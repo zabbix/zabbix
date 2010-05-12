@@ -22,45 +22,14 @@
 
 #include "zbxalgo.h"
 
-static int	is_prime(int n);
-static int	next_prime(int n);
-
-static void	__zbx_hashset_free_entry(zbx_hashset_t *hs, ZBX_HASHSET_ENTRY_T *entry);
+static void	__hashset_free_entry(zbx_hashset_t *hs, ZBX_HASHSET_ENTRY_T *entry);
 
 #define	CRIT_LOAD_FACTOR	4/5
 #define	SLOT_GROWTH_FACTOR	3/2
 
-/* helper functions */
-
-static int	is_prime(int n)
-{
-	int i;
-
-	if (n <= 1)
-		return 0;
-	if (n == 2)
-		return 1;
-	if (n % 2 == 0)
-		return 0;
-
-	for (i = 3; i * i <= n; i+=2)
-		if (n % i == 0)
-			return 0;
-
-	return 1;
-}
-
-static int	next_prime(int n)
-{
-	while (!is_prime(n))
-		n++;
-
-	return n;
-}
-
 /* private hashset functions */
 
-static void	__zbx_hashset_free_entry(zbx_hashset_t *hs, ZBX_HASHSET_ENTRY_T *entry)
+static void	__hashset_free_entry(zbx_hashset_t *hs, ZBX_HASHSET_ENTRY_T *entry)
 {
 	hs->mem_free_func(entry->data);
 	hs->mem_free_func(entry);
@@ -120,7 +89,7 @@ void	zbx_hashset_destroy(zbx_hashset_t *hs)
 		while (NULL != entry)
 		{
 			next_entry = entry->next;
-			__zbx_hashset_free_entry(hs, entry);
+			__hashset_free_entry(hs, entry);
 			entry = next_entry;
 		}
 	}
@@ -263,7 +232,7 @@ void	zbx_hashset_remove(zbx_hashset_t *hs, const void *data)
 		if (entry->hash == hash && hs->compare_func(entry->data, data) == 0)
 		{
 			hs->slots[slot] = entry->next;
-			__zbx_hashset_free_entry(hs, entry);
+			__hashset_free_entry(hs, entry);
 			hs->num_data--;
 		}
 		else
@@ -278,7 +247,7 @@ void	zbx_hashset_remove(zbx_hashset_t *hs, const void *data)
 				if (entry->hash == hash && hs->compare_func(entry->data, data) == 0)
 				{
 					prev_entry->next = entry->next;
-					__zbx_hashset_free_entry(hs, entry);
+					__hashset_free_entry(hs, entry);
 					hs->num_data--;
 					break;
 				}
@@ -307,7 +276,7 @@ void	zbx_hashset_clear(zbx_hashset_t *hs)
 		{
 			entry = hs->slots[slot];
 			hs->slots[slot] = entry->next;
-			__zbx_hashset_free_entry(hs, entry);
+			__hashset_free_entry(hs, entry);
 		}
 	}
 

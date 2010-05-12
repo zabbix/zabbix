@@ -523,7 +523,7 @@ static int	get_values(int now)
 
 	DCinit_nextchecks();
 
-	num = DCconfig_get_poller_items(poller_type, poller_num, now, items, MAX_ITEMS);
+	num = DCconfig_get_poller_items(poller_type, now, items, MAX_ITEMS);
 
 	for (i = 0; i < num; i++)
 	{
@@ -708,7 +708,7 @@ static int	get_values(int now)
 void main_poller_loop(zbx_process_t p, int type, int num)
 {
 	struct	sigaction phan;
-	int	now, nextcheck, sleeptime, processed;
+	int	now, sleeptime, processed;
 	double	sec;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_poller_loop() poller_type:%d poller_num:%d", type, num);
@@ -724,7 +724,8 @@ void main_poller_loop(zbx_process_t p, int type, int num)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	for (;;) {
+	for (;;)
+	{
 		zbx_setproctitle("poller [getting values]");
 
 		now = time(NULL);
@@ -732,16 +733,8 @@ void main_poller_loop(zbx_process_t p, int type, int num)
 		processed = get_values(now);
 		sec = zbx_time() - sec;
 
-		if (FAIL == (nextcheck = DCconfig_get_poller_nextcheck(poller_type, poller_num, now)))
-			sleeptime = POLLER_DELAY;
-		else
-		{
-			sleeptime = nextcheck - time(NULL);
-			if (sleeptime < 0)
-				sleeptime = 0;
-			if (sleeptime > POLLER_DELAY)
-				sleeptime = POLLER_DELAY;
-		}
+		/* sleep only if there were no items to process */
+		sleeptime = (processed == 0 ? POLLER_DELAY : 0);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Poller #%d spent " ZBX_FS_DBL " seconds while updating %3d values."
 				" Sleeping for %d seconds", poller_num, sec, processed, sleeptime);

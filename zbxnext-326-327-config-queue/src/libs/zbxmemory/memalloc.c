@@ -604,6 +604,13 @@ void	zbx_mem_create(zbx_mem_info_t *info, key_t shm_key, int lock_name, size_t s
 	else
 		info->use_lock = 0;
 
+	if (ZBX_PTR_SIZE != 4 && ZBX_PTR_SIZE != 8)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Failed assumption about pointer size (%lu not in {4, 8}).",
+				ZBX_PTR_SIZE);
+		exit(FAIL);
+	}
+
 	/* prepare shared memory for further allocation by creating one big chunk */
 
 	info->orig_size = (uint32_t)size;

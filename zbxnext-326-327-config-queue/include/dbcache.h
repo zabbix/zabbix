@@ -36,7 +36,6 @@ extern int	CONFIG_TRENDS_CACHE_SIZE;
 extern int	CONFIG_TEXT_CACHE_SIZE;
 extern int	CONFIG_POLLER_FORKS;
 extern int	CONFIG_IPMIPOLLER_FORKS;
-extern int	CONFIG_UNREACHABLE_POLLER_FORKS;
 extern int	CONFIG_PINGER_FORKS;
 extern int	CONFIG_REFRESH_UNSUPPORTED;
 extern int	CONFIG_UNAVAILABLE_DELAY;
@@ -149,16 +148,12 @@ void	free_configuration_cache();
 int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid);
 int	DCconfig_get_item_by_key(DC_ITEM *item, zbx_uint64_t proxy_hostid, const char *hostname, const char *key);
 int	DCconfig_get_item_by_itemid(DC_ITEM *item, zbx_uint64_t itemid);
-int	DCconfig_get_poller_items(unsigned char poller_type, unsigned char poller_num, int now,
-		DC_ITEM *items, int max_items);
-int	DCconfig_get_poller_nextcheck(unsigned char poller_type, unsigned char poller_num, int now);
+int	DCconfig_get_poller_items(unsigned char poller_type, int now, DC_ITEM *items, int max_items);
 int	DCconfig_get_items(zbx_uint64_t hostid, const char *key, DC_ITEM **items);
 
 void	DCconfig_update_item(zbx_uint64_t itemid, unsigned char status, int now);
 int	DCconfig_activate_host(DC_ITEM *item);
 int	DCconfig_deactivate_host(DC_ITEM *item, int now);
-
-void	DCreset_item_nextcheck(zbx_uint64_t itemid);
 
 void	DCconfig_set_maintenance(zbx_uint64_t hostid, int maintenance_status,
 		int maintenance_type, int maintenance_from);
