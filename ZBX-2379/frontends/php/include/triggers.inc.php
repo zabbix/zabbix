@@ -1399,8 +1399,11 @@ return $result;
 		if(isset($expressionData[$expression]['errors'])) return null;
 		if(!is_array($expressionData[$expression]['expressions']) || !count($expressionData[$expression]['expressions'])) return $expression;
 		
+		$usedItems = Array();
+		
 		$cuted = 0;
 		foreach($expressionData[$expression]['expressions'] as &$macro) {
+			$itemStr = zbx_substr($expression, $macro['openSymbolNum'], $macro['closeSymbolNum']-$macro['openSymbolNum']+1);
 			unset($iData);
 //			SDII($macro);		
 			$iData =& $macro['indexes']['server'][0];
@@ -1445,18 +1448,21 @@ return $result;
 
 			$itemid = $item['itemid'];
 
-			$functionid = get_dbid('functions','functionid');
+			if(!isset($usedItems[$itemStr])) {
+				$functionid = get_dbid('functions','functionid');
 
-			$sql = 'insert into functions (functionid,itemid,triggerid,function,parameter)'.
-				' values ('.$functionid.','.$itemid.','.$triggerid.','.zbx_dbstr($function).','.
-				zbx_dbstr($functionParams).')';
-			if( !DBexecute($sql))
-			{
-				return	null;
+				$sql = 'insert into functions (functionid,itemid,triggerid,function,parameter)'.
+					' values ('.$functionid.','.$itemid.','.$triggerid.','.zbx_dbstr($function).','.
+					zbx_dbstr($functionParams).')';
+				if( !DBexecute($sql)) {
+					return	null;
+				}else {
+					$usedItems[$itemStr] = $functionid;
+				}
 			}
 //SDI("BEFORE: $expr");
-			$expr = zbx_substr($expr, 0, $macro['openSymbolNum']-$cuted).'{'.$functionid.'}'.zbx_substr($expr, $macro['closeSymbolNum']-$cuted+1);
-			$cuted += $macro['closeSymbolNum']-$macro['openSymbolNum']+1-zbx_strlen('{'.$functionid.'}');
+			$expr = zbx_substr($expr, 0, $macro['openSymbolNum']-$cuted).'{'.$usedItems[$itemStr].'}'.zbx_substr($expr, $macro['closeSymbolNum']-$cuted+1);
+			$cuted += $macro['closeSymbolNum']-$macro['openSymbolNum']+1-zbx_strlen('{'.$usedItems[$itemStr].'}');
 //SDI("AFTER: $expr");
 		}
 //		SDI($expr);
@@ -1972,6 +1978,7 @@ return $result;
 		if(is_null($expression)){
 			/* Restore expression */
 			$expression = explode_exp($trigger['expression'],0);
+			$expressionData = parseTriggerExpressions($expression, true);
 		}else if(!isset($expressionData[$expression]['errors']) && $expression != explode_exp($trigger['expression'],0)){
 			$event_to_unknown = true;
 		}
@@ -4103,7 +4110,8 @@ $triggerExpressionRules['independent'] = Array(
 	'notAllowedSymbols' => Array(
 					"[.\/*+<>#=&|\-]{2,}",
 					"[ .]{2,}",
-					"(^\.|\.$)"
+					"(^\.|\.$)",
+					"\.\d+\."
 				),
 	'customValidate' => 'triggerExpressionValidateGroup',
 	'ignorSymbols' => ' +');
@@ -4114,7 +4122,8 @@ $triggerExpressionRules['grouping'] = Array(
 	'notAllowedSymbols' => Array(
 					"[.\/*+<>#=&|\-]{2,}",
 					"[ .]{2,}",
-					"(^\.|\.$)"
+					"(^\.|\.$)",
+					"\.\d+\."
 				),
 	'customValidate' => 'triggerExpressionValidateGroup',
 	'ignorSymbols' => ' +',
