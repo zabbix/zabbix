@@ -724,6 +724,30 @@ void main_poller_loop(zbx_process_t p, int type, int num)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
+/*	{
+		int	i;
+
+//zabbix_set_log_level(LOG_LEVEL_DEBUG);
+		DBbegin();
+		for (i = 0; i < 1000000; i++)
+		{
+			int	j;
+
+			for (j = 0; j < num * 1000; j++)
+				;
+			
+			DBget_maxid("events");
+			
+			if (0 != i && (i % 50) == 0)
+			{
+				DBcommit();
+				DBbegin();
+			}
+		}
+		DBcommit();
+//zabbix_set_log_level(LOG_LEVEL_CRIT);
+	}*/
+
 	for (;;) {
 		zbx_setproctitle("poller [getting values]");
 
