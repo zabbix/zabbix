@@ -636,9 +636,8 @@ class CEvent extends CZBXAPI{
 						' AND objectid = '.$event['objectid'].
 						' AND value = '.$val.
 						' AND object = '.EVENT_OBJECT_TRIGGER.
-						' ORDER BY object desc, objectid desc, eventid DESC'.
-						' LIMIT 1';
-					$first = DBfetch(DBselect($sql));
+						' ORDER BY object desc, objectid desc, eventid DESC';
+					$first = DBfetch(DBselect($sql, 1));
 					$first_sql = $first ? ' AND e.eventid > '.$first['eventid'] : '';
 
 
@@ -648,9 +647,8 @@ class CEvent extends CZBXAPI{
 						' AND objectid = '.$event['objectid'].
 						' AND value = '.$val.
 						' AND object = '.EVENT_OBJECT_TRIGGER.
-						' ORDER BY object ASC, objectid ASC, eventid ASC'.
-						' LIMIT 1';
-					$last = DBfetch(DBselect($sql));
+						' ORDER BY object ASC, objectid ASC, eventid ASC';
+					$last = DBfetch(DBselect($sql, 1));
 					$last_sql = $last ? ' AND e.eventid < '.$last['eventid'] : '';
 
 					
