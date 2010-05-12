@@ -2716,8 +2716,6 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 		exit(-1);
 	}
 
-	zabbix_log(LOG_LEVEL_CRIT, "added ids record [%d]:'%s'", i, table_name);
-
 	zbx_strlcpy(id->table_name, table_name, sizeof(id->table_name));
 
 	table = DBget_table(table_name);
@@ -2775,16 +2773,16 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
  ******************************************************************************/
 zbx_uint64_t	DCget_nextid_shared(const char *table_name)
 {
-#define ZBX_RESERVE	100
+#define ZBX_RESERVE	256
 	const char	*__function_name = "DCget_nextid_shared";
 	int		i;
 	ZBX_DC_ID	*id;
 	zbx_uint64_t	nextid;
 
-	LOCK_CACHE_IDS;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s'",
 			__function_name, table_name);
+
+	LOCK_CACHE_IDS;
 
 	for (i = 0; i < ZBX_IDS_SIZE; i++)
 	{
@@ -2792,8 +2790,6 @@ zbx_uint64_t	DCget_nextid_shared(const char *table_name)
 
 		if ('\0' == *id->table_name)
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "added ids record [%d]:'%s'", i, table_name);
-
 			zbx_strlcpy(id->table_name, table_name, sizeof(id->table_name));
 			id->lastid = 0;
 			id->reserved = 0;
@@ -2818,10 +2814,10 @@ zbx_uint64_t	DCget_nextid_shared(const char *table_name)
 
 		nextid = id->lastid;
 
+		UNLOCK_CACHE_IDS;
+
 		zabbix_log(LOG_LEVEL_DEBUG, "End of %s() table:'%s' [" ZBX_FS_UI64 "]",
 				__function_name, table_name, nextid);
-
-		UNLOCK_CACHE_IDS;
 
 		return nextid;
 	}
@@ -2832,41 +2828,30 @@ zbx_uint64_t	DCget_nextid_shared(const char *table_name)
 
 	LOCK_CACHE_IDS;
 
-	zabbix_log(LOG_LEVEL_CRIT, "DB: [" ZBX_FS_UI64 ":%d]", nextid, ZBX_RESERVE);
-	zabbix_log(LOG_LEVEL_CRIT, "DC: [" ZBX_FS_UI64 ":%d]", id->lastid, id->reserved);
-
 	if (0 == id->reserved)
 	{
 		id->lastid = nextid;
 		id->reserved = ZBX_RESERVE;
-		zabbix_log(LOG_LEVEL_CRIT, "{1} reserved records");
 	}
 	else if (id->lastid + id->reserved == nextid)
 	{
 		id->reserved += ZBX_RESERVE;
-		zabbix_log(LOG_LEVEL_CRIT, "{2} reserved records");
 	}
 	else if (id->reserved < ZBX_RESERVE && nextid > id->lastid)
 	{
 		id->lastid = nextid;
 		id->reserved = ZBX_RESERVE;
-		zabbix_log(LOG_LEVEL_CRIT, "{3} overwrited records");
 	}
-	else
-		zabbix_log(LOG_LEVEL_CRIT, "{4} skipped records");
-
-	zabbix_log(LOG_LEVEL_CRIT, "DC: [" ZBX_FS_UI64 ":%d]", id->lastid, id->reserved);
-	zabbix_log(LOG_LEVEL_CRIT, "------------------------------------------");
 
 	id->lastid++;
 	id->reserved--;
 
 	nextid = id->lastid;
 
+	UNLOCK_CACHE_IDS;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() table:'%s' [" ZBX_FS_UI64 "]",
 			__function_name, table_name, nextid);
-
-	UNLOCK_CACHE_IDS;
 
 	return nextid;
 }
