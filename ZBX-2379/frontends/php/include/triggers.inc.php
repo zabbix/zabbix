@@ -3219,8 +3219,8 @@ return $result;
 				S_CHECK_EXPRESSION_PART_STARTING_FROM,
 				zbx_substr(
 					$expression, 
-					$errData['errStart'],
-					$errData['errEnd']-$errData['errStart']+1
+					$errData['errStart']//,
+					//$errData['errEnd']-$errData['errStart']+1
 				)
 			);
 
@@ -3237,6 +3237,14 @@ return $result;
 				case 7: error(S_EXPRESSION_NOT_ALLOWED_SYMBOLS_OR_SEQUENCE_ERROR.': '.$checkExprFrom); break;
 				case 8: error(S_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR.$checkExprFrom); break;
 				case 9: error(S_EXPRESSION_HOST_KEY_DOES_NOT_ERROR.$checkExprFrom); break;
+				case 10:
+					info(S_FUNCTION.' ('.$errData['function'].') '.S_AVAILABLE_ONLY_FOR_ITEMS_WITH_VALUE_TYPES_SMALL.' ['.implode(',',$errData['validTypes']).']');
+					error(S_INCORRECT_VALUE_TYPE.' ['.item_value_type2str($errData['value_type']).'] '.S_FOR_FUNCTION_SMALL.' ('.$errData['function'].'). '.$checkExprFrom);
+				break;
+				case 11: error(S_MISSING_MANDATORY_PARAMETER_FOR_FUNCTION.' ('.$errData['function'].'). '.$checkExprFrom); break;
+				case 12: error('['.$errData['errValue'].'] '.S_NOT_FLOAT_OR_MACRO_FOR_FUNCTION_SMALL.' ('.$errData['function'].'). '.$checkExprFrom); break;
+				case 13: error('['.$errData['errValue'].'] '.S_NOT_FLOAT_OR_MACRO_OR_COUNTER_FOR_FUNCTION_SMALL.' ('.$errData['function'].'). '.$checkExprFrom); break;
+				case 14: error(sprintf(S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR, $errData['function']).' '.$checkExprFrom); break;
 			}
 			if($totalBreak) break;
 		}
@@ -4222,6 +4230,7 @@ $triggerExpressionRules['key'] = Array(
 	'openSymbol' => ':',
 	'closeSymbol' => ')',
 	'isEmpty' => true,
+	'levelIndex' => true,
 	'customValidate' => 'triggerExpressionValidateItemKey',
 	'parent' => 'expression');
 $triggerExpressionRules['keyName'] = Array(
@@ -4245,6 +4254,7 @@ $triggerExpressionRules['keyFunction'] = Array(
 	'openSymbol' => '.',
 	'closeSymbol' => ')',
 	'isEmpty' => true,
+	'customValidate' => 'triggerExpressionValidateItemKeyFunction',
 	'parent' => 'key');
 $triggerExpressionRules['keyFunctionName'] = Array(
 	'openSymbol' => '.',
@@ -4279,6 +4289,7 @@ $triggerExpressionRules['keyFunctionParams'] = Array(
 	'closeSymbol' => ')',
 	'isEmpty' => true,
 	'indexItem' => true,
+	'customValidate' => 'triggerExpressionValidateItemKeyFunctionParams',
 	'parent' => 'keyFunction');
 $triggerExpressionRules['keyFunctionParam'] = Array(
 	'openSymbol' => Array('(' => 'default', ',' => 'default'),

@@ -776,26 +776,25 @@ function triggerExpressionValidateHost(&$parent, &$levelData, $index, &$expressi
 					'errEnd' => $levelData['closeSymbolNum'],
 					'errValues' => Array($host))
 				);
+	}else{
+		$levelData['levelDBData']['hostid'] = $hostId;
 	}
 }
 
 function triggerExpressionValidateItemKey(&$parent, &$levelData, $index, &$expression, &$rules) {
-	$host = zbx_substr($expression, $parent['openSymbolNum']+1, $parent['closeSymbolNum']-($parent['openSymbolNum']+1));
-	$kData =& $parent['indexes']['keys'][0];
+	$kData =& $parent['indexes']['keyName'][0];
 	$keyName = zbx_substr($expression, $kData['openSymbolNum']+zbx_strlen($kData['openSymbol']), $kData['closeSymbolNum']-$kData['openSymbolNum']-zbx_strlen($kData['closeSymbol']));
-	$kpData =& $parent['indexes']['keysParams'][0];
-	$keyParams = isset($parent['indexes']['keysParams']) && count($parent['indexes']['keysParams']) > 0 ? zbx_substr($expression, $kpData['openSymbolNum'], $kpData['closeSymbolNum']-$kpData['openSymbolNum']+zbx_strlen($kpData['closeSymbol'])) : '';
-	
-	$hostFound = CHost::get(Array('filter' => Array('host' => $host), 'templated_hosts' => true));
-	
-	if(count($hostFound) > 0) {
-		$hostFound = array_shift($hostFound);
-		if(isset($hostFound['hostid']) && $hostFound['hostid'] > 0) $hostId = $hostFound['hostid'];
+	$kpData =& $parent['indexes']['keyParams'][0];
+	$keyParams = isset($parent['indexes']['keyParams']) && count($parent['indexes']['keyParams']) > 0 ? zbx_substr($expression, $kpData['openSymbolNum'], $kpData['closeSymbolNum']-$kpData['openSymbolNum']+zbx_strlen($kpData['closeSymbol'])) : '';
+
+	$hData =& $parent['indexes']['server'][0];
+	if(isset($hData['levelDBData']) && $hData['levelDBData']['hostid'] > 0) {
+		$hostId = $hData['levelDBData']['hostid'];
 	}else{
 		return;
 	}
 	
-	$itemFound = CItem::get(Array('filter' => Array('hostid' => $hostId, 'key_' => $keyName.$keyParams)));
+	$itemFound = CItem::get(Array('filter' => Array('hostid' => $hostId, 'key_' => $keyName.$keyParams), 'output' => API_OUTPUT_EXTEND));
 	if(count($itemFound) > 0) {
 		$itemFound = array_shift($itemFound);
 		if(isset($itemFound['itemid']) && $itemFound['itemid'] > 0) $itemId = $itemFound['itemid'];
@@ -809,9 +808,136 @@ function triggerExpressionValidateItemKey(&$parent, &$levelData, $index, &$expre
 					'errorMsg' => 'Key of item host does not exists.'.$levelData['levelType'].'. Check expression starting from symbol #'.($levelData['openSymbolNum']+1).' up to symbol #'.$levelData['closeSymbolNum'].'.',
 					'errStart' => $levelData['openSymbolNum'],
 					'errEnd' => $levelData['closeSymbolNum'],
-					'errValues' => Array($item))
+					'errValues' => Array($keyName.$keyParams))
 				);
+	}else{
+		$levelData['levelDBData'] = $itemFound;
+		$levelData['levelDBData']['itemid'] = $itemId;
 	}
+}
+
+function triggerExpressionValidateItemKeyFunction(&$parent, &$levelData, $index, &$expression, &$rules) {
+	global $ZBX_TR_EXPR_ALLOWED_FUNCTIONS;
+	$fData =& $parent['indexes']['keyFunctionName'][0];
+	$function = zbx_substr($expression, $fData['openSymbolNum']+zbx_strlen($fData['openSymbol']), $fData['closeSymbolNum']-$fData['openSymbolNum']-zbx_strlen($fData['closeSymbol']));
+	$fnc_valid = &$ZBX_TR_EXPR_ALLOWED_FUNCTIONS[$function];
+	
+	if(is_array($fnc_valid['item_types']) && isset($parent['levelDBData']) &&
+		!uint_in_array($parent['levelDBData']['value_type'], $fnc_valid['item_types'])){
+		foreach($fnc_valid['item_types'] as $type)
+			$allowed_types[] = item_value_type2str($type);
+		return Array(
+				'valid' => false,
+				'errArray' => Array(
+					'errorCode' => 10,
+					'errorMsg' => 'Key of item host does not exists.'.$levelData['levelType'].'. Check expression starting from symbol #'.($levelData['openSymbolNum']+1).' up to symbol #'.$levelData['closeSymbolNum'].'.',
+					'errStart' => $levelData['openSymbolNum'],
+					'errEnd' => $levelData['closeSymbolNum'],
+					'errValues' => Array($function),
+					'validTypes' => $allowed_types,
+					'function' => $function,
+					'value_type' => $parent['levelDBData']['value_type'])
+				);
+	}else{
+		$levelData['levelDBData']['valid'] = $fnc_valid;
+		$levelData['levelDBData']['function'] = $function;
+	}
+		/*$allowed_types = array();
+		foreach($fnc_valid['item_types'] as $type)
+			$allowed_types[] = item_value_type2str($type);
+		info(S_FUNCTION.' ('.$function.') '.S_AVAILABLE_ONLY_FOR_ITEMS_WITH_VALUE_TYPES_SMALL.' ['.implode(',',$allowed_types).']');
+		error(S_INCORRECT_VALUE_TYPE.' ['.item_value_type2str($item['value_type']).'] '.S_FOR_FUNCTION_SMALL.' ('.$function.') '.S_OF_KEY_SMALL.' ('.$host.':'.$key.')');
+		return false;*/
+	//$kpData =& $parent['indexes']['keyFunctionParams'][0];
+	//$keyParams = isset($parent['indexes']['keyFunctionParams']) && count($parent['indexes']['keyFunctionParams']) > 0 ? zbx_substr($expression, $kpData['openSymbolNum'], $kpData['closeSymbolNum']-$kpData['openSymbolNum']+zbx_strlen($kpData['closeSymbol'])) : '';
+}
+
+function triggerExpressionValidateItemKeyFunctionParams(&$parent, &$levelData, $index, &$expression, &$rules) {
+	//$fpData =& $parent['indexes']['keyFunctionParams'][0];
+	$functionParams = zbx_substr($expression, $levelData['openSymbolNum'], $levelData['closeSymbolNum']-$levelData['openSymbolNum']+zbx_strlen($levelData['closeSymbol']));
+	$fnc_valid =& $parent['levelDBData']['valid'];
+	if(!is_null($fnc_valid['args'])){
+		$parameter = Array();
+		if(isset($levelData['parts']) && is_array($levelData['parts']) && count($levelData['parts']) > 0) {
+			foreach($levelData['parts'] as $param) {
+				if(isset($param['parts']) && is_array($param['parts']) && count($param['parts']) > 0) {
+					$quoted =& $param['parts'][0];
+					$parameter[] = zbx_substr($expression, $quoted['openSymbolNum']+zbx_strlen($quoted['openSymbol']), $quoted['closeSymbolNum']-($quoted['openSymbolNum']+zbx_strlen($quoted['openSymbol'])));
+				}else {
+					$parameter[] = zbx_substr($expression, $param['openSymbolNum']+zbx_strlen($param['openSymbol']), $param['closeSymbolNum']-($param['openSymbolNum']+zbx_strlen($param['openSymbol'])));
+				}
+			}
+		}
+//		SDII($parameter);
+		
+		if(!is_array($fnc_valid['args']))  $fnc_valid['args'] = array($fnc_valid['args']);
+		
+		foreach($fnc_valid['args'] as $pid => $params){
+			if(!isset($parameter[$pid]) || !$parameter[$pid]){
+				if( !isset($params['mandat']) ){
+					continue;
+				}else{
+					//error(S_MISSING_MANDATORY_PARAMETER_FOR_FUNCTION.' ('.$function.')');
+					//return false;
+					return Array(
+							'valid' => false,
+							'errArray' => Array(
+								'errorCode' => 11,
+								'errorMsg' => 'Used function missing required parametrs '.$levelData['levelType'].'. Check expression starting from symbol #'.($levelData['openSymbolNum']+1).' up to symbol #'.$levelData['closeSymbolNum'].'.',
+								'errStart' => $levelData['openSymbolNum'],
+								'errEnd' => $levelData['closeSymbolNum'],
+								'errValues' => Array($functionParams),
+								'function' => isset($parent['levelDBData']['function']) ? $parent['levelDBData']['function'] : '',
+								'value_type' => isset($parent['levelDBData']['value_type']) ? $parent['levelDBData']['value_type'] : '')
+							);
+				}
+			}
+			
+			if(preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $parameter[$pid])) continue;
+			
+			if(('sec' == $params['type']) && (validate_float($parameter[$pid])!=0) ){
+				//error('['.$parameter[$pid].'] '.S_NOT_FLOAT_OR_MACRO_FOR_FUNCTION_SMALL.' ('.$function.')');
+				//return false;
+				 return Array(
+				 		'valid' => false,
+				 		'errArray' => Array(
+				 			'errorCode' => 12,
+							'errorMsg' => $parameter[$pid].' is not float or not a macro for function '.$parent['levelDBData']['function'].' '.$levelData['levelType'].'. Check expression starting from symbol #'.($levelData['openSymbolNum']+1).' up to symbol #'.$levelData['closeSymbolNum'].'.',
+							'errStart' => $levelData['openSymbolNum'],
+							'errEnd' => $levelData['closeSymbolNum'],
+							'errValue' => $parameter[$pid],
+							'function' => isset($parent['levelDBData']['function']) ? $parent['levelDBData']['function'] : '')
+						);
+			}
+			
+			if(('sec_num' == $params['type']) && (validate_ticks($parameter[$pid])!=0) ){
+				//error('['.$parameter[$pid].'] '.S_NOT_FLOAT_OR_MACRO_OR_COUNTER_FOR_FUNCTION_SMALL.' ('.$function.')');
+				//return false;
+				return Array(
+						'valid' => false,
+						'errArray' => Array(
+							'errorCode' => 13,
+							'errorMsg' => $parameter[$pid].' is not float or not a macro or not a counter for function '.$parent['levelDBData']['function'].' '.$levelData['levelType'].'. Check expression starting from symbol #'.($levelData['openSymbolNum']+1).' up to symbol #'.$levelData['closeSymbolNum'].'.',
+							'errStart' => $levelData['openSymbolNum'],
+							'errEnd' => $levelData['closeSymbolNum'],
+							'errValue' => $parameter[$pid],
+							'function' => isset($parent['levelDBData']['function']) ? $parent['levelDBData']['function'] : '')
+						);
+			}
+		}
+	}/*else if(is_null($fnc_valid['args']) && isset($levelData['parts']) && count($levelData['parts']) > 1) {
+		return Array(
+				'valid' => false,
+				'errArray' => Array(
+					'errorCode' => 14,
+					'errorMsg' => 'Used function does not accept params.'.$levelData['levelType'].'. Check expression starting from symbol #'.($levelData['openSymbolNum']+1).' up to symbol #'.$levelData['closeSymbolNum'].'.',
+					'errStart' => $levelData['openSymbolNum'],
+					'errEnd' => $levelData['closeSymbolNum'],
+					'errValues' => Array($functionParams),
+					'function' => isset($parent['levelDBData']['function']) ? $parent['levelDBData']['function'] : '',
+					'value_type' => isset($parent['levelDBData']['value_type']) ? $parent['levelDBData']['value_type'] : '')
+				);
+	}*/
 }
 
 ?>
