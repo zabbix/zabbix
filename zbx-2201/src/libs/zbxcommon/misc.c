@@ -173,9 +173,9 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...)
  *        !!! Don't forget to sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
-int	check_time_period(char *period, time_t now)
+int	check_time_period(const char *period, time_t now)
 {
-	char		*s, *c = NULL;
+	const char	*s, *delim;
 	int		d1, d2, h1, h2, m1, m2, flag;
 	int		day, sec;
 	struct tm	*tm;
@@ -194,8 +194,7 @@ int	check_time_period(char *period, time_t now)
 
 	for (s = period; '\0' != *s;)
 	{
-		if (NULL != (c = strchr(s, ';')))
-			*c = '\0';
+		delim = strchr(s, ';');
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Period [%s]", s);
 
@@ -220,17 +219,13 @@ int	check_time_period(char *period, time_t now)
 			}
 		}
 
-		if (NULL != c)
+		if (NULL != delim)
 		{
-			*c = ';';
-			s = c + 1;
+			s = delim + 1;
 		}
 		else
 			break;
 	}
-
-	if (NULL != c)
-		*c = ';';
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of check_time_period():%s", ret == 1 ? "SUCCEED" : "FAIL");
 
@@ -254,23 +249,22 @@ int	check_time_period(char *period, time_t now)
  * Author: Alexei Vladishev, Alexander Vladishev, Aleksandrs Saveljevs        *
  *                                                                            *
  ******************************************************************************/
-static int	get_current_delay(int delay, char *flex_intervals, time_t now)
+static int	get_current_delay(int delay, const char *flex_intervals, time_t now)
 {
-	char	*s, *c;
-	char	flex_period[30];
-	int	flex_delay, current_delay = SEC_PER_YEAR;
+	const char	*s, *delim;
+	char		flex_period[30];
+	int		flex_delay, current_delay = SEC_PER_YEAR;
 
 	if (NULL == flex_intervals || '\0' == *flex_intervals)
 		return delay;
 
-	for (s = flex_intervals; '\0' != *s; s = c + 1)
+	for (s = flex_intervals; '\0' != *s; s = delim + 1)
 	{
-		if (NULL != (c = strchr(s, ';')))
-			*c = '\0';
+		delim = strchr(s, ';');
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Delay period [%s]", s);
 
-		if (2 == sscanf(s, "%d/%29s", &flex_delay, flex_period))
+		if (2 == sscanf(s, "%d/%29[^;]s", &flex_delay, flex_period))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%d sec at %s", flex_delay, flex_period);
 			
@@ -280,9 +274,7 @@ static int	get_current_delay(int delay, char *flex_intervals, time_t now)
 		else
 			zabbix_log(LOG_LEVEL_ERR, "Delay period format is wrong [%s]", s);
 
-		if (NULL != c)
-			*c = ';';
-		else
+		if (NULL == delim)
 			break;
 	}
 	
@@ -309,9 +301,9 @@ static int	get_current_delay(int delay, char *flex_intervals, time_t now)
  * Author: Alexei Vladishev, Alexander Vladishev, Aleksandrs Saveljevs        *
  *                                                                            *
  ******************************************************************************/
-static int	get_next_delay_interval(char *flex_intervals, time_t now, time_t *next_interval)
+static int	get_next_delay_interval(const char *flex_intervals, time_t now, time_t *next_interval)
 {
-	char		*s, *c = NULL;
+	const char	*s, *delim;
 	struct tm	*tm;
 	int		day, sec, sec1, sec2, delay, d1, d2, h1, h2, m1, m2, flag;
 	time_t		next = 0;
@@ -325,8 +317,7 @@ static int	get_next_delay_interval(char *flex_intervals, time_t now, time_t *nex
 
 	for (s = flex_intervals; '\0' != *s;)
 	{
-		if (NULL != (c = strchr(s, ';')))
-			*c = '\0';
+		delim = strchr(s, ';');
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Delay period [%s]", s);
 
@@ -391,10 +382,9 @@ static int	get_next_delay_interval(char *flex_intervals, time_t now, time_t *nex
 			}
 		}
 
-		if (NULL != c)
+		if (NULL != delim)
 		{
-			*c = ';';
-			s = c + 1;
+			s = delim + 1;
 		}
 		else
 			break;
@@ -429,7 +419,7 @@ static int	get_next_delay_interval(char *flex_intervals, time_t now, time_t *nex
  *           !!! Don't forget to sync code with PHP !!!                       *
  *                                                                            *
  ******************************************************************************/
-int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, char *flex_intervals, time_t now)
+int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, const char *flex_intervals, time_t now)
 {
 	int	nextcheck;
 

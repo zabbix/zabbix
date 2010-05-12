@@ -1720,8 +1720,8 @@ return $result;
 	}
 
 	function expand_trigger_description($triggerid){
-		$description=expand_trigger_description_simple($triggerid);
-		$description=htmlspecialchars($description);
+		$description = expand_trigger_description_simple($triggerid);
+		$description = htmlspecialchars($description);
 	return $description;
 	}
 
