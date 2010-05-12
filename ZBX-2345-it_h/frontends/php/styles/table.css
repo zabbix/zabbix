@@ -369,6 +369,9 @@ table.screen_view tr td.right_mdl {	text-align: right;	vertical-align: middle;		
 table.screen_view tr td.right_bttm {	text-align: right;	vertical-align: bottom;		}
 
 /*************** Table Tree **************/
+
+
+
 table.tabletree .treeheader{
 	border: 1px #000000 solid;
 	background-color: #CCCCCC;
@@ -389,7 +392,7 @@ table.tabletree tr.treeheader td {
 	vertical-align:middle;
 }
 
-table.tabletree .imgnode:hover{
+.imgnode:hover{
 	cursor: pointer;
 }
 
@@ -477,7 +480,6 @@ table.tableinfo tr.header td {
 	font-weight: bold;
 	background-color:#CCCCCC;
 	border-width: 0px;
-	text-align: center;
 }
 
 table.tableinfo tr.header td.hover_grey {

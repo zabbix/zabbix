@@ -78,17 +78,17 @@ class CTree{
 	}
 
 	private function simpleHTML(){
-		$table = new CTable('','tableinfo');
+		$table = new CTableInfo();
 
-		$table->setCellSpacing(0);
-		$table->setCellPadding(0);
+		// $table->setCellSpacing(0);
+		// $table->setCellPadding(0);
 
-		$table->setOddRowClass('odd_row');
-		$table->setEvenRowClass('even_row');
-		$table->headerClass = 'header';
-		$table->footerClass = 'footer';
+		// $table->setOddRowClass('odd_row');
+		// $table->setEvenRowClass('even_row');
+		// $table->headerClass = 'header';
+		// $table->footerClass = 'footer';
 
-		$table->setAttribute('valign','top');
+		// $table->setAttribute('valign','top');
 		$table->addRow($this->makeHeaders());
 
 		foreach($this->tree as $id => $rows){
@@ -100,16 +100,13 @@ class CTree{
 	private function makeRow($id){
 
 		$table = new CTable();
-		$table->setCellSpacing(0);
-		$table->setCellPadding(0);
-		$table->setAttribute('border','0');
-		$table->setAttribute('height','100%');
+		// $table->setCellSpacing(0);
+		// $table->setCellPadding(0);
+		// $table->setAttribute('border','0');
+		// $table->setAttribute('height','100%');
 
 		$tr = $this->makeSImgStr($id);
-
-		$td = new CCol($this->tree[$id]['caption']);
-		$td->setAttribute('style','height: 100%; vertical-align: top; white-space: normal; padding-right: 10px; padding-left: 2px;');
-		$tr->addItem($td);
+		$tr->addItem($this->tree[$id]['caption']);
 
 		$table->addRow($tr);
 
@@ -120,9 +117,7 @@ class CTree{
 
 
 		foreach($this->fields as $key => $value){
-			$td = new CCol($this->tree[$id][$value]);
-			$td->setAttribute('style',' padding-right: 10px; padding-left: 2px;');
-			$tr->addItem($td);
+			$tr->addItem(new CCol($this->tree[$id][$value]));
 		}
 
 	return $tr;
@@ -130,10 +125,10 @@ class CTree{
 
 	private function makeSImgStr($id){
 		$tr = new CRow();
-		$td = new CCol();
 
 		$count=(isset($this->tree[$id]['nodeimg']))?(zbx_strlen($this->tree[$id]['nodeimg'])):(0);
 		for($i=0; $i<$count; $i++){
+			$td = new CCol();
 			switch($this->tree[$id]['nodeimg'][$i]){
 				case 'O':
 					$td->setAttribute('style','width: 22px');
@@ -186,8 +181,6 @@ class CTree{
 			}
 			$td->addItem($img);
 			$tr->addItem($td);
-
-			$td = new CCol();
 		}
 	//	echo $txt.' '.$this->tree[$id]['Name'].'<br />';
 	return $tr;
