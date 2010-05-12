@@ -990,13 +990,12 @@ double	DBget_requiredperformance(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "In DBget_requiredperformance()");
 
 	/* !!! Don't forget sync code with PHP !!! */
-	result = DBselect("select i.type,i.delay,count(*)/i.delay from hosts h,items i"
-			" where h.hostid=i.hostid and h.status=%d and i.status=%d"
-			" group by i.type,i.delay",
+	result = DBselect("select sum(1.0/i.delay) from hosts h,items i"
+			" where h.hostid=i.hostid and h.status=%d and i.status=%d and i.delay<>0",
 			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE);
-	while (NULL != (row = DBfetch(result)))
-		qps_total += atof(row[2]);
+	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
+		qps_total += atof(row[0]);
 	DBfree_result(result);
 
 	return qps_total;
