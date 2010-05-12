@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBX-2276] fixed dashboard discovery status header (Aly)
  - [ZBX-2377] fixed converting html special chars in graphs legend (Aly)
  - [ZBX-2311] fixed Host group empty value selection for items filtering (Aly)
  - [ZBXNEXT-313] implemented string pool for configuration cache (asaveljevs)
