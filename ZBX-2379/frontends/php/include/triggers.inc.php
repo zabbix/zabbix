@@ -3228,6 +3228,8 @@ return $result;
 				case 5: error(S_EXPRESSION_NOT_ALLOWED_SYMBOLS_AFTER_ERROR.': '.$checkExprFrom); break;
 				case 6: error(S_EXPRESSION_NOT_ALLOWED_VALUE_IN_ELEMENT_ERROR.': '.$checkExprFrom); break;
 				case 7: error(S_EXPRESSION_NOT_ALLOWED_SYMBOLS_OR_SEQUENCE_ERROR.': '.$checkExprFrom); break;
+				case 8: error(S_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR.$checkExprFrom); break;
+				case 9: error(S_EXPRESSION_HOST_KEY_DOES_NOT_ERROR.$checkExprFrom); break;
 			}
 			if($totalBreak) break;
 		}
@@ -3893,7 +3895,7 @@ return $result;
 					$fData =& $expData[$expr]['keysFunctions'][0];
 					$host = zbx_substr($expr, $hData['openSymbolNum']+zbx_strlen($hData['openSymbol']), $hData['closeSymbolNum']-$hData['openSymbolNum']-zbx_strlen($hData['closeSymbol']));
 					$hostKey = zbx_substr($expr, $kData['openSymbolNum']+zbx_strlen($kData['openSymbol']), $kData['closeSymbolNum']-$kData['openSymbolNum']-zbx_strlen($kData['closeSymbol']));
-					$hostKeyParams = zbx_substr($expr, $kpData['openSymbolNum'], $kpData['closeSymbolNum']-$kpData['openSymbolNum']+zbx_strlen($kpData['closeSymbol']));
+					$hostKeyParams = isset($expData[$expr]['keysParams']) && count($expData[$expr]['keysParams']) > 0 ? zbx_substr($expr, $kpData['openSymbolNum'], $kpData['closeSymbolNum']-$kpData['openSymbolNum']+zbx_strlen($kpData['closeSymbol'])) : '';
 					$function = zbx_substr($expr, $fData['openSymbolNum']+zbx_strlen($fData['openSymbol']), $fData['closeSymbolNum']-$fData['openSymbolNum']-zbx_strlen($fData['closeSymbol']));
 
 					//SDI($host);
@@ -4205,11 +4207,13 @@ $triggerExpressionRules['server'] = Array(
 	'closeSymbol' => ':',
 	'allowedSymbols' => '[0-9a-zA-Z_\. \-]+',
 	'indexItem' => true,
+	'customValidate' => 'triggerExpressionValidateHost',
 	'parent' => 'expression');
 $triggerExpressionRules['key'] = Array(
 	'openSymbol' => ':',
 	'closeSymbol' => ')',
 	'isEmpty' => true,
+	'customValidate' => 'triggerExpressionValidateItemKey',
 	'parent' => 'expression');
 $triggerExpressionRules['keyName'] = Array(
 	'openSymbol' => ':',

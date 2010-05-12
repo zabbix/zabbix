@@ -2149,6 +2149,8 @@
 	'S_SPECIFY_THE_CONDITIONAL_EXPR_FOR_THE_TARGET'=>	'Specify the conditional expression for the target.',
 	'S_0_OR_1'=>						'0 or 1',
 	'S_TRIGGER_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR'=>	'There is no macros with host in trigger expression. Required at least one macros with host.',
+	'S_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR'=>		'Host does not exists.',
+	'S_EXPRESSION_HOST_KEY_DOES_NOT_ERROR'=>		'Host key does not exists.',
 
 //	page_footer.php
 	'S_TRANSACTION_HAVE_NOT_BEEN_CLOSED_ABORTING'=>	'Transaction has not been closed. Aborting..',

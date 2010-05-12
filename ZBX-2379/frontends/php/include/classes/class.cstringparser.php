@@ -743,18 +743,75 @@ function triggerExpressionValidateGroup(&$parent, &$levelData, $index, &$express
 	if(preg_match("/(^[\/*<>#=&|]+|[\/*+<>#=&|\-]+$)/", $values, $errValues)) {
 		//echo "\t\t\t-----ERROR!-----\n";
 		return Array(
-					'valid' => false,
-					'errArray' => Array(
-						'errorCode' => 7,
-						'errorMsg' => 'Not allowed symbols or sequence of symbols detected at the beginnig or at the end of '.$levelData['levelType'].'. Check expression starting from symbol #'.($levelData['openSymbolNum']+1).' up to symbol #'.$levelData['closeSymbolNum'].'.',
-						'errStart' => $levelData['openSymbolNum'],
-						'errEnd' => $levelData['closeSymbolNum'],
-						'origVal' => mb_substr($expression, $levelData['openSymbolNum']+$openprepend, $levelData['closeSymbolNum']+$openpostend-($levelData['openSymbolNum']+$openprepend)+1),
-						'changedVal' => $values,
-						'errValues' => Array($errValues[0]))
-					);
+				'valid' => false,
+				'errArray' => Array(
+					'errorCode' => 7,
+					'errorMsg' => 'Not allowed symbols or sequence of symbols detected at the beginnig or at the end of '.$levelData['levelType'].'. Check expression starting from symbol #'.($levelData['openSymbolNum']+1).' up to symbol #'.$levelData['closeSymbolNum'].'.',
+					'errStart' => $levelData['openSymbolNum'],
+					'errEnd' => $levelData['closeSymbolNum'],
+					'origVal' => mb_substr($expression, $levelData['openSymbolNum']+$openprepend, $levelData['closeSymbolNum']+$openpostend-($levelData['openSymbolNum']+$openprepend)+1),
+					'changedVal' => $values,
+					'errValues' => Array($errValues[0]))
+				);
 	}
 	//echo "{$levelData['value']}:\n{$values}\n";
+}
+
+function triggerExpressionValidateHost(&$parent, &$levelData, $index, &$expression, &$rules) {
+	$host = zbx_substr($expression, $levelData['openSymbolNum']+1, $levelData['closeSymbolNum']-($levelData['openSymbolNum']+1));
+	
+	$hostFound = CHost::get(Array('filter' => Array('host' => $host), 'templated_hosts' => true));
+	if(count($hostFound) > 0) {
+		$hostFound = array_shift($hostFound);
+		if(isset($hostFound['hostid']) && $hostFound['hostid'] > 0) $hostId = $hostFound['hostid'];
+	}
+	
+	if(!isset($hostId)) {
+		return Array(
+				'valid' => false,
+				'errArray' => Array(
+					'errorCode' => 8,
+					'errorMsg' => 'Host of item does not exists.'.$levelData['levelType'].'. Check expression starting from symbol #'.($levelData['openSymbolNum']+1).' up to symbol #'.$levelData['closeSymbolNum'].'.',
+					'errStart' => $levelData['openSymbolNum'],
+					'errEnd' => $levelData['closeSymbolNum'],
+					'errValues' => Array($host))
+				);
+	}
+}
+
+function triggerExpressionValidateItemKey(&$parent, &$levelData, $index, &$expression, &$rules) {
+	$host = zbx_substr($expression, $parent['openSymbolNum']+1, $parent['closeSymbolNum']-($parent['openSymbolNum']+1));
+	$kData =& $parent['indexes']['keys'][0];
+	$keyName = zbx_substr($expression, $kData['openSymbolNum']+zbx_strlen($kData['openSymbol']), $kData['closeSymbolNum']-$kData['openSymbolNum']-zbx_strlen($kData['closeSymbol']));
+	$kpData =& $parent['indexes']['keysParams'][0];
+	$keyParams = isset($parent['indexes']['keysParams']) && count($parent['indexes']['keysParams']) > 0 ? zbx_substr($expression, $kpData['openSymbolNum'], $kpData['closeSymbolNum']-$kpData['openSymbolNum']+zbx_strlen($kpData['closeSymbol'])) : '';
+	
+	$hostFound = CHost::get(Array('filter' => Array('host' => $host), 'templated_hosts' => true));
+	
+	if(count($hostFound) > 0) {
+		$hostFound = array_shift($hostFound);
+		if(isset($hostFound['hostid']) && $hostFound['hostid'] > 0) $hostId = $hostFound['hostid'];
+	}else{
+		return;
+	}
+	
+	$itemFound = CItem::get(Array('filter' => Array('hostid' => $hostId, 'key_' => $keyName.$keyParams)));
+	if(count($itemFound) > 0) {
+		$itemFound = array_shift($itemFound);
+		if(isset($itemFound['itemid']) && $itemFound['itemid'] > 0) $itemId = $itemFound['itemid'];
+	}
+	
+	if(!isset($itemId)) {
+		return Array(
+				'valid' => false,
+				'errArray' => Array(
+					'errorCode' => 9,
+					'errorMsg' => 'Key of item host does not exists.'.$levelData['levelType'].'. Check expression starting from symbol #'.($levelData['openSymbolNum']+1).' up to symbol #'.$levelData['closeSymbolNum'].'.',
+					'errStart' => $levelData['openSymbolNum'],
+					'errEnd' => $levelData['closeSymbolNum'],
+					'errValues' => Array($item))
+				);
+	}
 }
 
 ?>
