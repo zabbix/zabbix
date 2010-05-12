@@ -564,6 +564,8 @@ return $result;
 	function get_hosts_by_expression($expression){
 		$expressionData = parseTriggerExpressions($expression, true);
 		
+		//SDI($expression);
+		
 		$hosts = array();
 		if(isset($expressionData[$expression]['hosts'])) {
 			foreach($expressionData[$expression]['hosts'] as &$hostData) {
@@ -574,13 +576,11 @@ return $result;
 		
 		//SDII($hosts);
 		
-		if(count($hosts) == 0) $hosts = Array('0');
-
 		$sql = 'SELECT DISTINCT * '.
 				' FROM hosts '.
 				' WHERE '.DBin_node('hostid', false).
 					' AND status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.') '.
-					' AND host IN ('.implode(',',$hosts).')';
+					' AND host IN ('.(count($hosts) > 0 ? implode(',',$hosts) : '\'!#\'').')';
 		//SDI($sql);
 		/*$myhosts = CHost::get(Array('output' => API_OUTPUT_EXTEND, 'filter' => Array('host' => $hosts)));
 		return $myhosts;*/
@@ -1967,15 +1967,15 @@ return $result;
 
 		$event_to_unknown = false;
 
+		$expressionData = parseTriggerExpressions($expression, true);
+
 		if(is_null($expression)){
 			/* Restore expression */
 			$expression = explode_exp($trigger['expression'],0);
-		}
-		else if($expression != explode_exp($trigger['expression'],0)){
+		}else if(!isset($expressionData[$expression]['errors']) && $expression != explode_exp($trigger['expression'],0)){
 			$event_to_unknown = true;
 		}
 
-		$expressionData = parseTriggerExpressions($expression, true);
 		if( isset($expressionData[$expression]['errors']) ) {
 			showExpressionErrors($expression, $expressionData[$expression]['errors']);
 			return false;
@@ -4097,15 +4097,23 @@ return $result;
 	}
 
 $triggerExpressionRules['independent'] = Array(
-	'allowedSymbols' => "[0-9 \/*+<>#=&|\-]+",
-	'notAllowedSymbols' => "[\/*+<>#=&|\-]{2,}",
+	'allowedSymbols' => "[0-9. \/*+<>#=&|\-]+",
+	'notAllowedSymbols' => Array(
+					"[.\/*+<>#=&|\-]{2,}",
+					"[ .]{2,}",
+					"(^\.|\.$)"
+				),
 	'customValidate' => 'triggerExpressionValidateGroup',
 	'ignorSymbols' => ' +');
 $triggerExpressionRules['grouping'] = Array(
 	'openSymbol' => '(',
 	'closeSymbol' => ')',
-	'allowedSymbols' => "[0-9 \/*+<>#=&|\-]+",
-	'notAllowedSymbols' => "[\/*+<>#=&|\-]{2,}",
+	'allowedSymbols' => "[0-9. \/*+<>#=&|\-]+",
+	'notAllowedSymbols' => Array(
+					"[.\/*+<>#=&|\-]{2,}",
+					"[ .]{2,}",
+					"(^\.|\.$)"
+				),
 	'customValidate' => 'triggerExpressionValidateGroup',
 	'ignorSymbols' => ' +',
 	'parent' => Array('independent', 'grouping'));
