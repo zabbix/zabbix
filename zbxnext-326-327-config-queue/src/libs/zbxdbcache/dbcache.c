@@ -1993,6 +1993,7 @@ int	DCsync_history(int sync_type)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Syncing history data...");
 		now = time(NULL);
+		cache->itemids_num = 0;
 	}
 
 	if (0 == cache->history_num)

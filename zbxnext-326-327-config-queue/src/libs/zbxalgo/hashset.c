@@ -144,34 +144,33 @@ void	*zbx_hashset_insert(zbx_hashset_t *hs, const void *data, size_t size)
 		if (hs->num_data >= hs->num_slots * CRIT_LOAD_FACTOR)
 		{
 			int			inc_slots, new_slot;
-			ZBX_HASHSET_ENTRY_T	**new_slots, **prev_next, *tmp;
+			ZBX_HASHSET_ENTRY_T	**prev_next, *curr_entry, *tmp;
 
 			inc_slots = next_prime(hs->num_slots * SLOT_GROWTH_FACTOR);
 
 			hs->slots = hs->mem_realloc_func(hs->slots, inc_slots * sizeof(ZBX_HASHSET_ENTRY_T *));
-			new_slots = hs->slots + hs->num_slots * sizeof(ZBX_HASHSET_ENTRY_T *);
-			memset(new_slots, 0, (inc_slots - hs->num_slots) * sizeof(ZBX_HASHSET_ENTRY_T *));
+			memset(hs->slots + hs->num_slots, 0, (inc_slots - hs->num_slots) * sizeof(ZBX_HASHSET_ENTRY_T *));
 
 			for (slot = 0; slot < hs->num_slots; slot++)
 			{
 				prev_next = &hs->slots[slot];
-				entry = hs->slots[slot];
+				curr_entry = hs->slots[slot];
 
-				while (NULL != entry)
+				while (NULL != curr_entry)
 				{
-					if (slot != (new_slot = entry->hash % inc_slots))
+					if (slot != (new_slot = curr_entry->hash % inc_slots))
 					{
-						tmp = entry->next;
-						entry->next = hs->slots[new_slot];
-						hs->slots[new_slot] = entry;
+						tmp = curr_entry->next;
+						curr_entry->next = hs->slots[new_slot];
+						hs->slots[new_slot] = curr_entry;
 
 						*prev_next = tmp;
-						entry = tmp;
+						curr_entry = tmp;
 					}
 					else
 					{
-						prev_next = &entry->next;
-						entry = entry->next;
+						prev_next = &curr_entry->next;
+						curr_entry = curr_entry->next;
 					}
 				}
 			}

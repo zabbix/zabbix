@@ -1425,6 +1425,9 @@
 				$housekeeperid = get_dbid('housekeeper','housekeeperid');
 				DBexecute('INSERT INTO housekeeper (housekeeperid,tablename,field,value)'.
 					" VALUES ($housekeeperid, 'trends','itemid',$itemid)");
+				$housekeeperid = get_dbid('housekeeper','housekeeperid');
+				DBexecute('INSERT INTO housekeeper (housekeeperid,tablename,field,value)'.
+					" VALUES ($housekeeperid, 'trends_uint','itemid',$itemid)");
 			}
 			return TRUE;
 		}
@@ -1444,7 +1447,7 @@
 					$db_item["value_type"] == ITEM_VALUE_TYPE_LOG){
 				$lastvalue=$db_item["lastvalue"];
 				if(zbx_strlen($lastvalue) > 20)
-					$lastvalue = substr($lastvalue,0,20)." ...";
+					$lastvalue = zbx_substr($lastvalue,0,20)." ...";
 				$lastvalue = nbsp(htmlspecialchars($lastvalue));
 			}
 			else{

@@ -30,13 +30,7 @@
 #define LOCK_POOL	zbx_mutex_lock(&strpool.pool_lock)
 #define UNLOCK_POOL	zbx_mutex_unlock(&strpool.pool_lock)
 
-typedef struct
-{
-	zbx_mem_info_t	mem_info;
-	zbx_hashset_t	hashset;
-	ZBX_MUTEX	pool_lock;
-}
-zbx_strpool_t;
+extern char		*CONFIG_FILE;
 
 static zbx_strpool_t	strpool;
 
@@ -209,4 +203,9 @@ void	zbx_strpool_clear()
 	UNLOCK_POOL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+const zbx_strpool_t	*zbx_strpool_info()
+{
+	return &strpool;
 }
