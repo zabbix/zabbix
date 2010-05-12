@@ -261,7 +261,7 @@ static void	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t hostid, zbx_uint64_
 	*poller_type = (unsigned char)ZBX_NO_POLLER;
 }
 
-static int	DCget_reachable_nextcheck(ZBX_DC_ITEM *item, int now)
+static int	DCget_reachable_nextcheck(const ZBX_DC_ITEM *item, int now)
 {
 	int	nextcheck;
 
@@ -280,17 +280,29 @@ static int	DCget_reachable_nextcheck(ZBX_DC_ITEM *item, int now)
 	return nextcheck;
 }
 
-static int	DCget_unreachable_nextcheck(int disable_until, int snmp_disable_until, int ipmi_disable_until)
+static int	DCget_unreachable_nextcheck(const ZBX_DC_ITEM *item, const ZBX_DC_HOST *host)
 {
-	int	nextcheck;
+	switch (item->type)
+	{
+		case ITEM_TYPE_ZABBIX:
+			if (0 != host->errors_from)
+				return host->disable_until;
+			break;
+		case ITEM_TYPE_SNMPv1:
+		case ITEM_TYPE_SNMPv2c:
+		case ITEM_TYPE_SNMPv3:
+			if (0 != host->snmp_errors_from)
+				return host->snmp_disable_until;
+			break;
+		case ITEM_TYPE_IPMI:
+			if (0 != host->ipmi_errors_from)
+				return host->ipmi_disable_until;
+			break;
+		default:
+			/* nothing to do */;
+	}
 
-	nextcheck = disable_until;
-	if (0 != snmp_disable_until && (0 == nextcheck || nextcheck > snmp_disable_until))
-		nextcheck = snmp_disable_until;
-	if (0 != ipmi_disable_until && (0 == nextcheck || nextcheck > ipmi_disable_until))
-		nextcheck = ipmi_disable_until;
-
-	return nextcheck;
+	return 0;
 }
 
 static void	*DCfind_id(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *found)
@@ -1544,7 +1556,9 @@ unlock:
  *                                                                            *
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
- * Comments:                                                                  *
+ * Comments: Items leave the queue only through this function. Pollers        *
+ *           must always return the items they have taken using either        *
+ *           DCrequeue_reachable_item() or DCrequeue_unreachable_item().      *
  *                                                                            *
  ******************************************************************************/
 int	DCconfig_get_poller_items(unsigned char poller_type, int now, DC_ITEM *items, int max_items)
@@ -1562,7 +1576,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, int now, DC_ITEM *items
 
 	while (num < max_items && FAIL == zbx_binary_heap_empty(queue))
 	{
-		int				requeue;
+		int				nextcheck;
 		const zbx_binary_heap_elem_t	*min;
 		ZBX_DC_ITEM			*dc_item;
 		const ZBX_DC_HOST		*dc_host;
@@ -1590,32 +1604,9 @@ int	DCconfig_get_poller_items(unsigned char poller_type, int now, DC_ITEM *items
 			continue;
 		}
 
-		requeue = 0;
-		switch (dc_item->type)
+		if ((nextcheck = DCget_unreachable_nextcheck(dc_item, dc_host)) > now)
 		{
-			case ITEM_TYPE_ZABBIX:
-				if (0 != dc_host->errors_from && dc_host->disable_until > now)
-					requeue = 1;
-				break;
-			case ITEM_TYPE_SNMPv1:
-			case ITEM_TYPE_SNMPv2c:
-			case ITEM_TYPE_SNMPv3:
-				if (0 != dc_host->snmp_errors_from && dc_host->snmp_disable_until > now)
-					requeue = 1;
-				break;
-			case ITEM_TYPE_IPMI:
-				if (0 != dc_host->ipmi_errors_from && dc_host->ipmi_disable_until > now)
-					requeue = 1;
-				break;
-			default:
-				/* nothing to do */;
-		}
-
-		if (requeue)
-		{
-			dc_item->nextcheck = DCget_unreachable_nextcheck(dc_host->disable_until,
-										dc_host->snmp_disable_until,
-										dc_host->ipmi_disable_until);
+			dc_item->nextcheck = nextcheck;
 			DCupdate_item_queue(dc_item);
 			continue;
 		}
@@ -1713,7 +1704,7 @@ int	DCconfig_get_items(zbx_uint64_t hostid, const char *key, DC_ITEM **items)
 	return items_num;
 }
 
-void	DCconfig_update_item(zbx_uint64_t itemid, unsigned char status, int now)
+void	DCrequeue_reachable_item(zbx_uint64_t itemid, unsigned char status, int now)
 {
 	ZBX_DC_ITEM	*dc_item;
 
@@ -1723,7 +1714,23 @@ void	DCconfig_update_item(zbx_uint64_t itemid, unsigned char status, int now)
 	{
 		dc_item->status = status;
 		dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, now);
+		DCupdate_item_queue(dc_item);
+	}
 
+	UNLOCK_CACHE;
+}
+
+void	DCrequeue_unreachable_item(zbx_uint64_t itemid)
+{
+	ZBX_DC_ITEM	*dc_item;
+	ZBX_DC_HOST	*dc_host;
+
+	LOCK_CACHE;
+
+	if (NULL != (dc_item = zbx_hashset_search(&config->items, &itemid)) &&
+			NULL != (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+	{
+		dc_item->nextcheck = DCget_unreachable_nextcheck(dc_item, dc_host);
 		DCupdate_item_queue(dc_item);
 	}
 

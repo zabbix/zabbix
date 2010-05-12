@@ -151,7 +151,8 @@ int	DCconfig_get_item_by_itemid(DC_ITEM *item, zbx_uint64_t itemid);
 int	DCconfig_get_poller_items(unsigned char poller_type, int now, DC_ITEM *items, int max_items);
 int	DCconfig_get_items(zbx_uint64_t hostid, const char *key, DC_ITEM **items);
 
-void	DCconfig_update_item(zbx_uint64_t itemid, unsigned char status, int now);
+void	DCrequeue_reachable_item(zbx_uint64_t itemid, unsigned char status, int now);
+void	DCrequeue_unreachable_item(zbx_uint64_t itemid);
 int	DCconfig_activate_host(DC_ITEM *item);
 int	DCconfig_deactivate_host(DC_ITEM *item, int now);
 

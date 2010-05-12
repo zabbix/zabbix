@@ -601,6 +601,7 @@ static int	get_values(int now)
 		case ITEM_TYPE_ZABBIX:
 			if (SUCCEED == uint64_array_exists(ids, ids_num, items[i].host.hostid))
 			{
+				DCrequeue_unreachable_item(items[i].itemid);
 				zabbix_log(LOG_LEVEL_DEBUG, "Zabbix Host " ZBX_FS_UI64 " is unreachable. Skipping [%s]",
 						items[i].host.hostid, items[i].key_orig);
 				continue;
@@ -611,6 +612,7 @@ static int	get_values(int now)
 		case ITEM_TYPE_SNMPv3:
 			if (SUCCEED == uint64_array_exists(snmpids, snmpids_num, items[i].host.hostid))
 			{
+				DCrequeue_unreachable_item(items[i].itemid);
 				zabbix_log(LOG_LEVEL_DEBUG, "SNMP Host " ZBX_FS_UI64 " is unreachable. Skipping [%s]",
 						items[i].host.hostid, items[i].key_orig);
 				continue;
@@ -619,6 +621,7 @@ static int	get_values(int now)
 		case ITEM_TYPE_IPMI:
 			if (SUCCEED == uint64_array_exists(ipmiids, ipmiids_num, items[i].host.hostid))
 			{
+				DCrequeue_unreachable_item(items[i].itemid);
 				zabbix_log(LOG_LEVEL_DEBUG, "IPMI Host " ZBX_FS_UI64 " is unreachable. Skipping [%s]",
 						items[i].host.hostid, items[i].key_orig);
 				continue;
@@ -639,7 +642,7 @@ static int	get_values(int now)
 
 			dc_add_history(items[i].itemid, items[i].value_type, &agent, now, 0, NULL, 0, 0, 0, 0);
 
-			DCconfig_update_item(items[i].itemid, ITEM_STATUS_ACTIVE, now);
+			DCrequeue_reachable_item(items[i].itemid, ITEM_STATUS_ACTIVE, now);
 		}
 		else if (res == NOTSUPPORTED || res == AGENT_ERROR)
 		{
@@ -655,7 +658,7 @@ static int	get_values(int now)
 			activate_host(&items[i], now);
 
 			DCadd_nextcheck(&items[i], now, agent.msg);	/* update error & status field in items table */
-			DCconfig_update_item(items[i].itemid, ITEM_STATUS_NOTSUPPORTED, now);
+			DCrequeue_reachable_item(items[i].itemid, ITEM_STATUS_NOTSUPPORTED, now);
 		}
 		else if (res == NETWORK_ERROR)
 		{
@@ -676,6 +679,8 @@ static int	get_values(int now)
 			default:
 				/* nothing to do */;
 			}
+
+			DCrequeue_unreachable_item(items[i].itemid);
 		}
 		else
 		{

@@ -76,7 +76,7 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 	if (ping_result == NOTSUPPORTED)
 	{
 		DCadd_nextcheck(&item, now, error);	/* update error & status field in items table */
-		DCconfig_update_item(item.itemid, ITEM_STATUS_NOTSUPPORTED, now);
+		DCrequeue_reachable_item(item.itemid, ITEM_STATUS_NOTSUPPORTED, now);
 	}
 	else
 	{
@@ -93,7 +93,7 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 
 		dc_add_history(item.itemid, item.value_type, &value, now, 0, NULL, 0, 0, 0, 0);
 
-		DCconfig_update_item(item.itemid, ITEM_STATUS_ACTIVE, now);
+		DCrequeue_reachable_item(item.itemid, ITEM_STATUS_ACTIVE, now);
 
 		free_result(&value);
 	}
