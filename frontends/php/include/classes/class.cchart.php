@@ -446,12 +446,13 @@ class CChart extends CGraphDraw{
 		$cnt = 0;
 
 		foreach($this->items as $inum => $item){
-			$sql = 'SELECT distinct tr.triggerid,tr.expression,tr.priority, tr.value '.
-					' FROM triggers tr,functions f,items i'.
+			$sql = 'SELECT DISTINCT h.host, tr.description, tr.triggerid, tr.expression, tr.priority, tr.value '.
+					' FROM triggers tr,functions f,items i, hosts h '.
 					' WHERE tr.triggerid=f.triggerid '.
 						" AND f.function IN ('last','min','avg','max') ".
 						' AND tr.status='.TRIGGER_STATUS_ENABLED.
 						' AND i.itemid=f.itemid '.
+						' AND h.hostid=i.hostid '.
 						' AND f.itemid='.$item['itemid'].
 					' ORDER BY tr.priority';
 			$db_triggers = DBselect($sql);
@@ -486,7 +487,7 @@ class CChart extends CGraphDraw{
 					'skipdraw' => ($val <= $minY || $val >= $maxY),
 					'y' => $this->sizeY - (($val-$minY) / ($maxY-$minY)) * $this->sizeY + $this->shiftY,
 					'color' => $color,
-					'description' => 'trigger: '.expand_trigger_description($trigger['triggerid']),
+					'description' => S_TRIGGER.': '.expand_trigger_description_by_data($trigger),
 					'constant' => '['.$arr[2].' '.$arr[3].$arr[4].']'
 					));
 				++$cnt;
