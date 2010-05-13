@@ -546,8 +546,9 @@ void		DBrollback();
 
 const ZBX_TABLE	*DBget_table(const char *tablename);
 const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname);
-#define DBget_maxid(table, field)	DBget_maxid_num(table, field, 1)
-zbx_uint64_t	DBget_maxid_num(char *table, char *field, int num);
+#define DBget_maxid(table)	DBget_maxid_num(table, 1)
+zbx_uint64_t	DBget_maxid_num(const char *tablename, int num);
+zbx_uint64_t	DBget_nextid(const char *tablename, int num);
 
 int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *error);
 int	DBadd_service_alarm(zbx_uint64_t serviceid,int status,int clock);
