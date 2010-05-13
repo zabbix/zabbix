@@ -1420,7 +1420,6 @@ return $result;
 			}else{
 				$keyParams = '';
 			}
-//			SDI($keyParams);
 			unset($iData);
 			$iData =& $macro['indexes']['keyFunctionName'][0];
 			$function = zbx_substr($expression, $iData['openSymbolNum']+1, $iData['closeSymbolNum']-($iData['openSymbolNum']+1));
