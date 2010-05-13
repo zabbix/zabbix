@@ -2148,7 +2148,7 @@
 	'S_NO_FUNCTION_WITH'=>					'No function with',
 	'S_SPECIFY_THE_CONDITIONAL_EXPR_FOR_THE_TARGET'=>	'Specify the conditional expression for the target.',
 	'S_0_OR_1'=>						'0 or 1',
-	'S_TRIGGER_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR'=>	'There is no macros with host in trigger expression. Required at least one macros with host.',
+	'S_TRIGGER_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR'=>	'At least one item must present in the trigger expression.',
 	'S_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR'=>		'Host does not exists.',
 	'S_EXPRESSION_HOST_KEY_DOES_NOT_ERROR'=>		'Host key does not exists.',
 	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR'=>	'Function \'%s\' does not accept parameters.',
