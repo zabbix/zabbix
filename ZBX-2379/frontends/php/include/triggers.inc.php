@@ -3685,7 +3685,7 @@ return $result;
 					unset($bParts);
 					$bParts = Array();
 					$prev = is_int($opPos) && $opPos < $sEnd ? $opPos : $sEnd;
-					$opPos = find_next_operand($expression, $prev+zbx_strlen($operand), $sEnd, $parts, $i, &$bParts, $operand);
+					$opPos = find_next_operand($expression, $prev+zbx_strlen($operand), $sEnd, $parts, $i, $bParts, $operand);
 					
 //					SDI('>>>>>>>>>>>>>>>>>>>newTreeLevel parts count:'.(isset($newTreeLevel['parts']) ? count($newTreeLevel['parts']): 0));
 					
