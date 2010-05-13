@@ -3686,15 +3686,15 @@
 			$new_timeperiod['timeperiod_type'] = TIMEPERIOD_TYPE_ONETIME;
 		}
 
-		if(!isset($new_timeperiod['every']))			$new_timeperiod['every']		= 1;
+		if(!isset($new_timeperiod['every']))		$new_timeperiod['every']		= 1;
 		if(!isset($new_timeperiod['day']))			$new_timeperiod['day']			= 1;
 		if(!isset($new_timeperiod['hour']))			$new_timeperiod['hour']			= 12;
-		if(!isset($new_timeperiod['minute']))			$new_timeperiod['minute']		= 0;
-		if(!isset($new_timeperiod['start_date']))		$new_timeperiod['start_date']		= 0;
+		if(!isset($new_timeperiod['minute']))		$new_timeperiod['minute']		= 0;
+		if(!isset($new_timeperiod['start_date']))	$new_timeperiod['start_date']		= 0;
 
 		if(!isset($new_timeperiod['period_days']))		$new_timeperiod['period_days']		= 0;
 		if(!isset($new_timeperiod['period_hours']))		$new_timeperiod['period_hours']		= 1;
-		if(!isset($new_timeperiod['period_minutes']))		$new_timeperiod['period_minutes']	= 0;
+		if(!isset($new_timeperiod['period_minutes']))	$new_timeperiod['period_minutes']	= 0;
 
 		if(!isset($new_timeperiod['month_date_type']))	$new_timeperiod['month_date_type'] = !(bool)$new_timeperiod['day'];
 
@@ -3933,16 +3933,17 @@
 			$filtertimetab->setCellPadding(0);
 			$filtertimetab->setCellSpacing(0);
 
+			$start_date = zbxDateToTime($new_timeperiod['start_date']);
 			$filtertimetab->addRow(array(
-					new CNumericBox('new_timeperiod_day',(($new_timeperiod['start_date']>0)?date('d',$new_timeperiod['start_date']):''),2),
+					new CNumericBox('new_timeperiod_day',(($start_date>0)?date('d',$start_date):''),2),
 					'/',
-					new CNumericBox('new_timeperiod_month',(($new_timeperiod['start_date']>0)?date('m',$new_timeperiod['start_date']):''),2),
+					new CNumericBox('new_timeperiod_month',(($start_date>0)?date('m',$start_date):''),2),
 					'/',
-					new CNumericBox('new_timeperiod_year',(($new_timeperiod['start_date']>0)?date('Y',$new_timeperiod['start_date']):''),4),
+					new CNumericBox('new_timeperiod_year',(($start_date>0)?date('Y',$start_date):''),4),
 					SPACE,
-					new CNumericBox('new_timeperiod_hour',(($new_timeperiod['start_date']>0)?date('H',$new_timeperiod['start_date']):''),2),
+					new CNumericBox('new_timeperiod_hour',(($start_date>0)?date('H',$start_date):''),2),
 					':',
-					new CNumericBox('new_timeperiod_minute',(($new_timeperiod['start_date']>0)?date('i',$new_timeperiod['start_date']):''),2),
+					new CNumericBox('new_timeperiod_minute',(($start_date>0)?date('i',$start_date):''),2),
 					$clndr_icon
 					));
 
