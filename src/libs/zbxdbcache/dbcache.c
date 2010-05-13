@@ -53,14 +53,15 @@ int			ZBX_SYNC_MAX = 1000;	/* Must be less than ZBX_HISTORY_SIZE */
 static int		ZBX_TREND_SIZE = 0;
 static int		ZBX_ITEMIDS_SIZE = 0;
 
-#define ZBX_IDS_SIZE	7
+#define ZBX_IDS_SIZE	8
 #define ZBX_DC_ID	struct zbx_dc_id_type
 #define ZBX_DC_IDS	struct zbx_dc_ids_type
 
 ZBX_DC_ID
 {
-	char		table_name[64], field_name[64];
+	char		table_name[16];
 	zbx_uint64_t	lastid;
+	int		reserved;
 };
 
 ZBX_DC_IDS
@@ -1591,7 +1592,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
  */
 	if (history_text_num > 0)
 	{
-		id = DBget_maxid_num("history_text", "id", history_text_num);
+		id = DBget_maxid_num("history_text", history_text_num);
 
 #ifdef HAVE_MYSQL
 		tmp_offset = sql_offset;
@@ -1647,7 +1648,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
  */
 	if (history_log_num > 0)
 	{
-		id = DBget_maxid_num("history_log", "id", history_log_num);
+		id = DBget_maxid_num("history_log", history_log_num);
 
 #ifdef HAVE_MYSQL
 		tmp_offset = sql_offset;
@@ -2661,7 +2662,7 @@ void	free_database_cache()
 
 /******************************************************************************
  *                                                                            *
- * Function: DCget_maxid                                                      *
+ * Function: DCget_nextid                                                     *
  *                                                                            *
  * Purpose: Return next id for requested table                                *
  *                                                                            *
@@ -2674,8 +2675,9 @@ void	free_database_cache()
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-zbx_uint64_t	DCget_nextid(const char *table_name, const char *field_name, int num)
+zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 {
+	const char	*__function_name = "DCget_nextid";
 	int		i, nodeid;
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -2685,8 +2687,8 @@ zbx_uint64_t	DCget_nextid(const char *table_name, const char *field_name, int nu
 
 	LOCK_CACHE_IDS;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In DCget_nextid %s.%s [%d]",
-			table_name, field_name, num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s' num:%d",
+			__function_name, table_name, num);
 
 	for (i = 0; i < ZBX_IDS_SIZE; i++)
 	{
@@ -2694,13 +2696,13 @@ zbx_uint64_t	DCget_nextid(const char *table_name, const char *field_name, int nu
 		if ('\0' == *id->table_name)
 			break;
 
-		if (0 == strcmp(id->table_name, table_name) && 0 == strcmp(id->field_name, field_name))
+		if (0 == strcmp(id->table_name, table_name))
 		{
 			nextid = id->lastid + 1;
 			id->lastid += num;
 
-			zabbix_log(LOG_LEVEL_DEBUG, "End of DCget_nextid %s.%s [" ZBX_FS_UI64 ":" ZBX_FS_UI64 "]",
-					table_name, field_name, nextid, id->lastid);
+			zabbix_log(LOG_LEVEL_DEBUG, "End of %s() table:'%s' [" ZBX_FS_UI64 ":" ZBX_FS_UI64 "]",
+					__function_name, table_name, nextid, id->lastid);
 
 			UNLOCK_CACHE_IDS;
 
@@ -2715,7 +2717,6 @@ zbx_uint64_t	DCget_nextid(const char *table_name, const char *field_name, int nu
 	}
 
 	zbx_strlcpy(id->table_name, table_name, sizeof(id->table_name));
-	zbx_strlcpy(id->field_name, field_name, sizeof(id->field_name));
 
 	table = DBget_table(table_name);
 	nodeid = CONFIG_NODEID >= 0 ? CONFIG_NODEID : 0;
@@ -2732,9 +2733,9 @@ zbx_uint64_t	DCget_nextid(const char *table_name, const char *field_name, int nu
 		max += (zbx_uint64_t)__UINT64_C(99999999999999);
 
 	result = DBselect("select max(%s) from %s where %s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
-			field_name,
+			table->recid,
 			table_name,
-			field_name,
+			table->recid,
 			min, max);
 
 	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
@@ -2747,10 +2748,110 @@ zbx_uint64_t	DCget_nextid(const char *table_name, const char *field_name, int nu
 
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of DCget_nextid %s.%s [" ZBX_FS_UI64 ":" ZBX_FS_UI64 "]",
-			table_name, field_name, nextid, id->lastid);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() table:'%s' [" ZBX_FS_UI64 ":" ZBX_FS_UI64 "]",
+			__function_name, table_name, nextid, id->lastid);
 
 	UNLOCK_CACHE_IDS;
+
+	return nextid;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_nextid_shared                                              *
+ *                                                                            *
+ * Purpose: Return next id for requested table and store it in ids table      *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	DCget_nextid_shared(const char *table_name)
+{
+#define ZBX_RESERVE	256
+	const char	*__function_name = "DCget_nextid_shared";
+	int		i;
+	ZBX_DC_ID	*id;
+	zbx_uint64_t	nextid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s'",
+			__function_name, table_name);
+
+	LOCK_CACHE_IDS;
+
+	for (i = 0; i < ZBX_IDS_SIZE; i++)
+	{
+		id = &ids->id[i];
+
+		if ('\0' == *id->table_name)
+		{
+			zbx_strlcpy(id->table_name, table_name, sizeof(id->table_name));
+			id->lastid = 0;
+			id->reserved = 0;
+
+			break;
+		}
+
+		if (0 == strcmp(id->table_name, table_name))
+			break;
+	}
+
+	if (i == ZBX_IDS_SIZE)
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Insufficient shared memory for ids");
+		exit(-1);
+	}
+
+	if (id->reserved > 0)
+	{
+		id->lastid++;
+		id->reserved--;
+
+		nextid = id->lastid;
+
+		UNLOCK_CACHE_IDS;
+
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s() table:'%s' [" ZBX_FS_UI64 "]",
+				__function_name, table_name, nextid);
+
+		return nextid;
+	}
+
+	UNLOCK_CACHE_IDS;
+
+	nextid = DBget_nextid(table_name, ZBX_RESERVE) - 1;
+
+	LOCK_CACHE_IDS;
+
+	if (0 == id->reserved)
+	{
+		id->lastid = nextid;
+		id->reserved = ZBX_RESERVE;
+	}
+	else if (id->lastid + id->reserved == nextid)
+	{
+		id->reserved += ZBX_RESERVE;
+	}
+	else if (id->reserved < ZBX_RESERVE && nextid > id->lastid)
+	{
+		id->lastid = nextid;
+		id->reserved = ZBX_RESERVE;
+	}
+
+	id->lastid++;
+	id->reserved--;
+
+	nextid = id->lastid;
+
+	UNLOCK_CACHE_IDS;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() table:'%s' [" ZBX_FS_UI64 "]",
+			__function_name, table_name, nextid);
 
 	return nextid;
 }
