@@ -196,7 +196,7 @@ function make_refresh_menu($pmid,$dollid,$cur_interval,$params=null,&$menu,&$sub
 			'javascript: setRefreshRate('.zbx_jsvalue($pmid).','.zbx_jsvalue($dollid).','.$value.','.zbx_jsvalue($params).');'.
 			'void(0);',
 			null,
-			array('outer' => ($value == $cur_interval)?'pum_b_submenu':'pum_o_submenu', 'inner'=>array('pum_i_submenu')
+			array('outer' => ($value == $cur_interval)? 'pum_b_submenu':'pum_o_submenu', 'inner'=>array('pum_i_submenu')
 		));
 	}
 	$submenu['menu_'.$dollid][] = array();
@@ -322,9 +322,11 @@ function zbx_set_post_cookie($name, $value, $time=null){
  * author: Alexei Vladishev
  */
 function zbx_date2str($format, $value=NULL){
-	static $weekdaynames, $weekdaynameslong, $months, $monthslong;
+	static $weekdaynames, $weekdaynameslong, $months, $monthslong, $rplcs;
 	
 	if($value === NULL) $value = time();
+	
+	if(!$value) return S_NEVER;
 	
 	if(!is_array($weekdaynames)) {
 		$weekdaynames = Array(
@@ -379,16 +381,32 @@ function zbx_date2str($format, $value=NULL){
 					11 => S_MONTH_NOVEMBER_LONG,
 					12 => S_MONTH_DECEMBER_LONG);
 	}
-
-	if(!$value) return S_NEVER;
 	
-	$output = date($format, $value);
-
-	$output = str_replace(date('l',$value), $weekdaynameslong[date('w',$value)], $output);
-	$output = str_replace(date('F',$value), $monthslong[date('n',$value)], $output);
-	$output = str_replace(date('D',$value), $weekdaynames[date('w',$value)], $output);
-	$output = str_replace(date('M',$value), $months[date('n',$value)], $output);
-
+	if(!is_array($rplcs)) {
+		$rplcs = Array(
+			'l' => $weekdaynameslong[date('w',$value)],
+			'F' => $monthslong[date('n',$value)],
+			'D' => $weekdaynames[date('w',$value)],
+			'M' => $months[date('n',$value)]
+		);
+	}
+	
+	$output = '';
+	$part = '';
+	$length = zbx_strlen($format);
+	for($i = 0; $i < $length; $i++) {
+		$pchar = $i > 0 ? zbx_substr($format, $i-1, 1) : '';
+		$char = zbx_substr($format, $i, 1);
+		if($pchar != '\\' && isset($rplcs[$char])) {
+			$output .= (zbx_strlen($part) ? date($part) : '').$rplcs[$char];
+			$part = '';
+		}else{
+			$part .= $char;
+		}
+	}
+	
+	$output .= zbx_strlen($part) ? date($part) : '';
+	
 	return $output;
 }
 
@@ -512,7 +530,7 @@ function zbx_num2bitstr($num,$rev=false){
 
 	for($i=0;$i<$len;$i++){
 		$sbin= 1 << $i;
-		$bit = ($sbin & $num)?'1':'0';
+		$bit = ($sbin & $num)? '1':'0';
 		if($rev){
 			$strbin.=$bit;
 		}
