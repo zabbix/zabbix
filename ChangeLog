@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [DEV-460] improved host-group and maps icons info in zabbix maps (Aly)
  - [ZBX-2379] fixed trigger expression editing with trigger builder (Maxim Andruhovich/AM)
  - [ZBXNEXT-338] added caching of eventid's (Sasha)
  - [ZBX-1438] fixed not deleting data from trends_uint table when delete item (Vedmak)
