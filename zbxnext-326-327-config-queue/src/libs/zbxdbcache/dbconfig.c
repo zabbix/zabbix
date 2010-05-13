@@ -956,7 +956,7 @@ static void	DCsync_hosts(DB_RESULT result)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Aleksander Vladishev, Aleksandrs Saveljevs                         *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -968,13 +968,13 @@ void	DCsync_configuration()
 	DB_RESULT		item_result;
 	DB_RESULT		host_result;
 
-	double			sec;
+	int			i;
+	double			sec, isec, hsec, ssec;
 	const zbx_strpool_t	*strpool;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	sec = zbx_time();
-
 	item_result = DBselect(
 			"select i.itemid,i.hostid,h.proxy_hostid,i.type,i.data_type,i.value_type,i.key_,"
 				"i.snmp_community,i.snmp_oid,i.snmp_port,i.snmpv3_securityname,"
@@ -989,7 +989,9 @@ void	DCsync_configuration()
 			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED,
 			DBnode_local("i.itemid"));
+	isec = zbx_time() - sec;
 
+	sec = zbx_time();
 	host_result = DBselect(
 			"select hostid,proxy_hostid,host,useip,ip,dns,port,"
 				"useipmi,ipmi_ip,ipmi_port,ipmi_authtype,ipmi_privilege,ipmi_username,"
@@ -1001,23 +1003,25 @@ void	DCsync_configuration()
 				DB_NODE,
 			HOST_STATUS_MONITORED,
 			DBnode_local("hostid"));
+	hsec = zbx_time() - sec;
 
 	LOCK_CACHE;
 
+	sec = zbx_time();
 	DCsync_items(item_result);
 	DCsync_hosts(host_result);
-
-	UNLOCK_CACHE;
-
-	DBfree_result(item_result);
-	DBfree_result(host_result);
-
-	sec = zbx_time() - sec;
+	ssec = zbx_time() - sec;
 
 	strpool = zbx_strpool_info();
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() time       : " ZBX_FS_DBL " sec.", __function_name,
-			sec);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() item sql   : " ZBX_FS_DBL " sec.", __function_name,
+			isec);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() host sql   : " ZBX_FS_DBL " sec.", __function_name,
+			hsec);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() sync lock  : " ZBX_FS_DBL " sec.", __function_name,
+			ssec);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() total time : " ZBX_FS_DBL " sec.", __function_name,
+			isec + hsec + ssec);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() itemids    : %d (%d allocated)", __function_name,
 			config->itemids.values_num, config->itemids.values_alloc);
@@ -1051,6 +1055,11 @@ void	DCsync_configuration()
 			config->hosts_ph.num_data, config->hosts_ph.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() ipmihosts  : %d (%d slots)", __function_name,
 			config->ipmihosts.num_data, config->ipmihosts.num_slots);
+
+	for (i = 0; i < ZBX_POLLER_TYPE_COUNT; i++)
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() queue[%d]   : %d (%d allocated)", __function_name,
+				i, config->queues[i].elems_num, config->queues[i].elems_alloc);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() configfree : " ZBX_FS_DBL "%%", __function_name,
 			100 * ((double)config_mem.free_size / config_mem.orig_size));
 
@@ -1058,6 +1067,11 @@ void	DCsync_configuration()
 			strpool->hashset.num_data, strpool->hashset.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() strpoolfree: " ZBX_FS_DBL "%%", __function_name,
 			100 * ((double)strpool->mem_info.free_size / strpool->mem_info.orig_size));
+
+	UNLOCK_CACHE;
+
+	DBfree_result(item_result);
+	DBfree_result(host_result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
