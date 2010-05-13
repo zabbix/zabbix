@@ -821,12 +821,12 @@ COpt::memoryPick();
 			$expressionData = parseTriggerExpressions($expression, true);
 			
 			if( isset($expressionData[$expression]['errors']) ) {
-				showExpressionErrors($expression, $expressionData[$expression]['errors']);
+				//showExpressionErrors($expression, $expressionData[$expression]['errors']);
 				return false;
 			}
 			
 			if(!isset($expressionData[$expression]['hosts']) || !is_array($expressionData[$expression]['hosts']) || !count($expressionData[$expression]['hosts'])) {
-				error(S_TRIGGER_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR);
+				//error(S_TRIGGER_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR);
 				return false;
 			}
 			

@@ -3924,7 +3924,7 @@ return $result;
 
 					if($hostId == null) return EXPRESSION_HOST_UNKNOWN;
 
-					$itemFound = CItem::get(Array('filter' => Array('hostid' => $hostId, 'key_' => $hostKey.$hostKeyParams)));
+					$itemFound = CItem::get(Array('filter' => Array('hostid' => $hostId, 'key_' => $hostKey.$hostKeyParams, 'webitems' => true)));
 					if(count($itemFound) > 0) {
 						$itemFound = array_shift($itemFound);
 						if(isset($itemFound['itemid']) && $itemFound['itemid'] > 0) $itemId = $itemFound['itemid'];
@@ -3940,7 +3940,8 @@ return $result;
 						$value_type = null;
 						$options = array(
 							'itemids'=>$itemId,
-							'output'=>API_OUTPUT_EXTEND
+							'output'=>API_OUTPUT_EXTEND,
+							'webitems'=> true
 						);
 						$item_data = CItem::get($options);
 
