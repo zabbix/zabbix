@@ -272,7 +272,7 @@ static void	copy_acknowledges(zbx_uint64_t src_eventid, zbx_uint64_t dst_eventid
 	sql = zbx_malloc(sql, sql_alloc * sizeof(char));
 
 #ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "begin\n");
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
 #endif
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 96,
@@ -281,7 +281,7 @@ static void	copy_acknowledges(zbx_uint64_t src_eventid, zbx_uint64_t dst_eventid
 			" where eventid=" ZBX_FS_UI64 ";\n",
 			dst_eventid);
 
-	acknowledgeid = DBget_maxid_num("acknowledges", "acknowledgeid", ids_num);
+	acknowledgeid = DBget_maxid_num("acknowledges", ids_num);
 
 	for (i = 0; i < ids_num; i++, acknowledgeid++)
 	{
@@ -295,7 +295,7 @@ static void	copy_acknowledges(zbx_uint64_t src_eventid, zbx_uint64_t dst_eventid
 	}
 
 #ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "end;\n");
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
 #endif
 
 	if (sql_offset > 16) /* In ORACLE always present begin..end; */
@@ -356,7 +356,7 @@ int	process_event(DB_EVENT *event)
 	add_trigger_info(event);
 
 	if (0 == event->eventid)
-		event->eventid = DBget_maxid("events", "eventid");
+		event->eventid = DBget_maxid("events");
 
 	DBexecute("insert into events (eventid,source,object,objectid,clock,value)"
 			" values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 ",%d,%d)",

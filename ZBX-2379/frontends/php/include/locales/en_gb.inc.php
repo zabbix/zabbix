@@ -232,6 +232,8 @@
 	'S_EXISTING'=>				'Existing',
 	'S_MISSING'=>				'Missing',
 	'S_REFRESH'=>				'Refresh',
+	'S_REFRESH_TIME_IN_SECONDS'=> 'Refresh time in seconds',
+	'S_REFRESH_TIME_MULTIPLIER' => 'Refresh time multiplier',
 	'S_IMPORTED'=>				'Imported',
 	'S_SUCCESSEFULLY_SMALL'=>		'successfully',
 	'S_FAILED_SMALL'=>			'failed',
@@ -1162,6 +1164,7 @@
 	'S_COPY_SELECTED_ITEMS_Q'=>				'Copy selected items?',
 	'S_DELETE_HISTORY_SELECTED_ITEMS_Q'=>			'Delete history of selected items?',
 	'S_DELETE_SELECTED_ITEMS_Q'=>				'Delete selected items?',
+	'S_FORMULA'=>						'Formula',
 
 //	events.php
 	'S_EVENT'=>				'Event',
@@ -1674,7 +1677,7 @@
 	'S_INSERT'=>				'Insert',
 	'S_SECONDS'=>				'Seconds',
 	'S_LAST_OF'=>				'Last of',
-	'S_MULTIPLE_TRUE_EVENTS'=>		'Multiple TRUE events',
+	'S_MULTIPLE_PROBLEM_EVENTS'=>		'Multiple PROBLEM events',
 	'S_SHOW_DISABLED_TRIGGERS'=>		'Show disabled triggers',
 	'S_HIDE_DISABLED_TRIGGERS'=>		'Hide disabled triggers',
 	'S_THE_TRIGGER_DEPENDS_ON'=>		'The trigger depends on',
@@ -2340,6 +2343,9 @@
 	'S_CANNOT_FIND_OBJECTS_WITH_NAME'=>	'Can not find objects with name',
 	'S_CANNOT_CREATE_NEW_ELEMENT'=>		'Can not create new element',
 	'S_OTHER_SMALL'=>			'other',
+
+// class.cookie.js
+	'S_MAX_COOKIE_SIZE_REACHED' => 'We are sorry, the maximum possible number of elements to remember has been reached.',
 
 );
 ?>

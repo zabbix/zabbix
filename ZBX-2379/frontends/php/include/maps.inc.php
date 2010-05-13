@@ -22,6 +22,7 @@
 	require_once('include/images.inc.php');
 	require_once('include/hosts.inc.php');
 	require_once('include/triggers.inc.php');
+	require_once('include/events.inc.php');
 	require_once('include/scripts.inc.php');
 	require_once('include/maintenances.inc.php');
 
@@ -158,27 +159,6 @@
 		return	DBexecute('UPDATE sysmaps SET name='.zbx_dbstr($name).',width='.$width.',height='.$height.','.
 			'backgroundid='.$backgroundid.',highlight='.$highlight.',label_type='.$label_type.','.
 			'label_location='.$label_location.' WHERE sysmapid='.$sysmapid);
-	}
-
-// Delete System Map
-
-	function delete_sysmap($sysmapids){
-		zbx_value2array($sysmapids);
-
-		$result = delete_sysmaps_elements_with_sysmapid($sysmapids);
-		if(!$result)	return	$result;
-
-		$res=DBselect('SELECT linkid FROM sysmaps_links WHERE '.DBcondition('sysmapid',$sysmapids));
-		while($rows = DBfetch($res)){
-			$result&=delete_link($rows['linkid']);
-		}
-
-		$result = DBexecute('DELETE FROM sysmaps_elements WHERE '.DBcondition('sysmapid',$sysmapids));
-		$result &= DBexecute("DELETE FROM profiles WHERE idx='web.favorite.sysmapids' AND source='sysmapid' AND ".DBcondition('value_id',$sysmapids));
-		$result &= DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid',$sysmapids).' AND resourcetype='.SCREEN_RESOURCE_MAP);
-		$result &= DBexecute('DELETE FROM sysmaps WHERE '.DBcondition('sysmapid',$sysmapids));
-
-	return $result;
 	}
 
 // LINKS
@@ -841,14 +821,22 @@
 					while(zbx_strstr($label, '{TRIGGERS.UNACK}')){
 						$label = str_replace('{TRIGGERS.UNACK}', get_triggers_unacknowledged($db_element), $label);
 					}
+					while(zbx_strstr($label, '{TRIGGERS.PROBLEM.UNACK}')){
+						$label = str_replace('{TRIGGERS.PROBLEM.UNACK}', get_triggers_unacknowledged($db_element, true), $label);
+					}
 					while(zbx_strstr($label, '{TRIGGER.EVENTS.UNACK}')){
-						$label = str_replace('{TRIGGER.EVENTS.UNACK}', get_unacknowledged_events($db_element), $label);
+						$label = str_replace('{TRIGGER.EVENTS.UNACK}', get_events_unacknowledged($db_element), $label);
+					}
+					while(zbx_strstr($label, '{TRIGGER.EVENTS.PROBLEM.UNACK}')){
+						$label = str_replace('{TRIGGER.EVENTS.PROBLEM.UNACK}', get_events_unacknowledged($db_element, TRIGGER_VALUE_TRUE), $label);
 					}
 					break;
 			}
 		}
 
+/*
 		while(false !== ($pos = zbx_strpos($label, '{'))){
+
 			$expr = substr($label, $pos);
 
 			if(false === ($pos = zbx_strpos($expr, '}'))) break;
@@ -885,7 +873,16 @@
 			}
 
 			$parameter = substr($parameter, 0, $pos);
+*/
+		$pattern = "/{(?P<host>.+):(?P<key>.+)\.(?P<func>.+)\((?P<param>.+)\)}/u";
+		preg_match_all($pattern, $label, $matches);
 
+		foreach($matches[0] as $num => $expr){
+			$host = $matches['host'][$num];
+			$key = $matches['key'][$num];
+			$function = $matches['func'][$num];
+			$parameter = $matches['param'][$num];
+			
 			$options = array(
 				'filter' => array('host' => $host, 'key_' => $key),
 				'output' => API_OUTPUT_EXTEND
@@ -893,7 +890,7 @@
 			$db_item = CItem::get($options);
 			$db_item = reset($db_item);
 			if(!$db_item){
-				$label = str_replace('{'.$expr.'}', '???', $label);
+				$label = str_replace($expr, '???', $label);
 				continue;
 			}
 
@@ -928,7 +925,7 @@
 
 				$result = DBselect($sql, 1);
 				if(NULL == ($row = DBfetch($result)))
-					$label = str_replace('{'.$expr.'}', '('.S_NO_DATA_SMALL.')', $label);
+					$label = str_replace($expr, '('.S_NO_DATA_SMALL.')', $label);
 				else{
 					switch($db_item['value_type']){
 						case ITEM_VALUE_TYPE_FLOAT:
@@ -939,13 +936,13 @@
 							$value = $row['value'];
 					}
 
-					$label = str_replace('{'.$expr.'}', $value, $label);
+					$label = str_replace($expr, $value, $label);
 				}
 			}
 			else if((0 == strcmp($function, 'min')) || (0 == strcmp($function, 'max')) || (0 == strcmp($function, 'avg'))){
 
 				if($db_item['value_type'] != ITEM_VALUE_TYPE_FLOAT && $db_item['value_type'] != ITEM_VALUE_TYPE_UINT64){
-					$label = str_replace('{'.$expr.'}', '???', $label);
+					$label = str_replace($expr, '???', $label);
 					continue;
 				}
 
@@ -957,12 +954,12 @@
 
 				$result = DBselect($sql);
 				if(NULL == ($row = DBfetch($result)) || is_null($row['value']))
-					$label = str_replace('{'.$expr.'}', '('.S_NO_DATA_SMALL.')', $label);
+					$label = str_replace($expr, '('.S_NO_DATA_SMALL.')', $label);
 				else
-					$label = str_replace('{'.$expr.'}', convert_units($row['value'], $db_item['units']), $label);
+					$label = str_replace($expr, convert_units($row['value'], $db_item['units']), $label);
 			}
 			else{
-				$label = str_replace('{'.$expr.'}', '???', $label);
+				$label = str_replace($expr, '???', $label);
 				continue;
 			}
 		}
@@ -970,88 +967,26 @@
 	return $label;
 	}
 
-	function get_unacknowledged_events($db_element){
-		$elements = array('hosts' => array(), 'hosts_groups' => array(), 'triggers' => array());
-
-		get_map_elements($db_element, $elements);
-		if(empty($elements['hosts_groups']) && empty($elements['hosts']) && empty($elements['triggers'])){
-			return 0;
-		}
-
-		$config = select_config();
-		$options = array(
-			'nodeids' => get_current_nodeid(),
-			'output' => API_OUTPUT_SHORTEN,
-			'monitored' => 1,
-			'only_problems' => 1,
-			'skipDependent' => 1,
-			'limit' => ($config['search_limit']+1)
-		);
-		if(!empty($elements['hosts_groups'])) $options['groupids'] = array_unique($elements['hosts_groups']);
-		if(!empty($elements['hosts'])) $options['hostids'] = array_unique($elements['hosts']);
-		if(!empty($elements['triggers'])) $options['triggerids'] = array_unique($elements['triggers']);
-		$triggerids = CTrigger::get($options);
-
-
-		$options = array(
-			'count' => 1,
-			'triggerids' => zbx_objectValues($triggerids, 'triggerid'),
-			'object' => EVENT_OBJECT_TRIGGER,
-			'acknowledged' => 0,
-			'value' => TRIGGER_VALUE_TRUE,
-			'nopermissions' => 1
-		);
-		$event_count = CEvent::get($options);
-
-	return $event_count['rowscount'];
-	}
-
-	function get_triggers_unacknowledged($db_element){
-		$elements = array('hosts' => array(), 'hosts_groups' => array(), 'triggers' => array());
-
-		get_map_elements($db_element, $elements);
-		if(empty($elements['hosts_groups']) && empty($elements['hosts']) && empty($elements['triggers'])){
-			return 0;
-		}
-
-		$config = select_config();
-		$options = array(
-			'nodeids' => get_current_nodeid(),
-			'monitored' => 1,
-			'countOutput' => 1,
-			'only_problems' => 1,
-			'with_unacknowledged_events' => 1,
-			'limit' => ($config['search_limit']+1)
-		);
-		if(!empty($elements['hosts_groups'])) $options['groupids'] = array_unique($elements['hosts_groups']);
-		if(!empty($elements['hosts'])) $options['hostids'] = array_unique($elements['hosts']);
-		if(!empty($elements['triggers'])) $options['triggerids'] = array_unique($elements['triggers']);
-		$triggers = CTrigger::get($options);
-
-
-	return $triggers;
-	}
-
 	function get_map_elements($db_element, &$elements){
-		switch ($db_element['elementtype']){
-		case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-			$elements['hosts_groups'][] = $db_element['elementid'];
-			break;
-		case SYSMAP_ELEMENT_TYPE_HOST:
-			$elements['hosts'][] = $db_element['elementid'];
-			break;
-		case SYSMAP_ELEMENT_TYPE_TRIGGER:
-			$elements['triggers'][] = $db_element['elementid'];
-			break;
-		case SYSMAP_ELEMENT_TYPE_MAP:
-			$sql = 'SELECT DISTINCT elementtype,elementid'.
-					' FROM sysmaps_elements'.
-					' WHERE sysmapid='.$db_element['elementid'];
-			$db_mapselements = DBselect($sql);
-			while($db_mapelement = DBfetch($db_mapselements)){
-				get_map_elements($db_mapelement, $elements);
-			}
-			break;
+		switch($db_element['elementtype']){
+			case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+				$elements['hosts_groups'][] = $db_element['elementid'];
+				break;
+			case SYSMAP_ELEMENT_TYPE_HOST:
+				$elements['hosts'][] = $db_element['elementid'];
+				break;
+			case SYSMAP_ELEMENT_TYPE_TRIGGER:
+				$elements['triggers'][] = $db_element['elementid'];
+				break;
+			case SYSMAP_ELEMENT_TYPE_MAP:
+				$sql = 'SELECT DISTINCT elementtype,elementid'.
+						' FROM sysmaps_elements'.
+						' WHERE sysmapid='.$db_element['elementid'];
+				$db_mapselements = DBselect($sql);
+				while($db_mapelement = DBfetch($db_mapselements)){
+					get_map_elements($db_mapelement, $elements);
+				}
+				break;
 		}
 	}
 

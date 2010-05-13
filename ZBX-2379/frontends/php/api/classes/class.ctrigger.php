@@ -83,6 +83,7 @@ class CTrigger extends CZBXAPI{
 			'itemids'				=> null,
 			'applicationids'		=> null,
 			'status'				=> null,
+			'functions'				=> null,
 			'monitored' 			=> null,
 			'templated'				=> null,
 			'maintenance'			=> null,
@@ -264,9 +265,13 @@ class CTrigger extends CZBXAPI{
 			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
 		}
 
-// status
-		if(!is_null($options['status'])){
-			$sql_parts['where'][] = 't.status='.$options['status'];
+// functions
+		if(!is_null($options['functions'])){
+			zbx_value2array($options['functions']);
+
+			$sql_parts['from']['functions'] = 'functions f';
+			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
+			$sql_parts['where'][] = DBcondition('f.function', $options['functions'], false, true);
 		}
 
 // monitored
@@ -417,6 +422,12 @@ class CTrigger extends CZBXAPI{
 				$sql_parts['where']['priority'] = DBcondition('t.priority', $options['filter']['priority']);
 			}
 
+//status
+			if(isset($options['filter']['status']) && !is_null($options['filter']['status'])){
+				zbx_value2array($options['filter']['status']);
+
+				$sql_parts['where']['status'] = DBcondition('t.status', $options['filter']['status']);
+			}
 // value
 			if(isset($options['filter']['value']) && !is_null($options['filter']['value'])){
 				zbx_value2array($options['filter']['value']);

@@ -671,12 +671,12 @@ COpt::memoryPick();
 
 		self::BeginTransaction(__METHOD__);
 
-// delete selements
+// delete maps from selements of other maps
 		$selementids = array();
-		$sql = 'SELECT selementid '.
-				' FROM sysmaps_elements '.
-				' WHERE '.DBcondition('sysmapid',$sysmapids).
-					' AND elementtype='.SYSMAP_ELEMENT_TYPE_MAP;
+		$sql = 'SELECT se.selementid '.
+				' FROM sysmaps_elements se'.
+				' WHERE '.DBcondition('se.elementid',$sysmapids).
+					' AND se.elementtype='.SYSMAP_ELEMENT_TYPE_MAP;
 		$db_elements = DBselect($sql);
 		while($db_element = DBfetch($db_elements)){
 			$selementids[$db_element['selementid']] = $db_element['selementid'];
@@ -684,7 +684,8 @@ COpt::memoryPick();
 
 		if(!empty($selementids)){
 			$sysmap_linkids = array();
-			$sql = 'SELECT linkid FROM sysmaps_links '.
+			$sql = 'SELECT linkid '.
+					' FROM sysmaps_links '.
 					' WHERE '.DBcondition('selementid1',$selementids).
 						' OR '.DBcondition('selementid2',$selementids);
 

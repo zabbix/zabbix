@@ -179,15 +179,17 @@ class Curl{
 	}
 
 	public function getUrl(){
-			$url = $this->protocol ? $this->protocol.'://' : '';
-			$url .= $this->username ? $this->username : '';
-			$url .= $this->password ? ':'.$this->password : '';
-			$url .= $this->host ? $this->host : '';
-			$url .= $this->port ? ':'.$this->port : '';
-			$url .= $this->path ? $this->path : '';
-			$url .= $this->query ? '?'.$this->query : '';
-			$url .= $this->reference ? '#'.urlencode($this->reference) : '';
-	//SDI($this->getProtocol().' : '.$this->getHost().' : '.$this->getPort().' : '.$this->getPath().' : '.$this->getQuery());
+		$this->formatQuery();
+
+		$url = $this->protocol ? $this->protocol.'://' : '';
+		$url .= $this->username ? $this->username : '';
+		$url .= $this->password ? ':'.$this->password : '';
+		$url .= $this->host ? $this->host : '';
+		$url .= $this->port ? ':'.$this->port : '';
+		$url .= $this->path ? $this->path : '';
+		$url .= $this->query ? '?'.$this->query : '';
+		$url .= $this->reference ? '#'.urlencode($this->reference) : '';
+//SDI($this->getProtocol().' : '.$this->getHost().' : '.$this->getPort().' : '.$this->getPath().' : '.$this->getQuery());
 	return $url;
 	}
 
@@ -201,7 +203,6 @@ class Curl{
 
 	public function setArgument($key,$value=''){
 		$this->arguments[$key] = $value;
-		$this->formatQuery();
 	}
 
 	public function getArgument($key){
@@ -216,6 +217,7 @@ class Curl{
 	}
 
 	public function getQuery(){
+		$this->formatQuery();
 		return $this->query;
 	}
 

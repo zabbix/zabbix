@@ -338,12 +338,15 @@ include_once('include/page_header.php');
 		unset($_REQUEST['itemid']);
 		$_REQUEST['form'] = 'clone';
 	}
-	else if(isset($_REQUEST['save'])){
+	else if(isset($_REQUEST['save']) && ($_REQUEST['form_hostid'] > 0)){
 		$applications = get_request('applications',array());
 		$delay_flex = get_request('delay_flex',array());
 		$db_delay_flex = '';
-		foreach($delay_flex as $num => $val)
+
+		foreach($delay_flex as $num => $val){
 			$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
+		}
+		
 		$db_delay_flex = trim($db_delay_flex,';');
 
 		$item = array(
@@ -822,7 +825,7 @@ include_once('include/page_header.php');
 			'limit' => ($config['search_limit']+1)
 		);
 
-		$preFilter = count($options);
+		$preFilter = count($options, COUNT_RECURSIVE);
 
 		if($hostid > 0)
 			$options['hostids'] = $hostid;
@@ -877,7 +880,7 @@ include_once('include/page_header.php');
 		if(isset($_REQUEST['filter_with_triggers']) && !zbx_empty($_REQUEST['filter_with_triggers']) && $_REQUEST['filter_with_triggers'] != -1)
 			$options['with_triggers'] = $_REQUEST['filter_with_triggers'];
 
-		$afterFilter = count($options);
+		$afterFilter = count($options, COUNT_RECURSIVE);
 //} Items Filter
 
 		if($preFilter == $afterFilter)
@@ -1195,6 +1198,9 @@ include_once('include/page_header.php');
 	$jsmenu = new CPUMenu(null,200);
 	$jsmenu->InsertJavaScript();
 
+?>
+<?php
 
 include_once('include/page_footer.php');
+
 ?>

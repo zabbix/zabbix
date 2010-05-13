@@ -127,11 +127,11 @@ char	*CONFIG_LISTEN_IP		= NULL;
 char	*CONFIG_SOURCE_IP		= NULL;
 int	CONFIG_TRAPPER_TIMEOUT		= ZABBIX_TRAPPER_TIMEOUT;
 /**/
-/*int	CONFIG_NOTIMEWAIT		=0;*/
+/*int	CONFIG_NOTIMEWAIT		= 0;*/
 int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
 int	CONFIG_MAX_HOUSEKEEPER_DELETE	= 500;		/* applies for every separate field value */
 int	CONFIG_SENDER_FREQUENCY		= 30;
-int	CONFIG_DBSYNCER_FORKS		= 1;
+int	CONFIG_DBSYNCER_FORKS		= 4;
 int	CONFIG_DBSYNCER_FREQUENCY	= 5;
 int	CONFIG_DBCONFIG_FORKS		= 1;
 int	CONFIG_DBCONFIG_FREQUENCY	= 60;
@@ -203,6 +203,7 @@ void	init_config(void)
 	static struct cfg_line cfg[]=
 	{
 /*		 PARAMETER	,VAR	,FUNC,	TYPE(0i,1s),MANDATORY,MIN,MAX	*/
+		{"StartDBSyncers",&CONFIG_DBSYNCER_FORKS,0,TYPE_INT,PARM_OPT,1,64},
 		{"StartDiscoverers",&CONFIG_DISCOVERER_FORKS,0,TYPE_INT,PARM_OPT,0,255},
 		{"StartHTTPPollers",&CONFIG_HTTPPOLLER_FORKS,0,TYPE_INT,PARM_OPT,0,255},
 		{"StartPingers",&CONFIG_PINGER_FORKS,0,TYPE_INT,PARM_OPT,0,255},
@@ -478,6 +479,9 @@ int MAIN_ZABBIX_ENTRY(void)
 	}
 	DBfree_result(result);
 
+	init_database_cache(ZBX_PROCESS_SERVER);
+	init_configuration_cache();
+
 /* Need to set trigger status to UNKNOWN since last run */
 /* DBconnect() already made in init_config() */
 /*	DBconnect();*/
@@ -493,9 +497,6 @@ int MAIN_ZABBIX_ENTRY(void)
 		zbx_error("Unable to create mutex for node syncs");
 		exit(FAIL);
 	}
-
-	init_database_cache(ZBX_PROCESS_SERVER);
-	init_configuration_cache();
 
 /*#define CALC_TREND*/
 

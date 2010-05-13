@@ -190,7 +190,7 @@
  *	 Aly mod by Vedmak
  *
  */
-function get_accessible_triggers($perm, $hostids, $perm_res=null, $nodeid=null, $cache=1){
+function get_accessible_triggers($perm, $hostids, $perm=null, $nodeid=null, $cache=1){
 	global $USER_DETAILS;
 	static $available_triggers;
 
@@ -207,54 +207,16 @@ function get_accessible_triggers($perm, $hostids, $perm_res=null, $nodeid=null, 
 		return $available_triggers[$cache_hash];
 	}
 
-	$result = array();
+	$options = array(
+		'output' => API_OUTPUT_SHORTEN
+	);
 
-	$sql_where = array();
-	if(!empty($hostids)){
-		array_push($sql_where, DBcondition('i.hostid', $hostids));
-	}
-	if(!is_null($nodeid)){
-		array_push($sql_where, DBin_node('i.hostid', $nodeid));
-	}
-	$sql_where = count($sql_where) ? ' AND '.implode(' AND ',$sql_where) : '';
+	if(!empty($hostids)) $options['hostids'] = $hostids;
+	if(!is_null($nodeid)) $options['nodeids'] = $nodeid;
+	if($perm == PERM_READ_WRITE) $options['editable'] = 1;
 
-	if(USER_TYPE_SUPER_ADMIN == $user_type){
-		$sql = 'SELECT DISTINCT t.triggerid
-				FROM triggers t, functions f, items i
-				WHERE t.triggerid=f.triggerid
-					AND f.itemid=i.itemid'.
-					$sql_where;
-	}
-	else{
-		$sql = 'SELECT DISTINCT t.triggerid
-				FROM triggers t, functions f, items i, hosts_groups hg, rights r, users_groups g
-				WHERE t.triggerid=f.triggerid'.
-					$sql_where.'
-					AND hg.hostid=i.hostid
-					AND r.id=hg.groupid
-					AND r.groupid=g.usrgrpid
-					AND g.userid='.$userid.'
-					AND f.itemid=i.itemid
-					AND r.permission>'.($perm-1).'
-					AND NOT EXISTS(
-						SELECT ff.triggerid
-						FROM functions ff, items ii
-						WHERE ff.triggerid=t.triggerid
-							AND ff.itemid=ii.itemid
-							AND	EXISTS (
-							  SELECT hgg.hostid
-							  FROM hosts_groups hgg, rights rr, users_groups gg
-							  WHERE hgg.hostid=ii.hostid
-								AND rr.id=hgg.groupid
-								AND rr.groupid=gg.usrgrpid
-								AND gg.userid='.$userid.'
-								AND rr.permission<'.$perm.'))';
-	}
-
-	$db_triggers = DBselect($sql);
-	while($trigger = DBfetch($db_triggers)){
-		$result[$trigger['triggerid']] = $trigger['triggerid'];
-	}
+	$result = CTrigger::get($options);
+	$result = zbx_objectValues($result, 'triggerid');
 
 	$available_triggers[$cache_hash] = $result;
 
@@ -935,9 +897,8 @@ return $result;
 
 		$host_triggers = DBSelect($sql);
 		while($host_trigger = DBfetch($host_triggers)){
-			if(cmp_triggers_exressions($triggerid, $host_trigger['triggerid']))	continue;
+			if(cmp_triggers_exressions($trigger['expression'], $host_trigger['expression'])) continue;
 			// link not linked trigger with same expression
-
 			return update_trigger(
 				$host_trigger['triggerid'],
 				NULL,	// expression
@@ -1804,8 +1765,8 @@ return $result;
 	}
 
 	function expand_trigger_description($triggerid){
-		$description=expand_trigger_description_simple($triggerid);
-		$description=htmlspecialchars($description);
+		$description = expand_trigger_description_simple($triggerid);
+		$description = htmlspecialchars($description);
 	return $description;
 	}
 
@@ -2392,17 +2353,28 @@ return $result;
 			$tdiff = array_diff($dep_templateids, $templateids);
 			if(!empty($templateids) && !empty($dep_templateids) && !empty($tdiff)){
 				$tpls = zbx_array_merge($templateids, $dep_templateids);
-				$sql = 'SELECT DISTINCT ht.templateid '.
-						' FROM hosts h, hosts_templates ht '.
-						' WHERE h.hostid=ht.hostid '.
-							' AND h.status='.HOST_STATUS_TEMPLATE.
+				$sql = 'SELECT DISTINCT ht.templateid, ht.hostid, h.host'.
+						' FROM hosts_templates ht, hosts h'.
+						' WHERE h.hostid=ht.hostid'.
 							' AND '.DBcondition('ht.templateid', $tpls);
 
 				$db_lowlvltpl = DBselect($sql);
+				$map = array();
 				while($lovlvltpl = DBfetch($db_lowlvltpl)){
-					error($templates[$lovlvltpl['templateid']]['host'].SPACE.S_IS_NOT_THE_HIGHEST_LEVEL_TEMPLATE);
-					$result = false;
+					if(!isset($map[$lovlvltpl['hostid']])) $map[$lovlvltpl['hostid']] = array();
+					$map[$lovlvltpl['hostid']][$lovlvltpl['templateid']] = $lovlvltpl['host'];
 				}
+				
+				foreach($map as $hostid => $templates){
+					foreach($tpls as $tplid){
+						if(!isset($templates[$tplid])){
+							error('Not all Templates are linked to host [ '.reset($templates).' ]');
+							$result = false;
+							break 2;
+						}
+					}
+				}
+				
 			}
 		}
 
@@ -2468,24 +2440,10 @@ return $result;
  * Comments:
  *
  */
-	function cmp_triggers_exressions($triggerid1, $triggerid2){
-// compare EXPRESSION !!!
-		$trig1 = get_trigger_by_triggerid($triggerid1);
-		$trig2 = get_trigger_by_triggerid($triggerid2);
-
-		$trig_fnc1 = get_functions_by_triggerid($triggerid1);
-		$expr1 = $trig1['expression'];
-		while($fnc1 = DBfetch($trig_fnc1)){
-			$trig_fnc2 = get_functions_by_triggerid($triggerid2);
-			while($fnc2 = DBfetch($trig_fnc2)){
-				$expr1 = str_replace(
-					'{'.$fnc1['functionid'].'}',
-					'{'.$fnc2['functionid'].'}',
-					$expr1);
-				break;
-			}
-		}
-	return strcmp($expr1,$trig2['expression']);
+	function cmp_triggers_exressions($expr1, $expr2){
+		$expr1 = preg_replace('/{[0-9]+}/', 'func', $expr1);
+		$expr2 = preg_replace('/{[0-9]+}/', 'func', $expr2);
+		return strcmp($expr1, $expr2);
 	}
 
 	/*
@@ -3155,6 +3113,31 @@ return $result;
 	return $row;
 	}
 
+	function get_triggers_unacknowledged($db_element, $count_problems=null){
+		$elements = array('hosts' => array(), 'hosts_groups' => array(), 'triggers' => array());
+
+		get_map_elements($db_element, $elements);
+		if(empty($elements['hosts_groups']) && empty($elements['hosts']) && empty($elements['triggers'])){
+			return 0;
+		}
+
+		$config = select_config();
+		$options = array(
+			'nodeids' => get_current_nodeid(),
+			'monitored' => 1,
+			'countOutput' => 1,
+			'only_problems' => $count_problems,
+			'with_unacknowledged_events' => 1,
+			'limit' => ($config['search_limit']+1)
+		);
+		if(!empty($elements['hosts_groups'])) $options['groupids'] = array_unique($elements['hosts_groups']);
+		if(!empty($elements['hosts'])) $options['hostids'] = array_unique($elements['hosts']);
+		if(!empty($elements['triggers'])) $options['triggerids'] = array_unique($elements['triggers']);
+		$triggers = CTrigger::get($options);
+
+
+	return $triggers;
+	}
 
 // author: Aly
 	function make_trigger_details($triggerid,&$trigger_data){
@@ -3168,7 +3151,7 @@ return $result;
 		$table->addRow(array(S_TRIGGER, $trigger_data['exp_desc']));
 		$table->addRow(array(S_SEVERITY, new CCol(get_severity_description($trigger_data['priority']), get_severity_style($trigger_data['priority']))));
 		$table->addRow(array(S_EXPRESSION, $trigger_data['exp_expr']));
-		$table->addRow(array(S_EVENT_GENERATION, S_NORMAL.((TRIGGER_MULT_EVENT_ENABLED==$trigger_data['type'])?SPACE.'+'.SPACE.S_MULTIPLE_TRUE_EVENTS:'')));
+		$table->addRow(array(S_EVENT_GENERATION, S_NORMAL.((TRIGGER_MULT_EVENT_ENABLED==$trigger_data['type'])?SPACE.'+'.SPACE.S_MULTIPLE_PROBLEM_EVENTS:'')));
 		$table->addRow(array(S_DISABLED, ((TRIGGER_STATUS_ENABLED==$trigger_data['status'])?new CCol(S_NO,'off'):new CCol(S_YES,'on')) ));
 
 	return $table;
