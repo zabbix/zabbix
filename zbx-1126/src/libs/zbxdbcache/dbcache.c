@@ -870,8 +870,13 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 			TRIGGER_STATUS_ENABLED);
 
 	for (i = 0; i < history_num; i++)
+	{
+		if (0 != history[i].value_null)
+			continue;
+
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 32, ZBX_FS_UI64 ",",
 				history[i].itemid);
+	}
 
 	if (sql[sql_offset - 1] == ',')
 	{
@@ -932,6 +937,18 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 	DBfree_result(result);
 }
 
+static int	DBchk_double(double value)
+{
+	/* field with precision 16, scale 4 [NUMERIC(16,4)] */
+	register double	pg_min_numeric = (double)-1E12;
+	register double	pg_max_numeric = (double)1E12;
+
+	if (value <= pg_min_numeric || value >= pg_max_numeric)
+		return FAIL;
+
+	return SUCCEED;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: DCmass_update_items                                              *
@@ -956,6 +973,7 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	ZBX_DC_HISTORY	*h;
 	zbx_uint64_t	*ids = NULL;
 	int		ids_alloc, ids_num = 0;
+	unsigned char	status;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In DCmass_update_items()");
 
@@ -1039,6 +1057,8 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 			h->keep_trends = (unsigned char)(item.trends ? 1 : 0);
 		}
 
+		status = ITEM_STATUS_ACTIVE;
+
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, "update items set lastclock=%d",
 				h->clock);
 
@@ -1047,20 +1067,41 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 			switch (item.delta) {
 			case ITEM_STORE_AS_IS:
 				h->value.value_float = DBmultiply_value_float(&item, h->value_orig.value_float);
-				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-						",prevvalue=lastvalue,prevorgvalue=NULL,lastvalue='" ZBX_FS_DBL "'",
-						h->value.value_float);
+
+				if (SUCCEED == DBchk_double(h->value.value_float))
+				{
+					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+							",prevvalue=lastvalue,prevorgvalue=NULL,lastvalue='" ZBX_FS_DBL "'",
+							h->value.value_float);
+				}
+				else
+				{
+					status = ITEM_STATUS_NOTSUPPORTED;
+					h->value_null = 1;
+				}
 				break;
 			case ITEM_STORE_SPEED_PER_SECOND:
 				if (item.prevorgvalue_null == 0 && item.prevorgvalue_dbl <= h->value_orig.value_float && item.lastclock < h->clock)
 				{
 					h->value.value_float = (h->value_orig.value_float - item.prevorgvalue_dbl) / (h->clock - item.lastclock);
 					h->value.value_float = DBmultiply_value_float(&item, h->value.value_float);
-					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-							",prevvalue=lastvalue,prevorgvalue='" ZBX_FS_DBL "'"
-							",lastvalue='" ZBX_FS_DBL "'",
-							h->value_orig.value_float,
-							h->value.value_float);
+
+					if (SUCCEED == DBchk_double(h->value.value_float))
+					{
+						zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+								",prevvalue=lastvalue,prevorgvalue='" ZBX_FS_DBL "'"
+								",lastvalue='" ZBX_FS_DBL "'",
+								h->value_orig.value_float,
+								h->value.value_float);
+					}
+					else
+					{
+						zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+								",prevorgvalue='" ZBX_FS_DBL "'",
+								h->value_orig.value_float);
+						status = ITEM_STATUS_NOTSUPPORTED;
+						h->value_null = 1;
+					}
 				}
 				else
 				{
@@ -1075,11 +1116,23 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 				{
 					h->value.value_float = h->value_orig.value_float - item.prevorgvalue_dbl;
 					h->value.value_float = DBmultiply_value_float(&item, h->value.value_float);
-					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-							",prevvalue=lastvalue,prevorgvalue='" ZBX_FS_DBL "'"
-							",lastvalue='" ZBX_FS_DBL "'",
-							h->value_orig.value_float,
-							h->value.value_float);
+
+					if (SUCCEED == DBchk_double(h->value.value_float))
+					{
+						zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+								",prevvalue=lastvalue,prevorgvalue='" ZBX_FS_DBL "'"
+								",lastvalue='" ZBX_FS_DBL "'",
+								h->value_orig.value_float,
+								h->value.value_float);
+					}
+					else
+					{
+						zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+								",prevorgvalue='" ZBX_FS_DBL "'",
+								h->value_orig.value_float);
+						status = ITEM_STATUS_NOTSUPPORTED;
+						h->value_null = 1;
+					}
 				}
 				else
 				{
@@ -1089,6 +1142,37 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 					h->value_null = 1;
 				}
 				break;
+			}
+
+			if (ITEM_STATUS_NOTSUPPORTED == status)
+			{
+				const char	*hostkey_name;
+
+				hostkey_name = zbx_host_key_string(h->itemid);
+
+				message = zbx_dsprintf(message, "Type of received value"
+						" [" ZBX_FS_DBL "] is not suitable for value type [%s]",
+						h->value.value_float,
+						zbx_item_value_type_string(h->value_type));
+
+				zabbix_log(LOG_LEVEL_WARNING, "Item [%s] error: %s",
+						hostkey_name, message);
+				zabbix_syslog("Item [%s] error: %s",
+						hostkey_name, message);
+
+				if (ITEM_STATUS_NOTSUPPORTED != item.status)
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "Parameter [%s] is not supported by agent"
+							" Old status [%d]",
+							hostkey_name, item.status);
+					zabbix_syslog("Parameter [%s] is not supported by agent",
+							hostkey_name);
+				}
+
+				DCadd_nextcheck(h->itemid, h->clock, message);	/* update error & status field in items table */
+				DCconfig_update_item(h->itemid, ITEM_STATUS_NOTSUPPORTED, h->clock);
+
+				zbx_free(message);
 			}
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
@@ -1159,7 +1243,7 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 		}
 
 		/* Update item status if required */
-		if (item.status == ITEM_STATUS_NOTSUPPORTED)
+		if (item.status == ITEM_STATUS_NOTSUPPORTED && status == ITEM_STATUS_ACTIVE)
 		{
 			message = zbx_dsprintf(message, "Parameter [" ZBX_FS_UI64 "][%s] became supported by agent",
 					item.itemid, zbx_host_key_string(item.itemid));
@@ -2063,6 +2147,8 @@ int	DCsync_history(int sync_type)
 		if (0 == history_num)
 			break;
 
+		DCinit_nextchecks();
+
 		DBbegin();
 
 		if (zbx_process == ZBX_PROCESS_SERVER)
@@ -2079,6 +2165,8 @@ int	DCsync_history(int sync_type)
 		}
 
 		DBcommit();
+
+		DCflush_nextchecks();
 
 		LOCK_CACHE;
 
