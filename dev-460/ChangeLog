@@ -1,6 +1,9 @@
 Changes for 1.8.3
 
  - [DEV-460]  improved host-group and maps icons info in zabbix maps (Aly)
+ - [ZBX-2379] fixed trigger expression editing with trigger builder (Maxim Andruhovich/AM)
+ - [ZBXNEXT-338] added caching of eventid's (Sasha)
+ - [ZBX-1438] fixed not deleting data from trends_uint table when delete item (Vedmak)
  - [ZBX-2276] fixed dashboard discovery status header (Aly)
  - [ZBX-2377] fixed converting html special chars in graphs legend (Aly)
  - [ZBX-2311] fixed Host group empty value selection for items filtering (Aly)
@@ -24,10 +27,6 @@ Changes for 1.8.3
  - [ZBX-1902] fixed some possibilities to create incorrect linkage (Vedmak)
  - [ZBX-2386] rows per page limit increased (Vedmak)
  - [ZBX-2306] fixed zoom position (Aly)
- - [ZBX-2306] improved starting zoom on edges (Aly)
- - [ZBX-2132] added date format constants to locales, changed zbx_date2str function to meet regional formats and date translation
- - [ZBXNEXT-311] improved speedup dbconfig synchronization (Sasha)
- - [ZBX-2378] renamed calculated item field 'Expression' to 'Formula', changed trigger option 'Multiple TRUE events' to use 'PROBLEM' instead (Richlv)
  - [ZBX-2360] added multiple acknowledging for OK>UNKNOWN>OK and PROBLEM>UNKNOWN>PROBLEM events (Vedmak,Sasha)
  - [ZBX-2374] updated Ukrainian translation; thanks to zalex_ua (Richlv)
  - [ZBX-2347] fixed last 20 issues in event details showing less than 20 issues (Vedmak)
@@ -46,6 +45,7 @@ Changes for 1.8.3
  - [ZBX-2264] added opportunity to translate class.cuser.php and config.inc.php (AM)
  - [ZBX-2132] added date format constants to locales, changed zbx_date2str function to meet regional formats and date translation (AM)
  - [ZBXNEXT-311] improved the speed of dbconfig synchronization (Sasha)
+ - [ZBX-2378] renamed calculated item field 'Expression' to 'Formula', changed trigger option 'Multiple TRUE events' to use 'PROBLEM' instead (Richlv)
  - [ZBX-2329] fixed screen renaming (Aly)
  - [ZBX-2315] fixed multiple issues with JS scrollbar (Aly)
  - [ZBX-2321] fixed log items appearing in the wrong order (Alexei,asaveljevs,Sasha)

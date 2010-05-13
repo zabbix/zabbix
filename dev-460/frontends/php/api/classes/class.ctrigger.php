@@ -297,7 +297,7 @@ class CTrigger extends CZBXAPI{
 
 // maintenance
 		if(!is_null($options['maintenance'])){
-			$sql_parts['where'][] = (($options['maintenance'] == 0)?' NOT ':'').
+			$sql_parts['where'][] = (($options['maintenance'] == 0) ? ' NOT ':'').
 				' EXISTS ('.
 					' SELECT ff.functionid'.
 					' FROM functions ff'.
@@ -828,8 +828,21 @@ COpt::memoryPick();
 		$result = false;
 		
 		if(!isset($object['hostid']) && !isset($object['host'])){
-			preg_match('/^.*?{(.+?):/u', $object['expression'], $host);
-			$object['host'] = $host[1];
+			$expression = $object['expression'];
+			$expressionData = parseTriggerExpressions($expression, true);
+			
+			if( isset($expressionData[$expression]['errors']) ) {
+				//showExpressionErrors($expression, $expressionData[$expression]['errors']);
+				return false;
+			}
+			
+			if(!isset($expressionData[$expression]['hosts']) || !is_array($expressionData[$expression]['hosts']) || !count($expressionData[$expression]['hosts'])) {
+				//error(S_TRIGGER_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR);
+				return false;
+			}
+			
+			$hData =& $expressionData[$expression]['hosts'][0];
+			$object['host'] = zbx_substr($expression, $hData['openSymbolNum']+1, $hData['closeSymbolNum']-($hData['openSymbolNum']+1));
 		}
 
 		$options = array(

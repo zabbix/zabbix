@@ -2682,16 +2682,16 @@
 			$limited = $trigger['templateid'] ? 'yes' : null;
 		}
 
-		$expression		= get_request('expression'	,'');
-		$description		= get_request('description'	,'');
+		$expression		= get_request('expression',	'');
+		$description		= get_request('description',	'');
 		$type 			= get_request('type',		0);
-		$priority		= get_request('priority'	,0);
-		$status			= get_request('status'		,0);
-		$comments		= get_request('comments'	,'');
-		$url			= get_request('url'		,'');
+		$priority		= get_request('priority',	0);
+		$status			= get_request('status',		0);
+		$comments		= get_request('comments',	'');
+		$url			= get_request('url',		'');
 
-		$expr_temp  = get_request('expr_temp','');
-		$input_method = get_request('input_method',IM_ESTABLISHED);
+		$expr_temp		= get_request('expr_temp',	'');
+		$input_method		= get_request('input_method',	IM_ESTABLISHED);
 
 		if((isset($_REQUEST['triggerid']) && !isset($_REQUEST['form_refresh']))  || isset($limited)){
 			$description	= $trigger['description'];
@@ -2722,22 +2722,26 @@
 			$alz = analyze_expression($expression);
 
 			if($alz !== false){
-				list($outline, $node, $map) = $alz;
-				if(isset($_REQUEST['expr_action']) && $node != null){
+				list($outline, $eHTMLTree) = $alz;
+				if(isset($_REQUEST['expr_action']) && $eHTMLTree != null){
 
-					$new_expr = remake_expression($node, $_REQUEST['expr_target_single'], $_REQUEST['expr_action'], $expr_temp, $map);
+					$new_expr = remake_expression($expression, $_REQUEST['expr_target_single'], $_REQUEST['expr_action'], $expr_temp);
 					if($new_expr !== false){
 						$expression = $new_expr;
-						list($outline, $node, $map) = analyze_expression($expression);
+						$alz = analyze_expression($expression);
+						
+						if($alz !== false) list($outline, $eHTMLTree) = $alz;
+						else show_messages(false, '', S_EXPRESSION_SYNTAX_ERROR);
+
 						$expr_temp = '';
 					}
 					else{
-						show_messages();
+						show_messages(false, '', S_EXPRESSION_SYNTAX_ERROR);
 					}
 				}
 
 				$tree = array();
-				create_node_list($node, $tree);
+				//create_node_list($node, $tree);
 
 				$frmTrig->addVar('expression', $expression);
 				$exprfname = 'expr_temp';
@@ -2746,7 +2750,9 @@
 				$exprparam = "this.form.elements['$exprfname'].value";
 			}
 			else{
-				$input_method = IM_FORCED;
+				show_messages(false, '', S_EXPRESSION_SYNTAX_ERROR);
+				$input_method = IM_ESTABLISHED;
+				//$input_method = IM_FORCED;
 			}
 		}
 
@@ -2797,23 +2803,44 @@
 			$exp_table->setOddRowClass('even_row');
 			$exp_table->setEvenRowClass('even_row');
 
-			$exp_table->setHeader(array(S_TARGET, S_EXPRESSION, S_DELETE));
+			$exp_table->setHeader(array(S_TARGET, S_EXPRESSION, S_EXPRESSION_PART_ERROR, S_DELETE));
 
-			if($node != null){
-				$exprs = make_disp_tree($tree, $map, true);
-				foreach($exprs as $i => $e){
-					$tgt_chk = new CCheckbox('expr_target_single', ($i==0)?'yes':'no', 'check_target(this);', $e['id']);
+			$allowedTesting = true;
+			if($eHTMLTree != null){
+				foreach($eHTMLTree as $i => $e){
+					$tgt_chk = new CCheckbox('expr_target_single', ($i==0) ? 'yes':'no', 'check_target(this);', $e['id']);
 					$del_url = new CSpan(S_DELETE,'link');
+					
 					$del_url->setAttribute('onclick', 'javascript: if(confirm("'.S_DELETE_EXPRESSION_Q.'")) {'.
-										 	' delete_expression('.$e['id'] .');'.
-										 	' document.forms["config_triggers.php"].submit(); '.
-										'}');
+									' delete_expression(\''.$e['id'] .'\');'.
+									' document.forms["config_triggers.php"].submit(); '.
+								'}');
+					
+					if(!isset($e['expression']['levelErrors'])) {
+						$errorImg = new CImg('images/general/ok_icon.png', 'expression_no_errors');
+						$errorImg->setHint(S_EXPRESSION_PART_NO_ERROR, '', '', false);
+					}else{
+						$allowedTesting = false;
+						$errorImg = new CImg('images/general/error_icon.png', 'expression_errors');
+						
+						$errorTexts = Array();
+						if(is_array($e['expression']['levelErrors'])) {
+							foreach($e['expression']['levelErrors'] as $expVal => $errTxt) {
+								if(count($errorTexts) > 0) array_push($errorTexts, BR());
+								array_push($errorTexts, $expVal, ':', $errTxt);
+							}
+						}
+						
+						$errorImg->setHint($errorTexts, '', 'left', false);
+					}
 
-					$row = new CRow(array($tgt_chk, $e['expr'], $del_url));
+					$errorCell = new CCol($errorImg, 'center');
+					$row = new CRow(array($tgt_chk, $e['list'], $errorCell, $del_url));
 					$exp_table->addRow($row);
 				}
 			}
 			else{
+				$allowedTesting = false;
 				$outline = '';
 			}
 
@@ -2826,7 +2853,9 @@
 									",850,400".
 									",'titlebar=no, resizable=yes, scrollbars=yes');".
 									"return false;");
+			if(!isset($allowedTesting) || !$allowedTesting) $btn_test->setAttribute('disabled', 'disabled');
 			if (empty($outline)) $btn_test->setAttribute('disabled', 'yes');
+			//SDI($outline);
 			$frmTrig->addRow(SPACE, array($outline,
 										  BR(),BR(),
 										  $exp_table,
