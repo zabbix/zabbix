@@ -2077,7 +2077,7 @@
 
 				if(isset($mainProblems[$el_info['elementtype']])){
 					if(!is_null($hl_color)) $st_color = null;
-					if(isset($el_info['disabled'])) $st_color = hex2rgb('EEEEEE');
+					else if(isset($el_info['disabled'])) $st_color = hex2rgb('EEEEEE');
 				}
 				else if(!is_null($st_color)){
 					$hl_color = null;
