@@ -196,7 +196,10 @@
 //	define('HOST_STATUS_UNREACHABLE',	2);
 	define('HOST_STATUS_TEMPLATE',		3);
 	define('HOST_STATUS_DELETED',		4);
-	define('HOST_STATUS_PROXY',		5);
+	define('HOST_STATUS_PROXY',			5);
+
+	define('HOST_MAINTENANCE_STATUS_OFF',	0);
+	define('HOST_MAINTENANCE_STATUS_ON',	1);
 
 	define('HOST_AVAILABLE_UNKNOWN',	0);
 	define('HOST_AVAILABLE_TRUE',		1);

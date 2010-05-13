@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [DEV-460] improved host-group and maps icons info in zabbix maps (Aly)
  - [ZBXNEXT-338] added caching of eventid's (Sasha)
  - [ZBX-1438] fixed not deleting data from trends_uint table when delete item (Vedmak)
  - [ZBX-2276] fixed dashboard discovery status header (Aly)
