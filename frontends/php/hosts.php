@@ -701,7 +701,6 @@ $thid = get_request('hostid', 0);
 				$proxy = reset($proxy);
 				$description[] = $proxy['host'] . ':';
 			}
-			$description[] = new CLink($host['host'], 'hosts.php?form=update&hostid='.$host['hostid'].url_param('groupid'));
 
 			$dns = empty($host['dns']) ? '-' : $host['dns'];
 			$ip = empty($host['ip']) ? '-' : $host['ip'];
@@ -710,14 +709,25 @@ $thid = get_request('hostid', 0);
 
 			switch($host['status']){
 				case HOST_STATUS_MONITORED:
-					$status = new CLink(S_MONITORED, 'hosts.php?hosts%5B%5D='.$host['hostid'].'&go=disable'.url_param('groupid'), 'off');
+					$status_caption = S_MONITORED;
+					$status_url = 'hosts.php?hosts%5B%5D='.$host['hostid'].'&go=disable'.url_param('groupid');
+					$status_class = 'enabled';
 					break;
 				case HOST_STATUS_NOT_MONITORED:
-					$status = new CLink(S_NOT_MONITORED, 'hosts.php?hosts%5B%5D='.$host['hostid'].'&go=activate'.url_param('groupid'), 'on');
+					$status_caption = S_NOT_MONITORED;
+					$status_url = 'hosts.php?hosts%5B%5D='.$host['hostid'].'&go=activate'.url_param('groupid');
+					$status_class = 'disabled';
 					break;
 				default:
-					$status = S_UNKNOWN;
+					$status_caption = S_UNKNOWN;
+					$status_url = '#';
+					$status_class = 'unknown';
 			}
+			
+			$status = new CLink($status_caption, $status_url, $status_class);
+
+			if($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) $status_class = 'orange';
+			$description[] = new CLink($host['host'], 'hosts.php?form=update&hostid='.$host['hostid'].url_param('groupid'), $status_class);
 
 			switch($host['available']){
 				case HOST_AVAILABLE_TRUE:
@@ -837,6 +847,9 @@ $thid = get_request('hostid', 0);
 	}
 	
 	$hosts_wdgt->show();
+?>
+<?php
 
 include_once('include/page_footer.php');
+
 ?>
