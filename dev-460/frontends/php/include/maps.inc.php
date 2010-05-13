@@ -2067,8 +2067,8 @@
 				}
 
 				if(isset($el_info['unavailable']))		$st_color = ($el_info['unavailable'] == HOST_AVAILABLE_FALSE) ? hex2rgb('FF0000'): hex2rgb('CCCCCC');
-				if(isset($el_info['disabled']))			$st_color = hex2rgb('AA0000');
-				if(!empty($el_info['maintenances']))	$st_color = hex2rgb('EE6000');
+				if(isset($el_info['disabled']))			$st_color = hex2rgb('EEEEEE');
+				if(!empty($el_info['maintenances']))	$st_color = hex2rgb('FF9933');
 
 				$mainProblems = array(
 					SYSMAP_ELEMENT_TYPE_HOST_GROUP => 1,
@@ -2077,7 +2077,6 @@
 
 				if(isset($mainProblems[$el_info['elementtype']])){
 					if(!is_null($hl_color)) $st_color = null;
-					else if(isset($el_info['disabled'])) $st_color = hex2rgb('EEEEEE');
 				}
 				else if(!is_null($st_color)){
 					$hl_color = null;
