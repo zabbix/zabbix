@@ -277,7 +277,7 @@
 				' GROUP BY h.proxy_hostid';
 		$db_perf = DBselect($sql);
 		while($perf = DBfetch($db_perf)){
-			$proxies[$perf['proxy_hostid']]['perf'] = $perf['qps'];
+			$proxies[$perf['proxy_hostid']]['perf'] = round($perf['qps'], 2);
 		}
 // }}} CALCULATE PERFORMANCE
 

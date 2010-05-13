@@ -816,7 +816,8 @@ function __autoload($class_name){
 					' AND h.status='.HOST_STATUS_MONITORED.
 					' AND i.delay<>0';
 		$row = DBfetch(DBselect($sql));
-		$status['qps_total'] = $row['qps'];
+		
+		$status['qps_total'] = round($row['qps'],2);
 
 	return $status;
 	}
