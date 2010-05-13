@@ -386,11 +386,10 @@ static void	DCupdate_item_queue(ZBX_DC_ITEM *item)
 	}
 }
 
-static void	DCsync_items()
+static void	DCsync_items(DB_RESULT result)
 {
 	const char		*__function_name = "DCsync_items";
 
-	DB_RESULT		result;
 	DB_ROW			row;
 
 	ZBX_DC_ITEM		*item;
@@ -418,23 +417,6 @@ static void	DCsync_items()
 	zbx_vector_uint64_reserve(&ids, config->itemids.values_num + 32);
 
 	now = time(NULL);
-
-	result = DBselect(
-			"select i.itemid,i.hostid,h.proxy_hostid,i.type,i.data_type,i.value_type,i.key_,"
-				"i.snmp_community,i.snmp_oid,i.snmp_port,i.snmpv3_securityname,"
-				"i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,"
-				"i.ipmi_sensor,i.delay,i.delay_flex,i.trapper_hosts,i.logtimefmt,i.params,"
-				"i.status,i.authtype,i.username,i.password,i.publickey,i.privatekey"
-			" from items i,hosts h"
-			" where i.hostid=h.hostid"
-				" and h.status in (%d)"
-				" and i.status in (%d,%d)"
-				DB_NODE,
-			HOST_STATUS_MONITORED,
-			ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED,
-			DBnode_local("i.itemid"));
-
-	LOCK_CACHE;
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -814,20 +796,15 @@ static void	DCsync_items()
 	for (i = 0; i < ids.values_num; i++)
 		zbx_vector_uint64_append(&config->itemids, ids.values[i]);
 
-	UNLOCK_CACHE;
-
-	DBfree_result(result);
-
 	zbx_vector_uint64_destroy(&ids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	DCsync_hosts()
+static void	DCsync_hosts(DB_RESULT result)
 {
 	const char		*__function_name = "DCsync_hosts";
 
-	DB_RESULT		result;
 	DB_ROW			row;
 
 	ZBX_DC_HOST		*host;
@@ -843,20 +820,6 @@ static void	DCsync_hosts()
 
 	zbx_vector_uint64_create(&ids);
 	zbx_vector_uint64_reserve(&ids, config->hostids.values_num + 32);
-
-	result = DBselect(
-			"select hostid,proxy_hostid,host,useip,ip,dns,port,"
-				"useipmi,ipmi_ip,ipmi_port,ipmi_authtype,ipmi_privilege,ipmi_username,"
-				"ipmi_password,maintenance_status,maintenance_type,maintenance_from,"
-				"errors_from,available,disable_until,snmp_errors_from,snmp_available,"
-				"snmp_disable_until,ipmi_errors_from,ipmi_available,ipmi_disable_until"
-			" from hosts"
-			" where status=%d"
-				DB_NODE,
-			HOST_STATUS_MONITORED,
-			DBnode_local("hostid"));
-
-	LOCK_CACHE;
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -978,10 +941,6 @@ static void	DCsync_hosts()
 	for (i = 0; i < ids.values_num; i++)
 		zbx_vector_uint64_append(&config->hostids, ids.values[i]);
 
-	UNLOCK_CACHE;
-
-	DBfree_result(result);
-
 	zbx_vector_uint64_destroy(&ids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -1006,14 +965,53 @@ void	DCsync_configuration()
 {
 	const char		*__function_name = "DCsync_configuration";
 
+	DB_RESULT		item_result;
+	DB_RESULT		host_result;
+
 	double			sec;
 	const zbx_strpool_t	*strpool;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	sec = zbx_time();
-	DCsync_items();
-	DCsync_hosts();
+
+	item_result = DBselect(
+			"select i.itemid,i.hostid,h.proxy_hostid,i.type,i.data_type,i.value_type,i.key_,"
+				"i.snmp_community,i.snmp_oid,i.snmp_port,i.snmpv3_securityname,"
+				"i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,"
+				"i.ipmi_sensor,i.delay,i.delay_flex,i.trapper_hosts,i.logtimefmt,i.params,"
+				"i.status,i.authtype,i.username,i.password,i.publickey,i.privatekey"
+			" from items i,hosts h"
+			" where i.hostid=h.hostid"
+				" and h.status in (%d)"
+				" and i.status in (%d,%d)"
+				DB_NODE,
+			HOST_STATUS_MONITORED,
+			ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED,
+			DBnode_local("i.itemid"));
+
+	host_result = DBselect(
+			"select hostid,proxy_hostid,host,useip,ip,dns,port,"
+				"useipmi,ipmi_ip,ipmi_port,ipmi_authtype,ipmi_privilege,ipmi_username,"
+				"ipmi_password,maintenance_status,maintenance_type,maintenance_from,"
+				"errors_from,available,disable_until,snmp_errors_from,snmp_available,"
+				"snmp_disable_until,ipmi_errors_from,ipmi_available,ipmi_disable_until"
+			" from hosts"
+			" where status=%d"
+				DB_NODE,
+			HOST_STATUS_MONITORED,
+			DBnode_local("hostid"));
+
+	LOCK_CACHE;
+
+	DCsync_items(item_result);
+	DCsync_hosts(host_result);
+
+	UNLOCK_CACHE;
+
+	DBfree_result(item_result);
+	DBfree_result(host_result);
+
 	sec = zbx_time() - sec;
 
 	strpool = zbx_strpool_info();
