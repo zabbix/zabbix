@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -61,6 +61,8 @@
 	$hostprof_wdgt = new CWidget();
 
 	$profile_form = new CForm(null, 'get');
+	// $profile_form->addVar('sort', 'host');
+	// $profile_form->addVar('sortorder', ZBX_SORT_UP);
 	$cmbProf = new CComboBox('prof_type', $_REQUEST['prof_type'], 'javascript: submit();');
 	$cmbProf->additem(0, S_NORMAL);
 	$cmbProf->additem(1, S_EXTENDED);
@@ -70,6 +72,8 @@
 
 
 	if($_REQUEST['hostid'] > 0){
+		echo SBR;
+
 		if($_REQUEST['prof_type']){
 			$hostprof_wdgt->addItem(insert_host_profile_ext_form());
 		}
@@ -194,17 +198,17 @@
 				new CLink($host['host'],'?hostid='.$host['hostid'].url_param('groupid').'&prof_type='.$_REQUEST['prof_type']),
 				$host_groups);
 			if(0 == $_REQUEST['prof_type']){
-				$row[] = text2array_with_links($host['profile']['name']);
-				$row[] = text2array_with_links($host['profile']['os']);
-				$row[] = text2array_with_links($host['profile']['serialno']);
-				$row[] = text2array_with_links($host['profile']['tag']);
-				$row[] = text2array_with_links($host['profile']['macaddress']);
+				$row[] = $host['profile']['name'];
+				$row[] = $host['profile']['os'];
+				$row[] = $host['profile']['serialno'];
+				$row[] = $host['profile']['tag'];
+				$row[] = $host['profile']['macaddress'];
 			}
 			else{
-				$row[] = text2array_with_links($host['profile_ext']['device_os_short']);
-				$row[] = text2array_with_links($host['profile_ext']['device_hw_arch']);
-				$row[] = text2array_with_links($host['profile_ext']['device_type']);
-				$row[] = text2array_with_links($host['profile_ext']['device_status']);
+				$row[] = $host['profile_ext']['device_os_short'];
+				$row[] = $host['profile_ext']['device_hw_arch'];
+				$row[] = $host['profile_ext']['device_type'];
+				$row[] = $host['profile_ext']['device_status'];
 			}
 
 			$table->addRow($row);
