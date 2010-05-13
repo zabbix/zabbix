@@ -189,6 +189,7 @@ static void	*__mem_malloc(zbx_mem_info_t *info, uint32_t size)
 	void		**next_in_prev_chunk, **prev_in_next_chunk;
 	uint32_t	chunk_size;
 	int		counter = 0;
+	uint32_t	skip_min = 0xffffffff, skip_max = 0;
 
 	size = mem_proper_alloc_size(size);
 
@@ -199,13 +200,17 @@ static void	*__mem_malloc(zbx_mem_info_t *info, uint32_t size)
 	while (NULL != chunk && CHUNK_SIZE(chunk) < size)
 	{
 		counter++;
+		skip_min = MIN(skip_min, CHUNK_SIZE(chunk));
+		skip_max = MAX(skip_max, CHUNK_SIZE(chunk));
 		chunk = mem_get_next_chunk(chunk);
 	}
 
 	if (NULL == chunk)
 		return NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "__mem_malloc: chunk #%d is big enough", counter);
+	if (counter >= 100)
+		zabbix_log(LOG_LEVEL_DEBUG, "__mem_malloc: chunk #%d size %u asked %u skip_min %u skip_max %u",
+				counter, CHUNK_SIZE(chunk), size, skip_min, skip_max);
 
 	/* gather information about previous and next chunks, and their pointers to this chunk */
 

@@ -27,6 +27,8 @@ static void	__hashmap_ensure_free_entry(zbx_hashmap_t *hm, ZBX_HASHMAP_SLOT_T *s
 #define	CRIT_LOAD_FACTOR	5/1
 #define	SLOT_GROWTH_FACTOR	3/2
 
+#define ARRAY_GROWTH_FACTOR	2 /* because the number of slot entries is usually small, with 3/2 they grow too slow */
+
 /* private hashmap functions */
 
 static void	__hashmap_ensure_free_entry(zbx_hashmap_t *hm, ZBX_HASHMAP_SLOT_T *slot)
@@ -34,12 +36,12 @@ static void	__hashmap_ensure_free_entry(zbx_hashmap_t *hm, ZBX_HASHMAP_SLOT_T *s
 	if (NULL == slot->entries)
 	{
 		slot->entries_num = 0;
-		slot->entries_alloc = 4;
+		slot->entries_alloc = 6;
 		slot->entries = hm->mem_malloc_func(NULL, slot->entries_alloc * sizeof(ZBX_HASHMAP_ENTRY_T));
 	}
 	else if (slot->entries_num == slot->entries_alloc)
 	{
-		slot->entries_alloc += 4;
+		slot->entries_alloc = slot->entries_alloc * ARRAY_GROWTH_FACTOR;
 		slot->entries = hm->mem_realloc_func(slot->entries, slot->entries_alloc * sizeof(ZBX_HASHMAP_ENTRY_T));
 	}
 }
@@ -179,7 +181,7 @@ void	zbx_hashmap_set(zbx_hashmap_t *hm, zbx_uint64_t key, int value)
 				for (i = 0; i < slot->entries_num; i++)
 				{
 					hash = hm->hash_func(&slot->entries[i].key);
-					new_slot = &hm->slots[hash % hm->num_slots];
+					new_slot = &hm->slots[hash % inc_slots];
 
 					if (slot != new_slot)
 					{
