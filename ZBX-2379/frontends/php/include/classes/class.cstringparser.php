@@ -925,7 +925,7 @@ function triggerExpressionValidateItemKeyFunctionParams(&$parent, &$levelData, $
 						);
 			}
 		}
-	}/*else if(is_null($fnc_valid['args']) && isset($levelData['parts']) && count($levelData['parts']) > 1) {
+	}else if((!isset($fnc_valid['args']) || !$fnc_valid['args']) && isset($levelData['parts']) && count($levelData['parts']) > 1) {
 		return Array(
 				'valid' => false,
 				'errArray' => Array(
@@ -937,7 +937,7 @@ function triggerExpressionValidateItemKeyFunctionParams(&$parent, &$levelData, $
 					'function' => isset($parent['levelDBData']['function']) ? $parent['levelDBData']['function'] : '',
 					'value_type' => isset($parent['levelDBData']['value_type']) ? $parent['levelDBData']['value_type'] : '')
 				);
-	}*/
+	}
 }
 
 ?>
