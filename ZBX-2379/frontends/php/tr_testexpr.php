@@ -142,7 +142,7 @@ include_once('include/page_header.php');
 		
 		$result = '-';
 		if($allowedTesting && $test && isset($e['expression'])){
-			$evStr = replaceExpressionTestData($expression, &$e, &$rplcts);
+			$evStr = replaceExpressionTestData($expression, $e, $rplcts);
 			if(preg_match("/^[0-9\s=!()><+*\/&|\-]+$/is", $evStr)) eval('$result = '.$evStr.';');
 			$result = $result === true || ($result && $result != '-') ? 'TRUE' : 'FALSE';
 		}
@@ -159,7 +159,7 @@ include_once('include/page_header.php');
 	$result = '-';
 	if($allowedTesting && $test){
 		$e['expression'] = array('start' => 0, 'end' => zbx_strlen($expression), 'oSym' => NULL, 'cSym' => NULL);
-		$evStr = replaceExpressionTestData($expression, &$e, &$rplcts);
+		$evStr = replaceExpressionTestData($expression, $e, $rplcts);
 		if(preg_match("/^[0-9\s=!()><+*\/&|\-]+$/is", $evStr)) eval('$result = '.$evStr.';');
 		$result = $result === true || ($result && $result != '-') ? 'TRUE' : 'FALSE';
 	}
