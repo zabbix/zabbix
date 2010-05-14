@@ -597,6 +597,9 @@
 	'S_DELETE_SELECTED_PROXIES' =>	'Delete selected proxies?',
 	'S_CONFIGURATION_OF_PROXIES'=>	'CONFIGURATION OF PROXIES',
 	'S_DELETE_SELECTED_PROXY_Q'=>	'Delete selected proxy?',
+	'S_HOST_COUNT' => 'Host count',
+	'S_ITEM_COUNT' => 'Item count',
+	'S_REQUIRED_PERFORMANCE' => 'Required performance (vps)',
 
 //  Authentication
 	'S_AUTHENTICATION'=>			'Authentication',
@@ -737,12 +740,13 @@
 	'S_HISTORY_ITEM_DATE_FORMAT'=>		'Y.M.d H:i:s',
 
 // maintenance.php
-	'S_MAINTENANCE'=>			'Maintenance',
+	'S_MAINTENANCE'=>				'Maintenance',
 	'S_MAINTENANCE_ADDED'=>			'Maintenance added',
 	'S_MAINTENANCE_UPDATED'=>		'Maintenance updated',
 	'S_MAINTENANCE_DELETED'=>		'Maintenance deleted',
 	'S_DELETE_SELECTED_MAINTENANCE_PERIODS_Q'=>'Delete selected maintenance periods?',
 
+	'S_IN_MAINTENANCE'=>			'In maintenance',
 	'S_HOSTS_IN_MAINTENANCE'=>		'Hosts in maintenance',
 	'S_GROUPS_IN_MAINTENANCE'=>		'Groups in maintenance',
 
