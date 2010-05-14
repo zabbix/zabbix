@@ -368,7 +368,7 @@ static void	DCupdate_item_queue(ZBX_DC_ITEM *item)
 {
 	zbx_binary_heap_elem_t	elem;
 
-	if (!(0 <= item->poller_type && item->poller_type < ZBX_POLLER_TYPE_COUNT))
+	if (item->poller_type >= ZBX_POLLER_TYPE_COUNT)
 		return;
 
 	if (INTERNED_SERVER_STATUS_KEY == item->key || INTERNED_SERVER_ZABBIXLOG_KEY == item->key)
@@ -1211,7 +1211,7 @@ void	init_configuration_cache()
 								__config_mem_malloc_func,	\
 								__config_mem_realloc_func,	\
 								__config_mem_free_func);
-							
+
 	CREATE_VECTOR(config->itemids);
 	CREATE_HASHSET(config->items);
 	CREATE_HASHSET(config->snmpitems);

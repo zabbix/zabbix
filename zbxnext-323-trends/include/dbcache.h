@@ -114,7 +114,7 @@ void	init_database_cache(zbx_process_t p);
 void	free_database_cache(void);
 
 void	DCinit_nextchecks();
-void	DCadd_nextcheck(DC_ITEM *item, time_t now, const char *error_msg);
+void	DCadd_nextcheck(zbx_uint64_t itemid, time_t now, const char *error_msg);
 void	DCflush_nextchecks();
 
 #define ZBX_STATS_HISTORY_COUNTER	0
@@ -137,7 +137,8 @@ void	DCflush_nextchecks();
 #define ZBX_STATS_TEXT_PFREE		17
 void	*DCget_stats(int request);
 
-zbx_uint64_t	DCget_nextid(const char *table_name, const char *field_name, int num);
+zbx_uint64_t	DCget_nextid(const char *table_name, int num);
+zbx_uint64_t	DCget_nextid_shared(const char *table_name);
 
 int	DCget_item_lastclock(zbx_uint64_t itemid);
 

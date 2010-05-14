@@ -657,7 +657,7 @@ static int	get_values(int now)
 
 			activate_host(&items[i], now);
 
-			DCadd_nextcheck(&items[i], now, agent.msg);	/* update error & status field in items table */
+			DCadd_nextcheck(items[i].itemid, now, agent.msg);	/* update error & status field in items table */
 			DCrequeue_reachable_item(items[i].itemid, ITEM_STATUS_NOTSUPPORTED, now);
 		}
 		else if (res == NETWORK_ERROR)
