@@ -3205,12 +3205,9 @@ return $result;
 					//$errData['errEnd']-$errData['errStart']+1
 				)
 			);
-
+			
 			switch($errData['errorCode']) {
-				case 1:
-					error(S_EXPRESSION_UNEXPECTED_END_OF_ELEMENT_ERROR.': '.$checkExprFrom);
-					$totalBreak = true;
-				break;
+				case 1: error(S_EXPRESSION_UNEXPECTED_END_OF_ELEMENT_ERROR.': '.$checkExprFrom); $totalBreak = true; break;
 				case 2: error(S_EXPRESSION_NOT_ALLOWED_SYMBOLS_OR_SEQUENCE_ERROR.': '.$checkExprFrom); break;
 				case 3: error(S_EXPRESSION_UNNECESSARY_SYMBOLS_DETECTED_ERROR.': '.$checkExprFrom); break;
 				case 4: error(S_EXPRESSION_NOT_ALLOWED_SYMBOLS_BEFORE_ERROR.': '.$checkExprFrom); break;
@@ -4233,12 +4230,12 @@ $triggerExpressionRules['keyParam'] = Array(
 	'closeSymbol' => Array(',' => 'default', ']' => 'default'),
 	'escapeSymbol' => '\\',
 	'parent' => 'keyParams');
-$triggerExpressionRules['keyFunction'] = Array(
+/*$triggerExpressionRules['keyFunction'] = Array(
 	'openSymbol' => '.',
 	'closeSymbol' => ')',
 	'isEmpty' => true,
 	'customValidate' => 'triggerExpressionValidateItemKeyFunction',
-	'parent' => 'key');
+	'parent' => 'key');*/
 $triggerExpressionRules['keyFunctionName'] = Array(
 	'openSymbol' => '.',
 	'closeSymbol' => '(',
@@ -4266,14 +4263,15 @@ $triggerExpressionRules['keyFunctionName'] = Array(
 		'sum',
 		'time'),
 	'indexItem' => true,
-	'parent' => 'keyFunction');
+	'customValidate' => 'triggerExpressionValidateItemKeyFunction',
+	'parent' => 'key');
 $triggerExpressionRules['keyFunctionParams'] = Array(
 	'openSymbol' => '(',
 	'closeSymbol' => ')',
 	'isEmpty' => true,
 	'indexItem' => true,
 	'customValidate' => 'triggerExpressionValidateItemKeyFunctionParams',
-	'parent' => 'keyFunction');
+	'parent' => 'key');
 $triggerExpressionRules['keyFunctionParam'] = Array(
 	'openSymbol' => Array('(' => 'default', ',' => 'default'),
 	'closeSymbol' => Array(',' => 'default', ')' => 'default'),
