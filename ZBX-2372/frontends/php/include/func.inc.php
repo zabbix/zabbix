@@ -398,14 +398,14 @@ function zbx_date2str($format, $value=NULL){
 		$pchar = $i > 0 ? zbx_substr($format, $i-1, 1) : '';
 		$char = zbx_substr($format, $i, 1);
 		if($pchar != '\\' && isset($rplcs[$char])) {
-			$output .= (zbx_strlen($part) ? date($part) : '').$rplcs[$char];
+			$output .= (zbx_strlen($part) ? date($part, $value) : '').$rplcs[$char];
 			$part = '';
 		}else{
 			$part .= $char;
 		}
 	}
 	
-	$output .= zbx_strlen($part) ? date($part) : '';
+	$output .= zbx_strlen($part) ? date($part, $value) : '';
 	
 	return $output;
 }
