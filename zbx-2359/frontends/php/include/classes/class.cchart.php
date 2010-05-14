@@ -1695,6 +1695,26 @@ class CChart extends CGraphDraw{
 		$legend->draw();
 	}
 
+	protected function limitToBounds(&$value1, &$value2, $min, $max, $drawtype){
+// Fixes graph out of bounds problem
+		if( (($value1 > ($max+$min)) && ($value2 > ($max+$min))) || (($value1 < $min) && ($value2 < $min)) ){
+			if($drawtype != GRAPH_ITEM_DRAWTYPE_FILLED_REGION) return false;
+		}
+
+		$y_first = (($value1 > ($max+$min)) || ($value1 < $min));
+		$y_second = (($value2 > ($max+$min)) || ($value2 < $min));
+
+		if($y_first){
+			$value1 = ($value1 > ($max+$min))?($max+$min):$min;
+		}
+
+		if($y_second){
+			$value2 = ($value2 > ($max+$min))?($max+$min):$min;
+		}
+//--------
+	return true;
+	}
+
 	protected function drawElement(&$data, $from, $to, $minX, $maxX, $minY, $maxY, $drawtype, $max_color, $avg_color, $min_color, $minmax_color, $calc_fnc, $axisside){
 		if(!isset($data['max'][$from]) || !isset($data['max'][$to])) return;
 
@@ -1787,30 +1807,9 @@ class CChart extends CGraphDraw{
 		$y2_shift	= $zero - $shift_to/$unit2px;//*/
 
 
-// Fixes graph out of bounds problem
-		if( (($y1 > ($this->sizeY+$this->shiftY)) && ($y2 > ($this->sizeY+$this->shiftY))) || (($y1 < $this->shiftY) && ($y2 < $this->shiftY)) ){
-			if($drawtype == GRAPH_ITEM_DRAWTYPE_FILLED_REGION){
-				if($y1 > ($this->sizeY+$this->shiftY)) $y1 = $this->sizeY+$this->shiftY;
-				if($y2 > ($this->sizeY+$this->shiftY)) $y2 = $this->sizeY+$this->shiftY;
+		if(!$this->limitToBounds($y1, $y2, $this->shiftY, $this->sizeY, $drawtype)) return true;
+		if(!$this->limitToBounds($y1_shift, $y2_shift, $this->shiftY, $this->sizeY, $drawtype)) return true;
 
-				if($y1 < ($this->sizeY+$this->shiftY)) $y1 = $this->shiftY;
-				if($y2 < ($this->sizeY+$this->shiftY)) $y2 = $this->shiftY;
-			}
-			else{
-				return true;
-			}
-		}
-
-		$y_first = !(($y1 > ($this->sizeY+$this->shiftY)) || ($y1 < $this->shiftY));
-		$y_second = !(($y2 > ($this->sizeY+$this->shiftY)) || ($y2 < $this->shiftY));
-
-		if(!$y_first){
-			$y1 = ($y1 > ($this->sizeY+$this->shiftY))?($this->sizeY+$this->shiftY):$this->shiftY;
-		}
-		else if(!$y_second){
-			$y2 = ($y2 > ($this->sizeY+$this->shiftY))?($this->sizeY+$this->shiftY):$this->shiftY;
-		}
-//--------
 
 // draw main line
 		switch($drawtype){
@@ -1842,11 +1841,12 @@ class CChart extends CGraphDraw{
 				imageline($this->im,$x1,$y1,$x2,$y2,$avg_color);
 				break;
 			case GRAPH_ITEM_DRAWTYPE_FILLED_REGION:
+//--
 				$a[0] = $x1;		$a[1] = $y1;
 				$a[2] = $x1;		$a[3] = $y1_shift;
 				$a[4] = $x2;		$a[5] = $y2_shift;
 				$a[6] = $x2;		$a[7] = $y2;
-//SDI($a);
+
 				imagefilledpolygon($this->im,$a,4,$avg_color);
 //				imageline($this->im,$x1,$y1,$x2,$y2,$this->getShadow('333333',50));
 				break;
