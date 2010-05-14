@@ -3,7 +3,7 @@
 require_once('include/locales/en_gb.inc.php');
 $translations = $TRANSLATION;
 
-if(isset($_GET['lang']) && ($_GET['lang'] != 'en_gb') && (preg_match('/^[a-z]{2}_[a-z]{2}$/', $_GET['lang']))){
+if(isset($_GET['lang']) && ($_GET['lang'] != 'en_gb') && preg_match('/^[a-z]{2}_[a-z]{2}$/', $_GET['lang'])){
 	require_once('include/locales/'.$_GET['lang'].'.inc.php');
 	$translations = array_merge($translations, $TRANSLATION);
 }
