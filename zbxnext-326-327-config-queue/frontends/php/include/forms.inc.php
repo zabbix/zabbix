@@ -1355,12 +1355,12 @@
 		$col_table1->setClass('filter');
 		$col_table1->addRow(array(bold(S_HOST_GROUP.': '),
 				array(new CTextBox('filter_group', $filter_group, 20),
-					new CButton('btn_group', S_SELECT, 'return PopUp("popup.php?dstfrm='.$form->GetName().
+					new CButton('btn_group', S_SELECT, 'return PopUp("popup.php?dstfrm='.$form->getName().
 						'&dstfld1=filter_group&srctbl=host_group&srcfld1=name",450,450);', 'G'))
 		));
 		$col_table1->addRow(array(bold(S_HOST.': '),
 				array(new CTextBox('filter_host', $filter_host, 20),
-					new CButton('btn_host', S_SELECT, 'return PopUp("popup.php?dstfrm='.$form->GetName().
+					new CButton('btn_host', S_SELECT, 'return PopUp("popup.php?dstfrm='.$form->getName().
 						'&dstfld1=filter_host&srctbl=hosts_and_templates&srcfld1=host",450,450);', 'H'))
 		));
 		$col_table1->addRow(array(bold(S_APPLICATION.': '),
@@ -2682,16 +2682,16 @@
 			$limited = $trigger['templateid'] ? 'yes' : null;
 		}
 
-		$expression		= get_request('expression'	,'');
-		$description		= get_request('description'	,'');
+		$expression		= get_request('expression',	'');
+		$description		= get_request('description',	'');
 		$type 			= get_request('type',		0);
-		$priority		= get_request('priority'	,0);
-		$status			= get_request('status'		,0);
-		$comments		= get_request('comments'	,'');
-		$url			= get_request('url'		,'');
+		$priority		= get_request('priority',	0);
+		$status			= get_request('status',		0);
+		$comments		= get_request('comments',	'');
+		$url			= get_request('url',		'');
 
-		$expr_temp  = get_request('expr_temp','');
-		$input_method = get_request('input_method',IM_ESTABLISHED);
+		$expr_temp		= get_request('expr_temp',	'');
+		$input_method		= get_request('input_method',	IM_ESTABLISHED);
 
 		if((isset($_REQUEST['triggerid']) && !isset($_REQUEST['form_refresh']))  || isset($limited)){
 			$description	= $trigger['description'];
@@ -2722,22 +2722,26 @@
 			$alz = analyze_expression($expression);
 
 			if($alz !== false){
-				list($outline, $node, $map) = $alz;
-				if(isset($_REQUEST['expr_action']) && $node != null){
+				list($outline, $eHTMLTree) = $alz;
+				if(isset($_REQUEST['expr_action']) && $eHTMLTree != null){
 
-					$new_expr = remake_expression($node, $_REQUEST['expr_target_single'], $_REQUEST['expr_action'], $expr_temp, $map);
+					$new_expr = remake_expression($expression, $_REQUEST['expr_target_single'], $_REQUEST['expr_action'], $expr_temp);
 					if($new_expr !== false){
 						$expression = $new_expr;
-						list($outline, $node, $map) = analyze_expression($expression);
+						$alz = analyze_expression($expression);
+						
+						if($alz !== false) list($outline, $eHTMLTree) = $alz;
+						else show_messages(false, '', S_EXPRESSION_SYNTAX_ERROR);
+
 						$expr_temp = '';
 					}
 					else{
-						show_messages();
+						show_messages(false, '', S_EXPRESSION_SYNTAX_ERROR);
 					}
 				}
 
 				$tree = array();
-				create_node_list($node, $tree);
+				//create_node_list($node, $tree);
 
 				$frmTrig->addVar('expression', $expression);
 				$exprfname = 'expr_temp';
@@ -2746,7 +2750,9 @@
 				$exprparam = "this.form.elements['$exprfname'].value";
 			}
 			else{
-				$input_method = IM_FORCED;
+				show_messages(false, '', S_EXPRESSION_SYNTAX_ERROR);
+				$input_method = IM_ESTABLISHED;
+				//$input_method = IM_FORCED;
 			}
 		}
 
@@ -2797,23 +2803,44 @@
 			$exp_table->setOddRowClass('even_row');
 			$exp_table->setEvenRowClass('even_row');
 
-			$exp_table->setHeader(array(S_TARGET, S_EXPRESSION, S_DELETE));
+			$exp_table->setHeader(array(S_TARGET, S_EXPRESSION, S_EXPRESSION_PART_ERROR, S_DELETE));
 
-			if($node != null){
-				$exprs = make_disp_tree($tree, $map, true);
-				foreach($exprs as $i => $e){
-					$tgt_chk = new CCheckbox('expr_target_single', ($i==0)?'yes':'no', 'check_target(this);', $e['id']);
+			$allowedTesting = true;
+			if($eHTMLTree != null){
+				foreach($eHTMLTree as $i => $e){
+					$tgt_chk = new CCheckbox('expr_target_single', ($i==0) ? 'yes':'no', 'check_target(this);', $e['id']);
 					$del_url = new CSpan(S_DELETE,'link');
+					
 					$del_url->setAttribute('onclick', 'javascript: if(confirm("'.S_DELETE_EXPRESSION_Q.'")) {'.
-										 	' delete_expression('.$e['id'] .');'.
-										 	' document.forms["config_triggers.php"].submit(); '.
-										'}');
+									' delete_expression(\''.$e['id'] .'\');'.
+									' document.forms["config_triggers.php"].submit(); '.
+								'}');
+					
+					if(!isset($e['expression']['levelErrors'])) {
+						$errorImg = new CImg('images/general/ok_icon.png', 'expression_no_errors');
+						$errorImg->setHint(S_EXPRESSION_PART_NO_ERROR, '', '', false);
+					}else{
+						$allowedTesting = false;
+						$errorImg = new CImg('images/general/error_icon.png', 'expression_errors');
+						
+						$errorTexts = Array();
+						if(is_array($e['expression']['levelErrors'])) {
+							foreach($e['expression']['levelErrors'] as $expVal => $errTxt) {
+								if(count($errorTexts) > 0) array_push($errorTexts, BR());
+								array_push($errorTexts, $expVal, ':', $errTxt);
+							}
+						}
+						
+						$errorImg->setHint($errorTexts, '', 'left', false);
+					}
 
-					$row = new CRow(array($tgt_chk, $e['expr'], $del_url));
+					$errorCell = new CCol($errorImg, 'center');
+					$row = new CRow(array($tgt_chk, $e['list'], $errorCell, $del_url));
 					$exp_table->addRow($row);
 				}
 			}
 			else{
+				$allowedTesting = false;
 				$outline = '';
 			}
 
@@ -2826,7 +2853,9 @@
 									",850,400".
 									",'titlebar=no, resizable=yes, scrollbars=yes');".
 									"return false;");
+			if(!isset($allowedTesting) || !$allowedTesting) $btn_test->setAttribute('disabled', 'disabled');
 			if (empty($outline)) $btn_test->setAttribute('disabled', 'yes');
+			//SDI($outline);
 			$frmTrig->addRow(SPACE, array($outline,
 										  BR(),BR(),
 										  $exp_table,
@@ -3686,15 +3715,15 @@
 			$new_timeperiod['timeperiod_type'] = TIMEPERIOD_TYPE_ONETIME;
 		}
 
-		if(!isset($new_timeperiod['every']))			$new_timeperiod['every']		= 1;
+		if(!isset($new_timeperiod['every']))		$new_timeperiod['every']		= 1;
 		if(!isset($new_timeperiod['day']))			$new_timeperiod['day']			= 1;
 		if(!isset($new_timeperiod['hour']))			$new_timeperiod['hour']			= 12;
-		if(!isset($new_timeperiod['minute']))			$new_timeperiod['minute']		= 0;
-		if(!isset($new_timeperiod['start_date']))		$new_timeperiod['start_date']		= 0;
+		if(!isset($new_timeperiod['minute']))		$new_timeperiod['minute']		= 0;
+		if(!isset($new_timeperiod['start_date']))	$new_timeperiod['start_date']		= 0;
 
 		if(!isset($new_timeperiod['period_days']))		$new_timeperiod['period_days']		= 0;
 		if(!isset($new_timeperiod['period_hours']))		$new_timeperiod['period_hours']		= 1;
-		if(!isset($new_timeperiod['period_minutes']))		$new_timeperiod['period_minutes']	= 0;
+		if(!isset($new_timeperiod['period_minutes']))	$new_timeperiod['period_minutes']	= 0;
 
 		if(!isset($new_timeperiod['month_date_type']))	$new_timeperiod['month_date_type'] = !(bool)$new_timeperiod['day'];
 
@@ -3933,16 +3962,17 @@
 			$filtertimetab->setCellPadding(0);
 			$filtertimetab->setCellSpacing(0);
 
+			$start_date = zbxDateToTime($new_timeperiod['start_date']);
 			$filtertimetab->addRow(array(
-					new CNumericBox('new_timeperiod_day',(($new_timeperiod['start_date']>0)?date('d',$new_timeperiod['start_date']):''),2),
+					new CNumericBox('new_timeperiod_day',(($start_date>0)?date('d',$start_date):''),2),
 					'/',
-					new CNumericBox('new_timeperiod_month',(($new_timeperiod['start_date']>0)?date('m',$new_timeperiod['start_date']):''),2),
+					new CNumericBox('new_timeperiod_month',(($start_date>0)?date('m',$start_date):''),2),
 					'/',
-					new CNumericBox('new_timeperiod_year',(($new_timeperiod['start_date']>0)?date('Y',$new_timeperiod['start_date']):''),4),
+					new CNumericBox('new_timeperiod_year',(($start_date>0)?date('Y',$start_date):''),4),
 					SPACE,
-					new CNumericBox('new_timeperiod_hour',(($new_timeperiod['start_date']>0)?date('H',$new_timeperiod['start_date']):''),2),
+					new CNumericBox('new_timeperiod_hour',(($start_date>0)?date('H',$start_date):''),2),
 					':',
-					new CNumericBox('new_timeperiod_minute',(($new_timeperiod['start_date']>0)?date('i',$new_timeperiod['start_date']):''),2),
+					new CNumericBox('new_timeperiod_minute',(($start_date>0)?date('i',$start_date):''),2),
 					$clndr_icon
 					));
 

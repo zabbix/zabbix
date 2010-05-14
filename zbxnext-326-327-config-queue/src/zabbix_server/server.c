@@ -477,6 +477,9 @@ int MAIN_ZABBIX_ENTRY(void)
 	}
 	DBfree_result(result);
 
+	init_database_cache(ZBX_PROCESS_SERVER);
+	init_configuration_cache();
+
 /* Need to set trigger status to UNKNOWN since last run */
 /* DBconnect() already made in init_config() */
 /*	DBconnect();*/
@@ -492,9 +495,6 @@ int MAIN_ZABBIX_ENTRY(void)
 		zbx_error("Unable to create mutex for node syncs");
 		exit(FAIL);
 	}
-
-	init_database_cache(ZBX_PROCESS_SERVER);
-	init_configuration_cache();
 
 /*#define CALC_TREND*/
 
