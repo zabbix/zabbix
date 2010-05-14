@@ -770,7 +770,7 @@ function triggerExpressionValidateHost(&$parent, &$levelData, $index, &$expressi
 		if(isset($hostFound['hostid']) && $hostFound['hostid'] > 0) $hostId = $hostFound['hostid'];
 	}
 
-	$usedHosts[$hostFound['status']][$hostFound['hostid']] = true;
+	$usedHosts[$expression][$hostFound['status']][$hostFound['hostid']] = true;
 
 	if(!isset($hostId)) {
 		return Array(
@@ -782,7 +782,7 @@ function triggerExpressionValidateHost(&$parent, &$levelData, $index, &$expressi
 				'errEnd' => $levelData['closeSymbolNum'],
 				'errValues' => Array($host))
 			);
-	}else if(isset($usedHosts[HOST_STATUS_TEMPLATE]) && ( count($usedHosts) > 1 || count($usedHosts[HOST_STATUS_TEMPLATE]) > 1 )) {
+	}else if(isset($usedHosts[$expression][HOST_STATUS_TEMPLATE]) && ( count($usedHosts[$expression]) > 1 || count($usedHosts[$expression][HOST_STATUS_TEMPLATE]) > 1 )) {
 	        return Array(
 	                'valid' => false,
 	                'errArray' => Array(
