@@ -299,6 +299,7 @@ frontends/php/include/classes/class.cpumenu.php -text
 frontends/php/include/classes/class.crow.php -text
 frontends/php/include/classes/class.cserverinfo.php -text
 frontends/php/include/classes/class.cspan.php -text
+frontends/php/include/classes/class.cstringparser.php -text
 frontends/php/include/classes/class.ctable.php -text
 frontends/php/include/classes/class.ctableinfo.php -text
 frontends/php/include/classes/class.ctag.php -text
