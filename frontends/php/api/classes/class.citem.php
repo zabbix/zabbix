@@ -74,6 +74,7 @@ class CItem extends CZBXAPI{
 			'nodeids'				=> null,
 			'groupids'				=> null,
 			'hostids'				=> null,
+			'proxyids'				=> null,
 			'itemids'				=> null,
 			'graphids'				=> null,
 			'triggerids'			=> null,
@@ -81,6 +82,7 @@ class CItem extends CZBXAPI{
 			'webitems'				=> null,
 			'inherited'				=> null,
 			'templated'				=> null,
+			'monitored'				=> null,
 			'editable'				=> null,
 			'nopermissions'			=> null,
 // filter
@@ -192,6 +194,23 @@ class CItem extends CZBXAPI{
 				$sql_parts['group']['i'] = 'i.hostid';
 			}
 		}
+		
+// proxyids
+		if(!is_null($options['proxyids'])){
+			zbx_value2array($options['proxyids']);
+
+			if($options['output'] != API_OUTPUT_EXTEND){
+				$sql_parts['select']['proxyid'] = 'h.proxy_hostid';
+			}
+
+			$sql_parts['from']['hosts'] = 'hosts h';
+			$sql_parts['where'][] = DBcondition('h.proxy_hostid', $options['proxyids']);
+			$sql_parts['where'][] = 'h.hostid=i.hostid';
+
+			if(!is_null($options['groupCount'])){
+				$sql_parts['group']['h'] = 'h.proxy_hostid';
+			}
+		}
 
 // itemids
 		if(!is_null($options['itemids'])){
@@ -254,7 +273,7 @@ class CItem extends CZBXAPI{
 
 // templated
 		if(!is_null($options['templated'])){
-			$sql_parts['from']['h'] = 'hosts h';
+			$sql_parts['from']['hosts'] = 'hosts h';
 			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
 
 			if($options['templated'])
@@ -263,6 +282,20 @@ class CItem extends CZBXAPI{
 				$sql_parts['where'][] = 'h.status<>'.HOST_STATUS_TEMPLATE;
 		}
 
+// monitored
+		if(!is_null($options['monitored'])){
+			$sql_parts['from']['hosts'] = 'hosts h';
+			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
+
+			if($options['monitored']){
+				$sql_parts['where'][] = 'h.status='.HOST_STATUS_MONITORED;
+				$sql_parts['where'][] = 'i.status='.ITEM_STATUS_ACTIVE;
+			}
+			else{
+				$sql_parts['where'][] = '(h.status<>'.HOST_STATUS_MONITORED.' OR i.status<>'.ITEM_STATUS_ACTIVE.')';
+			}
+		}
+		
 // API_OUTPUT_EXTEND
 		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['items'] = 'i.*';
@@ -284,7 +317,7 @@ class CItem extends CZBXAPI{
 			if(isset($options['filter']['host'])){
 				zbx_value2array($options['filter']['host']);
 
-				$sql_parts['from']['h'] = 'hosts h';
+				$sql_parts['from']['hosts'] = 'hosts h';
 				$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
 				$sql_parts['where']['h'] = DBcondition('h.host', $options['filter']['host'], false, true);
 			}
@@ -368,7 +401,7 @@ class CItem extends CZBXAPI{
 				$sql_parts['select']['host'] = 'h.host';
 			}
 
-			$sql_parts['from']['h'] = 'hosts h';
+			$sql_parts['from']['hosts'] = 'hosts h';
 			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
 			$sql_parts['where'][] = ' UPPER(h.host)='.zbx_dbstr(zbx_strtoupper($options['host']));
 		}
