@@ -3224,6 +3224,7 @@ return $result;
 				case 12: error('['.$errData['errValue'].'] '.S_NOT_FLOAT_OR_MACRO_FOR_FUNCTION_SMALL.' ('.$errData['function'].'). '.$checkExprFrom); break;
 				case 13: error('['.$errData['errValue'].'] '.S_NOT_FLOAT_OR_MACRO_OR_COUNTER_FOR_FUNCTION_SMALL.' ('.$errData['function'].'). '.$checkExprFrom); break;
 				case 14: error(sprintf(S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR, $errData['function']).' '.$checkExprFrom); break;
+				case 15: error(S_INCORRECT_TRIGGER_EXPRESSION.'.'.SPACE.S_YOU_CAN_NOT_USE_TEMPLATE_HOSTS_MIXED_EXPR.' '.$checkExprFrom); break;
 			}
 			if($totalBreak) break;
 		}

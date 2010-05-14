@@ -869,7 +869,11 @@ function triggerExpressionValidateItemKeyFunction(&$parent, &$levelData, $index,
 function triggerExpressionValidateItemKeyFunctionParams(&$parent, &$levelData, $index, &$expression, &$rules) {
 	//$fpData =& $parent['indexes']['keyFunctionParams'][0];
 	$functionParams = zbx_substr($expression, $levelData['openSymbolNum'], $levelData['closeSymbolNum']-$levelData['openSymbolNum']+zbx_strlen($levelData['closeSymbol']));
-	$fnc_valid =& $parent['levelDBData']['valid'];
+	if(isset($parent['indexes']['keyFunctionName']) && count($parent['indexes']['keyFunctionName']) > 0)
+	        $fItem =& $parent['indexes']['keyFunctionName'][0];
+        else
+                $fItem = Array();
+	$fnc_valid =& $fItem['levelDBData']['valid'];
 	if(!is_null($fnc_valid['args'])){
 		$parameter = Array();
 		if(isset($levelData['parts']) && is_array($levelData['parts']) && count($levelData['parts']) > 0) {
@@ -901,8 +905,8 @@ function triggerExpressionValidateItemKeyFunctionParams(&$parent, &$levelData, $
 								'errStart' => $levelData['openSymbolNum'],
 								'errEnd' => $levelData['closeSymbolNum'],
 								'errValues' => Array($functionParams),
-								'function' => isset($parent['levelDBData']['function']) ? $parent['levelDBData']['function'] : '',
-								'value_type' => isset($parent['levelDBData']['value_type']) ? $parent['levelDBData']['value_type'] : '')
+								'function' => isset($fItem['levelDBData']['function']) ? $fItem['levelDBData']['function'] : '',
+								'value_type' => isset($fItem['levelDBData']['value_type']) ? $fItem['levelDBData']['value_type'] : '')
 							);
 				}
 			}
@@ -916,11 +920,11 @@ function triggerExpressionValidateItemKeyFunctionParams(&$parent, &$levelData, $
 				 		'valid' => false,
 				 		'errArray' => Array(
 				 			'errorCode' => 12,
-							'errorMsg' => $parameter[$pid].' is not float or not a macro for function '.$parent['levelDBData']['function'].' '.$levelData['levelType'].'. Check expression starting from symbol #'.($levelData['openSymbolNum']+1).' up to symbol #'.$levelData['closeSymbolNum'].'.',
+							'errorMsg' => $parameter[$pid].' is not float or not a macro for function '.$fItem['levelDBData']['function'].' '.$levelData['levelType'].'. Check expression starting from symbol #'.($levelData['openSymbolNum']+1).' up to symbol #'.$levelData['closeSymbolNum'].'.',
 							'errStart' => $levelData['openSymbolNum'],
 							'errEnd' => $levelData['closeSymbolNum'],
 							'errValue' => $parameter[$pid],
-							'function' => isset($parent['levelDBData']['function']) ? $parent['levelDBData']['function'] : '')
+							'function' => isset($fItem['levelDBData']['function']) ? $fItem['levelDBData']['function'] : '')
 						);
 			}
 			
@@ -931,11 +935,11 @@ function triggerExpressionValidateItemKeyFunctionParams(&$parent, &$levelData, $
 						'valid' => false,
 						'errArray' => Array(
 							'errorCode' => 13,
-							'errorMsg' => $parameter[$pid].' is not float or not a macro or not a counter for function '.$parent['levelDBData']['function'].' '.$levelData['levelType'].'. Check expression starting from symbol #'.($levelData['openSymbolNum']+1).' up to symbol #'.$levelData['closeSymbolNum'].'.',
+							'errorMsg' => $parameter[$pid].' is not float or not a macro or not a counter for function '.$fItem['levelDBData']['function'].' '.$levelData['levelType'].'. Check expression starting from symbol #'.($levelData['openSymbolNum']+1).' up to symbol #'.$levelData['closeSymbolNum'].'.',
 							'errStart' => $levelData['openSymbolNum'],
 							'errEnd' => $levelData['closeSymbolNum'],
 							'errValue' => $parameter[$pid],
-							'function' => isset($parent['levelDBData']['function']) ? $parent['levelDBData']['function'] : '')
+							'function' => isset($fItem['levelDBData']['function']) ? $fItem['levelDBData']['function'] : '')
 						);
 			}
 		}
@@ -948,8 +952,8 @@ function triggerExpressionValidateItemKeyFunctionParams(&$parent, &$levelData, $
 					'errStart' => $levelData['openSymbolNum'],
 					'errEnd' => $levelData['closeSymbolNum'],
 					'errValues' => Array($functionParams),
-					'function' => isset($parent['levelDBData']['function']) ? $parent['levelDBData']['function'] : '',
-					'value_type' => isset($parent['levelDBData']['value_type']) ? $parent['levelDBData']['value_type'] : '')
+					'function' => isset($fItem['levelDBData']['function']) ? $fItem['levelDBData']['function'] : '',
+					'value_type' => isset($fItem['levelDBData']['value_type']) ? $fItem['levelDBData']['value_type'] : '')
 				);
 	}
 }
