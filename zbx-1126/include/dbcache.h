@@ -138,7 +138,8 @@ void	DCflush_nextchecks();
 #define ZBX_STATS_TEXT_PFREE		17
 void	*DCget_stats(int request);
 
-zbx_uint64_t	DCget_nextid(const char *table_name, const char *field_name, int num);
+zbx_uint64_t	DCget_nextid(const char *table_name, int num);
+zbx_uint64_t	DCget_nextid_shared(const char *table_name);
 
 int	DCget_item_lastclock(zbx_uint64_t itemid);
 

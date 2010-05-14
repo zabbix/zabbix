@@ -318,7 +318,7 @@ int	DBadd_service_alarm(zbx_uint64_t serviceid,int status,int clock)
 	}
 
 	DBexecute("insert into service_alarms(servicealarmid,serviceid,clock,value) values(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d)",
-		DBget_maxid("service_alarms","servicealarmid"),
+		DBget_maxid("service_alarms"),
 		serviceid,
 		clock,
 		status);
@@ -990,13 +990,12 @@ double	DBget_requiredperformance(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "In DBget_requiredperformance()");
 
 	/* !!! Don't forget sync code with PHP !!! */
-	result = DBselect("select i.type,i.delay,count(*)/i.delay from hosts h,items i"
-			" where h.hostid=i.hostid and h.status=%d and i.status=%d"
-			" group by i.type,i.delay",
+	result = DBselect("select sum(1.0/i.delay) from hosts h,items i"
+			" where h.hostid=i.hostid and h.status=%d and i.status=%d and i.delay<>0",
 			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE);
-	while (NULL != (row = DBfetch(result)))
-		qps_total += atof(row[2]);
+	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
+		qps_total += atof(row[0]);
 	DBfree_result(result);
 
 	return qps_total;
@@ -1049,7 +1048,7 @@ int	DBadd_alert(zbx_uint64_t actionid, zbx_uint64_t userid, zbx_uint64_t eventid
 
 	DBexecute("insert into alerts (alertid,actionid,eventid,userid,clock,mediatypeid,sendto,subject,message,status,retries)"
 		" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",'%s','%s','%s',0,0)",
-		DBget_maxid("alerts","alertid"),
+		DBget_maxid("alerts"),
 		actionid,
 		eventid,
 		userid,
@@ -1095,7 +1094,7 @@ int	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64
 			triggerid,
 			ESCALATION_STATUS_ACTIVE);
 
-	escalationid = DBget_maxid("escalations", "escalationid");
+	escalationid = DBget_maxid("escalations");
 
 	DBexecute("insert into escalations (escalationid,actionid,triggerid,eventid,status)"
 			" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d)",
@@ -1592,48 +1591,6 @@ void	DBget_item_from_db(DB_ITEM *item, DB_ROW row)
 	item->key = key;
 }
 
-/*
-zbx_uint64_t DBget_nextid(char *table, char *field)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	res;
-	zbx_uint64_t	min;
-	zbx_uint64_t	max;
-
-	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_nextid(%s,%s)", table, field);
-
-	min = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)CONFIG_NODEID;
-	max = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)(CONFIG_NODEID+1)-1;
-
-	result = DBselect("select max(%s) from %s where %s>=" ZBX_FS_UI64 " and %s<=" ZBX_FS_UI64,
-		field,
-		table,
-		field,
-		min,
-		field,
-		max);
-	zabbix_log(LOG_LEVEL_DEBUG, "select max(%s) from %s where %s>=" ZBX_FS_UI64 " and %s<=" ZBX_FS_UI64, field, table, field, min, field, max);
-
-	row=DBfetch(result);
-
-	if(row && (DBis_null(row[0])!=SUCCEED))
-	{
-		sscanf(row[0],ZBX_FS_UI64,&res);
-
-		res++;
-	}
-	else
-	{
-		res=(zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)CONFIG_NODEID+1;
-	}
-	DBfree_result(result);
-	zabbix_log(LOG_LEVEL_DEBUG, ZBX_FS_UI64, res);
-
-	return res;
-}
-*/
-
 const ZBX_TABLE *DBget_table(const char *tablename)
 {
 	int	t;
@@ -1654,8 +1611,26 @@ const ZBX_FIELD *DBget_field(const ZBX_TABLE *table, const char *fieldname)
 	return NULL;
 }
 
-zbx_uint64_t DBget_maxid_num(char *tablename, char *fieldname, int num)
+zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 {
+	if (0 == strcmp(tablename, "events"))
+		return DCget_nextid_shared(tablename);
+
+	if (0 == strcmp(tablename, "history_log") ||
+			0 == strcmp(tablename, "history_text") ||
+			0 == strcmp(tablename, "dservices") ||
+			0 == strcmp(tablename, "dhosts") ||
+			0 == strcmp(tablename, "alerts") ||
+			0 == strcmp(tablename, "escalations") ||
+			0 == strcmp(tablename, "autoreg_host"))
+		return DCget_nextid(tablename, num);
+
+	return DBget_nextid(tablename, num);
+}
+
+zbx_uint64_t	DBget_nextid(const char *tablename, int num)
+{
+	const char	*__function_name = "DBget_nextid";
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	ret1,ret2;
@@ -1663,18 +1638,8 @@ zbx_uint64_t DBget_maxid_num(char *tablename, char *fieldname, int num)
 	int		found  = FAIL, dbres, nodeid;
 	const ZBX_TABLE	*table;
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_maxid %s.%s",
-			tablename,
-			fieldname);
-
-	if ((0 == strcmp(tablename, "history_log") && 0 == strcmp(fieldname, "id")) ||
-			(0 == strcmp(tablename, "history_text") && 0 == strcmp(fieldname, "id")) ||
-			(0 == strcmp(tablename, "dservices") && 0 == strcmp(fieldname, "dserviceid")) ||
-			(0 == strcmp(tablename, "dhosts") && 0 == strcmp(fieldname, "dhostid")) ||
-			(0 == strcmp(tablename, "alerts") && 0 == strcmp(fieldname, "alertid")) ||
-			(0 == strcmp(tablename, "escalations") && 0 == strcmp(fieldname, "escalationid")) ||
-			(0 == strcmp(tablename, "autoreg_host") && 0 == strcmp(fieldname, "autoreg_hostid")))
-		return DCget_nextid(tablename, fieldname, num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tablename:'%s'",
+			__function_name, tablename);
 
 	table = DBget_table(tablename);
 	nodeid = CONFIG_NODEID >= 0 ? CONFIG_NODEID : 0;
@@ -1690,16 +1655,16 @@ zbx_uint64_t DBget_maxid_num(char *tablename, char *fieldname, int num)
 	do {
 		result = DBselect("select nextid from ids where nodeid=%d and table_name='%s' and field_name='%s'",
 			nodeid,
-			tablename,
-			fieldname);
+			table->table,
+			table->recid);
 
 		if(NULL == (row = DBfetch(result))) {
 			DBfree_result(result);
 
 			result = DBselect("select max(%s) from %s where %s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
-					fieldname,
-					tablename,
-					fieldname,
+					table->recid,
+					table->table,
+					table->recid,
 					min,
 					max);
 
@@ -1710,8 +1675,8 @@ zbx_uint64_t DBget_maxid_num(char *tablename, char *fieldname, int num)
 				if(ret1 >= max) {
 					zabbix_log(LOG_LEVEL_CRIT, "DBget_maxid: Maximum number of id's was exceeded"
 							" [table:%s, field:%s, id:" ZBX_FS_UI64 "]",
-							tablename,
-							fieldname,
+							table->table,
+							table->recid,
 							ret1);
 
 					exit(FAIL);
@@ -1722,8 +1687,8 @@ zbx_uint64_t DBget_maxid_num(char *tablename, char *fieldname, int num)
 			dbres = DBexecute("insert into ids (nodeid,table_name,field_name,nextid)"
 					" values (%d,'%s','%s'," ZBX_FS_UI64 ")",
 					nodeid,
-					tablename,
-					fieldname,
+					table->table,
+					table->recid,
 					ret1);
 
 			if (dbres < ZBX_DB_OK) {
@@ -1731,8 +1696,8 @@ zbx_uint64_t DBget_maxid_num(char *tablename, char *fieldname, int num)
 				DBexecute("update ids set nextid=nextid+1 where nodeid=%d and table_name='%s'"
 						" and field_name='%s'",
 						nodeid,
-						tablename,
-						fieldname);
+						table->table,
+						table->recid);
 			}
 			continue;
 		} else {
@@ -1742,21 +1707,21 @@ zbx_uint64_t DBget_maxid_num(char *tablename, char *fieldname, int num)
 			if((ret1 < min) || (ret1 >= max)) {
 				DBexecute("delete from ids where nodeid=%d and table_name='%s' and field_name='%s'",
 					nodeid,
-					tablename,
-					fieldname);
+					table->table,
+					table->recid);
 				continue;
 			}
 
 			DBexecute("update ids set nextid=nextid+%d where nodeid=%d and table_name='%s' and field_name='%s'",
 					num,
 					nodeid,
-					tablename,
-					fieldname);
+					table->table,
+					table->recid);
 
 			result = DBselect("select nextid from ids where nodeid=%d and table_name='%s' and field_name='%s'",
 				nodeid,
-				tablename,
-				fieldname);
+				table->table,
+				table->recid);
 			row = DBfetch(result);
 			if (!row || DBis_null(row[0])==SUCCEED) {
 				/* Should never be here */
@@ -1772,50 +1737,13 @@ zbx_uint64_t DBget_maxid_num(char *tablename, char *fieldname, int num)
 	}
 	while(FAIL == found);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of DBget_maxid \"%s\".\"%s\":" ZBX_FS_UI64,
-			tablename,
-			fieldname,
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() \"%s\".\"%s\":" ZBX_FS_UI64,
+			__function_name,
+			table->table,
+			table->recid,
 			ret2);
 
 	return ret2 - num + 1;
-
-/*	if(CONFIG_NODEID == 0)
-	{
-		result = DBselect("select max(%s) from %s where " ZBX_COND_NODEID, field, table, LOCAL_NODE(field));
-		row = DBfetch(result);
-
-		if(!row || DBis_null(row[0])==SUCCEED)
-		{
-			ret = 1;
-		}
-		else
-		{
-			ZBX_STR2UINT64(ret, row[0]);
-			ret = CONFIG_NODEID*(zbx_uint64_t)__UINT64_C(100000000000000) + ret;
-			ret++;
-		}
-	}
-	else
-	{
-		result = DBselect("select %s_%s from nodes where nodeid=%d", table, field, CONFIG_NODEID);
-		row = DBfetch(result);
-
-		if(!row || DBis_null(row[0])==SUCCEED)
-		{
-			ret = CONFIG_NODEID*(zbx_uint64_t)__UINT64_C(100000000000000) + 1;
-		}
-		else
-		{
-			ZBX_STR2UINT64(ret, row[0]);
-			ret = CONFIG_NODEID*(zbx_uint64_t)__UINT64_C(100000000000000) + ret;
-			ret++;
-		}
-		DBexecute("update nodes set %s_%s=%s_%s+1 where nodeid=%d",
-			table, field, table, field, CONFIG_NODEID);
-		DBfree_result(result);
-	}
-
-	return ret;*/
 }
 
 void	DBadd_condition_alloc(char **sql, int *sql_alloc, int *sql_offset, const char *fieldname, const zbx_uint64_t *values, const int num)
@@ -2089,7 +2017,7 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, int now)
 		ZBX_STR2UINT64(autoreg_hostid, row[0])
 	else
 	{
-		autoreg_hostid = DBget_maxid("autoreg_host", "autoreg_hostid");
+		autoreg_hostid = DBget_maxid("autoreg_host");
 		DBexecute("insert into autoreg_host (autoreg_hostid,proxy_hostid,host) values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s')",
 				autoreg_hostid,
 				proxy_hostid,

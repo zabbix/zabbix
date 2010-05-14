@@ -285,11 +285,10 @@ void	DCflush_nextchecks()
 		DBfree_result(result);
 
 		/* dealing with events */
-		if (events_num > 0)
-			events_maxid = DBget_maxid_num("events", "eventid", events_num);
-
 		for (i = 0; i < events_num; i++)
 		{
+			events_maxid = DBget_maxid("events");
+
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 256,
 					"insert into events (eventid,source,object,objectid,clock,value) "
 					"values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 ",%d,%d);\n",
@@ -299,7 +298,6 @@ void	DCflush_nextchecks()
 					events[i].objectid,
 					events[i].clock,
 					TRIGGER_VALUE_UNKNOWN);
-			events_maxid++;
 
 			DBexecute_overflowed_sql(&sql, &sql_allocated, &sql_offset);
 		}
