@@ -760,24 +760,38 @@ function triggerExpressionValidateGroup(&$parent, &$levelData, $index, &$express
 }
 
 function triggerExpressionValidateHost(&$parent, &$levelData, $index, &$expression, &$rules) {
+        static $usedHosts;
+        
 	$host = zbx_substr($expression, $levelData['openSymbolNum']+1, $levelData['closeSymbolNum']-($levelData['openSymbolNum']+1));
 	
-	$hostFound = CHost::get(Array('filter' => Array('host' => $host), 'templated_hosts' => true));
+	$hostFound = CHost::get(Array('filter' => Array('host' => $host), 'templated_hosts' => true, 'output' => API_OUTPUT_EXTEND));
 	if(count($hostFound) > 0) {
 		$hostFound = array_shift($hostFound);
 		if(isset($hostFound['hostid']) && $hostFound['hostid'] > 0) $hostId = $hostFound['hostid'];
 	}
-	
+
+	$usedHosts[$hostFound['status']][$hostFound['hostid']] = true;
+
 	if(!isset($hostId)) {
 		return Array(
-				'valid' => false,
-				'errArray' => Array(
-					'errorCode' => 8,
-					'errorMsg' => 'Host of item does not exists.'.$levelData['levelType'].'. Check expression starting from symbol #'.($levelData['openSymbolNum']+1).' up to symbol #'.$levelData['closeSymbolNum'].'.',
-					'errStart' => $levelData['openSymbolNum'],
-					'errEnd' => $levelData['closeSymbolNum'],
-					'errValues' => Array($host))
-				);
+                        'valid' => false,
+			'errArray' => Array(
+				'errorCode' => 8,
+				'errorMsg' => 'Host of item does not exists.'.$levelData['levelType'].'. Check expression starting from symbol #'.($levelData['openSymbolNum']+1).' up to symbol #'.$levelData['closeSymbolNum'].'.',
+				'errStart' => $levelData['openSymbolNum'],
+				'errEnd' => $levelData['closeSymbolNum'],
+				'errValues' => Array($host))
+			);
+	}else if(isset($usedHosts[HOST_STATUS_TEMPLATE]) && ( count($usedHosts) > 1 || count($usedHosts[HOST_STATUS_TEMPLATE]) > 1 )) {
+	        return Array(
+	                'valid' => false,
+	                'errArray' => Array(
+	                        'errorCode' => 15,
+                                'errorMsg' => S_INCORRECT_TRIGGER_EXPRESSION.'.'.SPACE.S_YOU_CAN_NOT_USE_TEMPLATE_HOSTS_MIXED_EXPR.' Check expression starting from symbol #'.($levelData['openSymbolNum']+1).' up to symbol #'.$levelData['closeSymbolNum'].'.',
+                                'errStart' => $levelData['openSymbolNum'],
+                                'errEnd' => $levelData['closeSymbolNum'],
+                                'errValues' => Array($host))
+                        );
 	}else{
 		$levelData['levelDBData']['hostid'] = $hostId;
 	}
