@@ -1947,6 +1947,17 @@
 	'S_BLOCKS_DISCOVERY_STATUS_TIME_FORMAT'=>	'H:i:s',
 
 //	forms.inc.php
+	'S_EXPRESSION_PART_ERROR'=>			'Error',
+	'S_EXPRESSION_PART_NO_ERROR'=>			'No errors found',
+	'S_EXPRESSION_SYNTAX_ERROR'=> 			'Expression Syntax Error',
+	'S_EXPRESSION_UNEXPECTED_END_OF_ELEMENT_ERROR'=>'Unexpected end of element',
+	'S_CHECK_EXPRESSION_PART_STARTING_FROM'=>	'Check expression part starting from \'%s\'',
+	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_OR_SEQUENCE_ERROR'=>'Not allowed symbols or sequence of symbols in expression element detected',
+	'S_EXPRESSION_NOT_ALLOWED_VALUE_IN_ELEMENT_ERROR'=>'Not allowed value detected in element',
+	'S_EXPRESSION_UNNECESSARY_SYMBOLS_DETECTED_ERROR'=>'Unnecessary symbols detected',
+	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_AFTER_ERROR'=>'Not allowed symbols detected after element',
+	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_BEFORE_ERROR'=>'Not allowed symbols detected before element',
+
 //	popup_link_tr.php
 	'S_NEW_INDICATORS'=>			'New indicators',
 	'S_EDIT_CONNECTOR'=>			'Edit connector',
@@ -1961,7 +1972,11 @@
 
 //  tr_testexpr.php
 	'S_TEST_DATA'=>		'Test data',
-	'S_ITEM_SLASH_FUNCTION'=>	'Item / Function',
+	'S_EXPRESSION_VARIABLE_ELEMENTS'=>	'Expression Variable Elements',
+	'S_EXPRESSION_VALUE_TYPE_UNKNOWN'=>	'Unknown variable type, testing not available',
+	'S_EXPRESSION_HOST_UNKNOWN'=>		'Unknown host, no such host presented in system',
+	'S_EXPRESSION_HOST_ITEM_UNKNOWN'=>	'Unknown host item, no such item in selected host',
+	'S_EXPRESSION_NOT_A_MACRO_ERROR'=>	'Given expression is not a macro',
 	'S_RESULT_TYPE'=>	'Result type',
 	'S_COMBINED_RESULT'=>	'Combined result',
 
@@ -2144,6 +2159,10 @@
 	'S_NO_FUNCTION_WITH'=>					'No function with',
 	'S_SPECIFY_THE_CONDITIONAL_EXPR_FOR_THE_TARGET'=>	'Specify the conditional expression for the target.',
 	'S_0_OR_1'=>						'0 or 1',
+	'S_TRIGGER_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR'=>	'At least one item must present in the trigger expression.',
+	'S_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR'=>		'Host does not exists.',
+	'S_EXPRESSION_HOST_KEY_DOES_NOT_ERROR'=>		'Host key does not exists.',
+	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR'=>	'Function \'%s\' does not accept parameters.',
 
 //	page_footer.php
 	'S_TRANSACTION_HAVE_NOT_BEEN_CLOSED_ABORTING'=>	'Transaction has not been closed. Aborting..',
