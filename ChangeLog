@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2379] fixed trigger expression editing with trigger builder (Maxim Andruhovich/AM)
  - [ZBX-1882] fixed selecting items from disabled hosts for graphs (Aly)
  - [ZBX-1126] fixed large numbers processing for values stored as 'Delta' (Sasha)
  - [ZBXNEXT-241] extended proxy screen to show proxy vps and item count (Vedmak)
@@ -49,7 +50,6 @@ Changes for 1.8.3
  - [ZBX-633] removed linkage of OpenIPMI library to Agents in "configure" script (Sasha) 
  - [ZBX-633] more debug information in checks_ipmi.c module (Sasha) 
  - [ZBX-2362] fixed processing of logrt[] checks under Windows (Sasha)
- - [ZBX-2356] fixed error when perform group actions creating item (Vedmak)
  - [ZBX-2355] fixed error when try to massupdate trigger severity (Vedmak)
  - [ZBX-2354] updated Russian translation; thanks to dotneft (Richlv)
  - [ZBX-2352] fixed typo in the default locale (Richlv)
@@ -57,6 +57,7 @@ Changes for 1.8.3
  - [ZBX-2264] added opportunity to translate class.cuser.php and config.inc.php (AM)
  - [ZBX-2132] added date format constants to locales, changed zbx_date2str function to meet regional formats and date translation (AM)
  - [ZBXNEXT-311] improved the speed of dbconfig synchronization (Sasha)
+ - [ZBX-2378] renamed calculated item field 'Expression' to 'Formula', changed trigger option 'Multiple TRUE events' to use 'PROBLEM' instead (Richlv)
  - [ZBX-2329] fixed screen renaming (Aly)
  - [ZBX-2315] fixed multiple issues with JS scrollbar (Aly)
  - [ZBX-2321] fixed log items appearing in the wrong order (Alexei,asaveljevs,Sasha)
