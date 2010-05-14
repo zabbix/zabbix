@@ -1,6 +1,6 @@
 Changes for 1.8.3
 
- - [ZBX-1126] fixed ladge numbers processing for values stored as 'Delta' (Sasha)
+ - [ZBX-1126] fixed large numbers processing for values stored as 'Delta' (Sasha)
  - [ZBX-2276] fixed dashboard discovery status header (Aly)
  - [ZBX-2377] fixed converting html special chars in graphs legend (Aly)
  - [ZBX-2311] fixed Host group empty value selection for items filtering (Aly)
