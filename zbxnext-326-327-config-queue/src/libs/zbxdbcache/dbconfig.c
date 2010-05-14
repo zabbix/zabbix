@@ -56,13 +56,13 @@ ZBX_DC_ITEM
 {
 	zbx_uint64_t	itemid;
 	zbx_uint64_t	hostid;
+	const char	*key;			/* interned; key[ITEM_KEY_LEN_MAX];					*/
+	int		delay;
+	int		nextcheck;
 	unsigned char 	type;
 	unsigned char	data_type;
 	unsigned char	value_type;
 	unsigned char 	poller_type;
-	const char	*key;			/* interned; key[ITEM_KEY_LEN_MAX];					*/
-	int		delay;
-	int		nextcheck;
 	unsigned char	status;
 	unsigned char	in_queue;
 };
@@ -79,11 +79,11 @@ ZBX_DC_SNMPITEM
 	zbx_uint64_t	itemid;
 	const char	*snmp_community;	/* interned; snmp_community[ITEM_SNMP_COMMUNITY_LEN_MAX];		*/
 	const char	*snmp_oid;		/* interned; snmp_oid[ITEM_SNMP_OID_LEN_MAX];				*/
-	unsigned short	snmp_port;
 	const char	*snmpv3_securityname;	/* interned; snmpv3_securityname[ITEM_SNMPV3_SECURITYNAME_LEN_MAX];	*/
-	unsigned char	snmpv3_securitylevel;
 	const char	*snmpv3_authpassphrase;	/* interned; snmpv3_authpassphrase[ITEM_SNMPV3_AUTHPASSPHRASE_LEN_MAX];	*/
 	const char	*snmpv3_privpassphrase;	/* interned; snmpv3_privpassphrase[ITEM_SNMPV3_PRIVPASSPHRASE_LEN_MAX];	*/
+	unsigned short	snmp_port;
+	unsigned char	snmpv3_securitylevel;
 };
 
 ZBX_DC_IPMIITEM
@@ -119,12 +119,12 @@ ZBX_DC_DBITEM
 ZBX_DC_SSHITEM
 {
 	zbx_uint64_t	itemid;
-	unsigned char	authtype;
 	const char	*username;		/* interned; username[ITEM_USERNAME_LEN_MAX];				*/
 	const char	*publickey;		/* interned; publickey[ITEM_PUBLICKEY_LEN_MAX];				*/
 	const char	*privatekey;		/* interned; privatekey[ITEM_PRIVATEKEY_LEN_MAX];			*/
 	const char	*password;		/* interned; password[ITEM_PASSWORD_LEN_MAX];				*/
 	const char	*params;		/* interned; params[ITEM_PARAMS_LEN_MAX];				*/
+	unsigned char	authtype;
 };
 
 ZBX_DC_TELNETITEM
@@ -146,22 +146,22 @@ ZBX_DC_HOST
 	zbx_uint64_t	hostid;
 	zbx_uint64_t	proxy_hostid;
 	const char	*host;			/* interned; host[HOST_HOST_LEN_MAX];					*/
-	unsigned char	useip;
 	const char	*ip;			/* interned; ip[HOST_IP_LEN_MAX];					*/
 	const char	*dns;			/* interned; dns[HOST_DNS_LEN_MAX];					*/
-	unsigned short	port;
-	unsigned char	maintenance_status;
-	unsigned char	maintenance_type;
 	int		maintenance_from;
 	int		errors_from;
-	unsigned char	available;
 	int		disable_until;
 	int		snmp_errors_from;
-	unsigned char	snmp_available;
 	int		snmp_disable_until;
 	int		ipmi_errors_from;
-	unsigned char	ipmi_available;
 	int		ipmi_disable_until;
+	unsigned short	port;
+	unsigned char	useip;
+	unsigned char	maintenance_status;
+	unsigned char	maintenance_type;
+	unsigned char	available;
+	unsigned char	snmp_available;
+	unsigned char	ipmi_available;
 };
 
 ZBX_DC_HOST_PH
@@ -175,11 +175,11 @@ ZBX_DC_IPMIHOST
 {
 	zbx_uint64_t	hostid;
 	const char	*ipmi_ip;		/* interned; ipmi_ip[HOST_ADDR_LEN_MAX];				*/
+	const char	*ipmi_username;		/* interned; ipmi_username[HOST_IPMI_USERNAME_LEN_MAX];			*/
+	const char	*ipmi_password;		/* interned; ipmi_password[HOST_IPMI_PASSWORD_LEN_MAX];			*/
 	unsigned short	ipmi_port;
 	signed char	ipmi_authtype;
 	unsigned char	ipmi_privilege;
-	const char	*ipmi_username;		/* interned; ipmi_username[HOST_IPMI_USERNAME_LEN_MAX];			*/
-	const char	*ipmi_password;		/* interned; ipmi_password[HOST_IPMI_PASSWORD_LEN_MAX];			*/
 };
 
 ZBX_DC_CONFIG
@@ -1179,7 +1179,7 @@ void	init_configuration_cache()
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() size:%d", __function_name, CONFIG_DBCONFIG_SIZE);
 
-	strpool_size = (size_t)(CONFIG_DBCONFIG_SIZE * 0.25);
+	strpool_size = (size_t)(CONFIG_DBCONFIG_SIZE * 0.15);
 	config_size = CONFIG_DBCONFIG_SIZE - strpool_size;
 
 	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, (int)'k')))
