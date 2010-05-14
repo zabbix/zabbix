@@ -760,24 +760,38 @@ function triggerExpressionValidateGroup(&$parent, &$levelData, $index, &$express
 }
 
 function triggerExpressionValidateHost(&$parent, &$levelData, $index, &$expression, &$rules) {
+        static $usedHosts;
+        
 	$host = zbx_substr($expression, $levelData['openSymbolNum']+1, $levelData['closeSymbolNum']-($levelData['openSymbolNum']+1));
 	
-	$hostFound = CHost::get(Array('filter' => Array('host' => $host), 'templated_hosts' => true));
+	$hostFound = CHost::get(Array('filter' => Array('host' => $host), 'templated_hosts' => true, 'output' => API_OUTPUT_EXTEND));
 	if(count($hostFound) > 0) {
 		$hostFound = array_shift($hostFound);
 		if(isset($hostFound['hostid']) && $hostFound['hostid'] > 0) $hostId = $hostFound['hostid'];
 	}
-	
+
+	$usedHosts[$expression][$hostFound['status']][$hostFound['hostid']] = true;
+
 	if(!isset($hostId)) {
 		return Array(
-				'valid' => false,
-				'errArray' => Array(
-					'errorCode' => 8,
-					'errorMsg' => 'Host of item does not exists.'.$levelData['levelType'].'. Check expression starting from symbol #'.($levelData['openSymbolNum']+1).' up to symbol #'.$levelData['closeSymbolNum'].'.',
-					'errStart' => $levelData['openSymbolNum'],
-					'errEnd' => $levelData['closeSymbolNum'],
-					'errValues' => Array($host))
-				);
+                        'valid' => false,
+			'errArray' => Array(
+				'errorCode' => 8,
+				'errorMsg' => 'Host of item does not exists.'.$levelData['levelType'].'. Check expression starting from symbol #'.($levelData['openSymbolNum']+1).' up to symbol #'.$levelData['closeSymbolNum'].'.',
+				'errStart' => $levelData['openSymbolNum'],
+				'errEnd' => $levelData['closeSymbolNum'],
+				'errValues' => Array($host))
+			);
+	}else if(isset($usedHosts[$expression][HOST_STATUS_TEMPLATE]) && ( count($usedHosts[$expression]) > 1 || count($usedHosts[$expression][HOST_STATUS_TEMPLATE]) > 1 )) {
+	        return Array(
+	                'valid' => false,
+	                'errArray' => Array(
+	                        'errorCode' => 15,
+                                'errorMsg' => S_INCORRECT_TRIGGER_EXPRESSION.'.'.SPACE.S_YOU_CAN_NOT_USE_TEMPLATE_HOSTS_MIXED_EXPR.' Check expression starting from symbol #'.($levelData['openSymbolNum']+1).' up to symbol #'.$levelData['closeSymbolNum'].'.',
+                                'errStart' => $levelData['openSymbolNum'],
+                                'errEnd' => $levelData['closeSymbolNum'],
+                                'errValues' => Array($host))
+                        );
 	}else{
 		$levelData['levelDBData']['hostid'] = $hostId;
 	}
@@ -869,7 +883,11 @@ function triggerExpressionValidateItemKeyFunction(&$parent, &$levelData, $index,
 function triggerExpressionValidateItemKeyFunctionParams(&$parent, &$levelData, $index, &$expression, &$rules) {
 	//$fpData =& $parent['indexes']['keyFunctionParams'][0];
 	$functionParams = zbx_substr($expression, $levelData['openSymbolNum'], $levelData['closeSymbolNum']-$levelData['openSymbolNum']+zbx_strlen($levelData['closeSymbol']));
-	$fnc_valid =& $parent['levelDBData']['valid'];
+	if(isset($parent['indexes']['keyFunctionName']) && count($parent['indexes']['keyFunctionName']) > 0)
+	        $fItem =& $parent['indexes']['keyFunctionName'][0];
+        else
+                $fItem = Array();
+	$fnc_valid =& $fItem['levelDBData']['valid'];
 	if(!is_null($fnc_valid['args'])){
 		$parameter = Array();
 		if(isset($levelData['parts']) && is_array($levelData['parts']) && count($levelData['parts']) > 0) {
@@ -901,8 +919,8 @@ function triggerExpressionValidateItemKeyFunctionParams(&$parent, &$levelData, $
 								'errStart' => $levelData['openSymbolNum'],
 								'errEnd' => $levelData['closeSymbolNum'],
 								'errValues' => Array($functionParams),
-								'function' => isset($parent['levelDBData']['function']) ? $parent['levelDBData']['function'] : '',
-								'value_type' => isset($parent['levelDBData']['value_type']) ? $parent['levelDBData']['value_type'] : '')
+								'function' => isset($fItem['levelDBData']['function']) ? $fItem['levelDBData']['function'] : '',
+								'value_type' => isset($fItem['levelDBData']['value_type']) ? $fItem['levelDBData']['value_type'] : '')
 							);
 				}
 			}
@@ -916,11 +934,11 @@ function triggerExpressionValidateItemKeyFunctionParams(&$parent, &$levelData, $
 				 		'valid' => false,
 				 		'errArray' => Array(
 				 			'errorCode' => 12,
-							'errorMsg' => $parameter[$pid].' is not float or not a macro for function '.$parent['levelDBData']['function'].' '.$levelData['levelType'].'. Check expression starting from symbol #'.($levelData['openSymbolNum']+1).' up to symbol #'.$levelData['closeSymbolNum'].'.',
+							'errorMsg' => $parameter[$pid].' is not float or not a macro for function '.$fItem['levelDBData']['function'].' '.$levelData['levelType'].'. Check expression starting from symbol #'.($levelData['openSymbolNum']+1).' up to symbol #'.$levelData['closeSymbolNum'].'.',
 							'errStart' => $levelData['openSymbolNum'],
 							'errEnd' => $levelData['closeSymbolNum'],
 							'errValue' => $parameter[$pid],
-							'function' => isset($parent['levelDBData']['function']) ? $parent['levelDBData']['function'] : '')
+							'function' => isset($fItem['levelDBData']['function']) ? $fItem['levelDBData']['function'] : '')
 						);
 			}
 			
@@ -931,11 +949,11 @@ function triggerExpressionValidateItemKeyFunctionParams(&$parent, &$levelData, $
 						'valid' => false,
 						'errArray' => Array(
 							'errorCode' => 13,
-							'errorMsg' => $parameter[$pid].' is not float or not a macro or not a counter for function '.$parent['levelDBData']['function'].' '.$levelData['levelType'].'. Check expression starting from symbol #'.($levelData['openSymbolNum']+1).' up to symbol #'.$levelData['closeSymbolNum'].'.',
+							'errorMsg' => $parameter[$pid].' is not float or not a macro or not a counter for function '.$fItem['levelDBData']['function'].' '.$levelData['levelType'].'. Check expression starting from symbol #'.($levelData['openSymbolNum']+1).' up to symbol #'.$levelData['closeSymbolNum'].'.',
 							'errStart' => $levelData['openSymbolNum'],
 							'errEnd' => $levelData['closeSymbolNum'],
 							'errValue' => $parameter[$pid],
-							'function' => isset($parent['levelDBData']['function']) ? $parent['levelDBData']['function'] : '')
+							'function' => isset($fItem['levelDBData']['function']) ? $fItem['levelDBData']['function'] : '')
 						);
 			}
 		}
@@ -948,8 +966,8 @@ function triggerExpressionValidateItemKeyFunctionParams(&$parent, &$levelData, $
 					'errStart' => $levelData['openSymbolNum'],
 					'errEnd' => $levelData['closeSymbolNum'],
 					'errValues' => Array($functionParams),
-					'function' => isset($parent['levelDBData']['function']) ? $parent['levelDBData']['function'] : '',
-					'value_type' => isset($parent['levelDBData']['value_type']) ? $parent['levelDBData']['value_type'] : '')
+					'function' => isset($fItem['levelDBData']['function']) ? $fItem['levelDBData']['function'] : '',
+					'value_type' => isset($fItem['levelDBData']['value_type']) ? $fItem['levelDBData']['value_type'] : '')
 				);
 	}
 }
