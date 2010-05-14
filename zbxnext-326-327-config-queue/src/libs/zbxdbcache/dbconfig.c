@@ -407,7 +407,7 @@ static void	DCsync_items(DB_RESULT result)
 
 	time_t			now;
 	unsigned char		status;
-	int			i, delay, found, changed;
+	int			i, index, delay, found, changed;
 	zbx_uint64_t		itemid, hostid, proxy_hostid;
 	zbx_vector_uint64_t	ids;
 
@@ -668,13 +668,14 @@ static void	DCsync_items(DB_RESULT result)
 
 	/* remove deleted or disabled items from buffer */
 
+	index = 0;
 	zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	for (i = 0; i < config->itemids.values_num; i++)
 	{
 		itemid = config->itemids.values[i];
 
-		if (FAIL == zbx_vector_uint64_bsearch(&ids, itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+		if (FAIL == zbx_vector_uint64_lsearch(&ids, itemid, &index, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 		{
 			item = zbx_hashset_search(&config->items, &itemid);
 
@@ -812,7 +813,7 @@ static void	DCsync_hosts(DB_RESULT result)
 
 	ZBX_DC_HOST_PH		host_ph;
 
-	int			i, found, changed;
+	int			i, index, found, changed;
 	zbx_uint64_t		hostid, proxy_hostid;
 	zbx_vector_uint64_t	ids;
 
@@ -900,13 +901,14 @@ static void	DCsync_hosts(DB_RESULT result)
 
 	/* remove deleted or disabled hosts from buffer */
 
+	index = 0;
 	zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	for (i = 0; i < config->hostids.values_num; i++)
 	{
 		hostid = config->hostids.values[i];
 
-		if (FAIL == zbx_vector_uint64_bsearch(&ids, hostid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+		if (FAIL == zbx_vector_uint64_lsearch(&ids, hostid, &index, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 		{
 			host = zbx_hashset_search(&config->hosts, &hostid);
 

@@ -118,6 +118,29 @@ int	zbx_vector_ ## __id ## _bsearch(zbx_vector_ ## __id ## _t *vector, __type va
 		return FAIL;											\
 }														\
 														\
+int	zbx_vector_ ## __id ## _lsearch(zbx_vector_ ## __id ## _t *vector, __type value, int *index,		\
+									zbx_compare_func_t compare_func)	\
+{														\
+	while (*index < vector->values_num)									\
+	{													\
+		int	c = compare_func(&vector->values[*index], &value);					\
+														\
+		if (c < 0)											\
+		{												\
+			(*index)++;										\
+			continue;										\
+		}												\
+														\
+		if (c == 0)											\
+			return SUCCEED;										\
+														\
+		if (c > 0)											\
+			break;											\
+	}													\
+														\
+	return FAIL;												\
+}														\
+														\
 void	zbx_vector_ ## __id ## _reserve(zbx_vector_ ## __id ## _t *vector, size_t size)				\
 {														\
 	if (size > vector->values_alloc)									\

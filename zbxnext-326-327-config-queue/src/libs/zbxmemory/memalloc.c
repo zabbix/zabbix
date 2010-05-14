@@ -208,8 +208,8 @@ static void	*__mem_malloc(zbx_mem_info_t *info, uint32_t size)
 	if (NULL == chunk)
 		return NULL;
 
-	if (counter >= 1000)
-		zabbix_log(LOG_LEVEL_CRIT, "__mem_malloc: chunk #%d size %u asked %u skip_min %u skip_max %u",
+	if (counter >= 100)
+		zabbix_log(LOG_LEVEL_DEBUG, "__mem_malloc: chunk #%d size %u asked %u skip_min %u skip_max %u",
 				counter, CHUNK_SIZE(chunk), size, skip_min, skip_max);
 
 	/* gather information about previous and next chunks, and their pointers to this chunk */
