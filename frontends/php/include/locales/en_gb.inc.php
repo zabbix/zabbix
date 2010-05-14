@@ -597,6 +597,9 @@
 	'S_DELETE_SELECTED_PROXIES' =>	'Delete selected proxies?',
 	'S_CONFIGURATION_OF_PROXIES'=>	'CONFIGURATION OF PROXIES',
 	'S_DELETE_SELECTED_PROXY_Q'=>	'Delete selected proxy?',
+	'S_HOST_COUNT' => 'Host count',
+	'S_ITEM_COUNT' => 'Item count',
+	'S_REQUIRED_PERFORMANCE' => 'Required performance (vps)',
 
 //  Authentication
 	'S_AUTHENTICATION'=>			'Authentication',
