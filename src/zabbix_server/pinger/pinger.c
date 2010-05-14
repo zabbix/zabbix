@@ -75,7 +75,7 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 
 	if (ping_result == NOTSUPPORTED)
 	{
-		DCadd_nextcheck(&item, now, error);	/* update error & status field in items table */
+		DCadd_nextcheck(item.itemid, now, error);	/* update error & status field in items table */
 		DCconfig_update_item(item.itemid, ITEM_STATUS_NOTSUPPORTED, now);
 	}
 	else
@@ -355,7 +355,7 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 					timeout, items[i].itemid, addr, icmpping, type);
 		}
 		else
-			DCadd_nextcheck(&items[i], now, "Unsupported parameters");	/* update error & status field in items table */
+			DCadd_nextcheck(items[i].itemid, now, "Unsupported parameters");	/* update error & status field in items table */
 
 		zbx_free(items[i].key);
 	}
