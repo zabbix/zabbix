@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBX-1882] fixed selecting items from disabled hosts for graphs (Aly)
  - [ZBX-1126] fixed large numbers processing for values stored as 'Delta' (Sasha)
  - [ZBXNEXT-241] extended proxy screen to show proxy vps and item count (Vedmak)
  - [DEV-460] improved host-group and maps icons info in zabbix maps (Aly)
