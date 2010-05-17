@@ -2305,6 +2305,8 @@ updateForm_selementByType: function(e, multi){
 		this.selementForm.massEdit.elementName.style.display = 'none';
 
 		this.selementForm.typeDOM.iconid_off.style.display = display_style;
+
+		this.selementForm.typeDOM.advanced_icons.style.display = display_style;
 		this.selementForm.typeDOM.iconid_on.style.display = display_style;
 		this.selementForm.typeDOM.iconid_unknown.style.display = display_style;
 		this.selementForm.typeDOM.iconid_maintenance.style.display = display_style;
@@ -2312,6 +2314,8 @@ updateForm_selementByType: function(e, multi){
 		
 		this.selementForm.massEdit.x.style.display = 'none';
 		this.selementForm.massEdit.y.style.display = 'none';
+
+		this.selementForm.advanced_icons.checked = true;
 		
 		this.updateForm_selementByIcons(e);
 		return true;
@@ -2343,7 +2347,7 @@ updateForm_selementByType: function(e, multi){
 	
 	var selementid = this.selementForm.selementid.value;
 	var elementtype = this.selementForm.elementtype.selectedIndex;
-	
+
 	if(this.selements[selementid].elementtype != elementtype){
 		this.selementForm.elementName.value = '';
 		this.selementForm.elementid.value = '0';
@@ -2352,6 +2356,7 @@ updateForm_selementByType: function(e, multi){
 	var srctbl = '';
 	var srcfld1 = '';
 	var srcfld2 = '';
+
 
 	switch(elementtype.toString()){
 		case '0':
@@ -2363,6 +2368,8 @@ updateForm_selementByType: function(e, multi){
 			
 			this.selementForm.typeDOM.elementName.style.display = display_style;
 			this.selementForm.typeDOM.iconid_off.style.display = display_style;
+
+			this.selementForm.typeDOM.advanced_icons.style.display = display_style;
 			this.selementForm.typeDOM.iconid_on.style.display = display_style;
 			this.selementForm.typeDOM.iconid_unknown.style.display = display_style;
 			this.selementForm.typeDOM.iconid_maintenance.style.display = display_style;
@@ -2377,6 +2384,8 @@ updateForm_selementByType: function(e, multi){
 			
 			this.selementForm.typeDOM.elementName.style.display = display_style;
 			this.selementForm.typeDOM.iconid_off.style.display = display_style;
+
+			this.selementForm.typeDOM.advanced_icons.style.display = display_style;
 			this.selementForm.typeDOM.iconid_on.style.display = display_style;
 			this.selementForm.typeDOM.iconid_unknown.style.display = 'none';
 			this.selementForm.typeDOM.iconid_maintenance.style.display = 'none';
@@ -2391,6 +2400,8 @@ updateForm_selementByType: function(e, multi){
 			
 			this.selementForm.typeDOM.elementName.style.display = display_style;
 			this.selementForm.typeDOM.iconid_off.style.display = display_style;
+
+			this.selementForm.typeDOM.advanced_icons.style.display = display_style;
 			this.selementForm.typeDOM.iconid_on.style.display = display_style;
 			this.selementForm.typeDOM.iconid_unknown.style.display = display_style;
 			this.selementForm.typeDOM.iconid_maintenance.style.display = display_style;
@@ -2405,6 +2416,8 @@ updateForm_selementByType: function(e, multi){
 			
 			this.selementForm.typeDOM.elementName.style.display = display_style;
 			this.selementForm.typeDOM.iconid_off.style.display = display_style;
+
+			this.selementForm.typeDOM.advanced_icons.style.display = display_style;
 			this.selementForm.typeDOM.iconid_on.style.display = display_style;
 			this.selementForm.typeDOM.iconid_unknown.style.display = display_style;
 			this.selementForm.typeDOM.iconid_maintenance.style.display = 'none';
@@ -2417,6 +2430,8 @@ updateForm_selementByType: function(e, multi){
 			
 			this.selementForm.typeDOM.elementName.style.display = 'none';
 			this.selementForm.typeDOM.iconid_off.style.display = display_style;
+
+			this.selementForm.typeDOM.advanced_icons.style.display = 'none';
 			this.selementForm.typeDOM.iconid_on.style.display = 'none';
 			this.selementForm.typeDOM.iconid_unknown.style.display = 'none';
 			this.selementForm.typeDOM.iconid_maintenance.style.display = 'none';
