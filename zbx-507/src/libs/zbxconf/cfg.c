@@ -34,7 +34,7 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int level)
 {
 #ifdef _WINDOWS
-	return __parse_cfg_file(cfg_file, cfg, level);
+	return __parse_cfg_file(cfg_file, cfg, level, 0);
 #else
 	DIR		*dir;
 	struct stat	sb;
