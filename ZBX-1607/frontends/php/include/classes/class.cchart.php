@@ -1507,6 +1507,22 @@ class CChart extends CGraphDraw{
 				$this->sizeX+$this->shiftXleft,
 				$trigger['y'],
 				$this->getColor($trigger['color']));
+			
+			dashedline(
+				$this->im,
+				$this->shiftXleft,
+				$trigger['y']+1,
+				$this->sizeX+$this->shiftXleft,
+				$trigger['y']+1,
+				$this->getColor($trigger['color']));
+			
+			/*dashedline(
+				$this->im,
+				$this->shiftXleft,
+				$trigger['y']+2,
+				$this->sizeX+$this->shiftXleft,
+				$trigger['y']+2,
+				$this->getColor($trigger['color']));*/
 		}
 	}
 
