@@ -643,9 +643,10 @@ require_once('include/httptest.inc.php');
 		foreach ($hostids as $id) {	/* The section should be improved */
 			$host_old = get_host_by_hostid($id);
 			$result = DBexecute('DELETE FROM hosts WHERE hostid='.$id);
-			if ($result)
+			if ($result) {
+				info(sprintf(S_HOST_HAS_BEEN_DELETED_MSG, $host_old['host']));
 				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $id, $host_old['host'], 'hosts', NULL, NULL);
-			else
+			}else
 				break;
 		}
 
