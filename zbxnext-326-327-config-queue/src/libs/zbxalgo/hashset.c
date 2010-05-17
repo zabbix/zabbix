@@ -283,3 +283,73 @@ void	zbx_hashset_clear(zbx_hashset_t *hs)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
+
+#define	ITER_START	(-1)
+#define	ITER_FINISH	(-2)
+
+void	zbx_hashset_iter_reset(zbx_hashset_t *hs, zbx_hashset_iter_t *iter)
+{
+	iter->hashset = hs;
+	iter->slot = ITER_START;
+}
+
+void	*zbx_hashset_iter_next(zbx_hashset_iter_t *iter)
+{
+	if (ITER_FINISH == iter->slot)
+		return NULL;
+
+	if (ITER_START != iter->slot && NULL != iter->entry && NULL != iter->entry->next)
+	{
+		iter->entry = iter->entry->next;
+		return iter->entry->data;
+	}
+
+	while (1)
+	{
+		iter->slot++;
+
+		if (iter->slot == iter->hashset->num_slots)
+		{
+			iter->slot = ITER_FINISH;
+			return NULL;
+		}
+
+		if (NULL != iter->hashset->slots[iter->slot])
+		{
+			iter->entry = iter->hashset->slots[iter->slot];
+			return iter->entry->data;
+		}
+	}
+}
+
+void	zbx_hashset_iter_remove(zbx_hashset_iter_t *iter)
+{
+	if (ITER_START == iter->slot || ITER_FINISH == iter->slot || NULL == iter->entry)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Removing a hashset entry through a bad iterator.");
+		exit(FAIL);
+	}
+
+	if (iter->hashset->slots[iter->slot] == iter->entry)
+	{
+		iter->hashset->slots[iter->slot] = iter->entry->next;
+		iter->hashset->mem_free_func(iter->entry);
+		iter->hashset->num_data--;
+
+		iter->slot--;
+		iter->entry = NULL;
+	}
+	else
+	{
+		ZBX_HASHSET_ENTRY_T	*prev_entry = iter->hashset->slots[iter->slot];
+
+		while (prev_entry->next != iter->entry)
+			prev_entry = prev_entry->next;
+
+		prev_entry->next = iter->entry->next;		
+		iter->hashset->mem_free_func(iter->entry);
+		iter->hashset->num_data--;
+
+		iter->entry = prev_entry;
+	}
+}
