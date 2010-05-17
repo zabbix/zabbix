@@ -528,13 +528,16 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	if(flags & PROCESS_TEST)
 	{
 		printf("%s", usr_cmd);
-		i = (int)strlen(usr_cmd);
 
 		if(commands[i].flags & CF_USEUPARAM)
 		{
 			printf("[]");
-			i += 2;
+			i = 2;
 		}
+		else
+			i = 0;
+
+		i += (int)strlen(usr_cmd);
 
 #define COLUMN_2_X 45 /* max of spaces count */
 		i = i > COLUMN_2_X ? 1 : (COLUMN_2_X - i);
