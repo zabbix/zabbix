@@ -1376,7 +1376,6 @@
 				'nodeids' => get_current_nodeid(true),
 				'groupids' => zbx_objectValues($selements, 'elementid'),
 				'select_hosts' => API_OUTPUT_EXTEND,
-				'select_triggers' => API_OUTPUT_EXTEND,
 				'output' => API_OUTPUT_EXTEND,
 				'nopermissions' => 1
 			);
@@ -1404,6 +1403,8 @@
 			$info['maintenances'] = array();
 
 			foreach($group['hosts'] as $hnum => $host){
+				if($host['status'] == HOST_STATUS_TEMPLATE) continue;
+
 				if($host['status'] != HOST_STATUS_MONITORED){
 					$info['type'] = TRIGGER_VALUE_FALSE;
 					$info['disabled'] = 1;
@@ -1428,7 +1429,8 @@
 
 			$options = array(
 				'groupids' => $group['groupid'],
-//				'maintenance' => 0,
+				'maintenance' => 0,
+				'templated' => 0,
 				'output' => API_OUTPUT_EXTEND,
 				'nodeids' => get_current_nodeid(true)
 				);
