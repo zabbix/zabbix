@@ -1424,7 +1424,8 @@ class CChart extends CGraphDraw{
 			$this->shiftY,
 			$this->sizeX+$this->shiftXleft-2,	// -2 border
 			$this->sizeY+$this->shiftY,
-			$this->getColor($this->graphtheme['noneworktimecolor'], 0));
+			$this->getColor($this->graphtheme['noneworktimecolor'], 0)
+		);
 
 		$now = time();
 		if(isset($this->stime)){
@@ -1441,13 +1442,14 @@ class CChart extends CGraphDraw{
 
 		$start = find_period_start($periods,$from);
 		$end = -1;
-		while($start < $max_time && $start > 0){
+		while(($start < $max_time) && ($start > 0)){
 			$end = find_period_end($periods,$start,$max_time);
 
 			$x1 = round((($start-$from)*$this->sizeX)/$this->period) + $this->shiftXleft;
 			$x2 = ceil((($end-$from)*$this->sizeX)/$this->period) + $this->shiftXleft;
 
-			//draw rectangle
+
+//draw rectangle
 			imagefilledrectangle(
 				$this->im,
 				$x1,
@@ -1980,6 +1982,7 @@ class CChart extends CGraphDraw{
 //-----*/
 
 		$maxX = $this->sizeX;
+
 
 // For each metric
 		for($item = 0; $item < $this->num; $item++){
