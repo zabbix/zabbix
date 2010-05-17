@@ -105,8 +105,7 @@ int	main(int argc, char **argv)
 	zbx_sock_t	s_out;
 
 	int		ret;
-	char	**value,
-		*command;
+	char		**value, *command;
 
 	AGENT_RESULT	result;
 
@@ -116,56 +115,58 @@ int	main(int argc, char **argv)
 
 /* Parse the command-line. */
 	while ((ch = (char)zbx_getopt_long(argc, argv, "c:hVpt:", longopts, NULL)) != (char)EOF)
-		switch (ch) {
-		case 'c':
-			CONFIG_FILE = strdup(zbx_optarg);
-			break;
-		case 'h':
-			help();
-			exit(-1);
-			break;
-		case 'V':
-			version();
-			exit(-1);
-			break;
-		case 'p':
-			if(task == ZBX_TASK_START)
-				task = ZBX_TASK_PRINT_SUPPORTED;
-			break;
-		case 't':
-			if(task == ZBX_TASK_START)
-			{
-				task = ZBX_TASK_TEST_METRIC;
-				TEST_METRIC = strdup(zbx_optarg);
-			}
-			break;
-		default:
-			task = ZBX_TASK_SHOW_USAGE;
-			break;
-	}
+		switch (ch)
+		{
+			case 'c':
+				CONFIG_FILE = strdup(zbx_optarg);
+				break;
+			case 'h':
+				help();
+				exit(-1);
+				break;
+			case 'V':
+				version();
+				exit(-1);
+				break;
+			case 'p':
+				if (task == ZBX_TASK_START)
+					task = ZBX_TASK_PRINT_SUPPORTED;
+				break;
+			case 't':
+				if (task == ZBX_TASK_START)
+				{
+					task = ZBX_TASK_TEST_METRIC;
+					TEST_METRIC = strdup(zbx_optarg);
+				}
+				break;
+			default:
+				task = ZBX_TASK_SHOW_USAGE;
+				break;
+		}
 
-	if(CONFIG_FILE == NULL)
-	{
+	if (CONFIG_FILE == NULL)
 		CONFIG_FILE = DEFAULT_CONFIG_FILE;
-	}
 
 	init_metrics(); /* Must be before init_config() */
 
-	if( ZBX_TASK_START == task )
+	if (ZBX_TASK_START == task)
+	{
 		load_config();
-
-	load_user_parameters();
+		load_user_parameters(0);
+	}
 
 	/* Do not create debug files */
-	zabbix_open_log(LOG_TYPE_SYSLOG,LOG_LEVEL_EMPTY,NULL);
+	zabbix_open_log(LOG_TYPE_SYSLOG, LOG_LEVEL_EMPTY, NULL);
 
-	switch(task)
+	switch (task)
 	{
 		case ZBX_TASK_PRINT_SUPPORTED:
+			load_user_parameters(1);
 			test_parameters();
 			exit(-1);
 			break;
 		case ZBX_TASK_TEST_METRIC:
+			load_user_parameters(1);
 			test_parameter(TEST_METRIC, PROCESS_TEST);
 			exit(-1);
 			break;
@@ -176,13 +177,13 @@ int	main(int argc, char **argv)
 	}
 
 #if !defined(_WINDOWS)
-	signal( SIGINT,  child_signal_handler);
-	signal( SIGTERM, child_signal_handler );
-	signal( SIGQUIT, child_signal_handler );
-	signal( SIGALRM, child_signal_handler );
+	signal(SIGINT,  child_signal_handler);
+	signal(SIGTERM, child_signal_handler);
+	signal(SIGQUIT, child_signal_handler);
+	signal(SIGALRM, child_signal_handler);
 
 	alarm(CONFIG_TIMEOUT);
-#endif /* not WONDOWS */
+#endif /* not WINDOWS */
 
 	zbx_tcp_init(&s_in, (ZBX_SOCKET)fileno(stdin));
 	zbx_tcp_init(&s_out, (ZBX_SOCKET)fileno(stdout));
@@ -225,7 +226,7 @@ int	main(int argc, char **argv)
 
 #if !defined(_WINDOWS)
 	alarm(0);
-#endif /* not WONDOWS */
+#endif /* not WINDOWS */
 	zabbix_close_log();
 
 	return SUCCEED;

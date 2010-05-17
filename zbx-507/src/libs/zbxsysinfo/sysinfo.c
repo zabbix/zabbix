@@ -100,7 +100,7 @@ int	add_user_parameter(char *key, char *command)
 	for (i = 0; ; i++)
 	{
 		/* Add new parameters */
-		if (0 == commands[i].key)
+		if (NULL == commands[i].key)
 		{
 			commands[i].key = strdup(usr_cmd);
 			commands[i].flags = flag;
@@ -528,12 +528,13 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	if(flags & PROCESS_TEST)
 	{
 		printf("%s", usr_cmd);
+		i = (int)strlen(usr_cmd);
+
 		if(commands[i].flags & CF_USEUPARAM)
 		{
-			printf("[%s]", param);
-			i = (int)strlen(param)+2;
-		} else	i = 0;
-		i += (int)strlen(usr_cmd);
+			printf("[]");
+			i += 2;
+		}
 
 #define COLUMN_2_X 45 /* max of spaces count */
 		i = i > COLUMN_2_X ? 1 : (COLUMN_2_X - i);
@@ -804,14 +805,14 @@ static char** get_result_text_value(AGENT_RESULT *result)
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments:  beter use definitions                                           *
+ * Comments:  better use definitions                                          *
  *                GET_UI64_RESULT                                             *
  *                GET_DBL_RESULT                                              *
  *                GET_STR_RESULT                                              *
  *                GET_TEXT_RESULT                                             *
  *                GET_MSG_RESULT                                              *
  *                                                                            *
- *    AR_MESSAGE - skiped in conversion                                       *
+ *    AR_MESSAGE - skipped in conversion                                      *
  *                                                                            *
  ******************************************************************************/
 void	*get_result_value_by_type(AGENT_RESULT *result, int require_type)

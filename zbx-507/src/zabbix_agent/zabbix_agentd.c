@@ -254,7 +254,7 @@ int MAIN_ZABBIX_ENTRY(void)
 
 	init_collector_data();
 
-	load_user_parameters();
+	load_user_parameters(0);
 
 	/* --- START THREADS ---*/
 
@@ -398,11 +398,13 @@ int	main(int argc, char **argv)
 			break;
 #endif /* _WINDOWS */
 		case ZBX_TASK_PRINT_SUPPORTED:
+			load_user_parameters(1);
 			test_parameters();
 			free_metrics();
 			exit(SUCCEED);
 			break;
 		case ZBX_TASK_TEST_METRIC:
+			load_user_parameters(1);
 			test_parameter(TEST_METRIC, PROCESS_TEST);
 			exit(SUCCEED);
 			break;
