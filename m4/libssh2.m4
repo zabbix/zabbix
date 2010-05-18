@@ -102,7 +102,7 @@ AC_HELP_STRING([--with-ssh2@<:@=DIR@:>@],[use SSH2 package @<:@default=no@:>@, D
      fi #if test "x$_libssh2_dir" = "xno"; then
   fi # if test "x$want_ssh2" != "xno"; then
 
-  if test "x$found_ssh2" == "xyes"; then
+  if test "x$found_ssh2" = "xyes"; then
     am_save_cflags="$CFLAGS"
     am_save_ldflags="$LDFLAGS"
     am_save_libs="$LIBS"
@@ -118,7 +118,7 @@ AC_HELP_STRING([--with-ssh2@<:@=DIR@:>@],[use SSH2 package @<:@default=no@:>@, D
     LDFLAGS="$am_save_ldflags"
     LIBS="$am_save_libs"
 
-    if test "x$found_ssh2" == "xyes"; then
+    if test "x$found_ssh2" = "xyes"; then
       AC_DEFINE([HAVE_SSH2], 1, [Define to 1 if you have the 'libssh2' library (-lssh2)])
       AC_MSG_RESULT(yes)
     else
