@@ -1,8 +1,21 @@
 /*
-** All rights reserved
-** Copyright (C) Aly
+** Copyright (C) 2010 Artem "Aly" Suharev
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-// javascript document
+// JavaScript Document
 var LCL_SUGGESTS = new Array();
 
 function createSuggest(oid){
@@ -147,8 +160,8 @@ searchServer: function(needle){
 					{
 						'method': 'post',
 						'parameters':params,
-						'onSuccess': this.serverRespond.bind(this),
-//						'onSuccess': function(resp){ SDI(resp.responseText); },
+//						'onSuccess': this.serverRespond.bind(this),
+						'onSuccess': function(resp){ SDI(resp.responseText); },
 						'onFailure': function(){ alert('Simple request: Connection to server failed.'); }
 					}
 	);
@@ -171,7 +184,7 @@ serverRespond: function(resp){
 },
 
 searchServerRPC: function(needle){
-	this.debug('zbxrpc', needle);
+	this.debug('searchServerRPC', needle);
 //---
 	var sid = cookie.read('zbx_sessionid');
 	this.rpcid++;
@@ -193,13 +206,14 @@ searchServerRPC: function(needle){
 		'Content-type': 'application/json-rpc'
 	}
 
+
 	new Ajax.Request('api_jsonrpc.php',
 					{
 						'method': 'post',
 						'requestHeaders': header,
 						'postBody': Object.toJSON(postBody),
 						'onSuccess': this.serverRespondRPC.bind(this, needle),
-						'onFailure': function(){ throw('RPC: Connection to server failed.'); }
+						'onFailure': function(){ throw ('RPC: Connection to server failed.'); }
 					}
 	);
 
@@ -243,7 +257,7 @@ keyPressed: function(e){
 
 	if(!e) var e = window.event;
 	var key = e.keyCode;
-//SDI(key);
+
 	switch(true){
 		case(key == 27):
 			this.hlIndex = 0;

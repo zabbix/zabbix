@@ -35,6 +35,9 @@ $allowed_content = array(
 
 $http_request = new CHTTP_request();
 $content_type = $http_request->header('Content-Type');
+$content_type = explode(';', $content_type);
+$content_type = $content_type[0];
+
 
 if(!isset($allowed_content[$content_type])){
 	header('HTTP/1.0 412 Precondition Failed');
@@ -44,7 +47,7 @@ if(!isset($allowed_content[$content_type])){
 $data = $http_request->body();
 
 if($allowed_content[$content_type] == 'json-rpc'){
-	header('Content-Type: application/json; charset=UTF-8');
+	header('Content-Type: application/json');
 
 	$json_rpc = new CJSONrpc();
 
