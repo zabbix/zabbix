@@ -1,5 +1,11 @@
 Changes for 1.8.3
 
+ - [ZBX-1436] fixed trigger events display after next steps  monitoring -> triggers -> click on any event time (Maxim Andruhovich / AM)
+ - [ZBX-1532] added screen name to visual screen editing form (when adding screen rows and cols) (Maxim Andruhovich / AM)
+ - [ZBX-2438] fixed configuration of ssh2 on FreeBSD. Thanks to Alex Deiter (asaveljevs)
+ - [ZBX-2423] added custom color input for link elements (Vedmak)
+ - [ZBX-2100] fixed group with templates but without hosts breaks map editing issue (Aly)
+ - [ZBX-1591] fixed "advanced icons" for image type map elements (Aly)
  - [ZBX-1882] fixed selecting items from disabled hosts for graphs (Aly)
  - [ZBX-1126] fixed large numbers processing for values stored as 'Delta' (Sasha)
  - [ZBXNEXT-241] extended proxy screen to show proxy vps and item count (Vedmak)
