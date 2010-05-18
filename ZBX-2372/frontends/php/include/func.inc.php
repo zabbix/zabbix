@@ -405,7 +405,7 @@ function zbx_date2str($format, $value=NULL){
 		}
 	}
 	
-	$output .= zbx_strlen($part) ? date($part, $value) : '';
+	$output .= zbx_strlen($part) > 0 ? date($part, $value) : '';
 	
 	return $output;
 }
