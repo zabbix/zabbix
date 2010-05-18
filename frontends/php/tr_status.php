@@ -215,7 +215,7 @@ include_once('include/page_header.php');
 	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 	$fs_icon->addAction('onclick',new CJSscript("javascript: document.location = '".$url."';"));
 
-	$mute_icon = new CDiv(SPACE,$mute?'iconmute':'iconsound');
+	$mute_icon = new CDiv(SPACE,$mute? 'iconmute':'iconsound');
 	$mute_icon->setAttribute('title',S_SOUND.' '.S_ON.'/'.S_OFF);
 	$mute_icon->addAction('onclick',new CJSscript("javascript: switch_mute(this);"));
 
