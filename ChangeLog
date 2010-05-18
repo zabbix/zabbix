@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-1436] fixed trigger events display after next steps  monitoring -> triggers -> click on any event time (Maxim Andruhovich / AM)
  - [ZBX-1532] added screen name to visual screen editing form (when adding screen rows and cols) (Maxim Andruhovich / AM)
  - [ZBX-2438] fixed configuration of ssh2 on FreeBSD. Thanks to Alex Deiter (asaveljevs)
  - [ZBX-2423] added custom color input for link elements (Vedmak)
