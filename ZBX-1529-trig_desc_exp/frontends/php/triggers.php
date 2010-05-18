@@ -542,6 +542,7 @@ include_once('include/page_header.php');
 			'output' => API_OUTPUT_EXTEND,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
+			'expandDescription' => 1,
 			'limit' => ($config['search_limit']+1)
 		);
 
@@ -586,7 +587,7 @@ include_once('include/page_header.php');
 				}
 			}
 
-			$description[] = new CLink(expandTriggerDescription($trigger), 'triggers.php?form=update&triggerid='.$triggerid);
+			$description[] = new CLink($trigger['description'], 'triggers.php?form=update&triggerid='.$triggerid);
 
 //add dependencies{
 			$deps = $trigger['dependencies'];
