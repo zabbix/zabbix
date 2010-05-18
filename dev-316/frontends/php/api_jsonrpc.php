@@ -23,12 +23,12 @@ define('ZBX_PAGE_NO_AUTHORIZATION', 1);
 require_once('include/config.inc.php');
 
 $allowed_content = array(
-				'application/json-rpc'		=> 'json-rpc',
-				'application/json'			=> 'json-rpc',
-				'application/jsonrequest'	=> 'json-rpc',
-//				'application/xml-rpc'		=> 'xml-rpc',
-//				'application/xml'			=> 'xml-rpc',
-//				'application/xmlrequest'	=> 'xml-rpc'
+	'application/json-rpc'		=> 'json-rpc',
+	'application/json'			=> 'json-rpc',
+	'application/jsonrequest'	=> 'json-rpc',
+//	'application/xml-rpc'		=> 'xml-rpc',
+//	'application/xml'			=> 'xml-rpc',
+//	'application/xmlrequest'	=> 'xml-rpc'
 				);
 ?>
 <?php
@@ -42,9 +42,10 @@ if(!isset($allowed_content[$content_type])){
 }
 
 $data = $http_request->body();
-//SDI($data);
 
 if($allowed_content[$content_type] == 'json-rpc'){
+	header('Content-Type: application/json; charset=UTF-8');
+
 	$json_rpc = new CJSONrpc();
 
 	$json_rpc->process($data);

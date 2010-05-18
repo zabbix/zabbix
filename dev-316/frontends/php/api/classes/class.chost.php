@@ -114,8 +114,9 @@ class CHost extends CZBXAPI{
 			'nopermissions'				=> null,
 // filter
 			'filter'					=> null,
-			'pattern'					=> '',
-			'extend_pattern'			=> null,
+			'startPattern'				=> null,
+			'pattern'					=> null,
+			'extendPattern'				=> null,
 
 // OutPut
 			'output'					=> API_OUTPUT_REFER,
@@ -452,18 +453,24 @@ class CHost extends CZBXAPI{
 			}
 		}
 
+
+// startPattern (use index)
+		if(!zbx_empty($options['startPattern'])){
+			$sql_parts['where']['host'] = ' UPPER(h.host) LIKE '.zbx_dbstr(zbx_strtoupper($options['startPattern']).'%');
+		}
+
 // pattern
 		if(!zbx_empty($options['pattern'])){
-			if($options['extend_pattern']){
-				$sql_parts['where'][] = ' ( '.
-											'UPPER(h.host) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%').' OR '.
-											'h.ip LIKE '.zbx_dbstr('%'.$options['pattern'].'%').' OR '.
-											'UPPER(h.dns) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%').
-										' ) ';
-			}
-			else{
-				$sql_parts['where']['host'] = ' UPPER(h.host) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
-			}
+			$sql_parts['where']['host'] = ' UPPER(h.host) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
+		}
+
+// extendPattern
+		if(!zbx_empty($options['extendPattern'])){
+			$sql_parts['where']['host'] = ' ( '.
+				'UPPER(h.host) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['extendPattern']).'%').' OR '.
+				'h.ip LIKE '.zbx_dbstr('%'.$options['extendPattern'].'%').' OR '.
+				'UPPER(h.dns) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['extendPattern']).'%').
+			' ) ';
 		}
 
 // filter

@@ -11,12 +11,29 @@ if(isset($_GET['lang']) && ($_GET['lang'] != 'en_gb') && preg_match('/^[a-z]{2}_
 
 
 // available scriptas 'scriptFileName' => 'path relative to js/'
-$availableJScripts = array('common.js' => '', 'menu.js' => '', 'prototype.js' => '', 'builder.js' => 'scriptaculous/',
-	'controls.js' => 'scriptaculous/', 'dragdrop.js' => 'scriptaculous/', 'effects.js' => 'scriptaculous/',
-	'slider.js' => 'scriptaculous/', 'sound.js' => 'scriptaculous/', 'gtlc.js' => '', 'functions.js' => '',
-	'main.js' => '', 'class.calendar.js' => '', 'class.cdate.js' => '', 'class.cmap.js' => '',
-	'class.cookie.js' => '', 'class.cscreen.js' => '', 'class.cswitcher.js' => '', 'class.ctree.js' => '',
-	'class.curl.js' => '', 'class.pmaster.js' => ''
+$availableJScripts = array(
+	'common.js' => '',
+	'menu.js' => '',
+	'prototype.js' => '',
+	'builder.js' => 'scriptaculous/',
+	'controls.js' => 'scriptaculous/', 
+	'dragdrop.js' => 'scriptaculous/',
+	'effects.js' => 'scriptaculous/',
+	'slider.js' => 'scriptaculous/',
+	'sound.js' => 'scriptaculous/',
+	'gtlc.js' => '',
+	'functions.js' => '',
+	'main.js' => '',
+	'class.calendar.js' => '',
+	'class.cdate.js' => '',
+	'class.cmap.js' => '',
+	'class.cookie.js' => '', 
+	'class.cscreen.js' => '',
+	'class.csuggest.js' => '',
+	'class.cswitcher.js' => '',
+	'class.ctree.js' => '',
+	'class.curl.js' => '',
+	'class.pmaster.js' => ''
 );
 
 $tranStrings = array(
@@ -49,7 +66,7 @@ $tranStrings = array(
 );
 
 if(empty($_GET['files'])){
-	$files = array('prototype.js', 'common.js', 'class.cdate.js', 'class.cookie.js', 'class.curl.js', 'main.js', 'functions.js');
+	$files = array('prototype.js', 'common.js', 'class.cdate.js', 'class.cookie.js', 'class.curl.js', 'class.csuggest.js', 'main.js', 'functions.js');
 }
 else{
 	$files = $_GET['files'];

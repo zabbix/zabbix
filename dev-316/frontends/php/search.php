@@ -106,11 +106,10 @@ include_once('include/page_header.php');
 // FIND Hosts
 	$params = array(
 		'nodeids'=> get_current_nodeid(true),
-		'extendoutput' => true,
-		'pattern' => $search,
-		'extend_pattern' => true,
-		'limit' => $rows_per_page,
-		'select_groups' => 1
+		'extendPattern' => $search,
+		'select_groups' => API_OUTPUT_EXTEND,
+		'output' => API_OUTPUT_EXTEND,
+		'limit' => $rows_per_page
 	);
 	$db_hosts = CHost::get($params);
 
@@ -129,16 +128,14 @@ include_once('include/page_header.php');
 
 	$params = array(
 		'nodeids'=> get_current_nodeid(true),
-		'pattern' => $search,
-		'extend_pattern' => true,
+		'extendPattern' => $search,
 		'count' => 1,
 	);
 	$hosts_count = CHost::get($params);
 
 	$params = array(
 		'nodeids'=> get_current_nodeid(true),
-		'pattern' => $search,
-		'extend_pattern' => true,
+		'extendPattern' => $search,
 		'countOutput' => 1,
 	);
 	$hosts_count = CHost::get($params);
@@ -294,11 +291,11 @@ include_once('include/page_header.php');
 	if($admin){
 		$params = array(
 			'nodeids'=> get_current_nodeid(true),
-			'extendoutput' => 1,
-			'select_groups' => 1,
 			'pattern' => $search,
-			'limit' => $rows_per_page,
-			'sortfield' => 'host'
+			'output' => API_OUTPUT_EXTEND,
+			'select_groups' => API_OUTPUT_EXTEND,
+			'sortfield' => 'host',
+			'limit' => $rows_per_page
 		);
 
 		$db_templates = CTemplate::get($params);

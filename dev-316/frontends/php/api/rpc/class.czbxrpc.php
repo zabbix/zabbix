@@ -50,7 +50,7 @@ class czbxrpc{
 
 				$options = array(
 							'users' => $params['user'],
-							'extendoutput' => 1,
+							'output' => API_OUTPUT_EXTEND,
 							'get_access' => 1
 						);
 				$users = CUser::get($options);
@@ -73,7 +73,7 @@ class czbxrpc{
 
 				$options = array(
 						'userids' => $USER_DETAILS['userid'],
-						'extendoutput' => 1,
+						'output' => API_OUTPUT_EXTEND,
 						'get_access' => 1
 					);
 				$users = CUser::get($options);
