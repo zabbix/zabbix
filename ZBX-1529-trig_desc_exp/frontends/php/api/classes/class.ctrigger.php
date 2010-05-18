@@ -839,7 +839,6 @@ Copt::memoryPick();
 				}
 			}
 
-
 			if(!empty($functionids)){
 				$sql = 'SELECT DISTINCT f.triggerid, f.functionid, h.host, i.lastvalue'.
 						' FROM functions f,items i,hosts h'.
@@ -849,24 +848,25 @@ Copt::memoryPick();
 							' AND '.DBcondition('f.functionid', $functionids);
 				$db_funcs = DBselect($sql);
 				while($func = DBfetch($db_funcs)){
-					if(isset($triggers_to_expand_hosts[$trigger['triggerid']][$func['functionid']])){
-						$fnum = $triggers_to_expand_hosts[$trigger['triggerid']][$func['functionid']];
+					if(isset($triggers_to_expand_hosts[$func['triggerid']][$func['functionid']])){
+
+						$fnum = $triggers_to_expand_hosts[$func['triggerid']][$func['functionid']];
 						if($fnum == 1)
 							$result[$func['triggerid']]['description'] = str_replace('{HOSTNAME}', $func['host'], $result[$func['triggerid']]['description']);
 
 						$result[$func['triggerid']]['description'] = str_replace('{HOSTNAME'.$fnum.'}', $func['host'], $result[$func['triggerid']]['description']);
 					}
 
-					if(isset($triggers_to_expand_items[$trigger['triggerid']][$func['functionid']])){
-						$fnum = $triggers_to_expand_items[$trigger['triggerid']][$func['functionid']];
+					if(isset($triggers_to_expand_items[$func['triggerid']][$func['functionid']])){
+						$fnum = $triggers_to_expand_items[$func['triggerid']][$func['functionid']];
 						if($fnum == 1)
 							$result[$func['triggerid']]['description'] = str_replace('{ITEM.LASTVALUE}', $func['lastvalue'], $result[$func['triggerid']]['description']);
 
 						$result[$func['triggerid']]['description'] = str_replace('{ITEM.LASTVALUE'.$fnum.'}', $func['lastvalue'], $result[$func['triggerid']]['description']);
 					}
 
-					if(isset($triggers_to_expand_items2[$trigger['triggerid']][$func['functionid']])){
-						$fnum = $triggers_to_expand_items2[$trigger['triggerid']][$func['functionid']];
+					if(isset($triggers_to_expand_items2[$func['triggerid']][$func['functionid']])){
+						$fnum = $triggers_to_expand_items2[$func['triggerid']][$func['functionid']];
 						if($fnum == 1)
 							$result[$func['triggerid']]['description'] = str_replace('{ITEM.VALUE}', $func['lastvalue'], $result[$func['triggerid']]['description']);
 
