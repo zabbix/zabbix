@@ -3151,12 +3151,12 @@ linkForm_addLinktrigger: function(linktrigger){
 	e_input_10.setAttribute('value',linktrigger.desc_exp);
 	e_td_9.appendChild(e_input_10);
 
-	var e_input_10 = document.createElement('input');
-	e_input_10.setAttribute('name',"link_triggers["+triggerid+"][color]");
-	e_input_10.setAttribute('id',"link_triggers["+triggerid+"][color]");
-	e_input_10.setAttribute('type',"hidden");
-	e_input_10.setAttribute('value',linktrigger.color);
-	e_td_9.appendChild(e_input_10);
+	// var e_input_10 = document.createElement('input');
+	// e_input_10.setAttribute('name',"link_triggers["+triggerid+"][color]");
+	// e_input_10.setAttribute('id',"link_triggers["+triggerid+"][color]");
+	// e_input_10.setAttribute('type',"hidden");
+	// e_input_10.setAttribute('value',linktrigger.color);
+	// e_td_9.appendChild(e_input_10);
 
 //-----
 	var linktriggerid = isset('linktriggerid', linktrigger)?linktrigger.linktriggerid:0;
@@ -3219,7 +3219,17 @@ linkForm_addLinktrigger: function(linktrigger){
 	var e_td_9 = document.createElement('td');
 	e_tr_8.appendChild(e_td_9);
 
-
+	var e_input_22 = document.createElement('input');
+	e_input_22.setAttribute('style',"margin-top: 0px; margin-bottom: 0px;");
+	e_input_22.setAttribute('onchange',"set_color_by_name('link_triggers["+triggerid+"][color]',this.value)");
+	e_input_22.setAttribute('maxlength',"6");
+	e_input_22.setAttribute('value',linktrigger.color);
+	e_input_22.setAttribute('size',"7");
+	e_input_22.setAttribute('id',"link_triggers["+triggerid+"][color]");
+	e_input_22.setAttribute('name',"link_triggers["+triggerid+"][color]");
+	e_input_22.className = "biginput";
+	e_td_9.appendChild(e_input_22);
+		
 	var e_div_10 = document.createElement('div');
 //this.linkForm.colorPicker = e_div_10;
 
