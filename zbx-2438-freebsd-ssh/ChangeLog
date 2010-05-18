@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBX-2438] fixed configuration of ssh2 on FreeBSD. Thanks to Alex Deiter (asaveljevs)
  - [ZBX-2423] added custom color input for link elements (Vedmak)
  - [ZBX-2100] fixed group with templates but without hosts breaks map editing issue (Aly)
  - [ZBX-1591] fixed "advanced icons" for image type map elements (Aly)
