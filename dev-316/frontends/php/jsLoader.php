@@ -33,6 +33,7 @@ $availableJScripts = array(
 	'class.cswitcher.js' => '',
 	'class.ctree.js' => '',
 	'class.curl.js' => '',
+	'class.rpc.js' => '',
 	'class.pmaster.js' => ''
 );
 
@@ -66,7 +67,7 @@ $tranStrings = array(
 );
 
 if(empty($_GET['files'])){
-	$files = array('prototype.js', 'common.js', 'class.cdate.js', 'class.cookie.js', 'class.curl.js', 'class.csuggest.js', 'main.js', 'functions.js');
+	$files = array('prototype.js', 'common.js', 'class.cookie.js', 'class.rpc.js', 'class.curl.js', 'class.csuggest.js', 'class.cdate.js', 'main.js', 'functions.js');
 }
 else{
 	$files = $_GET['files'];

@@ -2431,12 +2431,9 @@ updateForm_selementByType: function(e, multi){
 			this.selementForm.typeDOM.elementName.style.display = 'none';
 			this.selementForm.typeDOM.iconid_off.style.display = display_style;
 
+// initiats icons hide
+			this.selementForm.advanced_icons.checked = false;
 			this.selementForm.typeDOM.advanced_icons.style.display = 'none';
-			this.selementForm.typeDOM.iconid_on.style.display = 'none';
-			this.selementForm.typeDOM.iconid_unknown.style.display = 'none';
-			this.selementForm.typeDOM.iconid_maintenance.style.display = 'none';
-			this.selementForm.typeDOM.iconid_disabled.style.display = 'none';
-
 		break;
 	}
 	

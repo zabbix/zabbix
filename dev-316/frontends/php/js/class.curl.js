@@ -1,4 +1,3 @@
-//Javascript document
 /*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
@@ -17,6 +16,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/ 
+// JavaScript Document
 
 /************************************************************************************/
 /*								URL MANIPULATION CLASS 								*/
@@ -106,16 +106,23 @@ initialize: function(url){
 	if(this.query.length>0) this.file+='?'+this.query;
 	if(this.query.length > 0)	this.formatArguments();
 
-	var possition = parseInt(location.href.indexOf('sid='));
-	if(possition > -1){
-		this.setArgument('sid', location.href.substr(possition+4, 16));
-	}
-	else{
-		var sid = cookie.read('zbx_sessionid');
-		if(!is_null(sid)) this.setArgument('sid', sid.substring(16));
-	}
+	this.addSID();
 },
 
+addSID: function(){
+	var sid = '';
+	var possition = parseInt(location.href.indexOf('sid='));
+
+	if(possition > -1){
+		sid = location.href.substr(possition+4, 16);
+	}
+	else{
+		sid = cookie.read('zbx_sessionid');
+		if(!is_null(sid)) sid = sid.substr(0,16);
+	}
+
+	if((/[\da-z]{16}/i).test(sid))	this.setArgument('sid', sid);	
+},
 
 formatQuery: function(){
 	if(this.args.lenght < 1) return;
@@ -130,8 +137,8 @@ formatQuery: function(){
 },
 
 formatArguments: function(){
-	var args=this.query.split('&');
-	var keyval='';
+	var args = this.query.split('&');
+	var keyval = '';
 
 	if(args.length<1) return;
 	
@@ -183,16 +190,15 @@ getPort: function(){
 	return this.port;
 },
 
-setQuery: function(query){ 
+setQuery: function(query){
 	this.query = query;
 	if(this.query.indexOf('?')>=0){
 		this.query= this.query.substring(this.query.indexOf('?')+1);
 	}
 	
 	this.formatArguments();
-	
-	var sid = cookie.read('zbx_sessionid');
-	this.setArgument('sid', sid.substring(16));
+
+	this.addSID();
 },
 
 getQuery: function(){ 

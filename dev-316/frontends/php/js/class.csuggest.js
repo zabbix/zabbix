@@ -33,35 +33,38 @@ CSuggest.prototype = {
 
 'saveToCache':		true,	// save results to cache
 
-'cacheTimeOut':		30000,	// cache timeout (milliseconds)
+'cacheTimeOut':		60,		// cache timeout (seconds)
 'suggestLimit':		15,		// suggestion show limit
+
+'searchDelay':		200,	// milliseconds
 
 
 // PRIVATE
-'id':			null,	// sugg obj identity
-'rpcid':		0,		// rpc request id
+'id':				null,	// sugg obj identity
+'rpcid':			0,		// rpc request id
 
-'needles':		{},		// searched strings
-'usrNeedle':	'',		// usrNeedle
+'needles':			{},		// searched strings
+'usrNeedle':		'',		// usrNeedle
+'timeoutNeedle':	null,	// Timeout reference
 
 'cache':{
-	'time':		0,		// cache creation time
-	'list':		{},		// cache by word
-	'needle':	{}		// cache by needle
+	'time':			0,		// cache creation time
+	'list':			{},		// cache by word
+	'needle':		{}		// cache by needle
 },
 
 'dom':{
-	'input':	null,	// DOM node input
-	'suggest':	null,	// DOM node suggest div
-	'sugtab':	null	// DOM node suggests table
+	'input':		null,	// DOM node input
+	'suggest':		null,	// DOM node suggest div
+	'sugtab':		null	// DOM node suggests table
 },
 
-'hlIndex':		0,		// indicates what row should be highlilghted
-'suggestCount':	0,		// suggests shown
+'hlIndex':			0,		// indicates what row should be highlilghted
+'suggestCount':		0,		// suggests shown
 
-'debug_status': 0,		// debug status: 0 - off, 1 - on, 2 - SDI;
-'debug_info': 	'',		// debug string
-'debug_prev':	'',		// don't log repeated fnc
+'debug_status':		0,		// debug status: 0 - off, 1 - on, 2 - SDI;
+'debug_info':		'',		// debug string
+'debug_prev':		'',		// don't log repeated fnc
 
 initialize: function(id, objid){
 	this.id = id;
@@ -71,6 +74,8 @@ initialize: function(id, objid){
 	addListener(this.dom.input, 'keyup', this.keyPressed.bindAsEventListener(this));
 	addListener(this.dom.input, 'blur', this.hideSuggests.bindAsEventListener(this));
 	addListener(window, 'resize', this.positionSuggests.bindAsEventListener(this));
+
+	this.timeoutNeedle = null;
 },
 
 needleChange: function(e){
@@ -78,50 +83,73 @@ needleChange: function(e){
 //--
 	this.hlIndex = 0;
 	this.suggestCount = 0;
+	
+	clearTimeout(this.timeoutNeedle);
 
 	var target = Event.element(e);
 	var needle = target.value.toLowerCase();
-
-	this.usrNeedle = needle;
-	if(empty(this.usrNeedle)){
+	
+	if(empty(needle)){
 		this.hideSuggests();
 		return true;
 	}
 
+	this.usrNeedle = needle;
 	this.needles[needle] = {'needle': needle, 'list': {}};
 
 	var found = false;
 
-	if(this.useLocal)				found = this.searchClient(needle);
-//	if(!found && this.useServer)	found = this.searchServer(needle);
-	if(!found && this.useServer)	found = this.searchServerRPC(needle);
+	if(this.useLocal) found = this.searchClient(needle);
 
-	if(!found) this.hideSuggests();
+	if(!found && this.useServer){
+		this.timeoutNeedle = setTimeout(this.searchServer.bind(this, needle), this.searchDelay);
+	}
 },
 
 // SEARCH
-searchCache: function(needle){
-	this.debug('searchCache', needle);
+searchServer: function(needle){
+	this.debug('searchServer', needle);
 //---
-	var fkey = needle[0];
-	if(!isset(fkey, this.cache.list)) return false;
+	if(needle != this.usrNeedle) return true;
 
-	var found = false;
-	var list = {};
-	for(var key in this.cache.list[fkey]){
-		var value = this.cache.list[fkey][key];
-		if(empty(value)) continue;
-
-		if(key.indexOf(needle) === 0){
-			list[value] = value;
-			found = true;
-		}
+	var rpcRequest = {
+		'method': 'host.get',
+		'params': {
+			'startPattern': needle,
+			'output': ['hostid', 'host'],
+			'sortfield': 'host',
+			'limit': this.suggestLimit
+		},
+		'onSuccess': this.serverRespond.bind(this, needle),
+		'onFailure': function(){ throw ('Suggest Widget: search request failed.'); }
 	}
 
-	this.needles[needle].list = list;
-	if(this.saveToCache) this.saveCache(needle, list);
+	new RPC.Call(rpcRequest);
 
-return found;
+return true;
+},
+
+serverRespond: function(needle, respond){
+	this.debug('serverRespond', needle);
+//--
+
+	var params = {
+		'list': {},
+		'needle': needle
+	};
+
+	for(var i=0; i < respond.length; i++){
+		if(!isset(i, respond) || empty(respond[i])) continue;
+		params.list[i] = respond[i].host.toLowerCase();
+	}
+	this.needles[params.needle].list = params.list;
+
+	if(needle == this.usrNeedle){
+		this.showSuggests();
+		this.newSugTab(params.needle);
+	}
+	
+	if(this.saveToCache) this.saveCache(params.needle, params.list);
 },
 
 searchClient: function(needle){
@@ -143,110 +171,6 @@ searchClient: function(needle){
 	}
 
 return found;
-},
-
-searchServer: function(needle){
-	this.debug('searchServer', needle);
-//---
-
-	var params = {
-		'favobj': 'search',
-		'action': 'get',
-		'needle': needle,
-		'limit': this.suggestLimit
-	};
-
-	new Ajax.Request('json.php',
-					{
-						'method': 'post',
-						'parameters':params,
-//						'onSuccess': this.serverRespond.bind(this),
-						'onSuccess': function(resp){ SDI(resp.responseText); },
-						'onFailure': function(){ alert('Simple request: Connection to server failed.'); }
-					}
-	);
-
-return true;
-},
-
-serverRespond: function(resp){
-	this.debug('serverRespond');
-//--
-
-	var params = resp.responseJSON;
-	this.needles[params.needle].list = params.list;
-
-//SDJ(params.list);
-	if(this.saveToCache) this.saveCache(params.needle, params.list);
-
-	this.showSuggests();
-	this.newSugTab(params.needle);
-},
-
-searchServerRPC: function(needle){
-	this.debug('searchServerRPC', needle);
-//---
-	var sid = cookie.read('zbx_sessionid');
-	this.rpcid++;
-
-	var postBody = {
-		'jsonrpc': '2.0',
-		'method': 'host.get',
-		'params': {
-			'startPattern': needle,
-			'output': ['hostid', 'host'],
-			'sortfield': 'host',
-			'limit': this.suggestLimit
-		},
-		'auth': sid,
-		'id': this.rpcid
-	};
-
-	var header = {
-		'Content-type': 'application/json-rpc'
-	}
-
-
-	new Ajax.Request('api_jsonrpc.php',
-					{
-						'method': 'post',
-						'requestHeaders': header,
-						'postBody': Object.toJSON(postBody),
-						'onSuccess': this.serverRespondRPC.bind(this, needle),
-						'onFailure': function(){ throw ('RPC: Connection to server failed.'); }
-					}
-	);
-
-return true;
-},
-
-serverRespondRPC: function(needle, resp){
-	this.debug('serverRespondRPC');
-//--
-
-	var params = {
-		'list': {},
-		'needle': needle
-	};
-
-	if(isset('result', resp.responseJSON)){
-		for(var i=0; i < resp.responseJSON.result.length; i++){
-			if(!isset(i, resp.responseJSON.result) || empty(resp.responseJSON.result[i])) continue;
-			params.list[i] = resp.responseJSON.result[i].host.toLowerCase();
-		}
-	}
-
-//*
-	this.needles[params.needle].list = params.list;
-
-
-	if(this.saveToCache) this.saveCache(params.needle, params.list);
-
-	if(needle == this.usrNeedle){
-		this.showSuggests();
-		this.newSugTab(params.needle);
-	}
-//*/
 },
 //-----
 
@@ -294,14 +218,38 @@ keyPressed: function(e){
 
 
 // -----------------------------------------------------------------------
-// Help
+// CACHE
 // -----------------------------------------------------------------------
+searchCache: function(needle){
+	this.debug('searchCache', needle);
+//---
+	var fkey = needle[0];
+	if(!isset(fkey, this.cache.list)) return false;
+
+	var found = false;
+	var list = {};
+	for(var key in this.cache.list[fkey]){
+		var value = this.cache.list[fkey][key];
+		if(empty(value)) continue;
+
+		if(key.indexOf(needle) === 0){
+			list[value] = value;
+			found = true;
+		}
+	}
+
+	this.needles[needle].list = list;
+	if(this.saveToCache) this.saveCache(needle, list);
+
+return found;
+},
+
 inCache: function(needle){
 	this.debug('inCache');
 //---
 	if(this.useServer){
 		var dd = new Date();
-		if((this.cache.time + this.cacheTimeOut) < dd.getTime()) this.cleanCache();
+		if((this.cache.time + (this.cacheTimeOut*1000)) < dd.getTime()) this.cleanCache();
 	}
 
 return isset(needle, this.cache.needle);
@@ -312,7 +260,7 @@ saveCache: function(needle, list){
 //---
 	if(this.useServer){
 		var dd = new Date();
-		if((this.cache.time + this.cacheTimeOut) < dd.getTime()) this.cleanCache();
+		if((this.cache.time + (this.cacheTimeOut*1000)) < dd.getTime()) this.cleanCache();
 	}
 
 // Needles
@@ -364,7 +312,6 @@ showSuggests: function(){
 
 		this.positionSuggests();
 	}
-
 
 	this.dom.suggest.style.display = 'block';
 },
