@@ -34,7 +34,7 @@ char usage_message[] = "[-Vhp] [-c <file>] [-t <metric>]";
 #ifndef HAVE_GETOPT_LONG
 char *help_message[] = {
 	"Options:",
-	"  -c <file>     Specify configuration file",
+	"  -c <file>     Specify configuration file. Use absolute path",
 	"  -h            give this help",
 	"  -V            display version number",
 	"  -p            print supported metrics and exit",
@@ -44,7 +44,7 @@ char *help_message[] = {
 #else
 char *help_message[] = {
 	"Options:",
-	"  -c --config <file>  Specify configuration file",
+	"  -c --config <file>  Specify configuration file. Use absolute path",
 	"  -h --help           give this help",
 	"  -V --version        display version number",
 	"  -p --print          print supported metrics and exit",

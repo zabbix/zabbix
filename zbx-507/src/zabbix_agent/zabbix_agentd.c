@@ -94,8 +94,6 @@ char *help_message[] = {
 	"  -p --print            print supported metrics and exit",
 	"  -t --test <metric>    test specified metric and exit",
 /*	"  -u --usage <metric> test specified metric and exit",	*/ /* !!! TODO - print metric usage !!! */
-	"",
-	"Note that -t and -p switches do not work with user parameters. Use zabbix_get instead.",
 
 #if defined (_WINDOWS)
 
