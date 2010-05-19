@@ -333,7 +333,7 @@ void	zbx_hashset_iter_remove(zbx_hashset_iter_t *iter)
 	if (iter->hashset->slots[iter->slot] == iter->entry)
 	{
 		iter->hashset->slots[iter->slot] = iter->entry->next;
-		iter->hashset->mem_free_func(iter->entry);
+		__hashset_free_entry(iter->hashset, iter->entry);
 		iter->hashset->num_data--;
 
 		iter->slot--;
@@ -347,7 +347,7 @@ void	zbx_hashset_iter_remove(zbx_hashset_iter_t *iter)
 			prev_entry = prev_entry->next;
 
 		prev_entry->next = iter->entry->next;		
-		iter->hashset->mem_free_func(iter->entry);
+		__hashset_free_entry(iter->hashset, iter->entry);
 		iter->hashset->num_data--;
 
 		iter->entry = prev_entry;
