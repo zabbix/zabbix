@@ -680,11 +680,11 @@ include_once('include/page_header.php');
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('massupdate',S_MASS_UPDATE);
-		$goOption->setAttribute('confirm',S_MASS_UPDATE_SELECTED_TRIGGERS_Q);
+		//$goOption->setAttribute('confirm',S_MASS_UPDATE_SELECTED_TRIGGERS_Q);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('copy_to',S_COPY_SELECTED_TO);
-		$goOption->setAttribute('confirm',S_COPY_SELECTED_TRIGGERS_Q);
+		//$goOption->setAttribute('confirm',S_COPY_SELECTED_TRIGGERS_Q);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('delete',S_DELETE_SELECTED);

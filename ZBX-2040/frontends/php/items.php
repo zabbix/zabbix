@@ -1007,7 +1007,7 @@ include_once('include/page_header.php');
 			$description[] = new CLink($item['description_expanded'], '?form=update&itemid='.$item['itemid']);
 
 			$status = new CCol(new CLink(item_status2str($item['status']), '?group_itemid='.$item['itemid'].'&go='.
-				($item['status']?'activate':'disable'), item_status2style($item['status'])));
+				($item['status']? 'activate':'disable'), item_status2style($item['status'])));
 
 
 			if(zbx_empty($item['error'])){
@@ -1162,11 +1162,11 @@ include_once('include/page_header.php');
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('massupdate',S_MASS_UPDATE);
-		$goOption->setAttribute('confirm',S_MASS_UPDATE_SELECTED_ITEMS_Q);
+		//$goOption->setAttribute('confirm',S_MASS_UPDATE_SELECTED_ITEMS_Q);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('copy_to',S_COPY_SELECTED_TO);
-		$goOption->setAttribute('confirm',S_COPY_SELECTED_ITEMS_Q);
+		//$goOption->setAttribute('confirm',S_COPY_SELECTED_ITEMS_Q);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('clean_history',S_CLEAR_HISTORY_FOR_SELECTED);
