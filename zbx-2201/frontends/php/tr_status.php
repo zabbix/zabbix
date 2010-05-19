@@ -398,7 +398,7 @@ include_once('include/page_header.php');
 	if($config['event_ack_enable']){
 		foreach($triggers as $tnum => $trigger){
 			$options = array(
-				'count' => 1,
+				'countOutput' => 1,
 				'triggerids' => $trigger['triggerid'],
 				'object' => EVENT_OBJECT_TRIGGER,
 				'acknowledged' => 0,
