@@ -76,11 +76,7 @@ void	child_signal_handler( int sig )
 	exit( FAIL );
 }
 
-#ifdef _WINDOWS
-	static char	DEFAULT_CONFIG_FILE[]	= "C:\\zabbix_agent.conf";
-#else /* not _WINDOWS */
-	static char	DEFAULT_CONFIG_FILE[]	= "/etc/zabbix/zabbix_agent.conf";
-#endif /* _WINDOWS */
+static char	DEFAULT_CONFIG_FILE[]	= "/etc/zabbix/zabbix_agent.conf";
 
 void    init_config(void)
 {
@@ -176,14 +172,12 @@ int	main(int argc, char **argv)
 			break;
 	}
 
-#if !defined(_WINDOWS)
 	signal(SIGINT,  child_signal_handler);
 	signal(SIGTERM, child_signal_handler);
 	signal(SIGQUIT, child_signal_handler);
 	signal(SIGALRM, child_signal_handler);
 
 	alarm(CONFIG_TIMEOUT);
-#endif /* not WINDOWS */
 
 	zbx_tcp_init(&s_in, (ZBX_SOCKET)fileno(stdin));
 	zbx_tcp_init(&s_out, (ZBX_SOCKET)fileno(stdout));
@@ -224,9 +218,8 @@ int	main(int argc, char **argv)
 	free_metrics();
 	alias_list_free();
 
-#if !defined(_WINDOWS)
 	alarm(0);
-#endif /* not WINDOWS */
+
 	zabbix_close_log();
 
 	return SUCCEED;
