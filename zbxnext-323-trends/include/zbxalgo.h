@@ -109,6 +109,18 @@ void	zbx_hashset_remove(zbx_hashset_t *hs, const void *data);
 
 void	zbx_hashset_clear(zbx_hashset_t *hs);
 
+typedef struct
+{
+	zbx_hashset_t		*hashset;
+	int			slot;
+	ZBX_HASHSET_ENTRY_T	*entry;
+}
+zbx_hashset_iter_t;
+
+void	zbx_hashset_iter_reset(zbx_hashset_t *hs, zbx_hashset_iter_t *iter);
+void	*zbx_hashset_iter_next(zbx_hashset_iter_t *iter);
+void	zbx_hashset_iter_remove(zbx_hashset_iter_t *iter);
+
 /* hashmap */
 
 /* currently, we only have a very specialized hashmap */
