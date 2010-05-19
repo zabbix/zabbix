@@ -1,0 +1,32 @@
+.TH ZABBIX_PROXY 8 "4 August 2009"
+.SH NAME
+zabbix_proxy \- Zabbix Proxy daemon.
+.SH SYNOPSIS
+.B zabbix_proxy [-hV] [-c 
+.I config-file
+.B ]
+.SH DESCRIPTION
+.B zabbix_proxy
+is a Proxy daemon used for remote data collection.
+.SS Options
+.IP "-c, --config config-file"
+Use the alternate
+.I config-file
+instead  of
+.I /etc/zabbix/zabbix_proxy.conf
+.
+.IP "-h, --help"
+Display this help and exit.
+.IP "-V, --version"
+Output version information and exit.
+.SH FILES
+.TP
+.I /etc/zabbix/zabbix_proxy.conf
+Default location of Zabbix Proxy configuration file.
+.SH "SEE ALSO"
+.BR zabbix_agentd (8),
+.BR zabbix_get (8),
+.BR zabbix_sender (8),
+.BR zabbix_server (8)
+.SH AUTHOR
+Alexei Vladishev <alex@zabbix.com>
