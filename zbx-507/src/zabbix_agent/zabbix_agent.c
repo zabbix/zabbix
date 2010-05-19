@@ -215,7 +215,7 @@ int	main(int argc, char **argv)
 
 		if( FAIL == ret )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Processing  error: %s", zbx_tcp_strerror());
+			zabbix_log(LOG_LEVEL_DEBUG, "Processing error: %s", zbx_tcp_strerror());
 		}
 	}
 

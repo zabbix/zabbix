@@ -27,7 +27,7 @@
 #include "perfstat.h"
 
 #if defined(ZABBIX_DAEMON)
-/* use pid file configureation */
+/* use pid file configuration */
 #	include "daemon.h"
 #endif /* ZABBIX_DAEMON */
 
