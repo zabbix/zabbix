@@ -73,14 +73,14 @@ AC_HELP_STRING([--with-ssh2@<:@=DIR@:>@],[use SSH2 package @<:@default=no@:>@, D
      AC_MSG_CHECKING(for SSH2 support)
      if test "x$_libssh2_dir" = "xno"; then
        if test -f /usr/include/libssh2.h; then
-         SSH2_CFLAGS=-I$/usr/include
-         SSH2_LDFLAGS=-L$/usr/lib
+         SSH2_CFLAGS=-I/usr/include
+         SSH2_LDFLAGS=-L/usr/lib
          SSH2_LIBS="-lssh2"
          found_ssh2="yes"
 	 LIBSSH2_ACCEPT_VERSION([/usr/include/libssh2.h])
        elif test -f /usr/local/include/libssh2.h; then
-         SSH2_CFLAGS=-I$/usr/local/include
-         SSH2_LDFLAGS=-L$/usr/local/lib
+         SSH2_CFLAGS=-I/usr/local/include
+         SSH2_LDFLAGS=-L/usr/local/lib
          SSH2_LIBS="-lssh2"
          found_ssh2="yes"
 	 LIBSSH2_ACCEPT_VERSION([/usr/local/include/libssh2.h])
