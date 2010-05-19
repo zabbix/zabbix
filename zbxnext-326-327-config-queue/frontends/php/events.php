@@ -92,7 +92,9 @@
 		$_REQUEST['triggerid'] = 0;
 		$_REQUEST['hide_unknown'] = 0;
 	}
-
+	
+	$source = get_request('triggerid') > 0 ? EVENT_SOURCE_TRIGGERS : get_request('source', CProfile::get('web.events.source', EVENT_SOURCE_TRIGGERS));
+	
 	$_REQUEST['triggerid'] = get_request('triggerid',CProfile::get('web.events.filter.triggerid',0));
 	$_REQUEST['hide_unknown'] = get_request('hide_unknown',CProfile::get('web.events.filter.hide_unknown',0));
 
@@ -102,7 +104,6 @@
 	}
 // --------------
 	
-	$source = get_request('source', CProfile::get('web.events.source', EVENT_SOURCE_TRIGGERS));
 	CProfile::update('web.events.source',$source, PROFILE_TYPE_INT);
 ?>
 <?php
@@ -110,7 +111,7 @@
 	$events_wdgt = new CWidget();
 	
 // PAGE HEADER {{{
-	$url = '?fullscreen='.($_REQUEST['fullscreen']?'0':'1');
+	$url = '?fullscreen='.($_REQUEST['fullscreen']? '0':'1');
 	$fs_icon = new CDiv(SPACE,'fullscreen');
 	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 	$fs_icon->addAction('onclick',new CJSscript("javascript: document.location = '".$url."';"));
@@ -453,7 +454,7 @@
 				$items = array();
 				foreach($event['items'] as $inum => $item){
 					$item['itemid'] = $item['itemid'];
-					$item['action'] = str_in_array($item['value_type'],array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64))?'showgraph':'showvalues';
+					$item['action'] = str_in_array($item['value_type'],array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64))? 'showgraph':'showvalues';
 					$item['description'] = item_description($item);
 					$items[] = $item;
 				}
