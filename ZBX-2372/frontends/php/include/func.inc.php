@@ -322,7 +322,7 @@ function zbx_set_post_cookie($name, $value, $time=null){
  * author: Alexei Vladishev
  */
 function zbx_date2str($format, $value=NULL){
-	static $weekdaynames, $weekdaynameslong, $months, $monthslong, $rplcs;
+	static $weekdaynames, $weekdaynameslong, $months, $monthslong;
 	
 	if($value === NULL) $value = time();
 	
@@ -382,14 +382,12 @@ function zbx_date2str($format, $value=NULL){
 					12 => S_MONTH_DECEMBER_LONG);
 	}
 	
-	if(!is_array($rplcs)) {
-		$rplcs = Array(
-			'l' => $weekdaynameslong[date('w',$value)],
-			'F' => $monthslong[date('n',$value)],
-			'D' => $weekdaynames[date('w',$value)],
-			'M' => $months[date('n',$value)]
-		);
-	}
+	$rplcs = Array(
+		'l' => $weekdaynameslong[date('w',$value)],
+		'F' => $monthslong[date('n',$value)],
+		'D' => $weekdaynames[date('w',$value)],
+		'M' => $months[date('n',$value)]
+	);
 	
 	$output = '';
 	$part = '';

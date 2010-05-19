@@ -1233,7 +1233,7 @@
 	'S_BY_TRIGGER_TEMPLATE'=>			'По шаблону тригера',
 	'S_CHART4_HEADER_TITLE'=>			'%s (рік %s)',
 	'S_CHART4_HEADER_DATE_FORMAT'=>			'Y',
-	'S_CHART4_TIMELINE_DATE_FORMAT'=>			'd.m',
+	'S_CHART4_TIMELINE_DATE_FORMAT'=>			'd M',
 	'S_CHART5_HEADER_TITLE'=>			'%s (рік %s)',
 	'S_CHART5_HEADER_DATE_FORMAT'=>			'Y',
 	'S_CHART5_TIMELINE_DATE_FORMAT'=>			'd.m',
