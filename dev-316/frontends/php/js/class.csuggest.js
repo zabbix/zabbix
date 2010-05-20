@@ -90,7 +90,7 @@ needleChange: function(e){
 
 	var target = Event.element(e);
 	var needle = target.value.toLowerCase();
-	
+
 	if(empty(needle)){
 		this.hideSuggests();
 		return true;
@@ -310,7 +310,7 @@ keyUp: function(e){
 keyDown: function(e){
 	this.debug('keyDown');
 //---
-	if(!is_null(this.dom.suggest) && (this.dom.suggest.style.display == 'none')){
+	if(is_null(this.dom.suggest) || (this.dom.suggest.style.display == 'none')){
 		this.needleChange(e);
 		return true;
 	}
@@ -426,6 +426,10 @@ hideSuggests: function(e){
 
 	if(!is_null(this.dom.suggest)){
 		this.dom.suggest.style.display = 'none';
+
+// IE6 Fix
+		showPopupDiv(this.dom.suggest, 'suggestFrame');
+//		hidePopupDiv('suggestFrame');
 	}
 },
 
@@ -440,6 +444,9 @@ positionSuggests: function(e){
 
 	this.dom.suggest.style.top = (pos.top+dims.height)+'px';
 	this.dom.suggest.style.left = pos.left+'px';
+
+// IE6 Fix
+	showPopupDiv(this.dom.suggest, 'suggestFrame');
 },
 
 newSugTab: function(needle){
@@ -472,8 +479,7 @@ newSugTab: function(needle){
 		addListener(td, 'mouseup', this.selectSuggest.bindAsEventListener(this), true);
 		addListener(td, 'mouseout', this.mouseOut.bindAsEventListener(this), true);
 
-
-
+// text
 		var bold = document.createElement('b');
 		td.appendChild(bold);
 
@@ -488,6 +494,10 @@ newSugTab: function(needle){
 	this.dom.suggest.appendChild(this.dom.sugtab);
 
 	if(count == 0) this.hideSuggests();
+
+// IE6 Fix
+	if(count > 0) showPopupDiv(this.dom.suggest, 'suggestFrame');
+
 	this.suggestCount = count;
 },
 

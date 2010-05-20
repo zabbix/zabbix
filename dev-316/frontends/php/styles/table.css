@@ -1366,12 +1366,16 @@ table.suggest{
 	width: 100%;
 	margin: 0px;
 	border-spacing: 0px;
+	background-color: #FEFEFE;
 }
 
 table.suggest tr{
 	background-color: #FEFEFE;
 }
 
+table.suggest tr.highlight{
+	background-color: #AACCFF;
+}
 table.suggest tr td{
 	text-align: left;
 	padding-left: 4px;
@@ -1380,8 +1384,4 @@ table.suggest tr td{
 	font-size: 11px;
 
 	cursor: default;
-}
-
-table.suggest tr.highlight{
-	background-color: #AACCFF;
 }

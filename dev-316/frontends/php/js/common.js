@@ -707,8 +707,10 @@ function ScaleChartToParenElement(obj_name){
 function hidePopupDiv(iFrameID){
 	if(!IE6) return;
 
-	$(iFrameID).hide();
-	$(iFrameID).remove();
+	if(!is_null($(iFrameID))){
+		$(iFrameID).hide();
+		$(iFrameID).remove();
+	}
 }
 
 function showPopupDiv(divID,iFrameID){
@@ -721,7 +723,7 @@ function showPopupDiv(divID,iFrameID){
 		var iFrame = document.createElement('iframe');
 		document.body.appendChild(iFrame);
 		
-		//Match IFrame position with divPopup
+//Match IFrame position with divPopup
 		iFrame.setAttribute('id',iFrameID);
 		iFrame.style.position='absolute';
 	}
@@ -733,8 +735,7 @@ function showPopupDiv(divID,iFrameID){
 
 //Increase default zIndex of div by 1, so that DIV appears before IFrame
 	divPopup.style.zIndex=divPopup.style.zIndex+1;
-//	iFrame.style.zIndex = 1;
-
+	//iFrame.style.zIndex = 1;
 
 	var divCumOff = $(divID).cumulativeOffset();
 	iFrame.style.display = 'block';

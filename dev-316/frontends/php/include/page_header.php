@@ -391,7 +391,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 			$search_form->setMethod('get');
 			$search_form->setAttribute('class','thin');
 
-			$searchBox = new CTextBox('search',get_request('search',''));
+			$searchBox = new CTextBox('search', get_request('search',''));
 			$searchBox->setAttribute('autocomplete', 'off');
 			$searchBox->setAttribute('style', 'width: 160px;');
 
@@ -401,7 +401,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 			$search_div->setAttribute('id','zbx_search');
 			$search_div->setAttribute('class','zbx_search');
 			
-			zbx_add_post_js("var sid = createSuggest('search'); $('search').focus();");
+			zbx_add_post_js("var sid = createSuggest('search'); $('search').focus(); $('search').select();");
 		}
 
 		$sub_menu_table->addRow(array($menu_divs, $search_div));
