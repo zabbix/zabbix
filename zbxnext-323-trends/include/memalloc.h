@@ -39,7 +39,7 @@ typedef struct
 }
 zbx_mem_info_t;
 
-void	zbx_mem_create(zbx_mem_info_t *info, key_t shm_key, int lock_name, size_t size, const char *descr);
+void	zbx_mem_create(zbx_mem_info_t **info, key_t shm_key, int lock_name, size_t size, const char *descr);
 void	zbx_mem_destroy(zbx_mem_info_t *info);
 
 #define	zbx_mem_malloc(info, old, size) __zbx_mem_malloc(__FILE__, __LINE__, info, old, size)

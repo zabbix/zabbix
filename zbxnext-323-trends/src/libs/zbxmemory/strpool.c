@@ -57,17 +57,17 @@ static int	__strpool_compare_func(const void *d1, const void *d2)
 
 static void	*__strpool_mem_malloc_func(void *old, size_t size)
 {
-	return zbx_mem_malloc(&strpool.mem_info, old, size);
+	return zbx_mem_malloc(strpool.mem_info, old, size);
 }
 
 static void	*__strpool_mem_realloc_func(void *old, size_t size)
 {
-	return zbx_mem_realloc(&strpool.mem_info, old, size);
+	return zbx_mem_realloc(strpool.mem_info, old, size);
 }
 
 static void	__strpool_mem_free_func(void *ptr)
 {
-	zbx_mem_free(&strpool.mem_info, ptr);
+	zbx_mem_free(strpool.mem_info, ptr);
 }
 
 /* public strpool interface */
@@ -107,7 +107,7 @@ void	zbx_strpool_destroy()
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_mem_destroy(&strpool.mem_info);
+	zbx_mem_destroy(strpool.mem_info);
 	zbx_mutex_destroy(&strpool.pool_lock);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -195,7 +195,7 @@ void	zbx_strpool_clear()
 
 	LOCK_POOL;
 
-	zbx_mem_clear(&strpool.mem_info);
+	zbx_mem_clear(strpool.mem_info);
 	zbx_hashset_create_ext(&strpool.hashset, INIT_HASHSET_SIZE,
 				__strpool_hash_func, __strpool_compare_func,
 				__strpool_mem_malloc_func, __strpool_mem_realloc_func, __strpool_mem_free_func);

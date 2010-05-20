@@ -205,7 +205,7 @@ ZBX_DC_CONFIG
 
 static ZBX_DC_CONFIG	*config = NULL;
 static ZBX_MUTEX	config_lock;
-static zbx_mem_info_t	config_mem;
+static zbx_mem_info_t	*config_mem;
 
 static const char	*INTERNED_SERVER_STATUS_KEY;
 static const char	*INTERNED_SERVER_ZABBIXLOG_KEY;
@@ -1063,12 +1063,12 @@ void	DCsync_configuration()
 				i, config->queues[i].elems_num, config->queues[i].elems_alloc);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() configfree : " ZBX_FS_DBL "%%", __function_name,
-			100 * ((double)config_mem.free_size / config_mem.orig_size));
+			100 * ((double)config_mem->free_size / config_mem->orig_size));
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() strings    : %d (%d slots)", __function_name,
 			strpool->hashset.num_data, strpool->hashset.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() strpoolfree: " ZBX_FS_DBL "%%", __function_name,
-			100 * ((double)strpool->mem_info.free_size / strpool->mem_info.orig_size));
+			100 * ((double)strpool->mem_info->free_size / strpool->mem_info->orig_size));
 
 	UNLOCK_CACHE;
 
@@ -1098,17 +1098,17 @@ void	DCsync_configuration()
 
 static void	*__config_mem_malloc_func(void *old, size_t size)
 {
-	return zbx_mem_malloc(&config_mem, old, size);
+	return zbx_mem_malloc(config_mem, old, size);
 }
 
 static void	*__config_mem_realloc_func(void *old, size_t size)
 {
-	return zbx_mem_realloc(&config_mem, old, size);
+	return zbx_mem_realloc(config_mem, old, size);
 }
 
 static void	__config_mem_free_func(void *ptr)
 {
-	zbx_mem_free(&config_mem, ptr);
+	zbx_mem_free(config_mem, ptr);
 }
 
 static zbx_hash_t	__config_item_hk_hash(const void *data)
@@ -1289,7 +1289,7 @@ void	free_configuration_cache()
 	LOCK_CACHE;
 
 	config = NULL;
-	zbx_mem_destroy(&config_mem);
+	zbx_mem_destroy(config_mem);
 
 	zbx_strpool_destroy();
 
@@ -1929,23 +1929,23 @@ void	*DCconfig_get_stats(int request)
 
 	const zbx_mem_info_t	*strpool_mem;
 
-	strpool_mem = &zbx_strpool_info()->mem_info;
+	strpool_mem = zbx_strpool_info()->mem_info;
 
 	switch (request)
 	{
 		case ZBX_CONFSTATS_BUFFER_TOTAL:
-			value_uint = config_mem.orig_size + strpool_mem->orig_size;
+			value_uint = config_mem->orig_size + strpool_mem->orig_size;
 			return &value_uint;
 		case ZBX_CONFSTATS_BUFFER_USED:
-			value_uint = (config_mem.orig_size + strpool_mem->orig_size) -
-					(config_mem.free_size + strpool_mem->free_size);
+			value_uint = (config_mem->orig_size + strpool_mem->orig_size) -
+					(config_mem->free_size + strpool_mem->free_size);
 			return &value_uint;
 		case ZBX_CONFSTATS_BUFFER_FREE:
-			value_uint = config_mem.free_size + strpool_mem->free_size;
+			value_uint = config_mem->free_size + strpool_mem->free_size;
 			return &value_uint;
 		case ZBX_CONFSTATS_BUFFER_PFREE:
-			value_double = 100.0 * ((double)(config_mem.free_size + strpool_mem->free_size) /
-							(config_mem.orig_size + strpool_mem->orig_size));
+			value_double = 100.0 * ((double)(config_mem->free_size + strpool_mem->free_size) /
+							(config_mem->orig_size + strpool_mem->orig_size));
 			return &value_double;
 		default:
 			return NULL;
