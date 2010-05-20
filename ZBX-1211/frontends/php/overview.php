@@ -134,10 +134,10 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 
 	$over_wdgt = new CWidget();
 // Header
-	$url = 'overview.php?fullscreen='.($_REQUEST['fullscreen']?'0':'1');
+	$url = 'overview.php?fullscreen='.($_REQUEST['fullscreen'] ? '0':'1');
 
 	$fs_icon = new CDiv(SPACE,'fullscreen');
-	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
+	$fs_icon->setAttribute('title',$_REQUEST['fullscreen'] ? S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 	$fs_icon->addAction('onclick',new CJSscript("javascript: document.location = '".$url."';"));
 
 	$over_wdgt->addPageHeader(S_OVERVIEW_BIG, array($fs_icon, $help));

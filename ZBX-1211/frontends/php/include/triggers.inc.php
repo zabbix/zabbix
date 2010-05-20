@@ -2600,7 +2600,7 @@ return $result;
 		if($view_style == STYLE_TOP){
 			$header=array(new CCol(S_TRIGGERS,'center'));
 			foreach($hosts as $hostname){
-				$header = array_merge($header,array(new CImg('vtext.php?text='.$hostname)));
+				$header = array_merge($header,array(new CCol(array(new CImg('vtext.php?text='.$hostname)), 'hosts')));
 			}
 			$table->setHeader($header,'vertical_header');
 
@@ -2785,7 +2785,13 @@ return $result;
 			unset($img, $dep_table, $dependency);
 		}
 //------------------------
-		$status_col = new CCol(array($desc, $ack),$css_class);
+		//SDII($desc);
+		//SDII($ack);
+		if((is_array($desc) && count($desc) > 0) || $ack) {
+			$status_col = new CCol(array($desc, $ack),$css_class.' hosts');
+		} else {
+			$status_col = new CCol(SPACE,$css_class.' hosts');
+		}
 		if(isset($style)){
 			$status_col->setAttribute('style', $style);
 		}
@@ -2793,9 +2799,8 @@ return $result;
 		if(isset($tr_ov_menu)){
 			$tr_ov_menu  = new CPUMenu($tr_ov_menu,170);
 			$status_col->OnClick($tr_ov_menu->GetOnActionJS());
-			$status_col->addAction('onmouseover',
-				'this.old_border=this.style.border; this.style.border=\'1px dotted #0C0CF0\'');
-			$status_col->addAction('onmouseout', 'this.style.border=this.old_border;');
+			$status_col->addAction('onmouseover', 'this.style.border=\'1px dotted #0C0CF0\'');
+			$status_col->addAction('onmouseout', 'this.style.border = \'\';');
 		}
 		array_push($table_row,$status_col);
 
