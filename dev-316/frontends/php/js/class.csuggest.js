@@ -293,6 +293,8 @@ keyPressed: function(e){
 		default:
 			this.needleChange(e);
 	}
+
+	Event.stop(e);
 },
 
 keyUp: function(e){
