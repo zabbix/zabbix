@@ -122,7 +122,7 @@ static void	__mem_free(zbx_mem_info_t *info, void *ptr);
 #define	MEM_MIN_SIZE	128
 #define MEM_MAX_SIZE	(1<<30)	/* 1 GB */
 
-#define MEM_MIN_ALLOC	16	/* should be a multiple of 8 and at least (2 * ZBX_PTR_SIZE) */
+#define MEM_MIN_ALLOC	24	/* should be a multiple of 8 and at least (2 * ZBX_PTR_SIZE) */
 
 /* helper functions */
 
@@ -561,10 +561,11 @@ static void	__mem_free(zbx_mem_info_t *info, void *ptr)
 
 /* public memory interface */
 
-void	zbx_mem_create(zbx_mem_info_t *info, key_t shm_key, int lock_name, size_t size, const char *descr)
+void	zbx_mem_create(zbx_mem_info_t **info, key_t shm_key, int lock_name, size_t size, const char *descr)
 {
 	const char	*__function_name = "zbx_mem_create";
 
+	int		shm_id;
 	void		*base, *chunk_lsize, *chunk_rsize;
 
 	descr = (NULL == descr ? "(null)" : descr);
@@ -572,42 +573,7 @@ void	zbx_mem_create(zbx_mem_info_t *info, key_t shm_key, int lock_name, size_t s
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): descr[%s] size[%lu]",
 		       __function_name, descr, size);
 
-	/* allocate shared memory and mutex */
-
-	if (!(MEM_MIN_SIZE <= size && size <= MEM_MAX_SIZE))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "Requested size [%lu] not within bounds [%d <= size <= %d].",
-				size, MEM_MIN_SIZE, MEM_MAX_SIZE);
-		exit(FAIL);
-	}
-
-	if (-1 == (info->shm_id = zbx_shmget(shm_key, size)))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "Could not allocate shared memory for %s.",
-				descr);
-		exit(FAIL);
-	}
-
-	if ((void *)(-1) == (base = shmat(info->shm_id, NULL, 0)))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "Could not attach shared memory for %s (error: [%s]).",
-				descr, strerror(errno));
-		exit(FAIL);
-	}
-
-	if (ZBX_NO_MUTEX != lock_name)
-	{
-		info->use_lock = 1;
-
-		if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&info->mem_lock, lock_name))
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "Could not create mutex for %s.",
-					descr);
-			exit(FAIL);
-		}
-	}
-	else
-		info->use_lock = 0;
+	/* allocate shared memory */
 
 	if (ZBX_PTR_SIZE != 4 && ZBX_PTR_SIZE != 8)
 	{
@@ -616,39 +582,87 @@ void	zbx_mem_create(zbx_mem_info_t *info, key_t shm_key, int lock_name, size_t s
 		exit(FAIL);
 	}
 
+	if (!(MEM_MIN_SIZE <= size && size <= MEM_MAX_SIZE))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Requested size [%lu] not within bounds [%d <= size <= %d].",
+				size, MEM_MIN_SIZE, MEM_MAX_SIZE);
+		exit(FAIL);
+	}
+
+	if (-1 == (shm_id = zbx_shmget(shm_key, size)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Could not allocate shared memory for %s.",
+				descr);
+		exit(FAIL);
+	}
+
+	if ((void *)(-1) == (base = shmat(shm_id, NULL, 0)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Could not attach shared memory for %s (error: [%s]).",
+				descr, strerror(errno));
+		exit(FAIL);
+	}
+
+	/* allocate zbx_mem_info_t structure and description inside shared memory */
+
+	*info = ALIGN8(base);
+	(*info)->shm_id = shm_id;
+	(*info)->orig_size = (uint32_t)size;
+
+	size -= (void *)(*info + 1) - base;
+	base = (void *)(*info + 1);
+
+	strcpy(base, descr);
+	(*info)->mem_descr = base;
+
+	size -= strlen(descr) + 1;
+	base += strlen(descr) + 1;
+	
+	/* allocate mutex */
+
+	if (ZBX_NO_MUTEX != lock_name)
+	{
+		(*info)->use_lock = 1;
+
+		if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&((*info)->mem_lock), lock_name))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "Could not create mutex for %s.",
+					descr);
+			exit(FAIL);
+		}
+	}
+	else
+		(*info)->use_lock = 0;
+
 	/* prepare shared memory for further allocation by creating one big chunk */
-
-	info->orig_size = (uint32_t)size;
-
-	chunk_rsize = ALIGN8(base + size - 8);
-	if (chunk_rsize + MEM_SIZE_FIELD > base + size)
-		chunk_rsize -= 8;
 
 	chunk_lsize = ALIGN8(base);
 	if (chunk_lsize - MEM_SIZE_FIELD < base)
 		chunk_lsize += 8;
 	chunk_lsize -= MEM_SIZE_FIELD;
 
-	info->lo_bound = chunk_lsize;
-	info->hi_bound = chunk_rsize + MEM_SIZE_FIELD;
+	chunk_rsize = ALIGN8(base + size - 8);
+	if (chunk_rsize + MEM_SIZE_FIELD > base + size)
+		chunk_rsize -= 8;
 
-	info->first_chunk = info->lo_bound;
+	(*info)->lo_bound = chunk_lsize;
+	(*info)->hi_bound = chunk_rsize + MEM_SIZE_FIELD;
 
-	info->total_size = (uint32_t)(chunk_rsize - chunk_lsize - MEM_SIZE_FIELD);
-	mem_set_chunk_size(info->first_chunk, info->total_size);
+	(*info)->first_chunk = (*info)->lo_bound;
 
-	mem_set_prev_chunk(info->first_chunk, NULL);
-	mem_set_next_chunk(info->first_chunk, NULL);
+	(*info)->total_size = (uint32_t)(chunk_rsize - chunk_lsize - MEM_SIZE_FIELD);
+	mem_set_chunk_size((*info)->first_chunk, (*info)->total_size);
 
-	info->used_size = 0;
-	info->free_size = info->total_size;
+	mem_set_prev_chunk((*info)->first_chunk, NULL);
+	mem_set_next_chunk((*info)->first_chunk, NULL);
 
-	info->mem_descr = strdup(descr);
+	(*info)->used_size = 0;
+	(*info)->free_size = (*info)->total_size;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "valid addresses: [%p, %p) total size: [%lu]",
-			info->lo_bound + MEM_SIZE_FIELD,
-			info->hi_bound - MEM_SIZE_FIELD,
-			info->total_size);
+	zabbix_log(LOG_LEVEL_DEBUG, "valid user addresses: [%p, %p) total size: [%lu]",
+			(*info)->lo_bound + MEM_SIZE_FIELD,
+			(*info)->hi_bound - MEM_SIZE_FIELD,
+			(*info)->total_size);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -659,17 +673,14 @@ void	zbx_mem_destroy(zbx_mem_info_t *info)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	if (info->use_lock)
+		zbx_mutex_destroy(&info->mem_lock);
+
 	if (-1 == shmctl(info->shm_id, IPC_RMID, 0))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Could not remove shared memory for %s (error: [%s]).",
 				info->mem_descr, strerror(errno));
 	}
-
-	info->first_chunk = NULL;
-	zbx_free(info->mem_descr);
-
-	if (info->use_lock)
-		zbx_mutex_destroy(&info->mem_lock);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
