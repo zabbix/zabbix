@@ -44,7 +44,7 @@ CSuggest.prototype = {
 'rpcid':			0,		// rpc request id
 
 'needles':			{},		// searched strings
-'usrNeedle':		'',		// usrNeedle
+'userNeedle':		'',		// userNeedle
 'timeoutNeedle':	null,	// Timeout reference
 
 'cache':{
@@ -62,6 +62,8 @@ CSuggest.prototype = {
 'hlIndex':			0,		// indicates what row should be highlilghted
 'suggestCount':		0,		// suggests shown
 
+'mouseOverSuggest':	false,	// indicates if mouse is over suggests
+
 'debug_status':		0,		// debug status: 0 - off, 1 - on, 2 - SDI;
 'debug_info':		'',		// debug string
 'debug_prev':		'',		// don't log repeated fnc
@@ -72,7 +74,7 @@ initialize: function(id, objid){
 
 	this.dom.input = $(objid);
 	addListener(this.dom.input, 'keyup', this.keyPressed.bindAsEventListener(this));
-	addListener(this.dom.input, 'blur', this.hideSuggests.bindAsEventListener(this));
+	addListener(this.dom.input, 'blur', this.suggestBlur.bindAsEventListener(this));
 	addListener(window, 'resize', this.positionSuggests.bindAsEventListener(this));
 
 	this.timeoutNeedle = null;
@@ -94,7 +96,7 @@ needleChange: function(e){
 		return true;
 	}
 
-	this.usrNeedle = needle;
+	this.userNeedle = needle;
 	this.needles[needle] = {'needle': needle, 'list': {}};
 
 	var found = false;
@@ -110,7 +112,7 @@ needleChange: function(e){
 searchServer: function(needle){
 	this.debug('searchServer', needle);
 //---
-	if(needle != this.usrNeedle) return true;
+	if(needle != this.userNeedle) return true;
 
 	var rpcRequest = {
 		'method': 'host.get',
@@ -144,7 +146,7 @@ serverRespond: function(needle, respond){
 	}
 	this.needles[params.needle].list = params.list;
 
-	if(needle == this.usrNeedle){
+	if(needle == this.userNeedle){
 		this.showSuggests();
 		this.newSugTab(params.needle);
 	}
@@ -173,49 +175,6 @@ searchClient: function(needle){
 return found;
 },
 //-----
-
-// Keyboard
-keyPressed: function(e){
-	this.debug('keyPressed');
-//---
-
-	if(!e) var e = window.event;
-	var key = e.keyCode;
-
-	switch(true){
-		case(key == 27):
-			this.hlIndex = 0;
-			this.suggestCount = 0;
-			this.highLightSuggest();
-			this.hideSuggests();
-			break;
-		case(key==13):
-			this.selectSuggest();
-			break;
-		case(key == 37 || key == 39 || key == 9): // left, right, tab
-			break;
-		case(key==38): // up
-			if(this.hlIndex == 0) this.hlIndex = this.suggestCount;
-			else this.hlIndex--;
-
-			this.highLightSuggest();
-			break;
-		case(key==40): // down
-			if(!is_null(this.dom.suggest) && (this.dom.suggest.style.display == 'none')){
-				this.needleChange(e);
-				break;
-			}
-
-			if(this.hlIndex == this.suggestCount) this.hlIndex = 0;
-			else this.hlIndex++;
-
-			this.highLightSuggest();
-			break;
-		default:
-			this.needleChange(e);
-	}
-},
-
 
 // -----------------------------------------------------------------------
 // CACHE
@@ -292,11 +251,156 @@ cleanCache: function(){
 		'needle':	{}
 	}
 },
+
+// -----------------------------------------------------------------------
+// Events
+// -----------------------------------------------------------------------
+
+onSelect: function(selection){
+	return true;
+},
+
+// -----------------------------------------------------------------------
+// Keyboard
+// -----------------------------------------------------------------------
+
+keyPressed: function(e){
+	this.debug('keyPressed');
+//---
+
+	if(!e) var e = window.event;
+	var key = e.keyCode;
+
+	switch(true){
+		case(key == 27):
+			this.hlIndex = 0;
+			this.suggestCount = 0
+			this.removeHighLight(e);
+			this.setNeedleByHighLight(e);
+			this.hideSuggests(e);
+			break;
+		case(key==13):
+			this.selectSuggest(e);
+			break;
+		case(key == 37 || key == 39 || key == 9): // left, right, tab
+			break;
+		case(key==38): // up
+			this.keyUp(e);
+			break;
+		case(key==40): // down
+			this.keyDown(e);
+			break;
+		default:
+			this.needleChange(e);
+	}
+},
+
+keyUp: function(e){
+	this.debug('keyUp');
+//---
+
+	if(this.hlIndex == 0) this.hlIndex = this.suggestCount;
+	else this.hlIndex--;
+
+	this.removeHighLight(e);
+	this.highLightSuggest(e);
+	this.setNeedleByHighLight(e);
+},
+
+keyDown: function(e){
+	this.debug('keyDown');
+//---
+	if(!is_null(this.dom.suggest) && (this.dom.suggest.style.display == 'none')){
+		this.needleChange(e);
+		return true;
+	}
+
+	if(this.hlIndex == this.suggestCount) this.hlIndex = 0;
+	else this.hlIndex++;
+
+	this.removeHighLight(e);
+	this.highLightSuggest(e);
+	this.setNeedleByHighLight(e);
+},
+
+mouseOver: function(e){
+	this.debug('mouseOver');
+//---
+	this.mouseOverSuggest = true;
+
+	var row = Event.element(e).parentNode;
+	if(is_null(row) || (row.tagName.toLowerCase() != 'tr') || !isset('id',row)) return true;
+
+	var tmp = row.id.split('_');
+	if(tmp.length != 2) return true;
+
+	this.hlIndex = parseInt(tmp[1], 10);
+
+	this.removeHighLight(e);
+	this.highLightSuggest(e);
+},
+
+mouseOut: function(e){
+	this.debug('mouseOut');
+//---
+
+	this.mouseOverSuggest = false;
+},
+
+suggestBlur: function(e){
+	this.debug('mouseOut');
+//---
+
+	if(this.mouseOverSuggest) Event.stop(e);
+	else this.hideSuggests(e);
+},
+
+// -----------------------------------------------------------------------
+// HighLight
+// -----------------------------------------------------------------------
+
+removeHighLight: function(e){
+	this.debug('rmvHighLight');
+//---
+
+	$$('tr.highlight').each( function(hlRow){hlRow.className = '';});
+},
+
+
+highLightSuggest: function(e){
+	this.debug('highLightSuggest');
+//---
+
+	var row = $('line_'+this.hlIndex);
+	if(!is_null(row)) row.className = 'highlight';
+},
+
+setNeedleByHighLight: function(e){
+	this.debug('setNeedleByHighLight');
+//---
+	if(this.hlIndex == 0)
+		this.dom.input.value = this.userNeedle;
+	else
+		this.dom.input.value = $('line_'+this.hlIndex).readAttribute('needle');
+},
+
+selectSuggest: function(e){
+	this.debug('selectSuggest');
+//---
+
+	this.setNeedleByHighLight(e)
+	this.hideSuggests();
+
+//SDJ(this.dom.input);
+	if(this.onSelect(this.dom.input.value)) this.dom.input.form.submit();
+},
+
+
 // -----------------------------------------------------------------------
 // DOM creation
 // -----------------------------------------------------------------------
 
-showSuggests: function(){
+showSuggests: function(e){
 	this.debug('showSuggests');
 //---
 
@@ -356,18 +460,23 @@ newSugTab: function(needle){
 
 		var tr = document.createElement('tr');
 		sugBody.appendChild(tr);
-		
-		tr.setAttribute('id', 'line'+count);
+
+		tr.setAttribute('id', 'line_'+count);
 		tr.setAttribute('needle', list[key]);
 
 		var td = document.createElement('td');
 		tr.appendChild(td);
 
 		td.appendChild(document.createTextNode(needle));
+		addListener(td, 'mouseover', this.mouseOver.bindAsEventListener(this), true);
+		addListener(td, 'mouseup', this.selectSuggest.bindAsEventListener(this), true);
+		addListener(td, 'mouseout', this.mouseOut.bindAsEventListener(this), true);
+
+
 
 		var bold = document.createElement('b');
 		td.appendChild(bold);
-		
+
 		bold.appendChild(document.createTextNode(list[key].substr(needle.length)));
 
 		if(count >= this.suggestLimit) break;
@@ -380,48 +489,6 @@ newSugTab: function(needle){
 
 	if(count == 0) this.hideSuggests();
 	this.suggestCount = count;
-},
-
-highLightSuggest: function(){
-	this.debug('highLightSuggest');
-//---
-
-	var hlRows = $$('tr.highlight');
-	for(var key in hlRows){
-		hlRows[key].className = '';
-	}
-
-	var row = $('line'+this.hlIndex);
-	if(is_null(row)) this.hlIndex = 0;
-
-	if(this.hlIndex == 0){
-		this.dom.input.value = this.usrNeedle;
-	}
-	else{
-		row.className = 'highlight';
-		this.dom.input.value = row.readAttribute('needle');
-	}
-},
-
-selectSuggest: function(){
-	this.debug('selectSuggest');
-//---
-
-	var needle = '';
-	if(this.hlIndex == 0){
-		needle = this.usrNeedle;
-	}
-	else{
-		var row = $('line'+this.hlIndex);
-		needle = row.readAttribute('needle');
-	}
-
-	this.onSelect(needle);
-},
-
-onSelect: function(selection){
-	this.hideSuggests();
-	//alert('You have selected "'+selection+'".\nThank You for testing Auto Suggest by Aly.');
 },
 
 debug: function(fnc_name, id){

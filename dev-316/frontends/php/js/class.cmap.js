@@ -993,7 +993,7 @@ show_menu: function(e){
 	if(this.menu_active != 1) return true;
 	
 	var e = e || window.event;
-	var element = eventTarget(e);
+	var element = Event.element(e);
 	var element_id = element.id.split('_');
 	var selementid = element_id[(element_id.length - 1)];
 

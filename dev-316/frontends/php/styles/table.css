@@ -14,7 +14,7 @@ table.home{
 }
 
 table.nowrap tr td {
-	white-space: nowrap;
+	white-space:	nowrap;
 	word-spacing:	0px;
 }
 
@@ -439,7 +439,7 @@ table.tableinfo{
 	width: 100%;
 	background-color: #AAAAAA;
 	border-spacing: 1px;
-
+	
 /*	border: 1px #AAAAAA dotted; */
 }
 
@@ -1378,6 +1378,8 @@ table.suggest tr td{
 
 	line-height: 18px;
 	font-size: 11px;
+
+	cursor: default;
 }
 
 table.suggest tr.highlight{

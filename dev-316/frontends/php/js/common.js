@@ -321,19 +321,6 @@ function deselectAll(){
 	}
 }
 
-function eventTarget(e){
-	var targ = false;
-
-	if(!e) var e = window.event;
-	if(e.target) targ = e.target;
-	else if (e.srcElement) targ = e.srcElement;
-
-// defeat Safari bug
-	if (targ.nodeType == 3) targ = targ.parentNode;
-
-return targ;
-}
-
 function getDimensions(obj, trueSide){
 	obj = $(obj);
 	
