@@ -1554,21 +1554,7 @@ return $result;
 						$triggerData+= $trigger['items'][$triggerData['itemid']];
 						$triggerData+= $trigger['hosts'][$triggerData['hostid']];
 
-						if($triggerData['value_type']!=ITEM_VALUE_TYPE_LOG){
-							$description = str_replace($macro, $triggerData['lastvalue'], $description);
-						}
-						else{
-							$sql = 'SELECT MAX(clock) as max FROM history_log WHERE itemid='.$triggerData['itemid'];
-							$trigger3=DBfetch(DBselect($sql));
-							if($trigger3 && !is_null($trigger3['max'])){
-								$sql = 'SELECT value '.
-										' FROM history_log '.
-										' WHERE itemid='.$triggerData['itemid'].
-											' AND clock='.$trigger3['max'];
-								$trigger4=DBfetch(DBselect($sql));
-								$description = str_replace($macro, $trigger4['value'], $description);
-							}
-						}
+						$description = str_replace($macro, $triggerData['lastvalue'], $description);			
 					}
 				}
 			}
@@ -1708,28 +1694,17 @@ return $result;
 
 			for($i=0; $i<10; $i++){
 				$macro = '{ITEM.LASTVALUE'.($i ? $i : '').'}';
-				if(zbx_strstr($description, $macro)) {
+				if(zbx_strstr($description, $macro)){
 					$functionid = trigger_get_N_functionid($row['expression'], $i ? $i : 1);
 
 					if(isset($functionid)){
-						$sql = 'SELECT i.lastvalue, i.value_type, i.itemid '.
+						$sql = 'SELECT i.lastvalue, i.value_type, i.itemid, i.valuemapid, i.units '.
 								' FROM items i, functions f '.
 								' WHERE i.itemid=f.itemid '.
 									' AND f.functionid='.$functionid;
 						$row2=DBfetch(DBselect($sql));
-						if($row2['value_type']!=ITEM_VALUE_TYPE_LOG){
-							$description = str_replace($macro, $row2['lastvalue'], $description);
-						}
-						else{
-							$sql = 'SELECT MAX(clock) as max FROM history_log WHERE itemid='.$row2['itemid'];
-							$row3=DBfetch(DBselect($sql));
-							if($row3 && !is_null($row3['max'])){
-								$sql = 'SELECT value FROM history_log WHERE itemid='.$row2['itemid'].
-										' AND clock='.$row3['max'];
-								$row4=DBfetch(DBselect($sql));
-								$description = str_replace($macro, $row4['value'], $description);
-							}
-						}
+						$description = str_replace($macro, format_lastvalue($row2), $description);
+						
 					}
 				}
 			}
@@ -3205,12 +3180,9 @@ return $result;
 					//$errData['errEnd']-$errData['errStart']+1
 				)
 			);
-
+			
 			switch($errData['errorCode']) {
-				case 1:
-					error(S_EXPRESSION_UNEXPECTED_END_OF_ELEMENT_ERROR.': '.$checkExprFrom);
-					$totalBreak = true;
-				break;
+				case 1: error(S_EXPRESSION_UNEXPECTED_END_OF_ELEMENT_ERROR.': '.$checkExprFrom); $totalBreak = true; break;
 				case 2: error(S_EXPRESSION_NOT_ALLOWED_SYMBOLS_OR_SEQUENCE_ERROR.': '.$checkExprFrom); break;
 				case 3: error(S_EXPRESSION_UNNECESSARY_SYMBOLS_DETECTED_ERROR.': '.$checkExprFrom); break;
 				case 4: error(S_EXPRESSION_NOT_ALLOWED_SYMBOLS_BEFORE_ERROR.': '.$checkExprFrom); break;
@@ -3227,6 +3199,7 @@ return $result;
 				case 12: error('['.$errData['errValue'].'] '.S_NOT_FLOAT_OR_MACRO_FOR_FUNCTION_SMALL.' ('.$errData['function'].'). '.$checkExprFrom); break;
 				case 13: error('['.$errData['errValue'].'] '.S_NOT_FLOAT_OR_MACRO_OR_COUNTER_FOR_FUNCTION_SMALL.' ('.$errData['function'].'). '.$checkExprFrom); break;
 				case 14: error(sprintf(S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR, $errData['function']).' '.$checkExprFrom); break;
+				case 15: error(S_INCORRECT_TRIGGER_EXPRESSION.'.'.SPACE.S_YOU_CAN_NOT_USE_TEMPLATE_HOSTS_MIXED_EXPR.' '.$checkExprFrom); break;
 			}
 			if($totalBreak) break;
 		}
@@ -4233,12 +4206,12 @@ $triggerExpressionRules['keyParam'] = Array(
 	'closeSymbol' => Array(',' => 'default', ']' => 'default'),
 	'escapeSymbol' => '\\',
 	'parent' => 'keyParams');
-$triggerExpressionRules['keyFunction'] = Array(
+/*$triggerExpressionRules['keyFunction'] = Array(
 	'openSymbol' => '.',
 	'closeSymbol' => ')',
 	'isEmpty' => true,
 	'customValidate' => 'triggerExpressionValidateItemKeyFunction',
-	'parent' => 'key');
+	'parent' => 'key');*/
 $triggerExpressionRules['keyFunctionName'] = Array(
 	'openSymbol' => '.',
 	'closeSymbol' => '(',
@@ -4266,14 +4239,15 @@ $triggerExpressionRules['keyFunctionName'] = Array(
 		'sum',
 		'time'),
 	'indexItem' => true,
-	'parent' => 'keyFunction');
+	'customValidate' => 'triggerExpressionValidateItemKeyFunction',
+	'parent' => 'key');
 $triggerExpressionRules['keyFunctionParams'] = Array(
 	'openSymbol' => '(',
 	'closeSymbol' => ')',
 	'isEmpty' => true,
 	'indexItem' => true,
 	'customValidate' => 'triggerExpressionValidateItemKeyFunctionParams',
-	'parent' => 'keyFunction');
+	'parent' => 'key');
 $triggerExpressionRules['keyFunctionParam'] = Array(
 	'openSymbol' => Array('(' => 'default', ',' => 'default'),
 	'closeSymbol' => Array(',' => 'default', ')' => 'default'),
