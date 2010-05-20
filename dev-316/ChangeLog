@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [DEV-377] improved global search (Aly)
  - [ZBX-2100] fixed group with templates but without hosts breaks map editing issue (Aly)
  - [ZBX-1591] fixed "advanced icons" for image type map elements (Aly)
  - [ZBX-1882] fixed selecting items from disabled hosts for graphs (Aly)
