@@ -1560,6 +1560,54 @@ unlock:
 
 /******************************************************************************
  *                                                                            *
+ * Function: DCconfig_get_poller_nextcheck                                    *
+ *                                                                            *
+ * Purpose: Get nextcheck for selected poller                                 *
+ *                                                                            *
+ * Parameters: poller_type - [IN] poller type (ZBX_POLLER_TYPE_...)           *
+ *             now - [IN] current time                                        *
+ *                                                                            *
+ * Return value: nextcheck or FAIL if no items for selected poller            *
+ *                                                                            *
+ * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	DCconfig_get_poller_nextcheck(unsigned char poller_type)
+{
+	const char			*__function_name = "DCconfig_get_poller_nextcheck";
+
+	int				nextcheck;
+	zbx_binary_heap_t		*queue;
+	const zbx_binary_heap_elem_t	*min;
+	const ZBX_DC_ITEM		*dc_item;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() poller_type:%d", __function_name, (int)poller_type);
+
+	LOCK_CACHE;
+
+	queue = &config->queues[poller_type];
+
+	if (FAIL == zbx_binary_heap_empty(queue))
+	{
+		min = zbx_binary_heap_find_min(queue);
+		dc_item = (const ZBX_DC_ITEM *)min->data;
+
+		nextcheck = dc_item->nextcheck;
+	}
+	else
+		nextcheck = FAIL;
+
+	UNLOCK_CACHE;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, nextcheck);
+
+	return nextcheck;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DCconfig_get_poller_items                                        *
  *                                                                            *
  * Purpose: Get array of items for selected poller                            *
@@ -1578,16 +1626,18 @@ unlock:
  *           DCrequeue_reachable_item() or DCrequeue_unreachable_item().      *
  *                                                                            *
  ******************************************************************************/
-int	DCconfig_get_poller_items(unsigned char poller_type, int now, DC_ITEM *items, int max_items)
+int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max_items)
 {
 	const char		*__function_name = "DCconfig_get_poller_items";
 
-	int			num = 0;
+	int			now, num = 0;
 	zbx_binary_heap_t	*queue;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() poller_type:%d", __function_name, (int)poller_type);
 
 	LOCK_CACHE;
+
+	now = time(NULL);
 
 	queue = &config->queues[poller_type];
 

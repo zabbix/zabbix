@@ -114,7 +114,7 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
  * Comments: can be done in process_data()                                    *
  *                                                                            *
  ******************************************************************************/
-static void process_values(icmpitem_t *items, int first_index, int last_index, ZBX_FPING_HOST *hosts,
+static void	process_values(icmpitem_t *items, int first_index, int last_index, ZBX_FPING_HOST *hosts,
 		int hosts_count, /*struct timeb *tp*/int now, int ping_result, char *error)
 {
 	int 	i, h;
@@ -339,7 +339,7 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 
 	DCinit_nextchecks();
 
-	num = DCconfig_get_poller_items(poller_type, now, items, MAX_ITEMS);
+	num = DCconfig_get_poller_items(poller_type, items, MAX_ITEMS);
 
 	for (i = 0; i < num; i++)
 	{
@@ -472,9 +472,9 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count)
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-void main_pinger_loop(int num)
+void	main_pinger_loop(int num)
 {
-	int			now, sleeptime;
+	int			now, nextcheck, sleeptime;
 	double			sec;
 	static icmpitem_t	*items = NULL;
 	static int		items_alloc = 4;
@@ -501,8 +501,16 @@ void main_pinger_loop(int num)
 		process_pinger_hosts(items, items_count);
 		sec = zbx_time() - sec;
 
-		/* sleep only if there were no items to process */
-		sleeptime = (items_count == 0 ? POLLER_DELAY : 0);
+		if (FAIL == (nextcheck = DCconfig_get_poller_nextcheck(poller_type)))
+			sleeptime = POLLER_DELAY;
+		else
+		{
+			sleeptime = nextcheck - time(NULL);
+			if (sleeptime < 0)
+				sleeptime = 0;
+			else if (sleeptime > POLLER_DELAY)
+				sleeptime = POLLER_DELAY;
+		}
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Pinger spent " ZBX_FS_DBL " seconds while processing %d items."
 				" Nextcheck after %d sec.",

@@ -506,7 +506,7 @@ static void	deactivate_host(DC_ITEM *item, int now, const char *error)
  * Comments: always SUCCEED                                                   *
  *                                                                            *
  ******************************************************************************/
-static int	get_values(int now)
+static int	get_values()
 {
 	const char	*__function_name = "get_values";
 	DC_ITEM		items[MAX_ITEMS];
@@ -514,7 +514,7 @@ static int	get_values(int now)
 	zbx_uint64_t	*ids = NULL, *snmpids = NULL, *ipmiids = NULL;
 	int		ids_alloc = 0, snmpids_alloc = 0, ipmiids_alloc = 0,
 			ids_num = 0, snmpids_num = 0, ipmiids_num = 0,
-			i, num, res;
+			i, now, num, res;
 	static char	*key = NULL, *ipmi_ip = NULL, *params = NULL,
 			*username = NULL, *publickey = NULL, *privatekey = NULL,
 			*password = NULL;
@@ -523,7 +523,7 @@ static int	get_values(int now)
 
 	DCinit_nextchecks();
 
-	num = DCconfig_get_poller_items(poller_type, now, items, MAX_ITEMS);
+	num = DCconfig_get_poller_items(poller_type, items, MAX_ITEMS);
 
 	for (i = 0; i < num; i++)
 	{
@@ -710,10 +710,10 @@ static int	get_values(int now)
 	return num;
 }
 
-void main_poller_loop(zbx_process_t p, int type, int num)
+void	main_poller_loop(zbx_process_t p, int type, int num)
 {
 	struct	sigaction phan;
-	int	now, sleeptime, processed;
+	int	nextcheck, sleeptime, processed;
 	double	sec;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_poller_loop() poller_type:%d poller_num:%d", type, num);
@@ -733,13 +733,20 @@ void main_poller_loop(zbx_process_t p, int type, int num)
 	{
 		zbx_setproctitle("poller [getting values]");
 
-		now = time(NULL);
 		sec = zbx_time();
-		processed = get_values(now);
+		processed = get_values();
 		sec = zbx_time() - sec;
 
-		/* sleep only if there were no items to process */
-		sleeptime = (processed == 0 ? POLLER_DELAY : 0);
+		if (FAIL == (nextcheck = DCconfig_get_poller_nextcheck(poller_type)))
+			sleeptime = POLLER_DELAY;
+		else
+		{
+			sleeptime = nextcheck - time(NULL);
+			if (sleeptime < 0)
+				sleeptime = 0;
+			if (sleeptime > POLLER_DELAY)
+				sleeptime = POLLER_DELAY;
+		}
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Poller #%d spent " ZBX_FS_DBL " seconds while updating %3d values."
 				" Sleeping for %d seconds", poller_num, sec, processed, sleeptime);
