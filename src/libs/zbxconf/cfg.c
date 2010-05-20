@@ -29,12 +29,12 @@ int	CONFIG_LOG_FILE_SIZE		= 1;
 char	CONFIG_ALLOW_ROOT		= 0;
 int	CONFIG_TIMEOUT			= AGENT_TIMEOUT;
 
-static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int level);
+static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int level, int optional);
 
 static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int level)
 {
 #ifdef _WINDOWS
-	return __parse_cfg_file(cfg_file, cfg, level);
+	return __parse_cfg_file(cfg_file, cfg, level, 0);
 #else
 	DIR		*dir;
 	struct stat	sb;
@@ -48,7 +48,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 	}
 
 	if (!S_ISDIR(sb.st_mode))
-		return __parse_cfg_file(cfg_file, cfg, level);
+		return __parse_cfg_file(cfg_file, cfg, level, 0);
 
 	if (NULL == (dir = opendir(cfg_file))) {
 		zbx_error("%s: %s\n", cfg_file, strerror(errno));
@@ -61,7 +61,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 		if (stat(incl_file, &sb) == -1 || !S_ISREG(sb.st_mode))
 			continue;
 
-		if (__parse_cfg_file(incl_file, cfg, level) == FAIL) {
+		if (__parse_cfg_file(incl_file, cfg, level, 0) == FAIL) {
 			result = FAIL;
 			break;
 		}
@@ -95,7 +95,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int level)
+static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int level, int optional)
 {
 	FILE	*file;
 
@@ -229,9 +229,11 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 		}
 	}
 
-	return	result;
+	return result;
 
 lbl_cannot_open:
+	if (optional)
+		return result;
 	zbx_error("Cannot open config file [%s] [%s].",cfg_file,strerror(errno));
 	exit(1);
 
@@ -244,7 +246,12 @@ lbl_incorrect_config:
 	exit(1);
 }
 
-int	parse_cfg_file(const char *cfg_file,struct cfg_line *cfg)
+int	parse_cfg_file(const char *cfg_file, struct cfg_line *cfg)
 {
-	return __parse_cfg_file(cfg_file, cfg, 0);
+	return __parse_cfg_file(cfg_file, cfg, 0, 0);
+}
+
+int	parse_opt_cfg_file(const char *cfg_file, struct cfg_line *cfg)
+{
+	return __parse_cfg_file(cfg_file, cfg, 0, 1);
 }
