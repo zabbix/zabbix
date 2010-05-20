@@ -1066,7 +1066,7 @@ void	DCsync_configuration()
 			100 * ((double)config_mem->free_size / config_mem->orig_size));
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() strings    : %d (%d slots)", __function_name,
-			strpool->hashset.num_data, strpool->hashset.num_slots);
+			strpool->hashset->num_data, strpool->hashset->num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() strpoolfree: " ZBX_FS_DBL "%%", __function_name,
 			100 * ((double)strpool->mem_info->free_size / strpool->mem_info->orig_size));
 

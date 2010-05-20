@@ -94,7 +94,8 @@ void	zbx_strpool_create(size_t size)
 		exit(FAIL);
 	}
 
-	zbx_hashset_create_ext(&strpool.hashset, INIT_HASHSET_SIZE,
+	strpool.hashset = __strpool_mem_malloc_func(NULL, sizeof(zbx_hashset_t));
+	zbx_hashset_create_ext(strpool.hashset, INIT_HASHSET_SIZE,
 				__strpool_hash_func, __strpool_compare_func,
 				__strpool_mem_malloc_func, __strpool_mem_realloc_func, __strpool_mem_free_func);
 
@@ -124,7 +125,7 @@ const char	*zbx_strpool_intern(const char *str)
 
 	LOCK_POOL;
 
-	record = zbx_hashset_search(&strpool.hashset, str - REFCOUNT_FIELD_SIZE);
+	record = zbx_hashset_search(strpool.hashset, str - REFCOUNT_FIELD_SIZE);
 
 	if (NULL == record)
 	{
@@ -132,7 +133,7 @@ const char	*zbx_strpool_intern(const char *str)
 		/* strictly speaking, this is not a very safe thing to do, */
 		/* but at least we avoid copying str to a temporary buffer */
 
-		record = zbx_hashset_insert(&strpool.hashset,
+		record = zbx_hashset_insert(strpool.hashset,
 						str - REFCOUNT_FIELD_SIZE,
 						REFCOUNT_FIELD_SIZE + strlen(str) + 1);
 		*(uint32_t *)record = 0;
@@ -180,7 +181,7 @@ void	zbx_strpool_release(const char *str)
 
 	refcount = (uint32_t *)(str - REFCOUNT_FIELD_SIZE);
 	if (--(*refcount) == 0)
-		zbx_hashset_remove(&strpool.hashset, str - REFCOUNT_FIELD_SIZE);
+		zbx_hashset_remove(strpool.hashset, str - REFCOUNT_FIELD_SIZE);
 
 	UNLOCK_POOL;
 
@@ -196,7 +197,9 @@ void	zbx_strpool_clear()
 	LOCK_POOL;
 
 	zbx_mem_clear(strpool.mem_info);
-	zbx_hashset_create_ext(&strpool.hashset, INIT_HASHSET_SIZE,
+
+	strpool.hashset = __strpool_mem_malloc_func(NULL, sizeof(zbx_hashset_t));
+	zbx_hashset_create_ext(strpool.hashset, INIT_HASHSET_SIZE,
 				__strpool_hash_func, __strpool_compare_func,
 				__strpool_mem_malloc_func, __strpool_mem_realloc_func, __strpool_mem_free_func);
 
