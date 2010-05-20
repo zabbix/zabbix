@@ -80,7 +80,7 @@ div #div_node_tree {
 div.suggest{
 	position: absolute;
 	border: 1px #5C7099 solid;
-	width: 202px;
+	width: 162px;
 	z-index: 100;
 	display: none;
 }

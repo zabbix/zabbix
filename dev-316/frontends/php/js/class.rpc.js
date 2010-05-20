@@ -149,14 +149,18 @@ processError: function(resp){
 	}
 
 // JSON have wrong header or no respond at all
-	if(is_null(resp.responseJSON)){
+	if(empty(resp.responseJSON)){
 		throw('RPC: Server call ['+this.userParams.method+'] responded with incorrect JSON.');
 		return true;
 	}
 
 // RPC responded with error || with incorrect JSON
-	if(!isset('result', resp.responseJSON) || isset('error', resp.responseJSON)){
+	if(isset('error', resp.responseJSON)){
 		this.userParams.onFailure(resp.responseJSON.error);
+		return true;
+	}
+	else if(!isset('result', resp.responseJSON)){
+		throw('RPC: Server call ['+this.userParams.method+'] responded with incorrect JSON.');
 		return true;
 	}
 

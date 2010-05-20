@@ -52,9 +52,9 @@ return false;
 
 function empty(obj){
 	if(is_null(obj)) return true;
-	if(obj == false) return true;
-	if((obj == 0) || (obj == '0')) return true;
-	if(is_string(obj) && (obj == '')) return true;
+	if(obj === false) return true;
+//if((obj == 0) || (obj == '0')) return true;
+	if(is_string(obj) && (obj === '')) return true;
 	if(is_array(obj) && (obj.length == 0)) return true;
 return false;
 }

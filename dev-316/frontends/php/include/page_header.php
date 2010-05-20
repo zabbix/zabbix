@@ -393,7 +393,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 
 			$searchBox = new CTextBox('search',get_request('search',''));
 			$searchBox->setAttribute('autocomplete', 'off');
-			$searchBox->setAttribute('style', 'width: 200px;');
+			$searchBox->setAttribute('style', 'width: 160px;');
 
 			$search_form->addItem(new CDiv(array(S_SEARCH_BIG.': ', $searchBox)));
 
