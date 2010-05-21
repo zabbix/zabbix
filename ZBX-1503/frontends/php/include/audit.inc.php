@@ -105,10 +105,10 @@
 			$details = substr($resourcename, 0, 252).'...';
 
 		$ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))?$_SERVER['HTTP_X_FORWARDED_FOR']:$_SERVER['REMOTE_ADDR'];
-		SDI(
+		/*SDI(
 			'INSERT INTO auditlog (auditid,userid,clock,ip,action,resourcetype,resourceid,resourcename)'.
 			' values ('.$auditid.','.$USER_DETAILS['userid'].','.time().','.zbx_dbstr($ip).
-			','.$action.','.$resourcetype.','.$resourceid.','.zbx_dbstr($resourcename).')');
+			','.$action.','.$resourcetype.','.$resourceid.','.zbx_dbstr($resourcename).')');*/
 		$result = DBexecute('INSERT INTO auditlog (auditid,userid,clock,ip,action,resourcetype,resourceid,resourcename)'.
 				' values ('.$auditid.','.$USER_DETAILS['userid'].','.time().','.zbx_dbstr($ip).
 				','.$action.','.$resourcetype.','.$resourceid.','.zbx_dbstr($resourcename).')');
