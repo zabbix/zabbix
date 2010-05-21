@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBX-2253] fixed delete confirmation dialog refer to empty element (Vedmak)
  - [ZBX-2370] fixed duration value in monitoring events for multiple problem triggers (Vedmak)
  - [ZBX-507] made UserParameters work with zabbix_agent(d) -p and -t (asaveljevs)
  - [ZBX-2250] value mapping is now applied for {ITEM.LASTVALUE} macro inside triggers description (Vedmak)
