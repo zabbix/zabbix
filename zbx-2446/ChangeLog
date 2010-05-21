@@ -1,6 +1,10 @@
 Changes for 1.8.3
 
  - [ZBX-2446] fixed compilation on AIX 5.3 with OS level 5300-05 or earlier (Sasha)
+ - [ZBX-2027] fixed selecting wrong host after canceling trigger comment  (Vedmak)
+ - [ZBX-2253] fixed delete confirmation dialog refer to empty element (Vedmak)
+ - [ZBX-2370] fixed duration value in monitoring events for multiple problem triggers (Vedmak)
+ - [ZBX-507] made UserParameters work with zabbix_agent(d) -p and -t (asaveljevs)
  - [ZBX-2250] value mapping is now applied for {ITEM.LASTVALUE} macro inside triggers description (Vedmak)
  - [ZBX-1436] fixed trigger events display after next steps  monitoring -> triggers -> click on any event time (Maxim Andruhovich / AM)
  - [ZBX-1532] added screen name to visual screen editing form (when adding screen rows and cols) (Maxim Andruhovich / AM)
