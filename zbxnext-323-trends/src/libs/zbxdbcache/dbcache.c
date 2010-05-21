@@ -260,7 +260,7 @@ void	*DCget_stats(int request)
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value: pointer to a new structure or NULL if array is full          *
+ * Return value: pointer to a trend structure                                 *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
