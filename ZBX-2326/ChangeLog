@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBX-2326] fixed dynamic chart titles now all symbols rendered correcly (Maxim Andruhovich / AM)
  - [ZBX-2250] value mapping is now applied for {ITEM.LASTVALUE} macro inside triggers description (Vedmak)
  - [ZBX-1436] fixed trigger events display after next steps  monitoring -> triggers -> click on any event time (Maxim Andruhovich / AM)
  - [ZBX-1532] added screen name to visual screen editing form (when adding screen rows and cols) (Maxim Andruhovich / AM)
