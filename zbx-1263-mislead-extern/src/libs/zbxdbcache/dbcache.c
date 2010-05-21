@@ -1163,10 +1163,9 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 
 				if (ITEM_STATUS_NOTSUPPORTED != item.status)
 				{
-					zabbix_log(LOG_LEVEL_WARNING, "Parameter [%s] is not supported by agent"
-							" Old status [%d]",
+					zabbix_log(LOG_LEVEL_WARNING, "Parameter [%s] is not supported, old status [%d]",
 							hostkey_name, item.status);
-					zabbix_syslog("Parameter [%s] is not supported by agent",
+					zabbix_syslog("Parameter [%s] is not supported",
 							hostkey_name);
 				}
 
@@ -1246,7 +1245,7 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 		/* Update item status if required */
 		if (item.status == ITEM_STATUS_NOTSUPPORTED && status == ITEM_STATUS_ACTIVE)
 		{
-			message = zbx_dsprintf(message, "Parameter [" ZBX_FS_UI64 "][%s] became supported by agent",
+			message = zbx_dsprintf(message, "Parameter [" ZBX_FS_UI64 "][%s] became supported",
 					item.itemid, zbx_host_key_string(item.itemid));
 			zabbix_log(LOG_LEVEL_WARNING, "%s", message);
 			zabbix_syslog("%s", message);

@@ -645,10 +645,9 @@ static int	get_values(int now)
 		{
 			if (ITEM_STATUS_NOTSUPPORTED != items[i].status)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "Parameter [%s:%s] is not supported by agent"
-						" Old status [%d]",
+				zabbix_log(LOG_LEVEL_WARNING, "Parameter [%s:%s] is not supported, old status [%d]",
 						items[i].host.host, items[i].key_orig, items[i].status);
-				zabbix_syslog("Parameter [%s:%s] is not supported by agent",
+				zabbix_syslog("Parameter [%s:%s] is not supported",
 						items[i].host.host, items[i].key_orig);
 			}
 
