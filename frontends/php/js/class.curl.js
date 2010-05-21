@@ -103,8 +103,8 @@ initialize: function(url){
 	}
 
 	this.path=this.file;
-	if(this.query.length>0) this.file+='?'+this.query;
-	if(this.query.length > 0)	this.formatArguments();
+	if(this.query.length > 0) this.file+='?'+this.query;
+	if(this.query.length > 0) this.formatArguments();
 
 	var possition = parseInt(location.href.indexOf('sid='));
 	if(possition > -1){
@@ -120,13 +120,13 @@ initialize: function(url){
 formatQuery: function(){
 	if(this.args.lenght < 1) return;
 	
-	var query = '';
+	var query = new Array();
 	for(var key in this.args){
 		if((typeof(this.args[key]) != 'undefined') && !is_null(this.args[key])){
-			query+=key+'='+this.args[key]+'&';
+			query.push(key+'='+encodeURIComponent(this.args[key]));
 		}
 	}
-	this.query = query.substring(0,query.length-1);
+	this.query = query.join('&');
 },
 
 formatArguments: function(){
@@ -137,7 +137,7 @@ formatArguments: function(){
 	
 	for(var i=0; i<args.length; i++){
 		keyval = args[i].split('=');
-		this.args[keyval[0]] = (keyval.length>1)?keyval[1]:'';
+		this.args[keyval[0]] = keyval.length > 1 ? decodeURIComponent(keyval[1]):'';
 	}
 },
 
@@ -163,15 +163,14 @@ getArguments: function(){
 getUrl: function(){
 	this.formatQuery();
  
-	var url = (this.protocol.length > 0)?(this.protocol+'://'):'';
-	url +=  encodeURI((this.username.length > 0)?(this.username):'');
-	url +=  encodeURI((this.password.length > 0)?(':'+this.password):'');
-	url +=  (this.host.length > 0)?(this.host):'';
-	url +=  (this.port.length > 0)?(':'+this.port):'';
-	url +=  encodeURI((this.path.length > 0)?(this.path):'');
-	url +=  encodeURI((this.query.length > 0)?('?'+this.query):'');
-	url +=  encodeURI((this.reference.length > 0)?('#'+this.reference):'');
-//alert(url);
+	var url = this.protocol.length > 0 ? this.protocol+'://':'';
+	url +=  this.username.length > 0 ? encodeURI(this.username):'';
+	url +=  this.password.length > 0 ? encodeURI(':'+this.password):'';
+	url +=  this.host.length > 0 ? this.host:'';
+	url +=  this.port.length > 0 ? ':'+this.port:'';
+	url +=  this.path.length > 0 ? encodeURI(this.path):'';
+	url +=  this.query.length > 0 ? '?'+this.query:'';
+	url +=  this.reference.length > 0 ? encodeURI('#'+this.reference):'';
 return url;
 },
 
