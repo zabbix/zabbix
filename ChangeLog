@@ -5,6 +5,7 @@ Changes for 1.9
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 Changes for 1.8.3
+
  - [ZBX-2027] fixed selecting wrong host after canceling trigger comment  (Vedmak)
  - [ZBX-2253] fixed delete confirmation dialog refer to empty element (Vedmak)
  - [ZBX-2370] fixed duration value in monitoring events for multiple problem triggers (Vedmak)
