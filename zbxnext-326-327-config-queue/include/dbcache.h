@@ -30,6 +30,7 @@
 #define DC_HOST struct dc_host
 
 extern char	*CONFIG_FILE;
+extern int	CONFIG_TIMEOUT;
 extern int	CONFIG_DBCONFIG_SIZE;
 extern int	CONFIG_HISTORY_CACHE_SIZE;
 extern int	CONFIG_TRENDS_CACHE_SIZE;

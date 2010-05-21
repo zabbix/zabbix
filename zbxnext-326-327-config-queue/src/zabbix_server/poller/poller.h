@@ -35,4 +35,5 @@ extern	int	CONFIG_UNREACHABLE_PERIOD;
 extern	int	CONFIG_UNREACHABLE_DELAY;
 
 void	main_poller_loop(zbx_process_t p, int type, int num);
+
 #endif
