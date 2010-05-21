@@ -608,6 +608,10 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 	return $value;
 	}
 
+	if($value == 0){
+		return '0 '.$units;
+	}
+	
 	switch($units){
 		case 'Bps':
 		case 'B':
@@ -621,23 +625,6 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 			$step = 1000;
 	}
 
-	if(zbx_empty($units) && ($convert == ITEM_CONVERT_WITH_UNITS)){;
-		if(abs($value) >= 1)
-			$format = '%.2f';
-		else if(abs($value) >= 0.01)
-			$format = '%.4f';
-		else
-			$format = '%.6f';
-
-		if(round($value, 6) == 0) $value = 0;
-		else{
-			$value = sprintf($format,$value);
-			$value = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U','$1$2$3', $value);
-			$value = rtrim($value, '.');
-		}
-
-		return sprintf('%s %s', $value, $units);
-	}
 
 // INIT intervals
 	static $digitUnits;
