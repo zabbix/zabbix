@@ -1,4 +1,5 @@
 Changes for 1.8.3
+
  - [ZBX-2027] fixed selecting wrong host after canceling trigger comment  (Vedmak)
  - [ZBX-2253] fixed delete confirmation dialog refer to empty element (Vedmak)
  - [ZBX-2370] fixed duration value in monitoring events for multiple problem triggers (Vedmak)
