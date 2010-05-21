@@ -96,10 +96,10 @@ initialize: function(url){
 	
 	if(this.file.indexOf('?')>=0) this.file=this.file.substring(0, this.file.indexOf('?'));
 
-	var refSepIndex=this.url.indexOf('#');
+	var refSepIndex=this.file.indexOf('#');
 	if(refSepIndex>=0){
+		this.reference=this.file.substring(refSepIndex+1);
 		this.file=this.file.substring(0,refSepIndex);
-		this.reference=this.url.substring(refSepIndex+1);
 	}
 
 	this.path=this.file;
