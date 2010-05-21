@@ -1143,11 +1143,12 @@ function text2array_with_links($text){
 	
 	$start = 0;
 	foreach($matches[0] as $match){
-		$part = zbx_substr($text, $start, $match[1]-$start);
-		$result[] = $part;
+		$result[] = zbx_substr($text, $start, $match[1]-$start);
 		$result[] = new CLink($match[0], $match[0], null, null, true);
-		$start = $match[1] + strlen($match[0]);
+		$start = $match[1] + zbx_strlen($match[0]);
 	}
+	
+	$result[] = zbx_substr($text, $start, zbx_strlen($text));
 	return $result;
 }
 /************* END ZBX MISC *************/
