@@ -824,7 +824,7 @@ static void	DCsync_trends()
 
 	UNLOCK_TRENDS;
 
-	zabbix_log(LOG_LEVEL_WARNING, "Syncing trends data...done.");
+	zabbix_log(LOG_LEVEL_WARNING, "Syncing trends data... done.");
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -2081,7 +2081,7 @@ int	DCsync_history(int sync_type)
 	}
 
 	if (0 == cache->history_num)
-		return 0;
+		goto finish;
 
 	if (NULL == history)
 		history = zbx_malloc(history, ZBX_SYNC_MAX * sizeof(ZBX_DC_HISTORY));
@@ -2191,14 +2191,14 @@ int	DCsync_history(int sync_type)
 
 		if (ZBX_SYNC_FULL == sync_type && time(NULL) - now >= 10)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Syncing history data..." ZBX_FS_DBL "%%",
+			zabbix_log(LOG_LEVEL_WARNING, "Syncing history data... " ZBX_FS_DBL "%%",
 					(double)total_num / (cache->history_num + total_num) * 100);
 			now = time(NULL);
 		}
 	} while (--syncs > 0 || sync_type == ZBX_SYNC_FULL || (skipped_clock != 0 && skipped_clock < max_delay));
-
+finish:
 	if (ZBX_SYNC_FULL == sync_type)
-		zabbix_log(LOG_LEVEL_WARNING, "Syncing history data...done.");
+		zabbix_log(LOG_LEVEL_WARNING, "Syncing history data... done.");
 
 	return total_num;
 }
