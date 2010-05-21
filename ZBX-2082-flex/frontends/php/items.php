@@ -775,14 +775,10 @@ include_once('include/page_header.php');
 //$items_wdgt->addPageHeader(S_CONFIGURATION_OF_ITEMS_BIG, $form);
 	show_table_header(S_CONFIGURATION_OF_ITEMS_BIG, $form);
 
-	if(isset($_REQUEST['form'])){
-		if(str_in_array($_REQUEST['form'], array(S_CREATE_ITEM, 'update', 'clone')) ||
-			(($_REQUEST['form']=='mass_update') && isset($_REQUEST['group_itemid'])))
-		{
-			insert_item_form();
-		}
+	if(isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], array(S_CREATE_ITEM, 'update', 'clone'))){
+		insert_item_form();
 	}
-	else if(($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['group_itemid'])){
+	else if((($_REQUEST['go'] == 'massupdate') || isset($_REQUEST['massupdate'])) && isset($_REQUEST['group_itemid'])){
 		insert_mass_update_item_form('group_itemid');
 	}
 	else if(($_REQUEST['go'] == 'copy_to') && isset($_REQUEST['group_itemid'])){
@@ -1198,8 +1194,6 @@ include_once('include/page_header.php');
 	$jsmenu = new CPUMenu(null,200);
 	$jsmenu->InsertJavaScript();
 
-?>
-<?php
 
 include_once('include/page_footer.php');
 
