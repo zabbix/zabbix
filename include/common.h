@@ -653,10 +653,11 @@ const char *zbx_permission_string(int perm);
 #define	POLLER_DELAY	5
 #define DISCOVERER_DELAY	60
 
+#define	ZBX_NO_POLLER			255
 #define	ZBX_POLLER_TYPE_NORMAL		0
-#define	ZBX_POLLER_TYPE_UNREACHABLE	1
-#define	ZBX_POLLER_TYPE_IPMI		2
-#define	ZBX_POLLER_TYPE_PINGER		3
+#define	ZBX_POLLER_TYPE_IPMI		1
+#define	ZBX_POLLER_TYPE_PINGER		2
+#define	ZBX_POLLER_TYPE_COUNT		3	/* number of poller types */
 
 #define	POLLER_TIMEOUT	5
 /* Do not perform more than this number of checks during unavailability period */
