@@ -108,7 +108,7 @@ include_once('include/page_header.php');
 		'nodeids'=> get_current_nodeid(true),
 		'extendoutput' => true,
 		'pattern' => $search,
-		'extend_pattern' => true,
+		'extendPattern' => true,
 		'limit' => $rows_per_page,
 		'select_groups' => 1
 	);
@@ -130,7 +130,7 @@ include_once('include/page_header.php');
 	$params = array(
 		'nodeids'=> get_current_nodeid(true),
 		'pattern' => $search,
-		'extend_pattern' => true,
+		'extendPattern' => true,
 		'count' => 1,
 	);
 	$hosts_count = CHost::get($params);
@@ -138,7 +138,7 @@ include_once('include/page_header.php');
 	$params = array(
 		'nodeids'=> get_current_nodeid(true),
 		'pattern' => $search,
-		'extend_pattern' => true,
+		'extendPattern' => true,
 		'countOutput' => 1,
 	);
 	$hosts_count = CHost::get($params);

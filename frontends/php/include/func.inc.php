@@ -460,10 +460,10 @@ function getmicrotime(){
 }
 
 function zbxDateToTime($strdate){
-	if(5 == sscanf($strdate, '%04d%02d%02d%02d%02d', $year, $month, $date, $hours, $minutes))
-		return mktime($hours,$minutes,0,$month,$date,$year);
+	if(6 == sscanf($strdate, '%04d%02d%02d%02d%02d%02d', $year, $month, $date, $hours, $minutes, $seconds))
+		return mktime($hours,$minutes,$seconds,$month,$date,$year);
 	else
-		return 0;
+		return time();
 }
 /************* END DATE *************/
 

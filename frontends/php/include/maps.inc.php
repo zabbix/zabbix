@@ -19,13 +19,6 @@
 **/
 ?>
 <?php
-	require_once('include/images.inc.php');
-	require_once('include/hosts.inc.php');
-	require_once('include/triggers.inc.php');
-	require_once('include/events.inc.php');
-	require_once('include/scripts.inc.php');
-	require_once('include/maintenances.inc.php');
-
 /*
  * Function: map_link_drawtypes
  *

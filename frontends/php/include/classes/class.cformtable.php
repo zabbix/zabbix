@@ -130,7 +130,7 @@ class CFormTable extends CForm{
 		else{
 			$tmp = $item1;
 			if(is_string($item1)){
-				$item1=nbsp($item1);
+				$item1 = nbsp($item1);
 			}
 
 			if(empty($item1)) $item1 = SPACE;
