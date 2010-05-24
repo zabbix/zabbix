@@ -7,6 +7,7 @@ Changes for 1.8.3
  - [ZBXNEXT-323] improved bad performance of the trends for large number of items (Sasha)
  - [ZBXNEXT-327] more intuitive load balancing of pollers with a single item queue (asaveljevs)
  - [ZBXNEXT-326] more efficient synchronization of configuration data (asaveljevs)
+ - [ZBX-2153] fixed server crash due to unaligned memory access (asaveljevs)
  - [ZBX-2092] fixed label line height in maps, now all lines have the same line height (Maxim Andruhovich / AM)
  - [DEV-377] improved global search (Aly)
  - [ZBX-1510] fixed history view bound by minute issue (Aly)
