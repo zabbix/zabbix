@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [DEV-377] improved global search (Aly)
  - [ZBX-1510] fixed history view bound by minute issue (Aly)
  - [ZBX-2339] fixed row height for type of information "text" (Aly)
  - [ZBX-2201] improved history page (Aly)
