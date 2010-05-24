@@ -749,10 +749,9 @@ ZBX_TASK_EX
 };
 
 
-char *string_replace(char *str, char *sub_str1, char *sub_str2);
+char	*string_replace(char *str, char *sub_str1, char *sub_str2);
 
-void	del_zeroes(char *s);
-int	find_char(char *str,char c);
+int	find_char(char *str, char c);
 int	is_double_prefix(char *str);
 int	is_double(char *c);
 int	is_uint_prefix(const char *c);
@@ -760,6 +759,7 @@ int	is_uint(char *c);
 int	is_uint64(register char *str, zbx_uint64_t *value);
 int	is_uoct(char *str);
 int	is_uhex(char *str);
+int	is_hex_string(char *str);
 void	zbx_rtrim(char *str, const char *charlist);
 void	zbx_ltrim(register char *str, const char *charlist);
 void	zbx_remove_chars(register char *str, const char *charlist);
@@ -767,7 +767,11 @@ void	lrtrim_spaces(char *c);
 void	compress_signs(char *str);
 void	ltrim_spaces(char *c);
 void	rtrim_spaces(char *c);
+void	del_zeroes(char *s);
 void	delete_reol(char *c);
+void	delete_chars(char *c, const char *charlist);
+void	delete_spaces(char *c);
+void	delete_whitespace(char *c);
 int	get_param(const char *param, int num, char *buf, int maxlen);
 int	num_param(const char *param);
 char	*get_param_dyn(const char *param, int num);
