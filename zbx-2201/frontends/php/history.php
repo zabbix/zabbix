@@ -123,6 +123,8 @@ include_once('include/page_header.php');
 			if(count($_REQUEST['itemid']) == 1) break;
 			if(isset($itemList[$itemid])) unset($_REQUEST['itemid'][$id]);
 		}
+
+		unset($_REQUEST['remove_log']);
 	}
 ?>
 <?php
@@ -255,7 +257,9 @@ include_once('include/page_header.php');
 			$addItemBttn = new CButton('add_log',S_ADD,"return PopUp('popup.php?multiselect=1".'&reference=itemid&srctbl=items&value_types[]='.$item['value_type']."&srcfld1=itemid');");
 			$delItemBttn = (count($items) > 1)?new CButton('remove_log',S_REMOVE_SELECTED) : null;
 
-			$filterForm->addRow(S_ITEMS_LIST, array($cmbitemlist, SPACE, $addItemBttn, $delItemBttn));
+			$filterForm->addRow(S_ITEMS_LIST, array($cmbitemlist, BR(), $addItemBttn, $delItemBttn));
+
+			$filterForm->addRow(S_SELECT_ROWS_WITH_VALUE_LIKE, new CTextBox('filter',$filter,25));
 
 			$cmbFTask = new CComboBox('filter_task',$filter_task,'submit()');
 			$cmbFTask->addItem(FILTER_TAST_SHOW,S_SHOW_SELECTED);
@@ -263,8 +267,7 @@ include_once('include/page_header.php');
 			$cmbFTask->addItem(FILTER_TAST_MARK,S_MARK_SELECTED);
 			$cmbFTask->addItem(FILTER_TAST_INVERT_MARK,S_MARK_OTHERS);
 
-			$filterForm->addRow(S_SELECT_ROWS_WITH_VALUE_LIKE, new CTextBox('filter',$filter,25));
-			$filterForm->addRow(S_SELECTED, $cmbFTask);
+			$tmp = array($cmbFTask);
 
 			if(str_in_array($filter_task,array(FILTER_TAST_MARK,FILTER_TAST_INVERT_MARK))){
 				$cmbColor = new CComboBox('mark_color',$mark_color);
@@ -272,8 +275,11 @@ include_once('include/page_header.php');
 				$cmbColor->addItem(MARK_COLOR_GREEN,S_AS_GREEN);
 				$cmbColor->addItem(MARK_COLOR_BLUE,S_AS_BLUE);
 
-				$filterForm->addRow(S_SELECTED, $cmbColor);
+				$tmp[] = SPACE;
+				$tmp[] = $cmbColor;
 			}
+
+			$filterForm->addRow(S_SELECTED, $tmp);
 
 			$filterForm->addItemToBottomRow(new CButton('select',S_FILTER));
 		}
