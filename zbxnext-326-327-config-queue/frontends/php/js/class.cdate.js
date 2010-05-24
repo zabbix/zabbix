@@ -84,7 +84,7 @@ getZBXDate: function(){
 		if((thedate[i]+'').length < 2) thedate[i] = '0'+thedate[i];
 	}
 
-return ''+thedate[2]+thedate[1]+thedate[0]+thedate[3]+thedate[4];
+return ''+thedate[2]+thedate[1]+thedate[0]+thedate[3]+thedate[4]+thedate[5];
 },
 
 setZBXDate: function(strdate){
@@ -97,7 +97,8 @@ setZBXDate: function(strdate){
 		'm': strdate.toString().substr(4,2),
 		'd': strdate.toString().substr(6,2),
 		'H': strdate.toString().substr(8,2),
-		'i': strdate.toString().substr(10,2)
+		'i': strdate.toString().substr(10,2),
+		's': strdate.toString().substr(12,2)
 	};
 
 	this.serverDate.setFullYear(theDate.Y);
@@ -105,7 +106,7 @@ setZBXDate: function(strdate){
 	this.serverDate.setDate(theDate.d);
 	this.serverDate.setHours(theDate.H);
 	this.serverDate.setMinutes(theDate.i);
-	this.serverDate.setSeconds(0);
+	this.serverDate.setSeconds(theDate.s);
 	this.serverDate.setMilliseconds(0);
 	this.calcTZdiff();
 

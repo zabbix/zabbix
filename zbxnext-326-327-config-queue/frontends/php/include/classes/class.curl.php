@@ -141,19 +141,19 @@ class Curl{
 	}
 
 	public function formatQuery(){
-		$query = '';
+		$query = Array();
 		foreach($this->arguments as $key => $value){
 			if(is_null($value)) continue;
 			if(is_array($value)){
 				foreach($value as $vkey => $vvalue){
-					$query.= $key.'['.$vkey.']='.$vvalue.'&';
+					$query[] = $key.'['.$vkey.']='.rawurlencode($vvalue);
 				}
 			}
 			else{
-				$query.= $key.'='.$value.'&';
+				$query[] = $key.'='.rawurlencode($value);
 			}
 		}
-		$this->query = rtrim($query,'&');
+		$this->query = implode('&', $query);
 	}
 
 	public function formatGetArguments(){
@@ -171,8 +171,8 @@ class Curl{
 			foreach($args as $id => $arg){
 				if(empty($arg)) continue;
 
-				$tmp = explode('=',$arg);
-				$this->arguments[$tmp[0]] = isset($tmp[1])?$tmp[1]:'';
+				list($name, $value) = explode('=',$arg);
+				$this->arguments[$name] = isset($value) ? urldecode($value):'';
 			}
 		}
 		$this->formatQuery();

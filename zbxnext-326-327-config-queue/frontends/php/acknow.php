@@ -68,7 +68,7 @@ include_once('include/page_header.php');
 <?php
 	if(!$bulk){
 		$options = array(
-			'extendoutput' => 1,
+			'output' => API_OUTPUT_EXTEND,
 			'select_triggers' => 1,
 			'eventids' => $_REQUEST['eventid']
 		);
