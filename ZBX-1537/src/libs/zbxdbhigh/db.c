@@ -831,19 +831,19 @@ int	DBget_items_unsupported_count(void)
 	return res;
 }
 
-int	DBget_history_str_count(void)
+int	DBget_history_count(const char *table_name)
 {
-	int	res;
+	int		res;
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_history_str_count()");
+	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_history_count(): %s", table_name);
 
-	result = DBselect("select count(*) from history_str");
+	result = DBselect("select count(*) from %s", table_name);
 
-	row=DBfetch(result);
+	row = DBfetch(result);
 
-	if(!row || DBis_null(row[0])==SUCCEED)
+	if (!row || DBis_null(row[0]) == SUCCEED)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query");
 		zabbix_syslog("Cannot execute query");
@@ -851,26 +851,26 @@ int	DBget_history_str_count(void)
 		return 0;
 	}
 
-	res  = atoi(row[0]);
+	res = atoi(row[0]);
 
 	DBfree_result(result);
 
 	return res;
 }
 
-int	DBget_history_count(void)
+int	DBget_trends_count(const char *table_name)
 {
-	int	res;
+	int		res;
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_history_count()");
+	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_trends_count(): %s", table_name);
 
-	result = DBselect("select count(*) from history");
+	result = DBselect("select count(*) from %s", table_name);
 
-	row=DBfetch(result);
+	row = DBfetch(result);
 
-	if(!row || DBis_null(row[0])==SUCCEED)
+	if (!row || DBis_null(row[0]) == SUCCEED)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query");
 		zabbix_syslog("Cannot execute query");
@@ -878,34 +878,7 @@ int	DBget_history_count(void)
 		return 0;
 	}
 
-	res  = atoi(row[0]);
-
-	DBfree_result(result);
-
-	return res;
-}
-
-int	DBget_trends_count(void)
-{
-	int	res;
-	DB_RESULT	result;
-	DB_ROW		row;
-
-	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_trends_count()");
-
-	result = DBselect("select count(*) from trends");
-
-	row=DBfetch(result);
-
-	if(!row || DBis_null(row[0])==SUCCEED)
-	{
-		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query");
-		zabbix_syslog("Cannot execute query");
-		DBfree_result(result);
-		return 0;
-	}
-
-	res  = atoi(row[0]);
+	res = atoi(row[0]);
 
 	DBfree_result(result);
 

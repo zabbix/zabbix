@@ -92,7 +92,9 @@
 		$_REQUEST['triggerid'] = 0;
 		$_REQUEST['hide_unknown'] = 0;
 	}
-
+	
+	$source = get_request('triggerid') > 0 ? EVENT_SOURCE_TRIGGERS : get_request('source', CProfile::get('web.events.source', EVENT_SOURCE_TRIGGERS));
+	
 	$_REQUEST['triggerid'] = get_request('triggerid',CProfile::get('web.events.filter.triggerid',0));
 	$_REQUEST['hide_unknown'] = get_request('hide_unknown',CProfile::get('web.events.filter.hide_unknown',0));
 
@@ -102,7 +104,6 @@
 	}
 // --------------
 	
-	$source = get_request('source', CProfile::get('web.events.source', EVENT_SOURCE_TRIGGERS));
 	CProfile::update('web.events.source',$source, PROFILE_TYPE_INT);
 ?>
 <?php
@@ -110,7 +111,7 @@
 	$events_wdgt = new CWidget();
 	
 // PAGE HEADER {{{
-	$url = '?fullscreen='.($_REQUEST['fullscreen']?'0':'1');
+	$url = '?fullscreen='.($_REQUEST['fullscreen']? '0':'1');
 	$fs_icon = new CDiv(SPACE,'fullscreen');
 	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 	$fs_icon->addAction('onclick',new CJSscript("javascript: document.location = '".$url."';"));
@@ -419,10 +420,12 @@
 				'select_hosts' => API_OUTPUT_EXTEND,
 				'select_triggers' => API_OUTPUT_EXTEND,
 				'select_items' => API_OUTPUT_EXTEND,
+				'sortfield' => 'eventid',
+				'sortorder' => ZBX_SORT_DOWN,
 				'nopermissions' => 1
 			);
 			$events = CEvent::get($options);
-			order_result($events, 'eventid', ZBX_SORT_DOWN);
+//			order_result($events, 'eventid', ZBX_SORT_DOWN);
 
 			foreach($events as $enum => $event){
 				$trigger = reset($event['triggers']);
@@ -431,10 +434,11 @@
 				$event['type'] = $trigger['type'];
 
 				$event += $trigger;
-
-				$event['duration'] = zbx_date2age($event['clock']);
-				if($next_event = get_next_event($event,$_REQUEST['hide_unknown'])){
-					$event['duration'] = zbx_date2age($event['clock'],$next_event['clock']);
+				if($next_event = get_next_event($event, $events)){
+					$event['duration'] = zbx_date2age($event['clock'], $next_event['clock']);
+				}
+				else{
+					$event['duration'] = zbx_date2age($event['clock']);
 				}
 
 				$event['value_col'] = new CCol(trigger_value2str($event['value']), get_trigger_value_style($event['value']));
@@ -453,7 +457,7 @@
 				$items = array();
 				foreach($event['items'] as $inum => $item){
 					$item['itemid'] = $item['itemid'];
-					$item['action'] = str_in_array($item['value_type'],array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64))?'showgraph':'showvalues';
+					$item['action'] = str_in_array($item['value_type'],array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64))? 'showgraph':'showvalues';
 					$item['description'] = item_description($item);
 					$items[] = $item;
 				}
