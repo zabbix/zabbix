@@ -312,7 +312,7 @@ update: function(){
 onSuccess: function(resp){
 	this.debug('onSuccess');
 	this.rmwDarken();
-	
+
 	var headers = resp.getAllResponseHeaders(); 
 //alert(headers);
 	if(headers.indexOf('Ajax-response: false') > -1){
