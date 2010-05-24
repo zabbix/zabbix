@@ -527,7 +527,7 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 		}
 		else
 		{
-			break;/* the first occurence is found */
+			break;/* the first occurrence is found */
 		}
 	}
 
