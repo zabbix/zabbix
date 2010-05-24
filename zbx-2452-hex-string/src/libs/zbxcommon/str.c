@@ -484,57 +484,6 @@ void	delete_chars(char *c, const char *charlist)
 
 /******************************************************************************
  *                                                                            *
- * Function: delete_spaces                                                    *
- *                                                                            *
- * Purpose: delete all spaces                                                 *
- *                                                                            *
- * Parameters: c - string to delete spaces                                    *
- *                                                                            *
- * Return value:  the string without spaces                                   *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-void	delete_spaces(char *c)
-{
-	int i,j;
-
-	j=0;
-	for(i=0;c[i]!=0;i++)
-	{
-		if( c[i] != ' ')
-		{
-			c[j]=c[i];
-			j++;
-		}
-	}
-	c[j]=0;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: delete_whitespace                                                *
- *                                                                            *
- * Purpose: delete all whitespace characters                                  *
- *                                                                            *
- * Parameters: c - string to delete whitespace in                             *
- *                                                                            *
- * Return value: string without whitespace                                    *
- *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-void	delete_whitespace(char *c)
-{
-	delete_chars(c, " \t\n\r");
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: zbx_rtrim                                                        *
  *                                                                            *
  * Purpose: Strip characters from the end of a string                         *
