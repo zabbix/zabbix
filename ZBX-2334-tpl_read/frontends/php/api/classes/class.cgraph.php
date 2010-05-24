@@ -980,7 +980,6 @@ COpt::memoryPick();
 
 			$options = array(
 				'hostids' => $data['templateids'],
-				'editable' => 1,
 				'preservekeys' => 1,
 				'output' => API_OUTPUT_EXTEND,
 				'select_graph_items' => API_OUTPUT_EXTEND
