@@ -948,7 +948,7 @@ function make_discovery_status(){
 		);
 
 	$table  = new CTableInfo();
-	$table->setHeader($header,'vertical_header');
+	$table->setHeader($header,'header');
 
 	foreach($drules as $drnum => $drule){
 		$table->addRow(array(

@@ -781,7 +781,8 @@
 			$host_list[$graphid] = array();
 			$db_hosts = get_hosts_by_graphid($graphid);
 			while($db_host = DBfetch($db_hosts)){
-				$host_list[$graphid] = '"'.$db_host['host'].'"';
+				if(!isset($host_list[$graphid][$db_host['host']]))
+					$host_list[$graphid][$db_host['host']] = true;
 			}
 		}
 
@@ -805,7 +806,7 @@
 		if($result){
 			foreach($graphs as $graphid => $graph){
 				if(isset($host_list[$graphid]))
-					info('Graph "'.$graph['name'].'" deleted from hosts '.implode(',',$host_list));
+					info(sprintf(S_GRAPH_DELETED_FROM_HOSTS, $graph['name'], count($host_list[$graphid]) > 1 ? 's' : '').': '.'"'.implode('","', array_keys($host_list[$graphid])).'"');
 			}
 		}
 
@@ -1085,92 +1086,14 @@
 			$time = zbxDateToTime($_REQUEST['stime']);
 
 			if(($time+$_REQUEST['period']) > time()) {
-				$_REQUEST['stime'] = date('YmdHi', time()-$_REQUEST['period']);
+				$_REQUEST['stime'] = date('YmdHis', time()-$_REQUEST['period']);
 			}
 		}
 		else{
-			$_REQUEST['stime'] = date('YmdHi', time()-$_REQUEST['period']);
+			$_REQUEST['stime'] = date('YmdHis', time()-$_REQUEST['period']);
 		}
 
 	return $_REQUEST['period'];
-	}
-
-/*
- * Function:
- *		make_array_from_gitems
- *
- * Description:
- *     Creates array with items params for prepare_url function
- *
- * Author:
- *     Aly
- *
- * Comments
- *
- */
-	function make_url_from_gitems($gitems){
-
-		$gurl=array();
-		$ifields = array(
-						'itemid'	=> 1,
-						'drawtype'	=> 1,
-						'sortorder'	=> 1,
-						'color'		=> 1,
-						'yaxisside'	=> 1,
-						'calc_fnc'	=> 1,
-						'type'		=> 1,
-						'periods_cnt'	=> 1
-					);
-
-		foreach($gitems as $gitem){
-			foreach($gitem as $name => $value){
-				if(isset($ifields[$name])){
-					$gurl['items['.$gitem['itemid'].']['.$name.']']=$value;
-				}
-			}
-		}
-
-	return prepare_url($gurl);
-	}
-
-/*
- * Function:
- *		make_array_from_graphid
- *
- * Description:
- *     Creates array with graph params for prepare_url function
- *
- * Author:
- *     Aly
- *
- * Comments
- *	$full= false: for screens(WITHOUT width && height), true=all params
- */
-	function make_url_from_graphid($graphid,$full=false){
-
-		$gurl=array();
-		if($full){
-			$gparams = array();
-		}
-		else{
-			$gparams = array(
-						'height'=> 1,
-						'width'	=> 1
-					);
-		}
-
-		$graph=get_graph_by_graphid($graphid);
-		if($graph){
-			foreach($graph as $name => $value){
-				if(!is_numeric($name) && !isset($gparams[$name])) $gurl[$name]=$value;
-			}
-		}
-
-		$url = prepare_url($gurl);
-		if(!empty($url)){
-			$url=((($gurl['graphtype']==GRAPH_TYPE_PIE) || ($gurl['graphtype']==GRAPH_TYPE_EXPLODED))?'chart7.php?':'chart3.php?').trim($url,'&');
-		}
-	return $url;
 	}
 
 //Author:	Aly
@@ -1248,6 +1171,103 @@
 		$prev_color[$palette]++;
 
 	return $result;
+	}
+
+	function imageDiagonalMarks($im,$x, $y, $offset, $color){
+		global $colors;
+
+		$gims = array(
+			'lt' => array(0,0, -9,0, -9,-3, -3,-9, 0,-9),
+			'rt' => array(0,0,  9,0,  9,-3,  3,-9, 0,-9),
+			'lb' => array(0,0, -9,0,  -9,3,  -3,9,  0,9),
+			'rb' => array(0,0,  9,0,   9,3,   3,9,  0,9),
+		);
+
+		foreach($gims['lt'] as $num => $px){
+			if(($num % 2) == 0) $gims['lt'][$num] = $px  + $x - $offset;
+			else $gims['lt'][$num] = $px  + $y - $offset;
+		}
+
+		foreach($gims['rt'] as $num => $px){
+			if(($num % 2) == 0) $gims['rt'][$num] = $px  + $x + $offset;
+			else $gims['rt'][$num] = $px  + $y - $offset;
+		}
+
+		foreach($gims['lb'] as $num => $px){
+			if(($num % 2) == 0) $gims['lb'][$num] = $px  + $x - $offset;
+			else $gims['lb'][$num] = $px  + $y + $offset;
+		}
+
+		foreach($gims['rb'] as $num => $px){
+			if(($num % 2) == 0) $gims['rb'][$num] = $px  + $x + $offset;
+			else $gims['rb'][$num] = $px  + $y + $offset;
+		}
+
+		imagefilledpolygon($im,$gims['lt'],5,$color);
+		imagepolygon($im,$gims['lt'],5,$colors['Dark Red']);
+
+		imagefilledpolygon($im,$gims['rt'],5,$color);
+		imagepolygon($im,$gims['rt'],5,$colors['Dark Red']);
+
+		imagefilledpolygon($im,$gims['lb'],5,$color);
+		imagepolygon($im,$gims['lb'],5,$colors['Dark Red']);
+
+		imagefilledpolygon($im,$gims['rb'],5,$color);
+		imagepolygon($im,$gims['rb'],5,$colors['Dark Red']);
+
+	}
+
+	function imageVerticalMarks($im,$x, $y, $offset, $color, $marks='tlbr'){
+		global $colors;
+
+		$polygons = 5;
+		$gims = array(
+			't' => array(0,0, -6,-6, -3,-9,  3,-9,  6,-6),
+			'l' => array(0,0,  -6,6,  -9,3, -9,-3, -6,-6),
+			'b' => array(0,0,   6,6,   3,9,  -3,9,  -6,6),
+			'r' => array(0,0,  6,-6,  9,-3,   9,3,   6,6),
+		);
+
+		foreach($gims['t'] as $num => $px){
+			if(($num % 2) == 0) $gims['t'][$num] = $px  + $x;
+			else $gims['t'][$num] = $px  + $y - $offset;
+		}
+
+		foreach($gims['l'] as $num => $px){
+			if(($num % 2) == 0) $gims['l'][$num] = $px  + $x - $offset;
+			else $gims['l'][$num] = $px  + $y;
+		}
+
+		foreach($gims['b'] as $num => $px){
+			if(($num % 2) == 0) $gims['b'][$num] = $px  + $x;
+			else $gims['b'][$num] = $px  + $y + $offset;
+		}
+
+		foreach($gims['r'] as $num => $px){
+			if(($num % 2) == 0) $gims['r'][$num] = $px  + $x + $offset;
+			else $gims['r'][$num] = $px  + $y;
+		}
+
+		if(strpos($marks, 't') !== false){
+			imagefilledpolygon($im,$gims['t'],$polygons,$color);
+			imagepolygon($im,$gims['t'],$polygons,$colors['Dark Red']);
+		}
+
+		if(strpos($marks, 'l') !== false){
+			imagefilledpolygon($im,$gims['l'],$polygons,$color);
+			imagepolygon($im,$gims['l'],$polygons,$colors['Dark Red']);
+		}
+
+		if(strpos($marks, 'b') !== false){
+			imagefilledpolygon($im,$gims['b'],$polygons,$color);
+			imagepolygon($im,$gims['b'],$polygons,$colors['Dark Red']);
+		}
+
+		if(strpos($marks, 'r') !== false){
+			imagefilledpolygon($im,$gims['r'],$polygons,$color);
+			imagepolygon($im,$gims['r'],$polygons,$colors['Dark Red']);
+		}
+
 	}
 
 	function imageText($image, $fontsize, $angle, $x, $y, $color, $string){

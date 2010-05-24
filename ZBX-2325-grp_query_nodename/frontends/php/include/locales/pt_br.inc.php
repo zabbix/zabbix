@@ -568,7 +568,6 @@
 	'S_HIDE_UNKNOWN'=>			'Esconder desconhecido(s)',
 	'S_LOG_FILES_SMALL'=>			'arquivos de log',
 	'S_REMOVE_SELECTED'=>			'Remover selecionado',
-	'S_LOG_FILES_LIST'=>			'Lista de arquivos de log',
 	'S_SHOW_SELECTED'=>			'Mostrar selecionados',
 	'S_HIDE_SELECTED'=>			'Esconder selecionados',
 	'S_MARK_SELECTED'=>			'Marcar selecionados',

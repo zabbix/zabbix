@@ -64,7 +64,7 @@ include_once('include/page_header.php');
 		'autologout'=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(90,10000), null),
 		'url'=>				array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
 		'refresh'=>			array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,3600),'isset({save})'),
-		'rows_per_page'=>	array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,1000),'isset({save})'),
+		'rows_per_page'=>	array(T_ZBX_INT, O_OPT,	null,	BETWEEN(1,999999),'isset({save})'),
 // Actions
 		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
 // form

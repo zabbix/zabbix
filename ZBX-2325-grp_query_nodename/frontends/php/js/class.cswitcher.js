@@ -84,7 +84,7 @@ open : function(switcherid){
 showHide : function(e){
 	PageRefresh.restart();
 
-	var obj = eventTarget(e);
+	var obj = Event.element(e);
 	var switcherid = obj.getAttribute('data-switcherid');
 
 	if(obj.className == this.classClosed){

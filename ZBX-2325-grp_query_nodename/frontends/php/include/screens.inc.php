@@ -523,7 +523,7 @@ require_once('include/js.inc.php');
 			$form->addVar('resourceid',$id);
 
 			$textfield = new CTextbox('caption',$caption,75,'yes');
-			$selectbtn = new CButton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=graphs&srcfld1=graphid&srcfld2=name',800,450);");
+			$selectbtn = new CButton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&real_hosts=1&dstfld1=resourceid&dstfld2=caption&srctbl=graphs&srcfld1=graphid&srcfld2=name',800,450);");
 			$selectbtn->setAttribute('onmouseover',"javascript: this.style.cursor = 'pointer';");
 
 			$form->addRow(S_GRAPH_NAME,array($textfield,SPACE,$selectbtn));
@@ -556,7 +556,7 @@ require_once('include/js.inc.php');
 			$form->addVar('resourceid',$id);
 
 			$textfield = new Ctextbox('caption',$caption,75,'yes');
-			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=simple_graph&srcfld1=itemid&srcfld2=description',800,450);");
+			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&real_hosts=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=simple_graph&srcfld1=itemid&srcfld2=description',800,450);");
 			$selectbtn->setAttribute('onmouseover',"javascript: this.style.cursor = 'pointer';");
 
 			$form->addRow(S_PARAMETER,array($textfield,SPACE,$selectbtn));
@@ -999,31 +999,54 @@ require_once('include/js.inc.php');
 					$graphDims['graphHeight'] = $height;
 					$graphDims['width'] = $width;
 
-					$sql = 'SELECT g.graphid, g.show_legend as legend, g.show_3d as show3d '.
-							' FROM graphs g '.
-							' WHERE g.graphid='.$resourceid;
-					$res = DBselect($sql);
-					if($graph=DBfetch($res)){
+					$graph = get_graph_by_graphid($resourceid);
+
+					if($graph){
 						$graphid = $graph['graphid'];
-						$legend = $graph['legend'];
-						$graph3d = $graph['show3d'];
+						$legend = $graph['show_legend'];
+						$graph3d = $graph['show_3d'];
 					}
 //-------------
 
 // Host feature
 					if(($dynamic == SCREEN_DYNAMIC_ITEM) && isset($_REQUEST['hostid']) && ($_REQUEST['hostid']>0)){
+						$options = array(
+							'hostids' => $_REQUEST['hostid'],
+							'output' => API_OUTPUT_EXTEND
+						);
+						$hosts = CHost::get($options);
+						$host = reset($hosts);
+
 						$def_items = array();
 						$di_res = get_graphitems_by_graphid($resourceid);
-						while( $gitem = DBfetch($di_res)){
-							$def_items[] = $gitem;
+						while($gitem = DBfetch($di_res)) $def_items[] = $gitem;
+						
+						$new_items = get_same_graphitems_for_host($def_items, $_REQUEST['hostid'], false);
+
+						if(($graph['graphtype']==GRAPH_TYPE_PIE) || ($graph['graphtype']==GRAPH_TYPE_EXPLODED))
+							$url = 'chart7.php';
+						else
+							$url = 'chart3.php';
+//-----
+
+						$url = new Curl($url);
+						foreach($graph as $name => $value){
+							if(($name == 'width') || ($name == 'height')) continue;
+
+							$url->setArgument($name, $value);
 						}
 
-						$url='';
-						if($new_items = get_same_graphitems_for_host($def_items, $_REQUEST['hostid'], false)){
-							$url.= make_url_from_gitems($new_items);
+						foreach($new_items as $ginum => $gitem){
+							unset($gitem['gitemid']);
+							unset($gitem['graphid']);
+
+							foreach($gitem as $name => $value){
+								$url->setArgument('items['.$gitem['itemid'].']['.$name.']', $value);
+							}
 						}
 
-						$url= make_url_from_graphid($resourceid,false).$url;
+						$url->setArgument('name', $host['host'].': '.$graph['name']);
+						$url = $url->getUrl();
 					}
 //-------------
 
@@ -1048,7 +1071,7 @@ require_once('include/js.inc.php');
 
 					$default = false;
 					if(($graphDims['graphtype'] == GRAPH_TYPE_PIE) || ($graphDims['graphtype'] == GRAPH_TYPE_EXPLODED)){
-						if(($dynamic==SCREEN_SIMPLE_ITEM) || empty($url)){
+						if(($dynamic == SCREEN_SIMPLE_ITEM) || empty($url)){
 							$url='chart6.php?graphid='.$resourceid;
 							$default = true;
 						}
@@ -1068,7 +1091,7 @@ require_once('include/js.inc.php');
 
 					}
 					else{
-						if(($dynamic==SCREEN_SIMPLE_ITEM) || empty($url)){
+						if(($dynamic == SCREEN_SIMPLE_ITEM) || empty($url)){
 							$url='chart2.php?graphid='.$resourceid;
 							$default = true;
 						}
@@ -1098,6 +1121,7 @@ require_once('include/js.inc.php');
 
 					$item = array($item);
 					if($editmode == 1){
+						$item[] = BR();
 						$item[] = new CLink(S_CHANGE, $action);
 					}
 
@@ -1160,6 +1184,7 @@ require_once('include/js.inc.php');
 
 					$item = array($item);
 					if($editmode == 1){
+						$item[] = BR();
 						$item[] = new CLink(S_CHANGE, $action);
 					}
 										
@@ -1213,45 +1238,50 @@ require_once('include/js.inc.php');
 						$hostgroup = reset($hostgroups);
 
 						$tr_form = new CSpan(S_GROUP.': '.$hostgroup['name'], 'white');
-						$params['groupid'] = $hostgroup['groupid'];
+						$params['groupids'] = $hostgroup['groupid'];
 					}
 ///-----------------------
 					else{
-						$params['groupid'] = get_request('tr_groupid', CProfile::get('web.screens.tr_groupid',0));
-						$params['hostid'] = get_request('tr_hostid', CProfile::get('web.screens.tr_hostid',0));
+						$groupid = get_request('tr_groupid', CProfile::get('web.screens.tr_groupid',0));
+						$hostid = get_request('tr_hostid', CProfile::get('web.screens.tr_hostid',0));
 
-						CProfile::update('web.screens.tr_groupid',$params['groupid'], PROFILE_TYPE_ID);
-						CProfile::update('web.screens.tr_hostid',$params['hostid'], PROFILE_TYPE_ID);
-
-						$tr_form = new CForm();
-
-						$cmbGroup = new CComboBox('tr_groupid',$params['groupid'],'submit()');
-						$cmbHosts = new CComboBox('tr_hostid',$params['hostid'],'submit()');
-
-						$cmbGroup->addItem(0,S_ALL_SMALL);
-						$cmbHosts->addItem(0,S_ALL_SMALL);
+						CProfile::update('web.screens.tr_groupid',$groupid, PROFILE_TYPE_ID);
+						CProfile::update('web.screens.tr_hostid',$hostid, PROFILE_TYPE_ID);
 
 						$options = array(
 							'monitored_hosts' => 1,
 							'output' => API_OUTPUT_EXTEND
 						);
 						$groups = CHostGroup::get($options);
+						order_result($groups, 'name');
+
+						$options = array(
+							'monitored_hosts' => 1,
+							'output' => API_OUTPUT_EXTEND
+						);
+						if($groupid > 0) $options['groupids'] = $groupid;
+
+						$hosts = CHost::get($options);
+						$hosts = zbx_toHash($hosts, 'hostid');
+						order_result($hosts, 'host');
+
+						if(!isset($hosts[$hostid])) $hostid = 0;
+
+						$tr_form = new CForm();
+
+						$cmbGroup = new CComboBox('tr_groupid',$groupid,'submit()');
+						$cmbHosts = new CComboBox('tr_hostid',$hostid,'submit()');
+
+						$cmbGroup->addItem(0,S_ALL_SMALL);
+						$cmbHosts->addItem(0,S_ALL_SMALL);
+
 						foreach($groups as $gnum => $group){
 							$cmbGroup->addItem(
 								$group['groupid'],
 								get_node_name_by_elid($group['groupid'], null, ': ').$group['name']
 							);
 						}
-						$tr_form->addItem(array(S_GROUP.SPACE,$cmbGroup));
 
-						$options = array(
-							'monitored_hosts' => 1,
-							'output' => API_OUTPUT_EXTEND
-						);
-						if($params['groupid'] > 0)
-							$options['groupids'] = $params['groupid'];
-
-						$hosts = CHost::get($options);
 						foreach($hosts as $hnum => $host){
 							$cmbHosts->addItem(
 								$host['hostid'],
@@ -1259,18 +1289,18 @@ require_once('include/js.inc.php');
 							);
 						}
 
+						$tr_form->addItem(array(S_GROUP.SPACE,$cmbGroup));
 						$tr_form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
 
-						$item[] = make_latest_issues($params);
-
-						if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
+						if($groupid > 0) $params['groupids'] = $groupid;
+						if($hostid > 0) $params['hostids'] = $hostid;
 					}
-///-----------------------
 
 					$item = array(get_table_header(array(S_STATUS_OF_TRIGGERS_BIG,SPACE,zbx_date2str(S_SCREENS_TRIGGER_FORM_DATE_FORMAT)), $tr_form));
 					$item[] = make_latest_issues($params);
 
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
+///-----------------------
 				}
 				else if(($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_HOST_TRIGGERS)){
 					$params = array(
@@ -1291,45 +1321,50 @@ require_once('include/js.inc.php');
 						$host = reset($hosts);
 
 						$tr_form = new CSpan(S_HOST.': '.$host['host'], 'white');
-						$params['hostid'] = $host['hostid'];
+						$params['hostids'] = $host['hostid'];
 					}
 ///-----------------------
 					else{
-						$params['groupid'] = get_request('tr_groupid',CProfile::get('web.screens.tr_groupid',0));
-						$params['hostid'] = get_request('tr_hostid',CProfile::get('web.screens.tr_hostid',0));
+						$groupid = get_request('tr_groupid', CProfile::get('web.screens.tr_groupid',0));
+						$hostid = get_request('tr_hostid', CProfile::get('web.screens.tr_hostid',0));
 
-						CProfile::update('web.screens.tr_groupid',$params['groupid'], PROFILE_TYPE_ID);
-						CProfile::update('web.screens.tr_hostid',$params['hostid'], PROFILE_TYPE_ID);
-
-						$tr_form = new CForm();
-
-						$cmbGroup = new CComboBox('tr_groupid',$params['groupid'],'submit()');
-						$cmbHosts = new CComboBox('tr_hostid',$params['hostid'],'submit()');
-
-						$cmbGroup->addItem(0,S_ALL_SMALL);
-						$cmbHosts->addItem(0,S_ALL_SMALL);
+						CProfile::update('web.screens.tr_groupid',$groupid, PROFILE_TYPE_ID);
+						CProfile::update('web.screens.tr_hostid',$hostid, PROFILE_TYPE_ID);
 
 						$options = array(
 							'monitored_hosts' => 1,
 							'output' => API_OUTPUT_EXTEND
 						);
 						$groups = CHostGroup::get($options);
+						order_result($groups, 'name');
+
+						$options = array(
+							'monitored_hosts' => 1,
+							'output' => API_OUTPUT_EXTEND
+						);
+						if($groupid > 0) $options['groupids'] = $groupid;
+
+						$hosts = CHost::get($options);
+						$hosts = zbx_toHash($hosts, 'hostid');
+						order_result($hosts, 'host');
+
+						if(!isset($hosts[$hostid])) $hostid = 0;
+
+						$tr_form = new CForm();
+
+						$cmbGroup = new CComboBox('tr_groupid',$groupid,'submit()');
+						$cmbHosts = new CComboBox('tr_hostid',$hostid,'submit()');
+
+						$cmbGroup->addItem(0,S_ALL_SMALL);
+						$cmbHosts->addItem(0,S_ALL_SMALL);
+
 						foreach($groups as $gnum => $group){
 							$cmbGroup->addItem(
 								$group['groupid'],
 								get_node_name_by_elid($group['groupid'], null, ': ').$group['name']
 							);
 						}
-						$tr_form->addItem(array(S_GROUP.SPACE,$cmbGroup));
 
-						$options = array(
-							'monitored_hosts' => 1,
-							'output' => API_OUTPUT_EXTEND
-						);
-						if($params['groupid'] > 0)
-							$options['groupids'] = $params['groupid'];
-
-						$hosts = CHost::get($options);
 						foreach($hosts as $hnum => $host){
 							$cmbHosts->addItem(
 								$host['hostid'],
@@ -1337,11 +1372,11 @@ require_once('include/js.inc.php');
 							);
 						}
 
+						$tr_form->addItem(array(S_GROUP.SPACE,$cmbGroup));
 						$tr_form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
 
-						$item[] = make_latest_issues($params);
-
-						if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
+						if($groupid > 0) $params['groupids'] = $groupid;
+						if($hostid > 0) $params['hostids'] = $hostid;
 					}
 ///-----------------------
 

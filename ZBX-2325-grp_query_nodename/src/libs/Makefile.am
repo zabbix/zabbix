@@ -4,6 +4,8 @@ DIST_SUBDIRS = \
 	zbxdbcache \
 	zbxdbhigh \
 	zbxdb \
+	zbxmemory \
+	zbxalgo \
 	zbxemail \
 	zbxsms \
 	zbxcrypto \
@@ -25,6 +27,7 @@ PROXY_SUBDIRS = \
 	zbxdb \
 	zbxdbcache \
 	zbxdbhigh \
+	zbxmemory \
 	zbxserver \
 	zbxicmpping
 endif
@@ -34,6 +37,7 @@ SERVER_SUBDIRS = \
 	zbxdb \
 	zbxdbcache \
 	zbxdbhigh \
+	zbxmemory \
 	zbxemail \
 	zbxsms \
 	zbxserver \
@@ -48,6 +52,7 @@ SUBDIRS = \
 	zbxcrypto \
 	zbxcommon \
 	zbxlog \
+	zbxalgo \
 	zbxnix \
 	zbxconf \
 	zbxsysinfo \
