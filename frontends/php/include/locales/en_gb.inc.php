@@ -2105,6 +2105,7 @@
 	'S_TEMPLATE_WITH_ITEM_KEY'=>			'Template with item key',
 	'S_TEMPLATE_WITH_APPLICATION'=>			'Template with application',
 	'S_ALREADY_LINKED_TO_HOST_SMALL'=>		'already linked to host',
+	'S_HOST_HAS_BEEN_DELETED_MSG'=>			'Host %s has been deleted from the system',
 
 //	validate.inc.php
 	'S_CRITICAL_ERROR'=>				'Critical error',
