@@ -5,14 +5,14 @@
 class CHTTP_request{
 
 	/** additional HTTP headers not prefixed with HTTP_ in $_SERVER superglobal */
-	var $add_headers = array('CONTENT_TYPE', 'CONTENT_LENGTH');
+	public $add_headers = array('CONTENT_TYPE', 'CONTENT_LENGTH');
 
 	/**
 	* Constructor
 	* Retrieve HTTP Body
 	* @param Array Additional Headers to retrieve
 	*/
-	function __construct($add_headers = false) {
+	public function __construct($add_headers = false) {
 
 		$this->retrieve_headers($add_headers);
 		$this->body = @file_get_contents('php://input');
@@ -22,7 +22,7 @@ class CHTTP_request{
 	* Retrieve the HTTP request headers from the $_SERVER superglobal
 	* @param Array Additional Headers to retrieve
 	*/
-	function retrieve_headers($add_headers = false) {
+	public function retrieve_headers($add_headers = false) {
 
 		if ($add_headers) {
 			$this->add_headers = array_merge($this->add_headers, $add_headers);
@@ -51,14 +51,14 @@ class CHTTP_request{
 	/**
 	* Retrieve HTTP Method
 	*/
-	function method() {
+	public function method() {
 		return $this->method;
 	}
 
 	/**
 	* Retrieve HTTP Body
 	*/
-	function body() {
+	public function body() {
 		return $this->body;
 	}
 
@@ -66,7 +66,7 @@ class CHTTP_request{
 	* Retrieve an HTTP Header
 	* @param string Case-Insensitive HTTP Header Name (eg: "User-Agent")
 	*/
-	function header($name) {
+	public function header($name) {
 		$name = zbx_strtoupper($name);
 		return isset($this->headers[$name]) ? $this->headers[$name] : false;
 	}
@@ -75,7 +75,7 @@ class CHTTP_request{
 	* Retrieve all HTTP Headers
 	* @return array HTTP Headers
 	*/
-	function headers() {
+	public function headers() {
 		return $this->headers;
 	}
 
@@ -83,7 +83,7 @@ class CHTTP_request{
 	* Return Raw HTTP Request (note: This is incomplete)
 	* @param bool ReBuild the Raw HTTP Request
 	*/
-	function raw($refresh = false) {
+	public function raw($refresh = false) {
 
 		if (isset($this->raw) && !$refresh) {
 			return $this->raw; // return cached

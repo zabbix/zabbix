@@ -86,8 +86,8 @@ $ZBX_MENU = array(
 				array('url'=>'chart3.php'),
 				array('url'=>'imgstore.php'),
 				array('url'=>'search.php')
-				)
-			),
+			)
+	),
 	'cm'=>array(
 			'label'			=> S_INVENTORY,
 			'user_type'		=> USER_TYPE_ZABBIX_USER,
@@ -95,8 +95,8 @@ $ZBX_MENU = array(
 			'default_page_id'	=> 0,
 			'pages'=>array(
 				array('url'=>'hostprofiles.php'	,'label'=>S_HOSTS	)
-				)
-			),
+			)
+	),
 	'reports'=>array(
 			'label'			=> S_REPORTS,
 			'user_type'		=> USER_TYPE_ZABBIX_USER,
@@ -123,8 +123,8 @@ $ZBX_MENU = array(
 					),
 				array('url'=>'popup.php'),
 				array('url'=>'popup_right.php')
-				),
 			),
+	),
 	'config'=>array(
 			'label'			=> S_CONFIGURATION,
 			'user_type'		=> USER_TYPE_ZABBIX_ADMIN,
@@ -168,8 +168,8 @@ $ZBX_MENU = array(
 						'label' => S_EXPORT_IMPORT,
 						'sub_pages'=>array('import.php')
 					)
-				)
-			),
+			)
+	),
 	'admin'=>array(
 			'label'			=> S_ADMINISTRATION,
 			'user_type'		=> USER_TYPE_SUPER_ADMIN,
@@ -216,8 +216,8 @@ $ZBX_MENU = array(
 						'label'=>S_INSTALLATION,
 						'sub_pages'=>array('setup.php','warning.php')
 					)
-				)
-			),
+			)
+	),
 	'login'=>array(
 			'label'			=> S_LOGIN,
 			'user_type'		=> 	0,
