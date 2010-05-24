@@ -65,7 +65,7 @@
 		$triggerids = CTrigger::get($options);
 
 		$options = array(
-			'count' => 1,
+			'countOutput' => 1,
 			'triggerids' => zbx_objectValues($triggerids, 'triggerid'),
 			'object' => EVENT_OBJECT_TRIGGER,
 			'acknowledged' => 0,

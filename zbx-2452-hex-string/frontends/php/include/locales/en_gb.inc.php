@@ -719,8 +719,7 @@
 	'S_HIDE_UNKNOWN'=>			'Hide unknown',
 	'S_LOG_FILES_SMALL'=>			'log files',
 	'S_REMOVE_SELECTED'=>			'Remove selected',
-	'S_LOG_FILES_LIST'=>			'Log files list',
-
+	'S_ITEMS_LIST'=>				'Items list',
 	'S_SHOW_SELECTED'=>			'Show selected',
 	'S_HIDE_SELECTED'=>			'Hide selected',
 	'S_MARK_SELECTED'=>			'Mark selected',
@@ -2106,6 +2105,7 @@
 	'S_TEMPLATE_WITH_ITEM_KEY'=>			'Template with item key',
 	'S_TEMPLATE_WITH_APPLICATION'=>			'Template with application',
 	'S_ALREADY_LINKED_TO_HOST_SMALL'=>		'already linked to host',
+	'S_HOST_HAS_BEEN_DELETED_MSG'=>			'Host %s has been deleted from the system',
 
 //	validate.inc.php
 	'S_CRITICAL_ERROR'=>				'Critical error',
@@ -2185,6 +2185,7 @@
 	'S_FOR_TEMPLATE_GRAPH_SMALL'=>				'for template graph',
 	'S_UPDATED_FOR_HOSTS'=>					'updated for hosts',
 	'S_SKIPPED_COPYING_OF_GRAPH'=>				'Skipped copying of graph',
+	'S_GRAPH_DELETED_FROM_HOSTS'=>				'Graph "%s" deleted from host%s',
 
 //	profiles.inc.php
 	'S_UNABLE_TO_SELECT_CONFIGURATION'=>	'Unable to select configuration',
