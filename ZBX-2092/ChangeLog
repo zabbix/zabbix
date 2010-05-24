@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBX-2092] fixed label line height in maps, now all lines have the same line height (Maxim Andruhovich / AM)
  - [DEV-377] improved global search (Aly)
  - [ZBX-1510] fixed history view bound by minute issue (Aly)
  - [ZBX-2339] fixed row height for type of information "text" (Aly)
