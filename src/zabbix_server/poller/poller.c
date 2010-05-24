@@ -506,7 +506,7 @@ static void	deactivate_host(DC_ITEM *item, int now, const char *error)
  * Comments: always SUCCEED                                                   *
  *                                                                            *
  ******************************************************************************/
-static int	get_values(int now)
+static int	get_values()
 {
 	const char	*__function_name = "get_values";
 	DC_ITEM		items[MAX_ITEMS];
@@ -514,7 +514,7 @@ static int	get_values(int now)
 	zbx_uint64_t	*ids = NULL, *snmpids = NULL, *ipmiids = NULL;
 	int		ids_alloc = 0, snmpids_alloc = 0, ipmiids_alloc = 0,
 			ids_num = 0, snmpids_num = 0, ipmiids_num = 0,
-			i, num, res;
+			i, now, num, res;
 	static char	*key = NULL, *ipmi_ip = NULL, *params = NULL,
 			*username = NULL, *publickey = NULL, *privatekey = NULL,
 			*password = NULL;
@@ -523,7 +523,7 @@ static int	get_values(int now)
 
 	DCinit_nextchecks();
 
-	num = DCconfig_get_poller_items(poller_type, poller_num, now, items, MAX_ITEMS);
+	num = DCconfig_get_poller_items(poller_type, items, MAX_ITEMS);
 
 	for (i = 0; i < num; i++)
 	{
@@ -601,6 +601,7 @@ static int	get_values(int now)
 		case ITEM_TYPE_ZABBIX:
 			if (SUCCEED == uint64_array_exists(ids, ids_num, items[i].host.hostid))
 			{
+				DCrequeue_unreachable_item(items[i].itemid);
 				zabbix_log(LOG_LEVEL_DEBUG, "Zabbix Host " ZBX_FS_UI64 " is unreachable. Skipping [%s]",
 						items[i].host.hostid, items[i].key_orig);
 				continue;
@@ -611,6 +612,7 @@ static int	get_values(int now)
 		case ITEM_TYPE_SNMPv3:
 			if (SUCCEED == uint64_array_exists(snmpids, snmpids_num, items[i].host.hostid))
 			{
+				DCrequeue_unreachable_item(items[i].itemid);
 				zabbix_log(LOG_LEVEL_DEBUG, "SNMP Host " ZBX_FS_UI64 " is unreachable. Skipping [%s]",
 						items[i].host.hostid, items[i].key_orig);
 				continue;
@@ -619,6 +621,7 @@ static int	get_values(int now)
 		case ITEM_TYPE_IPMI:
 			if (SUCCEED == uint64_array_exists(ipmiids, ipmiids_num, items[i].host.hostid))
 			{
+				DCrequeue_unreachable_item(items[i].itemid);
 				zabbix_log(LOG_LEVEL_DEBUG, "IPMI Host " ZBX_FS_UI64 " is unreachable. Skipping [%s]",
 						items[i].host.hostid, items[i].key_orig);
 				continue;
@@ -639,7 +642,7 @@ static int	get_values(int now)
 
 			dc_add_history(items[i].itemid, items[i].value_type, &agent, now, 0, NULL, 0, 0, 0, 0);
 
-			DCconfig_update_item(items[i].itemid, ITEM_STATUS_ACTIVE, now);
+			DCrequeue_reachable_item(items[i].itemid, ITEM_STATUS_ACTIVE, now);
 		}
 		else if (res == NOTSUPPORTED || res == AGENT_ERROR)
 		{
@@ -654,7 +657,7 @@ static int	get_values(int now)
 			activate_host(&items[i], now);
 
 			DCadd_nextcheck(items[i].itemid, now, agent.msg);	/* update error & status field in items table */
-			DCconfig_update_item(items[i].itemid, ITEM_STATUS_NOTSUPPORTED, now);
+			DCrequeue_reachable_item(items[i].itemid, ITEM_STATUS_NOTSUPPORTED, now);
 		}
 		else if (res == NETWORK_ERROR)
 		{
@@ -675,6 +678,8 @@ static int	get_values(int now)
 			default:
 				/* nothing to do */;
 			}
+
+			DCrequeue_unreachable_item(items[i].itemid);
 		}
 		else
 		{
@@ -704,10 +709,10 @@ static int	get_values(int now)
 	return num;
 }
 
-void main_poller_loop(zbx_process_t p, int type, int num)
+void	main_poller_loop(zbx_process_t p, int type, int num)
 {
 	struct	sigaction phan;
-	int	now, nextcheck, sleeptime, processed;
+	int	nextcheck, sleeptime, processed;
 	double	sec;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_poller_loop() poller_type:%d poller_num:%d", type, num);
@@ -723,15 +728,15 @@ void main_poller_loop(zbx_process_t p, int type, int num)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	for (;;) {
+	for (;;)
+	{
 		zbx_setproctitle("poller [getting values]");
 
-		now = time(NULL);
 		sec = zbx_time();
-		processed = get_values(now);
+		processed = get_values();
 		sec = zbx_time() - sec;
 
-		if (FAIL == (nextcheck = DCconfig_get_poller_nextcheck(poller_type, poller_num, now)))
+		if (FAIL == (nextcheck = DCconfig_get_poller_nextcheck(poller_type)))
 			sleeptime = POLLER_DELAY;
 		else
 		{

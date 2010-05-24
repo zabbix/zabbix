@@ -98,7 +98,7 @@ double	zbx_time(void)
 
 	struct timeval current;
 
-	gettimeofday(&current,NULL);
+	gettimeofday(&current, NULL);
 
 	return (((double)current.tv_sec) + 1.0e-6 * ((double)current.tv_usec));
 
