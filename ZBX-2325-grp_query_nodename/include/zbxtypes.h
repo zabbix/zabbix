@@ -20,8 +20,10 @@
 #ifndef ZABBIX_TYPES_H
 #define ZABBIX_TYPES_H
 
-#define	ZBX_FS_DBL	"%lf"
+#define	ZBX_FS_DBL		"%lf"
 #define	ZBX_FS_DBL_EXT(p)	"%." #p "lf"
+
+#define ZBX_PTR_SIZE		sizeof(void *)
 
 #if defined(_WINDOWS)
 
@@ -126,6 +128,5 @@
 #define ZBX_HEX2UINT64(uint,string) sscanf(string ,ZBX_FS_UX64 ,&uint);
 
 #define ZBX_CONST_STRING(str) ""str
-
 
 #endif

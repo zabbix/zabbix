@@ -75,8 +75,8 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 
 	if (ping_result == NOTSUPPORTED)
 	{
-		DCadd_nextcheck(&item, now, error);	/* update error & status field in items table */
-		DCconfig_update_item(item.itemid, ITEM_STATUS_NOTSUPPORTED, now);
+		DCadd_nextcheck(item.itemid, now, error);	/* update error & status field in items table */
+		DCrequeue_reachable_item(item.itemid, ITEM_STATUS_NOTSUPPORTED, now);
 	}
 	else
 	{
@@ -93,7 +93,7 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 
 		dc_add_history(item.itemid, item.value_type, &value, now, 0, NULL, 0, 0, 0, 0);
 
-		DCconfig_update_item(item.itemid, ITEM_STATUS_ACTIVE, now);
+		DCrequeue_reachable_item(item.itemid, ITEM_STATUS_ACTIVE, now);
 
 		free_result(&value);
 	}
@@ -114,7 +114,7 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
  * Comments: can be done in process_data()                                    *
  *                                                                            *
  ******************************************************************************/
-static void process_values(icmpitem_t *items, int first_index, int last_index, ZBX_FPING_HOST *hosts,
+static void	process_values(icmpitem_t *items, int first_index, int last_index, ZBX_FPING_HOST *hosts,
 		int hosts_count, /*struct timeb *tp*/int now, int ping_result, char *error)
 {
 	int 	i, h;
@@ -339,7 +339,7 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 
 	DCinit_nextchecks();
 
-	num = DCconfig_get_poller_items(poller_type, poller_num, now, items, MAX_ITEMS);
+	num = DCconfig_get_poller_items(poller_type, items, MAX_ITEMS);
 
 	for (i = 0; i < num; i++)
 	{
@@ -355,7 +355,7 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 					timeout, items[i].itemid, addr, icmpping, type);
 		}
 		else
-			DCadd_nextcheck(&items[i], now, "Unsupported parameters");	/* update error & status field in items table */
+			DCadd_nextcheck(items[i].itemid, now, "Unsupported parameters");	/* update error & status field in items table */
 
 		zbx_free(items[i].key);
 	}
@@ -472,7 +472,7 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count)
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-void main_pinger_loop(int num)
+void	main_pinger_loop(int num)
 {
 	int			now, nextcheck, sleeptime;
 	double			sec;
@@ -501,7 +501,7 @@ void main_pinger_loop(int num)
 		process_pinger_hosts(items, items_count);
 		sec = zbx_time() - sec;
 
-		if (FAIL == (nextcheck = DCconfig_get_poller_nextcheck(poller_type, poller_num, now)))
+		if (FAIL == (nextcheck = DCconfig_get_poller_nextcheck(poller_type)))
 			sleeptime = POLLER_DELAY;
 		else
 		{
@@ -520,7 +520,8 @@ void main_pinger_loop(int num)
 
 		free_hosts(&items, &items_count);
 
-		if (sleeptime > 0) {
+		if (sleeptime > 0)
+		{
 			zbx_setproctitle("pinger [sleeping for %d seconds]",
 					sleeptime);
 

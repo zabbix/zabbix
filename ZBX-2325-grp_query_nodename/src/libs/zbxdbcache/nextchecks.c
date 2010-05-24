@@ -23,6 +23,16 @@
 #include "db.h"
 #include "dbcache.h"
 
+#define ZBX_DC_NEXTCHECK struct zbx_dc_nextcheck_type
+
+ZBX_DC_NEXTCHECK
+{
+	zbx_uint64_t	itemid;
+	time_t		now;/*, nextcheck;*/
+	/* for not supported items */
+	char		*error_msg;
+};
+
 static ZBX_DC_NEXTCHECK	*nextchecks = NULL;
 static int		nextcheck_allocated = 64;
 static int		nextcheck_num;
@@ -95,7 +105,7 @@ static void	DCrelease_nextchecks()
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	DCadd_nextcheck(DC_ITEM *item, time_t now, const char *error_msg)
+void	DCadd_nextcheck(zbx_uint64_t itemid, time_t now, const char *error_msg)
 {
 	int	i;
 	size_t	sz;
@@ -107,8 +117,8 @@ void	DCadd_nextcheck(DC_ITEM *item, time_t now, const char *error_msg)
 
 	sz = sizeof(ZBX_DC_NEXTCHECK);
 
-	i = get_nearestindex(nextchecks, sizeof(ZBX_DC_NEXTCHECK), nextcheck_num, item->itemid);
-	if (i < nextcheck_num && nextchecks[i].itemid == item->itemid)	/* item exists? */
+	i = get_nearestindex(nextchecks, sizeof(ZBX_DC_NEXTCHECK), nextcheck_num, itemid);
+	if (i < nextcheck_num && nextchecks[i].itemid == itemid)	/* item exists? */
 	{
 		if (nextchecks[i].now < now)
 		{
@@ -129,7 +139,7 @@ void	DCadd_nextcheck(DC_ITEM *item, time_t now, const char *error_msg)
 	/* insert new item */
 	memmove(&nextchecks[i + 1], &nextchecks[i], sz * (nextcheck_num - i));
 
-	nextchecks[i].itemid = item->itemid;
+	nextchecks[i].itemid = itemid;
 	nextchecks[i].now = now;
 	nextchecks[i].error_msg = (NULL != error_msg) ? strdup(error_msg) : NULL;
 
@@ -236,13 +246,13 @@ void	DCflush_nextchecks()
 
 		zbx_free(sql_select);
 
-		/* proccessing triggers */
+		/* processing triggers */
 		while (NULL != (row = DBfetch(result)))
 		{
 			ZBX_STR2UINT64(triggerid, row[0]);
 			ZBX_STR2UINT64(itemid, row[1]);
 
-			/* index `i' will surely contain neccessary itemid */
+			/* index `i' will surely contain necessary itemid */
 			i = get_nearestindex(nextchecks, sizeof(ZBX_DC_NEXTCHECK), nextcheck_num, itemid);
 
 			if (i == nextcheck_num || nextchecks[i].itemid != itemid)
@@ -275,11 +285,10 @@ void	DCflush_nextchecks()
 		DBfree_result(result);
 
 		/* dealing with events */
-		if (events_num > 0)
-			events_maxid = DBget_maxid_num("events", "eventid", events_num);
-
 		for (i = 0; i < events_num; i++)
 		{
+			events_maxid = DBget_maxid("events");
+
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 256,
 					"insert into events (eventid,source,object,objectid,clock,value) "
 					"values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 ",%d,%d);\n",
@@ -289,7 +298,6 @@ void	DCflush_nextchecks()
 					events[i].objectid,
 					events[i].clock,
 					TRIGGER_VALUE_UNKNOWN);
-			events_maxid++;
 
 			DBexecute_overflowed_sql(&sql, &sql_allocated, &sql_offset);
 		}

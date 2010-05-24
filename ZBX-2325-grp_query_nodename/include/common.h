@@ -653,10 +653,11 @@ const char *zbx_permission_string(int perm);
 #define	POLLER_DELAY	5
 #define DISCOVERER_DELAY	60
 
+#define	ZBX_NO_POLLER			255
 #define	ZBX_POLLER_TYPE_NORMAL		0
-#define	ZBX_POLLER_TYPE_UNREACHABLE	1
-#define	ZBX_POLLER_TYPE_IPMI		2
-#define	ZBX_POLLER_TYPE_PINGER		3
+#define	ZBX_POLLER_TYPE_IPMI		1
+#define	ZBX_POLLER_TYPE_PINGER		2
+#define	ZBX_POLLER_TYPE_COUNT		3	/* number of poller types */
 
 #define	POLLER_TIMEOUT	5
 /* Do not perform more than this number of checks during unavailability period */
@@ -775,8 +776,8 @@ void	remove_param(char *param, int num);
 const char	*get_string(const char *p, char *buf, size_t bufsize);
 int	get_key_param(char *param, int num, char *buf, int maxlen);
 int	num_key_param(char *param);
-int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, char *delay_flex, time_t now);
-int	check_time_period(char *period, time_t now);
+int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, const char *delay_flex, time_t now);
+int	check_time_period(const char *period, time_t now);
 char	zbx_num2hex(u_char c);
 u_char	zbx_hex2num(char c);
 int	zbx_binary2hex(const u_char *input, int ilen, char **output, int *olen);
@@ -906,6 +907,8 @@ char	*zbx_time2str(time_t time);
 
 /* Return the needle in the haystack (or NULL). */
 char	*zbx_strcasestr(const char *haystack, const char *needle);
+int	starts_with(const char *str, const char *prefix);
+int	cmp_key_id(const char *key_1, const char *key_2);
 
 int	get_nearestindex(void *p, size_t sz, int num, zbx_uint64_t id);
 int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t value, int alloc_step);
