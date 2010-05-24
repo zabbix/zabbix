@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBX-2452] fixed parsing of integer values from SNMP's Hex-STRING (asaveljevs)
  - [ZBX-2313] forbid to add graph from templates to screen (Vedmak)
  - [ZBX-1503] added information message after host delete action, about host being deleted (Maxim Andruhovich / AM)
  - [ZBX-2418] fixed bug with JavaScript URL parser, anchor were recognized as part of file (Maxim Andruhovich / AM)
