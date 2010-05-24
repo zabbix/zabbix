@@ -386,7 +386,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$menu_divs[] = $sub_menu_div;
 		$search_div = null;
 
-		if($USER_DETAILS['userid'] > 0){
+		if(($page['file'] != 'index.php') && ($USER_DETAILS['userid'] > 0)){
 			$search_form = new CForm('search.php');
 			$search_form->setMethod('get');
 			$search_form->setAttribute('class','thin');

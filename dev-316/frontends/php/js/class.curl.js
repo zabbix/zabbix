@@ -118,10 +118,10 @@ addSID: function(){
 	}
 	else{
 		sid = cookie.read('zbx_sessionid');
-		if(!is_null(sid)) sid = sid.substr(0,16);
+		if(!is_null(sid)) sid = sid.substr(16,16);
 	}
 
-	if((/[\da-z]{16}/i).test(sid))	this.setArgument('sid', sid);	
+	if((/[\da-z]{16}/i).test(sid))	this.setArgument('sid', sid);
 },
 
 formatQuery: function(){
