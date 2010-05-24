@@ -597,6 +597,9 @@
 	'S_DELETE_SELECTED_PROXIES' =>	'Delete selected proxies?',
 	'S_CONFIGURATION_OF_PROXIES'=>	'CONFIGURATION OF PROXIES',
 	'S_DELETE_SELECTED_PROXY_Q'=>	'Delete selected proxy?',
+	'S_HOST_COUNT' => 'Host count',
+	'S_ITEM_COUNT' => 'Item count',
+	'S_REQUIRED_PERFORMANCE' => 'Required performance (vps)',
 
 //  Authentication
 	'S_AUTHENTICATION'=>			'Authentication',
@@ -736,12 +739,13 @@
 	'S_HISTORY_ITEM_DATE_FORMAT'=>		'Y.M.d H:i:s',
 
 // maintenance.php
-	'S_MAINTENANCE'=>			'Maintenance',
+	'S_MAINTENANCE'=>				'Maintenance',
 	'S_MAINTENANCE_ADDED'=>			'Maintenance added',
 	'S_MAINTENANCE_UPDATED'=>		'Maintenance updated',
 	'S_MAINTENANCE_DELETED'=>		'Maintenance deleted',
 	'S_DELETE_SELECTED_MAINTENANCE_PERIODS_Q'=>'Delete selected maintenance periods?',
 
+	'S_IN_MAINTENANCE'=>			'In maintenance',
 	'S_HOSTS_IN_MAINTENANCE'=>		'Hosts in maintenance',
 	'S_GROUPS_IN_MAINTENANCE'=>		'Groups in maintenance',
 
@@ -1938,6 +1942,17 @@
 	'S_BLOCKS_DISCOVERY_STATUS_TIME_FORMAT'=>	'H:i:s',
 
 //	forms.inc.php
+	'S_EXPRESSION_PART_ERROR'=>			'Error',
+	'S_EXPRESSION_PART_NO_ERROR'=>			'No errors found',
+	'S_EXPRESSION_SYNTAX_ERROR'=> 			'Expression Syntax Error',
+	'S_EXPRESSION_UNEXPECTED_END_OF_ELEMENT_ERROR'=>'Unexpected end of element',
+	'S_CHECK_EXPRESSION_PART_STARTING_FROM'=>	'Check expression part starting from \'%s\'',
+	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_OR_SEQUENCE_ERROR'=>'Not allowed symbols or sequence of symbols in expression element detected',
+	'S_EXPRESSION_NOT_ALLOWED_VALUE_IN_ELEMENT_ERROR'=>'Not allowed value detected in element',
+	'S_EXPRESSION_UNNECESSARY_SYMBOLS_DETECTED_ERROR'=>'Unnecessary symbols detected',
+	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_AFTER_ERROR'=>'Not allowed symbols detected after element',
+	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_BEFORE_ERROR'=>'Not allowed symbols detected before element',
+
 //	popup_link_tr.php
 	'S_NEW_INDICATORS'=>			'New indicators',
 	'S_EDIT_CONNECTOR'=>			'Edit connector',
@@ -1952,7 +1967,11 @@
 
 //  tr_testexpr.php
 	'S_TEST_DATA'=>		'Test data',
-	'S_ITEM_SLASH_FUNCTION'=>	'Item / Function',
+	'S_EXPRESSION_VARIABLE_ELEMENTS'=>	'Expression Variable Elements',
+	'S_EXPRESSION_VALUE_TYPE_UNKNOWN'=>	'Unknown variable type, testing not available',
+	'S_EXPRESSION_HOST_UNKNOWN'=>		'Unknown host, no such host present in system',
+	'S_EXPRESSION_HOST_ITEM_UNKNOWN'=>	'Unknown host item, no such item in selected host',
+	'S_EXPRESSION_NOT_A_MACRO_ERROR'=>	'Given expression is not a macro',
 	'S_RESULT_TYPE'=>	'Result type',
 	'S_COMBINED_RESULT'=>	'Combined result',
 
@@ -2135,6 +2154,10 @@
 	'S_NO_FUNCTION_WITH'=>					'No function with',
 	'S_SPECIFY_THE_CONDITIONAL_EXPR_FOR_THE_TARGET'=>	'Specify the conditional expression for the target.',
 	'S_0_OR_1'=>						'0 or 1',
+	'S_TRIGGER_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR'=>	'At least one item must be present in the trigger expression.',
+	'S_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR'=>		'Host does not exist.',
+	'S_EXPRESSION_HOST_KEY_DOES_NOT_ERROR'=>		'Host key does not exist.',
+	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR'=>	'Function \'%s\' does not accept parameters.',
 
 //	page_footer.php
 	'S_TRANSACTION_HAVE_NOT_BEEN_CLOSED_ABORTING'=>	'Transaction has not been closed. Aborting..',
@@ -2161,6 +2184,7 @@
 	'S_FOR_TEMPLATE_GRAPH_SMALL'=>				'for template graph',
 	'S_UPDATED_FOR_HOSTS'=>					'updated for hosts',
 	'S_SKIPPED_COPYING_OF_GRAPH'=>				'Skipped copying of graph',
+	'S_GRAPH_DELETED_FROM_HOSTS'=>				'Graph "%s" deleted from host%s',
 
 //	profiles.inc.php
 	'S_UNABLE_TO_SELECT_CONFIGURATION'=>	'Unable to select configuration',

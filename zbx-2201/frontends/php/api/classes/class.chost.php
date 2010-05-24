@@ -92,6 +92,7 @@ class CHost extends CZBXAPI{
 			'nodeids'					=> null,
 			'groupids'					=> null,
 			'hostids'					=> null,
+			'proxyids'					=> null,
 			'templateids'				=> null,
 			'itemids'					=> null,
 			'triggerids'				=> null,
@@ -114,7 +115,7 @@ class CHost extends CZBXAPI{
 // filter
 			'filter'					=> null,
 			'pattern'					=> '',
-			'extendPattern'			=> null,
+			'extendPattern'				=> null,
 
 // OutPut
 			'output'					=> API_OUTPUT_REFER,
@@ -236,6 +237,16 @@ class CHost extends CZBXAPI{
 				$nodeCheck = true;
 				$sql_parts['where'][] = DBin_node('hg.groupid', $nodeids);
 			}
+		}
+
+
+// proxyids
+		if(!is_null($options['proxyids'])){
+			zbx_value2array($options['proxyids']);
+			if($options['output'] != API_OUTPUT_SHORTEN){
+				$sql_parts['select']['proxy_hostid'] = 'h.proxy_hostid';
+			}
+			$sql_parts['where'][] = DBcondition('h.proxy_hostid', $options['proxyids']);
 		}
 
 // templateids
@@ -609,7 +620,7 @@ class CHost extends CZBXAPI{
 						$result[$host['hostid']]['triggers'][] = array('triggerid' => $host['triggerid']);
 						unset($host['triggerid']);
 					}
-
+					
 // itemids
 					if(isset($host['itemid']) && is_null($options['select_items'])){
 						if(!isset($result[$host['hostid']]['items']))

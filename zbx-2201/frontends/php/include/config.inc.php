@@ -823,17 +823,15 @@ function __autoload($class_name){
 
 
 		/* Comments: !!! Don't forget sync code with C !!! */
-		$result=DBselect('SELECT i.type, i.delay, count(*)/i.delay as qps '.
-							' FROM items i,hosts h '.
-							' WHERE i.status='.ITEM_STATUS_ACTIVE.
-								' AND i.hostid=h.hostid '.
-								' AND h.status='.HOST_STATUS_MONITORED.
-							' GROUP BY i.type,i.delay ');
-
-		$status['qps_total']=0;
-		while($row=DBfetch($result)){
-			$status['qps_total']+=$row['qps'];
-		}
+		$sql = 'SELECT sum(1.0/i.delay) as qps '.
+				' FROM items i,hosts h '.
+				' WHERE i.status='.ITEM_STATUS_ACTIVE.
+					' AND i.hostid=h.hostid '.
+					' AND h.status='.HOST_STATUS_MONITORED.
+					' AND i.delay<>0';
+		$row = DBfetch(DBselect($sql));
+		
+		$status['qps_total'] = round($row['qps'],2);
 
 	return $status;
 	}

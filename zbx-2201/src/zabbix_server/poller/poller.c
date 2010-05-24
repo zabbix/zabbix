@@ -645,16 +645,15 @@ static int	get_values(int now)
 		{
 			if (ITEM_STATUS_NOTSUPPORTED != items[i].status)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "Parameter [%s:%s] is not supported by agent"
-						" Old status [%d]",
+				zabbix_log(LOG_LEVEL_WARNING, "Parameter [%s:%s] is not supported, old status [%d]",
 						items[i].host.host, items[i].key_orig, items[i].status);
-				zabbix_syslog("Parameter [%s:%s] is not supported by agent",
+				zabbix_syslog("Parameter [%s:%s] is not supported",
 						items[i].host.host, items[i].key_orig);
 			}
 
 			activate_host(&items[i], now);
 
-			DCadd_nextcheck(&items[i], now, agent.msg);	/* update error & status field in items table */
+			DCadd_nextcheck(items[i].itemid, now, agent.msg);	/* update error & status field in items table */
 			DCconfig_update_item(items[i].itemid, ITEM_STATUS_NOTSUPPORTED, now);
 		}
 		else if (res == NETWORK_ERROR)
