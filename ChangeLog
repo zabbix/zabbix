@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBX-1537] fixed multiple displaying of same host, from which were deleted graph, when deleting mass graphs (Maxim Andruhovich / AM)
  - [ZBX-1263] fixed misleading log messages that referenced agent for any kind of unsupported item (asaveljevs)
  - [ZBXNEXT-58] added zabbix[{history_log,history_text,history_uint,trends_uint}] internal checks (asaveljevs)
  - [ZBX-2446] fixed compilation on AIX 5.3 with OS level 5300-05 or earlier (Sasha)

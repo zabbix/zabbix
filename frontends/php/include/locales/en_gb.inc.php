@@ -2185,6 +2185,7 @@
 	'S_FOR_TEMPLATE_GRAPH_SMALL'=>				'for template graph',
 	'S_UPDATED_FOR_HOSTS'=>					'updated for hosts',
 	'S_SKIPPED_COPYING_OF_GRAPH'=>				'Skipped copying of graph',
+	'S_GRAPH_DELETED_FROM_HOSTS'=>				'Graph "%s" deleted from host%s',
 
 //	profiles.inc.php
 	'S_UNABLE_TO_SELECT_CONFIGURATION'=>	'Unable to select configuration',
