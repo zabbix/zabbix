@@ -747,11 +747,13 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 		$_COOKIE	= zbx_stripslashes($_COOKIE);
 	}
 
-/* init $_REQUEST */
+// init $_REQUEST
 	ini_set('variables_order', 'GP');
 	$_REQUEST = $_POST + $_GET;
 
-/* init precision */
+// init precision
 	ini_set('precision', 14);
 
+//
+	bcscale(7);
 ?>
