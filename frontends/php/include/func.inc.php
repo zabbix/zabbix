@@ -1134,5 +1134,22 @@ function zbx_array_mintersect($keys, $array){
 	return $result;
 }
 
+function zbx_str2links($text){
+// $value = preg_replace('#(https?|ftp|file)://[^\n\t\r ]+#u', '<a href="$0">$0</a>', $value);
+	$result = array();
+	if(empty($text)) return $result;
+	
+	preg_match_all('#https?://[^\n\t\r ]+#u', $text, $matches, PREG_OFFSET_CAPTURE);
+	
+	$start = 0;
+	foreach($matches[0] as $match){
+		$result[] = zbx_substr($text, $start, $match[1]-$start);
+		$result[] = new CLink($match[0], $match[0], null, null, true);
+		$start = $match[1] + zbx_strlen($match[0]);
+	}
+	
+	$result[] = zbx_substr($text, $start, zbx_strlen($text));
+	return $result;
+}
 /************* END ZBX MISC *************/
 ?>
