@@ -630,6 +630,7 @@
 	'S_HIDE_UNKNOWN'=>			'Приховати невідомі',
 	'S_LOG_FILES_SMALL'=>			'журнали',
 	'S_REMOVE_SELECTED'=>			'Прибрати обраний',
+	'S_LOG_FILES_LIST'=>			'Перелік журналів',
 	'S_SHOW_SELECTED'=>			'Відобразити тільки відібрані',
 	'S_HIDE_SELECTED'=>			'Не відображувати тільки відібрані',
 	'S_MARK_SELECTED'=>			'Помітити тільки відібрані',

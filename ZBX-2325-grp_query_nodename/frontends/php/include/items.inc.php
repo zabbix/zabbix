@@ -1095,44 +1095,32 @@
 	return $param;
 	}
 
-	function expand_item_key_by_data($item){
-		$key =& $item['key_'];
-		$macStack = array();
+	function expand_item_key_by_data($item)
+	{
+		$key = $item['key_'];
 
-		$macroses = array('{HOSTNAME}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}');
-
-		foreach($macroses as $macro){
-			$pos = 0;
-			while($pos = zbx_strpos($key, $macro, $pos)){
-				$pos++;
-				$macStack[] = $macro;
-			}
-		}
-
-		if(!empty($macStack)){
+		if (zbx_strstr($key, '{HOSTNAME}'))
+		{
 			$host = get_host_by_itemid($item['itemid']);
-
-			foreach($macStack as $macro){
-				switch($macro){
-					case '{HOSTNAME}':
-						$key = str_replace('{HOSTNAME}', $host['host'], $key);
-					break;
-					case '{IPADDRESS}':
-						$key = str_replace('{IPADDRESS}', $host['ip'], $key);
-					break;
-					case '{HOST.DNS}':
-						$key = str_replace('{HOST.DNS}', $host['dns'], $key);
-					break;
-					case '{HOST.CONN}':
-						$key = str_replace('{HOST.CONN}', $host['useip'] ? $host['ip'] : $host['dns'], $key);
-					break;
-				}
-			}
+			$key = str_replace('{HOSTNAME}', $host['host'], $key);
 		}
-		
-		CUserMacro::resolveItem($item);
+		else if (zbx_strstr($key, '{IPADDRESS}'))
+		{
+			$host = get_host_by_itemid($item['itemid']);
+			$key = str_replace('{IPADDRESS}', $host['ip'], $key);
+		}
+		else if (zbx_strstr($key, '{HOST.DNS}'))
+		{
+			$host = get_host_by_itemid($item['itemid']);
+			$key = str_replace('{HOST.DNS}', $host['dns'], $key);
+		}
+		else if (zbx_strstr($key, '{HOST.CONN}'))
+		{
+			$host = get_host_by_itemid($item['itemid']);
+			$key = str_replace('{HOST.CONN}', $host['useip'] ? $host['ip'] : $host['dns'], $key);
+		}
 
-		return $item['key_'];
+		return $key;
 	}
 
 	function item_description($item){
@@ -1425,9 +1413,6 @@
 				$housekeeperid = get_dbid('housekeeper','housekeeperid');
 				DBexecute('INSERT INTO housekeeper (housekeeperid,tablename,field,value)'.
 					" VALUES ($housekeeperid, 'trends','itemid',$itemid)");
-				$housekeeperid = get_dbid('housekeeper','housekeeperid');
-				DBexecute('INSERT INTO housekeeper (housekeeperid,tablename,field,value)'.
-					" VALUES ($housekeeperid, 'trends_uint','itemid',$itemid)");
 			}
 			return TRUE;
 		}
@@ -1447,7 +1432,7 @@
 					$db_item["value_type"] == ITEM_VALUE_TYPE_LOG){
 				$lastvalue=$db_item["lastvalue"];
 				if(zbx_strlen($lastvalue) > 20)
-					$lastvalue = zbx_substr($lastvalue,0,20)." ...";
+					$lastvalue = substr($lastvalue,0,20)." ...";
 				$lastvalue = nbsp(htmlspecialchars($lastvalue));
 			}
 			else{

@@ -23,6 +23,16 @@
 
 #include "db.h"
 
+#define ZBX_DC_CACHE struct zbx_dc_cache_type
+#define ZBX_DC_STATS struct zbx_dc_stats_type
+#define ZBX_DC_HISTORY struct zbx_dc_history_type
+#define ZBX_DC_TREND struct zbx_dc_trend_type
+#define ZBX_DC_NEXTCHECK struct zbx_dc_nextcheck_type
+#define ZBX_DC_ID struct zbx_dc_id_type
+#define ZBX_DC_IDS struct zbx_dc_ids_type
+
+#define ZBX_IDS_SIZE		7
+
 #define ZBX_SYNC_PARTIAL	0
 #define	ZBX_SYNC_FULL		1
 
@@ -30,19 +40,94 @@
 #define DC_HOST struct dc_host
 
 extern char	*CONFIG_FILE;
-extern int	CONFIG_TIMEOUT;
 extern int	CONFIG_DBCONFIG_SIZE;
 extern int	CONFIG_HISTORY_CACHE_SIZE;
 extern int	CONFIG_TRENDS_CACHE_SIZE;
 extern int	CONFIG_TEXT_CACHE_SIZE;
 extern int	CONFIG_POLLER_FORKS;
 extern int	CONFIG_IPMIPOLLER_FORKS;
+extern int	CONFIG_UNREACHABLE_POLLER_FORKS;
 extern int	CONFIG_PINGER_FORKS;
 extern int	CONFIG_REFRESH_UNSUPPORTED;
 extern int	CONFIG_UNAVAILABLE_DELAY;
 extern int	CONFIG_UNREACHABLE_PERIOD;
 extern int	CONFIG_UNREACHABLE_DELAY;
-extern int	CONFIG_DBSYNCER_FORKS;
+
+typedef union{
+	double		value_float;
+	zbx_uint64_t	value_uint64;
+	char		*value_str;
+} history_value_t;
+
+ZBX_DC_ID
+{
+	char		table_name[64], field_name[64];
+	zbx_uint64_t	lastid;
+};
+
+ZBX_DC_IDS
+{
+	ZBX_DC_ID	id[ZBX_IDS_SIZE];
+};
+
+ZBX_DC_HISTORY
+{
+	zbx_uint64_t	itemid;
+	int		clock;
+	unsigned char	value_type;
+	history_value_t	value_orig;
+	history_value_t	value;
+	unsigned char	value_null;
+	int		timestamp;
+	char		*source;
+	int		severity;
+	int		logeventid;
+	int		lastlogsize;
+	int		mtime;
+	unsigned char	keep_history;
+	unsigned char	keep_trends;
+};
+
+ZBX_DC_TREND
+{
+	zbx_uint64_t	itemid;
+	int		clock;
+	int		num;
+	unsigned char	value_type;
+	history_value_t	value_min;
+	history_value_t	value_avg;
+	history_value_t	value_max;
+};
+
+ZBX_DC_STATS
+{
+	zbx_uint64_t	history_counter;	/* Total number of saved values in th DB */
+	zbx_uint64_t	history_float_counter;	/* Number of saved float values in th DB */
+	zbx_uint64_t	history_uint_counter;	/* Number of saved uint values in the DB */
+	zbx_uint64_t	history_str_counter;	/* Number of saved str values in the DB */
+	zbx_uint64_t	history_log_counter;	/* Number of saved log values in the DB */
+	zbx_uint64_t	history_text_counter;	/* Number of saved text values in the DB */
+};
+
+ZBX_DC_CACHE
+{
+	int		history_first;
+	int		history_num;
+	int		trends_num;
+	ZBX_DC_STATS	stats;
+	ZBX_DC_HISTORY	*history;	/* [ZBX_HISTORY_SIZE] */
+	ZBX_DC_TREND	*trends;	/* [ZBX_TREND_SIZE] */
+	char		*text;		/* [ZBX_TEXTBUFFER_SIZE] */
+	char		*last_text;
+};
+
+ZBX_DC_NEXTCHECK
+{
+	zbx_uint64_t	itemid;
+	time_t		now;/*, nextcheck;*/
+	/* for not supported items */
+	char		*error_msg;
+};
 
 DC_HOST
 {
@@ -115,7 +200,7 @@ void	init_database_cache(zbx_process_t p);
 void	free_database_cache(void);
 
 void	DCinit_nextchecks();
-void	DCadd_nextcheck(zbx_uint64_t itemid, time_t now, const char *error_msg);
+void	DCadd_nextcheck(DC_ITEM *item, time_t now, const char *error_msg);
 void	DCflush_nextchecks();
 
 #define ZBX_STATS_HISTORY_COUNTER	0
@@ -138,8 +223,7 @@ void	DCflush_nextchecks();
 #define ZBX_STATS_TEXT_PFREE		17
 void	*DCget_stats(int request);
 
-zbx_uint64_t	DCget_nextid(const char *table_name, int num);
-zbx_uint64_t	DCget_nextid_shared(const char *table_name);
+zbx_uint64_t	DCget_nextid(const char *table_name, const char *field_name, int num);
 
 int	DCget_item_lastclock(zbx_uint64_t itemid);
 
@@ -150,14 +234,16 @@ void	free_configuration_cache();
 int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid);
 int	DCconfig_get_item_by_key(DC_ITEM *item, zbx_uint64_t proxy_hostid, const char *hostname, const char *key);
 int	DCconfig_get_item_by_itemid(DC_ITEM *item, zbx_uint64_t itemid);
-int	DCconfig_get_poller_nextcheck(unsigned char poller_type);
-int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max_items);
+int	DCconfig_get_poller_items(unsigned char poller_type, unsigned char poller_num, int now,
+		DC_ITEM *items, int max_items);
+int	DCconfig_get_poller_nextcheck(unsigned char poller_type, unsigned char poller_num, int now);
 int	DCconfig_get_items(zbx_uint64_t hostid, const char *key, DC_ITEM **items);
 
-void	DCrequeue_reachable_item(zbx_uint64_t itemid, unsigned char status, int now);
-void	DCrequeue_unreachable_item(zbx_uint64_t itemid);
+void	DCconfig_update_item(zbx_uint64_t itemid, unsigned char status, int now);
 int	DCconfig_activate_host(DC_ITEM *item);
 int	DCconfig_deactivate_host(DC_ITEM *item, int now);
+
+void	DCreset_item_nextcheck(zbx_uint64_t itemid);
 
 void	DCconfig_set_maintenance(zbx_uint64_t hostid, int maintenance_status,
 		int maintenance_type, int maintenance_from);

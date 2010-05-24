@@ -36,6 +36,6 @@ extern char	CONFIG_LOG_UNRES_SYMB;
 extern int	CONFIG_MAX_LINES_PER_SECOND;
 
 void    load_config();
-void    load_user_parameters(int optional);
+void    load_user_parameters(void);
 
 #endif /* ZABBIX_ZBXCONF_H */

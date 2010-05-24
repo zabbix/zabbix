@@ -2283,24 +2283,6 @@ char	*zbx_strcasestr(const char *haystack, const char *needle)
 /*#endif*/
 }
 
-int	starts_with(const char *str, const char *prefix)
-{
-	const char	*p, *q;
-
-	for (p = str, q = prefix; *p == *q && *q != '\0'; p++, q++);
-
-	return (*q == '\0' ? SUCCEED : FAIL);
-}
-
-int	cmp_key_id(const char *key_1, const char *key_2)
-{
-	const char	*p, *q;
-
-	for (p = key_1, q = key_2; *p == *q && *q != '\0' && *q != '[' && *q != ','; p++, q++);
-
-	return ((*p == '\0' || *p == '[' || *p == ',') && (*q == '\0' || *q == '[' || *q == ',') ? SUCCEED : FAIL);
-}
-
 const char *zbx_permission_string(int perm)
 {
 	switch (perm) {

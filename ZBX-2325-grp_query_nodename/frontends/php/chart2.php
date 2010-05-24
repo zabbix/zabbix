@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ require_once('include/config.inc.php');
 require_once('include/graphs.inc.php');
 
 $page['file']	= 'chart2.php';
-// $page['title']	= 'S_CHART';
+$page['title']	= 'S_CHART';
 $page['type']	= PAGE_TYPE_IMAGE;
 
 include_once('include/page_header.php');
@@ -48,19 +48,19 @@ include_once('include/page_header.php');
 	}
 
 	$options = array(
-		'nodeids' => get_current_nodeid(true),
 		'graphids' => $_REQUEST['graphid'],
-		'output' => API_OUTPUT_EXTEND
+		'extendoutput' => 1,
+		'nodeids' => get_current_nodeid(true)
 	);
 	$db_data = CGraph::get($options);
 	if(empty($db_data)) access_deny();
 	else $db_data = reset($db_data);
 
 	$options = array(
-		'nodeids' => get_current_nodeid(true),
-		'graphids' => $_REQUEST['graphid'],
-		'output' => API_OUTPUT_EXTEND
-	);
+			'graphids' => $_REQUEST['graphid'],
+			'extendoutput' => 1,
+			'nodeids' => get_current_nodeid(true)
+		);
 	$host = CHost::get($options);
 	$host = reset($host);
 
@@ -108,7 +108,6 @@ include_once('include/page_header.php');
 	$graph->setLeftPercentage($db_data['percent_left']);
 	$graph->setRightPercentage($db_data['percent_right']);
 
-
 	$sql = 'SELECT gi.* '.
 			' FROM graphs_items gi '.
 			' WHERE gi.graphid='.$db_data['graphid'].
@@ -123,7 +122,7 @@ include_once('include/page_header.php');
 			$db_data['drawtype'],
 			$db_data['type'],
 			$db_data['periods_cnt']
-		);
+			);
 	}
 
 	$graph->draw();

@@ -1,4 +1,4 @@
-.TH ZABBIX_AGENTD 8 "20 May 2010"
+.TH ZABBIX_AGENTD 8 "4 August 2009"
 .SH NAME
 zabbix_agentd \- Zabbix agent daemon.
 .SH SYNOPSIS
@@ -33,5 +33,13 @@ Default location of Zabbix Agent configuration file.
 .BR zabbix_proxy (8),
 .BR zabbix_sender (8),
 .BR zabbix_server (8)
+.SH BUGS
+Note that
+.B -t
+and
+.B -p
+switches do not work with user parameters. Use
+.B zabbix_get
+instead.
 .SH AUTHOR
 Alexei Vladishev <alex@zabbix.com>

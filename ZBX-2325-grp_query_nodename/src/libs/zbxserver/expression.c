@@ -988,36 +988,22 @@ static int	DBget_trigger_value_by_triggerid(zbx_uint64_t triggerid, char **repla
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-#define ZBX_TRIGGER_EVENTS_PROBLEM_UNACK	0
-#define ZBX_TRIGGER_EVENTS_UNACK		1
-static int	DBget_trigger_events_unacknowledged(zbx_uint64_t triggerid, char **replace_to, unsigned char type)
+static int DBget_trigger_events_unacknowledged(zbx_uint64_t triggerid, char **replace_to)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		value[4];
 	int		ret = FAIL;
-
-	switch (type) {
-		case ZBX_TRIGGER_EVENTS_PROBLEM_UNACK:
-			zbx_snprintf(value, sizeof(value), "%d", TRIGGER_VALUE_TRUE);
-			break;
-		case ZBX_TRIGGER_EVENTS_UNACK:
-			zbx_snprintf(value, sizeof(value), "%d,%d", TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE);
-			break;
-		default:
-			assert(0);
-	}
 
 	result = DBselect(
 			"select count(*)"
 			" from events"
 			" where object=%d"
 				" and objectid=" ZBX_FS_UI64
-				" and value in (%s)"
+				" and value=%d"
 				" and acknowledged=0",
 			EVENT_OBJECT_TRIGGER,
 			triggerid,
-			value);
+			TRIGGER_VALUE_TRUE);
 
 	if (NULL != (row = DBfetch(result)))
 	{
@@ -1708,7 +1694,6 @@ static int	get_node_value_by_event(DB_EVENT *event, char **replace_to, const cha
 #define MVAR_TRIGGER_URL		"{TRIGGER.URL}"
 
 #define MVAR_TRIGGER_EVENTS_UNACK	"{TRIGGER.EVENTS.UNACK}"
-#define MVAR_TRIGGER_EVENTS_PROBLEM_UNACK	"{TRIGGER.EVENTS.PROBLEM.UNACK}"
 
 #define MVAR_PROFILE_DEVICETYPE		"{PROFILE.DEVICETYPE}"
 #define MVAR_PROFILE_NAME		"{PROFILE.NAME}"
@@ -1940,11 +1925,7 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, 
 				else if (0 == strcmp(m, MVAR_TRIGGER_URL))
 					replace_to = zbx_dsprintf(replace_to, "%s", event->trigger_url);
 				else if (0 == strcmp(m, MVAR_TRIGGER_EVENTS_UNACK))
-					ret = DBget_trigger_events_unacknowledged(event->objectid, &replace_to,
-							ZBX_TRIGGER_EVENTS_UNACK);
-				else if (0 == strcmp(m, MVAR_TRIGGER_EVENTS_PROBLEM_UNACK))
-					ret = DBget_trigger_events_unacknowledged(event->objectid, &replace_to,
-							ZBX_TRIGGER_EVENTS_PROBLEM_UNACK);
+					ret = DBget_trigger_events_unacknowledged(event->objectid, &replace_to);
 				else if (0 == strcmp(m, MVAR_EVENT_ID))
 					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->eventid);
 				else if (0 == strcmp(m, MVAR_EVENT_DATE))

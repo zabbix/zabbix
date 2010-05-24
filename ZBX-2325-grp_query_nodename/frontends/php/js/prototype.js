@@ -757,7 +757,7 @@ var Enumerable = (function() {
   }
 
   function detect(iterator, context) {
-    var result = null;
+    var result;
     this.each(function(value, index) {
       if (iterator.call(context, value, index)) {
         result = value;

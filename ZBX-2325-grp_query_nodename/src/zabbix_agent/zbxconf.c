@@ -27,7 +27,7 @@
 #include "perfstat.h"
 
 #if defined(ZABBIX_DAEMON)
-/* use pid file configuration */
+/* use pid file configureation */
 #	include "daemon.h"
 #endif /* ZABBIX_DAEMON */
 
@@ -151,7 +151,7 @@ static int     add_parameter(char *key)
 	return add_user_parameter(key, command);
 }
 
-void    load_user_parameters(int optional)
+void    load_user_parameters(void)
 {
 	struct cfg_line cfg[]=
 	{
@@ -174,8 +174,5 @@ void    load_user_parameters(int optional)
 		{0}
 	};
 
-	if (!optional)
-		parse_cfg_file(CONFIG_FILE, cfg);
-	else
-		parse_opt_cfg_file(CONFIG_FILE, cfg);
+	parse_cfg_file(CONFIG_FILE,cfg);
 }

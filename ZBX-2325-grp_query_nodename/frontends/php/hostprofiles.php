@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -74,6 +74,8 @@
 
 
 	if($_REQUEST['hostid'] > 0){
+		echo SBR;
+
 		if($_REQUEST['prof_type']){
 			$hostprof_wdgt->addItem(insert_host_profile_ext_form());
 		}
@@ -178,17 +180,17 @@
 				new CLink($host['host'],'?hostid='.$host['hostid'].url_param('groupid').'&prof_type='.$_REQUEST['prof_type']),
 				$host_groups);
 			if(0 == $_REQUEST['prof_type']){
-				$row[] = zbx_str2links($host['profile']['name']);
-				$row[] = zbx_str2links($host['profile']['os']);
-				$row[] = zbx_str2links($host['profile']['serialno']);
-				$row[] = zbx_str2links($host['profile']['tag']);
-				$row[] = zbx_str2links($host['profile']['macaddress']);
+				$row[] = $host['profile']['name'];
+				$row[] = $host['profile']['os'];
+				$row[] = $host['profile']['serialno'];
+				$row[] = $host['profile']['tag'];
+				$row[] = $host['profile']['macaddress'];
 			}
 			else{
-				$row[] = zbx_str2links($host['profile_ext']['device_os_short']);
-				$row[] = zbx_str2links($host['profile_ext']['device_hw_arch']);
-				$row[] = zbx_str2links($host['profile_ext']['device_type']);
-				$row[] = zbx_str2links($host['profile_ext']['device_status']);
+				$row[] = $host['profile_ext']['device_os_short'];
+				$row[] = $host['profile_ext']['device_hw_arch'];
+				$row[] = $host['profile_ext']['device_type'];
+				$row[] = $host['profile_ext']['device_status'];
 			}
 
 			$table->addRow($row);

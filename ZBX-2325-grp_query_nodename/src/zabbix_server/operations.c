@@ -447,7 +447,7 @@ static void	add_discovered_host_group(zbx_uint64_t hostid, zbx_uint64_t groupid)
 
 	if (NULL == (row = DBfetch(result)))
 	{
-		hostgroupid = DBget_maxid("hosts_groups");
+		hostgroupid = DBget_maxid("hosts_groups", "hostgroupid");
 		DBexecute("insert into hosts_groups (hostgroupid,hostid,groupid)"
 				" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
 				hostgroupid,
@@ -555,7 +555,7 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 
 			if (NULL == (row2 = DBfetch(result2)))
 			{
-				hostid = DBget_maxid("hosts");
+				hostid = DBget_maxid("hosts", "hostid");
 
 				DBexecute("insert into hosts (hostid,proxy_hostid,host,useip,dns)"
 						" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s',0,'%s')",
@@ -603,7 +603,7 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 
 			if (NULL == (row2 = DBfetch(result2)))
 			{
-				hostid = DBget_maxid("hosts");
+				hostid = DBget_maxid("hosts", "hostid");
 
 				/* for host uniqueness purposes */
 				if ('\0' != *host)

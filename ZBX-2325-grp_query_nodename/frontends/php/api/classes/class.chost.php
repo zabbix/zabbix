@@ -62,7 +62,7 @@ class CHost extends CZBXAPI{
  * @param boolean $options['select_profile'] select Profile
  * @param int $options['count'] count Hosts, returned column name is rowscount
  * @param string $options['pattern'] search hosts by pattern in Host name
- * @param string $options['extendPattern'] search hosts by pattern in Host name, ip and DNS
+ * @param string $options['extend_pattern'] search hosts by pattern in Host name, ip and DNS
  * @param int $options['limit'] limit selection
  * @param string $options['sortfield'] field to sort by
  * @param string $options['sortorder'] sort order
@@ -92,7 +92,6 @@ class CHost extends CZBXAPI{
 			'nodeids'					=> null,
 			'groupids'					=> null,
 			'hostids'					=> null,
-			'proxyids'					=> null,
 			'templateids'				=> null,
 			'itemids'					=> null,
 			'triggerids'				=> null,
@@ -114,9 +113,8 @@ class CHost extends CZBXAPI{
 			'nopermissions'				=> null,
 // filter
 			'filter'					=> null,
-			'startPattern'				=> null,
-			'pattern'					=> null,
-			'extendPattern'				=> null,
+			'pattern'					=> '',
+			'extend_pattern'			=> null,
 
 // OutPut
 			'output'					=> API_OUTPUT_REFER,
@@ -208,17 +206,6 @@ class CHost extends CZBXAPI{
 // nodeids
 		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
-// hostids
-		if(!is_null($options['hostids'])){
-			zbx_value2array($options['hostids']);
-			$sql_parts['where']['hostid'] = DBcondition('h.hostid', $options['hostids']);
-
-			if(!$nodeCheck){
-				$nodeCheck = true;
-				$sql_parts['where'][] = DBin_node('h.hostid', $nodeids);
-			}
-		}
-
 // groupids
 		if(!is_null($options['groupids'])){
 			zbx_value2array($options['groupids']);
@@ -240,14 +227,15 @@ class CHost extends CZBXAPI{
 			}
 		}
 
+// hostids
+		if(!is_null($options['hostids'])){
+			zbx_value2array($options['hostids']);
+			$sql_parts['where']['hostid'] = DBcondition('h.hostid', $options['hostids']);
 
-// proxyids
-		if(!is_null($options['proxyids'])){
-			zbx_value2array($options['proxyids']);
-			if($options['output'] != API_OUTPUT_SHORTEN){
-				$sql_parts['select']['proxy_hostid'] = 'h.proxy_hostid';
+			if(!$nodeCheck){
+				$nodeCheck = true;
+				$sql_parts['where'][] = DBin_node('h.hostid', $nodeids);
 			}
-			$sql_parts['where'][] = DBcondition('h.proxy_hostid', $options['proxyids']);
 		}
 
 // templateids
@@ -456,10 +444,7 @@ class CHost extends CZBXAPI{
 
 // pattern
 		if(!zbx_empty($options['pattern'])){
-			if($options['startPattern']){
-				$sql_parts['where']['host'] = ' UPPER(h.host) LIKE '.zbx_dbstr(zbx_strtoupper($options['pattern']).'%');
-			}
-			else if($options['extendPattern']){
+			if($options['extend_pattern']){
 				$sql_parts['where'][] = ' ( '.
 											'UPPER(h.host) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%').' OR '.
 											'h.ip LIKE '.zbx_dbstr('%'.$options['pattern'].'%').' OR '.
@@ -471,7 +456,6 @@ class CHost extends CZBXAPI{
 			}
 		}
 
-
 // filter
 		if(!is_null($options['filter'])){
 			zbx_value2array($options['filter']);
@@ -482,11 +466,13 @@ class CHost extends CZBXAPI{
 
 			if(isset($options['filter']['host']) && !is_null($options['filter']['host'])){
 				zbx_value2array($options['filter']['host']);
+
 				$sql_parts['where']['host'] = DBcondition('h.host', $options['filter']['host'], false, true);
 			}
 
 			if(isset($options['filter']['ip']) && !is_null($options['filter']['ip'])){
 				zbx_value2array($options['filter']['ip']);
+
 				$sql_parts['where']['ip'] = DBcondition('h.ip', $options['filter']['ip'], false, true);
 			}
 
@@ -625,7 +611,7 @@ class CHost extends CZBXAPI{
 						$result[$host['hostid']]['triggers'][] = array('triggerid' => $host['triggerid']);
 						unset($host['triggerid']);
 					}
-					
+
 // itemids
 					if(isset($host['itemid']) && is_null($options['select_items'])){
 						if(!isset($result[$host['hostid']]['items']))

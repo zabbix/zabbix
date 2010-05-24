@@ -41,7 +41,7 @@ static void	process_listener(zbx_sock_t *s)
 	char	**value = NULL;
 	int		ret;
 
-	if (SUCCEED == (ret = zbx_tcp_recv_to(s, &command, CONFIG_TIMEOUT)))
+	if( SUCCEED == (ret = zbx_tcp_recv(s, &command)) )
 	{
 		zbx_rtrim(command, "\r\n\0");
 
@@ -56,7 +56,7 @@ static void	process_listener(zbx_sock_t *s)
 		if(value)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Sending back [%s]", *value);
-			ret = zbx_tcp_send_to(s, *value, CONFIG_TIMEOUT);
+			ret = zbx_tcp_send(s, *value);
 		}
 
 		free_result(&result);
@@ -84,10 +84,12 @@ ZBX_THREAD_ENTRY(listener_thread, pSock)
 	zabbix_log( LOG_LEVEL_INFORMATION, "zabbix_agentd listener started");
 
 #if defined(ZABBIX_DAEMON)
-	phan.sa_sigaction = child_signal_handler;
+/*	phan.sa_handler = child_signal_handler;*/
+        phan.sa_sigaction = child_signal_handler;
 	sigemptyset(&phan.sa_mask);
 	phan.sa_flags = SA_SIGINFO;
 	sigaction(SIGALRM, &phan, NULL);
+
 #endif
 
 	memcpy(&s, ((zbx_sock_t *)pSock), sizeof(zbx_sock_t));

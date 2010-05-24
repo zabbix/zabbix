@@ -506,7 +506,7 @@ static void	deactivate_host(DC_ITEM *item, int now, const char *error)
  * Comments: always SUCCEED                                                   *
  *                                                                            *
  ******************************************************************************/
-static int	get_values()
+static int	get_values(int now)
 {
 	const char	*__function_name = "get_values";
 	DC_ITEM		items[MAX_ITEMS];
@@ -514,7 +514,7 @@ static int	get_values()
 	zbx_uint64_t	*ids = NULL, *snmpids = NULL, *ipmiids = NULL;
 	int		ids_alloc = 0, snmpids_alloc = 0, ipmiids_alloc = 0,
 			ids_num = 0, snmpids_num = 0, ipmiids_num = 0,
-			i, now, num, res;
+			i, num, res;
 	static char	*key = NULL, *ipmi_ip = NULL, *params = NULL,
 			*username = NULL, *publickey = NULL, *privatekey = NULL,
 			*password = NULL;
@@ -523,7 +523,7 @@ static int	get_values()
 
 	DCinit_nextchecks();
 
-	num = DCconfig_get_poller_items(poller_type, items, MAX_ITEMS);
+	num = DCconfig_get_poller_items(poller_type, poller_num, now, items, MAX_ITEMS);
 
 	for (i = 0; i < num; i++)
 	{
@@ -601,7 +601,6 @@ static int	get_values()
 		case ITEM_TYPE_ZABBIX:
 			if (SUCCEED == uint64_array_exists(ids, ids_num, items[i].host.hostid))
 			{
-				DCrequeue_unreachable_item(items[i].itemid);
 				zabbix_log(LOG_LEVEL_DEBUG, "Zabbix Host " ZBX_FS_UI64 " is unreachable. Skipping [%s]",
 						items[i].host.hostid, items[i].key_orig);
 				continue;
@@ -612,7 +611,6 @@ static int	get_values()
 		case ITEM_TYPE_SNMPv3:
 			if (SUCCEED == uint64_array_exists(snmpids, snmpids_num, items[i].host.hostid))
 			{
-				DCrequeue_unreachable_item(items[i].itemid);
 				zabbix_log(LOG_LEVEL_DEBUG, "SNMP Host " ZBX_FS_UI64 " is unreachable. Skipping [%s]",
 						items[i].host.hostid, items[i].key_orig);
 				continue;
@@ -621,7 +619,6 @@ static int	get_values()
 		case ITEM_TYPE_IPMI:
 			if (SUCCEED == uint64_array_exists(ipmiids, ipmiids_num, items[i].host.hostid))
 			{
-				DCrequeue_unreachable_item(items[i].itemid);
 				zabbix_log(LOG_LEVEL_DEBUG, "IPMI Host " ZBX_FS_UI64 " is unreachable. Skipping [%s]",
 						items[i].host.hostid, items[i].key_orig);
 				continue;
@@ -642,22 +639,23 @@ static int	get_values()
 
 			dc_add_history(items[i].itemid, items[i].value_type, &agent, now, 0, NULL, 0, 0, 0, 0);
 
-			DCrequeue_reachable_item(items[i].itemid, ITEM_STATUS_ACTIVE, now);
+			DCconfig_update_item(items[i].itemid, ITEM_STATUS_ACTIVE, now);
 		}
 		else if (res == NOTSUPPORTED || res == AGENT_ERROR)
 		{
 			if (ITEM_STATUS_NOTSUPPORTED != items[i].status)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "Parameter [%s:%s] is not supported, old status [%d]",
+				zabbix_log(LOG_LEVEL_WARNING, "Parameter [%s:%s] is not supported by agent"
+						" Old status [%d]",
 						items[i].host.host, items[i].key_orig, items[i].status);
-				zabbix_syslog("Parameter [%s:%s] is not supported",
+				zabbix_syslog("Parameter [%s:%s] is not supported by agent",
 						items[i].host.host, items[i].key_orig);
 			}
 
 			activate_host(&items[i], now);
 
-			DCadd_nextcheck(items[i].itemid, now, agent.msg);	/* update error & status field in items table */
-			DCrequeue_reachable_item(items[i].itemid, ITEM_STATUS_NOTSUPPORTED, now);
+			DCadd_nextcheck(&items[i], now, agent.msg);	/* update error & status field in items table */
+			DCconfig_update_item(items[i].itemid, ITEM_STATUS_NOTSUPPORTED, now);
 		}
 		else if (res == NETWORK_ERROR)
 		{
@@ -678,8 +676,6 @@ static int	get_values()
 			default:
 				/* nothing to do */;
 			}
-
-			DCrequeue_unreachable_item(items[i].itemid);
 		}
 		else
 		{
@@ -709,10 +705,10 @@ static int	get_values()
 	return num;
 }
 
-void	main_poller_loop(zbx_process_t p, int type, int num)
+void main_poller_loop(zbx_process_t p, int type, int num)
 {
 	struct	sigaction phan;
-	int	nextcheck, sleeptime, processed;
+	int	now, nextcheck, sleeptime, processed;
 	double	sec;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_poller_loop() poller_type:%d poller_num:%d", type, num);
@@ -728,15 +724,15 @@ void	main_poller_loop(zbx_process_t p, int type, int num)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	for (;;)
-	{
+	for (;;) {
 		zbx_setproctitle("poller [getting values]");
 
+		now = time(NULL);
 		sec = zbx_time();
-		processed = get_values();
+		processed = get_values(now);
 		sec = zbx_time() - sec;
 
-		if (FAIL == (nextcheck = DCconfig_get_poller_nextcheck(poller_type)))
+		if (FAIL == (nextcheck = DCconfig_get_poller_nextcheck(poller_type, poller_num, now)))
 			sleeptime = POLLER_DELAY;
 		else
 		{

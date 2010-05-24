@@ -186,7 +186,7 @@ static void	separate_host(DB_DRULE *drule, DB_DHOST *dhost, const char *ip)
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		dhostid = DBget_maxid("dhosts");
+		dhostid = DBget_maxid("dhosts", "dhostid");
 
 		DBexecute("insert into dhosts (dhostid,druleid)"
 				" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
@@ -264,7 +264,7 @@ static void	register_service(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "New service discovered on port %d", port);
 
-			dservice->dserviceid	= DBget_maxid("dservices");
+			dservice->dserviceid	= DBget_maxid("dservices", "dserviceid");
 			dservice->status	= DOBJECT_STATUS_DOWN;
 
 			DBexecute("insert into dservices (dserviceid,dhostid,dcheckid,type,key_,ip,port,status)"
@@ -404,7 +404,7 @@ static void	register_host(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost, c
 			zabbix_log(LOG_LEVEL_DEBUG, "New host discovered at %s",
 					ip);
 
-			dhost->dhostid	= DBget_maxid("dhosts");
+			dhost->dhostid	= DBget_maxid("dhosts", "dhostid");
 			dhost->status	= DOBJECT_STATUS_DOWN;
 			dhost->lastup	= 0;
 			dhost->lastdown	= 0;

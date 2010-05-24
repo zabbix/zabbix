@@ -67,24 +67,6 @@ div.hintbox {
 
 /************** END OF HINT BOX ************/
 
-/* Node Tree */
-div #div_node_tree {
-	background-color: gray;
-	position: absolute;
-	border: 2px solid black;
-	right: 0px;
-	z-index: 200;
-}
-
-/* SEARCH Suggest */
-div.suggest{
-	position: absolute;
-	border: 1px #5C7099 solid;
-	width: 162px;
-	z-index: 100;
-	display: none;
-}
-
 /**** SCREEN DRAG & DROP ****/
 div.draggable {
 	cursor: pointer;
@@ -581,4 +563,14 @@ span.info{
 .biglink:hover{
 	color:#6C80B9;
 	text-decoration: underline;
+}
+
+/*********** Node Tree ****************/
+
+div #div_node_tree {
+	background-color: gray;
+	position: absolute;
+	border: 2px solid black;
+	right: 0px;
+	z-index: 200;
 }

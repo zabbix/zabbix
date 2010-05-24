@@ -7,7 +7,7 @@ select{
 	cursor: pointer;
 }
 
-.biginput, .biginput[disabled]:hover{
+.biginput{
 	font-family: Verdana, Helvetica, Geneva;
 	font-size: 10px;
 	border: 1px solid gray;
@@ -24,13 +24,13 @@ select{
 	border-color: black;
 }
 
-.biginput[readonly], .biginput[readonly]:hover{
+.biginput[readonly]{
 /* NOTE: Ignored by IE */
 	border-color: #D0D0D0;
 	background-color: #EEEEEE;
 }
 
-.button, .button[disabled]:hover{
+.button{
 	font-family: Verdana, Helvetica, Geneva;
 	font-size: 10px;
 	background: #F0F0F0 url('../images/gradients/button.gif') repeat-x top left;
@@ -48,10 +48,6 @@ select{
 	border-color: black;
 }
 
-.button[disabled], .button[disabled]:hover{
-	cursor: default;
-}
-
 .checkbox{
 	cursor: pointer;
 }
@@ -63,23 +59,19 @@ table.thin_header .button{
 }
 
 table.thin_header .biginput{
-	font-size: 11px;
-	height: 14px;
-	line-height: 14px;
-	padding: 0px 1px 0px 1px;
-	margin-top: 0px;
-	margin-bottom: 0px;
+	font-size: 9px;
+	height: 10px;
+	padding: 0px 1px 2px 1px;
+	margin-top: 1px;
 	margin-left: 2px;
 	vertical-align: top;
 }
 
 form.thin .biginput{
-	font-size: 11px;
-	height: 14px;
-	line-height: 14px;
-	padding: 0px 1px 0px 1px;
-	margin-top: 0px;
-	margin-bottom: 0px;
+	font-size: 9px;
+	height: 10px;
+	padding: 0px 1px 2px 1px;
+	margin-top: 1px;
 	margin-left: 2px;
 	vertical-align: top;
 }

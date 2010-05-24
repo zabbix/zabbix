@@ -1,3 +1,4 @@
+//Javascript document
 /*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
@@ -16,7 +17,6 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/ 
-// JavaScript Document
 
 /************************************************************************************/
 /*								URL MANIPULATION CLASS 								*/
@@ -96,55 +96,48 @@ initialize: function(url){
 	
 	if(this.file.indexOf('?')>=0) this.file=this.file.substring(0, this.file.indexOf('?'));
 
-	var refSepIndex=this.file.indexOf('#');
+	var refSepIndex=this.url.indexOf('#');
 	if(refSepIndex>=0){
-		this.reference=this.file.substring(refSepIndex+1);
 		this.file=this.file.substring(0,refSepIndex);
+		this.reference=this.url.substring(refSepIndex+1);
 	}
 
 	this.path=this.file;
-	if(this.query.length > 0) this.file+='?'+this.query;
-	if(this.query.length > 0) this.formatArguments();
+	if(this.query.length>0) this.file+='?'+this.query;
+	if(this.query.length > 0)	this.formatArguments();
 
-	this.addSID();
-},
-
-addSID: function(){
-	var sid = '';
 	var possition = parseInt(location.href.indexOf('sid='));
-
 	if(possition > -1){
-		sid = location.href.substr(possition+4, 16);
+		this.setArgument('sid', location.href.substr(possition+4, 16));
 	}
 	else{
-		sid = cookie.read('zbx_sessionid');
-		if(!is_null(sid)) sid = sid.substr(16,16);
+		var sid = cookie.read('zbx_sessionid');
+		if(!is_null(sid)) this.setArgument('sid', sid.substring(16));
 	}
-
-	if((/[\da-z]{16}/i).test(sid))	this.setArgument('sid', sid);
 },
+
 
 formatQuery: function(){
 	if(this.args.lenght < 1) return;
 	
-	var query = new Array();
+	var query = '';
 	for(var key in this.args){
 		if((typeof(this.args[key]) != 'undefined') && !is_null(this.args[key])){
-			query.push(key+'='+encodeURIComponent(this.args[key]));
+			query+=key+'='+this.args[key]+'&';
 		}
 	}
-	this.query = query.join('&');
+	this.query = query.substring(0,query.length-1);
 },
 
 formatArguments: function(){
-	var args = this.query.split('&');
-	var keyval = '';
+	var args=this.query.split('&');
+	var keyval='';
 
 	if(args.length<1) return;
 	
 	for(var i=0; i<args.length; i++){
 		keyval = args[i].split('=');
-		this.args[keyval[0]] = keyval.length > 1 ? decodeURIComponent(keyval[1]):'';
+		this.args[keyval[0]] = (keyval.length>1)?keyval[1]:'';
 	}
 },
 
@@ -170,14 +163,15 @@ getArguments: function(){
 getUrl: function(){
 	this.formatQuery();
  
-	var url = this.protocol.length > 0 ? this.protocol+'://':'';
-	url +=  this.username.length > 0 ? encodeURI(this.username):'';
-	url +=  this.password.length > 0 ? encodeURI(':'+this.password):'';
-	url +=  this.host.length > 0 ? this.host:'';
-	url +=  this.port.length > 0 ? ':'+this.port:'';
-	url +=  this.path.length > 0 ? encodeURI(this.path):'';
-	url +=  this.query.length > 0 ? '?'+this.query:'';
-	url +=  this.reference.length > 0 ? encodeURI('#'+this.reference):'';
+	var url = (this.protocol.length > 0)?(this.protocol+'://'):'';
+	url +=  encodeURI((this.username.length > 0)?(this.username):'');
+	url +=  encodeURI((this.password.length > 0)?(':'+this.password):'');
+	url +=  (this.host.length > 0)?(this.host):'';
+	url +=  (this.port.length > 0)?(':'+this.port):'';
+	url +=  encodeURI((this.path.length > 0)?(this.path):'');
+	url +=  encodeURI((this.query.length > 0)?('?'+this.query):'');
+	url +=  encodeURI((this.reference.length > 0)?('#'+this.reference):'');
+//alert(url);
 return url;
 },
 
@@ -189,15 +183,16 @@ getPort: function(){
 	return this.port;
 },
 
-setQuery: function(query){
+setQuery: function(query){ 
 	this.query = query;
 	if(this.query.indexOf('?')>=0){
 		this.query= this.query.substring(this.query.indexOf('?')+1);
 	}
 	
 	this.formatArguments();
-
-	this.addSID();
+	
+	var sid = cookie.read('zbx_sessionid');
+	this.setArgument('sid', sid.substring(16));
 },
 
 getQuery: function(){ 

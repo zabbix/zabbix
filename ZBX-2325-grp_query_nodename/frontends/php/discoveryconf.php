@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -96,22 +96,8 @@ include_once('include/page_header.php');
 			'snmpv3_authpassphrase'=> $_REQUEST['new_check_snmpv3_authpassphrase'],
 			'snmpv3_privpassphrase'=> $_REQUEST['new_check_snmpv3_privpassphrase']
 			);
-
-		$found = false;
-		foreach($_REQUEST['dchecks'] as $dbcheck){
-			if($dbcheck['type'] === $new_dcheck['type']
-				&& $dbcheck['ports'] === $new_dcheck['ports']
-				&& $dbcheck['key'] === $new_dcheck['key']
-				&& $dbcheck['snmp_community'] === $new_dcheck['snmp_community']
-				&& $dbcheck['snmpv3_securityname'] === $new_dcheck['snmpv3_securityname']
-				&& $dbcheck['snmpv3_securitylevel'] === $new_dcheck['snmpv3_securitylevel']
-				&& $dbcheck['snmpv3_authpassphrase'] === $new_dcheck['snmpv3_authpassphrase']
-				&& $dbcheck['snmpv3_privpassphrase'] === $new_dcheck['snmpv3_privpassphrase']
-			){
-				$found = true;
-			}
-		}
-		if(!$found) $_REQUEST['dchecks'][] = $new_dcheck;
+		if( !str_in_array($new_dcheck, $_REQUEST['dchecks']))
+			$_REQUEST['dchecks'][] = $new_dcheck;
 	}
 	else if(inarr_isset(array('delete_ckecks', 'selected_checks'))){
 		foreach($_REQUEST['selected_checks'] as $chk_id)
@@ -207,9 +193,8 @@ include_once('include/page_header.php');
 /* header */
 	$form = new CForm(null, 'get');
 
-	if(!isset($_REQUEST['form'])){
+	if(!isset($_REQUEST['form']))
 		$form->addItem(new CButton('form', S_CREATE_RULE));
-	}
 		
 	$dscry_wdgt = new CWidget();
 	$dscry_wdgt->addPageHeader(S_CONFIGURATION_OF_DISCOVERY_BIG, $form);

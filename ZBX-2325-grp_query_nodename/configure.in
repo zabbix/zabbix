@@ -215,20 +215,6 @@ AC_DEFINE(HAVE_SYSINFO_FREESWAP,1,[Define to 1 if 'sysinfo.freeswap' exist.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
-dnl Check for libperfstat 5.3.0.60 fileset
-AC_MSG_CHECKING(for AIX OS level 5300-06)
-AC_TRY_COMPILE([#include <libperfstat.h>],
-[perfstat_partition_total_t	lparstats;
-lparstats.type.b.donate_enabled = 0;
-lparstats.idle_donated_purr = 0;
-lparstats.busy_donated_purr = 0;
-lparstats.idle_stolen_purr = 0;
-lparstats.busy_stolen_purr = 0;
-],
-AC_DEFINE(HAVE_AIXOSLEVEL_530006,1,[Define to 1 if AIX OS level 5300-06 exist.])
-AC_MSG_RESULT(yes),
-AC_MSG_RESULT(no))
-
 dnl Check for function setpriority in sys/resource.h
 AC_MSG_CHECKING(for function setpriority() in sys/resource.h)
 AC_TRY_COMPILE(
@@ -1211,7 +1197,7 @@ openbsd*)
 dnl	AC_MSG_ERROR(${host_os} not supported)
 ;;
 esac
-	AC_DEFINE_UNQUOTED([ARCH], "${ARCH}", [Define to OS name for code managing])
+	AC_DEFINE_UNQUOTED([ARCH], "${ARCH}", [Define to os name for code managing])
 
 AC_SUBST(ARCH)
 
@@ -1222,8 +1208,6 @@ AC_OUTPUT([
 	src/Makefile
 	src/libs/Makefile
 	src/libs/zbxlog/Makefile
-	src/libs/zbxalgo/Makefile
-	src/libs/zbxmemory/Makefile
 	src/libs/zbxcrypto/Makefile
 	src/libs/zbxconf/Makefile
 	src/libs/zbxdbcache/Makefile

@@ -164,7 +164,7 @@ include_once('include/page_header.php');
 			$host_condition = "&only_hostid=".$only_hostid;
 		}
 		else if(isset($monitored_hosts)){
-			$host_condition = "&real_hosts=1";
+			$host_condition = "&monitored_hosts=1";
 		}
 
 		$btnSelect = new CButton('btn1',S_SELECT,

@@ -100,7 +100,7 @@ int	add_user_parameter(char *key, char *command)
 	for (i = 0; ; i++)
 	{
 		/* Add new parameters */
-		if (NULL == commands[i].key)
+		if (0 == commands[i].key)
 		{
 			commands[i].key = strdup(usr_cmd);
 			commands[i].flags = flag;
@@ -528,15 +528,11 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	if(flags & PROCESS_TEST)
 	{
 		printf("%s", usr_cmd);
-
 		if(commands[i].flags & CF_USEUPARAM)
 		{
-			printf("[]");
-			i = 2;
-		}
-		else
-			i = 0;
-
+			printf("[%s]", param);
+			i = (int)strlen(param)+2;
+		} else	i = 0;
 		i += (int)strlen(usr_cmd);
 
 #define COLUMN_2_X 45 /* max of spaces count */
@@ -563,6 +559,18 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	}
 
 	return ret;
+}
+
+static int	DBchk_double(double value)
+{
+	/* field with precision 16, scale 4 [NUMERIC(16,4)] */
+	register double	pg_min_numeric = (double)-1E12;
+	register double	pg_max_numeric = (double)1E12;
+
+	if (value <= pg_min_numeric || value >= pg_max_numeric)
+		return FAIL;
+
+	return SUCCEED;
 }
 
 int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c)
@@ -611,6 +619,8 @@ int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c
 		if (SUCCEED != is_double(c))
 			break;
 		value_double = atof(c);
+		if (SUCCEED != DBchk_double(value_double))
+			break;
 
 		SET_DBL_RESULT(result, value_double)
 		ret = SUCCEED;
@@ -704,6 +714,8 @@ static double* get_result_dbl_value(AGENT_RESULT *result)
 		if (SUCCEED != is_double(result->str))
 			return NULL;
 		value = atof(result->str);
+		if (SUCCEED != DBchk_double(value))
+			return NULL;
 
 		SET_DBL_RESULT(result, value)
 	}
@@ -715,6 +727,8 @@ static double* get_result_dbl_value(AGENT_RESULT *result)
 		if (SUCCEED != is_double(result->text))
 			return NULL;
 		value = atof(result->text);
+		if (SUCCEED != DBchk_double(value))
+			return NULL;
 
 		SET_DBL_RESULT(result, value)
 	}
@@ -808,14 +822,14 @@ static char** get_result_text_value(AGENT_RESULT *result)
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments:  better use definitions                                          *
+ * Comments:  beter use definitions                                           *
  *                GET_UI64_RESULT                                             *
  *                GET_DBL_RESULT                                              *
  *                GET_STR_RESULT                                              *
  *                GET_TEXT_RESULT                                             *
  *                GET_MSG_RESULT                                              *
  *                                                                            *
- *    AR_MESSAGE - skipped in conversion                                      *
+ *    AR_MESSAGE - skiped in conversion                                       *
  *                                                                            *
  ******************************************************************************/
 void	*get_result_value_by_type(AGENT_RESULT *result, int require_type)

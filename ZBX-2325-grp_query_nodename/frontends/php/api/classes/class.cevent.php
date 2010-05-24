@@ -94,7 +94,7 @@ class CEvent extends CZBXAPI{
 			'select_hosts'			=> null,
 			'select_items'			=> null,
 			'select_triggers'		=> null,
-			'countOutput'			=> null,
+			'count'					=> null,
 			'preservekeys'			=> null,
 
 			'sortfield'				=> '',
@@ -249,8 +249,8 @@ class CEvent extends CZBXAPI{
 		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['events'] = 'e.*';
 		}
-// countOutput
-		if(!is_null($options['countOutput'])){
+// count
+		if(!is_null($options['count'])){
 			$options['sortfield'] = '';
 			$sql_parts['select'] = array('COUNT(DISTINCT e.eventid) as rowscount');
 		}
@@ -304,9 +304,9 @@ class CEvent extends CZBXAPI{
 					$sql_where.
 				$sql_order;
 		$db_res = DBselect($sql, $sql_limit);
- //sdi($sql);
+// sdi($sql);
 		while($event = DBfetch($db_res)){
-			if($options['countOutput'])
+			if($options['count'])
 				$result = $event;
 			else{
 				$eventids[$event['eventid']] = $event['eventid'];
@@ -363,8 +363,7 @@ class CEvent extends CZBXAPI{
 		}
 
 
-Copt::memoryPick();
-		if(!is_null($options['countOutput'])){
+		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['count'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
@@ -637,8 +636,9 @@ Copt::memoryPick();
 						' AND objectid = '.$event['objectid'].
 						' AND value = '.$val.
 						' AND object = '.EVENT_OBJECT_TRIGGER.
-						' ORDER BY object desc, objectid desc, eventid DESC';
-					$first = DBfetch(DBselect($sql, 1));
+						' ORDER BY object desc, objectid desc, eventid DESC'.
+						' LIMIT 1';
+					$first = DBfetch(DBselect($sql));
 					$first_sql = $first ? ' AND e.eventid > '.$first['eventid'] : '';
 
 
@@ -648,8 +648,9 @@ Copt::memoryPick();
 						' AND objectid = '.$event['objectid'].
 						' AND value = '.$val.
 						' AND object = '.EVENT_OBJECT_TRIGGER.
-						' ORDER BY object ASC, objectid ASC, eventid ASC';
-					$last = DBfetch(DBselect($sql, 1));
+						' ORDER BY object ASC, objectid ASC, eventid ASC'.
+						' LIMIT 1';
+					$last = DBfetch(DBselect($sql));
 					$last_sql = $last ? ' AND e.eventid < '.$last['eventid'] : '';
 
 					

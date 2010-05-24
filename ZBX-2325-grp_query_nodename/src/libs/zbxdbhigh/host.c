@@ -1135,7 +1135,7 @@ static void	DBdelete_history_by_itemids(zbx_uint64_t *itemids, int itemids_num)
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
 #endif
 
-	housekeeperid = DBget_maxid_num("housekeeper", 7 * itemids_num);
+	housekeeperid = DBget_maxid_num("housekeeper", "housekeeperid", 7 * itemids_num);
 
 	for (i = 0; i < itemids_num; i++)
 	{
@@ -1818,7 +1818,7 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t host
 	{
 		res = SUCCEED;
 
-		*new_triggerid = DBget_maxid("triggers");
+		*new_triggerid = DBget_maxid("triggers", "triggerid");
 		new_expression = strdup(expression);
 
 		/* Loop: functions */
@@ -1838,7 +1838,7 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t host
 			{
 				ZBX_STR2UINT64(itemid, row[0]);
 
-				functionid = DBget_maxid("functions");
+				functionid = DBget_maxid("functions", "functionid");
 
 				search = zbx_dsprintf(NULL, "{%s}", row[1]);
 				replace = zbx_dsprintf(NULL, "{" ZBX_FS_UI64 "}", functionid);
@@ -2011,7 +2011,7 @@ static int	DBadd_template_dependencies_for_new_triggers(zbx_uint64_t *trids, int
 
 		if (0 != triggerid_down)
 		{
-			triggerdepid = DBget_maxid("trigger_depends");
+			triggerdepid = DBget_maxid("trigger_depends", "triggerdepid");
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 160,
 					"insert into trigger_depends"
@@ -2193,7 +2193,7 @@ static int	DBcopy_template_applications(zbx_uint64_t hostid,
 		}
 		else
 		{
-			applicationid = DBget_maxid("applications");
+			applicationid = DBget_maxid("applications", "applicationid");
 
 			name_esc = DBdyn_escape_string(row[1]);
 
@@ -2376,7 +2376,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 		}
 		else
 		{
-			itemid = DBget_maxid("items");
+			itemid = DBget_maxid("items","itemid");
 
 			key_esc = DBdyn_escape_string(row[2]);
 
@@ -2457,7 +2457,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 		if (SUCCEED == DBget_same_applications_by_itemid(hostid, itemid, template_itemid,
 				&appids, &appids_alloc, &appids_num))
 		{
-			itemappid = DBget_maxid_num("items_applications", appids_num);
+			itemappid = DBget_maxid_num("items_applications", "itemappid", appids_num);
 
 			for (i = 0; i < appids_num; i++)
 			{
@@ -2765,7 +2765,7 @@ static int	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
 	}
 	else
 	{
-		hst_graphid = DBget_maxid("graphs");
+		hst_graphid = DBget_maxid("graphs", "graphid");
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 1024,
 				"insert into graphs"
@@ -2782,7 +2782,7 @@ static int	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
 				percent_left, percent_right, (int)ymin_type, (int)ymax_type,
 				ymin_itemid, ymax_itemid);
 
-		hst_gitemid = DBget_maxid_num("graphs_items", gitems_num);
+		hst_gitemid = DBget_maxid_num("graphs_items", "gitemid", gitems_num);
 
 		for (i = 0; i < gitems_num; i++)
 		{
@@ -2977,7 +2977,7 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_uint64_t templateid)
 		goto clean;
 	}
 
-	hosttemplateid = DBget_maxid("hosts_templates");
+	hosttemplateid = DBget_maxid("hosts_templates", "hosttemplateid");
 
 	DBexecute("insert into hosts_templates"
 			" (hosttemplateid,hostid,templateid)"

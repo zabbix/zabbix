@@ -557,7 +557,7 @@ COpt::savesqlrequest(microtime(true)-$time_start,$query);
 					$result = array();
 					foreach($row as $key => $value){
 						$field_type = zbx_strtolower(oci_field_type($cursor,$key));
-						$value = (str_in_array($field_type,array('varchar','varchar2','blob','clob')) && is_null($value))? '':$value;
+						$value = (str_in_array($field_type,array('varchar','varchar2','blob','clob')) && is_null($value))?'':$value;
 
 						if(is_object($value) && (zbx_stristr($field_type, 'lob') !== false)){
 							$value = $value->load();
@@ -835,8 +835,8 @@ else {
 				return ' 1=0 ';
 		}
 
-		$in = 		$notin ? ' NOT IN ':' IN ';
-		$concat = 	$notin ? ' AND ':' OR ';
+		$in = 		$notin?' NOT IN ':' IN ';
+		$concat = 	$notin?' AND ':' OR ';
 
 		switch($DB['TYPE']) {
 			case 'SQLITE3':
@@ -848,13 +848,13 @@ else {
 				foreach($items as $id => $values){
 					if($string) $values = zbx_dbstr($values);
 
-					$condition.=!empty($condition) ? ')'.$concat.$fieldname.$in.'(':'';
+					$condition.=!empty($condition)?')'.$concat.$fieldname.$in.'(':'';
 					$condition.= implode(',',$values);
 				}
 				break;
 		}
 
-		if(zbx_empty($condition)) $condition = $string ? "'-1'":'-1';
+		if(zbx_empty($condition)) $condition = $string?"'-1'":'-1';
 
 	return ' ('.$fieldname.$in.'('.$condition.')) ';
 	}

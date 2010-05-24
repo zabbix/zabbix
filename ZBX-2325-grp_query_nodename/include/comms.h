@@ -70,11 +70,10 @@ int     zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, un
 
 #define ZBX_TCP_NEW_PROTOCOL	0x01
 
-#define zbx_tcp_send(s, d)		zbx_tcp_send_ext((s), (d), ZBX_TCP_NEW_PROTOCOL, 0)
-#define zbx_tcp_send_to(s, d, timeout)	zbx_tcp_send_ext((s), (d), ZBX_TCP_NEW_PROTOCOL, timeout)
-#define zbx_tcp_send_raw(s, d)		zbx_tcp_send_ext((s), (d), 0, 0)
+#define zbx_tcp_send(s, d)		zbx_tcp_send_ext((s), (d), ZBX_TCP_NEW_PROTOCOL)
+#define zbx_tcp_send_raw(s, d)	zbx_tcp_send_ext((s), (d), 0)
 
-int     zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags, int timeout);
+int     zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags);
 
 void    zbx_tcp_close(zbx_sock_t *s);
 
@@ -95,10 +94,9 @@ void    zbx_tcp_free(zbx_sock_t *s);
 
 #define ZBX_TCP_READ_UNTIL_CLOSE 0x01
 
-#define	zbx_tcp_recv(s, data) 			zbx_tcp_recv_ext(s, data, 0, 0)
-#define	zbx_tcp_recv_to(s, data, timeout) 	zbx_tcp_recv_ext(s, data, 0, timeout)
+#define	zbx_tcp_recv(s, data) 	zbx_tcp_recv_ext(s, data, 0)
 
-int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeout);
+int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags);
 
 char    *get_ip_by_socket(zbx_sock_t *s);
 int	zbx_tcp_check_security(

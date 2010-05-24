@@ -86,6 +86,15 @@
 		return str_replace(" ",SPACE,$str);
 	}
 
+	function url1_param($parameter){
+		if(isset($_REQUEST[$parameter])){
+			return "$parameter=".$_REQUEST[$parameter];
+		}
+		else{
+			return "";
+		}
+	}
+
 	function prepare_url(&$var, $varname=null){
 		$result = '';
 
@@ -96,8 +105,7 @@
 		else{
 			$result = '&'.$varname.'='.urlencode($var);
 		}
-
-	return $result;
+		return $result;
 	}
 
 	function url_param($parameter,$request=true,$name=null){

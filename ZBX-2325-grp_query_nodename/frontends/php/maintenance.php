@@ -74,7 +74,6 @@ include_once('include/page_header.php');
 		'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		'form_refresh'=>array(T_ZBX_STR, O_OPT, NULL,	NULL,	NULL)
 	);
-
 	check_fields($fields);
 	validate_sort_and_sortorder('name',ZBX_SORT_UP);
 
@@ -124,6 +123,7 @@ include_once('include/page_header.php');
 			$timeperiodid = add_timeperiod($timeperiod);
 			$timeperiodids[$timeperiodid] = $timeperiodid;
 		}
+
 
 		if(isset($_REQUEST['maintenanceid'])){
 
@@ -193,13 +193,14 @@ include_once('include/page_header.php');
 		$new_timeperiod = $_REQUEST['new_timeperiod'];
 
 		$new_timeperiod['start_date'] = zbxDateToTime($new_timeperiod['start_date']);
-
 // START TIME
 		$new_timeperiod['start_time'] = ($new_timeperiod['hour'] * 3600) + ($new_timeperiod['minute'] * 60);
+//--
 
 // PERIOD
 		$new_timeperiod['period'] = ($new_timeperiod['period_days'] * 86400) + ($new_timeperiod['period_hours'] * 3600) +
 				($new_timeperiod['period_minutes'] * 60);
+//--
 
 // DAYSOFWEEK
 		if(!isset($new_timeperiod['dayofweek'])){
@@ -320,7 +321,6 @@ include_once('include/page_header.php');
 		if(isset($_REQUEST['timeperiods'][$edit_timeperiodid])){
 			$_REQUEST['new_timeperiod'] = $_REQUEST['timeperiods'][$edit_timeperiodid];
 			$_REQUEST['new_timeperiod']['id'] = $edit_timeperiodid;
-			$_REQUEST['new_timeperiod']['start_date'] = date('YmdHi', $_REQUEST['timeperiods'][$edit_timeperiodid]['start_date']);
 		}
 	}
 
@@ -520,9 +520,6 @@ include_once('include/page_header.php');
 	}
 
 	$maintenance_wdgt->show();
-?>
-<?php
 
 include_once('include/page_footer.php');
-
 ?>

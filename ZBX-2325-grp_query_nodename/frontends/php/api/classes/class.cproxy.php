@@ -78,8 +78,6 @@ class CProxy extends CZBXAPI{
 			'output'					=> API_OUTPUT_REFER,
 			'count'						=> null,
 			'preservekeys'				=> null,
-			
-			'select_hosts'				=> null,
 
 			'sortfield'					=> '',
 			'sortorder'					=> '',
@@ -95,6 +93,7 @@ class CProxy extends CZBXAPI{
 
 
 // editable + PERMISSION CHECK
+
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
 		}
 		else{
@@ -148,7 +147,7 @@ class CProxy extends CZBXAPI{
 		}
 //-------
 
-		$proxyids = array();
+		$hostids = array();
 
 		$sql_parts['select'] = array_unique($sql_parts['select']);
 		$sql_parts['from'] = array_unique($sql_parts['from']);
@@ -176,7 +175,7 @@ class CProxy extends CZBXAPI{
 			if($options['count'])
 				$result = $proxy;
 			else{
-				$proxyids[$proxy['hostid']] = $proxy['hostid'];
+				// $hostids[$proxy['hostid']] = $proxy['hostid'];
 
 				$proxy['proxyid'] = $proxy['hostid'];
 				unset($proxy['hostid']);
@@ -186,10 +185,6 @@ class CProxy extends CZBXAPI{
 				}
 				else{
 					if(!isset($result[$proxy['proxyid']])) $result[$proxy['proxyid']]= array();
-					
-					if(!is_null($options['select_hosts']) && !isset($result[$proxy['proxyid']]['hosts'])){
-						$result[$proxy['proxyid']]['hosts'] = array();
-					}
 
 					$result[$proxy['proxyid']] += $proxy;
 				}
@@ -203,22 +198,6 @@ class CProxy extends CZBXAPI{
 
 // Adding Objects
 
-// select_hosts
-		if(!empty($proxyids)){
-			if(!is_null($options['select_hosts']) && str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
-				$obj_params = array(
-					'nodeids' => $nodeids,
-					'output' => $options['select_hosts'],
-					'proxyids' => $proxyids,
-					'preservekeys' => 1
-				);
-				$hosts = CHost::get($obj_params);
-
-				foreach($hosts as $host){
-					$result[$host['proxy_hostid']]['hosts'][] = $host;
-				}
-			}
-		}
 
 // removing keys (hash -> array)
 		if(is_null($options['preservekeys'])){

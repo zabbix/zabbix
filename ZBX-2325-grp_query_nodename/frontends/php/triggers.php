@@ -183,10 +183,7 @@ include_once('include/page_header.php');
 	else if(isset($_REQUEST['delete'])&&isset($_REQUEST['triggerid'])){
 		$result = false;
 
-		$options = array(
-			'triggerids' => $_REQUEST['triggerid'],
-			'output' => API_OUTPUT_EXTEND
-		);
+		$options = array('triggerids' => $_REQUEST['triggerid'], 'extendoutput'=>1);
 
 		$triggers = CTrigger::get($options);
 		if($trigger_data = reset($triggers)){

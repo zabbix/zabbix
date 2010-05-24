@@ -62,7 +62,7 @@ class CDHost extends CZBXAPI{
  * @param boolean $options['select_profile'] select Profile
  * @param int $options['count'] count Hosts, returned column name is rowscount
  * @param string $options['pattern'] search hosts by pattern in Host name
- * @param string $options['extendPattern'] search hosts by pattern in Host name, ip and DNS
+ * @param string $options['extend_pattern'] search hosts by pattern in Host name, ip and DNS
  * @param int $options['limit'] limit selection
  * @param string $options['sortfield'] field to sort by
  * @param string $options['sortorder'] sort order

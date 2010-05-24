@@ -23,7 +23,7 @@ require_once('include/config.inc.php');
 require_once('include/hosts.inc.php');
 require_once('include/items.inc.php');
 
-$page['title'] = 'S_LATEST_DATA';
+$page['title'] = S_LATEST_DATA;
 $page['file'] = 'latest.php';
 $page['hist_arg'] = array('groupid','hostid','show','select','open','applicationid');
 $page['scripts'] = array('effects.js');

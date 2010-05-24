@@ -384,25 +384,15 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$sub_menu_div->setAttribute('style','display: '.($menu_selected?'none;':'block;'));
 
 		$menu_divs[] = $sub_menu_div;
-		$search_div = null;
 
-		if(($page['file'] != 'index.php') && ($USER_DETAILS['userid'] > 0)){
-			$search_form = new CForm('search.php');
-			$search_form->setMethod('get');
-			$search_form->setAttribute('class','thin');
+		$search_form = new CForm('search.php');
+		$search_form->setMethod('get');
+		$search_form->setAttribute('class','thin');
+		$search_form->addItem(new CDiv(array(S_SEARCH_BIG.': ', new CTextBox('search',get_request('search',''),15))));
 
-			$searchBox = new CTextBox('search', get_request('search',''));
-			$searchBox->setAttribute('autocomplete', 'off');
-			$searchBox->setAttribute('style', 'width: 160px;');
-
-			$search_form->addItem(new CDiv(array(S_SEARCH_BIG.': ', $searchBox)));
-
-			$search_div = new CDiv($search_form);
-			$search_div->setAttribute('id','zbx_search');
-			$search_div->setAttribute('class','zbx_search');
-			
-			zbx_add_post_js("var sid = createSuggest('search'); $('search').focus(); $('search').select();");
-		}
+		$search_div = new CDiv($search_form);
+		$search_div->setAttribute('id','zbx_search');
+		$search_div->setAttribute('class','zbx_search');
 
 		$sub_menu_table->addRow(array($menu_divs, $search_div));
 
@@ -436,7 +426,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$tr->addItem($history);
 
 		$table->addRow($tr);
-		$table->show();
+		$table->Show();
 	}
 	else if(($page['type'] == PAGE_TYPE_HTML) && !defined('ZBX_PAGE_NO_MENU')) {
 		echo SBR;
