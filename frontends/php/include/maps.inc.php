@@ -2358,7 +2358,10 @@
 
 //		imagerectangle($im, $x_rec-2-1, $y_rec-1, $x_rec+$w+2+1, $y_rec+($oc*4)+$h+1, $black);
 //		imagefilledrectangle($im, $x_rec-2, $y_rec-2, $x_rec+$w+2, $y_rec+($oc*4)+$h-2, $white);
-
+			
+			$tmpDims = imageTextSize(8,0, str_replace("\n", '', $label_line));
+			$maxHeight = $tmpDims['height'];
+			
 			$num = 0;
 			$increasey = 0;
 			foreach($strings as $key => $str){
@@ -2366,6 +2369,7 @@
 				if(zbx_empty($str)) continue;
 
 				$dims = imageTextSize(8,0,$str);
+				$dims['height'] = $maxHeight;
 
 				$color = $label_color;
 
@@ -2375,7 +2379,6 @@
 					$x_label = $x_rec + $w - $dims['width'];
 				else
 					$x_label = $x_rec;
-
 
 				imagefilledrectangle(
 					$im,
