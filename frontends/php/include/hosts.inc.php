@@ -19,13 +19,7 @@
 **/
 ?>
 <?php
-require_once('include/graphs.inc.php');
-require_once('include/triggers.inc.php');
-require_once('include/items.inc.php');
-require_once('include/httptest.inc.php');
-
-/* HOST GROUP functions */
-
+// HOST GROUP functions
 	function update_host_groups_by_groupid($groupid,$hosts=array()){
 		$options = array(
 				'groupids'=>$groupid,

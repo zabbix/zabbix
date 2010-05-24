@@ -6,6 +6,9 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-1510] fixed history view bound by minute issue (Aly)
+ - [ZBX-2339] fixed row height for type of information "text" (Aly)
+ - [ZBX-2201] improved history page (Aly)
  - [ZBX-2359] fixed graph lines for fixed Y axis with items draw functions "All" (Aly)
  - [ZBXNEXT-335] links started with http(s) are now clickable in hosts inventory (Vedmak)
  - [ZBX-1537] fixed multiple displaying of same host, from which were deleted graph, when deleting mass graphs (Maxim Andruhovich / AM)
