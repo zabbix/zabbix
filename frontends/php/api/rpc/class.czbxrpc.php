@@ -49,13 +49,13 @@ class czbxrpc{
 				$sessionid = null;
 
 				$options = array(
-							'users' => $params['user'],
-							'extendoutput' => 1,
-							'get_access' => 1
-						);
+					'users' => $params['user'],
+					'output' => API_OUTPUT_EXTEND,
+					'get_access' => 1
+				);
 				$users = CUser::get($options);
 				$user = reset($users);
-				if($user['api_access'] != GROUP_API_ACCESS_ENABLED){
+				if(!$user || $user['api_access'] != GROUP_API_ACCESS_ENABLED){
 					self::$result = array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'No API access');
 					return self::$result;
 				}
@@ -66,16 +66,17 @@ class czbxrpc{
 				return self::$result;
 			}
 			else if(!empty($sessionid)){
-				if(!CUser::checkAuthentication(array('sessionid' => $sessionid))){
+				if(!CUser::simpleAuth($sessionid)){
 					self::$result = array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'Not authorized');
 					return self::$result;
 				}
 
 				$options = array(
-						'userids' => $USER_DETAILS['userid'],
-						'extendoutput' => 1,
-						'get_access' => 1
-					);
+					'userids' => $USER_DETAILS['userid'],
+					'output' => API_OUTPUT_EXTEND,
+					'get_access' => 1
+				);
+
 				$users = CUser::get($options);
 				$user = reset($users);
 				if($user['api_access'] != GROUP_API_ACCESS_ENABLED){

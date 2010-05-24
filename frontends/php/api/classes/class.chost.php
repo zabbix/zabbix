@@ -114,7 +114,8 @@ class CHost extends CZBXAPI{
 			'nopermissions'				=> null,
 // filter
 			'filter'					=> null,
-			'pattern'					=> '',
+			'startPattern'				=> null,
+			'pattern'					=> null,
 			'extendPattern'				=> null,
 
 // OutPut
@@ -455,7 +456,10 @@ class CHost extends CZBXAPI{
 
 // pattern
 		if(!zbx_empty($options['pattern'])){
-			if($options['extendPattern']){
+			if($options['startPattern']){
+				$sql_parts['where']['host'] = ' UPPER(h.host) LIKE '.zbx_dbstr(zbx_strtoupper($options['pattern']).'%');
+			}
+			else if($options['extendPattern']){
 				$sql_parts['where'][] = ' ( '.
 											'UPPER(h.host) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%').' OR '.
 											'h.ip LIKE '.zbx_dbstr('%'.$options['pattern'].'%').' OR '.
@@ -466,6 +470,7 @@ class CHost extends CZBXAPI{
 				$sql_parts['where']['host'] = ' UPPER(h.host) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
 			}
 		}
+
 
 // filter
 		if(!is_null($options['filter'])){
