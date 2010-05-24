@@ -286,6 +286,31 @@ static int	DCget_unreachable_nextcheck(const ZBX_DC_ITEM *item, const ZBX_DC_HOS
 	{
 		case ITEM_TYPE_ZABBIX:
 			if (0 != host->errors_from)
+				return DCget_reachable_nextcheck(item, host->disable_until);
+			break;
+		case ITEM_TYPE_SNMPv1:
+		case ITEM_TYPE_SNMPv2c:
+		case ITEM_TYPE_SNMPv3:
+			if (0 != host->snmp_errors_from)
+				return DCget_reachable_nextcheck(item, host->snmp_disable_until);
+			break;
+		case ITEM_TYPE_IPMI:
+			if (0 != host->ipmi_errors_from)
+				return DCget_reachable_nextcheck(item, host->ipmi_disable_until);
+			break;
+		default:
+			/* nothing to do */;
+	}
+
+	return DCget_reachable_nextcheck(item, time(NULL));
+}
+
+static int	DCget_disable_until(const ZBX_DC_ITEM *item, const ZBX_DC_HOST *host)
+{
+	switch (item->type)
+	{
+		case ITEM_TYPE_ZABBIX:
+			if (0 != host->errors_from)
 				return host->disable_until;
 			break;
 		case ITEM_TYPE_SNMPv1:
@@ -303,6 +328,29 @@ static int	DCget_unreachable_nextcheck(const ZBX_DC_ITEM *item, const ZBX_DC_HOS
 	}
 
 	return 0;
+}
+
+static void	DCincrease_disable_until(const ZBX_DC_ITEM *item, ZBX_DC_HOST *host)
+{
+	switch (item->type)
+	{
+		case ITEM_TYPE_ZABBIX:
+			if (0 != host->errors_from)
+				host->disable_until += CONFIG_TIMEOUT;
+			break;
+		case ITEM_TYPE_SNMPv1:
+		case ITEM_TYPE_SNMPv2c:
+		case ITEM_TYPE_SNMPv3:
+			if (0 != host->snmp_errors_from)
+				host->snmp_disable_until += CONFIG_TIMEOUT;
+			break;
+		case ITEM_TYPE_IPMI:
+			if (0 != host->ipmi_errors_from)
+				host->ipmi_disable_until += CONFIG_TIMEOUT;
+			break;
+		default:
+			/* nothing to do */;
+	}
 }
 
 static void	*DCfind_id(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *found)
@@ -1560,6 +1608,54 @@ unlock:
 
 /******************************************************************************
  *                                                                            *
+ * Function: DCconfig_get_poller_nextcheck                                    *
+ *                                                                            *
+ * Purpose: Get nextcheck for selected poller                                 *
+ *                                                                            *
+ * Parameters: poller_type - [IN] poller type (ZBX_POLLER_TYPE_...)           *
+ *             now - [IN] current time                                        *
+ *                                                                            *
+ * Return value: nextcheck or FAIL if no items for selected poller            *
+ *                                                                            *
+ * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	DCconfig_get_poller_nextcheck(unsigned char poller_type)
+{
+	const char			*__function_name = "DCconfig_get_poller_nextcheck";
+
+	int				nextcheck;
+	zbx_binary_heap_t		*queue;
+	const zbx_binary_heap_elem_t	*min;
+	const ZBX_DC_ITEM		*dc_item;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() poller_type:%d", __function_name, (int)poller_type);
+
+	LOCK_CACHE;
+
+	queue = &config->queues[poller_type];
+
+	if (FAIL == zbx_binary_heap_empty(queue))
+	{
+		min = zbx_binary_heap_find_min(queue);
+		dc_item = (const ZBX_DC_ITEM *)min->data;
+
+		nextcheck = dc_item->nextcheck;
+	}
+	else
+		nextcheck = FAIL;
+
+	UNLOCK_CACHE;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, nextcheck);
+
+	return nextcheck;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DCconfig_get_poller_items                                        *
  *                                                                            *
  * Purpose: Get array of items for selected poller                            *
@@ -1578,25 +1674,27 @@ unlock:
  *           DCrequeue_reachable_item() or DCrequeue_unreachable_item().      *
  *                                                                            *
  ******************************************************************************/
-int	DCconfig_get_poller_items(unsigned char poller_type, int now, DC_ITEM *items, int max_items)
+int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max_items)
 {
 	const char		*__function_name = "DCconfig_get_poller_items";
 
-	int			num = 0;
+	int			now, num = 0;
 	zbx_binary_heap_t	*queue;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() poller_type:%d", __function_name, (int)poller_type);
 
 	LOCK_CACHE;
 
+	now = time(NULL);
+
 	queue = &config->queues[poller_type];
 
 	while (num < max_items && FAIL == zbx_binary_heap_empty(queue))
 	{
-		int				nextcheck;
+		int				disable_until;
 		const zbx_binary_heap_elem_t	*min;
 		ZBX_DC_ITEM			*dc_item;
-		const ZBX_DC_HOST		*dc_host;
+		ZBX_DC_HOST			*dc_host;
 
 		min = zbx_binary_heap_find_min(queue);
 		dc_item = (ZBX_DC_ITEM *)min->data;
@@ -1621,12 +1719,15 @@ int	DCconfig_get_poller_items(unsigned char poller_type, int now, DC_ITEM *items
 			continue;
 		}
 
-		if ((nextcheck = DCget_unreachable_nextcheck(dc_item, dc_host)) > now)
+		if ((disable_until = DCget_disable_until(dc_item, dc_host)) > now)
 		{
-			dc_item->nextcheck = nextcheck;
+			dc_item->nextcheck = DCget_unreachable_nextcheck(dc_item, dc_host);
 			DCupdate_item_queue(dc_item);
 			continue;
 		}
+
+		if (0 != disable_until)
+			DCincrease_disable_until(dc_item, dc_host);
 
 		DCget_host(&items[num].host, dc_host);
 		DCget_item(&items[num], dc_item);

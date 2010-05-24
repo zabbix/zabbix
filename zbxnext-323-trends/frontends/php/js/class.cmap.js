@@ -2584,7 +2584,16 @@ deleteForm_selement: function(e){
 	var selementid = this.selementForm.selementid.value;	
 	var selement = this.selements[selementid];
 	
-	if(Confirm('Delete element "'+selement.elementName+'"?')){
+	var typeName;
+	switch(selement.elementtype-0){
+		case 0: typeName = locale['S_HOST']; break;
+		case 1: typeName = locale['S_MAP']; break;
+		case 2: typeName = locale['S_TRIGGER']; break;
+		case 3: typeName = locale['S_HOST_GROUP']; break;
+		case 4: typeName = locale['S_IMAGE']; break;
+	}
+
+	if(Confirm(locale['S_REMOVE']+' '+typeName+'?')){
 		this.remove_selement(selementid, true);
 		this.hideForm(e);
 	}
