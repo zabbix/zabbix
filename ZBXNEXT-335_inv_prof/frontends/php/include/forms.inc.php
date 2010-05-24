@@ -6190,7 +6190,7 @@
 		if($row = DBfetch($result)) {
 			foreach($row as $key => $value) {
 				if(!zbx_empty($value)){
-					$frmHostP->addRow($table_titles[$key], new CSpan(text2array_with_links($value)));
+					$frmHostP->addRow($table_titles[$key], new CSpan(zbx_str2links($value)));
 				}
 			}
 		}
@@ -6230,7 +6230,7 @@
 		if($row = DBfetch($result)) {
 			foreach($row as $key => $value) {
 				if(!zbx_empty($value)) {
-					$frmHostPA->addRow($table_titles[$key], new CSpan(text2array_with_links($value)));
+					$frmHostPA->addRow($table_titles[$key], new CSpan(zbx_str2links($value)));
 				}
 			}
 		}

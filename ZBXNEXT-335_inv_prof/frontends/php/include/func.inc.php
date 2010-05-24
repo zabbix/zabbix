@@ -1134,7 +1134,7 @@ function zbx_array_mintersect($keys, $array){
 	return $result;
 }
 
-function text2array_with_links($text){
+function zbx_str2links($text){
 // $value = preg_replace('#(https?|ftp|file)://[^\n\t\r ]+#u', '<a href="$0">$0</a>', $value);
 	$result = array();
 	if(empty($text)) return $result;

@@ -194,17 +194,17 @@
 				new CLink($host['host'],'?hostid='.$host['hostid'].url_param('groupid').'&prof_type='.$_REQUEST['prof_type']),
 				$host_groups);
 			if(0 == $_REQUEST['prof_type']){
-				$row[] = text2array_with_links($host['profile']['name']);
-				$row[] = text2array_with_links($host['profile']['os']);
-				$row[] = text2array_with_links($host['profile']['serialno']);
-				$row[] = text2array_with_links($host['profile']['tag']);
-				$row[] = text2array_with_links($host['profile']['macaddress']);
+				$row[] = zbx_str2links($host['profile']['name']);
+				$row[] = zbx_str2links($host['profile']['os']);
+				$row[] = zbx_str2links($host['profile']['serialno']);
+				$row[] = zbx_str2links($host['profile']['tag']);
+				$row[] = zbx_str2links($host['profile']['macaddress']);
 			}
 			else{
-				$row[] = text2array_with_links($host['profile_ext']['device_os_short']);
-				$row[] = text2array_with_links($host['profile_ext']['device_hw_arch']);
-				$row[] = text2array_with_links($host['profile_ext']['device_type']);
-				$row[] = text2array_with_links($host['profile_ext']['device_status']);
+				$row[] = zbx_str2links($host['profile_ext']['device_os_short']);
+				$row[] = zbx_str2links($host['profile_ext']['device_hw_arch']);
+				$row[] = zbx_str2links($host['profile_ext']['device_type']);
+				$row[] = zbx_str2links($host['profile_ext']['device_status']);
 			}
 
 			$table->addRow($row);
