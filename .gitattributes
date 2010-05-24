@@ -415,7 +415,10 @@ misc/init.d/tru64/zabbix_server -text
 /splint -text
 src/libs/zbxalgo/Makefile.am -text
 src/libs/zbxalgo/algodefs.c -text
+src/libs/zbxalgo/binaryheap.c -text
+src/libs/zbxalgo/hashmap.c -text
 src/libs/zbxalgo/hashset.c -text
+src/libs/zbxalgo/vector.c -text
 src/libs/zbxcommon/file.c -text
 src/libs/zbxcommon/time.c -text
 src/libs/zbxdbcache/Makefile.am -text
