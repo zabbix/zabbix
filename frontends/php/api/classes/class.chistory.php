@@ -63,7 +63,7 @@ class CHistory extends CZBXAPI{
 			'limit' => null);
 
 		$def_options = array(
-			'history'			=> ITEM_VALUE_TYPE_UINT64,
+			'history'				=> ITEM_VALUE_TYPE_UINT64,
 			'nodeids'				=> null,
 			'hostids'				=> null,
 			'itemids'				=> null,
@@ -149,7 +149,7 @@ class CHistory extends CZBXAPI{
 				$sql_parts['select']['hostid'] = 'i.hostid';
 			}
 
-			$sql_parts['from']['i'] = 'items i';
+			$sql_parts['from']['items'] = 'items i';
 			$sql_parts['where']['i'] = DBcondition('i.hostid', $options['hostids']);
 			$sql_parts['where']['hi'] = 'h.itemid=i.itemid';
 
@@ -182,7 +182,7 @@ class CHistory extends CZBXAPI{
 		if(!is_null($options['pattern'])){
 			$sql_parts['where']['value'] = ' UPPER(h.value) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
 		}
-// exPattern
+// excludePattern
 		if(!is_null($options['excludePattern'])){
 			$sql_parts['where']['value'] = ' UPPER(h.value) NOT LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
 		}

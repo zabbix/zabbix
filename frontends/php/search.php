@@ -106,11 +106,11 @@ include_once('include/page_header.php');
 // FIND Hosts
 	$params = array(
 		'nodeids'=> get_current_nodeid(true),
-		'extendoutput' => true,
 		'pattern' => $search,
 		'extendPattern' => true,
 		'limit' => $rows_per_page,
-		'select_groups' => 1
+		'select_groups' => API_OUTPUT_EXTEND,
+		'output' => API_OUTPUT_EXTEND,
 	);
 	$db_hosts = CHost::get($params);
 
@@ -141,8 +141,8 @@ include_once('include/page_header.php');
 		'extendPattern' => true,
 		'countOutput' => 1,
 	);
-	$hosts_count = CHost::get($params);
-	$overalCount = $hosts_count['rowscount'];
+
+	$overalCount = CHost::get($params);
 	$viewCount = count($hosts);
 
 	$header = array(
@@ -240,8 +240,8 @@ include_once('include/page_header.php');
 		'pattern' => $search,
 		'count' => 1,
 	);
-	$groups_count = CHostGroup::get($params);
 
+	$groups_count = CHostGroup::get($params);
 	$overalCount = $groups_count['rowscount'];
 	$viewCount = count($hostGroups);
 
@@ -294,11 +294,11 @@ include_once('include/page_header.php');
 	if($admin){
 		$params = array(
 			'nodeids'=> get_current_nodeid(true),
-			'extendoutput' => 1,
-			'select_groups' => 1,
 			'pattern' => $search,
-			'limit' => $rows_per_page,
-			'sortfield' => 'host'
+			'output' => API_OUTPUT_EXTEND,
+			'select_groups' => API_OUTPUT_EXTEND,
+			'sortfield' => 'host',
+			'limit' => $rows_per_page
 		);
 
 		$db_templates = CTemplate::get($params);
@@ -316,14 +316,13 @@ include_once('include/page_header.php');
 		$rw_templates = zbx_toHash($rw_templates,'templateid');
 
 		$params = array(
-					'nodeids'=> get_current_nodeid(true),
-					'pattern' => $search,
-					'countOutput' => 1,
-					'editable' => 1
-					);
-		$hosts_count = CTemplate::get($params);
+			'nodeids'=> get_current_nodeid(true),
+			'pattern' => $search,
+			'countOutput' => 1,
+			'editable' => 1
+		);
 
-		$overalCount = $hosts_count['rowscount'];
+		$overalCount = CTemplate::get($params);
 		$viewCount = count($templates);
 
 		$header = array(
