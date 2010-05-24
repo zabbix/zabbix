@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBX-2359] fixed graph lines for fixed Y axis with items draw functions "All" (Aly)
  - [ZBXNEXT-335] links started with http(s) are now clickable in hosts inventory (Vedmak)
  - [ZBX-1537] fixed multiple displaying of same host, from which were deleted graph, when deleting mass graphs (Maxim Andruhovich / AM)
  - [ZBX-1263] fixed misleading log messages that referenced agent for any kind of unsupported item (asaveljevs)
