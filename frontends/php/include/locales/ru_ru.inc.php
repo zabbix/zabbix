@@ -632,7 +632,6 @@
 	'S_HIDE_UNKNOWN'=>			'Скрыть неизвестные',
 	'S_LOG_FILES_SMALL'=>			'Скрыть неизвестное',
 	'S_REMOVE_SELECTED'=>			'Удалить выбранные',
-	'S_LOG_FILES_LIST'=>			'Список файлов логов',
 	'S_SHOW_SELECTED'=>			'Показать выбранное',
 	'S_HIDE_SELECTED'=>			'Не показывать выбранное',
 	'S_MARK_SELECTED'=>			'Пометить выбранное',

@@ -1086,11 +1086,11 @@
 			$time = zbxDateToTime($_REQUEST['stime']);
 
 			if(($time+$_REQUEST['period']) > time()) {
-				$_REQUEST['stime'] = date('YmdHi', time()-$_REQUEST['period']);
+				$_REQUEST['stime'] = date('YmdHis', time()-$_REQUEST['period']);
 			}
 		}
 		else{
-			$_REQUEST['stime'] = date('YmdHi', time()-$_REQUEST['period']);
+			$_REQUEST['stime'] = date('YmdHis', time()-$_REQUEST['period']);
 		}
 
 	return $_REQUEST['period'];

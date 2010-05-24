@@ -81,9 +81,6 @@
 		$post_script.='}'."\n";
 //		$post_script.= 'try{ chkbxRange.init(); } catch(e){ throw("Checkbox extension failed!");}';
 
-
-		insert_js($post_script);
-
 		if(!defined('ZBX_PAGE_NO_MENU') && !defined('ZBX_PAGE_NO_FOOTER')){
 			$table = new CTable(NULL,"page_footer");
 			$table->setCellSpacing(0);
@@ -103,7 +100,9 @@
 			$table->show();
 		}
 
-		echo "</body>\n";
+		insert_js($post_script);
+
+		echo "</body>\n";		
 		echo "</html>\n";
 	}
 
