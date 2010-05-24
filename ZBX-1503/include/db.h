@@ -563,9 +563,8 @@ int     DBupdate_trigger_value(zbx_uint64_t triggerid, int type, int value,
 
 int	DBget_items_count(void);
 int	DBget_items_unsupported_count(void);
-int	DBget_history_count(void);
-int	DBget_history_str_count(void);
-int	DBget_trends_count(void);
+int	DBget_history_count(const char *table_name);
+int	DBget_trends_count(const char *table_name);
 int	DBget_triggers_count(void);
 int	DBget_queue_count(void);
 double	DBget_requiredperformance(void);

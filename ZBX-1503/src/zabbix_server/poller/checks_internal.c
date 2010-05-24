@@ -83,28 +83,25 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		i = DBget_items_unsupported_count();
 		SET_UI64_RESULT(result, i);
 	}
-	else if (0 == strcmp(tmp, "history"))		/* zabbix["history"] */
+	else if (0 == strcmp(tmp, "history") ||			/* zabbix["history"] */
+			0 == strcmp(tmp, "history_log") ||	/* zabbix["history_log"] */
+			0 == strcmp(tmp, "history_str") ||	/* zabbix["history_str"] */
+			0 == strcmp(tmp, "history_text") ||	/* zabbix["history_text"] */
+			0 == strcmp(tmp, "history_uint"))	/* zabbix["history_uint"] */
 	{
 		if (1 != nparams)
 			goto not_supported;
 
-		i = DBget_history_count();
+		i = DBget_history_count(tmp);
 		SET_UI64_RESULT(result, i);
 	}
-	else if (0 == strcmp(tmp, "history_str"))	/* zabbix["history_str"] */
+	else if (0 == strcmp(tmp, "trends") ||			/* zabbix["trends"] */
+			0 == strcmp(tmp, "trends_uint"))	/* zabbix["trends_uint"] */
 	{
 		if (1 != nparams)
 			goto not_supported;
 
-		i = DBget_history_str_count();
-		SET_UI64_RESULT(result, i);
-	}
-	else if (0 == strcmp(tmp, "trends"))		/* zabbix["trends"] */
-	{
-		if (1 != nparams)
-			goto not_supported;
-
-		i = DBget_trends_count();
+		i = DBget_trends_count(tmp);
 		SET_UI64_RESULT(result, i);
 	}
 	else if (0 == strcmp(tmp, "queue"))		/* zabbix["queue"] */
