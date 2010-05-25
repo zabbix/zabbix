@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2432] fixed warning message in templates when template has linked templates (Maxim Andruhovich / AM)
  - [ZBX-2325] improved groups\hosts selecting for filter dropdowns (Vedmak)
  - [ZBX-2433] fixed time not updated on slides when now is selected (Vedmak)
  - [ZBX-2452] fixed parsing of integer values from SNMP's Hex-STRING (asaveljevs)
