@@ -71,6 +71,7 @@ class CGraph extends CZBXAPI{
 // output
 			'output'				=> API_OUTPUT_REFER,
 			'select_hosts'			=> null,
+			'select_groups'			=> null,
 			'select_templates'		=> null,
 			'select_items'			=> null,
 			'select_graph_items'	=> null,
@@ -92,6 +93,9 @@ class CGraph extends CZBXAPI{
 
 			if(!is_null($options['select_hosts'])){
 				$options['select_hosts'] = API_OUTPUT_EXTEND;
+			}
+			if(!is_null($options['select_groups'])){
+				$options['select_groups'] = API_OUTPUT_EXTEND;
 			}
 			if(!is_null($options['select_templates'])){
 				$options['select_templates'] = API_OUTPUT_EXTEND;
@@ -405,6 +409,28 @@ COpt::memoryPick();
 				unset($gitem['graphs']);
 				foreach($ggraphs as $num => $graph){
 					$result[$graph['graphid']]['gitems'][] = $gitem;
+				}
+			}
+		}
+
+// Adding Hostgroups
+		if(!is_null($options['select_groups'])){
+			if(is_array($options['select_groups']) || str_in_array($options['select_groups'], $subselects_allowed_outputs)){
+				$obj_params = array(
+					'nodeids' => $nodeids,
+					'output' => $options['select_groups'],
+					'graphids' => $graphids,
+					'nopermissions' => 1,
+					'preservekeys' => 1
+				);
+				$groups = CHostGroup::get($obj_params);
+
+				foreach($groups as $groupis => $group){
+					$ggraphs = $group['graphs'];
+					unset($group['graphs']);
+					foreach($ggraphs as $num => $graph){
+						$result[$graph['graphid']]['groups'][] = $group;
+					}
 				}
 			}
 		}
