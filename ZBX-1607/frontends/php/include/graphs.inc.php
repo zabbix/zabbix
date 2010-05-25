@@ -1388,4 +1388,21 @@
 
 	return $result;
 	}
+	
+	function DashedLine($image,$x1,$y1,$x2,$y2,$color){
+		// Style for dashed lines
+		//$style = array($color, $color, $color, $color, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT);
+		if(!is_array($color)) $style = array($color, $color, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT);
+		else $style = $color;
+
+		ImageSetStyle($image, $style);
+		ImageLine($image,$x1,$y1,$x2,$y2,IMG_COLOR_STYLED);
+	}
+
+	function DashedRectangle($image,$x1,$y1,$x2,$y2,$color){
+		DashedLine($image, $x1,$y1,$x1,$y2,$color);
+		DashedLine($image, $x1,$y2,$x2,$y2,$color);
+		DashedLine($image, $x2,$y2,$x2,$y1,$color);
+		DashedLine($image, $x2,$y1,$x1,$y1,$color);
+	}
 ?>
