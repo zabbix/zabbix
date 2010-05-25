@@ -246,22 +246,23 @@ include_once('include/page_header.php');
 					$selements = get_request('selements', '[]');
 					$selements = $json->decode($selements, true);
 
-					if(!empty($selements)){
-						$selement = reset($selements);
-
-//						$selement['image'] = get_base64_icon($element);
-						$selement['image'] = get_selement_iconid($selement);
-						$selement['label_expanded'] = expand_map_element_label_by_data($selement);
-
-						$action = '';
-						$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.add_selement('.zbx_jsvalue($selement).',1);';
-//						$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.update_mapimg();';
-
-						print($action);
-					}
-					else{
+					if(empty($selements)){
 						print('ZBX_SYSMAPS['.$cmapid.'].map.info("'.S_GET_IMG_ELEMENT_DATA_NOT_FOUND.'"); ');
+						break;
 					}
+
+					$selement = reset($selements);
+					$selement['sysmapid'] = $sysmapid;
+
+//					$selement['image'] = get_base64_icon($element);
+					$selement['image'] = get_selement_iconid($selement);
+					$selement['label_expanded'] = expand_map_element_label_by_data($selement);
+
+					$action = '';
+					$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.add_selement('.zbx_jsvalue($selement).',1);';
+//					$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.update_mapimg();';
+
+					print($action);
 				break;
 				case 'new_selement':
 					$default_icon = get_default_image(false);
