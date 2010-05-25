@@ -24,8 +24,6 @@ require_once('include/hosts.inc.php');
 
 class CGraphDraw{
 	public function __construct($type = GRAPH_TYPE_NORMAL){
-		bcscale(6);
-		
 		$this->stime = null;
 		$this->fullSizeX = null;
 		$this->fullSizeY = null;
