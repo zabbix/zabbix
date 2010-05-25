@@ -511,12 +511,12 @@ include_once('include/page_header.php');
 			'hostids' => $hostids,
 			'output' => array('hostid', 'host')
 		);
-		$delHosts = CHost::get($options);
+		//$delHosts = CHost::get($options);
 
 		$go_result = CHost::delete($hosts);
-		foreach($delHosts as $hnum => $host){
+		/*foreach($delHosts as $hnum => $host){
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, 'Host ['.$host['host'].']');
-		}
+		}*/
 
 		$go_result = DBend($go_result);
 

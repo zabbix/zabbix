@@ -5814,22 +5814,22 @@
 	function insert_host_profile_form(){
 
 		$frmHostP = new CFormTable(S_HOST_PROFILE);
-		$frmHostP->setHelp("web.host_profile.php");
 
 		$table_titles = array(
-				'devicetype' => S_DEVICE_TYPE, 'name' => S_NAME, 'os' => S_OS, 'serialno' => S_SERIALNO,
-				'tag' => S_TAG, 'macaddress' => S_MACADDRESS, 'hardware' => S_HARDWARE, 'software' => S_SOFTWARE,
-				'contact' => S_CONTACT, 'location' => S_LOCATION, 'notes' => S_NOTES);
+			'devicetype' => S_DEVICE_TYPE, 'name' => S_NAME, 'os' => S_OS, 'serialno' => S_SERIALNO,
+			'tag' => S_TAG, 'macaddress' => S_MACADDRESS, 'hardware' => S_HARDWARE, 'software' => S_SOFTWARE,
+			'contact' => S_CONTACT, 'location' => S_LOCATION, 'notes' => S_NOTES
+		);
 
 		$sql_fields = implode(', ', array_keys($table_titles)); //generate string of fields to get from DB
 
 		$sql = 'SELECT '.$sql_fields.' FROM hosts_profiles WHERE hostid='.$_REQUEST['hostid'];
 		$result = DBselect($sql);
 
-		if($row=DBfetch($result)) {
+		if($row = DBfetch($result)) {
 			foreach($row as $key => $value) {
-				if(!zbx_empty($value)) {
-					$frmHostP->addRow($table_titles[$key], new CTextBox($key, $value, 61, 'yes'));
+				if(!zbx_empty($value)){
+					$frmHostP->addRow($table_titles[$key], new CSpan(zbx_str2links($value)));
 				}
 			}
 		}
@@ -5837,14 +5837,14 @@
 			$frmHostP->addSpanRow(S_PROFILE_FOR_THIS_HOST_IS_MISSING,"form_row_c");
 		}
 		$frmHostP->addItemToBottomRow(new CButtonCancel(url_param('groupid').url_param('prof_type')));
-	return $frmHostP;
+		
+		return $frmHostP;
 	}
 
 // BEGIN: HOSTS PROFILE EXTENDED Section
 	function insert_host_profile_ext_form(){
 
 		$frmHostPA = new CFormTable(S_EXTENDED_HOST_PROFILE);
-		$frmHostPA->setHelp('web.host_profile_alt.php');
 
 		$table_titles = array(
 				'device_alias' => S_DEVICE_ALIAS, 'device_type' => S_DEVICE_TYPE, 'device_chassis' => S_DEVICE_CHASSIS, 'device_os' => S_DEVICE_OS,
@@ -5864,13 +5864,12 @@
 				'poc_2_screen' => S_POC_2_SCREEN, 'poc_2_notes' => S_POC_2_NOTES);
 
 		$sql_fields = implode(', ', array_keys($table_titles)); //generate string of fields to get from DB
+		$result = DBselect('SELECT '.$sql_fields.' FROM hosts_profiles_ext WHERE hostid='.$_REQUEST['hostid']);
 
-		$result=DBselect('SELECT '.$sql_fields.' FROM hosts_profiles_ext WHERE hostid='.$_REQUEST['hostid']);
-
-		if($row=DBfetch($result)) {
+		if($row = DBfetch($result)) {
 			foreach($row as $key => $value) {
 				if(!zbx_empty($value)) {
-					$frmHostPA->addRow($table_titles[$key], new CTextBox('ext_host_profiles['.$key.']', $value, 61, 'yes'));
+					$frmHostPA->addRow($table_titles[$key], new CSpan(zbx_str2links($value)));
 				}
 			}
 		}

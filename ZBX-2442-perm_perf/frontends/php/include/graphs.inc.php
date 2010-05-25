@@ -687,7 +687,8 @@
 			$host_list[$graphid] = array();
 			$db_hosts = get_hosts_by_graphid($graphid);
 			while($db_host = DBfetch($db_hosts)){
-				$host_list[$graphid] = '"'.$db_host['host'].'"';
+				if(!isset($host_list[$graphid][$db_host['host']]))
+					$host_list[$graphid][$db_host['host']] = true;
 			}
 		}
 
@@ -711,7 +712,7 @@
 		if($result){
 			foreach($graphs as $graphid => $graph){
 				if(isset($host_list[$graphid]))
-					info('Graph "'.$graph['name'].'" deleted from hosts '.implode(',',$host_list));
+					info(sprintf(S_GRAPH_DELETED_FROM_HOSTS, $graph['name'], count($host_list[$graphid]) > 1 ? 's' : '').': '.'"'.implode('","', array_keys($host_list[$graphid])).'"');
 			}
 		}
 
@@ -991,11 +992,11 @@
 			$time = zbxDateToTime($_REQUEST['stime']);
 
 			if(($time+$_REQUEST['period']) > time()) {
-				$_REQUEST['stime'] = date('YmdHi', time()-$_REQUEST['period']);
+				$_REQUEST['stime'] = date('YmdHis', time()-$_REQUEST['period']);
 			}
 		}
 		else{
-			$_REQUEST['stime'] = date('YmdHi', time()-$_REQUEST['period']);
+			$_REQUEST['stime'] = date('YmdHis', time()-$_REQUEST['period']);
 		}
 
 	return $_REQUEST['period'];

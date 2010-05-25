@@ -65,7 +65,7 @@
 		$triggerids = CTrigger::get($options);
 
 		$options = array(
-			'count' => 1,
+			'countOutput' => 1,
 			'triggerids' => zbx_objectValues($triggerids, 'triggerid'),
 			'object' => EVENT_OBJECT_TRIGGER,
 			'acknowledged' => 0,
@@ -230,31 +230,52 @@ return $events;
  *
  * author: Aly
  */
-function get_next_event($row,$hide_unknown=0){
-	$sql_cond=($hide_unknown != 0)?' AND e.value<>'.TRIGGER_VALUE_UNKNOWN:'';
+function get_next_event($event, $event_list=array()){
 
-	if((TRIGGER_VALUE_TRUE == $row['value']) && (TRIGGER_MULT_EVENT_ENABLED == $row['type'])){
+	if(!empty($event_list)){
+		$next_event = false;
+		if((TRIGGER_VALUE_TRUE == $event['value']) && (TRIGGER_MULT_EVENT_ENABLED == $event['type'])){
+			foreach($event_list as $e){
+				if(($e['objectid'] == $event['objectid']) && ($e['eventid'] > $event['eventid'])
+						&& ($e['value'] != TRIGGER_VALUE_UNKNOWN)){
+					$next_event = $e;
+				}
+			}
+		}
+		else{
+			foreach($event_list as $e){
+				if(($e['objectid'] == $event['objectid']) && ($e['eventid'] > $event['eventid'])
+						&& ($e['value'] != TRIGGER_VALUE_UNKNOWN) && ($e['value'] != $event['value'])){
+					$next_event = $e;
+				}
+			}
+		}
+
+		if($next_event) return $next_event;
+	}
+
+
+	if((TRIGGER_VALUE_TRUE == $event['value']) && (TRIGGER_MULT_EVENT_ENABLED == $event['type'])){
 		$sql = 'SELECT e.eventid, e.value, e.clock '.
 			' FROM events e'.
-			' WHERE e.objectid='.$row['objectid'].
-				' AND e.eventid > '.$row['eventid'].
+			' WHERE e.objectid='.$event['objectid'].
+				' AND e.eventid > '.$event['eventid'].
 				' AND e.object='.EVENT_OBJECT_TRIGGER.
-				' AND e.value='.$row['value'].
+				' AND e.value<>'.TRIGGER_VALUE_UNKNOWN.
 			' ORDER BY e.object, e.objectid, e.eventid';
 	}
 	else{
 		$sql = 'SELECT e.eventid, e.value, e.clock '.
 			' FROM events e'.
-			' WHERE e.objectid='.$row['objectid'].
-				' AND e.eventid > '.$row['eventid'].
+			' WHERE e.objectid='.$event['objectid'].
+				' AND e.eventid > '.$event['eventid'].
 				' AND e.object='.EVENT_OBJECT_TRIGGER.
-				' AND e.value<>'.$row['value'].
-				$sql_cond.
+				' AND e.value<>'.$event['value'].
+				' AND e.value<>'.TRIGGER_VALUE_UNKNOWN.
 			' ORDER BY e.object, e.objectid, e.eventid';
 	}
-	$rez = DBfetch(DBselect($sql,1));
 
-return $rez;
+	return DBfetch(DBselect($sql,1));
 }
 
 // author: Aly

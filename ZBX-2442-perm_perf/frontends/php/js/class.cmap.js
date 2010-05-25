@@ -993,7 +993,7 @@ show_menu: function(e){
 	if(this.menu_active != 1) return true;
 	
 	var e = e || window.event;
-	var element = eventTarget(e);
+	var element = Event.element(e);
 	var element_id = element.id.split('_');
 	var selementid = element_id[(element_id.length - 1)];
 
@@ -2431,12 +2431,9 @@ updateForm_selementByType: function(e, multi){
 			this.selementForm.typeDOM.elementName.style.display = 'none';
 			this.selementForm.typeDOM.iconid_off.style.display = display_style;
 
+// initiats icons hide
+			this.selementForm.advanced_icons.checked = false;
 			this.selementForm.typeDOM.advanced_icons.style.display = 'none';
-			this.selementForm.typeDOM.iconid_on.style.display = 'none';
-			this.selementForm.typeDOM.iconid_unknown.style.display = 'none';
-			this.selementForm.typeDOM.iconid_maintenance.style.display = 'none';
-			this.selementForm.typeDOM.iconid_disabled.style.display = 'none';
-
 		break;
 	}
 	
@@ -2584,7 +2581,16 @@ deleteForm_selement: function(e){
 	var selementid = this.selementForm.selementid.value;	
 	var selement = this.selements[selementid];
 	
-	if(Confirm('Delete element "'+selement.elementName+'"?')){
+	var typeName;
+	switch(selement.elementtype-0){
+		case 0: typeName = locale['S_HOST']; break;
+		case 1: typeName = locale['S_MAP']; break;
+		case 2: typeName = locale['S_TRIGGER']; break;
+		case 3: typeName = locale['S_HOST_GROUP']; break;
+		case 4: typeName = locale['S_IMAGE']; break;
+	}
+
+	if(Confirm(locale['S_REMOVE']+' '+typeName+'?')){
 		this.remove_selement(selementid, true);
 		this.hideForm(e);
 	}

@@ -420,10 +420,12 @@
 				'select_hosts' => API_OUTPUT_EXTEND,
 				'select_triggers' => API_OUTPUT_EXTEND,
 				'select_items' => API_OUTPUT_EXTEND,
+				'sortfield' => 'eventid',
+				'sortorder' => ZBX_SORT_DOWN,
 				'nopermissions' => 1
 			);
 			$events = CEvent::get($options);
-			order_result($events, 'eventid', ZBX_SORT_DOWN);
+//			order_result($events, 'eventid', ZBX_SORT_DOWN);
 
 			foreach($events as $enum => $event){
 				$trigger = reset($event['triggers']);
@@ -432,10 +434,11 @@
 				$event['type'] = $trigger['type'];
 
 				$event += $trigger;
-
-				$event['duration'] = zbx_date2age($event['clock']);
-				if($next_event = get_next_event($event,$_REQUEST['hide_unknown'])){
-					$event['duration'] = zbx_date2age($event['clock'],$next_event['clock']);
+				if($next_event = get_next_event($event, $events)){
+					$event['duration'] = zbx_date2age($event['clock'], $next_event['clock']);
+				}
+				else{
+					$event['duration'] = zbx_date2age($event['clock']);
 				}
 
 				$event['value_col'] = new CCol(trigger_value2str($event['value']), get_trigger_value_style($event['value']));
