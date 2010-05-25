@@ -497,8 +497,7 @@ include_once('include/page_header.php');
 		$form = new CForm('triggers.php', 'post');
 		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
 		if($pageFilter->hostsSelected){
-
-	// Header Host
+// Header Host
 			if($_REQUEST['hostid'] > 0){
 				$tbl_header_host = get_header_host_table($_REQUEST['hostid'], array('items', 'applications', 'graphs'));
 				$triggers_wdgt->addItem($tbl_header_host);
@@ -507,46 +506,49 @@ include_once('include/page_header.php');
 			$form->setName('triggers');
 			$form->addVar('hostid', $_REQUEST['hostid']);
 
-
 			$table->setHeader(array(
 				new CCheckBox('all_triggers',NULL,"checkAll('".$form->getName()."','all_triggers','g_triggerid');"),
 				make_sorting_header(S_SEVERITY,'priority'),
 				make_sorting_header(S_STATUS,'status'),
 				($_REQUEST['hostid'] > 0)?NULL:S_HOST,
-	//			($_REQUEST['hostid'] > 0)?NULL:make_sorting_header(S_HOST,'host'),
 				make_sorting_header(S_NAME,'description'),
 				S_EXPRESSION,
-				S_ERROR));
+				S_ERROR
+			));
 
 			$sortfield = getPageSortField('description');
 			$sortorder = getPageSortOrder();
 			$options = array(
 				'editable' => 1,
-				'select_hosts' => API_OUTPUT_EXTEND,
-				'select_items' => API_OUTPUT_EXTEND,
-				'select_functions' => API_OUTPUT_EXTEND,
-				'select_dependencies' => API_OUTPUT_EXTEND,
-				'output' => API_OUTPUT_EXTEND,
+				'output' => API_OUTPUT_SHORTEN,
 				'sortfield' => $sortfield,
 				'sortorder' => $sortorder,
 				'limit' => ($config['search_limit']+1)
 			);
-
 			if($showdisabled == 0){
 				$options['status'] = TRIGGER_STATUS_ENABLED;
 			}
-
 			if($pageFilter->hostid > 0)
 				$options['hostids'] = $pageFilter->hostid;
-			else
-				$options['hostids'] = array_keys($pageFilter->hosts);
+			else if($pageFilter->groupid > 0)
+				$options['groupids'] = $pageFilter->groupid;
 
 			$triggers = CTrigger::get($options);
 
-	// sorting && paginf
-			order_result($triggers, $sortfield, $sortorder);
+// sorting && paginf
 			$paging = getPagingLine($triggers);
-	//---------
+//---------
+
+			$options = array(
+				'triggerids' => zbx_objectValues($triggers, 'triggerid'),
+				'output' => API_OUTPUT_EXTEND,
+				'select_hosts' => API_OUTPUT_EXTEND,
+				'select_items' => API_OUTPUT_EXTEND,
+				'select_functions' => API_OUTPUT_EXTEND,
+				'select_dependencies' => API_OUTPUT_EXTEND,
+			);
+			$triggers = CTrigger::get($options);
+			order_result($triggers, $sortfield, $sortorder);
 
 			$realHosts = getParentHostsByTriggers($triggers);
 

@@ -65,9 +65,9 @@ class CPageFilter{
 			if(isset($options['graphid'])){
 				$this->_updateGHbyGraph($options);
 			}
-			else if(isset($options['itemid'])){
+//			else if(isset($options['itemid'])){
 //				$this->updateGHbyItem();
-			}
+//			}
 		}
 
 
@@ -101,17 +101,18 @@ class CPageFilter{
 
 	private function _initGroups($groupid, $options){
 
-		$def_ptions = array(
+		$def_options = array(
 			'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
 			'output' => API_OUTPUT_EXTEND,
 		);
-		$options = zbx_array_merge($def_ptions, $options);
+		$options = zbx_array_merge($def_options, $options);
 		$groups = CHostGroup::get($options);
 
 		$this->data['groups'] = array();
 		foreach($groups as $group){
 			$this->data['groups'][$group['groupid']] = $group['name'];
 		}
+
 		if(is_null($groupid) && ($this->config['DDRemember'])){
 			if($this->config['select_latest']){
 				$groupid = CProfile::get(self::GROUP_LATEST_IDX);
@@ -120,6 +121,7 @@ class CPageFilter{
 				$groupid = CProfile::get($this->_profileIdx['groups']);
 			}
 		}
+
 		if(is_null($groupid)){
 			$groupid = 0;
 		}
@@ -163,6 +165,7 @@ class CPageFilter{
 					$hostid = CProfile::get($this->_profileIdx['hosts']);
 				}
 			}
+
 			if(is_null($hostid)){
 				$hostid = 0;
 			}
@@ -224,62 +227,35 @@ class CPageFilter{
 	}
 
 	public function getHostsCB($withNode=false){
-		$cmb = new CComboBox('hostid', $this->hostid,'javascript: submit();');
-
-		$hosts = $this->hosts;
-		if($withNode){
-			foreach($hosts as $hostid => $host){
-				$hosts[$hostid] = get_node_name_by_elid($hostid, null, ': ') . $host;
-			}
-		}
-		order_result($hosts, 'host');
-		$hosts = array(0 => ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_NONE) ? S_NOT_SELECTED_SMALL : S_ALL_SMALL) + $hosts;
-	
-		foreach($hosts as $hostid => $name){
-			$cmb->addItem($hostid, $name);
-		}
-
-		return $cmb;
+		return $this->_getCB('hostid', $this->hostid, $this->hosts, 'host', $withNode);
 	}
 
 	public function getGroupsCB($withNode=false){
-		$cmb = new CComboBox('groupid', $this->groupid,'javascript: submit();');
-
-		$groups = $this->groups;
-		if($withNode){
-			foreach($groups as $groupid => $name){
-				$groups[$groupid] = get_node_name_by_elid($groupid, null, ': ') . $name;
-			}
-		}
-		order_result($groups, 'name');
-		$groups = array(0 => ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_NONE) ? S_NOT_SELECTED_SMALL : S_ALL_SMALL) + $groups;
-
-		foreach($groups as $groupid => $name){
-			$cmb->addItem($groupid, $name);
-		}
-
-		return $cmb;
+		return $this->_getCB('groupid', $this->groupid, $this->groups, 'name', $withNode);
 	}
 
 	public function getGraphsCB($withNode=false){
-		$cmb = new CComboBox('graphid', $this->graphid,'javascript: submit();');
+		return $this->_getCB('graphid', $this->graphid, $this->graphs, 'name', $withNode);
+	}
 
-		$graphs = $this->graphs;
+	private function _getCB($cbname, $selectedid, $items, $sortcolumn, $withNode){
+		$cmb = new CComboBox($cbname, $selectedid,'javascript: submit();');
+
 		if($withNode){
-			foreach($graphs as $graphid => $name){
-				$graphs[$graphid] = get_node_name_by_elid($graphid, null, ': ') . $name;
+			foreach($items as $id => $item){
+				$items[$id] = get_node_name_by_elid($id, null, ': ') . $item;
 			}
 		}
-		order_result($graphs, 'name');
-		$graphs = array(0 => S_SELECT_GRAPH_DOT_DOT_DOT) + $graphs;
-	
-		foreach($graphs as $graphid => $name){
-			$cmb->addItem($graphid, $name);
+
+		order_result($items, $sortcolumn);
+		$items = array(0 => ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_NONE) ? S_NOT_SELECTED_SMALL : S_ALL_SMALL) + $items;
+
+		foreach($items as $id => $name){
+			$cmb->addItem($id, $name);
 		}
 
 		return $cmb;
 	}
-
 }
 
 ?>

@@ -202,6 +202,7 @@ include_once('include/page_header.php');
 		),
 		'hosts' => array(
 			'editable' => 1,
+			'templated_hosts' => 1,
 		),
 		'hostid' => get_request('hostid', null),
 		'groupid' => get_request('groupid', null),
@@ -294,11 +295,10 @@ include_once('include/page_header.php');
 
 		$frmApp->show();
 	}
-	else {
+	else{
 		$app_wdgt = new CWidget();
 
 		$form = new CForm(null, 'get');
-
 		$form->addItem(array(S_GROUP.SPACE,$pageFilter->getGroupsCB()));
 		$form->addItem(array(SPACE.S_HOST.SPACE,$pageFilter->getHostsCB()));
 
@@ -308,105 +308,105 @@ include_once('include/page_header.php');
 		$app_wdgt->addHeader(S_APPLICATIONS_BIG, $form);
 		$app_wdgt->addHeader($numrows);
 
-// Header Host
-		if($_REQUEST['hostid'] > 0){
-			$tbl_header_host = get_header_host_table($_REQUEST['hostid'], array('items', 'triggers', 'graphs'));
-			$app_wdgt->addItem($tbl_header_host);
-		}
+		$form = new CForm();
+		$table = new CTableInfo('...');
 
-// table applications
-		$sortfield = getPageSortField('name');
-		$sortorder = getPageSortOrder();
-		$options = array(
-			'select_items' => 1,
-			'extendoutput' => 1,
-			'editable' => 1,
-			'expand_data' => 1,
-			'sortfield' => $sortfield,
-			'sortorder' => $sortorder,
-			'limit' => ($config['search_limit']+1)
-		);
 		if($pageFilter->hostsSelected){
+// Header Host
+			if($_REQUEST['hostid'] > 0){
+				$tbl_header_host = get_header_host_table($_REQUEST['hostid'], array('items', 'triggers', 'graphs'));
+				$app_wdgt->addItem($tbl_header_host);
+			}
+
+			$form->setName('applications');
+			$form->addVar('groupid', $_REQUEST['groupid']);
+			$form->addVar('hostid', $_REQUEST['hostid']);
+
+			$table->setHeader(array(
+				new CCheckBox('all_applications',NULL,"checkAll('".$form->getName()."','all_applications','applications');"),
+				(($_REQUEST['hostid'] > 0) ? null : S_HOST),
+				make_sorting_header(S_APPLICATION, 'name'),
+				S_SHOW
+			));
+
+
+			$sortfield = getPageSortField('name');
+			$sortorder = getPageSortOrder();
+			$options = array(
+				'output' => API_OUTPUT_SHORTEN,
+				'editable' => 1,
+				'sortfield' => $sortfield,
+				'sortorder' => $sortorder,
+				'limit' => ($config['search_limit']+1)
+			);
 			if($pageFilter->hostid > 0)
 				$options['hostids'] = $pageFilter->hostid;
-			else
-				$options['hostids'] = array_keys($pageFilter->hosts);
-		}
-		else{
-			$options['hostids'] = array();
-		}
-		$applications = CApplication::get($options);
+			else if($pageFilter->groupid > 0)
+				$options['groupids'] = $pageFilter->groupid;
+			$applications = CApplication::get($options);
 
-		$form = new CForm();
-		$form->setName('applications');
-		$form->addVar('groupid', $_REQUEST['groupid']);
-		$form->addVar('hostid', $_REQUEST['hostid']);
+			$paging = getPagingLine($applications);
 
-		$table = new CTableInfo();
-		$table->setHeader(array(
-			new CCheckBox('all_applications',NULL,"checkAll('".$form->getName()."','all_applications','applications');"),
-			(($_REQUEST['hostid'] > 0) ? null : S_HOST),
-			make_sorting_header(S_APPLICATION, 'name'),
-			S_SHOW
-		));
+			$options = array(
+				'applicationids' => zbx_objectValues($applications, 'applicationid'),
+				'output' => API_OUTPUT_EXTEND,
+				'select_items' => API_OUTPUT_REFER,
+				'expand_data' => 1,
+			);
+			$applications = CApplication::get($options);
 
-// sorting
-		order_result($applications, $sortfield, $sortorder);
-		$paging = getPagingLine($applications);
-//---------
+			order_result($applications, $sortfield, $sortorder);
 
-		foreach($applications as $anum => $application){
-			$applicationid = $application['applicationid'];
+			foreach($applications as $anum => $application){
+				$applicationid = $application['applicationid'];
 
-			if($application['templateid']==0){
-				$name = new CLink($application['name'],'applications.php?form=update&applicationid='.$applicationid);
+				if($application['templateid']==0){
+					$name = new CLink($application['name'],'applications.php?form=update&applicationid='.$applicationid);
+				}
+				else{
+					$template_host = get_realhost_by_applicationid($application['templateid']);
+					$name = array(
+						new CLink($template_host['host'], 'applications.php?hostid='.$template_host['hostid']),
+						':',
+						$application['name']
+					);
+				}
+				$table->addRow(array(
+					new CCheckBox('applications['.$applicationid.']',NULL,NULL,$applicationid),
+					(($_REQUEST['hostid'] > 0) ? null : $application['host']),
+					$name,
+					array(new CLink(S_ITEMS,'items.php?hostid='.$_REQUEST['hostid'].'&filter_set=1&filter_application='.urlencode($application['name'])),
+					SPACE.'('.count($application['items']).')')
+				));
 			}
-			else{
-				$template_host = get_realhost_by_applicationid($application['templateid']);
-				$name = array(
-					new CLink($template_host['host'], 'applications.php?hostid='.$template_host['hostid']),
-					':',
-					$application['name']
-				);
-			}
-			$table->addRow(array(
-				new CCheckBox('applications['.$applicationid.']',NULL,NULL,$applicationid),
-				(($_REQUEST['hostid'] > 0) ? null : $application['host']),
-				$name,
-				array(new CLink(S_ITEMS,'items.php?hostid='.$_REQUEST['hostid'].'&filter_set=1&filter_application='.urlencode($application['name'])),
-				SPACE.'('.count($application['items']).')')
-			));
+
+	// goBox
+			$goBox = new CComboBox('go');
+			$goOption = new CComboItem('activate', S_ACTIVATE_SELECTED);
+			$goOption->setAttribute('confirm', S_ACTIVATE_SELECTED_APPLICATIONS);
+			$goBox->addItem($goOption);
+
+			$goOption = new CComboItem('disable', S_DISABLE_SELECTED);
+			$goOption->setAttribute('confirm', S_DISABLE_SELECTED_APPLICATIONS);
+			$goBox->addItem($goOption);
+
+			$goOption = new CComboItem('delete', S_DELETE_SELECTED);
+			$goOption->setAttribute('confirm', S_DELETE_SELECTED_APPLICATIONS);
+			$goBox->addItem($goOption);
+
+			// goButton name is necessary!!!
+			$goButton = new CButton('goButton',S_GO.' (0)');
+			$goButton->setAttribute('id','goButton');
+
+			zbx_add_post_js('chkbxRange.pageGoName = "applications";');
+
+			$footer = get_table_header(new CCol(array($goBox, $goButton)));
+	//----
+
+			$table = array($paging,$table,$paging,$footer);
 		}
-
-// goBox
-		$goBox = new CComboBox('go');
-		$goOption = new CComboItem('activate', S_ACTIVATE_SELECTED);
-		$goOption->setAttribute('confirm', S_ACTIVATE_SELECTED_APPLICATIONS);
-		$goBox->addItem($goOption);
-
-		$goOption = new CComboItem('disable', S_DISABLE_SELECTED);
-		$goOption->setAttribute('confirm', S_DISABLE_SELECTED_APPLICATIONS);
-		$goBox->addItem($goOption);
-		
-		$goOption = new CComboItem('delete', S_DELETE_SELECTED);
-		$goOption->setAttribute('confirm', S_DELETE_SELECTED_APPLICATIONS);
-		$goBox->addItem($goOption);
-		
-		// goButton name is necessary!!!
-		$goButton = new CButton('goButton',S_GO.' (0)');
-		$goButton->setAttribute('id','goButton');
-
-		zbx_add_post_js('chkbxRange.pageGoName = "applications";');
-
-		$footer = get_table_header(new CCol(array($goBox, $goButton)));
-//----
-
-// PAGING FOOTER
-		$table = array($paging,$table,$paging,$footer);
-//---------
 
 		$form->addItem($table);
-
 		$app_wdgt->addItem($form);
 		$app_wdgt->show();
 	}

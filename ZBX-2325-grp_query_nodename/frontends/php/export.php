@@ -343,8 +343,6 @@ include_once('include/page_header.php');
 			);
 			if($pageFilter->groupid > 0)
 				$options['groupids'] = $pageFilter->groupid;
-			else
-				$options['groupids'] = array_keys($pageFilter->groups);
 			
 			$hosts_all = CHost::get($options);
 

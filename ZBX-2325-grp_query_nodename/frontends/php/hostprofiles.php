@@ -95,13 +95,14 @@
 		if($pageFilter->groupsSelected){
 			if($pageFilter->groupid > 0)
 				$options['groupids'] = $pageFilter->groupid;
-			else
-				$options['groupids'] = array_keys($pageFilter->groups);
+		}
+		else{
+			$options['groupids'] = array();
 		}
 		$hosts = CHost::get($options);
 
 
-	// unset hosts without profiles, and copy some profile fileds to the uppers array level for sorting
+// unset hosts without profiles, and copy some profile fileds to the uppers array level for sorting
 		$pr = ($_REQUEST['prof_type'] == 0) ? 'profile' : 'profile_ext';
 		$profile = array();
 		foreach($hosts as $num => $host){

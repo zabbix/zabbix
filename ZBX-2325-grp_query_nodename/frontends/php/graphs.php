@@ -475,8 +475,8 @@ include_once('include/page_header.php');
 		if($pageFilter->hostsSelected){
 			if($pageFilter->hostid > 0)
 				$options['hostids'] = $pageFilter->hostid;
-			else
-				$options['hostids'] = array_keys($pageFilter->hosts);
+			else if($pageFilter->groupid > 0)
+				$options['groupids'] = $pageFilter->groupid;
 		}
 		else{
 			$options['hostids'] = array();

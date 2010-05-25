@@ -257,7 +257,6 @@
 	$till = $from + $effectiveperiod;
 
 	if(empty($firstEvent)){
-		$events_wdgt->addItem($table);
 		$starttime = null;
 	}
 	else{
@@ -382,8 +381,8 @@
 			if($pageFilter->hostsSelected){
 				if($pageFilter->hostid > 0)
 					$trigOpt['hostids'] = $pageFilter->hostid;
-				else
-					$trigOpt['hostids'] = array_keys($pageFilter->hosts);
+				else if($pageFilter->groupid > 0)
+					$trigOpt['groupids'] = $pageFilter->groupid;
 			}
 			else{
 				$trigOpt['hostids'] = array();
@@ -496,13 +495,13 @@
 		}
 
 		$table = array($paging, $table, $paging);
-		$events_wdgt->addItem($table);
-
 		
 		$jsmenu = new CPUMenu(null,170);
 		$jsmenu->InsertJavaScript();
 	}
-	
+
+	$events_wdgt->addItem($table);
+
 // NAV BAR
 	$timeline = array(
 		'period' => $effectiveperiod,
