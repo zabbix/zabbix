@@ -433,23 +433,20 @@ include_once('include/page_header.php');
 		}
 	}
 
-	$params=array();
-	$options = array('only_current_node','not_proxy_hosts');
-	foreach($options as $option) $params[$option] = 1;
-
-	$PAGE_GROUPS = get_viewed_groups(PERM_READ_WRITE, $params);
-	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_WRITE, $PAGE_GROUPS['selected'], $params);
-
-	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
-
-	$available_groups = $PAGE_GROUPS['groupids'];
-	$available_hosts = $PAGE_HOSTS['hostids'];
+	$options = array(
+		'groups' => array('not_proxy_hosts' => 1, 'editable' => 1),
+		'hosts' => array('templated_hosts' => 1, 'editable' => 1),
+		'groupid' => get_request('groupid', null),
+		'hostid' => get_request('hostid', null),
+	);
+	$pageFilter = new CPageFilter($options);
+	$_REQUEST['groupid'] = $pageFilter->groupid;
+	$_REQUEST['hostid'] = $pageFilter->hostid;
 
 ?>
 <?php
 
-	$form = new CForm();
-	$form->setMethod('get');
+	$form = new CForm(null, 'get');
 
 // Config
 	$cmbConf = new CComboBox('config','triggers.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
@@ -483,21 +480,10 @@ include_once('include/page_header.php');
 		$triggers_wdgt = new CWidget();
 
 // Triggers Header
-		$r_form = new CForm();
-		$r_form->setMethod('get');
+		$r_form = new CForm(null, 'get');
 
-		$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
-		$cmbHosts = new CComboBox('hostid',$PAGE_HOSTS['selected'],'javascript: submit();');
-
-		foreach($PAGE_GROUPS['groups'] as $groupid => $name){
-			$cmbGroups->addItem($groupid, $name);
-		}
-		foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
-			$cmbHosts->addItem($hostid, $name);
-		}
-
-		$r_form->addItem(array(S_GROUP.SPACE,$cmbGroups));
-		$r_form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
+		$r_form->addItem(array(S_GROUP.SPACE,$pageFilter->getGroupsCB()));
+		$r_form->addItem(array(SPACE.S_HOST.SPACE,$pageFilter->getHostsCB()));
 
 		$numrows = new CDiv();
 		$numrows->setAttribute('name','numrows');
@@ -508,210 +494,204 @@ include_once('include/page_header.php');
 		$triggers_wdgt->addHeader($numrows, array('[ ',$tr_link,' ]'));
 // ----------------
 
-
-// Header Host
-		if($PAGE_HOSTS['selected'] > 0){
-			$tbl_header_host = get_header_host_table($PAGE_HOSTS['selected'], array('items', 'applications', 'graphs'));
-			$triggers_wdgt->addItem($tbl_header_host);
-		}
-
-		$form = new CForm('triggers.php');
-		$form->setName('triggers');
-		$form->setMethod('post');
-		$form->addVar('hostid', $_REQUEST['hostid']);
-
+		$form = new CForm('triggers.php', 'post');
 		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
-		$table->setHeader(array(
-			new CCheckBox('all_triggers',NULL,"checkAll('".$form->getName()."','all_triggers','g_triggerid');"),
-			make_sorting_header(S_SEVERITY,'priority'),
-			make_sorting_header(S_STATUS,'status'),
-			($_REQUEST['hostid'] > 0)?NULL:S_HOST,
-//			($_REQUEST['hostid'] > 0)?NULL:make_sorting_header(S_HOST,'host'),
-			make_sorting_header(S_NAME,'description'),
-			S_EXPRESSION,
-			S_ERROR));
-
-		$sortfield = getPageSortField('description');
-		$sortorder = getPageSortOrder();
-		$options = array(
-			'editable' => 1,
-			'select_hosts' => API_OUTPUT_EXTEND,
-			'select_items' => API_OUTPUT_EXTEND,
-			'select_functions' => API_OUTPUT_EXTEND,
-			'select_dependencies' => API_OUTPUT_EXTEND,
-			'filter' => array(),
-			'output' => API_OUTPUT_EXTEND,
-			'sortfield' => $sortfield,
-			'sortorder' => $sortorder,
-			'limit' => ($config['search_limit']+1)
-		);
-
-		if($showdisabled == 0){
-		    $options['filter']['status'] = TRIGGER_STATUS_ENABLED;
-		}
-
-		if(($PAGE_HOSTS['selected'] > 0) || empty($PAGE_HOSTS['hostids'])){
-			$options['hostids'] = $PAGE_HOSTS['selected'];
-		}
-		if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
-			$options['groupids'] = $PAGE_GROUPS['selected'];
-		}
-
-		$triggers = CTrigger::get($options);
-
-// sorting && paginf
-		order_result($triggers, $sortfield, $sortorder);
-		$paging = getPagingLine($triggers);
-//---------
-
-		$realHosts = getParentHostsByTriggers($triggers);
-
-		foreach($triggers as $tnum => $trigger){
-			$triggerid = $trigger['triggerid'];
-
-			$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
-			$trigger['items'] = zbx_toHash($trigger['items'], 'itemid');
-			$trigger['functions'] = zbx_toHash($trigger['functions'], 'functionid');
-
-			$description = array();
-			if($trigger['templateid'] > 0){
-				if(!isset($realHosts[$triggerid])){
-					$description[] = new CSpan('HOST','unknown');
-					$description[] = ':';
-				}
-				else{
-					$real_hosts = $realHosts[$triggerid];
-					$real_host = reset($real_hosts);
-					$description[] = new CLink($real_host['host'], 'triggers.php?&hostid='.$real_host['hostid'], 'unknown');
-					$description[] = ':';
-				}
+		if($pageFilter->hostsSelected){
+// Header Host
+			if($_REQUEST['hostid'] > 0){
+				$tbl_header_host = get_header_host_table($_REQUEST['hostid'], array('items', 'applications', 'graphs'));
+				$triggers_wdgt->addItem($tbl_header_host);
 			}
 
-			$description[] = new CLink(expandTriggerDescription($trigger), 'triggers.php?form=update&triggerid='.$triggerid);
+			$form->setName('triggers');
+			$form->addVar('hostid', $_REQUEST['hostid']);
 
-//add dependencies{
-			$deps = $trigger['dependencies'];
-			if(count($deps) > 0){
-				$description[] = array(BR(), bold(S_DEPENDS_ON.' : '));
-				foreach($deps as $dnum => $dep_trigger) {
-					$description[] = BR();
-
-					$hosts = get_hosts_by_triggerid($dep_trigger['triggerid']);
-					while($host = DBfetch($hosts)){
-						$description[] = $host['host'];
-						$description[] = ', ';
-					}
-
-					array_pop($description);
-					$description[] = ' : ';
-					$description[] = expand_trigger_description_by_data($dep_trigger);
-				}
-			}
-// } add dependencies
-
-			if($trigger['status'] != TRIGGER_STATUS_UNKNOWN) $trigger['error'] = '';
-
-			$templated = false;
-			foreach($trigger['hosts'] as $hostid => $host){
-				$templated |= (HOST_STATUS_TEMPLATE == $host['status']);
-			}
-
-			if(!zbx_empty($trigger['error']) && !$templated){
-				$error = new CDiv(SPACE,'iconerror');
-				$error->setHint($trigger['error'], '', 'on');
-			}
-			else{
-				$error = new CDiv(SPACE,'iconok');
-			}
-
-			switch($trigger['priority']){
-				case 0: $priority = S_NOT_CLASSIFIED; break;
-				case 1: $priority = new CCol(S_INFORMATION, 'information'); break;
-				case 2: $priority = new CCol(S_WARNING, 'warning'); break;
-				case 3: $priority = new CCol(S_AVERAGE, 'average'); break;
-				case 4: $priority = new CCol(S_HIGH, 'high'); break;
-				case 5: $priority = new CCol(S_DISASTER, 'disaster'); break;
-				default: $priority = $trigger['priority'];
-			}
-
-			$status_link = 'triggers.php?go='.(($trigger['status'] == TRIGGER_STATUS_DISABLED) ? 'activate' : 'disable').
-				'&g_triggerid%5B%5D='.$triggerid;
-
-			if($trigger['status'] == TRIGGER_STATUS_DISABLED){
-				$status = new CLink(S_DISABLED, $status_link, 'disabled');
-			}
-			else if($trigger['status'] == TRIGGER_STATUS_UNKNOWN){
-				$status = new CLink(S_UNKNOWN, $status_link, 'unknown');
-			}
-			else if($trigger['status'] == TRIGGER_STATUS_ENABLED){
-				$status = new CLink(S_ENABLED, $status_link, 'enabled');
-			}
-
-			$hosts = null;
-			if($_REQUEST['hostid'] == 0){
-				$hosts = array();
-				foreach($trigger['hosts'] as $hostid => $host){
-					if(!empty($hosts)) $hosts[] = ', ';
-					$hosts[] = $host['host'];
-				}
-			}
-
-			$table->addRow(array(
-				new CCheckBox('g_triggerid['.$triggerid.']', NULL, NULL, $triggerid),
-				$priority,
-				$status,
-				$hosts,
-				$description,
-				triggerExpression($trigger,1),
-//				explode_exp($trigger['expression'], 1),
-				$error
+			$table->setHeader(array(
+				new CCheckBox('all_triggers',NULL,"checkAll('".$form->getName()."','all_triggers','g_triggerid');"),
+				make_sorting_header(S_SEVERITY,'priority'),
+				make_sorting_header(S_STATUS,'status'),
+				($_REQUEST['hostid'] > 0)?NULL:S_HOST,
+				make_sorting_header(S_NAME,'description'),
+				S_EXPRESSION,
+				S_ERROR
 			));
 
-			$triggers[$tnum] = $trigger;
+			$sortfield = getPageSortField('description');
+			$sortorder = getPageSortOrder();
+			$options = array(
+				'editable' => 1,
+					'output' => API_OUTPUT_SHORTEN,
+				'sortfield' => $sortfield,
+				'sortorder' => $sortorder,
+				'limit' => ($config['search_limit']+1)
+			);
+			if($showdisabled == 0){
+				$options['status'] = TRIGGER_STATUS_ENABLED;
+			}
+			if($pageFilter->hostid > 0)
+				$options['hostids'] = $pageFilter->hostid;
+			else if($pageFilter->groupid > 0)
+				$options['groupids'] = $pageFilter->groupid;
+
+			$triggers = CTrigger::get($options);
+
+			$paging = getPagingLine($triggers);
+
+			$options = array(
+				'triggerids' => zbx_objectValues($triggers, 'triggerid'),
+				'output' => API_OUTPUT_EXTEND,
+				'select_hosts' => API_OUTPUT_EXTEND,
+				'select_items' => API_OUTPUT_EXTEND,
+				'select_functions' => API_OUTPUT_EXTEND,
+				'select_dependencies' => API_OUTPUT_EXTEND,
+			);
+			$triggers = CTrigger::get($options);
+			order_result($triggers, $sortfield, $sortorder);
+
+			$realHosts = getParentHostsByTriggers($triggers);
+
+			foreach($triggers as $tnum => $trigger){
+				$triggerid = $trigger['triggerid'];
+
+				$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
+				$trigger['items'] = zbx_toHash($trigger['items'], 'itemid');
+				$trigger['functions'] = zbx_toHash($trigger['functions'], 'functionid');
+
+				$description = array();
+				if($trigger['templateid'] > 0){
+					if(!isset($realHosts[$triggerid])){
+						$description[] = new CSpan('HOST','unknown');
+						$description[] = ':';
+					}
+					else{
+						$real_hosts = $realHosts[$triggerid];
+						$real_host = reset($real_hosts);
+						$description[] = new CLink($real_host['host'], 'triggers.php?&hostid='.$real_host['hostid'], 'unknown');
+						$description[] = ':';
+					}
+				}
+
+				$description[] = new CLink(expandTriggerDescription($trigger), 'triggers.php?form=update&triggerid='.$triggerid);
+
+		//add dependencies {
+				$deps = $trigger['dependencies'];
+				if(count($deps) > 0){
+					$description[] = array(BR(), bold(S_DEPENDS_ON.' : '));
+					foreach($deps as $dnum => $dep_trigger) {
+						$description[] = BR();
+
+						$hosts = get_hosts_by_triggerid($dep_trigger['triggerid']);
+						while($host = DBfetch($hosts)){
+							$description[] = $host['host'];
+							$description[] = ', ';
+						}
+
+						array_pop($description);
+						$description[] = ' : ';
+						$description[] = expand_trigger_description_by_data($dep_trigger);
+					}
+				}
+		// } add dependencies
+
+				if($trigger['status'] != TRIGGER_STATUS_UNKNOWN) $trigger['error'] = '';
+
+				$templated = false;
+				foreach($trigger['hosts'] as $hostid => $host){
+					$templated |= (HOST_STATUS_TEMPLATE == $host['status']);
+				}
+
+				if(!zbx_empty($trigger['error']) && !$templated){
+					$error = new CDiv(SPACE,'iconerror');
+					$error->setHint($trigger['error'], '', 'on');
+				}
+				else{
+					$error = new CDiv(SPACE,'iconok');
+				}
+
+				switch($trigger['priority']){
+					case 0: $priority = S_NOT_CLASSIFIED; break;
+					case 1: $priority = new CCol(S_INFORMATION, 'information'); break;
+					case 2: $priority = new CCol(S_WARNING, 'warning'); break;
+					case 3: $priority = new CCol(S_AVERAGE, 'average'); break;
+					case 4: $priority = new CCol(S_HIGH, 'high'); break;
+					case 5: $priority = new CCol(S_DISASTER, 'disaster'); break;
+					default: $priority = $trigger['priority'];
+				}
+
+				$status_link = 'triggers.php?go='.(($trigger['status'] == TRIGGER_STATUS_DISABLED) ? 'activate' : 'disable').
+					'&g_triggerid%5B%5D='.$triggerid;
+
+				if($trigger['status'] == TRIGGER_STATUS_DISABLED){
+					$status = new CLink(S_DISABLED, $status_link, 'disabled');
+				}
+				else if($trigger['status'] == TRIGGER_STATUS_UNKNOWN){
+					$status = new CLink(S_UNKNOWN, $status_link, 'unknown');
+				}
+				else if($trigger['status'] == TRIGGER_STATUS_ENABLED){
+					$status = new CLink(S_ENABLED, $status_link, 'enabled');
+				}
+
+				$hosts = null;
+				if($_REQUEST['hostid'] == 0){
+					$hosts = array();
+					foreach($trigger['hosts'] as $hostid => $host){
+						if(!empty($hosts)) $hosts[] = ', ';
+						$hosts[] = $host['host'];
+					}
+				}
+
+				$table->addRow(array(
+					new CCheckBox('g_triggerid['.$triggerid.']', NULL, NULL, $triggerid),
+					$priority,
+					$status,
+					$hosts,
+					$description,
+					triggerExpression($trigger,1),
+		//				explode_exp($trigger['expression'], 1),
+					$error
+				));
+
+				$triggers[$tnum] = $trigger;
+			}
+
+		//----- GO ------
+			$goBox = new CComboBox('go');
+			$goOption = new CComboItem('activate',S_ACTIVATE_SELECTED);
+			$goOption->setAttribute('confirm',S_ENABLE_SELECTED_TRIGGERS_Q);
+			$goBox->addItem($goOption);
+
+			$goOption = new CComboItem('disable',S_DISABLE_SELECTED);
+			$goOption->setAttribute('confirm',S_DISABLE_SELECTED_TRIGGERS_Q);
+			$goBox->addItem($goOption);
+
+			$goOption = new CComboItem('massupdate',S_MASS_UPDATE);
+			$goOption->setAttribute('confirm',S_MASS_UPDATE_SELECTED_TRIGGERS_Q);
+			$goBox->addItem($goOption);
+
+			$goOption = new CComboItem('copy_to',S_COPY_SELECTED_TO);
+			$goOption->setAttribute('confirm',S_COPY_SELECTED_TRIGGERS_Q);
+			$goBox->addItem($goOption);
+
+			$goOption = new CComboItem('delete',S_DELETE_SELECTED);
+			$goOption->setAttribute('confirm',S_DELETE_SELECTED_TRIGGERS_Q);
+			$goBox->addItem($goOption);
+
+		// goButton name is necessary!!!
+			$goButton = new CButton('goButton',S_GO);
+			$goButton->setAttribute('id','goButton');
+
+			zbx_add_post_js('chkbxRange.pageGoName = "g_triggerid";');
+
+			$footer = get_table_header(array($goBox, $goButton));
+
+			$table = array($paging,$table,$paging,$footer);
 		}
-
-//----- GO ------
-		$goBox = new CComboBox('go');
-		$goOption = new CComboItem('activate',S_ACTIVATE_SELECTED);
-		$goOption->setAttribute('confirm',S_ENABLE_SELECTED_TRIGGERS_Q);
-		$goBox->addItem($goOption);
-
-		$goOption = new CComboItem('disable',S_DISABLE_SELECTED);
-		$goOption->setAttribute('confirm',S_DISABLE_SELECTED_TRIGGERS_Q);
-		$goBox->addItem($goOption);
-
-		$goOption = new CComboItem('massupdate',S_MASS_UPDATE);
-		$goOption->setAttribute('confirm',S_MASS_UPDATE_SELECTED_TRIGGERS_Q);
-		$goBox->addItem($goOption);
-
-		$goOption = new CComboItem('copy_to',S_COPY_SELECTED_TO);
-		$goOption->setAttribute('confirm',S_COPY_SELECTED_TRIGGERS_Q);
-		$goBox->addItem($goOption);
-
-		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
-		$goOption->setAttribute('confirm',S_DELETE_SELECTED_TRIGGERS_Q);
-		$goBox->addItem($goOption);
-
-// goButton name is necessary!!!
-		$goButton = new CButton('goButton',S_GO);
-		$goButton->setAttribute('id','goButton');
-
-		zbx_add_post_js('chkbxRange.pageGoName = "g_triggerid";');
-
-		$footer = get_table_header(array($goBox, $goButton));
-//----
-
-// PAGING FOOTER
-		$table = array($paging,$table,$paging,$footer);
-//---------
 
 		$form->addItem($table);
 		$triggers_wdgt->addItem($form);
 		$triggers_wdgt->show();
 	}
-?>
-<?php
+
 
 include_once('include/page_footer.php');
-
 ?>
