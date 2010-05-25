@@ -554,6 +554,7 @@ function mem2str($size){
 
 // convert:
 function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
+
 // Special processing for unix timestamps
 	if($units=='unixtime'){
 		$ret=zbx_date2str(S_FUNCT_UNIXTIMESTAMP_DATE_FORMAT,$value);
@@ -621,24 +622,6 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 			$step = 1000;
 	}
 
-	if(zbx_empty($units) && ($convert == ITEM_CONVERT_WITH_UNITS)){;
-		if(abs($value) >= 1)
-			$format = '%.2f';
-		else if(abs($value) >= 0.01)
-			$format = '%.4f';
-		else
-			$format = '%.6f';
-
-		if(round($value, 6) == 0) $value = 0;
-		else{
-			$value = sprintf($format,$value);
-			$value = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U','$1$2$3', $value);
-			$value = rtrim($value, '.');
-		}
-
-		return sprintf('%s %s', $value, $units);
-	}
-
 // INIT intervals
 	static $digitUnits;
 	if(is_null($digitUnits)) $digitUnits = array();
@@ -669,7 +652,7 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 	else $abs = $value;
 
 	$valUnit = array('pow'=>0, 'short'=>'', 'long'=>'', 'value'=>$value);
-	if(($abs > 999) ||  ($abs < 0.001)){
+	if(($abs > 999) || ($abs < 0.001)){
 		foreach($digitUnits[$step] as $dnum => $data){
 			if(bccomp($abs, $data['value']) > -1) $valUnit = $data;
 			else break;

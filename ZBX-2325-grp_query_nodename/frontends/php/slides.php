@@ -61,7 +61,9 @@ include_once('include/page_header.php');
 	);
 
 	check_fields($fields);
-
+	
+	$tmpstime = get_request('stime');
+	
 	if(isset($_REQUEST['favobj'])){
 		$_REQUEST['pmasterid'] = get_request('pmasterid','mainpage');
 
@@ -285,14 +287,12 @@ include_once('include/page_header.php');
 			insert_js('var page_menu='.zbx_jsvalue($menu).";\n".'var page_submenu='.zbx_jsvalue($submenu).";\n");
 // --------------
 
-			$refresh_tab = array(
-				array(
-					'id' => 'hat_slides',
-					'frequency' => $element['delay']*$refresh_multipl,
-					'url' => 'slides.php?elementid='.$elementid.url_param('stime').url_param('period').url_param('groupid').url_param('hostid'),
-					'params'=> array('lastupdate' => time())
-				)
-			);
+			$refresh_tab = array(array(
+				'id' => 'hat_slides',
+				'frequency' => $element['delay']*$refresh_multipl,
+				'url' => 'slides.php?elementid='.$elementid.(is_null($tmpstime) ? '' : '&stime='.$tmpstime).url_param('period').url_param('groupid').url_param('hostid'),
+				'params'=> array('lastupdate' => time())
+			));
 			add_doll_objects($refresh_tab);
 
 			

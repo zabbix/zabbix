@@ -413,9 +413,9 @@ function get_bodywidth(){
 		w-=16;
 	}
 	else{
-		w = (w2 > w)?w2:w;
+		w = (w2 < w)?w2:w;
 	}
-
+//alert(w);
 return w;
 }
 
