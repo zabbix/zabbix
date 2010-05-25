@@ -1099,7 +1099,7 @@ require_once('include/js.inc.php');
 						$objData['src'] = $src;
 					}
 
-					if($default) $item = new CLink(null, $action);
+					if($default && !$editmode) $item = new CLink(null, $action);
 					else $item = new CDiv();
 
 					$item->setAttribute('id', $containerid);
@@ -1164,7 +1164,9 @@ require_once('include/js.inc.php');
 
 					$objData['src'] = $src;
 
-					$item = new CLink(null, $action);
+					if(!$editmode) $item = new CLink(null, $action);
+					else $item = new CDiv();
+
 					$item->setAttribute('id', $containerid);
 
 					$item = array($item);

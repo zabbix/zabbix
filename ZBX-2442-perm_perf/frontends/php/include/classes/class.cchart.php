@@ -207,7 +207,7 @@ class CChart extends CGraphDraw{
 
 		$p = $this->to_time - $this->from_time;		// graph size in time
 		$z = $p - $this->from_time % $p;			// graphsize - mod(from_time,p) for Oracle...
-		$x = $this->sizeX;							// graph size in px
+		$x = $this->sizeX;						// graph size in px
 
 		$this->itemsHost = null;
 		for($i=0; $i < $this->num; $i++){

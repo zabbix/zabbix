@@ -139,18 +139,6 @@
 			}
 		}
 
-		$options = array(
-			'allow_all_hosts' => 1,
-			'monitored_hosts' => 1,
-			'with_items' => 1
-		);
-		if(!$ZBX_WITH_ALL_NODES) $options['only_current_node'] = 1;
-
-		$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $options);
-		$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $options);
-		validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
-
-		
 		if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0)){
 			$triggers = CTrigger::get(array( 'triggerids' => $_REQUEST['triggerid'] ));
 			if(empty($triggers)){
@@ -158,16 +146,24 @@
 			}
 		}
 
-		$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
-		foreach($PAGE_GROUPS['groups'] as $groupid => $name){
-			$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid, null, ': ').$name);
-		}
-		$cmbHosts = new CComboBox('hostid',$PAGE_HOSTS['selected'],'javascript: submit();');
-		foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
-			$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid, null, ': ').$name);
-		}
-		$r_form->addItem(array(S_GROUP.SPACE,$cmbGroups));
-		$r_form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
+		$options = array(
+			'groups' => array(
+				'monitored_hosts' => 1,
+				'with_items' => 1,
+			),
+			'hosts' => array(
+				'monitored_hosts' => 1,
+				'with_items' => 1,
+			),
+			'hostid' => get_request('hostid', null),
+			'groupid' => get_request('groupid', null),
+		);
+		$pageFilter = new CPageFilter($options);
+		$_REQUEST['groupid'] = $pageFilter->groupid;
+		$_REQUEST['hostid'] = $pageFilter->hostid;
+
+		$r_form->addItem(array(S_GROUP.SPACE,$pageFilter->getGroupsCB(true)));
+		$r_form->addItem(array(SPACE.S_HOST.SPACE,$pageFilter->getHostsCB(true)));
 	}
 
 	if($allow_discovery){
@@ -261,7 +257,6 @@
 	$till = $from + $effectiveperiod;
 
 	if(empty($firstEvent)){
-		$events_wdgt->addItem($table);
 		$starttime = null;
 	}
 	else{
@@ -382,15 +377,17 @@
 				'nodeids' => get_current_nodeid(),
 				'output' => API_OUTPUT_SHORTEN
 			);
-			if(($PAGE_HOSTS['selected'] > 0) || empty($PAGE_HOSTS['hostids'])){
-				$trigOpt['hostids'] = $PAGE_HOSTS['selected'];
+
+			if($pageFilter->hostsSelected){
+				if($pageFilter->hostid > 0)
+					$trigOpt['hostids'] = $pageFilter->hostid;
+				else if($pageFilter->groupid > 0)
+					$trigOpt['groupids'] = $pageFilter->groupid;
 			}
-			else if(!empty($PAGE_HOSTS['hostids'])){
-				$trigOpt['hostids'] = $PAGE_HOSTS['hostids'];
+			else{
+				$trigOpt['hostids'] = array();
 			}
-			else if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
-				$trigOpt['groupids'] = $PAGE_GROUPS['selected'];
-			}
+
 			if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0)){
 				$trigOpt['triggerids'] = $_REQUEST['triggerid'];
 			}
@@ -498,13 +495,13 @@
 		}
 
 		$table = array($paging, $table, $paging);
-		$events_wdgt->addItem($table);
-
 		
 		$jsmenu = new CPUMenu(null,170);
 		$jsmenu->InsertJavaScript();
 	}
-	
+
+	$events_wdgt->addItem($table);
+
 // NAV BAR
 	$timeline = array(
 		'period' => $effectiveperiod,

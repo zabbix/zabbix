@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -330,15 +330,18 @@ include_once('include/page_header.php');
 		insert_js('cookie.eraseArray("'.$path.'")');
 	}
 
-	$params = array('only_current_node' => 1);
 
-	$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
-	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
+	$options = array(
+		'groups' => array(
+			'editable' => 1,
+		),
+		'groupid' => get_request('groupid', null),
+	);
+	$pageFilter = new CPageFilter($options);
+	$_REQUEST['groupid'] = $pageFilter->groupid;
 
-	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS, true);
 
-	$frmForm = new CForm();
-	$frmForm->setMethod('get');
+	$frmForm = new CForm(null, 'get');
 
 	if(!isset($_REQUEST['form'])){
 		$frmForm->addItem(new CButton('form',S_CREATE_MAINTENANCE_PERIOD));
@@ -628,11 +631,9 @@ include_once('include/page_header.php');
 // Table HEADER
 		$form = new CForm(null,'get');
 
-		$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
-		foreach($PAGE_GROUPS['groups'] as $groupid => $name){
-			$cmbGroups->addItem($groupid, $name);
-		}
-		$form->addItem(array(S_GROUP.SPACE, $cmbGroups));
+		$form = new CForm(null, 'get');
+
+		$form->addItem(array(S_GROUP.SPACE, $pageFilter->getGroupsCB()));
 
 
 		$numrows = new CDiv();
@@ -651,9 +652,14 @@ include_once('include/page_header.php');
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
 		);
-
-		if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
-			$options['groupids'] = $PAGE_GROUPS['selected'];
+		if($pageFilter->groupsSelected){
+			if($pageFilter->groupid > 0)
+				$options['groupids'] = $pageFilter->groupid;
+			else
+				$options['groupids'] = array_keys($pageFilter->groups);
+		}
+		else{
+			$options['groupids'] = array();
 		}
 
 		$maintenances = CMaintenance::get($options);
@@ -670,10 +676,8 @@ include_once('include/page_header.php');
 			S_DESCRIPTION
 		));
 
-// sorting && paging
 		order_result($maintenances, $sortfield, $sortorder);
 		$paging = getPagingLine($maintenances);
-//---------
 
 		foreach($maintenances as $mnum => $maintenance){
 			$maintenanceid = $maintenance['maintenanceid'];
