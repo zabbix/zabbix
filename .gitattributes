@@ -293,6 +293,7 @@ frontends/php/include/classes/class.clistbox.php -text
 frontends/php/include/classes/class.clistitem.php -text
 frontends/php/include/classes/class.cnumericbox.php -text
 frontends/php/include/classes/class.cobject.php -text
+frontends/php/include/classes/class.cpagefilter.php -text
 frontends/php/include/classes/class.cparam.php -text
 frontends/php/include/classes/class.cpassbox.php -text
 frontends/php/include/classes/class.cpie.php -text

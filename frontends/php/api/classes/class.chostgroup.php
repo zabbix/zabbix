@@ -62,6 +62,7 @@ class CHostGroup extends CZBXAPI{
 			'groupids'					=> null,
 			'hostids'					=> null,
 			'templateids'				=> null,
+			'graphids'					=> null,
 			'monitored_hosts'			=> null,
 			'templated_hosts' 			=> null,
 			'real_hosts' 				=> null,
@@ -149,6 +150,24 @@ class CHostGroup extends CZBXAPI{
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
 			$sql_parts['where'][] = DBcondition('hg.hostid', $options['hostids']);
 			$sql_parts['where']['hgg'] = 'hg.groupid=g.groupid';
+		}
+
+// graphids
+		if(!is_null($options['graphids'])){
+			zbx_value2array($options['graphids']);
+
+			if($options['output'] != API_OUTPUT_SHORTEN){
+				$sql_parts['select']['graphid'] = 'gi.graphid';
+			}
+
+			$sql_parts['from']['gi'] = 'graphs_items gi';
+			$sql_parts['from']['i'] = 'items i';
+			$sql_parts['from']['hg'] = 'hosts_groups hg';
+
+			$sql_parts['where'][] = DBcondition('gi.graphid', $options['graphids']);
+			$sql_parts['where']['hgg'] = 'hg.groupid=g.groupid';
+			$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
+			$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
 		}
 
 // monitored_hosts, real_hosts, templated_hosts, not_proxy_hosts
@@ -345,6 +364,14 @@ class CHostGroup extends CZBXAPI{
 							$result[$group['groupid']]['hosts'] = array();
 
 						$result[$group['groupid']]['hosts'][] = array('hostid' => $group['hostid']);
+						unset($group['hostid']);
+					}
+//graphids
+					if(isset($group['graphid'])){
+						if(!isset($result[$group['groupid']]['graphs']))
+							$result[$group['groupid']]['graphs'] = array();
+
+						$result[$group['groupid']]['graphs'][] = array('graphid' => $group['graphid']);
 						unset($group['hostid']);
 					}
 
