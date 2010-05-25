@@ -682,7 +682,7 @@ int zbx_tcp_listen(
 	unsigned short	listen_port
 	)
 {
-	struct		addrinfo hints, *ai = NULL, *current_ai;
+	struct addrinfo	hints, *ai = NULL, *current_ai;
 	char		port[MAX_STRING_LEN];
 	int		e, on, ret = FAIL;
 
