@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -206,100 +206,6 @@
 					' FROM graphs_items '.
 					' WHERE graphid='.$graphid.
 					' ORDER BY itemid,drawtype,sortorder,color,yaxisside');
-	}
-
-/*
- * Function: graph_accessible
- *
- * Description:
- *     Checks if graph is accessible to USER
- *
- * Author:
- *     Aly
- *
- */
-	function graph_accessible($graphid){
-		global $USER_DETAILS;
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY, PERM_RES_IDS_ARRAY,get_current_nodeid(true));
-
-		$sql = 	'SELECT g.graphid '.
-				' FROM graphs g, graphs_items gi, items i '.
-				' WHERE g.graphid='.$graphid.
-					' AND g.graphid=gi.graphid '.
-					' AND i.itemid=gi.itemid '.
-					' AND '.DBcondition('i.hostid',$available_hosts,true);
-
-		if(DBfetch(DBselect($sql,1))){
-			return false;
-		}
-	return true;
-	}
-
-/*
- * Function: get_accessible_graphs
- *
- * Description:
- *     returns string of accessible graphid's
- *
- * Author:
- *     Aly
- *
- */
-	function get_accessible_graphs($perm,$hostids,$perm_res=null,$nodeid=null,$cache=1){
-		global $USER_DETAILS;
-		static $available_graphs;
-
-		if(is_null($perm_res)) $perm_res = PERM_RES_IDS_ARRAY;
-		$nodeid_str =(is_array($nodeid))?implode('',$nodeid):strval($nodeid);
-		$hostid_str = implode('',$hostids);
-
-		$cache_hash = md5($perm.$perm_res.$nodeid_str.$hostid_str);
-		if($cache && isset($available_graphs[$cache_hash])){
-			return $available_graphs[$cache_hash];
-		}
-
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, $perm, PERM_RES_IDS_ARRAY, $nodeid);
-
-		$denied_graphs = array();
-		$result = array();
-
-		$sql_where = '';
-		if(!empty($hostids)){
-			$sql_where.= ' AND '.DBcondition('i.hostid',$hostids);
-		}
-		$sql = 	'SELECT DISTINCT g.graphid '.
-				' FROM graphs g, graphs_items gi, items i '.
-				' WHERE g.graphid=gi.graphid '.
-					' AND i.itemid=gi.itemid '.
-					$sql_where.
-					' AND '.DBcondition('i.hostid',$available_hosts, true);
-
-		$db_graphs = DBselect($sql);
-		while($graph = DBfetch($db_graphs)){
-			$denied_graphs[] = $graph['graphid'];
-		}
-
-		$sql = 	'SELECT DISTINCT g.graphid '.
-				' FROM graphs g, graphs_items gi, items i '.
-				' WHERE g.graphid=gi.graphid '.
-					' AND i.itemid=gi.itemid '.
-					$sql_where.
-					(!empty($denied_graphs)?' AND '.DBcondition('g.graphid',$denied_graphs,true):'');
-		$db_graphs = DBselect($sql);
-		while($graph = DBfetch($db_graphs)){
-			$result[$graph['graphid']] = $graph['graphid'];
-		}
-
-		if(PERM_RES_STRING_LINE == $perm_res){
-			if(count($result) == 0)
-				$result = '-1';
-			else
-				$result = implode(',',$result);
-		}
-
-		$available_graphs[$cache_hash] = $result;
-
-	return $result;
 	}
 
 /*

@@ -67,6 +67,26 @@ div.hintbox {
 
 /************** END OF HINT BOX ************/
 
+div.formElement_header{
+	color: #FFFFFF;
+	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;
+	border: 0px;
+	text-align: left;	
+	height: 24px;
+	padding-left: 5px;
+	line-height:20px;
+}
+
+div.formElement_footer{
+	color: #FFFFFF;
+	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;
+	border: 0px;
+	text-align: right;	
+	height: 21px;
+	padding-right: 5px;
+	line-height: 20px;
+}
+
 /**** SCREEN DRAG & DROP ****/
 div.draggable {
 	cursor: pointer;

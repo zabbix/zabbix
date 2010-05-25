@@ -71,10 +71,18 @@ require_once('include/js.inc.php');
 						unset($itemid);
 						break;
 					case SCREEN_RESOURCE_MAP:
-						$result &= sysmap_accessible($ac_data['resourceid'], PERM_READ_ONLY);
+						$map = CMap::get(array(
+							'sysmapids' => $ac_data['resourceid'],
+							'output' => API_OUTPUT_SHORTEN,
+						));
+						$result &= !empty($map);
 						break;
 					case SCREEN_RESOURCE_SCREEN:
-						$result &= screen_accessible($ac_data['resourceid'], PERM_READ_ONLY);
+						$screen = CScreen::get(array(
+							'screenids' => $ac_data['resourceid'],
+							'output' => API_OUTPUT_SHORTEN,
+						));
+						$result &= !empty($screen);
 						break;
 					case SCREEN_RESOURCE_SERVER_INFO:
 					case SCREEN_RESOURCE_HOSTS_INFO:
@@ -426,9 +434,8 @@ require_once('include/js.inc.php');
 
 	function get_screen_item_form(){
 		global $USER_DETAILS;
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY,get_current_nodeid(true));
 
-		$form = new CFormTable(S_SCREEN_CELL_CONFIGURATION,'screenedit.php?screenid='.$_REQUEST['screenid']);
+		$form = new CFormTable(S_SCREEN_CELL_CONFIGURATION, 'screenedit.php?screenid='.$_REQUEST['screenid']);
 		$form->SetHelp('web.screenedit.cell.php');
 
 		if(isset($_REQUEST['screenitemid'])){
@@ -445,7 +452,6 @@ require_once('include/js.inc.php');
 		}
 
 		if(isset($_REQUEST['screenitemid']) && !isset($_REQUEST['form_refresh'])){
-
 			$irow = DBfetch($iresult);
 			$resourcetype	= $irow['resourcetype'];
 			$resourceid	= $irow['resourceid'];
@@ -499,61 +505,56 @@ require_once('include/js.inc.php');
 
 		if($resourcetype == SCREEN_RESOURCE_GRAPH){
 // User-defined graph
-			$resourceid = graph_accessible($resourceid)?$resourceid:0;
-
 			$caption = '';
-			$id=0;
-
 			if($resourceid > 0){
-				$result = DBselect('SELECT DISTINCT g.graphid,g.name,n.name as node_name, h.host'.
-						' FROM graphs g '.
-							' LEFT JOIN graphs_items gi ON g.graphid=gi.graphid '.
-							' LEFT JOIN items i ON gi.itemid=i.itemid '.
-							' LEFT JOIN hosts h ON h.hostid=i.hostid '.
-							' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid('g.graphid').
-						' WHERE g.graphid='.$resourceid);
-
-				while($row=DBfetch($result)){
-					$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
-					$caption = $row['node_name'].$row['host'].':'.$row['name'];
-					$id = $resourceid;
+				$options = array(
+					'graphids' => $resourceid,
+					'select_hosts' => API_OUTPUT_EXTEND,
+					'output' => API_OUTPUT_EXTEND,
+				);
+				$graph = CGraph::get($options);
+				if(!empty($graph)){
+					$graph = reset($graph);
+					$host = reset($graph['hosts']);
+					$nname = (get_node_name_by_elid($graph['graphid'], true)) ? '('.get_node_name_by_elid($graph['graphid'], true).') ' : '';
+					$caption = $nname.$host['host'].':'.$graph['name'];
+				}
+				else{
+					$resourceid = 0;
 				}
 			}
 
-			$form->addVar('resourceid',$id);
+			$form->addVar('resourceid', $resourceid);
 
 			$textfield = new CTextbox('caption',$caption,75,'yes');
 			$selectbtn = new CButton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=graphs&srcfld1=graphid&srcfld2=name',800,450);");
 			$selectbtn->setAttribute('onmouseover',"javascript: this.style.cursor = 'pointer';");
 
 			$form->addRow(S_GRAPH_NAME,array($textfield,SPACE,$selectbtn));
-
 		}
 		else if($resourcetype == SCREEN_RESOURCE_SIMPLE_GRAPH){
 // Simple graph
 			$caption = '';
-			$id=0;
-
 			if($resourceid > 0){
-				$result=DBselect('SELECT n.name as node_name,h.host,i.description,i.itemid,i.key_ '.
-						' FROM hosts h,items i '.
-							' LEFT JOIN nodes n on n.nodeid='.DBid2nodeid('i.itemid').
-						' WHERE h.hostid=i.hostid '.
-							' AND h.status='.HOST_STATUS_MONITORED.
-							' AND i.status='.ITEM_STATUS_ACTIVE.
-							' AND '.DBcondition('i.hostid',$available_hosts).
-							' AND i.itemid='.$resourceid);
-
-				while($row=DBfetch($result)){
-					$description_=item_description($row);
-					$row["node_name"] = isset($row["node_name"]) ? "(".$row["node_name"].") " : '';
-
-					$caption = $row['node_name'].$row['host'].': '.$description_;
-					$id = $resourceid;
+				$options = array(
+					'itemids' => $resourceid,
+					'select_hosts' => API_OUTPUT_EXTEND,
+					'output' => API_OUTPUT_EXTEND,
+					'monitored' => 1,
+				);
+				$item = CItem::get($options);
+				if(!empty($item)){
+					$item = reset($item);
+					$host = reset($item['hosts']);
+					$nname = (get_node_name_by_elid($item['itemid'], true)) ? '('.get_node_name_by_elid($item['itemid'], true).') ' : '';
+					$caption = $nname.$host['host'].':'.item_description($item);
+				}
+				else{
+					$resourceid = 0;
 				}
 			}
 
-			$form->addVar('resourceid',$id);
+			$form->addVar('resourceid', $resourceid);
 
 			$textfield = new Ctextbox('caption',$caption,75,'yes');
 			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=simple_graph&srcfld1=itemid&srcfld2=description',800,450);");
@@ -564,57 +565,54 @@ require_once('include/js.inc.php');
 		else if($resourcetype == SCREEN_RESOURCE_MAP){
 // Map
 			$caption = '';
-			$id=0;
 
 			if($resourceid > 0){
-				$result=DBselect('SELECT n.name as node_name, s.sysmapid,s.name '.
-							' FROM sysmaps s'.
-								' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid('s.sysmapid').
-							' WHERE s.sysmapid='.$resourceid);
-
-				while($row=DBfetch($result)){
-					if(!sysmap_accessible($row['sysmapid'],PERM_READ_ONLY)) continue;
-
-					$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
-					$caption = $row['node_name'].$row['name'];
-					$id = $resourceid;
+				$options = array(
+					'sysmapids' => $resourceid,
+					'output' => API_OUTPUT_EXTEND,
+				);
+				$map = CMap::get($options);
+				if(empty($map)){
+					$resourceid = 0;
+				}
+				else{
+					$map = reset($map);
+					$nname = (get_node_name_by_elid($map['sysmapid'], true)) ? '('.get_node_name_by_elid($map['sysmapid'], true).') ' : '';
+					$caption = $nname.$map['name'];
 				}
 			}
 
-			$form->addVar('resourceid',$id);
-			$textfield = new Ctextbox('caption',$caption,60,'yes');
+			$form->addVar('resourceid', $resourceid);
 
+			$textfield = new Ctextbox('caption',$caption,60,'yes');
 			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name',400,450);");
 			$selectbtn->setAttribute('onmouseover',"javascript: this.style.cursor = 'pointer';");
 
 			$form->addRow(S_PARAMETER,array($textfield,SPACE,$selectbtn));
-
 		}
 		else if($resourcetype == SCREEN_RESOURCE_PLAIN_TEXT){
 // Plain text
 			$caption = '';
-			$id=0;
-
 			if($resourceid > 0){
-				$result=DBselect('SELECT n.name as node_name,h.host,i.description,i.itemid,i.key_ '.
-						' FROM hosts h,items i '.
-							' LEFT JOIN nodes n on n.nodeid='.DBid2nodeid('i.itemid').
-						' WHERE h.hostid=i.hostid '.
-							' AND h.status='.HOST_STATUS_MONITORED.
-							' AND i.status='.ITEM_STATUS_ACTIVE.
-							' AND '.DBcondition('i.hostid',$available_hosts).
-							' AND i.itemid='.$resourceid);
-
-				while($row=DBfetch($result)){
-					$description_=item_description($row);
-					$row["node_name"] = isset($row["node_name"]) ? '('.$row["node_name"].') ' : '';
-
-					$caption = $row['node_name'].$row['host'].': '.$description_;
-					$id = $resourceid;
+				$options = array(
+					'itemids' => $resourceid,
+					'select_hosts' => API_OUTPUT_EXTEND,
+					'output' => API_OUTPUT_EXTEND,
+					'monitored' => 1,
+				);
+				$item = CItem::get($options);
+				if(!empty($item)){
+					$item = reset($item);
+					$host = reset($item['hosts']);
+					$nname = (get_node_name_by_elid($item['itemid'], true)) ? '('.get_node_name_by_elid($item['itemid'], true).') ' : '';
+					$caption = $nname.$host['host'].':'.item_description($item);
+				}
+				else{
+					$resourceid = 0;
 				}
 			}
 
-			$form->addVar('resourceid',$id);
+			$form->addVar('resourceid', $resourceid);
 
 			$textfield = new CTextbox('caption',$caption,75,'yes');
 			$selectbtn = new CButton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=plain_text&srcfld1=itemid&srcfld2=description',800,450);");
@@ -634,9 +632,7 @@ require_once('include/js.inc.php');
 					$options = array(
 						'groupids' => $resourceid,
 						'output' => API_OUTPUT_EXTEND,
-						'editable' => 1
 					);
-
 					$groups = CHostgroup::get($options);
 					foreach($groups as $gnum => $group){
 						$caption = get_node_name_by_elid($group['groupid'], true, ':').$group['name'];
@@ -658,7 +654,6 @@ require_once('include/js.inc.php');
 					$options = array(
 						'hostids' => $resourceid,
 						'output' => API_OUTPUT_EXTEND,
-						'editable' => 1
 					);
 
 					$hosts = CHost::get($options);
@@ -694,9 +689,7 @@ require_once('include/js.inc.php');
 				$options = array(
 					'groupids' => $resourceid,
 					'output' => API_OUTPUT_EXTEND,
-					'editable' => 1
 				);
-
 				$groups = CHostgroup::get($options);
 				foreach($groups as $gnum => $group){
 					$caption = get_node_name_by_elid($group['groupid'], true, ':').$group['name'];
@@ -743,36 +736,28 @@ require_once('include/js.inc.php');
 		}
 		else if(($resourcetype == SCREEN_RESOURCE_HOSTS_INFO) || ($resourcetype == SCREEN_RESOURCE_TRIGGERS_INFO)){
 // HOSTS info
-			$caption = '';
-			$id=0;
-
-			$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
 			if(remove_nodes_from_id($resourceid) > 0){
-				$result=DBselect('SELECT DISTINCT n.name as node_name,g.groupid,g.name '.
-						' FROM hosts_groups hg, groups g '.
-							' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid('g.groupid').
-						' WHERE '.DBcondition('g.groupid',$available_groups).
-							' AND g.groupid='.$resourceid);
-
-				while($row=DBfetch($result)){
-					$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
-					$caption = $row['node_name'].$row['name'];
-					$id = $resourceid;
+				$options = array(
+					'groupids' => $resourceid,
+					'output' => API_OUTPUT_EXTEND,
+				);
+				$group = CHostgroup::get($options);
+				if(empty($group)){
+					$resourceid = 0;
+				}
+				else{
+					$group = reset($group);
+					$gname = $group['name'];
 				}
 			}
-			else if(remove_nodes_from_id($resourceid)==0){
-				$result=DBselect('SELECT DISTINCT n.name as node_name '.
-						' FROM nodes n '.
-						' WHERE n.nodeid='.id2nodeid($resourceid));
-
-				while($row=DBfetch($result)){
-					$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
-					$caption = $row['node_name'].S_MINUS_ALL_GROUPS_MINUS;
-					$id = $resourceid;
-				}
+			else{
+				$gname = S_MINUS_ALL_GROUPS_MINUS;
 			}
 
-			$form->addVar('resourceid',$id);
+			$nname = (get_node_name_by_elid($resourceid, true)) ? '('.get_node_name_by_elid($resourceid, true).') ' : '';
+			$caption = $nname.$gname;
+
+			$form->addVar('resourceid', $resourceid);
 
 			$textfield = new CTextbox('caption',$caption,60,'yes');
 			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=host_group_scr&srcfld1=groupid&srcfld2=name',480,450);");

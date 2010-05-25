@@ -640,10 +640,10 @@ COpt::memoryPick();
 		$actionids = array();
 
 		$options = array(
-			'actionids'=>zbx_objectValues($actions, 'actionid'),
-			'editable'=>1,
-			'output'=> API_OUTPUT_EXTEND,
-			'preservekeys'=>1
+			'actionids' => zbx_objectValues($actions, 'actionid'),
+			'editable' => 1,
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => 1
 		);
 		$upd_actions = CAction::get($options);
 		foreach($actions as $anum => $action){

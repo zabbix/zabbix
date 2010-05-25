@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -213,28 +213,6 @@ function available_hosts($hostids, $editable=null){
 	$hosts = CHost::get($options);
 
 return zbx_objectValues($hosts, 'hostid');
-}
-
-function available_triggers($triggerids, $editable=null){
-	$options = array(
-		'triggerids' => $triggerids,
-		'editable' => $editable,
-		'nodes' => get_current_nodeid(true)
-	);
-
-	$triggers = CTrigger::get($options);
-
-return zbx_objectValues($triggers, 'triggerid');
-}
-
-function available_graphs($graphids, $editable=null){
-	$options = array();
-	$options['graphids'] = $graphids;
-	$options['editable'] = $editable;
-	$options['nodes'] = get_current_nodeid(true);
-
-	$graphs = CGraph::get($options);
-return zbx_objectValues($graphs, 'graphid');
 }
 
 function get_accessible_hosts_by_user(&$user_data,$perm,$perm_res=null,$nodeid=null,$cache=1){

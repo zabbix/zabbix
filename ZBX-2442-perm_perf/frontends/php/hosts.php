@@ -192,21 +192,12 @@ include_once('include/page_header.php');
 	else if(isset($_REQUEST['go']) && ($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['masssave'])){
 		$hosts = get_request('hosts', array());
 		$visible = get_request('visible', array());
-		$_REQUEST['groups'] = get_request('groups', array());
 		$_REQUEST['newgroup'] = get_request('newgroup', '');
 		$_REQUEST['proxy_hostid'] = get_request('proxy_hostid', 0);
 		$_REQUEST['templates'] = get_request('templates', array());
 
-		if(count($_REQUEST['groups']) > 0){
-			$accessible_groups = get_accessible_groups_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY);
-			foreach($_REQUEST['groups'] as $gid){
-				if(!isset($accessible_groups[$gid])) access_deny();
-			}
-		}
-
 		try{
 			DBstart();
-
 			$hosts = array('hosts' => zbx_toObject($hosts, 'hostid'));
 
 			$properties = array('port', 'useip', 'dns',	'ip', 'proxy_hostid', 'useipmi', 'ipmi_ip', 'ipmi_port', 'ipmi_authtype',
@@ -250,7 +241,11 @@ include_once('include/page_header.php');
 			}
 		
 			if(isset($visible['groups'])){
-				$hosts['groups'] = zbx_toObject($_REQUEST['groups'], 'groupid');
+				$hosts['groups'] = CHostGroup::get(array(
+					'groupids' => get_request('groups', array()),
+					'editable' => 1,
+					'output' => API_OUTPUT_SHORTEN,
+				));
 			}
 			if(isset($visible['template_table_r'])){
 				$hosts['templates'] = $templates;

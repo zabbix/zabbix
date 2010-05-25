@@ -127,9 +127,8 @@ include_once('include/page_header.php');
 		$cmbType = new CComboBox('drawtype', $drawtype);
 
 		$drawtypes = map_link_drawtypes();
-		foreach($drawtypes as $num => $i){
-			$value = map_link_drawtype2str($i);
-			$cmbType->addItem($i, $value);
+		foreach($drawtypes as $num => $type){
+			$cmbType->addItem($num, $type);
 		}
 //---
 		$btnSelect = new CButton('btn1', S_SELECT,

@@ -800,7 +800,8 @@ else {
 		$nodeid = ($nodeid == 0)?get_current_nodeid(false):$nodeid;
 
 		$id=remove_nodes_from_id($id);
-		$id=bcadd($id,bcadd(bcmul($nodeid,'100000000000000'),bcmul($ZBX_LOCALNODEID,'100000000000')));
+
+		$id=bcadd($id,bcadd(bcmul($nodeid,'100000000000000'),bcmul($ZBX_LOCALNODEID,'100000000000')), 0);
 	return $id;
 	}
 

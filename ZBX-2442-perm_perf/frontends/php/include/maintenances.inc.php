@@ -19,59 +19,6 @@
 **/
 ?>
 <?php
-function get_accessible_maintenance_by_user($perm,$perm_res=null,$nodeid=null,$hostid=null,$cache=1){
-	global $USER_DETAILS;
-	static $available_maintenances;
-
-	$result = array();
-	if(is_null($perm_res)) $perm_res = PERM_RES_IDS_ARRAY;
-	$nodeid_str =(is_array($nodeid))?implode('',$nodeid):strval($nodeid);
-	$hostid_str =(is_array($hostid))?implode('',$hostid):strval($hostid);
-
-	if($cache && isset($available_maintenances[$perm][$perm_res][$nodeid_str][$hostid_str])){
-		return $available_maintenances[$perm][$perm_res][$nodeid_str][$hostid_str];
-	}
-
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, $perm, PERM_RES_IDS_ARRAY, $nodeid);
-
-	$denied_maintenances = array();
-	$available_maintenances = array();
-
-	$sql =	'SELECT DISTINCT m.maintenanceid '.
-			' FROM maintenances m, maintenances_hosts mh, maintenances_groups mg, hosts_groups hg '.
-			' WHERE '.DBcondition('hg.hostid',$available_hosts,true).
-				(!empty($hostid)?' AND hg.hostid='.$hostid:'').
-				' AND ('.
-					'(mh.hostid=hg.hostid AND m.maintenanceid=mh.maintenanceid)'.
-					' OR (mg.groupid=hg.groupid AND m.maintenanceid=mg.maintenanceid))';
-//SDI($sql);
-	$db_maintenances = DBselect($sql);
-	while($maintenance = DBfetch($db_maintenances)){
-		$denied_maintenances[] = $maintenance['maintenanceid'];
-	}
-
-	$sql = 'SELECT m.maintenanceid '.
-			' FROM maintenances m '.
-			' WHERE '.DBin_node('m.maintenanceid').
-				' AND '.DBcondition('m.maintenanceid',$denied_maintenances,true);
-//SDI($sql);
-	$db_maintenances = DBselect($sql);
-	while($maintenance = DBfetch($db_maintenances)){
-		$result[$maintenance['maintenanceid']] = $maintenance['maintenanceid'];
-	}
-
-	if(PERM_RES_STRING_LINE == $perm_res){
-		if(count($result) == 0)
-			$result = '-1';
-		else
-			$result = implode(',',$result);
-	}
-
-	$available_maintenances[$perm][$perm_res][$nodeid_str][$hostid_str] = $result;
-
-return $result;
-}
-
 // function: get_maintenance_by_maintenanceid
 // author: Aly
 function get_maintenance_by_maintenanceid($maintenanceid){

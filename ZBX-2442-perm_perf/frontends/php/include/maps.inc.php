@@ -26,95 +26,22 @@
 	require_once('include/scripts.inc.php');
 	require_once('include/maintenances.inc.php');
 
-/*
- * Function: map_link_drawtypes
- *
- * Description:
- *     Return available drawing types for links
- *
- * Author:
- *     Eugene Grigorjev
- *
- */
-	function map_link_drawtypes(){
-		return array(
-				MAP_LINK_DRAWTYPE_LINE,
-				MAP_LINK_DRAWTYPE_BOLD_LINE,
-				(function_exists('imagesetstyle') ? MAP_LINK_DRAWTYPE_DOT : null),
-				MAP_LINK_DRAWTYPE_DASHED_LINE
-			    );
-	}
-
-/*
- * Function: map_link_drawtype2str
- *
- * Description:
- *     Represent integer value of links drawing type into the string
- *
- * Author:
- *     Eugene Grigorjev
- *
- */
-	function map_link_drawtype2str($drawtype){
-		switch($drawtype){
-			case MAP_LINK_DRAWTYPE_LINE:		$drawtype = S_LINE;			break;
-			case MAP_LINK_DRAWTYPE_BOLD_LINE:	$drawtype = S_BOLD_LINE;	break;
-			case MAP_LINK_DRAWTYPE_DOT:			$drawtype = S_DOT;			break;
-			case MAP_LINK_DRAWTYPE_DASHED_LINE:	$drawtype = S_DASHED_LINE;	break;
-			default: $drawtype = S_UNKNOWN;		break;
+	function map_link_drawtypes($type=null){
+		$types = array(
+			MAP_LINK_DRAWTYPE_LINE => S_LINE,
+			MAP_LINK_DRAWTYPE_BOLD_LINE => S_BOLD_LINE,
+			MAP_LINK_DRAWTYPE_DASHED_LINE => S_DASHED_LINE,
+		);
+		if(function_exists('imagesetstyle')){
+			$types[MAP_LINK_DRAWTYPE_DOT] = S_DOT;
 		}
-	return $drawtype;
-	}
 
-/*
- * Function: sysmap_accessible
- *
- * Description: Check permission for map
- *
- * Return: true on success
- *
- * Author: Aly
- */
-	function sysmap_accessible($sysmapid,$perm){
-		global $USER_DETAILS;
-
-		$nodes = get_current_nodeid(null,$perm);
-		$result = (bool) count($nodes);
-
-		$sql = 'SELECT * '.
-				' FROM sysmaps_elements '.
-				' WHERE sysmapid='.$sysmapid.
-					' AND '.DBin_node('sysmapid', $nodes);
-		$db_result = DBselect($sql);
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,$perm,PERM_RES_IDS_ARRAY,get_current_nodeid(true));
-//SDI($available_hosts);
-		while(($se_data = DBfetch($db_result)) && $result){
-			switch($se_data['elementtype']){
-				case SYSMAP_ELEMENT_TYPE_HOST:
-					if(!isset($available_hosts[$se_data['elementid']])){
-						$result = false;
-					}
-					break;
-				case SYSMAP_ELEMENT_TYPE_MAP:
-					$result = sysmap_accessible($se_data['elementid'], $perm);
-					break;
-				case SYSMAP_ELEMENT_TYPE_TRIGGER:
-					$available_triggers = get_accessible_triggers($perm, array(), PERM_RES_IDS_ARRAY);
-					if(!isset($available_triggers[$se_data['elementid']])){
-						$result = false;
-					}
-					break;
-				case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-					$available_groups = get_accessible_groups_by_user($USER_DETAILS,$perm);
-					if(!isset($available_groups[$se_data['elementid']])){
-						$result = false;
-					}
-					break;
-			}
-		}
-//SDI($se_data['elementid']);
-
-	return $result;
+		if(is_null($type))
+			return $types;
+		else if(isset($types[$type]))
+			return $types[$type];
+		else
+			return S_UNKNOWN;
 	}
 
 	function get_sysmap_by_sysmapid($sysmapid){
@@ -124,41 +51,6 @@
 		}
 		error(S_NO_SYSTEM_MAP_WITH.' sysmapid=['.$sysmapid.']');
 		return false;
-	}
-
-	function get_sysmaps_element_by_selementid($selementid){
-		$sql='select * FROM sysmaps_elements WHERE selementid='.$selementid;
-		$result=DBselect($sql);
-		$row=DBfetch($result);
-		if($row){
-			return	$row;
-		}
-		else{
-			error(S_NO_SYSMAP_ELEMENT_WITH.' selementid=['.$selementid.']');
-		}
-	return	$result;
-	}
-
-// Add System Map
-
-	function add_sysmap($name,$width,$height,$backgroundid,$highlight,$label_type,$label_location){
-		$sysmapid=get_dbid('sysmaps','sysmapid');
-
-		$result=DBexecute('insert into sysmaps (sysmapid,name,width,height,backgroundid,highlight,label_type,label_location)'.
-			' VALUES ('.$sysmapid.','.zbx_dbstr($name).','.$width.','.$height.','.$backgroundid.','.$highlight.','.$label_type.','.$label_location.')');
-
-		if(!$result)
-			return $result;
-
-	return $sysmapid;
-	}
-
-// Update System Map
-
-	function update_sysmap($sysmapid,$name,$width,$height,$backgroundid,$highlight,$label_type,$label_location){
-		return	DBexecute('UPDATE sysmaps SET name='.zbx_dbstr($name).',width='.$width.',height='.$height.','.
-			'backgroundid='.$backgroundid.',highlight='.$highlight.',label_type='.$label_type.','.
-			'label_location='.$label_location.' WHERE sysmapid='.$sysmapid);
 	}
 
 // LINKS
@@ -250,33 +142,11 @@
 	return $result;
 	}
 
-	function get_link_triggers($linkid){
-		$triggers = array();
-
-		$sql = 'SELECT * FROM sysmaps_link_triggers WHERE linkid='.$linkid;
-		$res = DBselect($sql);
-
-		while($rows = DBfetch($res)){
-			$triggers[] = $rows;
-		}
-	return $triggers;
-	}
-
 	function add_link_trigger($linkid,$triggerid,$drawtype,$color){
 		$linktriggerid=get_dbid("sysmaps_link_triggers","linktriggerid");
 		$sql = 'INSERT INTO sysmaps_link_triggers (linktriggerid,linkid,triggerid,drawtype,color) '.
 					" VALUES ($linktriggerid,$linkid,$triggerid,$drawtype,".zbx_dbstr($color).')';
 	return DBexecute($sql);
-	}
-
-	function update_link_trigger($linkid,$triggerid,$drawtype,$color){
-		$result=delete_link_trigger($linkid,$triggerid);
-		$result&=add_link_trigger($linkid,$triggerid,$drawtype,$color);
-	return $result;
-	}
-
-	function delete_link_trigger($linkid,$triggerid){
-	return DBexecute('DELETE FROM sysmaps_link_triggers WHERE linkid='.$linkid.' AND triggerid='.$triggerid);
 	}
 
 	function delete_all_link_triggers($linkids){
@@ -547,13 +417,7 @@
 	return $action_map;
 	}
 
-	function get_icon_center_by_selementid($selementid){
-		$element = get_sysmaps_element_by_selementid($selementid);
-	return get_icon_center_by_selement($element);
-	}
-
 	function get_icon_center_by_selement($element, $info=null){
-
 		$x = $element['x'];
 		$y = $element['y'];
 
@@ -605,13 +469,6 @@
 		}
 	}
 
-	function get_png_by_selementid($selementid){
-		$selement = DBfetch(DBselect('SELECT * FROM sysmaps_elements WHERE selementid='.$selementid));
-		if(!$selement)	return FALSE;
-
-	return get_png_by_selement($selement);
-	}
-
 	function get_png_by_selement($selement, $info){
 
 		switch($info['icon_type']){
@@ -647,10 +504,6 @@
 	return imagecreatefromstring($image['image']);
 	}
 
-	function get_base64_icon($element){
-		return base64_encode(get_element_icon($element));
-	}
-
 	function get_selement_iconid($selement, $info=null){
 		if($selement['selementid'] > 0){
 			if(is_null($info)){
@@ -683,37 +536,6 @@
 		}
 
 	return $info['iconid'];
-	}
-
-	function get_element_icon($element){
-		$iconid = get_element_iconid($element);
-
-		$image = get_image_by_imageid($iconid);
-		$img = imagecreatefromstring($image['image']);
-
-		unset($image);
-
-		$w=imagesx($img);
-		$h=imagesy($img);
-
-		if(function_exists('imagecreatetruecolor') && @imagecreatetruecolor(1,1)){
-			$im = imagecreatetruecolor($w,$h);
-		}
-		else{
-			$im = imagecreate($w,$h);
-		}
-
-		imagefilledrectangle($im,0,0,$w,$h, imagecolorallocate($im,255,255,255));
-
-		imagecopy($im,$img,0,0,0,0,$w,$h);
-		imagedestroy($img);
-
-		ob_start();
-		imagepng($im);
-		$image_txt = ob_get_contents();
-		ob_end_clean();
-
-	return $image_txt;
 	}
 
 	function get_selement_icons(){

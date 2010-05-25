@@ -62,6 +62,7 @@ class CHostGroup extends CZBXAPI{
 			'groupids'					=> null,
 			'hostids'					=> null,
 			'templateids'				=> null,
+			'maintenanceids'			=> null,
 			'monitored_hosts'			=> null,
 			'templated_hosts' 			=> null,
 			'real_hosts' 				=> null,
@@ -149,6 +150,18 @@ class CHostGroup extends CZBXAPI{
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
 			$sql_parts['where'][] = DBcondition('hg.hostid', $options['hostids']);
 			$sql_parts['where']['hgg'] = 'hg.groupid=g.groupid';
+		}
+		
+// maintenanceids
+		if(!is_null($options['maintenanceids'])){
+			zbx_value2array($options['maintenanceids']);
+			if($options['output'] != API_OUTPUT_SHORTEN){
+				$sql_parts['select']['maintenanceid'] = 'mg.maintenanceid';
+			}
+
+			$sql_parts['from']['maintenances_groups'] = 'maintenances_groups mg';
+			$sql_parts['where'][] = DBcondition('mg.maintenanceid', $options['maintenanceids']);
+			$sql_parts['where']['hmh'] = 'g.groupid=mg.groupid';
 		}
 
 // monitored_hosts, real_hosts, templated_hosts, not_proxy_hosts
@@ -346,6 +359,14 @@ class CHostGroup extends CZBXAPI{
 
 						$result[$group['groupid']]['hosts'][] = array('hostid' => $group['hostid']);
 						unset($group['hostid']);
+					}
+// maintenanceids
+					if(isset($group['maintenanceid'])){
+						if(!isset($result[$group['groupid']]['maintenanceid']))
+							$result[$group['groupid']]['maintenances'] = array();
+
+						$result[$group['groupid']]['maintenances'][] = array('maintenanceid' => $group['maintenanceid']);
+						unset($group['maintenanceid']);
 					}
 
 					$result[$group['groupid']] += $group;

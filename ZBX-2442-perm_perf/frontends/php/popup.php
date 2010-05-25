@@ -1441,7 +1441,7 @@ include_once('include/page_header.php');
 
 		$all = false;
 		foreach($hostgroups as $hgnum => $row){
-			$row['node_name'] = get_node_name_by_elid($row['groupid']);
+			$row['node_name'] = get_node_name_by_elid($row['groupid'], true);
 
 			if(!$all){
 				$name = new CLink(bold(S_MINUS_ALL_GROUPS_MINUS),'#');
@@ -1467,7 +1467,7 @@ include_once('include/page_header.php');
 		}
 		$table->show();
 	}
-	else if($srctbl == "drules"){
+	else if($srctbl == 'drules'){
 		$table = new CTableInfo(S_NO_DISCOVERY_RULES_DEFINED);
 		$table->setHeader(S_NAME);
 
@@ -1526,9 +1526,7 @@ include_once('include/page_header.php');
 		}
 		$table->show();
 	}
-?>
-<?php
 
-include_once('include/page_footer.php');
 
+	include_once('include/page_footer.php');
 ?>

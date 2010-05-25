@@ -99,6 +99,7 @@ class CHost extends CZBXAPI{
 			'graphids'					=> null,
 			'dhostids'					=> null,
 			'dserviceids'				=> null,
+			'maintenanceids'			=> null,
 			'monitored_hosts'			=> null,
 			'templated_hosts'			=> null,
 			'proxy_hosts'				=> null,
@@ -337,6 +338,22 @@ class CHost extends CZBXAPI{
 
 			if(!is_null($options['groupCount'])){
 				$sql_parts['group']['dhostid'] = 'ds.dhostid';
+			}
+		}
+
+// maintenanceids
+		if(!is_null($options['maintenanceids'])){
+			zbx_value2array($options['maintenanceids']);
+			if($options['output'] != API_OUTPUT_SHORTEN){
+				$sql_parts['select']['maintenanceid'] = 'mh.maintenanceid';
+			}
+
+			$sql_parts['from']['maintenances_hosts'] = 'maintenances_hosts mh';
+			$sql_parts['where'][] = DBcondition('mh.maintenanceid', $options['maintenanceids']);
+			$sql_parts['where']['hmh'] = 'h.hostid=mh.hostid';
+
+			if(!is_null($options['groupCount'])){
+				$sql_parts['group']['maintenanceid'] = 'mh.maintenanceid';
 			}
 		}
 
@@ -654,6 +671,14 @@ class CHost extends CZBXAPI{
 
 						$result[$host['hostid']]['dservices'][] = array('dserviceid' => $host['dserviceid']);
 						unset($host['dserviceid']);
+					}
+// maintenanceids
+					if(isset($host['maintenanceid'])){
+						if(!isset($result[$host['hostid']]['maintenanceid']))
+							$result[$host['hostid']]['maintenances'] = array();
+
+						$result[$host['hostid']]['maintenances'][] = array('maintenanceid' => $host['maintenanceid']);
+						unset($host['maintenanceid']);
 					}
 //---
 
@@ -1135,7 +1160,7 @@ Copt::memoryPick();
 				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Incorrect characters used for Hostname [ '.$host['host'].' ]');
 				break;
 			}
-			if(!empty($dns) && !preg_match('/^'.ZBX_PREG_DNS_FORMAT.'$/i', $host['dns'])){
+			if(!empty($host['dns']) && !preg_match('/^'.ZBX_PREG_DNS_FORMAT.'$/i', $host['dns'])){
 				$result = false;
 				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Incorrect characters used for DNS [ '.$host['dns'].' ]');
 				break;
@@ -1249,7 +1274,6 @@ Copt::memoryPick();
  * @return boolean
  */
 	public static function update($hosts){
-		$errors = array();
 		$result = true;
 
 		$hosts = zbx_toArray($hosts);
@@ -1308,11 +1332,7 @@ Copt::memoryPick();
  * @return boolean
  */
 	public static function massAdd($data){
-		$errors = array();
 		$result = true;
-
-		$hosts = isset($data['hosts']) ? zbx_toArray($data['hosts']) : null;
-		$hostids = is_null($hosts) ? array() : zbx_objectValues($hosts, 'hostid');
 
 		try{
 			$transaction = self::BeginTransaction(__METHOD__);
@@ -1661,7 +1681,7 @@ Copt::memoryPick();
 							'poc_2_email','poc_2_phone_1','poc_2_phone_2','poc_2_cell','poc_2_screen','poc_2_notes');
 
 						$sql_set = array();
-						foreach($host_profile_fields as $field){
+						foreach($host_profile_ext_fields as $field){
 							if(isset($data['extendedProfile'][$field])) $sql_set[] = $field.'='.zbx_dbstr($data['extendedProfile'][$field]);
 						}
 
@@ -1707,9 +1727,6 @@ Copt::memoryPick();
 	public static function massRemove($data){
 		$errors = array();
 		$result = true;
-
-		$hosts = isset($data['hosts']) ? zbx_toArray($data['hosts']) : null;
-		$hostids = is_null($hosts) ? array() : zbx_objectValues($hosts, 'hostid');
 
 		self::BeginTransaction(__METHOD__);
 

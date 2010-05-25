@@ -306,26 +306,21 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		if(!count($nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 			access_deny();
 
-		$status = ($_REQUEST['go'] == 'activate')?0:1;
-		$status_name = $status?'disabled':'enabled';
+		$status = ($_REQUEST['go'] == 'activate') ? 0 : 1;
+		$status_name = $status ? 'disabled' : 'enabled';
 
-		DBstart();
-		$actionids = array();
-		$sql = 'SELECT DISTINCT a.actionid '.
-					' FROM actions a '.
-					' WHERE '.DBin_node('a.actionid',$nodes).
-						' AND '.DBcondition('a.actionid', $_REQUEST['g_actionid']);
+		$options = array(
+			'actionids' => $_REQUEST['g_actionid'],
+			'editable' => 1,
+			'output' => API_OUTPUT_SHORTEN,
+		);
+		$actions = CAction::get($options);
+		$actionids = zbx_objectValues($actions, 'actionid');
+		
+		$res = DBexecute('UPDATE actions SET status='.$status.' WHERE '.DBcondition('actionid', $actionids));
+		show_messages($res, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
 
-		$go_result=DBselect($sql);
-		while($row=DBfetch($go_result)){
-			$res = update_action_status($row['actionid'],$status);
-			if($res)
-				$actionids[] = $row['actionid'];
-		}
-		$go_result = DBend($res);
-
-		if($go_result && isset($res)){
-			show_messages($go_result, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
+		if($res){
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',',$actionids).'] '.$status_name);
 		}
 	}

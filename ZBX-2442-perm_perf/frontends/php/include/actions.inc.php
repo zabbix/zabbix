@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,50 +22,6 @@ include_once 'include/discovery.inc.php';
 
 ?>
 <?php
-function action_accessible($actionid,$perm){
-	global $USER_DETAILS;
-
-	$result = false;
-
-	if(DBselect('select actionid from actions where actionid='.$actionid.' and '.DBin_node('actionid'))){
-		$result = true;
-
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,$perm,null,get_current_nodeid(true));
-		$available_groups = get_accessible_groups_by_user($USER_DETAILS,$perm,null,get_current_nodeid(true));
-
-		$db_result = DBselect('SELECT * FROM conditions WHERE actionid='.$actionid);
-		while(($ac_data = DBfetch($db_result)) && $result){
-			if($ac_data['operator'] != 0) continue;
-
-			switch($ac_data['conditiontype']){
-				case CONDITION_TYPE_HOST_GROUP:
-					if(!isset($available_groups[$ac_data['value']])){
-						$result = false;
-					}
-					break;
-				case CONDITION_TYPE_HOST:
-				case CONDITION_TYPE_HOST_TEMPLATE:
-					if(!isset($available_hosts[$ac_data['value']])){
-						$result = false;
-					}
-					break;
-				case CONDITION_TYPE_TRIGGER:
-					$sql = 'SELECT DISTINCT t.triggerid'.
-						' FROM triggers t,items i,functions f '.
-						' WHERE t.triggerid='.$ac_data['value'].
-							' AND f.triggerid=t.triggerid'.
-							' AND i.itemid=f.itemid '.
-							' AND '.DBcondition('i.hostid',$available_hosts, true);
-
-					if(DBfetch(DBselect($sql,1))){
-						$result = false;
-					}
-					break;
-			}
-		}
-	}
-	return $result;
-}
 
 function check_permission_for_action_conditions($conditions){
 	global $USER_DETAILS;
@@ -837,40 +793,50 @@ function	get_operators_by_conditiontype($conditiontype)
 	return array();
 }
 
-function	update_action_status($actionid, $status)
-{
-	return DBexecute("update actions set status=$status where actionid=$actionid");
-}
-
 function validate_condition($conditiontype, $value){
 	global $USER_DETAILS;
 
 	switch($conditiontype){
 		case CONDITION_TYPE_HOST_GROUP:
-			$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY,null,get_current_nodeid(true));
-			if(!isset($available_groups[$value])){
+			$groups = CHostGroup::get(array(
+				'groupids' => $value,
+				'output' => API_OUTPUT_SHORTEN,
+				'nodeids' => get_current_nodeid(true),
+			));
+			if(empty($groups)){
 				error(S_INCORRECT_GROUP);
 				return false;
 			}
 			break;
 		case CONDITION_TYPE_HOST_TEMPLATE:
-			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,get_current_nodeid(true));
-			if(!isset($available_hosts[$value])){
+			$templates = CTemplate::get(array(
+				'templateids' => $value,
+				'output' => API_OUTPUT_SHORTEN,
+				'nodeids' => get_current_nodeid(true),
+			));
+			if(empty($templates)){
 				error(S_INCORRECT_HOST);
 				return false;
 			}
 			break;
 		case CONDITION_TYPE_TRIGGER:
-			if( !DBfetch(DBselect('select triggerid from triggers where triggerid='.$value)) ||
-				!check_right_on_trigger_by_triggerid(PERM_READ_ONLY, $value) )
-			{
+			$triggers = CTrigger::get(array(
+				'triggerids' => $value,
+				'output' => API_OUTPUT_SHORTEN,
+				'nodeids' => get_current_nodeid(true),
+			));
+			if(empty($triggers)){
 				error(S_INCORRECT_TRIGGER);
 				return false;
 			}
 			break;
 		case CONDITION_TYPE_HOST:
-			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,get_current_nodeid(true));
-			if(!isset($available_hosts[$value])){
+			$hosts = CTemplate::get(array(
+				'hostids' => $value,
+				'output' => API_OUTPUT_SHORTEN,
+				'nodeids' => get_current_nodeid(true),
+			));
+			if(empty($hosts)){
 				error(S_INCORRECT_HOST);
 				return false;
 			}
@@ -941,14 +907,20 @@ function validate_operation($operation){
 		case OPERATION_TYPE_MESSAGE:
 			switch($operation['object']){
 				case OPERATION_OBJECT_USER:
-					$users = CUser::get(array('userids' => $operation['objectid'],  'extendoutput' => 1));
+					$users = CUser::get(array(
+						'userids' => $operation['objectid'],
+						'extendoutput' => 1
+					));
 					if(empty($users)){
 						error(S_INCORRECT_USER);
 						return false;
 					}
 					break;
 				case OPERATION_OBJECT_GROUP:
-					$usrgrps = CUserGroup::get(array('usrgrpids' => $operation['objectid'],  'extendoutput' => 1));
+					$usrgrps = CUserGroup::get(array(
+						'usrgrpids' => $operation['objectid'],
+						'extendoutput' => 1
+					));
 					if(empty($usrgrps)){
 						error(S_INCORRECT_GROUP);
 						return false;
@@ -968,16 +940,24 @@ function validate_operation($operation){
 			break;
 		case OPERATION_TYPE_GROUP_ADD:
 		case OPERATION_TYPE_GROUP_REMOVE:
-			$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
-			if(!isset($available_groups[$operation['objectid']])){
+			$groups = CHostGroup::get(array(
+				'groupids' => $operation['objectid'],
+				'output' => API_OUTPUT_SHORTEN,
+				'editable' => 1,
+			));
+			if(empty($groups)){
 				error(S_INCORRECT_GROUP);
 				return false;
 			}
 			break;
 		case OPERATION_TYPE_TEMPLATE_ADD:
 		case OPERATION_TYPE_TEMPLATE_REMOVE:
-			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
-			if(!isset($available_hosts[$operation['objectid']])){
+			$tpls = CTemplate::get(array(
+				'templateids' => $operation['objectid'],
+				'output' => API_OUTPUT_SHORTEN,
+				'editable' => 1,
+			));
+			if(empty($tpls)){
 				error(S_INCORRECT_HOST);
 				return false;
 			}

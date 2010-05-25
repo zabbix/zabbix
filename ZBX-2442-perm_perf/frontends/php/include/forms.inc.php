@@ -2266,19 +2266,16 @@
 
 		$frmItem->addSpanRow($frmRow,'form_row_last');
 
-	        $cmbGroups = new CComboBox('add_groupid',$add_groupid);
-
-			$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
-	        $groups=DBselect('SELECT DISTINCT groupid,name '.
-				' FROM groups '.
-				' WHERE '.DBcondition('groupid',$available_groups).
-				' ORDER BY name');
-	        while($group=DBfetch($groups)){
-				$cmbGroups->addItem(
-					$group['groupid'],
-					get_node_name_by_elid($group['groupid'], null, ': ').$group['name']
-					);
-	        }
+// GROUP OPERATIONS
+		$cmbGroups = new CComboBox('add_groupid',$add_groupid);
+		$groups = CHostGroup::get(array(
+			'editable' => 1,
+			'output' => API_OUTPUT_EXTEND,
+		));
+		order_result($groups, 'name');
+		foreach($groups as $group){
+			$cmbGroups->addItem($group['groupid'], get_node_name_by_elid($group['groupid'], null, ': ').$group['name']);
+		}
 		$frmItem->addRow(S_GROUP,$cmbGroups);
 
 		$cmbAction = new CComboBox('action');
@@ -2287,9 +2284,7 @@
 			$cmbAction->addItem('update in group',S_UPDATE_IN_GROUP);
 			$cmbAction->addItem('delete FROM group',S_DELETE_FROM_GROUP);
 		}
-		$frmItem->addItemToBottomRow($cmbAction);
-		$frmItem->addItemToBottomRow(SPACE);
-		$frmItem->addItemToBottomRow(new CButton('register',S_DO_SMALL));
+		$frmItem->addItemToBottomRow(array($cmbAction, SPACE, new CButton('register',S_DO_SMALL)));
 
 		$frmItem->show();
 	}
@@ -3350,352 +3345,6 @@
 		$frmGraph->addItemToBottomRow(new CButtonCancel(url_param('groupid').url_param('hostid')));
 
 		$frmGraph->show();
-	}
-
-	function get_maintenance_form(){
-		$frm_title = S_MAINTENANCE;
-
-		if(isset($_REQUEST['maintenanceid']) && !isset($_REQUEST["form_refresh"])){
-			$sql = 'SELECT m.* '.
-				' FROM maintenances m '.
-				' WHERE '.DBin_node('m.maintenanceid').
-					' AND m.maintenanceid='.$_REQUEST['maintenanceid'];
-			$maintenance = DBfetch(DBSelect($sql));
-
-			$frm_title = S_USER.' ['.$maintenance['name'].']';
-
-			$mname			= $maintenance['name'];
-			$maintenance_type	= $maintenance['maintenance_type'];
-
-			$active_since		= $maintenance['active_since'];
-			$active_till		= $maintenance['active_till'];
-
-			$description		= $maintenance['description'];
-
-		}
-		else{
-			$mname				= get_request('mname','');
-			$maintenance_type	= get_request('maintenance_type',0);
-
-			$active_since		= zbxDateToTime(get_request('active_since',date('YmdHi')));
-			$active_till		= zbxDateToTime(get_request('active_till', date('YmdHi', time()+86400)));
-
-			$description		= get_request('description','');
-		}
-
-		$tblMntc = new CTable('','nowrap');
-
-		$tblMntc->addRow(array(S_NAME, new CTextBox('mname', $mname, 50)));
-
-/* form row generation */
-		$cmbType =  new CComboBox('maintenance_type', $maintenance_type);
-		$cmbType->addItem(MAINTENANCE_TYPE_NORMAL, S_WITH_DATA_COLLECTION);
-		$cmbType->addItem(MAINTENANCE_TYPE_NODATA, S_NO_DATA_COLLECTION);
-		$tblMntc->addRow(array(S_MAINTENANCE_TYPE, $cmbType));
-
-
-/***********************************************************/
-
-		$tblMntc->addItem(new Cvar('active_since', date('YmdHi', $active_since)));
-		$tblMntc->addItem(new Cvar('active_till', date('YmdHi', $active_till)));
-
-		$clndr_icon = new CImg('images/general/bar/cal.gif','calendar', 16, 12, 'pointer');
-
-		$clndr_icon->addAction('onclick','javascript: '.
-											'var pos = getPosition(this); '.
-											'pos.top+=10; '.
-											'pos.left+=16; '.
-											"CLNDR['mntc_active_since'].clndr.clndrshow(pos.top,pos.left);");
-
-		$filtertimetab = new CTable(null,'calendar');
-		$filtertimetab->setAttribute('width','10%');
-
-		$filtertimetab->setCellPadding(0);
-		$filtertimetab->setCellSpacing(0);
-
-		$filtertimetab->addRow(array(
-								new CNumericBox('mntc_since_day',(($active_since>0)?date('d',$active_since):''),2),
-								'/',
-								new CNumericBox('mntc_since_month',(($active_since>0)?date('m',$active_since):''),2),
-								'/',
-								new CNumericBox('mntc_since_year',(($active_since>0)?date('Y',$active_since):''),4),
-								SPACE,
-								new CNumericBox('mntc_since_hour',(($active_since>0)?date('H',$active_since):''),2),
-								':',
-								new CNumericBox('mntc_since_minute',(($active_since>0)?date('i',$active_since):''),2),
-								$clndr_icon
-						));
-
-		zbx_add_post_js('create_calendar(null,'.
-						'["mntc_since_day","mntc_since_month","mntc_since_year","mntc_since_hour","mntc_since_minute"],'.
-						'"mntc_active_since",'.
-						'"active_since");');
-
-		$clndr_icon->addAction('onclick','javascript: '.
-											'var pos = getPosition(this); '.
-											'pos.top+=10; '.
-											'pos.left+=16; '.
-											"CLNDR['mntc_active_till'].clndr.clndrshow(pos.top,pos.left);");
-
-		$tblMntc->addRow(array(S_ACTIVE_SINCE,$filtertimetab));
-
-		$filtertimetab = new CTable(null,'calendar');
-		$filtertimetab->setAttribute('width','10%');
-
-		$filtertimetab->setCellPadding(0);
-		$filtertimetab->setCellSpacing(0);
-
-		$filtertimetab->addRow(array(
-								new CNumericBox('mntc_till_day',(($active_till>0)?date('d',$active_till):''),2),
-								'/',
-								new CNumericBox('mntc_till_month',(($active_till>0)?date('m',$active_till):''),2),
-								'/',
-								new CNumericBox('mntc_till_year',(($active_till>0)?date('Y',$active_till):''),4),
-								SPACE,
-								new CNumericBox('mntc_till_hour',(($active_till>0)?date('H',$active_till):''),2),
-								':',
-								new CNumericBox('mntc_till_minute',(($active_till>0)?date('i',$active_till):''),2),
-								$clndr_icon
-						));
-		zbx_add_post_js('create_calendar(null,'.
-						'["mntc_till_day","mntc_till_month","mntc_till_year","mntc_till_hour","mntc_till_minute"],'.
-						'"mntc_active_till",'.
-						'"active_till");');
-
-		$tblMntc->addRow(array(S_ACTIVE_TILL, $filtertimetab));
-//-------
-
-		$tblMntc->addRow(array(S_DESCRIPTION, new CTextArea('description', $description,66,5)));
-
-
-		$tblMaintenance = new CTableInfo();
-		$tblMaintenance->addRow($tblMntc);
-
-		$td = new CCol(array(new CButton('save',S_SAVE)));
-		$td->setAttribute('colspan','2');
-		$td->setAttribute('style','text-align: right;');
-
-		if(isset($_REQUEST['maintenanceid'])){
-
-			$td->addItem(SPACE);
-			$td->addItem(new CButton('clone',S_CLONE));
-			$td->addItem(SPACE);
-			$td->addItem(new CButtonDelete(S_DELETE_MAINTENANCE_PERIOD_Q,url_param('form').url_param('config').url_param('maintenanceid')));
-
-		}
-		$td->addItem(SPACE);
-		$td->addItem(new CButtonCancel(url_param("maintenanceid")));
-
-		$tblMaintenance->setFooter($td);
-	return $tblMaintenance;
-	}
-
-	function get_maintenance_hosts_form(&$form){
-		global $USER_DETAILS;
-		$tblHlink = new CTableInfo();
-		$tblHlink->setAttribute('style', 'background-color: #CCC;');
-
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_WRITE);
-
-//		validate_group(PERM_READ_WRITE,array('real_hosts'),'web.last.conf.groupid');
-
-		$twb_groupid = get_request('twb_groupid', 0);
-
-		$options = array(
-			'editable' => 1,
-			'extendoutput' => 1,
-			'real_hosts' => 1,
-		);
-		$groups = CHostGroup::get($options);
-		$groups = zbx_toHash($groups, 'groupid');
-		order_result($groups, 'name');
-
-		if(!isset($groups[$twb_groupid])){
-			$twb_groupid = key($groups);
-		}
-
-		$cmbGroups = new CComboBox('twb_groupid', $twb_groupid, 'submit()');
-		foreach($groups as $group){
-			$cmbGroups->addItem($group['groupid'], $group['name']);
-		}
-
-		$hostids = get_request('hostids', array());
-
-		$host_tb = new CTweenBox($form, 'hostids', null, 10);
-
-		if(isset($_REQUEST['maintenanceid']) && !isset($_REQUEST['form_refresh'])){
-			$sql_from = ', maintenances_hosts mh ';
-			$sql_where = ' AND h.hostid=mh.hostid '.
-							' AND mh.maintenanceid='.$_REQUEST['maintenanceid'];
-		}
-		else{
-			$sql_from = '';
-			$sql_where =  'AND '.DBcondition('h.hostid', $hostids);
-		}
-
-		$sql = 'SELECT DISTINCT h.hostid, h.host '.
-				' FROM hosts h '.$sql_from.
-				' WHERE '.DBcondition('h.hostid',$available_hosts).
-					$sql_where.
-					' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
-				' ORDER BY h.host';
-		$db_hosts = DBselect($sql);
-		while($host = DBfetch($db_hosts)){
-			$hostids[$host['hostid']] = $host['hostid'];
-			$host_tb->addItem($host['hostid'], $host['host'], true);
-		}
-
-
-		$options = array(
-			'editable' => 1,
-			'extendoutput' => 1,
-			'groupids' => $twb_groupid
-		);
-		$group_hosts = CHost::get($options);
-		order_result($group_hosts, 'host');
-
-		foreach($group_hosts as $ghost){
-			if(isset($hostids[$ghost['hostid']])) continue;
-			$host_tb->addItem($ghost['hostid'], $ghost['host'], false);
-		}
-
-		$tblHlink->addRow($host_tb->Get(S_IN.SPACE.S_MAINTENANCE, array(S_OTHER.SPACE.S_HOSTS.SPACE.'|'.SPACE.S_GROUP.SPACE, $cmbGroups)));
-
-	return $tblHlink;
-	}
-
-	function get_maintenance_groups_form($form){
-		global $USER_DETAILS;
-
-		$tblGlink = new CTableInfo();
-		$tblGlink->setAttribute('style','background-color: #CCC;');
-
-		$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
-
-		$groupids = get_request('groupids', array());
-
-		$group_tb = new CTweenBox($form,'groupids',null,10);
-
-		if(isset($_REQUEST['maintenanceid']) && !isset($_REQUEST["form_refresh"])){
-			$sql_from = ', maintenances_groups mg ';
-			$sql_where = ' AND g.groupid=mg.groupid '.
-							' AND mg.maintenanceid='.$_REQUEST['maintenanceid'];
-		}
-		else{
-			$sql_from = '';
-			$sql_where =  'AND '.DBcondition('g.groupid',$groupids);
-		}
-
-		$sql = 'SELECT DISTINCT g.groupid, g.name '.
-				' FROM hosts h, hosts_groups hg, groups g '.$sql_from.
-				' WHERE hg.groupid=g.groupid'.
-					' AND h.hostid=hg.hostid '.
-					' AND '.DBcondition('g.groupid',$available_groups).
-					' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
-					$sql_where.
-				' ORDER BY g.name';
-//SDI($sql);
-		$db_groups = DBselect($sql);
-		while($group = DBfetch($db_groups)){
-			$groupids[$group['groupid']] = $group['groupid'];
-			$group_tb->addItem($group['groupid'],$group['name'], true);
-		}
-
-
-		$sql = 'SELECT DISTINCT g.* '.
-				' FROM hosts h, hosts_groups hg, groups g '.
-				' WHERE hg.groupid=g.groupid'.
-					' AND h.hostid=hg.hostid '.
-					' AND '.DBcondition('g.groupid',$available_groups).
-					' AND '.DBcondition('g.groupid',$groupids,true).
-					' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
-				' ORDER BY g.name';
-		$db_groups = DBselect($sql);
-		while($group = DBfetch($db_groups)){
-			$group_tb->addItem($group['groupid'],$group['name'], false);
-		}
-
-		$tblGlink->addRow($group_tb->Get(S_IN.SPACE.S_MAINTENANCE,S_OTHER.SPACE.S_GROUPS));
-
-	return $tblGlink;
-	}
-
-	function get_maintenance_periods(){
-		$tblPeriod = new CTableInfo();
-		$tblPeriod->setAttribute('style','background-color: #CCC;');
-
-		if(isset($_REQUEST['maintenanceid']) && !isset($_REQUEST["form_refresh"])){
-
-			$timeperiods = array();
-			$sql = 'SELECT DISTINCT mw.maintenanceid, tp.* '.
-					' FROM timeperiods tp, maintenances_windows mw '.
-					' WHERE mw.maintenanceid='.$_REQUEST['maintenanceid'].
-						' AND tp.timeperiodid=mw.timeperiodid '.
-					' ORDER BY tp.timeperiod_type ASC';
-			$db_timeperiods = DBselect($sql);
-			while($timeperiod = DBfetch($db_timeperiods)){
-				$timeperiods[] = $timeperiod;
-			}
-
-		}
-		else {
-			$timeperiods = get_request('timeperiods', array());
-		}
-
-		$tblPeriod->setHeader(array(
-				new CCheckBox('all_periods',null,'checkAll("'.S_PERIOD.'","all_periods","g_timeperiodid");'),
-				S_PERIOD_TYPE,
-				S_SCHEDULE,
-				S_PERIOD,
-//				S_NEXT_RUN,
-				S_ACTION
-			));
-
-//		zbx_rksort($timeperiods);
-		foreach($timeperiods as $id => $timeperiod){
-			$period_type = timeperiod_type2str($timeperiod['timeperiod_type']);
-			$shedule_str = shedule2str($timeperiod);
-
-			$tblPeriod->addRow(array(
-				new CCheckBox('g_timeperiodid[]', 'no', null, $id),
-				$period_type,
-				new CCol($shedule_str, 'wraptext'),
-				zbx_date2age(0,$timeperiod['period']),
-//				0,
-				new CButton('edit_timeperiodid['.$id.']',S_EDIT)
-				));
-
-			$tblPeriod->addItem(new Cvar('timeperiods['.$id.'][timeperiod_type]',	$timeperiod['timeperiod_type']));
-
-			$tblPeriod->addItem(new Cvar('timeperiods['.$id.'][every]',		$timeperiod['every']));
-			$tblPeriod->addItem(new Cvar('timeperiods['.$id.'][month]',		$timeperiod['month']));
-			$tblPeriod->addItem(new Cvar('timeperiods['.$id.'][dayofweek]',		$timeperiod['dayofweek']));
-			$tblPeriod->addItem(new Cvar('timeperiods['.$id.'][day]',		$timeperiod['day']));
-			$tblPeriod->addItem(new Cvar('timeperiods['.$id.'][start_time]',	$timeperiod['start_time']));
-			$tblPeriod->addItem(new Cvar('timeperiods['.$id.'][start_date]',	$timeperiod['start_date']));
-			$tblPeriod->addItem(new Cvar('timeperiods['.$id.'][period]',		$timeperiod['period']));
-		}
-		unset($timeperiods);
-
-		$tblPeriodFooter = new CTableInfo(null);
-
-		$oper_buttons = array();
-		if(!isset($_REQUEST['new_timeperiod'])){
-			$oper_buttons[] = new CButton('new_timeperiod',S_NEW);
-		}
-
-		if($tblPeriod->ItemsCount() > 0 ){
-			$oper_buttons[] = new CButton('del_timeperiod',S_DELETE_SELECTED);
-		}
-
-		$td = new CCol($oper_buttons);
-		$td->setAttribute('colspan',7);
-		$td->setAttribute('style','text-align: right;');
-
-
-		$tblPeriodFooter->setFooter($td);
-// end of condition list preparation
-	return array($tblPeriod,$tblPeriodFooter);
 	}
 
 	function get_timeperiod_form(){
@@ -5425,15 +5074,16 @@
 
 		$frmHost->addRow(S_NAME,S_ORIGINAL);
 
-		$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST);
 		$grp_tb = new CTweenBox($frmHost,'groups',$groups,6);
-		$db_groups=DBselect('SELECT DISTINCT groupid,name '.
-						' FROM groups '.
-						' WHERE '.DBcondition('groupid',$available_groups).
-						' ORDER BY name');
 
-		while($db_group=DBfetch($db_groups)){
-			$grp_tb->addItem($db_group['groupid'],$db_group['name']);
+		$options = array(
+			'output' => API_OUTPUT_EXTEND,
+			'editable' => 1,
+		);
+		$all_groups = CHostGroup::get($options);
+		order_result($all_groups, 'name');
+		foreach($all_groups as $grp){
+			$grp_tb->addItem($grp['groupid'], $grp['name']);
 		}
 
 		$frmHost->addRow(array(new CVisibilityBox('visible[groups]', isset($visible['groups']), $grp_tb->GetName(), S_ORIGINAL),S_GROUPS),
@@ -5670,8 +5320,6 @@
 		if(isset($_REQUEST['groupid']) && ($_REQUEST['groupid']>0) && !uint_in_array($_REQUEST['groupid'], $host_groups)){
 			array_push($host_groups, $_REQUEST['groupid']);
 		}
-
-		$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
 
 		$newgroup	= get_request('newgroup','');
 
@@ -5958,71 +5606,62 @@
 
 		if($_REQUEST['form'] == 'full_clone'){
 // Host items
-			$items_lbx = new CListBox('items',null,8);
-			$items_lbx->setAttribute('disabled','disabled');
+			$options = array(
+				'inherited' => 0,
+				'hostids' => $_REQUEST['hostid'],
+				'output' => API_OUTPUT_EXTEND,
+				'webitems' => 1,
+			);
+			$host_items = CItem::get($options);
 
-			$sql = 'SELECT * '.
-					' FROM items '.
-					' WHERE hostid='.$_REQUEST['hostid'].
-						' AND templateid=0 '.
-					' ORDER BY description';
-			$host_items_res = DBselect($sql);
-			while($host_item = DBfetch($host_items_res)){
-				$item_description = item_description($host_item);
-				$items_lbx->addItem($host_item['itemid'],$item_description);
+			if(!empty($host_items)){
+				$items_lbx = new CListBox('items', null, 8);
+				$items_lbx->setAttribute('disabled', 'disabled');
+
+				order_result($host_items, 'description');
+				foreach($host_items as $hitem){
+					$items_lbx->addItem($hitem['itemid'], item_description($hitem));
+				}
+				$host_tbl->addRow(array(S_ITEMS, $items_lbx));
 			}
-
-			if($items_lbx->ItemsCount() < 1) $items_lbx->setAttribute('style','width: 200px;');
-			$host_tbl->addRow(array(S_ITEMS, $items_lbx));
 
 // Host triggers
-			$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array($_REQUEST['hostid']), PERM_RES_IDS_ARRAY);
+			$options = array(
+				'inherited' => 0,
+				'hostids' => $_REQUEST['hostid'],
+				'output' => API_OUTPUT_EXTEND,
+			);
+			$host_triggers = CTrigger::get($options);
 
-			$trig_lbx = new CListBox('triggers',null,8);
-			$trig_lbx->setAttribute('disabled','disabled');
+			if(!empty($host_triggers)){
+				$trig_lbx = new CListBox('triggers' ,null, 8);
+				$trig_lbx->setAttribute('disabled', 'disabled');
 
-			$sql = 'SELECT DISTINCT t.* '.
-					' FROM triggers t, items i, functions f'.
-					' WHERE i.hostid='.$_REQUEST['hostid'].
-						' AND f.itemid=i.itemid '.
-						' AND t.triggerid=f.triggerid '.
-						' AND '.DBcondition('t.triggerid', $available_triggers).
-						' AND t.templateid=0 '.
-					' ORDER BY t.description';
-
-			$host_trig_res = DBselect($sql);
-			while($host_trig = DBfetch($host_trig_res)){
-				$trig_description = expand_trigger_description($host_trig["triggerid"]);
-				$trig_lbx->addItem($host_trig['triggerid'],$trig_description);
+				order_result($host_triggers, 'description');
+				foreach($host_triggers as $htrigger){
+					$trig_lbx->addItem($htrigger['triggerid'], expand_trigger_description($htrigger['triggerid']));
+				}
+				$host_tbl->addRow(array(S_TRIGGERS, $trig_lbx));
 			}
-
-			if($trig_lbx->ItemsCount() < 1) $trig_lbx->setAttribute('style','width: 200px;');
-			$host_tbl->addRow(array(S_TRIGGERS, $trig_lbx));
 
 // Host graphs
-			$available_graphs = get_accessible_graphs(PERM_READ_ONLY, array($_REQUEST['hostid']), PERM_RES_IDS_ARRAY);
+			$options = array(
+				'inherited' => 0,
+				'hostids' => $_REQUEST['hostid'],
+				'output' => API_OUTPUT_EXTEND,
+			);
+			$host_graphs = CGraph::get($options);
 
-			$graphs_lbx = new CListBox('graphs',null,8);
-			$graphs_lbx->setAttribute('disabled','disabled');
+			if(!empty($host_graphs)){
+				$graphs_lbx = new CListBox('triggers' ,null, 8);
+				$graphs_lbx->setAttribute('disabled', 'disabled');
 
-			$def_items = array();
-			$sql = 'SELECT DISTINCT g.* '.
-						' FROM graphs g, graphs_items gi,items i '.
-						' WHERE '.DBcondition('g.graphid',$available_graphs).
-							' AND gi.graphid=g.graphid '.
-							' AND g.templateid=0 '.
-							' AND i.itemid=gi.itemid '.
-							' AND i.hostid='.$_REQUEST['hostid'].
-						' ORDER BY g.name';
-
-			$host_graph_res = DBselect($sql);
-			while($host_graph = DBfetch($host_graph_res)){
-				$graphs_lbx->addItem($host_graph['graphid'],$host_graph['name']);
+				order_result($host_graphs, 'name');
+				foreach($host_graphs as $hgraph){
+					$graphs_lbx->addItem($hgraph['graphid'], $hgraph['name']);
+				}
+				$host_tbl->addRow(array(S_GRAPHS, $graphs_lbx));
 			}
-
-			if($graphs_lbx->ItemsCount() < 1) $graphs_lbx->setAttribute('style','width: 200px;');
-
-			$host_tbl->addRow(array(S_GRAPHS, $graphs_lbx));
 		}
 
 		$host_footer = array();

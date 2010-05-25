@@ -121,12 +121,9 @@ include_once('include/page_header.php');
 
 // HEADER
 	if(0 == $config){
-		$available_groups = $PAGE_GROUPS['groupids'];
 		$available_hosts = $PAGE_HOSTS['hostids'];
 	}
 	else{
-		$available_groups = get_accessible_groups_by_user($USER_DETAILS, PERM_READ_ONLY);
-
 		if($PAGE_HOSTS['selected'] != 0)
 			$PAGE_HOSTS['hostids'] = $available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 		else
@@ -260,9 +257,7 @@ include_once('include/page_header.php');
 		$rep2_wdgt->addItem($table);
 		$rep2_wdgt->show();
 	}
-?>
-<?php
+
 
 include_once('include/page_footer.php');
-
 ?>
