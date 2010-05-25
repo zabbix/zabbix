@@ -562,7 +562,7 @@ Copt::memoryPick();
 				foreach($templates as $templateid => $template){
 					unset($templates[$templateid]['parentTemplates']);
 
-					if(is_array($template['parentTemplates'])) {
+					if(isset($template['parentTemplates']) && is_array($template['parentTemplates'])) {
 						foreach($template['parentTemplates'] as $hnum => $parentTemplate){
 							if(!is_null($options['limitSelects'])){
 								if(!isset($count[$parentTemplate['templateid']])) $count[$parentTemplate['templateid']] = 0;
