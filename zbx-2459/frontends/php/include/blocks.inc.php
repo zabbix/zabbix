@@ -269,10 +269,12 @@ function make_system_summary($filter){
 		'groupids' => $groupids,
 		'monitored' => 1,
 		'maintenance' => $filter['maintenance'],
-		'only_problems' => 1,
 		'expand_data' => 1,
 		'skipDependent' => 1,
-		'filter' => array('priority' => $filter['severity']),
+		'filter' => array(
+			'priority' => $filter['severity'],
+			'value' => TRIGGER_VALUE_TRUE
+		),
 		'output' => API_OUTPUT_EXTEND,
 	);
 
@@ -429,9 +431,11 @@ function make_hoststat_summary($filter){
 		'nodeids' => get_current_nodeid(),
 		'monitored' => 1,
 		'maintenance' => $filter['maintenance'],
-		'only_problems' => 1,
 		'expand_data' => 1,
-		'filter' => array('priority' => $filter['severity']),
+		'filter' => array(
+			'priority' => $filter['severity'],
+			'value' => TRIGGER_VALUE_TRUE
+		),
 		'output' => API_OUTPUT_EXTEND,
 	);
 
@@ -680,11 +684,13 @@ function make_latest_issues($filter = array()){
 	$limit = isset($filter['limit']) ? $filter['limit'] : 20;
 	$options = array(
 		'groupids' => $filter['groupids'],
-		'only_problems' => 1,
 		'monitored' => 1,
 		'maintenance' => $filter['maintenance'],
 		'skipDependent' => 1,
-		'filter' => array('priority' => $filter['severity']),
+		'filter' => array(
+			'priority' => $filter['severity'],
+			'value' => TRIGGER_VALUE_TRUE
+		),
 		'select_hosts' => API_OUTPUT_EXTEND,
 		'output' => API_OUTPUT_EXTEND,
 		'sortfield' => 'lastchange',

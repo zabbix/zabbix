@@ -1438,19 +1438,25 @@ return $result;
 	function update_trigger_status($triggerids,$status){
 		zbx_value2array($triggerids);
 
-		// first update status for child triggers
+// first update status for child triggers
 		$upd_chd_triggers = array();
 		$db_chd_triggers = get_triggers_by_templateid($triggerids);
 		while($db_chd_trigger = DBfetch($db_chd_triggers)){
 			$upd_chd_triggers[$db_chd_trigger['triggerid']] = $db_chd_trigger['triggerid'];
 		}
+
 		if(!empty($upd_chd_triggers)){
 			update_trigger_status($upd_chd_triggers,$status);
 		}
 
-		add_event($triggerids,TRIGGER_VALUE_UNKNOWN);
+		DBexecute('UPDATE triggers SET status='.$status.' WHERE '.DBcondition('triggerid',$triggerids));
 
-	return DBexecute('UPDATE triggers SET status='.$status.' WHERE '.DBcondition('triggerid',$triggerids));
+		if($status != TRIGGER_STATUS_ENABLED){
+			add_event($triggerids,TRIGGER_VALUE_UNKNOWN);
+			DBexecute('UPDATE triggers SET value='.TRIGGER_VALUE_UNKNOWN.' WHERE '.DBcondition('triggerid',$triggerids));
+		}
+
+	return true;
 	}
 
 	/*
@@ -1798,6 +1804,7 @@ return $result;
 						' AND repeats>0 '.
 						' AND status='.ALERT_STATUS_NOT_SENT);
 		}
+
 	return $triggerids;
 	}
 
@@ -1910,7 +1917,8 @@ return $result;
 			/* Restore expression */
 			$expression = explode_exp($trigger['expression'],0);
 			$expressionData = parseTriggerExpressions($expression, true);
-		}else if(!isset($expressionData[$expression]['errors']) && $expression != explode_exp($trigger['expression'],0)){
+		}
+		else if(!isset($expressionData[$expression]['errors']) && $expression != explode_exp($trigger['expression'],0)){
 			$event_to_unknown = true;
 		}
 
@@ -2010,6 +2018,7 @@ return $result;
 		if(!is_null($type))			$sql .= ' type='.$type.',';
 		if(!is_null($priority))		$sql .= ' priority='.$priority.',';
 		if(!is_null($status))		$sql .= ' status='.$status.',';
+		if(!is_null($status) && ($status != TRIGGER_STATUS_ENABLED))	$sql .= ' value='.TRIGGER_VALUE_UNKNOWN.',';
 		if(!is_null($comments))		$sql .= ' comments='.zbx_dbstr($comments).',';
 		if(!is_null($url))			$sql .= ' url='.zbx_dbstr($url).',';
 		if(!is_null($templateid))	$sql .= ' templateid='.$templateid.',';
@@ -3097,10 +3106,11 @@ return $result;
 			'nodeids' => get_current_nodeid(),
 			'monitored' => 1,
 			'countOutput' => 1,
-			'only_problems' => $count_problems,
+			'filter' => array(),
 			'with_unacknowledged_events' => 1,
 			'limit' => ($config['search_limit']+1)
 		);
+		if($count_problems) $options['filter']['value'] = TRIGGER_VALUE_TRUE;
 		if(!empty($elements['hosts_groups'])) $options['groupids'] = array_unique($elements['hosts_groups']);
 		if(!empty($elements['hosts'])) $options['hostids'] = array_unique($elements['hosts']);
 		if(!empty($elements['triggers'])) $options['triggerids'] = array_unique($elements['triggers']);

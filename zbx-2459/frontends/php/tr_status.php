@@ -334,10 +334,9 @@ include_once('include/page_header.php');
 	$sortorder = getPageSortOrder();
 	$options = array(
 		'nodeids' => get_current_nodeid(),
-//		'status' => TRIGGER_STATUS_ENABLED,
-		'filter' => 1,
+		'filter' => array(),
 		'monitored' => 1,
-		'extendoutput' => 1,
+		'output' => API_OUTPUT_EXTEND,
 		'skipDependent' => 1,
 		'sortfield' => $sortfield,
 		'sortorder' => $sortorder,
@@ -378,10 +377,10 @@ include_once('include/page_header.php');
 	$options = array(
 		'nodeids' => get_current_nodeid(),
 		'triggerids' => zbx_objectValues($triggers, 'triggerid'),
-		'extendoutput' => 1,
-		'select_hosts' => 1,
-		'select_items' => 1,
-		'select_dependencies' => 1
+		'output' => API_OUTPUT_EXTEND,
+		'select_hosts' => array('hostid', 'host', 'maintenance_status'),
+		'select_items' => API_OUTPUT_EXTEND,
+		'select_dependencies' => API_OUTPUT_EXTEND
 	);
 	$triggers = CTrigger::get($options);
 	$triggers = zbx_toHash($triggers, 'triggerid');

@@ -82,7 +82,6 @@ class CTrigger extends CZBXAPI{
 			'triggerids'			=> null,
 			'itemids'				=> null,
 			'applicationids'		=> null,
-			'status'				=> null,
 			'functions'				=> null,
 			'monitored' 			=> null,
 			'templated'				=> null,
@@ -90,7 +89,6 @@ class CTrigger extends CZBXAPI{
 			'inherited'				=> null,
 			'editable'				=> null,
 			'nopermissions'			=> null,
-			'only_problems'			=> null,
 			'skipDependent'			=> null,
 			'with_unacknowledged_events' => null,
 
@@ -276,7 +274,7 @@ class CTrigger extends CZBXAPI{
 
 // monitored
 		if(!is_null($options['monitored'])){
-			$sql_parts['where'][] = ''.
+			$sql_parts['where']['monitored'] = ''.
 				' NOT EXISTS ('.
 					' SELECT ff.functionid'.
 					' FROM functions ff'.
@@ -292,7 +290,7 @@ class CTrigger extends CZBXAPI{
 									' )'.
 						' )'.
 				' )';
-			$sql_parts['where'][] = 't.status='.TRIGGER_STATUS_ENABLED;
+			$sql_parts['where']['monitored'] = 't.status='.TRIGGER_STATUS_ENABLED;
 		}
 
 // maintenance
@@ -311,18 +309,6 @@ class CTrigger extends CZBXAPI{
 						' )'.
 				' )';
 			$sql_parts['where'][] = 't.status='.TRIGGER_STATUS_ENABLED;
-		}
-
-// only_problems
-		if(!is_null($options['only_problems'])){
-			if(is_null($options['filter'])) $options['filter'] = array();
-			$options['filter']['value'] = TRIGGER_VALUE_TRUE;
-		}
-		
-// status
-		if(!is_null($options['status'])){
-			if(is_null($options['filter'])) $options['filter'] = array();
-			$options['filter']['status'] = $options['status'];
 		}
 
 // lastChangeSince
@@ -441,6 +427,7 @@ class CTrigger extends CZBXAPI{
 				$sql_parts['where']['value'] = DBcondition('t.value', $options['filter']['value']);
 			}
 		}
+
 // group
 		if(!is_null($options['group'])){
 			if($options['output'] != API_OUTPUT_SHORTEN){
@@ -963,7 +950,7 @@ COpt::memoryPick();
 			$options = array(
 				'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 				'editable' => 1,
-				'extendoutput' => 1,
+				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1
 			);
 			$upd_triggers = self::get($options);

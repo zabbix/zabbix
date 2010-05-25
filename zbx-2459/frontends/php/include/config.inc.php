@@ -546,7 +546,9 @@ function __autoload($class_name){
 		$triggerids='';
 
 		$options = array(
-			'only_problems' => 1,
+			'filter' => array(
+				'value' => TRIGGER_VALUE_TRUE
+			),
 			'with_unacknowledged_events' => 1,
 			'output' => array('triggerid', 'priority')
 		);
