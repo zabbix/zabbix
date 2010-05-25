@@ -539,6 +539,7 @@ include_once('include/page_header.php');
 			'select_items' => API_OUTPUT_EXTEND,
 			'select_functions' => API_OUTPUT_EXTEND,
 			'select_dependencies' => API_OUTPUT_EXTEND,
+			'filter' => array(),
 			'output' => API_OUTPUT_EXTEND,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
@@ -546,7 +547,7 @@ include_once('include/page_header.php');
 		);
 
 		if($showdisabled == 0){
-		    $options['status'] = TRIGGER_STATUS_ENABLED;
+		    $options['filter']['status'] = TRIGGER_STATUS_ENABLED;
 		}
 
 		if(($PAGE_HOSTS['selected'] > 0) || empty($PAGE_HOSTS['hostids'])){
