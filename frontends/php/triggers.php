@@ -520,13 +520,14 @@ include_once('include/page_header.php');
 			$sortorder = getPageSortOrder();
 			$options = array(
 				'editable' => 1,
-					'output' => API_OUTPUT_SHORTEN,
+				'output' => API_OUTPUT_SHORTEN,
+				'filter' => array(),
 				'sortfield' => $sortfield,
 				'sortorder' => $sortorder,
 				'limit' => ($config['search_limit']+1)
 			);
 			if($showdisabled == 0){
-				$options['status'] = TRIGGER_STATUS_ENABLED;
+				 $options['filter']['status'] = TRIGGER_STATUS_ENABLED;
 			}
 			if($pageFilter->hostid > 0)
 				$options['hostids'] = $pageFilter->hostid;
