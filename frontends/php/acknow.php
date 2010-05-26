@@ -69,7 +69,7 @@ include_once('include/page_header.php');
 	if(!$bulk){
 		$options = array(
 			'output' => API_OUTPUT_EXTEND,
-			'select_triggers' => 1,
+			'select_triggers' => API_OUTPUT_EXTEND,
 			'eventids' => $_REQUEST['eventid']
 		);
 		$events = CEvent::get($options);
