@@ -401,7 +401,6 @@ int	DBadd_service_alarm(zbx_uint64_t serviceid,int status,int clock)
  *                                                                            *
  * Return value: SUCCEED - it does depend, FAIL - otherwise                   *
  *                                                                            *
- *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: Recursive function!                                              *

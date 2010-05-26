@@ -64,7 +64,7 @@ void	zbx_db_close(void)
 	}
 
 	if (oracle.errhp) {
-		(void) OCIHandleFree (oracle.errhp, OCI_HTYPE_ERROR);
+		(void) OCIHandleFree(oracle.errhp, OCI_HTYPE_ERROR);
 		oracle.errhp = NULL;
 	}
 
@@ -85,9 +85,9 @@ void	zbx_db_close(void)
 #endif
 }
 #if HAVE_ORACLE
-char* zbx_oci_error(sword status)
+char*	zbx_oci_error(sword status)
 {
-	/* NOTE: do not thread safe, be carefully */
+	/* NOTE: not thread safe, be careful */
 	static char errbuf[512];
 	sb4 errcode = 0;
 
@@ -347,7 +347,7 @@ void	zbx_db_init(char *host, char *user, char *password, char *dbname, char *dbs
 #endif
 }
 
-int __zbx_zbx_db_execute(const char *fmt, ...)
+int	__zbx_zbx_db_execute(const char *fmt, ...)
 {
 	va_list args;
 	int ret;
@@ -364,9 +364,9 @@ int __zbx_zbx_db_execute(const char *fmt, ...)
 #else
 #	define zbx_db_select __zbx_zbx_db_select
 #endif /* HAVE___VA_ARGS__ */
-static DB_RESULT __zbx_zbx_db_select(const char *fmt, ...)
+static DB_RESULT	__zbx_zbx_db_select(const char *fmt, ...)
 {
-	va_list args;
+	va_list		args;
 	DB_RESULT	result;
 
 	va_start(args, fmt);
@@ -454,7 +454,7 @@ int	zbx_db_commit(void)
 	php_sem_release(&sqlite_access);
 #endif	/* HAVE_SQLITE3 */
 #ifdef	HAVE_ORACLE
-	(void) OCITransCommit (oracle.svchp, oracle.errhp, OCI_DEFAULT);
+	(void)OCITransCommit(oracle.svchp, oracle.errhp, OCI_DEFAULT);
 #endif	/* HAVE_ORACLE */
 
 	if (ZBX_DB_OK == rc)
@@ -496,7 +496,7 @@ int	zbx_db_rollback(void)
 	php_sem_release(&sqlite_access);
 #endif	/* HAVE_SQLITE3 */
 #ifdef	HAVE_ORACLE
-	(void) OCITransRollback (oracle.svchp, oracle.errhp, OCI_DEFAULT);
+	(void)OCITransRollback(oracle.svchp, oracle.errhp, OCI_DEFAULT);
 #endif	/* HAVE_ORACLE */
 
 	if (ZBX_DB_OK == rc)
@@ -508,7 +508,7 @@ int	zbx_db_rollback(void)
 /*
  * Execute SQL statement. For non-select statements only.
  */
-int zbx_db_vexecute(const char *fmt, va_list args)
+int	zbx_db_vexecute(const char *fmt, va_list args)
 {
 	char	*sql = NULL;
 	int	ret = ZBX_DB_OK;
@@ -522,7 +522,7 @@ int zbx_db_vexecute(const char *fmt, va_list args)
 	int err;
 	char *error=0;
 #endif
-#ifdef HAVE_MYSQL
+#ifdef	HAVE_MYSQL
 	int		status;
 #endif
 
@@ -707,7 +707,7 @@ lbl_exec:
 }
 
 
-int	zbx_db_is_null(char *field)
+int	zbx_db_is_null(const char *field)
 {
 	int ret = FAIL;
 
@@ -878,7 +878,7 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 /*
  * Execute SQL statement. For select statements only.
  */
-DB_RESULT zbx_db_vselect(const char *fmt, va_list args)
+DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 {
 	char	*sql = NULL;
 	DB_RESULT result = NULL;
