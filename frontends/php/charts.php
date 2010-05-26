@@ -213,6 +213,9 @@ include_once('include/page_header.php');
 	$charts_wdgt->addItem($table);
 	$charts_wdgt->show();
 
+?>
+<?php
 
 include_once('include/page_footer.php');
+
 ?>

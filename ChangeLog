@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBX-2105] fixed acknowledging events from dashboard for different nodes (Aly)
  - [ZBX-2441] fixed handling of begin/commit/rollback statements with temporarily unavailable SQL server (Sasha)
  - [ZBX-2432] fixed warning message in templates when template has linked templates (Maxim Andruhovich / AM)
  - [ZBX-2325] improved groups\hosts selecting for filter dropdowns (Vedmak)
