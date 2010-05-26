@@ -34,7 +34,7 @@
 #	define ZBX_TCP_ERROR	SOCKET_ERROR
 #	define ZBX_SOCK_ERROR	INVALID_SOCKET
 
-#	define zbx_sock_close(s)		if( ZBX_SOCK_ERROR != (s) ) closesocket(s)
+#	define zbx_sock_close(s)	if (ZBX_SOCK_ERROR != (s)) closesocket(s)
 #	define zbx_sock_last_error()	WSAGetLastError()
 
 #	define ZBX_SOCK_ERR_TIMEDOUT	WSAETIMEDOUT
@@ -45,7 +45,7 @@
 #	define ZBX_TCP_ERROR	-1
 #	define ZBX_SOCK_ERROR	-1
 
-#	define zbx_sock_close(s)	if( ZBX_SOCK_ERROR != (s) ) close(s)
+#	define zbx_sock_close(s)	if (ZBX_SOCK_ERROR != (s)) close(s)
 #	define zbx_sock_last_error()	errno
 
 #	define ZBX_SOCK_ERR_TIMEDOUT	EINTR
@@ -77,7 +77,7 @@
 
 int	zbx_tcp_error(void)
 {
-	if( ZBX_SOCK_ERR_TIMEDOUT == zbx_sock_last_error() )
+	if (ZBX_SOCK_ERR_TIMEDOUT == zbx_sock_last_error())
 	{
 		return ZBX_TCP_ERR_TIMEOUT;
 	}
@@ -129,7 +129,7 @@ static void __zbx_zbx_set_tcp_strerror(const char *fmt, ...)
 #if defined(HAVE_IPV6)
 void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
 {
-	struct	addrinfo hints, *ai = NULL;
+	struct addrinfo	hints, *ai = NULL;
 
 	assert(ip);
 
@@ -192,7 +192,7 @@ void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
 struct hostent	*zbx_gethost(const char *hostname)
 {
 	unsigned int	addr;
-	struct hostent*	host;
+	struct hostent	*host;
 
 	assert(hostname);
 
@@ -208,7 +208,7 @@ struct hostent	*zbx_gethost(const char *hostname)
 
 	zbx_set_tcp_strerror("gethost() failed for address '%s' [%s]", hostname, strerror_from_system(zbx_sock_last_error()));
 
-	return (struct hostent*) NULL;
+	return (struct hostent *)NULL;
 }
 
 /******************************************************************************
@@ -219,7 +219,7 @@ struct hostent	*zbx_gethost(const char *hostname)
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value: SUCCEED or FAIL - an error occurred                           *
+ * Return value: SUCCEED or FAIL - an error occurred                          *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -236,7 +236,7 @@ static int	zbx_tcp_start(void)
 {
 	WSADATA sockInfo;
 
-	switch(WSAStartup(MAKEWORD(2, 2),&sockInfo))
+	switch (WSAStartup(MAKEWORD(2, 2), &sockInfo))
 	{
 		case WSASYSNOTREADY:
 			zbx_set_tcp_strerror("Underlying network subsystem is not ready for network communication.");
@@ -384,17 +384,12 @@ static void	zbx_tcp_timeout_cleanup(zbx_sock_t *s)
  *                                                                            *
  ******************************************************************************/
 #if defined(HAVE_IPV6)
-int	zbx_tcp_connect(zbx_sock_t *s,
-	const char	*source_ip,
-	const char	*ip,
-	unsigned short	port,
-	int		timeout
-	)
+int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout)
 {
-	int	ret = FAIL;
-	struct	addrinfo *ai = NULL, hints;
-	struct	addrinfo *ai_bind = NULL;
-	char	service[8];
+	int		ret = FAIL;
+	struct addrinfo	*ai = NULL, hints;
+	struct addrinfo	*ai_bind = NULL;
+	char		service[8];
 
 	ZBX_TCP_START();
 
@@ -405,13 +400,15 @@ int	zbx_tcp_connect(zbx_sock_t *s,
 	hints.ai_family = PF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 
-	if (0 != getaddrinfo(ip, service, &hints, &ai)) {
+	if (0 != getaddrinfo(ip, service, &hints, &ai))
+	{
 		zbx_set_tcp_strerror("Cannot resolve [%s]", ip);
 		goto out;
 	}
 
-	if (ZBX_SOCK_ERROR == (s->socket = socket(ai->ai_family, ai->ai_socktype, ai->ai_protocol))) {
-		zbx_set_tcp_strerror("Cannot create socket [%s]:%d [%s]", ip, port ,strerror_from_system(zbx_sock_last_error()));
+	if (ZBX_SOCK_ERROR == (s->socket = socket(ai->ai_family, ai->ai_socktype, ai->ai_protocol)))
+	{
+		zbx_set_tcp_strerror("Cannot create socket [%s]:%d [%s]", ip, port, strerror_from_system(zbx_sock_last_error()));
 		goto out;
 	}
 
@@ -440,7 +437,8 @@ int	zbx_tcp_connect(zbx_sock_t *s,
 
 	zbx_tcp_timeout_set(s, timeout);
 
-	if (ZBX_TCP_ERROR == connect(s->socket, ai->ai_addr, ai->ai_addrlen)) {
+	if (ZBX_TCP_ERROR == connect(s->socket, ai->ai_addr, ai->ai_addrlen))
+	{
 		zbx_set_tcp_strerror("*** Cannot connect to [%s]:%d [%s]", ip, port, strerror_from_system(zbx_sock_last_error()));
 		zbx_tcp_close(s);
 		goto out;
@@ -457,15 +455,10 @@ out:
 	return ret;
 }
 #else
-int	zbx_tcp_connect(zbx_sock_t *s,
-	const char	*source_ip,
-	const char	*ip,
-	unsigned short	port,
-	int		timeout
-	)
+int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout)
 {
 	ZBX_SOCKADDR	servaddr_in, source_addr;
-	struct	hostent *hp;
+	struct hostent	*hp;
 
 	ZBX_TCP_START();
 
@@ -478,8 +471,9 @@ int	zbx_tcp_connect(zbx_sock_t *s,
 	servaddr_in.sin_addr.s_addr	= ((struct in_addr *)(hp->h_addr))->s_addr;
 	servaddr_in.sin_port		= htons(port);
 
-	if (ZBX_SOCK_ERROR == (s->socket = socket(AF_INET,SOCK_STREAM,0))) {
-		zbx_set_tcp_strerror("Cannot create socket [%s:%d] [%s]", ip, port ,strerror_from_system(zbx_sock_last_error()));
+	if (ZBX_SOCK_ERROR == (s->socket = socket(AF_INET, SOCK_STREAM, 0)))
+	{
+		zbx_set_tcp_strerror("Cannot create socket [%s:%d] [%s]", ip, port, strerror_from_system(zbx_sock_last_error()));
 		return FAIL;
 	}
 
@@ -500,7 +494,8 @@ int	zbx_tcp_connect(zbx_sock_t *s,
 
 	zbx_tcp_timeout_set(s, timeout);
 
-	if (ZBX_TCP_ERROR == connect(s->socket,(struct sockaddr *)&servaddr_in,sizeof(ZBX_SOCKADDR))) {
+	if (ZBX_TCP_ERROR == connect(s->socket, (struct sockaddr *)&servaddr_in, sizeof(ZBX_SOCKADDR)))
+	{
 		zbx_set_tcp_strerror("Cannot connect to [%s:%d] [%s]", ip, port, strerror_from_system(zbx_sock_last_error()));
 		zbx_tcp_close(s);
 		return FAIL;
@@ -509,6 +504,7 @@ int	zbx_tcp_connect(zbx_sock_t *s,
 	return SUCCEED;
 }
 #endif /*HAVE_IPV6*/
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tcp_send                                                     *
@@ -676,11 +672,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 #if defined(HAVE_IPV6)
-int zbx_tcp_listen(
-	zbx_sock_t	*s,
-	const char	*listen_ip,
-	unsigned short	listen_port
-	)
+int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_port)
 {
 	struct addrinfo	hints, *ai = NULL, *current_ai;
 	char		port[MAX_STRING_LEN];
@@ -703,9 +695,9 @@ int zbx_tcp_listen(
 
 	for(s->num_socks = 0, current_ai = ai; current_ai != NULL; current_ai = current_ai->ai_next)
 	{
-		if(s->num_socks == FD_SETSIZE) {
+		if(s->num_socks == FD_SETSIZE)
 			break;
-		}
+
 		/* This example only supports PF_INET and PF_INET6. */
 		if((current_ai->ai_family != PF_INET) && (current_ai->ai_family != PF_INET6))
 			continue;
@@ -752,11 +744,7 @@ out:
 	return ret;
 }
 #else
-int zbx_tcp_listen(
-	zbx_sock_t	*s,
-	const char	*listen_ip,
-	unsigned short	listen_port
-	)
+int zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_port)
 {
 	ZBX_SOCKADDR	serv_addr;
 	int		on, res = FAIL;
@@ -808,6 +796,7 @@ out:
 	return res;
 }
 #endif /*HAVE_IPV6*/
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tcp_accept                                                   *
@@ -837,7 +826,7 @@ int	zbx_tcp_accept(zbx_sock_t *s)
 
 	FD_ZERO(&sock_set);
 
-	/* For connection orientated protocols, we will handle the
+	/* For connection oriented protocols, we will handle the
 	   packets comprising a connection collectively.  For datagram
 	   protocols, we have to handle each datagram individually.
 
@@ -907,6 +896,7 @@ int	zbx_tcp_accept(zbx_sock_t *s)
 	return	SUCCEED;
 }
 #endif /* HAVE_IPV6 */
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tcp_unaccept                                                 *
@@ -924,14 +914,14 @@ int	zbx_tcp_accept(zbx_sock_t *s)
  ******************************************************************************/
 void	zbx_tcp_unaccept(zbx_sock_t *s)
 {
-	if( !s->accepted ) return;
+	if (!s->accepted) return;
 
-	shutdown(s->socket,2);
+	shutdown(s->socket, 2);
 
 	zbx_sock_close(s->socket);
 
-	s->socket	= s->socket2;		/* restore main socket */
-	s->socket2	= ZBX_SOCK_ERROR;
+	s->socket = s->socket2;		/* restore main socket */
+	s->socket2 = ZBX_SOCK_ERROR;
 	s->accepted = 0;
 }
 
@@ -1007,7 +997,7 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeou
 		expected_len = zbx_letoh_uint64(expected_len);
 
 		/* The rest was already cleared */
-		memset(s->buf_stat,0,ZBX_TCP_HEADER_LEN);
+		memset(s->buf_stat, 0, ZBX_TCP_HEADER_LEN);
 
 		flags |= ZBX_TCP_READ_UNTIL_CLOSE;
 	}
@@ -1058,7 +1048,7 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeou
 			s->buf_type		= ZBX_BUF_TYPE_DYN;
 			s->buf_dyn		= zbx_malloc(s->buf_dyn, allocated);
 
-			memset(s->buf_dyn,0,allocated);
+			memset(s->buf_dyn, 0, allocated);
 			memcpy(s->buf_dyn, s->buf_stat, sizeof(s->buf_stat));
 
 
@@ -1127,7 +1117,7 @@ char	*get_ip_by_socket(zbx_sock_t *s)
  *                                                                            *
  * Purpose: check if connection initiator is in list of IP addresses          *
  *                                                                            *
- * Parameters: sockfd - socker descriptor                                     *
+ * Parameters: sockfd - socket descriptor                                     *
  *             ip_list - comma-delimited list of IP addresses                 *
  *             allow_if_empty - allow connection if no IP given               *
  *                                                                            *
@@ -1141,19 +1131,15 @@ char	*get_ip_by_socket(zbx_sock_t *s)
  *                                                                            *
  ******************************************************************************/
 
-int	zbx_tcp_check_security(
-	zbx_sock_t *s,
-	const char *ip_list,
-	int allow_if_empty
-	)
+int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empty)
 {
 #if defined(HAVE_IPV6)
-	struct		addrinfo hints, *ai = NULL;
+	struct addrinfo	hints, *ai = NULL;
 	/* Network Byte Order is ensured */
 	unsigned char	ipv4_cmp_mask[12] = {0};				/* IPv4-Compatible, the first 96 bits are zeros */
 	unsigned char	ipv4_mpd_mask[12] = {0,0,0,0,0,0,0,0,0,0,255,255};	/* IPv4-Mapped, the first 80 bits are zeros, 16 next - ones */
 #else
-	struct		hostent *hp;
+	struct hostent	*hp;
 	char		*sip;
 	int		i[4], j[4];
 #endif
