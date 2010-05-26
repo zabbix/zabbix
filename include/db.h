@@ -537,7 +537,7 @@ int	__zbx_DBexecute(const char *fmt, ...);
 #endif /* HAVE___VA_ARGS__ */
 DB_RESULT	__zbx_DBselect(const char *fmt, ...);
 
-DB_RESULT	DBselectN(char *query, int n);
+DB_RESULT	DBselectN(const char *query, int n);
 DB_ROW		DBfetch(DB_RESULT result);
 int		DBis_null(char *field);
 void		DBbegin();
