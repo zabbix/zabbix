@@ -71,21 +71,22 @@ void    DBconnect(int flag)
 		err = zbx_db_connect(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBNAME, CONFIG_DBSOCKET, CONFIG_DBPORT);
 
 		switch(err) {
-			case ZBX_DB_OK:
-				break;
-			case ZBX_DB_DOWN:
-				if(flag == ZBX_DB_CONNECT_EXIT)
-				{
-					exit(FAIL);
-				}
-				else
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "Database is down. Reconnecting in 10 seconds");
-					zbx_sleep(10);
-				}
-				break;
-			default:
+		case ZBX_DB_OK:
+			break;
+		case ZBX_DB_DOWN:
+			if(flag == ZBX_DB_CONNECT_EXIT)
+			{
 				exit(FAIL);
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Database is down."
+						" Reconnecting in 10 seconds");
+				zbx_sleep(10);
+			}
+			break;
+		default:
+			exit(FAIL);
 		}
 	} while(ZBX_DB_OK != err);
 }
@@ -150,9 +151,24 @@ int	DBping(void)
  * Comments: Do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-void DBbegin(void)
+void	DBbegin(void)
 {
-	zbx_db_begin();
+	int	rc;
+
+	rc = zbx_db_begin();
+
+	while (rc == ZBX_DB_DOWN)
+	{
+		DBclose();
+		DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+		if (ZBX_DB_DOWN == (rc = zbx_db_begin()))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down."
+					" Retrying in 10 seconds");
+			sleep(10);
+		}
+	}
 }
 
 /******************************************************************************
@@ -170,9 +186,24 @@ void DBbegin(void)
  * Comments: Do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-void DBcommit(void)
+void	DBcommit(void)
 {
-	zbx_db_commit();
+	int	rc;
+
+	rc = zbx_db_commit();
+
+	while (rc == ZBX_DB_DOWN)
+	{
+		DBclose();
+		DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+		if (ZBX_DB_DOWN == (rc = zbx_db_commit()))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down."
+					" Retrying in 10 seconds");
+			sleep(10);
+		}
+	}
 }
 
 /******************************************************************************
@@ -190,37 +221,58 @@ void DBcommit(void)
  * Comments: Do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-void DBrollback(void)
+void	DBrollback(void)
 {
-	zbx_db_rollback();
+	int	rc;
+
+	rc = zbx_db_rollback();
+
+	while (rc == ZBX_DB_DOWN)
+	{
+		DBclose();
+		DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+		if (ZBX_DB_DOWN == (rc = zbx_db_rollback()))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down."
+					" Retrying in 10 seconds");
+			sleep(10);
+		}
+	}
 }
 
 /*
  * Execute SQL statement. For non-select statements only.
  * If fails, program terminates.
  */
-int __zbx_DBexecute(const char *fmt, ...)
+int	__zbx_DBexecute(const char *fmt, ...)
 {
-	va_list args;
-	int ret = ZBX_DB_DOWN;
+	va_list	args;
+	int	rc = ZBX_DB_DOWN;
 
-	while(ret == ZBX_DB_DOWN)
+	va_start(args, fmt);
+
+	rc = zbx_db_vexecute(fmt, args);
+
+	while (rc == ZBX_DB_DOWN)
 	{
-		va_start(args, fmt);
-		ret = zbx_db_vexecute(fmt, args);
-		va_end(args);
-		if( ret == ZBX_DB_DOWN)
+		DBclose();
+		DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+		rc = zbx_db_vexecute(fmt, args);
+
+		if (rc == ZBX_DB_DOWN)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds");
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down."
+					" Retrying in 10 seconds");
 			sleep(10);
-			DBclose();
-			DBconnect(ZBX_DB_CONNECT_NORMAL);
 		}
 	}
 
-	return ret;
-}
+	va_end(args);
 
+	return rc;
+}
 
 int	DBis_null(char *field)
 {
@@ -237,50 +289,61 @@ DB_ROW	DBfetch(DB_RESULT result)
  * Execute SQL statement. For select statements only.
  * If fails, program terminates.
  */
-DB_RESULT __zbx_DBselect(const char *fmt, ...)
+DB_RESULT	__zbx_DBselect(const char *fmt, ...)
 {
-	va_list args;
-	DB_RESULT result = (DB_RESULT)ZBX_DB_DOWN;
+	va_list		args;
+	DB_RESULT	rc;
 
-	while(result == (DB_RESULT)ZBX_DB_DOWN)
+	va_start(args, fmt);
+
+	rc = zbx_db_vselect(fmt, args);
+
+	while (rc == (DB_RESULT)ZBX_DB_DOWN)
 	{
-		va_start(args, fmt);
-		result = zbx_db_vselect(fmt, args);
-		va_end(args);
-		if( result == (DB_RESULT)ZBX_DB_DOWN)
+		DBclose();
+		DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+		rc = zbx_db_vselect(fmt, args);
+
+		if (rc == (DB_RESULT)ZBX_DB_DOWN)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds");
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down."
+					" Retrying in 10 seconds");
 			sleep(10);
-			DBclose();
-			DBconnect(ZBX_DB_CONNECT_NORMAL);
 		}
 	}
 
-	return result;
+	va_end(args);
+
+	return rc;
 }
 
 /*
  * Execute SQL statement. For select statements only.
  * If fails, program terminates.
  */
-DB_RESULT DBselectN(char *query, int n)
+DB_RESULT	DBselectN(const char *query, int n)
 {
-	DB_RESULT result = (DB_RESULT)ZBX_DB_DOWN;
+	DB_RESULT rc;
 
-	while(result == (DB_RESULT)ZBX_DB_DOWN)
+	rc = zbx_db_select_n(query, n);
+
+	while (rc == (DB_RESULT)ZBX_DB_DOWN)
 	{
-		result = zbx_db_select_n(query, n);
+		DBclose();
+		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-		if( result == (DB_RESULT)ZBX_DB_DOWN)
+		rc = zbx_db_select_n(query, n);
+
+		if (rc == (DB_RESULT)ZBX_DB_DOWN)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds");
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down."
+					" Retrying in 10 seconds");
 			sleep(10);
-			DBclose();
-			DBconnect(ZBX_DB_CONNECT_NORMAL);
 		}
 	}
 
-	return result;
+	return rc;
 }
 
 /* SUCCEED if latest service alarm has this status */
@@ -337,7 +400,6 @@ int	DBadd_service_alarm(zbx_uint64_t serviceid,int status,int clock)
  * Parameters: triggerid - trigger ID                                         *
  *                                                                            *
  * Return value: SUCCEED - it does depend, FAIL - otherwise                   *
- *                                                                            *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
