@@ -2259,6 +2259,8 @@
 	'S_REQUIRES_CTYPE_MODULE' => 'Requires ctype module',
 	'S_PHP_UPLOAD_MAX_FILESIZE' => 'PHP upload max filesize',
 	'S_IS_MINIMAL_FOR_PHP_ULOAD_FILESIZE_SMALL' => 'is minimum for PHP upload filesize',
+	'S_SESSION_MODULE' => 'PHP Session',
+	'S_REQUIRED_SESSION_MODULE' => 'Required Session module',
 
 //	class.cuser.php
 	'S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_MINUTES'=>	'Account is blocked for %s seconds',
