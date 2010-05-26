@@ -429,6 +429,7 @@ Copt::memoryPick();
 				'nodeids' => $nodeids,
 				'output' => $options['select_items'],
 				'triggerids' => $triggerids,
+				'webitems' => 1,
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
@@ -439,15 +440,15 @@ Copt::memoryPick();
 				$itriggers = $item['triggers'];
 				unset($item['triggers']);
 				foreach($itriggers as $trigger){
-					if(!isset($items[$trigger['triggerid']])) $items[$trigger['triggerid']] = array('items' => array());
+					if(!isset($items[$trigger['triggerid']])) $items[$trigger['triggerid']] = array();
 
-					$items[$triggerid]['items'][] = $item;
+					$items[$trigger['triggerid']][] = $item;
 				}
 			}
 
 			foreach($result as $eventid => $event){
 				if(isset($items[$event['objectid']])){
-					$result[$eventid]['items'] = $items[$event['objectid']]['items'];
+					$result[$eventid]['items'] = $items[$event['objectid']];
 				}
 				else{
 					$result[$eventid]['items'] = array();
