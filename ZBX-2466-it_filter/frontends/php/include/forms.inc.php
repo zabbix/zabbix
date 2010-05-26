@@ -1314,6 +1314,7 @@
 		$filter_status			= $_REQUEST['filter_status'];
 		$filter_templated_items			= $_REQUEST['filter_templated_items'];
 		$filter_with_triggers			= $_REQUEST['filter_with_triggers'];
+		$filter_ipmi_sensor			= $_REQUEST['filter_ipmi_sensor'];
 
 // subfilter
 		$subfilter_hosts = $_REQUEST['subfilter_hosts'];
@@ -1383,8 +1384,9 @@
 			ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3, ITEM_TYPE_TRAPPER,
 			ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE, ITEM_TYPE_HTTPTEST,
 			ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
-			ITEM_TYPE_CALCULATED) as $it)
+			ITEM_TYPE_CALCULATED) as $it){
 				$cmbType->addItem($it, item_type2str($it));
+		}
 		$col_table2->addRow(array(bold(S_TYPE.': '), $cmbType));
 
 		if(($filter_type != ITEM_TYPE_TRAPPER) && ($filter_type != ITEM_TYPE_HTTPTEST)){
@@ -1394,7 +1396,7 @@
 		else{
 			$col_table2->addRow(SPACE, SPACE);
 		}
-
+		
 		if(uint_in_array($filter_type, array(ITEM_TYPE_SNMPV1,ITEM_TYPE_SNMPV2C,ITEM_TYPE_SNMPV3))){
 			$col_table2->addRow(array(array(bold(S_SNMP_COMMUNITY),SPACE.S_LIKE_SMALL),
 				new CTextBox("filter_snmp_community", $filter_snmp_community, 16)));
@@ -1402,6 +1404,11 @@
 				new CTextBox("filter_snmp_oid", $filter_snmp_oid, 40)));
 			$col_table2->addRow(array(array(bold(S_SNMP_PORT),SPACE.S_LIKE_SMALL),
 				new CNumericBox("filter_snmp_port", $filter_snmp_port, 5 ,null, true)));
+		}
+		else if($filter_type == ITEM_TYPE_IPMI){
+			$col_table2->addRow(array(bold(S_IPMI_SENSOR), new CTextBox('filter_ipmi_sensor', $filter_ipmi_sensor, 32)));
+			$col_table2->addRow(array(SPACE,SPACE));
+			$col_table2->addRow(array(SPACE,SPACE));
 		}
 		else{
 			$col_table2->addRow(array(SPACE,SPACE));
@@ -1422,7 +1429,7 @@
 			$col_table3->addRow(array(bold(S_TYPE_OF_INFORMATION.': '), $cmbValType));
 
 		if($filter_value_type == ITEM_VALUE_TYPE_UINT64){
-			$cmbDataType = new CComboBox('filter_data_type', $filter_data_type, 'submit()');
+			$cmbDataType = new CComboBox('filter_data_type', $filter_data_type);
 			$cmbDataType->addItem(-1, S_ALL_SMALL);
 			$cmbDataType->addItem(ITEM_DATA_TYPE_DECIMAL, item_data_type2str(ITEM_DATA_TYPE_DECIMAL));
 			$cmbDataType->addItem(ITEM_DATA_TYPE_OCTAL, item_data_type2str(ITEM_DATA_TYPE_OCTAL));
