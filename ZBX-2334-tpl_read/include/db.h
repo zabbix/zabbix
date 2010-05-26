@@ -537,7 +537,7 @@ int	__zbx_DBexecute(const char *fmt, ...);
 #endif /* HAVE___VA_ARGS__ */
 DB_RESULT	__zbx_DBselect(const char *fmt, ...);
 
-DB_RESULT	DBselectN(char *query, int n);
+DB_RESULT	DBselectN(const char *query, int n);
 DB_ROW		DBfetch(DB_RESULT result);
 int		DBis_null(char *field);
 void		DBbegin();
@@ -546,8 +546,9 @@ void		DBrollback();
 
 const ZBX_TABLE	*DBget_table(const char *tablename);
 const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname);
-#define DBget_maxid(table, field)	DBget_maxid_num(table, field, 1)
-zbx_uint64_t	DBget_maxid_num(char *table, char *field, int num);
+#define DBget_maxid(table)	DBget_maxid_num(table, 1)
+zbx_uint64_t	DBget_maxid_num(const char *tablename, int num);
+zbx_uint64_t	DBget_nextid(const char *tablename, int num);
 
 int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *error);
 int	DBadd_service_alarm(zbx_uint64_t serviceid,int status,int clock);
@@ -562,9 +563,8 @@ int     DBupdate_trigger_value(zbx_uint64_t triggerid, int type, int value,
 
 int	DBget_items_count(void);
 int	DBget_items_unsupported_count(void);
-int	DBget_history_count(void);
-int	DBget_history_str_count(void);
-int	DBget_trends_count(void);
+int	DBget_history_count(const char *table_name);
+int	DBget_trends_count(const char *table_name);
 int	DBget_triggers_count(void);
 int	DBget_queue_count(void);
 double	DBget_requiredperformance(void);

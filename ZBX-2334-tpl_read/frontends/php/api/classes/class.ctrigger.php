@@ -83,6 +83,7 @@ class CTrigger extends CZBXAPI{
 			'itemids'				=> null,
 			'applicationids'		=> null,
 			'status'				=> null,
+			'functions'				=> null,
 			'monitored' 			=> null,
 			'templated'				=> null,
 			'maintenance'			=> null,
@@ -264,9 +265,13 @@ class CTrigger extends CZBXAPI{
 			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
 		}
 
-// status
-		if(!is_null($options['status'])){
-			$sql_parts['where'][] = 't.status='.$options['status'];
+// functions
+		if(!is_null($options['functions'])){
+			zbx_value2array($options['functions']);
+
+			$sql_parts['from']['functions'] = 'functions f';
+			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
+			$sql_parts['where'][] = DBcondition('f.function', $options['functions'], false, true);
 		}
 
 // monitored
@@ -292,7 +297,7 @@ class CTrigger extends CZBXAPI{
 
 // maintenance
 		if(!is_null($options['maintenance'])){
-			$sql_parts['where'][] = (($options['maintenance'] == 0)?' NOT ':'').
+			$sql_parts['where'][] = (($options['maintenance'] == 0) ? ' NOT ':'').
 				' EXISTS ('.
 					' SELECT ff.functionid'.
 					' FROM functions ff'.
@@ -312,6 +317,12 @@ class CTrigger extends CZBXAPI{
 		if(!is_null($options['only_problems'])){
 			if(is_null($options['filter'])) $options['filter'] = array();
 			$options['filter']['value'] = TRIGGER_VALUE_TRUE;
+		}
+		
+// status
+		if(!is_null($options['status'])){
+			if(is_null($options['filter'])) $options['filter'] = array();
+			$options['filter']['status'] = $options['status'];
 		}
 
 // lastChangeSince
@@ -417,6 +428,12 @@ class CTrigger extends CZBXAPI{
 				$sql_parts['where']['priority'] = DBcondition('t.priority', $options['filter']['priority']);
 			}
 
+//status
+			if(isset($options['filter']['status']) && !is_null($options['filter']['status'])){
+				zbx_value2array($options['filter']['status']);
+
+				$sql_parts['where']['status'] = DBcondition('t.status', $options['filter']['status']);
+			}
 // value
 			if(isset($options['filter']['value']) && !is_null($options['filter']['value'])){
 				zbx_value2array($options['filter']['value']);
@@ -817,8 +834,21 @@ COpt::memoryPick();
 		$result = false;
 		
 		if(!isset($object['hostid']) && !isset($object['host'])){
-			preg_match('/^.*?{(.+?):/u', $object['expression'], $host);
-			$object['host'] = $host[1];
+			$expression = $object['expression'];
+			$expressionData = parseTriggerExpressions($expression, true);
+			
+			if( isset($expressionData[$expression]['errors']) ) {
+				//showExpressionErrors($expression, $expressionData[$expression]['errors']);
+				return false;
+			}
+			
+			if(!isset($expressionData[$expression]['hosts']) || !is_array($expressionData[$expression]['hosts']) || !count($expressionData[$expression]['hosts'])) {
+				//error(S_TRIGGER_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR);
+				return false;
+			}
+			
+			$hData =& $expressionData[$expression]['hosts'][0];
+			$object['host'] = zbx_substr($expression, $hData['openSymbolNum']+1, $hData['closeSymbolNum']-($hData['openSymbolNum']+1));
 		}
 
 		$options = array(

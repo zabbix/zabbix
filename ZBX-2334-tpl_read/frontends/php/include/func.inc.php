@@ -177,19 +177,27 @@ function get_update_doll_script($pmasterid, $dollid, $key, $value=''){
 return $script;
 }
 
-function make_refresh_menu($pmid,$dollid,$cur_interval,$params=null,&$menu,&$submenu){
+function make_refresh_menu($pmid,$dollid,$cur_interval,$params=null,&$menu,&$submenu, $menu_type=1){
 
-	$menu['menu_'.$dollid][] = array(S_REFRESH, null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
-	$intervals = array('10','30','60','120','600','900');
+	if($menu_type == 1){
+		$intervals = array('10'=>10, '30'=>30, '60'=>60, '120'=>120, '600'=>600, '900'=>900);
+		$title = S_REFRESH_TIME_IN_SECONDS;
+	}
+	else if($menu_type == 2){
+		$intervals = array('x0.25'=>0.25, 'x0.5'=>0.5, 'x1'=>1, 'x1.5'=>1.5, 'x2'=>2, 'x3'=>3, 'x4'=>4, 'x5'=>5);
+		$title = S_REFRESH_TIME_MULTIPLIER;
+	}
+	
+	$menu['menu_'.$dollid][] = array($title, null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
 
 	foreach($intervals as $key => $value){
 		$menu['menu_'.$dollid][] = array(
-					S_EVERY.SPACE.$value.SPACE.S_SECONDS_SMALL,
-					'javascript: setRefreshRate('.zbx_jsvalue($pmid).','.zbx_jsvalue($dollid).','.$value.','.zbx_jsvalue($params).');'.
-					'void(0);',
-					null,
-					array('outer' => ($value == $cur_interval)?'pum_b_submenu':'pum_o_submenu', 'inner'=>array('pum_i_submenu')
-			));
+			$key,
+			'javascript: setRefreshRate('.zbx_jsvalue($pmid).','.zbx_jsvalue($dollid).','.$value.','.zbx_jsvalue($params).');'.
+			'void(0);',
+			null,
+			array('outer' => ($value == $cur_interval)?'pum_b_submenu':'pum_o_submenu', 'inner'=>array('pum_i_submenu')
+		));
 	}
 	$submenu['menu_'.$dollid][] = array();
 }
@@ -452,10 +460,10 @@ function getmicrotime(){
 }
 
 function zbxDateToTime($strdate){
-	if(5 == sscanf($strdate, '%04d%02d%02d%02d%02d', $year, $month, $date, $hours, $minutes))
-		return mktime($hours,$minutes,0,$month,$date,$year);
+	if(6 == sscanf($strdate, '%04d%02d%02d%02d%02d%02d', $year, $month, $date, $hours, $minutes, $seconds))
+		return mktime($hours,$minutes,$seconds,$month,$date,$year);
 	else
-		return 0;
+		return time();
 }
 /************* END DATE *************/
 
@@ -546,6 +554,7 @@ function mem2str($size){
 
 // convert:
 function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
+
 // Special processing for unix timestamps
 	if($units=='unixtime'){
 		$ret=zbx_date2str(S_FUNCT_UNIXTIMESTAMP_DATE_FORMAT,$value);
@@ -613,24 +622,6 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 			$step = 1000;
 	}
 
-	if(zbx_empty($units) && ($convert == ITEM_CONVERT_WITH_UNITS)){;
-		if(abs($value) >= 1)
-			$format = '%.2f';
-		else if(abs($value) >= 0.01)
-			$format = '%.4f';
-		else
-			$format = '%.6f';
-
-		if(round($value, 6) == 0) $value = 0;
-		else{
-			$value = sprintf($format,$value);
-			$value = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U','$1$2$3', $value);
-			$value = rtrim($value, '.');
-		}
-
-		return sprintf('%s %s', $value, $units);
-	}
-
 // INIT intervals
 	static $digitUnits;
 	if(is_null($digitUnits)) $digitUnits = array();
@@ -661,7 +652,7 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 	else $abs = $value;
 
 	$valUnit = array('pow'=>0, 'short'=>'', 'long'=>'', 'value'=>$value);
-	if(($abs > 999) ||  ($abs < 0.001)){
+	if(($abs > 999) || ($abs < 0.001)){
 		foreach($digitUnits[$step] as $dnum => $data){
 			if(bccomp($abs, $data['value']) > -1) $valUnit = $data;
 			else break;
@@ -1126,5 +1117,22 @@ function zbx_array_mintersect($keys, $array){
 	return $result;
 }
 
+function zbx_str2links($text){
+// $value = preg_replace('#(https?|ftp|file)://[^\n\t\r ]+#u', '<a href="$0">$0</a>', $value);
+	$result = array();
+	if(empty($text)) return $result;
+	
+	preg_match_all('#https?://[^\n\t\r ]+#u', $text, $matches, PREG_OFFSET_CAPTURE);
+	
+	$start = 0;
+	foreach($matches[0] as $match){
+		$result[] = zbx_substr($text, $start, $match[1]-$start);
+		$result[] = new CLink($match[0], $match[0], null, null, true);
+		$start = $match[1] + zbx_strlen($match[0]);
+	}
+	
+	$result[] = zbx_substr($text, $start, zbx_strlen($text));
+	return $result;
+}
 /************* END ZBX MISC *************/
 ?>

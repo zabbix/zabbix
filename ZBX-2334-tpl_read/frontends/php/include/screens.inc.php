@@ -523,7 +523,7 @@ require_once('include/js.inc.php');
 			$form->addVar('resourceid',$id);
 
 			$textfield = new CTextbox('caption',$caption,75,'yes');
-			$selectbtn = new CButton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=graphs&srcfld1=graphid&srcfld2=name',800,450);");
+			$selectbtn = new CButton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&real_hosts=1&dstfld1=resourceid&dstfld2=caption&srctbl=graphs&srcfld1=graphid&srcfld2=name',800,450);");
 			$selectbtn->setAttribute('onmouseover',"javascript: this.style.cursor = 'pointer';");
 
 			$form->addRow(S_GRAPH_NAME,array($textfield,SPACE,$selectbtn));
@@ -556,7 +556,7 @@ require_once('include/js.inc.php');
 			$form->addVar('resourceid',$id);
 
 			$textfield = new Ctextbox('caption',$caption,75,'yes');
-			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=simple_graph&srcfld1=itemid&srcfld2=description',800,450);");
+			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&real_hosts=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=simple_graph&srcfld1=itemid&srcfld2=description',800,450);");
 			$selectbtn->setAttribute('onmouseover',"javascript: this.style.cursor = 'pointer';");
 
 			$form->addRow(S_PARAMETER,array($textfield,SPACE,$selectbtn));
@@ -999,31 +999,54 @@ require_once('include/js.inc.php');
 					$graphDims['graphHeight'] = $height;
 					$graphDims['width'] = $width;
 
-					$sql = 'SELECT g.graphid, g.show_legend as legend, g.show_3d as show3d '.
-							' FROM graphs g '.
-							' WHERE g.graphid='.$resourceid;
-					$res = DBselect($sql);
-					if($graph=DBfetch($res)){
+					$graph = get_graph_by_graphid($resourceid);
+
+					if($graph){
 						$graphid = $graph['graphid'];
-						$legend = $graph['legend'];
-						$graph3d = $graph['show3d'];
+						$legend = $graph['show_legend'];
+						$graph3d = $graph['show_3d'];
 					}
 //-------------
 
 // Host feature
 					if(($dynamic == SCREEN_DYNAMIC_ITEM) && isset($_REQUEST['hostid']) && ($_REQUEST['hostid']>0)){
+						$options = array(
+							'hostids' => $_REQUEST['hostid'],
+							'output' => API_OUTPUT_EXTEND
+						);
+						$hosts = CHost::get($options);
+						$host = reset($hosts);
+
 						$def_items = array();
 						$di_res = get_graphitems_by_graphid($resourceid);
-						while( $gitem = DBfetch($di_res)){
-							$def_items[] = $gitem;
+						while($gitem = DBfetch($di_res)) $def_items[] = $gitem;
+						
+						$new_items = get_same_graphitems_for_host($def_items, $_REQUEST['hostid'], false);
+
+						if(($graph['graphtype']==GRAPH_TYPE_PIE) || ($graph['graphtype']==GRAPH_TYPE_EXPLODED))
+							$url = 'chart7.php';
+						else
+							$url = 'chart3.php';
+//-----
+
+						$url = new Curl($url);
+						foreach($graph as $name => $value){
+							if(($name == 'width') || ($name == 'height')) continue;
+
+							$url->setArgument($name, $value);
 						}
 
-						$url='';
-						if($new_items = get_same_graphitems_for_host($def_items, $_REQUEST['hostid'], false)){
-							$url.= make_url_from_gitems($new_items);
+						foreach($new_items as $ginum => $gitem){
+							unset($gitem['gitemid']);
+							unset($gitem['graphid']);
+
+							foreach($gitem as $name => $value){
+								$url->setArgument('items['.$gitem['itemid'].']['.$name.']', $value);
+							}
 						}
 
-						$url= make_url_from_graphid($resourceid,false).$url;
+						$url->setArgument('name', $host['host'].': '.$graph['name']);
+						$url = $url->getUrl();
 					}
 //-------------
 
@@ -1048,7 +1071,7 @@ require_once('include/js.inc.php');
 
 					$default = false;
 					if(($graphDims['graphtype'] == GRAPH_TYPE_PIE) || ($graphDims['graphtype'] == GRAPH_TYPE_EXPLODED)){
-						if(($dynamic==SCREEN_SIMPLE_ITEM) || empty($url)){
+						if(($dynamic == SCREEN_SIMPLE_ITEM) || empty($url)){
 							$url='chart6.php?graphid='.$resourceid;
 							$default = true;
 						}
@@ -1068,7 +1091,7 @@ require_once('include/js.inc.php');
 
 					}
 					else{
-						if(($dynamic==SCREEN_SIMPLE_ITEM) || empty($url)){
+						if(($dynamic == SCREEN_SIMPLE_ITEM) || empty($url)){
 							$url='chart2.php?graphid='.$resourceid;
 							$default = true;
 						}
@@ -1091,7 +1114,7 @@ require_once('include/js.inc.php');
 						$objData['src'] = $src;
 					}
 
-					if($default) $item = new CLink(null, $action);
+					if($default && !$editmode) $item = new CLink(null, $action);
 					else $item = new CDiv();
 
 					$item->setAttribute('id', $containerid);
@@ -1156,7 +1179,9 @@ require_once('include/js.inc.php');
 
 					$objData['src'] = $src;
 
-					$item = new CLink(null, $action);
+					if(!$editmode) $item = new CLink(null, $action);
+					else $item = new CDiv();
+
 					$item->setAttribute('id', $containerid);
 
 					$item = array($item);

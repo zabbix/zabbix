@@ -338,12 +338,15 @@ include_once('include/page_header.php');
 		unset($_REQUEST['itemid']);
 		$_REQUEST['form'] = 'clone';
 	}
-	else if(isset($_REQUEST['save'])){
+	else if(isset($_REQUEST['save']) && ($_REQUEST['form_hostid'] > 0)){
 		$applications = get_request('applications',array());
 		$delay_flex = get_request('delay_flex',array());
 		$db_delay_flex = '';
-		foreach($delay_flex as $num => $val)
+
+		foreach($delay_flex as $num => $val){
 			$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
+		}
+		
 		$db_delay_flex = trim($db_delay_flex,';');
 
 		$item = array(
@@ -772,14 +775,10 @@ include_once('include/page_header.php');
 //$items_wdgt->addPageHeader(S_CONFIGURATION_OF_ITEMS_BIG, $form);
 	show_table_header(S_CONFIGURATION_OF_ITEMS_BIG, $form);
 
-	if(isset($_REQUEST['form'])){
-		if(str_in_array($_REQUEST['form'], array(S_CREATE_ITEM, 'update', 'clone')) ||
-			(($_REQUEST['form']=='mass_update') && isset($_REQUEST['group_itemid'])))
-		{
-			insert_item_form();
-		}
+	if(isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], array(S_CREATE_ITEM, 'update', 'clone'))){
+		insert_item_form();
 	}
-	else if(($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['group_itemid'])){
+	else if((($_REQUEST['go'] == 'massupdate') || isset($_REQUEST['massupdate'])) && isset($_REQUEST['group_itemid'])){
 		insert_mass_update_item_form('group_itemid');
 	}
 	else if(($_REQUEST['go'] == 'copy_to') && isset($_REQUEST['group_itemid'])){
@@ -822,7 +821,7 @@ include_once('include/page_header.php');
 			'limit' => ($config['search_limit']+1)
 		);
 
-		$preFilter = count($options);
+		$preFilter = count($options, COUNT_RECURSIVE);
 
 		if($hostid > 0)
 			$options['hostids'] = $hostid;
@@ -877,7 +876,7 @@ include_once('include/page_header.php');
 		if(isset($_REQUEST['filter_with_triggers']) && !zbx_empty($_REQUEST['filter_with_triggers']) && $_REQUEST['filter_with_triggers'] != -1)
 			$options['with_triggers'] = $_REQUEST['filter_with_triggers'];
 
-		$afterFilter = count($options);
+		$afterFilter = count($options, COUNT_RECURSIVE);
 //} Items Filter
 
 		if($preFilter == $afterFilter)
@@ -1004,7 +1003,7 @@ include_once('include/page_header.php');
 			$description[] = new CLink($item['description_expanded'], '?form=update&itemid='.$item['itemid']);
 
 			$status = new CCol(new CLink(item_status2str($item['status']), '?group_itemid='.$item['itemid'].'&go='.
-				($item['status']?'activate':'disable'), item_status2style($item['status'])));
+				($item['status']? 'activate':'disable'), item_status2style($item['status'])));
 
 
 			if(zbx_empty($item['error'])){
@@ -1197,4 +1196,5 @@ include_once('include/page_header.php');
 
 
 include_once('include/page_footer.php');
+
 ?>

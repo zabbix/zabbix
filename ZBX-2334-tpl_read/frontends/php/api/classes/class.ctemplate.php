@@ -164,7 +164,7 @@ class CTemplate extends CZBXAPI{
 		}
 
 // nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid(false);
+		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
 // groupids
 		if(!is_null($options['groupids'])){
@@ -562,15 +562,17 @@ Copt::memoryPick();
 				foreach($templates as $templateid => $template){
 					unset($templates[$templateid]['parentTemplates']);
 
-					foreach($template['parentTemplates'] as $hnum => $parentTemplate){
-						if(!is_null($options['limitSelects'])){
-							if(!isset($count[$parentTemplate['templateid']])) $count[$parentTemplate['templateid']] = 0;
-							$count[$parentTemplate['hostid']]++;
+					if(isset($template['parentTemplates']) && is_array($template['parentTemplates'])) {
+						foreach($template['parentTemplates'] as $hnum => $parentTemplate){
+							if(!is_null($options['limitSelects'])){
+								if(!isset($count[$parentTemplate['templateid']])) $count[$parentTemplate['templateid']] = 0;
+								$count[$parentTemplate['hostid']]++;
 
-							if($count[$parentTemplate['templateid']] > $options['limitSelects']) continue;
+								if($count[$parentTemplate['templateid']] > $options['limitSelects']) continue;
+							}
+
+							$result[$parentTemplate['templateid']]['templates'][] = &$templates[$templateid];
 						}
-
-						$result[$parentTemplate['templateid']]['templates'][] = &$templates[$templateid];
 					}
 				}
 			}

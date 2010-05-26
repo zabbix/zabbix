@@ -86,18 +86,24 @@ include_once('include/page_header.php');
 <?php
 	$showdisabled = get_request('showdisabled', 0);
 
-	$params = array();
-	$options = array('only_current_node','not_proxy_hosts');
-	foreach($options as $option) $params[$option] = 1;
+	$options = array(
+		'groups' => array(
+			'not_proxy_hosts' => 1,
+			'editable' => 1,
+		),
+		'hosts' => array(
+			'templated_hosts' => 1,
+			'editable' => 1,
+		),
+		'hostid' => get_request('hostid', null),
+		'groupid' => get_request('groupid', null),
+	);
+	$pageFilter = new CPageFilter($options);
+	$_REQUEST['groupid'] = $pageFilter->groupid;
+	$_REQUEST['hostid'] = $pageFilter->hostid;
 
-	$PAGE_GROUPS = get_viewed_groups(PERM_READ_WRITE, $params);
-	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_WRITE, $PAGE_GROUPS['selected'], $params);
-//SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
 
-	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
-
-	$available_groups = $PAGE_GROUPS['groupids'];
-	$available_hosts = $PAGE_HOSTS['hostids'];
+	$available_hosts = $pageFilter->hostsSelected ? array_keys($pageFilter->hosts) : array();
 
 	CProfile::update('web.httpconf.showdisabled',$showdisabled, PROFILE_TYPE_STR);
 ?>
@@ -350,23 +356,11 @@ include_once('include/page_header.php');
 	}
 	else {
 // Table HEADER
-		
 
-		$form = new CForm();
-		$form->setMethod('get');
+		$form = new CForm(null, 'get');
 
-		$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
-		$cmbHosts = new CComboBox('hostid',$PAGE_HOSTS['selected'],'javascript: submit();');
-
-		foreach($PAGE_GROUPS['groups'] as $groupid => $name){
-			$cmbGroups->addItem($groupid, $name);
-		}
-		foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
-			$cmbHosts->addItem($hostid, $name);
-		}
-
-		$form->addItem(array(S_GROUP.SPACE,$cmbGroups));
-		$form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
+		$form->addItem(array(S_GROUP.SPACE,$pageFilter->getGroupsCB()));
+		$form->addItem(array(SPACE.S_HOST.SPACE,$pageFilter->getHostsCB()));
 
 		$numrows = new CDiv();
 		$numrows->setAttribute('name','numrows');

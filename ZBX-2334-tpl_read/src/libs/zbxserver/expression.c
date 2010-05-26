@@ -139,37 +139,6 @@ static int	DBget_trigger_expression_by_triggerid(zbx_uint64_t triggerid, char *e
 
 /******************************************************************************
  *                                                                            *
- * Function: delete_spaces                                                    *
- *                                                                            *
- * Purpose: delete all spaces                                                 *
- *                                                                            *
- * Parameters: c - string to delete spaces                                    *
- *                                                                            *
- * Return value:  the string wtihout spaces                                   *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-void	delete_spaces(char *c)
-{
-	int i,j;
-
-	j=0;
-	for(i=0;c[i]!=0;i++)
-	{
-		if( c[i] != ' ')
-		{
-			c[j]=c[i];
-			j++;
-		}
-	}
-	c[j]=0;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: evaluate_simple                                                  *
  *                                                                            *
  * Purpose: evaluate simple expression                                        *
@@ -988,22 +957,36 @@ static int	DBget_trigger_value_by_triggerid(zbx_uint64_t triggerid, char **repla
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int DBget_trigger_events_unacknowledged(zbx_uint64_t triggerid, char **replace_to)
+#define ZBX_TRIGGER_EVENTS_PROBLEM_UNACK	0
+#define ZBX_TRIGGER_EVENTS_UNACK		1
+static int	DBget_trigger_events_unacknowledged(zbx_uint64_t triggerid, char **replace_to, unsigned char type)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
+	char		value[4];
 	int		ret = FAIL;
+
+	switch (type) {
+		case ZBX_TRIGGER_EVENTS_PROBLEM_UNACK:
+			zbx_snprintf(value, sizeof(value), "%d", TRIGGER_VALUE_TRUE);
+			break;
+		case ZBX_TRIGGER_EVENTS_UNACK:
+			zbx_snprintf(value, sizeof(value), "%d,%d", TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE);
+			break;
+		default:
+			assert(0);
+	}
 
 	result = DBselect(
 			"select count(*)"
 			" from events"
 			" where object=%d"
 				" and objectid=" ZBX_FS_UI64
-				" and value=%d"
+				" and value in (%s)"
 				" and acknowledged=0",
 			EVENT_OBJECT_TRIGGER,
 			triggerid,
-			TRIGGER_VALUE_TRUE);
+			value);
 
 	if (NULL != (row = DBfetch(result)))
 	{
@@ -1694,6 +1677,7 @@ static int	get_node_value_by_event(DB_EVENT *event, char **replace_to, const cha
 #define MVAR_TRIGGER_URL		"{TRIGGER.URL}"
 
 #define MVAR_TRIGGER_EVENTS_UNACK	"{TRIGGER.EVENTS.UNACK}"
+#define MVAR_TRIGGER_EVENTS_PROBLEM_UNACK	"{TRIGGER.EVENTS.PROBLEM.UNACK}"
 
 #define MVAR_PROFILE_DEVICETYPE		"{PROFILE.DEVICETYPE}"
 #define MVAR_PROFILE_NAME		"{PROFILE.NAME}"
@@ -1925,7 +1909,11 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, 
 				else if (0 == strcmp(m, MVAR_TRIGGER_URL))
 					replace_to = zbx_dsprintf(replace_to, "%s", event->trigger_url);
 				else if (0 == strcmp(m, MVAR_TRIGGER_EVENTS_UNACK))
-					ret = DBget_trigger_events_unacknowledged(event->objectid, &replace_to);
+					ret = DBget_trigger_events_unacknowledged(event->objectid, &replace_to,
+							ZBX_TRIGGER_EVENTS_UNACK);
+				else if (0 == strcmp(m, MVAR_TRIGGER_EVENTS_PROBLEM_UNACK))
+					ret = DBget_trigger_events_unacknowledged(event->objectid, &replace_to,
+							ZBX_TRIGGER_EVENTS_PROBLEM_UNACK);
 				else if (0 == strcmp(m, MVAR_EVENT_ID))
 					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->eventid);
 				else if (0 == strcmp(m, MVAR_EVENT_DATE))
