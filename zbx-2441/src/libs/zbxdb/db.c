@@ -392,28 +392,33 @@ static DB_RESULT __zbx_zbx_db_select(const char *fmt, ...)
  * Comments: Do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_begin(void)
+int	zbx_db_begin(void)
 {
+	int	rc = ZBX_DB_OK;
+
 	if (txn_level > 0)
 	{
-		zabbix_log( LOG_LEVEL_CRIT, "ERROR: nested transaction detected. Please report it to Zabbix Team.");
+		zabbix_log(LOG_LEVEL_CRIT, "ERROR: nested transaction detected."
+				" Please report it to Zabbix Team.");
 		assert(0);
 	}
-	txn_level++;
-#ifdef	HAVE_MYSQL
-	zbx_db_execute("%s","begin;");
-#endif
-#ifdef	HAVE_POSTGRESQL
-	zbx_db_execute("%s","begin;");
-#endif
+
 #ifdef	HAVE_SQLITE3
-	if(PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
+	if (PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
 	{
-		zabbix_log( LOG_LEVEL_CRIT, "ERROR: Unable to create lock on SQLite database.");
-		exit(FAIL);
+		zabbix_log(LOG_LEVEL_CRIT, "ERROR: Unable to create lock"
+				" on SQLite database.");
+		assert(0);
 	}
-	zbx_db_execute("%s","begin;");
-#endif
+#endif	/* HAVE_SQLITE3 */
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL) || defined(HAVE_SQLITE3)
+	rc = zbx_db_execute("%s", "begin;");
+#endif	/* HAVE_MYSQL || HAVE_POSTGRESQL || HAVE_SQLITE3 */
+
+	if (ZBX_DB_OK == rc)
+		txn_level++;
+
+	return rc;
 }
 
 /******************************************************************************
@@ -431,27 +436,31 @@ void	zbx_db_begin(void)
  * Comments: Do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-void zbx_db_commit(void)
+int	zbx_db_commit(void)
 {
+	int	rc = ZBX_DB_OK;
+
 	if (0 == txn_level)
 	{
-		zabbix_log( LOG_LEVEL_CRIT, "ERROR: commit without transaction. Please report it to Zabbix Team.");
+		zabbix_log(LOG_LEVEL_CRIT, "ERROR: commit without transaction."
+				" Please report it to Zabbix Team.");
 		assert(0);
 	}
-#ifdef	HAVE_MYSQL
-	zbx_db_execute("%s","commit;");
-#endif
-#ifdef	HAVE_POSTGRESQL
-	zbx_db_execute("%s","commit;");
-#endif
+
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL) || defined(HAVE_SQLITE3)
+	rc = zbx_db_execute("%s", "commit;");
+#endif	/* HAVE_MYSQL || HAVE_POSTGRESQL || HAVE_SQLITE3 */
+#ifdef	HAVE_SQLITE3
+	php_sem_release(&sqlite_access);
+#endif	/* HAVE_SQLITE3 */
 #ifdef	HAVE_ORACLE
 	(void) OCITransCommit (oracle.svchp, oracle.errhp, OCI_DEFAULT);
-#endif /* HAVE_ORACLE */
-#ifdef	HAVE_SQLITE3
-	zbx_db_execute("%s","commit;");
-	php_sem_release(&sqlite_access);
-#endif
-	txn_level--;
+#endif	/* HAVE_ORACLE */
+
+	if (ZBX_DB_OK == rc)
+		txn_level--;
+
+	return rc;
 }
 
 /******************************************************************************
@@ -469,27 +478,31 @@ void zbx_db_commit(void)
  * Comments: Do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-void zbx_db_rollback(void)
+int	zbx_db_rollback(void)
 {
+	int	rc = ZBX_DB_OK;
+
 	if (0 == txn_level)
 	{
-		zabbix_log( LOG_LEVEL_CRIT, "ERROR: rollback without transaction. Please report it to Zabbix Team.");
+		zabbix_log(LOG_LEVEL_CRIT, "ERROR: rollback without transaction."
+				" Please report it to Zabbix Team.");
 		assert(0);
 	}
-#ifdef	HAVE_MYSQL
-	zbx_db_execute("rollback;");
-#endif
-#ifdef	HAVE_POSTGRESQL
-	zbx_db_execute("rollback;");
-#endif
+
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL) || defined(HAVE_SQLITE3)
+	rc = zbx_db_execute("%s", "rollback;");
+#endif	/* HAVE_MYSQL || HAVE_POSTGRESQL || HAVE_SQLITE3 */
+#ifdef	HAVE_SQLITE3
+	php_sem_release(&sqlite_access);
+#endif	/* HAVE_SQLITE3 */
 #ifdef	HAVE_ORACLE
 	(void) OCITransRollback (oracle.svchp, oracle.errhp, OCI_DEFAULT);
-#endif /* HAVE_ORACLE */
-#ifdef	HAVE_SQLITE3
-	zbx_db_execute("rollback;");
-	php_sem_release(&sqlite_access);
-#endif
-	txn_level--;
+#endif	/* HAVE_ORACLE */
+
+	if (ZBX_DB_OK == rc)
+		txn_level--;
+
+	return rc;
 }
 
 /*
@@ -1105,7 +1118,7 @@ lbl_get_table:
 /*
  * Execute SQL statement. For select statements only.
  */
-DB_RESULT zbx_db_select_n(char *query, int n)
+DB_RESULT	zbx_db_select_n(const char *query, int n)
 {
 #ifdef	HAVE_MYSQL
 	return zbx_db_select("%s limit %d", query, n);
