@@ -373,14 +373,11 @@ include_once('include/page_header.php');
 		'hosts' => array('with_graphs' => 1, 'editable' => 1),
 		'groupid' => get_request('groupid', null),
 		'hostid' => get_request('hostid', null),
-		'graphs' => array(),
-		'graphid' => get_request('graphid', null),
 	);
+
 	$pageFilter = new CPageFilter($options);
 	$_REQUEST['groupid'] = $pageFilter->groupid;
 	$_REQUEST['hostid'] = $pageFilter->hostid;
-	$_REQUEST['graphid'] = $pageFilter->graphid;
-
 ?>
 <?php
 	$form = new CForm(null, 'get');
