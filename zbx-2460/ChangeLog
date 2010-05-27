@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBX-2460] fixed auto adding host group to updated host (Aly)
  - [ZBX-2367] improved using DISTINCT rule in queries in API (Aly) 
  - [ZBX-2408] fixed mute button in status of triggers page (Aly)
  - [ZBX-2477] fixed dynamic graphs disappear from screens (Vedmak)

@@ -5674,7 +5674,7 @@
 		global $USER_DETAILS;
 
 		$host_groups = get_request('groups', array());
-		if(isset($_REQUEST['groupid']) && ($_REQUEST['groupid']>0) && !uint_in_array($_REQUEST['groupid'], $host_groups)){
+		if(isset($_REQUEST['groupid']) && ($_REQUEST['groupid']>0) && empty($host_groups)){
 			array_push($host_groups, $_REQUEST['groupid']);
 		}
 
