@@ -836,8 +836,8 @@ function triggerExpressionValidateHost(&$parent, &$levelData, $index, &$expressi
 		$hostFound = array_shift($hostFound);
 		if(isset($hostFound['hostid']) && $hostFound['hostid'] > 0) $hostId = $hostFound['hostid'];
 	}
-
-	$usedHosts[$expression][$hostFound['status']][$hostFound['hostid']] = true;
+	
+	if(isset($hostFound['hostid']) && isset($hostFound['hostid'])) $usedHosts[$expression][$hostFound['status']][$hostFound['hostid']] = true;
 
 	if(!isset($hostId)) {
 		return Array(
