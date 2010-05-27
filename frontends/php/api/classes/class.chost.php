@@ -82,7 +82,7 @@ class CHost extends CZBXAPI{
 
 		$sql_parts = array(
 			'select' => array('hosts' => 'h.hostid'),
-			'from' => array('hosts h'),
+			'from' => array('hosts' => 'hosts h'),
 			'where' => array(),
 			'group' => array(),
 			'order' => array(),
@@ -187,9 +187,9 @@ class CHost extends CZBXAPI{
 		else{
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
 
-			$sql_parts['from']['hg'] = 'hosts_groups hg';
-			$sql_parts['from']['r'] = 'rights r';
-			$sql_parts['from']['ug'] = 'users_groups ug';
+			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sql_parts['from']['rights'] = 'rights r';
+			$sql_parts['from']['users_groups'] = 'users_groups ug';
 			$sql_parts['where']['hgh'] = 'hg.hostid=h.hostid';
 			$sql_parts['where'][] = 'r.id=hg.groupid ';
 			$sql_parts['where'][] = 'r.groupid=ug.usrgrpid';
@@ -226,7 +226,7 @@ class CHost extends CZBXAPI{
 				$sql_parts['select']['groupid'] = 'hg.groupid';
 			}
 
-			$sql_parts['from']['hg'] = 'hosts_groups hg';
+			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
 			$sql_parts['where']['hgh'] = 'hg.hostid=h.hostid';
 
@@ -257,7 +257,7 @@ class CHost extends CZBXAPI{
 				$sql_parts['select']['templateid'] = 'ht.templateid';
 			}
 
-			$sql_parts['from']['ht'] = 'hosts_templates ht';
+			$sql_parts['from']['hosts_templates'] = 'hosts_templates ht';
 			$sql_parts['where'][] = DBcondition('ht.templateid', $options['templateids']);
 			$sql_parts['where']['hht'] = 'h.hostid=ht.hostid';
 
@@ -278,7 +278,7 @@ class CHost extends CZBXAPI{
 				$sql_parts['select']['itemid'] = 'i.itemid';
 			}
 
-			$sql_parts['from']['i'] = 'items i';
+			$sql_parts['from']['items'] = 'items i';
 			$sql_parts['where'][] = DBcondition('i.itemid', $options['itemids']);
 			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
 
@@ -295,8 +295,8 @@ class CHost extends CZBXAPI{
 				$sql_parts['select']['triggerid'] = 'f.triggerid';
 			}
 
-			$sql_parts['from']['f'] = 'functions f';
-			$sql_parts['from']['i'] = 'items i';
+			$sql_parts['from']['functions'] = 'functions f';
+			$sql_parts['from']['items'] = 'items i';
 			$sql_parts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
 			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
 			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
@@ -314,8 +314,8 @@ class CHost extends CZBXAPI{
 				$sql_parts['select']['graphid'] = 'gi.graphid';
 			}
 
-			$sql_parts['from']['gi'] = 'graphs_items gi';
-			$sql_parts['from']['i'] = 'items i';
+			$sql_parts['from']['graphs_items'] = 'graphs_items gi';
+			$sql_parts['from']['items'] = 'items i';
 			$sql_parts['where'][] = DBcondition('gi.graphid', $options['graphids']);
 			$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
 			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
@@ -333,7 +333,7 @@ class CHost extends CZBXAPI{
 				$sql_parts['select']['dhostid'] = 'ds.dhostid';
 			}
 
-			$sql_parts['from']['ds'] = 'dservices ds';
+			$sql_parts['from']['dservices'] = 'dservices ds';
 			$sql_parts['where'][] = DBcondition('ds.dhostid', $options['dhostids']);
 			$sql_parts['where']['dsh'] = 'ds.ip=h.ip';
 
@@ -349,7 +349,7 @@ class CHost extends CZBXAPI{
 				$sql_parts['select']['dserviceid'] = 'ds.dserviceid';
 			}
 
-			$sql_parts['from']['ds'] = 'dservices ds';
+			$sql_parts['from']['dservices'] = 'dservices ds';
 			$sql_parts['where'][] = DBcondition('ds.dserviceid', $options['dserviceids']);
 			$sql_parts['where']['dsh'] = 'ds.ip=h.ip';
 
@@ -536,7 +536,7 @@ class CHost extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT DISTINCT '.$sql_select.
+		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.
 				' FROM '.$sql_from.
 				' WHERE '.$sql_where.
 				$sql_group.

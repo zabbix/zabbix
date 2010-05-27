@@ -65,7 +65,7 @@ class CAction extends CZBXAPI{
 
 		$sql_parts = array(
 			'select' => array('actions' => 'a.actionid'),
-			'from' => array('a' => 'actions a'),
+			'from' => array('actions' => 'actions a'),
 			'where' => array(),
 			'order' => array(),
 			'limit' => null,
@@ -123,7 +123,7 @@ class CAction extends CZBXAPI{
 		else{
 			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
 
-			$sql_parts['from']['c'] = 'conditions c';
+			$sql_parts['from']['conditions'] = 'conditions c';
 			$sql_parts['where']['ac'] = 'a.actionid=c.actionid';
 
 // condition hostgroup
@@ -256,9 +256,9 @@ class CAction extends CZBXAPI{
 				$sql_parts['select']['groupid'] = 'hg.groupid';
 			}
 
-			$sql_parts['from']['f'] = 'functions f';
-			$sql_parts['from']['i'] = 'items i';
-			$sql_parts['from']['hg'] = 'hosts_groups hg';
+			$sql_parts['from']['functions'] = 'functions f';
+			$sql_parts['from']['items'] = 'items i';
+			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
 
 			$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
 			$sql_parts['where']['e'] = 'e.object='.EVENT_OBJECT_TRIGGER;
@@ -275,8 +275,8 @@ class CAction extends CZBXAPI{
 				$sql_parts['select']['hostid'] = 'i.hostid';
 			}
 
-			$sql_parts['from']['f'] = 'functions f';
-			$sql_parts['from']['i'] = 'items i';
+			$sql_parts['from']['functions'] = 'functions f';
+			$sql_parts['from']['items'] = 'items i';
 
 			$sql_parts['where']['i'] = DBcondition('i.hostid', $options['hostids']);
 			$sql_parts['where']['e'] = 'e.object='.EVENT_OBJECT_TRIGGER;
