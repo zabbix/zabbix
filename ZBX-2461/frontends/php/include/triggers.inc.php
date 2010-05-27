@@ -3868,10 +3868,14 @@ return $result;
 						'validation'	=> NOT_EMPTY
 					);
 				} elseif(isset($expData[$expr]['expressions']) && count($expData[$expr]['expressions']) > 0) {
-					$hData =& $expData[$expr]['hosts'][0];
-					$kData =& $expData[$expr]['keys'][0];
-					$kpData =& $expData[$expr]['keysParams'][0];
-					$fData =& $expData[$expr]['keysFunctions'][0];
+					reset($expData[$expr]['hosts']);
+					$hData =& $expData[$expr]['hosts'][key($expData[$expr]['hosts'])];
+					reset($expData[$expr]['keys']);
+					$kData =& $expData[$expr]['keys'][key($expData[$expr]['keys'])];
+					reset($expData[$expr]['keysParams']);
+					$kpData =& $expData[$expr]['keysParams'][key($expData[$expr]['keysParams'])];
+					reset($expData[$expr]['keysFunctions']);
+					$fData =& $expData[$expr]['keysFunctions'][key($expData[$expr]['keysFunctions'])];
 					$host = zbx_substr($expr, $hData['openSymbolNum']+zbx_strlen($hData['openSymbol']), $hData['closeSymbolNum']-$hData['openSymbolNum']-zbx_strlen($hData['closeSymbol']));
 					$hostKey = zbx_substr($expr, $kData['openSymbolNum']+zbx_strlen($kData['openSymbol']), $kData['closeSymbolNum']-$kData['openSymbolNum']-zbx_strlen($kData['closeSymbol']));
 					$hostKeyParams = isset($expData[$expr]['keysParams']) && count($expData[$expr]['keysParams']) > 0 ? zbx_substr($expr, $kpData['openSymbolNum'], $kpData['closeSymbolNum']-$kpData['openSymbolNum']+zbx_strlen($kpData['closeSymbol'])) : '';
