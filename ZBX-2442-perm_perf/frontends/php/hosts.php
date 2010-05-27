@@ -582,8 +582,6 @@ $thid = get_request('hostid', 0);
 	$_REQUEST['hostid'] = $thid;
 ?>
 <?php
-	// echo SBR;
-
 	if(($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['hosts'])){
 		$hosts_wdgt->addItem(insert_mass_update_host_form());
 	}
@@ -591,10 +589,7 @@ $thid = get_request('hostid', 0);
 		$hosts_wdgt->addItem(insert_host_form(false));
 	}
 	else{
-		
-
-		$frmForm = new CForm();
-		$frmForm->setMethod('get');
+		$frmForm = new CForm(null, 'get');
 
 		$cmbGroups = new CComboBox('groupid', $PAGE_GROUPS['selected'], 'javascript: submit();');
 		foreach($PAGE_GROUPS['groups'] as $groupid => $name){
@@ -852,9 +847,7 @@ $thid = get_request('hostid', 0);
 	}
 	
 	$hosts_wdgt->show();
-?>
-<?php
+
 
 include_once('include/page_footer.php');
-
 ?>

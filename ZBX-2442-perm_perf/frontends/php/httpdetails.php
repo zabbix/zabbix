@@ -36,7 +36,6 @@
 	include_once('include/page_header.php');
 ?>
 <?php
-
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'period'=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
@@ -311,10 +310,7 @@
 	zbx_add_post_js('timeControl.processObjects();');
 
 	$graphsWidget->show();
-	
-?>
-<?php
 
-include_once('include/page_footer.php');
 
+	include_once('include/page_footer.php');
 ?>

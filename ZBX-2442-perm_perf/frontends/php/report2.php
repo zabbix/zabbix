@@ -119,20 +119,6 @@ include_once('include/page_header.php');
 <?php
 	$rep2_wdgt = new CWidget();
 
-// HEADER
-	if(0 == $config){
-		$available_hosts = $PAGE_HOSTS['hostids'];
-	}
-	else{
-		if($PAGE_HOSTS['selected'] != 0)
-			$PAGE_HOSTS['hostids'] = $available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
-		else
-			$available_hosts = $PAGE_HOSTS['hostids'];
-	}
-
-	$rep2_wdgt->addPageHeader(S_AVAILABILITY_REPORT_BIG);
-//	show_report2_header($config, $PAGE_GROUPS, $PAGE_HOSTS);
-
 	if(isset($_REQUEST['triggerid'])){
 		$options = array(
 			'triggerids' => $_REQUEST['triggerid'],
@@ -140,7 +126,6 @@ include_once('include/page_header.php');
 			'select_hosts' => API_OUTPUT_EXTEND,
 			'nodeids' => get_current_nodeid(true)
 		);
-
 		$trigger_data = CTrigger::get($options);
 		if(empty($trigger_data)){
 			unset($_REQUEST['triggerid']);
@@ -152,80 +137,39 @@ include_once('include/page_header.php');
 			$trigger_data['hostid'] = $host['hostid'];
 			$trigger_data['host'] = $host['host'];
 		}
-	}
 
-
-	if(isset($_REQUEST['triggerid'])){
 		$rep2_wdgt->addHeader(array(
 			new CLink($trigger_data['host'],'?filter_groupid='.$_REQUEST['groupid'].'&filter_hostid='.$trigger_data['hostid']),
 			' : ',
 			expand_trigger_description_by_data($trigger_data)
-			),SPACE);
+		));
 
 		$table = new CTableInfo(null,'graph');
 		$table->addRow(new CImg('chart4.php?triggerid='.$_REQUEST['triggerid']));
 
+		$rep2_wdgt->addPageHeader(S_AVAILABILITY_REPORT_BIG);
 		$rep2_wdgt->addItem($table);
 		$rep2_wdgt->show();
 	}
 	else if(isset($_REQUEST['hostid'])){
-
-		$r_form = new CForm();
-		$r_form->setMethod('get');
-
-		$cmbConf = new CComboBox('config',$config,'submit()');
+		$r_form = new CForm(null, 'get');
+		$cmbConf = new CComboBox('config', $config, 'submit()');
 		$cmbConf->addItem(0, S_BY_HOST);
 		$cmbConf->addItem(1, S_BY_TRIGGER_TEMPLATE);
 		$r_form->addItem($cmbConf);
-
-		$rep2_wdgt->addHeader(S_REPORT_BIG, array(S_MODE.SPACE, $r_form));
-		//$rep2_wdgt->addItem(BR());
+		$rep2_wdgt->addPageHeader(S_AVAILABILITY_REPORT_BIG, array(S_MODE.SPACE, $r_form));
+		
+		$rep2_wdgt->addHeader(S_REPORT_BIG);
 
 // FILTER
 		$filterForm = get_report2_filter($config, $PAGE_GROUPS, $PAGE_HOSTS);
 		$rep2_wdgt->addFlicker($filterForm, CProfile::get('web.avail_report.filter.state', 0));
 //-------
 
-		$sql_from = '';
-		$sql_where = '';
-
-		if(0 == $config){
-			if($_REQUEST['groupid'] > 0){
-				$sql_from .= ',hosts_groups hg ';
-				$sql_where.= ' AND hg.hostid=h.hostid AND hg.groupid='.$_REQUEST['groupid'];
-			}
-
-			if($_REQUEST['hostid'] > 0){
-				$sql_where.= ' AND h.hostid='.$_REQUEST['hostid'];
-			}
-		}
-		else{
-			if($_REQUEST['hostid'] > 0){
-				$sql_from.=',hosts_templates ht ';
-				$sql_where.=' AND ht.hostid=h.hostid AND ht.templateid='.$_REQUEST['hostid'];
-			}
-
-			if(isset($_REQUEST['tpl_triggerid']) && ($_REQUEST['tpl_triggerid'] > 0))
-				$sql_where.= ' AND t.templateid='.$_REQUEST['tpl_triggerid'];
-		}
-
-		$sql = 'SELECT DISTINCT h.hostid,h.host,t.triggerid,t.expression,t.description,t.value '.
-			' FROM triggers t,hosts h,items i,functions f '.$sql_from.
-			' WHERE h.status='.HOST_STATUS_MONITORED.
-				' AND '.DBcondition('h.hostid',$available_hosts).
-				' AND i.hostid=h.hostid '.
-				' AND i.status='.ITEM_STATUS_ACTIVE.
-				' AND f.itemid=i.itemid '.
-				' AND t.triggerid=f.triggerid '.
-				' AND t.status='.TRIGGER_STATUS_ENABLED.
-				$sql_where.
-			' ORDER BY h.host, t.description';
-		$result = DBselect($sql);
-
 		$table = new CTableInfo();
 		$table->setHeader(
 			array(is_show_all_nodes() ? S_NODE : null,
-			(($_REQUEST['hostid'] == 0) || (1 == $config))? S_HOST : NULL,
+			(($_REQUEST['hostid'] == 0) || (1 == $config)) ? S_HOST : NULL,
 			S_NAME,
 			S_PROBLEMS,
 			S_OK,
@@ -233,9 +177,46 @@ include_once('include/page_header.php');
 			S_GRAPH
 		));
 
-		while($row = DBfetch($result)){
-			if(!check_right_on_trigger_by_triggerid(null, $row['triggerid'])) continue;
 
+		$options = array(
+			'monitored' => 1,
+			'output' => API_OUTPUT_EXTEND,
+			'select_hosts' => API_OUTPUT_EXTEND,
+		);
+		if(0 == $config){
+			if($_REQUEST['groupid'] > 0){
+				$options['groupids'] = $_REQUEST['groupid'];
+			}
+
+			if($_REQUEST['hostid'] > 0){
+				$options['hostids'] = $_REQUEST['hostid'];
+			}
+		}
+		else{
+			if($_REQUEST['hostid'] > 0){
+				$hosts = CHost::get(array(
+					'output' => API_OUTPUT_SHORTEN,
+					'filter' => array('templateid' => $_REQUEST['hostid']),
+				));
+				$options['hostids'] = zbx_objectValues($hosts, 'hostid');
+			}
+
+			if(isset($_REQUEST['tpl_triggerid']) && ($_REQUEST['tpl_triggerid'] > 0)){
+				$options['filter'] = array('templateid' => $_REQUEST['tpl_triggerid']);
+			}
+		}
+
+		$triggers = CTrigger::get($options);
+		
+		foreach($triggers as $tnum => $trigger){
+			$h = reset($trigger['hosts']);
+			$triggers[$tnum]['host'] = $h['host'];
+			$triggers[$tnum]['hostid'] = $h['hostid'];
+			unset($triggers[$tnum]['hosts']);
+		}
+		order_result($triggers, 'description');
+
+		foreach($triggers as $row){
 			$availability = calculate_availability($row['triggerid'], $_REQUEST['filter_timesince'], $_REQUEST['filter_timetill']);
 
 			$true	= new CSpan(sprintf("%.4f%%", $availability['true']), 'on');

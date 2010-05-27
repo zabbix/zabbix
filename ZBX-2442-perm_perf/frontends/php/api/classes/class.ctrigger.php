@@ -434,6 +434,12 @@ class CTrigger extends CZBXAPI{
 
 				$sql_parts['where']['status'] = DBcondition('t.status', $options['filter']['status']);
 			}
+//templateid
+			if(isset($options['filter']['templateid']) && !is_null($options['filter']['templateid'])){
+				zbx_value2array($options['filter']['templateid']);
+
+				$sql_parts['where']['templateid'] = DBcondition('t.templateid', $options['filter']['templateid']);
+			}
 // value
 			if(isset($options['filter']['value']) && !is_null($options['filter']['value'])){
 				zbx_value2array($options['filter']['value']);

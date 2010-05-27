@@ -218,7 +218,6 @@ return zbx_objectValues($hosts, 'hostid');
 function get_accessible_hosts_by_user(&$user_data,$perm,$perm_res=null,$nodeid=null,$cache=1){
 //		global $DB;
 	static $available_hosts;
-
 	if(is_null($perm_res)) $perm_res = PERM_RES_IDS_ARRAY;
 	if($perm == PERM_READ_LIST)	$perm = PERM_READ_ONLY;
 

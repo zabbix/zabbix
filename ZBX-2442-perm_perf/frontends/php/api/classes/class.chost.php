@@ -118,7 +118,6 @@ class CHost extends CZBXAPI{
 			'startPattern'				=> null,
 			'pattern'					=> null,
 			'extendPattern'				=> null,
-
 // OutPut
 			'output'					=> API_OUTPUT_REFER,
 			'extendoutput'				=> null,
@@ -495,6 +494,11 @@ class CHost extends CZBXAPI{
 
 			if(isset($options['filter']['hostid']) && !is_null($options['filter']['hostid'])){
 				$sql_parts['where']['hostid'] = 'h.hostid='.$options['filter']['hostid'];
+			}
+
+			if(isset($options['filter']['templateid']) && !is_null($options['filter']['templateid'])){
+				zbx_value2array($options['filter']['templateid']);
+				$sql_parts['where']['templateid'] = DBcondition('h.templateid', $options['filter']['templateid']);
 			}
 
 			if(isset($options['filter']['host']) && !is_null($options['filter']['host'])){

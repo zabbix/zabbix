@@ -755,7 +755,6 @@ include_once('include/page_header.php');
 	}
 ?>
 <?php
-
 	$form = new CForm(null, 'get');
 	$form->setName('hdrform');
 	if(!isset($_REQUEST['form']))
