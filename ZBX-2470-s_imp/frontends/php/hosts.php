@@ -857,9 +857,7 @@ $thid = get_request('hostid', 0);
 	}
 	
 	$hosts_wdgt->show();
-?>
-<?php
+
 
 include_once('include/page_footer.php');
-
 ?>
