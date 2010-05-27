@@ -94,19 +94,27 @@ include_once('include/page_header.php');
 	$_REQUEST['go'] = get_request('go', 'none');
 
 // PERMISSIONS
-	if(get_request('graphid',0) > 0){
+	if(get_request('graphid', false)){
 		$options = array(
 			'nodeids' => get_current_nodeid(true),
 			'graphids' => $_REQUEST['graphid'],
 			'editable' => 1
 		);
 		$graphs = CGraph::get($options);
-
 		if(empty($graphs)) access_deny();
+	}
+	else if(get_request('hostid', 0) > 0){
+		$options = array(
+			'hostids' => $_REQUEST['hostid'],
+			'extendoutput' => 1,
+			'templated_hosts' => 1,
+			'editable' => 1
+		);
+		$hosts = CHost::get($options);
+		if(empty($hosts)) access_deny();
 	}
 ?>
 <?php
-
 	$_REQUEST['items'] = get_request('items', array());
 	$_REQUEST['group_gid'] = get_request('group_gid', array());
 	$_REQUEST['graph3d'] = get_request('graph3d', 0);
