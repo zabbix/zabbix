@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2471] fix location of the space in a translatable string (Richlv)
  - [ZBX-954] fix Hungarian language name (Richlv)
  - [ZBX-2457] change 'type' keyword to 'ENGINE' for table creation in MySQL schema (Richlv)
  - [ZBX-2466] fixed item filter form (Vedmak)
