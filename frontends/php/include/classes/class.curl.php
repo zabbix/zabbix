@@ -57,7 +57,7 @@ class Curl{
 			$this->url = $url = $protocol.'://'.$_SERVER['SERVER_NAME'].':'.$_SERVER['SERVER_PORT'].$_SERVER['SCRIPT_NAME'].'?'.$this->getQuery();
 		}
 		else{
-			$this->url=urldecode($url);
+			$this->url = $url;
 
 			$tmp_pos = zbx_strpos($this->url,'?');
 			$this->query=($tmp_pos!==false)?(substr($this->url,$tmp_pos+1)):'';
