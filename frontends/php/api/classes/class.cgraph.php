@@ -968,17 +968,27 @@ COpt::memoryPick();
 			$data['templateids'] = zbx_toArray($data['templateids']);
 			$data['hostids'] = zbx_toArray($data['hostids']);
 			
-			$objectids = array_merge($data['templateids'], $data['hostids']);
 			$options = array(
-				'hostids' => $objectids,
+				'hostids' => $data['hostids'],
 				'editable' => 1,
 				'preservekeys' => 1,
-				'templated_hosts' => 1,
 				'output' => API_OUTPUT_SHORTEN
 			);
-			$allowedObjects = CHost::get($options);
-			foreach($objectids as $objectid){
-				if(!isset($allowedObjects[$objectid])){
+			$allowedHosts = CHost::get($options);		
+			foreach($data['hostids'] as $hostid){
+				if(!isset($allowedHosts[$hostid])){
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				}
+			}
+
+			$options = array(
+				'templateids' => $data['templateids'],
+				'preservekeys' => 1,
+				'output' => API_OUTPUT_SHORTEN
+			);
+			$allowedTemplates = CTemplate::get($options);
+			foreach($data['templateids'] as $templateid){
+				if(!isset($allowedTemplates[$templateid])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				}
 			}
@@ -996,7 +1006,6 @@ COpt::memoryPick();
 
 			$options = array(
 				'hostids' => $data['templateids'],
-				'editable' => 1,
 				'preservekeys' => 1,
 				'output' => API_OUTPUT_EXTEND,
 				'select_graph_items' => API_OUTPUT_EXTEND
