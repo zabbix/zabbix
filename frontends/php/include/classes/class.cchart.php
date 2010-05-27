@@ -476,11 +476,13 @@ class CChart extends CGraphDraw{
 
 //				if($val <= $minY || $val >= $maxY)	continue;
 //SDI($item['itemid']);
-				$color = 'Priority';
-				if($trigger['value'] == TRIGGER_VALUE_TRUE){
-					if($trigger['priority'] == 5)		$color = 'Priority Disaster';
-					else if($trigger['priority'] == 4)	$color = 'Priority High';
-					else if($trigger['priority'] == 3)	$color = 'Priority Average';
+				switch($trigger['priority']){
+					case TRIGGER_SEVERITY_DISASTER:	$color = 'Priority Disaster'; break;
+					case TRIGGER_SEVERITY_HIGH: $color = 'Priority High'; break;
+					case TRIGGER_SEVERITY_AVERAGE: $color = 'Priority Average'; break;
+					case TRIGGER_SEVERITY_WARNING: $color = 'Priority Warning'; break;
+					case TRIGGER_SEVERITY_INFORMATION: $color = 'Priority Information'; break;
+					default: $color = 'Priority';
 				}
 
 				array_push($this->triggers,array(
@@ -1499,16 +1501,29 @@ class CChart extends CGraphDraw{
 		if($this->m_showTriggers != 1) return;
 //		if($this->num != 1) return; // skip multiple graphs
 
+		$opposite = hex2rgb(GRAPH_TRIGGER_LINE_OPPOSITE_COLOR);
+		$oppColor = imagecolorallocate($this->im, $opposite[0], $opposite[1], $opposite[2]);
 		foreach($this->triggers as $tnum => $trigger){
 			if($trigger['skipdraw']) continue;
 
+			$triggerColor = $this->getColor($trigger['color']);
+			$lineStyle = Array($triggerColor, $triggerColor, $triggerColor, $triggerColor, $triggerColor, $oppColor, $oppColor, $oppColor);
+
+//			SDI($trigger['color']);
 			dashedline(
 				$this->im,
 				$this->shiftXleft,
 				$trigger['y'],
 				$this->sizeX+$this->shiftXleft,
 				$trigger['y'],
-				$this->getColor($trigger['color']));
+				$lineStyle);
+			dashedline(
+				$this->im,
+				$this->shiftXleft,
+				$trigger['y']+1,
+				$this->sizeX+$this->shiftXleft,
+				$trigger['y']+1,
+				$lineStyle);
 		}
 	}
 
