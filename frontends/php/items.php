@@ -161,6 +161,8 @@ include_once('include/page_header.php');
 		'filter_status'=>			array(T_ZBX_INT, O_OPT,  null,  IN('-1,0,1,3'),null),
 		'filter_templated_items'=>	array(T_ZBX_INT, O_OPT,  null,  IN('-1,0,1'),null),
 		'filter_with_triggers'=>	array(T_ZBX_INT, O_OPT,  null,  IN('-1,0,1'),null),
+		'filter_ipmi_sensor' =>		array(T_ZBX_STR, O_OPT,  null,  null,	null),
+		
 // subfilters
 		'subfilter_apps'=>				array(T_ZBX_STR, O_OPT,	 null,	null, null),
 		'subfilter_types'=>				array(T_ZBX_INT, O_OPT,	 null,	null, null),
@@ -245,6 +247,7 @@ include_once('include/page_header.php');
 		$_REQUEST['filter_status'] = get_request('filter_status');
 		$_REQUEST['filter_templated_items'] = get_request('filter_templated_items', -1);
 		$_REQUEST['filter_with_triggers'] = get_request('filter_with_triggers', -1);
+		$_REQUEST['filter_ipmi_sensor'] = get_request('filter_ipmi_sensor');
 
 		CProfile::update('web.items.filter_group', $_REQUEST['filter_group'], PROFILE_TYPE_STR);
 		CProfile::update('web.items.filter_host', $_REQUEST['filter_host'], PROFILE_TYPE_STR);
@@ -263,6 +266,7 @@ include_once('include/page_header.php');
 		CProfile::update('web.items.filter_status', $_REQUEST['filter_status'], PROFILE_TYPE_INT);
 		CProfile::update('web.items.filter_templated_items', $_REQUEST['filter_templated_items'], PROFILE_TYPE_INT);
 		CProfile::update('web.items.filter_with_triggers', $_REQUEST['filter_with_triggers'], PROFILE_TYPE_INT);
+		CProfile::update('web.items.filter_ipmi_sensor', $_REQUEST['filter_ipmi_sensor'], PROFILE_TYPE_STR);
 	}
 	else{
 		$_REQUEST['filter_group'] = CProfile::get('web.items.filter_group');
@@ -282,6 +286,7 @@ include_once('include/page_header.php');
 		$_REQUEST['filter_status'] = CProfile::get('web.items.filter_status');
 		$_REQUEST['filter_templated_items'] = CProfile::get('web.items.filter_templated_items', -1);
 		$_REQUEST['filter_with_triggers'] = CProfile::get('web.items.filter_with_triggers', -1);
+		$_REQUEST['filter_ipmi_sensor'] = CProfile::get('web.items.filter_ipmi_sensor');
 	}
 
 	if(isset($_REQUEST['filter_host']) && !zbx_empty($_REQUEST['filter_host'])){
@@ -875,6 +880,9 @@ include_once('include/page_header.php');
 
 		if(isset($_REQUEST['filter_with_triggers']) && !zbx_empty($_REQUEST['filter_with_triggers']) && $_REQUEST['filter_with_triggers'] != -1)
 			$options['with_triggers'] = $_REQUEST['filter_with_triggers'];
+			
+		if(isset($_REQUEST['filter_ipmi_sensor']) && !zbx_empty($_REQUEST['filter_ipmi_sensor']))
+			$options['filter']['ipmi_sensor'] = $_REQUEST['filter_ipmi_sensor'];
 
 		$afterFilter = count($options, COUNT_RECURSIVE);
 //} Items Filter
