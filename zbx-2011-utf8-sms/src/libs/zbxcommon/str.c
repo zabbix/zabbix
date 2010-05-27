@@ -2351,7 +2351,7 @@ char	*zbx_item_value_type_string(zbx_item_value_type_t value_type)
 	case ITEM_VALUE_TYPE_FLOAT: return "Numeric (float)";
 	case ITEM_VALUE_TYPE_STR: return "Character";
 	case ITEM_VALUE_TYPE_LOG: return "Log";
-	case ITEM_VALUE_TYPE_UINT64: return "Numeric (integer 64bit)";
+	case ITEM_VALUE_TYPE_UINT64: return "Numeric (unsigned)";
 	case ITEM_VALUE_TYPE_TEXT: return "Text";
 	default: return "unknown";
 	}
