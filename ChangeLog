@@ -6,6 +6,8 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-954] fix Hungarian language name (Richlv)
+ - [ZBX-2457] change 'type' keyword to 'ENGINE' for table creation in MySQL schema (Richlv)
  - [ZBX-2466] fixed item filter form (Vedmak)
  - [ZBX-1607] now trigger line is visible in all zabbix themes in all states and severity in corresponding severity color mixed with opposite color which stored in defines in hex (Maxim Andruhovich / AM)
  - [ZBX-2105] fixed acknowledging events from dashboard for different nodes (Aly)
