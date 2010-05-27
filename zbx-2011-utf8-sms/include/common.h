@@ -717,7 +717,7 @@ void	version();
 /* MAX Length of base64 data */
 #define ZBX_MAX_B64_LEN 16*1024
 
-char* get_programm_name(char *path);
+char	*get_programm_name(char *path);
 
 typedef enum
 {
@@ -749,7 +749,6 @@ ZBX_TASK_EX
 	int		flags;
 };
 
-
 char	*string_replace(char *str, char *sub_str1, char *sub_str2);
 
 int	find_char(char *str, char c);
@@ -760,7 +759,8 @@ int	is_uint(char *c);
 int	is_uint64(register char *str, zbx_uint64_t *value);
 int	is_uoct(char *str);
 int	is_uhex(char *str);
-int	is_hex_string(char *str);
+int	is_hex_string(const char *str);
+int	is_ascii_string(const char *str);
 void	zbx_rtrim(char *str, const char *charlist);
 void	zbx_ltrim(register char *str, const char *charlist);
 void	zbx_remove_chars(register char *str, const char *charlist);
@@ -946,13 +946,8 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding);
 
 int MAIN_ZABBIX_ENTRY(void);
 
-zbx_uint64_t	zbx_letoh_uint64(
-		zbx_uint64_t	data
-	);
-
-zbx_uint64_t	zbx_htole_uint64(
-		zbx_uint64_t	data
-	);
+zbx_uint64_t	zbx_letoh_uint64(zbx_uint64_t data);
+zbx_uint64_t	zbx_htole_uint64(zbx_uint64_t data);
 
 int	is_hostname_char(const char c);
 int	is_key_char(const char c);

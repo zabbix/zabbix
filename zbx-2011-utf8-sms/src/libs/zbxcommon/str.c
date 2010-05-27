@@ -109,7 +109,7 @@ void help()
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! beter use system functions like 'strchr' !!!                 *
+ * Comments: !!! better use system functions like 'strchr' !!!                *
  *                                                                            *
  ******************************************************************************/
 int	find_char(char *str,char c)
@@ -165,7 +165,7 @@ void __zbx_zbx_error(const char *fmt, ...)
  *                                                                            *
  * Function: zbx_snprintf                                                     *
  *                                                                            *
- * Purpose: Sequire version of snprintf function.                             *
+ * Purpose: Secure version of snprintf function.                              *
  *          Add zero character at the end of string.                          *
  *                                                                            *
  * Parameters: str - destination buffer poiner                                *
@@ -201,7 +201,7 @@ int __zbx_zbx_snprintf(char* str, size_t count, const char *fmt, ...)
  *                                                                            *
  * Function: zbx_vsnprintf                                                    *
  *                                                                            *
- * Purpose: Sequire version of vsnprintf function.                            *
+ * Purpose: Secure version of vsnprintf function.                             *
  *          Add zero character at the end of string.                          *
  *                                                                            *
  * Parameters: str - destination buffer poiner                                *
@@ -232,7 +232,7 @@ int zbx_vsnprintf(char* str, size_t count, const char *fmt, va_list args)
  *                                                                            *
  * Function: zbx_snprintf_alloc                                               *
  *                                                                            *
- * Purpose: Sequire version of snprintf function.                             *
+ * Purpose: Secure version of snprintf function.                              *
  *          Add zero character at the end of string.                          *
  *          Reallocs memory if not enough.                                    *
  *                                                                            *
@@ -261,7 +261,8 @@ void __zbx_zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_l
 
 	va_start(args, fmt);
 
-	if (*offset + max_len >= *alloc_len) {
+	if (*offset + max_len >= *alloc_len)
+	{
 		while (*offset + max_len >= *alloc_len)
 			*alloc_len *= 2;
 		*str = zbx_realloc(*str, *alloc_len);
@@ -2682,4 +2683,17 @@ void	win2unix_eol(char *text)
 			memmove(&text[i + 1], &text[i + 2], (sz - i) * sizeof(char));
 		}
 	}
+}
+
+int	is_ascii_string(const char *str)
+{
+	while ('\0' != *str)
+	{
+		if (!(0 <= *str && *str <= 127))
+			return FAIL;
+
+		str++;
+	}
+
+	return SUCCEED;
 }
