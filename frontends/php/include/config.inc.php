@@ -918,31 +918,6 @@ function __autoload($class_name){
 		return $res;
 	}
 
-/* Use ImageSetStyle+ImageLIne instead of bugged ImageDashedLine */
-	if(function_exists('imagesetstyle')){
-		function DashedLine($image,$x1,$y1,$x2,$y2,$color){
-// Style for dashed lines
-//			$style = array($color, $color, $color, $color, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT);
-			$style = array($color, $color, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT);
-			ImageSetStyle($image, $style);
-			ImageLine($image,$x1,$y1,$x2,$y2,IMG_COLOR_STYLED);
-		}
-
-	}
-	else{
-		function DashedLine($image,$x1,$y1,$x2,$y2,$color){
-			ImageDashedLine($image,$x1,$y1,$x2,$y2,$color);
-		}
-	}
-
-	function DashedRectangle($image,$x1,$y1,$x2,$y2,$color){
-		DashedLine($image, $x1,$y1,$x1,$y2,$color);
-		DashedLine($image, $x1,$y2,$x2,$y2,$color);
-		DashedLine($image, $x2,$y2,$x2,$y1,$color);
-		DashedLine($image, $x2,$y1,$x1,$y1,$color);
-	}
-
-
 	function set_image_header($format=null){
 		global $IMAGE_FORMAT_DEFAULT;
 
