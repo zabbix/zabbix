@@ -105,9 +105,19 @@ include_once('include/page_header.php');
 	$_REQUEST['go'] = get_request('go','none');
 
 // PERMISSIONS
-	if(get_request('triggerid',0) > 0){
+	if(get_request('triggerid', false)){
 		$triggers = available_triggers($_REQUEST['triggerid'], 1);
 		if(empty($triggers)) access_deny();
+	}
+	else if(get_request('hostid', 0) > 0){
+		$options = array(
+			'hostids' => $_REQUEST['hostid'],
+			'extendoutput' => 1,
+			'templated_hosts' => 1,
+			'editable' => 1
+		);
+		$hosts = CHost::get($options);
+		if(empty($hosts)) access_deny();
 	}
 ?>
 <?php
