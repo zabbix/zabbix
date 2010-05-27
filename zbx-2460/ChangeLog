@@ -1,5 +1,9 @@
 Changes for 1.8.3
 
+ - [ZBX-2367] improved using DISTINCT rule in queries in API (Aly) 
+ - [ZBX-2408] fixed mute button in status of triggers page (Aly)
+ - [ZBX-2477] fixed dynamic graphs disappear from screens (Vedmak)
+ - [ZBX-1346] clarify some parameter values in the example configuration files (Richlv)
  - [ZBX-2471] fix location of the space in a translatable string (Richlv)
  - [ZBX-954] fix Hungarian language name (Richlv)
  - [ZBX-2457] change 'type' keyword to 'ENGINE' for table creation in MySQL schema (Richlv)
