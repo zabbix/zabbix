@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2319] fixed escaping locales on download (Aly)
  - [ZBX-2460] fixed auto adding host group to updated host (Aly)
  - [ZBX-2367] improved using DISTINCT rule in queries in API (Aly) 
  - [ZBX-2408] fixed mute button in status of triggers page (Aly)
