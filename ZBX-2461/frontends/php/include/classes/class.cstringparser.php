@@ -53,7 +53,12 @@ class CStringParser {
 		$this->totalSymbols = mb_strlen($this->expression); // should be changed to zbx_strlen
 		$this->levelData[$this->currentLevel] = Array();
 		$this->levelData[$this->currentLevel]['levelType'] = 'independent';
-		$this->indexLevels[0] =& $this->indexes;
+		if(isset($this->ess[$this->levelData[$this->currentLevel]['levelType']]['levelIndex']))
+		        $this->addToIndex();
+                else
+                        $this->indexLevels[$this->currentLevel] = Array();
+                
+                $this->indexes =& $this->indexLevels[$this->currentLevel];
 
 		for($this->currentSymbolNum = 0; $this->currentSymbolNum < $this->totalSymbols; $this->currentSymbolNum++) {
 			$this->currentSymbol = mb_substr($this->expression, $this->currentSymbolNum, 1); // should be changed to zbx_substr
@@ -654,13 +659,19 @@ class CStringParser {
 				}
 			}
 		}
+		if(isset($this->ess[$levelData['levelType']]['customValidate'])) {
+		        if(!is_array($this->ess[$levelData['levelType']]['customValidate']))
+		                $this->ess[$levelData['levelType']]['customValidate'] = Array($this->ess[$levelData['levelType']]['customValidate']);
+                        
+                        foreach($this->ess[$levelData['levelType']]['customValidate'] as &$customFunction) {
+                                if(!is_callable($customFunction)) continue;
+                                
+        			$ret = call_user_func_array($customFunction, Array(&$parent, &$levelData, $index, &$this->expression, &$this->ess[$levelData['levelType']]));
 
-		if(isset($this->ess[$levelData['levelType']]['customValidate']) && is_callable($this->ess[$levelData['levelType']]['customValidate'])) {
-			$ret = call_user_func_array($this->ess[$levelData['levelType']]['customValidate'], Array(&$parent, &$levelData, $index, &$this->expression, &$this->ess[$levelData['levelType']]));
-			
-			if(isset($ret['valid']) && $ret['valid'] === false && isset($ret['errArray']) && is_array($ret['errArray']) && isset($ret['errArray']['errorCode']) && isset($ret['errArray']['errStart']) && isset($ret['errArray']['errEnd'])) {
-				$this->errors[] = $ret['errArray'];
-			}
+        			if(isset($ret['valid']) && $ret['valid'] === false && isset($ret['errArray']) && is_array($ret['errArray']) && isset($ret['errArray']['errorCode']) && isset($ret['errArray']['errStart']) && isset($ret['errArray']['errEnd'])) {
+        				$this->errors[] = $ret['errArray'];
+	        		}
+                        }
 		}
 
 		if(isset($levelData['parts']) && is_array($levelData['parts']))
@@ -745,6 +756,20 @@ class CStringParser {
 		global $debugfile;
 		file_put_contents($debugfile, $debugStr, FILE_APPEND);
 	}
+}
+
+function triggerExpressionValidateIndependent(&$parent, &$levelData, $index, &$expression, &$rules) {
+        
+        if(!isset($levelData['indexes']['server']) || !is_array($levelData['indexes']['server']) || !count($levelData['indexes']['server'])) {
+                return Array(
+                        'valid' => false,
+                        'errArray' => Array(
+                                'errorCode' => 16,
+                                'errorMsg' => 'At least one host required in expression. Check expression starting from symbol #'.($levelData['openSymbolNum']+1).' up to symbol #'.$levelData['closeSymbolNum'].'.',
+                                'errStart' => $levelData['openSymbolNum'],
+                                'errEnd' => $levelData['closeSymbolNum'])
+                        );
+        }
 }
 
 function triggerExpressionValidateGroup(&$parent, &$levelData, $index, &$expression, &$rules) {

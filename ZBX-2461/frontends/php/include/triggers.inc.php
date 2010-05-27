@@ -1924,11 +1924,6 @@ return $result;
 			return false;
 		}
 		
-		if(!isset($expressionData[$expression]['hosts']) || !is_array($expressionData[$expression]['hosts']) || !count($expressionData[$expression]['hosts'])) {
-			error(S_TRIGGER_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR);
-			return false;
-		}
-
 		if(!validate_trigger_dependency($expression, $deps)) return false;
 
 		if(is_null($description)){
@@ -3202,6 +3197,7 @@ return $result;
 				case 13: error('['.$errData['errValue'].'] '.S_NOT_FLOAT_OR_MACRO_OR_COUNTER_FOR_FUNCTION_SMALL.' ('.$errData['function'].'). '.$checkExprFrom); break;
 				case 14: error(sprintf(S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR, $errData['function']).' '.$checkExprFrom); break;
 				case 15: error(S_INCORRECT_TRIGGER_EXPRESSION.'.'.SPACE.S_YOU_CAN_NOT_USE_TEMPLATE_HOSTS_MIXED_EXPR.' '.$checkExprFrom); break;
+				case 16: error(S_INCORRECT_TRIGGER_EXPRESSION.'.'.SPACE.S_TRIGGER_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR.SPACE.$checkExprFrom); break;
 			}
 			if($totalBreak) break;
 		}
@@ -4093,7 +4089,11 @@ $triggerExpressionRules['independent'] = Array(
 					"[KMGTsmhdw]+\d+[KMGTsmhdw]+",
 					"\d+[KMGTsmhdw]+\d+"
 				),
-	'customValidate' => 'triggerExpressionValidateGroup',
+	'customValidate' => Array(
+				'triggerExpressionValidateGroup',
+				'triggerExpressionValidateIndependent'
+				),
+	'levelIndex' => true,
 	'ignorSymbols' => ' +');
 $triggerExpressionRules['grouping'] = Array(
 	'openSymbol' => '(',
