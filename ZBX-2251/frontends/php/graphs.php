@@ -88,7 +88,7 @@ include_once('include/page_header.php');
 		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
 	);
 
-	check_fields($fields);
+	$dataValid = check_fields($fields);
 	validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 	$_REQUEST['go'] = get_request('go', 'none');
@@ -405,20 +405,18 @@ include_once('include/page_header.php');
 		insert_graph_form();
 		echo SBR;
 		$table = new CTable(NULL,'graph');
-		if(($_REQUEST['graphtype'] == GRAPH_TYPE_PIE) || ($_REQUEST['graphtype'] == GRAPH_TYPE_EXPLODED)){
+		if(($_REQUEST['graphtype'] == GRAPH_TYPE_PIE || $_REQUEST['graphtype'] == GRAPH_TYPE_EXPLODED) && $dataValid){
 			$table->addRow(new CImg('chart7.php?period=3600'.url_param('name').
 					url_param('legend').url_param('graph3d').url_param('width').
 					url_param('height').url_param('graphtype').url_param('items')));
-			$table->show();
-		}
-		else{
+		}else if($dataValid){
 			$table->addRow(new CImg('chart3.php?period=3600'.url_param('name').url_param('width').url_param('height').
 				url_param('ymin_type').url_param('ymax_type').url_param('yaxismin').url_param('yaxismax').
 				url_param('ymin_itemid').url_param('ymax_itemid').
 				url_param('showworkperiod').url_param('legend').url_param('showtriggers').url_param('graphtype').
 				url_param('percent_left').url_param('percent_right').url_param('items')));
-			$table->show();
 		}
+		$table->show();
 	}
 	else {
 /* Table HEADER */
