@@ -49,7 +49,7 @@ class Curl{
 		$this->arguments =	array();
 
 		if(empty($url)){
-			$this->formatArguments();
+			$this->formatGetArguments();
 
 			// $protocol = (zbx_strpos(zbx_strtolower($_SERVER['SERVER_PROTOCOL']), 'shttp') !== false)?'shttp':'http';
 			$protocol = ((isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on')) || ($_SERVER['SERVER_PORT'] == 443)) ? 'https' : 'http';
@@ -141,19 +141,22 @@ class Curl{
 	}
 
 	public function formatQuery(){
-		$query = '';
+		$query = Array();
+
 		foreach($this->arguments as $key => $value){
 			if(is_null($value)) continue;
 			if(is_array($value)){
 				foreach($value as $vkey => $vvalue){
-					$query.= $key.'['.$vkey.']='.$vvalue.'&';
+					if(is_array($vvalue)) continue;
+
+					$query[] = $key.'['.$vkey.']='.rawurlencode($vvalue);
 				}
 			}
 			else{
-				$query.= $key.'='.$value.'&';
+				$query[] = $key.'='.rawurlencode($value);
 			}
 		}
-		$this->query = rtrim($query,'&');
+		$this->query = implode('&', $query);
 	}
 
 	public function formatGetArguments(){
@@ -171,8 +174,8 @@ class Curl{
 			foreach($args as $id => $arg){
 				if(empty($arg)) continue;
 
-				$tmp = explode('=',$arg);
-				$this->arguments[$tmp[0]] = isset($tmp[1])?$tmp[1]:'';
+				list($name, $value) = explode('=',$arg);
+				$this->arguments[$name] = isset($value) ? urldecode($value):'';
 			}
 		}
 		$this->formatQuery();

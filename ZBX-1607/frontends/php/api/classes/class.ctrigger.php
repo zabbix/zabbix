@@ -318,6 +318,12 @@ class CTrigger extends CZBXAPI{
 			if(is_null($options['filter'])) $options['filter'] = array();
 			$options['filter']['value'] = TRIGGER_VALUE_TRUE;
 		}
+		
+// status
+		if(!is_null($options['status'])){
+			if(is_null($options['filter'])) $options['filter'] = array();
+			$options['filter']['status'] = $options['status'];
+		}
 
 // lastChangeSince
 		if(!is_null($options['lastChangeSince'])){

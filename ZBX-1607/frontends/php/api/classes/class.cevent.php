@@ -94,7 +94,7 @@ class CEvent extends CZBXAPI{
 			'select_hosts'			=> null,
 			'select_items'			=> null,
 			'select_triggers'		=> null,
-			'count'					=> null,
+			'countOutput'			=> null,
 			'preservekeys'			=> null,
 
 			'sortfield'				=> '',
@@ -162,7 +162,7 @@ class CEvent extends CZBXAPI{
 		}
 
 // nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid(false);
+		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
 
 // groupids
@@ -249,8 +249,8 @@ class CEvent extends CZBXAPI{
 		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['events'] = 'e.*';
 		}
-// count
-		if(!is_null($options['count'])){
+// countOutput
+		if(!is_null($options['countOutput'])){
 			$options['sortfield'] = '';
 			$sql_parts['select'] = array('COUNT(DISTINCT e.eventid) as rowscount');
 		}
@@ -306,7 +306,7 @@ class CEvent extends CZBXAPI{
 		$db_res = DBselect($sql, $sql_limit);
  //sdi($sql);
 		while($event = DBfetch($db_res)){
-			if($options['count'])
+			if($options['countOutput'])
 				$result = $event;
 			else{
 				$eventids[$event['eventid']] = $event['eventid'];
@@ -363,7 +363,8 @@ class CEvent extends CZBXAPI{
 		}
 
 
-		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['count'])){
+Copt::memoryPick();
+		if(!is_null($options['countOutput'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
@@ -428,6 +429,7 @@ class CEvent extends CZBXAPI{
 				'nodeids' => $nodeids,
 				'output' => $options['select_items'],
 				'triggerids' => $triggerids,
+				'webitems' => 1,
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
@@ -438,15 +440,15 @@ class CEvent extends CZBXAPI{
 				$itriggers = $item['triggers'];
 				unset($item['triggers']);
 				foreach($itriggers as $trigger){
-					if(!isset($items[$trigger['triggerid']])) $items[$trigger['triggerid']] = array('items' => array());
+					if(!isset($items[$trigger['triggerid']])) $items[$trigger['triggerid']] = array();
 
-					$items[$triggerid]['items'][] = $item;
+					$items[$trigger['triggerid']][] = $item;
 				}
 			}
 
 			foreach($result as $eventid => $event){
 				if(isset($items[$event['objectid']])){
-					$result[$eventid]['items'] = $items[$event['objectid']]['items'];
+					$result[$eventid]['items'] = $items[$event['objectid']];
 				}
 				else{
 					$result[$eventid]['items'] = array();

@@ -139,37 +139,6 @@ static int	DBget_trigger_expression_by_triggerid(zbx_uint64_t triggerid, char *e
 
 /******************************************************************************
  *                                                                            *
- * Function: delete_spaces                                                    *
- *                                                                            *
- * Purpose: delete all spaces                                                 *
- *                                                                            *
- * Parameters: c - string to delete spaces                                    *
- *                                                                            *
- * Return value:  the string wtihout spaces                                   *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-void	delete_spaces(char *c)
-{
-	int i,j;
-
-	j=0;
-	for(i=0;c[i]!=0;i++)
-	{
-		if( c[i] != ' ')
-		{
-			c[j]=c[i];
-			j++;
-		}
-	}
-	c[j]=0;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: evaluate_simple                                                  *
  *                                                                            *
  * Purpose: evaluate simple expression                                        *

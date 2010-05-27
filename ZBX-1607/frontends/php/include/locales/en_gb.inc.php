@@ -719,8 +719,7 @@
 	'S_HIDE_UNKNOWN'=>			'Hide unknown',
 	'S_LOG_FILES_SMALL'=>			'log files',
 	'S_REMOVE_SELECTED'=>			'Remove selected',
-	'S_LOG_FILES_LIST'=>			'Log files list',
-
+	'S_ITEMS_LIST'=>				'Items list',
 	'S_SHOW_SELECTED'=>			'Show selected',
 	'S_HIDE_SELECTED'=>			'Hide selected',
 	'S_MARK_SELECTED'=>			'Mark selected',
@@ -1970,7 +1969,7 @@
 	'S_TEST_DATA'=>		'Test data',
 	'S_EXPRESSION_VARIABLE_ELEMENTS'=>	'Expression Variable Elements',
 	'S_EXPRESSION_VALUE_TYPE_UNKNOWN'=>	'Unknown variable type, testing not available',
-	'S_EXPRESSION_HOST_UNKNOWN'=>		'Unknown host, no such host presented in system',
+	'S_EXPRESSION_HOST_UNKNOWN'=>		'Unknown host, no such host present in system',
 	'S_EXPRESSION_HOST_ITEM_UNKNOWN'=>	'Unknown host item, no such item in selected host',
 	'S_EXPRESSION_NOT_A_MACRO_ERROR'=>	'Given expression is not a macro',
 	'S_RESULT_TYPE'=>	'Result type',
@@ -2106,6 +2105,7 @@
 	'S_TEMPLATE_WITH_ITEM_KEY'=>			'Template with item key',
 	'S_TEMPLATE_WITH_APPLICATION'=>			'Template with application',
 	'S_ALREADY_LINKED_TO_HOST_SMALL'=>		'already linked to host',
+	'S_HOST_HAS_BEEN_DELETED_MSG'=>			'Host %s has been deleted from the system',
 
 //	validate.inc.php
 	'S_CRITICAL_ERROR'=>				'Critical error',
@@ -2155,9 +2155,9 @@
 	'S_NO_FUNCTION_WITH'=>					'No function with',
 	'S_SPECIFY_THE_CONDITIONAL_EXPR_FOR_THE_TARGET'=>	'Specify the conditional expression for the target.',
 	'S_0_OR_1'=>						'0 or 1',
-	'S_TRIGGER_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR'=>	'At least one item must present in the trigger expression.',
-	'S_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR'=>		'Host does not exists.',
-	'S_EXPRESSION_HOST_KEY_DOES_NOT_ERROR'=>		'Host key does not exists.',
+	'S_TRIGGER_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR'=>	'At least one item must be present in the trigger expression.',
+	'S_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR'=>		'Host does not exist.',
+	'S_EXPRESSION_HOST_KEY_DOES_NOT_ERROR'=>		'Host key does not exist.',
 	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR'=>	'Function \'%s\' does not accept parameters.',
 
 //	page_footer.php
@@ -2185,6 +2185,7 @@
 	'S_FOR_TEMPLATE_GRAPH_SMALL'=>				'for template graph',
 	'S_UPDATED_FOR_HOSTS'=>					'updated for hosts',
 	'S_SKIPPED_COPYING_OF_GRAPH'=>				'Skipped copying of graph',
+	'S_GRAPH_DELETED_FROM_HOSTS'=>				'Graph "%s" deleted from host%s',
 
 //	profiles.inc.php
 	'S_UNABLE_TO_SELECT_CONFIGURATION'=>	'Unable to select configuration',
