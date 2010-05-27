@@ -847,7 +847,8 @@ COpt::memoryPick();
 				return false;
 			}
 			
-			$hData =& $expressionData[$expression]['hosts'][0];
+			reset($expressionData[$expression]['hosts']);
+			$hData =& $expressionData[$expression]['hosts'][key($expressionData[$expression]['hosts'])];
 			$object['host'] = zbx_substr($expression, $hData['openSymbolNum']+1, $hData['closeSymbolNum']-($hData['openSymbolNum']+1));
 		}
 
