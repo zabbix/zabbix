@@ -814,7 +814,7 @@ return $result;
 			return	$result;
 		}
 
-		add_event($triggerid,TRIGGER_VALUE_UNKNOWN);
+		addEvent($triggerid,TRIGGER_VALUE_UNKNOWN);
 
 		if( null == ($expression = implode_exp($expression,$triggerid)) ){
 			$result = false;
@@ -1452,8 +1452,8 @@ return $result;
 		DBexecute('UPDATE triggers SET status='.$status.' WHERE '.DBcondition('triggerid',$triggerids));
 
 		if($status != TRIGGER_STATUS_ENABLED){
-			add_event($triggerids,TRIGGER_VALUE_UNKNOWN);
-			DBexecute('UPDATE triggers SET value='.TRIGGER_VALUE_UNKNOWN.' WHERE '.DBcondition('triggerid',$triggerids));
+			addEvent($triggerids,TRIGGER_VALUE_UNKNOWN);
+			DBexecute('UPDATE triggers SET lastchange='.time().', value='.TRIGGER_VALUE_UNKNOWN.' WHERE '.DBcondition('triggerid',$triggerids));
 		}
 
 	return true;
@@ -1763,7 +1763,7 @@ return $result;
 		}
 		if(!empty($triggers)){
 // returns updated triggers
-			$triggers = add_event($triggers,TRIGGER_VALUE_UNKNOWN,$now);
+			$triggers = addEvent($triggers,TRIGGER_VALUE_UNKNOWN,$now);
 		}
 
 		if(!empty($triggers)){
@@ -1772,40 +1772,23 @@ return $result;
 	return true;
 	}
 
-/******************************************************************************
- *																			*
- * Comments: !!! Don't forget sync code with C !!!							*
- *		   !!! C code dosn't support TRIGGERS MULTI EVENT !!!			   *
- *																			*
- ******************************************************************************/
-	function add_event($triggerids, $value, $time=NULL){
+	function addEvent($triggerids, $value){
 		zbx_value2array($triggerids);
-		if(is_null($time)) $time = time();
-
-		$result = DBselect('SELECT DISTINCT triggerid, value, type FROM triggers WHERE '.DBcondition('triggerid',$triggerids));
-		while($trigger = DBfetch($result)){
-			if(($value == $trigger['value']) && !(($value == TRIGGER_VALUE_TRUE) && ($trigger['type'] == TRIGGER_MULT_EVENT_ENABLED))){
-				unset($triggerids[$trigger['triggerid']]);
-			}
-		}
 
 		$events = array();
-		foreach($triggerids as $id => $triggerid){
-			$eventid = get_dbid('events','eventid');
-			$result = DBexecute('INSERT INTO events (eventid,source,object,objectid,clock,value) '.
-					' VALUES ('.$eventid.','.EVENT_SOURCE_TRIGGERS.','.EVENT_OBJECT_TRIGGER.','.$triggerid.','.$time.','.$value.')');
-			$events[$eventid] = $eventid;
+		foreach($triggerids as $tnum => $triggerid){
+			$events[] = array(
+				'source'		=> EVENT_SOURCE_TRIGGERS,
+				'object'		=> EVENT_OBJECT_TRIGGER,
+				'objectid'		=> $triggerid,
+				'clock'			=> time(),
+				'value'			=> $value,
+				'acknowledged'	=> 0
+			);
 		}
+		$eventids = CEvent::create($events);
 
-		if(!empty($events) && ($value == TRIGGER_VALUE_FALSE || $value == TRIGGER_VALUE_TRUE)){
-			DBexecute('UPDATE alerts '.
-						" SET retries=3,error='Trigger changed its status. Will not send repeats.'".
-					' WHERE '.DBcondition('eventid',$events).
-						' AND repeats>0 '.
-						' AND status='.ALERT_STATUS_NOT_SENT);
-		}
-
-	return $triggerids;
+	return $eventids;
 	}
 
 /******************************************************************************
@@ -2003,28 +1986,34 @@ return $result;
 			}
 		}
 
-		$result=delete_function_by_triggerid($triggerid);
+		$result = delete_function_by_triggerid($triggerid);
+
 		if(!$result){
 			return	$result;
 		}
 
 		$expression = implode_exp($expression,$triggerid); /* errors can be ignored cose function must return NULL */
+		
+		$sql_update = '';
+		if(!is_null($expression))	$sql_update .= ' expression='.zbx_dbstr($expression).',';
+		if(!is_null($description))	$sql_update .= ' description='.zbx_dbstr($description).',';
+		if(!is_null($type))			$sql_update .= ' type='.$type.',';
+		if(!is_null($priority))		$sql_update .= ' priority='.$priority.',';
+		if(!is_null($status))		$sql_update .= ' status='.$status.',';
+		if(!is_null($comments))		$sql_update .= ' comments='.zbx_dbstr($comments).',';
+		if(!is_null($url))			$sql_update .= ' url='.zbx_dbstr($url).',';
+		if(!is_null($templateid))	$sql_update .= ' templateid='.$templateid;
 
-		if($event_to_unknown) add_event($triggerid,TRIGGER_VALUE_UNKNOWN);
+		if($event_to_unknown){
+			if(($trigger['expression'] != $expression) || (!is_null($status) && ($status != TRIGGER_STATUS_ENABLED))){
+				addEvent($triggerid, TRIGGER_VALUE_UNKNOWN);
 
-		$sql='UPDATE triggers SET ';
-		if(!is_null($expression))	$sql .= ' expression='.zbx_dbstr($expression).',';
-		if(!is_null($description))	$sql .= ' description='.zbx_dbstr($description).',';
-		if(!is_null($type))			$sql .= ' type='.$type.',';
-		if(!is_null($priority))		$sql .= ' priority='.$priority.',';
-		if(!is_null($status))		$sql .= ' status='.$status.',';
-		if(!is_null($status) && ($status != TRIGGER_STATUS_ENABLED))	$sql .= ' value='.TRIGGER_VALUE_UNKNOWN.',';
-		if(!is_null($comments))		$sql .= ' comments='.zbx_dbstr($comments).',';
-		if(!is_null($url))			$sql .= ' url='.zbx_dbstr($url).',';
-		if(!is_null($templateid))	$sql .= ' templateid='.$templateid.',';
-		$sql .= ' value=2 WHERE triggerid='.$triggerid;
+				$sql_update .= ',value='.TRIGGER_VALUE_UNKNOWN;
+				$sql_update .= ',lastchange='.time();
+			}
+		}
 
-		$result = DBexecute($sql);
+		$result = DBexecute('UPDATE triggers SET '.$sql_update.' WHERE triggerid='.$triggerid);
 
 		delete_dependencies_by_triggerid($triggerid);
 

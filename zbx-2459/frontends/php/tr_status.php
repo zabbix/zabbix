@@ -419,11 +419,11 @@ include_once('include/page_header.php');
 			'nodeids' => get_current_nodeid(),
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 			'nopermissions' => 1,
-			'extendoutput' => 1,
-			'sortfield' => 'eventid',
-			'sortorder' => ZBX_SORT_DOWN,
+			'output' => API_OUTPUT_EXTEND,
 			'time_from' => time() - ($config['event_expire']*86400),
 			'time_till' => time(),
+			'sortfield' => 'eventid',
+			'sortorder' => ZBX_SORT_DOWN,
 			//'limit' => $config['event_show_max']
 		);
 
@@ -441,12 +441,12 @@ include_once('include/page_header.php');
 		}
 
 		$events = CEvent::get($ev_options);
+		order_result($events, 'clock', ZBX_SORT_DOWN);
 
 		foreach($events as $enum => $event){
 			$triggers[$event['objectid']]['events'][] = $event;
 		}
 	}
-
 
 
 	foreach($triggers as $tnum => $trigger){

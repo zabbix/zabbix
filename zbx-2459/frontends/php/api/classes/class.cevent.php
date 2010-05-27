@@ -486,10 +486,30 @@ Copt::memoryPick();
  */
 	public static function create($events){
 		$events = zbx_toArray($events);
-		$eventids = array();
 
-		$result = false;
-		$triggers = array();
+		$eventids = array();
+		$result = true;
+		
+		$options = array(
+			'triggerids' => zbx_objectValues($events, 'objectid'),
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => 1
+		);
+		$triggers = CTrigger::get($options);
+
+		foreach($events as $num => $event){
+			if($event['object'] != EVENT_OBJECT_TRIGGER) continue;
+
+			if(isset($triggers[$event['objectid']])){
+				$trigger = $triggers[$event['objectid']];
+
+				if(($event['value'] != $trigger['value']) || (($event['value'] == TRIGGER_VALUE_TRUE) && ($trigger['type'] == TRIGGER_MULT_EVENT_ENABLED))){
+					continue;
+				}
+			}
+
+			unset($events[$num]);
+		}
 
 		self::BeginTransaction(__METHOD__);
 		foreach($events as $num => $event){
@@ -520,13 +540,14 @@ Copt::memoryPick();
 			$result = DBexecute($sql);
 			if(!$result) break;
 
-			$triggers[] = array('triggerid' => $event['objectid'], 'value'=> $event['value'], 'lastchange'=> $event['clock']);
+//			$triggers[] = array('triggerid' => $event['objectid'], 'value'=> $event['value'], 'lastchange'=> $event['clock']);
 
 			$eventids[$eventid] = $eventid;
 		}
 
 		if($result){
-			$result = CTrigger::update($triggers);
+// This will create looping (Trigger->Event->Trigger->Event)
+//			$result = CTrigger::update($triggers);
 		}
 
 		$result = self::EndTransaction($result, __METHOD__);
