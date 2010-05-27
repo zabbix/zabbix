@@ -897,60 +897,37 @@ out:
 int	zbx_tcp_accept(zbx_sock_t *s)
 {
 	ZBX_SOCKADDR	serv_addr;
+	fd_set		sock_set;
 	ZBX_SOCKET	accepted_socket;
 	socklen_t	nlen;
 	int		i, n = 0;
 
-	static int	init = 0;
-	static fd_set	sock_set;
-
 	zbx_tcp_unaccept(s);
 
-	if (!init)
-	{
-		init = 1;
-		FD_ZERO(&sock_set);
-	}
-
-	/* Check whether there were any other sockets to */
-	/* be accept()-ed the last time we did select(). */
+	FD_ZERO(&sock_set);
 
 	for (i = 0; i < s->num_socks; i++)
 	{
+		FD_SET(s->sockets[i], &sock_set);
 #if !defined(_WINDOWS)
 		if (s->sockets[i] > n)
 			n = s->sockets[i];
 #endif
+	}
+
+	if (ZBX_TCP_ERROR == select(n + 1, &sock_set, NULL, NULL, NULL))
+	{
+		zbx_set_tcp_strerror("select() failed with error %d: %s",
+				zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
+		return FAIL;
+	}
+
+	for (i = 0; i < s->num_socks; i++)
 		if (FD_ISSET(s->sockets[i], &sock_set))
 			break;
-	}
-
-	if (i == s->num_socks)
-	{
-		for (i = 0; i < s->num_socks; i++)
-			FD_SET(s->sockets[i], &sock_set);
-
-		if (ZBX_TCP_ERROR == select(n + 1, &sock_set, NULL, NULL, NULL))
-		{
-			zbx_set_tcp_strerror("select() failed with error %d: %s",
-					zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
-			return FAIL;
-		}
-
-		for (i = 0; i < s->num_socks; i++)
-			if (FD_ISSET(s->sockets[i], &sock_set))
-				break;
-	}
-
-	FD_CLR(s->sockets[i], &sock_set);
 
 	/* Since this socket was returned by select(), we know we have */
-	/* a connection waiting and that this accept() will not block. */ /* <--- This is not correct, because that
-									     connection might have disappeared while
-									     we were processing the previous request.
-									     If that is the case, we will block waiting
-									     for a new connection on this socket. */
-
+	/* a connection waiting and that this accept() will not block. */
 	nlen = sizeof(serv_addr);
 	if (ZBX_SOCK_ERROR == (accepted_socket = (ZBX_SOCKET)accept(s->sockets[i], (struct sockaddr *)&serv_addr, &nlen)))
 	{
