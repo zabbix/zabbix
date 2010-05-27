@@ -483,7 +483,7 @@
 						),
 					is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null,
 					$_REQUEST['hostid'] == 0 ? $host['host'] : null,
-					$tr_desc,
+					new CSpan($tr_desc, 'link_menu'),
 					$event['value_col'],
 					new CCol(get_severity_description($trigger['priority']), get_severity_style($trigger['priority'],$event['value'])),
 					$event['duration'],

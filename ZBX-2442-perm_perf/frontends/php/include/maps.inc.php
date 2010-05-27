@@ -500,8 +500,18 @@
 	function get_selement_iconid($selement, $info=null){
 		if($selement['selementid'] > 0){
 			if(is_null($info)){
-				$selements_info = getSelementsInfo(array('selements' => array($selement)));
-				$info = reset($selements_info);
+// get sysmap
+				$options = array(
+					'sysmapids' => $selement['sysmapid'],
+					'output' => API_OUTPUT_EXTEND
+				);
+				$sysmaps = CMap::get($options);
+				$sysmap = reset($sysmaps);
+				$sysmap['selements'] = array($selement);
+
+				$map_info = getSelementsInfo($sysmap);
+				$info = reset($map_info);
+//-----
 			}
 //SDI($info);
 

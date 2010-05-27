@@ -757,7 +757,7 @@ add_selement_img: function(selement){
 //	selement_div.setAttribute('src','data:image/png;base64,'+selement.image);
 //	selement_div.setAttribute('src','imgstore.php?iconid='+selement.image);
 	selement_div.className = 'pointer sysmap_iconid_'+selement.image;
-	
+
 	selement_div.style.zIndex = '10';
 	selement_div.style.position = 'absolute';
 	selement_div.style.top = position.top+'px';
@@ -1100,7 +1100,7 @@ update_multiContainer: function(e){
 		var e_table_1 = document.createElement('table');
 		e_table_1.setAttribute('cellspacing',"0");
 		e_table_1.setAttribute('cellpadding',"1");
-		e_table_1.setAttribute('class',"header");
+		e_table_1.className = 'header';
 	
 	
 		var e_tbody_2 = document.createElement('tbody');
@@ -1112,14 +1112,14 @@ update_multiContainer: function(e){
 	
 	
 		var e_td_4 = document.createElement('td');
-		e_td_4.setAttribute('class',"header_l");
+		e_td_4.className = 'header_l';
 		e_td_4.appendChild(document.createTextNode(locale['S_MAP_ELEMENTS']));
 		e_tr_3.appendChild(e_td_4);
 	
 		
 		var e_td_4 = document.createElement('td');
 		e_td_4.setAttribute('align',"right");
-		e_td_4.setAttribute('class',"header_r");
+		e_td_4.className = 'header_r';
 		
 		e_tr_3.appendChild(e_td_4);
 		
@@ -1243,7 +1243,7 @@ update_linkContainer: function(e){
 		var e_table_1 = document.createElement('table');
 		e_table_1.setAttribute('cellspacing',"0");
 		e_table_1.setAttribute('cellpadding',"1");
-		e_table_1.setAttribute('class',"header");
+		e_table_1.className = 'header';
 		
 		
 		var e_tbody_2 = document.createElement('tbody');
@@ -1255,14 +1255,14 @@ update_linkContainer: function(e){
 		
 		
 		var e_td_4 = document.createElement('td');
-		e_td_4.setAttribute('class',"header_l");
+		e_td_4.className = 'header_l';
 		e_td_4.appendChild(document.createTextNode(locale['S_CONNECTORS']));
 		e_tr_3.appendChild(e_td_4);
 		
 		
 		var e_td_4 = document.createElement('td');
 		e_td_4.setAttribute('align',"right");
-		e_td_4.setAttribute('class',"header_r");
+		e_td_4.className = 'header_r';
 		
 		e_tr_3.appendChild(e_td_4);
 		
@@ -1380,7 +1380,7 @@ update_linkContainer: function(e){
 		
 		var e_td_4 = document.createElement('td');
 		e_td_4.setAttribute('colSpan',4);
-		e_td_4.setAttribute('class','center');
+		e_td_4.className = 'center';
 		e_td_4.appendChild(document.createTextNode(locale['S_NO_LINKS']));
 		e_tr_3.appendChild(e_td_4);
 	}

@@ -73,6 +73,7 @@ initialize: function(id, objid){
 	this.cleanCache();
 
 	this.dom.input = $(objid);
+
 	addListener(this.dom.input, 'keyup', this.keyPressed.bindAsEventListener(this));
 	addListener(this.dom.input, 'blur', this.suggestBlur.bindAsEventListener(this));
 	addListener(window, 'resize', this.positionSuggests.bindAsEventListener(this));
@@ -281,6 +282,7 @@ keyPressed: function(e){
 			this.hideSuggests(e);
 			break;
 		case(key==13):
+			Event.stop(e);
 			this.selectSuggest(e);
 			break;
 		case(key == 37 || key == 39 || key == 9): // left, right, tab
@@ -351,7 +353,7 @@ mouseOut: function(e){
 },
 
 suggestBlur: function(e){
-	this.debug('mouseOut');
+	this.debug('suggestBlur');
 //---
 
 	if(this.mouseOverSuggest) Event.stop(e);
@@ -395,7 +397,8 @@ selectSuggest: function(e){
 	this.hideSuggests();
 
 //SDJ(this.dom.input);
-	if(this.onSelect(this.dom.input.value)) this.dom.input.form.submit();
+
+	if(this.onSelect(this.dom.input.value) && !GK) this.dom.input.form.submit();
 },
 
 

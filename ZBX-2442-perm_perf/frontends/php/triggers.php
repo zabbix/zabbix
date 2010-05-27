@@ -105,13 +105,23 @@ include_once('include/page_header.php');
 	$_REQUEST['go'] = get_request('go','none');
 
 // PERMISSIONS
-	if(get_request('triggerid',0) > 0){
+	if(get_request('triggerid', false)){
 		$options = array(
 			'triggerids' => $_REQUEST['triggerid'],
 			'editable' => 1,
 		);
 		$triggers = CTrigger::get($options);
 		if(empty($triggers)) access_deny();
+	}
+	else if(get_request('hostid', 0) > 0){
+		$options = array(
+			'hostids' => $_REQUEST['hostid'],
+			'extendoutput' => 1,
+			'templated_hosts' => 1,
+			'editable' => 1
+		);
+		$hosts = CHost::get($options);
+		if(empty($hosts)) access_deny();
 	}
 ?>
 <?php
@@ -524,13 +534,14 @@ include_once('include/page_header.php');
 			$sortorder = getPageSortOrder();
 			$options = array(
 				'editable' => 1,
-					'output' => API_OUTPUT_SHORTEN,
+				'output' => API_OUTPUT_SHORTEN,
+				'filter' => array(),
 				'sortfield' => $sortfield,
 				'sortorder' => $sortorder,
 				'limit' => ($config['search_limit']+1)
 			);
 			if($showdisabled == 0){
-				$options['status'] = TRIGGER_STATUS_ENABLED;
+				 $options['filter']['status'] = TRIGGER_STATUS_ENABLED;
 			}
 			if($pageFilter->hostid > 0)
 				$options['hostids'] = $pageFilter->hostid;
