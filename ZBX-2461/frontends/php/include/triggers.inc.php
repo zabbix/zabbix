@@ -106,7 +106,7 @@
 				ITEM_VALUE_TYPE_LOG
 				)
 			);
-		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['last']	= array('args' => null,
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['last']	= array('args' => array( 0 => array('type' => 'sec_num','mandat' => true) ),
 			'item_types' => array(
 				ITEM_VALUE_TYPE_FLOAT,
 				ITEM_VALUE_TYPE_UINT64,
