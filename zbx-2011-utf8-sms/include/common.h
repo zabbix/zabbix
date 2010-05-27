@@ -751,7 +751,6 @@ ZBX_TASK_EX
 
 char	*string_replace(char *str, char *sub_str1, char *sub_str2);
 
-int	find_char(char *str, char c);
 int	is_double_prefix(char *str);
 int	is_double(char *c);
 int	is_uint_prefix(const char *c);
@@ -769,7 +768,6 @@ void	compress_signs(char *str);
 void	ltrim_spaces(char *c);
 void	rtrim_spaces(char *c);
 void	del_zeroes(char *s);
-void	delete_reol(char *c);
 void	delete_chars(char *c, const char *charlist);
 #define delete_spaces(c)	delete_chars(c, " ");
 #define delete_whitespace(c)	delete_chars(c, " \t\n\r");

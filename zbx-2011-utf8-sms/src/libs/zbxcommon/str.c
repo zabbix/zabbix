@@ -97,32 +97,6 @@ void help()
 
 /******************************************************************************
  *                                                                            *
- * Function: find_char                                                        *
- *                                                                            *
- * Purpose: locate a character in the string                                  *
- *                                                                            *
- * Parameters: str - string                                                   *
- *             c   - character to find                                        *
- *                                                                            *
- * Return value:  position of the character                                   *
- *                FAIL - otherwise                                            *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments: !!! better use system functions like 'strchr' !!!                *
- *                                                                            *
- ******************************************************************************/
-int	find_char(char *str,char c)
-{
-	char *p;
-	for(p = str; *p; p++)
-		if(*p == c) return (int)(p - str);
-
-	return	FAIL;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: zbx_error                                                        *
  *                                                                            *
  * Purpose: Print error text to the stderr                                    *
@@ -427,32 +401,6 @@ void	del_zeroes(char *s)
 				break;
 			}
 		}
-	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: delete_reol                                                      *
- *                                                                            *
- * Purpose: delete all right EOL characters                                   *
- *                                                                            *
- * Parameters: c - string to delete EOL                                       *
- *                                                                            *
- * Return value:  the string without EOL                                      *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-void	delete_reol(char *c)
-{
-	int i;
-
-	for(i=(int)strlen(c)-1;i>=0;i--)
-	{
-		if( c[i] != '\n')	break;
-		c[i]=0;
 	}
 }
 
