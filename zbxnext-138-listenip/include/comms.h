@@ -42,12 +42,10 @@ typedef enum
 
 typedef struct zbx_sock
 {
-#if defined(HAVE_IPV6)
-	ZBX_SOCKET	sockets[FD_SETSIZE];
 	int		num_socks;
-#endif /* HAVE_IPV6 */
+	ZBX_SOCKET	sockets[FD_SETSIZE];
 	ZBX_SOCKET	socket;
-	ZBX_SOCKET	socket2;
+	ZBX_SOCKET	socket_orig;
 	char		buf_stat[ZBX_STAT_BUF_LEN];
 	char		*buf_dyn;
 	zbx_buf_type_t	buf_type;
@@ -56,8 +54,8 @@ typedef struct zbx_sock
 	int		timeout;
 } zbx_sock_t;
 
-char*	zbx_tcp_strerror(void);
-int	zbx_tcp_error(void);
+const char	*zbx_tcp_strerror(void);
+int		zbx_tcp_error(void);
 
 struct hostent	*zbx_gethost(const char *hostname);
 
