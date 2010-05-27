@@ -830,6 +830,9 @@ include_once('include/page_header.php');
 		$template_wdgt->addItem($form);
 		$template_wdgt->show();
 	}
+?>
+<?php
 
 include_once('include/page_footer.php');
+
 ?>
