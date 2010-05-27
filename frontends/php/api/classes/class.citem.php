@@ -365,6 +365,9 @@ class CItem extends CZBXAPI{
 				zbx_value2array($options['filter']['value_type']);
 				$sql_parts['where']['value_type'] = DBCondition('i.value_type', $options['filter']['value_type']);
 			}
+			
+			if(isset($options['filter']['ipmi_sensor']))
+				$sql_parts['where'][] = 'i.ipmi_sensor='.zbx_dbstr($options['filter']['ipmi_sensor']);
 
 			if(isset($options['filter']['data_type']))
 				$sql_parts['where'][] = 'i.data_type='.$options['filter']['data_type'];
