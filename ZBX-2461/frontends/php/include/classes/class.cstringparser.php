@@ -974,7 +974,7 @@ function triggerExpressionValidateItemKeyFunctionParams(&$parent, &$levelData, $
 		if(!is_array($fnc_valid['args']))  $fnc_valid['args'] = array($fnc_valid['args']);
 		
 		foreach($fnc_valid['args'] as $pid => $params){
-			if(!isset($parameter[$pid]) || !$parameter[$pid]){
+			if(!isset($parameter[$pid])){
 				if( !isset($params['mandat']) ){
 					continue;
 				}else{
