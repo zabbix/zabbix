@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2461] fixed complex bugs with trigger expressions (Maxim Andruhovich / AM)
  - [ZBX-1357] updated German translation; thanks to Peter Schultz (Richlv)
  - [ZBX-2319] fixed escaping locales on download (Aly)
  - [ZBX-2460] fixed auto adding host group to updated host (Aly)
