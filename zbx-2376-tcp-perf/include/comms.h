@@ -107,4 +107,14 @@ int	zbx_tcp_check_security(
 	int allow_if_empty
 	);
 
+#define	ZBX_DEFAULT_FTP_PORT	21
+#define	ZBX_DEFAULT_SSH_PORT	22
+#define	ZBX_DEFAULT_SMTP_PORT	25
+#define	ZBX_DEFAULT_HTTP_PORT	80
+#define	ZBX_DEFAULT_POP_PORT	110
+#define	ZBX_DEFAULT_NNTP_PORT	119
+#define	ZBX_DEFAULT_NTP_PORT	123
+#define	ZBX_DEFAULT_IMAP_PORT	143
+#define	ZBX_DEFAULT_LDAP_PORT	389
+
 #endif
