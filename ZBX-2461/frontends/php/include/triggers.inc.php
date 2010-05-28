@@ -2707,7 +2707,7 @@ return $result;
 						break;
 				}
 
-				if(zbx_strlen($description) > 25) $description = substr($description,0,22).'...';
+				if(zbx_strlen($description) > 25) $description = zbx_substr($description,0,22).'...';
 
 				$item_menu[$action][] = array(
 					$description,
