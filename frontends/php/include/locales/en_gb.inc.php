@@ -1918,6 +1918,7 @@
 	'S_EXTENDED'=>				'Extended',
 
 //	search.php
+	'S_EDIT_HOSTS' => 'Edit hosts',
 	'S_SEARCH_BIG'=>			'SEARCH',
 	'S_GO'=>				'Go',
 	'S_FOUND_SMALL'=>			'found',

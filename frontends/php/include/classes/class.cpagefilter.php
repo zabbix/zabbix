@@ -60,18 +60,19 @@ class CPageFilter{
 			$this->config['DDFirst'] = $config['dropdown_first_entry'];
 		}
 
-
+		
 		if(!isset($options['groupid'], $options['hostid'])){
 			if(isset($options['graphid'])){
 				$this->_updateGHbyGraph($options);
 			}
-//			else if(isset($options['itemid'])){
-//				$this->updateGHbyItem();
-//			}
 		}
 
 
 		if(isset($options['groups'])){
+			if(!isset($options['groupid']) && isset($options['hostid'])){
+				$options['groupid'] = 0;
+			}
+			
 			$this->_profileIdx['groups'] = 'web.'.$page['menu'].'.groupid';
 			$this->_initGroups($options['groupid'], $options['groups']);
 		}
@@ -86,7 +87,6 @@ class CPageFilter{
 	}
 
 	private function _updateGHbyGraph(&$options){
-
 		$graph = CGraph::get(array(
 			'graphids' => $options['graphid'],
 			'output' => API_OUTPUT_EXTEND,
@@ -100,7 +100,6 @@ class CPageFilter{
 	}
 
 	private function _initGroups($groupid, $options){
-
 		$def_options = array(
 			'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
 			'output' => API_OUTPUT_EXTEND,
@@ -138,7 +137,6 @@ class CPageFilter{
 	}
 
 	private function _initHosts($hostid, $options){
-
 		$this->data['hosts'] = array();
 
 		if(!$this->groupsSelected){
@@ -183,7 +181,6 @@ class CPageFilter{
 	}
 
 	private function _initGraphs($graphid, $options){
-
 		$this->data['graphs'] = array();
 
 		if(!$this->hostsSelected){
