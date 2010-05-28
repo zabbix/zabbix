@@ -197,13 +197,8 @@ include_once('include/page_header.php');
 ?>
 <?php
 	$options = array(
-		'groups' => array(
-			'editable' => 1,
-		),
-		'hosts' => array(
-			'editable' => 1,
-			'templated_hosts' => 1,
-		),
+		'groups' => array('editable' => 1),
+		'hosts' => array('editable' => 1, 'templated_hosts' => 1),
 		'hostid' => get_request('hostid', null),
 		'groupid' => get_request('groupid', null),
 	);

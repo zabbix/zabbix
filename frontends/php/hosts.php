@@ -850,9 +850,7 @@ include_once('include/page_header.php');
 	}
 	
 	$hosts_wdgt->show();
-?>
-<?php
+
 
 include_once('include/page_footer.php');
-
 ?>
