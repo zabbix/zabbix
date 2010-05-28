@@ -66,7 +66,7 @@ class CTag extends CObject{
 		foreach($this->attributes as $key => $value){
 			$res .= ' '.$key.'="'.$value.'"';
 		}
-		$res .= ($this->paired==='yes')?'>':' />';
+		$res .= ($this->paired==='yes')? '>':' />';
 	return $res;
 	}
 

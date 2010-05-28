@@ -480,24 +480,25 @@ function rgb2hex($color){
 		if(zbx_strlen($value) != 2) $HEX[$id] = '0'.$value;
 	}
 
-	return $HEX[0].$HEX[1].$HEX[2];
+return $HEX[0].$HEX[1].$HEX[2];
 }
 
 function hex2rgb($color){
-	if($color[0] == '#') $color = substr($color, 1);
+	if($color[0] == '#')
+		$color = substr($color, 1);
 
 	if(zbx_strlen($color) == 6)
-		list($r, $g, $b) = array($color[0].$color[1], $color[2].$color[3], $color[4].$color[5]);
+		list($r, $g, $b) = array($color[0].$color[1],
+								 $color[2].$color[3],
+								 $color[4].$color[5]);
 	else if(zbx_strlen($color) == 3)
 		list($r, $g, $b) = array($color[0].$color[0], $color[1].$color[1], $color[2].$color[2]);
 	else
 		return false;
 
-	$r = hexdec($r);
-	$g = hexdec($g);
-	$b = hexdec($b);
+	$r = hexdec($r); $g = hexdec($g); $b = hexdec($b);
 
-	return array($r, $g, $b);
+return array($r, $g, $b);
 }
 
 function zbx_num2bitstr($num,$rev=false){
@@ -1132,6 +1133,14 @@ function zbx_str2links($text){
 	
 	$result[] = zbx_substr($text, $start, zbx_strlen($text));
 	return $result;
+}
+
+function zbx_add2subarray(&$mainArray, $sIndex, $element) {
+	if(!isset($mainArray[$sIndex])) $mainArray[$sIndex] = Array();
+	
+	if(!is_array($mainArray[$sIndex])) $mainArray[$sIndex]= Array($mainArray[$sIndex]);
+	
+	$mainArray[$sIndex][] = &$element;
 }
 /************* END ZBX MISC *************/
 ?>
