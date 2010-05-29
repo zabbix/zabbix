@@ -60,7 +60,7 @@ class CScreen extends CZBXAPI{
 
 		$sql_parts = array(
 			'select' => array('screens' => 's.screenid'),
-			'from' => array('screens' => 'screens s'),
+			'from' => array('screens s'),
 			'where' => array(),
 			'order' => array(),
 			'limit' => null);
@@ -100,7 +100,7 @@ class CScreen extends CZBXAPI{
 // editable + PERMISSION CHECK
 
 // nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
+		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid(false);
 
 // screenids
 		if(!is_null($options['screenids'])){
@@ -173,7 +173,7 @@ class CScreen extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.'
+		$sql = 'SELECT DISTINCT '.$sql_select.'
 				FROM '.$sql_from.'
 				WHERE '.DBin_node('s.screenid', $nodeids).
 					$sql_where.

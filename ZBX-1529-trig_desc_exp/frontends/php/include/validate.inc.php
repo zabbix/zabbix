@@ -485,11 +485,11 @@
 		if($opt == O_MAND){
 			if(!isset($_REQUEST[$field])){
 				if($flags&P_SYS){
-					info(S_CRITICAL_ERROR.'.'.SPACE.S_FIELD.SPACE.'['.$caption.']'.SPACE.S_IS_MANDATORY_SMALL);
+					info(S_CRITICAL_ERROR.'.'.SPACE.S_FIELD.SPACE.'['.$field.']'.SPACE.S_IS_MANDATORY_SMALL);
 					return ZBX_VALID_ERROR;
 				}
 				else{
-					info(S_WARNING.'.'.SPACE.S_FIELD.SPACE.'['.$caption.']'.SPACE.S_IS_MANDATORY_SMALL);
+					info(S_WARNING.'.'.SPACE.S_FIELD.SPACE.'['.$field.']'.SPACE.S_IS_MANDATORY_SMALL);
 					return ZBX_VALID_WARNING;
 				}
 			}
@@ -501,11 +501,11 @@
 			unset_request($field,'O_NO');
 
 			if($flags&P_SYS){
-				info(S_CRITICAL_ERROR.'.'.SPACE.S_FIELD.SPACE.'['.$caption.']'.SPACE.S_MUST_BE_MISSING_SMALL);
+				info(S_CRITICAL_ERROR.'.'.SPACE.S_FIELD.SPACE.'['.$field.']'.SPACE.S_MUST_BE_MISSING_SMALL);
 				return ZBX_VALID_ERROR;
 			}
 			else{
-				info(S_WARNING.'.'.SPACE.S_FIELD.SPACE.'['.$caption.']'.SPACE.S_MUST_BE_MISSING_SMALL);
+				info(S_WARNING.'.'.SPACE.S_FIELD.SPACE.'['.$field.']'.SPACE.S_MUST_BE_MISSING_SMALL);
 				return ZBX_VALID_WARNING;
 			}
 		}

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2010 Artem "Aly" Suharev
+** Copyright (C) 2009 Artem "Aly" Suharev
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -312,7 +312,7 @@ update: function(){
 onSuccess: function(resp){
 	this.debug('onSuccess');
 	this.rmwDarken();
-
+	
 	var headers = resp.getAllResponseHeaders(); 
 //alert(headers);
 	if(headers.indexOf('Ajax-response: false') > -1){

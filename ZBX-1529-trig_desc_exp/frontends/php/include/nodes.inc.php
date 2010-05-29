@@ -138,9 +138,9 @@
 			else {
 				$result = $ZBX_VIEWED_NODES['selected'];
 			}
-
-			if(empty($result)) $result = $USER_DETAILS['node']['nodeid'];
-			if(empty($result)) $result = $ZBX_CURRENT_NODEID;
+			if(empty($result)){
+				$result = $USER_DETAILS['node']['nodeid'];
+			}
 		}
 		else if($forse_all_nodes) {
 			$result = $ZBX_AVAILABLE_NODES;

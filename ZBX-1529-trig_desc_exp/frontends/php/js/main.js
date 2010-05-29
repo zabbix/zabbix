@@ -170,7 +170,7 @@ implement: function(obj){
 
 check: function(e){
 	var e = e || window.event;
-	var obj = Event.element(e);
+	var obj = eventTarget(e);
 
 	PageRefresh.restart();
 	
@@ -830,7 +830,6 @@ function switch_mute(icon){
 
 	var params = {
 		'favobj': 	'sound',
-		'favref':	'sound',
 		'state':	sound_state
 	}
 	

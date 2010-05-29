@@ -48,7 +48,7 @@ class CDRule extends CZBXAPI{
 
 		$sql_parts = array(
 			'select' => array('drules' => 'dr.druleid'),
-			'from' => array('drules' => 'drules dr'),
+			'from' => array('drules dr'),
 			'where' => array(),
 			'group' => array(),
 			'order' => array(),
@@ -133,8 +133,8 @@ class CDRule extends CZBXAPI{
 				$sql_parts['select']['dserviceid'] = 'ds.dserviceid';
 			}
 
-			$sql_parts['from']['dhosts'] = 'dhosts dh';
-			$sql_parts['from']['dservices'] = 'dservices ds';
+			$sql_parts['from']['dh'] = 'dhosts dh';
+			$sql_parts['from']['dh'] = 'dservices ds';
 
 			$sql_parts['where']['dserviceid'] = DBcondition('ds.dserviceid', $options['dserviceids']);
 			$sql_parts['where']['dhdr'] = 'dh.druleid=dr.druleid';
@@ -244,7 +244,7 @@ class CDRule extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.
+		$sql = 'SELECT DISTINCT '.$sql_select.
 				' FROM '.$sql_from.
 				' WHERE '.$sql_where.
 				$sql_group.

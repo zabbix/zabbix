@@ -94,7 +94,7 @@ include_once('include/page_header.php');
 			}
 
 			$data_table->addRow(new CRow(array($macroStr, is_array($info) || !isset($definedErrorPhrases[$info]) ? $info['value_type'] : new CCol($definedErrorPhrases[$info], 'disaster'), $control)));
-			$fields[$fname] = array($info['type'], O_OPT, null, $validation, 'isset({test_expression})', $macroStr);
+			$fields[$fname] = array($info['type'], O_OPT, null, $validation, 'isset({test_expression})');
 		}
 	}
 

@@ -54,7 +54,7 @@ class CTemplate extends CZBXAPI{
 
 		$sql_parts = array(
 			'select' => array('templates' => 'h.hostid'),
-			'from' => array('hosts' => 'hosts h'),
+			'from' => array('hosts h'),
 			'where' => array('h.status='.HOST_STATUS_TEMPLATE),
 			'group' => array(),
 			'order' => array(),
@@ -145,9 +145,9 @@ class CTemplate extends CZBXAPI{
 		else{
 			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
 
-			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sql_parts['from']['rights'] = 'rights r';
-			$sql_parts['from']['users_groups'] = 'users_groups ug';
+			$sql_parts['from']['hg'] = 'hosts_groups hg';
+			$sql_parts['from']['r'] = 'rights r';
+			$sql_parts['from']['ug'] = 'users_groups ug';
 			$sql_parts['where'][] = 'hg.hostid=h.hostid';
 			$sql_parts['where'][] = 'r.id=hg.groupid ';
 			$sql_parts['where'][] = 'r.groupid=ug.usrgrpid';
@@ -164,7 +164,7 @@ class CTemplate extends CZBXAPI{
 		}
 
 // nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
+		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid(false);
 
 // groupids
 		if(!is_null($options['groupids'])){
@@ -174,7 +174,7 @@ class CTemplate extends CZBXAPI{
 				$sql_parts['select']['groupid'] = 'hg.groupid';
 			}
 
-			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sql_parts['from']['hg'] = 'hosts_groups hg';
 			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
 			$sql_parts['where']['hgh'] = 'hg.hostid=h.hostid';
 
@@ -207,7 +207,7 @@ class CTemplate extends CZBXAPI{
 				$sql_parts['select']['parentTemplateid'] = 'ht.templateid as parentTemplateid';
 			}
 
-			$sql_parts['from']['hosts_templates'] = 'hosts_templates ht';
+			$sql_parts['from']['ht'] = 'hosts_templates ht';
 			$sql_parts['where'][] = DBcondition('ht.templateid', $options['parentTemplateids']);
 			$sql_parts['where']['hht'] = 'h.hostid=ht.hostid';
 
@@ -229,7 +229,7 @@ class CTemplate extends CZBXAPI{
 				$sql_parts['select']['linked_hostid'] = 'ht.hostid as linked_hostid';
 			}
 
-			$sql_parts['from']['hosts_templates'] = 'hosts_templates ht';
+			$sql_parts['from']['ht'] = 'hosts_templates ht';
 			$sql_parts['where'][] = DBcondition('ht.hostid', $options['hostids']);
 			$sql_parts['where']['hht'] = 'h.hostid=ht.templateid';
 
@@ -251,7 +251,7 @@ class CTemplate extends CZBXAPI{
 				$sql_parts['select']['itemid'] = 'i.itemid';
 			}
 
-			$sql_parts['from']['items'] = 'items i';
+			$sql_parts['from']['i'] = 'items i';
 			$sql_parts['where'][] = DBcondition('i.itemid', $options['itemids']);
 			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
 
@@ -268,8 +268,8 @@ class CTemplate extends CZBXAPI{
 				$sql_parts['select']['triggerid'] = 'f.triggerid';
 			}
 
-			$sql_parts['from']['functions'] = 'functions f';
-			$sql_parts['from']['items'] = 'items i';
+			$sql_parts['from']['f'] = 'functions f';
+			$sql_parts['from']['i'] = 'items i';
 			$sql_parts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
 			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
 			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
@@ -288,8 +288,8 @@ class CTemplate extends CZBXAPI{
 				$sql_parts['select']['graphid'] = 'gi.graphid';
 			}
 
-			$sql_parts['from']['graphs_items'] = 'graphs_items gi';
-			$sql_parts['from']['items'] = 'items i';
+			$sql_parts['from']['gi'] = 'graphs_items gi';
+			$sql_parts['from']['i'] = 'items i';
 			$sql_parts['where'][] = DBcondition('gi.graphid', $options['graphids']);
 			$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
 			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
@@ -405,7 +405,7 @@ class CTemplate extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.
+		$sql = 'SELECT DISTINCT '.$sql_select.
 				' FROM '.$sql_from.
 				' WHERE '.DBin_node('h.hostid', $nodeids).
 					$sql_where.
@@ -562,17 +562,15 @@ Copt::memoryPick();
 				foreach($templates as $templateid => $template){
 					unset($templates[$templateid]['parentTemplates']);
 
-					if(isset($template['parentTemplates']) && is_array($template['parentTemplates'])) {
-						foreach($template['parentTemplates'] as $hnum => $parentTemplate){
-							if(!is_null($options['limitSelects'])){
-								if(!isset($count[$parentTemplate['templateid']])) $count[$parentTemplate['templateid']] = 0;
-								$count[$parentTemplate['hostid']]++;
+					foreach($template['parentTemplates'] as $hnum => $parentTemplate){
+						if(!is_null($options['limitSelects'])){
+							if(!isset($count[$parentTemplate['templateid']])) $count[$parentTemplate['templateid']] = 0;
+							$count[$parentTemplate['hostid']]++;
 
-								if($count[$parentTemplate['templateid']] > $options['limitSelects']) continue;
-							}
-
-							$result[$parentTemplate['templateid']]['templates'][] = &$templates[$templateid];
+							if($count[$parentTemplate['templateid']] > $options['limitSelects']) continue;
 						}
+
+						$result[$parentTemplate['templateid']]['templates'][] = &$templates[$templateid];
 					}
 				}
 			}

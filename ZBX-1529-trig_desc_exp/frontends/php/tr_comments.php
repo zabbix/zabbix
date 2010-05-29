@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,31 +19,34 @@
 **/
 ?>
 <?php
-	require_once 'include/config.inc.php';
-	require_once 'include/triggers.inc.php';
-	require_once 'include/forms.inc.php';
+	require_once "include/config.inc.php";
+	require_once "include/triggers.inc.php";
+	require_once "include/forms.inc.php";
 
-	$page['title'] = 'S_TRIGGER_COMMENTS';
-	$page['file'] = 'tr_comments.php';
+	$page["title"] = "S_TRIGGER_COMMENTS";
+	$page["file"] = "tr_comments.php";
 
-include_once 'include/page_header.php';
+include_once "include/page_header.php";
 
 ?>
 <?php
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'triggerid'=>	array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID, null),
-		'comments'=>	array(T_ZBX_STR, O_OPT,  null,	null, 'isset({save})'),
+		"triggerid"=>	array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID, null),
+		"comments"=>	array(T_ZBX_STR, O_OPT,  null,	null, 'isset({save})'),
 
-		'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'cancel'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+/* actions */
+		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+/* other */
 /*
 		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 		"form_copy_to"=>	array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	null,	null,	null)
 */
 	);
+
 	check_fields($fields);
 ?>
 <?php
@@ -53,30 +56,37 @@ include_once 'include/page_header.php';
 	$options = array(
 		'nodeids' => get_current_nodeid(true),
 		'triggerids' => $_REQUEST['triggerid'],
-		'output' => API_OUTPUT_SHORTEN,
+		'output' => API_OUTPUT_EXTEND,
+		'select_hosts' => API_OUTPUT_EXTEND
 	);
+
 	$db_data = CTrigger::get($options);
 	if(empty($db_data)) access_deny();
+	else $db_data = reset($db_data);
 
+	$host = reset($db_data['hosts']);
 
-	if(isset($_REQUEST['save'])){
-		$result = update_trigger_comments($_REQUEST['triggerid'],$_REQUEST['comments']);
+	if(isset($_REQUEST["save"])){
+		$result = update_trigger_comments($_REQUEST["triggerid"],$_REQUEST["comments"]);
 		show_messages($result, S_COMMENT_UPDATED, S_CANNOT_UPDATE_COMMENT);
 
 		if($result){
 			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_TRIGGER,
-				S_TRIGGER.' ['.$_REQUEST['triggerid'].'] ['.expand_trigger_description($_REQUEST['triggerid']).'] '.
-				S_COMMENTS.' ['.$_REQUEST['comments'].']');
+				S_TRIGGER." [".$_REQUEST["triggerid"]."] [".expand_trigger_description($_REQUEST["triggerid"])."] ".
+				S_COMMENTS." [".$_REQUEST["comments"]."]");
 		}
 	}
-	else if(isset($_REQUEST['cancel'])){
-		redirect('tr_status.php');
+	else if(isset($_REQUEST["cancel"])){
+		redirect('tr_status.php?hostid='.$host['hostid']);
 		exit;
-	}
 
+	}
+?>
+<?php
 	show_table_header(S_TRIGGER_COMMENTS_BIG);
 	insert_trigger_comment_form($_REQUEST["triggerid"]);
-
+?>
+<?php
 
 include_once('include/page_footer.php');
 

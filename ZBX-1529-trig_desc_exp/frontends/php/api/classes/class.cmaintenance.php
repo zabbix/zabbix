@@ -62,7 +62,7 @@ class CMaintenance extends CZBXAPI{
 
 		$sql_parts = array(
 			'select' => array('maintenance' => 'm.maintenanceid'),
-			'from' => array('maintenances' => 'maintenances m'),
+			'from' => array('maintenances m'),
 			'where' => array(),
 			'group' => array(),
 			'order' => array(),
@@ -206,7 +206,7 @@ class CMaintenance extends CZBXAPI{
 		}
 
 // nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
+		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid(false);
 
 // groupids
 		if(!is_null($options['groupids'])){
@@ -287,7 +287,7 @@ class CMaintenance extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.
+		$sql = 'SELECT DISTINCT '.$sql_select.
 				' FROM '.$sql_from.
 				' WHERE '.DBin_node('m.maintenanceid', $nodeids).
 					$sql_where.

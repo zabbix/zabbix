@@ -144,7 +144,6 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 #ifdef _AIXVERSION_530
 		/* Distribute the donated and stolen purr to the existing purr buckets in case if donation is 
 		enabled.*/
-#ifdef HAVE_AIXOSLEVEL_530006
 		if (lparstats.type.b.donate_enabled)
 		{
 			didle_donated_purr = lparstats.idle_donated_purr - last_idle_donated_purr;
@@ -169,7 +168,6 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 					+ dbusy_stolen_purr;
 			pcputime = delta_purr; 
 		}
-#endif	/* HAVE_AIXOSLEVEL_530006 */
 
 		dtimebase = lparstats.timebase_last - last_timebase_last;
 		vmstat->ent = (double)lparstats.entitled_proc_capacity / 100.0;
@@ -280,13 +278,11 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 
 	last_pool_idle_time = (zbx_uint64_t)lparstats.pool_idle_time;
 
-#ifdef HAVE_AIXOSLEVEL_530006
 	last_idle_donated_purr = (zbx_uint64_t)lparstats.idle_donated_purr;
 	last_busy_donated_purr = (zbx_uint64_t)lparstats.busy_donated_purr;
 
 	last_idle_stolen_purr = (zbx_uint64_t)lparstats.idle_stolen_purr;
 	last_busy_stolen_purr = (zbx_uint64_t)lparstats.busy_stolen_purr;
-#endif	/* HAVE_AIXOSLEVEL_530006 */
 #endif	/* not _AIXVERSION_530 */
 	last_user = (zbx_uint64_t)cpustats.user;
 	last_sys = (zbx_uint64_t)cpustats.sys;

@@ -163,7 +163,7 @@ function format_doll_init($doll){
 		else $obj[$key] = $def;
 	}
 
-	$obj['url'].= (zbx_empty($obj['url'])? '?':'&').'output=html';
+	$obj['url'].= (zbx_empty($obj['url'])?'?':'&').'output=html';
 
 	$obj['params']['favobj'] = 'hat';
 	$obj['params']['favref'] = $doll['id'];
@@ -196,7 +196,7 @@ function make_refresh_menu($pmid,$dollid,$cur_interval,$params=null,&$menu,&$sub
 			'javascript: setRefreshRate('.zbx_jsvalue($pmid).','.zbx_jsvalue($dollid).','.$value.','.zbx_jsvalue($params).');'.
 			'void(0);',
 			null,
-			array('outer' => ($value == $cur_interval)? 'pum_b_submenu':'pum_o_submenu', 'inner'=>array('pum_i_submenu')
+			array('outer' => ($value == $cur_interval)?'pum_b_submenu':'pum_o_submenu', 'inner'=>array('pum_i_submenu')
 		));
 	}
 	$submenu['menu_'.$dollid][] = array();
@@ -460,10 +460,10 @@ function getmicrotime(){
 }
 
 function zbxDateToTime($strdate){
-	if(6 == sscanf($strdate, '%04d%02d%02d%02d%02d%02d', $year, $month, $date, $hours, $minutes, $seconds))
-		return mktime($hours,$minutes,$seconds,$month,$date,$year);
+	if(5 == sscanf($strdate, '%04d%02d%02d%02d%02d', $year, $month, $date, $hours, $minutes))
+		return mktime($hours,$minutes,0,$month,$date,$year);
 	else
-		return time();
+		return 0;
 }
 /************* END DATE *************/
 
@@ -480,24 +480,25 @@ function rgb2hex($color){
 		if(zbx_strlen($value) != 2) $HEX[$id] = '0'.$value;
 	}
 
-	return $HEX[0].$HEX[1].$HEX[2];
+return $HEX[0].$HEX[1].$HEX[2];
 }
 
 function hex2rgb($color){
-	if($color[0] == '#') $color = substr($color, 1);
+	if($color[0] == '#')
+		$color = substr($color, 1);
 
 	if(zbx_strlen($color) == 6)
-		list($r, $g, $b) = array($color[0].$color[1], $color[2].$color[3], $color[4].$color[5]);
+		list($r, $g, $b) = array($color[0].$color[1],
+								 $color[2].$color[3],
+								 $color[4].$color[5]);
 	else if(zbx_strlen($color) == 3)
 		list($r, $g, $b) = array($color[0].$color[0], $color[1].$color[1], $color[2].$color[2]);
 	else
 		return false;
 
-	$r = hexdec($r);
-	$g = hexdec($g);
-	$b = hexdec($b);
+	$r = hexdec($r); $g = hexdec($g); $b = hexdec($b);
 
-	return array($r, $g, $b);
+return array($r, $g, $b);
 }
 
 function zbx_num2bitstr($num,$rev=false){
@@ -511,7 +512,7 @@ function zbx_num2bitstr($num,$rev=false){
 
 	for($i=0;$i<$len;$i++){
 		$sbin= 1 << $i;
-		$bit = ($sbin & $num)? '1':'0';
+		$bit = ($sbin & $num)?'1':'0';
 		if($rev){
 			$strbin.=$bit;
 		}
@@ -553,7 +554,6 @@ function mem2str($size){
 
 // convert:
 function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
-
 // Special processing for unix timestamps
 	if($units=='unixtime'){
 		$ret=zbx_date2str(S_FUNCT_UNIXTIMESTAMP_DATE_FORMAT,$value);
@@ -621,6 +621,24 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 			$step = 1000;
 	}
 
+	if(zbx_empty($units) && ($convert == ITEM_CONVERT_WITH_UNITS)){;
+		if(abs($value) >= 1)
+			$format = '%.2f';
+		else if(abs($value) >= 0.01)
+			$format = '%.4f';
+		else
+			$format = '%.6f';
+
+		if(round($value, 6) == 0) $value = 0;
+		else{
+			$value = sprintf($format,$value);
+			$value = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U','$1$2$3', $value);
+			$value = rtrim($value, '.');
+		}
+
+		return sprintf('%s %s', $value, $units);
+	}
+
 // INIT intervals
 	static $digitUnits;
 	if(is_null($digitUnits)) $digitUnits = array();
@@ -651,7 +669,7 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 	else $abs = $value;
 
 	$valUnit = array('pow'=>0, 'short'=>'', 'long'=>'', 'value'=>$value);
-	if(($abs > 999) || ($abs < 0.001)){
+	if(($abs > 999) ||  ($abs < 0.001)){
 		foreach($digitUnits[$step] as $dnum => $data){
 			if(bccomp($abs, $data['value']) > -1) $valUnit = $data;
 			else break;
@@ -1116,22 +1134,5 @@ function zbx_array_mintersect($keys, $array){
 	return $result;
 }
 
-function zbx_str2links($text){
-// $value = preg_replace('#(https?|ftp|file)://[^\n\t\r ]+#u', '<a href="$0">$0</a>', $value);
-	$result = array();
-	if(empty($text)) return $result;
-	
-	preg_match_all('#https?://[^\n\t\r ]+#u', $text, $matches, PREG_OFFSET_CAPTURE);
-	
-	$start = 0;
-	foreach($matches[0] as $match){
-		$result[] = zbx_substr($text, $start, $match[1]-$start);
-		$result[] = new CLink($match[0], $match[0], null, null, true);
-		$start = $match[1] + zbx_strlen($match[0]);
-	}
-	
-	$result[] = zbx_substr($text, $start, zbx_strlen($text));
-	return $result;
-}
 /************* END ZBX MISC *************/
 ?>

@@ -540,8 +540,6 @@
 
 	define('GRAPH_ZERO_LINE_COLOR_LEFT',	'AAAAAA');
 	define('GRAPH_ZERO_LINE_COLOR_RIGHT',	'888888');
-	
-	define('GRAPH_TRIGGER_LINE_OPPOSITE_COLOR',	'000');
 
 	define('ZBX_MAX_TREND_DIFF',		3600);
 
@@ -757,13 +755,11 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 		$_COOKIE	= zbx_stripslashes($_COOKIE);
 	}
 
-// init $_REQUEST
+/* init $_REQUEST */
 	ini_set('variables_order', 'GP');
 	$_REQUEST = $_POST + $_GET;
 
-// init precision
+/* init precision */
 	ini_set('precision', 14);
 
-//
-	bcscale(7);
 ?>

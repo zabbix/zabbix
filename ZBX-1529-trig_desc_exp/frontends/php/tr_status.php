@@ -125,22 +125,15 @@ include_once('include/page_header.php');
 
 	$config = select_config();
 
-	$options = array(
-		'groups' => array(
-			'monitored_hosts' => 1,
-			'with_monitored_triggers' => 1,
-		),
-		'hosts' => array(
-			'monitored_hosts' => 1,
-			'with_monitored_triggers' => 1,
-		),
-		'hostid' => get_request('hostid', null),
-		'groupid' => get_request('groupid', null),
-	);
-	$pageFilter = new CPageFilter($options);
-	$_REQUEST['groupid'] = $pageFilter->groupid;
-	$_REQUEST['hostid'] = $pageFilter->hostid;
+	$options = array('allow_all_hosts','monitored_hosts','with_monitored_triggers');
+	$params = array();
+	foreach($options as  $option) $params[$option] = 1;
+	$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
+	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
+	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
 
+	// $_REQUEST['groupid'] = get_request('groupid', 0);
+	// $_REQUEST['hostid'] = get_request('hostid', 0);
 
 /* FILTER */
 	if(isset($_REQUEST['filter_rst'])){
@@ -199,9 +192,22 @@ include_once('include/page_header.php');
 <?php
 	$trigg_wdgt = new CWidget();
 
-	$r_form = new CForm(null, 'get');
-	$r_form->addItem(array(S_GROUP.SPACE,$pageFilter->getGroupsCB(true)));
-	$r_form->addItem(array(SPACE.S_HOST.SPACE,$pageFilter->getHostsCB(true)));
+	$r_form = new CForm();
+	$r_form->setMethod('get');
+
+	$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
+	$cmbHosts = new CComboBox('hostid',$PAGE_HOSTS['selected'],'javascript: submit();');
+
+	foreach($PAGE_GROUPS['groups'] as $groupid => $name){
+		$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid, null, ': ').$name);
+	}
+	foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
+		$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid, null, ': ').$name);
+	}
+
+
+	$r_form->addItem(array(S_GROUP.SPACE,$cmbGroups));
+	$r_form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
 	$r_form->addVar('fullscreen',$_REQUEST['fullscreen']);
 
 	$url = 'tr_status.php'.($_REQUEST['fullscreen'] ? '' : '?fullscreen=1');
@@ -209,7 +215,7 @@ include_once('include/page_header.php');
 	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 	$fs_icon->addAction('onclick',new CJSscript("javascript: document.location = '".$url."';"));
 
-	$mute_icon = new CDiv(SPACE,$mute? 'iconmute':'iconsound');
+	$mute_icon = new CDiv(SPACE,$mute?'iconmute':'iconsound');
 	$mute_icon->setAttribute('title',S_SOUND.' '.S_ON.'/'.S_OFF);
 	$mute_icon->addAction('onclick',new CJSscript("javascript: switch_mute(this);"));
 
@@ -345,14 +351,14 @@ include_once('include/page_header.php');
 	);
 
 // Filtering
-	if($pageFilter->hostsSelected){
-		if($pageFilter->hostid > 0)
-			$options['hostids'] = $pageFilter->hostid;
-		else if($pageFilter->groupid > 0)
-			$options['groupids'] = $pageFilter->groupid;
+	if(($PAGE_HOSTS['selected'] > 0) || empty($PAGE_HOSTS['hostids'])){
+		$options['hostids'] = $PAGE_HOSTS['selected'];
 	}
-	else{
-		$options['hostids'] = array();
+	else if(($PAGE_GROUPS['selected'] > 0) && !empty($PAGE_HOSTS['hostids'])){
+		$options['hostids'] = $PAGE_HOSTS['hostids'];
+	}
+	else if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
+		$options['groupids'] = $PAGE_GROUPS['selected'];
 	}
 
 
@@ -392,7 +398,7 @@ include_once('include/page_header.php');
 	if($config['event_ack_enable']){
 		foreach($triggers as $tnum => $trigger){
 			$options = array(
-				'countOutput' => 1,
+				'count' => 1,
 				'triggerids' => $trigger['triggerid'],
 				'object' => EVENT_OBJECT_TRIGGER,
 				'acknowledged' => 0,
