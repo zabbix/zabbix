@@ -19,13 +19,6 @@
 **/
 ?>
 <?php
-	require_once('include/images.inc.php');
-	require_once('include/hosts.inc.php');
-	require_once('include/triggers.inc.php');
-	require_once('include/events.inc.php');
-	require_once('include/scripts.inc.php');
-	require_once('include/maintenances.inc.php');
-
 /*
  * Function: map_link_drawtypes
  *
@@ -654,8 +647,18 @@
 	function get_selement_iconid($selement, $info=null){
 		if($selement['selementid'] > 0){
 			if(is_null($info)){
-				$selements_info = getSelementsInfo(array('selements' => array($selement)));
-				$info = reset($selements_info);
+// get sysmap
+				$options = array(
+					'sysmapids' => $selement['sysmapid'],
+					'output' => API_OUTPUT_EXTEND
+				);
+				$sysmaps = CMap::get($options);
+				$sysmap = reset($sysmaps);
+				$sysmap['selements'] = array($selement);
+
+				$map_info = getSelementsInfo($sysmap);
+				$info = reset($map_info);
+//-----
 			}
 //SDI($info);
 
@@ -1399,7 +1402,6 @@
 				'nodeids' => get_current_nodeid(true),
 				'groupids' => zbx_objectValues($selements, 'elementid'),
 				'select_hosts' => API_OUTPUT_EXTEND,
-				'select_triggers' => API_OUTPUT_EXTEND,
 				'output' => API_OUTPUT_EXTEND,
 				'nopermissions' => 1
 			);
@@ -1427,6 +1429,8 @@
 			$info['maintenances'] = array();
 
 			foreach($group['hosts'] as $hnum => $host){
+				if($host['status'] == HOST_STATUS_TEMPLATE) continue;
+
 				if($host['status'] != HOST_STATUS_MONITORED){
 					$info['type'] = TRIGGER_VALUE_FALSE;
 					$info['disabled'] = 1;
@@ -1451,7 +1455,8 @@
 
 			$options = array(
 				'groupids' => $group['groupid'],
-//				'maintenance' => 0,
+				'maintenance' => 0,
+				'templated' => 0,
 				'output' => API_OUTPUT_EXTEND,
 				'nodeids' => get_current_nodeid(true)
 				);
@@ -2219,6 +2224,32 @@
 			$drawtype = $link['drawtype'];
 			$color = convertColor($im,$link['color']);
 
+			$linktriggers = $link['linktriggers'];
+			order_result($linktriggers, 'triggerid');
+
+			if(!empty($linktriggers)){
+				$max_severity=0;
+				$options = array();
+				$options['nopermissions'] = 1;
+				$options['extendoutput'] = 1;
+				$options['triggerids'] = array();
+
+				$triggers = array();
+				foreach($linktriggers as $lt_num => $link_trigger){
+					if($link_trigger['triggerid'] == 0) continue;
+					$id = $link_trigger['linktriggerid'];
+
+					$triggers[$id] = zbx_array_merge($link_trigger, get_trigger_by_triggerid($link_trigger['triggerid']));
+					if(($triggers[$id]['status'] == TRIGGER_STATUS_ENABLED) && ($triggers[$id]['value'] == TRIGGER_VALUE_TRUE)){
+						if($triggers[$id]['priority'] >= $max_severity){
+							$drawtype = $triggers[$id]['drawtype'];
+							$color = convertColor($im,$triggers[$id]['color']);
+							$max_severity = $triggers[$id]['priority'];
+						}
+					}
+				}
+			}
+
 			$label = $link['label'];
 
 			$label = str_replace("\r", '', $label);
@@ -2386,7 +2417,10 @@
 
 //		imagerectangle($im, $x_rec-2-1, $y_rec-1, $x_rec+$w+2+1, $y_rec+($oc*4)+$h+1, $black);
 //		imagefilledrectangle($im, $x_rec-2, $y_rec-2, $x_rec+$w+2, $y_rec+($oc*4)+$h-2, $white);
-
+			
+			$tmpDims = imageTextSize(8,0, str_replace("\n", '', $label_line));
+			$maxHeight = $tmpDims['height'];
+			
 			$num = 0;
 			$increasey = 0;
 			foreach($strings as $key => $str){
@@ -2394,6 +2428,7 @@
 				if(zbx_empty($str)) continue;
 
 				$dims = imageTextSize(8,0,$str);
+				$dims['height'] = $maxHeight;
 
 				$color = $label_color;
 
@@ -2403,7 +2438,6 @@
 					$x_label = $x_rec + $w - $dims['width'];
 				else
 					$x_label = $x_rec;
-
 
 				imagefilledrectangle(
 					$im,

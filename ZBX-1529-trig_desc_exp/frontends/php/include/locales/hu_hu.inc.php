@@ -888,7 +888,7 @@
 	'S_LOGOUT'=>			'Kilépés',
 	'S_LATEST_DATA'=>			'Legutolsó adat',
 	'S_INCORRECT_DESCRIPTION'=>			'Incorrect description',
-	'S_CANT_FORMAT_TREE'=>			'Can\"t format Tree',
+	'S_CANT_FORMAT_TREE'=>			'Can"t format Tree',
 
 	);
 ?>

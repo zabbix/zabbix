@@ -46,7 +46,6 @@ class CFormTable extends CForm{
 
 		parent::__construct($action,$method,$enctype);
 		$this->setTitle($title);
-		$this->setAlign('center');
 		$this->setHelp();
 
 		$this->addVar($form_variable, get_request($form_variable, 1));
@@ -130,7 +129,7 @@ class CFormTable extends CForm{
 		else{
 			$tmp = $item1;
 			if(is_string($item1)){
-				$item1=nbsp($item1);
+				$item1 = nbsp($item1);
 			}
 
 			if(empty($item1)) $item1 = SPACE;

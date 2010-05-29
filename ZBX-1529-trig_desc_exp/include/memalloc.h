@@ -25,9 +25,9 @@
 
 typedef struct
 {
+	void		**buckets;
 	void		*lo_bound;
 	void		*hi_bound;
-	void		*first_chunk;
 	uint32_t	free_size;
 	uint32_t	used_size;
 	uint32_t	orig_size;
@@ -39,7 +39,7 @@ typedef struct
 }
 zbx_mem_info_t;
 
-void	zbx_mem_create(zbx_mem_info_t *info, key_t shm_key, int lock_name, size_t size, const char *descr);
+void	zbx_mem_create(zbx_mem_info_t **info, key_t shm_key, int lock_name, size_t size, const char *descr);
 void	zbx_mem_destroy(zbx_mem_info_t *info);
 
 #define	zbx_mem_malloc(info, old, size) __zbx_mem_malloc(__FILE__, __LINE__, info, old, size)
@@ -51,5 +51,7 @@ void	*__zbx_mem_realloc(const char *file, int line, zbx_mem_info_t *info, void *
 void	__zbx_mem_free(const char *file, int line, zbx_mem_info_t *info, void *ptr);
 
 void	zbx_mem_clear(zbx_mem_info_t *info);
+
+void	zbx_mem_dump_stats(zbx_mem_info_t *info);
 
 #endif
