@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ require_once('include/hosts.inc.php');
 require_once('include/httptest.inc.php');
 require_once('include/forms.inc.php');
 
-$page['title'] = 'S_STATUS_OF_WEB_MONITORING';
+$page['title'] = "S_STATUS_OF_WEB_MONITORING";
 $page['file'] = 'httpmon.php';
 $page['hist_arg'] = array('open','groupid','hostid');
 
@@ -67,6 +67,19 @@ include_once('include/page_header.php');
 	}
 //--------
 	validate_sort_and_sortorder('wt.name',ZBX_SORT_DOWN);
+
+	$options = array('allow_all_hosts','monitored_hosts','with_monitored_httptests');
+	if(!$ZBX_WITH_ALL_NODES)	array_push($options,'only_current_node');
+
+//SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
+	$params = array();
+	foreach($options as  $option) $params[$option] = 1;
+	$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
+	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
+
+//SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
+	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
+//SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
 ?>
 <?php
 	// $_REQUEST['applications'] = get_request('applications',CProfile::get('web.httpmon.applications',array()));
@@ -121,37 +134,37 @@ include_once('include/page_header.php');
 	$httpmon_wdgt->addPageHeader(S_STATUS_OF_WEB_MONITORING_BIG, $fs_icon);
 
 // 2nd header
-	$options = array(
-		'groups' => array(
-			'monitored_hosts' => 1,
-			'with_monitored_httptests' => 1,
-		),
-		'hosts' => array(
-			'monitored_hosts' => 1,
-			'with_monitored_httptests' => 1,
-		),
-		'hostid' => get_request('hostid', null),
-		'groupid' => get_request('groupid', null),
-	);
-	$pageFilter = new CPageFilter($options);
-	$_REQUEST['groupid'] = $pageFilter->groupid;
-	$_REQUEST['hostid'] = $pageFilter->hostid;
-
-	$available_hosts = $pageFilter->hostsSelected ? array_keys($pageFilter->hosts) : array();
-
-	$r_form = new CForm(null, 'get');
+	$r_form = new CForm();
+	$r_form->setMethod('get');
 	$r_form->addVar('fullscreen',$_REQUEST['fullscreen']);
 
-	$r_form->addItem(array(S_GROUP.SPACE,$pageFilter->getGroupsCB(true)));
-	$r_form->addItem(array(SPACE.S_HOST.SPACE,$pageFilter->getHostsCB(true)));
+	$available_groups = $PAGE_GROUPS['groupids'];
+	$available_hosts = $PAGE_HOSTS['hostids'];
+
+	$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
+	$cmbHosts = new CComboBox('hostid',$PAGE_HOSTS['selected'],'javascript: submit();');
+
+	foreach($PAGE_GROUPS['groups'] as $groupid => $name){
+		$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid, null, ': ').$name);
+	}
+	foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
+		$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid, null, ': ').$name);
+	}
+
+	$r_form->addItem(array(S_GROUP.SPACE,$cmbGroups));
+	$r_form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
 
 	$httpmon_wdgt->addHeader(S_WEB_CHECKS_BIG, $r_form);
 	$httpmon_wdgt->addItem(SPACE);
+//	show_table_header(S_STATUS_OF_WEB_MONITORING_BIG, $r_form);
+//-----------------
 
 // TABLE
-	$form = new CForm(null, 'get');
+	$form = new CForm();
+	$form->setMethod('get');
+
 	$form->setName('scenarios');
-	$form->addVar('hostid', $_REQUEST['hostid']);
+	$form->addVar('hostid',$_REQUEST['hostid']);
 
 	if(isset($show_all_apps))
 		$link = new CLink(new CImg('images/general/opened.gif'),'?close=1'.url_param('groupid').url_param('hostid'));
@@ -316,7 +329,8 @@ include_once('include/page_header.php');
 	$httpmon_wdgt->addItem($form);
 
 	$httpmon_wdgt->show();
-
+?>
+<?php
 
 include_once('include/page_footer.php');
 

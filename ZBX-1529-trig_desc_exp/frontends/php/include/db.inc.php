@@ -804,20 +804,6 @@ else {
 	return $id;
 	}
 
-	function zbx_db_distinct($sql_parts){
-		if(count($sql_parts['from']) > 1) return ' DISTINCT ';
-		else return ' ';
-
-		$distinct_tables = array(
-			'hosts_groups', 'hosts_templates',
-			'functions', 'graphs_items', 'screens_items', 'slides', 
-			'httpstepitem', 'items_applications',
-			'maintenances_hosts', 'maintenances_groups',
-			'sysmaps_elements', 'sysmaps_link_triggers',
-			'rights', 'users_groups'
-		);
-	}
-
 	function remove_nodes_from_id($id){
 		return bcmod($id,'100000000000');
 	}

@@ -429,7 +429,7 @@
 	'S_GRAPH_DELETED'=>				'Usunięto wykres',
 	'S_CANNOT_DELETE_GRAPH'=>			'Nie można usunąć wykresu',
 	'S_CANNOT_ADD_GRAPH'=>				'Nie można dodać wykresu',
-	'S_ANOTHER_ITEM_SUM'=>				'Nie można dodać kolejnego elementu o typie "Suma wykresu"',
+	'S_ANOTHER_ITEM_SUM'=>				'Nie można dodać kolejnego elementu o typie \"Suma wykresu\"',
 	'S_ID'=>					'Id',
 	'S_NO_GRAPHS_DEFINED'=>				'Brak zdefiniowanych wykresów',
 	'S_NO_GRAPH_DEFINED'=>				'Brak zdefiniowanego wykresu',

@@ -83,7 +83,6 @@ $page['file']	= 'index.php';
 
 		if($login){
 			$url = is_null($request)?$USER_DETAILS['url']:$request;
-
 			redirect($url);
 			exit();
 		}

@@ -63,7 +63,7 @@
  *           and next chunks are free, those will not have MEM_FLG_USED)      *
  *                                                                            *
  *                                                                            *
- * (*) free chunks are stored in doubly-linked lists according to their sizes *
+ * (*) free chunks are stored in a doubly-linked list                         *
  *                                                                            *
  *     a typical situation is thus as follows (1 used chunk, 2 free chunks)   *
  *                                                                            *
@@ -94,12 +94,9 @@
 #define LOCK_INFO	if (info->use_lock) zbx_mutex_lock(&info->mem_lock)
 #define UNLOCK_INFO	if (info->use_lock) zbx_mutex_unlock(&info->mem_lock)
 
-static void	*ALIGN4(void *ptr);
 static void	*ALIGN8(void *ptr);
-static void	*ALIGNPTR(void *ptr);
 
 static uint32_t	mem_proper_alloc_size(uint32_t size);
-static int	mem_bucket_by_size(uint32_t size);
 
 static void	mem_set_chunk_size(void *chunk, uint32_t size);
 static void	mem_set_used_chunk_size(void *chunk, uint32_t size);
@@ -110,9 +107,6 @@ static void	*mem_get_next_chunk(void *chunk);
 static void	mem_set_next_chunk(void *chunk, void *next);
 static void	**mem_ptr_to_prev_field(void *chunk);
 static void	**mem_ptr_to_next_field(void *chunk, void **first_chunk);
-
-static void	mem_link_chunk(zbx_mem_info_t *info, void *chunk);
-static void	mem_unlink_chunk(zbx_mem_info_t *info, void *chunk);
 
 static void	*__mem_malloc(zbx_mem_info_t *info, uint32_t size);
 static void	*__mem_realloc(zbx_mem_info_t *info, void *old, uint32_t size);
@@ -128,31 +122,13 @@ static void	__mem_free(zbx_mem_info_t *info, void *ptr);
 #define	MEM_MIN_SIZE	128
 #define MEM_MAX_SIZE	(1<<30)	/* 1 GB */
 
-#define MEM_MIN_ALLOC	24	/* should be a multiple of 8 and at least (2 * ZBX_PTR_SIZE) */
-
-#define	MEM_MIN_BUCKET_SIZE	MEM_MIN_ALLOC
-#define	MEM_MAX_BUCKET_SIZE	256 /* starting from this size all free chunks are put into the same bucket */
-#define	MEM_BUCKET_COUNT	((MEM_MAX_BUCKET_SIZE - MEM_MIN_BUCKET_SIZE) / 8 + 1)
+#define MEM_MIN_ALLOC	16	/* should be a multiple of 8 and at least (2 * ZBX_PTR_SIZE) */
 
 /* helper functions */
-
-static void	*ALIGN4(void *ptr)
-{
-	return (void *)((uintptr_t)(ptr + 3) & (uintptr_t)~3);
-}
 
 static void	*ALIGN8(void *ptr)
 {
 	return (void *)((uintptr_t)(ptr + 7) & (uintptr_t)~7);
-}
-
-static void	*ALIGNPTR(void *ptr)
-{
-	if (ZBX_PTR_SIZE == 4)
-		return ALIGN4(ptr);
-	if (ZBX_PTR_SIZE == 8)
-		return ALIGN8(ptr);
-	assert(0);
 }
 
 static uint32_t	mem_proper_alloc_size(uint32_t size)
@@ -161,15 +137,6 @@ static uint32_t	mem_proper_alloc_size(uint32_t size)
 		return size + (8 - size % 8) % 8;	/* allocate in multiples of 8... */
 	else
 		return MEM_MIN_ALLOC;			/* ...and at least MEM_MIN_ALLOC */
-}
-
-static int	mem_bucket_by_size(uint32_t size)
-{
-	if (size < MEM_MIN_BUCKET_SIZE)
-		return 0;
-	if (size < MEM_MAX_BUCKET_SIZE)
-		return (size - MEM_MIN_BUCKET_SIZE) >> 3;
-	return MEM_BUCKET_COUNT - 1;
 }
 
 static void	mem_set_chunk_size(void *chunk, uint32_t size)
@@ -214,110 +181,83 @@ static void	**mem_ptr_to_next_field(void *chunk, void **first_chunk)
 	return (NULL != chunk ? (void **)(chunk + MEM_SIZE_FIELD + ZBX_PTR_SIZE) : first_chunk);
 }
 
-static void	mem_link_chunk(zbx_mem_info_t *info, void *chunk)
-{
-	int	index;
-
-	index = mem_bucket_by_size(CHUNK_SIZE(chunk));
-
-	if (NULL != info->buckets[index])
-		mem_set_prev_chunk(info->buckets[index], chunk);
-
-	mem_set_prev_chunk(chunk, NULL);
-	mem_set_next_chunk(chunk, info->buckets[index]);
-
-	info->buckets[index] = chunk;
-}
-
-static void	mem_unlink_chunk(zbx_mem_info_t *info, void *chunk)
-{
-	int	index;
-	void	*prev_chunk, *next_chunk;
-	void	**next_in_prev_chunk, **prev_in_next_chunk;
-
-	index = mem_bucket_by_size(CHUNK_SIZE(chunk));
-
-	prev_chunk = mem_get_prev_chunk(chunk);
-	next_chunk = mem_get_next_chunk(chunk);
-
-	next_in_prev_chunk = mem_ptr_to_next_field(prev_chunk, &info->buckets[index]);
-	prev_in_next_chunk = mem_ptr_to_prev_field(next_chunk);
-
-	*next_in_prev_chunk = next_chunk;
-	if (NULL != prev_in_next_chunk)
-		*prev_in_next_chunk = prev_chunk;
-}
-
 /* private memory functions */
 
 static void	*__mem_malloc(zbx_mem_info_t *info, uint32_t size)
 {
-	int		index;
-	void		*chunk;
+	void		*chunk, *prev_chunk, *next_chunk;
+	void		**next_in_prev_chunk, **prev_in_next_chunk;
 	uint32_t	chunk_size;
+	int		counter = 0;
 
 	size = mem_proper_alloc_size(size);
 
-	/* try to find an appropriate chunk in special buckets */
+	/* find a chunk big enough according to first-fit strategy */
 
-	index = mem_bucket_by_size(size);
-	
-	while (index < MEM_BUCKET_COUNT - 1 && NULL == info->buckets[index])
-		index++;
+	chunk = info->first_chunk;
 
-	chunk = info->buckets[index];
-
-	if (index == MEM_BUCKET_COUNT - 1)
+	while (NULL != chunk && CHUNK_SIZE(chunk) < size)
 	{
-		/* otherwise, find a chunk big enough according to first-fit strategy */
-
-		int		counter = 0;
-		uint32_t	skip_min = 0xffffffff, skip_max = 0;
-
-		while (NULL != chunk && CHUNK_SIZE(chunk) < size)
-		{
-			counter++;
-			skip_min = MIN(skip_min, CHUNK_SIZE(chunk));
-			skip_max = MAX(skip_max, CHUNK_SIZE(chunk));
-			chunk = mem_get_next_chunk(chunk);
-		}
-
-		if (counter >= 100)
-			zabbix_log(LOG_LEVEL_DEBUG, "__mem_malloc: chunk #%d size %u asked %u skip_min %u skip_max %u",
-					counter, CHUNK_SIZE(chunk), size, skip_min, skip_max);
+		counter++;
+		chunk = mem_get_next_chunk(chunk);
 	}
 
 	if (NULL == chunk)
 		return NULL;
 
-	chunk_size = CHUNK_SIZE(chunk);
-	mem_unlink_chunk(info, chunk);
+	zabbix_log(LOG_LEVEL_DEBUG, "__mem_malloc: chunk #%d is big enough", counter);
+
+	/* gather information about previous and next chunks, and their pointers to this chunk */
+
+	prev_chunk = mem_get_prev_chunk(chunk);
+	next_chunk = mem_get_next_chunk(chunk);
+
+	next_in_prev_chunk = mem_ptr_to_next_field(prev_chunk, &info->first_chunk);
+	prev_in_next_chunk = mem_ptr_to_prev_field(next_chunk);
 
 	/* either use the full chunk or split it */
 
+	chunk_size = CHUNK_SIZE(chunk);
+
 	if (chunk_size < size + 2 * MEM_SIZE_FIELD + MEM_MIN_ALLOC)
 	{
+		/* link previous and next chunks together */
+
+		*next_in_prev_chunk = next_chunk;
+		if (NULL != prev_in_next_chunk)
+			*prev_in_next_chunk = prev_chunk;
+
 		info->used_size += chunk_size;
 		info->free_size -= chunk_size;
-
-		mem_set_used_chunk_size(chunk, chunk_size);
 	}
 	else
 	{
 		void		*new_chunk;
 		uint32_t	new_chunk_size;
 
+		/* split the chunk */
+
 		new_chunk = chunk + MEM_SIZE_FIELD + size + MEM_SIZE_FIELD;
 		new_chunk_size = chunk_size - size - 2 * MEM_SIZE_FIELD;
 		mem_set_chunk_size(new_chunk, new_chunk_size);
-		mem_link_chunk(info, new_chunk);
 
 		info->used_size += size;
 		info->free_size -= chunk_size;
 		info->free_size += new_chunk_size;
 
-		mem_set_used_chunk_size(chunk, size);
+		chunk_size = size;
+
+		/* link previous, new, and next chunks together */
+
+		mem_set_prev_chunk(new_chunk, prev_chunk);
+		mem_set_next_chunk(new_chunk, next_chunk);
+
+		*next_in_prev_chunk = new_chunk;
+		if (NULL != prev_in_next_chunk)
+			*prev_in_next_chunk = new_chunk;
 	}
+
+	mem_set_used_chunk_size(chunk, chunk_size);
 
 	return chunk;
 }
@@ -325,7 +265,9 @@ static void	*__mem_malloc(zbx_mem_info_t *info, uint32_t size)
 static void	*__mem_realloc(zbx_mem_info_t *info, void *old, uint32_t size)
 {
 	void		*chunk, *new_chunk, *next_chunk;
-	uint32_t	chunk_size, new_chunk_size;
+	void		*prev_chunk_2, *next_chunk_2;
+	void		**next_in_prev_chunk, **prev_in_next_chunk;
+	uint32_t	chunk_size;
 	int		next_free;
 
 	size = mem_proper_alloc_size(size);
@@ -347,6 +289,8 @@ static void	*__mem_realloc(zbx_mem_info_t *info, void *old, uint32_t size)
 		{
 			/* merge with next chunk */
 
+			uint32_t	new_chunk_size;
+
 			info->used_size -= chunk_size;
 			info->used_size += size;
 			info->free_size += chunk_size + 2 * MEM_SIZE_FIELD;
@@ -354,17 +298,28 @@ static void	*__mem_realloc(zbx_mem_info_t *info, void *old, uint32_t size)
 
 			new_chunk = chunk + MEM_SIZE_FIELD + size + MEM_SIZE_FIELD;
 			new_chunk_size = CHUNK_SIZE(next_chunk) + (chunk_size - size);
-
-			mem_unlink_chunk(info, next_chunk);
-
 			mem_set_chunk_size(new_chunk, new_chunk_size);
-			mem_link_chunk(info, new_chunk);
 
-			mem_set_used_chunk_size(chunk, size);
+			mem_set_prev_chunk(new_chunk, mem_get_prev_chunk(next_chunk));
+			mem_set_next_chunk(new_chunk, mem_get_next_chunk(next_chunk));
+		
+			/* link previous, new, and next chunks together */
+
+			prev_chunk_2 = mem_get_prev_chunk(new_chunk);
+			next_chunk_2 = mem_get_next_chunk(new_chunk);
+
+			next_in_prev_chunk = mem_ptr_to_next_field(prev_chunk_2, &info->first_chunk);
+			prev_in_next_chunk = mem_ptr_to_prev_field(next_chunk_2);
+
+			*next_in_prev_chunk = new_chunk;
+			if (NULL != prev_in_next_chunk)
+				*prev_in_next_chunk = new_chunk;
 		}
 		else
 		{
 			/* split the current one */
+
+			uint32_t	new_chunk_size;
 
 			info->used_size -= chunk_size;
 			info->used_size += size;
@@ -373,12 +328,24 @@ static void	*__mem_realloc(zbx_mem_info_t *info, void *old, uint32_t size)
 
 			new_chunk = chunk + MEM_SIZE_FIELD + size + MEM_SIZE_FIELD;
 			new_chunk_size = chunk_size - size - 2 * MEM_SIZE_FIELD;
-
 			mem_set_chunk_size(new_chunk, new_chunk_size);
-			mem_link_chunk(info, new_chunk);
-
-			mem_set_used_chunk_size(chunk, size);
+			
+			if (NULL == info->first_chunk)
+			{
+				info->first_chunk = new_chunk;
+				mem_set_prev_chunk(new_chunk, NULL);
+				mem_set_next_chunk(new_chunk, NULL);
+			}
+			else
+			{
+				mem_set_prev_chunk(info->first_chunk, new_chunk);
+				mem_set_next_chunk(new_chunk, info->first_chunk);
+				mem_set_prev_chunk(new_chunk, NULL);
+				info->first_chunk = new_chunk;
+			}
 		}
+
+		mem_set_used_chunk_size(chunk, size);
 
 		return chunk;
 	}
@@ -390,30 +357,52 @@ static void	*__mem_realloc(zbx_mem_info_t *info, void *old, uint32_t size)
 
 		chunk_size += 2 * MEM_SIZE_FIELD + CHUNK_SIZE(next_chunk);
 
-		mem_unlink_chunk(info, next_chunk);
+		prev_chunk_2 = mem_get_prev_chunk(next_chunk);
+		next_chunk_2 = mem_get_next_chunk(next_chunk);
+
+		next_in_prev_chunk = mem_ptr_to_next_field(prev_chunk_2, &info->first_chunk);
+		prev_in_next_chunk = mem_ptr_to_prev_field(next_chunk_2);
 
 		/* either use the full next_chunk or split it */
 
 		if (chunk_size < size + 2 * MEM_SIZE_FIELD + MEM_MIN_ALLOC)
 		{
+			/* link previous and next chunks together */
+
+			*next_in_prev_chunk = next_chunk_2;
+			if (NULL != prev_in_next_chunk)
+				*prev_in_next_chunk = prev_chunk_2;
+
 			info->used_size += chunk_size;
 			info->free_size -= chunk_size;
-
-			mem_set_used_chunk_size(chunk, chunk_size);
 		}
 		else
 		{
+			uint32_t	new_chunk_size;
+
+			/* split the chunk */
+
 			new_chunk = chunk + MEM_SIZE_FIELD + size + MEM_SIZE_FIELD;
 			new_chunk_size = chunk_size - size - 2 * MEM_SIZE_FIELD;
 			mem_set_chunk_size(new_chunk, new_chunk_size);
-			mem_link_chunk(info, new_chunk);
 
 			info->used_size += size;
 			info->free_size -= chunk_size;
 			info->free_size += new_chunk_size;
 
-			mem_set_used_chunk_size(chunk, size);
+			chunk_size = size;
+
+			/* link previous, new, and next chunks together */
+
+			mem_set_prev_chunk(new_chunk, prev_chunk_2);
+			mem_set_next_chunk(new_chunk, next_chunk_2);
+
+			*next_in_prev_chunk = new_chunk;
+			if (NULL != prev_in_next_chunk)
+				*prev_in_next_chunk = new_chunk;
 		}
+
+		mem_set_used_chunk_size(chunk, chunk_size);
 
 		return chunk;
 	}
@@ -450,6 +439,8 @@ static void	__mem_free(zbx_mem_info_t *info, void *ptr)
 {
 	void		*chunk;
 	void		*prev_chunk, *next_chunk;
+	void		*prev_chunk_2, *next_chunk_2;
+	void		**next_in_prev_chunk, **prev_in_next_chunk;
 	uint32_t	chunk_size;
 	int		prev_free, next_free;
 
@@ -473,13 +464,44 @@ static void	__mem_free(zbx_mem_info_t *info, void *ptr)
 		prev_chunk = chunk - MEM_SIZE_FIELD - CHUNK_SIZE(chunk - MEM_SIZE_FIELD) - MEM_SIZE_FIELD;
 
 		chunk_size += 4 * MEM_SIZE_FIELD + CHUNK_SIZE(prev_chunk) + CHUNK_SIZE(next_chunk);
-		
-		mem_unlink_chunk(info, prev_chunk);
-		mem_unlink_chunk(info, next_chunk);
+		mem_set_chunk_size(prev_chunk, chunk_size);
+
+		/* link previous and next chunks of prev_chunk and next_chunk */
+		/* put this new chunk at the beginning of the free chunk list */
+
+		/* prev_chunk */
+
+		prev_chunk_2 = mem_get_prev_chunk(prev_chunk);
+		next_chunk_2 = mem_get_next_chunk(prev_chunk);
+
+		next_in_prev_chunk = mem_ptr_to_next_field(prev_chunk_2, &info->first_chunk);
+		prev_in_next_chunk = mem_ptr_to_prev_field(next_chunk_2);
+
+		*next_in_prev_chunk = next_chunk_2;
+		if (NULL != prev_in_next_chunk)
+			*prev_in_next_chunk = prev_chunk_2;
+
+		/* next_chunk */
+
+		prev_chunk_2 = mem_get_prev_chunk(next_chunk);
+		next_chunk_2 = mem_get_next_chunk(next_chunk);
+
+		next_in_prev_chunk = mem_ptr_to_next_field(prev_chunk_2, &info->first_chunk);
+		prev_in_next_chunk = mem_ptr_to_prev_field(next_chunk_2);
+
+		*next_in_prev_chunk = next_chunk_2;
+		if (NULL != prev_in_next_chunk)
+			*prev_in_next_chunk = prev_chunk_2;
+
+		/* new chunk */
 
 		chunk = prev_chunk;
-		mem_set_chunk_size(chunk, chunk_size);
-		mem_link_chunk(info, chunk);
+
+		if (NULL != info->first_chunk)
+			mem_set_prev_chunk(info->first_chunk, chunk);
+		mem_set_prev_chunk(chunk, NULL);
+		mem_set_next_chunk(chunk, info->first_chunk);
+		info->first_chunk = chunk;
 	}
 	else if (prev_free)
 	{
@@ -488,38 +510,56 @@ static void	__mem_free(zbx_mem_info_t *info, void *ptr)
 		prev_chunk = chunk - MEM_SIZE_FIELD - CHUNK_SIZE(chunk - MEM_SIZE_FIELD) - MEM_SIZE_FIELD;
 
 		chunk_size += 2 * MEM_SIZE_FIELD + CHUNK_SIZE(prev_chunk);
-
-		mem_unlink_chunk(info, prev_chunk);
-
-		chunk = prev_chunk;
-		mem_set_chunk_size(chunk, chunk_size);
-		mem_link_chunk(info, chunk);
+		mem_set_chunk_size(prev_chunk, chunk_size);
 	}
 	else if (next_free)
 	{
 		info->free_size += 2 * MEM_SIZE_FIELD;
 
 		chunk_size += 2 * MEM_SIZE_FIELD + CHUNK_SIZE(next_chunk);
-
-		mem_unlink_chunk(info, next_chunk);
-
 		mem_set_chunk_size(chunk, chunk_size);
-		mem_link_chunk(info, chunk);
+		
+		mem_set_prev_chunk(chunk, mem_get_prev_chunk(next_chunk));
+		mem_set_next_chunk(chunk, mem_get_next_chunk(next_chunk));
+		
+		/* gather information about previous and next chunks, and link */
+
+		prev_chunk = mem_get_prev_chunk(chunk);
+		next_chunk = mem_get_next_chunk(chunk);
+
+		next_in_prev_chunk = mem_ptr_to_next_field(prev_chunk, &info->first_chunk);
+		prev_in_next_chunk = mem_ptr_to_prev_field(next_chunk);
+
+		*next_in_prev_chunk = chunk;
+		if (NULL != prev_in_next_chunk)
+			*prev_in_next_chunk = chunk;
 	}
 	else
 	{
 		mem_set_chunk_size(chunk, chunk_size);
-		mem_link_chunk(info, chunk);
+
+		if (NULL == info->first_chunk)
+		{
+			info->first_chunk = chunk;
+			mem_set_prev_chunk(chunk, NULL);
+			mem_set_next_chunk(chunk, NULL);
+		}
+		else
+		{
+			mem_set_prev_chunk(info->first_chunk, chunk);
+			mem_set_next_chunk(chunk, info->first_chunk);
+			mem_set_prev_chunk(chunk, NULL);
+			info->first_chunk = chunk;
+		}
 	}
 }
 
 /* public memory interface */
 
-void	zbx_mem_create(zbx_mem_info_t **info, key_t shm_key, int lock_name, size_t size, const char *descr)
+void	zbx_mem_create(zbx_mem_info_t *info, key_t shm_key, int lock_name, size_t size, const char *descr)
 {
 	const char	*__function_name = "zbx_mem_create";
 
-	int		shm_id, index;
 	void		*base, *chunk_lsize, *chunk_rsize;
 
 	descr = (NULL == descr ? "(null)" : descr);
@@ -527,14 +567,7 @@ void	zbx_mem_create(zbx_mem_info_t **info, key_t shm_key, int lock_name, size_t 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): descr[%s] size[%lu]",
 		       __function_name, descr, size);
 
-	/* allocate shared memory */
-
-	if (ZBX_PTR_SIZE != 4 && ZBX_PTR_SIZE != 8)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "Failed assumption about pointer size (%lu not in {4, 8}).",
-				ZBX_PTR_SIZE);
-		exit(FAIL);
-	}
+	/* allocate shared memory and mutex */
 
 	if (!(MEM_MIN_SIZE <= size && size <= MEM_MAX_SIZE))
 	{
@@ -543,45 +576,25 @@ void	zbx_mem_create(zbx_mem_info_t **info, key_t shm_key, int lock_name, size_t 
 		exit(FAIL);
 	}
 
-	if (-1 == (shm_id = zbx_shmget(shm_key, size)))
+	if (-1 == (info->shm_id = zbx_shmget(shm_key, size)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "Could not allocate shared memory for %s.",
 				descr);
 		exit(FAIL);
 	}
 
-	if ((void *)(-1) == (base = shmat(shm_id, NULL, 0)))
+	if ((void *)(-1) == (base = shmat(info->shm_id, NULL, 0)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "Could not attach shared memory for %s (error: [%s]).",
 				descr, strerror(errno));
 		exit(FAIL);
 	}
 
-	/* allocate zbx_mem_info_t structure, its buckets, and description inside shared memory */
-
-	*info = ALIGN8(base);
-	(*info)->shm_id = shm_id;
-	(*info)->orig_size = (uint32_t)size;
-	size -= (void *)(*info + 1) - base;
-	base = (void *)(*info + 1);
-
-	(*info)->buckets = ALIGNPTR(base);
-	memset((*info)->buckets, 0, MEM_BUCKET_COUNT * ZBX_PTR_SIZE);
-	size -= (void *)((*info)->buckets + MEM_BUCKET_COUNT) - base;
-	base = (void *)((*info)->buckets + MEM_BUCKET_COUNT);
-
-	strcpy(base, descr);
-	(*info)->mem_descr = base;
-	size -= strlen(descr) + 1;
-	base += strlen(descr) + 1;
-	
-	/* allocate mutex */
-
 	if (ZBX_NO_MUTEX != lock_name)
 	{
-		(*info)->use_lock = 1;
+		info->use_lock = 1;
 
-		if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&((*info)->mem_lock), lock_name))
+		if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&info->mem_lock, lock_name))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "Could not create mutex for %s.",
 					descr);
@@ -589,37 +602,41 @@ void	zbx_mem_create(zbx_mem_info_t **info, key_t shm_key, int lock_name, size_t 
 		}
 	}
 	else
-		(*info)->use_lock = 0;
+		info->use_lock = 0;
 
 	/* prepare shared memory for further allocation by creating one big chunk */
+
+	info->orig_size = (uint32_t)size;
+
+	chunk_rsize = ALIGN8(base + size - 8);
+	if (chunk_rsize + MEM_SIZE_FIELD > base + size)
+		chunk_rsize -= 8;
 
 	chunk_lsize = ALIGN8(base);
 	if (chunk_lsize - MEM_SIZE_FIELD < base)
 		chunk_lsize += 8;
 	chunk_lsize -= MEM_SIZE_FIELD;
 
-	chunk_rsize = ALIGN8(base + size - 8);
-	if (chunk_rsize + MEM_SIZE_FIELD > base + size)
-		chunk_rsize -= 8;
+	info->lo_bound = chunk_lsize;
+	info->hi_bound = chunk_rsize + MEM_SIZE_FIELD;
 
-	(*info)->lo_bound = chunk_lsize;
-	(*info)->hi_bound = chunk_rsize + MEM_SIZE_FIELD;
+	info->first_chunk = info->lo_bound;
 
-	(*info)->total_size = (uint32_t)(chunk_rsize - chunk_lsize - MEM_SIZE_FIELD);
+	info->total_size = (uint32_t)(chunk_rsize - chunk_lsize - MEM_SIZE_FIELD);
+	mem_set_chunk_size(info->first_chunk, info->total_size);
 
-	index = mem_bucket_by_size((*info)->total_size);
-	(*info)->buckets[index] = (*info)->lo_bound;
-	mem_set_chunk_size((*info)->buckets[index], (*info)->total_size);
-	mem_set_prev_chunk((*info)->buckets[index], NULL);
-	mem_set_next_chunk((*info)->buckets[index], NULL);
+	mem_set_prev_chunk(info->first_chunk, NULL);
+	mem_set_next_chunk(info->first_chunk, NULL);
 
-	(*info)->used_size = 0;
-	(*info)->free_size = (*info)->total_size;
+	info->used_size = 0;
+	info->free_size = info->total_size;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "valid user addresses: [%p, %p) total size: [%lu]",
-			(*info)->lo_bound + MEM_SIZE_FIELD,
-			(*info)->hi_bound - MEM_SIZE_FIELD,
-			(*info)->total_size);
+	info->mem_descr = strdup(descr);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "valid addresses: [%p, %p) total size: [%lu]",
+			info->lo_bound + MEM_SIZE_FIELD,
+			info->hi_bound - MEM_SIZE_FIELD,
+			info->total_size);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -630,14 +647,17 @@ void	zbx_mem_destroy(zbx_mem_info_t *info)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (info->use_lock)
-		zbx_mutex_destroy(&info->mem_lock);
-
 	if (-1 == shmctl(info->shm_id, IPC_RMID, 0))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Could not remove shared memory for %s (error: [%s]).",
 				info->mem_descr, strerror(errno));
 	}
+
+	info->first_chunk = NULL;
+	zbx_free(info->mem_descr);
+
+	if (info->use_lock)
+		zbx_mutex_destroy(&info->mem_lock);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -744,67 +764,18 @@ void	zbx_mem_clear(zbx_mem_info_t *info)
 {
 	const char	*__function_name = "zbx_mem_clear";
 
-	int		index;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	LOCK_INFO;
 
-	memset(info->buckets, 0, MEM_BUCKET_COUNT * ZBX_PTR_SIZE);
-	index = mem_bucket_by_size(info->total_size);
-	info->buckets[index] = info->lo_bound;
-	mem_set_chunk_size(info->buckets[index], info->total_size);
-	mem_set_prev_chunk(info->buckets[index], NULL);
-	mem_set_next_chunk(info->buckets[index], NULL);
+	info->first_chunk = info->lo_bound;
+	mem_set_chunk_size(info->first_chunk, info->total_size);
+	mem_set_prev_chunk(info->first_chunk, NULL);
+	mem_set_next_chunk(info->first_chunk, NULL);
 	info->used_size = 0;
 	info->free_size = info->total_size;
 
 	UNLOCK_INFO;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
-
-void	zbx_mem_dump_stats(zbx_mem_info_t *info)
-{
-	void		*chunk;
-	int		index, counter, total, total_free = 0;
-	uint32_t	min_size = 0xffffffff, max_size = 0;
-
-	LOCK_INFO;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "=== memory statistics for %s ===", info->mem_descr);
-
-	for (index = 0; index < MEM_BUCKET_COUNT; index++)
-	{
-		counter = 0;
-		chunk = info->buckets[index];
-
-		while (NULL != chunk)
-		{
-			counter++;
-			min_size = MIN(min_size, CHUNK_SIZE(chunk));
-			max_size = MAX(max_size, CHUNK_SIZE(chunk));
-			chunk = mem_get_next_chunk(chunk);
-		}
-
-		if (counter > 0)
-		{
-			total_free += counter;
-			zabbix_log(LOG_LEVEL_DEBUG, "free chunks of size %2s %3d bytes: %8d",
-					index == MEM_BUCKET_COUNT - 1 ? ">=" : "",
-					MEM_MIN_BUCKET_SIZE + 8 * index, counter);
-		}
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "min chunk size: %10u bytes", min_size);
-	zabbix_log(LOG_LEVEL_DEBUG, "max chunk size: %10u bytes", max_size);
-
-	total = (info->total_size - info->used_size - info->free_size) / (2 * MEM_SIZE_FIELD) + 1;
-	zabbix_log(LOG_LEVEL_DEBUG, "memory of total size %u bytes fragmented into %d chunks", info->total_size, total);
-	zabbix_log(LOG_LEVEL_DEBUG, "of those, %10u bytes are in %8d free chunks", info->free_size, total_free);
-	zabbix_log(LOG_LEVEL_DEBUG, "of those, %10u bytes are in %8d used chunks", info->used_size, total - total_free);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "================================");
-
-	UNLOCK_INFO;
 }

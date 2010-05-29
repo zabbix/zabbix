@@ -19,7 +19,13 @@
 **/
 ?>
 <?php
-// HOST GROUP functions
+require_once('include/graphs.inc.php');
+require_once('include/triggers.inc.php');
+require_once('include/items.inc.php');
+require_once('include/httptest.inc.php');
+
+/* HOST GROUP functions */
+
 	function update_host_groups_by_groupid($groupid,$hosts=array()){
 		$options = array(
 				'groupids'=>$groupid,
@@ -637,18 +643,9 @@
 		foreach ($hostids as $id) {	/* The section should be improved */
 			$host_old = get_host_by_hostid($id);
 			$result = DBexecute('DELETE FROM hosts WHERE hostid='.$id);
-			if ($result) {
-				info(sprintf(S_HOST_HAS_BEEN_DELETED_MSG, $host_old['host']));
-				/*SDI(
-					'AUDIT_ACTION_DELETE '.AUDIT_ACTION_DELETE.' / '.
-					'AUDIT_RESOURCE_HOST '.AUDIT_RESOURCE_HOST.' / '.
-					'$id '.$id.' / '.
-					'$host_old[\'host\'] '.$host_old['host'].' / '.
-					'hosts / '.
-					'NULL / NULL'
-					);*/
+			if ($result)
 				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $id, $host_old['host'], 'hosts', NULL, NULL);
-			}else
+			else
 				break;
 		}
 

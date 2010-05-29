@@ -22,14 +22,45 @@
 
 #include "zbxalgo.h"
 
-static void	__hashset_free_entry(zbx_hashset_t *hs, ZBX_HASHSET_ENTRY_T *entry);
+static int	is_prime(int n);
+static int	next_prime(int n);
+
+static void	__zbx_hashset_free_entry(zbx_hashset_t *hs, ZBX_HASHSET_ENTRY_T *entry);
 
 #define	CRIT_LOAD_FACTOR	4/5
 #define	SLOT_GROWTH_FACTOR	3/2
 
+/* helper functions */
+
+static int	is_prime(int n)
+{
+	int i;
+
+	if (n <= 1)
+		return 0;
+	if (n == 2)
+		return 1;
+	if (n % 2 == 0)
+		return 0;
+
+	for (i = 3; i * i <= n; i+=2)
+		if (n % i == 0)
+			return 0;
+
+	return 1;
+}
+
+static int	next_prime(int n)
+{
+	while (!is_prime(n))
+		n++;
+
+	return n;
+}
+
 /* private hashset functions */
 
-static void	__hashset_free_entry(zbx_hashset_t *hs, ZBX_HASHSET_ENTRY_T *entry)
+static void	__zbx_hashset_free_entry(zbx_hashset_t *hs, ZBX_HASHSET_ENTRY_T *entry)
 {
 	hs->mem_free_func(entry->data);
 	hs->mem_free_func(entry);
@@ -89,7 +120,7 @@ void	zbx_hashset_destroy(zbx_hashset_t *hs)
 		while (NULL != entry)
 		{
 			next_entry = entry->next;
-			__hashset_free_entry(hs, entry);
+			__zbx_hashset_free_entry(hs, entry);
 			entry = next_entry;
 		}
 	}
@@ -231,7 +262,7 @@ void	zbx_hashset_remove(zbx_hashset_t *hs, const void *data)
 		if (entry->hash == hash && hs->compare_func(entry->data, data) == 0)
 		{
 			hs->slots[slot] = entry->next;
-			__hashset_free_entry(hs, entry);
+			__zbx_hashset_free_entry(hs, entry);
 			hs->num_data--;
 		}
 		else
@@ -246,7 +277,7 @@ void	zbx_hashset_remove(zbx_hashset_t *hs, const void *data)
 				if (entry->hash == hash && hs->compare_func(entry->data, data) == 0)
 				{
 					prev_entry->next = entry->next;
-					__hashset_free_entry(hs, entry);
+					__zbx_hashset_free_entry(hs, entry);
 					hs->num_data--;
 					break;
 				}
@@ -275,81 +306,11 @@ void	zbx_hashset_clear(zbx_hashset_t *hs)
 		{
 			entry = hs->slots[slot];
 			hs->slots[slot] = entry->next;
-			__hashset_free_entry(hs, entry);
+			__zbx_hashset_free_entry(hs, entry);
 		}
 	}
 
 	hs->num_data = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
-
-#define	ITER_START	(-1)
-#define	ITER_FINISH	(-2)
-
-void	zbx_hashset_iter_reset(zbx_hashset_t *hs, zbx_hashset_iter_t *iter)
-{
-	iter->hashset = hs;
-	iter->slot = ITER_START;
-}
-
-void	*zbx_hashset_iter_next(zbx_hashset_iter_t *iter)
-{
-	if (ITER_FINISH == iter->slot)
-		return NULL;
-
-	if (ITER_START != iter->slot && NULL != iter->entry && NULL != iter->entry->next)
-	{
-		iter->entry = iter->entry->next;
-		return iter->entry->data;
-	}
-
-	while (1)
-	{
-		iter->slot++;
-
-		if (iter->slot == iter->hashset->num_slots)
-		{
-			iter->slot = ITER_FINISH;
-			return NULL;
-		}
-
-		if (NULL != iter->hashset->slots[iter->slot])
-		{
-			iter->entry = iter->hashset->slots[iter->slot];
-			return iter->entry->data;
-		}
-	}
-}
-
-void	zbx_hashset_iter_remove(zbx_hashset_iter_t *iter)
-{
-	if (ITER_START == iter->slot || ITER_FINISH == iter->slot || NULL == iter->entry)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "Removing a hashset entry through a bad iterator.");
-		exit(FAIL);
-	}
-
-	if (iter->hashset->slots[iter->slot] == iter->entry)
-	{
-		iter->hashset->slots[iter->slot] = iter->entry->next;
-		__hashset_free_entry(iter->hashset, iter->entry);
-		iter->hashset->num_data--;
-
-		iter->slot--;
-		iter->entry = NULL;
-	}
-	else
-	{
-		ZBX_HASHSET_ENTRY_T	*prev_entry = iter->hashset->slots[iter->slot];
-
-		while (prev_entry->next != iter->entry)
-			prev_entry = prev_entry->next;
-
-		prev_entry->next = iter->entry->next;		
-		__hashset_free_entry(iter->hashset, iter->entry);
-		iter->hashset->num_data--;
-
-		iter->entry = prev_entry;
-	}
 }

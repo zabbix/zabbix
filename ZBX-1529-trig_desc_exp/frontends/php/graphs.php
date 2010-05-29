@@ -94,27 +94,19 @@ include_once('include/page_header.php');
 	$_REQUEST['go'] = get_request('go', 'none');
 
 // PERMISSIONS
-	if(get_request('graphid', false)){
+	if(get_request('graphid',0) > 0){
 		$options = array(
 			'nodeids' => get_current_nodeid(true),
 			'graphids' => $_REQUEST['graphid'],
 			'editable' => 1
 		);
 		$graphs = CGraph::get($options);
+
 		if(empty($graphs)) access_deny();
-	}
-	else if(get_request('hostid', 0) > 0){
-		$options = array(
-			'hostids' => $_REQUEST['hostid'],
-			'extendoutput' => 1,
-			'templated_hosts' => 1,
-			'editable' => 1
-		);
-		$hosts = CHost::get($options);
-		if(empty($hosts)) access_deny();
 	}
 ?>
 <?php
+
 	$_REQUEST['items'] = get_request('items', array());
 	$_REQUEST['group_gid'] = get_request('group_gid', array());
 	$_REQUEST['graph3d'] = get_request('graph3d', 0);
@@ -376,19 +368,59 @@ include_once('include/page_header.php');
 // ----</ACTIONS>----
 ?>
 <?php
-	$options = array(
-		'groups' => array('not_proxy_hosts' => 1, 'editable' => 1),
-		'hosts' => array('editable' => 1, 'templated_hosts' => 1),
-		'groupid' => get_request('groupid', null),
-		'hostid' => get_request('hostid', null),
-	);
+	if(isset($_REQUEST['hostid']) && !isset($_REQUEST['groupid']) && !isset($_REQUEST['graphid'])){
+		$sql = 'SELECT DISTINCT hg.groupid '.
+				' FROM hosts_groups hg '.
+				' WHERE hg.hostid='.$_REQUEST['hostid'];
+		if($group=DBfetch(DBselect($sql, 1))){
+			$_REQUEST['groupid'] = $group['groupid'];
+		}
+	}
 
-	$pageFilter = new CPageFilter($options);
-	$_REQUEST['groupid'] = $pageFilter->groupid;
-	$_REQUEST['hostid'] = $pageFilter->hostid;
+	if(isset($_REQUEST['graphid']) && ($_REQUEST['graphid']>0)){
+		$sql_from = '';
+		$sql_where = '';
+		if(isset($_REQUEST['groupid']) && ($_REQUEST['groupid'] > 0)){
+			$sql_where.= ' AND hg.groupid='.$_REQUEST['groupid'];
+		}
+
+		if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid'] > 0)){
+			$sql_where.= ' AND hg.hostid='.$_REQUEST['hostid'];
+		}
+		$sql = 'SELECT DISTINCT hg.groupid, hg.hostid '.
+				' FROM hosts_groups hg '.
+				' WHERE EXISTS( SELECT DISTINCT i.itemid '.
+									' FROM items i, graphs_items gi '.
+									' WHERE i.hostid=hg.hostid '.
+										' AND i.itemid=gi.itemid '.
+										' AND gi.graphid='.$_REQUEST['graphid'].')'.
+						$sql_where;
+		if($host_group = DBfetch(DBselect($sql,1))){
+			if(!isset($_REQUEST['groupid']) || !isset($_REQUEST['hostid'])){
+				$_REQUEST['groupid'] = $host_group['groupid'];
+				$_REQUEST['hostid'] = $host_group['hostid'];
+			}
+			else if(($_REQUEST['groupid']!=$host_group['groupid']) || ($_REQUEST['hostid']!=$host_group['hostid'])){
+				$_REQUEST['graphid'] = 0;
+			}
+		}
+		else{
+//			$_REQUEST['graphid'] = 0;
+		}
+	}
+
+	$params = array();
+	$options = array('only_current_node', 'not_proxy_hosts');
+	foreach($options as $option) $params[$option] = 1;
+
+	$PAGE_GROUPS = get_viewed_groups(PERM_READ_WRITE, $params);
+	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_WRITE, $PAGE_GROUPS['selected'], $params);
+
+	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
 ?>
 <?php
-	$form = new CForm(null, 'get');
+	$form = new CForm();
+	$form->setMethod('get');
 
 // Config
 	$cmbConf = new CComboBox('config','graphs.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
@@ -436,10 +468,21 @@ include_once('include/page_header.php');
 			unset($_REQUEST['graphid']);
 		}
 
-		$r_form = new CForm(null, 'get');
+		$r_form = new CForm();
+		$r_form->setMethod('get');
 
-		$r_form->addItem(array(S_GROUP.SPACE,$pageFilter->getGroupsCB()));
-		$r_form->addItem(array(SPACE.S_HOST.SPACE,$pageFilter->getHostsCB()));
+		$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
+		$cmbHosts = new CComboBox('hostid',$PAGE_HOSTS['selected'],'javascript: submit();');
+
+		foreach($PAGE_GROUPS['groups'] as $groupid => $name){
+			$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid, null, ': ').$name);
+		}
+		foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
+			$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid, null, ': ').$name);
+		}
+
+		$r_form->addItem(array(S_GROUP.SPACE,$cmbGroups));
+		$r_form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
 
 		$numrows = new CDiv();
 		$numrows->setAttribute('name','numrows');
@@ -448,8 +491,8 @@ include_once('include/page_header.php');
 		$graphs_wdgt->addHeader($numrows);
 
 // Header Host
-		if($_REQUEST['hostid'] > 0){
-			$tbl_header_host = get_header_host_table($_REQUEST['hostid'], array('items', 'triggers', 'applications'));
+		if($PAGE_HOSTS['selected'] > 0){
+			$tbl_header_host = get_header_host_table($PAGE_HOSTS['selected'], array('items', 'triggers', 'applications'));
 			$graphs_wdgt->addItem($tbl_header_host);
 		}
 
@@ -477,15 +520,18 @@ include_once('include/page_header.php');
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
 		);
-		if($pageFilter->hostsSelected){
-			if($pageFilter->hostid > 0)
-				$options['hostids'] = $pageFilter->hostid;
-			else if($pageFilter->groupid > 0)
-				$options['groupids'] = $pageFilter->groupid;
+
+// Filtering
+		if(($PAGE_HOSTS['selected'] > 0) || empty($PAGE_HOSTS['hostids'])){
+			$options['hostids'] = $PAGE_HOSTS['selected'];
 		}
-		else{
-			$options['hostids'] = array();
+		else if(($PAGE_GROUPS['selected'] > 0) && !empty($PAGE_HOSTS['hostids'])){
+			$options['hostids'] = $PAGE_HOSTS['hostids'];
 		}
+		else if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
+			$options['groupids'] = $PAGE_GROUPS['selected'];
+		}
+
 		$graphs = CGraph::get($options);
 
 		order_result($graphs, $sortfield, $sortorder);

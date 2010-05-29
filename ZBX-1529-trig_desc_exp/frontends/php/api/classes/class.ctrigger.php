@@ -159,11 +159,11 @@ class CTrigger extends CZBXAPI{
 		else{
 			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
 
-			$sql_parts['from']['functions'] = 'functions f';
-			$sql_parts['from']['items'] = 'items i';
-			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sql_parts['from']['rights'] = 'rights r';
-			$sql_parts['from']['users_groups'] = 'users_groups ug';
+			$sql_parts['from']['f'] = 'functions f';
+			$sql_parts['from']['i'] = 'items i';
+			$sql_parts['from']['hg'] = 'hosts_groups hg';
+			$sql_parts['from']['r'] = 'rights r';
+			$sql_parts['from']['ug'] = 'users_groups ug';
 			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
 			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
 			$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
@@ -197,9 +197,9 @@ class CTrigger extends CZBXAPI{
 				$sql_parts['select']['groupid'] = 'hg.groupid';
 			}
 
-			$sql_parts['from']['functions'] = 'functions f';
-			$sql_parts['from']['items'] = 'items i';
-			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sql_parts['from']['f'] = 'functions f';
+			$sql_parts['from']['i'] = 'items i';
+			$sql_parts['from']['hg'] = 'hosts_groups hg';
 			$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
 			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
 			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
@@ -218,8 +218,8 @@ class CTrigger extends CZBXAPI{
 				$sql_parts['select']['hostid'] = 'i.hostid';
 			}
 
-			$sql_parts['from']['functions'] = 'functions f';
-			$sql_parts['from']['items'] = 'items i';
+			$sql_parts['from']['f'] = 'functions f';
+			$sql_parts['from']['i'] = 'items i';
 			$sql_parts['where']['hostid'] = DBcondition('i.hostid', $options['hostids']);
 			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
 			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
@@ -244,7 +244,7 @@ class CTrigger extends CZBXAPI{
 				$sql_parts['select']['itemid'] = 'f.itemid';
 			}
 
-			$sql_parts['from']['functions'] = 'functions f';
+			$sql_parts['from']['f'] = 'functions f';
 			$sql_parts['where']['itemid'] = DBcondition('f.itemid', $options['itemids']);
 			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
 		}
@@ -257,9 +257,9 @@ class CTrigger extends CZBXAPI{
 				$sql_parts['select']['applicationid'] = 'a.applicationid';
 			}
 
-			$sql_parts['from']['functions'] = 'functions f';
-			$sql_parts['from']['items'] = 'items i';
-			$sql_parts['from']['applications'] = 'applications a';
+			$sql_parts['from']['f'] = 'functions f';
+			$sql_parts['from']['i'] = 'items i';
+			$sql_parts['from']['a'] = 'applications a';
 			$sql_parts['where']['a'] = DBcondition('a.applicationid', $options['applicationids']);
 			$sql_parts['where']['ia'] = 'i.hostid=a.hostid';
 			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
@@ -319,12 +319,6 @@ class CTrigger extends CZBXAPI{
 			if(is_null($options['filter'])) $options['filter'] = array();
 			$options['filter']['value'] = TRIGGER_VALUE_TRUE;
 		}
-		
-// status
-		if(!is_null($options['status'])){
-			if(is_null($options['filter'])) $options['filter'] = array();
-			$options['filter']['status'] = $options['status'];
-		}
 
 // lastChangeSince
 		if(!is_null($options['lastChangeSince'])){
@@ -348,9 +342,9 @@ class CTrigger extends CZBXAPI{
 		}
 // templated
 		if(!is_null($options['templated'])){
-			$sql_parts['from']['functions'] = 'functions f';
-			$sql_parts['from']['items'] = 'items i';
-			$sql_parts['from']['hosts'] = 'hosts h';
+			$sql_parts['from']['f'] = 'functions f';
+			$sql_parts['from']['i'] = 'items i';
+			$sql_parts['from']['h'] = 'hosts h';
 			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
 			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
 			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
@@ -382,9 +376,9 @@ class CTrigger extends CZBXAPI{
 		if(!is_null($options['expand_data'])){
 			$sql_parts['select']['host'] = 'h.host';
 			$sql_parts['select']['hostid'] = 'h.hostid';
-			$sql_parts['from']['functions'] = 'functions f';
-			$sql_parts['from']['items'] = 'items i';
-			$sql_parts['from']['hosts'] = 'hosts h';
+			$sql_parts['from']['f'] = 'functions f';
+			$sql_parts['from']['i'] = 'items i';
+			$sql_parts['from']['h'] = 'hosts h';
 			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
 			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
 			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
@@ -407,13 +401,13 @@ class CTrigger extends CZBXAPI{
 			}
 			
 			if(isset($options['filter']['host']) || isset($options['filter']['hostid'])){
-				$sql_parts['from']['functions'] = 'functions f';
-				$sql_parts['from']['items'] = 'items i';
+				$sql_parts['from']['f'] = 'functions f';
+				$sql_parts['from']['i'] = 'items i';
 				$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
 				$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
 
 				if(isset($options['filter']['host']) && !is_null($options['filter']['host'])){
-					$sql_parts['from']['hosts'] = 'hosts h';
+					$sql_parts['from']['h'] = 'hosts h';
 					$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
 					$sql_parts['where']['host'] = 'h.host='.zbx_dbstr($options['filter']['host']);
 				}
@@ -448,10 +442,10 @@ class CTrigger extends CZBXAPI{
 				$sql_parts['select']['name'] = 'g.name';
 			}
 
-			$sql_parts['from']['functions'] = 'functions f';
-			$sql_parts['from']['items'] = 'items i';
-			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sql_parts['from']['groups'] = 'groups g';
+			$sql_parts['from']['f'] = 'functions f';
+			$sql_parts['from']['i'] = 'items i';
+			$sql_parts['from']['hg'] = 'hosts_groups hg';
+			$sql_parts['from']['g'] = 'groups g';
 			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
 			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
 			$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
@@ -465,9 +459,9 @@ class CTrigger extends CZBXAPI{
 				$sql_parts['select']['host'] = 'h.host';
 			}
 
-			$sql_parts['from']['functions'] = 'functions f';
-			$sql_parts['from']['items'] = 'items i';
-			$sql_parts['from']['hosts'] = 'hosts h';
+			$sql_parts['from']['f'] = 'functions f';
+			$sql_parts['from']['i'] = 'items i';
+			$sql_parts['from']['h'] = 'hosts h';
 			$sql_parts['where']['i'] = DBcondition('i.hostid', $options['hostids']);
 			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
 			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
@@ -540,7 +534,7 @@ class CTrigger extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.
+		$sql = 'SELECT DISTINCT '.$sql_select.
 				' FROM '.$sql_from.
 				' WHERE '.DBin_node('t.triggerid', $nodeids).
 					$sql_where.
@@ -951,8 +945,7 @@ COpt::memoryPick();
 				return false;
 			}
 			
-			reset($expressionData[$expression]['hosts']);
-			$hData =& $expressionData[$expression]['hosts'][key($expressionData[$expression]['hosts'])];
+			$hData =& $expressionData[$expression]['hosts'][0];
 			$object['host'] = zbx_substr($expression, $hData['openSymbolNum']+1, $hData['closeSymbolNum']-($hData['openSymbolNum']+1));
 		}
 

@@ -72,7 +72,7 @@ class CMap extends CZBXAPI{
 
 		$sql_parts = array(
 			'select' => array('sysmaps' => 's.sysmapid'),
-			'from' => array('sysmaps' => 'sysmaps s'),
+			'from' => array('sysmaps s'),
 			'where' => array(),
 			'order' => array(),
 			'limit' => null);
@@ -189,7 +189,7 @@ class CMap extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.'
+		$sql = 'SELECT DISTINCT '.$sql_select.'
 				FROM '.$sql_from.'
 				WHERE '.DBin_node('s.sysmapid', $nodeids).
 					$sql_where.
@@ -878,7 +878,7 @@ COpt::memoryPick();
 				$result = DBexecute('INSERT INTO sysmaps_elements ('.implode(',', array_keys($values)).')'.
 								' VALUES ('.implode(',', array_values($values)).')');
 
-				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Map add elements failed');
+				if(!$result) break;
 			}
 
 			$result = self::EndTransaction($result, __METHOD__);
@@ -921,10 +921,11 @@ COpt::memoryPick();
  * @param array $elements[0,...]['label_location']
  */
 	public static function updateElements($selements){
+		$errors = array();
+		$result_selements = array();
 		$result = true;
 
 		$selements = zbx_toArray($selements);
-		$selementids = array();
 
 		$sysmapids = zbx_objectValues($selements, 'sysmapid');
 
@@ -989,13 +990,13 @@ COpt::memoryPick();
 							' url='.zbx_dbstr($selement['url']).
 						' WHERE selementid='.$selement['selementid']);
 
-				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Map update elements failed');
+				if(!$result) break;
 
-				$selementids[] = $selement['selementid'];
+				$result_selements[] = $selement['selementid'];
 			}
 
 			$result = self::EndTransaction($result, __METHOD__);
-			return $selementids;
+			return $result_selements;
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
@@ -1009,7 +1010,7 @@ COpt::memoryPick();
 	}
 
 /**
- * Delete Element from map
+ * Gets the selementid from the hostid (getSeIDFromEID).
  *
  * {@source}
  * @access public
@@ -1017,50 +1018,27 @@ COpt::memoryPick();
  * @since 1.8
  * @version 1
  *
- * @param array $selements multidimensional array with selement objects
- * @param array $selements[0, ...]['selementid'] selementid to delete
- */
-    public static function deleteElements($selements){
-		$result = true;
+ * @param _array $element_data
+ * @param string $element_data[0,...]['sysmapid']
+ * @param string $element_data[0,...]['elementid']
+ * @return array|boolean selementid as array or false if error
+ *
+	public static function getSeId($data){
 
-        $selements = zbx_toArray($selements);
-        $selementids = zbx_objectValues($selements, 'selementid');
+		$element = $selement_data['elementid'];
+		$sysmapid = $selement_data['sysmapid'];
+		$sql = 'select selementid from sysmaps_elements where elementid='.$element.' and sysmapid='.$sysmapid;
+		$map = DBfetch(DBselect($sql));
 
-		$sysmapids = zbx_objectValues($selements, 'sysmapid');
-
-		try{
-			self::BeginTransaction(__METHOD__);
-
-			$options = array(
-				'sysmapids' => $sysmapids,
-				'editable' => 1,
-				'preservekeys' => 1
-			);
-			$upd_maps = self::get($options);
-
-			foreach($selements as $snumm => $selement){
-				if(!isset($upd_maps[$selement['sysmapid']])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
-				}
-			}
-
-	        $result = delete_sysmaps_element($selementids);
-		    $result = self::EndTransaction($result, __METHOD__);
-			
-			if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Map delete elements failed');
-
-			return $selementids;
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-
-			$errors = $e->getErrors();
-			$error = reset($errors);
-
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, $error);
+		$result = $map ? true : false;
+		if($result)
+			return $map;
+		else{
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);//'Internal zabbix error');
 			return false;
 		}
-    }
+	}
+//*/
 
 /**
  * Add link trigger to link (Sysmap)

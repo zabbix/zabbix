@@ -757,7 +757,7 @@ add_selement_img: function(selement){
 //	selement_div.setAttribute('src','data:image/png;base64,'+selement.image);
 //	selement_div.setAttribute('src','imgstore.php?iconid='+selement.image);
 	selement_div.className = 'pointer sysmap_iconid_'+selement.image;
-
+	
 	selement_div.style.zIndex = '10';
 	selement_div.style.position = 'absolute';
 	selement_div.style.top = position.top+'px';
@@ -993,7 +993,7 @@ show_menu: function(e){
 	if(this.menu_active != 1) return true;
 	
 	var e = e || window.event;
-	var element = Event.element(e);
+	var element = eventTarget(e);
 	var element_id = element.id.split('_');
 	var selementid = element_id[(element_id.length - 1)];
 
@@ -1100,7 +1100,7 @@ update_multiContainer: function(e){
 		var e_table_1 = document.createElement('table');
 		e_table_1.setAttribute('cellspacing',"0");
 		e_table_1.setAttribute('cellpadding',"1");
-		e_table_1.className = 'header';
+		e_table_1.setAttribute('class',"header");
 	
 	
 		var e_tbody_2 = document.createElement('tbody');
@@ -1112,14 +1112,14 @@ update_multiContainer: function(e){
 	
 	
 		var e_td_4 = document.createElement('td');
-		e_td_4.className = 'header_l';
+		e_td_4.setAttribute('class',"header_l");
 		e_td_4.appendChild(document.createTextNode(locale['S_MAP_ELEMENTS']));
 		e_tr_3.appendChild(e_td_4);
 	
 		
 		var e_td_4 = document.createElement('td');
 		e_td_4.setAttribute('align',"right");
-		e_td_4.className = 'header_r';
+		e_td_4.setAttribute('class',"header_r");
 		
 		e_tr_3.appendChild(e_td_4);
 		
@@ -1243,7 +1243,7 @@ update_linkContainer: function(e){
 		var e_table_1 = document.createElement('table');
 		e_table_1.setAttribute('cellspacing',"0");
 		e_table_1.setAttribute('cellpadding',"1");
-		e_table_1.className = 'header';
+		e_table_1.setAttribute('class',"header");
 		
 		
 		var e_tbody_2 = document.createElement('tbody');
@@ -1255,14 +1255,14 @@ update_linkContainer: function(e){
 		
 		
 		var e_td_4 = document.createElement('td');
-		e_td_4.className = 'header_l';
+		e_td_4.setAttribute('class',"header_l");
 		e_td_4.appendChild(document.createTextNode(locale['S_CONNECTORS']));
 		e_tr_3.appendChild(e_td_4);
 		
 		
 		var e_td_4 = document.createElement('td');
 		e_td_4.setAttribute('align',"right");
-		e_td_4.className = 'header_r';
+		e_td_4.setAttribute('class',"header_r");
 		
 		e_tr_3.appendChild(e_td_4);
 		
@@ -1380,7 +1380,7 @@ update_linkContainer: function(e){
 		
 		var e_td_4 = document.createElement('td');
 		e_td_4.setAttribute('colSpan',4);
-		e_td_4.className = 'center';
+		e_td_4.setAttribute('class','center');
 		e_td_4.appendChild(document.createTextNode(locale['S_NO_LINKS']));
 		e_tr_3.appendChild(e_td_4);
 	}
@@ -2305,8 +2305,6 @@ updateForm_selementByType: function(e, multi){
 		this.selementForm.massEdit.elementName.style.display = 'none';
 
 		this.selementForm.typeDOM.iconid_off.style.display = display_style;
-
-		this.selementForm.typeDOM.advanced_icons.style.display = display_style;
 		this.selementForm.typeDOM.iconid_on.style.display = display_style;
 		this.selementForm.typeDOM.iconid_unknown.style.display = display_style;
 		this.selementForm.typeDOM.iconid_maintenance.style.display = display_style;
@@ -2314,8 +2312,6 @@ updateForm_selementByType: function(e, multi){
 		
 		this.selementForm.massEdit.x.style.display = 'none';
 		this.selementForm.massEdit.y.style.display = 'none';
-
-		this.selementForm.advanced_icons.checked = true;
 		
 		this.updateForm_selementByIcons(e);
 		return true;
@@ -2347,7 +2343,7 @@ updateForm_selementByType: function(e, multi){
 	
 	var selementid = this.selementForm.selementid.value;
 	var elementtype = this.selementForm.elementtype.selectedIndex;
-
+	
 	if(this.selements[selementid].elementtype != elementtype){
 		this.selementForm.elementName.value = '';
 		this.selementForm.elementid.value = '0';
@@ -2356,7 +2352,6 @@ updateForm_selementByType: function(e, multi){
 	var srctbl = '';
 	var srcfld1 = '';
 	var srcfld2 = '';
-
 
 	switch(elementtype.toString()){
 		case '0':
@@ -2368,8 +2363,6 @@ updateForm_selementByType: function(e, multi){
 			
 			this.selementForm.typeDOM.elementName.style.display = display_style;
 			this.selementForm.typeDOM.iconid_off.style.display = display_style;
-
-			this.selementForm.typeDOM.advanced_icons.style.display = display_style;
 			this.selementForm.typeDOM.iconid_on.style.display = display_style;
 			this.selementForm.typeDOM.iconid_unknown.style.display = display_style;
 			this.selementForm.typeDOM.iconid_maintenance.style.display = display_style;
@@ -2384,8 +2377,6 @@ updateForm_selementByType: function(e, multi){
 			
 			this.selementForm.typeDOM.elementName.style.display = display_style;
 			this.selementForm.typeDOM.iconid_off.style.display = display_style;
-
-			this.selementForm.typeDOM.advanced_icons.style.display = display_style;
 			this.selementForm.typeDOM.iconid_on.style.display = display_style;
 			this.selementForm.typeDOM.iconid_unknown.style.display = 'none';
 			this.selementForm.typeDOM.iconid_maintenance.style.display = 'none';
@@ -2400,8 +2391,6 @@ updateForm_selementByType: function(e, multi){
 			
 			this.selementForm.typeDOM.elementName.style.display = display_style;
 			this.selementForm.typeDOM.iconid_off.style.display = display_style;
-
-			this.selementForm.typeDOM.advanced_icons.style.display = display_style;
 			this.selementForm.typeDOM.iconid_on.style.display = display_style;
 			this.selementForm.typeDOM.iconid_unknown.style.display = display_style;
 			this.selementForm.typeDOM.iconid_maintenance.style.display = display_style;
@@ -2416,8 +2405,6 @@ updateForm_selementByType: function(e, multi){
 			
 			this.selementForm.typeDOM.elementName.style.display = display_style;
 			this.selementForm.typeDOM.iconid_off.style.display = display_style;
-
-			this.selementForm.typeDOM.advanced_icons.style.display = display_style;
 			this.selementForm.typeDOM.iconid_on.style.display = display_style;
 			this.selementForm.typeDOM.iconid_unknown.style.display = display_style;
 			this.selementForm.typeDOM.iconid_maintenance.style.display = 'none';
@@ -2430,10 +2417,11 @@ updateForm_selementByType: function(e, multi){
 			
 			this.selementForm.typeDOM.elementName.style.display = 'none';
 			this.selementForm.typeDOM.iconid_off.style.display = display_style;
+			this.selementForm.typeDOM.iconid_on.style.display = 'none';
+			this.selementForm.typeDOM.iconid_unknown.style.display = 'none';
+			this.selementForm.typeDOM.iconid_maintenance.style.display = 'none';
+			this.selementForm.typeDOM.iconid_disabled.style.display = 'none';
 
-// initiats icons hide
-			this.selementForm.advanced_icons.checked = false;
-			this.selementForm.typeDOM.advanced_icons.style.display = 'none';
 		break;
 	}
 	
@@ -2581,16 +2569,7 @@ deleteForm_selement: function(e){
 	var selementid = this.selementForm.selementid.value;	
 	var selement = this.selements[selementid];
 	
-	var typeName;
-	switch(selement.elementtype-0){
-		case 0: typeName = locale['S_HOST']; break;
-		case 1: typeName = locale['S_MAP']; break;
-		case 2: typeName = locale['S_TRIGGER']; break;
-		case 3: typeName = locale['S_HOST_GROUP']; break;
-		case 4: typeName = locale['S_IMAGE']; break;
-	}
-
-	if(Confirm(locale['S_REMOVE']+' '+typeName+'?')){
+	if(Confirm('Delete element "'+selement.elementName+'"?')){
 		this.remove_selement(selementid, true);
 		this.hideForm(e);
 	}
@@ -3157,12 +3136,12 @@ linkForm_addLinktrigger: function(linktrigger){
 	e_input_10.setAttribute('value',linktrigger.desc_exp);
 	e_td_9.appendChild(e_input_10);
 
-	// var e_input_10 = document.createElement('input');
-	// e_input_10.setAttribute('name',"link_triggers["+triggerid+"][color]");
-	// e_input_10.setAttribute('id',"link_triggers["+triggerid+"][color]");
-	// e_input_10.setAttribute('type',"hidden");
-	// e_input_10.setAttribute('value',linktrigger.color);
-	// e_td_9.appendChild(e_input_10);
+	var e_input_10 = document.createElement('input');
+	e_input_10.setAttribute('name',"link_triggers["+triggerid+"][color]");
+	e_input_10.setAttribute('id',"link_triggers["+triggerid+"][color]");
+	e_input_10.setAttribute('type',"hidden");
+	e_input_10.setAttribute('value',linktrigger.color);
+	e_td_9.appendChild(e_input_10);
 
 //-----
 	var linktriggerid = isset('linktriggerid', linktrigger)?linktrigger.linktriggerid:0;
@@ -3225,17 +3204,7 @@ linkForm_addLinktrigger: function(linktrigger){
 	var e_td_9 = document.createElement('td');
 	e_tr_8.appendChild(e_td_9);
 
-	var e_input_22 = document.createElement('input');
-	e_input_22.setAttribute('style',"margin-top: 0px; margin-bottom: 0px;");
-	e_input_22.setAttribute('onchange',"set_color_by_name('link_triggers["+triggerid+"][color]',this.value)");
-	e_input_22.setAttribute('maxlength',"6");
-	e_input_22.setAttribute('value',linktrigger.color);
-	e_input_22.setAttribute('size',"7");
-	e_input_22.setAttribute('id',"link_triggers["+triggerid+"][color]");
-	e_input_22.setAttribute('name',"link_triggers["+triggerid+"][color]");
-	e_input_22.className = "biginput";
-	e_td_9.appendChild(e_input_22);
-		
+
 	var e_div_10 = document.createElement('div');
 //this.linkForm.colorPicker = e_div_10;
 

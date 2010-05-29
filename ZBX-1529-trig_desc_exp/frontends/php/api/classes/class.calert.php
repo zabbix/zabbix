@@ -65,7 +65,7 @@ class CAlert extends CZBXAPI{
 
 		$sql_parts = array(
 			'select' => array('alerts' => 'a.alertid'),
-			'from' => array('alerts' => 'alerts a'),
+			'from' => array('a' => 'alerts a'),
 			'where' => array(),
 			'order' => array(),
 			'limit' => null,
@@ -128,12 +128,12 @@ class CAlert extends CZBXAPI{
 		else{
 			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
 
-			$sql_parts['from']['events'] = 'events e';
-			$sql_parts['from']['items'] = 'items i';
-			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sql_parts['from']['rights'] = 'rights r';
-			$sql_parts['from']['users_groups'] = 'users_groups ug';
-			$sql_parts['from']['functions'] = 'functions f';
+			$sql_parts['from']['e'] = 'events e';
+			$sql_parts['from']['i'] = 'items i';
+			$sql_parts['from']['hg'] = 'hosts_groups hg';
+			$sql_parts['from']['r'] = 'rights r';
+			$sql_parts['from']['ug'] = 'users_groups ug';
+			$sql_parts['from']['f'] = 'functions f';
 
 			$sql_parts['where']['ae'] = 'a.eventid=e.eventid';
 			$sql_parts['where']['e'] = 'e.object='.EVENT_OBJECT_TRIGGER;
@@ -160,7 +160,7 @@ class CAlert extends CZBXAPI{
 		}
 
 // nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
+		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid(false);
 
 // groupids
 		if(!is_null($options['groupids'])){
@@ -170,9 +170,9 @@ class CAlert extends CZBXAPI{
 				$sql_parts['select']['groupid'] = 'hg.groupid';
 			}
 
-			$sql_parts['from']['functions'] = 'functions f';
-			$sql_parts['from']['items'] = 'items i';
-			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sql_parts['from']['f'] = 'functions f';
+			$sql_parts['from']['i'] = 'items i';
+			$sql_parts['from']['hg'] = 'hosts_groups hg';
 
 			$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
 			$sql_parts['where']['e'] = 'e.object='.EVENT_OBJECT_TRIGGER;
@@ -189,8 +189,8 @@ class CAlert extends CZBXAPI{
 				$sql_parts['select']['hostid'] = 'i.hostid';
 			}
 
-			$sql_parts['from']['functions'] = 'functions f';
-			$sql_parts['from']['items'] = 'items i';
+			$sql_parts['from']['f'] = 'functions f';
+			$sql_parts['from']['i'] = 'items i';
 
 			$sql_parts['where']['i'] = DBcondition('i.hostid', $options['hostids']);
 			$sql_parts['where']['e'] = 'e.object='.EVENT_OBJECT_TRIGGER;
@@ -339,7 +339,7 @@ class CAlert extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.
+		$sql = 'SELECT DISTINCT '.$sql_select.
 				' FROM '.$sql_from.
 				' WHERE '.DBin_node('a.alertid', $nodeids).
 					$sql_where.

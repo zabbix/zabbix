@@ -21,15 +21,14 @@
 
 #include "zbxalgo.h"
 
-typedef unsigned char uchar;
-
 /*
  * Bob Jenkins hash function (see http://burtleburtle.net/bob/hash/evahash.html)
  */
-zbx_hash_t	zbx_hash_lookup2(const void *data, size_t len, zbx_hash_t seed)
+zbx_hash_t	zbx_string_hash_lookup2(const void *data)
 {
-	const uchar	*p = (const uchar *)data;
+	const char	*p, *str = (const char *)data;
 
+	size_t		len;
 	zbx_hash_t	a, b, c;
 
 #define	mix(a, b, c)						\
@@ -45,8 +44,12 @@ zbx_hash_t	zbx_hash_lookup2(const void *data, size_t len, zbx_hash_t seed)
 	c = c - a;	c = c - b;	c = c ^ (b >> 15);	\
 }
 
+	len = strlen(str);
+
 	a = b = 0x9e3779b9u;
-	c = seed;
+	c = 0;
+
+	p = str;
 
 	while (len >= 12)
 	{
@@ -85,18 +88,14 @@ zbx_hash_t	zbx_hash_lookup2(const void *data, size_t len, zbx_hash_t seed)
 /*
  * modified FNV hash function (see http://home.comcast.net/~bretm/hash/6.html)
  */
-zbx_hash_t	zbx_hash_modfnv(const void *data, size_t len, zbx_hash_t seed)
+zbx_hash_t	zbx_string_hash_modfnv(const void *data)
 {
-	const uchar	*p = (const uchar *)data;
+	const char	*p, *str = (const char *)data;
 
-	zbx_hash_t	hash;
-
-	hash = 2166136261u ^ seed;
-
-	while (len-- >= 1)
-	{
-		hash = (hash ^ *(p++)) * 16777619u;
-	}
+	zbx_hash_t	hash = 2166136261u;
+	
+	for (p = str; *p != '\0'; p++)
+		hash = (hash ^ *p) * 16777619u;
 
 	hash += hash << 13;
 	hash ^= hash >> 7;
@@ -110,16 +109,21 @@ zbx_hash_t	zbx_hash_modfnv(const void *data, size_t len, zbx_hash_t seed)
 /*
  * Murmur (see http://sites.google.com/site/murmurhash/)
  */
-zbx_hash_t	zbx_hash_murmur2(const void *data, size_t len, zbx_hash_t seed)
+zbx_hash_t	zbx_string_hash_murmur2(const void *data)
 {
-	const uchar	*p = (const uchar *)data;
+	const char	*p, *str = (const char *)data;
 
+	int		len;
 	zbx_hash_t	hash;
 
 	const uint32_t	m = 0x5bd1e995u;
 	const uint32_t	r = 24;
 
-	hash = seed ^ len;
+	len = strlen(str);
+
+	hash = 0 /* seed */ ^ len;
+
+	p = str;
 
 	while (len >= 4)
 	{
@@ -159,15 +163,17 @@ zbx_hash_t	zbx_hash_murmur2(const void *data, size_t len, zbx_hash_t seed)
 /*
  * sdbm (see http://www.cse.yorku.ca/~oz/hash.html)
  */
-zbx_hash_t	zbx_hash_sdbm(const void *data, size_t len, zbx_hash_t seed)
+zbx_hash_t	zbx_string_hash_sdbm(const void *data)
 {
-	const uchar	*p = (const uchar *)data;
+	const char	*p, *str = (const char *)data;
 
-	zbx_hash_t	hash = seed;
+	zbx_hash_t	hash = 0;
+
+	p = str;
 
 #if	1
 
-	while (len-- >= 1)
+	while (*p != '\0')
 	{
 		/* hash = *(p++) + hash * 65599; */
 
@@ -176,10 +182,9 @@ zbx_hash_t	zbx_hash_sdbm(const void *data, size_t len, zbx_hash_t seed)
 
 #else	/* Duff's device */
 
-#define	HASH_STEP	len--;						\
-			hash = *(p++) + (hash << 6) + (hash << 16) - hash
+#define	HASH_STEP	hash = *(p++) + (hash << 6) + (hash << 16) - hash
 
-	switch (len & 7)
+	switch (strlen(str) & 7)
 	{
 			do
 			{
@@ -193,7 +198,7 @@ zbx_hash_t	zbx_hash_sdbm(const void *data, size_t len, zbx_hash_t seed)
 		case 1:		HASH_STEP;
 		case 0:		;
 			}
-			while (len >= 8);
+			while (*p != '\0');
 	}
 
 #endif
@@ -204,59 +209,21 @@ zbx_hash_t	zbx_hash_sdbm(const void *data, size_t len, zbx_hash_t seed)
 /*
  * djb2 (see http://www.cse.yorku.ca/~oz/hash.html)
  */
-zbx_hash_t	zbx_hash_djb2(const void *data, size_t len, zbx_hash_t seed)
+zbx_hash_t	zbx_string_hash_djb2(const void *data)
 {
-	const uchar	*p = (const uchar *)data;
+	const char	*p, *str = (const char *)data;
 
-	zbx_hash_t	hash;
-       
-	hash = 5381u ^ seed;
+	zbx_hash_t	hash = 5381u;
 
-	while (len-- >= 1)
+	for (p = str; *p != '\0'; p++)
 	{
-		/* hash = hash * 33 + *(p++); */
+		/* hash = hash * 33 + *p; */
 
-		hash = ((hash << 5) + hash) + *(p++);
+		hash = ((hash << 5) + hash) + *p;
 	}
 
 	return hash;
 }
-
-/* default hash functions */
-
-zbx_hash_t	zbx_default_uint64_hash_func(const void *data)
-{
-	return ZBX_DEFAULT_UINT64_HASH_ALGO(data, sizeof(zbx_uint64_t), ZBX_DEFAULT_HASH_SEED);
-}
-
-zbx_hash_t	zbx_default_string_hash_func(const void *data)
-{
-	return ZBX_DEFAULT_STRING_HASH_ALGO(data, strlen((const char *)data), ZBX_DEFAULT_HASH_SEED);
-}
-
-/* default comparison functions */
-
-int	zbx_default_int_compare_func(const void *d1, const void *d2)
-{
-	const int	*i1=(const int *)d1;
-	const int	*i2=(const int *)d2;
-
-	if (*i1 < *i2) return -1;
-	if (*i1 > *i2) return +1;
-	return 0;
-}
-
-int	zbx_default_uint64_compare_func(const void *d1, const void *d2)
-{
-	const zbx_uint64_t	*i1=(const zbx_uint64_t *)d1;
-	const zbx_uint64_t	*i2=(const zbx_uint64_t *)d2;
-
-	if (*i1 < *i2) return -1;
-	if (*i1 > *i2) return +1;
-	return 0;
-}
-
-/* default memory management functions */
 
 void	*zbx_default_mem_malloc_func(void *old, size_t size)
 {
@@ -271,32 +238,4 @@ void	*zbx_default_mem_realloc_func(void *old, size_t size)
 void	zbx_default_mem_free_func(void *ptr)
 {
 	zbx_free(ptr);
-}
-
-/* numeric functions */
-
-int	is_prime(int n)
-{
-	int i;
-
-	if (n <= 1)
-		return 0;
-	if (n == 2)
-		return 1;
-	if (n % 2 == 0)
-		return 0;
-
-	for (i = 3; i * i <= n; i+=2)
-		if (n % i == 0)
-			return 0;
-
-	return 1;
-}
-
-int	next_prime(int n)
-{
-	while (!is_prime(n))
-		n++;
-
-	return n;
 }

@@ -52,9 +52,9 @@ return false;
 
 function empty(obj){
 	if(is_null(obj)) return true;
-	if(obj === false) return true;
-//if((obj == 0) || (obj == '0')) return true;
-	if(is_string(obj) && (obj === '')) return true;
+	if(obj == false) return true;
+	if((obj == 0) || (obj == '0')) return true;
+	if(is_string(obj) && (obj == '')) return true;
 	if(is_array(obj) && (obj.length == 0)) return true;
 return false;
 }
@@ -321,6 +321,19 @@ function deselectAll(){
 	}
 }
 
+function eventTarget(e){
+	var targ = false;
+
+	if(!e) var e = window.event;
+	if(e.target) targ = e.target;
+	else if (e.srcElement) targ = e.srcElement;
+
+// defeat Safari bug
+	if (targ.nodeType == 3) targ = targ.parentNode;
+
+return targ;
+}
+
 function getDimensions(obj, trueSide){
 	obj = $(obj);
 	
@@ -413,9 +426,9 @@ function get_bodywidth(){
 		w-=16;
 	}
 	else{
-		w = (w2 < w)?w2:w;
+		w = (w2 > w)?w2:w;
 	}
-//alert(w);
+
 return w;
 }
 
@@ -508,8 +521,8 @@ function openWinCentered(loc, winname, iwidth, iheight, params){
 }
 
 function PopUp(url,width,height,form_name){
-	if(!width) width = 720;
-	if(!height) height = 480;
+	if(!width) width = 600;
+	if(!height) height = 450;
 	if(!form_name) form_name = 'zbx_popup';
 
 	var left = (screen.width-(width+150))/2; 
@@ -707,10 +720,8 @@ function ScaleChartToParenElement(obj_name){
 function hidePopupDiv(iFrameID){
 	if(!IE6) return;
 
-	if(!is_null($(iFrameID))){
-		$(iFrameID).hide();
-		$(iFrameID).remove();
-	}
+	$(iFrameID).hide();
+	$(iFrameID).remove();
 }
 
 function showPopupDiv(divID,iFrameID){
@@ -723,7 +734,7 @@ function showPopupDiv(divID,iFrameID){
 		var iFrame = document.createElement('iframe');
 		document.body.appendChild(iFrame);
 		
-//Match IFrame position with divPopup
+		//Match IFrame position with divPopup
 		iFrame.setAttribute('id',iFrameID);
 		iFrame.style.position='absolute';
 	}
@@ -735,7 +746,8 @@ function showPopupDiv(divID,iFrameID){
 
 //Increase default zIndex of div by 1, so that DIV appears before IFrame
 	divPopup.style.zIndex=divPopup.style.zIndex+1;
-	//iFrame.style.zIndex = 1;
+//	iFrame.style.zIndex = 1;
+
 
 	var divCumOff = $(divID).cumulativeOffset();
 	iFrame.style.display = 'block';

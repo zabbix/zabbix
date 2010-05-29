@@ -537,7 +537,7 @@ int	__zbx_DBexecute(const char *fmt, ...);
 #endif /* HAVE___VA_ARGS__ */
 DB_RESULT	__zbx_DBselect(const char *fmt, ...);
 
-DB_RESULT	DBselectN(const char *query, int n);
+DB_RESULT	DBselectN(char *query, int n);
 DB_ROW		DBfetch(DB_RESULT result);
 int		DBis_null(char *field);
 void		DBbegin();
@@ -563,8 +563,9 @@ int     DBupdate_trigger_value(zbx_uint64_t triggerid, int type, int value,
 
 int	DBget_items_count(void);
 int	DBget_items_unsupported_count(void);
-int	DBget_history_count(const char *table_name);
-int	DBget_trends_count(const char *table_name);
+int	DBget_history_count(void);
+int	DBget_history_str_count(void);
+int	DBget_trends_count(void);
 int	DBget_triggers_count(void);
 int	DBget_queue_count(void);
 double	DBget_requiredperformance(void);

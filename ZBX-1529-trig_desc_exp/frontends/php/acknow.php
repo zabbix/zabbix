@@ -68,8 +68,8 @@ include_once('include/page_header.php');
 <?php
 	if(!$bulk){
 		$options = array(
-			'output' => API_OUTPUT_EXTEND,
-			'select_triggers' => API_OUTPUT_EXTEND,
+			'extendoutput' => 1,
+			'select_triggers' => 1,
 			'eventids' => $_REQUEST['eventid']
 		);
 		$events = CEvent::get($options);
