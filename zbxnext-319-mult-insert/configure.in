@@ -842,6 +842,8 @@ fi
 
 if test "$server" = "yes" || test "$proxy" = "yes"; then
 
+	have_multirow_insert="no"
+
 	dnl Checking for Oracle support
 	AX_LIB_ORACLE_OCI([10.0])
 	if test "x$WANT_ORACLE_OCI" = "xyes"; then
@@ -903,6 +905,7 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 
 		if test "x$found_mysql" = "xyes"; then
 			have_db="MySQL"
+			have_multirow_insert="yes"
 		else
 			AC_MSG_ERROR([MySQL library not found])
 		fi
@@ -933,6 +936,14 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 		AC_MSG_ERROR([No database selected for Zabbix server. Use --with-mysql or --with-oracle or --with-pgsql or --with-sqlite3.])
 	else
 		AC_MSG_RESULT(ok)
+	fi
+
+	AC_MSG_CHECKING(for multirow insert statements)
+	if test "x$have_multirow_insert" = "xyes"; then
+		AC_DEFINE(HAVE_MULTIROW_INSERT,1,[Define to 1 if database supports multirow insert statements.])
+		AC_MSG_RESULT(yes)
+	else
+		AC_MSG_RESULT(no)
 	fi
 
 	DB_CPPFLAGS="$ORACLE_CPPFLAGS $SQLITE3_CPPFLAGS $MYSQL_CFLAGS $POSTGRESQL_CPPFLAGS"
