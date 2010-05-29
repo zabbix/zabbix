@@ -516,12 +516,12 @@ include_once('include/page_header.php');
 			'hostids' => $hostids,
 			'output' => array('hostid', 'host')
 		);
-		$delHosts = CHost::get($options);
+		//$delHosts = CHost::get($options);
 
 		$go_result = CHost::delete($hosts);
-		foreach($delHosts as $hnum => $host){
+		/*foreach($delHosts as $hnum => $host){
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, 'Host ['.$host['host'].']');
-		}
+		}*/
 
 		$go_result = DBend($go_result);
 
@@ -572,19 +572,16 @@ include_once('include/page_header.php');
 	$hosts_wdgt->addPageHeader(S_CONFIGURATION_OF_HOSTS, $frmForm);
 	
 
-// TODO: neponjatno pochemu hostid sbrasivaetsja no on nuzhen dlja formi
-$thid = get_request('hostid', 0);
+	$options = array(
+		'groups' => array(
+			'editable' => 1,
+		),
+		'groupid' => get_request('groupid', null),
+	);
+	$pageFilter = new CPageFilter($options);
 
-	$params=array();
-	$options = array('only_current_node');
-	foreach($options as $option) $params[$option] = 1;
-
-	$PAGE_GROUPS = get_viewed_groups(PERM_READ_WRITE, $params);
-	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_WRITE, $PAGE_GROUPS['selected'], $params);
-
-	validate_group($PAGE_GROUPS,$PAGE_HOSTS);
-
-	$_REQUEST['hostid'] = $thid;
+	$_REQUEST['groupid'] = $pageFilter->groupid;
+	$_REQUEST['hostid'] = get_request('hostid', 0);
 ?>
 <?php
 	// echo SBR;
@@ -601,11 +598,7 @@ $thid = get_request('hostid', 0);
 		$frmForm = new CForm();
 		$frmForm->setMethod('get');
 
-		$cmbGroups = new CComboBox('groupid', $PAGE_GROUPS['selected'], 'javascript: submit();');
-		foreach($PAGE_GROUPS['groups'] as $groupid => $name){
-			$cmbGroups->addItem($groupid, $name);
-		}
-		$frmForm->addItem(array(S_GROUP.SPACE, $cmbGroups));
+		$frmForm->addItem(array(S_GROUP.SPACE, $pageFilter->getGroupsCB()));
 
 		$numrows = new CDiv();
 		$numrows->setAttribute('name', 'numrows');
@@ -644,8 +637,8 @@ $thid = get_request('hostid', 0);
 			'limit' => ($config['search_limit']+1)
 		);
 
-		if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
-			$options['groupids'] = $PAGE_GROUPS['selected'];
+		if($pageFilter->groupsSelected && $pageFilter->groupid > 0){
+			$options['groupids'] = $pageFilter->groupid;
 		}
 
 		$hosts = CHost::get($options);
@@ -686,13 +679,13 @@ $thid = get_request('hostid', 0);
 		$templates = zbx_toHash($templates, 'templateid');
 //---------
 		foreach($hosts as $num => $host){
-			$applications = array(new CLink(S_APPLICATIONS, 'applications.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$host['hostid']),
+			$applications = array(new CLink(S_APPLICATIONS, 'applications.php?groupid='.$_REQUEST['groupid'].'&hostid='.$host['hostid']),
 				' ('.$host['applications'].')');
 			$items = array(new CLink(S_ITEMS, 'items.php?filter_set=1&hostid='.$host['hostid']),
 				' ('.$host['items'].')');
-			$triggers = array(new CLink(S_TRIGGERS, 'triggers.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$host['hostid']),
+			$triggers = array(new CLink(S_TRIGGERS, 'triggers.php?groupid='.$_REQUEST['groupid'].'&hostid='.$host['hostid']),
 				' ('.$host['triggers'].')');
-			$graphs = array(new CLink(S_GRAPHS, 'graphs.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$host['hostid']),
+			$graphs = array(new CLink(S_GRAPHS, 'graphs.php?groupid='.$_REQUEST['groupid'].'&hostid='.$host['hostid']),
 				' ('.$host['graphs'].')');
 
 			$description = array();
@@ -857,9 +850,7 @@ $thid = get_request('hostid', 0);
 	}
 	
 	$hosts_wdgt->show();
-?>
-<?php
+
 
 include_once('include/page_footer.php');
-
 ?>

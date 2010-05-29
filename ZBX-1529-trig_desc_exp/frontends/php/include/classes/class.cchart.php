@@ -207,7 +207,7 @@ class CChart extends CGraphDraw{
 
 		$p = $this->to_time - $this->from_time;		// graph size in time
 		$z = $p - $this->from_time % $p;			// graphsize - mod(from_time,p) for Oracle...
-		$x = $this->sizeX;							// graph size in px
+		$x = $this->sizeX;						// graph size in px
 
 		$this->itemsHost = null;
 		for($i=0; $i < $this->num; $i++){
@@ -476,11 +476,13 @@ class CChart extends CGraphDraw{
 
 //				if($val <= $minY || $val >= $maxY)	continue;
 //SDI($item['itemid']);
-				$color = 'Priority';
-				if($trigger['value'] == TRIGGER_VALUE_TRUE){
-					if($trigger['priority'] == 5)		$color = 'Priority Disaster';
-					else if($trigger['priority'] == 4)	$color = 'Priority High';
-					else if($trigger['priority'] == 3)	$color = 'Priority Average';
+				switch($trigger['priority']){
+					case TRIGGER_SEVERITY_DISASTER:	$color = 'Priority Disaster'; break;
+					case TRIGGER_SEVERITY_HIGH: $color = 'Priority High'; break;
+					case TRIGGER_SEVERITY_AVERAGE: $color = 'Priority Average'; break;
+					case TRIGGER_SEVERITY_WARNING: $color = 'Priority Warning'; break;
+					case TRIGGER_SEVERITY_INFORMATION: $color = 'Priority Information'; break;
+					default: $color = 'Priority';
 				}
 
 				array_push($this->triggers,array(
@@ -1424,7 +1426,8 @@ class CChart extends CGraphDraw{
 			$this->shiftY,
 			$this->sizeX+$this->shiftXleft-2,	// -2 border
 			$this->sizeY+$this->shiftY,
-			$this->getColor($this->graphtheme['noneworktimecolor'], 0));
+			$this->getColor($this->graphtheme['noneworktimecolor'], 0)
+		);
 
 		$now = time();
 		if(isset($this->stime)){
@@ -1441,13 +1444,14 @@ class CChart extends CGraphDraw{
 
 		$start = find_period_start($periods,$from);
 		$end = -1;
-		while($start < $max_time && $start > 0){
+		while(($start < $max_time) && ($start > 0)){
 			$end = find_period_end($periods,$start,$max_time);
 
 			$x1 = round((($start-$from)*$this->sizeX)/$this->period) + $this->shiftXleft;
 			$x2 = ceil((($end-$from)*$this->sizeX)/$this->period) + $this->shiftXleft;
 
-			//draw rectangle
+
+//draw rectangle
 			imagefilledrectangle(
 				$this->im,
 				$x1,
@@ -1497,16 +1501,29 @@ class CChart extends CGraphDraw{
 		if($this->m_showTriggers != 1) return;
 //		if($this->num != 1) return; // skip multiple graphs
 
+		$opposite = hex2rgb(GRAPH_TRIGGER_LINE_OPPOSITE_COLOR);
+		$oppColor = imagecolorallocate($this->im, $opposite[0], $opposite[1], $opposite[2]);
 		foreach($this->triggers as $tnum => $trigger){
 			if($trigger['skipdraw']) continue;
 
+			$triggerColor = $this->getColor($trigger['color']);
+			$lineStyle = Array($triggerColor, $triggerColor, $triggerColor, $triggerColor, $triggerColor, $oppColor, $oppColor, $oppColor);
+
+//			SDI($trigger['color']);
 			dashedline(
 				$this->im,
 				$this->shiftXleft,
 				$trigger['y'],
 				$this->sizeX+$this->shiftXleft,
 				$trigger['y'],
-				$this->getColor($trigger['color']));
+				$lineStyle);
+			dashedline(
+				$this->im,
+				$this->shiftXleft,
+				$trigger['y']+1,
+				$this->sizeX+$this->shiftXleft,
+				$trigger['y']+1,
+				$lineStyle);
 		}
 	}
 
@@ -1696,6 +1713,26 @@ class CChart extends CGraphDraw{
 		$legend->draw();
 	}
 
+	protected function limitToBounds(&$value1, &$value2, $min, $max, $drawtype){
+// Fixes graph out of bounds problem
+		if( (($value1 > ($max+$min)) && ($value2 > ($max+$min))) || (($value1 < $min) && ($value2 < $min)) ){
+			if($drawtype != GRAPH_ITEM_DRAWTYPE_FILLED_REGION) return false;
+		}
+
+		$y_first = (($value1 > ($max+$min)) || ($value1 < $min));
+		$y_second = (($value2 > ($max+$min)) || ($value2 < $min));
+
+		if($y_first){
+			$value1 = ($value1 > ($max+$min))?($max+$min):$min;
+		}
+
+		if($y_second){
+			$value2 = ($value2 > ($max+$min))?($max+$min):$min;
+		}
+//--------
+	return true;
+	}
+
 	protected function drawElement(&$data, $from, $to, $minX, $maxX, $minY, $maxY, $drawtype, $max_color, $avg_color, $min_color, $minmax_color, $calc_fnc, $axisside){
 		if(!isset($data['max'][$from]) || !isset($data['max'][$to])) return;
 
@@ -1752,26 +1789,28 @@ class CChart extends CGraphDraw{
 				$shift_to	= $shift_min_to;
 				break;
 			case CALC_FNC_ALL:
+// MAX
+				$y1x = (($y1max > ($this->sizeY+$this->shiftY)) || ($y1max < $this->shiftY));
+				$y2x = (($y2max > ($this->sizeY+$this->shiftY)) || ($y2max < $this->shiftY));
+
+				if($y1x) $y1max = ($y1max > ($this->sizeY+$this->shiftY))?($this->sizeY+$this->shiftY):$this->shiftY;
+				if($y2x) $y2max = ($y2max > ($this->sizeY+$this->shiftY))?($this->sizeY+$this->shiftY):$this->shiftY;
+//--
+// MIN
+				$y1n = (($y1min > ($this->sizeY+$this->shiftY)) || ($y1min < $this->shiftY));
+				$y2n = (($y2min > ($this->sizeY+$this->shiftY)) || ($y2min < $this->shiftY));
+
+				if($y1n) $y1min = ($y1min > ($this->sizeY+$this->shiftY))?($this->sizeY+$this->shiftY):$this->shiftY;
+				if($y2n) $y2min = ($y2min > ($this->sizeY+$this->shiftY))?($this->sizeY+$this->shiftY):$this->shiftY;
+//--
 				$a[0] = $x1;		$a[1] = $y1max;
 				$a[2] = $x1;		$a[3] = $y1min;
 				$a[4] = $x2;		$a[5] = $y2min;
 				$a[6] = $x2;		$a[7] = $y2max;
 //SDI('2: '.$x2.' - '.$x1.' : '.$y2min.' - '.$y1min);
-				if($drawtype == GRAPH_ITEM_DRAWTYPE_BOLD_DOT){
-					imagefilledrectangle($this->im,$x1,$y1max-1,$x1+1,$y1max,$max_color);
-					imagefilledrectangle($this->im,$x1,$y1min-1,$x1+1,$y1min,$min_color);
-				}
-				else{
-					imagefilledpolygon($this->im,$a,4,$minmax_color);
-					imageline($this->im,$x1,$y1max,$x2,$y2max,$max_color);
-					imageline($this->im,$x1,$y1min,$x2,$y2min,$min_color);
-				}
-
-				/* don't use break, avg must be drawed in this statement */
-				// break;
+// don't use break, avg must be drawed in this statement
 			case CALC_FNC_AVG:
-				/* don't use break, avg must be drawed in this statement */
-				// break;
+// don't use break, avg must be drawed in this statement
 			default:
 				$y1 = $y1avg;
 				$y2 = $y2avg;
@@ -1786,46 +1825,46 @@ class CChart extends CGraphDraw{
 		$y2_shift	= $zero - $shift_to/$unit2px;//*/
 
 
-// Fixes graph out of bounds problem
-		if( (($y1 > ($this->sizeY+$this->shiftY)) && ($y2 > ($this->sizeY+$this->shiftY))) || (($y1 < $this->shiftY) && ($y2 < $this->shiftY)) ){
-			if($drawtype == GRAPH_ITEM_DRAWTYPE_FILLED_REGION){
-				if($y1 > ($this->sizeY+$this->shiftY)) $y1 = $this->sizeY+$this->shiftY;
-				if($y2 > ($this->sizeY+$this->shiftY)) $y2 = $this->sizeY+$this->shiftY;
+		if(!$this->limitToBounds($y1, $y2, $this->shiftY, $this->sizeY, $drawtype)) return true;
+		if(!$this->limitToBounds($y1_shift, $y2_shift, $this->shiftY, $this->sizeY, $drawtype)) return true;
 
-				if($y1 < ($this->sizeY+$this->shiftY)) $y1 = $this->shiftY;
-				if($y2 < ($this->sizeY+$this->shiftY)) $y2 = $this->shiftY;
-			}
-			else{
-				return true;
-			}
-		}
-
-		$y_first = !(($y1 > ($this->sizeY+$this->shiftY)) || ($y1 < $this->shiftY));
-		$y_second = !(($y2 > ($this->sizeY+$this->shiftY)) || ($y2 < $this->shiftY));
-
-		if(!$y_first){
-			$y1 = ($y1 > ($this->sizeY+$this->shiftY))?($this->sizeY+$this->shiftY):$this->shiftY;
-		}
-		else if(!$y_second){
-			$y2 = ($y2 > ($this->sizeY+$this->shiftY))?($this->sizeY+$this->shiftY):$this->shiftY;
-		}
-//--------
 
 // draw main line
 		switch($drawtype){
 			case GRAPH_ITEM_DRAWTYPE_BOLD_LINE:
+				if($calc_fnc == CALC_FNC_ALL){
+					imagefilledpolygon($this->im,$a,4,$minmax_color);
+					if(!$y1x || !$y2x){
+						imageline($this->im,$x1+1,$y1max,$x2+1,$y2max,$max_color);
+						imageline($this->im,$x1,$y1max,$x2,$y2max,$max_color);
+					}
+
+					if(!$y1n || !$y2n){
+						imageline($this->im,$x1-1,$y1min,$x2-1,$y2min,$min_color);
+						imageline($this->im,$x1,$y1min,$x2,$y2min,$min_color);
+					}
+				}
+
 				imageline($this->im,$x1,$y1+1,$x2,$y2+1,$avg_color);
-				// break; /* don't use break, must be drawed line also */
+				imageline($this->im,$x1,$y1,$x2,$y2,$avg_color);
+				break;
 			case GRAPH_ITEM_DRAWTYPE_LINE:
 //SDI(array($this->im,$x1,$y1,$x2,$y2,$avg_color));
+				if($calc_fnc == CALC_FNC_ALL){
+					imagefilledpolygon($this->im,$a,4,$minmax_color);
+					if(!$y1x || !$y2x) imageline($this->im,$x1,$y1max,$x2,$y2max,$max_color);
+					if(!$y1n || !$y2n) imageline($this->im,$x1,$y1min,$x2,$y2min,$min_color);
+				}
+
 				imageline($this->im,$x1,$y1,$x2,$y2,$avg_color);
 				break;
 			case GRAPH_ITEM_DRAWTYPE_FILLED_REGION:
+//--
 				$a[0] = $x1;		$a[1] = $y1;
 				$a[2] = $x1;		$a[3] = $y1_shift;
 				$a[4] = $x2;		$a[5] = $y2_shift;
 				$a[6] = $x2;		$a[7] = $y2;
-//SDI($a);
+
 				imagefilledpolygon($this->im,$a,4,$avg_color);
 //				imageline($this->im,$x1,$y1,$x2,$y2,$this->getShadow('333333',50));
 				break;
@@ -1980,6 +2019,7 @@ class CChart extends CGraphDraw{
 //-----*/
 
 		$maxX = $this->sizeX;
+
 
 // For each metric
 		for($item = 0; $item < $this->num; $item++){
