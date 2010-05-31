@@ -75,6 +75,7 @@ class CStringParser {
 		//if(count($this->errors) > 0) $this->saveDebug(print_r($this->errors, true));
 
 		$this->parsedTree =& $this->levelData[0];
+		//SDII($this->parsedTree);
 
 		//$this->saveDebug(print_r($this->parsedTree, true));
 
@@ -494,6 +495,7 @@ class CStringParser {
 		$skipAfterEmpty = false;
 		$values = $this->levelValue($levelData);
 
+		//SDII("Validating {$levelData['levelType']} splited values:\n".var_export($values, true)."\nRules:\n".var_export($this->ess[$levelData['levelType']], true)."\n");
 		//$this->saveDebug("Validating {$levelData['levelType']} splited values:\n".var_export($values, true)."\nRules:\n".var_export($this->ess[$levelData['levelType']], true)."\n");
 
 		if(isset($parent['parts']) && is_array($parent['parts'])) {
@@ -697,7 +699,7 @@ class CStringParser {
 					(!isset($levelData['openSymbol']) && $level['openSymbolNum']==$levelData['openSymbolNum'])*/
                                 )) {
 					$val = Array();
-					$val['value'] = mb_substr($this->expression, $levelData['openSymbolNum']+$openprepend, $level['openSymbolNum']-$levelData['openSymbolNum']); // should be changed to zbx_substr
+					$val['value'] = mb_substr($this->expression, $levelData['openSymbolNum']+$openprepend, $level['openSymbolNum']-($levelData['openSymbolNum']+$openprepend)); // should be changed to zbx_substr
 					$val['from'] = $levelData['openSymbolNum']+$openprepend;
 					$val['until'] = $level['openSymbolNum'];
 					$value .= $val['value'];
