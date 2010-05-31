@@ -1,5 +1,7 @@
 Changes for 1.8.3
 
+ - [ZBX-2483] fixed showing latest data by filter when clicking from dashboard with GUI option 'Dropdown first entry' -> None (Maxim Andruhovich/AM)
+ - [ZBX-1529] fixed macros expand to nothing in templates (Vedmak)
  - [ZBX-2461] fixed complex bugs with trigger expressions (Maxim Andruhovich / AM)
  - [ZBX-1357] updated German translation; thanks to Peter Schultz (Richlv)
  - [ZBX-2319] fixed escaping locales on download (Aly)
