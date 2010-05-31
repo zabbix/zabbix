@@ -677,8 +677,6 @@ function make_latest_issues($filter = array()){
 
 	$config = select_config();
 
-	$requestFirstGroup = isset($options['config']['deny_all']) || $config['dropdown_first_entry'] == ZBX_DROPDOWN_FIRST_NONE;
-
 	$limit = isset($filter['limit']) ? $filter['limit'] : 20;
 	$options = array(
 		'groupids' => $filter['groupids'],
@@ -687,6 +685,7 @@ function make_latest_issues($filter = array()){
 		'maintenance' => $filter['maintenance'],
 		'skipDependent' => 1,
 		'filter' => array('priority' => $filter['severity']),
+		'select_groups' => API_OUTPUT_EXTEND,
 		'select_hosts' => API_OUTPUT_EXTEND,
 		'output' => API_OUTPUT_EXTEND,
 		'sortfield' => 'lastchange',
@@ -708,6 +707,7 @@ function make_latest_issues($filter = array()){
 
 		$triggers_hosts = array_merge($triggers_hosts, $trigger['hosts']);
 	}
+
 	$triggers_hosts = zbx_toHash($triggers_hosts, 'hostid');
 	$triggers_hostids = array_keys($triggers_hosts);
 // }}} GATHER HOSTS FOR SELECTED TRIGGERS
@@ -729,8 +729,9 @@ function make_latest_issues($filter = array()){
 	
 	foreach($triggers as $tnum => $trigger){
 // Check for dependencies
+		$group = reset($trigger['groups']);
 		$host = reset($trigger['hosts']);
-
+		
 		$trigger['hostid'] = $host['hostid'];
 		$trigger['host'] = $host['host'];
 
@@ -741,21 +742,15 @@ function make_latest_issues($filter = array()){
 		foreach($scripts_by_hosts[$trigger['hostid']] as $id => $script){
 			$script_nodeid = id2nodeid($script['scriptid']);
 			if( (bccomp($host_nodeid ,$script_nodeid ) == 0))
-				$menus.= "['".$script['name']."',\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$trigger['hostid']."&scriptid=".$script['scriptid']."','".S_TOOLS."',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+				$menus.= "[".zbx_jsvalue($script['name']).",\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$trigger['hostid']."&scriptid=".$script['scriptid']."','".S_TOOLS."',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 		}
 
 		if(!empty($scripts_by_hosts)){
-			$menus = "[".zbx_jsvalue(S_TOOLS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus;
+			$menus = "['".S_TOOLS."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus;
 		}
 
-		if($requestFirstGroup && !isset($cachedGroups[$trigger['hostid']])) {
-			$hgroups = CHostGroup::get(Array('hostids' => $trigger['hostid'], 'limit' => 1));
-			reset($hgroups);
-			$cachedGroups[$trigger['hostid']] = $hgroups[key($hgroups)]['groupid'];
-		}
-
-		$menus.= "[".zbx_jsvalue(S_LINKS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
-		$menus.= "['".S_LATEST_DATA."',\"javascript: redirect('latest.php?".($requestFirstGroup ? 'groupid='.$cachedGroups[$trigger['hostid']].'&':'')."hostid={$trigger['hostid']}')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+		$menus.= "['".S_LINKS."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
+		$menus.= "['".S_LATEST_DATA."',\"javascript: redirect('latest.php?groupid=".$group['groupid'].'&hostid='.$trigger['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 
 		$menus = rtrim($menus,',');
 		$menus = 'show_popup_menu(event,['.$menus.'],180);';
