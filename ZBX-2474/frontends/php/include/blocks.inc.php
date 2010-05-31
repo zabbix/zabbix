@@ -907,8 +907,8 @@ function make_webmon_overview($filter){
 			is_show_all_nodes() ? get_node_name_by_elid($group['groupid']) : null,
 			$group['name'],
 			new CSpan($apps['ok'],'off'),
-			new CSpan($apps['failed'],$apps['failed']?'on':'off'),
-			new CSpan($apps[HTTPTEST_STATE_BUSY],$apps[HTTPTEST_STATE_BUSY]?'orange':'off'),
+			new CSpan($apps['failed'],$apps['failed']? 'on':'off'),
+			new CSpan($apps[HTTPTEST_STATE_BUSY],$apps[HTTPTEST_STATE_BUSY]? 'orange':'off'),
 			new CSpan($apps[HTTPTEST_STATE_UNKNOWN],'unknown')
 		));
 	}
@@ -955,7 +955,7 @@ function make_discovery_status(){
 			get_node_name_by_elid($drule['druleid']),
 			new CLink(get_node_name_by_elid($drule['druleid'], null, ': ').$drule['name'],'discovery.php?druleid='.$drule['druleid']),
 			new CSpan($drule['up'],'green'),
-			new CSpan($drule['down'],($drule['down'] > 0)?'red':'green')
+			new CSpan($drule['down'],($drule['down'] > 0)? 'red':'green')
 		));
 	}
 	$table->setFooter(new CCol(S_UPDATED.': '.zbx_date2str(S_BLOCKS_DISCOVERY_STATUS_TIME_FORMAT)));

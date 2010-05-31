@@ -1423,7 +1423,7 @@
 		
 		$json = new CJSON();
 
-		zbx_add_post_js("var filterTypeSwitcher = new CViewSwitcher('filter_type', new Array('keyup','click','change'), JSON.parse('".$json->encode($fTypeVisibility)."'));");
+		zbx_add_post_js("var filterTypeSwitcher = new CViewSwitcher('filter_type', new Array('keyup','click','change'), ".$json->encode($fTypeVisibility).");");
 		$col21 = new CCol(bold(S_TYPE.': '));
 		$col21->setAttribute('style', 'width: 160px');
 		
@@ -1486,7 +1486,7 @@
 		
 		$col_table3->addRow(array(bold(S_TYPE_OF_INFORMATION.': '), $cmbValType));
 		
-		zbx_add_post_js("var filterValueTypeSwitcher = new CViewSwitcher('filter_value_type', new Array('keyup','click','change'), JSON.parse('".$json->encode($fVTypeVisibility)."'));");
+		zbx_add_post_js("var filterValueTypeSwitcher = new CViewSwitcher('filter_value_type', new Array('keyup','click','change'), ".$json->encode($fVTypeVisibility).");");
 	//second row
 		$label321 = new CSpan(bold(S_DATA_TYPE.': '), 'hidden');
 		$label321->setAttribute('id', 'filter_data_type_label');
