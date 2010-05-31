@@ -4150,7 +4150,7 @@ $triggerExpressionRules['macro'] = Array(
 		'TRIGGERS.UNACK',
 		'TRIGGERS.PROBLEM.UNACK'),
 	'indexItem' => true,
-	'parent' => Array('independent', 'grouping'));
+	'parent' => Array('independent','grouping','checkPort'));
 $triggerExpressionRules['macroNum'] = Array(
 	'openSymbol' => Array('{' => 'valueDependent'),
 	'closeSymbol' => '}',
@@ -4184,13 +4184,13 @@ $triggerExpressionRules['macroNum'] = Array(
 		'PROFILE\.TAG[1-9]{1}',
 		'TRIGGER\.KEY[1-9]{1}'),
 	'indexItem' => true,
-	'parent' => Array('independent', 'grouping'));
+	'parent' => Array('independent','grouping','checkPort'));
 $triggerExpressionRules['customMacro'] = Array(
 	'openSymbol' => Array('{' => 'valueDependent'),
 	'closeSymbol' => '}',
 	'allowedSymbols' => '\$[A-Z0-9_.]+',
 	'indexItem' => true,
-	'parent' => Array('independent', 'grouping'));
+	'parent' => Array('independent','grouping','checkPort'));
 $triggerExpressionRules['expression'] = Array(
 	'openSymbol' => '{',
 	'closeSymbol' => '}',
