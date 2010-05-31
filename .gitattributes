@@ -339,6 +339,7 @@ frontends/php/js/class.csuggest.js -text
 frontends/php/js/class.cswitcher.js -text
 frontends/php/js/class.ctree.js -text
 frontends/php/js/class.curl.js -text
+frontends/php/js/class.cviewswitcher.js -text
 frontends/php/js/class.pmaster.js -text
 frontends/php/js/class.rpc.js -text
 frontends/php/js/common.js -text
