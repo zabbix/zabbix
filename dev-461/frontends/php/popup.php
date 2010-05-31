@@ -713,7 +713,7 @@ include_once('include/page_header.php');
 
 
 			if($multiselect){
-				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", '".$trigger[$srcfld1]."');";
+				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", ".zbx_jsvalue($trigger[$srcfld1]).");";
 			}
 			else{
 				$values = array(
@@ -748,8 +748,8 @@ include_once('include/page_header.php');
 					$status = new CSpan(S_ENABLED, 'enabled');
 				break;
 			}
-			//if($row["status"] != TRIGGER_STATUS_UNKNOWN) $row["error"]=SPACE;
-			//if($row["error"]=="") $row["error"]=SPACE;
+//if($row["status"] != TRIGGER_STATUS_UNKNOWN) $row["error"]=SPACE;
+//if($row["error"]=="") $row["error"]=SPACE;
 
 			if($multiselect){
 				$description = new CCol(array(new CCheckBox('triggers['.zbx_jsValue($trigger[$srcfld1]).']', NULL, NULL, $trigger['triggerid']),	$description));
@@ -830,7 +830,7 @@ include_once('include/page_header.php');
 			$row['description'] = $row['host'].':'.$row['description'];
 
 			if($multiselect){
-				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", '".$row[$srcfld1]."');";
+				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", ".zbx_jsvalue($row[$srcfld1]).");";
 			}
 			else{
 				$values = array(
@@ -957,7 +957,7 @@ include_once('include/page_header.php');
 			$description = new CSpan($row['name'],'link');
 
 			if($multiselect){
-				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", '".$row[$srcfld1]."');";
+				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", ".zbx_jsvalue($row[$srcfld1]).");";
 			}
 			else{
 				$values = array(
@@ -1064,7 +1064,7 @@ include_once('include/page_header.php');
 			$row['description'] = $row['host'].':'.$row['description'];
 
 			if($multiselect){
-				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", '".$row[$srcfld1]."');";
+				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", ".zbx_jsvalue($row[$srcfld1]).");";
 			}
 			else{
 				$values = array(
@@ -1138,7 +1138,7 @@ include_once('include/page_header.php');
 			$description = new CSpan($sysmap['name'], 'link');
 
 			if($multiselect){
-				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", '".$sysmap[$srcfld1]."');";
+				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", ".zbx_jsvalue($sysmap[$srcfld1]).");";
 			}
 			else{
 				$values = array(
@@ -1251,7 +1251,7 @@ include_once('include/page_header.php');
 			$name = new CLink($row['name'],'#');
 
 			if($multiselect){
-				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", '".$row[$srcfld1]."');";
+				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", ".zbx_jsvalue($row[$srcfld1]).");";
 			}
 			else{
 				$values = array(
@@ -1317,7 +1317,7 @@ include_once('include/page_header.php');
 			$name = new CSpan($row["name"],'link');
 
 			if($multiselect){
-				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", '".$row[$srcfld1]."');";
+				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", ".zbx_jsvalue($row[$srcfld1]).");";
 			}
 			else{
 				$values = array(

@@ -822,6 +822,7 @@
 	'S_DELETE_SELECTED_GROUPS'=>		'Delete selected groups',
 
 //	hosts.php
+	'S_IMPORT_HOST'=>				'Import Host',
 	'S_MACROS'=>					'Macros',
 	'S_WRONG_MACRO'=>				'Wrong macro',
 	'S_MACRO_TOO_LONG'=>				'Macro name is too long, should not exceed 64 chars.',

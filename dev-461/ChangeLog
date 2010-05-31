@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [DEV-461] changes in GUI configuration menu (Aly)
  - [ZBX-2461] fixed complex bugs with trigger expressions (Maxim Andruhovich / AM)
  - [ZBX-1357] updated German translation; thanks to Peter Schultz (Richlv)
  - [ZBX-2319] fixed escaping locales on download (Aly)

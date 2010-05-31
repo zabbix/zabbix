@@ -173,10 +173,6 @@ $ZBX_MENU = array(
 						'sub_pages'=>array('services_form.php')
 					),
 				array('url' => 'discoveryconf.php', 'label' => S_DISCOVERY),
-				array(	'url' => 'export.php',
-						'label' => S_EXPORT_IMPORT,
-						'sub_pages'=>array('import.php')
-					)
 			)
 	),
 	'admin'=>array(

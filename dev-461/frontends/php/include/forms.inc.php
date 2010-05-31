@@ -5674,6 +5674,33 @@
 		return $frmHost;
 	}
 
+// Host import form
+	function import_host_form($rules){
+		$form = new CFormTable(S_IMPORT, null, 'post', 'multipart/form-data');
+		$form->addRow(S_IMPORT_FILE, new CFile('import_file'));
+
+		$table = new CTable();
+		$table->setHeader(array(S_ELEMENT, S_UPDATE.SPACE.S_EXISTING, S_ADD.SPACE.S_MISSING), 'bold');
+
+		$titles = array('host' => S_HOST, 'template' => S_TEMPLATE_LINKAGE, 'item' => S_ITEM, 'trigger' => S_TRIGGER, 'graph' => S_GRAPH);
+		foreach($titles as $key => $title){
+			$cbExist = new CCheckBox('rules['.$key.'][exist]', isset($rules[$key]['exist']));
+
+			if($key == 'template')
+				$cbMissed = null;
+			else
+				$cbMissed = new CCheckBox('rules['.$key.'][missed]', isset($rules[$key]['missed']));
+
+			$table->addRow(array($title, $cbExist, $cbMissed));
+		}
+
+		$form->addRow(S_RULES, $table);
+
+		$form->addItemToBottomRow(new CButton('import', S_IMPORT));
+
+	return $form;
+	}
+
 // Host form
 	function insert_host_form(){
 		global $USER_DETAILS;
