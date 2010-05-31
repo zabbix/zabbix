@@ -37,9 +37,9 @@ else{
 	$EXPORT_DATA = false;
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
-	$page['title'] = 'S_SCREENS';
+	$page['title'] = 'S_CONFIGURATION_OF_SCREENS';
 	$page['file'] = 'screenconf.php';
-	$page['hist_arg'] = array('config');
+	$page['hist_arg'] = array();
 }
 
 include_once('include/page_header.php');

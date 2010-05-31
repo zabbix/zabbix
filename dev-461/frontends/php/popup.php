@@ -405,9 +405,9 @@ include_once('include/page_header.php');
 			$name->setAttribute('onclick', $action.' close_window();');
 
 			if($host['status'] == HOST_STATUS_MONITORED)
-				$status=new CSpan(S_MONITORED,'off');
+				$status = new CSpan(S_MONITORED,'off');
 			else if($host['status'] == HOST_STATUS_NOT_MONITORED)
-				$status=new CSpan(S_NOT_MONITORED,'on');
+				$status = new CSpan(S_NOT_MONITORED,'on');
 			else
 				$status=S_UNKNOWN;
 
@@ -418,15 +418,15 @@ include_once('include/page_header.php');
 				$dns = $host['dns'];
 				$ip = $host['ip'];
 
-				$tmp = ($host['useip']==1) ? 'ip' : 'dns';
+				$tmp = ($host['useip'] == 1) ? 'ip' : 'dns';
 				$$tmp = bold($$tmp);
 
 				if($host['available'] == HOST_AVAILABLE_TRUE)
-					$available=new CSpan(S_AVAILABLE,'off');
+					$available = new CSpan(S_AVAILABLE,'off');
 				else if($host['available'] == HOST_AVAILABLE_FALSE)
-					$available=new CSpan(S_NOT_AVAILABLE,'on');
+					$available = new CSpan(S_NOT_AVAILABLE,'on');
 				else if($host['available'] == HOST_AVAILABLE_UNKNOWN)
-					$available=new CSpan(S_UNKNOWN,'unknown');
+					$available = new CSpan(S_UNKNOWN,'unknown');
 			}
 
 			$table->addRow(array(
@@ -456,13 +456,13 @@ include_once('include/page_header.php');
 			$script = '';
 			if(count($new_templates) > 0) {
 				foreach($new_templates as $id => $name){
-					$script .= 'add_variable(null,"templates['.$id.']","'.$name.'","'.$dstfrm.'",window.opener.document);'."\n";
+					$script .= 'add_variable(null,"templates['.$id.']",'.zbx_jsvalue($name).','.zbx_jsvalue($dstfrm).',window.opener.document);'."\n";
 				}
 
 
 			} // if count new_templates > 0
 
-			$script.= 'var form = window.opener.document.forms["'.$dstfrm.'"];'.
+			$script.= 'var form = window.opener.document.forms['.zbx_jsvalue($dstfrm).'];'.
 					' if(form) form.submit();'.
 					' close_window();';
 			insert_js($script);

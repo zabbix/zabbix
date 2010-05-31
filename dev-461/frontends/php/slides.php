@@ -24,7 +24,7 @@ require_once('include/graphs.inc.php');
 require_once('include/screens.inc.php');
 require_once('include/blocks.inc.php');
 
-$page['title'] = 'S_CUSTOM_SCREENS';
+$page['title'] = 'S_CUSTOM_SLIDES';
 $page['file'] = 'slides.php';
 $page['hist_arg'] = array('elementid');
 $page['scripts'] = array('effects.js','dragdrop.js','class.pmaster.js','class.calendar.js','gtlc.js');
