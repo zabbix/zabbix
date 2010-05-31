@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2489] fixed server crash when trapper received data sent using the old protocol (asaveljevs)
  - [ZBX-2474,ZBXNEXT-378] fixed page refresh on filter change, now all filters hiding and showing works without refresh (Maxim Andruhovich / AM)
  - [ZBX-2488] changed filter from Web Monitoring to External Check (Maxim Andruhovich / AM)
  - [ZBX-2483] fixed showing latest data by filter when clicking from dashboard with GUI option 'Dropdown first entry' -> None (Maxim Andruhovich/AM)
