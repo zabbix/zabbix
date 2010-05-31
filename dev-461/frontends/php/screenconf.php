@@ -51,6 +51,7 @@ include_once('include/page_header.php');
 		'screens'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 
 		'screenid'=>	array(T_ZBX_INT, O_NO,	 P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))'),
+		'name'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),
 		'hsize'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(1,100),	'isset({save})'),
 		'vsize'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(1,100),	'isset({save})'),
 
