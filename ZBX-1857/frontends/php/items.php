@@ -32,6 +32,14 @@ $page['hist_arg'] = array();
 include_once('include/page_header.php');
 ?>
 <?php
+// needed type to know which field name to use
+$itemType = get_request('type', 0);
+switch($itemType) {
+	case ITEM_TYPE_SSH: case ITEM_TYPE_TELNET: $paramsFieldName = S_EXECUTED_SCRIPT; break;
+	case ITEM_TYPE_DB_MONITOR: $paramsFieldName = S_PARAMS; break;
+	case ITEM_TYPE_CALCULATED: $paramsFieldName = S_FORMULA; break;
+	default: $paramsFieldName = 'params';
+}
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'type_visible'=>			array(T_ZBX_STR, O_OPT,  null, null,           null),
@@ -88,11 +96,11 @@ include_once('include/page_header.php');
 		'valuemapid'=>		array(T_ZBX_INT, O_OPT,	 null,	DB_ID,				'isset({save})'),
 		'authtype'=>		array(T_ZBX_INT, O_OPT,  NULL,	IN(ITEM_AUTHTYPE_PASSWORD.','.ITEM_AUTHTYPE_PUBLICKEY),
 					'isset({save})'),
-		'username'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,	'isset({save})'),
-		'password'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,	'isset({save})'),
-		'publickey'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,	'isset({save})'),
-		'privatekey'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,	'isset({save})'),
-		'params'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,	'isset({save})'),
+		'username'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,		'isset({save})'),
+		'password'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,		'isset({save})'),
+		'publickey'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,		'isset({save})'),
+		'privatekey'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,		'isset({save})'),
+		'params'=>		array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,	'isset({save})', $paramsFieldName),
 
 		'snmp_community'=>	array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,			'isset({save})&&isset({type})&&'.IN('1,4','type')),
 		'snmp_oid'=>		array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,			'isset({save})&&isset({type})&&'.IN('1,4,6','type')),
