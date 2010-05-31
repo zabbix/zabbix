@@ -691,8 +691,22 @@ Copt::memoryPick();
 
 // Adding groups
 		if(!is_null($options['select_groups']) && str_in_array($options['select_groups'], $subselects_allowed_outputs)){
-		}
+			$obj_params = array(
+					'nodeids' => $nodeids,
+					'output' => $options['select_groups'],
+					'triggerids' => $triggerids,
+					'preservekeys' => 1
+				);
+			$groups = CHostgroup::get($obj_params);
+			foreach($groups as $groupid => $group){
+				$gtriggers = $group['triggers'];
+				unset($group['triggers']);
 
+				foreach($gtriggers as $num => $trigger){
+					$result[$trigger['triggerid']]['groups'][] = $group;
+				}
+			}
+		}
 // Adding hosts
 		if(!is_null($options['select_hosts'])){
 
