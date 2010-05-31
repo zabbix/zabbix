@@ -64,7 +64,7 @@ class CItem extends CZBXAPI{
 
 		$sql_parts = array(
 			'select' => array('items' => 'i.itemid'),
-			'from' => array('items i'),
+			'from' => array('items' => 'items i'),
 			'where' => array('webtype' => 'i.type<>9'),
 			'group' => array(),
 			'order' => array(),
@@ -142,9 +142,9 @@ class CItem extends CZBXAPI{
 		else{
 			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
 
-			$sql_parts['from']['hg'] = 'hosts_groups hg';
-			$sql_parts['from']['r'] = 'rights r';
-			$sql_parts['from']['ug'] = 'users_groups ug';
+			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sql_parts['from']['rights'] = 'rights r';
+			$sql_parts['from']['users_groups'] = 'users_groups ug';
 			$sql_parts['where'][] = 'hg.hostid=i.hostid';
 			$sql_parts['where'][] = 'r.id=hg.groupid ';
 			$sql_parts['where'][] = 'r.groupid=ug.usrgrpid';
@@ -171,7 +171,7 @@ class CItem extends CZBXAPI{
 				$sql_parts['select']['groupid'] = 'hg.groupid';
 			}
 
-			$sql_parts['from']['hg'] = 'hosts_groups hg';
+			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
 			$sql_parts['where'][] = 'hg.hostid=i.hostid';
 
@@ -227,7 +227,7 @@ class CItem extends CZBXAPI{
 				$sql_parts['select']['triggerid'] = 'f.triggerid';
 			}
 
-			$sql_parts['from'][] = 'functions f';
+			$sql_parts['from']['functions'] = 'functions f';
 			$sql_parts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
 			$sql_parts['where']['if'] = 'i.itemid=f.itemid';
 		}
@@ -240,7 +240,7 @@ class CItem extends CZBXAPI{
 				$sql_parts['select']['applicationid'] = 'ia.applicationid';
 			}
 
-			$sql_parts['from']['ia'] = 'items_applications ia';
+			$sql_parts['from']['items_applications'] = 'items_applications ia';
 			$sql_parts['where'][] = DBcondition('ia.applicationid', $options['applicationids']);
 			$sql_parts['where']['ia'] = 'ia.itemid=i.itemid';
 		}
@@ -253,7 +253,7 @@ class CItem extends CZBXAPI{
 				$sql_parts['select']['graphid'] = 'gi.graphid';
 			}
 
-			$sql_parts['from']['gi'] = 'graphs_items gi';
+			$sql_parts['from']['graphs_items'] = 'graphs_items gi';
 			$sql_parts['where'][] = DBcondition('gi.graphid', $options['graphids']);
 			$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
 		}
@@ -390,8 +390,8 @@ class CItem extends CZBXAPI{
 				$sql_parts['select']['name'] = 'g.name';
 			}
 
-			$sql_parts['from']['g'] = 'groups g';
-			$sql_parts['from']['hg'] = 'hosts_groups hg';
+			$sql_parts['from']['groups'] = 'groups g';
+			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
 
 			$sql_parts['where']['ghg'] = 'g.groupid = hg.groupid';
 			$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
@@ -415,8 +415,8 @@ class CItem extends CZBXAPI{
 				$sql_parts['select']['application'] = 'a.name as application';
 			}
 
-			$sql_parts['from']['a'] = 'applications a';
-			$sql_parts['from']['ia'] = 'items_applications ia';
+			$sql_parts['from']['applications'] = 'applications a';
+			$sql_parts['from']['items_applications'] = 'items_applications ia';
 
 			$sql_parts['where']['aia'] = 'a.applicationid = ia.applicationid';
 			$sql_parts['where']['iai'] = 'ia.itemid=i.itemid';
@@ -484,7 +484,7 @@ class CItem extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT DISTINCT '.$sql_select.
+		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.
 				' FROM '.$sql_from.
 				' WHERE '.DBin_node('i.itemid', $nodeids).
 					$sql_where.

@@ -830,6 +830,7 @@ function switch_mute(icon){
 
 	var params = {
 		'favobj': 	'sound',
+		'favref':	'sound',
 		'state':	sound_state
 	}
 	

@@ -677,6 +677,8 @@ function make_latest_issues($filter = array()){
 
 	$config = select_config();
 
+	$requestFirstGroup = isset($options['config']['deny_all']) || $config['dropdown_first_entry'] == ZBX_DROPDOWN_FIRST_NONE;
+
 	$limit = isset($filter['limit']) ? $filter['limit'] : 20;
 	$options = array(
 		'groupids' => $filter['groupids'],
@@ -691,6 +693,7 @@ function make_latest_issues($filter = array()){
 		'sortorder' => ZBX_SORT_DOWN,
 		'limit' => $limit
 	);
+
 	if(isset($filter['hostids'])) $options['hostids'] = $filter['hostids'];
 	$triggers = CTrigger::get($options);
 
@@ -721,7 +724,9 @@ function make_latest_issues($filter = array()){
 		($config['event_ack_enable'])? S_ACK : NULL,
 		S_ACTIONS
 	));
-
+	
+	$cachedGroups = Array();
+	
 	foreach($triggers as $tnum => $trigger){
 // Check for dependencies
 		$host = reset($trigger['hosts']);
@@ -743,8 +748,14 @@ function make_latest_issues($filter = array()){
 			$menus = "[".zbx_jsvalue(S_TOOLS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus;
 		}
 
+		if($requestFirstGroup && !isset($cachedGroups[$trigger['hostid']])) {
+			$hgroups = CHostGroup::get(Array('hostids' => $trigger['hostid'], 'limit' => 1));
+			reset($hgroups);
+			$cachedGroups[$trigger['hostid']] = $hgroups[key($hgroups)]['groupid'];
+		}
+
 		$menus.= "[".zbx_jsvalue(S_LINKS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
-		$menus.= "['".S_LATEST_DATA."',\"javascript: redirect('latest.php?groupid=0&hostid=".$trigger['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+		$menus.= "['".S_LATEST_DATA."',\"javascript: redirect('latest.php?".($requestFirstGroup ? 'groupid='.$cachedGroups[$trigger['hostid']].'&':'')."hostid={$trigger['hostid']}')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 
 		$menus = rtrim($menus,',');
 		$menus = 'show_popup_menu(event,['.$menus.'],180);';
@@ -833,6 +844,7 @@ function make_latest_issues($filter = array()){
 		}
 		unset($trigger,$description,$actions,$alerts,$hint);
 	}
+	
 	$table->setFooter(new CCol(S_UPDATED.': '.zbx_date2str(S_BLOCKS_LATEST_ISSUES_TIME_FORMAT)));
 
 return $table;

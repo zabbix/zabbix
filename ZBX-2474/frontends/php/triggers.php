@@ -105,9 +105,19 @@ include_once('include/page_header.php');
 	$_REQUEST['go'] = get_request('go','none');
 
 // PERMISSIONS
-	if(get_request('triggerid',0) > 0){
+	if(get_request('triggerid', false)){
 		$triggers = available_triggers($_REQUEST['triggerid'], 1);
 		if(empty($triggers)) access_deny();
+	}
+	else if(get_request('hostid', 0) > 0){
+		$options = array(
+			'hostids' => $_REQUEST['hostid'],
+			'extendoutput' => 1,
+			'templated_hosts' => 1,
+			'editable' => 1
+		);
+		$hosts = CHost::get($options);
+		if(empty($hosts)) access_deny();
 	}
 ?>
 <?php
@@ -545,6 +555,7 @@ include_once('include/page_header.php');
 				'select_items' => API_OUTPUT_EXTEND,
 				'select_functions' => API_OUTPUT_EXTEND,
 				'select_dependencies' => API_OUTPUT_EXTEND,
+				'expandDescription' => 1,
 			);
 			$triggers = CTrigger::get($options);
 			order_result($triggers, $sortfield, $sortorder);
@@ -572,7 +583,7 @@ include_once('include/page_header.php');
 					}
 				}
 
-				$description[] = new CLink(expandTriggerDescription($trigger), 'triggers.php?form=update&triggerid='.$triggerid);
+			$description[] = new CLink($trigger['description'], 'triggers.php?form=update&triggerid='.$triggerid);
 
 		//add dependencies {
 				$deps = $trigger['dependencies'];
