@@ -106,7 +106,7 @@ include_once('include/page_header.php');
 // Header
 	$fs_icon = new CDiv(SPACE,'fullscreen');
 	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-	$fs_icon->addAction('onclick',new CJSscript('javascript: document.location = "?fullscreen='.($_REQUEST['fullscreen']?'0':'1').'";'));
+	$fs_icon->addAction('onclick', 'javascript: document.location = "?fullscreen='.($_REQUEST['fullscreen']?'0':'1').'";');
 	$latest_wdgt->addPageHeader(S_LATEST_DATA_BIG,$fs_icon);
 
 // 2nd header

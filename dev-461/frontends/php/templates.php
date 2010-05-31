@@ -351,6 +351,7 @@ include_once('include/page_header.php');
 
 	$options = array(
 		'groups' => array(
+			'templated_hosts' => 1,
 			'editable' => 1,
 		),
 		'groupid' => get_request('groupid', null),
@@ -358,17 +359,7 @@ include_once('include/page_header.php');
 	$pageFilter = new CPageFilter($options);
 	$_REQUEST['groupid'] = $pageFilter->groupid;
 
-
 	$frmForm = new CForm();
-	$cmbConf = new CComboBox('config', 'templates.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
-		$cmbConf->addItem('templates.php', S_TEMPLATES);
-		$cmbConf->addItem('hosts.php', S_HOSTS);
-		$cmbConf->addItem('items.php', S_ITEMS);
-		$cmbConf->addItem('triggers.php', S_TRIGGERS);
-		$cmbConf->addItem('graphs.php', S_GRAPHS);
-		$cmbConf->addItem('applications.php', S_APPLICATIONS);
-	$frmForm->addItem($cmbConf);
-
 	if(!isset($_REQUEST['form'])){
 		$frmForm->addItem(new CButton('form', S_CREATE_TEMPLATE));
 	}
@@ -663,173 +654,176 @@ include_once('include/page_header.php');
 
 		$table = new CTableInfo(S_NO_TEMPLATES_DEFINED);
 
+		$table->setHeader(array(
+			new CCheckBox('all_templates', NULL, "checkAll('".$form->getName()."', 'all_templates', 'templates');"),
+			make_sorting_header(S_TEMPLATES, 'host'),
+			S_APPLICATIONS,
+			S_ITEMS,
+			S_TRIGGERS,
+			S_GRAPHS,
+			S_LINKED_TEMPLATES,
+			S_LINKED_TO
+		));
+
+
+// get templates
+		$templates = array();
+
+		$sortfield = getPageSortField('host');
+		$sortorder = getPageSortOrder();
+
 		if($pageFilter->groupsSelected){
-			$table->setHeader(array(
-				new CCheckBox('all_templates', NULL, "checkAll('".$form->getName()."', 'all_templates', 'templates');"),
-				make_sorting_header(S_TEMPLATES, 'host'),
-				S_APPLICATIONS,
-				S_ITEMS,
-				S_TRIGGERS,
-				S_GRAPHS,
-				S_LINKED_TEMPLATES,
-				S_LINKED_TO
-			));
-
-	//$config = select_config();
-	// get templates
-
-			$sortfield = getPageSortField('host');
-			$sortorder = getPageSortOrder();
 			$options = array(
 				'editable' => 1,
 				'sortfield' => $sortfield,
 				'sortorder' => $sortorder,
 				'limit' => ($config['search_limit']+1)
 			);
-			if($pageFilter->groupsSelected && $pageFilter->groupid > 0){
-				$options['groupids'] = $pageFilter->groupid;
-			}
-			$templates = CTemplate::get($options);
 
-			order_result($templates, $sortfield, $sortorder);
-			$paging = getPagingLine($templates);
-	//--------
-
-			$options = array(
-				'templateids' => zbx_objectValues($templates, 'templateid'),
-				'output' => API_OUTPUT_EXTEND,
-				'select_hosts' => array('hostid','host','status'),
-				'select_templates' => array('hostid','host','status'),
-				'selectParentTemplates' => array('hostid','host','status'),
-				'select_items' => API_OUTPUT_COUNT,
-				'select_triggers' => API_OUTPUT_COUNT,
-				'select_graphs' => API_OUTPUT_COUNT,
-				'select_applications' => API_OUTPUT_COUNT,
-				'nopermissions' => 1
-			);
+			if($pageFilter->groupid > 0) $options['groupids'] = $pageFilter->groupid;
 
 			$templates = CTemplate::get($options);
-			order_result($templates, $sortfield, $sortorder);
-	//-----
-			foreach($templates as $tnum => $template){
-				$templates_output = array();
-				if($template['proxy_hostid']){
-					$proxy = get_host_by_hostid($template['proxy_hostid']);
-					$templates_output[] = $proxy['host'].':';
-				}
-				$templates_output[] = new CLink($template['host'], 'templates.php?form=update&templateid='.$template['templateid'].url_param('groupid'));
-
-				$applications = array(new CLink(S_APPLICATIONS,'applications.php?groupid='.$_REQUEST['groupid'].'&hostid='.$template['templateid']),
-					' ('.$template['applications'].')');
-				$items = array(new CLink(S_ITEMS,'items.php?groupid='.$_REQUEST['groupid'].'&hostid='.$template['templateid']),
-					' ('.$template['items'].')');
-				$triggers = array(new CLink(S_TRIGGERS,'triggers.php?groupid='.$_REQUEST['groupid'].'&hostid='.$template['templateid']),
-					' ('.$template['triggers'].')');
-				$graphs = array(new CLink(S_GRAPHS,'graphs.php?groupid='.$_REQUEST['groupid'].'&hostid='.$template['templateid']),
-					' ('.$template['graphs'].')');
-
-
-				$i = 0;
-				$linked_templates_output = array();
-				order_result($template['parentTemplates'], 'host');
-				foreach($template['parentTemplates'] as $snum => $linked_template){
-					$i++;
-					if($i > $config['max_in_table']){
-						$linked_templates_output[] = '...';
-						$linked_templates_output[] = '//empty element for array_pop';
-						break;
-					}
-
-					$url = 'templates.php?form=update&templateid='.$linked_template['templateid'].url_param('groupid');
-					$linked_templates_output[] = new CLink($linked_template['host'], $url, 'unknown');
-					$linked_templates_output[] = ', ';
-				}
-				array_pop($linked_templates_output);
-
-
-				$i = 0;
-				$linked_to_output = array();
-				$linked_to_objects = array();
-				foreach($template['hosts'] as $h){
-					$h['objectid'] = $h['hostid'];
-					$linked_to_objects[] = $h;
-				}
-				foreach($template['templates'] as $h){
-					$h['objectid'] = $h['templateid'];
-					$linked_to_objects[] = $h;
-				}
-
-				order_result($linked_to_objects, 'host');
-				foreach($linked_to_objects as $linked_to_host){
-					if(++$i > $config['max_in_table']){
-						$linked_to_output[] = '...';
-						$linked_to_output[] = '//empty element for array_pop';
-						break;
-					}
-
-					switch($linked_to_host['status']){
-						case HOST_STATUS_NOT_MONITORED:
-							$style = 'on';
-							$url = 'hosts.php?form=update&hostid='.$linked_to_host['hostid'].'&groupid='.$_REQUEST['groupid'];
-						break;
-						case HOST_STATUS_TEMPLATE:
-							$style = 'unknown';
-							$url = 'templates.php?form=update&templateid='.$linked_to_host['hostid'];
-						break;
-						default:
-							$style = null;
-							$url = 'hosts.php?form=update&hostid='.$linked_to_host['hostid'].'&groupid='.$_REQUEST['groupid'];
-						break;
-					}
-
-					$linked_to_output[] = new CLink($linked_to_host['host'], $url, $style);
-					$linked_to_output[] = ', ';
-				}
-				array_pop($linked_to_output);
-
-
-				$table->addRow(array(
-					new CCheckBox('templates['.$template['templateid'].']', NULL, NULL, $template['templateid']),
-					$templates_output,
-					$applications,
-					$items,
-					$triggers,
-					$graphs,
-					(empty($linked_templates_output) ? '-' : new CCol($linked_templates_output,'wraptext')),
-					(empty($linked_to_output) ? '-' : new CCol($linked_to_output,'wraptext'))
-				));
-			}
-
-	// GO{
-			$goBox = new CComboBox('go');
-
-			$goOption = new CComboItem('delete',S_DELETE_SELECTED);
-			$goOption->setAttribute('confirm',S_DELETE_SELECTED_TEMPLATES_Q);
-			$goBox->addItem($goOption);
-
-			$goOption = new CComboItem('delete_and_clear',S_DELETE_SELECTED_WITH_LINKED_ELEMENTS);
-			$goOption->setAttribute('confirm',S_WARNING_THIS_DELETE_TEMPLATES_AND_CLEAR);
-			$goBox->addItem($goOption);
-
-	// goButton name is necessary!!!
-			$goButton = new CButton('goButton',S_GO);
-			$goButton->setAttribute('id','goButton');
-
-			zbx_add_post_js('chkbxRange.pageGoName = "templates";');
-
-			$footer = get_table_header(new CCol(array($goBox, $goButton)));
-	// }GO
-
-	// PAGING FOOTER
-			$table = array($paging,$table,$paging,$footer);
-	//---------
 		}
 
-		$form->addItem($table);
+// sorting && paging
+		order_result($templates, $sortfield, $sortorder);
+		$paging = getPagingLine($templates);
+//--------
 
-		$template_wdgt->addItem($form);
-		$template_wdgt->show();
+		$options = array(
+			'templateids' => zbx_objectValues($templates, 'templateid'),
+			'output' => API_OUTPUT_EXTEND,
+			'select_hosts' => array('hostid','host','status'),
+			'select_templates' => array('hostid','host','status'),
+			'selectParentTemplates' => array('hostid','host','status'),
+			'select_items' => API_OUTPUT_COUNT,
+			'select_triggers' => API_OUTPUT_COUNT,
+			'select_graphs' => API_OUTPUT_COUNT,
+			'select_applications' => API_OUTPUT_COUNT,
+			'nopermissions' => 1
+		);
+
+		$templates = CTemplate::get($options);
+		order_result($templates, $sortfield, $sortorder);
+//-----
+		foreach($templates as $tnum => $template){
+			$templates_output = array();
+			if($template['proxy_hostid']){
+				$proxy = get_host_by_hostid($template['proxy_hostid']);
+				$templates_output[] = $proxy['host'].':';
+			}
+			$templates_output[] = new CLink($template['host'], 'templates.php?form=update&templateid='.$template['templateid'].url_param('groupid'));
+
+			$applications = array(new CLink(S_APPLICATIONS,'applications.php?groupid='.$_REQUEST['groupid'].'&hostid='.$template['templateid']),
+				' ('.$template['applications'].')');
+			$items = array(new CLink(S_ITEMS,'items.php?groupid='.$_REQUEST['groupid'].'&hostid='.$template['templateid']),
+				' ('.$template['items'].')');
+			$triggers = array(new CLink(S_TRIGGERS,'triggers.php?groupid='.$_REQUEST['groupid'].'&hostid='.$template['templateid']),
+				' ('.$template['triggers'].')');
+			$graphs = array(new CLink(S_GRAPHS,'graphs.php?groupid='.$_REQUEST['groupid'].'&hostid='.$template['templateid']),
+				' ('.$template['graphs'].')');
+
+
+			$i = 0;
+			$linked_templates_output = array();
+			order_result($template['parentTemplates'], 'host');
+			foreach($template['parentTemplates'] as $snum => $linked_template){
+				$i++;
+				if($i > $config['max_in_table']){
+					$linked_templates_output[] = '...';
+					$linked_templates_output[] = '//empty element for array_pop';
+					break;
+				}
+
+				$url = 'templates.php?form=update&templateid='.$linked_template['templateid'].url_param('groupid');
+				$linked_templates_output[] = new CLink($linked_template['host'], $url, 'unknown');
+				$linked_templates_output[] = ', ';
+			}
+			array_pop($linked_templates_output);
+
+
+			$i = 0;
+			$linked_to_output = array();
+			$linked_to_objects = array();
+			foreach($template['hosts'] as $h){
+				$h['objectid'] = $h['hostid'];
+				$linked_to_objects[] = $h;
+			}
+			foreach($template['templates'] as $h){
+				$h['objectid'] = $h['templateid'];
+				$linked_to_objects[] = $h;
+			}
+
+			order_result($linked_to_objects, 'host');
+			foreach($linked_to_objects as $linked_to_host){
+				if(++$i > $config['max_in_table']){
+					$linked_to_output[] = '...';
+					$linked_to_output[] = '//empty element for array_pop';
+					break;
+				}
+
+				switch($linked_to_host['status']){
+					case HOST_STATUS_NOT_MONITORED:
+						$style = 'on';
+						$url = 'hosts.php?form=update&hostid='.$linked_to_host['hostid'].'&groupid='.$_REQUEST['groupid'];
+					break;
+					case HOST_STATUS_TEMPLATE:
+						$style = 'unknown';
+						$url = 'templates.php?form=update&templateid='.$linked_to_host['hostid'];
+					break;
+					default:
+						$style = null;
+						$url = 'hosts.php?form=update&hostid='.$linked_to_host['hostid'].'&groupid='.$_REQUEST['groupid'];
+					break;
+				}
+
+				$linked_to_output[] = new CLink($linked_to_host['host'], $url, $style);
+				$linked_to_output[] = ', ';
+			}
+			array_pop($linked_to_output);
+
+
+			$table->addRow(array(
+				new CCheckBox('templates['.$template['templateid'].']', NULL, NULL, $template['templateid']),
+				$templates_output,
+				$applications,
+				$items,
+				$triggers,
+				$graphs,
+				(empty($linked_templates_output) ? '-' : new CCol($linked_templates_output,'wraptext')),
+				(empty($linked_to_output) ? '-' : new CCol($linked_to_output,'wraptext'))
+			));
+		}
+
+// GO{
+		$goBox = new CComboBox('go');
+
+		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
+		$goOption->setAttribute('confirm',S_DELETE_SELECTED_TEMPLATES_Q);
+		$goBox->addItem($goOption);
+
+		$goOption = new CComboItem('delete_and_clear',S_DELETE_SELECTED_WITH_LINKED_ELEMENTS);
+		$goOption->setAttribute('confirm',S_WARNING_THIS_DELETE_TEMPLATES_AND_CLEAR);
+		$goBox->addItem($goOption);
+
+// goButton name is necessary!!!
+		$goButton = new CButton('goButton',S_GO);
+		$goButton->setAttribute('id','goButton');
+
+		zbx_add_post_js('chkbxRange.pageGoName = "templates";');
+
+		$footer = get_table_header(new CCol(array($goBox, $goButton)));
+// }GO
+
+// PAGING FOOTER
+		$table = array($paging,$table,$paging,$footer);
+//---------
 	}
+
+	$form->addItem($table);
+
+	$template_wdgt->addItem($form);
+	$template_wdgt->show();
 ?>
 <?php
 

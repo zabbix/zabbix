@@ -137,9 +137,13 @@ $ZBX_MENU = array(
 						'label'=>S_HOST_GROUPS
 					),
 				array(
+						'url'=>'templates.php',
+						'label'=>S_TEMPLATES
+					),
+				array(
 						'url'=>'hosts.php',
 						'label'=>S_HOSTS,
-						'sub_pages'=>array('items.php','triggers.php','graphs.php','templates.php','applications.php','tr_logform.php','tr_testexpr.php','popup_trexpr.php','popup_gitem.php')
+						'sub_pages'=>array('items.php','triggers.php','graphs.php','applications.php','tr_logform.php','tr_testexpr.php','popup_trexpr.php','popup_gitem.php')
 					),
 				array(
 						'url'=>'maintenance.php',
@@ -150,14 +154,19 @@ $ZBX_MENU = array(
 						'label'=>S_WEB,
 						'sub_pages'=>array('popup_httpstep.php')
 					),
-				array('url'=>'actionconf.php'	,'label'=>S_ACTIONS),
+				array('url'=>'actionconf.php',
+						'label'=>S_ACTIONS
+					),
 				array('url'=>'screenconf.php',
-						'label'=>S_SCREENS,
-						'sub_pages'=>array('screenedit.php')
+						'label' => S_SCREENS,
+						'sub_pages' => array('screenedit.php')
+					),
+				array('url'=>'slideconf.php',
+						'label' => S_SLIDES,
 					),
 				array('url'=>'sysmaps.php',
-						'label'=>S_MAPS,
-						'sub_pages'=>array('image.php','sysmap.php','popup_link_tr.php')
+						'label' => S_MAPS,
+						'sub_pages' => array('image.php','sysmap.php','popup_link_tr.php')
 					),
 				array('url'=>'services.php',
 						'label'=>S_IT_SERVICES,

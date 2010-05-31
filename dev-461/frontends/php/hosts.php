@@ -555,25 +555,16 @@ include_once('include/page_header.php');
 <?php
 
 	$frmForm = new CForm();
-	$cmbConf = new CComboBox('config', 'hosts.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
-		$cmbConf->addItem('templates.php', S_TEMPLATES);
-		$cmbConf->addItem('hosts.php', S_HOSTS);
-		$cmbConf->addItem('items.php', S_ITEMS);
-		$cmbConf->addItem('triggers.php', S_TRIGGERS);
-		$cmbConf->addItem('graphs.php', S_GRAPHS);
-		$cmbConf->addItem('applications.php', S_APPLICATIONS);
-	$frmForm->addItem($cmbConf);
-
 	if(!isset($_REQUEST['form'])){
 		$frmForm->addItem(new CButton('form',S_CREATE_HOST));
 	}
 
 	$hosts_wdgt = new CWidget();
 	$hosts_wdgt->addPageHeader(S_CONFIGURATION_OF_HOSTS, $frmForm);
-	
 
 	$options = array(
 		'groups' => array(
+			'real_hosts' => 1,
 			'editable' => 1,
 		),
 		'groupid' => get_request('groupid', null),
@@ -582,6 +573,7 @@ include_once('include/page_header.php');
 
 	$_REQUEST['groupid'] = $pageFilter->groupid;
 	$_REQUEST['hostid'] = get_request('hostid', 0);
+
 ?>
 <?php
 	// echo SBR;
@@ -626,22 +618,24 @@ include_once('include/page_header.php');
 			S_AVAILABILITY
 		));
 
+// get Hosts
+		$hosts = array();
 
 		$sortfield = getPageSortField('host');
 		$sortorder = getPageSortOrder();
-		$options = array(
-			'output' => API_OUTPUT_EXTEND,
-			'editable' => 1,
-			'sortfield' => $sortfield,
-			'sortorder' => $sortorder,
-			'limit' => ($config['search_limit']+1)
-		);
+		
+		if($pageFilter->groupsSelected){
+			$options = array(
+				'editable' => 1,
+				'sortfield' => $sortfield,
+				'sortorder' => $sortorder,
+				'limit' => ($config['search_limit']+1)
+			);
 
-		if($pageFilter->groupsSelected && $pageFilter->groupid > 0){
-			$options['groupids'] = $pageFilter->groupid;
+			if($pageFilter->groupid > 0) $options['groupids'] = $pageFilter->groupid;
+
+			$hosts = CHost::get($options);
 		}
-
-		$hosts = CHost::get($options);
 
 // sorting && paging
 		order_result($hosts, $sortfield, $sortorder);

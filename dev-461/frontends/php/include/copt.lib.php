@@ -345,7 +345,7 @@ if(defined('USE_PROFILING')){
 			$debug->setAttribute('style','display: none; overflow: auto; width: 95%; border: 1px #777777 solid; margin: 4px; padding: 4px;');
 
 			if(self::$memory_limit_reached){
-				$debug->addItem(array(BR(),new CJSscript(S_MEMORY_LIMIT_REACHED),BR()));
+				$debug->addItem(array(BR(), S_MEMORY_LIMIT_REACHED,BR()));
 			}
 			foreach(self::$debug_info as $type => $info){
 				$debug->addItem(array(BR(),new CJSscript($info),BR()));

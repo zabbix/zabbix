@@ -66,20 +66,21 @@ class CPageFilter{
 				$this->_updateGHbyGraph($options);
 			}
 		}
-
-
+// groups
 		if(isset($options['groups'])){
 			if(!isset($options['groupid']) && isset($options['hostid'])){
 				$options['groupid'] = 0;
 			}
-			
+
 			$this->_profileIdx['groups'] = 'web.'.$page['menu'].'.groupid';
 			$this->_initGroups($options['groupid'], $options['groups']);
 		}
+// hosts
 		if(isset($options['hosts'])){
 			$this->_profileIdx['hosts'] = 'web.'.$page['menu'].'.hostid';
 			$this->_initHosts($options['hostid'], $options['hosts']);
 		}
+// graphs
 		if(isset($options['graphs'])){
 			$this->_profileIdx['graphs'] = 'web.'.$page['file'].'.graphid';
 			$this->_initGraphs($options['graphid'], $options['graphs']);
@@ -131,8 +132,7 @@ class CPageFilter{
 		CProfile::update($this->_profileIdx['groups'], $groupid, PROFILE_TYPE_ID);
 		CProfile::update(self::GROUP_LATEST_IDX, $groupid, PROFILE_TYPE_ID);
 
-		$this->isSelected['groupsSelected'] = (($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL) && !empty($this->data['groups']))
-			|| ($groupid > 0);
+		$this->isSelected['groupsSelected'] = (($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL) && !empty($this->data['groups'])) || ($groupid > 0);
 		$this->ids['groupid'] = $groupid;
 	}
 

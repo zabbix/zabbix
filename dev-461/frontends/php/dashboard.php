@@ -237,13 +237,13 @@ include_once('include/page_header.php');
 
 	$fs_icon = new CDiv(SPACE,'fullscreen');
 	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-	$fs_icon->addAction('onclick',new CJSscript("javascript: document.location = '".$url->getUrl()."';"));
+	$fs_icon->addAction('onclick', "javascript: document.location = '".$url->getUrl()."';");
 
 	$style = $dashconf['filterEnable']?'iconconfig_hl':'iconconfig';
 	$state = S_FILTER.' '.($dashconf['filterEnable']?S_ENABLED:S_DISABLED);
 	$dc_icon = new CDiv(SPACE,$style);
 	$dc_icon->setAttribute('title', S_CONFIGURE.' ('.$state.')');
-	$dc_icon->addAction('onclick',new CJSscript("javascript: document.location = 'dashconf.php';"));
+	$dc_icon->addAction('onclick', "javascript: document.location = 'dashconf.php';");
 
 
 	$dashboard_wdgt->setClass('header');
