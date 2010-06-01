@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2035] fixed host full cloning (Vedmak)
  - [ZBX-1986] fixed empty Y axis if item values are zeros (Aly)
  - [ZBX-2492] updated Japanese translation; thanks to Kodai Terashima (Richlv)
  - [ZBX-1357] update Hungarian translation; thanks to Laszlo Szabo (Richlv)

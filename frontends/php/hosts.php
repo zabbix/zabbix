@@ -426,9 +426,15 @@ include_once('include/page_header.php');
 			// }
 
 // Host graphs
-			$graphs = CGraph::get(array('hostids' => $clone_hostid, 'inherited' => 0));
-
-			foreach($graphs as $graph){
+			$options = array(
+				'inherited' => 0,
+				'hostids' => $clone_hostid,
+				'select_hosts' => API_OUTPUT_REFER,
+				'output' => API_OUTPUT_EXTEND,
+			);
+			$graphs = CGraph::get($options);
+			foreach($graphs as $gnum => $graph){
+				if(count($graph['hosts']) > 1) continue;
 				$result &= (bool) copy_graph_to_host($graph['graphid'], $hostid, true);
 			}
 
