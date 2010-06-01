@@ -5970,29 +5970,27 @@
 			$host_tbl->addRow(array(S_TRIGGERS, $trig_lbx));
 
 // Host graphs
-			$available_graphs = get_accessible_graphs(PERM_READ_ONLY, array($_REQUEST['hostid']), PERM_RES_IDS_ARRAY);
+			$options = array(
+				'inherited' => 0,
+				'hostids' => $_REQUEST['hostid'],
+				'select_hosts' => API_OUTPUT_REFER,
+				'output' => API_OUTPUT_EXTEND,
+			);
+			$host_graphs = CGraph::get($options);
+			
+			if(!empty($host_graphs)){
+				$graphs_lbx = new CListBox('graphs', null, 8);
+				$graphs_lbx->setAttribute('disabled', 'disabled');
 
-			$graphs_lbx = new CListBox('graphs',null,8);
-			$graphs_lbx->setAttribute('disabled','disabled');
-
-			$def_items = array();
-			$sql = 'SELECT DISTINCT g.* '.
-						' FROM graphs g, graphs_items gi,items i '.
-						' WHERE '.DBcondition('g.graphid',$available_graphs).
-							' AND gi.graphid=g.graphid '.
-							' AND g.templateid=0 '.
-							' AND i.itemid=gi.itemid '.
-							' AND i.hostid='.$_REQUEST['hostid'].
-						' ORDER BY g.name';
-
-			$host_graph_res = DBselect($sql);
-			while($host_graph = DBfetch($host_graph_res)){
-				$graphs_lbx->addItem($host_graph['graphid'],$host_graph['name']);
+				order_result($host_graphs, 'name');
+				foreach($host_graphs as $hgraph){
+					if(count($hgraph['hosts']) > 1) continue;
+					$graphs_lbx->addItem($hgraph['graphid'], $hgraph['name']);
+				}
+				
+				if($graphs_lbx->ItemsCount() > 1)
+					$host_tbl->addRow(array(S_GRAPHS, $graphs_lbx));
 			}
-
-			if($graphs_lbx->ItemsCount() < 1) $graphs_lbx->setAttribute('style','width: 200px;');
-
-			$host_tbl->addRow(array(S_GRAPHS, $graphs_lbx));
 		}
 
 		$host_footer = array();
