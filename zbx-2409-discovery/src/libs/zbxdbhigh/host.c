@@ -722,7 +722,7 @@ static void	DBupdate_services_status_all(void)
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(serviceid, row[0]);
-		if (NULL == row[2])
+		if (SUCCEED == DBis_null(row[2]))
 			triggerid = 0;
 		else
 			ZBX_STR2UINT64(triggerid, row[2]);
