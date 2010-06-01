@@ -826,6 +826,7 @@
 
 //	hosts.php
 	'S_MACROS'=>					'Macros',
+	'S_MACRO'=>					'Macro',
 	'S_WRONG_MACRO'=>				'Wrong macro',
 	'S_MACRO_TOO_LONG'=>				'Macro name is too long, should not exceed 64 chars.',
 	'S_MACRO_VALUE_TOO_LONG'=>			'Macro value is too long, should not exceed 255 chars.',
@@ -834,6 +835,8 @@
 	'S_EMPTY_MACRO_VALUE'=>				'Empty macro value',
 	'S_NO_MACROS_DEFINED'=>				'No macros defined',
 	'S_MACRO_ADDED'=>				'Macro added',
+	'S_MACROS_UPDATED'=>				'Macros updated',
+	'S_CANNOT_UPDATE_MACROS'=>				'Cannot update macros',
 	'S_MACROS_DELETED' =>				'Macros deleted',
 	'S_CANNOT_ADD_MACRO'=>				'Cannot add macro',
 	'S_CANNOT_DELETE_MACROS'=>			'Cannot delete macros',
