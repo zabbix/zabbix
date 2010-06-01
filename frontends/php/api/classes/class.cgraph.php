@@ -972,6 +972,7 @@ COpt::memoryPick();
 				'hostids' => $data['hostids'],
 				'editable' => 1,
 				'preservekeys' => 1,
+				'templated_hosts' => 1,
 				'output' => API_OUTPUT_SHORTEN
 			);
 			$allowedHosts = CHost::get($options);		
@@ -980,7 +981,6 @@ COpt::memoryPick();
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				}
 			}
-
 			$options = array(
 				'templateids' => $data['templateids'],
 				'preservekeys' => 1,
