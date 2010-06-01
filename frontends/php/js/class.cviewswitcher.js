@@ -20,73 +20,73 @@
 var CViewSwitcher = Class.create();
 
 CViewSwitcher.prototype = {
-  mainObj : null,
-  shownIds : new Array(),
-  depIds : {},
-  lastValue : null,
+	mainObj : null,
+	shownIds : new Array(),
+	depIds : {},
+	lastValue : null,
 
-  initialize : function(objId, objAction, confData) {
-    
-    this.depIds = confData;
-    this.mainObj = document.getElementById(objId);
+	initialize : function(objId, objAction, confData) {
+		this.depIds = confData;
+		this.mainObj = $(objId);
+		if(is_null(this.mainObj)) throw('ViewSwitcher error: main object not found!');
+	
+		if(!is_array(objAction)) objAction = new Array(objAction);
 
-    if(!is_array(objAction)) objAction = new Array(objAction);
-    
-    for(var i = 0; i < objAction.length; i++)
-      addListener(this.mainObj, objAction[i], this.rebuildView.bindAsEventListener(this));
+		for(var i=0; i<objAction.length; i++){
+			addListener(this.mainObj, objAction[i], this.rebuildView.bindAsEventListener(this));
+		}
 
-    this.rebuildView();
-  },
-  
-  rebuildView : function () {
-    var myValue = this.objValue();
+		this.rebuildView();
+	},
 
-    if(myValue == this.lastValue) return;
+	rebuildView : function () {
+		var myValue = this.objValue();
+		if(myValue == this.lastValue) return;
 
-    for(var i  = 0; i < this.shownIds.length; i++) {
-      this.shownIds[i].style.display = 'none';
-      this.shownIds[i].setAttribute('disabled', 'disabled');
-    }
+		for(var i=0; i<this.shownIds.length; i++){
+			this.shownIds[i].style.display = 'none';
+			this.shownIds[i].setAttribute('disabled', 'disabled');
+		}
 
-    this.shownIds = null;
-    this.shownIds = new Array();
+		this.shownIds = new Array();
 
-    if(this.depIds[myValue]) {
-      for(var i in this.depIds[myValue]) {
-        var elm = document.getElementById(this.depIds[myValue][i]);
+		if(isset(myValue, this.depIds)) {
+			for(var key in this.depIds[myValue]){
+				var elm = $(this.depIds[myValue][key]);
+				if(is_null(elm)) continue;
 
-        if(!elm) continue;
+				if(elm.removeAttribute) elm.removeAttribute('disabled');
+				elm.style.display = 'inline';
 
-        if(elm.removeAttribute) elm.removeAttribute('disabled');
-        elm.style.display = 'inline';
-        this.shownIds.push(elm);
-      }
-    }
-    
-    this.lastValue = myValue;
-  },
-  
-  objValue : function () {
-    var aValue;
-    
-    if(this.mainObj.tagName) {
-      switch(this.mainObj.tagName.toString().toLowerCase()) {
-        case 'select':
-          aValue = this.mainObj.options[this.mainObj.selectedIndex].value;
-        break;
-        case 'input':
-          //TO DO should be added support of checkboxes, radio and etc
-          aValue = this.mainObj.value;
-        break;
-        case 'textarea':
-          aValue = this.mainObj.value;
-        break;
-        default:
-          aValue = this.mainObj.valueOf();
-      }
-    }else
-      aValue = this.mainObj.valueOf();
+				this.shownIds.push(elm);
+			}
+		}
 
-    return aValue;
-  }
+		this.lastValue = myValue;
+	},
+
+	objValue : function () {
+		var aValue;
+
+		if(this.mainObj.tagName) {
+			switch(this.mainObj.tagName.toString().toLowerCase()) {
+				case 'select':
+					aValue = this.mainObj.options[this.mainObj.selectedIndex].value;
+					break;
+				case 'input':
+					//TO DO should be added support of checkboxes, radio and etc
+					aValue = this.mainObj.value;
+					break;
+				case 'textarea':
+					aValue = this.mainObj.value;
+					break;
+				default:
+					aValue = this.mainObj.valueOf();
+			}
+		}
+		else
+			aValue = this.mainObj.valueOf();
+
+	return aValue;
+	}
 }
