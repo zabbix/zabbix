@@ -49,7 +49,7 @@ class Curl{
 		$this->arguments =	array();
 
 		if(empty($url)){
-			$this->formatArguments();
+			$this->formatGetArguments();
 
 			// $protocol = (zbx_strpos(zbx_strtolower($_SERVER['SERVER_PROTOCOL']), 'shttp') !== false)?'shttp':'http';
 			$protocol = ((isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on')) || ($_SERVER['SERVER_PORT'] == 443)) ? 'https' : 'http';
@@ -57,7 +57,7 @@ class Curl{
 			$this->url = $url = $protocol.'://'.$_SERVER['SERVER_NAME'].':'.$_SERVER['SERVER_PORT'].$_SERVER['SCRIPT_NAME'].'?'.$this->getQuery();
 		}
 		else{
-			$this->url=urldecode($url);
+			$this->url = $url;
 
 			$tmp_pos = zbx_strpos($this->url,'?');
 			$this->query=($tmp_pos!==false)?(substr($this->url,$tmp_pos+1)):'';
@@ -141,19 +141,22 @@ class Curl{
 	}
 
 	public function formatQuery(){
-		$query = '';
+		$query = Array();
+
 		foreach($this->arguments as $key => $value){
 			if(is_null($value)) continue;
 			if(is_array($value)){
 				foreach($value as $vkey => $vvalue){
-					$query.= $key.'['.$vkey.']='.$vvalue.'&';
+					if(is_array($vvalue)) continue;
+
+					$query[] = $key.'['.$vkey.']='.rawurlencode($vvalue);
 				}
 			}
 			else{
-				$query.= $key.'='.$value.'&';
+				$query[] = $key.'='.rawurlencode($value);
 			}
 		}
-		$this->query = rtrim($query,'&');
+		$this->query = implode('&', $query);
 	}
 
 	public function formatGetArguments(){
@@ -171,23 +174,25 @@ class Curl{
 			foreach($args as $id => $arg){
 				if(empty($arg)) continue;
 
-				$tmp = explode('=',$arg);
-				$this->arguments[$tmp[0]] = isset($tmp[1])?$tmp[1]:'';
+				list($name, $value) = explode('=',$arg);
+				$this->arguments[$name] = isset($value) ? urldecode($value):'';
 			}
 		}
 		$this->formatQuery();
 	}
 
 	public function getUrl(){
-			$url = $this->protocol ? $this->protocol.'://' : '';
-			$url .= $this->username ? $this->username : '';
-			$url .= $this->password ? ':'.$this->password : '';
-			$url .= $this->host ? $this->host : '';
-			$url .= $this->port ? ':'.$this->port : '';
-			$url .= $this->path ? $this->path : '';
-			$url .= $this->query ? '?'.$this->query : '';
-			$url .= $this->reference ? '#'.urlencode($this->reference) : '';
-	//SDI($this->getProtocol().' : '.$this->getHost().' : '.$this->getPort().' : '.$this->getPath().' : '.$this->getQuery());
+		$this->formatQuery();
+
+		$url = $this->protocol ? $this->protocol.'://' : '';
+		$url .= $this->username ? $this->username : '';
+		$url .= $this->password ? ':'.$this->password : '';
+		$url .= $this->host ? $this->host : '';
+		$url .= $this->port ? ':'.$this->port : '';
+		$url .= $this->path ? $this->path : '';
+		$url .= $this->query ? '?'.$this->query : '';
+		$url .= $this->reference ? '#'.urlencode($this->reference) : '';
+//SDI($this->getProtocol().' : '.$this->getHost().' : '.$this->getPort().' : '.$this->getPath().' : '.$this->getQuery());
 	return $url;
 	}
 
@@ -201,7 +206,6 @@ class Curl{
 
 	public function setArgument($key,$value=''){
 		$this->arguments[$key] = $value;
-		$this->formatQuery();
 	}
 
 	public function getArgument($key){
@@ -216,6 +220,7 @@ class Curl{
 	}
 
 	public function getQuery(){
+		$this->formatQuery();
 		return $this->query;
 	}
 

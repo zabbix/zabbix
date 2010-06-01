@@ -61,10 +61,6 @@
 			$page['title'] = 'S_TRIGGERS_BIG';
 			$min_user_type = USER_TYPE_ZABBIX_USER;
 			break;
-		case 'logitems':
-			$page['title'] = 'S_ITEMS_BIG';
-			$min_user_type = USER_TYPE_ZABBIX_USER;
-			break;
 		case 'usrgrp':
 			$page['title'] = 'S_GROUPS';
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
@@ -173,7 +169,9 @@ include_once('include/page_header.php');
 		'only_hostid'=>		array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 		'monitored_hosts'=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
 		'real_hosts'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
-		'itemtype'=>		array(T_ZBX_INT, O_OPT, null,   null,		null),
+
+		'itemtype'=>		array(T_ZBX_INT, O_OPT, null,   null,			null),
+		'value_types'=>		array(T_ZBX_INT, O_OPT, null,   BETWEEN(0,15),	null),
 
 		'reference'=>		array(T_ZBX_STR, O_OPT, null,   null,		null),
 		'writeonly'=>		array(T_ZBX_STR, O_OPT, null,   null,		null),
@@ -202,10 +200,14 @@ include_once('include/page_header.php');
 
 	$reference = get_request('reference','unknown');
 
+// hosts
 	$real_hosts			= get_request('real_hosts', 0);
 	$monitored_hosts	= get_request('monitored_hosts', 0);
 	$templated_hosts	= get_request('templated_hosts', 0);
 	$only_hostid		= get_request('only_hostid', null);
+
+// items
+ 	$value_types		= get_request('value_types', null);
 
 	$host_status = null;
 	$templated = null;
@@ -251,6 +253,9 @@ include_once('include/page_header.php');
 	if($real_hosts)
 		$frmTitle->addVar('real_hosts', 1);
 
+	if($value_types)
+		$frmTitle->addVar('value_types', $value_types);
+
 	$frmTitle->addVar('dstfrm', $dstfrm);
 	$frmTitle->addVar('dstact', $dstact);
 	$frmTitle->addVar('dstfld1', $dstfld1);
@@ -290,7 +295,7 @@ include_once('include/page_header.php');
 	$PAGE_GROUPS = get_viewed_groups($perm, $params, $nodeid);
 	$PAGE_HOSTS = get_viewed_hosts($perm, $PAGE_GROUPS['selected'], $params, $nodeid);
 
-	if(str_in_array($srctbl, array('graphs','applications','screens','triggers','logitems','items','simple_graph','plain_text'))){
+	if(str_in_array($srctbl, array('graphs','applications','screens','triggers','items','simple_graph','plain_text'))){
 		validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
 	}
 	else if(str_in_array($srctbl,array('host_group','hosts','templates','host_templates','hosts_and_templates'))){
@@ -311,8 +316,8 @@ include_once('include/page_header.php');
 		$hostid = $_REQUEST['hostid'] = $only_hostid;
 	}
 	else{
-		if(str_in_array($srctbl,array('hosts','host_group','triggers','logitems','items',
-									'applications','screens','slides','graphs','simple_graph',
+		if(str_in_array($srctbl,array('hosts','host_group','triggers','items','simple_graph',
+									'applications','screens','slides','graphs',
 									'sysmaps','plain_text','screens2','overview','host_group_scr')))
 		{
 			if(ZBX_DISTRIBUTED){
@@ -330,7 +335,7 @@ include_once('include/page_header.php');
 		if(!isset($ok)) $nodeid = get_current_nodeid();
 		unset($ok);
 
-		if(str_in_array($srctbl,array('hosts_and_templates', 'hosts','templates','triggers','logitems','items','applications','host_templates','graphs','simple_graph','plain_text'))){
+		if(str_in_array($srctbl,array('hosts_and_templates', 'hosts','templates','triggers','items','applications','host_templates','graphs','simple_graph','plain_text'))){
 
 			$groupid = $PAGE_GROUPS['selected'];
 			$cmbGroups = new CComboBox('groupid',$groupid,'javascript: submit();');
@@ -350,7 +355,7 @@ include_once('include/page_header.php');
 			$frmTitle->addItem(array(S_TYPE,SPACE,$cmbTypes));
 		}
 
-		if(str_in_array($srctbl,array('triggers','logitems','items','applications','graphs','simple_graph','plain_text'))){
+		if(str_in_array($srctbl,array('triggers','items','applications','graphs','simple_graph','plain_text'))){
 			$hostid = $PAGE_HOSTS['selected'];
 
 			$cmbHosts = new CComboBox('hostid',$hostid,'javascript: submit();');
@@ -362,13 +367,15 @@ include_once('include/page_header.php');
 			CProfile::update('web.popup.hostid',$hostid,PROFILE_TYPE_ID);
 		}
 
-		if(str_in_array($srctbl,array('triggers','hosts','host_group'))){
-			$btnEmpty = new CButton('empty',S_EMPTY,
-				get_window_opener($dstfrm, $dstfld1, 0).
-				get_window_opener($dstfrm, $dstfld2, '').
-				" close_window(); return false;");
+		if(str_in_array($srctbl,array('triggers','hosts','host_group','hosts_and_templates'))){
+			$value1 = (isset($_REQUEST['dstfld1']) && (zbx_strpos($_REQUEST['dstfld1'], 'id') !== false))?0:'';
+			$value2 = (isset($_REQUEST['dstfld2']) && (zbx_strpos($_REQUEST['dstfld2'], 'id') !== false))?0:'';
 
-			$frmTitle->addItem(array(SPACE,$btnEmpty));
+			$epmtyScript = get_window_opener($dstfrm, $dstfld1, $value1);
+			$epmtyScript.= get_window_opener($dstfrm, $dstfld2, $value2);
+			$epmtyScript.= ' close_window(); return false;';
+
+			$frmTitle->addItem(array(SPACE,new CButton('empty',S_EMPTY, $epmtyScript)));
 		}
 	}
 
@@ -392,48 +399,41 @@ include_once('include/page_header.php');
 		$hosts = CHost::get($options);
 
 		foreach($hosts as $hnum => $host){
-
-			$name = new CSpan($host['host'],'link');
+			$name = new CSpan($host['host'], 'link');
 			$action = get_window_opener($dstfrm, $dstfld1, $host[$srcfld1]).
-					(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $host[$srcfld2]) : '');
+				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $host[$srcfld2]) : '');
+			$name->setAttribute('onclick', $action.' close_window();');
 
-			$name->setAttribute('onclick', $action." close_window();");
-
-			if($host["status"] == HOST_STATUS_MONITORED)
-				$status=new CSpan(S_MONITORED,"off");
-			else if($host["status"] == HOST_STATUS_NOT_MONITORED)
-				$status=new CSpan(S_NOT_MONITORED,"on");
+			if($host['status'] == HOST_STATUS_MONITORED)
+				$status=new CSpan(S_MONITORED,'off');
+			else if($host['status'] == HOST_STATUS_NOT_MONITORED)
+				$status=new CSpan(S_NOT_MONITORED,'on');
 			else
 				$status=S_UNKNOWN;
 
-			if($host["status"] == HOST_STATUS_TEMPLATE){
+			if($host['status'] == HOST_STATUS_TEMPLATE){
 				$dns = $ip = $port = $available = '-';
 			}
 			else{
 				$dns = $host['dns'];
 				$ip = $host['ip'];
 
-				if($host["useip"]==1)
-					$ip = bold($ip);
-				else
-					$dns = bold($dns);
+				$tmp = ($host['useip']==1) ? 'ip' : 'dns';
+				$$tmp = bold($$tmp);
 
-				$port = $host["port"];
-
-				if($host["available"] == HOST_AVAILABLE_TRUE)
-					$available=new CSpan(S_AVAILABLE,"off");
-				else if($host["available"] == HOST_AVAILABLE_FALSE)
-					$available=new CSpan(S_NOT_AVAILABLE,"on");
-				else if($host["available"] == HOST_AVAILABLE_UNKNOWN)
-					$available=new CSpan(S_UNKNOWN,"unknown");
-
+				if($host['available'] == HOST_AVAILABLE_TRUE)
+					$available=new CSpan(S_AVAILABLE,'off');
+				else if($host['available'] == HOST_AVAILABLE_FALSE)
+					$available=new CSpan(S_NOT_AVAILABLE,'on');
+				else if($host['available'] == HOST_AVAILABLE_UNKNOWN)
+					$available=new CSpan(S_UNKNOWN,'unknown');
 			}
 
 			$table->addRow(array(
 				$name,
 				$dns,
 				$ip,
-				$port,
+				$host['port'],
 				$status,
 				$available
 				));
@@ -487,13 +487,10 @@ include_once('include/page_header.php');
 			$chk = new CCheckBox('templates['.$host['hostid'].']', isset($templates[$host['hostid']]), null, $host['host']);
 			$chk->setEnabled(!isset($existed_templates[$host['hostid']]) && !isset($excludeids[$host['hostid']]));
 
-			$table->addRow(array(
-				array(
-					$chk,
-					$host['host'])
-				));
-
-			unset($host);
+			$table->addRow(array(array(
+				$chk,
+				$host['host'])
+			));
 		}
 
 		$table->setFooter(new CButton('select',S_SELECT));
@@ -514,7 +511,7 @@ include_once('include/page_header.php');
 		$form->addItem($table);
 		$form->show();
 	}
-	else if(str_in_array($srctbl,array('host_group'))){
+	else if($srctbl == 'host_group'){
 		$table = new CTableInfo(S_NO_GROUPS_DEFINED);
 		$table->setHeader(array(S_NAME));
 
@@ -532,7 +529,6 @@ include_once('include/page_header.php');
 			$name = new CSpan($row['name'],'link');
 
 			$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
-//			$row['name'] = $row['node_name'].$row['name'];
 
 			$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
 				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
@@ -543,15 +539,15 @@ include_once('include/page_header.php');
 		}
 		$table->show();
 	}
-	else if(str_in_array($srctbl,array('host_templates'))){
+	else if($srctbl == 'host_templates'){
 		$table = new CTableInfo(S_NO_TEMPLATES_DEFINED);
 		$table->setHeader(array(S_NAME));
 
 		$options = array(
-				'nodeids' => $nodeid,
-				'groupids'=>$groupid,
-				'extendoutput' => 1,
-				'sortfield'=>'host'
+			'nodeids' => $nodeid,
+			'groupids' => $groupid,
+			'extendoutput' => 1,
+			'sortfield' => 'host'
 			);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 
@@ -598,7 +594,7 @@ include_once('include/page_header.php');
 		}
 		$table->show();
 	}
-	else if($srctbl == "usrgrp"){
+	else if($srctbl == 'usrgrp'){
 		$table = new CTableInfo(S_NO_GROUPS_DEFINED);
 		$table->setHeader(array(S_NAME));
 
@@ -622,7 +618,7 @@ include_once('include/page_header.php');
 		}
 		$table->show();
 	}
-	else if($srctbl == "users"){
+	else if($srctbl == 'users'){
 		$table = new CTableInfo(S_NO_USERS_DEFINED);
 		$table->setHeader(array(S_ALIAS, S_NAME, S_SURNAME));
 
@@ -646,7 +642,7 @@ include_once('include/page_header.php');
 		}
 		$table->show();
 	}
-	else if($srctbl == "help_items"){
+	else if($srctbl == 'help_items'){
 		$table = new CTableInfo(S_NO_ITEMS);
 		$table->setHeader(array(S_KEY,S_DESCRIPTION));
 
@@ -688,14 +684,15 @@ include_once('include/page_header.php');
 		$table->setHeader($header);
 
 		$options = array(
-				'nodeids' => $nodeid,
-				'hostids' => $hostid,
-				'output' => API_OUTPUT_EXTEND,
-				'select_hosts' => API_OUTPUT_EXTEND,
-				'select_items' => API_OUTPUT_EXTEND,
-				'select_functions' => API_OUTPUT_EXTEND,
-				'select_dependencies' => API_OUTPUT_EXTEND
-			);
+			'nodeids' => $nodeid,
+			'hostids' => $hostid,
+			'output' => API_OUTPUT_EXTEND,
+			'select_hosts' => API_OUTPUT_EXTEND,
+			'select_items' => API_OUTPUT_EXTEND,
+			'select_functions' => API_OUTPUT_EXTEND,
+			'select_dependencies' => API_OUTPUT_EXTEND,
+			'expandDescription' => 1,
+		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 		if(!is_null($templated)) $options['templated'] = $templated;
 
@@ -710,7 +707,6 @@ include_once('include/page_header.php');
 			$host = reset($trigger['hosts']);
 			$trigger['host'] = $host['host'];
 
-			$trigger['description'] = expandTriggerDescription($trigger);
 			$description = new CSpan($trigger['description'], 'link');
 
 			$trigger['description'] = $trigger['host'].':'.$trigger['description'];
@@ -741,7 +737,7 @@ include_once('include/page_header.php');
 					$description[] = array(expand_trigger_description_by_data($val),BR());
 			}
 
-			switch($trigger["status"]) {
+			switch($trigger['status']) {
 				case TRIGGER_STATUS_DISABLED:
 					$status = new CSpan(S_DISABLED, 'disabled');
 				break;
@@ -779,80 +775,48 @@ include_once('include/page_header.php');
 		$form->addItem($table);
 		$form->show();
 	}
-	else if($srctbl == "logitems"){
-		insert_js_function('add_item_variable');
+	else if($srctbl == 'items'){
+		$form = new CForm();
+		$form->setName('itemform');
+		$form->setAttribute('id', 'items');
 
 		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
 
-		$table->setHeader(array(
+		insert_js_function('addSelectedValues');
+		insert_js_function('addValues');
+		insert_js_function('addValue');
+
+		if($multiselect)
+			$header = array(
+				($hostid>0)?null:S_HOST,
+				array(new CCheckBox("all_items", NULL, "javascript: checkAll('".$form->getName()."', 'all_items','items');"), S_DESCRIPTION),
+				S_KEY,
+				S_TYPE,
+				S_TYPE_OF_INFORMATION,
+				S_STATUS
+			);
+		else
+			$header = array(
 				($hostid>0)?null:S_HOST,
 				S_DESCRIPTION,
-				S_KEY,nbsp(S_UPDATE_INTERVAL),
+				S_KEY,
+				S_TYPE,
+				S_TYPE_OF_INFORMATION,
 				S_STATUS
-			));
+			);
+
+		$table->setHeader($header);
 
 		$options = array(
-				'nodeids' => $nodeid,
-				'hostids'=>$hostid,
-				'output' => API_OUTPUT_EXTEND,
-				'select_hosts' => API_OUTPUT_EXTEND,
-				'filter' => array(
-					'value_type' => ITEM_VALUE_TYPE_LOG,
-				),
-				
-				'sortfield'=>'description'
-			);
+			'nodeids' => $nodeid,
+			'hostids' => $hostid,
+			'webitems' => 1,
+			'output' => API_OUTPUT_EXTEND,
+			'select_hosts' => API_OUTPUT_EXTEND
+		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 		if(!is_null($templated)) $options['templated'] = $templated;
-
-		$items = CItem::get($options);
-
-		foreach($items as $inum => $db_item){
-			$host = reset($db_item['hosts']);
-			$db_item['host'] = $host['host'];
-
-			$description = new CSpan(item_description($db_item),'link');
-			$description->onClick("return add_item_variable('".$dstfrm."','".$db_item["itemid"]."');");
-
-			switch($db_item["status"]){
-				case 0: $status=new CCol(S_ACTIVE,"enabled");		break;
-				case 1: $status=new CCol(S_DISABLED,"disabled");	break;
-				case 3: $status=new CCol(S_NOT_SUPPORTED,"unknown");	break;
-				default:$status=S_UNKNOWN;
-			}
-
-			$table->addRow(array(
-				($hostid>0)?null:$db_item['host'],
-				$description,
-				$db_item["key_"],
-				$db_item["delay"],
-				$status
-				));
-		}
-		unset($db_items, $db_item);
-
-		$table->show();
-	}
-	else if($srctbl == "items"){
-		$table = new CTableInfo(S_SELECT_HOST_DOT_DOT_DOT);
-		$table->setHeader(array(
-			($hostid>0)?null:S_HOST,
-			S_DESCRIPTION,
-			S_TYPE,
-			S_TYPE_OF_INFORMATION,
-			S_STATUS
-			));
-
-		$options = array(
-				'nodeids' => $nodeid,
-				'hostids' => $hostid,
-				'webitems' => 1,
-				'output' => API_OUTPUT_EXTEND,
-				'select_hosts' => API_OUTPUT_EXTEND,
-				'sortfield'=>'description'
-			);
-		if(!is_null($writeonly)) $options['editable'] = 1;
-		if(!is_null($templated)) $options['templated'] = $templated;
+		if(!is_null($value_types)) $options['filter']['value_type'] = $value_types;
 
 		$items = CItem::get($options);
 
@@ -860,24 +824,47 @@ include_once('include/page_header.php');
 			$host = reset($row['hosts']);
 			$row['host'] = $host['host'];
 
-			$row["description"] = item_description($row);
+			$row['description'] = item_description($row);
+			$description = new CLink($row['description'],'#');
 
-			$description = new CSpan($row["description"],'link');
+			$row['description'] = $row['host'].':'.$row['description'];
 
-			$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
-				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
+			if($multiselect){
+				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", '".$row[$srcfld1]."');";
+			}
+			else{
+				$values = array(
+					$dstfld1 => $row[$srcfld1],
+					$dstfld2 => $row[$srcfld2],
+				);
 
-			$description->setAttribute('onclick',$action." close_window(); return false;");
+				$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).','.zbx_jsvalue($values).'); return false;';
+			}
+
+			$description->setAttribute('onclick', $js_action);
+
+			if($multiselect){
+				$description = new CCol(array(new CCheckBox('items['.zbx_jsValue($row[$srcfld1]).']', NULL, NULL, $row['itemid']), $description));
+			}
 
 			$table->addRow(array(
 				($hostid>0)?null:$row['host'],
 				$description,
+				$row['key_'],
 				item_type2str($row['type']),
 				item_value_type2str($row['value_type']),
 				new CSpan(item_status2str($row['status']),item_status2style($row['status']))
 				));
 		}
-		$table->show();
+
+		if($multiselect){
+			$button = new CButton('select', S_SELECT, "javascript: addSelectedValues('items', ".zbx_jsvalue($reference).");");
+			$button->setType('button');
+			$table->setFooter(new CCol($button, 'right'));
+		}
+
+		$form->addItem($table);
+		$form->show();
 	}
 	else if($srctbl == 'applications'){
 		$table = new CTableInfo(S_NO_APPLICATIONS_DEFINED);
@@ -924,7 +911,7 @@ include_once('include/page_header.php');
 		}
 		$table->show();
 	}
-	else if($srctbl == "graphs"){
+	else if($srctbl == 'graphs'){
 		$form = new CForm();
 		$form->setName('graphform');
 		$form->setAttribute('id', 'graphs');
@@ -1019,7 +1006,7 @@ include_once('include/page_header.php');
 		$form->addItem($table);
 		$form->show();
 	}
-	else if($srctbl == "simple_graph"){
+	else if($srctbl == 'simple_graph'){
 		$form = new CForm();
 		$form->setName('itemform');
 		$form->setAttribute('id', 'items');
@@ -1465,7 +1452,7 @@ include_once('include/page_header.php');
 		}
 		$table->show();
 	}
-	else if($srctbl == "drules"){
+	else if($srctbl == 'drules'){
 		$table = new CTableInfo(S_NO_DISCOVERY_RULES_DEFINED);
 		$table->setHeader(S_NAME);
 
@@ -1482,7 +1469,7 @@ include_once('include/page_header.php');
 		}
 		$table->show();
 	}
-	else if($srctbl == "dchecks"){
+	else if($srctbl == 'dchecks'){
 		$table = new CTableInfo(S_NO_DISCOVERY_RULES_DEFINED);
 		$table->setHeader(S_NAME);
 

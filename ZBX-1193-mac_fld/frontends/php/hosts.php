@@ -34,11 +34,11 @@ include_once('include/page_header.php');
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 //ARRAYS
-		'hosts'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
-		'groups'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
-		'hostids'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
-		'groupids'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
-		'applications'=>array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
+		'hosts'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
+		'groups'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
+		'hostids'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
+		'groupids'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
+		'applications'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 // host
 		'groupid'=>			array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,			null),
 		'hostid'=>			array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,			'isset({form})&&({form}=="update")'),
@@ -65,16 +65,16 @@ include_once('include/page_header.php');
 
 		'useprofile'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	NULL),
 		'devicetype'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
-		'name'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
-		'os'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
+		'name'=>			array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
+		'os'=>				array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
 		'serialno'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
-		'tag'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
+		'tag'=>				array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
 		'macaddress'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
 		'hardware'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
 		'software'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
-		'contact'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
+		'contact'=>			array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
 		'location'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
-		'notes'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
+		'notes'=>			array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
 		'host_profile'=> 	array(T_ZBX_STR, O_OPT, P_UNSET_EMPTY,   NULL,   NULL),
 
 		'useprofile_ext'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	NULL),
@@ -87,8 +87,8 @@ include_once('include/page_header.php');
 		'macro_add' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	NULL),
 		'macros_del' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	NULL),
 // mass update
-		'massupdate'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-		'visible'=>			array(T_ZBX_STR, O_OPT,	null, 	null,	null),
+		'massupdate'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		'visible'=>				array(T_ZBX_STR, O_OPT,	null, 	null,	null),
 // actions
 		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
 // form
@@ -97,14 +97,14 @@ include_once('include/page_header.php');
 		'unlink'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	NULL),
 		'unlink_and_clear'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	NULL),
 		'save'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		'masssave'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'masssave'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'clone'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'full_clone'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'delete'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'cancel'=>				array(T_ZBX_STR, O_OPT, P_SYS,			NULL,	NULL),
 // other
-		'form'=>	array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-		'form_refresh'=>array(T_ZBX_STR, O_OPT, NULL,	NULL,	NULL)
+		'form'=>				array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		'form_refresh'=>		array(T_ZBX_STR, O_OPT, NULL,	NULL,	NULL)
 	);
 
 // OUTER DATA
@@ -455,12 +455,12 @@ include_once('include/page_header.php');
 			'hostids' => $hostids,
 			'output' => array('hostid', 'host')
 		);
-		$delHosts = CHost::get($options);
+		//$delHosts = CHost::get($options);
 
 		$go_result = CHost::delete($hosts);
-		foreach($delHosts as $hnum => $host){
+		/*foreach($delHosts as $hnum => $host){
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, 'Host ['.$host['host'].']');
-		}
+		}*/
 
 		$go_result = DBend($go_result);
 
@@ -511,19 +511,16 @@ include_once('include/page_header.php');
 	$hosts_wdgt->addPageHeader(S_CONFIGURATION_OF_HOSTS, $frmForm);
 	
 
-// TODO: neponjatno pochemu hostid sbrasivaetsja no on nuzhen dlja formi
-$thid = get_request('hostid', 0);
+	$options = array(
+		'groups' => array(
+			'editable' => 1,
+		),
+		'groupid' => get_request('groupid', null),
+	);
+	$pageFilter = new CPageFilter($options);
 
-	$params=array();
-	$options = array('only_current_node');
-	foreach($options as $option) $params[$option] = 1;
-
-	$PAGE_GROUPS = get_viewed_groups(PERM_READ_WRITE, $params);
-	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_WRITE, $PAGE_GROUPS['selected'], $params);
-
-	validate_group($PAGE_GROUPS,$PAGE_HOSTS);
-
-	$_REQUEST['hostid'] = $thid;
+	$_REQUEST['groupid'] = $pageFilter->groupid;
+	$_REQUEST['hostid'] = get_request('hostid', 0);
 ?>
 <?php
 	// echo SBR;
@@ -540,11 +537,7 @@ $thid = get_request('hostid', 0);
 		$frmForm = new CForm();
 		$frmForm->setMethod('get');
 
-		$cmbGroups = new CComboBox('groupid', $PAGE_GROUPS['selected'], 'javascript: submit();');
-		foreach($PAGE_GROUPS['groups'] as $groupid => $name){
-			$cmbGroups->addItem($groupid, $name);
-		}
-		$frmForm->addItem(array(S_GROUP.SPACE, $cmbGroups));
+		$frmForm->addItem(array(S_GROUP.SPACE, $pageFilter->getGroupsCB()));
 
 		$numrows = new CDiv();
 		$numrows->setAttribute('name', 'numrows');
@@ -583,8 +576,8 @@ $thid = get_request('hostid', 0);
 			'limit' => ($config['search_limit']+1)
 		);
 
-		if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
-			$options['groupids'] = $PAGE_GROUPS['selected'];
+		if($pageFilter->groupsSelected && $pageFilter->groupid > 0){
+			$options['groupids'] = $pageFilter->groupid;
 		}
 
 		$hosts = CHost::get($options);
@@ -625,13 +618,13 @@ $thid = get_request('hostid', 0);
 		$templates = zbx_toHash($templates, 'templateid');
 //---------
 		foreach($hosts as $num => $host){
-			$applications = array(new CLink(S_APPLICATIONS, 'applications.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$host['hostid']),
+			$applications = array(new CLink(S_APPLICATIONS, 'applications.php?groupid='.$_REQUEST['groupid'].'&hostid='.$host['hostid']),
 				' ('.$host['applications'].')');
 			$items = array(new CLink(S_ITEMS, 'items.php?filter_set=1&hostid='.$host['hostid']),
 				' ('.$host['items'].')');
-			$triggers = array(new CLink(S_TRIGGERS, 'triggers.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$host['hostid']),
+			$triggers = array(new CLink(S_TRIGGERS, 'triggers.php?groupid='.$_REQUEST['groupid'].'&hostid='.$host['hostid']),
 				' ('.$host['triggers'].')');
-			$graphs = array(new CLink(S_GRAPHS, 'graphs.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$host['hostid']),
+			$graphs = array(new CLink(S_GRAPHS, 'graphs.php?groupid='.$_REQUEST['groupid'].'&hostid='.$host['hostid']),
 				' ('.$host['graphs'].')');
 
 			$description = array();
@@ -640,6 +633,7 @@ $thid = get_request('hostid', 0);
 				$proxy = reset($proxy);
 				$description[] = $proxy['host'] . ':';
 			}
+
 			$description[] = new CLink($host['host'], 'hosts.php?form=update&hostid='.$host['hostid'].url_param('groupid'));
 
 			$dns = empty($host['dns']) ? '-' : $host['dns'];
@@ -647,16 +641,35 @@ $thid = get_request('hostid', 0);
 			$use = (1 == $host['useip']) ? 'ip' : 'dns';
 			$$use = bold($$use);
 
+			$status_script = null;
 			switch($host['status']){
 				case HOST_STATUS_MONITORED:
-					$status = new CLink(S_MONITORED, 'hosts.php?hosts%5B%5D='.$host['hostid'].'&go=disable'.url_param('groupid'), 'off');
+					if($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON){
+						$status_caption = S_IN_MAINTENANCE;
+						$status_class = 'orange';
+					}
+					else{
+						$status_caption = S_MONITORED;
+						$status_class = 'enabled';
+					}
+
+					$status_script = 'javascript: if(!Confirm('.zbx_jsvalue(S_DISABLE_HOST.'?').')) cancelEvent();';
+					$status_url = 'hosts.php?hosts%5B%5D='.$host['hostid'].'&go=disable'.url_param('groupid');
 					break;
 				case HOST_STATUS_NOT_MONITORED:
-					$status = new CLink(S_NOT_MONITORED, 'hosts.php?hosts%5B%5D='.$host['hostid'].'&go=activate'.url_param('groupid'), 'on');
+					$status_caption = S_NOT_MONITORED;
+					$status_url = 'hosts.php?hosts%5B%5D='.$host['hostid'].'&go=activate'.url_param('groupid');
+					$status_script = 'javascript: if(!Confirm('.zbx_jsvalue(S_ENABLE_HOST.'?').')) cancelEvent();';
+					$status_class = 'disabled';
 					break;
 				default:
-					$status = S_UNKNOWN;
+					$status_caption = S_UNKNOWN;
+					$status_script = 'javascript: if(!Confirm('.zbx_jsvalue(S_DISABLE_HOST.'?').')) cancelEvent();';
+					$status_url = 'hosts.php?hosts%5B%5D='.$host['hostid'].'&go=disable'.url_param('groupid');
+					$status_class = 'unknown';
 			}
+
+			$status = new CLink($status_caption, $status_url, $status_class, $status_script);
 
 			switch($host['available']){
 				case HOST_AVAILABLE_TRUE:
@@ -776,6 +789,7 @@ $thid = get_request('hostid', 0);
 	}
 	
 	$hosts_wdgt->show();
+
 
 include_once('include/page_footer.php');
 ?>

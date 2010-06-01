@@ -55,13 +55,14 @@ body{
 
 /**************** OTHERS ****************/
 .top		{	vertical-align: top; }
-.footer 	{ 	color:#CCCCCC; }
+.footer 	{ 	color: #CCCCCC;	}
 
 .enabled	{	color: #00AA00;	}
 .disabled	{	color: #AA0000;	}
 .unknown	{	color: #AAAAAA;	}
-.on			{	color: #AA0000;	}
+.on		{	color: #AA0000;	}
 .off		{	color: #00AA00;	}
+.hidden		{	display: none;	}
 
 .disaster	{	background-color: #FF0000;	color: #222222;}
 .high		{	background-color: #FF8888;	color: #222222;}
@@ -71,9 +72,9 @@ body{
 .unknown_trigger{	background-color: #BCBCBC;	color: #222222;}
 .normal		{	background-color: #AADDAA;	color: #222222;}
 
-.img 		{	border-color:black; border-width:1px;	}
-img.top		{	vertical-align:text-top;}
-img.bottom	{	vertical-align:text-bottom;}
+.img 		{	border-color:black; border-width:1px;		}
+img.top		{	vertical-align:text-top;			}
+img.bottom	{	vertical-align:text-bottom;			}
 img.borderless	{	border-width: 0px; vertical-align: bottom;	}
 
 .center{

@@ -34,6 +34,7 @@ function __autoload($class_name){
 		'cevent' => 1,
 		'cgraph' => 1,
 		'cgraphitem' => 1,
+		'chistory' => 1,
 		'chost' => 1,
 		'chostgroup' => 1,
 		'cimage' => 1,
@@ -77,6 +78,19 @@ function __autoload($class_name){
 
 	require_once('include/nodes.inc.php');
 	require_once('include/hosts.inc.php');
+	require_once('include/items.inc.php');
+	require_once('include/triggers.inc.php');
+	require_once('include/graphs.inc.php');
+
+	require_once('include/maps.inc.php');
+	require_once('include/acknow.inc.php');
+	require_once('include/services.inc.php');
+	require_once('include/httptest.inc.php');
+
+	require_once('include/images.inc.php');
+	require_once('include/events.inc.php');
+	require_once('include/scripts.inc.php');
+	require_once('include/maintenances.inc.php');
 
 	require_once('include/users.inc.php');
 // GLOBALS
@@ -261,7 +275,7 @@ function __autoload($class_name){
 			$table->setAlign('center');
 			$table->setHeader(new CCol(S_CONFIG_ERROR_YOU_ARE_NOT_LOGGED_IN_HEAD, 'left'),'header');
 
-			$table->addRow(new CCol(Array(S_CONFIG_NOT_LOGGED_IN_ACCESS_DENIED, bold(ZBX_GUEST_USER), '. ', S_CONFIG_ERROR_YOU_MUST_LOGIN, BR(), S_CONFIG_NOT_LOGGED_IN_NOTE), 'center'));
+			$table->addRow(new CCol(Array(S_CONFIG_NOT_LOGGED_IN_ACCESS_DENIED, SPACE, bold(ZBX_GUEST_USER), '. ', S_CONFIG_ERROR_YOU_MUST_LOGIN, BR(), S_CONFIG_NOT_LOGGED_IN_NOTE), 'center'));
 
 			$url = urlencode($req->toString());
 			$footer = new CCol(
@@ -809,17 +823,15 @@ function __autoload($class_name){
 
 
 		/* Comments: !!! Don't forget sync code with C !!! */
-		$result=DBselect('SELECT i.type, i.delay, count(*)/i.delay as qps '.
-							' FROM items i,hosts h '.
-							' WHERE i.status='.ITEM_STATUS_ACTIVE.
-								' AND i.hostid=h.hostid '.
-								' AND h.status='.HOST_STATUS_MONITORED.
-							' GROUP BY i.type,i.delay ');
-
-		$status['qps_total']=0;
-		while($row=DBfetch($result)){
-			$status['qps_total']+=$row['qps'];
-		}
+		$sql = 'SELECT sum(1.0/i.delay) as qps '.
+				' FROM items i,hosts h '.
+				' WHERE i.status='.ITEM_STATUS_ACTIVE.
+					' AND i.hostid=h.hostid '.
+					' AND h.status='.HOST_STATUS_MONITORED.
+					' AND i.delay<>0';
+		$row = DBfetch(DBselect($sql));
+		
+		$status['qps_total'] = round($row['qps'],2);
 
 	return $status;
 	}
@@ -905,31 +917,6 @@ function __autoload($class_name){
 
 		return $res;
 	}
-
-/* Use ImageSetStyle+ImageLIne instead of bugged ImageDashedLine */
-	if(function_exists('imagesetstyle')){
-		function DashedLine($image,$x1,$y1,$x2,$y2,$color){
-// Style for dashed lines
-//			$style = array($color, $color, $color, $color, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT);
-			$style = array($color, $color, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT);
-			ImageSetStyle($image, $style);
-			ImageLine($image,$x1,$y1,$x2,$y2,IMG_COLOR_STYLED);
-		}
-
-	}
-	else{
-		function DashedLine($image,$x1,$y1,$x2,$y2,$color){
-			ImageDashedLine($image,$x1,$y1,$x2,$y2,$color);
-		}
-	}
-
-	function DashedRectangle($image,$x1,$y1,$x2,$y2,$color){
-		DashedLine($image, $x1,$y1,$x1,$y2,$color);
-		DashedLine($image, $x1,$y2,$x2,$y2,$color);
-		DashedLine($image, $x2,$y2,$x2,$y1,$color);
-		DashedLine($image, $x2,$y1,$x1,$y1,$color);
-	}
-
 
 	function set_image_header($format=null){
 		global $IMAGE_FORMAT_DEFAULT;

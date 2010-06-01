@@ -64,7 +64,7 @@ class CItem extends CZBXAPI{
 
 		$sql_parts = array(
 			'select' => array('items' => 'i.itemid'),
-			'from' => array('items i'),
+			'from' => array('items' => 'items i'),
 			'where' => array('webtype' => 'i.type<>9'),
 			'group' => array(),
 			'order' => array(),
@@ -74,6 +74,7 @@ class CItem extends CZBXAPI{
 			'nodeids'				=> null,
 			'groupids'				=> null,
 			'hostids'				=> null,
+			'proxyids'				=> null,
 			'itemids'				=> null,
 			'graphids'				=> null,
 			'triggerids'			=> null,
@@ -81,6 +82,7 @@ class CItem extends CZBXAPI{
 			'webitems'				=> null,
 			'inherited'				=> null,
 			'templated'				=> null,
+			'monitored'				=> null,
 			'editable'				=> null,
 			'nopermissions'			=> null,
 // filter
@@ -140,9 +142,9 @@ class CItem extends CZBXAPI{
 		else{
 			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
 
-			$sql_parts['from']['hg'] = 'hosts_groups hg';
-			$sql_parts['from']['r'] = 'rights r';
-			$sql_parts['from']['ug'] = 'users_groups ug';
+			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sql_parts['from']['rights'] = 'rights r';
+			$sql_parts['from']['users_groups'] = 'users_groups ug';
 			$sql_parts['where'][] = 'hg.hostid=i.hostid';
 			$sql_parts['where'][] = 'r.id=hg.groupid ';
 			$sql_parts['where'][] = 'r.groupid=ug.usrgrpid';
@@ -159,7 +161,7 @@ class CItem extends CZBXAPI{
 		}
 
 // nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid(false);
+		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
 // groupids
 		if(!is_null($options['groupids'])){
@@ -169,7 +171,7 @@ class CItem extends CZBXAPI{
 				$sql_parts['select']['groupid'] = 'hg.groupid';
 			}
 
-			$sql_parts['from']['hg'] = 'hosts_groups hg';
+			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
 			$sql_parts['where'][] = 'hg.hostid=i.hostid';
 
@@ -192,6 +194,23 @@ class CItem extends CZBXAPI{
 				$sql_parts['group']['i'] = 'i.hostid';
 			}
 		}
+		
+// proxyids
+		if(!is_null($options['proxyids'])){
+			zbx_value2array($options['proxyids']);
+
+			if($options['output'] != API_OUTPUT_EXTEND){
+				$sql_parts['select']['proxyid'] = 'h.proxy_hostid';
+			}
+
+			$sql_parts['from']['hosts'] = 'hosts h';
+			$sql_parts['where'][] = DBcondition('h.proxy_hostid', $options['proxyids']);
+			$sql_parts['where'][] = 'h.hostid=i.hostid';
+
+			if(!is_null($options['groupCount'])){
+				$sql_parts['group']['h'] = 'h.proxy_hostid';
+			}
+		}
 
 // itemids
 		if(!is_null($options['itemids'])){
@@ -208,7 +227,7 @@ class CItem extends CZBXAPI{
 				$sql_parts['select']['triggerid'] = 'f.triggerid';
 			}
 
-			$sql_parts['from'][] = 'functions f';
+			$sql_parts['from']['functions'] = 'functions f';
 			$sql_parts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
 			$sql_parts['where']['if'] = 'i.itemid=f.itemid';
 		}
@@ -221,7 +240,7 @@ class CItem extends CZBXAPI{
 				$sql_parts['select']['applicationid'] = 'ia.applicationid';
 			}
 
-			$sql_parts['from']['ia'] = 'items_applications ia';
+			$sql_parts['from']['items_applications'] = 'items_applications ia';
 			$sql_parts['where'][] = DBcondition('ia.applicationid', $options['applicationids']);
 			$sql_parts['where']['ia'] = 'ia.itemid=i.itemid';
 		}
@@ -234,7 +253,7 @@ class CItem extends CZBXAPI{
 				$sql_parts['select']['graphid'] = 'gi.graphid';
 			}
 
-			$sql_parts['from']['gi'] = 'graphs_items gi';
+			$sql_parts['from']['graphs_items'] = 'graphs_items gi';
 			$sql_parts['where'][] = DBcondition('gi.graphid', $options['graphids']);
 			$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
 		}
@@ -254,7 +273,7 @@ class CItem extends CZBXAPI{
 
 // templated
 		if(!is_null($options['templated'])){
-			$sql_parts['from']['h'] = 'hosts h';
+			$sql_parts['from']['hosts'] = 'hosts h';
 			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
 
 			if($options['templated'])
@@ -263,6 +282,20 @@ class CItem extends CZBXAPI{
 				$sql_parts['where'][] = 'h.status<>'.HOST_STATUS_TEMPLATE;
 		}
 
+// monitored
+		if(!is_null($options['monitored'])){
+			$sql_parts['from']['hosts'] = 'hosts h';
+			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
+
+			if($options['monitored']){
+				$sql_parts['where'][] = 'h.status='.HOST_STATUS_MONITORED;
+				$sql_parts['where'][] = 'i.status='.ITEM_STATUS_ACTIVE;
+			}
+			else{
+				$sql_parts['where'][] = '(h.status<>'.HOST_STATUS_MONITORED.' OR i.status<>'.ITEM_STATUS_ACTIVE.')';
+			}
+		}
+		
 // API_OUTPUT_EXTEND
 		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['items'] = 'i.*';
@@ -282,26 +315,42 @@ class CItem extends CZBXAPI{
 			zbx_value2array($options['filter']);
 
 			if(isset($options['filter']['host'])){
-				$sql_parts['from']['h'] = 'hosts h';
+				zbx_value2array($options['filter']['host']);
 
+				$sql_parts['from']['hosts'] = 'hosts h';
 				$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
-				$sql_parts['where']['h'] = 'h.host='.zbx_dbstr($options['filter']['host']);
+				$sql_parts['where']['h'] = DBcondition('h.host', $options['filter']['host'], false, true);
 			}
 
-			if(isset($options['filter']['hostid']))
-				$sql_parts['where']['hostid'] = 'i.hostid='.$options['filter']['hostid'];
+			if(isset($options['filter']['hostid'])){
+				zbx_value2array($options['filter']['hostid']);
+				$sql_parts['where']['hostid'] = DBcondition('i.hostid', $options['filter']['hostid']);
+			}
 
-			if(isset($options['filter']['itemid']))
-				$sql_parts['where']['itemid'] = 'i.itemid='.$options['filter']['itemid'];
+			if(isset($options['filter']['itemid'])){
+				zbx_value2array($options['filter']['itemid']);
+				$sql_parts['where']['itemid'] = DBcondition('i.itemid', $options['filter']['itemid']);
+			}
 				
-			if(isset($options['filter']['description']))
-				$sql_parts['where']['description'] = 'i.description='.zbx_dbstr($options['filter']['description']);
+			if(isset($options['filter']['description'])){
+				zbx_value2array($options['filter']['description']);
+				$sql_parts['where']['description'] = DBcondition('i.description', $options['filter']['description'], false, true);
+			}
 
-			if(isset($options['filter']['key_']))
-				$sql_parts['where']['key_'] = 'i.key_='.zbx_dbstr($options['filter']['key_']);
+			if(isset($options['filter']['key_'])){
+				zbx_value2array($options['filter']['key_']);
+				$sql_parts['where']['key_'] = DBcondition('i.key_', $options['filter']['key_'], false, true);
+			}
 
-			if(isset($options['filter']['type']))
-				$sql_parts['where'][] = 'i.type='.$options['filter']['type'];
+			if(isset($options['filter']['type'])){
+				zbx_value2array($options['filter']['type']);
+				$sql_parts['where']['type'] = DBcondition('i.type', $options['filter']['type']);
+			}
+
+			if(isset($options['filter']['status'])){
+				zbx_value2array($options['filter']['status']);
+				$sql_parts['where']['status'] = DBcondition('i.status', $options['filter']['status']);
+			}
 
 			if(isset($options['filter']['snmp_community']))
 				$sql_parts['where'][] = 'i.snmp_community='.zbx_dbstr($options['filter']['snmp_community']);
@@ -314,24 +363,25 @@ class CItem extends CZBXAPI{
 
 			if(isset($options['filter']['value_type'])){
 				zbx_value2array($options['filter']['value_type']);
-
-				$sql_parts['where'][] = DBCondition('i.value_type', $options['filter']['value_type']);
+				$sql_parts['where']['value_type'] = DBCondition('i.value_type', $options['filter']['value_type']);
 			}
+			
+			if(isset($options['filter']['ipmi_sensor']))
+				$sql_parts['where'][] = 'i.ipmi_sensor='.zbx_dbstr($options['filter']['ipmi_sensor']);
 
 			if(isset($options['filter']['data_type']))
 				$sql_parts['where'][] = 'i.data_type='.$options['filter']['data_type'];
 
-			if(isset($options['filter']['delay']))
-				$sql_parts['where'][] = 'i.delay='.$options['filter']['delay'];
+			if(isset($options['filter']['delay'])){
+				zbx_value2array($options['filter']['delay']);
+				$sql_parts['where']['delay'] = DBCondition('i.delay', $options['filter']['delay']);
+			}
 
 			if(isset($options['filter']['trends']))
 				$sql_parts['where'][] = 'i.trends='.$options['filter']['trends'];
 
 			if(isset($options['filter']['history']))
 				$sql_parts['where'][] = 'i.history='.$options['filter']['history'];
-
-			if(isset($options['filter']['status']))
-				$sql_parts['where'][] = 'i.status='.$options['filter']['status'];
 		}
 
 // group
@@ -340,8 +390,8 @@ class CItem extends CZBXAPI{
 				$sql_parts['select']['name'] = 'g.name';
 			}
 
-			$sql_parts['from']['g'] = 'groups g';
-			$sql_parts['from']['hg'] = 'hosts_groups hg';
+			$sql_parts['from']['groups'] = 'groups g';
+			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
 
 			$sql_parts['where']['ghg'] = 'g.groupid = hg.groupid';
 			$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
@@ -354,7 +404,7 @@ class CItem extends CZBXAPI{
 				$sql_parts['select']['host'] = 'h.host';
 			}
 
-			$sql_parts['from']['h'] = 'hosts h';
+			$sql_parts['from']['hosts'] = 'hosts h';
 			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
 			$sql_parts['where'][] = ' UPPER(h.host)='.zbx_dbstr(zbx_strtoupper($options['host']));
 		}
@@ -365,8 +415,8 @@ class CItem extends CZBXAPI{
 				$sql_parts['select']['application'] = 'a.name as application';
 			}
 
-			$sql_parts['from']['a'] = 'applications a';
-			$sql_parts['from']['ia'] = 'items_applications ia';
+			$sql_parts['from']['applications'] = 'applications a';
+			$sql_parts['from']['items_applications'] = 'items_applications ia';
 
 			$sql_parts['where']['aia'] = 'a.applicationid = ia.applicationid';
 			$sql_parts['where']['iai'] = 'ia.itemid=i.itemid';
@@ -434,7 +484,7 @@ class CItem extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT DISTINCT '.$sql_select.
+		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.
 				' FROM '.$sql_from.
 				' WHERE '.DBin_node('i.itemid', $nodeids).
 					$sql_where.

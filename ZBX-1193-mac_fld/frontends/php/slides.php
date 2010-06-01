@@ -52,7 +52,7 @@ include_once('include/page_header.php');
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
 		'favid'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NULL,			NULL),
-		'favcnt'=>		array(T_ZBX_INT, O_OPT,	null,	null,			null),
+		'favcnt'=>		array(T_ZBX_STR, O_OPT,	null,	null,			null),
 		'pmasterid'=>	array(T_ZBX_STR, O_OPT,	P_SYS,	null,			NULL),
 
 		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove','refresh','flop'"),	NULL),
@@ -61,7 +61,9 @@ include_once('include/page_header.php');
 	);
 
 	check_fields($fields);
-
+	
+	$tmpstime = get_request('stime');
+	
 	if(isset($_REQUEST['favobj'])){
 		$_REQUEST['pmasterid'] = get_request('pmasterid','mainpage');
 
@@ -111,16 +113,15 @@ include_once('include/page_header.php');
 
 						$element = get_screen($screen['screenid'],2,$effectiveperiod);
 
-						$refresh = CProfile::get('web.slides.rf_rate.hat_slides', 0, $elementid);
-						if($refresh == 0){
-							if($screen['delay'] > 0) $refresh = $screen['delay'];
-							else $refresh = $slideshow['delay'];
-						}
+						$refresh_multipl = CProfile::get('web.slides.rf_rate.hat_slides', 1, $elementid);
+						
+						if($screen['delay'] > 0) $refresh = $screen['delay'];
+						else $refresh = $slideshow['delay'];
 
 						$element->show();
 
-						$script = get_update_doll_script('mainpage', $_REQUEST['favobj'], 'frequency', $refresh)."\n";
-						$script.= get_update_doll_script('mainpage', $_REQUEST['favobj'], 'restartDoll')."\n";
+						$script = get_update_doll_script('mainpage', $_REQUEST['favref'], 'frequency', $refresh*$refresh_multipl)."\n";
+						$script.= get_update_doll_script('mainpage', $_REQUEST['favref'], 'restartDoll')."\n";
 						$script.= 'timeControl.processObjects();';
 						insert_js($script);
 					}
@@ -128,7 +129,7 @@ include_once('include/page_header.php');
 						print(SBR.S_NO_SLIDESHOWS_DEFINED);
 					}
 
-					break;
+				break;
 			}
 		}
 
@@ -136,21 +137,18 @@ include_once('include/page_header.php');
 			if(str_in_array($_REQUEST['favref'],array('hat_slides'))){
 				$elementid = $_REQUEST['elementid'];
 
-				CProfile::update('web.slides.rf_rate.hat_slides', $_REQUEST['favcnt'], PROFILE_TYPE_INT, $elementid);
-
-				$script= get_update_doll_script('mainpage', $_REQUEST['favref'], 'frequency', $_REQUEST['favcnt'])."\n";
-				$script.= get_update_doll_script('mainpage', $_REQUEST['favref'], 'stopDoll')."\n";
-				$script.= get_update_doll_script('mainpage', $_REQUEST['favref'], 'startDoll')."\n";
-
+				CProfile::update('web.slides.rf_rate.hat_slides', $_REQUEST['favcnt'], PROFILE_TYPE_STR, $elementid);
+			
+				// $script= get_update_doll_script('mainpage', $_REQUEST['favref'], 'frequency', $_REQUEST['favcnt'])*$refresh."\n";
+				// $script.= get_update_doll_script('mainpage', $_REQUEST['favref'], 'stopDoll')."\n";
+				// $script.= get_update_doll_script('mainpage', $_REQUEST['favref'], 'startDoll')."\n";
 
 				$menu = array();
 				$submenu = array();
 
-				make_refresh_menu('mainpage', $_REQUEST['favref'],$_REQUEST['favcnt'],array('elementid'=> $elementid),$menu,$submenu);
-
-				$script.= 'page_menu["menu_'.$_REQUEST['favref'].'"] = '.zbx_jsvalue($menu['menu_'.$_REQUEST['favref']]).';'."\n";
-				
-				print($script);
+				make_refresh_menu('mainpage', $_REQUEST['favref'],$_REQUEST['favcnt'],array('elementid'=> $elementid),$menu,$submenu,2);
+				$script = 'page_menu["menu_'.$_REQUEST['favref'].'"] = '.zbx_jsvalue($menu['menu_'.$_REQUEST['favref']]).';'."\n";
+				echo $script;
 			}
 		}
 	}
@@ -278,26 +276,23 @@ include_once('include/page_header.php');
 			
 			$element = get_slideshow_by_slideshowid($elementid);
 			if($screen['delay'] > 0) $element['delay'] = $screen['delay'];
-
-			CProfile::update('web.slides.rf_rate.hat_slides', 0, PROFILE_TYPE_INT, $elementid);
 			
 			show_messages();
 			
-	// js menu arrays
+// js menu arrays
 			$menu = array();
 			$submenu = array();
-			make_refresh_menu('mainpage','hat_slides', $element['delay'], array('elementid'=> $elementid), $menu, $submenu);
+			$refresh_multipl = CProfile::get('web.slides.rf_rate.hat_slides', 1, $elementid);
+			make_refresh_menu('mainpage','hat_slides', $refresh_multipl, array('elementid'=> $elementid), $menu, $submenu, 2);
 			insert_js('var page_menu='.zbx_jsvalue($menu).";\n".'var page_submenu='.zbx_jsvalue($submenu).";\n");
-	// --------------
+// --------------
 
-			$refresh_tab = array(
-				array(
-					'id' => 'hat_slides',
-					'frequency' => $element['delay'],
-					'url' => 'slides.php?elementid='.$elementid.url_param('stime').url_param('period').url_param('groupid').url_param('hostid'),
-					'params'=> array('lastupdate' => time())
-				)
-			);
+			$refresh_tab = array(array(
+				'id' => 'hat_slides',
+				'frequency' => $element['delay']*$refresh_multipl,
+				'url' => 'slides.php?elementid='.$elementid.(is_null($tmpstime) ? '' : '&stime='.$tmpstime).url_param('period').url_param('groupid').url_param('hostid'),
+				'params'=> array('lastupdate' => time())
+			));
 			add_doll_objects($refresh_tab);
 
 			

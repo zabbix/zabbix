@@ -556,37 +556,18 @@ function bar_report_form3(){
 
 // GROUPS
 	$groupids = get_request('groupids', array());
-	$group_tb = new CTweenBox($reportForm,'groupids',null,10);
+	$group_tb = new CTweenBox($reportForm,'groupids',$groupids,10);
 
-	$sql_from = '';
-	$sql_where =  'AND '.DBcondition('g.groupid',$groupids);
+	$options = array(
+		'real_hosts' => 1,
+		'output' => 'extend'
+	);
 
-	$sql = 'SELECT DISTINCT g.groupid, g.name '.
-			' FROM hosts h, hosts_groups hg, groups g '.$sql_from.
-			' WHERE hg.groupid=g.groupid'.
-				' AND h.hostid=hg.hostid '.
-				' AND '.DBcondition('h.hostid',$available_hosts).
-				' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
-				$sql_where.
-			' ORDER BY g.name';
-//SDI($sql);
-	$db_groups = DBselect($sql);
-	while($group = DBfetch($db_groups)){
+	$db_groups = CHostGroup::get($options);
+	order_result($db_groups, 'name');
+	foreach($db_groups as $gnum => $group){
 		$groupids[$group['groupid']] = $group['groupid'];
-		$group_tb->addItem($group['groupid'],$group['name'], true);
-	}
-
-	$sql = 'SELECT DISTINCT g.* '.
-			' FROM hosts h, hosts_groups hg, groups g '.
-			' WHERE hg.groupid=g.groupid'.
-				' AND h.hostid=hg.hostid '.
-				' AND '.DBcondition('h.hostid',$available_hosts).
-				' AND '.DBcondition('g.groupid',$groupids,true).
-				' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
-			' ORDER BY g.name';
-	$db_groups = DBselect($sql);
-	while($group = DBfetch($db_groups)){
-		$group_tb->addItem($group['groupid'],$group['name'], false);
+		$group_tb->addItem($group['groupid'],$group['name']);
 	}
 
 	$reportForm->addRow(S_GROUPS, $group_tb->Get(S_SELECTED_GROUPS,S_OTHER.SPACE.S_GROUPS));
@@ -597,58 +578,26 @@ function bar_report_form3(){
 
 	$cmbGroups = new CComboBox('groupid',get_request('groupid',0),'submit()');
 	$cmbGroups->addItem(0,S_ALL_S);
-	$sql = 'SELECT DISTINCT g.groupid,g.name '.
-			' FROM groups g,hosts_groups hg,hosts h '.
-			' WHERE '.DBcondition('h.hostid',$available_hosts).
-				' AND g.groupid=hg.groupid '.
-				' AND h.hostid=hg.hostid'.
-				' AND h.status IN ('.HOST_STATUS_MONITORED.') '.
-			' ORDER BY g.name';
 
-	$result=DBselect($sql);
-	while($row=DBfetch($result)){
-		$cmbGroups->addItem($row['groupid'],$row['name']);
+	foreach($db_groups as $gnum => $group){
+		$cmbGroups->addItem($group['groupid'],$group['name']);
 	}
 
 	$td_groups = new CCol(array(S_GROUP,SPACE,$cmbGroups));
 	$td_groups->setAttribute('style','text-align: right;');
 
-	$host_tb = new CTweenBox($reportForm,'hostids',null,10);
+	$host_tb = new CTweenBox($reportForm,'hostids',$hostids,10);
 
-	$sql_from = '';
-	$sql_where =  'AND '.DBcondition('h.hostid',$hostids);
+	$options = array(
+		'real_hosts' => 1,
+		'output' => array('hostid', 'host')
+	);
+	$db_hosts = CHost::get($options);
+	order_result($db_hosts, 'host');
 
-	$sql = 'SELECT DISTINCT h.hostid, h.host '.
-			' FROM hosts h '.$sql_from.
-			' WHERE '.DBcondition('h.hostid',$available_hosts).
-				$sql_where.
-				' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
-			' ORDER BY h.host';
-	$db_hosts = DBselect($sql);
-	while($host = DBfetch($db_hosts)){
+	foreach($db_hosts as $hnum => $host){
 		$hostids[$host['hostid']] = $host['hostid'];
-		$host_tb->addItem($host['hostid'],$host['host'], true);
-	}
-
-
-	$sql_from = '';
-	$sql_where = '';
-	if(isset($_REQUEST['groupid']) && ($_REQUEST['groupid']>0)){
-		$sql_from .= ', hosts_groups hg ';
-		$sql_where .= ' AND hg.groupid='.$_REQUEST['groupid'].
-						' AND h.hostid=hg.hostid ';
-	}
-
-	$sql = 'SELECT DISTINCT h.* '.
-			' FROM hosts h '.$sql_from.
-			' WHERE '.DBcondition('h.hostid',$available_hosts).
-				' AND '.DBcondition('h.hostid',$hostids,true).
-				' AND h.status IN ('.HOST_STATUS_MONITORED.') '.
-				$sql_where.
-			' ORDER BY h.host';
-	$db_hosts = DBselect($sql);
-	while($host = DBfetch($db_hosts)){
-		$host_tb->addItem($host['hostid'],$host['host'], false);
+		$host_tb->addItem($host['hostid'],$host['host']);
 	}
 
 	$reportForm->addRow(S_HOSTS, $host_tb->Get(S_SELECTED_HOSTS,array(S_OTHER.SPACE.S_HOSTS.SPACE.'|'.SPACE.S_GROUP.SPACE,$cmbGroups)));

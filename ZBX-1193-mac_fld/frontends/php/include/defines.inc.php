@@ -196,7 +196,10 @@
 //	define('HOST_STATUS_UNREACHABLE',	2);
 	define('HOST_STATUS_TEMPLATE',		3);
 	define('HOST_STATUS_DELETED',		4);
-	define('HOST_STATUS_PROXY',		5);
+	define('HOST_STATUS_PROXY',			5);
+
+	define('HOST_MAINTENANCE_STATUS_OFF',	0);
+	define('HOST_MAINTENANCE_STATUS_ON',	1);
 
 	define('HOST_AVAILABLE_UNKNOWN',	0);
 	define('HOST_AVAILABLE_TRUE',		1);
@@ -537,6 +540,8 @@
 
 	define('GRAPH_ZERO_LINE_COLOR_LEFT',	'AAAAAA');
 	define('GRAPH_ZERO_LINE_COLOR_RIGHT',	'888888');
+	
+	define('GRAPH_TRIGGER_LINE_OPPOSITE_COLOR',	'000');
 
 	define('ZBX_MAX_TREND_DIFF',		3600);
 
@@ -581,6 +586,11 @@
 	define('EXPRESSION_TYPE_NOT_INCLUDED',	2);
 	define('EXPRESSION_TYPE_TRUE',		3);
 	define('EXPRESSION_TYPE_FALSE',		4);
+	
+	define('EXPRESSION_VALUE_TYPE_UNKNOWN',	'#ERROR_VALUE_TYPE#');
+	define('EXPRESSION_HOST_UNKNOWN',	'#ERROR_HOST#');
+	define('EXPRESSION_HOST_ITEM_UNKNOWN',	'#ERROR_ITEM#');
+	define('EXPRESSION_NOT_A_MACRO_ERROR',	'#ERROR_MACRO#');
 
 	define('AVAILABLE_NOCACHE',	0);	// take available objects not from cache
 
@@ -747,11 +757,13 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 		$_COOKIE	= zbx_stripslashes($_COOKIE);
 	}
 
-/* init $_REQUEST */
+// init $_REQUEST
 	ini_set('variables_order', 'GP');
 	$_REQUEST = $_POST + $_GET;
 
-/* init precision */
+// init precision
 	ini_set('precision', 14);
 
+//
+	bcscale(7);
 ?>

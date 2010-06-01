@@ -42,6 +42,40 @@
 	return $result;
 	}
 
+	function get_events_unacknowledged($db_element, $value=null){
+		$elements = array('hosts' => array(), 'hosts_groups' => array(), 'triggers' => array());
+
+		get_map_elements($db_element, $elements);
+		if(empty($elements['hosts_groups']) && empty($elements['hosts']) && empty($elements['triggers'])){
+			return 0;
+		}
+
+		$config = select_config();
+		$options = array(
+			'nodeids' => get_current_nodeid(),
+			'output' => API_OUTPUT_SHORTEN,
+			'monitored' => 1,
+//			'only_problems' => 1,
+			'skipDependent' => 1,
+			'limit' => ($config['search_limit']+1)
+		);
+		if(!empty($elements['hosts_groups'])) $options['groupids'] = array_unique($elements['hosts_groups']);
+		if(!empty($elements['hosts'])) $options['hostids'] = array_unique($elements['hosts']);
+		if(!empty($elements['triggers'])) $options['triggerids'] = array_unique($elements['triggers']);
+		$triggerids = CTrigger::get($options);
+
+		$options = array(
+			'countOutput' => 1,
+			'triggerids' => zbx_objectValues($triggerids, 'triggerid'),
+			'object' => EVENT_OBJECT_TRIGGER,
+			'acknowledged' => 0,
+			'value' => is_null($value) ? array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE) : $value,
+			'nopermissions' => 1
+		);
+		$event_count = CEvent::get($options);
+
+	return $event_count['rowscount'];
+	}
 
 /* function:
  *     event_initial_time
@@ -196,31 +230,52 @@ return $events;
  *
  * author: Aly
  */
-function get_next_event($row,$hide_unknown=0){
-	$sql_cond=($hide_unknown != 0)?' AND e.value<>'.TRIGGER_VALUE_UNKNOWN:'';
+function get_next_event($event, $event_list=array()){
 
-	if((TRIGGER_VALUE_TRUE == $row['value']) && (TRIGGER_MULT_EVENT_ENABLED == $row['type'])){
+	if(!empty($event_list)){
+		$next_event = false;
+		if((TRIGGER_VALUE_TRUE == $event['value']) && (TRIGGER_MULT_EVENT_ENABLED == $event['type'])){
+			foreach($event_list as $e){
+				if(($e['objectid'] == $event['objectid']) && ($e['eventid'] > $event['eventid'])
+						&& ($e['value'] != TRIGGER_VALUE_UNKNOWN)){
+					$next_event = $e;
+				}
+			}
+		}
+		else{
+			foreach($event_list as $e){
+				if(($e['objectid'] == $event['objectid']) && ($e['eventid'] > $event['eventid'])
+						&& ($e['value'] != TRIGGER_VALUE_UNKNOWN) && ($e['value'] != $event['value'])){
+					$next_event = $e;
+				}
+			}
+		}
+
+		if($next_event) return $next_event;
+	}
+
+
+	if((TRIGGER_VALUE_TRUE == $event['value']) && (TRIGGER_MULT_EVENT_ENABLED == $event['type'])){
 		$sql = 'SELECT e.eventid, e.value, e.clock '.
 			' FROM events e'.
-			' WHERE e.objectid='.$row['objectid'].
-				' AND e.eventid > '.$row['eventid'].
+			' WHERE e.objectid='.$event['objectid'].
+				' AND e.eventid > '.$event['eventid'].
 				' AND e.object='.EVENT_OBJECT_TRIGGER.
-				' AND e.value='.$row['value'].
+				' AND e.value<>'.TRIGGER_VALUE_UNKNOWN.
 			' ORDER BY e.object, e.objectid, e.eventid';
 	}
 	else{
 		$sql = 'SELECT e.eventid, e.value, e.clock '.
 			' FROM events e'.
-			' WHERE e.objectid='.$row['objectid'].
-				' AND e.eventid > '.$row['eventid'].
+			' WHERE e.objectid='.$event['objectid'].
+				' AND e.eventid > '.$event['eventid'].
 				' AND e.object='.EVENT_OBJECT_TRIGGER.
-				' AND e.value<>'.$row['value'].
-				$sql_cond.
+				' AND e.value<>'.$event['value'].
+				' AND e.value<>'.TRIGGER_VALUE_UNKNOWN.
 			' ORDER BY e.object, e.objectid, e.eventid';
 	}
-	$rez = DBfetch(DBselect($sql,1));
 
-return $rez;
+	return DBfetch(DBselect($sql,1));
 }
 
 // author: Aly
