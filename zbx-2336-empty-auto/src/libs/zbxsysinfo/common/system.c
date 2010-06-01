@@ -175,7 +175,7 @@ int	SYSTEM_HOSTNAME(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	/* characters. MAX_COMPUTERNAME_LENGTH is usually less than 32, but it varies among systems, so we  */
 	/* cannot use the constant in a precompiled Windows agent, which is expected to work on any system. */
 	if (0 == GetComputerName(computerName, &dwSize))
-		*wide_buffer = '\0';
+		*computerName = '\0';
 
 	SET_STR_RESULT(result, zbx_unicode_to_utf8(computerName))
 
