@@ -528,6 +528,9 @@ include_once('include/page_header.php');
 	$template_wdgt->addPageHeader(S_CONFIGURATION_OF_TEMPLATES, $frmForm);
 
 	$options = array(
+		'config' => array(
+			'individual' => 1
+		),
 		'groups' => array(
 			'templated_hosts' => 1,
 			'editable' => 1,
