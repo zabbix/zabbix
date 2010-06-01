@@ -2637,7 +2637,7 @@ int	is_ascii_string(const char *str)
 {
 	while ('\0' != *str)
 	{
-		if (!(0 <= *str && *str <= 127))
+		if (!isascii((int)*str))
 			return FAIL;
 
 		str++;
