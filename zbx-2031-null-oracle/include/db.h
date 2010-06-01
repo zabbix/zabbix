@@ -17,7 +17,6 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-
 #ifndef ZABBIX_DB_H
 #define ZABBIX_DB_H
 
@@ -224,12 +223,29 @@ typedef enum {
 #define HTTPSTEP_REQUIRED_LEN		255
 #define HTTPSTEP_REQUIRED_LEN_MAX	HTTPSTEP_REQUIRED_LEN+1
 
-#define ZBX_SQL_ITEM_FIELDS	"i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.type,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,i.value_type,i.delta,i.prevorgvalue,i.lastclock,i.units,i.multiplier,i.formula,i.status,i.valuemapid,h.dns,i.trends,i.lastlogsize,i.data_type,i.mtime"
+#define ZBX_SQL_ITEM_FIELDS	"i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.type,h.useip,"	\
+				"h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,i.value_type,i.delta,"	\
+				"i.prevorgvalue,i.lastclock,i.units,i.multiplier,i.formula,i.status,"	\
+				"i.valuemapid,h.dns,i.trends,i.lastlogsize,i.data_type,i.mtime"
 #define ZBX_SQL_ITEM_TABLES	"hosts h,items i"
-#define ZBX_SQL_ITEM_FIELDS_NUM	27/* after adding "i.mtime" */
+#define ZBX_SQL_ITEM_FIELDS_NUM	27
 #define ZBX_SQL_ITEM_SELECT	ZBX_SQL_ITEM_FIELDS " from " ZBX_SQL_ITEM_TABLES
 
-#define ZBX_MAX_SQL_LEN			65535
+#ifdef HAVE_ORACLE
+#define	ZBX_SQL_STRCMP		"%s%s%s"
+#define	ZBX_SQL_STRVAL_EQ(str)	str[0] != '\0' ? "='"  : "",			\
+				str[0] != '\0' ? str   : " is null",		\
+				str[0] != '\0' ? "'"   : ""
+#define	ZBX_SQL_STRVAL_NE(str)	str[0] != '\0' ? "<>'" : "",			\
+				str[0] != '\0' ? str   : " is not null",	\
+				str[0] != '\0' ? "'"   : ""
+#else
+#define	ZBX_SQL_STRCMP		"%s'%s'"
+#define	ZBX_SQL_STRVAL_EQ(str)	"=", str
+#define	ZBX_SQL_STRVAL_NE(str)	"<>", str
+#endif
+
+#define ZBX_MAX_SQL_LEN		65535
 
 DB_DRULE
 {
