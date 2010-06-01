@@ -546,7 +546,7 @@ include_once('include/page_header.php');
 
 <?php
 	$form = new CForm('config.php', 'get');
-	$cmbConfig = new CCombobox('config',$_REQUEST['config'],'submit()');
+	$cmbConfig = new CCombobox('config',$_REQUEST['config'], 'javascript: redirect("config.php?config="+this.options[this.selectedIndex].value);');
 //	$cmbConfig->addItem(4,S_AUTOREGISTRATION);
 //	$cmbConfig->addItem(2,S_ESCALATION_RULES);
 	$cmbConfig->addItem(8,S_GUI);
@@ -1091,9 +1091,10 @@ include_once('include/page_header.php');
 /////////////////////////////
 	else if($_REQUEST['config']==11){	// Macros		
 		$form = new CForm();
-		$form->addStyle('width: 50%;');
-		$form->addStyle('margin: 0 auto;');
-		$form->addItem(get_macros_widget());
+		$tbl = get_macros_widget();
+		$tbl->addStyle('width: 50%;');
+		$tbl->addStyle('margin: 0 auto;');
+		$form->addItem($tbl);
 		$cnf_wdgt->addItem($form);
 	}
 

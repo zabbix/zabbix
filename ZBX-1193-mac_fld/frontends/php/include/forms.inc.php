@@ -6977,9 +6977,11 @@
 		}
 		else if($hostid > 0){
 			$macros = CUserMacro::get(array('extendoutput' => 1, 'hostids' => $hostid));
+			order_result($macros, 'macro');
 		}
 		else if($hostid === null){
 			$macros = CUserMacro::get(array('extendoutput' => 1, 'globalmacro' => 1));
+			order_result($macros, 'macro');
 		}
 		else{
 			$macros = array();
@@ -6987,9 +6989,6 @@
 		
 		if(empty($macros)){
 			$macros = array(0 => array('macro' => '', 'value' => ''));
-		}
-		else{
-			order_result($macros, 'macro');
 		}
 
 		$macros_tbl = new CTable(SPACE, 'tablestripped');
