@@ -191,7 +191,7 @@ include_once('include/page_header.php');
 ?>
 <?php
 	$form = new CForm(null, 'get');
-	$form->addItem(new CButton("form", S_SLIDESHOW));
+	$form->addItem(new CButton("form", S_CREATE_SLIDESHOW));
 
 	$slide_wdgt = new CWidget();
 	$slide_wdgt->addPageHeader(S_CONFIGURATION_OF_SLIDESHOWS_BIG, $form);
@@ -202,7 +202,7 @@ include_once('include/page_header.php');
 	else{
 
 		$form = new CForm();
-		$form->setName('frm_shows');
+		$form->setName('shows');
 
 		$numrows = new CDiv();
 		$numrows->setAttribute('name','numrows');
@@ -211,7 +211,7 @@ include_once('include/page_header.php');
 //		$slide_wdgt->addHeader($numrows);
 
 		$table = new CTableInfo(S_NO_SLIDESHOWS_DEFINED);
-		$table->SetHeader(array(
+		$table->setHeader(array(
 			new CCheckBox('all_shows',NULL,"checkAll('".$form->getName()."','all_shows','shows');"),
 			make_sorting_header(S_NAME,'s.name'),
 			make_sorting_header(S_DELAY,'s.delay'),
@@ -272,7 +272,7 @@ include_once('include/page_header.php');
 
 	$slide_wdgt->show();
 ?>
-<?
+<?php
 
 include_once('include/page_footer.php');
 

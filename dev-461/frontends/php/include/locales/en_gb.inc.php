@@ -822,6 +822,7 @@
 	'S_DELETE_SELECTED_GROUPS'=>		'Delete selected groups',
 
 //	hosts.php
+	'S_IMPORT_TEMPLATE'=>			'Import Template',
 	'S_IMPORT_HOST'=>				'Import Host',
 	'S_MACROS'=>					'Macros',
 	'S_WRONG_MACRO'=>				'Wrong macro',
@@ -1516,6 +1517,7 @@
 	'S_WIDTH'=>						'Width',
 	'S_HEIGHT'=>					'Height',
 	'S_CREATE_SCREEN'=>				'Create Screen',
+	'S_CREATE_SLIDESHOW'=>			'Create Slide Show',
 	'S_EDIT'=>						'Edit',
 	'S_DYNAMIC_ITEM'=>				'Dynamic item',
 	'S_DIMENSION_COLS_ROWS'=>		'Dimension (cols x rows)',

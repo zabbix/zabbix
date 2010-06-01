@@ -38,7 +38,7 @@ else{
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 	$page['title'] = 'S_HOSTS';
 	$page['file'] = 'hosts.php';
-	$page['hist_arg'] = array('groupid','hostid');
+	$page['hist_arg'] = array('groupid');
 }
 
 include_once('include/page_header.php');
@@ -149,7 +149,6 @@ include_once('include/page_header.php');
 // SELECT HOSTS
 		$params = array(
 			'hostids' => $hostids,
-			'templated_hosts' => 1,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => 1,
 			'select_profile' => 1
