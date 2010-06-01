@@ -85,9 +85,8 @@ $output = '<?php
 
 	$TRANSLATION=array('."\n\n\t";
 
-
 		foreach($_REQUEST['langTo'] as $key => $value){
-			$value = addslashes($value);
+			$value = preg_replace("/([^\\\])\'/uU", "$1\\\'", $value);
 			$output.= "'".zbx_strtoupper($key)."'=>\t\t\t'".$value."',\n\t";
 		}
 

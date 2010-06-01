@@ -377,8 +377,8 @@ include_once('include/page_header.php');
 ?>
 <?php
 	$options = array(
-		'groups' => array('not_proxy_hosts' => 1, 'with_graphs' => 1, 'editable' => 1),
-		'hosts' => array('with_graphs' => 1, 'editable' => 1),
+		'groups' => array('not_proxy_hosts' => 1, 'editable' => 1),
+		'hosts' => array('editable' => 1, 'templated_hosts' => 1),
 		'groupid' => get_request('groupid', null),
 		'hostid' => get_request('hostid', null),
 	);

@@ -480,24 +480,29 @@ function rgb2hex($color){
 		if(zbx_strlen($value) != 2) $HEX[$id] = '0'.$value;
 	}
 
-	return $HEX[0].$HEX[1].$HEX[2];
+return $HEX[0].$HEX[1].$HEX[2];
 }
 
 function hex2rgb($color){
 	if($color[0] == '#') $color = substr($color, 1);
 
-	if(zbx_strlen($color) == 6)
-		list($r, $g, $b) = array($color[0].$color[1], $color[2].$color[3], $color[4].$color[5]);
-	else if(zbx_strlen($color) == 3)
+	if(zbx_strlen($color) == 6){
+		list($r, $g, $b) = array($color[0].$color[1],
+								 $color[2].$color[3],
+								 $color[4].$color[5]);
+	}
+	else if(zbx_strlen($color) == 3){
 		list($r, $g, $b) = array($color[0].$color[0], $color[1].$color[1], $color[2].$color[2]);
-	else
+	}
+	else{
 		return false;
+	}
 
-	$r = hexdec($r);
+	$r = hexdec($r); 
 	$g = hexdec($g);
 	$b = hexdec($b);
 
-	return array($r, $g, $b);
+return array($r, $g, $b);
 }
 
 function zbx_num2bitstr($num,$rev=false){
@@ -665,16 +670,16 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 	}
 
 //------
-	if(round($valUnit['value'],2) == round($valUnit['value'],0)) $format = '%.0f %s%s';
-	else $format = '%.2f %s%s';
-
 	switch($convert){
 		case 0: $units = trim($units); 
 		case 1: $desc = $valUnit['short']; break;
 		case 2: $desc = $valUnit['long']; break;
 	}
 
-return sprintf($format, $valUnit['value'], $desc, $units);
+	$value = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U','$1$2$3', round($valUnit['value'],2));
+	$value = rtrim($value, '.');
+
+return sprintf('%s %s%s', $value, $desc, $units);
 }
 
 /*************** END CONVERTING ******************/
@@ -1132,6 +1137,14 @@ function zbx_str2links($text){
 	
 	$result[] = zbx_substr($text, $start, zbx_strlen($text));
 	return $result;
+}
+
+function zbx_subarray_push(&$mainArray, $sIndex, $element) {
+	if(!isset($mainArray[$sIndex])) $mainArray[$sIndex] = Array();
+	
+	if(!is_array($mainArray[$sIndex])) $mainArray[$sIndex]= Array($mainArray[$sIndex]);
+	
+	$mainArray[$sIndex][] = $element;
 }
 /************* END ZBX MISC *************/
 ?>

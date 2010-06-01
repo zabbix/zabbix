@@ -108,6 +108,7 @@ class CTrigger extends CZBXAPI{
 			'pattern'				=> '',
 // OutPut
 			'expand_data'			=> null,
+			'expandDescription'		=> null,
 			'output'				=> API_OUTPUT_REFER,
 			'extendoutput'			=> null,
 			'select_groups'			=> null,
@@ -122,7 +123,7 @@ class CTrigger extends CZBXAPI{
 			'sortfield'				=> '',
 			'sortorder'				=> '',
 			'limit'					=> null,
-			'limitSelects'				=> null
+			'limitSelects'			=> null
 		);
 
 		$options = zbx_array_merge($def_options, $options);
@@ -696,8 +697,22 @@ Copt::memoryPick();
 
 // Adding groups
 		if(!is_null($options['select_groups']) && str_in_array($options['select_groups'], $subselects_allowed_outputs)){
-		}
+			$obj_params = array(
+					'nodeids' => $nodeids,
+					'output' => $options['select_groups'],
+					'triggerids' => $triggerids,
+					'preservekeys' => 1
+				);
+			$groups = CHostgroup::get($obj_params);
+			foreach($groups as $groupid => $group){
+				$gtriggers = $group['triggers'];
+				unset($group['triggers']);
 
+				foreach($gtriggers as $num => $trigger){
+					$result[$trigger['triggerid']]['groups'][] = $group;
+				}
+			}
+		}
 // Adding hosts
 		if(!is_null($options['select_hosts'])){
 
@@ -784,6 +799,109 @@ Copt::memoryPick();
 			}
 		}
 
+		if(!is_null($options['expandDescription'])){
+// Function compare values {{{
+			foreach($result as $tnum => $trigger){
+				preg_match_all('/\$([1-9])/u', $trigger['description'], $numbers);
+				preg_match_all('~{[0-9]+}[+\-\*/<>=#]?[\(]*(?P<val>[+\-0-9]+)[\)]*~u', $trigger['expression'], $matches);
+
+				foreach($numbers[1] as $i){
+					$rep = isset($matches['val'][$i-1]) ? $matches['val'][$i-1] : '';
+					$result[$tnum]['description'] = str_replace('$'.($i), $rep, $result[$tnum]['description']);
+				}
+			}
+// }}}
+
+			$functionids = array();
+
+			$triggers_to_expand_hosts = array();
+			$triggers_to_expand_items = array();
+			$triggers_to_expand_items2 = array();
+			foreach($result as $tnum => $trigger){
+				
+				preg_match_all('/{HOSTNAME([1-9]?)}/u', $trigger['description'], $hnums);
+				if(!empty($hnums[1])){
+					preg_match_all('/{([0-9]+)}/u', $trigger['expression'], $funcs);
+					$funcs = $funcs[1];
+
+					foreach($hnums[1] as $fnum){
+						$fnum = $fnum ? $fnum : 1;
+						if(isset($funcs[$fnum-1])){
+							$functionid = $funcs[$fnum-1];
+							$functionids[$functionid] = $functionid;
+							$triggers_to_expand_hosts[$trigger['triggerid']][$functionid] = $fnum;
+						}
+					}
+				}
+
+				preg_match_all('/{ITEM.LASTVALUE([1-9]?)}/u', $trigger['description'], $inums);
+				if(!empty($inums[1])){
+					preg_match_all('/{([0-9]+)}/u', $trigger['expression'], $funcs);
+					$funcs = $funcs[1];
+
+					foreach($inums[1] as $fnum){
+						$fnum = $fnum ? $fnum : 1;
+						if(isset($funcs[$fnum-1])){
+							$functionid = $funcs[$fnum-1];
+							$functionids[$functionid] = $functionid;
+							$triggers_to_expand_items[$trigger['triggerid']][$functionid] = $fnum;
+						}
+					}
+				}
+
+				preg_match_all('/{ITEM.VALUE([1-9]?)}/u', $trigger['description'], $inums);
+				if(!empty($inums[1])){
+					preg_match_all('/{([0-9]+)}/u', $trigger['expression'], $funcs);
+					$funcs = $funcs[1];
+
+					foreach($inums[1] as $fnum){
+						$fnum = $fnum ? $fnum : 1;
+						if(isset($funcs[$fnum-1])){
+							$functionid = $funcs[$fnum-1];
+							$functionids[$functionid] = $functionid;
+							$triggers_to_expand_items2[$trigger['triggerid']][$functionid] = $fnum;
+						}
+					}
+				}
+			}
+
+			if(!empty($functionids)){
+				$sql = 'SELECT DISTINCT f.triggerid, f.functionid, h.host, i.lastvalue'.
+						' FROM functions f,items i,hosts h'.
+						' WHERE f.itemid=i.itemid'.
+							' AND i.hostid=h.hostid'.
+							' AND h.status<>'.HOST_STATUS_TEMPLATE.
+							' AND '.DBcondition('f.functionid', $functionids);
+				$db_funcs = DBselect($sql);
+				while($func = DBfetch($db_funcs)){
+					if(isset($triggers_to_expand_hosts[$func['triggerid']][$func['functionid']])){
+
+						$fnum = $triggers_to_expand_hosts[$func['triggerid']][$func['functionid']];
+						if($fnum == 1)
+							$result[$func['triggerid']]['description'] = str_replace('{HOSTNAME}', $func['host'], $result[$func['triggerid']]['description']);
+
+						$result[$func['triggerid']]['description'] = str_replace('{HOSTNAME'.$fnum.'}', $func['host'], $result[$func['triggerid']]['description']);
+					}
+
+					if(isset($triggers_to_expand_items[$func['triggerid']][$func['functionid']])){
+						$fnum = $triggers_to_expand_items[$func['triggerid']][$func['functionid']];
+						if($fnum == 1)
+							$result[$func['triggerid']]['description'] = str_replace('{ITEM.LASTVALUE}', $func['lastvalue'], $result[$func['triggerid']]['description']);
+
+						$result[$func['triggerid']]['description'] = str_replace('{ITEM.LASTVALUE'.$fnum.'}', $func['lastvalue'], $result[$func['triggerid']]['description']);
+					}
+
+					if(isset($triggers_to_expand_items2[$func['triggerid']][$func['functionid']])){
+						$fnum = $triggers_to_expand_items2[$func['triggerid']][$func['functionid']];
+						if($fnum == 1)
+							$result[$func['triggerid']]['description'] = str_replace('{ITEM.VALUE}', $func['lastvalue'], $result[$func['triggerid']]['description']);
+
+						$result[$func['triggerid']]['description'] = str_replace('{ITEM.VALUE'.$fnum.'}', $func['lastvalue'], $result[$func['triggerid']]['description']);
+					}
+				}
+			}
+		}
+
 COpt::memoryPick();
 // removing keys (hash -> array)
 		if(is_null($options['preservekeys'])){
@@ -792,7 +910,7 @@ COpt::memoryPick();
 
 	return $result;
 	}
-
+	
 /**
  * Get triggerid by host.host and trigger.expression
  *
@@ -853,7 +971,8 @@ COpt::memoryPick();
 				return false;
 			}
 			
-			$hData =& $expressionData[$expression]['hosts'][0];
+			reset($expressionData[$expression]['hosts']);
+			$hData =& $expressionData[$expression]['hosts'][key($expressionData[$expression]['hosts'])];
 			$object['host'] = zbx_substr($expression, $hData['openSymbolNum']+1, $hData['closeSymbolNum']-($hData['openSymbolNum']+1));
 		}
 
