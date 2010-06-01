@@ -301,10 +301,10 @@ include_once('include/page_header.php');
 // NAV BAR
 				$timeline = array();
 				$timeline['period'] = $effectiveperiod;
-				$timeline['starttime'] = date('YmdHi', time() - ZBX_MAX_PERIOD);
+				$timeline['starttime'] = date('YmdHis', time() - ZBX_MAX_PERIOD);
 
 				if(isset($_REQUEST['stime'])){
-					$timeline['usertime'] = date('YmdHi', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
+					$timeline['usertime'] = date('YmdHis', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 				}
 
 				$scroll_div = new CDiv();
