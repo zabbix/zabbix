@@ -57,15 +57,16 @@ int	SYSTEM_UNUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 int	SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #if defined(_WINDOWS)
-	DWORD	dwSize;
-		/* NOTE: The buffer size should be large enough to contain MAX_COMPUTERNAME_LENGTH + 1 characters.*/
-	TCHAR	computerName[MAX_COMPUTERNAME_LENGTH + 1], osVersion[256], *cpuType, wide_buffer[MAX_STRING_LEN];
+	DWORD	dwSize = 256;
+	TCHAR	computerName[256], osVersion[256], *cpuType, wide_buffer[MAX_STRING_LEN];
 	SYSTEM_INFO
 		sysInfo;
 	OSVERSIONINFO
 		versionInfo;
 
-	dwSize = MAX_COMPUTERNAME_LENGTH;
+	/* Buffer size is chosen large enough to contain any DNS name, not just MAX_COMPUTERNAME_LENGTH + 1 */
+	/* characters. MAX_COMPUTERNAME_LENGTH is usually less than 32, but it varies among systems, so we  */
+	/* cannot use the constant in a precompiled Windows agent, which is expected to work on any system. */
 	if (0 == GetComputerName(computerName, &dwSize))
 		*computerName = '\0';
 
@@ -167,14 +168,16 @@ int	SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 int	SYSTEM_HOSTNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #if defined(_WINDOWS)
-	/* NOTE: The buffer size should be large enough to contain MAX_COMPUTERNAME_LENGTH + 1 characters.*/
-	TCHAR	wide_buffer[MAX_COMPUTERNAME_LENGTH + 1];
-	DWORD	dwSize = MAX_COMPUTERNAME_LENGTH;
+	DWORD	dwSize = 256;
+	TCHAR	computerName[256]; 
 
-	if (0 == GetComputerName(wide_buffer, &dwSize))
+	/* Buffer size is chosen large enough to contain any DNS name, not just MAX_COMPUTERNAME_LENGTH + 1 */
+	/* characters. MAX_COMPUTERNAME_LENGTH is usually less than 32, but it varies among systems, so we  */
+	/* cannot use the constant in a precompiled Windows agent, which is expected to work on any system. */
+	if (0 == GetComputerName(computerName, &dwSize))
 		*wide_buffer = '\0';
 
-	SET_STR_RESULT(result, zbx_unicode_to_utf8(wide_buffer))
+	SET_STR_RESULT(result, zbx_unicode_to_utf8(computerName))
 
 	return SYSINFO_RET_OK;
 #else
