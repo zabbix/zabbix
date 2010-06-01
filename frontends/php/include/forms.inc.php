@@ -1378,13 +1378,14 @@
 		$col_table2->setClass('filter');
 		$fTypeVisibility = array();
 		
-	//first row
+//first row
 		$cmbType = new CComboBox("filter_type", $filter_type); //"javascript: create_var('zbx_filter', 'filter_set', '1', true); ");
 		$cmbType->setAttribute('id', 'filter_type');
 		$cmbType->addItem(-1, S_ALL_SMALL);
 		foreach(array('filter_delay_label','filter_delay') as $vItem)
-			zbx_add2subarray($fTypeVisibility, -1, $vItem);
-		foreach(array(
+			zbx_subarray_push($fTypeVisibility, -1, $vItem);
+
+		$itemTypes = array(
 			ITEM_TYPE_ZABBIX,
 			ITEM_TYPE_ZABBIX_ACTIVE,
 			ITEM_TYPE_SIMPLE,
@@ -1400,31 +1401,33 @@
 			ITEM_TYPE_IPMI,
 			ITEM_TYPE_SSH,
 			ITEM_TYPE_TELNET,
-			ITEM_TYPE_CALCULATED) as $it) {
+			ITEM_TYPE_CALCULATED);
+
+		foreach($itemTypes as $it){
 
 			$cmbType->addItem($it, item_type2str($it));
 			
 			if(!uint_in_array($it, array(ITEM_TYPE_TRAPPER, ITEM_TYPE_HTTPTEST))){
 				foreach(array('filter_delay_label','filter_delay') as $vItem)
-					zbx_add2subarray($fTypeVisibility, $it, $vItem);
+					zbx_subarray_push($fTypeVisibility, $it, $vItem);
 				
 				unset($vItem);
 			}
 			
 			if(uint_in_array($it, array(ITEM_TYPE_SNMPV1,ITEM_TYPE_SNMPV2C,ITEM_TYPE_SNMPV3))){
-				foreach(array(
+				$snmp_types = array(
 					'filter_snmp_community_label', 'filter_snmp_community',
 					'filter_snmp_oid_label', 'filter_snmp_oid',
 					'filter_snmp_port_label', 'filter_snmp_port'
-					) as $vItem)
-					zbx_add2subarray($fTypeVisibility, $it, $vItem);
-				unset($vItem);
+				);
+
+				foreach($snmp_types as $vItem){
+					zbx_subarray_push($fTypeVisibility, $it, $vItem);
+				}
 			}
 		}
-		
-		$json = new CJSON();
 
-		zbx_add_post_js("var filterTypeSwitcher = new CViewSwitcher('filter_type', new Array('keyup','click','change'), ".$json->encode($fTypeVisibility).");");
+		zbx_add_post_js("var filterTypeSwitcher = new CViewSwitcher('filter_type', new Array('keyup','click','change'), ".zbx_jsvalue($fTypeVisibility, true).");");
 		$col21 = new CCol(bold(S_TYPE.': '));
 		$col21->setAttribute('style', 'width: 160px');
 		
@@ -1483,12 +1486,12 @@
 		$cmbValType->addItem(ITEM_VALUE_TYPE_TEXT, S_TEXT);
 		
 		foreach(array('filter_data_type_label','filter_data_type') as $vItem)
-			zbx_add2subarray($fVTypeVisibility, ITEM_VALUE_TYPE_UINT64, $vItem);
+			zbx_subarray_push($fVTypeVisibility, ITEM_VALUE_TYPE_UINT64, $vItem);
 		
 		$col_table3->addRow(array(bold(S_TYPE_OF_INFORMATION.': '), $cmbValType));
 		
-		zbx_add_post_js("var filterValueTypeSwitcher = new CViewSwitcher('filter_value_type', new Array('keyup','click','change'), ".$json->encode($fVTypeVisibility).");");
-	//second row
+		zbx_add_post_js("var filterValueTypeSwitcher = new CViewSwitcher('filter_value_type', new Array('keyup','click','change'), ".zbx_jsvalue($fVTypeVisibility, true).");");
+//second row
 		$label321 = new CSpan(bold(S_DATA_TYPE.': '), 'hidden');
 		$label321->setAttribute('id', 'filter_data_type_label');
 
@@ -1640,7 +1643,7 @@
 				}
 			}
 
-			// value types
+// value types
 			if($filter_value_type == -1){
 				if(!isset($item_params['value_types'][$item['value_type']])){
 					$item_params['value_types'][$item['value_type']] = array('name' => item_value_type2str($item['value_type']), 'count' => 0);
@@ -1655,7 +1658,7 @@
 				}
 			}
 
-			// status
+// status
 			if($filter_status == -1){
 				if(!isset($item_params['status'][$item['status']])){
 					$item_params['status'][$item['status']] = array('name' => item_status2str($item['status']), 'count' => 0);
