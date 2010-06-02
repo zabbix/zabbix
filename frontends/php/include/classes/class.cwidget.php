@@ -134,7 +134,7 @@ private $items;
 
 			$thin_tab = $this->createFlicker($icons_row);
 			$thin_tab->setAttribute('id','filter_icon');
-			$thin_tab->addAction('onclick',new CJSscript("javascript: change_flicker_state('".$flicker_domid."');"));
+			$thin_tab->addAction('onclick', "javascript: change_flicker_state('".$flicker_domid."');");
 
 			$flicker_tab->addRow($thin_tab,'textcolorstyles link pointer');
 
@@ -236,7 +236,7 @@ private $items;
 			$icon = new CDiv(SPACE, $this->state?'arrowup':'arrowdown');
 			$icon->setAttribute('id',$this->domid.'_icon');
 			$icon->setAttribute('title',S_SHOW.'/'.S_HIDE);
-			$icon->addAction('onclick',new CJSscript("javascript: change_hat_state(this,'".$this->domid."');"));
+			$icon->addAction('onclick', "javascript: change_hat_state(this,'".$this->domid."');");
 			$right_row[] = new CCol($icon);
 		}
 
