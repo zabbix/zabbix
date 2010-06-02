@@ -105,10 +105,12 @@ processObjects: function(){
 		if(isset('graphtype', obj.objDims) && (obj.objDims.graphtype < 2)){
 			var g_url = new Curl(obj.src);
 			g_url.setArgument('width', obj.objDims.width);
-			
-			var date = datetoarray(obj.time.usertime - obj.time.period);
-			var url_stime = ''+date[2]+date[1]+date[0]+date[3]+date[4];
-			
+
+			var date = new CDate((obj.time.usertime - obj.time.period) * 1000);
+			var url_stime = date.getZBXDate();
+//			var date = datetoarray(obj.time.usertime - obj.time.period);
+//			var url_stime = ''+date[2]+date[1]+date[0]+date[3]+date[4]+date[5];
+
 			g_url.setArgument('period', obj.time.period);
 			g_url.setArgument('stime', url_stime);
 

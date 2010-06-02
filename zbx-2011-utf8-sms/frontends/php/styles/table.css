@@ -102,6 +102,7 @@ table.formtable {
 	color: #000000;
 	border: 0px solid #000000;
 	width: 50%;
+	margin: auto;
 }
 
 table.formtable tr td {
@@ -230,6 +231,12 @@ table.tablestripped tr.form_odd_row td{
 
 table.tablestripped tr.form_even_row td{
 	background-color:#DFDFDF;
+}
+
+table.tablestripped tr.header td{
+	color: #FFFFFF;
+	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;
+	text-align: left;
 }
 
 table.tablestripped tr.footer td{

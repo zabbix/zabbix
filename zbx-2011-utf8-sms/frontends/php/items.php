@@ -26,7 +26,7 @@ require_once('include/forms.inc.php');
 
 $page['title'] = 'S_CONFIGURATION_OF_ITEMS';
 $page['file'] = 'items.php';
-$page['scripts'] = array('effects.js');
+$page['scripts'] = array('effects.js', 'class.cviewswitcher.js');
 $page['hist_arg'] = array();
 
 include_once('include/page_header.php');
@@ -185,18 +185,7 @@ include_once('include/page_header.php');
 
 	$_REQUEST['go'] = get_request('go', 'none');
 
-// PERMISSIONS
-	if(get_request('hostid', 0) > 0){
-		$options = array(
-			'hostids' => $_REQUEST['hostid'],
-			'extendoutput' => 1,
-			'templated_hosts' => 1,
-			'editable' => 1
-		);
-		$hosts = CHost::get($options);
-		if(empty($hosts)) access_deny();
-	}
-	
+// PERMISSIONS	
 	if(get_request('itemid', false)){
 		$options = array(
 			'itemids' => $_REQUEST['itemid'],
@@ -205,6 +194,16 @@ include_once('include/page_header.php');
 		);
 		$item = CItem::get($options);
 		if(empty($item)) access_deny();
+	}
+	else if(get_request('hostid', 0) > 0){
+		$options = array(
+			'hostids' => $_REQUEST['hostid'],
+			'extendoutput' => 1,
+			'templated_hosts' => 1,
+			'editable' => 1
+		);
+		$hosts = CHost::get($options);
+		if(empty($hosts)) access_deny();
 	}
 ?>
 <?php
@@ -767,14 +766,6 @@ include_once('include/page_header.php');
 		$form->addVar('form_hostid', $hostid);
 
 // Config
-	$cmbConf = new CComboBox('config', 'items.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
-		$cmbConf->addItem('templates.php',S_TEMPLATES);
-		$cmbConf->addItem('hosts.php',S_HOSTS);
-		$cmbConf->addItem('items.php',S_ITEMS);
-		$cmbConf->addItem('triggers.php',S_TRIGGERS);
-		$cmbConf->addItem('graphs.php',S_GRAPHS);
-		$cmbConf->addItem('applications.php',S_APPLICATIONS);
-	$form->addItem($cmbConf);
 	$form->addItem(array(SPACE, new CButton('form', S_CREATE_ITEM)));
 
 //$items_wdgt->addPageHeader(S_CONFIGURATION_OF_ITEMS_BIG, $form);
