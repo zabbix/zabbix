@@ -37,20 +37,20 @@ include_once('include/page_header.php');
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'groupid'=>		array(T_ZBX_INT, O_OPT,	 P_SYS,		DB_ID,NULL),
-		'hostid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,		DB_ID,NULL),
-		'graphid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,		DB_ID,NULL),
-		'period'=>		array(T_ZBX_INT, O_OPT,  P_SYS, 	null,NULL),
-		'stime'=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	NULL,NULL),
-		'action'=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	IN("'go','add','remove'"),NULL),
-		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,		IN('0,1'),NULL),
+		'groupid'=>		array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,	null),
+		'hostid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,	null),
+		'graphid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,	null),
+		'period'=>		array(T_ZBX_INT, O_OPT,  P_SYS, null,	null),
+		'stime'=>		array(T_ZBX_STR, O_OPT,  P_SYS, null,	null),
+		'action'=>		array(T_ZBX_STR, O_OPT,  P_SYS, IN("'go','add','remove'"),null),
+		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),null),
 //ajax
-		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
-		'favid'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NULL,			NULL),
+		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	null,			null),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		null),
+		'favid'=>		array(T_ZBX_INT, O_OPT, P_ACT,  null,			null),
 
-		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
-		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove'"),NULL)
+		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		null),
+		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove'"),null)
 	);
 
 	check_fields($fields);
@@ -182,11 +182,11 @@ include_once('include/page_header.php');
 // NAV BAR
 		$timeline = array(
 			'period' => $effectiveperiod,
-			'starttime' => date('YmdHi', get_min_itemclock_by_graphid($_REQUEST['graphid']))
+			'starttime' => date('YmdHis', get_min_itemclock_by_graphid($_REQUEST['graphid']))
 		);
 
 		if(isset($_REQUEST['stime'])){
-			$timeline['usertime'] = date('YmdHi', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
+			$timeline['usertime'] = date('YmdHis', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 		}
 
 		$dom_graph_id = 'graph';

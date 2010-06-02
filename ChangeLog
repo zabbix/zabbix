@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBX-2473] fixed timescroll most right position when "now" (Aly)
  - [ZBX-1193] improved macros form (Vedmak)
  - [ZBX-2035] fixed host full cloning (Vedmak)
  - [ZBX-1986] fixed empty Y axis if item values are zeros (Aly)
