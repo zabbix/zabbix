@@ -6,6 +6,9 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2376] port parameter to tcp and tcp_perf is now mandatory (asaveljevs)
+ - [ZBX-2376] added ldap, ldap_perf, ntp, and ntp_perf simple checks (asaveljevs)
+ - [ZBX-808] renamed service.ntp parameter of net.tcp.service{.perf} to ntp (asaveljevs)
  - [ZBX-2011] plain ASCII subjects are no longer base64-encoded, fixes issues with email to SMS gateways (asaveljevs)
  - [ZBXNEXT-319] multirow inserts are now used for PostgreSQL 8.2 and higher (asaveljevs)
  - [ZBXNEXT-392] our daemons no longer crash after "strace -p" (asaveljevs)
