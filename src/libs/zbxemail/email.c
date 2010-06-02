@@ -193,10 +193,17 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	cp = string_replace(mailsubject, "\r\n", "\n");
 	mailsubject = string_replace(cp, "\n", "\r\n");
 	zbx_free(cp);
-	str_base64_encode_dyn((const char *)mailsubject, &pc_base64, strlen(mailsubject));
-	zbx_free(mailsubject);
-	mailsubject = pc_base64;
-	pc_base64 = NULL;
+	if (FAIL == is_ascii_string(mailsubject))
+	{
+		int	len;
+		str_base64_encode_dyn((const char *)mailsubject, &pc_base64, strlen(mailsubject));
+		zbx_free(mailsubject);
+		len = strlen(pc_base64) + 13;
+		mailsubject = zbx_malloc(NULL, len);
+		zbx_snprintf(mailsubject, len, "=?UTF-8?B?%s?=", pc_base64);
+		zbx_free(pc_base64);
+		pc_base64 = NULL;
+	}
 
 	cp = string_replace(mailbody, "\r\n", "\n");
 	mailbody = string_replace(cp, "\n", "\r\n");
@@ -214,7 +221,7 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	/* =?charset?encoding?encoded text?= format must be used for subject field */
 	/* e-mails are sent in 'SMTP/MIME e-mail' format, this should be documented */
 	cp = zbx_dsprintf(cp, "From:<%s>\r\nTo:<%s>\r\nDate: %s\r\n"
-			"Subject: =?UTF-8?B?%s?=\r\n"
+			"Subject: %s\r\n"
 			"MIME-Version: 1.0\r\n"
 			"Content-Type: text/plain; charset=\"UTF-8\"\r\n"
 			"Content-Transfer-Encoding: base64\r\n"
