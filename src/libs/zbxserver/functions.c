@@ -28,7 +28,6 @@
 
 #include "zbxserver.h"
 #include "evalfunc.h"
-#include "expression.h"
 
 /******************************************************************************
  *                                                                            *

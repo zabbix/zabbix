@@ -20,7 +20,6 @@
 
 #include "common.h"
 #include "zbxserver.h"
-#include "expression.h"
 #include "evalfunc.h"
 #include "db.h"
 #include "log.h"
@@ -539,10 +538,10 @@ int	evaluate(double *value, char *exp, char *error, int maxerrlen)
 
 	strscpy(tmp, exp);
 	t=0;
-	while( find_char( tmp, ')' ) != FAIL )
+	while (NULL != strchr(tmp, ')'))
 	{
 		l=-1;
-		r=find_char(tmp,')');
+		r=strchr(tmp,')')-tmp;
 		for(i=r;i>=0;i--)
 		{
 			if( tmp[i] == '(' )
