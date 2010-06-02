@@ -2021,13 +2021,39 @@
 		else
 			array_push($delay_flex_el, new CButton('del_delay_flex',S_DELETE_SELECTED));
 
-		if(count($applications)==0)  array_push($applications,0);
+		if(count($applications)==0) array_push($applications, 0);
 
-		if(isset($_REQUEST['itemid'])) {
-			$frmItem->setTitle(S_ITEM." '$host:".$item_data["description"]."'");
+		if(isset($_REQUEST['itemid'])){
+			$caption = array();
+			$itmid = $_REQUEST['itemid'];
+			do{
+				$sql = 'SELECT i.itemid, i.templateid, h.host'.
+						' FROM items i, hosts h'.
+						' WHERE i.itemid='.$itmid.
+							' AND h.hostid=i.hostid';
+				$itm = DBfetch(DBselect($sql));			
+				if($itm){
+					if($_REQUEST['itemid'] == $itmid){
+						$caption[] = SPACE.SPACE;
+						$caption[] = $itm['host'];
+					}
+					else{
+						$caption[] = ' : ';
+						$caption[] = new CLink($itm['host'], 'items.php?form=update&itemid='.$itm['itemid'], 'highlight underline');
+					}
+					
+					$itmid = $itm['templateid'];
+				}
+				else break;
+			}while($itmid != 0);
+			
+			$caption[] = S_ITEM.SPACE;
+			$caption = array_reverse($caption);
+			$caption[] = $item_data['description'];
+			$frmItem->setTitle($caption);
 		}
-		else {
-			$frmItem->setTitle(S_ITEM." '$host:$description'");
+		else{
+			$frmItem->setTitle(S_ITEM." $host : $description");
 		}
 
 		$frmItem->addVar('form_hostid', $hostid);
