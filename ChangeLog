@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-1477] fixed moving screen elemnts with spans (Vedmak)
  - [ZBXNEXT-279] added links to parent elements for item and trigger form (Vedmak)
  - [ZBX-2376] port parameter to tcp and tcp_perf is now mandatory (asaveljevs)
  - [ZBX-2376] added ldap, ldap_perf, ntp, and ntp_perf simple checks (asaveljevs)
