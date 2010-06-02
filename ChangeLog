@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBXNEXT-392] our daemons no longer crash after "strace -p" (asaveljevs)
  - [ZBX-2031] fixed comparison of empty strings with Oracle that led to duplicate rows in dservices (asaveljevs)
  - [ZBX-2409] fixed server crash when deleting unreachable hosts in discovery (asaveljevs)
  - [DEV-461] changes in GUI configuration menu (Aly)
