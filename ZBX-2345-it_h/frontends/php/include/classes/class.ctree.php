@@ -79,16 +79,6 @@ class CTree{
 
 	private function simpleHTML(){
 		$table = new CTableInfo();
-
-		// $table->setCellSpacing(0);
-		// $table->setCellPadding(0);
-
-		// $table->setOddRowClass('odd_row');
-		// $table->setEvenRowClass('even_row');
-		// $table->headerClass = 'header';
-		// $table->footerClass = 'footer';
-
-		// $table->setAttribute('valign','top');
 		$table->addRow($this->makeHeaders());
 
 		foreach($this->tree as $id => $rows){
@@ -100,11 +90,6 @@ class CTree{
 	private function makeRow($id){
 
 		$table = new CTable();
-		// $table->setCellSpacing(0);
-		// $table->setCellPadding(0);
-		// $table->setAttribute('border','0');
-		// $table->setAttribute('height','100%');
-
 		$tr = $this->makeSImgStr($id);
 		$tr->addItem($this->tree[$id]['caption']);
 
@@ -152,7 +137,7 @@ class CTree{
 												" showPopupDiv('div_node_tree','select_iframe');"); // IE6 Fix
 
 						$img->setAttribute('id','idi_'.$id);
-						$img->setClass('imgnode');
+						$img->setClass('pointer');
 					}
 					else {
 						$img = new CImg('images/general/tree/pointl.gif','y','22','14');
@@ -171,7 +156,7 @@ class CTree{
 												" showPopupDiv('div_node_tree','select_iframe');");	// IE6 Fix
 
 						$img->setAttribute('id','idi_'.$id);
-						$img->setClass('imgnode');
+						$img->setClass('pointer');
 					}
 					else {
 						$td->setAttribute('style','width:22px; background-image:url(images/general/tree/pointc.gif);');
@@ -228,6 +213,7 @@ class CTree{
 		$js.= '</script>'."\n";
 
 		zbx_add_post_js($this->treename.' = new CTree("tree_'.$this->getUserAlias().'_'.$this->treename.'", '.$this->treename.'_tree);');
+
 	return new CJSscript($js);
 	}
 
