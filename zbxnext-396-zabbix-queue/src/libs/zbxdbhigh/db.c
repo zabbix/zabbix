@@ -619,7 +619,7 @@ void  DBdelete_trigger(zbx_uint64_t triggerid)
 		triggerid);
 	DBexecute("delete from functions where triggerid=" ZBX_FS_UI64,
 		triggerid);
-	DBexecute("delete from events where object=%d AND objectid=" ZBX_FS_UI64,
+	DBexecute("delete from events where object=%d and objectid=" ZBX_FS_UI64,
 		EVENT_OBJECT_TRIGGER,
 		triggerid);
 
@@ -815,47 +815,20 @@ int	DBadd_trend_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock)
 	return SUCCEED;
 }
 
-int	DBget_items_count(void)
+int	DBget_row_count(const char *table_name)
 {
-	int	res;
-	char	sql[MAX_STRING_LEN];
+	const char	*__function_name = "DBget_row_count";
+	int		count;
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_items_count()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): %s", __function_name, table_name);
 
-	result = DBselect("select count(*) from items");
+	result = DBselect("select count(*) from %s", table_name);
 
-	row=DBfetch(result);
+	row = DBfetch(result);
 
-	if(!row || DBis_null(row[0])==SUCCEED)
-	{
-		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query [%s]", sql);
-		zabbix_syslog("Cannot execute query [%s]", sql);
-		DBfree_result(result);
-		return 0;
-	}
-
-	res  = atoi(row[0]);
-
-	DBfree_result(result);
-
-	return res;
-}
-
-int	DBget_triggers_count(void)
-{
-	int	res;
-	DB_RESULT	result;
-	DB_ROW		row;
-
-	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_triggers_count()");
-
-	result = DBselect("select count(*) from triggers");
-
-	row=DBfetch(result);
-
-	if(!row || DBis_null(row[0])==SUCCEED)
+	if (NULL == row || SUCCEED == DBis_null(row[0]))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query");
 		zabbix_syslog("Cannot execute query");
@@ -863,53 +836,29 @@ int	DBget_triggers_count(void)
 		return 0;
 	}
 
-	res  = atoi(row[0]);
+	count = atoi(row[0]);
 
 	DBfree_result(result);
 
-	return res;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %s %d", __function_name, table_name, count);
+
+	return count;
 }
 
-int	DBget_items_unsupported_count(void)
+int	DBget_items_unsupported_count()
 {
-	int	res;
+	const char	*__function_name = "DBget_items_unsupported_count";
+	int		count;
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_items_unsupported_count()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	result = DBselect("select count(*) from items where status=%d", ITEM_STATUS_NOTSUPPORTED);
 
-	row=DBfetch(result);
-
-	if(!row || DBis_null(row[0])==SUCCEED)
-	{
-		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query");
-		zabbix_syslog("Cannot execute query");
-		DBfree_result(result);
-		return 0;
-	}
-
-	res  = atoi(row[0]);
-
-	DBfree_result(result);
-
-	return res;
-}
-
-int	DBget_history_count(const char *table_name)
-{
-	int		res;
-	DB_RESULT	result;
-	DB_ROW		row;
-
-	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_history_count(): %s", table_name);
-
-	result = DBselect("select count(*) from %s", table_name);
-
 	row = DBfetch(result);
 
-	if (!row || DBis_null(row[0]) == SUCCEED)
+	if (NULL == row || SUCCEED == DBis_null(row[0]))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query");
 		zabbix_syslog("Cannot execute query");
@@ -917,41 +866,16 @@ int	DBget_history_count(const char *table_name)
 		return 0;
 	}
 
-	res = atoi(row[0]);
+	count = atoi(row[0]);
 
 	DBfree_result(result);
 
-	return res;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %s %d", __function_name, count);
+
+	return count;
 }
 
-int	DBget_trends_count(const char *table_name)
-{
-	int		res;
-	DB_RESULT	result;
-	DB_ROW		row;
-
-	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_trends_count(): %s", table_name);
-
-	result = DBselect("select count(*) from %s", table_name);
-
-	row = DBfetch(result);
-
-	if (!row || DBis_null(row[0]) == SUCCEED)
-	{
-		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query");
-		zabbix_syslog("Cannot execute query");
-		DBfree_result(result);
-		return 0;
-	}
-
-	res = atoi(row[0]);
-
-	DBfree_result(result);
-
-	return res;
-}
-
-int	DBget_queue_count(void)
+int	DBget_queue_count()
 {
 	int		res = 0, now;
 	DB_RESULT	result;
@@ -1020,13 +944,14 @@ int	DBget_queue_count(void)
 	return res;
 }
 
-double	DBget_requiredperformance(void)
+double	DBget_requiredperformance()
 {
+	const char	*__function_name = "DBget_requiredperformance";
 	double		qps_total = 0;
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In DBget_requiredperformance()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	/* !!! Don't forget sync code with PHP !!! */
 	result = DBselect("select sum(1.0/i.delay) from hosts h,items i"
@@ -1034,8 +959,10 @@ double	DBget_requiredperformance(void)
 			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE);
 	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
-		qps_total += atof(row[0]);
+		qps_total = atof(row[0]);
 	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): " ZBX_FS_DBL, __function_name, qps_total);
 
 	return qps_total;
 }

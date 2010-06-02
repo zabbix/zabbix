@@ -64,7 +64,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		if (1 != nparams)
 			goto not_supported;
 
-		i = (zbx_uint64_t)DBget_triggers_count();
+		i = DBget_row_count("triggers");
 		SET_UI64_RESULT(result, i);
 	}
 	else if (0 == strcmp(tmp, "items"))		/* zabbix["items"] */
@@ -72,7 +72,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		if (1 != nparams)
 			goto not_supported;
 
-		i = (zbx_uint64_t)DBget_items_count();
+		i = DBget_row_count("items");
 		SET_UI64_RESULT(result, i);
 	}
 	else if (0 == strcmp(tmp, "items_unsupported"))	/* zabbix["items_unsupported"] */
@@ -92,7 +92,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		if (1 != nparams)
 			goto not_supported;
 
-		i = DBget_history_count(tmp);
+		i = DBget_row_count(tmp);
 		SET_UI64_RESULT(result, i);
 	}
 	else if (0 == strcmp(tmp, "trends") ||			/* zabbix["trends"] */
@@ -101,7 +101,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		if (1 != nparams)
 			goto not_supported;
 
-		i = DBget_trends_count(tmp);
+		i = DBget_row_count(tmp);
 		SET_UI64_RESULT(result, i);
 	}
 	else if (0 == strcmp(tmp, "queue"))		/* zabbix["queue"] */
@@ -124,7 +124,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		if (1 != nparams)
 			goto not_supported;
 
-		i = time(NULL)-CONFIG_SERVER_STARTUP_TIME;
+		i = time(NULL) - CONFIG_SERVER_STARTUP_TIME;
 		SET_UI64_RESULT(result, i);
 	}
 	else if (0 == strcmp(tmp, "boottime"))		/* zabbix["boottime"] */
@@ -146,10 +146,12 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		if (0 != get_param(params, 3, tmp, sizeof(tmp)))
 			goto not_supported;
 
-		if (0 == strcmp(tmp, "lastaccess")) {
+		if (0 == strcmp(tmp, "lastaccess"))
+		{
 			if (FAIL == (i = DBget_proxy_lastaccess(tmp1)))
 				goto not_supported;
-		} else
+		}
+		else
 			goto not_supported;
 
 		SET_UI64_RESULT(result, i);
@@ -256,10 +258,8 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 	return SUCCEED;
 not_supported:
-	zbx_snprintf(tmp, sizeof(tmp), "Internal check [%s] is not supported",
-			item->key_orig);
-	zabbix_log(LOG_LEVEL_WARNING, "%s",
-			tmp);
+	zbx_snprintf(tmp, sizeof(tmp), "Internal check [%s] is not supported", item->key_orig);
+	zabbix_log(LOG_LEVEL_WARNING, "%s", tmp);
 
 	SET_MSG_RESULT(result, strdup(tmp));
 

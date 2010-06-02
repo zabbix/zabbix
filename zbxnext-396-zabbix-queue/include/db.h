@@ -577,13 +577,10 @@ int	DBget_prev_trigger_value(zbx_uint64_t triggerid);
 int     DBupdate_trigger_value(zbx_uint64_t triggerid, int type, int value,
 		const char *trigger_error, int new_value, int now, const char *reason);
 
-int	DBget_items_count(void);
-int	DBget_items_unsupported_count(void);
-int	DBget_history_count(const char *table_name);
-int	DBget_trends_count(const char *table_name);
-int	DBget_triggers_count(void);
-int	DBget_queue_count(void);
-double	DBget_requiredperformance(void);
+int	DBget_row_count(const char *table_name);
+int	DBget_items_unsupported_count();
+int	DBget_queue_count();
+double	DBget_requiredperformance();
 zbx_uint64_t DBget_proxy_lastaccess(const char *hostname);
 
 int	DBget_escape_string_len(const char *src);
