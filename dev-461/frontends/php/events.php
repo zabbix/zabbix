@@ -505,8 +505,8 @@
 // NAV BAR
 	$timeline = array(
 		'period' => $effectiveperiod,
-		'starttime' => date('YmdHi', $starttime),
-		'usertime' => date('YmdHi', $till)
+		'starttime' => date('YmdHis', $starttime),
+		'usertime' => date('YmdHis', $till)
 	);
 
 	$dom_graph_id = 'scroll_events_id';

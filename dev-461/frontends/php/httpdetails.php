@@ -235,11 +235,11 @@
 // NAV BAR
 	$timeline = array(
 		'period' => get_request('period',ZBX_PERIOD_DEFAULT),
-		'starttime' => date('YmdHi', get_min_itemclock_by_itemid($itemids))
+		'starttime' => date('YmdHis', get_min_itemclock_by_itemid($itemids))
 	);
 
 	if(isset($_REQUEST['stime'])){
-		$timeline['usertime'] = date('YmdHi', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
+		$timeline['usertime'] = date('YmdHis', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 	}
 
 	$graphDims = getGraphDims();

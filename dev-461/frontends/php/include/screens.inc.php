@@ -1078,10 +1078,10 @@ require_once('include/js.inc.php');
 
 						$timeline = array();
 						$timeline['period'] = $effectiveperiod;
-						$timeline['starttime'] = date('YmdHi', get_min_itemclock_by_graphid($resourceid));
+						$timeline['starttime'] = date('YmdHis', get_min_itemclock_by_graphid($resourceid));
 
 						if(isset($_REQUEST['stime'])){
-							$timeline['usertime'] = date('YmdHi', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
+							$timeline['usertime'] = date('YmdHis', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 						}
 
 						// $src = $url.'&width='.$width.'&height='.$height.'&legend='.$legend.'&graph3d='.$graph3d;
@@ -1101,10 +1101,10 @@ require_once('include/js.inc.php');
 						$timeline = array();
 						if(isset($graphid) && !is_null($graphid) && ($editmode != 1)){
 							$timeline['period'] = $effectiveperiod;
-							$timeline['starttime'] = date('YmdHi', time() - ZBX_MAX_PERIOD); //get_min_itemclock_by_graphid($graphid);
+							$timeline['starttime'] = date('YmdHis', time() - ZBX_MAX_PERIOD); //get_min_itemclock_by_graphid($graphid);
 
 							if(isset($_REQUEST['stime'])){
-								$timeline['usertime'] = date('YmdHi', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
+								$timeline['usertime'] = date('YmdHis', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 							}
 
 							$objData['loadSBox'] = 1;
@@ -1162,13 +1162,13 @@ require_once('include/js.inc.php');
 					if(($editmode == 0) && !empty($resourceid)) $action = 'history.php?action=showgraph&itemid='.$resourceid.url_param('period').url_param('stime');
 
 					$timeline = array();
-					$timeline['starttime'] = date('YmdHi', time() - ZBX_MAX_PERIOD);
+					$timeline['starttime'] = date('YmdHis', time() - ZBX_MAX_PERIOD);
 
 					if(!zbx_empty($resourceid) && ($editmode != 1)){
 						$timeline['period'] = $effectiveperiod;
 
 						if(isset($_REQUEST['stime'])){
-							$timeline['usertime'] = date('YmdHi', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
+							$timeline['usertime'] = date('YmdHis', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 						}
 
 						$objData['loadSBox'] = 1;

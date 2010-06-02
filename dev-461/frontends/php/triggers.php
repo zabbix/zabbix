@@ -537,6 +537,7 @@ include_once('include/page_header.php');
 			if($pageFilter->hostid > 0) $options['hostids'] = $pageFilter->hostid;
 			else if($pageFilter->groupid > 0) $options['groupids'] = $pageFilter->groupid;
 
+
 			$triggers = CTrigger::get($options);
 		}
 
@@ -580,7 +581,7 @@ include_once('include/page_header.php');
 				}
 			}
 
-			$description[] = new CLink(expandTriggerDescription($trigger), 'triggers.php?form=update&triggerid='.$triggerid);
+			$description[] = new CLink($trigger['description'], 'triggers.php?form=update&triggerid='.$triggerid);
 
 //add dependencies {
 			$deps = $trigger['dependencies'];

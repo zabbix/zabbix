@@ -684,14 +684,15 @@ include_once('include/page_header.php');
 		$table->setHeader($header);
 
 		$options = array(
-				'nodeids' => $nodeid,
-				'hostids' => $hostid,
-				'output' => API_OUTPUT_EXTEND,
-				'select_hosts' => API_OUTPUT_EXTEND,
-				'select_items' => API_OUTPUT_EXTEND,
-				'select_functions' => API_OUTPUT_EXTEND,
-				'select_dependencies' => API_OUTPUT_EXTEND
-			);
+			'nodeids' => $nodeid,
+			'hostids' => $hostid,
+			'output' => API_OUTPUT_EXTEND,
+			'select_hosts' => API_OUTPUT_EXTEND,
+			'select_items' => API_OUTPUT_EXTEND,
+			'select_functions' => API_OUTPUT_EXTEND,
+			'select_dependencies' => API_OUTPUT_EXTEND,
+			'expandDescription' => 1,
+		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 		if(!is_null($templated)) $options['templated'] = $templated;
 
@@ -706,7 +707,6 @@ include_once('include/page_header.php');
 			$host = reset($trigger['hosts']);
 			$trigger['host'] = $host['host'];
 
-			$trigger['description'] = expandTriggerDescription($trigger);
 			$description = new CSpan($trigger['description'], 'link');
 
 			$trigger['description'] = $trigger['host'].':'.$trigger['description'];

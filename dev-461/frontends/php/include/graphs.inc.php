@@ -972,7 +972,7 @@
  *
  */
 	function copy_graph_to_host($graphid, $hostid, $copy_mode = false){
-		$result = false;
+		$result = true;
 
 		$gitems = array();
 
@@ -991,7 +991,6 @@
 		}
 
 		$db_graph = get_graph_by_graphid($graphid);
-
 		if($new_gitems = get_same_graphitems_for_host($gitems, $hostid)){
 			unset($chd_graphid);
 

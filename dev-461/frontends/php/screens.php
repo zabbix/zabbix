@@ -230,11 +230,11 @@
 		if(2 != $_REQUEST['fullscreen']){
 			$timeline = array(
 				'period' => $effectiveperiod,
-				'starttime' => date('YmdHi', time() - ZBX_MAX_PERIOD)
+				'starttime' => date('YmdHis', time() - ZBX_MAX_PERIOD)
 			);
 
 			if(isset($_REQUEST['stime'])){
-				$timeline['usertime'] = date('YmdHi', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
+				$timeline['usertime'] = date('YmdHis', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 			}
 
 			$dom_graph_id = 'screen_scroll';

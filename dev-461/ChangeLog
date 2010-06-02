@@ -1,6 +1,17 @@
 Changes for 1.8.3
 
  - [DEV-461] changes in GUI configuration menu (Aly)
+ - [ZBX-2473] fixed timescroll most right position when "now" (Aly)
+ - [ZBX-1193] improved macros form (Vedmak)
+ - [ZBX-2035] fixed host full cloning (Vedmak)
+ - [ZBX-1986] fixed empty Y axis if item values are zeros (Aly)
+ - [ZBX-2492] updated Japanese translation; thanks to Kodai Terashima (Richlv)
+ - [ZBX-1357] update Hungarian translation; thanks to Laszlo Szabo (Richlv)
+ - [ZBX-2489] fixed server crash when trapper received data sent using the old protocol (asaveljevs)
+ - [ZBX-2474,ZBXNEXT-378] fixed page refresh on filter change, now all filters hiding and showing works without refresh (Maxim Andruhovich / AM)
+ - [ZBX-2488] changed filter from Web Monitoring to External Check (Maxim Andruhovich / AM)
+ - [ZBX-2483] fixed showing latest data by filter when clicking from dashboard with GUI option 'Dropdown first entry' -> None (Maxim Andruhovich/AM)
+ - [ZBX-1529] fixed macros expand to nothing in templates (Vedmak)
  - [ZBX-2461] fixed complex bugs with trigger expressions (Maxim Andruhovich / AM)
  - [ZBX-1357] updated German translation; thanks to Peter Schultz (Richlv)
  - [ZBX-2319] fixed escaping locales on download (Aly)

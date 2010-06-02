@@ -255,46 +255,6 @@ include_once('include/page_header.php');
 /**********************************/
 /* <<<--- TEMPLATE ACTIONS --->>> */
 /**********************************/
-// REMOVE MACROS
-	if(isset($_REQUEST['macros_del']) && isset($_REQUEST['macros_rem'])){
-		$macros_rem = get_request('macros_rem', array());
-		foreach($macros_rem as $macro)
-			unset($_REQUEST['macros'][$macro]);
-	}
-// ADD MACRO
-	if(isset($_REQUEST['macro_add'])){
-		$macro_new = get_request('macro_new');
-		$value_new = get_request('value_new', null);
-
-		$currentmacros = array_keys(get_request('macros', array()));
-
-		if(!CUserMacro::validate(zbx_toObject($macro_new, 'macro'))){
-			error(S_WRONG_MACRO.' : '.$macro_new);
-			show_messages(false, '', S_MACROS);
-		}
-		else if(zbx_empty($value_new)){
-			error(S_EMPTY_MACRO_VALUE);
-			show_messages(false, '', S_MACROS);
-		}
-		else if(str_in_array($macro_new, $currentmacros)){
-			error(S_MACRO_EXISTS.' : '.$macro_new);
-			show_messages(false, '', S_MACROS);
-		}
-		else if(zbx_strlen($macro_new) > 64){
-			error(S_MACRO_TOO_LONG.' : '.$macro_new);
-			show_messages(false, '', S_MACROS);
-		}
-		else if(zbx_strlen($value_new) > 255){
-			error(S_MACRO_VALUE_TOO_LONG.' : '.$value_new);
-			show_messages(false, '', S_MACROS);
-		}
-		else{
-			$_REQUEST['macros'][$macro_new]['macro'] = $macro_new;
-			$_REQUEST['macros'][$macro_new]['value'] = $value_new;
-			unset($_REQUEST['macro_new']);
-			unset($_REQUEST['value_new']);
-		}
-	}
 // unlink, unlink_and_clear
 	if((isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear']))){
 		$_REQUEST['clear_templates'] = get_request('clear_templates', array());
