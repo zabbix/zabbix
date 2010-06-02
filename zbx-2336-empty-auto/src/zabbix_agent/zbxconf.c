@@ -114,8 +114,11 @@ void    load_config()
 	}
 #endif /* USE_PID_FILE */
 
-	if(CONFIG_HOSTNAME == NULL)
+	if(CONFIG_HOSTNAME == NULL || *CONFIG_HOSTNAME == '\0')
 	{
+		if(CONFIG_HOSTNAME != NULL)
+			zbx_free(CONFIG_HOSTNAME);
+
 	  	if(SUCCEED == process("system.hostname", 0, &result))
 		{
 			if( NULL != (value = GET_STR_RESULT(&result)) )

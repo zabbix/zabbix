@@ -269,8 +269,11 @@ void	init_config(void)
 
 	parse_cfg_file(CONFIG_FILE,cfg);
 
-	if(CONFIG_HOSTNAME == NULL)
+	if(CONFIG_HOSTNAME == NULL || *CONFIG_HOSTNAME == '\0')
 	{
+		if(CONFIG_HOSTNAME != NULL)
+			zbx_free(CONFIG_HOSTNAME);
+
 	  	if(SUCCEED == process("system.hostname", 0, &result))
 		{
 			if( NULL != (value = GET_STR_RESULT(&result)) )
