@@ -1898,9 +1898,9 @@ return $result;
 // Update Trigger definition
 
 	/******************************************************************************
-	 *																			*
-	 * Comments: !!! Don't forget sync code with C !!!							*
-	 *																			*
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
 	 ******************************************************************************/
 	function update_trigger($triggerid,$expression=NULL,$description=NULL,$type=NULL,$priority=NULL,$status=NULL,$comments=NULL,$url=NULL,$deps=array(),$templateid=0){
 		$trigger	= get_trigger_by_triggerid($triggerid);
@@ -4150,7 +4150,7 @@ $triggerExpressionRules['macro'] = Array(
 		'TRIGGERS.UNACK',
 		'TRIGGERS.PROBLEM.UNACK'),
 	'indexItem' => true,
-	'parent' => Array('independent', 'grouping'));
+	'parent' => Array('independent','grouping','checkPort'));
 $triggerExpressionRules['macroNum'] = Array(
 	'openSymbol' => Array('{' => 'valueDependent'),
 	'closeSymbol' => '}',
@@ -4184,13 +4184,13 @@ $triggerExpressionRules['macroNum'] = Array(
 		'PROFILE\.TAG[1-9]{1}',
 		'TRIGGER\.KEY[1-9]{1}'),
 	'indexItem' => true,
-	'parent' => Array('independent', 'grouping'));
+	'parent' => Array('independent','grouping','checkPort'));
 $triggerExpressionRules['customMacro'] = Array(
 	'openSymbol' => Array('{' => 'valueDependent'),
 	'closeSymbol' => '}',
 	'allowedSymbols' => '\$[A-Z0-9_.]+',
 	'indexItem' => true,
-	'parent' => Array('independent', 'grouping'));
+	'parent' => Array('independent','grouping','checkPort'));
 $triggerExpressionRules['expression'] = Array(
 	'openSymbol' => '{',
 	'closeSymbol' => '}',
@@ -4215,9 +4215,15 @@ $triggerExpressionRules['key'] = Array(
 $triggerExpressionRules['keyName'] = Array(
 	'openSymbol' => ':',
 	'closeSymbol' => Array('[' => 'default', '.' => 'nextEnd'),
-	'allowedSymbols' => '[0-9a-zA-Z_\.\-]+',
+	'allowedSymbols' => '[0-9a-zA-Z_.-]+',
 	'indexItem' => true,
 	'parent' => 'key');
+$triggerExpressionRules['checkPort'] = Array(
+	'openSymbol' => ',',
+	'closeSymbol' => '.',
+	'allowedSymbols' => '\d+',
+	'parent' => 'keyName'
+	);
 $triggerExpressionRules['keyParams'] = Array(
 	'openSymbol' => '[',
 	'closeSymbol' => ']',
