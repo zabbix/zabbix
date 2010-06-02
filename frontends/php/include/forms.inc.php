@@ -2026,13 +2026,41 @@
 		else
 			array_push($delay_flex_el, new CButton('del_delay_flex',S_DELETE_SELECTED));
 
-		if(count($applications)==0)  array_push($applications,0);
+		if(count($applications)==0) array_push($applications, 0);
 
-		if(isset($_REQUEST['itemid'])) {
-			$frmItem->setTitle(S_ITEM." '$host:".$item_data["description"]."'");
+		if(isset($_REQUEST['itemid'])){
+			$caption = array();
+			$itmid = $_REQUEST['itemid'];
+			do{
+				$sql = 'SELECT i.itemid, i.templateid, h.host'.
+						' FROM items i, hosts h'.
+						' WHERE i.itemid='.$itmid.
+							' AND h.hostid=i.hostid';
+				$itm = DBfetch(DBselect($sql));			
+				if($itm){
+					if($_REQUEST['itemid'] == $itmid){
+						$caption[] = SPACE;
+						$caption[] = $itm['host'];
+					}
+					else{
+						$caption[] = ' : ';
+						$caption[] = new CLink($itm['host'], 'items.php?form=update&itemid='.$itm['itemid'], 'highlight underline');
+					}
+					
+					$itmid = $itm['templateid'];
+				}
+				else break;
+			}while($itmid != 0);
+			
+			$caption[] = S_ITEM.' "';
+			$caption = array_reverse($caption);
+			$caption[] = ': ';
+			$caption[] = $item_data['description'];
+			$caption[] = '"';
+			$frmItem->setTitle($caption);
 		}
-		else {
-			$frmItem->setTitle(S_ITEM." '$host:$description'");
+		else{
+			$frmItem->setTitle(S_ITEM." $host : $description");
 		}
 
 		$frmItem->addVar('form_hostid', $hostid);
@@ -2761,11 +2789,35 @@
 		$limited = null;
 
 		if(isset($_REQUEST['triggerid'])){
-			$frmTrig->addVar('triggerid',$_REQUEST['triggerid']);
-			$trigger=get_trigger_by_triggerid($_REQUEST['triggerid']);
+			$frmTrig->addVar('triggerid', $_REQUEST['triggerid']);
+			
+			$trigger = get_trigger_by_triggerid($_REQUEST['triggerid']);
 
-			$frmTrig->setTitle(S_TRIGGER.' "'.htmlspecialchars($trigger['description']).'"');
-
+			$caption = array();
+			$trigid = $_REQUEST['triggerid'];
+			do{
+				$sql = 'SELECT t.triggerid, t.templateid, h.host'.
+						' FROM triggers t, functions f, items i, hosts h'.
+						' WHERE t.triggerid='.$trigid.
+							' AND h.hostid=i.hostid'.
+							' AND i.itemid=f.itemid'.
+							' AND f.triggerid=t.triggerid';
+				$trig = DBfetch(DBselect($sql));
+				
+				if($_REQUEST['triggerid'] != $trigid){
+					$caption[] = ' : ';
+					$caption[] = new CLink($trig['host'], 'triggers.php?form=update&triggerid='.$trig['triggerid'], 'highlight underline');
+				}
+				
+				$trigid = $trig['templateid'];
+			}while($trigid != 0);
+			
+			$caption[] = S_TRIGGER.' "';
+			$caption = array_reverse($caption);
+			$caption[] = htmlspecialchars($trigger['description']);
+			$caption[] = '"';
+			$frmTrig->setTitle($caption);
+		
 			$limited = $trigger['templateid'] ? 'yes' : null;
 		}
 

@@ -86,7 +86,8 @@ class CFormTable extends CForm{
 			return 0;
 		}
 
-		$this->title = unpack_object($value);
+		// $this->title = unpack_object($value);
+		$this->title = $value;
 	}
 
 	public function setHelp($value=NULL){
