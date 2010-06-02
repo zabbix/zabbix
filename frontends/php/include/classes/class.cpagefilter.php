@@ -8,7 +8,7 @@ class CPageFilter{
 
 	protected $config = array();
 
-	// profiles idx
+// profiles idx
 	private $_profileIdx = array();
 
 	const GROUP_LATEST_IDX = 'web.latest.groupid';
@@ -35,7 +35,7 @@ class CPageFilter{
 		global $page, $ZBX_WITH_ALL_NODES;
 
 		/* options = array(
-			'config' => [ allow_all, deny_all, select_latest ],
+			'config' => {DDFirst: [ allow_all, deny_all, select_latest ], 'individual': [true,false]},
 			'groups' => [apiget filters],
 			'hosts' => [apiget filters],
 			'graphs' => [apiget filters],
@@ -48,8 +48,15 @@ class CPageFilter{
 		$this->config['select_latest'] = isset($options['config']['select_latest']);
 
 		$config = select_config();
-		$this->config['DDRemember'] = $config['dropdown_first_remember'];
 
+// Individual remember selections per page (not for menu)
+		$this->config['individual'] = false;
+		if(isset($options['config']['individual']) && !is_null($options['config']['individual'])){
+			$this->config['individual'] = true;
+		}
+
+// DropDown
+		$this->config['DDRemember'] = $config['dropdown_first_remember'];
 		if(isset($options['config']['allow_all'])){
 			$this->config['DDFirst'] = ZBX_DROPDOWN_FIRST_ALL;
 		}
@@ -67,21 +74,26 @@ class CPageFilter{
 			}
 		}
 
-
+		$profileSection = ($this->config['individual']) ? $page['file'] : $page['menu'];
+// groups
 		if(isset($options['groups'])){
 			if(!isset($options['groupid']) && isset($options['hostid'])){
 				$options['groupid'] = 0;
 			}
 			
-			$this->_profileIdx['groups'] = 'web.'.$page['menu'].'.groupid';
+			$this->_profileIdx['groups'] = 'web.'.$profileSection.'.groupid';
 			$this->_initGroups($options['groupid'], $options['groups']);
 		}
+
+// hosts
 		if(isset($options['hosts'])){
-			$this->_profileIdx['hosts'] = 'web.'.$page['menu'].'.hostid';
+			$this->_profileIdx['hosts'] = 'web.'.$profileSection.'.hostid';
 			$this->_initHosts($options['hostid'], $options['hosts']);
 		}
+
+// graphs
 		if(isset($options['graphs'])){
-			$this->_profileIdx['graphs'] = 'web.'.$page['file'].'.graphid';
+			$this->_profileIdx['graphs'] = 'web.'.$profileSection.'.graphid';
 			$this->_initGraphs($options['graphid'], $options['graphs']);
 		}
 	}
@@ -131,8 +143,7 @@ class CPageFilter{
 		CProfile::update($this->_profileIdx['groups'], $groupid, PROFILE_TYPE_ID);
 		CProfile::update(self::GROUP_LATEST_IDX, $groupid, PROFILE_TYPE_ID);
 
-		$this->isSelected['groupsSelected'] = (($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL) && !empty($this->data['groups']))
-			|| ($groupid > 0);
+		$this->isSelected['groupsSelected'] = (($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL) && !empty($this->data['groups'])) || ($groupid > 0);
 		$this->ids['groupid'] = $groupid;
 	}
 

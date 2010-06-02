@@ -96,7 +96,6 @@ frontends/php/conf/maintenance.inc.php -text
 frontends/php/conf/zabbix.conf.php.example -text
 frontends/php/dashboard.php -text
 frontends/php/dashconf.php -text
-frontends/php/export.php -text
 frontends/php/fonts/DejaVuSans.ttf -text
 frontends/php/hostgroups.php -text
 frontends/php/images/flash/zbxclock.swf -text svneol=unset#unset
@@ -251,7 +250,6 @@ frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
 frontends/php/imgstore.php -text
-frontends/php/import.php -text
 frontends/php/include/apicalls.inc.php -text
 frontends/php/include/blocks.inc.php -text
 frontends/php/include/classes/class.carea.php -text
@@ -365,6 +363,7 @@ frontends/php/report6.php -text
 frontends/php/scripts.php -text
 frontends/php/scripts_exec.php -text
 frontends/php/search.php -text
+frontends/php/slideconf.php -text
 frontends/php/slides.php -text
 frontends/php/styles/blocks.css -text
 frontends/php/styles/calendar.css -text
