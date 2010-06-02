@@ -24,8 +24,6 @@ require_once('include/hosts.inc.php');
 
 class CGraphDraw{
 	public function __construct($type = GRAPH_TYPE_NORMAL){
-		bcscale(6);
-		
 		$this->stime = null;
 		$this->fullSizeX = null;
 		$this->fullSizeY = null;
@@ -120,7 +118,10 @@ class CGraphDraw{
 			'Priority Disaster'	=> array(255,0,0),
 			'Priority High'		=> array(255,100,100),
 			'Priority Average'	=> array(221,120,120),
-			'Priority'			=> array(100,100,100),
+			'Priority Warning'	=> array(239,239,204),
+			'Priority Information'	=> array(204,226,204),
+			'Priority'		=> array(188,188,188),
+
 			'Not Work Period'	=> array(230,230,230),
 
 			'UnknownData'		=> array(130,130,130, 50)

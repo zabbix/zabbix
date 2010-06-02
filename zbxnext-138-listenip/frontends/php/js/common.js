@@ -89,7 +89,7 @@ function SDI(msg){
 		doc_body.appendChild(div_help);
 		
 		div_help.setAttribute('id','div_help');
-		div_help.setAttribute('style','position: absolute; right: 30px; top: 100px; border: 1px red solid; width: 500px; height: 400px; background-color: white; font-size: 12px; overflow: auto; z-index: 20;');
+		div_help.setAttribute('style','position: absolute; right: 100px; top: 100px; border: 1px red solid; width: 500px; height: 400px; background-color: white; font-size: 12px; overflow: auto; z-index: 20;');
 		
 //		new Draggable(div_help,{});
 	}
@@ -413,9 +413,9 @@ function get_bodywidth(){
 		w-=16;
 	}
 	else{
-		w = (w2 > w)?w2:w;
+		w = (w2 < w)?w2:w;
 	}
-
+//alert(w);
 return w;
 }
 

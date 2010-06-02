@@ -34,7 +34,8 @@ $availableJScripts = array(
 	'class.ctree.js' => '',
 	'class.curl.js' => '',
 	'class.rpc.js' => '',
-	'class.pmaster.js' => ''
+	'class.pmaster.js' => '',
+	'class.cviewswitcher.js' => ''
 );
 
 $tranStrings = array(

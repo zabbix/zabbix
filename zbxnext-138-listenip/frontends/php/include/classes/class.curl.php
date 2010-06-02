@@ -49,7 +49,7 @@ class Curl{
 		$this->arguments =	array();
 
 		if(empty($url)){
-			$this->formatArguments();
+			$this->formatGetArguments();
 
 			// $protocol = (zbx_strpos(zbx_strtolower($_SERVER['SERVER_PROTOCOL']), 'shttp') !== false)?'shttp':'http';
 			$protocol = ((isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on')) || ($_SERVER['SERVER_PORT'] == 443)) ? 'https' : 'http';
@@ -57,7 +57,7 @@ class Curl{
 			$this->url = $url = $protocol.'://'.$_SERVER['SERVER_NAME'].':'.$_SERVER['SERVER_PORT'].$_SERVER['SCRIPT_NAME'].'?'.$this->getQuery();
 		}
 		else{
-			$this->url=urldecode($url);
+			$this->url = $url;
 
 			$tmp_pos = zbx_strpos($this->url,'?');
 			$this->query=($tmp_pos!==false)?(substr($this->url,$tmp_pos+1)):'';
@@ -142,10 +142,13 @@ class Curl{
 
 	public function formatQuery(){
 		$query = Array();
+
 		foreach($this->arguments as $key => $value){
 			if(is_null($value)) continue;
 			if(is_array($value)){
 				foreach($value as $vkey => $vvalue){
+					if(is_array($vvalue)) continue;
+
 					$query[] = $key.'['.$vkey.']='.rawurlencode($vvalue);
 				}
 			}

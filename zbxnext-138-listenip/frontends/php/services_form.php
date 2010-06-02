@@ -621,11 +621,12 @@ if(isset($_REQUEST['sform'])){
 
 
 
-		$script = new CJSscript("javascript: if(CLNDR['downtime_since'].clndr.setSDateFromOuterObj()){".
-								"$('new_service_time[from]').value = parseInt(CLNDR['downtime_since'].clndr.sdt.getTime()/1000);}".
-							"if(CLNDR['downtime_till'].clndr.setSDateFromOuterObj()){".
-								"$('new_service_time[to]').value = parseInt(CLNDR['downtime_till'].clndr.sdt.getTime()/1000);}"
-							);
+		$script = "javascript: ".
+						"if(CLNDR['downtime_since'].clndr.setSDateFromOuterObj()){".
+							"$('new_service_time[from]').value = parseInt(CLNDR['downtime_since'].clndr.sdt.getTime()/1000);}".
+						"if(CLNDR['downtime_till'].clndr.setSDateFromOuterObj()){".
+							"$('new_service_time[to]').value = parseInt(CLNDR['downtime_till'].clndr.sdt.getTime()/1000);}"
+						;
 		$frmService->addAction('onsubmit',$script);
 		$frmService->addVar('new_service_time[from]','');
 		$frmService->addVar('new_service_time[to]','');

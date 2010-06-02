@@ -141,21 +141,17 @@
 
 			$this->DISABLE_NEXT_BUTTON = !$this->getConfig('agree', false);
 
+			$license = 'Missing licence file. See GPL licence.';
+			if(file_exists($LICENCE_FILE))
+				$license = zbx_nl2br(nbsp(file_get_contents($LICENCE_FILE)));
+
+			$agree = array( new CCheckBox('agree', $this->getConfig('agree', false), 'submit();'), 'I agree');
+
 			return array(
-				new CTag('div', 'yes', (file_exists($LICENCE_FILE) ?
-					new CJSscript(nl2br(nbsp(htmlspecialchars(file_get_contents($LICENCE_FILE))))) :
-					'Missing licence file. See GPL licence.')
-				, 'licence'),
+				new CDiv(new CSpan($license), 'licence'),
 				BR(),
-				new CTag('div', 'yes',
-					array(
-						new CCheckBox(
-							'agree',
-							$this->getConfig('agree', false),
-							'submit();'),
-						'I agree'),
-					'center')
-				);
+				new CDiv($agree, 'center')
+			);
 		}
 
 		function stage2(){
