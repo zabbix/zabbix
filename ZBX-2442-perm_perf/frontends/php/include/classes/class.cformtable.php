@@ -49,7 +49,6 @@ class CFormTable extends CForm{
 		$this->setHelp();
 
 		$this->addVar($form_variable, get_request($form_variable, 1));
-		$this->addVar('form_refresh',get_request('form_refresh',0)+1);
 
 		$this->bottom_items = new CCol(SPACE,'form_row_last');
 			$this->bottom_items->setColSpan(2);
@@ -87,7 +86,8 @@ class CFormTable extends CForm{
 			return 0;
 		}
 
-		$this->title = unpack_object($value);
+		// $this->title = unpack_object($value);
+		$this->title = $value;
 	}
 
 	public function setHelp($value=NULL){

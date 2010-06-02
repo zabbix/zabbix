@@ -85,18 +85,18 @@
 			$up = null;
 			if($sid != $first){
 				$up = new CSpan(S_UP,'link');
-				$up->onClick("return create_var('".$form->GetName()."','move_up',".$sid.", true);");
+				$up->onClick("return create_var('".$form->getName()."','move_up',".$sid.", true);");
 			}
 
 			$down = null;
 			if($sid != $last){
 				$down = new CSpan(S_DOWN,'link');
-				$down->onClick("return create_var('".$form->GetName()."','move_down',".$sid.", true);");
+				$down->onClick("return create_var('".$form->getName()."','move_down',".$sid.", true);");
 			}
 
 			$screen_data = get_screen_by_screenid($s['screenid']);
 			$name = new CSpan($screen_data['name'],'link');
-			$name->onClick("return create_var('".$form->GetName()."','edit_step',".$sid.", true);");
+			$name->onClick("return create_var('".$form->getName()."','edit_step',".$sid.", true);");
 
 			$tblSteps->addRow(array(
 				array(new CCheckBox('sel_step[]',null,null,$sid), $name),
@@ -129,7 +129,7 @@
 					new CNumericBox('new_step[delay]', $new_step['delay'], 5), BR(),
 					new CTextBox('screen_name', $screen_data['name'], 40, 'yes'),
 					new CButton('select_screen',S_SELECT,
-						'return PopUp("popup.php?dstfrm='.$form->GetName().'&srctbl=screens'.
+						'return PopUp("popup.php?dstfrm='.$form->getName().'&srctbl=screens'.
 						'&dstfld1=screen_name&srcfld1=name'.
 						'&dstfld2=new_step%5Bscreenid%5D&srcfld2=screenid");'),
 					BR(),
@@ -435,7 +435,7 @@
 			new CTextBox('application', $application, 40),
 			SPACE,
 			new CButton('select_app',S_SELECT,
-				'return PopUp("popup.php?dstfrm='.$form->GetName().
+				'return PopUp("popup.php?dstfrm='.$form->getName().
 				'&dstfld1=application&srctbl=applications'.
 				'&srcfld1=name&only_hostid='.$_REQUEST['hostid'].'",200,300,"application");')
 			));
@@ -522,17 +522,17 @@
 			$up = null;
 			if($stepid != $first){
 				$up = new CSpan(S_UP,'link');
-				$up->onClick("return create_var('".$form->GetName()."','move_up',".$stepid.", true);");
+				$up->onClick("return create_var('".$form->getName()."','move_up',".$stepid.", true);");
 			}
 
 			$down = null;
 			if($stepid != $last){
 				$down = new CLink(S_DOWN,'link');
-				$down->onClick("return create_var('".$form->GetName()."','move_down',".$stepid.", true);");
+				$down->onClick("return create_var('".$form->getName()."','move_down',".$stepid.", true);");
 			}
 
 			$name = new CSpan($s['name'],'link');
-			$name->onClick('return PopUp("popup_httpstep.php?dstfrm='.$form->GetName().
+			$name->onClick('return PopUp("popup_httpstep.php?dstfrm='.$form->getName().
 				'&list_name=steps&stepid='.$stepid.
 				url_param($s['name'],false,'name').
 				url_param($s['timeout'],false,'timeout').
@@ -564,7 +564,7 @@
 		$form->addRow(S_STEPS, array(
 			(count($steps) > 0) ? array ($tblSteps, BR()) : null ,
 			new CButton('add_step',S_ADD,
-				'return PopUp("popup_httpstep.php?dstfrm='.$form->GetName().'");'),
+				'return PopUp("popup_httpstep.php?dstfrm='.$form->getName().'");'),
 			(count($steps) > 0) ? new CButton('del_sel_step',S_DELETE_SELECTED) : null
 			));
 
@@ -783,7 +783,7 @@
 					$lstGroups,
 					BR(),
 					new CButton('add_group',S_ADD,
-						'return PopUp("popup_usrgrp.php?dstfrm='.$frmUser->GetName().
+						'return PopUp("popup_usrgrp.php?dstfrm='.$frmUser->getName().
 						'&list_name=user_groups_to_del[]&var_name=user_groups",450, 450);'),
 					SPACE,
 					(count($user_groups) > 0)?new CButton('del_user_group',S_DELETE_SELECTED):null
@@ -806,9 +806,8 @@
 
 		$frmUser->addRow(S_THEME, $cmbTheme);
 
-		$chkbx_autologin = new CCheckBox("autologin",
-											$autologin,
-											new CJSscript("var autologout_visible = document.getElementById('autologout_visible');
+		$script = "javascript:
+			var autologout_visible = document.getElementById('autologout_visible');
 														var autologout = document.getElementById('autologout');
 														if (this.checked) {
 															if (autologout_visible.checked) {
@@ -816,25 +815,31 @@
 																autologout_visible.onclick();
 															}
 															autologout_visible.disabled = true;
-														} else {
+			}
+			else {
 															autologout_visible.disabled = false;
-														}"), 1);
+			}";
+		$chkbx_autologin = new CCheckBox("autologin", $autologin, $script, 1);
+
 		$chkbx_autologin->setAttribute('autocomplete','off');
 		$frmUser->addRow(S_AUTO_LOGIN,	$chkbx_autologin);
-		$autologoutCheckBox = new CCheckBox('autologout_visible',
-											($autologout == 0) ? 'no' : 'yes',
-											new CJSscript("var autologout = document.getElementById('autologout');
+
+		$script = "javascript:
+					var autologout = document.getElementById('autologout');
 														if (this.checked) {
 															autologout.disabled = false;
-														} else {
+					}
+					else {
 															autologout.disabled = true;
-														}"));
+					}";
+		$autologoutCheckBox = new CCheckBox('autologout_visible', ($autologout == 0) ? 'no' : 'yes', $script);
 
 		$autologoutTextBox = new CNumericBox("autologout", ($autologout == 0) ? '90' : $autologout, 4);
-		// if autologout is disabled
-		if ($autologout == 0) {
+// if autologout is disabled
+		if($autologout == 0) {
 			$autologoutTextBox->setAttribute('disabled','disabled');
 		}
+
 		if($autologin != 0) {
 			$autologoutCheckBox->setAttribute('disabled','disabled');
 		}
@@ -853,14 +858,14 @@
 			foreach($user_medias as $id => $one_media){
 				if(!isset($one_media['active']) || $one_media['active']==0){
 					$status = new CLink(S_ENABLED,'#','enabled');
-					$status->OnClick('return create_var("'.$frmUser->GetName().'","disable_media",'.$id.', true);');
+					$status->onClick('return create_var("'.$frmUser->getName().'","disable_media",'.$id.', true);');
 				}
 				else{
 					$status = new CLink(S_DISABLED,'#','disabled');
-					$status->OnClick('return create_var("'.$frmUser->GetName().'","enable_media",'.$id.', true);');
+					$status->onClick('return create_var("'.$frmUser->getName().'","enable_media",'.$id.', true);');
 				}
 
-				$media_url = '?dstfrm='.$frmUser->GetName().
+				$media_url = '?dstfrm='.$frmUser->getName().
 								'&media='.$id.
 								'&mediatypeid='.$one_media['mediatypeid'].
 								'&sendto='.urlencode($one_media['sendto']).
@@ -882,7 +887,7 @@
 			$frmUser->addRow(
 				S_MEDIA,
 				array($media_table,
-					new CButton('add_media',S_ADD,'javascript: return PopUp("popup_media.php?dstfrm='.$frmUser->GetName().'",550,400);'),
+					new CButton('add_media',S_ADD,'javascript: return PopUp("popup_media.php?dstfrm='.$frmUser->getName().'",550,400);'),
 					SPACE,
 					(count($user_medias) > 0) ? new CButton('del_user_media',S_DELETE_SELECTED) : null
 				));
@@ -893,7 +898,7 @@
 			$frmUser->addVar('perm_details', $perm_details);
 
 			$link = new CSpan($perm_details?S_HIDE:S_SHOW ,'link');
-			$link->onClick("return create_var('".$frmUser->GetName()."','perm_details',".($perm_details ? 0 : 1).", true);");
+			$link->onClick("return create_var('".$frmUser->getName()."','perm_details',".($perm_details ? 0 : 1).", true);");
 			$resources_list = array(
 				S_RIGHTS_OF_RESOURCES,
 				SPACE.'(',$link,')'
@@ -1072,7 +1077,7 @@
 				$lstUsers,
 				BR(),
 				new CButton('add_user',S_ADD,
-					"return PopUp('popup_users.php?dstfrm=".$frmUserG->GetName().
+					"return PopUp('popup_users.php?dstfrm=".$frmUserG->getName().
 					"&list_name=group_users_to_del[]&var_name=group_users',600,300);"),
 				(count($group_users) > 0) ? new CButton('del_group_user',S_DELETE_SELECTED) : null
 			));
@@ -1133,15 +1138,15 @@
 		$table_Rights->addRow(array(new CCol($lstWrite,'read_write'), new CCol($lstRead,'read_only'), new CCol($lstDeny,'deny')));
 		$table_Rights->addRow(array(
 			array(new CButton('add_read_write',S_ADD,
-					"return PopUp('popup_right.php?dstfrm=".$frmUserG->GetName().
+					"return PopUp('popup_right.php?dstfrm=".$frmUserG->getName().
 					"&permission=".PERM_READ_WRITE."',450,450);"),
 				new CButton('del_read_write',S_DELETE_SELECTED)),
 			array(	new CButton('add_read_only',S_ADD,
-					"return PopUp('popup_right.php?dstfrm=".$frmUserG->GetName().
+					"return PopUp('popup_right.php?dstfrm=".$frmUserG->getName().
 					"&permission=".PERM_READ_ONLY."',450,450);"),
 				new CButton('del_read_only',S_DELETE_SELECTED)),
 			array(new CButton('add_deny',S_ADD,
-					"return PopUp('popup_right.php?dstfrm=".$frmUserG->GetName().
+					"return PopUp('popup_right.php?dstfrm=".$frmUserG->getName().
 					"&permission=".PERM_DENY."',450,450);"),
 				new CButton('del_deny',S_DELETE_SELECTED))
 			));
@@ -1151,7 +1156,7 @@
 		$frmUserG->addVar('perm_details', $perm_details);
 
 		$link = new CSpan($perm_details?S_HIDE:S_SHOW,'link');
-		$link->OnClick("return create_var('".$frmUserG->GetName()."','perm_details',".($perm_details ? 0 : 1).", true);");
+		$link->onClick("return create_var('".$frmUserG->getName()."','perm_details',".($perm_details ? 0 : 1).", true);");
 		$resources_list = array(
 			S_RIGHTS_OF_RESOURCES,
 			SPACE.'(',$link,')'
@@ -1365,7 +1370,7 @@
 		));
 		$col_table1->addRow(array(bold(S_APPLICATION.': '),
 				array(new CTextBox('filter_application', $filter_application, 20),
-					new CButton('btn_app', S_SELECT, 'return PopUp("popup.php?dstfrm='.$form->GetName().
+					new CButton('btn_app', S_SELECT, 'return PopUp("popup.php?dstfrm='.$form->getName().
 						'&dstfld1=filter_application&srctbl=applications&srcfld1=name",400,300,"application");', 'A'))
 		));
 		$col_table1->addRow(array(array(bold(S_DESCRIPTION),SPACE.S_LIKE_SMALL.': '),
@@ -2021,13 +2026,41 @@
 		else
 			array_push($delay_flex_el, new CButton('del_delay_flex',S_DELETE_SELECTED));
 
-		if(count($applications)==0)  array_push($applications,0);
+		if(count($applications)==0) array_push($applications, 0);
 
-		if(isset($_REQUEST['itemid'])) {
-			$frmItem->setTitle(S_ITEM." '$host:".$item_data["description"]."'");
+		if(isset($_REQUEST['itemid'])){
+			$caption = array();
+			$itmid = $_REQUEST['itemid'];
+			do{
+				$sql = 'SELECT i.itemid, i.templateid, h.host'.
+						' FROM items i, hosts h'.
+						' WHERE i.itemid='.$itmid.
+							' AND h.hostid=i.hostid';
+				$itm = DBfetch(DBselect($sql));			
+				if($itm){
+					if($_REQUEST['itemid'] == $itmid){
+						$caption[] = SPACE;
+						$caption[] = $itm['host'];
 		}
-		else {
-			$frmItem->setTitle(S_ITEM." '$host:$description'");
+					else{
+						$caption[] = ' : ';
+						$caption[] = new CLink($itm['host'], 'items.php?form=update&itemid='.$itm['itemid'], 'highlight underline');
+		}
+					
+					$itmid = $itm['templateid'];
+				}
+				else break;
+			}while($itmid != 0);
+			
+			$caption[] = S_ITEM.' "';
+			$caption = array_reverse($caption);
+			$caption[] = ': ';
+			$caption[] = $item_data['description'];
+			$caption[] = '"';
+			$frmItem->setTitle($caption);
+		}
+		else{
+			$frmItem->setTitle(S_ITEM." $host : $description");
 		}
 
 		$frmItem->addVar('form_hostid', $hostid);
@@ -2109,7 +2142,7 @@
 		}
 		else{
 			$btnSelect = new CButton('btn1',S_SELECT,
-				"return PopUp('popup.php?dstfrm=".$frmItem->GetName().
+				"return PopUp('popup.php?dstfrm=".$frmItem->getName().
 				"&dstfld1=key&srctbl=help_items&srcfld1=key_&itemtype=".$type."');",
 				'T');
 		}
@@ -2751,11 +2784,35 @@
 		$limited = null;
 
 		if(isset($_REQUEST['triggerid'])){
-			$frmTrig->addVar('triggerid',$_REQUEST['triggerid']);
-			$trigger=get_trigger_by_triggerid($_REQUEST['triggerid']);
+			$frmTrig->addVar('triggerid', $_REQUEST['triggerid']);
+			
+			$trigger = get_trigger_by_triggerid($_REQUEST['triggerid']);
 
-			$frmTrig->setTitle(S_TRIGGER.' "'.htmlspecialchars($trigger['description']).'"');
-
+			$caption = array();
+			$trigid = $_REQUEST['triggerid'];
+			do{
+				$sql = 'SELECT t.triggerid, t.templateid, h.host'.
+						' FROM triggers t, functions f, items i, hosts h'.
+						' WHERE t.triggerid='.$trigid.
+							' AND h.hostid=i.hostid'.
+							' AND i.itemid=f.itemid'.
+							' AND f.triggerid=t.triggerid';
+				$trig = DBfetch(DBselect($sql));
+				
+				if($_REQUEST['triggerid'] != $trigid){
+					$caption[] = ' : ';
+					$caption[] = new CLink($trig['host'], 'triggers.php?form=update&triggerid='.$trig['triggerid'], 'highlight underline');
+				}
+				
+				$trigid = $trig['templateid'];
+			}while($trigid != 0);
+			
+			$caption[] = S_TRIGGER.' "';
+			$caption = array_reverse($caption);
+			$caption[] = htmlspecialchars($trigger['description']);
+			$caption[] = '"';
+			$frmTrig->setTitle($caption);
+		
 			$limited = $trigger['templateid'] ? 'yes' : null;
 		}
 
@@ -2841,7 +2898,7 @@
 
 		$row = array($exprtxt,
 					 new CButton('insert',$input_method == IM_TREE ? S_EDIT : S_SELECT,
-								 "return PopUp('popup_trexpr.php?dstfrm=".$frmTrig->GetName().
+								 "return PopUp('popup_trexpr.php?dstfrm=".$frmTrig->getName().
 								 "&dstfld1=${exprfname}&srctbl=expression".
 								 "&srcfld1=expression&expression=' + escape($exprparam),800,200);"));
 
@@ -3401,7 +3458,7 @@
 				array(
 					$items_table,
 					new CButton('add_item',S_ADD,
-						"return PopUp('popup_gitem.php?dstfrm=".$frmGraph->GetName().
+						"return PopUp('popup_gitem.php?dstfrm=".$frmGraph->getName().
 						url_param($only_hostid, false, 'only_hostid').
 						url_param($monitored_hosts, false, 'monitored_hosts').
 						url_param($graphtype, false, 'graphtype').
@@ -5168,8 +5225,8 @@
 			$grp_tb->addItem($grp['groupid'], $grp['name']);
 		}
 
-		$frmHost->addRow(array(new CVisibilityBox('visible[groups]', isset($visible['groups']), $grp_tb->GetName(), S_ORIGINAL),S_GROUPS),
-						$grp_tb->Get(S_IN.SPACE.S_GROUPS,S_OTHER.SPACE.S_GROUPS)
+		$frmHost->addRow(array(new CVisibilityBox('visible[groups]', isset($visible['groups']), $grp_tb->getName(), S_ORIGINAL),S_GROUPS),
+						$grp_tb->get(S_IN.SPACE.S_GROUPS,S_OTHER.SPACE.S_GROUPS)
 					);
 
 		$frmHost->addRow(array(new CVisibilityBox('visible[newgroup]', isset($visible['newgroup']), 'newgroup', S_ORIGINAL),S_NEW_GROUP),
@@ -5241,7 +5298,7 @@
 		}
 
 		$template_table->addRow(array(
-			new CButton('add_template', S_ADD, "return PopUp('popup.php?dstfrm=".$frmHost->GetName().
+			new CButton('add_template', S_ADD, "return PopUp('popup.php?dstfrm=".$frmHost->getName().
 				"&dstfld1=new_template&srctbl=templates&srcfld1=hostid&srcfld2=host".
 				url_param($templates,false,'existed_templates')."',450,450)"),
 			new CButton('unlink', S_REMOVE)
@@ -5275,7 +5332,7 @@
 		}
 
 		$template_table_r->addRow(array(
-			new CButton('add_template', S_ADD, "return PopUp('popup.php?dstfrm=".$frmHost->GetName().
+			new CButton('add_template', S_ADD, "return PopUp('popup.php?dstfrm=".$frmHost->getName().
 				"&dstfld1=new_template&srctbl=templates&srcfld1=hostid&srcfld2=host".
 				url_param($templates,false,'existed_templates')."',450,450)"),
 			new CButton('unlink', S_REMOVE)
@@ -5392,6 +5449,33 @@
 		$frmHost->addItemToBottomRow(new CButtonCancel(url_param('config').url_param('groupid')));
 		
 		return $frmHost;
+	}
+
+// Host import form
+	function import_host_form($rules, $template=false){
+		$form = new CFormTable(S_IMPORT, null, 'post', 'multipart/form-data');
+		$form->addRow(S_IMPORT_FILE, new CFile('import_file'));
+
+		$table = new CTable();
+		$table->setHeader(array(S_ELEMENT, S_UPDATE.SPACE.S_EXISTING, S_ADD.SPACE.S_MISSING), 'bold');
+
+		$titles = array('host' => $template?S_TEMPLATE:S_HOST, 'template' => S_TEMPLATE_LINKAGE, 'item' => S_ITEM, 'trigger' => S_TRIGGER, 'graph' => S_GRAPH);
+		foreach($titles as $key => $title){
+			$cbExist = new CCheckBox('rules['.$key.'][exist]', isset($rules[$key]['exist']));
+
+			if($key == 'template')
+				$cbMissed = null;
+			else
+				$cbMissed = new CCheckBox('rules['.$key.'][missed]', isset($rules[$key]['missed']));
+
+			$table->addRow(array($title, $cbExist, $cbMissed));
+		}
+
+		$form->addRow(S_RULES, $table);
+
+		$form->addItemToBottomRow(new CButton('import', S_IMPORT));
+
+	return $form;
 	}
 
 // Host form
@@ -5730,19 +5814,23 @@
 			$options = array(
 				'inherited' => 0,
 				'hostids' => $_REQUEST['hostid'],
+				'select_hosts' => API_OUTPUT_REFER,
 				'output' => API_OUTPUT_EXTEND,
 			);
 			$host_graphs = CGraph::get($options);
-
+			
 			if(!empty($host_graphs)){
-				$graphs_lbx = new CListBox('triggers' ,null, 8);
+				$graphs_lbx = new CListBox('graphs', null, 8);
 				$graphs_lbx->setAttribute('disabled', 'disabled');
 
 				order_result($host_graphs, 'name');
 				foreach($host_graphs as $hgraph){
+					if(count($hgraph['hosts']) > 1) continue;
 					$graphs_lbx->addItem($hgraph['graphid'], $hgraph['name']);
 				}
-				$host_tbl->addRow(array(S_GRAPHS, $graphs_lbx));
+				
+				if($graphs_lbx->ItemsCount() > 1)
+					$host_tbl->addRow(array(S_GRAPHS, $graphs_lbx));
 			}
 		}
 
@@ -5801,6 +5889,8 @@
 
 
 // MACROS WIDGET {
+		// $macros_wdgt = new CWidget();
+		// $macros_wdgt->addItem(get_macros_widget($_REQUEST['hostid']));
 		$macros_wdgt = get_macros_widget($_REQUEST['hostid']);
 // } MACROS WIDGET
 
@@ -6505,7 +6595,6 @@
 		return $tbl_header_host;
 	}
 
-
 	function get_macros_widget($hostid = null){
 
 		if(isset($_REQUEST['form_refresh'])){
@@ -6513,52 +6602,118 @@
 		}
 		else if($hostid > 0){
 			$macros = CUserMacro::get(array('extendoutput' => 1, 'hostids' => $hostid));
+			order_result($macros, 'macro');
+		}
+		else if($hostid === null){
+			$macros = CUserMacro::get(array('extendoutput' => 1, 'globalmacro' => 1));
+			order_result($macros, 'macro');
 		}
 		else{
 			$macros = array();
 		}
-		order_result($macros, 'macro');
+		
+		if(empty($macros)){
+			$macros = array(0 => array('macro' => '', 'value' => ''));
+		}
 
-		$macros_tbl = new CTable('', 'tablestripped');
+		$macros_tbl = new CTable(SPACE, 'tablestripped');
+		$hcol = new CCol(S_MACROS);
+		$hcol->setColspan(4);
+		$macros_tbl->setHeader($hcol);
+		$macros_tbl->setAttribute('id', 'tbl_macros');
 		$macros_tbl->setOddRowClass('form_odd_row');
 		$macros_tbl->setEvenRowClass('form_even_row');
+		
+		$macros_tbl->addRow(array(SPACE, S_MACRO, SPACE, S_VALUE));
 
+		insert_js('
+			function addMacroRow(){
+				if(typeof(addMacroRow.macro_count) == "undefined"){
+					addMacroRow.macro_count = '.count($macros).';
+		}
+
+				var tr = document.createElement("tr");
+				tr.className = (addMacroRow.macro_count % 2) ? "form_even_row" : "form_odd_row";
+			
+				var td1 = document.createElement("td");
+				tr.appendChild(td1);
+			
+				var cb = document.createElement("input");
+				cb.setAttribute("type", "checkbox");
+				cb.className = "checkbox";
+				td1.appendChild(cb);
+				td1.appendChild(document.createTextNode(" "));
+
+				var td2 = document.createElement("td");
+				tr.appendChild(td2);
+				
+				var text1 = document.createElement("input");
+				text1.setAttribute("type", "text");
+				text1.setAttribute("name", "macros["+addMacroRow.macro_count+"][macro]");
+				text1.className = "biginput";
+				text1.setAttribute("size",40);
+				text1.setAttribute("placeholder","{$MACRO}");
+				td2.appendChild(text1);
+				td2.appendChild(document.createTextNode(" "));
+				
+				var td3 = document.createElement("td");
+				tr.appendChild(td3);
+				
+				var span = document.createElement("span");
+				span.innerHTML = "&rArr;";
+				span.setAttribute("style", "vertical-align:top;");
+				td3.appendChild(span);
+				
+				var td4 = document.createElement("td");
+				tr.appendChild(td4);
+				
+				var text2 = document.createElement("input");
+				text2.setAttribute("type", "text");
+				text2.setAttribute("placeholder","<'.S_VALUE.'>");
+				text2.setAttribute("name","macros["+addMacroRow.macro_count+"][value]");
+				text2.className = "biginput";
+				text2.setAttribute("size",40);
+				td4.appendChild(text2);
+			
+				var sd = $("row_new_macro").insert({before : tr});
+				addMacroRow.macro_count++;
+			}
+		');
+
+		$macros = array_values($macros);
 		foreach($macros as $macroid => $macro){
-			$macros_tbl->addItem(new CVar('macros['.$macro['macro'].'][macro]', $macro['macro']));
-			$macros_tbl->addItem(new CVar('macros['.$macro['macro'].'][value]', $macro['value']));
-			$macros_tbl->addRow(array(
-				new CCheckBox('macros_rem['.$macro['macro'].']', 'no', null, $macro['macro']),
-				$macro['macro'],
-				SPACE.RARR.SPACE,
-				$macro['value']
-			));
+			$text1 = new CTextBox('macros['.$macroid.'][macro]', $macro['macro'], 40);
+			$text1->setAttribute('placeholder', '{$MACRO}');
+			$text2 = new CTextBox('macros['.$macroid.'][value]', $macro['value'], 40);
+			$text2->setAttribute('placeholder', '<'.S_VALUE.'>');
+			$span = new CSpan(RARR);
+			$span->addStyle('vertical-align:top;');
+			
+			$macros_tbl->addRow(array(new CCheckBox(), $text1, $span, $text2));
 		}
 
-		$add_macro = array(
-			S_NEW,
-			new CTextBox('macro_new', get_request('macro_new', ''), 20),
-			SPACE.RARR.SPACE,
-			new CTextBox('value_new', get_request('value_new', ''), 20)
-		);
-
-		$macros_tbl->addRow($add_macro);
-
-
-		$delete_btn = new CButton('macros_del', S_DELETE_SELECTED);
-		if(count($macros) == 0){
-			$delete_btn->setAttribute('disabled', 'disabled');
+		
+		$script = '$$("#tbl_macros input:checked").each(function(obj){ $(obj.parentNode.parentNode).remove(); });';
+		$delete_btn = new CButton('macros_del', S_DELETE_SELECTED, $script);
+		$delete_btn->setType('button');
+		
+		$add_button = new CButton('macro_add', S_ADD, 'javascript: addMacroRow()');
+		$add_button->setType('button');
+		
+		$buttonRow = new CRow();
+		$buttonRow->setAttribute('id', 'row_new_macro');
+		$col = new CCol(array($add_button, SPACE, $delete_btn));
+		$col->setAttribute('colspan', 4);
+		$buttonRow->addItem($col);
+		$macros_tbl->addRow($buttonRow);
+		
+		if($hostid === null){
+			$fcol = new CCol(new CButton('save', S_SAVE));
+			$fcol->setColspan(4);
+			$macros_tbl->setFooter($fcol);
 		}
-
-		$footer = new CCol(array(new CButton('macro_add', S_ADD), SPACE, $delete_btn));
-		$footer->setColSpan(4);
-
-		$macros_tbl->setFooter($footer);
-
-		$macros_wdgt = new CWidget();
-		$macros_wdgt->setClass('header');
-		$macros_wdgt->addHeader(S_MACROS);
-		$macros_wdgt->addItem($macros_tbl);
-
-		return $macros_wdgt;
+		
+		return $macros_tbl;
 	}
+
 ?>

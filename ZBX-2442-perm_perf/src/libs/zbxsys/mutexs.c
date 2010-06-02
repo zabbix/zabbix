@@ -214,11 +214,14 @@ void	__zbx_mutex_lock(const char *filename, int line, ZBX_MUTEX *mutex)
 	if (!*mutex)
 		return;
 
-	if (-1 == semop(ZBX_SEM_LIST_ID, &sem_lock, 1))
+	while (-1 == semop(ZBX_SEM_LIST_ID, &sem_lock, 1))
 	{
-		zbx_error("[file:'%s',line:%d] Lock failed [%s]",
-				filename, line, strerror(errno));
-		exit(FAIL);
+		if (EINTR != errno)
+		{
+			zbx_error("[file:'%s',line:%d] Lock failed [%s]",
+					filename, line, strerror(errno));
+			exit(FAIL);
+		}
 	}
 
 #endif /* _WINDOWS */
@@ -260,11 +263,14 @@ void	__zbx_mutex_unlock(const char *filename, int line, ZBX_MUTEX *mutex)
 	if (!*mutex)
 		return;
 
-	if (-1 == semop(ZBX_SEM_LIST_ID, &sem_unlock, 1))
+	while (-1 == semop(ZBX_SEM_LIST_ID, &sem_unlock, 1))
 	{
-		zbx_error("[file:'%s',line:%d] Lock failed [%s]",
-				filename, line, strerror(errno));
-		exit(FAIL);
+		if (EINTR != errno)
+		{
+			zbx_error("[file:'%s',line:%d] Lock failed [%s]",
+					filename, line, strerror(errno));
+			exit(FAIL);
+		}
 	}
 
 #endif /* _WINDOWS */
