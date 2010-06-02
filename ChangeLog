@@ -8,6 +8,7 @@ Changes for 1.8.3
 
  - [ZBXNEXT-319] multirow inserts are now used for PostgreSQL 8.2 and higher (asaveljevs)
  - [ZBXNEXT-392] our daemons no longer crash after "strace -p" (asaveljevs)
+ - [ZBXNEXT-138] our daemons can now listen on multiple IPs, see ListenIP configuration parameter (asaveljevs)
  - [ZBX-2031] fixed comparison of empty strings with Oracle that led to duplicate rows in dservices (asaveljevs)
  - [ZBX-2409] fixed server crash when deleting unreachable hosts in discovery (asaveljevs)
  - [DEV-461] changes in GUI configuration menu (Aly)
