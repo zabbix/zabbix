@@ -71,7 +71,7 @@ include_once('include/page_header.php');
 
 	$fs_icon = new CDiv(SPACE,'fullscreen');
 	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-	$fs_icon->addAction('onclick',new CJSscript("javascript: document.location = '".$url."';"));
+	$fs_icon->addAction('onclick', "javascript: document.location = '".$url."';");
 
 	$dscvry_wdgt->addPageHeader(S_STATUS_OF_DISCOVERY_BIG, $fs_icon);
 
