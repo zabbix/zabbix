@@ -91,7 +91,7 @@ include_once('include/page_header.php');
 
 	if(isset($_REQUEST['save']) && !isset($_REQUEST['gid'])){
 		$script = "add_graph_item('".
-			$_REQUEST['dstfrm']."','".
+			zbx_jsvalue($_REQUEST['dstfrm'])."','".
 			$_REQUEST['itemid']."','".
 			$_REQUEST['color']."',".
 			$_REQUEST['drawtype'].",".
@@ -105,8 +105,8 @@ include_once('include/page_header.php');
 
 	if(isset($_REQUEST['save']) && isset($_REQUEST['gid'])){
 		$script = "update_graph_item('".
-			$_REQUEST['dstfrm']."','".
-			$_REQUEST['list_name']."','".
+			zbx_jsvalue($_REQUEST['dstfrm'])."','".
+			zbx_jsvalue($_REQUEST['list_name'])."','".
 			$_REQUEST['gid']."','".
 			$_REQUEST['itemid']."','".
 			$_REQUEST['color']."',".

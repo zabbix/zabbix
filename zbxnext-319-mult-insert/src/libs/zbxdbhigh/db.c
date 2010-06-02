@@ -350,43 +350,47 @@ DB_RESULT	DBselectN(const char *query, int n)
 /* Rewrite required to simplify logic ?*/
 int	latest_service_alarm(zbx_uint64_t serviceid, int status)
 {
+	const char	*__function_name = "latest_service_alarm";
 	DB_RESULT	result;
 	DB_ROW		row;
-	int ret = FAIL;
-	char sql[MAX_STRING_LEN];
+	int		ret = FAIL;
+	char		sql[MAX_STRING_LEN];
 
-	zbx_snprintf(sql,sizeof(sql),"select servicealarmid, value from service_alarms where serviceid=" ZBX_FS_UI64 " order by servicealarmid desc", serviceid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): serviceid [" ZBX_FS_UI64 "] status [%d]",
+			__function_name, serviceid, status);
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In latest_service_alarm()");
+	zbx_snprintf(sql, sizeof(sql), "select servicealarmid,value"
+					" from service_alarms"
+					" where serviceid=" ZBX_FS_UI64
+					" order by servicealarmid desc", serviceid);
 
-	result = DBselectN(sql,1);
+	result = DBselectN(sql, 1);
 	row = DBfetch(result);
 
-	if(row && (DBis_null(row[1])==FAIL) && (atoi(row[1]) == status)){
+	if (NULL != row && FAIL == DBis_null(row[1]) && status == atoi(row[1]))
+	{
 		ret = SUCCEED;
 	}
 
 	DBfree_result(result);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
 	return ret;
 }
 
-int	DBadd_service_alarm(zbx_uint64_t serviceid,int status,int clock)
+int	DBadd_service_alarm(zbx_uint64_t serviceid, int status, int clock)
 {
-	zabbix_log(LOG_LEVEL_DEBUG,"In add_service_alarm()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In add_service_alarm()");
 
-	if(latest_service_alarm(serviceid,status) == SUCCEED)
+	if (SUCCEED != latest_service_alarm(serviceid, status))
 	{
-		return SUCCEED;
+		DBexecute("insert into service_alarms (servicealarmid,serviceid,clock,value)"
+			" values(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d)",
+			DBget_maxid("service_alarms"), serviceid, clock, status);
 	}
 
-	DBexecute("insert into service_alarms(servicealarmid,serviceid,clock,value) values(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d)",
-		DBget_maxid("service_alarms"),
-		serviceid,
-		clock,
-		status);
-
-	zabbix_log(LOG_LEVEL_DEBUG,"End of add_service_alarm()");
+	zabbix_log(LOG_LEVEL_DEBUG, "End of add_service_alarm()");
 
 	return SUCCEED;
 }
@@ -408,7 +412,7 @@ int	DBadd_service_alarm(zbx_uint64_t serviceid,int status,int clock)
  ******************************************************************************/
 static int	trigger_dependent_rec(zbx_uint64_t triggerid, int *level)
 {
-	int	ret = FAIL;
+	int		ret = FAIL;
 	DB_RESULT	result;
 	DB_ROW		row;
 
