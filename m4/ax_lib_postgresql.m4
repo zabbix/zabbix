@@ -133,22 +133,7 @@ PQserverVersion(conn);
 
     postgresql_version_req=ifelse([$1], [], [], [$1])
 
-    if test "$found_postgresql" = "yes" -a -n "$postgresql_version_req"; then
-
-        AC_MSG_CHECKING([if PostgreSQL version is >= $postgresql_version_req])
-
-        dnl Decompose required version string of PostgreSQL
-        dnl and calculate its number representation
-        postgresql_version_req_major=`expr $postgresql_version_req : '\([[0-9]]*\)'`
-        postgresql_version_req_minor=`expr $postgresql_version_req : '[[0-9]]*\.\([[0-9]]*\)'`
-        postgresql_version_req_micro=`expr $postgresql_version_req : '[[0-9]]*\.[[0-9]]*\.\([[0-9]]*\)'`
-        if test "x$postgresql_version_req_micro" = "x"; then
-            postgresql_version_req_micro="0"
-        fi
-
-        postgresql_version_req_number=`expr $postgresql_version_req_major \* 1000000 \
-                                   \+ $postgresql_version_req_minor \* 1000 \
-                                   \+ $postgresql_version_req_micro`
+    if test "$found_postgresql" = "yes"; then
 
         dnl Decompose version string of installed PostgreSQL
         dnl and calculate its number representation
@@ -162,13 +147,33 @@ PQserverVersion(conn);
         postgresql_version_number=`expr $postgresql_version_major \* 1000000 \
                                    \+ $postgresql_version_minor \* 1000 \
                                    \+ $postgresql_version_micro`
+	
+        if test -n "$postgresql_version_req"; then
 
-        postgresql_version_check=`expr $postgresql_version_number \>\= $postgresql_version_req_number`
-        if test "$postgresql_version_check" = "1"; then
-            AC_MSG_RESULT([yes])
-        else
-            AC_MSG_RESULT([no])
-        fi
+            AC_MSG_CHECKING([if PostgreSQL version is >= $postgresql_version_req])
+
+            dnl Decompose required version string of PostgreSQL
+            dnl and calculate its number representation
+            postgresql_version_req_major=`expr $postgresql_version_req : '\([[0-9]]*\)'`
+            postgresql_version_req_minor=`expr $postgresql_version_req : '[[0-9]]*\.\([[0-9]]*\)'`
+            postgresql_version_req_micro=`expr $postgresql_version_req : '[[0-9]]*\.[[0-9]]*\.\([[0-9]]*\)'`
+            if test "x$postgresql_version_req_micro" = "x"; then
+                postgresql_version_req_micro="0"
+            fi
+
+            postgresql_version_req_number=`expr $postgresql_version_req_major \* 1000000 \
+                                       \+ $postgresql_version_req_minor \* 1000 \
+                                       \+ $postgresql_version_req_micro`
+
+            postgresql_version_check=`expr $postgresql_version_number \>\= $postgresql_version_req_number`
+            if test "$postgresql_version_check" = "1"; then
+                AC_MSG_RESULT([yes])
+            else
+                AC_MSG_RESULT([no])
+            fi
+
+	fi
+
     fi
 
     AC_SUBST([POSTGRESQL_VERSION])
