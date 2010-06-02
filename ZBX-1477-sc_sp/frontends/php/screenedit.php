@@ -220,8 +220,8 @@ include_once('include/page_header.php');
 			if($fitem){
 				DBexecute('UPDATE screens_items '.
 							' SET y='.$sw_pos[2].',x='.$sw_pos[3].
-							($sitem ? ',colspan='.$sitem['colspan'] : '').
-							($sitem ? ',rowspan='.$sitem['rowspan'] : '').
+							',colspan='.(isset($sitem['colspan']) ? $sitem['colspan'] : 0).
+							',rowspan='.(isset($sitem['rowspan']) ? $sitem['rowspan'] : 0).
 							' WHERE y='.$sw_pos[0].
 								' AND x='.$sw_pos[1].
 								' AND screenid='.$screen['screenid'].
@@ -232,8 +232,8 @@ include_once('include/page_header.php');
 			if($sitem){
 				DBexecute('UPDATE screens_items '.
 							' SET y='.$sw_pos[0].',x='.$sw_pos[1].
-							($fitem ? ',colspan='.$fitem['colspan'] : '').
-							($fitem ? ',rowspan='.$fitem['rowspan'] : '').
+							',colspan='.(isset($fitem['colspan']) ? $fitem['colspan'] : 0).
+							',rowspan='.(isset($fitem['rowspan']) ? $fitem['rowspan'] : 0).
 							' WHERE y='.$sw_pos[2].
 								' AND x='.$sw_pos[3].
 								' AND screenid='.$screen['screenid'].
