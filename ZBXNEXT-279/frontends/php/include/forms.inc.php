@@ -2034,7 +2034,7 @@
 				$itm = DBfetch(DBselect($sql));			
 				if($itm){
 					if($_REQUEST['itemid'] == $itmid){
-						$caption[] = SPACE.SPACE;
+						$caption[] = SPACE;
 						$caption[] = $itm['host'];
 					}
 					else{
@@ -2047,9 +2047,11 @@
 				else break;
 			}while($itmid != 0);
 			
-			$caption[] = S_ITEM.SPACE;
+			$caption[] = S_ITEM.' "';
 			$caption = array_reverse($caption);
+			$caption[] = ': ';
 			$caption[] = $item_data['description'];
+			$caption[] = '"';
 			$frmItem->setTitle($caption);
 		}
 		else{
@@ -2782,11 +2784,35 @@
 		$limited = null;
 
 		if(isset($_REQUEST['triggerid'])){
-			$frmTrig->addVar('triggerid',$_REQUEST['triggerid']);
-			$trigger=get_trigger_by_triggerid($_REQUEST['triggerid']);
+			$frmTrig->addVar('triggerid', $_REQUEST['triggerid']);
+			
+			$trigger = get_trigger_by_triggerid($_REQUEST['triggerid']);
 
-			$frmTrig->setTitle(S_TRIGGER.' "'.htmlspecialchars($trigger['description']).'"');
-
+			$caption = array();
+			$trigid = $_REQUEST['triggerid'];
+			do{
+				$sql = 'SELECT t.triggerid, t.templateid, h.host'.
+						' FROM triggers t, functions f, items i, hosts h'.
+						' WHERE t.triggerid='.$trigid.
+							' AND h.hostid=i.hostid'.
+							' AND i.itemid=f.itemid'.
+							' AND f.triggerid=t.triggerid';
+				$trig = DBfetch(DBselect($sql));
+				
+				if($_REQUEST['triggerid'] != $trigid){
+					$caption[] = ' : ';
+					$caption[] = new CLink($trig['host'], 'triggers.php?form=update&triggerid='.$trig['triggerid'], 'highlight underline');
+				}
+				
+				$trigid = $trig['templateid'];
+			}while($trigid != 0);
+			
+			$caption[] = S_TRIGGER.' "';
+			$caption = array_reverse($caption);
+			$caption[] = htmlspecialchars($trigger['description']);
+			$caption[] = '"';
+			$frmTrig->setTitle($caption);
+		
 			$limited = $trigger['templateid'] ? 'yes' : null;
 		}
 
