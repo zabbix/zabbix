@@ -131,7 +131,7 @@ function getPagingLine(&$items, $autotrim=true){
 	$page_view[] = $search_limit;
 	$page_view[] = SPACE.S_FOUND_SMALL;
 
-	$page_view = new CJSscript($page_view);
+	$page_view = new CSpan($page_view);
 
 	zbx_add_post_js('insert_in_element("numrows",'.zbx_jsvalue($page_view->toString()).');');
 
@@ -721,13 +721,17 @@ return false;
 
 // STRING FUNCTIONS {{{
 
-function zbx_nl2br(&$str){
+function zbx_nl2br($str){
 	$str_res = array();
 	$str_arr = explode("\n",$str);
 	foreach($str_arr as $id => $str_line){
 		array_push($str_res,$str_line,BR());
 	}
 return $str_res;
+}
+
+function zbx_htmlstr($str){
+	return str_replace(array('<','>','"'),array('&lt;','&gt;','&quot;'), $str);
 }
 
 function zbx_strlen($str){
