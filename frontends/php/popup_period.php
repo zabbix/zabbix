@@ -71,16 +71,16 @@ include_once 'include/page_header.php';
 		if(isset($_REQUEST['period_id'])){
 			insert_js("update_period('".
 				$_REQUEST['period_id']."','".
-				$_REQUEST['dstfrm']."','".
-				$_REQUEST['caption']."','".
+				zbx_jsvalue($_REQUEST['dstfrm'])."','".
+				zbx_jsvalue($_REQUEST['caption'])."','".
 				$_REQUEST['report_timesince']."','".
 				$_REQUEST['report_timetill']."','".
 				$_REQUEST['color']."');\n");
 		}
 		else{
 			insert_js("add_period('".
-				$_REQUEST['dstfrm']."','".
-				$_REQUEST['caption']."','".
+				zbx_jsvalue($_REQUEST['dstfrm'])."','".
+				zbx_jsvalue($_REQUEST['caption'])."','".
 				$_REQUEST['report_timesince']."','".
 				$_REQUEST['report_timetill']."','".
 				$_REQUEST['color']."');\n");

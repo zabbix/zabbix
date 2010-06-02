@@ -91,11 +91,11 @@
 	$url = '?httptestid='.$_REQUEST['httptestid'].'&fullscreen='.($_REQUEST['fullscreen']?'0':'1');
 	$fs_icon = new CDiv(SPACE, 'fullscreen');
 	$fs_icon->setAttribute('title', $_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-	$fs_icon->addAction('onclick', new CJSscript("javascript: document.location = '".$url."';"));
+	$fs_icon->addAction('onclick', "javascript: document.location = '".$url."';");
 
 	$rst_icon = new CDiv(SPACE, 'iconreset');
 	$rst_icon->setAttribute('title', S_RESET);
-	$rst_icon->addAction('onclick', new CJSscript("javascript: timeControl.objectReset('".$_REQUEST['httptestid']."');"));
+	$rst_icon->addAction('onclick', "javascript: timeControl.objectReset('".$_REQUEST['httptestid']."');");
 
 	$details_wdgt->addPageHeader(
 		array(S_DETAILS_OF_SCENARIO_BIG.SPACE, bold($httptest_data['name']),' ['.date(S_DATE_FORMAT_YMDHMS, $httptest_data['lastcheck']).']'),
