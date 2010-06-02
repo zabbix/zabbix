@@ -2012,7 +2012,7 @@ zbx_uint64_t	DBmultiply_value_uint64(DB_ITEM *item, zbx_uint64_t value)
 	else
 		value_uint64 = (zbx_uint64_t)((double)value * atof(item->formula));
 
-	zabbix_log(LOG_LEVEL_DEBUG, "DBmultiply_value_float() " ZBX_FS_UI64 ",%s " ZBX_FS_UI64,
+	zabbix_log(LOG_LEVEL_DEBUG, "DBmultiply_value_uint64() " ZBX_FS_UI64 ",%s " ZBX_FS_UI64,
 			value, item->formula, value_uint64);
 
 	return value_uint64;
@@ -2022,7 +2022,7 @@ zbx_uint64_t	DBmultiply_value_uint64(DB_ITEM *item, zbx_uint64_t value)
  *                                                                            *
  * Function: DBregister_host                                                  *
  *                                                                            *
- * Purpose: registrate unknown host and generate event                        *
+ * Purpose: register unknown host and generate event                          *
  *                                                                            *
  * Parameters: host - host name                                               *
  *                                                                            *
