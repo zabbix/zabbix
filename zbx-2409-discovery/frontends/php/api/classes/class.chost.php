@@ -1575,8 +1575,6 @@ Copt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot add macro');
 				}
 			}
-
-
 // }}} UPDATE MACROS
 
 

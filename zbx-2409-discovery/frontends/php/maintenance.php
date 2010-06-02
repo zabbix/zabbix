@@ -109,7 +109,7 @@ include_once('include/page_header.php');
 			'name' => $_REQUEST['mname'],
 			'maintenance_type' => $_REQUEST['maintenance_type'],
 			'description'=>	$_REQUEST['description'],
-			'active_since'=> zbxDateToTime(get_request('active_since', date('YmdHi'))),
+			'active_since'=> zbxDateToTime(get_request('active_since', date('YmdHis'))),
 			'active_till' => zbxDateToTime(get_request('active_till', 0))
 		);
 
@@ -320,7 +320,7 @@ include_once('include/page_header.php');
 		if(isset($_REQUEST['timeperiods'][$edit_timeperiodid])){
 			$_REQUEST['new_timeperiod'] = $_REQUEST['timeperiods'][$edit_timeperiodid];
 			$_REQUEST['new_timeperiod']['id'] = $edit_timeperiodid;
-			$_REQUEST['new_timeperiod']['start_date'] = date('YmdHi', $_REQUEST['timeperiods'][$edit_timeperiodid]['start_date']);
+			$_REQUEST['new_timeperiod']['start_date'] = date('YmdHis', $_REQUEST['timeperiods'][$edit_timeperiodid]['start_date']);
 		}
 	}
 

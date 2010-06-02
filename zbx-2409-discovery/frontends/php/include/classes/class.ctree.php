@@ -236,6 +236,7 @@ class CTree{
 		$js.= '</script>'."\n";
 
 		zbx_add_post_js($this->treename.' = new CTree("tree_'.$this->getUserAlias().'_'.$this->treename.'", '.$this->treename.'_tree);');
+
 	return new CJSscript($js);
 	}
 

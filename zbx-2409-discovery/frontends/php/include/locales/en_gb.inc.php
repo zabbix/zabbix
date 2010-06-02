@@ -822,7 +822,10 @@
 	'S_DELETE_SELECTED_GROUPS'=>		'Delete selected groups',
 
 //	hosts.php
+	'S_IMPORT_TEMPLATE'=>			'Import Template',
+	'S_IMPORT_HOST'=>				'Import Host',
 	'S_MACROS'=>					'Macros',
+	'S_MACRO'=>					'Macro',
 	'S_WRONG_MACRO'=>				'Wrong macro',
 	'S_MACRO_TOO_LONG'=>				'Macro name is too long, should not exceed 64 chars.',
 	'S_MACRO_VALUE_TOO_LONG'=>			'Macro value is too long, should not exceed 255 chars.',
@@ -831,6 +834,8 @@
 	'S_EMPTY_MACRO_VALUE'=>				'Empty macro value',
 	'S_NO_MACROS_DEFINED'=>				'No macros defined',
 	'S_MACRO_ADDED'=>				'Macro added',
+	'S_MACROS_UPDATED'=>				'Macros updated',
+	'S_CANNOT_UPDATE_MACROS'=>				'Cannot update macros',
 	'S_MACROS_DELETED' =>				'Macros deleted',
 	'S_CANNOT_ADD_MACRO'=>				'Cannot add macro',
 	'S_CANNOT_DELETE_MACROS'=>			'Cannot delete macros',
@@ -1515,6 +1520,7 @@
 	'S_WIDTH'=>						'Width',
 	'S_HEIGHT'=>					'Height',
 	'S_CREATE_SCREEN'=>				'Create Screen',
+	'S_CREATE_SLIDESHOW'=>			'Create Slide Show',
 	'S_EDIT'=>						'Edit',
 	'S_DYNAMIC_ITEM'=>				'Dynamic item',
 	'S_DIMENSION_COLS_ROWS'=>		'Dimension (cols x rows)',
@@ -1574,7 +1580,7 @@
 
 //	screens.php
 	'S_CUSTOM_SCREENS'=>			'Custom screens',
-	'S_SCREENS_BIG'=>			'SCREENS',
+	'S_SCREENS_BIG'=>				'SCREENS',
 
 	'S_SLIDESHOW_UPDATED'=>			'Slideshow updated',
 	'S_CANNOT_UPDATE_SLIDESHOW'=>		'Cannot_update slideshow',
@@ -1583,6 +1589,10 @@
 	'S_SLIDESHOW_DELETED'=>			'Slideshow deleted',
 	'S_CANNOT_DELETE_SLIDESHOW'=>		'Cannot delete slideshow',
 	'S_DELETE_SLIDESHOW_Q'=>		'Delete slideshow?',
+
+// slides.php
+	'S_CUSTOM_SLIDES' =>			'Custom slides',
+
 
 //	services.php
 	'S_AVERAGE_PROBLEM'=>			'Average problem',
@@ -2267,7 +2277,9 @@
 	'S_CUSER_ERROR_SESSION_TERMINATED'=>			'Session terminated, please re-login!',
 	'S_CUSER_ERROR_TABLE_USERS_EMPTY'=>			'Table users is empty. Possible database corruption.',
 	'S_CUSER_ERROR_LDAP_MODULE_MISSING'=>			'Probably php-ldap module is missing',
-	'S_CUSER_ERROR_ATTEMP_FAILED'=>				'%1$s failed login attempts logged. Last failed attempt was from %2$s on %3$s.',
+//	'S_CUSER_ERROR_ATTEMP_FAILED'=>						'%1$s failed login attempts logged. Last failed attempt was from %2$s on %3$s.',
+	'S_CUSER_ERROR_FAILED_LOGIN_ATTEMPTS'=>				'failed login attempts logged.',
+	'S_CUSER_ERROR_LAST_FAILED_ATTEMPTS'=>				'Last failed attempt was from',
 	'S_CUSER_ERROR_ONLY_ADMIN_CAN_CREATE_USERS'=>		'Only Super Admins can create Users',
 	'S_CUSER_ERROR_ONLY_ADMIN_CAN_UPDATE_USERS'=>		'Only Super Admins can update Users',
 	'S_CUSER_ERROR_ONLY_ADMIN_CAN_DELETE_USERS'=>		'Only Super Admins can delete Users',
