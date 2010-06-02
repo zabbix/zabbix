@@ -111,7 +111,7 @@ class CChart extends CGraphDraw{
 		$this->m_showTriggers = ($value==1)?1:0;
 	}
 
-	public function addItem($itemid, $axis=GRAPH_YAXIS_SIDE_LEFT, $calc_fnc=CALC_FNC_AVG, $color=null, $drawtype=null, $type=null, $periods_cnt=null){
+	public function addItem($itemid, $axis=GRAPH_YAXIS_SIDE_DEFAULT, $calc_fnc=CALC_FNC_AVG, $color=null, $drawtype=null, $type=null, $periods_cnt=null){
 		if($this->type == GRAPH_TYPE_STACKED /* stacked graph */)
 			$drawtype = GRAPH_ITEM_DRAWTYPE_FILLED_REGION;
 
@@ -131,7 +131,7 @@ class CChart extends CGraphDraw{
 		$this->items[$this->num]['host'] = $host['host'];
 		$this->items[$this->num]['color'] = is_null($color) ? 'Dark Green' : $color;
 		$this->items[$this->num]['drawtype'] = is_null($drawtype) ? GRAPH_ITEM_DRAWTYPE_LINE : $drawtype;
-		$this->items[$this->num]['axisside'] = is_null($axis) ? GRAPH_YAXIS_SIDE_LEFT : $axis;
+		$this->items[$this->num]['axisside'] = is_null($axis) ? GRAPH_YAXIS_SIDE_DEFAULT : $axis;
 		$this->items[$this->num]['calc_fnc'] = is_null($calc_fnc) ? CALC_FNC_AVG : $calc_fnc;
 		$this->items[$this->num]['calc_type'] = is_null($type) ? GRAPH_ITEM_SIMPLE : $type;
 		$this->items[$this->num]['periods_cnt'] = is_null($periods_cnt) ? 0 : $periods_cnt;
@@ -476,11 +476,13 @@ class CChart extends CGraphDraw{
 
 //				if($val <= $minY || $val >= $maxY)	continue;
 //SDI($item['itemid']);
-				$color = 'Priority';
-				if($trigger['value'] == TRIGGER_VALUE_TRUE){
-					if($trigger['priority'] == 5)		$color = 'Priority Disaster';
-					else if($trigger['priority'] == 4)	$color = 'Priority High';
-					else if($trigger['priority'] == 3)	$color = 'Priority Average';
+				switch($trigger['priority']){
+					case TRIGGER_SEVERITY_DISASTER:	$color = 'Priority Disaster'; break;
+					case TRIGGER_SEVERITY_HIGH: $color = 'Priority High'; break;
+					case TRIGGER_SEVERITY_AVERAGE: $color = 'Priority Average'; break;
+					case TRIGGER_SEVERITY_WARNING: $color = 'Priority Warning'; break;
+					case TRIGGER_SEVERITY_INFORMATION: $color = 'Priority Information'; break;
+					default: $color = 'Priority';
 				}
 
 				array_push($this->triggers,array(
@@ -1499,16 +1501,29 @@ class CChart extends CGraphDraw{
 		if($this->m_showTriggers != 1) return;
 //		if($this->num != 1) return; // skip multiple graphs
 
+		$opposite = hex2rgb(GRAPH_TRIGGER_LINE_OPPOSITE_COLOR);
+		$oppColor = imagecolorallocate($this->im, $opposite[0], $opposite[1], $opposite[2]);
 		foreach($this->triggers as $tnum => $trigger){
 			if($trigger['skipdraw']) continue;
 
+			$triggerColor = $this->getColor($trigger['color']);
+			$lineStyle = Array($triggerColor, $triggerColor, $triggerColor, $triggerColor, $triggerColor, $oppColor, $oppColor, $oppColor);
+
+//			SDI($trigger['color']);
 			dashedline(
 				$this->im,
 				$this->shiftXleft,
 				$trigger['y'],
 				$this->sizeX+$this->shiftXleft,
 				$trigger['y'],
-				$this->getColor($trigger['color']));
+				$lineStyle);
+			dashedline(
+				$this->im,
+				$this->shiftXleft,
+				$trigger['y']+1,
+				$this->sizeX+$this->shiftXleft,
+				$trigger['y']+1,
+				$lineStyle);
 		}
 	}
 
@@ -1933,7 +1948,7 @@ class CChart extends CGraphDraw{
 			if($this->graphOrientation[GRAPH_YAXIS_SIDE_LEFT] == '-') $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT] = 0;
 			else if($this->m_minY[GRAPH_YAXIS_SIDE_LEFT] == 0){
 				$this->m_maxY[GRAPH_YAXIS_SIDE_LEFT] = 1;
-				$this->skipLeftScale = 1;
+//				$this->skipLeftScale = 1;
 			}
 			else $this->m_minY[GRAPH_YAXIS_SIDE_LEFT] = 0;
 		}
@@ -1948,7 +1963,7 @@ class CChart extends CGraphDraw{
 			if($this->graphOrientation[GRAPH_YAXIS_SIDE_RIGHT] == '-') $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT] = 0;
 			else if($this->m_minY[GRAPH_YAXIS_SIDE_RIGHT] == 0){
 				$this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT] = 1;
-				$this->skipRightScale = 1;
+//				$this->skipRightScale = 1;
 			}
 			else $this->m_minY[GRAPH_YAXIS_SIDE_RIGHT] = 0;
 		}
@@ -1959,7 +1974,6 @@ class CChart extends CGraphDraw{
 			else $this->m_minY[GRAPH_YAXIS_SIDE_RIGHT] = 0;
 		}
 //*/
-
 		$this->calcMinMaxInterval();
 
 		$this->updateShifts();

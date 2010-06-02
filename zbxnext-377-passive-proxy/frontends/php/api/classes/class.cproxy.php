@@ -61,7 +61,7 @@ class CProxy extends CZBXAPI{
 
 		$sql_parts = array(
 			'select' => array('hosts' => 'h.hostid'),
-			'from' => array('hosts h'),
+			'from' => array('hosts' => 'hosts h'),
 			'where' => array('h.status='.HOST_STATUS_PROXY),
 			'order' => array(),
 			'limit' => null);
@@ -165,7 +165,7 @@ class CProxy extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT DISTINCT '.$sql_select.'
+		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.'
 				FROM '.$sql_from.'
 				WHERE '.DBin_node('h.hostid', $nodeids).
 					$sql_where.

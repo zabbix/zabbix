@@ -405,9 +405,9 @@ include_once('include/page_header.php');
 			$name->setAttribute('onclick', $action.' close_window();');
 
 			if($host['status'] == HOST_STATUS_MONITORED)
-				$status=new CSpan(S_MONITORED,'off');
+				$status = new CSpan(S_MONITORED,'off');
 			else if($host['status'] == HOST_STATUS_NOT_MONITORED)
-				$status=new CSpan(S_NOT_MONITORED,'on');
+				$status = new CSpan(S_NOT_MONITORED,'on');
 			else
 				$status=S_UNKNOWN;
 
@@ -418,15 +418,15 @@ include_once('include/page_header.php');
 				$dns = $host['dns'];
 				$ip = $host['ip'];
 
-				$tmp = ($host['useip']==1) ? 'ip' : 'dns';
+				$tmp = ($host['useip'] == 1) ? 'ip' : 'dns';
 				$$tmp = bold($$tmp);
 
 				if($host['available'] == HOST_AVAILABLE_TRUE)
-					$available=new CSpan(S_AVAILABLE,'off');
+					$available = new CSpan(S_AVAILABLE,'off');
 				else if($host['available'] == HOST_AVAILABLE_FALSE)
-					$available=new CSpan(S_NOT_AVAILABLE,'on');
+					$available = new CSpan(S_NOT_AVAILABLE,'on');
 				else if($host['available'] == HOST_AVAILABLE_UNKNOWN)
-					$available=new CSpan(S_UNKNOWN,'unknown');
+					$available = new CSpan(S_UNKNOWN,'unknown');
 			}
 
 			$table->addRow(array(
@@ -456,13 +456,13 @@ include_once('include/page_header.php');
 			$script = '';
 			if(count($new_templates) > 0) {
 				foreach($new_templates as $id => $name){
-					$script .= 'add_variable(null,"templates['.$id.']","'.$name.'","'.$dstfrm.'",window.opener.document);'."\n";
+					$script .= 'add_variable(null,"templates['.$id.']",'.zbx_jsvalue($name).','.zbx_jsvalue($dstfrm).',window.opener.document);'."\n";
 				}
 
 
 			} // if count new_templates > 0
 
-			$script.= 'var form = window.opener.document.forms["'.$dstfrm.'"];'.
+			$script.= 'var form = window.opener.document.forms['.zbx_jsvalue($dstfrm).'];'.
 					' if(form) form.submit();'.
 					' close_window();';
 			insert_js($script);
@@ -684,14 +684,15 @@ include_once('include/page_header.php');
 		$table->setHeader($header);
 
 		$options = array(
-				'nodeids' => $nodeid,
-				'hostids' => $hostid,
-				'output' => API_OUTPUT_EXTEND,
-				'select_hosts' => API_OUTPUT_EXTEND,
-				'select_items' => API_OUTPUT_EXTEND,
-				'select_functions' => API_OUTPUT_EXTEND,
-				'select_dependencies' => API_OUTPUT_EXTEND
-			);
+			'nodeids' => $nodeid,
+			'hostids' => $hostid,
+			'output' => API_OUTPUT_EXTEND,
+			'select_hosts' => API_OUTPUT_EXTEND,
+			'select_items' => API_OUTPUT_EXTEND,
+			'select_functions' => API_OUTPUT_EXTEND,
+			'select_dependencies' => API_OUTPUT_EXTEND,
+			'expandDescription' => 1,
+		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 		if(!is_null($templated)) $options['templated'] = $templated;
 
@@ -706,14 +707,13 @@ include_once('include/page_header.php');
 			$host = reset($trigger['hosts']);
 			$trigger['host'] = $host['host'];
 
-			$trigger['description'] = expandTriggerDescription($trigger);
 			$description = new CSpan($trigger['description'], 'link');
 
 			$trigger['description'] = $trigger['host'].':'.$trigger['description'];
 
 
 			if($multiselect){
-				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", '".$trigger[$srcfld1]."');";
+				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", ".zbx_jsvalue($trigger[$srcfld1]).");";
 			}
 			else{
 				$values = array(
@@ -748,8 +748,8 @@ include_once('include/page_header.php');
 					$status = new CSpan(S_ENABLED, 'enabled');
 				break;
 			}
-			//if($row["status"] != TRIGGER_STATUS_UNKNOWN) $row["error"]=SPACE;
-			//if($row["error"]=="") $row["error"]=SPACE;
+//if($row["status"] != TRIGGER_STATUS_UNKNOWN) $row["error"]=SPACE;
+//if($row["error"]=="") $row["error"]=SPACE;
 
 			if($multiselect){
 				$description = new CCol(array(new CCheckBox('triggers['.zbx_jsValue($trigger[$srcfld1]).']', NULL, NULL, $trigger['triggerid']),	$description));
@@ -830,7 +830,7 @@ include_once('include/page_header.php');
 			$row['description'] = $row['host'].':'.$row['description'];
 
 			if($multiselect){
-				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", '".$row[$srcfld1]."');";
+				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", ".zbx_jsvalue($row[$srcfld1]).");";
 			}
 			else{
 				$values = array(
@@ -957,7 +957,7 @@ include_once('include/page_header.php');
 			$description = new CSpan($row['name'],'link');
 
 			if($multiselect){
-				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", '".$row[$srcfld1]."');";
+				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", ".zbx_jsvalue($row[$srcfld1]).");";
 			}
 			else{
 				$values = array(
@@ -1064,7 +1064,7 @@ include_once('include/page_header.php');
 			$row['description'] = $row['host'].':'.$row['description'];
 
 			if($multiselect){
-				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", '".$row[$srcfld1]."');";
+				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", ".zbx_jsvalue($row[$srcfld1]).");";
 			}
 			else{
 				$values = array(
@@ -1138,7 +1138,7 @@ include_once('include/page_header.php');
 			$description = new CSpan($sysmap['name'], 'link');
 
 			if($multiselect){
-				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", '".$sysmap[$srcfld1]."');";
+				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", ".zbx_jsvalue($sysmap[$srcfld1]).");";
 			}
 			else{
 				$values = array(
@@ -1251,7 +1251,7 @@ include_once('include/page_header.php');
 			$name = new CLink($row['name'],'#');
 
 			if($multiselect){
-				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", '".$row[$srcfld1]."');";
+				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", ".zbx_jsvalue($row[$srcfld1]).");";
 			}
 			else{
 				$values = array(
@@ -1317,7 +1317,7 @@ include_once('include/page_header.php');
 			$name = new CSpan($row["name"],'link');
 
 			if($multiselect){
-				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", '".$row[$srcfld1]."');";
+				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", ".zbx_jsvalue($row[$srcfld1]).");";
 			}
 			else{
 				$values = array(
