@@ -685,12 +685,14 @@ function make_latest_issues($filter = array()){
 		'maintenance' => $filter['maintenance'],
 		'skipDependent' => 1,
 		'filter' => array('priority' => $filter['severity']),
+		'select_groups' => API_OUTPUT_EXTEND,
 		'select_hosts' => API_OUTPUT_EXTEND,
 		'output' => API_OUTPUT_EXTEND,
 		'sortfield' => 'lastchange',
 		'sortorder' => ZBX_SORT_DOWN,
 		'limit' => $limit
 	);
+
 	if(isset($filter['hostids'])) $options['hostids'] = $filter['hostids'];
 	$triggers = CTrigger::get($options);
 
@@ -705,6 +707,7 @@ function make_latest_issues($filter = array()){
 
 		$triggers_hosts = array_merge($triggers_hosts, $trigger['hosts']);
 	}
+
 	$triggers_hosts = zbx_toHash($triggers_hosts, 'hostid');
 	$triggers_hostids = array_keys($triggers_hosts);
 // }}} GATHER HOSTS FOR SELECTED TRIGGERS
@@ -721,11 +724,14 @@ function make_latest_issues($filter = array()){
 		($config['event_ack_enable'])? S_ACK : NULL,
 		S_ACTIONS
 	));
-
+	
+	$cachedGroups = Array();
+	
 	foreach($triggers as $tnum => $trigger){
 // Check for dependencies
+		$group = reset($trigger['groups']);
 		$host = reset($trigger['hosts']);
-
+		
 		$trigger['hostid'] = $host['hostid'];
 		$trigger['host'] = $host['host'];
 
@@ -736,15 +742,15 @@ function make_latest_issues($filter = array()){
 		foreach($scripts_by_hosts[$trigger['hostid']] as $id => $script){
 			$script_nodeid = id2nodeid($script['scriptid']);
 			if( (bccomp($host_nodeid ,$script_nodeid ) == 0))
-				$menus.= "['".$script['name']."',\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$trigger['hostid']."&scriptid=".$script['scriptid']."','".S_TOOLS."',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+				$menus.= "[".zbx_jsvalue($script['name']).",\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$trigger['hostid']."&scriptid=".$script['scriptid']."','".S_TOOLS."',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 		}
 
 		if(!empty($scripts_by_hosts)){
-			$menus = "[".zbx_jsvalue(S_TOOLS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus;
+			$menus = "['".S_TOOLS."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus;
 		}
 
-		$menus.= "[".zbx_jsvalue(S_LINKS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
-		$menus.= "['".S_LATEST_DATA."',\"javascript: redirect('latest.php?groupid=0&hostid=".$trigger['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+		$menus.= "['".S_LINKS."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
+		$menus.= "['".S_LATEST_DATA."',\"javascript: redirect('latest.php?groupid=".$group['groupid'].'&hostid='.$trigger['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 
 		$menus = rtrim($menus,',');
 		$menus = 'show_popup_menu(event,['.$menus.'],180);';
@@ -833,6 +839,7 @@ function make_latest_issues($filter = array()){
 		}
 		unset($trigger,$description,$actions,$alerts,$hint);
 	}
+	
 	$table->setFooter(new CCol(S_UPDATED.': '.zbx_date2str(S_BLOCKS_LATEST_ISSUES_TIME_FORMAT)));
 
 return $table;
@@ -907,8 +914,8 @@ function make_webmon_overview($filter){
 			is_show_all_nodes() ? get_node_name_by_elid($group['groupid']) : null,
 			$group['name'],
 			new CSpan($apps['ok'],'off'),
-			new CSpan($apps['failed'],$apps['failed']?'on':'off'),
-			new CSpan($apps[HTTPTEST_STATE_BUSY],$apps[HTTPTEST_STATE_BUSY]?'orange':'off'),
+			new CSpan($apps['failed'],$apps['failed']? 'on':'off'),
+			new CSpan($apps[HTTPTEST_STATE_BUSY],$apps[HTTPTEST_STATE_BUSY]? 'orange':'off'),
 			new CSpan($apps[HTTPTEST_STATE_UNKNOWN],'unknown')
 		));
 	}
@@ -948,14 +955,14 @@ function make_discovery_status(){
 		);
 
 	$table  = new CTableInfo();
-	$table->setHeader($header,'vertical_header');
+	$table->setHeader($header,'header');
 
 	foreach($drules as $drnum => $drule){
 		$table->addRow(array(
 			get_node_name_by_elid($drule['druleid']),
 			new CLink(get_node_name_by_elid($drule['druleid'], null, ': ').$drule['name'],'discovery.php?druleid='.$drule['druleid']),
 			new CSpan($drule['up'],'green'),
-			new CSpan($drule['down'],($drule['down'] > 0)?'red':'green')
+			new CSpan($drule['down'],($drule['down'] > 0)? 'red':'green')
 		));
 	}
 	$table->setFooter(new CCol(S_UPDATED.': '.zbx_date2str(S_BLOCKS_DISCOVERY_STATUS_TIME_FORMAT)));

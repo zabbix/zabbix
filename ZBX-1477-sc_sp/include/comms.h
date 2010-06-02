@@ -28,7 +28,7 @@ typedef enum {
 
 #if defined(SOCKET) || defined(_WINDOWS)
 	typedef SOCKET ZBX_SOCKET;
-#else /* not SOCKET && not _WINDOWS*/
+#else /* not SOCKET && not _WINDOWS */
 	typedef int ZBX_SOCKET;
 #endif /* SOCKET || _WINDOWS */
 
@@ -42,27 +42,25 @@ typedef enum
 
 typedef struct zbx_sock
 {
-#if defined(HAVE_IPV6)
-	ZBX_SOCKET	sockets[FD_SETSIZE];
 	int		num_socks;
-#endif /* HAVE_IPV6 */
+	ZBX_SOCKET	sockets[FD_SETSIZE];
 	ZBX_SOCKET	socket;
-	ZBX_SOCKET	socket2;
+	ZBX_SOCKET	socket_orig;
 	char		buf_stat[ZBX_STAT_BUF_LEN];
 	char		*buf_dyn;
 	zbx_buf_type_t	buf_type;
-	unsigned char accepted;
+	unsigned char	accepted;
 	char		*error;
 	int		timeout;
 } zbx_sock_t;
 
-char*	zbx_tcp_strerror(void);
-int	zbx_tcp_error(void);
+const char	*zbx_tcp_strerror(void);
+int		zbx_tcp_error(void);
 
 struct hostent	*zbx_gethost(const char *hostname);
 
 #if !defined(_WINDOWS)
-void zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen);
+void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen);
 #endif /* WINDOWS */
 
 void	zbx_tcp_init(zbx_sock_t *s, ZBX_SOCKET o);
@@ -70,10 +68,11 @@ int     zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, un
 
 #define ZBX_TCP_NEW_PROTOCOL	0x01
 
-#define zbx_tcp_send(s, d)		zbx_tcp_send_ext((s), (d), ZBX_TCP_NEW_PROTOCOL)
-#define zbx_tcp_send_raw(s, d)	zbx_tcp_send_ext((s), (d), 0)
+#define zbx_tcp_send(s, d)		zbx_tcp_send_ext((s), (d), ZBX_TCP_NEW_PROTOCOL, 0)
+#define zbx_tcp_send_to(s, d, timeout)	zbx_tcp_send_ext((s), (d), ZBX_TCP_NEW_PROTOCOL, timeout)
+#define zbx_tcp_send_raw(s, d)		zbx_tcp_send_ext((s), (d), 0, 0)
 
-int     zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags);
+int     zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags, int timeout);
 
 void    zbx_tcp_close(zbx_sock_t *s);
 
@@ -81,11 +80,7 @@ void    zbx_tcp_close(zbx_sock_t *s);
 int	get_address_family(const char *addr, int *family, char *error, int max_error_len);
 #endif /* HAVE_IPV6 */
 
-int zbx_tcp_listen(
-	zbx_sock_t		*s,
-	const char		*listen_ip,
-	unsigned short	listen_port
-	);
+int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_port);
 
 int	zbx_tcp_accept(zbx_sock_t *s);
 void	zbx_tcp_unaccept(zbx_sock_t *s);
@@ -94,15 +89,12 @@ void    zbx_tcp_free(zbx_sock_t *s);
 
 #define ZBX_TCP_READ_UNTIL_CLOSE 0x01
 
-#define	zbx_tcp_recv(s, data) 	zbx_tcp_recv_ext(s, data, 0)
+#define	zbx_tcp_recv(s, data) 			zbx_tcp_recv_ext(s, data, 0, 0)
+#define	zbx_tcp_recv_to(s, data, timeout) 	zbx_tcp_recv_ext(s, data, 0, timeout)
 
-int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags);
+int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeout);
 
 char    *get_ip_by_socket(zbx_sock_t *s);
-int	zbx_tcp_check_security(
-	zbx_sock_t *s,
-	const char *ip_list,
-	int allow_if_empty
-	);
+int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empty);
 
 #endif

@@ -97,32 +97,6 @@ void help()
 
 /******************************************************************************
  *                                                                            *
- * Function: find_char                                                        *
- *                                                                            *
- * Purpose: locate a character in the string                                  *
- *                                                                            *
- * Parameters: str - string                                                   *
- *             c   - character to find                                        *
- *                                                                            *
- * Return value:  position of the character                                   *
- *                FAIL - otherwise                                            *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments: !!! beter use system functions like 'strchr' !!!                 *
- *                                                                            *
- ******************************************************************************/
-int	find_char(char *str,char c)
-{
-	char *p;
-	for(p = str; *p; p++)
-		if(*p == c) return (int)(p - str);
-
-	return	FAIL;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: zbx_error                                                        *
  *                                                                            *
  * Purpose: Print error text to the stderr                                    *
@@ -165,7 +139,7 @@ void __zbx_zbx_error(const char *fmt, ...)
  *                                                                            *
  * Function: zbx_snprintf                                                     *
  *                                                                            *
- * Purpose: Sequire version of snprintf function.                             *
+ * Purpose: Secure version of snprintf function.                              *
  *          Add zero character at the end of string.                          *
  *                                                                            *
  * Parameters: str - destination buffer poiner                                *
@@ -201,7 +175,7 @@ int __zbx_zbx_snprintf(char* str, size_t count, const char *fmt, ...)
  *                                                                            *
  * Function: zbx_vsnprintf                                                    *
  *                                                                            *
- * Purpose: Sequire version of vsnprintf function.                            *
+ * Purpose: Secure version of vsnprintf function.                             *
  *          Add zero character at the end of string.                          *
  *                                                                            *
  * Parameters: str - destination buffer poiner                                *
@@ -232,7 +206,7 @@ int zbx_vsnprintf(char* str, size_t count, const char *fmt, va_list args)
  *                                                                            *
  * Function: zbx_snprintf_alloc                                               *
  *                                                                            *
- * Purpose: Sequire version of snprintf function.                             *
+ * Purpose: Secure version of snprintf function.                              *
  *          Add zero character at the end of string.                          *
  *          Reallocs memory if not enough.                                    *
  *                                                                            *
@@ -261,7 +235,8 @@ void __zbx_zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_l
 
 	va_start(args, fmt);
 
-	if (*offset + max_len >= *alloc_len) {
+	if (*offset + max_len >= *alloc_len)
+	{
 		while (*offset + max_len >= *alloc_len)
 			*alloc_len *= 2;
 		*str = zbx_realloc(*str, *alloc_len);
@@ -361,7 +336,7 @@ char *string_replace(char *str, char *sub_str1, char *sub_str2)
 
         len = (long)strlen(sub_str1);
 
-        /* count the number of occurences of sub_str1 */
+        /* count the number of occurrences of sub_str1 */
         for ( p=str; (p = strstr(p, sub_str1)); p+=len, count++ );
 
 	if ( 0 == count )	return strdup(str);
@@ -373,7 +348,7 @@ char *string_replace(char *str, char *sub_str1, char *sub_str2)
 
         for (q=str,t=new_str,p=str; (p = strstr(p, sub_str1)); )
         {
-                /* copy until next occurence of sub_str1 */
+                /* copy until next occurrence of sub_str1 */
                 for ( ; q < p; *t++ = *q++);
                 q += len;
                 p = q;
@@ -401,10 +376,10 @@ char *string_replace(char *str, char *sub_str1, char *sub_str2)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:  10.0100 => 10.01, 10. => 10                                                                 *
+ * Comments: 10.0100 => 10.01, 10. => 10                                      *
  *                                                                            *
  ******************************************************************************/
-void del_zeroes(char *s)
+void	del_zeroes(char *s)
 {
 	int     i;
 
@@ -431,28 +406,29 @@ void del_zeroes(char *s)
 
 /******************************************************************************
  *                                                                            *
- * Function: delete_reol                                                      *
+ * Function: delete_chars                                                     *
  *                                                                            *
- * Purpose: delete all right EOL characters                                   *
+ * Purpose: delete all unwanted characters                                    *
  *                                                                            *
- * Parameters: c - string to delete EOL                                       *
+ * Parameters: c - string to delete characters in                             *
+ *             charlist - characters to delete                                *
  *                                                                            *
- * Return value:  the string wtihout EOL                                      *
+ * Return value: string without unwanted characters                           *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	delete_reol(char *c)
+void	delete_chars(char *c, const char *charlist)
 {
-	int i;
+	char	*p, *q;
 
-	for(i=(int)strlen(c)-1;i>=0;i--)
-	{
-		if( c[i] != '\n')	break;
-		c[i]=0;
-	}
+	for (p = q = c; '\0' != *p; p++)
+		if (NULL == strchr(charlist, *p))
+			*(q++) = *p;
+
+	*q = '\0';
 }
 
 /******************************************************************************
@@ -2283,6 +2259,24 @@ char	*zbx_strcasestr(const char *haystack, const char *needle)
 /*#endif*/
 }
 
+int	starts_with(const char *str, const char *prefix)
+{
+	const char	*p, *q;
+
+	for (p = str, q = prefix; *p == *q && *q != '\0'; p++, q++);
+
+	return (*q == '\0' ? SUCCEED : FAIL);
+}
+
+int	cmp_key_id(const char *key_1, const char *key_2)
+{
+	const char	*p, *q;
+
+	for (p = key_1, q = key_2; *p == *q && *q != '\0' && *q != '[' && *q != ','; p++, q++);
+
+	return ((*p == '\0' || *p == '[' || *p == ',') && (*q == '\0' || *q == '[' || *q == ',') ? SUCCEED : FAIL);
+}
+
 const char *zbx_permission_string(int perm)
 {
 	switch (perm) {
@@ -2305,7 +2299,7 @@ char	*zbx_item_value_type_string(zbx_item_value_type_t value_type)
 	case ITEM_VALUE_TYPE_FLOAT: return "Numeric (float)";
 	case ITEM_VALUE_TYPE_STR: return "Character";
 	case ITEM_VALUE_TYPE_LOG: return "Log";
-	case ITEM_VALUE_TYPE_UINT64: return "Numeric (integer 64bit)";
+	case ITEM_VALUE_TYPE_UINT64: return "Numeric (unsigned)";
 	case ITEM_VALUE_TYPE_TEXT: return "Text";
 	default: return "unknown";
 	}
@@ -2637,4 +2631,17 @@ void	win2unix_eol(char *text)
 			memmove(&text[i + 1], &text[i + 2], (sz - i) * sizeof(char));
 		}
 	}
+}
+
+int	is_ascii_string(const char *str)
+{
+	while ('\0' != *str)
+	{
+		if (0 != ((1<<7) & *str)) /* check for range 0..127 */
+			return FAIL;
+
+		str++;
+	}
+
+	return SUCCEED;
 }

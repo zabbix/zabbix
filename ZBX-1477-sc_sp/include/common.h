@@ -653,10 +653,11 @@ const char *zbx_permission_string(int perm);
 #define	POLLER_DELAY	5
 #define DISCOVERER_DELAY	60
 
+#define	ZBX_NO_POLLER			255
 #define	ZBX_POLLER_TYPE_NORMAL		0
-#define	ZBX_POLLER_TYPE_UNREACHABLE	1
-#define	ZBX_POLLER_TYPE_IPMI		2
-#define	ZBX_POLLER_TYPE_PINGER		3
+#define	ZBX_POLLER_TYPE_IPMI		1
+#define	ZBX_POLLER_TYPE_PINGER		2
+#define	ZBX_POLLER_TYPE_COUNT		3	/* number of poller types */
 
 #define	POLLER_TIMEOUT	5
 /* Do not perform more than this number of checks during unavailability period */
@@ -716,7 +717,7 @@ void	version();
 /* MAX Length of base64 data */
 #define ZBX_MAX_B64_LEN 16*1024
 
-char* get_programm_name(char *path);
+char	*get_programm_name(char *path);
 
 typedef enum
 {
@@ -748,11 +749,8 @@ ZBX_TASK_EX
 	int		flags;
 };
 
+char	*string_replace(char *str, char *sub_str1, char *sub_str2);
 
-char *string_replace(char *str, char *sub_str1, char *sub_str2);
-
-void	del_zeroes(char *s);
-int	find_char(char *str,char c);
 int	is_double_prefix(char *str);
 int	is_double(char *c);
 int	is_uint_prefix(const char *c);
@@ -760,6 +758,8 @@ int	is_uint(char *c);
 int	is_uint64(register char *str, zbx_uint64_t *value);
 int	is_uoct(char *str);
 int	is_uhex(char *str);
+int	is_hex_string(const char *str);
+int	is_ascii_string(const char *str);
 void	zbx_rtrim(char *str, const char *charlist);
 void	zbx_ltrim(register char *str, const char *charlist);
 void	zbx_remove_chars(register char *str, const char *charlist);
@@ -767,7 +767,10 @@ void	lrtrim_spaces(char *c);
 void	compress_signs(char *str);
 void	ltrim_spaces(char *c);
 void	rtrim_spaces(char *c);
-void	delete_reol(char *c);
+void	del_zeroes(char *s);
+void	delete_chars(char *c, const char *charlist);
+#define delete_spaces(c)	delete_chars(c, " ");
+#define delete_whitespace(c)	delete_chars(c, " \t\n\r");
 int	get_param(const char *param, int num, char *buf, int maxlen);
 int	num_param(const char *param);
 char	*get_param_dyn(const char *param, int num);
@@ -775,8 +778,8 @@ void	remove_param(char *param, int num);
 const char	*get_string(const char *p, char *buf, size_t bufsize);
 int	get_key_param(char *param, int num, char *buf, int maxlen);
 int	num_key_param(char *param);
-int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, char *delay_flex, time_t now);
-int	check_time_period(char *period, time_t now);
+int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, const char *delay_flex, time_t now);
+int	check_time_period(const char *period, time_t now);
 char	zbx_num2hex(u_char c);
 u_char	zbx_hex2num(char c);
 int	zbx_binary2hex(const u_char *input, int ilen, char **output, int *olen);
@@ -906,6 +909,8 @@ char	*zbx_time2str(time_t time);
 
 /* Return the needle in the haystack (or NULL). */
 char	*zbx_strcasestr(const char *haystack, const char *needle);
+int	starts_with(const char *str, const char *prefix);
+int	cmp_key_id(const char *key_1, const char *key_2);
 
 int	get_nearestindex(void *p, size_t sz, int num, zbx_uint64_t id);
 int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t value, int alloc_step);
@@ -939,13 +944,8 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding);
 
 int MAIN_ZABBIX_ENTRY(void);
 
-zbx_uint64_t	zbx_letoh_uint64(
-		zbx_uint64_t	data
-	);
-
-zbx_uint64_t	zbx_htole_uint64(
-		zbx_uint64_t	data
-	);
+zbx_uint64_t	zbx_letoh_uint64(zbx_uint64_t data);
+zbx_uint64_t	zbx_htole_uint64(zbx_uint64_t data);
 
 int	is_hostname_char(const char c);
 int	is_key_char(const char c);

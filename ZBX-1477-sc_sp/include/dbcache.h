@@ -30,13 +30,13 @@
 #define DC_HOST struct dc_host
 
 extern char	*CONFIG_FILE;
+extern int	CONFIG_TIMEOUT;
 extern int	CONFIG_DBCONFIG_SIZE;
 extern int	CONFIG_HISTORY_CACHE_SIZE;
 extern int	CONFIG_TRENDS_CACHE_SIZE;
 extern int	CONFIG_TEXT_CACHE_SIZE;
 extern int	CONFIG_POLLER_FORKS;
 extern int	CONFIG_IPMIPOLLER_FORKS;
-extern int	CONFIG_UNREACHABLE_POLLER_FORKS;
 extern int	CONFIG_PINGER_FORKS;
 extern int	CONFIG_REFRESH_UNSUPPORTED;
 extern int	CONFIG_UNAVAILABLE_DELAY;
@@ -115,7 +115,7 @@ void	init_database_cache(zbx_process_t p);
 void	free_database_cache(void);
 
 void	DCinit_nextchecks();
-void	DCadd_nextcheck(DC_ITEM *item, time_t now, const char *error_msg);
+void	DCadd_nextcheck(zbx_uint64_t itemid, time_t now, const char *error_msg);
 void	DCflush_nextchecks();
 
 #define ZBX_STATS_HISTORY_COUNTER	0
@@ -138,7 +138,8 @@ void	DCflush_nextchecks();
 #define ZBX_STATS_TEXT_PFREE		17
 void	*DCget_stats(int request);
 
-zbx_uint64_t	DCget_nextid(const char *table_name, const char *field_name, int num);
+zbx_uint64_t	DCget_nextid(const char *table_name, int num);
+zbx_uint64_t	DCget_nextid_shared(const char *table_name);
 
 int	DCget_item_lastclock(zbx_uint64_t itemid);
 
@@ -149,16 +150,14 @@ void	free_configuration_cache();
 int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid);
 int	DCconfig_get_item_by_key(DC_ITEM *item, zbx_uint64_t proxy_hostid, const char *hostname, const char *key);
 int	DCconfig_get_item_by_itemid(DC_ITEM *item, zbx_uint64_t itemid);
-int	DCconfig_get_poller_items(unsigned char poller_type, unsigned char poller_num, int now,
-		DC_ITEM *items, int max_items);
-int	DCconfig_get_poller_nextcheck(unsigned char poller_type, unsigned char poller_num, int now);
+int	DCconfig_get_poller_nextcheck(unsigned char poller_type);
+int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max_items);
 int	DCconfig_get_items(zbx_uint64_t hostid, const char *key, DC_ITEM **items);
 
-void	DCconfig_update_item(zbx_uint64_t itemid, unsigned char status, int now);
+void	DCrequeue_reachable_item(zbx_uint64_t itemid, unsigned char status, int now);
+void	DCrequeue_unreachable_item(zbx_uint64_t itemid);
 int	DCconfig_activate_host(DC_ITEM *item);
 int	DCconfig_deactivate_host(DC_ITEM *item, int now);
-
-void	DCreset_item_nextcheck(zbx_uint64_t itemid);
 
 void	DCconfig_set_maintenance(zbx_uint64_t hostid, int maintenance_status,
 		int maintenance_type, int maintenance_from);

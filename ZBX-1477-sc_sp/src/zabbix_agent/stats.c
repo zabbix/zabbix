@@ -210,7 +210,7 @@ lbl_create:
 		}
 	}
 
-	collector = shmat(shm_id, 0, 0);
+	collector = shmat(shm_id, NULL, 0);
 
 	if ((void*)(-1) == collector)
 	{

@@ -51,15 +51,11 @@ include_once('include/page_header.php');
 		'groupid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL),
 		'hostid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL),
 
-
 		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		NULL),
-
 // filter
 		'select'=>			array(T_ZBX_STR, O_OPT, NULL,	NULL,		NULL),
-
 		'filter_rst'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
 		'filter_set'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,	NULL),
-
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
@@ -71,21 +67,6 @@ include_once('include/page_header.php');
 // HEADER REQUEST
 	$_REQUEST['select'] = get_request('select',CProfile::get('web.latest.filter.select', ''));
 	CProfile::update('web.latest.filter.select', $_REQUEST['select'], PROFILE_TYPE_STR);
-
-	
-//if(!$ZBX_WITH_ALL_NODES)	array_push($options,'only_current_node');
-
-	$options = array(
-		'allow_all_hosts' => 1,
-		'monitored_hosts' => 1,
-		'with_historical_items' => 1
-	);
-	$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $options);
-	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $options);
-
-	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
-//SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
-
 //----------------
 ?>
 <?php
@@ -115,50 +96,47 @@ include_once('include/page_header.php');
 	if(isset($_REQUEST['filter_rst'])){
 		$_REQUEST['select'] = '';
 	}
-
-	$_REQUEST['select'] = get_request('select',CProfile::get('web.latest.filter.select',''));
-
 	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
 		CProfile::update('web.latest.filter.select',$_REQUEST['select'], PROFILE_TYPE_STR);
 	}
 // --------------
 
 	$latest_wdgt = new CWidget();
+
 // Header
-
-	$url = '?fullscreen='.($_REQUEST['fullscreen']?'0':'1');
-
 	$fs_icon = new CDiv(SPACE,'fullscreen');
 	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-	$fs_icon->addAction('onclick',new CJSscript("javascript: document.location = '".$url."';"));
-
+	$fs_icon->addAction('onclick', 'javascript: document.location = "?fullscreen='.($_REQUEST['fullscreen']?'0':'1').'";');
 	$latest_wdgt->addPageHeader(S_LATEST_DATA_BIG,$fs_icon);
 
 // 2nd header
-	$r_form = new CForm();
-	$r_form->setMethod('get');
+	$r_form = new CForm(null, 'get');
 
 //	$cmbGroup = new CComboBox('groupid',$_REQUEST['groupid'],"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."',this.form);");
 //	$cmbHosts = new CComboBox('hostid',$_REQUEST['hostid'],"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."',this.form);");
 
-	$available_groups = $PAGE_GROUPS['groupids'];
-	$available_hosts = $PAGE_HOSTS['hostids'];
+	$options = array(
+		'groups' => array(
+			'monitored_hosts' => 1,
+			'with_historical_items' => 1,
+		),
+		'hosts' => array(
+			'monitored_hosts' => 1,
+			'with_historical_items' => 1,
+		),
+		'hostid' => get_request('hostid', null),
+		'groupid' => get_request('groupid', null),
+	);
+	$pageFilter = new CPageFilter($options);
+	$_REQUEST['groupid'] = $pageFilter->groupid;
+	$_REQUEST['hostid'] = $pageFilter->hostid;
 
-	$cmbGroup = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
-	$cmbHosts = new CComboBox('hostid',$PAGE_HOSTS['selected'],'javascript: submit();');
+	$available_hosts = $pageFilter->hostsSelected ? array_keys($pageFilter->hosts) : array();
 
-	foreach($PAGE_GROUPS['groups'] as $groupid => $name){
-		$cmbGroup->addItem($groupid, get_node_name_by_elid($groupid, null, ': ').$name);
-	}
-	foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
-		$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid, null, ': ').$name);
-	}
-
-	$r_form->addItem(array(S_GROUP.SPACE,$cmbGroup));
-	$r_form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
+	$r_form->addItem(array(S_GROUP.SPACE,$pageFilter->getGroupsCB(true)));
+	$r_form->addItem(array(SPACE.S_HOST.SPACE,$pageFilter->getHostsCB(true)));
 
 	$latest_wdgt->addHeader(S_ITEMS_BIG,$r_form);
-//	show_table_header(S_LATEST_DATA_BIG,$r_form);
 //-------------
 
 /************************* FILTER **************************/
@@ -552,7 +530,6 @@ include_once('include/page_header.php');
 	$latest_wdgt->show();
 
 //	add_refresh_objects($refresh_tab);
-?>
-<?php
+
 include_once 'include/page_footer.php';
 ?>

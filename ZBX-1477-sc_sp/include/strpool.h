@@ -1,6 +1,6 @@
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,15 +17,30 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
+#ifndef ZABBIX_STRPOOL_H
+#define ZABBIX_STRPOOL_H
 
-#ifndef ZABBIX_EXPRESSION_H
-#define ZABBIX_EXPRESSION_H
+#include "mutexs.h"
+#include "zbxalgo.h"
+#include "memalloc.h"
 
-#include "common.h"
-#include "db.h"
+typedef struct
+{
+	zbx_mem_info_t	*mem_info;
+	zbx_hashset_t	*hashset;
+	ZBX_MUTEX	pool_lock;
+}
+zbx_strpool_t;
 
-int	cmp_double(double a,double b);
-int	find_char(char *str,char c);
-void	delete_reol(char *c);
+void		zbx_strpool_create(size_t size);
+void		zbx_strpool_destroy();
+
+const char	*zbx_strpool_intern(const char *str);
+const char	*zbx_strpool_acquire(const char *str);
+void		zbx_strpool_release(const char *str);
+
+void		zbx_strpool_clear();
+
+const zbx_strpool_t	*zbx_strpool_info();
 
 #endif

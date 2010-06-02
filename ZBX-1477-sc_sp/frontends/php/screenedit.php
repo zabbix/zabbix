@@ -76,7 +76,10 @@ include_once('include/page_header.php');
 	$_REQUEST['dynmic'] = get_request('dynamic',SCREEN_SIMPLE_ITEM);
 ?>
 <?php
-	show_table_header(S_CONFIGURATION_OF_SCREEN_BIG);
+	$trigg_wdgt = new CWidget();
+	$trigg_wdgt->addPageHeader(S_CONFIGURATION_OF_SCREEN_BIG);
+	
+	//show_table_header(S_CONFIGURATION_OF_SCREEN_BIG);
 
 	$options = array(
 		'screenids' => $_REQUEST['screenid'],
@@ -87,6 +90,9 @@ include_once('include/page_header.php');
 	if(empty($screens)) access_deny();
 
 	$screen = reset($screens);
+	
+	$trigg_wdgt->addHeader($screen['name']);
+	$trigg_wdgt->addItem(BR());
 	
 	if(isset($_REQUEST['save'])){
 		if(!isset($_REQUEST['elements'])) $_REQUEST['elements'] = 0;
@@ -239,11 +245,15 @@ include_once('include/page_header.php');
 
 	if($_REQUEST['screenid'] > 0){
 		$table = get_screen($_REQUEST['screenid'], 1);
-		$table->show();
+		$trigg_wdgt->addItem($table);
 		zbx_add_post_js('init_screen("'.$_REQUEST['screenid'].'","iframe","'.$_REQUEST['screenid'].'");');
 		zbx_add_post_js('timeControl.processObjects();');
 	}
 
+	$trigg_wdgt->show();
+?>
+<?php
 
 include_once('include/page_footer.php');
+
 ?>
