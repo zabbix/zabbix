@@ -804,6 +804,12 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 		if (NULL != delim)
 			*delim = '\0';
 
+		if (FAIL == is_ip4(ip))
+		{
+			zbx_set_tcp_strerror("Incorrect IPv4 address [%s]", ip);
+			goto out;
+		}
+
 		if (FD_SETSIZE == s->num_socks)
 		{
 			zbx_set_tcp_strerror("Not enough space for socket [[%s]:%hu]",
