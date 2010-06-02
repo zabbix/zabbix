@@ -714,6 +714,28 @@ function add2favorites(favobj,favid){
 //	json.onetime('dashboard.php?output=json&'+Object.toQueryString(params));
 }
 
+
+function rm4favorites(favobj,favid,menu_rowid){
+//	alert(favobj+','+favid+','+menu_rowid);
+	if('undefined' == typeof(Ajax)){
+		throw("Prototype.js lib is required!");
+		return false;
+	}
+
+	if((typeof(favobj) == 'undefined') || (typeof(favid) == 'undefined'))
+		throw "No agruments sent to function [rm4favorites()].";
+
+	var params = {
+		'favobj': 	favobj,
+		'favid': 	favid,
+		'favcnt':	menu_rowid,
+		'action':	'remove'
+	}
+
+	send_params(params);
+//	json.onetime('dashboard.php?output=json&'+Object.toQueryString(params));
+}
+
 function change_flicker_state(divid){
 	deselectAll(); 
 	var eff_time = 500;
@@ -765,27 +787,6 @@ function change_hat_state(icon, divid){
 	}
 	
 	send_params(params);
-}
-
-function rm4favorites(favobj,favid,menu_rowid){
-//	alert(favobj+','+favid+','+menu_rowid);
-	if('undefined' == typeof(Ajax)){
-		throw("Prototype.js lib is required!");
-		return false;
-	}
-
-	if((typeof(favobj) == 'undefined') || (typeof(favid) == 'undefined')) 
-		throw "No agruments sent to function [rm4favorites()].";
-
-	var params = {
-		'favobj': 	favobj,
-		'favid': 	favid,
-		'favcnt':	menu_rowid,
-		'action':	'remove'
-	}
-
-	send_params(params);
-//	json.onetime('dashboard.php?output=json&'+Object.toQueryString(params));
 }
 
 function send_params(params){

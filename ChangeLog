@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [DEV-461] changes in GUI configuration menu (Aly)
  - [ZBX-2473] fixed timescroll most right position when "now" (Aly)
  - [ZBX-1193] improved macros form (Vedmak)
  - [ZBX-2035] fixed host full cloning (Vedmak)
