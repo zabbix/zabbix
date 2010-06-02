@@ -178,9 +178,9 @@ static void	separate_host(DB_DRULE *drule, DB_DHOST *dhost, const char *ip)
 			"select dserviceid"
 			" from dservices"
 			" where dhostid=" ZBX_FS_UI64
-				" and ip<>'%s'",
+				" and ip" ZBX_SQL_STRCMP,
 			dhost->dhostid,
-			ip_esc);
+			ZBX_SQL_STRVAL_NE(ip_esc));
 
 	result = DBselectN(sql, 1);
 
@@ -196,10 +196,10 @@ static void	separate_host(DB_DRULE *drule, DB_DHOST *dhost, const char *ip)
 		DBexecute("update dservices"
 				" set dhostid=" ZBX_FS_UI64
 				" where dhostid=" ZBX_FS_UI64
-					" and ip='%s'",
+					" and ip" ZBX_SQL_STRCMP,
 				dhostid,
 				dhost->dhostid,
-				ip_esc);
+				ZBX_SQL_STRVAL_EQ(ip_esc));
 
 		dhost->dhostid	= dhostid;
 		dhost->status	= DOBJECT_STATUS_DOWN;
@@ -248,13 +248,13 @@ static void	register_service(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost
 			" from dservices"
 			" where dcheckid=" ZBX_FS_UI64
 				" and type=%d"
-				" and key_='%s'"
-				" and ip='%s'"
+				" and key_" ZBX_SQL_STRCMP
+				" and ip" ZBX_SQL_STRCMP
 				" and port=%d",
 			dcheck->dcheckid,
 			dcheck->type,
-			key_esc,
-			ip_esc,
+			ZBX_SQL_STRVAL_EQ(key_esc),
+			ZBX_SQL_STRVAL_EQ(ip_esc),
 			port);
 
 	if (NULL == (row = DBfetch(result)))
@@ -323,10 +323,10 @@ static DB_RESULT	get_dhost_by_ip(zbx_uint64_t druleid, const char *ip)
 			" from dhosts dh,dservices ds"
 			" where ds.dhostid=dh.dhostid"
 				" and dh.druleid=" ZBX_FS_UI64
-				" and ds.ip='%s'"
+				" and ds.ip" ZBX_SQL_STRCMP
 			" order by dh.dhostid",
 			druleid,
-			ip_esc);
+			ZBX_SQL_STRVAL_EQ(ip_esc));
 
 	zbx_free(ip_esc);
 
@@ -345,10 +345,10 @@ static DB_RESULT	get_dhost_by_value(zbx_uint64_t dcheckid, const char *value)
 			" from dhosts dh,dservices ds"
 			" where ds.dhostid=dh.dhostid"
 				" and ds.dcheckid=" ZBX_FS_UI64
-				" and ds.value='%s'"
+				" and ds.value" ZBX_SQL_STRCMP
 			" order by dh.dhostid",
 			dcheckid,
-			value_esc);
+			ZBX_SQL_STRVAL_EQ(value_esc));
 
 	zbx_free(value_esc);
 
@@ -376,7 +376,8 @@ static void	register_host(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost, c
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s' status:%d value:'%s'",
+			__function_name, ip, status, value);
 
 	if (drule->unique_dcheckid == dcheck->dcheckid)
 	{
@@ -1075,22 +1076,19 @@ static void process_rule(DB_DRULE *drule)
 		{
 			ipv6 = 0;
 #endif /* HAVE_IPV6 */
-			if (4 == sscanf(curr_range, "%d.%d.%d.%d", &j[0], &j[1], &j[2], &j[3]) &&
-					j[0] >= 0 && j[0] <= 255 &&
-					j[1] >= 0 && j[1] <= 255 &&
-					j[2] >= 0 && j[2] <= 255 &&
-					j[3] >= 0 && j[3] <= 255)
+			if (4 == sscanf(curr_range, "%u.%u.%u.%u", &j[0], &j[1], &j[2], &j[3]) &&
+					j[0] <= 255 && j[1] <= 255 && j[2] <= 255 && j[3] <= 255)
 			{
 				first = (j[0] << 24) + (j[1] << 16) + (j[2] << 8) + j[3];
 
 				if (NULL != dash)
 				{
-					if (1 == sscanf(dash + 1, "%d", &j[4]) && j[4] >= 0 && j[4] <= 255)
+					if (1 == sscanf(dash + 1, "%u", &j[4]) && j[4] <= 255)
 						last = (j[0] << 24) + (j[1] << 16) + (j[2] << 8) + j[4];
 				}
 				else if (NULL != slash)
 				{
-					if (1 == sscanf(slash + 1, "%d", &j[4]) && j[4] >= 16 && j[4] <= 32)
+					if (1 == sscanf(slash + 1, "%u", &j[4]) && j[4] >= 16 && j[4] <= 32)
 					{
 						mask = (32 == j[4]) ? 0xffffffff : ~(0xffffffff >> j[4]);
 						network = first & mask;

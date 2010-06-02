@@ -56,7 +56,7 @@ class CObject{
 			array_push($this->items,unpack_object($value));
 		}
 		else if(is_string($value)){
-			array_push($this->items,str_replace(array('<','>','"'),array('&lt;','&gt;','&quot;'),$value));
+			array_push($this->items, zbx_htmlstr($value));
 //				array_push($this->items,htmlspecialchars($value));
 		}
 		else if(is_array($value)){

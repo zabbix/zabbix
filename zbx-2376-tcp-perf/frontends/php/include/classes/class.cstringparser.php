@@ -53,7 +53,12 @@ class CStringParser {
 		$this->totalSymbols = mb_strlen($this->expression); // should be changed to zbx_strlen
 		$this->levelData[$this->currentLevel] = Array();
 		$this->levelData[$this->currentLevel]['levelType'] = 'independent';
-		$this->indexLevels[0] =& $this->indexes;
+		if(isset($this->ess[$this->levelData[$this->currentLevel]['levelType']]['levelIndex']))
+		        $this->addToIndex();
+                else
+                        $this->indexLevels[$this->currentLevel] = Array();
+                
+                $this->indexes =& $this->indexLevels[$this->currentLevel];
 
 		for($this->currentSymbolNum = 0; $this->currentSymbolNum < $this->totalSymbols; $this->currentSymbolNum++) {
 			$this->currentSymbol = mb_substr($this->expression, $this->currentSymbolNum, 1); // should be changed to zbx_substr
@@ -70,6 +75,7 @@ class CStringParser {
 		//if(count($this->errors) > 0) $this->saveDebug(print_r($this->errors, true));
 
 		$this->parsedTree =& $this->levelData[0];
+		//SDII($this->parsedTree);
 
 		//$this->saveDebug(print_r($this->parsedTree, true));
 
@@ -112,10 +118,12 @@ class CStringParser {
 
 		//$this->saveDebug("current selected Open symbol {$ruleSetName}\n");
 		$this->currentLevel++;
-		$this->levelData[$this->currentLevel]['levelType'] = $ruleSetName;
-		$this->levelData[$this->currentLevel]['openSymbol'] = $this->currentSymbol;
-		$this->levelData[$this->currentLevel]['openSymbolNum'] = $this->currentSymbolNum;
-		if(isset($this->ess[$this->levelData[$this->currentLevel]['levelType']]['levelIndex']) && $this->ess[$this->levelData[$this->currentLevel]['levelType']]['levelIndex'] === true) {
+		$newLevel = Array();
+		$newLevel['levelType'] = $ruleSetName;
+		$newLevel['openSymbol'] = $this->currentSymbol;
+		$newLevel['openSymbolNum'] = $this->currentSymbolNum;
+		$this->levelData[$this->currentLevel] =& $newLevel;
+		if(isset($this->ess[$newLevel['levelType']]['levelIndex']) && $this->ess[$newLevel['levelType']]['levelIndex'] === true) {
 			$this->addToIndex();
 		}
 		$this->checkSymbol();
@@ -136,43 +144,43 @@ class CStringParser {
 
 				//$this->saveDebug("{$ruleSetName} open symbols:\n".var_export($this->ess[$ruleSetName]['openSymbol'], true)."\n");
 
+				if(isset($this->levelData[$this->currentLevel]['parts']) && is_array($this->levelData[$this->currentLevel]['parts']) && count($this->levelData[$this->currentLevel]['parts']) > 0) {
+				        $currentLastPart = end($this->levelData[$this->currentLevel]['parts']);
+				        if($currentLastPart === NULL) $currentLastPart = false;
+				}else
+				        $currentLastPart = false;
+
 				foreach($this->ess[$ruleSetName]['openSymbol'] as $openSymbol => $symbolType) {
 					//$this->saveDebug("comparing open symbol {$this->currentSymbol} == {$openSymbol} ?\n");
 
-					if($this->currentSymbol == $openSymbol && (
-								$this->levelData[$this->currentLevel]['levelType'] != $this->ess[$ruleSetName]['ruleName'] ||
-								(
-									$this->levelData[$this->currentLevel]['levelType'] == $this->ess[$ruleSetName]['ruleName'] &&
-									(
-										$this->levelData[$this->currentLevel]['openSymbol'] != $this->currentSymbol ||
-										$this->levelData[$this->currentLevel]['openSymbolNum'] != $this->currentSymbolNum
-									)
-								)
-							) && (
-							$symbolType != 'individual' ||
-							!isset($this->levelData[$this->currentLevel]['parts']) ||
-							!is_array($this->levelData[$this->currentLevel]['parts']) ||
-							!count($this->levelData[$this->currentLevel]['parts']) ||
-							$this->levelData[$this->currentLevel]['parts'][count($this->levelData[$this->currentLevel]['parts'])-1]['closeSymbol'] != $openSymbol
-							) && (
-								!isset($this->ess[$ruleSetName]['allowedSymbolsBefore']) ||
-								((
-									!isset($this->levelData[$this->currentLevel]['parts']) ||
-									!is_array($this->levelData[$this->currentLevel]['parts']) ||
-									!count($this->levelData[$this->currentLevel]['parts'])
-								) &&
-								(preg_match("/^".$this->ess[$ruleSetName]['allowedSymbolsBefore']."$/",
-											mb_substr($this->expression, $this->levelData[$this->currentLevel]['openSymbolNum']+1,
-											$this->currentSymbolNum-$this->levelData[$this->currentLevel]['openSymbolNum']-1))
-								)) || (
-							isset($this->levelData[$this->currentLevel]['parts']) &&
-							is_array($this->levelData[$this->currentLevel]['parts']) &&
-							count($this->levelData[$this->currentLevel]['parts']) > 0 &&
-							(preg_match("/^".$this->ess[$ruleSetName]['allowedSymbolsBefore']."$/",
-								mb_substr($this->expression,
-								$this->levelData[$this->currentLevel]['parts'][count($this->levelData[$this->currentLevel]['parts'])-1]['closeSymbolNum']+1,
-								$this->currentSymbolNum-$this->levelData[$this->currentLevel]['parts'][count($this->levelData[$this->currentLevel]['parts'])-1]['closeSymbolNum']-1)) //change to zbx_substr
-							)))) {
+					if($this->currentSymbol == $openSymbol &&
+					(
+						$this->levelData[$this->currentLevel]['levelType'] != $this->ess[$ruleSetName]['ruleName'] ||
+						(
+							$this->levelData[$this->currentLevel]['levelType'] == $this->ess[$ruleSetName]['ruleName'] &&
+                                                        (
+								$this->levelData[$this->currentLevel]['openSymbol'] != $this->currentSymbol ||
+								$this->levelData[$this->currentLevel]['openSymbolNum'] != $this->currentSymbolNum
+                                                        )
+                                                )
+                                        ) && (
+						$symbolType != 'individual' ||
+						$currentLastPart === false ||
+						$currentLastPart['closeSymbol'] != $openSymbol
+                                        ) && (
+						!isset($this->ess[$ruleSetName]['allowedSymbolsBefore']) ||
+						(
+						        $currentLastPart === false &&
+                                                        preg_match("/^".$this->ess[$ruleSetName]['allowedSymbolsBefore']."$/",
+								mb_substr($this->expression, $this->levelData[$this->currentLevel]['openSymbolNum']+1,
+                                                                        $this->currentSymbolNum-$this->levelData[$this->currentLevel]['openSymbolNum']-1))
+                                                ) || (
+                                                        $currentLastPart !== false &&
+                                                        preg_match("/^".$this->ess[$ruleSetName]['allowedSymbolsBefore']."$/",
+							        mb_substr($this->expression, $currentLastPart['closeSymbolNum']+1,
+							                $this->currentSymbolNum-$currentLastPart['closeSymbolNum']-1)) //change to zbx_substr
+                                                )
+                                        )) {
 						//$this->saveDebug("found Open symbol {$ruleSetName}\n");
 						if($symbolType == 'valueDependent' && (isset($this->ess[$ruleSetName]['allowedValues']) || isset($this->ess[$ruleSetName]['allowedSymbols']))) {
 							//$this->saveDebug("found {$symbolType} Open symbol {$ruleSetName}\n");
@@ -258,10 +266,17 @@ class CStringParser {
 
 	private function checkCloseSymbol() {
 		//$this->saveDebug("checking Close symbol {$this->levelData[$this->currentLevel]['levelType']} -> ".(isset($this->levelData[$this->currentLevel]['escaped']) ? var_export($this->levelData[$this->currentLevel]['escaped'], true) : '')."\n");
+		
+		if(isset($this->levelData[$this->currentLevel]['parts']) && is_array($this->levelData[$this->currentLevel]['parts']) && count($this->levelData[$this->currentLevel]['parts']) > 0) {
+		        $currentLastPart = end($this->levelData[$this->currentLevel]['parts']);
+		        if($currentLastPart === NULL) $currentLastPart = false;
+		}else
+		        $currentLastPart = false;
+		
 		if(	!is_array($this->currentRuleSet) ||
 			!isset($this->currentRuleSet['closeSymbol']) ||
 			$this->levelData[$this->currentLevel]['openSymbolNum'] == $this->currentSymbolNum ||
-			(isset($this->levelData[$this->currentLevel]['parts']) && $this->levelData[$this->currentLevel]['levelType'] == $this->levelData[$this->currentLevel]['parts'][count($this->levelData[$this->currentLevel]['parts'])-1]['levelType'] && $this->currentSymbolNum == $this->levelData[$this->currentLevel]['parts'][count($this->levelData[$this->currentLevel]['parts'])-1]['closeSymbolNum']) ||
+			($currentLastPart !== false && $this->levelData[$this->currentLevel]['levelType'] == $currentLastPart['levelType'] && $this->currentSymbolNum == $currentLastPart['closeSymbolNum']) ||
 			(isset($this->levelData[$this->currentLevel]['escaped']) && $this->levelData[$this->currentLevel]['escaped'] == $this->currentSymbolNum-1)
 			)
 			return false;
@@ -313,10 +328,12 @@ class CStringParser {
 
 					unset($this->currentRuleSet);
 					$this->currentRuleSet =& $ruleData;
-					$this->levelData[$this->currentLevel] = Array();
-					$this->levelData[$this->currentLevel]['levelType'] = $ruleData['ruleName'];
-					$this->levelData[$this->currentLevel]['openSymbol'] = $closeSymbol;
-					$this->levelData[$this->currentLevel]['openSymbolNum'] = $nextSymbolData['occurred'];
+					
+					$newLevel = Array();
+					$newLevel['levelType'] = $ruleData['ruleName'];
+					$newLevel['openSymbol'] = $closeSymbol;
+					$newLevel['openSymbolNum'] = $nextSymbolData['occurred'];
+					$this->levelData[$this->currentLevel] =& $newLevel;
 					$this->checkCloseSymbol();
 					unset($this->flags['nextData']);
 					if($tmpLevel == $this->currentLevel) {
@@ -329,10 +346,11 @@ class CStringParser {
 
 						$this->saveToParent();
 
-						$this->levelData[$this->currentLevel] = Array();
-						$this->levelData[$this->currentLevel]['levelType'] = $ruleData['ruleName'];
-						$this->levelData[$this->currentLevel]['openSymbol'] = $closeSymbol;
-						$this->levelData[$this->currentLevel]['openSymbolNum'] = $nextSymbolData['occurred'];
+						$newLevel = Array();
+						$newLevel['levelType'] = $ruleData['ruleName'];
+						$newLevel['openSymbol'] = $closeSymbol;
+    						$newLevel['openSymbolNum'] = $nextSymbolData['occurred'];
+						$this->levelData[$this->currentLevel] =& $newLevel;
 
 						$this->currentSymbolNum = $nextSymbolData['occurred'];
 						$this->currentSymbol = $closeSymbol;
@@ -419,11 +437,14 @@ class CStringParser {
 		if(!isset($this->levelData[$this->currentLevel-1]['parts']))
 			$this->levelData[$this->currentLevel-1]['parts'] = Array();
 
-		$this->levelData[$this->currentLevel-1]['parts'][] = $this->levelData[$this->currentLevel];
-
+                $currentItem =& $this->levelData[$this->currentLevel];
+                if(isset($currentItem['parts'])) ksort($currentItem['parts'], SORT_NUMERIC);
+                
+                $key = $currentItem['openSymbolNum'].'_'.$currentItem['closeSymbolNum'];
+                                
+		$this->levelData[$this->currentLevel-1]['parts'][$key] =& $this->levelData[$this->currentLevel];
+		
 		unset($this->levelData[$this->currentLevel]);
-
-		$currentItem =& $this->levelData[$this->currentLevel-1]['parts'][count($this->levelData[$this->currentLevel-1]['parts'])-1];
 		if(isset($this->ess[$currentItem['levelType']]['levelIndex']) && $this->ess[$currentItem['levelType']]['levelIndex'] === true) {
 			$this->removeFromIndex();
 		}
@@ -441,7 +462,8 @@ class CStringParser {
 			foreach($this->indexLevels as &$level) {
 				if(!isset($level[$levelType])) $level[$levelType] = Array();
 				
-				$level[$levelType][] =& $itemToIndex;
+				if(!isset($level[$levelType][$itemToIndex['openSymbolNum'].'_'.$itemToIndex['closeSymbolNum']]))
+				        $level[$levelType][$itemToIndex['openSymbolNum'].'_'.$itemToIndex['closeSymbolNum']] =& $itemToIndex;
 			}
                 }
 	}
@@ -459,10 +481,12 @@ class CStringParser {
 	private function validateFatal() {
 		if(count($this->levelData) == 1) return true;
 
+
+		SDI(count($this->levelData));
 		$this->errors[] = Array('errorCode' => 1,
-								'errorMsg' => 'Fatal error, '.$this->levelData[count($this->levelData)-1]['levelType'].' ending symbol not found. '.$this->levelData[count($this->levelData)-1]['levelType'].' begins at char '.($this->levelData[count($this->levelData)-1]['openSymbolNum']+1),
-								'errStart' => $this->levelData[count($this->levelData)-1]['openSymbolNum'],
-								'errEnd' => mb_strlen($this->expression)-1);
+                                        'errorMsg' => 'Fatal error, '.$this->levelData[count($this->levelData)-1]['levelType'].' ending symbol not found. '.$this->levelData[count($this->levelData)-1]['levelType'].' begins at char '.($this->levelData[count($this->levelData)-1]['openSymbolNum']+1),
+					'errStart' => $this->levelData[count($this->levelData)-1]['openSymbolNum'],
+					'errEnd' => mb_strlen($this->expression)-1);
 
 		return false;
 	}
@@ -471,14 +495,33 @@ class CStringParser {
 		$skipAfterEmpty = false;
 		$values = $this->levelValue($levelData);
 
+		//SDII("Validating {$levelData['levelType']} splited values:\n".var_export($values, true)."\nRules:\n".var_export($this->ess[$levelData['levelType']], true)."\n");
 		//$this->saveDebug("Validating {$levelData['levelType']} splited values:\n".var_export($values, true)."\nRules:\n".var_export($this->ess[$levelData['levelType']], true)."\n");
 
+		if(isset($parent['parts']) && is_array($parent['parts'])) {
+		        $nextKey = key($parent['parts']);
+		        $nextItem =& $parent['parts'][$nextKey];
+		        prev($parent['parts']);
+		        prev($parent['parts']);
+		        $prevKey = key($parent['parts']);
+		        $prevItem = $prevKey !== NULL ? $parent['parts'][$prevKey]: false;
+		        reset($parent['parts']);
+		        $startKey = key($parent['parts']);
+		        $startItem =& $parent['parts'][$startKey];
+		        end($parent['parts']);
+		        $endKey = key($parent['parts']);
+		        $endItem = $parent['parts'][$endKey];
+                }else{
+                        $startKey = $endKey = $nextKey = $prevKey = false;
+                        $startItem = $endItem = $nextItem = $prevItem = false;
+                }
+                
 		if(isset($this->ess[$levelData['levelType']]['allowedSymbolsBefore'])) {
-			if(isset($parent['openSymbolNum']) && $index == 0 && $parent['openSymbolNum'] < $levelData['openSymbolNum'])  {
+			if(isset($parent['openSymbolNum']) && $startKey == $index && $parent['openSymbolNum'] < $levelData['openSymbolNum'])  {
 				$startCut = $parent['openSymbolNum']+1;
 				$endCut = $levelData['openSymbolNum'];
-			}else if($index > 0 && isset($parent['parts'][$index-1]['closeSymbolNum']) && $parent['parts'][$index-1]['closeSymbolNum'] < $levelData['openSymbolNum']) {
-				$startCut = $parent['parts'][$index-1]['closeSymbolNum']+1;
+			}else if($startKey != $index && $prevItem && isset($prevItem['closeSymbolNum']) && $prevItem['closeSymbolNum'] < $levelData['openSymbolNum']) {
+				$startCut = $prevItem['closeSymbolNum']+1;
 				$endCut = $levelData['openSymbolNum'];
 			}else{
 				$startCut = $levelData['openSymbolNum'];
@@ -490,20 +533,20 @@ class CStringParser {
 
 			if(!preg_match("/^".$this->ess[$levelData['levelType']]['allowedSymbolsBefore']."$/", $beforesymbols)){
 				$this->errors[] = Array('errorCode' => 4,
-										'errorMsg' => 'Not allowed symbols detected before '.$levelData['levelType'].'. Check expression starting from symbol #'.($startCut+1).' up to symbol #'.$endCut.'. Debug / symbols before: <'.$beforesymbols.'>/ RegExp: '.$this->ess[$levelData['levelType']]['allowedSymbolsBefore'],
-										'errStart' => $startCut,
-										'errEnd' => $endCut,
-										'errValues' => Array($beforesymbols));
+                                                        'errorMsg' => 'Not allowed symbols detected before '.$levelData['levelType'].'. Check expression starting from symbol #'.($startCut+1).' up to symbol #'.$endCut.'. Debug / symbols before: <'.$beforesymbols.'>/ RegExp: '.$this->ess[$levelData['levelType']]['allowedSymbolsBefore'],
+							'errStart' => $startCut,
+							'errEnd' => $endCut,
+							'errValues' => Array($beforesymbols));
 			}
 		}
-
+		
 		if(isset($this->ess[$levelData['levelType']]['allowedSymbolsAfter'])) {
-			if(isset($parent['closeSymbolNum']) && $index == count($parent['parts'])-1 && $parent['closeSymbolNum'] > $levelData['closeSymbolNum'])  {
+			if(isset($parent['closeSymbolNum']) && $endKey == $index && $parent['closeSymbolNum'] > $levelData['closeSymbolNum'])  {
 				$startCut = $levelData['closeSymbolNum']+1;
 				$endCut = $parent['closeSymbolNum'];
-			}else if($index >= 0 && $index < count($parent['parts'])-1 && isset($parent['parts'][$index+1]['openSymbolNum']) && $parent['parts'][$index+1]['openSymbolNum'] > $levelData['closeSymbolNum']) {
+			}else if($endKey !== $index && $nextItem && isset($nextItem['openSymbolNum']) && $nextItem['openSymbolNum'] > $levelData['closeSymbolNum']) {
 				$startCut = $levelData['closeSymbolNum']+1;
-				$endCut = $parent['parts'][$index+1]['openSymbolNum'];
+				$endCut = $nextItem['openSymbolNum'];
 			}else{
 				$startCut = $levelData['closeSymbolNum'];
 				$endCut = $levelData['closeSymbolNum'];
@@ -514,10 +557,10 @@ class CStringParser {
 
 			if(!preg_match("/^".$this->ess[$levelData['levelType']]['allowedSymbolsAfter']."$/", $aftersymbols)){
 				$this->errors[] = Array('errorCode' => 5,
-										'errorMsg' => 'Not allowed symbols detected after '.$levelData['levelType'].'. Check expression starting from symbol #'.($startCut+1).' up to symbol #'.$endCut.'. Debug / symbols after: <'.$aftersymbols.'>/ RegExp: '.$this->ess[$levelData['levelType']]['allowedSymbolsAfter'],
-										'errStart' => $startCut,
-										'errEnd' => $endCut,
-										'errValues' => Array($aftersymbols));
+                                                        'errorMsg' => 'Not allowed symbols detected after '.$levelData['levelType'].'. Check expression starting from symbol #'.($startCut+1).' up to symbol #'.$endCut.'. Debug / symbols after: <'.$aftersymbols.'>/ RegExp: '.$this->ess[$levelData['levelType']]['allowedSymbolsAfter'],
+							'errStart' => $startCut,
+							'errEnd' => $endCut,
+                                                        'errValues' => Array($aftersymbols));
 			}
 		}
 
@@ -525,10 +568,10 @@ class CStringParser {
 			if(is_array($values) && (count($values) > 1 || (count($values) > 0 && mb_strlen($values[0]['value']) > 0))){
 				foreach($values as &$val) {
 					$this->errors[] = Array('errorCode' => 3,
-											'errorMsg' => $levelData['levelType'].' has unnecessary symbols. Check expression starting from symbol #'.($val['from']+1).' up to symbol #'.$val['until'].'. Debug: <'.$val['value'].'>',
-											'errStart' => $val['from'],
-											'errEnd' => $val['until'],
-											'errValues' => Array($val['value']));
+								'errorMsg' => $levelData['levelType'].' has unnecessary symbols. Check expression starting from symbol #'.($val['from']+1).' up to symbol #'.$val['until'].'. Debug: <'.$val['value'].'>',
+								'errStart' => $val['from'],
+								'errEnd' => $val['until'],
+								'errValues' => Array($val['value']));
 				}
 			}else{
 				$skipAfterEmpty = true;
@@ -611,20 +654,26 @@ class CStringParser {
 
 				if((isset($this->ess[$levelData['levelType']]['allowedValues']) && !$allowedValuesValid) || (isset($this->ess[$levelData['levelType']]['notAllowedValues']) && !$notAllowedValuesValid)) {
 					$this->errors[] = Array('errorCode' => 6,
-											'errorMsg' => 'Not allowed value detected in '.$levelData['levelType'].'. Check expression starting from symbol #'.($val['from']+1).' up to symbol #'.$val['until'].'. Not allowed values: '.implode(', ', $errValues).'. Debug: '.$notclean.' / '.$val['value'],
-											'errStart' => $val['from'],
-											'errEnd' => $val['until'],
-											'errValues' => $errValues);
+                                                                'errorMsg' => 'Not allowed value detected in '.$levelData['levelType'].'. Check expression starting from symbol #'.($val['from']+1).' up to symbol #'.$val['until'].'. Not allowed values: '.implode(', ', $errValues).'. Debug: '.$notclean.' / '.$val['value'],
+								'errStart' => $val['from'],
+								'errEnd' => $val['until'],
+								'errValues' => $errValues);
 				}
 			}
 		}
+		if(isset($this->ess[$levelData['levelType']]['customValidate'])) {
+		        if(!is_array($this->ess[$levelData['levelType']]['customValidate']))
+		                $this->ess[$levelData['levelType']]['customValidate'] = Array($this->ess[$levelData['levelType']]['customValidate']);
+                        
+                        foreach($this->ess[$levelData['levelType']]['customValidate'] as &$customFunction) {
+                                if(!is_callable($customFunction)) continue;
+                                
+        			$ret = call_user_func_array($customFunction, Array(&$parent, &$levelData, $index, &$this->expression, &$this->ess[$levelData['levelType']]));
 
-		if(isset($this->ess[$levelData['levelType']]['customValidate']) && is_callable($this->ess[$levelData['levelType']]['customValidate'])) {
-			$ret = call_user_func_array($this->ess[$levelData['levelType']]['customValidate'], Array(&$parent, &$levelData, $index, &$this->expression, &$this->ess[$levelData['levelType']]));
-			
-			if(isset($ret['valid']) && $ret['valid'] === false && isset($ret['errArray']) && is_array($ret['errArray']) && isset($ret['errArray']['errorCode']) && isset($ret['errArray']['errStart']) && isset($ret['errArray']['errEnd'])) {
-				$this->errors[] = $ret['errArray'];
-			}
+        			if(isset($ret['valid']) && $ret['valid'] === false && isset($ret['errArray']) && is_array($ret['errArray']) && isset($ret['errArray']['errorCode']) && isset($ret['errArray']['errStart']) && isset($ret['errArray']['errEnd'])) {
+        				$this->errors[] = $ret['errArray'];
+	        		}
+                        }
 		}
 
 		if(isset($levelData['parts']) && is_array($levelData['parts']))
@@ -641,14 +690,16 @@ class CStringParser {
 		$openpostend = (!isset($this->ess[$levelData['levelType']]['inclusive']) || $this->ess[$levelData['levelType']]['inclusive'] !== true) && isset($levelData['closeSymbol'])? mb_strlen($levelData['closeSymbol'])*-1 : 0;
 		if(isset($levelData['parts']) && is_array($levelData['parts'])) {
 			$prev = NULL;
+			end($levelData['parts']);
+			$endKey = key($levelData['parts']);
 			foreach($levelData['parts'] as $key => &$level) {
 				//$this->saveDebug("Test {$level['levelType']} for first: ".var_export(!isset($prev) && ( $level['openSymbolNum'] > $levelData['openSymbolNum']+$openprepend/* || (!isset($levelData['openSymbol']) && $level['openSymbolNum']==$levelData['openSymbolNum'])*/), true)."\n");
 				if(!isset($prev) && (
-										$level['openSymbolNum'] > $levelData['openSymbolNum']+$openprepend/* || 
-										(!isset($levelData['openSymbol']) && $level['openSymbolNum']==$levelData['openSymbolNum'])*/
-									)) {
+                                        $level['openSymbolNum'] > $levelData['openSymbolNum']+$openprepend/* || 
+					(!isset($levelData['openSymbol']) && $level['openSymbolNum']==$levelData['openSymbolNum'])*/
+                                )) {
 					$val = Array();
-					$val['value'] = mb_substr($this->expression, $levelData['openSymbolNum']+$openprepend, $level['openSymbolNum']-$levelData['openSymbolNum']); // should be changed to zbx_substr
+					$val['value'] = mb_substr($this->expression, $levelData['openSymbolNum']+$openprepend, $level['openSymbolNum']-($levelData['openSymbolNum']+$openprepend)); // should be changed to zbx_substr
 					$val['from'] = $levelData['openSymbolNum']+$openprepend;
 					$val['until'] = $level['openSymbolNum'];
 					$value .= $val['value'];
@@ -665,9 +716,9 @@ class CStringParser {
 					$values[] = $val;
 				}
 				//$this->saveDebug("Test {$level['levelType']} for last: ".var_export($key == count($levelData['parts'])-1 && ($level['closeSymbolNum']+mb_strlen($level['closeSymbol']) < $levelData['closeSymbolNum']+$openpostend/* || (!isset($levelData['closeSymbol']) && $level['closeSymbolNum']+mb_strlen($level['closeSymbol'])==$levelData['closeSymbolNum'])*/), true)."\n");
-				if($key == count($levelData['parts'])-1 && ($level['closeSymbolNum']+mb_strlen($level['closeSymbol']) < $levelData['closeSymbolNum']+$openpostend+1/* ||
-															(!isset($levelData['closeSymbol']) && $level['closeSymbolNum']+mb_strlen($level['closeSymbol'])==$levelData['closeSymbolNum'])*/
-															)) {
+				if($endKey == $key && ($level['closeSymbolNum']+mb_strlen($level['closeSymbol']) < $levelData['closeSymbolNum']+$openpostend+1/* ||
+                                        (!isset($levelData['closeSymbol']) && $level['closeSymbolNum']+mb_strlen($level['closeSymbol'])==$levelData['closeSymbolNum'])*/
+                                )) {
 					$val = Array();
 					$val['value'] = mb_substr($this->expression, $level['closeSymbolNum']+mb_strlen($level['closeSymbol']), $levelData['closeSymbolNum']+$openpostend-($level['closeSymbolNum']+mb_strlen($level['closeSymbol']))+1); // should be changed to zbx_substr
 					$val['from'] = $level['closeSymbolNum']+mb_strlen($level['closeSymbol']);
@@ -709,6 +760,20 @@ class CStringParser {
 	}
 }
 
+function triggerExpressionValidateIndependent(&$parent, &$levelData, $index, &$expression, &$rules) {
+        
+        if(!isset($levelData['indexes']['server']) || !is_array($levelData['indexes']['server']) || !count($levelData['indexes']['server'])) {
+                return Array(
+                        'valid' => false,
+                        'errArray' => Array(
+                                'errorCode' => 16,
+                                'errorMsg' => 'At least one host required in expression. Check expression starting from symbol #'.($levelData['openSymbolNum']+1).' up to symbol #'.$levelData['closeSymbolNum'].'.',
+                                'errStart' => $levelData['openSymbolNum'],
+                                'errEnd' => $levelData['closeSymbolNum'])
+                        );
+        }
+}
+
 function triggerExpressionValidateGroup(&$parent, &$levelData, $index, &$expression, &$rules) {
 	$replacementchar = '0';
 
@@ -717,6 +782,10 @@ function triggerExpressionValidateGroup(&$parent, &$levelData, $index, &$express
 	if(isset($levelData['parts']) && is_array($levelData['parts']) && count($levelData['parts']) > 0) {
 		$values = '';
 		$prev = NULL;
+		
+		end($levelData['parts']);
+		$endKey = key($levelData['parts']);
+		
 		foreach($levelData['parts'] as $key => &$level) {
 			if(!isset($prev) && $level['openSymbolNum'] > $levelData['openSymbolNum']+$openprepend) {
 				$val = Array();
@@ -730,7 +799,7 @@ function triggerExpressionValidateGroup(&$parent, &$levelData, $index, &$express
 				$values .= mb_substr($expression, $prev['closeSymbolNum']+mb_strlen($prev['closeSymbol']), $level['openSymbolNum']-($prev['closeSymbolNum']+mb_strlen($prev['closeSymbol']))).$replacementchar; // should be changed to zbx_substr
 			}
 
-			if($key == count($levelData['parts'])-1 && $level['closeSymbolNum']+mb_strlen($level['closeSymbol']) < $levelData['closeSymbolNum']+$openpostend) {
+			if($endKey == $key && $level['closeSymbolNum']+mb_strlen($level['closeSymbol']) < $levelData['closeSymbolNum']+$openpostend) {
 				$val = Array();
 				$values .= mb_substr($expression, $level['closeSymbolNum']+mb_strlen($level['closeSymbol']), $levelData['closeSymbolNum']+$openpostend-($level['closeSymbolNum']+mb_strlen($level['closeSymbol']))+1); // should be changed to zbx_substr
 			}
@@ -769,8 +838,8 @@ function triggerExpressionValidateHost(&$parent, &$levelData, $index, &$expressi
 		$hostFound = array_shift($hostFound);
 		if(isset($hostFound['hostid']) && $hostFound['hostid'] > 0) $hostId = $hostFound['hostid'];
 	}
-
-	$usedHosts[$expression][$hostFound['status']][$hostFound['hostid']] = true;
+	
+	if(isset($hostFound['hostid']) && isset($hostFound['hostid'])) $usedHosts[$expression][$hostFound['status']][$hostFound['hostid']] = true;
 
 	if(!isset($hostId)) {
 		return Array(
@@ -793,6 +862,7 @@ function triggerExpressionValidateHost(&$parent, &$levelData, $index, &$expressi
                                 'errValues' => Array($host))
                         );
 	}else{
+	        $levelData['levelDBData'] = Array();
 		$levelData['levelDBData']['hostid'] = $hostId;
 	}
 }
@@ -801,17 +871,20 @@ function triggerExpressionValidateItemKey(&$parent, &$levelData, $index, &$expre
         if(!isset($parent['indexes']['keyName']) || !count($parent['indexes']['keyName']))
                 return;
         
-	$kData =& $parent['indexes']['keyName'][0];
+        reset($parent['indexes']['keyName']);
+	$kData =& $parent['indexes']['keyName'][key($parent['indexes']['keyName'])];
 	$keyName = zbx_substr($expression, $kData['openSymbolNum']+zbx_strlen($kData['openSymbol']), $kData['closeSymbolNum']-$kData['openSymbolNum']-zbx_strlen($kData['closeSymbol']));
 	
 	if(isset($parent['indexes']['keyParams']) && count($parent['indexes']['keyParams']) > 0) {
-        	$kpData =& $parent['indexes']['keyParams'][0];
+	        reset($parent['indexes']['keyParams']);
+        	$kpData =& $parent['indexes']['keyParams'][key($parent['indexes']['keyParams'])];
         	$keyParams = isset($parent['indexes']['keyParams']) && count($parent['indexes']['keyParams']) > 0 ? zbx_substr($expression, $kpData['openSymbolNum'], $kpData['closeSymbolNum']-$kpData['openSymbolNum']+zbx_strlen($kpData['closeSymbol'])) : '';
         }else{
                 $keyParams = '';
         }
 
-	$hData =& $parent['indexes']['server'][0];
+        reset($parent['indexes']['server']);
+	$hData =& $parent['indexes']['server'][key($parent['indexes']['server'])];
 	if(isset($hData['levelDBData']) && $hData['levelDBData']['hostid'] > 0) {
 		$hostId = $hData['levelDBData']['hostid'];
 	}else{
@@ -835,6 +908,7 @@ function triggerExpressionValidateItemKey(&$parent, &$levelData, $index, &$expre
 					'errValues' => Array($keyName.$keyParams))
 				);
 	}else{
+	        $levelData['levelDBData'] = Array();
 		$levelData['levelDBData'] = $itemFound;
 		$levelData['levelDBData']['itemid'] = $itemId;
 	}
@@ -843,11 +917,7 @@ function triggerExpressionValidateItemKey(&$parent, &$levelData, $index, &$expre
 function triggerExpressionValidateItemKeyFunction(&$parent, &$levelData, $index, &$expression, &$rules) {
 	global $ZBX_TR_EXPR_ALLOWED_FUNCTIONS;
 	
-	if(!isset($parent['indexes']['keyFunctionName']) || !count($parent['indexes']['keyFunctionName']))
-                return;
-	
-	$fData =& $parent['indexes']['keyFunctionName'][0];
-	$function = zbx_substr($expression, $fData['openSymbolNum']+zbx_strlen($fData['openSymbol']), $fData['closeSymbolNum']-$fData['openSymbolNum']-zbx_strlen($fData['closeSymbol']));
+	$function = zbx_substr($expression, $levelData['openSymbolNum']+zbx_strlen($levelData['openSymbol']), $levelData['closeSymbolNum']-$levelData['openSymbolNum']-zbx_strlen($levelData['closeSymbol']));
 	$fnc_valid = &$ZBX_TR_EXPR_ALLOWED_FUNCTIONS[$function];
 	
 	if(is_array($fnc_valid['item_types']) && isset($parent['levelDBData']) &&
@@ -867,33 +937,34 @@ function triggerExpressionValidateItemKeyFunction(&$parent, &$levelData, $index,
 					'value_type' => $parent['levelDBData']['value_type'])
 				);
 	}else{
+	        $levelData['levelDBData'] = Array();
 		$levelData['levelDBData']['valid'] = $fnc_valid;
 		$levelData['levelDBData']['function'] = $function;
+		//SDII($parent);
 	}
-		/*$allowed_types = array();
-		foreach($fnc_valid['item_types'] as $type)
-			$allowed_types[] = item_value_type2str($type);
-		info(S_FUNCTION.' ('.$function.') '.S_AVAILABLE_ONLY_FOR_ITEMS_WITH_VALUE_TYPES_SMALL.' ['.implode(',',$allowed_types).']');
-		error(S_INCORRECT_VALUE_TYPE.' ['.item_value_type2str($item['value_type']).'] '.S_FOR_FUNCTION_SMALL.' ('.$function.') '.S_OF_KEY_SMALL.' ('.$host.':'.$key.')');
-		return false;*/
-	//$kpData =& $parent['indexes']['keyFunctionParams'][0];
-	//$keyParams = isset($parent['indexes']['keyFunctionParams']) && count($parent['indexes']['keyFunctionParams']) > 0 ? zbx_substr($expression, $kpData['openSymbolNum'], $kpData['closeSymbolNum']-$kpData['openSymbolNum']+zbx_strlen($kpData['closeSymbol'])) : '';
 }
 
 function triggerExpressionValidateItemKeyFunctionParams(&$parent, &$levelData, $index, &$expression, &$rules) {
 	//$fpData =& $parent['indexes']['keyFunctionParams'][0];
 	$functionParams = zbx_substr($expression, $levelData['openSymbolNum'], $levelData['closeSymbolNum']-$levelData['openSymbolNum']+zbx_strlen($levelData['closeSymbol']));
-	if(isset($parent['indexes']['keyFunctionName']) && count($parent['indexes']['keyFunctionName']) > 0)
-	        $fItem =& $parent['indexes']['keyFunctionName'][0];
-        else
+	//SDII($parent['indexes']);
+	if(isset($parent['indexes']['keyFunctionName']) && count($parent['indexes']['keyFunctionName']) > 0) {
+	        reset($parent['indexes']['keyFunctionName']);
+	        $fItem =& $parent['indexes']['keyFunctionName'][key($parent['indexes']['keyFunctionName'])];
+        }else{
                 $fItem = Array();
+        }
+        
+        //SDII($fItem);
+        
 	$fnc_valid =& $fItem['levelDBData']['valid'];
 	if(!is_null($fnc_valid['args'])){
 		$parameter = Array();
 		if(isset($levelData['parts']) && is_array($levelData['parts']) && count($levelData['parts']) > 0) {
-			foreach($levelData['parts'] as $param) {
+			foreach($levelData['parts'] as &$param) {
 				if(isset($param['parts']) && is_array($param['parts']) && count($param['parts']) > 0) {
-					$quoted =& $param['parts'][0];
+				        reset($param['parts']);
+					$quoted =& $param['parts'][key($param['parts'])];
 					$parameter[] = zbx_substr($expression, $quoted['openSymbolNum']+zbx_strlen($quoted['openSymbol']), $quoted['closeSymbolNum']-($quoted['openSymbolNum']+zbx_strlen($quoted['openSymbol'])));
 				}else {
 					$parameter[] = zbx_substr($expression, $param['openSymbolNum']+zbx_strlen($param['openSymbol']), $param['closeSymbolNum']-($param['openSymbolNum']+zbx_strlen($param['openSymbol'])));
@@ -905,7 +976,7 @@ function triggerExpressionValidateItemKeyFunctionParams(&$parent, &$levelData, $
 		if(!is_array($fnc_valid['args']))  $fnc_valid['args'] = array($fnc_valid['args']);
 		
 		foreach($fnc_valid['args'] as $pid => $params){
-			if(!isset($parameter[$pid]) || !$parameter[$pid]){
+			if(!isset($parameter[$pid])){
 				if( !isset($params['mandat']) ){
 					continue;
 				}else{

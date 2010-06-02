@@ -96,7 +96,7 @@
 	$url = '?fullscreen='.($_REQUEST['fullscreen']?'0':'1').url_param('triggerid').url_param('eventid');
 	$fs_icon = new CDiv(SPACE, 'fullscreen');
 	$fs_icon->setAttribute('title',$_REQUEST['fullscreen'] ? S_NORMAL.' '.S_VIEW : S_FULLSCREEN);
-	$fs_icon->addAction('onclick', new CJSscript("javascript: document.location = '".$url."';"));
+	$fs_icon->addAction('onclick', "javascript: document.location = '".$url."';");
 
 	$tr_event_wdgt->addHeader($text, $fs_icon);
 //-------
