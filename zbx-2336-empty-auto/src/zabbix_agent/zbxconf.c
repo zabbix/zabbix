@@ -124,6 +124,13 @@ void    load_config()
 			if( NULL != (value = GET_STR_RESULT(&result)) )
 			{
 				CONFIG_HOSTNAME = strdup(*value);
+
+				/* Depending on whether we use auto registration or not, our */
+				/* CONFIG_HOSTNAME might make it into the server's database, */
+				/* where it is limited by HOST_HOST_LEN (currently, 64), so  */
+				/* to make it work properly we need to shorten our hostname. */
+				if (strlen(CONFIG_HOSTNAME) > 64)
+					CONFIG_HOSTNAME[64] = '\0';
 			}
 		}
 	        free_result(&result);
@@ -131,6 +138,14 @@ void    load_config()
 		if(CONFIG_HOSTNAME == NULL)
 		{
 			zabbix_log( LOG_LEVEL_CRIT, "Hostname is not defined");
+			exit(1);
+		}
+	}
+	else
+	{
+		if(strlen(CONFIG_HOSTNAME) > 64)
+		{
+			zabbix_log( LOG_LEVEL_CRIT, "Hostname too long");
 			exit(1);
 		}
 	}

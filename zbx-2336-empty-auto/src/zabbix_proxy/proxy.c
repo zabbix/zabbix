@@ -279,6 +279,8 @@ void	init_config(void)
 			if( NULL != (value = GET_STR_RESULT(&result)) )
 			{
 				CONFIG_HOSTNAME = strdup(*value);
+				if (strlen(CONFIG_HOSTNAME) > HOST_HOST_LEN)
+					CONFIG_HOSTNAME[HOST_HOST_LEN] = '\0';
 			}
 		}
 	        free_result(&result);
@@ -286,6 +288,14 @@ void	init_config(void)
 		if(CONFIG_HOSTNAME == NULL)
 		{
 			zabbix_log( LOG_LEVEL_CRIT, "Hostname is not defined");
+			exit(1);
+		}
+	}
+	else
+	{
+		if(strlen(CONFIG_HOSTNAME) > HOST_HOST_LEN)
+		{
+			zabbix_log( LOG_LEVEL_CRIT, "Hostname too long");
 			exit(1);
 		}
 	}
