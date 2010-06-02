@@ -64,7 +64,7 @@ class CUser extends CZBXAPI{
 
 		$sql_parts = array(
 			'select' => array('users' => 'u.userid'),
-			'from' => array('users u'),
+			'from' => array('users' => 'users u'),
 			'where' => array(),
 			'order' => array(),
 			'limit' => null);
@@ -108,7 +108,7 @@ class CUser extends CZBXAPI{
 
 		}
 		else if(is_null($options['editable']) && ($USER_DETAILS['type'] == USER_TYPE_ZABBIX_ADMIN)){
-			$sql_parts['from']['ug'] = 'users_groups ug';
+			$sql_parts['from']['users_groups'] = 'users_groups ug';
 			$sql_parts['where']['uug'] = 'u.userid=ug.userid';
 			$sql_parts['where'][] = 'ug.usrgrpid IN ('.
 				' SELECT uug.usrgrpid'.
@@ -121,7 +121,7 @@ class CUser extends CZBXAPI{
 		}
 
 // nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid(false);
+		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
 // usrgrpids
 		if(!is_null($options['usrgrpids'])){
@@ -129,7 +129,7 @@ class CUser extends CZBXAPI{
 			if($options['output'] != API_OUTPUT_SHORTEN){
 				$sql_parts['select']['usrgrpid'] = 'ug.usrgrpid';
 			}
-			$sql_parts['from']['ug'] = 'users_groups ug';
+			$sql_parts['from']['users_groups'] = 'users_groups ug';
 			$sql_parts['where'][] = DBcondition('ug.usrgrpid', $options['usrgrpids']);
 			$sql_parts['where']['uug'] = 'u.userid=ug.userid';
 
@@ -205,7 +205,7 @@ class CUser extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT DISTINCT '.$sql_select.'
+		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.'
 				FROM '.$sql_from.'
 				WHERE '.DBin_node('u.userid', $nodeids).
 				$sql_where.
@@ -379,10 +379,10 @@ class CUser extends CZBXAPI{
 
 		if($login){
 			$sql = 'SELECT u.userid,u.alias,u.name,u.surname,u.url,u.refresh,u.passwd '.
-						' FROM users u, users_groups ug, usrgrp g '.
-						' WHERE u.alias='.zbx_dbstr($name).
-							((ZBX_AUTH_INTERNAL==$auth_type)?' AND u.passwd='.zbx_dbstr($password):'').
-							' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID);
+					' FROM users u, users_groups ug, usrgrp g '.
+					' WHERE u.alias='.zbx_dbstr($name).
+						((ZBX_AUTH_INTERNAL==$auth_type)?' AND u.passwd='.zbx_dbstr($password):'').
+						' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID);
 
 			$login = $user = DBfetch(DBselect($sql));
 		}
@@ -574,6 +574,61 @@ class CUser extends CZBXAPI{
 
 		return false;
 		}
+
+	return true;
+	}
+
+/**
+ * Check if session ID is authenticated
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param string $sessionid Session ID
+ * @return boolean
+ */
+	public static function simpleAuth($sessionid){
+		global	$PHP_AUTH_USER,$PHP_AUTH_PW;
+		global	$USER_DETAILS;
+		global	$ZBX_LOCALNODEID;
+		global	$ZBX_NODES;
+
+		$USER_DETAILS = NULL;
+		$login = FALSE;
+
+		if(is_null($sessionid)) return false;
+
+		$sql = 'SELECT u.*,s.* '.
+			' FROM sessions s,users u'.
+			' WHERE '.DBin_node('u.userid', $ZBX_LOCALNODEID).
+				' AND s.sessionid='.zbx_dbstr($sessionid).
+				' AND s.status='.ZBX_SESSION_ACTIVE.
+				' AND s.userid = u.userid';
+
+		$login = $USER_DETAILS = DBfetch(DBselect($sql));
+
+		if($login){
+			$login = (check_perm2login($USER_DETAILS['userid']) && check_perm2system($USER_DETAILS['userid']));
+		}
+
+		if(!$login) return false;
+
+		if(isset($ZBX_NODES[$ZBX_LOCALNODEID])){
+			$USER_DETAILS['node'] = $ZBX_NODES[$ZBX_LOCALNODEID];
+		}
+		else{
+			$USER_DETAILS['node'] = array();
+			$USER_DETAILS['node']['name'] = '- unknown -';
+			$USER_DETAILS['node']['nodeid'] = $ZBX_LOCALNODEID;
+		}
+
+		$USER_DETAILS['debug_mode'] = 0;
+
+		$userip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))?$_SERVER['HTTP_X_FORWARDED_FOR']:$_SERVER['REMOTE_ADDR'];
+		$USER_DETAILS['userip'] = $userip;
 
 	return true;
 	}

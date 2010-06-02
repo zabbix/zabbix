@@ -781,7 +781,8 @@
 			$host_list[$graphid] = array();
 			$db_hosts = get_hosts_by_graphid($graphid);
 			while($db_host = DBfetch($db_hosts)){
-				$host_list[$graphid] = '"'.$db_host['host'].'"';
+				if(!isset($host_list[$graphid][$db_host['host']]))
+					$host_list[$graphid][$db_host['host']] = true;
 			}
 		}
 
@@ -805,7 +806,7 @@
 		if($result){
 			foreach($graphs as $graphid => $graph){
 				if(isset($host_list[$graphid]))
-					info('Graph "'.$graph['name'].'" deleted from hosts '.implode(',',$host_list));
+					info(sprintf(S_GRAPH_DELETED_FROM_HOSTS, $graph['name'], count($host_list[$graphid]) > 1 ? 's' : '').': '.'"'.implode('","', array_keys($host_list[$graphid])).'"');
 			}
 		}
 
@@ -971,7 +972,7 @@
  *
  */
 	function copy_graph_to_host($graphid, $hostid, $copy_mode = false){
-		$result = false;
+		$result = true;
 
 		$gitems = array();
 
@@ -990,7 +991,6 @@
 		}
 
 		$db_graph = get_graph_by_graphid($graphid);
-
 		if($new_gitems = get_same_graphitems_for_host($gitems, $hostid)){
 			unset($chd_graphid);
 
@@ -1085,11 +1085,11 @@
 			$time = zbxDateToTime($_REQUEST['stime']);
 
 			if(($time+$_REQUEST['period']) > time()) {
-				$_REQUEST['stime'] = date('YmdHi', time()-$_REQUEST['period']);
+				$_REQUEST['stime'] = date('YmdHis', time()-$_REQUEST['period']);
 			}
 		}
 		else{
-			$_REQUEST['stime'] = date('YmdHi', time()-$_REQUEST['period']);
+			$_REQUEST['stime'] = date('YmdHis', time()-$_REQUEST['period']);
 		}
 
 	return $_REQUEST['period'];
@@ -1387,5 +1387,22 @@
 		}
 
 	return $result;
+	}
+	
+	function DashedLine($image,$x1,$y1,$x2,$y2,$color){
+		// Style for dashed lines
+		//$style = array($color, $color, $color, $color, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT);
+		if(!is_array($color)) $style = array($color, $color, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT);
+		else $style = $color;
+
+		ImageSetStyle($image, $style);
+		ImageLine($image,$x1,$y1,$x2,$y2,IMG_COLOR_STYLED);
+	}
+
+	function DashedRectangle($image,$x1,$y1,$x2,$y2,$color){
+		DashedLine($image, $x1,$y1,$x1,$y2,$color);
+		DashedLine($image, $x1,$y2,$x2,$y2,$color);
+		DashedLine($image, $x2,$y2,$x2,$y1,$color);
+		DashedLine($image, $x2,$y1,$x1,$y1,$color);
 	}
 ?>

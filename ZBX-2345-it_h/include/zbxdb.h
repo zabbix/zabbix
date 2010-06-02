@@ -146,11 +146,11 @@ int	zbx_db_vexecute(const char *fmt, va_list args);
 int	__zbx_zbx_db_execute(const char *fmt, ...);
 
 DB_RESULT	zbx_db_vselect(const char *fmt, va_list args);
-DB_RESULT	zbx_db_select_n(char *query, int n);
+DB_RESULT	zbx_db_select_n(const char *query, int n);
 DB_ROW		zbx_db_fetch(DB_RESULT result);
-int		zbx_db_is_null(char *field);
-void		zbx_db_begin();
-void		zbx_db_commit();
-void		zbx_db_rollback();
+int		zbx_db_is_null(const char *field);
+int		zbx_db_begin();
+int		zbx_db_commit();
+int		zbx_db_rollback();
 
 #endif

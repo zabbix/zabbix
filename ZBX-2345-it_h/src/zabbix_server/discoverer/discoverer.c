@@ -178,15 +178,15 @@ static void	separate_host(DB_DRULE *drule, DB_DHOST *dhost, const char *ip)
 			"select dserviceid"
 			" from dservices"
 			" where dhostid=" ZBX_FS_UI64
-				" and ip<>'%s'",
+				" and ip" ZBX_SQL_STRCMP,
 			dhost->dhostid,
-			ip_esc);
+			ZBX_SQL_STRVAL_NE(ip_esc));
 
 	result = DBselectN(sql, 1);
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		dhostid = DBget_maxid("dhosts", "dhostid");
+		dhostid = DBget_maxid("dhosts");
 
 		DBexecute("insert into dhosts (dhostid,druleid)"
 				" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
@@ -196,10 +196,10 @@ static void	separate_host(DB_DRULE *drule, DB_DHOST *dhost, const char *ip)
 		DBexecute("update dservices"
 				" set dhostid=" ZBX_FS_UI64
 				" where dhostid=" ZBX_FS_UI64
-					" and ip='%s'",
+					" and ip" ZBX_SQL_STRCMP,
 				dhostid,
 				dhost->dhostid,
-				ip_esc);
+				ZBX_SQL_STRVAL_EQ(ip_esc));
 
 		dhost->dhostid	= dhostid;
 		dhost->status	= DOBJECT_STATUS_DOWN;
@@ -248,13 +248,13 @@ static void	register_service(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost
 			" from dservices"
 			" where dcheckid=" ZBX_FS_UI64
 				" and type=%d"
-				" and key_='%s'"
-				" and ip='%s'"
+				" and key_" ZBX_SQL_STRCMP
+				" and ip" ZBX_SQL_STRCMP
 				" and port=%d",
 			dcheck->dcheckid,
 			dcheck->type,
-			key_esc,
-			ip_esc,
+			ZBX_SQL_STRVAL_EQ(key_esc),
+			ZBX_SQL_STRVAL_EQ(ip_esc),
 			port);
 
 	if (NULL == (row = DBfetch(result)))
@@ -264,7 +264,7 @@ static void	register_service(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "New service discovered on port %d", port);
 
-			dservice->dserviceid	= DBget_maxid("dservices", "dserviceid");
+			dservice->dserviceid	= DBget_maxid("dservices");
 			dservice->status	= DOBJECT_STATUS_DOWN;
 
 			DBexecute("insert into dservices (dserviceid,dhostid,dcheckid,type,key_,ip,port,status)"
@@ -323,10 +323,10 @@ static DB_RESULT	get_dhost_by_ip(zbx_uint64_t druleid, const char *ip)
 			" from dhosts dh,dservices ds"
 			" where ds.dhostid=dh.dhostid"
 				" and dh.druleid=" ZBX_FS_UI64
-				" and ds.ip='%s'"
+				" and ds.ip" ZBX_SQL_STRCMP
 			" order by dh.dhostid",
 			druleid,
-			ip_esc);
+			ZBX_SQL_STRVAL_EQ(ip_esc));
 
 	zbx_free(ip_esc);
 
@@ -345,10 +345,10 @@ static DB_RESULT	get_dhost_by_value(zbx_uint64_t dcheckid, const char *value)
 			" from dhosts dh,dservices ds"
 			" where ds.dhostid=dh.dhostid"
 				" and ds.dcheckid=" ZBX_FS_UI64
-				" and ds.value='%s'"
+				" and ds.value" ZBX_SQL_STRCMP
 			" order by dh.dhostid",
 			dcheckid,
-			value_esc);
+			ZBX_SQL_STRVAL_EQ(value_esc));
 
 	zbx_free(value_esc);
 
@@ -376,7 +376,8 @@ static void	register_host(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost, c
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s' status:%d value:'%s'",
+			__function_name, ip, status, value);
 
 	if (drule->unique_dcheckid == dcheck->dcheckid)
 	{
@@ -404,7 +405,7 @@ static void	register_host(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost, c
 			zabbix_log(LOG_LEVEL_DEBUG, "New host discovered at %s",
 					ip);
 
-			dhost->dhostid	= DBget_maxid("dhosts", "dhostid");
+			dhost->dhostid	= DBget_maxid("dhosts");
 			dhost->status	= DOBJECT_STATUS_DOWN;
 			dhost->lastup	= 0;
 			dhost->lastdown	= 0;

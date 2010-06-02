@@ -63,7 +63,7 @@ if(isset($_REQUEST['action'])){
 $output = '<?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2008 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -85,9 +85,8 @@ $output = '<?php
 
 	$TRANSLATION=array('."\n\n\t";
 
-
 		foreach($_REQUEST['langTo'] as $key => $value){
-			$value= addslashes($value);
+			$value = preg_replace("/([^\\\])\'/uU", "$1\\\'", $value);
 			$output.= "'".zbx_strtoupper($key)."'=>\t\t\t'".$value."',\n\t";
 		}
 
@@ -171,13 +170,13 @@ else if(isset($_REQUEST['next'])){
 		$help_table->addRow(array(S_STEP.SPACE.'3:','Replace previous locale file with one you have downloaded.'));
 	}
 
-	$help->SetHint($help_table);
+	$help->setHint($help_table);
 
 	show_table_header(array($help,S_LOCALES));
 
 	$frmLcls = new CFormTable(S_CREATE.SPACE.S_LOCALE_SMALL.SPACE.S_FROM_SMALL.SPACE.$ZBX_LOCALES[$_REQUEST['srclang']],'locales.php?action=1','post',null,'form');
 	$frmLcls->setAttribute('id','locales');
-	$frmLcls->SetHelp($help);
+	$frmLcls->setHelp($help);
 
 	$fileFrom = 'include/locales/'.$_REQUEST['srclang'].'.inc.php';
 	if(preg_match('/^[a-z0-9_]+$/i', $_REQUEST['srclang']) && file_exists($fileFrom)){
@@ -225,15 +224,19 @@ else if(isset($_REQUEST['next'])){
 			$valueTo = mb_convert_encoding($valueTo,'UTF-8',mb_detect_encoding($valueTo));
 		}
 
-		$frmLcls->addRow($value, new Ctextbox('langTo['.$key.']',$valueTo,80));
-		$value='';
+//		$value = new CDiv($value);
+//		$value->setAttribute('style','text-align: right;');
+
+//		$frmLcls->addRow($value, new CTextBox('langTo['.$key.']',$valueTo,80));
+		$frmLcls->addRow(new CTextBox('langTo['.$key.']',$valueTo,80), $value);
+		$value = '';
 	}
 
 	$frmLcls->addItemToBottomRow(new CButton('prev','<< '.S_PREVIOUS));
 	$frmLcls->addItemToBottomRow(SPACE);
 
 	$frmLcls->addItemToBottomRow(new CButton('download',S_DOWNLOAD));
-	$frmLcls->Show();
+	$frmLcls->show();
 }
 else{
 	show_table_header(S_LOCALES);
@@ -263,7 +266,7 @@ else{
 	$frmLcls->addRow(S_NEW_ENTRIES, $cmbFill);
 
 	$frmLcls->addItemToBottomRow(new CButton('next',S_NEXT.' >>'));
-	$frmLcls->Show();
+	$frmLcls->show();
 }
 
 

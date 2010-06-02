@@ -361,7 +361,7 @@ char *string_replace(char *str, char *sub_str1, char *sub_str2)
 
         len = (long)strlen(sub_str1);
 
-        /* count the number of occurences of sub_str1 */
+        /* count the number of occurrences of sub_str1 */
         for ( p=str; (p = strstr(p, sub_str1)); p+=len, count++ );
 
 	if ( 0 == count )	return strdup(str);
@@ -373,7 +373,7 @@ char *string_replace(char *str, char *sub_str1, char *sub_str2)
 
         for (q=str,t=new_str,p=str; (p = strstr(p, sub_str1)); )
         {
-                /* copy until next occurence of sub_str1 */
+                /* copy until next occurrence of sub_str1 */
                 for ( ; q < p; *t++ = *q++);
                 q += len;
                 p = q;
@@ -401,10 +401,10 @@ char *string_replace(char *str, char *sub_str1, char *sub_str2)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:  10.0100 => 10.01, 10. => 10                                                                 *
+ * Comments: 10.0100 => 10.01, 10. => 10                                      *
  *                                                                            *
  ******************************************************************************/
-void del_zeroes(char *s)
+void	del_zeroes(char *s)
 {
 	int     i;
 
@@ -437,7 +437,7 @@ void del_zeroes(char *s)
  *                                                                            *
  * Parameters: c - string to delete EOL                                       *
  *                                                                            *
- * Return value:  the string wtihout EOL                                      *
+ * Return value:  the string without EOL                                      *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
@@ -453,6 +453,33 @@ void	delete_reol(char *c)
 		if( c[i] != '\n')	break;
 		c[i]=0;
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: delete_chars                                                     *
+ *                                                                            *
+ * Purpose: delete all unwanted characters                                    *
+ *                                                                            *
+ * Parameters: c - string to delete characters in                             *
+ *             charlist - characters to delete                                *
+ *                                                                            *
+ * Return value: string without unwanted characters                           *
+ *                                                                            *
+ * Author: Aleksandrs Saveljevs                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	delete_chars(char *c, const char *charlist)
+{
+	char	*p, *q;
+
+	for (p = q = c; '\0' != *p; p++)
+		if (NULL == strchr(charlist, *p))
+			*(q++) = *p;
+
+	*q = '\0';
 }
 
 /******************************************************************************
@@ -2281,6 +2308,24 @@ char	*zbx_strcasestr(const char *haystack, const char *needle)
 
 	return NULL;
 /*#endif*/
+}
+
+int	starts_with(const char *str, const char *prefix)
+{
+	const char	*p, *q;
+
+	for (p = str, q = prefix; *p == *q && *q != '\0'; p++, q++);
+
+	return (*q == '\0' ? SUCCEED : FAIL);
+}
+
+int	cmp_key_id(const char *key_1, const char *key_2)
+{
+	const char	*p, *q;
+
+	for (p = key_1, q = key_2; *p == *q && *q != '\0' && *q != '[' && *q != ','; p++, q++);
+
+	return ((*p == '\0' || *p == '[' || *p == ',') && (*q == '\0' || *q == '[' || *q == ',') ? SUCCEED : FAIL);
 }
 
 const char *zbx_permission_string(int perm)
