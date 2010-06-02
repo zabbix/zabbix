@@ -1075,22 +1075,19 @@ static void process_rule(DB_DRULE *drule)
 		{
 			ipv6 = 0;
 #endif /* HAVE_IPV6 */
-			if (4 == sscanf(curr_range, "%d.%d.%d.%d", &j[0], &j[1], &j[2], &j[3]) &&
-					j[0] >= 0 && j[0] <= 255 &&
-					j[1] >= 0 && j[1] <= 255 &&
-					j[2] >= 0 && j[2] <= 255 &&
-					j[3] >= 0 && j[3] <= 255)
+			if (4 == sscanf(curr_range, "%u.%u.%u.%u", &j[0], &j[1], &j[2], &j[3]) &&
+					j[0] <= 255 && j[1] <= 255 && j[2] <= 255 && j[3] <= 255)
 			{
 				first = (j[0] << 24) + (j[1] << 16) + (j[2] << 8) + j[3];
 
 				if (NULL != dash)
 				{
-					if (1 == sscanf(dash + 1, "%d", &j[4]) && j[4] >= 0 && j[4] <= 255)
+					if (1 == sscanf(dash + 1, "%u", &j[4]) && j[4] <= 255)
 						last = (j[0] << 24) + (j[1] << 16) + (j[2] << 8) + j[4];
 				}
 				else if (NULL != slash)
 				{
-					if (1 == sscanf(slash + 1, "%d", &j[4]) && j[4] >= 16 && j[4] <= 32)
+					if (1 == sscanf(slash + 1, "%u", &j[4]) && j[4] >= 16 && j[4] <= 32)
 					{
 						mask = (32 == j[4]) ? 0xffffffff : ~(0xffffffff >> j[4]);
 						network = first & mask;
