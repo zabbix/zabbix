@@ -143,7 +143,7 @@ class CTree{
 //					$td->setAttribute('style','width:22px; background-image:url(images/general/tree/pointc.gif);');
 
 					$div = new CTag('div','yes');
-					$div->setAttribute('style','height: 10px; width:22px; background-image:url(images/general/tree/pointc.gif);');
+					$div->setAttribute('style','height: 10px; width:22px; margin-left: -1px; background-image:url(images/general/tree/pointc.gif);');
 
 					if($this->tree[$id]['nodetype'] == 2){
 						$img= new CImg('images/general/tree/plus.gif','y','22','14');
