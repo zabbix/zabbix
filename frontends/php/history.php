@@ -456,11 +456,11 @@ include_once('include/page_header.php');
 // NAV BAR
 		$timeline = array();
 		$timeline['period'] = $period;
-		$timeline['starttime'] = date('YmdHi', get_min_itemclock_by_itemid($item['itemid']));
+		$timeline['starttime'] = date('YmdHis', get_min_itemclock_by_itemid($item['itemid']));
 		$timeline['usertime'] = null;
 
 		if(isset($_REQUEST['stime'])){
-			$timeline['usertime'] = date('YmdHi', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
+			$timeline['usertime'] = date('YmdHis', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 		}
 
 		$objData = array();
