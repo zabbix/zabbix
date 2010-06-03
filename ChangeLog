@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBX-2040] annoying "double check" popups removed from copy to & mass update actions of items and triggers (Maxim Andruhovich / AM)
  - [ZBX-2482] fixes in chart graphs avg calc (Aly)
  - [ZBX-1477] fixed moving screen elements with spans (Vedmak)
  - [ZBXNEXT-279] added links to parent elements for item and trigger form (Vedmak)
