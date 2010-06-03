@@ -10,6 +10,7 @@ update graphs_items set color='00FFFF' where color='Cyan';
 update graphs_items set color='000000' where color='Black';
 update graphs_items set color='969696' where color='Gray';
 update graphs_items set color='FFFFFF' where color='White';
-alter table graphs_items change color color varchar(6) DEFAULT '009600' NOT NULL;
+alter table graphs_items alter color type varchar(6);
+alter table graphs_items alter color set default '009600';
 CREATE INDEX graphs_items_1 on graphs_items (itemid);
 CREATE INDEX graphs_items_2 on graphs_items (graphid);
