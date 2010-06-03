@@ -63,6 +63,7 @@ class CHostGroup extends CZBXAPI{
 			'hostids'					=> null,
 			'templateids'				=> null,
 			'graphids'					=> null,
+			'triggerids'				=> null,
 			'monitored_hosts'			=> null,
 			'templated_hosts' 			=> null,
 			'real_hosts' 				=> null,
@@ -150,6 +151,29 @@ class CHostGroup extends CZBXAPI{
 			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sql_parts['where'][] = DBcondition('hg.hostid', $options['hostids']);
 			$sql_parts['where']['hgg'] = 'hg.groupid=g.groupid';
+		}
+
+// triggerids
+		if(!is_null($options['triggerids'])){
+			zbx_value2array($options['triggerids']);
+
+			if($options['output'] != API_OUTPUT_SHORTEN){
+				$sql_parts['select']['triggerid'] = 'f.triggerid';
+			}
+
+			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sql_parts['from']['functions'] = 'functions f';
+			$sql_parts['from']['items'] = 'items i';
+			$sql_parts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
+			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
+			$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
+			$sql_parts['where']['hgg'] = 'hg.groupid=g.groupid';
+/*
+			if(!$nodeCheck){
+				$nodeCheck = true;
+				$sql_parts['where'][] = DBin_node('f.triggerid', $nodeids);
+			}
+//*/
 		}
 
 // graphids
@@ -373,6 +397,15 @@ class CHostGroup extends CZBXAPI{
 
 						$result[$group['groupid']]['graphs'][] = array('graphid' => $group['graphid']);
 						unset($group['hostid']);
+					}
+
+// triggerids
+					if(isset($group['triggerid'])){
+						if(!isset($result[$group['groupid']]['triggers']))
+							$result[$group['groupid']]['triggers'] = array();
+
+						$result[$group['groupid']]['triggers'][] = array('triggerid' => $group['triggerid']);
+						unset($group['triggerid']);
 					}
 
 					$result[$group['groupid']] += $group;
