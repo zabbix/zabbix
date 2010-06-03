@@ -822,7 +822,7 @@
 	'S_NUMBER_OF_USERS'=>				'Liczba użytkowników (online)',
 	'S_NUMBER_OF_USERS_SHORT'=>			'Użytkownicy (online)',
 	'S_NUMBER_OF_HOSTS'=>				'Liczba stacji (monitorowanych/nie monitorowanych/wzorców)',
-	'S_NUMBER_OF_HOSTS_SHORT'=>			'Stacje (m/n/w/d)',
+	'S_NUMBER_OF_HOSTS_SHORT'=>			'Stacje (m/n/w)',
 	'S_REQUIRED_SERVER_PERFORMANCE_NVPS'=>		'Wymagana wydajność serwera, nowe wartości na sekundę',
 	'S_YES'=>					'Tak',
 	'S_NO'=>					'Nie',

@@ -49,8 +49,7 @@ class CServerInfo extends CTable{
 		$this->addRow(new CCol(array(S_NUMBER_OF_HOSTS_SHORT.': '.$status['hosts_count'].'(',
 			new CSpan($status['hosts_count_monitored'],'off'),'/',
 			new CSpan($status['hosts_count_not_monitored'],'on'),'/',
-			new CSpan($status['hosts_count_template'],'unknown'),'/',
-			$status['hosts_count_deleted'].')')));
+			new CSpan($status['hosts_count_template'],'unknown'),')')));
 		$this->addRow(new CCol(array(S_NUMBER_OF_ITEMS_SHORT.': '.$status['items_count'].'(',
 			new CSpan($status['items_count_monitored'],'off'),'/',
 			new CSpan($status['items_count_disabled'],'on'),'/',

@@ -600,6 +600,8 @@
 	'S_HOST_COUNT' => 'Host count',
 	'S_ITEM_COUNT' => 'Item count',
 	'S_REQUIRED_PERFORMANCE' => 'Required performance (vps)',
+	'S_PROXY_MODE' => 'Proxy mode',
+	'S_PASSIVE' => 'Passive',
 
 //  Authentication
 	'S_AUTHENTICATION'=>			'Authentication',
@@ -1384,7 +1386,7 @@
 	'S_NUMBER_OF_USERS'=>			'Number of users (online)',
 	'S_NUMBER_OF_USERS_SHORT'=>		'Users (online)',
 	'S_NUMBER_OF_HOSTS'=>			'Number of hosts (monitored/not monitored/templates)',
-	'S_NUMBER_OF_HOSTS_SHORT'=>		'Hosts (m/n/t/d)',
+	'S_NUMBER_OF_HOSTS_SHORT'=>		'Hosts (m/n/t)',
 	'S_REQUIRED_SERVER_PERFORMANCE_NVPS'=>	'Required server performance, new values per second',
 	'S_YES'=>				'Yes',
 	'S_NO'=>				'No',

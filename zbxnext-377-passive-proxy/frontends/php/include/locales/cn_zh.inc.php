@@ -1127,7 +1127,7 @@
 	'S_NUMBER_OF_USERS'=>			'ZABBIX 系统用户数量',
 	'S_NUMBER_OF_USERS_SHORT'=>			'Users (online)',
 	'S_NUMBER_OF_HOSTS'=>			'主机数量 (监控/未监控/模板)',
-	'S_NUMBER_OF_HOSTS_SHORT'=>			'主机 (m/n/t/d)',
+	'S_NUMBER_OF_HOSTS_SHORT'=>			'主机 (m/n/t)',
 	'S_REQUIRED_SERVER_PERFORMANCE_NVPS'=>			'Required server performance, new values per second',
 	'S_YES'=>			'Yes',
 	'S_NO'=>			'No',

@@ -1125,7 +1125,7 @@
 	'S_NUMBER_OF_USERS'=>			'Felhasználók száma (bejelentkezve)',
 	'S_NUMBER_OF_USERS_SHORT'=>			'Felhasználók (bejelentkezve)',
 	'S_NUMBER_OF_HOSTS'=>			'Hosztok száma (monitorozott/nem monitorozott/minták)',
-	'S_NUMBER_OF_HOSTS_SHORT'=>			'Hosztok (m/n/mi/l)',
+	'S_NUMBER_OF_HOSTS_SHORT'=>			'Hosztok (m/n/mi)',
 	'S_REQUIRED_SERVER_PERFORMANCE_NVPS'=>			'Szükséges szerver teljesítmény (másodpercenkénti mérések száma))',
 	'S_YES'=>			'Igen',
 	'S_NO'=>			'Nem',
