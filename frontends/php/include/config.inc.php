@@ -929,7 +929,7 @@ function __autoload($class_name){
 
 		if(IMAGE_FORMAT_JPEG == $format)	Header( "Content-type:  image/jpeg");
 		if(IMAGE_FORMAT_TEXT == $format)	Header( "Content-type:  text/html");
-		else								Header( "Content-type:  image/png");
+		else					Header( "Content-type:  image/png");
 
 		Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT");
 	}
