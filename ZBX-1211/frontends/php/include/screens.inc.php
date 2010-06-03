@@ -523,7 +523,7 @@ require_once('include/js.inc.php');
 			$form->addVar('resourceid',$id);
 
 			$textfield = new CTextbox('caption',$caption,75,'yes');
-			$selectbtn = new CButton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=graphs&srcfld1=graphid&srcfld2=name',800,450);");
+			$selectbtn = new CButton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&real_hosts=1&dstfld1=resourceid&dstfld2=caption&srctbl=graphs&srcfld1=graphid&srcfld2=name',800,450);");
 			$selectbtn->setAttribute('onmouseover',"javascript: this.style.cursor = 'pointer';");
 
 			$form->addRow(S_GRAPH_NAME,array($textfield,SPACE,$selectbtn));
@@ -556,7 +556,7 @@ require_once('include/js.inc.php');
 			$form->addVar('resourceid',$id);
 
 			$textfield = new Ctextbox('caption',$caption,75,'yes');
-			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=simple_graph&srcfld1=itemid&srcfld2=description',800,450);");
+			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&real_hosts=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=simple_graph&srcfld1=itemid&srcfld2=description',800,450);");
 			$selectbtn->setAttribute('onmouseover',"javascript: this.style.cursor = 'pointer';");
 
 			$form->addRow(S_PARAMETER,array($textfield,SPACE,$selectbtn));
@@ -1078,10 +1078,10 @@ require_once('include/js.inc.php');
 
 						$timeline = array();
 						$timeline['period'] = $effectiveperiod;
-						$timeline['starttime'] = date('YmdHi', get_min_itemclock_by_graphid($resourceid));
+						$timeline['starttime'] = date('YmdHis', get_min_itemclock_by_graphid($resourceid));
 
 						if(isset($_REQUEST['stime'])){
-							$timeline['usertime'] = date('YmdHi', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
+							$timeline['usertime'] = date('YmdHis', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 						}
 
 						// $src = $url.'&width='.$width.'&height='.$height.'&legend='.$legend.'&graph3d='.$graph3d;
@@ -1101,10 +1101,10 @@ require_once('include/js.inc.php');
 						$timeline = array();
 						if(isset($graphid) && !is_null($graphid) && ($editmode != 1)){
 							$timeline['period'] = $effectiveperiod;
-							$timeline['starttime'] = date('YmdHi', time() - ZBX_MAX_PERIOD); //get_min_itemclock_by_graphid($graphid);
+							$timeline['starttime'] = date('YmdHis', time() - ZBX_MAX_PERIOD); //get_min_itemclock_by_graphid($graphid);
 
 							if(isset($_REQUEST['stime'])){
-								$timeline['usertime'] = date('YmdHi', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
+								$timeline['usertime'] = date('YmdHis', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 							}
 
 							$objData['loadSBox'] = 1;
@@ -1114,7 +1114,7 @@ require_once('include/js.inc.php');
 						$objData['src'] = $src;
 					}
 
-					if($default) $item = new CLink(null, $action);
+					if($default && !$editmode) $item = new CLink(null, $action);
 					else $item = new CDiv();
 
 					$item->setAttribute('id', $containerid);
@@ -1162,13 +1162,13 @@ require_once('include/js.inc.php');
 					if(($editmode == 0) && !empty($resourceid)) $action = 'history.php?action=showgraph&itemid='.$resourceid.url_param('period').url_param('stime');
 
 					$timeline = array();
-					$timeline['starttime'] = date('YmdHi', time() - ZBX_MAX_PERIOD);
+					$timeline['starttime'] = date('YmdHis', time() - ZBX_MAX_PERIOD);
 
 					if(!zbx_empty($resourceid) && ($editmode != 1)){
 						$timeline['period'] = $effectiveperiod;
 
 						if(isset($_REQUEST['stime'])){
-							$timeline['usertime'] = date('YmdHi', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
+							$timeline['usertime'] = date('YmdHis', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 						}
 
 						$objData['loadSBox'] = 1;
@@ -1179,7 +1179,9 @@ require_once('include/js.inc.php');
 
 					$objData['src'] = $src;
 
-					$item = new CLink(null, $action);
+					if(!$editmode) $item = new CLink(null, $action);
+					else $item = new CDiv();
+
 					$item->setAttribute('id', $containerid);
 
 					$item = array($item);

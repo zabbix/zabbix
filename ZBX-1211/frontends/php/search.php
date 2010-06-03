@@ -34,7 +34,6 @@ include_once('include/page_header.php');
 	$fields=array(
 		'type'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		NULL),
 		'search'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,			NULL),
-
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
@@ -106,11 +105,15 @@ include_once('include/page_header.php');
 // FIND Hosts
 	$params = array(
 		'nodeids'=> get_current_nodeid(true),
-		'extendoutput' => true,
 		'pattern' => $search,
-		'extend_pattern' => true,
+		'extendPattern' => true,
 		'limit' => $rows_per_page,
-		'select_groups' => 1
+		'select_groups' => API_OUTPUT_EXTEND,
+		'select_items' => API_OUTPUT_COUNT,
+		'select_triggers' => API_OUTPUT_COUNT,
+		'select_graphs' => API_OUTPUT_COUNT,
+		'select_applications' => API_OUTPUT_COUNT,
+		'output' => API_OUTPUT_EXTEND,
 	);
 	$db_hosts = CHost::get($params);
 
@@ -130,7 +133,7 @@ include_once('include/page_header.php');
 	$params = array(
 		'nodeids'=> get_current_nodeid(true),
 		'pattern' => $search,
-		'extend_pattern' => true,
+		'extendPattern' => true,
 		'count' => 1,
 	);
 	$hosts_count = CHost::get($params);
@@ -138,11 +141,11 @@ include_once('include/page_header.php');
 	$params = array(
 		'nodeids'=> get_current_nodeid(true),
 		'pattern' => $search,
-		'extend_pattern' => true,
+		'extendPattern' => true,
 		'countOutput' => 1,
 	);
-	$hosts_count = CHost::get($params);
-	$overalCount = $hosts_count['rowscount'];
+
+	$overalCount = CHost::get($params);
 	$viewCount = count($hosts);
 
 	$header = array(
@@ -153,7 +156,10 @@ include_once('include/page_header.php');
 		new CCol(S_LATEST_DATA),
 		new CCol(S_TRIGGERS),
 		new CCol(S_EVENTS),
-		$admin?new CCol(S_EDIT, 'center'):null,
+		new CCol(S_APPLICATIONS),
+		new CCol(S_ITEMS),
+		new CCol(S_TRIGGERS),
+		new CCol(S_GRAPHS),
 	);
 
 	$table  = new CTableInfo();
@@ -162,43 +168,51 @@ include_once('include/page_header.php');
 	foreach($hosts as $hnum => $host){
 		$hostid = $host['hostid'];
 
+		switch($host['status']){
+			case HOST_STATUS_NOT_MONITORED:
+				$style = 'on';
+			break;
+			default:
+				$style = null;
+			break;
+		}
+		
+		
 		$group = reset($host['groups']);
 		$link = 'groupid='.$group['groupid'].'&hostid='.$hostid.'&switch_node='.id2nodeid($hostid);
-
-		if($admin){
-			$pageBox = new CComboBox('hostpages_'.$hostid);
-				$pageBox->addItem('hosts.php?form=update&'.$link, S_HOST);
-				$pageBox->addItem('items.php?'.$link, S_ITEMS);
-				$pageBox->addItem('triggers.php?'.$link, S_TRIGGERS);
-				$pageBox->addItem('graphs.php?'.$link, S_GRAPHS);
-
-			$pageGo = new CButton('pagego', S_GO, "javascript: ".
-						" redirect(\$('hostpages_$hostid').options[\$('hostpages_$hostid').selectedIndex].value);");
-
-			if(!isset($rw_hosts[$hostid])){
-				$pageBox->setAttribute('disabled','disabled');
-				$pageGo->setAttribute('disabled','disabled');
-			}
-
-			$pageSelect = array($pageBox,SPACE,$pageGo);
+		
+		$caption = make_decoration($host['host'], $search);
+		
+		if(isset($rw_hosts[$hostid])){
+			$host_link = new CLink($caption,'hosts.php?form=update&'.$link, $style);
+			$applications_link = array(new CLink(S_APPLICATIONS,'applications.php?'.$link), ' ('.$host['applications'].')');
+			$items_link = array(new CLink(S_ITEMS,'items.php?'.$link), ' ('.$host['items'].')');
+			$triggers_link = array(new CLink(S_TRIGGERS,'triggers.php?'.$link), ' ('.$host['triggers'].')');
+			$graphs_link = array(new CLink(S_GRAPHS,'graphs.php?'.$link), ' ('.$host['graphs'].')');
 		}
 		else{
-			$pageSelect = null;
+			$host_link = new CSpan($caption, $style);
+			$applications_link = array(new CSpan(S_APPLICATIONS,'unknown'), ' ('.$host['applications'].')');
+			$items_link = array(new CSpan(S_ITEMS,'unknown'), ' ('.$host['items'].')');
+			$triggers_link = array(new CSpan(S_TRIGGERS,'unknown'), ' ('.$host['triggers'].')');
+			$graphs_link = array(new CSpan(S_GRAPHS,'unknown'), ' ('.$host['graphs'].')');
 		}
 
-		$caption = make_decoration($host['host'], $search);
 		$hostip = make_decoration($host['ip'], $search);
 		$hostdns = make_decoration($host['dns'], $search);
 
 		$table->addRow(array(
 			get_node_name_by_elid($hostid, true),
-			$caption,
+			$host_link,
 			$hostip,
 			$hostdns,
-			new CLink(S_GO,'latest.php?'.$link),
-			new CLink(S_GO,'tr_status.php?'.$link),
-			new CLink(S_GO,'events.php?'.$link),
-			$pageSelect
+			new CLink(S_LATEST_DATA,'latest.php?'.$link),
+			new CLink(S_TRIGGERS,'tr_status.php?'.$link),
+			new CLink(S_EVENTS,'events.php?'.$link),
+			$applications_link,
+			$items_link,
+			$triggers_link,
+			$graphs_link,
 		));
 	}
 	$table->setFooter(new CCol(S_DISPLAYING.SPACE.$viewCount.SPACE.S_OF_SMALL.SPACE.$overalCount.SPACE.S_FOUND_SMALL));
@@ -240,8 +254,8 @@ include_once('include/page_header.php');
 		'pattern' => $search,
 		'count' => 1,
 	);
-	$groups_count = CHostGroup::get($params);
 
+	$groups_count = CHostGroup::get($params);
 	$overalCount = $groups_count['rowscount'];
 	$viewCount = count($hostGroups);
 
@@ -251,8 +265,8 @@ include_once('include/page_header.php');
 		new CCol(S_LATEST_DATA),
 		new CCol(S_TRIGGERS),
 		new CCol(S_EVENTS),
-		$admin?new CCol(S_EDIT):null,
-		);
+		$admin?new CCol(S_EDIT_HOSTS):null,
+	);
 
 	$table  = new CTableInfo();
 	$table->setHeader($header);
@@ -264,10 +278,14 @@ include_once('include/page_header.php');
 		$link = 'groupid='.$hostgroupid.'&hostid=0&switch_node='.id2nodeid($hostgroupid);
 
 		if($admin){
-			if(isset($rw_hostGroups[$hostgroupid]))
-				$admin_link = new CLink(S_GO,'hosts.php?config=1&groupid='.$hostgroupid.'&hostid=0'.'&switch_node='.id2nodeid($hostgroupid));
-			else
-				$admin_link = new CSpan(S_GO,'unknown');
+			if(isset($rw_hostGroups[$hostgroupid])){
+				$admin_link = new CLink(S_EDIT_HOSTS,'hosts.php?config=1&groupid='.$hostgroupid.'&hostid=0'.'&switch_node='.id2nodeid($hostgroupid));
+				$hgroup_link = new CLink($caption,'hostgroups.php?form=update&'.$link);
+			}
+			else{
+				$admin_link = new CSpan(S_EDIT_HOSTS,'unknown');
+				$hgroup_link = new CSpan($caption);
+			}
 		}
 		else{
 			$admin_link = null;
@@ -275,10 +293,10 @@ include_once('include/page_header.php');
 
 		$table->addRow(array(
 			get_node_name_by_elid($hostgroupid, true),
-			$caption,
-			new CLink(S_GO,'latest.php?'.$link),
-			new CLink(S_GO,'tr_status.php?'.$link),
-			new CLink(S_GO,'events.php?'.$link),
+			$hgroup_link,
+			new CLink(S_LATEST_DATA,'latest.php?'.$link),
+			new CLink(S_TRIGGERS,'tr_status.php?'.$link),
+			new CLink(S_EVENTS,'events.php?'.$link),
 			$admin_link,
 		));
 	}
@@ -294,13 +312,16 @@ include_once('include/page_header.php');
 	if($admin){
 		$params = array(
 			'nodeids'=> get_current_nodeid(true),
-			'extendoutput' => 1,
-			'select_groups' => 1,
 			'pattern' => $search,
-			'limit' => $rows_per_page,
-			'sortfield' => 'host'
+			'output' => API_OUTPUT_EXTEND,
+			'select_groups' => API_OUTPUT_REFER,
+			'sortfield' => 'host',
+			'select_items' => API_OUTPUT_COUNT,
+			'select_triggers' => API_OUTPUT_COUNT,
+			'select_graphs' => API_OUTPUT_COUNT,
+			'select_applications' => API_OUTPUT_COUNT,
+			'limit' => $rows_per_page
 		);
-
 		$db_templates = CTemplate::get($params);
 		order_result($db_templates, 'host');
 
@@ -316,23 +337,23 @@ include_once('include/page_header.php');
 		$rw_templates = zbx_toHash($rw_templates,'templateid');
 
 		$params = array(
-					'nodeids'=> get_current_nodeid(true),
-					'pattern' => $search,
-					'countOutput' => 1,
-					'editable' => 1
-					);
-		$hosts_count = CTemplate::get($params);
+			'nodeids'=> get_current_nodeid(true),
+			'pattern' => $search,
+			'countOutput' => 1,
+			'editable' => 1
+		);
 
-		$overalCount = $hosts_count['rowscount'];
+		$overalCount = CTemplate::get($params);
 		$viewCount = count($templates);
 
 		$header = array(
 			ZBX_DISTRIBUTED?new CCol(S_NODE):null,
 			new CCol(S_TEMPLATES),
+			new CCol(S_APPLICATIONS),
 			new CCol(S_ITEMS),
 			new CCol(S_TRIGGERS),
 			new CCol(S_GRAPHS),
-			);
+		);
 
 		$table  = new CTableInfo();
 		$table->setHeader($header);
@@ -346,21 +367,24 @@ include_once('include/page_header.php');
 			$caption = make_decoration($template['host'], $search);
 
 			if(isset($rw_templates[$templateid])){
-				$template_link = new CLink($caption,'hosts.php?hostid='.$templateid);
-				$items_link = new CLink(S_GO,'items.php?'.$link);
-				$triggers_link = new CLink(S_GO,'triggers.php?'.$link);
-				$graphs_link = new CLink(S_GO,'graphs.php?'.$link);
+				$template_link = new CLink($caption,'templates.php?form=update&'.'&templateid='.$templateid.'&switch_node='.id2nodeid($templateid));
+				$applications_link = array(new CLink(S_APPLICATIONS,'applications.php?'.$link), ' ('.$template['applications'].')');
+				$items_link = array(new CLink(S_ITEMS,'items.php?'.$link), ' ('.$template['items'].')');
+				$triggers_link = array(new CLink(S_TRIGGERS,'triggers.php?'.$link), ' ('.$template['triggers'].')');
+				$graphs_link = array(new CLink(S_GRAPHS,'graphs.php?'.$link), ' ('.$template['graphs'].')');
 			}
 			else{
 				$template_link = new CSpan($caption);
-				$items_link = new CSpan(S_GO,'unknown');
-				$triggers_link = new CSpan(S_GO,'unknown');
-				$graphs_link = new CSpan(S_GO,'unknown');
+				$applications_link = array(new CSpan(S_APPLICATIONS,'unknown'), ' ('.$template['applications'].')');
+				$items_link = array(new CSpan(S_ITEMS,'unknown'), ' ('.$template['items'].')');
+				$triggers_link = array(new CSpan(S_TRIGGERS,'unknown'), ' ('.$template['triggers'].')');
+				$graphs_link = array(new CSpan(S_GRAPHS,'unknown'), ' ('.$template['graphs'].')');
 			}
 
 			$table->addRow(array(
 				get_node_name_by_elid($templateid, true),
 				$template_link,
+				$applications_link,
 				$items_link,
 				$triggers_link,
 				$graphs_link
@@ -391,9 +415,7 @@ include_once('include/page_header.php');
 	$search_wdgt->addItem($outer_table);
 
 	$search_wdgt->show();
-?>
-<?php
+
 
 include_once('include/page_footer.php');
-
 ?>

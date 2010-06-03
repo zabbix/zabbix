@@ -71,21 +71,22 @@ void    DBconnect(int flag)
 		err = zbx_db_connect(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBNAME, CONFIG_DBSOCKET, CONFIG_DBPORT);
 
 		switch(err) {
-			case ZBX_DB_OK:
-				break;
-			case ZBX_DB_DOWN:
-				if(flag == ZBX_DB_CONNECT_EXIT)
-				{
-					exit(FAIL);
-				}
-				else
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "Database is down. Reconnecting in 10 seconds");
-					zbx_sleep(10);
-				}
-				break;
-			default:
+		case ZBX_DB_OK:
+			break;
+		case ZBX_DB_DOWN:
+			if(flag == ZBX_DB_CONNECT_EXIT)
+			{
 				exit(FAIL);
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Database is down."
+						" Reconnecting in 10 seconds");
+				zbx_sleep(10);
+			}
+			break;
+		default:
+			exit(FAIL);
 		}
 	} while(ZBX_DB_OK != err);
 }
@@ -150,9 +151,24 @@ int	DBping(void)
  * Comments: Do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-void DBbegin(void)
+void	DBbegin(void)
 {
-	zbx_db_begin();
+	int	rc;
+
+	rc = zbx_db_begin();
+
+	while (rc == ZBX_DB_DOWN)
+	{
+		DBclose();
+		DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+		if (ZBX_DB_DOWN == (rc = zbx_db_begin()))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down."
+					" Retrying in 10 seconds");
+			sleep(10);
+		}
+	}
 }
 
 /******************************************************************************
@@ -170,9 +186,24 @@ void DBbegin(void)
  * Comments: Do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-void DBcommit(void)
+void	DBcommit(void)
 {
-	zbx_db_commit();
+	int	rc;
+
+	rc = zbx_db_commit();
+
+	while (rc == ZBX_DB_DOWN)
+	{
+		DBclose();
+		DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+		if (ZBX_DB_DOWN == (rc = zbx_db_commit()))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down."
+					" Retrying in 10 seconds");
+			sleep(10);
+		}
+	}
 }
 
 /******************************************************************************
@@ -190,37 +221,58 @@ void DBcommit(void)
  * Comments: Do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-void DBrollback(void)
+void	DBrollback(void)
 {
-	zbx_db_rollback();
+	int	rc;
+
+	rc = zbx_db_rollback();
+
+	while (rc == ZBX_DB_DOWN)
+	{
+		DBclose();
+		DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+		if (ZBX_DB_DOWN == (rc = zbx_db_rollback()))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down."
+					" Retrying in 10 seconds");
+			sleep(10);
+		}
+	}
 }
 
 /*
  * Execute SQL statement. For non-select statements only.
  * If fails, program terminates.
  */
-int __zbx_DBexecute(const char *fmt, ...)
+int	__zbx_DBexecute(const char *fmt, ...)
 {
-	va_list args;
-	int ret = ZBX_DB_DOWN;
+	va_list	args;
+	int	rc = ZBX_DB_DOWN;
 
-	while(ret == ZBX_DB_DOWN)
+	va_start(args, fmt);
+
+	rc = zbx_db_vexecute(fmt, args);
+
+	while (rc == ZBX_DB_DOWN)
 	{
-		va_start(args, fmt);
-		ret = zbx_db_vexecute(fmt, args);
-		va_end(args);
-		if( ret == ZBX_DB_DOWN)
+		DBclose();
+		DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+		rc = zbx_db_vexecute(fmt, args);
+
+		if (rc == ZBX_DB_DOWN)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds");
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down."
+					" Retrying in 10 seconds");
 			sleep(10);
-			DBclose();
-			DBconnect(ZBX_DB_CONNECT_NORMAL);
 		}
 	}
 
-	return ret;
-}
+	va_end(args);
 
+	return rc;
+}
 
 int	DBis_null(char *field)
 {
@@ -237,93 +289,108 @@ DB_ROW	DBfetch(DB_RESULT result)
  * Execute SQL statement. For select statements only.
  * If fails, program terminates.
  */
-DB_RESULT __zbx_DBselect(const char *fmt, ...)
+DB_RESULT	__zbx_DBselect(const char *fmt, ...)
 {
-	va_list args;
-	DB_RESULT result = (DB_RESULT)ZBX_DB_DOWN;
+	va_list		args;
+	DB_RESULT	rc;
 
-	while(result == (DB_RESULT)ZBX_DB_DOWN)
+	va_start(args, fmt);
+
+	rc = zbx_db_vselect(fmt, args);
+
+	while (rc == (DB_RESULT)ZBX_DB_DOWN)
 	{
-		va_start(args, fmt);
-		result = zbx_db_vselect(fmt, args);
-		va_end(args);
-		if( result == (DB_RESULT)ZBX_DB_DOWN)
+		DBclose();
+		DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+		rc = zbx_db_vselect(fmt, args);
+
+		if (rc == (DB_RESULT)ZBX_DB_DOWN)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds");
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down."
+					" Retrying in 10 seconds");
 			sleep(10);
-			DBclose();
-			DBconnect(ZBX_DB_CONNECT_NORMAL);
 		}
 	}
 
-	return result;
+	va_end(args);
+
+	return rc;
 }
 
 /*
  * Execute SQL statement. For select statements only.
  * If fails, program terminates.
  */
-DB_RESULT DBselectN(char *query, int n)
+DB_RESULT	DBselectN(const char *query, int n)
 {
-	DB_RESULT result = (DB_RESULT)ZBX_DB_DOWN;
+	DB_RESULT rc;
 
-	while(result == (DB_RESULT)ZBX_DB_DOWN)
+	rc = zbx_db_select_n(query, n);
+
+	while (rc == (DB_RESULT)ZBX_DB_DOWN)
 	{
-		result = zbx_db_select_n(query, n);
+		DBclose();
+		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-		if( result == (DB_RESULT)ZBX_DB_DOWN)
+		rc = zbx_db_select_n(query, n);
+
+		if (rc == (DB_RESULT)ZBX_DB_DOWN)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds");
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down."
+					" Retrying in 10 seconds");
 			sleep(10);
-			DBclose();
-			DBconnect(ZBX_DB_CONNECT_NORMAL);
 		}
 	}
 
-	return result;
+	return rc;
 }
 
 /* SUCCEED if latest service alarm has this status */
 /* Rewrite required to simplify logic ?*/
 int	latest_service_alarm(zbx_uint64_t serviceid, int status)
 {
+	const char	*__function_name = "latest_service_alarm";
 	DB_RESULT	result;
 	DB_ROW		row;
-	int ret = FAIL;
-	char sql[MAX_STRING_LEN];
+	int		ret = FAIL;
+	char		sql[MAX_STRING_LEN];
 
-	zbx_snprintf(sql,sizeof(sql),"select servicealarmid, value from service_alarms where serviceid=" ZBX_FS_UI64 " order by servicealarmid desc", serviceid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): serviceid [" ZBX_FS_UI64 "] status [%d]",
+			__function_name, serviceid, status);
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In latest_service_alarm()");
+	zbx_snprintf(sql, sizeof(sql), "select servicealarmid,value"
+					" from service_alarms"
+					" where serviceid=" ZBX_FS_UI64
+					" order by servicealarmid desc", serviceid);
 
-	result = DBselectN(sql,1);
+	result = DBselectN(sql, 1);
 	row = DBfetch(result);
 
-	if(row && (DBis_null(row[1])==FAIL) && (atoi(row[1]) == status)){
+	if (NULL != row && FAIL == DBis_null(row[1]) && status == atoi(row[1]))
+	{
 		ret = SUCCEED;
 	}
 
 	DBfree_result(result);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
 	return ret;
 }
 
-int	DBadd_service_alarm(zbx_uint64_t serviceid,int status,int clock)
+int	DBadd_service_alarm(zbx_uint64_t serviceid, int status, int clock)
 {
-	zabbix_log(LOG_LEVEL_DEBUG,"In add_service_alarm()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In add_service_alarm()");
 
-	if(latest_service_alarm(serviceid,status) == SUCCEED)
+	if (SUCCEED != latest_service_alarm(serviceid, status))
 	{
-		return SUCCEED;
+		DBexecute("insert into service_alarms (servicealarmid,serviceid,clock,value)"
+			" values(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d)",
+			DBget_maxid("service_alarms"), serviceid, clock, status);
 	}
 
-	DBexecute("insert into service_alarms(servicealarmid,serviceid,clock,value) values(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d)",
-		DBget_maxid("service_alarms"),
-		serviceid,
-		clock,
-		status);
-
-	zabbix_log(LOG_LEVEL_DEBUG,"End of add_service_alarm()");
+	zabbix_log(LOG_LEVEL_DEBUG, "End of add_service_alarm()");
 
 	return SUCCEED;
 }
@@ -338,7 +405,6 @@ int	DBadd_service_alarm(zbx_uint64_t serviceid,int status,int clock)
  *                                                                            *
  * Return value: SUCCEED - it does depend, FAIL - otherwise                   *
  *                                                                            *
- *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: Recursive function!                                              *
@@ -346,7 +412,7 @@ int	DBadd_service_alarm(zbx_uint64_t serviceid,int status,int clock)
  ******************************************************************************/
 static int	trigger_dependent_rec(zbx_uint64_t triggerid, int *level)
 {
-	int	ret = FAIL;
+	int		ret = FAIL;
 	DB_RESULT	result;
 	DB_ROW		row;
 
@@ -831,19 +897,19 @@ int	DBget_items_unsupported_count(void)
 	return res;
 }
 
-int	DBget_history_str_count(void)
+int	DBget_history_count(const char *table_name)
 {
-	int	res;
+	int		res;
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_history_str_count()");
+	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_history_count(): %s", table_name);
 
-	result = DBselect("select count(*) from history_str");
+	result = DBselect("select count(*) from %s", table_name);
 
-	row=DBfetch(result);
+	row = DBfetch(result);
 
-	if(!row || DBis_null(row[0])==SUCCEED)
+	if (!row || DBis_null(row[0]) == SUCCEED)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query");
 		zabbix_syslog("Cannot execute query");
@@ -851,26 +917,26 @@ int	DBget_history_str_count(void)
 		return 0;
 	}
 
-	res  = atoi(row[0]);
+	res = atoi(row[0]);
 
 	DBfree_result(result);
 
 	return res;
 }
 
-int	DBget_history_count(void)
+int	DBget_trends_count(const char *table_name)
 {
-	int	res;
+	int		res;
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_history_count()");
+	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_trends_count(): %s", table_name);
 
-	result = DBselect("select count(*) from history");
+	result = DBselect("select count(*) from %s", table_name);
 
-	row=DBfetch(result);
+	row = DBfetch(result);
 
-	if(!row || DBis_null(row[0])==SUCCEED)
+	if (!row || DBis_null(row[0]) == SUCCEED)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query");
 		zabbix_syslog("Cannot execute query");
@@ -878,34 +944,7 @@ int	DBget_history_count(void)
 		return 0;
 	}
 
-	res  = atoi(row[0]);
-
-	DBfree_result(result);
-
-	return res;
-}
-
-int	DBget_trends_count(void)
-{
-	int	res;
-	DB_RESULT	result;
-	DB_ROW		row;
-
-	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_trends_count()");
-
-	result = DBselect("select count(*) from trends");
-
-	row=DBfetch(result);
-
-	if(!row || DBis_null(row[0])==SUCCEED)
-	{
-		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query");
-		zabbix_syslog("Cannot execute query");
-		DBfree_result(result);
-		return 0;
-	}
-
-	res  = atoi(row[0]);
+	res = atoi(row[0]);
 
 	DBfree_result(result);
 
@@ -1170,7 +1209,7 @@ int	DBremove_escalation(zbx_uint64_t escalationid)
 void	DBvacuum(void)
 {
 #ifdef	HAVE_POSTGRESQL
-	char *table_for_housekeeping[]={"services", "services_links", "graphs_items", "graphs", "sysmaps_links",
+	char	*table_for_housekeeping[] = {"services", "services_links", "graphs_items", "graphs", "sysmaps_links",
 			"sysmaps_elements", "sysmaps_link_triggers","sysmaps", "config", "groups", "hosts_groups", "alerts",
 			"actions", "events", "functions", "history", "history_str", "hosts", "trends",
 			"items", "media", "media_type", "triggers", "trigger_depends", "users",
@@ -1182,15 +1221,11 @@ void	DBvacuum(void)
 
 	zbx_setproctitle("housekeeper [vacuum DB]");
 
-	i=0;
+	i = 0;
 	while (NULL != (table = table_for_housekeeping[i++]))
 	{
 		DBexecute("vacuum analyze %s", table);
 	}
-#endif
-
-#ifdef	HAVE_MYSQL
-	/* Nothing to do */
 #endif
 }
 
@@ -1977,7 +2012,7 @@ zbx_uint64_t	DBmultiply_value_uint64(DB_ITEM *item, zbx_uint64_t value)
 	else
 		value_uint64 = (zbx_uint64_t)((double)value * atof(item->formula));
 
-	zabbix_log(LOG_LEVEL_DEBUG, "DBmultiply_value_float() " ZBX_FS_UI64 ",%s " ZBX_FS_UI64,
+	zabbix_log(LOG_LEVEL_DEBUG, "DBmultiply_value_uint64() " ZBX_FS_UI64 ",%s " ZBX_FS_UI64,
 			value, item->formula, value_uint64);
 
 	return value_uint64;
@@ -1987,7 +2022,7 @@ zbx_uint64_t	DBmultiply_value_uint64(DB_ITEM *item, zbx_uint64_t value)
  *                                                                            *
  * Function: DBregister_host                                                  *
  *                                                                            *
- * Purpose: registrate unknown host and generate event                        *
+ * Purpose: register unknown host and generate event                          *
  *                                                                            *
  * Parameters: host - host name                                               *
  *                                                                            *

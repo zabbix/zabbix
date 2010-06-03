@@ -757,7 +757,7 @@ add_selement_img: function(selement){
 //	selement_div.setAttribute('src','data:image/png;base64,'+selement.image);
 //	selement_div.setAttribute('src','imgstore.php?iconid='+selement.image);
 	selement_div.className = 'pointer sysmap_iconid_'+selement.image;
-	
+
 	selement_div.style.zIndex = '10';
 	selement_div.style.position = 'absolute';
 	selement_div.style.top = position.top+'px';
@@ -993,7 +993,7 @@ show_menu: function(e){
 	if(this.menu_active != 1) return true;
 	
 	var e = e || window.event;
-	var element = eventTarget(e);
+	var element = Event.element(e);
 	var element_id = element.id.split('_');
 	var selementid = element_id[(element_id.length - 1)];
 
@@ -1100,7 +1100,7 @@ update_multiContainer: function(e){
 		var e_table_1 = document.createElement('table');
 		e_table_1.setAttribute('cellspacing',"0");
 		e_table_1.setAttribute('cellpadding',"1");
-		e_table_1.setAttribute('class',"header");
+		e_table_1.className = 'header';
 	
 	
 		var e_tbody_2 = document.createElement('tbody');
@@ -1112,14 +1112,14 @@ update_multiContainer: function(e){
 	
 	
 		var e_td_4 = document.createElement('td');
-		e_td_4.setAttribute('class',"header_l");
+		e_td_4.className = 'header_l';
 		e_td_4.appendChild(document.createTextNode(locale['S_MAP_ELEMENTS']));
 		e_tr_3.appendChild(e_td_4);
 	
 		
 		var e_td_4 = document.createElement('td');
 		e_td_4.setAttribute('align',"right");
-		e_td_4.setAttribute('class',"header_r");
+		e_td_4.className = 'header_r';
 		
 		e_tr_3.appendChild(e_td_4);
 		
@@ -1243,7 +1243,7 @@ update_linkContainer: function(e){
 		var e_table_1 = document.createElement('table');
 		e_table_1.setAttribute('cellspacing',"0");
 		e_table_1.setAttribute('cellpadding',"1");
-		e_table_1.setAttribute('class',"header");
+		e_table_1.className = 'header';
 		
 		
 		var e_tbody_2 = document.createElement('tbody');
@@ -1255,14 +1255,14 @@ update_linkContainer: function(e){
 		
 		
 		var e_td_4 = document.createElement('td');
-		e_td_4.setAttribute('class',"header_l");
+		e_td_4.className = 'header_l';
 		e_td_4.appendChild(document.createTextNode(locale['S_CONNECTORS']));
 		e_tr_3.appendChild(e_td_4);
 		
 		
 		var e_td_4 = document.createElement('td');
 		e_td_4.setAttribute('align',"right");
-		e_td_4.setAttribute('class',"header_r");
+		e_td_4.className = 'header_r';
 		
 		e_tr_3.appendChild(e_td_4);
 		
@@ -1380,7 +1380,7 @@ update_linkContainer: function(e){
 		
 		var e_td_4 = document.createElement('td');
 		e_td_4.setAttribute('colSpan',4);
-		e_td_4.setAttribute('class','center');
+		e_td_4.className = 'center';
 		e_td_4.appendChild(document.createTextNode(locale['S_NO_LINKS']));
 		e_tr_3.appendChild(e_td_4);
 	}
@@ -2431,12 +2431,9 @@ updateForm_selementByType: function(e, multi){
 			this.selementForm.typeDOM.elementName.style.display = 'none';
 			this.selementForm.typeDOM.iconid_off.style.display = display_style;
 
+// initiats icons hide
+			this.selementForm.advanced_icons.checked = false;
 			this.selementForm.typeDOM.advanced_icons.style.display = 'none';
-			this.selementForm.typeDOM.iconid_on.style.display = 'none';
-			this.selementForm.typeDOM.iconid_unknown.style.display = 'none';
-			this.selementForm.typeDOM.iconid_maintenance.style.display = 'none';
-			this.selementForm.typeDOM.iconid_disabled.style.display = 'none';
-
 		break;
 	}
 	
@@ -2584,7 +2581,16 @@ deleteForm_selement: function(e){
 	var selementid = this.selementForm.selementid.value;	
 	var selement = this.selements[selementid];
 	
-	if(Confirm('Delete element "'+selement.elementName+'"?')){
+	var typeName;
+	switch(selement.elementtype-0){
+		case 0: typeName = locale['S_HOST']; break;
+		case 1: typeName = locale['S_MAP']; break;
+		case 2: typeName = locale['S_TRIGGER']; break;
+		case 3: typeName = locale['S_HOST_GROUP']; break;
+		case 4: typeName = locale['S_IMAGE']; break;
+	}
+
+	if(Confirm(locale['S_REMOVE']+' '+typeName+'?')){
 		this.remove_selement(selementid, true);
 		this.hideForm(e);
 	}

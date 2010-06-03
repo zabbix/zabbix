@@ -215,6 +215,20 @@ AC_DEFINE(HAVE_SYSINFO_FREESWAP,1,[Define to 1 if 'sysinfo.freeswap' exist.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
+dnl Check for libperfstat 5.3.0.60 fileset
+AC_MSG_CHECKING(for AIX OS level 5300-06)
+AC_TRY_COMPILE([#include <libperfstat.h>],
+[perfstat_partition_total_t	lparstats;
+lparstats.type.b.donate_enabled = 0;
+lparstats.idle_donated_purr = 0;
+lparstats.busy_donated_purr = 0;
+lparstats.idle_stolen_purr = 0;
+lparstats.busy_stolen_purr = 0;
+],
+AC_DEFINE(HAVE_AIXOSLEVEL_530006,1,[Define to 1 if AIX OS level 5300-06 exist.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
 dnl Check for function setpriority in sys/resource.h
 AC_MSG_CHECKING(for function setpriority() in sys/resource.h)
 AC_TRY_COMPILE(
@@ -828,6 +842,8 @@ fi
 
 if test "$server" = "yes" || test "$proxy" = "yes"; then
 
+	have_multirow_insert="no"
+
 	dnl Checking for Oracle support
 	AX_LIB_ORACLE_OCI([10.0])
 	if test "x$WANT_ORACLE_OCI" = "xyes"; then
@@ -889,6 +905,7 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 
 		if test "x$found_mysql" = "xyes"; then
 			have_db="MySQL"
+			have_multirow_insert="yes"
 		else
 			AC_MSG_ERROR([MySQL library not found])
 		fi
@@ -904,10 +921,11 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 		if test "x$found_postgresql" = "xyes"; then
 
 			have_db="PostgreSQL"
-			
-			dnl To avoid linking of crypt with the agent
-			dnl It seems PostgreSQL does not require this
-			dnl AC_CHECK_FUNC(crypt, , AC_CHECK_LIB(crypt, crypt,  POSTGRESQL_LDFLAGS="-lcrypt $POSTGRESQL_LDFLAGS"))
+
+			if test "$postgresql_version_number" -ge 8002000; then
+				have_multirow_insert="yes"
+			fi
+
 		else
 			AC_MSG_ERROR([PostgreSQL library not found])
 		fi
@@ -919,6 +937,14 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 		AC_MSG_ERROR([No database selected for Zabbix server. Use --with-mysql or --with-oracle or --with-pgsql or --with-sqlite3.])
 	else
 		AC_MSG_RESULT(ok)
+	fi
+
+	AC_MSG_CHECKING(for multirow insert statements)
+	if test "x$have_multirow_insert" = "xyes"; then
+		AC_DEFINE(HAVE_MULTIROW_INSERT,1,[Define to 1 if database supports multirow insert statements.])
+		AC_MSG_RESULT(yes)
+	else
+		AC_MSG_RESULT(no)
 	fi
 
 	DB_CPPFLAGS="$ORACLE_CPPFLAGS $SQLITE3_CPPFLAGS $MYSQL_CFLAGS $POSTGRESQL_CPPFLAGS"

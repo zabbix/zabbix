@@ -33,7 +33,7 @@ local $output;
 	"type"		=>	"sql",
 	"before"	=>	"",
 	"after"		=>	"",
-	"table_options"	=>	" type=InnoDB",
+	"table_options"	=>	" ENGINE=InnoDB",
 	"exec_cmd"	=>	";\n",
 	"t_bigint"	=>	"bigint unsigned",
 	"t_id"		=>	"bigint unsigned",

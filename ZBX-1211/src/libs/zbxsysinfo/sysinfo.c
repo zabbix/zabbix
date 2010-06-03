@@ -595,6 +595,13 @@ int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c
 				SET_UI64_RESULT(result, value_uint64);
 				ret = SUCCEED;
 			}
+			else if (SUCCEED == is_hex_string(c))
+			{
+				delete_whitespace(c);
+				ZBX_HEX2UINT64(value_uint64, c);
+				SET_UI64_RESULT(result, value_uint64);
+				ret = SUCCEED;
+			}
 			break;
 		default:	/* ITEM_DATA_TYPE_DECIMAL */
 			if (SUCCEED == is_uint64(c, &value_uint64))
