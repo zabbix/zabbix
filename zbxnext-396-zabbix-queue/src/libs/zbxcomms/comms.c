@@ -739,7 +739,10 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 				zbx_set_tcp_strerror("bind() for [[%s]:%s] failed with error %d: %s",
 						ip, port, zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
 				zbx_sock_close(s->sockets[s->num_socks]);
-				goto out;
+				if (EADDRINUSE == errno)
+					continue;
+				else
+					goto out;
 			}
 
 			if (ZBX_TCP_ERROR == listen(s->sockets[s->num_socks], SOMAXCONN))
@@ -804,7 +807,7 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 		if (NULL != delim)
 			*delim = '\0';
 
-		if (FAIL == is_ip4(ip))
+		if (NULL != ip && FAIL == is_ip4(ip))
 		{
 			zbx_set_tcp_strerror("Incorrect IPv4 address [%s]", ip);
 			goto out;
@@ -837,7 +840,7 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 		memset(&serv_addr, 0, sizeof(ZBX_SOCKADDR));
 
 		serv_addr.sin_family		= AF_INET;
-		serv_addr.sin_addr.s_addr	= ip ? inet_addr(ip) : htonl(INADDR_ANY);
+		serv_addr.sin_addr.s_addr	= NULL != ip ? inet_addr(ip) : htonl(INADDR_ANY);
 		serv_addr.sin_port		= htons((unsigned short)listen_port);
 
 		if (ZBX_TCP_ERROR == bind(s->sockets[s->num_socks], (struct sockaddr *)&serv_addr, sizeof(ZBX_SOCKADDR)))
