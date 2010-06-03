@@ -579,7 +579,7 @@ int     DBupdate_trigger_value(zbx_uint64_t triggerid, int type, int value,
 
 int	DBget_row_count(const char *table_name);
 int	DBget_items_unsupported_count();
-int	DBget_queue_count();
+int	DBget_queue_count(int from, int to);
 double	DBget_requiredperformance();
 zbx_uint64_t DBget_proxy_lastaccess(const char *hostname);
 

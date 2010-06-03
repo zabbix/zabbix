@@ -104,12 +104,34 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		i = DBget_row_count(tmp);
 		SET_UI64_RESULT(result, i);
 	}
-	else if (0 == strcmp(tmp, "queue"))		/* zabbix["queue"] */
+	else if (0 == strcmp(tmp, "queue"))		/* zabbix["queue"<,from><,to>] */
 	{
-		if (1 != nparams)
+		int	from = 6, to = (-1);
+
+		if (nparams > 3)
 			goto not_supported;
 
-		i = DBget_queue_count();
+		if (nparams >= 2)
+		{
+			if (get_param(params, 2, tmp, sizeof(tmp)) != 0)
+				goto not_supported;
+			else if (*tmp != '\0' && is_uint_prefix(tmp) == FAIL)
+				goto not_supported;
+			else
+				from = (*tmp != '\0' ? str2uint(tmp) : 6);
+		}
+
+		if (nparams >= 3)
+		{
+			if (get_param(params, 3, tmp, sizeof(tmp)) != 0)
+				goto not_supported;
+			else if (*tmp != '\0' && is_uint_prefix(tmp) == FAIL)
+				goto not_supported;
+			else
+				to = (*tmp != '\0' ? str2uint(tmp) : -1);
+		}
+
+		i = DBget_queue_count(from, to);
 		SET_UI64_RESULT(result, i);
 	}
 	else if (0 == strcmp(tmp, "requiredperformance"))	/* zabbix["requiredperformance"] */
@@ -143,7 +165,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		if (get_param(params, 2, tmp1, sizeof(tmp1)) != 0)
 			goto not_supported;
 
-		if (0 != get_param(params, 3, tmp, sizeof(tmp)))
+		if (get_param(params, 3, tmp, sizeof(tmp)) != 0)
 			goto not_supported;
 
 		if (0 == strcmp(tmp, "lastaccess"))

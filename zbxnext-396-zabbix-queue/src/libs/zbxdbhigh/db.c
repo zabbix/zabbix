@@ -875,9 +875,10 @@ int	DBget_items_unsupported_count()
 	return count;
 }
 
-int	DBget_queue_count()
+int	DBget_queue_count(int from, int to)
 {
-	int		res = 0, now;
+	const char	*__function_name = "DBget_queue_count";
+	int		count = 0, now;
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	itemid;
@@ -885,12 +886,12 @@ int	DBget_queue_count()
 	char		*delay_flex;
 	time_t		lastclock;
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_queue_count()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): from [%d] to [%d]", __function_name, from, to);
 
 	now = time(NULL);
 
 	result = DBselect(
-			"select i.itemid,i.type,i.delay,i.delay_flex,i.lastclock,h.host"
+			"select i.itemid,i.type,i.delay,i.delay_flex,i.lastclock"
 			" from items i,hosts h"
 			" where i.hostid=h.hostid"
 				" and h.proxy_hostid=0"
@@ -898,7 +899,10 @@ int	DBget_queue_count()
 				" and i.status=%d"
 				" and i.value_type not in (%d)"
 				" and i.key_ not in ('%s','%s')"
-				" and not i.lastclock is null"
+				" and ("
+					"i.lastclock is not null"
+					" and i.lastclock<%d"
+					")"
 				" and ("
 					"i.type in (%d,%d,%d,%d,%d,%d,%d)"
 					" or (h.available<>%d and i.type in (%d))"
@@ -910,6 +914,7 @@ int	DBget_queue_count()
 			ITEM_STATUS_ACTIVE,
 			ITEM_VALUE_TYPE_LOG,
 			SERVER_STATUS_KEY, SERVER_ZABBIXLOG_KEY,
+			now - from,
 				ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SIMPLE,
 				ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL,
 			HOST_AVAILABLE_FALSE,
@@ -927,21 +932,18 @@ int	DBget_queue_count()
 		delay_flex	= row[3];
 
 		if (FAIL == (lastclock = DCget_item_lastclock(itemid)))
-		{
-			if (SUCCEED == DBis_null(row[4]))
-				lastclock = 0;
-			else
-				lastclock = (time_t)atoi(row[4]);
-		}
+			lastclock = (time_t)atoi(row[4]);
 
 		nextcheck = calculate_item_nextcheck(itemid, item_type, delay, delay_flex, lastclock);
 
-		if (now - nextcheck > 5)
-			res++;
+		if ((-1 == from || from <= now - nextcheck) && (-1 == to || now - nextcheck <= to))
+			count++;
 	}
 	DBfree_result(result);
 
-	return res;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %d", __function_name, count);
+
+	return count;
 }
 
 double	DBget_requiredperformance()
