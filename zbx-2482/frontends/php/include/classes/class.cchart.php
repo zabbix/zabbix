@@ -354,7 +354,11 @@ class CChart extends CGraphDraw{
 					continue;
 				}
 
-				if($cj == 0) continue;
+//				if(($cj == 0) || ($this->type != GRAPH_TYPE_STACKED)){
+//					$cj = 0;
+				if($cj == 0){
+					continue;
+				}
 
 				$dx = $cj + 1;
 				$first_idx = $ci - $dx;
