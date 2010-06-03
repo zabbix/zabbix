@@ -307,9 +307,8 @@ class CChart extends CGraphDraw{
 
 			foreach($sql_arr as $sql){
 //SDI($sql);
-				$result=DBselect($sql);
-
-				while($row=DBfetch($result)){
+				$result = DBselect($sql);
+				while($row = DBfetch($result)){
 					$idx=$row['i']-1;
 					if($idx<0) continue;
 /* --------------------------------------------------
@@ -334,60 +333,62 @@ class CChart extends CGraphDraw{
 				$this->setGraphOrientation($loc_min, $this->items[$i]['axisside']);
 				unset($row);
 			}
-			/* calculate missed points */
-			$first_idx = 0;
-			/*
-				first_idx - last existing point
-				ci - current index
-				cj - count of missed in one go
-				dx - offset to first value (count to last existing point)
-			//*/
+			$curr_data['avg_orig'] = zbx_avg($curr_data['avg']);
 
-			for($ci = 0, $cj=0; $ci < $this->sizeX; $ci++){
-				if(!isset($curr_data['count'][$ci]) || $curr_data['count'][$ci] == 0){
+// calculate missed points
+			$first_idx = 0;
+/*
+	first_idx - last existing point
+	ci - current index
+	cj - count of missed in one go
+	dx - offset to first value (count to last existing point)
+//*/
+
+			for($ci=0,$cj=0; $ci < $this->sizeX; $ci++){
+				if(!isset($curr_data['count'][$ci]) || ($curr_data['count'][$ci] == 0)){
 					$curr_data['count'][$ci] = 0;
 					$curr_data['shift_min'][$ci] = 0;
 					$curr_data['shift_max'][$ci] = 0;
 					$curr_data['shift_avg'][$ci] = 0;
 					$cj++;
+					continue;
 				}
-				else if($cj > 0){
-					$dx = $cj + 1;
 
-					$first_idx = $ci - $dx;
+//				if(($cj == 0) || ($this->type != GRAPH_TYPE_STACKED)){
+//					$cj = 0;
+				if($cj == 0){
+					continue;
+				}
 
-					if($first_idx < 0)	$first_idx = $ci; // if no data FROM start of graph get current data as first data
+				$dx = $cj + 1;
+				$first_idx = $ci - $dx;
 
-					for(;$cj > 0; $cj--){
-						if(($dx < ($this->sizeX/20)) && ($this->type == GRAPH_TYPE_STACKED)){
-							$curr_data['count'][$ci - ($dx - $cj)] = 1;
+				if($first_idx < 0)	$first_idx = $ci; // if no data FROM start of graph get current data as first data
+
+				for(;$cj > 0; $cj--){
+					if(($dx < ($this->sizeX/20)) && ($this->type == GRAPH_TYPE_STACKED)){
+						$curr_data['count'][$ci - ($dx - $cj)] = 1;
+					}
+
+					foreach(array('clock','min','max','avg') as $var_name){
+						$var = &$curr_data[$var_name];
+
+						if($first_idx == $ci && $var_name == 'clock'){
+							$var[$ci - ($dx - $cj)] = $var[$first_idx] - (($p / $this->sizeX) * ($dx - $cj));
+							continue;
 						}
 
-						foreach(array('clock','min','max','avg') as $var_name){
-							$var = &$curr_data[$var_name];
-
-							if($first_idx == $ci && $var_name == 'clock'){
-								$var[$ci - ($dx - $cj)] = $var[$first_idx] - (($p / $this->sizeX) * ($dx - $cj));
-								continue;
-							}
-
-							$dy = $var[$ci] - $var[$first_idx];
-							$var[$ci - ($dx - $cj)] = bcadd($var[$first_idx] , bcdiv(($cj * $dy) , $dx));
-						}
+						$dy = $var[$ci] - $var[$first_idx];
+						$var[$ci - ($dx - $cj)] = bcadd($var[$first_idx] , bcdiv(($cj * $dy) , $dx));
 					}
 				}
 			}
 
 			if($cj > 0 && $ci > $cj){
 				$dx = $cj + 1;
-
 				$first_idx = $ci - $dx;
 
 				for(;$cj > 0; $cj--){
-
-//					if($dx < ($this->sizeX/20))			//($this->type == GRAPH_TYPE_STACKED)
-//						$curr_data['count'][$first_idx + ($dx - $cj)] = 1;
-
 					foreach(array('clock','min','max','avg') as $var_name){
 						$var = &$curr_data[$var_name];
 
@@ -399,11 +400,11 @@ class CChart extends CGraphDraw{
 					}
 				}
 			}
-			/* end of missed points calculation */
+//*/
+// end of missed points calculation
 		}
 
-		/* calculte shift for stacked graphs */
-
+// calculte shift for stacked graphs
 		if($this->type == GRAPH_TYPE_STACKED){
 			for($i=1; $i<$this->num; $i++){
 				$curr_data = &$this->data[$this->items[$i]['itemid']][$this->items[$i]['calc_type']];
@@ -641,9 +642,8 @@ class CChart extends CGraphDraw{
 		}
 
 		$maxY = null;
-		for($i=0;$i<$this->num;$i++){
-			if($this->items[$i]['axisside'] != $side)
-				continue;
+		for($i=0; $i<$this->num; $i++){
+			if($this->items[$i]['axisside'] != $side) continue;
 
 			foreach(array(GRAPH_ITEM_SIMPLE, GRAPH_ITEM_AGGREGATED) as $type){
 				if(!isset($this->data[$this->items[$i]['itemid']][$type])) continue;
@@ -676,6 +676,8 @@ class CChart extends CGraphDraw{
 				if(!isset($val)) continue;
 
 				for($ci=0; $ci < min(count($val),count($shift_val)); $ci++){
+					if($data['count'][$ci] == 0) continue;
+
 					$val[$ci] = bcadd($shift_val[$ci], $val[$ci]);
 				}
 //SDII($val);
@@ -1584,7 +1586,7 @@ class CChart extends CGraphDraw{
 				$legend->addCell($colNum, array('text' => '['.$fnc_name.']'));
 				$legend->addCell($colNum, array('text' => convert_units($this->getLastValue($i),$this->items[$i]['units'],ITEM_CONVERT_NO_UNITS), 'align'=> 2));
 				$legend->addCell($colNum, array('text' => convert_units(min($data['min']),$this->items[$i]['units']),ITEM_CONVERT_NO_UNITS, 'align'=> 2));
-				$legend->addCell($colNum, array('text' => convert_units(zbx_avg($data['avg']),$this->items[$i]['units'],ITEM_CONVERT_NO_UNITS), 'align'=> 2));
+				$legend->addCell($colNum, array('text' => convert_units($data['avg_orig'],$this->items[$i]['units'],ITEM_CONVERT_NO_UNITS), 'align'=> 2));
 				$legend->addCell($colNum, array('text' => convert_units(max($data['max']),$this->items[$i]['units'],ITEM_CONVERT_NO_UNITS), 'align'=> 2));
 			}
 			else{
@@ -2062,6 +2064,7 @@ class CChart extends CGraphDraw{
 
 // For each X
 			$draw = true;
+			$prevDraw = true;
 			for($i = 1, $j = 0; $i < $maxX; $i++){  // new point
 				if(($data['count'][$i] == 0) && ($i != ($maxX-1))) continue;
 

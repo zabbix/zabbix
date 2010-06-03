@@ -56,7 +56,6 @@ include_once('include/page_header.php');
 	check_fields($fields);
 ?>
 <?php
-
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
 			CProfile::update('web.charts.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
