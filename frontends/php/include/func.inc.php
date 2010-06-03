@@ -326,6 +326,8 @@ function zbx_date2str($format, $value=NULL){
 	
 	if($value === NULL) $value = time();
 	
+	if(!$value) return S_NEVER;
+	
 	if(!is_array($weekdaynames)) {
 		$weekdaynames = Array(
 					0 => S_WEEKDAY_SUNDAY_SHORT,
@@ -379,16 +381,30 @@ function zbx_date2str($format, $value=NULL){
 					11 => S_MONTH_NOVEMBER_LONG,
 					12 => S_MONTH_DECEMBER_LONG);
 	}
-
-	if(!$value) return S_NEVER;
 	
-	$output = date($format, $value);
-
-	$output = str_replace(date('l',$value), $weekdaynameslong[date('w',$value)], $output);
-	$output = str_replace(date('F',$value), $monthslong[date('n',$value)], $output);
-	$output = str_replace(date('D',$value), $weekdaynames[date('w',$value)], $output);
-	$output = str_replace(date('M',$value), $months[date('n',$value)], $output);
-
+	$rplcs = Array(
+		'l' => $weekdaynameslong[date('w',$value)],
+		'F' => $monthslong[date('n',$value)],
+		'D' => $weekdaynames[date('w',$value)],
+		'M' => $months[date('n',$value)]
+	);
+	
+	$output = '';
+	$part = '';
+	$length = zbx_strlen($format);
+	for($i = 0; $i < $length; $i++) {
+		$pchar = $i > 0 ? zbx_substr($format, $i-1, 1) : '';
+		$char = zbx_substr($format, $i, 1);
+		if($pchar != '\\' && isset($rplcs[$char])) {
+			$output .= (zbx_strlen($part) ? date($part, $value) : '').$rplcs[$char];
+			$part = '';
+		}else{
+			$part .= $char;
+		}
+	}
+	
+	$output .= zbx_strlen($part) > 0 ? date($part, $value) : '';
+	
 	return $output;
 }
 
