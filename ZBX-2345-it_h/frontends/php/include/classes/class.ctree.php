@@ -102,7 +102,34 @@ class CTree{
 
 
 		foreach($this->fields as $key => $value){
-			$tr->addItem(new CCol($this->tree[$id][$value]));
+			$style = null;
+			
+			if(($value == 'status') && ($this->tree[$id]['serviceid'] > 0)){
+				switch($this->tree[$id][$value]){
+					case TRIGGER_SEVERITY_DISASTER:
+						$this->tree[$id][$value] = S_DISASTER;
+						$style = 'disaster'; 
+						break;
+					case TRIGGER_SEVERITY_HIGH:
+						$this->tree[$id][$value] = S_HIGH;
+						$style = 'high'; 
+						break;
+					case TRIGGER_SEVERITY_AVERAGE:
+						$this->tree[$id][$value] = S_AVERAGE;
+						$style = 'average'; 
+						break;
+					case TRIGGER_SEVERITY_WARNING:
+						$this->tree[$id][$value] = S_WARNING;
+						$style = 'warning'; 
+						break;
+					case TRIGGER_SEVERITY_INFORMATION:
+					default:
+						$this->tree[$id][$value] = new CSpan(S_OK_BIG, 'green');
+						break;
+				}
+			}
+			
+			$tr->addItem(new CCol($this->tree[$id][$value], $style));
 		}
 
 	return $tr;
