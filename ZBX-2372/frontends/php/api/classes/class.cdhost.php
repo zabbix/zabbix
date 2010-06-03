@@ -62,7 +62,7 @@ class CDHost extends CZBXAPI{
  * @param boolean $options['select_profile'] select Profile
  * @param int $options['count'] count Hosts, returned column name is rowscount
  * @param string $options['pattern'] search hosts by pattern in Host name
- * @param string $options['extend_pattern'] search hosts by pattern in Host name, ip and DNS
+ * @param string $options['extendPattern'] search hosts by pattern in Host name, ip and DNS
  * @param int $options['limit'] limit selection
  * @param string $options['sortfield'] field to sort by
  * @param string $options['sortorder'] sort order
@@ -82,7 +82,7 @@ class CDHost extends CZBXAPI{
 
 		$sql_parts = array(
 			'select' => array('dhosts' => 'dh.dhostid'),
-			'from' => array('dhosts dh'),
+			'from' => array('dhosts' => 'dhosts dh'),
 			'where' => array(),
 			'group' => array(),
 			'order' => array(),
@@ -178,7 +178,7 @@ class CDHost extends CZBXAPI{
 				$sql_parts['select']['dserviceids'] = 'ds.dserviceids';
 			}
 
-			$sql_parts['from']['ds'] = 'dservices ds';
+			$sql_parts['from']['dservices'] = 'dservices ds';
 			$sql_parts['where'][] = DBcondition('ds.dserviceid', $options['dserviceids']);
 			$sql_parts['where']['dhds'] = 'dh.dhostid=ds.dhostid';
 
@@ -199,8 +199,8 @@ class CDHost extends CZBXAPI{
 				$sql_parts['select']['groupid'] = 'hg.groupid';
 			}
 
-			$sql_parts['from']['h'] = 'hosts h';
-			$sql_parts['from']['hg'] = 'hosts_groups hg';
+			$sql_parts['from']['hosts'] = 'hosts h';
+			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
 			$sql_parts['where']['dhh'] = 'h.ip=dh.ip';
 			$sql_parts['where']['hgh'] = 'hg.hostid=h.hostid';
@@ -223,7 +223,7 @@ class CDHost extends CZBXAPI{
 				$sql_parts['select']['hostid'] = 'h.hostid';
 			}
 
-			$sql_parts['from']['h'] = 'hosts h';
+			$sql_parts['from']['hosts'] = 'hosts h';
 			$sql_parts['where'][] = DBcondition('h.hostid', $options['hostids']);
 			$sql_parts['where']['dhh'] = 'h.ip=dh.ip';
 
@@ -327,7 +327,7 @@ class CDHost extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT DISTINCT '.$sql_select.
+		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.
 				' FROM '.$sql_from.
 				' WHERE '.$sql_where.
 				$sql_group.

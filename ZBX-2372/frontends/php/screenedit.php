@@ -76,7 +76,10 @@ include_once('include/page_header.php');
 	$_REQUEST['dynmic'] = get_request('dynamic',SCREEN_SIMPLE_ITEM);
 ?>
 <?php
-	show_table_header(S_CONFIGURATION_OF_SCREEN_BIG);
+	$trigg_wdgt = new CWidget();
+	$trigg_wdgt->addPageHeader(S_CONFIGURATION_OF_SCREEN_BIG);
+	
+	//show_table_header(S_CONFIGURATION_OF_SCREEN_BIG);
 
 	$options = array(
 		'screenids' => $_REQUEST['screenid'],
@@ -87,6 +90,9 @@ include_once('include/page_header.php');
 	if(empty($screens)) access_deny();
 
 	$screen = reset($screens);
+	
+	$trigg_wdgt->addHeader($screen['name']);
+	$trigg_wdgt->addItem(BR());
 	
 	if(isset($_REQUEST['save'])){
 		if(!isset($_REQUEST['elements'])) $_REQUEST['elements'] = 0;
@@ -197,45 +203,41 @@ include_once('include/page_header.php');
 	else if(isset($_REQUEST['sw_pos'])){
 		$sw_pos = get_request('sw_pos', array());
 		if(count($sw_pos) > 3){
-			$sql = 'SELECT screenitemid '.
+			$sql = 'SELECT screenitemid, colspan, rowspan '.
 					' FROM screens_items '.
 					' WHERE y='.$sw_pos[0].
 						' AND x='.$sw_pos[1].
 						' AND screenid='.$screen['screenid'];
-			if($screen_item = DBfetch(DBselect($sql))){
+			$fitem = DBfetch(DBselect($sql));
+			
+			$sql = 'SELECT screenitemid, colspan, rowspan '.
+					' FROM screens_items '.
+					' WHERE y='.$sw_pos[2].
+						' AND x='.$sw_pos[3].
+						' AND screenid='.$screen['screenid'];
+			$sitem = DBfetch(DBselect($sql));
+			
+			if($fitem){
 				DBexecute('UPDATE screens_items '.
 							' SET y='.$sw_pos[2].',x='.$sw_pos[3].
+							',colspan='.(isset($sitem['colspan']) ? $sitem['colspan'] : 0).
+							',rowspan='.(isset($sitem['rowspan']) ? $sitem['rowspan'] : 0).
 							' WHERE y='.$sw_pos[0].
 								' AND x='.$sw_pos[1].
-								' AND screenid='.$screen['screenid']);
+								' AND screenid='.$screen['screenid'].
+								' AND screenitemid='.$fitem['screenitemid']);
+								
+			}
 
+			if($sitem){
 				DBexecute('UPDATE screens_items '.
 							' SET y='.$sw_pos[0].',x='.$sw_pos[1].
+							',colspan='.(isset($fitem['colspan']) ? $fitem['colspan'] : 0).
+							',rowspan='.(isset($fitem['rowspan']) ? $fitem['rowspan'] : 0).
 							' WHERE y='.$sw_pos[2].
 								' AND x='.$sw_pos[3].
 								' AND screenid='.$screen['screenid'].
-								' AND screenitemid<>'.$screen_item['screenitemid']);
-			}
-			else{
-				$sql = 'SELECT screenitemid '.
-						' FROM screens_items '.
-						' WHERE y='.$sw_pos[2].
-							' AND x='.$sw_pos[3].
-							' AND screenid='.$screen['screenid'];
-				if($screen_item = DBfetch(DBselect($sql))){
-					DBexecute('UPDATE screens_items '.
-								' SET y='.$sw_pos[0].',x='.$sw_pos[1].
-								' WHERE y='.$sw_pos[2].
-									' AND x='.$sw_pos[3].
-									' AND screenid='.$screen['screenid']);
-
-					DBexecute('UPDATE screens_items '.
-								' SET y='.$sw_pos[2].',x='.$sw_pos[3].
-								' WHERE y='.$sw_pos[0].
-									' AND x='.$sw_pos[1].
-									' AND screenid='.$screen['screenid'].
-									' AND screenitemid<>'.$screen_item['screenitemid']);
-				}
+								' AND screenitemid='.$sitem['screenitemid']);
 			}
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN,' Name ['.$screen['name'].'] Items switched');
 		}
@@ -243,11 +245,15 @@ include_once('include/page_header.php');
 
 	if($_REQUEST['screenid'] > 0){
 		$table = get_screen($_REQUEST['screenid'], 1);
-		$table->show();
+		$trigg_wdgt->addItem($table);
 		zbx_add_post_js('init_screen("'.$_REQUEST['screenid'].'","iframe","'.$_REQUEST['screenid'].'");');
 		zbx_add_post_js('timeControl.processObjects();');
 	}
 
+	$trigg_wdgt->show();
+?>
+<?php
 
 include_once('include/page_footer.php');
+
 ?>

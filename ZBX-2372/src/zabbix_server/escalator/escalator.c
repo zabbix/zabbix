@@ -266,7 +266,7 @@ static void	add_command_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In add_command_alert()");
 
-	alertid		= DBget_maxid("alerts", "alertid");
+	alertid		= DBget_maxid("alerts");
 	now		= time(NULL);
 	command_esc	= DBdyn_escape_string(command);
 
@@ -340,7 +340,7 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 			continue;
 		}
 
-		alertid		= DBget_maxid("alerts", "alertid");
+		alertid		= DBget_maxid("alerts");
 		sendto_esc	= DBdyn_escape_string_len(row[1], ALERT_SENDTO_LEN);
 
 		DBexecute("insert into alerts (alertid,actionid,eventid,userid,clock"
@@ -369,7 +369,7 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 		zbx_snprintf(error, sizeof(error), "No media defined for user \"%s\"",
 				zbx_user_string(userid));
 
-		alertid		= DBget_maxid("alerts", "alertid");
+		alertid		= DBget_maxid("alerts");
 		error_esc	= DBdyn_escape_string(error);
 
 		DBexecute("insert into alerts (alertid,actionid,eventid,userid,retries,clock"

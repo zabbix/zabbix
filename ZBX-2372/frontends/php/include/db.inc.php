@@ -557,7 +557,7 @@ COpt::savesqlrequest(microtime(true)-$time_start,$query);
 					$result = array();
 					foreach($row as $key => $value){
 						$field_type = zbx_strtolower(oci_field_type($cursor,$key));
-						$value = (str_in_array($field_type,array('varchar','varchar2','blob','clob')) && is_null($value))?'':$value;
+						$value = (str_in_array($field_type,array('varchar','varchar2','blob','clob')) && is_null($value))? '':$value;
 
 						if(is_object($value) && (zbx_stristr($field_type, 'lob') !== false)){
 							$value = $value->load();
@@ -804,6 +804,20 @@ else {
 	return $id;
 	}
 
+	function zbx_db_distinct($sql_parts){
+		if(count($sql_parts['from']) > 1) return ' DISTINCT ';
+		else return ' ';
+
+		$distinct_tables = array(
+			'hosts_groups', 'hosts_templates',
+			'functions', 'graphs_items', 'screens_items', 'slides', 
+			'httpstepitem', 'items_applications',
+			'maintenances_hosts', 'maintenances_groups',
+			'sysmaps_elements', 'sysmaps_link_triggers',
+			'rights', 'users_groups'
+		);
+	}
+
 	function remove_nodes_from_id($id){
 		return bcmod($id,'100000000000');
 	}
@@ -835,8 +849,8 @@ else {
 				return ' 1=0 ';
 		}
 
-		$in = 		$notin?' NOT IN ':' IN ';
-		$concat = 	$notin?' AND ':' OR ';
+		$in = 		$notin ? ' NOT IN ':' IN ';
+		$concat = 	$notin ? ' AND ':' OR ';
 
 		switch($DB['TYPE']) {
 			case 'SQLITE3':
@@ -848,13 +862,13 @@ else {
 				foreach($items as $id => $values){
 					if($string) $values = zbx_dbstr($values);
 
-					$condition.=!empty($condition)?')'.$concat.$fieldname.$in.'(':'';
+					$condition.=!empty($condition) ? ')'.$concat.$fieldname.$in.'(':'';
 					$condition.= implode(',',$values);
 				}
 				break;
 		}
 
-		if(zbx_empty($condition)) $condition = $string?"'-1'":'-1';
+		if(zbx_empty($condition)) $condition = $string ? "'-1'":'-1';
 
 	return ' ('.$fieldname.$in.'('.$condition.')) ';
 	}

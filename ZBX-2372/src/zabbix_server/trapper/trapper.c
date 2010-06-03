@@ -181,7 +181,7 @@ static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT
 
 		if (0 == strcmp(values[i].value, "ZBX_NOTSUPPORTED"))
 		{
-			DCadd_nextcheck(&item, (time_t)values[i].clock, values[i].value);
+			DCadd_nextcheck(item.itemid, (time_t)values[i].clock, values[i].value);
 
 			if (NULL != processed)
 				(*processed)++;
@@ -206,7 +206,7 @@ static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "Item [%s:%s] error: %s",
 						item.host.host, item.key_orig, agent.msg);
-				DCadd_nextcheck(&item, (time_t)values[i].clock, agent.msg);
+				DCadd_nextcheck(item.itemid, (time_t)values[i].clock, agent.msg);
 			}
 			else
 			{
@@ -485,7 +485,7 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 	int	sender_nodeid, nodeid;
 	char	*answer;
 
-	int	ret=SUCCEED, res;
+	int	ret = SUCCEED, res;
 	size_t	datalen;
 
 	struct 		zbx_json_parse jp;
@@ -497,25 +497,24 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 	zbx_rtrim(s, " \r\n\0");
 
 	datalen = strlen(s);
-	zabbix_log( LOG_LEVEL_DEBUG, "Trapper got [%s] len %zd",
-		s,
-		datalen);
+	zabbix_log(LOG_LEVEL_DEBUG, "Trapper got [%s] len %zd", s, datalen);
 
-	if (0 == strncmp(s,"ZBX_GET_ACTIVE_CHECKS", 21))	/* Request for list of active checks */
+	if (0 == strncmp(s, "ZBX_GET_ACTIVE_CHECKS", 21))	/* Request for list of active checks */
 	{
 		ret = send_list_of_active_checks(sock, s, zbx_process);
-/* Request for last ids */
-	} else if (strncmp(s,"ZBX_GET_HISTORY_LAST_ID", 23) == 0) {
+	}
+	else if (strncmp(s, "ZBX_GET_HISTORY_LAST_ID", 23) == 0) /* Request for last ids */
+	{
 		send_history_last_id(sock, s);
 		return ret;
-/* Process information sent by zabbix_sender */
-	} else {
+	}
+	else	/* Process information sent by zabbix_sender */
+	{
 		/* Node data exchange? */
-		if(strncmp(s,"Data",4) == 0)
+		if (strncmp(s, "Data", 4) == 0)
 		{
 			node_sync_lock(0);
 
-/*			zabbix_log( LOG_LEVEL_WARNING, "Node data received [len:%d]", strlen(s)); */
 			res = node_sync(s, &sender_nodeid, &nodeid);
 			if (FAIL == res)
 			{
@@ -523,9 +522,11 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 				send_data_to_node(sender_nodeid, sock, "FAIL");
 				alarm(0);
 			}
-			else {
+			else
+			{
 				res = calculate_checksums(nodeid, NULL, 0);
-				if (SUCCEED == res && NULL != (data = get_config_data(nodeid, ZBX_NODE_SLAVE))) {
+				if (SUCCEED == res && NULL != (data = get_config_data(nodeid, ZBX_NODE_SLAVE)))
+				{
 					zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Sending configuration changes"
 							" to slave node %d for node %d datalen %d",
 							CONFIG_NODEID,
@@ -548,12 +549,14 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 			return ret;
 		}
 		/* Slave node history ? */
-		if(strncmp(s,"History",7) == 0)
+		if (strncmp(s, "History", 7) == 0)
 		{
 /*			zabbix_log( LOG_LEVEL_WARNING, "Slave node history received [len:%d]", strlen(s)); */
-			if (node_history(s, datalen) == SUCCEED) {
+			if (node_history(s, datalen) == SUCCEED)
+			{
 				alarm(CONFIG_TIMEOUT);
-				if (zbx_tcp_send_raw(sock,"OK") != SUCCEED) {
+				if (zbx_tcp_send_raw(sock,"OK") != SUCCEED)
+				{
 					zabbix_log( LOG_LEVEL_WARNING, "Error sending confirmation to node");
 					zabbix_syslog("Trapper: error sending confirmation to node");
 				}
@@ -564,7 +567,8 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 		/* JSON protocol? */
 		else if (SUCCEED == zbx_json_open(s, &jp))
 		{
-			if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_REQUEST, value, sizeof(value))) {
+			if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_REQUEST, value, sizeof(value)))
+			{
 				if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_CONFIG) && zbx_process == ZBX_PROCESS_SERVER)
 				{
 					send_proxyconfig(sock, &jp);
@@ -641,6 +645,7 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 			zbx_strlcpy(av.key, pl, sizeof(av.key));
 			*pr = ':';
 
+			av.value	= pr + 1;
 			av.severity	= 0;
 		}
 

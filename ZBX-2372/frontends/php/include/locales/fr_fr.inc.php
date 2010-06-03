@@ -568,7 +568,6 @@
 	'S_HIDE_UNKNOWN'=>			'Cacher les inconnus',
 	'S_LOG_FILES_SMALL'=>			'fichiers journaux',
 	'S_REMOVE_SELECTED'=>			'Supprimer sélection',
-	'S_LOG_FILES_LIST'=>			'Liste de fichiers journaux',
 	'S_SHOW_SELECTED'=>			'Montrer sélections',
 	'S_HIDE_SELECTED'=>			'Cacher sélections',
 	'S_MARK_SELECTED'=>			'Marquer les éléments sélectionnés',
