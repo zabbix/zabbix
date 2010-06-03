@@ -122,8 +122,8 @@ include_once('include/page_header.php');
 
 	for($i=0, $period_start = $start; $i <= $sizeX; $i += $sizeX/52){
 		DashedLine($im,$i+$shiftX,$shiftYup,$i+$shiftX,$sizeY+$shiftYup,$gray);
-		//imagestringup($im, 1,$i+$shiftX-4, $sizeY+$shiftYup+32, zbx_date2str(S_TIMELINE_DATE_FORMAT,$period_start) , $black);
-		imageText($im, 6, 90, $i+$shiftX+4, $sizeY+$shiftYup+30, $black, zbx_date2str(S_TIMELINE_DATE_FORMAT,$period_start));
+		//imagestringup($im, 1,$i+$shiftX-4, $sizeY+$shiftYup+32, zbx_date2str(S_CHART4_TIMELINE_DATE_FORMAT,$period_start) , $black);
+		imageText($im, 6, 90, $i+$shiftX+4, $sizeY+$shiftYup+30, $black, zbx_date2str(S_CHART4_TIMELINE_DATE_FORMAT,$period_start));
 
 		$period_start += 7*24*3600;
 	}
