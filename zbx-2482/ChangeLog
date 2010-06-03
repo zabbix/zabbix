@@ -1,5 +1,6 @@
-Changes for 1.8.3
+﻿Changes for 1.8.3
 
+ - [ZBX-2482] fixes in chart graphs (Aly)
  - [ZBX-2409] fixed server crash when deleting unreachable hosts in discovery (asaveljevs)
  - [DEV-461] changes in GUI configuration menu (Aly)
  - [ZBX-2473] fixed timescroll most right position when "now" (Aly)
