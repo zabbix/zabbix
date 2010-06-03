@@ -14,7 +14,7 @@ table.home{
 }
 
 table.nowrap tr td {
-	white-space: nowrap;
+	white-space:	nowrap;
 	word-spacing:	0px;
 }
 
@@ -102,6 +102,7 @@ table.formtable {
 	color: #000000;
 	border: 0px solid #000000;
 	width: 50%;
+	margin: auto;
 }
 
 table.formtable tr td {
@@ -232,6 +233,12 @@ table.tablestripped tr.form_even_row td{
 	background-color:#DFDFDF;
 }
 
+table.tablestripped tr.header td{
+	color: #FFFFFF;
+	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;
+	text-align: left;
+}
+
 table.tablestripped tr.footer td{
 	color: #FFFFFF;
 	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;
@@ -259,22 +266,15 @@ td.form_row_r_simple { /* right cell simple */
 
 /************ HISTORY LOG TABLE ***********/
 table.log_history_table {
-/*	background-color: #AAAAAA; */
-	color: #000000;
+	background-color: #AAAAAA;
 	width: 100%;
-	border-width: 0px;
-	border-style: solid;
-	border-color: #0B198C;
+	border-color: gray;
+	border-spacing: 1px 1px;
 }
 table.log_history_table tr td {
 	white-space: nowrap;
-	word-spacing:	0px;
-	font-family:verdana, arial, helvetica, sans-serif;
-	font-size:8pt;
 	text-decoration: none;
-	border-width: 0px;
-	border-style: solid;
-	border-color: #0B198C;
+	background-color: #EEE;
 }
 
 /* table.log_history_table tr:hover td		{	background-color: #EEEEFE; } */
@@ -288,7 +288,7 @@ table.log_history_table tr.header td {
 	padding-left: 5px;
 	white-space: nowrap;
 	word-spacing:	0px;
-	text-align: center;
+	text-align: left;
 	font-weight: bold;
 	background-color:#CCCCCC;
 }
@@ -439,7 +439,7 @@ table.tableinfo{
 	width: 100%;
 	background-color: #AAAAAA;
 	border-spacing: 1px;
-
+	
 /*	border: 1px #AAAAAA dotted; */
 }
 
@@ -522,10 +522,10 @@ table.tableinfo tr td.message {
 table.tableinfo tr.selected td			{	background-color: #FFFFBB; border: 1px #DDDDDD solid; }
 
 table.tableinfo tr.odd_row 	td			{	background-color: #DDDDDD; border: 1px #DDDDDD solid; }
-table.tableinfo tr.odd_row:hover td		{	background-color: #c1dad7; border: 1px #c1dad7 solid; }
+table.tableinfo tr.odd_row:hover td		{	background-color: #BBCCFF; border: 1px #BBCCFF solid; }
 
 table.tableinfo tr.even_row td		 	{	background-color: #EEEEEE; border: 1px #EEEEEE solid; }
-table.tableinfo tr.even_row:hover td		{	background-color: #c1dad7; border: 1px #c1dad7 solid; }
+table.tableinfo tr.even_row:hover td		{	background-color: #BBCCFF; border: 1px #BBCCFF solid; }
 
 table.tableinfo tr td.center				{	vertical-align: middle; text-align: center; }
 
@@ -573,6 +573,15 @@ table.tableinfo tr:hover td.active			{	background-color: #AAD9AA;	border: 1px #A
 
 table.tableinfo tr td.inactive				{	background-color: #FF8888;	border: 1px #FF8888 solid; }
 table.tableinfo tr:hover td.inactive			{	background-color: #FA8388;	border: 1px #FA8388 solid; }
+
+table.tableinfo tr.red						{	background-color: #FFBBBB; border: 1px #FFBBBB solid; }
+table.tableinfo tr.red:hover				{	background-color: #EEAAAA; border: 1px #EEAAAA solid; }
+
+table.tableinfo tr.green					{	background-color: #BBFFBB; border: 1px #BBFFBB solid; }
+table.tableinfo tr.green:hover				{	background-color: #AAEEAA; border: 1px #AAEEAA solid; }
+
+table.tableinfo tr.blue 					{	background-color: #BBBBFF; border: 1px #BBBBFF solid; }
+table.tableinfo tr.blue:hover 				{	background-color: #AAAAEE; border: 1px #AAAAEE solid; }
 
 /****** HEADER *********/
 
@@ -1352,10 +1361,36 @@ table.header_wide tr.next td.header_l{
 
 table.header_wide tr.next td.header_r{
 	background:none;
-	font-family:verdana, arial, helvetica, sans-serif;
-	font-size:10px;
+	font-family: Verdana, Arial, Helvetica, Sans-serif;
+	font-size: 10px;
 	text-align: right;
 	height: 20px;
 	padding-right: 5px;
 	border-width: 0px;
+}
+
+/* Suggest */
+
+table.suggest{
+	width: 100%;
+	margin: 0px;
+	border-spacing: 0px;
+	background-color: #FEFEFE;
+}
+
+table.suggest tr{
+	background-color: #FEFEFE;
+}
+
+table.suggest tr.highlight{
+	background-color: #AACCFF;
+}
+table.suggest tr td{
+	text-align: left;
+	padding-left: 4px;
+
+	line-height: 18px;
+	font-size: 11px;
+
+	cursor: default;
 }

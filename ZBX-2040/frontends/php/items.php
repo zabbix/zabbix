@@ -26,7 +26,7 @@ require_once('include/forms.inc.php');
 
 $page['title'] = 'S_CONFIGURATION_OF_ITEMS';
 $page['file'] = 'items.php';
-$page['scripts'] = array('effects.js');
+$page['scripts'] = array('effects.js', 'class.cviewswitcher.js');
 $page['hist_arg'] = array();
 
 include_once('include/page_header.php');
@@ -161,6 +161,8 @@ include_once('include/page_header.php');
 		'filter_status'=>			array(T_ZBX_INT, O_OPT,  null,  IN('-1,0,1,3'),null),
 		'filter_templated_items'=>	array(T_ZBX_INT, O_OPT,  null,  IN('-1,0,1'),null),
 		'filter_with_triggers'=>	array(T_ZBX_INT, O_OPT,  null,  IN('-1,0,1'),null),
+		'filter_ipmi_sensor' =>		array(T_ZBX_STR, O_OPT,  null,  null,	null),
+		
 // subfilters
 		'subfilter_apps'=>				array(T_ZBX_STR, O_OPT,	 null,	null, null),
 		'subfilter_types'=>				array(T_ZBX_INT, O_OPT,	 null,	null, null),
@@ -183,18 +185,7 @@ include_once('include/page_header.php');
 
 	$_REQUEST['go'] = get_request('go', 'none');
 
-// PERMISSIONS
-	if(get_request('hostid', 0) > 0){
-		$options = array(
-			'hostids' => $_REQUEST['hostid'],
-			'extendoutput' => 1,
-			'templated_hosts' => 1,
-			'editable' => 1
-		);
-		$hosts = CHost::get($options);
-		if(empty($hosts)) access_deny();
-	}
-	
+// PERMISSIONS	
 	if(get_request('itemid', false)){
 		$options = array(
 			'itemids' => $_REQUEST['itemid'],
@@ -203,6 +194,16 @@ include_once('include/page_header.php');
 		);
 		$item = CItem::get($options);
 		if(empty($item)) access_deny();
+	}
+	else if(get_request('hostid', 0) > 0){
+		$options = array(
+			'hostids' => $_REQUEST['hostid'],
+			'extendoutput' => 1,
+			'templated_hosts' => 1,
+			'editable' => 1
+		);
+		$hosts = CHost::get($options);
+		if(empty($hosts)) access_deny();
 	}
 ?>
 <?php
@@ -245,6 +246,7 @@ include_once('include/page_header.php');
 		$_REQUEST['filter_status'] = get_request('filter_status');
 		$_REQUEST['filter_templated_items'] = get_request('filter_templated_items', -1);
 		$_REQUEST['filter_with_triggers'] = get_request('filter_with_triggers', -1);
+		$_REQUEST['filter_ipmi_sensor'] = get_request('filter_ipmi_sensor');
 
 		CProfile::update('web.items.filter_group', $_REQUEST['filter_group'], PROFILE_TYPE_STR);
 		CProfile::update('web.items.filter_host', $_REQUEST['filter_host'], PROFILE_TYPE_STR);
@@ -263,6 +265,7 @@ include_once('include/page_header.php');
 		CProfile::update('web.items.filter_status', $_REQUEST['filter_status'], PROFILE_TYPE_INT);
 		CProfile::update('web.items.filter_templated_items', $_REQUEST['filter_templated_items'], PROFILE_TYPE_INT);
 		CProfile::update('web.items.filter_with_triggers', $_REQUEST['filter_with_triggers'], PROFILE_TYPE_INT);
+		CProfile::update('web.items.filter_ipmi_sensor', $_REQUEST['filter_ipmi_sensor'], PROFILE_TYPE_STR);
 	}
 	else{
 		$_REQUEST['filter_group'] = CProfile::get('web.items.filter_group');
@@ -282,6 +285,7 @@ include_once('include/page_header.php');
 		$_REQUEST['filter_status'] = CProfile::get('web.items.filter_status');
 		$_REQUEST['filter_templated_items'] = CProfile::get('web.items.filter_templated_items', -1);
 		$_REQUEST['filter_with_triggers'] = CProfile::get('web.items.filter_with_triggers', -1);
+		$_REQUEST['filter_ipmi_sensor'] = CProfile::get('web.items.filter_ipmi_sensor');
 	}
 
 	if(isset($_REQUEST['filter_host']) && !zbx_empty($_REQUEST['filter_host'])){
@@ -762,27 +766,15 @@ include_once('include/page_header.php');
 		$form->addVar('form_hostid', $hostid);
 
 // Config
-	$cmbConf = new CComboBox('config', 'items.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
-		$cmbConf->addItem('templates.php',S_TEMPLATES);
-		$cmbConf->addItem('hosts.php',S_HOSTS);
-		$cmbConf->addItem('items.php',S_ITEMS);
-		$cmbConf->addItem('triggers.php',S_TRIGGERS);
-		$cmbConf->addItem('graphs.php',S_GRAPHS);
-		$cmbConf->addItem('applications.php',S_APPLICATIONS);
-	$form->addItem($cmbConf);
 	$form->addItem(array(SPACE, new CButton('form', S_CREATE_ITEM)));
 
 //$items_wdgt->addPageHeader(S_CONFIGURATION_OF_ITEMS_BIG, $form);
 	show_table_header(S_CONFIGURATION_OF_ITEMS_BIG, $form);
 
-	if(isset($_REQUEST['form'])){
-		if(str_in_array($_REQUEST['form'], array(S_CREATE_ITEM, 'update', 'clone')) ||
-			(($_REQUEST['form']=='mass_update') && isset($_REQUEST['group_itemid'])))
-		{
-			insert_item_form();
-		}
+	if(isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], array(S_CREATE_ITEM, 'update', 'clone'))){
+		insert_item_form();
 	}
-	else if(($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['group_itemid'])){
+	else if((($_REQUEST['go'] == 'massupdate') || isset($_REQUEST['massupdate'])) && isset($_REQUEST['group_itemid'])){
 		insert_mass_update_item_form('group_itemid');
 	}
 	else if(($_REQUEST['go'] == 'copy_to') && isset($_REQUEST['group_itemid'])){
@@ -879,6 +871,9 @@ include_once('include/page_header.php');
 
 		if(isset($_REQUEST['filter_with_triggers']) && !zbx_empty($_REQUEST['filter_with_triggers']) && $_REQUEST['filter_with_triggers'] != -1)
 			$options['with_triggers'] = $_REQUEST['filter_with_triggers'];
+			
+		if(isset($_REQUEST['filter_ipmi_sensor']) && !zbx_empty($_REQUEST['filter_ipmi_sensor']))
+			$options['filter']['ipmi_sensor'] = $_REQUEST['filter_ipmi_sensor'];
 
 		$afterFilter = count($options, COUNT_RECURSIVE);
 //} Items Filter
@@ -1198,8 +1193,6 @@ include_once('include/page_header.php');
 	$jsmenu = new CPUMenu(null,200);
 	$jsmenu->InsertJavaScript();
 
-?>
-<?php
 
 include_once('include/page_footer.php');
 

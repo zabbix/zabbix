@@ -262,12 +262,12 @@ static int	process_record(char **sql, int *sql_allocated, int *sql_offset, int s
 		zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 8, "begin\n");
 #endif
 
-#ifdef HAVE_MYSQL
+#ifdef HAVE_MULTIROW_INSERT
 		begin_history_sql(sql, sql_allocated, sql_offset, table);
 #endif
 	}
 
-#ifndef HAVE_MYSQL
+#ifndef HAVE_MULTIROW_INSERT
 	begin_history_sql(sql, sql_allocated, sql_offset, table);
 #endif
 
@@ -276,7 +276,8 @@ static int	process_record(char **sql, int *sql_allocated, int *sql_offset, int s
 		zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 16, "%d,",
 				nodeid);
 
-	for (r = record, f = 0; table->fields[f].name != 0; f++) {
+	for (r = record, f = 0; table->fields[f].name != 0; f++)
+	{
 		if (0 != (table->flags & ZBX_HISTORY_SYNC) && 0 == (table->fields[f].flags & ZBX_HISTORY_SYNC))
 			continue;
 
@@ -323,7 +324,7 @@ static int	process_record(char **sql, int *sql_allocated, int *sql_offset, int s
 
 	(*sql_offset)--;
 
-#ifdef HAVE_MYSQL
+#ifdef HAVE_MULTIROW_INSERT
 	zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 3, "),");
 #else
 	zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 4, ");\n");
@@ -335,7 +336,7 @@ static int	process_record(char **sql, int *sql_allocated, int *sql_offset, int s
 		zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 8, "end;\n");
 #endif
 
-#ifdef HAVE_MYSQL
+#ifdef HAVE_MULTIROW_INSERT
 		(*sql_offset)--;
 		zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 4, ";\n");
 #endif

@@ -69,7 +69,7 @@ include_once 'include/page_header.php';
 
 	if(isset($_REQUEST['save']) && !isset($_REQUEST['gid'])){
 		insert_js("add_bitem('".
-			$_REQUEST['dstfrm']."',".
+			zbx_jsvalue($_REQUEST['dstfrm'])."',".
 			zbx_jsvalue($_REQUEST['caption']).",'".
 			$_REQUEST['itemid']."','".
 			$_REQUEST['color']."',".
@@ -79,8 +79,8 @@ include_once 'include/page_header.php';
 
 	if(isset($_REQUEST['save']) && isset($_REQUEST['gid'])){
 		insert_js("update_bitem('".
-			$_REQUEST['dstfrm']."','".
-			$_REQUEST['list_name']."','".
+			zbx_jsvalue($_REQUEST['dstfrm'])."','".
+			zbx_jsvalue($_REQUEST['list_name'])."','".
 			$_REQUEST['gid']."',".
 			zbx_jsvalue($_REQUEST['caption']).",'".
 			$_REQUEST['itemid']."','".

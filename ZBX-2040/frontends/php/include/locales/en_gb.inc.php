@@ -719,8 +719,7 @@
 	'S_HIDE_UNKNOWN'=>			'Hide unknown',
 	'S_LOG_FILES_SMALL'=>			'log files',
 	'S_REMOVE_SELECTED'=>			'Remove selected',
-	'S_LOG_FILES_LIST'=>			'Log files list',
-
+	'S_ITEMS_LIST'=>				'Items list',
 	'S_SHOW_SELECTED'=>			'Show selected',
 	'S_HIDE_SELECTED'=>			'Hide selected',
 	'S_MARK_SELECTED'=>			'Mark selected',
@@ -823,7 +822,10 @@
 	'S_DELETE_SELECTED_GROUPS'=>		'Delete selected groups',
 
 //	hosts.php
+	'S_IMPORT_TEMPLATE'=>			'Import Template',
+	'S_IMPORT_HOST'=>				'Import Host',
 	'S_MACROS'=>					'Macros',
+	'S_MACRO'=>					'Macro',
 	'S_WRONG_MACRO'=>				'Wrong macro',
 	'S_MACRO_TOO_LONG'=>				'Macro name is too long, should not exceed 64 chars.',
 	'S_MACRO_VALUE_TOO_LONG'=>			'Macro value is too long, should not exceed 255 chars.',
@@ -832,6 +834,8 @@
 	'S_EMPTY_MACRO_VALUE'=>				'Empty macro value',
 	'S_NO_MACROS_DEFINED'=>				'No macros defined',
 	'S_MACRO_ADDED'=>				'Macro added',
+	'S_MACROS_UPDATED'=>				'Macros updated',
+	'S_CANNOT_UPDATE_MACROS'=>				'Cannot update macros',
 	'S_MACROS_DELETED' =>				'Macros deleted',
 	'S_CANNOT_ADD_MACRO'=>				'Cannot add macro',
 	'S_CANNOT_DELETE_MACROS'=>			'Cannot delete macros',
@@ -1516,6 +1520,7 @@
 	'S_WIDTH'=>						'Width',
 	'S_HEIGHT'=>					'Height',
 	'S_CREATE_SCREEN'=>				'Create Screen',
+	'S_CREATE_SLIDESHOW'=>			'Create Slide Show',
 	'S_EDIT'=>						'Edit',
 	'S_DYNAMIC_ITEM'=>				'Dynamic item',
 	'S_DIMENSION_COLS_ROWS'=>		'Dimension (cols x rows)',
@@ -1575,7 +1580,7 @@
 
 //	screens.php
 	'S_CUSTOM_SCREENS'=>			'Custom screens',
-	'S_SCREENS_BIG'=>			'SCREENS',
+	'S_SCREENS_BIG'=>				'SCREENS',
 
 	'S_SLIDESHOW_UPDATED'=>			'Slideshow updated',
 	'S_CANNOT_UPDATE_SLIDESHOW'=>		'Cannot_update slideshow',
@@ -1584,6 +1589,10 @@
 	'S_SLIDESHOW_DELETED'=>			'Slideshow deleted',
 	'S_CANNOT_DELETE_SLIDESHOW'=>		'Cannot delete slideshow',
 	'S_DELETE_SLIDESHOW_Q'=>		'Delete slideshow?',
+
+// slides.php
+	'S_CUSTOM_SLIDES' =>			'Custom slides',
+
 
 //	services.php
 	'S_AVERAGE_PROBLEM'=>			'Average problem',
@@ -1899,7 +1908,7 @@
 	'S_JAPANESE_JP'=>			'Japanese (JP)',
 	'S_CHINESE_CN'=>			'Chinese (CN)',
 	'S_DUTCH_NL'=>				'Dutch (NL)',
-	'S_HUNGARY_HU'=>			'Hungary (HU)',
+	'S_HUNGARY_HU'=>			'Hungarian (HU)',
 	'S_POLISH_PL'=>				'Polish (PL)',
 	'S_UKRAINIAN_UA'=>			'Ukrainian (UA)',
 
@@ -1915,6 +1924,7 @@
 	'S_EXTENDED'=>				'Extended',
 
 //	search.php
+	'S_EDIT_HOSTS' => 'Edit hosts',
 	'S_SEARCH_BIG'=>			'SEARCH',
 	'S_GO'=>				'Go',
 	'S_FOUND_SMALL'=>			'found',
@@ -1970,7 +1980,7 @@
 	'S_TEST_DATA'=>		'Test data',
 	'S_EXPRESSION_VARIABLE_ELEMENTS'=>	'Expression Variable Elements',
 	'S_EXPRESSION_VALUE_TYPE_UNKNOWN'=>	'Unknown variable type, testing not available',
-	'S_EXPRESSION_HOST_UNKNOWN'=>		'Unknown host, no such host presented in system',
+	'S_EXPRESSION_HOST_UNKNOWN'=>		'Unknown host, no such host present in system',
 	'S_EXPRESSION_HOST_ITEM_UNKNOWN'=>	'Unknown host item, no such item in selected host',
 	'S_EXPRESSION_NOT_A_MACRO_ERROR'=>	'Given expression is not a macro',
 	'S_RESULT_TYPE'=>	'Result type',
@@ -2106,6 +2116,7 @@
 	'S_TEMPLATE_WITH_ITEM_KEY'=>			'Template with item key',
 	'S_TEMPLATE_WITH_APPLICATION'=>			'Template with application',
 	'S_ALREADY_LINKED_TO_HOST_SMALL'=>		'already linked to host',
+	'S_HOST_HAS_BEEN_DELETED_MSG'=>			'Host %s has been deleted from the system',
 
 //	validate.inc.php
 	'S_CRITICAL_ERROR'=>				'Critical error',
@@ -2155,9 +2166,9 @@
 	'S_NO_FUNCTION_WITH'=>					'No function with',
 	'S_SPECIFY_THE_CONDITIONAL_EXPR_FOR_THE_TARGET'=>	'Specify the conditional expression for the target.',
 	'S_0_OR_1'=>						'0 or 1',
-	'S_TRIGGER_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR'=>	'At least one item must present in the trigger expression.',
-	'S_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR'=>		'Host does not exists.',
-	'S_EXPRESSION_HOST_KEY_DOES_NOT_ERROR'=>		'Host key does not exists.',
+	'S_TRIGGER_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR'=>	'At least one item must be present in the trigger expression.',
+	'S_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR'=>		'Host does not exist.',
+	'S_EXPRESSION_HOST_KEY_DOES_NOT_ERROR'=>		'Host key does not exist.',
 	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR'=>	'Function \'%s\' does not accept parameters.',
 
 //	page_footer.php
@@ -2185,6 +2196,7 @@
 	'S_FOR_TEMPLATE_GRAPH_SMALL'=>				'for template graph',
 	'S_UPDATED_FOR_HOSTS'=>					'updated for hosts',
 	'S_SKIPPED_COPYING_OF_GRAPH'=>				'Skipped copying of graph',
+	'S_GRAPH_DELETED_FROM_HOSTS'=>				'Graph "%s" deleted from host%s',
 
 //	profiles.inc.php
 	'S_UNABLE_TO_SELECT_CONFIGURATION'=>	'Unable to select configuration',
@@ -2265,7 +2277,9 @@
 	'S_CUSER_ERROR_SESSION_TERMINATED'=>			'Session terminated, please re-login!',
 	'S_CUSER_ERROR_TABLE_USERS_EMPTY'=>			'Table users is empty. Possible database corruption.',
 	'S_CUSER_ERROR_LDAP_MODULE_MISSING'=>			'Probably php-ldap module is missing',
-	'S_CUSER_ERROR_ATTEMP_FAILED'=>				'%1$s failed login attempts logged. Last failed attempt was from %2$s on %3$s.',
+//	'S_CUSER_ERROR_ATTEMP_FAILED'=>						'%1$s failed login attempts logged. Last failed attempt was from %2$s on %3$s.',
+	'S_CUSER_ERROR_FAILED_LOGIN_ATTEMPTS'=>				'failed login attempts logged.',
+	'S_CUSER_ERROR_LAST_FAILED_ATTEMPTS'=>				'Last failed attempt was from',
 	'S_CUSER_ERROR_ONLY_ADMIN_CAN_CREATE_USERS'=>		'Only Super Admins can create Users',
 	'S_CUSER_ERROR_ONLY_ADMIN_CAN_UPDATE_USERS'=>		'Only Super Admins can update Users',
 	'S_CUSER_ERROR_ONLY_ADMIN_CAN_DELETE_USERS'=>		'Only Super Admins can delete Users',
@@ -2285,7 +2299,7 @@
 	'S_CUSER_ERROR_INTERNAL_ZABBIX_ERROR'=>			'Internal zabbix error',
 
 //	config.inc.php
-	'S_CONFIG_NOT_LOGGED_IN_ACCESS_DENIED'=>		'You cannot view this URL as a ',
+	'S_CONFIG_NOT_LOGGED_IN_ACCESS_DENIED'=>		'You cannot view this URL as a',
 	'S_CONFIG_ERROR_YOU_MUST_LOGIN'=>			'You must login to view this page.',
 	'S_CONFIG_NOT_LOGGED_IN_NOTE'=>				'If you think this message is wrong, please consult your administrators about getting the necessary permissions.',
 	'S_CONFIG_ERROR_YOU_ARE_NOT_LOGGED_IN_HEAD'=>		'You are not logged in.',
