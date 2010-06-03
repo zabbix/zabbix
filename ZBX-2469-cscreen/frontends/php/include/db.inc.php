@@ -880,6 +880,9 @@ else {
 		const DBEXECUTE_ERROR = 1;
 		const RESERVEIDS_ERROR = 2;
 
+		const FIELD_TYPE_INT = 'int';
+		const FIELD_TYPE_STR = 'str';
+
 		static $schema = null;
 
 		private static function exception($code, $errors=array()){
@@ -950,8 +953,13 @@ else {
 				$result_ids[$key] = $id;
 
 				foreach($row as $field => $v){
-					if(!isset($table_schema['fields'][$field]))
+					if(!isset($table_schema['fields'][$field])){
 						unset($row[$field]);
+					}
+					else if($table_schema['fields'][$field] == self::FIELD_TYPE_STR){
+						$row[$field] = zbx_dbstr($v);
+					}
+
 				}
 				
 				$sql = 'INSERT INTO '.$table.' ('.$table_schema['key'].','.implode(',',array_keys($row)).')'.
@@ -979,7 +987,12 @@ else {
 			foreach($data as $row){
 				$sql_set = '';
 				foreach($row['values'] as $field => $value){
-					if(!isset($table_schema['fields'][$field])) continue;
+					if(!isset($table_schema['fields'][$field])){
+						continue;
+					}
+					else if($table_schema['fields'][$field] == self::FIELD_TYPE_STR){
+						$value = zbx_dbstr($value);
+					}
 
 					$sql_set .= $field.'='.$value.',';
 				}

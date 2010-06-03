@@ -506,7 +506,7 @@ SDI('/////////////////////////////////');
 				'preservekeys' => 1,
 			));
 			foreach($hostgroups as $id){
-				if(!isset($result[$id])) self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				if(!isset($result[$id])) self::exception(ZBX_API_ERROR_PERMISSIONS, 1);
 			}
 		}
 		if(!empty($hosts)){
@@ -516,7 +516,7 @@ SDI('/////////////////////////////////');
 				'preservekeys' => 1,
 			));
 			foreach($hosts as $id){
-				if(!isset($result[$id])) self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				if(!isset($result[$id])) self::exception(ZBX_API_ERROR_PERMISSIONS, 2);
 			}
 		}
 		if(!empty($graphs)){
@@ -526,7 +526,7 @@ SDI('/////////////////////////////////');
 				'preservekeys' => 1,
 			));
 			foreach($graphs as $id){
-				if(!isset($result[$id])) self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				if(!isset($result[$id])) self::exception(ZBX_API_ERROR_PERMISSIONS, 3);
 			}
 		}
 		if(!empty($items)){
@@ -534,9 +534,10 @@ SDI('/////////////////////////////////');
 				'itemids' => $items,
 				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => 1,
+				'webitems' => 1,
 			));
 			foreach($items as $id){
-				if(!isset($result[$id])) self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				if(!isset($result[$id])) self::exception(ZBX_API_ERROR_PERMISSIONS, 4);
 			}
 		}
 		if(!empty($maps)){
@@ -546,7 +547,7 @@ SDI('/////////////////////////////////');
 				'preservekeys' => 1,
 			));
 			foreach($maps as $id){
-				if(!isset($result[$id])) self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				if(!isset($result[$id])) self::exception(ZBX_API_ERROR_PERMISSIONS, 5);
 			}
 		}
 		if(!empty($screens)){
@@ -556,7 +557,7 @@ SDI('/////////////////////////////////');
 				'preservekeys' => 1,
 			));
 			foreach($screens as $id){
-				if(!isset($result[$id])) self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				if(!isset($result[$id])) self::exception(ZBX_API_ERROR_PERMISSIONS, 6);
 			}
 		}
 	}
@@ -837,10 +838,9 @@ SDI('/////////////////////////////////');
 			}
 		}
 
-
-		DB::insert('screens_items', $insert);
-		DB::update('screens_items', $update);
-		DB::delete(array('table' => 'screens_items', 'where' => DBcondition('screenitemid', $delete)));
+		if(!empty($insert)) DB::insert('screens_items', $insert);
+		if(!empty($update)) DB::update('screens_items', $update);
+		if(!empty($delete)) DB::delete(array('table' => 'screens_items', 'where' => DBcondition('screenitemid', $delete)));
 
 		return true;
 	}
