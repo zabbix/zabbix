@@ -118,8 +118,6 @@
 	if(2 != $_REQUEST['fullscreen'])
 		CProfile::update('web.screens.elementid',$_REQUEST['elementid'], PROFILE_TYPE_ID);
 
-?>
-<?php
 
 	$screens_wdgt = new CWidget();
 	

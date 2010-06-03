@@ -101,7 +101,6 @@ include_once('include/page_header.php');
 ?>
 <?php
 // EXPORT ///////////////////////////////////
-
 	if($EXPORT_DATA){
 		$screens = get_request('screens', array());
 
@@ -151,8 +150,6 @@ include_once('include/page_header.php');
 		}
 		else if(isset($_REQUEST['save'])){
 			if(isset($_REQUEST['screenid'])){
-				// TODO check permission by new value.
-//				$result=update_screen($_REQUEST['screenid'],$_REQUEST['name'],$_REQUEST['hsize'],$_REQUEST['vsize']);
 				$screen = array(
 					'screenid' => $_REQUEST['screenid'],
 					'name' => $_REQUEST['name'],
@@ -160,9 +157,7 @@ include_once('include/page_header.php');
 					'vsize' => $_REQUEST['vsize']
 				);
 				$result = CScreen::update($screen);
-				if(!$result){
-					error(CScreen::resetErrors());
-				}
+
 				$audit_action = AUDIT_ACTION_UPDATE;
 				show_messages($result, S_SCREEN_UPDATED, S_CANNOT_UPDATE_SCREEN);
 			}
@@ -170,18 +165,12 @@ include_once('include/page_header.php');
 				if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 					access_deny();
 
-//				DBstart();
 				$screen = array(
 					'name' => $_REQUEST['name'],
 					'hsize' => $_REQUEST['hsize'],
 					'vsize' => $_REQUEST['vsize']
 				);
 				$result = CScreen::create($screen);
-				if(!$result){
-					error(CScreen::resetErrors());
-				}
-//				add_screen($_REQUEST['name'],$_REQUEST['hsize'],$_REQUEST['vsize']);
-//				$result = DBend();
 
 				$audit_action = AUDIT_ACTION_ADD;
 				show_messages($result, S_SCREEN_ADDED, S_CANNOT_ADD_SCREEN);
@@ -192,32 +181,15 @@ include_once('include/page_header.php');
 				unset($_REQUEST['screenid']);
 			}
 		}
-		if(isset($_REQUEST["delete"])&&isset($_REQUEST["screenid"])){
-			if($screen = get_screen_by_screenid($_REQUEST["screenid"])){
-				DBstart();
-					delete_screen($_REQUEST["screenid"]);
-				$result = DBend();
+		if(isset($_REQUEST['delete']) && isset($_REQUEST['screenid'])){
+			$result = CScreen::delete($_REQUEST['screenid']);
 
-				show_messages($result, S_SCREEN_DELETED, S_CANNOT_DELETE_SCREEN);
-				add_audit_if($result, AUDIT_ACTION_DELETE,AUDIT_RESOURCE_SCREEN," Name [".$screen['name']."] ");
-			}
-			unset($_REQUEST["screenid"]);
-			unset($_REQUEST["form"]);
+			if($result) unset($_REQUEST['screenid'], $_REQUEST['form']);
+			show_messages($result, S_SCREEN_DELETED, S_CANNOT_DELETE_SCREEN);
 		}
 		else if($_REQUEST['go'] == 'delete'){
-			$go_result = true;
-			$screens = get_request('screens', array());
-
-			DBstart();
-			foreach($screens as $screenid){
-				$go_result &= delete_screen($screenid);
-				if(!$go_result) break;
-			}
-			$go_result = DBend($go_result);
-
-			if($go_result){
-				unset($_REQUEST["form"]);
-			}
+			$go_result = CScreen::delete(get_request('screens', array()));
+			if($go_result) unset($_REQUEST['form']);
 			show_messages($go_result, S_SCREEN_DELETED, S_CANNOT_DELETE_SCREEN);
 		}
 	}
