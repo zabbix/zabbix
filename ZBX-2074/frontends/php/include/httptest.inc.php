@@ -81,7 +81,7 @@ require_once('include/items.inc.php');
 				'description'	=> 'Download speed for step \'$2\' of scenario \'$1\'',
 				'key_'		=> 'web.test.in['.$testname.','.$name.',bps]',
 				'type'		=> ITEM_VALUE_TYPE_FLOAT,
-				'units'		=> 'bps',
+				'units'		=> 'Bps',
 				'httpstepitemtype'=> HTTPSTEP_ITEM_TYPE_IN),
 			array(
 				'description'	=> 'Response time for step \'$2\' of scenario \'$1\'',
@@ -288,7 +288,7 @@ require_once('include/items.inc.php');
 					'description'	=> 'Download speed for scenario \'$1\'',
 					'key_'		=> 'web.test.in['.$name.',,bps]',
 					'type'		=> ITEM_VALUE_TYPE_FLOAT,
-					'units'		=> 'bps',
+					'units'		=> 'Bps',
 					'httptestitemtype'=> HTTPSTEP_ITEM_TYPE_IN),
 				array(
 					'description'	=> 'Failed step of scenario \'$1\'',
