@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,338 +21,103 @@
 <?php
 
 class czbxrpc{
-	public static $result;
 
-	public static function call($method, $params, $sessionid=null){
-		global $USER_DETAILS;
-
-		$process = true;
-
-// List of methods without params
+	public static function call($method, $params, $source){
+		
 		$notifications = array(
 			'apiinfo.version' => 1
 		);
-
+		
 		if(is_null($params) && !isset($notifications[$method])){
-			self::$result = array('error' => ZBX_API_ERROR_PARAMETERS);
-			return self::$result;
+			return array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => 'Empty parameters');
 		}
-//-----
 
+		switch($source){
+			case DATA_SOURCE_API:
+				return self::callAPI($method, $params);
+			break;
+			case DATA_SOURCE_JSON:
+				return self::callJSON($method, $params);
+			break;
+		}
+	}
+	
+	public static function auth($method, $params, $sessionid){
+		global $USER_DETAILS;
+		
 		list($resource, $action) = explode('.', $method);
-
-		$without_auth = array('apiinfo.version'); // list of methods which does not require athentication
-
+		
+		$without_auth = array('info.version'); // list of methods which does not require athentication
+		
 		if(!str_in_array($method, $without_auth)){
-// Authentication {{{
 			if(($resource == 'user') && ($action == 'authenticate')){
 				$sessionid = null;
 
 				$options = array(
-							'users' => $params['user'],
-							'extendoutput' => 1,
-							'get_access' => 1
-						);
-				$users = CUser::get($options);
+					'users' => $params['user'],
+					'extendoutput' => 1,
+					'get_access' => 1
+				);
+				$users = API::User()->get($options);
 				$user = reset($users);
 				if($user['api_access'] != GROUP_API_ACCESS_ENABLED){
-					self::$result = array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'No API access');
-					return self::$result;
+					return array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'No API access');
 				}
 			}
 
 			if(empty($sessionid) && (($resource != 'user') || ($action != 'authenticate'))){
-				self::$result = array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'Not authorized');
-				return self::$result;
+				return array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'Not authorized');
 			}
 			else if(!empty($sessionid)){
-				if(!CUser::checkAuthentication(array('sessionid' => $sessionid))){
-					self::$result = array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'Not authorized');
-					return self::$result;
+				if(!API::User()->checkAuthentication(array('sessionid' => $sessionid))){
+					return array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'Not authorized');
 				}
 
 				$options = array(
-						'userids' => $USER_DETAILS['userid'],
-						'extendoutput' => 1,
-						'get_access' => 1
-					);
-				$users = CUser::get($options);
+					'userids' => $USER_DETAILS['userid'],
+					'extendoutput' => 1,
+					'get_access' => 1
+				);
+				$users = API::User()->get($options);
 				$user = reset($users);
 				if($user['api_access'] != GROUP_API_ACCESS_ENABLED){
-					self::$result = array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'No API access');
-					return self::$result;
+					return array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'No API access');
 				}
 			}
-// }}} Authentication
 		}
-
-		if(!method_exists('czbxrpc', $resource)){
-			self::$result = array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => 'Resource ('.$resource.') does not exist');
-			return self::$result;
-		}
-
+		
+		return true;
+	}
+	
+	private static function callJSON($method, $params){	
+		// http bla bla
+	}
+	
+	private static function callAPI($method, $params){	
+		list($resource, $action) = explode('.', $method);
+		
 		$class_name = 'C'.$resource;
+		
+		if(!class_exists($class_name)){
+			return array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => 'Resource ('.$resource.') does not exist');
+		}
+
 		if(!method_exists($class_name, $action)){
-			self::$result = array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => 'Action ('.$action.') does not exist');
-			return self::$result;
+			return array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => 'Action ('.$action.') does not exist');
 		}
 
-		call_user_func(array('czbxrpc', $resource), $action, $params);
-
-		if(self::$result !== false){
-			self::$result = array('result' => self::$result);
+		try{
+			DBstart();
+			$result = call_user_func(array($class_name, $action), $params);
+			DBend(true);
+			
+			return array('result' => $result);
 		}
-		else{
-			self::$result = reset(CZBXAPI::$error);
-		}
-
-	return self::$result;
+		catch(APIException $e){
+			DBend(false);
+			return array('error' => $e->getCode(), 'data' => $e->getErrors(), 'trace' => $e->getTrace());
+		}		
 	}
-
-// APIINFO
-	private static function apiinfo($action, $params){
-
-		CAPIInfo::$error = array();
-
-		switch($action){
-			default:
-			$result = call_user_func(array('CAPIInfo', $action), $params);
-		}
-
-		self::$result = $result;
-	}
-// USER
-	private static function user($action, $params){
-
-		CUser::$error = array();
-
-		switch($action){
-			default:
-			$result = call_user_func(array('CUser', $action), $params);
-		}
-
-		self::$result = $result;
-	}
-
-// HOST GROUP
-	private static function hostgroup($action, $params){
-
-		CHostGroup::$error = array();
-
-		switch($action){
-			default:
-			$result = call_user_func(array('CHostGroup', $action), $params);
-		}
-
-		self::$result = $result;
-	}
-
-// TEMPLATE
-	private static function template($action, $params){
-
-		CTemplate::$error = array();
-
-		switch($action){
-			default:
-			$result = call_user_func(array('CTemplate', $action), $params);
-		}
-
-		self::$result = $result;
-	}
-
-// HOST
-	private static function host($action, $params){
-
-		CHost::$error = array();
-
-		switch($action){
-			default:
-			$result = call_user_func(array('CHost', $action), $params);
-		}
-
-		self::$result = $result;
-	}
-
-// ITEM
-	private static function item($action, $params){
-
-		CItem::$error = array();
-
-		switch($action){
-			default:
-			$result = call_user_func(array('CItem', $action), $params);
-		}
-
-		self::$result = $result;
-	}
-
-// TRIGGER
-	private static function trigger($action, $params){
-
-		CTrigger::$error = array();
-
-		switch($action){
-			default:
-			$result = call_user_func(array('CTrigger', $action), $params);
-		}
-
-		self::$result = $result;
-	}
-
-// GRAPH
-	private static function graph($action, $params){
-
-		CGraph::$error = array();
-
-		switch($action){
-			default:
-			$result = call_user_func(array('CGraph', $action), $params);
-		}
-
-		self::$result = $result;
-	}
-
-// ACTION
-	private static function action($action, $params){
-
-		CAction::$error = array();
-
-		switch($action){
-			default:
-			$result = call_user_func(array('CAction', $action), $params);
-		}
-
-		self::$result = $result;
-	}
-
-// ALERT
-	private static function alert($action, $params){
-
-		CAlert::$error = array();
-
-		switch($action){
-			default:
-			$result = call_user_func(array('CAlert', $action), $params);
-		}
-
-		self::$result = $result;
-	}
-
-// APPLICATION
-	private static function application($action, $params){
-
-		CApplication::$error = array();
-
-		switch($action){
-			default:
-			$result = call_user_func(array('CApplication', $action), $params);
-		}
-
-		self::$result = $result;
-	}
-
-// EVENT
-	private static function event($action, $params){
-
-		CEvent::$error = array();
-
-		switch($action){
-			default:
-			$result = call_user_func(array('CEvent', $action), $params);
-		}
-
-		self::$result = $result;
-	}
-
-// GRAPHITEM
-	private static function graphitem($action, $params){
-
-		CGraphItem::$error = array();
-
-		switch($action){
-			default:
-			$result = call_user_func(array('CGraphItem', $action), $params);
-		}
-
-		self::$result = $result;
-	}
-
-// MAINTENANCE
-	private static function maintenance($action, $params){
-
-		CMaintenance::$error = array();
-
-		switch($action){
-			default:
-			$result = call_user_func(array('CMaintenance', $action), $params);
-		}
-
-		self::$result = $result;
-	}
-
-// MAP
-	private static function map($action, $params){
-
-		CMap::$error = array();
-
-		switch($action){
-			default:
-			$result = call_user_func(array('CMap', $action), $params);
-		}
-
-		self::$result = $result;
-	}
-
-// SCREEN
-	private static function screen($action, $params){
-
-		CScreen::$error = array();
-
-		switch($action){
-			default:
-			$result = call_user_func(array('CScreen', $action), $params);
-		}
-
-		self::$result = $result;
-	}
-
-// SCRIPT
-	private static function script($action, $params){
-
-		CScript::$error = array();
-
-		switch($action){
-			default:
-			$result = call_user_func(array('CScript', $action), $params);
-		}
-
-		self::$result = $result;
-	}
-
-// USERGROUP
-	private static function usergroup($action, $params){
-
-		CUserGroup::$error = array();
-
-		switch($action){
-			default:
-			$result = call_user_func(array('CUserGroup', $action), $params);
-		}
-
-		self::$result = $result;
-	}
-
-// USERMACRO
-	private static function usermacro($action, $params){
-
-		CUserMacro::$error = array();
-
-		switch($action){
-			default:
-			$result = call_user_func(array('CUserMacro', $action), $params);
-		}
-
-		self::$result = $result;
-	}
+	
 }
 ?>

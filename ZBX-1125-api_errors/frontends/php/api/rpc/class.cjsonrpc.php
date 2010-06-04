@@ -97,18 +97,22 @@ private $zbx2json_error_list;
 
 	private function execute($call){
 		if(!isset($call['id'])) $call['id'] = null;  // Notification
-
+		
 		if($this->validate($call)){
 			$method = $call['method'];
-			$params = isset($call['params'])?$call['params']:null;
-			$auth = isset($call['auth'])?$call['auth']:null;
-
-			$result = czbxrpc::call($method, $params, $auth);
+			$params = isset($call['params']) ? $call['params'] : null;
+			$auth = isset($call['auth']) ? $call['auth'] : null;
+			
+			$result = czbxrpc::auth($method, $params, $auth);
+			if($result === true){
+				$result = czbxrpc::call($method, $params, DATA_SOURCE_API);
+			}
+			
 			if(isset($result['result'])){
 				$this->json_success($call['id'], $result['result']);
 			}
 			else{
-				$result['data'] = isset($result['data'])?$result['data']:null;
+				$result['data'] = isset($result['data']) ? $result['data'] : null;
 				$errno = $this->zbx2json_error($result['error']);
 				$this->json_error($call['id'], $errno, $result['data']);
 			}
@@ -140,7 +144,7 @@ private $zbx2json_error_list;
 		$error = $this->error_list[$errno];
 
 		if(!is_null($data))
-			$error['data'] = $data;
+			$error['data'] = zbx_toArray($data);
 
 		$formed_error = array('jsonrpc'=>'2.0', 'error'=> $error, 'id'=>$id);
 
