@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBX-2251] removed error displaying in area of graphics (Maxim Andruhovich / AM)
  - [ZBX-1327] page is now remembered correctly after performing actions (Vedmak)
  - [ZBX-1211] fixed cell spacing in empty cells (Maxim Andruhovich / AM)
  - [ZBX-2372] fixed bug with date in local language, now short and long month names shown correctly (Andruhovich Maxim / AM)
