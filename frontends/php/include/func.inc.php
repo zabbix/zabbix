@@ -22,7 +22,7 @@
 
 /************* PAGING *************/
 function getPagingLine(&$items, $autotrim=true){
-	global $USER_DETAILS;
+	global $USER_DETAILS, $page;
 	$config = select_config();
 
 	$search_limit = '';
@@ -31,7 +31,15 @@ function getPagingLine(&$items, $autotrim=true){
 		$search_limit = '+';
 	}
 
-	$start = get_request('start',0);
+	$start = get_request('start', null);
+	
+	if(is_null($start)){
+		$last_page = CProfile::get('web.paging.lastpage');
+		$start = ($last_page == $page['file']) ? CProfile::get('web.paging.start', 0) : 0;
+	}
+	CProfile::update('web.paging.lastpage', $page['file'], PROFILE_TYPE_STR);
+	CProfile::update('web.paging.start', $start, PROFILE_TYPE_INT);
+	
 	$rows_per_page = $USER_DETAILS['rows_per_page'];
 
 	$cnt_items = count($items);
@@ -60,18 +68,18 @@ function getPagingLine(&$items, $autotrim=true){
 	$table = BR();
 	if($cnt_pages > 1){
 		if($startPage > 1){
-			$page = new CSpan('<< '.S_FIRST, 'darklink');
-			$page->setAttribute('onclick', 'javascript: openPage(0);');
+			$pagespan = new CSpan('<< '.S_FIRST, 'darklink');
+			$pagespan->setAttribute('onclick', 'javascript: openPage(0);');
 
-			$pageline[] = $page;
+			$pageline[] = $pagespan;
 			$pageline[] = '&nbsp;&nbsp;';
 		}
 
 		if($crnt_page > 1){
-			$page = new CSpan('< '.S_PREVIOUS, 'darklink');
-			$page->setAttribute('onclick', 'javascript: openPage('.(($crnt_page-2) * $rows_per_page).');');
+			$pagespan = new CSpan('< '.S_PREVIOUS, 'darklink');
+			$pagespan->setAttribute('onclick', 'javascript: openPage('.(($crnt_page-2) * $rows_per_page).');');
 
-			$pageline[] = $page;
+			$pageline[] = $pagespan;
 			$pageline[] = ' | ';
 		}
 
@@ -79,33 +87,33 @@ function getPagingLine(&$items, $autotrim=true){
 			if($p > $endPage)	break;
 
 			if($p == $crnt_page){
-				$page = new CSpan($p, 'bold textcolorstyles');
+				$pagespan = new CSpan($p, 'bold textcolorstyles');
 			}
 			else{
-				$page = new CSpan($p, 'darklink');
-				$page->setAttribute('onclick', 'javascript: openPage('.(($p-1) * $rows_per_page).');');
+				$pagespan = new CSpan($p, 'darklink');
+				$pagespan->setAttribute('onclick', 'javascript: openPage('.(($p-1) * $rows_per_page).');');
 			}
 
-			$pageline[] = $page;
+			$pageline[] = $pagespan;
 			$pageline[] = ' | ';
 		}
 
 		array_pop($pageline);
 
 		if($crnt_page <  $cnt_pages){
-			$page = new CSpan(S_NEXT.' >', 'darklink');
-			$page->setAttribute('onclick', 'javascript: openPage('.($crnt_page * $rows_per_page).');');
+			$pagespan = new CSpan(S_NEXT.' >', 'darklink');
+			$pagespan->setAttribute('onclick', 'javascript: openPage('.($crnt_page * $rows_per_page).');');
 
 			$pageline[] = ' | ';
-			$pageline[] = $page;
+			$pageline[] = $pagespan;
 		}
 
 		if($p < $cnt_pages){
-			$page = new CSpan(S_LAST.' >>', 'darklink');
-			$page->setAttribute('onclick', 'javascript: openPage('.(($cnt_pages-1) * $rows_per_page).');');
+			$pagespan = new CSpan(S_LAST.' >>', 'darklink');
+			$pagespan->setAttribute('onclick', 'javascript: openPage('.(($cnt_pages-1) * $rows_per_page).');');
 
 			$pageline[] = '&nbsp;&nbsp;';
-			$pageline[] = $page;
+			$pageline[] = $pagespan;
 		}
 
 		$table = new CTable(null, 'paging');
