@@ -52,7 +52,7 @@ static int    check_ldap(const char *host, unsigned short port, int *value_int)
 
 	int	ldapErr = 0;
 
-        assert(NULL != value_int);
+	assert(NULL != value_int);
 
 	*value_int = 0;
 
@@ -149,31 +149,31 @@ static int	check_service(const char *cmd, const char *param, unsigned flags, AGE
 	int		value_int = 0;
 	double		check_time;
 
-        assert(NULL != result);
+	assert(NULL != result);
 
-        init_result(result);
+	init_result(result);
 
 	check_time = zbx_time();
 
-        if (num_param(param) > 3)
+	if (num_param(param) > 3)
 	{
-                return SYSINFO_RET_FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 
 	if (0 != get_param(param, 1, service, MAX_STRING_LEN))
 	{
-                return SYSINFO_RET_FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 
 	if (0 != get_param(param, 2, ip, MAX_STRING_LEN) || '\0' == *ip)
-        {
+	{
 		strscpy(ip, "127.0.0.1");
-        }
+	}
 
 	if (0 != get_param(param, 3, str_port, MAX_STRING_LEN) || '\0' == *str_port)
-        {
+	{
 		port = 0;
-        }
+	}
 	else if (FAIL == is_uint(str_port))
 	{
 		return SYSINFO_RET_FAIL;
