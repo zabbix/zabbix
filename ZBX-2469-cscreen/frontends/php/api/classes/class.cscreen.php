@@ -506,7 +506,7 @@ SDI('/////////////////////////////////');
 				'preservekeys' => 1,
 			));
 			foreach($hostgroups as $id){
-				if(!isset($result[$id])) self::exception(ZBX_API_ERROR_PERMISSIONS, 1);
+				if(!isset($result[$id])) self::exception(ZBX_API_ERROR_PERMISSIONS, S_HOSTGROUP);
 			}
 		}
 		if(!empty($hosts)){
@@ -516,7 +516,7 @@ SDI('/////////////////////////////////');
 				'preservekeys' => 1,
 			));
 			foreach($hosts as $id){
-				if(!isset($result[$id])) self::exception(ZBX_API_ERROR_PERMISSIONS, 2);
+				if(!isset($result[$id])) self::exception(ZBX_API_ERROR_PERMISSIONS, S_HOST);
 			}
 		}
 		if(!empty($graphs)){
@@ -526,7 +526,7 @@ SDI('/////////////////////////////////');
 				'preservekeys' => 1,
 			));
 			foreach($graphs as $id){
-				if(!isset($result[$id])) self::exception(ZBX_API_ERROR_PERMISSIONS, 3);
+				if(!isset($result[$id])) self::exception(ZBX_API_ERROR_PERMISSIONS, S_GRAPH);
 			}
 		}
 		if(!empty($items)){
@@ -537,7 +537,7 @@ SDI('/////////////////////////////////');
 				'webitems' => 1,
 			));
 			foreach($items as $id){
-				if(!isset($result[$id])) self::exception(ZBX_API_ERROR_PERMISSIONS, 4);
+				if(!isset($result[$id])) self::exception(ZBX_API_ERROR_PERMISSIONS, S_ITEM);
 			}
 		}
 		if(!empty($maps)){
@@ -547,7 +547,7 @@ SDI('/////////////////////////////////');
 				'preservekeys' => 1,
 			));
 			foreach($maps as $id){
-				if(!isset($result[$id])) self::exception(ZBX_API_ERROR_PERMISSIONS, 5);
+				if(!isset($result[$id])) self::exception(ZBX_API_ERROR_PERMISSIONS, S_MAP);
 			}
 		}
 		if(!empty($screens)){
@@ -557,7 +557,7 @@ SDI('/////////////////////////////////');
 				'preservekeys' => 1,
 			));
 			foreach($screens as $id){
-				if(!isset($result[$id])) self::exception(ZBX_API_ERROR_PERMISSIONS, 6);
+				if(!isset($result[$id])) self::exception(ZBX_API_ERROR_PERMISSIONS, S_SCREEN);
 			}
 		}
 	}
@@ -680,7 +680,7 @@ SDI('/////////////////////////////////');
 				if(isset($screen['screenitems'])){
 					$update_items = array(
 						'screenids' => $screen['screenid'],
-						'screenitems' => $screen['screenitems'],
+						'screenitems' => zbx_toArray($screen['screenitems']),
 					);
 					self::updateItems($update_items);
 				}
