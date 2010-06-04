@@ -23,7 +23,7 @@ require_once('include/hosts.inc.php');
 require_once('include/triggers.inc.php');
 require_once('include/html.inc.php');
 
-$page['title'] = "S_DASHBOARD_CONFIGURATION";
+$page['title'] = 'S_DASHBOARD_CONFIGURATION';
 $page['file'] = 'dashconf.php';
 $page['hist_arg'] = array();
 $page['scripts'] = array();
@@ -165,17 +165,17 @@ include_once('include/page_header.php');
 
 	if($grpswitch == 1){
 		$options = array(
+			'nodeids' => get_current_nodeid(true),
 			'groupids' => $groupids,
 			'output' => API_OUTPUT_EXTEND
 		);
-
 		$groups = CHostGroup::get($options);
 		order_result($groups, 'name');
 
 		$lstGroups = new CListBox('del_groups[]',null,15);
 		$lstGroups->setAttribute('style', 'width: 200px;');
 		foreach($groups as $gnum => $group){
-			$lstGroups->addItem($group['groupid'], get_node_name_by_elid($group['groupid'], null, ':').$group['name']);
+			$lstGroups->addItem($group['groupid'], get_node_name_by_elid($group['groupid'], true, ':').$group['name']);
 		}
 
 		if(!$filterEnable) $lstGroups->setAttribute('disabled', 'disabled');
