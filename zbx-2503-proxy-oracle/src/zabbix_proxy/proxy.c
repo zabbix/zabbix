@@ -46,12 +46,12 @@
 #include "datasender/datasender.h"
 #include "heart/heart.h"
 
-char *progname = NULL;
-char title_message[] = "Zabbix Proxy";
-char usage_message[] = "[-hV] [-c <file>]";
+const char	*progname = NULL;
+const char	title_message[] = "Zabbix Proxy";
+const char	usage_message[] = "[-hV] [-c <file>]";
 
 #ifndef HAVE_GETOPT_LONG
-char *help_message[] = {
+const char	*help_message[] = {
         "Options:",
         "  -c <file>       Specify configuration file",
         "  -h              give this help",
@@ -59,7 +59,7 @@ char *help_message[] = {
         0 /* end of text */
 };
 #else
-char *help_message[] = {
+const char	*help_message[] = {
         "Options:",
         "  -c --config <file>       Specify configuration file",
         "  -h --help                give this help",
@@ -341,7 +341,7 @@ int main(int argc, char **argv)
 {
 	char    ch      = '\0';
 
-	progname = argv[0];
+	progname = get_program_name(argv[0]);
 
 	/* Parse the command-line. */
 	while ((ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts,NULL)) != (char)EOF)

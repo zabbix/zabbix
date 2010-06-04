@@ -86,7 +86,7 @@ void usage()
  ******************************************************************************/
 void help()
 {
-	char **p = help_message;
+	const char **p = help_message;
 
 	app_title();
 	printf("\n");
