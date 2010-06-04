@@ -938,38 +938,29 @@ char* __zbx_zbx_dsprintf(char *dest, const char *f, ...)
  *            zbx_strdcat(NULL,"") must return "", not NULL!                  *
  *                                                                            *
  ******************************************************************************/
-char* zbx_strdcat(char *dest, const char *src)
+char	*zbx_strdcat(char *dest, const char *src)
 {
-	register int new_len = 0;
-	char *new_dest = NULL;
+	int	len_dest, len_src;
+	char	*new_dest = NULL;
 
-	if(!src)	return dest;
-	if(!dest)	return strdup(src);
+	if (!src)	return dest;
+	if (!dest)	return strdup(src);
 
-	new_len += (int)strlen(dest);
-	new_len += (int)strlen(src);
+	len_dest = (int)strlen(dest);
+	len_src = (int)strlen(src);
 
-	new_dest = zbx_malloc(new_dest, new_len + 1);
+	new_dest = zbx_malloc(new_dest, len_dest + len_src + 1);
 
-	if(dest)
-	{
-		strcpy(new_dest, dest);
-		strcat(new_dest, src);
-		zbx_free(dest);
-	}
-	else
-	{
-		strcpy(new_dest, src);
-	}
-
-	new_dest[new_len] = '\0';
+	strcpy(new_dest, dest);
+	strcpy(new_dest + len_dest, src);
+	zbx_free(dest);
 
 	return new_dest;
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_strdcat                                                      *
+ * Function: zbx_strdcatf                                                     *
  *                                                                            *
  * Purpose: dynamical cating of formated strings                              *
  *                                                                            *
@@ -981,7 +972,7 @@ char* zbx_strdcat(char *dest, const char *src)
  *            zbx_strdcat(NULL,"") must return "", not NULL!                  *
  *                                                                            *
  ******************************************************************************/
-char* __zbx_zbx_strdcatf(char *dest, const char *f, ...)
+char	*__zbx_zbx_strdcatf(char *dest, const char *f, ...)
 {
 	char *string = NULL;
 	char *result = NULL;
