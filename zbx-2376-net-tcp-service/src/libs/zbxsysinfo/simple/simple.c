@@ -165,15 +165,19 @@ static int	check_service(const char *cmd, const char *param, unsigned flags, AGE
                 return SYSINFO_RET_FAIL;
 	}
 
-	if (0 != get_param(param, 2, ip, MAX_STRING_LEN))
+	if (0 != get_param(param, 2, ip, MAX_STRING_LEN) || '\0' == *ip)
         {
 		strscpy(ip, "127.0.0.1");
         }
 
-	if (0 != get_param(param, 3, str_port, MAX_STRING_LEN))
+	if (0 != get_param(param, 3, str_port, MAX_STRING_LEN) || '\0' == *str_port)
         {
 		port = 0;
         }
+	else if (FAIL == is_uint(str_port))
+	{
+		return SYSINFO_RET_FAIL;
+	}
 	else
 		port = (unsigned short)atoi(str_port);
 
