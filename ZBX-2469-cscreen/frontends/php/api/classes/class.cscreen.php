@@ -402,6 +402,7 @@ SDI('/////////////////////////////////');
 // Adding ScreenItems
 		if(!is_null($options['select_screenitems']) && str_in_array($options['select_screenitems'], $subselects_allowed_outputs)){
 			if(!isset($screens_items)){
+				$screens_items = array();
 				$db_sitems = DBselect('SELECT * FROM screens_items WHERE '.DBcondition('screenid', $screenids));
 				while($sitem = DBfetch($db_sitems)){
 					$screens_items[$sitem['screenitemid']] = $sitem;
