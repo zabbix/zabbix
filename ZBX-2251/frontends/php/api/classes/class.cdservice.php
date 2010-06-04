@@ -82,7 +82,7 @@ class CDService extends CZBXAPI{
 
 		$sql_parts = array(
 			'select' => array('dservices' => 'ds.dserviceid'),
-			'from' => array('dservices ds'),
+			'from' => array('dservices' => 'dservices ds'),
 			'where' => array(),
 			'group' => array(),
 			'order' => array(),
@@ -177,8 +177,8 @@ class CDService extends CZBXAPI{
 				$sql_parts['select']['dcheckid'] = 'dc.dcheckid';
 			}
 			
-			$sql_parts['from']['dh'] = 'dhosts dh';
-			$sql_parts['from']['dc'] = 'dchecks dc';
+			$sql_parts['from']['dhosts'] = 'dhosts dh';
+			$sql_parts['from']['dchecks'] = 'dchecks dc';
 
 			$sql_parts['where'][] = DBcondition('dc.dcheckid', $options['dcheckids']);
 			$sql_parts['where']['dhds'] = 'dh.hostid=ds.hostid';
@@ -196,7 +196,7 @@ class CDService extends CZBXAPI{
 				$sql_parts['select']['druleid'] = 'dh.druleid';
 			}
 
-			$sql_parts['from']['dh'] = 'dhosts dh';
+			$sql_parts['from']['dhosts'] = 'dhosts dh';
 
 			$sql_parts['where']['druleid'] = DBcondition('dh.druleid', $options['druleids']);
 			$sql_parts['where']['dhds'] = 'dh.dhostid=ds.dhostid';
@@ -317,7 +317,7 @@ class CDService extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT DISTINCT '.$sql_select.
+		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.
 				' FROM '.$sql_from.
 				' WHERE '.$sql_where.
 				$sql_group.

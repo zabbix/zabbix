@@ -188,12 +188,12 @@ include_once('include/page_header.php');
 			if(infavorites('web.favorite.graphids',$item['itemid'],'itemid')){
 				$icon = new CDiv(SPACE,'iconminus');
 				$icon->setAttribute('title',S_REMOVE_FROM.' '.S_FAVOURITES);
-				$icon->addAction('onclick',new CJSscript("javascript: rm4favorites('itemid','".$_REQUEST['itemid']."',0);"));
+				$icon->addAction('onclick', "javascript: rm4favorites('itemid','".$_REQUEST['itemid']."',0);");
 			}
 			else{
 				$icon = new CDiv(SPACE,'iconplus');
 				$icon->setAttribute('title',S_ADD_TO.' '.S_FAVOURITES);
-				$icon->addAction('onclick',new CJSscript("javascript: add2favorites('itemid','".$_REQUEST['itemid']."');"));
+				$icon->addAction('onclick', "javascript: add2favorites('itemid','".$_REQUEST['itemid']."');");
 			}
 			$icon->setAttribute('id','addrm_fav');
 
@@ -456,11 +456,11 @@ include_once('include/page_header.php');
 // NAV BAR
 		$timeline = array();
 		$timeline['period'] = $period;
-		$timeline['starttime'] = date('YmdHi', get_min_itemclock_by_itemid($item['itemid']));
+		$timeline['starttime'] = date('YmdHis', get_min_itemclock_by_itemid($item['itemid']));
 		$timeline['usertime'] = null;
 
 		if(isset($_REQUEST['stime'])){
-			$timeline['usertime'] = date('YmdHi', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
+			$timeline['usertime'] = date('YmdHis', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 		}
 
 		$objData = array();

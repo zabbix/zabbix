@@ -134,9 +134,9 @@ class CUserMacro extends CZBXAPI{
 		else{
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
 
-			$sql_parts['from']['hg'] = 'hosts_groups hg';
-			$sql_parts['from']['r'] = 'rights r';
-			$sql_parts['from']['ug'] = 'users_groups ug';
+			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sql_parts['from']['rights'] = 'rights r';
+			$sql_parts['from']['users_groups'] = 'users_groups ug';
 			$sql_parts['where']['hgh'] = 'hg.hostid=hm.hostid';
 			$sql_parts['where'][] = 'r.id=hg.groupid ';
 			$sql_parts['where'][] = 'r.groupid=ug.usrgrpid';
@@ -187,7 +187,7 @@ class CUserMacro extends CZBXAPI{
 				$sql_parts['select']['groupid'] = 'hg.groupid';
 			}
 
-			$sql_parts['from']['hg'] = 'hosts_groups hg';
+			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
 			$sql_parts['where']['hgh'] = 'hg.hostid=hm.hostid';
 		}
@@ -205,7 +205,7 @@ class CUserMacro extends CZBXAPI{
 				$sql_parts['select']['templateid'] = 'ht.templateid';
 			}
 
-			$sql_parts['from']['ht'] = 'macros_templates ht';
+			$sql_parts['from']['macros_templates'] = 'macros_templates ht';
 			$sql_parts['where'][] = DBcondition('ht.templateid', $options['templateids']);
 			$sql_parts['where']['hht'] = 'hm.hostid=ht.macroid';
 		}
@@ -284,7 +284,7 @@ class CUserMacro extends CZBXAPI{
 			if(!empty($sql_parts_global['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts_global['order']);
 			$sql_limit = $sql_parts_global['limit'];
 
-			$sql = 'SELECT DISTINCT '.$sql_select.'
+			$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.'
 					FROM '.$sql_from.'
 					WHERE '.DBin_node('gm.globalmacroid', $nodeids).
 					$sql_where.
@@ -505,159 +505,6 @@ class CUserMacro extends CZBXAPI{
 	return $result;
 	}
 
-
-/**
- * add Host Macro
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $macros
- * @param string $macros[0..]['hostid']
- * @param string $macros[0..]['macro']
- * @param string $macros[0..]['value']
- * @return array of object macros
- */
-	public static function create($macros){
-		$macros = zbx_toArray($macros);
-		$hostmacroids = array();
-
-		$result = true;
-
-		self::BeginTransaction(__METHOD__);
-		foreach($macros as $mnum => $macro){
-
-			$hostmacroid = self::getHostMacroObjects(array('hostid' => $macro['hostid'], 'macro' => $macro['macro']));
-			if(!$hostmacroid){
-				$hostmacroid = get_dbid('hostmacro', 'hostmacroid');
-
-				$sql = 'INSERT INTO hostmacro (hostmacroid, hostid, macro, value)
-					VALUES('.$hostmacroid.', '.$macro['hostid'].', '.zbx_dbstr($macro['macro']).', '.zbx_dbstr($macro['value']).')';
-				$result = DBExecute($sql);
-
-				if(!$result) break;
-			}
-			$hostmacroids[] = $hostmacroid;
-		}
-
-		$result = self::EndTransaction($result, __METHOD__);
-
-		if($result){
-			return array('hostmacroids' => $hostmacroids);
-		}
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => null);
-			return false;
-		}
-	}
-
-/**
- * Update host macros, replace all with new ones
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $macros
- * @param string $macros['hostid']
- * @param string $macros['macros'][0..]['macro']
- * @param string $macros['macros'][0..]['value']
- * @return array|boolean
- */
-/*	public static function update($macros){
-		$macros = zbx_toArray($macros);
-		$new_macros = array();
-		$hostmacroids = array();
-		$result = true;
-//------
-		$hostids = array();
-		self::BeginTransaction(__METHOD__);
-		foreach($macros as $mnum => $macro){
-			$hostids[] = $macro['hostid'];
-
-			if(isset($macro['macro']) && isset($macro['value'])){
-				if(CUserMacro::validate($macro)) $new_macros[] = $macro;
-			}
-		}
-
-		$result = DBexecute('DELETE FROM hostmacro WHERE '.DBcondition('hostid', $hostids));
-
-		foreach($new_macros as $mnum => $macro){
-			$hostmacroid = get_dbid('hostmacro', 'hostmacroid');
-
-			$sql = 'INSERT INTO hostmacro (hostmacroid, hostid, macro, value) '.
-				' VALUES('.$hostmacroid.', '.$macro['hostid'].', '.zbx_dbstr($macro['macro']).', '.zbx_dbstr($macro['value']).')';
-			$result = DBExecute($sql);
-
-			if(!$result) break;
-			$hostmacroids[] = $hostmacroid;
-		}
-
-		$result = self::EndTransaction($result, __METHOD__);
-
-		if($result){
-			$upd_macros = self::get(array('hostmacroids'=>$hostmacroids, 'extendoutput'=>1, 'nopermissions'=>1));
-			return $upd_macros;
-		}
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => null);
-			return false;
-		}
-	}
-*/
-/**
- * Update macros values
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $macros
- * @param string $macros['hostid']
- * @param string $macros['macros'][0..]['macro']
- * @param string $macros['macros'][0..]['value']
- * @return array|boolean
- */
-	public static function updateValue($macros){
-		$macros = zbx_toArray($macros);
-		$hostmacroids = array();
-
-		$result = false;
-//------
-
-		self::BeginTransaction(__METHOD__);
-
-		foreach($macros as $mnum => $macro){
-
-			$sql = 'UPDATE hostmacro '.
-					' SET value='.zbx_dbstr($macro['value']).
-					' WHERE hostid='.$macro['hostid'].
-						' AND macro='.zbx_dbstr($macro['macro']);
-			$result = DBExecute($sql);
-
-			if(!$result) break;
-		}
-
-		$result = self::EndTransaction($result, __METHOD__);
-
-		if($result){
-//			$upd_macros = self::get(array('macroids'=>$macroids, 'extendoutput'=>1, 'nopermissions'=>1));
-//			return $upd_macros;
-			return $macros;
-		}
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => null);
-			return false;
-		}
-	}
-
 /**
  * Delete UserMacros
  *
@@ -675,26 +522,24 @@ class CUserMacro extends CZBXAPI{
 		$hostmacros = zbx_toArray($hostmacros);
 		$hostmacroids = zbx_objectValues($hostmacros, 'hostmacroid');
 
-		$result = false;
-//------
+		try{
+			self::BeginTransaction(__METHOD__);
 
-		self::BeginTransaction(__METHOD__);
-		if(!empty($hostmacroids)){
+			if(empty($hostmacroids))
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ hostmacroids ]');
+
 			$sql = 'DELETE FROM hostmacro WHERE '.DBcondition('hostmacroid', $hostmacroids);
-			$result = DBexecute($sql);
-		}
-		else{
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ hostmacroids ]');
-			$result = false;
-		}
+			if(!DBExecute($sql))
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 
-		$result = self::EndTransaction($result, __METHOD__);
-
-		if($result){
+			self::EndTransaction(true, __METHOD__);
 			return array('hostmacroids' => $hostmacroids);
 		}
-		else{
-			self::setError(__METHOD__);
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
 		}
 	}
@@ -714,35 +559,89 @@ class CUserMacro extends CZBXAPI{
  */
 	public static function createGlobal($macros){
 		$macros = zbx_toArray($macros);
+		$macros_macros = zbx_objectValues($macros, 'macro');
 		$globalmacroids = array();
 
-		$result = false;
-//------
+		try{
+			self::BeginTransaction(__METHOD__);
 
-		self::BeginTransaction(__METHOD__);
-		foreach($macros as $mnum => $macro){
+			foreach($macros as $mid => $macro){
+				if(empty($macro['macro']) && empty($macro['value'])) unset($macros[$mid]);
+			}
+				
+			self::validate($macros);
+			
+			$existing = array();
+			$sql = 'SELECT macro FROM globalmacro WHERE '.DBcondition('macro', $macros_macros, false, true);
+			$existing_db = DBselect($sql);
+			while($m = DBfetch($existing_db)){
+				$existing[$m['macro']] = 1;
+			}
 
-			$globalmacroid = get_dbid('globalmacro', 'globalmacroid');
+			foreach($macros as $mnum => $macro){
+				if(isset($existing[$macro['macro']])) continue;
+				
+				$globalmacroids[] = $globalmacroid = get_dbid('globalmacro', 'globalmacroid');
 
-			$sql = 'INSERT INTO globalmacro (globalmacroid, macro, value) '.
-					' VALUES('.$globalmacroid.', '.zbx_dbstr($macro['macro']).', '.zbx_dbstr($macro['value']).')';
-			$result = DBExecute($sql);
+				$values = array(
+					'globalmacroid' => $globalmacroid,
+					'macro' => zbx_dbstr($macro['macro']),
+					'value' => zbx_dbstr($macro['value'])
+				);
+				$sql = 'INSERT INTO globalmacro ('. implode(', ', array_keys($values)) .')'.
+					' VALUES ('. implode(', ', $values) .')';
+				if(!DBExecute($sql))
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+			}
 
-			if(!$result) break;
-			$globalmacroids[] = $globalmacroid;
+			self::EndTransaction(true, __METHOD__);
+			return array('globalmacroids' => $globalmacroids);
 		}
-
-		$result = self::EndTransaction($result, __METHOD__);
-
-		if($result){
-			return array('globalmacroids'=>$globalmacroids);
-		}
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => null);
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
 		}
 	}
 
+	public static function updateGlobal($macros){
+		$macros = zbx_toArray($macros);
+		$macros = zbx_toHash($macros, 'macro');
+		$macros_macros = zbx_objectValues($macros, 'macro');
+		$globalmacroids = array();
+
+		try{
+			self::BeginTransaction(__METHOD__);
+			foreach($macros as $mid => $macro){
+				if(empty($macro['macro']) && empty($macro['value'])) unset($macros[$mid]);
+			}
+			
+			self::validate($macros);
+
+			$sql = 'SELECT globalmacroid, macro FROM globalmacro WHERE '.DBcondition('macro', $macros_macros, false, true);
+			$row_db = DBselect($sql);
+			while($row = DBfetch($row_db)){
+				$sql = 'UPDATE globalmacro SET value='.zbx_dbstr($macros[$row['macro']]['value']).
+					' WHERE macro='.zbx_dbstr($row['macro']);
+				if(!DBexecute($sql))
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+					
+				$globalmacroids[] = $row['globalmacroid'];
+			}			
+
+			self::EndTransaction(true, __METHOD__);
+			return array('globalmacroids' => $globalmacroids);
+		}
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
+			return false;
+		}
+	}
 /**
  * Delete UserMacros
  *
@@ -756,27 +655,30 @@ class CUserMacro extends CZBXAPI{
  * @param array $globalmacroids['globalmacroids']
  * @return boolean
  */
-	public static function deleteGlobalMacro($globalmacros){
+	public static function deleteGlobal($globalmacros){
+
 		$globalmacros = zbx_toArray($globalmacros);
-		$globalmacroids = zbx_objectValues($globalmacros, 'globalmacroid');
+		$globalmacros = zbx_objectValues($globalmacros, 'macro');
 
-		$result = false;
-//------
+		try{
+			self::BeginTransaction(__METHOD__);
 
-		if(!empty($globalmacroids)){
-			$sql = 'DELETE FROM globalmacro WHERE '.DBcondition('globalmacroid', $globalmacroids);
-			$result = DBexecute($sql);
-		}
-		else{
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, S_EMPTY_INPUT_PARAMETER.' [ globalmacroids ]');
-			$result = false;
-		}
+			if(empty($globalmacros))
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ $globalmacroids ]');
 
-		if($result){
-			return array('globalmacroids' => $globalmacroids);
+			$sql = 'DELETE FROM globalmacro WHERE '.DBcondition('macro', $globalmacros, false, true);
+			if(!DBExecute($sql))
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+
+			self::EndTransaction(true, __METHOD__);
+			// return array('globalmacroids' => $globalmacroids);
+			return true;
 		}
-		else{
-			self::setError(__METHOD__);
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
 		}
 	}
@@ -794,26 +696,32 @@ class CUserMacro extends CZBXAPI{
  * @return array|boolean
  */
 	public static function validate($macros){
-		$macros = zbx_toArray($macros);
-		$globalmacroids = array();
+		$tmp = array();
+		foreach($macros as $macro){
+			if(isset($tmp[$macro['macro']]))
+				self::exception(ZBX_API_ERROR_PARAMETERS, '['.$macro['macro'].']: not unique');
+			else
+				$tmp[$macro['macro']] = 1;
+		}
 
-		$result = true;
-//------
+		foreach($macros as $macro){
+			if(zbx_empty($macro['value'])){
+				self::exception(ZBX_API_ERROR_PARAMETERS, '['.$macro['macro'].']: '.S_EMPTY_MACRO_VALUE);
+			}
+			if(zbx_strlen($macro['macro']) > 64){
+				self::exception(ZBX_API_ERROR_PARAMETERS, '['.$macro['macro'].']: '.S_MACRO_TOO_LONG.' > 64');
+			}
 
-		foreach($macros as $mnum => $macro){
+			if(zbx_strlen($macro['value']) > 255){
+				self::exception(ZBX_API_ERROR_PARAMETERS, '['.$macro['macro'].']: '.S_MACRO_VALUE_TOO_LONG.' > 255');
+			}
+
 			if(!preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $macro['macro'])){
-				$result = false;
-				break;
+				self::exception(ZBX_API_ERROR_PARAMETERS, '['.$macro['macro'].']: '.S_WRONG_MACRO);
 			}
 		}
 
-		if($result){
-			return true;
-		}
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => null);
-			return false;
-		}
+		return true;
 	}
 
 /**
@@ -880,7 +788,7 @@ class CUserMacro extends CZBXAPI{
 	}
 
 /**
- * Add Hosts to HostGroups. All Hosts are added to all HostGroups.
+ * Add Macros to Hosts
  *
  * {@source}
  * @access public
@@ -895,9 +803,6 @@ class CUserMacro extends CZBXAPI{
  * @return boolean
  */
 	public static function massAdd($data){
-		$errors = array();
-		$result = true;
-
 		try{
 			$hosts = isset($data['hosts']) ? zbx_toArray($data['hosts']) : null;
 			$hostids = is_null($hosts) ? array() : zbx_objectValues($hosts, 'hostid');
@@ -908,6 +813,11 @@ class CUserMacro extends CZBXAPI{
 			self::BeginTransaction(__METHOD__);
 
 			if(isset($data['macros'])){
+				foreach($data['macros'] as $mid => $macro){
+					if(empty($macro['macro']) && empty($macro['value'])) unset($data['macros'][$mid]);
+				}
+				self::validate($data['macros']);
+				
 				if(isset($data['hosts']) || isset($data['templates'])){
 					$linked = array();
 
@@ -933,7 +843,7 @@ class CUserMacro extends CZBXAPI{
 							$sql = 'INSERT INTO hostmacro (hostmacroid, hostid, macro, value) VALUES ('. implode(', ', $values) .')';
 
 							if(!DBexecute($sql)){
-								throw new APIException(ZBX_API_ERROR_PARAMETERS, 'DB error');
+								self::exception(ZBX_API_ERROR_PARAMETERS, 'DB error');
 							}
 						}
 					}
@@ -953,7 +863,7 @@ class CUserMacro extends CZBXAPI{
 	}
 
 /**
- * Remove Hosts from HostGroups
+ * Remove Macros from Hosts
  *
  * {@source}
  * @access public
@@ -1003,7 +913,7 @@ class CUserMacro extends CZBXAPI{
 	}
 
 /**
- * Remove Hosts from HostGroups
+ * Remove Macros from Hosts
  *
  * {@source}
  * @access public
@@ -1028,6 +938,12 @@ class CUserMacro extends CZBXAPI{
 
 			if(isset($data['macros'])){
 				self::BeginTransaction(__METHOD__);
+				
+				foreach($data['macros'] as $mid => $macro){
+					if(empty($macro['macro']) && empty($macro['value'])) unset($data['macros'][$mid]);
+				}
+				
+				self::validate($data['macros']);
 
 				if(isset($data['hosts']) || isset($data['templates'])){
 					$objectids = array_merge($hostids, $templateids);
@@ -1042,9 +958,8 @@ class CUserMacro extends CZBXAPI{
 					while($row = DBfetch($row_db)){
 						$sql = 'UPDATE hostmacro SET value='.zbx_dbstr($macros[$row['macro']]['value']).
 							' WHERE macro='.zbx_dbstr($row['macro']).' AND hostid='.$row['hostid'];
-
 						if(!DBexecute($sql)){
-							throw new APIException(ZBX_API_ERROR_PARAMETERS, 'DB error');
+							self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 						}
 					}
 				}
@@ -1057,7 +972,9 @@ class CUserMacro extends CZBXAPI{
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
 
-			self::setMethodErrors(__METHOD__, $e->getErrors());
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
 		}
 	}
@@ -1101,11 +1018,11 @@ class CUserMacro extends CZBXAPI{
 
 		$hmacro = array();
 		$obj_options = array(
-				'extendoutput' => 1,
-				'globalmacro' => 1,
-				'nopermissions' => 1,
-				'macros' => $macros
-				);
+			'extendoutput' => 1,
+			'globalmacro' => 1,
+			'nopermissions' => 1,
+			'macros' => $macros
+		);
 		$gmacros = self::get($obj_options);
 
 		$obj_options = array(
@@ -1113,7 +1030,7 @@ class CUserMacro extends CZBXAPI{
 			'preservekeys' => 1,
 			'itemids' => $options['itemid'],
 			'triggerids' => $options['triggerid']
-			);
+		);
 		$hosts = CHost::get($obj_options);
 		$hostids = array_keys($hosts);
 
@@ -1125,7 +1042,7 @@ class CUserMacro extends CZBXAPI{
 				'preservekeys' => 1,
 				'macros' => $macros,
 				'hostids' => $hostids
-				);
+			);
 
 			$tmacros = self::get($obj_options);
 			$hmacros = zbx_array_merge($tmacros, $hmacros);
@@ -1134,7 +1051,7 @@ class CUserMacro extends CZBXAPI{
 				'nopermissions' => 1,
 				'preservekeys' => 1,
 				'hostids' => $hostids
-				);
+			);
 			$hosts = CTemplate::get($obj_options);
 			$hostids = array_keys($hosts);
 		}
@@ -1146,9 +1063,7 @@ class CUserMacro extends CZBXAPI{
 			$result[$macro['macro']] = $macro['value'];
 		}
 
-//SDII($result);
-
-	return $result;
+		return $result;
 	}
 
 	public static function resolveTrigger(&$triggers){

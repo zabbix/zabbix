@@ -199,16 +199,20 @@ function __autoload($class_name){
 			include_once('include/locales/'.$USER_DETAILS['lang'].'.inc.php');
 			process_locales();
 		}
-		
+
 		if($USER_DETAILS['attempt_failed']) {
 			$attemps = bold($USER_DETAILS['attempt_failed']);
 			$attempip = bold($USER_DETAILS['attempt_ip']);
 			$attempdate = bold(zbx_date2str(S_CUSER_ERROR_DATE_FORMAT,$USER_DETAILS['attempt_clock']));
-			error(new CJSscript(sprintf(	S_CUSER_ERROR_ATTEMP_FAILED,
-							$attemps->toString(),
-							$attempip->toString(),
-							$attempdate->toString()
-							)));
+
+			$error_msg = array(
+				$attemps,
+				SPACE.S_CUSER_ERROR_FAILED_LOGIN_ATTEMPTS,SPACE.S_CUSER_ERROR_LAST_FAILED_ATTEMPTS.SPACE,
+				$attempip,
+				SPACE.S_ON_SMALL.SPACE,
+				$attempdate
+			);
+			error(new CSpan($error_msg));
 		}
 	}
 	else{
@@ -275,7 +279,7 @@ function __autoload($class_name){
 			$table->setAlign('center');
 			$table->setHeader(new CCol(S_CONFIG_ERROR_YOU_ARE_NOT_LOGGED_IN_HEAD, 'left'),'header');
 
-			$table->addRow(new CCol(Array(S_CONFIG_NOT_LOGGED_IN_ACCESS_DENIED, bold(ZBX_GUEST_USER), '. ', S_CONFIG_ERROR_YOU_MUST_LOGIN, BR(), S_CONFIG_NOT_LOGGED_IN_NOTE), 'center'));
+			$table->addRow(new CCol(Array(S_CONFIG_NOT_LOGGED_IN_ACCESS_DENIED, SPACE, bold(ZBX_GUEST_USER), '. ', S_CONFIG_ERROR_YOU_MUST_LOGIN, BR(), S_CONFIG_NOT_LOGGED_IN_NOTE), 'center'));
 
 			$url = urlencode($req->toString());
 			$footer = new CCol(
@@ -361,7 +365,7 @@ function __autoload($class_name){
 
 					if(isset($ZBX_MESSAGES) && !empty($ZBX_MESSAGES)){
 						$msg_details = new CDiv(S_DETAILS,'blacklink');
-						$msg_details->setAttribute('onclick',new CJSscript("javascript: ShowHide('msg_messages', IE?'block':'table');"));
+						$msg_details->setAttribute('onclick', "javascript: ShowHide('msg_messages', IE?'block':'table');");
 						$msg_details->setAttribute('title',S_MAXIMIZE.'/'.S_MINIMIZE);
 						array_unshift($row, new CCol($msg_details,'clr'));
 					}
@@ -925,7 +929,7 @@ function __autoload($class_name){
 
 		if(IMAGE_FORMAT_JPEG == $format)	Header( "Content-type:  image/jpeg");
 		if(IMAGE_FORMAT_TEXT == $format)	Header( "Content-type:  text/html");
-		else								Header( "Content-type:  image/png");
+		else					Header( "Content-type:  image/png");
 
 		Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT");
 	}
@@ -1145,10 +1149,10 @@ function __autoload($class_name){
 		$url = $link->getUrl();
 
 		if(($page['type'] != PAGE_TYPE_HTML) && defined('ZBX_PAGE_MAIN_HAT')){
-			$script = new CJSscript("javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
+			$script = "javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');";
 		}
 		else{
-			$script = new CJSscript("javascript: redirect('".$url."');");
+			$script = "javascript: redirect('".$url."');";
 		}
 
 		$col = array(new CSpan($obj,'underline'));

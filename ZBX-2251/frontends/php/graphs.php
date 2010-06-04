@@ -53,8 +53,8 @@ include_once('include/page_header.php');
 		'graphtype'=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN('0,1,2,3'),		'isset({save}) || isset({preview})'),
 		'yaxismin'=>	array(T_ZBX_DBL, O_OPT,	 NULL,	null,	'(isset({save}) || isset({preview}))&&(({graphtype} == 0) || ({graphtype} == 1))'),
 		'yaxismax'=>	array(T_ZBX_DBL, O_OPT,	 NULL,	null,	'(isset({save}) || isset({preview}))&&(({graphtype} == 0) || ({graphtype} == 1))'),
-		'graph3d'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	IN('0,1'),		null),
-		'legend'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	IN('0,1'),		null),
+		'graph3d'=>		array(T_ZBX_INT, O_OPT,	P_NZERO,	IN('0,1'),		null),
+		'legend'=>		array(T_ZBX_INT, O_OPT,	P_NZERO,	IN('0,1'),		null),
 		'ymin_itemid'=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,	'(isset({save}) || isset({preview}))&&isset({ymin_type})&&({ymin_type}==3)'),
 		'ymax_itemid'=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,	'(isset({save}) || isset({preview}))&&isset({ymax_type})&&({ymax_type}==3)'),
 		'percent_left'=>	array(T_ZBX_DBL, O_OPT,	 NULL,	BETWEEN(0,100),	null),
@@ -95,19 +95,27 @@ include_once('include/page_header.php');
 	$_REQUEST['go'] = get_request('go', 'none');
 
 // PERMISSIONS
-	if(get_request('graphid',0) > 0){
+	if(get_request('graphid', false)){
 		$options = array(
 			'nodeids' => get_current_nodeid(true),
 			'graphids' => $_REQUEST['graphid'],
 			'editable' => 1
 		);
 		$graphs = CGraph::get($options);
-
 		if(empty($graphs)) access_deny();
+	}
+	else if(get_request('hostid', 0) > 0){
+		$options = array(
+			'hostids' => $_REQUEST['hostid'],
+			'extendoutput' => 1,
+			'templated_hosts' => 1,
+			'editable' => 1
+		);
+		$hosts = CHost::get($options);
+		if(empty($hosts)) access_deny();
 	}
 ?>
 <?php
-
 	$_REQUEST['items'] = get_request('items', array());
 	$_REQUEST['group_gid'] = get_request('group_gid', array());
 	$_REQUEST['graph3d'] = get_request('graph3d', 0);
@@ -370,8 +378,8 @@ include_once('include/page_header.php');
 ?>
 <?php
 	$options = array(
-		'groups' => array('not_proxy_hosts' => 1, 'with_graphs' => 1, 'editable' => 1),
-		'hosts' => array('with_graphs' => 1, 'editable' => 1),
+		'groups' => array('not_proxy_hosts' => 1, 'editable' => 1),
+		'hosts' => array('editable' => 1, 'templated_hosts' => 1),
 		'groupid' => get_request('groupid', null),
 		'hostid' => get_request('hostid', null),
 	);
@@ -384,16 +392,6 @@ include_once('include/page_header.php');
 	$form = new CForm(null, 'get');
 
 // Config
-	$cmbConf = new CComboBox('config','graphs.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
-		$cmbConf->addItem('templates.php',S_TEMPLATES);
-		$cmbConf->addItem('hosts.php',S_HOSTS);
-		$cmbConf->addItem('items.php',S_ITEMS);
-		$cmbConf->addItem('triggers.php',S_TRIGGERS);
-		$cmbConf->addItem('graphs.php',S_GRAPHS);
-		$cmbConf->addItem('applications.php',S_APPLICATIONS);
-
-	$form->addItem($cmbConf);
-
 	if(!isset($_REQUEST['form']))
 		$form->addItem(new CButton('form', S_CREATE_GRAPH));
 
@@ -458,30 +456,33 @@ include_once('include/page_header.php');
 			S_HEIGHT,
 			make_sorting_header(S_GRAPH_TYPE,'graphtype')));
 
+// get Graphs
+		$graphs = array();
 
 		$sortfield = getPageSortField('description');
 		$sortorder = getPageSortOrder();
-		$options = array(
-			'editable' => 1,
-			'extendoutput' => 1,
-			'sortfield' => $sortfield,
-			'sortorder' => $sortorder,
-			'limit' => ($config['search_limit']+1)
-		);
+
 		if($pageFilter->hostsSelected){
+			$options = array(
+				'editable' => 1,
+				'extendoutput' => 1,
+				'sortfield' => $sortfield,
+				'sortorder' => $sortorder,
+				'limit' => ($config['search_limit']+1)
+			);
+		
 			if($pageFilter->hostid > 0)
 				$options['hostids'] = $pageFilter->hostid;
 			else if($pageFilter->groupid > 0)
 				$options['groupids'] = $pageFilter->groupid;
-		}
-		else{
-			$options['hostids'] = array();
-		}
-		$graphs = CGraph::get($options);
 
+			$graphs = CGraph::get($options);
+		}
+		
+// sorting && paging
 		order_result($graphs, $sortfield, $sortorder);
 		$paging = getPagingLine($graphs);
-
+//----
 
 		$graphids = zbx_objectValues($graphs, 'graphid');
 		$options = array(
