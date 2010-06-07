@@ -681,7 +681,7 @@ SDI('/////////////////////////////////');
 				if(isset($screen['screenitems'])){
 					$update_items = array(
 						'screenids' => $screen['screenid'],
-						'screenitems' => zbx_toArray($screen['screenitems']),
+						'screenitems' => $screen['screenitems'],
 					);
 					self::updateItems($update_items);
 				}
@@ -748,7 +748,6 @@ SDI('/////////////////////////////////');
  * @return boolean
  */
 	protected static function addItems($screenitems){
-		$screenitems = zbx_toArray($screenitems);
 		$insert = array();
 
 		self::checkItems($screenitems);
