@@ -25,3 +25,5 @@ alter table items modify logtimefmt              nvarchar2(64)           DEFAULT
 alter table items modify delay_flex              nvarchar2(255)          DEFAULT '';
 alter table items modify params          nvarchar2(2048)         DEFAULT '';
 alter table items modify ipmi_sensor             nvarchar2(128)          DEFAULT '';
+
+UPDATE items SET units='Bps' WHERE type=9 AND units='bps';
