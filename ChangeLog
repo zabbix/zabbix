@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBX-2486] fixed syntax error in 1.6 PostgreSQL upgrade script (asaveljevs)
  - [ZBX-2336] fixed 'system.hostname' being empty on Windows hosts with names longer than 15 characters (asaveljevs)
  - [ZBX-2251] removed error displaying in area of graphics (Maxim Andruhovich / AM)
  - [ZBX-1327] page is now remembered correctly after performing actions (Vedmak)
