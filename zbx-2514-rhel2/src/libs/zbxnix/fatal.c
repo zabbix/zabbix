@@ -19,8 +19,12 @@
 
 #include "config.h"
 
-#ifdef	HAVE_SYS_UCONTEXT_H
+#ifdef	HAVE_SIGNAL_H
 #	define	_GNU_SOURCE /* required for getting at program counter */
+#	include <signal.h>
+#endif
+
+#ifdef	HAVE_SYS_UCONTEXT_H
 #	include <sys/ucontext.h>
 #endif
 
