@@ -52,3 +52,5 @@ alter table items_tmp rename to items;
 CREATE UNIQUE INDEX items_1 on items (hostid,key_);
 CREATE INDEX items_3 on items (status);
 CREATE INDEX items_4 on items (templateid);
+
+UPDATE items SET units='Bps' WHERE type=9 AND units='bps';
