@@ -82,28 +82,12 @@ static struct zbx_option longopts[] =
 	{"help",	0,	0,	'h'},
 	{"new-nodeid",	1,	0,	'n'},
 	{"version",	0,	0,	'V'},
-
-#if defined (_WINDOWS)
-
-	{"install",	0,	0,	'i'},
-	{"uninstall",	0,	0,	'd'},
-
-	{"start",	0,	0,	's'},
-	{"stop",	0,	0,	'x'},
-
-#endif /* _WINDOWS */
-
 	{0,0,0,0}
 };
 
 /* short options */
 
-static char	shortopts[] =
-	"c:n:hV"
-#if defined (_WINDOWS)
-	"idsx"
-#endif /* _WINDOWS */
-	;
+static char	shortopts[] = "c:n:hV";
 
 /* end of COMMAND LINE OPTIONS*/
 
@@ -674,27 +658,27 @@ int MAIN_ZABBIX_ENTRY(void)
 
 void	zbx_on_exit()
 {
-#if !defined(_WINDOWS)
-
-	int i = 0;
+	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called");
 
 	if (threads != NULL)
 	{
+		int	i;
+
 		for (i = 1; i <= CONFIG_DBCONFIG_FORKS + CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS
 				+ CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS + CONFIG_HOUSEKEEPER_FORKS
 				+ CONFIG_TIMER_FORKS + CONFIG_NODEWATCHER_FORKS + CONFIG_HTTPPOLLER_FORKS
 				+ CONFIG_DISCOVERER_FORKS + CONFIG_DBSYNCER_FORKS + CONFIG_ESCALATOR_FORKS
 				+ CONFIG_IPMIPOLLER_FORKS; i++)
 		{
-			if (threads[i]) {
+			if (threads[i])
+			{
 				kill(threads[i], SIGTERM);
 				threads[i] = (ZBX_THREAD_HANDLE)NULL;
 			}
 		}
+
 		zbx_free(threads);
 	}
-
-#endif /* not _WINDOWS */
 
 #ifdef USE_PID_FILE
 
@@ -717,8 +701,6 @@ void	zbx_on_exit()
 	free_ipmi_handler();
 #endif
 
-	zabbix_close_log();
-
 #ifdef  HAVE_SQLITE3
 	php_sem_remove(&sqlite_access);
 #endif /* HAVE_SQLITE3 */
@@ -726,6 +708,8 @@ void	zbx_on_exit()
 	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Server stopped. Zabbix %s (revision %s).",
 			ZABBIX_VERSION,
 			ZABBIX_REVISION);
+
+	zabbix_close_log();
 
 	exit(SUCCEED);
 }

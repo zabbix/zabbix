@@ -888,9 +888,9 @@ int	regexp_match_ex(ZBX_REGEXP *regexps, int regexps_num, const char *string, co
 int	is_ip4(const char *ip);
 
 int	cmp_double(double a,double b);
-int     zbx_get_field(char *line, char *result, int num, char delim);
+int	zbx_get_field(char *line, char *result, int num, char delim);
 
-void	zbx_on_exit();
+void	zbx_on_exit(); /* calls exit() at the end! */
 
 int	get_nodeid_by_id(zbx_uint64_t id);
 
