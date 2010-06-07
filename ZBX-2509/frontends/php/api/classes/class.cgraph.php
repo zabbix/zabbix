@@ -599,10 +599,10 @@ COpt::memoryPick();
 				
 // check ymin, ymax items
 				$axis_items = array();
-				if($graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE){
+				if(isset($graph['ymin_type']) && ($graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE)){
 					$axis_items[] = $graph['ymin_itemid'];
 				}
-				if($graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE){
+				if(isset($graph['ymax_type']) && ($graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE)){
 					$axis_items[] = $graph['ymax_itemid'];
 				}
 				self::checkAxisItems($axis_items, $templated_graph);
