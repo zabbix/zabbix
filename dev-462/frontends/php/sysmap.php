@@ -139,8 +139,8 @@ include_once('include/page_header.php');
 						$action .= 'ZBX_SYSMAPS['.$cmapid.'].map.add_link('.zbx_jsvalue($link).'); '."\n";
 					}
 
-					$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.update_mapimg(); '."\n";
-					$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.update_selements_icon(); '."\n";
+					$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.updateMapImage(); '."\n";
+					$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.updateSelementsIcon(); '."\n";
 
 					print($action);
 					break;
@@ -148,9 +148,9 @@ include_once('include/page_header.php');
 					$options = array(
 							'sysmapids'=> $sysmapid,
 							'editable'=>1,
-							'extendoutput'=>1,
-							'select_selements'=>1,
-							'select_links'=>1
+							'output'=> API_OUTPUT_EXTEND,
+							'select_selements'=>API_OUTPUT_EXTEND,
+							'select_links'=>API_OUTPUT_EXTEND
 						);
 					$sysmaps = CMap::get($options);
 					if(empty($sysmaps)) print('alert("Access denied!");');
@@ -182,11 +182,12 @@ include_once('include/page_header.php');
 							}
 							if(isset($selement['new'])){
 								$selement['sysmapid'] = $sysmapid;
-								$selementid = CMap::addElements($selement);
+								$selementids = CMap::addElements($selement);
+								$selementid = reset($selementids);
 
 								foreach($links as $id => $link){
-									if($link['selementid1'] == $selement['selementid']) $links[$id]['selementid1']=$selementid;
-									else if($link['selementid2'] == $selement['selementid']) $links[$id]['selementid2']=$selementid;
+									if($link['selementid1'] == $selement['selementid']) $links[$id]['selementid1'] = $selementid;
+									else if($link['selementid2'] == $selement['selementid']) $links[$id]['selementid2'] = $selementid;
 								}
 							}
 							else{
@@ -261,7 +262,7 @@ include_once('include/page_header.php');
 
 					$action = '';
 					$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.add_selement('.zbx_jsvalue($selement).',1);';
-//					$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.update_mapimg();';
+//					$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.updateMapImage();';
 
 					print($action);
 				break;
@@ -280,7 +281,7 @@ include_once('include/page_header.php');
 
 						$action = '';
 						$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.add_selement('.zbx_jsvalue($selement).',1);';
-						$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.update_mapimg();';
+						$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.updateMapImage();';
 						$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.show_selement_list();';
 
 						print($action);
@@ -332,15 +333,9 @@ include_once('include/page_header.php');
 	$el_rmv = new CDiv(SPACE,'iconminus');
 	$el_rmv->setAttribute('title',S_REMOVE_ELEMENT);
 	$el_rmv->setAttribute('id','selement_rmv');
-
 //-----------------
 
 // CONNECTORS
-//		echo BR;
-//		show_table_header("CONNECTORS", new CButton("form","Create connection","return Redirect('".$page["file"]."?form=add_link".url_param("sysmapid")."');"));
-
-//		$table->Show();
-
 	$cn_add = new CDiv(SPACE,'iconplus');
 	$cn_add->setAttribute('title',S_ADD_LINK);
 	$cn_add->setAttribute('id','link_add');
@@ -348,7 +343,19 @@ include_once('include/page_header.php');
 	$cn_rmv = new CDiv(SPACE,'iconminus');
 	$cn_rmv->setAttribute('title',S_REMOVE_LINK);
 	$cn_rmv->setAttribute('id','link_rmv');
+//------------------------
 
+// GRID
+	$gr_add = new CDiv(SPACE,'iconplus');
+	$gr_add->setAttribute('title',S_ADD_LINK);
+	$gr_add->setAttribute('id','link_add');
+
+	$gr_rmv = new CDiv(SPACE,'iconminus');
+	$gr_rmv->setAttribute('title',S_REMOVE_LINK);
+	$gr_rmv->setAttribute('id','link_rmv');
+//------------------------
+
+// Side Menu
 	$elcn_tab = new CTable();
 	$elcn_tab->addRow(array(bold('E'),bold('L')));
 	$elcn_tab->addRow(array($el_add,$cn_add));
@@ -356,13 +363,41 @@ include_once('include/page_header.php');
 
 	$td = new CCol($elcn_tab);
 	$td->setAttribute('valign','top');
-//------------------------\
-
+//----
 	$save_btn = new CButton('save',S_SAVE);
 	$save_btn->setAttribute('id','sysmap_save');
 
 	$elcn_tab = new CTable(null,'textwhite');
-	$elcn_tab->addRow(array(S_ELEMENT.'[',$el_add,$el_rmv,']',SPACE,SPACE,S_LINK.'[',$cn_add,$cn_rmv,']'));
+	$menuRow = array();
+
+	$gridShow = new CSpan(S_HIDE, 'whitelink');
+	$gridShow->setAttribute('id', 'gridshow');
+
+	$gridAutoAlign = new CSpan(S_OFF,'whitelink');
+	$gridAutoAlign->setAttribute('id', 'gridautoalign');
+
+
+	$gridSize = new CComboBox('gridsize');
+	$gridSize->addItem('20x20', '20x20');
+	$gridSize->addItem('40x40', '40x40');
+	$gridSize->addItem('50x50', '50x50', 1);
+	$gridSize->addItem('75x75', '75x75');
+	$gridSize->addItem('100x100', '100x100');
+
+	$gridAlignAll = new CButton('gridalignall', S_ALIGN_ICONS);
+	$gridAlignAll->setAttribute('id', 'gridalignall');
+
+	$gridForm = new CDiv(array($gridSize, $gridAlignAll));
+	$gridForm->setAttribute('id', 'gridalignblock');
+
+	array_push($menuRow, S_ICON.'[',$el_add,$el_rmv,']');
+	array_push($menuRow, SPACE.SPACE);
+	array_push($menuRow, S_LINK.'[',$cn_add,$cn_rmv,']');
+	array_push($menuRow, SPACE.SPACE);
+	array_push($menuRow, S_GRID.'[',$gridShow,'|',$gridAutoAlign,']');
+	array_push($menuRow, SPACE, $gridForm);
+
+	$elcn_tab->addRow($menuRow);
 //	show_table_header($map['name'], $save_btn);
 	show_table_header($elcn_tab, $save_btn);
 
@@ -385,6 +420,9 @@ include_once('include/page_header.php');
 
 	zbx_add_post_js('create_map("sysmap_cnt", "'.$sysmap['sysmapid'].'");');
 
+?>
+<?php
 
 include_once('include/page_footer.php');
+
 ?>

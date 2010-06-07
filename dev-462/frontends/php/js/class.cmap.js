@@ -39,13 +39,13 @@ function create_map(container,sysmapid,id){
 	ZBX_SYSMAPS[id].map = new Cmap(container,sysmapid,id);
 }
 
-var Cmap = Class.create();
-
-Cmap.prototype = {
+var Cmap = Class.create(CDebug,{
 id:	null,							// own id
 sysmapid: null,						// sysmapid
 container: null,					// selements and links HTML container (D&D droppable area)
 mapimg: null,						// HTML element map img
+
+grid: null,							// grid object
 
 selements: {},						// map selements array
 links:	{},							// map links array
@@ -58,28 +58,25 @@ selection: {
 
 menu_active: 0,						// To recognize D&D
 
-debug_status: 0,					// debug status: 0 - off, 1 - on, 2 - SDI;
-debug_info: '',						// debug string
-
 mselement: {
-	selementid: 	0,			// ALWAYS must be a STRING (js doesn't support uint64) 
-	elementtype:	4,			// 5-UNDEFINED
-	elementid: 		0,			// ALWAYS must be a STRING (js doesn't support uint64) 
-	elementName:	'',			// element name
-	iconid_off:		0,			// ALWAYS must be a STRING (js doesn't support uint64)
-	iconid_on:		0,			// ALWAYS must be a STRING (js doesn't support uint64)
-	iconid_unknown:	0,			// ALWAYS must be a STRING (js doesn't support uint64)
-	iconid_maintenance:0,		// ALWAYS must be a STRING (js doesn't support uint64)
-	iconid_disabled:0,			// ALWAYS must be a STRING (js doesn't support uint64)
-	label:			locale['S_NEW_ELEMENT'],	// Element label
-	label_expanded: locale['S_NEW_ELEMENT'],	// Element label macros expanded
-	label_location:	3,
-	x:				0,
-	y:				0,
-	url:			'',	
-	html_obj:		null,			// reference to html obj
-	html_objid:		null,			// html elements id
-	selected:		0				// element is not selected
+	selementid:			0,			// ALWAYS must be a STRING (js doesn't support uint64)
+	elementtype:		4,			// 5-UNDEFINED
+	elementid:			0,			// ALWAYS must be a STRING (js doesn't support uint64)
+	elementName:		'',			// element name
+	iconid_off:			0,			// ALWAYS must be a STRING (js doesn't support uint64)
+	iconid_on:			0,			// ALWAYS must be a STRING (js doesn't support uint64)
+	iconid_unknown:		0,			// ALWAYS must be a STRING (js doesn't support uint64)
+	iconid_maintenance:	0,		// ALWAYS must be a STRING (js doesn't support uint64)
+	iconid_disabled:	0,			// ALWAYS must be a STRING (js doesn't support uint64)
+	label:				locale['S_NEW_ELEMENT'],	// Element label
+	label_expanded:		locale['S_NEW_ELEMENT'],	// Element label macros expanded
+	label_location:		3,
+	x:					0,
+	y:					0,
+	url:				'',
+	html_obj:			null,			// reference to html obj
+	html_objid:			null,			// html elements id
+	selected:			0				// element is not selected
 },
 
 mlink: {
@@ -107,10 +104,10 @@ mlinktrigger: {
 selementForm:		{},					// container for Selement form dom objects
 linkForm:			{},					// container for link form dom objects
 
-initialize: function(container, sysmapid, id){
-	this.debug('initialize');
-
+initialize: function($super, container, sysmapid, id){
 	this.id = id;
+	$super('CMap['+id+']');
+
 	this.container = $(container);
 
 	if(is_null(this.container)){
@@ -124,7 +121,32 @@ initialize: function(container, sysmapid, id){
 	
 	if(typeof(sysmapid) != 'undefined'){
 		this.sysmapid = sysmapid;
-		this.get_sysmap_by_sysmapid(this.sysmapid);
+
+// add event listeners
+// sysmap
+		addListener($('sysmap_save'), 'click', this.saveSysmap.bindAsEventListener(this), false);
+
+// grid
+		var gridCtrlElemetns = {
+			'gridsize': $('gridsize'),
+			'gridautoalign': $('gridautoalign'),
+			'gridshow': $('gridshow'),
+			'gridalignall': $('gridalignall')
+		}
+		
+		this.grid = new CGrid(this.id, gridCtrlElemetns);
+
+// selement
+		addListener($('selement_add'), 'click', this.addNewElement.bindAsEventListener(this), false);
+		addListener($('selement_rmv'), 'click', this.remove_selements.bindAsEventListener(this), false);
+// link
+		addListener($('link_add'), 'click', this.add_empty_link.bindAsEventListener(this), false);
+		addListener($('link_rmv'), 'click', this.remove_links.bindAsEventListener(this), false);
+
+
+//------
+
+		this.getSysmapBySysmapid(this.sysmapid);
 	}
 	
 	Position.includeScrollOffsets = true;
@@ -132,19 +154,8 @@ initialize: function(container, sysmapid, id){
 
 
 // SYSMAP
-get_sysmap_by_sysmapid: function(sysmapid){
-	this.debug('get_sysmap_by_sysmapid');
-
-	var url = new Curl(location.href);
-	
-	addListener($('selement_add'), 'click', this.add_empty_selement.bindAsEventListener(this), false);
-	addListener($('selement_rmv'), 'click', this.remove_selements.bindAsEventListener(this), false);
-
-	addListener($('link_add'), 'click', this.add_empty_link.bindAsEventListener(this), false);
-	addListener($('link_rmv'), 'click', this.remove_links.bindAsEventListener(this), false);
-
-	addListener($('sysmap_save'), 'click', this.save_sysmap.bindAsEventListener(this), false);
-//	this.add_mapimg();
+getSysmapBySysmapid: function(sysmapid){
+	this.debug('getSysmapBySysmapid');
 
 	var url = new Curl(location.href);
 	var params = {
@@ -165,8 +176,8 @@ get_sysmap_by_sysmapid: function(sysmapid){
 	);
 },
 
-dragend_sysmap_update: function(dragable,e){
-	this.debug('dragend_sysmap_update');
+sysmapUpdate: function(dragable,e){
+	this.debug('sysmapUpdate');
 	
 	this.deactivate_menu();
 	
@@ -178,20 +189,21 @@ dragend_sysmap_update: function(dragable,e){
 	pos.x = parseInt(element.style.left,10);
 	pos.y = parseInt(element.style.top,10);
 
-	this.selements[selementid].x = pos.x;
 	this.selements[selementid].y = pos.y;
-	
-	this.update_mapimg();
+	this.selements[selementid].x = pos.x;
+
+
+	this.alignSelement(selementid);
+	this.updateMapImage();
 //	alert(id+' : '+this.selementids[id]);
 },
-
 
 // ---------- FORMS ------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------
 
 //ELEMENTS
-add_empty_selement: function(){
-	this.debug('add_empty_selement');
+addNewElement: function(){
+	this.debug('addNewElement');
 	
 //	var selement = this.mselement;
 	
@@ -247,7 +259,7 @@ add_empty_link: function(e){
 		this.info(locale['S_TWO_ELEMENTS_SHOULD_BE_SELECTED']);
 		return false;
 	}
-		
+
 	var mlink = {};
 	for(var key in this.mlink){
 		mlink[key] = this.mlink[key];
@@ -278,8 +290,8 @@ add_empty_linktrigger: function(linkid){
 },
 
 // SYSMAP FORM
-save_sysmap: function(){
-	this.debug('save_sysmap');
+saveSysmap: function(){
+	this.debug('saveSysmap');
 	
 	var url = new Curl(location.href);	
 	var params = {
@@ -290,7 +302,7 @@ save_sysmap: function(){
 	}
 	
 	params = this.get_update_params(params);
-
+//SDJ(params);
 	new Ajax.Request(url.getPath()+'?output=ajax'+'&sid='+url.getArgument('sid'),
 					{
 						'method': 'post',
@@ -369,6 +381,33 @@ select_selement: function(selementid, multi){
 return false;
 },
 
+alignSelement: function(selementid){
+	this.debug('placeSelement');
+//--
+
+	if(!this.grid.autoAlign) return true;
+
+	if(!isset(selementid, this.selements) || empty(this.selements[selementid])) return false;
+
+	var selement = 	this.selements[selementid];
+	
+	var dims = getDimensions(selement.html_obj);
+	var shiftX = Math.round(dims.width / 2);
+	var shiftY = Math.round(dims.height / 2);
+
+	var newX = parseInt(selement.x, 10) + shiftX;
+	var newY = parseInt(selement.y, 10) + shiftY;
+	
+	newX = Math.floor(newX / this.grid.gridSize) * this.grid.gridSize;
+	newY = Math.floor(newY / this.grid.gridSize) * this.grid.gridSize;
+
+	this.selements[selementid].y = newY;
+	this.selements[selementid].x = newX;
+
+	this.selements[selementid].html_obj.style.top = newY+'px';
+	this.selements[selementid].html_obj.style.left = newX+'px';
+},
+
 add_selement: function(selement, update_icon){
 	this.debug('add_selement');
 
@@ -394,15 +433,15 @@ add_selement: function(selement, update_icon){
 	}
 	
 	if((typeof(update_icon) != 'undefined') && (update_icon != 0)){
-		selement.html_obj = this.add_selement_img(selement);
+		selement.html_obj = this.addSelementImage(selement);
 		selement.image = null;
 	}
 
 	this.selements[selementid] = selement;
 },
 
-update_selement_option: function(selementid, params){ // params = {'key': value, 'key': value}
-	this.debug('update_selement_option');
+updateSelementOption: function(selementid, params){ // params = {'key': value, 'key': value}
+	this.debug('updateSelementOption');
 //--
 
 	if(!isset(selementid, this.selements) || empty(this.selements[selementid])) return false;
@@ -412,14 +451,13 @@ update_selement_option: function(selementid, params){ // params = {'key': value,
 		
 		if(is_number(params[key])) params[key] = params[key].toString();
 		this.selements[selementid][key] = params[key];
-//SDI(key+' : '+params[key]);
 	}
 
-	this.update_selement(this.selements[selementid]);
+	this.updateSelement(this.selements[selementid]);
 },
 
-update_selement: function(selement){
-	this.debug('update_selement');
+updateSelement: function(selement){
+	this.debug('updateSelement');
 //--
 
 	var url = new Curl(location.href);
@@ -456,7 +494,7 @@ remove_selements: function(e){
 		}
 
 		this.hideForm(e);
-		this.update_mapimg();
+		this.updateMapImage();
 	}	
 },
 
@@ -483,7 +521,7 @@ remove_selement: function(selementid, update_map){
 
 
 	if((typeof(update_map) != 'undefined') && (update_map != 0)){
-		this.update_mapimg();
+		this.updateMapImage();
 	}
 },
 
@@ -556,7 +594,7 @@ add_link: function(mlink, update_map){
 	this.links[linkid] = mlink;
 	
 	if((typeof(update_map) != 'undefined') && (update_map == 1)){
-		this.update_mapimg();
+		this.updateMapImage();
 	}
 },
 
@@ -586,7 +624,7 @@ update_link_option: function(linkid, params, update_map){ // params = [{'key': k
 	}
 
 	if((typeof(update_map) != 'undefined') && (update_map == 1)){
-		this.update_mapimg();
+		this.updateMapImage();
 	}
 },
 
@@ -624,7 +662,7 @@ remove_links: function(e){
 			}
 
 			this.hideForm(e);
-			this.update_mapimg();
+			this.updateMapImage();
 		}
 	}
 },
@@ -640,7 +678,7 @@ remove_link: function(linkid, update_map){
 	delete(this.links[linkid]);
 
 	if((typeof(update_map) != 'undefined') && (update_map == 1)){
-		this.update_mapimg();
+		this.updateMapImage();
 	}
 },
 
@@ -688,7 +726,7 @@ add_linktrigger: function(linkid, linktrigger, update_map){
 	this.links[linkid].linktriggers[linktriggerid] = linktrigger;
 
 	if((typeof(update_map) != 'undefined') && (update_map == 1)){
-		this.update_mapimg();
+		this.updateMapImage();
 	}
 },
 
@@ -709,7 +747,7 @@ update_linktrigger_option: function(linkid, linktriggerid, params, update_map){
 	}
 
 	if((typeof(update_map) != 'undefined') && (update_map == 1)){
-		this.update_mapimg();
+		this.updateMapImage();
 	}
 },
 
@@ -724,15 +762,15 @@ remove_linktrigger: function(linkid, linktriggerid, update_map){
 	delete(this.links[linkid].linktriggers[linktriggerid]);
 
 	if((typeof(update_map) != 'undefined') && (update_map == 1)){
-		this.update_mapimg();
+		this.updateMapImage();
 	}
 },
 // ---------- IMAGES MANIPULATION ------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------
 
 // ELEMENTS
-add_selement_img: function(selement){
-	this.debug('add_selement_img');
+addSelementImage: function(selement){
+	this.debug('addSelementImage');
 
 	var dom_id = 'selement_'+selement.selementid;
 
@@ -747,7 +785,7 @@ add_selement_img: function(selement){
 		selement_div.style.position = 'absolute';
 		selement_div.style.visibility = 'hidden';
 		
-		this.make_selement_dragable(selement_div);
+		this.makeSelementDragable(selement_div);
 	}
 		
 	var position = {};	
@@ -773,17 +811,17 @@ add_selement_img: function(selement){
 return selement_div;
 },
 
-update_selements_icon: function(){
-	this.debug('update_selements_icon');
+updateSelementsIcon: function(){
+	this.debug('updateSelementsIcon');
 	
 	if(is_null(this.mapimg)){
-		setTimeout('ZBX_SYSMAPS['+this.id+'].map.update_selements_icon();',500);
+		setTimeout('ZBX_SYSMAPS['+this.id+'].map.updateSelementsIcon();',500);
 	}
 	else{
 		for(var selementid in this.selements){
 			if(empty(this.selements[selementid])) continue;
 
-			this.selements[selementid].html_obj = this.add_selement_img(this.selements[selementid]);
+			this.selements[selementid].html_obj = this.addSelementImage(this.selements[selementid]);
 			this.selements[selementid].image = null;
 		}
 	}
@@ -796,8 +834,8 @@ remove_selement_img: function(selement){
 	selement.html_obj.remove();	
 },
 
-make_selement_dragable: function(selement){
-	this.debug('make_selement_dragable');
+makeSelementDragable: function(selement){
+	this.debug('makeSelementDragable');
 
 //	addListener(selement, 'click', this.select_selement.bindAsEventListener(this), false);
 	addListener(selement, 'click', this.show_menu.bindAsEventListener(this), false);
@@ -806,17 +844,24 @@ make_selement_dragable: function(selement){
 	new Draggable(selement,{
 				ghosting: true,
 				snap: this.get_dragable_dimensions.bind(this),
-				onEnd: this.dragend_sysmap_update.bind(this)
+				onEnd: this.sysmapUpdate.bind(this)
 				});
 
 },
 
 // MAP
 
-update_mapimg: function(){
-	this.debug('update_mapimg');
+updateMapImage: function(){
+	this.debug('updateMapImage');
+//--
 
-	var url = new Curl(location.href);	
+// grid
+	var urlGrid = '';
+	if(this.grid.showGrid){
+		urlGrid += '&grid='+this.grid.gridSize;
+	}
+//--
+
 	var params = {
 		'output': 'ajax',
 		'sysmapid': this.sysmapid,
@@ -826,7 +871,9 @@ update_mapimg: function(){
 
 	params = this.get_update_params(params);
 //SDJ(params);
-	new Ajax.Request('map.php'+'?sid='+url.getArgument('sid'),
+
+	var url = new Curl(location.href);
+	new Ajax.Request('map.php'+'?sid='+url.getArgument('sid')+urlGrid,
 					{
 						'method': 'post',
 						'parameters':params,
@@ -2522,7 +2569,7 @@ saveForm_selement: function(e){
 // URL
 		params.url = this.selementForm.url.value;
 		
-		this.update_selement_option(selementid, params);
+		this.updateSelementOption(selementid, params);
 	}
 	else{
 		var params = {};
@@ -2564,12 +2611,12 @@ saveForm_selement: function(e){
 			if(!isset(this.selection.selements[i], this.selements)) continue;
 
 			var selementid = this.selection.selements[i];
-			this.update_selement_option(selementid, params);
+			this.updateSelementOption(selementid, params);
 		}
-		this.update_selement_option(selementid, params);
+		this.updateSelementOption(selementid, params);
 	}
 
-	this.update_mapimg();
+	this.updateMapImage();
 	this.update_multiContainer(e);
 //	this.hideForm();
 },
@@ -3327,7 +3374,7 @@ saveForm_link: function(e){
 	this.update_linkContainer(e);
 	this.hideForm_link(e);
 
-	this.update_mapimg();
+	this.updateMapImage();
 },
 
 deleteForm_link: function(e){
@@ -3346,38 +3393,388 @@ deleteForm_link: function(e){
 	}
 	else
 		return false;
+}
+
+//**************************************************************************************************************
+//**************************************************************************************************************
+//**************************************************************************************************************
+//**************************************************************************************************************
+});
+
+var CGrid = Class.create(CDebug, {
+mapObjectId:	null,						// own id
+sysmapid:	null,				// sysmapid
+showGrid:	true,				// grid On|Off
+autoAlign:	true,				// align icons on drag end
+gridSize:	'50',				// grid size
+
+initialize: function($super, id, params){
+	this.mapObjectId = id;
+	
+	$super('CGrid['+id+']');
+
+	if(!params) var params = {};
+	
+	if(isset('gridsize', params))
+		addListener(params.gridsize, 'change', this.setGridSize.bindAsEventListener(this), false);
+	if(isset('gridautoalign', params))
+		addListener(params.gridautoalign, 'click', this.setGridAutoAlign.bindAsEventListener(this), false);
+	if(isset('gridshow', params))
+		addListener(params.gridshow, 'click', this.setGridView.bindAsEventListener(this), false);
+	if(isset('gridalignall', params))
+		addListener(params.gridalignall, 'click', this.gridAlignIcons.bindAsEventListener(this), false);
 },
 
-//**************************************************************************************************************
-//**************************************************************************************************************
-//**************************************************************************************************************
-//**************************************************************************************************************
-//**************************************************************************************************************
-//**************************************************************************************************************
+setGridSize: function(e){
+	this.debug('setGridSize');
+//--
 
+	var domObject = Event.element(e);
+	var tmpGS = domObject.options[domObject.selectedIndex].value.split('x');
 
+	if(!isset(0, tmpGS)) this.gridSize = 50;
+	else this.gridSize = tmpGS[0];
 
-// ---------- DEBUG ------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------
-debug: function(str){
-	if(this.debug_status){
-		this.debug_info += str + '\n';
+	this.updateMapView(e);
+},
+
+setGridAutoAlign: function(e){
+	this.debug('setGridAutoAlign');
+//--
+
+	var domObject = Event.element(e);
+	if(this.autoAlign){
+		this.autoAlign = false;
+		domObject.update(locale['S_ON']);
+	}
+	else{
+		this.autoAlign = true;
+		domObject.update(locale['S_OFF']);
+	}
+},
+
+setGridView: function(e){
+	this.debug('setGridView');
+//--
+	var domObject = Event.element(e);
+	if(this.showGrid){
+		this.showGrid = false;
+		$(domObject).update(locale['S_SHOW']);
+	}
+	else{
+		this.showGrid = true;
+		$(domObject).update(locale['S_HIDE']);
+	}
+
+	this.updateMapView(e);
+},
+
+// ACTION
+gridAlignIcons: function(e){
+	this.debug('gridAlignIcons');
+
+	var tmpAutoAlign = this.autoAlign;
+	this.autoAlign = true;
+
+	for(var selementid in ZBX_SYSMAPS[this.mapObjectId].map.selements){
+		if(empty(ZBX_SYSMAPS[this.mapObjectId].map.selements[selementid])) continue;
 		
-		if(this.debug_status == 2){
-			SDI(str);
+		ZBX_SYSMAPS[this.mapObjectId].map.alignSelement(selementid);
+	}
+
+	this.autoAlign = tmpAutoAlign;
+	this.updateMapView(e);
+},
+
+// Update
+updateMapView: function(e){
+	this.debug('setGridView');
+//--
+
+	ZBX_SYSMAPS[this.mapObjectId].map.updateMapImage();
+}
+});
+//]]
+
+// *******************************************************************
+//		SELEMENT object (unfinished)
+// *******************************************************************
+var CSelement = Class.create(CDebug, {
+sysmap:				null,		// sysmap object reference
+
+data: {
+	selementid:			0,			// ALWAYS must be a STRING (js doesn't support uint64)
+	elementtype:		4,			// 5-UNDEFINED
+	elementid:			0,			// ALWAYS must be a STRING (js doesn't support uint64)
+	elementName:		'',			// element name
+	iconid_off:			0,			// ALWAYS must be a STRING (js doesn't support uint64)
+	iconid_on:			0,			// ALWAYS must be a STRING (js doesn't support uint64)
+	iconid_unknown:		0,			// ALWAYS must be a STRING (js doesn't support uint64)
+	iconid_maintenance:	0,		// ALWAYS must be a STRING (js doesn't support uint64)
+	iconid_disabled:	0,			// ALWAYS must be a STRING (js doesn't support uint64)
+	label:				locale['S_NEW_ELEMENT'],	// Element label
+	label_expanded:		locale['S_NEW_ELEMENT'],	// Element label macros expanded
+	label_location:		3,
+	x:					0,
+	y:					0,
+	url:				'',
+	html_obj:			null,			// reference to html obj
+	html_objid:			null,			// html elements id
+	selected:			0				// element is not selected
+},
+	
+initialize: function($super, sysmap, params){
+	this.sysmap = sysmap;
+	$super('CSelement['+id+']');
+//--
+
+	if(typeof(params) == 'undefined'){
+		var url = new Curl(location.href);
+		var params = {
+			'favobj': 	'selements',
+			'favid':	this.id,
+			'sysmapid':	this.sysmapid,
+			'action':	'new_selement'
+		}
+
+		params['selements'] = Object.toJSON({'0': selement});
+
+		new Ajax.Request(url.getPath()+'?output=ajax'+'&sid='+url.getArgument('sid'),
+						{
+							'method': 'post',
+							'parameters':params,
+							'onSuccess': function(resp){ },
+	//						'onSuccess': function(resp){ SDI(resp.responseText); },
+							'onFailure': function(){ document.location = url.getPath()+'?'+Object.toQueryString(params); }
+						}
+		);
+	}
+	else{
+		var selementid = 0;
+		if((typeof(params['selementid']) == 'undefined') || (params['selementid'] == 0)){
+			do{
+				selementid = parseInt(Math.random(1000000000) * 1000000000);
+				selementid = selementid.toString();
+			}while(isset(selementid, this.sysmap.selements));
+
+			params['new'] = 'new';
+			params['selementid'] = selementid;
+		}
+		else{
+			selementid = params.selementid;
+		}
+
+		if(typeof(this.selements[selementid]) == 'undefined'){
+			selement.selected = null;
+		}
+		else{
+			selement.selected = this.sysmap.selements[selementid].selected;
+		}
+
+		if(isset('updateIcon', params) && (params['updateIcon'] != 0)){
+			selement.html_obj = this.addImage(params);
+			selement.image = null;
+		}
+
+		for(var key in params){
+			if(is_null(params[key])) continue;
+
+			if(is_number(params[key])) params[key] = params[key].toString();
+			this.data[key] = params[key];
 		}
 	}
-	
 },
 
-info: function(msg){
-	msg = msg || 'Map selement failed.'
-	alert(msg);
+updateOption: function(params){ // params = {'key': value, 'key': value}
+	this.debug('updateOption');
+//--
+
+	for(var key in params){
+		if(is_null(params[key])) continue;
+
+		if(is_number(params[key])) params[key] = params[key].toString();
+		this.data[key] = params[key];
+	}
+
+	this.update();
 },
 
-error: function(msg){
-	msg = msg || 'Map selement failed.'
-	throw(msg);
+update: function(){
+	this.debug('update');
+//--
+
+	var url = new Curl(location.href);
+
+	var params = {
+		'favobj': 	'selements',
+		'favid':	this.sysmap.id,
+		'sysmapid':	this.sysmap.sysmapid,
+		'action':	'get_img'
+	}
+
+	params['selements'] = Object.toJSON({'0': this.data});
+
+	new Ajax.Request(url.getPath()+'?output=ajax'+'&sid='+url.getArgument('sid'),
+					{
+						'method': 'post',
+						'parameters':params,
+						'onSuccess': function(resp){ },
+//						'onSuccess': function(resp){ SDI(resp.responseText); },
+						'onFailure': function(){ document.location = url.getPath()+'?'+Object.toQueryString(params); }
+					}
+	);
+},
+
+remove: function(){
+	this.debug('remove');
+//--
+
+	this.removeImage();
+
+// remove selement
+	this.sysmap.selements[selementid] = null;
+	delete(this.sysmap.selements[selementid]);
+
+	this.sysmap.updateMapImage();
+},
+
+select: function(multi){
+	this.debug('select');
+//--
+
+	var multi = multi || false;
+
+	var position = null;
+
+	if(is_null(this.selected)){
+		position = this.sysmap.selection.position;
+
+		this.sysmap.selection.selements[position] = selementid;
+		this.selected = position;
+
+		this.html_obj.style.border = '1px #3333FF solid';
+		this.html_obj.style.backgroundColor = '#00AAAA';
+		this.html_obj.style.opacity = '.60';
+
+		this.sysmap.selection.count++;
+		this.sysmap.selection.position++;
+	}
+	else if((this.sysmap.selection.count > 1) && !multi){
+// if selected several selements and then we clicked on one of them
+	}
+	else{
+		this.sysmap.selection.count--;
+		position = this.selected;
+
+		this.sysmap.selection.selements[position] = null;
+		delete(this.sysmap.selection.selements[position]);
+
+		this.sysmap.selements[selementid].selected = null;
+
+		this.html_obj.style.border = '0px';
+		this.html_obj.style.backgroundColor = 'transparent';
+		this.html_obj.style.opacity = '1';
+	}
+
+	if(!multi && (this.sysmap.selection.count > 1)){
+		for(var i=0; i<this.sysmap.selection.position; i++){
+			if(!isset(i,this.sysmap.selection.selements) || (this.sysmap.selection.selements[i] == selementid)) continue;;
+
+			this.sysmap.selection.count--;
+
+			var tmp_selementid = this.sysmap.selection.selements[i];
+
+			this.sysmap.selements[this.selection.selements[i]].selected = null;
+			this.sysmap.selements[this.selection.selements[i]].html_obj.style.border = '0px';
+			this.sysmap.selements[this.selection.selements[i]].html_obj.style.backgroundColor = 'transparent';
+			this.sysmap.selements[this.selection.selements[i]].html_obj.style.opacity = '1';
+
+			this.sysmap.selection.selements[i] = null;
+			delete(this.sysmap.selection.selements[i]);
+		}
+	}
+
+return false;
+},
+
+// ELEMENTS
+addImage: function(){
+	this.debug('addImage');
+
+	var dom_id = 'selement_'+this.selementid;
+
+	var selement_div = $(dom_id);
+	if(is_null(selement_div)){
+//		var selement_div = document.createElement('img');
+		var selement_div = document.createElement('div');
+		this.container.appendChild(selement_div);
+
+		selement_div.setAttribute('id',dom_id);
+//		selement_div.setAttribute('alt','selement_'+selement.id);
+		selement_div.style.position = 'absolute';
+		selement_div.style.visibility = 'hidden';
+
+		this.makeSelementDragable(selement_div);
+	}
+
+	var position = {};
+	position.top = parseInt(selement.y,10);
+	position.left = parseInt(selement.x,10);
+
+//	selement_div.setAttribute('src','data:image/png;base64,'+selement.image);
+//	selement_div.setAttribute('src','imgstore.php?iconid='+selement.image);
+	selement_div.className = 'pointer sysmap_iconid_'+selement.image;
+
+	selement_div.style.zIndex = '10';
+	selement_div.style.position = 'absolute';
+	selement_div.style.top = position.top+'px';
+	selement_div.style.left = position.left+'px';
+	selement_div.style.visibility = 'visible';
+
+	if(!is_null(selement.selected)){
+		selement_div.style.border = '1px #3333FF solid';
+		selement_div.style.backgroundColor = '#00AAAA';
+		selement_div.style.opacity = '.60';
+	}
+
+return selement_div;
+},
+
+updateIcon: function(){
+	this.debug('updateSelementsIcon');
+
+	if(is_null(this.mapimg)){
+		setTimeout('ZBX_SYSMAPS['+this.id+'].map.updateSelementsIcon();',500);
+	}
+	else{
+		for(var selementid in this.selements){
+			if(empty(this.selements[selementid])) continue;
+
+			this.selements[selementid].html_obj = this.addSelementImage(this.selements[selementid]);
+			this.selements[selementid].image = null;
+		}
+	}
+},
+
+removeImage: function(){
+	this.debug('remove_selement_img');
+
+	Draggables.unregister(this.html_obj);
+	this.html_obj.remove();
+},
+
+makeDragable: function(){
+	this.debug('makeSelementDragable');
+
+	addListener(selement, 'click', this.sysmap.show_menu.bindAsEventListener(this.sysmap), false);
+	addListener(selement, 'mousedown', this.sysmap.activate_menu.bindAsEventListener(this.sysmap), false);
+
+	new Draggable(selement,{
+				ghosting: true,
+				snap: this.sysmap.get_dragable_dimensions.bind(this.sysmap),
+				onEnd: this.sysmap.sysmapUpdate.bind(this.sysmap)
+				});
+
 }
-}
+});
 //]]
