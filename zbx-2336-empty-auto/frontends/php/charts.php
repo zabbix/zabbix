@@ -37,26 +37,25 @@ include_once('include/page_header.php');
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'groupid'=>		array(T_ZBX_INT, O_OPT,	 P_SYS,		DB_ID,NULL),
-		'hostid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,		DB_ID,NULL),
-		'graphid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,		DB_ID,NULL),
-		'period'=>		array(T_ZBX_INT, O_OPT,  P_SYS, 	null,NULL),
-		'stime'=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	NULL,NULL),
-		'action'=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	IN("'go','add','remove'"),NULL),
-		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,		IN('0,1'),NULL),
+		'groupid'=>		array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,	null),
+		'hostid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,	null),
+		'graphid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,	null),
+		'period'=>		array(T_ZBX_INT, O_OPT,  P_SYS, null,	null),
+		'stime'=>		array(T_ZBX_STR, O_OPT,  P_SYS, null,	null),
+		'action'=>		array(T_ZBX_STR, O_OPT,  P_SYS, IN("'go','add','remove'"),null),
+		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),null),
 //ajax
-		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
-		'favid'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NULL,			NULL),
+		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	null,			null),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		null),
+		'favid'=>		array(T_ZBX_INT, O_OPT, P_ACT,  null,			null),
 
-		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
-		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove'"),NULL)
+		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		null),
+		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove'"),null)
 	);
 
 	check_fields($fields);
 ?>
 <?php
-
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
 			CProfile::update('web.charts.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
@@ -159,34 +158,34 @@ include_once('include/page_header.php');
 		if(infavorites('web.favorite.graphids',$_REQUEST['graphid'],'graphid')){
 			$icon = new CDiv(SPACE,'iconminus');
 			$icon->setAttribute('title',S_REMOVE_FROM.' '.S_FAVOURITES);
-			$icon->addAction('onclick',new CJSscript("javascript: rm4favorites('graphid','".$_REQUEST['graphid']."',0);"));
+			$icon->addAction('onclick', "javascript: rm4favorites('graphid','".$_REQUEST['graphid']."',0);");
 		}
 		else{
 			$icon = new CDiv(SPACE,'iconplus');
 			$icon->setAttribute('title',S_ADD_TO.' '.S_FAVOURITES);
-			$icon->addAction('onclick',new CJSscript("javascript: add2favorites('graphid','".$_REQUEST['graphid']."');"));
+			$icon->addAction('onclick', "javascript: add2favorites('graphid','".$_REQUEST['graphid']."');");
 		}
 		$icon->setAttribute('id','addrm_fav');
 
 		$url = '?graphid='.$_REQUEST['graphid'].($_REQUEST['fullscreen']?'':'&fullscreen=1');
 		$fs_icon = new CDiv(SPACE,'fullscreen');
 		$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-		$fs_icon->addAction('onclick',new CJSscript("javascript: document.location = '".$url."';"));
+		$fs_icon->addAction('onclick', "javascript: document.location = '".$url."';");
 
 		$rst_icon = new CDiv(SPACE,'iconreset');
 		$rst_icon->setAttribute('title',S_RESET);
-		$rst_icon->addAction('onclick',new CJSscript("javascript: timeControl.objectReset('".$_REQUEST['graphid']."');"));
+		$rst_icon->addAction('onclick', "javascript: timeControl.objectReset('".$_REQUEST['graphid']."');");
 
 		array_push($icons, $icon, $rst_icon, $fs_icon);
 
 // NAV BAR
 		$timeline = array(
 			'period' => $effectiveperiod,
-			'starttime' => date('YmdHi', get_min_itemclock_by_graphid($_REQUEST['graphid']))
+			'starttime' => date('YmdHis', get_min_itemclock_by_graphid($_REQUEST['graphid']))
 		);
 
 		if(isset($_REQUEST['stime'])){
-			$timeline['usertime'] = date('YmdHi', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
+			$timeline['usertime'] = date('YmdHis', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 		}
 
 		$dom_graph_id = 'graph';

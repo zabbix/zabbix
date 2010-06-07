@@ -222,6 +222,7 @@
 			function_exists('mysql_insert_id')){
 
 			$current[] = 'MySQL';
+			$current[] = BR();
 		}
 
 		if(function_exists('pg_pconnect') &&
@@ -231,6 +232,7 @@
 			function_exists('pg_getlastoid')){
 
 			$current[] = 'PostgreSQL';
+			$current[] = BR();
 		}
 
 		if(function_exists('ocilogon') &&
@@ -240,6 +242,7 @@
 			function_exists('ocifetchinto')){
 
 			$current[] = 'Oracle';
+			$current[] = BR();
 		}
 
 		if(function_exists('sqlite3_open') &&
@@ -251,6 +254,7 @@
 			function_exists('sqlite3_exec')){
 
 			$current[] = 'SQLite3';
+			$current[] = BR();
 		}
 
 		if(!empty($current)){
@@ -262,14 +266,14 @@
 
 		$result = array(
 			'name' => S_PHP_DATABASES_SUPPORT,
-			'current' => empty($current) ? S_NO_SMALL : new CJSscript(implode(SBR, $current)),
+			'current' => empty($current) ? S_NO_SMALL : new CSpan($current),
 			'required' => null,
 			'recommended' => null,
 			'result' => $req,
 			'error' => S_REQUIRES_ANY_DATABASE_SUPPORT
 		);
 
-		return $result;
+	return $result;
 	}
 
 	function check_php_bc(){

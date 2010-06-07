@@ -22,7 +22,7 @@
 
 /************* PAGING *************/
 function getPagingLine(&$items, $autotrim=true){
-	global $USER_DETAILS;
+	global $USER_DETAILS, $page;
 	$config = select_config();
 
 	$search_limit = '';
@@ -31,7 +31,15 @@ function getPagingLine(&$items, $autotrim=true){
 		$search_limit = '+';
 	}
 
-	$start = get_request('start',0);
+	$start = get_request('start', null);
+	
+	if(is_null($start)){
+		$last_page = CProfile::get('web.paging.lastpage');
+		$start = ($last_page == $page['file']) ? CProfile::get('web.paging.start', 0) : 0;
+	}
+	CProfile::update('web.paging.lastpage', $page['file'], PROFILE_TYPE_STR);
+	CProfile::update('web.paging.start', $start, PROFILE_TYPE_INT);
+	
 	$rows_per_page = $USER_DETAILS['rows_per_page'];
 
 	$cnt_items = count($items);
@@ -60,18 +68,18 @@ function getPagingLine(&$items, $autotrim=true){
 	$table = BR();
 	if($cnt_pages > 1){
 		if($startPage > 1){
-			$page = new CSpan('<< '.S_FIRST, 'darklink');
-			$page->setAttribute('onclick', 'javascript: openPage(0);');
+			$pagespan = new CSpan('<< '.S_FIRST, 'darklink');
+			$pagespan->setAttribute('onclick', 'javascript: openPage(0);');
 
-			$pageline[] = $page;
+			$pageline[] = $pagespan;
 			$pageline[] = '&nbsp;&nbsp;';
 		}
 
 		if($crnt_page > 1){
-			$page = new CSpan('< '.S_PREVIOUS, 'darklink');
-			$page->setAttribute('onclick', 'javascript: openPage('.(($crnt_page-2) * $rows_per_page).');');
+			$pagespan = new CSpan('< '.S_PREVIOUS, 'darklink');
+			$pagespan->setAttribute('onclick', 'javascript: openPage('.(($crnt_page-2) * $rows_per_page).');');
 
-			$pageline[] = $page;
+			$pageline[] = $pagespan;
 			$pageline[] = ' | ';
 		}
 
@@ -79,33 +87,33 @@ function getPagingLine(&$items, $autotrim=true){
 			if($p > $endPage)	break;
 
 			if($p == $crnt_page){
-				$page = new CSpan($p, 'bold textcolorstyles');
+				$pagespan = new CSpan($p, 'bold textcolorstyles');
 			}
 			else{
-				$page = new CSpan($p, 'darklink');
-				$page->setAttribute('onclick', 'javascript: openPage('.(($p-1) * $rows_per_page).');');
+				$pagespan = new CSpan($p, 'darklink');
+				$pagespan->setAttribute('onclick', 'javascript: openPage('.(($p-1) * $rows_per_page).');');
 			}
 
-			$pageline[] = $page;
+			$pageline[] = $pagespan;
 			$pageline[] = ' | ';
 		}
 
 		array_pop($pageline);
 
 		if($crnt_page <  $cnt_pages){
-			$page = new CSpan(S_NEXT.' >', 'darklink');
-			$page->setAttribute('onclick', 'javascript: openPage('.($crnt_page * $rows_per_page).');');
+			$pagespan = new CSpan(S_NEXT.' >', 'darklink');
+			$pagespan->setAttribute('onclick', 'javascript: openPage('.($crnt_page * $rows_per_page).');');
 
 			$pageline[] = ' | ';
-			$pageline[] = $page;
+			$pageline[] = $pagespan;
 		}
 
 		if($p < $cnt_pages){
-			$page = new CSpan(S_LAST.' >>', 'darklink');
-			$page->setAttribute('onclick', 'javascript: openPage('.(($cnt_pages-1) * $rows_per_page).');');
+			$pagespan = new CSpan(S_LAST.' >>', 'darklink');
+			$pagespan->setAttribute('onclick', 'javascript: openPage('.(($cnt_pages-1) * $rows_per_page).');');
 
 			$pageline[] = '&nbsp;&nbsp;';
-			$pageline[] = $page;
+			$pageline[] = $pagespan;
 		}
 
 		$table = new CTable(null, 'paging');
@@ -131,7 +139,7 @@ function getPagingLine(&$items, $autotrim=true){
 	$page_view[] = $search_limit;
 	$page_view[] = SPACE.S_FOUND_SMALL;
 
-	$page_view = new CJSscript($page_view);
+	$page_view = new CSpan($page_view);
 
 	zbx_add_post_js('insert_in_element("numrows",'.zbx_jsvalue($page_view->toString()).');');
 
@@ -326,6 +334,8 @@ function zbx_date2str($format, $value=NULL){
 	
 	if($value === NULL) $value = time();
 	
+	if(!$value) return S_NEVER;
+	
 	if(!is_array($weekdaynames)) {
 		$weekdaynames = Array(
 					0 => S_WEEKDAY_SUNDAY_SHORT,
@@ -379,16 +389,30 @@ function zbx_date2str($format, $value=NULL){
 					11 => S_MONTH_NOVEMBER_LONG,
 					12 => S_MONTH_DECEMBER_LONG);
 	}
-
-	if(!$value) return S_NEVER;
 	
-	$output = date($format, $value);
-
-	$output = str_replace(date('l',$value), $weekdaynameslong[date('w',$value)], $output);
-	$output = str_replace(date('F',$value), $monthslong[date('n',$value)], $output);
-	$output = str_replace(date('D',$value), $weekdaynames[date('w',$value)], $output);
-	$output = str_replace(date('M',$value), $months[date('n',$value)], $output);
-
+	$rplcs = Array(
+		'l' => $weekdaynameslong[date('w',$value)],
+		'F' => $monthslong[date('n',$value)],
+		'D' => $weekdaynames[date('w',$value)],
+		'M' => $months[date('n',$value)]
+	);
+	
+	$output = '';
+	$part = '';
+	$length = zbx_strlen($format);
+	for($i = 0; $i < $length; $i++) {
+		$pchar = $i > 0 ? zbx_substr($format, $i-1, 1) : '';
+		$char = zbx_substr($format, $i, 1);
+		if($pchar != '\\' && isset($rplcs[$char])) {
+			$output .= (zbx_strlen($part) ? date($part, $value) : '').$rplcs[$char];
+			$part = '';
+		}else{
+			$part .= $char;
+		}
+	}
+	
+	$output .= zbx_strlen($part) > 0 ? date($part, $value) : '';
+	
 	return $output;
 }
 
@@ -721,13 +745,17 @@ return false;
 
 // STRING FUNCTIONS {{{
 
-function zbx_nl2br(&$str){
+function zbx_nl2br($str){
 	$str_res = array();
 	$str_arr = explode("\n",$str);
 	foreach($str_arr as $id => $str_line){
 		array_push($str_res,$str_line,BR());
 	}
 return $str_res;
+}
+
+function zbx_htmlstr($str){
+	return str_replace(array('<','>','"'),array('&lt;','&gt;','&quot;'), $str);
 }
 
 function zbx_strlen($str){

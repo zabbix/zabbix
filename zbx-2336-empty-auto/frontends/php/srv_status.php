@@ -263,12 +263,12 @@ include_once('include/page_header.php');
 
 		$tree = new CTree('service_status_tree',
 							$treeServ,
-							array('caption' => bold(S_SERVICE),
-								'status' => bold(S_STATUS),
-								'reason' => bold(S_REASON),
-								'sla' => bold('SLA ('.$periods[$period].')'),
-								'sla2' => bold(nbsp(S_SLA)),
-								'graph' => bold(S_GRAPH))
+							array('caption' => S_SERVICE,
+								'status' => S_STATUS,
+								'reason' => S_REASON,
+								'sla' => 'SLA ('.$periods[$period].')',
+								'sla2' => nbsp(S_SLA),
+								'graph' => S_GRAPH)
 						);
 
 		if($tree){
@@ -288,7 +288,7 @@ include_once('include/page_header.php');
 			$url = '?period='.$period.'&fullscreen='.($_REQUEST['fullscreen']?'0':'1');
 			$fs_icon = new CDiv(SPACE, 'fullscreen');
 			$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-			$fs_icon->addAction('onclick',new CJSscript("javascript: document.location = '".$url."';"));
+			$fs_icon->addAction('onclick', "javascript: document.location = '".$url."';");
 
 			$srv_wdgt = new CWidget('hat_services', $tree->getHTML());
 

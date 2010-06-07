@@ -1426,7 +1426,7 @@ int	is_uhex(char *str)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	is_hex_string(char *str)
+int	is_hex_string(const char *str)
 {
 	if ('\0' == *str)
 		return FAIL;

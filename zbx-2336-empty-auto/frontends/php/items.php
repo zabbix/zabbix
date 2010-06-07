@@ -766,14 +766,6 @@ include_once('include/page_header.php');
 		$form->addVar('form_hostid', $hostid);
 
 // Config
-	$cmbConf = new CComboBox('config', 'items.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
-		$cmbConf->addItem('templates.php',S_TEMPLATES);
-		$cmbConf->addItem('hosts.php',S_HOSTS);
-		$cmbConf->addItem('items.php',S_ITEMS);
-		$cmbConf->addItem('triggers.php',S_TRIGGERS);
-		$cmbConf->addItem('graphs.php',S_GRAPHS);
-		$cmbConf->addItem('applications.php',S_APPLICATIONS);
-	$form->addItem($cmbConf);
 	$form->addItem(array(SPACE, new CButton('form', S_CREATE_ITEM)));
 
 //$items_wdgt->addPageHeader(S_CONFIGURATION_OF_ITEMS_BIG, $form);
@@ -1165,11 +1157,11 @@ include_once('include/page_header.php');
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('massupdate',S_MASS_UPDATE);
-		$goOption->setAttribute('confirm',S_MASS_UPDATE_SELECTED_ITEMS_Q);
+		//$goOption->setAttribute('confirm',S_MASS_UPDATE_SELECTED_ITEMS_Q);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('copy_to',S_COPY_SELECTED_TO);
-		$goOption->setAttribute('confirm',S_COPY_SELECTED_ITEMS_Q);
+		//$goOption->setAttribute('confirm',S_COPY_SELECTED_ITEMS_Q);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('clean_history',S_CLEAR_HISTORY_FOR_SELECTED);
