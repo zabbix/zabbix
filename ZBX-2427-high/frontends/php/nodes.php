@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -67,7 +67,6 @@
 	if(isset($_REQUEST['save'])){
 		$result = false;
 		if(isset($_REQUEST['nodeid'])){
-/* update */
 			$audit_action = AUDIT_ACTION_UPDATE;
 			DBstart();
 			$result = update_node($_REQUEST['nodeid'], $_REQUEST['new_nodeid'],
@@ -78,7 +77,6 @@
 			show_messages($result, S_NODE_UPDATED, S_CANNOT_UPDATE_NODE);
 		}
 		else{
-/* add */
 			$audit_action = AUDIT_ACTION_ADD;
 
 			$_REQUEST['masterid'] = isset($_REQUEST['masterid']) ? $_REQUEST['masterid'] : null;
@@ -223,7 +221,6 @@
 		}
 		else{
 			$nodes_wdgt->addHeader(S_NODES_BIG);
-
 			$nodes_wdgt->addItem(BR());
 
 			$table=new CTableInfo(S_NO_NODES_DEFINED);
@@ -240,7 +237,6 @@
 			$db_nodes = DBselect($sql);
 
 			while($node = DBfetch($db_nodes)){
-
 				$table->addRow(array(
 					$node['nodeid'],
 					array(
@@ -251,18 +247,15 @@
 					$node['nodetype'] ? 'bold' : null)
 				));
 			}
-
-			$nodes_wdgt->addItem($table);
 		}
 	}
 	else{
-		$table = new CTableInfo(S_NOT_DM_SETUP);
-		$nodes_wdgt->addItem($table);
+		$table = new CTable(new CCol(S_NOT_DM_SETUP, 'center'));
 	}
 
+	$nodes_wdgt->addItem($table);
 	$nodes_wdgt->show();
-?>
-<?php
+
 
 include_once('include/page_footer.php');
 ?>
