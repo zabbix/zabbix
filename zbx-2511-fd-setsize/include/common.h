@@ -763,14 +763,13 @@ int	is_ascii_string(const char *str);
 void	zbx_rtrim(char *str, const char *charlist);
 void	zbx_ltrim(register char *str, const char *charlist);
 void	zbx_remove_chars(register char *str, const char *charlist);
-void	lrtrim_spaces(char *c);
+#define zbx_remove_spaces(str)		zbx_remove_chars(str, " ");
+#define zbx_remove_whitespace(str)	zbx_remove_chars(str, " \t\n\r");
 void	compress_signs(char *str);
 void	ltrim_spaces(char *c);
 void	rtrim_spaces(char *c);
+void	lrtrim_spaces(char *c);
 void	del_zeroes(char *s);
-void	delete_chars(char *c, const char *charlist);
-#define delete_spaces(c)	delete_chars(c, " ");
-#define delete_whitespace(c)	delete_chars(c, " \t\n\r");
 int	get_param(const char *param, int num, char *buf, int maxlen);
 int	num_param(const char *param);
 char	*get_param_dyn(const char *param, int num);
@@ -789,6 +788,7 @@ void	zbx_hex2octal(const char *input, char **output, int *olen);
 int	zbx_pg_escape_bytea(const u_char *input, int ilen, char **output, int *olen);
 int	zbx_pg_unescape_bytea(u_char *io);
 #endif
+int	zbx_get_field(const char *line, char *result, int num, char separator);
 int	zbx_get_next_field(const char **line, char **output, int *olen, char separator);
 int	str_in_list(char *list, const char *value, const char delimiter);
 
@@ -806,7 +806,7 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 #define SEC_PER_YEAR (365*SEC_PER_DAY)
 #define ZBX_JAN_1970_IN_SEC   2208988800.0        /* 1970 - 1900 in seconds */
 double	zbx_time(void);
-double	zbx_current_time (void);
+double	zbx_current_time(void);
 
 #ifdef HAVE___VA_ARGS__
 #	define zbx_error(fmt, ...) __zbx_zbx_error(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
@@ -888,7 +888,6 @@ int	regexp_match_ex(ZBX_REGEXP *regexps, int regexps_num, const char *string, co
 int	is_ip4(const char *ip);
 
 int	cmp_double(double a,double b);
-int	zbx_get_field(char *line, char *result, int num, char delim);
 
 void	zbx_on_exit(); /* calls exit() at the end! */
 
