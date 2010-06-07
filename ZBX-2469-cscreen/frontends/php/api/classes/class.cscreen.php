@@ -594,7 +594,7 @@ SDI('/////////////////////////////////');
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_SCREEN.' [ '.$screen['name'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
 
-				$iscr = array('name' => zbx_dbstr($screen['name']));
+				$iscr = array('name' => $screen['name']);
 				if(isset($screen['hsize'])) $iscr['hsize'] = $screen['hsize'];
 				if(isset($screen['vsize'])) $iscr['vsize'] = $screen['vsize'];
 				$insert_screen[$snum] = $iscr;
