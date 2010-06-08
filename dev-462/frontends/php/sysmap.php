@@ -97,21 +97,19 @@ include_once('include/page_header.php');
 
 					$options = array(
 						'sysmapids'=> $sysmapid,
-						'editable'=>1,
-						'extendoutput'=>1,
-						'select_selements'=>1,
-						'select_links'=>1
+						'editable' => 1,
+						'output' => API_OUTPUT_EXTEND,
+						'select_selements' => API_OUTPUT_EXTEND,
+						'select_links' => API_OUTPUT_EXTEND
 					);
 
 					$sysmaps = CMap::get($options);
 					$db_map = reset($sysmaps);
 
 					expandMapLabels($db_map);
-
 					$map_info = getSelementsInfo($db_map);
-//SDII($db_map);
 					add_elementNames($db_map['selements']);
-
+//SDII($db_map);
 					$action .= 'ZBX_SYSMAPS['.$cmapid.'].map.mselement["label_location"]='.$db_map['label_location'].'; '."\n";
 
 					foreach($db_map['selements'] as $snum => $selement){
@@ -138,7 +136,11 @@ include_once('include/page_header.php');
 						order_result($link['linktriggers'], 'desc_exp');
 						$action .= 'ZBX_SYSMAPS['.$cmapid.'].map.add_link('.zbx_jsvalue($link).'); '."\n";
 					}
-
+					
+					unset($db_map['selements']);
+					unset($db_map['links']);
+					
+					$action .= 'ZBX_SYSMAPS['.$cmapid.'].map.sysmap = '.zbx_jsvalue($db_map, true).";\n";
 					$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.updateMapImage(); '."\n";
 					$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.updateSelementsIcon(); '."\n";
 

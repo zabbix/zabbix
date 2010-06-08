@@ -47,6 +47,7 @@ mapimg: null,						// HTML element map img
 
 grid: null,							// grid object
 
+sysmap:	{},							// map data
 selements: {},						// map selements array
 links:	{},							// map links array
 
@@ -448,7 +449,10 @@ updateSelementOption: function(selementid, params){ // params = {'key': value, '
 
 	for(var key in params){
 		if(is_null(params[key])) continue;
-		
+
+		if((key == 'x') && (params[key] > this.sysmap.width)) continue;
+		if((key == 'y') && (params[key] > this.sysmap.height)) continue;
+
 		if(is_number(params[key])) params[key] = params[key].toString();
 		this.selements[selementid][key] = params[key];
 	}
@@ -2052,11 +2056,7 @@ this.selementForm.x = e_input_6;
 	e_input_6.setAttribute('id',"x");
 	e_input_6.setAttribute('name',"x");
 	e_input_6.className = "biginput";
-//	e_td_5.appendChild(e_input_6);
-
-	var e_span_6 = document.createElement('span');
-this.selementForm.x = e_span_6;
-	e_td_5.appendChild(e_span_6);
+	e_td_5.appendChild(e_input_6);
 
 // Y
 	var e_tr_4 = document.createElement('tr');
@@ -2087,11 +2087,8 @@ this.selementForm.y = e_input_6;
 	e_input_6.setAttribute('id',"y");
 	e_input_6.setAttribute('name',"y");
 	e_input_6.className = "biginput";
-//	e_td_5.appendChild(e_input_6);
+	e_td_5.appendChild(e_input_6);
 	
-	var e_span_6 = document.createElement('span');
-this.selementForm.y = e_span_6;
-	e_td_5.appendChild(e_span_6);
 	
 // URL
 	var e_tr_4 = document.createElement('tr');
@@ -2266,10 +2263,8 @@ updateForm_selement: function(e, selementid){
 
 
 // X & Y
-//		this.selementForm.x.value = selement.x;
-//		this.selementForm.y.value = selement.y;
-		$(this.selementForm.x).update(selement.x);
-		$(this.selementForm.y).update(selement.y);
+		$(this.selementForm.x).value = selement.x;
+		$(this.selementForm.y).value = selement.y;
 
 // URL
 		this.selementForm.url.value = selement.url;
@@ -2563,8 +2558,11 @@ saveForm_selement: function(e){
 		}
 		
 // X & Y
-//	params.x = this.selementForm.x.value;
-//	params.y = this.selementForm.y.value;
+		if(parseInt(this.selementForm.x.value, 10) > this.sysmap.width) this.selementForm.x.value = 0;
+		if(parseInt(this.selementForm.y.value, 10) > this.sysmap.height) this.selementForm.y.value = 0;
+
+		params.x = this.selementForm.x.value;
+		params.y = this.selementForm.y.value;
 
 // URL
 		params.url = this.selementForm.url.value;
