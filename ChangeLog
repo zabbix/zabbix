@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBX-2469] fixed screen api (Vedmak)
  - [ZBXNEXT-396] added optional parameters 'from' and 'to' to zabbix[queue] (asaveljevs)
  - [ZBX-2511] fixed compilation on FreeBSD with IPv6 due to FD_SETSIZE being undefined (asaveljevs)
  - [ZBX-2503] fixed server and proxy crash with Oracle in cases DBUser and DBPassword parameters were not specified (asaveljevs)
