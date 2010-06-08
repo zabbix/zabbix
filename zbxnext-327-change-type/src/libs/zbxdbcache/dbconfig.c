@@ -221,7 +221,7 @@ static void	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t hostid, zbx_uint64_
 				ITEM_TYPE_AGGREGATE != item_type &&
 				ITEM_TYPE_CALCULATED != item_type))
 	{
-		*poller_type = (unsigned char)ZBX_NO_POLLER;
+		*poller_type = ZBX_NO_POLLER;
 		return;
 	}
 
@@ -233,7 +233,7 @@ static void	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t hostid, zbx_uint64_
 		{
 			if (0 == CONFIG_PINGER_FORKS)
 				break;
-			*poller_type = (unsigned char)ZBX_POLLER_TYPE_PINGER;
+			*poller_type = ZBX_POLLER_TYPE_PINGER;
 			return;
 		}
 	case ITEM_TYPE_ZABBIX:
@@ -249,16 +249,16 @@ static void	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t hostid, zbx_uint64_
 	case ITEM_TYPE_CALCULATED:
 		if (0 == CONFIG_POLLER_FORKS)
 			break;
-		*poller_type = (unsigned char)ZBX_POLLER_TYPE_NORMAL;
+		*poller_type = ZBX_POLLER_TYPE_NORMAL;
 		return;
 	case ITEM_TYPE_IPMI:
 		if (0 == CONFIG_IPMIPOLLER_FORKS)
 			break;
-		*poller_type = (unsigned char)ZBX_POLLER_TYPE_IPMI;
+		*poller_type = ZBX_POLLER_TYPE_IPMI;
 		return;
 	}
 
-	*poller_type = (unsigned char)ZBX_NO_POLLER;
+	*poller_type = ZBX_NO_POLLER;
 }
 
 static int	DCget_reachable_nextcheck(const ZBX_DC_ITEM *item, int now)
@@ -454,7 +454,7 @@ static void	DCsync_items(DB_RESULT result)
 	ZBX_DC_ITEM_HK		item_hk;
 
 	time_t			now;
-	unsigned char		status;
+	unsigned char		status, poller_type;
 	int			i, index, delay, found, changed;
 	zbx_uint64_t		itemid, hostid, proxy_hostid;
 	zbx_vector_uint64_t	ids;
@@ -533,12 +533,27 @@ static void	DCsync_items(DB_RESULT result)
 		item->status = status;
 		item->delay = delay;
 
+		poller_type = item->poller_type;
 		poller_by_item(itemid, item->hostid, proxy_hostid, item->type, item->key, &item->poller_type);
 
 		if (!found)
+		{
 			item->in_queue = 0;
-		if (!found || changed)
 			DCupdate_item_queue(item);
+		}
+		else if (poller_type != item->poller_type)
+		{
+			if (item->in_queue)
+			{
+				item->in_queue = 0;
+				zbx_binary_heap_remove_direct(&config->queues[poller_type], item->itemid);
+			}
+			DCupdate_item_queue(item);
+		}
+		else if (changed)
+		{
+			DCupdate_item_queue(item);
+		}
 
 		/* SNMP items */
 
