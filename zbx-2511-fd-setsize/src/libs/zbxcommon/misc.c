@@ -22,7 +22,7 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: get_programm_name                                                *
+ * Function: get_program_name                                                 *
  *                                                                            *
  * Purpose: return program name without path                                  *
  *                                                                            *
@@ -35,13 +35,13 @@
  *  Comments:                                                                 *
  *                                                                            *
  ******************************************************************************/
-char* get_programm_name(char *path)
+const char	*get_program_name(const char *path)
 {
-	char	*filename = NULL;
+	const char	*filename = NULL;
 
-	for(filename = path; path && *path; path++)
-		if(*path == '\\' || *path == '/')
-			filename = path+1;
+	for (filename = path; path && *path; path++)
+		if (*path == '\\' || *path == '/')
+			filename = path + 1;
 
 	return filename;
 }
@@ -61,7 +61,7 @@ char* get_programm_name(char *path)
  *  Comments:                                                                 *
  *                                                                            *
  ******************************************************************************/
-int get_nodeid_by_id(zbx_uint64_t id)
+int	get_nodeid_by_id(zbx_uint64_t id)
 {
 	return (int)(id/__UINT64_C(100000000000000))%1000;
 

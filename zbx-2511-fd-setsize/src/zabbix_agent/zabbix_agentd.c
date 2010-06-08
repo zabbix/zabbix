@@ -44,7 +44,7 @@
 #endif /* ZABBIX_DAEMON */
 
 
-char *progname = NULL;
+const char	*progname = NULL;
 
 /* Default config file location */
 #ifdef _WINDOWS
@@ -55,7 +55,7 @@ char *progname = NULL;
 
 /* application TITLE */
 
-char title_message[] = APPLICATION_NAME
+const char	title_message[] = APPLICATION_NAME
 #if defined(_WIN64)
 				" Win64"
 #elif defined(WIN32)
@@ -72,7 +72,7 @@ char title_message[] = APPLICATION_NAME
 
 /* application USAGE message */
 
-char usage_message[] =
+const char	usage_message[] =
 	"[-Vhp]"
 #if defined(_WINDOWS)
 	" [-idsx] [-m]"
@@ -85,7 +85,7 @@ char usage_message[] =
 
 /* application HELP message */
 
-char *help_message[] = {
+const char	*help_message[] = {
 	"Options:",
 	"",
 	"  -c --config <file>    Specify configuration file. Use absolute path",
@@ -363,7 +363,7 @@ int	main(int argc, char **argv)
 	memset(&t, 0, sizeof(t));
 	t.task = ZBX_TASK_START;
 
-	progname = get_programm_name(argv[0]);
+	progname = get_program_name(argv[0]);
 
 	parse_commandline(argc, argv, &t);
 
