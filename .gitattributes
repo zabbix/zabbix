@@ -353,6 +353,7 @@ frontends/php/js/scriptaculous/effects.js -text
 frontends/php/js/scriptaculous/slider.js -text
 frontends/php/js/scriptaculous/sound.js -text
 frontends/php/jsLoader.php -text
+frontends/php/jsrpc.php -text
 frontends/php/locales.php -text
 frontends/php/maintenance.php -text
 frontends/php/popup_bitem.php -text

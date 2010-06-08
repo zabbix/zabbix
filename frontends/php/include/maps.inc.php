@@ -1586,9 +1586,9 @@
 		$selements_info = array();
 		$options = array(
 				'sysmapids' => zbx_objectValues($selements, 'elementid'),
-				'extendoutput' => 1,
+				'output' => API_OUTPUT_EXTEND,
+				'select_selements' => API_OUTPUT_EXTEND,
 				'nopermissions' => 1,
-				'select_selements' => 1,
 				'nodeids' => get_current_nodeid(true)
 			);
 		$maps = CMap::get($options);

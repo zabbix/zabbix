@@ -85,7 +85,8 @@ $ZBX_MENU = array(
 				array('url'=>'vtext.php'),
 				array('url'=>'chart3.php'),
 				array('url'=>'imgstore.php'),
-				array('url'=>'search.php')
+				array('url'=>'search.php'),
+				array('url'=>'jsrpc.php')
 			)
 	),
 	'cm'=>array(
