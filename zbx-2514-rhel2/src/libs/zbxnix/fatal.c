@@ -25,6 +25,7 @@
 #endif
 
 #ifdef	HAVE_SYS_UCONTEXT_H
+#	define	_GNU_SOURCE /* required for getting at program counter */
 #	include <sys/ucontext.h>
 #endif
 
