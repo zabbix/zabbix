@@ -406,6 +406,14 @@ alignSelement: function(selementid){
 	newX += Math.round(this.grid.gridSize / 2) - shiftX;
 	newY += Math.round(this.grid.gridSize / 2) - shiftY;
 
+// limits
+	if(newX < shiftX) newX = 0;
+	else if((newX + dims.width) > this.sysmap.width) newX = this.sysmap.width - dims.width;
+
+	if(newY < shiftY) newY = 0;
+	else if((newY + dims.height) > this.sysmap.height) newY = this.sysmap.height - dims.height;
+//--
+
 	this.selements[selementid].y = newY;
 	this.selements[selementid].x = newX;
 
