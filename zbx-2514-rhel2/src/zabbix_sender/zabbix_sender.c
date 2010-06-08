@@ -26,14 +26,12 @@
 #include "zbxgetopt.h"
 #include "zbxjson.h"
 
-char *progname = NULL;
-
-char title_message[] = "Zabbix Sender";
-
-char usage_message[] = "[-Vhv] {[-zpsI] -ko | [-zpI] -T -i <file> -r} [-c <file>]";
+const char	*progname = NULL;
+const char	title_message[] = "Zabbix Sender";
+const char	usage_message[] = "[-Vhv] {[-zpsI] -ko | [-zpI] -T -i <file> -r} [-c <file>]";
 
 #ifdef HAVE_GETOPT_LONG
-char *help_message[] = {
+const char	*help_message[] = {
 	"Options:",
 	"  -c --config <File>                   Specify configuration file",
 	"",
@@ -60,7 +58,7 @@ char *help_message[] = {
 	0 /* end of text */
 };
 #else
-char *help_message[] = {
+const char	*help_message[] = {
 	"Options:",
 	"  -c <File>                    Specify configuration file",
 	"",
@@ -407,7 +405,7 @@ int main(int argc, char **argv)
 
 	ZBX_THREAD_SENDVAL_ARGS sentdval_args;
 
-	progname = get_programm_name(argv[0]);
+	progname = get_program_name(argv[0]);
 
 	task = parse_commandline(argc, argv);
 

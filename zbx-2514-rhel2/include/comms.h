@@ -38,12 +38,13 @@ typedef enum
 	ZBX_BUF_TYPE_DYN
 } zbx_buf_type_t;
 
+#define ZBX_SOCKET_COUNT	256
 #define ZBX_STAT_BUF_LEN	2048
 
 typedef struct zbx_sock
 {
 	int		num_socks;
-	ZBX_SOCKET	sockets[FD_SETSIZE];
+	ZBX_SOCKET	sockets[ZBX_SOCKET_COUNT];
 	ZBX_SOCKET	socket;
 	ZBX_SOCKET	socket_orig;
 	char		buf_stat[ZBX_STAT_BUF_LEN];
