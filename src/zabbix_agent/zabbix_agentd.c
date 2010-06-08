@@ -307,24 +307,25 @@ int MAIN_ZABBIX_ENTRY(void)
 
 void	zbx_on_exit()
 {
-
-	int i = 0;
+	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called");
 
 	ZBX_DO_EXIT();
 
-	if(threads != NULL)
+	if (threads != NULL)
 	{
-		for(i = 0; i < 1 + CONFIG_ZABBIX_FORKS + ((0 == CONFIG_DISABLE_ACTIVE) ? 1 : 0); i++)
+		int	i;
+
+		for (i = 0; i < 1 + CONFIG_ZABBIX_FORKS + (0 == CONFIG_DISABLE_ACTIVE ? 1 : 0); i++)
 		{
-			if(threads[i]) {
+			if (threads[i])
+			{
 				zbx_thread_kill(threads[i]);
 				threads[i] = (ZBX_THREAD_HANDLE)NULL;
 			}
 		}
+
 		zbx_free(threads);
 	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called.");
 
 #ifdef USE_PID_FILE
 
