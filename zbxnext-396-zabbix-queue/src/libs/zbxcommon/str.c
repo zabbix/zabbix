@@ -86,7 +86,7 @@ void usage()
  ******************************************************************************/
 void help()
 {
-	char **p = help_message;
+	const char **p = help_message;
 
 	app_title();
 	printf("\n");
@@ -308,7 +308,8 @@ void	zbx_chrcpy_alloc(char **str, int *alloc_len, int *offset, const char src)
 	assert(offset && 0 <= *offset);
 	assert(alloc_len && 0 <= *alloc_len);
 
-	if (*offset + 1 >= *alloc_len) {
+	if (*offset + 1 >= *alloc_len)
+	{
 		*alloc_len += 64;
 		*str = zbx_realloc(*str, *alloc_len);
 	}
@@ -319,7 +320,7 @@ void	zbx_chrcpy_alloc(char **str, int *alloc_len, int *offset, const char src)
 }
 
 /* Has to be rewritten to avoid malloc */
-char *string_replace(char *str, char *sub_str1, char *sub_str2)
+char	*string_replace(char *str, char *sub_str1, char *sub_str2)
 {
         char *new_str = NULL;
         char *p;
@@ -402,33 +403,6 @@ void	del_zeroes(char *s)
 			}
 		}
 	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: delete_chars                                                     *
- *                                                                            *
- * Purpose: delete all unwanted characters                                    *
- *                                                                            *
- * Parameters: c - string to delete characters in                             *
- *             charlist - characters to delete                                *
- *                                                                            *
- * Return value: string without unwanted characters                           *
- *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-void	delete_chars(char *c, const char *charlist)
-{
-	char	*p, *q;
-
-	for (p = q = c; '\0' != *p; p++)
-		if (NULL == strchr(charlist, *p))
-			*(q++) = *p;
-
-	*q = '\0';
 }
 
 /******************************************************************************
@@ -546,8 +520,6 @@ void	compress_signs(char *str)
 	char	cur, next, prev;
 	int	loop = 1;
 
-/*	printf("In compress_signs [%s]\n", str);*/
-
 	/* Compress '--' '+-' '++' '-+' */
 	while(loop == 1)
 	{
@@ -572,7 +544,6 @@ void	compress_signs(char *str)
 			}
 		}
 	}
-/*	printf("After removing duplicates [%s]\n", str);*/
 
 	/* Remove '-', '+' where needed, Convert -123 to +D123 */
 	for(i=0;str[i]!='\0';i++)
@@ -621,9 +592,7 @@ void	compress_signs(char *str)
 			}
 		}
 	}
-/*	printf("After removing unnecessary + and - [%s]\n", str);*/
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -711,47 +680,6 @@ void	lrtrim_spaces(char *c)
 {
 	ltrim_spaces(c);
 	rtrim_spaces(c);
-}
-
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_get_field                                                    *
- *                                                                            *
- * Purpose: return Nth field of characted separated string                    *
- *                                                                            *
- * Parameters: c - string to trim spaces                                      *
- *                                                                            *
- * Return value: string without left and right spaces                         *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-int	zbx_get_field(char *line, char *result, int num, char separator)
-{
-	int delim=0;
-	int ptr=0;
-	int i;
-
-	int ret = FAIL;
-
-	for(i=0;line[i]!=0;i++)
-	{
-		if(line[i]==separator)
-		{
-			delim++;
-			continue;
-		}
-		if(delim==num)
-		{
-			result[ptr++]=line[i];
-			result[ptr]=0;
-			ret = SUCCEED;
-		}
-	}
-	return ret;
 }
 
 /*
@@ -938,38 +866,29 @@ char* __zbx_zbx_dsprintf(char *dest, const char *f, ...)
  *            zbx_strdcat(NULL,"") must return "", not NULL!                  *
  *                                                                            *
  ******************************************************************************/
-char* zbx_strdcat(char *dest, const char *src)
+char	*zbx_strdcat(char *dest, const char *src)
 {
-	register int new_len = 0;
-	char *new_dest = NULL;
+	int	len_dest, len_src;
+	char	*new_dest = NULL;
 
-	if(!src)	return dest;
-	if(!dest)	return strdup(src);
+	if (!src)	return dest;
+	if (!dest)	return strdup(src);
 
-	new_len += (int)strlen(dest);
-	new_len += (int)strlen(src);
+	len_dest = (int)strlen(dest);
+	len_src = (int)strlen(src);
 
-	new_dest = zbx_malloc(new_dest, new_len + 1);
+	new_dest = zbx_malloc(new_dest, len_dest + len_src + 1);
 
-	if(dest)
-	{
-		strcpy(new_dest, dest);
-		strcat(new_dest, src);
-		zbx_free(dest);
-	}
-	else
-	{
-		strcpy(new_dest, src);
-	}
-
-	new_dest[new_len] = '\0';
+	strcpy(new_dest, dest);
+	strcpy(new_dest + len_dest, src);
+	zbx_free(dest);
 
 	return new_dest;
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_strdcat                                                      *
+ * Function: zbx_strdcatf                                                     *
  *                                                                            *
  * Purpose: dynamical cating of formated strings                              *
  *                                                                            *
@@ -981,7 +900,7 @@ char* zbx_strdcat(char *dest, const char *src)
  *            zbx_strdcat(NULL,"") must return "", not NULL!                  *
  *                                                                            *
  ******************************************************************************/
-char* __zbx_zbx_strdcatf(char *dest, const char *f, ...)
+char	*__zbx_zbx_strdcatf(char *dest, const char *f, ...)
 {
 	char *string = NULL;
 	char *result = NULL;
@@ -1975,17 +1894,58 @@ int	zbx_pg_unescape_bytea(u_char *io)
 	return o - io;
 }
 #endif
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_get_field                                                    *
+ *                                                                            *
+ * Purpose: return Nth field of character separated string                    *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_get_field(const char *line, char *result, int num, char separator)
+{
+	int delim=0;
+	int ptr=0;
+	int i;
+
+	int ret = FAIL;
+
+	for(i=0;line[i]!=0;i++)
+	{
+		if(line[i]==separator)
+		{
+			delim++;
+			continue;
+		}
+		if(delim==num)
+		{
+			result[ptr++]=line[i];
+			result[ptr]=0;
+			ret = SUCCEED;
+		}
+	}
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_get_next_field                                               *
  *                                                                            *
- * Purpose: return current field of characted separated string                *
+ * Purpose: return current field of character separated string                *
  *                                                                            *
  * Parameters:                                                                *
- *	line - null terminated, character separated string                    *
- *	output - output buffer (current field)                                *
- *	olen - allocated output buffer size                                   *
- *	separator - fields separator                                          *
+ *      line - null terminated, character separated string                    *
+ *      output - output buffer (current field)                                *
+ *      olen - allocated output buffer size                                   *
+ *      separator - fields separator                                          *
  *                                                                            *
  * Return value: pointer to the next field                                    *
  *                                                                            *
@@ -2008,13 +1968,16 @@ int	zbx_get_next_field(const char **line, char **output, int *olen, char separat
 	}
 
 	ret = strchr(*line, separator);
-	if (ret) {
+	if (ret)
+	{
 		flen = (int)(ret - *line);
 		ret++;
-	} else
+	}
+	else
 		flen = (int)strlen(*line);
 
-	if (*olen < flen + 1) {
+	if (*olen < flen + 1)
+	{
 		*olen = flen * 2;
 		*output = zbx_realloc(*output, *olen);
 	}

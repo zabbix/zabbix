@@ -1401,7 +1401,7 @@
 //	chart4.php
 	'S_CHART4_HEADER_TITLE'=>		'%s (year %s)',
 	'S_CHART4_HEADER_DATE_FORMAT'=>		'Y',
-	'S_CHART4_TIMELINE_DATE_FORMAT'=>	'd.M',
+	'S_CHART4_TIMELINE_DATE_FORMAT'=>	'd.F',
 
 //	chart5.php
 	'S_CHART5_HEADER_TITLE'=>		'%s (year %s)',

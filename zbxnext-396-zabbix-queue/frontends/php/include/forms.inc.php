@@ -5802,7 +5802,7 @@
 	}
 
 // Host import form
-	function import_host_form($rules, $template=false){
+	function import_host_form($template=false){
 		$form = new CFormTable(S_IMPORT, null, 'post', 'multipart/form-data');
 		$form->addRow(S_IMPORT_FILE, new CFile('import_file'));
 
@@ -5811,12 +5811,12 @@
 
 		$titles = array('host' => $template?S_TEMPLATE:S_HOST, 'template' => S_TEMPLATE_LINKAGE, 'item' => S_ITEM, 'trigger' => S_TRIGGER, 'graph' => S_GRAPH);
 		foreach($titles as $key => $title){
-			$cbExist = new CCheckBox('rules['.$key.'][exist]', isset($rules[$key]['exist']));
+			$cbExist = new CCheckBox('rules['.$key.'][exist]', true);
 
 			if($key == 'template')
 				$cbMissed = null;
 			else
-				$cbMissed = new CCheckBox('rules['.$key.'][missed]', isset($rules[$key]['missed']));
+				$cbMissed = new CCheckBox('rules['.$key.'][missed]', true);
 
 			$table->addRow(array($title, $cbExist, $cbMissed));
 		}

@@ -81,7 +81,7 @@ require_once('include/items.inc.php');
 				'description'	=> 'Download speed for step \'$2\' of scenario \'$1\'',
 				'key_'		=> 'web.test.in['.$testname.','.$name.',bps]',
 				'type'		=> ITEM_VALUE_TYPE_FLOAT,
-				'units'		=> 'bps',
+				'units'		=> 'Bps',
 				'httpstepitemtype'=> HTTPSTEP_ITEM_TYPE_IN),
 			array(
 				'description'	=> 'Response time for step \'$2\' of scenario \'$1\'',
@@ -288,7 +288,7 @@ require_once('include/items.inc.php');
 					'description'	=> 'Download speed for scenario \'$1\'',
 					'key_'		=> 'web.test.in['.$name.',,bps]',
 					'type'		=> ITEM_VALUE_TYPE_FLOAT,
-					'units'		=> 'bps',
+					'units'		=> 'Bps',
 					'httptestitemtype'=> HTTPSTEP_ITEM_TYPE_IN),
 				array(
 					'description'	=> 'Failed step of scenario \'$1\'',
@@ -452,11 +452,47 @@ require_once('include/items.inc.php');
 	}
 
 	function activate_httptest($httptestid){
-		return DBexecute('UPDATE httptest SET status='.HTTPTEST_STATUS_ACTIVE.' WHERE httptestid='.$httptestid);
+		$r = DBexecute('UPDATE httptest SET status='.HTTPTEST_STATUS_ACTIVE.' WHERE httptestid='.$httptestid);
+		
+		$itemids = array();
+		$sql = 'SELECT hti.itemid FROM httptestitem hti WHERE hti.httptestid='.$httptestid;
+		$items_db = DBselect($sql);
+		while($itemid = Dbfetch($items_db)){
+			$itemids[] = $itemid['itemid'];
+		}
+
+		$sql = 'SELECT hsi.itemid FROM httpstep hs, httpstepitem hsi WHERE '.
+			' hs.httptestid='.$httptestid.' AND hs.httpstepid=hsi.httpstepid';
+		$items_db = DBselect($sql);
+		while($itemid = Dbfetch($items_db)){
+			$itemids[] = $itemid['itemid'];
+		}				
+		
+		$sql = 'UPDATE items SET status='.ITEM_STATUS_ACTIVE.' WHERE '.DBcondition('itemid', $itemids);
+		$r &= DBexecute($sql);
+		return $r;
 	}
 
 	function disable_httptest($httptestid){
-		return DBexecute('UPDATE httptest SET status='.HTTPTEST_STATUS_DISABLED.' WHERE httptestid='.$httptestid);
+		$r = DBexecute('UPDATE httptest SET status='.HTTPTEST_STATUS_DISABLED.' WHERE httptestid='.$httptestid);
+		
+		$itemids = array();
+		$sql = 'SELECT hti.itemid FROM httptestitem hti WHERE hti.httptestid='.$httptestid;
+		$items_db = DBselect($sql);
+		while($itemid = Dbfetch($items_db)){
+			$itemids[] = $itemid['itemid'];
+		}
+
+		$sql = 'SELECT hsi.itemid FROM httpstep hs, httpstepitem hsi WHERE '.
+			' hs.httptestid='.$httptestid.' AND hs.httpstepid=hsi.httpstepid';
+		$items_db = DBselect($sql);
+		while($itemid = Dbfetch($items_db)){
+			$itemids[] = $itemid['itemid'];
+		}				
+		
+		$sql = 'UPDATE items SET status='.ITEM_STATUS_DISABLED.' WHERE '.DBcondition('itemid', $itemids);
+		$r &= DBexecute($sql);
+		return $r;
 	}
 
 	function delete_history_by_httptestid($httptestid){

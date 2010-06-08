@@ -25,12 +25,12 @@
 #include "log.h"
 #include "zbxgetopt.h"
 
-char *progname = NULL;
-char title_message[] = "Zabbix Get";
-char usage_message[] = "[-hV] -s<host name or IP> [-p<port>] [-I<ip address>] -k<key>";
+const char	*progname = NULL;
+const char	title_message[] = "Zabbix Get";
+const char	usage_message[] = "[-hV] -s<host name or IP> [-p<port>] [-I<ip address>] -k<key>";
 
 #ifdef HAVE_GETOPT_LONG
-char *help_message[] = {
+const char	*help_message[] = {
         "Options:",
 	"  -s --host <host name or IP>          Specify host name or IP address of a host.",
 	"  -p --port <port number>              Specify port number of agent running on the host. Default is 10050.",
@@ -45,7 +45,7 @@ char *help_message[] = {
         0 /* end of text */
 };
 #else
-char *help_message[] = {
+const char	*help_message[] = {
         "Options:",
 	"  -s <host name or IP>         Specify host name or IP address of a host.",
 	"  -p <port number>             Specify port number of agent running on the host. Default is 10050.",
@@ -196,7 +196,7 @@ int main(int argc, char **argv)
 	char	*source_ip = NULL;
 	char	ch;
 
-	progname = get_programm_name(argv[0]);
+	progname = get_program_name(argv[0]);
 
 	/* Parse the command-line. */
 	while ((ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)) != (char)EOF)

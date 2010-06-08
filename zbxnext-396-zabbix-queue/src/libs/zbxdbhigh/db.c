@@ -67,15 +67,18 @@ void    DBconnect(int flag)
 	int	err;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "Connect to the database");
-	do {
-		err = zbx_db_connect(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBNAME, CONFIG_DBSOCKET, CONFIG_DBPORT);
+	do
+	{
+		err = zbx_db_connect(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD,
+					CONFIG_DBNAME, CONFIG_DBSOCKET, CONFIG_DBPORT);
 
 		switch(err) {
 		case ZBX_DB_OK:
 			break;
 		case ZBX_DB_DOWN:
-			if(flag == ZBX_DB_CONNECT_EXIT)
+			if (ZBX_DB_CONNECT_EXIT == flag)
 			{
+				zabbix_log(LOG_LEVEL_DEBUG, "Could not connect to the database. Exiting...");
 				exit(FAIL);
 			}
 			else
@@ -86,9 +89,11 @@ void    DBconnect(int flag)
 			}
 			break;
 		default:
+			zabbix_log(LOG_LEVEL_DEBUG, "Could not connect to the database. Exiting...");
 			exit(FAIL);
 		}
-	} while(ZBX_DB_OK != err);
+	}
+	while (ZBX_DB_OK != err);
 }
 
 /******************************************************************************
