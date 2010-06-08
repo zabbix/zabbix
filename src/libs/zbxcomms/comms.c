@@ -705,7 +705,7 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 
 		for (current_ai = ai; NULL != current_ai; current_ai = current_ai->ai_next)
 		{
-			if (FD_SETSIZE == s->num_socks)
+			if (ZBX_SOCKET_COUNT == s->num_socks)
 			{
 				zbx_set_tcp_strerror("Not enough space for socket [[%s]:%s]",
 						ip, port);
@@ -813,7 +813,7 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 			goto out;
 		}
 
-		if (FD_SETSIZE == s->num_socks)
+		if (ZBX_SOCKET_COUNT == s->num_socks)
 		{
 			zbx_set_tcp_strerror("Not enough space for socket [[%s]:%hu]",
 					ip, listen_port);
