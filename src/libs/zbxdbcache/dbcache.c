@@ -2943,25 +2943,29 @@ zbx_uint64_t	DCget_nextid_shared(const char *table_name)
  ******************************************************************************/
 int	DCget_item_lastclock(zbx_uint64_t itemid)
 {
-	int	i, index;
+	int	i, index, clock = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In DCget_item_lastclock()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In DCget_item_lastclock(): itemid [" ZBX_FS_UI64 "]", itemid);
 
 	LOCK_CACHE;
 
-	for (i = 0; i < cache->history_num; i++)
+	index = (cache->history_first + cache->history_num - 1) % ZBX_HISTORY_SIZE;
+
+	for (i = cache->history_num - 1; i >= 0; i--)
 	{
-		index = (cache->history_first + i) % ZBX_HISTORY_SIZE;
 		if (cache->history[index].itemid == itemid)
 		{
-			UNLOCK_CACHE;
-
-			return cache->history[index].clock;
+			clock = cache->history[index].clock;
+			break;
 		}
+
+		if (--index < 0)
+			index = ZBX_HISTORY_SIZE - 1;
 	}
 
 	UNLOCK_CACHE;
 
-	return FAIL;
-}
+	zabbix_log(LOG_LEVEL_DEBUG, "End of DCget_item_lastclock(): %d", clock);
 
+	return clock;
+}
