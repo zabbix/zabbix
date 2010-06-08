@@ -705,10 +705,10 @@ void    *zbx_realloc2(char *filename, int line, void *src, size_t size);
 #define MIN_ZABBIX_PORT 1024u
 #define MAX_ZABBIX_PORT 65535u
 
-extern char *progname;
-extern char title_message[];
-extern char usage_message[];
-extern char *help_message[];
+extern const char	*progname;
+extern const char	title_message[];
+extern const char	usage_message[];
+extern const char	*help_message[];
 
 void	help();
 void	usage();
@@ -717,7 +717,7 @@ void	version();
 /* MAX Length of base64 data */
 #define ZBX_MAX_B64_LEN 16*1024
 
-char	*get_programm_name(char *path);
+const char	*get_program_name(const char *path);
 
 typedef enum
 {
