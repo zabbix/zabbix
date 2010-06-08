@@ -680,7 +680,8 @@ COpt::memoryPick();
 	public static function getObjects($itemData){
 		$options = array(
 			'filter' => $itemData,
-			'output'=>API_OUTPUT_EXTEND
+			'output'=>API_OUTPUT_EXTEND,
+			'webitems' => 1,
 		);
 
 		if(isset($itemData['node']))
