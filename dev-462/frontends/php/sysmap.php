@@ -372,10 +372,10 @@ include_once('include/page_header.php');
 	$elcn_tab = new CTable(null,'textwhite');
 	$menuRow = array();
 
-	$gridShow = new CSpan(S_HIDE, 'whitelink');
+	$gridShow = new CSpan(S_SHOWN, 'whitelink');
 	$gridShow->setAttribute('id', 'gridshow');
 
-	$gridAutoAlign = new CSpan(S_OFF,'whitelink');
+	$gridAutoAlign = new CSpan(S_ON,'whitelink');
 	$gridAutoAlign->setAttribute('id', 'gridautoalign');
 
 
@@ -392,11 +392,11 @@ include_once('include/page_header.php');
 	$gridForm = new CDiv(array($gridSize, $gridAlignAll));
 	$gridForm->setAttribute('id', 'gridalignblock');
 
-	array_push($menuRow, S_ICON.'[',$el_add,$el_rmv,']');
+	array_push($menuRow, S_ICON.' [',$el_add,$el_rmv,']');
 	array_push($menuRow, SPACE.SPACE);
-	array_push($menuRow, S_LINK.'[',$cn_add,$cn_rmv,']');
+	array_push($menuRow, S_LINK.' [',$cn_add,$cn_rmv,']');
 	array_push($menuRow, SPACE.SPACE);
-	array_push($menuRow, S_GRID.'[',$gridShow,'|',$gridAutoAlign,']');
+	array_push($menuRow, S_GRID.' [',$gridShow,'|',$gridAutoAlign,']');
 	array_push($menuRow, SPACE, $gridForm);
 
 	$elcn_tab->addRow($menuRow);

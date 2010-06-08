@@ -402,6 +402,10 @@ alignSelement: function(selementid){
 	newX = Math.floor(newX / this.grid.gridSize) * this.grid.gridSize;
 	newY = Math.floor(newY / this.grid.gridSize) * this.grid.gridSize;
 
+// centrillize
+	newX += Math.round(this.grid.gridSize / 2) - shiftX;
+	newY += Math.round(this.grid.gridSize / 2) - shiftY;
+
 	this.selements[selementid].y = newY;
 	this.selements[selementid].x = newX;
 
@@ -3443,11 +3447,11 @@ setGridAutoAlign: function(e){
 	var domObject = Event.element(e);
 	if(this.autoAlign){
 		this.autoAlign = false;
-		domObject.update(locale['S_ON']);
+		domObject.update(locale['S_OFF']);
 	}
 	else{
 		this.autoAlign = true;
-		domObject.update(locale['S_OFF']);
+		domObject.update(locale['S_ON']);
 	}
 },
 
@@ -3457,11 +3461,11 @@ setGridView: function(e){
 	var domObject = Event.element(e);
 	if(this.showGrid){
 		this.showGrid = false;
-		$(domObject).update(locale['S_SHOW']);
+		$(domObject).update(locale['S_HIDDEN']);
 	}
 	else{
 		this.showGrid = true;
-		$(domObject).update(locale['S_HIDE']);
+		$(domObject).update(locale['S_SHOWN']);
 	}
 
 	this.updateMapView(e);
