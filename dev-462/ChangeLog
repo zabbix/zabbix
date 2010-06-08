@@ -1,5 +1,7 @@
 Changes for 1.8.3
 
+ - [DEV-461] improved map creation/editing by adding align option (Aly)
+ - [ZBX-2518] fixed new map saving (Aly)
  - [ZBX-1477] fixed moving screen elements with spans (Vedmak)
  - [ZBXNEXT-279] added links to parent elements for item and trigger form (Vedmak)
  - [ZBX-2376] port parameter to tcp and tcp_perf is now mandatory (asaveljevs)
