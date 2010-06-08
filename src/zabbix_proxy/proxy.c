@@ -77,28 +77,12 @@ static struct zbx_option longopts[] =
 	{"config",	1,	0,	'c'},
 	{"help",	0,	0,	'h'},
 	{"version",	0,	0,	'V'},
-
-#if defined (_WINDOWS)
-
-	{"install",	0,	0,	'i'},
-	{"uninstall",	0,	0,	'd'},
-
-	{"start",	0,	0,	's'},
-	{"stop",	0,	0,	'x'},
-
-#endif /* _WINDOWS */
-
 	{0,0,0,0}
 };
 
 /* short options */
 
-static char	shortopts[] =
-	"c:n:hV"
-#if defined (_WINDOWS)
-	"idsx"
-#endif /* _WINDOWS */
-	;
+static char	shortopts[] = "c:n:hV";
 
 /* end of COMMAND LINE OPTIONS*/
 
@@ -180,7 +164,7 @@ int	CONFIG_REFRESH_UNSUPPORTED	= 600;
 /* Zabbix server startup time */
 int     CONFIG_SERVER_STARTUP_TIME      = 0;
 
-/* Mutex for node syncs */
+/* Mutex for node syncs; not used in proxy */
 ZBX_MUTEX	node_sync_access;
 
 /******************************************************************************
@@ -624,26 +608,26 @@ int MAIN_ZABBIX_ENTRY(void)
 
 void	zbx_on_exit()
 {
-	zabbix_log(LOG_LEVEL_INFORMATION, "zbx_on_exit()");
-#if !defined(_WINDOWS)
+	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called");
+		
+	if (threads != NULL)
+	{
+		int	i;
 
-	int i = 0;
-
-	if (threads != NULL) {
 		for (i = 1; i <= CONFIG_DBCONFIG_FORKS + CONFIG_CONFSYNCER_FORKS + CONFIG_DATASENDER_FORKS
 				+ CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS
 				+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS
 				+ CONFIG_DBSYNCER_FORKS + CONFIG_IPMIPOLLER_FORKS; i++)
 		{
-			if (threads[i]) {
+			if (threads[i])
+			{
 				kill(threads[i], SIGTERM);
 				threads[i] = (ZBX_THREAD_HANDLE)NULL;
 			}
 		}
+
 		zbx_free(threads);
 	}
-
-#endif /* not _WINDOWS */
 
 #ifdef USE_PID_FILE
 
@@ -659,13 +643,10 @@ void	zbx_on_exit()
 	free_database_cache();
 	free_configuration_cache();
 	DBclose();
-/*	zbx_mutex_destroy(&node_sync_access);*/
 
 #ifdef HAVE_OPENIPMI
 	free_ipmi_handler();
 #endif
-
-	zabbix_close_log();
 
 #ifdef  HAVE_SQLITE3
 	php_sem_remove(&sqlite_access);
@@ -674,6 +655,8 @@ void	zbx_on_exit()
 	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Proxy stopped. Zabbix %s (revision %s).",
 		ZABBIX_VERSION,
 		ZABBIX_REVISION);
+
+	zabbix_close_log();
 
 	exit(SUCCEED);
 }
