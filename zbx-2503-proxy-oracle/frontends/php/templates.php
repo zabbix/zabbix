@@ -503,7 +503,7 @@ include_once('include/page_header.php');
 <?php
 	if(isset($_REQUEST['form'])){
 		if($_REQUEST['form'] == S_IMPORT_TEMPLATE){
-			$template_wdgt->addItem(import_host_form($rules, true));
+			$template_wdgt->addItem(import_host_form(true));
 		}
 		else{
 

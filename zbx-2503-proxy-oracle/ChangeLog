@@ -1,5 +1,11 @@
 Changes for 1.8.3
 
+ - [ZBX-2503] fixed server and proxy crash with Oracle in cases DBUser and DBPassword parameters were not specified (asaveljevs)
+ - [ZBX-2074] fixed wed scenarios showing incorrect speed (Vedmak)
+ - [ZBX-2486] fixed syntax error in 1.6 PostgreSQL upgrade script (asaveljevs)
+ - [ZBX-2336] fixed 'system.hostname' being empty on Windows hosts with names longer than 15 characters (asaveljevs)
+ - [ZBX-2251] removed error displaying in area of graphics (Maxim Andruhovich / AM)
+ - [ZBX-1327] page is now remembered correctly after performing actions (Vedmak)
  - [ZBX-1211] fixed cell spacing in empty cells (Maxim Andruhovich / AM)
  - [ZBX-2372] fixed bug with date in local language, now short and long month names shown correctly (Andruhovich Maxim / AM)
  - [ZBX-2385] added macro {TRIGGER.PROBLEM.EVENTS.PROBLEM.UNACK} (Vedmak)
