@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2503] fixed server and proxy crash with Oracle in cases DBUser and DBPassword parameters were not specified (asaveljevs)
  - [ZBX-2074] fixed wed scenarios showing incorrect speed (Vedmak)
  - [ZBX-2486] fixed syntax error in 1.6 PostgreSQL upgrade script (asaveljevs)
  - [ZBX-2336] fixed 'system.hostname' being empty on Windows hosts with names longer than 15 characters (asaveljevs)

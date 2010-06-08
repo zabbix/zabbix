@@ -28,11 +28,11 @@
 #include "zbxgetopt.h"
 #include "alias.h"
 
-char *progname = NULL;
-char title_message[] = "Zabbix Agent";
-char usage_message[] = "[-Vhp] [-c <file>] [-t <metric>]";
+const char	*progname = NULL;
+const char	title_message[] = "Zabbix Agent";
+const char	usage_message[] = "[-Vhp] [-c <file>] [-t <metric>]";
 #ifndef HAVE_GETOPT_LONG
-char *help_message[] = {
+const char	*help_message[] = {
 	"Options:",
 	"  -c <file>     Specify configuration file. Use absolute path",
 	"  -h            give this help",
@@ -42,7 +42,7 @@ char *help_message[] = {
 	0 /* end of text */
 };
 #else
-char *help_message[] = {
+const char	*help_message[] = {
 	"Options:",
 	"  -c --config <file>  Specify configuration file. Use absolute path",
 	"  -h --help           give this help",
@@ -107,7 +107,7 @@ int	main(int argc, char **argv)
 
 	memset(&result, 0, sizeof(AGENT_RESULT));
 
-	progname = argv[0];
+	progname = get_program_name(argv[0]);
 
 /* Parse the command-line. */
 	while ((ch = (char)zbx_getopt_long(argc, argv, "c:hVpt:", longopts, NULL)) != (char)EOF)
