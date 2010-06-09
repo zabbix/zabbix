@@ -103,7 +103,7 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 
 	if (NOTSUPPORTED == ret)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s", error);
+		zabbix_log(LOG_LEVEL_WARNING, "Host [%s] %s", item->host.host, error);
 		SET_MSG_RESULT(result, error);
 	}
 
