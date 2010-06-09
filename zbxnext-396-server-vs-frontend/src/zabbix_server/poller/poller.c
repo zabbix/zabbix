@@ -262,7 +262,7 @@ static void	activate_host(DC_ITEM *item, int now)
 		fld_available = "available";
 		fld_disable_until = "disable_until";
 		fld_error = "error";
-		type = "ZABBIX";
+		type = "Zabbix";
 		break;
 	case ITEM_TYPE_SNMPv1:
 	case ITEM_TYPE_SNMPv2c:
@@ -392,7 +392,7 @@ static void	deactivate_host(DC_ITEM *item, int now, const char *error)
 		fld_available = "available";
 		fld_disable_until = "disable_until";
 		fld_error = "error";
-		type = "ZABBIX";
+		type = "Zabbix";
 		break;
 	case ITEM_TYPE_SNMPv1:
 	case ITEM_TYPE_SNMPv2c:

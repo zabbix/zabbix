@@ -2318,7 +2318,7 @@ char	*zbx_dservice_type_string(zbx_dservice_type_t service)
 	case SVC_NNTP: return "NNTP";
 	case SVC_IMAP: return "IMAP";
 	case SVC_TCP: return "TCP";
-	case SVC_AGENT: return "ZABBIX agent";
+	case SVC_AGENT: return "Zabbix agent";
 	case SVC_SNMPv1: return "SNMPv1 agent";
 	case SVC_SNMPv2c: return "SNMPv2c agent";
 	case SVC_SNMPv3: return "SNMPv3 agent";
