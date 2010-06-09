@@ -40,7 +40,6 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-
 		'actionid'=>		array(T_ZBX_INT, O_OPT, P_SYS, DB_ID, null),
 		'name'=>			array(T_ZBX_STR, O_OPT,	 null, NOT_EMPTY, 'isset({save})'),
 		'eventsource'=>		array(T_ZBX_INT, O_MAND, null, IN(array(EVENT_SOURCE_TRIGGERS,EVENT_SOURCE_DISCOVERY,EVENT_SOURCE_AUTO_REGISTRATION)),	null),
@@ -137,53 +136,37 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 			access_deny();
 
-		$_REQUEST['recovery_msg'] = get_request('recovery_msg',0);
-		$_REQUEST['r_shortdata'] = get_request('r_shortdata','');
-		$_REQUEST['r_longdata'] = get_request('r_longdata','');
-
 		if(!isset($_REQUEST['escalation'])) $_REQUEST['esc_period'] = 0;
 
 		$conditions = get_request('conditions', array());
-		$operations = get_request('operations', array());
+		foreach($conditions as $cnum => &$condition){
+			$condition['conditiontype'] = $condition['type'];
+		}
+		unset($condition);
 
-		DBstart();
+		$action = array(
+			'name'				=> get_request('name'),
+			'eventsource'		=> get_request('eventsource',0),
+			'evaltype'			=> get_request('evaltype',0),
+			'status'			=> get_request('status',0),
+			'esc_period'		=> get_request('esc_period',0),
+			'def_shortdata'		=> get_request('def_shortdata',''),
+			'def_longdata'		=> get_request('def_longdata',''),
+			'recovery_msg'		=> get_request('recovery_msg',0),
+			'r_shortdata'		=> get_request('r_shortdata',''),
+			'r_longdata'		=> get_request('r_longdata',''),
+			'conditions'		=> $conditions,
+			'operations'		=> get_request('operations', array()),
+		);
+
 		if(isset($_REQUEST['actionid'])){
-
-			$actionid = $_REQUEST['actionid'];
-			$result = update_action($actionid,
-				$_REQUEST['name'],$_REQUEST['eventsource'],$_REQUEST['esc_period'],
-				$_REQUEST['def_shortdata'],$_REQUEST['def_longdata'],
-				$_REQUEST['recovery_msg'],$_REQUEST['r_shortdata'],$_REQUEST['r_longdata'],
-				$_REQUEST['evaltype'],$_REQUEST['status'],
-				$conditions, $operations
-				);
-
-			$result = DBend($result);
+			$action['actionid']= $_REQUEST['actionid'];
+			
+			$result = CAction::update($action);
 			show_messages($result,S_ACTION_UPDATED,S_CANNOT_UPDATE_ACTION);
 		}
-		else {
-			foreach($conditions as $cnum => &$condition){
-				$condition['conditiontype'] = $condition['type'];
-			}
-			unset($condition);
-
-			$action = array(
-					'name'				=> get_request('name'),
-					'eventsource'		=> get_request('eventsource',0),
-					'evaltype'			=> get_request('evaltype',0),
-					'status'			=> get_request('status',0),
-					'esc_period'		=> get_request('esc_period',0),
-					'def_shortdata'		=> get_request('def_shortdata',''),
-					'def_longdata'		=> get_request('def_longdata',''),
-					'recovery_msg'		=> get_request('recovery_msg',0),
-					'r_shortdata'		=> get_request('r_shortdata',''),
-					'r_longdata'			=> get_request('r_longdata',''),
-					'conditions'		=> $conditions,
-					'operations'		=> $operations
-				);
-
+		else{
 			$result = CAction::create($action);
-			$result = DBend($result);
 			show_messages($result,S_ACTION_ADDED,S_CANNOT_ADD_ACTION);
 		}
 
@@ -200,28 +183,22 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 			access_deny();
 
-		$action_data = DBfetch(DBselect('select name from actions where actionid='.$_REQUEST['actionid']));
-
-		DBstart();
-		delete_action($_REQUEST['actionid']);
-		$result = DBend();
+		$result = CAction::delete($_REQUEST['actionid']);
 
 		show_messages($result,S_ACTION_DELETED,S_CANNOT_DELETE_ACTION);
 		if($result){
-			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_ACTION,
-				'Id ['.$_REQUEST['actionid'].'] '.S_NAME.' ['.$action_data['name'].']');
 			unset($_REQUEST['form']);
 			unset($_REQUEST['actionid']);
 		}
 	}
-	else if(inarr_isset(array('add_condition','new_condition'))){
+	else if(inarr_isset(array('add_condition', 'new_condition'))){
 		$new_condition = $_REQUEST['new_condition'];
 
 		if(!isset($new_condition['value'])) $new_condition['value'] = '';
 
-		if( validate_condition($new_condition['type'],$new_condition['value']) ){
+		if(validate_condition($new_condition['type'], $new_condition['value'])){
 			$_REQUEST['conditions'] = get_request('conditions',array());
-			if(!str_in_array($new_condition,$_REQUEST['conditions']))
+			if(!str_in_array($new_condition, $_REQUEST['conditions']))
 				array_push($_REQUEST['conditions'],$new_condition);
 
 			unset($_REQUEST['new_condition']);
@@ -333,25 +310,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		if(!count($nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 			access_deny();
 
-		DBstart();
-		$actionids = array();
-		$sql = 'SELECT DISTINCT a.actionid '.
-					' FROM actions a '.
-					' WHERE '.DBin_node('a.actionid',$nodes).
-						' AND '.DBcondition('a.actionid', $_REQUEST['g_actionid']);
-
-		$go_result=DBselect($sql);
-		while($row=DBfetch($go_result)){
-			$del_res = delete_action($row['actionid']);
-			if($del_res)
-				$actionids[] = $row['actionid'];
-		}
-		$go_result = DBend();
-
-		if($go_result && isset($del_res)){
-			show_messages(TRUE, S_ACTIONS_DELETED, S_CANNOT_DELETE_ACTIONS);
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',',$actionids).'] deleted');
-		}
+		$go_result = CAction::delete($_REQUEST['g_actionid']);
 	}
 
 	if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
@@ -593,6 +552,6 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 
 	$action_wdgt->show();
 
-	
+
 include_once('include/page_footer.php');
 ?>
