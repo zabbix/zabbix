@@ -574,7 +574,7 @@ SDI('/////////////////////////////////');
  */
 	public static function create($screens){
 		$screens = zbx_toArray($screens);
-		$insert_screen = array();
+		$insert_screens = array();
 		$insert_screen_items = array();
 
 		try{
@@ -597,9 +597,9 @@ SDI('/////////////////////////////////');
 				$iscr = array('name' => $screen['name']);
 				if(isset($screen['hsize'])) $iscr['hsize'] = $screen['hsize'];
 				if(isset($screen['vsize'])) $iscr['vsize'] = $screen['vsize'];
-				$insert_screen[$snum] = $iscr;
+				$insert_screens[$snum] = $iscr;
 			}
-			$screenids = DB::insert('screens', $insert_screen);
+			$screenids = DB::insert('screens', $insert_screens);
 
 			foreach($screens as $snum => $screen){
 				if(isset($screen['screenitems'])){
@@ -662,8 +662,9 @@ SDI('/////////////////////////////////');
 						'output' => API_OUTPUT_SHORTEN,
 					);
 					$exist_screens = self::get($options);
-					$exist_screens = reset($exist_screens);
-					if($exist_screens && ($exist_screens['screenid'] != $screen['screenid']))
+					$exist_screen = reset($exist_screens);
+
+					if($exist_screen && ($exist_screen['screenid'] != $screen['screenid']))
 						self::exception(ZBX_API_ERROR_PERMISSIONS, S_SCREEN.' [ '.$screen['name'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
 

@@ -903,7 +903,6 @@ else {
 			$sql = 'SELECT nextid FROM ids WHERE nodeid='.$nodeid .'
 				AND table_name='.$table.' AND field_name='.$id_name;
 			$res = DBfetch(DBselect($sql));
-
 			if($res){
 				$nextid = $res['nextid']+1;
 
