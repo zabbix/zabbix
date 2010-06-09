@@ -288,7 +288,7 @@ sdii($screens_to_check);
 								'nodeids' => $nodeids,
 								'graphids' => $graphs_to_check,
 								'editable' => $options['editable']);
-			$allowed_graphs = CGraph::get($graph_options);		
+			$allowed_graphs = CGraph::get($graph_options);
 			$allowed_graphs = zbx_objectValues($allowed_graphs, 'graphid');
 
 // item
@@ -668,14 +668,12 @@ SDI('/////////////////////////////////');
 						self::exception(ZBX_API_ERROR_PERMISSIONS, S_SCREEN.' [ '.$screen['name'].' ] '.S_ALREADY_EXISTS_SMALL);
 					}
 
-				$u = array();
-				if(isset($screen['name'])) $u['name'] = $screen['name'];
-				if(isset($screen['hsize'])) $u['hsize'] = $screen['hsize'];
-				if(isset($screen['vsize'])) $u['vsize'] = $screen['vsize'];
-				if(!empty($u)){
+				$screenid = $screen['screenid'];
+				unset($screen['screenid']);
+				if(!empty($screen)){
 					$update[] = array(
-						'values' => $u,
-						'where' => 'screenid='.$screen['screenid'],
+						'values' => $screen,
+						'where' => 'screenid='.$screenid,
 				);
 				}
 
@@ -789,7 +787,7 @@ SDI('/////////////////////////////////');
 		);
 		$screens = self::get($options);
 
-		
+
 		foreach($data['screenitems'] as $new_item){
 			$items_db_fields = array(
 				'x' => null,
@@ -806,7 +804,7 @@ SDI('/////////////////////////////////');
 			foreach($screen['screenitems'] as $cnum => $current_item){
 				foreach($new_items as $nnum => $new_item){
 					if(($current_item['x'] == $new_item['x']) && ($current_item['y'] == $new_item['y'])){
-						
+
 						$u = array(
 							'where' => 'screenid='.$screen['screenid'].' AND x='.$new_item['x'].' AND y='.$new_item['y'],
 						);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,12 +29,6 @@
 class CAPIInfo extends CZBXAPI{
 /**
  * Get API version
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
  *
  * @return string
  */
