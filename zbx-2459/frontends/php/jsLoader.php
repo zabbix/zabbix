@@ -26,6 +26,7 @@ $availableJScripts = array(
 	'main.js' => '',
 	'class.calendar.js' => '',
 	'class.cdate.js' => '',
+	'class.cdebug.js' => '',
 	'class.cmap.js' => '',
 	'class.cookie.js' => '', 
 	'class.cscreen.js' => '',
@@ -34,7 +35,8 @@ $availableJScripts = array(
 	'class.ctree.js' => '',
 	'class.curl.js' => '',
 	'class.rpc.js' => '',
-	'class.pmaster.js' => ''
+	'class.pmaster.js' => '',
+	'class.cviewswitcher.js' => ''
 );
 
 $tranStrings = array(
@@ -50,7 +52,8 @@ $tranStrings = array(
 		'S_TUESDAY_SHORT_BIG', 'S_WEDNESDAY_SHORT_BIG', 'S_THURSDAY_SHORT_BIG', 'S_FRIDAY_SHORT_BIG',
 		'S_SATURDAY_SHORT_BIG', 'S_SUNDAY_SHORT_BIG'
 	),
-	'class.cmap.js' => array('S_EDIT_MAP_ELEMENT','S_ERROR', 'S_TYPE','S_LABEL','S_GET_SELEMENTS_FAILED',
+	'class.cmap.js' => array('S_ON','S_OFF','S_HIDDEN','S_SHOWN','S_EDIT_MAP_ELEMENT','S_ERROR',
+		'S_TYPE','S_LABEL','S_GET_SELEMENTS_FAILED','S_SHOW','S_HIDE',
 		'S_LABEL_LOCATION','S_HOST', 'S_MAP','S_TRIGGER','S_SELECT', 'S_HOST_GROUP','S_IMAGE','S_ICON_OK',
 		'S_ICON_PROBLEM','S_ICON_UNKNOWN', 'S_ICON_MAINTENANCE','S_ICON_DISABLED','S_ICON_DEFAULT',
 		'S_COORDINATE_X','S_COORDINATE_Y', 'S_URL','S_BOTTOM','S_TOP','S_LEFT','S_RIGHT','S_DEFAULT',
@@ -67,7 +70,7 @@ $tranStrings = array(
 );
 
 if(empty($_GET['files'])){
-	$files = array('prototype.js', 'common.js', 'class.cookie.js', 'class.rpc.js', 'class.curl.js', 'class.csuggest.js', 'class.cdate.js', 'main.js', 'functions.js');
+	$files = array('prototype.js', 'common.js', 'class.cdebug.js', 'class.cookie.js', 'class.rpc.js', 'class.curl.js', 'class.csuggest.js', 'class.cdate.js', 'main.js', 'functions.js');
 }
 else{
 	$files = $_GET['files'];

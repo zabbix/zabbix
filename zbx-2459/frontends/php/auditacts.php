@@ -231,12 +231,12 @@ include_once('include/page_header.php');
 // NAV BAR
 	$timeline = array(
 		'period' => $effectiveperiod,
-		'starttime' => date('YmdHi', $starttime),
+		'starttime' => date('YmdHis', $starttime),
 		'usertime' => null
 	);
 
 	if(isset($_REQUEST['stime'])){
-		$timeline['usertime'] = date('YmdHi', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
+		$timeline['usertime'] = date('YmdHis', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 	}
 
 	$dom_graph_id = 'events';

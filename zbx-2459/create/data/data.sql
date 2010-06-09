@@ -84,7 +84,7 @@ INSERT INTO hosts VALUES (10013,0,'Template_HPUX','Template_HPUX',0,'',10050,3,0
 INSERT INTO hosts VALUES (10014,0,'Template_MacOS_X','Template_MacOS_X',0,'',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','',0,0,0,0,0,0,0,0,'',0,0,'','');
 INSERT INTO hosts VALUES (10015,0,'Template_Solaris','Template_Solaris',0,'',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','',0,0,0,0,0,0,0,0,'',0,0,'','');
 INSERT INTO hosts VALUES (10016,0,'Template_SNMPv1_Device','',0,'',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','',0,0,0,0,0,0,0,0,'',0,0,'','');
-INSERT INTO hosts VALUES (10017,0,'Zabbix Server','',1,'127.0.0.1',10050,1,0,'',0,0,0,0,0,0,623,0,2,'','',0,0,0,0,0,0,0,0,'',0,0,'','');
+INSERT INTO hosts VALUES (10017,0,'Zabbix server','',1,'127.0.0.1',10050,1,0,'',0,0,0,0,0,0,623,0,2,'','',0,0,0,0,0,0,0,0,'',0,0,'','');
 INSERT INTO hosts VALUES (10018,0,'Template_Cisco_PIX_525','',0,'',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','',0,0,0,0,0,0,0,0,'',0,0,'','');
 INSERT INTO hosts VALUES (10019,0,'Template_Dell_PowerConnect_6248','',0,'',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','',0,0,0,0,0,0,0,0,'',0,0,'','');
 INSERT INTO hosts VALUES (10020,0,'Template_APC_Battery','',0,'0.0.0.0',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','',0,0,0,0,0,0,0,0,'',0,0,'','');
@@ -313,8 +313,8 @@ INSERT INTO valuemaps VALUES (7,'Dell Open Manage System Status');
 INSERT INTO groups VALUES (1,'Templates',0);
 INSERT INTO groups VALUES (2,'Linux servers',0);
 INSERT INTO groups VALUES (3,'Windows servers',0);
-INSERT INTO groups VALUES (4,'Zabbix Servers',0);
-INSERT INTO groups VALUES (5,'Discovered Hosts',1);
+INSERT INTO groups VALUES (4,'Zabbix servers',0);
+INSERT INTO groups VALUES (5,'Discovered hosts',1);
 
 --
 -- Dumping data for table hosts_groups
@@ -368,34 +368,42 @@ INSERT INTO hosts_groups VALUES (46,10046,1);
 -- Dumping data for table `help_items`
 --
 
-insert into help_items values (3,'icmpping[&lt;ip&gt;,&lt;count&gt;,&lt;interval&gt;,&lt;size&gt;,&lt;timeout&gt;]','Checks if server is accessible by ICMP ping	0 - ICMP ping fails 1 - ICMP ping successful	One of zabbix_server processes performs ICMP pings once per PingerFrequency seconds.');
-insert into help_items values (3,'icmppingloss[&lt;ip&gt;,&lt;count&gt;,&lt;interval&gt;,&lt;size&gt;,&lt;timeout&gt;]','Returns percentage of lost ICMP ping packets');
-insert into help_items values (3,'icmppingsec[&lt;ip&gt;,&lt;count&gt;,&lt;interval&gt;,&lt;size&gt;,&lt;timeout&gt;,&lt;type&gt;]','Returns ICMP ping response time	Number of seconds Example: 0.02');
-insert into help_items values (3,'ftp&lt;,port&gt;','Checks if FTP server is running and accepting connections	0 - FTP server is down 1 - FTP server is running');
-insert into help_items values (3,'http&lt;,port&gt;','Checks if HTTP (WEB) server is running and accepting connections	0 - HTTP server is down 1 - HTTP server is running');
-insert into help_items values (3,'imap&lt;,port&gt;','Checks if IMAP server is running and accepting connections	0 - IMAP server is down 1 - IMAP server is running');
-insert into help_items values (3,'nntp&lt;,port&gt;','Checks if NNTP server is running and accepting connections	0 - NNTP server is down 1 - NNTP server is running');
-insert into help_items values (3,'pop&lt;,port&gt;','Checks if POP server is running and accepting connections	0 - POP server is down 1 - POP server is running');
-insert into help_items values (3,'smtp&lt;,port&gt;','Checks if SMTP server is running and accepting connections	0 - SMTP server is down 1 - SMTP server is running');
-insert into help_items values (3,'ssh&lt;,port&gt;','Checks if SSH server is running and accepting connections	0 - SSH server is down 1 - SSH server is running');
-insert into help_items values (3,'tcp,port','Checks if TCP service is running and accepting connections on port	0 - the service on the port is down 1 - the service is running');
-insert into help_items values (3,'tcp_perf,port','Checks if TCP service is running and accepting connections on port	0 - the service on the port is down Otherwise, number of milliseconds spent connecting to TCP service');
-insert into help_items values (3,'ftp_perf&lt;,port&gt;','Checks if FTP server is running and accepting connections	0 - FTP server is down Otherwise, number of milliseconds spent connecting to FTP server');
-insert into help_items values (3,'http_perf&lt;,port&gt;','Checks if HTTP (WEB) server is running and accepting connections	0 - HTTP server is down Otherwise, number of milliseconds spent connecting to HTTP server');
-insert into help_items values (3,'imap_perf&lt;,port&gt;','Checks if IMAP server is running and accepting connections	0 - IMAP server is down Otherwise, number of milliseconds spent connecting to IMAP server');
-insert into help_items values (3,'nntp_perf&lt;,port&gt;','Checks if NNTP server is running and accepting connections	0 - NNTP server is down Otherwise, number of milliseconds spent connecting to NNTP server');
-insert into help_items values (3,'pop_perf&lt;,port&gt;','Checks if POP server is running and accepting connections	0 - POP server is down Otherwise, number of milliseconds spent connecting to POP server');
-insert into help_items values (3,'smtp_perf&lt;,port&gt;','Checks if SMTP server is running and accepting connections	0 - SMTP server is down Otherwise, number of milliseconds spent connecting to SMTP server');
-insert into help_items values (3,'ssh_perf&lt;,port&gt;','Checks if SSH server is running and accepting connections	0 - SSH server is down Otherwise, number of milliseconds spent connecting to SSH server');
+insert into help_items values (3,'icmpping[&lt;ip&gt;,&lt;count&gt;,&lt;interval&gt;,&lt;size&gt;,&lt;timeout&gt;]','Checks if server is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful. One of zabbix_server processes performs ICMP pings once per PingerFrequency seconds.');
+insert into help_items values (3,'icmppingloss[&lt;ip&gt;,&lt;count&gt;,&lt;interval&gt;,&lt;size&gt;,&lt;timeout&gt;]','Returns percentage of lost ICMP ping packets.');
+insert into help_items values (3,'icmppingsec[&lt;ip&gt;,&lt;count&gt;,&lt;interval&gt;,&lt;size&gt;,&lt;timeout&gt;,&lt;type&gt;]','Returns ICMP ping response time in seconds. Example: 0.02');
+insert into help_items values (3,'ftp&lt;,port&gt;','Checks if FTP server is running and accepting connections. 0 - FTP server is down. 1 - FTP server is running.');
+insert into help_items values (3,'http&lt;,port&gt;','Checks if HTTP (WEB) server is running and accepting connections. 0 - HTTP server is down. 1 - HTTP server is running.');
+insert into help_items values (3,'imap&lt;,port&gt;','Checks if IMAP server is running and accepting connections. 0 - IMAP server is down. 1 - IMAP server is running.');
+insert into help_items values (3,'ldap&lt;,port&gt;','Checks if LDAP server is running and accepting connections. 0 - LDAP server is down. 1 - LDAP server is running.');
+insert into help_items values (3,'nntp&lt;,port&gt;','Checks if NNTP server is running and accepting connections. 0 - NNTP server is down. 1 - NNTP server is running.');
+insert into help_items values (3,'ntp&lt;,port&gt;','Checks if NTP server is running and accepting connections. 0 - NTP server is down. 1 - NTP server is running.');
+insert into help_items values (3,'pop&lt;,port&gt;','Checks if POP server is running and accepting connections. 0 - POP server is down. 1 - POP server is running.');
+insert into help_items values (3,'smtp&lt;,port&gt;','Checks if SMTP server is running and accepting connections. 0 - SMTP server is down. 1 - SMTP server is running.');
+insert into help_items values (3,'ssh&lt;,port&gt;','Checks if SSH server is running and accepting connections. 0 - SSH server is down. 1 - SSH server is running.');
+insert into help_items values (3,'tcp,port','Checks if TCP service is running and accepting connections on port. 0 - the service on the port is down. 1 - the service is running.');
+insert into help_items values (3,'ftp_perf&lt;,port&gt;','Checks if FTP server is running and accepting connections. 0 - FTP server is down. Otherwise, number of seconds spent connecting to FTP server.');
+insert into help_items values (3,'http_perf&lt;,port&gt;','Checks if HTTP (WEB) server is running and accepting connections. 0 - HTTP server is down. Otherwise, number of seconds spent connecting to HTTP server.');
+insert into help_items values (3,'imap_perf&lt;,port&gt;','Checks if IMAP server is running and accepting connections. 0 - IMAP server is down. Otherwise, number of seconds spent connecting to IMAP server.');
+insert into help_items values (3,'ldap_perf&lt;,port&gt;','Checks if LDAP server is running and accepting connections. 0 - LDAP server is down. Otherwise, number of seconds spent connecting to LDAP server.');
+insert into help_items values (3,'nntp_perf&lt;,port&gt;','Checks if NNTP server is running and accepting connections. 0 - NNTP server is down. Otherwise, number of seconds spent connecting to NNTP server.');
+insert into help_items values (3,'ntp_perf&lt;,port&gt;','Checks if NTP server is running and accepting connections. 0 - NTP server is down. Otherwise, number of seconds spent connecting to NTP server.');
+insert into help_items values (3,'pop_perf&lt;,port&gt;','Checks if POP server is running and accepting connections. 0 - POP server is down. Otherwise, number of milliseconds spent connecting to POP server.');
+insert into help_items values (3,'smtp_perf&lt;,port&gt;','Checks if SMTP server is running and accepting connections. 0 - SMTP server is down. Otherwise, number of seconds spent connecting to SMTP server.');
+insert into help_items values (3,'ssh_perf&lt;,port&gt;','Checks if SSH server is running and accepting connections. 0 - SSH server is down. Otherwise, number of seconds spent connecting to SSH server.');
+insert into help_items values (3,'tcp_perf,port','Checks if TCP service is running and accepting connections on port. 0 - the service on the port is down. Otherwise, number of seconds spent connecting to TCP service.');
 
-insert into help_items values (5,'zabbix[history]','Number of values stored in table HISTORY');
-insert into help_items values (5,'zabbix[history_str]','Number of values stored in table HISTORY_STR');
-insert into help_items values (5,'zabbix[items]','Number of items in Zabbix database');
-insert into help_items values (5,'zabbix[items_unsupported]','Number of unsupported items in Zabbix database');
+insert into help_items values (5,'zabbix[history]','Number of values stored in table HISTORY.');
+insert into help_items values (5,'zabbix[history_log]','Number of values stored in table HISTORY_LOG.');
+insert into help_items values (5,'zabbix[history_str]','Number of values stored in table HISTORY_STR.');
+insert into help_items values (5,'zabbix[history_text]','Number of values stored in table HISTORY_TEXT.');
+insert into help_items values (5,'zabbix[history_uint]','Number of values stored in table HISTORY_UINT.');
+insert into help_items values (5,'zabbix[items]','Number of items in Zabbix database.');
+insert into help_items values (5,'zabbix[items_unsupported]','Number of unsupported items in Zabbix database.');
 insert into help_items values (5,'zabbix[log]','Stores warning and error messages generated by Zabbix server.');
-insert into help_items values (5,'zabbix[queue]','Number of items in the queue');
-insert into help_items values (5,'zabbix[trends]','Number of values stored in table TRENDS');
-insert into help_items values (5,'zabbix[triggers]','Number of triggers in Zabbix database');
+insert into help_items values (5,'zabbix[queue&lt;,from&gt;&lt;,to&gt;]','Number of items in the queue which are delayed by from to to seconds, inclusive.');
+insert into help_items values (5,'zabbix[trends]','Number of values stored in table TRENDS.');
+insert into help_items values (5,'zabbix[trends_uint]','Number of values stored in table TRENDS_UINT.');
+insert into help_items values (5,'zabbix[triggers]','Number of triggers in Zabbix database.');
 
 insert into help_items values (8,'grpfunc[&lt;Group&gt;,&lt;Key&gt;,&lt;func&gt;,&lt;param&gt;]','Aggregate checks do not require any agent running on a host being monitored. Zabbix server collects aggregate information by doing direct database queries. See Zabbix Manual.');
 
@@ -437,7 +445,7 @@ insert into help_items values(0,'vfs.file.md5sum[file]','Calculate MD5 check sum
 insert into help_items values(0,'vfs.file.regexp[file,regexp]','Find string in a file. Matched string');
 insert into help_items values(0,'vfs.file.regmatch[file,regexp]','Find string in a file. 0 - expression not found, 1 - found');
 insert into help_items values(0,'vfs.file.size[file]','Size of a given file. Size in bytes. File must have read permissions for user zabbix. Example: vfs.file.size[/var/log/syslog]');
-insert into help_items values(0,'vfs.file.time[file&lt;, mode&gt;]','File time information. Number of seconds.	The mode is optional. If mode is missing modify is used.');
+insert into help_items values(0,'vfs.file.time[file &lt;,mode&gt;]','File time information. Number of seconds.	The mode is optional. If mode is missing modify is used.');
 insert into help_items values(0,'vfs.fs.inode[fs &lt;,mode&gt;]','Number of inodes for a given volume. If mode is missing total is used.');
 insert into help_items values(0,'vfs.fs.size[fs &lt;,mode&gt;]','Calculate disk space for a given volume. Disk space in KB. If mode is missing total is used.  In case of mounted volume, unused disk space for local file system is returned. Example: vfs.fs.size[/tmp,free].');
 insert into help_items values(0,'vm.memory.size[&lt;mode&gt;]','Amount of memory size in bytes. If mode is missing total is used.');
@@ -12280,7 +12288,7 @@ INSERT INTO graphs_items VALUES (795,384,22149,0,0,'FF00FF',1,2,0,5);
 INSERT INTO graphs_items VALUES (796,385,22137,0,0,'009900',1,2,0,5);
 
 --
--- Dumping data for table graph_theme
+-- Dumping data for table `graph_theme`
 --
 
 INSERT INTO graph_theme VALUES (1,'Original Blue','css_ob.css','F0F0F0','FFFFFF','333333','CCCCCC','AAAAAA','000000','222222','AA4444','11CC11','CC1111','E0E0E0',1,1);
@@ -12290,7 +12298,7 @@ INSERT INTO graph_theme VALUES (2,'Black & Blue','css_bb.css','333333','0A0A0A',
 -- Dumping data for table `screens`
 --
 
-INSERT INTO screens VALUES (2,'Zabbix Server',2,3);
+INSERT INTO screens VALUES (2,'Zabbix server',2,3);
 
 --
 -- Dumping data for table `screens_items`
@@ -12312,4 +12320,4 @@ INSERT INTO sysmaps VALUES (2,'Local network',980,200,0,1,2,0);
 -- Dumping data for table `sysmaps_elements`
 --
 
-INSERT INTO sysmaps_elements VALUES (2,2,10017,0,19,0,0,'ZABBIX Server',NULL,100,100,'',0,0);
+INSERT INTO sysmaps_elements VALUES (2,2,10017,0,19,0,0,'Zabbix server',NULL,100,100,'',0,0);

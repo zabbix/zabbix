@@ -9,7 +9,7 @@
 ** (at your option) any later version.
 **
 ** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** but WITHOUT ANY WARRANTY; withouts even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ** GNU General Public License for more details.
 **
@@ -376,8 +376,10 @@
 	'S_DEFAULT_MESSAGE'=>			'Default message',
 	'S_DEFAULT_SUBJECT'=>			'Default subject',
 	'S_MESSAGE'=>				'Message',
-	'S_ON'=>				'ON',
-	'S_OFF'=>				'OFF',
+	'S_ON_BIG'=>				'ON',
+	'S_OFF_BIG'=>				'OFF',
+	'S_ON'=>					'On',
+	'S_OFF'=>					'Off',
 	'S_NO_ACTIONS_DEFINED'=>		'No actions defined',
 	'S_SINGLE_USER'=>			'Single user',
 	'S_USER_GROUP'=>			'User group',
@@ -822,7 +824,10 @@
 	'S_DELETE_SELECTED_GROUPS'=>		'Delete selected groups',
 
 //	hosts.php
+	'S_IMPORT_TEMPLATE'=>			'Import Template',
+	'S_IMPORT_HOST'=>				'Import Host',
 	'S_MACROS'=>					'Macros',
+	'S_MACRO'=>					'Macro',
 	'S_WRONG_MACRO'=>				'Wrong macro',
 	'S_MACRO_TOO_LONG'=>				'Macro name is too long, should not exceed 64 chars.',
 	'S_MACRO_VALUE_TOO_LONG'=>			'Macro value is too long, should not exceed 255 chars.',
@@ -831,6 +836,8 @@
 	'S_EMPTY_MACRO_VALUE'=>				'Empty macro value',
 	'S_NO_MACROS_DEFINED'=>				'No macros defined',
 	'S_MACRO_ADDED'=>				'Macro added',
+	'S_MACROS_UPDATED'=>				'Macros updated',
+	'S_CANNOT_UPDATE_MACROS'=>				'Cannot update macros',
 	'S_MACROS_DELETED' =>				'Macros deleted',
 	'S_CANNOT_ADD_MACRO'=>				'Cannot add macro',
 	'S_CANNOT_DELETE_MACROS'=>			'Cannot delete macros',
@@ -1193,10 +1200,14 @@
 	'S_LATEST_ITEMS_TRIGGERS_DATE_FORMAT'=>	'd M Y H:i:s',
 
 //	sysmap.php
-	'S_UPPER_LEVEL_MAPS'=>			'Upper level maps',
+	'S_HIDDEN'=>			'Hidden',
+	'S_SHOWN'=>				'Shown',
+	'S_ALIGN_ICONS'=>		'Align icons',
+	'S_UPPER_LEVEL_MAPS'=>	'Upper level maps',
 	'S_LINKS'=>				'Links',
 	'S_LINK'=>				'Link',
 	'S_LABEL'=>				'Label',
+	'S_GRID'=>				'Grid',
 	'S_X'=>					'X',
 	'S_ICON_PROBLEM'=>			'Icon (problem)',
 	'S_ICON_OK'=>				'Icon (OK)',
@@ -1396,7 +1407,7 @@
 //	chart4.php
 	'S_CHART4_HEADER_TITLE'=>		'%s (year %s)',
 	'S_CHART4_HEADER_DATE_FORMAT'=>		'Y',
-	'S_CHART4_TIMELINE_DATE_FORMAT'=>	'd.M',
+	'S_CHART4_TIMELINE_DATE_FORMAT'=>	'd.F',
 
 //	chart5.php
 	'S_CHART5_HEADER_TITLE'=>		'%s (year %s)',
@@ -1515,6 +1526,7 @@
 	'S_WIDTH'=>						'Width',
 	'S_HEIGHT'=>					'Height',
 	'S_CREATE_SCREEN'=>				'Create Screen',
+	'S_CREATE_SLIDESHOW'=>			'Create Slide Show',
 	'S_EDIT'=>						'Edit',
 	'S_DYNAMIC_ITEM'=>				'Dynamic item',
 	'S_DIMENSION_COLS_ROWS'=>		'Dimension (cols x rows)',
@@ -1574,7 +1586,7 @@
 
 //	screens.php
 	'S_CUSTOM_SCREENS'=>			'Custom screens',
-	'S_SCREENS_BIG'=>			'SCREENS',
+	'S_SCREENS_BIG'=>				'SCREENS',
 
 	'S_SLIDESHOW_UPDATED'=>			'Slideshow updated',
 	'S_CANNOT_UPDATE_SLIDESHOW'=>		'Cannot_update slideshow',
@@ -1583,6 +1595,10 @@
 	'S_SLIDESHOW_DELETED'=>			'Slideshow deleted',
 	'S_CANNOT_DELETE_SLIDESHOW'=>		'Cannot delete slideshow',
 	'S_DELETE_SLIDESHOW_Q'=>		'Delete slideshow?',
+
+// slides.php
+	'S_CUSTOM_SLIDES' =>			'Custom slides',
+
 
 //	services.php
 	'S_AVERAGE_PROBLEM'=>			'Average problem',
@@ -1898,7 +1914,7 @@
 	'S_JAPANESE_JP'=>			'Japanese (JP)',
 	'S_CHINESE_CN'=>			'Chinese (CN)',
 	'S_DUTCH_NL'=>				'Dutch (NL)',
-	'S_HUNGARY_HU'=>			'Hungary (HU)',
+	'S_HUNGARY_HU'=>			'Hungarian (HU)',
 	'S_POLISH_PL'=>				'Polish (PL)',
 	'S_UKRAINIAN_UA'=>			'Ukrainian (UA)',
 
@@ -1914,6 +1930,7 @@
 	'S_EXTENDED'=>				'Extended',
 
 //	search.php
+	'S_EDIT_HOSTS' => 'Edit hosts',
 	'S_SEARCH_BIG'=>			'SEARCH',
 	'S_GO'=>				'Go',
 	'S_FOUND_SMALL'=>			'found',
@@ -2266,7 +2283,9 @@
 	'S_CUSER_ERROR_SESSION_TERMINATED'=>			'Session terminated, please re-login!',
 	'S_CUSER_ERROR_TABLE_USERS_EMPTY'=>			'Table users is empty. Possible database corruption.',
 	'S_CUSER_ERROR_LDAP_MODULE_MISSING'=>			'Probably php-ldap module is missing',
-	'S_CUSER_ERROR_ATTEMP_FAILED'=>				'%1$s failed login attempts logged. Last failed attempt was from %2$s on %3$s.',
+//	'S_CUSER_ERROR_ATTEMP_FAILED'=>						'%1$s failed login attempts logged. Last failed attempt was from %2$s on %3$s.',
+	'S_CUSER_ERROR_FAILED_LOGIN_ATTEMPTS'=>				'failed login attempts logged.',
+	'S_CUSER_ERROR_LAST_FAILED_ATTEMPTS'=>				'Last failed attempt was from',
 	'S_CUSER_ERROR_ONLY_ADMIN_CAN_CREATE_USERS'=>		'Only Super Admins can create Users',
 	'S_CUSER_ERROR_ONLY_ADMIN_CAN_UPDATE_USERS'=>		'Only Super Admins can update Users',
 	'S_CUSER_ERROR_ONLY_ADMIN_CAN_DELETE_USERS'=>		'Only Super Admins can delete Users',
@@ -2286,7 +2305,7 @@
 	'S_CUSER_ERROR_INTERNAL_ZABBIX_ERROR'=>			'Internal zabbix error',
 
 //	config.inc.php
-	'S_CONFIG_NOT_LOGGED_IN_ACCESS_DENIED'=>		'You cannot view this URL as a ',
+	'S_CONFIG_NOT_LOGGED_IN_ACCESS_DENIED'=>		'You cannot view this URL as a',
 	'S_CONFIG_ERROR_YOU_MUST_LOGIN'=>			'You must login to view this page.',
 	'S_CONFIG_NOT_LOGGED_IN_NOTE'=>				'If you think this message is wrong, please consult your administrators about getting the necessary permissions.',
 	'S_CONFIG_ERROR_YOU_ARE_NOT_LOGGED_IN_HEAD'=>		'You are not logged in.',

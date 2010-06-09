@@ -61,7 +61,7 @@ class CImage extends CZBXAPI{
 
 		$sql_parts = array(
 			'select' => array('images' => 'i.imageid'),
-			'from' => array('images i'),
+			'from' => array('images' => 'images i'),
 			'where' => array(),
 			'order' => array(),
 			'limit' => null);
@@ -94,7 +94,7 @@ class CImage extends CZBXAPI{
 		}
 
 // nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid(false);
+		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
 // imageids
 		if(!is_null($options['imageids'])){
@@ -109,8 +109,8 @@ class CImage extends CZBXAPI{
 
 			$sql_parts['select']['sm'] = 'sm.sysmapid';
 
-			$sql_parts['from']['sm'] = 'sysmaps sm';
-			$sql_parts['from']['se'] = 'sysmaps_elements se';
+			$sql_parts['from']['sysmaps'] = 'sysmaps sm';
+			$sql_parts['from']['sysmaps_elements'] = 'sysmaps_elements se';
 
 			$sql_parts['where']['sm'] = DBcondition('sm.sysmapid', $options['sysmapids']);
 			$sql_parts['where']['smse'] = 'sm.sysmapid=se.sysmapid ';
@@ -188,7 +188,7 @@ class CImage extends CZBXAPI{
 		if(!empty($sql_parts['where'])) $sql_where.= ' AND '.implode(' AND ',$sql_parts['where']);
 		if(!empty($sql_parts['order'])) $sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 
-		$sql = 'SELECT DISTINCT '.$sql_select.
+		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.
 				' FROM '.$sql_from.
 				' WHERE '.DBin_node('i.imageid', $nodeids).
 					$sql_where.

@@ -64,7 +64,7 @@ class CUser extends CZBXAPI{
 
 		$sql_parts = array(
 			'select' => array('users' => 'u.userid'),
-			'from' => array('users u'),
+			'from' => array('users' => 'users u'),
 			'where' => array(),
 			'order' => array(),
 			'limit' => null);
@@ -108,7 +108,7 @@ class CUser extends CZBXAPI{
 
 		}
 		else if(is_null($options['editable']) && ($USER_DETAILS['type'] == USER_TYPE_ZABBIX_ADMIN)){
-			$sql_parts['from']['ug'] = 'users_groups ug';
+			$sql_parts['from']['users_groups'] = 'users_groups ug';
 			$sql_parts['where']['uug'] = 'u.userid=ug.userid';
 			$sql_parts['where'][] = 'ug.usrgrpid IN ('.
 				' SELECT uug.usrgrpid'.
@@ -121,7 +121,7 @@ class CUser extends CZBXAPI{
 		}
 
 // nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid(false);
+		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
 // usrgrpids
 		if(!is_null($options['usrgrpids'])){
@@ -129,7 +129,7 @@ class CUser extends CZBXAPI{
 			if($options['output'] != API_OUTPUT_SHORTEN){
 				$sql_parts['select']['usrgrpid'] = 'ug.usrgrpid';
 			}
-			$sql_parts['from']['ug'] = 'users_groups ug';
+			$sql_parts['from']['users_groups'] = 'users_groups ug';
 			$sql_parts['where'][] = DBcondition('ug.usrgrpid', $options['usrgrpids']);
 			$sql_parts['where']['uug'] = 'u.userid=ug.userid';
 
@@ -205,7 +205,7 @@ class CUser extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT DISTINCT '.$sql_select.'
+		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.'
 				FROM '.$sql_from.'
 				WHERE '.DBin_node('u.userid', $nodeids).
 				$sql_where.

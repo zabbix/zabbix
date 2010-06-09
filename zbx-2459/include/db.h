@@ -17,7 +17,6 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-
 #ifndef ZABBIX_DB_H
 #define ZABBIX_DB_H
 
@@ -224,12 +223,29 @@ typedef enum {
 #define HTTPSTEP_REQUIRED_LEN		255
 #define HTTPSTEP_REQUIRED_LEN_MAX	HTTPSTEP_REQUIRED_LEN+1
 
-#define ZBX_SQL_ITEM_FIELDS	"i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.type,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,i.value_type,i.delta,i.prevorgvalue,i.lastclock,i.units,i.multiplier,i.formula,i.status,i.valuemapid,h.dns,i.trends,i.lastlogsize,i.data_type,i.mtime"
+#define ZBX_SQL_ITEM_FIELDS	"i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.type,h.useip,"	\
+				"h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,i.value_type,i.delta,"	\
+				"i.prevorgvalue,i.lastclock,i.units,i.multiplier,i.formula,i.status,"	\
+				"i.valuemapid,h.dns,i.trends,i.lastlogsize,i.data_type,i.mtime"
 #define ZBX_SQL_ITEM_TABLES	"hosts h,items i"
-#define ZBX_SQL_ITEM_FIELDS_NUM	27/* after adding "i.mtime" */
+#define ZBX_SQL_ITEM_FIELDS_NUM	27
 #define ZBX_SQL_ITEM_SELECT	ZBX_SQL_ITEM_FIELDS " from " ZBX_SQL_ITEM_TABLES
 
-#define ZBX_MAX_SQL_LEN			65535
+#ifdef HAVE_ORACLE
+#define	ZBX_SQL_STRCMP		"%s%s%s"
+#define	ZBX_SQL_STRVAL_EQ(str)	str[0] != '\0' ? "='"  : "",			\
+				str[0] != '\0' ? str   : " is null",		\
+				str[0] != '\0' ? "'"   : ""
+#define	ZBX_SQL_STRVAL_NE(str)	str[0] != '\0' ? "<>'" : "",			\
+				str[0] != '\0' ? str   : " is not null",	\
+				str[0] != '\0' ? "'"   : ""
+#else
+#define	ZBX_SQL_STRCMP		"%s'%s'"
+#define	ZBX_SQL_STRVAL_EQ(str)	"=", str
+#define	ZBX_SQL_STRVAL_NE(str)	"<>", str
+#endif
+
+#define ZBX_MAX_SQL_LEN		65535
 
 DB_DRULE
 {
@@ -537,7 +553,7 @@ int	__zbx_DBexecute(const char *fmt, ...);
 #endif /* HAVE___VA_ARGS__ */
 DB_RESULT	__zbx_DBselect(const char *fmt, ...);
 
-DB_RESULT	DBselectN(char *query, int n);
+DB_RESULT	DBselectN(const char *query, int n);
 DB_ROW		DBfetch(DB_RESULT result);
 int		DBis_null(char *field);
 void		DBbegin();
@@ -551,7 +567,7 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num);
 zbx_uint64_t	DBget_nextid(const char *tablename, int num);
 
 int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *error);
-int	DBadd_service_alarm(zbx_uint64_t serviceid,int status,int clock);
+int	DBadd_service_alarm(zbx_uint64_t serviceid, int status, int clock);
 int	DBadd_alert(zbx_uint64_t actionid, zbx_uint64_t eventid, zbx_uint64_t userid, zbx_uint64_t mediatypeid, char *sendto, char *subject, char *message);
 int	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid);
 int	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid);
@@ -561,13 +577,10 @@ int	DBget_prev_trigger_value(zbx_uint64_t triggerid);
 int     DBupdate_trigger_value(zbx_uint64_t triggerid, int type, int value,
 		const char *trigger_error, int new_value, int now, const char *reason);
 
-int	DBget_items_count(void);
-int	DBget_items_unsupported_count(void);
-int	DBget_history_count(const char *table_name);
-int	DBget_trends_count(const char *table_name);
-int	DBget_triggers_count(void);
-int	DBget_queue_count(void);
-double	DBget_requiredperformance(void);
+int	DBget_row_count(const char *table_name);
+int	DBget_items_unsupported_count();
+int	DBget_queue_count(int from, int to);
+double	DBget_requiredperformance();
 zbx_uint64_t DBget_proxy_lastaccess(const char *hostname);
 
 int	DBget_escape_string_len(const char *src);

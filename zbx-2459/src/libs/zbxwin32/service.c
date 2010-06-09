@@ -26,7 +26,6 @@
 #include "zbxconf.h"
 #include "perfmon.h"
 
-#define uninit() { zbx_on_exit(); }
 #define EVENTLOG_REG_PATH TEXT("SYSTEM\\CurrentControlSet\\Services\\EventLog\\")
 
 /*
@@ -44,9 +43,8 @@ static void	parent_signal_handler(int sig)
 	{
 	case SIGINT:
 	case SIGTERM:
-		zabbix_log( LOG_LEVEL_INFORMATION, "Got signal. Exiting ...");
-		uninit();
-		ExitProcess( FAIL );
+		zabbix_log(LOG_LEVEL_INFORMATION, "Got signal. Exiting ...");
+		zbx_on_exit();
 		break;
 	}
 }

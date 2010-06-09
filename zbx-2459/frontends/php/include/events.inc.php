@@ -42,7 +42,7 @@
 	return $result;
 	}
 
-	function get_events_unacknowledged($db_element, $value=null){
+	function get_events_unacknowledged($db_element, $value_trigger=null, $value_event=null){
 		$elements = array('hosts' => array(), 'hosts_groups' => array(), 'triggers' => array());
 
 		get_map_elements($db_element, $elements);
@@ -58,6 +58,8 @@
 			'skipDependent' => 1,
 			'limit' => ($config['search_limit']+1)
 		);
+		if(!is_null($value_trigger)) $options['filter'] = array('value' => $value_trigger);
+		
 		if(!empty($elements['hosts_groups'])) $options['groupids'] = array_unique($elements['hosts_groups']);
 		if(!empty($elements['hosts'])) $options['hostids'] = array_unique($elements['hosts']);
 		if(!empty($elements['triggers'])) $options['triggerids'] = array_unique($elements['triggers']);
@@ -68,7 +70,7 @@
 			'triggerids' => zbx_objectValues($triggerids, 'triggerid'),
 			'object' => EVENT_OBJECT_TRIGGER,
 			'acknowledged' => 0,
-			'value' => is_null($value) ? array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE) : $value,
+			'value' => is_null($value_event) ? array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE) : $value_event,
 			'nopermissions' => 1
 		);
 		$event_count = CEvent::get($options);

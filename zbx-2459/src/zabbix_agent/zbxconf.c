@@ -50,8 +50,8 @@ int	CONFIG_DISABLE_PASSIVE		= 0;
 int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
 int	CONFIG_LOG_REMOTE_COMMANDS	= 0;
 int	CONFIG_UNSAFE_USER_PARAMETERS	= 0;
-int	CONFIG_LISTEN_PORT	= 10050;
-int	CONFIG_SERVER_PORT	= 10051;
+int	CONFIG_LISTEN_PORT		= 10050;
+int	CONFIG_SERVER_PORT		= 10051;
 int	CONFIG_REFRESH_ACTIVE_CHECKS	= 120;
 char	*CONFIG_LISTEN_IP		= NULL;
 char	*CONFIG_SOURCE_IP		= NULL;
@@ -114,13 +114,22 @@ void    load_config()
 	}
 #endif /* USE_PID_FILE */
 
-	if(CONFIG_HOSTNAME == NULL)
+	if(CONFIG_HOSTNAME == NULL || *CONFIG_HOSTNAME == '\0')
 	{
+		if(CONFIG_HOSTNAME != NULL)
+			zbx_free(CONFIG_HOSTNAME);
+
 	  	if(SUCCEED == process("system.hostname", 0, &result))
 		{
 			if( NULL != (value = GET_STR_RESULT(&result)) )
 			{
 				CONFIG_HOSTNAME = strdup(*value);
+
+				/* If auto registration is used, our CONFIG_HOSTNAME will make it into the  */
+				/* server's database, where it is limited by HOST_HOST_LEN (currently, 64), */
+				/* so to make it work properly we need to truncate our hostname.            */
+				if (strlen(CONFIG_HOSTNAME) > 64)
+					CONFIG_HOSTNAME[64] = '\0';
 			}
 		}
 	        free_result(&result);
@@ -128,6 +137,14 @@ void    load_config()
 		if(CONFIG_HOSTNAME == NULL)
 		{
 			zabbix_log( LOG_LEVEL_CRIT, "Hostname is not defined");
+			exit(1);
+		}
+	}
+	else
+	{
+		if(strlen(CONFIG_HOSTNAME) > 64)
+		{
+			zabbix_log( LOG_LEVEL_CRIT, "Hostname too long");
 			exit(1);
 		}
 	}

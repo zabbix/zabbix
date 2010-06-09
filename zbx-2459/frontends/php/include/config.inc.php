@@ -199,16 +199,20 @@ function __autoload($class_name){
 			include_once('include/locales/'.$USER_DETAILS['lang'].'.inc.php');
 			process_locales();
 		}
-		
+
 		if($USER_DETAILS['attempt_failed']) {
 			$attemps = bold($USER_DETAILS['attempt_failed']);
 			$attempip = bold($USER_DETAILS['attempt_ip']);
 			$attempdate = bold(zbx_date2str(S_CUSER_ERROR_DATE_FORMAT,$USER_DETAILS['attempt_clock']));
-			error(new CJSscript(sprintf(	S_CUSER_ERROR_ATTEMP_FAILED,
-							$attemps->toString(),
-							$attempip->toString(),
-							$attempdate->toString()
-							)));
+
+			$error_msg = array(
+				$attemps,
+				SPACE.S_CUSER_ERROR_FAILED_LOGIN_ATTEMPTS,SPACE.S_CUSER_ERROR_LAST_FAILED_ATTEMPTS.SPACE,
+				$attempip,
+				SPACE.S_ON_SMALL.SPACE,
+				$attempdate
+			);
+			error(new CSpan($error_msg));
 		}
 	}
 	else{
@@ -275,7 +279,7 @@ function __autoload($class_name){
 			$table->setAlign('center');
 			$table->setHeader(new CCol(S_CONFIG_ERROR_YOU_ARE_NOT_LOGGED_IN_HEAD, 'left'),'header');
 
-			$table->addRow(new CCol(Array(S_CONFIG_NOT_LOGGED_IN_ACCESS_DENIED, bold(ZBX_GUEST_USER), '. ', S_CONFIG_ERROR_YOU_MUST_LOGIN, BR(), S_CONFIG_NOT_LOGGED_IN_NOTE), 'center'));
+			$table->addRow(new CCol(Array(S_CONFIG_NOT_LOGGED_IN_ACCESS_DENIED, SPACE, bold(ZBX_GUEST_USER), '. ', S_CONFIG_ERROR_YOU_MUST_LOGIN, BR(), S_CONFIG_NOT_LOGGED_IN_NOTE), 'center'));
 
 			$url = urlencode($req->toString());
 			$footer = new CCol(
@@ -298,7 +302,10 @@ function __autoload($class_name){
 					return PAGE_TYPE_JS;
 					break;
 				case 'json':
-					return PAGE_TYPE_JS;
+					return PAGE_TYPE_JSON;
+					break;
+				case 'json-rpc':
+					return PAGE_TYPE_JSON_RPC;
 					break;
 				case 'html':
 					return PAGE_TYPE_HTML_BLOCK;
@@ -361,7 +368,7 @@ function __autoload($class_name){
 
 					if(isset($ZBX_MESSAGES) && !empty($ZBX_MESSAGES)){
 						$msg_details = new CDiv(S_DETAILS,'blacklink');
-						$msg_details->setAttribute('onclick',new CJSscript("javascript: ShowHide('msg_messages', IE?'block':'table');"));
+						$msg_details->setAttribute('onclick', "javascript: ShowHide('msg_messages', IE?'block':'table');");
 						$msg_details->setAttribute('title',S_MAXIMIZE.'/'.S_MINIMIZE);
 						array_unshift($row, new CCol($msg_details,'clr'));
 					}
@@ -509,9 +516,9 @@ function __autoload($class_name){
 	}
 
 	function fatal_error($msg){
-		include_once 'include/page_header.php';
+		include_once('include/page_header.php');
 		show_error_message($msg);
-		include_once 'include/page_footer.php';
+		include_once('include/page_footer.php');
 	}
 
 	function get_tree_by_parentid($parentid,&$tree,$parent_field, $level=0){
@@ -920,31 +927,6 @@ function __autoload($class_name){
 		return $res;
 	}
 
-/* Use ImageSetStyle+ImageLIne instead of bugged ImageDashedLine */
-	if(function_exists('imagesetstyle')){
-		function DashedLine($image,$x1,$y1,$x2,$y2,$color){
-// Style for dashed lines
-//			$style = array($color, $color, $color, $color, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT);
-			$style = array($color, $color, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT);
-			ImageSetStyle($image, $style);
-			ImageLine($image,$x1,$y1,$x2,$y2,IMG_COLOR_STYLED);
-		}
-
-	}
-	else{
-		function DashedLine($image,$x1,$y1,$x2,$y2,$color){
-			ImageDashedLine($image,$x1,$y1,$x2,$y2,$color);
-		}
-	}
-
-	function DashedRectangle($image,$x1,$y1,$x2,$y2,$color){
-		DashedLine($image, $x1,$y1,$x1,$y2,$color);
-		DashedLine($image, $x1,$y2,$x2,$y2,$color);
-		DashedLine($image, $x2,$y2,$x2,$y1,$color);
-		DashedLine($image, $x2,$y1,$x1,$y1,$color);
-	}
-
-
 	function set_image_header($format=null){
 		global $IMAGE_FORMAT_DEFAULT;
 
@@ -952,7 +934,7 @@ function __autoload($class_name){
 
 		if(IMAGE_FORMAT_JPEG == $format)	Header( "Content-type:  image/jpeg");
 		if(IMAGE_FORMAT_TEXT == $format)	Header( "Content-type:  text/html");
-		else								Header( "Content-type:  image/png");
+		else					Header( "Content-type:  image/png");
 
 		Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT");
 	}
@@ -1172,10 +1154,10 @@ function __autoload($class_name){
 		$url = $link->getUrl();
 
 		if(($page['type'] != PAGE_TYPE_HTML) && defined('ZBX_PAGE_MAIN_HAT')){
-			$script = new CJSscript("javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
+			$script = "javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');";
 		}
 		else{
-			$script = new CJSscript("javascript: redirect('".$url."');");
+			$script = "javascript: redirect('".$url."');";
 		}
 
 		$col = array(new CSpan($obj,'underline'));

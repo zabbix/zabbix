@@ -62,26 +62,6 @@ function zbx_addJSLocale($to_translate){
 	}
 }
 
-function get_js_sizeable_graph($dom_graph_id,$url){
-
-return new CJSscript('
-	<script language="JavaScript" type="text/javascript">
-	<!--
-		A_SBOX["'.$dom_graph_id.'"] = new Object;
-		A_SBOX["'.$dom_graph_id.'"].shiftT = 36;
-		A_SBOX["'.$dom_graph_id.'"].shiftL = 100;
-
-		var ZBX_G_WIDTH;
-		if(window.innerWidth) ZBX_G_WIDTH=window.innerWidth;
-		else ZBX_G_WIDTH=document.body.clientWidth;
-
-		ZBX_G_WIDTH-= 160;
-
-		insert_sizeable_graph('.zbx_jsvalue($dom_graph_id).','.zbx_jsvalue($url).');
-	-->
-	</script>');
-}
-
 function inseret_javascript_for_editable_combobox(){
 	if(defined('EDITABLE_COMBOBOX_SCRIPT_INSERTTED')) return;
 	define('EDITABLE_COMBOBOX_SCRIPT_INSERTTED', 1);
@@ -570,6 +550,22 @@ function insert_js_function($fnct_name){
 				function check_all(objname, value) {
 					$(objname).getInputs("checkbox").each(function(e){ e.checked = value });
 				}');
+		break;
+		case 'removeSelectedItems':
+			insert_js('function removeSelectedItems(formobject, name){
+					formobject = $(formobject);
+					if(is_null(formobject)) return false;
+
+					for(var i=0; i < formobject.options.length; i++){
+						if(!isset(i, formobject.options)) continue;
+
+						if(formobject.options[i].selected){
+							var obj = $(name+"["+formobject.options[i].value+"]");
+							if(!is_null(obj)) obj.remove();
+						}
+					}
+				}
+			');
 		break;
 		default:
 			insert_js('throw("JS function not found ['.$fnct_name.']");');

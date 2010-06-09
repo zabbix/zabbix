@@ -114,8 +114,8 @@
 	$url = '?fullscreen='.($_REQUEST['fullscreen']? '0':'1');
 	$fs_icon = new CDiv(SPACE,'fullscreen');
 	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-	$fs_icon->addAction('onclick',new CJSscript("javascript: document.location = '".$url."';"));
-	$events_wdgt->addPageHeader(array(S_HISTORY_OF_EVENTS_BIG.SPACE.S_ON.SPACE, zbx_date2str(S_EVENTS_DATE_FORMAT,time())), $fs_icon);
+	$fs_icon->addAction('onclick', "javascript: document.location = '".$url."';");
+	$events_wdgt->addPageHeader(array(S_HISTORY_OF_EVENTS_BIG.SPACE.S_ON_BIG.SPACE, zbx_date2str(S_EVENTS_DATE_FORMAT,time())), $fs_icon);
 // }}}PAGE HEADER	
 	
 	
@@ -483,7 +483,7 @@
 						),
 					is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null,
 					$_REQUEST['hostid'] == 0 ? $host['host'] : null,
-					$tr_desc,
+					new CSpan($tr_desc, 'link_menu'),
 					$event['value_col'],
 					new CCol(get_severity_description($trigger['priority']), get_severity_style($trigger['priority'],$event['value'])),
 					$event['duration'],
@@ -505,8 +505,8 @@
 // NAV BAR
 	$timeline = array(
 		'period' => $effectiveperiod,
-		'starttime' => date('YmdHi', $starttime),
-		'usertime' => date('YmdHi', $till)
+		'starttime' => date('YmdHis', $starttime),
+		'usertime' => date('YmdHis', $till)
 	);
 
 	$dom_graph_id = 'scroll_events_id';

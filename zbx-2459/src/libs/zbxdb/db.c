@@ -64,7 +64,7 @@ void	zbx_db_close(void)
 	}
 
 	if (oracle.errhp) {
-		(void) OCIHandleFree (oracle.errhp, OCI_HTYPE_ERROR);
+		(void) OCIHandleFree(oracle.errhp, OCI_HTYPE_ERROR);
 		oracle.errhp = NULL;
 	}
 
@@ -85,9 +85,9 @@ void	zbx_db_close(void)
 #endif
 }
 #if HAVE_ORACLE
-char* zbx_oci_error(sword status)
+char*	zbx_oci_error(sword status)
 {
-	/* NOTE: do not thread safe, be carefully */
+	/* NOTE: not thread safe, be careful */
 	static char errbuf[512];
 	sb4 errcode = 0;
 
@@ -219,61 +219,70 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	}
 #endif
 #ifdef	HAVE_ORACLE
-	char *connect = NULL;
-	sword err = OCI_SUCCESS;
+	char	*connect = NULL;
+	sword	err = OCI_SUCCESS;
 
 #if defined(HAVE_GETENV) && defined(HAVE_PUTENV)
-	if (NULL == getenv ("NLS_LANG")) {
-		putenv ("NLS_LANG=.UTF8");
-	}
+	if (NULL == getenv("NLS_LANG"))
+		putenv("NLS_LANG=.UTF8");
 #endif /* defined(HAVE_GETENV) && defined(HAVE_PUTENV) */
 
-	memset (&oracle, 0, sizeof (oracle));
+	memset(&oracle, 0, sizeof(oracle));
 
-	if (host && *host) {
+	/* connection string format: [//]host[:port][/service name] */
+
+	if (host && *host)
+	{
 		connect = zbx_strdcatf(connect, "//%s", host);
 
 		if (port)
 			connect = zbx_strdcatf(connect, ":%d", port);
-	}
 
-	if (dbname && *dbname && connect) {
-		if (connect)
-			connect = zbx_strdcat(connect, "/");
-		connect = zbx_strdcatf(connect, "%s", dbname);
+		if (dbname && *dbname)
+			connect = zbx_strdcatf(connect, "/%s", dbname);
 	}
-
-	/* initialize environment */
-	err = OCIEnvCreate((OCIEnv **) &oracle.envhp, (ub4) OCI_DEFAULT,
-			(dvoid *) 0, (dvoid * (*)(dvoid *,size_t)) 0,
-			(dvoid * (*)(dvoid *, dvoid *, size_t)) 0,
-			(void (*)(dvoid *, dvoid *)) 0, (size_t) 0, (dvoid **) 0);
-	if (OCI_SUCCESS != err) {
-		zabbix_errlog(ERR_Z3001, connect, err, zbx_oci_error(err));
+	else
 		ret = ZBX_DB_FAIL;
+
+	if (ZBX_DB_OK == ret)
+	{
+		/* initialize environment */
+		err = OCIEnvCreate((OCIEnv **)&oracle.envhp, (ub4)OCI_DEFAULT,
+				(dvoid *)0, (dvoid * (*)(dvoid *,size_t))0,
+				(dvoid * (*)(dvoid *, dvoid *, size_t))0,
+				(void (*)(dvoid *, dvoid *))0, (size_t)0, (dvoid **)0);
+		if (OCI_SUCCESS != err)
+		{
+			zabbix_errlog(ERR_Z3001, connect, err, zbx_oci_error(err));
+			ret = ZBX_DB_FAIL;
+		}
 	}
 
-	if (ZBX_DB_OK == ret) {
+	if (ZBX_DB_OK == ret)
+	{
 		/* allocate an error handle */
-		(void) OCIHandleAlloc((dvoid *) oracle.envhp, (dvoid **) &oracle.errhp, OCI_HTYPE_ERROR,
-			(size_t) 0, (dvoid **) 0);
+		(void)OCIHandleAlloc((dvoid *)oracle.envhp, (dvoid **)&oracle.errhp, OCI_HTYPE_ERROR,
+				(size_t)0, (dvoid **)0);
 
 		/* get the session */
 		err = OCILogon2(oracle.envhp, oracle.errhp, &oracle.svchp,
-				(text *)user, (ub4)strlen(user),
-				(text *)password, (ub4)strlen(password),
+				(text *)user, (ub4)(NULL != user ? strlen(user) : 0),
+				(text *)password, (ub4)(NULL != password ? strlen(password) : 0),
 				(text *)connect, (ub4)strlen(connect),
 				OCI_DEFAULT);
 
-		if (OCI_SUCCESS != err) {
+		if (OCI_SUCCESS != err)
+		{
 			zabbix_errlog(ERR_Z3001, connect, err, zbx_oci_error(err));
 			ret = ZBX_DB_DOWN;
 		}
-		else {
+		else
+		{
 			err = OCIAttrGet((void *)oracle.svchp, OCI_HTYPE_SVCCTX,
 						(void *)&oracle.srvhp, (ub4 *)0,
 						OCI_ATTR_SERVER, oracle.errhp);
-			if (OCI_SUCCESS != err) {
+			if (OCI_SUCCESS != err)
+			{
 				zabbix_errlog(ERR_Z3001, connect, err, zbx_oci_error(err));
 				ret = ZBX_DB_DOWN;
 			}
@@ -282,12 +291,10 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	zbx_free(connect);
 
-	if (ZBX_DB_OK != ret) {
-		zbx_db_close ();
-	}
+	if (ZBX_DB_OK != ret)
+		zbx_db_close();
 #endif
 #ifdef	HAVE_SQLITE3
-	/* check to see that the backend connection was successfully made */
 #ifdef	HAVE_FUNCTION_SQLITE3_OPEN_V2
 	if (SQLITE_OK != (ret = sqlite3_open_v2(dbname, &conn, SQLITE_OPEN_READWRITE, NULL)))
 #else
@@ -331,12 +338,14 @@ void	zbx_db_init(char *host, char *user, char *password, char *dbname, char *dbs
 #endif
 
 #ifdef	HAVE_SQLITE3
-	if (0 != stat(dbname, &buf)) {
+	if (0 != stat(dbname, &buf))
+	{
 		zabbix_log(LOG_LEVEL_WARNING, "Cannot open database file \"%s\": %s", dbname, strerror(errno));
 		zabbix_log(LOG_LEVEL_WARNING, "Creating database ...");
 
 		ret = sqlite3_open(dbname, &conn);
-		if (SQLITE_OK != ret) {
+		if (SQLITE_OK != ret)
+		{
 			zabbix_errlog(ERR_Z3002, dbname, 0, sqlite3_errmsg(conn));
 			exit(FAIL);
 		}
@@ -347,7 +356,7 @@ void	zbx_db_init(char *host, char *user, char *password, char *dbname, char *dbs
 #endif
 }
 
-int __zbx_zbx_db_execute(const char *fmt, ...)
+int	__zbx_zbx_db_execute(const char *fmt, ...)
 {
 	va_list args;
 	int ret;
@@ -364,9 +373,9 @@ int __zbx_zbx_db_execute(const char *fmt, ...)
 #else
 #	define zbx_db_select __zbx_zbx_db_select
 #endif /* HAVE___VA_ARGS__ */
-static DB_RESULT __zbx_zbx_db_select(const char *fmt, ...)
+static DB_RESULT	__zbx_zbx_db_select(const char *fmt, ...)
 {
-	va_list args;
+	va_list		args;
 	DB_RESULT	result;
 
 	va_start(args, fmt);
@@ -375,7 +384,6 @@ static DB_RESULT __zbx_zbx_db_select(const char *fmt, ...)
 
 	return result;
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -392,28 +400,33 @@ static DB_RESULT __zbx_zbx_db_select(const char *fmt, ...)
  * Comments: Do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_begin(void)
+int	zbx_db_begin(void)
 {
+	int	rc = ZBX_DB_OK;
+
 	if (txn_level > 0)
 	{
-		zabbix_log( LOG_LEVEL_CRIT, "ERROR: nested transaction detected. Please report it to Zabbix Team.");
+		zabbix_log(LOG_LEVEL_CRIT, "ERROR: nested transaction detected."
+				" Please report it to Zabbix Team.");
 		assert(0);
 	}
-	txn_level++;
-#ifdef	HAVE_MYSQL
-	zbx_db_execute("%s","begin;");
-#endif
-#ifdef	HAVE_POSTGRESQL
-	zbx_db_execute("%s","begin;");
-#endif
+
 #ifdef	HAVE_SQLITE3
-	if(PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
+	if (PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
 	{
-		zabbix_log( LOG_LEVEL_CRIT, "ERROR: Unable to create lock on SQLite database.");
-		exit(FAIL);
+		zabbix_log(LOG_LEVEL_CRIT, "ERROR: Unable to create lock"
+				" on SQLite database.");
+		assert(0);
 	}
-	zbx_db_execute("%s","begin;");
-#endif
+#endif	/* HAVE_SQLITE3 */
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL) || defined(HAVE_SQLITE3)
+	rc = zbx_db_execute("%s", "begin;");
+#endif	/* HAVE_MYSQL || HAVE_POSTGRESQL || HAVE_SQLITE3 */
+
+	if (ZBX_DB_OK == rc)
+		txn_level++;
+
+	return rc;
 }
 
 /******************************************************************************
@@ -431,27 +444,31 @@ void	zbx_db_begin(void)
  * Comments: Do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-void zbx_db_commit(void)
+int	zbx_db_commit(void)
 {
+	int	rc = ZBX_DB_OK;
+
 	if (0 == txn_level)
 	{
-		zabbix_log( LOG_LEVEL_CRIT, "ERROR: commit without transaction. Please report it to Zabbix Team.");
+		zabbix_log(LOG_LEVEL_CRIT, "ERROR: commit without transaction."
+				" Please report it to Zabbix Team.");
 		assert(0);
 	}
-#ifdef	HAVE_MYSQL
-	zbx_db_execute("%s","commit;");
-#endif
-#ifdef	HAVE_POSTGRESQL
-	zbx_db_execute("%s","commit;");
-#endif
-#ifdef	HAVE_ORACLE
-	(void) OCITransCommit (oracle.svchp, oracle.errhp, OCI_DEFAULT);
-#endif /* HAVE_ORACLE */
+
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL) || defined(HAVE_SQLITE3)
+	rc = zbx_db_execute("%s", "commit;");
+#endif	/* HAVE_MYSQL || HAVE_POSTGRESQL || HAVE_SQLITE3 */
 #ifdef	HAVE_SQLITE3
-	zbx_db_execute("%s","commit;");
 	php_sem_release(&sqlite_access);
-#endif
-	txn_level--;
+#endif	/* HAVE_SQLITE3 */
+#ifdef	HAVE_ORACLE
+	(void)OCITransCommit(oracle.svchp, oracle.errhp, OCI_DEFAULT);
+#endif	/* HAVE_ORACLE */
+
+	if (ZBX_DB_OK == rc)
+		txn_level--;
+
+	return rc;
 }
 
 /******************************************************************************
@@ -469,33 +486,37 @@ void zbx_db_commit(void)
  * Comments: Do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-void zbx_db_rollback(void)
+int	zbx_db_rollback(void)
 {
+	int	rc = ZBX_DB_OK;
+
 	if (0 == txn_level)
 	{
-		zabbix_log( LOG_LEVEL_CRIT, "ERROR: rollback without transaction. Please report it to Zabbix Team.");
+		zabbix_log(LOG_LEVEL_CRIT, "ERROR: rollback without transaction."
+				" Please report it to Zabbix Team.");
 		assert(0);
 	}
-#ifdef	HAVE_MYSQL
-	zbx_db_execute("rollback;");
-#endif
-#ifdef	HAVE_POSTGRESQL
-	zbx_db_execute("rollback;");
-#endif
-#ifdef	HAVE_ORACLE
-	(void) OCITransRollback (oracle.svchp, oracle.errhp, OCI_DEFAULT);
-#endif /* HAVE_ORACLE */
+
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL) || defined(HAVE_SQLITE3)
+	rc = zbx_db_execute("%s", "rollback;");
+#endif	/* HAVE_MYSQL || HAVE_POSTGRESQL || HAVE_SQLITE3 */
 #ifdef	HAVE_SQLITE3
-	zbx_db_execute("rollback;");
 	php_sem_release(&sqlite_access);
-#endif
-	txn_level--;
+#endif	/* HAVE_SQLITE3 */
+#ifdef	HAVE_ORACLE
+	(void)OCITransRollback(oracle.svchp, oracle.errhp, OCI_DEFAULT);
+#endif	/* HAVE_ORACLE */
+
+	if (ZBX_DB_OK == rc)
+		txn_level--;
+
+	return rc;
 }
 
 /*
  * Execute SQL statement. For non-select statements only.
  */
-int zbx_db_vexecute(const char *fmt, va_list args)
+int	zbx_db_vexecute(const char *fmt, va_list args)
 {
 	char	*sql = NULL;
 	int	ret = ZBX_DB_OK;
@@ -509,7 +530,7 @@ int zbx_db_vexecute(const char *fmt, va_list args)
 	int err;
 	char *error=0;
 #endif
-#ifdef HAVE_MYSQL
+#ifdef	HAVE_MYSQL
 	int		status;
 #endif
 
@@ -694,7 +715,7 @@ lbl_exec:
 }
 
 
-int	zbx_db_is_null(char *field)
+int	zbx_db_is_null(const char *field)
 {
 	int ret = FAIL;
 
@@ -865,7 +886,7 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 /*
  * Execute SQL statement. For select statements only.
  */
-DB_RESULT zbx_db_vselect(const char *fmt, va_list args)
+DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 {
 	char	*sql = NULL;
 	DB_RESULT result = NULL;
@@ -1105,7 +1126,7 @@ lbl_get_table:
 /*
  * Execute SQL statement. For select statements only.
  */
-DB_RESULT zbx_db_select_n(char *query, int n)
+DB_RESULT	zbx_db_select_n(const char *query, int n)
 {
 #ifdef	HAVE_MYSQL
 	return zbx_db_select("%s limit %d", query, n);

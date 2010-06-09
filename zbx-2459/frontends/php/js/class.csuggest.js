@@ -25,8 +25,7 @@ function createSuggest(oid){
 return sid;
 }
 
-var CSuggest = Class.create();
-CSuggest.prototype = {
+var CSuggest = Class.create(CDebug,{
 // PUBLIC
 'useLocal':			true,	// use cache to find suggests
 'useServer':		true,	// use server to find suggests
@@ -64,15 +63,15 @@ CSuggest.prototype = {
 
 'mouseOverSuggest':	false,	// indicates if mouse is over suggests
 
-'debug_status':		0,		// debug status: 0 - off, 1 - on, 2 - SDI;
-'debug_info':		'',		// debug string
-'debug_prev':		'',		// don't log repeated fnc
-
-initialize: function(id, objid){
+initialize: function($super, id, objid){
 	this.id = id;
+	$super('CSuggest['+id+']');
+//--
+
 	this.cleanCache();
 
 	this.dom.input = $(objid);
+
 	addListener(this.dom.input, 'keyup', this.keyPressed.bindAsEventListener(this));
 	addListener(this.dom.input, 'blur', this.suggestBlur.bindAsEventListener(this));
 	addListener(window, 'resize', this.positionSuggests.bindAsEventListener(this));
@@ -124,7 +123,7 @@ searchServer: function(needle){
 			'limit': this.suggestLimit
 		},
 		'onSuccess': this.serverRespond.bind(this, needle),
-		'onFailure': function(){ throw ('Suggest Widget: search request failed.'); }
+		'onFailure': function(resp){ throw('Suggest Widget: search request failed.'); }
 	}
 
 	new RPC.Call(rpcRequest);
@@ -281,6 +280,7 @@ keyPressed: function(e){
 			this.hideSuggests(e);
 			break;
 		case(key==13):
+			Event.stop(e);
 			this.selectSuggest(e);
 			break;
 		case(key == 37 || key == 39 || key == 9): // left, right, tab
@@ -351,7 +351,7 @@ mouseOut: function(e){
 },
 
 suggestBlur: function(e){
-	this.debug('mouseOut');
+	this.debug('suggestBlur');
 //---
 
 	if(this.mouseOverSuggest) Event.stop(e);
@@ -395,7 +395,8 @@ selectSuggest: function(e){
 	this.hideSuggests();
 
 //SDJ(this.dom.input);
-	if(this.onSelect(this.dom.input.value)) this.dom.input.form.submit();
+
+	if(this.onSelect(this.dom.input.value) && !GK) this.dom.input.form.submit();
 },
 
 
@@ -502,21 +503,5 @@ newSugTab: function(needle){
 	if(count > 0) showPopupDiv(this.dom.suggest, 'suggestFrame');
 
 	this.suggestCount = count;
-},
-
-debug: function(fnc_name, id){
-	if(this.debug_status){
-		var str = 'CSuggest['+this.id+'].'+fnc_name;
-		if(typeof(id) != 'undefined') str+= ' :'+id;
-
-//		if(this.debug_prev == str) return true;
-
-		this.debug_info += str + '\n';
-		if(this.debug_status == 2){
-			SDI(str);
-		}
-
-		this.debug_prev = str;
-	}
 }
-}
+});

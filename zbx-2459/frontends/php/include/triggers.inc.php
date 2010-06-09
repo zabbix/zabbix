@@ -106,7 +106,7 @@
 				ITEM_VALUE_TYPE_LOG
 				)
 			);
-		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['last']	= array('args' => null,
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['last']	= array('args' => array( 0 => array('type' => 'sec_num','mandat' => true) ),
 			'item_types' => array(
 				ITEM_VALUE_TYPE_FLOAT,
 				ITEM_VALUE_TYPE_UINT64,
@@ -1257,7 +1257,7 @@ return $result;
 					if(0 == $html) $exp.='{'.$functionid.'}';
 					else array_push($exp,'{'.$functionid.'}');
 				}
-				else if(is_numeric($functionid)){
+				else if(is_numeric($functionid) && isset($trigger['functions'][$functionid])){
 					$function_data = $trigger['functions'][$functionid];
 					$function_data+= $trigger['items'][$function_data['itemid']];
 					$function_data+= $trigger['hosts'][$function_data['hostid']];
@@ -1362,28 +1362,33 @@ return $result;
 		foreach($expressionData[$expression]['expressions'] as &$macro) {
 			$itemStr = zbx_substr($expression, $macro['openSymbolNum'], $macro['closeSymbolNum']-$macro['openSymbolNum']+1);
 			unset($iData);
-//			SDII($macro);		
-			$iData =& $macro['indexes']['server'][0];
+//			SDII($macro);
+			reset($macro['indexes']['server']);
+			$iData =& $macro['indexes']['server'][key($macro['indexes']['server'])];
 			$host = zbx_substr($expression, $iData['openSymbolNum']+1, $iData['closeSymbolNum']-($iData['openSymbolNum']+1));
 //			SDI($host);
 			unset($iData);
-			$iData =& $macro['indexes']['keyName'][0];
+			reset($macro['indexes']['keyName']);
+			$iData =& $macro['indexes']['keyName'][key($macro['indexes']['keyName'])];
 			$keyName = zbx_substr($expression, $iData['openSymbolNum']+1, $iData['closeSymbolNum']-($iData['openSymbolNum']+1));
 //			SDI($keyName);
 			if(isset($macro['indexes']['keyParams']) && count($macro['indexes']['keyParams']) > 0) {
 				unset($iData);
-				$iData =& $macro['indexes']['keyParams'][0];
+				reset($macro['indexes']['keyParams']);
+				$iData =& $macro['indexes']['keyParams'][key($macro['indexes']['keyParams'])];
 				$keyParams = zbx_substr($expression, $iData['openSymbolNum'], $iData['closeSymbolNum']-$iData['openSymbolNum']+1);
 			}else{
 				$keyParams = '';
 			}
 			unset($iData);
-			$iData =& $macro['indexes']['keyFunctionName'][0];
+			reset($macro['indexes']['keyFunctionName']);
+			$iData =& $macro['indexes']['keyFunctionName'][key($macro['indexes']['keyFunctionName'])];
 			$function = zbx_substr($expression, $iData['openSymbolNum']+1, $iData['closeSymbolNum']-($iData['openSymbolNum']+1));
 //			SDI($function);
 			if(isset($macro['indexes']['keyFunctionParams']) && count($macro['indexes']['keyFunctionParams']) > 0) {
 				unset($iData);
-				$iData =& $macro['indexes']['keyFunctionParams'][0];
+				reset($macro['indexes']['keyFunctionParams']);
+				$iData =& $macro['indexes']['keyFunctionParams'][key($macro['indexes']['keyFunctionParams'])];
 				$functionParams = zbx_substr($expression, $iData['openSymbolNum']+1, $iData['closeSymbolNum']-($iData['openSymbolNum']+1));
 			}else{
 				$functionParams = '';
@@ -1883,9 +1888,9 @@ return $result;
 // Update Trigger definition
 
 	/******************************************************************************
-	 *																			*
-	 * Comments: !!! Don't forget sync code with C !!!							*
-	 *																			*
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
 	 ******************************************************************************/
 	function update_trigger($triggerid,$expression=NULL,$description=NULL,$type=NULL,$priority=NULL,$status=NULL,$comments=NULL,$url=NULL,$deps=array(),$templateid=0){
 		$trigger	= get_trigger_by_triggerid($triggerid);
@@ -1910,11 +1915,6 @@ return $result;
 			return false;
 		}
 		
-		if(!isset($expressionData[$expression]['hosts']) || !is_array($expressionData[$expression]['hosts']) || !count($expressionData[$expression]['hosts'])) {
-			error(S_TRIGGER_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR);
-			return false;
-		}
-
 		if(!validate_trigger_dependency($expression, $deps)) return false;
 
 		if(is_null($description)){
@@ -1922,7 +1922,8 @@ return $result;
 		}
 		if(CTrigger::exists(array('description' => $description, 'expression' => $expression))){
 		
-			$hData =& $expressionData[$expression]['hosts'][0];
+			reset($expressionData[$expression]['hosts']);
+			$hData =& $expressionData[$expression]['hosts'][key($expressionData[$expression]['hosts'])];
 			
 			$host = zbx_substr($expression, $hData['openSymbolNum']+1, $hData['closeSymbolNum']-($hData['openSymbolNum']+1));
 			
@@ -2594,7 +2595,7 @@ return $result;
 		if($view_style == STYLE_TOP){
 			$header=array(new CCol(S_TRIGGERS,'center'));
 			foreach($hosts as $hostname){
-				$header = array_merge($header,array(new CImg('vtext.php?text='.$hostname)));
+				$header = array_merge($header,array(new CCol(array(new CImg('vtext.php?text='.$hostname)), 'hosts')));
 			}
 			$table->setHeader($header,'vertical_header');
 
@@ -2704,7 +2705,7 @@ return $result;
 						break;
 				}
 
-				if(zbx_strlen($description) > 25) $description = substr($description,0,22).'...';
+				if(zbx_strlen($description) > 25) $description = zbx_substr($description,0,22).'...';
 
 				$item_menu[$action][] = array(
 					$description,
@@ -2779,7 +2780,13 @@ return $result;
 			unset($img, $dep_table, $dependency);
 		}
 //------------------------
-		$status_col = new CCol(array($desc, $ack),$css_class);
+		//SDII($desc);
+		//SDII($ack);
+		if((is_array($desc) && count($desc) > 0) || $ack) {
+			$status_col = new CCol(array($desc, $ack),$css_class.' hosts');
+		} else {
+			$status_col = new CCol(SPACE,$css_class.' hosts');
+		}
 		if(isset($style)){
 			$status_col->setAttribute('style', $style);
 		}
@@ -2787,9 +2794,8 @@ return $result;
 		if(isset($tr_ov_menu)){
 			$tr_ov_menu  = new CPUMenu($tr_ov_menu,170);
 			$status_col->OnClick($tr_ov_menu->GetOnActionJS());
-			$status_col->addAction('onmouseover',
-				'this.old_border=this.style.border; this.style.border=\'1px dotted #0C0CF0\'');
-			$status_col->addAction('onmouseout', 'this.style.border=this.old_border;');
+			$status_col->addAction('onmouseover', 'this.style.border=\'1px dotted #0C0CF0\'');
+			$status_col->addAction('onmouseout', 'this.style.border = \'\';');
 		}
 		array_push($table_row,$status_col);
 
@@ -3195,6 +3201,7 @@ return $result;
 				case 13: error('['.$errData['errValue'].'] '.S_NOT_FLOAT_OR_MACRO_OR_COUNTER_FOR_FUNCTION_SMALL.' ('.$errData['function'].'). '.$checkExprFrom); break;
 				case 14: error(sprintf(S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR, $errData['function']).' '.$checkExprFrom); break;
 				case 15: error(S_INCORRECT_TRIGGER_EXPRESSION.'.'.SPACE.S_YOU_CAN_NOT_USE_TEMPLATE_HOSTS_MIXED_EXPR.' '.$checkExprFrom); break;
+				case 16: error(S_INCORRECT_TRIGGER_EXPRESSION.'.'.SPACE.S_TRIGGER_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR.SPACE.$checkExprFrom); break;
 			}
 			if($totalBreak) break;
 		}
@@ -3356,23 +3363,25 @@ return $result;
 			if(isset($treeLevel['parts'])) $parts =& $treeLevel['parts'];
 			else $parts = Array();
 			
-			if(count($parts) == 1 && $sStart == $parts[0]['openSymbolNum'] && $sEnd == $parts[0]['closeSymbolNum']) {
+			$fPart = reset($parts);
+			
+			if(count($parts) == 1 && $sStart == $fPart['openSymbolNum'] && $sEnd == $fPart['closeSymbolNum']) {
 				$next[$level] = false;
-				list($outline, $treeList) = build_expression_html_tree($expression, $parts[0], $level, $next, $nextletter);
+				list($outline, $treeList) = build_expression_html_tree($expression, $fPart, $level, $next, $nextletter);
 				$outline = (isset($treeLevel['openSymbol']) && $treeLevel['levelType'] == 'grouping' ? $treeLevel['openSymbol'].' ' : '').$outline.(isset($treeLevel['closeSymbol'])  && $treeLevel['levelType'] == 'grouping' ? ' '.$treeLevel['closeSymbol'] : '');
 				return Array($outline, $treeList);
 			}
 			
 			$operand = '|';
-			$i = 0;
+			reset($parts);
 			$bParts = Array();
-			$opPos = find_next_operand($expression, $sStart, $sEnd, $parts, $i, $bParts, $operand);
+			$opPos = find_next_operand($expression, $sStart, $sEnd, $parts, $bParts, $operand);
 			
 			if(!is_int($opPos) || $opPos >= $sEnd) {
 				$operand = '&';
-				$i = 0;
+				reset($parts);
 				$bParts = Array();
-				$opPos = find_next_operand($expression, $sStart, $sEnd, $parts, $i, $bParts, $operand);
+				$opPos = find_next_operand($expression, $sStart, $sEnd, $parts, $bParts, $operand);
 			}
 			
 			if(is_int($opPos) && $opPos < $sEnd) {
@@ -3400,9 +3409,12 @@ return $result;
 					unset($newTreeLevel);
 					$strStart = $prev+($prev > $sStart ? zbx_strlen($operand):0);
 					$strEnd = is_int($opPos) && $opPos < $sEnd ? $opPos-zbx_strlen($operand):$sEnd;
+					
+					if(count($bParts) == 1) $fbPart = reset($bParts);
+					
 					if(count($bParts) == 1 && 
-						zbx_substr($expression, $bParts[0]['openSymbolNum'], $bParts[0]['closeSymbolNum']-$bParts[0]['openSymbolNum']+1) == trim(zbx_substr($expression, $strStart, $strEnd-$strStart+1))) {
-						$newTreeLevel =& $bParts[0];
+						zbx_substr($expression, $fbPart['openSymbolNum'], $fbPart['closeSymbolNum']-$fbPart['openSymbolNum']+1) == trim(zbx_substr($expression, $strStart, $strEnd-$strStart+1))) {
+						$newTreeLevel =& $bParts[key($bParts)];
 					}else{
 						$newTreeLevel = Array(
 							'levelType' => 'grouping',
@@ -3418,7 +3430,7 @@ return $result;
 					unset($bParts);
 					$bParts = Array();
 					$prev = is_int($opPos) && $opPos < $sEnd ? $opPos : $sEnd;
-					$opPos = find_next_operand($expression, $prev+zbx_strlen($operand), $sEnd, $parts, $i, $bParts, $operand);
+					$opPos = find_next_operand($expression, $prev+zbx_strlen($operand), $sEnd, $parts, $bParts, $operand);
 										
 //					SDI('>>>>>>>>>>>>>>>>>>>newTreeLevel parts count:'.(isset($newTreeLevel['parts']) ? count($newTreeLevel['parts']) : 0));					
 					$next[$level] = is_int($prev) && $prev < $sEnd ? true : false;
@@ -3534,7 +3546,7 @@ return $result;
  * Comments:
  *
  */
-	function find_next_operand($expression, $sStart, $sEnd, &$parts, &$i, &$betweenParts, $operand) {
+	function find_next_operand($expression, $sStart, $sEnd, &$parts, &$betweenParts, $operand) {
 		if($sStart >= $sEnd)
 			return false;
 		
@@ -3542,27 +3554,28 @@ return $result;
 		$position = is_int($sStart) && $sStart < $sEnd ? mb_strpos($expression, $operand, $sStart) : $sEnd;		
 //		SDI("Found at: {$position}");
 
+		$cKey = key($parts);
 //		SDI("find_next_operand parts: ".count($parts));
-		if(count($parts) > 0) {
-//			SDI("Current Index: $i");
-			for(; $i < count($parts); $i++) {
-//				SDI("levelType: {$parts[$i]['levelType']}");
-//				SDI("Position: $position; openSymbolNum: {$parts[$i]['openSymbolNum']}; closeSymbolNum: {$parts[$i]['closeSymbolNum']};");
-//				SDI("Grouping Value (From {$parts[$i]['openSymbolNum']}, To {$parts[$i]['closeSymbolNum']}): ".zbx_substr($expression, $parts[$i]['openSymbolNum'], $parts[$i]['closeSymbolNum']-$parts[$i]['openSymbolNum']+1).";");
-//				if(isset($parts[$i+1]))
-//				SDI("Grouping Value (From {$parts[$i+1]['openSymbolNum']}, To {$parts[$i+1]['closeSymbolNum']}): ".zbx_substr($expression, $parts[$i+1]['openSymbolNum'], $parts[$i+1]['closeSymbolNum']-$parts[$i+1]['openSymbolNum']+1).";");
-				if(is_int($position) && $parts[$i]['openSymbolNum'] <= $position && $position <= $parts[$i]['closeSymbolNum']) {
-//					SDI("Position is inside child: {$parts[$i]['levelType']}");
-					$position = $parts[$i]['closeSymbolNum'] < $sEnd ? mb_strpos($expression, $operand, $parts[$i]['closeSymbolNum']) : $sEnd;
-					$betweenParts[] =& $parts[$i];
-				}else if (is_int($position) && $position < $parts[$i]['openSymbolNum']) {
-//					SDI('breaking loop');
-					break;
-				}elseif(!is_int($position) || $position > $parts[$i]['closeSymbolNum']) {
-//					SDI('moving to the next');
-					$betweenParts[] =& $parts[$i];
-				}
+//		SDI("Current Index: $cKey");
+		while($cKey !== NULL && $cKey !== false) {
+//			SDI("levelType: {$parts[$i]['levelType']}");
+//			SDI("Position: $position; openSymbolNum: {$parts[$i]['openSymbolNum']}; closeSymbolNum: {$parts[$i]['closeSymbolNum']};");
+//			SDI("Grouping Value (From {$parts[$i]['openSymbolNum']}, To {$parts[$i]['closeSymbolNum']}): ".zbx_substr($expression, $parts[$i]['openSymbolNum'], $parts[$i]['closeSymbolNum']-$parts[$i]['openSymbolNum']+1).";");
+//			if(isset($parts[$i+1]))
+//			SDI("Grouping Value (From {$parts[$i+1]['openSymbolNum']}, To {$parts[$i+1]['closeSymbolNum']}): ".zbx_substr($expression, $parts[$i+1]['openSymbolNum'], $parts[$i+1]['closeSymbolNum']-$parts[$i+1]['openSymbolNum']+1).";");
+			if(is_int($position) && $parts[$cKey]['openSymbolNum'] <= $position && $position <= $parts[$cKey]['closeSymbolNum']) {
+//				SDI("Position is inside child: {$parts[$i]['levelType']}");
+				$position = $parts[$cKey]['closeSymbolNum'] < $sEnd ? mb_strpos($expression, $operand, $parts[$cKey]['closeSymbolNum']) : $sEnd;
+				$betweenParts[$cKey] =& $parts[$cKey];
+			}else if (is_int($position) && $position < $parts[$cKey]['openSymbolNum']) {
+//				SDI('breaking loop');
+				break;
+			}elseif(!is_int($position) || $position > $parts[$cKey]['closeSymbolNum']) {
+//				SDI('moving to the next');
+				$betweenParts[$cKey] =& $parts[$cKey];
 			}
+			next($parts);
+			$cKey = key($parts);
 		}
 //		SDI("Returning position: {$position}");
 		return $position;
@@ -3595,20 +3608,22 @@ return $result;
 			if(isset($treeLevel['parts'])) $parts =& $treeLevel['parts'];
 			else $parts = Array();
 			
-			if(count($parts) == 1 && $sStart == $parts[0]['openSymbolNum'] && $sEnd == $parts[0]['closeSymbolNum']) {
-				return (isset($parts[0]['openSymbol']) && $parts[0]['levelType'] == 'grouping' ? $parts[0]['openSymbol']:'').trim(rebuild_expression_tree($expression, $parts[0], $action, $actionid, $newPart)).(isset($parts[0]['closeSymbol']) && $parts[0]['levelType'] == 'grouping' ? $parts[0]['closeSymbol']:'');
+			$fPart = reset($parts);
+			
+			if(count($parts) == 1 && $sStart == $fPart['openSymbolNum'] && $sEnd == $fPart['closeSymbolNum']) {
+				return (isset($fPart['openSymbol']) && $fPart['levelType'] == 'grouping' ? $fPart['openSymbol']:'').trim(rebuild_expression_tree($expression, $fPart, $action, $actionid, $newPart)).(isset($fPart['closeSymbol']) && $fPart['levelType'] == 'grouping' ? $fPart['closeSymbol']:'');
 			}
 			
 			$operand = '|';
-			$i = 0;
+			reset($parts);
 			$bParts = Array();
-			$opPos = find_next_operand($expression, $sStart, $sEnd, $parts, $i, $bParts, $operand);
+			$opPos = find_next_operand($expression, $sStart, $sEnd, $parts, $bParts, $operand);
 			
 			if(!is_int($opPos) || $opPos >= $sEnd) {
 				$operand = '&';
-				$i = 0;
+				reset($parts);
 				$bParts = Array();
-				$opPos = find_next_operand($expression, $sStart, $sEnd, $parts, $i, $bParts, $operand);
+				$opPos = find_next_operand($expression, $sStart, $sEnd, $parts, $bParts, $operand);
 			}
 			
 			if(is_int($opPos) && $opPos < $sEnd) {
@@ -3618,9 +3633,12 @@ return $result;
 				$levelNewExpression = Array();
 				while (is_int($opPos) && $opPos < $sEnd || $prev < $sEnd) {
 					unset($newTreeLevel);
+					
+					if(count($bParts) == 1) $fbPart = reset($bParts);
+					
 					if(count($bParts) == 1 && 
-						zbx_substr($expression, $bParts[0]['openSymbolNum'], $bParts[0]['closeSymbolNum']-$bParts[0]['openSymbolNum']+(isset($bParts[0]['closeSymbol']) ? zbx_strlen($bParts[0]['closeSymbol']) : 0)) == trim(zbx_substr($expression, $prev+($prev > $sStart ? zbx_strlen($operand): 0), (is_int($opPos) && $opPos < $sEnd ? $opPos-zbx_strlen($operand): $sEnd)-$prev))) {
-						$newTreeLevel =& $bParts[0];
+						zbx_substr($expression, $fbPart['openSymbolNum'], $fbPart['closeSymbolNum']-$fbPart['openSymbolNum']+(isset($fbPart['closeSymbol']) ? zbx_strlen($fbPart['closeSymbol']) : 0)) == trim(zbx_substr($expression, $prev+($prev > $sStart ? zbx_strlen($operand): 0), (is_int($opPos) && $opPos < $sEnd ? $opPos-zbx_strlen($operand): $sEnd)-$prev))) {
+						$newTreeLevel =& $bParts[key($bParts)];
 					}else{
 						$newTreeLevel = Array(
 							'levelType' => 'grouping',
@@ -3636,7 +3654,7 @@ return $result;
 					unset($bParts);
 					$bParts = Array();
 					$prev = is_int($opPos) && $opPos < $sEnd ? $opPos : $sEnd;
-					$opPos = find_next_operand($expression, $prev+zbx_strlen($operand), $sEnd, $parts, $i, $bParts, $operand);
+					$opPos = find_next_operand($expression, $prev+zbx_strlen($operand), $sEnd, $parts, $bParts, $operand);
 					
 //					SDI('>>>>>>>>>>>>>>>>>>>newTreeLevel parts count:'.(isset($newTreeLevel['parts']) ? count($newTreeLevel['parts']): 0));
 					
@@ -3854,10 +3872,14 @@ return $result;
 						'validation'	=> NOT_EMPTY
 					);
 				} elseif(isset($expData[$expr]['expressions']) && count($expData[$expr]['expressions']) > 0) {
-					$hData =& $expData[$expr]['hosts'][0];
-					$kData =& $expData[$expr]['keys'][0];
-					$kpData =& $expData[$expr]['keysParams'][0];
-					$fData =& $expData[$expr]['keysFunctions'][0];
+					reset($expData[$expr]['hosts']);
+					$hData =& $expData[$expr]['hosts'][key($expData[$expr]['hosts'])];
+					reset($expData[$expr]['keys']);
+					$kData =& $expData[$expr]['keys'][key($expData[$expr]['keys'])];
+					reset($expData[$expr]['keysParams']);
+					$kpData =& $expData[$expr]['keysParams'][key($expData[$expr]['keysParams'])];
+					reset($expData[$expr]['keysFunctions']);
+					$fData =& $expData[$expr]['keysFunctions'][key($expData[$expr]['keysFunctions'])];
 					$host = zbx_substr($expr, $hData['openSymbolNum']+zbx_strlen($hData['openSymbol']), $hData['closeSymbolNum']-$hData['openSymbolNum']-zbx_strlen($hData['closeSymbol']));
 					$hostKey = zbx_substr($expr, $kData['openSymbolNum']+zbx_strlen($kData['openSymbol']), $kData['closeSymbolNum']-$kData['openSymbolNum']-zbx_strlen($kData['closeSymbol']));
 					$hostKeyParams = isset($expData[$expr]['keysParams']) && count($expData[$expr]['keysParams']) > 0 ? zbx_substr($expr, $kpData['openSymbolNum'], $kpData['closeSymbolNum']-$kpData['openSymbolNum']+zbx_strlen($kpData['closeSymbol'])) : '';
@@ -4065,24 +4087,34 @@ return $result;
 	}
 
 $triggerExpressionRules['independent'] = Array(
-	'allowedSymbols' => "[0-9. \/*+<>#=&|\-]+",
+	'allowedSymbols' => "[0-9KMGTsmhdw. \/*+<>#=&|\-]+",
 	'notAllowedSymbols' => Array(
 					"[.\/*+<>#=&|\-]{2,}",
-					"[ .]{2,}",
+					"[ .KMGTsmhdw]{2,}",
 					"(^\.|\.$)",
-					"\.\d+\."
+					"\.\d+\.",
+					"[.\/*+<>#=&|\-]+[KMGTsmhdw]+",
+					"[KMGTsmhdw]+\d+[KMGTsmhdw]+",
+					"\d+[KMGTsmhdw]+\d+"
 				),
-	'customValidate' => 'triggerExpressionValidateGroup',
+	'customValidate' => Array(
+				'triggerExpressionValidateGroup',
+				'triggerExpressionValidateIndependent'
+				),
+	'levelIndex' => true,
 	'ignorSymbols' => ' +');
 $triggerExpressionRules['grouping'] = Array(
 	'openSymbol' => '(',
 	'closeSymbol' => ')',
-	'allowedSymbols' => "[0-9. \/*+<>#=&|\-]+",
+	'allowedSymbols' => "[0-9KMGTsmhdw. \/*+<>#=&|\-]+",
 	'notAllowedSymbols' => Array(
 					"[.\/*+<>#=&|\-]{2,}",
-					"[ .]{2,}",
+					"[ .KMGTsmhdw]{2,}",
 					"(^\.|\.$)",
-					"\.\d+\."
+					"\.\d+\.",
+					"[.\/*+<>#=&|\-]+[KMGTsmhdw]+",
+					"[KMGTsmhdw]+\d+[KMGTsmhdw]+",
+					"\d+[KMGTsmhdw]+\d+"
 				),
 	'customValidate' => 'triggerExpressionValidateGroup',
 	'ignorSymbols' => ' +',
@@ -4122,7 +4154,7 @@ $triggerExpressionRules['macro'] = Array(
 		'TRIGGERS.UNACK',
 		'TRIGGERS.PROBLEM.UNACK'),
 	'indexItem' => true,
-	'parent' => Array('independent', 'grouping'));
+	'parent' => Array('independent','grouping','checkPort'));
 $triggerExpressionRules['macroNum'] = Array(
 	'openSymbol' => Array('{' => 'valueDependent'),
 	'closeSymbol' => '}',
@@ -4156,13 +4188,13 @@ $triggerExpressionRules['macroNum'] = Array(
 		'PROFILE\.TAG[1-9]{1}',
 		'TRIGGER\.KEY[1-9]{1}'),
 	'indexItem' => true,
-	'parent' => Array('independent', 'grouping'));
+	'parent' => Array('independent','grouping','checkPort'));
 $triggerExpressionRules['customMacro'] = Array(
 	'openSymbol' => Array('{' => 'valueDependent'),
 	'closeSymbol' => '}',
 	'allowedSymbols' => '\$[A-Z0-9_.]+',
 	'indexItem' => true,
-	'parent' => Array('independent', 'grouping'));
+	'parent' => Array('independent','grouping','checkPort'));
 $triggerExpressionRules['expression'] = Array(
 	'openSymbol' => '{',
 	'closeSymbol' => '}',
@@ -4187,9 +4219,15 @@ $triggerExpressionRules['key'] = Array(
 $triggerExpressionRules['keyName'] = Array(
 	'openSymbol' => ':',
 	'closeSymbol' => Array('[' => 'default', '.' => 'nextEnd'),
-	'allowedSymbols' => '[0-9a-zA-Z_\.\-]+',
+	'allowedSymbols' => '[0-9a-zA-Z_.-]+',
 	'indexItem' => true,
 	'parent' => 'key');
+$triggerExpressionRules['checkPort'] = Array(
+	'openSymbol' => ',',
+	'closeSymbol' => '.',
+	'allowedSymbols' => '\d+',
+	'parent' => 'keyName'
+	);
 $triggerExpressionRules['keyParams'] = Array(
 	'openSymbol' => '[',
 	'closeSymbol' => ']',

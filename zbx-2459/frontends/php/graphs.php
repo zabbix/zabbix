@@ -44,19 +44,19 @@ include_once('include/page_header.php');
 		'copy_mode'	=>array(T_ZBX_INT, O_OPT,	 P_SYS,	IN('0'),NULL),
 
 		'graphid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))'),
-		'name'=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,		'isset({save})', S_NAME),
-		'width'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),	'isset({save})'),
-		'height'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),	'isset({save})'),
+		'name'=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,		'isset({save}) || isset({preview})', S_NAME),
+		'width'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),	'isset({save}) || isset({preview})'),
+		'height'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),	'isset({save}) || isset({preview})'),
 
 		'ymin_type'=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN('0,1,2'),		null),
 		'ymax_type'=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN('0,1,2'),		null),
-		'graphtype'=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN('0,1,2,3'),		'isset({save})'),
-		'yaxismin'=>	array(T_ZBX_DBL, O_OPT,	 NULL,	null,	'isset({save})&&(({graphtype} == 0) || ({graphtype} == 1))'),
-		'yaxismax'=>	array(T_ZBX_DBL, O_OPT,	 NULL,	null,	'isset({save})&&(({graphtype} == 0) || ({graphtype} == 1))'),
-		'graph3d'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	IN('0,1'),		null),
-		'legend'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	IN('0,1'),		null),
-		"ymin_itemid"=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,	'isset({save})&&isset({ymin_type})&&({ymin_type}==3)'),
-		"ymax_itemid"=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,	'isset({save})&&isset({ymax_type})&&({ymax_type}==3)'),
+		'graphtype'=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN('0,1,2,3'),		'isset({save}) || isset({preview})'),
+		'yaxismin'=>	array(T_ZBX_DBL, O_OPT,	 NULL,	null,	'(isset({save}) || isset({preview}))&&(({graphtype} == 0) || ({graphtype} == 1))'),
+		'yaxismax'=>	array(T_ZBX_DBL, O_OPT,	 NULL,	null,	'(isset({save}) || isset({preview}))&&(({graphtype} == 0) || ({graphtype} == 1))'),
+		'graph3d'=>		array(T_ZBX_INT, O_OPT,	P_NZERO,	IN('0,1'),		null),
+		'legend'=>		array(T_ZBX_INT, O_OPT,	P_NZERO,	IN('0,1'),		null),
+		'ymin_itemid'=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,	'(isset({save}) || isset({preview}))&&isset({ymin_type})&&({ymin_type}==3)'),
+		'ymax_itemid'=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,	'(isset({save}) || isset({preview}))&&isset({ymax_type})&&({ymax_type}==3)'),
 		'percent_left'=>	array(T_ZBX_DBL, O_OPT,	 NULL,	BETWEEN(0,100),	null),
 		'percent_right'=>	array(T_ZBX_DBL, O_OPT,	 NULL,	BETWEEN(0,100),	null),
 		'visible'=>			array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,1),	null),
@@ -78,6 +78,7 @@ include_once('include/page_header.php');
 		'add_item'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'delete_item'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 
+		'preview'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,    NULL,   NULL),
 		'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'clone'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'copy'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -88,25 +89,33 @@ include_once('include/page_header.php');
 		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
 	);
 
-	check_fields($fields);
+	$dataValid = check_fields($fields);
 	validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 	$_REQUEST['go'] = get_request('go', 'none');
 
 // PERMISSIONS
-	if(get_request('graphid',0) > 0){
+	if(get_request('graphid', false)){
 		$options = array(
 			'nodeids' => get_current_nodeid(true),
 			'graphids' => $_REQUEST['graphid'],
 			'editable' => 1
 		);
 		$graphs = CGraph::get($options);
-
 		if(empty($graphs)) access_deny();
+	}
+	else if(get_request('hostid', 0) > 0){
+		$options = array(
+			'hostids' => $_REQUEST['hostid'],
+			'extendoutput' => 1,
+			'templated_hosts' => 1,
+			'editable' => 1
+		);
+		$hosts = CHost::get($options);
+		if(empty($hosts)) access_deny();
 	}
 ?>
 <?php
-
 	$_REQUEST['items'] = get_request('items', array());
 	$_REQUEST['group_gid'] = get_request('group_gid', array());
 	$_REQUEST['graph3d'] = get_request('graph3d', 0);
@@ -147,27 +156,27 @@ include_once('include/page_header.php');
 			$result = false;
 		}
 		else{
-			isset($_REQUEST["ymin_type"])?(''):($_REQUEST["ymin_type"]=0);
-			isset($_REQUEST["ymax_type"])?(''):($_REQUEST["ymax_type"]=0);
+			if(!isset($_REQUEST['ymin_type'])) $_REQUEST['ymin_type'] = 0;
+			if(!isset($_REQUEST['ymax_type'])) $_REQUEST['ymax_type'] = 0;
 
-			isset($_REQUEST['yaxismin'])?(''):($_REQUEST['yaxismin']=0);
-			isset($_REQUEST['yaxismax'])?(''):($_REQUEST['yaxismax']=0);
+			if(!isset($_REQUEST['yaxismin'])) $_REQUEST['yaxismin'] = 0;
+			if(!isset($_REQUEST['yaxismax'])) $_REQUEST['yaxismax'] = 0;
 
-			$showworkperiod	= isset($_REQUEST['showworkperiod']) ? 1 : 0;
-			$showtriggers	= isset($_REQUEST['showtriggers']) ? 1 : 0;
+			$showworkperiod	= isset($_REQUEST['showworkperiod']) ? 1:0;
+			$showtriggers	= isset($_REQUEST['showtriggers']) ? 1:0;
 
 			$visible = get_request('visible');
 			$percent_left  = 0;
 			$percent_right = 0;
 
-			if(isset($visible['percent_left'])) 	$percent_left  = get_request('percent_left', 0);
+			if(isset($visible['percent_left']))	$percent_left = get_request('percent_left', 0);
 			if(isset($visible['percent_right']))	$percent_right = get_request('percent_right', 0);
 
-			if(($_REQUEST['ymin_itemid'] != 0) && ($_REQUEST['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE)){
+			if($_REQUEST['ymin_itemid'] != 0 && $_REQUEST['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE){
 				$_REQUEST['yaxismin']=0;
 			}
 
-			if(($_REQUEST['ymax_itemid'] != 0)  && ($_REQUEST['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE)){
+			if($_REQUEST['ymax_itemid'] != 0 && $_REQUEST['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE){
 				$_REQUEST['yaxismax']=0;
 			}
 
@@ -369,33 +378,20 @@ include_once('include/page_header.php');
 ?>
 <?php
 	$options = array(
-		'groups' => array('not_proxy_hosts' => 1, 'with_graphs' => 1, 'editable' => 1),
-		'hosts' => array('with_graphs' => 1, 'editable' => 1),
+		'groups' => array('not_proxy_hosts' => 1, 'editable' => 1),
+		'hosts' => array('editable' => 1, 'templated_hosts' => 1),
 		'groupid' => get_request('groupid', null),
 		'hostid' => get_request('hostid', null),
-		'graphs' => array(),
-		'graphid' => get_request('graphid', null),
 	);
+
 	$pageFilter = new CPageFilter($options);
 	$_REQUEST['groupid'] = $pageFilter->groupid;
 	$_REQUEST['hostid'] = $pageFilter->hostid;
-	$_REQUEST['graphid'] = $pageFilter->graphid;
-
 ?>
 <?php
 	$form = new CForm(null, 'get');
 
 // Config
-	$cmbConf = new CComboBox('config','graphs.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
-		$cmbConf->addItem('templates.php',S_TEMPLATES);
-		$cmbConf->addItem('hosts.php',S_HOSTS);
-		$cmbConf->addItem('items.php',S_ITEMS);
-		$cmbConf->addItem('triggers.php',S_TRIGGERS);
-		$cmbConf->addItem('graphs.php',S_GRAPHS);
-		$cmbConf->addItem('applications.php',S_APPLICATIONS);
-
-	$form->addItem($cmbConf);
-
 	if(!isset($_REQUEST['form']))
 		$form->addItem(new CButton('form', S_CREATE_GRAPH));
 
@@ -408,20 +404,18 @@ include_once('include/page_header.php');
 		insert_graph_form();
 		echo SBR;
 		$table = new CTable(NULL,'graph');
-		if(($_REQUEST['graphtype'] == GRAPH_TYPE_PIE) || ($_REQUEST['graphtype'] == GRAPH_TYPE_EXPLODED)){
+		if(($_REQUEST['graphtype'] == GRAPH_TYPE_PIE || $_REQUEST['graphtype'] == GRAPH_TYPE_EXPLODED) && $dataValid){
 			$table->addRow(new CImg('chart7.php?period=3600'.url_param('name').
 					url_param('legend').url_param('graph3d').url_param('width').
 					url_param('height').url_param('graphtype').url_param('items')));
-			$table->show();
-		}
-		else{
+		}else if($dataValid){
 			$table->addRow(new CImg('chart3.php?period=3600'.url_param('name').url_param('width').url_param('height').
 				url_param('ymin_type').url_param('ymax_type').url_param('yaxismin').url_param('yaxismax').
 				url_param('ymin_itemid').url_param('ymax_itemid').
 				url_param('showworkperiod').url_param('legend').url_param('showtriggers').url_param('graphtype').
 				url_param('percent_left').url_param('percent_right').url_param('items')));
-			$table->show();
 		}
+		$table->show();
 	}
 	else {
 /* Table HEADER */
@@ -462,30 +456,33 @@ include_once('include/page_header.php');
 			S_HEIGHT,
 			make_sorting_header(S_GRAPH_TYPE,'graphtype')));
 
+// get Graphs
+		$graphs = array();
 
 		$sortfield = getPageSortField('description');
 		$sortorder = getPageSortOrder();
-		$options = array(
-			'editable' => 1,
-			'extendoutput' => 1,
-			'sortfield' => $sortfield,
-			'sortorder' => $sortorder,
-			'limit' => ($config['search_limit']+1)
-		);
+
 		if($pageFilter->hostsSelected){
+			$options = array(
+				'editable' => 1,
+				'extendoutput' => 1,
+				'sortfield' => $sortfield,
+				'sortorder' => $sortorder,
+				'limit' => ($config['search_limit']+1)
+			);
+		
 			if($pageFilter->hostid > 0)
 				$options['hostids'] = $pageFilter->hostid;
 			else if($pageFilter->groupid > 0)
 				$options['groupids'] = $pageFilter->groupid;
-		}
-		else{
-			$options['hostids'] = array();
-		}
-		$graphs = CGraph::get($options);
 
+			$graphs = CGraph::get($options);
+		}
+		
+// sorting && paging
 		order_result($graphs, $sortfield, $sortorder);
 		$paging = getPagingLine($graphs);
-
+//----
 
 		$graphids = zbx_objectValues($graphs, 'graphid');
 		$options = array(

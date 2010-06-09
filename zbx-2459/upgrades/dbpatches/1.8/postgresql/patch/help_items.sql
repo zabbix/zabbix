@@ -7,34 +7,42 @@ CREATE TABLE help_items (
         PRIMARY KEY (itemtype,key_)
 ) with OIDS;
 
-insert into help_items values (3,'icmpping[&lt;ip&gt;,&lt;count&gt;,&lt;interval&gt;,&lt;size&gt;,&lt;timeout&gt;]','Checks if server is accessible by ICMP ping0 - ICMP ping fails 1 - ICMP ping successfulOne of zabbix_server processes performs ICMP pings once per PingerFrequency seconds.');
-insert into help_items values (3,'icmppingloss[&lt;ip&gt;,&lt;count&gt;,&lt;interval&gt;,&lt;size&gt;,&lt;timeout&gt;]','Returns percentage of lost ICMP ping packets');
-insert into help_items values (3,'icmppingsec[&lt;ip&gt;,&lt;count&gt;,&lt;interval&gt;,&lt;size&gt;,&lt;timeout&gt;,&lt;type&gt;]','Returns ICMP ping response timeNumber of seconds Example: 0.02');
-insert into help_items values (3,'ftp&lt;,port&gt;','Checks if FTP server is running and accepting connections0 - FTP server is down 1 - FTP server is running');
-insert into help_items values (3,'http&lt;,port&gt;','Checks if HTTP (WEB) server is running and accepting connections0 - HTTP server is down 1 - HTTP server is running');
-insert into help_items values (3,'imap&lt;,port&gt;','Checks if IMAP server is running and accepting connections0 - IMAP server is down 1 - IMAP server is running');
-insert into help_items values (3,'nntp&lt;,port&gt;','Checks if NNTP server is running and accepting connections0 - NNTP server is down 1 - NNTP server is running');
-insert into help_items values (3,'pop&lt;,port&gt;','Checks if POP server is running and accepting connections0 - POP server is down 1 - POP server is running');
-insert into help_items values (3,'smtp&lt;,port&gt;','Checks if SMTP server is running and accepting connections0 - SMTP server is down 1 - SMTP server is running');
-insert into help_items values (3,'ssh&lt;,port&gt;','Checks if SSH server is running and accepting connections0 - SSH server is down 1 - SSH server is running');
-insert into help_items values (3,'tcp,port','Checks if TCP service is running and accepting connections on port0 - the serivce on the port is down 1 - the service is running');
-insert into help_items values (3,'tcp_perf,port','Checks if TCP service is running and accepting connections on port0 - the service on the port is down Otherwise, number of milliseconds spent connecting to TCP service');
-insert into help_items values (3,'ftp_perf&lt;,port&gt;','Checks if FTP server is running and accepting connections0 - FTP server is down Otherwise, number of milliseconds spent connecting to FTP server');
-insert into help_items values (3,'http_perf&lt;,port&gt;','Checks if HTTP (WEB) server is running and accepting connections0 - HTTP server is down Otherwise, number of milliseconds spent connecting to HTTP server');
-insert into help_items values (3,'imap_perf&lt;,port&gt;','Checks if IMAP server is running and accepting connections0 - IMAP server is down Otherwise, number of milliseconds spent connecting to IMAP server');
-insert into help_items values (3,'nntp_perf&lt;,port&gt;','Checks if NNTP server is running and accepting connections0 - NNTP server is down Otherwise, number of milliseconds spent connecting to NNTP server');
-insert into help_items values (3,'pop_perf&lt;,port&gt;','Checks if POP server is running and accepting connections0 - POP server is down Otherwise, number of milliseconds spent connecting to POP server');
-insert into help_items values (3,'smtp_perf&lt;,port&gt;','Checks if SMTP server is running and accepting connections0 - SMTP server is down Otherwise, number of milliseconds spent connecting to SMTP server');
-insert into help_items values (3,'ssh_perf&lt;,port&gt;','Checks if SSH server is running and accepting connections0 - SSH server is down Otherwise, number of milliseconds spent connecting to SSH server');
+insert into help_items values (3,'icmpping[&lt;ip&gt;,&lt;count&gt;,&lt;interval&gt;,&lt;size&gt;,&lt;timeout&gt;]','Checks if server is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful. One of zabbix_server processes performs ICMP pings once per PingerFrequency seconds.');
+insert into help_items values (3,'icmppingloss[&lt;ip&gt;,&lt;count&gt;,&lt;interval&gt;,&lt;size&gt;,&lt;timeout&gt;]','Returns percentage of lost ICMP ping packets.');
+insert into help_items values (3,'icmppingsec[&lt;ip&gt;,&lt;count&gt;,&lt;interval&gt;,&lt;size&gt;,&lt;timeout&gt;,&lt;type&gt;]','Returns ICMP ping response time in seconds. Example: 0.02');
+insert into help_items values (3,'ftp&lt;,port&gt;','Checks if FTP server is running and accepting connections. 0 - FTP server is down. 1 - FTP server is running.');
+insert into help_items values (3,'http&lt;,port&gt;','Checks if HTTP (WEB) server is running and accepting connections. 0 - HTTP server is down. 1 - HTTP server is running.');
+insert into help_items values (3,'imap&lt;,port&gt;','Checks if IMAP server is running and accepting connections. 0 - IMAP server is down. 1 - IMAP server is running.');
+insert into help_items values (3,'ldap&lt;,port&gt;','Checks if LDAP server is running and accepting connections. 0 - LDAP server is down. 1 - LDAP server is running.');
+insert into help_items values (3,'nntp&lt;,port&gt;','Checks if NNTP server is running and accepting connections. 0 - NNTP server is down. 1 - NNTP server is running.');
+insert into help_items values (3,'ntp&lt;,port&gt;','Checks if NTP server is running and accepting connections. 0 - NTP server is down. 1 - NTP server is running.');
+insert into help_items values (3,'pop&lt;,port&gt;','Checks if POP server is running and accepting connections. 0 - POP server is down. 1 - POP server is running.');
+insert into help_items values (3,'smtp&lt;,port&gt;','Checks if SMTP server is running and accepting connections. 0 - SMTP server is down. 1 - SMTP server is running.');
+insert into help_items values (3,'ssh&lt;,port&gt;','Checks if SSH server is running and accepting connections. 0 - SSH server is down. 1 - SSH server is running.');
+insert into help_items values (3,'tcp,port','Checks if TCP service is running and accepting connections on port. 0 - the service on the port is down. 1 - the service is running.');
+insert into help_items values (3,'ftp_perf&lt;,port&gt;','Checks if FTP server is running and accepting connections. 0 - FTP server is down. Otherwise, number of seconds spent connecting to FTP server.');
+insert into help_items values (3,'http_perf&lt;,port&gt;','Checks if HTTP (WEB) server is running and accepting connections. 0 - HTTP server is down. Otherwise, number of seconds spent connecting to HTTP server.');
+insert into help_items values (3,'imap_perf&lt;,port&gt;','Checks if IMAP server is running and accepting connections. 0 - IMAP server is down. Otherwise, number of seconds spent connecting to IMAP server.');
+insert into help_items values (3,'ldap_perf&lt;,port&gt;','Checks if LDAP server is running and accepting connections. 0 - LDAP server is down. Otherwise, number of seconds spent connecting to LDAP server.');
+insert into help_items values (3,'nntp_perf&lt;,port&gt;','Checks if NNTP server is running and accepting connections. 0 - NNTP server is down. Otherwise, number of seconds spent connecting to NNTP server.');
+insert into help_items values (3,'ntp_perf&lt;,port&gt;','Checks if NTP server is running and accepting connections. 0 - NTP server is down. Otherwise, number of seconds spent connecting to NTP server.');
+insert into help_items values (3,'pop_perf&lt;,port&gt;','Checks if POP server is running and accepting connections. 0 - POP server is down. Otherwise, number of milliseconds spent connecting to POP server.');
+insert into help_items values (3,'smtp_perf&lt;,port&gt;','Checks if SMTP server is running and accepting connections. 0 - SMTP server is down. Otherwise, number of seconds spent connecting to SMTP server.');
+insert into help_items values (3,'ssh_perf&lt;,port&gt;','Checks if SSH server is running and accepting connections. 0 - SSH server is down. Otherwise, number of seconds spent connecting to SSH server.');
+insert into help_items values (3,'tcp_perf,port','Checks if TCP service is running and accepting connections on port. 0 - the service on the port is down. Otherwise, number of seconds spent connecting to TCP service.');
 
-insert into help_items values (5,'zabbix[history]','Number of values stored in table HISTORY');
-insert into help_items values (5,'zabbix[history_str]','Number of values stored in table HISTORY_STR');
-insert into help_items values (5,'zabbix[items]','Number of items in Zabbix database');
-insert into help_items values (5,'zabbix[items_unsupported]','Number of unsupported items in Zabbix database');
+insert into help_items values (5,'zabbix[history]','Number of values stored in table HISTORY.');
+insert into help_items values (5,'zabbix[history_log]','Number of values stored in table HISTORY_LOG.');
+insert into help_items values (5,'zabbix[history_str]','Number of values stored in table HISTORY_STR.');
+insert into help_items values (5,'zabbix[history_text]','Number of values stored in table HISTORY_TEXT.');
+insert into help_items values (5,'zabbix[history_uint]','Number of values stored in table HISTORY_UINT.');
+insert into help_items values (5,'zabbix[items]','Number of items in Zabbix database.');
+insert into help_items values (5,'zabbix[items_unsupported]','Number of unsupported items in Zabbix database.');
 insert into help_items values (5,'zabbix[log]','Stores warning and error messages generated by Zabbix server.');
-insert into help_items values (5,'zabbix[queue]','Number of items in the queue');
-insert into help_items values (5,'zabbix[trends]','Number of values stored in table TRENDS');
-insert into help_items values (5,'zabbix[triggers]','Number of triggers in Zabbix database');
+insert into help_items values (5,'zabbix[queue&lt;,from&gt;&lt;,to&gt;]','Number of items in the queue which are delayed by from to to seconds, inclusive.');
+insert into help_items values (5,'zabbix[trends]','Number of values stored in table TRENDS.');
+insert into help_items values (5,'zabbix[trends_uint]','Number of values stored in table TRENDS_UINT.');
+insert into help_items values (5,'zabbix[triggers]','Number of triggers in Zabbix database.');
 
 insert into help_items values (8,'grpfunc[&lt;Group&gt;,&lt;Key&gt;,&lt;func&gt;,&lt;param&gt;]','Aggregate checks do not require any agent running on a host being monitored. Zabbix server collects aggregate information by doing direct database queries. See Zabbix Manual.');
 

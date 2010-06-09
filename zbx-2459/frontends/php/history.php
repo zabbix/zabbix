@@ -188,12 +188,12 @@ include_once('include/page_header.php');
 			if(infavorites('web.favorite.graphids',$item['itemid'],'itemid')){
 				$icon = new CDiv(SPACE,'iconminus');
 				$icon->setAttribute('title',S_REMOVE_FROM.' '.S_FAVOURITES);
-				$icon->addAction('onclick',new CJSscript("javascript: rm4favorites('itemid','".$_REQUEST['itemid']."',0);"));
+				$icon->addAction('onclick', "javascript: rm4favorites('itemid','".$_REQUEST['itemid']."',0);");
 			}
 			else{
 				$icon = new CDiv(SPACE,'iconplus');
 				$icon->setAttribute('title',S_ADD_TO.' '.S_FAVOURITES);
-				$icon->addAction('onclick',new CJSscript("javascript: add2favorites('itemid','".$_REQUEST['itemid']."');"));
+				$icon->addAction('onclick', "javascript: add2favorites('itemid','".$_REQUEST['itemid']."');");
 			}
 			$icon->setAttribute('id','addrm_fav');
 
@@ -241,7 +241,7 @@ include_once('include/page_header.php');
 			$filterForm->setAttribute('id', 'zbx_filter');
 
 			$filterForm->addVar('action',$_REQUEST['action']);
-			$filterForm->addVar('itemid',$_REQUEST['itemid']);
+			$filterForm->addVar('itemid',zbx_toHash($_REQUEST['itemid']));
 
 			$cmbitemlist = new CListBox('cmbitemlist[]');
 			foreach($items as $itemid => $item){
@@ -255,7 +255,12 @@ include_once('include/page_header.php');
 			}
 
 			$addItemBttn = new CButton('add_log',S_ADD,"return PopUp('popup.php?multiselect=1".'&reference=itemid&srctbl=items&value_types[]='.$item['value_type']."&srcfld1=itemid');");
-			$delItemBttn = (count($items) > 1)?new CButton('remove_log',S_REMOVE_SELECTED) : null;
+			$delItemBttn = null;
+
+			if(count($items) > 1){
+				insert_js_function('removeSelectedItems');
+				$delItemBttn = new CButton('remove_log',S_REMOVE_SELECTED, "javascript: removeSelectedItems('cmbitemlist[]', 'itemid')");
+			}
 
 			$filterForm->addRow(S_ITEMS_LIST, array($cmbitemlist, BR(), $addItemBttn, $delItemBttn));
 
@@ -456,11 +461,11 @@ include_once('include/page_header.php');
 // NAV BAR
 		$timeline = array();
 		$timeline['period'] = $period;
-		$timeline['starttime'] = date('YmdHi', get_min_itemclock_by_itemid($item['itemid']));
+		$timeline['starttime'] = date('YmdHis', get_min_itemclock_by_itemid($item['itemid']));
 		$timeline['usertime'] = null;
 
 		if(isset($_REQUEST['stime'])){
-			$timeline['usertime'] = date('YmdHi', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
+			$timeline['usertime'] = date('YmdHis', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 		}
 
 		$objData = array();
@@ -488,6 +493,7 @@ include_once('include/page_header.php');
 			$objData['dynamic'] = 0;
 			$objData['mainObject'] = 1;
 		}
+
 //-------------
 	}
 
