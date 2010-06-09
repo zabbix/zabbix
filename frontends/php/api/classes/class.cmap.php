@@ -543,7 +543,7 @@ COpt::memoryPick();
 				'label_location' => $map['label_location']
 			);
 
-			$result = DBexecute('INSERT INTO sysmaps ('.implde(',', array_keys($values)).')'.
+			$result = DBexecute('INSERT INTO sysmaps ('.implode(',', array_keys($values)).')'.
 					' VALUES ('.implde(',', array_values($values)).')');
 
 			if(!$result) break;
