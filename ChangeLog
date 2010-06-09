@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2324] fixed guest user settings not being stored (Vedmak)
  - [DEV-461] improved map creation/editing by adding align option (Aly)
  - [ZBX-2518] fixed new map saving (Aly)
  - [ZBX-2469] fixed screen api (Vedmak)
