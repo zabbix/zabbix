@@ -17,15 +17,12 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-
 #include "common.h"
 
 #include "db.h"
 #include "log.h"
 #include "zlog.h"
 #include "dbcache.h"
-
-#define ZBX_MAX_DEPENDENCES	128
 
 /******************************************************************************
  *                                                                            *
@@ -525,14 +522,12 @@ static int	DBget_same_applications_by_itemid(zbx_uint64_t hostid,
  * Comments: !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
-static void	DBclear_parents_from_trigger(
-		zbx_uint64_t serviceid
-	)
+static void	DBclear_parents_from_trigger(zbx_uint64_t serviceid)
 {
-	DB_RESULT res;
-	DB_ROW rows;
+	DB_RESULT	result;
+	DB_ROW		row;
 
-	if( serviceid != 0 )
+	if (0 != serviceid)
 	{
 		DBexecute("UPDATE services as s "
 				" SET s.triggerid = null "
@@ -540,21 +535,20 @@ static void	DBclear_parents_from_trigger(
 	}
 	else
 	{
-
-		res = DBselect("SELECT s.serviceid "
+		result = DBselect("SELECT s.serviceid "
 					" FROM services as s, services_links as sl "
 					" WHERE s.serviceid = sl.serviceupid "
 					" AND NOT(s.triggerid IS NULL) "
 					" GROUP BY s.serviceid");
-		while( (rows = DBfetch(res)) )
+		while (NULL != (row = DBfetch(result)))
 		{
-			ZBX_STR2UINT64(serviceid, rows[0]);
+			ZBX_STR2UINT64(serviceid, row[0]);
 
 			DBexecute("UPDATE services as s "
 					" SET s.triggerid = null "
 					" WHERE s.serviceid = " ZBX_FS_UI64, serviceid);
 		}
-		DBfree_result(res);
+		DBfree_result(result);
 	}
 }
 
@@ -573,51 +567,56 @@ static void	DBclear_parents_from_trigger(
  * Comments: !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
-static int	DBget_service_status(
-		zbx_uint64_t	serviceid,
-		int		algorithm,
-		zbx_uint64_t	triggerid
-	)
+static int	DBget_service_status(zbx_uint64_t serviceid, int algorithm, zbx_uint64_t triggerid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	int status = 0;
-	char sort_order[MAX_STRING_LEN];
-	char sql[MAX_STRING_LEN];
+	int		status = 0;
+	char		sort_order[MAX_STRING_LEN];
+	char		sql[MAX_STRING_LEN];
 
-	if( 0 != triggerid )
+	if (0 != triggerid)
 	{
-		result = DBselect("select priority from triggers where triggerid=" ZBX_FS_UI64 " and status=0 and value=%d", triggerid, TRIGGER_VALUE_TRUE);
+		result = DBselect("select priority"
+					" from triggers"
+					" where triggerid=" ZBX_FS_UI64
+						" and status=0"
+						" and value=%d",
+					triggerid,
+					TRIGGER_VALUE_TRUE);
 		row = DBfetch(result);
-		if(row && (DBis_null(row[0])!=SUCCEED))
+		if (NULL != row && SUCCEED != DBis_null(row[0]))
 		{
 			status = atoi(row[0]);
 		}
 		DBfree_result(result);
 	}
 
-	if((SERVICE_ALGORITHM_MAX == algorithm) || (SERVICE_ALGORITHM_MIN == algorithm))
+	if (SERVICE_ALGORITHM_MAX == algorithm || SERVICE_ALGORITHM_MIN == algorithm)
 	{
+		strcpy(sort_order, (SERVICE_ALGORITHM_MAX == algorithm ? "desc" : "asc"));
 
-		strcpy(sort_order,((SERVICE_ALGORITHM_MAX == algorithm)?" DESC ":" ASC "));
+		zbx_snprintf(sql, sizeof(sql), "select s.status"
+						" from services s,services_links l"
+						" where l.serviceupid=" ZBX_FS_UI64
+							" and s.serviceid=l.servicedownid"
+						" order by s.status %s",
+						serviceid,
+						sort_order);
 
-		zbx_snprintf(sql,sizeof(sql),"select s.status from services s,services_links l where l.serviceupid=" ZBX_FS_UI64 " and s.serviceid=l.servicedownid order by s.status %s",
-			serviceid,
-			sort_order);
-
-		result = DBselectN(sql,1);
-
-		row=DBfetch(result);
-		if(row && DBis_null(row[0]) != SUCCEED)
+		result = DBselectN(sql, 1);
+		row = DBfetch(result);
+		if (NULL != row && SUCCEED != DBis_null(row[0]))
 		{
-			if(atoi(row[0])!=0)
+			if (atoi(row[0]) != 0)
 			{
 				status = atoi(row[0]);
 			}
 		}
 		DBfree_result(result);
 	}
+
 	return status;
 }
 
@@ -704,16 +703,13 @@ static void	DBupdate_services_rec(zbx_uint64_t serviceid, int clock)
  * Comments: !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
-static void DBupdate_services_status_all(void)
+static void	DBupdate_services_status_all(void)
 {
-	DB_RESULT result;
-	DB_ROW rows;
+	DB_RESULT	result;
+	DB_ROW		row;
 
-	zbx_uint64_t
-		serviceid = 0,
-		triggerid = 0;
-
-	int	status = 0, clock;
+	zbx_uint64_t	serviceid = 0, triggerid = 0;
+	int		status = 0, clock;
 
 	DBclear_parents_from_trigger(0);
 
@@ -723,14 +719,17 @@ static void DBupdate_services_status_all(void)
 			" FROM services AS s "
 			" WHERE s.serviceid NOT IN (SELECT DISTINCT sl.serviceupid FROM services_links AS sl)");
 
-	while( (rows = DBfetch(result)) )
+	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(serviceid, rows[0]);
-		ZBX_STR2UINT64(triggerid, rows[2]);
+		ZBX_STR2UINT64(serviceid, row[0]);
+		if (SUCCEED == DBis_null(row[2]))
+			triggerid = 0;
+		else
+			ZBX_STR2UINT64(triggerid, row[2]);
 
-		status = DBget_service_status(serviceid, atoi(rows[1]), triggerid);
+		status = DBget_service_status(serviceid, atoi(row[1]), triggerid);
 
-		DBexecute("UPDATE services SET status=%i WHERE serviceid=" ZBX_FS_UI64,
+		DBexecute("UPDATE services SET status=%d WHERE serviceid=" ZBX_FS_UI64,
 			status,
 			serviceid);
 
@@ -743,9 +742,9 @@ static void DBupdate_services_status_all(void)
 			" WHERE sl.servicedownid NOT IN (select distinct sl.serviceupid from services_links as sl) "
 			" GROUP BY sl.serviceupid");
 
-	while( (rows = DBfetch(result)) )
+	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(serviceid, rows[0]);
+		ZBX_STR2UINT64(serviceid, row[0]);
 		DBupdate_services_rec(serviceid, clock);
 	}
 	DBfree_result(result);

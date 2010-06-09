@@ -1170,9 +1170,6 @@ COpt::memoryPick();
 		}
 	}
 
-
-
-
 }
 
 ?>

@@ -347,26 +347,22 @@ include_once('include/page_header.php');
 				
 // PROFILES {{{
 			if(isset($visible['useprofile'])){
-				$host_profile = get_request('host_profile', array());
-				if(get_request('useprofile', false) && !empty($host_profile)){
-					$new_values['profile'] = $host_profile;
-				}
-				else{
-					$new_values['profile'] = array();
-				}
+				$new_values['profile'] = get_request('useprofile', false) ? get_request('host_profile', array()) : array();
 			}
 			
 			if(isset($visible['useprofile_ext'])){
-				$ext_host_profiles = get_request('ext_host_profiles', array());
-				if(get_request('useprofile_ext', false) && !empty($ext_host_profiles)){
-					$new_values['extendedProfile'] = $ext_host_profiles;
-				}
-				else{
-					$new_values['extendedProfile'] = array();
-				}
+				$new_values['extendedProfile'] = get_request('useprofile_ext', false) ? get_request('ext_host_profiles', array()) : array();
 			}
 // }}} PROFILES
 
+			$newgroup = array();
+			if(isset($visible['newgroup']) && !empty($_REQUEST['newgroup'])){
+				$result = CHostGroup::create(array('name' => $_REQUEST['newgroup']));
+				if($result === false) throw new Exception();
+				
+				$newgroup = array('groupid' => reset($result['groupids']), 'name' => $_REQUEST['newgroup']);
+			}
+			
 			$templates = array();
 			if(isset($visible['template_table']) || isset($visible['template_table_r'])){
 				$tplids = array_keys($_REQUEST['templates']);
@@ -375,6 +371,9 @@ include_once('include/page_header.php');
 		
 			if(isset($visible['groups'])){
 				$hosts['groups'] = zbx_toObject($_REQUEST['groups'], 'groupid');
+				if(!empty($newgroup)){
+					$hosts['groups'][] = $newgroup;
+				}
 			}
 			if(isset($visible['template_table_r'])){
 				$hosts['templates'] = $templates;
@@ -383,25 +382,13 @@ include_once('include/page_header.php');
 			if($result === false) throw new Exception();
 
 			
-			$groups = array();
-			if(isset($visible['newgroup']) && !empty($_REQUEST['newgroup'])){
-				$result = CHostGroup::create(array('name' => $_REQUEST['newgroup']));
-				$options = array(
-					'groupids' => $result['groupids'],
-					'output' => API_OUTPUT_EXTEND
-				);
-				$groups = CHostGroup::get($options);
-				if($groups === false) throw new Exception();
-			}
-
-			
-			
 			$add = array();
 			if(!empty($templates) && isset($visible['template_table'])){
 				$add['templates'] = $templates;
 			}
-			if(!empty($groups))
-				$add['groups'] = $groups;
+			if(!empty($newgroup) && !isset($visible['groups'])){
+				$add['groups'][] = $newgroup;			
+			}
 			if(!empty($add)){
 				$add['hosts'] = $hosts['hosts'];
 				
@@ -693,7 +680,7 @@ include_once('include/page_header.php');
 	}
 	else if(isset($_REQUEST['form'])){
 		if($_REQUEST['form'] == S_IMPORT_HOST)
-			$hosts_wdgt->addItem(import_host_form($rules));
+			$hosts_wdgt->addItem(import_host_form());
 		else
 			$hosts_wdgt->addItem(insert_host_form(false));
 	}
@@ -958,8 +945,6 @@ include_once('include/page_header.php');
 	
 	$hosts_wdgt->show();
 
-?>
-<?php
 
 include_once('include/page_footer.php');
 

@@ -302,7 +302,10 @@ function __autoload($class_name){
 					return PAGE_TYPE_JS;
 					break;
 				case 'json':
-					return PAGE_TYPE_JS;
+					return PAGE_TYPE_JSON;
+					break;
+				case 'json-rpc':
+					return PAGE_TYPE_JSON_RPC;
 					break;
 				case 'html':
 					return PAGE_TYPE_HTML_BLOCK;
@@ -513,9 +516,9 @@ function __autoload($class_name){
 	}
 
 	function fatal_error($msg){
-		include_once 'include/page_header.php';
+		include_once('include/page_header.php');
 		show_error_message($msg);
-		include_once 'include/page_footer.php';
+		include_once('include/page_footer.php');
 	}
 
 	function get_tree_by_parentid($parentid,&$tree,$parent_field, $level=0){
@@ -926,7 +929,7 @@ function __autoload($class_name){
 
 		if(IMAGE_FORMAT_JPEG == $format)	Header( "Content-type:  image/jpeg");
 		if(IMAGE_FORMAT_TEXT == $format)	Header( "Content-type:  text/html");
-		else								Header( "Content-type:  image/png");
+		else					Header( "Content-type:  image/png");
 
 		Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT");
 	}

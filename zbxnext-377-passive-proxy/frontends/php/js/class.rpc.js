@@ -20,7 +20,8 @@
 // JSON RPC by Artem "Aly" Suharev (based on Prototype)
 
 var RPC = {
-'_rpcurl':		'api_jsonrpc.php',	// rpc url
+//'_rpcurl':		'api_jsonrpc.php',	// rpc url
+'_rpcurl':		'jsrpc.php?output=json-rpc',		// rpc url
 '_callid':		0,					// rpc request id
 '_auth':		null,				// authentication hash
 
@@ -130,6 +131,7 @@ call: function(){
 processRespond: function(resp){
 	this.debug('processRespond');
 //--
+//SDJ(resp);
 	var isError = this.processError(resp);
 	if(isError) return false;
 
