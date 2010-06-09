@@ -31,12 +31,6 @@ class CAction extends CZBXAPI{
 /**
  * Get Actions data
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param _array $options
  * @param array $options['itemids']
  * @param array $options['hostids']
@@ -369,7 +363,6 @@ class CAction extends CZBXAPI{
 			$sql_parts['where'][] = ' UPPER(a.name) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
 		}
 
-
 // order
 // restrict not allowed columns for sorting
 		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
@@ -390,8 +383,6 @@ class CAction extends CZBXAPI{
 //---------------
 
 		$actionids = array();
-		$userids = array();
-		$mediatypeids = array();
 
 		$sql_parts['select'] = array_unique($sql_parts['select']);
 		$sql_parts['from'] = array_unique($sql_parts['from']);
@@ -496,12 +487,6 @@ COpt::memoryPick();
 /**
  * Add actions
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param _array $actions multidimensional array with actions data
  * @param array $actions[0,...]['expression']
  * @param array $actions[0,...]['description']
@@ -514,86 +499,48 @@ COpt::memoryPick();
  */
 	public static function create($actions){
 		$actions = zbx_toArray($actions);
-		$actionids = array();
+		$insert = array();
+		$conditions = array();
+		$operations = array();
 
 		try{
 			self::BeginTransaction(__METHOD__);
 
 			foreach($actions as $anum => $action){
-				if(!isset($action['operations']) || !is_array($action['operations']) || count($action['operations']) == 0){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_OPERATIONS_DEFINED);
-				}
-
-				if(!isset($action['conditions'])){
-					$action['conditions'] = array();
-					continue;
-				}
-
-				if(!check_permission_for_action_conditions($action['conditions'])){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, 'You do not have enough rights for operation');
-				}
-
-				foreach($action['conditions'] as $condition)
-					if(!validate_condition($condition['type'], $condition['value'])){
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Action condition validation failed');
-					}
-			}
-
-			foreach($actions as $anum => $action){
 				$action_db_fields = array(
-					'name'				=> null,
-					'eventsource'		=> null,
-					'evaltype'			=> null,
-					'status'			=> 0,
-					'esc_period'		=> 0,
-					'def_shortdata'		=> '',
-					'def_longdata'		=> '',
-					'recovery_msg'		=> 0,
-					'r_shortdata'		=> '',
-					'r_longdata'		=> '',
+					'name' => null,
+					'eventsource' => null,
+					'evaltype' => null,
 				);
 				if(!check_db_fields($action_db_fields, $action)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect parameters used for Action [ '.$action['name'].' ]');
 				}
 
-				$actionid = get_dbid('actions', 'actionid');
-				$values = array(
-					'actionid' => $actionid,
-					'name' => zbx_dbstr($action['name']),
-					'eventsource' => $action['eventsource'],
-					'esc_period' => $action['esc_period'],
-					'def_shortdata' => zbx_dbstr($action['def_shortdata']),
-					'def_longdata' => zbx_dbstr($action['def_longdata']),
-					'recovery_msg' => zbx_dbstr($action['recovery_msg']),
-					'r_shortdata' => zbx_dbstr($action['r_shortdata']),
-					'r_longdata' => zbx_dbstr($action['r_longdata']),
-					'evaltype' => $action['evaltype'],
-					'status' => $action['status']
-				);
+				$insert[$anum] = $action;
+			}
 
+			$actionids = DB::insert('actions', $insert);
 
-				$sql = 'INSERT INTO actions ('.implode(',', array_keys($values)).')'.
-						' VALUES ('.implode(',', array_values($values)).')';
-				if(!DBexecute($sql)) self::exception(ZBX_API_ERROR_INTERNAL, 'Failed to add Action [ '.$action['name'].' ]');
+			foreach($actions as $anum => $action){
+				if(isset($action['conditions']) && !empty($action['conditions'])){
+					foreach($action['conditions'] as $condition){
+						$conditions[] = array_merge(array('actionid' => $actionids[$anum]), $condition);
+					}
+				}
 
-				$actionids[] = $actionid;
-
-				foreach($action['operations'] as $onum => &$operation) $operation['actionid'] = $actionid;
-				unset($operation);
-
-				$result = self::addOperations($action['operations']);
-				if(!$result)
-					self::exception(ZBX_API_ERROR_INTERNAL, 'Failed to add Action operation [ '.$action['name'].' ]');
-
-				foreach($action['conditions'] as $cnum => &$condition) $condition['actionid'] = $actionid;
-				unset($condition);
-
-				if(!empty($action['conditions'])){
-					$result = self::addConditions($action['conditions']);
-					if(!$result)
-						self::exception(ZBX_API_ERROR_INTERNAL, 'Failed to add Action condition [ '.$action['name'].' ]');
+				if(!isset($action['operations']) || empty($action['operations'])){
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect parameters used for Action [ '.$action['name'].' ]');
+				}
+				else{
+					foreach($action['operations'] as $operation){
+						$operations[] = array_merge(array('actionid' => $actionids[$anum]), $operation);
+					}
 				}
 			}
+
+			self::addOperations($operations);
+			self::addConditions($conditions);
+
 
 			self::EndTransaction(true, __METHOD__);
 			return array('actionids' => $actionids);
@@ -610,12 +557,6 @@ COpt::memoryPick();
 /**
  * Update actions
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param _array $actions multidimensional array with actions data
  * @param array $actions[0,...]['actionid']
  * @param array $actions[0,...]['expression']
@@ -630,6 +571,9 @@ COpt::memoryPick();
 	public static function update($actions){
 		$actions = zbx_toArray($actions);
 		$actionids = zbx_objectValues($actions, 'actionid');
+		$update = array();
+		$operations = array();
+		$conditions = array();
 
 		try{
 			self::BeginTransaction(__METHOD__);
@@ -637,11 +581,10 @@ COpt::memoryPick();
 			$options = array(
 				'actionids' => $actionids,
 				'editable' => 1,
-				'output' => API_OUTPUT_EXTEND,
+				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => 1
 			);
-			$upd_actions = CAction::get($options);
-
+			$upd_actions = self::get($options);
 			foreach($actions as $anum => $action){
 				if(!isset($upd_actions[$action['actionid']])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
@@ -649,17 +592,70 @@ COpt::memoryPick();
 			}
 
 			foreach($actions as $anum => $action){
-				$action_db_fields = $upd_actions[$action['actionid']];
-
+				$action_db_fields = array(
+					'actionid' => null
+				);
 				if(!check_db_fields($action_db_fields, $action)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect parameters used for Action [ '.$action['name'].' ]');
 				}
 
-				$result = update_action($action['actionid'], $action['name'], $action['eventsource'], $action['esc_period'],
-					$action['def_shortdata'], $action['def_longdata'], $action['recovery_msg'], $action['r_shortdata'],
-					$action['r_longdata'], $action['evaltype'], $action['status'], $action['conditions'], $action['operations']);
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect parameters used for Action');
+				if(isset($action['conditions']) && !empty($action['conditions'])){
+					foreach($action['conditions'] as $condition){
+						$conditions[] = array_merge(array('actionid' => $action['actionid']), $condition);
+					}
+				}
+
+				if(!isset($action['operations']) || empty($action['operations'])){
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect parameters used for Action [ '.$action['name'].' ]');
+				}
+				else{
+					foreach($action['operations'] as $operation){
+						$operations[] = array_merge(array('actionid' => $action['actionid']), $operation);
+					}
+				}
+
+				$actionid = $action['actionid'];
+				unset($action['actionid']);
+				if(!empty($action)){
+					$update[] = array(
+						'values' => $action,
+						'where' => 'actionid='.$actionid,
+					);
+				}
 			}
+
+			DB::update('actions', $update);
+
+
+			$operationids = array();
+			$sql = 'SELECT operationid FROM operations WHERE '.DBcondition('actionid', $actionids);
+			$operations_db = DBselect($sql);
+			while($operationid = DBfetch($operations_db)){
+				$operationids[] = $operationid['operationid'];
+			}
+
+			$delete = array(
+				array(
+					'table' => 'conditions',
+					'where' => DBcondition('actionid', $actionids),
+				),
+				array(
+					'table' => 'opconditions',
+					'where' => DBcondition('operationid', $operationids),
+				),
+				array(
+					'table' => 'opmediatypes',
+					'where' => DBcondition('operationid', $operationids),
+				),
+				array(
+					'table' => 'operations',
+					'where' => DBcondition('actionid', $actionids),
+				)
+			);
+			DB::delete($delete);
+
+			self::addOperations($operations);
+			self::addConditions($conditions);
 
 			self::EndTransaction(true, __METHOD__);
 			return array('actionids' => $actionids);
@@ -676,75 +672,35 @@ COpt::memoryPick();
 /**
  * add conditions
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $conditions multidimensional array with conditions data
+ * @param array $conditions multidimensional array with conditions data
  * @param array $conditions[0,...]['actionid']
  * @param array $conditions[0,...]['type']
  * @param array $conditions[0,...]['value']
  * @param array $conditions[0,...]['operator']
  * @return boolean
  */
-	public static function addConditions($conditions){
+	protected static function addConditions($conditions){
 		$conditions = zbx_toArray($conditions);
-		$result = true;
+		$conditions_insert = array();
 
-		try{
-			self::BeginTransaction(__METHOD__);
-
-			if(!check_permission_for_action_conditions($conditions)){
-				self::$error[] = array('error' => ZBX_API_ERROR_PERMISSIONS, 'data' => 'You do not have enough rights for operation');
-				return false;
-			}
-
-			foreach($conditions as $cnum => $condition){
-				if(!validate_condition($condition['type'],$condition['value']) ){
-					self::$error[] = array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => 'Action condition validation failed');
-					return false;
-				}
-			}
-
-			foreach($conditions as $cnum => $condition){
-
-				$conditionid = get_dbid('conditions','conditionid');
-				$values = array(
-					'conditionid' => $conditionid,
-					'actionid' => $condition['actionid'],
-					'conditiontype' => $condition['conditiontype'],
-					'operator' => $condition['operator'],
-					'value' => zbx_dbstr($condition['value'])
-				);
-
-				$result = DBexecute('INSERT INTO conditions ('.implode(',', array_keys($values)).')'.
-						' VALUES ('.implode(',', array_values($values)).')');
-
-				if(!$result) break;
-			}
-			self::EndTransaction(true, __METHOD__);
-
-			return $conditions;
+		if(!check_permission_for_action_conditions($conditions)){
+			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NOPERMISSIONS);
 		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
+
+		foreach($conditions as $cnum => $condition){
+			if(!validate_condition($condition['type'], $condition['value'])){
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect parameters used for Conditions');
+			}
+			$conditions_insert[] = $condition;
 		}
+
+		DB::insert('conditions', $conditions_insert);
+
+		return true;
 	}
 
 /**
  * add operations
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
  *
  * @param _array $operations multidimensional array with operations data
  * @param array $operations[0,...]['actionid']
@@ -765,144 +721,115 @@ COpt::memoryPick();
  * @param array $operations[0,...]['opconditions']['value']
  * @return boolean
  */
-	public static function addOperations($operations){
+	protected static function addOperations($operations){
 		$operations = zbx_toArray($operations);
-		$result = true;
+		$operation_inserts = array();
+		$opcondition_inserts = array();
+		$opmediatype_inserts = array();
 
-		try{
-			self::BeginTransaction(__METHOD__);
+		foreach($operations as $onum => $operation){
+			if(!validate_operation($operation)){
+				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+			}
+		}
 
-			foreach($operations as $onum => $operation){
-				if(!validate_operation($operation)){
-					self::$error[] = array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => 'Action operation validation failed');
-					return false;
+		foreach($operations as $onum => $operation){
+			$operation_db_fields = array(
+				'actionid' => null,
+				'operationtype' => null,
+			);
+			if(!check_db_fields($operation_db_fields, $operation)){
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect parameters used for Operations');
+			}
+
+			$operation_inserts[$onum] = $operation;
+		}
+
+		$operationids = DB::insert('operations', $operation_inserts);
+
+		foreach($operations as $onum => $operation){
+			if(isset($operation['opconditions'])){
+				foreach($operation['opconditions'] as $opcondition){
+					$opcondition['operationid'] = $operationids[$onum];
+					$opcondition_inserts[] = $opcondition;
 				}
 			}
 
-			foreach($operations as $onum => $operation){
-				$operation_db_fields = array(
-					'operationid' => get_dbid('operations','operationid'),
-					'actionid' => null,
-					'operationtype' => null,
-					'object' => 0,
-					'objectid' => 0,
-					'shortdata' => '',
-					'longdata' => '',
-					'esc_period' => 0,
-					'esc_step_from' => 0,
-					'esc_step_to' => 0,
-					'default_msg' => 0,
-					'evaltype' => 0,
-					'mediatypeid' => 0,
-					'opconditions' => array()
+			if($operation['mediatypeid'] > 0){
+				$opmediatype_inserts[] = array(
+					'operationid' => $operationids[$onum],
+					'mediatypeid' => $operation['mediatypeid'],
 				);
-
-				if(!check_db_fields($operation_db_fields, $operation)){
-					$result = false;
-					break;
-				}
-
-				$operationid = get_dbid('operations','operationid');
-				$values = array(
-					'operationid' => $operationid,
-					'actionid' => $operation['actionid'],
-					'operationtype' => $operation['operationtype'],
-					'object' => $operation['object'],
-					'objectid' => $operation['objectid'],
-					'shortdata' => zbx_dbstr($operation['shortdata']),
-					'longdata' => zbx_dbstr($operation['longdata']),
-					'esc_period' => $operation['esc_period'],
-					'esc_step_from' => $operation['esc_step_from'],
-					'esc_step_to' => $operation['esc_step_to'],
-					'default_msg' => $operation['default_msg'],
-					'evaltype' => $operation['evaltype']
-				);
-
-				$result = DBexecute('INSERT INTO operations ('.implode(',', array_keys($values)).')'.
-						' VALUES ('.implode(',', array_values($values)).')');
-
-				if(!$result) return $result;
-
-				foreach($operation['opconditions'] as $num => $opcondition){
-					$opconditionid = get_dbid("opconditions","opconditionid");
-
-					$result &= (bool) DBexecute('INSERT INTO opconditions (opconditionid,operationid,conditiontype,operator,value)'.
-						' values ('.$opconditionid.','.
-							$operationid.','.
-							$opcondition['conditiontype'].','.
-							$opcondition['operator'].','.
-							zbx_dbstr($opcondition['value']).
-						')');
-				}
-
-				if($operation['mediatypeid'] > 0){
-					$opmediatypeid = get_dbid('opmediatypes', 'opmediatypeid');
-
-					$result &= (bool) DBexecute('INSERT INTO opmediatypes (opmediatypeid,operationid,mediatypeid)'.
-						' VALUES ('.$opmediatypeid.','.$operationid.','.$operation['mediatypeid'].')');
-				}
-
-				if(!$result) break;
 			}
-
-			self::EndTransaction(true, __METHOD__);
-
-			return $operations;
 		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
+
+		DB::insert('opconditions', $opcondition_inserts);
+		DB::insert('opmediatypes', $opmediatype_inserts);
+
+		return true;
 	}
 
 /**
  * Delete actions
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $actionids
+ * @param array $actionids
  * @param array $actionids['actionids']
  * @return boolean
  */
-	public static function delete($actions){
-		$actions = zbx_toArray($actions);
-		$actionids = array();
+	public static function delete($actionids){
+		if(empty($actionids)) return true;
+		$actionids = zbx_toArray($actionids);
 
 		try{
 			self::BeginTransaction(__METHOD__);
 
 			$options = array(
-				'actionids'=>zbx_objectValues($actions, 'actionid'),
-				'editable'=>1,
-				'extendoutput'=>1,
-				'preservekeys'=>1
+				'actionids' => $actionids,
+				'editable' => 1,
+				'output' => API_OUTPUT_SHORTEN,
+				'preservekeys' => 1
 			);
-			$del_actions = Caction::get($options);
-			foreach($actions as $anum => $action){
-				if(!isset($del_actions[$action['actionid']])){
-					self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-					return false;
+			$del_actions = self::get($options);
+			foreach($actionids as $actionid){
+				if(!isset($del_actions[$actionid])){
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				}
-
-				$actionids[] = $action['actionid'];
-				//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ACTION, 'Action ['.$action['name'].']');
 			}
 
-			if(!empty($actionids)){
-				$sql = 'DELETE FROM actions WHERE '.DBcondition('actionid', $actionids);
-				$result = DBexecute($sql);
+			$operationids = array();
+			$sql = 'SELECT operationid FROM operations WHERE '.DBcondition('actionid', $actionids);
+			$operations_db = DBselect($sql);
+			while($operationid = DBfetch($operations_db)){
+				$operationids[] = $operationid['operationid'];
 			}
-			else{
-				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ actionids ]');
-				$result = false;
-			}
+
+			$delete = array(
+				array(
+					'table' => 'conditions',
+					'where' => DBcondition('actionid', $actionids),
+				),
+				array(
+					'table' => 'opconditions',
+					'where' => DBcondition('operationid', $operationids),
+				),
+				array(
+					'table' => 'opmediatypes',
+					'where' => DBcondition('operationid', $operationids),
+				),
+				array(
+					'table' => 'operations',
+					'where' => DBcondition('actionid', $actionids),
+				),
+				array(
+					'table' => 'alerts',
+					'where' => DBcondition('actionid', $actionids),
+				),
+				array(
+					'table' => 'actions',
+					'where' => DBcondition('actionid', $actionids),
+				),
+			);
+			DB::delete($delete);
 
 			self::EndTransaction(true, __METHOD__);
 
