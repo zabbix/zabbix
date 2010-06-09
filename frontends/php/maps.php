@@ -145,7 +145,7 @@ include_once('include/page_header.php');
 
 		$table->addRow($action_map);
 
-		$imgMap = new CImg('map.php?noedit=1&sysmapid='.$_REQUEST['sysmapid']);
+		$imgMap = new CImg('map.php?sysmapid='.$_REQUEST['sysmapid']);
 		$imgMap->setMap($action_map->getName());
 		$table->addRow($imgMap);
 

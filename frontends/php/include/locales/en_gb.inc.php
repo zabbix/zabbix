@@ -9,7 +9,7 @@
 ** (at your option) any later version.
 **
 ** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** but WITHOUT ANY WARRANTY; withouts even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ** GNU General Public License for more details.
 **
@@ -379,8 +379,10 @@
 	'S_DEFAULT_MESSAGE'=>			'Default message',
 	'S_DEFAULT_SUBJECT'=>			'Default subject',
 	'S_MESSAGE'=>				'Message',
-	'S_ON'=>				'ON',
-	'S_OFF'=>				'OFF',
+	'S_ON_BIG'=>				'ON',
+	'S_OFF_BIG'=>				'OFF',
+	'S_ON'=>					'On',
+	'S_OFF'=>					'Off',
 	'S_NO_ACTIONS_DEFINED'=>		'No actions defined',
 	'S_SINGLE_USER'=>			'Single user',
 	'S_USER_GROUP'=>			'User group',
@@ -1201,10 +1203,14 @@
 	'S_LATEST_ITEMS_TRIGGERS_DATE_FORMAT'=>	'd M Y H:i:s',
 
 //	sysmap.php
-	'S_UPPER_LEVEL_MAPS'=>			'Upper level maps',
+	'S_HIDDEN'=>			'Hidden',
+	'S_SHOWN'=>				'Shown',
+	'S_ALIGN_ICONS'=>		'Align icons',
+	'S_UPPER_LEVEL_MAPS'=>	'Upper level maps',
 	'S_LINKS'=>				'Links',
 	'S_LINK'=>				'Link',
 	'S_LABEL'=>				'Label',
+	'S_GRID'=>				'Grid',
 	'S_X'=>					'X',
 	'S_ICON_PROBLEM'=>			'Icon (problem)',
 	'S_ICON_OK'=>				'Icon (OK)',
