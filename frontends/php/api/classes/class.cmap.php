@@ -544,7 +544,7 @@ COpt::memoryPick();
 			);
 
 			$result = DBexecute('INSERT INTO sysmaps ('.implode(',', array_keys($values)).')'.
-					' VALUES ('.implde(',', array_values($values)).')');
+					' VALUES ('.implode(',', array_values($values)).')');
 
 			if(!$result) break;
 
