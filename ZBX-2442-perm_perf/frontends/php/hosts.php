@@ -47,13 +47,13 @@ include_once('include/page_header.php');
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 //ARRAYS
-		'hosts'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, null),
-		'groups'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, null),
-		'hostids'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, null),
-		'groupids'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, null),
-		'applications'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, null),
+		'hosts'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
+		'groups'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
+		'hostids'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
+		'groupids'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
+		'applications'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 // host
-		'groupid'=>			array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,			null),
+		'groupid'=>			array(T_ZBX_INT, O_OPT,	P_SYS, 	DB_ID,				NULL),
 		'hostid'=>			array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,			'isset({form})&&({form}=="update")'),
 		'host'=>			array(T_ZBX_STR, O_OPT,	null,   NOT_EMPTY,		'isset({save})'),
 		'proxy_hostid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,			'isset({save})'),
@@ -68,27 +68,27 @@ include_once('include/page_header.php');
 		'templates_rem'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   null,	null),
 		'clear_templates'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,	null),
 
-		'useipmi'=>			array(T_ZBX_STR, O_OPT,	null,	null,				null),
-		'ipmi_ip'=>			array(T_ZBX_STR, O_OPT,	null,	null,				'isset({useipmi})'),
-		'ipmi_port'=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,65535),	'isset({useipmi})'),
-		'ipmi_authtype'=>	array(T_ZBX_INT, O_OPT,	null,	BETWEEN(-1,6),		'isset({useipmi})'),
-		'ipmi_privilege'=>	array(T_ZBX_INT, O_OPT,	null,	BETWEEN(1,5),		'isset({useipmi})'),
-		'ipmi_username'=>	array(T_ZBX_STR, O_OPT,	null,	null,				'isset({useipmi})'),
-		'ipmi_password'=>	array(T_ZBX_STR, O_OPT,	null,	null,				'isset({useipmi})'),
+		'useipmi'=>			array(T_ZBX_STR, O_OPT,	NULL, NULL,				NULL),
+		'ipmi_ip'=>			array(T_ZBX_STR, O_OPT,	NULL, NULL,				NULL),
+		'ipmi_port'=>		array(T_ZBX_INT, O_OPT,	NULL, BETWEEN(0,65535),	NULL),
+		'ipmi_authtype'=>	array(T_ZBX_INT, O_OPT,	NULL, BETWEEN(-1,6),	NULL),
+		'ipmi_privilege'=>	array(T_ZBX_INT, O_OPT,	NULL, BETWEEN(1,5),		NULL),
+		'ipmi_username'=>	array(T_ZBX_STR, O_OPT,	NULL, NULL,				NULL),
+		'ipmi_password'=>	array(T_ZBX_STR, O_OPT,	NULL, NULL,				NULL),
 
-		'useprofile'=>		array(T_ZBX_STR, O_OPT, null,   null,	null),
-		'devicetype'=>		array(T_ZBX_STR, O_OPT, null,   null,	'isset({useprofile})'),
-		'name'=>			array(T_ZBX_STR, O_OPT, null,   null,	'isset({useprofile})'),
-		'os'=>				array(T_ZBX_STR, O_OPT, null,   null,	'isset({useprofile})'),
-		'serialno'=>		array(T_ZBX_STR, O_OPT, null,   null,	'isset({useprofile})'),
-		'tag'=>				array(T_ZBX_STR, O_OPT, null,   null,	'isset({useprofile})'),
-		'macaddress'=>		array(T_ZBX_STR, O_OPT, null,   null,	'isset({useprofile})'),
-		'hardware'=>		array(T_ZBX_STR, O_OPT, null,   null,	'isset({useprofile})'),
-		'software'=>		array(T_ZBX_STR, O_OPT, null,   null,	'isset({useprofile})'),
-		'contact'=>			array(T_ZBX_STR, O_OPT, null,   null,	'isset({useprofile})'),
-		'location'=>		array(T_ZBX_STR, O_OPT, null,   null,	'isset({useprofile})'),
-		'notes'=>			array(T_ZBX_STR, O_OPT, null,   null,	'isset({useprofile})'),
-		'host_profile'=> 	array(T_ZBX_STR, O_OPT, P_UNSET_EMPTY,   null,   null),
+		'useprofile'=>		array(T_ZBX_STR, O_OPT, NULL, 			NULL,	NULL),
+		'devicetype'=>		array(T_ZBX_STR, O_OPT, NULL, 			NULL,	NULL),
+		'name'=>			array(T_ZBX_STR, O_OPT, NULL, 			NULL,	NULL),
+		'os'=>				array(T_ZBX_STR, O_OPT, NULL, 			NULL,	NULL),
+		'serialno'=>		array(T_ZBX_STR, O_OPT, NULL, 			NULL,	NULL),
+		'tag'=>				array(T_ZBX_STR, O_OPT, NULL,			NULL,	NULL),
+		'macaddress'=>		array(T_ZBX_STR, O_OPT, NULL, 			NULL,	NULL),
+		'hardware'=>		array(T_ZBX_STR, O_OPT, NULL, 			NULL,	NULL),
+		'software'=>		array(T_ZBX_STR, O_OPT, NULL, 			NULL,	NULL),
+		'contact'=>			array(T_ZBX_STR, O_OPT, NULL,			NULL,	NULL),
+		'location'=>		array(T_ZBX_STR, O_OPT, NULL, 			NULL,	NULL),
+		'notes'=>			array(T_ZBX_STR, O_OPT, NULL, 			NULL,	NULL),
+		'host_profile'=> 	array(T_ZBX_STR, O_OPT, P_UNSET_EMPTY,	NULL,   NULL),
 
 		'useprofile_ext'=>		array(T_ZBX_STR, O_OPT, null,   null,	null),
 		'ext_host_profiles'=> 	array(T_ZBX_STR, O_OPT, P_UNSET_EMPTY,   null,   null),
@@ -101,7 +101,7 @@ include_once('include/page_header.php');
 		'macros_del' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   null,	null),
 // mass update
 		'massupdate'=>			array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-		'visible'=>				array(T_ZBX_STR, O_OPT,	null, 	null,	null),
+		'visible'=>			array(T_ZBX_STR, O_OPT,	NULL, 	NULL,	NULL),
 // actions
 		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 // form
@@ -129,7 +129,6 @@ include_once('include/page_header.php');
 	validate_sort_and_sortorder('host', ZBX_SORT_UP);
 
 	$_REQUEST['go'] = get_request('go', 'none');
-
 
 // PERMISSIONS
 	if(get_request('groupid', 0) > 0){
@@ -338,26 +337,22 @@ include_once('include/page_header.php');
 				
 // PROFILES {{{
 			if(isset($visible['useprofile'])){
-				$host_profile = get_request('host_profile', array());
-				if(get_request('useprofile', false) && !empty($host_profile)){
-					$new_values['profile'] = $host_profile;
-				}
-				else{
-					$new_values['profile'] = array();
-				}
+				$new_values['profile'] = get_request('useprofile', false) ? get_request('host_profile', array()) : array();
 			}
 			
 			if(isset($visible['useprofile_ext'])){
-				$ext_host_profiles = get_request('ext_host_profiles', array());
-				if(get_request('useprofile_ext', false) && !empty($ext_host_profiles)){
-					$new_values['extendedProfile'] = $ext_host_profiles;
-				}
-				else{
-					$new_values['extendedProfile'] = array();
-				}
+				$new_values['extendedProfile'] = get_request('useprofile_ext', false) ? get_request('ext_host_profiles', array()) : array();
 			}
 // }}} PROFILES
 
+			$newgroup = array();
+			if(isset($visible['newgroup']) && !empty($_REQUEST['newgroup'])){
+				$result = CHostGroup::create(array('name' => $_REQUEST['newgroup']));
+				if($result === false) throw new Exception();
+				
+				$newgroup = array('groupid' => reset($result['groupids']), 'name' => $_REQUEST['newgroup']);
+			}
+			
 			$templates = array();
 			if(isset($visible['template_table']) || isset($visible['template_table_r'])){
 				$tplids = array_keys($_REQUEST['templates']);
@@ -370,33 +365,25 @@ include_once('include/page_header.php');
 					'editable' => 1,
 					'output' => API_OUTPUT_SHORTEN,
 				));
+				if(!empty($newgroup)){
+					$hosts['groups'][] = $newgroup;
+				}
 			}
 			if(isset($visible['template_table_r'])){
 				$hosts['templates'] = $templates;
 			}
+
 			$result = CHost::massUpdate(array_merge($hosts, $new_values));
 			if($result === false) throw new Exception();
 
-			
-			$groups = array();
-			if(isset($visible['newgroup']) && !empty($_REQUEST['newgroup'])){
-				$result = CHostGroup::create(array('name' => $_REQUEST['newgroup']));
-				$options = array(
-					'groupids' => $result['groupids'],
-					'output' => API_OUTPUT_EXTEND
-				);
-				$groups = CHostGroup::get($options);
-				if($groups === false) throw new Exception();
-			}
-
-			
 			
 			$add = array();
 			if(!empty($templates) && isset($visible['template_table'])){
 				$add['templates'] = $templates;
 			}
-			if(!empty($groups))
-				$add['groups'] = $groups;
+			if(!empty($newgroup) && !isset($visible['groups'])){
+				$add['groups'][] = $newgroup;			
+			}
 			if(!empty($add)){
 				$add['hosts'] = $hosts['hosts'];
 				
@@ -686,7 +673,7 @@ include_once('include/page_header.php');
 	}
 	else if(isset($_REQUEST['form'])){
 		if($_REQUEST['form'] == S_IMPORT_HOST)
-			$hosts_wdgt->addItem(import_host_form($rules));
+			$hosts_wdgt->addItem(import_host_form());
 		else
 		$hosts_wdgt->addItem(insert_host_form(false));
 	}
@@ -949,8 +936,6 @@ include_once('include/page_header.php');
 	
 	$hosts_wdgt->show();
 
-?>
-<?php
 
 include_once('include/page_footer.php');
 

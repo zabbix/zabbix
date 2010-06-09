@@ -653,7 +653,10 @@
 						$label = str_replace('{TRIGGER.EVENTS.UNACK}', get_events_unacknowledged($db_element), $label);
 					}
 					while(zbx_strstr($label, '{TRIGGER.EVENTS.PROBLEM.UNACK}')){
-						$label = str_replace('{TRIGGER.EVENTS.PROBLEM.UNACK}', get_events_unacknowledged($db_element, TRIGGER_VALUE_TRUE), $label);
+						$label = str_replace('{TRIGGER.EVENTS.PROBLEM.UNACK}', get_events_unacknowledged($db_element, null, TRIGGER_VALUE_TRUE), $label);
+					}
+					while(zbx_strstr($label, '{TRIGGER.PROBLEM.EVENTS.PROBLEM.UNACK}')){
+						$label = str_replace('{TRIGGER.PROBLEM.EVENTS.PROBLEM.UNACK}', get_events_unacknowledged($db_element, TRIGGER_VALUE_TRUE, TRIGGER_VALUE_TRUE), $label);
 					}
 					break;
 			}
@@ -1428,9 +1431,9 @@
 		$selements_info = array();
 		$options = array(
 				'sysmapids' => zbx_objectValues($selements, 'elementid'),
-				'extendoutput' => 1,
+				'output' => API_OUTPUT_EXTEND,
+				'select_selements' => API_OUTPUT_EXTEND,
 				'nopermissions' => 1,
-				'select_selements' => 1,
 				'nodeids' => get_current_nodeid(true)
 			);
 		$maps = CMap::get($options);

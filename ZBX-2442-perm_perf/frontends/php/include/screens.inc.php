@@ -1560,12 +1560,12 @@ require_once('include/js.inc.php');
 		foreach($exportScreens as $snum => $screen){
 			$screenItems = separateScreenElements($screen);
 
-			$screens += zbx_objectValues($screenItems['screens'], 'resourceid');
-			$sysmaps += zbx_objectValues($screenItems['sysmaps'], 'resourceid');
-			$hostgroups += zbx_objectValues($screenItems['hostgroups'], 'resourceid');
-			$hosts += zbx_objectValues($screenItems['hosts'], 'resourceid');
-			$graphs += zbx_objectValues($screenItems['graphs'], 'resourceid');
-			$items += zbx_objectValues($screenItems['items'], 'resourceid');
+			$screens = array_merge($screens, zbx_objectValues($screenItems['screens'], 'resourceid'));
+			$sysmaps = array_merge($sysmaps, zbx_objectValues($screenItems['sysmaps'], 'resourceid'));
+			$hostgroups = array_merge($hostgroups, zbx_objectValues($screenItems['hostgroups'], 'resourceid'));
+			$hosts = array_merge($hosts, zbx_objectValues($screenItems['hosts'], 'resourceid'));
+			$graphs = array_merge($graphs, zbx_objectValues($screenItems['graphs'], 'resourceid'));
+			$items = array_merge($items, zbx_objectValues($screenItems['items'], 'resourceid'));
 		}
 
 		$screens = screenIdents($screens);
@@ -1578,7 +1578,6 @@ require_once('include/js.inc.php');
 		try{
 			foreach($exportScreens as $snum => &$screen){
 				unset($screen['screenid']);
-				$screen['backgroundid'] = ($screen['backgroundid'] > 0)?$images[$screen['backgroundid']]:'';
 
 				foreach($screen['screenitems'] as $snum => &$screenItem){
 					unset($screenItem['screenid']);
@@ -1616,7 +1615,7 @@ require_once('include/js.inc.php');
 			unset($screen);
 		}
 		catch(Exception $e){
-			throw new exception($e->show_message());
+			throw new exception($e->getMessage());
 		}
 	}
 ?>

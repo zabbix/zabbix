@@ -6,3 +6,5 @@ alter table items add password                varchar(64)             DEFAULT ''
 alter table items add publickey               varchar(64)             DEFAULT ''      NOT NULL;
 alter table items add privatekey              varchar(64)             DEFAULT ''      NOT NULL;
 alter table items add mtime                   integer         DEFAULT '0'     NOT NULL;
+
+UPDATE items SET units='Bps' WHERE type=9 AND units='bps';

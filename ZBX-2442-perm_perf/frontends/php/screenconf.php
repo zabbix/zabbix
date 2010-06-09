@@ -83,7 +83,6 @@ include_once('include/page_header.php');
 ?>
 <?php
 // EXPORT ///////////////////////////////////
-
 	if($EXPORT_DATA){
 		$screens = get_request('screens', array());
 
@@ -126,81 +125,54 @@ include_once('include/page_header.php');
 <?php
 	$_REQUEST['go'] = get_request('go', 'none');
 
-	if(isset($_REQUEST['clone']) && isset($_REQUEST['screenid'])){
-		unset($_REQUEST['screenid']);
-		$_REQUEST['form'] = 'clone';
-	}
-	else if(isset($_REQUEST['save'])){
-		if(isset($_REQUEST['screenid'])){
-			// TODO check permission by new value.
-//				$result=update_screen($_REQUEST['screenid'],$_REQUEST['name'],$_REQUEST['hsize'],$_REQUEST['vsize']);
-			$screen = array(
-				'screenid' => $_REQUEST['screenid'],
-				'name' => $_REQUEST['name'],
-				'hsize' => $_REQUEST['hsize'],
-				'vsize' => $_REQUEST['vsize']
-			);
-			$result = CScreen::update($screen);
-			if(!$result){
-				error(CScreen::resetErrors());
-			}
-			$audit_action = AUDIT_ACTION_UPDATE;
-			show_messages($result, S_SCREEN_UPDATED, S_CANNOT_UPDATE_SCREEN);
-		}
-		else{
-			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
-				access_deny();
-
-//				DBstart();
-			$screen = array(
-				'name' => $_REQUEST['name'],
-				'hsize' => $_REQUEST['hsize'],
-				'vsize' => $_REQUEST['vsize']
-			);
-			$result = CScreen::create($screen);
-			if(!$result){
-				error(CScreen::resetErrors());
-			}
-//				add_screen($_REQUEST['name'],$_REQUEST['hsize'],$_REQUEST['vsize']);
-//				$result = DBend();
-
-			$audit_action = AUDIT_ACTION_ADD;
-			show_messages($result, S_SCREEN_ADDED, S_CANNOT_ADD_SCREEN);
-		}
-		if($result){
-			add_audit($audit_action,AUDIT_RESOURCE_SCREEN,' Name ['.$_REQUEST['name'].'] ');
-			unset($_REQUEST['form']);
+		if(isset($_REQUEST['clone']) && isset($_REQUEST['screenid'])){
 			unset($_REQUEST['screenid']);
+			$_REQUEST['form'] = 'clone';
 		}
-	}
-	if(isset($_REQUEST["delete"])&&isset($_REQUEST["screenid"])){
-		if($screen = get_screen_by_screenid($_REQUEST["screenid"])){
-			DBstart();
-				delete_screen($_REQUEST["screenid"]);
-			$result = DBend();
+		else if(isset($_REQUEST['save'])){
+			if(isset($_REQUEST['screenid'])){
+				$screen = array(
+					'screenid' => $_REQUEST['screenid'],
+					'name' => $_REQUEST['name'],
+					'hsize' => $_REQUEST['hsize'],
+					'vsize' => $_REQUEST['vsize']
+				);
+				$result = CScreen::update($screen);
 
+				$audit_action = AUDIT_ACTION_UPDATE;
+				show_messages($result, S_SCREEN_UPDATED, S_CANNOT_UPDATE_SCREEN);
+			}
+			else{
+				if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
+					access_deny();
+
+				$screen = array(
+					'name' => $_REQUEST['name'],
+					'hsize' => $_REQUEST['hsize'],
+					'vsize' => $_REQUEST['vsize']
+				);
+				$result = CScreen::create($screen);
+
+				$audit_action = AUDIT_ACTION_ADD;
+				show_messages($result, S_SCREEN_ADDED, S_CANNOT_ADD_SCREEN);
+			}
+			if($result){
+				add_audit($audit_action,AUDIT_RESOURCE_SCREEN,' Name ['.$_REQUEST['name'].'] ');
+				unset($_REQUEST['form']);
+				unset($_REQUEST['screenid']);
+			}
+		}
+		if(isset($_REQUEST['delete']) && isset($_REQUEST['screenid'])){
+			$result = CScreen::delete($_REQUEST['screenid']);
+
+			if($result) unset($_REQUEST['screenid'], $_REQUEST['form']);
 			show_messages($result, S_SCREEN_DELETED, S_CANNOT_DELETE_SCREEN);
-			add_audit_if($result, AUDIT_ACTION_DELETE,AUDIT_RESOURCE_SCREEN," Name [".$screen['name']."] ");
 		}
-		unset($_REQUEST["screenid"]);
-		unset($_REQUEST["form"]);
-	}
-	else if($_REQUEST['go'] == 'delete'){
-		$go_result = true;
-		$screens = get_request('screens', array());
-
-		DBstart();
-		foreach($screens as $screenid){
-			$go_result &= delete_screen($screenid);
-			if(!$go_result) break;
+		else if($_REQUEST['go'] == 'delete'){
+			$go_result = CScreen::delete(get_request('screens', array()));
+			if($go_result) unset($_REQUEST['form']);
+			show_messages($go_result, S_SCREEN_DELETED, S_CANNOT_DELETE_SCREEN);
 		}
-		$go_result = DBend($go_result);
-
-		if($go_result){
-			unset($_REQUEST["form"]);
-		}
-		show_messages($go_result, S_SCREEN_DELETED, S_CANNOT_DELETE_SCREEN);
-	}
 
 	if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
 		$url = new CUrl();
@@ -211,87 +183,84 @@ include_once('include/page_header.php');
 <?php
 	$form = new CForm(null, 'get');
 
-	$form->addItem(new CButton("form", S_CREATE_SCREEN));
-	$form->addItem(new CButton('form', S_IMPORT_SCREEN));
+		$form->addItem(new CButton("form", S_CREATE_SCREEN));
+		$form->addItem(new CButton('form', S_IMPORT_SCREEN));
 
 	$screen_wdgt = new CWidget();
 	$screen_wdgt->addPageHeader(S_CONFIGURATION_OF_SCREENS_BIG, $form);
 
-	if(isset($_REQUEST['form'])){
-		if($_REQUEST['form'] == S_IMPORT_SCREEN)
-			$screen_wdgt->addItem(import_screen_form($rules));
-		else if(($_REQUEST['form'] == S_CREATE_SCREEN) || ($_REQUEST['form'] == 'update'))
-			$screen_wdgt->addItem(insert_screen_form());
-	}
-	else{
-		$form = new CForm();
-		$form->setName('frm_screens');
-
-		$numrows = new CDiv();
-		$numrows->setAttribute('name', 'numrows');
-
-		$screen_wdgt->addHeader(S_SCREENS_BIG);
-		$screen_wdgt->addHeader($numrows);
-
-		$table = new CTableInfo(S_NO_SCREENS_DEFINED);
-		$table->setHeader(array(
-			new CCheckBox('all_screens', NULL, "checkAll('".$form->getName()."','all_screens','screens');"),
-			make_sorting_header(S_NAME, 'name'),
-			S_DIMENSION_COLS_ROWS,
-			S_SCREEN)
-		);
-
-		$sortfield = getPageSortField('name');
-		$sortorder = getPageSortOrder();
-		$options = array(
-//				'select_screenitems' => API_OUTPUT_EXTEND,
-			'editable' => 1,
-			'output' => API_OUTPUT_EXTEND,
-			'sortfield' => $sortfield,
-			'sortorder' => $sortorder,
-			'limit' => ($config['search_limit']+1)
-		);
-
-		$screens = CScreen::get($options);
-
-		order_result($screens, $sortfield, $sortorder);
-		$paging = getPagingLine($screens);
-
-		foreach($screens as $num => $screen){
-			$table->addRow(array(
-				new CCheckBox('screens['.$screen['screenid'].']', NULL, NULL, $screen['screenid']),
-				new CLink($screen["name"],'screenedit.php?screenid='.$screen['screenid']),
-				$screen['hsize'].' x '.$screen['vsize'],
-				new CLink(S_EDIT,'?config=0&form=update&screenid='.$screen['screenid'])
-			));
+		if(isset($_REQUEST['form'])){
+			if($_REQUEST['form'] == S_IMPORT_SCREEN)
+				$screen_wdgt->addItem(import_screen_form($rules));
+			else if(($_REQUEST['form'] == S_CREATE_SCREEN) || ($_REQUEST['form'] == 'update'))
+				$screen_wdgt->addItem(insert_screen_form());
 		}
+		else{
+			$form = new CForm();
+			$form->setName('frm_screens');
+
+			$numrows = new CDiv();
+			$numrows->setAttribute('name', 'numrows');
+
+			$screen_wdgt->addHeader(S_SCREENS_BIG);
+			$screen_wdgt->addHeader($numrows);
+
+			$table = new CTableInfo(S_NO_SCREENS_DEFINED);
+			$table->setHeader(array(
+				new CCheckBox('all_screens', NULL, "checkAll('".$form->getName()."','all_screens','screens');"),
+				make_sorting_header(S_NAME, 'name'),
+				S_DIMENSION_COLS_ROWS,
+				S_SCREEN)
+			);
+
+			$sortfield = getPageSortField('name');
+			$sortorder = getPageSortOrder();
+			$options = array(
+//				'select_screenitems' => API_OUTPUT_EXTEND,
+				'editable' => 1,
+				'output' => API_OUTPUT_EXTEND,
+				'sortfield' => $sortfield,
+				'sortorder' => $sortorder,
+				'limit' => ($config['search_limit']+1)
+			);
+
+			$screens = CScreen::get($options);
+
+			order_result($screens, $sortfield, $sortorder);
+			$paging = getPagingLine($screens);
+
+			foreach($screens as $num => $screen){
+				$table->addRow(array(
+					new CCheckBox('screens['.$screen['screenid'].']', NULL, NULL, $screen['screenid']),
+					new CLink($screen["name"],'screenedit.php?screenid='.$screen['screenid']),
+					$screen['hsize'].' x '.$screen['vsize'],
+					new CLink(S_EDIT,'?config=0&form=update&screenid='.$screen['screenid'])
+				));
+			}
 
 //goBox
-		$goBox = new CComboBox('go');
-		$goBox->addItem('export', S_EXPORT_SELECTED);
+			$goBox = new CComboBox('go');
+			$goBox->addItem('export', S_EXPORT_SELECTED);
 
-		$goOption = new CComboItem('delete', S_DELETE_SELECTED);
-		$goOption->setAttribute('confirm', 'Delete selected screens?');
-		$goBox->addItem($goOption);
+			$goOption = new CComboItem('delete', S_DELETE_SELECTED);
+			$goOption->setAttribute('confirm', 'Delete selected screens?');
+			$goBox->addItem($goOption);
 
-		// goButton name is necessary!!!
-		$goButton = new CButton('goButton', S_GO);
-		$goButton->setAttribute('id', 'goButton');
+			// goButton name is necessary!!!
+			$goButton = new CButton('goButton', S_GO);
+			$goButton->setAttribute('id', 'goButton');
 
-		zbx_add_post_js('chkbxRange.pageGoName = "screens";');
+			zbx_add_post_js('chkbxRange.pageGoName = "screens";');
 //---------
-		$footer = get_table_header(array($goBox, $goButton));
+			$footer = get_table_header(array($goBox, $goButton));
 
-		$table = array($paging, $table, $paging, $footer);
-		$form->addItem($table);
+			$table = array($paging, $table, $paging, $footer);
+			$form->addItem($table);
 
-		$screen_wdgt->addItem($form);
-	}
+			$screen_wdgt->addItem($form);
+		}
 	
 	$screen_wdgt->show();
-?>
-<?php
 
 include_once('include/page_footer.php');
-
 ?>

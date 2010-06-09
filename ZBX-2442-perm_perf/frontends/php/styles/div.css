@@ -493,6 +493,16 @@ div.icon_sortdown{
 	color:#3A3A3A;
 }
 
+.whitelink{
+	color:#F3F3F3;
+	cursor: pointer;
+	text-decoration: underline;
+}
+
+.whitelink:hover{
+	color:#DADADA;
+}
+
 .link_menu{
 	color: #3C3089;
 	cursor: pointer;

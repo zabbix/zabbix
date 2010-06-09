@@ -174,7 +174,7 @@ class CFormTable extends CForm{
 
 		$tbl = new CTable(NULL,$this->tableclass);
 
-		foreach($this->top_items as $item)	$tbl->additem($item);
+		foreach($this->top_items as $item)	$tbl->addItem($item);
 
 		$tbl->setOddRowClass('form_odd_row');
 		$tbl->setEvenRowClass('form_even_row');

@@ -71,7 +71,9 @@
 	define('PAGE_TYPE_JS',				3);	// javascript
 	define('PAGE_TYPE_CSS',				4);
 	define('PAGE_TYPE_HTML_BLOCK',		5);	// simple block of html (as text)
-	define('PAGE_TYPE_JSON_RPC',		6);	// api call
+	define('PAGE_TYPE_JSON',			6);	// simple JSON
+	define('PAGE_TYPE_JSON_RPC',		7);	// api call
+
 
 	define('ZBX_SESSION_ACTIVE',		0);
 	define('ZBX_SESSION_PASSIVE',		1);

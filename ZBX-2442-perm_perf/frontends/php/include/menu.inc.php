@@ -85,7 +85,8 @@ $ZBX_MENU = array(
 				array('url'=>'vtext.php'),
 				array('url'=>'chart3.php'),
 				array('url'=>'imgstore.php'),
-				array('url'=>'search.php')
+				array('url'=>'search.php'),
+				array('url'=>'jsrpc.php')
 			)
 	),
 	'cm'=>array(
@@ -137,13 +138,13 @@ $ZBX_MENU = array(
 						'label'=>S_HOST_GROUPS
 					),
 				array(
+						'url'=>'templates.php',
+						'label'=>S_TEMPLATES
+					),
+				array(
 						'url'=>'hosts.php',
 						'label'=>S_HOSTS,
 						'sub_pages'=>array('items.php','triggers.php','graphs.php','applications.php','tr_logform.php','tr_testexpr.php','popup_trexpr.php','popup_gitem.php')
-					),
-				array(
-						'url'=>'templates.php',
-						'label'=>S_TEMPLATES
 					),
 				array(
 						'url'=>'maintenance.php',
