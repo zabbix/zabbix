@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2526] fixed graph refresh problem when referred from screens page (Aly)
  - [ZBX-2525] improved actions api code (Vedmak)
  - [ZBX-2324] fixed guest user settings not being stored (Vedmak)
  - [DEV-461] improved map creation/editing by adding align option (Aly)
