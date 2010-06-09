@@ -1205,9 +1205,10 @@ int	is_double(char *c)
  ******************************************************************************/
 int	is_uint_prefix(const char *c)
 {
-	int	i;
+	int	i = 0;
 
-	for (i=0; c[i]==' '; i++); /* trim left spaces */
+	while (c[i]==' ') /* trim left spaces */
+		i++;
 	
 	if (!isdigit(c[i]))
 		return FAIL;

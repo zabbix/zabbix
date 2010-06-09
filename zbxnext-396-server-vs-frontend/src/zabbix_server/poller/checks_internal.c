@@ -42,8 +42,8 @@
 int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 {
 	zbx_uint64_t	i;
-	char		tmp[MAX_STRING_LEN], params[MAX_STRING_LEN],
-			tmp1[HOST_HOST_LEN_MAX];
+	char		params[MAX_STRING_LEN], *error = NULL;
+	char		tmp[MAX_STRING_LEN], tmp1[HOST_HOST_LEN_MAX];
 	int		nparams;
 
 	init_result(result);
@@ -116,7 +116,10 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			if (get_param(params, 2, tmp, sizeof(tmp)) != 0)
 				goto not_supported;
 			else if (*tmp != '\0' && is_uint_prefix(tmp) == FAIL)
+			{
+				error = zbx_dsprintf(error, "Second argument to [%s] is badly formatted", item->key);
 				goto not_supported;
+			}
 			else
 				from = (*tmp != '\0' ? str2uint(tmp) : 6);
 		}
@@ -126,9 +129,18 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			if (get_param(params, 3, tmp, sizeof(tmp)) != 0)
 				goto not_supported;
 			else if (*tmp != '\0' && is_uint_prefix(tmp) == FAIL)
+			{
+				error = zbx_dsprintf(error, "Third argument to [%s] is badly formatted", item->key);
 				goto not_supported;
+			}
 			else
 				to = (*tmp != '\0' ? str2uint(tmp) : -1);
+		}
+
+		if (from > to && -1 != to)
+		{
+			error = zbx_dsprintf(error, "Arguments to [%s] represent an invalid interval", item->key);
+			goto not_supported;
 		}
 
 		i = DBget_queue_count(from, to);
@@ -280,10 +292,12 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 	return SUCCEED;
 not_supported:
-	zbx_snprintf(tmp, sizeof(tmp), "Internal check [%s] is not supported", item->key_orig);
-	zabbix_log(LOG_LEVEL_WARNING, "%s", tmp);
+	if (NULL == error)
+		error = zbx_dsprintf(error, "Internal check [%s] is not supported", item->key_orig);
 
-	SET_MSG_RESULT(result, strdup(tmp));
+	zabbix_log(LOG_LEVEL_WARNING, "Host [%s] %s", item->host.host, error);
+
+	SET_MSG_RESULT(result, error);
 
 	return NOTSUPPORTED;
 }
