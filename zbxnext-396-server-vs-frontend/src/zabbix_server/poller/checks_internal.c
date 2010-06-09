@@ -26,7 +26,7 @@
  *                                                                            *
  * Function: get_value_internal                                               *
  *                                                                            *
- * Purpose: retrieve data from ZABBIX server (internally supported items)     *
+ * Purpose: retrieve data from Zabbix server (internally supported items)     *
  *                                                                            *
  * Parameters: item - item we are interested in                               *
  *                                                                            *
