@@ -93,7 +93,6 @@ class CProfile{
 			self::init();
 		}
 		
-		if($USER_DETAILS['alias'] == ZBX_GUEST_USER) return false;		
 		if(!self::checkValueType($value, $type)) return false;
 
 		$profile = array(
@@ -341,16 +340,14 @@ function get_favorites($idx){
 
 	$result = array();
 	
-	if($USER_DETAILS['alias'] != ZBX_GUEST_USER){
-		$sql = 'SELECT value_id, source '.
-				' FROM profiles '.
-				' WHERE userid='.$USER_DETAILS['userid'].
-					' AND idx='.zbx_dbstr($idx).
-				' ORDER BY profileid ASC';
-		$db_profiles = DBselect($sql);
-		while($profile = DBfetch($db_profiles)){
-			$result[] = array('value' => $profile['value_id'], 'source' => $profile['source']);
-		}
+	$sql = 'SELECT value_id, source '.
+			' FROM profiles '.
+			' WHERE userid='.$USER_DETAILS['userid'].
+				' AND idx='.zbx_dbstr($idx).
+			' ORDER BY profileid ASC';
+	$db_profiles = DBselect($sql);
+	while($profile = DBfetch($db_profiles)){
+		$result[] = array('value' => $profile['value_id'], 'source' => $profile['source']);
 	}
 
 	return $result;
