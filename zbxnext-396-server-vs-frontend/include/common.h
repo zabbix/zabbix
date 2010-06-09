@@ -777,7 +777,8 @@ void	remove_param(char *param, int num);
 const char	*get_string(const char *p, char *buf, size_t bufsize);
 int	get_key_param(char *param, int num, char *buf, int maxlen);
 int	num_key_param(char *param);
-int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, const char *delay_flex, time_t now);
+int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay,
+		const char *delay_flex, time_t now, int *effective_delay);
 int	check_time_period(const char *period, time_t now);
 char	zbx_num2hex(u_char c);
 u_char	zbx_hex2num(char c);
@@ -837,16 +838,16 @@ void	zbx_chrcpy_alloc(char **str, int *alloc_len, int *offset, const char src);
 size_t	zbx_strlcpy(char *dst, const char *src, size_t siz);
 size_t	zbx_strlcat(char *dst, const char *src, size_t siz);
 
-char* zbx_dvsprintf(char *dest, const char *f, va_list args);
+char	*zbx_dvsprintf(char *dest, const char *f, va_list args);
 
 #ifdef HAVE___VA_ARGS__
 #	define zbx_dsprintf(dest, fmt, ...) __zbx_zbx_dsprintf(dest, ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
 #else
 #	define zbx_dsprintf __zbx_zbx_dsprintf
 #endif /* HAVE___VA_ARGS__ */
-char* __zbx_zbx_dsprintf(char *dest, const char *f, ...);
+char	*__zbx_zbx_dsprintf(char *dest, const char *f, ...);
 
-char* zbx_strdcat(char *dest, const char *src);
+char	*zbx_strdcat(char *dest, const char *src);
 
 #ifdef HAVE___VA_ARGS__
 #	define zbx_strdcatf(dest, fmt, ...) __zbx_zbx_strdcatf(dest, ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
