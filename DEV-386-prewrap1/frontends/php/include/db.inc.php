@@ -894,14 +894,13 @@ else {
 
 			$nodeid = get_current_nodeid(false);
 			$id_name = self::getSchema($table);
-			$id_name = zbx_dbstr($id_name['key']);
-			$table = zbx_dbstr($table);
+			$id_name = $id_name['key'];
 
 			$min = bcadd(bcmul($nodeid,'100000000000000'), bcmul($ZBX_LOCALNODEID,'100000000000'));
 			$max = bcadd(bcadd(bcmul($nodeid,'100000000000000'), bcmul($ZBX_LOCALNODEID,'100000000000')),'99999999999');
 
 			$sql = 'SELECT nextid FROM ids WHERE nodeid='.$nodeid .'
-				AND table_name='.$table.' AND field_name='.$id_name;
+				AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($id_name);
 			$res = DBfetch(DBselect($sql));
 			if($res){
 				$nextid = $res['nextid']+1;
@@ -910,7 +909,7 @@ else {
 					self::exception(self::RESERVEIDS_ERROR, __METHOD__.' ID out of range');
 
 				$sql = 'UPDATE ids SET nextid=nextid+'.$count.' WHERE nodeid='.$nodeid.
-					' AND table_name='.$table.' AND field_name='.$id_name;
+					' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($id_name);
 				if(!DBexecute($sql)) self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
 			}
 			else{
@@ -922,7 +921,7 @@ else {
 
 				$nextid = (!$row || is_null($row['id'])) ? $min : $row['id'];
 				$sql = 'INSERT INTO ids (nodeid,table_name,field_name,nextid) '.
-					' VALUES ('.$nodeid.','.$table.','.$id_name.','.($nextid + $count).')';
+					' VALUES ('.$nodeid.','.zbx_dbstr($table).','.zbx_dbstr($id_name).','.($nextid + $count).')';
 
 				if(!DBexecute($sql)) self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
 			}
@@ -959,6 +958,8 @@ else {
 
 			foreach($values as $key => $row){
 				$result_ids[$key] = $id;
+				
+				unset($row[$table_schema['key']]);
 
 				foreach($row as $field => $v){
 					if(!isset($table_schema['fields'][$field])){
