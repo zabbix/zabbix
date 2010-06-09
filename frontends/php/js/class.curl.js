@@ -35,7 +35,7 @@ filr:		'',
 reference:	'',
 path:		'',
 query:		'',
-args:  null,
+args:		null,
 
 initialize: function(url){
 	var url = url || location.href;
@@ -137,11 +137,13 @@ formatQuery: function(){
 },
 
 formatArguments: function(){
+	this.args = {};
+
 	var args = this.query.split('&');
 	var keyval = '';
 
 	if(args.length<1) return;
-	
+
 	for(var i=0; i<args.length; i++){
 		keyval = args[i].split('=');
 		if(keyval.length > 1){
