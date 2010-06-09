@@ -1457,8 +1457,8 @@ return $result;
 		DBexecute('UPDATE triggers SET status='.$status.' WHERE '.DBcondition('triggerid',$triggerids));
 
 		if($status != TRIGGER_STATUS_ENABLED){
-			addEvent($triggerids,TRIGGER_VALUE_UNKNOWN);
-			DBexecute('UPDATE triggers SET lastchange='.time().', value='.TRIGGER_VALUE_UNKNOWN.' WHERE '.DBcondition('triggerid',$triggerids));
+			addEvent($triggerids, TRIGGER_VALUE_UNKNOWN);
+			DBexecute('UPDATE triggers SET lastchange='.time().', value='.TRIGGER_VALUE_UNKNOWN.' WHERE '.DBcondition('triggerid',$triggerids).' AND value<>'.TRIGGER_VALUE_UNKNOWN);
 		}
 
 	return true;
@@ -1920,6 +1920,7 @@ return $result;
 		if(is_null($description)){
 			$description = $trigger['description'];
 		}
+
 		if(CTrigger::exists(array('description' => $description, 'expression' => $expression))){
 		
 			reset($expressionData[$expression]['hosts']);
@@ -2005,8 +2006,10 @@ return $result;
 		if(!is_null($url))			$sql_update .= ' url='.zbx_dbstr($url).',';
 		if(!is_null($templateid))	$sql_update .= ' templateid='.$templateid;
 
-		if($event_to_unknown){
-			if(($trigger['expression'] != $expression) || (!is_null($status) && ($status != TRIGGER_STATUS_ENABLED))){
+
+		if($event_to_unknown || (!is_null($status) && ($status != TRIGGER_STATUS_ENABLED))){
+
+			if($trigger['value'] != TRIGGER_VALUE_UNKNOWN){
 				addEvent($triggerid, TRIGGER_VALUE_UNKNOWN);
 
 				$sql_update .= ',value='.TRIGGER_VALUE_UNKNOWN;
