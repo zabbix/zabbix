@@ -27,21 +27,21 @@
 	$page['type'] = detect_page_type(PAGE_TYPE_IMAGE);
 
 include_once('include/page_header.php');
-
+set_time_limit(10);
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'sysmapid'=>		array(T_ZBX_INT, O_MAND,P_SYS,	DB_ID,		NULL),
 
-		'selements'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	DB_ID, NULL),
-		'links'=>			array(T_ZBX_STR, O_OPT,	P_SYS,	DB_ID, NULL),
+		'selements'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	DB_ID,		NULL),
+		'links'=>			array(T_ZBX_STR, O_OPT,	P_SYS,	DB_ID,		NULL),
 		'noselements'=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1"),	NULL),
 		'nolinks'=>			array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1"),	NULL),
 
-		'show_triggers'=>	array(T_ZBX_INT, O_OPT,	P_SYS,		IN("0,1,2,3"),	NULL),
-		'noedit'=>			array(T_ZBX_INT, O_OPT,	NULL,	IN('0,1'),	NULL),
-		'border'=>			array(T_ZBX_INT, O_OPT,	NULL,	IN('0,1'),	NULL)
+		'show_triggers'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1,2,3"),	NULL),
+		'grid'=>			array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,500),	NULL),
+		'border'=>			array(T_ZBX_INT, O_OPT,	NULL,	IN('0,1'),		NULL)
 	);
 
 	check_fields($fields);
@@ -106,8 +106,9 @@ include_once('include/page_header.php');
 	$str = zbx_date2str(S_MAPS_DATE_FORMAT,time(NULL));
 	imagestring($im, 0,imagesx($im)-120,imagesy($im)-12,$str, $colors['Gray']);
 
-	if(!isset($_REQUEST['noedit'])){
-		$grid = 50;
+	if(isset($_REQUEST['grid'])){
+		$grid = get_request('grid', 50);
+		if(!is_numeric($grid)) $grid = 50;
 
 		$dims = imageTextSize(8, 0, '11');
 		for($x=$grid; $x<$width; $x+=$grid){

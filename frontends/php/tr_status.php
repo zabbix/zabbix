@@ -210,7 +210,7 @@ include_once('include/page_header.php');
 	$fs_icon->addAction('onclick', "javascript: document.location = '".$url."';");
 
 	$mute_icon = new CDiv(SPACE,$mute? 'iconmute':'iconsound');
-	$mute_icon->setAttribute('title',S_SOUND.' '.S_ON.'/'.S_OFF);
+	$mute_icon->setAttribute('title',S_SOUND.' '.S_ON_BIG.'/'.S_OFF_BIG);
 	$mute_icon->addAction('onclick', "javascript: switch_mute(this);");
 
 //	show_table_header(S_STATUS_OF_TRIGGERS_BIG,array($mute_icon,$fs_icon));

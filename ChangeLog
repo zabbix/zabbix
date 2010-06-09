@@ -6,6 +6,8 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [DEV-461] improved map creation/editing by adding align option (Aly)
+ - [ZBX-2518] fixed new map saving (Aly)
  - [ZBX-2469] fixed screen api (Vedmak)
  - [ZBXNEXT-396] added optional parameters 'from' and 'to' to zabbix[queue] (asaveljevs)
  - [ZBX-2511] fixed compilation on FreeBSD with IPv6 due to FD_SETSIZE being undefined (asaveljevs)
