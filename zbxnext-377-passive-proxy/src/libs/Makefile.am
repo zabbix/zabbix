@@ -11,6 +11,7 @@ DIST_SUBDIRS = \
 	zbxcrypto \
 	zbxcommon \
 	zbxcomms \
+	zbxcommshigh \
 	zbxlog \
 	zbxnix \
 	zbxconf \
