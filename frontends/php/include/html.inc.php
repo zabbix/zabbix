@@ -208,33 +208,6 @@
 		}
 	}
 
-	function get_thin_table_header($col1, $col2=NULL){
-
-		$table = new CTable(NULL,'thin_header');
-//		$table->setAttribute('border',1);
-		$table->setCellSpacing(0);
-		$table->setCellPadding(1);
-
-		if(!is_null($col2)){
-			$td_r = new CCol($col2,'thin_header_r');
-			$td_r->setAttribute('align','right');
-			$table->addRow(array(new CCol($col1,'thin_header_l'), $td_r));
-		}
-		else{
-			$td_c = new CCol($col1,'thin_header_c');
-			$td_c->setAttribute('align','center');
-
-			$table->addRow($td_c);
-		}
-
-	return $table;
-	}
-
-	function show_thin_table_header($col1, $col2=NULL){
-		$table = get_thin_table_header($col1, $col2);
-		$table->Show();
-	}
-
 	function get_table_header($col1, $col2=SPACE){
 		if(isset($_REQUEST['print'])){
 			hide_form_items($col1);
