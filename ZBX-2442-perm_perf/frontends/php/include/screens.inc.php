@@ -1099,8 +1099,12 @@ require_once('include/js.inc.php');
 						$objData['src'] = $src;
 					}
 
-					if($default && !$editmode) $item = new CLink(null, $action);
-					else $item = new CDiv();
+					$item = new CDiv();
+					$item->setAttribute('id', $containerid);
+					if($default && !$editmode){
+						$item->setAttribute('class', 'pointer');
+						$item->setAttribute('onclick',"javascript: redirect(".zbx_jsvalue($action).",'post','id');");
+					}
 
 					$item->setAttribute('id', $containerid);
 
@@ -1164,10 +1168,12 @@ require_once('include/js.inc.php');
 
 					$objData['src'] = $src;
 
-					if(!$editmode) $item = new CLink(null, $action);
-					else $item = new CDiv();
-
+					$item = new CDiv();
 					$item->setAttribute('id', $containerid);
+					if(!$editmode){
+						$item->setAttribute('class', 'pointer');
+						$item->setAttribute('onclick',"javascript: redirect(".zbx_jsvalue($action).",'post','id');");
+					}
 
 					$item = array($item);
 					if($editmode == 1){

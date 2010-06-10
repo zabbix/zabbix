@@ -22,7 +22,6 @@ include_once 'include/discovery.inc.php';
 
 ?>
 <?php
-
 function check_permission_for_action_conditions($conditions){
 	global $USER_DETAILS;
 
@@ -101,231 +100,6 @@ function get_action_by_actionid($actionid){
 		error('No action with actionid=['.$actionid.']');
 	}
 return	$result;
-}
-
-function get_operations_by_actionid($actionid){
-	$sql='SELECT * FROM operations WHERE actionid='.$actionid;
-	$result=DBselect($sql);
-
-return	$result;
-}
-
-
-// Add Action's condition
-
-function add_action_condition($actionid, $condition){
-	$conditionid = get_dbid("conditions","conditionid");
-
-	$result = DBexecute('INSERT INTO conditions (conditionid,actionid,conditiontype,operator,value)'.
-		' values ('.$conditionid.','.$actionid.','.
-			$condition['type'].','.
-			$condition['operator'].','.
-			zbx_dbstr($condition['value']).
-		')');
-
-	if(!$result)
-		return $result;
-
-	return $conditionid;
-}
-
-function add_action_operation($actionid, $operation){
-	$operationid = get_dbid('operations','operationid');
-
-	if(!isset($operation['default_msg'])) $operation['default_msg'] = 0;
-	if(!isset($operation['opconditions'])) $operation['opconditions'] = array();
-
-	$result = DBexecute('INSERT INTO operations (operationid, actionid, operationtype, object, objectid, shortdata, longdata, esc_period, esc_step_from, esc_step_to, default_msg, evaltype)'.
-		' values('.$operationid.','.$actionid.','.
-			$operation['operationtype'].','.
-			$operation['object'].','.
-			$operation['objectid'].','.
-			zbx_dbstr($operation['shortdata']).','.
-			zbx_dbstr($operation['longdata']).','.
-			$operation['esc_period'].','.
-			$operation['esc_step_from'].','.
-			$operation['esc_step_to'].','.
-			$operation['default_msg'].','.
-			$operation['evaltype'].
-		')');
-	if(!$result)
-		return $result;
-
-	foreach($operation['opconditions'] as $num => $opcondition){
-		$result &= add_operation_condition($operationid, $opcondition);
-	}
-
-	$result &= add_operation_mediatype($operationid, $operation['mediatypeid']);
-
-	return $operationid;
-}
-
-// Add operation condition
-function add_operation_condition($operationid, $opcondition){
-	$opconditionid = get_dbid("opconditions","opconditionid");
-
-	$result = DBexecute('INSERT INTO opconditions (opconditionid,operationid,conditiontype,operator,value)'.
-		' values ('.$opconditionid.','.
-			$operationid.','.
-			$opcondition['conditiontype'].','.
-			$opcondition['operator'].','.
-			zbx_dbstr($opcondition['value']).
-		')');
-
-	if(!$result)
-		return $result;
-
-return $opconditionid;
-}
-
-// Add operation mediatype
-function add_operation_mediatype($operationid, $mediatypeid){
-	if (0 == $mediatypeid)
-		return;
-
-	$opmediatypeid = get_dbid('opmediatypes', 'opmediatypeid');
-
-	$result = DBexecute('INSERT INTO opmediatypes (opmediatypeid,operationid,mediatypeid)'.
-		' values ('.$opmediatypeid.','.$operationid.','.$mediatypeid.')');
-
-	if(!$result)
-		return $result;
-
-return $opmediatypeid;
-}
-
-// Add Action
-function add_action($name, $eventsource, $esc_period, $def_shortdata, $def_longdata, $recovery_msg, $r_shortdata, $r_longdata, $evaltype, $status, $conditions, $operations){
-	if(!is_array($conditions) || count($conditions) == 0){
-		/*
-		error(S_NO_CONDITIONS_DEFINED);
-		return false;
-		*/
-	}
-	else{
-		if(!check_permission_for_action_conditions($conditions))
-			return false;
-
-		foreach($conditions as $condition)
-			if( !validate_condition($condition['type'], $condition['value']) ) return false;
-	}
-
-	if(!is_array($operations) || count($operations) == 0){
-		error(S_NO_OPERATIONS_DEFINED);
-		return false;
-	}
-
-	foreach($operations as $num => $operation){
-		if(!validate_operation($operation))	return false;
-	}
-
-	$actionid=get_dbid('actions','actionid');
-
-	$result = DBexecute('INSERT INTO actions (actionid,name,eventsource,esc_period,def_shortdata,def_longdata,recovery_msg,r_shortdata,r_longdata,evaltype,status)'.
-				' VALUES ('.$actionid.','.zbx_dbstr($name).','.$eventsource.','.$esc_period.','.zbx_dbstr($def_shortdata).','.zbx_dbstr($def_longdata).','.$recovery_msg.','.zbx_dbstr($r_shortdata).','.zbx_dbstr($r_longdata).','.$evaltype.','.$status.')');
-
-	foreach($operations as $operation)
-		if(!$result = add_action_operation($actionid, $operation))
-			break;
-
-	if($result){
-		foreach($conditions as $condition)
-		if(!$result = add_action_condition($actionid, $condition))
-			break;
-	}
-
-	if(!$result)
-		return $result;
-
-return $actionid;
-}
-
-// Update Action
-
-function update_action($actionid, $name, $eventsource, $esc_period, $def_shortdata, 
-		$def_longdata, $recovery_msg, $r_shortdata, $r_longdata, $evaltype, $status, $conditions, $operations
-		){
-
-	if(!is_array($conditions) || count($conditions) == 0){
-		/*
-		error(S_NO_CONDITIONS_DEFINED);
-		return false;
-		*/
-	}
-	else{
-		if(!check_permission_for_action_conditions($conditions)) return false;
-
-		foreach($conditions as $condition)
-			if( !validate_condition($condition['type'],$condition['value']) ) return false;
-	}
-
-	if(!is_array($operations) || count($operations) == 0){
-		error(S_NO_OPERATIONS_DEFINED);
-		return false;
-	}
-
-	foreach($operations as $num => $operation){
-		if(!validate_operation($operation))	return false;
-	}
-
-	$result = DBexecute('UPDATE actions SET name='.zbx_dbstr($name).
-							',eventsource='.$eventsource.
-							',esc_period='.$esc_period.
-							',def_shortdata='.zbx_dbstr($def_shortdata).
-							',def_longdata='.zbx_dbstr($def_longdata).
-							',recovery_msg='.$recovery_msg.
-							',r_shortdata='.zbx_dbstr($r_shortdata).
-							',r_longdata='.zbx_dbstr($r_longdata).
-							',evaltype='.$evaltype.
-							',status='.$status.
-						' WHERE actionid='.$actionid);
-
-	if($result){
-		DBexecute('DELETE FROM conditions WHERE actionid='.$actionid);
-
-		$opers = get_operations_by_actionid($actionid);
-		while($operation = DBFetch($opers)){
-			DBexecute('DELETE FROM opconditions WHERE operationid='.$operation['operationid']);
-			DBexecute('DELETE FROM opmediatypes WHERE operationid='.$operation['operationid']);
-		}
-		DBexecute('DELETE FROM operations WHERE actionid='.$actionid);
-
-
-		foreach($operations as $operation)
-			if(!$result = add_action_operation($actionid, $operation))
-				break;
-
-		if($result){
-			foreach($conditions as $condition)
-			if(!$result = add_action_condition($actionid, $condition))
-				break;
-		}
-	}
-
-return $result;
-}
-
-// Delete Action
-
-function delete_action( $actionid ){
-	$return = DBexecute('delete from conditions where actionid='.$actionid);
-
-	$opers = get_operations_by_actionid($actionid);
-	while($operation = DBFetch($opers)){
-		DBexecute('DELETE FROM opmediatypes WHERE operationid='.$operation['operationid']);
-		DBexecute('DELETE FROM opconditions WHERE operationid='.$operation['operationid']);
-	}
-
-	if($return)
-		$result = DBexecute('delete from operations where actionid='.$actionid);
-
-	if($return)
-		$result = DBexecute('delete from alerts where actionid='.$actionid);
-
-	if($return)
-		$result = DBexecute('delete from actions where actionid='.$actionid);
-
-return $result;
 }
 
 function condition_operator2str($operator){
@@ -625,17 +399,16 @@ function get_conditions_by_eventsource($eventsource){
 }
 
 function get_opconditions_by_eventsource($eventsource){
-	$conditions[EVENT_SOURCE_TRIGGERS] = array(
+	$conditions = array(
+		EVENT_SOURCE_TRIGGERS => array(
 			CONDITION_TYPE_EVENT_ACKNOWLEDGED
-		);
-
-	$conditions[EVENT_SOURCE_DISCOVERY] = array(
+		),
+		EVENT_SOURCE_DISCOVERY => array(),
 		);
 
 	if(isset($conditions[$eventsource]))
 		return $conditions[$eventsource];
 
-	return $conditions[EVENT_SOURCE_TRIGGERS];
 }
 
 function get_operations_by_eventsource($eventsource){
