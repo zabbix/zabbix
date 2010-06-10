@@ -47,6 +47,7 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 	{
 		if (0 != get_param(item->key, 1, service, MAX_STRING_LEN))
 		{
+			/* this should never happen */
 			ret = NOTSUPPORTED;
 		}
 		else if (0 == strcmp(service, "tcp") || 0 == strcmp(service, "tcp_perf"))
@@ -59,10 +60,12 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 	{
 		if (0 != get_param(item->key, 1, service, MAX_STRING_LEN))
 		{
+			/* this should never happen */
 			ret = NOTSUPPORTED;
 		}
 		else if (0 != get_param(item->key, 2, port, MAX_STRING_LEN))
 		{
+			/* this should never happen */
 			ret = NOTSUPPORTED;
 		}
 		else if (SUCCEED != is_uint(port))
@@ -95,15 +98,14 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 		zabbix_log(LOG_LEVEL_DEBUG, "Transformed [%s] into [%s]", item->key, check);
 	}
 
-	if (SUCCEED == ret && NOTSUPPORTED == process(check, 0, result))
-	{
-		error = zbx_dsprintf(error, "Simple check [%s] is not supported", item->key);
+	if (SUCCEED == ret && SUCCEED != process(check, 0, result))
 		ret = NOTSUPPORTED;
-	}
+
+	if (NOTSUPPORTED == ret && NULL == error)
+		error = zbx_dsprintf(error, "Simple check [%s] is not supported", item->key);
 
 	if (NOTSUPPORTED == ret)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Host [%s] %s", item->host.host, error);
 		SET_MSG_RESULT(result, error);
 	}
 
