@@ -272,6 +272,7 @@ frontends/php/include/classes/class.cflash.php -text
 frontends/php/include/classes/class.cflashclock.php -text
 frontends/php/include/classes/class.cflashembed.php -text
 frontends/php/include/classes/class.cform.php -text
+frontends/php/include/classes/class.cformelement.php -text
 frontends/php/include/classes/class.cformtable.php -text
 frontends/php/include/classes/class.cgraphdraw.php -text
 frontends/php/include/classes/class.chelp.php -text
