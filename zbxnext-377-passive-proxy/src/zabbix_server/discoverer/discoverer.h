@@ -27,6 +27,6 @@ extern	int	CONFIG_DISCOVERER_FORKS;
 void	update_host(DB_DHOST *dhost, const char *ip, int status, int now);
 void	update_service(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost, char *ip, int port, int status, const char *value, int now);
 
-void	main_discoverer_loop(zbx_process_t p, int num);
+void	main_discoverer_loop(unsigned char p, int num);
 
 #endif

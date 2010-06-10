@@ -1261,6 +1261,7 @@ AC_OUTPUT([
 	src/libs/zbxplugin/Makefile
 	src/libs/zbxsys/Makefile
 	src/libs/zbxcomms/Makefile
+	src/libs/zbxcommshigh/Makefile
 	src/libs/zbxdb/Makefile
 	src/libs/zbxjson/Makefile
 	src/libs/zbxserver/Makefile
@@ -1283,6 +1284,7 @@ AC_OUTPUT([
 	src/zabbix_server/utils/Makefile
 	src/zabbix_server/watchdog/Makefile
 	src/zabbix_server/escalator/Makefile
+	src/zabbix_server/proxypoller/Makefile
 	src/zabbix_proxy/Makefile
 	src/zabbix_proxy/heart/Makefile
 	src/zabbix_proxy/housekeeper/Makefile

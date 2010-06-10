@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBXNEXT-377] added support of passive mode for proxies (Sasha)
  - [DEV-461] improved map creation/editing by adding align option (Aly)
  - [ZBX-2518] fixed new map saving (Aly)
  - [ZBX-2469] fixed screen api (Vedmak)

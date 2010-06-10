@@ -46,7 +46,7 @@
 
 AGENT_RESULT    result;
 
-static zbx_process_t	zbx_process;
+static unsigned char	zbx_process;
 int			poller_type;
 int			poller_num;
 
@@ -709,7 +709,7 @@ static int	get_values()
 	return num;
 }
 
-void	main_poller_loop(zbx_process_t p, int type, int num)
+void	main_poller_loop(unsigned char p, int type, int num)
 {
 	struct	sigaction phan;
 	int	nextcheck, sleeptime, processed;

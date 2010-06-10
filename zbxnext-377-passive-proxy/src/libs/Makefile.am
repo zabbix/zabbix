@@ -24,6 +24,7 @@ DIST_SUBDIRS = \
 
 if PROXY
 PROXY_SUBDIRS = \
+	zbxcommshigh \
 	zbxdb \
 	zbxdbcache \
 	zbxdbhigh \
@@ -34,6 +35,7 @@ endif
 
 if SERVER
 SERVER_SUBDIRS = \
+	zbxcommshigh \
 	zbxdb \
 	zbxdbcache \
 	zbxdbhigh \

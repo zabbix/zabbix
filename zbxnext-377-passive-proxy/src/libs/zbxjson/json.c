@@ -761,6 +761,53 @@ int	zbx_json_brackets_by_name(struct zbx_json_parse *jp, const char *name, struc
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_json_object_is_empty                                         *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: SUCCESS - if object is empty                                 *
+ *               FAIL - if object contains data                               *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_json_object_is_empty(struct zbx_json_parse *jp)
+{
+	return jp->end - jp->start > 1 ? FAIL : SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_json_count                                                   *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: number of elements in zbx_json_parse object                  *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_json_count(struct zbx_json_parse *jp)
+{
+	int		num = 0;
+	const char	*p = NULL;
+
+	while (NULL != (p = zbx_json_next(jp, p)))
+		num++;
+
+	return num;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_json_type                                                    *
  *                                                                            *
  * Purpose: return type of pointed value                                      *

@@ -986,7 +986,7 @@ zbx_uint64_t DBget_proxy_lastaccess(const char *hostname)
 	host_esc = DBdyn_escape_string(hostname);
 	result = DBselect("select lastaccess from hosts where host='%s' and status in (%d)",
 			host_esc,
-			HOST_STATUS_PROXY);
+			HOST_STATUS_PROXY_ACTIVE);
 	zbx_free(host_esc);
 
 	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0])) {

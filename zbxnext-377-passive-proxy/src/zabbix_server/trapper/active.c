@@ -41,7 +41,7 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	get_hostid_by_host(const char *host, zbx_uint64_t *hostid, char *error, zbx_process_t zbx_process)
+static int	get_hostid_by_host(const char *host, zbx_uint64_t *hostid, char *error, unsigned char zbx_process)
 {
 	char		*host_esc;
 	DB_RESULT	result;
@@ -80,14 +80,13 @@ static int	get_hostid_by_host(const char *host, zbx_uint64_t *hostid, char *erro
 
 		DBbegin();
 
-		switch (zbx_process)
+		if (0 != (zbx_process & ZBX_PROCESS_SERVER))
 		{
-		case ZBX_PROCESS_SERVER:
 			DBregister_host(0, host, (int)time(NULL));
-			break;
-		case ZBX_PROCESS_PROXY:
+		}
+		else if (0 != (zbx_process & ZBX_PROCESS_PROXY))
+		{
 			DBproxy_register_host(host);
-			break;
 		}
 
 		DBcommit();
@@ -118,7 +117,7 @@ static int	get_hostid_by_host(const char *host, zbx_uint64_t *hostid, char *erro
  *           format of the list: key:delay:last_log_size                      *
  *                                                                            *
  ******************************************************************************/
-int	send_list_of_active_checks(zbx_sock_t *sock, char *request, zbx_process_t zbx_process)
+int	send_list_of_active_checks(zbx_sock_t *sock, char *request, unsigned char zbx_process)
 {
 	char		*host = NULL, *p;
 	DB_RESULT	result;
@@ -247,7 +246,7 @@ static void	add_regexp_name(char ***regexp, int *regexp_alloc, int *regexp_num, 
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp, zbx_process_t zbx_process)
+int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp, unsigned char zbx_process)
 {
 	char		host[HOST_HOST_LEN_MAX], *name_esc, params[MAX_STRING_LEN],
 			pattern[MAX_STRING_LEN], tmp[32],

@@ -473,6 +473,35 @@ int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, cons
 
 /******************************************************************************
  *                                                                            *
+ * Function: calculate_proxy_nextcheck                                        *
+ *                                                                            *
+ * Purpose: calculate nextcheck timestamp for passive proxy                   *
+ *                                                                            *
+ * Parameters: hostid - [IN] host identificator from database                 *
+ *             delay  - [IN] default delay value, can be overridden           *
+ *             now    - [IN] current timestamp                                *
+ *                                                                            *
+ * Return value: nextcheck value                                              *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+time_t	calculate_proxy_nextcheck(zbx_uint64_t hostid, unsigned int delay, time_t now)
+{
+	time_t	nextcheck;
+
+	nextcheck = delay * (now / delay) + (unsigned int)(hostid % delay);
+
+	while (nextcheck <= now)
+		nextcheck += delay;
+
+	return nextcheck;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: is_ip4                                                           *
  *                                                                            *
  * Purpose: is string IPv4 address                                            *
