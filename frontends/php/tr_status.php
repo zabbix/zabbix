@@ -592,7 +592,7 @@ include_once('include/page_header.php');
 			$status->setAttribute('name', 'blink');
 		}
 		$lastchange = new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS, $trigger['lastchange']), 'events.php?triggerid='.$trigger['triggerid']);
-		//.'&stime='.date('YmdHi', $trigger['lastchange']
+		//.'&stime='.date('YmdHis', $trigger['lastchange']
 
 		if($config['event_ack_enable']){
 			if($trigger['event_count']){
