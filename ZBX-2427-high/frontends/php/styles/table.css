@@ -430,14 +430,14 @@ table.tableinfo tr td.message {
 	text-align: center;
 }
 
-table.tableinfo tr.selected td { background-color: #FFFFBB; border: 1px #DDDDDD solid; }
-table.tableinfo tr.selected:hover td { background-color: #BBCCFF; border: 1px #DDDDDD solid; }
+table.tableinfo tr.selected { background-color: #FFFFBB; }
+table.tableinfo tr.selected:hover { background-color: #BBCCFF; }
 
-table.tableinfo tr.odd_row td { background-color: #DDDDDD; border: 1px #DDDDDD solid; }
-table.tableinfo tr.odd_row:hover td { background-color: #BBCCFF; border: 1px #BBCCFF solid; }
+table.tableinfo tr.odd_row { background-color: #DDDDDD; }
+table.tableinfo tr.odd_row:hover { background-color: #BBCCFF; }
 
-table.tableinfo tr.even_row td { background-color: #EEEEEE; border: 1px #EEEEEE solid; }
-table.tableinfo tr.even_row:hover td { background-color: #BBCCFF; border: 1px #BBCCFF solid; }
+table.tableinfo tr.even_row { background-color: #EEEEEE; }
+table.tableinfo tr.even_row:hover { background-color: #BBCCFF; }
 
 table.tableinfo tr td.center { vertical-align: middle; text-align: center; }
 
