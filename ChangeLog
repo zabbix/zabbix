@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2414] added PHP session module check as requirement in dashboard and installation (Maxim Andruhovich / AM)
  - [ZBX-2526] fixed graph refresh problem when referred from screens page (Aly)
  - [ZBX-2525] improved actions api code (Vedmak)
  - [ZBX-2324] fixed guest user settings not being stored (Vedmak)
