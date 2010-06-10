@@ -3516,8 +3516,8 @@
 			$mname				= get_request('mname','');
 			$maintenance_type	= get_request('maintenance_type',0);
 
-			$active_since		= zbxDateToTime(get_request('active_since',date('YmdHi')));
-			$active_till		= zbxDateToTime(get_request('active_till', date('YmdHi', time()+86400)));
+			$active_since		= zbxDateToTime(get_request('active_since',date('YmdHi')).'00');
+			$active_till		= zbxDateToTime(get_request('active_till', date('YmdHi', time()+86400)).'00');
 
 			$description		= get_request('description','');
 		}

@@ -205,13 +205,13 @@ include_once('include/page_header.php');
 		if(!isset($new_timeperiod['dayofweek'])){
 			$dayofweek = '';
 
-			$dayofweek .= (!isset($new_timeperiod['dayofweek_su']))?'0':'1';
-			$dayofweek .= (!isset($new_timeperiod['dayofweek_sa']))?'0':'1';
-			$dayofweek .= (!isset($new_timeperiod['dayofweek_fr']))?'0':'1';
-			$dayofweek .= (!isset($new_timeperiod['dayofweek_th']))?'0':'1';
-			$dayofweek .= (!isset($new_timeperiod['dayofweek_we']))?'0':'1';
-			$dayofweek .= (!isset($new_timeperiod['dayofweek_tu']))?'0':'1';
-			$dayofweek .= (!isset($new_timeperiod['dayofweek_mo']))?'0':'1';
+			$dayofweek .= (!isset($new_timeperiod['dayofweek_su']))? '0':'1';
+			$dayofweek .= (!isset($new_timeperiod['dayofweek_sa']))? '0':'1';
+			$dayofweek .= (!isset($new_timeperiod['dayofweek_fr']))? '0':'1';
+			$dayofweek .= (!isset($new_timeperiod['dayofweek_th']))? '0':'1';
+			$dayofweek .= (!isset($new_timeperiod['dayofweek_we']))? '0':'1';
+			$dayofweek .= (!isset($new_timeperiod['dayofweek_tu']))? '0':'1';
+			$dayofweek .= (!isset($new_timeperiod['dayofweek_mo']))? '0':'1';
 
 			$new_timeperiod['dayofweek'] = bindec($dayofweek);
 		}
@@ -221,18 +221,18 @@ include_once('include/page_header.php');
 		if(!isset($new_timeperiod['month'])){
 			$month = '';
 
-			$month .= (!isset($new_timeperiod['month_dec']))?'0':'1';
-			$month .= (!isset($new_timeperiod['month_nov']))?'0':'1';
-			$month .= (!isset($new_timeperiod['month_oct']))?'0':'1';
-			$month .= (!isset($new_timeperiod['month_sep']))?'0':'1';
-			$month .= (!isset($new_timeperiod['month_aug']))?'0':'1';
-			$month .= (!isset($new_timeperiod['month_jul']))?'0':'1';
-			$month .= (!isset($new_timeperiod['month_jun']))?'0':'1';
-			$month .= (!isset($new_timeperiod['month_may']))?'0':'1';
-			$month .= (!isset($new_timeperiod['month_apr']))?'0':'1';
-			$month .= (!isset($new_timeperiod['month_mar']))?'0':'1';
-			$month .= (!isset($new_timeperiod['month_feb']))?'0':'1';
-			$month .= (!isset($new_timeperiod['month_jan']))?'0':'1';
+			$month .= (!isset($new_timeperiod['month_dec']))? '0':'1';
+			$month .= (!isset($new_timeperiod['month_nov']))? '0':'1';
+			$month .= (!isset($new_timeperiod['month_oct']))? '0':'1';
+			$month .= (!isset($new_timeperiod['month_sep']))? '0':'1';
+			$month .= (!isset($new_timeperiod['month_aug']))? '0':'1';
+			$month .= (!isset($new_timeperiod['month_jul']))? '0':'1';
+			$month .= (!isset($new_timeperiod['month_jun']))? '0':'1';
+			$month .= (!isset($new_timeperiod['month_may']))? '0':'1';
+			$month .= (!isset($new_timeperiod['month_apr']))? '0':'1';
+			$month .= (!isset($new_timeperiod['month_mar']))? '0':'1';
+			$month .= (!isset($new_timeperiod['month_feb']))? '0':'1';
+			$month .= (!isset($new_timeperiod['month_jan']))? '0':'1';
 
 			$new_timeperiod['month'] = bindec($month);
 		}
@@ -333,7 +333,7 @@ include_once('include/page_header.php');
 
 	$options = array(
 		'groups' => array(
-			'editable' => 1,
+		'editable' => 1,
 		),
 		'groupid' => get_request('groupid', null),
 	);
