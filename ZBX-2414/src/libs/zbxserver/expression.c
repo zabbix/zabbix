@@ -20,7 +20,6 @@
 
 #include "common.h"
 #include "zbxserver.h"
-#include "expression.h"
 #include "evalfunc.h"
 #include "db.h"
 #include "log.h"
@@ -539,10 +538,10 @@ int	evaluate(double *value, char *exp, char *error, int maxerrlen)
 
 	strscpy(tmp, exp);
 	t=0;
-	while( find_char( tmp, ')' ) != FAIL )
+	while (NULL != strchr(tmp, ')'))
 	{
 		l=-1;
-		r=find_char(tmp,')');
+		r=strchr(tmp,')')-tmp;
 		for(i=r;i>=0;i--)
 		{
 			if( tmp[i] == '(' )
@@ -586,7 +585,7 @@ int	evaluate(double *value, char *exp, char *error, int maxerrlen)
 		res = zbx_strdcat(res, value_str);
 		res = zbx_strdcat(res, tmp+r+1);
 
-		delete_spaces(res);
+		zbx_remove_spaces(res);
 		strscpy(tmp,res);
 
 		zbx_free(res); res = NULL;
@@ -2423,7 +2422,7 @@ int	evaluate_expression(int *result, char **expression, time_t now,
 			error, maxerrlen))
 	{
 		/* Evaluate expression */
-		delete_spaces(*expression);
+		zbx_remove_spaces(*expression);
 		if (substitute_functions(expression, now, error, maxerrlen) == SUCCEED)
 		{
 			if (evaluate(&value, *expression, error, maxerrlen) == SUCCEED)

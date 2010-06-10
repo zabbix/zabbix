@@ -146,7 +146,7 @@
 		if(!is_null($state)){
 			$icon = new CDiv(SPACE, $state?'arrowup':'arrowdown');
 			$icon->setAttribute('id',$id.'_icon');
-			$icon->addAction('onclick',new CJSscript("javascript: change_hat_state(this,'".$id."');"));
+			$icon->addAction('onclick', "javascript: change_hat_state(this,'".$id."');");
 			$icon->setAttribute('title',S_SHOW.'/'.S_HIDE);
 			$icons_row[] = $icon;
 		}
@@ -239,7 +239,7 @@
 		if(isset($_REQUEST['print'])){
 			hide_form_items($col1);
 			hide_form_items($col2);
-		//if empty header than do not show it
+//if empty header than do not show it
 			if(($col1 == SPACE) && ($col2 == SPACE)) return new CJSscript('');
 		}
 

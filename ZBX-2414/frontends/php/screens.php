@@ -118,8 +118,6 @@
 	if(2 != $_REQUEST['fullscreen'])
 		CProfile::update('web.screens.elementid',$_REQUEST['elementid'], PROFILE_TYPE_ID);
 
-?>
-<?php
 
 	$screens_wdgt = new CWidget();
 	
@@ -161,12 +159,12 @@
 		if(infavorites('web.favorite.screenids',$elementid,'screenid')){
 			$icon = new CDiv(SPACE,'iconminus');
 			$icon->setAttribute('title',S_REMOVE_FROM.' '.S_FAVOURITES);
-			$icon->addAction('onclick', new CJSscript("javascript: rm4favorites('screenid','".$elementid."',0);"));
+			$icon->addAction('onclick', "javascript: rm4favorites('screenid','".$elementid."',0);");
 		}
 		else{
 			$icon = new CDiv(SPACE,'iconplus');
 			$icon->setAttribute('title',S_ADD_TO.' '.S_FAVOURITES);
-			$icon->addAction('onclick', new CJSscript("javascript: add2favorites('screenid','".$elementid."');"));
+			$icon->addAction('onclick', "javascript: add2favorites('screenid','".$elementid."');");
 		}
 		$icon->setAttribute('id','addrm_fav');
 
@@ -175,7 +173,7 @@
 
 		$fs_icon = new CDiv(SPACE,'fullscreen');
 		$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-		$fs_icon->addAction('onclick',new CJSscript("javascript: document.location = '".$url."';"));
+		$fs_icon->addAction('onclick', "javascript: document.location = '".$url."';");
 		
 		$screens_wdgt->addPageHeader(S_SCREENS_BIG, array($formHeader, SPACE, $icon, $fs_icon));
 		$screens_wdgt->addItem(BR());
@@ -230,11 +228,11 @@
 		if(2 != $_REQUEST['fullscreen']){
 			$timeline = array(
 				'period' => $effectiveperiod,
-				'starttime' => date('YmdHi', time() - ZBX_MAX_PERIOD)
+				'starttime' => date('YmdHis', time() - ZBX_MAX_PERIOD)
 			);
 
 			if(isset($_REQUEST['stime'])){
-				$timeline['usertime'] = date('YmdHi', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
+				$timeline['usertime'] = date('YmdHis', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 			}
 
 			$dom_graph_id = 'screen_scroll';

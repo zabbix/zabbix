@@ -46,8 +46,6 @@ static HANDLE system_log_handle = INVALID_HANDLE_VALUE;
 
 #endif /* _WINDOWS */
 
-extern	char title_message[]; /* for nice logging into syslog */
-
 #if !defined(_WINDOWS)
 
 void redirect_std(const char *filename)

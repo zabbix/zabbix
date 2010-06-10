@@ -93,8 +93,8 @@ include_once('include/page_header.php');
 		'fullscreen'=>			array(T_ZBX_INT, O_OPT,		P_SYS,	IN('0,1'),				null),
 		'btnSelect'=>			array(T_ZBX_STR, O_OPT,  	null,  	null, 					null),
 // filter
-		'filter_rst'=>			array(T_ZBX_STR, O_OPT,		P_SYS,	null,	NULL),
-		'filter_set'=>			array(T_ZBX_STR, O_OPT,		P_SYS,	null,	NULL),
+		'filter_rst'=>			array(T_ZBX_STR, O_OPT,		P_ACT,	null,	NULL),
+		'filter_set'=>			array(T_ZBX_STR, O_OPT,		P_ACT,	null,	NULL),
 		'show_triggers'=>		array(T_ZBX_INT, O_OPT,  	null, 	null, 	null),
 		'show_events'=>			array(T_ZBX_INT, O_OPT,		P_SYS,	null,	null),
 		'show_severity'=>		array(T_ZBX_INT, O_OPT,		P_SYS,	null,	null),
@@ -207,11 +207,11 @@ include_once('include/page_header.php');
 	$url = 'tr_status.php'.($_REQUEST['fullscreen'] ? '' : '?fullscreen=1');
 	$fs_icon = new CDiv(SPACE,'fullscreen');
 	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-	$fs_icon->addAction('onclick',new CJSscript("javascript: document.location = '".$url."';"));
+	$fs_icon->addAction('onclick', "javascript: document.location = '".$url."';");
 
 	$mute_icon = new CDiv(SPACE,$mute? 'iconmute':'iconsound');
-	$mute_icon->setAttribute('title',S_SOUND.' '.S_ON.'/'.S_OFF);
-	$mute_icon->addAction('onclick',new CJSscript("javascript: switch_mute(this);"));
+	$mute_icon->setAttribute('title',S_SOUND.' '.S_ON_BIG.'/'.S_OFF_BIG);
+	$mute_icon->addAction('onclick', "javascript: switch_mute(this);");
 
 //	show_table_header(S_STATUS_OF_TRIGGERS_BIG,array($mute_icon,$fs_icon));
 	$trigg_wdgt->addPageHeader(S_STATUS_OF_TRIGGERS_BIG.' ['.date(S_DATE_FORMAT_YMDHMS).']', array($mute_icon, $fs_icon));
@@ -592,7 +592,7 @@ include_once('include/page_header.php');
 			$status->setAttribute('name', 'blink');
 		}
 		$lastchange = new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS, $trigger['lastchange']), 'events.php?triggerid='.$trigger['triggerid']);
-		//.'&stime='.date('YmdHi', $trigger['lastchange']
+		//.'&stime='.date('YmdHis', $trigger['lastchange']
 
 		if($config['event_ack_enable']){
 			if($trigger['event_count']){

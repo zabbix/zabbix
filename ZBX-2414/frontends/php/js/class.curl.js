@@ -35,12 +35,12 @@ filr:		'',
 reference:	'',
 path:		'',
 query:		'',
-args:  null,
+args:		null,
 
 initialize: function(url){
 	var url = url || location.href;
-	
-	this.url = decodeURI(url);
+
+	this.url = url;
 	this.args = {};
 
 	this.query=(this.url.indexOf('?')>=0)?this.url.substring(this.url.indexOf('?')+1):'';
@@ -137,14 +137,26 @@ formatQuery: function(){
 },
 
 formatArguments: function(){
+	this.args = {};
+
 	var args = this.query.split('&');
 	var keyval = '';
 
 	if(args.length<1) return;
-	
+
 	for(var i=0; i<args.length; i++){
 		keyval = args[i].split('=');
-		this.args[keyval[0]] = keyval.length > 1 ? decodeURIComponent(keyval[1]):'';
+		if(keyval.length > 1){
+			try{
+				this.args[keyval[0]] = decodeURIComponent(keyval[1]);
+			}
+			catch(exc){
+				this.args[keyval[0]] = keyval[1];
+			}
+		}
+		else{
+			this.args[keyval[0]] = '';
+		}
 	}
 },
 
@@ -178,6 +190,7 @@ getUrl: function(){
 	url +=  this.path.length > 0 ? encodeURI(this.path):'';
 	url +=  this.query.length > 0 ? '?'+this.query:'';
 	url +=  this.reference.length > 0 ? encodeURI('#'+this.reference):'';
+	
 return url;
 },
 

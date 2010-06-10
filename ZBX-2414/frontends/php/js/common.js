@@ -89,7 +89,7 @@ function SDI(msg){
 		doc_body.appendChild(div_help);
 		
 		div_help.setAttribute('id','div_help');
-		div_help.setAttribute('style','position: absolute; right: 30px; top: 100px; border: 1px red solid; width: 500px; height: 400px; background-color: white; font-size: 12px; overflow: auto; z-index: 20;');
+		div_help.setAttribute('style','position: absolute; right: 100px; top: 100px; border: 1px red solid; width: 500px; height: 400px; background-color: white; font-size: 12px; overflow: auto; z-index: 20;');
 		
 //		new Draggable(div_help,{});
 	}
@@ -469,30 +469,6 @@ function insert_in_element(element_name, text){
 	}
 }
 
-function insert_sizeable_graph(graph_id,url){
-	if((typeof(ZBX_G_WIDTH) != 'undefined')) url += "&amp;width="+ZBX_G_WIDTH;
-
-	document.write('<img id="'+graph_id+'" src="'+url+'" alt="graph" /><br />');
-}
-
-function is_empty_form(id){
-	id = $(id);
-	var count = 0;
-
-	var inputs = id.getElementsByTagName('input');
-	for(var i=0; i<inputs.length;i++){
-		if((inputs[i].type == 'text') && (typeof(inputs[i].hidden) == 'undefined') && !empty(inputs[i].value)) return false;
-		if((inputs[i].type == 'checkbox') && (inputs[i].checked)) return false;
-	}
-
-	var selects = id.getElementsByTagName('select');
-	for(var i=0; i<selects.length;i++){
-		if((typeof(selects[i].hidden) == 'undefined') && (selects[i].selectedIndex)) return false;
-	}
-
-return true;
-}
-
 function openWinCentered(loc, winname, iwidth, iheight, params){
 		var uri = new Curl(loc);
 		loc = uri.getUrl();
@@ -523,11 +499,42 @@ function PopUp(url,width,height,form_name){
 	return false;
 }
 
-function redirect(uri) {
-	uri = new Curl(uri);
-	var loc = uri.getUrl();
-	window.location = loc;
-	return false;
+function redirect(uri, method, needle) {
+	var method = method || 'get';
+	var url = new Curl(uri);
+
+	if(method.toLowerCase() == 'get'){
+		window.location = url.getUrl();
+	}
+	else{
+// ussless param just for easier loop
+		var action = '';
+
+		var domBody = document.getElementsByTagName('body')[0];
+		var postForm = document.createElement('form');
+		domBody.appendChild(postForm);
+		postForm.setAttribute('method', 'post');
+
+		var args = url.getArguments();
+		for(var key in args){
+			if(empty(args[key])) continue;
+			if((typeof(needle) != 'undefined') && (key.indexOf(needle) > -1)){
+				action += '&'+key+'='+args[key];
+				continue;
+			}
+			var hInput = document.createElement('input');
+			hInput.setAttribute('type', 'hidden');
+
+			postForm.appendChild(hInput);
+			hInput.setAttribute('name', key);
+			hInput.setAttribute('value', args[key]);
+		}
+
+		postForm.setAttribute('action', url.getPath()+'?'+action.substr(1));
+		postForm.submit();
+	}
+
+return false;
 }
 
 function removeListener(element, eventname, expression, bubbling){

@@ -31,12 +31,6 @@ class CApplication extends CZBXAPI{
 /**
  * Get Applications data
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param array $options
  * @param array $options['itemids']
  * @param array $options['hostids']
@@ -64,7 +58,7 @@ class CApplication extends CZBXAPI{
 
 		$sql_parts = array(
 			'select' => array('apps' => 'a.applicationid'),
-			'from' => array('applications a'),
+			'from' => array('applications' => 'applications a'),
 			'where' => array(),
 			'group' => array(),
 			'order' => array(),
@@ -118,9 +112,9 @@ class CApplication extends CZBXAPI{
 		else{
 			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
 
-			$sql_parts['from']['hg'] = 'hosts_groups hg';
-			$sql_parts['from']['r'] = 'rights r';
-			$sql_parts['from']['ug'] = 'users_groups ug';
+			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sql_parts['from']['rights'] = 'rights r';
+			$sql_parts['from']['users_groups'] = 'users_groups ug';
 			$sql_parts['where'][] = 'hg.hostid=a.hostid';
 			$sql_parts['where'][] = 'r.id=hg.groupid ';
 			$sql_parts['where'][] = 'r.groupid=ug.usrgrpid';
@@ -144,7 +138,7 @@ class CApplication extends CZBXAPI{
 			if($options['output'] != API_OUTPUT_SHORTEN){
 				$sql_parts['select']['groupid'] = 'hg.groupid';
 			}
-			$sql_parts['from']['hg'] = 'hosts_groups hg';
+			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sql_parts['where']['ahg'] = 'a.hostid=hg.hostid';
 			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
 
@@ -171,7 +165,7 @@ class CApplication extends CZBXAPI{
 // expand_data
 		if(!is_null($options['expand_data'])){
 			$sql_parts['select']['host'] = 'h.host';
-			$sql_parts['from']['h'] = 'hosts h';
+			$sql_parts['from']['hosts'] = 'hosts h';
 			$sql_parts['where']['ah'] = 'a.hostid=h.hostid';
 		}
 
@@ -182,7 +176,7 @@ class CApplication extends CZBXAPI{
 			if($options['output'] != API_OUTPUT_SHORTEN){
 				$sql_parts['select']['itemid'] = 'ia.itemid';
 			}
-			$sql_parts['from']['ia'] = 'items_applications ia';
+			$sql_parts['from']['items_applications'] = 'items_applications ia';
 			$sql_parts['where'][] = DBcondition('ia.itemid', $options['itemids']);
 			$sql_parts['where']['aia'] = 'a.applicationid=ia.applicationid';
 
@@ -201,7 +195,7 @@ class CApplication extends CZBXAPI{
 
 // templated
 		if(!is_null($options['templated'])){
-			$sql_parts['from']['h'] = 'hosts h';
+			$sql_parts['from']['hosts'] = 'hosts h';
 			$sql_parts['where']['ah'] = 'a.hostid=h.hostid';
 
 			if($options['templated'])
@@ -209,7 +203,7 @@ class CApplication extends CZBXAPI{
 			else
 				$sql_parts['where'][] = 'h.status<>'.HOST_STATUS_TEMPLATE;
 		}
-		
+
 // inherited
 		if(!is_null($options['inherited'])){
 			if($options['inherited']){
@@ -293,7 +287,7 @@ class CApplication extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT DISTINCT '.$sql_select.
+		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.
 				' FROM '.$sql_from.
 				' WHERE '.DBin_node('a.applicationid', $nodeids).
 					$sql_where.
@@ -401,37 +395,6 @@ COpt::memoryPick();
 	return $result;
 	}
 
-
-/**
- * Get Application ID by host.name and item.key
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param array $app_data
- * @param array $app_data['name']
- * @param array $app_data['hostid']
- * @return int|boolean
- */
-	public static function getObjects($applicationData){
-		$options = array(
-			'filter' => $applicationData,
-			'output'=>API_OUTPUT_EXTEND
-		);
-
-		if(isset($applicationData['node']))
-			$options['nodeids'] = getNodeIdByNodeName($applicationData['node']);
-		else if(isset($applicationData['nodeids']))
-			$options['nodeids'] = $applicationData['nodeids'];
-
-		$result = self::get($options);
-
-	return $result;
-	}
-
 	public static function exists($object){
 		$keyFields = array(array('hostid', 'host'), 'name');
 
@@ -454,12 +417,6 @@ COpt::memoryPick();
 /**
  * Add Applications
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param _array $applications
  * @param array $app_data['name']
  * @param array $app_data['hostid']
@@ -469,34 +426,32 @@ COpt::memoryPick();
 		$applications = zbx_toArray($applications);
 		$applicationids = array();
 
-		$result = false;
+		try{
+			self::BeginTransaction(__METHOD__);
 
-		self::BeginTransaction(__METHOD__);
-		foreach($applications as $anum => $application){
-			$result = add_application($application['name'], $application['hostid']);
+			foreach($applications as $anum => $application){
+				$result = add_application($application['name'], $application['hostid']);
 
-			if(!$result) break;
-			$applicationids[] = $result;
+				if(!$result)
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot create application');
+				$applicationids[] = $result;
+			}
+
+			self::EndTransaction(true, __METHOD__);
+
+			return array('applicationids' => $applicationids);
 		}
-		$result = self::EndTransaction($result, __METHOD__);
-
-		if($result){
-			return array('applicationids'=>$applicationids);
-		}
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
 		}
 	}
 
 /**
  * Update Applications
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
  *
  * @param _array $applications
  * @param array $app_data['name']
@@ -505,46 +460,45 @@ COpt::memoryPick();
  */
 	public static function update($applications){
 		$applications = zbx_toArray($applications);
-		$applicationids = array();
+		$applicationids = zbx_objectValues($applications, 'applicationid');
 
-		$options = array(
-			'applicationids'=>zbx_objectValues($applications, 'applicationid'),
-			'editable'=>1,
-			'extendoutput'=>1,
-			'preservekeys'=>1
-		);
-		$upd_applications = self::get($options);
-		foreach($applications as $anum => $application){
-			if(!isset($upd_applications[$application['applicationid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				return false;
-			}
-			$applicationids[] = $application['applicationid'];
-		}
+		try{
+			self::BeginTransaction(__METHOD__);
 
-		$result = false;
-
-		self::BeginTransaction(__METHOD__);
-		foreach($applications as $anum => $application){
-			$application_db_fields = $upd_applications[$application['applicationid']];
-
-			if(!check_db_fields($application_db_fields, $application)){
-				error('Incorrect arguments pasted to function [CApplication::update]');
-				$result = false;
-				break;
+			$options = array(
+				'applicationids' => $applicationids,
+				'editable' => 1,
+				'extendoutput' => 1,
+				'preservekeys' => 1
+			);
+			$upd_applications = self::get($options);
+			foreach($applications as $anum => $application){
+				if(!isset($upd_applications[$application['applicationid']])){
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
+				}
 			}
 
-			$result = update_application($application['applicationid'], $application['name'], $application['hostid']);
+			foreach($applications as $anum => $application){
+				$application_db_fields = $upd_applications[$application['applicationid']];
 
-			if(!$result) break;
-		}
-		$result = self::EndTransaction($result, __METHOD__);
+				if(!check_db_fields($application_db_fields, $application)){
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect fields for application');
+				}
 
-		if($result){
-			return array('applicationids'=>$applicationids);
+				$result = update_application($application['applicationid'], $application['name'], $application['hostid']);
+				if(!$result)
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot update application');
+			}
+
+			self::EndTransaction(true, __METHOD__);
+
+			return array('applicationids' => $applicationids);
 		}
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
 		}
 	}
@@ -552,63 +506,48 @@ COpt::memoryPick();
 /**
  * Delete Applications
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param _array $applications
  * @param array $applications[0,...]['applicationid']
  * @return boolean
  */
 	public static function delete($applications){
 		$applications = zbx_toArray($applications);
-		$applicationids = array();
+		$applicationids = zbx_objectValues($applications, 'applicationid');
 
-		$options = array(
-			'applicationids'=>zbx_objectValues($applications, 'applicationid'),
-			'editable'=>1,
-			'extendoutput'=>1,
-			'preservekeys'=>1
-		);
-		$del_applications = self::get($options);
-		foreach($applications as $anum => $application){
-			if(!isset($del_applications[$application['applicationid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				return false;
+		try{
+			self::BeginTransaction(__METHOD__);
+
+			$options = array(
+				'applicationids' => $applicationids,
+				'editable' => 1,
+				'output' => API_OUTPUT_SHORTEN,
+				'preservekeys' => 1
+			);
+			$del_applications = self::get($options);
+			foreach($applications as $anum => $application){
+				if(!isset($del_applications[$application['applicationid']])){
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
+				}
 			}
 
-			$applicationids[] = $application['applicationid'];
-			//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_APPLICATION, 'application ['.$application['name'].']');
-		}
-
-		if(!empty($applicationids)){
 			$result = delete_application($applicationids);
-		}
-		else{
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ applicationids ]');
-			$result = false;
-		}
+			if(!$result)
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete application');
 
-		if($result){
-			return array('applicationids'=>$applicationids);
+			self::EndTransaction(true, __METHOD__);
+			return array('applicationids' => $applicationids);
 		}
-		else{
-			self::setError(__METHOD__);
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
 		}
 	}
 
-
 /**
  * Add Items to applications
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
  *
  * @param array $data
  * @param array $data['applications']
@@ -616,116 +555,116 @@ COpt::memoryPick();
  * @return boolean
  */
 	public static function addItems($data){
-
-		$result = true;
-		$errors = array();
+		if(empty($data['applications'])) return true;
 
 		$applications = zbx_toArray($data['applications']);
 		$items = zbx_toArray($data['items']);
-		$applicationids = array();
-		$itemids = array();
+		$applicationids = zbx_objectValues($applications, 'applicationid');
+		$itemids = zbx_objectValues($items, 'itemid');
 
-		if(empty($applications)) return true;
+		try{
+			self::BeginTransaction(__METHOD__);
 
-// PERMISSION {{{
-		$app_options = array(
-			'applicationids' => zbx_objectValues($applications, 'applicationid'),
-			'editable' => 1,
-			'extendoutput' => 1,
-			'preservekeys' => 1
-		);
-		$allowed_applications = self::get($app_options);
-		foreach($applications as $num => $application){
-			if(!isset($allowed_applications[$application['applicationid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				return false;
-			}
-			$applicationids[] = $application['applicationid'];
-		}
-
-		$item_options = array(
-			'itemids' => zbx_objectValues($items, 'itemid'),
-			'editable' => 1,
-			'extendoutput' => 1,
-			'preservekeys' => 1
-		);
-		$allowed_items = CItem::get($item_options);
-		foreach($items as $num => $item){
-			if(!isset($allowed_items[$item['itemid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				return false;
-			}
-			$itemids[] = $item['itemid'];
-		}
-// }}} PERMISSION
-
-
-		self::BeginTransaction(__METHOD__);
-
-		$sql = 'SELECT itemid, applicationid '.
-				' FROM items_applications '.
-				' WHERE '.DBcondition('itemid', $itemids).
-					' AND '.DBcondition('applicationid', $applicationids);
-		$linked_db = DBselect($sql);
-		while($pair = DBfetch($linked_db)){
-			$linked[$pair['applicationid']] = array($pair['itemid'] => $pair['itemid']);
-		}
-
-		foreach($applicationids as $anum => $applicationid){
-			foreach($itemids as $inum => $itemid){
-				if(isset($linked[$applicationid]) && isset($linked[$applicationid][$itemid])) continue;
-
-				$itemappid = get_dbid('items_applications', 'itemappid');
-				$result = DBexecute("INSERT INTO items_applications (itemappid, itemid, applicationid) VALUES ($itemappid, $itemid, $applicationid)");
-				if(!$result){
-					break 2;
+// PERMISSIONS {{{
+			$app_options = array(
+				'applicationids' => $applicationids,
+				'editable' => 1,
+				'extendoutput' => 1,
+				'preservekeys' => 1,
+			);
+			$allowed_applications = self::get($app_options);
+			foreach($applications as $num => $application){
+				if(!isset($allowed_applications[$application['applicationid']])){
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
 				}
 			}
-		}
 
-		if($result){
+			$item_options = array(
+				'itemids' => $itemids,
+				'editable' => 1,
+				'extendoutput' => 1,
+				'preservekeys' => 1
+			);
+			$allowed_items = CItem::get($item_options);
+			foreach($items as $num => $item){
+				if(!isset($allowed_items[$item['itemid']])){
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
+				}
+			}
+// }}} PERMISSIONS
+
+			$sql = 'SELECT itemid, applicationid ' .
+					' FROM items_applications ' .
+					' WHERE ' . DBcondition('itemid', $itemids) .
+					' AND ' . DBcondition('applicationid', $applicationids);
+			$linked_db = DBselect($sql);
+			while($pair = DBfetch($linked_db)){
+				$linked[$pair['applicationid']] = array($pair['itemid'] => $pair['itemid']);
+			}
+
+			$apps_insert = array();
+			foreach($applicationids as $anum => $applicationid){
+				foreach($itemids as $inum => $itemid){
+					if(isset($linked[$applicationid]) && isset($linked[$applicationid][$itemid])) continue;
+
+					$apps_insert[] = array(
+						'itemid' => $itemid,
+						'applicationid' => $applicationid,
+					);
+				}
+			}
+
+			DB::insert('items_applications', $apps_insert);
+
+
 			$child_applications = array();
 			foreach($itemids as $itemid){
-				$db_childs = DBselect('SELECT itemid, hostid FROM items WHERE templateid='.$itemid);
+				$db_childs = DBselect('SELECT itemid, hostid FROM items WHERE templateid=' . $itemid);
 
 				if($child = DBfetch($db_childs)){
-					$sql = 'SELECT a1.applicationid '.
-							' FROM applications a1, applications a2 '.
-							' WHERE a1.name=a2.name '.
-								' AND a1.hostid='.$child['hostid'].
-								' AND '.DBcondition('a2.applicationid', $applicationids);
+					$sql = 'SELECT a1.applicationid ' .
+							' FROM applications a1, applications a2 ' .
+							' WHERE a1.name=a2.name ' .
+							' AND a1.hostid=' . $child['hostid'] .
+							' AND ' . DBcondition('a2.applicationid', $applicationids);
 					$db_apps = DBselect($sql);
 					while($app = DBfetch($db_apps)){
 						$child_applications[] = $app;
 					}
 					$result = self::addItems(array('items' => $child, 'applications' => $child_applications));
 					if(!$result){
-						break;
+						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot add items');
 					}
 				}
 			}
+
+			self::EndTransaction(true, __METHOD__);
+			return true;
 		}
-
-
-		$result = self::EndTransaction($result, __METHOD__);
-
-		if($result){
-			$options = array(
-				'applicationids' => $applicationids,
-				'output' => API_OUTPUT_EXTEND,
-				'select_items' => API_OUTPUT_EXTEND,
-				'nopermission' => 1
-			);
-			$result = self::get($options);
-			return $result;
-		}
-		else{
-			self::setMethodErrors(__METHOD__, $errors);
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
 		}
 	}
 
+	private function inherit($application, $hostids=null){
 
+	}
+
+	private function create_real(){
+
+	}
+
+	private function update_real(){
+
+	}
+
+	public function syncTemplates(){
+
+	}
 }
 
 ?>

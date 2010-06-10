@@ -471,7 +471,7 @@
 			unset_request($field,'P_UNSET_EMPTY');
 		}
 
-//echo "Field: $field<br>";
+//SDI("Field: $field");
 
 		if($exception==NULL)
 			$except=FALSE;
@@ -485,11 +485,11 @@
 		if($opt == O_MAND){
 			if(!isset($_REQUEST[$field])){
 				if($flags&P_SYS){
-					info(S_CRITICAL_ERROR.'.'.SPACE.S_FIELD.SPACE.'['.$field.']'.SPACE.S_IS_MANDATORY_SMALL);
+					info(S_CRITICAL_ERROR.'.'.SPACE.S_FIELD.SPACE.'['.$caption.']'.SPACE.S_IS_MANDATORY_SMALL);
 					return ZBX_VALID_ERROR;
 				}
 				else{
-					info(S_WARNING.'.'.SPACE.S_FIELD.SPACE.'['.$field.']'.SPACE.S_IS_MANDATORY_SMALL);
+					info(S_WARNING.'.'.SPACE.S_FIELD.SPACE.'['.$caption.']'.SPACE.S_IS_MANDATORY_SMALL);
 					return ZBX_VALID_WARNING;
 				}
 			}
@@ -501,11 +501,11 @@
 			unset_request($field,'O_NO');
 
 			if($flags&P_SYS){
-				info(S_CRITICAL_ERROR.'.'.SPACE.S_FIELD.SPACE.'['.$field.']'.SPACE.S_MUST_BE_MISSING_SMALL);
+				info(S_CRITICAL_ERROR.'.'.SPACE.S_FIELD.SPACE.'['.$caption.']'.SPACE.S_MUST_BE_MISSING_SMALL);
 				return ZBX_VALID_ERROR;
 			}
 			else{
-				info(S_WARNING.'.'.SPACE.S_FIELD.SPACE.'['.$field.']'.SPACE.S_MUST_BE_MISSING_SMALL);
+				info(S_WARNING.'.'.SPACE.S_FIELD.SPACE.'['.$caption.']'.SPACE.S_MUST_BE_MISSING_SMALL);
 				return ZBX_VALID_WARNING;
 			}
 		}
@@ -528,6 +528,7 @@
 		check_trim($_REQUEST[$field]);
 
 		$err = check_type($field, $flags, $_REQUEST[$field], $type);
+
 		if($err != ZBX_VALID_OK)
 			return $err;
 
@@ -598,8 +599,9 @@
 			invalid_url();
 		}
 
-		if($show_messages && ($err!=ZBX_VALID_OK))
+		if($show_messages && ($err!=ZBX_VALID_OK)){
 			show_messages($err==ZBX_VALID_OK, NULL, S_PAGE_RECEIVED_INCORRECT_DATA);
+		}
 
 	return ($err==ZBX_VALID_OK ? 1 : 0);
 	}

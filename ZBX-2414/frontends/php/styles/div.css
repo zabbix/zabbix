@@ -85,6 +85,40 @@ div.suggest{
 	display: none;
 }
 
+/* <FORM ELEMENT> */
+div.formElement_header{
+	color: #FFFFFF;
+	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;
+	border: 0;
+	text-align: left;
+	height: 24px;
+	padding-left: 5px;
+	line-height:20px;
+}
+
+div.formElement_body{
+	border: 1px solid gray;
+	}
+	.formElementTable{
+		white-space: nowrap;
+		}
+		.formElementTable tr td{
+			padding-left: 5px;
+			padding-right: 5px;
+			height: 24px;
+			}
+
+div.formElement_footer{
+	color: #FFFFFF;
+	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;
+	border: 0;
+	text-align: right;
+	height: 21px;
+	padding-right: 5px;
+	line-height: 20px;
+}
+/* </FORM ELEMENT> */
+
 /**** SCREEN DRAG & DROP ****/
 div.draggable {
 	cursor: pointer;
@@ -471,6 +505,16 @@ div.icon_sortdown{
 
 .blacklink:hover{
 	color:#3A3A3A;
+}
+
+.whitelink{
+	color:#F3F3F3;
+	cursor: pointer;
+	text-decoration: underline;
+}
+
+.whitelink:hover{
+	color:#DADADA;
 }
 
 .link_menu{
