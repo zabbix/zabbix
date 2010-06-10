@@ -9,7 +9,7 @@
 ** (at your option) any later version.
 **
 ** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; withouts even the implied warranty of
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ** GNU General Public License for more details.
 **
@@ -1792,10 +1792,10 @@
 	'S_CANNOT_UPDATE_API_ACCESS'=>			'Cannot update API access',
 	'S_DEBUG_MODE_UPDATED'=>			'Debug mode updated',
 	'S_CANNOT_UPDATE_DEBUG_MODE'=>			'Cannot update debug mode',
-	'S_USER_CANNOT_DISABLE_ITSELF'=>		'User cannot disable him self',
-	'S_USER_CANNOT_CHANGE_STATUS'=>			'User cannot change status to him self',
-	'S_USER_CANNOT_CHANGE_GUI_ACCESS'=>		'User cannot change GUI access to him self',
-	'S_USER_CANNOT_DELETE_ITSELF'=>			'User cannot delete him self',
+	'S_USER_CANNOT_DISABLE_ITSELF'=>		'User cannot disable himself',
+	'S_USER_CANNOT_CHANGE_STATUS'=>			'User cannot change status of himself',
+	'S_USER_CANNOT_CHANGE_GUI_ACCESS'=>		'User cannot change GUI access for himself',
+	'S_USER_CANNOT_DELETE_ITSELF'=>			'User cannot delete himself',
 	'S_CONFIGURATION_OF_USERS_AND_USER_GROUPS'=>	'CONFIGURATION OF USERS AND USER GROUPS',
 	'S_USER_GROUPS_BIG'=>				'USER GROUPS',
 	'S_USERS_BIG'=>					'USERS',
@@ -2302,11 +2302,11 @@
 	'S_CUSER_ERROR_WRONG_FIELD_FOR_USER'=>			'Wrong fields for user',
 	'S_CUSER_ERROR_USER_EXISTS'=>				'User [ %1$s ] already exists',
 	'S_CUSER_ERROR_CANT_RENAME_GUEST_USER'=>		'Cannot rename guest user',
-	'S_CUSER_ERROR_USER_UNABLE_RESTRICT_SELF_GUI_ACCESS'=>	'User cannot restrict access to GUI to him self. Group "%1$s"',
-	'S_CUSER_ERROR_USER_CANT_DISABLE_SELF'=>		'User cannot disable him self. Group "%1$s"',
+	'S_CUSER_ERROR_USER_UNABLE_RESTRICT_SELF_GUI_ACCESS'=>	'User cannot restrict access to GUI for himself. Group "%1$s"',
+	'S_CUSER_ERROR_USER_CANT_DISABLE_SELF'=>		'User cannot disable himself. Group "%1$s"',
 	'S_CUSER_ERROR_INCORRECT_TIME_PERIOD'=>			'Incorrect time period',
 	'S_CUSER_ERROR_WRONG_PERIOD'=>				'Wrong period [ %1$s ]',
-	'S_CUSER_ERROR_INTERNAL_ZABBIX_ERROR'=>			'Internal zabbix error',
+	'S_CUSER_ERROR_INTERNAL_ZABBIX_ERROR'=>			'Internal Zabbix error',
 
 //	config.inc.php
 	'S_CONFIG_NOT_LOGGED_IN_ACCESS_DENIED'=>		'You cannot view this URL as a',
