@@ -117,7 +117,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 				goto not_supported;
 			else if (*tmp != '\0' && is_uint_prefix(tmp) == FAIL)
 			{
-				error = zbx_dsprintf(error, "Second argument to [%s] is badly formatted", item->key);
+				error = zbx_dsprintf(error, "Second argument is badly formatted");
 				goto not_supported;
 			}
 			else
@@ -130,7 +130,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 				goto not_supported;
 			else if (*tmp != '\0' && is_uint_prefix(tmp) == FAIL)
 			{
-				error = zbx_dsprintf(error, "Third argument to [%s] is badly formatted", item->key);
+				error = zbx_dsprintf(error, "Third argument is badly formatted");
 				goto not_supported;
 			}
 			else
@@ -139,7 +139,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 		if (from > to && -1 != to)
 		{
-			error = zbx_dsprintf(error, "Arguments to [%s] represent an invalid interval", item->key);
+			error = zbx_dsprintf(error, "Arguments represent an invalid interval");
 			goto not_supported;
 		}
 
@@ -293,7 +293,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 	return SUCCEED;
 not_supported:
 	if (NULL == error)
-		error = zbx_dsprintf(error, "Internal check [%s] is not supported", item->key_orig);
+		error = zbx_dsprintf(error, "Internal check is not supported");
 
 	SET_MSG_RESULT(result, error);
 

@@ -70,13 +70,13 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 		}
 		else if (SUCCEED != is_uint(port))
 		{
-			error = zbx_dsprintf(error, "Port number must be numeric in [%s]", item->key);
+			error = zbx_dsprintf(error, "Port number must be numeric");
 			ret = NOTSUPPORTED;
 		}
 	}
 	else
 	{
-		error = zbx_dsprintf(error, "Too many parameters in [%s]", item->key);
+		error = zbx_dsprintf(error, "Too many parameters");
 		ret = NOTSUPPORTED;
 	}
 
@@ -102,7 +102,7 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 		ret = NOTSUPPORTED;
 
 	if (NOTSUPPORTED == ret && NULL == error)
-		error = zbx_dsprintf(error, "Simple check [%s] is not supported", item->key);
+		error = zbx_dsprintf(error, "Simple check is not supported");
 
 	if (NOTSUPPORTED == ret)
 		SET_MSG_RESULT(result, error);
