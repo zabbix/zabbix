@@ -2324,7 +2324,7 @@
 
 			$link = new CLink(S_SHOW_VALUE_MAPPINGS,'config.php?config=6');
 			$link->setAttribute('target','_blank');
-			$frmItem->addRow(array(S_SHOW_VALUE),array($cmbMap, $link));
+			$frmItem->addRow(array(S_SHOW_VALUE),array($cmbMap, SPACE, $link));
 
 		}
 		else{
