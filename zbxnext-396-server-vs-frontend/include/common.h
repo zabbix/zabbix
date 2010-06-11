@@ -691,16 +691,20 @@ void    *zbx_realloc2(char *filename, int line, void *src, size_t size);
 #define zbx_free(ptr)		\
 	if (ptr)		\
 	{			\
-		/*fprintf(stderr, "%-6li => [file:%s,line:%d] zbx_free: %p\n", (long int)getpid(), __FILE__, __LINE__, ptr);*/	\
 		free(ptr);	\
 		ptr = NULL;	\
 	}
-#define zbx_fclose(f) { if(f){ fclose(f); f = NULL; } }
 
-/*#define ZBX_COND_NODEID " %s>=100000000000000*%d and %s<=(100000000000000*%d+99999999999999) "*/
-/*#define ZBX_COND_NODEID " %s>=%d00000000000000 and %s<=%d99999999999999 "
-#define LOCAL_NODE(fieldid) fieldid, CONFIG_NODEID, fieldid, CONFIG_NODEID
-#define ZBX_NODE(fieldid,nodeid) fieldid, nodeid, fieldid, nodeid*/
+#define zbx_fclose(file)	\
+	if (file)		\
+	{			\
+		fclose(file);	\
+		file = NULL;	\
+	}
+
+#define THIS_SHOULD_NEVER_HAPPEN()	zbx_error("ERROR [file:%s,line:%d] "				\
+							"Something impossible has just happened.",	\
+							__FILE__, __LINE__);
 
 #define MIN_ZABBIX_PORT 1024u
 #define MAX_ZABBIX_PORT 65535u

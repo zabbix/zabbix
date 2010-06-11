@@ -47,7 +47,7 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 	{
 		if (0 != get_param(item->key, 1, service, MAX_STRING_LEN))
 		{
-			/* this should never happen */
+			THIS_SHOULD_NEVER_HAPPEN();
 			ret = NOTSUPPORTED;
 		}
 		else if (0 == strcmp(service, "tcp") || 0 == strcmp(service, "tcp_perf"))
@@ -60,12 +60,12 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 	{
 		if (0 != get_param(item->key, 1, service, MAX_STRING_LEN))
 		{
-			/* this should never happen */
+			THIS_SHOULD_NEVER_HAPPEN();
 			ret = NOTSUPPORTED;
 		}
 		else if (0 != get_param(item->key, 2, port, MAX_STRING_LEN))
 		{
-			/* this should never happen */
+			THIS_SHOULD_NEVER_HAPPEN();
 			ret = NOTSUPPORTED;
 		}
 		else if (SUCCEED != is_uint(port))

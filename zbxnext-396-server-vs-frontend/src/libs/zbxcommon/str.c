@@ -123,7 +123,7 @@ void __zbx_zbx_error(const char *fmt, ...)
 
 	va_start(args, fmt);
 
-	fprintf(f, "%s [%li]: ",progname, zbx_get_thread_id());
+	fprintf(f, "%s [%li]: ", progname, zbx_get_thread_id());
 	vfprintf(f, fmt, args);
 	fprintf(f, "\n");
 	fflush(f);
