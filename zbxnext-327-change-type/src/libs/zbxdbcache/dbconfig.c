@@ -214,8 +214,9 @@ static const char	*INTERNED_SERVER_ZABBIXLOG_KEY;
  * Returns type of poller for item
  * (for normal or IPMI pollers)
  */
-static void	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t hostid, zbx_uint64_t proxy_hostid,
-				unsigned char item_type, const char *key, unsigned char *poller_type)
+static void	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t proxy_hostid,
+				unsigned char item_type, const char *key,
+				unsigned char *poller_type)
 {
 	if (0 != proxy_hostid && (ITEM_TYPE_INTERNAL != item_type &&
 				ITEM_TYPE_AGGREGATE != item_type &&
@@ -225,37 +226,38 @@ static void	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t hostid, zbx_uint64_
 		return;
 	}
 
-	switch (item_type) {
-	case ITEM_TYPE_SIMPLE:
-		if (SUCCEED == cmp_key_id(key, SERVER_ICMPPING_KEY) ||
-				SUCCEED == cmp_key_id(key, SERVER_ICMPPINGSEC_KEY) ||
-				SUCCEED == cmp_key_id(key, SERVER_ICMPPINGLOSS_KEY))
-		{
-			if (0 == CONFIG_PINGER_FORKS)
+	switch (item_type)
+	{
+		case ITEM_TYPE_SIMPLE:
+			if (SUCCEED == cmp_key_id(key, SERVER_ICMPPING_KEY) ||
+					SUCCEED == cmp_key_id(key, SERVER_ICMPPINGSEC_KEY) ||
+					SUCCEED == cmp_key_id(key, SERVER_ICMPPINGLOSS_KEY))
+			{
+				if (0 == CONFIG_PINGER_FORKS)
+					break;
+				*poller_type = ZBX_POLLER_TYPE_PINGER;
+				return;
+			}
+		case ITEM_TYPE_ZABBIX:
+		case ITEM_TYPE_SNMPv1:
+		case ITEM_TYPE_SNMPv2c:
+		case ITEM_TYPE_SNMPv3:
+		case ITEM_TYPE_INTERNAL:
+		case ITEM_TYPE_AGGREGATE:
+		case ITEM_TYPE_EXTERNAL:
+		case ITEM_TYPE_DB_MONITOR:
+		case ITEM_TYPE_SSH:
+		case ITEM_TYPE_TELNET:
+		case ITEM_TYPE_CALCULATED:
+			if (0 == CONFIG_POLLER_FORKS)
 				break;
-			*poller_type = ZBX_POLLER_TYPE_PINGER;
+			*poller_type = ZBX_POLLER_TYPE_NORMAL;
 			return;
-		}
-	case ITEM_TYPE_ZABBIX:
-	case ITEM_TYPE_SNMPv1:
-	case ITEM_TYPE_SNMPv2c:
-	case ITEM_TYPE_SNMPv3:
-	case ITEM_TYPE_INTERNAL:
-	case ITEM_TYPE_AGGREGATE:
-	case ITEM_TYPE_EXTERNAL:
-	case ITEM_TYPE_DB_MONITOR:
-	case ITEM_TYPE_SSH:
-	case ITEM_TYPE_TELNET:
-	case ITEM_TYPE_CALCULATED:
-		if (0 == CONFIG_POLLER_FORKS)
-			break;
-		*poller_type = ZBX_POLLER_TYPE_NORMAL;
-		return;
-	case ITEM_TYPE_IPMI:
-		if (0 == CONFIG_IPMIPOLLER_FORKS)
-			break;
-		*poller_type = ZBX_POLLER_TYPE_IPMI;
-		return;
+		case ITEM_TYPE_IPMI:
+			if (0 == CONFIG_IPMIPOLLER_FORKS)
+				break;
+			*poller_type = ZBX_POLLER_TYPE_IPMI;
+			return;
 	}
 
 	*poller_type = ZBX_NO_POLLER;
@@ -455,7 +457,8 @@ static void	DCsync_items(DB_RESULT result)
 
 	time_t			now;
 	unsigned char		status, poller_type;
-	int			i, index, delay, found, changed;
+	int			i, index, delay, found;
+	int			update_index, update_queue;
 	zbx_uint64_t		itemid, hostid, proxy_hostid;
 	zbx_vector_uint64_t	ids;
 
@@ -479,17 +482,18 @@ static void	DCsync_items(DB_RESULT result)
 
 		item = DCfind_id(&config->items, itemid, sizeof(ZBX_DC_ITEM), &found);
 
+		update_index = 0;
+		update_queue = 0;
+
 		/* check whether we need to update item_hk index */
-		if (found && (item->hostid != hostid || strcmp(item->key, row[6]) != 0))
+		if (found && ((update_queue = (0 != strcmp(item->key, row[6]))) || item->hostid != hostid))
 		{
-			changed = 1;
+			update_index = 1;
 			item_hk.hostid = item->hostid;
 			item_hk.key = item->key;
 			zbx_strpool_release(item_hk.key);
 			zbx_hashset_remove(&config->items_hk, &item_hk);
 		}
-		else
-			changed = 0;
 
 		item->itemid = itemid;
 		item->hostid = hostid;
@@ -499,7 +503,7 @@ static void	DCsync_items(DB_RESULT result)
 		DCstrpool_replace(found, &item->key, row[6]);
 
 		/* update item_hk index, if needed */
-		if (!found || changed)
+		if (!found || update_index)
 		{
 			item_hk.hostid = item->hostid;
 			item_hk.key = zbx_strpool_acquire(item->key);
@@ -518,23 +522,25 @@ static void	DCsync_items(DB_RESULT result)
 		}
 		else
 		{
-			changed = 1;
-
 			if (ITEM_STATUS_ACTIVE == status && (status != item->status || delay != item->delay))
+			{
+				update_queue = 1;
 				item->nextcheck = calculate_item_nextcheck(itemid, item->type,
 						delay, row[16], now);
+			}
 			else if (ITEM_STATUS_NOTSUPPORTED == status && status != item->status)
+			{
+				update_queue = 1;
 				item->nextcheck = calculate_item_nextcheck(itemid, item->type,
 						CONFIG_REFRESH_UNSUPPORTED, NULL, now);
-			else
-				changed = 0;
+			}
 		}
 
 		item->status = status;
 		item->delay = delay;
 
 		poller_type = item->poller_type;
-		poller_by_item(itemid, item->hostid, proxy_hostid, item->type, item->key, &item->poller_type);
+		poller_by_item(itemid, proxy_hostid, item->type, item->key, &item->poller_type);
 
 		if (!found)
 		{
@@ -550,9 +556,16 @@ static void	DCsync_items(DB_RESULT result)
 			}
 			DCupdate_item_queue(item);
 		}
-		else if (changed)
+		else if (update_queue)
 		{
-			DCupdate_item_queue(item);
+			if (item->in_queue && (INTERNED_SERVER_STATUS_KEY == item->key ||
+						INTERNED_SERVER_ZABBIXLOG_KEY == item->key))
+			{
+				item->in_queue = 0;
+				zbx_binary_heap_remove_direct(&config->queues[poller_type], item->itemid);
+			}
+			else
+				DCupdate_item_queue(item);
 		}
 
 		/* SNMP items */
