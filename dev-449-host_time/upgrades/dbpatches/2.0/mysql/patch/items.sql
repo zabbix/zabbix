@@ -1,1 +1,0 @@
-ALTER TABLE items CHANGE units units VARCHAR(255) DEFAULT '' NOT NULL;
