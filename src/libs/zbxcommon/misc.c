@@ -419,7 +419,8 @@ static int	get_next_delay_interval(const char *flex_intervals, time_t now, time_
  *           !!! Don't forget to sync code with PHP !!!                       *
  *                                                                            *
  ******************************************************************************/
-int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, const char *flex_intervals, time_t now)
+int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay,
+		const char *flex_intervals, time_t now, int *effective_delay)
 {
 	int	nextcheck;
 
@@ -465,8 +466,11 @@ int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, cons
 		while (nextcheck <= now)
 			nextcheck += delay;
 	}
+	
+	if (NULL != effective_delay)
+		*effective_delay = delay;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End calculate_item_nextcheck (result:%d)", nextcheck);
+	zabbix_log(LOG_LEVEL_DEBUG, "End calculate_item_nextcheck (nextcheck:%d delay:%d)", nextcheck, delay);
 
 	return nextcheck;
 }
@@ -1201,9 +1205,10 @@ int	is_double(char *c)
  ******************************************************************************/
 int	is_uint_prefix(const char *c)
 {
-	int	i;
+	int	i = 0;
 
-	for (i=0; c[i]==' '; i++); /* trim left spaces */
+	while (c[i]==' ') /* trim left spaces */
+		i++;
 	
 	if (!isdigit(c[i]))
 		return FAIL;
