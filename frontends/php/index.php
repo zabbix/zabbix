@@ -104,8 +104,13 @@ include_once('include/page_header.php');
 				$frmLogin = new CFormTable(S_LOGIN,'index.php?login=1','post','multipart/form-data');
 				$frmLogin->setHelp('web.index.login');
 				$frmLogin->addVar('request', $request);
-				$frmLogin->addRow(S_LOGIN_NAME, new CTextBox('name'));
-				$frmLogin->addRow(S_PASSWORD, new CPassBox('password'));
+				$lt = new CTextBox('name');
+				$lt->addStyle('width: 150px');
+				$frmLogin->addRow(S_LOGIN_NAME, $lt);
+				
+				$pt = new CPassBox('password');
+				$pt->addStyle('width: 150px');
+				$frmLogin->addRow(S_PASSWORD, $pt);
 				$frmLogin->addItemToBottomRow(new CButton('enter','Enter'));
 				$frmLogin->show(false);
 
