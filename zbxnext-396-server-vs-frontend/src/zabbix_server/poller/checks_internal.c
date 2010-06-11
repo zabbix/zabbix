@@ -295,8 +295,6 @@ not_supported:
 	if (NULL == error)
 		error = zbx_dsprintf(error, "Internal check [%s] is not supported", item->key_orig);
 
-	zabbix_log(LOG_LEVEL_WARNING, "Host [%s] %s", item->host.host, error);
-
 	SET_MSG_RESULT(result, error);
 
 	return NOTSUPPORTED;

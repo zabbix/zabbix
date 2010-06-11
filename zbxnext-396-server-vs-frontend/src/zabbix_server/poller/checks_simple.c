@@ -105,9 +105,7 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 		error = zbx_dsprintf(error, "Simple check [%s] is not supported", item->key);
 
 	if (NOTSUPPORTED == ret)
-	{
 		SET_MSG_RESULT(result, error);
-	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
