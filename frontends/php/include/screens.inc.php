@@ -320,30 +320,16 @@ require_once('include/js.inc.php');
 			return $table;
 		}
 
-		global $DB;
-
-		$item=get_item_by_itemid($itemid);
+		$item = get_item_by_itemid($itemid);
 		switch($item['value_type']){
-			case ITEM_VALUE_TYPE_FLOAT:
-				$history_table = 'history';
-				$order_field = 'clock';
-				break;
-			case ITEM_VALUE_TYPE_UINT64:
-				$history_table = 'history_uint';
-				$order_field = 'clock';
-				break;
 			case ITEM_VALUE_TYPE_TEXT:
-				$history_table = 'history_text';
-				$order_field = 'id';
-				break;
 			case ITEM_VALUE_TYPE_LOG:
-				$history_table = 'history_log';
 				$order_field = 'id';
 				break;
+			case ITEM_VALUE_TYPE_FLOAT:
+			case ITEM_VALUE_TYPE_UINT64:
 			default:
-				$history_table = 'history_str';
 				$order_field = 'clock';
-				break;
 		}
 
 		$host = get_host_by_itemid($itemid);
@@ -351,51 +337,37 @@ require_once('include/js.inc.php');
 		$table = new CTableInfo();
 		$table->setHeader(array(S_TIMESTAMP,$host['host'].': '.item_description($item)));
 
-		$sql='SELECT h.clock,h.value,i.valuemapid '.
-				' FROM '.$history_table.' h, items i '.
-				' WHERE h.itemid=i.itemid '.
-					' AND i.itemid='.$itemid.
-				' ORDER BY h.'.$order_field.' DESC';
-		$result=DBselect($sql,$elements);
-		while($row=DBfetch($result)){
+		$options = array(
+			'history' => $item['value_type'],
+			'itemids' => $itemid,
+			'output' => API_OUTPUT_EXTEND,
+			'sortorder' => ZBX_SORT_DOWN,
+			'sortfield' => $order_field,
+			'limit' => $elements
+		);
+
+		$hData = CHistory::get($options);
+		foreach($hData as $hnum => $data){
 			switch($item['value_type']){
 				case ITEM_VALUE_TYPE_TEXT:
-					if($DB['TYPE'] == 'ORACLE'){
-						if(!isset($row['value'])){
-							$row['value'] = '';
-						}
-					}
-					/* do not use break */
+/* do not use break */
 				case ITEM_VALUE_TYPE_STR:
-					if($style){
-						$value = new CJSscript($row['value']);
-					}
-					else{
-						$value = htmlspecialchars($row['value']);
-//						$value = zbx_nl2br($value);
-					}
+					if($style) $value = new CJSscript($data['value']);
+					else $value = $data['value'];
 					break;
 				case ITEM_VALUE_TYPE_LOG:
-					if($style){
-						$value = new CJSscript($row['value']);
-					}
-					else{
-						$value = htmlspecialchars($row['value']);
-//						$value = zbx_nl2br($value);
-					}
+					if($style) $value = new CJSscript($data['value']);
+					else $value = $data['value'];
 					break;
 				default:
-					$value = $row['value'];
+					$value = $data['value'];
 					break;
 			}
 
-			if($row['valuemapid'] > 0)
-				$value = replace_value_by_map($value, $row['valuemapid']);
+			if($item['valuemapid'] > 0)
+				$value = replace_value_by_map($value, $item['valuemapid']);
 
-			$pre = new CTag('pre', true);
-			$pre->addItem($value);
-
-			$table->addRow(array(zbx_date2str(S_SCREENS_PLAIN_TEXT_DATE_FORMAT,$row['clock']),	$pre));
+			$table->addRow(array(zbx_date2str(S_SCREENS_PLAIN_TEXT_DATE_FORMAT,$data['clock']),	$value));
 		}
 
 	return $table;
