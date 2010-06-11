@@ -2322,9 +2322,9 @@
 						);
 			}
 
-			$link = new CLink(S_THROW_MAP_SMALL,'config.php?config=6');
+			$link = new CLink(S_SHOW_VALUE_MAPPINGS,'config.php?config=6');
 			$link->setAttribute('target','_blank');
-			$frmItem->addRow(array(S_SHOW_VALUE.SPACE,$link),$cmbMap);
+			$frmItem->addRow(array(S_SHOW_VALUE),array($cmbMap, $link));
 
 		}
 		else{
