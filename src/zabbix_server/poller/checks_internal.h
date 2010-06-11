@@ -24,8 +24,8 @@
 #include "dbcache.h"
 #include "sysinfo.h"
 
-extern int		CONFIG_SERVER_STARTUP_TIME;
+extern int	CONFIG_SERVER_STARTUP_TIME;
 
-extern	int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result);
+int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result);
 
 #endif

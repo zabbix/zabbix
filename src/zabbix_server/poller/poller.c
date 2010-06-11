@@ -57,19 +57,12 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, item->key_orig);
 
-	switch (item->type) {
+	switch (item->type)
+	{
 		case ITEM_TYPE_ZABBIX:
 			alarm(CONFIG_TIMEOUT);
 			res = get_value_agent(item, result);
 			alarm(0);
-
-			if (SUCCEED != res && GET_MSG_RESULT(result))
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "Item [%s:%s] error: %s",
-						item->host.host, item->key_orig, result->msg);
-				zabbix_syslog("Item [%s:%s] error: %s",
-						item->host.host, item->key_orig, result->msg);
-			}
 			break;
 		case ITEM_TYPE_SNMPv1:
 		case ITEM_TYPE_SNMPv2c:
@@ -82,13 +75,6 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			SET_MSG_RESULT(result, strdup("Support of SNMP parameters was not compiled in"));
 			res = NOTSUPPORTED;
 #endif
-			if (SUCCEED != res && GET_MSG_RESULT(result))
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "Item [%s:%s] error: %s",
-						item->host.host, item->key_orig, result->msg);
-				zabbix_syslog("Item [%s:%s] error: %s",
-						item->host.host, item->key_orig, result->msg);
-			}
 			break;
 		case ITEM_TYPE_IPMI:
 #ifdef HAVE_OPENIPMI
@@ -97,13 +83,6 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			SET_MSG_RESULT(result, strdup("Support of IPMI parameters was not compiled in"));
 			res = NOTSUPPORTED;
 #endif
-			if (SUCCEED != res && GET_MSG_RESULT(result))
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "Item [%s:%s] error: %s",
-						item->host.host, item->key_orig, result->msg);
-				zabbix_syslog("Item [%s:%s] error: %s",
-						item->host.host, item->key_orig, result->msg);
-			}
 			break;
 		case ITEM_TYPE_SIMPLE:
 			alarm(CONFIG_TIMEOUT);
@@ -117,38 +96,14 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			alarm(CONFIG_TIMEOUT);
 			res = get_value_db(item, result);
 			alarm(0);
-
-			if (SUCCEED != res && GET_MSG_RESULT(result))
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "Item [%s:%s] error: %s",
-						item->host.host, item->key_orig, result->msg);
-				zabbix_syslog("Item [%s:%s] error: %s",
-						item->host.host, item->key_orig, result->msg);
-			}
 			break;
 		case ITEM_TYPE_AGGREGATE:
 			res = get_value_aggregate(item, result);
-
-			if (SUCCEED != res && GET_MSG_RESULT(result))
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "Item [%s:%s] error: %s",
-						item->host.host, item->key_orig, result->msg);
-				zabbix_syslog("Item [%s:%s] error: %s",
-						item->host.host, item->key_orig, result->msg);
-			}
 			break;
 		case ITEM_TYPE_EXTERNAL:
 			alarm(CONFIG_TIMEOUT);
 			res = get_value_external(item, result);
 			alarm(0);
-
-			if (SUCCEED != res && GET_MSG_RESULT(result))
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "Item [%s:%s] error: %s",
-						item->host.host, item->key_orig, result->msg);
-				zabbix_syslog("Item [%s:%s] error: %s",
-						item->host.host, item->key_orig, result->msg);
-			}
 			break;
 		case ITEM_TYPE_SSH:
 #ifdef HAVE_SSH2
@@ -161,38 +116,14 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			SET_MSG_RESULT(result, strdup("Support of SSH parameters was not compiled in"));
 			res = NOTSUPPORTED;
 #endif	/* HAVE_SSH2 */
-
-			if (SUCCEED != res && GET_MSG_RESULT(result))
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "Item [%s:%s] error: %s",
-						item->host.host, item->key_orig, result->msg);
-				zabbix_syslog("Item [%s:%s] error: %s",
-						item->host.host, item->key_orig, result->msg);
-			}
 			break;
 		case ITEM_TYPE_TELNET:
 			alarm(CONFIG_TIMEOUT);
 			res = get_value_telnet(item, result);
 			alarm(0);
-
-			if (SUCCEED != res && GET_MSG_RESULT(result))
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "Item [%s:%s] error: %s",
-						item->host.host, item->key_orig, result->msg);
-				zabbix_syslog("Item [%s:%s] error: %s",
-						item->host.host, item->key_orig, result->msg);
-			}
 			break;
 		case ITEM_TYPE_CALCULATED:
 			res = get_value_calculated(item, result);
-
-			if (SUCCEED != res && GET_MSG_RESULT(result))
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "Item [%s:%s] error: %s",
-						item->host.host, item->key_orig, result->msg);
-				zabbix_syslog("Item [%s:%s] error: %s",
-						item->host.host, item->key_orig, result->msg);
-			}
 			break;
 		default:
 			zabbix_log(LOG_LEVEL_WARNING, "Not supported item type:%d",
@@ -200,6 +131,14 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			zabbix_syslog("Not supported item type:%d",
 					item->type);
 			res = NOTSUPPORTED;
+	}
+
+	if (SUCCEED != res && GET_MSG_RESULT(result))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Item [%s:%s] error: %s",
+				item->host.host, item->key_orig, result->msg);
+		zabbix_syslog("Item [%s:%s] error: %s",
+				item->host.host, item->key_orig, result->msg);
 	}
 
 	/* remove formatting symbols from the end of the result */
@@ -262,7 +201,7 @@ static void	activate_host(DC_ITEM *item, int now)
 		fld_available = "available";
 		fld_disable_until = "disable_until";
 		fld_error = "error";
-		type = "ZABBIX";
+		type = "Zabbix";
 		break;
 	case ITEM_TYPE_SNMPv1:
 	case ITEM_TYPE_SNMPv2c:
@@ -392,7 +331,7 @@ static void	deactivate_host(DC_ITEM *item, int now, const char *error)
 		fld_available = "available";
 		fld_disable_until = "disable_until";
 		fld_error = "error";
-		type = "ZABBIX";
+		type = "Zabbix";
 		break;
 	case ITEM_TYPE_SNMPv1:
 	case ITEM_TYPE_SNMPv2c:

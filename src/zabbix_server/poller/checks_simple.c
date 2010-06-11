@@ -47,6 +47,7 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 	{
 		if (0 != get_param(item->key, 1, service, MAX_STRING_LEN))
 		{
+			THIS_SHOULD_NEVER_HAPPEN();
 			ret = NOTSUPPORTED;
 		}
 		else if (0 == strcmp(service, "tcp") || 0 == strcmp(service, "tcp_perf"))
@@ -59,21 +60,23 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 	{
 		if (0 != get_param(item->key, 1, service, MAX_STRING_LEN))
 		{
+			THIS_SHOULD_NEVER_HAPPEN();
 			ret = NOTSUPPORTED;
 		}
 		else if (0 != get_param(item->key, 2, port, MAX_STRING_LEN))
 		{
+			THIS_SHOULD_NEVER_HAPPEN();
 			ret = NOTSUPPORTED;
 		}
 		else if (SUCCEED != is_uint(port))
 		{
-			error = zbx_dsprintf(error, "Port number must be numeric in [%s]", item->key);
+			error = zbx_dsprintf(error, "Port number must be numeric");
 			ret = NOTSUPPORTED;
 		}
 	}
 	else
 	{
-		error = zbx_dsprintf(error, "Too many parameters in [%s]", item->key);
+		error = zbx_dsprintf(error, "Too many parameters");
 		ret = NOTSUPPORTED;
 	}
 
@@ -95,17 +98,14 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 		zabbix_log(LOG_LEVEL_DEBUG, "Transformed [%s] into [%s]", item->key, check);
 	}
 
-	if (SUCCEED == ret && NOTSUPPORTED == process(check, 0, result))
-	{
-		error = zbx_dsprintf(error, "Simple check [%s] is not supported", item->key);
+	if (SUCCEED == ret && SUCCEED != process(check, 0, result))
 		ret = NOTSUPPORTED;
-	}
+
+	if (NOTSUPPORTED == ret && NULL == error)
+		error = zbx_dsprintf(error, "Simple check is not supported");
 
 	if (NOTSUPPORTED == ret)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 		SET_MSG_RESULT(result, error);
-	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 

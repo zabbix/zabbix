@@ -26,7 +26,7 @@
  *                                                                            *
  * Function: get_value_agent                                                  *
  *                                                                            *
- * Purpose: retrieve data from ZABBIX agent                                   *
+ * Purpose: retrieve data from Zabbix agent                                   *
  *                                                                            *
  * Parameters: item - item we are interested in                               *
  *                                                                            *

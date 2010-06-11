@@ -333,10 +333,10 @@ json_error:
  *                                                                            *
  * Function: refresh_active_checks                                            *
  *                                                                            *
- * Purpose: Retrieve from ZABBIX server list of active checks                 *
+ * Purpose: Retrieve from Zabbix server list of active checks                 *
  *                                                                            *
- * Parameters: host - IP or Hostname of ZABBIX server                         *
- *             port - port of ZABBIX server                                   *
+ * Parameters: host - IP or Hostname of Zabbix server                         *
+ *             port - port of Zabbix server                                   *
  *                                                                            *
  * Return value: returns SUCCEED on successful parsing,                       *
  *               FAIL on other cases                                          *
@@ -442,9 +442,9 @@ static int	check_response(char *response)
  *                                                                            *
  * Function: send_buffer                                                      *
  *                                                                            *
- * Purpose: Send value stored in the buffer to ZABBIX server                  *
+ * Purpose: Send value stored in the buffer to Zabbix server                  *
  *                                                                            *
- * Parameters: host - IP or Hostname of ZABBIX server                         *
+ * Parameters: host - IP or Hostname of Zabbix server                         *
  *             port - port number                                             *
  *                                                                            *
  * Return value: returns SUCCEED on successful parsing,                       *
@@ -577,9 +577,9 @@ ret:
  *                                                                            *
  * Purpose: Buffer new value or send the whole buffer to the server           *
  *                                                                            *
- * Parameters: host - IP or Hostname of ZABBIX server                         *
- *             port - port of ZABBIX server                                   *
- *             hostname - name of host in ZABBIX database                     *
+ * Parameters: host - IP or Hostname of Zabbix server                         *
+ *             port - port of Zabbix server                                   *
+ *             hostname - name of host in Zabbix database                     *
  *             key - name of metric                                           *
  *             value - string version os key value                            *
  *             lastlogsize - size of read logfile                             *
@@ -811,7 +811,7 @@ static void	process_active_checks(char *server, unsigned short port)
 					else
 						lastlogsize = active_metrics[i].lastlogsize;
 
-					/* do not flood ZABBIX server if file grows too fast */
+					/* do not flood Zabbix server if file grows too fast */
 					if (s_count >= (maxlines_persec * active_metrics[i].refresh))
 						break;
 
@@ -912,7 +912,7 @@ static void	process_active_checks(char *server, unsigned short port)
 						mtime = active_metrics[i].mtime;
 					}
 
-					/* Do not flood ZABBIX server if file grows too fast */
+					/* Do not flood Zabbix server if file grows too fast */
 					if (s_count >= (maxlines_persec * active_metrics[i].refresh))
 						break;
 
@@ -1054,7 +1054,7 @@ static void	process_active_checks(char *server, unsigned short port)
 					else
 						lastlogsize = active_metrics[i].lastlogsize;
 
-					/* Do not flood ZABBIX server if file grows too fast */
+					/* Do not flood Zabbix server if file grows too fast */
 					if (s_count >= (maxlines_persec * active_metrics[i].refresh))
 						break;
 
