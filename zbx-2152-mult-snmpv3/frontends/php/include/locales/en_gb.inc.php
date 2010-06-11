@@ -2056,7 +2056,7 @@
 	'S_DELETE_SELECTED_USER_Q'=>		'Delete selected user?',
 	'S_SUBFILTER'=>				'Subfilter',
 	'S_AFFECTS_ONLY_FILTERED_DATA_SMALL'=>	'affects only filtered data!',
-	'S_THROW_MAP_SMALL'=>			'throw map',
+	'S_SHOW_VALUE_MAPPINGS'=>			'show value mappings',
 	'S_DELETE_SELECTED_ITEM_Q'=>		'Delete selected item?',
 	'S_DO_SMALL'=>				'do',
 	'S_INCORRECT_LIST_OF_ITEMS'=>		'Incorrect list of items.',
@@ -2277,6 +2277,8 @@
 	'S_REQUIRES_CTYPE_MODULE' => 'Requires ctype module',
 	'S_PHP_UPLOAD_MAX_FILESIZE' => 'PHP upload max filesize',
 	'S_IS_MINIMAL_FOR_PHP_ULOAD_FILESIZE_SMALL' => 'is minimum for PHP upload filesize',
+	'S_SESSION_MODULE' => 'PHP Session',
+	'S_REQUIRED_SESSION_MODULE' => 'Required Session module',
 
 //	class.cuser.php
 	'S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_MINUTES'=>	'Account is blocked for %s seconds',

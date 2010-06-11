@@ -92,7 +92,7 @@ table.page_footer tr td.page_footer_r{
 table.formtable {
 	background-color: #FFFFFF;
 	color: #000000;
-	border: 0 solid #000000;
+	border: 1px solid #AAAAAA;
 	width: 50%;
 	margin: auto;
 }
@@ -101,32 +101,29 @@ table.formtable tr td {
 	padding-left: 5px;
 	padding-right: 5px;
 	color: #000000;
-	font-family:verdana, arial, helvetica, sans-serif;
-	font-size:10px;
-	border-width: 1px;
+	font-family: verdana, arial, helvetica, sans-serif;
+	font-size: 10px;
 	height: 24px;
 	white-space: nowrap;
 	word-spacing: 0;
+	text-align: left;
+	text-decoration: none;
 }
 
 table.formtable tr.new {
-	text-decoration: none;
 	background-color: #E0F0E0;
 }
 
 table.formtable tr.edit {
-	text-decoration: none;
 	background-color: #F0F0E0;
 }
 
 table.formtable tr.form_odd_row td{
-	text-decoration: none;
-	background-color:#D8D8D8;
+	background-color: #D8D8D8;
 }
 
 table.formtable tr.form_even_row td{
-	text-decoration: none;
-	background-color:#DFDFDF;
+	background-color: #DFDFDF;
 }
 
 table.formtable tr td.form_row_first{
@@ -134,37 +131,24 @@ table.formtable tr td.form_row_first{
 	color: #FFFFFF;
 	font-size:11px;
 	font-weight: bold;
-	border: solid #AAAAAA;
-	text-align: left;
 }
 
 table.formtable tr td.form_row_last {
 	color: #FFFFFF;
 	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;
-	border: solid #AAAAAA;
 	text-align: right;
 }
 
-table.formtable tr td.form_row_l { /* left cell */
-	border: none #AAAAAA;
-	border-left-style: solid;
-	text-align: left;
-	white-space: nowrap;
-	word-spacing: 0;
+/* left cell */
+table.formtable tr td.form_row_l { 
 	width: 30%;
 }
-table.formtable tr td.form_row_c { /* center cell */
-	border: none #AAAAAA;
-	border-right-style: solid;
-	border-left-style: solid;
-	color: inherit;
+/* center cell */
+table.formtable tr td.form_row_c { 
 	text-align: center;
 }
-table.formtable tr td.form_row_r { /* right cell */
-	border: none #AAAAAA;
-	border-right-style: solid;
-	text-align: left;
-}
+/* right cell */
+table.formtable tr td.form_row_r { }
 
 table.formtable tr td.form_row_r table.calendar tr td{ /* right cell */
 	padding-left: 1px;
@@ -367,7 +351,7 @@ table.tableinfo tr td {
 	border-width: 0;
 	padding-top: 0;
 	padding-bottom: 0;
-	height: 20px;
+	height: 22px;
 }
 
 table.tableinfo tr.header td {
@@ -572,45 +556,6 @@ table.flicker a{
 	color: #0BF;
 }
 
-/****** THIN HEADER *********/
-table.thin_header{
-	width: 100%;
-	color: #FFFFFF;
-	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;
-	background-color: #6d88ad;
-	border: 0px #000000 solid;
-	vertical-align:middle;
-}
-
-table.thin_header tr td.thin_header_c{
-	font-family:verdana, arial, helvetica, sans-serif;
-	font-size:10px;
-	height: 16px;
-	padding-left: 4px;
-	padding-right: 4px;
-	line-height: 12px;
-}
-
-table.thin_header tr td.thin_header_l{
-	font-family:verdana, arial, helvetica, sans-serif;
-	font-size:10px;
-	text-align: left;
-	height: 16px;
-	padding-left: 4px;
-	line-height: 12px;
-}
-table.thin_header tr td.thin_header_r{
-	font-family:verdana, arial, helvetica, sans-serif;
-	font-size:10px;
-	text-align: right;
-	height: 16px;
-	padding-right: 4px;
-	line-height: 12px;
-}
-
-table.thin_header a{
-	color: #0BF;
-}
 /**************** Aknowledges ****************/
 
 table.ack_msgs{

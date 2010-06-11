@@ -28,6 +28,7 @@ typedef struct zbx_snmp_index_s
 	char	*value;
 	int	index;
 } zbx_snmp_index_t;
+
 static zbx_snmp_index_t	*snmpidx = NULL;
 static int		snmpidx_count = 0, snmpidx_alloc = 16;
 
@@ -87,16 +88,7 @@ end:
 	return index;
 }
 
-/******************************************************************************
- * Function: cache_put_snmp_index                                             *
- *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value: -                                                            *
- ******************************************************************************/
-static int cache_get_snmp_index(const char *oid, const char *value, int *index)
+static int	cache_get_snmp_index(const char *oid, const char *value, int *index)
 {
 	const char	*__function_name = "cache_get_snmp_index";
 	int		i, res = FAIL;
@@ -126,16 +118,7 @@ end:
 	return res;
 }
 
-/******************************************************************************
- * Function: cache_put_snmp_index                                             *
- *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value: -                                                            *
- ******************************************************************************/
-static void cache_put_snmp_index(const char *oid, const char *value, int index)
+static void	cache_put_snmp_index(const char *oid, const char *value, int index)
 {
 	const char	*__function_name = "cache_put_snmp_index";
 	int		i;
@@ -171,16 +154,7 @@ end:
 			__function_name);
 }
 
-/******************************************************************************
- * Function: cache_del_snmp_index                                             *
- *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value: -                                                            *
- ******************************************************************************/
-static void cache_del_snmp_index(const char *oid, const char *value)
+static void	cache_del_snmp_index(const char *oid, const char *value)
 {
 	const char	*__function_name = "cache_del_snmp_index";
 	int		i;
@@ -211,15 +185,6 @@ end:
 			__function_name);
 }
 
-/******************************************************************************
- * Function: snmp_open_session                                                *
- *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value: -                                                            *
- ******************************************************************************/
 static struct snmp_session	*snmp_open_session(DC_ITEM *item, char *err)
 {
 	const char		*__function_name = "snmp_open_session";

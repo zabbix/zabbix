@@ -586,7 +586,7 @@ int	DBupdate_trigger_value(zbx_uint64_t triggerid, int trigger_type, int trigger
 	return ret;
 }
 
-void  DBdelete_service(zbx_uint64_t serviceid)
+void	DBdelete_service(zbx_uint64_t serviceid)
 {
 	DBexecute("delete from services_links where servicedownid=" ZBX_FS_UI64 " or serviceupid=" ZBX_FS_UI64,
 		serviceid,
@@ -595,7 +595,7 @@ void  DBdelete_service(zbx_uint64_t serviceid)
 		serviceid);
 }
 
-void  DBdelete_services_by_triggerid(zbx_uint64_t triggerid)
+void	DBdelete_services_by_triggerid(zbx_uint64_t triggerid)
 {
 	zbx_uint64_t	serviceid;
 	DB_RESULT	result;
@@ -617,7 +617,7 @@ void  DBdelete_services_by_triggerid(zbx_uint64_t triggerid)
 		triggerid);
 }
 
-void  DBdelete_trigger(zbx_uint64_t triggerid)
+void	DBdelete_trigger(zbx_uint64_t triggerid)
 {
 	DBexecute("delete from trigger_depends where triggerid_down=" ZBX_FS_UI64 " or triggerid_up=" ZBX_FS_UI64,
 		triggerid,
@@ -634,7 +634,7 @@ void  DBdelete_trigger(zbx_uint64_t triggerid)
 	DBexecute("delete from triggers where triggerid=" ZBX_FS_UI64,triggerid);
 }
 
-void DBupdate_triggers_status_after_restart(void)
+void	DBupdate_triggers_status_after_restart(void)
 {
 	const char	*__function_name = "DBupdate_triggers_after_restart";
 	DB_RESULT	result;
@@ -697,7 +697,7 @@ void DBupdate_triggers_status_after_restart(void)
 				lastclock = atoi(row2[2]);
 			delay = atoi(row2[3]);
 
-			nextcheck = calculate_item_nextcheck(itemid, type, delay, row2[4], lastclock);
+			nextcheck = calculate_item_nextcheck(itemid, type, delay, row2[4], lastclock, NULL);
 			if (-1 == min_nextcheck || nextcheck < min_nextcheck)
 				min_nextcheck = nextcheck;
 		}
@@ -886,8 +886,8 @@ int	DBget_queue_count(int from, int to)
 	int		count = 0, now;
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	itemid;
-	int		item_type, delay, nextcheck;
+	zbx_uint64_t	itemid, proxy_hostid;
+	int		item_type, delay, effective_delay, nextcheck;
 	char		*delay_flex;
 	time_t		lastclock;
 
@@ -896,10 +896,9 @@ int	DBget_queue_count(int from, int to)
 	now = time(NULL);
 
 	result = DBselect(
-			"select i.itemid,i.type,i.delay,i.delay_flex,i.lastclock"
+			"select i.itemid,i.type,i.delay,i.delay_flex,i.lastclock,h.proxy_hostid"
 			" from items i,hosts h"
 			" where i.hostid=h.hostid"
-				" and h.proxy_hostid=0"
 				" and h.status=%d"
 				" and i.status=%d"
 				" and i.value_type not in (%d)"
@@ -909,7 +908,7 @@ int	DBget_queue_count(int from, int to)
 					" and i.lastclock<%d"
 					")"
 				" and ("
-					"i.type in (%d,%d,%d,%d,%d,%d,%d)"
+					"i.type in (%d,%d,%d,%d,%d,%d,%d,%d)"
 					" or (h.available<>%d and i.type in (%d))"
 					" or (h.snmp_available<>%d and i.type in (%d,%d,%d))"
 					" or (h.ipmi_available<>%d and i.type in (%d))"
@@ -921,7 +920,7 @@ int	DBget_queue_count(int from, int to)
 			SERVER_STATUS_KEY, SERVER_ZABBIXLOG_KEY,
 			now - from,
 				ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SIMPLE,
-				ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL,
+				ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_CALCULATED,
 			HOST_AVAILABLE_FALSE,
 				ITEM_TYPE_ZABBIX,
 			HOST_AVAILABLE_FALSE,
@@ -935,11 +934,14 @@ int	DBget_queue_count(int from, int to)
 		item_type	= atoi(row[1]);
 		delay		= atoi(row[2]);
 		delay_flex	= row[3];
+		ZBX_STR2UINT64(proxy_hostid, row[5]);
 
 		if (FAIL == (lastclock = DCget_item_lastclock(itemid)))
 			lastclock = (time_t)atoi(row[4]);
 
-		nextcheck = calculate_item_nextcheck(itemid, item_type, delay, delay_flex, lastclock);
+		nextcheck = calculate_item_nextcheck(itemid, item_type, delay, delay_flex, lastclock, &effective_delay);
+		if (0 != proxy_hostid)
+			nextcheck = lastclock + effective_delay;
 
 		if ((-1 == from || from <= now - nextcheck) && (-1 == to || now - nextcheck <= to))
 			count++;

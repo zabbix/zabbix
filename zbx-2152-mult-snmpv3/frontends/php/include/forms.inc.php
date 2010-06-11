@@ -1565,8 +1565,9 @@
 // } FORM FOR FILTER DISPLAY
 
 // SUBFILTERS {
-		$header = get_thin_table_header(S_SUBFILTER.SPACE.'['.S_AFFECTS_ONLY_FILTERED_DATA_SMALL.']');
-		$form->addItem($header);
+		$h = new CDiv(S_SUBFILTER.SPACE.'['.S_AFFECTS_ONLY_FILTERED_DATA_SMALL.']');
+		$h->setClass('thin_header');
+		$form->addItem($h);
 		$table_subfilter = new Ctable();
 		$table_subfilter->setClass('filter');
 
@@ -2321,9 +2322,9 @@
 						);
 			}
 
-			$link = new CLink(S_THROW_MAP_SMALL,'config.php?config=6');
+			$link = new CLink(S_SHOW_VALUE_MAPPINGS,'config.php?config=6');
 			$link->setAttribute('target','_blank');
-			$frmItem->addRow(array(S_SHOW_VALUE.SPACE,$link),$cmbMap);
+			$frmItem->addRow(array(S_SHOW_VALUE),array($cmbMap, SPACE, $link));
 
 		}
 		else{
@@ -5136,8 +5137,6 @@
 
 
 // MACROS WIDGET {
-		// $macros_wdgt = new CWidget();
-		// $macros_wdgt->addItem(get_macros_widget($_REQUEST['hostid']));
 		$macros_wdgt = get_macros_widget($_REQUEST['hostid']);
 // } MACROS WIDGET
 
@@ -5965,14 +5964,8 @@
 			$macros = array(0 => array('macro' => '', 'value' => ''));
 		}
 
-		$macros_tbl = new CTable(SPACE, 'tablestripped');
-		$hcol = new CCol(S_MACROS);
-		$hcol->setColspan(4);
-		$macros_tbl->setHeader($hcol);
+		$macros_tbl = new CTable(SPACE, 'formElementTable');
 		$macros_tbl->setAttribute('id', 'tbl_macros');
-		$macros_tbl->setOddRowClass('form_odd_row');
-		$macros_tbl->setEvenRowClass('form_even_row');
-
 		$macros_tbl->addRow(array(SPACE, S_MACRO, SPACE, S_VALUE));
 
 		insert_js('
@@ -6000,7 +5993,7 @@
 				text1.setAttribute("type", "text");
 				text1.setAttribute("name", "macros["+addMacroRow.macro_count+"][macro]");
 				text1.className = "biginput";
-				text1.setAttribute("size",40);
+				text1.setAttribute("size",30);
 				text1.setAttribute("placeholder","{$MACRO}");
 				td2.appendChild(text1);
 				td2.appendChild(document.createTextNode(" "));
@@ -6031,7 +6024,7 @@
 
 		$macros = array_values($macros);
 		foreach($macros as $macroid => $macro){
-			$text1 = new CTextBox('macros['.$macroid.'][macro]', $macro['macro'], 40);
+			$text1 = new CTextBox('macros['.$macroid.'][macro]', $macro['macro'], 30);
 			$text1->setAttribute('placeholder', '{$MACRO}');
 			$text2 = new CTextBox('macros['.$macroid.'][value]', $macro['value'], 40);
 			$text2->setAttribute('placeholder', '<'.S_VALUE.'>');
@@ -6051,18 +6044,19 @@
 
 		$buttonRow = new CRow();
 		$buttonRow->setAttribute('id', 'row_new_macro');
+
 		$col = new CCol(array($add_button, SPACE, $delete_btn));
 		$col->setAttribute('colspan', 4);
 		$buttonRow->addItem($col);
 		$macros_tbl->addRow($buttonRow);
 
+		$footer = null;
 		if($hostid === null){
-			$fcol = new CCol(new CButton('save', S_SAVE));
-			$fcol->setColspan(4);
-			$macros_tbl->setFooter($fcol);
+			$footer = array(new CButton('save', S_SAVE));
 		}
 
-		return $macros_tbl;
+		return new CFormElement(S_MACROS, $macros_tbl, $footer); 
+
 	}
 
 ?>
