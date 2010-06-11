@@ -85,26 +85,14 @@ table.page_footer{
 	border-top-style: solid;
 }
 
+table.formtable {
+	border-color: #222222;
+}
 table.formtable tr td.form_row_first{
 	background: #5C7099 url('../images/gradients/table_head2_bb.gif') repeat-x top left;
-	border-color: #222222;
 }
-
 table.formtable tr td.form_row_last {
 	background: #5C7099 url('../images/gradients/table_head2_bb.gif') repeat-x top left;
-	border-color: #222222;
-}
-
-table.formtable tr td.form_row_l { /* left cell */
-	border-color: #222222;
-}
-
-table.formtable tr td.form_row_c { /* center cell */
-	border-color: #222222;
-}
-
-table.formtable tr td.form_row_r { /* right cell */
-	border-color: #222222;
 }
 
 td.form_row_l_simple { /* left cell simple */
@@ -175,10 +163,6 @@ table.header tr td.header_l{
 table.header tr td.header_r{
 	color: #EAEAEA;
 	height: 24px;
-}
-
-table.thin_header{
-	background: #5C7099 url('../images/gradients/table_head2_bb.gif') repeat-x top left;
 }
 
 table.flicker{
@@ -298,6 +282,20 @@ table.infobox a:active 		{	color:#22CCFF;	 }
 /*----------*/
 
 /*////////////////	DIVS	////////////////////*/
+
+div.formElement_header{
+	background: #5C7099 url('../images/gradients/table_head2_bb.gif') repeat-x top left;
+}
+div.formElement_body{
+	border: 1px solid #222222;
+}
+div.formElement_footer{
+	background: #5C7099 url('../images/gradients/table_head2_bb.gif') repeat-x top left;
+}
+
+div.thin_header{
+	background: #5C7099 url('../images/gradients/table_head2_bb.gif') repeat-x top left;
+}
 
 div.zabbix_logo{
 	height: 31px;

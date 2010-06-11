@@ -635,7 +635,7 @@ else {
 			foreach($var as $vnum => $value) $var[$vnum] = "'".addslashes($value)."'";
 			return $var;
 		}
-		
+
 	return "'".addslashes($var)."'";
 	}
 
@@ -810,7 +810,7 @@ else {
 
 		$distinct_tables = array(
 			'hosts_groups', 'hosts_templates',
-			'functions', 'graphs_items', 'screens_items', 'slides', 
+			'functions', 'graphs_items', 'screens_items', 'slides',
 			'httpstepitem', 'items_applications',
 			'maintenances_hosts', 'maintenances_groups',
 			'sysmaps_elements', 'sysmaps_link_triggers',
@@ -890,20 +890,17 @@ else {
 		}
 
 		protected static function reserveIds($table, $count){
-			global $DB, $ZBX_LOCALNODEID;
+			global $ZBX_LOCALNODEID;
 
 			$nodeid = get_current_nodeid(false);
 			$id_name = self::getSchema($table);
 			$id_name = $id_name['key'];
 
-			$min=bcadd(bcmul($nodeid,'100000000000000'), bcmul($ZBX_LOCALNODEID,'100000000000'));
-			$max=bcadd(bcadd(bcmul($nodeid,'100000000000000'), bcmul($ZBX_LOCALNODEID,'100000000000')),'99999999999');
-			
-			$sql = 'SELECT nextid '.
-					' FROM ids '.
-					' WHERE nodeid='.$nodeid.
-						' AND table_name='.zbx_dbstr($table).
-						' AND field_name='.zbx_dbstr($id_name);
+			$min = bcadd(bcmul($nodeid,'100000000000000'), bcmul($ZBX_LOCALNODEID,'100000000000'));
+			$max = bcadd(bcadd(bcmul($nodeid,'100000000000000'), bcmul($ZBX_LOCALNODEID,'100000000000')),'99999999999');
+
+			$sql = 'SELECT nextid FROM ids WHERE nodeid='.$nodeid .'
+				AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($id_name);
 			$res = DBfetch(DBselect($sql));
 			if($res){
 				$nextid = $res['nextid']+1;
@@ -911,15 +908,21 @@ else {
 				if((bccomp($nextid, $max) == 1) || (bccomp($nextid, $min) == -1))
 					self::exception(self::RESERVEIDS_ERROR, __METHOD__.' ID out of range');
 
-				$sql = 'UPDATE ids SET nextid=nextid+'.$count.
-						' WHERE nodeid='.$nodeid.
-							' AND table_name='.zbx_dbstr($table).
-							' AND field_name='.zbx_dbstr($id_name);
+				$sql = 'UPDATE ids SET nextid=nextid+'.$count.' WHERE nodeid='.$nodeid.
+					' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($id_name);
 				if(!DBexecute($sql)) self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
 			}
 			else{
+				$sql = 'SELECT max('.$id_name.') AS id'.
+						' FROM '.$table.
+						' WHERE '.$id_name.'>='.$min.
+							' AND '.$id_name.'<='.$max;
+				$row = DBfetch(DBselect($sql));
+
+				$nextid = (!$row || is_null($row['id'])) ? $min : $row['id'];
 				$sql = 'INSERT INTO ids (nodeid,table_name,field_name,nextid) '.
-						' VALUES ('.$nodeid.','.zbx_dbstr($table).','.zbx_dbstr($id_name).','.$min.')';
+					' VALUES ('.$nodeid.','.zbx_dbstr($table).','.zbx_dbstr($id_name).','.($nextid + $count).')';
+
 				if(!DBexecute($sql)) self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
 			}
 
@@ -955,6 +958,8 @@ else {
 
 			foreach($values as $key => $row){
 				$result_ids[$key] = $id;
+				
+				unset($row[$table_schema['key']]);
 
 				foreach($row as $field => $v){
 					if(!isset($table_schema['fields'][$field])){
@@ -963,9 +968,8 @@ else {
 					else if($table_schema['fields'][$field] == self::FIELD_TYPE_STR){
 						$row[$field] = zbx_dbstr($v);
 					}
-
 				}
-				
+
 				$sql = 'INSERT INTO '.$table.' ('.$table_schema['key'].','.implode(',',array_keys($row)).')'.
 					' VALUES ('.$id++.','.implode(',',array_values($row)).')';
 				if(!DBexecute($sql)) self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
@@ -984,7 +988,7 @@ else {
  */
 		public static function update($table, $data){
 			if(empty($data)) return true;
-			
+
 			$data = zbx_toArray($data);
 			$table_schema = self::getSchema($table);
 

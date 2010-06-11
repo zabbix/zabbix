@@ -1,10 +1,10 @@
 /* CSS Document */
 table{
-	border-spacing:	0px; /* cellspacing */
+	border-spacing:	0; /* cellspacing */
 }
 
 table.whitetext {
-	border-spacing:	0px; /* cellspacing */
+	border-spacing:	0; /* cellspacing */
 	color: #CCCCCC;
 }
 
@@ -14,8 +14,8 @@ table.home{
 }
 
 table.nowrap tr td {
-	white-space:	nowrap;
-	word-spacing:	0px;
+	white-space: nowrap;
+	word-spacing: 0;
 }
 
 td,tr{
@@ -45,20 +45,15 @@ td.top{
 /* page_header */
 table.page_header{
 	background-color: #FFFFFF;
-	border-color: #000000;
-	border-width:0px;
-	border-top-style: solid;
-	border-left-style: solid;
-	border-right-style: solid;
-	border-bottom-style: solid;
-	padding-right: 0px;
-	padding-left: 0px;
+	border: 0 solid #000000;
+	padding-right: 0;
+	padding-left: 0;
 	width: 100%;
 }
 
 table.page_header tr td.page_header_l{
 	vertical-align: middle;
-	padding: 0px;
+	padding: 0;
 }
 
 table.page_header tr td.page_header_r{
@@ -72,11 +67,8 @@ table.page_header tr td.page_header_r{
 table.page_footer{
 	color: #FFFFFF;
 	background: #5C7099 url('../images/gradients/table_head.gif') repeat-x top left;
-	border-color: #000000;
 	font-weight: bold;
-
-	border-color: 	#E5E5E5;
-
+	border-color: #E5E5E5;
 	border-top-width: 17px;
 	border-top-style: solid;
 	width: 100%;
@@ -100,7 +92,7 @@ table.page_footer tr td.page_footer_r{
 table.formtable {
 	background-color: #FFFFFF;
 	color: #000000;
-	border: 0px solid #000000;
+	border: 1px solid #AAAAAA;
 	width: 50%;
 	margin: auto;
 }
@@ -109,32 +101,29 @@ table.formtable tr td {
 	padding-left: 5px;
 	padding-right: 5px;
 	color: #000000;
-	font-family:verdana, arial, helvetica, sans-serif;
-	font-size:10px;
-	border-width: 1px;
+	font-family: verdana, arial, helvetica, sans-serif;
+	font-size: 10px;
 	height: 24px;
 	white-space: nowrap;
-	word-spacing:	0px;
+	word-spacing: 0;
+	text-align: left;
+	text-decoration: none;
 }
 
 table.formtable tr.new {
-	text-decoration: none;
 	background-color: #E0F0E0;
 }
 
 table.formtable tr.edit {
-	text-decoration: none;
 	background-color: #F0F0E0;
 }
 
 table.formtable tr.form_odd_row td{
-	text-decoration: none;
-	background-color:#D8D8D8;
+	background-color: #D8D8D8;
 }
 
 table.formtable tr.form_even_row td{
-	text-decoration: none;
-	background-color:#DFDFDF;
+	background-color: #DFDFDF;
 }
 
 table.formtable tr td.form_row_first{
@@ -142,53 +131,24 @@ table.formtable tr td.form_row_first{
 	color: #FFFFFF;
 	font-size:11px;
 	font-weight: bold;
-	border-top-style: solid;
-	border-left-style: solid;
-	border-right-style: solid;
-	border-bottom-style: solid;
-	border-color: #AAAAAA;
-	text-align: left;
 }
 
 table.formtable tr td.form_row_last {
 	color: #FFFFFF;
 	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;
-	border-top-style: solid;
-	border-left-style: solid;
-	border-right-style: solid;
-	border-bottom-style: solid;
-	border-color: #AAAAAA;
 	text-align: right;
 }
 
-table.formtable tr td.form_row_l { /* left cell */
-	border-left-style:	solid;
-	border-top-style:	none;
-	border-right-style:	none;
-	border-bottom-style:	none;
-	border-color:		#AAAAAA;
-	text-align:		left;
-	white-space:		nowrap;
-	word-spacing:		0px;
-	width:			30%;
+/* left cell */
+table.formtable tr td.form_row_l { 
+	width: 30%;
 }
-table.formtable tr td.form_row_c { /* center cell */
-	border-right-style: solid;
-	border-left-style: solid;
-	border-top-style: none;
-	border-bottom-style: none;
-	border-color: #AAAAAA;
-	color: inherit;
+/* center cell */
+table.formtable tr td.form_row_c { 
 	text-align: center;
 }
-table.formtable tr td.form_row_r { /* right cell */
-	border-right-style: solid;
-	border-top-style: none;
-	border-left-style: none;
-	border-bottom-style: none;
-	border-color: #AAAAAA;
-	text-align: left;
-}
+/* right cell */
+table.formtable tr td.form_row_r { }
 
 table.formtable tr td.form_row_r table.calendar tr td{ /* right cell */
 	padding-left: 1px;
@@ -222,7 +182,7 @@ table.tablestripped tr td {
 	font-size:10px;
 	height: 24px;
 	white-space: nowrap;
-	word-spacing: 0px;
+	word-spacing: 0;
 }
 
 table.tablestripped tr.form_odd_row td{
@@ -248,11 +208,11 @@ table.tablestripped tr.footer td{
 /*----------------- </TABLESTRIPPED> ----------------*/
 
 td.form_row_l_simple { /* left cell simple */
-	border-color:	#AAAAAA;
+	border-color: #AAAAAA;
 	text-align:	left;
-	white-space:	nowrap;
-	word-spacing:	0px;
-	width:		50%;
+	white-space: nowrap;
+	word-spacing: 0;
+	width: 50%;
 }
 
 td.form_row_r_simple { /* right cell simple */
@@ -287,7 +247,7 @@ table.log_history_table tr.header td {
 	padding-right: 5px;
 	padding-left: 5px;
 	white-space: nowrap;
-	word-spacing:	0px;
+	word-spacing: 0;
 	text-align: left;
 	font-weight: bold;
 	background-color:#CCCCCC;
@@ -348,7 +308,7 @@ table.screen_view td{
 }
 
 table.screen_view iframe {
-	border: 0px;
+	border: 0;
 }
 
 table.screen_view tr td.def_def {	text-align: center;	vertical-align: middle;		}
@@ -377,37 +337,37 @@ table.tableinfo{
 	width: 100%;
 	background-color: #AAAAAA;
 	border-spacing: 1px;
-	
+
 /*	border: 1px #AAAAAA dotted; */
 }
 
 table.tableinfo tr td {
 	white-space: nowrap;
-	word-spacing:	0px;
+	word-spacing:	0;
 	font-family:verdana, arial, helvetica, sans-serif;
 	font-size:8pt;
 	text-decoration: none;
 	text-align: left;
-	border-width: 0px;
-	padding-top: 0px;
-	padding-bottom: 0px;
-	height: 20px;
+	border-width: 0;
+	padding-top: 0;
+	padding-bottom: 0;
+	height: 22px;
 }
 
 table.tableinfo tr.header td {
 	white-space: nowrap;
-	word-spacing:	0px;
+	word-spacing: 0;
 	font-weight: bold;
 	background-color:#CCCCCC;
-	border-width: 0px;
+	border-width: 0;
 }
 
 table.tableinfo tr.header td.hover_grey {
 	white-space: nowrap;
-	word-spacing:	0px;
+	word-spacing: 0;
 	font-weight: bold;
 	background-color:#CCCCCC;
-	border-width: 0px;
+	border-width: 0;
 	cursor: pointer;
 }
 
@@ -417,13 +377,10 @@ table.tableinfo tr.header td.hover_grey:hover {
 }
 
 table.tableinfo tr.vertical_header td {
-	padding-left: 0px;
-	padding-right: 0px;
-	padding-top: 5px;
-	padding-bottom: 5px;
-	margin: 0px;
+	padding: 5px 0;
+	margin: 0;
 	white-space: nowrap;
-	word-spacing:	0px;
+	word-spacing: 0;
 	font-weight: bold;
 	background-color:#CCCCCC;
 	vertical-align:text-top;
@@ -457,24 +414,25 @@ table.tableinfo tr td.message {
 	text-align: center;
 }
 
-table.tableinfo tr.selected td			{	background-color: #FFFFBB; border: 1px #DDDDDD solid; }
+table.tableinfo tr.selected { background-color: #FFFFBB; }
+table.tableinfo tr.selected:hover { background-color: #BBCCFF; }
 
-table.tableinfo tr.odd_row 	td			{	background-color: #DDDDDD; border: 1px #DDDDDD solid; }
-table.tableinfo tr.odd_row:hover td		{	background-color: #BBCCFF; border: 1px #BBCCFF solid; }
+table.tableinfo tr.odd_row { background-color: #DDDDDD; }
+table.tableinfo tr.odd_row:hover { background-color: #BBCCFF; }
 
-table.tableinfo tr.even_row td		 	{	background-color: #EEEEEE; border: 1px #EEEEEE solid; }
-table.tableinfo tr.even_row:hover td		{	background-color: #BBCCFF; border: 1px #BBCCFF solid; }
+table.tableinfo tr.even_row { background-color: #EEEEEE; }
+table.tableinfo tr.even_row:hover { background-color: #BBCCFF; }
 
-table.tableinfo tr td.center				{	vertical-align: middle; text-align: center; }
+table.tableinfo tr td.center { vertical-align: middle; text-align: center; }
 
-table.tableinfo tr td.disaster_empty			{	border: 1px #FF0000 solid; }
-table.tableinfo tr:hover td.disaster_empty		{	border: 1px #FF0000 solid; }
+table.tableinfo tr td.disaster_empty { border: 1px #FF0000 solid; }
+table.tableinfo tr:hover td.disaster_empty { border: 1px #FF0000 solid; }
 
-table.tableinfo tr td.disaster				{	background-color: #FF0000;	border: 1px #FF0000 solid; }
-table.tableinfo tr:hover td.disaster			{	background-color: #FA0000;	border: 1px #FA0000 solid; }
+table.tableinfo tr td.disaster { background-color: #FF0000;	border: 1px #FF0000 solid; }
+table.tableinfo tr:hover td.disaster { background-color: #FA0000;	border: 1px #FA0000 solid; }
 
-table.tableinfo tr td.high_empty			{	border: 1px #FF8888 solid; }
-table.tableinfo tr:hover td.high_empty			{	border: 1px #FF8888 solid; }
+table.tableinfo tr td.high_empty { border: 1px #FF8888 solid; }
+table.tableinfo tr:hover td.high_empty { border: 1px #FF8888 solid; }
 
 table.tableinfo tr td.high				{	background-color: #FF8888;	border: 1px #FF8888 solid; }
 table.tableinfo tr:hover td.high			{	background-color: #FA8388;	border: 1px #FA8388 solid; }
@@ -528,12 +486,7 @@ table.header{
 	color: #FFFFFF;
 	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;
 	background-color: #6d88ad;
-	border-color: #000000;
-	border-width:0px;
-	border-top-style: solid;
-	border-left-style: solid;
-	border-right-style: solid;
-	border-bottom-style: solid;
+	border: 0 solid #000000;
 	vertical-align: middle;
 }
 
@@ -544,7 +497,7 @@ table.header tr td.header_l{
 	text-align: left;
 	height: 24px;
 	padding-left: 5px;
-	border-width: 0px;
+	border-width: 0;
 }
 table.header tr td.header_r{
 	background:none;
@@ -553,7 +506,7 @@ table.header tr td.header_r{
 	text-align: right;
 	height: 24px;
 	padding-right: 5px;
-	border-width: 0px;
+	border-width: 0;
 }
 
 table.header a{
@@ -569,7 +522,7 @@ table.flicker{
 	color: #FFFFFF;
 	background: #5C7099 url('../images/gradients/menu_not_active2.gif') repeat-x top left;
 	background-color: #6d88ad;
-	border: 0px #000000 solid;
+	border: 0 #000000 solid;
 	vertical-align:middle;
 }
 
@@ -603,52 +556,13 @@ table.flicker a{
 	color: #0BF;
 }
 
-/****** THIN HEADER *********/
-table.thin_header{
-	width: 100%;
-	color: #FFFFFF;
-	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;
-	background-color: #6d88ad;
-	border: 0px #000000 solid;
-	vertical-align:middle;
-}
-
-table.thin_header tr td.thin_header_c{
-	font-family:verdana, arial, helvetica, sans-serif;
-	font-size:10px;
-	height: 16px;
-	padding-left: 4px;
-	padding-right: 4px;
-	line-height: 12px;
-}
-
-table.thin_header tr td.thin_header_l{
-	font-family:verdana, arial, helvetica, sans-serif;
-	font-size:10px;
-	text-align: left;
-	height: 16px;
-	padding-left: 4px;
-	line-height: 12px;
-}
-table.thin_header tr td.thin_header_r{
-	font-family:verdana, arial, helvetica, sans-serif;
-	font-size:10px;
-	text-align: right;
-	height: 16px;
-	padding-right: 4px;
-	line-height: 12px;
-}
-
-table.thin_header a{
-	color: #0BF;
-}
 /**************** Aknowledges ****************/
 
 table.ack_msgs{
 	width: 70%;
 	background-color: #EEEEEE;
-	padding: 0px;
-	border: 0px solid;
+	padding: 0;
+	border: 0 solid;
 }
 table.ack_msgs tr.title {
 	height: 14px;
@@ -684,7 +598,6 @@ table.ack_msgs tr.msg td{
 .right_header {
 	font-weight: bold;
 	text-align: center;
-
 	border-left-style: solid;
 	border-right-style: solid;
 	border-bottom-style: none;
@@ -693,9 +606,9 @@ table.ack_msgs tr.msg td{
 
 table.right_table{
 	width: 100%;
-	border-width: 0px;
-	margin: 0px;
-	padding: 0px;
+	border-width: 0;
+	margin: 0;
+	padding: 0;
 }
 
 table.right_table tr.header td{
@@ -704,11 +617,11 @@ table.right_table tr.header td{
 }
 
 table.right_table td{
-	margin: 0px;
-	padding: 0px;
+	margin: 0;
+	padding: 0;
 	text-align: right;
 	white-space: nowrap;
-	word-spacing:	0px;
+	word-spacing: 0;
 }
 
 table.right_table select{
@@ -730,7 +643,7 @@ table.graph{
 
 table.map{
 	text-align: left;
-	border-width:0px;
+	border-width:0;
 	padding-top: 1px;
 	padding-bottom: 5px;
 }
@@ -741,7 +654,7 @@ table.menu{
 	height: 24px;
 	background-color: #FFFFFF;
 	color: #000000;
-	border: 0px solid #000000;
+	border: 0 solid #000000;
 }
 
 table.menu tr{
@@ -779,7 +692,7 @@ table.sub_menu{
 	height: 24px;
 	background-color: #0000FC;
 	color: #000000;
-	border: 0px solid #000000;
+	border: 0 solid #000000;
 	width: 100%;
 /*	margin-bottom: 1px;*/
 }
@@ -790,7 +703,7 @@ table.sub_menu tr{
 	font-size:10px;
 	background: #5C7099 url('../images/gradients/table_head.gif') repeat-x top left;
 	border-color: #000000;
-	border-width:0px;
+	border-width:0;
 	border-top-style: solid;
 	border-left-style: solid;
 	border-right-style: solid;
@@ -800,8 +713,8 @@ table.sub_menu tr{
 }
 
 table.sub_menu tr td{
-	padding-top: 0px;
-	padding-bottom: 0px;
+	padding-top: 0;
+	padding-bottom: 0;
 }
 
 table.sub_menu tr td span.active a.highlight{
@@ -816,9 +729,9 @@ table.triggers_info {
 }
 
 table.triggers_info tr td {
-	border: 0px;
+	border: 0;
 	white-space: nowrap;
-	word-spacing:	0px;
+	word-spacing:	0;
 	padding-left: 5px;
 	padding-right: 5px;
 	font-weight: bold;
@@ -849,9 +762,9 @@ table.hosts_info {
 }
 
 table.hosts_info tr td {
-	border: 0px;
+	border: 0;
 	white-space: nowrap;
-	word-spacing:	0px;
+	word-spacing:	0;
 	padding-left: 5px;
 	padding-right: 5px;
 	font-weight: bold;
@@ -886,7 +799,7 @@ table.server_info {
 }
 
 table.server_info tr td {
-	border: 0px;
+	border: 0;
 	padding-left: 5px;
 	padding-right: 5px;
 	text-align: left;
@@ -894,7 +807,7 @@ table.server_info tr td {
 	font-size: 11px;
 	background-color: #EFEFEF;
 	white-space: nowrap;
-	word-spacing:	0px;
+	word-spacing: 0;
 }
 
 table.server_info tr td.header {
@@ -904,18 +817,18 @@ table.server_info tr td.header {
 
 table.server_info tr.status td{
 	white-space: nowrap;
-	word-spacing:	0px;
+	word-spacing: 0;
 }
 /**************** WARNING ***********/
 
 table.warning{
-	border-spacing:	0px; /* cellspacing */
+	border-spacing:	0; /* cellspacing */
 	border-collapse: collapse;
 	border-top:		2px gray solid;
 	border-left:	2px gray solid;
 	border-right:	2px #3F3F3F solid;
 	border-bottom:	2px #3F3F3F solid;
-	background-color:#EAEAEA;
+	background-color: #EAEAEA;
 }
 
 table.warning td{
@@ -948,7 +861,7 @@ table.warning tr td.left{
 	padding-left: 	10px;
 	padding-right: 	5px;
 	white-space: 	nowrap;
-	word-spacing:	0px;
+	word-spacing:	0;
 	text-align: 	left;
 }
 
@@ -977,21 +890,17 @@ table.warning tr.center td.right{
 
 /**************** SETUP WIZARD ***********/
 table.setup_wizard{
-	width:		640px;
-	height:		480px;
-	border-spacing:	0px; /* cellspacing */
+	width: 640px;
+	height: 480px;
+	border-spacing:	0; /* cellspacing */
 	border-collapse: collapse;
-	border-top:		2px gray solid;
-	border-left:		2px gray solid;
-	border-right:		2px #3F3F3F solid;
-	border-bottom:		2px #3F3F3F solid;
+	border: 2px solid gray;
+	border-right-color: #3F3F3F;
+	border-bottom-color: #3F3F3F;
 }
 
 table.setup_wizard td{
-	padding-left:	0;
-	padding-right:	0;
-	padding-top: 	2px;
-	padding-bottom: 2px;
+	padding: 2px 0;
 }
 
 table.setup_wizard tr.header{
@@ -1012,19 +921,19 @@ table.setup_wizard tr.footer input.button{
 }
 
 table.setup_wizard tr.title{
-	height:		28px;
+	height: 28px;
 }
 
 table.setup_wizard tr.title td{
-	font-size:	24px;
-	font-weight:	normal;
+	font-size: 24px;
+	font-weight: normal;
 }
 
 table.setup_wizard tr td.left{
 	padding-left: 	10px;
 	padding-right: 	5px;
 	white-space: 	nowrap;
-	word-spacing:	0px;
+	word-spacing:	0;
 	text-align: 	left;
 }
 
@@ -1051,9 +960,9 @@ table.setup_wizard tr.center td.right{
 }
 
 table.setup_wizard ul li{
-	font-size:	14px;
-	font-weight:	normal;
-	color:		gray;
+	font-size: 14px;
+	font-weight: normal;
+	color: gray;
 	list-style-image: url('../images/general/inst_step.gif');
 }
 
@@ -1070,7 +979,7 @@ table.setup_wizard ul li.completed{
 table.setup_wizard div.licence{
 	text-align: left;
 	height:	350px;
-	width:	100%;
+	width: 100%;
 	border:	1px gray inset;
 	background-color: white;
 	overflow: scroll;
@@ -1079,14 +988,13 @@ table.setup_wizard div.licence{
 table.setup_wizard div.text{
 	text-align: left;
 	vertical-align:	text-top;
-	height:	100%;
-	width:	100%;
+	height: 100%;
+	width: 100%;
 	overflow: hidden;
 }
 
 /***************** <HISTORY> *****************/
 table.history{
-
 }
 
 table.history tr{
@@ -1203,7 +1111,7 @@ table.filter{
 	width: 100%;
 	/*background-color: #F0F0F0;*/
 	background-color: #FFFFFF;
-	border-collapse: collapse;	
+	border-collapse: collapse;
 }
 table.filter tr > td:first-child{
 	width: 1%;
@@ -1218,22 +1126,22 @@ table.filter tr td {
 	height: 26px;
 	vertical-align: bottom;
 	border: 1px dotted silver;
-	padding-left: 6px;	
-	padding-right: 4px;	
+	padding-left: 6px;
+	padding-right: 4px;
 }
 
 /********** </FILTER> ************/
 
 /********** <INVISIBLE> ************/
 table.invisible{
-	border: 0px;
-	margin: 0px;
-	padding: 0px;
+	border: 0;
+	margin: 0;
+	padding: 0;
 }
 table.invisible tr td{
-	border: 0px;
-	margin: 0px;
-	padding: 0px;
+	border: 0;
+	margin: 0;
+	padding: 0;
 }
 /********** </INVISIBLE> ************/
 
@@ -1244,7 +1152,7 @@ table.paging{
 }
 
 table.paging tr td{
-	border: 0px black solid;
+	border: 0 black solid;
 	width: 100%;
 	font-size: 11px;
 	line-height: 18px;
@@ -1259,7 +1167,7 @@ table.paging tr td{
 table.header_wide{
 	width: 100%;
 	color: #222222;
-	
+
 	border: 1px #3377AA solid;
 	vertical-align: middle;
 	background-color:#FFFFFF;
@@ -1269,10 +1177,10 @@ table.header_wide tr.first td.header_l{
 	font-family: arial, verdana, helvetica, sans-serif;
 	font-size: 14px;
 	font-weight: bold;
-	
+
 	text-align: left;
 	height: 24px;
-	
+
 	padding-left: 5px;
 	color: #224488;
 }
@@ -1284,7 +1192,7 @@ table.header_wide tr.first td.header_r{
 	text-align: right;
 	height: 24px;
 	padding-right: 5px;
-	border-width: 0px;
+	border-width: 0;
 }
 
 table.header_wide tr.next td.header_l{
@@ -1294,7 +1202,7 @@ table.header_wide tr.next td.header_l{
 	text-align: left;
 	height: 20px;
 	padding-left: 5px;
-	border-width: 0px;
+	border-width: 0;
 }
 
 table.header_wide tr.next td.header_r{
@@ -1304,15 +1212,15 @@ table.header_wide tr.next td.header_r{
 	text-align: right;
 	height: 20px;
 	padding-right: 5px;
-	border-width: 0px;
+	border-width: 0;
 }
 
 /* Suggest */
 
 table.suggest{
 	width: 100%;
-	margin: 0px;
-	border-spacing: 0px;
+	margin: 0;
+	border-spacing: 0;
 	background-color: #FEFEFE;
 }
 
@@ -1326,9 +1234,7 @@ table.suggest tr.highlight{
 table.suggest tr td{
 	text-align: left;
 	padding-left: 4px;
-
 	line-height: 18px;
 	font-size: 11px;
-
 	cursor: default;
 }

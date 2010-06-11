@@ -31,12 +31,6 @@ class CAlert extends CZBXAPI{
 /**
  * Get Alerts data
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param _array $options
  * @param array $options['itemids']
  * @param array $options['hostids']
@@ -465,12 +459,6 @@ COpt::memoryPick();
 /**
  * Add alerts
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param _array $alerts multidimensional array with alerts data
  * @param array $alerts[0,...]['expression']
  * @param array $alerts[0,...]['description']
@@ -485,7 +473,6 @@ COpt::memoryPick();
 		$alerts = zbx_toArray($alerts);
 		$alertids = array();
 		$result = false;
-//------
 
 		self::BeginTransaction(__METHOD__);
 		foreach($alerts as $anum => $alert){
@@ -538,14 +525,7 @@ COpt::memoryPick();
 /**
  * Delete alerts
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $alertids
- * @param array $alertids['alertids']
+ * @param array $alertids
  * @return boolean
  */
 	public static function delete($alertids){
@@ -568,7 +548,6 @@ COpt::memoryPick();
 			}
 
 			$alertids[] = $alert['alertid'];
-			//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_alert, 'alert ['.$alert['name'].']');
 		}
 
 		if(!empty($alertids)){
