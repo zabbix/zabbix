@@ -126,7 +126,7 @@ include_once('include/page_header.php');
 
 		DBstart();
 		$result = CMediatype::delete($media_types);
-		$go_result = DBend(false);//$result);
+		$go_result = DBend($result);
 
 		if($go_result) unset($_REQUEST['form']);
 
@@ -310,7 +310,10 @@ include_once('include/page_header.php');
 
 //----- GO ------
 		$goBox = new CComboBox('go');
-		$goBox->addItem('delete', S_DELETE_SELECTED);
+
+		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
+		$goOption->setAttribute('confirm',S_DELETE_SELECTED_MEDIATYPES_Q);
+		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
 		$goButton = new CButton('goButton',S_GO.' (0)');

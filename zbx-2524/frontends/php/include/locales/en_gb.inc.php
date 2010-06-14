@@ -581,6 +581,9 @@
 	'S_VALUE_MAPS_CREATE_NUM_STRING'=>		'Value maps are used to create a mapping between numeric values and string representations',
 	'S_DELETE_SELECTED_VALUE_MAPPING'=>		'Delete selected value mapping?',
 
+// media_types.php
+	'S_DELETE_SELECTED_MEDIATYPES_Q'=>		'Delete selected media types?',
+
 //	nodes.php
 	'S_NOT_DM_SETUP'=>			'Your setup is not configured for distributed monitoring',
 	'S_CONFIGURATION_OF_NODES'=>		'CONFIGURATION OF NODES',
@@ -944,7 +947,7 @@
 	'S_EMPTY_INPUT_PARAMETER'=>			'Empty input parameter',
 	'S_ENABLE_SELECTED_HOSTS'=>			'Enable selected hosts?',
 	'S_DISABLE_SELECTED_HOSTS_Q'=>			'Disable selected hosts?',
-	'S_DELETE_SELECTED_HOSTS'=>			'Delete selected hosts?',
+	'S_DELETE_SELECTED_HOSTS_Q'=>			'Delete selected hosts?',
 	'S_UPDATED_STATUS_OF_HOST' =>		'Updated status of host',
 
 // templates.php
