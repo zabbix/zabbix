@@ -980,7 +980,6 @@
 	'S_ADD_TO_GROUP'=>			'Add to group',
 	'S_DELETE_FROM_GROUP'=>			'Delete from group',
 	'S_UPDATE_IN_GROUP'=>			'Update in group',
-	'S_DELETE_SELECTED_HOSTS_Q'=>		'Delete selected hosts?',
 	'S_CREATE_HOST'=>			'Create Host',
 	'S_CREATE_TEMPLATE'=>			'Create Template',
 	'S_TEMPLATE_LINKAGE'=>			'Template linkage',
