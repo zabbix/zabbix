@@ -291,7 +291,7 @@ class CTrigger extends CZBXAPI{
 									' )'.
 						' )'.
 				' )';
-			$sql_parts['where']['monitored'] = 't.status='.TRIGGER_STATUS_ENABLED;
+			$sql_parts['where']['status'] = 't.status='.TRIGGER_STATUS_ENABLED;
 		}
 
 // maintenance
