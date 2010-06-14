@@ -424,7 +424,7 @@
 
 			$error = '';
 			if(!$result = DBconnect($error)){
-				array_pop($ZBX_MESSAGES);
+				if(!is_null($ZBX_MESSAGES)) array_pop($ZBX_MESSAGES);
 				error($error);
 			}
 			else{
