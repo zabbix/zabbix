@@ -1464,7 +1464,7 @@
 				'filter' => array('value' => array(TRIGGER_VALUE_UNKNOWN, TRIGGER_VALUE_TRUE)),
 				'output' => API_OUTPUT_EXTEND,
 				'nodeids' => get_current_nodeid(true)
-				);
+			);
 
 			$triggers = CTrigger::get($options);
 			$triggers = zbx_toHash($triggers, 'triggerid');
@@ -1660,7 +1660,7 @@
 
 					if(!isset($info['status'][$type]['priority']) || ($info['status'][$type]['priority'] < $typeInfo['priority'])){
 						$info['status'][$type]['priority'] = $typeInfo['priority'];
-						$info['status'][$type]['info'] = $typeInfo['info'];
+						$info['status'][$type]['info'] = isset($typeInfo['info'])?$typeInfo['info']:'';
 					}
 				}
 //SDII($inf);
