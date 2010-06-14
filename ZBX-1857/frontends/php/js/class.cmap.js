@@ -1474,7 +1474,7 @@ this.selementForm.dragHandler = e_td_5;
 	var e_tr_4 = document.createElement('tr');
 this.selementForm.massEdit.elementtype = e_tr_4;
 
-	e_tr_4.className = "form_even_row";
+	e_tr_4.className = "even_row";
 	e_tbody_3.appendChild(e_tr_4);
 
 
@@ -1532,7 +1532,7 @@ this.selementForm.elementtype = e_select_6;
 
 // LABEL
 	var e_tr_4 = document.createElement('tr');
-	e_tr_4.className = "form_even_row";
+	e_tr_4.className = "even_row";
 	e_tbody_3.appendChild(e_tr_4);
 
 
@@ -1568,7 +1568,7 @@ this.selementForm.label = e_textarea_6;
 
 // LABEL LOCATION
 	var e_tr_4 = document.createElement('tr');
-	e_tr_4.className = "form_even_row";
+	e_tr_4.className = "even_row";
 	e_tbody_3.appendChild(e_tr_4);
 
 
@@ -1639,7 +1639,7 @@ this.selementForm.label_location = e_select_6;
 this.selementForm.typeDOM.elementName = e_tr_4;
 this.selementForm.massEdit.elementName = e_tr_4;
 
-	e_tr_4.className = "form_even_row";
+	e_tr_4.className = "even_row";
 	e_tbody_3.appendChild(e_tr_4);
 
 
@@ -1680,7 +1680,7 @@ this.selementForm.elementTypeSelect = e_span_6;
 	var e_tr_4 = document.createElement('tr');
 this.selementForm.typeDOM.iconid_off = e_tr_4;
 
-	e_tr_4.className = "form_even_row";
+	e_tr_4.className = "even_row";
 	e_tbody_3.appendChild(e_tr_4);
 
 
@@ -1720,7 +1720,7 @@ this.selementForm.iconid_off = e_select_6;
 	var e_tr_4 = document.createElement('tr');
 this.selementForm.typeDOM.advanced_icons = e_tr_4;
 
-	e_tr_4.className = "form_even_row";
+	e_tr_4.className = "even_row";
 	e_tbody_3.appendChild(e_tr_4);
 
 
@@ -1761,7 +1761,7 @@ this.selementForm.advanced_icons = e_input_6;
 	var e_tr_4 = document.createElement('tr');
 this.selementForm.typeDOM.iconid_on = e_tr_4;
 
-	e_tr_4.className = "form_even_row";
+	e_tr_4.className = "even_row";
 	e_tbody_3.appendChild(e_tr_4);
 
 
@@ -1816,7 +1816,7 @@ this.selementForm.iconid_on = e_select_6;
 	var e_tr_4 = document.createElement('tr');
 this.selementForm.typeDOM.iconid_unknown = e_tr_4;
 
-	e_tr_4.className = "form_even_row";
+	e_tr_4.className = "even_row";
 	e_tbody_3.appendChild(e_tr_4);
 
 
@@ -1871,7 +1871,7 @@ this.selementForm.iconid_unknown = e_select_6;
 	var e_tr_4 = document.createElement('tr');
 this.selementForm.typeDOM.iconid_maintenance = e_tr_4;
 
-	e_tr_4.className = "form_even_row";
+	e_tr_4.className = "even_row";
 	e_tbody_3.appendChild(e_tr_4);
 
 
@@ -1926,7 +1926,7 @@ this.selementForm.iconid_maintenance = e_select_6;
 	var e_tr_4 = document.createElement('tr');
 this.selementForm.typeDOM.iconid_disabled = e_tr_4;
 
-	e_tr_4.className = "form_even_row";
+	e_tr_4.className = "even_row";
 	e_tbody_3.appendChild(e_tr_4);
 
 
@@ -1979,7 +1979,7 @@ this.selementForm.iconid_disabled = e_select_6;
 // X
 	var e_tr_4 = document.createElement('tr');
 this.selementForm.massEdit.x = e_tr_4;
-	e_tr_4.className = "form_even_row";
+	e_tr_4.className = "even_row";
 	e_tbody_3.appendChild(e_tr_4);
 
 
@@ -2014,7 +2014,7 @@ this.selementForm.x = e_span_6;
 // Y
 	var e_tr_4 = document.createElement('tr');
 this.selementForm.massEdit.y = e_tr_4;
-	e_tr_4.className = "form_even_row";
+	e_tr_4.className = "even_row";
 	e_tbody_3.appendChild(e_tr_4);
 
 
@@ -2048,7 +2048,7 @@ this.selementForm.y = e_span_6;
 	
 // URL
 	var e_tr_4 = document.createElement('tr');
-	e_tr_4.className = "form_even_row";
+	e_tr_4.className = "even_row";
 	e_tbody_3.appendChild(e_tr_4);
 
 
@@ -2700,7 +2700,7 @@ this.linkForm.linkid = e_input_4;
 
 // LABEL
 	var e_tr_4 = document.createElement('tr');
-	e_tr_4.className = "form_even_row";
+	e_tr_4.className = "even_row";
 	e_tbody_3.appendChild(e_tr_4);
 
 
@@ -2728,7 +2728,7 @@ this.linkForm.linklabel = e_textarea_6;
 
 // SELEMENTID1
 	var e_tr_4 = document.createElement('tr');
-	e_tr_4.className = "form_even_row";
+	e_tr_4.className = "even_row";
 	e_tbody_3.appendChild(e_tr_4);
 
 
@@ -2753,7 +2753,7 @@ this.linkForm.selementid1 = e_select_6;
 
 // SELEMENTID2
 	var e_tr_4 = document.createElement('tr');
-	e_tr_4.className = "form_even_row";
+	e_tr_4.className = "even_row";
 	e_tbody_3.appendChild(e_tr_4);
 
 
@@ -2781,7 +2781,7 @@ this.linkForm.selementid2 = e_select_6;
 
 // LINK STATUS INDICATORS
 	var e_tr_4 = document.createElement('tr');
-	e_tr_4.className = "form_even_row";
+	e_tr_4.className = "even_row";
 	e_tbody_3.appendChild(e_tr_4);
 
 
@@ -2799,7 +2799,7 @@ this.linkForm.linkIndicatorsTable = e_td_5;
 
 // LINE TYPE OK
 	var e_tr_4 = document.createElement('tr');
-	e_tr_4.className = "form_even_row";
+	e_tr_4.className = "even_row";
 	e_tbody_3.appendChild(e_tr_4);
 
 
@@ -2848,7 +2848,7 @@ this.linkForm.drawtype = e_select_6;
 
 // Colour OK
 	var e_tr_4 = document.createElement('tr');
-	e_tr_4.className = "form_even_row";
+	e_tr_4.className = "even_row";
 	e_tbody_3.appendChild(e_tr_4);
 
 

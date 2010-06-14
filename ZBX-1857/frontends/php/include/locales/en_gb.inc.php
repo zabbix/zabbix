@@ -1129,7 +1129,7 @@
 	'S_SNMPV3_PRIV_PASSPHRASE'=>				'SNMPv3 priv passphrase',
 	'S_CUSTOM_MULTIPLIER'=>					'Custom multiplier',
 	'S_DO_NOT_USE'=>					'Do not use',
-	'S_USE_MULTIPLIER'=>					'Use multiplier',
+	'S_USE_CUSTOM_MULTIPLIER'=>				'Use custom multiplier',
 	'S_SELECT_HOST_DOT_DOT_DOT'=>				'Select host...',
 	'S_LOG_TIME_FORMAT'=>					'Log time format',
 	'S_CREATE_ITEM'=>					'Create Item',

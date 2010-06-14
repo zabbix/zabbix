@@ -117,7 +117,7 @@ table.formtable tr td {
 	word-spacing:	0px;
 }
 
-table.formtable tr.new {
+table.formtable tr.new td {
 	text-decoration: none;
 	background-color: #E0F0E0;
 }
@@ -135,6 +135,11 @@ table.formtable tr.form_odd_row td{
 table.formtable tr.form_even_row td{
 	text-decoration: none;
 	background-color:#DFDFDF;
+}
+
+table.formtable tr td {
+        text-decoration: none;
+	background-color: #EEEEEE;	
 }
 
 table.formtable tr td.form_row_first{
