@@ -2058,7 +2058,7 @@
 	'S_DELETE_SELECTED_USER_Q'=>		'Delete selected user?',
 	'S_SUBFILTER'=>				'Subfilter',
 	'S_AFFECTS_ONLY_FILTERED_DATA_SMALL'=>	'affects only filtered data!',
-	'S_THROW_MAP_SMALL'=>			'throw map',
+	'S_SHOW_VALUE_MAPPINGS'=>			'show value mappings',
 	'S_DELETE_SELECTED_ITEM_Q'=>		'Delete selected item?',
 	'S_DO_SMALL'=>				'do',
 	'S_INCORRECT_LIST_OF_ITEMS'=>		'Incorrect list of items.',
