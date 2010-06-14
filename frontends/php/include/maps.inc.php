@@ -1341,7 +1341,7 @@
 //*/
 			else if(isset($info['maintenance_status'])){
 // Host in maintenance
-				$info['type'] = TRIGGER_VALUE_UNKNOWN;
+				$info['type'] = TRIGGER_VALUE_FALSE;
 
 				$msg = S_MAINTENANCE_BIG;
 				if($info['maintenanceid'] > 0){
