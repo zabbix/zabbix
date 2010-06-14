@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBX-2524] fixed deleting media types (Aly)
  - [ZBX-2339] fixed height of row in resource "Plain text" in screens (Aly)
  - [ZBX-2459] fixed setting trigger value to unknown on disabling (Aly)
  - [ZBX-2414] added PHP session module check as requirement in dashboard and installation (Maxim Andruhovich / AM)

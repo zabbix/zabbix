@@ -722,7 +722,7 @@ include_once('include/page_header.php');
 
 		$sortfield = getPageSortField('host');
 		$sortorder = getPageSortOrder();
-		
+
 		if($pageFilter->groupsSelected){
 			$options = array(
 				'editable' => 1,
