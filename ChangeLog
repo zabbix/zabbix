@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2548] fixed sorting in items popup when adding items to simple graph, disbled dropdown with tooltip showing filtration added as well (Maxim Andruhovich / AM)
  - [ZBX-2547] fixed erros in installation (Aly)
  - [ZBX-2277] fixed menu position on screen (Aly)
  - [ZBX-2339] fixed height of row in resource "Plain text" in screens (Aly)
