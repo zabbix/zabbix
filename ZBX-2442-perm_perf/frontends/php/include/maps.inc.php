@@ -993,9 +993,9 @@
 
 		$options = array(
 				'hostids' => zbx_objectValues($selements, 'elementid'),
-				'extendoutput' => API_OUTPUT_EXTEND,
+				'output' => API_OUTPUT_EXTEND,
 				'nopermissions' => 1,
-				'select_triggers' => API_OUTPUT_EXTEND,
+				'select_triggers' => API_OUTPUT_REFER,
 				'nodeids' => get_current_nodeid(true)
 			);
 		$hosts = CHost::get($options);
@@ -1008,6 +1008,19 @@
 		);
 		$latestTriggers = CTrigger::get($options);
 		$latestTriggers = zbx_toHash($latestTriggers, 'triggerid');
+
+		$options = array(
+			'hostids' => zbx_objectValues($hosts, 'hostid'),
+			'maintenance' => 0,
+			'templated' => 0,
+			'monitored' => 1,
+			'filter' => array('value' => array(TRIGGER_VALUE_UNKNOWN, TRIGGER_VALUE_TRUE)),
+			'output' => API_OUTPUT_EXTEND,
+			'nodeids' => get_current_nodeid(true)
+		);
+
+		$triggers = CTrigger::get($options);
+		$triggers = zbx_toHash($triggers, 'triggerid');
 
 		foreach($selements as $snum => $selement){
 			$selements_info[$selement['selementid']] = array();
@@ -1039,6 +1052,14 @@
 			$info['triggers'] = array();
 			$info['status'] = array();
 			foreach($host['triggers'] as $tnum => $trigger){
+				if(!isset($triggers[$trigger['triggerid']])){
+					unset($host['triggers'][$tnum]);
+					continue;
+				}
+
+				$trigger = $triggers[$trigger['triggerid']];
+				$host['triggers'][$tnum] = $trigger;
+
 				if($trigger['status'] == TRIGGER_STATUS_DISABLED) continue;
 
 				if(!isset($info['type'])) $info['type'] = $trigger['value'];
@@ -1142,7 +1163,7 @@
 //*/
 			else if(isset($info['maintenance_status'])){
 // Host in maintenance
-				$info['type'] = TRIGGER_VALUE_UNKNOWN;
+				$info['type'] = TRIGGER_VALUE_FALSE;
 
 				$msg = S_MAINTENANCE_BIG;
 				if($info['maintenanceid'] > 0){
@@ -1236,7 +1257,9 @@
 		$options = array(
 			'groupids' => array_keys($hostgroups),
 			'lastChangeSince' => (time() - TRIGGER_BLINK_PERIOD),
-			'filter' => array('value' => array(TRIGGER_VALUE_FALSE, TRIGGER_VALUE_TRUE))
+			'filter' => array(
+				'value' => array(TRIGGER_VALUE_FALSE, TRIGGER_VALUE_TRUE)
+			)
 		);
 		$latestTriggers = CTrigger::get($options);
 		$latestTriggers = zbx_toHash($latestTriggers, 'triggerid');
@@ -1282,9 +1305,11 @@
 				'groupids' => $group['groupid'],
 				'maintenance' => 0,
 				'templated' => 0,
+				'monitored' => 1,
+				'filter' => array('value' => array(TRIGGER_VALUE_UNKNOWN, TRIGGER_VALUE_TRUE)),
 				'output' => API_OUTPUT_EXTEND,
 				'nodeids' => get_current_nodeid(true)
-				);
+			);
 
 			$triggers = CTrigger::get($options);
 			$triggers = zbx_toHash($triggers, 'triggerid');
@@ -1430,12 +1455,12 @@
 
 		$selements_info = array();
 		$options = array(
-				'sysmapids' => zbx_objectValues($selements, 'elementid'),
-				'output' => API_OUTPUT_EXTEND,
-				'select_selements' => API_OUTPUT_EXTEND,
-				'nopermissions' => 1,
-				'nodeids' => get_current_nodeid(true)
-			);
+			'sysmapids' => zbx_objectValues($selements, 'elementid'),
+			'output' => API_OUTPUT_EXTEND,
+			'select_selements' => API_OUTPUT_EXTEND,
+			'nopermissions' => 1,
+			'nodeids' => get_current_nodeid(true)
+		);
 		$maps = CMap::get($options);
 		$maps = zbx_toHash($maps, 'sysmapid');
 		foreach($selements as $snum => $selement){
@@ -1453,7 +1478,7 @@
 // recursion
 			$info['triggers'] = array();
 			$infos = getSelementsInfo($map);
-
+//SDII($infos);
 			foreach($infos as $inum => $inf){
 
 				if(!isset($info['type'])){
@@ -1471,17 +1496,20 @@
 				if(isset($inf['latelyChanged']) && $inf['latelyChanged'])
 					$info['latelyChanged'] = $inf['latelyChanged'];
 
-//				$info['triggers'] += $inf['triggers'];
 				$info['triggers'] = array_merge($info['triggers'], $inf['triggers']);
 				$info['maintenances'] = array_merge($info['maintenances'], $inf['maintenances']);
 
-				if(!isset($info['status'][$info['type']]['count'])) $info['status'][$info['type']]['count'] = 0;
-				$info['status'][$info['type']]['count'] += isset($inf['count'])?$inf['count']:1;
+				foreach($inf['status'] as $type => $typeInfo){
+					if(!isset($info['status'][$type]['count'])) $info['status'][$type]['count'] = 0;
+					$info['status'][$type]['count'] += isset($typeInfo['count'])?$typeInfo['count']:1;
 
-				if(!isset($info['status'][$info['type']]['priority']) || ($info['status'][$info['type']]['priority'] < $inf['priority'])){
-					$info['status'][$info['type']]['priority'] = $inf['priority'];
-					$info['status'][$info['type']]['info'] = $inf['info'];
+					if(!isset($info['status'][$type]['priority']) || ($info['status'][$type]['priority'] < $typeInfo['priority'])){
+						$info['status'][$type]['priority'] = $typeInfo['priority'];
+						$info['status'][$type]['info'] = isset($typeInfo['info'])?$typeInfo['info']:'';
+					}
 				}
+//SDII($inf);
+//SDII($info);
 			}
 
 			$info['triggers'] = array_unique($info['triggers']);

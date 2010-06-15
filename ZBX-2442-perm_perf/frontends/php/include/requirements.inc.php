@@ -190,12 +190,7 @@
 		$current = ini_get('date.timezone');
 		$current = !empty($current);
 
-		if($current){
-			$req = 1;
-		}
-		else{
-			$req = 0;
-		}
+		$req = $current ? 1 : 0;
 
 		$result = array(
 			'name' => S_PHP_TIMEZONE,
@@ -257,12 +252,7 @@
 			$current[] = BR();
 		}
 
-		if(!empty($current)){
-			$req = 1;
-		}
-		else{
-			$req = 0;
-		}
+		$req = !empty($current) ? 1 : 0;
 
 		$result = array(
 			'name' => S_PHP_DATABASES_SUPPORT,
@@ -289,12 +279,7 @@
 			function_exists('bcsqrt') &&
 			function_exists('bcsub');
 
-		if($current){
-			$req = 1;
-		}
-		else{
-			$req = 0;
-		}
+		$req = $current ? 1 : 0;
 
 		$result = array(
 			'name' => 'PHP BC math',
@@ -312,12 +297,7 @@
 
 		$current = mbstrings_available();
 
-		if($current){
-			$req = 1;
-		}
-		else{
-			$req = 0;
-		}
+		$req = $current ? 1 : 0;
 
 		$result = array(
 			'name' => 'PHP MB string',
@@ -335,12 +315,7 @@
 
 		$current = function_exists('socket_create');
 
-		if($current){
-			$req = 1;
-		}
-		else{
-			$req = 0;
-		}
+		$req = $current ? 1 : 0;
 
 		$result = array(
 			'name' => S_PHP_SOCKETS,
@@ -400,12 +375,7 @@
 			$current = false;
 		}
 
-		if($current){
-			$req = 1;
-		}
-		else{
-			$req = 0;
-		}
+		$req = $current ? 1 : 0;
 
 		$result = array(
 			'name' => S_GD_PNG_SUPPORT,
@@ -460,12 +430,7 @@
 			function_exists('ctype_xdigit') &&
 			function_exists('ctype_upper');
 
-		if($current){
-			$req = 1;
-		}
-		else{
-			$req = 0;
-		}
+		$req = $current ? 1 : 0;
 
 		$result = array(
 			'name' => S_CTYPE_MODULE,
@@ -477,6 +442,23 @@
 		);
 
 		return $result;
+	}
+	
+	function check_php_session() {
+		$current = function_exists('session_start') &&
+			function_exists('session_write_close');
+		
+		$req = $current ? 1 : 0;
+		
+		return array(
+			'name' => S_SESSION_MODULE,
+			'current' => $req ? S_YES_SMALL : S_NO_SMALL,
+			'required' => null,
+			'recommended' => null,
+			'result' => $req,
+			'error' => S_REQUIRED_SESSION_MODULE.SPACE.'['.S_CONFIGURE_PHP_WITH_SMALL.SPACE.'--enable-session]'
+			);
+			
 	}
 
 	function check_php_requirements(){
@@ -493,6 +475,7 @@
 		$result[] = check_php_bc();
 		$result[] = check_php_mbstring();
 		$result[] = check_php_sockets();
+		$result[] = check_php_session();
 		$result[] = check_php_gd();
 		$result[] = check_php_gd_png();
 		$result[] = check_php_xml();

@@ -35,12 +35,13 @@ include_once('include/page_header.php');
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 /* ARRAYS */
-		'hosts'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
-		'groups'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
-		'hostids'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
-		'groupids'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
-		'hostid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
-		'groupid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
+		'hosts'=>				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
+		'groups'=>				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
+		'hostids'=>				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
+		'groupids'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
+		'hostid'=>				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
+		'groupid'=>				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
+
 // maintenance
 		'maintenanceid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'isset({form})&&({form}=="update")'),
 		'maintenanceids'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, 		NULL),
@@ -59,8 +60,10 @@ include_once('include/page_header.php');
 
 		'edit_timeperiodid'=>	array(null,		 O_OPT, P_ACT,	DB_ID, null),
 		'twb_groupid' =>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
+
 // actions
 		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
+
 // form actions
 		'add_timeperiod'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, 	null, null),
 		'del_timeperiod'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -70,6 +73,7 @@ include_once('include/page_header.php');
 		'clone'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'delete'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'cancel'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+
 /* other */
 		'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		'form_refresh'=>array(T_ZBX_STR, O_OPT, NULL,	NULL,	NULL)
@@ -683,6 +687,7 @@ include_once('include/page_header.php');
 			$maintenanceid = $maintenance['maintenanceid'];
 
 			if($maintenance['active_till'] < time()) $mnt_status = new CSpan(S_EXPIRED,'red');
+			else if($maintenance['active_since'] > time()) $mnt_status = new CSpan(S_APPROACH,'blue');
 			else $mnt_status = new CSpan(S_ACTIVE,'green');
 
 			$table->addRow(array(

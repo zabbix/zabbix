@@ -61,7 +61,7 @@ if(!isset($DB)){
 					}
 					else{
 						if (!mysql_select_db($DB['DATABASE'])){
-							$error = 'Error database selection ['.mysql_error().']';
+							$error = 'Error database in selection ['.mysql_error().']';
 							$result = false;
 						}
 						else{

@@ -286,8 +286,11 @@ include_once('include/page_header.php');
 	}
 	else if(str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_REQUEST['g_triggerid'])){
 
-		$options = array('extendoutput'=>1, 'editable'=>1);
-		$options['triggerids'] = $_REQUEST['g_triggerid'];
+		$options = array(
+			'triggerids' => $_REQUEST['g_triggerid'],
+			'editable' => 1,
+			'output' => API_OUTPUT_EXTEND
+		);
 
 		$triggers = CTrigger::get($options);
 		$triggerids = zbx_objectValues($triggers, 'triggerid');
