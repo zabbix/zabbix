@@ -94,6 +94,7 @@ Changes for 1.8.3
  - [ZBX-2253] fixed delete confirmation dialogue referring to empty element (Vedmak)
  - [ZBX-2370] fixed duration value in monitoring events for multiple problem triggers (Vedmak)
  - [ZBX-507] made UserParameters work with zabbix_agent(d) -p and -t (asaveljevs)
+ - [ZBX-2326] fixed XSS vulnerability in triggers page; later independently discovered by VUPEN Security (Aly) 
  - [ZBX-2326] fixed dynamic chart titles, now all symbols are rendered correctly (Maxim Andruhovich / AM)
  - [ZBX-2250] value mapping is now applied for {ITEM.LASTVALUE} macro inside triggers description (Vedmak)
  - [ZBX-1436] fixed trigger events display after next steps  monitoring -> triggers -> click on any event time (Maxim Andruhovich / AM)
