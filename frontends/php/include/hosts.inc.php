@@ -182,7 +182,7 @@
 				' WHERE h.host='.zbx_dbstr($host).
 					' AND '.DBin_node('h.hostid', get_current_nodeid(false)).
 					' AND status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
-					(isset($hostid)?' AND h.hostid<>'.$hostid:'');
+					(isset($hostid)? ' AND h.hostid<>'.$hostid:'');
 		if(DBfetch(DBselect($sql))){
 			error(S_HOST.SPACE.'"'.$host.'"'.SPACE.S_ALREADY_EXISTS_SMALL);
 			return false;
@@ -1217,7 +1217,7 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()){
 	}
 	else{
 		if($config['dropdown_first_remember']){
-			if($_REQUEST['groupid'] == -1) $_REQUEST['groupid'] = is_null($profile_groupid)?'0':$profile_groupid;
+			if($_REQUEST['groupid'] == -1) $_REQUEST['groupid'] = is_null($profile_groupid)? '0':$profile_groupid;
 			if(isset($groupids[$_REQUEST['groupid']])){
 				$result['selected'] = $_REQUEST['groupid'];
 			}
@@ -1259,26 +1259,26 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 			);
 
 	$def_options = array(
-				'deny_all' =>					0,
-				'allow_all' =>					0,
-				'select_first_host'=>			0,
-				'select_first_host_if_empty'=>	0,
-				'select_host_on_group_switch'=>	0,
-				'do_not_select' =>				0,
+				'deny_all' =>				0,
+				'allow_all' =>				0,
+				'select_first_host' =>			0,
+				'select_first_host_if_empty' =>		0,
+				'select_host_on_group_switch' =>	0,
+				'do_not_select' =>			0,
 				'do_not_select_if_empty' =>		0,
 				'monitored_hosts' =>			0,
 				'templated_hosts' =>			0,
-				'real_hosts' =>					0,
+				'real_hosts' =>				0,
 				'not_proxy_hosts' =>			0,
-				'with_items' =>					0,
+				'with_items' =>				0,
 				'with_monitored_items' =>		0,
-				'with_historical_items'=>		0,
-				'with_triggers' =>				0,
-				'with_monitored_triggers'=>		0,
-				'with_httptests' =>				0,
-				'with_monitored_httptests'=>	0,
-				'with_graphs'=>					0,
-				'only_current_node' =>			0,
+				'with_historical_items' =>		0,
+				'with_triggers' =>			0,
+				'with_monitored_triggers' =>		0,
+				'with_httptests' =>			0,
+				'with_monitored_httptests' =>		0,
+				'with_graphs' =>			0,
+				'only_current_node' =>			0
 			);
 
 	$def_options = zbx_array_merge($def_options, $options);
@@ -1470,7 +1470,7 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 	}
 	else{
 		if($config['dropdown_first_remember']){
-			if($_REQUEST['hostid'] == -1) $_REQUEST['hostid'] = is_null($profile_hostid)?'0':$profile_hostid;
+			if($_REQUEST['hostid'] == -1) $_REQUEST['hostid'] = is_null($profile_hostid)? '0':$profile_hostid;
 
 			if(isset($hostids[$_REQUEST['hostid']])){
 				$result['selected'] = $_REQUEST['hostid'];

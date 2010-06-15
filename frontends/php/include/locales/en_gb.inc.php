@@ -1945,7 +1945,8 @@
 	'S_NO_ITEMS'=>				'No items',
 	'S_DISCOVERY_RULES_BIG'=>		'DISCOVERY RULES',
 	'S_DISCOVERY_CHECKS_BIG'=>		'DISCOVERY CHECKS',
-	'S_HOSTS_AND_TEMPLATES_BIG' => 'Hosts and templates',
+	'S_HOSTS_AND_TEMPLATES_BIG'=>		'Hosts and templates',
+	'S_ITEMS_FROM_SAME_TEMPLATE_ONLY'=>	'This graph already has items from a template. Further items can only be added from the same template.',
 
 //	popup_period.php
 	'S_POPUP_PERIOD_CAPTION_DATE_FORMAT'=>	'd M Y H:i:s',
