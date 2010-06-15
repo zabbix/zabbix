@@ -705,7 +705,7 @@ function __autoload($class_name){
 			if(($arr[3] * 100 + $arr[4]) >= ($arr[5] * 100 + $arr[6])) // check time period
 				return false;
 
-			$out .= sprintf("%d-%d,%02d:%02d-%02d:%02d",$arr[1],$arr[2],$arr[3],$arr[4],$arr[5],$arr[6]).';';
+			$out .= sprintf('%d-%d,%02d:%02d-%02d:%02d',$arr[1],$arr[2],$arr[3],$arr[4],$arr[5],$arr[6]).';';
 		}
 		$str = $out;
 //parse_period($str);
@@ -1007,7 +1007,7 @@ function __autoload($class_name){
 			case 10: $month = S_OCTOBER; break;
 			case 11: $month = S_NOVEMBER; break;
 			case 12: $month = S_DECEMBER; break;
-			default: $month = sprintf(S_CONFIG_WARNING_WRONG_MONTH, $num);
+			default: $month = S_CONFIG_WARNING_WRONG_MONTH_PART1.$num.S_CONFIG_WARNING_WRONG_MONTH_PART2;
 		}
 
 		return $month;
@@ -1022,7 +1022,7 @@ function __autoload($class_name){
 			case 5: $day = S_FRIDAY; break;
 			case 6: $day = S_SATURDAY; break;
 			case 7: $day = S_SUNDAY; break;
-			default: $day = sprintf(S_CONFIG_WARNING_WRONG_DOW, $num);
+			default: $day = S_CONFIG_WARNING_WRONG_DOW_PART1.$num.S_CONFIG_WARNING_WRONG_DOW_PART2;
 		}
 
 	return $day;

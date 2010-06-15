@@ -309,7 +309,7 @@ class CPie extends CGraphDraw{
 
 //			convert_units($datavalue,$this->items[$i]["units"]),
 			if(isset($data) && isset($datavalue)){
-				$strvalue = sprintf(S_VALUE.': %s ('.((round($proc)!=$proc)?'%0.2f':'%s')."%s)",convert_units($datavalue,$this->items[$i]["units"]),$proc,'%');
+				$strvalue = sprintf(S_VALUE.': %s ('.(round($proc)!=$proc? '%0.2f':'%s').'%%)',convert_units($datavalue,$this->items[$i]['units']),$proc);
 
 				$str = sprintf('%s: %s [%s] ',
 						str_pad($this->items[$i]['host'],$max_host_len,' '),
@@ -626,7 +626,7 @@ class CPie extends CGraphDraw{
 		$this->drawLogo();
 		if($this->drawLegend == 1)	$this->drawLegend();
 
-		$str=sprintf("%0.2f",(getmicrotime()-$start_time));
+		$str=sprintf('%0.2f',(getmicrotime()-$start_time));
 		imagestring($this->im, 0,$this->fullSizeX-210,$this->fullSizeY-12,'Data from '.$this->dataFrom.'. Generated in '.$str.' sec', $this->getColor('Gray'));
 
 		unset($this->items, $this->data);

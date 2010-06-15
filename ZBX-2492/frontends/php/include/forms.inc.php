@@ -3345,8 +3345,8 @@
 
 
 			if($graphtype == GRAPH_TYPE_NORMAL){
-				$percent_left = sprintf("%2.2f",$percent_left);
-				$percent_right = sprintf("%2.2f",$percent_right);
+				$percent_left = sprintf('%2.2f',$percent_left);
+				$percent_right = sprintf('%2.2f',$percent_right);
 
 				$pr_left_input = new CTextBox('percent_left',$percent_left,'5');
 				$pr_left_chkbx = new CCheckBox('visible[percent_left]',1,"javascript: ShowHide('percent_left');",1);

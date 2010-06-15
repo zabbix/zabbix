@@ -83,7 +83,7 @@ include_once('include/page_header.php');
 
 	$str = expand_trigger_description_by_data($db_data);
 
-	$str = sprintf(S_CHART4_HEADER_TITLE, $str, zbx_date2str(S_CHART4_HEADER_DATE_FORMAT));
+	$str = S_CHART4_HEADER_TITLE_PART1.$str.S_CHART4_HEADER_TITLE_PART2.zbx_date2str(S_CHART4_HEADER_DATE_FORMAT).S_CHART4_HEADER_TITLE_PART3;
 	$x = imagesx($im)/2-imagefontwidth(4)*zbx_strlen($str)/2;
 	//imagestring($im, 4,$x,1, $str , $darkred);
 	imageText($im, 10, 0, $x, 14, $darkred, $str);

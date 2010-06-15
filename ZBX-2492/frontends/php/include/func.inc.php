@@ -604,10 +604,10 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 			$value=$value-$min*(60);
 		}
 		if($days==0){
-			$ret = sprintf("%02d:%02d:%02d", $hours, $min, $value);
+			$ret = sprintf('%02d:%02d:%02d', $hours, $min, $value);
 		}
 		else{
-			$ret = sprintf("%d ".S_DAYS_SMALL.", %02d:%02d:%02d", $days, $hours, $min, $value);
+			$ret = sprintf('%d '.S_DAYS_SMALL.', %02d:%02d:%02d', $days, $hours, $min, $value);
 		}
 		return $ret;
 	}
