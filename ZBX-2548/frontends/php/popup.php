@@ -323,7 +323,6 @@ include_once('include/page_header.php');
 			$cmbHosts->setEnabled('disabled');
 			//$cmbHosts->setAttribute('style', 'cursor:default;');
 			$cmbHosts->setAttribute('title', S_ITEMS_FROM_SAME_TEMPLATE_ONLY);
-			$cmbHosts->setHint(S_ITEMS_FROM_SAME_TEMPLATE_ONLY, '', '', false);
 
 			$frmTitle->addItem(array(SPACE,S_HOST,SPACE,$cmbHosts));
 		}
