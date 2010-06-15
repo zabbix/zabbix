@@ -70,7 +70,13 @@ class CPageFilter{
 		
 		if(!isset($options['groupid'], $options['hostid'])){
 			if(isset($options['graphid'])){
-				$this->_updateGHbyGraph($options);
+				$this->_updateByGraph($options);
+			}
+		}
+
+		if(!isset($options['groupid'])){
+			if(isset($options['hostid'])){
+				$this->_updateByHost($options);
 			}
 		}
 
@@ -98,17 +104,33 @@ class CPageFilter{
 		}
 	}
 
-	private function _updateGHbyGraph(&$options){
+	private function _updateByGraph(&$options){
 		$graph = CGraph::get(array(
 			'graphids' => $options['graphid'],
 			'output' => API_OUTPUT_EXTEND,
 			'select_hosts' => API_OUTPUT_REFER,
+			'select_templates' => API_OUTPUT_REFER,
 			'select_groups' => API_OUTPUT_REFER,
 		));
-		$graph = reset($graph);
 
-		$options['groupid'] = $graph ? $graph['groups'][0]['groupid'] : null;
-		$options['hostid'] = $graph ? $graph['hosts'][0]['hostid'] : null;
+		if($graph = reset($graph)){
+			$options['groupid'] = $graph['groups'][0]['groupid'];
+			$options['hostid'] = $graph['hosts'][0]['hostid'];
+
+			if(is_null($options['hostid']))
+				$options['hostid'] = $graph['templates'][0]['templateid'];
+		}
+	}
+
+	private function _updateByHost(&$options){
+		$hosts = CHost::get(array(
+			'hostids' => $options['hostid'],
+			'templated_hosts' => 1,
+			'output' => array('hostid', 'host'),
+			'select_groups' => API_OUTPUT_REFER,
+		));
+		
+		if($host = reset($hosts)) $options['groupid'] = $host['groups'][0]['groupid'];
 	}
 
 	private function _initGroups($groupid, $options){
@@ -219,6 +241,7 @@ class CPageFilter{
 					$graphid = CProfile::get($this->_profileIdx['graphs']);
 				}
 			}
+
 			if(is_null($graphid)){
 				$graphid = 0;
 			}
