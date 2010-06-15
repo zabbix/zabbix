@@ -25,7 +25,7 @@ class CTextBox extends CTag{
 		$this->caption = null;
 		parent::__construct('input','no');
 		$this->tag_body_start = '';
-		$this->attributes['class'] = 'biginput';
+		$this->attributes['class'] = 'inputFont biginput';
 		$this->setAttribute('name', $name);
 		$this->setAttribute('id', $name);
 		$this->setAttribute('size', $size);

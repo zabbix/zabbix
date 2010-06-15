@@ -25,7 +25,7 @@ class CButton extends CTag{
 		$this->tag_body_start = '';
 		$this->attributes['type'] = 'submit';
 		$this->setAttribute('value', $caption);
-		$this->attributes['class'] = 'button';
+		$this->attributes['class'] = 'button inputFont';
 		$this->setName($name);
 		$this->setAction($action);
 		$this->setAccessKey($accesskey);
