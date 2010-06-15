@@ -176,7 +176,7 @@ include_once('include/page_header.php');
 
 	$ptData = array(
 		'header' => array(),
-		'data' => array()
+		'body' => array()
 	);
 
 	if(count($items) == 1){
