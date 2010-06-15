@@ -37,14 +37,16 @@ function getPagingLine(&$items, $autotrim=true){
 		$last_page = CProfile::get('web.paging.lastpage');
 		$start = ($last_page == $page['file']) ? CProfile::get('web.paging.start', 0) : 0;
 	}
-	CProfile::update('web.paging.lastpage', $page['file'], PROFILE_TYPE_STR);
-	CProfile::update('web.paging.start', $start, PROFILE_TYPE_INT);
 	
 	$rows_per_page = $USER_DETAILS['rows_per_page'];
 
 	$cnt_items = count($items);
 	$cnt_pages = ceil($cnt_items / $rows_per_page);
-
+	
+	if($cnt_items < $start) $start = 0;
+	CProfile::update('web.paging.lastpage', $page['file'], PROFILE_TYPE_STR);
+	CProfile::update('web.paging.start', $start, PROFILE_TYPE_INT);
+	
 	if($cnt_pages < 1) $cnt_pages = 1;
 
 	$crnt_page = floor($start / $rows_per_page) + 1;
