@@ -321,6 +321,9 @@ include_once('include/page_header.php');
 			$cmbHosts = new CComboBox('hostid',$hostid);
 			$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid, null, ': ').$host['host']);
 			$cmbHosts->setEnabled('disabled');
+			//$cmbHosts->setAttribute('style', 'cursor:default;');
+			$cmbHosts->setAttribute('title', S_ITEMS_FROM_SAME_TEMPLATE_ONLY);
+			$cmbHosts->setHint(S_ITEMS_FROM_SAME_TEMPLATE_ONLY, '', '', false);
 
 			$frmTitle->addItem(array(SPACE,S_HOST,SPACE,$cmbHosts));
 		}
