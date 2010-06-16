@@ -24,6 +24,7 @@ build/win32/project/zabbix_sender_win32.cmd -text
 create/data/create_data_sql/create_data_sql.sh -text
 create/data/create_data_sql/data_sql_blacklist.txt -text
 create/data/create_data_sql/data_sql_filter.txt -text
+create/data/create_data_sql/data_sql_predumphooks.txt -text
 create/data/images/Hub.png -text svneol=unset#unset
 create/data/images/Hub_small.png -text svneol=unset#unset
 create/data/images/Network.png -text svneol=unset#unset
