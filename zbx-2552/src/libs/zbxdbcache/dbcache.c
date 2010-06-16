@@ -905,6 +905,12 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 
 		if (NULL == tr_last || tr_last->triggerid != triggerid)
 		{
+			if (tr_num == tr_alloc)
+			{
+				tr_alloc += 64;
+				tr = zbx_realloc(tr, tr_alloc * sizeof(zbx_trigger_t));
+			}
+
 			tr_last = &tr[tr_num++];
 			tr_last->triggerid = triggerid;
 			tr_last->type = (unsigned char)atoi(row[1]);
