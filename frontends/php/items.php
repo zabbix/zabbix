@@ -1050,7 +1050,7 @@ include_once('include/page_header.php');
 				$trigger['description_expanded'] = expand_trigger_description($triggerid);
 				$tr_description[] = new CLink($trigger['description_expanded'], 'triggers.php?form=update&triggerid='.$triggerid);
 
-				if($trigger['status'] != TRIGGER_STATUS_UNKNOWN) $trigger['error'] = '';
+				if($trigger['value'] != TRIGGER_VALUE_UNKNOWN) $trigger['error'] = '';
 
 				switch($trigger['priority']){
 					case 0: $priority = S_NOT_CLASSIFIED; break;
@@ -1064,9 +1064,6 @@ include_once('include/page_header.php');
 
 				if($trigger['status'] == TRIGGER_STATUS_DISABLED){
 					$tstatus = new CSpan(S_DISABLED, 'disabled');
-				}
-				else if($trigger['status'] == TRIGGER_STATUS_UNKNOWN){
-					$tstatus = new CSpan(S_UNKNOWN, 'unknown');
 				}
 				else if($trigger['status'] == TRIGGER_STATUS_ENABLED){
 					$tstatus = new CSpan(S_ENABLED, 'enabled');
