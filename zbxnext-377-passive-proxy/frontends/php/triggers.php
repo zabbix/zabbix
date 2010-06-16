@@ -282,8 +282,11 @@ include_once('include/page_header.php');
 	}
 	else if(str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_REQUEST['g_triggerid'])){
 
-		$options = array('extendoutput'=>1, 'editable'=>1);
-		$options['triggerids'] = $_REQUEST['g_triggerid'];
+		$options = array(
+			'triggerids' => $_REQUEST['g_triggerid'],
+			'editable' => 1,
+			'output' => API_OUTPUT_EXTEND
+		);
 
 		$triggers = CTrigger::get($options);
 		$triggerids = zbx_objectValues($triggers, 'triggerid');
@@ -455,6 +458,7 @@ include_once('include/page_header.php');
 
 ?>
 <?php
+	$triggers_wdgt = new CWidget();
 
 	$form = new CForm(null, 'get');
 
@@ -463,22 +467,20 @@ include_once('include/page_header.php');
 		$form->addItem(new CButton('form', S_CREATE_TRIGGER));
 	}
 
-	show_table_header(S_CONFIGURATION_OF_TRIGGERS_BIG, $form);
-	echo SBR;
+	$triggers_wdgt->addPageHeader(S_CONFIGURATION_OF_TRIGGERS_BIG, $form);
 ?>
 <?php
 	if(($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['g_triggerid'])){
-		insert_mass_update_trigger_form();
+		$triggers_wdgt->addItem(insert_mass_update_trigger_form());
 	}
 	else if(isset($_REQUEST['form'])){
-		insert_trigger_form();
+		$triggers_wdgt->addItem(insert_trigger_form());
 	}
 	else if(($_REQUEST['go'] == 'copy_to') && isset($_REQUEST['g_triggerid'])){
-		insert_copy_elements_to_forms('g_triggerid');
+		$triggers_wdgt->addItem(insert_copy_elements_to_forms('g_triggerid'));
 	}
 	else{
 /* TABLE */
-		$triggers_wdgt = new CWidget();
 
 // Triggers Header
 		$r_form = new CForm(null, 'get');
@@ -698,9 +700,9 @@ include_once('include/page_header.php');
 
 		$form->addItem($table);
 		$triggers_wdgt->addItem($form);
-		$triggers_wdgt->show();
 	}
 
+	$triggers_wdgt->show();
 ?>
 <?php
 

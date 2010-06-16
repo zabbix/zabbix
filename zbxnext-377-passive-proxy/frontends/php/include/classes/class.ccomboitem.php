@@ -24,6 +24,7 @@ class CComboItem extends CTag{
 		parent::__construct('option','yes');
 		$this->tag_body_start = '';
 		$this->attributes['value'] = $value;
+		$this->attributes['title'] = $caption;
 
 		$this->addItem($caption);
 

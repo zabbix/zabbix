@@ -9,7 +9,7 @@
 ** (at your option) any later version.
 **
 ** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; withouts even the implied warranty of
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ** GNU General Public License for more details.
 **
@@ -765,6 +765,7 @@
 	'S_CREATE_MAINTENANCE_PERIOD'=>		'Create maintenance period',
 	'S_MAINTENANCE_TYPE'=>			'Maintenance type',
 	'S_EXPIRED'=>				'Expired',
+	'S_APPROACH'=>				'Approach',
 
 	'S_WITH_DATA_COLLECTION'=>		'With data collection',
 	'S_NO_DATA_COLLECTION'=>		'No data collection',
@@ -1790,10 +1791,10 @@
 	'S_CANNOT_UPDATE_API_ACCESS'=>			'Cannot update API access',
 	'S_DEBUG_MODE_UPDATED'=>			'Debug mode updated',
 	'S_CANNOT_UPDATE_DEBUG_MODE'=>			'Cannot update debug mode',
-	'S_USER_CANNOT_DISABLE_ITSELF'=>		'User cannot disable him self',
-	'S_USER_CANNOT_CHANGE_STATUS'=>			'User cannot change status to him self',
-	'S_USER_CANNOT_CHANGE_GUI_ACCESS'=>		'User cannot change GUI access to him self',
-	'S_USER_CANNOT_DELETE_ITSELF'=>			'User cannot delete him self',
+	'S_USER_CANNOT_DISABLE_ITSELF'=>		'User cannot disable himself',
+	'S_USER_CANNOT_CHANGE_STATUS'=>			'User cannot change status of himself',
+	'S_USER_CANNOT_CHANGE_GUI_ACCESS'=>		'User cannot change GUI access for himself',
+	'S_USER_CANNOT_DELETE_ITSELF'=>			'User cannot delete himself',
 	'S_CONFIGURATION_OF_USERS_AND_USER_GROUPS'=>	'CONFIGURATION OF USERS AND USER GROUPS',
 	'S_USER_GROUPS_BIG'=>				'USER GROUPS',
 	'S_USERS_BIG'=>					'USERS',
@@ -1946,7 +1947,8 @@
 	'S_NO_ITEMS'=>				'No items',
 	'S_DISCOVERY_RULES_BIG'=>		'DISCOVERY RULES',
 	'S_DISCOVERY_CHECKS_BIG'=>		'DISCOVERY CHECKS',
-	'S_HOSTS_AND_TEMPLATES_BIG' => 'Hosts and templates',
+	'S_HOSTS_AND_TEMPLATES_BIG'=>		'Hosts and templates',
+	'S_CANNOT_SWITCH_HOSTS'=>		'You can not switch hosts for current selection',
 
 //	popup_period.php
 	'S_POPUP_PERIOD_CAPTION_DATE_FORMAT'=>	'd M Y H:i:s',
@@ -2057,7 +2059,7 @@
 	'S_DELETE_SELECTED_USER_Q'=>		'Delete selected user?',
 	'S_SUBFILTER'=>				'Subfilter',
 	'S_AFFECTS_ONLY_FILTERED_DATA_SMALL'=>	'affects only filtered data!',
-	'S_THROW_MAP_SMALL'=>			'throw map',
+	'S_SHOW_VALUE_MAPPINGS'=>			'show value mappings',
 	'S_DELETE_SELECTED_ITEM_Q'=>		'Delete selected item?',
 	'S_DO_SMALL'=>				'do',
 	'S_INCORRECT_LIST_OF_ITEMS'=>		'Incorrect list of items.',
@@ -2278,6 +2280,8 @@
 	'S_REQUIRES_CTYPE_MODULE' => 'Requires ctype module',
 	'S_PHP_UPLOAD_MAX_FILESIZE' => 'PHP upload max filesize',
 	'S_IS_MINIMAL_FOR_PHP_ULOAD_FILESIZE_SMALL' => 'is minimum for PHP upload filesize',
+	'S_SESSION_MODULE' => 'PHP Session',
+	'S_REQUIRED_SESSION_MODULE' => 'Required Session module',
 
 //	class.cuser.php
 	'S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_MINUTES'=>	'Account is blocked for %s seconds',
@@ -2300,11 +2304,11 @@
 	'S_CUSER_ERROR_WRONG_FIELD_FOR_USER'=>			'Wrong fields for user',
 	'S_CUSER_ERROR_USER_EXISTS'=>				'User [ %1$s ] already exists',
 	'S_CUSER_ERROR_CANT_RENAME_GUEST_USER'=>		'Cannot rename guest user',
-	'S_CUSER_ERROR_USER_UNABLE_RESTRICT_SELF_GUI_ACCESS'=>	'User cannot restrict access to GUI to him self. Group "%1$s"',
-	'S_CUSER_ERROR_USER_CANT_DISABLE_SELF'=>		'User cannot disable him self. Group "%1$s"',
+	'S_CUSER_ERROR_USER_UNABLE_RESTRICT_SELF_GUI_ACCESS'=>	'User cannot restrict access to GUI for himself. Group "%1$s"',
+	'S_CUSER_ERROR_USER_CANT_DISABLE_SELF'=>		'User cannot disable himself. Group "%1$s"',
 	'S_CUSER_ERROR_INCORRECT_TIME_PERIOD'=>			'Incorrect time period',
 	'S_CUSER_ERROR_WRONG_PERIOD'=>				'Wrong period [ %1$s ]',
-	'S_CUSER_ERROR_INTERNAL_ZABBIX_ERROR'=>			'Internal zabbix error',
+	'S_CUSER_ERROR_INTERNAL_ZABBIX_ERROR'=>			'Internal Zabbix error',
 
 //	config.inc.php
 	'S_CONFIG_NOT_LOGGED_IN_ACCESS_DENIED'=>		'You cannot view this URL as a',

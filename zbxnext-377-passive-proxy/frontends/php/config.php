@@ -1091,8 +1091,9 @@ include_once('include/page_header.php');
 /////////////////////////////
 	else if($_REQUEST['config']==11){	// Macros		
 		$form = new CForm();
-		$tbl = get_macros_widget();
-		$tbl->addStyle('width: 50%;');
+		$tbl = new CTable();
+		$tbl->addRow(get_macros_widget());
+		$tbl->addStyle('width: 600px;');
 		$tbl->addStyle('margin: 0 auto;');
 		$form->addItem($tbl);
 		$cnf_wdgt->addItem($form);
