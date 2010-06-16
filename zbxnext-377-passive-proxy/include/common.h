@@ -84,9 +84,9 @@
 #	if defined(__va_copy)
 #		define va_copy(d, s) __va_copy(d, s)
 #	else
-#		define va_copy(d, s) memcpy (&d,&s, sizeof(va_list))
-#	endif /* __va_copy */
-#endif /* va_copy */
+#		define va_copy(d, s) memcpy(&d, &s, sizeof(va_list))
+#	endif
+#endif
 
 #ifdef snprintf
 #undef snprintf
@@ -129,7 +129,8 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #endif /* _WINDOWS */
 
 #ifndef HAVE_GETOPT_LONG
-	struct option {
+	struct option
+	{
 		const char *name;
 		int has_arg;
 		int *flag;
@@ -137,8 +138,6 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 	};
 #	define  getopt_long(argc, argv, optstring, longopts, longindex) getopt(argc, argv, optstring)
 #endif /* ndef HAVE_GETOPT_LONG */
-
-#define ZBX_UNUSED(a) ((void)0)(a)
 
 #define	SUCCEED		0
 #define	FAIL		(-1)
@@ -148,15 +147,7 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #define	AGENT_ERROR	(-5)
 char	*zbx_result_string(int result);
 
-/*
-#define ZBX_POLLER
-*/
-
-#ifdef ZBX_POLLER
-	#define MAX_STRING_LEN	800
-#else
-	#define MAX_STRING_LEN	2048
-#endif
+#define MAX_STRING_LEN	2048
 #define MAX_BUF_LEN	65536
 
 #define ZBX_DM_DELIMITER	'\255'
@@ -663,11 +654,11 @@ const char *zbx_permission_string(int perm);
 #define	SNMPTRAPPER_TIMEOUT	5
 
 #ifndef MAX
-#	define MAX(a, b) ((a)>(b) ? (a) : (b))
+#	define MAX(a, b) ((a) > (b) ? (a) : (b))
 #endif
 
 #ifndef MIN
-#	define MIN(a, b) ((a)<(b) ? (a) : (b))
+#	define MIN(a, b) ((a) < (b) ? (a) : (b))
 #endif
 
 /* Secure string copy */
@@ -934,7 +925,7 @@ int	__zbx_open(const char *pathname, int flags);
 #endif	/* _WINDOWS && _UNICODE */
 int	zbx_read(int fd, char *buf, size_t count, const char *encoding);
 
-int MAIN_ZABBIX_ENTRY(void);
+int	MAIN_ZABBIX_ENTRY(void);
 
 zbx_uint64_t	zbx_letoh_uint64(zbx_uint64_t data);
 zbx_uint64_t	zbx_htole_uint64(zbx_uint64_t data);
@@ -945,4 +936,5 @@ int	is_function_char(const char c);
 int	parse_function(char **exp, char **func, char **params);
 int	parse_host_key(char *exp, char **host, char **key);
 void	make_hostname(char *host);
+
 #endif
