@@ -193,10 +193,18 @@
 		if(($_REQUEST['hostid'] > 0) && !isset($_REQUEST['form_refresh'])){
 			$name = $proxy['host'];
 			$status = $proxy['status'];
-			$useip = $proxy['useip'];
-			$dns = $proxy['dns'];
-			$ip = $proxy['ip'];
-			$port = $proxy['port'];
+			if ($status == HOST_STATUS_PROXY_PASSIVE){
+				$useip = $proxy['useip'];
+				$dns = $proxy['dns'];
+				$ip = $proxy['ip'];
+				$port = $proxy['port'];
+			}
+			else{
+				$useip = get_request('useip', 1);
+				$dns = get_request('dns', '');
+				$ip = get_request('ip', '0.0.0.0');
+				$port = get_request('port', 10051);
+			}
 			$db_hosts = DBselect(
 				'SELECT hostid '.
 				' FROM hosts '.
