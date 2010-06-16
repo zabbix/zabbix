@@ -11,6 +11,7 @@ DIST_SUBDIRS = \
 	zbxcrypto \
 	zbxcommon \
 	zbxcomms \
+	zbxcommshigh \
 	zbxlog \
 	zbxnix \
 	zbxconf \
@@ -24,6 +25,7 @@ DIST_SUBDIRS = \
 
 if PROXY
 PROXY_SUBDIRS = \
+	zbxcommshigh \
 	zbxdb \
 	zbxdbcache \
 	zbxdbhigh \
@@ -34,6 +36,7 @@ endif
 
 if SERVER
 SERVER_SUBDIRS = \
+	zbxcommshigh \
 	zbxdb \
 	zbxdbcache \
 	zbxdbhigh \

@@ -108,4 +108,7 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 #define	ZBX_DEFAULT_IMAP_PORT	143
 #define	ZBX_DEFAULT_LDAP_PORT	389
 
+int	zbx_send_response(zbx_sock_t *sock, int result, const char *info, int timeout);
+int	zbx_recv_response(zbx_sock_t *sock, char *info, int max_info_len, int timeout);
+
 #endif

@@ -226,7 +226,7 @@
 
 		$sql = 'SELECT hostid,host '.
 				' FROM hosts'.
-				' WHERE status IN ('.HOST_STATUS_PROXY.') '.
+				' WHERE status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.') '.
 					' AND '.DBin_node('hostid').
 				' ORDER BY host';
 		$db_proxies = DBselect($sql);
@@ -4506,7 +4506,7 @@
 
 		$sql = 'SELECT hostid,host '.
 				' FROM hosts '.
-				' WHERE status IN ('.HOST_STATUS_PROXY.') '.
+				' WHERE status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.') '.
 					' AND '.DBin_node('hostid').
 				' ORDER BY host';
 		$db_proxies = DBselect($sql);

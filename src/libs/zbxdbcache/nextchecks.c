@@ -281,7 +281,7 @@ void	DCflush_nextchecks()
 			events_num++;
 
 			DBexecute_overflowed_sql(&sql, &sql_allocated, &sql_offset);
-		}	/* while (NULL != (row = DBfetch(result))) dealing with triggers */
+		}
 		DBfree_result(result);
 
 		/* dealing with events */

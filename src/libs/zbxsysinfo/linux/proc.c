@@ -276,7 +276,7 @@ int	PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
 			*p1++ = '\0';
 
-			value = zbx_atoui64(p);
+			ZBX_STR2UINT64(value, p);
 
 			zbx_rtrim(p1, "\n");
 

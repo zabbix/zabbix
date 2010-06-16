@@ -20,92 +20,87 @@
 #include "common.h"
 #include "db.h"
 #include "log.h"
-#include "zlog.h"
+#include "proxy.h"
 
-#include "trapper.h"
-#include "proxyconfig.h"
 #include "proxyautoreg.h"
 
 /******************************************************************************
  *                                                                            *
- * Function: process_autoreg_data                                             *
+ * Function: recv_areg_data                                                   *
  *                                                                            *
- * Purpose:                                                                   *
+ * Purpose: receive auto-registration data from proxy                         *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
+ * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	process_autoreg_data(zbx_sock_t *sock, struct zbx_json_parse *jp)
+void	recv_areg_data(zbx_sock_t *sock, struct zbx_json_parse *jp)
 {
-	char			tmp[MAX_STRING_LEN];
-	struct zbx_json_parse	jp_data, jp_row;
-	int			res = SUCCEED;
+	const char		*__function_name = "recv_areg_data";
 
-	const char		*p;
-	char			host[HOST_HOST_LEN_MAX];
-	time_t			now, hosttime, itemtime;
+	int			ret;
 	zbx_uint64_t		proxy_hostid;
+	char			host[HOST_HOST_LEN_MAX];
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In process_autoreg_data()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (FAIL == get_proxy_id(jp, &proxy_hostid)) {
-		res = FAIL;
+	if (FAIL == (ret = get_proxy_id(jp, &proxy_hostid, host)))
 		goto exit;
-	}
 
-	now = time(NULL);
-
-	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp))) {
-		res = FAIL;
-		goto exit;
-	}
-
-	hosttime = atoi(tmp);
-
-	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)) {
-		p = NULL;
-		while (NULL != (p = zbx_json_next(&jp_data, p)) && SUCCEED == res) {
-			if (FAIL == (res = zbx_json_brackets_open(p, &jp_row)))
-				break;
-
-			if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp)))
-				goto json_parse_error;
-			itemtime = now - (hosttime - atoi(tmp));
-
-			if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_HOST, host, sizeof(host)))
-				goto json_parse_error;
-
-			DBbegin();
-			DBregister_host(proxy_hostid, host, itemtime);
-			DBcommit();
-			continue;
-json_parse_error:
-			zabbix_log(LOG_LEVEL_WARNING, "Invalid auto registration data. %s",
-					zbx_json_strerror());
-			zabbix_syslog("Invalid auto registration data. %s",
-					zbx_json_strerror());
-		}
-	} else  {
-		zabbix_log(LOG_LEVEL_WARNING, "Invalid auto registration data. %s",
-				zbx_json_strerror());
-		zabbix_syslog("Invalid auto registration data. %s",
-				zbx_json_strerror());
-	}
+	process_areg_data(jp, proxy_hostid);
 exit:
-	if (SUCCEED != send_result(sock, res, NULL)) {
-		zabbix_log(LOG_LEVEL_WARNING, "Error sending result back");
-		zabbix_syslog("Trapper: error sending result back");
-	}
+	zbx_send_response(sock, ret, NULL, CONFIG_TIMEOUT);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of process_autoreg_data():%s",
-			zbx_result_string(res));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+}
 
-	return res;
+/******************************************************************************
+ *                                                                            *
+ * Function: send_areg_data                                                   *
+ *                                                                            *
+ * Purpose: send auto-registration data from proxy to a server                *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	send_areg_data(zbx_sock_t *sock)
+{
+	const char	*__function_name = "send_areg_data";
+
+	struct zbx_json	j;
+	zbx_uint64_t	lastid;
+	int		records;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+
+	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
+
+	records = proxy_get_areg_data(&j, &lastid);
+
+	zbx_json_close(&j);
+
+	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
+
+	if (FAIL == zbx_tcp_send_to(sock, j.buffer, CONFIG_TIMEOUT))
+		zabbix_log(LOG_LEVEL_WARNING, "Error while sending availability of hosts. %s",
+				zbx_tcp_strerror());
+	else if (SUCCEED == zbx_recv_response(sock, NULL, 0, CONFIG_TIMEOUT) && 0 != records)
+		proxy_set_areg_lastid(lastid);
+
+	zbx_json_free(&j);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

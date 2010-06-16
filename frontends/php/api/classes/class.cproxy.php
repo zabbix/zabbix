@@ -62,7 +62,7 @@ class CProxy extends CZBXAPI{
 		$sql_parts = array(
 			'select' => array('hosts' => 'h.hostid'),
 			'from' => array('hosts' => 'hosts h'),
-			'where' => array('h.status='.HOST_STATUS_PROXY),
+			'where' => array('h.status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')'),
 			'order' => array(),
 			'limit' => null);
 
