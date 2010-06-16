@@ -316,7 +316,6 @@
 
 	define('TRIGGER_STATUS_ENABLED',	0);
 	define('TRIGGER_STATUS_DISABLED',	1);
-	define('TRIGGER_STATUS_UNKNOWN',	2);
 
 	define('TRIGGER_VALUE_FALSE',		0);
 	define('TRIGGER_VALUE_TRUE',		1);
