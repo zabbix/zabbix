@@ -199,12 +199,12 @@ include_once('include/page_header.php');
 				'percent_right' => $percent_right,
 				'gitems' => $items
 			);
-				
+
 			if(isset($_REQUEST['graphid'])){
 				$graph['graphid'] = $_REQUEST['graphid'];
-				
+
 				$result = CGraph::update($graph);
-				
+
 				if($result){
 					add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_GRAPH,'Graph ID ['.$_REQUEST['graphid'].'] Graph ['.$_REQUEST['name'].']');
 				}
@@ -228,21 +228,8 @@ include_once('include/page_header.php');
 		}
 	}
 	else if(isset($_REQUEST['delete']) && isset($_REQUEST['graphid'])){
-		$options = array(
-			'graphids'=>$_REQUEST['graphid'],
-			'output'=>API_OUTPUT_EXTEND,
-			'editable'=>1,
-			'nopermissions'=>1
-		);
-		$graphs = CGraph::get($options);
-		$graph = reset($graphs);
-
-		DBstart();
-			$result = CGraph::delete($graphs);
-		$result = DBend($result);
-
+		$result = CGraph::delete($_REQUEST['graphid']);
 		if($result){
-			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_GRAPH,'Graph ['.$graph['name'].']');
 			unset($_REQUEST['form']);
 		}
 		show_messages($result, S_GRAPH_DELETED, S_CANNOT_DELETE_GRAPH);
@@ -292,36 +279,11 @@ include_once('include/page_header.php');
 	}
 //------ GO -------
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_graphid'])){
-		$options = array(
-			'graphids'=>$_REQUEST['group_graphid'],
-			'output'=>API_OUTPUT_EXTEND,
-			'editable'=>1
-		);
-		$graphs = CGraph::get($options);
-
-		$go_result = false;
-
-		DBstart();
-		foreach($graphs as $gnum => $graph){
-			if($graph['templateid'] != 0){
-				unset($graphs[$gnum]);
-				error(S_CANNOT_DELETE_GRAPH.' [ '.$graph['name'].' ] ('.S_TEMPLATED_GRAPH.')');
-				continue;
-			}
-
-			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_GRAPH,'Graph ['.$graph['name'].']');
-		}
-		if(!empty($graphs)){
-			$go_result = CGraph::delete($graphs);
-		}
-
-		$go_result = DBend($go_result);
-
+		$go_result = CGraph::delete($_REQUEST['group_graphid']);
 		show_messages($go_result, S_GRAPHS_DELETED, S_CANNOT_DELETE_GRAPHS);
 	}
 	else if(($_REQUEST['go'] == 'copy_to') && isset($_REQUEST['copy'])&&isset($_REQUEST['group_graphid'])){
 		if(isset($_REQUEST['copy_targetid']) && $_REQUEST['copy_targetid'] > 0 && isset($_REQUEST['copy_type'])){
-
 			$go_result = true;
 
 			$options = array(
@@ -470,7 +432,7 @@ include_once('include/page_header.php');
 				'sortorder' => $sortorder,
 				'limit' => ($config['search_limit']+1)
 			);
-		
+
 			if($pageFilter->hostid > 0)
 				$options['hostids'] = $pageFilter->hostid;
 			else if($pageFilter->groupid > 0)
@@ -478,7 +440,7 @@ include_once('include/page_header.php');
 
 			$graphs = CGraph::get($options);
 		}
-		
+
 // sorting && paging
 		order_result($graphs, $sortfield, $sortorder);
 		$paging = getPagingLine($graphs);
@@ -581,6 +543,6 @@ include_once('include/page_header.php');
 		$graphs_wdgt->show();
 	}
 
-	
+
 include_once('include/page_footer.php');
 ?>

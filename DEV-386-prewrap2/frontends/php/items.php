@@ -162,7 +162,7 @@ include_once('include/page_header.php');
 		'filter_templated_items'=>	array(T_ZBX_INT, O_OPT,  null,  IN('-1,0,1'),null),
 		'filter_with_triggers'=>	array(T_ZBX_INT, O_OPT,  null,  IN('-1,0,1'),null),
 		'filter_ipmi_sensor' =>		array(T_ZBX_STR, O_OPT,  null,  null,	null),
-		
+
 // subfilters
 		'subfilter_apps'=>				array(T_ZBX_STR, O_OPT,	 null,	null, null),
 		'subfilter_types'=>				array(T_ZBX_INT, O_OPT,	 null,	null, null),
@@ -185,7 +185,7 @@ include_once('include/page_header.php');
 
 	$_REQUEST['go'] = get_request('go', 'none');
 
-// PERMISSIONS	
+// PERMISSIONS
 	if(get_request('itemid', false)){
 		$options = array(
 			'itemids' => $_REQUEST['itemid'],
@@ -328,9 +328,7 @@ include_once('include/page_header.php');
 	else if(isset($_REQUEST['delete'])&&isset($_REQUEST['itemid'])){
 		$result = false;
 		if($item = get_item_by_itemid($_REQUEST['itemid'])){
-			DBstart();
-				$result = delete_item($_REQUEST['itemid']);
-			$result = DBend($result);
+			$result = CItem::delete($_REQUEST['itemid']);
 		}
 
 		show_messages($result, S_ITEM_DELETED, S_CANNOT_DELETE_ITEM);
@@ -350,7 +348,7 @@ include_once('include/page_header.php');
 		foreach($delay_flex as $num => $val){
 			$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
 		}
-		
+
 		$db_delay_flex = trim($db_delay_flex,';');
 
 		$item = array(
@@ -745,9 +743,7 @@ include_once('include/page_header.php');
 
 		$go_result &= !empty($group_itemid);
 		if($go_result) {
-			DBstart();
-			$go_result = delete_item($group_itemid);
-			$go_result = DBend($go_result);
+			$go_result = CItem::delete($group_itemid);
 		}
 		show_messages($go_result, S_ITEMS_DELETED, S_CANNOT_DELETE_ITEMS);
 	}
@@ -871,7 +867,7 @@ include_once('include/page_header.php');
 
 		if(isset($_REQUEST['filter_with_triggers']) && !zbx_empty($_REQUEST['filter_with_triggers']) && $_REQUEST['filter_with_triggers'] != -1)
 			$options['with_triggers'] = $_REQUEST['filter_with_triggers'];
-			
+
 		if(isset($_REQUEST['filter_ipmi_sensor']) && !zbx_empty($_REQUEST['filter_ipmi_sensor']))
 			$options['filter']['ipmi_sensor'] = $_REQUEST['filter_ipmi_sensor'];
 

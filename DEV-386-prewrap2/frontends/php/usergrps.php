@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,16 +33,12 @@ $page['scripts'] = array();
 
 include_once('include/page_header.php');
 
-$_REQUEST['config'] = get_request('config','usergrps.php');
-
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'config'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,		NULL),
 		'perm_details'=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
 		'grpaction'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
-
 /* group */
 		'usrgrpid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'isset({grpaction})&&(isset({form})&&({form}=="update"))'),
 		'group_groupid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
@@ -64,10 +60,8 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 		'set_gui_access'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1,2'), null),
 		'set_api_access'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'), null),
 		'set_debug_mode'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'), null),
-
 // Actions
 		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
-
 // form
 		'register'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"add permission","delete permission"'), null),
 
@@ -132,25 +126,28 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 		}
 	}
 	else if(isset($_REQUEST['save'])){
-		$group_users	= get_request('group_users', array());
-		$group_rights	= get_request('group_rights', array());
+		$usrgrp = array(
+			'name' => $_REQUEST['gname'],
+			'users_status' => $_REQUEST['users_status'],
+			'gui_access' => $_REQUEST['gui_access'],
+			'api_access' => $_REQUEST['api_access'],
+			'debug_mode' => $_REQUEST['debug_mode'],
+			'userids' => get_request('group_users', array()),
+			'rights' => get_request('group_rights', array()),
+		);
 
 		if(isset($_REQUEST['usrgrpid'])){
 			$action = AUDIT_ACTION_UPDATE;
 
-			DBstart();
-			$result = update_user_group($_REQUEST['usrgrpid'], $_REQUEST['gname'], $_REQUEST['users_status'], $_REQUEST['gui_access'], $_REQUEST['api_access'], $_REQUEST['debug_mode'],$group_users, $group_rights);
-			$result = DBend($result);
+			$usrgrp['usrgrpid'] = $_REQUEST['usrgrpid'];
 
+			$result = CUserGroup::update($usrgrp);
 			show_messages($result, S_GROUP_UPDATED, S_CANNOT_UPDATE_GROUP);
 		}
 		else{
 			$action = AUDIT_ACTION_ADD;
 
-			DBstart();
-			$result = add_user_group($_REQUEST['gname'], $_REQUEST['users_status'], $_REQUEST['gui_access'], $_REQUEST['api_access'], $_REQUEST['debug_mode'],$group_users, $group_rights);
-			$result = DBend($result);
-
+			$result = CUserGroup::create($usrgrp);
 			show_messages($result, S_GROUP_ADDED, S_CANNOT_ADD_GROUP);
 		}
 
@@ -163,9 +160,7 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 		$group = CUserGroup::get(array('usrgrpids' => $_REQUEST['usrgrpid'], 'extendoutput' => 1));
 		$group = reset($group);
 
-		DBstart();
-		$result = delete_user_group($_REQUEST['usrgrpid']);
-		$result = DBend($result);
+		$result = CUserGroup::delete($_REQUEST['usrgrpid']);
 
 		show_messages($result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
 		if($result){
@@ -177,8 +172,7 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 	}
 // -------- GO ---------
 	else if($_REQUEST['go'] == 'delete'){
-		$groupids = get_request('group_groupid', get_request('usrgrpid'));
-		zbx_value2array($groupids);
+		$groupids = get_request('group_groupid', array());
 
 		$groups = array();
 		$sql = 'SELECT ug.usrgrpid, ug.name '.
@@ -191,9 +185,7 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 		}
 
 		if(!empty($groups)){
-			DBstart();
-			$go_result = delete_user_group($groupids);
-			$go_result = DBend($go_result);
+			$go_result = CUserGroup::delete($groupids);
 
 			if($go_result){
 				foreach($groups as $groupid => $group){
@@ -339,13 +331,13 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 // Config
 	$frmForm = new CForm(null, 'get');
 
-	$cmbConf = new CComboBox('config','usergrps.php','javascript: submit()');
+	$cmbConf = new CComboBox('config','usergrps.php');
 	$cmbConf->setAttribute('onchange','javascript: redirect(this.options[this.selectedIndex].value);');
 		$cmbConf->addItem('usergrps.php',S_USER_GROUPS);
 		$cmbConf->addItem('users.php',S_USERS);
 
 	$frmForm->addItem(array($cmbConf,SPACE,new CButton('form', S_CREATE_GROUP)));
-	
+
 	$usrgroup_wdgt = new CWidget();
 	$usrgroup_wdgt->addPageHeader(S_CONFIGURATION_OF_USERS_AND_USER_GROUPS, $frmForm);
 
@@ -496,19 +488,15 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 		zbx_add_post_js('chkbxRange.pageGoName = "group_groupid";');
 
 		$footer = get_table_header(array($goBox, $goButton));
-//----
 
-// PAGING FOOTER
-		$table = array($paging,$table,$paging,$footer);
-//---------
 
-		$form->addItem($table);
+		$form->addItem(array($paging,$table,$paging,$footer));
 
 		$usrgroup_wdgt->addItem($form);
 	}
-	
+
 	$usrgroup_wdgt->show();
 
-	
+
 include_once('include/page_footer.php');
 ?>

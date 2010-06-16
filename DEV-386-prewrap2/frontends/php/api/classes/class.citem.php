@@ -194,7 +194,7 @@ class CItem extends CZBXAPI{
 				$sql_parts['group']['i'] = 'i.hostid';
 			}
 		}
-		
+
 // proxyids
 		if(!is_null($options['proxyids'])){
 			zbx_value2array($options['proxyids']);
@@ -295,7 +295,7 @@ class CItem extends CZBXAPI{
 				$sql_parts['where'][] = '(h.status<>'.HOST_STATUS_MONITORED.' OR i.status<>'.ITEM_STATUS_ACTIVE.')';
 			}
 		}
-		
+
 // API_OUTPUT_EXTEND
 		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['items'] = 'i.*';
@@ -331,7 +331,7 @@ class CItem extends CZBXAPI{
 				zbx_value2array($options['filter']['itemid']);
 				$sql_parts['where']['itemid'] = DBcondition('i.itemid', $options['filter']['itemid']);
 			}
-				
+
 			if(isset($options['filter']['description'])){
 				zbx_value2array($options['filter']['description']);
 				$sql_parts['where']['description'] = DBcondition('i.description', $options['filter']['description'], false, true);
@@ -365,7 +365,7 @@ class CItem extends CZBXAPI{
 				zbx_value2array($options['filter']['value_type']);
 				$sql_parts['where']['value_type'] = DBCondition('i.value_type', $options['filter']['value_type']);
 			}
-			
+
 			if(isset($options['filter']['ipmi_sensor']))
 				$sql_parts['where'][] = 'i.ipmi_sensor='.zbx_dbstr($options['filter']['ipmi_sensor']);
 
@@ -444,7 +444,7 @@ class CItem extends CZBXAPI{
 				}
 			}
 		}
-		
+
 // order
 // restrict not allowed columns for sorting
 		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
@@ -695,8 +695,6 @@ COpt::memoryPick();
 	}
 
 	public static function exists($object){
-		$keyFields = array(array('hostid', 'host'), 'key_');
-
 		$options = array(
 			'filter' => array('key_' => $object['key_']),
 			'webitems' => 1,
@@ -704,10 +702,10 @@ COpt::memoryPick();
 			'nopermissions' => 1,
 			'limit' => 1
 		);
-		
+
 		if(isset($object['hostid'])) $options['hostids'] = $object['hostid'];
 		if(isset($object['host'])) $options['filter']['host'] = $object['host'];
-		
+
 		if(isset($object['node']))
 			$options['nodeids'] = getNodeIdByNodeName($object['node']);
 		else if(isset($object['nodeids']))
@@ -721,12 +719,6 @@ COpt::memoryPick();
 /**
  * Add item
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param array $items
  * @return array|boolean
  */
@@ -734,23 +726,25 @@ COpt::memoryPick();
 		$items = zbx_toArray($items);
 		$itemids = array();
 
-		self::BeginTransaction(__METHOD__);
+		try{
+			self::BeginTransaction(__METHOD__);
 
-		$result = true;
-		foreach($items as $inum => $item){
-			$result = add_item($item);
+			foreach($items as $inum => $item){
+				$result = add_item($item);
 
-			if(!$result) break;
-			$itemids[] = $result;
-		}
+				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot create Item');
+				$itemids[] = $result;
+			}
 
-		$result = self::EndTransaction($result, __METHOD__);
+			self::EndTransaction(true, __METHOD__);
 
-		if($result){
 			return array('itemids' => $itemids);
 		}
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
 		}
 	}
@@ -758,62 +752,55 @@ COpt::memoryPick();
 /**
  * Update item
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param array $items
  * @return boolean
  */
 	public static function update($items){
 		$items = zbx_toArray($items);
-		$itemids = array();
+		$itemids = zbx_objectValues($items, 'itemid');
 
-		$options = array(
-			'itemids'=> zbx_objectValues($items, 'itemid'),
-			'editable'=>1,
-			'webitems' => 1,
-			'extendoutput'=>1,
-			'preservekeys'=>1
-		);
-		$upd_items = self::get($options);
-		foreach($items as $gnum => $item){
-			if(!isset($upd_items[$item['itemid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				return false;
-			}
-			$itemids[] = $item['itemid'];
-		}
+		try{
+			self::BeginTransaction(__METHOD__);
 
-		$result = true;
-
-		self::BeginTransaction(__METHOD__);
-		foreach($items as $inum => $item){
-			$item_db_fields = $upd_items[$item['itemid']];
-
-			unset($item_db_fields['lastvalue']);
-			unset($item_db_fields['prevvalue']);
-			unset($item_db_fields['lastclock']);
-			unset($item_db_fields['prevorgvalue']);
-			if(!check_db_fields($item_db_fields, $item)){
-				error('Incorrect arguments pasted to function [CItem::update]');
-				$result = false;
-				break;
+			$options = array(
+				'itemids' => $itemids,
+				'editable' => 1,
+				'webitems' => 1,
+				'extendoutput' => 1,
+				'preservekeys' => 1
+			);
+			$upd_items = self::get($options);
+			foreach($items as $gnum => $item){
+				if(!isset($upd_items[$item['itemid']])){
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
+				}
 			}
 
-			$result = update_item($item['itemid'], $item);
-			if(!$result) break;
-		}
+			foreach($items as $inum => $item){
+				$item_db_fields = $upd_items[$item['itemid']];
 
-		$result = self::EndTransaction($result, __METHOD__);
+				unset($item_db_fields['lastvalue']);
+				unset($item_db_fields['prevvalue']);
+				unset($item_db_fields['lastclock']);
+				unset($item_db_fields['prevorgvalue']);
+				if(!check_db_fields($item_db_fields, $item)){
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect parameters used for Item');
+				}
 
-		if($result){
+				$result = update_item($item['itemid'], $item);
+				if(!$result)
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot update item');
+			}
+
+			self::EndTransaction(true, __METHOD__);
+
 			return array('itemids' => $itemids);
 		}
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
 		}
 	}
@@ -821,48 +808,118 @@ COpt::memoryPick();
 /**
  * Delete items
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param array $items
- * @return deleted items
+ * @param array $itemids
+ * @return
  */
-	public static function delete($items){
-		$items = zbx_toArray($items);
-		$itemids = array();
+	public static function delete($itemids){
+		if(empty($itemids)) return true;
+		$itemids = zbx_toArray($itemids);
+		$delete = array();
+		$insert = array();
 
-		$options = array(
-			'itemids'=> zbx_objectValues($items, 'itemid'),
-			'editable'=>1,
-			'preservekeys'=>1
-		);
-		$del_items = self::get($options);
-		foreach($items as $num => $item){
-			if(!isset($del_items[$item['itemid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				return false;
+		try{
+			self::BeginTransaction(__METHOD__);
+
+			$options = array(
+				'itemids' => $itemids,
+				'editable' => 1,
+				'preservekeys' => 1,
+				'output' => API_OUTPUT_EXTEND,
+			);
+			$del_items = self::get($options);
+			foreach($itemids as $itemid){
+				if(!isset($del_items[$itemid])){
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
+				}
+				if($del_items[$itemid]['templateid'] != 0){
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete templated items');
+				}
+				if($del_items[$itemid]['type'] == ITEM_TYPE_HTTPTEST){
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete web items');
+				}
 			}
 
-			$itemids[] = $item['itemid'];
-			//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM, 'Item ['.$Item['description'].']');
-		}
+// first delete child items
+			$parent_itemids = $itemids;
+			do{
+				$db_items = DBselect('SELECT itemid FROM items WHERE ' . DBcondition('templateid', $parent_itemids));
+				$parent_itemids = array();
+				while($db_item = DBfetch($db_items)){
+					$parent_itemids[] = $db_item['itemid'];
+					$itemids[] = $db_item['itemid'];
+				}
+			} while(!empty($parent_itemids));
 
-		if(!empty($itemids)){
-			$result = delete_item($itemids);
-		}
-		else{
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Incorrect input parameter [ items ]');
-			$result = false;
-		}
+// delete triggers
+			$result = delete_triggers_by_itemid($itemids);
+			if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete item');
 
-		if($result){
-			return array('itemids' => $itemids);
+// delete graphs
+			$del_graphs = array();
+			$sql = 'SELECT gi.graphid' .
+					' FROM graphs_items gi' .
+					' WHERE ' . DBcondition('gi.itemid', $itemids) .
+					' AND NOT EXISTS (' .
+						' SELECT gii.gitemid' .
+						' FROM graphs_items gii' .
+						' WHERE gii.graphid=gi.graphid' .
+						' AND ' . DBcondition('gii.itemid', $itemids, true, false) .
+					' )';
+			$db_graphs = DBselect($sql);
+			while($db_graph = DBfetch($db_graphs)){
+				$del_graphs[$db_graph['graphid']] = $db_graph['graphid'];
+			}
+
+			if(!empty($del_graphs)){
+				$result = delete_graph($del_graphs);
+				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete item');
+			}
+
+
+			$itemids_condition = DBcondition('itemid', $itemids);
+
+			DB::delete('graphs_items', array($itemids_condition));
+			DB::delete('screens_items', array(
+				DBcondition('resourceid', $itemids),
+				DBcondition('resourcetype', array(SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT)),
+			));
+			DB::delete('items_applications', array($itemids_condition));
+			DB::delete('items', array($itemids_condition));
+			DB::delete('profiles', array(
+				'idx="web.favorite.graphids"',
+				'source="itemid"',
+				DBcondition('value_id', $itemids)
+			));
+
+
+			$item_data_tables = array(
+				'trends',
+				'trends_uint',
+				'history_text',
+				'history_log',
+				'history_uint',
+				'history_str',
+				'history',
+			);
+			foreach($itemids as $id => $itemid){
+				foreach($item_data_tables as $table){
+					$insert[] = array(
+						'tablename' => $table,
+						'field' => 'itemid',
+						'value' => $itemid,
+					);
+				}
+			}
+			DB::insert('housekeeper', $insert);
+
+			self::EndTransaction(true, __METHOD__);
+			return true;
 		}
-		else{
-			self::setError(__METHOD__);
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
 		}
 	}

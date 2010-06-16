@@ -343,12 +343,12 @@ include_once('include/page_header.php');
 						$new_values[$property] = $_REQUEST[$property];
 				}
 			}
-				
+
 // PROFILES {{{
 			if(isset($visible['useprofile'])){
 				$new_values['profile'] = get_request('useprofile', false) ? get_request('host_profile', array()) : array();
 			}
-			
+
 			if(isset($visible['useprofile_ext'])){
 				$new_values['extendedProfile'] = get_request('useprofile_ext', false) ? get_request('ext_host_profiles', array()) : array();
 			}
@@ -358,16 +358,16 @@ include_once('include/page_header.php');
 			if(isset($visible['newgroup']) && !empty($_REQUEST['newgroup'])){
 				$result = CHostGroup::create(array('name' => $_REQUEST['newgroup']));
 				if($result === false) throw new Exception();
-				
+
 				$newgroup = array('groupid' => reset($result['groupids']), 'name' => $_REQUEST['newgroup']);
 			}
-			
+
 			$templates = array();
 			if(isset($visible['template_table']) || isset($visible['template_table_r'])){
 				$tplids = array_keys($_REQUEST['templates']);
 				$templates = zbx_toObject($tplids, 'templateid');
 			}
-		
+
 			if(isset($visible['groups'])){
 				$hosts['groups'] = zbx_toObject($_REQUEST['groups'], 'groupid');
 				if(!empty($newgroup)){
@@ -381,17 +381,17 @@ include_once('include/page_header.php');
 			$result = CHost::massUpdate(array_merge($hosts, $new_values));
 			if($result === false) throw new Exception();
 
-			
+
 			$add = array();
 			if(!empty($templates) && isset($visible['template_table'])){
 				$add['templates'] = $templates;
 			}
 			if(!empty($newgroup) && !isset($visible['groups'])){
-				$add['groups'][] = $newgroup;			
+				$add['groups'][] = $newgroup;
 			}
 			if(!empty($add)){
 				$add['hosts'] = $hosts['hosts'];
-				
+
 				$result = CHost::massAdd($add);
 				if($result === false) throw new Exception();
 			}
@@ -576,11 +576,7 @@ include_once('include/page_header.php');
 	}
 // DELETE HOST
 	else if(isset($_REQUEST['delete']) && isset($_REQUEST['hostid'])){
-
-		DBstart();
-			$result = delete_host($_REQUEST['hostid']);
-		$result = DBend($result);
-
+		$result = CHost::delete($_REQUEST['hostid']);
 		show_messages($result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
 
 		if($result){
@@ -605,26 +601,8 @@ include_once('include/page_header.php');
 // DELETE HOST
 	else if($_REQUEST['go'] == 'delete'){
 		$hostids = get_request('hosts', array());
-		$hosts = zbx_toObject($hostids,'hostid');
 
-		DBstart();
-		$options = array(
-			'hostids' => $hostids,
-			'output' => array('hostid', 'host')
-		);
-		//$delHosts = CHost::get($options);
-
-		$go_result = CHost::delete($hosts);
-		/*foreach($delHosts as $hnum => $host){
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, 'Host ['.$host['host'].']');
-		}*/
-
-		$go_result = DBend($go_result);
-
-		if(!$go_result){
-			error(CHost::resetErrors());
-		}
-
+		$go_result = CHost::delete($hostids);
 		show_messages($go_result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
 	}
 // ACTIVATE/DISABLE HOSTS
@@ -722,7 +700,7 @@ include_once('include/page_header.php');
 
 		$sortfield = getPageSortField('host');
 		$sortorder = getPageSortOrder();
-		
+
 		if($pageFilter->groupsSelected){
 			$options = array(
 				'editable' => 1,
@@ -942,7 +920,7 @@ include_once('include/page_header.php');
 		$form->addItem($table);
 		$hosts_wdgt->addItem($form);
 	}
-	
+
 	$hosts_wdgt->show();
 
 
