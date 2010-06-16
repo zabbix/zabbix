@@ -6,6 +6,8 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2532] fixed outdated information in "server info" screen element (Sasha)
+ - [ZBXNEXT-377] added support of passive mode for proxies (Sasha)
  - [ZBX-2556] added dropdown length limit in frontend (Aly)
  - [ZBX-2548] fixed sorting in items popup when adding items to simple graph, disabled dropdown with tooltip showing filtration added as well (Maxim Andruhovich / AM)
  - [ZBX-2547] fixed errors in installation (Aly)

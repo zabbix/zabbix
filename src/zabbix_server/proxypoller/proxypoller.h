@@ -17,18 +17,14 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
+#ifndef ZABBIX_PROXYPOLLER_H
+#define ZABBIX_PROXYPOLLER_H
 
-#ifndef ZABBIX_TRAPPER_ACTIVE_H
-#define ZABBIX_TRAPPER_ACTIVE_H
+extern int	CONFIG_PROXYPOLLER_FORKS;
+extern char	*CONFIG_SOURCE_IP;
+extern int	CONFIG_TRAPPER_TIMEOUT;
 
-#include "common.h"
-#include "db.h"
-#include "comms.h"
-#include "zbxjson.h"
-
-extern int	CONFIG_TIMEOUT;
-
-int	send_list_of_active_checks(zbx_sock_t *sock, char *request, unsigned char zbx_process);
-int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *json, unsigned char zbx_process);
+void	main_proxypoller_loop();
 
 #endif
+

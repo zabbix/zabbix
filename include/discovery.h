@@ -1,3 +1,4 @@
+
 /*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
@@ -17,18 +18,14 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
+#ifndef ZABBIX_DISCOVERY_H
+#define ZABBIX_DISCOVERY_H
 
-#ifndef ZABBIX_TRAPPER_ACTIVE_H
-#define ZABBIX_TRAPPER_ACTIVE_H
-
-#include "common.h"
-#include "db.h"
-#include "comms.h"
 #include "zbxjson.h"
+#include "comms.h"
 
-extern int	CONFIG_TIMEOUT;
-
-int	send_list_of_active_checks(zbx_sock_t *sock, char *request, unsigned char zbx_process);
-int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *json, unsigned char zbx_process);
+void	discovery_update_host(DB_DHOST *dhost, const char *ip, int status, int now);
+void	discovery_update_service(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost,
+		char *ip, int port, int status, const char *value, int now);
 
 #endif

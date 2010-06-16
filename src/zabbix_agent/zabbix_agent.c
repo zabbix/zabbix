@@ -76,11 +76,11 @@ void	child_signal_handler( int sig )
 	exit( FAIL );
 }
 
-static char	DEFAULT_CONFIG_FILE[]	= "/etc/zabbix/zabbix_agent.conf";
+static char	DEFAULT_CONFIG_FILE[] = "/etc/zabbix/zabbix_agent.conf";
 
 void    init_config(void)
 {
-	struct cfg_line cfg[]=
+	struct cfg_line cfg[] =
 	{
 /*               PARAMETER      ,VAR    ,FUNC,  TYPE(0i,1s),MANDATORY,MIN,MAX
 */
@@ -89,12 +89,12 @@ void    init_config(void)
 		{0}
 	};
 
-	parse_cfg_file(CONFIG_FILE,cfg);
+	parse_cfg_file(CONFIG_FILE, cfg);
 }
 
 int	main(int argc, char **argv)
 {
-	char		ch = '\0';
+	char		ch;
 	int		task = ZBX_TASK_START;
 	char		*TEST_METRIC = NULL;
 	zbx_sock_t	s_in;

@@ -20,171 +20,87 @@
 #include "common.h"
 #include "db.h"
 #include "log.h"
-#include "zlog.h"
+#include "proxy.h"
 
-#include "trapper.h"
-#include "proxyconfig.h"
 #include "proxydiscovery.h"
-#include "../discoverer/discoverer.h"
 
 /******************************************************************************
  *                                                                            *
- * Function: process_discovery_data                                           *
+ * Function: recv_discovery_data                                              *
  *                                                                            *
  * Purpose:                                                                   *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
+ * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	process_discovery_data(zbx_sock_t *sock, struct zbx_json_parse *jp)
+void	recv_discovery_data(zbx_sock_t *sock, struct zbx_json_parse *jp)
 {
-	const char		*__function_name = "process_discovery_data";
-	char			tmp[MAX_STRING_LEN];
-	zbx_uint64_t		last_druleid;
-	DB_DRULE		drule;
-	DB_DCHECK		dcheck;
-	DB_DHOST		dhost;
-	struct zbx_json_parse	jp_data, jp_row;
-	int			res = SUCCEED;
+	const char		*__function_name = "recv_discovery_data";
 
-	int			port, status;
-	const char		*p;
-	char			last_ip[HOST_IP_LEN_MAX], ip[HOST_IP_LEN_MAX],
-				key_[ITEM_KEY_LEN_MAX],
-				value[DSERVICE_VALUE_LEN_MAX];
-	time_t			now, hosttime, itemtime;
+	int			ret;
 	zbx_uint64_t		proxy_hostid;
-	DB_RESULT		result;
-	DB_ROW			row;
+	char			host[HOST_HOST_LEN_MAX];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (FAIL == get_proxy_id(jp, &proxy_hostid))
-	{
-		res = FAIL;
+	if (FAIL == (ret = get_proxy_id(jp, &proxy_hostid, host)))
 		goto exit;
-	}
 
-	now = time(NULL);
-
-	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp)))
-	{
-		res = FAIL;
-		goto exit;
-	}
-
-	hosttime = atoi(tmp);
-	memset(&drule, 0, sizeof(drule));
-	last_druleid = 0;
-	*last_ip = '\0';
-
-	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data))
-	{
-		p = NULL;
-		while (NULL != (p = zbx_json_next(&jp_data, p)) && SUCCEED == res)
-		{
-			if (FAIL == (res = zbx_json_brackets_open(p, &jp_row)))
-				break;
-
-			memset(&dcheck, 0, sizeof(dcheck));
-			*key_ = '\0';
-			*value = '\0';
-			port = 0;
-			status = 0;
-			dcheck.key_ = key_;
-
-			if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp)))
-				goto json_parse_error;
-			itemtime = now - (hosttime - atoi(tmp));
-
-			if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DRULE, tmp, sizeof(tmp)))
-				goto json_parse_error;
-			ZBX_STR2UINT64(drule.druleid, tmp);
-
-			if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DCHECK, tmp, sizeof(tmp)))
-				goto json_parse_error;
-			ZBX_STR2UINT64(dcheck.dcheckid, tmp);
-
-			if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_TYPE, tmp, sizeof(tmp)))
-				goto json_parse_error;
-			dcheck.type = atoi(tmp);
-
-			if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_IP, ip, sizeof(ip)))
-				goto json_parse_error;
-
-			if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_PORT, tmp, sizeof(tmp)))
-				port = atoi(tmp);
-
-			zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_KEY, key_, sizeof(key_));
-			zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_VALUE, value, sizeof(value));
-
-			if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_STATUS, tmp, sizeof(tmp)))
-				status = atoi(tmp);
-
-			if (0 == last_druleid || drule.druleid != last_druleid)
-			{
-				result = DBselect(
-						"select unique_dcheckid"
-						" from drules"
-						" where druleid=" ZBX_FS_UI64,
-						drule.druleid);
-
-				if (NULL != (row = DBfetch(result)))
-					ZBX_STR2UINT64(drule.unique_dcheckid, row[0]);
-				DBfree_result(result);
-
-				last_druleid = drule.druleid;
-			}
-
-			if ('\0' == *last_ip || 0 != strcmp(ip, last_ip))
-			{
-				memset(&dhost, 0, sizeof(dhost));
-				zbx_strlcpy(last_ip, ip, HOST_IP_LEN_MAX);
-			}
-
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() druleid:" ZBX_FS_UI64 " dcheckid:" ZBX_FS_UI64  " unique_dcheckid:" ZBX_FS_UI64
-					" type:%d time:'%s %s' ip:'%s' port:%d key:'%s' value:'%s'",
-					__function_name, drule.druleid, dcheck.dcheckid, drule.unique_dcheckid, dcheck.type,
-					zbx_date2str(itemtime), zbx_time2str(itemtime),
-					ip, port, dcheck.key_, value);
-
-			DBbegin();
-			if (dcheck.type == -1)
-				update_host(&dhost, ip, status, itemtime);
-			else
-				update_service(&drule, &dcheck, &dhost, ip, port, status, value, itemtime);
-			DBcommit();
-
-			continue;
-json_parse_error:
-			zabbix_log(LOG_LEVEL_WARNING, "Invalid discovery data. %s",
-					zbx_json_strerror());
-			zabbix_syslog("Invalid discovery data. %s",
-					zbx_json_strerror());
-		}
-	}
-	else
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "Invalid discovery data. %s",
-				zbx_json_strerror());
-		zabbix_syslog("Invalid discovery data. %s",
-				zbx_json_strerror());
-	}
+	process_dhis_data(jp);
 exit:
-	if (SUCCEED != send_result(sock, res, NULL))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "Error sending result back");
-		zabbix_syslog("Trapper: error sending result back");
-	}
+	zbx_send_response(sock, ret, NULL, CONFIG_TIMEOUT);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+}
 
-	return res;
+/******************************************************************************
+ *                                                                            *
+ * Function: send_discovery_data                                              *
+ *                                                                            *
+ * Purpose: send discovery data from proxy to a server                        *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	send_discovery_data(zbx_sock_t *sock)
+{
+	const char	*__function_name = "send_discovery_data";
+
+	struct zbx_json	j;
+	zbx_uint64_t	lastid;
+	int		records;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+
+	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
+
+	records = proxy_get_dhis_data(&j, &lastid);
+
+	zbx_json_close(&j);
+
+	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
+
+	if (FAIL == zbx_tcp_send_to(sock, j.buffer, CONFIG_TIMEOUT))
+		zabbix_log(LOG_LEVEL_WARNING, "Error while sending availability of hosts. %s",
+				zbx_tcp_strerror());
+	else if (SUCCEED == zbx_recv_response(sock, NULL, 0, CONFIG_TIMEOUT) && 0 != records)
+		proxy_set_dhis_lastid(lastid);
+
+	zbx_json_free(&j);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
