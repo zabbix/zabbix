@@ -838,17 +838,29 @@ static void	DCsync_trends()
  ******************************************************************************/
 static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 {
-	char		*exp;
+	const char	*__function_name = "DCmass_update_triggers";
+
+	typedef struct zbx_trigger_s
+	{
+		zbx_uint64_t	triggerid;
+		char		*exp;
+		char		*error;
+		int		clock;
+		unsigned char	type;
+		unsigned char	value;
+	} zbx_trigger_t;
+
+	zbx_trigger_t	*tr = NULL, *tr_last = NULL;
+	int		tr_alloc, tr_num = 0;
+
 	char		error[MAX_STRING_LEN];
-	int		trigger_type, trigger_value, exp_value;
-	const char	*trigger_error;
+	int		exp_value;
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		sql_offset = 0, i;
-	ZBX_DC_HISTORY	*h;
 	zbx_uint64_t	itemid, triggerid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In DCmass_update_triggers()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 1024,
 			"select distinct t.triggerid,t.type,t.value,t.error,t.expression,f.itemid"
@@ -866,67 +878,93 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 		if (0 != history[i].value_null)
 			continue;
 
-		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 32, ZBX_FS_UI64 ",",
+		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 22, ZBX_FS_UI64 ",",
 				history[i].itemid);
 	}
 
-	if (sql[sql_offset - 1] == ',')
+	if (sql[--sql_offset] == ',')
 	{
-		sql_offset--;
-		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 32, ")");
+		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 23, ") order by t.triggerid");
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "No items with triggers");
-		return;
+		zabbix_log(LOG_LEVEL_DEBUG, "%s():no items with triggers", __function_name);
+		goto exit;
 	}
 
 	result = DBselect("%s", sql);
 
 	sql_offset = 0;
 
+	tr_alloc = history_num;
+	tr = zbx_malloc(tr, tr_alloc * sizeof(zbx_trigger_t));
+
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(triggerid, row[0]);
-		trigger_type = atoi(row[1]);
-		trigger_value = atoi(row[2]);
-		trigger_error = row[3];
-		ZBX_STR2UINT64(itemid, row[5]);
 
-		h = NULL;
+		if (NULL == tr_last || tr_last->triggerid != triggerid)
+		{
+			if (tr_num == tr_alloc)
+			{
+				tr_alloc += 64;
+				tr = zbx_realloc(tr, tr_alloc * sizeof(zbx_trigger_t));
+			}
+
+			tr_last = &tr[tr_num++];
+			tr_last->triggerid = triggerid;
+			tr_last->type = (unsigned char)atoi(row[1]);
+			tr_last->value = (unsigned char)atoi(row[2]);
+			tr_last->error = strdup(row[3]);
+			tr_last->exp = strdup(row[4]);
+			tr_last->clock = 0;
+		}
+
+		ZBX_STR2UINT64(itemid, row[5]);
 
 		for (i = 0; i < history_num; i++)
 		{
 			if (itemid == history[i].itemid)
 			{
-				h = &history[i];
+				if (tr_last->clock < history[i].clock)
+					tr_last->clock = history[i].clock;
 				break;
 			}
 		}
+	}
 
-		if (NULL == h)
-			continue;
+	DBfree_result(result);
 
-		exp = strdup(row[4]);
-
-		if (SUCCEED != evaluate_expression(&exp_value, &exp, h->clock, triggerid, trigger_value, error, sizeof(error)))
+	for (i = 0; i < tr_num; i++)
+	{
+		if (0 == tr[i].clock)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Expression [%s] for item [" ZBX_FS_UI64 "][%s] cannot be evaluated: %s",
-					row[4], itemid, zbx_host_key_string(itemid), error);
-			zabbix_syslog("Expression [%s] for item [" ZBX_FS_UI64 "][%s] cannot be evaluated: %s",
-					row[4], itemid, zbx_host_key_string(itemid), error);
+			THIS_SHOULD_NEVER_HAPPEN();
+			continue;
+		}
 
-/*			We shouldn't update trigger value if expressions failed */
-			DBupdate_trigger_value(triggerid, trigger_type, trigger_value,
-					trigger_error, TRIGGER_VALUE_UNKNOWN, h->clock, error);
+		if (SUCCEED != evaluate_expression(&exp_value, &tr[i].exp, tr[i].clock,
+					tr[i].triggerid, tr[i].value, error, sizeof(error)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Expression [%s] cannot be evaluated: %s",
+					tr[i].exp, error);
+			zabbix_syslog("Expression [%s] cannot be evaluated: %s",
+					tr[i].exp, error);
+
+			DBupdate_trigger_value(tr[i].triggerid, tr[i].type, tr[i].value,
+					tr[i].error, TRIGGER_VALUE_UNKNOWN, tr[i].clock, error);
 		}
 		else
-			DBupdate_trigger_value(triggerid, trigger_type, trigger_value,
-					trigger_error, exp_value, h->clock, NULL);
+			DBupdate_trigger_value(tr[i].triggerid, tr[i].type, tr[i].value,
+					tr[i].error, exp_value, tr[i].clock, NULL);
 
-		zbx_free(exp);
+		zbx_free(tr[i].error);
+		zbx_free(tr[i].exp);
 	}
-	DBfree_result(result);
+
+	zbx_free(tr);
+exit:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 static int	DBchk_double(double value)

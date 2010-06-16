@@ -568,10 +568,8 @@ int	DBupdate_trigger_value(zbx_uint64_t triggerid, int trigger_type, int trigger
 	{
 		reason_esc = DBdyn_escape_string_len(reason, TRIGGER_ERROR_LEN);
 		DBexecute("update triggers"
-				" set lastchange=%d,"
-					"error='%s'"
+				" set error='%s'"
 				" where triggerid=" ZBX_FS_UI64,
-				now,
 				reason_esc,
 				triggerid);
 		zbx_free(reason_esc);
