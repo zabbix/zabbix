@@ -109,14 +109,6 @@
 #define vsprintf	ERROR_DO_NOT_USE_VSPRINTF_FUNCTION_TRY_TO_USE_VSNPRINTF
 /*#define strncat		ERROR_DO_NOT_USE_STRNCAT_FUNCTION_TRY_TO_USE_ZBX_STRLCAT*/
 
-#ifdef HAVE_ATOLL
-#	define zbx_atoui64(str)	((zbx_uint64_t)atoll(str))
-#else
-#	define zbx_atoui64(str)	((zbx_uint64_t)atol(str))
-#endif
-
-#define zbx_atod(str)	strtod(str, (char **)NULL)
-
 #define ON	1
 #define OFF	0
 

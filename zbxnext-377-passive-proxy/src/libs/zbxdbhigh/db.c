@@ -788,9 +788,9 @@ int	DBadd_trend_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock)
 	if(row)
 	{
 		num = atoi(row[0]);
-		value_min = zbx_atoui64(row[1]);
-		value_avg = zbx_atoui64(row[2]);
-		value_max = zbx_atoui64(row[3]);
+		ZBX_STR2UINT64(value_min, row[1]);
+		ZBX_STR2UINT64(value_avg, row[2]);
+		ZBX_STR2UINT64(value_max, row[3]);
 		if(value<value_min)	value_min=value;
 		if(value>value_max)	value_max=value;
 		value_avg=(num*value_avg+value)/(num+1);
@@ -999,7 +999,7 @@ zbx_uint64_t	DBget_proxy_lastaccess(const char *hostname)
 		return FAIL;
 	}
 
-	lastaccess = zbx_atoui64(row[0]);
+	ZBX_STR2UINT64(lastaccess, row[0]);
 
 	DBfree_result(result);
 

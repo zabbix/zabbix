@@ -2073,8 +2073,6 @@ static void	add_value_suffix_normal(char *value, int max_len, char *units)
 
 	ZBX_STR2UINT64(value_uint64, value);
 
-/*      value_uint64 = llabs(zbx_atoui64(value));*/
-
 	/* Special processing for bits */
 	if(strcmp(units,"b") == 0 || strcmp(units,"bps") == 0)
 	{
@@ -2190,7 +2188,7 @@ int	add_value_suffix(char *value, int max_len, char *units, int value_type)
 		}
 		else if(strcmp(units,"unixtime") == 0)
 		{
-			time = (time_t)zbx_atoui64(value);
+			time = (time_t)atoi(value);
 			local_time = localtime(&time);
 			strftime(tmp, MAX_STRING_LEN, "%Y.%m.%d %H:%M:%S",
 				local_time);

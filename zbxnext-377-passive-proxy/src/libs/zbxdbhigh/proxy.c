@@ -122,8 +122,8 @@ int	get_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host)
 
 		if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
 		{
-			*hostid	= zbx_atoui64(row[0]);
-			ret	= SUCCEED;
+			ZBX_STR2UINT64(*hostid, row[0]);
+			ret = SUCCEED;
 		}
 		else
 			zabbix_log(LOG_LEVEL_WARNING, "Unknown proxy \"%s\"",

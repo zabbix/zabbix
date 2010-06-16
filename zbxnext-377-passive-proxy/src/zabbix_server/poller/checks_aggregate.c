@@ -22,14 +22,14 @@
 
 #include "checks_aggregate.h"
 
-static	int	evaluate_one(double *result, int *num, char *grpfunc, char const *value_str, unsigned char valuetype)
+static	int	evaluate_one(double *result, int *num, char *grpfunc, const char *value_str, unsigned char valuetype)
 {
 	int		ret = SUCCEED;
 	double		value = 0;
 	zbx_uint64_t	value_uint64;
 
 	if (ITEM_VALUE_TYPE_FLOAT == valuetype)
-		value = zbx_atod(value_str);
+		value = atof(value_str);
 	else if (ITEM_VALUE_TYPE_UINT64 == valuetype)
 	{
 		ZBX_STR2UINT64(value_uint64, value_str);
