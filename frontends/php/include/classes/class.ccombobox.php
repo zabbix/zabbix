@@ -29,7 +29,7 @@ class CComboBox extends CTag{
 		$this->attributes['id'] = $name;
 		$this->attributes['name'] = $name;
 
-		$this->attributes['class'] = 'inputFont select';
+		$this->attributes['class'] = 'select';
 		$this->attributes['size'] = 1;
 
 		$this->value = $value;
@@ -51,7 +51,7 @@ class CComboBox extends CTag{
 		}
 		else{
 			if(zbx_strlen($caption) > 44){
-				$this->setAttribute('class', 'inputFont select selectShorten');
+				$this->setAttribute('class', 'select selectShorten');
 			}
 
 			if(is_null($selected)){
