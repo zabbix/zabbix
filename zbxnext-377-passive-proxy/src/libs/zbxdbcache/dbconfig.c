@@ -893,7 +893,8 @@ static void	DCsync_hosts(DB_RESULT result)
 
 	ZBX_DC_HOST_PH		host_ph;
 
-	int			i, index, found, changed, update_queue;
+	int			i, index, found;
+	int			update_index, update_queue;
 	zbx_uint64_t		hostid, proxy_hostid;
 	zbx_vector_uint64_t	ids;
 	unsigned char		status;
@@ -921,7 +922,7 @@ static void	DCsync_hosts(DB_RESULT result)
 		if (found && (host->proxy_hostid != proxy_hostid ||
 				host->status != status || 0 != strcmp(host->host, row[2])))
 		{
-			changed = 1;
+			update_index = 1;
 			host_ph.proxy_hostid = host->proxy_hostid;
 			host_ph.status = host->status;
 			host_ph.host = host->host;
@@ -929,7 +930,7 @@ static void	DCsync_hosts(DB_RESULT result)
 			zbx_hashset_remove(&config->hosts_ph, &host_ph);
 		}
 		else
-			changed = 0;
+			update_index = 0;
 
 		update_queue = (!found && HOST_STATUS_PROXY_PASSIVE == status)
 				|| (found && host->status != status);
@@ -972,11 +973,9 @@ static void	DCsync_hosts(DB_RESULT result)
 				host->ipmi_disable_until = atoi(row[25]);
 			}
 		}
-		if (update_queue)
-			DCupdate_proxy_queue(host);
 
 		/* update host_ph index, if needed */
-		if (!found || changed)
+		if (!found || update_index)
 		{
 			host_ph.proxy_hostid = host->proxy_hostid;
 			host_ph.status = host->status;
@@ -984,6 +983,9 @@ static void	DCsync_hosts(DB_RESULT result)
 			host_ph.host_ptr = host;
 			zbx_hashset_insert(&config->hosts_ph, &host_ph, sizeof(ZBX_DC_HOST_PH));
 		}
+
+		if (update_queue)
+			DCupdate_proxy_queue(host);
 
 		/* IPMI hosts */
 
