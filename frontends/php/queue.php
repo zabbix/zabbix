@@ -155,7 +155,7 @@ include_once 'include/page_header.php';
 		}
 	}
 	else if ($_REQUEST["config"] == 1){
-		$db_proxies = DBselect('select hostid from hosts where status='.HOST_STATUS_PROXY);
+		$db_proxies = DBselect('SELECT hostid FROM hosts WHERE status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')');
 
 		while (null != ($db_proxy = DBfetch($db_proxies))){
 			$sec_10[$db_proxy['hostid']]	= 0;
@@ -193,7 +193,7 @@ include_once 'include/page_header.php';
 
 		$table->setHeader(array(S_PROXY,S_5_SECONDS,S_10_SECONDS,S_30_SECONDS,S_1_MINUTE,S_5_MINUTES,S_MORE_THAN_10_MINUTES));
 
-		$db_proxies = DBselect('select hostid,host from hosts where status='.HOST_STATUS_PROXY.' order by host');
+		$db_proxies = DBselect('SELECT hostid,host FROM hosts WHERE status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.') ORDER BY host');
 
 		while (null != ($db_proxy = DBfetch($db_proxies))){
 			$elements = array(

@@ -387,8 +387,10 @@ frontends/php/usergrps.php -text
 frontends/php/warning.php -text
 include/dbcache.h -text
 include/dbschema.h -text
+include/discovery.h -text
 include/ipc.h -text
 include/memalloc.h -text
+include/proxy.h -text
 include/strpool.h -text
 include/zbxalgo.h -text
 include/zbxicmpping.h -text
@@ -425,11 +427,15 @@ src/libs/zbxalgo/hashset.c -text
 src/libs/zbxalgo/vector.c -text
 src/libs/zbxcommon/file.c -text
 src/libs/zbxcommon/time.c -text
+src/libs/zbxcommshigh/Makefile.am -text
+src/libs/zbxcommshigh/comms.c -text
 src/libs/zbxdbcache/Makefile.am -text
 src/libs/zbxdbcache/dbcache.c -text
 src/libs/zbxdbcache/dbconfig.c -text
 src/libs/zbxdbcache/nextchecks.c -text
+src/libs/zbxdbhigh/discovery.c -text
 src/libs/zbxdbhigh/macro.c -text
+src/libs/zbxdbhigh/proxy.c -text
 src/libs/zbxicmpping/Makefile.am -text
 src/libs/zbxicmpping/icmpping.c -text
 src/libs/zbxjson/Makefile.am -text
@@ -484,6 +490,9 @@ src/zabbix_server/poller/checks_ssh.c -text
 src/zabbix_server/poller/checks_ssh.h -text
 src/zabbix_server/poller/checks_telnet.c -text
 src/zabbix_server/poller/checks_telnet.h -text
+src/zabbix_server/proxypoller/Makefile.am -text
+src/zabbix_server/proxypoller/proxypoller.c -text
+src/zabbix_server/proxypoller/proxypoller.h -text
 src/zabbix_server/trapper/nodecommand.c -text
 src/zabbix_server/trapper/nodecommand.h -text
 src/zabbix_server/trapper/proxyautoreg.c -text

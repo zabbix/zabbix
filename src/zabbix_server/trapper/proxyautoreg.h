@@ -17,13 +17,15 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-
 #ifndef ZABBIX_PROXYAUTOREG_H
 #define ZABBIX_PROXYAUTOREG_H
 
 #include "comms.h"
 #include "zbxjson.h"
 
-int	process_autoreg_data(zbx_sock_t *sock, struct zbx_json_parse *jp);
+extern int	CONFIG_TIMEOUT;
+
+void	recv_areg_data(zbx_sock_t *sock, struct zbx_json_parse *jp);
+void	send_areg_data(zbx_sock_t *sock);
 
 #endif

@@ -14,7 +14,8 @@ SUBDIRS = \
 	trapper \
 	utils \
 	watchdog \
-	escalator
+	escalator \
+	proxypoller
 
 sbin_PROGRAMS = zabbix_server
 
@@ -44,6 +45,7 @@ zabbix_server_LDADD = \
 	httppoller/libzbxhttppoller.a \
 	watchdog/libzbxwatchdog.a \
 	escalator/libzbxescalator.a \
+	proxypoller/libzbxproxypoller.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libspecsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
@@ -60,6 +62,7 @@ zabbix_server_LDADD = \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
+	$(top_srcdir)/src/libs/zbxcommshigh/libzbxcommshigh.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
 	$(top_srcdir)/src/libs/zbxicmpping/libzbxicmpping.a \

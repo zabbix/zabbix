@@ -44,6 +44,9 @@ src/libs/zbxcommon/Makefile.in
 src/libs/zbxcomms/.deps
 src/libs/zbxcomms/Makefile
 src/libs/zbxcomms/Makefile.in
+src/libs/zbxcommshigh/.deps
+src/libs/zbxcommshigh/Makefile
+src/libs/zbxcommshigh/Makefile.in
 src/libs/zbxconf/.deps
 src/libs/zbxconf/Makefile
 src/libs/zbxconf/Makefile.in
@@ -194,6 +197,9 @@ src/zabbix_server/pinger/Makefile.in
 src/zabbix_server/poller/.deps
 src/zabbix_server/poller/Makefile
 src/zabbix_server/poller/Makefile.in
+src/zabbix_server/proxypoller/.deps
+src/zabbix_server/proxypoller/Makefile
+src/zabbix_server/proxypoller/Makefile.in
 src/zabbix_server/timer/.deps
 src/zabbix_server/timer/Makefile
 src/zabbix_server/timer/Makefile.in

@@ -17,7 +17,6 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -38,7 +37,7 @@
 #include "zbxserver.h"
 #include "dbcache.h"
 
-const char *DBnode(const char *fieldid, const int nodeid)
+const char	*DBnode(const char *fieldid, const int nodeid)
 {
 	static char	dbnode[128];
 
@@ -789,9 +788,9 @@ int	DBadd_trend_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock)
 	if(row)
 	{
 		num = atoi(row[0]);
-		value_min = zbx_atoui64(row[1]);
-		value_avg = zbx_atoui64(row[2]);
-		value_max = zbx_atoui64(row[3]);
+		ZBX_STR2UINT64(value_min, row[1]);
+		ZBX_STR2UINT64(value_avg, row[2]);
+		ZBX_STR2UINT64(value_max, row[3]);
 		if(value<value_min)	value_min=value;
 		if(value>value_max)	value_max=value;
 		value_avg=(num*value_avg+value)/(num+1);
@@ -976,22 +975,24 @@ double	DBget_requiredperformance()
 	return qps_total;
 }
 
-zbx_uint64_t DBget_proxy_lastaccess(const char *hostname)
+zbx_uint64_t	DBget_proxy_lastaccess(const char *hostname)
 {
-	zbx_uint64_t	res;
+	const char	*__function_name = "DBget_proxy_lastaccess";
+	zbx_uint64_t	lastaccess;
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		*host_esc;
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_proxy_lastaccess()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	host_esc = DBdyn_escape_string(hostname);
-	result = DBselect("select lastaccess from hosts where host='%s' and status in (%d)",
+	result = DBselect("select lastaccess from hosts where host='%s' and status in (%d,%d)",
 			host_esc,
-			HOST_STATUS_PROXY);
+			HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE);
 	zbx_free(host_esc);
 
-	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0])) {
+	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
+	{
 		zabbix_log(LOG_LEVEL_ERR, "Proxy \"%s\" does not exist",
 				hostname);
 		zabbix_syslog("Proxy \"%s\" does not exist",
@@ -1000,11 +1001,13 @@ zbx_uint64_t DBget_proxy_lastaccess(const char *hostname)
 		return FAIL;
 	}
 
-	res = zbx_atoui64(row[0]);
+	ZBX_STR2UINT64(lastaccess, row[0]);
 
 	DBfree_result(result);
 
-	return res;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): " ZBX_FS_UI64, __function_name, lastaccess);
+
+	return lastaccess;
 }
 
 int	DBadd_alert(zbx_uint64_t actionid, zbx_uint64_t userid, zbx_uint64_t eventid,  zbx_uint64_t mediatypeid, char *sendto, char *subject, char *message)
