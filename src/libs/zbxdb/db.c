@@ -411,6 +411,8 @@ int	zbx_db_begin(void)
 		assert(0);
 	}
 
+	txn_level++;
+
 #ifdef	HAVE_SQLITE3
 	if (PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
 	{
@@ -423,8 +425,8 @@ int	zbx_db_begin(void)
 	rc = zbx_db_execute("%s", "begin;");
 #endif	/* HAVE_MYSQL || HAVE_POSTGRESQL || HAVE_SQLITE3 */
 
-	if (ZBX_DB_OK == rc)
-		txn_level++;
+	if (ZBX_DB_OK != rc)
+		txn_level--;
 
 	return rc;
 }
