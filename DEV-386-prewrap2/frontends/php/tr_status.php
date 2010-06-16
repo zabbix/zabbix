@@ -334,10 +334,9 @@ include_once('include/page_header.php');
 	$sortorder = getPageSortOrder();
 	$options = array(
 		'nodeids' => get_current_nodeid(),
-//		'status' => TRIGGER_STATUS_ENABLED,
-		'filter' => 1,
+		'filter' => array(),
 		'monitored' => 1,
-		'extendoutput' => 1,
+		'output' => API_OUTPUT_EXTEND,
 		'skipDependent' => 1,
 		'sortfield' => $sortfield,
 		'sortorder' => $sortorder,
@@ -378,10 +377,10 @@ include_once('include/page_header.php');
 	$options = array(
 		'nodeids' => get_current_nodeid(),
 		'triggerids' => zbx_objectValues($triggers, 'triggerid'),
-		'extendoutput' => 1,
-		'select_hosts' => 1,
-		'select_items' => 1,
-		'select_dependencies' => 1
+		'output' => API_OUTPUT_EXTEND,
+		'select_hosts' => array('hostid', 'host', 'maintenance_status'),
+		'select_items' => API_OUTPUT_EXTEND,
+		'select_dependencies' => API_OUTPUT_EXTEND
 	);
 	$triggers = CTrigger::get($options);
 	$triggers = zbx_toHash($triggers, 'triggerid');
@@ -420,11 +419,11 @@ include_once('include/page_header.php');
 			'nodeids' => get_current_nodeid(),
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 			'nopermissions' => 1,
-			'extendoutput' => 1,
-			'sortfield' => 'eventid',
-			'sortorder' => ZBX_SORT_DOWN,
+			'output' => API_OUTPUT_EXTEND,
 			'time_from' => time() - ($config['event_expire']*86400),
 			'time_till' => time(),
+			'sortfield' => 'eventid',
+			'sortorder' => ZBX_SORT_DOWN,
 			//'limit' => $config['event_show_max']
 		);
 
@@ -442,12 +441,12 @@ include_once('include/page_header.php');
 		}
 
 		$events = CEvent::get($ev_options);
+		order_result($events, 'clock', ZBX_SORT_DOWN);
 
 		foreach($events as $enum => $event){
 			$triggers[$event['objectid']]['events'][] = $event;
 		}
 	}
-
 
 
 	foreach($triggers as $tnum => $trigger){
@@ -592,7 +591,7 @@ include_once('include/page_header.php');
 			$status->setAttribute('name', 'blink');
 		}
 		$lastchange = new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS, $trigger['lastchange']), 'events.php?triggerid='.$trigger['triggerid']);
-		//.'&stime='.date('YmdHi', $trigger['lastchange']
+		//.'&stime='.date('YmdHis', $trigger['lastchange']
 
 		if($config['event_ack_enable']){
 			if($trigger['event_count']){

@@ -422,7 +422,7 @@
 				'nopermissions' => 1
 			);
 			$events = CEvent::get($options);
-//			order_result($events, 'eventid', ZBX_SORT_DOWN);
+			order_result($events, 'clock', ZBX_SORT_DOWN);
 
 			foreach($events as $enum => $event){
 				$trigger = reset($event['triggers']);

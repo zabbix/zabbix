@@ -26,7 +26,7 @@
  *                                                                            *
  * Function: get_value_external                                               *
  *                                                                            *
- * Purpose: retrieve data from script executed on ZABBIX server               *
+ * Purpose: retrieve data from script executed on Zabbix server               *
  *                                                                            *
  * Parameters: item - item we are interested in                               *
  *                                                                            *

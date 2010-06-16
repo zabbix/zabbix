@@ -399,17 +399,16 @@ function get_conditions_by_eventsource($eventsource){
 }
 
 function get_opconditions_by_eventsource($eventsource){
-	$conditions[EVENT_SOURCE_TRIGGERS] = array(
+	$conditions = array(
+		EVENT_SOURCE_TRIGGERS => array(
 			CONDITION_TYPE_EVENT_ACKNOWLEDGED
-		);
-
-	$conditions[EVENT_SOURCE_DISCOVERY] = array(
+		),
+		EVENT_SOURCE_DISCOVERY => array(),
 		);
 
 	if(isset($conditions[$eventsource]))
 		return $conditions[$eventsource];
 
-	return $conditions[EVENT_SOURCE_TRIGGERS];
 }
 
 function get_operations_by_eventsource($eventsource){

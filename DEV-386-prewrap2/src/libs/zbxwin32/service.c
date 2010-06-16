@@ -50,7 +50,7 @@ static void	parent_signal_handler(int sig)
 }
 
 /*
- * ZABBIX service control handler
+ * Zabbix service control handler
  */
 static VOID WINAPI ServiceCtrlHandler(DWORD ctrlCode)
 {
@@ -90,7 +90,7 @@ static VOID WINAPI ServiceCtrlHandler(DWORD ctrlCode)
 }
 
 /*
- * The entry point for a ZABBIX service.
+ * The entry point for a Zabbix service.
  */
 static VOID WINAPI ServiceEntry(DWORD argc, LPTSTR *argv)
 {

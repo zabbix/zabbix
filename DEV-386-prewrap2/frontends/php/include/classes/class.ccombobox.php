@@ -29,7 +29,7 @@ class CComboBox extends CTag{
 		$this->attributes['id'] = $name;
 		$this->attributes['name'] = $name;
 
-		$this->attributes['class'] = 'biginput';
+		$this->attributes['class'] = 'inputFont select';
 		$this->attributes['size'] = 1;
 
 		$this->value = $value;
