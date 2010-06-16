@@ -6,7 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
- - [ZBX-2552] fixed multipe events for triggers with difficult expressions (Sasha)
+ - [ZBX-2552] fixed multiple events for triggers with complicated expressions (Sasha)
  - [ZBX-2532] fixed outdated information in "server info" screen element (Sasha)
  - [ZBXNEXT-377] added support of passive mode for proxies (Sasha)
  - [ZBX-2556] added dropdown length limit in frontend (Aly)
