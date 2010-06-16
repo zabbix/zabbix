@@ -185,7 +185,7 @@ Changes for 1.8.3
  - [DEV-457] improved dashboard favourite selection (Aly)
  - [DEV-457] improvements in dynamic map link indicators form (Aly)
  - [ZBX-2258] fixed applications import (Vedmak)
- - [ZBX-1357,ZBXNEXT-376] update Brazilian Portuguese translation; thanks to edson (Richlv)
+ - [ZBX-1357,ZBXNEXT-376,ZBXNEXT-412] update Brazilian Portuguese translation; thanks to edson (Richlv)
  - [ZBX-2254] added update time for monitoring triggers screen (Vedmak)
  - [ZBX-1886] added js translations (Vedmak)
  - [ZBX-2245] added missing functions in trigger expression builder (Vedmak)
