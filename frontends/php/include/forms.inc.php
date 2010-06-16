@@ -2407,7 +2407,7 @@
 		$frmItem->addItemToBottomRow(SPACE);
 		$frmItem->addItemToBottomRow(new CButton('register',S_DO_SMALL));
 
-		$frmItem->show();
+	return $frmItem;
 	}
 
 	function insert_mass_update_item_form($elements_array_name){
@@ -2583,10 +2583,11 @@
 					get_node_name_by_elid($db_valuemap["valuemapid"], null, ': ').$db_valuemap["name"]
 					);
 
-		$link = new CLink(S_THROW_MAP_SMALL,"config.php?config=6");
-		$link->setAttribute("target","_blank");
+		$link = new CLink(S_SHOW_VALUE_MAPPINGS,'config.php?config=6');
+		$link->setAttribute('target','_blank');
+
 		$frmItem->addRow(array( new CVisibilityBox('valuemapid_visible', get_request('valuemapid_visible'), 'valuemapid', S_ORIGINAL),
-			S_SHOW_VALUE, SPACE, $link),$cmbMap);
+			S_SHOW_VALUE), array($cmbMap, SPACE, $link));
 
 		$frmItem->addRow(array( new CVisibilityBox('trapper_hosts_visible', get_request('trapper_hosts_visible'), 'trapper_hosts',
 			S_ORIGINAL), S_ALLOWED_HOSTS), new CTextBox('trapper_hosts',$trapper_hosts,40));
@@ -2610,7 +2611,7 @@
 		$frmItem->addItemToBottomRow(array(new CButton("update",S_UPDATE),
 			SPACE, new CButtonCancel(url_param('groupid').url_param("hostid").url_param("config"))));
 
-		$frmItem->show();
+	return $frmItem;
 	}
 
 	function insert_copy_elements_to_forms($elements_array_name){
@@ -2698,7 +2699,7 @@
 		$frmCopy->addItemToBottomRow(array(SPACE,
 			new CButtonCancel(url_param('groupid').url_param("hostid").url_param("config"))));
 
-		$frmCopy->show();
+	return $frmCopy;
 	}
 
 // TRIGGERS
@@ -2772,7 +2773,7 @@
 		$frmMTrig->addItemToBottomRow(new CButton('mass_save',S_SAVE));
 		$frmMTrig->addItemToBottomRow(SPACE);
 		$frmMTrig->addItemToBottomRow(new CButtonCancel(url_param('config').url_param('groupid')));
-		$frmMTrig->show();
+	return $frmMTrig;
 	}
 
 // Insert form for Trigger
@@ -3065,7 +3066,6 @@
 		}
 		$frmTrig->addItemToBottomRow(SPACE);
 		$frmTrig->addItemToBottomRow(new CButtonCancel(url_param('groupid').url_param("hostid")));
-		$frmTrig->show();
 
 		$jsmenu = new CPUMenu(null,170);
 		$jsmenu->InsertJavaScript();
@@ -3082,6 +3082,8 @@
 						}
 					}";
 		insert_js($script);
+
+	return $frmTrig;
 	}
 
 	function insert_trigger_comment_form($triggerid){
