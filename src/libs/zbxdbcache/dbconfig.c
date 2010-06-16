@@ -150,11 +150,11 @@ ZBX_DC_HOST
 	const char	*dns;			/* interned; dns[HOST_DNS_LEN_MAX];					*/
 	int		maintenance_from;
 	int		errors_from;
-	int		disable_until;
+	int		disable_until;		/* proxy_nextcheck for passive proxies (minimum of nextchecks below) */
 	int		snmp_errors_from;
-	int		snmp_disable_until;
+	int		snmp_disable_until;	/* proxy_config_nextcheck for passive proxies */
 	int		ipmi_errors_from;
-	int		ipmi_disable_until;
+	int		ipmi_disable_until;	/* proxy_data_nextcheck for passive proxies */
 	unsigned short	port;
 	unsigned char	useip;
 	unsigned char	maintenance_status;
@@ -162,11 +162,14 @@ ZBX_DC_HOST
 	unsigned char	available;
 	unsigned char	snmp_available;
 	unsigned char	ipmi_available;
+	unsigned char	status;
+	unsigned char	in_queue;
 };
 
 ZBX_DC_HOST_PH
 {
 	zbx_uint64_t	proxy_hostid;
+	unsigned char	status;
 	const char	*host;			/* interned; host[HOST_HOST_LEN_MAX];					*/
 	ZBX_DC_HOST	*host_ptr;
 };
@@ -201,6 +204,7 @@ ZBX_DC_CONFIG
 	zbx_hashset_t		hosts_ph;	/* proxy_hostid, host */
 	zbx_hashset_t		ipmihosts;
 	zbx_binary_heap_t	queues[ZBX_POLLER_TYPE_COUNT];
+	zbx_binary_heap_t	pqueue;
 };
 
 static ZBX_DC_CONFIG	*config = NULL;
@@ -393,6 +397,7 @@ static ZBX_DC_HOST	*DCfind_host(zbx_uint64_t proxy_hostid, const char *hostname)
 	ZBX_DC_HOST_PH	*host_ph, host_ph_local;
 
 	host_ph_local.proxy_hostid = proxy_hostid;
+	host_ph_local.status = HOST_STATUS_MONITORED;
 	host_ph_local.host = hostname;
 
 	if (NULL == (host_ph = zbx_hashset_search(&config->hosts_ph, &host_ph_local)))
@@ -433,6 +438,33 @@ static void	DCupdate_item_queue(ZBX_DC_ITEM *item)
 	{
 		item->in_queue = 1;
 		zbx_binary_heap_insert(&config->queues[item->poller_type], &elem);
+	}
+}
+
+static void	DCupdate_proxy_queue(ZBX_DC_HOST *host)
+{
+	zbx_binary_heap_elem_t	elem;
+
+	if (HOST_STATUS_PROXY_PASSIVE != host->status)
+	{
+		if (host->in_queue)
+		{
+			zbx_binary_heap_remove_direct(&config->pqueue, host->hostid);
+			host->in_queue = 0;
+		}
+
+		return;
+	}
+
+	elem.key = host->hostid;
+	elem.data = (const void *)host;
+
+	if (host->in_queue)
+		zbx_binary_heap_update_direct(&config->pqueue, &elem);
+	else
+	{
+		host->in_queue = 1;
+		zbx_binary_heap_insert(&config->pqueue, &elem);
 	}
 }
 
@@ -889,19 +921,25 @@ static void	DCsync_hosts(DB_RESULT result)
 
 	ZBX_DC_HOST_PH		host_ph;
 
-	int			i, index, found, changed;
+	int			i, index, found;
+	int			update_index, update_queue;
 	zbx_uint64_t		hostid, proxy_hostid;
 	zbx_vector_uint64_t	ids;
+	unsigned char		status;
+	time_t			now;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_uint64_create(&ids);
 	zbx_vector_uint64_reserve(&ids, config->hostids.values_num + 32);
 
+	now = time(NULL);
+
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(hostid, row[0]);
 		ZBX_STR2UINT64(proxy_hostid, row[1]);
+		status = (unsigned char)atoi(row[26]);
 
 		/* array of selected hosts */
 		zbx_vector_uint64_append(&ids, hostid);
@@ -909,16 +947,21 @@ static void	DCsync_hosts(DB_RESULT result)
 		host = DCfind_id(&config->hosts, hostid, sizeof(ZBX_DC_HOST), &found);
 
 		/* check whether we need to update host_ph index */
-		if (found && (host->proxy_hostid != proxy_hostid || strcmp(host->host, row[2]) != 0))
+		if (found && (host->proxy_hostid != proxy_hostid ||
+				host->status != status || 0 != strcmp(host->host, row[2])))
 		{
-			changed = 1;
+			update_index = 1;
 			host_ph.proxy_hostid = host->proxy_hostid;
+			host_ph.status = host->status;
 			host_ph.host = host->host;
 			zbx_strpool_release(host_ph.host);
 			zbx_hashset_remove(&config->hosts_ph, &host_ph);
 		}
 		else
-			changed = 0;
+			update_index = 0;
+
+		update_queue = (!found && HOST_STATUS_PROXY_PASSIVE == status)
+				|| (found && host->status != status);
 
 		host->hostid = hostid;
 		host->proxy_hostid = proxy_hostid;
@@ -930,24 +973,47 @@ static void	DCsync_hosts(DB_RESULT result)
 		host->maintenance_status = (unsigned char)atoi(row[14]);
 		host->maintenance_type = (unsigned char)atoi(row[15]);
 		host->maintenance_from = atoi(row[16]);
-		host->errors_from = atoi(row[17]);
-		host->available = (unsigned char)atoi(row[18]);
-		host->disable_until = atoi(row[19]);
-		host->snmp_errors_from = atoi(row[20]);
-		host->snmp_available = (unsigned char)atoi(row[21]);
-		host->snmp_disable_until = atoi(row[22]);
-		host->ipmi_errors_from = atoi(row[23]);
-		host->ipmi_available = (unsigned char)atoi(row[24]);
-		host->ipmi_disable_until = atoi(row[25]);
+		host->status = status;
+
+		if (!found)
+		{
+			host->errors_from = atoi(row[17]);
+			host->available = (unsigned char)atoi(row[18]);
+			host->snmp_errors_from = atoi(row[20]);
+			host->snmp_available = (unsigned char)atoi(row[21]);
+			host->ipmi_errors_from = atoi(row[23]);
+			host->ipmi_available = (unsigned char)atoi(row[24]);
+			host->in_queue = 0;
+
+			if (HOST_STATUS_PROXY_PASSIVE == host->status)
+			{
+				host->snmp_disable_until = (int)calculate_proxy_nextcheck(
+						host->hostid, CONFIG_PROXYCONFIG_FREQUENCY, now);
+				host->ipmi_disable_until = (int)calculate_proxy_nextcheck(
+						host->hostid, CONFIG_PROXYDATA_FREQUENCY, now);
+				host->disable_until = (host->snmp_disable_until <= host->ipmi_disable_until)
+						? host->snmp_disable_until : host->ipmi_disable_until;
+			}
+			else
+			{
+				host->disable_until = atoi(row[19]);
+				host->snmp_disable_until = atoi(row[22]);
+				host->ipmi_disable_until = atoi(row[25]);
+			}
+		}
 
 		/* update host_ph index, if needed */
-		if (!found || changed)
+		if (!found || update_index)
 		{
 			host_ph.proxy_hostid = host->proxy_hostid;
+			host_ph.status = host->status;
 			host_ph.host = zbx_strpool_acquire(host->host);
 			host_ph.host_ptr = host;
 			zbx_hashset_insert(&config->hosts_ph, &host_ph, sizeof(ZBX_DC_HOST_PH));
 		}
+
+		if (update_queue)
+			DCupdate_proxy_queue(host);
 
 		/* IPMI hosts */
 
@@ -1002,6 +1068,7 @@ static void	DCsync_hosts(DB_RESULT result)
 			/* hosts */
 
 			host_ph.proxy_hostid = host->proxy_hostid;
+			host_ph.status = host->status;
 			host_ph.host = host->host;
 			zbx_strpool_release(host_ph.host);
 			zbx_hashset_remove(&config->hosts_ph, &host_ph);
@@ -1075,11 +1142,12 @@ void	DCsync_configuration()
 				"useipmi,ipmi_ip,ipmi_port,ipmi_authtype,ipmi_privilege,ipmi_username,"
 				"ipmi_password,maintenance_status,maintenance_type,maintenance_from,"
 				"errors_from,available,disable_until,snmp_errors_from,snmp_available,"
-				"snmp_disable_until,ipmi_errors_from,ipmi_available,ipmi_disable_until"
+				"snmp_disable_until,ipmi_errors_from,ipmi_available,ipmi_disable_until,"
+				"status"
 			" from hosts"
-			" where status=%d"
+			" where status in (%d,%d,%d)"
 				DB_NODE,
-			HOST_STATUS_MONITORED,
+			HOST_STATUS_MONITORED, HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE,
 			DBnode_local("hostid"));
 	hsec = zbx_time() - sec;
 
@@ -1137,6 +1205,9 @@ void	DCsync_configuration()
 	for (i = 0; i < ZBX_POLLER_TYPE_COUNT; i++)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() queue[%d]   : %d (%d allocated)", __function_name,
 				i, config->queues[i].elems_num, config->queues[i].elems_alloc);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() pqueue     : %d (%d allocated)", __function_name,
+			i, config->pqueue.elems_num, config->pqueue.elems_alloc);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() configfree : " ZBX_FS_DBL "%%", __function_name,
 			100 * ((double)config_mem->free_size / config_mem->orig_size));
@@ -1219,6 +1290,7 @@ static zbx_hash_t	__config_host_ph_hash(const void *data)
 	zbx_hash_t		hash;
 
 	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&host_ph->proxy_hostid);
+	hash = ZBX_DEFAULT_STRING_HASH_ALGO((char *)&host_ph->status, 1, hash);
 	hash = ZBX_DEFAULT_STRING_HASH_ALGO(host_ph->host, strlen(host_ph->host), hash);
 
 	return hash;
@@ -1231,19 +1303,34 @@ static int	__config_host_ph_compare(const void *d1, const void *d2)
 
 	if (host_ph_1->proxy_hostid < host_ph_2->proxy_hostid) return -1;
 	if (host_ph_1->proxy_hostid > host_ph_2->proxy_hostid) return +1;
+	if (host_ph_1->status < host_ph_2->status) return -1;
+	if (host_ph_1->status > host_ph_2->status) return +1;
 	return (host_ph_1->host == host_ph_2->host ? 0 : strcmp(host_ph_1->host, host_ph_2->host));
 }
 
 static int	__config_nextcheck_compare(const void *d1, const void *d2)
 {
-	const zbx_binary_heap_elem_t	*e1=(const zbx_binary_heap_elem_t *)d1;
-	const zbx_binary_heap_elem_t	*e2=(const zbx_binary_heap_elem_t *)d2;
+	const zbx_binary_heap_elem_t	*e1 = (const zbx_binary_heap_elem_t *)d1;
+	const zbx_binary_heap_elem_t	*e2 = (const zbx_binary_heap_elem_t *)d2;
 
-	const ZBX_DC_ITEM		*i1=(const ZBX_DC_ITEM *)e1->data;
-	const ZBX_DC_ITEM		*i2=(const ZBX_DC_ITEM *)e2->data;
+	const ZBX_DC_ITEM		*i1 = (const ZBX_DC_ITEM *)e1->data;
+	const ZBX_DC_ITEM		*i2 = (const ZBX_DC_ITEM *)e2->data;
 
 	if (i1->nextcheck < i2->nextcheck) return -1;
 	if (i1->nextcheck > i2->nextcheck) return +1;
+	return 0;
+}
+
+static int	__config_proxy_compare(const void *d1, const void *d2)
+{
+	const zbx_binary_heap_elem_t	*e1 = (const zbx_binary_heap_elem_t *)d1;
+	const zbx_binary_heap_elem_t	*e2 = (const zbx_binary_heap_elem_t *)d2;
+
+	const ZBX_DC_HOST		*h1 = (const ZBX_DC_HOST *)e1->data;
+	const ZBX_DC_HOST		*h2 = (const ZBX_DC_HOST *)e2->data;
+
+	if (h1->disable_until < h2->disable_until) return -1;
+	if (h1->disable_until > h2->disable_until) return +1;
 	return 0;
 }
 
@@ -1330,6 +1417,13 @@ void	init_configuration_cache()
 						__config_mem_realloc_func,
 						__config_mem_free_func);
 	}
+
+	zbx_binary_heap_create_ext(&config->pqueue,
+					__config_proxy_compare,
+					ZBX_BINARY_HEAP_OPTION_DIRECT,
+					__config_mem_malloc_func,
+					__config_mem_realloc_func,
+					__config_mem_free_func);
 
 #undef	INIT_HASHSET_SIZE
 
@@ -1641,7 +1735,6 @@ unlock:
  * Purpose: Get nextcheck for selected poller                                 *
  *                                                                            *
  * Parameters: poller_type - [IN] poller type (ZBX_POLLER_TYPE_...)           *
- *             now - [IN] current time                                        *
  *                                                                            *
  * Return value: nextcheck or FAIL if no items for selected poller            *
  *                                                                            *
@@ -1661,9 +1754,9 @@ int	DCconfig_get_poller_nextcheck(unsigned char poller_type)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() poller_type:%d", __function_name, (int)poller_type);
 
-	LOCK_CACHE;
-
 	queue = &config->queues[poller_type];
+
+	LOCK_CACHE;
 
 	if (FAIL == zbx_binary_heap_empty(queue))
 	{
@@ -1689,7 +1782,6 @@ int	DCconfig_get_poller_nextcheck(unsigned char poller_type)
  * Purpose: Get array of items for selected poller                            *
  *                                                                            *
  * Parameters: poller_type - [IN] poller type (ZBX_POLLER_TYPE_...)           *
- *             now - [IN] current time                                        *
  *             items - [OUT] array of items                                   *
  *             max_items - [IN] elements in items array                       *
  *                                                                            *
@@ -1711,11 +1803,11 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() poller_type:%d", __function_name, (int)poller_type);
 
-	LOCK_CACHE;
-
 	now = time(NULL);
 
 	queue = &config->queues[poller_type];
+
+	LOCK_CACHE;
 
 	while (num < max_items && FAIL == zbx_binary_heap_empty(queue))
 	{
@@ -2082,4 +2174,144 @@ void	*DCconfig_get_stats(int request)
 		default:
 			return NULL;
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCconfig_get_proxypoller_hosts                                   *
+ *                                                                            *
+ * Purpose: Get array of proxies for proxy poller                             *
+ *                                                                            *
+ * Parameters: hosts - [OUT] array of hosts                                   *
+ *             max_hosts - [IN] elements in hosts array                       *
+ *                                                                            *
+ * Return value: number of proxies in hosts array                             *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments: Proxies leave the queue only through this function. Pollers must *
+ *           always return the proxies they have taken using DCrequeue_proxy. *
+ *                                                                            *
+ ******************************************************************************/
+int	DCconfig_get_proxypoller_hosts(DC_HOST *hosts, int max_hosts)
+{
+	const char		*__function_name = "DCconfig_get_proxypoller_hosts";
+	int			now, num = 0;
+	zbx_binary_heap_t	*queue;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	now = time(NULL);
+
+	queue = &config->pqueue;
+
+	LOCK_CACHE;
+
+	while (num < max_hosts && FAIL == zbx_binary_heap_empty(queue))
+	{
+		const zbx_binary_heap_elem_t	*min;
+		ZBX_DC_HOST			*dc_host;
+
+		min = zbx_binary_heap_find_min(queue);
+		dc_host = (ZBX_DC_HOST *)min->data;
+
+		if (dc_host->disable_until > now)
+			break;
+
+		zbx_binary_heap_remove_min(queue);
+		dc_host->in_queue = 0;
+
+		DCget_host(&hosts[num], dc_host);
+
+		num++;
+	}
+
+	UNLOCK_CACHE;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, num);
+
+	return num;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCconfig_get_proxy_nextcheck                                     *
+ *                                                                            *
+ * Purpose: Get nextcheck for passive proxies                                 *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: nextcheck or FAIL if no passive proxies in queue             *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	DCconfig_get_proxy_nextcheck()
+{
+	const char			*__function_name = "DCconfig_get_proxy_nextcheck";
+
+	int				nextcheck;
+	zbx_binary_heap_t		*queue;
+	const zbx_binary_heap_elem_t	*min;
+	const ZBX_DC_HOST		*dc_host;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	queue = &config->pqueue;
+
+	LOCK_CACHE;
+
+	if (FAIL == zbx_binary_heap_empty(queue))
+	{
+		min = zbx_binary_heap_find_min(queue);
+		dc_host = (const ZBX_DC_HOST *)min->data;
+
+		nextcheck = dc_host->disable_until;
+	}
+	else
+		nextcheck = FAIL;
+
+	UNLOCK_CACHE;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, nextcheck);
+
+	return nextcheck;
+}
+
+void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck)
+{
+	const char	*__function_name = "DCrequeue_proxy";
+	time_t		now;
+	ZBX_DC_HOST	*dc_host;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() update_nextcheck:%d",
+		       __function_name, (int)update_nextcheck);
+
+	now = time(NULL);
+
+	LOCK_CACHE;
+
+	if (NULL != (dc_host = zbx_hashset_search(&config->hosts, &hostid)))
+	{
+		if (0x01 & update_nextcheck)
+		{
+			dc_host->snmp_disable_until = (int)calculate_proxy_nextcheck(
+					dc_host->hostid, CONFIG_PROXYCONFIG_FREQUENCY, now);
+		}
+		if (0x02 & update_nextcheck)
+		{
+			dc_host->ipmi_disable_until = (int)calculate_proxy_nextcheck(
+					dc_host->hostid, CONFIG_PROXYDATA_FREQUENCY, now);
+		}
+		dc_host->disable_until = (dc_host->snmp_disable_until <= dc_host->ipmi_disable_until)
+				? dc_host->snmp_disable_until : dc_host->ipmi_disable_until;
+
+		DCupdate_proxy_queue(dc_host);
+	}
+
+	UNLOCK_CACHE;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

@@ -17,7 +17,6 @@ zabbix_proxy_SOURCES = \
 zabbix_proxy_LDADD = \
 	heart/libzbxheart.a \
 	$(top_srcdir)/src/zabbix_server/dbsyncer/libzbxdbsyncer.a \
-	$(top_srcdir)/src/zabbix_server/dbconfig/libzbxdbconfig.a \
 	$(top_srcdir)/src/zabbix_server/discoverer/libzbxdiscoverer.a \
 	housekeeper/libzbxhousekeeper.a \
 	$(top_srcdir)/src/zabbix_server/httppoller/libzbxhttppoller.a \
@@ -41,6 +40,7 @@ zabbix_proxy_LDADD = \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
+	$(top_srcdir)/src/libs/zbxcommshigh/libzbxcommshigh.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
 	$(top_srcdir)/src/libs/zbxicmpping/libzbxicmpping.a \

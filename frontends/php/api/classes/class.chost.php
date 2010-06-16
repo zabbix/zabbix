@@ -373,7 +373,7 @@ class CHost extends CZBXAPI{
 			$sql_parts['where']['status'] = 'h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')';
 		}
 		else if(!is_null($options['proxy_hosts'])){
-			$sql_parts['where']['status'] = 'h.status IN ('.HOST_STATUS_PROXY.')';
+			$sql_parts['where']['status'] = 'h.status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')';
 		}
 		else{
 			$sql_parts['where']['status'] = 'h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';

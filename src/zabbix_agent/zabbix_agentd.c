@@ -375,16 +375,18 @@ int	main(int argc, char **argv)
 		load_config();
 
 #if defined (_WINDOWS)
-	if (t.flags & ZBX_TASK_FLAG_MULTIPLE_AGENTS) {
+	if (t.flags & ZBX_TASK_FLAG_MULTIPLE_AGENTS)
+	{
 		zbx_snprintf(ZABBIX_SERVICE_NAME, sizeof(ZABBIX_SERVICE_NAME), "%s [%s]", APPLICATION_NAME, CONFIG_HOSTNAME);
 		zbx_snprintf(ZABBIX_EVENT_SOURCE, sizeof(ZABBIX_EVENT_SOURCE), "%s [%s]", APPLICATION_NAME, CONFIG_HOSTNAME);
 	}
 #endif /* _WINDOWS */
 
-	switch (t.task) {
+	switch (t.task)
+	{
 #if defined (_WINDOWS)
 		case ZBX_TASK_INSTALL_SERVICE:
-			exit(ZabbixCreateService(argv[0], (t.flags & ZBX_TASK_FLAG_MULTIPLE_AGENTS)));
+			exit(ZabbixCreateService(argv[0], t.flags & ZBX_TASK_FLAG_MULTIPLE_AGENTS));
 			break;
 		case ZBX_TASK_UNINSTALL_SERVICE:
 			exit(ZabbixRemoveService());
