@@ -47,7 +47,7 @@ static ZBX_MUTEX	cache_ids_lock;
 static char		*sql = NULL;
 static int		sql_allocated = 65536;
 
-zbx_process_t		zbx_process;
+static unsigned char	zbx_process;
 
 extern int		CONFIG_DBSYNCER_FREQUENCY;
 
@@ -1075,7 +1075,7 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 		item.history	= atoi(row[7]);
 		item.trends	= atoi(row[8]);
 
-		if (zbx_process == ZBX_PROCESS_PROXY)
+		if (0 != (zbx_process & ZBX_PROCESS_PROXY))
 		{
 			item.delta = ITEM_STORE_AS_IS;
 			h->keep_history = 1;
@@ -2129,7 +2129,7 @@ int	DCsync_history(int sync_type)
 
 		while (n > 0 && history_num < ZBX_SYNC_MAX)
 		{
-			if (zbx_process == ZBX_PROCESS_PROXY ||
+			if (0 != (zbx_process & ZBX_PROCESS_PROXY) ||
 					FAIL == uint64_array_exists(cache->itemids, cache->itemids_num, cache->history[f].itemid))
 			{
 				uint64_array_add(&cache->itemids, &cache->itemids_alloc,
@@ -2180,7 +2180,7 @@ int	DCsync_history(int sync_type)
 
 		DBbegin();
 
-		if (zbx_process == ZBX_PROCESS_SERVER)
+		if (0 != (zbx_process & ZBX_PROCESS_SERVER))
 		{
 			DCmass_update_items(history, history_num);
 			DCmass_add_history(history, history_num);
@@ -2624,7 +2624,7 @@ static void	__cache_mem_free_func(void *ptr)
 	zbx_mem_free(cache_mem, ptr);
 }
 
-void	init_database_cache(zbx_process_t p)
+void	init_database_cache(unsigned char p)
 {
 	const char	*__function_name = "init_database_cache";
 	key_t		shm_key;

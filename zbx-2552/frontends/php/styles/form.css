@@ -3,11 +3,20 @@
 form {margin: 0px}
 
 /**************** FORM ELEMENTS ****************/
+input, select, textarea{
+	font-family: Verdana, Helvetica, Geneva;
+	font-size: 10px;
+	line-height: 14px;
+}
+
 .select{
 	border: 1px solid gray;
-	
 	cursor: pointer;
 	margin: 1px 4px 1px 2px;
+}
+
+.selectShorten{
+	width: 200px;
 }
 
 .select:focus{
@@ -15,12 +24,6 @@ form {margin: 0px}
 }
 .select:hover{
 	border-color: black;
-}
-
-.inputFont{
-	font-family: Verdana, Helvetica, Geneva;
-	font-size: 10px;
-	line-height: 14px;
 }
 
 .biginput, .biginput[disabled]:hover{

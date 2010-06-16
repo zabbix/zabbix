@@ -1513,7 +1513,7 @@ include_once('include/page_header.php');
 		$sql = 'SELECT DISTINCT hostid,host '.
 				' FROM hosts'.
 				' WHERE '.DBin_node('hostid', $nodeid).
-					' AND status='.HOST_STATUS_PROXY.
+					' AND status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')'.
 				' ORDER BY host,hostid';
 		$result = DBselect($sql);
 		while($row = DBfetch($result)){
