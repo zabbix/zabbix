@@ -45,6 +45,7 @@ TMPFILE=/tmp/data_sql_tmp_dump.sql
 FINALFILE=final_data.sql
 BLACKLISTFILE=data_sql_blacklist.txt
 FILTERFILE=data_sql_filter.txt
+PREDUMPHOOKFILE=data_sql_predumphooks.txt
 >"$FINALFILE"
 
 fail() {
@@ -56,8 +57,9 @@ fail() {
 
 #UTILS="mysql strings awk cut sed"
 
-#TABLES="config"
-#cat >> /dev/null << EOF
+[[ "$2" ]] && {
+	TABLES="$2"
+} || {
 TABLES="actions \
 applications \
 conditions \
@@ -116,8 +118,8 @@ users \
 users_groups \
 usrgrp \
 valuemaps"
-#EOF
 # nodes \
+}
 
 for TABLE in $TABLES; do
 	while read line; do
@@ -152,6 +154,16 @@ for TABLE in $TABLES; do
 -- Dumping data for table \`$TABLE\`
 --
 " >> "$FINALFILE"
+
+		# pre-dump hook to update possibly out of order values in current database
+		# it's still possible that server would change them right after fixing & before dump,
+		#  but that's a smaller chance
+		HOOKLINE=$(grep ^$TABLE $PREDUMPHOOKFILE)
+		[[ "$HOOKLINE" ]] && {
+			HOOK=$(echo "$HOOKLINE" | cut -d" " -f2-)
+			echo "$HOOK" | $MYSQLLINE
+			unset HOOKLINE
+		}
 
 		echo "select ${DIFFERENT_FIELDS#,} from $TABLE $FINALFILTER into outfile '$TMPFILE' \
 FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY \"'\";" | $MYSQLLINE || fail "select failed"
