@@ -757,15 +757,10 @@ include_once('include/page_header.php');
 				case TRIGGER_STATUS_DISABLED:
 					$status = new CSpan(S_DISABLED, 'disabled');
 				break;
-				case TRIGGER_STATUS_UNKNOWN:
-					$status = new CSpan(S_UNKNOWN, 'unknown');
-				break;
 				case TRIGGER_STATUS_ENABLED:
 					$status = new CSpan(S_ENABLED, 'enabled');
 				break;
 			}
-//if($row["status"] != TRIGGER_STATUS_UNKNOWN) $row["error"]=SPACE;
-//if($row["error"]=="") $row["error"]=SPACE;
 
 			if($multiselect){
 				$description = new CCol(array(new CCheckBox('triggers['.zbx_jsValue($trigger[$srcfld1]).']', NULL, NULL, $trigger['triggerid']),	$description));
