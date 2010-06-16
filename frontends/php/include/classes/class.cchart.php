@@ -767,14 +767,14 @@ class CChart extends CGraphDraw{
 //------
 
 // CALC interval
-		$col_interval = ($this->gridPixelsVert*($this->m_maxY[$side] - $this->m_minY[$side]))/$this->sizeY;
+		$columnInterval = ($this->gridPixelsVert*($this->m_maxY[$side] - $this->m_minY[$side]))/$this->sizeY;
 		$max = $this->m_maxY[$side];
 
 		$dist = bcmul(5, bcpow(10, 18));
 		
 		$interval = 0;
 		foreach($intervals as $num => $int){
-			$t = abs($int - $col_interval);
+			$t = abs($int - $columnInterval);
 
 			if($t<$dist){
 				$dist = $t;
