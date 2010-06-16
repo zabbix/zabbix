@@ -679,7 +679,7 @@ SDI('/////////////////////////////////');
 
 				if(isset($screen['screenitems'])){
 					$update_items = array(
-						'screenids' => $screen['screenid'],
+						'screenids' => $screenid,
 						'screenitems' => $screen['screenitems'],
 					);
 					self::updateItems($update_items);
