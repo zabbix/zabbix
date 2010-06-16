@@ -50,6 +50,10 @@ class CComboBox extends CTag{
 			parent::addItem($value);
 		}
 		else{
+			if(zbx_strlen($caption) > 44){
+				$this->setAttribute('class', 'inputFont select selectShorten');
+			}
+
 			if(is_null($selected)){
 				$selected = 'no';
 				if(is_array($this->value)) {
