@@ -1635,7 +1635,7 @@ Copt::memoryPick();
 					$existing_profiles = array();
 					$existing_profiles_db = DBselect('SELECT hostid FROM hosts_profiles_ext WHERE '.DBcondition('hostid', $hostids));
 					while($existing_profile = DBfetch($existing_profiles_db)){
-						$existing_profiles[] = $existing_profile;
+						$existing_profiles[] = $existing_profile['hostid'];
 					}
 
 					$hostids_without_profile = array_diff($hostids, $existing_profiles);
@@ -1665,7 +1665,7 @@ Copt::memoryPick();
 							'poc_2_email','poc_2_phone_1','poc_2_phone_2','poc_2_cell','poc_2_screen','poc_2_notes');
 
 						$sql_set = array();
-						foreach($host_profile_fields as $field){
+						foreach($host_profile_ext_fields as $field){
 							if(isset($data['extendedProfile'][$field])) $sql_set[] = $field.'='.zbx_dbstr($data['extendedProfile'][$field]);
 						}
 

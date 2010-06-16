@@ -32,7 +32,7 @@
 #endif /* ZABBIX_DAEMON */
 
 #if defined(WITH_PLUGINS)
-/* use ZABBIX plugins configurations */
+/* use Zabbix plugins configurations */
 #	include "zbxplugin.h"
 #endif /* WITH_PLUGINS */
 

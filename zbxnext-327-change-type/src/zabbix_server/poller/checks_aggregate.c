@@ -302,7 +302,7 @@ clean:
  *                                                                            *
  * Function: get_value_aggregate                                              *
  *                                                                            *
- * Purpose: retrieve data from ZABBIX server (aggregate items)                *
+ * Purpose: retrieve data from Zabbix server (aggregate items)                *
  *                                                                            *
  * Parameters: item - item we are interested in                               *
  *                                                                            *

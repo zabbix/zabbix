@@ -269,14 +269,14 @@ static int	DCget_reachable_nextcheck(const ZBX_DC_ITEM *item, int now)
 
 	if (ITEM_STATUS_NOTSUPPORTED == item->status)
 		nextcheck = calculate_item_nextcheck(item->itemid, item->type,
-				CONFIG_REFRESH_UNSUPPORTED, NULL, now);
+				CONFIG_REFRESH_UNSUPPORTED, NULL, now, NULL);
 	else
 	{
 		const ZBX_DC_FLEXITEM	*flexitem;
 		
 		flexitem = zbx_hashset_search(&config->flexitems, &item->itemid);
 		nextcheck = calculate_item_nextcheck(item->itemid, item->type,
-				item->delay, flexitem ? flexitem->delay_flex : NULL, now);
+				item->delay, flexitem ? flexitem->delay_flex : NULL, now, NULL);
 	}
 	
 	return nextcheck;
@@ -515,10 +515,10 @@ static void	DCsync_items(DB_RESULT result)
 		{
 			if (ITEM_STATUS_NOTSUPPORTED == status)
 				item->nextcheck = calculate_item_nextcheck(itemid, item->type,
-						CONFIG_REFRESH_UNSUPPORTED, NULL, now);
+						CONFIG_REFRESH_UNSUPPORTED, NULL, now, NULL);
 			else
 				item->nextcheck = calculate_item_nextcheck(itemid, item->type,
-						delay, row[16], now);
+						delay, row[16], now, NULL);
 		}
 		else
 		{
@@ -526,13 +526,13 @@ static void	DCsync_items(DB_RESULT result)
 			{
 				update_queue = 1;
 				item->nextcheck = calculate_item_nextcheck(itemid, item->type,
-						delay, row[16], now);
+						delay, row[16], now, NULL);
 			}
 			else if (ITEM_STATUS_NOTSUPPORTED == status && status != item->status)
 			{
 				update_queue = 1;
 				item->nextcheck = calculate_item_nextcheck(itemid, item->type,
-						CONFIG_REFRESH_UNSUPPORTED, NULL, now);
+						CONFIG_REFRESH_UNSUPPORTED, NULL, now, NULL);
 			}
 		}
 

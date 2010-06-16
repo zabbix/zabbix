@@ -115,7 +115,7 @@
 	$fs_icon = new CDiv(SPACE,'fullscreen');
 	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 	$fs_icon->addAction('onclick', "javascript: document.location = '".$url."';");
-	$events_wdgt->addPageHeader(array(S_HISTORY_OF_EVENTS_BIG.SPACE.S_ON.SPACE, zbx_date2str(S_EVENTS_DATE_FORMAT,time())), $fs_icon);
+	$events_wdgt->addPageHeader(array(S_HISTORY_OF_EVENTS_BIG.SPACE.S_ON_BIG.SPACE, zbx_date2str(S_EVENTS_DATE_FORMAT,time())), $fs_icon);
 // }}}PAGE HEADER	
 	
 	
@@ -422,7 +422,7 @@
 				'nopermissions' => 1
 			);
 			$events = CEvent::get($options);
-//			order_result($events, 'eventid', ZBX_SORT_DOWN);
+			order_result($events, 'clock', ZBX_SORT_DOWN);
 
 			foreach($events as $enum => $event){
 				$trigger = reset($event['triggers']);

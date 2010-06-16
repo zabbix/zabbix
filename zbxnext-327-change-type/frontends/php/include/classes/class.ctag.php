@@ -72,7 +72,7 @@ class CTag extends CObject{
 
 	public function bodyToString(){
 		$res = $this->tag_body_start;
-	return $res.parent::ToString(false);
+	return $res.parent::toString(false);
 
 		/*foreach($this->items as $item)
 			$res .= $item;

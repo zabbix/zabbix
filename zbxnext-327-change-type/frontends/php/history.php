@@ -176,7 +176,7 @@ include_once('include/page_header.php');
 
 	$ptData = array(
 		'header' => array(),
-		'data' => array()
+		'body' => array()
 	);
 
 	if(count($items) == 1){
@@ -241,7 +241,7 @@ include_once('include/page_header.php');
 			$filterForm->setAttribute('id', 'zbx_filter');
 
 			$filterForm->addVar('action',$_REQUEST['action']);
-			$filterForm->addVar('itemid',$_REQUEST['itemid']);
+			$filterForm->addVar('itemid',zbx_toHash($_REQUEST['itemid']));
 
 			$cmbitemlist = new CListBox('cmbitemlist[]');
 			foreach($items as $itemid => $item){
@@ -255,7 +255,12 @@ include_once('include/page_header.php');
 			}
 
 			$addItemBttn = new CButton('add_log',S_ADD,"return PopUp('popup.php?multiselect=1".'&reference=itemid&srctbl=items&value_types[]='.$item['value_type']."&srcfld1=itemid');");
-			$delItemBttn = (count($items) > 1)?new CButton('remove_log',S_REMOVE_SELECTED) : null;
+			$delItemBttn = null;
+
+			if(count($items) > 1){
+				insert_js_function('removeSelectedItems');
+				$delItemBttn = new CButton('remove_log',S_REMOVE_SELECTED, "javascript: removeSelectedItems('cmbitemlist[]', 'itemid')");
+			}
 
 			$filterForm->addRow(S_ITEMS_LIST, array($cmbitemlist, BR(), $addItemBttn, $delItemBttn));
 
@@ -488,6 +493,7 @@ include_once('include/page_header.php');
 			$objData['dynamic'] = 0;
 			$objData['mainObject'] = 1;
 		}
+
 //-------------
 	}
 
