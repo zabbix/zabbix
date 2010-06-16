@@ -31,20 +31,22 @@
 #define ZBX_HISTORY_FIELD struct history_field_t
 #define ZBX_HISTORY_TABLE struct history_table_t
 
-struct history_field_t {
+struct history_field_t
+{
 	const char		*field;
 	const char		*tag;
 	zbx_json_type_t		jt;
 	char			*default_value;
 };
 
-struct history_table_t {
+struct history_table_t
+{
 	const char		*table, *lastfieldname;
 	const char		*from, *where;
 	ZBX_HISTORY_FIELD	fields[ZBX_MAX_FIELDS];
 };
 
-static ZBX_HISTORY_TABLE ht={
+static ZBX_HISTORY_TABLE ht = {
 	"proxy_history", "history_lastid", "hosts h,items i,",
 	"h.hostid=i.hostid and i.itemid=p.itemid and ",
 		{
@@ -60,7 +62,7 @@ static ZBX_HISTORY_TABLE ht={
 		}
 };
 
-static ZBX_HISTORY_TABLE dht={
+static ZBX_HISTORY_TABLE dht = {
 	"proxy_dhistory", "dhistory_lastid", "", "",
 		{
 		{"p.clock",	ZBX_PROTO_TAG_CLOCK,		ZBX_JSON_TYPE_INT,	NULL},
@@ -76,7 +78,7 @@ static ZBX_HISTORY_TABLE dht={
 		}
 };
 
-static ZBX_HISTORY_TABLE areg={
+static ZBX_HISTORY_TABLE areg = {
 	"proxy_autoreg_host", "autoreg_host_lastid", "", "",
 		{
 		{"p.clock",	ZBX_PROTO_TAG_CLOCK,		ZBX_JSON_TYPE_INT,	NULL},
@@ -199,7 +201,8 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 
 	zbx_json_addstring(j, NULL, table->recid, ZBX_JSON_TYPE_STRING);
 
-	for (f = 0; table->fields[f].name != 0; f ++) {
+	for (f = 0; table->fields[f].name != 0; f ++)
+	{
 		if ((table->fields[f].flags & ZBX_PROXY) == 0)
 			continue;
 
@@ -222,24 +225,27 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 
 	result = DBselect("%s", sql);
 
-	while (NULL != (row = DBfetch(result))) {
+	while (NULL != (row = DBfetch(result)))
+	{
 		fld = 0;
 		zbx_json_addarray(j, NULL);
 		zbx_json_addstring(j, NULL, row[fld++], ZBX_JSON_TYPE_INT);
 
-		for (f = 0; table->fields[f].name != 0; f ++) {
+		for (f = 0; table->fields[f].name != 0; f ++)
+		{
 			if ((table->fields[f].flags & ZBX_PROXY) == 0)
 				continue;
 
-			switch (table->fields[f].type) {
-			case ZBX_TYPE_INT:
-			case ZBX_TYPE_UINT:
-			case ZBX_TYPE_ID:
-				zbx_json_addstring(j, NULL, row[fld++], ZBX_JSON_TYPE_INT);
-				break;
-			default:
-				zbx_json_addstring(j, NULL, row[fld++], ZBX_JSON_TYPE_STRING);
-				break;
+			switch (table->fields[f].type)
+			{
+				case ZBX_TYPE_INT:
+				case ZBX_TYPE_UINT:
+				case ZBX_TYPE_ID:
+					zbx_json_addstring(j, NULL, row[fld++], ZBX_JSON_TYPE_INT);
+					break;
+				default:
+					zbx_json_addstring(j, NULL, row[fld++], ZBX_JSON_TYPE_STRING);
+					break;
 			}
 		}
 		zbx_json_close(j);
@@ -983,7 +989,7 @@ exit:
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: never returns                                                    *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	proxy_get_lastid(const ZBX_HISTORY_TABLE *ht, zbx_uint64_t *lastid)
@@ -1023,7 +1029,7 @@ static void	proxy_get_lastid(const ZBX_HISTORY_TABLE *ht, zbx_uint64_t *lastid)
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: never returns                                                    *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	proxy_set_lastid(const ZBX_HISTORY_TABLE *ht, const zbx_uint64_t lastid)
@@ -1085,7 +1091,7 @@ void	proxy_set_areg_lastid(const zbx_uint64_t lastid)
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: never returns                                                    *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	proxy_get_history_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *ht,
@@ -1108,7 +1114,7 @@ static int	proxy_get_history_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *h
 
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "select p.id");
 
-	for (f = 0; ht->fields[f].field != NULL; f ++)
+	for (f = 0; ht->fields[f].field != NULL; f++)
 		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, ",%s",
 				ht->fields[f].field);
 
@@ -1118,7 +1124,6 @@ static int	proxy_get_history_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *h
 			ht->where,
 			id);
 
-
 	result = DBselectN(sql, ZBX_MAX_HRECORDS);
 
 	while (NULL != (row = DBfetch(result)))
@@ -1127,7 +1132,7 @@ static int	proxy_get_history_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *h
 
 		ZBX_STR2UINT64(*lastid, row[0])
 
-		for (f = 0; ht->fields[f].field != NULL; f ++)
+		for (f = 0; ht->fields[f].field != NULL; f++)
 		{
 			if (NULL != ht->fields[f].default_value && 0 == strcmp(row[f + 1], ht->fields[f].default_value))
 				continue;
@@ -1184,7 +1189,8 @@ static void	calc_timestamp(char *line, int *timestamp, char *format)
 
 		num = (int)line[i] - 48;
 
-		switch ((char)format[i]) {
+		switch ((char)format[i])
+		{
 			case 'h':
 				hh = 10 * hh + num;
 				hhc++;
@@ -1244,7 +1250,7 @@ static void	calc_timestamp(char *line, int *timestamp, char *format)
  *                                 connection. NULL for proxy connection      *
  *             proxy_hostid - [IN] proxy identificator from database          *
  *             values       - [IN] array of incoming values                   *
- *             value_num    - [IN] numver of elements in array                *
+ *             value_num    - [IN] number of elements in array                *
  *             processed    - [OUT] number of processed elements              *
  *                                                                            *
  * Return value:                                                              *
@@ -1401,7 +1407,7 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 /* {"request":"ZBX_SENDER_DATA","data":[{"key":"system.cpu.num",...,...},{...},...]}
  *                                     ^------------------------------------------^
  */		if (FAIL == (ret = zbx_json_brackets_open(p, &jp_data)))
-			zabbix_log(LOG_LEVEL_WARNING, "Can't proceed jason request. %s",
+			zabbix_log(LOG_LEVEL_WARNING, "Can't process json request. %s",
 					zbx_json_strerror());
 	}
 
@@ -1630,7 +1636,7 @@ exit:
  *                                                                            *
  * Function: process_areg_data                                                *
  *                                                                            *
- * Purpose: update auto-registarion data, received from proxy                 *
+ * Purpose: update auto-registration data, received from proxy                *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *

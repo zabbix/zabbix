@@ -84,9 +84,9 @@ static struct zbx_option longopts[] =
 
 static char	shortopts[] = "c:n:hV";
 
-/* end of COMMAND LINE OPTIONS*/
+/* end of COMMAND LINE OPTIONS */
 
-pid_t	*threads=NULL;
+pid_t	*threads = NULL;
 
 static unsigned char	zbx_process = ZBX_PROCESS_PROXY_ACTIVE;
 
@@ -253,7 +253,7 @@ void	init_config(void)
 
 	CONFIG_SERVER_STARTUP_TIME = time(NULL);
 
-	parse_cfg_file(CONFIG_FILE,cfg);
+	parse_cfg_file(CONFIG_FILE, cfg);
 
 	if (ZBX_PROXYMODE_ACTIVE == CONFIG_PROXYMODE &&
 			(NULL == CONFIG_SERVER || '\0' == *CONFIG_SERVER))
@@ -350,33 +350,36 @@ void	init_config(void)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int main(int argc, char **argv)
+int	main(int argc, char **argv)
 {
-	char    ch      = '\0';
+	char	ch;
 
 	progname = get_program_name(argv[0]);
 
 	/* Parse the command-line. */
 	while ((ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts,NULL)) != (char)EOF)
-	switch (ch) {
-		case 'c':
-			CONFIG_FILE = strdup(zbx_optarg);
-			break;
-		case 'h':
-			help();
-			exit(-1);
-			break;
-		case 'V':
-			version();
-			exit(-1);
-			break;
-		default:
-			usage();
-			exit(-1);
-			break;
-        }
+	{
+		switch (ch)
+		{
+			case 'c':
+				CONFIG_FILE = strdup(zbx_optarg);
+				break;
+			case 'h':
+				help();
+				exit(-1);
+				break;
+			case 'V':
+				version();
+				exit(-1);
+				break;
+			default:
+				usage();
+				exit(-1);
+				break;
+		}
+	}
 
-	if(CONFIG_FILE == NULL)
+	if (NULL == CONFIG_FILE)
 	{
 		CONFIG_FILE=strdup("/etc/zabbix/zabbix_proxy.conf");
 	}
@@ -490,10 +493,12 @@ int MAIN_ZABBIX_ENTRY(void)
 			+ CONFIG_DBSYNCER_FORKS + CONFIG_IPMIPOLLER_FORKS;
 		i++)
 	{
-		if ((pid = zbx_fork()) == 0) {
+		if ((pid = zbx_fork()) == 0)
+		{
 			server_num = i;
 			break;
-		} else
+		}
+		else
 			threads[i] = pid;
 	}
 

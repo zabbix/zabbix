@@ -38,12 +38,12 @@ static int	connect_to_proxy(DC_HOST *host, zbx_sock_t *sock, int timeout)
 
 	addr = host->useip ? host->ip : host->dns;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() [%s]:%d timeout:%d",
-			__function_name, addr, (int)host->port, timeout);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() [%s]:%d timeout:%hu",
+			__function_name, addr, host->port, timeout);
 
 	if (FAIL == (ret = zbx_tcp_connect(sock, CONFIG_SOURCE_IP, addr, host->port, timeout)))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Unable to connect to the proxy [%s] [%s]:%d [%s]",
+		zabbix_log(LOG_LEVEL_ERR, "Unable to connect to the proxy [%s] [%s]:%hu [%s]",
 				host->host, addr, host->port, zbx_tcp_strerror());
 		ret = NETWORK_ERROR;
 	}
@@ -80,11 +80,11 @@ static int	send_data_to_proxy(DC_HOST *host, zbx_sock_t *sock, const char *data)
 static int	recv_data_from_proxy(DC_HOST *host, zbx_sock_t *sock, char **data)
 {
 	const char	*__function_name = "recv_data_from_proxy";
-	int		res;
+	int		ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (FAIL == (res = zbx_tcp_recv(sock, data)))
+	if (FAIL == (ret = zbx_tcp_recv(sock, data)))
 		zabbix_log(LOG_LEVEL_ERR, "Error while receiving answer from proxy [%s] [%s]",
 				host->host, zbx_tcp_strerror());
 	else
@@ -92,9 +92,9 @@ static int	recv_data_from_proxy(DC_HOST *host, zbx_sock_t *sock, char **data)
 				__function_name, *data);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s",
-			__function_name, zbx_result_string(res));
+			__function_name, zbx_result_string(ret));
 
-	return res;
+	return ret;
 }
 
 static void	disconnect_proxy(zbx_sock_t *sock)
@@ -169,7 +169,7 @@ static int	get_data_from_proxy(DC_HOST *host, const char *request, char **data)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments: always SUCCEED                                                   *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	process_proxy()

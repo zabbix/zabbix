@@ -18,7 +18,6 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-
 #ifndef ZABBIX_PROXY_H
 #define ZABBIX_PROXY_H
 

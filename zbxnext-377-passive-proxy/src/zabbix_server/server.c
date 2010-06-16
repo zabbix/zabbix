@@ -90,9 +90,9 @@ static struct zbx_option longopts[] =
 
 static char	shortopts[] = "c:n:hV";
 
-/* end of COMMAND LINE OPTIONS*/
+/* end of COMMAND LINE OPTIONS */
 
-pid_t	*threads=NULL;
+pid_t	*threads = NULL;
 
 int	CONFIG_ALERTER_FORKS		= 1;
 int	CONFIG_DISCOVERER_FORKS		= 1;
@@ -250,7 +250,7 @@ void	init_config(void)
 	CONFIG_SERVER_STARTUP_TIME = time(NULL);
 
 
-	parse_cfg_file(CONFIG_FILE,cfg);
+	parse_cfg_file(CONFIG_FILE, cfg);
 
 	if(CONFIG_DBNAME == NULL)
 	{

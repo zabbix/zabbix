@@ -20,12 +20,6 @@
 #ifndef ZABBIX_PROXYPOLLER_H
 #define ZABBIX_PROXYPOLLER_H
 
-#include "common.h"
-/*
-extern void	signal_handler(int);
-extern int	server_num;
-*/
-
 extern int	CONFIG_PROXYPOLLER_FORKS;
 extern char	*CONFIG_SOURCE_IP;
 extern int	CONFIG_TRAPPER_TIMEOUT;

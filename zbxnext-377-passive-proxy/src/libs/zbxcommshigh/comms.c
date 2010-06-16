@@ -42,8 +42,7 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	zbx_send_response(zbx_sock_t *sock, int result, const char *info,
-		int timeout)
+int	zbx_send_response(zbx_sock_t *sock, int result, const char *info, int timeout)
 {
 	const char	*__function_name = "zbx_send_response";
 
@@ -115,8 +114,8 @@ int	zbx_recv_response(zbx_sock_t *sock, char *info, int max_info_size, int timeo
 
 	if (FAIL == (ret = zbx_tcp_recv_to(sock, &answer, timeout)))
 	{
-		/* since we have successfully sent data to the server, we assume the */
-		/* server is just too busy processing our data if there is no response */
+		/* since we have successfully sent data earlier, we assume the other */
+		/* side is just too busy processing our data if there is no response */
 		zabbix_log(LOG_LEVEL_DEBUG, "Did not receive response from host");
 		ret = NETWORK_ERROR;
 		goto exit;

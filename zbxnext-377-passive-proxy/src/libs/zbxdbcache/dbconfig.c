@@ -150,7 +150,7 @@ ZBX_DC_HOST
 	const char	*dns;			/* interned; dns[HOST_DNS_LEN_MAX];					*/
 	int		maintenance_from;
 	int		errors_from;
-	int		disable_until;		/* proxy_nextcheck for passive proxies */
+	int		disable_until;		/* proxy_nextcheck for passive proxies (minimum of nextchecks below) */
 	int		snmp_errors_from;
 	int		snmp_disable_until;	/* proxy_config_nextcheck for passive proxies */
 	int		ipmi_errors_from;
@@ -436,6 +436,33 @@ static void	DCupdate_item_queue(ZBX_DC_ITEM *item)
 	{
 		item->in_queue = 1;
 		zbx_binary_heap_insert(&config->queues[item->poller_type], &elem);
+	}
+}
+
+static void	DCupdate_proxy_queue(ZBX_DC_HOST *host)
+{
+	zbx_binary_heap_elem_t	elem;
+
+	if (HOST_STATUS_PROXY_PASSIVE != host->status)
+	{
+		if (host->in_queue)
+		{
+			zbx_binary_heap_remove_direct(&config->pqueue, host->hostid);
+			host->in_queue = 0;
+		}
+
+		return;
+	}
+
+	elem.key = host->hostid;
+	elem.data = (const void *)host;
+
+	if (host->in_queue)
+		zbx_binary_heap_update_direct(&config->pqueue, &elem);
+	else
+	{
+		host->in_queue = 1;
+		zbx_binary_heap_insert(&config->pqueue, &elem);
 	}
 }
 
@@ -855,33 +882,6 @@ static void	DCsync_items(DB_RESULT result)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	DCupdate_proxy_queue(ZBX_DC_HOST *dc_host)
-{
-	zbx_binary_heap_elem_t	elem;
-
-	if (HOST_STATUS_PROXY_PASSIVE != dc_host->status)
-	{
-		if (dc_host->in_queue)
-		{
-			zbx_binary_heap_remove_direct(&config->pqueue, dc_host->hostid);
-			dc_host->in_queue = 0;
-		}
-
-		return;
-	}
-
-	elem.key = dc_host->hostid;
-	elem.data = (const void *)dc_host;
-
-	if (dc_host->in_queue)
-		zbx_binary_heap_update_direct(&config->pqueue, &elem);
-	else
-	{
-		dc_host->in_queue = 1;
-		zbx_binary_heap_insert(&config->pqueue, &elem);
-	}
-}
-
 static void	DCsync_hosts(DB_RESULT result)
 {
 	const char		*__function_name = "DCsync_hosts";
@@ -1280,11 +1280,11 @@ static int	__config_host_ph_compare(const void *d1, const void *d2)
 
 static int	__config_nextcheck_compare(const void *d1, const void *d2)
 {
-	const zbx_binary_heap_elem_t	*e1=(const zbx_binary_heap_elem_t *)d1;
-	const zbx_binary_heap_elem_t	*e2=(const zbx_binary_heap_elem_t *)d2;
+	const zbx_binary_heap_elem_t	*e1 = (const zbx_binary_heap_elem_t *)d1;
+	const zbx_binary_heap_elem_t	*e2 = (const zbx_binary_heap_elem_t *)d2;
 
-	const ZBX_DC_ITEM		*i1=(const ZBX_DC_ITEM *)e1->data;
-	const ZBX_DC_ITEM		*i2=(const ZBX_DC_ITEM *)e2->data;
+	const ZBX_DC_ITEM		*i1 = (const ZBX_DC_ITEM *)e1->data;
+	const ZBX_DC_ITEM		*i2 = (const ZBX_DC_ITEM *)e2->data;
 
 	if (i1->nextcheck < i2->nextcheck) return -1;
 	if (i1->nextcheck > i2->nextcheck) return +1;
@@ -1293,11 +1293,11 @@ static int	__config_nextcheck_compare(const void *d1, const void *d2)
 
 static int	__config_proxy_compare(const void *d1, const void *d2)
 {
-	const zbx_binary_heap_elem_t	*e1=(const zbx_binary_heap_elem_t *)d1;
-	const zbx_binary_heap_elem_t	*e2=(const zbx_binary_heap_elem_t *)d2;
+	const zbx_binary_heap_elem_t	*e1 = (const zbx_binary_heap_elem_t *)d1;
+	const zbx_binary_heap_elem_t	*e2 = (const zbx_binary_heap_elem_t *)d2;
 
-	const ZBX_DC_HOST		*h1=(const ZBX_DC_HOST *)e1->data;
-	const ZBX_DC_HOST		*h2=(const ZBX_DC_HOST *)e2->data;
+	const ZBX_DC_HOST		*h1 = (const ZBX_DC_HOST *)e1->data;
+	const ZBX_DC_HOST		*h2 = (const ZBX_DC_HOST *)e2->data;
 
 	if (h1->disable_until < h2->disable_until) return -1;
 	if (h1->disable_until > h2->disable_until) return +1;
@@ -1724,9 +1724,9 @@ int	DCconfig_get_poller_nextcheck(unsigned char poller_type)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() poller_type:%d", __function_name, (int)poller_type);
 
-	LOCK_CACHE;
-
 	queue = &config->queues[poller_type];
+
+	LOCK_CACHE;
 
 	if (FAIL == zbx_binary_heap_empty(queue))
 	{
@@ -1773,11 +1773,11 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() poller_type:%d", __function_name, (int)poller_type);
 
-	LOCK_CACHE;
-
 	now = time(NULL);
 
 	queue = &config->queues[poller_type];
+
+	LOCK_CACHE;
 
 	while (num < max_items && FAIL == zbx_binary_heap_empty(queue))
 	{
@@ -2150,18 +2150,17 @@ void	*DCconfig_get_stats(int request)
  *                                                                            *
  * Function: DCconfig_get_proxypoller_hosts                                   *
  *                                                                            *
- * Purpose: Get array of items for selected poller                            *
+ * Purpose: Get array of proxies for proxy poller                             *
  *                                                                            *
  * Parameters: hosts - [OUT] array of hosts                                   *
  *             max_hosts - [IN] elements in hosts array                       *
  *                                                                            *
- * Return value: number of items in items array                               *
+ * Return value: number of proxies in hosts array                             *
  *                                                                            *
- * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: Items leave the queue only through this function. Pollers        *
- *           must always return the items they have taken using either        *
- *           DCrequeue_reachable_item() or DCrequeue_unreachable_item().      *
+ * Comments: Proxies leave the queue only through this function. Pollers must *
+ *           always return the proxies they have taken using DCrequeue_proxy. *
  *                                                                            *
  ******************************************************************************/
 int	DCconfig_get_proxypoller_hosts(DC_HOST *hosts, int max_hosts)
@@ -2230,9 +2229,9 @@ int	DCconfig_get_proxy_nextcheck()
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	LOCK_CACHE;
-
 	queue = &config->pqueue;
+
+	LOCK_CACHE;
 
 	if (FAIL == zbx_binary_heap_empty(queue))
 	{
