@@ -50,7 +50,7 @@ void	update_functions(DB_ITEM *item)
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		value[MAX_STRING_LEN];
-	char		value_esc[MAX_STRING_LEN];
+	char		*value_esc, *function_esc, *parameter_esc;
 	char		*lastvalue;
 	int		ret=SUCCEED;
 
@@ -88,12 +88,21 @@ void	update_functions(DB_ITEM *item)
 			/* Update only if lastvalue differs from new one */
 			if( DBis_null(lastvalue)==SUCCEED || (strcmp(lastvalue,value) != 0))
 			{
-				DBescape_string(value,value_esc,MAX_STRING_LEN);
-				DBexecute("update functions set lastvalue='%s' where itemid=" ZBX_FS_UI64 " and function='%s' and parameter='%s'",
-					value_esc,
-					function.itemid,
-					function.function,
-					function.parameter );
+				value_esc = DBdyn_escape_string(value);
+				function_esc = DBdyn_escape_string(function.function);
+				parameter_esc = DBdyn_escape_string(function.parameter);
+
+				DBexecute("update functions"
+						" set lastvalue='%s'"
+						" where itemid=" ZBX_FS_UI64
+							" and function='%s'"
+							" and parameter='%s'",
+					value_esc, function.itemid,
+					function_esc, parameter_esc);
+
+				zbx_free(parameter_esc);
+				zbx_free(function_esc);
+				zbx_free(value_esc);
 			}
 			else
 			{

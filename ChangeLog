@@ -1,5 +1,6 @@
 Changes for 1.0.0
 
+ - [NTP-225] fixed processing of functions with parameters containing back-slashes (Sasha)
  - [NTP-193,ZBX-2417] fixed timeout handling for passive checks on agent side (Sasha)
  - [NTD-98] fixed regular expression tester giving wrong result for "Character string not included" expressions (Vedmak)
  - [NTP-200] fixed sending active items multiple times because of zbx_tcp_recv() timeout (asaveljevs,Sasha)
