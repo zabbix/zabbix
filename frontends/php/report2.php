@@ -241,9 +241,9 @@ include_once('include/page_header.php');
 
 			$availability = calculate_availability($row['triggerid'], $_REQUEST['filter_timesince'], $_REQUEST['filter_timetill']);
 
-			$true	= new CSpan(sprintf("%.4f%%", $availability['true']), 'on');
-			$false	= new CSpan(sprintf("%.4f%%", $availability['false']), 'off');
-			$unknown= new CSpan(sprintf("%.4f%%", $availability['unknown']), 'unknown');
+			$true	= new CSpan(sprintf('%.4f%%', $availability['true']), 'on');
+			$false	= new CSpan(sprintf('%.4f%%', $availability['false']), 'off');
+			$unknown= new CSpan(sprintf('%.4f%%', $availability['unknown']), 'unknown');
 			$actions= new CLink(S_SHOW, 'report2.php?filter_groupid='.$_REQUEST['groupid'].'&filter_hostid='.$_REQUEST['hostid'].'&triggerid='.$row['triggerid']);
 
 			$table->addRow(array(
