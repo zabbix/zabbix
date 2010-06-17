@@ -327,7 +327,7 @@ function InsertText(obj, value){
 <?php
 
 	if(isset($_REQUEST['insert'])){
-		$expression = sprintf("{%s:%s.%s(%s%s)}%s%s",
+		$expression = sprintf('{%s:%s.%s(%s%s)}%s%s',
 			$item_host,
 			$item_data['key_'],
 			$function,

@@ -198,7 +198,7 @@ include_once('include/page_header.php');
 				$stat = calculate_service_availability($row['serviceid'], $period_start, $period_end);
 
 				$p = min($stat['problem'], 20);
-				$sla_style = ($row['goodsla'] > $stat['ok'])?'on':'off';
+				$sla_style = ($row['goodsla'] > $stat['ok'])? 'on':'off';
 
 				$sizeX = 160;
 				$sizeY = 15;
@@ -221,7 +221,7 @@ include_once('include/page_header.php');
 					$chart2 = new CLink($chart2,'report3.php?serviceid='.$row['serviceid'].'&year='.date('Y'),'image');
 				}
 
-				$text = new CLink(sprintf("%.2f",$stat['problem']),'report3.php?serviceid='.$row['serviceid'].'&year='.date('Y'), $sla_style);
+				$text = new CLink(sprintf('%.2f',$stat['problem']),'report3.php?serviceid='.$row['serviceid'].'&year='.date('Y'), $sla_style);
 
 				$sla_tab->addRow(array($chart1, $chart2, SPACE, $text));
 
@@ -285,7 +285,7 @@ include_once('include/page_header.php');
 
 			$r_form->addItem(array(S_PERIOD.SPACE, $period_combo));
 
-			$url = '?period='.$period.'&fullscreen='.($_REQUEST['fullscreen']?'0':'1');
+			$url = '?period='.$period.'&fullscreen='.($_REQUEST['fullscreen']? '0':'1');
 			$fs_icon = new CDiv(SPACE, 'fullscreen');
 			$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 			$fs_icon->addAction('onclick', "javascript: document.location = '".$url."';");
