@@ -2424,7 +2424,7 @@
 			$w = 0;
 			foreach($strings as $strnum => $str){
 				$dims = imageTextSize(8,0,$str);
-				$h += $labelFontHeight;
+				$h += $labelFontHeight+4;
 				$w = max($w, $dims['width']);
 			}
 
@@ -2469,6 +2469,7 @@
 
 				$dims = imageTextSize(8,0,$str);
 				$dims['height'] = $labelFontHeight;
+				//$str .= ' - '.$labelFontHeight.' - '.$dims['height'];
 				//$str = $dims['width'].'x'.$dims['height'];
 
 				$color = $label_color;
@@ -2482,11 +2483,11 @@
 
 				imagefilledrectangle(
 					$im,
-					$x_label-2, $y_rec+$increasey-2,
+					$x_label-2, $y_rec+$increasey+2,
 					$x_label+$dims['width']+2, $y_rec+$increasey+$dims['height']+2,
 					$colors['White']
 				);
-				imagetext($im, 8, 0, $x_label, $y_rec+$dims['height']+$increasey, $color, $str);
+				imagetext($im, 8, 0, $x_label, $y_rec+$increasey+$dims['height'], $color, $str);
 
 				$increasey += $dims['height']+4;
 				$num++;
