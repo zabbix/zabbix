@@ -86,7 +86,7 @@ include_once('include/page_header.php');
 	imagefilledrectangle($im,0,0,$x,$y,$white);
 	imagerectangle($im,0,0,$x-1,$y-1,$black);
 
-	$str=sprintf(S_CHART5_HEADER_TITLE, $service['name'], zbx_date2str(S_CHART5_HEADER_DATE_FORMAT));
+	$str=S_CHART5_HEADER_TITLE_PART1.$service['name'].S_CHART5_HEADER_TITLE_PART2.zbx_date2str(S_CHART5_HEADER_DATE_FORMAT).S_CHART5_HEADER_TITLE_PART3;
 	$x=imagesx($im)/2-imagefontwidth(4)*zbx_strlen($str)/2;
 	// imagestring($im, 4,$x,1, $str , $darkred);
 	imageText($im, 10, 0, $x, 14, $darkred, $str);
