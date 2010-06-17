@@ -65,7 +65,7 @@
 	'S_MONTH_OCTOBER_SHORT' =>		'Oct',
 	'S_MONTH_NOVEMBER_SHORT' =>		'Nov',
 	'S_MONTH_DECEMBER_SHORT' =>		'Dec',
-	
+
 	'S_MONTH_JANUARY_LONG' =>		'January',
 	'S_MONTH_FEBRUARY_LONG' =>		'February',
 	'S_MONTH_MARCH_LONG' =>			'March',
@@ -738,7 +738,7 @@
 
 	'S_FAILURE_AUDIT'=>			'Failure Audit',
 	'S_SUCCESS_AUDIT'=>			'Success Audit',
-	
+
 	'S_HISTORY_LOG_ITEM_DATE_FORMAT'=>	'[Y.M.d H:i:s]',
 	'S_HISTORY_LOG_LOCALTIME_DATE_FORMAT'=>	'Y.M.d H:i:s',
 	'S_HISTORY_LOG_ITEM_PLAINTEXT'=>	'Y-m-d H:i:s',
@@ -951,6 +951,7 @@
 	'S_DISABLE_SELECTED_HOSTS_Q'=>			'Disable selected hosts?',
 	'S_DELETE_SELECTED_HOSTS_Q'=>			'Delete selected hosts?',
 	'S_UPDATED_STATUS_OF_HOST' =>		'Updated status of host',
+	'S_CLEAR_WHEN_UNLINKING' => 'Clear when unlinking',
 
 // templates.php
 	'S_TEMPLATE_LIST'=>			'Templates list',
@@ -1879,7 +1880,7 @@
 	'S_CLOSE'=>				'Close',
 	'S_CONNECT_TO_SERVER_ERROR'=>		'Cannot connect to Zabbix server',
 	'S_DELETE_SELECTED_SCRIPTS_Q'=>		'Delete selected scripts?',
-	
+
 	'S_SCRIPT_ERROR'=>			'SCRIPT ERROR',
 	'S_SCRIPT_ERROR_DESCRIPTION'=>		'Error Description',
 	'S_SCRIPT_SEND_ERROR'=>			'Can\'t send command, check connection',
@@ -2170,7 +2171,7 @@
 	'S_NOT_FLOAT_OR_MACRO_FOR_FUNCTION_SMALL'=> 'is not a float or macro for function',
 	'S_NOT_FLOAT_OR_MACRO_OR_COUNTER_FOR_FUNCTION_SMALL'=>	'is not a float or counter or macro for function',
 	'S_ITEM_KEY_MUST_BE_USED_IN_TRIGGER_EXPRESSION'=>	'An item key must be used in trigger expression',
-	'S_INCORRECT_TRIGGER_EXPRESSION'=>			'Incorrect trigger expression',	
+	'S_INCORRECT_TRIGGER_EXPRESSION'=>			'Incorrect trigger expression',
 	'S_YOU_CAN_NOT_USE_TEMPLATE_HOSTS_MIXED_EXPR'=>		'You can not use template hosts in mixed expressions.',
 	'S_ADDED_TRIGGER'=>					'Added trigger',
 	'S_TO_HOST_SMALL'=>					'to host',
