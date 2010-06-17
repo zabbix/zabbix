@@ -378,7 +378,7 @@ include_once('include/page_header.php');
 		'nodeids' => get_current_nodeid(),
 		'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 		'output' => API_OUTPUT_EXTEND,
-		'select_hosts' => array('hostid', 'host', 'maintenance_status'),
+		'select_hosts' => array('hostid', 'host', 'maintenance_status', 'maintenance_type', 'maintenanceid'),
 		'select_items' => API_OUTPUT_EXTEND,
 		'select_dependencies' => API_OUTPUT_EXTEND
 	);
@@ -565,8 +565,13 @@ include_once('include/page_header.php');
 				$text = ' ['.$text.']';
 				$maint_span = new CSpan($text, 'orange pointer');
 
-				$maintenance = CMaintenance::get(array('maintenanceids' => $trigger_host['maintenanceid'], 'extendoutput' => 1));
-				$maintenance = reset($maintenance);
+				$maintenanceOptions = array(
+					'maintenanceids' => $trigger_host['maintenanceid'],
+					'output' => API_OUTPUT_EXTEND
+				);
+				$maintenances = CMaintenance::get($maintenanceOptions);
+				$maintenance = reset($maintenances);
+
 				$maint_hint = new CSpan($maintenance['name'].($maintenance['description']=='' ? '' : ': '.$maintenance['description']));
 
 				$maint_span->setHint($maint_hint);
