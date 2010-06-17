@@ -36,6 +36,19 @@
 #     one of values.
 #    Adding a hash mark (#) in front of the line will indicate that it is a
 #     comment.
+#
+# 3. Pre-dump hook
+#    Pre-dump hook allows to execute a query right before dumping as specific
+#     table.
+#    Pre-dump hook entries are specified in PREDUMPHOOKFILE file. Each line
+#     contains space separated:
+#         table query
+#
+#    There is a possible race condition between executing the pre-dump hook and
+#     dumping the table. This feature should not be used for critical changes at
+#     this time.
+#    Adding a hash mark (#) in front of the line will indicate that it is a
+#     comment.
 
 # Do not make configuration changes to the database while running this script.
 
