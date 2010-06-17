@@ -133,7 +133,7 @@ include_once('include/page_header.php');
 			'api_access' => $_REQUEST['api_access'],
 			'debug_mode' => $_REQUEST['debug_mode'],
 			'userids' => get_request('group_users', array()),
-			'rights' => get_request('group_rights', array()),
+			'rights' => array_values(get_request('group_rights', array())),
 		);
 
 		if(isset($_REQUEST['usrgrpid'])){

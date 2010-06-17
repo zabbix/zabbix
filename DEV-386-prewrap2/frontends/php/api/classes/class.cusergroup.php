@@ -482,7 +482,7 @@ class CUserGroup extends CZBXAPI{
 			if(!is_null($rights)){
 				$linked_rights = array();
 				$sql = 'SELECT groupid, id'.
-						' FROM users_groups'.
+						' FROM rights'.
 						' WHERE '.DBcondition('groupid', $usrgrpids);
 							' AND '.DBcondition('id', zbx_objectValues($rights, 'id'));
 				$linked_rights_db = DBselect($sql);
@@ -503,7 +503,7 @@ class CUserGroup extends CZBXAPI{
 						}
 					}
 				}
-				DB::insert('rights_insert', $rights_insert);
+				DB::insert('rights', $rights_insert);
 			}
 
 			self::EndTransaction(true, __METHOD__);
@@ -554,12 +554,11 @@ class CUserGroup extends CZBXAPI{
 				if(!empty($data)){
 					$update[] = array(
 						'values' => $data,
-						'where' => 'usrgrpid='.$usrgrpid,
+						'where' => array('usrgrpid='.$usrgrpid),
 					);
 				}
 			}
 			DB::update('usrgrp', $update);
-
 
 			if(!is_null($userids)){
 				$usrgrps = self::get(array(
@@ -604,8 +603,8 @@ class CUserGroup extends CZBXAPI{
 					DB::insert('users_groups', $users_insert);
 				if(!empty($userids_to_unlink))
 					DB::delete('users_groups', array(
-						DBcondition('userids', $userids_to_unlink),
-						DBcondition('usrgrpids', $usrgrpids),
+						DBcondition('userid', $userids_to_unlink),
+						DBcondition('usrgrpid', $usrgrpids),
 					));
 			}
 
@@ -618,40 +617,46 @@ class CUserGroup extends CZBXAPI{
 				$linked_rights_db = DBselect($sql);
 				while($link = DBfetch($linked_rights_db)){
 					if(!isset($linked_rights[$link['groupid']])) $linked_rights[$link['groupid']] = array();
-					$linked_rights[$link['usrgrpid']][$link['userid']] = $link['permission'];
+					$linked_rights[$link['groupid']][$link['id']] = $link['permission'];
 				}
 
 				$rights_insert = array();
 				$rights_update = array();
-				$usergroups_to_unlink = array();
+				$rights_to_unlink = array();
 				foreach($usrgrpids as $usrgrpid){
 					foreach($rights as $right){
 						if(!isset($linked_rights[$usrgrpid][$right['id']])){
 							$rights_insert[] = array(
-								'usrgrpid' => $usrgrpid,
-								'userid' => $userid,
+								'groupid' => $usrgrpid,
+								'id' => $right['id'],
+								'permission' => $right['permission'],
 							);
 						}
 						else if($linked_rights[$usrgrpid][$right['id']] != $right['permission']){
 							$rights_update[] = array(
 								'values' => array('permission' => $right['permission']),
-								'where' => array('usrgrpid='.$usrgrpid, 'id='.$right['id']),
+								'where' => array('groupid='.$usrgrpid, 'id='.$right['id']),
 							);
 						}
-						unset($linked_rights[$usrgrpid][$userid]);
+						unset($linked_rights[$usrgrpid][$right['id']]);
 					}
+
 					if(isset($linked_rights[$usrgrpid]) && !empty($linked_rights[$usrgrpid])){
-						$usergroups_to_unlink = array_merge($usergroups_to_unlink, array_keys($linked_rights[$usrgrpid]));
+						$rights_to_unlink = array_merge($rights_to_unlink, array_keys($linked_rights[$usrgrpid]));
 					}
 				}
+
 				if(!empty($rights_insert))
-					DB::insert('users_groups', $rights_insert);
-				if(!empty($usergroups_to_unlink))
-					DB::delete('users_groups', array(
-						DBcondition('id', $usergroups_to_unlink),
-						DBcondition('usrgrpids', $usrgrpids),
+					DB::insert('rights', $rights_insert);
+				if(!empty($rights_to_unlink))
+					DB::delete('rights', array(
+						DBcondition('id', $rights_to_unlink),
+						DBcondition('groupid', $usrgrpids),
 					));
+				if(!empty($rights_update))
+					DB::update('rights', $rights_update);
 			}
+
 
 			self::EndTransaction(true, __METHOD__);
 			return true;
