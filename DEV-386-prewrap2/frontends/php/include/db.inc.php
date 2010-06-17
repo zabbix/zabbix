@@ -838,7 +838,7 @@ else {
 	return true;
 	}
 
-	function DBcondition($fieldname, &$array, $notin=false, $string=false){
+	function DBcondition($fieldname, $array, $notin=false, $string=false){
 		global $DB;
 		$condition = '';
 
@@ -958,7 +958,7 @@ else {
 
 			foreach($values as $key => $row){
 				$result_ids[$key] = $id;
-				
+
 				unset($row[$table_schema['key']]);
 
 				foreach($row as $field => $v){
