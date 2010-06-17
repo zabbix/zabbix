@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,8 +20,7 @@
 ?>
 <?php
 
-	function	media_type2str($type)
-	{
+	function media_type2str($type){
 		$str_type[MEDIA_TYPE_EMAIL]	= S_EMAIL;
 		$str_type[MEDIA_TYPE_EXEC]	= S_SCRIPT;
 		$str_type[MEDIA_TYPE_SMS]	= S_SMS;
@@ -53,37 +52,35 @@
 
 	function get_media_by_mediaid($mediaid){
 
-		$sql="select * from media where mediaid=$mediaid";
+		$sql = 'select * '.
+			' from media '.
+			' where mediaid='.$mediaid;
 		$result=DBselect($sql);
-		$row=DBfetch($result);
-		if($row)
-		{
+		if($row=DBfetch($result)){
 			return	$row;
 		}
-		else
-		{
-			error(S_NO_MEDIA_WITH.SPACE."mediaid=[$mediaid]");
+		else{
+			error(S_NO_MEDIA_WITH.SPACE.'mediaid=['.$mediaid.']');
 		}
-		return	$result;
+
+	return	$result;
 	}
 
 // Delete Media definition by mediatypeid
 	function delete_media_by_mediatypeid($mediatypeid){
-		$sql="delete from media where mediatypeid=$mediatypeid";
-		return	DBexecute($sql);
+		$sql = 'delete from media where mediatypeid='.$mediatypeid;
+	return DBexecute($sql);
 	}
 
 // Delete alerts by mediatypeid
 	function delete_alerts_by_mediatypeid($mediatypeid){
-		$sql="delete from alerts where mediatypeid=$mediatypeid";
-		return	DBexecute($sql);
+		$sql='delete from alerts where mediatypeid='.$mediatypeid;
+	return	DBexecute($sql);
 	}
 
 	function get_mediatype_by_mediatypeid($mediatypeid){
-		$sql="select * from media_type where mediatypeid=$mediatypeid";
-		$result=DBselect($sql);
-		$row=DBfetch($result);
-		if($row){
+		$result=DBselect('select * from media_type where mediatypeid='.$mediatypeid);
+		if($row=DBfetch($result)){
 			return	$row;
 		}
 		else{
