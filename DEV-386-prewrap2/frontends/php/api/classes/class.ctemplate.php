@@ -1125,15 +1125,11 @@ COpt::memoryPick();
  * @return boolean
  */
 	public static function massAdd($data){
-		$transaction = false;
-
 		$templates = isset($data['templates']) ? zbx_toArray($data['templates']) : null;
 		$templateids = is_null($templates) ? array() : zbx_objectValues($templates, 'templateid');
 
-
-		$transaction = self::BeginTransaction(__METHOD__);
-
 		try{
+			self::BeginTransaction(__METHOD__);
 			if(isset($data['groups'])){
 				$options = array('groups' => $data['groups'], 'templates' => $templates);
 				$result = CHostGroup::massAdd($options);
@@ -1160,7 +1156,7 @@ COpt::memoryPick();
 			return true;
 		}
 		catch(APIException $e){
-			if($transaction) self::EndTransaction(false, __METHOD__);
+			self::EndTransaction(false, __METHOD__);
 			$error = $e->getErrors();
 			$error = reset($error);
 			self::setError(__METHOD__, $e->getCode(), $error);
