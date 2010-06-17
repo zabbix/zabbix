@@ -73,7 +73,7 @@
 			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 				access_deny();
 
-			$hostid		= add_proxy($_REQUEST['host'], $_REQUEST['status'], $_REQUEST['useip'], $_REQUEST['dns'], $_REQUEST['ip'], $_REQUEST['port'], $hosts);
+			$result = $hostid = add_proxy($_REQUEST['host'], $_REQUEST['status'], $_REQUEST['useip'], $_REQUEST['dns'], $_REQUEST['ip'], $_REQUEST['port'], $hosts);
 			$action		= AUDIT_ACTION_ADD;
 			$msg_ok		= S_PROXY_ADDED;
 			$msg_fail	= S_CANNOT_ADD_PROXY;

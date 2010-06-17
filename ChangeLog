@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBX-2557] fixed incorrect message when add proxy with name that already exist (Vedmak)
  - [ZBX-2492] fixed japanese translation, all sprintf and their placeholders have been removed from phrases from all languages (Maxim Andruhovich / AM)
  - [ZBX-2551] fixed not shown errors in configuration/triggers (Vedmak)
  - [ZBX-2552] fixed multiple events for triggers with complicated expressions (Sasha)
