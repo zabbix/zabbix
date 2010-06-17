@@ -258,7 +258,7 @@ include_once('include/page_header.php');
 		}
 
 		$frmApp = new CFormTable($frm_title);
-		$frmApp->SetHelp("web.applications.php");
+		$frmApp->setHelp("web.applications.php");
 
 		if(isset($_REQUEST["applicationid"]))
 			$frmApp->addVar("applicationid",$_REQUEST["applicationid"]);
@@ -272,7 +272,7 @@ include_once('include/page_header.php');
 			$frmApp->addRow(S_HOST,array(
 				new CTextBox("apphost",$apphost,32,'yes'),
 				new CButton("btn1",S_SELECT,
-					"return PopUp('popup.php?dstfrm=".$frmApp->GetName().
+					"return PopUp('popup.php?dstfrm=".$frmApp->getName().
 					"&dstfld1=apphostid&dstfld2=apphost&srctbl=hosts_and_templates&srcfld1=hostid&srcfld2=host',450,450);",
 					'T')
 				));

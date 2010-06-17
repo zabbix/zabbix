@@ -673,7 +673,7 @@ SDI('/////////////////////////////////');
 				if(!empty($screen)){
 					$update[] = array(
 						'values' => $screen,
-						'where' => 'screenid='.$screenid,
+						'where' => array('screenid='.$screenid),
 					);
 				}
 
@@ -721,12 +721,10 @@ SDI('/////////////////////////////////');
 				if(!isset($del_screens[$screenid])) self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 			}
 
-			$delete = array();
-			$delete[] = array('table' => 'screens_items', 'where' => DBcondition('screenid', $screenids));
-			$delete[] = array('table' => 'screens_items', 'where' => DBcondition('resourceid', $screenids).' AND resourcetype='.SCREEN_RESOURCE_SCREEN);
-			$delete[] = array('table' => 'slides', 'where' => DBcondition('screenid', $screenids));
-			$delete[] = array('table' => 'screens', 'where' => DBcondition('screenid', $screenids));
-			DB::delete($delete);
+			DB::delete('screens_items', DBcondition('screenid', $screenids));
+			DB::delete('screens_items', array(DBcondition('resourceid', $screenids), 'resourcetype='.SCREEN_RESOURCE_SCREEN));
+			DB::delete('slides', DBcondition('screenid', $screenids));
+			DB::delete('screens', DBcondition('screenid', $screenids));
 
 			self::EndTransaction(true, __METHOD__);
 			return true;
@@ -805,12 +803,18 @@ SDI('/////////////////////////////////');
 				foreach($new_items as $nnum => $new_item){
 					if(($current_item['x'] == $new_item['x']) && ($current_item['y'] == $new_item['y'])){
 
-						$u = array(
-							'where' => 'screenid='.$screen['screenid'].' AND x='.$new_item['x'].' AND y='.$new_item['y'],
+						$tmpupd = array(
+							'where' => array(
+								'screenid='.$screen['screenid'],
+								'x='.$new_item['x'],
+								'y='.$new_item['y']
+							)
 						);
+
 						unset($new_item['screenid'], $new_item['screenitemid'], $new_item['x'], $new_item['y']);
-						$u['values'] = $new_item;
-						$update[] = $u;
+						$tmpupd['values'] = $new_item;
+
+						$update[] = $tmpupd;
 
 						unset($screen['screenitems'][$cnum]);
 						unset($new_items[$nnum]);
@@ -839,7 +843,7 @@ SDI('/////////////////////////////////');
 
 		if(!empty($insert)) DB::insert('screens_items', $insert);
 		if(!empty($update)) DB::update('screens_items', $update);
-		if(!empty($delete)) DB::delete(array('table' => 'screens_items', 'where' => DBcondition('screenitemid', $delete)));
+		if(!empty($delete)) DB::delete('screens_items', DBcondition('screenitemid', $delete));
 
 		return true;
 	}

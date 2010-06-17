@@ -581,6 +581,9 @@
 	'S_VALUE_MAPS_CREATE_NUM_STRING'=>		'Value maps are used to create a mapping between numeric values and string representations',
 	'S_DELETE_SELECTED_VALUE_MAPPING'=>		'Delete selected value mapping?',
 
+// media_types.php
+	'S_DELETE_SELECTED_MEDIATYPES_Q'=>		'Delete selected media types?',
+
 //	nodes.php
 	'S_NOT_DM_SETUP'=>			'Your setup is not configured for distributed monitoring',
 	'S_CONFIGURATION_OF_NODES'=>		'CONFIGURATION OF NODES',
@@ -946,7 +949,7 @@
 	'S_EMPTY_INPUT_PARAMETER'=>			'Empty input parameter',
 	'S_ENABLE_SELECTED_HOSTS'=>			'Enable selected hosts?',
 	'S_DISABLE_SELECTED_HOSTS_Q'=>			'Disable selected hosts?',
-	'S_DELETE_SELECTED_HOSTS'=>			'Delete selected hosts?',
+	'S_DELETE_SELECTED_HOSTS_Q'=>			'Delete selected hosts?',
 	'S_UPDATED_STATUS_OF_HOST' =>		'Updated status of host',
 
 // templates.php
@@ -979,7 +982,6 @@
 	'S_ADD_TO_GROUP'=>			'Add to group',
 	'S_DELETE_FROM_GROUP'=>			'Delete from group',
 	'S_UPDATE_IN_GROUP'=>			'Update in group',
-	'S_DELETE_SELECTED_HOSTS_Q'=>		'Delete selected hosts?',
 	'S_CREATE_HOST'=>			'Create Host',
 	'S_CREATE_TEMPLATE'=>			'Create Template',
 	'S_TEMPLATE_LINKAGE'=>			'Template linkage',
@@ -2302,9 +2304,9 @@
 //	'S_CUSER_ERROR_ATTEMP_FAILED'=>						'%1$s failed login attempts logged. Last failed attempt was from %2$s on %3$s.',
 	'S_CUSER_ERROR_FAILED_LOGIN_ATTEMPTS'=>				'failed login attempts logged.',
 	'S_CUSER_ERROR_LAST_FAILED_ATTEMPTS'=>				'Last failed attempt was from',
-	'S_CUSER_ERROR_ONLY_ADMIN_CAN_CREATE_USERS'=>		'Only Super Admins can create Users',
-	'S_CUSER_ERROR_ONLY_ADMIN_CAN_UPDATE_USERS'=>		'Only Super Admins can update Users',
-	'S_CUSER_ERROR_ONLY_ADMIN_CAN_DELETE_USERS'=>		'Only Super Admins can delete Users',
+	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_CREATE_USERS'=>		'Only Super Admins can create Users',
+	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_UPDATE_USERS'=>		'Only Super Admins can update Users',
+	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_DELETE_USERS'=>		'Only Super Admins can delete Users',
 	'S_CUSER_ERROR_ONLY_ADMIN_CAN_ADD_USER_MEDIAS'=>	'Only ZABBIX Admins can add user Medias',
 	'S_CUSER_ERROR_ONLY_ADMIN_CAN_REMOVE_USER_MEDIAS'=>	'Only ZABBIX Admins can remove user Medias',
 	'S_CUSER_ERROR_ONLY_ADMIN_CAN_CHANGE_USER_MEDIAS'=>	'Only ZABBIX Admins can change user Medias',
@@ -2312,17 +2314,27 @@
 	'S_CUSER_ERROR_CANT_UPDATE_USER_MEDIAS'=>		'Can\'t update user medias',
 	'S_CUSER_ERROR_CANT_INSERT_USER_MEDIAS'=>		'Can\'t insert user medias',
 	'S_CUSER_ERROR_WRONG_FIELD_FOR_USER'=>			'Wrong fields for user',
-	'S_CUSER_ERROR_USER_EXISTS_FIRST_PART'=>		'User [ ',
-	'S_CUSER_ERROR_USER_EXISTS_SECOND_PART'=>		' ] already exists',
+	'S_CUSER_ERROR_USER_EXISTS_FIRST_PART'=>		'User "',
+	'S_CUSER_ERROR_USER_EXISTS_SECOND_PART'=>		' "already exists',
 	'S_CUSER_ERROR_CANT_RENAME_GUEST_USER'=>		'Cannot rename guest user',
 	'S_CUSER_ERROR_USER_UNABLE_RESTRICT_SELF_GUI_ACCESS_PART1'=>	'User cannot restrict access to GUI for himself. Group "',
 	'S_CUSER_ERROR_USER_UNABLE_RESTRICT_SELF_GUI_ACCESS_PART2'=>	'"',
 	'S_CUSER_ERROR_USER_CANT_DISABLE_SELF_PART1'=>		'User cannot disable himself. Group "',
 	'S_CUSER_ERROR_USER_CANT_DISABLE_SELF_PART2'=>		'"',
 	'S_CUSER_ERROR_INCORRECT_TIME_PERIOD'=>			'Incorrect time period',
-	'S_CUSER_ERROR_WRONG_PERIOD_PART1'=>			'Wrong period [ ',
-	'S_CUSER_ERROR_WRONG_PERIOD_PART2'=>			' ]',
+	'S_CUSER_ERROR_WRONG_PERIOD'=>					'Wrong period',
 	'S_CUSER_ERROR_INTERNAL_ZABBIX_ERROR'=>			'Internal Zabbix error',
+
+// class.cmediatype.php
+	'S_CMEDIATYPE_ERROR_WRONG_FIELD_FOR_MEDIATYPE' =>	'Wrong fields for media type',
+	'S_CMEDIATYPE_ERROR_CANT_DELETE_MEDIATYPES'=>		'Can\'t delete media types',
+	'S_CMEDIATYPE_ERROR_CANT_UPDATE_MEDIATYPES'=>		'Can\'t update media types',
+	'S_CMEDIATYPE_ERROR_CANT_INSERT_MEDIATYPES'=>		'Can\'t insert media types',
+	'S_CMEDIATYPE_ERROR_MEDIATYPE_EXISTS'=>				'Mediatype "%1$s" already exists',
+	'S_CMEDIATYPE_ERROR_MEDIATYPE_USED_BY_ACTIONS'=>	'Mediatypes used by action "%1$s" operations',
+	'S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_CREATE_MEDIATYPES'=>'Only Super Admins can create media types',
+	'S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_UPDATE_MEDIATYPES'=>'Only Super Admins can update media types',
+	'S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_DELETE_MEDIATYPES'=>'Only Super Admins can delete media types',
 
 //	config.inc.php
 	'S_CONFIG_NOT_LOGGED_IN_ACCESS_DENIED'=>		'You cannot view this URL as a',

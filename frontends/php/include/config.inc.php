@@ -41,6 +41,7 @@ function __autoload($class_name){
 		'citem' => 1,
 		'cmaintenance' => 1,
 		'cmap' => 1,
+		'cmediatype' => 1,
 		'cproxy' => 1,
 		'cscreen' => 1,
 		'cscript' => 1,

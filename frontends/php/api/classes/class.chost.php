@@ -477,7 +477,8 @@ class CHost extends CZBXAPI{
 			zbx_value2array($options['filter']);
 
 			if(isset($options['filter']['hostid']) && !is_null($options['filter']['hostid'])){
-				$sql_parts['where']['hostid'] = 'h.hostid='.$options['filter']['hostid'];
+				zbx_value2array($options['filter']['hostid']);
+				$sql_parts['where']['hostid'] = 'h.hostid='.DBcondition($options['filter']['hostid']);
 			}
 
 			if(isset($options['filter']['host']) && !is_null($options['filter']['host'])){

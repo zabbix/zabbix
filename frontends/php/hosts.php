@@ -709,7 +709,7 @@ include_once('include/page_header.php');
 
 		$sortfield = getPageSortField('host');
 		$sortorder = getPageSortOrder();
-		
+
 		if($pageFilter->groupsSelected){
 			$options = array(
 				'editable' => 1,
@@ -911,7 +911,7 @@ include_once('include/page_header.php');
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
-		$goOption->setAttribute('confirm',S_DELETE_SELECTED_HOSTS);
+		$goOption->setAttribute('confirm',S_DELETE_SELECTED_HOSTS_Q);
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
