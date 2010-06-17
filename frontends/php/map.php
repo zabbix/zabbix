@@ -171,6 +171,8 @@ set_time_limit(10);
 	imageOut($im);
 	imagedestroy($im);
 
+?>
+<?php
 
 include_once('include/page_footer.php');
 
