@@ -239,55 +239,6 @@ class CAction extends CZBXAPI{
 // nodeids
 		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
-// groupids
-		if(!is_null($options['groupids'])){
-			zbx_value2array($options['groupids']);
-
-			if($options['output'] != API_OUTPUT_SHORTEN){
-				$sql_parts['select']['groupid'] = 'hg.groupid';
-			}
-
-			$sql_parts['from']['functions'] = 'functions f';
-			$sql_parts['from']['items'] = 'items i';
-			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
-
-			$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
-			$sql_parts['where']['e'] = 'e.object='.EVENT_OBJECT_TRIGGER;
-			$sql_parts['where']['ef'] = 'e.objectid=f.triggerid';
-			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
-			$sql_parts['where']['hg'] = DBcondition('hg.groupid', $options['groupids']);
-		}
-
-// hostids
-		if(!is_null($options['hostids'])){
-			zbx_value2array($options['hostids']);
-
-			if($options['output'] != API_OUTPUT_SHORTEN){
-				$sql_parts['select']['hostid'] = 'i.hostid';
-			}
-
-			$sql_parts['from']['functions'] = 'functions f';
-			$sql_parts['from']['items'] = 'items i';
-
-			$sql_parts['where']['i'] = DBcondition('i.hostid', $options['hostids']);
-			$sql_parts['where']['e'] = 'e.object='.EVENT_OBJECT_TRIGGER;
-			$sql_parts['where']['ef'] = 'e.objectid=f.triggerid';
-			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
-		}
-
-// triggerids
-		if(!is_null($options['triggerids'])){
-			zbx_value2array($options['triggerids']);
-
-			if($options['output'] != API_OUTPUT_SHORTEN){
-				$sql_parts['select']['actionid'] = 'a.actionid';
-			}
-
-			$sql_parts['where']['ae'] = 'a.eventid=e.eventid';
-			$sql_parts['where']['e'] = 'e.object='.EVENT_OBJECT_TRIGGER;
-			$sql_parts['where'][] = DBcondition('e.objectid', $options['triggerids']);
-		}
-
 // actionids
 		if(!is_null($options['actionids'])){
 			zbx_value2array($options['actionids']);
@@ -299,15 +250,49 @@ class CAction extends CZBXAPI{
 			$sql_parts['where'][] = DBcondition('a.actionid', $options['actionids']);
 		}
 
-// userids
-		if(!is_null($options['userids'])){
-			zbx_value2array($options['userids']);
+// groupids
+		if(!is_null($options['groupids'])){
+			zbx_value2array($options['groupids']);
 
 			if($options['output'] != API_OUTPUT_SHORTEN){
-				$sql_parts['select']['userid'] = 'a.userid';
+				$sql_parts['select']['groupids'] = 'c.value';
 			}
 
-			$sql_parts['where'][] = DBcondition('a.userid', $options['userids']);
+			$sql_parts['from']['conditions'] = 'conditions c';
+
+			$sql_parts['where'][] = DBcondition('c.value', $options['groupids'], false, true);
+			$sql_parts['where']['c'] = 'c.conditiontype='.CONDITION_TYPE_HOST_GROUP;
+			$sql_parts['where']['ac'] = 'a.actionid=c.actionid';
+		}
+
+// hostids
+		if(!is_null($options['hostids'])){
+			zbx_value2array($options['hostids']);
+
+			if($options['output'] != API_OUTPUT_SHORTEN){
+				$sql_parts['select']['hostids'] = 'c.value';
+			}
+
+			$sql_parts['from']['conditions'] = 'conditions c';
+
+			$sql_parts['where'][] = DBcondition('c.value', $options['hostids'], false, true);
+			$sql_parts['where']['c'] = 'c.conditiontype='.CONDITION_TYPE_HOST;
+			$sql_parts['where']['ac'] = 'a.actionid=c.actionid';
+		}
+
+// triggerids
+		if(!is_null($options['triggerids'])){
+			zbx_value2array($options['triggerids']);
+
+			if($options['output'] != API_OUTPUT_SHORTEN){
+				$sql_parts['select']['triggerids'] = 'c.value';
+			}
+
+			$sql_parts['from']['conditions'] = 'conditions c';
+
+			$sql_parts['where'][] = DBcondition('c.value', $options['triggerids'], false, true);
+			$sql_parts['where']['c'] = 'c.conditiontype='.CONDITION_TYPE_TRIGGER;
+			$sql_parts['where']['ac'] = 'a.actionid=c.actionid';
 		}
 
 // mediatypeids
@@ -315,10 +300,21 @@ class CAction extends CZBXAPI{
 			zbx_value2array($options['mediatypeids']);
 
 			if($options['output'] != API_OUTPUT_SHORTEN){
-				$sql_parts['select']['mediatypeid'] = 'a.mediatypeid';
+				$sql_parts['select']['mediatypeid'] = 'opm.mediatypeid';
 			}
 
-			$sql_parts['where'][] = DBcondition('a.mediatypeid', $options['mediatypeids']);
+			$sql_parts['from']['opmediatypes'] = 'opmediatypes opm';
+			$sql_parts['from']['operations'] = 'operations o';
+
+			$sql_parts['where'][] = DBcondition('opm.mediatypeid', $options['mediatypeids']);
+			$sql_parts['where']['oopm'] = 'opm.operationid=o.operationid';
+			$sql_parts['where']['ao'] = 'a.actionid=o.actionid';
+		}
+
+// userids
+		if(!is_null($options['userids'])){
+			zbx_value2array($options['userids']);
+// TODO:
 		}
 
 // eventsource
@@ -459,6 +455,7 @@ COpt::memoryPick();
 			$res = DBselect($sql);
 			while($operation = DBfetch($res)){
 				$operation['opconditions'] = array();
+				$operation['opmediatypes'] = array();
 
 				$operations[$operation['operationid']] = $operation;
 				$operationids[$operation['operationid']] = $operation['operationid'];
@@ -467,10 +464,16 @@ COpt::memoryPick();
 			$sql = 'SELECT op.* FROM opconditions op WHERE '.DBcondition('op.operationid', $operationids);
 			$res = DBselect($sql);
 			while($opcondition = DBfetch($res)){
-				$operations[$opcondition['operationid']]['opconditions'][$opcondition['opconditionid']] = $opcondition;
+				$operations[$opcondition['operationid']]['opconditions'][] = $opcondition;
 			}
 
-			foreach($operations as $operationd => $operation){
+			$sql = 'SELECT op.* FROM opmediatypes op WHERE '.DBcondition('op.operationid', $operationids);
+			$res = DBselect($sql);
+			while($opmediatype = DBfetch($res)){
+				$operations[$opmediatype['operationid']]['opmediatypes'][] = $opmediatype;
+			}
+
+			foreach($operations as $num => $operation){
 				$result[$operation['actionid']]['operations'][] = $operation;
 			}
 		}
@@ -619,13 +622,12 @@ COpt::memoryPick();
 				if(!empty($action)){
 					$update[] = array(
 						'values' => $action,
-						'where' => 'actionid='.$actionid,
+						'where' => array('actionid='.$actionid),
 					);
 				}
 			}
 
 			DB::update('actions', $update);
-
 
 			$operationids = array();
 			$sql = 'SELECT operationid FROM operations WHERE '.DBcondition('actionid', $actionids);
@@ -634,25 +636,10 @@ COpt::memoryPick();
 				$operationids[] = $operationid['operationid'];
 			}
 
-			$delete = array(
-				array(
-					'table' => 'conditions',
-					'where' => DBcondition('actionid', $actionids),
-				),
-				array(
-					'table' => 'opconditions',
-					'where' => DBcondition('operationid', $operationids),
-				),
-				array(
-					'table' => 'opmediatypes',
-					'where' => DBcondition('operationid', $operationids),
-				),
-				array(
-					'table' => 'operations',
-					'where' => DBcondition('actionid', $actionids),
-				)
-			);
-			DB::delete($delete);
+			DB::delete('conditions', DBcondition('actionid', $actionids));
+			DB::delete('opconditions', DBcondition('operationid', $operationids));
+			DB::delete('opmediatypes', DBcondition('operationid', $operationids));
+			DB::delete('operations', DBcondition('actionid', $actionids));
 
 			self::addOperations($operations);
 			self::addConditions($conditions);
@@ -803,33 +790,12 @@ COpt::memoryPick();
 				$operationids[] = $operationid['operationid'];
 			}
 
-			$delete = array(
-				array(
-					'table' => 'conditions',
-					'where' => DBcondition('actionid', $actionids),
-				),
-				array(
-					'table' => 'opconditions',
-					'where' => DBcondition('operationid', $operationids),
-				),
-				array(
-					'table' => 'opmediatypes',
-					'where' => DBcondition('operationid', $operationids),
-				),
-				array(
-					'table' => 'operations',
-					'where' => DBcondition('actionid', $actionids),
-				),
-				array(
-					'table' => 'alerts',
-					'where' => DBcondition('actionid', $actionids),
-				),
-				array(
-					'table' => 'actions',
-					'where' => DBcondition('actionid', $actionids),
-				),
-			);
-			DB::delete($delete);
+			DB::delete('conditions', DBcondition('actionid', $actionids));
+			DB::delete('opconditions', DBcondition('operationid', $operationids));
+			DB::delete('opmediatypes', DBcondition('operationid', $operationids));
+			DB::delete('alerts', DBcondition('actionid', $actionids));
+			DB::delete('operations', DBcondition('actionid', $actionids));
+			DB::delete('actions', DBcondition('actionid', $actionids));
 
 			self::EndTransaction(true, __METHOD__);
 

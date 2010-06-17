@@ -226,7 +226,7 @@
 
 		$sql = 'SELECT hostid,host '.
 				' FROM hosts'.
-				' WHERE status IN ('.HOST_STATUS_PROXY.') '.
+				' WHERE status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.') '.
 					' AND '.DBin_node('hostid').
 				' ORDER BY host';
 		$db_proxies = DBselect($sql);
@@ -2407,7 +2407,7 @@
 		$frmItem->addItemToBottomRow(SPACE);
 		$frmItem->addItemToBottomRow(new CButton('register',S_DO_SMALL));
 
-		$frmItem->show();
+	return $frmItem;
 	}
 
 	function insert_mass_update_item_form($elements_array_name){
@@ -2583,10 +2583,11 @@
 					get_node_name_by_elid($db_valuemap["valuemapid"], null, ': ').$db_valuemap["name"]
 					);
 
-		$link = new CLink(S_THROW_MAP_SMALL,"config.php?config=6");
-		$link->setAttribute("target","_blank");
+		$link = new CLink(S_SHOW_VALUE_MAPPINGS,'config.php?config=6');
+		$link->setAttribute('target','_blank');
+
 		$frmItem->addRow(array( new CVisibilityBox('valuemapid_visible', get_request('valuemapid_visible'), 'valuemapid', S_ORIGINAL),
-			S_SHOW_VALUE, SPACE, $link),$cmbMap);
+			S_SHOW_VALUE), array($cmbMap, SPACE, $link));
 
 		$frmItem->addRow(array( new CVisibilityBox('trapper_hosts_visible', get_request('trapper_hosts_visible'), 'trapper_hosts',
 			S_ORIGINAL), S_ALLOWED_HOSTS), new CTextBox('trapper_hosts',$trapper_hosts,40));
@@ -2610,7 +2611,7 @@
 		$frmItem->addItemToBottomRow(array(new CButton("update",S_UPDATE),
 			SPACE, new CButtonCancel(url_param('groupid').url_param("hostid").url_param("config"))));
 
-		$frmItem->show();
+	return $frmItem;
 	}
 
 	function insert_copy_elements_to_forms($elements_array_name){
@@ -2698,7 +2699,7 @@
 		$frmCopy->addItemToBottomRow(array(SPACE,
 			new CButtonCancel(url_param('groupid').url_param("hostid").url_param("config"))));
 
-		$frmCopy->show();
+	return $frmCopy;
 	}
 
 // TRIGGERS
@@ -2772,7 +2773,7 @@
 		$frmMTrig->addItemToBottomRow(new CButton('mass_save',S_SAVE));
 		$frmMTrig->addItemToBottomRow(SPACE);
 		$frmMTrig->addItemToBottomRow(new CButtonCancel(url_param('config').url_param('groupid')));
-		$frmMTrig->show();
+	return $frmMTrig;
 	}
 
 // Insert form for Trigger
@@ -3065,7 +3066,6 @@
 		}
 		$frmTrig->addItemToBottomRow(SPACE);
 		$frmTrig->addItemToBottomRow(new CButtonCancel(url_param('groupid').url_param("hostid")));
-		$frmTrig->show();
 
 		$jsmenu = new CPUMenu(null,170);
 		$jsmenu->InsertJavaScript();
@@ -3082,6 +3082,8 @@
 						}
 					}";
 		insert_js($script);
+
+	return $frmTrig;
 	}
 
 	function insert_trigger_comment_form($triggerid){
@@ -3345,8 +3347,8 @@
 
 
 			if($graphtype == GRAPH_TYPE_NORMAL){
-				$percent_left = sprintf("%2.2f",$percent_left);
-				$percent_right = sprintf("%2.2f",$percent_right);
+				$percent_left = sprintf('%2.2f',$percent_left);
+				$percent_right = sprintf('%2.2f',$percent_right);
 
 				$pr_left_input = new CTextBox('percent_left',$percent_left,'5');
 				$pr_left_chkbx = new CCheckBox('visible[percent_left]',1,"javascript: ShowHide('percent_left');",1);
@@ -4176,78 +4178,6 @@
 	return $tblPeriod;
 	}
 
-	function insert_media_type_form(){
-
-		$type		= get_request('type',0);
-		$description	= get_request('description','');
-		$smtp_server	= get_request('smtp_server','localhost');
-		$smtp_helo	= get_request('smtp_helo','localhost');
-		$smtp_email	= get_request('smtp_email','zabbix@localhost');
-		$exec_path	= get_request('exec_path','');
-		$gsm_modem	= get_request('gsm_modem','/dev/ttyS0');
-		$username	= get_request('username','user@server');
-		$password	= get_request('password','');
-
-		if(isset($_REQUEST['mediatypeid']) && !isset($_REQUEST['form_refresh'])){
-			$result = DBselect('select * FROM media_type WHERE mediatypeid='.$_REQUEST['mediatypeid']);
-
-			$row = DBfetch($result);
-			$mediatypeid	= $row['mediatypeid'];
-			$type		= get_request('type',$row['type']);
-			$description	= $row['description'];
-			$smtp_server	= $row['smtp_server'];
-			$smtp_helo	= $row['smtp_helo'];
-			$smtp_email	= $row['smtp_email'];
-			$exec_path	= $row['exec_path'];
-			$gsm_modem	= $row['gsm_modem'];
-			$username	= $row['username'];
-			$password	= $row['passwd'];
-		}
-
-		$frmMeadia = new CFormTable(S_MEDIA);
-		$frmMeadia->setHelp('web.config.medias.php');
-
-		if(isset($_REQUEST['mediatypeid'])){
-			$frmMeadia->addVar('mediatypeid',$_REQUEST['mediatypeid']);
-		}
-
-		$frmMeadia->addRow(S_DESCRIPTION,new CTextBox('description',$description,30));
-		$cmbType = new CComboBox('type',$type,'submit()');
-		$cmbType->addItem(MEDIA_TYPE_EMAIL,S_EMAIL);
-		$cmbType->addItem(MEDIA_TYPE_JABBER,S_JABBER);
-		$cmbType->addItem(MEDIA_TYPE_SMS,S_SMS);
-		$cmbType->addItem(MEDIA_TYPE_EXEC,S_SCRIPT);
-		$frmMeadia->addRow(S_TYPE,$cmbType);
-
-		switch($type){
-		case MEDIA_TYPE_EMAIL:
-			$frmMeadia->addRow(S_SMTP_SERVER,new CTextBox('smtp_server',$smtp_server,30));
-			$frmMeadia->addRow(S_SMTP_HELO,new CTextBox('smtp_helo',$smtp_helo,30));
-			$frmMeadia->addRow(S_SMTP_EMAIL,new CTextBox('smtp_email',$smtp_email,30));
-			break;
-		case MEDIA_TYPE_SMS:
-			$frmMeadia->addRow(S_GSM_MODEM,new CTextBox('gsm_modem',$gsm_modem,50));
-			break;
-		case MEDIA_TYPE_EXEC:
-			$frmMeadia->addRow(S_SCRIPT_NAME,new CTextBox('exec_path',$exec_path,50));
-			break;
-		case MEDIA_TYPE_JABBER:
-			$frmMeadia->addRow(S_JABBER_IDENTIFIER, new CTextBox('username',$username,30));
-			$frmMeadia->addRow(S_PASSWORD, new CPassBox('password',$password,30));
-		}
-
-		$frmMeadia->addItemToBottomRow(new CButton('save',S_SAVE));
-		if(isset($_REQUEST['mediatypeid'])){
-			$frmMeadia->addItemToBottomRow(SPACE);
-			$frmMeadia->addItemToBottomRow(new CButtonDelete(S_DELETE_SELECTED_MEDIA,
-				url_param('form').url_param('mediatypeid')));
-		}
-		$frmMeadia->addItemToBottomRow(SPACE);
-		$frmMeadia->addItemToBottomRow(new CButtonCancel());
-
-	return $frmMeadia;
-	}
-
 	function import_screen_form($rules){
 
 		$form = new CFormTable(S_IMPORT, null, 'post', 'multipart/form-data');
@@ -4504,7 +4434,7 @@
 
 		$sql = 'SELECT hostid,host '.
 				' FROM hosts '.
-				' WHERE status IN ('.HOST_STATUS_PROXY.') '.
+				' WHERE status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.') '.
 					' AND '.DBin_node('hostid').
 				' ORDER BY host';
 		$db_proxies = DBselect($sql);

@@ -581,6 +581,9 @@
 	'S_VALUE_MAPS_CREATE_NUM_STRING'=>		'Value maps are used to create a mapping between numeric values and string representations',
 	'S_DELETE_SELECTED_VALUE_MAPPING'=>		'Delete selected value mapping?',
 
+// media_types.php
+	'S_DELETE_SELECTED_MEDIATYPES_Q'=>		'Delete selected media types?',
+
 //	nodes.php
 	'S_NOT_DM_SETUP'=>			'Your setup is not configured for distributed monitoring',
 	'S_CONFIGURATION_OF_NODES'=>		'CONFIGURATION OF NODES',
@@ -602,6 +605,8 @@
 	'S_HOST_COUNT' => 'Host count',
 	'S_ITEM_COUNT' => 'Item count',
 	'S_REQUIRED_PERFORMANCE' => 'Required performance (vps)',
+	'S_PROXY_MODE' => 'Proxy mode',
+	'S_PASSIVE' => 'Passive',
 
 //  Authentication
 	'S_AUTHENTICATION'=>			'Authentication',
@@ -944,7 +949,7 @@
 	'S_EMPTY_INPUT_PARAMETER'=>			'Empty input parameter',
 	'S_ENABLE_SELECTED_HOSTS'=>			'Enable selected hosts?',
 	'S_DISABLE_SELECTED_HOSTS_Q'=>			'Disable selected hosts?',
-	'S_DELETE_SELECTED_HOSTS'=>			'Delete selected hosts?',
+	'S_DELETE_SELECTED_HOSTS_Q'=>			'Delete selected hosts?',
 	'S_UPDATED_STATUS_OF_HOST' =>		'Updated status of host',
 
 // templates.php
@@ -977,7 +982,6 @@
 	'S_ADD_TO_GROUP'=>			'Add to group',
 	'S_DELETE_FROM_GROUP'=>			'Delete from group',
 	'S_UPDATE_IN_GROUP'=>			'Update in group',
-	'S_DELETE_SELECTED_HOSTS_Q'=>		'Delete selected hosts?',
 	'S_CREATE_HOST'=>			'Create Host',
 	'S_CREATE_TEMPLATE'=>			'Create Template',
 	'S_TEMPLATE_LINKAGE'=>			'Template linkage',
@@ -1382,16 +1386,16 @@
 	'S_ZABBIX_SERVER_IS_RUNNING'=>		'Zabbix server is running',
 	'S_VALUES_STORED'=>			'Values stored',
 	'S_TRENDS_STORED'=>			'Trends stored',
-	'S_NUMBER_OF_TRIGGERS'=>		'Number of triggers (enabled/disabled)[true/unknown/false]',
-	'S_NUMBER_OF_TRIGGERS_SHORT'=>		'Triggers (e/d)[t/u/f]',
+	'S_NUMBER_OF_TRIGGERS'=>		'Number of triggers (enabled/disabled)[problem/unknown/ok]',
+	'S_NUMBER_OF_TRIGGERS_SHORT'=>		'Triggers (e/d)[p/u/o]',
 	'S_NUMBER_OF_TRIGGERS_TOOLTIP'=>	'Only triggers assigned to enabled hosts and depending on enabled items are counted',
 	'S_NUMBER_OF_ITEMS'=>			'Number of items (monitored/disabled/not supported)',
-	'S_NUMBER_OF_ITEMS_SHORT'=>		'Items (m/d/n)[t]',
+	'S_NUMBER_OF_ITEMS_SHORT'=>		'Items (m/d/n)',
 	'S_NUMBER_OF_ITEMS_TOOLTIP'=>		'Only items assigned to enabled hosts are counted',
 	'S_NUMBER_OF_USERS'=>			'Number of users (online)',
 	'S_NUMBER_OF_USERS_SHORT'=>		'Users (online)',
 	'S_NUMBER_OF_HOSTS'=>			'Number of hosts (monitored/not monitored/templates)',
-	'S_NUMBER_OF_HOSTS_SHORT'=>		'Hosts (m/n/t/d)',
+	'S_NUMBER_OF_HOSTS_SHORT'=>		'Hosts (m/n/t)',
 	'S_REQUIRED_SERVER_PERFORMANCE_NVPS'=>	'Required server performance, new values per second',
 	'S_YES'=>				'Yes',
 	'S_NO'=>				'No',
@@ -1406,12 +1410,16 @@
 	'S_BY_TRIGGER_TEMPLATE'=>		'By trigger template',
 
 //	chart4.php
-	'S_CHART4_HEADER_TITLE'=>		'%s (year %s)',
+	'S_CHART4_HEADER_TITLE_PART1'=>		'',
+	'S_CHART4_HEADER_TITLE_PART2'=>		' (year ',
+	'S_CHART4_HEADER_TITLE_PART3'=>		')',
 	'S_CHART4_HEADER_DATE_FORMAT'=>		'Y',
 	'S_CHART4_TIMELINE_DATE_FORMAT'=>	'd.F',
 
 //	chart5.php
-	'S_CHART5_HEADER_TITLE'=>		'%s (year %s)',
+	'S_CHART5_HEADER_TITLE_PART1'=>		'',
+	'S_CHART5_HEADER_TITLE_PART2'=>		' (year ',
+	'S_CHART5_HEADER_TITLE_PART3'=>		')',
 	'S_CHART5_HEADER_DATE_FORMAT'=>		'Y',
 	'S_CHART5_TIMELINE_DATE_FORMAT'=>	'd.M',
 
@@ -1965,7 +1973,8 @@
 	'S_EXPRESSION_PART_NO_ERROR'=>			'No errors found',
 	'S_EXPRESSION_SYNTAX_ERROR'=> 			'Expression Syntax Error',
 	'S_EXPRESSION_UNEXPECTED_END_OF_ELEMENT_ERROR'=>'Unexpected end of element',
-	'S_CHECK_EXPRESSION_PART_STARTING_FROM'=>	'Check expression part starting from \'%s\'',
+	'S_CHECK_EXPRESSION_PART_STARTING_FROM_PART1'=>	'Check expression part starting from \'',
+	'S_CHECK_EXPRESSION_PART_STARTING_FROM_PART2'=>	'\'',
 	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_OR_SEQUENCE_ERROR'=>'Not allowed symbols or sequence of symbols in expression element detected',
 	'S_EXPRESSION_NOT_ALLOWED_VALUE_IN_ELEMENT_ERROR'=>'Not allowed value detected in element',
 	'S_EXPRESSION_UNNECESSARY_SYMBOLS_DETECTED_ERROR'=>'Unnecessary symbols detected',
@@ -2124,7 +2133,8 @@
 	'S_TEMPLATE_WITH_ITEM_KEY'=>			'Template with item key',
 	'S_TEMPLATE_WITH_APPLICATION'=>			'Template with application',
 	'S_ALREADY_LINKED_TO_HOST_SMALL'=>		'already linked to host',
-	'S_HOST_HAS_BEEN_DELETED_MSG'=>			'Host %s has been deleted from the system',
+	'S_HOST_HAS_BEEN_DELETED_MSG_PART1'=>		'Host ',
+	'S_HOST_HAS_BEEN_DELETED_MSG_PART2'=>		' has been deleted from the system',
 
 //	validate.inc.php
 	'S_CRITICAL_ERROR'=>				'Critical error',
@@ -2177,7 +2187,8 @@
 	'S_TRIGGER_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR'=>	'At least one item must be present in the trigger expression.',
 	'S_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR'=>		'Host does not exist.',
 	'S_EXPRESSION_HOST_KEY_DOES_NOT_ERROR'=>		'Host key does not exist.',
-	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR'=>	'Function \'%s\' does not accept parameters.',
+	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART1'=>	'Function \'',
+	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART2'=>	'\' does not accept parameters.',
 
 //	page_footer.php
 	'S_TRANSACTION_HAVE_NOT_BEEN_CLOSED_ABORTING'=>	'Transaction has not been closed. Aborting..',
@@ -2204,7 +2215,9 @@
 	'S_FOR_TEMPLATE_GRAPH_SMALL'=>				'for template graph',
 	'S_UPDATED_FOR_HOSTS'=>					'updated for hosts',
 	'S_SKIPPED_COPYING_OF_GRAPH'=>				'Skipped copying of graph',
-	'S_GRAPH_DELETED_FROM_HOSTS'=>				'Graph "%s" deleted from host%s',
+	'S_GRAPH_DELETED_FROM_HOSTS_PART1'=>			'Graph "',
+	'S_GRAPH_DELETED_FROM_HOSTS_PART2'=>			'" deleted from host',
+	'S_GRAPH_DELETED_FROM_HOSTS_PART3'=>			'',
 
 //	profiles.inc.php
 	'S_UNABLE_TO_SELECT_CONFIGURATION'=>	'Unable to select configuration',
@@ -2282,7 +2295,8 @@
 	'S_REQUIRED_SESSION_MODULE' => 'Required Session module',
 
 //	class.cuser.php
-	'S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_MINUTES'=>	'Account is blocked for %s seconds',
+	'S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_SECONDS_FIRST_PART'=> 'Account is blocked for ',
+	'S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_SECONDS_SECOND_PART'=>	' seconds',
 	'S_CUSER_ERROR_LOGIN_OR_PASSWORD_INCORRECT'=>		'Login name or password is incorrect',
 	'S_CUSER_ERROR_SESSION_TERMINATED'=>			'Session terminated, please re-login!',
 	'S_CUSER_ERROR_TABLE_USERS_EMPTY'=>			'Table users is empty. Possible database corruption.',
@@ -2290,9 +2304,9 @@
 //	'S_CUSER_ERROR_ATTEMP_FAILED'=>						'%1$s failed login attempts logged. Last failed attempt was from %2$s on %3$s.',
 	'S_CUSER_ERROR_FAILED_LOGIN_ATTEMPTS'=>				'failed login attempts logged.',
 	'S_CUSER_ERROR_LAST_FAILED_ATTEMPTS'=>				'Last failed attempt was from',
-	'S_CUSER_ERROR_ONLY_ADMIN_CAN_CREATE_USERS'=>		'Only Super Admins can create Users',
-	'S_CUSER_ERROR_ONLY_ADMIN_CAN_UPDATE_USERS'=>		'Only Super Admins can update Users',
-	'S_CUSER_ERROR_ONLY_ADMIN_CAN_DELETE_USERS'=>		'Only Super Admins can delete Users',
+	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_CREATE_USERS'=>		'Only Super Admins can create Users',
+	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_UPDATE_USERS'=>		'Only Super Admins can update Users',
+	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_DELETE_USERS'=>		'Only Super Admins can delete Users',
 	'S_CUSER_ERROR_ONLY_ADMIN_CAN_ADD_USER_MEDIAS'=>	'Only ZABBIX Admins can add user Medias',
 	'S_CUSER_ERROR_ONLY_ADMIN_CAN_REMOVE_USER_MEDIAS'=>	'Only ZABBIX Admins can remove user Medias',
 	'S_CUSER_ERROR_ONLY_ADMIN_CAN_CHANGE_USER_MEDIAS'=>	'Only ZABBIX Admins can change user Medias',
@@ -2300,13 +2314,27 @@
 	'S_CUSER_ERROR_CANT_UPDATE_USER_MEDIAS'=>		'Can\'t update user medias',
 	'S_CUSER_ERROR_CANT_INSERT_USER_MEDIAS'=>		'Can\'t insert user medias',
 	'S_CUSER_ERROR_WRONG_FIELD_FOR_USER'=>			'Wrong fields for user',
-	'S_CUSER_ERROR_USER_EXISTS'=>				'User [ %1$s ] already exists',
+	'S_CUSER_ERROR_USER_EXISTS_FIRST_PART'=>		'User "',
+	'S_CUSER_ERROR_USER_EXISTS_SECOND_PART'=>		' "already exists',
 	'S_CUSER_ERROR_CANT_RENAME_GUEST_USER'=>		'Cannot rename guest user',
-	'S_CUSER_ERROR_USER_UNABLE_RESTRICT_SELF_GUI_ACCESS'=>	'User cannot restrict access to GUI for himself. Group "%1$s"',
-	'S_CUSER_ERROR_USER_CANT_DISABLE_SELF'=>		'User cannot disable himself. Group "%1$s"',
+	'S_CUSER_ERROR_USER_UNABLE_RESTRICT_SELF_GUI_ACCESS_PART1'=>	'User cannot restrict access to GUI for himself. Group "',
+	'S_CUSER_ERROR_USER_UNABLE_RESTRICT_SELF_GUI_ACCESS_PART2'=>	'"',
+	'S_CUSER_ERROR_USER_CANT_DISABLE_SELF_PART1'=>		'User cannot disable himself. Group "',
+	'S_CUSER_ERROR_USER_CANT_DISABLE_SELF_PART2'=>		'"',
 	'S_CUSER_ERROR_INCORRECT_TIME_PERIOD'=>			'Incorrect time period',
-	'S_CUSER_ERROR_WRONG_PERIOD'=>				'Wrong period [ %1$s ]',
+	'S_CUSER_ERROR_WRONG_PERIOD'=>					'Wrong period',
 	'S_CUSER_ERROR_INTERNAL_ZABBIX_ERROR'=>			'Internal Zabbix error',
+
+// class.cmediatype.php
+	'S_CMEDIATYPE_ERROR_WRONG_FIELD_FOR_MEDIATYPE' =>	'Wrong fields for media type',
+	'S_CMEDIATYPE_ERROR_CANT_DELETE_MEDIATYPES'=>		'Can\'t delete media types',
+	'S_CMEDIATYPE_ERROR_CANT_UPDATE_MEDIATYPES'=>		'Can\'t update media types',
+	'S_CMEDIATYPE_ERROR_CANT_INSERT_MEDIATYPES'=>		'Can\'t insert media types',
+	'S_CMEDIATYPE_ERROR_MEDIATYPE_EXISTS'=>				'Mediatype "%1$s" already exists',
+	'S_CMEDIATYPE_ERROR_MEDIATYPE_USED_BY_ACTIONS'=>	'Mediatypes used by action "%1$s" operations',
+	'S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_CREATE_MEDIATYPES'=>'Only Super Admins can create media types',
+	'S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_UPDATE_MEDIATYPES'=>'Only Super Admins can update media types',
+	'S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_DELETE_MEDIATYPES'=>'Only Super Admins can delete media types',
 
 //	config.inc.php
 	'S_CONFIG_NOT_LOGGED_IN_ACCESS_DENIED'=>		'You cannot view this URL as a',
@@ -2314,8 +2342,10 @@
 	'S_CONFIG_NOT_LOGGED_IN_NOTE'=>				'If you think this message is wrong, please consult your administrators about getting the necessary permissions.',
 	'S_CONFIG_ERROR_YOU_ARE_NOT_LOGGED_IN_HEAD'=>		'You are not logged in.',
 	'S_CONFIG_ERROR_HEAD'=>					'ERROR',
-	'S_CONFIG_WARNING_WRONG_MONTH'=>			'[Wrong value for month: %1$s]',
-	'S_CONFIG_WARNING_WRONG_DOW'=>				'[Wrong value for day of week: %1$s]',
+	'S_CONFIG_WARNING_WRONG_MONTH_PART1'=>			'[Wrong value for month: ',
+	'S_CONFIG_WARNING_WRONG_MONTH_PART2'=>			']',
+	'S_CONFIG_WARNING_WRONG_DOW_PART1'=>			'[Wrong value for day of week: ',
+	'S_CONFIG_WARNING_WRONG_DOW_PART2'=>			']',
 
 //	Menu
 

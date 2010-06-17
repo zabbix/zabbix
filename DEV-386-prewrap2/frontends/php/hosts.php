@@ -424,27 +424,29 @@ include_once('include/page_header.php');
 
 		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY))) access_deny();
 
+		if(isset($_REQUEST['hostid'])){
+			$create_new = false;
+			$msg_ok = S_HOST_UPDATED;
+			$msg_fail = S_CANNOT_UPDATE_HOST;
+		}
+		else{
+			$create_new = true;
+			$msg_ok = S_HOST_ADDED;
+			$msg_fail = S_CANNOT_ADD_HOST;
+		}
+		
 		$clone_hostid = false;
 		if($_REQUEST['form'] == 'full_clone'){
+			$create_new = true;
 			$clone_hostid = $_REQUEST['hostid'];
-			unset($_REQUEST['hostid']);
 		}
 
 		$templates = array_keys($templates);
 		$templates = zbx_toObject($templates, 'templateid');
 		$templates_clear = zbx_toObject($templates_clear, 'templateid');
 
-	// START SAVE TRANSACTION {{{
+// START SAVE TRANSACTION {{{
 		DBstart();
-
-		if(isset($_REQUEST['hostid'])){
-			$msg_ok = S_HOST_UPDATED;
-			$msg_fail = S_CANNOT_UPDATE_HOST;
-		}
-		else{
-			$msg_ok = S_HOST_ADDED;
-			$msg_fail = S_CANNOT_ADD_HOST;
-		}
 
 		if(!empty($_REQUEST['newgroup'])){
 				$group = CHostGroup::create(array('name' => $_REQUEST['newgroup']));
@@ -473,22 +475,20 @@ include_once('include/page_header.php');
 				'groups' => $groups,
 				'templates' => $templates,
 				'macros' => get_request('macros', array()),
+				'extendedProfile' => (get_request('useprofile_ext', 'no') == 'yes') ? get_request('ext_host_profiles', array()) : array(),
 			);
 
-			if(isset($_REQUEST['hostid'])){
-				$host['hostid'] = $_REQUEST['hostid'];
-				$host['templates_clear'] = $templates_clear;
-				if(!CHost::update($host)) throw new Exception();
-
-				$hostid = $_REQUEST['hostid'];
-			}
-			else{
+			if($create_new){
 				$host = CHost::create($host);
-
 				if($host){
 					$hostid = reset($host['hostids']);
 				}
 				else throw new Exception();
+			}
+			else{
+				$hostid = $host['hostid'] = $_REQUEST['hostid'];
+				$host['templates_clear'] = $templates_clear;
+				if(!CHost::update($host)) throw new Exception();				
 			}
 
 // FULL CLONE {{{
@@ -527,8 +527,6 @@ include_once('include/page_header.php');
 				if(count($graph['hosts']) > 1) continue;
 					if(!copy_graph_to_host($graph['graphid'], $hostid, true)) throw new Exception();
 			}
-
-			$_REQUEST['hostid'] = $clone_hostid;
 		}
 
 // }}} FULL CLONE
@@ -536,7 +534,7 @@ include_once('include/page_header.php');
 //HOSTS PROFILE Section
 			CProfile::update('HOST_PORT', $_REQUEST['port'], PROFILE_TYPE_INT);
 
-			if(isset($_REQUEST['hostid'])){
+			if(!$create_new){
 				delete_host_profile($hostid);
 			}
 
@@ -548,16 +546,6 @@ include_once('include/page_header.php');
 					$_REQUEST['location'],$_REQUEST['notes'])) throw new Exception();
 			}
 
-
-//HOSTS PROFILE EXTANDED Section
-			if(isset($_REQUEST['hostid'])){
-				delete_host_profile_ext($hostid);
-			}
-
-			$ext_host_profiles = get_request('ext_host_profiles', array());
-			if((get_request('useprofile_ext', 'no') == 'yes') && !empty($ext_host_profiles)){
-				if(!add_host_profile_ext($hostid, $ext_host_profiles)) throw new Exception();
-			}
 // }}} SAVE TRANSACTION
 
 			DBend(true);
@@ -902,7 +890,7 @@ include_once('include/page_header.php');
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
-		$goOption->setAttribute('confirm',S_DELETE_SELECTED_HOSTS);
+		$goOption->setAttribute('confirm',S_DELETE_SELECTED_HOSTS_Q);
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!

@@ -755,7 +755,8 @@ include_once('include/page_header.php');
 	}
 ?>
 <?php
-
+	$items_wdgt = new CWidget();
+	
 	$form = new CForm(null, 'get');
 	$form->setName('hdrform');
 	if(!isset($_REQUEST['form']))
@@ -764,17 +765,17 @@ include_once('include/page_header.php');
 // Config
 	$form->addItem(array(SPACE, new CButton('form', S_CREATE_ITEM)));
 
-//$items_wdgt->addPageHeader(S_CONFIGURATION_OF_ITEMS_BIG, $form);
-	show_table_header(S_CONFIGURATION_OF_ITEMS_BIG, $form);
+	$items_wdgt->addPageHeader(S_CONFIGURATION_OF_ITEMS_BIG, $form);
+//	show_table_header(S_CONFIGURATION_OF_ITEMS_BIG, $form);
 
 	if(isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], array(S_CREATE_ITEM, 'update', 'clone'))){
-		insert_item_form();
+		$items_wdgt->addItem(insert_item_form());
 	}
 	else if((($_REQUEST['go'] == 'massupdate') || isset($_REQUEST['massupdate'])) && isset($_REQUEST['group_itemid'])){
-		insert_mass_update_item_form('group_itemid');
+		$items_wdgt->addItem(insert_mass_update_item_form('group_itemid'));
 	}
 	else if(($_REQUEST['go'] == 'copy_to') && isset($_REQUEST['group_itemid'])){
-		insert_copy_elements_to_forms('group_itemid');
+		$items_wdgt->addItem(insert_copy_elements_to_forms('group_itemid'));
 	}
 	else{
 		$logtype['log']=0;
@@ -788,7 +789,7 @@ include_once('include/page_header.php');
 
 		$show_host = true;
 
-		$items_wdgt = new CWidget();
+		
 
 // Items Header
 		$numrows = new CDiv();
@@ -1045,7 +1046,7 @@ include_once('include/page_header.php');
 				$trigger['description_expanded'] = expand_trigger_description($triggerid);
 				$tr_description[] = new CLink($trigger['description_expanded'], 'triggers.php?form=update&triggerid='.$triggerid);
 
-				if($trigger['status'] != TRIGGER_STATUS_UNKNOWN) $trigger['error'] = '';
+				if($trigger['value'] != TRIGGER_VALUE_UNKNOWN) $trigger['error'] = '';
 
 				switch($trigger['priority']){
 					case 0: $priority = S_NOT_CLASSIFIED; break;
@@ -1059,9 +1060,6 @@ include_once('include/page_header.php');
 
 				if($trigger['status'] == TRIGGER_STATUS_DISABLED){
 					$tstatus = new CSpan(S_DISABLED, 'disabled');
-				}
-				else if($trigger['status'] == TRIGGER_STATUS_UNKNOWN){
-					$tstatus = new CSpan(S_UNKNOWN, 'unknown');
 				}
 				else if($trigger['status'] == TRIGGER_STATUS_ENABLED){
 					$tstatus = new CSpan(S_ENABLED, 'enabled');
@@ -1183,12 +1181,15 @@ include_once('include/page_header.php');
 
 		$form->addItem($table);
 		$items_wdgt->addItem($form);
-		$items_wdgt->show();
 	}
+
+	$items_wdgt->show();
 
 	$jsmenu = new CPUMenu(null,200);
 	$jsmenu->InsertJavaScript();
 
+?>
+<?php
 
 include_once('include/page_footer.php');
 

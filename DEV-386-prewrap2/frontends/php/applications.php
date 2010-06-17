@@ -207,6 +207,7 @@ include_once('include/page_header.php');
 	$_REQUEST['hostid'] = $pageFilter->hostid;
 ?>
 <?php
+	$app_wdgt = new CWidget();
 
 	$frmForm = new CForm(null, 'get');
 
@@ -226,7 +227,7 @@ include_once('include/page_header.php');
 		$frmForm->addItem(new CButton('form', S_CREATE_APPLICATION));
 	}
 
-	show_table_header(S_CONFIGURATION_OF_APPLICATIONS, $frmForm);
+	$app_wdgt->addPageheader(S_CONFIGURATION_OF_APPLICATIONS, $frmForm);
 ?>
 <?php
 	if(isset($_REQUEST['form'])){
@@ -257,7 +258,7 @@ include_once('include/page_header.php');
 		}
 
 		$frmApp = new CFormTable($frm_title);
-		$frmApp->SetHelp("web.applications.php");
+		$frmApp->setHelp("web.applications.php");
 
 		if(isset($_REQUEST["applicationid"]))
 			$frmApp->addVar("applicationid",$_REQUEST["applicationid"]);
@@ -271,7 +272,7 @@ include_once('include/page_header.php');
 			$frmApp->addRow(S_HOST,array(
 				new CTextBox("apphost",$apphost,32,'yes'),
 				new CButton("btn1",S_SELECT,
-					"return PopUp('popup.php?dstfrm=".$frmApp->GetName().
+					"return PopUp('popup.php?dstfrm=".$frmApp->getName().
 					"&dstfld1=apphostid&dstfld2=apphost&srctbl=hosts_and_templates&srcfld1=hostid&srcfld2=host',450,450);",
 					'T')
 				));
@@ -288,10 +289,9 @@ include_once('include/page_header.php');
 		$frmApp->addItemToBottomRow(SPACE);
 		$frmApp->addItemToBottomRow(new CButtonCancel(url_param("config").url_param("hostid").url_param('groupid')));
 
-		$frmApp->show();
+		$app_wdgt->addItem($frmApp);
 	}
 	else{
-		$app_wdgt = new CWidget();
 
 		$form = new CForm(null, 'get');
 		$form->addItem(array(S_GROUP.SPACE,$pageFilter->getGroupsCB()));
@@ -403,9 +403,12 @@ include_once('include/page_header.php');
 
 		$form->addItem($table);
 		$app_wdgt->addItem($form);
-		$app_wdgt->show();
 	}
 
-	
+	$app_wdgt->show();
+?>
+<?php
+
 include_once('include/page_footer.php');
+
 ?>

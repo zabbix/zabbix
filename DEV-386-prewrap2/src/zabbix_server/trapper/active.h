@@ -28,7 +28,7 @@
 
 extern int	CONFIG_TIMEOUT;
 
-int	send_list_of_active_checks(zbx_sock_t *sock, char *request, zbx_process_t zbx_process);
-int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *json, zbx_process_t zbx_process);
+int	send_list_of_active_checks(zbx_sock_t *sock, char *request, unsigned char zbx_process);
+int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *json, unsigned char zbx_process);
 
 #endif

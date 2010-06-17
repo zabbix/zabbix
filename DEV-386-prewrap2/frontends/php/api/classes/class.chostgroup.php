@@ -215,7 +215,7 @@ class CHostGroup extends CZBXAPI{
 			$sql_parts['from']['hosts'] = 'hosts h';
 			$sql_parts['where']['hgg'] = 'hg.groupid=g.groupid';
 			$sql_parts['where'][] = 'h.hostid=hg.hostid';
-			$sql_parts['where'][] = 'h.status<>'.HOST_STATUS_PROXY;
+			$sql_parts['where'][] = 'NOT h.status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')';
 		}
 
 // with_items, with_monitored_items, with_historical_items

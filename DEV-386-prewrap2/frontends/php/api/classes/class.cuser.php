@@ -73,6 +73,8 @@ class CUser extends CZBXAPI{
 			'nodeids'					=> null,
 			'usrgrpids'					=> null,
 			'userids'					=> null,
+			'mediaids'					=> null,
+			'mediatypeids'				=> null,
 			'users' 					=> null,
 			'type'						=> null,
 // filter
@@ -82,6 +84,8 @@ class CUser extends CZBXAPI{
 			'output'					=> API_OUTPUT_REFER,
 			'editable'					=> null,
 			'select_usrgrps'			=> null,
+			'select_medias'				=> null,
+			'select_mediatypes'			=> null,
 			'get_access'				=> null,
 			'count'						=> null,
 			'preservekeys'				=> null,
@@ -116,12 +120,18 @@ class CUser extends CZBXAPI{
 				' WHERE uug.userid='.$USER_DETAILS['userid'].
 				' )';
 		}
-		else if(!is_null($options['editable']) && ($USER_DETAILS['type']!=USER_TYPE_SUPER_ADMIN)){
+		else if(!is_null($options['editable']) || ($USER_DETAILS['type']!=USER_TYPE_SUPER_ADMIN)){
 			return array();
 		}
 
 // nodeids
 		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
+
+// userids
+		if(!is_null($options['userids'])){
+			zbx_value2array($options['userids']);
+			$sql_parts['where'][] = DBcondition('u.userid', $options['userids']);
+		}
 
 // usrgrpids
 		if(!is_null($options['usrgrpids'])){
@@ -132,13 +142,28 @@ class CUser extends CZBXAPI{
 			$sql_parts['from']['users_groups'] = 'users_groups ug';
 			$sql_parts['where'][] = DBcondition('ug.usrgrpid', $options['usrgrpids']);
 			$sql_parts['where']['uug'] = 'u.userid=ug.userid';
-
 		}
 
-// userids
-		if(!is_null($options['userids'])){
-			zbx_value2array($options['userids']);
-			$sql_parts['where'][] = DBcondition('u.userid', $options['userids']);
+// mediaids
+		if(!is_null($options['mediaids'])){
+			zbx_value2array($options['mediaids']);
+			if($options['output'] != API_OUTPUT_SHORTEN){
+				$sql_parts['select']['mediaid'] = 'm.mediaid';
+			}
+			$sql_parts['from']['media'] = 'media m';
+			$sql_parts['where'][] = DBcondition('m.mediaid', $options['mediaids']);
+			$sql_parts['where']['mu'] = 'm.userid=u.userid';
+		}
+
+// mediatypeids
+		if(!is_null($options['mediatypeids'])){
+			zbx_value2array($options['mediatypeids']);
+			if($options['output'] != API_OUTPUT_SHORTEN){
+				$sql_parts['select']['mediatypeid'] = 'm.mediatypeid';
+			}
+			$sql_parts['from']['media'] = 'media m';
+			$sql_parts['where'][] = DBcondition('m.mediatypeid', $options['mediatypeids']);
+			$sql_parts['where']['mu'] = 'm.userid=u.userid';
 		}
 
 // users
@@ -229,7 +254,7 @@ class CUser extends CZBXAPI{
 					}
 
 // usrgrpids
-					if(isset($user['usrgrpid'])  && is_null($options['select_usrgrps'])){
+					if(isset($user['usrgrpid']) && is_null($options['select_usrgrps'])){
 						if(!isset($result[$user['userid']]['usrgrps']))
 							$result[$user['userid']]['usrgrps'] = array();
 
@@ -237,11 +262,29 @@ class CUser extends CZBXAPI{
 						unset($user['usrgrpid']);
 					}
 
+// mediaids
+					if(isset($user['mediaid']) && is_null($options['select_medias'])){
+						if(!isset($result[$user['userid']]['medias']))
+							$result[$user['userid']]['medias'] = array();
+
+						$result[$user['userid']]['medias'][] = array('mediaid' => $user['mediaid']);
+						unset($user['mediaid']);
+					}
+
+// mediatypeids
+					if(isset($user['mediatypeid']) && is_null($options['select_mediatypes'])){
+						if(!isset($result[$user['userid']]['mediatypes']))
+							$result[$user['userid']]['mediatypes'] = array();
+
+						$result[$user['userid']]['mediatypes'][] = array('mediatypeid' => $user['mediatypeid']);
+						unset($user['mediatypeid']);
+					}
 					$result[$user['userid']] += $user;
 				}
 			}
 		}
 
+Copt::memoryPick();
 		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['count'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 
@@ -265,7 +308,7 @@ class CUser extends CZBXAPI{
 				$result[$useracc['userid']] = zbx_array_merge($result[$useracc['userid']], $useracc);
 			}
 		}
-// Adding Objects
+
 // Adding usergroups
 		if(!is_null($options['select_usrgrps']) && str_in_array($options['select_usrgrps'], $subselects_allowed_outputs)){
 			$obj_params = array(
@@ -281,6 +324,14 @@ class CUser extends CZBXAPI{
 					$result[$user['userid']]['usrgrps'][] = $usrgrp;
 				}
 			}
+		}
+
+// TODO:
+// Adding medias
+		if(!is_null($options['select_medias']) && str_in_array($options['select_medias'], $subselects_allowed_outputs)){
+		}
+// Adding mediatypes
+		if(!is_null($options['select_mediatypes']) && str_in_array($options['select_mediatypes'], $subselects_allowed_outputs)){
 		}
 
 // removing keys (hash -> array)
@@ -347,7 +398,7 @@ class CUser extends CZBXAPI{
 
 		if($login){
 			if(($login['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS) && ((time() - $login['attempt_clock']) < ZBX_LOGIN_BLOCK)){
-				$_REQUEST['message'] = sprintf(S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_MINUTES, (ZBX_LOGIN_BLOCK - (time() - $login['attempt_clock'])));
+				$_REQUEST['message'] = S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_SECONDS_FIRST_PART.(ZBX_LOGIN_BLOCK - (time() - $login['attempt_clock'])).S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_SECONDS_SECOND_PART;
 				return false;
 			}
 
@@ -701,7 +752,7 @@ class CUser extends CZBXAPI{
 		$errors = array();
 
 		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
-			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_CUSER_ERROR_ONLY_ADMIN_CAN_CREATE_USERS);
+			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_CREATE_USERS);
 			return false;
 		}
 
@@ -735,7 +786,7 @@ class CUser extends CZBXAPI{
 
 			$user_exist = self::getObjects(array('alias' => $user['alias']));
 			if(!empty($user_exist)){
-				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => sprintf(S_CUSER_ERROR_USER_EXISTS, $user_exist[0]['alias']));
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_CUSER_ERROR_USER_EXISTS_FIRST_PART.$user_exist[0]['alias'].S_CUSER_ERROR_USER_EXISTS_SECOND_PART);
 				$result = false;
 				break;
 			}
@@ -833,7 +884,7 @@ class CUser extends CZBXAPI{
 		$self = false;
 
 		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
-			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_CUSER_ERROR_ONLY_ADMIN_CAN_UPDATE_USERS);
+			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_UPDATE_USERS);
 			return false;
 		}
 
@@ -889,7 +940,7 @@ class CUser extends CZBXAPI{
 						' AND '.DBin_node('userid', id2nodeid($user['userid']));
 			$db_user = DBfetch(DBselect($sql));
 			if($db_user && ($db_user['userid'] != $user['userid'])){
-				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => sprintf(S_CUSER_ERROR_USER_EXISTS, $user['alias']));
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_CUSER_ERROR_USER_EXISTS_FIRST_PART.$user['alias'].S_CUSER_ERROR_USER_EXISTS_SECOND_PART);
 				$result = false;
 				break;
 			}
@@ -942,13 +993,13 @@ class CUser extends CZBXAPI{
 					if(!$result) break;
 
 					if(($group['gui_access'] == GROUP_GUI_ACCESS_DISABLED) && $self){
-						$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => sprintf(S_CUSER_ERROR_USER_UNABLE_RESTRICT_SELF_GUI_ACCESS, $group['name']));
+						$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_CUSER_ERROR_USER_UNABLE_RESTRICT_SELF_GUI_ACCESS_PART1.$group['name'].S_CUSER_ERROR_USER_UNABLE_RESTRICT_SELF_GUI_ACCESS_PART2);
 						$result = false;
 						break;
 					}
 
 					if(($group['users_status'] == GROUP_STATUS_DISABLED) && $self){
-						$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => sprintf(S_CUSER_ERROR_USER_CANT_DISABLE_SELF, $group['name']));
+						$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_CUSER_ERROR_USER_CANT_DISABLE_SELF_PART1.$group['name'].S_CUSER_ERROR_USER_CANT_DISABLE_SELF_PART2);
 						$result = false;
 						break;
 					}
@@ -1102,7 +1153,7 @@ class CUser extends CZBXAPI{
 		$errors = array();
 
 		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
-			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_CUSER_ERROR_ONLY_ADMIN_CAN_DELETE_USERS);
+			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_DELETE_USERS);
 			return false;
 		}
 
@@ -1319,7 +1370,7 @@ class CUser extends CZBXAPI{
 // UPDATE
 			foreach($upd_medias as $mnum => $media){
 				if(!validate_period($media['period'])){
-					throw new APIException(ZBX_API_ERROR_PARAMETERS, sprintf(S_CUSER_ERROR_WRONG_PERIOD, $media['period']));
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_WRONG_PERIOD.' "'.$media['period'].'"');
 				}
 
 				$sql = 'UPDATE media '.

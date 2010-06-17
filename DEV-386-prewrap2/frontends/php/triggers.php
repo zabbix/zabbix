@@ -458,6 +458,7 @@ include_once('include/page_header.php');
 
 ?>
 <?php
+	$triggers_wdgt = new CWidget();
 
 	$form = new CForm(null, 'get');
 
@@ -466,22 +467,20 @@ include_once('include/page_header.php');
 		$form->addItem(new CButton('form', S_CREATE_TRIGGER));
 	}
 
-	show_table_header(S_CONFIGURATION_OF_TRIGGERS_BIG, $form);
-	echo SBR;
+	$triggers_wdgt->addPageHeader(S_CONFIGURATION_OF_TRIGGERS_BIG, $form);
 ?>
 <?php
 	if(($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['g_triggerid'])){
-		insert_mass_update_trigger_form();
+		$triggers_wdgt->addItem(insert_mass_update_trigger_form());
 	}
 	else if(isset($_REQUEST['form'])){
-		insert_trigger_form();
+		$triggers_wdgt->addItem(insert_trigger_form());
 	}
 	else if(($_REQUEST['go'] == 'copy_to') && isset($_REQUEST['g_triggerid'])){
-		insert_copy_elements_to_forms('g_triggerid');
+		$triggers_wdgt->addItem(insert_copy_elements_to_forms('g_triggerid'));
 	}
 	else{
 /* TABLE */
-		$triggers_wdgt = new CWidget();
 
 // Triggers Header
 		$r_form = new CForm(null, 'get');
@@ -606,7 +605,7 @@ include_once('include/page_header.php');
 			}
 // } add dependencies
 
-			if($trigger['status'] != TRIGGER_STATUS_UNKNOWN) $trigger['error'] = '';
+			if($trigger['value'] != TRIGGER_VALUE_UNKNOWN) $trigger['error'] = '';
 
 			$templated = false;
 			foreach($trigger['hosts'] as $hostid => $host){
@@ -636,9 +635,6 @@ include_once('include/page_header.php');
 
 			if($trigger['status'] == TRIGGER_STATUS_DISABLED){
 				$status = new CLink(S_DISABLED, $status_link, 'disabled');
-			}
-			else if($trigger['status'] == TRIGGER_STATUS_UNKNOWN){
-				$status = new CLink(S_UNKNOWN, $status_link, 'unknown');
 			}
 			else if($trigger['status'] == TRIGGER_STATUS_ENABLED){
 				$status = new CLink(S_ENABLED, $status_link, 'enabled');
@@ -701,9 +697,9 @@ include_once('include/page_header.php');
 
 		$form->addItem($table);
 		$triggers_wdgt->addItem($form);
-		$triggers_wdgt->show();
 	}
 
+	$triggers_wdgt->show();
 ?>
 <?php
 
