@@ -3111,7 +3111,7 @@ Changes for 1.0beta9:
  - play disaster-on.wav if disaster trigger appers (Alexei)
  - added support for disk_read_opsX[*],disk_write_opsX[*],disk_read_blksX[*], disk_write_blksX[*] (Alexei)
  - added basice support of monitoring of disk stats (Alexei)
- - session cookie will expire wneh session is closed (Alexei)
+ - session cookie will expire when session is closed (Alexei)
  - fixed situation when large SNMP values become nagative (Alexei)
  - added EOL character to make HTML source more readable (Alexei)
  - added new column "severity" to history of alarms (Alexei)
