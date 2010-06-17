@@ -2424,7 +2424,7 @@
 			$w = 0;
 			foreach($strings as $strnum => $str){
 				$dims = imageTextSize(8,0,$str);
-				$h += $dims['height'];
+				$h += $labelFontHeight;
 				$w = max($w, $dims['width']);
 			}
 
