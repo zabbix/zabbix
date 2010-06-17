@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2543] fixed password reset when edit user profile and auth type is not internal (Vedmak)
  - [ZBX-2524] fixed deleting media types (Aly)
  - [ZBX-2557] fixed incorrect message when add proxy with name that already exist (Vedmak)
  - [ZBX-2492] fixed japanese translation, all sprintf and their placeholders have been removed from phrases from all languages (Maxim Andruhovich / AM)
