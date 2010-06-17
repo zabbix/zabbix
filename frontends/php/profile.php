@@ -95,21 +95,17 @@ $fields=array(
 		redirect($url);
 	}
 	elseif(isset($_REQUEST['save'])){
-		$config = select_config();		
-		$auth_type = isset($_REQUEST['userid']) ? get_user_system_auth($_REQUEST['userid']) : $config['authentication_type'];
+		$auth_type = get_user_system_auth($USER_DETAILS['userid']);
 		
-		if(isset($_REQUEST['userid']) && (ZBX_AUTH_INTERNAL != $auth_type)){
+		if(ZBX_AUTH_INTERNAL != $auth_type){
 			$_REQUEST['password1'] = $_REQUEST['password2'] = null;
-		}
-		else if(!isset($_REQUEST['userid']) && (ZBX_AUTH_INTERNAL != $auth_type)){
-			$_REQUEST['password1'] = $_REQUEST['password2'] = 'zabbix';
 		}
 		else{
 			$_REQUEST['password1'] = get_request('password1', null);
 			$_REQUEST['password2'] = get_request('password2', null);
 		}
 		
-		if($_REQUEST['password1'] != $_REQUEST['password2']) {
+		if($_REQUEST['password1'] != $_REQUEST['password2']){
 			show_error_message(S_CANNOT_UPDATE_USER_BOTH_PASSWORDS);
 		}
 		else if(isset($_REQUEST['password1']) && ($USER_DETAILS['alias']==ZBX_GUEST_USER) && !zbx_empty($_REQUEST['password1'])) {
@@ -118,7 +114,7 @@ $fields=array(
 		else if(isset($_REQUEST['password1']) && ($USER_DETAILS['alias']!=ZBX_GUEST_USER) && zbx_empty($_REQUEST['password1'])) {
 			show_error_message(S_PASSWORD_SHOULD_NOT_BE_EMPTY);
 		}
-		else {
+		else{
 
 			$user = array();
 			$user['userid'] = $USER_DETAILS['userid'];
