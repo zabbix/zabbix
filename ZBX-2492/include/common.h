@@ -84,9 +84,9 @@
 #	if defined(__va_copy)
 #		define va_copy(d, s) __va_copy(d, s)
 #	else
-#		define va_copy(d, s) memcpy (&d,&s, sizeof(va_list))
-#	endif /* __va_copy */
-#endif /* va_copy */
+#		define va_copy(d, s) memcpy(&d, &s, sizeof(va_list))
+#	endif
+#endif
 
 #ifdef snprintf
 #undef snprintf
@@ -109,14 +109,6 @@
 #define vsprintf	ERROR_DO_NOT_USE_VSPRINTF_FUNCTION_TRY_TO_USE_VSNPRINTF
 /*#define strncat		ERROR_DO_NOT_USE_STRNCAT_FUNCTION_TRY_TO_USE_ZBX_STRLCAT*/
 
-#ifdef HAVE_ATOLL
-#	define zbx_atoui64(str)	((zbx_uint64_t)atoll(str))
-#else
-#	define zbx_atoui64(str)	((zbx_uint64_t)atol(str))
-#endif
-
-#define zbx_atod(str)	strtod(str, (char **)NULL)
-
 #define ON	1
 #define OFF	0
 
@@ -137,7 +129,8 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #endif /* _WINDOWS */
 
 #ifndef HAVE_GETOPT_LONG
-	struct option {
+	struct option
+	{
 		const char *name;
 		int has_arg;
 		int *flag;
@@ -145,8 +138,6 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 	};
 #	define  getopt_long(argc, argv, optstring, longopts, longindex) getopt(argc, argv, optstring)
 #endif /* ndef HAVE_GETOPT_LONG */
-
-#define ZBX_UNUSED(a) ((void)0)(a)
 
 #define	SUCCEED		0
 #define	FAIL		(-1)
@@ -156,15 +147,7 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #define	AGENT_ERROR	(-5)
 char	*zbx_result_string(int result);
 
-/*
-#define ZBX_POLLER
-*/
-
-#ifdef ZBX_POLLER
-	#define MAX_STRING_LEN	800
-#else
-	#define MAX_STRING_LEN	2048
-#endif
+#define MAX_STRING_LEN	2048
 #define MAX_BUF_LEN	65536
 
 #define ZBX_DM_DELIMITER	'\255'
@@ -461,11 +444,10 @@ typedef enum
 } zbx_group_status_type_t;
 
 /* process type */
-typedef enum
-{
-	ZBX_PROCESS_SERVER = 0,
-	ZBX_PROCESS_PROXY
-} zbx_process_t;
+#define ZBX_PROCESS_SERVER		0x01
+#define ZBX_PROCESS_PROXY_ACTIVE	0x02
+#define ZBX_PROCESS_PROXY_PASSIVE	0x04
+#define ZBX_PROCESS_PROXY		0x06	/* ZBX_PROCESS_PROXY_ACTIVE | ZBX_PROCESS_PROXY_PASSIVE */
 
 /* maintenance */
 typedef enum
@@ -511,9 +493,10 @@ typedef enum
 #define HOST_STATUS_MONITORED		0
 #define HOST_STATUS_NOT_MONITORED	1
 /*#define HOST_STATUS_UNREACHABLE	2*/
-#define HOST_STATUS_TEMPLATE	3
-#define HOST_STATUS_DELETED	4
-#define HOST_STATUS_PROXY	5
+#define HOST_STATUS_TEMPLATE		3
+/*#define HOST_STATUS_DELETED		4*/
+#define HOST_STATUS_PROXY_ACTIVE	5
+#define HOST_STATUS_PROXY_PASSIVE	6
 
 /* Host maintenance status */
 #define HOST_MAINTENANCE_STATUS_OFF	0
@@ -671,11 +654,11 @@ const char *zbx_permission_string(int perm);
 #define	SNMPTRAPPER_TIMEOUT	5
 
 #ifndef MAX
-#	define MAX(a, b) ((a)>(b) ? (a) : (b))
+#	define MAX(a, b) ((a) > (b) ? (a) : (b))
 #endif
 
 #ifndef MIN
-#	define MIN(a, b) ((a)<(b) ? (a) : (b))
+#	define MIN(a, b) ((a) < (b) ? (a) : (b))
 #endif
 
 /* Secure string copy */
@@ -783,6 +766,7 @@ int	get_key_param(char *param, int num, char *buf, int maxlen);
 int	num_key_param(char *param);
 int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay,
 		const char *delay_flex, time_t now, int *effective_delay);
+time_t	calculate_proxy_nextcheck(zbx_uint64_t hostid, unsigned int delay, time_t now);
 int	check_time_period(const char *period, time_t now);
 char	zbx_num2hex(u_char c);
 u_char	zbx_hex2num(char c);
@@ -946,7 +930,7 @@ int	__zbx_open(const char *pathname, int flags);
 #endif	/* _WINDOWS && _UNICODE */
 int	zbx_read(int fd, char *buf, size_t count, const char *encoding);
 
-int MAIN_ZABBIX_ENTRY(void);
+int	MAIN_ZABBIX_ENTRY(void);
 
 zbx_uint64_t	zbx_letoh_uint64(zbx_uint64_t data);
 zbx_uint64_t	zbx_htole_uint64(zbx_uint64_t data);
@@ -957,4 +941,5 @@ int	is_function_char(const char c);
 int	parse_function(char **exp, char **func, char **params);
 int	parse_host_key(char *exp, char **host, char **key);
 void	make_hostname(char *host);
+
 #endif

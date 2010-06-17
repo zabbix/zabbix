@@ -89,55 +89,55 @@ class CHost extends CZBXAPI{
 			'limit' => null);
 
 		$def_options = array(
-			'nodeids'				=> null,
-			'groupids'				=> null,
-			'hostids'				=> null,
-			'proxyids'				=> null,
+			'nodeids'					=> null,
+			'groupids'					=> null,
+			'hostids'					=> null,
+			'proxyids'					=> null,
 			'templateids'				=> null,
-			'itemids'				=> null,
+			'itemids'					=> null,
 			'triggerids'				=> null,
-			'graphids'				=> null,
-			'dhostids'				=> null,
+			'graphids'					=> null,
+			'dhostids'					=> null,
 			'dserviceids'				=> null,
 			'monitored_hosts'			=> null,
 			'templated_hosts'			=> null,
 			'proxy_hosts'				=> null,
 			'with_items'				=> null,
-			'with_monitored_items'			=> null,
-			'with_historical_items'			=> null,
+			'with_monitored_items'		=> null,
+			'with_historical_items'		=> null,
 			'with_triggers'				=> null,
-			'with_monitored_triggers'		=> null,
+			'with_monitored_triggers'	=> null,
 			'with_httptests'			=> null,
-			'with_monitored_httptests'		=> null,
+			'with_monitored_httptests'	=> null,
 			'with_graphs'				=> null,
-			'editable'				=> null,
+			'editable'					=> null,
 			'nopermissions'				=> null,
 // filter
-			'filter'				=> null,
+			'filter'					=> null,
 			'startPattern'				=> null,
-			'pattern'				=> null,
+			'pattern'					=> null,
 			'extendPattern'				=> null,
 
 // OutPut
-			'output'				=> API_OUTPUT_REFER,
+			'output'					=> API_OUTPUT_REFER,
 			'extendoutput'				=> null,
 			'select_groups'				=> null,
-			'selectParentTemplates'			=> null,
+			'selectParentTemplates'		=> null,
 			'select_items'				=> null,
 			'select_triggers'			=> null,
 			'select_graphs'				=> null,
 			'select_dhosts'				=> null,
 			'select_dservices'			=> null,
-			'select_applications'			=> null,
+			'select_applications'		=> null,
 			'select_macros'				=> null,
 			'select_profile'			=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
 
-			'sortfield'				=> '',
-			'sortorder'				=> '',
-			'limit'					=> null,
+			'sortfield'					=> '',
+			'sortorder'					=> '',
+			'limit'						=> null,
 			'limitSelects'				=> null
 		);
 
@@ -373,7 +373,7 @@ class CHost extends CZBXAPI{
 			$sql_parts['where']['status'] = 'h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')';
 		}
 		else if(!is_null($options['proxy_hosts'])){
-			$sql_parts['where']['status'] = 'h.status IN ('.HOST_STATUS_PROXY.')';
+			$sql_parts['where']['status'] = 'h.status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')';
 		}
 		else{
 			$sql_parts['where']['status'] = 'h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
@@ -1195,7 +1195,7 @@ Copt::memoryPick();
 
 			$result &= CHost::massAdd($options);
 
-			if(isset($host['profile'])){
+			if(isset($host['profile']) && !empty($host['extendedProfile'])){
 				$fields = array_keys($host['profile']);
 				$fields = implode(', ', $fields);
 
@@ -1205,7 +1205,7 @@ Copt::memoryPick();
 				DBexecute('INSERT INTO hosts_profiles (hostid, '.$fields.') VALUES ('.$hostid.', '.$values.')');
 			}
 
-			if(isset($host['extendedProfile'])){
+			if(isset($host['extendedProfile']) && !empty($host['extendedProfile'])){
 				$fields = array_keys($host['extendedProfile']);
 				$fields = implode(', ', $fields);
 
@@ -1607,7 +1607,6 @@ Copt::memoryPick();
 					}
 
 					if(!empty($existing_profiles)){
-
 						$host_profile_fields = array('devicetype', 'name', 'os', 'serialno', 'tag','macaddress', 'hardware', 'software',
 							'contact', 'location', 'notes');
 						$sql_set = array();

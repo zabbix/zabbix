@@ -602,6 +602,8 @@
 	'S_HOST_COUNT' => 'Host count',
 	'S_ITEM_COUNT' => 'Item count',
 	'S_REQUIRED_PERFORMANCE' => 'Required performance (vps)',
+	'S_PROXY_MODE' => 'Proxy mode',
+	'S_PASSIVE' => 'Passive',
 
 //  Authentication
 	'S_AUTHENTICATION'=>			'Authentication',
@@ -1382,16 +1384,16 @@
 	'S_ZABBIX_SERVER_IS_RUNNING'=>		'Zabbix server is running',
 	'S_VALUES_STORED'=>			'Values stored',
 	'S_TRENDS_STORED'=>			'Trends stored',
-	'S_NUMBER_OF_TRIGGERS'=>		'Number of triggers (enabled/disabled)[true/unknown/false]',
-	'S_NUMBER_OF_TRIGGERS_SHORT'=>		'Triggers (e/d)[t/u/f]',
+	'S_NUMBER_OF_TRIGGERS'=>		'Number of triggers (enabled/disabled)[problem/unknown/ok]',
+	'S_NUMBER_OF_TRIGGERS_SHORT'=>		'Triggers (e/d)[p/u/o]',
 	'S_NUMBER_OF_TRIGGERS_TOOLTIP'=>	'Only triggers assigned to enabled hosts and depending on enabled items are counted',
 	'S_NUMBER_OF_ITEMS'=>			'Number of items (monitored/disabled/not supported)',
-	'S_NUMBER_OF_ITEMS_SHORT'=>		'Items (m/d/n)[t]',
+	'S_NUMBER_OF_ITEMS_SHORT'=>		'Items (m/d/n)',
 	'S_NUMBER_OF_ITEMS_TOOLTIP'=>		'Only items assigned to enabled hosts are counted',
 	'S_NUMBER_OF_USERS'=>			'Number of users (online)',
 	'S_NUMBER_OF_USERS_SHORT'=>		'Users (online)',
 	'S_NUMBER_OF_HOSTS'=>			'Number of hosts (monitored/not monitored/templates)',
-	'S_NUMBER_OF_HOSTS_SHORT'=>		'Hosts (m/n/t/d)',
+	'S_NUMBER_OF_HOSTS_SHORT'=>		'Hosts (m/n/t)',
 	'S_REQUIRED_SERVER_PERFORMANCE_NVPS'=>	'Required server performance, new values per second',
 	'S_YES'=>				'Yes',
 	'S_NO'=>				'No',
@@ -1950,7 +1952,7 @@
 	'S_DISCOVERY_RULES_BIG'=>		'DISCOVERY RULES',
 	'S_DISCOVERY_CHECKS_BIG'=>		'DISCOVERY CHECKS',
 	'S_HOSTS_AND_TEMPLATES_BIG'=>		'Hosts and templates',
-	'S_ITEMS_FROM_SAME_TEMPLATE_ONLY'=>	'This graph already has items from a template. Further items can only be added from the same template.',
+	'S_CANNOT_SWITCH_HOSTS'=>		'You can not switch hosts for current selection',
 
 //	popup_period.php
 	'S_POPUP_PERIOD_CAPTION_DATE_FORMAT'=>	'd M Y H:i:s',

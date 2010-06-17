@@ -59,7 +59,7 @@ static int delete_history(const char *table, const char *fieldname, int now)
 	if (NULL == (row = DBfetch(result)) || DBis_null(row[0]) == SUCCEED)
 		goto rollback;
 
-	lastid = zbx_atoui64(row[0]);
+	ZBX_STR2UINT64(lastid, row[0]);
 	DBfree_result(result);
 
 	result = DBselect("select min(clock) from %s",

@@ -790,13 +790,10 @@ function __autoload($class_name){
 		$row=DBfetch(DBselect($sql.' AND i.status=3'));
 		$status['items_count_not_supported']=$row['cnt'];
 
-		$row=DBfetch(DBselect($sql.' AND i.type=2'));
-		$status['items_count_trapper']=$row['cnt'];
-
 // hosts
 		$sql = 'SELECT COUNT(hostid) as cnt '.
 				' FROM hosts '.
-				' WHERE status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.','.HOST_STATUS_DELETED.' )';
+				' WHERE status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.' )';
 		$row=DBfetch(DBselect($sql));
 		$status['hosts_count']=$row['cnt'];
 
@@ -808,9 +805,6 @@ function __autoload($class_name){
 
 		$row=DBfetch(DBselect('SELECT COUNT(hostid) as cnt FROM hosts WHERE status='.HOST_STATUS_TEMPLATE));
 		$status['hosts_count_template']=$row['cnt'];
-
-		$row=DBfetch(DBselect('SELECT COUNT(hostid) as cnt FROM hosts WHERE status='.HOST_STATUS_DELETED));
-		$status['hosts_count_deleted']=$row['cnt'];
 
 // users
 		$row=DBfetch(DBselect('SELECT COUNT(userid) as cnt FROM users'));

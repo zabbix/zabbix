@@ -122,7 +122,7 @@ class CHistory extends CZBXAPI{
 				'preservekeys' => 1
 			);
 			if(!is_null($options['itemids'])) $itemOptions['itemids'] = $options['itemids'];
-			$items = CItem::get($options);
+			$items = CItem::get($itemOptions);
 
 			$options['itemids'] = array_keys($items);
 		}

@@ -36,6 +36,19 @@
 #     one of values.
 #    Adding a hash mark (#) in front of the line will indicate that it is a
 #     comment.
+#
+# 3. Pre-dump hook
+#    Pre-dump hook allows to execute a query right before dumping as specific
+#     table.
+#    Pre-dump hook entries are specified in PREDUMPHOOKFILE file. Each line
+#     contains space separated:
+#         table query
+#
+#    There is a possible race condition between executing the pre-dump hook and
+#     dumping the table. This feature should not be used for critical changes at
+#     this time.
+#    Adding a hash mark (#) in front of the line will indicate that it is a
+#     comment.
 
 # Do not make configuration changes to the database while running this script.
 
@@ -45,6 +58,7 @@ TMPFILE=/tmp/data_sql_tmp_dump.sql
 FINALFILE=final_data.sql
 BLACKLISTFILE=data_sql_blacklist.txt
 FILTERFILE=data_sql_filter.txt
+PREDUMPHOOKFILE=data_sql_predumphooks.txt
 >"$FINALFILE"
 
 fail() {
@@ -56,8 +70,9 @@ fail() {
 
 #UTILS="mysql strings awk cut sed"
 
-#TABLES="config"
-#cat >> /dev/null << EOF
+[[ "$2" ]] && {
+	TABLES="$2"
+} || {
 TABLES="actions \
 applications \
 conditions \
@@ -116,8 +131,8 @@ users \
 users_groups \
 usrgrp \
 valuemaps"
-#EOF
 # nodes \
+}
 
 for TABLE in $TABLES; do
 	while read line; do
@@ -152,6 +167,16 @@ for TABLE in $TABLES; do
 -- Dumping data for table \`$TABLE\`
 --
 " >> "$FINALFILE"
+
+		# pre-dump hook to update possibly out of order values in current database
+		# it's still possible that server would change them right after fixing & before dump,
+		#  but that's a smaller chance
+		HOOKLINE=$(grep ^$TABLE $PREDUMPHOOKFILE)
+		[[ "$HOOKLINE" ]] && {
+			HOOK=$(echo "$HOOKLINE" | cut -d" " -f2-)
+			echo "$HOOK" | $MYSQLLINE
+			unset HOOKLINE
+		}
 
 		echo "select ${DIFFERENT_FIELDS#,} from $TABLE $FINALFILTER into outfile '$TMPFILE' \
 FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY \"'\";" | $MYSQLLINE || fail "select failed"
