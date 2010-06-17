@@ -61,6 +61,7 @@ class CDRule extends CZBXAPI{
 			'dhostids'				=> null,
 			'dserviceids'			=> null,
 			'dcheckids'				=> null,
+			'editable'					=> null,
 			'selectDHosts'			=> null,
 			'selectDServices'		=> null,
 			'selectDChecks'			=> null,
