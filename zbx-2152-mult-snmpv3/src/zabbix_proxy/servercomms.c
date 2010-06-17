@@ -97,11 +97,13 @@ void	disconnect_server(zbx_sock_t *sock)
  ******************************************************************************/
 int	get_data_from_server(zbx_sock_t *sock, const char *request, char **data)
 {
+	const char	*__function_name = "get_data_from_server";
+
 	int		ret = FAIL;
 	struct zbx_json	j;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In get_data_from_server() [request:%s]",
-			request);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() request:'%s'",
+			__function_name, request);
 
 	zbx_json_init(&j, 128);
 	zbx_json_addstring(&j, "request", request, ZBX_JSON_TYPE_STRING);
@@ -116,6 +118,9 @@ int	get_data_from_server(zbx_sock_t *sock, const char *request, char **data)
 	ret = SUCCEED;
 exit:
 	zbx_json_free(&j);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s",
+			__function_name, zbx_result_string(ret));
 
 	return ret;
 }
@@ -138,32 +143,18 @@ exit:
  ******************************************************************************/
 int	put_data_to_server(zbx_sock_t *sock, struct zbx_json *j)
 {
-	const char		*__function_name = "put_data_to_server";
-	struct zbx_json_parse	jp;
-	int			ret = FAIL;
-	char			*answer, value[MAX_STRING_LEN];
+	const char	*__function_name = "put_data_to_server";
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [datalen:%zd]",
-			__function_name, j->buffer_size);
+	int		ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() datalen:%d",
+			__function_name, (int)j->buffer_size);
 
 	if (FAIL == send_data_to_server(sock, j->buffer))
 		goto exit;
 
-	if (SUCCEED == recv_data_from_server(sock, &answer))
-	{
-		if (FAIL == zbx_json_open(answer, &jp))
-			goto exit;
-
-		if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, value, sizeof(value)))
-			goto exit;
-
-		if (0 != strcmp(value, ZBX_PROTO_VALUE_SUCCESS))
-			goto exit;
-	}
-	else
-		/* since we have successfully sent data to the server, we assume the */
-		/* server is just too busy processing our data if there is no response */
-		zabbix_log(LOG_LEVEL_DEBUG, "Did not receive response from server.");
+	if (FAIL == zbx_recv_response(sock, NULL, 0, 0))
+		goto exit;
 
 	ret = SUCCEED;
 exit:

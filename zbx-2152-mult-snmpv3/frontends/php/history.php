@@ -48,7 +48,7 @@ include_once('include/page_header.php');
 		'right'=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
 		'stime'=>	array(T_ZBX_STR, O_OPT,	 null,	null, null),
 
-		'filter_task'=>	array(T_ZBX_STR, O_OPT,	 null,	IN(FILTER_TAST_SHOW.','.FILTER_TAST_HIDE.','.FILTER_TAST_MARK.','.FILTER_TAST_INVERT_MARK), null),
+		'filter_task'=>	array(T_ZBX_STR, O_OPT,	 null,	IN(FILTER_TASK_SHOW.','.FILTER_TASK_HIDE.','.FILTER_TASK_MARK.','.FILTER_TASK_INVERT_MARK), null),
 		'filter'=>		array(T_ZBX_STR, O_OPT,	 null,	null, null),
 		'mark_color'=>	array(T_ZBX_STR, O_OPT,	 null,	IN(MARK_COLOR_RED.','.MARK_COLOR_GREEN.','.MARK_COLOR_BLUE), null),
 
@@ -176,7 +176,7 @@ include_once('include/page_header.php');
 
 	$ptData = array(
 		'header' => array(),
-		'data' => array()
+		'body' => array()
 	);
 
 	if(count($items) == 1){
@@ -267,14 +267,14 @@ include_once('include/page_header.php');
 			$filterForm->addRow(S_SELECT_ROWS_WITH_VALUE_LIKE, new CTextBox('filter',$filter,25));
 
 			$cmbFTask = new CComboBox('filter_task',$filter_task,'submit()');
-			$cmbFTask->addItem(FILTER_TAST_SHOW,S_SHOW_SELECTED);
-			$cmbFTask->addItem(FILTER_TAST_HIDE,S_HIDE_SELECTED);
-			$cmbFTask->addItem(FILTER_TAST_MARK,S_MARK_SELECTED);
-			$cmbFTask->addItem(FILTER_TAST_INVERT_MARK,S_MARK_OTHERS);
+			$cmbFTask->addItem(FILTER_TASK_SHOW,S_SHOW_SELECTED);
+			$cmbFTask->addItem(FILTER_TASK_HIDE,S_HIDE_SELECTED);
+			$cmbFTask->addItem(FILTER_TASK_MARK,S_MARK_SELECTED);
+			$cmbFTask->addItem(FILTER_TASK_INVERT_MARK,S_MARK_OTHERS);
 
 			$tmp = array($cmbFTask);
 
-			if(str_in_array($filter_task,array(FILTER_TAST_MARK,FILTER_TAST_INVERT_MARK))){
+			if(str_in_array($filter_task,array(FILTER_TASK_MARK,FILTER_TASK_INVERT_MARK))){
 				$cmbColor = new CComboBox('mark_color',$mark_color);
 				$cmbColor->addItem(MARK_COLOR_RED,S_AS_RED);
 				$cmbColor->addItem(MARK_COLOR_GREEN,S_AS_GREEN);
@@ -304,7 +304,7 @@ include_once('include/page_header.php');
 			$options['limit'] = 500;
 		}
 		else if($_REQUEST['action']=='showvalues'){
-			$options['time_from'] = $time;
+			$options['time_from'] = $time - 10; // some seconds to take script execued
 			$options['time_till'] = $till;
 
 			$options['limit'] = $config['search_limit'];
@@ -324,15 +324,16 @@ include_once('include/page_header.php');
 					$logItem?S_EVENT_ID:null,
 					S_VALUE),'header');
 
-			if(isset($_REQUEST['filter']) && $_REQUEST['filter']!=''){
-				if($_REQUEST['filter_task'] == FILTER_TAST_SHOW)
-					$options['pattern'] = $_REQUEST['filter'];
-				else if($_REQUEST['filter_task'] == FILTER_TAST_HIDE)
-					$options['excludePattern'] = $_REQUEST['filter'];
-			}
-			$options['sortfield'] = 'id';
+			if(isset($_REQUEST['filter']) && !zbx_empty($_REQUEST['filter']) && in_array($_REQUEST['filter_task'], array(FILTER_TASK_SHOW, FILTER_TASK_HIDE))){
+				$options['pattern'] = $_REQUEST['filter'];
 
+				if($_REQUEST['filter_task'] == FILTER_TASK_HIDE)
+					$options['excludePattern'] = 1;
+			}
+
+			$options['sortfield'] = 'id';
 			$hData = CHistory::get($options);
+
 			foreach($hData as $hnum => $data){
 				$color_style = null;
 
@@ -342,11 +343,15 @@ include_once('include/page_header.php');
 				if(isset($_REQUEST['filter']) && !zbx_empty($_REQUEST['filter'])){
 					$contain = zbx_stristr($data['value'],$_REQUEST['filter']) ? TRUE : FALSE;
 
+//					if($_REQUEST['filter_task'] == FILTER_TASK_SHOW && !$contain) continue;
+//					if($_REQUEST['filter_task'] == FILTER_TASK_HIDE && $contain) continue;
+
 					if(!isset($_REQUEST['mark_color'])) $_REQUEST['mark_color'] = MARK_COLOR_RED;
 
-					if(($contain) && ($_REQUEST['filter_task'] == FILTER_TAST_MARK))
+					if(($contain) && ($_REQUEST['filter_task'] == FILTER_TASK_MARK))
 						$color_style = $_REQUEST['mark_color'];
-					if((!$contain) && ($_REQUEST['filter_task'] == FILTER_TAST_INVERT_MARK))
+
+					if((!$contain) && ($_REQUEST['filter_task'] == FILTER_TASK_INVERT_MARK))
 						$color_style = $_REQUEST['mark_color'];
 
 					switch($color_style){
@@ -392,6 +397,7 @@ include_once('include/page_header.php');
 				else if(!is_null($color_style)){
 					$crow->setClass($color_style);
 				}
+
 				$table->addRow($crow);
 
 // Plaint Text

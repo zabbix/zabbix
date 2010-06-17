@@ -61,7 +61,7 @@ if(!isset($DB)){
 					}
 					else{
 						if (!mysql_select_db($DB['DATABASE'])){
-							$error = 'Error database selection ['.mysql_error().']';
+							$error = 'Error database in selection ['.mysql_error().']';
 							$result = false;
 						}
 						else{
@@ -896,20 +896,26 @@ else {
 			$id_name = self::getSchema($table);
 			$id_name = $id_name['key'];
 
-			$min = bcadd(bcmul($nodeid,'100000000000000'), bcmul($ZBX_LOCALNODEID,'100000000000'));
-			$max = bcadd(bcadd(bcmul($nodeid,'100000000000000'), bcmul($ZBX_LOCALNODEID,'100000000000')),'99999999999');
+			$min = bcadd(bcmul($nodeid,'100000000000000'), bcmul($ZBX_LOCALNODEID,'100000000000'), 0);
+			$max = bcadd(bcadd(bcmul($nodeid,'100000000000000'), bcmul($ZBX_LOCALNODEID,'100000000000')),'99999999999', 0);
 
-			$sql = 'SELECT nextid FROM ids WHERE nodeid='.$nodeid .'
-				AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($id_name);
+			$sql = 'SELECT nextid '.
+				' FROM ids '.
+				' WHERE nodeid='.$nodeid .'
+					AND table_name='.zbx_dbstr($table).
+					' AND field_name='.zbx_dbstr($id_name);
 			$res = DBfetch(DBselect($sql));
 			if($res){
-				$nextid = $res['nextid']+1;
+				$nextid = bcadd($res['nextid'], 1, 0);
 
 				if((bccomp($nextid, $max) == 1) || (bccomp($nextid, $min) == -1))
-					self::exception(self::RESERVEIDS_ERROR, __METHOD__.' ID out of range');
+					self::exception(self::RESERVEIDS_ERROR, __METHOD__.' ID out of range for ['.$table.']');
 
-				$sql = 'UPDATE ids SET nextid=nextid+'.$count.' WHERE nodeid='.$nodeid.
-					' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($id_name);
+				$sql = 'UPDATE ids '.
+					' SET nextid=nextid+'.$count.
+					' WHERE nodeid='.$nodeid.
+						' AND table_name='.zbx_dbstr($table).
+						' AND field_name='.zbx_dbstr($id_name);
 				if(!DBexecute($sql)) self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
 			}
 			else{
@@ -920,8 +926,11 @@ else {
 				$row = DBfetch(DBselect($sql));
 
 				$nextid = (!$row || is_null($row['id'])) ? $min : $row['id'];
+
 				$sql = 'INSERT INTO ids (nodeid,table_name,field_name,nextid) '.
-					' VALUES ('.$nodeid.','.zbx_dbstr($table).','.zbx_dbstr($id_name).','.($nextid + $count).')';
+					' VALUES ('.$nodeid.','.zbx_dbstr($table).','.zbx_dbstr($id_name).','.bcadd($nextid, $count, 0).')';
+
+				$nextid = bcadd($res['nextid'], 1, 0);
 
 				if(!DBexecute($sql)) self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
 			}
@@ -971,7 +980,9 @@ else {
 				}
 
 				$sql = 'INSERT INTO '.$table.' ('.$table_schema['key'].','.implode(',',array_keys($row)).')'.
-					' VALUES ('.$id++.','.implode(',',array_values($row)).')';
+					' VALUES ('.$id.','.implode(',',array_values($row)).')';
+
+				$id = bcadd($id, 1, 0);
 				if(!DBexecute($sql)) self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
 			}
 			return $result_ids;
@@ -1007,20 +1018,19 @@ else {
 				$sql_set = rtrim($sql_set, ',');
 
 				if(!empty($sql_set)){
-					$sql = 'UPDATE '.$table.' SET '.$sql_set.' WHERE '.$row['where'];
+					$sql = 'UPDATE '.$table.' SET '.$sql_set.' WHERE '.implode(' AND ', $row['where']);
 					if(!DBexecute($sql)) self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
 				}
 			}
 			return true;
 		}
 
-		public static function delete($data){
-			$data = zbx_toArray($data);
+		public static function delete($table, $where){
+			$where = zbx_toArray($where);
 
-			foreach($data as $row){
-				$sql = 'DELETE FROM '.$row['table'].' WHERE '.$row['where'];
-				if(!DBexecute($sql)) self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
-			}
+			$sql = 'DELETE FROM '.$table.' WHERE '.implode(' AND ', $where);
+			if(!DBexecute($sql)) self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
+
 			return true;
 		}
 

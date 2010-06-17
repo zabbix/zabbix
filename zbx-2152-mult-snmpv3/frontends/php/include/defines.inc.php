@@ -197,8 +197,9 @@
 	define('HOST_STATUS_NOT_MONITORED',	1);
 //	define('HOST_STATUS_UNREACHABLE',	2);
 	define('HOST_STATUS_TEMPLATE',		3);
-	define('HOST_STATUS_DELETED',		4);
-	define('HOST_STATUS_PROXY',			5);
+//	define('HOST_STATUS_DELETED',		4);
+	define('HOST_STATUS_PROXY_ACTIVE',	5);
+	define('HOST_STATUS_PROXY_PASSIVE',	6);
 
 	define('HOST_MAINTENANCE_STATUS_OFF',	0);
 	define('HOST_MAINTENANCE_STATUS_ON',	1);
@@ -309,7 +310,6 @@
 
 	define('TRIGGER_STATUS_ENABLED',	0);
 	define('TRIGGER_STATUS_DISABLED',	1);
-	define('TRIGGER_STATUS_UNKNOWN',	2);
 
 	define('TRIGGER_VALUE_FALSE',		0);
 	define('TRIGGER_VALUE_TRUE',		1);
@@ -412,10 +412,10 @@
 	define('TIME_TYPE_LOCAL',	0);
 	define('TIME_TYPE_SERVER',	1);
 
-	define('FILTER_TAST_SHOW',		0);
-	define('FILTER_TAST_HIDE',		1);
-	define('FILTER_TAST_MARK',		2);
-	define('FILTER_TAST_INVERT_MARK',	3);
+	define('FILTER_TASK_SHOW',		0);
+	define('FILTER_TASK_HIDE',		1);
+	define('FILTER_TASK_MARK',		2);
+	define('FILTER_TASK_INVERT_MARK',	3);
 
 	define('MARK_COLOR_RED',	1);
 	define('MARK_COLOR_GREEN',	2);

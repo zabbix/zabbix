@@ -43,6 +43,8 @@ extern int	CONFIG_UNAVAILABLE_DELAY;
 extern int	CONFIG_UNREACHABLE_PERIOD;
 extern int	CONFIG_UNREACHABLE_DELAY;
 extern int	CONFIG_DBSYNCER_FORKS;
+extern int	CONFIG_PROXYCONFIG_FREQUENCY;
+extern int	CONFIG_PROXYDATA_FREQUENCY;
 
 DC_HOST
 {
@@ -111,7 +113,7 @@ void	DCadd_history_text(zbx_uint64_t itemid, char *value_orig, int clock);
 void	DCadd_history_log(zbx_uint64_t itemid, char *value_orig, int clock, int timestamp, char *source, int severity,
 		int logeventid, int lastlogsize, int mtime);
 int	DCsync_history(int sync_type);
-void	init_database_cache(zbx_process_t p);
+void	init_database_cache(unsigned char p);
 void	free_database_cache(void);
 
 void	DCinit_nextchecks();
@@ -167,5 +169,9 @@ void	DCconfig_set_maintenance(zbx_uint64_t hostid, int maintenance_status,
 #define ZBX_CONFSTATS_BUFFER_FREE	3
 #define ZBX_CONFSTATS_BUFFER_PFREE	4
 void	*DCconfig_get_stats(int request);
+
+int	DCconfig_get_proxypoller_hosts(DC_HOST *hosts, int max_hosts);
+int	DCconfig_get_proxy_nextcheck();
+void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck);
 
 #endif

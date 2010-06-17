@@ -354,7 +354,7 @@ include_once('include/page_header.php');
 		$cmbUGrp->addItem(0, S_ALL_S);
 
 		$options = array(
-			'extendoutput' => 1,
+			'output' => API_OUTPUT_EXTEND,
 			'sortfield' => 'name'
 		);
 		$usrgrps = CUserGroup::get($options);
@@ -370,18 +370,6 @@ include_once('include/page_header.php');
 
 		$user_wdgt->addHeader(S_USERS_BIG, $form);
 		$user_wdgt->addHeader($numrows);
-
-// User table
-		$options = array('extendoutput' => 1,
-						'select_usrgrps' => 1,
-						'get_access' => 1,
-						'limit' => ($config['search_limit']+1)
-					);
-		if($_REQUEST['filter_usrgrpid'] > 0){
-			$options['usrgrpids'] = $_REQUEST['filter_usrgrpid'];
-		}
-
-		$users = CUser::get($options);
 
 		$form = new CForm(null,'post');
 		$form->setName('users');
@@ -402,8 +390,21 @@ include_once('include/page_header.php');
 			S_STATUS
 		));
 
+// User table
+		$options = array(
+			'output' => API_OUTPUT_EXTEND,
+			'select_usrgrps' => API_OUTPUT_EXTEND,
+			'get_access' => 1,
+			'limit' => ($config['search_limit']+1)
+		);
+		if($_REQUEST['filter_usrgrpid'] > 0){
+			$options['usrgrpids'] = $_REQUEST['filter_usrgrpid'];
+		}
+
+		$users = CUser::get($options);
+
 // sorting
-		order_page_result($users, getPageSortField('alias'), getPageSortOrder());
+		order_result($users, getPageSortField('alias'), getPageSortOrder());
 		$paging = getPagingLine($users);
 //---------
 

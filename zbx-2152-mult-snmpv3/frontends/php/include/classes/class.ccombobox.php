@@ -29,7 +29,7 @@ class CComboBox extends CTag{
 		$this->attributes['id'] = $name;
 		$this->attributes['name'] = $name;
 
-		$this->attributes['class'] = 'biginput';
+		$this->attributes['class'] = 'select';
 		$this->attributes['size'] = 1;
 
 		$this->value = $value;
@@ -50,6 +50,10 @@ class CComboBox extends CTag{
 			parent::addItem($value);
 		}
 		else{
+			if(zbx_strlen($caption) > 44){
+				$this->setAttribute('class', 'select selectShorten');
+			}
+
 			if(is_null($selected)){
 				$selected = 'no';
 				if(is_array($this->value)) {

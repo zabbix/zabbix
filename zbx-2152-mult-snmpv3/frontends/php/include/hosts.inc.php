@@ -182,7 +182,7 @@
 				' WHERE h.host='.zbx_dbstr($host).
 					' AND '.DBin_node('h.hostid', get_current_nodeid(false)).
 					' AND status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
-					(isset($hostid)?' AND h.hostid<>'.$hostid:'');
+					(isset($hostid)? ' AND h.hostid<>'.$hostid:'');
 		if(DBfetch(DBselect($sql))){
 			error(S_HOST.SPACE.'"'.$host.'"'.SPACE.S_ALREADY_EXISTS_SMALL);
 			return false;
@@ -638,7 +638,7 @@
 			$host_old = get_host_by_hostid($id);
 			$result = DBexecute('DELETE FROM hosts WHERE hostid='.$id);
 			if ($result) {
-				info(sprintf(S_HOST_HAS_BEEN_DELETED_MSG, $host_old['host']));
+				info(S_HOST_HAS_BEEN_DELETED_MSG_PART1.$host_old['host'].S_HOST_HAS_BEEN_DELETED_MSG_PART2);
 				/*SDI(
 					'AUDIT_ACTION_DELETE '.AUDIT_ACTION_DELETE.' / '.
 					'AUDIT_RESOURCE_HOST '.AUDIT_RESOURCE_HOST.' / '.
@@ -770,17 +770,17 @@
 	return $groupids;
 	}
 
-	function db_save_proxy($name,$proxyid=null){
+	function db_save_proxy($name,$status,$useip,$dns,$ip,$port,$proxyid=null){
 		if(!is_string($name)){
 			error(S_INCORRECT_PARAMETERS_FOR_SMALL." 'db_save_proxy'");
 			return false;
 		}
 
 		if(is_null($proxyid))
-			$result = DBselect('SELECT * FROM hosts WHERE status IN ('.HOST_STATUS_PROXY.')'.
+			$result = DBselect('SELECT * FROM hosts WHERE status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')'.
 					' and '.DBin_node('hostid').' AND host='.zbx_dbstr($name));
 		else
-			$result = DBselect('SELECT * FROM hosts WHERE status IN ('.HOST_STATUS_PROXY.')'.
+			$result = DBselect('SELECT * FROM hosts WHERE status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')'.
 					' and '.DBin_node('hostid').' AND host='.zbx_dbstr($name).
 					' and hostid<>'.$proxyid);
 
@@ -791,8 +791,8 @@
 
 		if(is_null($proxyid)){
 			$proxyid=get_dbid('hosts','hostid');
-			if(!DBexecute('INSERT INTO hosts (hostid,host,status)'.
-				' values ('.$proxyid.','.zbx_dbstr($name).','.HOST_STATUS_PROXY.')'))
+			if(!DBexecute('INSERT INTO hosts (hostid,host,status,useip,dns,ip,port)'.
+				' values ('.$proxyid.','.zbx_dbstr($name).','.$status.','.$useip.','.zbx_dbstr($dns).','.zbx_dbstr($ip).','.$port.')'))
 			{
 				return false;
 			}
@@ -800,7 +800,7 @@
 			return $proxyid;
 		}
 		else
-			return DBexecute('update hosts set host='.zbx_dbstr($name).' where hostid='.$proxyid);
+			return DBexecute('update hosts set host='.zbx_dbstr($name).',status='.$status.',useip='.$useip.',dns='.zbx_dbstr($dns).',ip='.zbx_dbstr($ip).',port='.$port.' where hostid='.$proxyid);
 	}
 
 	function delete_proxy($proxyids){
@@ -842,8 +842,8 @@
 		}
 	}
 
-	function add_proxy($name,$hosts=array()){
-		$proxyid = db_save_proxy($name);
+	function add_proxy($name,$status,$useip,$dns,$ip,$port,$hosts=array()){
+		$proxyid = db_save_proxy($name,$status,$useip,$dns,$ip,$port);
 		if(!$proxyid)
 			return	$proxyid;
 
@@ -852,8 +852,8 @@
 		return $proxyid;
 	}
 
-	function update_proxy($proxyid,$name,$hosts){
-		$result = db_save_proxy($name,$proxyid);
+	function update_proxy($proxyid,$name,$status,$useip,$dns,$ip,$port,$hosts){
+		$result = db_save_proxy($name,$status,$useip,$dns,$ip,$port,$proxyid);
 		if(!$result)
 			return	$result;
 
@@ -1217,7 +1217,7 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()){
 	}
 	else{
 		if($config['dropdown_first_remember']){
-			if($_REQUEST['groupid'] == -1) $_REQUEST['groupid'] = is_null($profile_groupid)?'0':$profile_groupid;
+			if($_REQUEST['groupid'] == -1) $_REQUEST['groupid'] = is_null($profile_groupid)? '0':$profile_groupid;
 			if(isset($groupids[$_REQUEST['groupid']])){
 				$result['selected'] = $_REQUEST['groupid'];
 			}
@@ -1259,26 +1259,26 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 			);
 
 	$def_options = array(
-				'deny_all' =>					0,
-				'allow_all' =>					0,
-				'select_first_host'=>			0,
-				'select_first_host_if_empty'=>	0,
-				'select_host_on_group_switch'=>	0,
-				'do_not_select' =>				0,
+				'deny_all' =>				0,
+				'allow_all' =>				0,
+				'select_first_host' =>			0,
+				'select_first_host_if_empty' =>		0,
+				'select_host_on_group_switch' =>	0,
+				'do_not_select' =>			0,
 				'do_not_select_if_empty' =>		0,
 				'monitored_hosts' =>			0,
 				'templated_hosts' =>			0,
-				'real_hosts' =>					0,
+				'real_hosts' =>				0,
 				'not_proxy_hosts' =>			0,
-				'with_items' =>					0,
+				'with_items' =>				0,
 				'with_monitored_items' =>		0,
-				'with_historical_items'=>		0,
-				'with_triggers' =>				0,
-				'with_monitored_triggers'=>		0,
-				'with_httptests' =>				0,
-				'with_monitored_httptests'=>	0,
-				'with_graphs'=>					0,
-				'only_current_node' =>			0,
+				'with_historical_items' =>		0,
+				'with_triggers' =>			0,
+				'with_monitored_triggers' =>		0,
+				'with_httptests' =>			0,
+				'with_monitored_httptests' =>		0,
+				'with_graphs' =>			0,
+				'only_current_node' =>			0
 			);
 
 	$def_options = zbx_array_merge($def_options, $options);
@@ -1470,7 +1470,7 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 	}
 	else{
 		if($config['dropdown_first_remember']){
-			if($_REQUEST['hostid'] == -1) $_REQUEST['hostid'] = is_null($profile_hostid)?'0':$profile_hostid;
+			if($_REQUEST['hostid'] == -1) $_REQUEST['hostid'] = is_null($profile_hostid)? '0':$profile_hostid;
 
 			if(isset($hostids[$_REQUEST['hostid']])){
 				$result['selected'] = $_REQUEST['hostid'];
@@ -1988,7 +1988,6 @@ return $result;
 			case HOST_STATUS_MONITORED:	$status = S_MONITORED;		break;
 			case HOST_STATUS_NOT_MONITORED:	$status = S_NOT_MONITORED;	break;
 			case HOST_STATUS_TEMPLATE:	$status = S_TEMPLATE;		break;
-			case HOST_STATUS_DELETED:	$status = S_DELETED;		break;
 			default:
 				$status = S_UNKNOWN;		break;
 		}

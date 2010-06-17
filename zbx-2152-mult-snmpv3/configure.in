@@ -768,7 +768,6 @@ AC_CHECK_FUNCS(vasprintf)
 AC_CHECK_FUNCS(asprintf)
 AC_CHECK_FUNCS(vsnprintf)
 AC_CHECK_FUNCS(hstrerror)
-AC_CHECK_FUNCS(atoll)
 AC_CHECK_FUNCS(getopt_long)
 AC_CHECK_FUNCS(strcasestr)
 AC_CHECK_FUNCS(getenv)
@@ -1261,6 +1260,7 @@ AC_OUTPUT([
 	src/libs/zbxplugin/Makefile
 	src/libs/zbxsys/Makefile
 	src/libs/zbxcomms/Makefile
+	src/libs/zbxcommshigh/Makefile
 	src/libs/zbxdb/Makefile
 	src/libs/zbxjson/Makefile
 	src/libs/zbxserver/Makefile
@@ -1283,6 +1283,7 @@ AC_OUTPUT([
 	src/zabbix_server/utils/Makefile
 	src/zabbix_server/watchdog/Makefile
 	src/zabbix_server/escalator/Makefile
+	src/zabbix_server/proxypoller/Makefile
 	src/zabbix_proxy/Makefile
 	src/zabbix_proxy/heart/Makefile
 	src/zabbix_proxy/housekeeper/Makefile

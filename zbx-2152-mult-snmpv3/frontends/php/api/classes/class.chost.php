@@ -373,7 +373,7 @@ class CHost extends CZBXAPI{
 			$sql_parts['where']['status'] = 'h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')';
 		}
 		else if(!is_null($options['proxy_hosts'])){
-			$sql_parts['where']['status'] = 'h.status IN ('.HOST_STATUS_PROXY.')';
+			$sql_parts['where']['status'] = 'h.status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')';
 		}
 		else{
 			$sql_parts['where']['status'] = 'h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
@@ -456,18 +456,20 @@ class CHost extends CZBXAPI{
 
 // pattern
 		if(!zbx_empty($options['pattern'])){
-			if($options['startPattern']){
-				$sql_parts['where']['host'] = ' UPPER(h.host) LIKE '.zbx_dbstr(zbx_strtoupper($options['pattern']).'%');
+			$exclude = is_null($options['excludePattern'])?'':' NOT ';
+
+			if(!is_null($options['startPattern'])){
+				$sql_parts['where']['host'] = ' UPPER(h.host) '.$exclude.' LIKE '.zbx_dbstr(zbx_strtoupper($options['pattern']).'%');
 			}
-			else if($options['extendPattern']){
+			else if(!is_null($options['extendPattern'])){
 				$sql_parts['where'][] = ' ( '.
-											'UPPER(h.host) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%').' OR '.
-											'h.ip LIKE '.zbx_dbstr('%'.$options['pattern'].'%').' OR '.
-											'UPPER(h.dns) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%').
+											'UPPER(h.host) '.$exclude.' LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%').' OR '.
+											'h.ip '.$exclude.' LIKE '.zbx_dbstr('%'.$options['pattern'].'%').' OR '.
+											'UPPER(h.dns) '.$exclude.' LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%').
 										' ) ';
 			}
 			else{
-				$sql_parts['where']['host'] = ' UPPER(h.host) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
+				$sql_parts['where']['host'] = ' UPPER(h.host) '.$exclude.' LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
 			}
 		}
 
@@ -477,7 +479,8 @@ class CHost extends CZBXAPI{
 			zbx_value2array($options['filter']);
 
 			if(isset($options['filter']['hostid']) && !is_null($options['filter']['hostid'])){
-				$sql_parts['where']['hostid'] = 'h.hostid='.$options['filter']['hostid'];
+				zbx_value2array($options['filter']['hostid']);
+				$sql_parts['where']['hostid'] = 'h.hostid='.DBcondition($options['filter']['hostid']);
 			}
 
 			if(isset($options['filter']['host']) && !is_null($options['filter']['host'])){
@@ -1195,7 +1198,7 @@ Copt::memoryPick();
 
 			$result &= CHost::massAdd($options);
 
-			if(isset($host['profile'])){
+			if(isset($host['profile']) && !empty($host['extendedProfile'])){
 				$fields = array_keys($host['profile']);
 				$fields = implode(', ', $fields);
 
@@ -1205,7 +1208,7 @@ Copt::memoryPick();
 				DBexecute('INSERT INTO hosts_profiles (hostid, '.$fields.') VALUES ('.$hostid.', '.$values.')');
 			}
 
-			if(isset($host['extendedProfile'])){
+			if(isset($host['extendedProfile']) && !empty($host['extendedProfile'])){
 				$fields = array_keys($host['extendedProfile']);
 				$fields = implode(', ', $fields);
 
@@ -1607,7 +1610,6 @@ Copt::memoryPick();
 					}
 
 					if(!empty($existing_profiles)){
-
 						$host_profile_fields = array('devicetype', 'name', 'os', 'serialno', 'tag','macaddress', 'hardware', 'software',
 							'contact', 'location', 'notes');
 						$sql_set = array();

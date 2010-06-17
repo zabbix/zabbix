@@ -1277,15 +1277,15 @@
 			if(!isset($info['type'])) $info['type'] = TRIGGER_VALUE_FALSE;
 
 			if($host['status'] == HOST_STATUS_TEMPLATE){
-				$info['type'] = TRIGGER_VALUE_UNKNOWN;
-				$info['status'][TRIGGER_VALUE_UNKNOWN]['count']	= 0;
-				$info['status'][TRIGGER_VALUE_UNKNOWN]['priority'] = 0;
-				$info['status'][TRIGGER_VALUE_UNKNOWN]['info']	= S_TEMPLATE_SMALL;
+				$info['type'] = TRIGGER_VALUE_FALSE;
+				$info['status'][TRIGGER_VALUE_FALSE]['count']	= 0;
+				$info['status'][TRIGGER_VALUE_FALSE]['priority'] = 0;
+				$info['status'][TRIGGER_VALUE_FALSE]['info']	= S_TEMPLATE_SMALL;
 			}
 			else if($host['status'] == HOST_STATUS_NOT_MONITORED){
-				$info['type'] = TRIGGER_VALUE_UNKNOWN;
-				$info['status'][TRIGGER_VALUE_UNKNOWN]['count']	= 0;
-				$info['status'][TRIGGER_VALUE_UNKNOWN]['priority']	= 0;
+				$info['type'] = TRIGGER_VALUE_FALSE;
+				$info['status'][TRIGGER_VALUE_FALSE]['count']	= 0;
+				$info['status'][TRIGGER_VALUE_FALSE]['priority']	= 0;
 				$info['disabled'] = 1;
 			}
 			else if(!isset($info['status'][TRIGGER_VALUE_FALSE])){
@@ -1341,7 +1341,7 @@
 //*/
 			else if(isset($info['maintenance_status'])){
 // Host in maintenance
-				$info['type'] = TRIGGER_VALUE_UNKNOWN;
+				$info['type'] = TRIGGER_VALUE_FALSE;
 
 				$msg = S_MAINTENANCE_BIG;
 				if($info['maintenanceid'] > 0){
@@ -1487,7 +1487,7 @@
 				'filter' => array('value' => array(TRIGGER_VALUE_UNKNOWN, TRIGGER_VALUE_TRUE)),
 				'output' => API_OUTPUT_EXTEND,
 				'nodeids' => get_current_nodeid(true)
-				);
+			);
 
 			$triggers = CTrigger::get($options);
 			$triggers = zbx_toHash($triggers, 'triggerid');
@@ -1677,17 +1677,17 @@
 				$info['triggers'] = array_merge($info['triggers'], $inf['triggers']);
 				$info['maintenances'] = array_merge($info['maintenances'], $inf['maintenances']);
 
+				if(isset($inf['disabled']) && ($inf['disabled'] == 1)) $info['disabled'] = 1;
+
 				foreach($inf['status'] as $type => $typeInfo){
 					if(!isset($info['status'][$type]['count'])) $info['status'][$type]['count'] = 0;
 					$info['status'][$type]['count'] += isset($typeInfo['count'])?$typeInfo['count']:1;
 
 					if(!isset($info['status'][$type]['priority']) || ($info['status'][$type]['priority'] < $typeInfo['priority'])){
 						$info['status'][$type]['priority'] = $typeInfo['priority'];
-						$info['status'][$type]['info'] = $typeInfo['info'];
+						$info['status'][$type]['info'] = isset($typeInfo['info'])?$typeInfo['info']:'';
 					}
 				}
-//SDII($inf);
-//SDII($info);
 			}
 
 			$info['triggers'] = array_unique($info['triggers']);

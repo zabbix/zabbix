@@ -20,7 +20,7 @@
 #ifndef ZABBIX_PROXYCONFIG_H
 #define ZABBIX_PROXYCONFIG_H
 
-extern	int	 CONFIG_PROXYCONFIG_FREQUENCY;
+extern int	CONFIG_PROXYCONFIG_FREQUENCY;
 
 void	main_proxyconfig_loop();
 

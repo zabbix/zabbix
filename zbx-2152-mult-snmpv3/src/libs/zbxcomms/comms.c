@@ -739,7 +739,11 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 				zbx_set_tcp_strerror("bind() for [[%s]:%s] failed with error %d: %s",
 						ip, port, zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
 				zbx_sock_close(s->sockets[s->num_socks]);
+#ifdef _WINDOWS
+				if (WSAEADDRINUSE == errno)
+#else
 				if (EADDRINUSE == errno)
+#endif
 					continue;
 				else
 					goto out;

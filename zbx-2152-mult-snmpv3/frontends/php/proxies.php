@@ -33,6 +33,11 @@
 	$fields=array(
 		'hostid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,		'isset({form})&&({form}=="update")'),
 		'host'=>	array(T_ZBX_STR, O_OPT,	NULL,   NOT_EMPTY,	'isset({save})'),
+		'status'=>	array(T_ZBX_INT, O_OPT,	NULL,   BETWEEN(HOST_STATUS_PROXY_ACTIVE,HOST_STATUS_PROXY_PASSIVE), 'isset({save})'),
+		'useip'=>	array(T_ZBX_STR, O_OPT, NULL,	IN('0,1'),	'isset({save})'),
+		'dns'=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'isset({save})'),
+		'ip'=>		array(T_ZBX_IP,  O_OPT, NULL,	NULL,		'isset({save})'),
+		'port'=>	array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,65535),'isset({save})'),
 		'hosts'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 // Actions
 		'go'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
@@ -58,7 +63,7 @@
 
 		DBstart();
 		if(isset($_REQUEST['hostid'])){
-			$result 	= update_proxy($_REQUEST['hostid'], $_REQUEST['host'], $hosts);
+			$result 	= update_proxy($_REQUEST['hostid'], $_REQUEST['host'], $_REQUEST['status'], $_REQUEST['useip'], $_REQUEST['dns'], $_REQUEST['ip'], $_REQUEST['port'], $hosts);
 			$action		= AUDIT_ACTION_UPDATE;
 			$msg_ok		= S_PROXY_UPDATED;
 			$msg_fail	= S_CANNOT_UPDATE_PROXY;
@@ -68,7 +73,7 @@
 			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 				access_deny();
 
-			$hostid		= add_proxy($_REQUEST['host'], $hosts);
+			$result = $hostid = add_proxy($_REQUEST['host'], $_REQUEST['status'], $_REQUEST['useip'], $_REQUEST['dns'], $_REQUEST['ip'], $_REQUEST['port'], $hosts);
 			$action		= AUDIT_ACTION_ADD;
 			$msg_ok		= S_PROXY_ADDED;
 			$msg_fail	= S_CANNOT_ADD_PROXY;
@@ -103,6 +108,7 @@
 	}
 	else if(isset($_REQUEST['clone']) && isset($_REQUEST['hostid'])){
 		unset($_REQUEST['hostid']);
+		unset($_REQUEST['hosts']);
 		$_REQUEST['form'] = 'clone';
 	}
 // ------- GO --------
@@ -173,7 +179,6 @@
 
 	if(isset($_REQUEST['form'])){
 		$_REQUEST['hostid'] = get_request('hostid', 0);
-		$hosts = array();
 		$frm_title = S_PROXY;
 		
 		$frmHostG = new CFormTable($frm_title, 'proxies.php');
@@ -187,19 +192,67 @@
 
 		if(($_REQUEST['hostid'] > 0) && !isset($_REQUEST['form_refresh'])){
 			$name = $proxy['host'];
+			$status = $proxy['status'];
+			if ($status == HOST_STATUS_PROXY_PASSIVE){
+				$useip = $proxy['useip'];
+				$dns = $proxy['dns'];
+				$ip = $proxy['ip'];
+				$port = $proxy['port'];
+			}
+			else{
+				$useip = get_request('useip', 1);
+				$dns = get_request('dns', '');
+				$ip = get_request('ip', '0.0.0.0');
+				$port = get_request('port', 10051);
+			}
 			$db_hosts = DBselect(
 				'SELECT hostid '.
 				' FROM hosts '.
 				' WHERE proxy_hostid='.$_REQUEST['hostid']);
 
+			$hosts = array();
 			while($db_host = DBfetch($db_hosts))
 				array_push($hosts, $db_host['hostid']);
 		}
 		else{
 			$name = get_request('host', '');
+			$status = get_request('status', HOST_STATUS_PROXY_ACTIVE);
+			$useip = get_request('useip', 1);
+			$dns = get_request('dns', '');
+			$ip = get_request('ip', '0.0.0.0');
+			$port = get_request('port', 10051);
+			$hosts = get_request('hosts',array());
 		}
 
 		$frmHostG->addRow(S_PROXY_NAME, new CTextBox('host', $name, 30));
+
+		$statusBox = new CComboBox('status', $status, 'submit()');
+		$statusBox->addItem(HOST_STATUS_PROXY_ACTIVE, S_ACTIVE);
+		$statusBox->addItem(HOST_STATUS_PROXY_PASSIVE, S_PASSIVE);
+		$frmHostG->addRow(S_PROXY_MODE, $statusBox);
+
+		if ($status == HOST_STATUS_PROXY_PASSIVE){
+			$frmHostG->addRow(S_DNS_NAME, new CTextBox('dns', $dns, '40'));
+			if(defined('ZBX_HAVE_IPV6')){
+				$frmHostG->addRow(S_IP_ADDRESS, new CTextBox('ip', $ip, '39'));
+			}
+			else{
+				$frmHostG->addRow(S_IP_ADDRESS, new CTextBox('ip', $ip, '15'));
+			}
+
+			$cmbConnectBy = new CComboBox('useip', $useip);
+			$cmbConnectBy->addItem(0, S_DNS_NAME);
+			$cmbConnectBy->addItem(1, S_IP_ADDRESS);
+			$frmHostG->addRow(S_CONNECT_TO, $cmbConnectBy);
+
+			$frmHostG->addRow(S_PORT, new CNumericBox('port', $port, 5));
+		}
+		else{
+			$frmHostG->addVar('dns', $dns);
+			$frmHostG->addVar('ip', $ip);
+			$frmHostG->addVar('useip', $useip);
+			$frmHostG->addVar('port', $port);
+		}
 
 		$cmbHosts = new CTweenBox($frmHostG, 'hosts', $hosts);
 
@@ -224,9 +277,10 @@
 			$frmHostG->addItemToBottomRow(array(
 				SPACE, new CButton('clone',S_CLONE), 
 				SPACE, new CButtonDelete(S_DELETE_SELECTED_PROXY_Q, url_param('form').url_param('hostid')),
-				SPACE, new CButtonCancel()
+				SPACE
 			));
 		}
+		$frmHostG->addItemToBottomRow(new CButtonCancel());
 
 		$proxies_wdgt->addItem($frmHostG);
 		$proxies_wdgt->show();
@@ -244,6 +298,7 @@
 		$table->setHeader(array(
 			new CCheckBox('all_hosts', NULL, "checkAll('".$form->GetName()."','all_hosts','hosts');"),
 			make_sorting_header(S_NAME, 'host'),
+			S_MODE,
 			S_LASTSEEN_AGE,
 			S_HOST_COUNT,
 			S_ITEM_COUNT,
@@ -309,6 +364,7 @@
 			$table->addRow(array(
 				new CCheckBox('hosts['.$proxy['proxyid'].']', NULL, NULL, $proxy['proxyid']),
 				new CLink($proxy['host'], 'proxies.php?form=update&hostid='.$proxy['proxyid']),
+				$proxy['status'] == HOST_STATUS_PROXY_ACTIVE ? S_ACTIVE : S_PASSIVE,
 				($proxy['lastaccess'] == 0) ? '-' : zbx_date2age($proxy['lastaccess']),
 				count($proxy['hosts']),
 				isset($proxy['item_count']) ? $proxy['item_count'] : 0,
