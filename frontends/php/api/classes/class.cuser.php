@@ -535,12 +535,12 @@ Copt::memoryPick();
 
 		if(!is_null($sessionid)){
 			$sql = 'SELECT u.*,s.* '.
-					' FROM sessions s,users u'.
-					' WHERE s.sessionid='.zbx_dbstr($sessionid).
-						' AND s.status='.ZBX_SESSION_ACTIVE.
-						' AND s.userid=u.userid'.
-						' AND ((s.lastaccess+u.autologout>'.time().') OR (u.autologout=0))'.
-						' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID);
+				' FROM sessions s,users u'.
+				' WHERE s.sessionid='.zbx_dbstr($sessionid).
+					' AND s.status='.ZBX_SESSION_ACTIVE.
+					' AND s.userid=u.userid'.
+					' AND ((s.lastaccess+u.autologout>'.time().') OR (u.autologout=0))'.
+					' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID);
 
 			$login = $USER_DETAILS = DBfetch(DBselect($sql));
 
