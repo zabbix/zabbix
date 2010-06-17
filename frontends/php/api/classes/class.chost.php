@@ -456,18 +456,20 @@ class CHost extends CZBXAPI{
 
 // pattern
 		if(!zbx_empty($options['pattern'])){
-			if($options['startPattern']){
-				$sql_parts['where']['host'] = ' UPPER(h.host) LIKE '.zbx_dbstr(zbx_strtoupper($options['pattern']).'%');
+			$exclude = is_null($options['excludePattern'])?'':' NOT ';
+
+			if(!is_null($options['startPattern'])){
+				$sql_parts['where']['host'] = ' UPPER(h.host) '.$exclude.' LIKE '.zbx_dbstr(zbx_strtoupper($options['pattern']).'%');
 			}
-			else if($options['extendPattern']){
+			else if(!is_null($options['extendPattern'])){
 				$sql_parts['where'][] = ' ( '.
-											'UPPER(h.host) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%').' OR '.
-											'h.ip LIKE '.zbx_dbstr('%'.$options['pattern'].'%').' OR '.
-											'UPPER(h.dns) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%').
+											'UPPER(h.host) '.$exclude.' LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%').' OR '.
+											'h.ip '.$exclude.' LIKE '.zbx_dbstr('%'.$options['pattern'].'%').' OR '.
+											'UPPER(h.dns) '.$exclude.' LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%').
 										' ) ';
 			}
 			else{
-				$sql_parts['where']['host'] = ' UPPER(h.host) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
+				$sql_parts['where']['host'] = ' UPPER(h.host) '.$exclude.' LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
 			}
 		}
 
