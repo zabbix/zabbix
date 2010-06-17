@@ -419,10 +419,10 @@
 	define('TIME_TYPE_SERVER',	1);
 	define('TIME_TYPE_HOST',	2);
 
-	define('FILTER_TAST_SHOW',		0);
-	define('FILTER_TAST_HIDE',		1);
-	define('FILTER_TAST_MARK',		2);
-	define('FILTER_TAST_INVERT_MARK',	3);
+	define('FILTER_TASK_SHOW',		0);
+	define('FILTER_TASK_HIDE',		1);
+	define('FILTER_TASK_MARK',		2);
+	define('FILTER_TASK_INVERT_MARK',	3);
 
 	define('MARK_COLOR_RED',	1);
 	define('MARK_COLOR_GREEN',	2);
