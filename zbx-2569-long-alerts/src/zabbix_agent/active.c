@@ -1102,7 +1102,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 	init_active_metrics();
 
-	while(ZBX_IS_RUNNING)
+	while(ZBX_IS_RUNNING())
 	{
 		if(time(NULL) >= nextsend)
 		{
