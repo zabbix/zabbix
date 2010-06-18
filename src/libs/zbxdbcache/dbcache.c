@@ -939,7 +939,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 	{
 		if (0 == tr[i].clock)
 		{
-			THIS_SHOULD_NEVER_HAPPEN();
+			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
 		}
 
