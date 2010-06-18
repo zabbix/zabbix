@@ -102,6 +102,9 @@ include_once('include/page_header.php');
 				'color' => $item_color
 			);
 		}
+		
+		$httptest = get_httptest_by_httptestid($httptestid);
+		$graph_name = $httptest['name'];
 	}
 	else{
 		$items = get_request('items', array());
@@ -118,10 +121,11 @@ include_once('include/page_header.php');
 		foreach($items as $id => $gitem){
 			if(!isset($db_data[$gitem['itemid']])) access_deny();
 		}
+		$graph_name = get_request('name', '');
 	}
 
 	$graph = new CChart(get_request('graphtype', GRAPH_TYPE_NORMAL));
-	$graph->setHeader(get_request('name', ''));
+	$graph->setHeader($graph_name);
 
 	navigation_bar_calc();
 
