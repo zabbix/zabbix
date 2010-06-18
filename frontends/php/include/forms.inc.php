@@ -4515,10 +4515,24 @@
 		$vbox->setAttribute('id', 'cb_tplrplc');
 		if(isset($visible['template_table'])) $vbox->setAttribute('disabled', 'disabled');
 		$action = $vbox->getAttribute('onclick');
-		$action .= 'if($("cb_tpladd").disabled) $("cb_tpladd").enable(); else $("cb_tpladd").disable();';
+		$action .= <<<JAVASCRIPT
+if($("cb_tpladd").disabled){
+	$("cb_tpladd").enable();
+}
+else{
+	$("cb_tpladd").disable();
+}
+$("clrcbdiv").toggle();
+JAVASCRIPT;
 		$vbox->setAttribute('onclick', $action);
 
-		$frmHost->addRow(array($vbox, S_RELINK_TEMPLATES),	$template_table_r, 'T');
+		$clear_cb = new CCheckBox('mass_clear_tpls', get_request('mass_clear_tpls', false));
+		$div = new CDiv(array($clear_cb, S_CLEAR_WHEN_UNLINKING));
+		$div->setAttribute('id', 'clrcbdiv');
+		$div->addStyle('margin-left: 20px;');
+		if(!isset($visible['template_table_r'])) $div->addStyle('display: none;');
+
+		$frmHost->addRow(array($vbox, S_RELINK_TEMPLATES, $div), $template_table_r, 'T');
 // }}} RELINK TEMPLATES
 
 
@@ -5985,7 +5999,7 @@
 			$footer = array(new CButton('save', S_SAVE));
 		}
 
-		return new CFormElement(S_MACROS, $macros_tbl, $footer); 
+		return new CFormElement(S_MACROS, $macros_tbl, $footer);
 
 	}
 
