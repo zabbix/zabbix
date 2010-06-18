@@ -629,7 +629,7 @@ class CHost extends CZBXAPI{
 						$result[$host['hostid']]['triggers'][] = array('triggerid' => $host['triggerid']);
 						unset($host['triggerid']);
 					}
-					
+
 // itemids
 					if(isset($host['itemid']) && is_null($options['select_items'])){
 						if(!isset($result[$host['hostid']]['items']))
@@ -857,11 +857,11 @@ Copt::memoryPick();
 			if(is_array($options['select_graphs']) || str_in_array($options['select_graphs'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['select_graphs'];
 				$graphs = CGraph::get($obj_params);
-				
+
 				if(!is_null($options['limitSelects'])) order_result($graphs, 'name');
 				foreach($graphs as $graphid => $graph){
 					unset($graphs[$graphid]['hosts']);
-					
+
 					foreach($graph['hosts'] as $hnum => $host){
 						if(!is_null($options['limitSelects'])){
 							if(!isset($count[$host['hostid']])) $count[$host['hostid']] = 0;
@@ -1277,17 +1277,17 @@ Copt::memoryPick();
 					self::exception(ZBX_API_ERROR_PERMISSIONS, 'You do not have enough rights for operation');
 				}
 			}
-	
+
 			$transaction = self::BeginTransaction(__METHOD__);
-	
+
 			foreach($hosts as $num => $host){
 				$tmp = $host;
 				$host['hosts'] = $tmp;
-	
+
 				$result = self::massUpdate($host);
 				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Host update failed');
 			}
-	
+
 			$result = self::EndTransaction($result, __METHOD__);
 
 			return array('hostids' => $hostids);
@@ -1326,31 +1326,31 @@ Copt::memoryPick();
 
 		try{
 			$transaction = self::BeginTransaction(__METHOD__);
-	
+
 			if(isset($data['groups'])){
 				$options = array(
-					'groups' => zbx_toArray($data['groups']), 
+					'groups' => zbx_toArray($data['groups']),
 					'hosts' => zbx_toArray($data['hosts'])
 				);
 				$result = CHostGroup::massAdd($options);
 			}
-	
+
 			if(isset($data['templates'])){
 				$options = array(
-					'hosts' => zbx_toArray($data['hosts']), 
+					'hosts' => zbx_toArray($data['hosts']),
 					'templates' => zbx_toArray($data['templates'])
 				);
 				$result = CTemplate::massAdd($options);
 			}
-	
+
 			if(isset($data['macros'])){
 				$options = array(
-					'hosts' => zbx_toArray($data['hosts']), 
+					'hosts' => zbx_toArray($data['hosts']),
 					'macros' => $data['macros']
 				);
 				$result = CUserMacro::massAdd($options);
 			}
-	
+
 			$result = self::EndTransaction($result, __METHOD__);
 		}
 		catch(APIException $e){
@@ -1430,7 +1430,7 @@ Copt::memoryPick();
 				}
 
 				$cur_host = reset($hosts);
-				
+
 				$options = array(
 					'filter' => array(
 						'host' => $cur_host['host']),
@@ -1439,12 +1439,12 @@ Copt::memoryPick();
 					'nopermissions' => 1
 				);
 				$host_exists = self::get($options);
-				
+
 				$host_exists = reset($host_exists);
 
 				if(!empty($host_exists) && ($host_exists['hostid'] != $cur_host['hostid'])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
-				}				
+				}
 			}
 
 			if(isset($data['host']) && !preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $data['host'])){
@@ -1482,7 +1482,7 @@ Copt::memoryPick();
 // UPDATE HOSTGROUPS LINKAGE {{{
 			if(isset($data['groups']) && !is_null($data['groups'])){
 				$data['groups'] = zbx_toArray($data['groups']);
-				
+
 				$host_groups = CHostGroup::get(array('hostids' => $hostids));
 				$host_groupids = zbx_objectValues($host_groups, 'groupid');
 				$new_groupids = zbx_objectValues($data['groups'], 'groupid');
@@ -1536,7 +1536,7 @@ Copt::memoryPick();
 						self::exception(ZBX_API_ERROR_PARAMETERS, S_CANNOT_UNLINK_TEMPLATE);
 					}
 				}
-				
+
 				$result = self::massAdd(array('hosts' => $hosts, 'templates' => $new_templateids));
 				if(!$result){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_CANNOT_LINK_TEMPLATE);
