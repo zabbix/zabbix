@@ -2316,6 +2316,13 @@
 
 		$links = $map['links'];
 		$selements = $map['selements'];
+		$labelLines = Array();
+		foreach($selements as $selementid => $selement){
+			$labelLines[$selementid] = expand_map_element_label_by_data($selement);
+		}
+		
+		$allLabelsSize = imageTextSize(8,0, str_replace("\r", '', str_replace("\n", '', implode(' ', $labelLines))));
+		$labelFontHeight = $allLabelsSize['height'];
 
 		foreach($selements as $selementid => $selement){
 			if(empty($selement)) continue;
@@ -2336,7 +2343,7 @@
 
 				if(isset($el_info['unavailable']))		$st_color = true;
 				if(isset($el_info['disabled']))			$st_color = true;
-				if(!empty($el_info['maintenances']))	$st_color = true;
+				if(!empty($el_info['maintenances']))		$st_color = true;
 			}
 
 			$mainProblems = array(
@@ -2355,7 +2362,7 @@
 			$label_location = $selement['label_location'];
 			if(is_null($label_location) || ($label_location < 0)) $label_location = $map['label_location'];
 
-			$label_line = expand_map_element_label_by_data($selement);
+			$label_line = $labelLines[$selementid];
 
 			$info_line = array();
 			foreach($el_info['info'] as $key => $info){
@@ -2376,7 +2383,8 @@
 			}
 
 			if($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_IMAGE){
-				$label_line = expand_map_element_label_by_data($selement);
+				//$label_line = expand_map_element_label_by_data($selement);
+				$label_line = $labelLines[$selementid]; // to minimize queries
 			}
 
 // LABEL
@@ -2393,7 +2401,7 @@
 			$w = 0;
 			foreach($strings as $strnum => $str){
 				$dims = imageTextSize(8,0,$str);
-				$h += $dims['height'];
+				$h += $labelFontHeight+4;
 				$w = max($w, $dims['width']);
 			}
 
@@ -2423,8 +2431,9 @@
 					$x_rec = $x + $iconX/2 - $w/2;
 			}
 
-//		imagerectangle($im, $x_rec-2-1, $y_rec-1, $x_rec+$w+2+1, $y_rec+($oc*4)+$h+1, $black);
-//		imagefilledrectangle($im, $x_rec-2, $y_rec-2, $x_rec+$w+2, $y_rec+($oc*4)+$h-2, $white);
+//		$y_rec += 30;
+//		imagerectangle($im, $x_rec-2-1, $y_rec-3, $x_rec+$w+2+1, $y_rec+($oc*4)+$h+3, $label_color);
+//		imagefilledrectangle($im, $x_rec-2, $y_rec-2, $x_rec+$w+2, $y_rec+($oc*4)+$h-2, $colors['White']);
 			
 			$tmpDims = imageTextSize(8,0, str_replace("\n", '', $label_line));
 			$maxHeight = $tmpDims['height'];
@@ -2436,7 +2445,9 @@
 				if(zbx_empty($str)) continue;
 
 				$dims = imageTextSize(8,0,$str);
-				$dims['height'] = $maxHeight;
+				$dims['height'] = $labelFontHeight;
+				//$str .= ' - '.$labelFontHeight.' - '.$dims['height'];
+				//$str = $dims['width'].'x'.$dims['height'];
 
 				$color = $label_color;
 
@@ -2449,13 +2460,13 @@
 
 				imagefilledrectangle(
 					$im,
-					$x_label-2, $y_rec+$increasey-2,
-					$x_label+$dims['width']+2, $y_rec+$increasey+$dims['height']+2,
+					$x_label-2, $y_rec+$increasey+1,
+					$x_label+$dims['width'], $y_rec+$increasey+$dims['height']+3,
 					$colors['White']
 				);
-				imagetext($im, 8, 0, $x_label, $y_rec+$dims['height']+$increasey, $color, $str);
+				imagetext($im, 8, 0, $x_label, $y_rec+$increasey+$dims['height'], $color, $str);
 
-				$increasey+= $dims['height']+4;
+				$increasey += $dims['height']+3;
 				$num++;
 			}
 
@@ -2479,7 +2490,7 @@
 				imagefilledrectangle(
 					$im,
 					$x_label-2, $y_rec+$increasey-2,
-					$x_label+$dims['width']+2, $y_rec+$increasey+$dims['height']+2,
+					$x_label+$dims['width']+1, $y_rec+$increasey+$dims['height']+2,
 					$colors['White']
 				);
 				imagetext($im, 8, 0, $x_label, $y_rec+$dims['height']+$increasey, $color, $str);
