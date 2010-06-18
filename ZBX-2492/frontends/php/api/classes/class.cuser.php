@@ -347,7 +347,7 @@ class CUser extends CZBXAPI{
 
 		if($login){
 			if(($login['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS) && ((time() - $login['attempt_clock']) < ZBX_LOGIN_BLOCK)){
-				$_REQUEST['message'] = S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_SECONDS_FIRST_PART.(ZBX_LOGIN_BLOCK - (time() - $login['attempt_clock'])).S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_SECONDS_SECOND_PART;
+				$_REQUEST['message'] = S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_SECONDS_FIRST_PART.SPACE.(ZBX_LOGIN_BLOCK - (time() - $login['attempt_clock'])).SPACE.S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_SECONDS_SECOND_PART;
 				return false;
 			}
 
@@ -735,7 +735,7 @@ class CUser extends CZBXAPI{
 
 			$user_exist = self::getObjects(array('alias' => $user['alias']));
 			if(!empty($user_exist)){
-				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_CUSER_ERROR_USER_EXISTS_FIRST_PART.$user_exist[0]['alias'].S_CUSER_ERROR_USER_EXISTS_SECOND_PART);
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_CUSER_ERROR_USER_EXISTS_FIRST_PART.SPACE.$user_exist[0]['alias'].SPACE.S_CUSER_ERROR_USER_EXISTS_SECOND_PART);
 				$result = false;
 				break;
 			}
@@ -889,7 +889,7 @@ class CUser extends CZBXAPI{
 						' AND '.DBin_node('userid', id2nodeid($user['userid']));
 			$db_user = DBfetch(DBselect($sql));
 			if($db_user && ($db_user['userid'] != $user['userid'])){
-				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_CUSER_ERROR_USER_EXISTS_FIRST_PART.$user['alias'].S_CUSER_ERROR_USER_EXISTS_SECOND_PART);
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_CUSER_ERROR_USER_EXISTS_FIRST_PART.SPACE.$user['alias'].SPACE.S_CUSER_ERROR_USER_EXISTS_SECOND_PART);
 				$result = false;
 				break;
 			}
@@ -942,13 +942,13 @@ class CUser extends CZBXAPI{
 					if(!$result) break;
 
 					if(($group['gui_access'] == GROUP_GUI_ACCESS_DISABLED) && $self){
-						$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_CUSER_ERROR_USER_UNABLE_RESTRICT_SELF_GUI_ACCESS_PART1.$group['name'].S_CUSER_ERROR_USER_UNABLE_RESTRICT_SELF_GUI_ACCESS_PART2);
+						$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_CUSER_ERROR_USER_UNABLE_RESTRICT_SELF_GUI_ACCESS_PART1.SPACE.$group['name'].SPACE.S_CUSER_ERROR_USER_UNABLE_RESTRICT_SELF_GUI_ACCESS_PART2);
 						$result = false;
 						break;
 					}
 
 					if(($group['users_status'] == GROUP_STATUS_DISABLED) && $self){
-						$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_CUSER_ERROR_USER_CANT_DISABLE_SELF_PART1.$group['name'].S_CUSER_ERROR_USER_CANT_DISABLE_SELF_PART2);
+						$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_CUSER_ERROR_USER_CANT_DISABLE_SELF_PART1.SPACE.$group['name'].SPACE.S_CUSER_ERROR_USER_CANT_DISABLE_SELF_PART2);
 						$result = false;
 						break;
 					}
@@ -1319,7 +1319,7 @@ class CUser extends CZBXAPI{
 // UPDATE
 			foreach($upd_medias as $mnum => $media){
 				if(!validate_period($media['period'])){
-					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_WRONG_PERIOD_PART1.$media['period'].S_CUSER_ERROR_WRONG_PERIOD_PART2);
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_WRONG_PERIOD_PART1.SPACE.$media['period'].SPACE.S_CUSER_ERROR_WRONG_PERIOD_PART2);
 				}
 
 				$sql = 'UPDATE media '.

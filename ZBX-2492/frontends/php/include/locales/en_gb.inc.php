@@ -1409,14 +1409,14 @@
 
 //	chart4.php
 	'S_CHART4_HEADER_TITLE_PART1'=>		'',
-	'S_CHART4_HEADER_TITLE_PART2'=>		' (year ',
+	'S_CHART4_HEADER_TITLE_PART2'=>		'(year',
 	'S_CHART4_HEADER_TITLE_PART3'=>		')',
 	'S_CHART4_HEADER_DATE_FORMAT'=>		'Y',
 	'S_CHART4_TIMELINE_DATE_FORMAT'=>	'd.F',
 
 //	chart5.php
 	'S_CHART5_HEADER_TITLE_PART1'=>		'',
-	'S_CHART5_HEADER_TITLE_PART2'=>		' (year ',
+	'S_CHART5_HEADER_TITLE_PART2'=>		'(year',
 	'S_CHART5_HEADER_TITLE_PART3'=>		')',
 	'S_CHART5_HEADER_DATE_FORMAT'=>		'Y',
 	'S_CHART5_TIMELINE_DATE_FORMAT'=>	'd.M',
@@ -2131,8 +2131,8 @@
 	'S_TEMPLATE_WITH_ITEM_KEY'=>			'Template with item key',
 	'S_TEMPLATE_WITH_APPLICATION'=>			'Template with application',
 	'S_ALREADY_LINKED_TO_HOST_SMALL'=>		'already linked to host',
-	'S_HOST_HAS_BEEN_DELETED_MSG_PART1'=>		'Host ',
-	'S_HOST_HAS_BEEN_DELETED_MSG_PART2'=>		' has been deleted from the system',
+	'S_HOST_HAS_BEEN_DELETED_MSG_PART1'=>		'Host',
+	'S_HOST_HAS_BEEN_DELETED_MSG_PART2'=>		'has been deleted from the system',
 
 //	validate.inc.php
 	'S_CRITICAL_ERROR'=>				'Critical error',
@@ -2293,13 +2293,12 @@
 	'S_REQUIRED_SESSION_MODULE' => 'Required Session module',
 
 //	class.cuser.php
-	'S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_SECONDS_FIRST_PART'=> 'Account is blocked for ',
-	'S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_SECONDS_SECOND_PART'=>	' seconds',
+	'S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_SECONDS_FIRST_PART'=> 'Account is blocked for',
+	'S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_SECONDS_SECOND_PART'=>	'seconds',
 	'S_CUSER_ERROR_LOGIN_OR_PASSWORD_INCORRECT'=>		'Login name or password is incorrect',
 	'S_CUSER_ERROR_SESSION_TERMINATED'=>			'Session terminated, please re-login!',
 	'S_CUSER_ERROR_TABLE_USERS_EMPTY'=>			'Table users is empty. Possible database corruption.',
 	'S_CUSER_ERROR_LDAP_MODULE_MISSING'=>			'Probably php-ldap module is missing',
-//	'S_CUSER_ERROR_ATTEMP_FAILED'=>						'%1$s failed login attempts logged. Last failed attempt was from %2$s on %3$s.',
 	'S_CUSER_ERROR_FAILED_LOGIN_ATTEMPTS'=>				'failed login attempts logged.',
 	'S_CUSER_ERROR_LAST_FAILED_ATTEMPTS'=>				'Last failed attempt was from',
 	'S_CUSER_ERROR_ONLY_ADMIN_CAN_CREATE_USERS'=>		'Only Super Admins can create Users',
@@ -2312,16 +2311,16 @@
 	'S_CUSER_ERROR_CANT_UPDATE_USER_MEDIAS'=>		'Can\'t update user medias',
 	'S_CUSER_ERROR_CANT_INSERT_USER_MEDIAS'=>		'Can\'t insert user medias',
 	'S_CUSER_ERROR_WRONG_FIELD_FOR_USER'=>			'Wrong fields for user',
-	'S_CUSER_ERROR_USER_EXISTS_FIRST_PART'=>		'User [ ',
-	'S_CUSER_ERROR_USER_EXISTS_SECOND_PART'=>		' ] already exists',
+	'S_CUSER_ERROR_USER_EXISTS_FIRST_PART'=>		'User [',
+	'S_CUSER_ERROR_USER_EXISTS_SECOND_PART'=>		'] already exists',
 	'S_CUSER_ERROR_CANT_RENAME_GUEST_USER'=>		'Cannot rename guest user',
 	'S_CUSER_ERROR_USER_UNABLE_RESTRICT_SELF_GUI_ACCESS_PART1'=>	'User cannot restrict access to GUI for himself. Group "',
 	'S_CUSER_ERROR_USER_UNABLE_RESTRICT_SELF_GUI_ACCESS_PART2'=>	'"',
 	'S_CUSER_ERROR_USER_CANT_DISABLE_SELF_PART1'=>		'User cannot disable himself. Group "',
 	'S_CUSER_ERROR_USER_CANT_DISABLE_SELF_PART2'=>		'"',
 	'S_CUSER_ERROR_INCORRECT_TIME_PERIOD'=>			'Incorrect time period',
-	'S_CUSER_ERROR_WRONG_PERIOD_PART1'=>			'Wrong period [ ',
-	'S_CUSER_ERROR_WRONG_PERIOD_PART2'=>			' ]',
+	'S_CUSER_ERROR_WRONG_PERIOD_PART1'=>			'Wrong period [',
+	'S_CUSER_ERROR_WRONG_PERIOD_PART2'=>			']',
 	'S_CUSER_ERROR_INTERNAL_ZABBIX_ERROR'=>			'Internal Zabbix error',
 
 //	config.inc.php
@@ -2330,9 +2329,9 @@
 	'S_CONFIG_NOT_LOGGED_IN_NOTE'=>				'If you think this message is wrong, please consult your administrators about getting the necessary permissions.',
 	'S_CONFIG_ERROR_YOU_ARE_NOT_LOGGED_IN_HEAD'=>		'You are not logged in.',
 	'S_CONFIG_ERROR_HEAD'=>					'ERROR',
-	'S_CONFIG_WARNING_WRONG_MONTH_PART1'=>			'[Wrong value for month: ',
+	'S_CONFIG_WARNING_WRONG_MONTH_PART1'=>			'[Wrong value for month:',
 	'S_CONFIG_WARNING_WRONG_MONTH_PART2'=>			']',
-	'S_CONFIG_WARNING_WRONG_DOW_PART1'=>			'[Wrong value for day of week: ',
+	'S_CONFIG_WARNING_WRONG_DOW_PART1'=>			'[Wrong value for day of week:',
 	'S_CONFIG_WARNING_WRONG_DOW_PART2'=>			']',
 
 //	Menu
