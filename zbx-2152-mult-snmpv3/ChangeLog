@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBX-2152] fixed names of SNMPv3 security levels (asaveljevs)
  - [ZBX-2563] fixed warnings in m4/libunixodbc.m4 with newer autotools (asaveljevs)
  - [ZBX-2543] fixed password reset when edit user profile and auth type is not internal (Vedmak)
  - [ZBX-2524] fixed deleting media types (Aly)
