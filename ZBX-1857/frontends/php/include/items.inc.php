@@ -324,7 +324,7 @@
 			return FALSE;
 		}
 
-		if(($item['snmp_port']<1)||($item['snmp_port']>65535)){
+		if(($item['snmp_port']<1 || $item['snmp_port']>65535) && in_array($item['type'],array(ITEM_TYPE_SNMPV1,ITEM_TYPE_SNMPV2C,ITEM_TYPE_SNMPV3))){
 			error(S_INVALID_SNMP_PORT);
 			return FALSE;
 		}
