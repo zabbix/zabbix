@@ -2041,7 +2041,7 @@ int	str_in_list(char *list, const char *value, const char delimiter)
  *      maxlen - size of output buffer                                        *
  *                                                                            *
  * Return value:                                                              *
- *      1 - requested parameter missing                                        *
+ *      1 - requested parameter missing                                       *
  *      0 - requested parameter found (value - 'buf' can be empty string)     *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -2051,26 +2051,18 @@ int	str_in_list(char *list, const char *value, const char delimiter)
  ******************************************************************************/
 int	get_key_param(char *param, int num, char *buf, int maxlen)
 {
-	int	ret = 0;
-
-	char *pl, *pr;
+	int	ret;
+	char	*pl, *pr;
 
 	pl = strchr(param, '[');
 	pr = strrchr(param, ']');
 
-	if(pl > pr)
+	if (NULL == pl || NULL == pr || pl > pr)
 		return 1;
 
-	if(!pl || !pr || (pl && !pr) || (!pl && pr))
-		return 1;
-
-	if(pr != NULL)
-		pr[0] = 0;
-
-	ret = get_param(pl+1, num, buf, maxlen);
-
-	if(pr != NULL)
-		pr[0]=']';
+	*pr = '\0';
+	ret = get_param(pl + 1, num, buf, maxlen);
+	*pr = ']';
 
 	return ret;
 }
@@ -2094,33 +2086,21 @@ int	get_key_param(char *param, int num, char *buf, int maxlen)
  ******************************************************************************/
 int	num_key_param(char *param)
 {
-	int	ret = 1;
+	int	ret;
+	char	*pl, *pr;
 
-	char *pl, *pr;
-
-	if(param == NULL)
+	if (NULL == param)
 		return 0;
 
 	pl = strchr(param, '[');
 	pr = strrchr(param, ']');
 
-	if(pl > pr)
+	if (NULL == pl || NULL == pr || pl > pr)
 		return 0;
 
-	if(!pl || !pr || (pl && !pr) || (!pl && pr))
-		return 0;
-
-	if(pl != NULL)
-		pl[0] = 0;
-	if(pr != NULL)
-		pr[0] = 0;
-
-	ret = num_param(pl+1);
-
-	if(pl != NULL)
-		pl[0]='[';
-	if(pr != NULL)
-		pr[0]=']';
+	*pr = '\0';
+	ret = num_param(pl + 1);
+	*pr = ']';
 
 	return ret;
 }
