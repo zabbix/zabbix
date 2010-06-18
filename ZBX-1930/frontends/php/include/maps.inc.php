@@ -1277,15 +1277,15 @@
 			if(!isset($info['type'])) $info['type'] = TRIGGER_VALUE_FALSE;
 
 			if($host['status'] == HOST_STATUS_TEMPLATE){
-				$info['type'] = TRIGGER_VALUE_UNKNOWN;
-				$info['status'][TRIGGER_VALUE_UNKNOWN]['count']	= 0;
-				$info['status'][TRIGGER_VALUE_UNKNOWN]['priority'] = 0;
-				$info['status'][TRIGGER_VALUE_UNKNOWN]['info']	= S_TEMPLATE_SMALL;
+				$info['type'] = TRIGGER_VALUE_FALSE;
+				$info['status'][TRIGGER_VALUE_FALSE]['count']	= 0;
+				$info['status'][TRIGGER_VALUE_FALSE]['priority'] = 0;
+				$info['status'][TRIGGER_VALUE_FALSE]['info']	= S_TEMPLATE_SMALL;
 			}
 			else if($host['status'] == HOST_STATUS_NOT_MONITORED){
-				$info['type'] = TRIGGER_VALUE_UNKNOWN;
-				$info['status'][TRIGGER_VALUE_UNKNOWN]['count']	= 0;
-				$info['status'][TRIGGER_VALUE_UNKNOWN]['priority']	= 0;
+				$info['type'] = TRIGGER_VALUE_FALSE;
+				$info['status'][TRIGGER_VALUE_FALSE]['count']	= 0;
+				$info['status'][TRIGGER_VALUE_FALSE]['priority']	= 0;
 				$info['disabled'] = 1;
 			}
 			else if(!isset($info['status'][TRIGGER_VALUE_FALSE])){
@@ -1677,6 +1677,8 @@
 				$info['triggers'] = array_merge($info['triggers'], $inf['triggers']);
 				$info['maintenances'] = array_merge($info['maintenances'], $inf['maintenances']);
 
+				if(isset($inf['disabled']) && ($inf['disabled'] == 1)) $info['disabled'] = 1;
+
 				foreach($inf['status'] as $type => $typeInfo){
 					if(!isset($info['status'][$type]['count'])) $info['status'][$type]['count'] = 0;
 					$info['status'][$type]['count'] += isset($typeInfo['count'])?$typeInfo['count']:1;
@@ -1686,8 +1688,6 @@
 						$info['status'][$type]['info'] = isset($typeInfo['info'])?$typeInfo['info']:'';
 					}
 				}
-//SDII($inf);
-//SDII($info);
 			}
 
 			$info['triggers'] = array_unique($info['triggers']);
