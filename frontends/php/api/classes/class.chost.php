@@ -117,6 +117,7 @@ class CHost extends CZBXAPI{
 			'startPattern'				=> null,
 			'pattern'					=> null,
 			'extendPattern'				=> null,
+			'excludePattern'			=> null,
 
 // OutPut
 			'output'					=> API_OUTPUT_REFER,
