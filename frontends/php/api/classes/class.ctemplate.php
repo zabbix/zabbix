@@ -1287,7 +1287,7 @@ COpt::memoryPick();
 				}
 
 				$cur_template = reset($templates);
-				
+
 				$options = array(
 					'filter' => array(
 						'host' => $cur_template['host']),
@@ -1296,12 +1296,12 @@ COpt::memoryPick();
 					'nopermissions' => 1
 				);
 				$template_exists = self::get($options);
-				
+
 				$template_exists = reset($template_exists);
 
 				if(!empty($template_exists) && ($template_exists['templateid'] != $cur_template['templateid'])){
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
-				}				
+				}
 			}
 
 			if(isset($data['host']) && !preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $data['host'])){
@@ -1374,14 +1374,14 @@ COpt::memoryPick();
 					if(!$result){
 						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t unlink template');
 					}
-				}			
 				}
-			
+				}
+
 			if(isset($data['templates_link']) && !is_null($data['templates_link'])){
 				$template_templates = CTemplate::get(array('hostids' => $templateids));
 				$template_templateids = zbx_objectValues($template_templates, 'templateid');
 				$new_templateids = zbx_objectValues($data['templates_link'], 'templateid');
-				
+
 				$templates_to_del = array_diff($template_templateids, $new_templateids);
 				$templates_to_del = array_diff($templates_to_del, $cleared_templateids);
 				if(!empty($templates_to_del)){
@@ -1389,11 +1389,11 @@ COpt::memoryPick();
 					if(!$result){
 						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t unlink template');
 					}
-				}	
+				}
 			}
 
 			if(isset($data['hosts']) && !is_null($data['hosts'])){
-			
+
 				$hosts_to_add = array_diff($new_hostids, $template_hostids);
 				if(!empty($hosts_to_add)){
 					$result = self::massAdd(array('templates' => $templates, 'hosts' => $hosts_to_add));
@@ -1404,7 +1404,7 @@ COpt::memoryPick();
 			}
 
 			if(isset($data['templates_link']) && !is_null($data['templates_link'])){
-			
+
 				$templates_to_add = array_diff($new_templateids, $template_templateids);
 				if(!empty($templates_to_add)){
 					$result = self::massAdd(array('templates' => $templates, 'templates_link' => $templates_to_add));
@@ -1527,40 +1527,42 @@ COpt::memoryPick();
 
 	private static function link($templateids, $targetids){
 		if(empty($templateids)) return true;
-		
+
 		try{
 			self::BeginTransaction(__METHOD__);
 
 // check if any templates linked to targets have more than one unique item key\application {{{
-			$linkedTpls = self::get(array(
-				'nopermissions' => 1,
-				'output' => API_OUTPUT_SHORTEN,
-				'hostids' => $targetids
-			));
-			$allids = array_merge($templateids, zbx_objectValues($linkedTpls, 'templateid'));
-			
-			$sql = 'SELECT key_, count(*) as cnt '.
-				' FROM items '.
-				' WHERE '.DBcondition('hostid',$allids).
-				' GROUP BY key_ '.
-				' HAVING count(*) > 1';
-			$res = DBselect($sql);
-			if($db_cnt = DBfetch($res)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, 
-					S_TEMPLATE_WITH_ITEM_KEY.' ['.htmlspecialchars($db_cnt['key_']).'] '.S_ALREADY_LINKED_TO_HOST_SMALL);
-			}
+			foreach($targetids as $targetid){
+				$linkedTpls = self::get(array(
+					'nopermissions' => 1,
+					'output' => API_OUTPUT_SHORTEN,
+					'hostids' => $targetid
+				));
+				$allids = array_merge($templateids, zbx_objectValues($linkedTpls, 'templateid'));
 
-			$sql = 'SELECT name, count(*) as cnt '.
-				' FROM applications '.
-				' WHERE '.DBcondition('hostid',$allids).
-				' GROUP BY name '.
-				' HAVING count(*) > 1';
-			$res = DBselect($sql);
-			if($db_cnt = DBfetch($res)){
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					S_TEMPLATE_WITH_APPLICATION.' ['.htmlspecialchars($db_cnt['name']).'] '.S_ALREADY_LINKED_TO_HOST_SMALL);
+				$sql = 'SELECT key_, count(*) as cnt '.
+					' FROM items '.
+					' WHERE '.DBcondition('hostid',$allids).
+					' GROUP BY key_ '.
+					' HAVING count(*) > 1';
+				$res = DBselect($sql);
+				if($db_cnt = DBfetch($res)){
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						S_TEMPLATE_WITH_ITEM_KEY.' ['.htmlspecialchars($db_cnt['key_']).'] '.S_ALREADY_LINKED_TO_HOST_SMALL);
+				}
+
+				$sql = 'SELECT name, count(*) as cnt '.
+					' FROM applications '.
+					' WHERE '.DBcondition('hostid',$allids).
+					' GROUP BY name '.
+					' HAVING count(*) > 1';
+				$res = DBselect($sql);
+				if($db_cnt = DBfetch($res)){
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						S_TEMPLATE_WITH_APPLICATION.' ['.htmlspecialchars($db_cnt['name']).'] '.S_ALREADY_LINKED_TO_HOST_SMALL);
+				}
 			}
-// }}} check if any templates linked to targets have more than one unique item key\application			
+// }}} check if any templates linked to targets have more than one unique item key\application
 
 
 // CHECK TEMPLATE TRIGGERS DEPENDENCIES {{{
@@ -1634,7 +1636,7 @@ COpt::memoryPick();
 				$graph[$branch['hostid']][$branch['templateid']] = $branch['templateid'];
 			}
 
-// get points that have more than one parent templates			
+// get points that have more than one parent templates
 			$start_points = array();
 			$sql = 'SELECT max(ht.hostid) as hostid, ht.templateid'.
 				' FROM('.
@@ -1647,7 +1649,7 @@ COpt::memoryPick();
 					' AND ht.hostid=ggg.hostid'.
 				' GROUP BY ht.templateid';
 			$db_start_points = DBselect($sql);
-			while($start_point = DBfetch($db_start_points)){				
+			while($start_point = DBfetch($db_start_points)){
 				$start_points[] = $start_point['hostid'];
 				$graph[$start_point['hostid']][$start_point['templateid']] = $start_point['templateid'];
 			}
@@ -1680,27 +1682,27 @@ COpt::memoryPick();
 			}
 
 			self::EndTransaction(true, __METHOD__);
-			
+
 			return true;
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
 			self::exception($e->getCode(), $e->getErrors());
-			
+
 			return false;
 		}
 	}
 
 	private static function checkCircularLink(&$graph, $current, &$path){
-		
+
 		if(isset($path[$current])) return false;
 		$path[$current] = $current;
 		if(!isset($graph[$current])) return true;
-		
+
 		foreach($graph[$current] as $step){
 			if(!self::checkCircularLink($graph, $step, $path)) return false;
 		}
-		
+
 		return true;
 	}
 }
