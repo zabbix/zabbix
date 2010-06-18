@@ -685,7 +685,7 @@ void    *zbx_realloc2(char *filename, int line, void *src, size_t size);
 		file = NULL;	\
 	}
 
-#define THIS_SHOULD_NEVER_HAPPEN()	zbx_error("ERROR [file:%s,line:%d] "				\
+#define THIS_SHOULD_NEVER_HAPPEN	zbx_error("ERROR [file:%s,line:%d] "				\
 							"Something impossible has just happened.",	\
 							__FILE__, __LINE__);
 
