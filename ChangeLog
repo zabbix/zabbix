@@ -7,6 +7,7 @@ Changes for 1.9
 Changes for 1.8.3
 
  - [ZBX-2576] small text changes in administration/audit (Vedmak)
+ - [ZBX-1857] fixed item form correct processing, removed refreshing when item type is changed (Maxim Andruhovich / AM)
  - [ZBX-2528] fixed default language loading before using phrases, warning messages removed which were displayed after login (Maxim Andruhovich / AM)
  - [ZBXNEXT-343] added possibility to unlink and clear templates when mass update hosts templates (Vedmak)
  - [ZBX-1930] all top indents of icon labels now is equal (Maxim Andruhovich / AM)

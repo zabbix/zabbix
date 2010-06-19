@@ -25,6 +25,7 @@ class CTextArea extends CTag{
 		parent::__construct('textarea','yes');
 		$this->attributes['class'] = 'biginput';
 
+		$this->attributes['id'] = $name;
 		$this->attributes['name'] = $name;
 		$this->attributes['rows'] = $rows;
 		$this->attributes['cols'] = $cols;
