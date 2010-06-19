@@ -392,9 +392,9 @@ Copt::memoryPick();
 
 		$login = $attempt = DBfetch(DBselect($sql));
 
-		if(($name!=ZBX_GUEST_USER) && zbx_empty($passwd)){
+/*		if(($name!=ZBX_GUEST_USER) && zbx_empty($passwd)){
 			$login = $attempt = false;
-		}
+		}*/
 
 		if($login){
 			if(($login['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS) && ((time() - $login['attempt_clock']) < ZBX_LOGIN_BLOCK)){
@@ -432,7 +432,7 @@ Copt::memoryPick();
 			$sql = 'SELECT u.userid,u.alias,u.name,u.surname,u.url,u.refresh,u.passwd '.
 					' FROM users u, users_groups ug, usrgrp g '.
 					' WHERE u.alias='.zbx_dbstr($name).
-						((ZBX_AUTH_INTERNAL==$auth_type)?' AND u.passwd='.zbx_dbstr($password):'').
+						((ZBX_AUTH_INTERNAL==$auth_type)? ' AND u.passwd='.zbx_dbstr($password):'').
 						' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID);
 
 			$login = $user = DBfetch(DBselect($sql));

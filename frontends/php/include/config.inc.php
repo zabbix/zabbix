@@ -200,6 +200,9 @@ function __autoload($class_name){
 			include_once('include/locales/'.$USER_DETAILS['lang'].'.inc.php');
 			process_locales();
 		}
+		
+		include_once('include/locales/en_gb.inc.php');
+		process_locales();
 
 		if($USER_DETAILS['attempt_failed']) {
 			$attemps = bold($USER_DETAILS['attempt_failed']);
@@ -226,6 +229,7 @@ function __autoload($class_name){
 				'name'  =>'- unknown -',
 				'nodeid'=>0)
 			);
+		
 	}
 
 	include_once('include/locales/en_gb.inc.php');
