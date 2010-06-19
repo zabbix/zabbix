@@ -129,13 +129,10 @@ const char	*zbx_strpool_intern(const char *str)
 
 	if (NULL == record)
 	{
-		/* zbx_hashset_insert will reference memory just below str */
-		/* strictly speaking, this is not a very safe thing to do, */
-		/* but at least we avoid copying str to a temporary buffer */
-
-		record = zbx_hashset_insert(strpool.hashset,
+		record = zbx_hashset_insert_ext(strpool.hashset,
 						str - REFCOUNT_FIELD_SIZE,
-						REFCOUNT_FIELD_SIZE + strlen(str) + 1);
+						REFCOUNT_FIELD_SIZE + strlen(str) + 1,
+						REFCOUNT_FIELD_SIZE);
 		*(uint32_t *)record = 0;
 	}
 

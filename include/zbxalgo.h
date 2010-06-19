@@ -104,6 +104,7 @@ void	zbx_hashset_create_ext(zbx_hashset_t *hs, size_t init_size,
 void	zbx_hashset_destroy(zbx_hashset_t *hs);
 
 void	*zbx_hashset_insert(zbx_hashset_t *hs, const void *data, size_t size);
+void	*zbx_hashset_insert_ext(zbx_hashset_t *hs, const void *data, size_t size, size_t offset);
 void	*zbx_hashset_search(zbx_hashset_t *hs, const void *data);
 void	zbx_hashset_remove(zbx_hashset_t *hs, const void *data);
 
