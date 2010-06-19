@@ -317,14 +317,21 @@
 			error(S_INCORRECT_KEY_FORMAT.SPACE."'key_name[param1,param2,...]'");
 			return false;
 		}
+		
+		if(($item['type'] == ITEM_TYPE_DB_MONITOR && $item['key_'] == 'db.odbc.select[<unique short description>]') ||
+		   ($item['type'] == ITEM_TYPE_SSH && $item['key_'] == 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]') ||
+		   ($item['type'] == ITEM_TYPE_TELNET && $item['key_'] == 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]')) {
+		   	error(S_ITEMS_CHECK_KEY_DEFAULT_EXAMPLE_PASSED);
+		   	return false;
+		}
 
 		$res = calculate_item_nextcheck(0, $item['type'], $item['delay'], $item['delay_flex'], time());
-		if ($res['delay'] == SEC_PER_YEAR){
+		if ($res['delay'] == SEC_PER_YEAR && $item['type'] != ITEM_TYPE_ZABBIX_ACTIVE && $item['type'] != ITEM_TYPE_TRAPPER){
 			error(S_ITEM_WILL_NOT_BE_REFRESHED_PLEASE_ENTER_A_CORRECT_UPDATE_INTERVAL);
 			return FALSE;
 		}
 
-		if(($item['snmp_port']<1)||($item['snmp_port']>65535)){
+		if(($item['snmp_port']<1 || $item['snmp_port']>65535) && in_array($item['type'],array(ITEM_TYPE_SNMPV1,ITEM_TYPE_SNMPV2C,ITEM_TYPE_SNMPV3))){
 			error(S_INVALID_SNMP_PORT);
 			return FALSE;
 		}
@@ -503,13 +510,12 @@
 		'snmp_community','snmp_oid','value_type','trapper_hosts','snmp_port','units','multiplier','delta',
 		'snmpv3_securityname','snmpv3_securitylevel','snmpv3_authpassphrase','snmpv3_privpassphrase',
 		'formula','trends','logtimefmt','valuemapid','delay_flex','params','ipmi_sensor','applications','templateid');
-//*/
+*/
 		$upd_app = ((isset($item['applications'])) && !is_null($item['applications']));
 		$item_in_params = $item;
 
 		$item_data = get_item_by_itemid_limited($itemid);
 		$item_data['applications'] = get_applications_by_itemid($itemid);
-
 
 		if(!check_db_fields($item_data, $item)){
 			error(S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION.SPACE.'[update_item]');
@@ -524,14 +530,21 @@
 			error(S_INCORRECT_KEY_FORMAT.SPACE."'key_name[param1,param2,...]'");
 			return false;
 		}
+		
+		if(($item['type'] == ITEM_TYPE_DB_MONITOR && $item['key_'] == 'db.odbc.select[<unique short description>]') ||
+		   ($item['type'] == ITEM_TYPE_SSH && $item['key_'] == 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]') ||
+		   ($item['type'] == ITEM_TYPE_TELNET && $item['key_'] == 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]')) {
+		   	error(S_ITEMS_CHECK_KEY_DEFAULT_EXAMPLE_PASSED);
+			return false;
+		}
 
 		$res = calculate_item_nextcheck(0, $item['type'], $item['delay'], $item['delay_flex'], time());
-		if ($res['delay'] == SEC_PER_YEAR){
+		if ($res['delay'] == SEC_PER_YEAR && $item['type'] != ITEM_TYPE_ZABBIX_ACTIVE && $item['type'] != ITEM_TYPE_TRAPPER){
 			error(S_ITEM_WILL_NOT_BE_REFRESHED_PLEASE_ENTER_A_CORRECT_UPDATE_INTERVAL);
 			return FALSE;
 		}
 
-		if(($item['snmp_port']<1)||($item['snmp_port']>65535)){
+		if(($item['snmp_port'] < 1 || $item['snmp_port'] > 65535) && in_array($item['type'], array(ITEM_TYPE_SNMPV1,ITEM_TYPE_SNMPV2C,ITEM_TYPE_SNMPV3))){
 			error(S_INVALID_SNMP_PORT);
 			return FALSE;
 		}
@@ -579,7 +592,6 @@
 				error(S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION.SPACE.'[update_item]');
 				return false;
 			}
-
 
 			$result = update_item($db_tmp_item['itemid'], $child_item_params);		// recursion!!!
 
@@ -683,9 +695,8 @@
 					'history'		=> array('template' => 1 , 'httptest' => 1),
 					'status'		=> array('template' => 1 , 'httptest' => 1),
 					'type'			=> array(),
-					'snmp_community'=>	array(),
-					'snmp_oid'		=> array(),
 					'snmp_community'	=> array('template' => 1),
+					'snmp_oid'		=> array(),
 					'snmp_port'		=> array('template' => 1),
 					'snmpv3_securityname'	=> array('template' => 1),
 					'snmpv3_securitylevel'	=> array('template' => 1),
@@ -711,9 +722,9 @@
 					'ipmi_sensor'		=> array());
 
 		foreach($restore_rules as $var_name => $info){
-			if(($item_data['type'] == ITEM_TYPE_HTTPTEST) && !isset($info['httptest'])){
+/*			if(($item_data['type'] == ITEM_TYPE_HTTPTEST) && !isset($info['httptest'])){
 				$item[$var_name] = $item_data[$var_name];
-			}
+			}*/
 
 			if(!isset($info['template']) && (0 != $item_data['templateid'])){
 				$item[$var_name] = $item_data[$var_name];
@@ -724,8 +735,9 @@
 			}
 		}
 
-		if($item_data['type'] == ITEM_TYPE_HTTPTEST)
-			$item['applications'] = get_applications_by_itemid($itemid);
+/*		if($item_data['type'] == ITEM_TYPE_HTTPTEST)
+			$item['applications'] = get_applications_by_itemid($itemid);*/
+
 	return update_item($itemid,$item);
 	}
 

@@ -23,9 +23,12 @@ class CButton extends CTag{
 	public function __construct($name='button', $caption='', $action=NULL, $accesskey=NULL){
 		parent::__construct('input','no');
 		$this->tag_body_start = '';
+		
+		$this->attributes[''] = 'submit';
 		$this->attributes['type'] = 'submit';
 		$this->setAttribute('value', $caption);
 		$this->attributes['class'] = 'button';
+		$this->attributes['id'] = $name;
 		$this->setName($name);
 		$this->setAction($action);
 		$this->setAccessKey($accesskey);
