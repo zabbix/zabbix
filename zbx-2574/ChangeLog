@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBX-2574] improved fixed graph Y axis measurement (Aly)
  - [ZBXNEXT-343] added possibility to unlink and clear templates when mass update hosts templates (Vedmak)
  - [ZBX-1930] all top indents of icon labels now is equal (Maxim Andruhovich / AM)
  - [ZBX-2152] fixed names of SNMPv3 security levels (asaveljevs)

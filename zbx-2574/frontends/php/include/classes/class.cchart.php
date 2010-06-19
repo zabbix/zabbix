@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -68,6 +68,8 @@ class CChart extends CGraphDraw{
 		$this->grid = array();				// vertical & horizontal grids params
 
 		$this->gridLinesCount = array();	// How many grids to draw
+		$this->gridStep = array();			// Grid step
+
 		$this->gridPixels = 25;				// optimal grid size
 		$this->gridPixelsVert = 40;			//
 	}
@@ -689,7 +691,6 @@ class CChart extends CGraphDraw{
 				else{
 					$maxY = max($maxY, max($val));
 				}
-
 			}
 		}
 
@@ -741,12 +742,18 @@ class CChart extends CGraphDraw{
 				$this->m_minY[$side] = min($tmp_minY[GRAPH_YAXIS_SIDE_LEFT], 0);
 				continue;
 			}
+
 			if($this->ymax_type == GRAPH_YAXIS_TYPE_FIXED){
 				$this->m_maxY[$side] = $this->yaxismax;
 				$this->m_minY[$side] = 0;
 			}
+
 			if($this->ymin_type == GRAPH_YAXIS_TYPE_FIXED){
 				$this->m_minY[$side] = $this->yaxismin;
+
+				if(($this->ymax_type == GRAPH_YAXIS_TYPE_CALCULATED) && ($this->m_maxY[$side] < $this->m_minY[$side])){
+					$this->m_maxY[$side] = bcmul($this->m_minY[$side], 1.2);
+				}
 			}
 		}
 		
@@ -787,7 +794,7 @@ class CChart extends CGraphDraw{
 		$this->m_minY[$side] = bcmul(floor(bcdiv($this->m_minY[$side], $interval)), $interval);
 		$this->m_maxY[$side] = bcmul(ceil(bcdiv($this->m_maxY[$side], $interval)), $interval);
 //--------------------
-//SDI($this->m_minY[$side].' - '.$this->m_maxY[$side].' : '.$interval);
+
 		$this->gridLinesCount[$side] = ceil(($this->m_maxY[$side] - $this->m_minY[$side]) / $interval);
 
 // we add 1 interval so max Y woun't be at most top
@@ -796,21 +803,13 @@ class CChart extends CGraphDraw{
 		}
 
 		$this->m_maxY[$side] = bcadd($this->m_minY[$side], bcmul($interval, $this->gridLinesCount[$side]));
+		$this->gridStep[$side] = $interval;
 
-// division by zero
-		$diff_val = ($this->m_maxY[$side] - $this->m_minY[$side]);
-		if($diff_val == 0) $diff_val = 1;
-
-		$intervalX = ($interval * $this->sizeY) / $diff_val;
-//SDII(array($this->m_maxY[$side],$tmp_maxY[$side]));
-
-//SDI($this->m_maxY[$other_side].' - '.$this->m_minY[$other_side]);
 		if(isset($this->axis_valuetype[$other_side])){
 			$dist = ($this->m_maxY[$other_side] - $this->m_minY[$other_side]);
 			$interval = 1;
 
 			foreach($intervals as $num => $int){
-//SDI($dist.' < '.bcmul($this->gridLinesCount[$side],$int));
 				if($dist < bcmul($this->gridLinesCount[$side],$int)){
 					$interval = $int;
 					break;
@@ -827,7 +826,6 @@ class CChart extends CGraphDraw{
 				$dist = bcsub($this->m_maxY[$other_side],$this->m_minY[$other_side]);
 				$interval = 0;
 				foreach($intervals as $num => $int){
-//SDI($dist.' < '.bcmul($this->gridLinesCount[$side],$int));
 					if($dist < bcmul($this->gridLinesCount[$side],$int)){
 						$interval = $int;
 						break;
@@ -842,32 +840,47 @@ class CChart extends CGraphDraw{
 
 			$this->gridLinesCount[$other_side] = $this->gridLinesCount[$side];
 			$this->m_maxY[$other_side] = $this->m_minY[$other_side] + bcmul($interval,$this->gridLinesCount[$other_side]);
-//SDI($this->m_minY[$other_side].' - '.$this->m_maxY[$other_side].' : '.$interval.' x '.$this->gridLinesCount[$side]);
+
+			$this->gridStep[$other_side] = $interval;
 		}
 
 		$sides = array(GRAPH_YAXIS_SIDE_LEFT,GRAPH_YAXIS_SIDE_RIGHT);
-		foreach($sides as $snum => $side){
-			if(!isset($this->axis_valuetype[$side])) continue;
+		foreach($sides as $snum => $graphSide){
+			if(!isset($this->axis_valuetype[$graphSide])) continue;
 
 			if($this->type == GRAPH_TYPE_STACKED){
-				$this->m_minY[$side] = min($tmp_minY[GRAPH_YAXIS_SIDE_LEFT], 0);
+				$this->m_minY[$graphSide] = min($tmp_minY[GRAPH_YAXIS_SIDE_LEFT], 0);
 			}
 
 			if($this->ymax_type == GRAPH_YAXIS_TYPE_FIXED){
-				$this->m_maxY[$side] = $this->yaxismax;
-				$this->m_minY[$side] = 0;
+				$this->m_maxY[$graphSide] = $this->yaxismax;
+				$this->m_minY[$graphSide] = 0;
 			}
 			else if($this->ymax_type == GRAPH_YAXIS_TYPE_ITEM_VALUE){
-				$this->m_maxY[$side] = $tmp_maxY[$side];
+				$this->m_maxY[$graphSide] = $tmp_maxY[$graphSide];
 			}
 
 			if($this->ymin_type == GRAPH_YAXIS_TYPE_FIXED){
-				$this->m_minY[$side] = $this->yaxismin;
+				$this->m_minY[$graphSide] = $this->yaxismin;
 			}
 			else if($this->ymin_type == GRAPH_YAXIS_TYPE_ITEM_VALUE){
-				$this->m_minY[$side] = $tmp_minY[$side];
+				$this->m_minY[$graphSide] = $tmp_minY[$graphSide];
 			}
 		}
+
+// division by zero
+		$diff_val = ($this->m_maxY[$side] - $this->m_minY[$side]);
+		if($diff_val == 0) $diff_val = 1;
+		$this->gridStepX[$side] = ($this->gridStep[$side] * $this->sizeY) / $diff_val;
+
+		if(isset($this->axis_valuetype[$other_side])){
+			$diff_val = ($this->m_maxY[$other_side] - $this->m_minY[$other_side]);
+			if($diff_val == 0) $diff_val = 1;
+			$this->gridStepX[$other_side] = ($this->gridStep[$other_side] * $this->sizeY) / $diff_val;
+		}
+
+//SDI($this->gridStep);
+//SDI($this->gridStepX);
 	}
 
 	private function calcTimeInterval(){
@@ -1090,23 +1103,32 @@ class CChart extends CGraphDraw{
 	private function drawVerticalGrid(){
 		$hline_count = round($this->sizeY / $this->gridPixels);
 
-		if($this->yaxisleft)
+		if($this->yaxisleft){
 			$tmp_hlines = $this->gridLinesCount[GRAPH_YAXIS_SIDE_LEFT];
-		else
+			$stepX = $this->gridStepX[GRAPH_YAXIS_SIDE_LEFT];
+		}
+		else{
 			$tmp_hlines = $this->gridLinesCount[GRAPH_YAXIS_SIDE_RIGHT];
+			$stepX = $this->gridStepX[GRAPH_YAXIS_SIDE_RIGHT];
+		}
 
-		if($tmp_hlines < $hline_count)
-			$hline_count = $tmp_hlines * 2 - 1;
-		else
-			$hline_count = $tmp_hlines - 1;
+		if($tmp_hlines < $hline_count){
+			$hline_count = $tmp_hlines * 2;
+			$stepX = $stepX / 2;
+		}
+		else{
+			$hline_count = $tmp_hlines;
+		}
 
+		for($i=1; $i<$hline_count; $i++){
+			$y = $stepX * $i;
+			if($y >= $this->sizeY) continue;
 
-		for($i=1; $i<=$hline_count; $i++){
 			dashedline($this->im,
 					$this->shiftXleft,
-					$i*($this->sizeY/($hline_count+1))+$this->shiftY,
+					$this->sizeY - $y+$this->shiftY,
 					$this->sizeX+$this->shiftXleft,
-					$i*($this->sizeY/($hline_count+1))+$this->shiftY,
+					$this->sizeY - $y+$this->shiftY,
 					$this->getColor($this->graphtheme['maingridcolor'],0)
 				);
 		}
@@ -1299,25 +1321,39 @@ class CChart extends CGraphDraw{
 				$unitsLong
 			);
 		}
-		
+
+		$step = $this->gridStep[GRAPH_YAXIS_SIDE_LEFT];
 		$hstr_count = $this->gridLinesCount[GRAPH_YAXIS_SIDE_LEFT];
 		for($i=0; $i<=$hstr_count; $i++){
 // division by zero
 			$hstr_count = ($hstr_count == 0)?1:$hstr_count;
-			$val = bcadd(bcdiv(bcmul(bcdiv(bcmul($this->sizeY, $i), $hstr_count), bcsub($maxY, $minY)), $this->sizeY), $minY);
-			$str = convert_units($val, $units, ITEM_CONVERT_NO_UNITS);
 
+			$val = $i * $step + $minY;
+			if(bccomp(bcadd($val, bcdiv($step,2)), $maxY) == 1) continue;
+
+			$str = convert_units($val, $units, ITEM_CONVERT_NO_UNITS);
 			$dims = imageTextSize(8, 0, $str);
 
 			imageText($this->im,
 				8,
 				0,
 				$this->shiftXleft - $dims['width'] - 6,
-				$this->sizeY-$this->sizeY*$i/$hstr_count+$this->shiftY + 4,
+				$this->sizeY - $this->gridStepX[GRAPH_YAXIS_SIDE_LEFT]*$i + $this->shiftY  + 4,
 				$this->getColor($this->graphtheme['textcolor'], 0),
 				$str
 			);
 		}
+
+		$str = convert_units($maxY, $units, ITEM_CONVERT_NO_UNITS);
+		$dims = imageTextSize(8, 0, $str);
+		imageText($this->im,
+			8,
+			0,
+			$this->shiftXleft - $dims['width'] - 6,
+			$this->shiftY  + 4,
+			$this->getColor($this->graphtheme['textcolor'], 0),
+			$str
+		);
 
 		if(($this->zero[GRAPH_YAXIS_SIDE_LEFT] != ($this->sizeY+$this->shiftY)) && ($this->zero[GRAPH_YAXIS_SIDE_LEFT] != $this->shiftY)){
 			imageline($this->im,
@@ -1374,23 +1410,35 @@ class CChart extends CGraphDraw{
 		}
 
 
+		$step = $this->gridStep[GRAPH_YAXIS_SIDE_RIGHT];
 		$hstr_count = $this->gridLinesCount[GRAPH_YAXIS_SIDE_RIGHT];
 		for($i=0;$i<=$hstr_count;$i++){
 			if($hstr_count == 0) continue;
 
-			$val = bcadd(bcdiv(bcmul(bcdiv(bcmul($this->sizeY, $i), $hstr_count), bcsub($maxY, $minY)), $this->sizeY), $minY);
+			$val = $i * $step + $minY;
+			if(bccomp(bcadd($val, bcdiv($step,2)), $maxY) == 1) continue;
+
 			$str = convert_units($val, $units, ITEM_CONVERT_NO_UNITS);
 
 			imageText($this->im,
 				8,
 				0,
 				$this->sizeX+$this->shiftXleft+12,
-				$this->sizeY-$this->sizeY*$i/$hstr_count+$this->shiftY + 4,
+				$this->sizeY - $this->gridStepX[GRAPH_YAXIS_SIDE_RIGHT]*$i + $this->shiftY + 4,
 				$this->getColor($this->graphtheme['textcolor'], 0),
 				$str
 			);
 		}
-		
+
+		$str = convert_units($maxY, $units, ITEM_CONVERT_NO_UNITS);
+		imageText($this->im,
+			8,
+			0,
+			$this->sizeX+$this->shiftXleft+12,
+			$this->shiftY + 4,
+			$this->getColor($this->graphtheme['textcolor'], 0),
+			$str
+		);
 
 		if(($this->zero[GRAPH_YAXIS_SIDE_RIGHT] != $this->sizeY+$this->shiftY) &&
 			($this->zero[GRAPH_YAXIS_SIDE_RIGHT] != $this->shiftY))
