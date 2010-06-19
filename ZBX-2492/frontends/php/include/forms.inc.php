@@ -293,9 +293,9 @@
 				$external_param->addRow(array(S_SNMPV3_SECURITY_NAME, new CTextBox('new_check_snmpv3_securityname', $new_check_snmpv3_securityname)));
 
 				$cmbSecLevel = new CComboBox('new_check_snmpv3_securitylevel', $new_check_snmpv3_securitylevel);
-				$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,'NoAuthPriv');
-				$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,'AuthNoPriv');
-				$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV,'AuthPriv');
+				$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,'noAuthNoPriv');
+				$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,'authNoPriv');
+				$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV,'authPriv');
 
 				$external_param->addRow(array(S_SNMPV3_SECURITY_LEVEL, $cmbSecLevel));
 				$external_param->addRow(array(S_SNMPV3_AUTH_PASSPHRASE, new CTextBox('new_check_snmpv3_authpassphrase', $new_check_snmpv3_authpassphrase)));
@@ -2108,9 +2108,9 @@
 			$frmItem->addRow(S_SNMPV3_SECURITY_NAME, new CTextBox('snmpv3_securityname',$snmpv3_securityname,64));
 
 			$cmbSecLevel = new CComboBox('snmpv3_securitylevel',$snmpv3_securitylevel);
-				$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,'NoAuthPriv');
-				$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,'AuthNoPriv');
-				$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV,'AuthPriv');
+				$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,'noAuthNoPriv');
+				$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,'authNoPriv');
+				$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV,'authPriv');
 			$frmItem->addRow(S_SNMPV3_SECURITY_LEVEL, $cmbSecLevel);
 
 			$frmItem->addRow(S_SNMPV3_AUTH_PASSPHRASE, new CTextBox('snmpv3_authpassphrase',$snmpv3_authpassphrase,64));
@@ -2498,9 +2498,9 @@
 			S_ORIGINAL), S_SNMPV3_SECURITY_NAME), new CTextBox('snmpv3_securityname',$snmpv3_securityname,64));
 
 		$cmbSecLevel = new CComboBox('snmpv3_securitylevel',$snmpv3_securitylevel);
-		$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,"NoAuthPriv");
-		$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,"AuthNoPriv");
-		$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV,"AuthPriv");
+		$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,"noAuthNoPriv");
+		$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,"authNoPriv");
+		$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV,"authPriv");
 		$frmItem->addRow(array( new CVisibilityBox('securitylevel_visible',  get_request('securitylevel_visible'), 'snmpv3_securitylevel',
 			S_ORIGINAL), S_SNMPV3_SECURITY_LEVEL), $cmbSecLevel);
 		$frmItem->addRow(array( new CVisibilityBox('authpassphrase_visible', get_request('authpassphrase_visible'),
@@ -4178,78 +4178,6 @@
 	return $tblPeriod;
 	}
 
-	function insert_media_type_form(){
-
-		$type		= get_request('type',0);
-		$description	= get_request('description','');
-		$smtp_server	= get_request('smtp_server','localhost');
-		$smtp_helo	= get_request('smtp_helo','localhost');
-		$smtp_email	= get_request('smtp_email','zabbix@localhost');
-		$exec_path	= get_request('exec_path','');
-		$gsm_modem	= get_request('gsm_modem','/dev/ttyS0');
-		$username	= get_request('username','user@server');
-		$password	= get_request('password','');
-
-		if(isset($_REQUEST['mediatypeid']) && !isset($_REQUEST['form_refresh'])){
-			$result = DBselect('select * FROM media_type WHERE mediatypeid='.$_REQUEST['mediatypeid']);
-
-			$row = DBfetch($result);
-			$mediatypeid	= $row['mediatypeid'];
-			$type		= get_request('type',$row['type']);
-			$description	= $row['description'];
-			$smtp_server	= $row['smtp_server'];
-			$smtp_helo	= $row['smtp_helo'];
-			$smtp_email	= $row['smtp_email'];
-			$exec_path	= $row['exec_path'];
-			$gsm_modem	= $row['gsm_modem'];
-			$username	= $row['username'];
-			$password	= $row['passwd'];
-		}
-
-		$frmMeadia = new CFormTable(S_MEDIA);
-		$frmMeadia->setHelp('web.config.medias.php');
-
-		if(isset($_REQUEST['mediatypeid'])){
-			$frmMeadia->addVar('mediatypeid',$_REQUEST['mediatypeid']);
-		}
-
-		$frmMeadia->addRow(S_DESCRIPTION,new CTextBox('description',$description,30));
-		$cmbType = new CComboBox('type',$type,'submit()');
-		$cmbType->addItem(MEDIA_TYPE_EMAIL,S_EMAIL);
-		$cmbType->addItem(MEDIA_TYPE_JABBER,S_JABBER);
-		$cmbType->addItem(MEDIA_TYPE_SMS,S_SMS);
-		$cmbType->addItem(MEDIA_TYPE_EXEC,S_SCRIPT);
-		$frmMeadia->addRow(S_TYPE,$cmbType);
-
-		switch($type){
-		case MEDIA_TYPE_EMAIL:
-			$frmMeadia->addRow(S_SMTP_SERVER,new CTextBox('smtp_server',$smtp_server,30));
-			$frmMeadia->addRow(S_SMTP_HELO,new CTextBox('smtp_helo',$smtp_helo,30));
-			$frmMeadia->addRow(S_SMTP_EMAIL,new CTextBox('smtp_email',$smtp_email,30));
-			break;
-		case MEDIA_TYPE_SMS:
-			$frmMeadia->addRow(S_GSM_MODEM,new CTextBox('gsm_modem',$gsm_modem,50));
-			break;
-		case MEDIA_TYPE_EXEC:
-			$frmMeadia->addRow(S_SCRIPT_NAME,new CTextBox('exec_path',$exec_path,50));
-			break;
-		case MEDIA_TYPE_JABBER:
-			$frmMeadia->addRow(S_JABBER_IDENTIFIER, new CTextBox('username',$username,30));
-			$frmMeadia->addRow(S_PASSWORD, new CPassBox('password',$password,30));
-		}
-
-		$frmMeadia->addItemToBottomRow(new CButton('save',S_SAVE));
-		if(isset($_REQUEST['mediatypeid'])){
-			$frmMeadia->addItemToBottomRow(SPACE);
-			$frmMeadia->addItemToBottomRow(new CButtonDelete(S_DELETE_SELECTED_MEDIA,
-				url_param('form').url_param('mediatypeid')));
-		}
-		$frmMeadia->addItemToBottomRow(SPACE);
-		$frmMeadia->addItemToBottomRow(new CButtonCancel());
-
-	return $frmMeadia;
-	}
-
 	function import_screen_form($rules){
 
 		$form = new CFormTable(S_IMPORT, null, 'post', 'multipart/form-data');
@@ -4587,10 +4515,24 @@
 		$vbox->setAttribute('id', 'cb_tplrplc');
 		if(isset($visible['template_table'])) $vbox->setAttribute('disabled', 'disabled');
 		$action = $vbox->getAttribute('onclick');
-		$action .= 'if($("cb_tpladd").disabled) $("cb_tpladd").enable(); else $("cb_tpladd").disable();';
+		$action .= <<<JAVASCRIPT
+if($("cb_tpladd").disabled){
+	$("cb_tpladd").enable();
+}
+else{
+	$("cb_tpladd").disable();
+}
+$("clrcbdiv").toggle();
+JAVASCRIPT;
 		$vbox->setAttribute('onclick', $action);
 
-		$frmHost->addRow(array($vbox, S_RELINK_TEMPLATES),	$template_table_r, 'T');
+		$clear_cb = new CCheckBox('mass_clear_tpls', get_request('mass_clear_tpls', false));
+		$div = new CDiv(array($clear_cb, S_CLEAR_WHEN_UNLINKING));
+		$div->setAttribute('id', 'clrcbdiv');
+		$div->addStyle('margin-left: 20px;');
+		if(!isset($visible['template_table_r'])) $div->addStyle('display: none;');
+
+		$frmHost->addRow(array($vbox, S_RELINK_TEMPLATES, $div), $template_table_r, 'T');
 // }}} RELINK TEMPLATES
 
 
@@ -6057,7 +5999,7 @@
 			$footer = array(new CButton('save', S_SAVE));
 		}
 
-		return new CFormElement(S_MACROS, $macros_tbl, $footer); 
+		return new CFormElement(S_MACROS, $macros_tbl, $footer);
 
 	}
 

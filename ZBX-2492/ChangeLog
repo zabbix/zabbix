@@ -1,5 +1,12 @@
 Changes for 1.8.3
 
+ - [ZBXNEXT-343] added possibility to unlink and clear templates when mass update hosts templates (Vedmak)
+ - [ZBX-1930] all top indents of icon labels now is equal (Maxim Andruhovich / AM)
+ - [ZBX-2152] fixed names of SNMPv3 security levels (asaveljevs)
+ - [ZBX-2563] fixed warnings in m4/libunixodbc.m4 with newer autotools (asaveljevs)
+ - [ZBX-2543] fixed password reset when edit user profile and auth type is not internal (Vedmak)
+ - [ZBX-2524] fixed deleting media types (Aly)
+ - [ZBX-2557] fixed incorrect message when add proxy with name that already exist (Vedmak)
  - [ZBX-2492] fixed japanese translation, all sprintf and their placeholders have been removed from phrases from all languages (Maxim Andruhovich / AM)
  - [ZBX-2551] fixed not shown errors in configuration/triggers (Vedmak)
  - [ZBX-2552] fixed multiple events for triggers with complicated expressions (Sasha)
@@ -3108,7 +3115,7 @@ Changes for 1.0beta9:
  - play disaster-on.wav if disaster trigger appers (Alexei)
  - added support for disk_read_opsX[*],disk_write_opsX[*],disk_read_blksX[*], disk_write_blksX[*] (Alexei)
  - added basice support of monitoring of disk stats (Alexei)
- - session cookie will expire wneh session is closed (Alexei)
+ - session cookie will expire when session is closed (Alexei)
  - fixed situation when large SNMP values become nagative (Alexei)
  - added EOL character to make HTML source more readable (Alexei)
  - added new column "severity" to history of alarms (Alexei)

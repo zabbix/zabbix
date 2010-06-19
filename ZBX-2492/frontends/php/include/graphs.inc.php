@@ -1360,8 +1360,7 @@
 
 			$result['height'] = abs($ar[1] - $ar[5]);
 			$result['width'] = abs($ar[0] - $ar[4]);
-		}
-		else{
+		} else{
 			switch($fontsize){
 				case 5: $fontsize = 1; break;
 				case 6: $fontsize = 1; break;
@@ -1379,14 +1378,13 @@
 			if($angle){
 				$result['width'] = imagefontheight($fontsize);
 				$result['height'] = imagefontwidth($fontsize) * zbx_strlen($string);
-			}
-			else{
+			} else{
 				$result['height'] = imagefontheight($fontsize);
 				$result['width'] = imagefontwidth($fontsize) * zbx_strlen($string);
 			}
 		}
 
-	return $result;
+		return $result;
 	}
 	
 	function DashedLine($image,$x1,$y1,$x2,$y2,$color){
