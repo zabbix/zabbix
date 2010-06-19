@@ -103,7 +103,7 @@ static ZBX_HISTORY_TABLE areg = {
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	get_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host)
+int	get_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, char *error, int error_max_len)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -126,18 +126,12 @@ int	get_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host)
 			ret = SUCCEED;
 		}
 		else
-			zabbix_log(LOG_LEVEL_WARNING, "Unknown proxy \"%s\"",
-					host);
+			zbx_snprintf(error, error_max_len, "proxy [%s] not found", host);
 
 		DBfree_result(result);
 	}
 	else
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "Incorrect data. %s",
-				zbx_json_strerror());
-		zabbix_syslog("Incorrect data. %s",
-				zbx_json_strerror());
-	}
+		zbx_snprintf(error, error_max_len, "missing name of proxy");
 
 	return ret;
 }
