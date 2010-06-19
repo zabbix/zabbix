@@ -638,7 +638,7 @@
 			$host_old = get_host_by_hostid($id);
 			$result = DBexecute('DELETE FROM hosts WHERE hostid='.$id);
 			if ($result) {
-				info(S_HOST_HAS_BEEN_DELETED_MSG_PART1.$host_old['host'].S_HOST_HAS_BEEN_DELETED_MSG_PART2);
+				info(S_HOST_HAS_BEEN_DELETED_MSG_PART1.SPACE.$host_old['host'].SPACE.S_HOST_HAS_BEEN_DELETED_MSG_PART2);
 				/*SDI(
 					'AUDIT_ACTION_DELETE '.AUDIT_ACTION_DELETE.' / '.
 					'AUDIT_RESOURCE_HOST '.AUDIT_RESOURCE_HOST.' / '.

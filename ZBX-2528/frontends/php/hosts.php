@@ -76,6 +76,8 @@ include_once('include/page_header.php');
 		'ipmi_username'=>	array(T_ZBX_STR, O_OPT,	NULL, NULL,				NULL),
 		'ipmi_password'=>	array(T_ZBX_STR, O_OPT,	NULL, NULL,				NULL),
 
+		'mass_clear_tpls'=>		array(T_ZBX_STR, O_OPT, NULL, 			NULL,	NULL),
+
 		'useprofile'=>		array(T_ZBX_STR, O_OPT, NULL, 			NULL,	NULL),
 		'devicetype'=>		array(T_ZBX_STR, O_OPT, NULL, 			NULL,	NULL),
 		'name'=>			array(T_ZBX_STR, O_OPT, NULL, 			NULL,	NULL),
@@ -313,7 +315,7 @@ include_once('include/page_header.php');
 	}
 // HOST MASS UPDATE
 	else if(isset($_REQUEST['go']) && ($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['masssave'])){
-		$hosts = get_request('hosts', array());
+		$hostids = get_request('hosts', array());
 		$visible = get_request('visible', array());
 		$_REQUEST['groups'] = get_request('groups', array());
 		$_REQUEST['newgroup'] = get_request('newgroup', '');
@@ -330,7 +332,7 @@ include_once('include/page_header.php');
 		try{
 			DBstart();
 
-			$hosts = array('hosts' => zbx_toObject($hosts, 'hostid'));
+			$hosts = array('hosts' => zbx_toObject($hostids, 'hostid'));
 
 			$properties = array('port', 'useip', 'dns',	'ip', 'proxy_hostid', 'useipmi', 'ipmi_ip', 'ipmi_port', 'ipmi_authtype',
 				'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'status');
@@ -343,12 +345,12 @@ include_once('include/page_header.php');
 						$new_values[$property] = $_REQUEST[$property];
 				}
 			}
-				
+
 // PROFILES {{{
 			if(isset($visible['useprofile'])){
 				$new_values['profile'] = get_request('useprofile', false) ? get_request('host_profile', array()) : array();
 			}
-			
+
 			if(isset($visible['useprofile_ext'])){
 				$new_values['extendedProfile'] = get_request('useprofile_ext', false) ? get_request('ext_host_profiles', array()) : array();
 			}
@@ -358,16 +360,16 @@ include_once('include/page_header.php');
 			if(isset($visible['newgroup']) && !empty($_REQUEST['newgroup'])){
 				$result = CHostGroup::create(array('name' => $_REQUEST['newgroup']));
 				if($result === false) throw new Exception();
-				
+
 				$newgroup = array('groupid' => reset($result['groupids']), 'name' => $_REQUEST['newgroup']);
 			}
-			
+
 			$templates = array();
 			if(isset($visible['template_table']) || isset($visible['template_table_r'])){
 				$tplids = array_keys($_REQUEST['templates']);
 				$templates = zbx_toObject($tplids, 'templateid');
 			}
-		
+
 			if(isset($visible['groups'])){
 				$hosts['groups'] = zbx_toObject($_REQUEST['groups'], 'groupid');
 				if(!empty($newgroup)){
@@ -375,23 +377,29 @@ include_once('include/page_header.php');
 				}
 			}
 			if(isset($visible['template_table_r'])){
+				if(isset($_REQUEST['mass_clear_tpls'])){
+					$host_templates = CTemplate::get(array('hostids' => $hostids));
+					$host_templateids = zbx_objectValues($host_templates, 'templateid');
+					$templates_to_del = array_diff($host_templateids, $tplids);
+					$hosts['templates_clear'] = zbx_toObject($templates_to_del, 'templateid');
+				}
 				$hosts['templates'] = $templates;
 			}
 
 			$result = CHost::massUpdate(array_merge($hosts, $new_values));
 			if($result === false) throw new Exception();
 
-			
+
 			$add = array();
 			if(!empty($templates) && isset($visible['template_table'])){
 				$add['templates'] = $templates;
 			}
 			if(!empty($newgroup) && !isset($visible['groups'])){
-				$add['groups'][] = $newgroup;			
+				$add['groups'][] = $newgroup;
 			}
 			if(!empty($add)){
 				$add['hosts'] = $hosts['hosts'];
-				
+
 				$result = CHost::massAdd($add);
 				if($result === false) throw new Exception();
 			}
@@ -434,7 +442,7 @@ include_once('include/page_header.php');
 			$msg_ok = S_HOST_ADDED;
 			$msg_fail = S_CANNOT_ADD_HOST;
 		}
-		
+
 		$clone_hostid = false;
 		if($_REQUEST['form'] == 'full_clone'){
 			$create_new = true;
@@ -488,7 +496,7 @@ include_once('include/page_header.php');
 			else{
 				$hostid = $host['hostid'] = $_REQUEST['hostid'];
 				$host['templates_clear'] = $templates_clear;
-				if(!CHost::update($host)) throw new Exception();				
+				if(!CHost::update($host)) throw new Exception();
 			}
 
 // FULL CLONE {{{
@@ -929,7 +937,7 @@ include_once('include/page_header.php');
 		$form->addItem($table);
 		$hosts_wdgt->addItem($form);
 	}
-	
+
 	$hosts_wdgt->show();
 
 

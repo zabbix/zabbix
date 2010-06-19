@@ -806,7 +806,7 @@
 		if($result){
 			foreach($graphs as $graphid => $graph){
 				if(isset($host_list[$graphid]))
-					info(S_GRAPH_DELETED_FROM_HOSTS_PART1.$graph['name'].S_GRAPH_DELETED_FROM_HOSTS_PART2.(count($host_list[$graphid]) > 1 ? 's' : '').S_GRAPH_DELETED_FROM_HOSTS_PART3.': "'.implode('","', array_keys($host_list[$graphid])).'"');
+					info(S_GRAPH_DELETED_FROM_HOSTS_PART1.SPACE.$graph['name'].SPACE.S_GRAPH_DELETED_FROM_HOSTS_PART2.SPACE.(count($host_list[$graphid]) > 1 ? 's' : '').SPACE.S_GRAPH_DELETED_FROM_HOSTS_PART3.':'.SPACE.'"'.implode('","', array_keys($host_list[$graphid])).'"');
 			}
 		}
 
@@ -1360,8 +1360,7 @@
 
 			$result['height'] = abs($ar[1] - $ar[5]);
 			$result['width'] = abs($ar[0] - $ar[4]);
-		}
-		else{
+		} else{
 			switch($fontsize){
 				case 5: $fontsize = 1; break;
 				case 6: $fontsize = 1; break;
@@ -1379,14 +1378,13 @@
 			if($angle){
 				$result['width'] = imagefontheight($fontsize);
 				$result['height'] = imagefontwidth($fontsize) * zbx_strlen($string);
-			}
-			else{
+			} else{
 				$result['height'] = imagefontheight($fontsize);
 				$result['width'] = imagefontwidth($fontsize) * zbx_strlen($string);
 			}
 		}
 
-	return $result;
+		return $result;
 	}
 	
 	function DashedLine($image,$x1,$y1,$x2,$y2,$color){
