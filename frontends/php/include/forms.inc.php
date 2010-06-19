@@ -2090,8 +2090,7 @@
 			$caption[] = $item_data['description'];
 			$caption[] = '"';
 			$frmItem->setTitle($caption);
-		}
-		else{
+		}else
 			$frmItem->setTitle(S_ITEM." $host : $description");
 
 		$frmItem->addVar('form_hostid', $hostid);
@@ -2673,7 +2672,6 @@
 		$frmItem->addItemToBottomRow(SPACE);
 		$frmItem->addItemToBottomRow(new CButton('register',S_DO_SMALL));
 
-	return $frmItem;
 		
 		$json = new CJSON();
 		
@@ -2682,6 +2680,8 @@
 		zbx_add_post_js("var typeSwitcher = new CViewSwitcher('type', new Array('keyup','click','change'), ".$json->encode($typeVisibility).(isset($_REQUEST['itemid'])? ', true': '').');');
 		zbx_add_post_js("var multpStat = document.getElementById('multiplier'); if(multpStat && multpStat.onclick) multpStat.onclick();");
 		zbx_add_post_js("var mnFrmTbl = document.getElementById('web.items.item.php'); if(mnFrmTbl) mnFrmTbl.style.visibility = 'visible';");
+		
+		return $frmItem;
 	}
 
 	function insert_mass_update_item_form($elements_array_name){
