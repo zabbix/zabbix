@@ -3176,27 +3176,27 @@ return $result;
 
 		$totalBreak = false;
 		foreach($errors as $errData) {
-			$checkExprFrom = S_CHECK_EXPRESSION_PART_STARTING_FROM_PART1.zbx_substr($expression, $errData['errStart']).S_CHECK_EXPRESSION_PART_STARTING_FROM_PART2;
+			$checkExprFrom = S_CHECK_EXPRESSION_PART_STARTING_FROM_PART1.SPACE.zbx_substr($expression, $errData['errStart']).SPACE.S_CHECK_EXPRESSION_PART_STARTING_FROM_PART2;
 			
 			switch($errData['errorCode']) {
-				case 1: error(S_EXPRESSION_UNEXPECTED_END_OF_ELEMENT_ERROR.': '.$checkExprFrom); $totalBreak = true; break;
-				case 2: error(S_EXPRESSION_NOT_ALLOWED_SYMBOLS_OR_SEQUENCE_ERROR.': '.$checkExprFrom); break;
-				case 3: error(S_EXPRESSION_UNNECESSARY_SYMBOLS_DETECTED_ERROR.': '.$checkExprFrom); break;
-				case 4: error(S_EXPRESSION_NOT_ALLOWED_SYMBOLS_BEFORE_ERROR.': '.$checkExprFrom); break;
-				case 5: error(S_EXPRESSION_NOT_ALLOWED_SYMBOLS_AFTER_ERROR.': '.$checkExprFrom); break;
-				case 6: error(S_EXPRESSION_NOT_ALLOWED_VALUE_IN_ELEMENT_ERROR.': '.$checkExprFrom); break;
-				case 7: error(S_EXPRESSION_NOT_ALLOWED_SYMBOLS_OR_SEQUENCE_ERROR.': '.$checkExprFrom); break;
-				case 8: error(S_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR.$checkExprFrom); break;
-				case 9: error(S_EXPRESSION_HOST_KEY_DOES_NOT_ERROR.$checkExprFrom); break;
+				case 1: error(S_EXPRESSION_UNEXPECTED_END_OF_ELEMENT_ERROR.':'.SPACE.$checkExprFrom); $totalBreak = true; break;
+				case 2: error(S_EXPRESSION_NOT_ALLOWED_SYMBOLS_OR_SEQUENCE_ERROR.':'.SPACE.$checkExprFrom); break;
+				case 3: error(S_EXPRESSION_UNNECESSARY_SYMBOLS_DETECTED_ERROR.':'.SPACE.$checkExprFrom); break;
+				case 4: error(S_EXPRESSION_NOT_ALLOWED_SYMBOLS_BEFORE_ERROR.':'.SPACE.$checkExprFrom); break;
+				case 5: error(S_EXPRESSION_NOT_ALLOWED_SYMBOLS_AFTER_ERROR.':'.SPACE.$checkExprFrom); break;
+				case 6: error(S_EXPRESSION_NOT_ALLOWED_VALUE_IN_ELEMENT_ERROR.':'.SPACE.$checkExprFrom); break;
+				case 7: error(S_EXPRESSION_NOT_ALLOWED_SYMBOLS_OR_SEQUENCE_ERROR.':'.SPACE.$checkExprFrom); break;
+				case 8: error(S_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR.SPACE.$checkExprFrom); break;
+				case 9: error(S_EXPRESSION_HOST_KEY_DOES_NOT_ERROR.SPACE.$checkExprFrom); break;
 				case 10:
-					info(S_FUNCTION.' ('.$errData['function'].') '.S_AVAILABLE_ONLY_FOR_ITEMS_WITH_VALUE_TYPES_SMALL.' ['.implode(',',$errData['validTypes']).']');
-					error(S_INCORRECT_VALUE_TYPE.' ['.item_value_type2str($errData['value_type']).'] '.S_FOR_FUNCTION_SMALL.' ('.$errData['function'].'). '.$checkExprFrom);
+					info(S_FUNCTION.SPACE.'('.$errData['function'].')'.SPACE.S_AVAILABLE_ONLY_FOR_ITEMS_WITH_VALUE_TYPES_SMALL.SPACE.'['.implode(',',$errData['validTypes']).']');
+					error(S_INCORRECT_VALUE_TYPE.SPACE.'['.item_value_type2str($errData['value_type']).']'.SPACE.S_FOR_FUNCTION_SMALL.SPACE.'('.$errData['function'].').'.SPACE.$checkExprFrom);
 				break;
-				case 11: error(S_MISSING_MANDATORY_PARAMETER_FOR_FUNCTION.' ('.$errData['function'].'). '.$checkExprFrom); break;
-				case 12: error('['.$errData['errValue'].'] '.S_NOT_FLOAT_OR_MACRO_FOR_FUNCTION_SMALL.' ('.$errData['function'].'). '.$checkExprFrom); break;
-				case 13: error('['.$errData['errValue'].'] '.S_NOT_FLOAT_OR_MACRO_OR_COUNTER_FOR_FUNCTION_SMALL.' ('.$errData['function'].'). '.$checkExprFrom); break;
-				case 14: error(S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART1.$errData['function'].S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART2.' '.$checkExprFrom); break;
-				case 15: error(S_INCORRECT_TRIGGER_EXPRESSION.'.'.SPACE.S_YOU_CAN_NOT_USE_TEMPLATE_HOSTS_MIXED_EXPR.' '.$checkExprFrom); break;
+				case 11: error(S_MISSING_MANDATORY_PARAMETER_FOR_FUNCTION.SPACE.'('.$errData['function'].').'.SPACE.$checkExprFrom); break;
+				case 12: error('['.$errData['errValue'].']'.SPACE.S_NOT_FLOAT_OR_MACRO_FOR_FUNCTION_SMALL.SPACE.'('.$errData['function'].').'.SPACE.$checkExprFrom); break;
+				case 13: error('['.$errData['errValue'].']'.SPACE.S_NOT_FLOAT_OR_MACRO_OR_COUNTER_FOR_FUNCTION_SMALL.SPACE.'('.$errData['function'].').'.SPACE.$checkExprFrom); break;
+				case 14: error(S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART1.SPACE.$errData['function'].SPACE.S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART2.SPACE.$checkExprFrom); break;
+				case 15: error(S_INCORRECT_TRIGGER_EXPRESSION.'.'.SPACE.S_YOU_CAN_NOT_USE_TEMPLATE_HOSTS_MIXED_EXPR.SPACE.$checkExprFrom); break;
 				case 16: error(S_INCORRECT_TRIGGER_EXPRESSION.'.'.SPACE.S_TRIGGER_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR.SPACE.$checkExprFrom); break;
 			}
 			if($totalBreak) break;
