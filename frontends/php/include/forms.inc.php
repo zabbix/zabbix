@@ -1437,7 +1437,7 @@
 					'filter_snmp_oid_label', 'filter_snmp_oid',
 					'filter_snmp_port_label', 'filter_snmp_port'
 				) as $vItem)
-				zbx_add2subarray($fTypeVisibility, $it, $vItem);
+				zbx_subarray_push($fTypeVisibility, $it, $vItem);
 	unset($vItem);
 			}
 		}
@@ -2044,9 +2044,9 @@
 				$frmItem->addVar('delay_flex['.$i.'][period]', $val['period']);
 				foreach($types as $it) {
 					if($it == ITEM_TYPE_TRAPPER || $it == ITEM_TYPE_ZABBIX_ACTIVE) continue;
-					zbx_add2subarray($typeVisibility, $it, 'delay_flex['.$i.'][delay]');
-					zbx_add2subarray($typeVisibility, $it, 'delay_flex['.$i.'][period]');
-					zbx_add2subarray($typeVisibility, $it, 'rem_delay_flex['.$i.']');
+					zbx_subarray_push($typeVisibility, $it, 'delay_flex['.$i.'][delay]');
+					zbx_subarray_push($typeVisibility, $it, 'delay_flex['.$i.'][period]');
+					zbx_subarray_push($typeVisibility, $it, 'rem_delay_flex['.$i.']');
 				}
 				$i++;
 				if($i >= 7) break;	/* limit count of intervals
@@ -2122,26 +2122,26 @@
 		$row = new CRow(array(new CCol(S_SNMP_OID,'form_row_l'), new CCol(new CTextBox('snmp_oid',$snmp_oid,40,$limited), 'form_row_r')));
 		$row->setAttribute('id', 'row_snmp_oid');
 		$frmItem->addRow($row);
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_SNMPV1, 'snmp_oid');
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_SNMPV2C, 'snmp_oid');
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_SNMPV3, 'snmp_oid');
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_SNMPV1, 'row_snmp_oid');
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_SNMPV2C, 'row_snmp_oid');
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_SNMPV3, 'row_snmp_oid');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV1, 'snmp_oid');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV2C, 'snmp_oid');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'snmp_oid');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV1, 'row_snmp_oid');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV2C, 'row_snmp_oid');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'row_snmp_oid');
 
 		$row = new CRow(array(new CCol(S_SNMP_COMMUNITY,'form_row_l'), new CCol(new CTextBox('snmp_community',$snmp_community,16), 'form_row_r')));
 		$row->setAttribute('id', 'row_snmp_community');
 		$frmItem->addRow($row);
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_SNMPV1, 'snmp_community');
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_SNMPV2C, 'snmp_community');
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_SNMPV1, 'row_snmp_community');
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_SNMPV2C, 'row_snmp_community');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV1, 'snmp_community');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV2C, 'snmp_community');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV1, 'row_snmp_community');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV2C, 'row_snmp_community');
 
 		$row = new CRow(array(new CCol(S_SNMPV3_SECURITY_NAME,'form_row_l'), new CCol(new CTextBox('snmpv3_securityname',$snmpv3_securityname,64), 'form_row_r')));
 		$row->setAttribute('id', 'row_snmpv3_securityname');
 		$frmItem->addRow($row);
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_SNMPV3, 'snmpv3_securityname');
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_SNMPV3, 'row_snmpv3_securityname');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'snmpv3_securityname');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'row_snmpv3_securityname');
 		
 		$cmbSecLevel = new CComboBox('snmpv3_securitylevel', $snmpv3_securitylevel);
 		$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,'noAuthPriv');
@@ -2151,30 +2151,30 @@
 		$row = new CRow(array(new CCol(S_SNMPV3_SECURITY_LEVEL,'form_row_l'), new CCol($cmbSecLevel, 'form_row_r')));
 		$row->setAttribute('id', 'row_snmpv3_securitylevel');
 		$frmItem->addRow($row);
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_SNMPV3, 'snmpv3_securitylevel');
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_SNMPV3, 'row_snmpv3_securitylevel');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'snmpv3_securitylevel');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'row_snmpv3_securitylevel');
 
 		$row = new CRow(array(new CCol(S_SNMPV3_AUTH_PASSPHRASE,'form_row_l'), new CCol(new CTextBox('snmpv3_authpassphrase',$snmpv3_authpassphrase,64), 'form_row_r')));
 		$row->setAttribute('id', 'row_snmpv3_authpassphrase');
 		$frmItem->addRow($row);
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_SNMPV3, 'snmpv3_authpassphrase');
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_SNMPV3, 'row_snmpv3_authpassphrase');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'snmpv3_authpassphrase');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'row_snmpv3_authpassphrase');
 
 		$row = new CRow(array(new CCol(S_SNMPV3_PRIV_PASSPHRASE,'form_row_l'), new CCol(new CTextBox('snmpv3_privpassphrase',$snmpv3_privpassphrase,64), 'form_row_r')));
 		$row->setAttribute('id', 'row_snmpv3_privpassphrase');
 		$frmItem->addRow($row);
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_SNMPV3, 'snmpv3_privpassphrase');
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_SNMPV3, 'row_snmpv3_privpassphrase');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'snmpv3_privpassphrase');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'row_snmpv3_privpassphrase');
 		
 		$row = new CRow(array(new CCol(S_SNMP_PORT,'form_row_l'), new CCol(new CNumericBox('snmp_port',$snmp_port,5), 'form_row_r')));
 		$row->setAttribute('id', 'row_snmp_port');
 		$frmItem->addRow($row);
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_SNMPV1, 'snmp_port');
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_SNMPV2C, 'snmp_port');
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_SNMPV3, 'snmp_port');
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_SNMPV1, 'row_snmp_port');
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_SNMPV2C, 'row_snmp_port');
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_SNMPV3, 'row_snmp_port');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV1, 'snmp_port');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV2C, 'snmp_port');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'snmp_port');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV1, 'row_snmp_port');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV2C, 'row_snmp_port');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'row_snmp_port');
 		//}elseif($type==ITEM_TYPE_SNMPV3){
 			//$frmItem->addVar('snmp_community',$snmp_community);
 
@@ -2205,8 +2205,8 @@
 		$row = new CRow(array(new CCol(S_IPMI_SENSOR,'form_row_l'), new CCol(new CTextBox('ipmi_sensor', $ipmi_sensor, 64, $limited),'form_row_r')));
 		$row->setAttribute('id', 'row_ipmi_sensor');
 		$frmItem->addRow($row);
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_IPMI, 'ipmi_sensor');
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_IPMI, 'row_ipmi_sensor');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_IPMI, 'ipmi_sensor');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_IPMI, 'row_ipmi_sensor');
 		
 		//if ($type == ITEM_TYPE_IPMI)
 			//$frmItem->addRow(S_IPMI_SENSOR, new CTextBox('ipmi_sensor', $ipmi_sensor, 64, $limited));
@@ -2225,16 +2225,16 @@
 		foreach($types as $it) {
 			switch($it) {
 				case ITEM_TYPE_DB_MONITOR:
-					zbx_add2subarray($typeVisibility, $it, Array('id' => 'key', 'defaultValue' => 'db.odbc.select[<unique short description>]'));
+					zbx_subarray_push($typeVisibility, $it, Array('id' => 'key', 'defaultValue' => 'db.odbc.select[<unique short description>]'));
 				break;
 				case ITEM_TYPE_SSH:
-					zbx_add2subarray($typeVisibility, $it, Array('id' => 'key', 'defaultValue' => 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]'));
+					zbx_subarray_push($typeVisibility, $it, Array('id' => 'key', 'defaultValue' => 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]'));
 				break;
 				case ITEM_TYPE_TELNET:
-					zbx_add2subarray($typeVisibility, $it, Array('id' => 'key', 'defaultValue' => 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]'));
+					zbx_subarray_push($typeVisibility, $it, Array('id' => 'key', 'defaultValue' => 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]'));
 				break;
 				default:
-					zbx_add2subarray($typeVisibility, $it, 'key');
+					zbx_subarray_push($typeVisibility, $it, 'key');
 			}
 		}
 		/*
@@ -2251,49 +2251,49 @@
 		$row = new CRow(array(new CCol(S_AUTHENTICATION_METHOD,'form_row_l'), new CCol($cmbAuthType,'form_row_r')));
 		$row->setAttribute('id', 'row_authtype');
 		$frmItem->addRow($row);
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_SSH, 'authtype');
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_SSH, 'row_authtype');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'authtype');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'row_authtype');
 		
 		$row = new CRow(array(new CCol(S_USER_NAME,'form_row_l'), new CCol(new CTextBox('username',$username,16),'form_row_r')));
 		$row->setAttribute('id', 'row_username');
 		$frmItem->addRow($row);
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_SSH, 'username');
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_SSH, 'row_username');
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_TELNET, 'username');
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_TELNET, 'row_username');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'username');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'row_username');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'username');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'row_username');
 		
 		$row = new CRow(array(new CCol(S_PUBLIC_KEY_FILE,'form_row_l'), new CCol(new CTextBox('publickey',$publickey,16),'form_row_r')));
 		$row->setAttribute('id', 'row_publickey');
 		$frmItem->addRow($row);
-		zbx_add2subarray($authTypeVisibility, ITEM_AUTHTYPE_PUBLICKEY, 'publickey');
-		zbx_add2subarray($authTypeVisibility, ITEM_AUTHTYPE_PUBLICKEY, 'row_publickey');
+		zbx_subarray_push($authTypeVisibility, ITEM_AUTHTYPE_PUBLICKEY, 'publickey');
+		zbx_subarray_push($authTypeVisibility, ITEM_AUTHTYPE_PUBLICKEY, 'row_publickey');
 
 		$row = new CRow(array(new CCol(S_PRIVATE_KEY_FILE,'form_row_l'), new CCol(new CTextBox('privatekey',$privatekey,16),'form_row_r')));
 		$row->setAttribute('id', 'row_privatekey');
 		$frmItem->addRow($row);
-		zbx_add2subarray($authTypeVisibility, ITEM_AUTHTYPE_PUBLICKEY, 'privatekey');
-		zbx_add2subarray($authTypeVisibility, ITEM_AUTHTYPE_PUBLICKEY, 'row_privatekey');
+		zbx_subarray_push($authTypeVisibility, ITEM_AUTHTYPE_PUBLICKEY, 'privatekey');
+		zbx_subarray_push($authTypeVisibility, ITEM_AUTHTYPE_PUBLICKEY, 'row_privatekey');
 
 		$row = new CRow(array(new CCol(S_PASSWORD,'form_row_l'), new CCol(new CTextBox('password',$password,16),'form_row_r')));
 		$row->setAttribute('id', 'row_password');
 		$frmItem->addRow($row);
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_SSH, 'password');
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_SSH, 'row_password');
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_TELNET, 'password');
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_TELNET, 'row_password');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'password');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'row_password');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'password');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'row_password');
 
 		$spanEC = new CSpan(S_EXECUTED_SCRIPT);
 		$spanEC->setAttribute('id', 'label_executed_script');
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_SSH, 'label_executed_script');
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_TELNET, 'label_executed_script');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'label_executed_script');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'label_executed_script');
 
 		$spanP = new CSpan(S_PARAMS);
 		$spanP->setAttribute('id', 'label_params');
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_DB_MONITOR, 'label_params');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_DB_MONITOR, 'label_params');
 
 		$spanF = new CSpan(S_FORMULA);
 		$spanF->setAttribute('id', 'label_formula');
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_CALCULATED, 'label_formula');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_CALCULATED, 'label_formula');
 		
 		$params_script = get_request('params_script', '');
 		$params_dbmonitor = get_request('params_dbmonitor', $type != ITEM_TYPE_DB_MONITOR ? "DSN=<database source name>\nuser=<user name>\npassword=<password>\nsql=<query>" : '');
@@ -2322,14 +2322,14 @@
 		$row = new CRow(array(new CCol(array($spanEC, $spanP, $spanF),'form_row_l'), new CCol(new CTextArea('params',$params,60,4),'form_row_r')));
 		$row->setAttribute('id', 'row_params');
 		$frmItem->addRow($row);
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_SSH, Array('id' => 'params', 'value' => 'params_script'));
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_SSH, 'row_params');
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_TELNET, Array('id' => 'params', 'value' => 'params_script'));
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_TELNET, 'row_params');
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_DB_MONITOR, Array('id' => 'params', 'value' => 'params_dbmonitor'));
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_DB_MONITOR, 'row_params');
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_CALCULATED, Array('id' => 'params', 'value' => 'params_calculted'));
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_CALCULATED, 'row_params');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, Array('id' => 'params', 'value' => 'params_script'));
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'row_params');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, Array('id' => 'params', 'value' => 'params_script'));
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'row_params');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_DB_MONITOR, Array('id' => 'params', 'value' => 'params_dbmonitor'));
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_DB_MONITOR, 'row_params');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_CALCULATED, Array('id' => 'params', 'value' => 'params_calculted'));
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_CALCULATED, 'row_params');
 		$frmItem->addVar('params_script', $params_script);
 		$frmItem->addVar('params_dbmonitor', $params_dbmonitor);
 		$frmItem->addVar('params_calculted', $params_calculted);
@@ -2406,8 +2406,8 @@
 			$row = new CRow(array(new CCol(S_DATA_TYPE,'form_row_l'), new CCol($cmbDataType,'form_row_r')));
 			$row->setAttribute('id', 'row_data_type');
 			$frmItem->addRow($row);
-			zbx_add2subarray($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'data_type');
-			zbx_add2subarray($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_data_type');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'data_type');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_data_type');
 		//} else
 			//$frmItem->addVar('data_type', $data_type);
 
@@ -2417,10 +2417,10 @@
 			$row = new CRow(array(new CCol(S_UNITS,'form_row_l'), new CCol(new CTextBox('units',$units,40, $limited),'form_row_r')));
 			$row->setAttribute('id', 'row_units');
 			$frmItem->addRow($row);
-			zbx_add2subarray($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'units');
-			zbx_add2subarray($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'row_units');
-			zbx_add2subarray($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'units');
-			zbx_add2subarray($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_units');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'units');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'row_units');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'units');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_units');
 
 			$mltpbox = Array();
 			if(isset($limited)){
@@ -2445,10 +2445,10 @@
 			$row = new CRow(array(new CCol(S_USE_CUSTOM_MULTIPLIER,'form_row_l'), new CCol($mltpbox,'form_row_r')));
 			$row->setAttribute('id', 'row_multiplier');
 			$frmItem->addRow($row);
-			zbx_add2subarray($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'multiplier');
-			zbx_add2subarray($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'row_multiplier');
-			zbx_add2subarray($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'multiplier');
-			zbx_add2subarray($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_multiplier');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'multiplier');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'row_multiplier');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'multiplier');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_multiplier');
 			
 //			$frmItem->addRow(S_USE_CUSTOM_MULTIPLIER, $mltpbox);
 /*		}else{
@@ -2463,8 +2463,8 @@
 			$frmItem->addRow($row);
 			foreach($types as $it) {
 				if($it == ITEM_TYPE_TRAPPER) continue;
-				zbx_add2subarray($typeVisibility, $it, 'delay');
-				zbx_add2subarray($typeVisibility, $it, 'row_delay');
+				zbx_subarray_push($typeVisibility, $it, 'delay');
+				zbx_subarray_push($typeVisibility, $it, 'row_delay');
 			}
 
 //			$frmItem->addRow(S_UPDATE_INTERVAL_IN_SEC, new CNumericBox('delay',$delay,5));
@@ -2493,11 +2493,11 @@
 					),'new');*/
 			foreach($types as $it) {
 				if($it == ITEM_TYPE_TRAPPER || $it == ITEM_TYPE_ZABBIX_ACTIVE) continue;
-				zbx_add2subarray($typeVisibility, $it, 'row_flex_intervals');
-				zbx_add2subarray($typeVisibility, $it, 'row_new_delay_flex');
-				zbx_add2subarray($typeVisibility, $it, 'new_delay_flex[delay]');
-				zbx_add2subarray($typeVisibility, $it, 'new_delay_flex[period]');
-				zbx_add2subarray($typeVisibility, $it, 'add_delay_flex');
+				zbx_subarray_push($typeVisibility, $it, 'row_flex_intervals');
+				zbx_subarray_push($typeVisibility, $it, 'row_new_delay_flex');
+				zbx_subarray_push($typeVisibility, $it, 'new_delay_flex[delay]');
+				zbx_subarray_push($typeVisibility, $it, 'new_delay_flex[period]');
+				zbx_subarray_push($typeVisibility, $it, 'add_delay_flex');
 			}
 /*			}else
 				$frmItem->addVar('delay_flex',null);
@@ -2515,10 +2515,10 @@
 		$row = new CRow(array(new CCol(S_KEEP_TRENDS_IN_DAYS,'form_row_l'), new CCol(new CNumericBox('trends',$trends,8),'form_row_r')));
 		$row->setAttribute('id', 'row_trends');
 		$frmItem->addRow($row);
-		zbx_add2subarray($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'trends');
-		zbx_add2subarray($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'row_trends');
-		zbx_add2subarray($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'trends');
-		zbx_add2subarray($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_trends');
+		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'trends');
+		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'row_trends');
+		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'trends');
+		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_trends');
 
 /*		if(uint_in_array($value_type, array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64)))
 			$frmItem->addRow(S_KEEP_TRENDS_IN_DAYS, new CNumericBox('trends',$trends,8));
@@ -2533,8 +2533,8 @@
 		$row = new CRow(array(new CCol(S_LOG_TIME_FORMAT,'form_row_l'), new CCol(new CTextBox('logtimefmt',$logtimefmt,16,$limited),'form_row_r')));
 		$row->setAttribute('id', 'row_logtimefmt');
 		$frmItem->addRow($row);
-		zbx_add2subarray($typeVisibility, ITEM_VALUE_TYPE_LOG, 'logtimefmt');
-		zbx_add2subarray($typeVisibility, ITEM_VALUE_TYPE_LOG, 'row_logtimefmt');
+		zbx_subarray_push($typeVisibility, ITEM_VALUE_TYPE_LOG, 'logtimefmt');
+		zbx_subarray_push($typeVisibility, ITEM_VALUE_TYPE_LOG, 'row_logtimefmt');
 
 /*		if($value_type==ITEM_VALUE_TYPE_LOG)
 			$frmItem->addRow(S_LOG_TIME_FORMAT, new CTextBox('logtimefmt',$logtimefmt,16,$limited));
@@ -2550,10 +2550,10 @@
 			$row = new CRow(array(new CCol(S_STORE_VALUE,'form_row_l'), new CCol($cmbDelta,'form_row_r')));
 			$row->setAttribute('id', 'row_delta');
 			$frmItem->addRow($row);
-			zbx_add2subarray($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'delta');
-			zbx_add2subarray($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'row_delta');
-			zbx_add2subarray($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'delta');
-			zbx_add2subarray($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_delta');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'delta');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'row_delta');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'delta');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_delta');
 //			$frmItem->addRow(S_STORE_VALUE,$cmbDelta);
 //		}else
 //			$frmItem->addVar('delta',0);
@@ -2583,12 +2583,12 @@
 			$row = new CRow(array(new CCol(array(S_SHOW_VALUE.SPACE,$link),'form_row_l'), new CCol($cmbMap,'form_row_r')));
 			$row->setAttribute('id', 'row_valuemap');
 			$frmItem->addRow($row);
-			zbx_add2subarray($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'valuemapid');
-			zbx_add2subarray($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'row_valuemap');
-			zbx_add2subarray($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'valuemap_name');
-			zbx_add2subarray($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'valuemapid');
-			zbx_add2subarray($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_valuemap');
-			zbx_add2subarray($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'valuemap_name');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'valuemapid');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'row_valuemap');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'valuemap_name');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'valuemapid');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_valuemap');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'valuemap_name');
 //			$frmItem->addRow(array(S_SHOW_VALUE.SPACE,$link),$cmbMap);
 //		}else
 //			$frmItem->addVar('valuemapid',0);
@@ -2596,8 +2596,8 @@
 		$row = new CRow(array(new CCol(S_ALLOWED_HOSTS,'form_row_l'), new CCol(new CTextBox('trapper_hosts',$trapper_hosts,40),'form_row_r')));
 		$row->setAttribute('id', 'row_trapper_hosts');
 		$frmItem->addRow($row);
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_TRAPPER, 'trapper_hosts');
-		zbx_add2subarray($typeVisibility, ITEM_TYPE_TRAPPER, 'row_trapper_hosts');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_TRAPPER, 'trapper_hosts');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_TRAPPER, 'row_trapper_hosts');
 		
 /*		if($type==ITEM_TYPE_TRAPPER)
 			$frmItem->addRow(S_ALLOWED_HOSTS, new CTextBox('trapper_hosts',$trapper_hosts,40));
