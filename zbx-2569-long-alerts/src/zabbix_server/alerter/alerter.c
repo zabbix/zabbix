@@ -55,11 +55,7 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 	const char	*__function_name = "execute_action";
 
 	int 	pid, res = FAIL;
-
 	char	full_path[MAX_STRING_LEN];
-
-	char    env_alertid[128], env_actionid[128], env_clock[128], env_mediatypeid[128], env_status[128];
-	char    *zbxenv[] = { env_alertid, env_actionid, env_clock, env_mediatypeid, env_status, NULL };
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): alertid [" ZBX_FS_UI64 "] mediatype [%d]",
 			__function_name, alert->alertid, mediatype->type);
@@ -99,14 +95,8 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 
 			zabbix_log(LOG_LEVEL_DEBUG, "Before executing [%s]", full_path);
 
-			zbx_snprintf(env_alertid, 128, "ZABBIX_ALERT_ID=" ZBX_FS_UI64, alert->alertid);
-			zbx_snprintf(env_actionid, 128, "ZABBIX_ACTION_ID=" ZBX_FS_UI64, alert->actionid);
-			zbx_snprintf(env_clock, 128, "ZABBIX_ALERT_TIME=%d", alert->clock);
-			zbx_snprintf(env_mediatypeid, 128, "ZABBIX_ALERT_MEDIATYPEID=" ZBX_FS_UI64, alert->mediatypeid);
-			zbx_snprintf(env_status, 128, "ZABBIX_ALERT_STATUS=%d", alert->status);
-
-			if (-1 == execle(full_path, mediatype->exec_path, alert->sendto,
-						alert->subject, alert->message, NULL, zbxenv))
+			if (-1 == execl(full_path, mediatype->exec_path, alert->sendto,
+						alert->subject, alert->message, (char *)NULL))
 			{
 				zabbix_log(LOG_LEVEL_ERR, "Error executing [%s] [%s]",
 					full_path,
