@@ -68,8 +68,7 @@ int	zbx_send_response(zbx_sock_t *sock, int result, const char *info, int timeou
 
 	if (FAIL == (ret = zbx_tcp_send_to(sock, json.buffer, timeout)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Error sending result back");
-		zabbix_syslog("Trapper: error sending result back");
+		zabbix_log(LOG_LEVEL_DEBUG, "Error sending result back: %s", zbx_tcp_strerror());
 		ret = NETWORK_ERROR;
 	}
 
