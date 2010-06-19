@@ -17,7 +17,6 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-
 #ifndef ZABBIX_PROXYHOSTS_H
 #define ZABBIX_PROXYHOSTS_H
 
@@ -26,6 +25,7 @@
 
 extern int	CONFIG_TIMEOUT;
 
-int	process_host_availability(zbx_sock_t *sock, struct zbx_json_parse *jp);
+void	recv_host_availability(zbx_sock_t *sock, struct zbx_json_parse *jp);
+void	send_host_availability(zbx_sock_t *sock);
 
 #endif

@@ -66,7 +66,7 @@ class CTree{
 		$c=0;
 		$tr = new CRow();
 		$tr->addItem($this->fields['caption']);
-		$tr->setClass('treeheader');
+		$tr->setClass('header');
 		unset($this->fields['caption']);
 		foreach($this->fields as $id => $caption){
 			$tr->addItem($caption);
@@ -78,18 +78,7 @@ class CTree{
 	}
 
 	private function simpleHTML(){
-		$table = new CTable('','tabletree');
-
-		$table->setCellSpacing(0);
-		$table->setCellPadding(0);
-
-		$table->setOddRowClass('odd_row');
-		$table->setEvenRowClass('even_row');
-		$table->headerClass = 'header';
-		$table->footerClass = 'footer';
-
-		$table->setAttribute('valign','top');
-//		$table->setAttribute('border','1');
+		$table = new CTableInfo();
 		$table->addRow($this->makeHeaders());
 
 		foreach($this->tree as $id => $rows){
@@ -101,16 +90,8 @@ class CTree{
 	private function makeRow($id){
 
 		$table = new CTable();
-		$table->setCellSpacing(0);
-		$table->setCellPadding(0);
-		$table->setAttribute('border','0');
-		$table->setAttribute('height','100%');
-
 		$tr = $this->makeSImgStr($id);
-
-		$td = new CCol($this->tree[$id]['caption']);
-		$td->setAttribute('style','height: 100%; vertical-align: top; white-space: normal; padding-right: 10px; padding-left: 2px;');
-		$tr->addItem($td);
+		$tr->addItem($this->tree[$id]['caption']);
 
 		$table->addRow($tr);
 
@@ -121,9 +102,34 @@ class CTree{
 
 
 		foreach($this->fields as $key => $value){
-			$td = new CCol($this->tree[$id][$value]);
-			$td->setAttribute('style',' padding-right: 10px; padding-left: 2px;');
-			$tr->addItem($td);
+			$style = null;
+			
+			if(($value == 'status') && ($this->tree[$id]['serviceid'] > 0)){
+				switch($this->tree[$id][$value]){
+					case TRIGGER_SEVERITY_DISASTER:
+						$this->tree[$id][$value] = S_DISASTER;
+						$style = 'disaster'; 
+						break;
+					case TRIGGER_SEVERITY_HIGH:
+						$this->tree[$id][$value] = S_HIGH;
+						$style = 'high'; 
+						break;
+					case TRIGGER_SEVERITY_AVERAGE:
+						$this->tree[$id][$value] = S_AVERAGE;
+						$style = 'average'; 
+						break;
+					case TRIGGER_SEVERITY_WARNING:
+						$this->tree[$id][$value] = S_WARNING;
+						$style = 'warning'; 
+						break;
+					case TRIGGER_SEVERITY_INFORMATION:
+					default:
+						$this->tree[$id][$value] = new CSpan(S_OK_BIG, 'green');
+						break;
+				}
+			}
+			
+			$tr->addItem(new CCol($this->tree[$id][$value], $style));
 		}
 
 	return $tr;
@@ -131,10 +137,10 @@ class CTree{
 
 	private function makeSImgStr($id){
 		$tr = new CRow();
-		$td = new CCol();
 
 		$count=(isset($this->tree[$id]['nodeimg']))?(zbx_strlen($this->tree[$id]['nodeimg'])):(0);
 		for($i=0; $i<$count; $i++){
+			$td = new CCol();
 			switch($this->tree[$id]['nodeimg'][$i]){
 				case 'O':
 					$td->setAttribute('style','width: 22px');
@@ -149,7 +155,7 @@ class CTree{
 //					$td->setAttribute('style','width:22px; background-image:url(images/general/tree/pointc.gif);');
 
 					$div = new CTag('div','yes');
-					$div->setAttribute('style','height: 10px; width:22px; background-image:url(images/general/tree/pointc.gif);');
+					$div->setAttribute('style','height: 10px; width:22px; margin-left: -1px; background-image:url(images/general/tree/pointc.gif);');
 
 					if($this->tree[$id]['nodetype'] == 2){
 						$img= new CImg('images/general/tree/plus.gif','y','22','14');
@@ -158,7 +164,7 @@ class CTree{
 												" showPopupDiv('div_node_tree','select_iframe');"); // IE6 Fix
 
 						$img->setAttribute('id','idi_'.$id);
-						$img->setClass('imgnode');
+						$img->setClass('pointer');
 					}
 					else {
 						$img = new CImg('images/general/tree/pointl.gif','y','22','14');
@@ -177,7 +183,7 @@ class CTree{
 												" showPopupDiv('div_node_tree','select_iframe');");	// IE6 Fix
 
 						$img->setAttribute('id','idi_'.$id);
-						$img->setClass('imgnode');
+						$img->setClass('pointer');
 					}
 					else {
 						$td->setAttribute('style','width:22px; background-image:url(images/general/tree/pointc.gif);');
@@ -187,8 +193,6 @@ class CTree{
 			}
 			$td->addItem($img);
 			$tr->addItem($td);
-
-			$td = new CCol();
 		}
 	//	echo $txt.' '.$this->tree[$id]['Name'].'<br />';
 	return $tr;
@@ -236,6 +240,7 @@ class CTree{
 		$js.= '</script>'."\n";
 
 		zbx_add_post_js($this->treename.' = new CTree("tree_'.$this->getUserAlias().'_'.$this->treename.'", '.$this->treename.'_tree);');
+
 	return new CJSscript($js);
 	}
 

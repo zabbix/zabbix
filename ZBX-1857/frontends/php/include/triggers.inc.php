@@ -814,7 +814,7 @@ return $result;
 			return	$result;
 		}
 
-		add_event($triggerid,TRIGGER_VALUE_UNKNOWN);
+		addEvent($triggerid,TRIGGER_VALUE_UNKNOWN);
 
 		if( null == ($expression = implode_exp($expression,$triggerid)) ){
 			$result = false;
@@ -1443,19 +1443,25 @@ return $result;
 	function update_trigger_status($triggerids,$status){
 		zbx_value2array($triggerids);
 
-		// first update status for child triggers
+// first update status for child triggers
 		$upd_chd_triggers = array();
 		$db_chd_triggers = get_triggers_by_templateid($triggerids);
 		while($db_chd_trigger = DBfetch($db_chd_triggers)){
 			$upd_chd_triggers[$db_chd_trigger['triggerid']] = $db_chd_trigger['triggerid'];
 		}
+
 		if(!empty($upd_chd_triggers)){
 			update_trigger_status($upd_chd_triggers,$status);
 		}
 
-		add_event($triggerids,TRIGGER_VALUE_UNKNOWN);
+		DBexecute('UPDATE triggers SET status='.$status.' WHERE '.DBcondition('triggerid',$triggerids));
 
-	return DBexecute('UPDATE triggers SET status='.$status.' WHERE '.DBcondition('triggerid',$triggerids));
+		if($status != TRIGGER_STATUS_ENABLED){
+			addEvent($triggerids, TRIGGER_VALUE_UNKNOWN);
+			DBexecute('UPDATE triggers SET lastchange='.time().', value='.TRIGGER_VALUE_UNKNOWN.' WHERE '.DBcondition('triggerid',$triggerids).' AND value<>'.TRIGGER_VALUE_UNKNOWN);
+		}
+
+	return true;
 	}
 
 	/*
@@ -1762,7 +1768,7 @@ return $result;
 		}
 		if(!empty($triggers)){
 // returns updated triggers
-			$triggers = add_event($triggers,TRIGGER_VALUE_UNKNOWN,$now);
+			$triggers = addEvent($triggers,TRIGGER_VALUE_UNKNOWN,$now);
 		}
 
 		if(!empty($triggers)){
@@ -1771,39 +1777,23 @@ return $result;
 	return true;
 	}
 
-/******************************************************************************
- *																			*
- * Comments: !!! Don't forget sync code with C !!!							*
- *		   !!! C code dosn't support TRIGGERS MULTI EVENT !!!			   *
- *																			*
- ******************************************************************************/
-	function add_event($triggerids, $value, $time=NULL){
+	function addEvent($triggerids, $value){
 		zbx_value2array($triggerids);
-		if(is_null($time)) $time = time();
-
-		$result = DBselect('SELECT DISTINCT triggerid, value, type FROM triggers WHERE '.DBcondition('triggerid',$triggerids));
-		while($trigger = DBfetch($result)){
-			if(($value == $trigger['value']) && !(($value == TRIGGER_VALUE_TRUE) && ($trigger['type'] == TRIGGER_MULT_EVENT_ENABLED))){
-				unset($triggerids[$trigger['triggerid']]);
-			}
-		}
 
 		$events = array();
-		foreach($triggerids as $id => $triggerid){
-			$eventid = get_dbid('events','eventid');
-			$result = DBexecute('INSERT INTO events (eventid,source,object,objectid,clock,value) '.
-					' VALUES ('.$eventid.','.EVENT_SOURCE_TRIGGERS.','.EVENT_OBJECT_TRIGGER.','.$triggerid.','.$time.','.$value.')');
-			$events[$eventid] = $eventid;
+		foreach($triggerids as $tnum => $triggerid){
+			$events[] = array(
+				'source'		=> EVENT_SOURCE_TRIGGERS,
+				'object'		=> EVENT_OBJECT_TRIGGER,
+				'objectid'		=> $triggerid,
+				'clock'			=> time(),
+				'value'			=> $value,
+				'acknowledged'	=> 0
+			);
 		}
+		$eventids = CEvent::create($events);
 
-		if(!empty($events) && ($value == TRIGGER_VALUE_FALSE || $value == TRIGGER_VALUE_TRUE)){
-			DBexecute('UPDATE alerts '.
-						" SET retries=3,error='Trigger changed its status. Will not send repeats.'".
-					' WHERE '.DBcondition('eventid',$events).
-						' AND repeats>0 '.
-						' AND status='.ALERT_STATUS_NOT_SENT);
-		}
-	return $triggerids;
+	return $eventids;
 	}
 
 /******************************************************************************
@@ -1915,7 +1905,8 @@ return $result;
 			/* Restore expression */
 			$expression = explode_exp($trigger['expression'],0);
 			$expressionData = parseTriggerExpressions($expression, true);
-		}else if(!isset($expressionData[$expression]['errors']) && $expression != explode_exp($trigger['expression'],0)){
+		}
+		else if(!isset($expressionData[$expression]['errors']) && $expression != explode_exp($trigger['expression'],0)){
 			$event_to_unknown = true;
 		}
 
@@ -1929,6 +1920,7 @@ return $result;
 		if(is_null($description)){
 			$description = $trigger['description'];
 		}
+
 		if(CTrigger::exists(array('description' => $description, 'expression' => $expression))){
 		
 			reset($expressionData[$expression]['hosts']);
@@ -1996,27 +1988,36 @@ return $result;
 			}
 		}
 
-		$result=delete_function_by_triggerid($triggerid);
+		$result = delete_function_by_triggerid($triggerid);
+
 		if(!$result){
 			return	$result;
 		}
 
 		$expression = implode_exp($expression,$triggerid); /* errors can be ignored cose function must return NULL */
+		
+		$sql_update = '';
+		if(!is_null($expression))	$sql_update .= ' expression='.zbx_dbstr($expression).',';
+		if(!is_null($description))	$sql_update .= ' description='.zbx_dbstr($description).',';
+		if(!is_null($type))			$sql_update .= ' type='.$type.',';
+		if(!is_null($priority))		$sql_update .= ' priority='.$priority.',';
+		if(!is_null($status))		$sql_update .= ' status='.$status.',';
+		if(!is_null($comments))		$sql_update .= ' comments='.zbx_dbstr($comments).',';
+		if(!is_null($url))			$sql_update .= ' url='.zbx_dbstr($url).',';
+		if(!is_null($templateid))	$sql_update .= ' templateid='.$templateid;
 
-		if($event_to_unknown) add_event($triggerid,TRIGGER_VALUE_UNKNOWN);
 
-		$sql='UPDATE triggers SET ';
-		if(!is_null($expression))	$sql .= ' expression='.zbx_dbstr($expression).',';
-		if(!is_null($description))	$sql .= ' description='.zbx_dbstr($description).',';
-		if(!is_null($type))			$sql .= ' type='.$type.',';
-		if(!is_null($priority))		$sql .= ' priority='.$priority.',';
-		if(!is_null($status))		$sql .= ' status='.$status.',';
-		if(!is_null($comments))		$sql .= ' comments='.zbx_dbstr($comments).',';
-		if(!is_null($url))			$sql .= ' url='.zbx_dbstr($url).',';
-		if(!is_null($templateid))	$sql .= ' templateid='.$templateid.',';
-		$sql .= ' value=2 WHERE triggerid='.$triggerid;
+		if($event_to_unknown || (!is_null($status) && ($status != TRIGGER_STATUS_ENABLED))){
 
-		$result = DBexecute($sql);
+			if($trigger['value'] != TRIGGER_VALUE_UNKNOWN){
+				addEvent($triggerid, TRIGGER_VALUE_UNKNOWN);
+
+				$sql_update .= ',value='.TRIGGER_VALUE_UNKNOWN;
+				$sql_update .= ',lastchange='.time();
+			}
+		}
+
+		$result = DBexecute('UPDATE triggers SET '.$sql_update.' WHERE triggerid='.$triggerid);
 
 		delete_dependencies_by_triggerid($triggerid);
 
@@ -2597,7 +2598,7 @@ return $result;
 		if($view_style == STYLE_TOP){
 			$header=array(new CCol(S_TRIGGERS,'center'));
 			foreach($hosts as $hostname){
-				$header = array_merge($header,array(new CImg('vtext.php?text='.$hostname)));
+				$header = array_merge($header,array(new CCol(array(new CImg('vtext.php?text='.$hostname)), 'hosts')));
 			}
 			$table->setHeader($header,'vertical_header');
 
@@ -2782,7 +2783,13 @@ return $result;
 			unset($img, $dep_table, $dependency);
 		}
 //------------------------
-		$status_col = new CCol(array($desc, $ack),$css_class);
+		//SDII($desc);
+		//SDII($ack);
+		if((is_array($desc) && count($desc) > 0) || $ack) {
+			$status_col = new CCol(array($desc, $ack),$css_class.' hosts');
+		} else {
+			$status_col = new CCol(SPACE,$css_class.' hosts');
+		}
 		if(isset($style)){
 			$status_col->setAttribute('style', $style);
 		}
@@ -2790,9 +2797,8 @@ return $result;
 		if(isset($tr_ov_menu)){
 			$tr_ov_menu  = new CPUMenu($tr_ov_menu,170);
 			$status_col->OnClick($tr_ov_menu->GetOnActionJS());
-			$status_col->addAction('onmouseover',
-				'this.old_border=this.style.border; this.style.border=\'1px dotted #0C0CF0\'');
-			$status_col->addAction('onmouseout', 'this.style.border=this.old_border;');
+			$status_col->addAction('onmouseover', 'this.style.border=\'1px dotted #0C0CF0\'');
+			$status_col->addAction('onmouseout', 'this.style.border = \'\';');
 		}
 		array_push($table_row,$status_col);
 
@@ -3098,10 +3104,11 @@ return $result;
 			'nodeids' => get_current_nodeid(),
 			'monitored' => 1,
 			'countOutput' => 1,
-			'only_problems' => $count_problems,
+			'filter' => array(),
 			'with_unacknowledged_events' => 1,
 			'limit' => ($config['search_limit']+1)
 		);
+		if($count_problems) $options['filter']['value'] = TRIGGER_VALUE_TRUE;
 		if(!empty($elements['hosts_groups'])) $options['groupids'] = array_unique($elements['hosts_groups']);
 		if(!empty($elements['hosts'])) $options['hostids'] = array_unique($elements['hosts']);
 		if(!empty($elements['triggers'])) $options['triggerids'] = array_unique($elements['triggers']);
@@ -3169,34 +3176,27 @@ return $result;
 
 		$totalBreak = false;
 		foreach($errors as $errData) {
-			$checkExprFrom = sprintf(
-				S_CHECK_EXPRESSION_PART_STARTING_FROM,
-				zbx_substr(
-					$expression, 
-					$errData['errStart']//,
-					//$errData['errEnd']-$errData['errStart']+1
-				)
-			);
+			$checkExprFrom = S_CHECK_EXPRESSION_PART_STARTING_FROM_PART1.SPACE.zbx_substr($expression, $errData['errStart']).SPACE.S_CHECK_EXPRESSION_PART_STARTING_FROM_PART2;
 			
 			switch($errData['errorCode']) {
-				case 1: error(S_EXPRESSION_UNEXPECTED_END_OF_ELEMENT_ERROR.': '.$checkExprFrom); $totalBreak = true; break;
-				case 2: error(S_EXPRESSION_NOT_ALLOWED_SYMBOLS_OR_SEQUENCE_ERROR.': '.$checkExprFrom); break;
-				case 3: error(S_EXPRESSION_UNNECESSARY_SYMBOLS_DETECTED_ERROR.': '.$checkExprFrom); break;
-				case 4: error(S_EXPRESSION_NOT_ALLOWED_SYMBOLS_BEFORE_ERROR.': '.$checkExprFrom); break;
-				case 5: error(S_EXPRESSION_NOT_ALLOWED_SYMBOLS_AFTER_ERROR.': '.$checkExprFrom); break;
-				case 6: error(S_EXPRESSION_NOT_ALLOWED_VALUE_IN_ELEMENT_ERROR.': '.$checkExprFrom); break;
-				case 7: error(S_EXPRESSION_NOT_ALLOWED_SYMBOLS_OR_SEQUENCE_ERROR.': '.$checkExprFrom); break;
-				case 8: error(S_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR.$checkExprFrom); break;
-				case 9: error(S_EXPRESSION_HOST_KEY_DOES_NOT_ERROR.$checkExprFrom); break;
+				case 1: error(S_EXPRESSION_UNEXPECTED_END_OF_ELEMENT_ERROR.':'.SPACE.$checkExprFrom); $totalBreak = true; break;
+				case 2: error(S_EXPRESSION_NOT_ALLOWED_SYMBOLS_OR_SEQUENCE_ERROR.':'.SPACE.$checkExprFrom); break;
+				case 3: error(S_EXPRESSION_UNNECESSARY_SYMBOLS_DETECTED_ERROR.':'.SPACE.$checkExprFrom); break;
+				case 4: error(S_EXPRESSION_NOT_ALLOWED_SYMBOLS_BEFORE_ERROR.':'.SPACE.$checkExprFrom); break;
+				case 5: error(S_EXPRESSION_NOT_ALLOWED_SYMBOLS_AFTER_ERROR.':'.SPACE.$checkExprFrom); break;
+				case 6: error(S_EXPRESSION_NOT_ALLOWED_VALUE_IN_ELEMENT_ERROR.':'.SPACE.$checkExprFrom); break;
+				case 7: error(S_EXPRESSION_NOT_ALLOWED_SYMBOLS_OR_SEQUENCE_ERROR.':'.SPACE.$checkExprFrom); break;
+				case 8: error(S_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR.SPACE.$checkExprFrom); break;
+				case 9: error(S_EXPRESSION_HOST_KEY_DOES_NOT_ERROR.SPACE.$checkExprFrom); break;
 				case 10:
-					info(S_FUNCTION.' ('.$errData['function'].') '.S_AVAILABLE_ONLY_FOR_ITEMS_WITH_VALUE_TYPES_SMALL.' ['.implode(',',$errData['validTypes']).']');
-					error(S_INCORRECT_VALUE_TYPE.' ['.item_value_type2str($errData['value_type']).'] '.S_FOR_FUNCTION_SMALL.' ('.$errData['function'].'). '.$checkExprFrom);
+					info(S_FUNCTION.SPACE.'('.$errData['function'].')'.SPACE.S_AVAILABLE_ONLY_FOR_ITEMS_WITH_VALUE_TYPES_SMALL.SPACE.'['.implode(',',$errData['validTypes']).']');
+					error(S_INCORRECT_VALUE_TYPE.SPACE.'['.item_value_type2str($errData['value_type']).']'.SPACE.S_FOR_FUNCTION_SMALL.SPACE.'('.$errData['function'].').'.SPACE.$checkExprFrom);
 				break;
-				case 11: error(S_MISSING_MANDATORY_PARAMETER_FOR_FUNCTION.' ('.$errData['function'].'). '.$checkExprFrom); break;
-				case 12: error('['.$errData['errValue'].'] '.S_NOT_FLOAT_OR_MACRO_FOR_FUNCTION_SMALL.' ('.$errData['function'].'). '.$checkExprFrom); break;
-				case 13: error('['.$errData['errValue'].'] '.S_NOT_FLOAT_OR_MACRO_OR_COUNTER_FOR_FUNCTION_SMALL.' ('.$errData['function'].'). '.$checkExprFrom); break;
-				case 14: error(sprintf(S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR, $errData['function']).' '.$checkExprFrom); break;
-				case 15: error(S_INCORRECT_TRIGGER_EXPRESSION.'.'.SPACE.S_YOU_CAN_NOT_USE_TEMPLATE_HOSTS_MIXED_EXPR.' '.$checkExprFrom); break;
+				case 11: error(S_MISSING_MANDATORY_PARAMETER_FOR_FUNCTION.SPACE.'('.$errData['function'].').'.SPACE.$checkExprFrom); break;
+				case 12: error('['.$errData['errValue'].']'.SPACE.S_NOT_FLOAT_OR_MACRO_FOR_FUNCTION_SMALL.SPACE.'('.$errData['function'].').'.SPACE.$checkExprFrom); break;
+				case 13: error('['.$errData['errValue'].']'.SPACE.S_NOT_FLOAT_OR_MACRO_OR_COUNTER_FOR_FUNCTION_SMALL.SPACE.'('.$errData['function'].').'.SPACE.$checkExprFrom); break;
+				case 14: error(S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART1.SPACE.$errData['function'].SPACE.S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART2.SPACE.$checkExprFrom); break;
+				case 15: error(S_INCORRECT_TRIGGER_EXPRESSION.'.'.SPACE.S_YOU_CAN_NOT_USE_TEMPLATE_HOSTS_MIXED_EXPR.SPACE.$checkExprFrom); break;
 				case 16: error(S_INCORRECT_TRIGGER_EXPRESSION.'.'.SPACE.S_TRIGGER_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR.SPACE.$checkExprFrom); break;
 			}
 			if($totalBreak) break;

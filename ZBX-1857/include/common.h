@@ -84,9 +84,9 @@
 #	if defined(__va_copy)
 #		define va_copy(d, s) __va_copy(d, s)
 #	else
-#		define va_copy(d, s) memcpy (&d,&s, sizeof(va_list))
-#	endif /* __va_copy */
-#endif /* va_copy */
+#		define va_copy(d, s) memcpy(&d, &s, sizeof(va_list))
+#	endif
+#endif
 
 #ifdef snprintf
 #undef snprintf
@@ -109,14 +109,6 @@
 #define vsprintf	ERROR_DO_NOT_USE_VSPRINTF_FUNCTION_TRY_TO_USE_VSNPRINTF
 /*#define strncat		ERROR_DO_NOT_USE_STRNCAT_FUNCTION_TRY_TO_USE_ZBX_STRLCAT*/
 
-#ifdef HAVE_ATOLL
-#	define zbx_atoui64(str)	((zbx_uint64_t)atoll(str))
-#else
-#	define zbx_atoui64(str)	((zbx_uint64_t)atol(str))
-#endif
-
-#define zbx_atod(str)	strtod(str, (char **)NULL)
-
 #define ON	1
 #define OFF	0
 
@@ -137,7 +129,8 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #endif /* _WINDOWS */
 
 #ifndef HAVE_GETOPT_LONG
-	struct option {
+	struct option
+	{
 		const char *name;
 		int has_arg;
 		int *flag;
@@ -145,8 +138,6 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 	};
 #	define  getopt_long(argc, argv, optstring, longopts, longindex) getopt(argc, argv, optstring)
 #endif /* ndef HAVE_GETOPT_LONG */
-
-#define ZBX_UNUSED(a) ((void)0)(a)
 
 #define	SUCCEED		0
 #define	FAIL		(-1)
@@ -156,15 +147,7 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #define	AGENT_ERROR	(-5)
 char	*zbx_result_string(int result);
 
-/*
-#define ZBX_POLLER
-*/
-
-#ifdef ZBX_POLLER
-	#define MAX_STRING_LEN	800
-#else
-	#define MAX_STRING_LEN	2048
-#endif
+#define MAX_STRING_LEN	2048
 #define MAX_BUF_LEN	65536
 
 #define ZBX_DM_DELIMITER	'\255'
@@ -461,11 +444,10 @@ typedef enum
 } zbx_group_status_type_t;
 
 /* process type */
-typedef enum
-{
-	ZBX_PROCESS_SERVER = 0,
-	ZBX_PROCESS_PROXY
-} zbx_process_t;
+#define ZBX_PROCESS_SERVER		0x01
+#define ZBX_PROCESS_PROXY_ACTIVE	0x02
+#define ZBX_PROCESS_PROXY_PASSIVE	0x04
+#define ZBX_PROCESS_PROXY		0x06	/* ZBX_PROCESS_PROXY_ACTIVE | ZBX_PROCESS_PROXY_PASSIVE */
 
 /* maintenance */
 typedef enum
@@ -511,9 +493,10 @@ typedef enum
 #define HOST_STATUS_MONITORED		0
 #define HOST_STATUS_NOT_MONITORED	1
 /*#define HOST_STATUS_UNREACHABLE	2*/
-#define HOST_STATUS_TEMPLATE	3
-#define HOST_STATUS_DELETED	4
-#define HOST_STATUS_PROXY	5
+#define HOST_STATUS_TEMPLATE		3
+/*#define HOST_STATUS_DELETED		4*/
+#define HOST_STATUS_PROXY_ACTIVE	5
+#define HOST_STATUS_PROXY_PASSIVE	6
 
 /* Host maintenance status */
 #define HOST_MAINTENANCE_STATUS_OFF	0
@@ -671,11 +654,11 @@ const char *zbx_permission_string(int perm);
 #define	SNMPTRAPPER_TIMEOUT	5
 
 #ifndef MAX
-#	define MAX(a, b) ((a)>(b) ? (a) : (b))
+#	define MAX(a, b) ((a) > (b) ? (a) : (b))
 #endif
 
 #ifndef MIN
-#	define MIN(a, b) ((a)<(b) ? (a) : (b))
+#	define MIN(a, b) ((a) < (b) ? (a) : (b))
 #endif
 
 /* Secure string copy */
@@ -691,24 +674,28 @@ void    *zbx_realloc2(char *filename, int line, void *src, size_t size);
 #define zbx_free(ptr)		\
 	if (ptr)		\
 	{			\
-		/*fprintf(stderr, "%-6li => [file:%s,line:%d] zbx_free: %p\n", (long int)getpid(), __FILE__, __LINE__, ptr);*/	\
 		free(ptr);	\
 		ptr = NULL;	\
 	}
-#define zbx_fclose(f) { if(f){ fclose(f); f = NULL; } }
 
-/*#define ZBX_COND_NODEID " %s>=100000000000000*%d and %s<=(100000000000000*%d+99999999999999) "*/
-/*#define ZBX_COND_NODEID " %s>=%d00000000000000 and %s<=%d99999999999999 "
-#define LOCAL_NODE(fieldid) fieldid, CONFIG_NODEID, fieldid, CONFIG_NODEID
-#define ZBX_NODE(fieldid,nodeid) fieldid, nodeid, fieldid, nodeid*/
+#define zbx_fclose(file)	\
+	if (file)		\
+	{			\
+		fclose(file);	\
+		file = NULL;	\
+	}
+
+#define THIS_SHOULD_NEVER_HAPPEN	zbx_error("ERROR [file:%s,line:%d] "				\
+							"Something impossible has just happened.",	\
+							__FILE__, __LINE__);
 
 #define MIN_ZABBIX_PORT 1024u
 #define MAX_ZABBIX_PORT 65535u
 
-extern char *progname;
-extern char title_message[];
-extern char usage_message[];
-extern char *help_message[];
+extern const char	*progname;
+extern const char	title_message[];
+extern const char	usage_message[];
+extern const char	*help_message[];
 
 void	help();
 void	usage();
@@ -717,7 +704,7 @@ void	version();
 /* MAX Length of base64 data */
 #define ZBX_MAX_B64_LEN 16*1024
 
-char* get_programm_name(char *path);
+const char	*get_program_name(const char *path);
 
 typedef enum
 {
@@ -749,10 +736,8 @@ ZBX_TASK_EX
 	int		flags;
 };
 
-
 char	*string_replace(char *str, char *sub_str1, char *sub_str2);
 
-int	find_char(char *str, char c);
 int	is_double_prefix(char *str);
 int	is_double(char *c);
 int	is_uint_prefix(const char *c);
@@ -760,19 +745,18 @@ int	is_uint(char *c);
 int	is_uint64(register char *str, zbx_uint64_t *value);
 int	is_uoct(char *str);
 int	is_uhex(char *str);
-int	is_hex_string(char *str);
+int	is_hex_string(const char *str);
+int	is_ascii_string(const char *str);
 void	zbx_rtrim(char *str, const char *charlist);
 void	zbx_ltrim(register char *str, const char *charlist);
 void	zbx_remove_chars(register char *str, const char *charlist);
-void	lrtrim_spaces(char *c);
+#define zbx_remove_spaces(str)		zbx_remove_chars(str, " ");
+#define zbx_remove_whitespace(str)	zbx_remove_chars(str, " \t\n\r");
 void	compress_signs(char *str);
 void	ltrim_spaces(char *c);
 void	rtrim_spaces(char *c);
+void	lrtrim_spaces(char *c);
 void	del_zeroes(char *s);
-void	delete_reol(char *c);
-void	delete_chars(char *c, const char *charlist);
-#define delete_spaces(c)	delete_chars(c, " ");
-#define delete_whitespace(c)	delete_chars(c, " \t\n\r");
 int	get_param(const char *param, int num, char *buf, int maxlen);
 int	num_param(const char *param);
 char	*get_param_dyn(const char *param, int num);
@@ -780,7 +764,9 @@ void	remove_param(char *param, int num);
 const char	*get_string(const char *p, char *buf, size_t bufsize);
 int	get_key_param(char *param, int num, char *buf, int maxlen);
 int	num_key_param(char *param);
-int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, const char *delay_flex, time_t now);
+int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay,
+		const char *delay_flex, time_t now, int *effective_delay);
+time_t	calculate_proxy_nextcheck(zbx_uint64_t hostid, unsigned int delay, time_t now);
 int	check_time_period(const char *period, time_t now);
 char	zbx_num2hex(u_char c);
 u_char	zbx_hex2num(char c);
@@ -791,6 +777,7 @@ void	zbx_hex2octal(const char *input, char **output, int *olen);
 int	zbx_pg_escape_bytea(const u_char *input, int ilen, char **output, int *olen);
 int	zbx_pg_unescape_bytea(u_char *io);
 #endif
+int	zbx_get_field(const char *line, char *result, int num, char separator);
 int	zbx_get_next_field(const char **line, char **output, int *olen, char separator);
 int	str_in_list(char *list, const char *value, const char delimiter);
 
@@ -808,7 +795,7 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 #define SEC_PER_YEAR (365*SEC_PER_DAY)
 #define ZBX_JAN_1970_IN_SEC   2208988800.0        /* 1970 - 1900 in seconds */
 double	zbx_time(void);
-double	zbx_current_time (void);
+double	zbx_current_time(void);
 
 #ifdef HAVE___VA_ARGS__
 #	define zbx_error(fmt, ...) __zbx_zbx_error(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
@@ -839,16 +826,16 @@ void	zbx_chrcpy_alloc(char **str, int *alloc_len, int *offset, const char src);
 size_t	zbx_strlcpy(char *dst, const char *src, size_t siz);
 size_t	zbx_strlcat(char *dst, const char *src, size_t siz);
 
-char* zbx_dvsprintf(char *dest, const char *f, va_list args);
+char	*zbx_dvsprintf(char *dest, const char *f, va_list args);
 
 #ifdef HAVE___VA_ARGS__
 #	define zbx_dsprintf(dest, fmt, ...) __zbx_zbx_dsprintf(dest, ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
 #else
 #	define zbx_dsprintf __zbx_zbx_dsprintf
 #endif /* HAVE___VA_ARGS__ */
-char* __zbx_zbx_dsprintf(char *dest, const char *f, ...);
+char	*__zbx_zbx_dsprintf(char *dest, const char *f, ...);
 
-char* zbx_strdcat(char *dest, const char *src);
+char	*zbx_strdcat(char *dest, const char *src);
 
 #ifdef HAVE___VA_ARGS__
 #	define zbx_strdcatf(dest, fmt, ...) __zbx_zbx_strdcatf(dest, ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
@@ -890,9 +877,8 @@ int	regexp_match_ex(ZBX_REGEXP *regexps, int regexps_num, const char *string, co
 int	is_ip4(const char *ip);
 
 int	cmp_double(double a,double b);
-int     zbx_get_field(char *line, char *result, int num, char delim);
 
-void	zbx_on_exit();
+void	zbx_on_exit(); /* calls exit() at the end! */
 
 int	get_nodeid_by_id(zbx_uint64_t id);
 
@@ -944,15 +930,10 @@ int	__zbx_open(const char *pathname, int flags);
 #endif	/* _WINDOWS && _UNICODE */
 int	zbx_read(int fd, char *buf, size_t count, const char *encoding);
 
-int MAIN_ZABBIX_ENTRY(void);
+int	MAIN_ZABBIX_ENTRY(void);
 
-zbx_uint64_t	zbx_letoh_uint64(
-		zbx_uint64_t	data
-	);
-
-zbx_uint64_t	zbx_htole_uint64(
-		zbx_uint64_t	data
-	);
+zbx_uint64_t	zbx_letoh_uint64(zbx_uint64_t data);
+zbx_uint64_t	zbx_htole_uint64(zbx_uint64_t data);
 
 int	is_hostname_char(const char c);
 int	is_key_char(const char c);
@@ -960,4 +941,5 @@ int	is_function_char(const char c);
 int	parse_function(char **exp, char **func, char **params);
 int	parse_host_key(char *exp, char **host, char **key);
 void	make_hostname(char *host);
+
 #endif

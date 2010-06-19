@@ -599,12 +599,13 @@ COpt::memoryPick();
 				
 // check ymin, ymax items
 				$axis_items = array();
-				if($graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE){
+				if(isset($graph['ymin_type']) && ($graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE)){
 					$axis_items[] = $graph['ymin_itemid'];
 				}
-				if($graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE){
+				if(isset($graph['ymax_type']) && ($graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE)){
 					$axis_items[] = $graph['ymax_itemid'];
 				}
+				if(!empty($axis_items))
 				self::checkAxisItems($axis_items, $templated_graph);
 			
 	
@@ -705,13 +706,14 @@ COpt::memoryPick();
 
 // check ymin, ymax items
 				$axis_items = array();
-				if($graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE){
+				if(isset($graph['ymin_type']) && ($graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE)){
 					$axis_items[] = $graph['ymin_itemid'];
 				}
-				if($graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE){
+				if(isset($graph['ymax_type']) && $graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE){
 					$axis_items[] = $graph['ymax_itemid'];
 				}
-				self::checkAxisItems($axis_items, $templated_graph);
+				if(!empty($axis_items))
+					self::checkAxisItems($axis_items, $templated_graph);
 				
 
 				self::updateReal($graph);
@@ -972,6 +974,7 @@ COpt::memoryPick();
 				'hostids' => $data['hostids'],
 				'editable' => 1,
 				'preservekeys' => 1,
+				'templated_hosts' => 1,
 				'output' => API_OUTPUT_SHORTEN
 			);
 			$allowedHosts = CHost::get($options);		
@@ -980,7 +983,6 @@ COpt::memoryPick();
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				}
 			}
-
 			$options = array(
 				'templateids' => $data['templateids'],
 				'preservekeys' => 1,

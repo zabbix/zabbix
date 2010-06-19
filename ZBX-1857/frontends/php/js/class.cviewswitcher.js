@@ -33,8 +33,9 @@ CViewSwitcher.prototype = {
     this.inAction = false;
     this.fieldsPreChanged = preChangedFields ? true:false;
     this.depIds = confData;
-    this.mainObj = document.getElementById(objId);
-
+this.mainObj = $(objId);
+	if(is_null(this.mainObj)) throw('ViewSwitcher error: main object not found!');
+	
     if(!is_array(objAction)) objAction = new Array(objAction);
 
     var me = this; // required for next action;
@@ -53,13 +54,12 @@ CViewSwitcher.prototype = {
     this.inAction = true;
 
     var myValue = this.objValue(this.mainObj);
-
     if(myValue == this.lastValue) {
       this.inAction = false;
       return;
     }
 
-    if(this.lastValue && this.depIds[this.lastValue]) {
+    if(isset(this.lastValue, this.depIds)) {
       //alert('HIDING\n'+this.mainObj.id+'\n'+this.lastValue+': '+this.depIds[this.lastValue]);
       for(var i in this.depIds[this.lastValue]) {
         if(typeof(this.depIds[this.lastValue][i]) != 'string' && this.depIds[this.lastValue][i] != 'object' && !this.depIds[this.lastValue][i].id) {
@@ -86,19 +86,19 @@ CViewSwitcher.prototype = {
     //this.shownIds = null;
     //this.shownIds = new Array();
 
-    if(myValue && this.depIds[myValue]) {
+    if(isset(myValue, this.depIds)) {
       //alert('SHOWING\n'+this.mainObj.id+'\n'+myValue+': '+this.depIds[myValue]);
       for(var i in this.depIds[myValue]) {
         if(typeof(this.depIds[myValue][i]) != 'string' && this.depIds[myValue][i] != 'object' && !this.depIds[myValue][i].id) {
-          if(typeof(this.depIds[myValue][i]) != 'function') alert(this.depIds[myValue][i]+': '+typeof(this.depIds[myValue][i]));
+          //if(typeof(this.depIds[myValue][i]) != 'function') alert(this.depIds[myValue][i]+': '+typeof(this.depIds[myValue][i]));
           continue;
         }
         //alert('SHOWING\n'+this.mainObj.id+'\n'+myValue+': '+this.depIds[myValue][i]);
         //if(this.depIds[myValue][i] && !this.depIds[myValue][i].id) this.depIds[myValue][i] = {id: this.depIds[myValue][i], value:''};
 
         //var elm = document.getElementById(this.depIds[myValue][i].id);
-        var elm = document.getElementById(this.depIds[myValue][i].id ? this.depIds[myValue][i].id : this.depIds[myValue][i]);
-        if(!elm) {
+        var elm = $(this.depIds[myValue][i].id ? this.depIds[myValue][i].id : this.depIds[myValue][i]);
+        if(is_null(elm)) {
 //          alert(this.depIds[myValue][i]);
           continue;
         }
@@ -290,3 +290,4 @@ CViewSwitcher.prototype = {
     }
   }
 }
+

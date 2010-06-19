@@ -41,6 +41,7 @@ function __autoload($class_name){
 		'citem' => 1,
 		'cmaintenance' => 1,
 		'cmap' => 1,
+		'cmediatype' => 1,
 		'cproxy' => 1,
 		'cscreen' => 1,
 		'cscript' => 1,
@@ -200,15 +201,22 @@ function __autoload($class_name){
 			process_locales();
 		}
 		
+		include_once('include/locales/en_gb.inc.php');
+		process_locales();
+
 		if($USER_DETAILS['attempt_failed']) {
 			$attemps = bold($USER_DETAILS['attempt_failed']);
 			$attempip = bold($USER_DETAILS['attempt_ip']);
 			$attempdate = bold(zbx_date2str(S_CUSER_ERROR_DATE_FORMAT,$USER_DETAILS['attempt_clock']));
-			error(new CJSscript(sprintf(	S_CUSER_ERROR_ATTEMP_FAILED,
-							$attemps->toString(),
-							$attempip->toString(),
-							$attempdate->toString()
-							)));
+
+			$error_msg = array(
+				$attemps,
+				SPACE.S_CUSER_ERROR_FAILED_LOGIN_ATTEMPTS,SPACE.S_CUSER_ERROR_LAST_FAILED_ATTEMPTS.SPACE,
+				$attempip,
+				SPACE.S_ON_SMALL.SPACE,
+				$attempdate
+			);
+			error(new CSpan($error_msg));
 		}
 	}
 	else{
@@ -221,6 +229,7 @@ function __autoload($class_name){
 				'name'  =>'- unknown -',
 				'nodeid'=>0)
 			);
+		
 	}
 
 	include_once('include/locales/en_gb.inc.php');
@@ -298,7 +307,10 @@ function __autoload($class_name){
 					return PAGE_TYPE_JS;
 					break;
 				case 'json':
-					return PAGE_TYPE_JS;
+					return PAGE_TYPE_JSON;
+					break;
+				case 'json-rpc':
+					return PAGE_TYPE_JSON_RPC;
 					break;
 				case 'html':
 					return PAGE_TYPE_HTML_BLOCK;
@@ -361,7 +373,7 @@ function __autoload($class_name){
 
 					if(isset($ZBX_MESSAGES) && !empty($ZBX_MESSAGES)){
 						$msg_details = new CDiv(S_DETAILS,'blacklink');
-						$msg_details->setAttribute('onclick',new CJSscript("javascript: ShowHide('msg_messages', IE?'block':'table');"));
+						$msg_details->setAttribute('onclick', "javascript: ShowHide('msg_messages', IE?'block':'table');");
 						$msg_details->setAttribute('title',S_MAXIMIZE.'/'.S_MINIMIZE);
 						array_unshift($row, new CCol($msg_details,'clr'));
 					}
@@ -509,9 +521,9 @@ function __autoload($class_name){
 	}
 
 	function fatal_error($msg){
-		include_once 'include/page_header.php';
+		include_once('include/page_header.php');
 		show_error_message($msg);
-		include_once 'include/page_footer.php';
+		include_once('include/page_footer.php');
 	}
 
 	function get_tree_by_parentid($parentid,&$tree,$parent_field, $level=0){
@@ -546,7 +558,9 @@ function __autoload($class_name){
 		$triggerids='';
 
 		$options = array(
-			'only_problems' => 1,
+			'filter' => array(
+				'value' => TRIGGER_VALUE_TRUE
+			),
 			'with_unacknowledged_events' => 1,
 			'output' => array('triggerid', 'priority')
 		);
@@ -696,7 +710,7 @@ function __autoload($class_name){
 			if(($arr[3] * 100 + $arr[4]) >= ($arr[5] * 100 + $arr[6])) // check time period
 				return false;
 
-			$out .= sprintf("%d-%d,%02d:%02d-%02d:%02d",$arr[1],$arr[2],$arr[3],$arr[4],$arr[5],$arr[6]).';';
+			$out .= sprintf('%d-%d,%02d:%02d-%02d:%02d',$arr[1],$arr[2],$arr[3],$arr[4],$arr[5],$arr[6]).';';
 		}
 		$str = $out;
 //parse_period($str);
@@ -781,13 +795,10 @@ function __autoload($class_name){
 		$row=DBfetch(DBselect($sql.' AND i.status=3'));
 		$status['items_count_not_supported']=$row['cnt'];
 
-		$row=DBfetch(DBselect($sql.' AND i.type=2'));
-		$status['items_count_trapper']=$row['cnt'];
-
 // hosts
 		$sql = 'SELECT COUNT(hostid) as cnt '.
 				' FROM hosts '.
-				' WHERE status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.','.HOST_STATUS_DELETED.' )';
+				' WHERE status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.' )';
 		$row=DBfetch(DBselect($sql));
 		$status['hosts_count']=$row['cnt'];
 
@@ -799,9 +810,6 @@ function __autoload($class_name){
 
 		$row=DBfetch(DBselect('SELECT COUNT(hostid) as cnt FROM hosts WHERE status='.HOST_STATUS_TEMPLATE));
 		$status['hosts_count_template']=$row['cnt'];
-
-		$row=DBfetch(DBselect('SELECT COUNT(hostid) as cnt FROM hosts WHERE status='.HOST_STATUS_DELETED));
-		$status['hosts_count_deleted']=$row['cnt'];
 
 // users
 		$row=DBfetch(DBselect('SELECT COUNT(userid) as cnt FROM users'));
@@ -925,7 +933,7 @@ function __autoload($class_name){
 
 		if(IMAGE_FORMAT_JPEG == $format)	Header( "Content-type:  image/jpeg");
 		if(IMAGE_FORMAT_TEXT == $format)	Header( "Content-type:  text/html");
-		else								Header( "Content-type:  image/png");
+		else					Header( "Content-type:  image/png");
 
 		Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT");
 	}
@@ -998,7 +1006,7 @@ function __autoload($class_name){
 			case 10: $month = S_OCTOBER; break;
 			case 11: $month = S_NOVEMBER; break;
 			case 12: $month = S_DECEMBER; break;
-			default: $month = sprintf(S_CONFIG_WARNING_WRONG_MONTH, $num);
+			default: $month = S_CONFIG_WARNING_WRONG_MONTH_PART1.SPACE.$num.SPACE.S_CONFIG_WARNING_WRONG_MONTH_PART2;
 		}
 
 		return $month;
@@ -1013,7 +1021,7 @@ function __autoload($class_name){
 			case 5: $day = S_FRIDAY; break;
 			case 6: $day = S_SATURDAY; break;
 			case 7: $day = S_SUNDAY; break;
-			default: $day = sprintf(S_CONFIG_WARNING_WRONG_DOW, $num);
+			default: $day = S_CONFIG_WARNING_WRONG_DOW_PART1.SPACE.$num.SPACE.S_CONFIG_WARNING_WRONG_DOW_PART2;
 		}
 
 	return $day;
@@ -1145,10 +1153,10 @@ function __autoload($class_name){
 		$url = $link->getUrl();
 
 		if(($page['type'] != PAGE_TYPE_HTML) && defined('ZBX_PAGE_MAIN_HAT')){
-			$script = new CJSscript("javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
+			$script = "javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');";
 		}
 		else{
-			$script = new CJSscript("javascript: redirect('".$url."');");
+			$script = "javascript: redirect('".$url."');";
 		}
 
 		$col = array(new CSpan($obj,'underline'));

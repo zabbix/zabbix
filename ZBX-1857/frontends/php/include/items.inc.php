@@ -457,27 +457,6 @@
 	return $result;
 	}
 
-	function update_trigger_value_to_unknown_by_itemid($itemids){
-		zbx_value2array($itemids);
-
-		$now = time();
-		$result = DBselect('SELECT DISTINCT t.triggerid '.
-				' FROM triggers t,functions f '.
-				' WHERE f.triggerid=t.triggerid '.
-					' AND '.DBcondition('f.itemid',$itemids));
-
-		$triggerids = array();
-		while($row = DBfetch($result)){
-			if(!add_event($row['triggerid'], TRIGGER_VALUE_UNKNOWN, $now))
-				continue;
-			$triggerids[$row['triggerid']] = $row['triggerid'];
-		}
-
-		if(!empty($triggers)){
-			DBexecute('UPDATE triggers SET value='.TRIGGER_VALUE_UNKNOWN.' WHERE '.DBcondition('triggerid',$triggerids));
-		}
-	}
-
 // Update Item status
 
 	function update_item_status($itemids, $status){
@@ -1025,7 +1004,7 @@
 		if(!$result)	return	$result;
 //--
 
-// delete graphs		
+// delete graphs
 		$del_graphs = array();
 		$sql = 'SELECT gi.graphid'.
 			' FROM graphs_items gi'.
@@ -1040,12 +1019,12 @@
 		while($db_graph = DBfetch($db_graphs)){
 			$del_graphs[$db_graph['graphid']] = $db_graph['graphid'];
 		}
-		
+
 		if(!empty($del_graphs)){
 			$result = delete_graph($del_graphs);
 			if(!$result)	return	$result;
 		}
-		
+
 		DBexecute('DELETE FROM graphs_items WHERE '.DBcondition('itemid', $itemids));
 //--
 
@@ -1141,7 +1120,7 @@
 				}
 			}
 		}
-		
+
 		CUserMacro::resolveItem($item);
 
 		return $item['key_'];
@@ -1623,7 +1602,7 @@
 
 		foreach($arr_of_flex_intervals as $fnum => $flex_interval){
 			if(2 != sscanf($flex_interval, "%d/%29s", $flex_delay, $flex_period)) continue;
-			
+
 			if(($flex_delay < $current_delay) && check_time_period($flex_period, $now)){
 				$current_delay = $flex_delay;
 			}

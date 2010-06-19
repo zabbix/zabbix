@@ -198,7 +198,7 @@ include_once('include/page_header.php');
 				$stat = calculate_service_availability($row['serviceid'], $period_start, $period_end);
 
 				$p = min($stat['problem'], 20);
-				$sla_style = ($row['goodsla'] > $stat['ok'])?'on':'off';
+				$sla_style = ($row['goodsla'] > $stat['ok'])? 'on':'off';
 
 				$sizeX = 160;
 				$sizeY = 15;
@@ -221,7 +221,7 @@ include_once('include/page_header.php');
 					$chart2 = new CLink($chart2,'report3.php?serviceid='.$row['serviceid'].'&year='.date('Y'),'image');
 				}
 
-				$text = new CLink(sprintf("%.2f",$stat['problem']),'report3.php?serviceid='.$row['serviceid'].'&year='.date('Y'), $sla_style);
+				$text = new CLink(sprintf('%.2f',$stat['problem']),'report3.php?serviceid='.$row['serviceid'].'&year='.date('Y'), $sla_style);
 
 				$sla_tab->addRow(array($chart1, $chart2, SPACE, $text));
 
@@ -263,12 +263,12 @@ include_once('include/page_header.php');
 
 		$tree = new CTree('service_status_tree',
 							$treeServ,
-							array('caption' => bold(S_SERVICE),
-								'status' => bold(S_STATUS),
-								'reason' => bold(S_REASON),
-								'sla' => bold('SLA ('.$periods[$period].')'),
-								'sla2' => bold(nbsp(S_SLA)),
-								'graph' => bold(S_GRAPH))
+							array('caption' => S_SERVICE,
+								'status' => S_STATUS,
+								'reason' => S_REASON,
+								'sla' => 'SLA ('.$periods[$period].')',
+								'sla2' => nbsp(S_SLA),
+								'graph' => S_GRAPH)
 						);
 
 		if($tree){
@@ -285,10 +285,10 @@ include_once('include/page_header.php');
 
 			$r_form->addItem(array(S_PERIOD.SPACE, $period_combo));
 
-			$url = '?period='.$period.'&fullscreen='.($_REQUEST['fullscreen']?'0':'1');
+			$url = '?period='.$period.'&fullscreen='.($_REQUEST['fullscreen']? '0':'1');
 			$fs_icon = new CDiv(SPACE, 'fullscreen');
 			$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-			$fs_icon->addAction('onclick',new CJSscript("javascript: document.location = '".$url."';"));
+			$fs_icon->addAction('onclick', "javascript: document.location = '".$url."';");
 
 			$srv_wdgt = new CWidget('hat_services', $tree->getHTML());
 

@@ -22,7 +22,7 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: get_programm_name                                                *
+ * Function: get_program_name                                                 *
  *                                                                            *
  * Purpose: return program name without path                                  *
  *                                                                            *
@@ -35,13 +35,13 @@
  *  Comments:                                                                 *
  *                                                                            *
  ******************************************************************************/
-char* get_programm_name(char *path)
+const char	*get_program_name(const char *path)
 {
-	char	*filename = NULL;
+	const char	*filename = NULL;
 
-	for(filename = path; path && *path; path++)
-		if(*path == '\\' || *path == '/')
-			filename = path+1;
+	for (filename = path; path && *path; path++)
+		if (*path == '\\' || *path == '/')
+			filename = path + 1;
 
 	return filename;
 }
@@ -61,7 +61,7 @@ char* get_programm_name(char *path)
  *  Comments:                                                                 *
  *                                                                            *
  ******************************************************************************/
-int get_nodeid_by_id(zbx_uint64_t id)
+int	get_nodeid_by_id(zbx_uint64_t id)
 {
 	return (int)(id/__UINT64_C(100000000000000))%1000;
 
@@ -419,7 +419,8 @@ static int	get_next_delay_interval(const char *flex_intervals, time_t now, time_
  *           !!! Don't forget to sync code with PHP !!!                       *
  *                                                                            *
  ******************************************************************************/
-int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, const char *flex_intervals, time_t now)
+int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay,
+		const char *flex_intervals, time_t now, int *effective_delay)
 {
 	int	nextcheck;
 
@@ -465,8 +466,40 @@ int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, cons
 		while (nextcheck <= now)
 			nextcheck += delay;
 	}
+	
+	if (NULL != effective_delay)
+		*effective_delay = delay;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End calculate_item_nextcheck (result:%d)", nextcheck);
+	zabbix_log(LOG_LEVEL_DEBUG, "End calculate_item_nextcheck (nextcheck:%d delay:%d)", nextcheck, delay);
+
+	return nextcheck;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: calculate_proxy_nextcheck                                        *
+ *                                                                            *
+ * Purpose: calculate nextcheck timestamp for passive proxy                   *
+ *                                                                            *
+ * Parameters: hostid - [IN] host identificator from database                 *
+ *             delay  - [IN] default delay value, can be overridden           *
+ *             now    - [IN] current timestamp                                *
+ *                                                                            *
+ * Return value: nextcheck value                                              *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+time_t	calculate_proxy_nextcheck(zbx_uint64_t hostid, unsigned int delay, time_t now)
+{
+	time_t	nextcheck;
+
+	nextcheck = delay * (now / delay) + (unsigned int)(hostid % delay);
+
+	while (nextcheck <= now)
+		nextcheck += delay;
 
 	return nextcheck;
 }
@@ -1201,9 +1234,10 @@ int	is_double(char *c)
  ******************************************************************************/
 int	is_uint_prefix(const char *c)
 {
-	int	i;
+	int	i = 0;
 
-	for (i=0; c[i]==' '; i++); /* trim left spaces */
+	while (c[i]==' ') /* trim left spaces */
+		i++;
 	
 	if (!isdigit(c[i]))
 		return FAIL;
@@ -1426,7 +1460,7 @@ int	is_uhex(char *str)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	is_hex_string(char *str)
+int	is_hex_string(const char *str)
 {
 	if ('\0' == *str)
 		return FAIL;

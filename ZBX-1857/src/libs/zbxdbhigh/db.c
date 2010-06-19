@@ -17,7 +17,6 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -38,7 +37,7 @@
 #include "zbxserver.h"
 #include "dbcache.h"
 
-const char *DBnode(const char *fieldid, const int nodeid)
+const char	*DBnode(const char *fieldid, const int nodeid)
 {
 	static char	dbnode[128];
 
@@ -67,15 +66,18 @@ void    DBconnect(int flag)
 	int	err;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "Connect to the database");
-	do {
-		err = zbx_db_connect(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBNAME, CONFIG_DBSOCKET, CONFIG_DBPORT);
+	do
+	{
+		err = zbx_db_connect(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD,
+					CONFIG_DBNAME, CONFIG_DBSOCKET, CONFIG_DBPORT);
 
 		switch(err) {
 		case ZBX_DB_OK:
 			break;
 		case ZBX_DB_DOWN:
-			if(flag == ZBX_DB_CONNECT_EXIT)
+			if (ZBX_DB_CONNECT_EXIT == flag)
 			{
+				zabbix_log(LOG_LEVEL_DEBUG, "Could not connect to the database. Exiting...");
 				exit(FAIL);
 			}
 			else
@@ -86,9 +88,11 @@ void    DBconnect(int flag)
 			}
 			break;
 		default:
+			zabbix_log(LOG_LEVEL_DEBUG, "Could not connect to the database. Exiting...");
 			exit(FAIL);
 		}
-	} while(ZBX_DB_OK != err);
+	}
+	while (ZBX_DB_OK != err);
 }
 
 /******************************************************************************
@@ -350,43 +354,47 @@ DB_RESULT	DBselectN(const char *query, int n)
 /* Rewrite required to simplify logic ?*/
 int	latest_service_alarm(zbx_uint64_t serviceid, int status)
 {
+	const char	*__function_name = "latest_service_alarm";
 	DB_RESULT	result;
 	DB_ROW		row;
-	int ret = FAIL;
-	char sql[MAX_STRING_LEN];
+	int		ret = FAIL;
+	char		sql[MAX_STRING_LEN];
 
-	zbx_snprintf(sql,sizeof(sql),"select servicealarmid, value from service_alarms where serviceid=" ZBX_FS_UI64 " order by servicealarmid desc", serviceid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): serviceid [" ZBX_FS_UI64 "] status [%d]",
+			__function_name, serviceid, status);
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In latest_service_alarm()");
+	zbx_snprintf(sql, sizeof(sql), "select servicealarmid,value"
+					" from service_alarms"
+					" where serviceid=" ZBX_FS_UI64
+					" order by servicealarmid desc", serviceid);
 
-	result = DBselectN(sql,1);
+	result = DBselectN(sql, 1);
 	row = DBfetch(result);
 
-	if(row && (DBis_null(row[1])==FAIL) && (atoi(row[1]) == status)){
+	if (NULL != row && FAIL == DBis_null(row[1]) && status == atoi(row[1]))
+	{
 		ret = SUCCEED;
 	}
 
 	DBfree_result(result);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
 	return ret;
 }
 
-int	DBadd_service_alarm(zbx_uint64_t serviceid,int status,int clock)
+int	DBadd_service_alarm(zbx_uint64_t serviceid, int status, int clock)
 {
-	zabbix_log(LOG_LEVEL_DEBUG,"In add_service_alarm()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In add_service_alarm()");
 
-	if(latest_service_alarm(serviceid,status) == SUCCEED)
+	if (SUCCEED != latest_service_alarm(serviceid, status))
 	{
-		return SUCCEED;
+		DBexecute("insert into service_alarms (servicealarmid,serviceid,clock,value)"
+			" values(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d)",
+			DBget_maxid("service_alarms"), serviceid, clock, status);
 	}
 
-	DBexecute("insert into service_alarms(servicealarmid,serviceid,clock,value) values(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d)",
-		DBget_maxid("service_alarms"),
-		serviceid,
-		clock,
-		status);
-
-	zabbix_log(LOG_LEVEL_DEBUG,"End of add_service_alarm()");
+	zabbix_log(LOG_LEVEL_DEBUG, "End of add_service_alarm()");
 
 	return SUCCEED;
 }
@@ -408,7 +416,7 @@ int	DBadd_service_alarm(zbx_uint64_t serviceid,int status,int clock)
  ******************************************************************************/
 static int	trigger_dependent_rec(zbx_uint64_t triggerid, int *level)
 {
-	int	ret = FAIL;
+	int		ret = FAIL;
 	DB_RESULT	result;
 	DB_ROW		row;
 
@@ -560,10 +568,8 @@ int	DBupdate_trigger_value(zbx_uint64_t triggerid, int trigger_type, int trigger
 	{
 		reason_esc = DBdyn_escape_string_len(reason, TRIGGER_ERROR_LEN);
 		DBexecute("update triggers"
-				" set lastchange=%d,"
-					"error='%s'"
+				" set error='%s'"
 				" where triggerid=" ZBX_FS_UI64,
-				now,
 				reason_esc,
 				triggerid);
 		zbx_free(reason_esc);
@@ -577,7 +583,7 @@ int	DBupdate_trigger_value(zbx_uint64_t triggerid, int trigger_type, int trigger
 	return ret;
 }
 
-void  DBdelete_service(zbx_uint64_t serviceid)
+void	DBdelete_service(zbx_uint64_t serviceid)
 {
 	DBexecute("delete from services_links where servicedownid=" ZBX_FS_UI64 " or serviceupid=" ZBX_FS_UI64,
 		serviceid,
@@ -586,7 +592,7 @@ void  DBdelete_service(zbx_uint64_t serviceid)
 		serviceid);
 }
 
-void  DBdelete_services_by_triggerid(zbx_uint64_t triggerid)
+void	DBdelete_services_by_triggerid(zbx_uint64_t triggerid)
 {
 	zbx_uint64_t	serviceid;
 	DB_RESULT	result;
@@ -608,14 +614,14 @@ void  DBdelete_services_by_triggerid(zbx_uint64_t triggerid)
 		triggerid);
 }
 
-void  DBdelete_trigger(zbx_uint64_t triggerid)
+void	DBdelete_trigger(zbx_uint64_t triggerid)
 {
 	DBexecute("delete from trigger_depends where triggerid_down=" ZBX_FS_UI64 " or triggerid_up=" ZBX_FS_UI64,
 		triggerid,
 		triggerid);
 	DBexecute("delete from functions where triggerid=" ZBX_FS_UI64,
 		triggerid);
-	DBexecute("delete from events where object=%d AND objectid=" ZBX_FS_UI64,
+	DBexecute("delete from events where object=%d and objectid=" ZBX_FS_UI64,
 		EVENT_OBJECT_TRIGGER,
 		triggerid);
 
@@ -625,7 +631,7 @@ void  DBdelete_trigger(zbx_uint64_t triggerid)
 	DBexecute("delete from triggers where triggerid=" ZBX_FS_UI64,triggerid);
 }
 
-void DBupdate_triggers_status_after_restart(void)
+void	DBupdate_triggers_status_after_restart(void)
 {
 	const char	*__function_name = "DBupdate_triggers_after_restart";
 	DB_RESULT	result;
@@ -688,7 +694,7 @@ void DBupdate_triggers_status_after_restart(void)
 				lastclock = atoi(row2[2]);
 			delay = atoi(row2[3]);
 
-			nextcheck = calculate_item_nextcheck(itemid, type, delay, row2[4], lastclock);
+			nextcheck = calculate_item_nextcheck(itemid, type, delay, row2[4], lastclock, NULL);
 			if (-1 == min_nextcheck || nextcheck < min_nextcheck)
 				min_nextcheck = nextcheck;
 		}
@@ -780,9 +786,9 @@ int	DBadd_trend_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock)
 	if(row)
 	{
 		num = atoi(row[0]);
-		value_min = zbx_atoui64(row[1]);
-		value_avg = zbx_atoui64(row[2]);
-		value_max = zbx_atoui64(row[3]);
+		ZBX_STR2UINT64(value_min, row[1]);
+		ZBX_STR2UINT64(value_avg, row[2]);
+		ZBX_STR2UINT64(value_max, row[3]);
 		if(value<value_min)	value_min=value;
 		if(value>value_max)	value_max=value;
 		value_avg=(num*value_avg+value)/(num+1);
@@ -811,47 +817,20 @@ int	DBadd_trend_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock)
 	return SUCCEED;
 }
 
-int	DBget_items_count(void)
+int	DBget_row_count(const char *table_name)
 {
-	int	res;
-	char	sql[MAX_STRING_LEN];
+	const char	*__function_name = "DBget_row_count";
+	int		count;
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_items_count()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): %s", __function_name, table_name);
 
-	result = DBselect("select count(*) from items");
+	result = DBselect("select count(*) from %s", table_name);
 
-	row=DBfetch(result);
+	row = DBfetch(result);
 
-	if(!row || DBis_null(row[0])==SUCCEED)
-	{
-		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query [%s]", sql);
-		zabbix_syslog("Cannot execute query [%s]", sql);
-		DBfree_result(result);
-		return 0;
-	}
-
-	res  = atoi(row[0]);
-
-	DBfree_result(result);
-
-	return res;
-}
-
-int	DBget_triggers_count(void)
-{
-	int	res;
-	DB_RESULT	result;
-	DB_ROW		row;
-
-	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_triggers_count()");
-
-	result = DBselect("select count(*) from triggers");
-
-	row=DBfetch(result);
-
-	if(!row || DBis_null(row[0])==SUCCEED)
+	if (NULL == row || SUCCEED == DBis_null(row[0]))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query");
 		zabbix_syslog("Cannot execute query");
@@ -859,53 +838,29 @@ int	DBget_triggers_count(void)
 		return 0;
 	}
 
-	res  = atoi(row[0]);
+	count = atoi(row[0]);
 
 	DBfree_result(result);
 
-	return res;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %s %d", __function_name, table_name, count);
+
+	return count;
 }
 
-int	DBget_items_unsupported_count(void)
+int	DBget_items_unsupported_count()
 {
-	int	res;
+	const char	*__function_name = "DBget_items_unsupported_count";
+	int		count;
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_items_unsupported_count()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	result = DBselect("select count(*) from items where status=%d", ITEM_STATUS_NOTSUPPORTED);
 
-	row=DBfetch(result);
-
-	if(!row || DBis_null(row[0])==SUCCEED)
-	{
-		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query");
-		zabbix_syslog("Cannot execute query");
-		DBfree_result(result);
-		return 0;
-	}
-
-	res  = atoi(row[0]);
-
-	DBfree_result(result);
-
-	return res;
-}
-
-int	DBget_history_count(const char *table_name)
-{
-	int		res;
-	DB_RESULT	result;
-	DB_ROW		row;
-
-	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_history_count(): %s", table_name);
-
-	result = DBselect("select count(*) from %s", table_name);
-
 	row = DBfetch(result);
 
-	if (!row || DBis_null(row[0]) == SUCCEED)
+	if (NULL == row || SUCCEED == DBis_null(row[0]))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query");
 		zabbix_syslog("Cannot execute query");
@@ -913,66 +868,44 @@ int	DBget_history_count(const char *table_name)
 		return 0;
 	}
 
-	res = atoi(row[0]);
+	count = atoi(row[0]);
 
 	DBfree_result(result);
 
-	return res;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %s %d", __function_name, count);
+
+	return count;
 }
 
-int	DBget_trends_count(const char *table_name)
+int	DBget_queue_count(int from, int to)
 {
-	int		res;
+	const char	*__function_name = "DBget_queue_count";
+	int		count = 0, now;
 	DB_RESULT	result;
 	DB_ROW		row;
-
-	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_trends_count(): %s", table_name);
-
-	result = DBselect("select count(*) from %s", table_name);
-
-	row = DBfetch(result);
-
-	if (!row || DBis_null(row[0]) == SUCCEED)
-	{
-		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query");
-		zabbix_syslog("Cannot execute query");
-		DBfree_result(result);
-		return 0;
-	}
-
-	res = atoi(row[0]);
-
-	DBfree_result(result);
-
-	return res;
-}
-
-int	DBget_queue_count(void)
-{
-	int		res = 0, now;
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	itemid;
-	int		item_type, delay, nextcheck;
+	zbx_uint64_t	itemid, proxy_hostid;
+	int		item_type, delay, effective_delay, nextcheck;
 	char		*delay_flex;
 	time_t		lastclock;
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_queue_count()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): from [%d] to [%d]", __function_name, from, to);
 
 	now = time(NULL);
 
 	result = DBselect(
-			"select i.itemid,i.type,i.delay,i.delay_flex,i.lastclock,h.host"
+			"select i.itemid,i.type,i.delay,i.delay_flex,i.lastclock,h.proxy_hostid"
 			" from items i,hosts h"
 			" where i.hostid=h.hostid"
-				" and h.proxy_hostid=0"
 				" and h.status=%d"
 				" and i.status=%d"
 				" and i.value_type not in (%d)"
 				" and i.key_ not in ('%s','%s')"
-				" and not i.lastclock is null"
 				" and ("
-					"i.type in (%d,%d,%d,%d,%d,%d,%d)"
+					"i.lastclock is not null"
+					" and i.lastclock<%d"
+					")"
+				" and ("
+					"i.type in (%d,%d,%d,%d,%d,%d,%d,%d)"
 					" or (h.available<>%d and i.type in (%d))"
 					" or (h.snmp_available<>%d and i.type in (%d,%d,%d))"
 					" or (h.ipmi_available<>%d and i.type in (%d))"
@@ -982,8 +915,9 @@ int	DBget_queue_count(void)
 			ITEM_STATUS_ACTIVE,
 			ITEM_VALUE_TYPE_LOG,
 			SERVER_STATUS_KEY, SERVER_ZABBIXLOG_KEY,
+			now - from,
 				ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SIMPLE,
-				ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL,
+				ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_CALCULATED,
 			HOST_AVAILABLE_FALSE,
 				ITEM_TYPE_ZABBIX,
 			HOST_AVAILABLE_FALSE,
@@ -997,32 +931,33 @@ int	DBget_queue_count(void)
 		item_type	= atoi(row[1]);
 		delay		= atoi(row[2]);
 		delay_flex	= row[3];
+		ZBX_STR2UINT64(proxy_hostid, row[5]);
 
 		if (FAIL == (lastclock = DCget_item_lastclock(itemid)))
-		{
-			if (SUCCEED == DBis_null(row[4]))
-				lastclock = 0;
-			else
-				lastclock = (time_t)atoi(row[4]);
-		}
+			lastclock = (time_t)atoi(row[4]);
 
-		nextcheck = calculate_item_nextcheck(itemid, item_type, delay, delay_flex, lastclock);
+		nextcheck = calculate_item_nextcheck(itemid, item_type, delay, delay_flex, lastclock, &effective_delay);
+		if (0 != proxy_hostid)
+			nextcheck = lastclock + effective_delay;
 
-		if (now - nextcheck > 5)
-			res++;
+		if ((-1 == from || from <= now - nextcheck) && (-1 == to || now - nextcheck <= to))
+			count++;
 	}
 	DBfree_result(result);
 
-	return res;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %d", __function_name, count);
+
+	return count;
 }
 
-double	DBget_requiredperformance(void)
+double	DBget_requiredperformance()
 {
+	const char	*__function_name = "DBget_requiredperformance";
 	double		qps_total = 0;
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In DBget_requiredperformance()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	/* !!! Don't forget sync code with PHP !!! */
 	result = DBselect("select sum(1.0/i.delay) from hosts h,items i"
@@ -1030,28 +965,32 @@ double	DBget_requiredperformance(void)
 			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE);
 	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
-		qps_total += atof(row[0]);
+		qps_total = atof(row[0]);
 	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): " ZBX_FS_DBL, __function_name, qps_total);
 
 	return qps_total;
 }
 
-zbx_uint64_t DBget_proxy_lastaccess(const char *hostname)
+zbx_uint64_t	DBget_proxy_lastaccess(const char *hostname)
 {
-	zbx_uint64_t	res;
+	const char	*__function_name = "DBget_proxy_lastaccess";
+	zbx_uint64_t	lastaccess;
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		*host_esc;
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_proxy_lastaccess()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	host_esc = DBdyn_escape_string(hostname);
-	result = DBselect("select lastaccess from hosts where host='%s' and status in (%d)",
+	result = DBselect("select lastaccess from hosts where host='%s' and status in (%d,%d)",
 			host_esc,
-			HOST_STATUS_PROXY);
+			HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE);
 	zbx_free(host_esc);
 
-	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0])) {
+	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
+	{
 		zabbix_log(LOG_LEVEL_ERR, "Proxy \"%s\" does not exist",
 				hostname);
 		zabbix_syslog("Proxy \"%s\" does not exist",
@@ -1060,11 +999,13 @@ zbx_uint64_t DBget_proxy_lastaccess(const char *hostname)
 		return FAIL;
 	}
 
-	res = zbx_atoui64(row[0]);
+	ZBX_STR2UINT64(lastaccess, row[0]);
 
 	DBfree_result(result);
 
-	return res;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): " ZBX_FS_UI64, __function_name, lastaccess);
+
+	return lastaccess;
 }
 
 int	DBadd_alert(zbx_uint64_t actionid, zbx_uint64_t userid, zbx_uint64_t eventid,  zbx_uint64_t mediatypeid, char *sendto, char *subject, char *message)
@@ -1205,7 +1146,7 @@ int	DBremove_escalation(zbx_uint64_t escalationid)
 void	DBvacuum(void)
 {
 #ifdef	HAVE_POSTGRESQL
-	char *table_for_housekeeping[]={"services", "services_links", "graphs_items", "graphs", "sysmaps_links",
+	char	*table_for_housekeeping[] = {"services", "services_links", "graphs_items", "graphs", "sysmaps_links",
 			"sysmaps_elements", "sysmaps_link_triggers","sysmaps", "config", "groups", "hosts_groups", "alerts",
 			"actions", "events", "functions", "history", "history_str", "hosts", "trends",
 			"items", "media", "media_type", "triggers", "trigger_depends", "users",
@@ -1217,15 +1158,11 @@ void	DBvacuum(void)
 
 	zbx_setproctitle("housekeeper [vacuum DB]");
 
-	i=0;
+	i = 0;
 	while (NULL != (table = table_for_housekeeping[i++]))
 	{
 		DBexecute("vacuum analyze %s", table);
 	}
-#endif
-
-#ifdef	HAVE_MYSQL
-	/* Nothing to do */
 #endif
 }
 
@@ -2012,7 +1949,7 @@ zbx_uint64_t	DBmultiply_value_uint64(DB_ITEM *item, zbx_uint64_t value)
 	else
 		value_uint64 = (zbx_uint64_t)((double)value * atof(item->formula));
 
-	zabbix_log(LOG_LEVEL_DEBUG, "DBmultiply_value_float() " ZBX_FS_UI64 ",%s " ZBX_FS_UI64,
+	zabbix_log(LOG_LEVEL_DEBUG, "DBmultiply_value_uint64() " ZBX_FS_UI64 ",%s " ZBX_FS_UI64,
 			value, item->formula, value_uint64);
 
 	return value_uint64;
@@ -2022,7 +1959,7 @@ zbx_uint64_t	DBmultiply_value_uint64(DB_ITEM *item, zbx_uint64_t value)
  *                                                                            *
  * Function: DBregister_host                                                  *
  *                                                                            *
- * Purpose: registrate unknown host and generate event                        *
+ * Purpose: register unknown host and generate event                          *
  *                                                                            *
  * Parameters: host - host name                                               *
  *                                                                            *

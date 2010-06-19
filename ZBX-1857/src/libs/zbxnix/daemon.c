@@ -30,8 +30,8 @@
 char	*APP_PID_FILE	= NULL;
 
 static int	parent = 0;
-
-#define uninit() { if(parent == 1) zbx_on_exit(); }
+static int	parent_pid = (-1);
+static int	exiting = 0;
 
 void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
@@ -52,10 +52,19 @@ void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 	case SIGQUIT:
 	case SIGINT:
 	case SIGTERM:
-		zabbix_log(LOG_LEVEL_DEBUG, "Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%d,reason:%d]. Exiting ...",
-			sig, get_signal_name(sig), siginfo->si_pid, siginfo->si_uid, siginfo->si_code);
-		uninit();
-		exit(FAIL);
+		zabbix_log(siginfo->si_pid == parent_pid ? LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING,
+				"Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%d,reason:%d]. Exiting ...",
+				sig, get_signal_name(sig), siginfo->si_pid, siginfo->si_uid, siginfo->si_code);
+		if (1 == parent)
+		{
+			if (0 == exiting)
+			{
+				exiting = 1;
+				zbx_on_exit();
+			}
+		}
+		else
+			exit(FAIL);
 		break;
 	case SIGPIPE:
 		zabbix_log(LOG_LEVEL_DEBUG, "Got SIGPIPE from PID: %d.",
@@ -72,10 +81,18 @@ static void	parent_signal_handler(int sig, siginfo_t *siginfo, void *context)
 	switch(sig)
 	{
 	case SIGCHLD:
-		zabbix_log(LOG_LEVEL_CRIT, "One child process died (PID:%d,exitcode/signal:%d). Exiting ...",
-			siginfo->si_pid, siginfo->si_status);
-		uninit();
-		exit(FAIL);
+		if (1 == parent)
+		{
+			if (0 == exiting)
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "One child process died (PID:%d,exitcode/signal:%d). Exiting ...",
+						siginfo->si_pid, siginfo->si_status);
+				exiting = 1;
+				zbx_on_exit();
+			}
+		}
+		else
+			exit(FAIL);
 		break;
 	default:
 		child_signal_handler(sig, siginfo, context);
@@ -188,6 +205,8 @@ int	daemon_start(int allow_root)
 	{
 		exit(FAIL);
 	}
+
+	parent_pid = (int)getpid();
 
 /*	phan.sa_handler = child_signal_handler;*/
 	phan.sa_sigaction = child_signal_handler;

@@ -313,30 +313,16 @@ require_once('include/js.inc.php');
 			return $table;
 		}
 
-		global $DB;
-
-		$item=get_item_by_itemid($itemid);
+		$item = get_item_by_itemid($itemid);
 		switch($item['value_type']){
-			case ITEM_VALUE_TYPE_FLOAT:
-				$history_table = 'history';
-				$order_field = 'clock';
-				break;
-			case ITEM_VALUE_TYPE_UINT64:
-				$history_table = 'history_uint';
-				$order_field = 'clock';
-				break;
 			case ITEM_VALUE_TYPE_TEXT:
-				$history_table = 'history_text';
-				$order_field = 'id';
-				break;
 			case ITEM_VALUE_TYPE_LOG:
-				$history_table = 'history_log';
 				$order_field = 'id';
 				break;
+			case ITEM_VALUE_TYPE_FLOAT:
+			case ITEM_VALUE_TYPE_UINT64:
 			default:
-				$history_table = 'history_str';
 				$order_field = 'clock';
-				break;
 		}
 
 		$host = get_host_by_itemid($itemid);
@@ -344,51 +330,37 @@ require_once('include/js.inc.php');
 		$table = new CTableInfo();
 		$table->setHeader(array(S_TIMESTAMP,$host['host'].': '.item_description($item)));
 
-		$sql='SELECT h.clock,h.value,i.valuemapid '.
-				' FROM '.$history_table.' h, items i '.
-				' WHERE h.itemid=i.itemid '.
-					' AND i.itemid='.$itemid.
-				' ORDER BY h.'.$order_field.' DESC';
-		$result=DBselect($sql,$elements);
-		while($row=DBfetch($result)){
+		$options = array(
+			'history' => $item['value_type'],
+			'itemids' => $itemid,
+			'output' => API_OUTPUT_EXTEND,
+			'sortorder' => ZBX_SORT_DOWN,
+			'sortfield' => $order_field,
+			'limit' => $elements
+		);
+
+		$hData = CHistory::get($options);
+		foreach($hData as $hnum => $data){
 			switch($item['value_type']){
 				case ITEM_VALUE_TYPE_TEXT:
-					if($DB['TYPE'] == 'ORACLE'){
-						if(!isset($row['value'])){
-							$row['value'] = '';
-						}
-					}
-					/* do not use break */
+/* do not use break */
 				case ITEM_VALUE_TYPE_STR:
-					if($style){
-						$value = new CJSscript($row['value']);
-					}
-					else{
-						$value = htmlspecialchars($row['value']);
-//						$value = zbx_nl2br($value);
-					}
+					if($style) $value = new CJSscript($data['value']);
+					else $value = $data['value'];
 					break;
 				case ITEM_VALUE_TYPE_LOG:
-					if($style){
-						$value = new CJSscript($row['value']);
-					}
-					else{
-						$value = htmlspecialchars($row['value']);
-//						$value = zbx_nl2br($value);
-					}
+					if($style) $value = new CJSscript($data['value']);
+					else $value = $data['value'];
 					break;
 				default:
-					$value = $row['value'];
+					$value = $data['value'];
 					break;
 			}
 
-			if($row['valuemapid'] > 0)
-				$value = replace_value_by_map($value, $row['valuemapid']);
+			if($item['valuemapid'] > 0)
+				$value = replace_value_by_map($value, $item['valuemapid']);
 
-			$pre = new CTag('pre', true);
-			$pre->addItem($value);
-
-			$table->addRow(array(zbx_date2str(S_SCREENS_PLAIN_TEXT_DATE_FORMAT,$row['clock']),	$pre));
+			$table->addRow(array(zbx_date2str(S_SCREENS_PLAIN_TEXT_DATE_FORMAT,$data['clock']),	$value));
 		}
 
 	return $table;
@@ -1078,10 +1050,10 @@ require_once('include/js.inc.php');
 
 						$timeline = array();
 						$timeline['period'] = $effectiveperiod;
-						$timeline['starttime'] = date('YmdHi', get_min_itemclock_by_graphid($resourceid));
+						$timeline['starttime'] = date('YmdHis', get_min_itemclock_by_graphid($resourceid));
 
 						if(isset($_REQUEST['stime'])){
-							$timeline['usertime'] = date('YmdHi', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
+							$timeline['usertime'] = date('YmdHis', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 						}
 
 						// $src = $url.'&width='.$width.'&height='.$height.'&legend='.$legend.'&graph3d='.$graph3d;
@@ -1101,10 +1073,10 @@ require_once('include/js.inc.php');
 						$timeline = array();
 						if(isset($graphid) && !is_null($graphid) && ($editmode != 1)){
 							$timeline['period'] = $effectiveperiod;
-							$timeline['starttime'] = date('YmdHi', time() - ZBX_MAX_PERIOD); //get_min_itemclock_by_graphid($graphid);
+							$timeline['starttime'] = date('YmdHis', time() - ZBX_MAX_PERIOD); //get_min_itemclock_by_graphid($graphid);
 
 							if(isset($_REQUEST['stime'])){
-								$timeline['usertime'] = date('YmdHi', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
+								$timeline['usertime'] = date('YmdHis', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 							}
 
 							$objData['loadSBox'] = 1;
@@ -1114,8 +1086,12 @@ require_once('include/js.inc.php');
 						$objData['src'] = $src;
 					}
 
-					if($default && !$editmode) $item = new CLink(null, $action);
-					else $item = new CDiv();
+					$item = new CDiv();
+					$item->setAttribute('id', $containerid);
+					if($default && !$editmode){
+						$item->setAttribute('class', 'pointer');
+						$item->setAttribute('onclick',"javascript: redirect(".zbx_jsvalue($action).",'post','id');");
+					}
 
 					$item->setAttribute('id', $containerid);
 
@@ -1162,13 +1138,13 @@ require_once('include/js.inc.php');
 					if(($editmode == 0) && !empty($resourceid)) $action = 'history.php?action=showgraph&itemid='.$resourceid.url_param('period').url_param('stime');
 
 					$timeline = array();
-					$timeline['starttime'] = date('YmdHi', time() - ZBX_MAX_PERIOD);
+					$timeline['starttime'] = date('YmdHis', time() - ZBX_MAX_PERIOD);
 
 					if(!zbx_empty($resourceid) && ($editmode != 1)){
 						$timeline['period'] = $effectiveperiod;
 
 						if(isset($_REQUEST['stime'])){
-							$timeline['usertime'] = date('YmdHi', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
+							$timeline['usertime'] = date('YmdHis', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 						}
 
 						$objData['loadSBox'] = 1;
@@ -1179,10 +1155,12 @@ require_once('include/js.inc.php');
 
 					$objData['src'] = $src;
 
-					if(!$editmode) $item = new CLink(null, $action);
-					else $item = new CDiv();
-
+					$item = new CDiv();
 					$item->setAttribute('id', $containerid);
+					if(!$editmode){
+						$item->setAttribute('class', 'pointer');
+						$item->setAttribute('onclick',"javascript: redirect(".zbx_jsvalue($action).",'post','id');");
+					}
 
 					$item = array($item);
 					if($editmode == 1){
@@ -1575,12 +1553,12 @@ require_once('include/js.inc.php');
 		foreach($exportScreens as $snum => $screen){
 			$screenItems = separateScreenElements($screen);
 
-			$screens += zbx_objectValues($screenItems['screens'], 'resourceid');
-			$sysmaps += zbx_objectValues($screenItems['sysmaps'], 'resourceid');
-			$hostgroups += zbx_objectValues($screenItems['hostgroups'], 'resourceid');
-			$hosts += zbx_objectValues($screenItems['hosts'], 'resourceid');
-			$graphs += zbx_objectValues($screenItems['graphs'], 'resourceid');
-			$items += zbx_objectValues($screenItems['items'], 'resourceid');
+			$screens = array_merge($screens, zbx_objectValues($screenItems['screens'], 'resourceid'));
+			$sysmaps = array_merge($sysmaps, zbx_objectValues($screenItems['sysmaps'], 'resourceid'));
+			$hostgroups = array_merge($hostgroups, zbx_objectValues($screenItems['hostgroups'], 'resourceid'));
+			$hosts = array_merge($hosts, zbx_objectValues($screenItems['hosts'], 'resourceid'));
+			$graphs = array_merge($graphs, zbx_objectValues($screenItems['graphs'], 'resourceid'));
+			$items = array_merge($items, zbx_objectValues($screenItems['items'], 'resourceid'));
 		}
 
 		$screens = screenIdents($screens);
@@ -1593,7 +1571,6 @@ require_once('include/js.inc.php');
 		try{
 			foreach($exportScreens as $snum => &$screen){
 				unset($screen['screenid']);
-				$screen['backgroundid'] = ($screen['backgroundid'] > 0)?$images[$screen['backgroundid']]:'';
 
 				foreach($screen['screenitems'] as $snum => &$screenItem){
 					unset($screenItem['screenid']);
@@ -1631,7 +1608,7 @@ require_once('include/js.inc.php');
 			unset($screen);
 		}
 		catch(Exception $e){
-			throw new exception($e->show_message());
+			throw new exception($e->getMessage());
 		}
 	}
 ?>

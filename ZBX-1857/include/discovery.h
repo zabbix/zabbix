@@ -1,3 +1,4 @@
+
 /*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
@@ -17,15 +18,14 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
+#ifndef ZABBIX_DISCOVERY_H
+#define ZABBIX_DISCOVERY_H
 
-#ifndef ZABBIX_EXPRESSION_H
-#define ZABBIX_EXPRESSION_H
+#include "zbxjson.h"
+#include "comms.h"
 
-#include "common.h"
-#include "db.h"
-
-int	cmp_double(double a,double b);
-int	find_char(char *str,char c);
-void	delete_reol(char *c);
+void	discovery_update_host(DB_DHOST *dhost, const char *ip, int status, int now);
+void	discovery_update_service(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost,
+		char *ip, int port, int status, const char *value, int now);
 
 #endif

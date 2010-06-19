@@ -47,13 +47,14 @@
 #include "watchdog/watchdog.h"
 #include "utils/nodechange.h"
 #include "escalator/escalator.h"
+#include "proxypoller/proxypoller.h"
 
-char *progname = NULL;
-char title_message[] = "Zabbix Server";
-char usage_message[] = "[-hV] [-c <file>] [-n <nodeid>]";
+const char	*progname = NULL;
+const char	title_message[] = "Zabbix Server";
+const char	usage_message[] = "[-hV] [-c <file>] [-n <nodeid>]";
 
 #ifndef HAVE_GETOPT_LONG
-char *help_message[] = {
+const char	*help_message[] = {
         "Options:",
         "  -c <file>       Specify configuration file",
         "  -h              give this help",
@@ -62,7 +63,7 @@ char *help_message[] = {
         0 /* end of text */
 };
 #else
-char *help_message[] = {
+const char	*help_message[] = {
         "Options:",
         "  -c --config <file>       Specify configuration file",
         "  -h --help                give this help",
@@ -82,32 +83,16 @@ static struct zbx_option longopts[] =
 	{"help",	0,	0,	'h'},
 	{"new-nodeid",	1,	0,	'n'},
 	{"version",	0,	0,	'V'},
-
-#if defined (_WINDOWS)
-
-	{"install",	0,	0,	'i'},
-	{"uninstall",	0,	0,	'd'},
-
-	{"start",	0,	0,	's'},
-	{"stop",	0,	0,	'x'},
-
-#endif /* _WINDOWS */
-
 	{0,0,0,0}
 };
 
 /* short options */
 
-static char	shortopts[] =
-	"c:n:hV"
-#if defined (_WINDOWS)
-	"idsx"
-#endif /* _WINDOWS */
-	;
+static char	shortopts[] = "c:n:hV";
 
-/* end of COMMAND LINE OPTIONS*/
+/* end of COMMAND LINE OPTIONS */
 
-pid_t	*threads=NULL;
+pid_t	*threads = NULL;
 
 int	CONFIG_ALERTER_FORKS		= 1;
 int	CONFIG_DISCOVERER_FORKS		= 1;
@@ -178,6 +163,12 @@ int	CONFIG_REFRESH_UNSUPPORTED	= 0;
 
 /* Zabbix server startup time */
 int     CONFIG_SERVER_STARTUP_TIME      = 0;
+
+/* Parameters for passive proxies */
+int	CONFIG_PROXYPOLLER_FORKS	= 1;
+/* How often Zabbix Server sends configuration data to Proxy in seconds */
+int	CONFIG_PROXYCONFIG_FREQUENCY	= 3600; /* 1h */
+int	CONFIG_PROXYDATA_FREQUENCY	= 1; /* 1s */
 
 /* Mutex for node syncs */
 ZBX_MUTEX	node_sync_access;
@@ -250,13 +241,16 @@ void	init_config(void)
 		{"NodeNoHistory",&CONFIG_NODE_NOHISTORY,0,TYPE_INT,PARM_OPT,0,1},
 		{"SSHKeyLocation",&CONFIG_SSH_KEY_LOCATION,0,TYPE_STRING,PARM_OPT,0,0},
 		{"LogSlowQueries",&CONFIG_LOG_SLOW_QUERIES,0,TYPE_INT,PARM_OPT,0,3600000},
+		{"StartProxyPollers",&CONFIG_PROXYPOLLER_FORKS,0,TYPE_INT,PARM_OPT,0,255},
+		{"ProxyConfigFrequency",&CONFIG_PROXYCONFIG_FREQUENCY,0,TYPE_INT,PARM_OPT,1,3600*7*24},
+		{"ProxyDataFrequency",&CONFIG_PROXYDATA_FREQUENCY,0,TYPE_INT,PARM_OPT,1,3600},
 		{0}
 	};
 
 	CONFIG_SERVER_STARTUP_TIME = time(NULL);
 
 
-	parse_cfg_file(CONFIG_FILE,cfg);
+	parse_cfg_file(CONFIG_FILE, cfg);
 
 	if(CONFIG_DBNAME == NULL)
 	{
@@ -323,7 +317,7 @@ int main(int argc, char **argv)
 
 	int	nodeid = 0;
 
-	progname = argv[0];
+	progname = get_program_name(argv[0]);
 
 	/* Parse the command-line. */
 	while ((ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts,NULL)) != (char)EOF)
@@ -505,7 +499,8 @@ int MAIN_ZABBIX_ENTRY(void)
 	threads = calloc(1 + CONFIG_DBCONFIG_FORKS + CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS
 			+ CONFIG_ALERTER_FORKS + CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS
 			+ CONFIG_NODEWATCHER_FORKS + CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS
-			+ CONFIG_DBSYNCER_FORKS + CONFIG_ESCALATOR_FORKS + CONFIG_IPMIPOLLER_FORKS, sizeof(pid_t));
+			+ CONFIG_DBSYNCER_FORKS + CONFIG_ESCALATOR_FORKS
+			+ CONFIG_IPMIPOLLER_FORKS + CONFIG_PROXYPOLLER_FORKS, sizeof(pid_t));
 
 	if (CONFIG_TRAPPERD_FORKS > 0)
 	{
@@ -519,7 +514,8 @@ int MAIN_ZABBIX_ENTRY(void)
 	for (i = 1; i <= CONFIG_DBCONFIG_FORKS + CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS
 			+ CONFIG_ALERTER_FORKS + CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS
 			+ CONFIG_NODEWATCHER_FORKS + CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS
-			+ CONFIG_DBSYNCER_FORKS + CONFIG_ESCALATOR_FORKS + CONFIG_IPMIPOLLER_FORKS; i++)
+			+ CONFIG_DBSYNCER_FORKS + CONFIG_ESCALATOR_FORKS
+			+ CONFIG_IPMIPOLLER_FORKS + CONFIG_PROXYPOLLER_FORKS; i++)
 	{
 		if((pid = zbx_fork()) == 0)
 		{
@@ -668,33 +664,46 @@ int MAIN_ZABBIX_ENTRY(void)
 				- CONFIG_HTTPPOLLER_FORKS - CONFIG_DISCOVERER_FORKS - CONFIG_DBSYNCER_FORKS
 				- CONFIG_ESCALATOR_FORKS);
 	}
+	else if (server_num <= CONFIG_DBCONFIG_FORKS + CONFIG_POLLER_FORKS
+			+ CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS
+			+ CONFIG_ALERTER_FORKS + CONFIG_HOUSEKEEPER_FORKS
+			+ CONFIG_TIMER_FORKS + CONFIG_NODEWATCHER_FORKS
+			+ CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS
+			+ CONFIG_DBSYNCER_FORKS + CONFIG_ESCALATOR_FORKS
+			+ CONFIG_IPMIPOLLER_FORKS + CONFIG_PROXYPOLLER_FORKS)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [Proxy Poller]",
+				server_num);
+
+		main_proxypoller_loop();
+	}
 
 	return SUCCEED;
 }
 
 void	zbx_on_exit()
 {
-#if !defined(_WINDOWS)
-
-	int i = 0;
+	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called");
 
 	if (threads != NULL)
 	{
+		int	i;
+
 		for (i = 1; i <= CONFIG_DBCONFIG_FORKS + CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS
 				+ CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS + CONFIG_HOUSEKEEPER_FORKS
 				+ CONFIG_TIMER_FORKS + CONFIG_NODEWATCHER_FORKS + CONFIG_HTTPPOLLER_FORKS
 				+ CONFIG_DISCOVERER_FORKS + CONFIG_DBSYNCER_FORKS + CONFIG_ESCALATOR_FORKS
-				+ CONFIG_IPMIPOLLER_FORKS; i++)
+				+ CONFIG_IPMIPOLLER_FORKS + CONFIG_PROXYPOLLER_FORKS; i++)
 		{
-			if (threads[i]) {
+			if (threads[i])
+			{
 				kill(threads[i], SIGTERM);
 				threads[i] = (ZBX_THREAD_HANDLE)NULL;
 			}
 		}
+
 		zbx_free(threads);
 	}
-
-#endif /* not _WINDOWS */
 
 #ifdef USE_PID_FILE
 
@@ -717,8 +726,6 @@ void	zbx_on_exit()
 	free_ipmi_handler();
 #endif
 
-	zabbix_close_log();
-
 #ifdef  HAVE_SQLITE3
 	php_sem_remove(&sqlite_access);
 #endif /* HAVE_SQLITE3 */
@@ -726,6 +733,8 @@ void	zbx_on_exit()
 	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Server stopped. Zabbix %s (revision %s).",
 			ZABBIX_VERSION,
 			ZABBIX_REVISION);
+
+	zabbix_close_log();
 
 	exit(SUCCEED);
 }

@@ -782,13 +782,13 @@ class zbxXML{
 		try{
 			if(isset($rules['host']['exist']) || isset($rules['host']['missed'])){
 				$xpath = new DOMXPath(self::$xml);
-				
+
 				$hosts = $xpath->query('hosts/host');
 
 				foreach($hosts as $hnum => $host){
 					$host_db = self::mapXML2arr($host, XML_TAG_HOST);
 
-					if(!isset($host_db['status'])) $host_db['status'] = HOST_STATUS_TEMPLATE;		
+					if(!isset($host_db['status'])) $host_db['status'] = HOST_STATUS_TEMPLATE;
 					$current_host = ($host_db['status'] == HOST_STATUS_TEMPLATE) ? CTemplate::exists($host_db) : CHost::exists($host_db);
 					if(!$current_host && !isset($rules['host']['missed'])){
 						info('Host ['.$host_db['host'].'] skipped - user rule');
@@ -798,7 +798,7 @@ class zbxXML{
 						info('Host ['.$host_db['host'].'] skipped - user rule');
 						continue; // break if not update exist
 					}
-					
+
 					if(isset($host_db['proxy_hostid'])){
 						$proxy_exists = CProxy::get(array('proxyids' => $host_db['proxy_hostid']));
 						if(empty($proxy_exists))
@@ -826,7 +826,7 @@ class zbxXML{
 
 // HOST GROUPS {{{
 					$groups = $xpath->query('groups/group', $host);
-					
+
 					$host_db['groups'] = array();
 					$groups_to_parse = array();
 					foreach($groups as $gnum => $group){
@@ -835,7 +835,7 @@ class zbxXML{
 					if(empty($groups_to_parse)){
 						$groups_to_parse[] = array('name' => ZBX_DEFAULT_IMPORT_HOST_GROUP);
 					}
-					
+
 					foreach($groups_to_parse as $group){
 						$current_group = CHostGroup::exists($group);
 
@@ -849,7 +849,7 @@ class zbxXML{
 							if(empty($current_group)){
 								throw new APIException(1, 'No permissions for group '. $group['name']);
 							}
-							
+
 							$host_db['groups'][] = reset($current_group);
 						}
 						else{
@@ -857,13 +857,13 @@ class zbxXML{
 							if(!$result){
 								throw new APIException(1, CHostGroup::resetErrors());
 							}
-							
+
 							$options = array(
 								'groupids' => $result['groupids'],
 								'output' => API_OUTPUT_EXTEND
 							);
 							$new_group = CHostgroup::get($options);
-							
+
 							$host_db['groups'][] = reset($new_group);
 						}
 					}
@@ -895,14 +895,14 @@ class zbxXML{
 								'editable' => 1
 							);
 							$current_template = CTemplate::get($options);
-							
+
 							if(empty($current_template)){
 								throw new APIException(1, 'No permission for Template ['.$template->nodeValue.']');
 							}
-							
+
 							$current_template = reset($current_template);
-							
-							
+
+
 							if(!$current_template && !isset($rules['template']['missed'])){
 								info('Template ['.$template->nodeValue.'] skipped - user rule');
 								continue; // break if update nonexist
@@ -919,7 +919,7 @@ class zbxXML{
 
 
 // HOSTS
-					if($current_host && isset($rules['host']['exist'])){					
+					if($current_host && isset($rules['host']['exist'])){
 						if($host_db['status'] == HOST_STATUS_TEMPLATE){
 							$host_db['templateid'] = $current_host['hostid'];
 
@@ -927,7 +927,7 @@ class zbxXML{
 							if(!$result){
 								throw new APIException(1, CTemplate::resetErrors());
 							}
-							
+
 							$options = array(
 								'templateids' => $result['templateids'],
 								'output' => API_OUTPUT_EXTEND
@@ -941,7 +941,7 @@ class zbxXML{
 							if(!$result){
 								throw new APIException(1, CHost::resetErrors());
 							}
-							
+
 							$options = array(
 								'hostids' => $result['hostids'],
 								'output' => API_OUTPUT_EXTEND
@@ -958,7 +958,7 @@ class zbxXML{
 							$result = CTemplate::create($host_db);
 							if(!$result)
 								throw new APIException(1, CTemplate::resetErrors());
-								
+
 							$options = array(
 								'templateids' => $result['templateids'],
 								'output' => API_OUTPUT_EXTEND
@@ -969,7 +969,7 @@ class zbxXML{
 							$result = CHost::create($host_db);
 							if(!$result)
 								throw new APIException(1, CHost::resetErrors());
-								
+
 							$options = array(
 								'hostids' => $result['hostids'],
 								'output' => API_OUTPUT_EXTEND
@@ -980,7 +980,7 @@ class zbxXML{
 					}
 
 					$current_host = reset($current_host);
-					
+
 // HOST PROFILES {{{
 					$profile_node = $xpath->query('host_profile/*', $host);
 
@@ -1024,14 +1024,12 @@ class zbxXML{
 					if(isset($rules['item']['exist']) || isset($rules['item']['missed'])){
 						$items = $xpath->query('items/item', $host);
 
-						$items_to_add = array();
-						$items_to_upd = array();
 						foreach($items as $inum => $item){
 							$item_db = self::mapXML2arr($item, XML_TAG_ITEM);
 
 							$item_db['hostid'] = $current_host['hostid'];
 
-							
+
 							if($current_item = CItem::exists($item_db)){
 								$options = array(
 									'filter' => array(
@@ -1041,15 +1039,15 @@ class zbxXML{
 									'webitems' => 1,
 									'output' => API_OUTPUT_EXTEND,
 									'editable' => 1
-								);								
+								);
 								$current_item = CItem::get($options);
-								
+
 								if(empty($current_item)){
 									throw new APIException(1, 'No permission for Item ['.$item_db['key_'].']');
 								}
-								
+
 								$current_item = reset($current_item);
-								
+
 							}
 
 							if(!$current_item && !isset($rules['item']['missed'])){
@@ -1061,7 +1059,7 @@ class zbxXML{
 								continue; // break if not update exist
 							}
 
-							
+
 // ITEM APPLICATIONS {{{
 							$applications = $xpath->query('applications/application', $item);
 
@@ -1080,12 +1078,12 @@ class zbxXML{
 										'filter' => $application_db,
 										'output' => API_OUTPUT_EXTEND
 									));
-									
+
 									if(empty($current_application)){
 										throw new APIException(1, 'No permission for Application ['.$application_db['name'].']');
 									}
 								}
-								
+
 								if($current_application){
 									$item_applications = array_merge($item_applications, $current_application);
 								}
@@ -1099,13 +1097,13 @@ class zbxXML{
 								if(!$result){
 									throw new APIException(1, CApplication::resetErrors());
 								}
-								
+
 								$options = array(
 									'applicationids' => $result['applicationids'],
 									'output' => API_OUTPUT_EXTEND
 								);
 								$new_applications = CApplication::get($options);
-								
+
 								$item_applications = array_merge($item_applications, $new_applications);
 							}
 // }}} ITEM APPLICATIONS
@@ -1115,7 +1113,7 @@ class zbxXML{
 								if(!$result){
 									throw new APIException(1, CItem::resetErrors());
 								}
-								
+
 								$options = array(
 									'itemids' => $result['itemids'],
 									'webitems' => 1,
@@ -1128,7 +1126,7 @@ class zbxXML{
 								if(!$result){
 									throw new APIException(1, CItem::resetErrors());
 								}
-								
+
 								$options = array(
 									'itemids' => $result['itemids'],
 									'webitems' => 1,
@@ -1161,7 +1159,7 @@ class zbxXML{
 
 							$trigger_db['expression'] = str_replace('{{HOSTNAME}:', '{'.$host_db['host'].':', $trigger_db['expression']);
 							$trigger_db['hostid'] = $current_host['hostid'];
-							
+
 							if($current_trigger = CTrigger::exists($trigger_db)){
 								$ctriggers = CTrigger::get(array(
 									'filter' => array(
@@ -1171,7 +1169,7 @@ class zbxXML{
 									'output' => API_OUTPUT_EXTEND,
 									'editable' => 1
 								));
-								
+
 								$current_trigger = false;
 								foreach($ctriggers as $tnum => $ct){
 									$tmp_exp = explode_exp($ct['expression'], false);
@@ -1179,13 +1177,13 @@ class zbxXML{
 										$current_trigger = $ct;
 										break;
 									}
-								}							
+								}
 								if(!$current_trigger){
 									throw new APIException(1, 'No permission for Trigger ['.$trigger_db['description'].']');
 								}
 							}
-							
-						
+
+
 							if(!$current_trigger && !isset($rules['trigger']['missed'])){
 								info('Trigger ['.$trigger_db['description'].'] skipped - user rule');
 								continue; // break if not update exist
@@ -1203,13 +1201,13 @@ class zbxXML{
 								$triggers_to_add[] = $trigger_db;
 							}
 						}
-					
+
 						if(!empty($triggers_to_upd)){
 							$result = CTrigger::update($triggers_to_upd);
 							if(!$result){
 								throw new APIException(1, CTrigger::resetErrors());
 							}
-							
+
 							$options = array(
 								'triggerids' => $result['triggerids'],
 								'output' => API_OUTPUT_EXTEND
@@ -1223,7 +1221,7 @@ class zbxXML{
 							if(!$result){
 								throw new APIException(1, CTrigger::resetErrors());
 							}
-							
+
 							$options = array(
 								'triggerids' => $result['triggerids'],
 								'output' => API_OUTPUT_EXTEND
@@ -1254,8 +1252,8 @@ class zbxXML{
 								$gitem_host = array_shift($data);
 								$gitem_db['host'] = ($gitem_host == '{HOSTNAME}') ? $host_db['host'] : $gitem_host;
 								$gitem_db['key_'] = implode(':', $data);
-								
-								if($current_item = CItem::exists($gitem_db)){							
+
+								if($current_item = CItem::exists($gitem_db)){
 									$current_item = CItem::get(array(
 										'filter' => array(
 											'key_' => $gitem_db['key_']
@@ -1269,7 +1267,7 @@ class zbxXML{
 										throw new APIException(1, 'No permission for Item ['.$gitem_db['key_'].']');
 									}
 									$current_item = reset($current_item);
-									
+
 									$graph_hostids[] = $current_item['hostid'];
 									$gitem_db['itemid'] = $current_item['itemid'];
 									$graph_items[] = $gitem_db;
@@ -1290,7 +1288,7 @@ class zbxXML{
 									'output' => API_OUTPUT_EXTEND,
 									'editable' => 1
 								));
-								
+
 								if(empty($current_graph)){
 									throw new APIException(1, 'No permission for Graph ['.$graph_db['name'].']');
 								}
@@ -1340,7 +1338,7 @@ class zbxXML{
 								}
 							}
 
-							
+
 							$graph_db['gitems'] = $graph_items;
 							if($current_graph){
 								$graph_db['graphid'] = $current_graph['graphid'];
@@ -1397,7 +1395,7 @@ class zbxXML{
 					}
 				}
 			}
-			
+
 			return true;
 		}
 		catch(APIException $e){

@@ -26,7 +26,7 @@
  *                                                                            *
  * Function: get_value_internal                                               *
  *                                                                            *
- * Purpose: retrieve data from ZABBIX server (internally supported items)     *
+ * Purpose: retrieve data from Zabbix server (internally supported items)     *
  *                                                                            *
  * Parameters: item - item we are interested in                               *
  *                                                                            *
@@ -42,8 +42,8 @@
 int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 {
 	zbx_uint64_t	i;
-	char		tmp[MAX_STRING_LEN], params[MAX_STRING_LEN],
-			tmp1[HOST_HOST_LEN_MAX];
+	char		params[MAX_STRING_LEN], *error = NULL;
+	char		tmp[MAX_STRING_LEN], tmp1[HOST_HOST_LEN_MAX];
 	int		nparams;
 
 	init_result(result);
@@ -64,7 +64,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		if (1 != nparams)
 			goto not_supported;
 
-		i = (zbx_uint64_t)DBget_triggers_count();
+		i = DBget_row_count("triggers");
 		SET_UI64_RESULT(result, i);
 	}
 	else if (0 == strcmp(tmp, "items"))		/* zabbix["items"] */
@@ -72,7 +72,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		if (1 != nparams)
 			goto not_supported;
 
-		i = (zbx_uint64_t)DBget_items_count();
+		i = DBget_row_count("items");
 		SET_UI64_RESULT(result, i);
 	}
 	else if (0 == strcmp(tmp, "items_unsupported"))	/* zabbix["items_unsupported"] */
@@ -92,7 +92,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		if (1 != nparams)
 			goto not_supported;
 
-		i = DBget_history_count(tmp);
+		i = DBget_row_count(tmp);
 		SET_UI64_RESULT(result, i);
 	}
 	else if (0 == strcmp(tmp, "trends") ||			/* zabbix["trends"] */
@@ -101,15 +101,49 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		if (1 != nparams)
 			goto not_supported;
 
-		i = DBget_trends_count(tmp);
+		i = DBget_row_count(tmp);
 		SET_UI64_RESULT(result, i);
 	}
-	else if (0 == strcmp(tmp, "queue"))		/* zabbix["queue"] */
+	else if (0 == strcmp(tmp, "queue"))		/* zabbix["queue"<,from><,to>] */
 	{
-		if (1 != nparams)
+		int	from = 6, to = (-1);
+
+		if (nparams > 3)
 			goto not_supported;
 
-		i = DBget_queue_count();
+		if (nparams >= 2)
+		{
+			if (get_param(params, 2, tmp, sizeof(tmp)) != 0)
+				goto not_supported;
+			else if (*tmp != '\0' && is_uint_prefix(tmp) == FAIL)
+			{
+				error = zbx_dsprintf(error, "Second argument is badly formatted");
+				goto not_supported;
+			}
+			else
+				from = (*tmp != '\0' ? str2uint(tmp) : 6);
+		}
+
+		if (nparams >= 3)
+		{
+			if (get_param(params, 3, tmp, sizeof(tmp)) != 0)
+				goto not_supported;
+			else if (*tmp != '\0' && is_uint_prefix(tmp) == FAIL)
+			{
+				error = zbx_dsprintf(error, "Third argument is badly formatted");
+				goto not_supported;
+			}
+			else
+				to = (*tmp != '\0' ? str2uint(tmp) : -1);
+		}
+
+		if (from > to && -1 != to)
+		{
+			error = zbx_dsprintf(error, "Arguments represent an invalid interval");
+			goto not_supported;
+		}
+
+		i = DBget_queue_count(from, to);
 		SET_UI64_RESULT(result, i);
 	}
 	else if (0 == strcmp(tmp, "requiredperformance"))	/* zabbix["requiredperformance"] */
@@ -124,7 +158,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		if (1 != nparams)
 			goto not_supported;
 
-		i = time(NULL)-CONFIG_SERVER_STARTUP_TIME;
+		i = time(NULL) - CONFIG_SERVER_STARTUP_TIME;
 		SET_UI64_RESULT(result, i);
 	}
 	else if (0 == strcmp(tmp, "boottime"))		/* zabbix["boottime"] */
@@ -143,13 +177,15 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		if (get_param(params, 2, tmp1, sizeof(tmp1)) != 0)
 			goto not_supported;
 
-		if (0 != get_param(params, 3, tmp, sizeof(tmp)))
+		if (get_param(params, 3, tmp, sizeof(tmp)) != 0)
 			goto not_supported;
 
-		if (0 == strcmp(tmp, "lastaccess")) {
+		if (0 == strcmp(tmp, "lastaccess"))
+		{
 			if (FAIL == (i = DBget_proxy_lastaccess(tmp1)))
 				goto not_supported;
-		} else
+		}
+		else
 			goto not_supported;
 
 		SET_UI64_RESULT(result, i);
@@ -256,12 +292,10 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 	return SUCCEED;
 not_supported:
-	zbx_snprintf(tmp, sizeof(tmp), "Internal check [%s] is not supported",
-			item->key_orig);
-	zabbix_log(LOG_LEVEL_WARNING, "%s",
-			tmp);
+	if (NULL == error)
+		error = zbx_dsprintf(error, "Internal check is not supported");
 
-	SET_MSG_RESULT(result, strdup(tmp));
+	SET_MSG_RESULT(result, error);
 
 	return NOTSUPPORTED;
 }

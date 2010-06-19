@@ -25,7 +25,7 @@ require_once('include/requirements.inc.php');
 
 /* ******** */
 
-$page['title'] = 'S_INSTALLATION';
+$page['title'] = "S_INSTALLATION";
 $page['file'] = 'setup.php';
 
 if(!defined('PAGE_HEADER_LOADED'))

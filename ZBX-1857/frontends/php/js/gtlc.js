@@ -105,10 +105,12 @@ processObjects: function(){
 		if(isset('graphtype', obj.objDims) && (obj.objDims.graphtype < 2)){
 			var g_url = new Curl(obj.src);
 			g_url.setArgument('width', obj.objDims.width);
-			
-			var date = datetoarray(obj.time.usertime - obj.time.period);
-			var url_stime = ''+date[2]+date[1]+date[0]+date[3]+date[4];
-			
+
+			var date = new CDate((obj.time.usertime - obj.time.period) * 1000);
+			var url_stime = date.getZBXDate();
+//			var date = datetoarray(obj.time.usertime - obj.time.period);
+//			var url_stime = ''+date[2]+date[1]+date[0]+date[3]+date[4]+date[5];
+
 			g_url.setArgument('period', obj.time.period);
 			g_url.setArgument('stime', url_stime);
 
@@ -2014,9 +2016,7 @@ return box;
 }
 
 
-var sbox = Class.create();
-
-sbox.prototype = {
+var sbox = Class.create(CDebug, {
 sbox_id:			'',				// id to create references in array to self
 
 mouse_event:		{},				// json object wheres defined needed event params
@@ -2031,20 +2031,15 @@ box:				{},				// object params
 dom_box:			null,			// selection box html obj
 dom_period_span:	null,			// period container html obj
 
-shifts:				{},			// shifts regarding to main objet
+shifts:				{},				// shifts regarding to main objet
 
 px2time:			null,			// seconds in 1px
 
 dynamic:			'',				// how page updates, all page/graph only update
 
-debug_status: 		0,				// debug status: 0 - off, 1 - on, 2 - SDI;
-debug_info: 		'',				// debug string
-debug_prev:			'',				// don't log repeated fnc
-
-
-initialize: function(sbid, timelineid, obj, width, height){
+initialize: function($super, sbid, timelineid, obj, width, height){
 	this.sbox_id = sbid;
-	this.debug('initialize');
+	$super('CBOX['+sbid+']');
 
 // For some reason this parameter is need to be initialized due to cross object reference somewhere..
 	this.cobj = {};
@@ -2100,9 +2095,12 @@ onselect: function(){
 	userstarttime += Math.round((this.box.left-(this.cobj.left - this.shifts.left)) * this.px2time);
 
 	var new_period = this.calcperiod();
-	
+
+
+	if(this.start_event.left < this.mouse_event.left) userstarttime+= new_period;
+
 	this.timeline.period(new_period);
-	this.timeline.usertime(userstarttime + new_period);
+	this.timeline.usertime(userstarttime);
 
 	this.onchange(this.sbox_id, this.timeline.timelineid, true);
 },
@@ -2121,7 +2119,7 @@ mousedown: function(e){
 	cancelEvent(e);
 
 	if(ZBX_SBOX[this.sbox_id].mousedown == false){
-		this.optimize_event(e);
+		this.optimizeEvent(e);
 		deselectAll();
 
 		if(IE){
@@ -2145,7 +2143,7 @@ mousemove: function(e){
 	if(IE) cancelEvent(e);
 
 	if(ZBX_SBOX[this.sbox_id].mousedown == true){
-		this.optimize_event(e);
+		this.optimizeEvent(e);
 		this.resizebox();
 	}
 },
@@ -2214,10 +2212,10 @@ resizebox: function(){
 // fix wrong selection box
 
 //SDI(this.mouse_event.left+' > '+(this.cobj.width + this.cobj.left));
-		if(this.mouse_event.left > (this.cobj.width + this.cobj.left)) {
+		if(this.mouse_event.left > (this.cobj.width + this.cobj.left)){
 			this.moveright(this.cobj.width - (this.start_event.left - this.cobj.left));
 		}
-		else if(this.mouse_event.left < this.cobj.left) {
+		else if(this.mouse_event.left < this.cobj.left){
 			this.moveleft(this.cobj.left, this.start_event.left - this.cobj.left);
 		}
 		else{
@@ -2320,8 +2318,8 @@ moveSBoxByObj: function(){
 	this.cobj.left = posxy.left+ZBX_SBOX[this.sbox_id].shiftL;
 },
 
-optimize_event: function(e){
-	this.debug('optimize_event');
+optimizeEvent: function(e){
+	this.debug('optimizeEvent');
 
 	if (e.pageX || e.pageY) {
 		this.mouse_event.left = e.pageX;
@@ -2356,23 +2354,8 @@ clear_params: function(){
 
 	this.box = {};
 	this.box.width = 0;
-},
-
-debug: function(fnc_name, id){
-	if(this.debug_status){
-		var str = 'ZBX_SBOX['+this.sbox_id+'].'+fnc_name;
-		if(typeof(id) != 'undefined') str+= ' :'+id;
-
-		if(this.debug_prev == str) return true;
-
-		this.debug_info += str + '\n';
-		if(this.debug_status == 2){
-			SDI(str);
-		}
-		this.debug_prev = str;
-	}
 }
-}
+});
 
 function create_box_on_obj(obj, height){
 	var parent = obj.parentNode;

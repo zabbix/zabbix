@@ -107,7 +107,8 @@ function itemIdents($itemids){
 		'itemids' => $itemids,
 		'output' => API_OUTPUT_EXTEND,
 		'select_hosts' => array('hostid', 'host'),
-		'nodeids'=> get_current_nodeid(true)
+		'nodeids'=> get_current_nodeid(true),
+		'webitems' => 1,
 	);
 
 	$items = CItem::get($options);

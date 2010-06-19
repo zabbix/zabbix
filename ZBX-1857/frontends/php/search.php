@@ -197,6 +197,10 @@ include_once('include/page_header.php');
 			$triggers_link = array(new CSpan(S_TRIGGERS,'unknown'), ' ('.$host['triggers'].')');
 			$graphs_link = array(new CSpan(S_GRAPHS,'unknown'), ' ('.$host['graphs'].')');
 		}
+		
+		if(!$admin){
+			$host_link = new CSpan($caption, $style);
+		}
 
 		$hostip = make_decoration($host['ip'], $search);
 		$hostdns = make_decoration($host['dns'], $search);
@@ -289,6 +293,7 @@ include_once('include/page_header.php');
 		}
 		else{
 			$admin_link = null;
+			$hgroup_link = new CSpan($caption);
 		}
 
 		$table->addRow(array(

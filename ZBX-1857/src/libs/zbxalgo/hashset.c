@@ -111,6 +111,11 @@ void	zbx_hashset_destroy(zbx_hashset_t *hs)
 
 void	*zbx_hashset_insert(zbx_hashset_t *hs, const void *data, size_t size)
 {
+	return zbx_hashset_insert_ext(hs, data, size, 0);
+}
+
+void	*zbx_hashset_insert_ext(zbx_hashset_t *hs, const void *data, size_t size, size_t offset)
+{
 	const char		*__function_name = "zbx_hashset_insert";
 
 	int			slot;
@@ -135,7 +140,7 @@ void	*zbx_hashset_insert(zbx_hashset_t *hs, const void *data, size_t size)
 	{
 		entry = hs->mem_malloc_func(NULL, sizeof(ZBX_HASHSET_ENTRY_T));
 		entry->data = hs->mem_malloc_func(NULL, size);
-		memcpy(entry->data, data, size);
+		memcpy(entry->data + offset, data + offset, size - offset);
 		entry->hash = hash;
 		entry->next = hs->slots[slot];
 		hs->slots[slot] = entry;

@@ -61,7 +61,7 @@ if(!isset($DB)){
 					}
 					else{
 						if (!mysql_select_db($DB['DATABASE'])){
-							$error = 'Error database selection ['.mysql_error().']';
+							$error = 'Error database in selection ['.mysql_error().']';
 							$result = false;
 						}
 						else{
@@ -635,7 +635,7 @@ else {
 			foreach($var as $vnum => $value) $var[$vnum] = "'".addslashes($value)."'";
 			return $var;
 		}
-		
+
 	return "'".addslashes($var)."'";
 	}
 
@@ -810,7 +810,7 @@ else {
 
 		$distinct_tables = array(
 			'hosts_groups', 'hosts_templates',
-			'functions', 'graphs_items', 'screens_items', 'slides', 
+			'functions', 'graphs_items', 'screens_items', 'slides',
 			'httpstepitem', 'items_applications',
 			'maintenances_hosts', 'maintenances_groups',
 			'sysmaps_elements', 'sysmaps_link_triggers',
@@ -871,6 +871,169 @@ else {
 		if(zbx_empty($condition)) $condition = $string ? "'-1'":'-1';
 
 	return ' ('.$fieldname.$in.'('.$condition.')) ';
+	}
+
+
+
+	class DB{
+		const SCHEMA_FILE = 'schema.inc.php';
+		const DBEXECUTE_ERROR = 1;
+		const RESERVEIDS_ERROR = 2;
+
+		const FIELD_TYPE_INT = 'int';
+		const FIELD_TYPE_STR = 'str';
+
+		static $schema = null;
+
+		private static function exception($code, $errors=array()){
+			throw new APIException($code, $errors);
+		}
+
+		protected static function reserveIds($table, $count){
+			global $ZBX_LOCALNODEID;
+
+			$nodeid = get_current_nodeid(false);
+			$id_name = self::getSchema($table);
+			$id_name = $id_name['key'];
+
+			$min = bcadd(bcmul($nodeid,'100000000000000'), bcmul($ZBX_LOCALNODEID,'100000000000'), 0);
+			$max = bcadd(bcadd(bcmul($nodeid,'100000000000000'), bcmul($ZBX_LOCALNODEID,'100000000000')),'99999999999', 0);
+
+			$sql = 'SELECT nextid '.
+				' FROM ids '.
+				' WHERE nodeid='.$nodeid .'
+					AND table_name='.zbx_dbstr($table).
+					' AND field_name='.zbx_dbstr($id_name);
+			$res = DBfetch(DBselect($sql));
+			if($res){
+				$nextid = bcadd($res['nextid'], 1, 0);
+
+				if((bccomp($nextid, $max) == 1) || (bccomp($nextid, $min) == -1))
+					self::exception(self::RESERVEIDS_ERROR, __METHOD__.' ID out of range for ['.$table.']');
+
+				$sql = 'UPDATE ids '.
+					' SET nextid=nextid+'.$count.
+					' WHERE nodeid='.$nodeid.
+						' AND table_name='.zbx_dbstr($table).
+						' AND field_name='.zbx_dbstr($id_name);
+				if(!DBexecute($sql)) self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
+			}
+			else{
+				$sql = 'SELECT max('.$id_name.') AS id'.
+						' FROM '.$table.
+						' WHERE '.$id_name.'>='.$min.
+							' AND '.$id_name.'<='.$max;
+				$row = DBfetch(DBselect($sql));
+
+				$nextid = (!$row || is_null($row['id'])) ? $min : $row['id'];
+
+				$sql = 'INSERT INTO ids (nodeid,table_name,field_name,nextid) '.
+					' VALUES ('.$nodeid.','.zbx_dbstr($table).','.zbx_dbstr($id_name).','.bcadd($nextid, $count, 0).')';
+
+				$nextid = bcadd($res['nextid'], 1, 0);
+
+				if(!DBexecute($sql)) self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
+			}
+
+			return $nextid;
+		}
+
+
+		protected static function getSchema($table=null){
+			if(is_null(self::$schema)){
+				self::$schema = include(self::SCHEMA_FILE);
+			}
+
+			if(is_null($table))
+				return self::$schema;
+			else if(isset(self::$schema[$table]))
+				return self::$schema[$table];
+			else return false;
+		}
+
+/**
+ * Insert data into DB
+ *
+ * @param string $table
+ * @param array $values pair of fieldname => fieldvalue
+ * @return array of ids
+ */
+		public static function insert($table, $values){
+			if(empty($values)) return true;
+			$result_ids = array();
+
+			$id = self::reserveIds($table, count($values));
+			$table_schema = self::getSchema($table);
+
+			foreach($values as $key => $row){
+				$result_ids[$key] = $id;
+				
+				unset($row[$table_schema['key']]);
+
+				foreach($row as $field => $v){
+					if(!isset($table_schema['fields'][$field])){
+						unset($row[$field]);
+					}
+					else if($table_schema['fields'][$field] == self::FIELD_TYPE_STR){
+						$row[$field] = zbx_dbstr($v);
+					}
+				}
+
+				$sql = 'INSERT INTO '.$table.' ('.$table_schema['key'].','.implode(',',array_keys($row)).')'.
+					' VALUES ('.$id.','.implode(',',array_values($row)).')';
+
+				$id = bcadd($id, 1, 0);
+				if(!DBexecute($sql)) self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
+			}
+			return $result_ids;
+		}
+
+/**
+ * Update data in DB
+ *
+ * @param string $table
+ * @param array $data
+ * @param array $data[...]['values'] pair of fieldname => fieldvalue for SET clause
+ * @param array $data[...]['where'] pair of fieldname => fieldvalue for WHERE clause
+ * @return array of ids
+ */
+		public static function update($table, $data){
+			if(empty($data)) return true;
+
+			$data = zbx_toArray($data);
+			$table_schema = self::getSchema($table);
+
+			foreach($data as $row){
+				$sql_set = '';
+				foreach($row['values'] as $field => $value){
+					if(!isset($table_schema['fields'][$field])){
+						continue;
+					}
+					else if($table_schema['fields'][$field] == self::FIELD_TYPE_STR){
+						$value = zbx_dbstr($value);
+					}
+
+					$sql_set .= $field.'='.$value.',';
+				}
+				$sql_set = rtrim($sql_set, ',');
+
+				if(!empty($sql_set)){
+					$sql = 'UPDATE '.$table.' SET '.$sql_set.' WHERE '.implode(' AND ', $row['where']);
+					if(!DBexecute($sql)) self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
+				}
+			}
+			return true;
+		}
+
+		public static function delete($table, $where){
+			$where = zbx_toArray($where);
+
+			$sql = 'DELETE FROM '.$table.' WHERE '.implode(' AND ', $where);
+			if(!DBexecute($sql)) self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
+
+			return true;
+		}
+
 	}
 
 ?>

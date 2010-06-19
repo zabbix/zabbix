@@ -806,7 +806,7 @@
 		if($result){
 			foreach($graphs as $graphid => $graph){
 				if(isset($host_list[$graphid]))
-					info(sprintf(S_GRAPH_DELETED_FROM_HOSTS, $graph['name'], count($host_list[$graphid]) > 1 ? 's' : '').': '.'"'.implode('","', array_keys($host_list[$graphid])).'"');
+					info(S_GRAPH_DELETED_FROM_HOSTS_PART1.SPACE.$graph['name'].SPACE.S_GRAPH_DELETED_FROM_HOSTS_PART2.SPACE.(count($host_list[$graphid]) > 1 ? 's' : '').SPACE.S_GRAPH_DELETED_FROM_HOSTS_PART3.':'.SPACE.'"'.implode('","', array_keys($host_list[$graphid])).'"');
 			}
 		}
 
@@ -826,15 +826,15 @@
  *
  */
 	function cmp_graphitems(&$gitem1, &$gitem2){
-		if($gitem1["drawtype"]	!= $gitem2["drawtype"])		return 1;
-		if($gitem1["sortorder"]	!= $gitem2["sortorder"])	return 2;
-		if($gitem1["color"]	!= $gitem2["color"])		return 3;
-		if($gitem1["yaxisside"]	!= $gitem2["yaxisside"])	return 4;
+		if($gitem1['drawtype']	!= $gitem2['drawtype'])		return 1;
+		if($gitem1['sortorder']	!= $gitem2['sortorder'])	return 2;
+		if($gitem1['color']	!= $gitem2['color'])		return 3;
+		if($gitem1['yaxisside']	!= $gitem2['yaxisside'])	return 4;
 
-		$item1 = get_item_by_itemid($gitem1["itemid"]);
-		$item2 = get_item_by_itemid($gitem2["itemid"]);
+		$item1 = get_item_by_itemid($gitem1['itemid']);
+		$item2 = get_item_by_itemid($gitem2['itemid']);
 
-		if($item1["key_"] != $item2["key_"])			return 5;
+		if($item1['key_'] != $item2['key_'])			return 5;
 
 		return 0;
 	}
@@ -972,7 +972,7 @@
  *
  */
 	function copy_graph_to_host($graphid, $hostid, $copy_mode = false){
-		$result = false;
+		$result = true;
 
 		$gitems = array();
 
@@ -991,7 +991,6 @@
 		}
 
 		$db_graph = get_graph_by_graphid($graphid);
-
 		if($new_gitems = get_same_graphitems_for_host($gitems, $hostid)){
 			unset($chd_graphid);
 
@@ -1361,8 +1360,7 @@
 
 			$result['height'] = abs($ar[1] - $ar[5]);
 			$result['width'] = abs($ar[0] - $ar[4]);
-		}
-		else{
+		} else{
 			switch($fontsize){
 				case 5: $fontsize = 1; break;
 				case 6: $fontsize = 1; break;
@@ -1380,14 +1378,13 @@
 			if($angle){
 				$result['width'] = imagefontheight($fontsize);
 				$result['height'] = imagefontwidth($fontsize) * zbx_strlen($string);
-			}
-			else{
+			} else{
 				$result['height'] = imagefontheight($fontsize);
 				$result['width'] = imagefontwidth($fontsize) * zbx_strlen($string);
 			}
 		}
 
-	return $result;
+		return $result;
 	}
 	
 	function DashedLine($image,$x1,$y1,$x2,$y2,$color){
