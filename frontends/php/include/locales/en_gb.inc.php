@@ -1146,7 +1146,7 @@
 	'S_SNMPV3_PRIV_PASSPHRASE'=>				'SNMPv3 priv passphrase',
 	'S_CUSTOM_MULTIPLIER'=>					'Custom multiplier',
 	'S_DO_NOT_USE'=>					'Do not use',
-	'S_USE_MULTIPLIER'=>					'Use multiplier',
+	'S_USE_CUSTOM_MULTIPLIER'=>				'Use custom multiplier',
 	'S_SELECT_HOST_DOT_DOT_DOT'=>				'Select host...',
 	'S_LOG_TIME_FORMAT'=>					'Log time format',
 	'S_CREATE_ITEM'=>					'Create Item',
@@ -2100,6 +2100,7 @@
 	'S_NO_ITEM_WITH'=>				'No item with',
 	'S_DELETED_SMALL'=>				'deleted',
 	'S_UNKNOWN_VALUE_TYPE'=>			'Unknown value type',
+	'S_ITEMS_CHECK_KEY_DEFAULT_EXAMPLE_PASSED'=>	'Check key, please. Default example were passed',
 
 //	httptest.inc.php
 	'S_SCENARIO_STEP_NUMBER_CANNOT_BE_LESS_ONE'=>	'Scenario step number cannot be less than 1',

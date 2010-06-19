@@ -355,6 +355,9 @@ class CItem extends CZBXAPI{
 			if(isset($options['filter']['snmp_community']))
 				$sql_parts['where'][] = 'i.snmp_community='.zbx_dbstr($options['filter']['snmp_community']);
 
+			if(isset($options['filter']['snmpv3_securityname']))
+				$sql_parts['where'][] = 'i.snmpv3_securityname='.zbx_dbstr($options['filter']['snmpv3_securityname']);
+
 			if(isset($options['filter']['snmp_oid']))
 				$sql_parts['where'][] = 'i.snmp_oid='.zbx_dbstr($options['filter']['snmp_oid']);
 
