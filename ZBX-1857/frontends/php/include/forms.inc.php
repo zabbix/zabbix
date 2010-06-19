@@ -1940,6 +1940,7 @@
 
 			$hostid	= ($hostid > 0) ? $hostid : $item_data['hostid'];
 			$limited = (($item_data['templateid'] == 0)  && ($item_data['type'] != ITEM_TYPE_HTTPTEST)) ? null : 'yes';
+			$item_data['snmp_port'] = $item_data['snmp_port'] == '0' ? 161 : $item_data['snmp_port'];
 		}
 
 		if(is_null($host)){
@@ -2183,7 +2184,7 @@
 				"&dstfld1=key&srctbl=help_items&srcfld1=key_&itemtype=".$type."');",
 				'T');
 
-		$frmItem->addRow(S_KEY, array(new CTextBox('key', !in_array($type, Array(ITEM_TYPE_DB_MONITOR,ITEM_TYPE_SSH,ITEM_TYPE_TELNET)) ? $key : '',40,$limited), $btnSelect));
+		$frmItem->addRow(S_KEY, array(new CTextBox('key',$key,40,$limited), $btnSelect));
 		foreach($types as $it) {
 			switch($it) {
 				case ITEM_TYPE_DB_MONITOR:
@@ -2640,7 +2641,7 @@
 		
 		zbx_add_post_js("var valueTypeSwitcher = new CViewSwitcher('value_type', new Array('keyup','click','change'), ".$json->encode($valueTypeVisibility).");");
 		zbx_add_post_js("var authTypeSwitcher = new CViewSwitcher('authtype', new Array('keyup','click','change'), ".$json->encode($authTypeVisibility).");");
-		zbx_add_post_js("var typeSwitcher = new CViewSwitcher('type', new Array('keyup','click','change'), ".$json->encode($typeVisibility).");");
+		zbx_add_post_js("var typeSwitcher = new CViewSwitcher('type', new Array('keyup','click','change'), ".$json->encode($typeVisibility).(isset($_REQUEST['itemid'])? ', true': '').');');
 		zbx_add_post_js("var multpStat = document.getElementById('multiplier'); if(multpStat && multpStat.onclick) multpStat.onclick();");
 		zbx_add_post_js("var mnFrmTbl = document.getElementById('web.items.item.php'); if(mnFrmTbl) mnFrmTbl.style.visibility = 'visible';");
 	}

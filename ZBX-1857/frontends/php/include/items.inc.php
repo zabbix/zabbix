@@ -317,9 +317,16 @@
 			error(S_INCORRECT_KEY_FORMAT.SPACE."'key_name[param1,param2,...]'");
 			return false;
 		}
+		
+		if(($item['type'] == ITEM_TYPE_DB_MONITOR && $item['key_'] == 'db.odbc.select[<unique short description>]') ||
+		   ($item['type'] == ITEM_TYPE_SSH && $item['key_'] == 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]') ||
+		   ($item['type'] == ITEM_TYPE_TELNET && $item['key_'] == 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]')) {
+		   	error(S_ITEMS_CHECK_KEY_DEFAULT_EXAMPLE_PASSED);
+		   	return false;
+		}
 
 		$res = calculate_item_nextcheck(0, $item['type'], $item['delay'], $item['delay_flex'], time());
-		if ($res['delay'] == SEC_PER_YEAR){
+		if ($res['delay'] == SEC_PER_YEAR && $item['type'] != ITEM_TYPE_ZABBIX_ACTIVE && $item['type'] != ITEM_TYPE_TRAPPER){
 			error(S_ITEM_WILL_NOT_BE_REFRESHED_PLEASE_ENTER_A_CORRECT_UPDATE_INTERVAL);
 			return FALSE;
 		}
@@ -542,6 +549,13 @@
 
 		if( !preg_match('/^'.ZBX_PREG_ITEM_KEY_FORMAT.'$/u', $item['key_']) ){
 			error(S_INCORRECT_KEY_FORMAT.SPACE."'key_name[param1,param2,...]'");
+			return false;
+		}
+		
+		if(($item['type'] == ITEM_TYPE_DB_MONITOR && $item['key_'] == 'db.odbc.select[<unique short description>]') ||
+		   ($item['type'] == ITEM_TYPE_SSH && $item['key_'] == 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]') ||
+		   ($item['type'] == ITEM_TYPE_TELNET && $item['key_'] == 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]')) {
+		   	error(S_ITEMS_CHECK_KEY_DEFAULT_EXAMPLE_PASSED);
 			return false;
 		}
 

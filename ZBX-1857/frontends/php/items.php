@@ -102,9 +102,7 @@ switch($itemType) {
 												ITEM_VALUE_TYPE_FLOAT.','.
 												ITEM_VALUE_TYPE_UINT64, 'value_type')),
 		'authtype'=>		array(T_ZBX_INT, O_OPT,  NULL,	IN(ITEM_AUTHTYPE_PASSWORD.','.ITEM_AUTHTYPE_PUBLICKEY),
-											'isset({save})&&isset({type})&&'.IN(
-												ITEM_TYPE_SSH.','.
-												ITEM_TYPE_TELNET,'type')),
+											'isset({save})&&isset({type})&&({type}=='.ITEM_TYPE_SSH.')'),
 		'username'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,		'isset({save})&&isset({type})&&'.IN(
 												ITEM_TYPE_SSH.','.
 												ITEM_TYPE_TELNET, 'type')),

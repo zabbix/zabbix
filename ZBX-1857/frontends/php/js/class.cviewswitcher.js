@@ -24,12 +24,14 @@ CViewSwitcher.prototype = {
   mainObj : null,
   curObj : null,
   changedFields : {},
+  fieldsPreChanged : false,
   depIds : {},
   lastValue : null,
 
-  initialize : function(objId, objAction, confData) {
+  initialize : function(objId, objAction, confData, preChangedFields) {
 
     this.inAction = false;
+    this.fieldsPreChanged = preChangedFields ? true:false;
     this.depIds = confData;
     this.mainObj = document.getElementById(objId);
 
@@ -232,7 +234,7 @@ CViewSwitcher.prototype = {
 
       if(typeof(elmVal) != 'undefined') this.setObjValue(elm, objVal);
 
-      if(typeof(elmVal) != 'undefined' || typeof(this.curObj.defaultValue) != 'undefined' && objVal === this.curObj.defaultValue) {
+      if(typeof(elmVal) != 'undefined' || typeof(this.curObj.defaultValue) != 'undefined' && objVal === this.curObj.defaultValue && this.changedFields[this.curObj.id] === false) {
         if(typeof(elmVal) != 'undefined') this.setObjValue(obj, elmVal);
         else this.setObjValue(obj, null);
       }
@@ -254,7 +256,8 @@ CViewSwitcher.prototype = {
         if(elm) elmVal = this.objValue(elm);
       }
 
-      if(typeof(this.curObj.defaultValue) != 'undefined' && this.changedFields[this.curObj.id] === false && objVal === '' && (typeof(elmVal) == 'undefined' || elmVal === ''))
+      if(typeof(this.curObj.defaultValue) != 'undefined' && this.changedFields[this.curObj.id] === false && objVal === '' &&
+         (typeof(elmVal) == 'undefined' || elmVal === ''))
         this.setObjValue(obj, this.curObj.defaultValue);
       else if(typeof(elmVal) != 'undefined')
         this.setObjValue(obj, elmVal);
@@ -278,7 +281,7 @@ CViewSwitcher.prototype = {
         this.hideObj(elm);
         if(this.depIds[i][a].defaultValue) {
           var me = this;
-          this.changedFields[this.depIds[i][a].id] = false;
+          this.changedFields[this.depIds[i][a].id] = this.fieldsPreChanged === false ? false : true;
           addListener(elm, 'change', function () { me.changedFields[this.getAttribute('id')] = true; });
           addListener(elm, 'keyup', function () { me.changedFields[this.getAttribute('id')] = true; });
           addListener(elm, 'keydown', function () { me.changedFields[this.getAttribute('id')] = true; });
