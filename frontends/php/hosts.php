@@ -867,11 +867,14 @@ include_once('include/page_header.php');
 			}
 			else{
 				$hostTemplates = array();
+				order_result($host['parentTemplates'], 'host');
 				foreach($host['parentTemplates'] as $htnum => $template){
 					$caption = array();
 					$caption[] = new CLink($template['host'],'templates.php?form=update&templateid='.$template['templateid'],'unknown');
 
 					if(!empty($templates[$template['templateid']]['parentTemplates'])){
+						order_result($templates[$template['templateid']]['parentTemplates'], 'host');
+						
 						$caption[] = ' (';
 						foreach($templates[$template['templateid']]['parentTemplates'] as $tnum => $tpl){
 							$caption[] = new CLink($tpl['host'],'templates.php?form=update&templateid='.$tpl['templateid'], 'unknown');
