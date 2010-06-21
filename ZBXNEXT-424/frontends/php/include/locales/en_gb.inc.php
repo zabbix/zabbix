@@ -1760,6 +1760,12 @@
 	'S_NOT_ACK'=>				'Not Ack',
 	'S_NEVER'=>				'Never',
 	'S_FOUND'=>				'Found',
+	'S_ACKNOWLEDGE_STATUS' => 'Acknowledge status',
+	'S_ANY' => 'Any',
+	'S_WITH_UNACKNOWLEDGED_EVENTS' => 'With unacknowledged events',
+	'S_WITH_LAST_EVENT_UNACKNOWLEDGED' => 'With last event unacknowledged',
+	'S_TRIGGERS_STATUS' => 'Triggers status',
+	'S_LAST_STATUS_CHANGE' => 'Last status change',
 
 //	users.php
 	'S_ZABBIX_USER'=>				'Zabbix User',
