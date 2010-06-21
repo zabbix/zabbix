@@ -126,7 +126,7 @@ static void	__mem_free(zbx_mem_info_t *info, void *ptr);
 #define CHUNK_SIZE(ptr) ((*(uint32_t *)(ptr)) & ~MEM_FLG_USED)
 
 #define	MEM_MIN_SIZE	128
-#define MEM_MAX_SIZE	(1<<30)	/* 1 GB */
+#define MEM_MAX_SIZE	0x7fffffff	/* just below 2 GB */
 
 #define MEM_MIN_ALLOC	24	/* should be a multiple of 8 and at least (2 * ZBX_PTR_SIZE) */
 
@@ -807,4 +807,31 @@ void	zbx_mem_dump_stats(zbx_mem_info_t *info)
 	zabbix_log(LOG_LEVEL_DEBUG, "================================");
 
 	UNLOCK_INFO;
+}
+
+size_t	zbx_mem_required_size(size_t size, int chunks_num, const char *descr)
+{
+	const char	*__function_name = "zbx_mem_required_size";
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): size[%lu] chunks_num[%d] descr[%s]",
+			__function_name, size, chunks_num, descr);
+
+	/* shared memory of what size should we allocate so that there is a guarantee */
+	/* that we will be able to get ourselves 'chunks_num' pieces of memory with a */
+	/* total size of 'size', given that we also have to store 'descr'?            */
+	
+	size += 7;					/* ensure we allocate enough to 8-align zbx_mem_info_t */
+	size += sizeof(zbx_mem_info_t);
+	size += ZBX_PTR_SIZE - 1;			/* ensure we allocate enough to align bucket pointers */
+	size += ZBX_PTR_SIZE * MEM_BUCKET_COUNT;
+	size += strlen(descr) + 1;
+	size += (MEM_SIZE_FIELD - 1) + 8;		/* ensure we allocate enough to align the first chunk */
+	size += (MEM_SIZE_FIELD - 1) + 8;		/* ensure we allocate enough to align right size field */
+
+	size += (chunks_num - 1) * 8;			/* each additional chunk requires 8 bytes of overhead */
+	size += chunks_num * (MEM_MIN_ALLOC - 1);	/* each chunk has size of at least MEM_MIN_ALLOC bytes */
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): size[%lu]", __function_name, size);
+
+	return size;
 }

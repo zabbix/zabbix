@@ -44,8 +44,8 @@ key_t	zbx_ftok(char *path, int id)
 
 	if (-1 == (ipc_key = ftok(path, id)))
 	{
-		zbx_error("Cannot create IPC key for path '%s' [%s]",
-			path, strerror(errno));
+		zbx_error("Cannot create IPC key for path [%s] id [%c] error [%s]",
+			path, (char)id, strerror(errno));
 	}
 
 	return ipc_key;

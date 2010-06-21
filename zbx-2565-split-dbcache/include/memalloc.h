@@ -54,6 +54,8 @@ void	zbx_mem_clear(zbx_mem_info_t *info);
 
 void	zbx_mem_dump_stats(zbx_mem_info_t *info);
 
+size_t	zbx_mem_required_size(size_t size, int chunks_num, const char *descr);
+
 #define ZBX_MEM_FUNC_DECL(__prefix)					\
 									\
 static void	*__prefix ## _mem_malloc_func(void *old, size_t size);	\
