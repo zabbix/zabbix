@@ -300,7 +300,7 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 	if (0 != init_cpu_collector(&(collector->cpus)))
 		close_cpu_collector(&(collector->cpus));
 
-	while(ZBX_IS_RUNNING)
+	while(ZBX_IS_RUNNING())
 	{
 		sec = zbx_time();
 		if (CPU_COLLECTOR_STARTED(collector))
