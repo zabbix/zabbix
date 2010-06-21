@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2597] fixed processing of telnet results with long prompts (Sasha)
  - [ZBX-2595] fixed logformat field showing (Maxim Andruhovich / AM)
  - [ZBX-2593] fixed possibility to copy item between templates that are linked to same host (Vedmak)
  - [ZBX-2585] removed spaces from charts title & fixed date format for chart4.php (Maxim Andruhovich / AM)
