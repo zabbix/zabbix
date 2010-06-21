@@ -131,7 +131,7 @@ static void run_remote_command(char* host_name, char* command)
 		else
 		{
 #endif
-			param = dyn_escape_param((const char *)p);
+			param = dyn_escape_param(p);
 			item.key = zbx_dsprintf(NULL, "system.run[\"%s\",\"nowait\"]", param);
 			zbx_free(param);
 
