@@ -112,7 +112,7 @@ static struct zbx_option longopts[] =
 
 static char	shortopts[] = "c:I:z:p:s:k:o:Ti:rvhV";
 
-/* end of COMMAND LINE OPTIONS*/
+/* end of COMMAND LINE OPTIONS */
 
 static int	CONFIG_LOG_LEVEL = LOG_LEVEL_CRIT;
 
@@ -129,19 +129,12 @@ static char*	ZABBIX_KEY_VALUE = NULL;
 
 #if !defined(_WINDOWS)
 
-static void	send_signal_handler( int sig )
+static void	send_signal_handler(int sig)
 {
-	if( SIGALRM == sig )
-	{
-		signal( SIGALRM, send_signal_handler );
-		zabbix_log( LOG_LEVEL_WARNING, "Timeout while executing operation");
-	}
+	if (SIGALRM == sig)
+		zabbix_log(LOG_LEVEL_WARNING, "Timeout while executing operation");
 
-	if( SIGQUIT == sig || SIGINT == sig || SIGTERM == sig )
-	{
-/*		fprintf(stderr,"\nGot QUIT or INT or TERM signal. Exiting..." ); */
-	}
-	exit( FAIL );
+	exit(FAIL);
 }
 
 #endif /* NOT _WINDOWS */
@@ -215,17 +208,17 @@ static ZBX_THREAD_ENTRY(send_value, args)
 
 	char	*answer = NULL;
 
-	int		tcp_ret = FAIL, ret = FAIL;
+	int	tcp_ret = FAIL, ret = FAIL;
 
 	assert(args);
 
 	sentdval_args = ((ZBX_THREAD_SENDVAL_ARGS *)args);
 
 #if !defined(_WINDOWS)
-	signal( SIGINT,  send_signal_handler );
-	signal( SIGTERM, send_signal_handler );
-	signal( SIGQUIT, send_signal_handler );
-	signal( SIGALRM, send_signal_handler );
+	signal(SIGINT,  send_signal_handler);
+	signal(SIGTERM, send_signal_handler);
+	signal(SIGQUIT, send_signal_handler);
+	signal(SIGALRM, send_signal_handler);
 #endif /* NOT _WINDOWS */
 
 	if (SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, CONFIG_SOURCE_IP, sentdval_args->server, sentdval_args->port, SENDER_TIMEOUT))) {

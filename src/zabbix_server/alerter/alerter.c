@@ -25,7 +25,7 @@
 #include "zlog.h"
 #include "email.h"
 #include "sms.h"
-#if defined (HAVE_JABBER)
+#if defined(HAVE_JABBER)
 #	include "jabber.h"
 #endif
 #include "daemon.h"
@@ -50,114 +50,80 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int execute_action(DB_ALERT *alert,DB_MEDIATYPE *mediatype, char *error, int max_error_len)
+int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int max_error_len)
 {
-	int 	res=FAIL;
-	int	pid;
+	const char	*__function_name = "execute_action";
 
+	int 	pid, res = FAIL;
 	char	full_path[MAX_STRING_LEN];
 
-	char    env_alertid[128],env_actionid[128],env_clock[128],env_mediatypeid[128],
-		env_status[128];
-	char    *zbxenv[] = { (char *)&env_alertid, (char *)&env_actionid, (char *)&env_clock,
-		(char *)&env_mediatypeid, (char *)&env_status,
-		(char *)0 };
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): alertid [" ZBX_FS_UI64 "] mediatype [%d]",
+			__function_name, alert->alertid, mediatype->type);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In execute_action(%s)",
-		mediatype->smtp_server);
-
-	if(mediatype->type==MEDIA_TYPE_EMAIL)
+	if (MEDIA_TYPE_EMAIL == mediatype->type)
 	{
 		alarm(40);
-		res = send_email(mediatype->smtp_server,mediatype->smtp_helo,mediatype->smtp_email,alert->sendto,alert->subject,
-			alert->message, error, max_error_len);
+		res = send_email(mediatype->smtp_server, mediatype->smtp_helo, mediatype->smtp_email,
+				alert->sendto, alert->subject, alert->message, error, max_error_len);
 		alarm(0);
 	}
-#if defined (HAVE_JABBER)
-	else if(mediatype->type==MEDIA_TYPE_JABBER)
+#if defined(HAVE_JABBER)
+	else if (MEDIA_TYPE_JABBER == mediatype->type)
 	{
 		/* Jabber uses its own timeouts */
-		res = send_jabber(mediatype->username, mediatype->passwd, alert->sendto, alert->subject,
-				alert->message, error, max_error_len);
+		res = send_jabber(mediatype->username, mediatype->passwd,
+				alert->sendto, alert->subject, alert->message, error, max_error_len);
 	}
-#endif /* HAVE_JABBER */
-	else if(mediatype->type==MEDIA_TYPE_SMS)
+#endif
+	else if (MEDIA_TYPE_SMS == mediatype->type)
 	{
 		/* SMS uses its own timeouts */
-		res = send_sms(mediatype->gsm_modem,alert->sendto,alert->message, error, max_error_len);
+		res = send_sms(mediatype->gsm_modem, alert->sendto, alert->message, error, max_error_len);
 	}
-	else if(mediatype->type==MEDIA_TYPE_EXEC)
+	else if (MEDIA_TYPE_EXEC == mediatype->type)
 	{
-/*		if(-1 == execl(CONFIG_ALERT_SCRIPTS_PATH,mediatype->exec_path,alert->sendto,alert->subject,alert->message))*/
-		zabbix_log( LOG_LEVEL_DEBUG, "Before execl([%s],[%s])",
-			CONFIG_ALERT_SCRIPTS_PATH,
-			mediatype->exec_path);
-
-/*		if(-1 == execl("/home/zabbix/bin/lmt.sh","lmt.sh",alert->sendto,alert->subject,alert->message,(char *)0))*/
-
 		pid = zbx_fork();
-		if(0 != pid)
+		if (0 != pid)
 		{
-			waitpid(pid,NULL,0);
+			waitpid(pid, NULL, 0);
+			res = SUCCEED;
 		}
 		else
 		{
-			strscpy(full_path,CONFIG_ALERT_SCRIPTS_PATH);
-			zbx_strlcat(full_path,"/",MAX_STRING_LEN);
-			zbx_strlcat(full_path,mediatype->exec_path,MAX_STRING_LEN);
-			ltrim_spaces(full_path);
-			zabbix_log( LOG_LEVEL_DEBUG, "Before executing [%s]",
-				full_path);
+			zbx_snprintf(full_path, sizeof(full_path), "%s/%s",
+					CONFIG_ALERT_SCRIPTS_PATH, mediatype->exec_path);
 
-			zbx_snprintf(env_alertid,127,"ZABBIX_ALERT_ID=%d",
-				alert->alertid);
-			zbx_snprintf(env_actionid,127,"ZABBIX_ACTION_ID=%d",
-				alert->actionid);
-			zbx_snprintf(env_clock,127,"ZABBIX_ALERT_TIME=%d",
-				alert->clock);
-			zbx_snprintf(env_mediatypeid,127,"ZABBIX_ALERT_MEDIATYPEID=%d",
-				alert->mediatypeid);
-			zbx_snprintf(env_status,127,"ZABBIX_ALERT_STATUS=%d",
-				alert->status);
+			zabbix_log(LOG_LEVEL_DEBUG, "Before executing [%s]", full_path);
 
-/*			if(-1 == execl(full_path,mediatype->exec_path,alert->sendto,alert->subject,alert->message,(char *)0))*/
-			if(-1 == execle(full_path,mediatype->exec_path,alert->sendto,alert->subject,alert->message,(char *)0, zbxenv))
+			if (-1 == execl(full_path, mediatype->exec_path, alert->sendto,
+						alert->subject, alert->message, (char *)NULL))
 			{
-				zabbix_log( LOG_LEVEL_ERR, "Error executing [%s] [%s]",
+				zabbix_log(LOG_LEVEL_ERR, "Error executing [%s] [%s]",
 					full_path,
 					strerror(errno));
 				zabbix_syslog("Error executing [%s] [%s]",
 					full_path,
 					strerror(errno));
-				zbx_snprintf(error,max_error_len,"Error executing [%s] [%s]",
-					full_path,
-					strerror(errno));
-				res = FAIL;
+				exit(FAIL);
 			}
 			else
-			{
-				res = SUCCEED;
-			}
-			/* In normal case the program will never reach this point */
-			zabbix_log( LOG_LEVEL_DEBUG, "After execl()");
-			exit(0);
+				THIS_SHOULD_NEVER_HAPPEN;
 		}
-		res = SUCCEED;
 	}
 	else
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Unsupported media type [%d] for alert ID [%d]",
+		zabbix_log(LOG_LEVEL_ERR, "Unsupported media type [%d] for alert ID [" ZBX_FS_UI64 "]",
 			mediatype->type,
 			alert->alertid);
-		zabbix_syslog("Unsupported media type [%d] for alert ID [%d]",
+		zabbix_syslog("Unsupported media type [%d] for alert ID [" ZBX_FS_UI64 "]",
 			mediatype->type,
 			alert->alertid);
-		zbx_snprintf(error,max_error_len,"Unsupported media type [%d]",
+		zbx_snprintf(error, max_error_len, "Unsupported media type [%d]",
 			mediatype->type);
 		res = FAIL;
 	}
 
-	zabbix_log( LOG_LEVEL_DEBUG, "End execute_action()");
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %d", __function_name, zbx_result_string(res));
 
 	return res;
 }
@@ -177,7 +143,7 @@ int execute_action(DB_ALERT *alert,DB_MEDIATYPE *mediatype, char *error, int max
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-int main_alerter_loop()
+int	main_alerter_loop()
 {
 	char			error[MAX_STRING_LEN], *error_esc;
 	int			res, now;
@@ -187,7 +153,6 @@ int main_alerter_loop()
 	DB_ALERT		alert;
 	DB_MEDIATYPE		mediatype;
 
-/*	phan.sa_handler = child_signal_handler;*/
         phan.sa_sigaction = child_signal_handler;
 	sigemptyset(&phan.sa_mask);
 	phan.sa_flags = SA_SIGINFO;
@@ -212,8 +177,6 @@ int main_alerter_loop()
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			res = FAIL;
-
 			ZBX_STR2UINT64(alert.alertid, row[0]);
 			alert.mediatypeid	= atoi(row[1]);
 			alert.sendto		= row[2];
@@ -228,7 +191,6 @@ int main_alerter_loop()
 			mediatype.smtp_helo	= row[10];
 			mediatype.smtp_email	= row[11];
 			mediatype.exec_path	= row[12];
-
 			mediatype.gsm_modem	= row[13];
 			mediatype.username	= row[14];
 			mediatype.passwd	= row[15];
@@ -240,7 +202,7 @@ int main_alerter_loop()
 
 			if (res == SUCCEED)
 			{
-				zabbix_log( LOG_LEVEL_DEBUG, "Alert ID [" ZBX_FS_UI64 "] was sent successfully",
+				zabbix_log(LOG_LEVEL_DEBUG, "Alert ID [" ZBX_FS_UI64 "] was sent successfully",
 					alert.alertid);
 				DBexecute("update alerts set status=%d,error='' where alertid=" ZBX_FS_UI64,
 					ALERT_STATUS_SENT,
@@ -248,14 +210,15 @@ int main_alerter_loop()
 			}
 			else
 			{
-				zabbix_log( LOG_LEVEL_DEBUG, "Error sending alert ID [" ZBX_FS_UI64 "]",
+				zabbix_log(LOG_LEVEL_DEBUG, "Error sending alert ID [" ZBX_FS_UI64 "]",
 					alert.alertid);
 				zabbix_syslog("Error sending alert ID [" ZBX_FS_UI64 "]",
 					alert.alertid);
+
 				error_esc = DBdyn_escape_string_len(error, ALERT_ERROR_LEN);
 
 				alert.retries++;
-				if(alert.retries < ALERT_MAX_RETRIES)
+				if (alert.retries < ALERT_MAX_RETRIES)
 				{
 					DBexecute("update alerts set retries=%d,error='%s' where alertid=" ZBX_FS_UI64,
 						alert.retries,

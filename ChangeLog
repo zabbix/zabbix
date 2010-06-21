@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2575] removed outdated and undocumented environment variables from alert scripts (asaveljevs)
  - [ZBX-2574] improved fixed graph Y axis measurement (Aly)
  - [ZBX-2576] small text changes in administration/audit (Vedmak)
  - [ZBX-1857] fixed item form correct processing, removed refreshing when item type is changed (Maxim Andruhovich / AM)
