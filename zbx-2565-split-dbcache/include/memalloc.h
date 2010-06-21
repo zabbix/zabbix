@@ -54,4 +54,27 @@ void	zbx_mem_clear(zbx_mem_info_t *info);
 
 void	zbx_mem_dump_stats(zbx_mem_info_t *info);
 
+#define ZBX_MEM_FUNC_DECL(__prefix)					\
+									\
+static void	*__prefix ## _mem_malloc_func(void *old, size_t size);	\
+static void	*__prefix ## _mem_realloc_func(void *old, size_t size);	\
+static void	__prefix ## _mem_free_func(void *ptr);
+
+#define ZBX_MEM_FUNC_IMPL(__prefix, __info_ptr)				\
+									\
+static void	*__prefix ## _mem_malloc_func(void *old, size_t size)	\
+{									\
+	return zbx_mem_malloc(__info_ptr, old, size);			\
+}									\
+									\
+static void	*__prefix ## _mem_realloc_func(void *old, size_t size)	\
+{									\
+	return zbx_mem_realloc(__info_ptr, old, size);			\
+}									\
+									\
+static void	__prefix ## _mem_free_func(void *ptr)			\
+{									\
+	zbx_mem_free(__info_ptr, ptr);					\
+}
+
 #endif

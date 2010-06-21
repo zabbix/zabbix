@@ -2609,20 +2609,7 @@ void	DCadd_history_log(zbx_uint64_t itemid, char *value_orig, int clock, int tim
  *                                                                            *
  ******************************************************************************/
 
-static void	*__cache_mem_malloc_func(void *old, size_t size)
-{
-	return zbx_mem_malloc(cache_mem, old, size);
-}
-
-static void	*__cache_mem_realloc_func(void *old, size_t size)
-{
-	return zbx_mem_realloc(cache_mem, old, size);
-}
-
-static void	__cache_mem_free_func(void *ptr)
-{
-	zbx_mem_free(cache_mem, ptr);
-}
+ZBX_MEM_FUNC_IMPL(__cache, cache_mem);
 
 void	init_database_cache(unsigned char p)
 {
@@ -2632,7 +2619,7 @@ void	init_database_cache(unsigned char p)
 
 	zbx_process = p;
 
-	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, (int)'c')))
+	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_DATABASE_ID)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "Can't create IPC key for database cache");
 		exit(FAIL);
