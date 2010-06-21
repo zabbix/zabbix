@@ -114,7 +114,6 @@ static void	parent_signal_handler(int sig, siginfo_t *siginfo, void *context)
  * Comments: it doesn't allow running under 'root' if allow_root is zero      *
  *                                                                            *
  ******************************************************************************/
-
 int	daemon_start(int allow_root)
 {
 	pid_t			pid;
