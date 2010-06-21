@@ -200,6 +200,9 @@ function __autoload($class_name){
 			include_once('include/locales/'.$USER_DETAILS['lang'].'.inc.php');
 			process_locales();
 		}
+		
+		include_once('include/locales/en_gb.inc.php');
+		process_locales();
 
 		if($USER_DETAILS['attempt_failed']) {
 			$attemps = bold($USER_DETAILS['attempt_failed']);
@@ -226,6 +229,7 @@ function __autoload($class_name){
 				'name'  =>'- unknown -',
 				'nodeid'=>0)
 			);
+		
 	}
 
 	include_once('include/locales/en_gb.inc.php');
@@ -1002,7 +1006,7 @@ function __autoload($class_name){
 			case 10: $month = S_OCTOBER; break;
 			case 11: $month = S_NOVEMBER; break;
 			case 12: $month = S_DECEMBER; break;
-			default: $month = S_CONFIG_WARNING_WRONG_MONTH_PART1.$num.S_CONFIG_WARNING_WRONG_MONTH_PART2;
+			default: $month = S_CONFIG_WARNING_WRONG_MONTH_PART1.SPACE.$num.SPACE.S_CONFIG_WARNING_WRONG_MONTH_PART2;
 		}
 
 		return $month;
@@ -1017,7 +1021,7 @@ function __autoload($class_name){
 			case 5: $day = S_FRIDAY; break;
 			case 6: $day = S_SATURDAY; break;
 			case 7: $day = S_SUNDAY; break;
-			default: $day = S_CONFIG_WARNING_WRONG_DOW_PART1.$num.S_CONFIG_WARNING_WRONG_DOW_PART2;
+			default: $day = S_CONFIG_WARNING_WRONG_DOW_PART1.SPACE.$num.SPACE.S_CONFIG_WARNING_WRONG_DOW_PART2;
 		}
 
 	return $day;

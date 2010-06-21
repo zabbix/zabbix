@@ -42,7 +42,6 @@ class CTable extends CTag{
 		$this->oddRowClass = NULL;
 		$this->evenRowClass = NULL;
 
-
 		$this->header = '';
 		$this->headerClass = NULL;
 		$this->footer = '';
@@ -88,7 +87,7 @@ class CTable extends CTag{
 		else{
 			$item = new CRow($item,$rowClass);
 		}
-		if(!isset($item->attributes['class'])){
+		if(!isset($item->attributes['class']) || is_array($item->attributes['class'])){
 			$class = ($this->rownum % 2)?$this->oddRowClass:$this->evenRowClass;
 			$item->setClass($class);
 			$item->setAttribute('origClass', $class);

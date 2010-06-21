@@ -111,7 +111,7 @@ include_once('include/page_header.php');
 	$numrows = new CDiv();
 	$numrows->setAttribute('name', 'numrows');
 
-	$audit_wdgt->addHeader(S_ACTIONS_BIG);
+	$audit_wdgt->addHeader(S_LOGS_BIG);
 	$audit_wdgt->addHeader($numrows);
 //--------
 

@@ -44,13 +44,17 @@ void	send_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp)
 {
 	const char	*__function_name = "send_proxyconfig";
 	zbx_uint64_t	proxy_hostid;
-	char		host[HOST_HOST_LEN_MAX];
+	char		host[HOST_HOST_LEN_MAX], error[256];
 	struct zbx_json	j;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (FAIL == get_proxy_id(jp, &proxy_hostid, host))
+	if (FAIL == get_proxy_id(jp, &proxy_hostid, host, error, sizeof(error)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Proxy config request from active proxy on [%s] failed: %s",
+				get_ip_by_socket(sock), error);
 		return;
+	}
 
 	update_proxy_lastaccess(proxy_hostid);
 
