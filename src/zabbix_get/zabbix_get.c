@@ -79,14 +79,13 @@ struct zbx_option longopts[] =
 
 static char     shortopts[] = "s:p:k:I:hV";
 
-/* end of COMMAND LINE OPTIONS*/
-
+/* end of COMMAND LINE OPTIONS */
 
 #if !defined(_WINDOWS)
 
 /******************************************************************************
  *                                                                            *
- * Function: signal_handler                                                   *
+ * Function: get_signal_handler                                               *
  *                                                                            *
  * Purpose: process signals                                                   *
  *                                                                            *
@@ -99,19 +98,12 @@ static char     shortopts[] = "s:p:k:I:hV";
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void    signal_handler( int sig )
+static void	get_signal_handler(int sig)
 {
-	if( SIGALRM == sig )
-	{
-		signal( SIGALRM, signal_handler );
-		zbx_error("Timeout while executing operation.");
-	}
+	if (SIGALRM == sig)
+		zbx_error("Timeout while executing operation");
 
-	if( SIGQUIT == sig || SIGINT == sig || SIGTERM == sig )
-	{
-/*		zbx_error("\nGot QUIT or INT or TERM signal. Exiting..." ); */
-	}
-	exit( FAIL );
+	exit(FAIL);
 }
 
 #endif /* not WINDOWS */
@@ -237,10 +229,10 @@ int main(int argc, char **argv)
 	{
 
 #if !defined(_WINDOWS)
-		signal( SIGINT,  signal_handler );
-		signal( SIGTERM, signal_handler );
-		signal( SIGQUIT, signal_handler );
-		signal( SIGALRM, signal_handler );
+		signal(SIGINT,  get_signal_handler);
+		signal(SIGTERM, get_signal_handler);
+		signal(SIGQUIT, get_signal_handler);
+		signal(SIGALRM, get_signal_handler);
 #endif /* not WINDOWS */
 
 		ret = get_value(source_ip, host, port, key, &value);

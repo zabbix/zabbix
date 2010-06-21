@@ -374,7 +374,6 @@ DB_FUNCTION
 DB_MEDIA
 {
 	zbx_uint64_t	mediaid;
-/*	char	*type;*/
 	zbx_uint64_t	mediatypeid;
 	char	*sendto;
 	char	*period;
@@ -443,29 +442,27 @@ DB_CONDITION
 	zbx_uint64_t	actionid;
 	zbx_condition_type_t	conditiontype;
 	zbx_condition_op_t	operator;
-	char	*value;
+	char		*value;
 };
 
 DB_ALERT
 {
 	zbx_uint64_t	alertid;
 	zbx_uint64_t 	actionid;
-	int 	clock;
-/*	char	*type;*/
+	int		clock;
 	zbx_uint64_t	mediatypeid;
-	char	*sendto;
-	char	*subject;
-	char	*message;
+	char		*sendto;
+	char		*subject;
+	char		*message;
 	zbx_alert_status_t	status;
-	int	retries;
-/*	int	delay;*/
+	int		retries;
 };
 
 DB_HOUSEKEEPER
 {
 	zbx_uint64_t	housekeeperid;
-	char	*tablename;
-	char	*field;
+	char		*tablename;
+	char		*field;
 	zbx_uint64_t	value;
 };
 
