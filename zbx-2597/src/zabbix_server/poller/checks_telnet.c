@@ -275,9 +275,12 @@ static void	convert_unix_to_telnet_eol(const char *buf, size_t offset, char *out
 
 static char	telnet_lastchar(const char *buf, size_t offset)
 {
-	while (offset-- > 0)
+	while (offset > 0)
+	{
+		offset--;
 		if (buf[offset] != ' ')
 			return buf[offset];
+	}
 
 	return '\0';
 }
@@ -288,7 +291,7 @@ static int	telnet_rm_echo(char *buf, size_t *offset, const char *echo, size_t le
 	{
 		*offset -= len;
 		memmove(&buf[0], &buf[len], *offset * sizeof(char));
-		
+
 		return SUCCEED;
 	}
 	else
@@ -297,10 +300,14 @@ static int	telnet_rm_echo(char *buf, size_t *offset, const char *echo, size_t le
 
 static void	telnet_rm_prompt(const char *buf, size_t *offset)
 {
+	unsigned char	state = 0;	/* 0 - init, 1 - prompt */
+
 	while (*offset > 0)
 	{
 		(*offset)--;
-		if (buf[*offset] == prompt_char)
+		if (0 == state && buf[*offset] == prompt_char)
+			state = 1;
+		if (1 == state && buf[*offset] == '\n')
 			break;
 	}
 }
