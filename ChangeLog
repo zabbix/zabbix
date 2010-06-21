@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2585] removed spaces from charts title & fixed date format for chart4.php (Maxim Andruhovich / AM)
  - [ZBX-2592] added support of comma character (,) for scripts in action remote commands (Sasha)
  - [ZBX-2575] removed outdated and undocumented environment variables from alert scripts (asaveljevs)
  - [ZBX-2574] improved fixed graph Y axis measurement (Aly)
