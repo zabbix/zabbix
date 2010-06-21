@@ -2533,8 +2533,8 @@
 		$row = new CRow(array(new CCol(S_LOG_TIME_FORMAT,'form_row_l'), new CCol(new CTextBox('logtimefmt',$logtimefmt,16,$limited),'form_row_r')));
 		$row->setAttribute('id', 'row_logtimefmt');
 		$frmItem->addRow($row);
-		zbx_subarray_push($typeVisibility, ITEM_VALUE_TYPE_LOG, 'logtimefmt');
-		zbx_subarray_push($typeVisibility, ITEM_VALUE_TYPE_LOG, 'row_logtimefmt');
+		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_LOG, 'logtimefmt');
+		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_LOG, 'row_logtimefmt');
 
 /*		if($value_type==ITEM_VALUE_TYPE_LOG)
 			$frmItem->addRow(S_LOG_TIME_FORMAT, new CTextBox('logtimefmt',$logtimefmt,16,$limited));
@@ -2672,7 +2672,6 @@
 		$frmItem->addItemToBottomRow(SPACE);
 		$frmItem->addItemToBottomRow(new CButton('register',S_DO_SMALL));
 
-		
 		$json = new CJSON();
 		
 		zbx_add_post_js("var valueTypeSwitcher = new CViewSwitcher('value_type', new Array('keyup','click','change'), ".$json->encode($valueTypeVisibility).");");
