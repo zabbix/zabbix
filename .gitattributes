@@ -377,6 +377,7 @@ frontends/php/styles/css_ob.css -text
 frontends/php/styles/default.css -text
 frontends/php/styles/div.css -text
 frontends/php/styles/form.css -text
+frontends/php/styles/ie.css -text
 frontends/php/styles/link.css -text
 frontends/php/styles/p.css -text
 frontends/php/styles/popupmenu.css -text
