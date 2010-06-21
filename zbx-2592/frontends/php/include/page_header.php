@@ -119,6 +119,10 @@
     <title><?php echo $page_title; ?></title>
 	<meta name="Author" content="ZABBIX SIA" />
 	<link rel="stylesheet" type="text/css" href="css.css" />
+<!--[if IE 6]>
+	<link rel="stylesheet" type="text/css" href="styles/ie.css" />
+<![endif]-->
+
 <?php
 	if(isset($DB['DB']) && !is_null($DB['DB'])){
 		$css = false;
