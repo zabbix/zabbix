@@ -2104,6 +2104,71 @@ int	num_key_param(char *param)
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: get_escape_param_len                                             *
+ *                                                                            *
+ * Purpose: calculate size of buffer for escaped string                       *
+ *                                                                            *
+ * Parameters: src - [IN] source string                                       *
+ *                                                                            *
+ * Return value: size of escaped string                                       *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static size_t	get_escape_param_len(const char *src)
+{
+	size_t	sz = 1;	/* '\0' */
+
+	for (; '\0' != *src; src++)
+	{
+		if ('"' == *src)
+			sz++;
+		sz++;
+	}
+
+	return sz;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dyn_escape_param                                                 *
+ *                                                                            *
+ * Purpose: escaping source string for using in quoted key parameters         *
+ *                                                                            *
+ * Parameters: src - [IN] source string                                       *
+ *                                                                            *
+ * Return value: escaped string                                               *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+char	*dyn_escape_param(const char *src)
+{
+	size_t	sz;
+	char	*d, *dst = NULL;
+
+	sz = get_escape_param_len(src);
+
+	dst = malloc(sz);
+
+	for (d = dst; '\0' != *src; src++)
+	{
+		if ('"' == *src)
+			*d++ = '\\';
+		*d++ = *src;
+	}
+
+	*d = '\0';
+
+	return dst;
+}
+
 char	*zbx_age2str(int age)
 {
 	int		days, hours, minutes, offset;
