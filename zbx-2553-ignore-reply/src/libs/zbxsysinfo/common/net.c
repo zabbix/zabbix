@@ -169,7 +169,7 @@ int	CHECK_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 
 	port=atoi(port_str);
 
-	ret = tcp_expect(ip,port,NULL,NULL,"",&value_int);
+	ret = tcp_expect(ip,port,NULL,NULL,NULL,&value_int);
 
 	if(ret == SYSINFO_RET_OK)
 	{
