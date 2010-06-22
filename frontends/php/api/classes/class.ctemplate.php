@@ -858,7 +858,7 @@ Copt::memoryPick();
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'output' => $options['select_macros'],
-				'hostids' => $hostids,
+				'hostids' => $templateids,
 				'preservekeys' => 1
 			);
 			$macros = CUserMacro::get($obj_params);

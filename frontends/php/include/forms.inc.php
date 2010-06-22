@@ -2670,7 +2670,7 @@
 		}
 		$frmItem->addItemToBottomRow($cmbAction);
 		$frmItem->addItemToBottomRow(SPACE);
-		$frmItem->addItemToBottomRow(new CButton('register',S_DO_SMALL));
+		$frmItem->addItemToBottomRow(new CButton('register',S_DO));
 
 		$json = new CJSON();
 		
