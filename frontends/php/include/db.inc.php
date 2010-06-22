@@ -838,7 +838,7 @@ else {
 	return true;
 	}
 
-	function DBcondition($fieldname, &$array, $notin=false, $string=false){
+	function DBcondition($fieldname, $array, $notin=false, $string=false){
 		global $DB;
 		$condition = '';
 

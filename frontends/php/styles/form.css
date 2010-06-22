@@ -1,6 +1,6 @@
 /* CSS Document */
 
-form {margin: 0px}
+form {margin: 0}
 
 /**************** FORM ELEMENTS ****************/
 input, select, textarea{
@@ -29,8 +29,8 @@ input, select, textarea{
 .biginput, .biginput[disabled]:hover{
 	border: 1px solid gray;
 	background-color: white;
-	padding: 0px 1px 0px 0px;
-	margin: 1px 2px 0px 2px;
+	padding: 0 1px 0 0;
+	margin: 1px 2px 0 2px;
 	vertical-align: top;
 }
 .biginput:focus	{
@@ -50,7 +50,7 @@ input, select, textarea{
 	background: #F0F0F0 url('../images/gradients/button.gif') repeat-x top left;
 	border: 1px solid #808080;
 	vertical-align: top;
-	margin: 1px 2px 0px 0px;
+	margin: 1px 2px 0 0;
 }
 
 .button:hover{
