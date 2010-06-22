@@ -371,13 +371,7 @@ Copt::memoryPick();
 /**
  * Add Media types
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $mediatypes multidimensional array with Media types data
+ * @param array $mediatypes
  * @param string $mediatypes['type']
  * @param string $mediatypes['description']
  * @param string $mediatypes['smtp_server']
@@ -391,34 +385,21 @@ Copt::memoryPick();
  */
 	public static function create($mediatypes){
 		global $USER_DETAILS;
-		$result = false;
-		$errors = array();
-
 		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
-			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_CREATE_MEDIATYPES);
-			return false;
+			self::exception(ZBX_API_ERROR_PERMISSIONS, S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_CREATE_MEDIATYPES);
 		}
 
 		$mediatypes = zbx_toArray($mediatypes);
-		$mediatypeids = array();
 		$insert_mediatypes = array();
 
 		try{
 			self::BeginTransaction(__METHOD__);
-			foreach($mediatypes as $mnum => $mediatype){
 
+			foreach($mediatypes as $mnum => $mediatype){
 				$mediatype_db_fields = array(
 					'type' => null,
 					'description' => null,
-					'smtp_server' => '',
-					'smtp_helo' => '',
-					'smtp_email' => '',
-					'exec_path' => '',
-					'gsm_modem' => '',
-					'username' => '',
-					'passwd' => ''
 				);
-
 				if(!check_db_fields($mediatype_db_fields, $mediatype)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_CMEDIATYPE_ERROR_WRONG_FIELD_FOR_MEDIATYPE);
 				}
@@ -430,7 +411,6 @@ Copt::memoryPick();
 
 				$insert_mediatypes[$mnum] = $mediatype;
 			}
-
 			$mediatypeids = DB::insert('media_type', $insert_mediatypes);
 
 			self::EndTransaction(true, __METHOD__);
@@ -438,7 +418,6 @@ Copt::memoryPick();
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
-
 			$error = $e->getErrors();
 			$error = reset($error);
 			self::setError(__METHOD__, $e->getCode(), $error);
@@ -449,55 +428,29 @@ Copt::memoryPick();
 /**
  * Update Media types
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $mediatypes multidimensional array with Media types data
- * @param string $mediatypes['mediatypeid']
- * @param string $mediatypes['name']
- * @param string $mediatypes['surname']
- * @param array $mediatypes['alias']
+ * @param array $mediatypes
+ * @param string $mediatypes['type']
+ * @param string $mediatypes['description']
+ * @param string $mediatypes['smtp_server']
+ * @param string $mediatypes['smtp_helo']
+ * @param string $mediatypes['smtp_email']
+ * @param string $mediatypes['exec_path']
+ * @param string $mediatypes['gsm_modem']
+ * @param string $mediatypes['username']
  * @param string $mediatypes['passwd']
- * @param string $mediatypes['url']
- * @param int $mediatypes['autologin']
- * @param int $mediatypes['autologout']
- * @param string $mediatypes['lang']
- * @param string $mediatypes['theme']
- * @param int $mediatypes['refresh']
- * @param int $mediatypes['rows_per_page']
- * @param int $mediatypes['type']
- * @param array $mediatypes['mediatype_medias']
- * @param string $mediatypes['mediatype_medias']['mediatypeid']
- * @param string $mediatypes['mediatype_medias']['address']
- * @param int $mediatypes['mediatype_medias']['severity']
- * @param int $mediatypes['mediatype_medias']['active']
- * @param string $mediatypes['mediatype_medias']['period']
  * @return boolean
  */
 	public static function update($mediatypes){
 		global $USER_DETAILS;
-
+		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
+			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
+		}
 		$mediatypes = zbx_toArray($mediatypes);
 		$mediatypeids = array();
 		$update = array();
 
 		try{
 			self::BeginTransaction(__METHOD__);
-
-			$options = array(
-				'mediatypeids' => zbx_objectValues($medias, 'mediatypeid'),
-				'output' => API_OUTPUT_EXTEND,
-				'preservekeys' => 1
-			);
-			$upd_mediatypes = self::get($options);
-			foreach($mediatypes as $mnum => $mediatype){
-				if(!isset($mediatype['mediatypeid'], $upd_mediatypes[$mediatype['mediatypeid']])){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_UPDATE_MEDIATYPES);
-				}
-			}
 
 			foreach($mediatypes as $mnum => $mediatype){
 				if(isset($mediatype['description'])){
@@ -513,7 +466,9 @@ Copt::memoryPick();
 						self::exception(ZBX_API_ERROR_PARAMETERS, sprintf(S_CMEDIATYPE_ERROR_MEDIATYPE_EXISTS, $mediatype['description']));
 				}
 
-				$mediatype_db_fields = $upd_mediatypes[$mediatype['mediatypeid']];
+				$mediatype_db_fields = array(
+					'mediatypeid' => null,
+				);
 				if(!check_db_fields($mediatype_db_fields, $mediatype)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_CMEDIATYPE_ERROR_WRONG_FIELD_FOR_MEDIATYPE);
 				}
@@ -521,12 +476,12 @@ Copt::memoryPick();
 				$mediatypeid = $mediatype['mediatypeid'];
 				unset($mediatype['mediatypeid']);
 
-				if(empty($mediatype)) continue;
-
-				$update[] = array(
-					'values' => $mediatype,
-					'where' => array('mediatypeid='.$mediatypeid),
-				);
+				if(!empty($mediatype)){
+					$update[] = array(
+						'values' => $mediatype,
+						'where' => array('mediatypeid='.$mediatypeid),
+					);
+				}
 			}
 
 			$mediatypeids = DB::update('media_type', $update);
@@ -543,8 +498,6 @@ Copt::memoryPick();
 			return false;
 		}
 	}
-
-
 
 /**
  * Delete Media types
@@ -563,8 +516,7 @@ Copt::memoryPick();
 		global $USER_DETAILS;
 
 		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
-			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_DELETE_MEDIATYPES);
-			return false;
+			self::exception(ZBX_API_ERROR_PERMISSIONS, S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_DELETE_MEDIATYPES);
 		}
 
 		$mediatypeids = zbx_toArray($mediatypeids);
@@ -574,18 +526,8 @@ Copt::memoryPick();
 
 			$options = array(
 				'mediatypeids' => $mediatypeids,
-				'editable' => 1,
+				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => 1,
-			);
-			$del_mediatypes = self::get($options);
-			foreach($mediatypeids as $mediatypeid){
-				if(!isset($del_mediatypes[$mediatypeid])) self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-			}
-
-			$options = array(
-				'mediatypeids' => $mediatypeids,
-				'output' => API_OUTPUT_EXTEND,
-				'preservekeys' => 1
 			);
 			$actions = CAction::get($options);
 			if(!empty($actions)){
