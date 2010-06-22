@@ -2580,7 +2580,7 @@
 			$link = new CLink(S_SHOW_VALUE_MAPPINGS,'config.php?config=6');
 			$link->setAttribute('target','_blank');
 			
-			$row = new CRow(array(new CCol(array(S_SHOW_VALUE.SPACE,$link),'form_row_l'), new CCol($cmbMap,'form_row_r')));
+			$row = new CRow(array(new CCol(S_SHOW_VALUE), new CCol(array($cmbMap, SPACE, $link))));
 			$row->setAttribute('id', 'row_valuemap');
 			$frmItem->addRow($row);
 			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'valuemapid');
