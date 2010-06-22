@@ -283,11 +283,15 @@ include_once('include/page_header.php');
 	$action = 'javascrip: this.checked ? $("status_change_days").enable() : $("status_change_days").disable()';
 	$sts_change_days_cb = new CNumericBox('status_change_days', $_REQUEST['status_change_days'], 4);
 	if(!$_REQUEST['status_change']) $sts_change_days_cb->setAttribute('disabled', 'disabled');
+    $sts_change_days_cb->addStyle('vertical-align: middle;');
+
+	$cbd = new CCheckBox('status_change', $_REQUEST['status_change'], $action, 1);
+	$cbd->addStyle('vertical-align: middle;');
 
 	$spand = new CSpan(S_DAYS);
-	$spand->addStyle('vertical-align: top;');
+	$spand->addStyle('vertical-align: middle;');
 	$filterForm->addRow(S_AGE_LESS_THAN, array(
-		new CCheckBox('status_change', $_REQUEST['status_change'], $action, 1),
+		$cbd,
 		$sts_change_days_cb,
 		$spand,
 	));
