@@ -1751,7 +1751,7 @@
 	'S_NOT_ACKNOWLEDGED'=>			'Not acknowledged',
 	'S_SHOW_LAST'=>				'Show last',
 	'S_SHOW_DETAILS'=>			'Show details',
-	'S_SELECT'=>				'Select',
+	'S_FILTER_BY_NAME'=>				'Filter by name',
 	'S_TRIGGERS_BIG'=>			'TRIGGERS',
 	'S_LAST_CHANGE'=>			'Last change',
 	'S_COMMENTS'=>				'Comments',
@@ -1765,7 +1765,7 @@
 	'S_WITH_UNACKNOWLEDGED_EVENTS' => 'With unacknowledged events',
 	'S_WITH_LAST_EVENT_UNACKNOWLEDGED' => 'With last event unacknowledged',
 	'S_TRIGGERS_STATUS' => 'Triggers status',
-	'S_LAST_STATUS_CHANGE' => 'Last status change',
+	'S_AGE_LESS_THAN' => 'Age less than',
 
 //	users.php
 	'S_ZABBIX_USER'=>				'Zabbix User',

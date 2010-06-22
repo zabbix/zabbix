@@ -283,14 +283,15 @@ include_once('include/page_header.php');
 	$action = 'javascrip: this.checked ? $("status_change_days").enable() : $("status_change_days").disable()';
 	$sts_change_days_cb = new CNumericBox('status_change_days', $_REQUEST['status_change_days'], 4);
 	if(!$_REQUEST['status_change']) $sts_change_days_cb->setAttribute('disabled', 'disabled');
-	$filterForm->addRow(S_LAST_STATUS_CHANGE, array(
+	$filterForm->addRow(S_AGE_LESS_THAN, array(
 		new CCheckBox('status_change', $_REQUEST['status_change'], $action, 1),
-		$sts_change_days_cb
+		$sts_change_days_cb,
+		S_DAYS		
 	));
 
 	$filterForm->addRow(S_SHOW_DETAILS, new CCheckBox('show_details', $_REQUEST['show_details'], null, 1));
 
-	$filterForm->addRow(S_SELECT, new CTextBox('txt_select', $_REQUEST['txt_select'], 40));
+	$filterForm->addRow(S_FILTER_BY_NAME, new CTextBox('txt_select', $_REQUEST['txt_select'], 40));
 
 	$filterForm->addItemToBottomRow(new CButton('filter_set', S_FILTER));
 	$filterForm->addItemToBottomRow(new CButton('filter_rst', S_RESET));
