@@ -288,7 +288,7 @@ include_once('include/page_header.php');
 	$cbd = new CCheckBox('status_change', $_REQUEST['status_change'], $action, 1);
 	$cbd->addStyle('vertical-align: middle;');
 
-	$spand = new CSpan(S_DAYS);
+	$spand = new CSpan(S_DAYS_SMALL);
 	$spand->addStyle('vertical-align: middle;');
 	$filterForm->addRow(S_AGE_LESS_THAN, array(
 		$cbd,
