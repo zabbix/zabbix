@@ -26,20 +26,8 @@
 	define('ZBX_LOGIN_ATTEMPTS',			5);
 	define('ZBX_LOGIN_BLOCK',			30); // sec
 
-	define('TRIGGERS_OPTION_DISABLED',		0);	// reserved
-	define('TRIGGERS_OPTION_ONLYTRUE',		1);	// use 0 to disable
-	define('TRIGGERS_OPTION_ALL',			2);	// use 0 to disable
-	define('TRIGGERS_OPTION_SHOW_ALL_WITH_UNACKNOWLEDGED',			3);	// use 0 to disable
-
 	define('TRIGGER_FALSE_PERIOD',			1800);	// 30min, 0 - disable
 	define('TRIGGER_BLINK_PERIOD',			1800);	// 30min,  0 - disable
-
-	define('EVENTS_OPTION_DISABLED',		0);	// reserved
-	define('EVENTS_OPTION_NOEVENT',			1);	// use 0 to disable
-	define('EVENTS_OPTION_ALL',				2);	// use 0 to disable
-	define('EVENTS_OPTION_NOT_ACK',			3);	// use 0 to disable
-	define('EVENTS_OPTION_ONLYTRUE_NOTACK',	0);	// use 0 to disable
-	define('EVENTS_OPTION_EVENT_LAST',		0); // use 0 to disable
 
 	define('ZBX_MIN_PERIOD',				3600);			// 1 hour
 	define('ZBX_MAX_PERIOD',				2*365*86400);	// ~2 years
@@ -59,8 +47,19 @@
 
 /* END OF USERS DEFINES */
 
+	define('TRIGGERS_OPTION_ONLYTRUE', 1);
+	define('TRIGGERS_OPTION_ALL', 2);
+
+	define('ZBX_ACK_STS_ANY', 1);
+	define('ZBX_ACK_STS_WITH_UNACK', 2);
+	define('ZBX_ACK_STS_WITH_LAST_UNACK', 3);
+
+	define('EVENTS_OPTION_NOEVENT', 1);
+	define('EVENTS_OPTION_ALL', 2);
+	define('EVENTS_OPTION_NOT_ACK', 3);
+
 	define('ZBX_FONT_NAME',			'DejaVuSans');
-	
+
 	define('ZBX_AUTH_INTERNAL',	0);
 	define('ZBX_AUTH_LDAP',		1);
 	define('ZBX_AUTH_HTTP',		2);
@@ -549,7 +548,7 @@
 
 	define('GRAPH_ZERO_LINE_COLOR_LEFT',	'AAAAAA');
 	define('GRAPH_ZERO_LINE_COLOR_RIGHT',	'888888');
-	
+
 	define('GRAPH_TRIGGER_LINE_OPPOSITE_COLOR',	'000');
 
 	define('ZBX_MAX_TREND_DIFF',		3600);
@@ -595,7 +594,7 @@
 	define('EXPRESSION_TYPE_NOT_INCLUDED',	2);
 	define('EXPRESSION_TYPE_TRUE',		3);
 	define('EXPRESSION_TYPE_FALSE',		4);
-	
+
 	define('EXPRESSION_VALUE_TYPE_UNKNOWN',	'#ERROR_VALUE_TYPE#');
 	define('EXPRESSION_HOST_UNKNOWN',	'#ERROR_HOST#');
 	define('EXPRESSION_HOST_ITEM_UNKNOWN',	'#ERROR_ITEM#');
@@ -625,7 +624,7 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	define('ZBX_PREG_PARAMS', '(['.ZBX_PREG_PRINT.']+?){0,1}');
 	define('ZBX_PREG_SIGN', '([&|><=+*\/#\-])');
 	define('ZBX_PREG_NUMBER', '([\-+]{0,1}[0-9]+[.]{0,1}[0-9]*[KMGTsmhdw]{0,1})');
-	
+
 	define('ZBX_PREG_DEF_FONT_STRING', '/^[0-9\.:% ]+$/');
 //--
 
@@ -633,12 +632,12 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	define('ZBX_PREG_HOST_FORMAT', ZBX_PREG_INTERNAL_NAMES);
 
 	define('ZBX_PREG_NODE_FORMAT', ZBX_PREG_INTERNAL_NAMES);
-	
-	
+
+
 	define('ZBX_PREG_ITEM_KEY_FORMAT', '('.ZBX_PREG_KEY_NAME.'(?(?=,)('.ZBX_PREG_PARAMS.'){0,1}|(\['.ZBX_PREG_PARAMS.'\]){0,1}))');
 	// define('ZBX_PREG_ITEM_KEY_FORMAT', '('.ZBX_PREG_KEY_NAME.'(\['.ZBX_PREG_PARAMS.'\]){0,1})');
 
-	
+
 	define('ZBX_PREG_FUNCTION_FORMAT', '('.ZBX_PREG_INTERNAL_NAMES.'(\('.ZBX_PREG_PARAMS.'\)))');
 
 	define('ZBX_PREG_SIMPLE_EXPRESSION_FORMAT','(\{'.ZBX_PREG_HOST_FORMAT.'\:'.ZBX_PREG_ITEM_KEY_FORMAT.'\.'.ZBX_PREG_FUNCTION_FORMAT.'\})');
