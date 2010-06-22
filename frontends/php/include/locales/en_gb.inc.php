@@ -1466,6 +1466,7 @@
 	'S_SERVICES_UPTIME_DATE_FORMAT'=>		'l H:i',
 	'S_SERVICES_DOWNTIME_DATE_FORMAT'=>		'l H:i',
 	'S_SERVICES_ONETIME_DOWNTIME_DATE_FORMAT'=>	'd M Y H:i',
+	'S_ADD_SMALL'=>								'add',
 
 //	locales.php
 	'S_DO_NOT_ADD'=>			'Do not add',
