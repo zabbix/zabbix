@@ -403,7 +403,7 @@ class Cscript extends CZBXAPI{
 			return array('scriptids'=>$scriptids);
 		}
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal Zabbix error');
 			return false;
 		}
 	}
@@ -465,7 +465,7 @@ class Cscript extends CZBXAPI{
 			return array('scriptids'=>$scriptids);
 		}
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal Zabbix error');
 			return false;
 		}
 	}
