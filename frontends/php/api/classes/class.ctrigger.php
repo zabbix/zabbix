@@ -1200,7 +1200,7 @@ COpt::memoryPick();
 		if($result)
 			return true;
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal Zabbix error');
 			return false;
 		}
 	}
@@ -1234,7 +1234,7 @@ COpt::memoryPick();
 		if($result)
 			return true;
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal Zabbix error');
 			return false;
 		}
 	}
