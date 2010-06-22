@@ -704,7 +704,7 @@ FIELD		|valuemapid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY	|valuemaps
 FIELD		|delay_flex	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|params		|t_item_param	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|ipmi_sensor	|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|data_type	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|data_type	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|authtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|username	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|password	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
