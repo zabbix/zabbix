@@ -23,9 +23,9 @@ require_once('include/config.inc.php');
 require_once('include/media.inc.php');
 require_once('include/forms.inc.php');
 
-$page['title'] = "S_MEDIA_TYPES";
-$page['file'] = "media_types.php";
-$page['hist_arg'] = array('form','mediatypeid');
+$page['title'] = 'S_MEDIA_TYPES';
+$page['file'] = 'media_types.php';
+$page['hist_arg'] = array('form', 'mediatypeid');
 
 include_once('include/page_header.php');
 
@@ -64,42 +64,28 @@ include_once('include/page_header.php');
 // MEDIATYPE ACTIONS
 	$_REQUEST['go'] = get_request('go', 'none');
 
-	$result = 0;
 	if(isset($_REQUEST['save'])){
+		$mediatype = array(
+			'type' => $_REQUEST['type'],
+			'description' => $_REQUEST['description'],
+			'smtp_server' => get_request('smtp_server'),
+			'smtp_helo' => get_request('smtp_helo'),
+			'smtp_email' => get_request('smtp_email'),
+			'exec_path' => get_request('exec_path'),
+			'gsm_modem' => get_request('gsm_modem'),
+			'username' => get_request('username'),
+			'passwd' => get_request('password')
+		);
+
 		if(isset($_REQUEST['mediatypeid'])){
-// UPDATE
 			$action = AUDIT_ACTION_UPDATE;
-			$mediatype = array(
-				'mediatypeid' => $_REQUEST['mediatypeid'],
-				'type' => $_REQUEST['type'],
-				'description' => $_REQUEST['description'],
-				'smtp_server' => get_request('smtp_server'),
-				'smtp_helo' => get_request('smtp_helo'),
-				'smtp_email' => get_request('smtp_email'),
-				'exec_path' => get_request('exec_path'),
-				'gsm_modem' => get_request('gsm_modem'),
-				'username' => get_request('username'),
-				'passwd' => get_request('passwd')
-			);
-			
+			$mediatype['mediatypeid'] = $_REQUEST['mediatypeid'];
+
 			$result = CMediatype::update($mediatype);
 			show_messages($result, S_MEDIA_TYPE_UPDATED, S_MEDIA_TYPE_WAS_NOT_UPDATED);
 		}
 		else{
-// ADD
 			$action = AUDIT_ACTION_ADD;
-			$mediatype = array(
-				'type' => $_REQUEST['type'],
-				'description' => $_REQUEST['description'],
-				'smtp_server' => get_request('smtp_server'),
-				'smtp_helo' => get_request('smtp_helo'),
-				'smtp_email' => get_request('smtp_email'),
-				'exec_path' => get_request('exec_path'),
-				'gsm_modem' => get_request('gsm_modem'),
-				'username' => get_request('username'),
-				'passwd' => get_request('passwd')
-			);
-
 			$result = CMediatype::create($mediatype);
 			show_messages($result, S_ADDED_NEW_MEDIA_TYPE, S_NEW_MEDIA_TYPE_WAS_NOT_ADDED);
 		}
@@ -124,12 +110,9 @@ include_once('include/page_header.php');
 		$go_result = true;
 		$media_types = get_request('media_types', array());
 
-		DBstart();
-		$result = CMediatype::delete($media_types);
-		$go_result = DBend($result);
+		$go_result = CMediatype::delete($media_types);
 
 		if($go_result) unset($_REQUEST['form']);
-
 		show_messages($go_result, S_MEDIA_TYPE_DELETED, S_MEDIA_TYPE_WAS_NOT_DELETED);
 	}
 
@@ -143,8 +126,7 @@ include_once('include/page_header.php');
 <?php
 	$medias_wdgt = new CWidget();
 
-	$form = new CForm();
-	$form->setMethod('get');
+	$form = new CForm(null, 'get');
 
 	if(!isset($_REQUEST['form']))
 		$form->addItem(new CButton('form',S_CREATE_MEDIA_TYPE));
@@ -249,7 +231,6 @@ include_once('include/page_header.php');
 			S_DETAILS
 		));
 
-
 // Mediatype table
 		$sortfield = getPageSortField('description');
 		$sortorder = getPageSortOrder();
@@ -257,28 +238,14 @@ include_once('include/page_header.php');
 		$options = array(
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => 1,
-			'sortfield' => 'description',
-			'sortorder' => ZBX_SORT_UP,
+			'sortfield' => $sortfield,
+			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
 		);
-
 		$mediatypes = CMediatype::get($options);
-
-// sorting
 		order_result($mediatypes, $sortfield, $sortorder);
+
 		$paging = getPagingLine($mediatypes);
-//---------
-
-		$options = array(
-			'mediatypeids' => zbx_objectValues($mediatypes, 'mediatypeid'),
-			'output' => API_OUTPUT_EXTEND,
-		);
-
-		$mediatypes = CMediatype::get($options);
-
-// sorting && paging
-		order_result($mediatypes, $sortfield, $sortorder);
-//---------
 
 		foreach($mediatypes as $mnum => $mediatype){
 			switch($mediatype['type']){
@@ -320,21 +287,16 @@ include_once('include/page_header.php');
 		$goButton->setAttribute('id','goButton');
 
 		zbx_add_post_js('chkbxRange.pageGoName = "media_types";');
-		
+
 		$footer = get_table_header(array($goBox, $goButton));
 
-// PAGING FOOTER
-		$table = array($paging, $table, $paging, $footer);
-//---------
-		$form->addItem($table);
+		$form->addItem(array($paging, $table, $paging, $footer));
 		$medias_wdgt->addItem($form);
 	}
 
 	$medias_wdgt->show();
 ?>
-
 <?php
 
 include_once('include/page_footer.php');
-
 ?>
