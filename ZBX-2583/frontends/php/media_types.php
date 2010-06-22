@@ -74,7 +74,7 @@ include_once('include/page_header.php');
 			'exec_path' => get_request('exec_path'),
 			'gsm_modem' => get_request('gsm_modem'),
 			'username' => get_request('username'),
-			'passwd' => get_request('passwd')
+			'passwd' => get_request('password')
 		);
 
 		if(isset($_REQUEST['mediatypeid'])){
