@@ -72,7 +72,7 @@ void	zbx_strpool_create(size_t size)
 		exit(FAIL);
 	}
 
-	zbx_mem_create(&strpool.mem_info, shm_key, ZBX_NO_MUTEX, size, "string pool");
+	zbx_mem_create(&strpool.mem_info, shm_key, ZBX_NO_MUTEX, size, "string pool", "CacheSize");
 
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&strpool.pool_lock, ZBX_MUTEX_STRPOOL))
 	{

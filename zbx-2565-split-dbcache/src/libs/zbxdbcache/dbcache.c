@@ -2663,9 +2663,9 @@ void	init_database_cache(unsigned char p)
 	sz += ZBX_HISTORY_SIZE * sizeof(ZBX_DC_HISTORY);
 	sz += ZBX_ITEMIDS_SIZE * sizeof(zbx_uint64_t);
 	sz += sizeof(ZBX_DC_IDS);
-	sz = zbx_mem_required_size(sz, 4, "history cache");
+	sz = zbx_mem_required_size(sz, 4, "history cache", "HistoryCacheSize");
 
-	zbx_mem_create(&history_mem, history_shm_key, ZBX_NO_MUTEX, sz, "history cache");
+	zbx_mem_create(&history_mem, history_shm_key, ZBX_NO_MUTEX, sz, "history cache", "HistoryCacheSize");
 
 	cache = (ZBX_DC_CACHE *)__history_mem_malloc_func(NULL, sizeof(ZBX_DC_CACHE));
 
@@ -2682,18 +2682,18 @@ void	init_database_cache(unsigned char p)
 
 	/* history text cache */
 
-	sz = zbx_mem_required_size(CONFIG_TEXT_CACHE_SIZE, 1, "history text cache");
+	sz = zbx_mem_required_size(CONFIG_TEXT_CACHE_SIZE, 1, "history text cache", "HistoryTextCacheSize");
 
-	zbx_mem_create(&history_text_mem, history_text_shm_key, ZBX_NO_MUTEX, sz, "history text cache");
+	zbx_mem_create(&history_text_mem, history_text_shm_key, ZBX_NO_MUTEX, sz, "history text cache", "HistoryTextCacheSize");
 
 	cache->text = (char *)__history_text_mem_malloc_func(NULL, CONFIG_TEXT_CACHE_SIZE);
 	cache->last_text = cache->text;
 
 	/* trend cache */
 
-	sz = zbx_mem_required_size(CONFIG_TRENDS_CACHE_SIZE, 1, "trend cache");
+	sz = zbx_mem_required_size(CONFIG_TRENDS_CACHE_SIZE, 1, "trend cache", "TrendCacheSize");
 
-	zbx_mem_create(&trend_mem, trend_shm_key, ZBX_NO_MUTEX, sz, "trend cache");
+	zbx_mem_create(&trend_mem, trend_shm_key, ZBX_NO_MUTEX, sz, "trend cache", "TrendCacheSize");
 
 	cache->trends_num = 0;
 

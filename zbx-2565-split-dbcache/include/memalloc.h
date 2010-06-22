@@ -35,11 +35,12 @@ typedef struct
 	int		shm_id;
 	char		use_lock;
 	ZBX_MUTEX	mem_lock;
-	char		*mem_descr;
+	const char	*mem_descr;
+	const char	*mem_param;
 }
 zbx_mem_info_t;
 
-void	zbx_mem_create(zbx_mem_info_t **info, key_t shm_key, int lock_name, size_t size, const char *descr);
+void	zbx_mem_create(zbx_mem_info_t **info, key_t shm_key, int lock_name, size_t size, const char *descr, const char *param);
 void	zbx_mem_destroy(zbx_mem_info_t *info);
 
 #define	zbx_mem_malloc(info, old, size) __zbx_mem_malloc(__FILE__, __LINE__, info, old, size)
@@ -54,7 +55,7 @@ void	zbx_mem_clear(zbx_mem_info_t *info);
 
 void	zbx_mem_dump_stats(zbx_mem_info_t *info);
 
-size_t	zbx_mem_required_size(size_t size, int chunks_num, const char *descr);
+size_t	zbx_mem_required_size(size_t size, int chunks_num, const char *descr, const char *param);
 
 #define ZBX_MEM_FUNC_DECL(__prefix)					\
 									\
