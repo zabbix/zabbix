@@ -1766,6 +1766,7 @@
 	'S_WITH_LAST_EVENT_UNACKNOWLEDGED' => 'With last event unacknowledged',
 	'S_TRIGGERS_STATUS' => 'Triggers status',
 	'S_AGE_LESS_THAN' => 'Age less than',
+	'S_SELECT' => 'Select',
 
 //	users.php
 	'S_ZABBIX_USER'=>				'Zabbix User',
@@ -2076,7 +2077,7 @@
 	'S_AFFECTS_ONLY_FILTERED_DATA_SMALL'=>	'affects only filtered data!',
 	'S_SHOW_VALUE_MAPPINGS'=>			'show value mappings',
 	'S_DELETE_SELECTED_ITEM_Q'=>		'Delete selected item?',
-	'S_DO_SMALL'=>				'do',
+	'S_DO'=>				'Do',
 	'S_INCORRECT_LIST_OF_ITEMS'=>		'Incorrect list of items.',
 	'S_DELETE_TRIGGER_Q'=>			'Delete trigger?',
 	'S_PROFILE_FOR_THIS_HOST_IS_MISSING'=>	'Profile for this host is missing',
