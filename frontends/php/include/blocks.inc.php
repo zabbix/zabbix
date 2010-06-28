@@ -991,6 +991,7 @@ function make_graph_menu(&$menu,&$submenu){
 				"PopUp('popup.php?srctbl=graphs".
 					'&srcfld1=graphid'.
 					'&reference=graphid'.
+					'&real_hosts=1'.
 					"&multiselect=1',800,450);".
 				"void(0);",
 				null,
@@ -1001,6 +1002,7 @@ function make_graph_menu(&$menu,&$submenu){
 				'javascript: '.
 				"PopUp('popup.php?srctbl=simple_graph".
 					'&srcfld1=itemid'.
+					'&real_hosts=1'.
 					'&reference=itemid'.
 					"&multiselect=1',800,450);".
 				"void(0);",
