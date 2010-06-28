@@ -19,14 +19,14 @@
 **/
 ?>
 <?php
-	require_once 'include/config.inc.php';
-	require_once 'include/triggers.inc.php';
-	require_once 'include/forms.inc.php';
+require_once('include/config.inc.php');
+require_once('include/triggers.inc.php');
+require_once('include/forms.inc.php');
 
-	$page['title'] = 'S_TRIGGER_COMMENTS';
-	$page['file'] = 'tr_comments.php';
+$page['title'] = 'S_TRIGGER_COMMENTS';
+$page['file'] = 'tr_comments.php';
 
-include_once 'include/page_header.php';
+include_once('include/page_header.php');
 
 ?>
 <?php
@@ -70,13 +70,15 @@ include_once 'include/page_header.php';
 		}
 	}
 	else if(isset($_REQUEST['cancel'])){
-		redirect('tr_status.php');
-		exit;
+		jsRedirect('tr_status.php');
+		exit();
 	}
 
 	show_table_header(S_TRIGGER_COMMENTS_BIG);
 	insert_trigger_comment_form($_REQUEST["triggerid"]);
 
+?>
+<?php
 
 include_once('include/page_footer.php');
 

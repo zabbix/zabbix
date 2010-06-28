@@ -19,14 +19,14 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/users.inc.php');
-	require_once('include/forms.inc.php');
-	require_once('include/media.inc.php');
+require_once('include/config.inc.php');
+require_once('include/users.inc.php');
+require_once('include/forms.inc.php');
+require_once('include/media.inc.php');
 
-	$page['title'] = 'S_USER_PROFILE';
-	$page['file'] = 'profile.php';
-	$page['hist_arg'] = array();
+$page['title'] = 'S_USER_PROFILE';
+$page['file'] = 'profile.php';
+$page['hist_arg'] = array();
 
 include_once 'include/page_header.php';
 
@@ -71,17 +71,17 @@ $fields=array(
 		$_REQUEST['user_medias'] = get_request('user_medias', array());
 		array_push($_REQUEST['user_medias'], $_REQUEST['new_media']);
 	}
-	elseif(isset($_REQUEST['user_medias']) && isset($_REQUEST['enable_media'])){
+	else if(isset($_REQUEST['user_medias']) && isset($_REQUEST['enable_media'])){
 		if(isset($_REQUEST['user_medias'][$_REQUEST['enable_media']])){
 			$_REQUEST['user_medias'][$_REQUEST['enable_media']]['active'] = 0;
 		}
 	}
-	elseif(isset($_REQUEST['user_medias']) && isset($_REQUEST['disable_media'])){
+	else if(isset($_REQUEST['user_medias']) && isset($_REQUEST['disable_media'])){
 		if(isset($_REQUEST['user_medias'][$_REQUEST['disable_media']])){
 			$_REQUEST['user_medias'][$_REQUEST['disable_media']]['active'] = 1;
 		}
 	}
-	elseif(isset($_REQUEST['del_user_media'])){
+	else if(isset($_REQUEST['del_user_media'])){
 		$user_medias_to_del = get_request('user_medias_to_del', array());
 		foreach($user_medias_to_del as $mediaid){
 			if(isset($_REQUEST['user_medias'][$mediaid]))
@@ -90,11 +90,11 @@ $fields=array(
 	}
 
 //Primary Actions
-	elseif(isset($_REQUEST['cancel'])){
+	else if(isset($_REQUEST['cancel'])){
 		$url = CProfile::get('web.menu.view.last', 'index.php');
-		redirect($url);
+		jsRedirect($url);
 	}
-	elseif(isset($_REQUEST['save'])){
+	else if(isset($_REQUEST['save'])){
 		$auth_type = get_user_system_auth($USER_DETAILS['userid']);
 		
 		if(ZBX_AUTH_INTERNAL != $auth_type){
@@ -161,6 +161,9 @@ $fields=array(
 	$profile_wdgt->addPageHeader(S_USER_PROFILE_BIG.' : '.$USER_DETAILS['name'].' '.$USER_DETAILS['surname']);
 	$profile_wdgt->addItem(insert_user_form($USER_DETAILS['userid'],1));
 	$profile_wdgt->show();
+?>
+<?php
 
-include_once ('include/page_footer.php');
+include_once('include/page_footer.php');
+
 ?>
