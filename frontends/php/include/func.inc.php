@@ -21,6 +21,45 @@
 <?php
 
 /************ REQUEST ************/
+function redirect($url){
+	zbx_flush_post_cookies();
+
+	header('Location: '.$url);
+	exit();
+}
+
+function jsRedirect($url,$timeout=null){
+	zbx_flush_post_cookies();
+
+	$script = '';
+	if( is_numeric($timeout) ) {
+		$script.='setTimeout(\'window.location="'.$url.'"\','.($timeout*1000).')';
+	}
+	else {
+		$script.='window.location = "'.$url.'";';
+	}
+	insert_js($script);
+}
+
+function resetGetParams($params, $newURL=null){
+	zbx_value2array($params);
+
+	$redirect = false;
+	$url = new CUrl($newURL);
+
+	foreach($params as $num => $param){
+		if(!isset($_GET[$param])) continue;
+
+		$redirect = true;
+		$url->setArgument($params, null);
+	}
+
+	if($redirect){
+		jsRedirect($url->getUrl());
+		exit();
+	}
+}
+
 function get_request($name, $def=NULL){
 	if(isset($_REQUEST[$name]))
 		return $_REQUEST[$name];
@@ -541,6 +580,7 @@ return false;
 
 
 // STRING FUNCTIONS {{{
+if(!function_exists('zbx_stripslashes')){
 function zbx_stripslashes($value){
 	if(is_array($value)){
 		foreach($value as $id => $data){
@@ -552,6 +592,7 @@ function zbx_stripslashes($value){
 	}
 
 return $value;
+}
 }
 
 function zbx_nl2br($str){

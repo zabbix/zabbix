@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,6 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
+?>
+<?php
 require_once('include/debug.inc.php');
 	
 function __autoload($class_name){
@@ -759,4 +761,19 @@ function __autoload($class_name){
 		}
 	return $new;
 	}
+
+// Function used in defines, so can't move it to func.inc.php
+function zbx_stripslashes($value){
+	if(is_array($value)){
+		foreach($value as $id => $data){
+			$value[$id] = zbx_stripslashes($data);
+		}
+	}
+	else if(is_string($value)){
+		$value = stripslashes($value);
+	}
+
+return $value;
+}
+
 ?>
