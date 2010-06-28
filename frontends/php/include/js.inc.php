@@ -290,26 +290,6 @@ function insert_javascript_for_visibilitybox(){
 	insert_js($js);
 }
 
-function redirect($url){
-	zbx_flush_post_cookies();
-
-	header('Location: '.$url);
-	exit();	
-}
-
-function jsRedirect($url,$timeout=null){
-	zbx_flush_post_cookies();
-
-	$script = '';
-	if( is_numeric($timeout) ) {
-		$script.='setTimeout(\'window.location="'.$url.'"\','.($timeout*1000).')';
-	}
-	else {
-		$script.='window.location = "'.$url.'";';
-	}
-	insert_js($script);
-}
-
 function play_sound($filename){
 	insert_js('	if (IE){
 			document.writeln(\'<bgsound src="'.$filename.'" loop="0" />\');

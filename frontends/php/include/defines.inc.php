@@ -745,20 +745,14 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	define('API_OUTPUT_COUNT', 'count');
 	define('API_OUTPUT_CUSTOM', 'custom');
 
-
 	define('SEC_PER_MIN', 60);
 	define('SEC_PER_HOUR', 3600);
 	define('SEC_PER_DAY', 86400);
 	define('SEC_PER_WEEK', (7*SEC_PER_DAY));
+	define('SEC_PER_MONTH', (30*SEC_PER_DAY));
 	define('SEC_PER_YEAR', (365*SEC_PER_DAY));
-/* Support for PHP5. PHP5 does not have $HTTP_..._VARS */
-	if(!function_exists('version_compare')){
-		$_GET		= $HTTP_GET_VARS;
-		$_POST		= $HTTP_POST_VARS;
-		$_COOKIE	= $HTTP_COOKIE_VARS;
-	}
 
-/* if magic quotes on then get rid of them */
+// if magic quotes on, then get rid of them
 	if(get_magic_quotes_gpc()){
 		$_GET		= zbx_stripslashes($_GET);
 		$_POST		 = zbx_stripslashes($_POST);
@@ -777,5 +771,4 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 
 // Numeric Locale to default
 	setLocale(LC_ALL, null);
-
 ?>
