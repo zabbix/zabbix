@@ -32,7 +32,7 @@ include_once('include/page_header.php');
 
 ?>
 <?php
-	$_REQUEST['go'] = get_request('go', 'none');
+	$_REQUEST['go'] = get_request('go', null);
 	$bulk = ($_REQUEST['go'] == 'bulkacknowledge');
 
 //		VAR				TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION

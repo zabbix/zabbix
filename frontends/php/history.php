@@ -77,7 +77,7 @@ include_once('include/page_header.php');
 <?php
 	if(isset($_REQUEST['favobj'])){
 		if('timeline' == $_REQUEST['favobj']){
-			navigation_bar_calc('web.item.graph', $_REQUEST['itemid'], true);
+			navigation_bar_calc('web.item.graph', $_REQUEST['favid'], true);
 		}
 		if('filter' == $_REQUEST['favobj']){
 			CProfile::update('web.history.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
