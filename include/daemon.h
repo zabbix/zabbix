@@ -21,7 +21,7 @@
 #define ZABBIX_DAEMON_H
 
 #if defined(_WINDOWS)
-#	error "This module allowed only for Linux OS"
+#	error "This module allowed only for Unix OS"
 #endif /* _WINDOWS */
 
 #define USE_PID_FILE	1

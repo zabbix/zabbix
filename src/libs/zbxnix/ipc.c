@@ -38,22 +38,15 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-key_t zbx_ftok(char *path, int id)
+key_t	zbx_ftok(char *path, int id)
 {
 	key_t	ipc_key;
 
-	if(-1 == (ipc_key = ftok(path, id)))
+	if (-1 == (ipc_key = ftok(path, id)))
 	{
-		zbx_error("Can not create IPC key for path '%s' [%s]",
-			path, strerror(errno));
+		zbx_error("Cannot create IPC key for path [%s] id [%c] error [%s]",
+			path, (char)id, strerror(errno));
 	}
-
-/*	Why do we need it?
-	if( -1 == (ipc_key = ftok(".",id) ))
-	{
-		zbx_error("Cannot create IPC key for path '.' [%s]", strerror(errno));
-	}
-*/
 
 	return ipc_key;
 }
@@ -65,7 +58,7 @@ key_t zbx_ftok(char *path, int id)
  * Purpose: Create block of shared memory                                     *
  *                                                                            *
  * Parameters:  key - IPC key                                                 *
- *              size- size                                                    *
+ *              size - size                                                   *
  *                                                                            *
  * Return value: If the function succeeds, then return SHM ID                 *
  *               -1 on an error                                               *
@@ -75,43 +68,42 @@ key_t zbx_ftok(char *path, int id)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int zbx_shmget(key_t key, size_t size)
+int	zbx_shmget(key_t key, size_t size)
 {
-	int shm_id, ret = SUCCEED;
+	int	shm_id, ret = SUCCEED;
 
-	if( -1 != (shm_id = shmget(key, size, IPC_CREAT | IPC_EXCL | 0666)))
+	if (-1 != (shm_id = shmget(key, size, IPC_CREAT | IPC_EXCL | 0666)))
 		return shm_id;
 
 	/* If shared memory block exists, try to remove and re-create it */
-	if( EEXIST == errno )
+	if (EEXIST == errno)
 	{
 		/* Get ID of existing memory */
-		if( -1 == (shm_id = shmget(key, 0 /* get reference */, 0666)))
+		if (-1 == (shm_id = shmget(key, 0 /* get reference */, 0666)))
 		{
 			zbx_error("Cannot attach to existing shared memory [%s]", strerror(errno));
 			ret = FAIL;
 		}
 
-		if( SUCCEED == ret && -1 == shmctl(shm_id, IPC_RMID, 0))
+		if (SUCCEED == ret && -1 == shmctl(shm_id, IPC_RMID, 0))
 		{
 			zbx_error("Cannot remove existing shared memory [%s]", strerror(errno));
 			ret = FAIL;
 		}
 
-		if( SUCCEED == ret && -1 == (shm_id = shmget(key, size, IPC_CREAT | IPC_EXCL | 0666)))
+		if (SUCCEED == ret && -1 == (shm_id = shmget(key, size, IPC_CREAT | IPC_EXCL | 0666)))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "Can't allocate shared memory of size %d [%s]",
+			zabbix_log(LOG_LEVEL_CRIT, "Cannot allocate shared memory of size %lu [%s]",
 				size, strerror(errno));
 			ret = FAIL;
 		}
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Can't allocate shared memory of size %d [%s]",
+		zabbix_log(LOG_LEVEL_CRIT, "Cannot allocate shared memory of size %lu [%s]",
 			size, strerror(errno));
 		ret = FAIL;
 	}
 
 	return (ret == SUCCEED) ? shm_id : -1;
 }
-
