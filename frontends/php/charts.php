@@ -66,7 +66,7 @@ include_once('include/page_header.php');
 
 		if('timeline' == $_REQUEST['favobj']){
 			if(isset($_REQUEST['graphid']) && isset($_REQUEST['period'])){
-				navigation_bar_calc('web.graph',$_REQUEST['graphid'], true);
+				navigation_bar_calc('web.graph',$_REQUEST['favid'], true);
 			}
 		}
 
