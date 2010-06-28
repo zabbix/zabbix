@@ -36,7 +36,7 @@ function jsRedirect($url,$timeout=null){
 		$script.='setTimeout(\'window.location="'.$url.'"\','.($timeout*1000).')';
 	}
 	else {
-		$script.='window.location = "'.$url.'";';
+		$script.='window.location.replace("'.$url.'");';
 	}
 	insert_js($script);
 }
@@ -51,12 +51,12 @@ function resetGetParams($params, $newURL=null){
 		if(!isset($_GET[$param])) continue;
 
 		$redirect = true;
-		$url->setArgument($params, null);
+		$url->setArgument($param, null);
 	}
 
 	if($redirect){
 		jsRedirect($url->getUrl());
-		exit();
+		include_once('include/page_footer.php');
 	}
 }
 
