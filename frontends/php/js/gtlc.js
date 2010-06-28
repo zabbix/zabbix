@@ -408,9 +408,7 @@ function create_timeline(tlid, period, starttime, usertime, endtime){
 return ZBX_TIMELINES[tlid];
 }
 
-var CTimeLine = Class.create();
-
-CTimeLine.prototype = {
+var CTimeLine = Class.create(CDebug,{
 timelineid: null,			// own id in array
 
 _starttime: null,				// timeline start time (left, past)
@@ -422,15 +420,9 @@ _now: false,					// state if time is set to NOW
 
 minperiod: 3600,				// minimal allowed period
 
-// DEBUG
-debug_status: 	1,			// debug status: 0 - off, 1 - on, 2 - SDI;
-debug_info:	'',			// debug string
-debug_prev:		'',			// don't log repeated fnc
-
-initialize: function(id, period, starttime, usertime, endtime){
-	this.debug('initialize', id);
-	
+initialize: function($super,id, period, starttime, usertime, endtime){
 	this.timelineid = id;
+	$super('CTimeLine['+id+']');
 
 	if((endtime - starttime) < (3*this.minperiod)) starttime = endtime - (3*this.minperiod);
 	
@@ -529,7 +521,7 @@ debug: function(fnc_name, id){
 		this.debug_prev = str;
 	}
 }
-}
+});
 
 /************************************************************************************/
 // Title: graph scrolling
@@ -560,9 +552,7 @@ return ZBX_SCROLLBARS[sbid];
 }
 
 
-var CScrollBar = Class.create();
-
-CScrollBar.prototype = {
+var CScrollBar = Class.create(CDebug,{
 scrollbarid:	null,		// scroll id in array
 timelineid:		null,		// timeline id to which it is connected
 timeline:		null,		// time Line object
@@ -629,17 +619,11 @@ arrowmsdown: 0,				// if mousedown on arrow = 1, else = 0
 arrow: '',					// pressed arrow (l/r)
 changed: 0,					// switches to 1, when scrollbar been moved or period changed
 fixedperiod: 1,				// fixes period on bar changes
-disabled: 1,				// activates/disables scrollbar
+disabled: 1,				// activates/disables scrollbars
 
-
-// DEBUG
-debug_status: 	0,			// debug status: 0 - off, 1 - on, 2 - SDI;
-debug_info: 	'',			// debug string
-debug_prev:		'',			// don't log repeated fnc
-
-initialize: function(sbid, timelineid, width){ // where to put bar on start(time on graph)
+initialize: function($super,sbid, timelineid, width){ // where to put bar on start(time on graph)
 	this.scrollbarid = sbid;
-	this.debug('initialize', sbid);
+	$super('CScrollBar['+sbid+']');
 
 	try{
 // Checks
@@ -826,7 +810,7 @@ navigateRight: function(e, right){
 //------------
 
 	this.timeline.usertime(new_usertime);
-	
+
 	this.setBarPosition();
 	this.setGhostByBar();
 
@@ -1338,7 +1322,7 @@ return time;
 
 updateTimeLine: function(dim){
 	this.debug('updateTimeLine');
-	
+
 // TimeLine Update
 	var starttime = this.timeline.starttime();
 	var usertime = this.timeline.usertime();
@@ -1368,17 +1352,16 @@ updateTimeLine: function(dim){
 		
 		this.timeline.setNow();
 	}
-	else{	
+	else{
 		if(right){
 			new_usertime = this.ghostBox.userstartime + new_period;
-
 		}
 		else if(left){
-			new_usertime = this.ghostBox.usertime;
+			new_usertime = this.ghostBox.userstartime;
 		}
 
 // To properly count TimeZone Diffs
-		new_usertime = this.roundTime(new_usertime);
+		if(period > 86400) new_usertime = this.roundTime(new_usertime);
 
 		if(dim.width != this.position.bar.width){
 			this.timeline.period(new_period);
@@ -1388,7 +1371,6 @@ updateTimeLine: function(dim){
 		
 		var	real_period = this.timeline.period();
 		var real_usertime = this.timeline.usertime();	
-		
 //SDI(left+' : '+new_usertime+' ('+real_usertime+')  p '+new_period+' ('+real_period+')');
 	}
 //---------------
@@ -1396,11 +1378,12 @@ updateTimeLine: function(dim){
 
 setTabInfo: function(){
 	this.debug('setTabInfo');
-	
+
 	var period = this.timeline.period();
 	var usertime = this.timeline.usertime();
 
 // USERTIME
+
 	var userstarttime = usertime-period;
 
 	this.dom.info_period.innerHTML = this.formatStampByDHM(period, true, false);
@@ -1482,21 +1465,6 @@ formatStampByDHM: function(timestamp, tsDouble, extend){
 return str;
 },
 
-debug: function(fnc_name, id){
-	if(this.debug_status){
-		var str = 'CScrollBar['+this.scrollbarid+'].'+fnc_name;
-		if(typeof(id) != 'undefined') str+= ' :'+id;
-
-		if(this.debug_prev == str) return true;
-
-		this.debug_info += str;
-		if(this.debug_status == 2){
-			SDI(str);
-		}
-		
-		this.debug_prev = str;
-	}
-},
 /*-------------------------------------------------------------------------------------------------*\
 *										SCROLL CREATION												*
 \*-------------------------------------------------------------------------------------------------*/
@@ -1870,10 +1838,9 @@ scrollcreate: function(w){
 
 */
 }
-}
+});
 
-var CGhostBox = Class.create();
-CGhostBox.prototype = {
+var CGhostBox = Class.create(CDebug,{
 box: 			null,	// resized dom object
 
 start:{					// resize start position
@@ -1891,13 +1858,8 @@ current:{				// resize in progress position
 sideToMove:		null,	// 0 - left side, 1 - right side
 flip:			null,	// if flip < 0, ghost is fliped
 
-// DEBUG
-debug_status: 	1,			// debug status: 0 - off, 1 - on, 2 - SDI;
-debug_info: 	'',			// debug string
-debug_prev:		'',			// don't log repeated fnc
-
-initialize: function(id){
-	this.debug('initialize');
+initialize: function($super,id){
+	$super('CGhostBox['+id+']');
 	
 	this.box = $(id);
 	if(is_null(this.box)) throw('Cannot initialize GhostBox with given object id');
@@ -1966,24 +1928,8 @@ resizeBox: function(px){
 
 	this.box.style.left = this.current.leftSide+'px';
 	this.box.style.width = this.current.width+'px';
-},
-
-debug: function(fnc_name, id){
-	if(this.debug_status){
-		var str = 'CGhost.'+fnc_name;
-		if(typeof(id) != 'undefined') str+= ' :'+id;
-
-		if(this.debug_prev == str) return true;
-
-		this.debug_info += str + '\n';
-		if(this.debug_status == 2){
-			SDI(str);
-		}
-		
-		this.debug_prev = str;
-	}
 }
-}
+});
 
 
 /************************************************************************************/
