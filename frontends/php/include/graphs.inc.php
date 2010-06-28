@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1402,5 +1402,91 @@
 		DashedLine($image, $x1,$y2,$x2,$y2,$color);
 		DashedLine($image, $x2,$y2,$x2,$y1,$color);
 		DashedLine($image, $x2,$y1,$x1,$y1,$color);
+	}
+
+	function find_period_start($periods,$time){
+		$date = getdate($time);
+		$wday = $date['wday'] == 0 ? 7 : $date['wday'];
+		$curr = $date['hours']*100+$date['minutes'];
+
+		if(isset($periods[$wday])){
+			$next_h = -1;
+			$next_m = -1;
+			foreach($periods[$wday] as $period){
+				$per_start = $period['start_h']*100+$period['start_m'];
+				if($per_start > $curr){
+					if(($next_h == -1 && $next_m == -1) || ($per_start < ($next_h*100 + $next_m))){
+						$next_h = $period['start_h'];
+						$next_m = $period['start_m'];
+					}
+					continue;
+				}
+
+				$per_end = $period['end_h']*100+$period['end_m'];
+				if($per_end <= $curr) continue;
+				return $time;
+			}
+
+			if($next_h >= 0 && $next_m >= 0){
+				return mktime($next_h, $next_m, 0, $date['mon'], $date['mday'], $date['year']);
+			}
+		}
+
+		for($days=1; $days < 7 ; ++$days){
+			$new_wday = (($wday + $days - 1)%7 + 1);
+			if(isset($periods[$new_wday ])){
+				$next_h = -1;
+				$next_m = -1;
+				foreach($periods[$new_wday] as $period){
+					$per_start = $period['start_h']*100+$period['start_m'];
+					if(($next_h == -1 && $next_m == -1) || ($per_start < ($next_h*100 + $next_m))){
+						$next_h = $period['start_h'];
+						$next_m = $period['start_m'];
+					}
+				}
+
+				if($next_h >= 0 && $next_m >= 0){
+					return mktime($next_h, $next_m, 0, $date['mon'], $date['mday'] + $days, $date['year']);
+				}
+			}
+		}
+	return -1;
+	}
+
+	function find_period_end($periods,$time,$max_time){
+		$date = getdate($time);
+		$wday = $date['wday'] == 0 ? 7 : $date['wday'];
+		$curr = $date['hours']*100+$date['minutes'];
+
+		if(isset($periods[$wday])){
+			$next_h = -1;
+			$next_m = -1;
+			foreach($periods[$wday] as $period){
+				$per_start = $period['start_h']*100+$period['start_m'];
+				$per_end = $period['end_h']*100+$period['end_m'];
+				if($per_start > $curr) continue;
+				if($per_end < $curr) continue;
+
+				if(($next_h == -1 && $next_m == -1) || ($per_end > ($next_h*100 + $next_m))){
+					$next_h = $period['end_h'];
+					$next_m = $period['end_m'];
+				}
+			}
+
+			if($next_h >= 0 && $next_m >= 0){
+				$new_time = mktime($next_h, $next_m, 0, $date['mon'], $date['mday'], $date['year']);
+
+				if($new_time == $time) return $time;
+				if($new_time > $max_time) return $max_time;
+
+				$next_time = find_period_end($periods,$new_time,$max_time);
+				if($next_time < 0)
+					return $new_time;
+				else
+					return $next_time;
+			}
+		}
+
+	return -1;
 	}
 ?>
