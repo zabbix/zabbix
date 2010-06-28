@@ -19,14 +19,14 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/acknow.inc.php');
-	require_once('include/triggers.inc.php');
-	require_once('include/forms.inc.php');
+require_once('include/config.inc.php');
+require_once('include/acknow.inc.php');
+require_once('include/triggers.inc.php');
+require_once('include/forms.inc.php');
 
-	$page['title']	= 'S_ACKNOWLEDGES';
-	$page['file']	= 'acknow.php';
-	$page['hist_arg'] = array('eventid');
+$page['title']	= 'S_ACKNOWLEDGES';
+$page['file']	= 'acknow.php';
+$page['hist_arg'] = array('eventid');
 
 include_once('include/page_header.php');
 
@@ -54,8 +54,8 @@ include_once('include/page_header.php');
 	if(isset($_REQUEST['cancel'])){
 		$last_page = $USER_DETAILS['last_page'];
 		$url = $last_page ? new CUrl($last_page['url']) : new CUrl('tr_status.php?hostid='.CProfile::get('web.tr_status.hostid', 0));
-		redirect($url->getUrl());
-		exit;
+		jsRedirect($url->getUrl());
+		exit();
 	}
 
 	if(!isset($_REQUEST['events']) && !isset($_REQUEST['eventid']) && !isset($_REQUEST['triggers'])){
@@ -119,8 +119,9 @@ include_once('include/page_header.php');
 			else{
 				$url = new CUrl($last_page['url']);
 			}
-			redirect($url->getUrl());
-			exit;
+
+			jsRedirect($url->getUrl());
+			exit();
 		}
 
  	}

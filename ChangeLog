@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2562] improved sessions store (Aly)
  - [ZBXNEXT-424] enhanced status of trigger filter (Vedmak)
  - [ZBX-2599] fixed processing of hexadecimal or octal data by proxy (Sasha)
  - [ZBX-2597] fixed processing of telnet results with long prompts (Sasha)

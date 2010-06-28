@@ -19,15 +19,15 @@
 **/
 ?>
 <?php
-require_once "include/config.inc.php";
-require_once "include/forms.inc.php";
+require_once('include/config.inc.php');
+require_once('include/forms.inc.php');
 
 $page["title"] = "S_INSTALLATION";
-$page["file"] = "instal.php";
+$page["file"] = 'instal.php';
 
-include_once "include/page_header.php";
-include_once "setup.php";
-include_once "include/page_footer.php";
+include_once('include/page_header.php');
+include_once('setup.php');
+include_once('include/page_footer.php');
 
 /*******************************/
 /* THIS POINT NEVER BE REACHED */
@@ -45,36 +45,35 @@ include_once "include/page_footer.php";
 	check_fields($fields);
 ?>
 <?php
-	if(isset($_REQUEST['install']))
-	{
-		redirect('setup.php');
+	if(isset($_REQUEST['install'])){
+		jsRedirect('setup.php');
+		exit();
 	}
-	elseif(isset($_REQUEST['update']))
-	{
+	else if(isset($_REQUEST['update'])){
 		error('*UNDER CONSTRUCTION*');
 	}
 
 	$form = new CFormTable(S_INSTALLATION_UPDATE);
-	$form->SetHelp('install_source_web.php');
-	$form->AddRow(
+	$form->setHelp('install_source_web.php');
+	$form->addRow(
 		array(bold(S_NEW_INSTALLATION_BIG),BR(),BR(),
 			bold(S_DESCRIPTION),BR(),
 			'Not implemented yet!',
 			BR(),BR(),BR()
 			),
 		new CButton('install',S_NEW_INSTALLATION));
-	$form->AddRow(
+	$form->addRow(
 		array(bold(S_UPDATE_BIG),BR(),BR(),
 			bold(S_DESCRIPTION),BR(),
 			'Not implemented yet!',
 			BR(),BR(),BR()
 			),
 		new CButton('update',S_UPDATE));
-	$form->Show();
+	$form->show();
 
 ?>
 <?php
 
-include_once "include/page_footer.php"
+include_once('include/page_footer.php');
 
 ?>

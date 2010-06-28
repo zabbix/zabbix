@@ -314,7 +314,7 @@ function shedule2str($timeperiod){
 		for($i=0; $i < $length; $i++){
 			if($dayofweek[$i] == 1){
 				if(!zbx_empty($days)) $days.=', ';
-				$days.= get_str_dayofweek($i+1);
+				$days.= getDayOfWeekCaption($i+1);
 			}
 		}
 		$str.= S_EVERY_SMALL.SPACE.$days.SPACE.S_OF_EVERY_SMALL.SPACE.(($timeperiod['every']>1)?$timeperiod['every'].SPACE.S_WEEKS_SMALL:S_WEEK_SMALL);
@@ -328,7 +328,7 @@ function shedule2str($timeperiod){
 		for($i=0; $i < $length; $i++){
 			if($month[$i] == 1){
 				if(!zbx_empty($months)) $months.=', ';
-				$months.= get_str_month($i+1);
+				$months.= getMonthCaption($i+1);
 			}
 		}
 
@@ -339,7 +339,7 @@ function shedule2str($timeperiod){
 			for($i=0; $i < $length; $i++){
 				if($dayofweek[$i] == 1){
 					if(!zbx_empty($days)) $days.=', ';
-					$days.= get_str_dayofweek($i+1);
+					$days.= getDayOfWeekCaption($i+1);
 				}
 			}
 

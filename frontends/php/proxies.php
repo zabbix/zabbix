@@ -306,20 +306,25 @@
 			S_HOSTS,
 		));
 
+		$sortfield = getPageSortField('host');
+		$sortorder = getPageSortOrder();
 
-		$proxies = CProxy::get(array(
-			'output' => API_OUTPUT_EXTEND,
-			'sortfield' => getPageSortField('host'),
-			'sortorder' => getPageSortOrder(),
+		$options = array(
 			'editable' => 1,
 			'select_hosts' => API_OUTPUT_EXTEND,
-		));
-		order_page_result($proxies, 'host');
-		
-		$paging = getPagingLine($proxies);
-		
+			'output' => API_OUTPUT_EXTEND,
+			'sortfield' => $sortfield,
+			'sortorder' => $sortorder,
+			'limit' => ($config['search_limit']+1)
+		);
+		$proxies = CProxy::get($options);
 		$proxies = zbx_toHash($proxies, 'proxyid');
-		
+
+// ordering && paging
+		order_result($proxies, $sortfield, $sortorder);
+		$paging = getPagingLine($proxies);
+// --
+
 // CALCULATE PERFORMANCE {{{ 
 		$proxyids = array_keys($proxies);
 		$sql = 'SELECT h.proxy_hostid, sum(1.0/i.delay) as qps '.
