@@ -18,7 +18,7 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 	require_once('include/debug.inc.php');
-	
+
 function __autoload($class_name){
 	$class_name = zbx_strtolower($class_name);
 	$api = array(
@@ -200,7 +200,7 @@ function __autoload($class_name){
 			include_once('include/locales/'.$USER_DETAILS['lang'].'.inc.php');
 			process_locales();
 		}
-		
+
 		include_once('include/locales/en_gb.inc.php');
 		process_locales();
 
@@ -229,13 +229,13 @@ function __autoload($class_name){
 				'name'  =>'- unknown -',
 				'nodeid'=>0)
 			);
-		
+
 	}
 
 	include_once('include/locales/en_gb.inc.php');
 	process_locales();
 	set_zbx_locales();
-	
+
 // INIT MB Strings if it's available
 	init_mbstrings();
 /*
@@ -561,7 +561,7 @@ function __autoload($class_name){
 			'filter' => array(
 				'value' => TRIGGER_VALUE_TRUE
 			),
-			'with_unacknowledged_events' => 1,
+			'withUnacknowledgedEvents' => 1,
 			'output' => array('triggerid', 'priority')
 		);
 		$triggers = CTrigger::get($options);
@@ -838,7 +838,7 @@ function __autoload($class_name){
 					' AND h.status='.HOST_STATUS_MONITORED.
 					' AND i.delay<>0';
 		$row = DBfetch(DBselect($sql));
-		
+
 		$status['qps_total'] = round($row['qps'],2);
 
 	return $status;
@@ -1084,24 +1084,24 @@ function __autoload($class_name){
 	return TRUE;
 	}
 
-	function replace_value_by_map($value, $valuemapid){ 
-		if($valuemapid < 1) return $value; 
-		
-		static $valuemaps = array(); 
-		if(isset($valuemaps[$valuemapid][$value])) return $valuemaps[$valuemapid][$value]; 
-		
-		$sql = 'SELECT newvalue '. 
-				' FROM mappings '. 
-				' WHERE valuemapid='.$valuemapid. 
-					' AND value='.zbx_dbstr($value); 
-		$result = DBselect($sql); 
-		if($row = DBfetch($result)){ 
-			$valuemaps[$valuemapid][$value] = $row['newvalue'].' '.'('.$value.')'; 
-			return $valuemaps[$valuemapid][$value]; 
-		} 
-	
-	return $value; 
-	} 
+	function replace_value_by_map($value, $valuemapid){
+		if($valuemapid < 1) return $value;
+
+		static $valuemaps = array();
+		if(isset($valuemaps[$valuemapid][$value])) return $valuemaps[$valuemapid][$value];
+
+		$sql = 'SELECT newvalue '.
+				' FROM mappings '.
+				' WHERE valuemapid='.$valuemapid.
+					' AND value='.zbx_dbstr($value);
+		$result = DBselect($sql);
+		if($row = DBfetch($result)){
+			$valuemaps[$valuemapid][$value] = $row['newvalue'].' '.'('.$value.')';
+			return $valuemaps[$valuemapid][$value];
+		}
+
+	return $value;
+	}
 /*************** END VALUE MAPPING ******************/
 
 
