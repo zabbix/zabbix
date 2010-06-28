@@ -38,29 +38,12 @@ class czbxrpc{
 			return self::$result;
 		}
 //-----
-
 		list($resource, $action) = explode('.', $method);
 
 		$without_auth = array('apiinfo.version'); // list of methods which does not require athentication
 
 		if(!str_in_array($method, $without_auth)){
 // Authentication {{{
-			if(($resource == 'user') && ($action == 'authenticate')){
-				$sessionid = null;
-
-				$options = array(
-					'users' => $params['user'],
-					'output' => API_OUTPUT_EXTEND,
-					'get_access' => 1
-				);
-				$users = CUser::get($options);
-				$user = reset($users);
-				if(!$user || $user['api_access'] != GROUP_API_ACCESS_ENABLED){
-					self::$result = array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'No API access');
-					return self::$result;
-				}
-			}
-
 			if(empty($sessionid) && (($resource != 'user') || ($action != 'authenticate'))){
 				self::$result = array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'Not authorized');
 				return self::$result;

@@ -235,6 +235,7 @@ class CUser extends CZBXAPI{
 				WHERE '.DBin_node('u.userid', $nodeids).
 				$sql_where.
 				$sql_order;
+//SDI($sql);
 		$res = DBselect($sql, $sql_limit);
 		while($user = DBfetch($res)){
 			if(!is_null($options['count'])){
@@ -340,348 +341,6 @@ Copt::memoryPick();
 		}
 
 	return $result;
-	}
-
-/**
- * Authenticate user
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $user
- * @param array $user['user'] User alias
- * @param array $user['password'] User password
- * @return string session ID
- */
-	public static function authenticate($user){
-		$config = select_config();
-		$user['auth_type'] = $config['authentication_type'];
-
-		$login = self::login($user);
-
-		if($login){
-			self::checkAuthentication($login);
-			return $login;
-		}
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => $_REQUEST['message']);
-			return false;
-		}
-	}
-
-	public static function login($user){
-		global $USER_DETAILS, $ZBX_LOCALNODEID;
-
-		$name = $user['user'];
-		$passwd = $user['password'];
-		$auth_type = $user['auth_type'];
-
-		$password = md5($passwd);
-
-		$sql = 'SELECT u.userid,u.attempt_failed, u.attempt_clock, u.attempt_ip '.
-				' FROM users u '.
-				' WHERE u.alias='.zbx_dbstr($name);
-
-//SQL to BLOCK attempts
-//					.' AND ( attempt_failed<'.ZBX_LOGIN_ATTEMPTS.
-//							' OR (attempt_failed>'.(ZBX_LOGIN_ATTEMPTS-1).
-//									' AND ('.time().'-attempt_clock)>'.ZBX_LOGIN_BLOCK.'))';
-
-		$login = $attempt = DBfetch(DBselect($sql));
-
-/*		if(($name!=ZBX_GUEST_USER) && zbx_empty($passwd)){
-			$login = $attempt = false;
-		}*/
-
-		if($login){
-			if(($login['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS) && ((time() - $login['attempt_clock']) < ZBX_LOGIN_BLOCK)){
-				$_REQUEST['message'] = S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_SECONDS_FIRST_PART.SPACE.(ZBX_LOGIN_BLOCK - (time() - $login['attempt_clock'])).SPACE.S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_SECONDS_SECOND_PART;
-				return false;
-			}
-
-			DBexecute('UPDATE users SET attempt_clock=' . time() . ' WHERE alias='.zbx_dbstr($name));
-
-			switch(get_user_auth($login['userid'])){
-				case GROUP_GUI_ACCESS_INTERNAL:
-					$auth_type = ZBX_AUTH_INTERNAL;
-					break;
-				case GROUP_GUI_ACCESS_SYSTEM:
-				case GROUP_GUI_ACCESS_DISABLED:
-				default:
-					break;
-			}
-
-			switch($auth_type){
-				case ZBX_AUTH_LDAP:
-					$login = self::ldapLogin($user);
-					break;
-				case ZBX_AUTH_HTTP:
-					$login = true;
-					break;
-				case ZBX_AUTH_INTERNAL:
-				default:
-					$alt_auth = ZBX_AUTH_INTERNAL;
-					$login = true;
-			}
-		}
-
-		if($login){
-			$sql = 'SELECT u.userid,u.alias,u.name,u.surname,u.url,u.refresh,u.passwd '.
-					' FROM users u'.
-					' WHERE u.alias='.zbx_dbstr($name).
-						((ZBX_AUTH_INTERNAL==$auth_type)? ' AND u.passwd='.zbx_dbstr($password):'').
-						' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID);
-
-			$login = $user = DBfetch(DBselect($sql));
-		}
-
-/* update internal pass if it's different
-	if($login && ($row['passwd']!=$password) && (ZBX_AUTH_INTERNAL!=$auth_type)){
-		DBexecute('UPDATE users SET passwd='.zbx_dbstr($password).' WHERE userid='.$row['userid']);
-	}
-*/
-		if($login){
-			$login = (check_perm2login($user['userid']) && check_perm2system($user['userid']));
-		}
-
-		if($login){
-			$sessionid = zbx_session_start($user['userid'], $name, $password);
-
-			add_audit(AUDIT_ACTION_LOGIN,AUDIT_RESOURCE_USER,'Correct login ['.$name.']');
-
-			if(empty($user['url'])){
-				$user['url'] = CProfile::get('web.menu.view.last','index.php');
-			}
-
-
-			$USER_DETAILS = $user;
-			$login = $sessionid;
-		}
-		else{
-			$user = NULL;
-
-			$_REQUEST['message'] = S_CUSER_ERROR_LOGIN_OR_PASSWORD_INCORRECT;
-			add_audit(AUDIT_ACTION_LOGIN,AUDIT_RESOURCE_USER,'Login failed ['.$name.']');
-
-			if($attempt){
-				$ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))?$_SERVER['HTTP_X_FORWARDED_FOR']:$_SERVER['REMOTE_ADDR'];
-				$attempt['attempt_failed']++;
-				$sql = 'UPDATE users SET attempt_failed='.$attempt['attempt_failed'].
-										', attempt_clock='.time().
-										', attempt_ip='.zbx_dbstr($ip).
-									' WHERE userid='.$attempt['userid'];
-				DBexecute($sql);
-			}
-		}
-
-	return $login;
-	}
-
-	public static function ldapLogin($user){
-		$name = $user['user'];
-		$passwd = $user['password'];
-		$cnf = isset($user['cnf'])?$user['cnf']:null;
-
-		if(is_null($cnf)){
-			$config = select_config();
-			foreach($config as $id => $value){
-				if(zbx_strpos($id,'ldap_') !== false){
-					$cnf[str_replace('ldap_','',$id)] = $config[$id];
-				}
-			}
-		}
-
-		if(!function_exists('ldap_connect')){
-			info(S_CUSER_ERROR_LDAP_MODULE_MISSING);
-			return false;
-		}
-
-		$ldap = new CLdap($cnf);
-		$ldap->connect();
-
-		$result = $ldap->checkPass($name,$passwd);
-
-	return $result;
-	}
-
-/**
- * Check if session ID is authenticated
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $session
- * @param array $session['sessionid'] Session ID
- * @return boolean
- */
-	public static function checkAuthentication($user=null){
-		global	$DB;
-		global	$page;
-		global	$PHP_AUTH_USER,$PHP_AUTH_PW;
-		global	$USER_DETAILS;
-		global	$ZBX_LOCALNODEID;
-		global	$ZBX_NODES;
-
-		$sessionid = is_null($user)?null:$user['sessionid'];
-
-		$USER_DETAILS = NULL;
-		$login = FALSE;
-
-		if(!is_null($sessionid)){
-			$sql = 'SELECT u.*,s.* '.
-				' FROM sessions s,users u'.
-				' WHERE s.sessionid='.zbx_dbstr($sessionid).
-					' AND s.status='.ZBX_SESSION_ACTIVE.
-					' AND s.userid=u.userid'.
-					' AND ((s.lastaccess+u.autologout>'.time().') OR (u.autologout=0))'.
-					' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID);
-
-			$login = $USER_DETAILS = DBfetch(DBselect($sql));
-
-			if(!$USER_DETAILS){
-				$incorrect_session = true;
-			}
-			else if($login['attempt_failed']){
-				DBexecute('UPDATE users SET attempt_failed=0 WHERE userid='.$login['userid']);
-			}
-		}
-
-		if(!$USER_DETAILS && !isset($_SERVER['PHP_AUTH_USER'])){
-			$sql = 'SELECT u.* '.
-					' FROM users u '.
-					' WHERE u.alias='.zbx_dbstr(ZBX_GUEST_USER).
-						' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID);
-			$login = $USER_DETAILS = DBfetch(DBselect($sql));
-			if(!$USER_DETAILS){
-				$missed_user_guest = true;
-			}
-			else{
-				$sessionid = zbx_session_start($USER_DETAILS['userid'], ZBX_GUEST_USER, '');
-			}
-		}
-
-		if($login){
-			$login = (check_perm2login($USER_DETAILS['userid']) && check_perm2system($USER_DETAILS['userid']));
-		}
-
-		if(!$login){
-			$USER_DETAILS = NULL;
-		}
-
-		if($login && $sessionid && !isset($incorrect_session)){
-			zbx_setcookie('zbx_sessionid',$sessionid,$USER_DETAILS['autologin']?(time()+86400*31):0);	//1 month
-			DBexecute('UPDATE sessions SET lastaccess='.time().' WHERE sessionid='.zbx_dbstr($sessionid));
-		}
-		else{
-			zbx_unsetcookie('zbx_sessionid');
-			DBexecute('UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.' WHERE sessionid='.zbx_dbstr($sessionid));
-			unset($sessionid);
-		}
-
-		if($USER_DETAILS){
-//		$USER_DETAILS['node'] = DBfetch(DBselect('SELECT * FROM nodes WHERE nodeid='.id2nodeid($USER_DETAILS['userid'])));
-			if(isset($ZBX_NODES[$ZBX_LOCALNODEID])){
-				$USER_DETAILS['node'] = $ZBX_NODES[$ZBX_LOCALNODEID];
-			}
-			else{
-				$USER_DETAILS['node'] = array();
-				$USER_DETAILS['node']['name'] = '- unknown -';
-				$USER_DETAILS['node']['nodeid'] = $ZBX_LOCALNODEID;
-			}
-
-			$USER_DETAILS['debug_mode'] = get_user_debug_mode($USER_DETAILS['userid']);
-		}
-		else{
-			$USER_DETAILS = array(
-				'alias'	=>ZBX_GUEST_USER,
-				'userid'=>0,
-				'lang'	=>'en_gb',
-				'type'	=>'0',
-				'node'	=>array(
-					'name'	=>'- unknown -',
-					'nodeid'=>0));
-		}
-
-		$userip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))?$_SERVER['HTTP_X_FORWARDED_FOR']:$_SERVER['REMOTE_ADDR'];
-		$USER_DETAILS['userip'] = $userip;
-
-		if(!$login || isset($incorrect_session) || isset($missed_user_guest)){
-
-			if(isset($incorrect_session))	$message = 'Session terminated, re-login, please'; // S_CUSER_ERROR_SESSION_TERMINATED
-			else if(isset($missed_user_guest)){
-				$row = DBfetch(DBselect('SELECT count(u.userid) as user_cnt FROM users u'));
-				if(!$row || $row['user_cnt'] == 0){
-					$message = 'Table users is empty. Possible database corruption.'; // S_CUSER_ERROR_TABLE_USERS_EMPTY
-				}
-			}
-
-			if(!isset($_REQUEST['message']) && isset($message)) $_REQUEST['message'] = $message;
-
-		return false;
-		}
-
-	return true;
-	}
-
-/**
- * Check if session ID is authenticated
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param string $sessionid Session ID
- * @return boolean
- */
-	public static function simpleAuth($sessionid){
-		global	$PHP_AUTH_USER,$PHP_AUTH_PW;
-		global	$USER_DETAILS;
-		global	$ZBX_LOCALNODEID;
-		global	$ZBX_NODES;
-
-		$USER_DETAILS = NULL;
-		$login = FALSE;
-
-		if(is_null($sessionid)) return false;
-
-		$sql = 'SELECT u.*,s.* '.
-			' FROM sessions s,users u'.
-			' WHERE '.DBin_node('u.userid', $ZBX_LOCALNODEID).
-				' AND s.sessionid='.zbx_dbstr($sessionid).
-				' AND s.status='.ZBX_SESSION_ACTIVE.
-				' AND s.userid = u.userid';
-
-		$login = $USER_DETAILS = DBfetch(DBselect($sql));
-
-		if($login){
-			$login = (check_perm2login($USER_DETAILS['userid']) && check_perm2system($USER_DETAILS['userid']));
-		}
-
-		if(!$login) return false;
-
-		if(isset($ZBX_NODES[$ZBX_LOCALNODEID])){
-			$USER_DETAILS['node'] = $ZBX_NODES[$ZBX_LOCALNODEID];
-		}
-		else{
-			$USER_DETAILS['node'] = array();
-			$USER_DETAILS['node']['name'] = '- unknown -';
-			$USER_DETAILS['node']['nodeid'] = $ZBX_LOCALNODEID;
-		}
-
-		$USER_DETAILS['debug_mode'] = 0;
-
-		$userip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))?$_SERVER['HTTP_X_FORWARDED_FOR']:$_SERVER['REMOTE_ADDR'];
-		$USER_DETAILS['userip'] = $userip;
-
-	return true;
 	}
 
 /**
@@ -1403,6 +1062,369 @@ Copt::memoryPick();
 			$error = reset($error);
 			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
+		}
+
+	return true;
+	}
+
+// ******************************************************************************
+//  LOGIN Methods
+// ******************************************************************************
+
+/**
+ * Authenticate user
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $user
+ * @param array $user['user'] User alias
+ * @param array $user['password'] User password
+ * @return string session ID
+ */
+	public static function authenticate($user){
+		$config = select_config();
+		$user['auth_type'] = $config['authentication_type'];
+
+		$login = self::login($user);
+
+		if($login){
+			self::checkAuthentication($login);
+			return $login;
+		}
+		else{
+			self::$error[] = array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => $_REQUEST['message']);
+			return false;
+		}
+	}
+
+	public static function login($user){
+		global $USER_DETAILS, $ZBX_LOCALNODEID;
+
+		$name = $user['user'];
+		$passwd = $user['password'];
+		$auth_type = $user['auth_type'];
+
+		$password = md5($passwd);
+
+		$sql = 'SELECT u.userid,u.attempt_failed, u.attempt_clock, u.attempt_ip '.
+				' FROM users u '.
+				' WHERE u.alias='.zbx_dbstr($name);
+
+//SQL to BLOCK attempts
+//					.' AND ( attempt_failed<'.ZBX_LOGIN_ATTEMPTS.
+//							' OR (attempt_failed>'.(ZBX_LOGIN_ATTEMPTS-1).
+//									' AND ('.time().'-attempt_clock)>'.ZBX_LOGIN_BLOCK.'))';
+
+		$login = $attempt = DBfetch(DBselect($sql));
+
+		if($login){
+			if($login['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS){
+				if((time() - $login['attempt_clock']) < ZBX_LOGIN_BLOCK){
+					$_REQUEST['message'] = S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_SECONDS_FIRST_PART.SPACE.(ZBX_LOGIN_BLOCK - (time() - $login['attempt_clock'])).SPACE.S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_SECONDS_SECOND_PART;
+					return false;
+				}
+				else{
+					DBexecute('UPDATE users SET attempt_clock='.time().' WHERE alias='.zbx_dbstr($name));
+				}
+			}
+
+			switch(get_user_auth($login['userid'])){
+				case GROUP_GUI_ACCESS_INTERNAL:
+					$auth_type = ZBX_AUTH_INTERNAL;
+					break;
+				case GROUP_GUI_ACCESS_SYSTEM:
+				case GROUP_GUI_ACCESS_DISABLED:
+				default:
+					break;
+			}
+
+			switch($auth_type){
+				case ZBX_AUTH_LDAP:
+					$login = self::ldapLogin($user);
+					break;
+				case ZBX_AUTH_HTTP:
+					$login = true;
+					break;
+				case ZBX_AUTH_INTERNAL:
+				default:
+					$alt_auth = ZBX_AUTH_INTERNAL;
+					$login = true;
+			}
+		}
+
+		if($login){
+			$sql = 'SELECT u.* '.
+					' FROM users u'.
+					' WHERE u.alias='.zbx_dbstr($name).
+						((ZBX_AUTH_INTERNAL==$auth_type)? ' AND u.passwd='.zbx_dbstr($password):'').
+						' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID);
+
+			$login = $user = DBfetch(DBselect($sql));
+		}
+
+/* update internal pass if it's different
+	if($login && ($row['passwd']!=$password) && (ZBX_AUTH_INTERNAL!=$auth_type)){
+		DBexecute('UPDATE users SET passwd='.zbx_dbstr(md5($password)).' WHERE userid='.$row['userid']);
+	}
+*/
+		if($login){
+			$login = (check_perm2login($user['userid']) && check_perm2system($user['userid']));
+		}
+
+		if($login){
+			$sessionid = zbx_session_start($user['userid'], $name, $password);
+
+			add_audit(AUDIT_ACTION_LOGIN,AUDIT_RESOURCE_USER, 'Correct login ['.$name.']');
+			if(empty($user['url'])){
+				$user['url'] = CProfile::get('web.menu.view.last','index.php');
+			}
+
+			$USER_DETAILS = $user;
+			$login = $sessionid;
+		}
+		else{
+			$user = NULL;
+
+			$_REQUEST['message'] = S_CUSER_ERROR_LOGIN_OR_PASSWORD_INCORRECT;
+			add_audit(AUDIT_ACTION_LOGIN,AUDIT_RESOURCE_USER,'Login failed ['.$name.']');
+
+			if($attempt){
+				$ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))?$_SERVER['HTTP_X_FORWARDED_FOR']:$_SERVER['REMOTE_ADDR'];
+				$attempt['attempt_failed']++;
+				$sql = 'UPDATE users '.
+						' SET attempt_failed='.$attempt['attempt_failed'].','.
+							' attempt_clock='.time().','.
+							' attempt_ip='.zbx_dbstr($ip).
+						' WHERE userid='.$attempt['userid'];
+				DBexecute($sql);
+			}
+		}
+
+	return $login;
+	}
+
+	public static function ldapLogin($user){
+		$name = $user['user'];
+		$passwd = $user['password'];
+		$cnf = isset($user['cnf'])?$user['cnf']:null;
+
+		if(is_null($cnf)){
+			$config = select_config();
+			foreach($config as $id => $value){
+				if(zbx_strpos($id,'ldap_') !== false){
+					$cnf[str_replace('ldap_','',$id)] = $config[$id];
+				}
+			}
+		}
+
+		if(!function_exists('ldap_connect')){
+			info(S_CUSER_ERROR_LDAP_MODULE_MISSING);
+			return false;
+		}
+
+		$ldap = new CLdap($cnf);
+		$ldap->connect();
+
+		$result = $ldap->checkPass($name,$passwd);
+
+	return $result;
+	}
+
+	public static function logout($sessionid){
+		global $ZBX_LOCALNODEID;
+
+		$sql = 'SELECT s.* '.
+			' FROM sessions s '.
+			' WHERE s.sessionid='.zbx_dbstr($sessionid).
+				' AND s.status='.ZBX_SESSION_ACTIVE.
+				' AND '.DBin_node('s.userid', $ZBX_LOCALNODEID);
+
+		$session = DBfetch(DBselect($sql));
+		if(!$session) return false;
+
+		zbx_unsetcookie('zbx_sessionid');
+		DBexecute('DELETE FROM sessions WHERE status='.ZBX_SESSION_PASSIVE.' AND userid='.zbx_dbstr($session['userid']));
+		DBexecute('UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.' WHERE sessionid='.zbx_dbstr($sessionid));
+
+	return true;
+	}
+
+/**
+ * Check if session ID is authenticated
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param string $sessionid Session ID
+ * @return boolean
+ */
+	public static function simpleAuth($sessionid){
+		global	$PHP_AUTH_USER,$PHP_AUTH_PW;
+		global	$USER_DETAILS;
+		global	$ZBX_LOCALNODEID;
+		global	$ZBX_NODES;
+
+		$USER_DETAILS = NULL;
+		$login = FALSE;
+
+		if(is_null($sessionid)) return false;
+
+		$sql = 'SELECT u.*,s.* '.
+			' FROM sessions s,users u'.
+			' WHERE '.DBin_node('u.userid', $ZBX_LOCALNODEID).
+				' AND s.sessionid='.zbx_dbstr($sessionid).
+				' AND s.status='.ZBX_SESSION_ACTIVE.
+				' AND s.userid = u.userid';
+
+		$login = $USER_DETAILS = DBfetch(DBselect($sql));
+
+		if($login){
+			$login = (check_perm2login($USER_DETAILS['userid']) && check_perm2system($USER_DETAILS['userid']));
+		}
+
+		if(!$login) return false;
+
+		if(isset($ZBX_NODES[$ZBX_LOCALNODEID])){
+			$USER_DETAILS['node'] = $ZBX_NODES[$ZBX_LOCALNODEID];
+		}
+		else{
+			$USER_DETAILS['node'] = array();
+			$USER_DETAILS['node']['name'] = '- unknown -';
+			$USER_DETAILS['node']['nodeid'] = $ZBX_LOCALNODEID;
+		}
+
+		$USER_DETAILS['debug_mode'] = 0;
+
+		$userip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))?$_SERVER['HTTP_X_FORWARDED_FOR']:$_SERVER['REMOTE_ADDR'];
+		$USER_DETAILS['userip'] = $userip;
+
+	return true;
+	}
+
+/**
+ * Check if session ID is authenticated
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $session
+ * @param array $session['sessionid'] Session ID
+ * @return boolean
+ */
+	public static function checkAuthentication($user=null){
+		global	$page;
+		global	$PHP_AUTH_USER,$PHP_AUTH_PW;
+		global	$USER_DETAILS;
+		global	$ZBX_LOCALNODEID;
+		global	$ZBX_NODES;
+
+		$sessionid = is_null($user)?null:$user['sessionid'];
+
+		$USER_DETAILS = NULL;
+		$login = FALSE;
+
+		if(!is_null($sessionid)){
+			$sql = 'SELECT u.*,s.* '.
+					' FROM sessions s,users u'.
+					' WHERE s.sessionid='.zbx_dbstr($sessionid).
+						' AND s.status='.ZBX_SESSION_ACTIVE.
+						' AND s.userid=u.userid'.
+						' AND ((s.lastaccess+u.autologout>'.time().') OR (u.autologout=0))'.
+						' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID);
+
+			$login = $USER_DETAILS = DBfetch(DBselect($sql));
+
+			if(!$USER_DETAILS){
+				$incorrect_session = true;
+			}
+			else if($login['attempt_failed']){
+				DBexecute('UPDATE users SET attempt_failed=0 WHERE userid='.$login['userid']);
+			}
+		}
+
+		if(!$USER_DETAILS && !isset($_SERVER['PHP_AUTH_USER'])){
+			$sql = 'SELECT u.* '.
+				' FROM users u '.
+				' WHERE u.alias='.zbx_dbstr(ZBX_GUEST_USER).
+					' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID);
+			$login = $USER_DETAILS = DBfetch(DBselect($sql));
+			if(!$USER_DETAILS){
+				$missed_user_guest = true;
+			}
+			else{
+				$sessionid = zbx_session_start($USER_DETAILS['userid'], ZBX_GUEST_USER, '');
+			}
+		}
+
+// Perm to login, perm to system
+		if($login){
+			$login = (check_perm2login($USER_DETAILS['userid']) && check_perm2system($USER_DETAILS['userid']));
+		}
+
+		if(!$login){
+			$USER_DETAILS = NULL;
+		}
+
+		if($login && $sessionid && !isset($incorrect_session)){
+			zbx_setcookie('zbx_sessionid',$sessionid,$USER_DETAILS['autologin']?(time()+86400*31):0);	//1 month
+			DBexecute('UPDATE sessions SET lastaccess='.time().' WHERE sessionid='.zbx_dbstr($sessionid));
+
+			if($USER_DETAILS['autologout'] > 0){
+				DBexecute('DELETE FROM sessions WHERE userid='.$USER_DETAILS['userid'].' AND status='.ZBX_SESSION_ACTIVE.' AND lastaccess<'.(time() - $USER_DETAILS['autologout']));
+			}
+		}
+		else{
+			self::logout($sessionid);
+		}
+
+		if($USER_DETAILS){
+			if(isset($ZBX_NODES[$ZBX_LOCALNODEID])){
+				$USER_DETAILS['node'] = $ZBX_NODES[$ZBX_LOCALNODEID];
+			}
+			else{
+				$USER_DETAILS['node'] = array();
+				$USER_DETAILS['node']['name'] = '- unknown -';
+				$USER_DETAILS['node']['nodeid'] = $ZBX_LOCALNODEID;
+			}
+
+			$USER_DETAILS['debug_mode'] = get_user_debug_mode($USER_DETAILS['userid']);
+		}
+		else{
+			$USER_DETAILS = array(
+				'alias'	=> ZBX_GUEST_USER,
+				'userid'=> 0,
+				'lang'	=> 'en_gb',
+				'type'	=> '0',
+				'node'	=> array( 'name'=>'- unknown -', 'nodeid'=>0 )
+			);
+		}
+
+		$userip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))?$_SERVER['HTTP_X_FORWARDED_FOR']:$_SERVER['REMOTE_ADDR'];
+		$USER_DETAILS['userip'] = $userip;
+
+		if(!$login || isset($incorrect_session) || isset($missed_user_guest)){
+
+			if(isset($incorrect_session))	$message = 'Session terminated, re-login, please'; // S_CUSER_ERROR_SESSION_TERMINATED
+			else if(isset($missed_user_guest)){
+				$row = DBfetch(DBselect('SELECT count(u.userid) as user_cnt FROM users u'));
+				if(!$row || $row['user_cnt'] == 0){
+					$message = 'Table users is empty. Possible database corruption.'; // S_CUSER_ERROR_TABLE_USERS_EMPTY
+				}
+			}
+
+			if(!isset($_REQUEST['message']) && isset($message)) $_REQUEST['message'] = $message;
+
+		return false;
 		}
 
 	return true;

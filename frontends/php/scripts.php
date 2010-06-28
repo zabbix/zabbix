@@ -238,13 +238,6 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 		$scripts_wdgt->addHeader(S_SCRIPTS_BIG);
 		$scripts_wdgt->addHeader($numrows);
 
-		$options = array(
-			'extendoutput' => 1,
-			'editable' => 1,
-			'select_groups' => 1
-		);
-		$scripts = CScript::get($options);
-
 		$table = new CTableInfo(S_NO_SCRIPTS_DEFINED);
 		$table->setHeader(array(
 				new CCheckBox('all_scripts',null,"checkAll('".$form->getName()."','all_scripts','scripts');"),
@@ -256,8 +249,18 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 			)
 		);
 
+		$sortfield = getPageSortField('name');
+		$sortorder = getPageSortOrder();
+
+		$options = array(
+			'output' => API_OUTPUT_EXTEND,
+			'editable' => 1,
+			'select_groups' => API_OUTPUT_EXTEND
+		);
+		$scripts = CScript::get($options);
+
 // sorting
-		order_page_result($scripts, 'name');
+		order_result($scripts, $sortfield, $sortorder);
 
 // PAGING UPPER
 		$paging = getPagingLine($scripts);
