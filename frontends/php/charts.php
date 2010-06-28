@@ -112,6 +112,13 @@ include_once('include/page_header.php');
 
 	$_REQUEST['graphid'] = $pageFilter->graphid;
 
+// resets get params for proper page refresh
+	if(isset($_REQUEST['period']) || isset($_REQUEST['stime'])){
+		navigation_bar_calc('web.graph',$_REQUEST['graphid'], true);
+		resetGetParams(array('period', 'stime'));
+	}
+//--
+
 	$effectiveperiod = navigation_bar_calc('web.graph',$_REQUEST['graphid']);
 
 	$r_form = new CForm(null, 'get');
