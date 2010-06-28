@@ -158,7 +158,14 @@ include_once('include/page_header.php');
 	$host = reset($item['hosts']);
 	$item['host'] = $host['host'];
 
-	$period = navigation_bar_calc('web.item.graph', $item['itemid'], true);
+// resets get params for proper page refresh
+	if(isset($_REQUEST['period']) || isset($_REQUEST['stime'])){
+		navigation_bar_calc('web.item.graph', $item['itemid'], true);
+		resetGetParams(array('period', 'stime'));
+	}
+//--
+
+	$period = navigation_bar_calc('web.item.graph', $item['itemid']);
 	$bstime = $_REQUEST['stime'];
 
 	$time = zbxDateToTime($bstime);
