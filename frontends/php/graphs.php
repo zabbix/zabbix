@@ -398,7 +398,9 @@ include_once('include/page_header.php');
 	show_table_header(S_CONFIGURATION_OF_GRAPHS_BIG,$form);
 
 	if(($_REQUEST['go'] == 'copy_to') && isset($_REQUEST['group_graphid'])){
-		insert_copy_elements_to_forms('group_graphid');
+		$graphs_wdgt = new CWidget();
+		$graphs_wdgt->addItem(insert_copy_elements_to_forms('group_graphid'));
+		$graphs_wdgt->show();
 	}
 	else if(isset($_REQUEST['form'])){
 		insert_graph_form();
