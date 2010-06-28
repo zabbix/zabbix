@@ -100,7 +100,7 @@ include_once('include/page_header.php');
 	$numrows = new CDiv();
 	$numrows->setAttribute('name', 'numrows');
 
-	$alerts_wdgt->addHeader(S_ALERTS_BIG);
+	$alerts_wdgt->addHeader(S_ACTIONS_BIG);
 	$alerts_wdgt->addHeader($numrows);
 //--------
 

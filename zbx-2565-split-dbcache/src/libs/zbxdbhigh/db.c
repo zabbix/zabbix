@@ -1008,7 +1008,8 @@ zbx_uint64_t	DBget_proxy_lastaccess(const char *hostname)
 	return lastaccess;
 }
 
-int	DBadd_alert(zbx_uint64_t actionid, zbx_uint64_t userid, zbx_uint64_t eventid,  zbx_uint64_t mediatypeid, char *sendto, char *subject, char *message)
+int	DBadd_alert(zbx_uint64_t actionid, zbx_uint64_t userid, zbx_uint64_t eventid,
+		zbx_uint64_t mediatypeid, char *sendto, char *subject, char *message)
 {
 	int	now;
 	char	*sendto_esc, *subject_esc, *message_esc;

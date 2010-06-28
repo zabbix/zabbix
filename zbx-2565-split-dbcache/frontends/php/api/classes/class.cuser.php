@@ -430,7 +430,7 @@ Copt::memoryPick();
 
 		if($login){
 			$sql = 'SELECT u.userid,u.alias,u.name,u.surname,u.url,u.refresh,u.passwd '.
-					' FROM users u, users_groups ug, usrgrp g '.
+					' FROM users u'.
 					' WHERE u.alias='.zbx_dbstr($name).
 						((ZBX_AUTH_INTERNAL==$auth_type)? ' AND u.passwd='.zbx_dbstr($password):'').
 						' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID);

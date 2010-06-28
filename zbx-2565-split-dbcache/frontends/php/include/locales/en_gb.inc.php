@@ -359,6 +359,7 @@
 //	actions.php
 	'S_ACTIONS'=>				'Actions',
 	'S_LOGS'=>				'Logs',
+	'S_LOGS_BIG'=>				'LOGS',
 	'S_ACTIONS_BIG'=>			'ACTIONS',
 	'S_MESSAGE_ACTIONS'=>			'Message actions',
 	'S_COMMAND_ACTIONS'=>			'Command actions',
@@ -1142,7 +1143,7 @@
 	'S_SNMPV3_PRIV_PASSPHRASE'=>				'SNMPv3 priv passphrase',
 	'S_CUSTOM_MULTIPLIER'=>					'Custom multiplier',
 	'S_DO_NOT_USE'=>					'Do not use',
-	'S_USE_MULTIPLIER'=>					'Use multiplier',
+	'S_USE_CUSTOM_MULTIPLIER'=>				'Use custom multiplier',
 	'S_SELECT_HOST_DOT_DOT_DOT'=>				'Select host...',
 	'S_LOG_TIME_FORMAT'=>					'Log time format',
 	'S_CREATE_ITEM'=>					'Create Item',
@@ -1415,7 +1416,7 @@
 	'S_CHART4_HEADER_TITLE_PART2'=>		'(year',
 	'S_CHART4_HEADER_TITLE_PART3'=>		')',
 	'S_CHART4_HEADER_DATE_FORMAT'=>		'Y',
-	'S_CHART4_TIMELINE_DATE_FORMAT'=>	'd.F',
+	'S_CHART4_TIMELINE_DATE_FORMAT'=>	'd.M',
 
 //	chart5.php
 	'S_CHART5_HEADER_TITLE_PART1'=>		'',
@@ -1462,6 +1463,7 @@
 	'S_SERVICES_UPTIME_DATE_FORMAT'=>		'l H:i',
 	'S_SERVICES_DOWNTIME_DATE_FORMAT'=>		'l H:i',
 	'S_SERVICES_ONETIME_DOWNTIME_DATE_FORMAT'=>	'd M Y H:i',
+	'S_ADD_SMALL'=>								'add',
 
 //	locales.php
 	'S_DO_NOT_ADD'=>			'Do not add',
@@ -1750,7 +1752,7 @@
 	'S_NOT_ACKNOWLEDGED'=>			'Not acknowledged',
 	'S_SHOW_LAST'=>				'Show last',
 	'S_SHOW_DETAILS'=>			'Show details',
-	'S_SELECT'=>				'Select',
+	'S_FILTER_BY_NAME'=>				'Filter by name',
 	'S_TRIGGERS_BIG'=>			'TRIGGERS',
 	'S_LAST_CHANGE'=>			'Last change',
 	'S_COMMENTS'=>				'Comments',
@@ -1759,6 +1761,13 @@
 	'S_NOT_ACK'=>				'Not Ack',
 	'S_NEVER'=>				'Never',
 	'S_FOUND'=>				'Found',
+	'S_ACKNOWLEDGE_STATUS' => 'Acknowledge status',
+	'S_ANY' => 'Any',
+	'S_WITH_UNACKNOWLEDGED_EVENTS' => 'With unacknowledged events',
+	'S_WITH_LAST_EVENT_UNACKNOWLEDGED' => 'With last event unacknowledged',
+	'S_TRIGGERS_STATUS' => 'Triggers status',
+	'S_AGE_LESS_THAN' => 'Age less than',
+	'S_SELECT' => 'Select',
 
 //	users.php
 	'S_ZABBIX_USER'=>				'Zabbix User',
@@ -1894,8 +1903,8 @@
 	'S_AUDIT'=>				'Audit',
 	'S_AUDIT_LOGS_BIG'=>			'AUDIT LOGS',
 	'S_AUDIT_ACTIONS_BIG'=>			'AUDIT ACTIONS',
-	'S_ALERTS_BIG'=>			'ALERTS',
 	'S_ACTION'=>				'Action',
+	'S_ACTIONS_BIG'=>				'ACTIONS',
 	'S_DETAILS'=>				'Details',
 	'S_UNKNOWN_ACTION'=>			'Unknown action',
 	'S_ADDED'=>				'Added',
@@ -2069,7 +2078,7 @@
 	'S_AFFECTS_ONLY_FILTERED_DATA_SMALL'=>	'affects only filtered data!',
 	'S_SHOW_VALUE_MAPPINGS'=>			'show value mappings',
 	'S_DELETE_SELECTED_ITEM_Q'=>		'Delete selected item?',
-	'S_DO_SMALL'=>				'do',
+	'S_DO'=>				'Do',
 	'S_INCORRECT_LIST_OF_ITEMS'=>		'Incorrect list of items.',
 	'S_DELETE_TRIGGER_Q'=>			'Delete trigger?',
 	'S_PROFILE_FOR_THIS_HOST_IS_MISSING'=>	'Profile for this host is missing',
@@ -2095,6 +2104,7 @@
 	'S_NO_ITEM_WITH'=>				'No item with',
 	'S_DELETED_SMALL'=>				'deleted',
 	'S_UNKNOWN_VALUE_TYPE'=>			'Unknown value type',
+	'S_ITEMS_CHECK_KEY_DEFAULT_EXAMPLE_PASSED'=>	'Check key, please. Default example were passed',
 
 //	httptest.inc.php
 	'S_SCENARIO_STEP_NUMBER_CANNOT_BE_LESS_ONE'=>	'Scenario step number cannot be less than 1',

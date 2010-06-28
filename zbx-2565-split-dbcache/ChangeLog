@@ -1,5 +1,16 @@
 Changes for 1.8.3
 
+ - [ZBXNEXT-424] enhanced status of trigger filter (Vedmak)
+ - [ZBX-2599] fixed processing of hexadecimal or octal data by proxy (Sasha)
+ - [ZBX-2597] fixed processing of telnet results with long prompts (Sasha)
+ - [ZBX-2595] fixed logformat field showing (Maxim Andruhovich / AM)
+ - [ZBX-2593] fixed possibility to copy item between templates that are linked to same host (Vedmak)
+ - [ZBX-2585] removed spaces from charts title & fixed date format for chart4.php (Maxim Andruhovich / AM)
+ - [ZBX-2592] added support of comma character (,) for scripts in action remote commands (Sasha)
+ - [ZBX-2575] removed outdated and undocumented environment variables from alert scripts (asaveljevs)
+ - [ZBX-2574] improved fixed graph Y axis measurement (Aly)
+ - [ZBX-2576] small text changes in administration/audit (Vedmak)
+ - [ZBX-1857] fixed item form correct processing, removed refreshing when item type is changed (Maxim Andruhovich / AM)
  - [ZBX-2528] fixed default language loading before using phrases, warning messages removed which were displayed after login (Maxim Andruhovich / AM)
  - [ZBXNEXT-343] added possibility to unlink and clear templates when mass update hosts templates (Vedmak)
  - [ZBX-1930] all top indents of icon labels now is equal (Maxim Andruhovich / AM)

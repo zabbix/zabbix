@@ -103,7 +103,7 @@ static ZBX_HISTORY_TABLE areg = {
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	get_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host)
+int	get_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, char *error, int error_max_len)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -126,18 +126,12 @@ int	get_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host)
 			ret = SUCCEED;
 		}
 		else
-			zabbix_log(LOG_LEVEL_WARNING, "Unknown proxy \"%s\"",
-					host);
+			zbx_snprintf(error, error_max_len, "proxy [%s] not found", host);
 
 		DBfree_result(result);
 	}
 	else
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "Incorrect data. %s",
-				zbx_json_strerror());
-		zabbix_syslog("Incorrect data. %s",
-				zbx_json_strerror());
-	}
+		zbx_snprintf(error, error_max_len, "missing name of proxy");
 
 	return ret;
 }
@@ -1306,7 +1300,8 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 		{
 			init_result(&agent);
 
-			if (SUCCEED == set_result_type(&agent, item.value_type, item.data_type, values[i].value))
+			if (SUCCEED == set_result_type(&agent, item.value_type,
+						proxy_hostid ? ITEM_DATA_TYPE_DECIMAL : item.data_type, values[i].value))
 			{
 				if (ITEM_VALUE_TYPE_LOG == item.value_type)
 					calc_timestamp(values[i].value, &values[i].timestamp, item.logtimefmt);
