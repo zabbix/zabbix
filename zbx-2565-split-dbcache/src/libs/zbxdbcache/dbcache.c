@@ -2612,8 +2612,8 @@ void	DCadd_history_log(zbx_uint64_t itemid, char *value_orig, int clock, int tim
  *                                                                            *
  ******************************************************************************/
 
-ZBX_MEM_FUNC_IMPL(__history, history_mem);
-ZBX_MEM_FUNC_IMPL(__history_text, history_text_mem);
+ZBX_MEM_FUNC1_IMPL_MALLOC(__history, history_mem);
+ZBX_MEM_FUNC1_IMPL_MALLOC(__history_text, history_text_mem);
 ZBX_MEM_FUNC_IMPL(__trend, trend_mem);
 
 void	init_database_cache(unsigned char p)
