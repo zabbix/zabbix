@@ -1246,20 +1246,7 @@ void	DCsync_configuration()
  *                                                                            *
  ******************************************************************************/
 
-static void	*__config_mem_malloc_func(void *old, size_t size)
-{
-	return zbx_mem_malloc(config_mem, old, size);
-}
-
-static void	*__config_mem_realloc_func(void *old, size_t size)
-{
-	return zbx_mem_realloc(config_mem, old, size);
-}
-
-static void	__config_mem_free_func(void *ptr)
-{
-	zbx_mem_free(config_mem, ptr);
-}
+ZBX_MEM_FUNC_IMPL(__config, config_mem);
 
 static zbx_hash_t	__config_item_hk_hash(const void *data)
 {
@@ -1348,7 +1335,7 @@ void	init_configuration_cache()
 	strpool_size = (size_t)(CONFIG_DBCONFIG_SIZE * 0.15);
 	config_size = CONFIG_DBCONFIG_SIZE - strpool_size;
 
-	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, (int)'k')))
+	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_CONFIG_ID)))
 	{
 		zbx_error("Can't create IPC key for configuration cache");
 		exit(FAIL);
@@ -1360,7 +1347,7 @@ void	init_configuration_cache()
 		exit(FAIL);
 	}
 
-	zbx_mem_create(&config_mem, shm_key, ZBX_NO_MUTEX, config_size, "configuration cache");
+	zbx_mem_create(&config_mem, shm_key, ZBX_NO_MUTEX, config_size, "configuration cache", "CacheSize");
 
 	config = __config_mem_malloc_func(NULL, sizeof(ZBX_DC_CONFIG));
 
