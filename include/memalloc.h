@@ -35,11 +35,12 @@ typedef struct
 	int		shm_id;
 	char		use_lock;
 	ZBX_MUTEX	mem_lock;
-	char		*mem_descr;
+	const char	*mem_descr;
+	const char	*mem_param;
 }
 zbx_mem_info_t;
 
-void	zbx_mem_create(zbx_mem_info_t **info, key_t shm_key, int lock_name, size_t size, const char *descr);
+void	zbx_mem_create(zbx_mem_info_t **info, key_t shm_key, int lock_name, size_t size, const char *descr, const char *param);
 void	zbx_mem_destroy(zbx_mem_info_t *info);
 
 #define	zbx_mem_malloc(info, old, size) __zbx_mem_malloc(__FILE__, __LINE__, info, old, size)
@@ -53,5 +54,47 @@ void	__zbx_mem_free(const char *file, int line, zbx_mem_info_t *info, void *ptr)
 void	zbx_mem_clear(zbx_mem_info_t *info);
 
 void	zbx_mem_dump_stats(zbx_mem_info_t *info);
+
+size_t	zbx_mem_required_size(size_t size, int chunks_num, const char *descr, const char *param);
+
+#define ZBX_MEM_FUNC1_DECL_MALLOC(__prefix)				\
+static void	*__prefix ## _mem_malloc_func(void *old, size_t size)
+#define ZBX_MEM_FUNC1_DECL_REALLOC(__prefix)				\
+static void	*__prefix ## _mem_realloc_func(void *old, size_t size)
+#define ZBX_MEM_FUNC1_DECL_FREE(__prefix)				\
+static void	__prefix ## _mem_free_func(void *ptr)
+
+#define ZBX_MEM_FUNC1_IMPL_MALLOC(__prefix, __info)			\
+									\
+static void	*__prefix ## _mem_malloc_func(void *old, size_t size)	\
+{									\
+	return zbx_mem_malloc(__info, old, size);			\
+}
+
+#define ZBX_MEM_FUNC1_IMPL_REALLOC(__prefix, __info)			\
+									\
+static void	*__prefix ## _mem_realloc_func(void *old, size_t size)	\
+{									\
+	return zbx_mem_realloc(__info, old, size);			\
+}
+
+#define ZBX_MEM_FUNC1_IMPL_FREE(__prefix, __info)			\
+									\
+static void	__prefix ## _mem_free_func(void *ptr)			\
+{									\
+	zbx_mem_free(__info, ptr);					\
+}
+
+#define ZBX_MEM_FUNC_DECL(__prefix)					\
+									\
+ZBX_MEM_FUNC1_DECL_MALLOC(__prefix);					\
+ZBX_MEM_FUNC1_DECL_REALLOC(__prefix);					\
+ZBX_MEM_FUNC1_DECL_FREE(__prefix);
+
+#define ZBX_MEM_FUNC_IMPL(__prefix, __info)				\
+									\
+ZBX_MEM_FUNC1_IMPL_MALLOC(__prefix, __info);				\
+ZBX_MEM_FUNC1_IMPL_REALLOC(__prefix, __info);				\
+ZBX_MEM_FUNC1_IMPL_FREE(__prefix, __info);
 
 #endif

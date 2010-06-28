@@ -24,7 +24,14 @@
 #	error "This module allowed only for Unix OS"
 #endif /* _WINDOWS */
 
-key_t zbx_ftok(char *path, int id);
-int zbx_shmget(key_t key, size_t size);
+#define ZBX_IPC_CONFIG_ID	'g'
+#define ZBX_IPC_HISTORY_ID	'h'
+#define ZBX_IPC_HISTORY_TEXT_ID	'x'
+#define ZBX_IPC_TREND_ID	't'
+#define ZBX_IPC_STRPOOL_ID	's'
+#define ZBX_IPC_COLLECTOR_ID	'l'
+
+key_t	zbx_ftok(char *path, int id);
+int	zbx_shmget(key_t key, size_t size);
 
 #endif
