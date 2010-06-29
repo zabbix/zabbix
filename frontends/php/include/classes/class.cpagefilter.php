@@ -176,12 +176,12 @@ class CPageFilter{
 			$hostid = 0;
 		}
 		else{
-			$def_ptions = array(
+			$def_options = array(
 				'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
 				'output' => array('hostid', 'host'),
 				'groupids' => (($this->groupid > 0) ? $this->groupid : null),
 			);
-			$options = zbx_array_merge($def_ptions, $options);
+			$options = zbx_array_merge($def_options, $options);
 			$hosts = CHost::get($options);
 
 			foreach($hosts as $host){
