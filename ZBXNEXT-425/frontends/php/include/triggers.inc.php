@@ -3105,7 +3105,6 @@ return $result;
 			'monitored' => 1,
 			'countOutput' => 1,
 			'filter' => array(),
-			'withUnacknowledgedEvents' => 1,
 			'limit' => ($config['search_limit']+1)
 		);
 		if($ack) $options['withAcknowledgedEvents'] = 1;
