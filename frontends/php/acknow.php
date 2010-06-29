@@ -130,7 +130,8 @@ include_once('include/page_header.php');
 <?php
 	$msg = $bulk ? ' BULK ACKNOWLEDGE ' : expand_trigger_description_by_data($event_trigger);
 	show_table_header(array(S_ALARM_ACKNOWLEDGES_BIG.': ', $msg));
-
+	print(SBR);
+	
 	if($bulk){
 		$title = S_ACKNOWLEDGE_ALARM_BY;
 		$btn_txt2 = S_ACKNOWLEDGE.' '.S_AND_SYMB.' '.S_RETURN;
@@ -195,5 +196,9 @@ include_once('include/page_header.php');
 
 	$frmMsg->show(false);
 
+?>
+<?php
+
 include_once('include/page_footer.php');
+
 ?>
