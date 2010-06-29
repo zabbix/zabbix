@@ -151,7 +151,7 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 			didle_stolen_purr = lparstats.idle_stolen_purr - last_idle_stolen_purr;
 			dbusy_stolen_purr = lparstats.busy_stolen_purr - last_busy_stolen_purr;
 
-			if (0 != (dlcpu_id + dlcpu_wa))
+			if (0 != dlcpu_id + dlcpu_wa)
 			{
 				r1 = dlcpu_id / (dlcpu_id + dlcpu_wa);
 				r2 = dlcpu_wa / (dlcpu_id + dlcpu_wa);
@@ -181,9 +181,12 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 			}
 			unused_purr = entitled_purr - delta_purr;
 
-			/* distributed unused purr in wait and idle proportionally to logical wait and idle */
-			dpcpu_wa += unused_purr * ((double)dlcpu_wa / (double)(dlcpu_wa + dlcpu_id));
-			dpcpu_id += unused_purr * ((double)dlcpu_id / (double)(dlcpu_wa + dlcpu_id));
+			/* distribute unused purr in wait and idle proportionally to logical wait and idle */
+			if (0 != dlcpu_wa + dlcpu_id)
+			{
+				dpcpu_wa += unused_purr * ((double)dlcpu_wa / (double)(dlcpu_wa + dlcpu_id));
+				dpcpu_id += unused_purr * ((double)dlcpu_id / (double)(dlcpu_wa + dlcpu_id));
+			}
 
 			pcputime = entitled_purr;
 		}
