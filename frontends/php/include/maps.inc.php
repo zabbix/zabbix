@@ -1045,11 +1045,12 @@
 
 		$selements_info = array();
 		$options = array(
+			'nodeids' => get_current_nodeid(true),
 			'triggerids' => zbx_objectValues($selements, 'elementid'),
-			'extendoutput' => 1,
+			'expandDescription' => 1,
 			'nopermissions' => 1,
-			'nodeids' => get_current_nodeid(true)
-			);
+			'output' => API_OUTPUT_EXTEND
+		);
 		$triggers = CTrigger::get($options);
 		$triggers = zbx_toHash($triggers, 'triggerid');
 		foreach($selements as $snum => $selement){
@@ -1060,7 +1061,7 @@
 			$trigger = $triggers[$selement['elementid']];
 
 // name
-			$info['name'] = expand_trigger_description_by_data($trigger);
+			$info['name'] = $trigger['description'];
 			$info['elementtype'] = SYSMAP_ELEMENT_TYPE_TRIGGER;
 			$info['maintenances'] = array();
 
@@ -1078,7 +1079,7 @@
 			}
 
 			if($trigger['status'] != TRIGGER_STATUS_ENABLED){
-				$info['type'] = TRIGGER_VALUE_UNKNOWN;
+				$info['type'] = TRIGGER_VALUE_FALSE;
 				$info['disabled'] = 1;
 			}
 
@@ -1196,7 +1197,7 @@
 			}
 
 			if($host['status'] != HOST_STATUS_MONITORED){
-				$info['type'] = TRIGGER_VALUE_UNKNOWN;
+				$info['type'] = TRIGGER_VALUE_FALSE;
 				$info['disabled'] = 1;
 			}
 
@@ -1213,9 +1214,9 @@
 				}
 
 				$trigger = $triggers[$trigger['triggerid']];
-				$host['triggers'][$tnum] = $trigger;
-
 				if($trigger['status'] == TRIGGER_STATUS_DISABLED) continue;
+				
+				$host['triggers'][$tnum] = $trigger;
 
 				if(!isset($info['type'])) $info['type'] = $trigger['value'];
 				else if($trigger['value'] == TRIGGER_VALUE_TRUE){
@@ -1635,7 +1636,6 @@
 			$infos = getSelementsInfo($map);
 //SDII($infos);
 			foreach($infos as $inum => $inf){
-
 				if(!isset($info['type'])){
 					$info['type'] = $inf['type'];
 				}
