@@ -610,7 +610,8 @@
 	'S_ITEM_COUNT' => 'Item count',
 	'S_REQUIRED_PERFORMANCE' => 'Required performance (vps)',
 	'S_PROXY_MODE' => 'Proxy mode',
-	'S_PASSIVE' => 'Passive',
+	'S_PROXY_PASSIVE' => 'Passive',
+	'S_PROXY_ACTIVE' => 'Active',
 
 //  Authentication
 	'S_AUTHENTICATION'=>			'Authentication',
