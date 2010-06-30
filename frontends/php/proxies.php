@@ -227,8 +227,8 @@
 		$frmHostG->addRow(S_PROXY_NAME, new CTextBox('host', $name, 30));
 
 		$statusBox = new CComboBox('status', $status, 'submit()');
-		$statusBox->addItem(HOST_STATUS_PROXY_ACTIVE, S_ACTIVE);
-		$statusBox->addItem(HOST_STATUS_PROXY_PASSIVE, S_PASSIVE);
+		$statusBox->addItem(HOST_STATUS_PROXY_ACTIVE, S_PROXY_ACTIVE);
+		$statusBox->addItem(HOST_STATUS_PROXY_PASSIVE, S_PROXY_PASSIVE);
 		$frmHostG->addRow(S_PROXY_MODE, $statusBox);
 
 		if ($status == HOST_STATUS_PROXY_PASSIVE){
@@ -369,7 +369,7 @@
 			$table->addRow(array(
 				new CCheckBox('hosts['.$proxy['proxyid'].']', NULL, NULL, $proxy['proxyid']),
 				new CLink($proxy['host'], 'proxies.php?form=update&hostid='.$proxy['proxyid']),
-				$proxy['status'] == HOST_STATUS_PROXY_ACTIVE ? S_ACTIVE : S_PASSIVE,
+				$proxy['status'] == HOST_STATUS_PROXY_ACTIVE ? S_PROXY_ACTIVE : S_PROXY_PASSIVE,
 				($proxy['lastaccess'] == 0) ? '-' : zbx_date2age($proxy['lastaccess']),
 				count($proxy['hosts']),
 				isset($proxy['item_count']) ? $proxy['item_count'] : 0,
