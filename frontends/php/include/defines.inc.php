@@ -770,5 +770,5 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	bcscale(7);
 
 // Numeric Locale to default
-	setLocale(LC_ALL, null);
+	setLocale(LC_NUMERIC, array('en','en_US','en_US.UTF-8','English_United States.1252'));
 ?>
