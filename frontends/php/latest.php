@@ -283,7 +283,9 @@ include_once('include/page_header.php');
 
 		$lastvalue = format_lastvalue($db_item);
 
-		if(isset($db_item['lastvalue']) && isset($db_item['prevvalue']) && ($db_item['value_type'] == 0) && ($db_item['lastvalue']-$db_item['prevvalue'] != 0)){
+		if(isset($db_item['lastvalue']) && isset($db_item['prevvalue']) 
+				&& in_array($db_item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64)) 
+				&& ($db_item['lastvalue']-$db_item['prevvalue'] != 0)){
 			if($db_item['lastvalue']-$db_item['prevvalue']<0){
 				$change=convert_units($db_item['lastvalue']-$db_item['prevvalue'],$db_item['units']);
 			}
