@@ -17,7 +17,6 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -34,9 +33,6 @@
 
 #include <sys/socket.h>
 #include <errno.h>
-
-/* Functions: pow(), round() */
-#include <math.h>
 
 #include "common.h"
 #include "db.h"
