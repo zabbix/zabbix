@@ -1123,7 +1123,7 @@ require_once('include/js.inc.php');
 
 					if($editmode || !$default) $item = new CDiv();
 					else $item = new CLink(null, $action); 
-
+					
 					$item->setAttribute('id', $containerid);
 
 					$item = array($item);
