@@ -350,11 +350,6 @@ function make_system_status($filter){
 					$event = CEvent::get($options);
 					$event = reset($event);
 
-					if($event['acknowledged'] == 0){
-						$trig_unack++;
-					}
-
-
 					if(!empty($event)){
 						if($config['event_ack_enable']){
 							if($event['acknowledged'] == 1){
@@ -371,6 +366,11 @@ function make_system_status($filter){
 						$ack = '-';
 						$actions = S_NO_DATA_SMALL;
 						$event['clock'] = $trigger['lastchange'];
+						$event['acknowledged'] = 1;
+					}
+					
+					if($event['acknowledged'] == 0){
+						$trig_unack++;
 					}
 
 					$table_inf->addRow(array(
