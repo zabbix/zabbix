@@ -1996,28 +1996,26 @@ return $result;
 
 		$expression = implode_exp($expression,$triggerid); /* errors can be ignored cose function must return NULL */
 		
-		$sql_update = '';
-		if(!is_null($expression))	$sql_update .= ' expression='.zbx_dbstr($expression).',';
-		if(!is_null($description))	$sql_update .= ' description='.zbx_dbstr($description).',';
-		if(!is_null($type))			$sql_update .= ' type='.$type.',';
-		if(!is_null($priority))		$sql_update .= ' priority='.$priority.',';
-		if(!is_null($status))		$sql_update .= ' status='.$status.',';
-		if(!is_null($comments))		$sql_update .= ' comments='.zbx_dbstr($comments).',';
-		if(!is_null($url))			$sql_update .= ' url='.zbx_dbstr($url).',';
-		if(!is_null($templateid))	$sql_update .= ' templateid='.$templateid;
-
+		$update_values = array();
+		if(!is_null($expression)) $update_values['expression'] = $expression;
+		if(!is_null($description)) $update_values['description'] = $description;
+		if(!is_null($type)) $update_values['type'] = $type;
+		if(!is_null($priority)) $update_values['priority'] = $priority;
+		if(!is_null($status)) $update_values['status'] = $status;
+		if(!is_null($comments)) $update_values['comments'] = $comments;
+		if(!is_null($url)) $update_values['url'] = $url;
+		if(!is_null($templateid)) $update_values['templateid'] = $templateid;
 
 		if($event_to_unknown || (!is_null($status) && ($status != TRIGGER_STATUS_ENABLED))){
-
 			if($trigger['value'] != TRIGGER_VALUE_UNKNOWN){
 				addEvent($triggerid, TRIGGER_VALUE_UNKNOWN);
 
-				$sql_update .= ',value='.TRIGGER_VALUE_UNKNOWN;
-				$sql_update .= ',lastchange='.time();
+				$update_values['value'] = TRIGGER_VALUE_UNKNOWN;
+				$update_values['lastchange'] = time();
 			}
 		}
 
-		$result = DBexecute('UPDATE triggers SET '.$sql_update.' WHERE triggerid='.$triggerid);
+		DB::update('triggers', array('values' => $update_values, 'where' => array('triggerid='.$triggerid)));
 
 		delete_dependencies_by_triggerid($triggerid);
 
