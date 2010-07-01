@@ -2389,14 +2389,14 @@
 
 // LABEL
 			if(zbx_empty($label_line) && empty($info_line)) continue;
-
+			
 			$label_line = str_replace("\r", '', $label_line);
 			$strings = explode("\n", $label_line);
 
 			$cnt = count($strings);
 			$strings = zbx_array_merge($strings, $info_line);
 			$oc = count($strings);
-
+			
 			$h = 0;
 			$w = 0;
 			foreach($strings as $strnum => $str){
@@ -2437,11 +2437,13 @@
 			
 			$tmpDims = imageTextSize(8,0, str_replace("\n", '', $label_line));
 			$maxHeight = $tmpDims['height'];
-			
+	
 			$num = 0;
 			$increasey = 0;
 			foreach($strings as $key => $str){
 				if($num >= $cnt) break;
+				$num++;
+				
 				if(zbx_empty($str)) continue;
 
 				$dims = imageTextSize(8,0,$str);
@@ -2467,9 +2469,8 @@
 				imagetext($im, 8, 0, $x_label, $y_rec+$increasey+$dims['height'], $color, $str);
 
 				$increasey += $dims['height']+3;
-				$num++;
 			}
-
+			
 			$el_msgs = array('problem', 'maintenances', 'unknown', 'ok', 'status', 'availability');
 			foreach($el_msgs as $key => $caption){
 				if(!isset($el_info['info'][$caption]) || zbx_empty($el_info['info'][$caption]['msg'])) continue;
