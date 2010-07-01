@@ -1300,7 +1300,8 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 		{
 			init_result(&agent);
 
-			if (SUCCEED == set_result_type(&agent, item.value_type, item.data_type, values[i].value))
+			if (SUCCEED == set_result_type(&agent, item.value_type,
+						proxy_hostid ? ITEM_DATA_TYPE_DECIMAL : item.data_type, values[i].value))
 			{
 				if (ITEM_VALUE_TYPE_LOG == item.value_type)
 					calc_timestamp(values[i].value, &values[i].timestamp, item.logtimefmt);

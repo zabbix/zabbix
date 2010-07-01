@@ -73,32 +73,23 @@
 		return 'preg_match("/^([0-9a-zA-Z_\.\-\$ ]+)$/",{'.$var.'})&&';
 	}
 
+	function validate_float($str){
+//		echo "Validating float:$str<br>";
+//		if (eregi('^[ ]*([0-9]+)((\.)?)([0-9]*[KMG]{0,1})[ ]*$', $str, $arr)) {
+		if(preg_match('/^[ ]*([0-9]+)((\.)?)([0-9]*[KMGTsmhdw]{0,1})[ ]*$/i', $str, $arr)) {
+			return 0;
+		}
+		else{
+			return -1;
+		}
+	}
+
 	function validate_ipv4($str,&$arr){
 //		if( !ereg('^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$', $str, $arr) )	return false;
 		if( !preg_match('/^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/', $str, $arr) )	return false;
 		for($i=1; $i<=4; $i++)	if( !is_numeric($arr[$i]) || $arr[$i] > 255 || $arr[$i] < 0 )	return false;
 		return true;
 	}
-
-/* EREG
-	function validate_ipv6($str,&$arr){
-		$pattern1 = '([A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}';
-		$pattern2 = ':(:[A-Fa-f0-9]{1,4}){1,7}';
-		$pattern3 = '[A-Fa-f0-9]{1,4}::([A-Fa-f0-9]{1,4}:){0,5}[A-Fa-f0-9]{1,4}';
-		$pattern4 = '([A-Fa-f0-9]{1,4}:){2}:([A-Fa-f0-9]{1,4}:){0,4}[A-Fa-f0-9]{1,4}';
-		$pattern5 = '([A-Fa-f0-9]{1,4}:){3}:([A-Fa-f0-9]{1,4}:){0,3}[A-Fa-f0-9]{1,4}';
-		$pattern6 = '([A-Fa-f0-9]{1,4}:){4}:([A-Fa-f0-9]{1,4}:){0,2}[A-Fa-f0-9]{1,4}';
-		$pattern7 = '([A-Fa-f0-9]{1,4}:){5}:([A-Fa-f0-9]{1,4}:){0,1}[A-Fa-f0-9]{1,4}';
-		$pattern8 = '([A-Fa-f0-9]{1,4}:){6}:[A-Fa-f0-9]{1,4}';
-		$pattern9 = '([A-Fa-f0-9]{1,4}:){1,7}:';
-		$pattern10 = '::';
-
-		$full = "^($pattern1)$|^($pattern2)$|^($pattern3)$|^($pattern4)$|^($pattern5)$|^($pattern6)$|^($pattern7)$|^($pattern8)$|^($pattern9)$|^($pattern10)$";
-
-		if( !ereg($full, $str, $arr) )	return false;
-		return true;
-	}
-//*/
 
 	function validate_ipv6($str,&$arr){
 		$pattern1 = '([a-f0-9]{1,4}:){7}[a-f0-9]{1,4}';
@@ -234,6 +225,42 @@
 	return true;
 	}
 
+	function validate_period(&$str){
+		$str = trim($str,';');
+		$out = "";
+		$periods = explode(';',$str);
+		foreach($periods as $preiod){
+			// arr[idx]   1       2         3             4            5            6
+//			if(!ereg('^([1-7])-([1-7]),([0-9]{1,2}):([0-9]{1,2})-([0-9]{1,2}):([0-9]{1,2})$', $preiod, $arr)) return false;
+			if(!preg_match('/^([1-7])-([1-7]),([0-9]{1,2}):([0-9]{1,2})-([0-9]{1,2}):([0-9]{1,2})$/', $preiod, $arr)) return false;
+
+			if($arr[1] > $arr[2]) // check week day
+				return false;
+			if($arr[3] > 23 || $arr[3] < 0 || $arr[5] > 24 || $arr[5] < 0) // check hour
+				return false;
+			if($arr[4] > 59 || $arr[4] < 0 || $arr[6] > 59 || $arr[6] < 0) // check min
+				return false;
+			if(($arr[5]*100 + $arr[6]) > 2400) // check max time 24:00
+				return false;
+			if(($arr[3] * 100 + $arr[4]) >= ($arr[5] * 100 + $arr[6])) // check time period
+				return false;
+
+			$out .= sprintf('%d-%d,%02d:%02d-%02d:%02d',$arr[1],$arr[2],$arr[3],$arr[4],$arr[5],$arr[6]).';';
+		}
+		$str = $out;
+//parse_period($str);
+		return true;
+	}
+
+// Check if str has format #<float> or <float>
+	function validate_ticks($str){
+//		echo "Validating float:$str<br>";
+//		if (eregi('^[ ]*#([0-9]+)((\.)?)([0-9]*)[ ]*$', $str, $arr)) {
+		if (preg_match('/^[ ]*#([0-9]+)((\.)?)([0-9]*)[ ]*$/i', $str, $arr)) {
+			return 0;
+		}
+		else return validate_float($str);
+	}
 
 	define('NOT_EMPTY',"({}!='')&&");
 	define('DB_ID',"({}>=0&&bccomp('{}',\"10000000000000000000\")<0)&&");

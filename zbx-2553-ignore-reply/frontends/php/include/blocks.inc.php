@@ -627,30 +627,14 @@ function make_status_of_zbx(){
 			new CSpan($status['triggers_count_off'],'off'),']'
 		)
 	));
+
 /*
 	$table->addRow(array(S_NUMBER_OF_EVENTS,$status['events_count'],' - '));
 	$table->addRow(array(S_NUMBER_OF_ALERTS,$status['alerts_count'],' - '));
-*/
+//*/
 
-//Log Out 10min
-	$sql = 'SELECT COUNT(*) as usr_cnt FROM users u WHERE '.DBin_node('u.userid');
-	$usr_cnt = DBfetch(DBselect($sql));
-
-	$online_cnt = 0;
-	$sql = 'SELECT DISTINCT s.userid, MAX(s.lastaccess) as lastaccess, MAX(u.autologout) as autologout, s.status '.
-			' FROM sessions s, users u '.
-			' WHERE '.DBin_node('s.userid').
-				' AND u.userid=s.userid '.
-				' AND s.status='.ZBX_SESSION_ACTIVE.
-			' GROUP BY s.userid,s.status';
-	$db_users = DBselect($sql);
-	while($user=DBfetch($db_users)){
-		$online_time = (($user['autologout'] == 0) || (ZBX_USER_ONLINE_TIME<$user['autologout']))?ZBX_USER_ONLINE_TIME:$user['autologout'];
-		if(!is_null($user['lastaccess']) && (($user['lastaccess']+$online_time)>=time()) && (ZBX_SESSION_ACTIVE == $user['status'])) $online_cnt++;
-	}
-
-	$table->addRow(array(S_NUMBER_OF_USERS,$usr_cnt,new CSpan($online_cnt,'green')));
-	$table->addRow(array(S_REQUIRED_SERVER_PERFORMANCE_NVPS,$status['qps_total'],' - '));
+	$table->addRow(array(S_NUMBER_OF_USERS, $status['users_count'], new CSpan($status['users_online'],'green')));
+	$table->addRow(array(S_REQUIRED_SERVER_PERFORMANCE_NVPS, $status['qps_total'],' - '));
 
 
 // CHECK REQUIREMENTS {{{
@@ -991,6 +975,7 @@ function make_graph_menu(&$menu,&$submenu){
 				"PopUp('popup.php?srctbl=graphs".
 					'&srcfld1=graphid'.
 					'&reference=graphid'.
+					'&real_hosts=1'.
 					"&multiselect=1',800,450);".
 				"void(0);",
 				null,
@@ -1001,6 +986,7 @@ function make_graph_menu(&$menu,&$submenu){
 				'javascript: '.
 				"PopUp('popup.php?srctbl=simple_graph".
 					'&srcfld1=itemid'.
+					'&real_hosts=1'.
 					'&reference=itemid'.
 					"&multiselect=1',800,450);".
 				"void(0);",

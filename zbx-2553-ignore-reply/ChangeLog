@@ -1,5 +1,13 @@
 Changes for 1.8.3
 
+ - [ZBX-2555] fixed simple checks for FTP, POP, and NNTP protocols so that they close sessions properly (asaveljevs)
+ - [ZBX-2553] fixed simple checks ignoring server replies (asaveljevs)
+ - [ZBX-2612] fixed system.stat showing cpu idle and I/O wait time over 100% on AIX (asaveljevs)
+ - [ZBX-1324] replaced more user visible strings ZABBIX with Zabbix (asaveljevs,Richlv)
+ - [ZBX-2616] bundled DejaVu font upgraded from 2.30 to 2.31 (Richlv)
+ - [ZBX-2562] improved sessions store (Aly)
+ - [ZBXNEXT-424] enhanced status of trigger filter (Vedmak)
+ - [ZBX-2599] fixed processing of hexadecimal or octal data by proxy (Sasha)
  - [ZBX-2597] fixed processing of telnet results with long prompts (Sasha)
  - [ZBX-2595] fixed logformat field showing (Maxim Andruhovich / AM)
  - [ZBX-2593] fixed possibility to copy item between templates that are linked to same host (Vedmak)

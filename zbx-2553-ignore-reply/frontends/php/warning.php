@@ -25,6 +25,7 @@ $page['title'] = 'S_WARNING';
 $page['file'] = 'warning.php';
 
 define('ZBX_PAGE_DO_REFRESH',1);
+
 if(!defined('PAGE_HEADER_LOADED'))
 	define('ZBX_PAGE_NO_MENU', 1);
 
@@ -46,7 +47,6 @@ $refresh_rate = 30; //seconds
 	if(isset($_REQUEST['cancel'])){
 		zbx_unsetcookie('ZBX_CONFIG');
 		redirect('index.php');
-		exit;
 	}
 //	clear_messages();
 $USER_DETAILS['refresh'] = $refresh_rate;

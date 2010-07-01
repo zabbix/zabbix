@@ -80,7 +80,7 @@ include_once('include/page_header.php');
 			CProfile::update('web.dashconf.triggers.severity', $trgSeverity, PROFILE_TYPE_STR);
 		}
 
-		redirect('dashboard.php');
+		jsRedirect('dashboard.php');
 	}
 	else if(isset($_REQUEST['new_right'])){
 		$_REQUEST['groupids'] = get_request('groupids', array());
