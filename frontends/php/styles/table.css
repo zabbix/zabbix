@@ -129,7 +129,7 @@ table.formtable tr.form_even_row td{
 
 table.formtable tr td {
         text-decoration: none;
-	background-color: #EEEEEE;	
+	background-color: #EEEEEE;
 }
 
 table.formtable tr td.form_row_first{
@@ -146,11 +146,11 @@ table.formtable tr td.form_row_last {
 }
 
 /* left cell */
-table.formtable tr td.form_row_l { 
+table.formtable tr td.form_row_l {
 	width: 30%;
 }
 /* center cell */
-table.formtable tr td.form_row_c { 
+table.formtable tr td.form_row_c {
 	text-align: center;
 }
 /* right cell */
@@ -352,6 +352,7 @@ table.tableinfo tr td {
 	word-spacing: 0;
 	font-family:verdana, arial, helvetica, sans-serif;
 	font-size:8pt;
+	font-weight: normal;
 	text-decoration: none;
 	text-align: left;
 	border: 0;
