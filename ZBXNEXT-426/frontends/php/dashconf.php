@@ -138,7 +138,7 @@ include_once('include/page_header.php');
 
 		$grpswitch = CProfile::get('web.dashconf.groups.grpswitch', 0);
 		$maintenance = CProfile::get('web.dashconf.hosts.maintenance', 1);
-		$extAck = CProfile::get('web.dashconf.events.extAck', 1);
+		$extAck = CProfile::get('web.dashconf.events.extAck', 0);
 
 		$severity = CProfile::get('web.dashconf.triggers.severity', '0;1;2;3;4;5');
 		$severity = zbx_empty($severity) ? array() : explode(';', $severity);
