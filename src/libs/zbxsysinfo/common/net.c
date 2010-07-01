@@ -30,54 +30,52 @@
  * 0 - NOT OK
  * 1 - OK
  * */
-int	tcp_expect(
-		const char		*host,
-		unsigned short		port,
-		const char		*request,
-		const char		*expect,
-		const char		*sendtoclose,
-		int			*value_int
-	   )
+int	tcp_expect(const char *host, unsigned short port, const char *request,
+		const char *expect, const char *sendtoclose, int *value_int)
 {
 	zbx_sock_t	s;
 	char		*buf;
-	int		ret;
+	int		net, val = SUCCEED;
 
 	assert(value_int);
 
 	*value_int = 0;
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, 3/*alarm!!!*/))) {
-		if( NULL == request )
+	if (SUCCEED == (net = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, 3/*alarm!!!*/)))
+	{
+		if (NULL != request)
 		{
-			*value_int = 1;
+			net = zbx_tcp_send_raw(&s, request);
 		}
-		else if( SUCCEED == (ret = zbx_tcp_send_raw(&s, request)) )
+
+		if (NULL != expect && SUCCEED == net)
 		{
-			if( NULL == expect )
+			if (SUCCEED == (net = zbx_tcp_recv(&s, &buf)))
 			{
-				*value_int = 1;
-			}
-			else if( SUCCEED == (ret = zbx_tcp_recv(&s, &buf)) )
-			{
-				if( 0 == strncmp(buf, expect, strlen(expect)) )
+				if (0 != strncmp(buf, expect, strlen(expect)))
 				{
-					*value_int = 1;
+					val = FAIL;
 				}
 			}
+		}
 
-			if(SUCCEED == ret && NULL != sendtoclose)
-			{
-				/* ret = (skip errors) */ zbx_tcp_send_raw(&s, sendtoclose);
-			}
+		if (NULL != sendtoclose && SUCCEED == net && SUCCEED == val)
+		{
+			zbx_tcp_send_raw(&s, sendtoclose);
+		}
+
+		if (SUCCEED == net && SUCCEED == val)
+		{
+			*value_int = 1;
 		}
 	}
 	zbx_tcp_close(&s);
 
-	if( FAIL == ret )
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "TCP expect error: %s", zbx_tcp_strerror());
-	}
+	if (FAIL == net)
+		zabbix_log(LOG_LEVEL_DEBUG, "TCP expect network error: %s", zbx_tcp_strerror());
+
+	if (FAIL == val)
+		zabbix_log(LOG_LEVEL_DEBUG, "TCP expect content error: expected [%s] received [%s]", expect, buf);
 
 	return SYSINFO_RET_OK;
 }
@@ -171,7 +169,7 @@ int	CHECK_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 
 	port=atoi(port_str);
 
-	ret = tcp_expect(ip,port,NULL,NULL,"",&value_int);
+	ret = tcp_expect(ip,port,NULL,NULL,NULL,&value_int);
 
 	if(ret == SYSINFO_RET_OK)
 	{
