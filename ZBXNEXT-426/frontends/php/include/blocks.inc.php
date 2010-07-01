@@ -626,7 +626,7 @@ function make_hoststat_summary($filter){
 		$group_row->addItem(new CCol($hosts_data[$group['groupid']]['ok'], 'normal'));
 
 		if($filter['extAck']){
-			if($hosts_data[$group['groupid']]['lastUnack']){
+			if(isset($hosts_data[$group['groupid']]['lastUnack']) && $hosts_data[$group['groupid']]['lastUnack']){
 				$table_inf = new CTableInfo();
 				$table_inf->setAttribute('style', 'width: 400px;');
 				$table_inf->setHeader(array(
