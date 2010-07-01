@@ -396,8 +396,11 @@ function make_system_status($filter){
 
 				switch($filter['extAck']){
 					case EXTACK_OPTION_ALL:
+				        $trigger_count = new CSpan($data['count'], 'pointer');
+						$trigger_count->setHint($table_inf);
+				        break;
 					case EXTACK_OPTION_UNACK:
-						$trigger_count = new CSpan($data['count'], 'pointer');
+						$trigger_count = new CSpan($data['count'], 'pointer red bold');
 						$trigger_count->setHint($table_inf);
 				        break;
 					case EXTACK_OPTION_BOTH:
@@ -661,7 +664,7 @@ function make_hoststat_summary($filter){
 					$table_inf->addRow($r);
 				}
 
-				$lastUnack_count = new CSpan($hosts_data[$group['groupid']]['lastUnack'], 'pointer');
+				$lastUnack_count = new CSpan($hosts_data[$group['groupid']]['lastUnack'], 'pointer red bold');
 				$lastUnack_count->setHint($table_inf);
 			}
 			else{
@@ -729,7 +732,7 @@ function make_hoststat_summary($filter){
 				$group_row->addItem($hosts_data[$group['groupid']]['lastUnack'] + $hosts_data[$group['groupid']]['ok']);
 				break;
 			case EXTACK_OPTION_BOTH:
-				$unackspan = $lastUnack_count ? new CSpan(array(new CSpan($lastUnack_count, 'bold pointer red'), SPACE.S_OF.SPACE)) : null;
+				$unackspan = $lastUnack_count ? new CSpan(array($lastUnack_count, SPACE.S_OF.SPACE)) : null;
 				$group_row->addItem(new CCol(array(
 					$unackspan, $problematic_count),
 					get_severity_style($highest_severity[$group['groupid']], $hosts_data[$group['groupid']]['problematic']))
