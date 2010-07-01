@@ -20,7 +20,8 @@
 #include "common.h"
 #include "sysinfo.h"
 
-struct net_stat_s {
+struct net_stat_s
+{
 	zbx_uint64_t ibytes;
 	zbx_uint64_t ipackets;
 	zbx_uint64_t ierr;
