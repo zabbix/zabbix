@@ -1341,6 +1341,7 @@
 	'S_MAXIMIZE'=>				'Maximize',
 	'S_MINIMIZE'=>				'Minimize',
 	'S_LOADING_P'=>				'Loading...',
+	'S_OF' => 'of',
 
 // dashconf.php
 	'S_DASHBOARD_CONFIGURATION' =>	'Dashboard configuration',
@@ -1353,6 +1354,10 @@
 	'S_FAVOURITE_GRAPHS' => 'Favourite graphs',
 	'S_FAVOURITE_MAPS' => 'Favourite maps',
 	'S_FAVOURITE_SCREENS' => 'Favourite screens',
+	'S_O_ALL' => 'All',
+	'S_O_UNACKNOWLEDGED_ONLY' => 'Unacknowledged only',
+	'S_O_SEPARATED' => 'Separated',
+	'S_PROBLEM_DISPLAY' => 'Problem display',
 
 //	overview.php
 	'S_OVERVIEW'=>				'Overview',
