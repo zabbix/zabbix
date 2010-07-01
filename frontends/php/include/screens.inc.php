@@ -881,10 +881,10 @@ require_once('include/js.inc.php');
 		$result=DBselect('SELECT name,hsize,vsize FROM screens WHERE screenid='.$screenid);
 		$row=DBfetch($result);
 		if(!$row) return new CTableInfo(S_NO_SCREENS_DEFINED);
-				
+
 		$sql = 'SELECT * FROM screens_items WHERE screenid='.$screenid;
 		$iresult = DBSelect($sql);
-		
+
 		$skip_field = array();
 		$irows = array();
 		while($irow = DBfetch($iresult)){
@@ -896,9 +896,9 @@ require_once('include/js.inc.php');
 						$skip_field[$irow['y']+$i][$irow['x']+$j] = 1;
 					}
 				}
-			}				
+			}
 		}
-	
+
 		$table = new CTable(new CLink(S_NO_ROWS_IN_SCREEN.SPACE.$row['name'],'screenconf.php?config=0&form=update&screenid='.$screenid),
 			($editmode == 0 || $editmode == 2) ? 'screen_view' : 'screen_edit');
 		$table->setAttribute('id', 'iframe');
@@ -937,7 +937,7 @@ require_once('include/js.inc.php');
 						break;
 					}
 				}
-				
+
 				if($irow){
 					$screenitemid	= $irow['screenitemid'];
 					$resourcetype	= $irow['resourcetype'];
@@ -1027,7 +1027,7 @@ require_once('include/js.inc.php');
 						$def_items = array();
 						$di_res = get_graphitems_by_graphid($resourceid);
 						while($gitem = DBfetch($di_res)) $def_items[] = $gitem;
-						
+
 						$new_items = get_same_graphitems_for_host($def_items, $_REQUEST['hostid'], false);
 
 						if(($graph['graphtype']==GRAPH_TYPE_PIE) || ($graph['graphtype']==GRAPH_TYPE_EXPLODED))
@@ -1196,7 +1196,7 @@ require_once('include/js.inc.php');
 						$item[] = BR();
 						$item[] = new CLink(S_CHANGE, $action);
 					}
-										
+
 //					zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 					insert_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 				}
@@ -1404,7 +1404,7 @@ require_once('include/js.inc.php');
 					);
 
 					$item = array(get_table_header(array(S_SYSTEM_STATUS,SPACE,zbx_date2str(S_SCREENS_TRIGGER_FORM_DATE_FORMAT))));
-					$item[] = make_system_summary($params);
+					$item[] = make_system_status($params);
 
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}

@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBXNEXT-426] added dashboard option to show unack problems (Vedmak)
  - [ZBX-2555] fixed simple checks for FTP, POP, and NNTP protocols so that they close sessions properly (asaveljevs)
  - [ZBX-2553] fixed simple checks ignoring server replies (asaveljevs)
  - [ZBX-2612] fixed system.stat showing cpu idle and I/O wait time over 100% on AIX (asaveljevs)
