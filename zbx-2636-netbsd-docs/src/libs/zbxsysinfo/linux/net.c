@@ -47,10 +47,8 @@ static int get_net_stat(const char *if_name, struct net_stat_s *result)
 
 	if(NULL != (f = fopen("/proc/net/dev","r") ))
 	{
-
 		while(fgets(line,MAX_STRING_LEN,f) != NULL)
 		{
-
 			p = strstr(line,":");
 			if(p) p[0]='\t';
 
@@ -130,7 +128,6 @@ int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 
 	ret = get_net_stat(if_name, &ns);
 
-
 	if(ret == SYSINFO_RET_OK)
 	{
 		if(strncmp(mode, "bytes", MAX_STRING_LEN) == 0)
@@ -192,7 +189,6 @@ int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 	}
 
 	ret = get_net_stat(if_name, &ns);
-
 
 	if(ret == SYSINFO_RET_OK)
 	{
@@ -256,7 +252,6 @@ int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 
 	ret = get_net_stat(if_name, &ns);
 
-
 	if(ret == SYSINFO_RET_OK)
 	{
 		if(strncmp(mode, "bytes", MAX_STRING_LEN) == 0)
@@ -315,9 +310,7 @@ int	NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_
 		return SYSINFO_RET_FAIL;
 	}
 
-
 	ret = get_net_stat(if_name, &ns);
-
 
 	if(ret == SYSINFO_RET_OK)
 	{
