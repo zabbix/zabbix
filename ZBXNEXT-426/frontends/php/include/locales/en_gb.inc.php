@@ -1352,7 +1352,7 @@
 	'S_FAVOURITE_MAPS' => 'Favourite maps',
 	'S_FAVOURITE_SCREENS' => 'Favourite screens',
 	'S_O_ALL' => 'All',
-	'S_O_UNACKNOWLEDGED' => 'Unacknowledged',
+	'S_O_UNACKNOWLEDGED_ONLY' => 'Unacknowledged only',
 	'S_O_SEPARATED' => 'Separated',
 	'S_PROBLEM_DISPLAY' => 'Problem display',
 

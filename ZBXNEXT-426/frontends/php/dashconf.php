@@ -242,7 +242,7 @@ include_once('include/page_header.php');
 	$cb = new CComboBox('extAck', $extAck);
 	$cb->addItems(array(
 		EXTACK_OPTION_ALL => S_O_ALL,
-		EXTACK_OPTION_UNACK => S_O_UNACKNOWLEDGED,
+		EXTACK_OPTION_UNACK => S_O_UNACKNOWLEDGED_ONLY,
 		EXTACK_OPTION_BOTH => S_O_SEPARATED,
 	));
 	$cb->setEnabled($filterEnable && $config['event_ack_enable']);

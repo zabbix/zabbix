@@ -606,7 +606,7 @@ function make_hoststat_summary($filter){
 				$highest_severity[$group['groupid']] = 0;
 
 			if(!isset($hosts_data[$group['groupid']]))
-				$hosts_data[$group['groupid']] = array('problematic' => 0, 'ok' => 0, 'lastAck' => 0);
+				$hosts_data[$group['groupid']] = array('problematic' => 0, 'ok' => 0, 'lastUnack' => 0);
 
 			if(!isset($problematic_host_list[$host['hostid']]))
 				$hosts_data[$group['groupid']]['ok']++;
@@ -626,7 +626,7 @@ function make_hoststat_summary($filter){
 		$group_row->addItem(new CCol($hosts_data[$group['groupid']]['ok'], 'normal'));
 
 		if($filter['extAck']){
-			if(isset($hosts_data[$group['groupid']]['lastUnack']) && $hosts_data[$group['groupid']]['lastUnack']){
+			if($hosts_data[$group['groupid']]['lastUnack']){
 				$table_inf = new CTableInfo();
 				$table_inf->setAttribute('style', 'width: 400px;');
 				$table_inf->setHeader(array(
