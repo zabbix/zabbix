@@ -47,6 +47,10 @@
 
 /* END OF USERS DEFINES */
 
+	define('EXTACK_OPTION_ALL', 0);
+	define('EXTACK_OPTION_UNACK', 1);
+	define('EXTACK_OPTION_BOTH', 2);
+
 	define('TRIGGERS_OPTION_ONLYTRUE', 1);
 	define('TRIGGERS_OPTION_ALL', 2);
 

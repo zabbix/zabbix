@@ -45,7 +45,7 @@
 					$str[$key] = $b;
 				}
 		}
-		else if(is_string($str)) {
+		else{
 			$b = new CTag('strong','yes','');
 			$b->addItem($str);
 			$str = $b;
