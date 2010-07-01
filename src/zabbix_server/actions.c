@@ -17,7 +17,6 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -34,9 +33,6 @@
 
 #include <sys/socket.h>
 #include <errno.h>
-
-/* Functions: pow(), round() */
-#include <math.h>
 
 #include "common.h"
 #include "db.h"
@@ -567,7 +563,7 @@ static int	check_discovery_condition(DB_EVENT *event, DB_CONDITION *condition)
 					condition->conditionid);
 		}
 	}
-	else if(condition->conditiontype == CONDITION_TYPE_PROXY)
+	else if (condition->conditiontype == CONDITION_TYPE_PROXY)
 	{
 		ZBX_STR2UINT64(condition_value, condition->value);
 
@@ -698,7 +694,7 @@ static int	check_discovery_condition(DB_EVENT *event, DB_CONDITION *condition)
 		}
 		DBfree_result(result);
 	}
-	else if(condition->conditiontype == CONDITION_TYPE_DSERVICE_TYPE)
+	else if (condition->conditiontype == CONDITION_TYPE_DSERVICE_TYPE)
 	{
 		if (EVENT_OBJECT_DSERVICE == event->object)
 		{
@@ -1005,98 +1001,80 @@ int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
  ******************************************************************************/
 static int	check_action_conditions(DB_EVENT *event, DB_ACTION *action)
 {
-	DB_RESULT result;
-	DB_ROW row;
+	const char	*__function_name = "check_action_conditions";
 
+	DB_RESULT	result;
+	DB_ROW		row;
 	DB_CONDITION	condition;
 
-	/* SUCCEED required for ACTION_EVAL_TYPE_AND_OR */
-	int	ret = SUCCEED;
-	int	old_type = -1;
-	int	cond;
-	int	num = 0;
-	int	exit = 0;
+	int	ret = SUCCEED; /* SUCCEED required for ACTION_EVAL_TYPE_AND_OR */
+	int	cond, old_type = -1, exit = 0;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In check_action_conditions (actionid:" ZBX_FS_UI64 ")",
-		action->actionid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): actionid [" ZBX_FS_UI64 "]", __function_name, action->actionid);
 
-	result = DBselect("select conditionid,actionid,conditiontype,operator,value from conditions where actionid=" ZBX_FS_UI64 " order by conditiontype",
-		action->actionid);
+	result = DBselect("select conditionid,conditiontype,operator,value"
+				" from conditions"
+				" where actionid=" ZBX_FS_UI64
+				" order by conditiontype",
+			action->actionid);
 
-	while((row=DBfetch(result)) && (0 == exit))
+	while (NULL != (row = DBfetch(result)) && 0 == exit)
 	{
-		num++;
-
 		ZBX_STR2UINT64(condition.conditionid, row[0]);
-		ZBX_STR2UINT64(condition.actionid, row[1]);
-		condition.conditiontype=atoi(row[2]);
-		condition.operator=atoi(row[3]);
-		condition.value=row[4];
+		condition.actionid = action->actionid;
+		condition.conditiontype = atoi(row[1]);
+		condition.operator = atoi(row[2]);
+		condition.value = row[3];
 
-		switch (action->evaltype) {
+		switch (action->evaltype)
+		{
 			case ACTION_EVAL_TYPE_AND_OR:
-				/* OR conditions */
-				if(old_type == condition.conditiontype)
+				if (old_type == condition.conditiontype)	/* OR conditions */
 				{
-					if(check_action_condition(event, &condition) == SUCCEED)
+					if (SUCCEED == check_action_condition(event, &condition))
 						ret = SUCCEED;
 				}
-				/* AND conditions */
-				else
+				else						/* AND conditions */
 				{
 					/* Break if PREVIOUS AND condition is FALSE */
-					if(ret == FAIL)
-					{
+					if (ret == FAIL)
 						exit = 1;
-					}
-					else if(check_action_condition(event, &condition) == FAIL)
-					{
+					else if (FAIL == check_action_condition(event, &condition))
 						ret = FAIL;
-					}
 				}
-
 				old_type = condition.conditiontype;
 				break;
 			case ACTION_EVAL_TYPE_AND:
 				cond = check_action_condition(event, &condition);
 				/* Break if any of AND conditions is FALSE */
-				if(cond == FAIL)
+				if (cond == FAIL)
 				{
-					ret = FAIL; exit = 1;
+					ret = FAIL;
+					exit = 1;
 				}
 				else
-				{
 					ret = SUCCEED;
-				}
 				break;
 			case ACTION_EVAL_TYPE_OR:
 				cond = check_action_condition(event, &condition);
 				/* Break if any of OR conditions is TRUE */
-				if(cond == SUCCEED)
+				if (cond == SUCCEED)
 				{
-					ret = SUCCEED; exit = 1;
+					ret = SUCCEED;
+					exit = 1;
 				}
 				else
-				{
 					ret = FAIL;
-				}
 				break;
 			default:
-				zabbix_log( LOG_LEVEL_DEBUG, "End check_action_conditions (result:%s)",
-					(FAIL==ret)?"FALSE":"TRUE");
 				ret = FAIL;
+				exit = 1;
 				break;
-
 		}
-
 	}
 	DBfree_result(result);
 
-	/* If no conditions defined, return SUCCEED*/
-	if(num == 0)	ret = SUCCEED;
-
-	zabbix_log( LOG_LEVEL_DEBUG, "End check_action_conditions (result:%s)",
-		(FAIL==ret)?"FALSE":"TRUE");
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
