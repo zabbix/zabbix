@@ -27,7 +27,7 @@ require_once('include/discovery.inc.php');
 require_once('include/html.inc.php');
 require_once('include/blocks.inc.php');
 
-$page['title'] = "S_DASHBOARD";
+$page['title'] = 'S_DASHBOARD';
 $page['file'] = 'dashboard.php';
 $page['hist_arg'] = array();
 $page['scripts'] = array('class.pmaster.js');
@@ -64,6 +64,7 @@ include_once('include/page_header.php');
 	$dashconf['groupids'] = null;
 	$dashconf['maintenance'] = null;
 	$dashconf['severity'] = null;
+	$dashconf['extAck'] = 0;
 
 	$dashconf['filterEnable'] = CProfile::get('web.dashconf.filter.enable', 0);
 	if($dashconf['filterEnable'] == 1){
@@ -86,6 +87,9 @@ include_once('include/page_header.php');
 		$severity = CProfile::get('web.dashconf.triggers.severity', null);
 		$dashconf['severity'] = zbx_empty($severity)?null:explode(';', $severity);
 		$dashconf['severity'] = zbx_toHash($dashconf['severity']);
+
+		$config = select_config();
+		$dashconf['extAck'] = $config['event_ack_enable'] ? CProfile::get('web.dashconf.events.extAck', 0) : 0;
 	}
 
 // ------
@@ -102,7 +106,7 @@ include_once('include/page_header.php');
 			else if('refresh' == $_REQUEST['action']){
 				switch($_REQUEST['favref']){
 					case 'hat_syssum':
-						$syssum = make_system_summary($dashconf);
+						$syssum = make_system_status($dashconf);
 						$syssum->show();
 						break;
 					case 'hat_hoststat':
@@ -156,7 +160,7 @@ include_once('include/page_header.php');
 
 				foreach($_REQUEST['favid'] as  $num => $sourceid){
 					$result = add2favorites('web.favorite.graphids',$sourceid,$_REQUEST['favobj']);
-				}	
+				}
 			}
 			else if('remove' == $_REQUEST['action']){
 				$result = rm4favorites('web.favorite.graphids',$_REQUEST['favid'],$_REQUEST['favobj']);

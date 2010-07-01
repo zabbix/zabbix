@@ -670,7 +670,10 @@ Copt::memoryPick();
 				$correct_triggerids[$trigger['objectid']] = $trigger['objectid'];
 			}
 			foreach($result as $triggerid => $trigger){
-				if(!isset($correct_triggerids[$triggerid])) unset($result[$triggerid]);
+				if(!isset($correct_triggerids[$triggerid])){
+					unset($result[$triggerid]);
+					unset($triggerids[$triggerid]);					
+				}
 
 			}
 		}

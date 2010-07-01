@@ -220,9 +220,7 @@ return $table;
 }
 
 // Author: Aly
-function make_system_summary($filter){
-	global $USER_DETAILS;
-
+function make_system_status($filter){
 	$config = select_config();
 
 	$table = new CTableInfo();
@@ -245,11 +243,10 @@ function make_system_summary($filter){
 		'output' => API_OUTPUT_EXTEND,
 	);
 	$groups = CHostGroup::get($options);
-
 	$groups = zbx_toHash($groups, 'groupid');
-
 	order_result($groups, 'name');
 	$groupids = array();
+
 	foreach($groups as $gnum => $group){
 		$groupids[] = $group['groupid'];
 		$group['tab_priority'] = array();
@@ -271,12 +268,14 @@ function make_system_summary($filter){
 		'maintenance' => $filter['maintenance'],
 		'expand_data' => 1,
 		'skipDependent' => 1,
+		'expandDescription' => 1,
 		'filter' => array(
 			'priority' => $filter['severity'],
 			'value' => TRIGGER_VALUE_TRUE
 		),
 		'output' => API_OUTPUT_EXTEND,
 	);
+	if($filter['extAck'] == EXTACK_OPTION_UNACK) $options['withLastEventUnacknowledged'] = 1;
 
 	$triggers = CTrigger::get($options);
 	order_result($triggers, 'lastchange', ZBX_SORT_DOWN);
@@ -296,6 +295,7 @@ function make_system_summary($filter){
 	}
 // }}} SELECT TRIGGERS
 
+
 	foreach($groups as $gnum => $group){
 		$group_row = new CRow();
 		if(is_show_all_nodes())
@@ -306,10 +306,8 @@ function make_system_summary($filter){
 
 		foreach($group['tab_priority'] as $severity => $data){
 			if(!is_null($filter['severity']) && !isset($filter['severity'][$severity])) continue;
-			
-			$trigger_count = $data['count'];
 
-			if($trigger_count){
+			if($data['count']){
 				$table_inf = new CTableInfo();
 				$table_inf->setAttribute('style', 'width: 400px;');
 				$table_inf->setHeader(array(
@@ -321,6 +319,20 @@ function make_system_summary($filter){
 					S_ACTIONS
 				));
 
+				if($filter['extAck'] == EXTACK_OPTION_BOTH){
+					$table_inf_unack = new CTableInfo();
+					$table_inf_unack->setAttribute('style', 'width: 400px;');
+					$table_inf_unack->setHeader(array(
+						is_show_all_nodes() ? S_NODE : null,
+						S_HOST,
+						S_ISSUE,
+						S_AGE,
+						($config['event_ack_enable']) ? S_ACK : NULL,
+						S_ACTIONS
+					));
+				}
+
+				$trig_unack = 0;
 				foreach($data['triggers'] as $tnum => $trigger){
 					$trigger_hosts = $trigger['host'];
 
@@ -335,21 +347,24 @@ function make_system_summary($filter){
 						'sortfield' => 'eventid',
 						'sortorder' => ZBX_SORT_DOWN
 					);
-
-					$event = array();
 					$event = CEvent::get($options);
 					$event = reset($event);
 
-					$actions = S_NO_DATA_SMALL;
-					$ack = '-';
-//*
+					if($event['acknowledged'] == 0){
+						$trig_unack++;
+					}
+
+
 					if(!empty($event)){
 						if($config['event_ack_enable']){
-							$ack = ($event['acknowledged'] == 1) ? new CLink(S_YES, 'acknow.php?eventid='.$event['eventid'], 'off')
-								: new CLink(S_NO, 'acknow.php?eventid='.$event['eventid'], 'on');
+							if($event['acknowledged'] == 1){
+								$ack = new CLink(S_YES, 'acknow.php?eventid='.$event['eventid'], 'off');
+							}
+							else{
+								$ack = new CLink(S_NO, 'acknow.php?eventid='.$event['eventid'], 'on');
+							}
 						}
 
-						// $description = expand_trigger_description_by_data(zbx_array_merge($trigger, array('clock' => $event['clock'])), ZBX_FLAG_EVENT);
 						$actions = get_event_actions_status($event['eventid']);
 					}
 					else{
@@ -357,26 +372,57 @@ function make_system_summary($filter){
 						$actions = S_NO_DATA_SMALL;
 						$event['clock'] = $trigger['lastchange'];
 					}
-//*/
-//					$description = expandTriggerDescription($trigger, ZBX_FLAG_EVENT);
-					$description = expand_trigger_description_by_data($trigger);
 
 					$table_inf->addRow(array(
 						get_node_name_by_elid($trigger['triggerid']),
 						$trigger_hosts,
-						new CCol($description, get_severity_style($trigger['priority'])),
+						new CCol($trigger['description'], get_severity_style($trigger['priority'])),
 						zbx_date2age($event['clock']),
-//						zbx_date2age($trigger['lastchange']),
 						($config['event_ack_enable']) ? (new CCol($ack, 'center')) : NULL,
 						$actions
 					));
+
+					if(($event['acknowledged'] == 0) && ($filter['extAck'] == EXTACK_OPTION_BOTH)){
+						$table_inf_unack->addRow(array(
+							get_node_name_by_elid($trigger['triggerid']),
+							$trigger_hosts,
+							new CCol($trigger['description'], get_severity_style($trigger['priority'])),
+							zbx_date2age($event['clock']),
+							($config['event_ack_enable']) ? (new CCol($ack, 'center')) : NULL,
+							$actions
+						));
+					}
 				}
 
-				$trigger_count = new CSpan($trigger_count, 'pointer');
-				$trigger_count->setHint($table_inf);
+				switch($filter['extAck']){
+					case EXTACK_OPTION_ALL:
+				        $trigger_count = new CSpan($data['count'], 'pointer');
+						$trigger_count->setHint($table_inf);
+				        break;
+					case EXTACK_OPTION_UNACK:
+						$trigger_count = new CSpan($data['count'], 'pointer red bold');
+						$trigger_count->setHint($table_inf);
+				        break;
+					case EXTACK_OPTION_BOTH:
+						$trigger_count = new CSpan($data['count'], 'pointer');
+						$trigger_count->setHint($table_inf);
+
+						if($trig_unack){
+							$unack_count = new CSpan($trig_unack, 'bold red pointer');
+							$unack_count->setHint($table_inf_unack);
+							$trigger_count = new CSpan(array($unack_count, SPACE.S_OF.SPACE, $trigger_count));
+						}
+						else{
+							$trigger_count = new CSpan($trigger_count);
+						}
+				        break;
+				}
+			}
+			else{
+				$trigger_count = 0;
 			}
 
-			$group_row->addItem(new CCol($trigger_count, get_severity_style($severity, $trigger_count)));
+			$group_row->addItem(new CCol($trigger_count, get_severity_style($severity, $data['count'])));
 			unset($table_inf);
 		}
 		$table->addRow($group_row);
@@ -388,8 +434,6 @@ return $table;
 }
 
 function make_hoststat_summary($filter){
-	global $USER_DETAILS;
-
 	$table = new CTableInfo();
 	$table->setHeader(array(
 		is_show_all_nodes() ? S_NODE : null,
@@ -406,10 +450,8 @@ function make_hoststat_summary($filter){
 		'monitored_hosts' => 1,
 		'output' => API_OUTPUT_EXTEND
 	);
-
 	$groups = CHostGroup::get($options);
 	$groups = zbx_toHash($groups, 'groupid');
-
 	order_result($groups, 'name');
 // }}} SELECT HOST GROUPS
 
@@ -419,9 +461,8 @@ function make_hoststat_summary($filter){
 		'groupids' => zbx_objectValues($groups, 'groupid'),
 		'monitored_hosts' => 1,
 		'filter' => array('maintenance_status' => $filter['maintenance']),
-		'output' => API_OUTPUT_EXTEND
+		'output' => array('hostid', 'host')
 	);
-
 	$hosts = CHost::get($options);
 	$hosts = zbx_toHash($hosts, 'hostid');
 // }}} SELECT HOSTS
@@ -438,18 +479,84 @@ function make_hoststat_summary($filter){
 		),
 		'output' => API_OUTPUT_EXTEND,
 	);
-
 	$triggers = CTrigger::get($options);
+
+	if($filter['extAck']){
+		$options = array(
+			'nodeids' => get_current_nodeid(),
+			'monitored' => 1,
+			'maintenance' => $filter['maintenance'],
+			'withLastEventUnacknowledged' => 1,
+			'select_hosts' => API_OUTPUT_REFER,
+			'filter' => array(
+				'priority' => $filter['severity'],
+				'value' => TRIGGER_VALUE_TRUE
+			),
+			'output' => API_OUTPUT_REFER,
+		);
+		$triggers_unack = CTrigger::get($options);
+		$triggers_unack = zbx_toHash($triggers_unack, 'triggerid');
+
+		foreach($triggers_unack as $tunack){
+			foreach($tunack['hosts'] as $unack_host){
+				$hosts_with_unack_triggers[$unack_host['hostid']] = $unack_host['hostid'];
+			}
+		}
+	}
 // }}} SELECT TRIGGERS
 
 	$hosts_data = array();
 	$problematic_host_list = array();
+	$lastUnack_host_list = array();
 	$highest_severity = array();
+	$highest_severity2 = array();
 
 	foreach($triggers as $tnum => $trigger){
 		foreach($trigger['hosts'] as $thnum => $trigger_host){
 			if(!isset($hosts[$trigger_host['hostid']])) continue;
 			else $host = $hosts[$trigger_host['hostid']];
+
+			if($filter['extAck'] && isset($hosts_with_unack_triggers[$host['hostid']])){
+				if(!isset($lastUnack_host_list[$host['hostid']])){
+					$lastUnack_host_list[$host['hostid']] = array();
+					$lastUnack_host_list[$host['hostid']]['host'] = $host['host'];
+					$lastUnack_host_list[$host['hostid']]['hostid'] = $host['hostid'];
+					$lastUnack_host_list[$host['hostid']]['severities'] = array();
+					$lastUnack_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_DISASTER] = 0;
+					$lastUnack_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_HIGH] = 0;
+					$lastUnack_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_AVERAGE] = 0;
+					$lastUnack_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_WARNING] = 0;
+					$lastUnack_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_INFORMATION] = 0;
+					$lastUnack_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_NOT_CLASSIFIED] = 0;
+				}
+				if(isset($triggers_unack[$trigger['triggerid']])){
+					$lastUnack_host_list[$host['hostid']]['severities'][$trigger['priority']]++;
+				}
+
+				foreach($host['groups'] as $gnum => $group){
+					if(!isset($highest_severity2[$group['groupid']]))
+						$highest_severity2[$group['groupid']] = 0;
+
+					if($trigger['priority'] > $highest_severity2[$group['groupid']]){
+						$highest_severity2[$group['groupid']] = $trigger['priority'];
+					}
+
+					if(!isset($hosts_data[$group['groupid']])){
+						$hosts_data[$group['groupid']] = array(
+							'problematic' => 0,
+							'ok' => 0,
+							'lastUnack' => 0,
+							'hostids_all' => array(),
+							'hostids_unack' => array(),
+						);
+					}
+
+					if(!isset($hosts_data[$group['groupid']]['hostids_unack'][$host['hostid']])){
+						$hosts_data[$group['groupid']]['hostids_unack'][$host['hostid']] = $host['hostid'];
+						$hosts_data[$group['groupid']]['lastUnack']++;
+					}
+				}
+			}
 
 			if(!isset($problematic_host_list[$host['hostid']])){
 				$problematic_host_list[$host['hostid']] = array();
@@ -463,22 +570,28 @@ function make_hoststat_summary($filter){
 				$problematic_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_INFORMATION] = 0;
 				$problematic_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_NOT_CLASSIFIED] = 0;
 			}
-
 			$problematic_host_list[$host['hostid']]['severities'][$trigger['priority']]++;
 
 			foreach($host['groups'] as $gnum => $group){
 				if(!isset($highest_severity[$group['groupid']]))
 					$highest_severity[$group['groupid']] = 0;
-				
+
 				if($trigger['priority'] > $highest_severity[$group['groupid']]){
 					$highest_severity[$group['groupid']] = $trigger['priority'];
 				}
 
-				if(!isset($hosts_data[$group['groupid']]))
-					$hosts_data[$group['groupid']] = array('problematic' => 0, 'ok' => 0, 'hostids' => array());
+				if(!isset($hosts_data[$group['groupid']])){
+					$hosts_data[$group['groupid']] = array(
+						'problematic' => 0,
+						'ok' => 0,
+						'lastUnack' => 0,
+						'hostids_all' => array(),
+						'hostids_unack' => array(),
+					);
+				}
 
-				if(!isset($hosts_data[$group['groupid']]['hostids'][$host['hostid']])){
-					$hosts_data[$group['groupid']]['hostids'][$host['hostid']] = $host['hostid'];
+				if(!isset($hosts_data[$group['groupid']]['hostids_all'][$host['hostid']])){
+					$hosts_data[$group['groupid']]['hostids_all'][$host['hostid']] = $host['hostid'];
 					$hosts_data[$group['groupid']]['problematic']++;
 				}
 			}
@@ -487,7 +600,7 @@ function make_hoststat_summary($filter){
 
 	foreach($hosts as $hnum => $host){
 		foreach($host['groups'] as $gnum => $group){
-			if(!isset($groups[$group['groupid']]['hosts'])) 
+			if(!isset($groups[$group['groupid']]['hosts']))
 				$groups[$group['groupid']]['hosts'] = array();
 
 			$groups[$group['groupid']]['hosts'][$host['hostid']] = array('hostid'=> $host['hostid']);
@@ -496,7 +609,7 @@ function make_hoststat_summary($filter){
 				$highest_severity[$group['groupid']] = 0;
 
 			if(!isset($hosts_data[$group['groupid']]))
-				$hosts_data[$group['groupid']] = array('problematic' => 0,'ok' => 0);
+				$hosts_data[$group['groupid']] = array('problematic' => 0, 'ok' => 0, 'lastUnack' => 0);
 
 			if(!isset($problematic_host_list[$host['hostid']]))
 				$hosts_data[$group['groupid']]['ok']++;
@@ -512,6 +625,52 @@ function make_hoststat_summary($filter){
 
 		$name = new CLink($group['name'], 'tr_status.php?groupid='.$group['groupid'].'&hostid=0&show_triggers='.TRIGGERS_OPTION_ONLYTRUE);
 		$group_row->addItem($name);
+
+		$group_row->addItem(new CCol($hosts_data[$group['groupid']]['ok'], 'normal'));
+
+		if($filter['extAck']){
+			if($hosts_data[$group['groupid']]['lastUnack']){
+				$table_inf = new CTableInfo();
+				$table_inf->setAttribute('style', 'width: 400px;');
+				$table_inf->setHeader(array(
+					S_HOST,
+					is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_DISASTER])?S_DISASTER:null,
+					is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_HIGH])?S_HIGH:null,
+					is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_AVERAGE])?S_AVERAGE:null,
+					is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_WARNING])?S_WARNING:null,
+					is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_INFORMATION])?S_INFORMATION:null,
+					is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_NOT_CLASSIFIED])?S_NOT_CLASSIFIED:null
+				));
+
+				$popup_rows = 0;
+
+				foreach($group['hosts'] as $hnum => $host){
+					$hostid = $host['hostid'];
+					if(!isset($lastUnack_host_list[$hostid])) continue;
+
+					if($popup_rows >= ZBX_WIDGET_ROWS) break;
+					$popup_rows++;
+
+					$host_data = $lastUnack_host_list[$hostid];
+
+					$r = new CRow();
+					$r->addItem(new CLink($host_data['host'], 'tr_status.php?groupid='.$group['groupid'].'&hostid='.$hostid.'&show_triggers='.TRIGGERS_OPTION_ONLYTRUE));
+
+					foreach($lastUnack_host_list[$host['hostid']]['severities'] as $severity => $trigger_count){
+						if(!is_null($filter['severity'])&&!isset($filter['severity'][$severity])) continue;
+
+						$r->addItem(new CCol($trigger_count, get_severity_style($severity, $trigger_count)));
+					}
+					$table_inf->addRow($r);
+				}
+
+				$lastUnack_count = new CSpan($hosts_data[$group['groupid']]['lastUnack'], 'pointer red bold');
+				$lastUnack_count->setHint($table_inf);
+			}
+			else{
+				$lastUnack_count = 0;
+			}
+		}
 
 // if hostgroup contains problematic hosts, hint should be built
 		if($hosts_data[$group['groupid']]['problematic']){
@@ -546,7 +705,6 @@ function make_hoststat_summary($filter){
 
 					$r->addItem(new CCol($trigger_count, get_severity_style($severity, $trigger_count)));
 				}
-
 				$table_inf->addRow($r);
 			}
 
@@ -557,28 +715,38 @@ function make_hoststat_summary($filter){
 			$problematic_count = 0;
 		}
 
-
-
-		$group_row->addItem(
-				new CCol(
-					$hosts_data[$group['groupid']]['ok'],
-					get_severity_style($highest_severity[$group['groupid']], 0)
-				)
-			);
-		$group_row->addItem(
-				new CCol(
+		switch($filter['extAck']){
+			case EXTACK_OPTION_ALL:
+		        $group_row->addItem(new CCol(
 					$problematic_count,
-					get_severity_style($highest_severity[$group['groupid']], $hosts_data[$group['groupid']]['problematic'])
-				)
-			);
-		$group_row->addItem($hosts_data[$group['groupid']]['problematic'] + $hosts_data[$group['groupid']]['ok']);
+					get_severity_style($highest_severity[$group['groupid']], $hosts_data[$group['groupid']]['problematic']))
+				);
+		        $group_row->addItem($hosts_data[$group['groupid']]['problematic'] + $hosts_data[$group['groupid']]['ok']);
+		        break;
+			case EXTACK_OPTION_UNACK:
+				$group_row->addItem(new CCol(
+					$lastUnack_count,
+					get_severity_style((isset($highest_severity2[$group['groupid']]) ? $highest_severity2[$group['groupid']] : 0),
+						$hosts_data[$group['groupid']]['lastUnack']))
+				);
+				$group_row->addItem($hosts_data[$group['groupid']]['lastUnack'] + $hosts_data[$group['groupid']]['ok']);
+				break;
+			case EXTACK_OPTION_BOTH:
+				$unackspan = $lastUnack_count ? new CSpan(array($lastUnack_count, SPACE.S_OF.SPACE)) : null;
+				$group_row->addItem(new CCol(array(
+					$unackspan, $problematic_count),
+					get_severity_style($highest_severity[$group['groupid']], $hosts_data[$group['groupid']]['problematic']))
+				);
+				$group_row->addItem($hosts_data[$group['groupid']]['problematic'] + $hosts_data[$group['groupid']]['ok']);
+				break;
+		}
 
 		$table->addRow($group_row);
 	}
 
 	$table->setFooter(new CCol(S_UPDATED.': '.zbx_date2str(S_BLOCKS_HOSTSTAT_SUMMARY_TIME_FORMAT)));
 
-return $table;
+	return $table;
 }
 
 // Author: Aly
@@ -714,14 +882,14 @@ function make_latest_issues($filter = array()){
 		($config['event_ack_enable'])? S_ACK : NULL,
 		S_ACTIONS
 	));
-	
+
 	$cachedGroups = Array();
-	
+
 	foreach($triggers as $tnum => $trigger){
 // Check for dependencies
 		$group = reset($trigger['groups']);
 		$host = reset($trigger['hosts']);
-		
+
 		$trigger['hostid'] = $host['hostid'];
 		$trigger['host'] = $host['host'];
 
@@ -829,7 +997,7 @@ function make_latest_issues($filter = array()){
 		}
 		unset($trigger,$description,$actions,$alerts,$hint);
 	}
-	
+
 	$table->setFooter(new CCol(S_UPDATED.': '.zbx_date2str(S_BLOCKS_LATEST_ISSUES_TIME_FORMAT)));
 
 return $table;
@@ -1035,7 +1203,7 @@ function make_graph_submenu(){
 	$items = zbx_toHash($items, 'itemid');
 
 	$graphids = array();
-	
+
 	foreach($fav_graphs as $key => $favorite){
 		$source = $favorite['source'];
 		$sourceid = $favorite['value'];
