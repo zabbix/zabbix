@@ -276,6 +276,7 @@ include_once('include/page_header.php');
 // full_clone
 	else if(isset($_REQUEST['full_clone']) && isset($_REQUEST['templateid'])){
 		$_REQUEST['form'] = 'full_clone';
+		$_REQUEST['hosts'] = array();
 	}
 // save
 	else if(isset($_REQUEST['save'])){
