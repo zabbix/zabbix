@@ -32,7 +32,7 @@
 
 #define TIMER_DELAY 30
 
-static void process_time_functions()
+static void	process_time_functions()
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -107,7 +107,7 @@ static int	get_host_maintenance_nearestindex(zbx_host_maintenance_t *hm, int hm_
 	}
 }
 
-static zbx_host_maintenance_t *get_host_maintenance(zbx_host_maintenance_t **hm, int *hm_alloc, int *hm_count,
+static zbx_host_maintenance_t	*get_host_maintenance(zbx_host_maintenance_t **hm, int *hm_alloc, int *hm_count,
 		zbx_uint64_t hostid, time_t maintenance_from, zbx_uint64_t maintenanceid, int maintenance_type,
 		zbx_uint64_t host_maintenanceid, int host_maintenance_status, int host_maintenance_type,
 		int host_maintenance_from)
@@ -143,12 +143,13 @@ static zbx_host_maintenance_t *get_host_maintenance(zbx_host_maintenance_t **hm,
 static void	process_maintenance_hosts(zbx_host_maintenance_t **hm, int *hm_alloc, int *hm_count,
 		time_t maintenance_from, zbx_uint64_t maintenanceid, int maintenance_type)
 {
+	const char	*__function_name = "process_maintenance_hosts";
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	host_hostid, host_maintenanceid;
 	int		host_maintenance_status, host_maintenance_type, host_maintenance_from;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In process_maintenance_hosts()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	result = DBselect(
 			"select h.hostid,h.maintenanceid,h.maintenance_status,h.maintenance_type,h.maintenance_from "
@@ -196,6 +197,8 @@ static void	process_maintenance_hosts(zbx_host_maintenance_t **hm, int *hm_alloc
 				host_maintenance_from);
 	}
 	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -626,14 +629,14 @@ static void	process_maintenance()
  * Comments: does update once per 30 seconds (hardcoded)                      *
  *                                                                            *
  ******************************************************************************/
-void main_timer_loop()
+void	main_timer_loop()
 {
-	int	now, nextcheck, sleeptime,
-		maintenance = 1;
+	int	now, nextcheck, sleeptime, maintenance = 1;
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	for (;;) {
+	for (;;)
+	{
 		process_time_functions();
 		if (1 == maintenance)
 			process_maintenance();

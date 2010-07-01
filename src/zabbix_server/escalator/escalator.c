@@ -193,7 +193,8 @@ static void	add_user_msg(int source, zbx_uint64_t userid, zbx_uint64_t mediatype
 		return;
 
 	p = *user_msg;
-	while (NULL != p) {
+	while (NULL != p)
+	{
 		if (p->userid == userid && 0 == strcmp(p->subject, subject)
 				&& 0 == strcmp(p->message, message))
 			break;
@@ -201,7 +202,8 @@ static void	add_user_msg(int source, zbx_uint64_t userid, zbx_uint64_t mediatype
 		p = p->next;
 	}
 
-	if (NULL == p) {
+	if (NULL == p)
+	{
 		p = zbx_malloc(p, sizeof(ZBX_USER_MSG));
 
 		p->userid = userid;
@@ -229,7 +231,8 @@ static void	add_object_msg(int source, zbx_uint64_t triggerid, DB_OPERATION *ope
 
 	DBfree_result(result);
 
-	switch (operation->object) {
+	switch (operation->object)
+	{
 		case OPERATION_OBJECT_USER:
 			add_user_msg(source, operation->objectid, mediatypeid, triggerid, user_msg, subject, message);
 			break;
@@ -289,6 +292,7 @@ static void	add_command_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACTION *action,
 		zbx_uint64_t userid, zbx_uint64_t mediatypeid, char *subject, char *message)
 {
+	const char	*__function_name = "add_message_alert";
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	alertid;
@@ -296,8 +300,7 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 	char		*sendto_esc, *subject_esc, *message_esc, *error_esc;
 	char		error[MAX_STRING_LEN];
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In add_message_alert()");
-/*	zabbix_log(LOG_LEVEL_DEBUG,"MESSAGE\n\tuserid : " ZBX_FS_UI64 "\n\tsubject: %s\n\tmessage: %s", userid, subject, message);*/
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	now		= time(NULL);
 	subject_esc	= DBdyn_escape_string_len(subject, ALERT_SUBJECT_LEN);
@@ -319,24 +322,27 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 				mediatypeid);
 	}
 
-	while (NULL != (row = DBfetch(result))) {
+	while (NULL != (row = DBfetch(result)))
+	{
 		medias		= 1;
 
 		ZBX_STR2UINT64(mediatypeid, row[0]);
 		severity	= atoi(row[2]);
 
-		zabbix_log( LOG_LEVEL_DEBUG, "Trigger severity [%d] Media severity [%d] Period [%s]",
+		zabbix_log(LOG_LEVEL_DEBUG, "Trigger severity [%d] Media severity [%d] Period [%s]",
 			event->trigger_priority,
 			severity,
 			row[3]);
 
-		if (((1 << event->trigger_priority) & severity) == 0) {
-			zabbix_log( LOG_LEVEL_DEBUG, "Won't send message (severity)");
+		if (((1 << event->trigger_priority) & severity) == 0)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Won't send message (severity)");
 			continue;
 		}
 
-		if (check_time_period(row[3], (time_t)NULL) == 0) {
-			zabbix_log( LOG_LEVEL_DEBUG, "Won't send message (period)");
+		if (check_time_period(row[3], (time_t)NULL) == 0)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Won't send message (period)");
 			continue;
 		}
 
@@ -365,7 +371,8 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 
 	DBfree_result(result);
 
-	if (0 == medias) {
+	if (0 == medias)
+	{
 		zbx_snprintf(error, sizeof(error), "No media defined for user \"%s\"",
 				zbx_user_string(userid));
 
@@ -394,6 +401,8 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 
 	zbx_free(subject_esc);
 	zbx_free(message_esc);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -414,76 +423,79 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
  ******************************************************************************/
 static int	check_operation_conditions(DB_EVENT *event, DB_OPERATION *operation)
 {
+	const char	*__function_name = "check_operation_conditions";
+
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_CONDITION	condition;
 
-	/* SUCCEED required for ACTION_EVAL_TYPE_AND_OR */
-	int	ret = SUCCEED;
-	int	old_type = -1;
-	int	cond;
-	int	num = 0;
-	int	exit = 0;
+	int	ret = SUCCEED; /* SUCCEED required for ACTION_EVAL_TYPE_AND_OR */
+	int	cond, old_type = -1, exit = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In check_operation_conditions (operationid:" ZBX_FS_UI64 ")",
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): operationid [" ZBX_FS_UI64 "]", __function_name, operation->operationid);
+
+	result = DBselect("select conditiontype,operator,value"
+				" from opconditions"
+				" where operationid=" ZBX_FS_UI64
+				" order by conditiontype",
 			operation->operationid);
 
-	result = DBselect("select conditiontype,operator,value from opconditions where operationid=" ZBX_FS_UI64 " order by conditiontype",
-			operation->operationid);
-
-	while (NULL != (row = DBfetch(result)) && (0 == exit)) {
-		num++;
-
+	while (NULL != (row = DBfetch(result)) && 0 == exit)
+	{
 		memset(&condition, 0, sizeof(condition));
 		condition.conditiontype	= atoi(row[0]);
 		condition.operator	= atoi(row[1]);
 		condition.value		= row[2];
 
-		switch (operation->evaltype) {
+		switch (operation->evaltype)
+		{
 			case ACTION_EVAL_TYPE_AND_OR:
-				if (old_type == condition.conditiontype) {	/* OR conditions */
+				if (old_type == condition.conditiontype)	/* OR conditions */
+				{
 					if (SUCCEED == check_action_condition(event, &condition))
 						ret = SUCCEED;
-				} else {					/* AND conditions */
+				}
+				else						/* AND conditions */
+				{
 					/* Break if PREVIOUS AND condition is FALSE */
 					if (ret == FAIL)
-						exit	= 1;
+						exit = 1;
 					else if (FAIL == check_action_condition(event, &condition))
-						ret	= FAIL;
+						ret = FAIL;
 				}
-
 				old_type = condition.conditiontype;
 				break;
 			case ACTION_EVAL_TYPE_AND:
 				cond = check_action_condition(event, &condition);
 				/* Break if any of AND conditions is FALSE */
-				if(cond == FAIL) {
-					ret	= FAIL;
-					exit	= 1;
-				} else
-					ret	= SUCCEED;
+				if (cond == FAIL)
+				{
+					ret = FAIL;
+					exit = 1;
+				}
+				else
+					ret = SUCCEED;
 				break;
 			case ACTION_EVAL_TYPE_OR:
 				cond = check_action_condition(event, &condition);
 				/* Break if any of OR conditions is TRUE */
-				if (cond == SUCCEED) {
-					ret	= SUCCEED;
-					exit	= 1;
-				} else
-					ret	= FAIL;
+				if (cond == SUCCEED)
+				{
+					ret = SUCCEED;
+					exit = 1;
+				}
+				else
+					ret = FAIL;
 				break;
 			default:
-				ret	= FAIL;
-				exit	= 1;
+				ret = FAIL;
+				exit = 1;
 				break;
-
 		}
-
 	}
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End check_operation_conditions():%s",
-			zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
@@ -543,8 +555,9 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 			if (0 == esc_period || esc_period > operation.esc_period)
 				esc_period = operation.esc_period;
 
-			switch (operation.operationtype) {
-				case	OPERATION_TYPE_MESSAGE:
+			switch (operation.operationtype)
+			{
+				case OPERATION_TYPE_MESSAGE:
 					if (0 == operation.default_msg)
 					{
 						shortdata = operation.shortdata;
@@ -558,7 +571,7 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 
 					add_object_msg(event->source, escalation->triggerid, &operation, &user_msg, shortdata, longdata);
 					break;
-				case	OPERATION_TYPE_COMMAND:
+				case OPERATION_TYPE_COMMAND:
 					add_command_alert(escalation, event, action, operation.longdata);
 					break;
 				default:
@@ -1016,7 +1029,7 @@ static void	process_escalations(int now)
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-int main_escalator_loop()
+int	main_escalator_loop()
 {
 	int			now/*, nextcheck, sleeptime*/;
 	double			sec;
