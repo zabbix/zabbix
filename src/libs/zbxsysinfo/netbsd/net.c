@@ -368,7 +368,7 @@ NET_FNCLIST
 		{"bytes",	NET_IF_TOTAL_BYTES},
 		{"packets",	NET_IF_TOTAL_PACKETS},
 		{"errors",	NET_IF_TOTAL_ERRORS},
-		{"dropped",	NET_IF_TOTAL_DROPPED},
+/*		{"dropped",	NET_IF_TOTAL_DROPPED},*/ /* disabled because net.if.out does not support dropped packets */
 		{0,		0}
 	};
 

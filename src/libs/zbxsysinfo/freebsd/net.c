@@ -170,10 +170,6 @@ int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	{
 		SET_UI64_RESULT(result, (zbx_uint64_t)ifmd.ifmd_data.ifi_ierrors + (zbx_uint64_t)ifmd.ifmd_data.ifi_oerrors);
 	}
-	else if (0 == strcmp(mode, "dropped"))
-	{
-		SET_UI64_RESULT(result, ifmd.ifmd_data.ifi_iqdrops);
-	}
 	else
 		return SYSINFO_RET_FAIL;
 
