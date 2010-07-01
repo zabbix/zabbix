@@ -607,7 +607,8 @@
 	'S_ITEM_COUNT' => 'Item count',
 	'S_REQUIRED_PERFORMANCE' => 'Required performance (vps)',
 	'S_PROXY_MODE' => 'Proxy mode',
-	'S_PASSIVE' => 'Passive',
+	'S_PROXY_PASSIVE' => 'Passive',
+	'S_PROXY_ACTIVE' => 'Active',
 
 //  Authentication
 	'S_AUTHENTICATION'=>			'Authentication',
@@ -1142,7 +1143,6 @@
 	'S_SNMPV3_AUTH_PASSPHRASE'=>				'SNMPv3 auth passphrase',
 	'S_SNMPV3_PRIV_PASSPHRASE'=>				'SNMPv3 priv passphrase',
 	'S_CUSTOM_MULTIPLIER'=>					'Custom multiplier',
-	'S_DO_NOT_USE'=>					'Do not use',
 	'S_USE_CUSTOM_MULTIPLIER'=>				'Use custom multiplier',
 	'S_SELECT_HOST_DOT_DOT_DOT'=>				'Select host...',
 	'S_LOG_TIME_FORMAT'=>					'Log time format',

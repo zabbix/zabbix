@@ -2425,16 +2425,29 @@
 			$mltpbox = Array();
 			if(isset($limited)){
 				$frmItem->addVar('multiplier', $multiplier);
-				$mltpbox[] = new CTextBox('multiplier_name', $multiplier ? S_CUSTOM_MULTIPLIER : S_DO_NOT_USE, 20, 'yes');
-			} else {
+				
+				$mcb = new CCheckBox('multiplier', $multiplier == 1 ? 'yes':'no');
+				$mcb->setAttribute('disabled', 'disabled');
+				$mltpbox[] = $mcb;
+				if($multiplier){
+					$mltpbox[] = SPACE;
+					$ctb = new CNumericBox('formula', $formula, 5, 1);
+					$mltpbox[] = $ctb;
+				}
+				else{
+					$frmItem->addVar('formula', $formula);
+				}
+			} 
+			else{
 				/*$cmbMultipler = new CComboBox('multiplier',$multiplier,'submit()');
 				$cmbMultipler->addItem(0,S_DO_NOT_USE);
 				$cmbMultipler->addItem(1,S_CUSTOM_MULTIPLIER);*/
 				$mltpbox[] = new CCheckBox('multiplier',$multiplier == 1 ? 'yes':'no', 'var editbx = document.getElementById(\'formula\'); if(editbx) editbx.disabled = !this.checked;', 1);
+				$mltpbox[] = SPACE;
+				$mltpbox[] = new CNumericBox('formula', $formula, 5);
 			}
 
-			$mltpbox[] = SPACE;
-			$mltpbox[] = new CNumericBox('formula',$formula, 5,$limited);
+			
 
 /*			if($multiplier != 1){
 				$frmItem->addRow(S_CUSTOM_MULTIPLIER, new CTextBox('formula',$formula,40,$limited));

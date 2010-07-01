@@ -1206,7 +1206,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 				}
 
 				$tblCond->addRow($cond_el);
-				$tblCond->addRow($cond_buttons);
+				$tblCond->addRow(new CCol($cond_buttons));
 
 				$tblNewOperation->addRow(array(S_CONDITIONS, $tblCond));
 				unset($grouped_opconditions, $cond_el, $cond_buttons, $tblCond);
