@@ -59,7 +59,7 @@
 			'limit' => ($config['search_limit']+1)
 		);
 		if(!is_null($value_trigger)) $options['filter'] = array('value' => $value_trigger);
-		
+
 		if(!empty($elements['hosts_groups'])) $options['groupids'] = array_unique($elements['hosts_groups']);
 		if(!empty($elements['hosts'])) $options['hostids'] = array_unique($elements['hosts']);
 		if(!empty($elements['triggers'])) $options['triggerids'] = array_unique($elements['triggers']);
@@ -330,13 +330,13 @@ function make_small_eventlist($eventid, $trigger_data){
 	$table->setHeader(array(S_TIME, S_STATUS, S_DURATION, S_AGE, S_ACK, S_ACTIONS));
 
 	$options = array(
-		'eventids' => $eventid, 
-		'output' => API_OUTPUT_EXTEND, 
+		'eventids' => $eventid,
+		'output' => API_OUTPUT_EXTEND,
 //		'select_triggers' => API_OUTPUT_EXTEND
 	);
 	$curevent = CEvent::get($options);
 	$curevent = reset($curevent);
-	
+
 	$clock = $curevent['clock'];
 
 	$options = array(
@@ -354,7 +354,7 @@ function make_small_eventlist($eventid, $trigger_data){
 		$trigger = reset($event['triggers']);
 
 		$event['type'] = $trigger['type'];
-		
+
 		$lclock = $clock;
 		$clock = $event['clock'];
 		$duration = zbx_date2age($lclock, $clock);
@@ -466,7 +466,7 @@ function get_history_of_triggers_events($start,$num, $groupid=0, $hostid=0){
 	$sql_from = $sql_cond = '';
 
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST);
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array(), PERM_RES_DATA_ARRAY, get_current_nodeid());
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array());
 
 	if($hostid > 0){
 		$sql_cond = ' AND h.hostid='.$hostid;

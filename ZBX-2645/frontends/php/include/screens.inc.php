@@ -71,7 +71,11 @@ require_once('include/js.inc.php');
 						unset($itemid);
 						break;
 					case SCREEN_RESOURCE_MAP:
-						$result &= sysmap_accessible($ac_data['resourceid'], PERM_READ_ONLY);
+						$sm = CMap::get(array(
+							'sysmapids' => $ac_data['resourceid'],
+							'output' => API_OUTPUT_SHORTEN,
+						));
+						$result &= !empty($sm);
 						break;
 					case SCREEN_RESOURCE_SCREEN:
 						$result &= screen_accessible($ac_data['resourceid'], PERM_READ_ONLY);
@@ -545,7 +549,11 @@ require_once('include/js.inc.php');
 							' WHERE s.sysmapid='.$resourceid);
 
 				while($row=DBfetch($result)){
-					if(!sysmap_accessible($row['sysmapid'],PERM_READ_ONLY)) continue;
+					$sm = CMap::get(array(
+						'sysmapids' => $row['sysmapid'],
+						'output' => API_OUTPUT_SHORTEN,
+					));
+					if(empty($sm)) continue;
 
 					$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
 					$caption = $row['node_name'].$row['name'];
@@ -1087,8 +1095,8 @@ require_once('include/js.inc.php');
 					}
 
 					if($editmode || !$default) $item = new CDiv();
-					else $item = new CLink(null, $action); 
-					
+					else $item = new CLink(null, $action);
+
 					$item->setAttribute('id', $containerid);
 
 					$item = array($item);
