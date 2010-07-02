@@ -1430,7 +1430,7 @@
 					zbx_subarray_push($fTypeVisibility, $it, $vItem);
 				}
 			}
-			
+
 			if($it == ITEM_TYPE_SNMPV3){
 				foreach(array(
 					'filter_snmpv3_securityname_label', 'filter_snmpv3_securityname',
@@ -1463,14 +1463,14 @@
 		$field231 = new CTextBox('filter_snmp_community', $filter_snmp_community, 40);
 		//$field231->setAttribute('id', 'filter_snmp_community');
 		$field231->setEnabled('no');
-		
+
 		$label232 = new CSpan(array(bold(S_SNMPV3_SECURITY_NAME), SPACE.S_LIKE_SMALL.': '));
 		$label232->setAttribute('id', 'filter_snmpv3_securityname_label');
 
 		$field232 = new CTextBox('filter_snmpv3_securityname', $filter_snmpv3_securityname, 40);
 		//$field232->setAttribute('id', 'filter_snmpv3_securityname');
 		$field232->setEnabled('no');
-		
+
 		$col_table2->addRow(array(array($label231, $label232, SPACE), array($field231, $field232, SPACE)));
 	//fourth row
 		$label241 = new CSpan(array(bold(S_SNMP_OID), SPACE.S_LIKE_SMALL.': '));
@@ -2142,7 +2142,7 @@
 		$frmItem->addRow($row);
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'snmpv3_securityname');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'row_snmpv3_securityname');
-		
+
 		$cmbSecLevel = new CComboBox('snmpv3_securitylevel', $snmpv3_securitylevel);
 		$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,'noAuthPriv');
 		$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,'authNoPriv');
@@ -2165,7 +2165,7 @@
 		$frmItem->addRow($row);
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'snmpv3_privpassphrase');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'row_snmpv3_privpassphrase');
-		
+
 		$row = new CRow(array(new CCol(S_SNMP_PORT,'form_row_l'), new CCol(new CNumericBox('snmp_port',$snmp_port,5), 'form_row_r')));
 		$row->setAttribute('id', 'row_snmp_port');
 		$frmItem->addRow($row);
@@ -2184,7 +2184,7 @@
 		//$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,'NoAuthPriv');
 		//$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,'AuthNoPriv');
 		//$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV,'AuthPriv');
-		
+
 		//$frmItem->addRow(S_SNMPV3_SECURITY_LEVEL, $cmbSecLevel);
 
 		//$frmItem->addRow(S_SNMPV3_AUTH_PASSPHRASE, new CTextBox('snmpv3_authpassphrase',$snmpv3_authpassphrase,64));
@@ -2207,7 +2207,7 @@
 		$frmItem->addRow($row);
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_IPMI, 'ipmi_sensor');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_IPMI, 'row_ipmi_sensor');
-		
+
 		//if ($type == ITEM_TYPE_IPMI)
 			//$frmItem->addRow(S_IPMI_SENSOR, new CTextBox('ipmi_sensor', $ipmi_sensor, 64, $limited));
 		//else
@@ -2247,13 +2247,13 @@
 		$cmbAuthType = new CComboBox('authtype', $authtype);
 		$cmbAuthType->addItem(ITEM_AUTHTYPE_PASSWORD,S_PASSWORD);
 		$cmbAuthType->addItem(ITEM_AUTHTYPE_PUBLICKEY,S_PUBLIC_KEY);
-		
+
 		$row = new CRow(array(new CCol(S_AUTHENTICATION_METHOD,'form_row_l'), new CCol($cmbAuthType,'form_row_r')));
 		$row->setAttribute('id', 'row_authtype');
 		$frmItem->addRow($row);
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'authtype');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'row_authtype');
-		
+
 		$row = new CRow(array(new CCol(S_USER_NAME,'form_row_l'), new CCol(new CTextBox('username',$username,16),'form_row_r')));
 		$row->setAttribute('id', 'row_username');
 		$frmItem->addRow($row);
@@ -2261,7 +2261,7 @@
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'row_username');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'username');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'row_username');
-		
+
 		$row = new CRow(array(new CCol(S_PUBLIC_KEY_FILE,'form_row_l'), new CCol(new CTextBox('publickey',$publickey,16),'form_row_r')));
 		$row->setAttribute('id', 'row_publickey');
 		$frmItem->addRow($row);
@@ -2294,11 +2294,11 @@
 		$spanF = new CSpan(S_FORMULA);
 		$spanF->setAttribute('id', 'label_formula');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_CALCULATED, 'label_formula');
-		
+
 		$params_script = get_request('params_script', '');
 		$params_dbmonitor = get_request('params_dbmonitor', $type != ITEM_TYPE_DB_MONITOR ? "DSN=<database source name>\nuser=<user name>\npassword=<password>\nsql=<query>" : '');
 		$params_calculted = get_request('params_calculted', '');
-		
+
 		// swaping values to save hidden values and synchronize actual values
 		switch($type) {
 			case ITEM_TYPE_SSH:
@@ -2318,7 +2318,7 @@
 				$params_calculted = $tmp_params;
 			break;
 		}
-		
+
 		$row = new CRow(array(new CCol(array($spanEC, $spanP, $spanF),'form_row_l'), new CCol(new CTextArea('params',$params,60,4),'form_row_r')));
 		$row->setAttribute('id', 'row_params');
 		$frmItem->addRow($row);
@@ -2391,7 +2391,7 @@
 		}
 
 		$frmItem->addRow(S_TYPE_OF_INFORMATION,$cmbValType);
-		
+
 		//if ($value_type == ITEM_VALUE_TYPE_UINT64) {
 			if(isset($limited)) {
 				$frmItem->addVar('data_type', $data_type);
@@ -2402,7 +2402,7 @@
 				$cmbDataType->addItem(ITEM_DATA_TYPE_OCTAL,		item_data_type2str(ITEM_DATA_TYPE_OCTAL));
 				$cmbDataType->addItem(ITEM_DATA_TYPE_HEXADECIMAL, 	item_data_type2str(ITEM_DATA_TYPE_HEXADECIMAL));
 			}
-			
+
 			$row = new CRow(array(new CCol(S_DATA_TYPE,'form_row_l'), new CCol($cmbDataType,'form_row_r')));
 			$row->setAttribute('id', 'row_data_type');
 			$frmItem->addRow($row);
@@ -2411,7 +2411,6 @@
 		//} else
 			//$frmItem->addVar('data_type', $data_type);
 
-		if( !is_numeric($formula)) $formula = 1;
 //		if( $value_type == ITEM_VALUE_TYPE_FLOAT || $value_type == ITEM_VALUE_TYPE_UINT64 ){
 			//$frmItem->addRow(S_UNITS, new CTextBox('units',$units,40, $limited));
 			$row = new CRow(array(new CCol(S_UNITS,'form_row_l'), new CCol(new CTextBox('units',$units,40, $limited),'form_row_r')));
@@ -2425,29 +2424,27 @@
 			$mltpbox = Array();
 			if(isset($limited)){
 				$frmItem->addVar('multiplier', $multiplier);
-				
+
 				$mcb = new CCheckBox('multiplier', $multiplier == 1 ? 'yes':'no');
 				$mcb->setAttribute('disabled', 'disabled');
 				$mltpbox[] = $mcb;
 				if($multiplier){
 					$mltpbox[] = SPACE;
-					$ctb = new CNumericBox('formula', $formula, 5, 1);
+					$ctb = new CTextBox('formula', $formula, 10, 1);
+					$ctb->setAttribute('style', 'text-align: right;');
 					$mltpbox[] = $ctb;
 				}
 				else{
 					$frmItem->addVar('formula', $formula);
 				}
-			} 
+			}
 			else{
-				/*$cmbMultipler = new CComboBox('multiplier',$multiplier,'submit()');
-				$cmbMultipler->addItem(0,S_DO_NOT_USE);
-				$cmbMultipler->addItem(1,S_CUSTOM_MULTIPLIER);*/
 				$mltpbox[] = new CCheckBox('multiplier',$multiplier == 1 ? 'yes':'no', 'var editbx = document.getElementById(\'formula\'); if(editbx) editbx.disabled = !this.checked;', 1);
 				$mltpbox[] = SPACE;
-				$mltpbox[] = new CNumericBox('formula', $formula, 5);
+				$ctb = new CTextBox('formula', $formula, 10);
+				$ctb->setAttribute('style', 'text-align: right;');
+				$mltpbox[] = $ctb;
 			}
-
-			
 
 /*			if($multiplier != 1){
 				$frmItem->addRow(S_CUSTOM_MULTIPLIER, new CTextBox('formula',$formula,40,$limited));
@@ -2462,7 +2459,7 @@
 			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'row_multiplier');
 			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'multiplier');
 			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_multiplier');
-			
+
 //			$frmItem->addRow(S_USE_CUSTOM_MULTIPLIER, $mltpbox);
 /*		}else{
 			$frmItem->addVar('units',$units);
@@ -2521,7 +2518,7 @@
 */
 		$frmItem->addRow(S_KEEP_HISTORY_IN_DAYS, array(
 			new CNumericBox('history',$history,8),
-			(!isset($_REQUEST['itemid'])) ? null : 
+			(!isset($_REQUEST['itemid'])) ? null :
 				new CButtonQMessage('del_history',S_CLEAR_HISTORY,S_HISTORY_CLEARING_CAN_TAKE_A_LONG_TIME_CONTINUE_Q)
 			));
 
@@ -2559,7 +2556,7 @@
 			$cmbDelta->addItem(0,S_AS_IS);
 			$cmbDelta->addItem(1,S_DELTA_SPEED_PER_SECOND);
 			$cmbDelta->addItem(2,S_DELTA_SIMPLE_CHANGE);
-			
+
 			$row = new CRow(array(new CCol(S_STORE_VALUE,'form_row_l'), new CCol($cmbDelta,'form_row_r')));
 			$row->setAttribute('id', 'row_delta');
 			$frmItem->addRow($row);
@@ -2592,7 +2589,7 @@
 
 			$link = new CLink(S_SHOW_VALUE_MAPPINGS,'config.php?config=6');
 			$link->setAttribute('target','_blank');
-			
+
 			$row = new CRow(array(new CCol(S_SHOW_VALUE), new CCol(array($cmbMap, SPACE, $link))));
 			$row->setAttribute('id', 'row_valuemap');
 			$frmItem->addRow($row);
@@ -2611,7 +2608,7 @@
 		$frmItem->addRow($row);
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TRAPPER, 'trapper_hosts');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TRAPPER, 'row_trapper_hosts');
-		
+
 /*		if($type==ITEM_TYPE_TRAPPER)
 			$frmItem->addRow(S_ALLOWED_HOSTS, new CTextBox('trapper_hosts',$trapper_hosts,40));
 		else
@@ -2686,13 +2683,13 @@
 		$frmItem->addItemToBottomRow(new CButton('register',S_DO));
 
 		$json = new CJSON();
-		
+
 		zbx_add_post_js("var valueTypeSwitcher = new CViewSwitcher('value_type', new Array('keyup','click','change'), ".$json->encode($valueTypeVisibility).");");
 		zbx_add_post_js("var authTypeSwitcher = new CViewSwitcher('authtype', new Array('keyup','click','change'), ".$json->encode($authTypeVisibility).");");
 		zbx_add_post_js("var typeSwitcher = new CViewSwitcher('type', new Array('keyup','click','change'), ".$json->encode($typeVisibility).(isset($_REQUEST['itemid'])? ', true': '').');');
 		zbx_add_post_js("var multpStat = document.getElementById('multiplier'); if(multpStat && multpStat.onclick) multpStat.onclick();");
 		zbx_add_post_js("var mnFrmTbl = document.getElementById('web.items.item.php'); if(mnFrmTbl) mnFrmTbl.style.visibility = 'visible';");
-		
+
 		return $frmItem;
 	}
 
