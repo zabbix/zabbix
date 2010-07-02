@@ -198,7 +198,7 @@ switch($itemType) {
 		'filter_templated_items'=>array(T_ZBX_INT, O_OPT,  null,  IN('-1,0,1'),null),
 		'filter_with_triggers'=>array(T_ZBX_INT, O_OPT,  null,  IN('-1,0,1'),null),
 		'filter_ipmi_sensor' =>	array(T_ZBX_STR, O_OPT,  null,  null,	null),
-		
+
 // subfilters
 		'subfilter_apps'=>	array(T_ZBX_STR, O_OPT,	 null,	null, null),
 		'subfilter_types'=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
@@ -221,7 +221,7 @@ switch($itemType) {
 
 	$_REQUEST['go'] = get_request('go', 'none');
 
-// PERMISSIONS	
+// PERMISSIONS
 	if(get_request('itemid', false)){
 		$options = array(
 			'itemids' => $_REQUEST['itemid'],
@@ -389,42 +389,43 @@ switch($itemType) {
 		foreach($delay_flex as $num => $val){
 			$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
 		}
-		
+
 		$db_delay_flex = trim($db_delay_flex,';');
 
 		$item = array(
-				'description'	=> get_request('description'),
-				'key_'			=> get_request('key'),
-				'hostid'		=> get_request('form_hostid'),
-				'delay'			=> get_request('delay'),
-				'history'		=> get_request('history'),
-				'status'		=> get_request('status'),
-				'type'			=> get_request('type'),
-				'snmp_community'=> get_request('snmp_community'),
-				'snmp_oid'		=> get_request('snmp_oid'),
-				'value_type'	=> get_request('value_type'),
-				'trapper_hosts'	=> get_request('trapper_hosts'),
-				'snmp_port'		=> get_request('snmp_port'),
-				'units'			=> get_request('units'),
-				'multiplier'	=> get_request('multiplier'),
-				'delta'			=> get_request('delta'),
-				'snmpv3_securityname'	=> get_request('snmpv3_securityname'),
-				'snmpv3_securitylevel'	=> get_request('snmpv3_securitylevel'),
-				'snmpv3_authpassphrase'	=> get_request('snmpv3_authpassphrase'),
-				'snmpv3_privpassphrase'	=> get_request('snmpv3_privpassphrase'),
-				'formula'			=> get_request('formula'),
-				'trends'			=> get_request('trends'),
-				'logtimefmt'		=> get_request('logtimefmt'),
-				'valuemapid'		=> get_request('valuemapid'),
-				'delay_flex'		=> $db_delay_flex,
-				'authtype'		=> get_request('authtype'),
-				'username'		=> get_request('username'),
-				'password'		=> get_request('password'),
-				'publickey'		=> get_request('publickey'),
-				'privatekey'		=> get_request('privatekey'),
-				'params'			=> get_request('params'),
-				'ipmi_sensor'		=> get_request('ipmi_sensor'),
-				'data_type'		=> get_request('data_type'));
+			'description'	=> get_request('description'),
+			'key_'			=> get_request('key'),
+			'hostid'		=> get_request('form_hostid'),
+			'delay'			=> get_request('delay'),
+			'history'		=> get_request('history'),
+			'status'		=> get_request('status'),
+			'type'			=> get_request('type'),
+			'snmp_community'=> get_request('snmp_community'),
+			'snmp_oid'		=> get_request('snmp_oid'),
+			'value_type'	=> get_request('value_type'),
+			'trapper_hosts'	=> get_request('trapper_hosts'),
+			'snmp_port'		=> get_request('snmp_port'),
+			'units'			=> get_request('units'),
+			'multiplier'	=> get_request('multiplier', 0),
+			'delta'			=> get_request('delta'),
+			'snmpv3_securityname'	=> get_request('snmpv3_securityname'),
+			'snmpv3_securitylevel'	=> get_request('snmpv3_securitylevel'),
+			'snmpv3_authpassphrase'	=> get_request('snmpv3_authpassphrase'),
+			'snmpv3_privpassphrase'	=> get_request('snmpv3_privpassphrase'),
+			'formula'			=> get_request('formula'),
+			'trends'			=> get_request('trends'),
+			'logtimefmt'		=> get_request('logtimefmt'),
+			'valuemapid'		=> get_request('valuemapid'),
+			'delay_flex'		=> $db_delay_flex,
+			'authtype'		=> get_request('authtype'),
+			'username'		=> get_request('username'),
+			'password'		=> get_request('password'),
+			'publickey'		=> get_request('publickey'),
+			'privatekey'		=> get_request('privatekey'),
+			'params'			=> get_request('params'),
+			'ipmi_sensor'		=> get_request('ipmi_sensor'),
+			'data_type'		=> get_request('data_type')
+		);
 
 		if(isset($_REQUEST['itemid'])){
 			DBstart();
@@ -799,7 +800,7 @@ switch($itemType) {
 ?>
 <?php
 	$items_wdgt = new CWidget();
-	
+
 	$form = new CForm(null, 'get');
 	$form->setName('hdrform');
 	if(!isset($_REQUEST['form']))
@@ -832,7 +833,7 @@ switch($itemType) {
 
 		$show_host = true;
 
-		
+
 
 // Items Header
 		$numrows = new CDiv();
@@ -881,7 +882,7 @@ switch($itemType) {
 
 		if(isset($_REQUEST['filter_snmp_community']) && !zbx_empty($_REQUEST['filter_snmp_community']))
 			$options['filter']['snmp_community'] = $_REQUEST['filter_snmp_community'];
-		
+
 		if(isset($_REQUEST['filter_snmpv3_securityname']) && !zbx_empty($_REQUEST['filter_snmpv3_securityname']))
 			$options['filter']['snmpv3_securityname'] = $_REQUEST['filter_snmpv3_securityname'];
 
@@ -914,7 +915,7 @@ switch($itemType) {
 
 		if(isset($_REQUEST['filter_with_triggers']) && !zbx_empty($_REQUEST['filter_with_triggers']) && $_REQUEST['filter_with_triggers'] != -1)
 			$options['with_triggers'] = $_REQUEST['filter_with_triggers'];
-			
+
 		if(isset($_REQUEST['filter_ipmi_sensor']) && !zbx_empty($_REQUEST['filter_ipmi_sensor']))
 			$options['filter']['ipmi_sensor'] = $_REQUEST['filter_ipmi_sensor'];
 
