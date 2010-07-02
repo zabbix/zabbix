@@ -2411,7 +2411,6 @@
 		//} else
 			//$frmItem->addVar('data_type', $data_type);
 
-		if( !is_numeric($formula)) $formula = 1;
 //		if( $value_type == ITEM_VALUE_TYPE_FLOAT || $value_type == ITEM_VALUE_TYPE_UINT64 ){
 			//$frmItem->addRow(S_UNITS, new CTextBox('units',$units,40, $limited));
 			$row = new CRow(array(new CCol(S_UNITS,'form_row_l'), new CCol(new CTextBox('units',$units,40, $limited),'form_row_r')));
