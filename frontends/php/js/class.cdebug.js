@@ -22,9 +22,9 @@
 // Author: Aly
 
 var CDebug = Class.create({
-className:	null,			// debuging class name
-debug_status: 0,			// debug status: 0 - off, 1 - on, 2 - SDI;
-debug_info: '',				// debug string
+className:		null,			// debuging class name
+debug_status:	0,				// debug status: 0 - off, 1 - on, 2 - SDI;
+debug_info:		'',				// debug string
 
 // ---------- DEBUG ------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------
@@ -38,7 +38,7 @@ debug: function(str, id){
 
 		if(typeof(id) != 'undefined') str+= ' :'+id;
 
-//		if(this.debug_prev == str) return true;
+		if(this.debug_prev == str) return true;
 
 		this.debug_info += str+'\n';		
 		if(this.debug_status == 2){

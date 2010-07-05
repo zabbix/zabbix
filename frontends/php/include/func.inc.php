@@ -457,7 +457,10 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 // Any other unit
 //-------------------
 
-	if(zbx_empty($units) && ($convert == ITEM_CONVERT_WITH_UNITS)){
+// black list wich do not require units metrics.. 
+	$blackList = array('%','ms','rpm');
+	if((in_array($units, $blackList)) || (zbx_empty($units) && ($convert == ITEM_CONVERT_WITH_UNITS))){
+//	if(zbx_empty($units) && ($convert == ITEM_CONVERT_WITH_UNITS)){
 		if(abs($value) >= 1)
 			$format = '%.2f';
 		else if(abs($value) >= 0.01)
@@ -470,7 +473,8 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 		$value = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U','$1$2$3', $value);
 		$value = rtrim($value, '.');
 
-	return $value;
+		if(zbx_empty($units)) return $value;
+		else return $value.' '.$units;
 	}
 
 	switch($units){
@@ -507,6 +511,8 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 			);
 
 		foreach($digitUnits[$step] as $dunit => $data){
+// skip mili & micro for values without units
+			if(zbx_empty($units) && ($data['pow'] < 0)) continue;
 			$digitUnits[$step][$dunit]['value'] = bcpow($step, $data['pow'], 9);
 		}
 	}
