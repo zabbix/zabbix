@@ -2014,7 +2014,7 @@ initialize: function($super, sbid, timelineid, obj, width, height){
 	if(IE){
 		addListener(obj, 'mousedown', this.mousedown.bindAsEventListener(this));
 		obj.onmousemove = this.mousemove.bindAsEventListener(this);
-//		addListener(obj, 'click', this.ieMouseClick.bindAsEventListener(this));
+		addListener(obj, 'click', function(event){ Event.stop(event); });
 	}
 	else{
 		addListener(this.dom_obj, 'mousedown', this.mousedown.bindAsEventListener(this),false);
@@ -2055,20 +2055,6 @@ onchange: function(){			// bind any func to this
 	
 },
 
-ieMouseClick: function(e){
-	e = e || window.event;
-        if(e.which && (e.which != 1)) return true;
-        else if (e.button && (e.button != 1)) return true;
-
-        this.optimizeEvent(e);
-        deselectAll();
-
-        var posxy = getPosition(this.dom_obj);
-	if((this.mouse_event.top < posxy.top) || (this.mouse_event.top > (this.dom_obj.offsetHeight + posxy.top))) return true;
-
-	Event.stop(e);
-},
-
 mousedown: function(e){
 	this.debug('mousedown',this.sbox_id);
 
@@ -2080,7 +2066,8 @@ mousedown: function(e){
 
 	if(ZBX_SBOX[this.sbox_id].mousedown == false){
 		this.optimizeEvent(e);
-		deselectAll();
+
+		if(!IE) deselectAll();
 
 		if(IE){
 			var posxy = getPosition(this.dom_obj);
@@ -2091,11 +2078,8 @@ mousedown: function(e){
 		this.create_box();
 
 		ZBX_SBOX[this.sbox_id].mousedown = true;
-
 	}
 	
-	Event.stop(e);
-
 return false;
 },
 
