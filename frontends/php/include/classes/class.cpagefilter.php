@@ -35,7 +35,7 @@ class CPageFilter{
 		global $page, $ZBX_WITH_ALL_NODES;
 
 		/* options = array(
-			'config' => {DDFirst: [ allow_all, deny_all, select_latest ], 'individual': [true,false]},
+			'config' => {'DDFirst': [ allow_all, deny_all], select_latest: [true,false], 'individual': [true,false]},
 			'groups' => [apiget filters],
 			'hosts' => [apiget filters],
 			'graphs' => [apiget filters],
@@ -67,7 +67,7 @@ class CPageFilter{
 			$this->config['DDFirst'] = $config['dropdown_first_entry'];
 		}
 
-		
+
 		if(!isset($options['groupid'], $options['hostid'])){
 			if(isset($options['graphid'])){
 				$this->_updateByGraph($options);
@@ -86,7 +86,7 @@ class CPageFilter{
 			if(!isset($options['groupid']) && isset($options['hostid'])){
 				$options['groupid'] = 0;
 			}
-			
+
 			$this->_profileIdx['groups'] = 'web.'.$profileSection.'.groupid';
 			$this->_initGroups($options['groupid'], $options['groups']);
 		}
@@ -129,7 +129,7 @@ class CPageFilter{
 			'output' => array('hostid', 'host'),
 			'select_groups' => API_OUTPUT_REFER,
 		));
-		
+
 		if($host = reset($hosts)) $options['groupid'] = $host['groups'][0]['groupid'];
 	}
 
@@ -277,7 +277,7 @@ class CPageFilter{
 				$items[$id] = get_node_name_by_elid($id, null, ': ') . $item;
 			}
 		}
-		
+
 		natcasesort($items);
 		$items = array(0 => ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_NONE) ? S_NOT_SELECTED_SMALL : S_ALL_SMALL) + $items;
 

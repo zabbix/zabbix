@@ -273,41 +273,40 @@ include_once('include/page_header.php');
 		$frmTitle->addVar('excludeids', $excludeids);
 
 
-// Optional
-
 	if(isset($only_hostid)){
 		$_REQUEST['hostid'] = $only_hostid;
 		$frmTitle->addVar('only_hostid',$only_hostid);
 		unset($_REQUEST['groupid'],$_REQUEST['nodeid']);
 	}
 
-	$validation_param = array('deny_all','select_first_group_if_empty','select_first_host_if_empty','select_host_on_group_switch');
-	if($monitored_hosts) array_push($validation_param, 'monitored_hosts');
-	if($real_hosts) 	array_push($validation_param, 'real_hosts');
-//	if(isset($templated_hosts)) array_push($validation_param, 'templated_hosts');
+	$options = array(
+		'config' => array('select_latest' => true),
+		'groups' => array('nodeids' => get_request('nodeid', get_current_nodeid(false))),
+		'hosts' => array('nodeids' => get_request('nodeid', get_current_nodeid(false))),
+		'groupid' => get_request('groupid', null),
+		'hostid' => get_request('hostid', null),
+	);
+	if($monitored_hosts){
+		$options['groups']['monitored_hosts'] = true;
+		$options['hosts']['monitored_hosts'] = true;
+	}
+	if($real_hosts){
+		$options['groups']['real_hosts'] = true;
+		$options['hosts']['real_hosts'] = true;
+	}
+	if(!is_null($writeonly)){
+		$options['groups']['editable'] = true;
+		$options['hosts']['editable'] = true;
+	}
+	$pageFilter = new CPageFilter($options);
 
 	$nodeid = get_request('nodeid', get_current_nodeid(false));
-
-	$params = array();
-	foreach($validation_param as $option) $params[$option] = 1;
-
-	$perm = !is_null($writeonly)?PERM_READ_WRITE:PERM_READ_ONLY;
-	$PAGE_GROUPS = get_viewed_groups($perm, $params, $nodeid);
-	$PAGE_HOSTS = get_viewed_hosts($perm, $PAGE_GROUPS['selected'], $params, $nodeid);
-
-	if(str_in_array($srctbl, array('graphs','applications','screens','triggers','items','simple_graph','plain_text'))){
-		validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
-	}
-	else if(str_in_array($srctbl,array('host_group','hosts','templates','host_templates','hosts_and_templates'))){
-		validate_group($PAGE_GROUPS, $PAGE_HOSTS);
-	}
-
-	$groupid = 0;
-	$hostid = 0;
+	$groupid = $pageFilter->groupid;
+	$hostid = $pageFilter->hostid;
 
 	$available_nodes	= get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST);
-	$available_groups	= $PAGE_GROUPS['groupids'];
-	$available_hosts	= $PAGE_HOSTS['hostids'];
+	$available_groups	= $pageFilter->groups;
+	$available_hosts	= $pageFilter->hosts;
 
 	if(isset($only_hostid)){
 		$hostid = $_REQUEST['hostid'] = $only_hostid;
@@ -329,13 +328,10 @@ include_once('include/page_header.php');
 		$cmbHosts->setAttribute('title', S_CANNOT_SWITCH_HOSTS);
 
 		$frmTitle->addItem(array(SPACE,S_HOST,SPACE,$cmbHosts));
-
 	}
 	else{
-		if(str_in_array($srctbl,array('hosts','host_group','triggers','items','simple_graph',
-									'applications','screens','slides','graphs',
-									'sysmaps','plain_text','screens2','overview','host_group_scr')))
-		{
+		if(str_in_array($srctbl,array('hosts','host_group','triggers','items','simple_graph','applications',
+				'screens','slides','graphs', 'sysmaps','plain_text','screens2','overview','host_group_scr'))){
 			if(ZBX_DISTRIBUTED){
 				$cmbNode = new CComboBox('nodeid', $nodeid, 'submit()');
 
@@ -352,15 +348,7 @@ include_once('include/page_header.php');
 		unset($ok);
 
 		if(str_in_array($srctbl,array('hosts_and_templates', 'hosts','templates','triggers','items','applications','host_templates','graphs','simple_graph','plain_text'))){
-
-			$groupid = $PAGE_GROUPS['selected'];
-			$cmbGroups = new CComboBox('groupid',$groupid,'javascript: submit();');
-			foreach($PAGE_GROUPS['groups'] as $slct_groupid => $name){
-				$cmbGroups->addItem($slct_groupid, get_node_name_by_elid($slct_groupid, null, ': ').$name);
-			}
-
-			$frmTitle->addItem(array(S_GROUP,SPACE,$cmbGroups));
-			CProfile::update('web.popup.groupid',$groupid,PROFILE_TYPE_ID);
+			$frmTitle->addItem(array(S_GROUP,SPACE, $pageFilter->getGroupsCB(true)));
 		}
 
 		if(str_in_array($srctbl,array('help_items'))){
@@ -372,15 +360,7 @@ include_once('include/page_header.php');
 		}
 
 		if(str_in_array($srctbl,array('triggers','items','applications','graphs','simple_graph','plain_text'))){
-			$hostid = $PAGE_HOSTS['selected'];
-
-			$cmbHosts = new CComboBox('hostid',$hostid,'javascript: submit();');
-			foreach($PAGE_HOSTS['hosts'] as $tmp_hostid => $name){
-				$cmbHosts->addItem($tmp_hostid, get_node_name_by_elid($tmp_hostid, null, ': ').$name);
-			}
-
-			$frmTitle->addItem(array(SPACE,S_HOST,SPACE,$cmbHosts));
-			CProfile::update('web.popup.hostid',$hostid,PROFILE_TYPE_ID);
+			$frmTitle->addItem(array(SPACE,S_HOST,SPACE,$pageFilter->getHostsCB(true)));
 		}
 
 		if(str_in_array($srctbl,array('triggers','hosts','host_group','hosts_and_templates'))){
@@ -598,7 +578,7 @@ include_once('include/page_header.php');
 		}
 		$hosts = CHost::get($options);
 		$objects = array_merge($templates, $hosts);
-	
+
 		foreach($objects as $row){
 			$name = new CSpan($row['host'], 'link');
 			$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
@@ -719,7 +699,7 @@ include_once('include/page_header.php');
 			$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
 			$trigger['items'] = zbx_toHash($trigger['items'], 'itemid');
 			$trigger['functions'] = zbx_toHash($trigger['functions'], 'functionid');
-			
+
 			$host = reset($trigger['hosts']);
 			$trigger['host'] = $host['host'];
 
