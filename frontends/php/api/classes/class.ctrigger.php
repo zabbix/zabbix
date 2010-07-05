@@ -90,7 +90,8 @@ class CTrigger extends CZBXAPI{
 			'editable'				=> null,
 			'nopermissions'			=> null,
 			'skipDependent'			=> null,
-			'with_unacknowledged_events' => null,
+			'withUnacknowledgedEvents' => null,
+			'withAcknowledgedEvents' => null,
 			'withLastEventUnacknowledged' => null,
 
 // timing
@@ -323,8 +324,8 @@ class CTrigger extends CZBXAPI{
 			$sql_parts['where']['lastchangetill'] = 't.lastchange<'.$options['lastChangeTill'];
 		}
 
-// with_unacknowledged_events
-		if(!is_null($options['with_unacknowledged_events'])){
+// withUnacknowledgedEvents
+		if(!is_null($options['withUnacknowledgedEvents'])){
 			$sql_parts['where']['unack'] = ' EXISTS('.
 				' SELECT e.eventid'.
 				' FROM events e'.
@@ -333,6 +334,17 @@ class CTrigger extends CZBXAPI{
 					' AND e.value='.TRIGGER_VALUE_TRUE.
 					' AND e.acknowledged=0)';
 		}
+// withAcknowledgedEvents
+		if(!is_null($options['withAcknowledgedEvents'])){
+			$sql_parts['where']['ack'] = 'NOT EXISTS('.
+				' SELECT e.eventid'.
+				' FROM events e'.
+				' WHERE e.objectid=t.triggerid'.
+					' AND e.object=0'.
+					' AND e.value='.TRIGGER_VALUE_TRUE.
+					' AND e.acknowledged=0)';
+		}
+
 // templated
 		if(!is_null($options['templated'])){
 			$sql_parts['from']['functions'] = 'functions f';
