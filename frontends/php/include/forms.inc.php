@@ -2446,6 +2446,8 @@
 				$mltpbox[] = $ctb;
 			}
 
+
+
 /*			if($multiplier != 1){
 				$frmItem->addRow(S_CUSTOM_MULTIPLIER, new CTextBox('formula',$formula,40,$limited));
 				end($mltpbox);
@@ -3064,9 +3066,9 @@
 		$frmTrig = new CFormTable(S_TRIGGER,'triggers.php');
 		$frmTrig->setHelp('config_triggers.php');
 
-		if(isset($_REQUEST['hostid'])){
-			$frmTrig->addVar('hostid',$_REQUEST['hostid']);
-		}
+//		if(isset($_REQUEST['hostid'])){
+//			$frmTrig->addVar('hostid',$_REQUEST['hostid']);
+//		}
 
 		$dep_el=array();
 		$dependencies = get_request('dependencies',array());
