@@ -16,7 +16,7 @@ $availableJScripts = array(
 	'menu.js' => '',
 	'prototype.js' => '',
 	'builder.js' => 'scriptaculous/',
-	'controls.js' => 'scriptaculous/', 
+	'controls.js' => 'scriptaculous/',
 	'dragdrop.js' => 'scriptaculous/',
 	'effects.js' => 'scriptaculous/',
 	'slider.js' => 'scriptaculous/',
@@ -28,7 +28,7 @@ $availableJScripts = array(
 	'class.cdate.js' => '',
 	'class.cdebug.js' => '',
 	'class.cmap.js' => '',
-	'class.cookie.js' => '', 
+	'class.cookie.js' => '',
 	'class.cscreen.js' => '',
 	'class.csuggest.js' => '',
 	'class.cswitcher.js' => '',
@@ -44,7 +44,8 @@ $tranStrings = array(
 		'S_MONTH_SHORT', 'S_WEEK_SHORT', 'S_DAY_SHORT', 'S_HOUR_SHORT', 'S_MINUTE_SHORT'
 	),
 	'functions.js' => array('DO_YOU_REPLACE_CONDITIONAL_EXPRESSION_Q', 'S_INSERT_MACRO', 'S_ADD_SERVICE',
-		'S_EDIT_SERVICE', 'S_DELETE_SERVICE', 'S_DELETE_SELECTED_SERVICES_Q', 'S_CREATE_LOG_TRIGGER', 'S_DELETE', 'S_DELETE_KEYWORD_Q'
+		'S_EDIT_SERVICE', 'S_DELETE_SERVICE', 'S_DELETE_SELECTED_SERVICES_Q', 'S_CREATE_LOG_TRIGGER', 'S_DELETE',
+		'S_DELETE_KEYWORD_Q', 'S_DELETE_EXPRESSION_Q',
 	),
 	'main.js' => array('S_CLOSE', 'S_NO_ELEMENTS_SELECTED'),
 	'class.calendar.js' => array('S_JANUARY', 'S_FEBRUARY', 'S_MARCH', 'S_APRIL', 'S_MAY', 'S_JUNE',
