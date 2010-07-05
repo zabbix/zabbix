@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBXNEXT-425] added new macros for acknowledged events count (Vedmak)
  - [ZBX-2642] fixed items multiplier field (Vedmak)
  - [ZBX-2639] now when do full clone template, linkage list is cleared (Vedmak)
  - [ZBX-2598] fixed labels with linebreak in maps (Aly)
