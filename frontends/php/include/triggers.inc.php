@@ -186,12 +186,11 @@
  *	 Aly mod by Vedmak
  *
  */
-function get_accessible_triggers($perm, $hostids, $perm=null, $nodeid=null, $cache=1){
+function get_accessible_triggers($perm, $hostids, $cache=1){
 	global $USER_DETAILS;
 	static $available_triggers;
 
 	$userid = $USER_DETAILS['userid'];
-	$user_type = $USER_DETAILS['type'];
 
 	if(is_null($nodeid)) $nodeid = get_current_nodeid();
 
@@ -204,15 +203,14 @@ function get_accessible_triggers($perm, $hostids, $perm=null, $nodeid=null, $cac
 	}
 
 	$options = array(
-		'output' => API_OUTPUT_SHORTEN
+		'output' => API_OUTPUT_SHORTEN,
+		'nodeids' => get_current_nodeid(),
 	);
-
 	if(!empty($hostids)) $options['hostids'] = $hostids;
-	if(!is_null($nodeid)) $options['nodeids'] = $nodeid;
 	if($perm == PERM_READ_WRITE) $options['editable'] = 1;
-
 	$result = CTrigger::get($options);
 	$result = zbx_objectValues($result, 'triggerid');
+	$result = zbx_toHash($result);
 
 	$available_triggers[$cache_hash] = $result;
 
