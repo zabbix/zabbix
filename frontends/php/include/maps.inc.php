@@ -59,57 +59,6 @@
 	return $drawtype;
 	}
 
-/*
- * Function: sysmap_accessible
- *
- * Description: Check permission for map
- *
- * Return: true on success
- *
- * Author: Aly
- */
-	function sysmap_accessible($sysmapid,$perm){
-		global $USER_DETAILS;
-
-		$nodes = get_current_nodeid(null,$perm);
-		$result = (bool) count($nodes);
-
-		$sql = 'SELECT * '.
-				' FROM sysmaps_elements '.
-				' WHERE sysmapid='.$sysmapid.
-					' AND '.DBin_node('sysmapid', $nodes);
-		$db_result = DBselect($sql);
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,$perm,PERM_RES_IDS_ARRAY,get_current_nodeid(true));
-//SDI($available_hosts);
-		while(($se_data = DBfetch($db_result)) && $result){
-			switch($se_data['elementtype']){
-				case SYSMAP_ELEMENT_TYPE_HOST:
-					if(!isset($available_hosts[$se_data['elementid']])){
-						$result = false;
-					}
-					break;
-				case SYSMAP_ELEMENT_TYPE_MAP:
-					$result = sysmap_accessible($se_data['elementid'], $perm);
-					break;
-				case SYSMAP_ELEMENT_TYPE_TRIGGER:
-					$available_triggers = get_accessible_triggers($perm, array(), PERM_RES_IDS_ARRAY);
-					if(!isset($available_triggers[$se_data['elementid']])){
-						$result = false;
-					}
-					break;
-				case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-					$available_groups = get_accessible_groups_by_user($USER_DETAILS,$perm);
-					if(!isset($available_groups[$se_data['elementid']])){
-						$result = false;
-					}
-					break;
-			}
-		}
-//SDI($se_data['elementid']);
-
-	return $result;
-	}
-
 	function get_sysmap_by_sysmapid($sysmapid){
 		$row = DBfetch(DBselect('SELECT * FROM sysmaps WHERE sysmapid='.$sysmapid));
 		if($row){
@@ -1188,7 +1137,7 @@
 
 				$trigger = $triggers[$trigger['triggerid']];
 				if($trigger['status'] == TRIGGER_STATUS_DISABLED) continue;
-				
+
 				$host['triggers'][$tnum] = $trigger;
 
 				if(!isset($info['type'])) $info['type'] = $trigger['value'];
@@ -2349,13 +2298,13 @@
 
 // LABEL
 			if(zbx_empty($label_line) && empty($info_line)) continue;
-			
+
 			$label_line = str_replace("\r", '', $label_line);
 			$strings = explode("\n", $label_line);
 
 			$cnt = count($strings);
 			$strings = zbx_array_merge($strings, $info_line);
-			
+
 			$h = 0;
 			$w = 0;
 			foreach($strings as $strnum => $str){
@@ -2395,13 +2344,14 @@
 //		imagefilledrectangle($im, $x_rec-2, $y_rec-2, $x_rec+$w+2, $y_rec+($oc*4)+$h-2, $colors['White']);
 
 			$tmpDims = imageTextSize(8,0, str_replace("\n", '', $label_line));
+			$maxHeight = $tmpDims['height'];
 
 			$num = 0;
 			$increasey = 0;
 			foreach($strings as $key => $str){
 				if($num >= $cnt) break;
 				$num++;
-				
+
 				if(zbx_empty($str)) continue;
 
 				$dims = imageTextSize(8,0,$str);
@@ -2428,7 +2378,7 @@
 
 				$increasey += $dims['height']+3;
 			}
-			
+
 			$el_msgs = array('problem', 'maintenances', 'unknown', 'ok', 'status', 'availability');
 			foreach($el_msgs as $key => $caption){
 				if(!isset($el_info['info'][$caption]) || zbx_empty($el_info['info'][$caption]['msg'])) continue;
