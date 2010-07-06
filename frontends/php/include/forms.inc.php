@@ -5264,7 +5264,7 @@ JAVASCRIPT;
 			$host_tbl->addRow(array(S_ITEMS, $items_lbx));
 
 // Host triggers
-			$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array($_REQUEST['hostid']), PERM_RES_IDS_ARRAY);
+			$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array($_REQUEST['hostid']));
 
 			$trig_lbx = new CListBox('triggers',null,8);
 			$trig_lbx->setAttribute('disabled','disabled');
