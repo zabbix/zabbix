@@ -305,8 +305,7 @@ include_once('include/page_header.php');
 	$hostid = $pageFilter->hostid;
 
 	$available_nodes	= get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST);
-	$available_groups	= $pageFilter->groups;
-	$available_hosts	= $pageFilter->hosts;
+	$available_hosts	= array_keys($pageFilter->hosts);
 
 	if(isset($only_hostid)){
 		$hostid = $_REQUEST['hostid'] = $only_hostid;
