@@ -527,6 +527,7 @@ function bar_report_form3(){
 	$items = get_request('items',array());
 
 	$hostids = get_request('hostids', array());
+	$hostids = zbx_toHash($hostids);
 	$showlegend = get_request('showlegend',0);
 
 	$palette = get_request('palette',0);
@@ -576,9 +577,9 @@ function bar_report_form3(){
 // HOSTS
 //	validate_group(PERM_READ_ONLY,array('real_hosts'),'web.last.conf.groupid');
 
-	$cmbGroups = new CComboBox('groupid',get_request('groupid',0),'submit()');
+	$groupid = get_request('groupid',0);
+	$cmbGroups = new CComboBox('groupid',$groupid,'submit()');
 	$cmbGroups->addItem(0,S_ALL_S);
-
 	foreach($db_groups as $gnum => $group){
 		$cmbGroups->addItem($group['groupid'],$group['name']);
 	}
@@ -592,18 +593,31 @@ function bar_report_form3(){
 		'real_hosts' => 1,
 		'output' => array('hostid', 'host')
 	);
+	if($groupid > 0){
+		$options['groupids'] = $groupid;
+	}
 	$db_hosts = CHost::get($options);
+	$db_hosts = zbx_toHash($db_hosts, 'hostid');
 	order_result($db_hosts, 'host');
 
 	foreach($db_hosts as $hnum => $host){
-		$hostids[$host['hostid']] = $host['hostid'];
 		$host_tb->addItem($host['hostid'],$host['host']);
 	}
 
+	$options = array(
+		'real_hosts' => 1,
+		'output' => array('hostid', 'host'),
+		'hostids' => $hostids,
+	);
+	$db_hosts2 = CHost::get($options);
+	order_result($db_hosts2, 'host');
+	foreach($db_hosts2 as $hnum => $host){
+		if(!isset($db_hosts[$host['hostid']]))
+			$host_tb->addItem($host['hostid'],$host['host']);
+	}
+	
 	$reportForm->addRow(S_HOSTS, $host_tb->Get(S_SELECTED_HOSTS,array(S_OTHER.SPACE.S_HOSTS.SPACE.'|'.SPACE.S_GROUP.SPACE,$cmbGroups)));
 // ----------
-
-
 //*/
 // PERIOD
 

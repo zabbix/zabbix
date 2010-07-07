@@ -70,17 +70,17 @@ include_once 'include/page_header.php';
 	if(isset($_REQUEST['save'])){
 		if(isset($_REQUEST['period_id'])){
 			insert_js("update_period('".
-				$_REQUEST['period_id']."','".
-				zbx_jsvalue($_REQUEST['dstfrm'])."','".
-				zbx_jsvalue($_REQUEST['caption'])."','".
+				$_REQUEST['period_id']."',".
+				zbx_jsvalue($_REQUEST['dstfrm']).",".
+				zbx_jsvalue($_REQUEST['caption']).",'".
 				$_REQUEST['report_timesince']."','".
 				$_REQUEST['report_timetill']."','".
 				$_REQUEST['color']."');\n");
 		}
 		else{
-			insert_js("add_period('".
-				zbx_jsvalue($_REQUEST['dstfrm'])."','".
-				zbx_jsvalue($_REQUEST['caption'])."','".
+			insert_js("add_period(".
+				zbx_jsvalue($_REQUEST['dstfrm']).",".
+				zbx_jsvalue($_REQUEST['caption']).",'".
 				$_REQUEST['report_timesince']."','".
 				$_REQUEST['report_timetill']."','".
 				$_REQUEST['color']."');\n");
@@ -111,7 +111,7 @@ include_once 'include/page_header.php';
 
 
 		$frmPd->addRow(array( new CVisibilityBox('caption_visible', !zbx_empty($caption), 'caption', S_DEFAULT),
-			S_CAPTION), new CTextBox('caption',$caption,10));
+			S_CAPTION), new CTextBox('caption',$caption,42));
 
 //		$frmPd->addRow(S_CAPTION, new CTextBox('caption',$caption,10));
 
