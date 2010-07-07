@@ -290,10 +290,13 @@ include_once('include/page_header.php');
 		$options['groups']['monitored_hosts'] = true;
 		$options['hosts']['monitored_hosts'] = true;
 	}
-	if($real_hosts){
+	else if($real_hosts){
 		$options['groups']['real_hosts'] = true;
-		$options['hosts']['real_hosts'] = true;
 	}
+	else{
+		$options['hosts']['templated_hosts'] = true;
+	}
+	
 	if(!is_null($writeonly)){
 		$options['groups']['editable'] = true;
 		$options['hosts']['editable'] = true;
@@ -304,8 +307,8 @@ include_once('include/page_header.php');
 	$groupid = $pageFilter->groupid;
 	$hostid = $pageFilter->hostid;
 
-	$available_nodes	= get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST);
-	$available_hosts	= array_keys($pageFilter->hosts);
+	$available_nodes = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST);
+	$available_hosts = array_keys($pageFilter->hosts);
 
 	if(isset($only_hostid)){
 		$hostid = $_REQUEST['hostid'] = $only_hostid;
