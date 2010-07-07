@@ -192,7 +192,7 @@ function get_accessible_triggers($perm, $hostids, $cache=1){
 
 	$userid = $USER_DETAILS['userid'];
 
-	if(is_null($nodeid)) $nodeid = get_current_nodeid();
+	$nodeid = get_current_nodeid();
 
 	$nodeid_str = (is_array($nodeid)) ? implode('', $nodeid) : strval($nodeid);
 	$hostid_str = implode('',$hostids);
@@ -204,7 +204,7 @@ function get_accessible_triggers($perm, $hostids, $cache=1){
 
 	$options = array(
 		'output' => API_OUTPUT_SHORTEN,
-		'nodeids' => get_current_nodeid(),
+		'nodeids' => $nodeid,
 	);
 	if(!empty($hostids)) $options['hostids'] = $hostids;
 	if($perm == PERM_READ_WRITE) $options['editable'] = 1;
