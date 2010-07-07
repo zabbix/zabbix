@@ -1294,6 +1294,7 @@
 	'S_OK_BIG'=>			'OK',
 	'S_PROBLEM_BIG'=>		'PROBLEM',
 	'S_ZABBIX_URL'=>		'http://www.zabbix.com',
+	'S_UNACKNOWLEDGED' => 'Unacknowledged',
 
 //	maps.php
 	'S_NETWORK_MAPS'=>		'Network maps',
