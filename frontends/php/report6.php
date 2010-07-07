@@ -58,18 +58,15 @@ include_once('include/page_header.php');
 
 		'palette'=>		array(T_ZBX_INT, O_OPT,	NULL,	null,		NULL),
 		'palettetype'=>		array(T_ZBX_INT, O_OPT,	NULL,	null,		NULL),
-
 // actions
 		'delete_item'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'delete_period'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'report_show'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-
 // filter
 		'report_show'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,		NULL),
 
 		'report_timesince'=>	array(T_ZBX_INT, O_OPT,	P_UNSET_EMPTY,	null,	NULL),
 		'report_timetill'=>		array(T_ZBX_INT, O_OPT,	P_UNSET_EMPTY,	null,	NULL),
-
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
