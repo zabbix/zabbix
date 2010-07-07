@@ -2198,12 +2198,12 @@
 					);
 
 					if(isset($el_info['ack']) && $el_info['ack']){
-						imagesetthickness($im, 4);
+						imagesetthickness($im, 5);
 						imagearc($im,
 							$selement['x'] + ($iconX / 2),
 							$selement['y'] + ($iconY / 2),
-							$iconX+20-4,
-							$iconX+20-4,
+							$iconX+20-3,
+							$iconX+20-3,
 							0,
 							359,
 							imagecolorallocate($im,50,150,50)
