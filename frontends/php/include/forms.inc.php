@@ -437,7 +437,7 @@
 			new CButton('select_app',S_SELECT,
 				'return PopUp("popup.php?dstfrm='.$form->getName().
 				'&dstfld1=application&srctbl=applications'.
-				'&srcfld1=name&only_hostid='.$_REQUEST['hostid'].'",200,300,"application");')
+				'&srcfld1=name&only_hostid='.$_REQUEST['hostid'].'",500,600,"application");')
 			));
 
 		$form->addRow(S_NAME, new CTextBox('name', $name, 40));
