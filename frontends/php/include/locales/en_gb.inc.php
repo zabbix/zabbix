@@ -2113,7 +2113,7 @@
 	'S_NO_ITEM_WITH'=>				'No item with',
 	'S_DELETED_SMALL'=>				'deleted',
 	'S_UNKNOWN_VALUE_TYPE'=>			'Unknown value type',
-	'S_ITEMS_CHECK_KEY_DEFAULT_EXAMPLE_PASSED'=>	'Check key, please. Default example were passed',
+	'S_ITEMS_CHECK_KEY_DEFAULT_EXAMPLE_PASSED'=>	'Check the key, please. Default example was passed',
 
 //	httptest.inc.php
 	'S_SCENARIO_STEP_NUMBER_CANNOT_BE_LESS_ONE'=>	'Scenario step number cannot be less than 1',
