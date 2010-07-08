@@ -2517,8 +2517,8 @@
 
 				imagefilledrectangle(
 					$im,
-					$x_label-2, $y_rec+$increasey+1,
-					$x_label+$dims['width'], $y_rec+$increasey+3,
+					$x_label-2, $y_rec+$increasey-$dims['height'],
+					$x_label+$dims['width'], $y_rec+$increasey+4,
 					$colors['White']
 				);
 				imagetext($im, 8, 0, $x_label, $y_rec+$increasey, $label_color, $str);
@@ -2543,11 +2543,10 @@
 
 				imagefilledrectangle(
 					$im,
-					$x_label-2, $y_rec+$increasey-2,
-					$x_label+$dims['width']+1, $y_rec+$increasey+2,
+					$x_label-2, $y_rec+$increasey-$dims['height'],
+					$x_label+$dims['width']+1, $y_rec+$increasey+4,
 					$colors['White']
 				);
-
 				imagetext($im, 8, 0, $x_label, $y_rec+$increasey, $color, $str);
 
 				$increasey += $dims['height']+2;
