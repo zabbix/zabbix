@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2670] make it clear in the 'configure' help output that full path to odbc_config should be specified (Richlv)
  - [ZBX-2666] fixed detection of resolv.h and net/if.h (asaveljevs)
  - [ZBX-2657] fixed bugs with non closing item select popups in bar reports (Vedmak)
  - [ZBXNEXT-425] added new macros for acknowledged events count (Vedmak)
