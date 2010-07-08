@@ -73,12 +73,10 @@ include_once('include/page_header.php');
 
 //------------------------ <ACTIONS> ---------------------------
 if(isset($_REQUEST['save_trigger'])){
-
 	show_messages();
 
-	$expression = construct_expression($_REQUEST['itemid'],get_request('expressions',array()));
-//SDII($_REQUEST);
-	if($expression){
+	$exprs = get_request('expressions', false);
+	if($exprs && ($expression = construct_expression($_REQUEST['itemid'], $exprs))){
 		if(!check_right_on_trigger_by_expression(PERM_READ_WRITE, $expression)) access_deny();
 
 		$now=time();
@@ -114,7 +112,6 @@ if(isset($_REQUEST['save_trigger'])){
 
 			$result &= CTrigger::deleteDependencies($trigger);
 			$result &= CTrigger::addDependencies($deps);
-
 //REVERT
 			$result = DBend($result);
 
@@ -178,7 +175,6 @@ if(isset($_REQUEST['save_trigger'])){
 //------------------------ <FORM> ---------------------------
 
 if(isset($_REQUEST['sform'])){
-
 	$frmTRLog = new CFormTable(S_TRIGGER,'tr_logform.php','POST',null,'sform');
 	$frmTRLog->setHelp('web.triggerlog.service.php');
 	$frmTRLog->setTableClass('formlongtable formtable');
@@ -306,7 +302,7 @@ if(isset($_REQUEST['sform'])){
 
 	$exp_select = new CComboBox('expr_type');
 	$exp_select->setAttribute('id','expr_type');
-		$exp_select->addItem(REGEXP_INCLUDE,S_INCLUDE);
+		$exp_select->addItem(REGEXP_INCLUDE,S_INCLUDE_S);
 		$exp_select->addItem(REGEXP_EXCLUDE,S_EXCLUDE);
 
 
@@ -341,7 +337,9 @@ if(isset($_REQUEST['sform'])){
 
 	$bExprResult = true;
 
-	if(isset($_REQUEST['triggerid']) && !isset($_REQUEST['save_trigger']) && !validate_expression(construct_expression($itemid,$expressions)) && !isset($_REQUEST['form_refresh'])){
+	if(isset($_REQUEST['triggerid']) && !isset($_REQUEST['save_trigger'])
+			&& !validate_expression(construct_expression($itemid,$expressions)) && !isset($_REQUEST['form_refresh'])){
+
 		unset($expressions);
 		$expressions[0]['value'] = $expr_incase;
 		$expressions[0]['type'] = 0;
@@ -362,7 +360,7 @@ if(isset($_REQUEST['sform'])){
 		$del_url = new CSpan(S_DELETE,'link');
 		$del_url->setAttribute('onclick', 'javascript: if(confirm("'.S_DELETE_EXPRESSION_Q.'")) remove_expression("logtr'.$id.'"); return false;');
 
-		$row = new CRow(array(htmlspecialchars($expr['view']),(($expr['type']==REGEXP_INCLUDE)?S_INCLUDE:S_EXCLUDE),array($imgup,SPACE,$imgdn),$del_url));
+		$row = new CRow(array(htmlspecialchars($expr['view']),(($expr['type']==REGEXP_INCLUDE)?S_INCLUDE_S:S_EXCLUDE),array($imgup,SPACE,$imgdn),$del_url));
 		$row->setAttribute('id','logtr'.$id);
 		$table->addRow($row);
 
@@ -413,13 +411,12 @@ if(isset($_REQUEST['sform'])){
 	$frmTRLog->addItemToBottomRow(new CButton('save_trigger',S_SAVE,'javascript: document.forms[0].action += \'?saction=1\';'));
 	$frmTRLog->addItemToBottomRow(SPACE);
 
-	$cb = new CButton('cancel',S_CANCEL);
+	$cb = new CButton('cancel',S_CANCEL, 'javascript: self.close();');
 	$cb->setType('button');
-	$cb->setAction('javascript: self.close();');
 
 	$frmTRLog->addItemToBottomRow($cb);
-	if ($bExprResult) {
-	  $frmTRLog->show();
+	if($bExprResult){
+		$frmTRLog->show();
 	}
 }
 //------------------------ </FORM> ---------------------------

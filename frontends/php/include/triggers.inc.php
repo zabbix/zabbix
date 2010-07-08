@@ -641,6 +641,7 @@ return $result;
 
 		if( empty($expression) ){
 			error(S_EXPRESSION_CANNOT_BE_EMPTY);
+			return false;
 		}
 
 		$expr = $expression;
@@ -978,6 +979,7 @@ return $result;
 
 		if(empty($expressions)){
 			error(S_EXPRESSION_CANNOT_BE_EMPTY);
+			return false;
 		}
 		$functions = array('regexp'=>1,'iregexp'=>1);
 
