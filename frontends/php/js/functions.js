@@ -25,23 +25,23 @@
 var logexpr_count = 0;
 var key_count = 0;
 
-function nextObject(n) { 
+function nextObject(n) {
 	var t = n.parentNode.tagName;
-	do{ 
-		n = n.nextSibling; 
-	} while (n && n.nodeType != 1 && n.parentNode.tagName == t); 
-	
-return n; 
-} 
+	do{
+		n = n.nextSibling;
+	} while (n && n.nodeType != 1 && n.parentNode.tagName == t);
 
-function previousObject(p) { 
+return n;
+}
+
+function previousObject(p) {
 	var t = p.parentNode.tagName;
-	do{ 
-		p = p.previousSibling; 
-	} while (p && p.nodeType != 1 && p.parentNode.tagName == t); 
-	
-return p; 
-} 
+	do{
+		p = p.previousSibling;
+	} while (p && p.nodeType != 1 && p.parentNode.tagName == t);
+
+return p;
+}
 
 function call_ins_macro_menu(ev){
 	show_popup_menu(ev,
@@ -97,7 +97,6 @@ function add_logexpr(){
 	}
 	catch(e){
 		throw('Error: '+(IE?e.description:e));
-		return false;
 	}
 
 	var ex = bt_and.disabled ? '|' : '&';
@@ -134,15 +133,15 @@ function add_logexpr(){
 		expr_v += iregexp.checked ? 'iregexp' : 'regexp';
 		expr_v += '(' + expr.value + ')';
 	}
-	
+
 	if(expression == '') return false;
-	
+
 	var classattr = (IE)?'className':'class';
 
 
 	var tr = document.createElement('tr');
 	document.getElementById('exp_list').firstChild.appendChild(tr);
-	
+
 	tr.setAttribute(classattr,'even_row');
 	tr.setAttribute('id','logtr'+logexpr_count);
 
@@ -168,7 +167,7 @@ function add_logexpr(){
 
 	var td = document.createElement('td');
 	tr.appendChild(td);
-	
+
 	td.appendChild(document.createTextNode(expr_t.options[expr_t.selectedIndex].text));
 
 	var input = (IE)?document.createElement('<input name="expressions['+logexpr_count+'][type]" />'):document.createElement('input');
@@ -181,7 +180,7 @@ function add_logexpr(){
 // optional
 	var td = document.createElement('td');
 	tr.appendChild(td);
-	
+
 	td.setAttribute((IE)?'cssText':'style','white-space: nowrap;');
 
 	var img = document.createElement('img');
@@ -193,11 +192,11 @@ function add_logexpr(){
 	url.setAttribute('href','javascript:  element_up("logtr'+logexpr_count+'");');
 	url.setAttribute(classattr,'action');
 	url.appendChild(img);
-	
+
 	td.appendChild(url);
-	
+
 	td.appendChild(document.createTextNode(' '));
-	
+
 	var img = document.createElement('img');
 	img.setAttribute('src','images/general/arrowdown.gif');
 	img.setAttribute('border','0');
@@ -207,20 +206,20 @@ function add_logexpr(){
 	url.setAttribute('href','javascript:  element_down("logtr'+logexpr_count+'");');
 	url.setAttribute(classattr,'action');
 	url.appendChild(img);
-	
+
 	td.appendChild(url);
 
-		
+
 	var td = document.createElement('td');
 	tr.appendChild(td);
-	
+
 	var url = document.createElement('a');
 	url.setAttribute('href','javascript: if(confirm("'+locale['S_DELETE_EXPRESSION_Q']+'")) remove_expression("logtr'+logexpr_count+'");');
 	url.setAttribute(classattr,'action');
 	url.appendChild(document.createTextNode(locale['S_DELETE']));
-	
+
 	td.appendChild(url);
-	
+
 	logexpr_count++;
 	expr.value = '';
 	expr_t.selectedIndex=0;
@@ -233,9 +232,9 @@ function remove_expression(expr_id){
 	var id = getIdFromNodeId(expr_id);
 	if(is_number(id)){
 		var elm_v = document.getElementsByName('expressions['+id+'][value]')[0];
-		var elm_t = document.getElementsByName('expressions['+id+'][type]')[0];	
-		var elm_s = document.getElementsByName('expressions['+id+'][view]')[0];	
-		
+		var elm_t = document.getElementsByName('expressions['+id+'][type]')[0];
+		var elm_s = document.getElementsByName('expressions['+id+'][view]')[0];
+
 		if(typeof(elm_v) != 'undefined') elm_v.parentNode.removeChild(elm_v);
 		if(typeof(elm_t) != 'undefined') elm_t.parentNode.removeChild(elm_t);
 		if(typeof(elm_s) != 'undefined') elm_s.parentNode.removeChild(elm_s);
@@ -246,7 +245,7 @@ function remove_expression(expr_id){
 }
 
 function getIdFromNodeId(id){
-	if(typeof(id)=='string'){ 
+	if(typeof(id)=='string'){
 		var reg = /logtr([0-9])/i;
 		id = parseInt(id.replace(reg,"$1"));
 	}
@@ -259,11 +258,11 @@ return null;
 function element_up(elementid){
 	var c_obj = document.getElementById(elementid);
 	var p_obj = c_obj.parentNode;
-	
+
 	if(typeof(p_obj) == 'undefined') return;
 
 	var c2_obj = previousObject(c_obj);
-	if(c2_obj && c2_obj.id.length > 0){ 
+	if(c2_obj && c2_obj.id.length > 0){
 		swapNodes(c2_obj,c_obj);
 		swapNodesNames(c2_obj,c_obj);
 	}
@@ -272,7 +271,7 @@ function element_up(elementid){
 function element_down(elementid){
 	var c_obj = document.getElementById(elementid);
 	var p_obj = c_obj.parentNode;
-	
+
 	if(typeof(p_obj) == 'undefined') return;
 
 	var c2_obj = nextObject(c_obj);
@@ -289,9 +288,9 @@ function swapNodes(n1, n2){
 	if((p1 = n1.parentNode) && (p2 = n2.parentNode)){
 		b = nextObject(n2);
 		if(n1 == b) return;
-		
+
 		p1.replaceChild(n2, n1); // new,old
-		if(b){ 
+		if(b){
 			p2.insertBefore(n1, b);	//4to,pered 4em
 		}
 		else {
@@ -303,12 +302,12 @@ function swapNodes(n1, n2){
 function swapNodesNames(n1,n2){
 	var id1 = n1.id;
 	var id2 = n2.id;
-	if(is_string(id1) && is_string(id2)){ 
+	if(is_string(id1) && is_string(id2)){
 		var reg = /logtr([0-9])/i;
 		id1 = parseInt(id1.replace(reg,"$1"));
 		id2 = parseInt(id2.replace(reg,"$1"));
 	}
-	if(is_number(id1) && is_number(id2)){ 
+	if(is_number(id1) && is_number(id2)){
 		var elm = new Array();
 		elm[0] = document.getElementsByName('expressions['+id1+'][value]')[0];
 		elm[1] = document.getElementsByName('expressions['+id1+'][type]')[0];
@@ -316,18 +315,18 @@ function swapNodesNames(n1,n2){
 		elm[3] = document.getElementsByName('expressions['+id2+'][value]')[0];
 		elm[4] = document.getElementsByName('expressions['+id2+'][type]')[0];
 		elm[5] = document.getElementsByName('expressions['+id2+'][view]')[0];
-		
+
 //		alert(elm[1].parentNode.tagName);
 //		alert(elm[3].name);
-		
+
 		swapNodes(elm[0],elm[3]);
 		swapNodes(elm[1],elm[4]);
 		swapNodes(elm[2],elm[5]);
-		
+
 		return true;
 	}
 return false;
-}	
+}
 
 function closeform(page){
 	var msg="";
@@ -337,7 +336,7 @@ function closeform(page){
 	} catch(e){
 		alert(e);
 	}
-	
+
 self.close();
 }
 
@@ -380,7 +379,7 @@ function add_keyword(bt_type){
 	// type
 	var td = document.createElement('td');
 	tr.appendChild(td);
-	
+
 	td.appendChild(document.createTextNode(iregexp.checked ? 'iregexp' : 'regexp'));
 
 	var input = (IE)?document.createElement('<input name="keys['+key_count+'][type]" />'):document.createElement('input');
@@ -393,14 +392,14 @@ function add_keyword(bt_type){
 	// delete
 	var td = document.createElement('td');
 	tr.appendChild(td);
-	
+
 	var url = document.createElement('a');
 	url.setAttribute('href','javascript: if(confirm("'+locale['S_DELETE_KEYWORD_Q']+'")) remove_keyword("keytr'+key_count+'");');
 	url.setAttribute(classattr,'action');
 	url.appendChild(document.createTextNode(locale['S_DELETE']));
-	
+
 	td.appendChild(url);
-	
+
 	key_count++;
 	expr.value = '';
 }
@@ -414,7 +413,7 @@ function add_keyword_or(){
 }
 
 function getIdFromNodeKeyId(id) {
-	if(typeof(id)=='string'){ 
+	if(typeof(id)=='string'){
 		var reg = /keytr([0-9])/i;
 		id = parseInt(id.replace(reg,"$1"));
 	}
@@ -429,7 +428,7 @@ function remove_keyword(key_id){
 	if(is_number(id)){
 		var elm_v = document.getElementsByName('keys['+id+'][value]')[0];
 		var elm_t = document.getElementsByName('keys['+id+'][type]')[0];
-		
+
 		if(typeof(elm_v) == 'undefined') elm_v.parentNode.removeChild(elm_v);
 		if(typeof(elm_t) == 'undefined') elm_t.parentNode.removeChild(elm_t);
 	}
@@ -448,7 +447,7 @@ function remove_keyword(key_id){
 		var bt_or = document.getElementById('add_key_or');
 		if (typeof(bt_and) != 'undefined') bt_and.disabled = false;
 		if (typeof(bt_or) != 'undefined') bt_or.disabled = false;
-	}	
+	}
 }
 
 function check_target(e){
@@ -488,13 +487,13 @@ function set_macro(v){
 /************************************************************************************/
 var graphs = {
 graphtype : 0,
-	
+
 submit : function(obj){
 	if(obj.name == 'graphtype'){
 		if(((obj.selectedIndex > 1) && (this.graphtype < 2)) || ((obj.selectedIndex < 2) && (this.graphtype > 1))){
 			var refr = document.getElementsByName('form_refresh');
 			refr[0].value = 0;
-		} 
+		}
 	}
 	document.getElementsByName('frm_graph')[0].submit();
 }
@@ -540,25 +539,25 @@ function add_child_service(name,serviceid,trigger,triggerid){
 	document.getElementById('service_childs').firstChild.appendChild(tr);
 
 	var classattr = (IE)?'className':'class';
-	
+
 	tr.setAttribute(classattr,'even_row');
-	
+
 	var td = document.createElement('td');
-	
+
 	var chkbx = document.createElement('input');
 	chkbx.type = 'checkbox';
 	chkbx.value = serviceid;
 	chkbx.name = 'childs_to_del['+serviceid+'][serviceid]';
-	
+
 	var input = document.createElement('input');
 	input.setAttribute('type','hidden');
 	input.setAttribute('value',serviceid);
 	input.setAttribute('name','childs['+serviceid+'][serviceid]');
-	
+
 	td.appendChild(chkbx);
 	td.appendChild(input);
 	tr.appendChild(td);
-		
+
 	var td = document.createElement('td');
 
 	var url = document.createElement('a');
@@ -573,9 +572,9 @@ function add_child_service(name,serviceid,trigger,triggerid){
 	td.appendChild(url);
 	td.appendChild(input);
 	tr.appendChild(td);
-	
+
 	var td = document.createElement('td');
-	
+
 	var chkbx = document.createElement('input');
 	chkbx.type = 'checkbox';
 	chkbx.value = '1';
@@ -583,7 +582,7 @@ function add_child_service(name,serviceid,trigger,triggerid){
 
 	td.appendChild(chkbx);
 	tr.appendChild(td);
-	
+
 	var td = document.createElement('td');
 
 	var input = document.createElement('input');
@@ -599,7 +598,7 @@ function add_child_service(name,serviceid,trigger,triggerid){
 function check_childs(form_name, chkMain, chkName){
 	var frmForm = document.forms[form_name];
 	var value = frmForm.elements[chkName].checked;
-	
+
 	for (var i=0; i < frmForm.length; i++){
 		if(frmForm.elements[i].type != 'checkbox') continue;
 		if(frmForm.elements[i].disabled == true) continue;
@@ -639,7 +638,7 @@ function create_page_menu(e,id){
 	id='menu_'+id;
 
 	var dbrd_menu = new Array();
-	
+
 //to create a copy of array, but not references!!!!
 //alert(id+' : '+page_menu[id]);
 	for(var i=0; i < page_menu[id].length; i++){
@@ -659,7 +658,7 @@ function create_page_menu(e,id){
 }
 
 //------------------------------------------------------
-//					TRIGGERS JS MENU 
+//					TRIGGERS JS MENU
 //------------------------------------------------------
 
 function create_mon_trigger_menu(e, args, items){

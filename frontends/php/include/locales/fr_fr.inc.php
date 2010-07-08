@@ -1746,7 +1746,7 @@
 	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_BEFORE_ERROR'=>			'Symboles interdits détectés avant l\'élément',
 	'S_NEW_INDICATORS'=>			'Nouveaux indicateurs',
 	'S_EDIT_CONNECTOR'=>			'Modifier le connecteur',
-	'S_INCLUDE'=>			'Inclure',
+	'S_INCLUDE_S'=>			'Inclure',
 	'S_EXCLUDE'=>			'Exclure',
 	'S_KEYWORD'=>			'Mot-clé',
 	'S_POSITION'=>			'Position',
