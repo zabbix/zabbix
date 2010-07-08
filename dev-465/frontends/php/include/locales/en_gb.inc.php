@@ -1442,6 +1442,7 @@
 	'S_TILL'=>					'Till',
 	'S_TO'=>					'To',
 	'S_OK'=>					'Ok',
+	'S_RESOLVED'=>				'Resolved',
 	'S_PROBLEM'=>					'Problem',
 	'S_PROBLEMS'=>					'Problems',
 	'S_PERCENTAGE'=>				'Percentage',

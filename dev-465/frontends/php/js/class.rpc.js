@@ -134,6 +134,7 @@ processRespond: function(resp){
 	var isError = this.processError(resp);
 	if(isError) return false;
 
+//SDJ(resp.responseJSON.result);
 	this.userParams.onSuccess(resp.responseJSON.result);
 
 return true;

@@ -29,19 +29,23 @@ return messagesListId;
 // Author: Aly
 var CMessageList = Class.create(CDebug,{
 messageListId:			0,				// PMasters reference id
-messageList:			{},				// list of recieved messages
-pexec:					null,			// PeriodicalExecuter object
 
-pipeLength:				15,				// how many messages to show
-messagePipe:			new Array(),	// messageid pipe line
-url:					'',
-
-updateFrequency:		100,			// seconds
+updateFrequency:		30,			// seconds
+timeoutFrequency:		10,				// seconds
 soundFrequency:			1,				// seconds
+
+ready:					false,
+PEupdater:				null,			// PeriodicalExecuter object update
+PEtimeout:				null,			// PeriodicalExecuter object update
 
 lastupdate:				0,				// lastupdate timestamp
 msgcounter:				0,				// how many messages have been added
-ready:					false,
+
+pipeLength:				15,				// how many messages to show
+
+messageList:			{},				// list of recieved messages
+messagePipe:			new Array(),	// messageid pipe line
+messageLast:			{},				// last massages sourceid by caption
 
 dom:					{},				// dom object links
 
@@ -52,6 +56,8 @@ initialize: function($super, messagesListId, args){
 
 	this.dom = {};
 	this.messageList = {};
+	this.messageLast = {};
+
 	if(typeof(args) != 'undefined'){
 		if(isset('pipeLength', args))		this.pipeLength = args.pipeLength;
 		if(isset('updateFrequency', args))	this.updateFrequency = args.updateFrequency;
@@ -59,12 +65,17 @@ initialize: function($super, messagesListId, args){
 
 	this.createContainer();
 
-	if(is_null(this.pexec)){
+	if(is_null(this.PEupdater)){
 		this.ready = true;
 		this.lastupdate = 0;
 
-		this.pexec = new PeriodicalExecuter(this.getServerMessages.bind(this), this.updateFrequency);
+		this.PEupdater = new PeriodicalExecuter(this.getServerMessages.bind(this), this.updateFrequency);
 		this.getServerMessages();
+	}
+
+	if(is_null(this.PEtimeout)){
+		this.PEtimeout = new PeriodicalExecuter(this.timeoutMessages.bind(this), this.timeoutFrequency);
+		this.timeoutMessages();
 	}
 },
 
@@ -72,7 +83,7 @@ addMessage: function(newMessage){
 	this.debug('addMessage');
 //--
 	var newMessage = newMessage || {};
-
+SDJ(newMessage.options);
 	while(isset(this.msgcounter, this.messageList)){
 		this.msgcounter++;
 	}
@@ -84,9 +95,9 @@ addMessage: function(newMessage){
 	
 	this.messagePipe.push(this.msgcounter);
 	newMessage.messageid = this.msgcounter;
-newMessage.title += this.msgcounter;
+//newMessage.title += ' | '+newMessage.sourceid;
 	this.messageList[this.msgcounter] = new CMessage(this, newMessage);
-
+	this.messageLast[this.messageList[this.msgcounter].caption] = this.messageList[this.msgcounter].sourceid;
 
 return this.messageList[this.msgcounter];
 },
@@ -120,33 +131,18 @@ closeAllMessages: function(){
 	this.messageList = {};
 },
 
-sortMessages: function(){
-    var ids = array();
+timeoutMessages: function(){
+	this.debug('timeoutMessages');
+//--
+	var now = parseInt(new Date().getTime()/1000);
 
-    for(var messageid in this.messageList){
+	for(var messageid in this.messageList){
 		if(empty(this.messageList[messageid])) continue;
 
-		ids.push(messageid);
+		var msg = this.messageList[messageid];
+		if((msg.time + msg.timeout) < now) this.closeMessage(messageid);
 	}
-
-	for(var i=(ids.length - 1); i >= 0; i--){
-		for(var j=0; j <= i; j++) {
-			if(ids[j+1] >= ids[j]) continue;
-
-			var tempValue = ids[j];
-			ids[j] = ids[j+1];
-			ids[j+1] = tempValue;
-		}
-	}
-
-	var sortedMessages = new Array();
-	for(var i=0; i < ids.length; i++){
-		if(!isset(ids[i], this.messageList)) continue;
-
-		sortedMessages.push(this.messageList[ids[i]]);
-    }
 	
-return sortedMessages;
 },
 
 getServerMessages: function(){
@@ -162,11 +158,14 @@ getServerMessages: function(){
 		'method': 'message.get',
 		'params': {
 			'messageListId': this.messageListId,
-			'lastmsgid': this.lastmsgid
+			'messageLast': this.messageLast
 		},
 		'onSuccess': this.serverRespond.bind(this),
-		'onFailure': function(resp){alert('Messages Widget: message request failed.'); throw('Messages Widget: message request failed.'); }
+		'onFailure': function(resp){zbx_throw('Messages Widget: message request failed.');}
 	}
+
+SDJ(rpcRequest.params);
+SDJ(rpcRequest.params.messageLast);
 
 	new RPC.Call(rpcRequest);
 
@@ -220,14 +219,17 @@ priority:			0,				// msg priority ASC
 color:				'ffffff',		// msg color
 time:				0,				// msg time arrival
 title:				'No title',		// msg header
-body:				'No text',		// msg details
+body:				['No text'],	// msg details
+timeout:			60,				// msg timeout
 
 dom:				{},				// msg dom links
+
 
 initialize: function($super, messageList, message){
 	this.messageid = message.messageid;
 	$super('CMessage['+this.messageid+']');
 //--
+
 	this.dom = {};
 	this.messageList = messageList;
 
@@ -257,19 +259,12 @@ close: function(){
 			'priority': this.priority
 		},
 //		'onSuccess': this.confirmClose.bind(this),
-		'onFailure': function(resp){ zbx_throw('Messages Widget: message request failed.'); }
+		'onFailure': function(resp){zbx_throw('Messages Widget: message request failed.');}
 	}
 
 	new RPC.Call(rpcRequest);
 
 	this.lastupdate = now;
-},
-
-confirmClose: function(confirm){
-	this.debug('confirmClose');
-//--
-
-	alert('Closed: '+confirm.messageid);
 },
 
 playSound: function(){
@@ -294,8 +289,8 @@ createMessage: function(){
 
 // LI
 	this.dom.listItem = document.createElement('li');
-	//this.messageList.dom.list.appendChild(this.dom.listItem);
 	$(this.messageList.dom.list).insert({'top': this.dom.listItem});
+	this.dom.listItem.style.border = '2px solid #'+this.color;
 
 	this.dom.listItem.className = 'listItem';
 // message
@@ -314,14 +309,41 @@ createMessage: function(){
 
 //* close box
 	this.dom.closeBox = document.createElement('div');
-	this.dom.message.appendChild(this.dom.closeBox);
+//	this.dom.message.appendChild(this.dom.closeBox);
 
 	this.dom.closeBox.className = 'closebox';
 	this.dom.closeBox.style.backgroundColor = '#FFFFFF';
 	//this.dom.colorBox.style.backgroundColor = '#'+this.color;
 //*/
 
-// message table
+// message box
+	this.dom.messageBox = document.createElement('div');
+	this.dom.message.appendChild(this.dom.messageBox);
+
+	this.dom.messageBox.className = 'messagebox';
+// title
+	this.dom.title = document.createElement('span');
+	this.dom.messageBox.appendChild(this.dom.title);
+
+	this.dom.title.appendChild(document.createTextNode(this.title));
+	this.dom.title.className = 'title';
+
+// body
+	if(!is_array(this.body)) this.body = new Array(this.body);
+
+	this.dom.message.style.height = (24+14*this.body.length)+'px';
+	for(var i=0; i < this.body.length; i++){
+		if(!isset(i, this.body) || empty(this.body[i])) continue;
+		this.dom.messageBox.appendChild(document.createElement('br'));
+
+		this.dom.body = document.createElement('span');
+		this.dom.messageBox.appendChild(this.dom.body);
+
+		this.dom.body.appendChild(document.createTextNode(this.body[i]));
+		this.dom.body.className = 'body';
+	}
+
+/* message table
 	this.dom.table = document.createElement('table');
 	//this.dom.listItem.appendChild(this.dom.table);
 	this.dom.message.appendChild(this.dom.table);
@@ -334,13 +356,12 @@ createMessage: function(){
 	this.dom.row = document.createElement('tr');
 	this.dom.tbody.appendChild(this.dom.row);
 
-/* color box
+// color box
 	this.dom.colorBox = document.createElement('td');
 	this.dom.row.appendChild(this.dom.colorBox);
 
 	this.dom.colorBox.className = 'colorbox';
 	this.dom.colorBox.style.backgroundColor = '#'+this.color;
-//*/
 
 // message box
 	this.dom.messageBox = document.createElement('td');
@@ -363,7 +384,7 @@ createMessage: function(){
 	this.dom.body.className = 'body';
 
 
-/* close box
+// close box
 	this.dom.closeBox = document.createElement('td');
 	this.dom.row.appendChild(this.dom.closeBox);
 

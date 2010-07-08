@@ -65,15 +65,62 @@ include_once('include/page_header.php');
 			break;
 		case 'message.get':
 			$params = $data['params'];
+// Events
+			$lastEventId = CProfile::get('web.messages.last.eventid', 0);
+
+			if(isset($params['messageLast']['events'])){
+				$lastEventId = max(array($params['messageLast']['events'], $lastEventId)) + 1;
+			}
+
+			$options = array(
+				'object' => EVENT_OBJECT_TRIGGER,
+				'time_from' => (time() - 18000), // 15 min
+				'output' => API_OUTPUT_EXTEND,
+				'sortfield' => 'eventid',
+				'sortorder' => 'DESC',
+				'limit' => 15
+			);
+
+			if($lastEventId > 0){
+				$options['eventid_from'] = $lastEventId;
+			}
+
+			$events = CEvent::get($options);
+			order_result($events, 'eventid', ZBX_SORT_UP);
+			order_result($events, 'clock', ZBX_SORT_UP);
+			
+			$triggerOptions = array(
+				'triggerids' => zbx_objectValues($events, 'objectid'),
+				'select_hosts' => array('hostid', 'host'),
+				'output' => API_OUTPUT_EXTEND,
+				'expandDescription' => 1
+			);
+			$triggers = CTrigger::get($triggerOptions);
+			$triggers = zbx_toHash($triggers, 'triggerid');
 
 			$messages = array();
-			for($i=0; $i<1; $i++){
+			foreach($events as $enum => $event){
+				$trigger = $triggers[$event['objectid']];
+				$host = reset($trigger['hosts']);
+				
+				$title = ($event['value'] == TRIGGER_VALUE_FALSE)?S_RESOLVED:S_PROBLEM.' '.S_ON_SMALL;
+
 				$messages[] = array(
-					'caption' => 'events',
 					'type' => 3,
-					'title'=> 'TITLE LongLongLongLongLong  ',
-					'body'=> 'Details: Body LongLongLongLongLongLongLongLong',
-					'color'=> 'FF6666'
+					'caption' => 'events',
+					'sourceid' => $event['eventid'],
+					'time' => $event['clock'],
+					'priority' => $trigger['priority'],
+					'color' => getEventColor($trigger['priority'], $event['value']),
+					'title' => $title.' '.$host['host'],
+					'body' => array(
+						S_DETAILS.': '.$trigger['description'],
+						S_AGE.': '.zbx_date2age($event['clock'], time()),
+//						S_SEVERITY.': '.get_severity_style($trigger['priority'])
+					),
+					'timeout' => 60,
+'options' => $options
+
 				);
 			}
 

@@ -23,7 +23,7 @@
 
 var CDebug = Class.create({
 className:		null,			// debuging class name
-debug_status:	2,				// debug status: 0 - off, 1 - on, 2 - SDI;
+debug_status:	0,				// debug status: 0 - off, 1 - on, 2 - SDI;
 debug_info:		'',				// debug string
 
 // ---------- DEBUG ------------------------------------------------------------------------------------

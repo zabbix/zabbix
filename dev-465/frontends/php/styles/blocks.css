@@ -28,9 +28,10 @@ div.messagecontainer{
 	right: 0px;
 
 	overflow: auto;
-/**/	height: 400px; /**/
+	height: 768px;
 
-	background-color: #AFAFAF;
+/*/	border: 1px solid yellow; /**/
+/**/background-color: #FFFFFF; /**/
 }
 
 div.messagecontainer ul{
@@ -40,12 +41,12 @@ div.messagecontainer ul{
 }
 
 div.messagecontainer ul li.listItem{
-	border: 1px solid #ff6666;
 	margin: 4px 2px 4px 2px;
 }
 
 ul li.listItem .message{
 	white-space: nowrap;
+	height: 38px;
 }
 
 ul li.listItem .messageTable{
@@ -56,19 +57,21 @@ ul li.listItem .messageTable{
 
 .message .colorbox{
 	width: 20px;
-	height: 38px;
-	display: inline-block;
+	height: 100%;
+	float: left;
 }
 
 .message .closebox{
 	width: 30px;
-	height: 38px;
-	display: inline-block;
+	height: 100%;
+	float: right;
 }
 
 .message .messagebox{
 	font-family: Verdana, Arial, Helvetica, sans-serif;
-	padding: 0px 6px 2px 6px;
+	padding: 0px 22px 2px 6px;
+	margin-left: 20px;
+/*/	margin-right: 30px; /**/
 	background-color: #4F4F4F;
 	color: #EAEAEA;
 }
