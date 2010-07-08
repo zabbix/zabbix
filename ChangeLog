@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2666] fixed detection of resolv.h and net/if.h (asaveljevs)
  - [ZBX-2657] fixed bugs with non closing item select popups in bar reports (Vedmak)
  - [ZBXNEXT-425] added new macros for acknowledged events count (Vedmak)
  - [ZBX-2642] fixed items multiplier field (Vedmak)
