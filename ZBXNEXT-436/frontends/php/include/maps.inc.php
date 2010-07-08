@@ -1183,6 +1183,7 @@
 			$info['snmp_available'] = $host['snmp_available'];
 			$info['ipmi_available'] = $host['ipmi_available'];
 			$info['triggers'] = array();
+			$info['status'] = array();
 
 			if($host['status'] == HOST_STATUS_TEMPLATE){
 				$info['type'] = TRIGGER_VALUE_FALSE;
