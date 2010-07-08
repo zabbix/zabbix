@@ -302,7 +302,7 @@ if(isset($_REQUEST['sform'])){
 
 	$exp_select = new CComboBox('expr_type');
 	$exp_select->setAttribute('id','expr_type');
-		$exp_select->addItem(REGEXP_INCLUDE,S_INCLUDE);
+		$exp_select->addItem(REGEXP_INCLUDE,S_INCLUDE_S);
 		$exp_select->addItem(REGEXP_EXCLUDE,S_EXCLUDE);
 
 
@@ -360,7 +360,7 @@ if(isset($_REQUEST['sform'])){
 		$del_url = new CSpan(S_DELETE,'link');
 		$del_url->setAttribute('onclick', 'javascript: if(confirm("'.S_DELETE_EXPRESSION_Q.'")) remove_expression("logtr'.$id.'"); return false;');
 
-		$row = new CRow(array(htmlspecialchars($expr['view']),(($expr['type']==REGEXP_INCLUDE)?S_INCLUDE:S_EXCLUDE),array($imgup,SPACE,$imgdn),$del_url));
+		$row = new CRow(array(htmlspecialchars($expr['view']),(($expr['type']==REGEXP_INCLUDE)?S_INCLUDE_S:S_EXCLUDE),array($imgup,SPACE,$imgdn),$del_url));
 		$row->setAttribute('id','logtr'.$id);
 		$table->addRow($row);
 
