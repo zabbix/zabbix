@@ -1182,6 +1182,7 @@
 			$info['available'] = $host['available'];
 			$info['snmp_available'] = $host['snmp_available'];
 			$info['ipmi_available'] = $host['ipmi_available'];
+			$info['triggers'] = array();
 
 			if($host['status'] == HOST_STATUS_TEMPLATE){
 				$info['type'] = TRIGGER_VALUE_FALSE;
@@ -1199,6 +1200,7 @@
 					)
 				);
 
+				$info['type'] = TRIGGER_VALUE_FALSE;
 				$info['iconid'] = $selement['iconid_disabled'];
 				$info['icon_type'] = SYSMAP_ELEMENT_ICON_DISABLED;
 			}
@@ -1219,11 +1221,11 @@
 					)
 				);
 
+				$info['type'] = TRIGGER_VALUE_FALSE;
 				$info['iconid'] = $selement['iconid_maintenance'];
 				$info['icon_type'] = SYSMAP_ELEMENT_ICON_MAINTENANCE;
 			}
 			else if($host['status'] == HOST_STATUS_MONITORED){
-				$info['triggers'] = array();
 				$info['status'] = array(
 					TRIGGER_VALUE_TRUE => array(
 						'count' => 0,
@@ -2461,7 +2463,8 @@
 //		imagefilledrectangle($im, $x_rec-2, $y_rec-2, $x_rec+$w+2, $y_rec+($oc*4)+$h-2, $colors['White']);
 
 			$num = 0;
-			$increasey = $labelFontHeight;
+//			$increasey = $labelFontHeight;
+			$increasey = 12;
 			foreach($strings as $key => $str){
 				if($num >= $cnt) break;
 				$num++;
@@ -2469,7 +2472,7 @@
 				if(zbx_empty($str)) continue;
 
 				$dims = imageTextSize(8,0,$str);
-				$dims['height'] = $labelFontHeight;
+//				$dims['height'] = $labelFontHeight;
 				//$str .= ' - '.$labelFontHeight.' - '.$dims['height'];
 				//$str = $dims['width'].'x'.$dims['height'];
 
@@ -2482,7 +2485,7 @@
 
 				imagefilledrectangle(
 					$im,
-					$x_label, $y_rec+$increasey-$dims['height']+$dims['baseline'],
+					$x_label, $y_rec+$increasey-$dims['height']+$dims['baseline']-1,
 					$x_label+$dims['width'], $y_rec+$increasey+$dims['baseline']+1,
 					$colors['White']
 				);
@@ -2508,7 +2511,7 @@
 
 				imagefilledrectangle(
 					$im,
-					$x_label, $y_rec+$increasey-$dims['height']+$dims['baseline'],
+					$x_label, $y_rec+$increasey-$dims['height']+$dims['baseline']-1,
 					$x_label+$dims['width'], $y_rec+$increasey+$dims['baseline']+1,
 					$colors['White']
 				);
