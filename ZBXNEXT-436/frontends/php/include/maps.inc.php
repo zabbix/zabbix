@@ -2480,7 +2480,7 @@
 
 				imagefilledrectangle(
 					$im,
-					$x_label+1, $y_rec+$increasey-$labelFontHeight+$labelFontBaseline,
+					$x_label-1, $y_rec+$increasey-$labelFontHeight+$labelFontBaseline,
 					$x_label+$dims['width']+1, $y_rec+$increasey+$labelFontBaseline,
 					$colors['White']
 				);
