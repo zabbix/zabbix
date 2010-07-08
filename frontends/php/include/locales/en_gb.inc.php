@@ -2005,7 +2005,7 @@
 	'S_EDIT_CONNECTOR'=>			'Edit connector',
 
 //	tr_logform.php
-	'S_INCLUDE'=>		'Include',
+	'S_INCLUDE_S'=>		'Include',
 	'S_EXCLUDE'=>		'Exclude',
 	'S_KEYWORD'=>		'Keyword',
 	'S_POSITION'=>		'Position',
