@@ -2432,7 +2432,7 @@
 			$iconX = imagesx($img);
 			$iconY = imagesy($img);
 
-			if(!is_null($hl_color)) $icon_hl = 12;
+			if(!is_null($hl_color)) $icon_hl = 14;
 			else if(!is_null($st_color)) $icon_hl = 6;
 			else $icon_hl = 2;
 
@@ -2446,7 +2446,7 @@
 					$x_rec = $x - $icon_hl - $w;
 					break;
 				case MAP_LABEL_LOC_RIGHT:
-					$y_rec = $y + $h/2;
+					$y_rec = $y - $h/2 + $iconY/2;
 					$x_rec = $x + $iconX + $icon_hl;
 					break;
 				case MAP_LABEL_LOC_BOTTOM:
@@ -2485,7 +2485,7 @@
 				);
 				imagetext($im, 8, 0, $x_label, $y_rec+$increasey, $color, $str);
 
-				$increasey += $labelFontHeight;
+				$increasey += $labelFontHeight+1;
 			}
 		}
 	}
