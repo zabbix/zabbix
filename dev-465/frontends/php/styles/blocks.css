@@ -20,7 +20,84 @@
 */
 
 /************************************************************/
-/*					SCROLLBAR III STYLES						*/
+/*					ZABBIX MESSAGING						*/
+/************************************************************/
+div.messagecontainer{
+	position: absolute;
+	top: 99px;
+	right: 0px;
+
+	overflow: auto;
+/**/	height: 400px; /**/
+
+	background-color: #AFAFAF;
+}
+
+div.messagecontainer ul{
+	padding: 0px;
+	margin: 0px 0px 0px 0px;
+	list-style: none;
+}
+
+div.messagecontainer ul li.listItem{
+	border: 1px solid #ff6666;
+	margin: 4px 2px 4px 2px;
+}
+
+ul li.listItem .message{
+	white-space: nowrap;
+}
+
+ul li.listItem .messageTable{
+	border: 0px;
+	border-spacing: 0px;
+	margin: 0px;
+}
+
+.message .colorbox{
+	width: 20px;
+	height: 38px;
+	display: inline-block;
+}
+
+.message .closebox{
+	width: 30px;
+	height: 38px;
+	display: inline-block;
+}
+
+.message .messagebox{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	padding: 0px 6px 2px 6px;
+	background-color: #4F4F4F;
+	color: #EAEAEA;
+}
+
+.messagebox span.title{
+	line-height: 22px;
+	font-size: 10pt;
+	font-weight: bold;
+	white-space: nowrap;
+}
+
+.messagebox span.body{
+	line-height: 14px;
+	font-size: 7pt;
+	white-space: nowrap;
+}
+/************************************************************/
+/*						SEARCH Suggest						*/
+/************************************************************/
+div.suggest{
+	position: absolute;
+	border: 1px #5C7099 solid;
+	width: 162px;
+	z-index: 100;
+	display: none;
+}
+
+/************************************************************/
+/*					SCROLLBAR III STYLES					*/
 /************************************************************/
 div.scrollbar{
 	position: relative;

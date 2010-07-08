@@ -411,23 +411,13 @@ COpt::compare_files_with_menu($ZBX_MENU);
 			$search_div->setAttribute('class','zbx_search');
 			
 			zbx_add_post_js("var sid = createSuggest('search'); $('search').focus(); $('search').select();");
+			zbx_add_post_js("var msglistid = initMessages({});");
 		}
 
 		$sub_menu_table->addRow(array($menu_divs, $search_div));
 
 		$page_menu->addItem($sub_menu_table);
 //---
-
-/* SEARCH form
-		$search_form = new CForm('search.php');
-		$search_form->addItem(new CDiv(array(S_SEARCH_BIG.': ', new CTextBox('search','',20))));
-
-		$search_div = new CDiv($search_form);
-		$search_div->setAttribute('id','zbx_search');
-		$search_div->setAttribute('class','zbx_search');
-
-		$page_menu->addItem($search_div);
-//*/
 
 		$page_menu->show();
 	}

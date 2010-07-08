@@ -41,27 +41,62 @@ include_once('include/page_header.php');
 
 	if(!is_array($data)) fatal_error('Wrong RPC call to JS RPC');
 	if(!isset($data['method']) || !isset($data['params'])) fatal_error('Wrong RPC call to JS RPC');
-	if(($data['method'] != 'host.get') || !is_array($data['params'])) fatal_error('Wrong RPC call to JS RPC');
+	if(!is_array($data['params'])) fatal_error('Wrong RPC call to JS RPC');
 
-	$pattern = $data['params']['pattern'];
+	switch($data['method']){
+		case 'host.get':
+			$pattern = $data['params']['pattern'];
 
-	$options = array(
-		"startPattern" => 1,
-		"pattern" => $pattern,
-		"output" => array("hostid", "host"),
-		"sortfield" => "host",
-		"limit" => 15
-	);
+			$options = array(
+				'startPattern' => 1,
+				'pattern' => $pattern,
+				'output' => array('hostid', 'host'),
+				'sortfield' => 'host',
+				'limit' => 15
+			);
 
-	$hosts = CHost::get($options);
+			$hosts = CHost::get($options);
 
-	$rpcResp = array(
-		'jsonrpc' => '2.0',
-		'result' => $hosts,
-		'id' => $data['id']
-	);
+			$rpcResp = array(
+				'jsonrpc' => '2.0',
+				'result' => $hosts,
+				'id' => $data['id']
+			);
+			break;
+		case 'message.get':
+			$params = $data['params'];
 
-	print($json->encode($rpcResp));
+			$messages = array();
+			for($i=0; $i<1; $i++){
+				$messages[] = array(
+					'caption' => 'events',
+					'type' => 3,
+					'title'=> 'TITLE LongLongLongLongLong  ',
+					'body'=> 'Details: Body LongLongLongLongLongLongLongLong',
+					'color'=> 'FF6666'
+				);
+			}
+
+			$rpcResp = array(
+				'jsonrpc' => '2.0',
+				'result' => $messages,
+				'id' => $data['id']
+			);
+		break;
+		case 'message.close':
+			$closeMessage = $data['params'];
+			
+			$rpcResp = array(
+				'jsonrpc' => '2.0',
+				'result' => $closeMessage,
+				'id' => $data['id']
+			);
+		break;
+		default:
+			fatal_error('Wrong RPC call to JS RPC');
+	}
+
+	if(isset($data['id'])) print($json->encode($rpcResp));
 ?>
 <?php
 

@@ -144,6 +144,7 @@ _lastupdate:	0,
 _counter:		0,			// how many times do update, 0 - infinite
 _params:		'',
 _status:		false,
+_ready:			false,
 
 pexec:			null,		// PeriodicalExecuter object
 min_freq:		5,			// seconds
@@ -340,8 +341,5 @@ rmwDarken: function(){
 		document.body.removeChild(this._domdark);
 		this._domdark = null;
 	}
-},
-
-notify: function(){
 }
 });

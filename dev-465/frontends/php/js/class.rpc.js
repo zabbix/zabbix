@@ -43,8 +43,7 @@ rpcurl: function(rpcurl_){
 }
 }
 
-RPC.Base = Class.create();
-RPC.Base.prototype = {
+RPC.Base = Class.create({
 // PRIVATE
 'userParams':		{},		// user OPtions
 'auth':				null,	// authentication hash
@@ -86,7 +85,7 @@ debug: function(fnc_name, id){
 		this.debug_prev = str;
 	}
 }
-}
+});
 
 RPC.Call = Class.create(RPC.Base, {
 initialize: function($super, userParams) {

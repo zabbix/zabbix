@@ -123,7 +123,7 @@ searchServer: function(needle){
 			'limit': this.suggestLimit
 		},
 		'onSuccess': this.serverRespond.bind(this, needle),
-		'onFailure': function(resp){ throw('Suggest Widget: search request failed.'); }
+		'onFailure': function(resp){ zbx_throw('Suggest Widget: search request failed.'); }
 	}
 
 	new RPC.Call(rpcRequest);
