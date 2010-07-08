@@ -6,7 +6,7 @@
 # specify whether to default to --with-unixodbc
 # If not supplied, DEFAULT-ACTION is no.
 #
-# This macro #defines HAVE_UNIXODBC if a required header files is
+# This macro #defines HAVE_UNIXODBC if required header files are
 # found, and sets @UNIXODBC_LDFLAGS@ and @UNIXODBC_CFLAGS@ to the necessary
 # values.
 #
@@ -21,7 +21,7 @@ AC_DEFUN([LIBUNIXODBC_CHECK_CONFIG],
 [
   AC_ARG_WITH(unixodbc,
     [AC_HELP_STRING([--with-unixodbc@<:@=ARG@:>@],
-		[use odbc driver against unixODBC package @<:@default=no@:>@, optionally specify path to odbc_config.])
+		[use odbc driver against unixODBC package @<:@default=no@:>@, optionally specify full path to odbc_config binary.])
     ],[ if test "$withval" = "no"; then
             want_unixodbc="no"
         elif test "$withval" = "yes"; then
