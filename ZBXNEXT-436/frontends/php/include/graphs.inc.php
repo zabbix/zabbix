@@ -1360,7 +1360,9 @@
 
 			$result['height'] = abs($ar[1] - $ar[5]);
 			$result['width'] = abs($ar[0] - $ar[4]);
-		} else{
+			$result['baseline'] = $ar[1];
+		}
+		else{
 			switch($fontsize){
 				case 5: $fontsize = 1; break;
 				case 6: $fontsize = 1; break;
@@ -1382,6 +1384,7 @@
 				$result['height'] = imagefontheight($fontsize);
 				$result['width'] = imagefontwidth($fontsize) * zbx_strlen($string);
 			}
+			$result['baseline'] = 0;
 		}
 
 		return $result;

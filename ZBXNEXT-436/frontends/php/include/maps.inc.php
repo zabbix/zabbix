@@ -988,6 +988,7 @@
  	function getTriggersInfo($selements, $highlight=false){
 		global $colors;
 
+		$active_triggerids = array();
 		$selements_info = array();
 		$options = array(
 			'nodeids' => get_current_nodeid(true),
@@ -1033,8 +1034,7 @@
 			$info['status'][$info['type']]['info'] = $info['name'];
 
 			$info['ack'] = false;
-			$active_triggerids = array();
-//----
+
 			if($info['type'] == TRIGGER_VALUE_TRUE){
 				$color = ($info['status'][$info['type']]['priority'] > 3) ? $colors['Red'] : $colors['Dark Red'];
 
@@ -1091,6 +1091,7 @@
 				'output' => API_OUTPUT_SHORTEN
 			);
 			$active_triggers = CTrigger::get($options);
+			$active_triggers = zbx_toHash($active_triggers, 'triggerid');
 			foreach($selements_info as $id => $selement){
 				if(!isset($active_triggers[$id])){
 					$selements_info[$id]['ack'] = true;
@@ -2481,13 +2482,13 @@
 
 				imagefilledrectangle(
 					$im,
-					$x_label-2, $y_rec+$increasey-$dims['height'],
-					$x_label+$dims['width'], $y_rec+$increasey+4,
+					$x_label-1, $y_rec+$increasey-$dims['height'],
+					$x_label+$dims['width']+2, $y_rec+$increasey+4,
 					$colors['White']
 				);
 				imagetext($im, 8, 0, $x_label, $y_rec+$increasey, $label_color, $str);
 
-				$increasey += $dims['height']+1;
+				$increasey += $dims['height']+2;
 			}
 
 			$el_msgs = array('problem', 'unack', 'maintenances', 'unknown', 'ok', 'status', 'availability');
@@ -2507,8 +2508,8 @@
 
 				imagefilledrectangle(
 					$im,
-					$x_label-2, $y_rec+$increasey-$dims['height'],
-					$x_label+$dims['width']+1, $y_rec+$increasey+4,
+					$x_label-1, $y_rec+$increasey-$dims['height']+$dims['baseline'],
+					$x_label+$dims['width']+2, $y_rec+$increasey+$dims['baseline']+1,
 					$colors['White']
 				);
 				imagetext($im, 8, 0, $x_label, $y_rec+$increasey, $color, $str);
