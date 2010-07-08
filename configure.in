@@ -47,13 +47,41 @@ AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   sys/swap.h sys/vmmeter.h strings.h sys/sysctl.h vm/vm_param.h \
   sys/time.h kstat.h sys/syscall.h sys/sysmacros.h sys/procfs.h \
   stdint.h mach/host_info.h mach/mach_host.h knlist.h pwd.h sys/proc.h \
-  sys/var.h resolv.h arpa/nameser.h assert.h sys/dkstat.h sys/disk.h \
-  nlist.h net/if.h kvm.h linux/kernel.h getopt.h procinfo.h sys/dk.h \
+  sys/var.h arpa/nameser.h assert.h sys/dkstat.h sys/disk.h \
+  nlist.h kvm.h linux/kernel.h getopt.h procinfo.h sys/dk.h \
   sys/resource.h pthread.h windows.h process.h conio.h sys/wait.h regex.h \
   stdarg.h winsock2.h pdh.h psapi.h sys/sem.h sys/ipc.h sys/shm.h Winldap.h \
   sys/timeb.h Winber.h lber.h ws2tcpip.h inttypes.h sys/file.h grp.h \
   net/if_mib.h sys/user.h execinfo.h sys/ucontext.h libperfstat.h devstat.h \
   sys/systemcfg.h)
+AC_CHECK_HEADERS(resolv.h, [], [], [
+  #ifdef HAVE_SYS_TYPES_H
+  #  include <sys/types.h>
+  #endif
+  #ifdef HAVE_NETINET_IN_H
+  #  include <netinet/in.h>
+  #endif
+  #ifdef HAVE_ARPA_NAMESER_H
+  #  include <arpa/nameser.h>
+  #endif
+  #ifdef HAVE_NETDB_H
+  #  include <netdb.h>
+  #endif
+])
+AC_CHECK_HEADERS(net/if.h, [], [], [
+  #include <stdio.h>
+  #if STDC_HEADERS
+  #  include <stdlib.h>
+  #  include <stddef.h>
+  #else
+  #  if HAVE_STDLIB_H
+  #    include <stdlib.h>
+  #  endif
+  #endif
+  #if HAVE_SYS_SOCKET_H
+  #  include <sys/socket.h>
+  #endif
+]) 
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
