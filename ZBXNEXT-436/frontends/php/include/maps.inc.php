@@ -2470,8 +2470,9 @@
 				//$str .= ' - '.$labelFontHeight.' - '.$dims['height'];
 				//$str = $dims['width'].'x'.$dims['height'];
 
-				if($label_location == MAP_LABEL_LOC_TOP || $label_location == MAP_LABEL_LOC_BOTTOM)
-					$x_label = $x + $iconX/2 - $dims['width']/2;
+				if($label_location == MAP_LABEL_LOC_TOP || $label_location == MAP_LABEL_LOC_BOTTOM){
+					$x_label = $x + ceil($iconX/2) - ceil($dims['width']/2);
+				}
 				else if($label_location == MAP_LABEL_LOC_LEFT)
 					$x_label = $x_rec + $w - $dims['width'];
 				else
@@ -2480,7 +2481,7 @@
 				imagefilledrectangle(
 					$im,
 					$x_label, $y_rec+$increasey-$labelFontHeight+$labelFontBaseline,
-					$x_label+$dims['width'], $y_rec+$increasey+$labelFontBaseline,
+					$x_label+$dims['width']+1, $y_rec+$increasey+$labelFontBaseline,
 					$colors['White']
 				);
 				imagetext($im, 8, 0, $x_label, $y_rec+$increasey, $color, $str);
