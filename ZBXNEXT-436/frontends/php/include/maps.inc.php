@@ -59,57 +59,6 @@
 	return $drawtype;
 	}
 
-/*
- * Function: sysmap_accessible
- *
- * Description: Check permission for map
- *
- * Return: true on success
- *
- * Author: Aly
- */
-	function sysmap_accessible($sysmapid,$perm){
-		global $USER_DETAILS;
-
-		$nodes = get_current_nodeid(null,$perm);
-		$result = (bool) count($nodes);
-
-		$sql = 'SELECT * '.
-				' FROM sysmaps_elements '.
-				' WHERE sysmapid='.$sysmapid.
-					' AND '.DBin_node('sysmapid', $nodes);
-		$db_result = DBselect($sql);
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,$perm,PERM_RES_IDS_ARRAY,get_current_nodeid(true));
-//SDI($available_hosts);
-		while(($se_data = DBfetch($db_result)) && $result){
-			switch($se_data['elementtype']){
-				case SYSMAP_ELEMENT_TYPE_HOST:
-					if(!isset($available_hosts[$se_data['elementid']])){
-						$result = false;
-					}
-					break;
-				case SYSMAP_ELEMENT_TYPE_MAP:
-					$result = sysmap_accessible($se_data['elementid'], $perm);
-					break;
-				case SYSMAP_ELEMENT_TYPE_TRIGGER:
-					$available_triggers = get_accessible_triggers($perm, array(), PERM_RES_IDS_ARRAY);
-					if(!isset($available_triggers[$se_data['elementid']])){
-						$result = false;
-					}
-					break;
-				case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-					$available_groups = get_accessible_groups_by_user($USER_DETAILS,$perm);
-					if(!isset($available_groups[$se_data['elementid']])){
-						$result = false;
-					}
-					break;
-			}
-		}
-//SDI($se_data['elementid']);
-
-	return $result;
-	}
-
 	function get_sysmap_by_sysmapid($sysmapid){
 		$row = DBfetch(DBselect('SELECT * FROM sysmaps WHERE sysmapid='.$sysmapid));
 		if($row){
@@ -793,6 +742,21 @@
 					}
 					while(zbx_strstr($label, '{TRIGGER.PROBLEM.EVENTS.PROBLEM.UNACK}')){
 						$label = str_replace('{TRIGGER.PROBLEM.EVENTS.PROBLEM.UNACK}', get_events_unacknowledged($db_element, TRIGGER_VALUE_TRUE, TRIGGER_VALUE_TRUE), $label);
+					}
+					while(zbx_strstr($label, '{TRIGGERS.ACK}')){
+						$label = str_replace('{TRIGGERS.ACK}', get_triggers_unacknowledged($db_element, null, true), $label);
+					}
+					while(zbx_strstr($label, '{TRIGGERS.PROBLEM.ACK}')){
+						$label = str_replace('{TRIGGERS.PROBLEM.ACK}', get_triggers_unacknowledged($db_element, true, true), $label);
+					}
+					while(zbx_strstr($label, '{TRIGGER.EVENTS.ACK}')){
+						$label = str_replace('{TRIGGER.EVENTS.ACK}', get_events_unacknowledged($db_element, null, null, true), $label);
+					}
+					while(zbx_strstr($label, '{TRIGGER.EVENTS.PROBLEM.ACK}')){
+						$label = str_replace('{TRIGGER.EVENTS.PROBLEM.ACK}', get_events_unacknowledged($db_element, null, TRIGGER_VALUE_TRUE, true), $label);
+					}
+					while(zbx_strstr($label, '{TRIGGER.PROBLEM.EVENTS.PROBLEM.ACK}')){
+						$label = str_replace('{TRIGGER.PROBLEM.EVENTS.PROBLEM.ACK}', get_events_unacknowledged($db_element, TRIGGER_VALUE_TRUE, TRIGGER_VALUE_TRUE, true), $label);
 					}
 					break;
 			}

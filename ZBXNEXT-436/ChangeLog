@@ -1,5 +1,7 @@
 Changes for 1.8.3
 
+ - [ZBX-2657] fixed bugs with non closing item select popups in bar reports (Vedmak)
+ - [ZBXNEXT-425] added new macros for acknowledged events count (Vedmak)
  - [ZBX-2642] fixed items multiplier field (Vedmak)
  - [ZBX-2639] now when do full clone template, linkage list is cleared (Vedmak)
  - [ZBX-2598] fixed labels with linebreak in maps (Aly)
@@ -178,7 +180,7 @@ Changes for 1.8.3
  - [ZBX-2362] fixed processing of logrt[] checks under Windows (Sasha)
  - [ZBX-2356] fixed error while performing group actions when creating an item (Vedmak)
  - [ZBX-2355] fixed error when trying to massupdate trigger severity (Vedmak)
- - [ZBX-2354,ZBX-2635] updated Russian translation; thanks to dotneft (Richlv)
+ - [ZBX-2354,ZBX-2635,ZBX-2648] updated Russian translation; thanks to dotneft and zalex_ua (Richlv)
  - [ZBX-2352] fixed typo in the default locale (Richlv)
  - [ZBX-2312] fixed event order in "monitoring triggers" and "last 20 events" (Vedmak)
  - [ZBX-2264] added opportunity to translate class.cuser.php and config.inc.php (AM)

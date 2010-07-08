@@ -437,7 +437,7 @@
 			new CButton('select_app',S_SELECT,
 				'return PopUp("popup.php?dstfrm='.$form->getName().
 				'&dstfld1=application&srctbl=applications'.
-				'&srcfld1=name&only_hostid='.$_REQUEST['hostid'].'",200,300,"application");')
+				'&srcfld1=name&only_hostid='.$_REQUEST['hostid'].'",500,600,"application");')
 			));
 
 		$form->addRow(S_NAME, new CTextBox('name', $name, 40));
@@ -5264,7 +5264,7 @@ JAVASCRIPT;
 			$host_tbl->addRow(array(S_ITEMS, $items_lbx));
 
 // Host triggers
-			$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array($_REQUEST['hostid']), PERM_RES_IDS_ARRAY);
+			$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array($_REQUEST['hostid']));
 
 			$trig_lbx = new CListBox('triggers',null,8);
 			$trig_lbx->setAttribute('disabled','disabled');

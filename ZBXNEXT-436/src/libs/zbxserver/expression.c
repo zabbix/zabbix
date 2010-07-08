@@ -17,7 +17,6 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-
 #include "common.h"
 #include "zbxserver.h"
 #include "evalfunc.h"
@@ -940,41 +939,33 @@ static int	DBget_trigger_value_by_triggerid(zbx_uint64_t triggerid, char **repla
 
 /******************************************************************************
  *                                                                            *
- * Function: DBget_trigger_events_unacknowledged                              *
+ * Function: DBget_trigger_event_count                                        *
  *                                                                            *
- * Purpose: retrieve number of unacknowledged PROBLEM events for a trigger    *
- *          which generated event                                             *
+ * Purpose: retrieve number of events (acknowledged or unacknowledged) for a  *
+ *          trigger (in an OK or PROBLEM state) which generated an event      *
  *                                                                            *
- * Parameters: triggerid - trigger identificator from database                *
+ * Parameters: triggerid - trigger identifier from database                   *
  *             replace_to - pointer to result buffer                          *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
+ * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-#define ZBX_TRIGGER_EVENTS_PROBLEM_UNACK	0
-#define ZBX_TRIGGER_EVENTS_UNACK		1
-static int	DBget_trigger_events_unacknowledged(zbx_uint64_t triggerid, char **replace_to, unsigned char type)
+static int	DBget_trigger_event_count(zbx_uint64_t triggerid, char **replace_to, int problem_only, int acknowledged)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		value[4];
 	int		ret = FAIL;
 
-	switch (type) {
-		case ZBX_TRIGGER_EVENTS_PROBLEM_UNACK:
-			zbx_snprintf(value, sizeof(value), "%d", TRIGGER_VALUE_TRUE);
-			break;
-		case ZBX_TRIGGER_EVENTS_UNACK:
-			zbx_snprintf(value, sizeof(value), "%d,%d", TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE);
-			break;
-		default:
-			assert(0);
-	}
+	if (problem_only)
+		zbx_snprintf(value, sizeof(value), "%d", TRIGGER_VALUE_TRUE);
+	else
+		zbx_snprintf(value, sizeof(value), "%d,%d", TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE);
 
 	result = DBselect(
 			"select count(*)"
@@ -982,10 +973,11 @@ static int	DBget_trigger_events_unacknowledged(zbx_uint64_t triggerid, char **re
 			" where object=%d"
 				" and objectid=" ZBX_FS_UI64
 				" and value in (%s)"
-				" and acknowledged=0",
+				" and acknowledged=%d",
 			EVENT_OBJECT_TRIGGER,
 			triggerid,
-			value);
+			value,
+			acknowledged);
 
 	if (NULL != (row = DBfetch(result)))
 	{
@@ -1675,7 +1667,9 @@ static int	get_node_value_by_event(DB_EVENT *event, char **replace_to, const cha
 #define MVAR_TRIGGER_VALUE		"{TRIGGER.VALUE}"
 #define MVAR_TRIGGER_URL		"{TRIGGER.URL}"
 
+#define MVAR_TRIGGER_EVENTS_ACK		"{TRIGGER.EVENTS.ACK}"
 #define MVAR_TRIGGER_EVENTS_UNACK	"{TRIGGER.EVENTS.UNACK}"
+#define MVAR_TRIGGER_EVENTS_PROBLEM_ACK		"{TRIGGER.EVENTS.PROBLEM.ACK}"
 #define MVAR_TRIGGER_EVENTS_PROBLEM_UNACK	"{TRIGGER.EVENTS.PROBLEM.UNACK}"
 
 #define MVAR_PROFILE_DEVICETYPE		"{PROFILE.DEVICETYPE}"
@@ -1907,12 +1901,14 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, 
 					replace_to = zbx_dsprintf(replace_to, "%d", event->value);
 				else if (0 == strcmp(m, MVAR_TRIGGER_URL))
 					replace_to = zbx_dsprintf(replace_to, "%s", event->trigger_url);
+				else if (0 == strcmp(m, MVAR_TRIGGER_EVENTS_ACK))
+					ret = DBget_trigger_event_count(event->objectid, &replace_to, 0, 1);
 				else if (0 == strcmp(m, MVAR_TRIGGER_EVENTS_UNACK))
-					ret = DBget_trigger_events_unacknowledged(event->objectid, &replace_to,
-							ZBX_TRIGGER_EVENTS_UNACK);
+					ret = DBget_trigger_event_count(event->objectid, &replace_to, 0, 0);
+				else if (0 == strcmp(m, MVAR_TRIGGER_EVENTS_PROBLEM_ACK))
+					ret = DBget_trigger_event_count(event->objectid, &replace_to, 1, 1);
 				else if (0 == strcmp(m, MVAR_TRIGGER_EVENTS_PROBLEM_UNACK))
-					ret = DBget_trigger_events_unacknowledged(event->objectid, &replace_to,
-							ZBX_TRIGGER_EVENTS_PROBLEM_UNACK);
+					ret = DBget_trigger_event_count(event->objectid, &replace_to, 1, 0);
 				else if (0 == strcmp(m, MVAR_EVENT_ID))
 					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->eventid);
 				else if (0 == strcmp(m, MVAR_EVENT_DATE))
