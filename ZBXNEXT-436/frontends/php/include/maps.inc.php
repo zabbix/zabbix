@@ -2344,25 +2344,43 @@
 	function drawMapLabels(&$im, &$map, &$map_info){
 		global $colors;
 
+		if($map['label_type'] == MAP_LABEL_TYPE_NOTHING) return;
+
 		$selements = $map['selements'];
-		$labelLines = array();
+		$all_strings = '';
+		$all_labels_lines = array();
 		foreach($selements as $selementid => $selement){
-			$labelLines[$selementid] = expand_map_element_label_by_data($selement);
+			if(!isset($all_labels_lines[$selementid])) $all_labels_lines[$selementid] = array();
+
+			$msg = expand_map_element_label_by_data($selement);
+			$all_strings .= $msg;
+			$msgs = explode("\n", $msg);
+			foreach($msgs as $msg){
+				$all_labels_lines[$selementid][] = array('msg' => $msg);
+			}
+
+			$el_info = $map_info[$selementid];
+			$el_msgs = array('problem', 'unack', 'maintenances', 'unknown', 'ok', 'status', 'availability');
+			foreach($el_msgs as $key => $caption){
+				if(!isset($el_info['info'][$caption]) || zbx_empty($el_info['info'][$caption]['msg'])) continue;
+
+				$all_labels_lines[$selementid][] = array(
+					'msg' => $el_info['info'][$caption]['msg'],
+					'color' => $el_info['info'][$caption]['color']
+				);
+
+				$all_strings .= $el_info['info'][$caption]['msg'];
+			}
 		}
 
-		$allLabelsSize = imageTextSize(8,0, str_replace("\r", '', str_replace("\n", '', implode(' ', $labelLines))));
+		$allLabelsSize = imageTextSize(8, 0, str_replace("\r", '', str_replace("\n", '', $all_strings)));
 		$labelFontHeight = $allLabelsSize['height'];
+		$labelFontBaseline = $allLabelsSize['baseline'];
 
 		foreach($selements as $selementid => $selement){
 			if(empty($selement)) continue;
 
 			$el_info = $map_info[$selementid];
-			$img = get_png_by_selement($selement, $el_info);
-
-			$iconX = imagesx($img);
-			$iconY = imagesy($img);
-
-			if($map['label_type'] == MAP_LABEL_TYPE_NOTHING) continue;
 
 			$hl_color = null;
 			$st_color = null;
@@ -2370,75 +2388,53 @@
 				if($el_info['icon_type'] == SYSMAP_ELEMENT_ICON_ON) $hl_color = true;
 				if($el_info['icon_type'] == SYSMAP_ELEMENT_ICON_UNKNOWN) $hl_color = true;
 
-				if(isset($el_info['unavailable']))		$st_color = true;
-				if(isset($el_info['disabled']))			$st_color = true;
-				if(!empty($el_info['maintenances']))		$st_color = true;
+				if(isset($el_info['unavailable'])) $st_color = true;
+				if(isset($el_info['disabled'])) $st_color = true;
+				if(!empty($el_info['maintenances'])) $st_color = true;
 			}
 
-			$mainProblems = array(
-				SYSMAP_ELEMENT_TYPE_HOST_GROUP => 1,
-				SYSMAP_ELEMENT_TYPE_MAP => 1
-			);
+			if(in_array($el_info['elementtype'], array(SYSMAP_ELEMENT_TYPE_HOST_GROUP, SYSMAP_ELEMENT_TYPE_MAP))
+					&& !is_null($hl_color))
+				$st_color = null;
+			else if(!is_null($st_color))
+				$hl_color = null;
 
-			if(isset($mainProblems[$el_info['elementtype']])) if(!is_null($hl_color)) $st_color = null;
-			else if(!is_null($st_color)) $hl_color = null;
 
-			$color	= $colors['Dark Green'];
-			$label_color = $colors['Black'];
+			$label_location = (is_null($selement['label_location']) || ($selement['label_location'] < 0))
+					? $map['label_location'] : $selement['label_location'];
 
-			$info_line	= '';
-
-			$label_location = $selement['label_location'];
-			if(is_null($label_location) || ($label_location < 0)) $label_location = $map['label_location'];
-
-			$label_line = $labelLines[$selementid];
-
-			$info_line = array();
-			foreach($el_info['info'] as $key => $info){
-				$info_line[$key] = $info['msg'];
+			$label_lines = array();
+			if(($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) && ($map['label_type'] == MAP_LABEL_TYPE_IP)){
+				$host = get_host_by_hostid($selement['elementid']);
+				$label_lines[] = array('msg' => $host['ip']);
 			}
-
-			if($map['label_type'] == MAP_LABEL_TYPE_STATUS){
-				$label_line = '';
+			else if($map['label_type'] == MAP_LABEL_TYPE_STATUS){
+				$label_lines = array();
 			}
 			else if($map['label_type'] == MAP_LABEL_TYPE_NAME){
-				$label_line = $el_info['name'];
+				$label_lines[] = array('msg' => $el_info['name']);
 			}
-
-			if($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST){
-				$host = get_host_by_hostid($selement['elementid']);
-
-				if($map['label_type'] == MAP_LABEL_TYPE_IP) $label_line = $host['ip'];
+			else{
+				$label_lines = $all_labels_lines[$selementid];
 			}
+			if(zbx_empty($label_lines)) continue;
 
-			if($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_IMAGE){
-				//$label_line = expand_map_element_label_by_data($selement);
-				$label_line = $labelLines[$selementid]; // to minimize queries
-			}
-
-// LABEL
-			if(zbx_empty($label_line) && empty($info_line)) continue;
-
-			$label_line = str_replace("\r", '', $label_line);
-			$strings = explode("\n", $label_line);
-
-			$cnt = count($strings);
-			$strings = zbx_array_merge($strings, $info_line);
-
-			$h = 0;
 			$w = 0;
-			foreach($strings as $strnum => $str){
-				$dims = imageTextSize(8,0,$str);
-				$h += $labelFontHeight+4;
+			foreach($label_lines as $str){
+				$dims = imageTextSize(8, 0, $str['msg']);
 				$w = max($w, $dims['width']);
 			}
+			$h = count($label_lines) * $labelFontHeight;
 
 			$x = $selement['x'];
 			$y = $selement['y'];
+			$img = get_png_by_selement($selement, $el_info);
+			$iconX = imagesx($img);
+			$iconY = imagesy($img);
 
-			$icon_hl = 2;
 			if(!is_null($hl_color)) $icon_hl = 12;
 			else if(!is_null($st_color)) $icon_hl = 6;
+			else $icon_hl = 2;
 
 			switch($label_location){
 				case MAP_LABEL_LOC_TOP:
@@ -2446,7 +2442,7 @@
 					$x_rec = $x + $iconX/2 - $w/2;
 					break;
 				case MAP_LABEL_LOC_LEFT:
-					$y_rec = $y + $h/2;
+					$y_rec = $y - $h/2 + $iconY/2;
 					$x_rec = $x - $icon_hl - $w;
 					break;
 				case MAP_LABEL_LOC_RIGHT:
@@ -2458,21 +2454,18 @@
 					$y_rec = $y + $iconY + $icon_hl;
 					$x_rec = $x + $iconX/2 - $w/2;
 			}
-
 //		$y_rec += 30;
 //		imagerectangle($im, $x_rec-2-1, $y_rec-3, $x_rec+$w+2+1, $y_rec+($oc*4)+$h+3, $label_color);
 //		imagefilledrectangle($im, $x_rec-2, $y_rec-2, $x_rec+$w+2, $y_rec+($oc*4)+$h-2, $colors['White']);
 
-			$num = 0;
-//			$increasey = $labelFontHeight;
 			$increasey = 12;
-			foreach($strings as $key => $str){
-				if($num >= $cnt) break;
-				$num++;
+			foreach($label_lines as $line){
+				if(zbx_empty($line['msg'])) continue;
 
-				if(zbx_empty($str)) continue;
+				$str = str_replace("\r", '', $line['msg']);
+				$color = isset($line['color']) ? $line['color'] : $colors['Black'];
 
-				$dims = imageTextSize(8,0,$str);
+				$dims = imageTextSize(8, 0, $str);
 //				$dims['height'] = $labelFontHeight;
 				//$str .= ' - '.$labelFontHeight.' - '.$dims['height'];
 				//$str = $dims['width'].'x'.$dims['height'];
@@ -2486,39 +2479,13 @@
 
 				imagefilledrectangle(
 					$im,
-					$x_label, $y_rec+$increasey-$dims['height']+$dims['baseline']-1,
-					$x_label+$dims['width'], $y_rec+$increasey+$dims['baseline']+1,
-					$colors['White']
-				);
-				imagetext($im, 8, 0, $x_label, $y_rec+$increasey, $label_color, $str);
-
-				$increasey += $dims['height']+2;
-			}
-
-			$el_msgs = array('problem', 'unack', 'maintenances', 'unknown', 'ok', 'status', 'availability');
-			foreach($el_msgs as $key => $caption){
-				if(!isset($el_info['info'][$caption]) || zbx_empty($el_info['info'][$caption]['msg'])) continue;
-
-				$str = $el_info['info'][$caption]['msg'];
-				$color = $el_info['info'][$caption]['color'];
-
-				$dims = imageTextSize(8, 0, $str);
-				if($label_location == MAP_LABEL_LOC_TOP || $label_location == MAP_LABEL_LOC_BOTTOM)
-					$x_label = $x + $iconX/2 - $dims['width']/2;
-				else if($label_location == MAP_LABEL_LOC_LEFT)
-					$x_label = $x_rec + $w - $dims['width'];
-				else
-					$x_label = $x_rec;
-
-				imagefilledrectangle(
-					$im,
-					$x_label, $y_rec+$increasey-$dims['height']+$dims['baseline']-1,
-					$x_label+$dims['width'], $y_rec+$increasey+$dims['baseline']+1,
+					$x_label, $y_rec+$increasey-$labelFontHeight+$labelFontBaseline,
+					$x_label+$dims['width'], $y_rec+$increasey+$labelFontBaseline,
 					$colors['White']
 				);
 				imagetext($im, 8, 0, $x_label, $y_rec+$increasey, $color, $str);
 
-				$increasey += $dims['height']+2;
+				$increasey += $labelFontHeight;
 			}
 		}
 	}
