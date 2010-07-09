@@ -243,9 +243,12 @@ include_once('include/page_header.php');
 	$cb->addItems(array(
 		EXTACK_OPTION_ALL => S_O_ALL,
 		EXTACK_OPTION_BOTH => S_O_SEPARATED,
-		EXTACK_OPTION_UNACK => S_O_UNACKNOWLEDGED_ONLY,	
+		EXTACK_OPTION_UNACK => S_O_UNACKNOWLEDGED_ONLY,
 	));
 	$cb->setEnabled($filterEnable && $config['event_ack_enable']);
+	if(!$config['event_ack_enable']){
+		$cb->setAttribute('title', S_EVENT_ACKNOWLEDGING_DISABLED);
+	}
 	$dashForm->addRow(S_PROBLEM_DISPLAY, $cb);
 //-----
 

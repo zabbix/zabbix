@@ -5748,6 +5748,9 @@ JAVASCRIPT;
 			EXTACK_OPTION_UNACK => S_O_UNACKNOWLEDGED_ONLY,
 		));
 		$cb->setEnabled($config['event_ack_enable']);
+		if(!$config['event_ack_enable']){
+			$cb->setAttribute('title', S_EVENT_ACKNOWLEDGING_DISABLED);
+		}
 		$frmMap->addRow(S_PROBLEM_DISPLAY, $cb);
 
 		$frmMap->addItemToBottomRow(new CButton('save',S_SAVE));

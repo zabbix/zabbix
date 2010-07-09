@@ -1295,6 +1295,7 @@
 	'S_PROBLEM_BIG'=>		'PROBLEM',
 	'S_ZABBIX_URL'=>		'http://www.zabbix.com',
 	'S_UNACKNOWLEDGED' => 'Unacknowledged',
+	'S_EVENT_ACKNOWLEDGING_DISABLED' => 'Event acknowledging disabled',
 
 //	maps.php
 	'S_NETWORK_MAPS'=>		'Network maps',
