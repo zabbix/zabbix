@@ -1406,7 +1406,8 @@
 			'groupids' => array_keys($hostgroups),
 			'withLastEventUnacknowledged' => true,
 			'output' => API_OUTPUT_SHORTEN,
-			'nodeids' => get_current_nodeid(true)
+			'nodeids' => get_current_nodeid(true),
+			'filter' => array('value' => TRIGGER_VALUE_TRUE),
 		);
 		$unack_triggerids = CTrigger::get($options);
 		$unack_triggerids = zbx_toHash($unack_triggerids, 'triggerid');
