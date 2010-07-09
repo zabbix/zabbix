@@ -205,7 +205,7 @@ include_once('include/page_header.php');
 		add_audit_if($result,AUDIT_ACTION_DELETE,AUDIT_RESOURCE_MAP,'Name ['.$sysmap['name'].']');
 		show_messages($result, S_MAP_DELETED, S_CANNOT_DELETE_MAP);
 		if($result){
-			unset($_REQUEST["form"]);
+			unset($_REQUEST['form']);
 		}
 	}
 	else if($_REQUEST['go'] == 'delete'){
