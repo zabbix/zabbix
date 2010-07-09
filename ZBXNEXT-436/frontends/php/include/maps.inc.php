@@ -988,7 +988,6 @@
  	function getTriggersInfo($selements, $highlight=false){
 		global $colors;
 
-		$active_triggerids = array();
 		$selements_info = array();
 		$options = array(
 			'nodeids' => get_current_nodeid(true),
@@ -999,6 +998,22 @@
 		);
 		$triggers = CTrigger::get($options);
 		$triggers = zbx_toHash($triggers, 'triggerid');
+
+
+		$config = select_config();
+		if($highlight && $config['event_ack_enable']){
+			$options = array(
+				'nodeids' => get_current_nodeid(true),
+				'triggerids' => array_keys($triggers),
+				'nopermissions' => true,
+				'withLastEventUnacknowledged' => true,
+				'output' => API_OUTPUT_SHORTEN,
+				'filter' => array('value' => TRIGGER_VALUE_TRUE),
+			);
+			$triggers_unack = CTrigger::get($options);
+			$triggers_unack = zbx_toHash($triggers_unack, 'triggerid');
+		}
+
 		foreach($selements as $snum => $selement){
 			$selements_info[$selement['selementid']] = array();
 			$info = &$selements_info[$selement['selementid']];
@@ -1033,7 +1048,8 @@
 			$info['status'][$info['type']]['priority'] = $trigger['priority'];
 			$info['status'][$info['type']]['info'] = $info['name'];
 
-			$info['ack'] = false;
+			$info['ack'] = !isset($triggers_unack[$trigger['triggerid']]);
+			$info['status']['count_unack'] = (int) !$info['ack'];
 
 			if($info['type'] == TRIGGER_VALUE_TRUE){
 				$color = ($info['status'][$info['type']]['priority'] > 3) ? $colors['Red'] : $colors['Dark Red'];
@@ -1044,7 +1060,6 @@
 				$info['iconid'] = $selement['iconid_on'];
 				$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
 
-				$active_triggerids[] = $trigger['triggerid'];
 			}
 			else if($info['type'] == TRIGGER_VALUE_UNKNOWN){
 				$info['info'] = array();
@@ -1081,23 +1096,6 @@
 			$info['priority'] = isset($info['status'][$info['type']]['priority']) ? $info['status'][$info['type']]['priority'] : 0;
 		}
 
-		$config = select_config();
-		if($highlight && $config['event_ack_enable']){
-			$options = array(
-				'nodeids' => get_current_nodeid(true),
-				'triggerids' => $active_triggerids,
-				'nopermissions' => true,
-				'withLastEventUnacknowledged' => true,
-				'output' => API_OUTPUT_SHORTEN
-			);
-			$active_triggers = CTrigger::get($options);
-			$active_triggers = zbx_toHash($active_triggers, 'triggerid');
-			foreach($selements_info as $id => $selement){
-				if(!isset($active_triggers[$id])){
-					$selements_info[$id]['ack'] = true;
-				}
-			}
-		}
 
 	return $selements_info;
 	}
@@ -1154,7 +1152,8 @@
 			'triggerids' => array_keys($triggers),
 			'withLastEventUnacknowledged' => true,
 			'output' => API_OUTPUT_SHORTEN,
-			'nodeids' => get_current_nodeid(true)
+			'nodeids' => get_current_nodeid(true),
+			'filter' => array('value' => TRIGGER_VALUE_TRUE),
 		);
 		$unack_triggerids = CTrigger::get($options);
 		$unack_triggerids = zbx_toHash($unack_triggerids, 'triggerid');
