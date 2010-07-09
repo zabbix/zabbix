@@ -59,57 +59,6 @@
 	return $drawtype;
 	}
 
-/*
- * Function: sysmap_accessible
- *
- * Description: Check permission for map
- *
- * Return: true on success
- *
- * Author: Aly
- */
-	function sysmap_accessible($sysmapid,$perm){
-		global $USER_DETAILS;
-
-		$nodes = get_current_nodeid(null,$perm);
-		$result = (bool) count($nodes);
-
-		$sql = 'SELECT * '.
-				' FROM sysmaps_elements '.
-				' WHERE sysmapid='.$sysmapid.
-					' AND '.DBin_node('sysmapid', $nodes);
-		$db_result = DBselect($sql);
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,$perm,PERM_RES_IDS_ARRAY,get_current_nodeid(true));
-//SDI($available_hosts);
-		while(($se_data = DBfetch($db_result)) && $result){
-			switch($se_data['elementtype']){
-				case SYSMAP_ELEMENT_TYPE_HOST:
-					if(!isset($available_hosts[$se_data['elementid']])){
-						$result = false;
-					}
-					break;
-				case SYSMAP_ELEMENT_TYPE_MAP:
-					$result = sysmap_accessible($se_data['elementid'], $perm);
-					break;
-				case SYSMAP_ELEMENT_TYPE_TRIGGER:
-					$available_triggers = get_accessible_triggers($perm, array(), PERM_RES_IDS_ARRAY);
-					if(!isset($available_triggers[$se_data['elementid']])){
-						$result = false;
-					}
-					break;
-				case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-					$available_groups = get_accessible_groups_by_user($USER_DETAILS,$perm);
-					if(!isset($available_groups[$se_data['elementid']])){
-						$result = false;
-					}
-					break;
-			}
-		}
-//SDI($se_data['elementid']);
-
-	return $result;
-	}
-
 	function get_sysmap_by_sysmapid($sysmapid){
 		$row = DBfetch(DBselect('SELECT * FROM sysmaps WHERE sysmapid='.$sysmapid));
 		if($row){
@@ -598,13 +547,6 @@
 		}
 	}
 
-	function get_png_by_selementid($selementid){
-		$selement = DBfetch(DBselect('SELECT * FROM sysmaps_elements WHERE selementid='.$selementid));
-		if(!$selement)	return FALSE;
-
-	return get_png_by_selement($selement);
-	}
-
 	function get_png_by_selement($selement, $info){
 
 		switch($info['icon_type']){
@@ -638,10 +580,6 @@
 		}
 
 	return imagecreatefromstring($image['image']);
-	}
-
-	function get_base64_icon($element){
-		return base64_encode(get_element_icon($element));
 	}
 
 	function get_selement_iconid($selement, $info=null){
@@ -686,37 +624,6 @@
 		}
 
 	return $info['iconid'];
-	}
-
-	function get_element_icon($element){
-		$iconid = get_element_iconid($element);
-
-		$image = get_image_by_imageid($iconid);
-		$img = imagecreatefromstring($image['image']);
-
-		unset($image);
-
-		$w=imagesx($img);
-		$h=imagesy($img);
-
-		if(function_exists('imagecreatetruecolor') && @imagecreatetruecolor(1,1)){
-			$im = imagecreatetruecolor($w,$h);
-		}
-		else{
-			$im = imagecreate($w,$h);
-		}
-
-		imagefilledrectangle($im,0,0,$w,$h, imagecolorallocate($im,255,255,255));
-
-		imagecopy($im,$img,0,0,0,0,$w,$h);
-		imagedestroy($img);
-
-		ob_start();
-		imagepng($im);
-		$image_txt = ob_get_contents();
-		ob_end_clean();
-
-	return $image_txt;
 	}
 
 	function get_selement_icons(){
@@ -836,6 +743,21 @@
 					while(zbx_strstr($label, '{TRIGGER.PROBLEM.EVENTS.PROBLEM.UNACK}')){
 						$label = str_replace('{TRIGGER.PROBLEM.EVENTS.PROBLEM.UNACK}', get_events_unacknowledged($db_element, TRIGGER_VALUE_TRUE, TRIGGER_VALUE_TRUE), $label);
 					}
+					while(zbx_strstr($label, '{TRIGGERS.ACK}')){
+						$label = str_replace('{TRIGGERS.ACK}', get_triggers_unacknowledged($db_element, null, true), $label);
+					}
+					while(zbx_strstr($label, '{TRIGGERS.PROBLEM.ACK}')){
+						$label = str_replace('{TRIGGERS.PROBLEM.ACK}', get_triggers_unacknowledged($db_element, true, true), $label);
+					}
+					while(zbx_strstr($label, '{TRIGGER.EVENTS.ACK}')){
+						$label = str_replace('{TRIGGER.EVENTS.ACK}', get_events_unacknowledged($db_element, null, null, true), $label);
+					}
+					while(zbx_strstr($label, '{TRIGGER.EVENTS.PROBLEM.ACK}')){
+						$label = str_replace('{TRIGGER.EVENTS.PROBLEM.ACK}', get_events_unacknowledged($db_element, null, TRIGGER_VALUE_TRUE, true), $label);
+					}
+					while(zbx_strstr($label, '{TRIGGER.PROBLEM.EVENTS.PROBLEM.ACK}')){
+						$label = str_replace('{TRIGGER.PROBLEM.EVENTS.PROBLEM.ACK}', get_events_unacknowledged($db_element, TRIGGER_VALUE_TRUE, TRIGGER_VALUE_TRUE, true), $label);
+					}
 					break;
 			}
 		}
@@ -888,7 +810,7 @@
 			$key = $matches['key'][$num];
 			$function = $matches['func'][$num];
 			$parameter = $matches['param'][$num];
-			
+
 			$options = array(
 				'filter' => array('host' => $host, 'key_' => $key),
 				'output' => API_OUTPUT_EXTEND
@@ -1238,7 +1160,7 @@
 
 				$trigger = $triggers[$trigger['triggerid']];
 				if($trigger['status'] == TRIGGER_STATUS_DISABLED) continue;
-				
+
 				$host['triggers'][$tnum] = $trigger;
 
 				if(!isset($info['type'])) $info['type'] = $trigger['value'];
@@ -1369,7 +1291,7 @@
 						$msg = $info['status'][$info['type']]['count'].' '.S_PROBLEMS;
 					else if($expandProblem && isset($info['status'][$info['type']]['info']))
 						$msg = $info['status'][$info['type']]['info'];
-					else 
+					else
 						$msg = $info['status'][$info['type']]['count'].' '.S_PROBLEM;
 
 
@@ -1562,7 +1484,7 @@
 					$msg = $info['status'][$info['type']]['count'].' '.S_PROBLEMS;
 				else if($expandProblem && isset($info['status'][$info['type']]['info']))
 					$msg = $info['status'][$info['type']]['info'];
-				else 
+				else
 					$msg = $info['status'][$info['type']]['count'].' '.S_PROBLEM;
 
 				$info['info']['problem'] = array('msg'=>$msg, 'color'=>$color);
@@ -1715,7 +1637,7 @@
 
 			if(!isset($info['type'])) $info['type'] = TRIGGER_VALUE_FALSE;
 //----
-			
+
 			$info['info'] = array();
 
 // Host maintenance info
@@ -1741,7 +1663,7 @@
 						$msg = '';
 					}
 				}
-				else 
+				else
 					$msg = $info['status'][$info['type']]['count'].' '.S_PROBLEM;
 
 				$info['info']['problem'] = array('msg'=>$msg, 'color'=>$color);
@@ -2000,14 +1922,11 @@
 		return $formatted;
 	}
 	function drawMapConnectors(&$im, &$map, &$map_info){
-		global $colors;
-
 		$links = $map['links'];
 		$selements = $map['selements'];
 
 		foreach($links as $lnum => $link){
 			if(empty($link)) continue;
-			$linkid = $link['linkid'];
 
 			$selement = $selements[$link['selementid1']];
 			list($x1, $y1) = get_icon_center_by_selement($selement, $map_info[$link['selementid1']]);
@@ -2049,9 +1968,6 @@
 	}
 
 	function drawMapSelements(&$im, &$map, &$map_info){
-		global $colors;
-
-		$links = $map['links'];
 		$selements = $map['selements'];
 
 		foreach($selements as $selementid => $selement){
@@ -2068,11 +1984,8 @@
 	}
 
 	function drawMapHighligts(&$im, &$map, &$map_info){
-		global $colors;
-
-		$links = $map['links'];
 		$selements = $map['selements'];
-		
+
 		foreach($selements as $selementid => $selement){
 			if(empty($selement)) continue;
 
@@ -2177,7 +2090,6 @@
 	function drawMapSelemetsMarks(&$im, &$map, &$map_info){
 		global $colors;
 
-		$links = $map['links'];
 		$selements = $map['selements'];
 
 		foreach($selements as $selementid => $selement){
@@ -2220,7 +2132,7 @@
 			if($map['label_type'] != MAP_LABEL_TYPE_NOTHING){
 				$label_location = $selement['label_location'];
 				if(is_null($label_location) || ($label_location < 0)) $label_location = $map['label_location'];
-				
+
 				switch($label_location){
 					case MAP_LABEL_LOC_TOP: $marks = 'lbr'; break;
 					case MAP_LABEL_LOC_LEFT: $marks = 'tbr'; break;
@@ -2243,8 +2155,6 @@
 		foreach($links as $lnum => $link){
 			if(empty($link)) continue;
 			if(empty($link['label'])) continue;
-
-			$linkid = $link['linkid'];
 
 			$selement = $selements[$link['selementid1']];
 			list($x1, $y1) = get_icon_center_by_selement($selement, $map_info[$link['selementid1']]);
@@ -2337,13 +2247,12 @@
 	function drawMapLabels(&$im, &$map, &$map_info){
 		global $colors;
 
-		$links = $map['links'];
 		$selements = $map['selements'];
 		$labelLines = Array();
 		foreach($selements as $selementid => $selement){
 			$labelLines[$selementid] = expand_map_element_label_by_data($selement);
 		}
-		
+
 		$allLabelsSize = imageTextSize(8,0, str_replace("\r", '', str_replace("\n", '', implode(' ', $labelLines))));
 		$labelFontHeight = $allLabelsSize['height'];
 
@@ -2418,7 +2327,6 @@
 
 			$cnt = count($strings);
 			$strings = zbx_array_merge($strings, $info_line);
-			$oc = count($strings);
 
 			$h = 0;
 			$w = 0;
@@ -2457,14 +2365,16 @@
 //		$y_rec += 30;
 //		imagerectangle($im, $x_rec-2-1, $y_rec-3, $x_rec+$w+2+1, $y_rec+($oc*4)+$h+3, $label_color);
 //		imagefilledrectangle($im, $x_rec-2, $y_rec-2, $x_rec+$w+2, $y_rec+($oc*4)+$h-2, $colors['White']);
-			
+
 			$tmpDims = imageTextSize(8,0, str_replace("\n", '', $label_line));
 			$maxHeight = $tmpDims['height'];
-			
+
 			$num = 0;
 			$increasey = 0;
 			foreach($strings as $key => $str){
 				if($num >= $cnt) break;
+				$num++;
+
 				if(zbx_empty($str)) continue;
 
 				$dims = imageTextSize(8,0,$str);
@@ -2490,7 +2400,6 @@
 				imagetext($im, 8, 0, $x_label, $y_rec+$increasey+$dims['height'], $color, $str);
 
 				$increasey += $dims['height']+3;
-				$num++;
 			}
 
 			$el_msgs = array('problem', 'maintenances', 'unknown', 'ok', 'status', 'availability');

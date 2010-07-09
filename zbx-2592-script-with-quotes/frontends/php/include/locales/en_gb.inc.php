@@ -607,7 +607,8 @@
 	'S_ITEM_COUNT' => 'Item count',
 	'S_REQUIRED_PERFORMANCE' => 'Required performance (vps)',
 	'S_PROXY_MODE' => 'Proxy mode',
-	'S_PASSIVE' => 'Passive',
+	'S_PROXY_PASSIVE' => 'Passive',
+	'S_PROXY_ACTIVE' => 'Active',
 
 //  Authentication
 	'S_AUTHENTICATION'=>			'Authentication',
@@ -1142,7 +1143,6 @@
 	'S_SNMPV3_AUTH_PASSPHRASE'=>				'SNMPv3 auth passphrase',
 	'S_SNMPV3_PRIV_PASSPHRASE'=>				'SNMPv3 priv passphrase',
 	'S_CUSTOM_MULTIPLIER'=>					'Custom multiplier',
-	'S_DO_NOT_USE'=>					'Do not use',
 	'S_USE_CUSTOM_MULTIPLIER'=>				'Use custom multiplier',
 	'S_SELECT_HOST_DOT_DOT_DOT'=>				'Select host...',
 	'S_LOG_TIME_FORMAT'=>					'Log time format',
@@ -1338,6 +1338,7 @@
 	'S_MAXIMIZE'=>				'Maximize',
 	'S_MINIMIZE'=>				'Minimize',
 	'S_LOADING_P'=>				'Loading...',
+	'S_OF' => 'of',
 
 // dashconf.php
 	'S_DASHBOARD_CONFIGURATION' =>	'Dashboard configuration',
@@ -1350,6 +1351,10 @@
 	'S_FAVOURITE_GRAPHS' => 'Favourite graphs',
 	'S_FAVOURITE_MAPS' => 'Favourite maps',
 	'S_FAVOURITE_SCREENS' => 'Favourite screens',
+	'S_O_ALL' => 'All',
+	'S_O_UNACKNOWLEDGED_ONLY' => 'Unacknowledged only',
+	'S_O_SEPARATED' => 'Separated',
+	'S_PROBLEM_DISPLAY' => 'Problem display',
 
 //	overview.php
 	'S_OVERVIEW'=>				'Overview',
@@ -1996,7 +2001,7 @@
 	'S_EDIT_CONNECTOR'=>			'Edit connector',
 
 //	tr_logform.php
-	'S_INCLUDE'=>		'Include',
+	'S_INCLUDE_S'=>		'Include',
 	'S_EXCLUDE'=>		'Exclude',
 	'S_KEYWORD'=>		'Keyword',
 	'S_POSITION'=>		'Position',
@@ -2104,7 +2109,7 @@
 	'S_NO_ITEM_WITH'=>				'No item with',
 	'S_DELETED_SMALL'=>				'deleted',
 	'S_UNKNOWN_VALUE_TYPE'=>			'Unknown value type',
-	'S_ITEMS_CHECK_KEY_DEFAULT_EXAMPLE_PASSED'=>	'Check key, please. Default example were passed',
+	'S_ITEMS_CHECK_KEY_DEFAULT_EXAMPLE_PASSED'=>	'Check the key, please. Default example was passed',
 
 //	httptest.inc.php
 	'S_SCENARIO_STEP_NUMBER_CANNOT_BE_LESS_ONE'=>	'Scenario step number cannot be less than 1',

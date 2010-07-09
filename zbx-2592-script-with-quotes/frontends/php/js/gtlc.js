@@ -2014,7 +2014,7 @@ initialize: function($super, sbid, timelineid, obj, width, height){
 	if(IE){
 		addListener(obj, 'mousedown', this.mousedown.bindAsEventListener(this));
 		obj.onmousemove = this.mousemove.bindAsEventListener(this);
-		addListener(obj, 'click', function(event){ cancelEvent(event);});
+		//addListener(obj, 'click', function(event){ Event.stop(event); });
 	}
 	else{
 		addListener(this.dom_obj, 'mousedown', this.mousedown.bindAsEventListener(this),false);
@@ -2062,23 +2062,25 @@ mousedown: function(e){
 	if(e.which && (e.which != 1)) return false;
 	else if (e.button && (e.button != 1)) return false;
 
-	cancelEvent(e);
+	Event.stop(e);
 
 	if(ZBX_SBOX[this.sbox_id].mousedown == false){
 		this.optimizeEvent(e);
-		deselectAll();
+
+		if(!IE) deselectAll();
 
 		if(IE){
 			var posxy = getPosition(this.dom_obj);
 			if((this.mouse_event.left < posxy.left) || (this.mouse_event.left > (posxy.left+this.dom_obj.offsetWidth))) return false;
+			if((this.mouse_event.top < posxy.top) || (this.mouse_event.top > (this.dom_obj.offsetHeight + posxy.top))) return true;
 		}
 
 		this.create_box();
 
 		ZBX_SBOX[this.sbox_id].mousedown = true;
-
 	}
-	return false;
+	
+return false;
 },
 
 mousemove: function(e){

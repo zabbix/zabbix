@@ -1586,7 +1586,7 @@
 	'S_HOSTS_AND_TEMPLATES_BIG'=>			'Hosts and templates',
 	'S_NEW_CONNECTOR'=>			'New connector',
 	'S_EDIT_CONNECTOR'=>			'Edit connector',
-	'S_INCLUDE'=>			'Include',
+	'S_INCLUDE_S'=>			'Include',
 	'S_EXCLUDE'=>			'Exclude',
 	'S_KEYWORD'=>			'Keyword',
 	'S_POSITION'=>			'Position',

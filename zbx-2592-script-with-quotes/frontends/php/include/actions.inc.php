@@ -773,7 +773,7 @@ return $delays;
 }
 
 function get_history_of_actions($limit,&$last_clock=null,$sql_cond=''){
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array(), PERM_RES_IDS_ARRAY);
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array());
 
 	$alerts = array();
 	$clock = array();

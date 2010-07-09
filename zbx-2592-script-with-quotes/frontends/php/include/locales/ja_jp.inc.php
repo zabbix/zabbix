@@ -1753,7 +1753,7 @@
 	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_BEFORE_ERROR'=>			'要素の前に許可されていない記号が存在します',
 	'S_NEW_INDICATORS'=>			'新規インジケーター',
 	'S_EDIT_CONNECTOR'=>			'コネクタの修正',
-	'S_INCLUDE'=>			'含める',
+	'S_INCLUDE_S'=>			'含める',
 	'S_EXCLUDE'=>			'含めない',
 	'S_KEYWORD'=>			'キーワード',
 	'S_POSITION'=>			'ポジション',

@@ -1093,7 +1093,7 @@ include_once('include/page_header.php');
 		$form = new CForm();
 		$tbl = new CTable();
 		$tbl->addRow(get_macros_widget());
-		$tbl->addStyle('width: 600px;');
+		$tbl->addStyle('width: 50%;');
 		$tbl->addStyle('margin: 0 auto;');
 		$form->addItem($tbl);
 		$cnf_wdgt->addItem($form);
