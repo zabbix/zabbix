@@ -353,12 +353,6 @@ include_once('include/page_header.php');
 		$usrgroup_wdgt->addHeader($numrows);
 
 // Groups table
-		$options = array('extendoutput' => 1,
-						 'select_users' => 1,
-						 'limit' => ($config['search_limit']+1)
-					);
-		$usrgrps = CUserGroup::get($options);
-
 		$form = new CForm();
 		$form->setName('usrgrp_form');
 
@@ -374,8 +368,20 @@ include_once('include/page_header.php');
 			S_DEBUG_MODE
 		));
 
+		$sortfield = getPageSortField('name');
+		$sortorder = getPageSortOrder();
+
+		$options = array(
+			'output' => API_OUTPUT_EXTEND,
+			'select_users' => API_OUTPUT_EXTEND,
+			'sortfield' => $sortfield,
+			'sortorder' => $sortorder,
+			'limit' => ($config['search_limit']+1)
+		);
+		$usrgrps = CUserGroup::get($options);
+
 // sorting
-		order_page_result($usrgrps, 'name');
+		order_result($usrgrps, $sortfield, $sortorder);
 		$paging = getPagingLine($usrgrps);
 //---------
 

@@ -6,7 +6,7 @@
 # specify whether to default to --with-unixodbc
 # If not supplied, DEFAULT-ACTION is no.
 #
-# This macro #defines HAVE_UNIXODBC if a required header files is
+# This macro #defines HAVE_UNIXODBC if required header files are
 # found, and sets @UNIXODBC_LDFLAGS@ and @UNIXODBC_CFLAGS@ to the necessary
 # values.
 #
@@ -21,7 +21,7 @@ AC_DEFUN([LIBUNIXODBC_CHECK_CONFIG],
 [
   AC_ARG_WITH(unixodbc,
     [AC_HELP_STRING([--with-unixodbc@<:@=ARG@:>@],
-		[use odbc driver against unixODBC package @<:@default=no@:>@, optionally specify path to odbc_config.])
+		[use odbc driver against unixODBC package @<:@default=no@:>@, optionally specify full path to odbc_config binary.])
     ],[ if test "$withval" = "no"; then
             want_unixodbc="no"
         elif test "$withval" = "yes"; then
@@ -64,7 +64,7 @@ AC_DEFUN([LIBUNIXODBC_CHECK_CONFIG],
 		LIBS="${LIBS} ${UNIXODBC_LIBS}"
 
 		AC_CACHE_CHECK([whether unixodbc is usable],
-			[_libunixodbc_usable],
+			[libunixodbc_cv_usable],
 			[AC_LINK_IFELSE(AC_LANG_PROGRAM([
 				#include <sql.h>
 				#include <sqlext.h>
@@ -74,7 +74,7 @@ AC_DEFUN([LIBUNIXODBC_CHECK_CONFIG],
 			   missing symbols or can't link. */
 			SQLRETURN       retcode;
 			retcode = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, (SQLHENV*)0);
-			]),_libunixodbc_usable=yes,_libunixodbc_usable=no)
+			]),libunixodbc_cv_usable=yes,libunixodbc_cv_usable=no)
 		])
 
 		LIBS="${_save_unixodbc_libs}"
@@ -84,7 +84,7 @@ AC_DEFUN([LIBUNIXODBC_CHECK_CONFIG],
 		unset _save_unixodbc_ldflags
 		unset _save_unixodbc_cflags
 
-		if test "$_libunixodbc_usable" != "yes"; then
+		if test "$libunixodbc_cv_usable" != "yes"; then
 			AC_MSG_ERROR([Can't use libodbc library])
 		fi
 
@@ -96,6 +96,4 @@ AC_DEFUN([LIBUNIXODBC_CHECK_CONFIG],
   AC_SUBST(UNIXODBC_CFLAGS)
   AC_SUBST(UNIXODBC_LIBS)
 
-  unset _libunixodbc_with
-  unset _libunixodbc_usable
 ])dnl

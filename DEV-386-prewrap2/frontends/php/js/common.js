@@ -374,6 +374,7 @@ function getPosition(obj){
 		try{
 			while(!is_null(obj.offsetParent)){
 				obj=obj.offsetParent;
+
 				pos.left += obj.offsetLeft;
 				pos.top += obj.offsetTop;
 

@@ -68,5 +68,13 @@ class CComboBox extends CTag{
 			parent::addItem(new CComboItem($value,$caption,$selected,$enabled));
 		}
 	}
+
+	public function addItems($items){
+		foreach($items as $value => $caption){
+			$selected = (int) ($value == $this->value);
+			parent::addItem(new CComboItem($value, $caption, $selected));
+		}
+
+	}
 }
 ?>

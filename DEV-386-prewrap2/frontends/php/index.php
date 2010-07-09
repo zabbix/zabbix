@@ -48,12 +48,10 @@ $page['file']	= 'index.php';
 	if(isset($_REQUEST['reconnect']) && isset($sessionid)){
 		add_audit(AUDIT_ACTION_LOGOUT,AUDIT_RESOURCE_USER,'Manual Logout');
 
-		zbx_unsetcookie('zbx_sessionid');
-		DBexecute('UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.' WHERE sessionid='.zbx_dbstr($sessionid));
-		unset($sessionid);
+		CUser::logout($sessionid);
 
-		redirect('index.php');
-		die();
+		jsRedirect('index.php');
+		exit();
 	}
 
 	$config = select_config();
@@ -84,7 +82,7 @@ $page['file']	= 'index.php';
 		if($login){
 			$url = is_null($request)?$USER_DETAILS['url']:$request;
 
-			redirect($url);
+			jsRedirect($url);
 			exit();
 		}
 	}

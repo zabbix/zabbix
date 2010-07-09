@@ -851,7 +851,7 @@ Copt::memoryPick();
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'output' => $options['select_macros'],
-				'hostids' => $hostids,
+				'hostids' => $templateids,
 				'preservekeys' => 1
 			);
 			$macros = CUserMacro::get($obj_params);
@@ -1461,33 +1461,35 @@ COpt::memoryPick();
 		if(empty($templateids)) return true;
 
 // check if any templates linked to targets have more than one unique item key\application {{{
-		$linkedTpls = self::get(array(
-			'nopermissions' => 1,
-			'output' => API_OUTPUT_SHORTEN,
-			'hostids' => $targetids
-		));
-		$allids = array_merge($templateids, zbx_objectValues($linkedTpls, 'templateid'));
+		foreach($targetids as $targetid){
+			$linkedTpls = self::get(array(
+				'nopermissions' => 1,
+				'output' => API_OUTPUT_SHORTEN,
+						'hostids' => $targetid
+			));
+			$allids = array_merge($templateids, zbx_objectValues($linkedTpls, 'templateid'));
 
-		$sql = 'SELECT key_, count(*) as cnt '.
-			' FROM items '.
-			' WHERE '.DBcondition('hostid',$allids).
-			' GROUP BY key_ '.
-			' HAVING count(*) > 1';
-		$res = DBselect($sql);
-		if($db_cnt = DBfetch($res)){
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				S_TEMPLATE_WITH_ITEM_KEY.' ['.htmlspecialchars($db_cnt['key_']).'] '.S_ALREADY_LINKED_TO_HOST_SMALL);
-		}
+			$sql = 'SELECT key_, count(*) as cnt '.
+				' FROM items '.
+				' WHERE '.DBcondition('hostid',$allids).
+				' GROUP BY key_ '.
+				' HAVING count(*) > 1';
+			$res = DBselect($sql);
+			if($db_cnt = DBfetch($res)){
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					S_TEMPLATE_WITH_ITEM_KEY.' ['.htmlspecialchars($db_cnt['key_']).'] '.S_ALREADY_LINKED_TO_HOST_SMALL);
+			}
 
-		$sql = 'SELECT name, count(*) as cnt '.
-			' FROM applications '.
-			' WHERE '.DBcondition('hostid',$allids).
-			' GROUP BY name '.
-			' HAVING count(*) > 1';
-		$res = DBselect($sql);
-		if($db_cnt = DBfetch($res)){
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				S_TEMPLATE_WITH_APPLICATION.' ['.htmlspecialchars($db_cnt['name']).'] '.S_ALREADY_LINKED_TO_HOST_SMALL);
+			$sql = 'SELECT name, count(*) as cnt '.
+				' FROM applications '.
+				' WHERE '.DBcondition('hostid',$allids).
+				' GROUP BY name '.
+				' HAVING count(*) > 1';
+			$res = DBselect($sql);
+			if($db_cnt = DBfetch($res)){
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					S_TEMPLATE_WITH_APPLICATION.' ['.htmlspecialchars($db_cnt['name']).'] '.S_ALREADY_LINKED_TO_HOST_SMALL);
+			}
 		}
 // }}} check if any templates linked to targets have more than one unique item key\application
 

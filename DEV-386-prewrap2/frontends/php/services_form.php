@@ -90,7 +90,7 @@ include_once('include/page_header.php');
 //----------------------------------------------------------------------
 
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array(), PERM_RES_IDS_ARRAY);
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array());
 
 	if(isset($_REQUEST['serviceid']) && $_REQUEST['serviceid'] > 0){
 		$sql = 'SELECT s.* '.
@@ -716,7 +716,7 @@ if(isset($_REQUEST['sform'])){
 	$frmService->addRow(S_NEW_SERVICE_TIME, array(
 			$cmbTimeType, BR(),
 			$time_param,
-			new CButton('add_service_time','add','javascript: document.forms[0].action += \'?sform=1\'; submit();')
+			new CButton('add_service_time',S_ADD_SMALL,'javascript: document.forms[0].action += \'?sform=1\'; submit();')
 		));
 //trigger
 	$frmService->addRow(S_LINK_TO_TRIGGER_Q, new CCheckBox('linktrigger',$linktrigger,"javascript: display_element('trigger_name');",1));

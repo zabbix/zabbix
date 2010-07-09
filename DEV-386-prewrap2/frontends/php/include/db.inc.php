@@ -930,7 +930,7 @@ else {
 				$sql = 'INSERT INTO ids (nodeid,table_name,field_name,nextid) '.
 					' VALUES ('.$nodeid.','.zbx_dbstr($table).','.zbx_dbstr($id_name).','.bcadd($nextid, $count, 0).')';
 
-				$nextid = bcadd($res['nextid'], 1, 0);
+				$nextid = bcadd($nextid, 1, 0);
 
 				if(!DBexecute($sql)) self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
 			}

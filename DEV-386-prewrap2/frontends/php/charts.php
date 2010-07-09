@@ -66,7 +66,7 @@ include_once('include/page_header.php');
 
 		if('timeline' == $_REQUEST['favobj']){
 			if(isset($_REQUEST['graphid']) && isset($_REQUEST['period'])){
-				navigation_bar_calc('web.graph',$_REQUEST['graphid'], true);
+				navigation_bar_calc('web.graph',$_REQUEST['favid'], true);
 			}
 		}
 
@@ -111,6 +111,13 @@ include_once('include/page_header.php');
 	$pageFilter = new CPageFilter($options);
 
 	$_REQUEST['graphid'] = $pageFilter->graphid;
+
+// resets get params for proper page refresh
+	if(isset($_REQUEST['period']) || isset($_REQUEST['stime'])){
+		navigation_bar_calc('web.graph',$_REQUEST['graphid'], true);
+		resetGetParams(array('period', 'stime'));
+	}
+//--
 
 	$effectiveperiod = navigation_bar_calc('web.graph',$_REQUEST['graphid']);
 

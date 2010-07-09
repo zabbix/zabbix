@@ -32,6 +32,14 @@ $page['hist_arg'] = array();
 include_once('include/page_header.php');
 ?>
 <?php
+// needed type to know which field name to use
+$itemType = get_request('type', 0);
+switch($itemType) {
+	case ITEM_TYPE_SSH: case ITEM_TYPE_TELNET: $paramsFieldName = S_EXECUTED_SCRIPT; break;
+	case ITEM_TYPE_DB_MONITOR: $paramsFieldName = S_PARAMS; break;
+	case ITEM_TYPE_CALCULATED: $paramsFieldName = S_FORMULA; break;
+	default: $paramsFieldName = 'params';
+}
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'type_visible'=>			array(T_ZBX_STR, O_OPT,  null, null,           null),
@@ -58,20 +66,23 @@ include_once('include/page_header.php');
 
 		'groupid'=>			array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			null),
 		'hostid'=>			array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,			null),
-		'form_hostid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,			'isset({save})'),
+		'form_hostid'=>			array(T_ZBX_INT, O_OPT,  null,	DB_ID.NOT_ZERO,		'isset({save})', S_HOST),
 
 
 		'add_groupid'=>		array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			'(isset({register})&&({register}=="go"))'),
 		'action'=>			array(T_ZBX_STR, O_OPT,	 P_SYS,	NOT_EMPTY,		'(isset({register})&&({register}=="go"))'),
 
-		'copy_type'	=>		array(T_ZBX_INT, O_OPT,	 P_SYS,	IN('0,1'),		'isset({copy})'),
-		'copy_mode'	=>		array(T_ZBX_INT, O_OPT,	 P_SYS,	IN('0'),		null),
+		'copy_type'=>			array(T_ZBX_INT, O_OPT,	 P_SYS,	IN('0,1'),	'isset({copy})'),
+		'copy_mode'=>			array(T_ZBX_INT, O_OPT,	 P_SYS,	IN('0'),	null),
 
 		'itemid'=>			array(T_ZBX_INT, O_NO,	 P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))'),
 		'description'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),
 		'key'=>				array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,		'isset({save})'),
-		'delay'=>			array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,86400),'isset({save})&&(isset({type})&&({type}!=2))'),
-		'new_delay_flex'=>	array(T_ZBX_STR, O_OPT,  NOT_EMPTY,  '','isset({add_delay_flex})&&(isset({type})&&({type}!=2))'),
+		'delay'=>			array(T_ZBX_INT, O_OPT,  null,  '(('.BETWEEN(1,86400).
+										'(!isset({delay_flex}) || !({delay_flex}) || is_array({delay_flex}) && !count({delay_flex}))) ||'.
+										'('.BETWEEN(0,86400).'isset({delay_flex})&&is_array({delay_flex})&&count({delay_flex})>0))&&',
+										'isset({save})&&(isset({type})&&({type}!='.ITEM_TYPE_ZABBIX_ACTIVE.')&&({type}!='.ITEM_TYPE_TRAPPER.'))'),
+		'new_delay_flex'=>		array(T_ZBX_STR, O_OPT,  NOT_EMPTY,  '',	'isset({add_delay_flex})&&(isset({type})&&({type}!=2))'),
 		'rem_delay_flex'=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,86400),null),
 		'delay_flex'=>		array(T_ZBX_STR, O_OPT,  null,  '',null),
 		'history'=>			array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),'isset({save})'),
@@ -79,38 +90,62 @@ include_once('include/page_header.php');
 		'type'=>			array(T_ZBX_INT, O_OPT,  null,
 				IN(array(-1,ITEM_TYPE_ZABBIX,ITEM_TYPE_SNMPV1,ITEM_TYPE_TRAPPER,ITEM_TYPE_SIMPLE,
 					ITEM_TYPE_SNMPV2C,ITEM_TYPE_INTERNAL,ITEM_TYPE_SNMPV3,ITEM_TYPE_ZABBIX_ACTIVE,
-					ITEM_TYPE_AGGREGATE,ITEM_TYPE_HTTPTEST,ITEM_TYPE_EXTERNAL,ITEM_TYPE_DB_MONITOR,
+					ITEM_TYPE_AGGREGATE,ITEM_TYPE_EXTERNAL,ITEM_TYPE_DB_MONITOR,
 					ITEM_TYPE_IPMI,ITEM_TYPE_SSH,ITEM_TYPE_TELNET,ITEM_TYPE_CALCULATED)),'isset({save})'),
-		'trends'=>			array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),		'isset({save})'),
+		'trends'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	'isset({save})&&isset({value_type})&&'.IN(
+												ITEM_VALUE_TYPE_FLOAT.','.
+												ITEM_VALUE_TYPE_UINT64, 'value_type')),
 		'value_type'=>		array(T_ZBX_INT, O_OPT,  null,  IN('0,1,2,3,4'),	'isset({save})'),
-		'data_type'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(ITEM_DATA_TYPE_DECIMAL,ITEM_DATA_TYPE_HEXADECIMAL),
+		'data_type'=>		array(T_ZBX_INT, O_OPT,  null,  IN(ITEM_DATA_TYPE_DECIMAL.','.ITEM_DATA_TYPE_OCTAL.','.ITEM_DATA_TYPE_HEXADECIMAL),
 					'isset({save})&&(isset({value_type})&&({value_type}=='.ITEM_VALUE_TYPE_UINT64.'))'),
-		'valuemapid'=>		array(T_ZBX_INT, O_OPT,	 null,	DB_ID,				'isset({save})'),
+		'valuemapid'=>		array(T_ZBX_INT, O_OPT,	 null,	DB_ID,		'isset({save})&&isset({value_type})&&'.IN(
+												ITEM_VALUE_TYPE_FLOAT.','.
+												ITEM_VALUE_TYPE_UINT64, 'value_type')),
 		'authtype'=>		array(T_ZBX_INT, O_OPT,  NULL,	IN(ITEM_AUTHTYPE_PASSWORD.','.ITEM_AUTHTYPE_PUBLICKEY),
-					'isset({save})'),
-		'username'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,	'isset({save})'),
-		'password'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,	'isset({save})'),
-		'publickey'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,	'isset({save})'),
-		'privatekey'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,	'isset({save})'),
-		'params'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,	'isset({save})'),
+											'isset({save})&&isset({type})&&({type}=='.ITEM_TYPE_SSH.')'),
+		'username'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,		'isset({save})&&isset({type})&&'.IN(
+												ITEM_TYPE_SSH.','.
+												ITEM_TYPE_TELNET, 'type')),
+		'password'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,		'isset({save})&&isset({type})&&'.IN(
+												ITEM_TYPE_SSH.','.
+												ITEM_TYPE_TELNET, 'type')),
+		'publickey'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,		'isset({save})&&isset({type})&&({type})=='.ITEM_TYPE_SSH.'&&({authtype})=='.ITEM_AUTHTYPE_PUBLICKEY),
+		'privatekey'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,		'isset({save})&&isset({type})&&({type})=='.ITEM_TYPE_SSH.'&&({authtype})=='.ITEM_AUTHTYPE_PUBLICKEY),
+		'params'=>		array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,	'isset({save})&&isset({type})&&'.IN(
+												ITEM_TYPE_SSH.','.
+												ITEM_TYPE_DB_MONITOR.','.
+												ITEM_TYPE_TELNET.','.
+												ITEM_TYPE_CALCULATED,'type'), $paramsFieldName),
+		//hidden fields for better gui
+		'params_script'=>	array(T_ZBX_STR, O_OPT, NULL, NULL, NULL),
+		'params_dbmonitor'=>	array(T_ZBX_STR, O_OPT, NULL, NULL, NULL),
+		'params_calculted'=>	array(T_ZBX_STR, O_OPT, NULL, NULL, NULL),
 
-		'snmp_community'=>	array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,			'isset({save})&&isset({type})&&'.IN('1,4','type')),
-		'snmp_oid'=>		array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,			'isset({save})&&isset({type})&&'.IN('1,4,6','type')),
-		'snmp_port'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	'isset({save})&&isset({type})&&'.IN('1,4,6','type')),
+		'snmp_community'=>	array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,		'isset({save})&&isset({type})&&'.IN(
+													ITEM_TYPE_SNMPV1.','.
+													ITEM_TYPE_SNMPV2C,'type')),
+		'snmp_oid'=>		array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,		'isset({save})&&isset({type})&&'.IN(
+													ITEM_TYPE_SNMPV1.','.
+													ITEM_TYPE_SNMPV2C.','.
+													ITEM_TYPE_SNMPV3,'type')),
+		'snmp_port'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	'isset({save})&&isset({type})&&'.IN(
+													ITEM_TYPE_SNMPV1.','.
+													ITEM_TYPE_SNMPV2C.','.
+													ITEM_TYPE_SNMPV3,'type')),
 
-		'snmpv3_securitylevel'=>array(T_ZBX_INT, O_OPT,  null,  IN('0,1,2'),	'isset({save})&&(isset({type})&&({type}==6))'),
-		'snmpv3_securityname'=>array(T_ZBX_STR, O_OPT,  null,  null,			'isset({save})&&(isset({type})&&({type}==6))'),
-		'snmpv3_authpassphrase'=>array(T_ZBX_STR, O_OPT,  null,  null,			'isset({save})&&(isset({type})&&({type}==6))'),
-		'snmpv3_privpassphrase'=>array(T_ZBX_STR, O_OPT,  null,  null,			'isset({save})&&(isset({type})&&({type}==6))'),
+		'snmpv3_securitylevel'=>array(T_ZBX_INT, O_OPT,  null,  IN('0,1,2'),	'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.'))'),
+		'snmpv3_securityname'=>	array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.'))'),
+		'snmpv3_authpassphrase'=>array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.'))'),
+		'snmpv3_privpassphrase'=>array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.'))'),
 
-		'ipmi_sensor'=>array(T_ZBX_STR, O_OPT,  null,  null,			'isset({save})&&(isset({type})&&({type}==12))'),
+		'ipmi_sensor'=>		array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,	'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_IPMI.'))', S_IPMI_SENSOR),
 
 		'trapper_hosts'=>	array(T_ZBX_STR, O_OPT,  null,  null,			'isset({save})&&isset({type})&&({type}==2)'),
-		'units'=>			array(T_ZBX_STR, O_OPT,  null,  null,			'isset({save})&&isset({type})&&'.IN('0,3','type')),
-		'multiplier'=>		array(T_ZBX_INT, O_OPT,  null,  IN('0,1'),		'isset({save})&&isset({type})&&'.IN('0,3','type')),
-		'delta'=>			array(T_ZBX_INT, O_OPT,  null,  IN('0,1,2'),	'isset({save})&&isset({type})&&'.IN('0,3','type')),
+		'units'=>		array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&isset({value_type})&&'.IN('0,3','value_type')),
+		'multiplier'=>		array(T_ZBX_INT, O_OPT,  null,  null,		null),
+		'delta'=>		array(T_ZBX_INT, O_OPT,  null,  IN('0,1,2'),	'isset({save})&&isset({value_type})&&'.IN('0,3','value_type')),
 
-		'formula'=>			array(T_ZBX_DBL, O_OPT,  null,  null,		'isset({save})&&(isset({multiplier})&&({multiplier}==1))'),
+		'formula'=>		array(T_ZBX_DBL, O_OPT,  null,  NOT_ZERO,	'isset({save})&&isset({multiplier})&&({multiplier}==1)&&'.IN('0,3','value_type'), S_CUSTOM_MULTIPLIER),
 		'logtimefmt'=>		array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({value_type})&&({value_type}==2))'),
 
 		'group_itemid'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID, null),
@@ -147,10 +182,11 @@ include_once('include/page_header.php');
 		'filter_type'=>				array(T_ZBX_INT, O_OPT,  null,
 				IN(array(-1,ITEM_TYPE_ZABBIX,ITEM_TYPE_SNMPV1,ITEM_TYPE_TRAPPER,ITEM_TYPE_SIMPLE,
 				ITEM_TYPE_SNMPV2C,ITEM_TYPE_INTERNAL,ITEM_TYPE_SNMPV3,ITEM_TYPE_ZABBIX_ACTIVE,
-				ITEM_TYPE_AGGREGATE,ITEM_TYPE_HTTPTEST,ITEM_TYPE_EXTERNAL,ITEM_TYPE_DB_MONITOR,
+				ITEM_TYPE_AGGREGATE,ITEM_TYPE_EXTERNAL,ITEM_TYPE_DB_MONITOR,
 				ITEM_TYPE_IPMI,ITEM_TYPE_SSH,ITEM_TYPE_TELNET,ITEM_TYPE_CALCULATED)),null),
 		'filter_key'=>				array(T_ZBX_STR, O_OPT,  null,  null,		null),
-		'filter_snmp_community'=>	array(T_ZBX_STR, O_OPT,  null,  null,	null),
+		'filter_snmp_community'=>array(T_ZBX_STR, O_OPT,  null,  null,	null),
+		'filter_snmpv3_securityname'=>array(T_ZBX_STR, O_OPT,  null,  null,  null),
 		'filter_snmp_oid'=>			array(T_ZBX_STR, O_OPT,  null,  null,	null),
 		'filter_snmp_port'=>		array(T_ZBX_INT, O_OPT,  P_UNSET_EMPTY,  BETWEEN(0,65535),	null),
 		'filter_value_type'=>		array(T_ZBX_INT, O_OPT,  null,  IN('-1,0,1,2,3,4'),null),
@@ -159,17 +195,17 @@ include_once('include/page_header.php');
 		'filter_history'=>			array(T_ZBX_INT, O_OPT,  P_UNSET_EMPTY,  BETWEEN(0,65535),null),
 		'filter_trends'=>			array(T_ZBX_INT, O_OPT,  P_UNSET_EMPTY,  BETWEEN(0,65535),null),
 		'filter_status'=>			array(T_ZBX_INT, O_OPT,  null,  IN('-1,0,1,3'),null),
-		'filter_templated_items'=>	array(T_ZBX_INT, O_OPT,  null,  IN('-1,0,1'),null),
-		'filter_with_triggers'=>	array(T_ZBX_INT, O_OPT,  null,  IN('-1,0,1'),null),
+		'filter_templated_items'=>array(T_ZBX_INT, O_OPT,  null,  IN('-1,0,1'),null),
+		'filter_with_triggers'=>array(T_ZBX_INT, O_OPT,  null,  IN('-1,0,1'),null),
 		'filter_ipmi_sensor' =>		array(T_ZBX_STR, O_OPT,  null,  null,	null),
 
 // subfilters
 		'subfilter_apps'=>				array(T_ZBX_STR, O_OPT,	 null,	null, null),
 		'subfilter_types'=>				array(T_ZBX_INT, O_OPT,	 null,	null, null),
-		'subfilter_value_types'=>		array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'subfilter_value_types'=>array(T_ZBX_INT, O_OPT,	 null,	null, null),
 		'subfilter_status'=>			array(T_ZBX_INT, O_OPT,	 null,	null, null),
-		'subfilter_templated_items'=>			array(T_ZBX_INT, O_OPT,	 null,	null, null),
-		'subfilter_with_triggers'=>		array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'subfilter_templated_items'=>array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'subfilter_with_triggers'=>array(T_ZBX_INT, O_OPT,	 null,	null, null),
 		'subfilter_hosts'=>				array(T_ZBX_INT, O_OPT,	 null,	null, null),
 		'subfilter_interval'=>				array(T_ZBX_INT, O_OPT,	 null,	null, null),
 		'subfilter_history'=>				array(T_ZBX_INT, O_OPT,	 null,	null, null),
@@ -236,6 +272,7 @@ include_once('include/page_header.php');
 		$_REQUEST['filter_type'] = get_request('filter_type', -1);
 		$_REQUEST['filter_key'] = get_request('filter_key');
 		$_REQUEST['filter_snmp_community'] = get_request('filter_snmp_community');
+		$_REQUEST['filter_snmpv3_securityname'] = get_request('filter_snmpv3_securityname');
 		$_REQUEST['filter_snmp_oid'] = get_request('filter_snmp_oid');
 		$_REQUEST['filter_snmp_port'] = get_request('filter_snmp_port');
 		$_REQUEST['filter_value_type'] = get_request('filter_value_type', -1);
@@ -255,6 +292,7 @@ include_once('include/page_header.php');
 		CProfile::update('web.items.filter_type', $_REQUEST['filter_type'], PROFILE_TYPE_INT);
 		CProfile::update('web.items.filter_key', $_REQUEST['filter_key'], PROFILE_TYPE_STR);
 		CProfile::update('web.items.filter_snmp_community', $_REQUEST['filter_snmp_community'], PROFILE_TYPE_STR);
+		CProfile::update('web.items.filter_snmpv3_securityname', $_REQUEST['filter_snmpv3_securityname'], PROFILE_TYPE_STR);
 		CProfile::update('web.items.filter_snmp_oid', $_REQUEST['filter_snmp_oid'], PROFILE_TYPE_STR);
 		CProfile::update('web.items.filter_snmp_port', $_REQUEST['filter_snmp_port'], PROFILE_TYPE_STR);
 		CProfile::update('web.items.filter_value_type', $_REQUEST['filter_value_type'], PROFILE_TYPE_INT);
@@ -275,6 +313,7 @@ include_once('include/page_header.php');
 		$_REQUEST['filter_type'] = CProfile::get('web.items.filter_type', -1);
 		$_REQUEST['filter_key'] = CProfile::get('web.items.filter_key');
 		$_REQUEST['filter_snmp_community'] = CProfile::get('web.items.filter_snmp_community');
+		$_REQUEST['filter_snmpv3_securityname'] = CProfile::get('web.items.filter_snmpv3_securityname');
 		$_REQUEST['filter_snmp_oid'] = CProfile::get('web.items.filter_snmp_oid');
 		$_REQUEST['filter_snmp_port'] = CProfile::get('web.items.filter_snmp_port');
 		$_REQUEST['filter_value_type'] = CProfile::get('web.items.filter_value_type', -1);
@@ -365,7 +404,7 @@ include_once('include/page_header.php');
 				'trapper_hosts'	=> get_request('trapper_hosts'),
 				'snmp_port'		=> get_request('snmp_port'),
 				'units'			=> get_request('units'),
-				'multiplier'	=> get_request('multiplier'),
+			'multiplier'	=> get_request('multiplier', 0),
 				'delta'			=> get_request('delta'),
 				'snmpv3_securityname'	=> get_request('snmpv3_securityname'),
 				'snmpv3_securitylevel'	=> get_request('snmpv3_securitylevel'),
@@ -383,7 +422,8 @@ include_once('include/page_header.php');
 				'privatekey'		=> get_request('privatekey'),
 				'params'			=> get_request('params'),
 				'ipmi_sensor'		=> get_request('ipmi_sensor'),
-				'data_type'		=> get_request('data_type'));
+			'data_type'		=> get_request('data_type')
+		);
 
 		if(isset($_REQUEST['itemid'])){
 			DBstart();
@@ -493,7 +533,7 @@ include_once('include/page_header.php');
 				'history'		=> get_request('history'),
 				'status'		=> get_request('status'),
 				'type'			=> get_request('type'),
-				'snmp_community'=> get_request('snmp_community'),
+				'snmp_community'	=> get_request('snmp_community'),
 				'snmp_oid'		=> get_request('snmp_oid'),
 				'value_type'	=> get_request('value_type'),
 				'trapper_hosts'	=> get_request('trapper_hosts'),
@@ -543,7 +583,7 @@ include_once('include/page_header.php');
 					'history'		=> get_request('history'),
 					'status'		=> get_request('status'),
 					'type'			=> get_request('type'),
-					'snmp_community'=> get_request('snmp_community'),
+				'snmp_community'	=> get_request('snmp_community'),
 					'snmp_oid'		=> get_request('snmp_oid'),
 					'value_type'	=> get_request('value_type'),
 					'trapper_hosts'	=> get_request('trapper_hosts'),
@@ -756,7 +796,7 @@ include_once('include/page_header.php');
 ?>
 <?php
 	$items_wdgt = new CWidget();
-	
+
 	$form = new CForm(null, 'get');
 	$form->setName('hdrform');
 	if(!isset($_REQUEST['form']))
@@ -789,7 +829,7 @@ include_once('include/page_header.php');
 
 		$show_host = true;
 
-		
+
 
 // Items Header
 		$numrows = new CDiv();
@@ -838,6 +878,9 @@ include_once('include/page_header.php');
 
 		if(isset($_REQUEST['filter_snmp_community']) && !zbx_empty($_REQUEST['filter_snmp_community']))
 			$options['filter']['snmp_community'] = $_REQUEST['filter_snmp_community'];
+
+		if(isset($_REQUEST['filter_snmpv3_securityname']) && !zbx_empty($_REQUEST['filter_snmpv3_securityname']))
+			$options['filter']['snmpv3_securityname'] = $_REQUEST['filter_snmpv3_securityname'];
 
 		if(isset($_REQUEST['filter_snmp_oid']) && !zbx_empty($_REQUEST['filter_snmp_oid']))
 			$options['filter']['snmp_oid'] = $_REQUEST['filter_snmp_oid'];
