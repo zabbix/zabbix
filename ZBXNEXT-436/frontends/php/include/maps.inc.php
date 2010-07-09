@@ -1855,10 +1855,13 @@
 	function getSelementsInfo($sysmap){
 		$elements = separateMapElements($sysmap);
 
+		$config = select_config();
+		$ext_ack = $config['event_ack_enable'] ? $sysmap['ext_ack'] : EXTACK_OPTION_ALL;
+
 		$info = array();
-		$info += getMapsInfo($elements['sysmaps'], $sysmap['expandproblem'], $sysmap['ext_ack']);
-		$info += getHostGroupsInfo($elements['hostgroups'], $sysmap['expandproblem'], $sysmap['ext_ack']);
-		$info += getHostsInfo($elements['hosts'], $sysmap['expandproblem'], $sysmap['ext_ack']);
+		$info += getMapsInfo($elements['sysmaps'], $sysmap['expandproblem'], $ext_ack);
+		$info += getHostGroupsInfo($elements['hostgroups'], $sysmap['expandproblem'], $ext_ack);
+		$info += getHostsInfo($elements['hosts'], $sysmap['expandproblem'], $ext_ack);
 		$info += getTriggersInfo($elements['triggers'], $sysmap['highlight']);
 		$info += getImagesInfo($elements['images']);
 
@@ -2165,7 +2168,8 @@
 							imagecolorallocate($im,120,120,120)
 					);
 
-					if(isset($el_info['ack']) && $el_info['ack']){
+					$config = select_config();
+					if(isset($el_info['ack']) && $el_info['ack'] && $config['event_ack_enable']){
 						imagesetthickness($im, 5);
 						imagearc($im,
 							$selement['x'] + ($iconX / 2),
