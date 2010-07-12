@@ -5682,6 +5682,7 @@ JAVASCRIPT;
 			$highlight =	$row['highlight'];
 			$markelements = $row['markelements'];
 			$expandproblem = $row['expandproblem'];
+			$show_unack = $row['show_unack'];
 		}
 		else{
 			$name		= get_request('name','');
@@ -5693,6 +5694,7 @@ JAVASCRIPT;
 			$highlight = get_request('highlight',0);
 			$markelements = get_request('markelements',0);
 			$expandproblem = get_request('expandproblem',0);
+			$show_unack = get_request('show_unack', 0);
 		}
 
 		$frmMap = new CFormTable($frm_title,'sysmaps.php');
@@ -5711,17 +5713,14 @@ JAVASCRIPT;
 		$result=DBselect('SELECT * FROM images WHERE imagetype=2 AND '.DBin_node('imageid').' order by name');
 		while($row=DBfetch($result)){
 			$cmbImg->addItem(
-					$row['imageid'],
-					get_node_name_by_elid($row['imageid'], null, ': ').$row['name']
-					);
+				$row['imageid'],
+				get_node_name_by_elid($row['imageid'], null, ': ').$row['name']
+			);
 		}
 
 		$frmMap->addRow(S_BACKGROUND_IMAGE,$cmbImg);
-
 		$frmMap->addRow(S_ICON_HIGHLIGHTING, new CCheckBox('highlight',$highlight,null,1));
-
 		$frmMap->addRow(S_MARK_ELEMENTS_ON_TRIGGER_STATUS_CHANGE, new CCheckBox('markelements',$markelements,null,1));
-
 		$frmMap->addRow(S_EXPAND_SINGLE_PROBLEM, new CCheckBox('expandproblem',$expandproblem,null,1));
 
 
@@ -5740,6 +5739,19 @@ JAVASCRIPT;
 		$cmbLocation->addItem(2,S_RIGHT);
 		$cmbLocation->addItem(3,S_TOP);
 		$frmMap->addRow(S_ICON_LABEL_LOCATION,$cmbLocation);
+
+		$config = select_config();
+		$cb = new CComboBox('show_unack', $show_unack);
+		$cb->addItems(array(
+			EXTACK_OPTION_ALL => S_O_ALL,
+			EXTACK_OPTION_BOTH => S_O_SEPARATED,
+			EXTACK_OPTION_UNACK => S_O_UNACKNOWLEDGED_ONLY,
+		));
+		$cb->setEnabled($config['event_ack_enable']);
+		if(!$config['event_ack_enable']){
+			$cb->setAttribute('title', S_EVENT_ACKNOWLEDGING_DISABLED);
+		}
+		$frmMap->addRow(S_PROBLEM_DISPLAY, $cb);
 
 		$frmMap->addItemToBottomRow(new CButton('save',S_SAVE));
 
