@@ -1005,7 +1005,7 @@
 	'S_JAPANESE_JP'=>			'일본어 (JP)',
 	'S_CHINESE_CN'=>			'중국어 (CN)',
 	'S_DUTCH_NL'=>				'네덜란드어 (NL)',
-	'S_HUNGARY_HU'=>                        '헝가리어 (HU)',
+	'S_HUNGARIAN_HU'=>                        '헝가리어 (HU)',
 
 //	index.php
 	'S_ZABBIX_BIG'=>			'ZABBIX',
