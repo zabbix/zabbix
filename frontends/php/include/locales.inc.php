@@ -63,6 +63,7 @@ function set_zbx_locales(){
 	$ZBX_LOCALES = array(
 		'en_gb'=>  S_ENGLISH_GB,
 		'cn_zh'=>  S_CHINESE_CN,
+		'cs_cz'=>  S_CZECH_CZ,
 		'nl_nl'=>  S_DUTCH_NL,
 		'fr_fr'=>  S_FRENCH_FR,
 		'de_de'=>  S_GERMAN_DE,
@@ -77,7 +78,6 @@ function set_zbx_locales(){
 		'sp_sp'=>  S_SPANISH_SP,
 		'sv_se'=>  S_SWEDISH_SE,
 		'ua_ua'=>  S_UKRAINIAN_UA,
-		'cs_cz'=>  S_CZECH_CZ,
 	);
 }
 ?>

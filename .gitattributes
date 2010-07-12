@@ -320,6 +320,7 @@ frontends/php/include/debug.inc.php -text
 frontends/php/include/func.inc.php -text
 frontends/php/include/ident.inc.php -text
 frontends/php/include/js.inc.php -text
+frontends/php/include/locales/cs_cz.inc.php -text
 frontends/php/include/locales/hu_hu.inc.php -text
 frontends/php/include/locales/ko_kr.inc.php -text
 frontends/php/include/locales/pl_pl.inc.php -text
