@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2634] fixed instability of Zabbix processes on Solaris due to them crashing in signal handlers (asaveljevs)
  - [ZBX-2670] make it clear in the 'configure' help output that full path to odbc_config should be specified (Richlv)
  - [ZBX-2666] fixed detection of resolv.h and net/if.h (asaveljevs)
  - [ZBX-2657] fixed bugs with non closing item select popups in bar reports (Vedmak)
