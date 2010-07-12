@@ -1944,9 +1944,10 @@
 	'S_JAPANESE_JP'=>			'Japanese (JP)',
 	'S_CHINESE_CN'=>			'Chinese (CN)',
 	'S_DUTCH_NL'=>				'Dutch (NL)',
-	'S_HUNGARY_HU'=>			'Hungarian (HU)',
+	'S_HUNGARIAN_HU'=>			'Hungarian (HU)',
 	'S_POLISH_PL'=>				'Polish (PL)',
 	'S_UKRAINIAN_UA'=>			'Ukrainian (UA)',
+	'S_CZECH_CZ'=>				'Czech (CZ)',
 
 //	index.php
 	'S_ZABBIX_BIG'=>			'ZABBIX',
