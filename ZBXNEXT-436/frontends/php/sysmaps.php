@@ -54,7 +54,7 @@ include_once('include/page_header.php');
 		'backgroundid'=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,				'isset({save})'),
 		'expandproblem'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,1),		null),
 		'markelements'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,1),		null),
-		'ext_ack'=>	        array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,2),		null),
+		'show_unack'=>	        array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,2),		null),
 		'highlight'=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,1),		null),
 		'label_type'=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,4),		'isset({save})'),
 		'label_location'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,3),		'isset({save})'),
@@ -157,7 +157,7 @@ include_once('include/page_header.php');
 				'expandproblem' => get_request('expandproblem', 0),
 				'label_type' => $_REQUEST['label_type'],
 				'label_location' => $_REQUEST['label_location'],
-				'ext_ack' => get_request('ext_ack', 0),
+				'show_unack' => get_request('show_unack', 0),
 			);
 
 			DBstart();
@@ -181,7 +181,7 @@ include_once('include/page_header.php');
 				'expandproblem' => get_request('expandproblem', 0),
 				'label_type' => $_REQUEST['label_type'],
 				'label_location' => $_REQUEST['label_location'],
-				'ext_ack' => get_request('ext_ack', 0),
+				'show_unack' => get_request('show_unack', 0),
 			);
 
 			DBstart();

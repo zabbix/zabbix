@@ -5682,7 +5682,7 @@ JAVASCRIPT;
 			$highlight =	$row['highlight'];
 			$markelements = $row['markelements'];
 			$expandproblem = $row['expandproblem'];
-			$ext_ack = $row['ext_ack'];
+			$show_unack = $row['show_unack'];
 		}
 		else{
 			$name		= get_request('name','');
@@ -5694,7 +5694,7 @@ JAVASCRIPT;
 			$highlight = get_request('highlight',0);
 			$markelements = get_request('markelements',0);
 			$expandproblem = get_request('expandproblem',0);
-			$ext_ack = get_request('ext_ack', 0);
+			$show_unack = get_request('show_unack', 0);
 		}
 
 		$frmMap = new CFormTable($frm_title,'sysmaps.php');
@@ -5741,7 +5741,7 @@ JAVASCRIPT;
 		$frmMap->addRow(S_ICON_LABEL_LOCATION,$cmbLocation);
 
 		$config = select_config();
-		$cb = new CComboBox('ext_ack', $ext_ack);
+		$cb = new CComboBox('show_unack', $show_unack);
 		$cb->addItems(array(
 			EXTACK_OPTION_ALL => S_O_ALL,
 			EXTACK_OPTION_BOTH => S_O_SEPARATED,

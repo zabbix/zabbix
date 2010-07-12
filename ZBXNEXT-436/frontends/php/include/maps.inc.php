@@ -1106,7 +1106,7 @@
  * Author: Aly
  */
 
- 	function getHostsInfo($selements, $expandProblem=false, $ext_ack=EXTACK_OPTION_ALL){
+ 	function getHostsInfo($selements, $expandProblem=false, $show_unack=EXTACK_OPTION_ALL){
 		global $colors;
 
 		$selements_info = array();
@@ -1277,7 +1277,7 @@
 					$color = ($info['status'][$info['type']]['priority'] > 3) ? $colors['Red'] : $colors['Dark Red'];
 
 					$info['info'] = array();
-					if(in_array($ext_ack, array(EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH))){
+					if(in_array($show_unack, array(EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH))){
 						if($info['status'][TRIGGER_VALUE_TRUE]['count'] > 1){
 							$msg = $info['status'][TRIGGER_VALUE_TRUE]['count'].' '.S_PROBLEMS;
 						}
@@ -1293,7 +1293,7 @@
 						);
 					}
 
-					if(in_array($ext_ack, array(EXTACK_OPTION_UNACK, EXTACK_OPTION_BOTH))){
+					if(in_array($show_unack, array(EXTACK_OPTION_UNACK, EXTACK_OPTION_BOTH))){
 						if($info['status']['count_unack']){
 							$info['info']['unack'] = array(
 								'msg' => $info['status']['count_unack'] . ' '.S_UNACKNOWLEDGED,
@@ -1378,7 +1378,7 @@
  * Description: Retrive selement
  * Author: Aly
  */
- 	function getHostGroupsInfo($selements, $expandProblem=false, $ext_ack=EXTACK_OPTION_ALL){
+ 	function getHostGroupsInfo($selements, $expandProblem=false, $show_unack=EXTACK_OPTION_ALL){
 		global $colors;
 
 		$selements_info = array();
@@ -1529,7 +1529,7 @@
 			if($info['type'] == TRIGGER_VALUE_TRUE){
 				$color = ($info['status'][$info['type']]['priority'] > 3) ? $colors['Red'] : $colors['Dark Red'];
 
-				if(in_array($ext_ack, array(EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH))){
+				if(in_array($show_unack, array(EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH))){
 					if($info['status'][$info['type']]['count'] > 1)
 						$msg = $info['status'][$info['type']]['count'].' '.S_PROBLEMS;
 					else if($expandProblem && isset($info['status'][$info['type']]['info']))
@@ -1540,7 +1540,7 @@
 					$info['info']['problem'] = array('msg'=>$msg, 'color'=>$color);
 				}
 
-				if(in_array($ext_ack, array(EXTACK_OPTION_UNACK, EXTACK_OPTION_BOTH))){
+				if(in_array($show_unack, array(EXTACK_OPTION_UNACK, EXTACK_OPTION_BOTH))){
 					if($info['status']['count_unack']){
 						$info['info']['unack'] = array(
 							'msg' => $info['status']['count_unack'] . ' '.S_UNACKNOWLEDGED,
@@ -1612,7 +1612,7 @@
  * Author: Aly
  */
 
- 	function getMapsInfo($selements, $expandProblem=false, $ext_ack=EXTACK_OPTION_ALL){
+ 	function getMapsInfo($selements, $expandProblem=false, $show_unack=EXTACK_OPTION_ALL){
 		global $colors;
 
 		$selements_info = array();
@@ -1726,7 +1726,7 @@
 			if($info['type'] == TRIGGER_VALUE_TRUE){
 				$color = ($info['status'][$info['type']]['priority'] > 3) ? $colors['Red'] : $colors['Dark Red'];
 
-				if(in_array($ext_ack, array(EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH))){
+				if(in_array($show_unack, array(EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH))){
 					if($info['status'][$info['type']]['count'] > 1)
 						$msg = $info['status'][$info['type']]['count'].' '.S_PROBLEMS;
 					else if($expandProblem && isset($info['status'][$info['type']]['info'])){
@@ -1739,7 +1739,7 @@
 					$info['info']['problem'] = array('msg'=>$msg, 'color'=>$color);
 				}
 
-				if(in_array($ext_ack, array(EXTACK_OPTION_UNACK, EXTACK_OPTION_BOTH))){
+				if(in_array($show_unack, array(EXTACK_OPTION_UNACK, EXTACK_OPTION_BOTH))){
 					if($info['status']['count_unack']){
 						$info['info']['unack'] = array(
 							'msg' => $info['status']['count_unack'] . ' '.S_UNACKNOWLEDGED,
@@ -1856,12 +1856,12 @@
 		$elements = separateMapElements($sysmap);
 
 		$config = select_config();
-		$ext_ack = $config['event_ack_enable'] ? $sysmap['ext_ack'] : EXTACK_OPTION_ALL;
+		$show_unack = $config['event_ack_enable'] ? $sysmap['show_unack'] : EXTACK_OPTION_ALL;
 
 		$info = array();
-		$info += getMapsInfo($elements['sysmaps'], $sysmap['expandproblem'], $ext_ack);
-		$info += getHostGroupsInfo($elements['hostgroups'], $sysmap['expandproblem'], $ext_ack);
-		$info += getHostsInfo($elements['hosts'], $sysmap['expandproblem'], $ext_ack);
+		$info += getMapsInfo($elements['sysmaps'], $sysmap['expandproblem'], $show_unack);
+		$info += getHostGroupsInfo($elements['hostgroups'], $sysmap['expandproblem'], $show_unack);
+		$info += getHostsInfo($elements['hosts'], $sysmap['expandproblem'], $show_unack);
 		$info += getTriggersInfo($elements['triggers'], $sysmap['highlight']);
 		$info += getImagesInfo($elements['images']);
 

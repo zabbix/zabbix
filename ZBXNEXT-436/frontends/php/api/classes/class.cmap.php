@@ -218,13 +218,13 @@ class CMap extends CZBXAPI{
 						$sysmap['markelements'] = ($sysmap['highlight'] & ZBX_MAP_MARKELEMENTS) ? 1 : 0;
 
 						if(($sysmap['highlight'] & ZBX_MAP_EXTACK_SEPARATED) == ZBX_MAP_EXTACK_SEPARATED){
-							$sysmap['ext_ack'] = EXTACK_OPTION_BOTH;
+							$sysmap['show_unack'] = EXTACK_OPTION_BOTH;
 						}
 						else if($sysmap['highlight'] & ZBX_MAP_EXTACK_UNACK){
-							$sysmap['ext_ack'] = EXTACK_OPTION_UNACK;
+							$sysmap['show_unack'] = EXTACK_OPTION_UNACK;
 						}
 						else{
-							$sysmap['ext_ack'] = EXTACK_OPTION_ALL;
+							$sysmap['show_unack'] = EXTACK_OPTION_ALL;
 						}
 
 						$sysmap['highlight'] = ($sysmap['highlight'] & ZBX_MAP_HIGHLIGHT) ? 1 : 0;
@@ -524,13 +524,13 @@ COpt::memoryPick();
 			if($map['markelements'] == 1) $map['highlight'] = $map['highlight'] | ZBX_MAP_MARKELEMENTS;
 			if($map['expandproblem'] == 0) $map['highlight'] = $map['highlight'] | ZBX_MAP_EXPANDPROBLEM;
 
-			if($map['ext_ack'] == EXTACK_OPTION_BOTH){
+			if($map['show_unack'] == EXTACK_OPTION_BOTH){
 				$map['highlight'] = $map['highlight'] | ZBX_MAP_EXTACK_SEPARATED;
 			}
-			else if($map['ext_ack'] == EXTACK_OPTION_UNACK){
+			else if($map['show_unack'] == EXTACK_OPTION_UNACK){
 				$map['highlight'] = $map['highlight'] | ZBX_MAP_EXTACK_UNACK;
 			}
-			else if($map['ext_ack'] == EXTACK_OPTION_ALL){
+			else if($map['show_unack'] == EXTACK_OPTION_ALL){
 				$map['highlight'] = $map['highlight'] | ZBX_MAP_EXTACK_TOTAL;
 			}
 
@@ -622,13 +622,13 @@ COpt::memoryPick();
 			if($map['markelements'] == 1) $map['highlight'] = $map['highlight'] | ZBX_MAP_MARKELEMENTS;
 			if($map['expandproblem'] == 0) $map['highlight'] = $map['highlight'] | ZBX_MAP_EXPANDPROBLEM;
 
-			if($map['ext_ack'] == EXTACK_OPTION_BOTH){
+			if($map['show_unack'] == EXTACK_OPTION_BOTH){
 				$map['highlight'] = $map['highlight'] | ZBX_MAP_EXTACK_SEPARATED;
 			}
-			else if($map['ext_ack'] == EXTACK_OPTION_UNACK){
+			else if($map['show_unack'] == EXTACK_OPTION_UNACK){
 				$map['highlight'] = $map['highlight'] | ZBX_MAP_EXTACK_UNACK;
 			}
-			else if($map['ext_ack'] == EXTACK_OPTION_ALL){
+			else if($map['show_unack'] == EXTACK_OPTION_ALL){
 				$map['highlight'] = $map['highlight'] | ZBX_MAP_EXTACK_TOTAL;
 			}
 
