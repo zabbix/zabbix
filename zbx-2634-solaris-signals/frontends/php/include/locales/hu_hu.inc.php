@@ -1583,7 +1583,7 @@
 	'S_HOSTS_AND_TEMPLATES_BIG'=>			'Hosztok és minták',
 	'S_NEW_CONNECTOR'=>			'Új kapcsolat',
 	'S_EDIT_CONNECTOR'=>			'Kapcsolat szerkesztése',
-	'S_INCLUDE'=>			'Beleértve',
+	'S_INCLUDE_S'=>			'Beleértve',
 	'S_EXCLUDE'=>			'Kivéve',
 	'S_KEYWORD'=>			'Kulcsszó',
 	'S_POSITION'=>			'Pozíció',

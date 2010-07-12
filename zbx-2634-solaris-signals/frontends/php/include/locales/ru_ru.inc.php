@@ -1758,7 +1758,7 @@
 	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_BEFORE_ERROR'=>			'Найдены неразрешенные символы до элемента',
 	'S_NEW_INDICATORS'=>			'Новые индикаторы',
 	'S_EDIT_CONNECTOR'=>			'Изменить соединитель',
-	'S_INCLUDE'=>			'Включено',
+	'S_INCLUDE_S'=>			'Включено',
 	'S_EXCLUDE'=>			'Исключено',
 	'S_KEYWORD'=>			'Ключевое слово',
 	'S_POSITION'=>			'Позиция',

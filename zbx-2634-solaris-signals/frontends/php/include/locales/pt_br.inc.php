@@ -1742,7 +1742,7 @@
 	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_BEFORE_ERROR'=>			'Detectado símbolo não permitido antes do elemento',
 	'S_NEW_INDICATORS'=>			'Novos indicadores',
 	'S_EDIT_CONNECTOR'=>			'Editar conector',
-	'S_INCLUDE'=>			'Incluir',
+	'S_INCLUDE_S'=>			'Incluir',
 	'S_EXCLUDE'=>			'Excluir',
 	'S_KEYWORD'=>			'Palavra-chave',
 	'S_POSITION'=>			'Posição',

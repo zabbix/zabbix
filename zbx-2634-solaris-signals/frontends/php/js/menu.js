@@ -114,7 +114,7 @@ function popup_menu (a_items, a_tpl, x, y) {
 		'inner' : ['pum_i_item']
 	};
 
-	
+
 	// assign methods and properties required to emulate parent item
 	this.getprop = function (s_key) {
 		return this.a_tpl_def[s_key];
@@ -172,7 +172,7 @@ function menu_collapse (n_id) {
 			}
 		}
 		A_MENUS.splice(this.o_root.n_id);
-	} 
+	}
 	else {
 		// hide all items over the level specified
 		for (n_id = 0; n_id < this.a_index.length; n_id++) {
@@ -228,10 +228,10 @@ function menu_onclick (n_id) {
 		// apply rollout
 		o_item.e_oelement.className = o_item.getstyle(0, 0);
 		o_item.e_ielement.className = o_item.getstyle(1, 0);
-		
+
 		// update status line
 		o_item.upstatus(7);
-		
+
 		this.o_hidetimer = setTimeout('A_MENUS['+ this.n_id +'].collapse();', 100);//o_item.getprop('hide_delay'));
 		//this.collapse();
 		//alert(A_MENUS[this.n_id].a_config[1][1]);
@@ -249,7 +249,7 @@ function menu_onmouseout (n_id) {
 	// apply rollout
 	o_item.e_oelement.className = o_item.getstyle(0, 0);
 	o_item.e_ielement.className = o_item.getstyle(1, 0);
-	
+
 	// update status line
 	o_item.upstatus(7);
 
@@ -274,7 +274,7 @@ function menu_onmouseover (n_id) {
 	// apply rollover
 	o_item.e_oelement.className = o_item.getstyle(0, 1);
 	o_item.e_ielement.className = o_item.getstyle(1, 1);
-	
+
 	// if onclick open is set then no more actions required
 	if (o_item.getprop('expd_delay') < 0)
 		return;
@@ -313,7 +313,7 @@ function menu_item (o_parent, n_order) {
 	this.a_config = o_parent.a_config[n_order + item_offset];
 
 	// return if required parameters are missing
-	if (!this.a_config || !this.a_config[0]) 
+	if (!this.a_config || !this.a_config[0])
 	{
 		return;
 	}
@@ -331,7 +331,7 @@ function menu_item (o_parent, n_order) {
 	// calculate item's coordinates
 	var o_root = this.o_root,
 		a_tpl  = this.o_root.a_tpl;
-	
+
 	this.a_css = this.a_config[3] ? this.a_config[3] : null;
 
 	// assign methods
@@ -348,7 +348,7 @@ function menu_item (o_parent, n_order) {
 	{
 		// calculate menu direction in first element
 		o_parent.set_x_direction(
-			(this.getprop('width') + o_parent.n_x + this.getprop('block_left') 
+			(this.getprop('width') + o_parent.n_x + this.getprop('block_left')
 				> o_root.n_scr_width + o_root.n_scroll_left)
 			? -1 : 1
 			);
@@ -375,7 +375,7 @@ function menu_item (o_parent, n_order) {
 		var mi_direction = 1;  //	always show menu in down direction.
 		o_parent.set_y_direction(mi_direction);
 	}
-	
+
 // TOP
 	this.n_y = n_order
 		? o_parent.a_children[n_order - 1].n_y + this.getprop('top')
@@ -389,7 +389,7 @@ function menu_item (o_parent, n_order) {
 		var url = new Curl(this.a_config[1]);
 		this.a_config[1] = url.getUrl();
 	}
-	
+
 	// generate item's HMTL
 	var el = document.createElement('a');
 	el.setAttribute('id', 'e' + o_root.n_id + '_' + this.n_id + 'o');
@@ -415,7 +415,13 @@ function menu_item (o_parent, n_order) {
 	el.onmouseover = A_MENUS_onmouseover;
 	el.onmousedown = A_MENUS_onmousedown;
 
-	el.innerHTML = '<div  id="e' + o_root.n_id + '_' + this.n_id +'i" class="' + this.getstyle(1, 0) + '">' + this.a_config[0] + '</div>';
+	var eldiv = document.createElement('div');
+	eldiv.setAttribute('id', 'e' + o_root.n_id + '_' + this.n_id +'i');
+	eldiv.className = this.getstyle(1, 0);
+	eldiv.appendChild(document.createTextNode(this.a_config[0]));
+
+	el.appendChild(eldiv);
+	
 //	console.log(el,el.innerHTML);
 	document.body.appendChild(el);
 
@@ -427,7 +433,7 @@ function menu_item (o_parent, n_order) {
 	// no more initialization if leaf
 	if (this.a_config.length < item_offset)
 		return;
-		
+
 	// node specific methods and properties
 	this.a_children = [];
 
@@ -468,12 +474,12 @@ function mitem_getstyle (n_pos, n_state) {
 	// request recursively from parent levels if not defined
 	if(!a_css)
 		a_css = this.o_root.a_css_def;
-	
+
 	//var a_css = this.o_root.a_css;
 
 	var a_oclass = a_css[n_pos ? 'inner' : 'outer'];
 
-	// same class for all states	
+	// same class for all states
 	if (typeof(a_oclass) == 'string')
 		return a_oclass;
 
