@@ -207,6 +207,7 @@ class CMap extends CZBXAPI{
 						$result[$sysmap['sysmapid']]['links'] = array();
 					}
 
+
 					$result[$sysmap['sysmapid']] += $sysmap;
 				}
 			}
@@ -519,10 +520,10 @@ COpt::memoryPick();
 				'highlight' => $map['highlight'],
 				'expandproblem' => $map['expandproblem'],
 				'markelements' => $map['markelements'],
+				'show_unack' => $map['show_unack'],
 				'label_type' => $map['label_type'],
 				'label_location' => $map['label_location']
 			);
-
 			$result = DBexecute('INSERT INTO sysmaps ('.implode(',', array_keys($values)).')'.
 					' VALUES ('.implode(',', array_values($values)).')');
 
@@ -609,12 +610,10 @@ COpt::memoryPick();
 				'highlight' => $map['highlight'],
 				'expandproblem' => $map['expandproblem'],
 				'markelements' => $map['markelements'],
+				'show_unack' => $map['show_unack'],
 				'label_type' => $map['label_type'],
 				'label_location' => $map['label_location']
 			);
-
-
-
 			$sql = 'UPDATE sysmaps '.
 					' SET '.zbx_implodeHash('=', ',', $values).
 					' WHERE sysmapid='.$map['sysmapid'];

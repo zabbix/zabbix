@@ -146,7 +146,7 @@ set_time_limit(10);
 
 // Draw MAP
 	drawMapConnectors($im, $map, $map_info);
-	
+
 	if(!isset($_REQUEST['noselements'])){
 		drawMapHighligts($im, $map, $map_info);
 		drawMapSelements($im, $map, $map_info);
@@ -154,7 +154,7 @@ set_time_limit(10);
 
 	drawMapLabels($im, $map, $map_info);
 	drawMapLinkLabels($im, $map, $map_info);
-	
+
 	if(!isset($_REQUEST['noselements']) && ($map['markelements'] == 1)){
 		drawMapSelemetsMarks($im, $map, $map_info);
 	}
