@@ -875,6 +875,7 @@ FIELD		|label_location	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|highlight	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|expandproblem	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|markelements	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|show_unack	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|name
 
 
