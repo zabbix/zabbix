@@ -31,12 +31,6 @@ class CImage extends CZBXAPI{
 /**
  * Get images data
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param array $options
  * @param array $options['itemids']
  * @param array $options['hostids']
@@ -241,12 +235,6 @@ class CImage extends CZBXAPI{
 /**
  * Get images
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param array $image
  * @param array $image['name']
  * @param array $image['hostid']
@@ -274,12 +262,6 @@ class CImage extends CZBXAPI{
 /**
  * Check image existance
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param array $images
  * @param array $images['name']
  * @return boolean
@@ -304,12 +286,6 @@ class CImage extends CZBXAPI{
 /**
  * Add images
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param array $images ['name' => string, 'image' => string, 'imagetype' => int]
  * @return array
  */
@@ -320,11 +296,11 @@ class CImage extends CZBXAPI{
 		$imageids = array();
 
 		try{
+			self::BeginTransaction(__METHOD__);
+
 			if($USER_DETAILS['type'] < USER_TYPE_ZABBIX_ADMIN){
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
 			}
-
-			$transaction = self::BeginTransaction(__METHOD__);
 
 			foreach($images as $snum => $image){
 
@@ -353,7 +329,7 @@ class CImage extends CZBXAPI{
 
 				if($DB['TYPE'] == 'ORACLE'){
 					$values['image'] = 'EMPTY_BLOB()';
-					
+
 					$lob = oci_new_descriptor($DB['DB'], OCI_D_LOB);
 
 					$sql = 'INSERT INTO images ('.implode(' ,', array_keys($values)).') VALUES ('.implode(',', $values).')'.
@@ -394,11 +370,9 @@ class CImage extends CZBXAPI{
 			return array('imageids' => $imageids);
 		}
 		catch(APIException $e){
-			if(isset($transaction)) self::EndTransaction(false, __METHOD__);
-
+			self::EndTransaction(false, __METHOD__);
 			$error = $e->getErrors();
 			$error = reset($error);
-
 			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
 		}
@@ -406,12 +380,6 @@ class CImage extends CZBXAPI{
 
 /**
  * Update images
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
  *
  * @param array $images
  * @return array (updated images)
@@ -422,11 +390,11 @@ class CImage extends CZBXAPI{
 		try{
 			$images = zbx_toArray($images);
 
+			self::BeginTransaction(__METHOD__);
+
 			if($USER_DETAILS['type'] < USER_TYPE_ZABBIX_ADMIN){
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
 			}
-
-			$transaction = self::BeginTransaction(__METHOD__);
 
 			foreach($images as $num => $image){
 				if(!isset($image['imageid']))
@@ -497,7 +465,7 @@ class CImage extends CZBXAPI{
 			return array('imageids' => zbx_objectValues($images, 'imageid'));
 		}
 		catch(APIException $e){
-			if(isset($transaction)) self::EndTransaction(false, __METHOD__);
+			self::EndTransaction(false, __METHOD__);
 
 			$error = $e->getErrors();
 			$error = reset($error);
@@ -510,12 +478,6 @@ class CImage extends CZBXAPI{
 /**
  * Delete images
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param array $imageids
  * @return boolean
  */
@@ -523,14 +485,14 @@ class CImage extends CZBXAPI{
 		global $USER_DETAILS;
 
 		try{
+			self::BeginTransaction(__METHOD__);
+
 			if(empty($imageids['imageids'])) self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty parameters');
 			$imageids = zbx_toArray($imageids['imageids']);
 
 			if($USER_DETAILS['type'] < USER_TYPE_ZABBIX_ADMIN){
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
 			}
-
-			$transaction = self::BeginTransaction(__METHOD__);
 
 			$sql = 'SELECT DISTINCT sm.sysmapid, sm.name '.
 					' FROM sysmaps_elements se, sysmaps sm '.
@@ -562,7 +524,7 @@ class CImage extends CZBXAPI{
 			return array('imageids' => $imageids);
 		}
 		catch(APIException $e){
-			if(isset($transaction)) self::EndTransaction(false, __METHOD__);
+			self::EndTransaction(false, __METHOD__);
 			$error = $e->getErrors();
 			$error = reset($error);
 
