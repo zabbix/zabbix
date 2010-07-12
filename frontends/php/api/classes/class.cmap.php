@@ -30,12 +30,6 @@ class CMap extends CZBXAPI{
 /**
  * Get Map data
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param _array $options
  * @param array $options['nodeids'] Node IDs
  * @param array $options['groupids'] HostGroup IDs
@@ -64,7 +58,6 @@ class CMap extends CZBXAPI{
 
 		$result = array();
 		$user_type = $USER_DETAILS['type'];
-		$userid = $USER_DETAILS['userid'];
 
 		$sort_columns = array('name'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
@@ -223,7 +216,7 @@ class CMap extends CZBXAPI{
 		}
 		else{
 			if(!empty($result)){
-			
+
 				$link_triggers = array();
 				$sql = 'SELECT slt.triggerid, sl.sysmapid'.
 					' FROM sysmaps_link_triggers slt, sysmaps_links sl'.
@@ -234,7 +227,7 @@ class CMap extends CZBXAPI{
 				while($link_trigger = DBfetch($db_link_triggers)){
 					$link_triggers[$link_trigger['sysmapid']] = $link_trigger['triggerid'];
 				}
-				
+
 				$all_triggers = CTrigger::get(array(
 					'triggerids' => $link_triggers,
 					'editable' => $options['editable'],
@@ -247,8 +240,8 @@ class CMap extends CZBXAPI{
 						unset($sysmapids[$id]);
 					}
 				}
-		
-				
+
+
 				$hosts_to_check = array();
 				$maps_to_check = array();
 				$triggers_to_check = array();
@@ -430,18 +423,11 @@ COpt::memoryPick();
 /**
  * Get Sysmap IDs by Sysmap params
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param array $sysmap_data
  * @param array $sysmap_data['name']
  * @param array $sysmap_data['sysmapid']
  * @return string sysmapid
  */
-
 	public static function getObjects($sysmapData){
 		$options = array(
 			'filter' => $sysmapData,
@@ -476,15 +462,9 @@ COpt::memoryPick();
 
 	return !empty($objs);
 	}
-	
+
 /**
  * Add Map
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
  *
  * @param _array $maps
  * @param string $maps['name']
@@ -522,7 +502,7 @@ COpt::memoryPick();
 				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Wrong fields for map');
 				break;
 			}
-			
+
 			if(self::exists(array('name' => $map['name']))){
 				$result = false;
 				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Map [ '.$map['name'].' ] already exists.');
@@ -563,12 +543,6 @@ COpt::memoryPick();
 
 /**
  * Update Map
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
  *
  * @param _array $maps multidimensional array with Hosts data
  * @param string $maps['sysmapid']
@@ -663,12 +637,6 @@ COpt::memoryPick();
 /**
  * Delete Map
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param array $sysmaps
  * @param array $sysmaps['sysmapid']
  * @return boolean
@@ -736,12 +704,6 @@ COpt::memoryPick();
 /**
  * addLinks Map
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param array $links
  * @param array $links[0,...]['sysmapid']
  * @param array $links[0,...]['selementid1']
@@ -797,12 +759,6 @@ COpt::memoryPick();
 	}
 /**
  * Add Element to Sysmap
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
  *
  * @param array $elements[0,...]['sysmapid']
  * @param array $elements[0,...]['elementid']
@@ -910,12 +866,6 @@ COpt::memoryPick();
 /**
  * Update Element to Sysmap
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param array $elements[0,...]['selementid']
  * @param array $elements[0,...]['sysmapid']
  * @param array $elements[0,...]['elementid']
@@ -1021,12 +971,6 @@ COpt::memoryPick();
 /**
  * Delete Element from map
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param array $selements multidimensional array with selement objects
  * @param array $selements[0, ...]['selementid'] selementid to delete
  */
@@ -1056,7 +1000,7 @@ COpt::memoryPick();
 
 	        $result = delete_sysmaps_element($selementids);
 		    $result = self::EndTransaction($result, __METHOD__);
-			
+
 			if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Map delete elements failed');
 
 			return $selementids;
@@ -1074,12 +1018,6 @@ COpt::memoryPick();
 
 /**
  * Add link trigger to link (Sysmap)
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
  *
  * @param array $links[0,...]['linkid']
  * @param array $links[0,...]['triggerid']
