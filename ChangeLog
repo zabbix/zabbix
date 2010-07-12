@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2669] fixed not showing map label when background image is used (Vedmak)
  - [ZBXNEXT-436] added unacknwledged problem display for maps (Vedmak)
  - [ZBX-2561] refactored usergroups api, improved items deletion (Vedmak)
  - [ZBX-2634] fixed instability of Zabbix processes on Solaris due to them crashing in signal handlers (asaveljevs)
