@@ -19,24 +19,20 @@
 **/
 ?>
 <?php
-	function get_user_detail($param){
-		global $USER_DETAILS;
+	function user_type2str($user_type=null){
+		$user_types = array(
+			USER_TYPE_ZABBIX_USER => S_ZABBIX_USER,
+			USER_TYPE_ZABBIX_ADMIN => S_ZABBIX_ADMIN,
+			USER_TYPE_SUPER_ADMIN => S_SUPER_ADMIN,
+		);
 
-		$result = null;
-		if(isset($USER_DETAILS[$param])) $result = $USER_DETAILS[$param];
-
-	return $USER_DETAILS[$param];
-	}
-
-	function user_type2str($user_type_int){
-		$str_user_type[USER_TYPE_ZABBIX_USER]	= S_ZABBIX_USER;
-		$str_user_type[USER_TYPE_ZABBIX_ADMIN]	= S_ZABBIX_ADMIN;
-		$str_user_type[USER_TYPE_SUPER_ADMIN]	= S_SUPER_ADMIN;
-
-		if(isset($str_user_type[$user_type_int]))
-			return $str_user_type[$user_type_int];
-
-		return S_UNKNOWN;
+		if(is_null($user_type)){
+			return $user_types;
+		}
+		else if(isset($user_types[$user_type])){
+			return $user_types[$user_type];
+		}
+		else return S_UNKNOWN;
 	}
 
 	function user_auth_type2str($auth_type){
@@ -55,7 +51,6 @@
 	return S_UNKNOWN;
 	}
 
-
 	function unblock_user_login($userids){
 		zbx_value2array($userids);
 
@@ -64,41 +59,6 @@
 
 	return $result;
 	}
-
-// Update User definition
-	function update_user_profile($userid, $passwd,$url, $autologin, $autologout, $lang, $theme, $refresh, $user_medias){
-		global $USER_DETAILS;
-
-		if((bccomp($userid,$USER_DETAILS["userid"]) != 0)){
-			access_deny();
-		}
-
-		$sql = 'UPDATE users SET '.
-					' url='.zbx_dbstr($url).','.
-					' autologin='.$autologin.','.
-					' autologout='.$autologout.','.
-					' lang='.zbx_dbstr($lang).','.
-					' theme='.zbx_dbstr($theme).','.
-					(isset($passwd)?(' passwd='.zbx_dbstr(md5($passwd)).',') : '').
-					' refresh='.$refresh.
-				' WHERE userid='.$userid;
-
-		$result = DBexecute($sql);
-
-		$result = DBexecute('DELEET FROM media WHERE userid='.$userid);
-			foreach($user_medias as $mediaid => $media_data){
-				$mediaid = get_dbid("media","mediaid");
-
-				$sql = 'INSERT INTO media (mediaid,userid,mediatypeid,sendto,active,severity,period)'.
-						' VALUES ('.$mediaid.','.$userid.','.$media_data['mediatypeid'].','.
-								zbx_dbstr($media_data['sendto']).','.$media_data['active'].','.$media_data['severity'].','.
-								zbx_dbstr($media_data['period']).')';
-
-				$result = DBexecute($sql);
-				if(!$result) break;
-			}
-	}
-
 
 	function get_userid_by_usrgrpid($usrgrpids){
 		zbx_value2array($usrgrpids);
@@ -117,7 +77,6 @@
 
 	return $userids;
 	}
-
 
 	function add_user_to_group($userid,$usrgrpid){
 		$result = false;
@@ -178,110 +137,6 @@
 	USER GROUPS
 **************************/
 
-	function add_user_group($name,$users_status,$gui_access,$api_access,$debug_mode,$users=array(),$rights=array()){
-
-		if(DBfetch(DBselect('select * from usrgrp where name='.zbx_dbstr($name).' and '.DBin_node('usrgrpid', get_current_nodeid(false))))){
-			error(S_GROUP.SPACE.$name.SPACE.S_ALREADY_EXISTS_SMALL);
-			return 0;
-		}
-
-		$usrgrpid=get_dbid("usrgrp","usrgrpid");
-
-		$result=DBexecute("INSERT INTO usrgrp (usrgrpid,name) VALUES ($usrgrpid,".zbx_dbstr($name).")");
-		if(!$result)	return	$result;
-
-// must come before adding user to group
-		$result&=change_group_status($usrgrpid,$users_status);
-		$result&=change_group_gui_access($usrgrpid,$gui_access);
-		$result&=change_group_api_access($usrgrpid, $api_access);
-		$result&=change_group_debug_mode($usrgrpid, $debug_mode);
-		if(!$result) return	$result;
-//--------
-
-		foreach($users as $userid => $name){
-			$result &= add_user_to_group($userid,$usrgrpid);
-			if(!$result)	return	$result;
-		}
-
-		$result=DBexecute("delete from rights where groupid=".$usrgrpid);
-		foreach($rights as $right){
-			$id = get_dbid('rights','rightid');
-			$result=DBexecute('insert into rights (rightid,groupid,permission,id)'.
-				' values ('.$id.','.$usrgrpid.','.$right['permission'].','.$right['id'].')');
-
-			if(!$result)	return	$result;
-		}
-
-		return $result;
-	}
-
-	function update_user_group($usrgrpid,$name,$users_status,$gui_access,$api_access,$debug_mode,$users=array(),$rights=array()){
-		global $USER_DETAILS;
-
-		$sql = 'SELECT * '.
-				' FROM usrgrp '.
-				' WHERE name='.zbx_dbstr($name).
-					' AND usrgrpid<>'.$usrgrpid.
-					' AND '.DBin_node('usrgrpid', false);
-		if(DBfetch(DBselect($sql))){
-			error(S_GROUP.SPACE.$name.SPACE.S_ALREADY_EXISTS_SMALL);
-			return 0;
-		}
-
-		$result=DBexecute('UPDATE usrgrp SET name='.zbx_dbstr($name).' WHERE usrgrpid='.$usrgrpid);
-		if(!$result) return	$result;
-
-// must come before adding user to group
-		$result&=change_group_status($usrgrpid,$users_status);
-		$result&=change_group_gui_access($usrgrpid,$gui_access);
-		$result&=change_group_api_access($usrgrpid, $api_access);
-		$result&=change_group_debug_mode($usrgrpid, $debug_mode);
-		if(!$result) return	$result;
-//-------
-
-		$grant = true;
-		if(($gui_access == GROUP_GUI_ACCESS_DISABLED) || ($users_status == GROUP_STATUS_DISABLED)){
-			$grant = !uint_in_array($USER_DETAILS['userid'],$users);
-		}
-		if($grant){
-			$result = DBexecute('DELETE FROM users_groups WHERE usrgrpid='.$usrgrpid);
-			foreach($users as $userid => $name){
-				$result = add_user_to_group($userid,$usrgrpid);
-				if(!$result)	return	$result;
-			}
-		}
-		else{
-			error(S_USER_CANNOT_DISABLE_ITSELF);
-			return false;
-		}
-
-		$result=DBexecute('DELETE FROM rights WHERE groupid='.$usrgrpid);
-		foreach($rights as $right){
-			$id = get_dbid('rights','rightid');
-			$result = DBexecute('INSERT INTO rights (rightid,groupid,permission,id)'.
-				' VALUES ('.$id.','.$usrgrpid.','.$right['permission'].','.$right['id'].')');
-
-			if(!$result)	return	$result;
-		}
-
-	return $result;
-	}
-
-	function delete_user_group($usrgrpids){
-		zbx_value2array($usrgrpids);
-
-		$result = DBexecute('DELETE FROM rights WHERE '.DBcondition('groupid',$usrgrpids));
-		if(!$result)	return	$result;
-
-		DBexecute('DELETE FROM operations WHERE object='.OPERATION_OBJECT_GROUP.' AND '.DBcondition('objectid',$usrgrpids));
-
-		$result = DBexecute('DELETE FROM users_groups WHERE '.DBcondition('usrgrpid',$usrgrpids));
-		if(!$result)	return	$result;
-
-		$result = DBexecute('DELETE FROM usrgrp WHERE '.DBcondition('usrgrpid',$usrgrpids));
-
-	return $result;
-	}
 
 	function change_group_status($usrgrpids,$users_status){
 		zbx_value2array($usrgrpids);

@@ -517,11 +517,11 @@ include_once('include/page_header.php');
 
 			$res = DBselect($sql);
 			while($db_item = DBfetch($res)){
-				if(!copy_item_to_host($db_item['itemid'], $hostid, true)) throw new Exception();
+					if(!copy_item_to_host($db_item['itemid'], $hostid, true)) throw new Exception();
 			}
 
 // Host triggers
-			if(!copy_triggers($clone_hostid, $hostid)) throw new Exception();
+				if(!copy_triggers($clone_hostid, $hostid)) throw new Exception();
 
 // Host graphs
 			$options = array(
@@ -572,10 +572,7 @@ include_once('include/page_header.php');
 	}
 // DELETE HOST
 	else if(isset($_REQUEST['delete']) && isset($_REQUEST['hostid'])){
-		DBstart();
-			$result = delete_host($_REQUEST['hostid']);
-		$result = DBend($result);
-
+		$result = CHost::delete($_REQUEST['hostid']);
 		show_messages($result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
 
 		if($result){
@@ -600,26 +597,8 @@ include_once('include/page_header.php');
 // DELETE HOST
 	else if($_REQUEST['go'] == 'delete'){
 		$hostids = get_request('hosts', array());
-		$hosts = zbx_toObject($hostids,'hostid');
 
-		DBstart();
-		$options = array(
-			'hostids' => $hostids,
-			'output' => array('hostid', 'host')
-		);
-		//$delHosts = CHost::get($options);
-
-		$go_result = CHost::delete($hosts);
-		/*foreach($delHosts as $hnum => $host){
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, 'Host ['.$host['host'].']');
-		}*/
-
-		$go_result = DBend($go_result);
-
-		if(!$go_result){
-			error(CHost::resetErrors());
-		}
-
+		$go_result = CHost::delete($hostids);
 		show_messages($go_result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
 	}
 // ACTIVATE/DISABLE HOSTS
