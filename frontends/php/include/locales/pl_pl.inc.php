@@ -1161,7 +1161,7 @@
 	'S_JAPANESE_JP'=>				'Japoński (JP)',
 	'S_CHINESE_CN'=>				'Chiński (CN)',
 	'S_DUTCH_NL'=>					'Holenderski (NL)',
-	'S_HUNGARY_HU'=>				'Węgierski (HU)',
+	'S_HUNGARIAN_HU'=>				'Węgierski (HU)',
 	'S_POLISH_PL'=>					'Polski (PL)',
 	'S_ZABBIX_BIG'=>				'ZABBIX',
 	'S_HOST_PROFILES'=>				'Profile stacji',

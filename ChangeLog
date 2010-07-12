@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2682] added Czech translation; thanks to Jakub Kalas (Richlv)
  - [ZBX-2669] fixed not showing map label when background image is used (Vedmak)
  - [ZBXNEXT-436] added unacknwledged problem display for maps (Vedmak)
  - [ZBX-2561] refactored usergroups api, improved items deletion (Vedmak)

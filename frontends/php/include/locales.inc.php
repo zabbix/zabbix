@@ -66,7 +66,7 @@ function set_zbx_locales(){
 		'nl_nl'=>  S_DUTCH_NL,
 		'fr_fr'=>  S_FRENCH_FR,
 		'de_de'=>  S_GERMAN_DE,
-		'hu_hu'=>  S_HUNGARY_HU,
+		'hu_hu'=>  S_HUNGARIAN_HU,
 		'it_it'=>  S_ITALIAN_IT,
 		'ko_kr'=>  S_KOREAN_KO,
 		'ja_jp'=>  S_JAPANESE_JP,
@@ -77,6 +77,7 @@ function set_zbx_locales(){
 		'sp_sp'=>  S_SPANISH_SP,
 		'sv_se'=>  S_SWEDISH_SE,
 		'ua_ua'=>  S_UKRAINIAN_UA,
+		'cs_cz'=>  S_CZECH_CZ,
 	);
 }
 ?>

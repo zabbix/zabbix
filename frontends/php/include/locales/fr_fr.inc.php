@@ -1713,7 +1713,7 @@
 	'S_JAPANESE_JP'=>			'Japonais (JP)',
 	'S_CHINESE_CN'=>			'Chinois (CN)',
 	'S_DUTCH_NL'=>			'Hollandais (NL)',
-	'S_HUNGARY_HU'=>			'Hongrois (HU)',
+	'S_HUNGARIAN_HU'=>			'Hongrois (HU)',
 	'S_POLISH_PL'=>			'Polonais (PL)',
 	'S_UKRAINIAN_UA'=>			'Ukrainien (UA)',
 	'S_ZABBIX_BIG'=>			'ZABBIX',
