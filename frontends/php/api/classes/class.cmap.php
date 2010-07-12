@@ -208,9 +208,20 @@ class CMap extends CZBXAPI{
 					}
 
 					if(isset($sysmap['highlight'])){
-						$sysmap['expandproblem'] = ($sysmap['highlight'] & 2)? 0 : 1;
-						$sysmap['markelements'] = ($sysmap['highlight'] & 4) ? 1 : 0;
-						$sysmap['highlight'] = ($sysmap['highlight'] & 1)? 1 : 0;
+						$sysmap['expandproblem'] = ($sysmap['highlight'] & ZBX_MAP_EXPANDPROBLEM) ? 0 : 1;
+						$sysmap['markelements'] = ($sysmap['highlight'] & ZBX_MAP_MARKELEMENTS) ? 1 : 0;
+
+						if(($sysmap['highlight'] & ZBX_MAP_EXTACK_SEPARATED) == ZBX_MAP_EXTACK_SEPARATED){
+							$sysmap['show_unack'] = EXTACK_OPTION_BOTH;
+						}
+						else if($sysmap['highlight'] & ZBX_MAP_EXTACK_UNACK){
+							$sysmap['show_unack'] = EXTACK_OPTION_UNACK;
+						}
+						else{
+							$sysmap['show_unack'] = EXTACK_OPTION_ALL;
+						}
+
+						$sysmap['highlight'] = ($sysmap['highlight'] & ZBX_MAP_HIGHLIGHT) ? 1 : 0;
 					}
 
 					$result[$sysmap['sysmapid']] += $sysmap;
@@ -491,8 +502,18 @@ COpt::memoryPick();
 
 		self::BeginTransaction(__METHOD__);
 		foreach($maps as $mnum => $map){
-			if($map['markelements'] == 1) $map['highlight'] = $map['highlight'] | 4;
-			if($map['expandproblem'] == 0) $map['highlight'] = $map['highlight'] | 2;
+			if($map['markelements'] == 1) $map['highlight'] = $map['highlight'] | ZBX_MAP_MARKELEMENTS;
+			if($map['expandproblem'] == 0) $map['highlight'] = $map['highlight'] | ZBX_MAP_EXPANDPROBLEM;
+
+			if($map['show_unack'] == EXTACK_OPTION_BOTH){
+				$map['highlight'] = $map['highlight'] | ZBX_MAP_EXTACK_SEPARATED;
+			}
+			else if($map['show_unack'] == EXTACK_OPTION_UNACK){
+				$map['highlight'] = $map['highlight'] | ZBX_MAP_EXTACK_UNACK;
+			}
+			else if($map['show_unack'] == EXTACK_OPTION_ALL){
+				$map['highlight'] = $map['highlight'] | ZBX_MAP_EXTACK_TOTAL;
+			}
 
 			$map_db_fields = array(
 				'name' => null,
@@ -573,8 +594,18 @@ COpt::memoryPick();
 		foreach($maps as $mnum => $map){
 			$map_db_fields = $db_sysmaps[$map['sysmapid']];
 
-			if($map['markelements'] == 1) $map['highlight'] = $map['highlight'] | 4;
-			if($map['expandproblem'] == 0) $map['highlight'] = $map['highlight'] | 2;
+			if($map['markelements'] == 1) $map['highlight'] = $map['highlight'] | ZBX_MAP_MARKELEMENTS;
+			if($map['expandproblem'] == 0) $map['highlight'] = $map['highlight'] | ZBX_MAP_EXPANDPROBLEM;
+
+			if($map['show_unack'] == EXTACK_OPTION_BOTH){
+				$map['highlight'] = $map['highlight'] | ZBX_MAP_EXTACK_SEPARATED;
+			}
+			else if($map['show_unack'] == EXTACK_OPTION_UNACK){
+				$map['highlight'] = $map['highlight'] | ZBX_MAP_EXTACK_UNACK;
+			}
+			else if($map['show_unack'] == EXTACK_OPTION_ALL){
+				$map['highlight'] = $map['highlight'] | ZBX_MAP_EXTACK_TOTAL;
+			}
 
 			if(!check_db_fields($map_db_fields, $map)){
 				$result = false;
