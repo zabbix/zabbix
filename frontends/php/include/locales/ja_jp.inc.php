@@ -1708,7 +1708,7 @@
 	'S_JAPANESE_JP'=>			'日本語 (JP)',
 	'S_CHINESE_CN'=>			'中国語 (CN)',
 	'S_DUTCH_NL'=>			'オランダ語 (NL)',
-	'S_HUNGARY_HU'=>			'ハンガリー語 (HU)',
+	'S_HUNGARIAN_HU'=>			'ハンガリー語 (HU)',
 	'S_POLISH_PL'=>			'ポーランド語 (PL)',
 	'S_UKRAINIAN_UA'=>			'ウクライナ語 (UA)',
 	'S_ZABBIX_BIG'=>			'Zabbix',

@@ -1559,7 +1559,7 @@
 	'S_JAPANESE_JP'=>			'Japán (JP)',
 	'S_CHINESE_CN'=>			'Kínai (CN)',
 	'S_DUTCH_NL'=>			'Holland (NL)',
-	'S_HUNGARY_HU'=>			'Magyar (HU)',
+	'S_HUNGARIAN_HU'=>			'Magyar (HU)',
 	'S_POLISH_PL'=>			'Lengyel (PL)',
 	'S_UKRAINIAN_UA'=>			'Ukrán (UK)',
 	'S_ZABBIX_BIG'=>			'ZABBIX',
