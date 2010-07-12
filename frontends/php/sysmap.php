@@ -390,6 +390,8 @@ include_once('include/page_header.php');
 	$gridForm = new CDiv(array($gridSize, $gridAlignAll));
 	$gridForm->setAttribute('id', 'gridalignblock');
 
+	array_push($menuRow, S_MAP . ' "'.$sysmap['name'].'"');
+	array_push($menuRow, SPACE.SPACE);
 	array_push($menuRow, S_ICON.' [',$el_add,$el_rmv,']');
 	array_push($menuRow, SPACE.SPACE);
 	array_push($menuRow, S_LINK.' [',$cn_add,$cn_rmv,']');
