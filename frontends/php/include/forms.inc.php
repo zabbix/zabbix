@@ -951,9 +951,8 @@
 
 // Insert form for User Groups
 	function insert_usergroups_form(){
-		$config = select_config();
-
 		$frm_title = S_USER_GROUP;
+		
 		if(isset($_REQUEST['usrgrpid'])){
 			$usrgrp		= CUserGroup::get(array('usrgrpids' => $_REQUEST['usrgrpid'],  'extendoutput' => 1));
 			$usrgrp = reset($usrgrp);
@@ -1013,7 +1012,6 @@
 
 		$frmUserG = new CFormTable($frm_title,'usergrps.php');
 		$frmUserG->setHelp('web.users.groups.php');
-		$frmUserG->addVar('config',get_request('config',1));
 
 		if(isset($_REQUEST['usrgrpid'])){
 			$frmUserG->addVar('usrgrpid',$_REQUEST['usrgrpid']);
@@ -1167,14 +1165,14 @@
 			$frmUserG->addSpanRow(get_rights_of_elements_table($group_rights));
 		}
 
-		$frmUserG->addItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["usrgrpid"])){
+		$frmUserG->addItemToBottomRow(new CButton('save',S_SAVE));
+		if(isset($_REQUEST['usrgrpid'])){
 			$frmUserG->addItemToBottomRow(SPACE);
-			$frmUserG->addItemToBottomRow(new CButtonDelete("Delete selected group?",
-				url_param("form").url_param("config").url_param("usrgrpid")));
+			$frmUserG->addItemToBottomRow(new CButtonDelete('Delete selected group?',
+				url_param('form').url_param('usrgrpid')));
 		}
 		$frmUserG->addItemToBottomRow(SPACE);
-		$frmUserG->addItemToBottomRow(new CButtonCancel(url_param("config")));
+		$frmUserG->addItemToBottomRow(new CButtonCancel());
 
 		return($frmUserG);
 	}
