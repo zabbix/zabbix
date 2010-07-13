@@ -42,12 +42,13 @@
 		'period'=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
 		'stime'=>	array(T_ZBX_STR, O_OPT,	 null,	null, null),
 		'reset'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'httptestid'=>	array(T_ZBX_INT, O_MAND,	null,	DB_ID,		null),
+		'httptestid'=>	array(T_ZBX_INT, O_MAND,	null,	DB_ID,		'isset({favobj})'),
 
 		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		NULL),
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		null),
+		'favid'=>		array(T_ZBX_INT, O_OPT, P_ACT,  null,			null),
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
 	);
 
@@ -59,8 +60,8 @@
 			CProfile::update('web.httpdetails.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 		if('timeline' == $_REQUEST['favobj']){
-			if(isset($_REQUEST['httptestid']) && isset($_REQUEST['period'])){
-				navigation_bar_calc('web.httptest', $_REQUEST['httptestid'], true);
+			if(isset($_REQUEST['favid']) && isset($_REQUEST['period'])){
+				navigation_bar_calc('web.httptest', $_REQUEST['favid'], true);
 			}
 		}
 	}
