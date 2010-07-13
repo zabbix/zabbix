@@ -30,7 +30,7 @@ return messagesListId;
 var CMessageList = Class.create(CDebug,{
 messageListId:			0,				// PMasters reference id
 
-updateFrequency:		30,			// seconds
+updateFrequency:		60,				// seconds
 timeoutFrequency:		10,				// seconds
 soundFrequency:			1,				// seconds
 
@@ -83,7 +83,7 @@ addMessage: function(newMessage){
 	this.debug('addMessage');
 //--
 	var newMessage = newMessage || {};
-SDJ(newMessage.options);
+
 	while(isset(this.msgcounter, this.messageList)){
 		this.msgcounter++;
 	}
@@ -95,7 +95,7 @@ SDJ(newMessage.options);
 	
 	this.messagePipe.push(this.msgcounter);
 	newMessage.messageid = this.msgcounter;
-//newMessage.title += ' | '+newMessage.sourceid;
+
 	this.messageList[this.msgcounter] = new CMessage(this, newMessage);
 	this.messageLast[this.messageList[this.msgcounter].caption] = this.messageList[this.msgcounter].sourceid;
 
@@ -164,8 +164,7 @@ getServerMessages: function(){
 		'onFailure': function(resp){zbx_throw('Messages Widget: message request failed.');}
 	}
 
-SDJ(rpcRequest.params);
-SDJ(rpcRequest.params.messageLast);
+//SDJ(rpcRequest.params.messageLast);
 
 	new RPC.Call(rpcRequest);
 
@@ -176,11 +175,19 @@ serverRespond: function(messages){
 	this.debug('serverRespond');
 //--
 
+	var playSound = {
+		'priority': 0,
+		'sound': null
+	};
 	for(var i=0; i < messages.length; i++){
-		this.addMessage(messages[i]);
+		var message = this.addMessage(messages[i]);
+
+		if(message.priority > playSound.priority) playSound.sound = message.sound;
 	}
 
 	this.ready = true;
+	
+	if(!is_null(playSound.sound)) AudioList.play(playSound.sound);
 },
 
 // DOM creation
@@ -216,6 +223,7 @@ caption:			'unknown',		// msg caption (events, actions, infos..  e.t.c.)
 sourceid:			null,			// caption + sourceid = identifier for server
 type:				0,				// 1 - sound, 2 - text, 3 - sound & text, 4 - notdefined
 priority:			0,				// msg priority ASC
+sound:				null,			// msg sound
 color:				'ffffff',		// msg color
 time:				0,				// msg time arrival
 title:				'No title',		// msg header
@@ -236,7 +244,8 @@ initialize: function($super, messageList, message){
 	for(var key in message){
 		if(empty(message[key]) || !isset(key, this)) continue;
 
-		this[key] = message[key];
+		if(key == 'time') this[key] = parseInt(message[key]);
+		else this[key] = message[key];
 	}
 
 	this.createMessage();
@@ -298,18 +307,20 @@ createMessage: function(){
 	this.dom.listItem.appendChild(this.dom.message);
 
 	this.dom.message.className = 'message';
+	this.dom.message.style.backgroundColor = '#'+this.color;
 
+/*
 // color box
 	this.dom.colorBox = document.createElement('div');
 	this.dom.message.appendChild(this.dom.colorBox);
 
 	this.dom.colorBox.className = 'colorbox';
 	this.dom.colorBox.style.backgroundColor = '#'+this.color;
-//*/
 
-//* close box
+
+// close box
 	this.dom.closeBox = document.createElement('div');
-//	this.dom.message.appendChild(this.dom.closeBox);
+	this.dom.message.appendChild(this.dom.closeBox);
 
 	this.dom.closeBox.className = 'closebox';
 	this.dom.closeBox.style.backgroundColor = '#FFFFFF';
@@ -331,7 +342,7 @@ createMessage: function(){
 // body
 	if(!is_array(this.body)) this.body = new Array(this.body);
 
-	this.dom.message.style.height = (24+14*this.body.length)+'px';
+//	this.dom.message.style.height = (24+14*this.body.length)+'px';
 	for(var i=0; i < this.body.length; i++){
 		if(!isset(i, this.body) || empty(this.body[i])) continue;
 		this.dom.messageBox.appendChild(document.createElement('br'));

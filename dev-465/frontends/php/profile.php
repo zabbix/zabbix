@@ -54,6 +54,7 @@ $fields=array(
 	'new_media'=>		array(T_ZBX_STR, O_OPT,	null, null, null),
 	'enable_media'=>	array(T_ZBX_INT, O_OPT,	null, null, null),
 	'disable_media'=>	array(T_ZBX_INT, O_OPT,	null, null, null),
+	'messages'=>		array(T_ZBX_STR, O_OPT,	null, null, null),
 /* actions */
 	'save'=>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT, null, null),
 	'cancel'=>			array(T_ZBX_STR, O_OPT,	P_SYS, null, null),
@@ -115,7 +116,6 @@ $fields=array(
 			show_error_message(S_PASSWORD_SHOULD_NOT_BE_EMPTY);
 		}
 		else{
-
 			$user = array();
 			$user['userid'] = $USER_DETAILS['userid'];
 //			$user['name'] = $USER_DETAILS['name'];
@@ -133,7 +133,11 @@ $fields=array(
 			$user['user_groups'] = null;
 			$user['user_medias'] = get_request('user_medias', array());
 
+			$messages = get_request('messages', array());
+
 			DBstart();
+			updateMessageSettings($messages);
+			
 			$result = CUser::updateProfile($user);
 			if($result && ($USER_DETAILS['type'] > USER_TYPE_ZABBIX_USER)){
 				$data = array(
@@ -148,11 +152,12 @@ $fields=array(
 
 			show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
 
-			if($result)
+			if($result){
 				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_USER,
 					'User alias ['.$USER_DETAILS['alias'].
 					'] name ['.$USER_DETAILS['name'].'] surname ['.
 					$USER_DETAILS['surname'].'] profile id ['.$USER_DETAILS['userid'].']');
+			}
 		}
 	}
 ?>

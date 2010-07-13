@@ -259,6 +259,24 @@ return $style;
 }
 
 /*
+ * Function: getSeverityCaption()
+ * Description: convert severity constant in to the CSS style name
+ * Author: Aly
+ */
+function getSeverityCaption($severity){
+	switch($severity){
+		case TRIGGER_SEVERITY_DISASTER: $caption=S_DISASTER; break;
+		case TRIGGER_SEVERITY_HIGH:		$caption=S_HIGH; break;
+		case TRIGGER_SEVERITY_AVERAGE:	$caption=S_AVERAGE; break;
+		case TRIGGER_SEVERITY_WARNING:	$caption=S_WARNING; break;
+		case TRIGGER_SEVERITY_INFORMATION: $caption=S_INFORMATION; break;
+		default: $caption=S_NOT_CLASSIFIED;
+	}
+
+return $caption;
+}
+
+/*
  * Function: get_service_status_of_trigger
  *
  * Description:

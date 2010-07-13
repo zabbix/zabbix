@@ -459,7 +459,7 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 
 // black list wich do not require units metrics.. 
 	$blackList = array('%','ms','rpm');
-	if((in_array($units, $blackList)) || (zbx_empty($units) && ($convert == ITEM_CONVERT_WITH_UNITS))){
+	if((in_array(strtolower($units), $blackList)) || (zbx_empty($units) && ($convert == ITEM_CONVERT_WITH_UNITS))){
 //	if(zbx_empty($units) && ($convert == ITEM_CONVERT_WITH_UNITS)){
 		if(abs($value) >= 1)
 			$format = '%.2f';

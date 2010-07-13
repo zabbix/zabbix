@@ -1922,10 +1922,18 @@
 	'S_ZABBIX_CONFIG'=>			'Zabbix config',
 
 //	profile.php
-	'S_USER_PROFILE_BIG'=>			'USER PROFILE',
+
+	'S_GUI_MESSAGING'=>			'GUI Messaging',
+	'S_REPEAT_SOUND'=>			'Repeat sound',
+	'S_MESSAGE_TIMEOUT'=>		'Message timeout',
+	'S_PLAY'=>					'Play',
+	'S_PAUSE'=>					'Pause',
+	'S_STOP'=>					'Stop',
+	'S_LOOP'=>					'Loop',
+	'S_USER_PROFILE_BIG'=>		'USER PROFILE',
 	'S_USER_PROFILE'=>			'User profile',
 	'S_LANGUAGE'=>				'Language',
-	'S_THEME'=>				'Theme',
+	'S_THEME'=>					'Theme',
 	'S_ENGLISH_GB'=>			'English (GB)',
 	'S_FRENCH_FR'=>				'French (FR)',
 	'S_GERMAN_DE'=>				'German (DE)',

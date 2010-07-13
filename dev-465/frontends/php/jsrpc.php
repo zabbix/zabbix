@@ -66,19 +66,36 @@ include_once('include/page_header.php');
 		case 'message.get':
 			$params = $data['params'];
 // Events
-			$lastEventId = CProfile::get('web.messages.last.eventid', 0);
+			$msgsettings = getMessageSettings();
 
+			$lastEventId = CProfile::get('web.messages.last.eventid', 0);
 			if(isset($params['messageLast']['events'])){
-				$lastEventId = max(array($params['messageLast']['events'], $lastEventId)) + 1;
+				if(bccomp($params['messageLast']['events'], $lastEventId) > 0)
+						$lastEventId = $params['messageLast']['events'];
+				$lastEventId = bcadd($lastEventId, 1);
 			}
+
+			$triggerOptions = array(
+				'lastChangeSince' => (time() - $msgsettings['timeout']), // 15 min
+				'filter' => array(
+					'priority' => array_keys($msgsettings['triggers']['severities'])
+				),
+				'select_hosts' => array('hostid', 'host'),
+				'output' => API_OUTPUT_EXTEND,
+				'expandDescription' => 1
+			);
+			$triggers = CTrigger::get($triggerOptions);
+			$triggers = zbx_toHash($triggers, 'triggerid');
 
 			$options = array(
 				'object' => EVENT_OBJECT_TRIGGER,
-				'time_from' => (time() - 18000), // 15 min
+				'triggerids' => zbx_objectValues($triggers, 'triggerid'),
+				'time_from' => (time() - $msgsettings['timeout']), // 15 min
 				'output' => API_OUTPUT_EXTEND,
 				'sortfield' => 'eventid',
 				'sortorder' => 'DESC',
-				'limit' => 15
+				'limit' => 15,
+				'nopermissions' => 1
 			);
 
 			if($lastEventId > 0){
@@ -88,22 +105,23 @@ include_once('include/page_header.php');
 			$events = CEvent::get($options);
 			order_result($events, 'eventid', ZBX_SORT_UP);
 			order_result($events, 'clock', ZBX_SORT_UP);
-			
-			$triggerOptions = array(
-				'triggerids' => zbx_objectValues($events, 'objectid'),
-				'select_hosts' => array('hostid', 'host'),
-				'output' => API_OUTPUT_EXTEND,
-				'expandDescription' => 1
-			);
-			$triggers = CTrigger::get($triggerOptions);
-			$triggers = zbx_toHash($triggers, 'triggerid');
+
 
 			$messages = array();
 			foreach($events as $enum => $event){
+				if(!isset($triggers[$event['objectid']])) continue;
+
 				$trigger = $triggers[$event['objectid']];
 				$host = reset($trigger['hosts']);
-				
-				$title = ($event['value'] == TRIGGER_VALUE_FALSE)?S_RESOLVED:S_PROBLEM.' '.S_ON_SMALL;
+
+				if($event['value'] == TRIGGER_VALUE_FALSE){
+					$title = S_RESOLVED;
+					$sound = $msgsettings['sounds']['ok'];
+				}
+				else{
+					$title = S_PROBLEM.' '.S_ON_SMALL;
+					$sound = $msgsettings['sounds'][$trigger['priority']];
+				}
 
 				$messages[] = array(
 					'type' => 3,
@@ -111,16 +129,17 @@ include_once('include/page_header.php');
 					'sourceid' => $event['eventid'],
 					'time' => $event['clock'],
 					'priority' => $trigger['priority'],
+					'sound' => $sound,
 					'color' => getEventColor($trigger['priority'], $event['value']),
 					'title' => $title.' '.$host['host'],
 					'body' => array(
 						S_DETAILS.': '.$trigger['description'],
-						S_AGE.': '.zbx_date2age($event['clock'], time()),
+						S_DATE.': '.zbx_date2str(S_DATE_FORMAT_YMDHMS, $event['clock']),
+//						S_AGE.': '.zbx_date2age($event['clock'], time()),
 //						S_SEVERITY.': '.get_severity_style($trigger['priority'])
+						S_SOURCE.': '.$event['eventid'].' : '.$event['clock']
 					),
-					'timeout' => 60,
-'options' => $options
-
+					'timeout' => $msgsettings['timeout']
 				);
 			}
 

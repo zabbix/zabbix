@@ -56,6 +56,7 @@ function empty(obj){
 //if((obj == 0) || (obj == '0')) return true;
 	if(is_string(obj) && (obj === '')) return true;
 	if(is_array(obj) && (obj.length == 0)) return true;
+
 return false;
 }
 
@@ -114,8 +115,9 @@ function SDJ(obj){
 //return null;
 
 	for(var key in obj){
-		var value = obj[key];
-		debug+=key+': '+value+'  key: '+typeof(key)+'\n';
+		if(typeof(obj[key]) == 'function') continue;
+
+		debug+=key+': '+obj[key]+' ('+typeof(obj[key])+')'+'\n';//' key: '+typeof(key)+'\n';
 	}
 	SDI(debug);
 }

@@ -649,27 +649,29 @@
 			if($autologout > 0) $_REQUEST['autologout'] = $autologout;
 
 			$user_groups	= array();
-			$user_medias		= array();
+			$user_medias	= array();
 
-			$sql = 'SELECT g.* '.
-					' FROM usrgrp g, users_groups ug '.
-					' WHERE ug.usrgrpid=g.usrgrpid '.
-						' AND ug.userid='.$userid;
-			$db_user_groups = DBselect($sql);
-
-			while($db_group = DBfetch($db_user_groups)){
-				$user_groups[$db_group['usrgrpid']] = $db_group['usrgrpid'];
-			}
+			$options = array(
+				'userids' => $userid,
+				'output' => API_OUTPUT_SHORTEN
+			);
+			$user_groups = CUserGroup::get($options);
+			$user_groups = zbx_objectValues($user_groups, 'usrgrpid');
+			$user_groups = zbx_toHash($user_groups);
 
 			$db_medias = DBselect('SELECT m.* FROM media m WHERE m.userid='.$userid);
 			while($db_media = DBfetch($db_medias)){
-				$user_medias[] = array('mediaid' => $db_media['mediaid'],
-									'mediatypeid' => $db_media['mediatypeid'],
-									'period' => $db_media['period'],
-									'sendto' => $db_media['sendto'],
-									'severity' => $db_media['severity'],
-									'active' => $db_media['active']);
+				$user_medias[] = array(
+					'mediaid' => $db_media['mediaid'],
+					'mediatypeid' => $db_media['mediatypeid'],
+					'period' => $db_media['period'],
+					'sendto' => $db_media['sendto'],
+					'severity' => $db_media['severity'],
+					'active' => $db_media['active']
+				);
 			}
+
+			$messages = getMessageSettings();
 		}
 		else{
 			$alias		= get_request('alias','');
@@ -692,14 +694,12 @@
 			$user_groups		= get_request('user_groups',array());
 			$change_password	= get_request('change_password', null);
 			$user_medias		= get_request('user_medias', array());
+
+			$messages = get_request('messages', array());
 		}
 
-		if($autologin || !isset($_REQUEST['autologout'])){
-			$autologout = 0;
-		}
-		else if(isset($_REQUEST['autologout']) && ($autologout < 90)){
-			$autologout = 90;
-		}
+		if($autologin || !isset($_REQUEST['autologout'])) $autologout = 0;
+		else if(isset($_REQUEST['autologout']) && ($autologout < 90)) $autologout = 90;
 
 		$perm_details	= get_request('perm_details',0);
 
@@ -708,10 +708,10 @@
 		foreach($user_medias as $one_media) $media_type_ids[$one_media['mediatypeid']] = 1;
 
 		if(count($media_type_ids) > 0){
-			$db_media_types = DBselect('SELECT mt.mediatypeid, mt.description '.
-									' FROM media_type mt '.
-									' WHERE mt.mediatypeid IN ('.implode(',',array_keys($media_type_ids)).')');
-
+			$sql = 'SELECT mt.mediatypeid, mt.description '.
+				' FROM media_type mt '.
+				' WHERE mt.mediatypeid IN ('.implode(',',array_keys($media_type_ids)).')';
+			$db_media_types = DBselect($sql);
 			while($db_media_type = DBfetch($db_media_types)){
 				$media_types[$db_media_type['mediatypeid']] = $db_media_type['description'];
 			}
@@ -747,15 +747,8 @@
 				$frmUser->addRow(S_PASSWORD, $passwd_but);
 			}
 		}
-		// else{
-			// if(!isset($userid) || isset($change_password)){
-				// $frmUser->addVar('password1','');
-				// $frmUser->addVar('password2','');
-			// }
-		// }
 
 		if($profile==0){
-
 			$frmUser->addVar('user_groups',$user_groups);
 
 			if(isset($userid) && (bccomp($USER_DETAILS['userid'], $userid)==0)){
@@ -772,7 +765,11 @@
 			$lstGroups = new CListBox('user_groups_to_del[]', null, 10);
 			$lstGroups->attributes['style'] = 'width: 320px';
 
-			$groups = CUserGroup::get(array('usrgrpids' => $user_groups, 'extendoutput' => 1));
+			$options = array(
+				'usrgrpids' => $user_groups,
+				'output' => API_OUTPUT_EXTEND
+			);
+			$groups = CUserGroup::get($options);
 			order_result($groups, 'name');
 			foreach($groups as $num => $group){
 				$lstGroups->addItem($group['usrgrpid'], $group['name']);
@@ -809,14 +806,14 @@
 		$script = "javascript:
 			var autologout_visible = document.getElementById('autologout_visible');
 			var autologout = document.getElementById('autologout');
-			if (this.checked) {
-				if (autologout_visible.checked) {
+			if(this.checked){
+				if(autologout_visible.checked){
 					autologout_visible.checked = false;
 					autologout_visible.onclick();
 				}
 				autologout_visible.disabled = true;
 			}
-			else {
+			else{
 				autologout_visible.disabled = false;
 			}";
 		$chkbx_autologin = new CCheckBox("autologin", $autologin, $script, 1);
@@ -824,14 +821,9 @@
 		$chkbx_autologin->setAttribute('autocomplete','off');
 		$frmUser->addRow(S_AUTO_LOGIN,	$chkbx_autologin);
 
-		$script = "javascript:
-					var autologout = document.getElementById('autologout');
-					if (this.checked) {
-						autologout.disabled = false;
-					}
-					else {
-						autologout.disabled = true;
-					}";
+		$script = "javascript: var autologout = document.getElementById('autologout');
+					if(this.checked) autologout.disabled = false;
+					else autologout.disabled = true;";
 		$autologoutCheckBox = new CCheckBox('autologout_visible', ($autologout == 0) ? 'no' : 'yes', $script);
 
 		$autologoutTextBox = new CNumericBox("autologout", ($autologout == 0) ? '90' : $autologout, 4);
@@ -933,8 +925,79 @@
 			}
 		}
 
+		if($profile){
+			$frmUser->addRow(S_GUI_MESSAGING, new CCheckBox('messages[enabled]', isset($messages['enabled']), 1));
+			$frmUser->addRow(S_MESSAGE_TIMEOUT.SPACE.'('.S_SECONDS_SMALL.')', new CNumericBox("messages[timeout]", $messages['timeout'], 4));
+
+			$severities = array(
+				TRIGGER_SEVERITY_NOT_CLASSIFIED,
+				TRIGGER_SEVERITY_INFORMATION,
+				TRIGGER_SEVERITY_WARNING,
+				TRIGGER_SEVERITY_AVERAGE,
+				TRIGGER_SEVERITY_HIGH,
+				TRIGGER_SEVERITY_DISASTER
+			);
+
+// trigger sounds
+			$zbxSounds = getSounds();
+			$triggers = new CTable('', 'invisible');
+
+			$soundList = new CComboBox('messages[sounds][ok]', $messages['sounds']['ok']);
+			foreach($zbxSounds as $filename => $file) $soundList->addItem($file, $filename);
+			$soundList->setAttribute('id', 'messages[sounds][ok]');
+
+			$jsPlay = "javascript: var soundIdx = $('messages[sounds][ok]').selectedIndex;".
+						"var loopIdx = $('messages[sounds][loop]').selectedIndex;".
+						"AudioList.loop(".
+							"$('messages[sounds][ok]').options[soundIdx].value, ".
+							"$('messages[sounds][loop]').options[loopIdx].value);";
+			$resolved = array(
+				new CCheckBox('messages[triggers][ok]', isset($messages['triggers']['ok']), null, 1),
+				S_OK,
+				$soundList,
+				new CButton('start', S_PLAY, $jsPlay, false),
+				new CButton('stop', S_STOP, 'javascript: AudioList.stopAll();', false)
+			);
+
+			$triggers->addRow($resolved);
+
+			
+			foreach($severities as $snum => $severity){
+				$soundList = new CComboBox('messages[sounds]['.$severity.']', $messages['sounds'][$severity]);
+				foreach($zbxSounds as $filename => $file) $soundList->addItem($file, $filename);
+				$soundList->setAttribute('id', 'messages[sounds]['.$severity.']');
+
+
+				$jsPlay = "javascript: var soundIdx = $('messages[sounds][".$severity."]').selectedIndex;".
+							"var loopIdx = $('messages[sounds][loop]').selectedIndex;".
+							"AudioList.loop(".
+								"$('messages[sounds][".$severity."]').options[soundIdx].value, ".
+								"$('messages[sounds][loop]').options[loopIdx].value);";
+
+				$triggers->addRow(array(
+					new CCheckBox('messages[triggers][severities]['.$severity.']', isset($messages['triggers']['severities'][$severity]), null, 1),
+					getSeverityCaption($severity),
+					$soundList,
+					new CButton('start', S_PLAY, $jsPlay, false),
+					new CButton('stop', S_STOP, 'javascript: AudioList.stopAll();', false)
+				));
+			}
+
+			$frmUser->addRow(S_TRIGGER_SEVERITY, $triggers);
+
+			$repeatSound = new CComboBox('messages[sounds][loop]', $messages['sounds']['loop']);
+			$repeatSound->setAttribute('id', 'messages[sounds][loop]');
+			$repeatSound->addItem(1, '1 time');
+			$repeatSound->addItem(3, '3 times');
+			$repeatSound->addItem(5, '5 times');
+			$repeatSound->addItem(10, '10 times');
+			$repeatSound->addItem(-1, 'Till timeout');
+
+			$frmUser->addRow(S_REPEAT_SOUND, $repeatSound);
+ 		}
+
 		$frmUser->addItemToBottomRow(new CButton('save',S_SAVE));
-		if(isset($userid) && $profile == 0){
+		if(isset($userid) && ($profile == 0)){
 			$frmUser->addItemToBottomRow(SPACE);
 			$delete_b = new CButtonDelete(S_DELETE_SELECTED_USER_Q,url_param("form").url_param("config").url_param("userid"));
 			if(bccomp($USER_DETAILS['userid'],$userid) == 0){
