@@ -286,6 +286,7 @@ include_once('include/page_header.php');
 		'groupid' => get_request('groupid', null),
 		'hostid' => get_request('hostid', null),
 	);
+
 	if($monitored_hosts){
 		$options['groups']['monitored_hosts'] = true;
 		$options['hosts']['monitored_hosts'] = true;
@@ -304,7 +305,7 @@ include_once('include/page_header.php');
 	$pageFilter = new CPageFilter($options);
 
 	$nodeid = get_request('nodeid', get_current_nodeid(false));
-	$groupid = $pageFilter->groupid;
+	$groupid = $pageFilter->groupid > 0 ? $pageFilter->groupid : null;
 	$hostid = $pageFilter->hostid;
 
 	$available_nodes = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST);
@@ -456,8 +457,6 @@ include_once('include/page_header.php');
 				foreach($new_templates as $id => $name){
 					$script .= 'add_variable(null,"templates['.$id.']",'.zbx_jsvalue($name).','.zbx_jsvalue($dstfrm).',window.opener.document);'."\n";
 				}
-
-
 			} // if count new_templates > 0
 
 			$script.= 'var form = window.opener.document.forms['.zbx_jsvalue($dstfrm).'];'.
@@ -472,11 +471,11 @@ include_once('include/page_header.php');
 		$table->setHeader(array(S_NAME));
 
 		$options = array(
-				'nodeids' => $nodeid,
-				'groupids' => $groupid,
-				'extendoutput' => 1,
-				'sortfield' => 'host'
-			);
+			'nodeids' => $nodeid,
+			'groupids' => $groupid,
+			'extendoutput' => 1,
+			'sortfield' => 'host'
+		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 
 		$template_list = CTemplate::get($options);
