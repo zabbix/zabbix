@@ -23,7 +23,7 @@
 									</element>
 									<element name="resourceid">
 										<choice>
-											<text/>
+											<data type="integer"/>
 											<group>
 												<interleave>
 													<element name="name">
