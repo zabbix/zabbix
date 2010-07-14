@@ -33,7 +33,7 @@ function create_map(container,sysmapid,id){
 	if(is_number(sysmapid) && (sysmapid > 100000000000000)){
 		throw('Error: Wrong type of arguments passed to function [create_map]');
 	}
-	
+
 
 	ZBX_SYSMAPS[id] = new Object;
 	ZBX_SYSMAPS[id].map = new Cmap(container,sysmapid,id);
@@ -119,7 +119,7 @@ initialize: function($super, container, sysmapid, id){
 //		var pos = getPosition(this.container);
 //		this.container.style.position = 'relative'; //absolute; top:'+pos.top+'px; left:'+pos.left+'px;');
 	}
-	
+
 	if(typeof(sysmapid) != 'undefined'){
 		this.sysmapid = sysmapid;
 
@@ -134,7 +134,7 @@ initialize: function($super, container, sysmapid, id){
 			'gridshow': $('gridshow'),
 			'gridalignall': $('gridalignall')
 		}
-		
+
 		this.grid = new CGrid(this.id, gridCtrlElemetns);
 
 // selement
@@ -149,7 +149,7 @@ initialize: function($super, container, sysmapid, id){
 
 		this.getSysmapBySysmapid(this.sysmapid);
 	}
-	
+
 	Position.includeScrollOffsets = true;
 },
 
@@ -165,7 +165,7 @@ getSysmapBySysmapid: function(sysmapid){
 		'sysmapid': this.sysmapid,
 		'action':	'get'
 	}
-			
+
 	new Ajax.Request(url.getPath()+'?output=ajax'+'&sid='+url.getArgument('sid'),
 					{
 						'method': 'post',
@@ -179,13 +179,13 @@ getSysmapBySysmapid: function(sysmapid){
 
 sysmapUpdate: function(dragable,e){
 	this.debug('sysmapUpdate');
-	
+
 	this.deactivate_menu();
-	
+
 	var element = dragable.element;
 	var element_id = element.id.split('_');
 	var selementid = element_id[(element_id.length - 1)];
-	
+
 	var pos = new Array();
 	pos.x = parseInt(element.style.left,10);
 	pos.y = parseInt(element.style.top,10);
@@ -205,23 +205,23 @@ sysmapUpdate: function(dragable,e){
 //ELEMENTS
 addNewElement: function(){
 	this.debug('addNewElement');
-	
+
 //	var selement = this.mselement;
-	
+
 	var selement = {};
 	for(var key in this.mselement){
 		selement[key] = this.mselement[key];
 	}
 
 	var url = new Curl(location.href);
-	
+
 	var params = {
 		'favobj': 	'selements',
 		'favid':	this.id,
 		'sysmapid':	this.sysmapid,
 		'action':	'new_selement'
 	}
-	
+
 	params['selements'] = Object.toJSON({'0': selement});
 
 	new Ajax.Request(url.getPath()+'?output=ajax'+'&sid='+url.getArgument('sid'),
@@ -239,14 +239,14 @@ addNewElement: function(){
 add_empty_link: function(e){
 	this.debug('add_empty_link');
 //--
-	
+
 	if(this.selection.count == 2){
 		var selementid1 = null;
 		var selementid2 = null;
 
 		for(var i=0; i < this.selection.position; i++){
 			if(!isset(i, this.selection.selements)) continue;
-			
+
 			if(is_null(selementid1)){
 				selementid1 = this.selection.selements[i];
 			}
@@ -265,7 +265,7 @@ add_empty_link: function(e){
 	for(var key in this.mlink){
 		mlink[key] = this.mlink[key];
 	}
-	
+
 	mlink['selementid1'] = selementid1;
 	mlink['selementid2'] = selementid2;
 
@@ -293,15 +293,15 @@ add_empty_linktrigger: function(linkid){
 // SYSMAP FORM
 saveSysmap: function(){
 	this.debug('saveSysmap');
-	
-	var url = new Curl(location.href);	
+
+	var url = new Curl(location.href);
 	var params = {
 		'favobj': 	'sysmap',
 		'favid':	this.id,
 		'sysmapid':	this.sysmapid,
 		'action':	'save'
 	}
-	
+
 	params = this.get_update_params(params);
 //SDJ(params);
 	new Ajax.Request(url.getPath()+'?output=ajax'+'&sid='+url.getArgument('sid'),
@@ -330,7 +330,7 @@ select_selement: function(selementid, multi){
 	if((typeof(this.selements[selementid]) != 'undefiend') && !empty(this.selements[selementid])){
 		var position = null;
 
-		if(is_null(this.selements[selementid].selected)){	
+		if(is_null(this.selements[selementid].selected)){
 			position = this.selection.position;
 
 			this.selection.selements[position] = selementid;
@@ -349,7 +349,7 @@ select_selement: function(selementid, multi){
 		else{
 			this.selection.count--;
 			position = selement.selected;
-			
+
 			this.selection.selements[position] = null;
 			delete(this.selection.selements[position]);
 
@@ -391,14 +391,14 @@ alignSelement: function(selementid){
 	if(!isset(selementid, this.selements) || empty(this.selements[selementid])) return false;
 
 	var selement = 	this.selements[selementid];
-	
+
 	var dims = getDimensions(selement.html_obj);
 	var shiftX = Math.round(dims.width / 2);
 	var shiftY = Math.round(dims.height / 2);
 
 	var newX = parseInt(selement.x, 10) + shiftX;
 	var newY = parseInt(selement.y, 10) + shiftY;
-	
+
 	newX = Math.floor(newX / this.grid.gridSize) * this.grid.gridSize;
 	newY = Math.floor(newY / this.grid.gridSize) * this.grid.gridSize;
 
@@ -437,14 +437,14 @@ add_selement: function(selement, update_icon){
 	else{
 		selementid = selement.selementid;
 	}
-	
+
 	if(typeof(this.selements[selementid]) == 'undefined'){
 		selement.selected = null;
 	}
 	else{
 		selement.selected = this.selements[selementid].selected;
 	}
-	
+
 	if((typeof(update_icon) != 'undefined') && (update_icon != 0)){
 		selement.html_obj = this.addSelementImage(selement);
 		selement.image = null;
@@ -459,12 +459,13 @@ updateSelementOption: function(selementid, params){ // params = {'key': value, '
 
 	if(!isset(selementid, this.selements) || empty(this.selements[selementid])) return false;
 
+
 	for(var key in params){
 		if(is_null(params[key])) continue;
 
-		if((key == 'x') && (params[key] > this.sysmap.width)) continue;
-		if((key == 'y') && (params[key] > this.sysmap.height)) continue;
-
+		if((key == 'x') && (parseInt(params[key], 10) > parseInt(this.sysmap.width, 10))) continue;
+		if((key == 'y') && (parseInt(params[key], 10) > parseInt(this.sysmap.height, 10))) continue;
+//SDI(key + ' ' + params[key]);
 		if(is_number(params[key])) params[key] = params[key].toString();
 		this.selements[selementid][key] = params[key];
 	}
@@ -477,16 +478,16 @@ updateSelement: function(selement){
 //--
 
 	var url = new Curl(location.href);
-	
+
 	var params = {
 		'favobj': 	'selements',
 		'favid':	this.id,
 		'sysmapid':	this.sysmapid,
 		'action':	'get_img'
-	}
-	
+	};
+
 	params['selements'] = Object.toJSON({'0': selement});
-			
+
 	new Ajax.Request(url.getPath()+'?output=ajax'+'&sid='+url.getArgument('sid'),
 					{
 						'method': 'post',
@@ -511,7 +512,7 @@ remove_selements: function(e){
 
 		this.hideForm(e);
 		this.updateMapImage();
-	}	
+	}
 },
 
 remove_selement: function(selementid, update_map){
@@ -519,7 +520,7 @@ remove_selement: function(selementid, update_map){
 //--
 
 	if(!isset(selementid, this.selements) || empty(this.selements[selementid])) return false;
-		
+
 // Unselect
 	this.selection.count--;
 	this.selection.selements[this.selements[selementid].selected] = null;
@@ -529,7 +530,7 @@ remove_selement: function(selementid, update_map){
 	this.remove_links_by_selementid(selementid);
 // remove icon
 	this.remove_selement_img(this.selements[selementid]);
-	
+
 //		this.selements[selementid].html_obj.remove();
 // remove selement
 	this.selements[selementid] = null;
@@ -549,11 +550,11 @@ get_linkid_by_selementids: function(selementid1,selementid2){
 //--
 
 	if(typeof(selementid2) == 'undefined') var selementid2 = null;
-	
+
 	var links = {};
 	for(var linkid in this.links){
 		if(empty(this.links[linkid])) continue;
-		
+
 		if(is_null(selementid2)){
 			if((this.links[linkid].selementid1 == selementid1) || (this.links[linkid].selementid2 == selementid1))
 				links[linkid] = linkid;
@@ -579,7 +580,7 @@ add_link: function(mlink, update_map){
 			linkid = parseInt(Math.random(1000000000) * 1000000000);
 			linkid = linkid.toString();
 		}while(isset(linkid, this.links));
-		
+
 		mlink['new'] = 'new';
 		mlink['linkid'] = linkid;
 	}
@@ -604,11 +605,11 @@ add_link: function(mlink, update_map){
 		}
 
 		mlink.linktriggers = tmp_lts;
-	} 
+	}
 
 	mlink.status = 1;
 	this.links[linkid] = mlink;
-	
+
 	if((typeof(update_map) != 'undefined') && (update_map == 1)){
 		this.updateMapImage();
 	}
@@ -623,7 +624,7 @@ update_link_option: function(linkid, params, update_map){ // params = [{'key': k
 //SDI(key+' : '+value);
 	for(var key in params){
 		if(is_null(params[key])) continue;
-		
+
 		if(key == 'selementid1'){
 			if(this.links[linkid]['selementid2'] == params[key])
 			return false;
@@ -654,7 +655,7 @@ remove_links: function(e){
 
 		for(var i=0; i < this.selection.position; i++){
 			if(!isset(i, this.selection.selements)) continue;
-			
+
 			if(is_null(selementid1)){
 				selementid1 = this.selection.selements[i];
 			}
@@ -668,11 +669,11 @@ remove_links: function(e){
 		this.info(locale['S_PLEASE_SELECT_TWO_ELEMENTS']);
 		return false;
 	}
-	
+
 	var linkids = this.get_linkid_by_selementids(selementid1,selementid2);
 
 	if(linkids !== false){
-		if(Confirm(locale['S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q'])){			
+		if(Confirm(locale['S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q'])){
 			for(var linkid in linkids){
 				this.remove_link(linkid);
 			}
@@ -795,16 +796,16 @@ addSelementImage: function(selement){
 //		var selement_div = document.createElement('img');
 		var selement_div = document.createElement('div');
 		this.container.appendChild(selement_div);
-	
+
 		selement_div.setAttribute('id',dom_id);
 //		selement_div.setAttribute('alt','selement_'+selement.id);
 		selement_div.style.position = 'absolute';
 		selement_div.style.visibility = 'hidden';
-		
+
 		this.makeSelementDragable(selement_div);
 	}
-		
-	var position = {};	
+
+	var position = {};
 	position.top = parseInt(selement.y,10);
 	position.left = parseInt(selement.x,10);
 
@@ -817,11 +818,11 @@ addSelementImage: function(selement){
 	selement_div.style.top = position.top+'px';
 	selement_div.style.left = position.left+'px';
 	selement_div.style.visibility = 'visible';
-	
+
 	if(!is_null(selement.selected)){
 		selement_div.style.border = '1px #3333FF solid';
 		selement_div.style.backgroundColor = '#00AAAA';
-		selement_div.style.opacity = '.60';		
+		selement_div.style.opacity = '.60';
 	}
 
 return selement_div;
@@ -829,7 +830,7 @@ return selement_div;
 
 updateSelementsIcon: function(){
 	this.debug('updateSelementsIcon');
-	
+
 	if(is_null(this.mapimg)){
 		setTimeout('ZBX_SYSMAPS['+this.id+'].map.updateSelementsIcon();',500);
 	}
@@ -847,7 +848,7 @@ remove_selement_img: function(selement){
 	this.debug('remove_selement_img');
 
 	Draggables.unregister(selement.html_obj);
-	selement.html_obj.remove();	
+	selement.html_obj.remove();
 },
 
 makeSelementDragable: function(selement){
@@ -908,17 +909,17 @@ set_mapimg: function(resp){
 	if(is_null(this.mapimg)){
 		this.mapimg = $('sysmap_img');
 //		this.container.appendChild(this.mapimg);
-		
+
 		this.mapimg.setAttribute('alt','Sysmap');
 		this.mapimg.setAttribute('id','mapimg_'+this.sysmapid);
 		this.mapimg.className = 'image';
-		
+
 		this.mapimg.style.zIndex = '1';
-		
+
 		addListener(this.mapimg, 'load', this.set_container.bindAsEventListener(this), false);
 		addListener(window, 'resize', this.set_container.bindAsEventListener(this), false);
 	}
-	
+
 //	this.mapimg.setAttribute('src','data:image/png;base64,'+resp.responseText);
 	this.mapimg.setAttribute('src','imgstore.php?imageid='+resp.responseText);
 },
@@ -938,9 +939,9 @@ set_container: function(event){
 		this.container.style.top = sysmap_pn.top+'px';
 		this.container.style.left = sysmap_pn.left+'px';
 		this.container.style.height = sysmap_ds.height+'px';
-		this.container.style.width = sysmap_ds.width+'px';	
+		this.container.style.width = sysmap_ds.width+'px';
 	}
-	
+
 	Event.stop(event)
 },
 //--------------------------------------------------------------------------------
@@ -956,10 +957,10 @@ get_window_dimensions: function(x,y,draggable){
 		else if (n < lower) return lower;
 		else return n;
 	}
-	
+
 	var h = parseInt(document.body.offsetHeight);
 	var w = parseInt(document.body.offsetWidth);
-	
+
 	return[
 		constrain(x, 0, w),
 		constrain(y, 0, h)
@@ -975,10 +976,10 @@ get_dragable_dimensions: function(x,y,draggable){
 		else if (n < lower) return lower;
 		else return n;
 	}
-	
+
 	var element_dimensions = Element.getDimensions(draggable.element);
 	var parent_dimensions = Element.getDimensions(this.mapimg);
-	
+
 	return[
 		constrain(x, 0, parent_dimensions.width - element_dimensions.width),
 		constrain(y, 0, parent_dimensions.height - element_dimensions.height)
@@ -989,12 +990,12 @@ get_update_params: function(params){
 	this.debug('get_update_params');
 
 	if(typeof(params) == 'undefined'){
-		var params = {};		
+		var params = {};
 	}
-	
+
 	params = this.get_selements_params(params);
 	params = this.get_links_params(params);
-	
+
 return params;
 },
 
@@ -1002,9 +1003,9 @@ get_selements_params: function(params, selementid){
 	this.debug('get_selements_params');
 
 	if(typeof(params) == 'undefined'){
-		var params = {};		
+		var params = {};
 	}
-	
+
 	if(typeof(selementid) != 'undefined'){
 		if(isset(selementid, this.selements)){
 			params['selements['+selementid+']'] = Object.toJSON(this.selements[selementid]);
@@ -1021,7 +1022,7 @@ get_links_params: function(params, linkid){
 	this.debug('get_links_params');
 
 	if(typeof(params) == 'undefined'){
-		var params = {};		
+		var params = {};
 	}
 
 	if(typeof(linkid) != 'undefined'){
@@ -1052,9 +1053,9 @@ deactivate_menu: function(){
 //------------------------------------------------------------------------------------------------------
 
 show_menu: function(e){
-	this.debug('show_menu');	
+	this.debug('show_menu');
 	if(this.menu_active != 1) return true;
-	
+
 	var e = e || window.event;
 	var element = Event.element(e);
 	var element_id = element.id.split('_');
@@ -1084,19 +1085,19 @@ showForm: function(e, selementid){
 //--
 
 	var divForm = document.getElementById('divSelementForm');
-	
+
 	if((typeof(divForm) == 'undefined') || empty(divForm)){
 		var divForm = document.createElement('div');
 		var doc_body = document.getElementsByTagName('body')[0];
 		doc_body.appendChild(divForm);
-		
+
 		divForm.setAttribute('id','divSelementForm');
 		divForm.style.backgroundColor = '#999999';
 		divForm.style.zIndex = 100;
 		divForm.style.position = 'absolute';
 		divForm.style.top = '50px';
 		divForm.style.left = '500px';
-		
+
 
 
 		divForm.style.border = '1px #999999 solid';
@@ -1111,11 +1112,11 @@ showForm: function(e, selementid){
 //---
 
 	new Draggable(divForm,{
-				  			'handle': this.selementForm.dragHandler, 
+				  			'handle': this.selementForm.dragHandler,
 							'snap': this.get_window_dimensions.bind(this),
 							'starteffect': function(){ return true; },
 							'endeffect': function(){ return true; }
-						});	
+						});
 	$(divForm).show();
 },
 
@@ -1125,7 +1126,7 @@ hideForm: function(e){
 
 	var divForm = $('divSelementForm');
 	if(!is_null(divForm)) divForm.hide();
-	
+
 	for(var i=0; i<this.selection.position; i++){
 		if(!isset(i,this.selection.selements)) continue;;
 
@@ -1141,7 +1142,7 @@ create_multiContainer: function(e, selementid){
 	this.debug('create_multiContainer');
 //--
 
-// var initialization 
+// var initialization
 	this.multiContainer = {};
 
 
@@ -1149,7 +1150,7 @@ create_multiContainer: function(e, selementid){
 this.multiContainer.container = e_div_1;
 	e_div_1.setAttribute('id',"multiContainer");
 	e_div_1.style.overflow = 'auto';
-	
+
 //	e_td_4.appendChild(e_div_1);
 },
 
@@ -1164,30 +1165,30 @@ update_multiContainer: function(e){
 		e_table_1.setAttribute('cellspacing',"0");
 		e_table_1.setAttribute('cellpadding',"1");
 		e_table_1.className = 'header';
-	
-	
+
+
 		var e_tbody_2 = document.createElement('tbody');
 		e_table_1.appendChild(e_tbody_2);
-	
-	
+
+
 		var e_tr_3 = document.createElement('tr');
 		e_tbody_2.appendChild(e_tr_3);
-	
-	
+
+
 		var e_td_4 = document.createElement('td');
 		e_td_4.className = 'header_l';
 		e_td_4.appendChild(document.createTextNode(locale['S_MAP_ELEMENTS']));
 		e_tr_3.appendChild(e_td_4);
-	
-		
+
+
 		var e_td_4 = document.createElement('td');
 		e_td_4.setAttribute('align',"right");
 		e_td_4.className = 'header_r';
-		
+
 		e_tr_3.appendChild(e_td_4);
-		
+
 		$('divSelementForm').appendChild(e_table_1);
-//-----------	
+//-----------
 
 		this.create_multiContainer(e);
 		$('divSelementForm').appendChild(this.multiContainer.container);
@@ -1216,7 +1217,7 @@ update_multiContainer: function(e){
 
 
 	var e_td_4 = document.createElement('td');
-	e_tr_3.appendChild(e_td_4);	
+	e_tr_3.appendChild(e_td_4);
 	e_td_4.appendChild(document.createTextNode(locale['S_TYPE']));
 
 
@@ -1230,27 +1231,27 @@ update_multiContainer: function(e){
 	for(var i=0; i<this.selection.position; i++){
 		if(!isset(i, this.selection.selements)) continue;
 		if(!isset(this.selection.selements[i], this.selements)) continue;
-		
+
 		count++;
 		selement = this.selements[this.selection.selements[i]];
-		
+
 		if(count > 4) this.multiContainer.container.style.height = '127px';
 		else this.multiContainer.container.style.height = 'auto';
 
 		var e_tr_3 = document.createElement('tr');
 		e_tr_3.className = "even_row";
 		e_tbody_2.appendChild(e_tr_3);
-		
-	
+
+
 		var e_td_4 = document.createElement('td');
 		e_tr_3.appendChild(e_td_4);
-	
-	
+
+
 		var e_span_5 = document.createElement('span');
 //		e_span_5.setAttribute('href',"sysmap.php?sysmapid=100100000000002&form=update&selementid=100100000000004&sid=791bd54e24454e2b");
 //		e_span_5.className = "link";
 		e_td_4.appendChild(e_span_5);
-		
+
 		e_span_5.appendChild(document.createTextNode(selement.label_expanded));
 
 		var elementtypeText = '';
@@ -1265,11 +1266,11 @@ update_multiContainer: function(e){
 
 		var e_td_4 = document.createElement('td');
 		e_td_4.appendChild(document.createTextNode(elementtypeText));
-		e_tr_3.appendChild(e_td_4);		
-	
+		e_tr_3.appendChild(e_td_4);
+
 		var e_td_4 = document.createElement('td');
 		e_td_4.appendChild(document.createTextNode(selement.elementName));
-		e_tr_3.appendChild(e_td_4);	
+		e_tr_3.appendChild(e_td_4);
 	}
 
 
@@ -1282,17 +1283,17 @@ create_linkContainer: function(e, selementid){
 	this.debug('create_multiContainer');
 //--
 
-// var initialization 
+// var initialization
 	this.linkContainer = {};
 
 
 // Down Stream
-	
+
 	var e_div_1 = document.createElement('div');
 this.linkContainer.container = e_div_1;
 	e_div_1.setAttribute('id',"linkContainer");
 	e_div_1.style.overflow = 'auto';
-	
+
 //	e_td_4.appendChild(e_div_1);
 },
 
@@ -1307,28 +1308,28 @@ update_linkContainer: function(e){
 		e_table_1.setAttribute('cellspacing',"0");
 		e_table_1.setAttribute('cellpadding',"1");
 		e_table_1.className = 'header';
-		
-		
+
+
 		var e_tbody_2 = document.createElement('tbody');
 		e_table_1.appendChild(e_tbody_2);
-		
-		
+
+
 		var e_tr_3 = document.createElement('tr');
 		e_tbody_2.appendChild(e_tr_3);
-		
-		
+
+
 		var e_td_4 = document.createElement('td');
 		e_td_4.className = 'header_l';
 		e_td_4.appendChild(document.createTextNode(locale['S_CONNECTORS']));
 		e_tr_3.appendChild(e_td_4);
-		
-		
+
+
 		var e_td_4 = document.createElement('td');
 		e_td_4.setAttribute('align',"right");
 		e_td_4.className = 'header_r';
-		
+
 		e_tr_3.appendChild(e_td_4);
-		
+
 		$('divSelementForm').appendChild(e_table_1);
 //-----------
 
@@ -1359,7 +1360,7 @@ update_linkContainer: function(e){
 
 
 	var e_td_4 = document.createElement('td');
-	e_tr_3.appendChild(e_td_4);	
+	e_tr_3.appendChild(e_td_4);
 	e_td_4.appendChild(document.createTextNode(locale['S_ELEMENT']+' 1'));
 
 
@@ -1379,7 +1380,7 @@ update_linkContainer: function(e){
 		if(!isset(this.selection.selements[i], this.selements)) continue;
 
 		selementid = this.selection.selements[i];
-		
+
 		var current_linkids = this.get_linkid_by_selementids(selementid);
 		for(var linkid in current_linkids){
 			if(empty(current_linkids[linkid])) continue;
@@ -1397,18 +1398,18 @@ update_linkContainer: function(e){
 
 		count++;
 		maplink = this.links[linkid];
-		
+
 		if(count > 4) this.linkContainer.container.style.height = '120px';
 
 		var e_tr_3 = document.createElement('tr');
 		e_tr_3.className = "even_row";
 		e_tbody_2.appendChild(e_tr_3);
-		
-	
+
+
 		var e_td_4 = document.createElement('td');
 		e_tr_3.appendChild(e_td_4);
-	
-	
+
+
 		var e_span_5 = document.createElement('span');
 		e_span_5.className = "link";
 		addListener(e_span_5, 'click', this.updateForm_link.bindAsEventListener(this, linkid));
@@ -1418,7 +1419,7 @@ update_linkContainer: function(e){
 
 		var e_td_4 = document.createElement('td');
 		e_td_4.appendChild(document.createTextNode(this.selements[maplink.selementid1].label_expanded));
-		e_tr_3.appendChild(e_td_4);		
+		e_tr_3.appendChild(e_td_4);
 
 
 		var e_td_4 = document.createElement('td');
@@ -1429,18 +1430,18 @@ update_linkContainer: function(e){
 		var e_td_4 = document.createElement('td');
 		for(var linktriggerid in maplink.linktriggers){
 			if(empty(maplink.linktriggers[linktriggerid])) continue;
-			
+
 			e_td_4.appendChild(document.createTextNode(maplink.linktriggers[linktriggerid].desc_exp));
 			e_td_4.appendChild(document.createElement('br'));
 		}
 		e_tr_3.appendChild(e_td_4);
-	}	
-	
+	}
+
 	if(count == 0){
 		var e_tr_3 = document.createElement('tr');
 		e_tr_3.className = "even_row";
 		e_tbody_2.appendChild(e_tr_3);
-		
+
 		var e_td_4 = document.createElement('td');
 		e_td_4.setAttribute('colSpan',4);
 		e_td_4.className = 'center';
@@ -1482,8 +1483,8 @@ this.selementForm.selementid = e_input_2;
 	e_input_2.setAttribute('id',"selementid");
 	e_input_2.setAttribute('name',"selementid");
 	e_form_1.appendChild(e_input_2);
-	
-	
+
+
 	var e_input_2 = document.createElement('input');
 this.selementForm.elementid = e_input_2;
 	e_input_2.setAttribute('type',"hidden");
@@ -1503,7 +1504,7 @@ this.selementForm.elementid = e_input_2;
 
 	e_form_1.appendChild(e_table_2);
 
-	var e_tbody_3 = document.createElement('tbody');	
+	var e_tbody_3 = document.createElement('tbody');
 	e_table_2.appendChild(e_tbody_3);
 
 
@@ -1609,7 +1610,7 @@ this.selementForm.massEdit.chkboxLabel = e_input_6
 	e_input_6.setAttribute('id', "chkboxLabel");
 	e_input_6.className = 'checkbox';
 	e_td_5.appendChild(e_input_6);
-	
+
 	e_td_5.appendChild(document.createTextNode(' '));
 	e_td_5.appendChild(document.createTextNode(locale['S_LABEL']));
 	e_tr_4.appendChild(e_td_5);
@@ -1637,7 +1638,7 @@ this.selementForm.label = e_textarea_6;
 
 	var e_td_5 = document.createElement('td');
 	e_td_5.className = "form_row_l";
-	
+
 
 	var e_input_6 = document.createElement('input');
 this.selementForm.massEdit.chkboxLabelLocation = e_input_6
@@ -1646,9 +1647,9 @@ this.selementForm.massEdit.chkboxLabelLocation = e_input_6
 	e_input_6.setAttribute('id', "chkboxLabelLocation");
 	e_input_6.className = 'checkbox';
 	e_td_5.appendChild(e_input_6);
-	
+
 	e_td_5.appendChild(document.createTextNode(' '));
-	
+
 	e_td_5.appendChild(document.createTextNode(locale['S_LABEL_LOCATION']));
 	e_tr_4.appendChild(e_td_5);
 
@@ -1670,7 +1671,7 @@ this.selementForm.label_location = e_select_6;
 
 	var e_option_7 = document.createElement('option');
 	e_option_7.setAttribute('value',"-1");
-	e_option_7.appendChild(document.createTextNode('-'));	
+	e_option_7.appendChild(document.createTextNode('-'));
 	e_select_6.appendChild(e_option_7);
 
 
@@ -1678,8 +1679,8 @@ this.selementForm.label_location = e_select_6;
 	e_option_7.setAttribute('value',"0");
 	e_option_7.appendChild(document.createTextNode(locale['S_BOTTOM']));
 	e_select_6.appendChild(e_option_7);
-	
-	
+
+
 	var e_option_7 = document.createElement('option');
 	e_option_7.setAttribute('value',"1");
 	e_option_7.appendChild(document.createTextNode(locale['S_LEFT']));
@@ -1690,8 +1691,8 @@ this.selementForm.label_location = e_select_6;
 	e_option_7.setAttribute('value',"2");
 	e_option_7.appendChild(document.createTextNode(locale['S_RIGHT']));
 	e_select_6.appendChild(e_option_7);
-	
-	
+
+
 	var e_option_7 = document.createElement('option');
 	e_option_7.setAttribute('value',"3");
 	e_option_7.appendChild(document.createTextNode(locale['S_TOP']));
@@ -1731,7 +1732,7 @@ this.selementForm.elementName = e_input_6;
 	e_td_5.appendChild(e_input_6);
 
 	e_td_5.appendChild(document.createTextNode('  '));
-	
+
 	var e_span_6 = document.createElement('span');
 this.selementForm.elementTypeSelect = e_span_6;
 
@@ -1758,7 +1759,7 @@ this.selementForm.massEdit.chkboxIconid_off = e_input_6
 	e_input_6.setAttribute('id', "chkboxIconid_off");
 	e_input_6.className = 'checkbox';
 	e_td_5.appendChild(e_input_6);
-	
+
 	e_td_5.appendChild(document.createTextNode(' '));
 
 	e_td_5.appendChild(document.createTextNode(locale['S_ICON_DEFAULT']));
@@ -1811,12 +1812,12 @@ this.selementForm.advanced_icons = e_input_6;
 	var icons = zbxSelementIcons['icons'];
 	for(var iconid in icons){
 		if(empty(icons[iconid])) continue;
-		
-		
+
+
 		var e_option_7 = document.createElement('option');
 		e_option_7.setAttribute('value', iconid);
 		e_option_7.appendChild(document.createTextNode(icons[iconid]));
-		
+
 		e_select_6.appendChild(e_option_7);
 	}
 
@@ -1838,7 +1839,7 @@ this.selementForm.massEdit.chkboxIconid_on = e_input_6
 	e_input_6.setAttribute('id', "chkboxIconid_on");
 	e_input_6.className = 'checkbox';
 	e_td_5.appendChild(e_input_6);
-	
+
 	e_td_5.appendChild(document.createTextNode(' '));
 	e_td_5.appendChild(document.createTextNode(locale['S_ICON_PROBLEM']));
 	e_tr_4.appendChild(e_td_5);
@@ -1860,17 +1861,17 @@ this.selementForm.iconid_on = e_select_6;
 
 	var e_option_7 = document.createElement('option');
 	e_option_7.setAttribute('value', '0');
-	e_option_7.appendChild(document.createTextNode(locale['S_DEFAULT']));	
+	e_option_7.appendChild(document.createTextNode(locale['S_DEFAULT']));
 	e_select_6.appendChild(e_option_7);
 
 
 	var icons = zbxSelementIcons['icons'];
 	for(var iconid in icons){
 		if(empty(icons[iconid])) continue;
-		
+
 		var e_option_7 = document.createElement('option');
 		e_option_7.setAttribute('value', iconid);
-		e_option_7.appendChild(document.createTextNode(icons[iconid]));		
+		e_option_7.appendChild(document.createTextNode(icons[iconid]));
 		e_select_6.appendChild(e_option_7);
 	}
 
@@ -1893,7 +1894,7 @@ this.selementForm.massEdit.chkboxIconid_unknown = e_input_6
 	e_input_6.setAttribute('id', "chkboxIconid_unknown");
 	e_input_6.className = 'checkbox';
 	e_td_5.appendChild(e_input_6);
-	
+
 	e_td_5.appendChild(document.createTextNode(' '));
 	e_td_5.appendChild(document.createTextNode(locale['S_ICON_UNKNOWN']));
 	e_tr_4.appendChild(e_td_5);
@@ -1915,20 +1916,20 @@ this.selementForm.iconid_unknown = e_select_6;
 
 	var e_option_7 = document.createElement('option');
 	e_option_7.setAttribute('value', '0');
-	e_option_7.appendChild(document.createTextNode(locale['S_DEFAULT']));	
+	e_option_7.appendChild(document.createTextNode(locale['S_DEFAULT']));
 	e_select_6.appendChild(e_option_7);
 
 
 	var icons = zbxSelementIcons['icons'];
 	for(var iconid in icons){
 		if(empty(icons[iconid])) continue;
-		
+
 		var e_option_7 = document.createElement('option');
 		e_option_7.setAttribute('value', iconid);
-		e_option_7.appendChild(document.createTextNode(icons[iconid]));		
+		e_option_7.appendChild(document.createTextNode(icons[iconid]));
 		e_select_6.appendChild(e_option_7);
 	}
-	
+
 
 // ICON MAINTENANCE
 	var e_tr_4 = document.createElement('tr');
@@ -1948,7 +1949,7 @@ this.selementForm.massEdit.chkboxIconid_maintenance = e_input_6
 	e_input_6.setAttribute('id', "chkboxIconid_maintenance");
 	e_input_6.className = 'checkbox';
 	e_td_5.appendChild(e_input_6);
-	
+
 	e_td_5.appendChild(document.createTextNode(' '));
 	e_td_5.appendChild(document.createTextNode(locale['S_ICON_MAINTENANCE']));
 	e_tr_4.appendChild(e_td_5);
@@ -1957,7 +1958,7 @@ this.selementForm.massEdit.chkboxIconid_maintenance = e_input_6
 	var e_td_5 = document.createElement('td');
 	e_td_5.className = "form_row_r";
 	e_tr_4.appendChild(e_td_5);
-	
+
 
 	var e_select_6 = document.createElement('select');
 this.selementForm.iconid_maintenance = e_select_6;
@@ -1970,21 +1971,21 @@ this.selementForm.iconid_maintenance = e_select_6;
 
 	var e_option_7 = document.createElement('option');
 	e_option_7.setAttribute('value', '0');
-	e_option_7.appendChild(document.createTextNode(locale['S_DEFAULT']));	
+	e_option_7.appendChild(document.createTextNode(locale['S_DEFAULT']));
 	e_select_6.appendChild(e_option_7);
 
 
 	var icons = zbxSelementIcons['icons'];
 	for(var iconid in icons){
 		if(empty(icons[iconid])) continue;
-		
+
 		var e_option_7 = document.createElement('option');
 		e_option_7.setAttribute('value', iconid);
-		e_option_7.appendChild(document.createTextNode(icons[iconid]));		
+		e_option_7.appendChild(document.createTextNode(icons[iconid]));
 		e_select_6.appendChild(e_option_7);
 	}
-	
-	
+
+
 // ICON DISABLED
 	var e_tr_4 = document.createElement('tr');
 this.selementForm.typeDOM.iconid_disabled = e_tr_4;
@@ -2003,7 +2004,7 @@ this.selementForm.massEdit.chkboxIconid_disabled = e_input_6
 	e_input_6.setAttribute('id', "chkboxIconid_disabled");
 	e_input_6.className = 'checkbox';
 	e_td_5.appendChild(e_input_6);
-	
+
 	e_td_5.appendChild(document.createTextNode(' '));
 	e_td_5.appendChild(document.createTextNode(locale['S_ICON_DISABLED']));
 	e_tr_4.appendChild(e_td_5);
@@ -2025,14 +2026,14 @@ this.selementForm.iconid_disabled = e_select_6;
 
 	var e_option_7 = document.createElement('option');
 	e_option_7.setAttribute('value', '0');
-	e_option_7.appendChild(document.createTextNode(locale['S_DEFAULT']));	
+	e_option_7.appendChild(document.createTextNode(locale['S_DEFAULT']));
 	e_select_6.appendChild(e_option_7);
 
 
 	var icons = zbxSelementIcons['icons'];
 	for(var iconid in icons){
 		if(empty(icons[iconid])) continue;
-				
+
 		var e_option_7 = document.createElement('option');
 		e_option_7.setAttribute('value', iconid);
 		e_option_7.appendChild(document.createTextNode(icons[iconid]));
@@ -2100,8 +2101,8 @@ this.selementForm.y = e_input_6;
 	e_input_6.setAttribute('name',"y");
 	e_input_6.className = "biginput";
 	e_td_5.appendChild(e_input_6);
-	
-	
+
+
 // URL
 	var e_tr_4 = document.createElement('tr');
 	e_tr_4.className = "even_row";
@@ -2119,7 +2120,7 @@ this.selementForm.massEdit.chkboxURL = e_input_6
 
 	e_input_6.className = 'checkbox';
 	e_td_5.appendChild(e_input_6);
-	
+
 	e_td_5.appendChild(document.createTextNode(' '));
 	e_td_5.appendChild(document.createTextNode(locale['S_URL']));
 	e_tr_4.appendChild(e_td_5);
@@ -2157,9 +2158,9 @@ this.selementForm.url = e_input_6;
 	e_input_6.setAttribute('name',"apply");
 	e_input_6.className = "button";
 	e_input_6.setAttribute('value',locale['S_APPLY']);
-	
+
 	addListener(e_input_6, 'click', this.saveForm_selement.bindAsEventListener(this));
-	
+
 	e_td_5.appendChild(document.createTextNode(' '));
 	e_td_5.appendChild(e_input_6);
 
@@ -2169,7 +2170,7 @@ this.selementForm.url = e_input_6;
 	e_input_6.setAttribute('name',"remove");
 	e_input_6.className = "button";
 	e_input_6.setAttribute('value',locale['S_REMOVE']);
-	
+
 	addListener(e_input_6, 'click', this.deleteForm_selement.bindAsEventListener(this));
 
 	e_td_5.appendChild(document.createTextNode(' '));
@@ -2181,9 +2182,9 @@ this.selementForm.url = e_input_6;
 	e_input_6.setAttribute('name',"close");
 	e_input_6.className = "button";
 	e_input_6.setAttribute('value',locale['S_CLOSE']);
-	
+
 	addListener(e_input_6, 'click', this.hideForm.bindAsEventListener(this));
-	
+
 	e_td_5.appendChild(e_input_6);
 },
 
@@ -2217,11 +2218,11 @@ updateForm_selement: function(e, selementid){
 // Element
 		this.selementForm.elementid.value = selement.elementid;
 		this.selementForm.elementName.value = selement.elementName;
-	
+
 // Icon OK
 		for(var i=0; i<this.selementForm.iconid_off.options.length; i++){
 			if(!isset(i, this.selementForm.iconid_off.options)) continue;
-			
+
 			if(this.selementForm.iconid_off.options[i].value === selement.iconid_off){
 				this.selementForm.iconid_off.options[i].selected = true;
 			}
@@ -2233,17 +2234,17 @@ updateForm_selement: function(e, selementid){
 		advanced_icons = (advanced_icons || (selement.iconid_on != 0))?true:false;
 		for(var i=0; i<this.selementForm.iconid_on.options.length; i++){
 			if(!isset(i, this.selementForm.iconid_on.options)) continue;
-			
+
 			if(this.selementForm.iconid_on.options[i].value === selement.iconid_on){
 				this.selementForm.iconid_on.options[i].selected = true;
 			}
 		}
-	
+
 // Icon UNKNOWN
 		advanced_icons = (advanced_icons || (selement.iconid_unknown != 0))?true:false;
 		for(var i=0; i<this.selementForm.iconid_unknown.options.length; i++){
 			if(!isset(i, this.selementForm.iconid_unknown.options)) continue;
-			
+
 			if(this.selementForm.iconid_unknown.options[i].value === selement.iconid_unknown){
 				this.selementForm.iconid_unknown.options[i].selected = true;
 			}
@@ -2253,18 +2254,18 @@ updateForm_selement: function(e, selementid){
 		advanced_icons =(advanced_icons || (selement.iconid_maintenance != 0))?true:false;
 		for(var i=0; i<this.selementForm.iconid_maintenance.options.length; i++){
 			if(!isset(i, this.selementForm.iconid_maintenance.options)) continue;
-			
+
 			if(this.selementForm.iconid_maintenance.options[i].value === selement.iconid_maintenance){
 				this.selementForm.iconid_maintenance.options[i].selected = true;
 			}
 		}
-	
+
 // Icon DISABLED
-		
+
 		advanced_icons = (advanced_icons || (selement.iconid_disabled != 0))?true:false;
 		for(var i=0; i<this.selementForm.iconid_disabled.options.length; i++){
 			if(!isset(i, this.selementForm.iconid_disabled.options)) continue;
-			
+
 			if(this.selementForm.iconid_disabled.options[i].value === selement.iconid_disabled){
 				this.selementForm.iconid_disabled.options[i].selected = true;
 			}
@@ -2289,7 +2290,7 @@ updateForm_selement: function(e, selementid){
 
 // Label
 		this.selementForm.label.value = '';
-	
+
 // Label Location
 		this.selementForm.label_location.selectedIndex = 0;
 
@@ -2298,7 +2299,7 @@ updateForm_selement: function(e, selementid){
 
 // Icon PROBLEM
 		this.selementForm.iconid_on.selectedIndex = 0;
-	
+
 // Icon UNKNOWN
 		this.selementForm.iconid_unknown.selectedIndex = 0;
 
@@ -2322,7 +2323,7 @@ updateForm_selementByIcons: function(e){
 
 	var advanced = this.selementForm.advanced_icons.checked;
 	var display_style = IE?'block':'table-row';
-	
+
 	if(advanced){
 		this.selementForm.typeDOM.iconid_on.style.display = display_style;
 		this.selementForm.typeDOM.iconid_unknown.style.display = display_style;
@@ -2335,7 +2336,7 @@ updateForm_selementByIcons: function(e){
 		this.selementForm.typeDOM.iconid_maintenance.style.display = 'none';
 		this.selementForm.typeDOM.iconid_disabled.style.display = 'none';
 	}
-	
+
 },
 
 // UPDATE FORM BY element TYPE
@@ -2354,7 +2355,7 @@ updateForm_selementByType: function(e, multi){
 		this.selementForm.massEdit.chkboxIconid_maintenance.style.display = 'inline';
 		this.selementForm.massEdit.chkboxIconid_disabled.style.display = 'inline';
 		this.selementForm.massEdit.chkboxURL.style.display = 'inline';
-		
+
 		this.selementForm.massEdit.elementtype.style.display = 'none';
 		this.selementForm.massEdit.elementName.style.display = 'none';
 
@@ -2365,12 +2366,12 @@ updateForm_selementByType: function(e, multi){
 		this.selementForm.typeDOM.iconid_unknown.style.display = display_style;
 		this.selementForm.typeDOM.iconid_maintenance.style.display = display_style;
 		this.selementForm.typeDOM.iconid_disabled.style.display = display_style;
-		
+
 		this.selementForm.massEdit.x.style.display = 'none';
 		this.selementForm.massEdit.y.style.display = 'none';
 
 		this.selementForm.advanced_icons.checked = true;
-		
+
 		this.updateForm_selementByIcons(e);
 		return true;
 	}
@@ -2383,7 +2384,7 @@ updateForm_selementByType: function(e, multi){
 		this.selementForm.massEdit.chkboxIconid_maintenance.style.display = 'none';
 		this.selementForm.massEdit.chkboxIconid_disabled.style.display = 'none';
 		this.selementForm.massEdit.chkboxURL.style.display = 'none';
-		
+
 		this.selementForm.massEdit.chkboxLabel.checked = false;
 		this.selementForm.massEdit.chkboxLabelLocation.checked = false;
 		this.selementForm.massEdit.chkboxIconid_off.checked = false;
@@ -2398,7 +2399,7 @@ updateForm_selementByType: function(e, multi){
 		this.selementForm.massEdit.x.style.display = display_style;
 		this.selementForm.massEdit.y.style.display = display_style;
 	}
-	
+
 	var selementid = this.selementForm.selementid.value;
 	var elementtype = this.selementForm.elementtype.selectedIndex;
 
@@ -2406,7 +2407,7 @@ updateForm_selementByType: function(e, multi){
 		this.selementForm.elementName.value = '';
 		this.selementForm.elementid.value = '0';
 	}
-	
+
 	var srctbl = '';
 	var srcfld1 = '';
 	var srcfld2 = '';
@@ -2419,7 +2420,7 @@ updateForm_selementByType: function(e, multi){
 			var srcfld1 = 'hostid';
 			var srcfld2 = 'host';
 			$(this.selementForm.typeDOM.elementCaption).update(locale['S_HOST']);
-			
+
 			this.selementForm.typeDOM.elementName.style.display = display_style;
 			this.selementForm.typeDOM.iconid_off.style.display = display_style;
 
@@ -2435,7 +2436,7 @@ updateForm_selementByType: function(e, multi){
 			var srcfld1 = 'sysmapid';
 			var srcfld2 = 'name';
 			$(this.selementForm.typeDOM.elementCaption).update(locale['S_MAP']);
-			
+
 			this.selementForm.typeDOM.elementName.style.display = display_style;
 			this.selementForm.typeDOM.iconid_off.style.display = display_style;
 
@@ -2451,7 +2452,7 @@ updateForm_selementByType: function(e, multi){
 			var srcfld1 = 'triggerid';
 			var srcfld2 = 'description';
 			$(this.selementForm.typeDOM.elementCaption).update(locale['S_TRIGGER']);
-			
+
 			this.selementForm.typeDOM.elementName.style.display = display_style;
 			this.selementForm.typeDOM.iconid_off.style.display = display_style;
 
@@ -2467,7 +2468,7 @@ updateForm_selementByType: function(e, multi){
 			var srcfld1 = 'groupid';
 			var srcfld2 = 'name';
 			$(this.selementForm.typeDOM.elementCaption).update(locale['S_HOST_GROUP']);
-			
+
 			this.selementForm.typeDOM.elementName.style.display = display_style;
 			this.selementForm.typeDOM.iconid_off.style.display = display_style;
 
@@ -2481,7 +2482,7 @@ updateForm_selementByType: function(e, multi){
 		case '4':
 // image
 			$(this.selementForm.typeDOM.elementCaption).update(locale['S_IMAGE']);
-			
+
 			this.selementForm.typeDOM.elementName.style.display = 'none';
 			this.selementForm.typeDOM.iconid_off.style.display = display_style;
 
@@ -2490,7 +2491,7 @@ updateForm_selementByType: function(e, multi){
 			this.selementForm.typeDOM.advanced_icons.style.display = 'none';
 		break;
 	}
-	
+
 	if(!empty(srctbl)){
 		var popup_url = 'popup.php?writeonly=1&real_hosts=1&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementName';
 		popup_url+= '&srctbl='+srctbl;
@@ -2498,7 +2499,7 @@ updateForm_selementByType: function(e, multi){
 		popup_url+= '&srcfld2='+srcfld2;
 
 		if(elementtype.toString() == '1') popup_url+= '&excludeids[]='+this.sysmapid;
-		
+
 		this.selementForm.elementTypeSelect.onclick =  function(){ PopUp(popup_url,450,450);};
 	}
 
@@ -2512,19 +2513,19 @@ saveForm_selement: function(e){
 	if(this.selection.count == 1){
 		var selementid = this.selementForm.selementid.value;
 		var selement = this.selements[selementid];
-	
+
 		var params = {};
-	
+
 // Element Type
 		params.elementtype = this.selementForm.elementtype.selectedIndex;
-		
+
 // Label
 		params.label = this.selementForm.label.value;
-		
+
 // Label Location
 		params.label_location = parseInt(this.selementForm.label_location.selectedIndex, 10) - 1;
-	
-	
+
+
 // Element
 		params.elementid = this.selementForm.elementid.value;
 		params.elementName = this.selementForm.elementName.value;
@@ -2545,19 +2546,19 @@ saveForm_selement: function(e){
 			}
 		}
 
-		
+
 // Icon OK
 		params.iconid_off = this.selementForm.iconid_off.options[this.selementForm.iconid_off.selectedIndex].value;
-		
+
 // Icon PROBLEM
 		params.iconid_on = this.selementForm.iconid_on.options[this.selementForm.iconid_on.selectedIndex].value;
-	
+
 // Icon UNKNOWN
 		params.iconid_unknown = this.selementForm.iconid_unknown.options[this.selementForm.iconid_unknown.selectedIndex].value;
-	
+
 // Icon MAINTENANCE
 		params.iconid_maintenance = this.selementForm.iconid_maintenance.options[this.selementForm.iconid_maintenance.selectedIndex].value;
-	
+
 // Icon DISABLED
 		params.iconid_disabled = this.selementForm.iconid_disabled.options[this.selementForm.iconid_disabled.selectedIndex].value;
 
@@ -2568,7 +2569,7 @@ saveForm_selement: function(e){
 			params.iconid_maintenance = 0;
 			params.iconid_disabled = 0;
 		}
-		
+
 // X & Y
 		if(parseInt(this.selementForm.x.value, 10) > this.sysmap.width) this.selementForm.x.value = 0;
 		if(parseInt(this.selementForm.y.value, 10) > this.sysmap.height) this.selementForm.y.value = 0;
@@ -2578,12 +2579,12 @@ saveForm_selement: function(e){
 
 // URL
 		params.url = this.selementForm.url.value;
-		
+
 		this.updateSelementOption(selementid, params);
 	}
 	else{
 		var params = {};
-	
+
 // Label
 		if(this.selementForm.massEdit.chkboxLabel.checked)
 			params.label = this.selementForm.label.value;
@@ -2591,31 +2592,31 @@ saveForm_selement: function(e){
 // Label Location
 		if(this.selementForm.massEdit.chkboxLabelLocation.checked)
 			params.label_location = parseInt(this.selementForm.label_location.selectedIndex, 10) - 1;
-			
+
 // Icon OK
 		if(this.selementForm.massEdit.chkboxIconid_off.checked)
 			params.iconid_off = this.selementForm.iconid_off.options[this.selementForm.iconid_off.selectedIndex].value;
-		
+
 // Icon PROBLEM
 		if(this.selementForm.massEdit.chkboxIconid_on.checked)
 			params.iconid_on = this.selementForm.iconid_on.options[this.selementForm.iconid_on.selectedIndex].value;
-	
+
 // Icon UNKNOWN
 		if(this.selementForm.massEdit.chkboxIconid_unknown.checked)
 			params.iconid_unknown = this.selementForm.iconid_unknown.options[this.selementForm.iconid_unknown.selectedIndex].value;
-	
+
 // Icon MAINTENANCE
 		if(this.selementForm.massEdit.chkboxIconid_maintenance.checked)
 			params.iconid_maintenance = this.selementForm.iconid_maintenance.options[this.selementForm.iconid_maintenance.selectedIndex].value;
-	
+
 // Icon DISABLED
 		if(this.selementForm.massEdit.chkboxIconid_disabled.checked)
 			params.iconid_disabled = this.selementForm.iconid_disabled.options[this.selementForm.iconid_disabled.selectedIndex].value;
-	
+
 // URL
 		if(this.selementForm.massEdit.chkboxURL.checked)
 			params.url = this.selementForm.url.value;
-		
+
 		for(var i=0; i < this.selection.position; i++){
 			if(!isset(i, this.selection.selements)) continue;
 			if(!isset(this.selection.selements[i], this.selements)) continue;
@@ -2635,9 +2636,9 @@ deleteForm_selement: function(e){
 	this.debug('deleteForm_selement');
 //--
 
-	var selementid = this.selementForm.selementid.value;	
+	var selementid = this.selementForm.selementid.value;
 	var selement = this.selements[selementid];
-	
+
 	var typeName;
 	switch(selement.elementtype-0){
 		case 0: typeName = locale['S_HOST']; break;
@@ -2733,7 +2734,7 @@ this.linkForm.form = e_form_1;
 	e_span_6.setAttribute('target',"_blank");
 	e_span_6.setAttribute('style',"padding-left: 5px; float: right; text-decoration: none;");
 	e_span_6.setAttribute('onclick','window.open("http://www.zabbix.com/documentation.php");');
-	
+
 	e_td_5.appendChild(e_span_6);
 
 
@@ -2879,7 +2880,7 @@ this.linkForm.drawtype = e_select_6;
 	e_select_6.setAttribute('name',"drawtype");
 	e_select_6.setAttribute('id',"drawtype");
 	e_td_5.appendChild(e_select_6);
-	
+
 	var e_option_7 = document.createElement('option');
 	e_option_7.setAttribute('value',"0");
 	e_option_7.appendChild(document.createTextNode(locale['S_LINE']));
@@ -2947,10 +2948,10 @@ this.linkForm.colorPicker = e_div_6;
 	e_div_6.style.border = '1px solid black';
 	e_div_6.style.display = 'inline';
 	e_div_6.style.width = '10px';
-	e_div_6.style.height = '10px'; 
-	e_div_6.style.textDecoration = 'none'; 
+	e_div_6.style.height = '10px';
+	e_div_6.style.textDecoration = 'none';
 	e_div_6.style.backgroundColor = '#000000';
-		
+
 	e_div_6.innerHTML = '&nbsp;&nbsp;&nbsp;';
 	e_td_5.appendChild(e_div_6);
 
@@ -2988,7 +2989,7 @@ this.linkForm.colorPicker = e_div_6;
 	e_td_5.appendChild(e_input_6);
 	addListener(e_input_6, 'click', this.deleteForm_link.bindAsEventListener(this));
 
-	
+
 	e_td_5.appendChild(document.createTextNode(' '));
 
 
@@ -3029,7 +3030,7 @@ updateForm_link: function(e, linkid){
 		if(empty(this.selements[selementid])) continue;
 
 		var e_option_7 = document.createElement('option');
-		
+
 		if(maplink.selementid1 == selementid){
 			e_option_7.setAttribute('selected',"selected");
 		}
@@ -3039,7 +3040,7 @@ updateForm_link: function(e, linkid){
 
 		e_option_7.setAttribute('value', selementid);
 		e_option_7.appendChild(document.createTextNode(this.selements[selementid].label_expanded));
-		
+
 		this.linkForm.selementid1.appendChild(e_option_7);
 	}
 
@@ -3050,7 +3051,7 @@ updateForm_link: function(e, linkid){
 		if(empty(this.selements[selementid])) continue;
 
 		var e_option_7 = document.createElement('option');
-		
+
 		if(maplink.selementid2 == selementid){
 			e_option_7.setAttribute('selected',"selected");
 		}
@@ -3060,9 +3061,9 @@ updateForm_link: function(e, linkid){
 
 		e_option_7.setAttribute('value', selementid);
 		e_option_7.appendChild(document.createTextNode(this.selements[selementid].label_expanded));
-		
+
 		this.linkForm.selementid2.appendChild(e_option_7);
-	}	
+	}
 
 
 // LINK INDICATOR TABLE
@@ -3115,7 +3116,7 @@ this.linkForm.linkIndicatorsBody = e_tbody_7;
 // Indicators
 	for(var linktriggerid in maplink.linktriggers){
 		if(empty(maplink.linktriggers[linktriggerid])) continue;
-		
+
 		this.linkForm_addLinktrigger(maplink.linktriggers[linktriggerid]);
 	}
 
@@ -3124,7 +3125,7 @@ this.linkForm.linkIndicatorsBody = e_tbody_7;
 	var e_br_6 = document.createElement('br');
 	this.linkForm.linkIndicatorsTable.appendChild(e_br_6);
 
-	
+
 	var e_input_6 = document.createElement('input');
 	e_input_6.setAttribute('type',"button");
 	e_input_6.setAttribute('name',"Add");
@@ -3142,12 +3143,12 @@ this.linkForm.linkIndicatorsBody = e_tbody_7;
 	e_input_6.setAttribute('value',locale['S_REMOVE']);
 	e_input_6.className = "button";
 	this.linkForm.linkIndicatorsTable.appendChild(e_input_6);
-	
+
 	addListener(e_input_6, 'click', function(){ remove_childs('linkForm','link_triggerids','tr'); });
 //----
 
-	
-// Type ok	
+
+// Type ok
 	if(maplink.drawtype == 0) var dindex = 0; // S_LINE
 	if(maplink.drawtype == 2) var dindex = 1; // S_BOLD_LINE
 	if(maplink.drawtype == 3) var dindex = 2; // S_DOT
@@ -3156,7 +3157,7 @@ this.linkForm.linkIndicatorsBody = e_tbody_7;
 
 
 // COLOR OK
-	this.linkForm.color.value = maplink.color;	
+	this.linkForm.color.value = maplink.color;
 	this.linkForm.colorPicker.style.backgroundColor = '#'+maplink.color;
 },
 
@@ -3292,7 +3293,7 @@ linkForm_addLinktrigger: function(linktrigger){
 	e_input_22.setAttribute('name',"link_triggers["+triggerid+"][color]");
 	e_input_22.className = "biginput";
 	e_td_9.appendChild(e_input_22);
-		
+
 	var e_div_10 = document.createElement('div');
 //this.linkForm.colorPicker = e_div_10;
 
@@ -3338,7 +3339,7 @@ saveForm_link: function(e){
 
 // Type OK
 	params.drawtype = this.linkForm.drawtype.options[this.linkForm.drawtype.selectedIndex].value;
-	
+
 // Color
 	params.color = this.linkForm.color.value;
 
@@ -3355,7 +3356,7 @@ saveForm_link: function(e){
 	var indicators = $$('input[name=link_triggerids]');
 	for(var i=0; i<indicators.length; i++){
 		if(!isset(i, indicators)) continue;
-		
+
 		linktrigger = {};
 		triggerid = indicators[i].value;
 
@@ -3370,7 +3371,7 @@ saveForm_link: function(e){
 
 		linktriggerid = $('link_triggers['+triggerid+'][linktriggerid]');
 
-		if(!is_null(linktriggerid)) 
+		if(!is_null(linktriggerid))
 			linktrigger.linktriggerid = linktriggerid.value;
 
 		this.add_linktrigger(linkid, linktrigger);
@@ -3393,10 +3394,10 @@ deleteForm_link: function(e){
 
 	var linkid = this.linkForm.linkid.value;
 	if(!isset(linkid, this.links)) return false;
-	
+
 	var maplink = this.links[linkid];
-	
-	if(Confirm('Remove link between "'+this.selements[maplink.selementid1].label+'" and "'+this.selements[maplink.selementid2].label+'"?')){	
+
+	if(Confirm('Remove link between "'+this.selements[maplink.selementid1].label+'" and "'+this.selements[maplink.selementid2].label+'"?')){
 		this.remove_link(linkid, true);
 		this.update_linkContainer(e);
 		this.hideForm_link(e);
@@ -3420,11 +3421,11 @@ gridSize:	'50',				// grid size
 
 initialize: function($super, id, params){
 	this.mapObjectId = id;
-	
+
 	$super('CGrid['+id+']');
 
 	if(!params) var params = {};
-	
+
 	if(isset('gridsize', params))
 		addListener(params.gridsize, 'change', this.setGridSize.bindAsEventListener(this), false);
 	if(isset('gridautoalign', params))
@@ -3488,7 +3489,7 @@ gridAlignIcons: function(e){
 
 	for(var selementid in ZBX_SYSMAPS[this.mapObjectId].map.selements){
 		if(empty(ZBX_SYSMAPS[this.mapObjectId].map.selements[selementid])) continue;
-		
+
 		ZBX_SYSMAPS[this.mapObjectId].map.alignSelement(selementid);
 	}
 
@@ -3532,7 +3533,7 @@ data: {
 	html_objid:			null,			// html elements id
 	selected:			0				// element is not selected
 },
-	
+
 initialize: function($super, sysmap, params){
 	this.sysmap = sysmap;
 	$super('CSelement['+id+']');
