@@ -167,15 +167,6 @@
 	return $graphDims;
 	}
 
-	function get_graph_by_gitemid($gitemid){
-		$db_graphs = DBselect('SELECT distinct g.* '.
-						' FROM graphs g, graphs_items gi '.
-						' WHERE g.graphid=gi.graphid '.
-							' AND gi.gitemid='.$gitemid);
-
-	return DBfetch($db_graphs);
-	}
-
 	function get_graphs_by_hostid($hostid){
 		$sql = 'SELECT distinct g.* '.
 				' FROM graphs g, graphs_items gi, items i '.
@@ -233,73 +224,6 @@
 			return false;
 		}
 	return true;
-	}
-
-/*
- * Function: get_accessible_graphs
- *
- * Description:
- *     returns string of accessible graphid's
- *
- * Author:
- *     Aly
- *
- */
-	function get_accessible_graphs($perm,$hostids,$perm_res=null,$nodeid=null,$cache=1){
-		global $USER_DETAILS;
-		static $available_graphs;
-
-		if(is_null($perm_res)) $perm_res = PERM_RES_IDS_ARRAY;
-		$nodeid_str =(is_array($nodeid))?implode('',$nodeid):strval($nodeid);
-		$hostid_str = implode('',$hostids);
-
-		$cache_hash = md5($perm.$perm_res.$nodeid_str.$hostid_str);
-		if($cache && isset($available_graphs[$cache_hash])){
-			return $available_graphs[$cache_hash];
-		}
-
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, $perm, PERM_RES_IDS_ARRAY, $nodeid);
-
-		$denied_graphs = array();
-		$result = array();
-
-		$sql_where = '';
-		if(!empty($hostids)){
-			$sql_where.= ' AND '.DBcondition('i.hostid',$hostids);
-		}
-		$sql = 	'SELECT DISTINCT g.graphid '.
-				' FROM graphs g, graphs_items gi, items i '.
-				' WHERE g.graphid=gi.graphid '.
-					' AND i.itemid=gi.itemid '.
-					$sql_where.
-					' AND '.DBcondition('i.hostid',$available_hosts, true);
-
-		$db_graphs = DBselect($sql);
-		while($graph = DBfetch($db_graphs)){
-			$denied_graphs[] = $graph['graphid'];
-		}
-
-		$sql = 	'SELECT DISTINCT g.graphid '.
-				' FROM graphs g, graphs_items gi, items i '.
-				' WHERE g.graphid=gi.graphid '.
-					' AND i.itemid=gi.itemid '.
-					$sql_where.
-					(!empty($denied_graphs)?' AND '.DBcondition('g.graphid',$denied_graphs,true):'');
-		$db_graphs = DBselect($sql);
-		while($graph = DBfetch($db_graphs)){
-			$result[$graph['graphid']] = $graph['graphid'];
-		}
-
-		if(PERM_RES_STRING_LINE == $perm_res){
-			if(count($result) == 0)
-				$result = '-1';
-			else
-				$result = implode(',',$result);
-		}
-
-		$available_graphs[$cache_hash] = $result;
-
-	return $result;
 	}
 
 /*
@@ -408,27 +332,6 @@
 		$result = is_null($min)?$result:$min;
 
 	return $result;
-	}
-
-	function get_graphitem_by_gitemid($gitemid){
-		$result=DBselect('SELECT * FROM graphs_items WHERE gitemid='.$gitemid);
-		$row=DBfetch($result);
-		if($row){
-			return	$row;
-		}
-		error(S_NO_GRAPH_WITH." gitemid=[$gitemid]");
-
-	return	$result;
-	}
-
-	function get_graphitem_by_itemid($itemid){
-		$result = DBfetch(DBselect('SELECT * FROM graphs_items WHERE itemid='.$itemid));
-		$row=DBfetch($result);
-		if($row)
-		{
-			return	$row;
-		}
-		return	$result;
 	}
 
 	function get_graph_by_graphid($graphid){

@@ -187,9 +187,9 @@ require_once('include/items.inc.php');
 		}
 
 		DBstart();
-		
+
 		try{
-		
+
 			$sql = 'SELECT t.httptestid'.
 					' FROM httptest t, applications a'.
 					' WHERE t.applicationid=a.applicationid'.
@@ -199,8 +199,8 @@ require_once('include/items.inc.php');
 			if((isset($httptestid) && $t && ($t['httptestid'] != $httptestid)) || ($t && !isset($httptestid))){
 				throw new Exception(S_SCENARIO_WITH_NAME.' [ '.$name.' ] '.S_ALREADY_EXISTS_SMALL);
 			}
-			
-			
+
+
 			$sql = 'SELECT applicationid FROM applications WHERE name='.zbx_dbstr($application).' AND hostid='.$hostid;
 			if($applicationid = DBfetch(DBselect($sql))){
 				$applicationid = $applicationid['applicationid'];
@@ -264,7 +264,7 @@ require_once('include/items.inc.php');
 				if(!isset($s['required']))	$s['required'] = '';
 				if(!isset($s['status_codes']))	$s['status_codes'] = '';
 
-				$result = db_save_step($hostid, $applicationid, $httptestid, $name, $s['name'], $sid+1, $s['timeout'], 
+				$result = db_save_step($hostid, $applicationid, $httptestid, $name, $s['name'], $sid+1, $s['timeout'],
 					$s['url'], $s['posts'], $s['required'],$s['status_codes'], $delay, $history, $trends);
 
 				if(!$result){
@@ -273,7 +273,7 @@ require_once('include/items.inc.php');
 
 				$httpstepids[$result] = $result;
 			}
-			
+
 /* clean unneeded steps */
 			$sql = 'SELECT httpstepid FROM httpstep WHERE httptestid='.$httptestid;
 			$db_steps = DBselect($sql);
@@ -453,7 +453,7 @@ require_once('include/items.inc.php');
 
 	function activate_httptest($httptestid){
 		$r = DBexecute('UPDATE httptest SET status='.HTTPTEST_STATUS_ACTIVE.' WHERE httptestid='.$httptestid);
-		
+
 		$itemids = array();
 		$sql = 'SELECT hti.itemid FROM httptestitem hti WHERE hti.httptestid='.$httptestid;
 		$items_db = DBselect($sql);
@@ -466,8 +466,8 @@ require_once('include/items.inc.php');
 		$items_db = DBselect($sql);
 		while($itemid = Dbfetch($items_db)){
 			$itemids[] = $itemid['itemid'];
-		}				
-		
+		}
+
 		$sql = 'UPDATE items SET status='.ITEM_STATUS_ACTIVE.' WHERE '.DBcondition('itemid', $itemids);
 		$r &= DBexecute($sql);
 		return $r;
@@ -475,7 +475,7 @@ require_once('include/items.inc.php');
 
 	function disable_httptest($httptestid){
 		$r = DBexecute('UPDATE httptest SET status='.HTTPTEST_STATUS_DISABLED.' WHERE httptestid='.$httptestid);
-		
+
 		$itemids = array();
 		$sql = 'SELECT hti.itemid FROM httptestitem hti WHERE hti.httptestid='.$httptestid;
 		$items_db = DBselect($sql);
@@ -488,8 +488,8 @@ require_once('include/items.inc.php');
 		$items_db = DBselect($sql);
 		while($itemid = Dbfetch($items_db)){
 			$itemids[] = $itemid['itemid'];
-		}				
-		
+		}
+
 		$sql = 'UPDATE items SET status='.ITEM_STATUS_DISABLED.' WHERE '.DBcondition('itemid', $itemids);
 		$r &= DBexecute($sql);
 		return $r;
@@ -509,14 +509,6 @@ require_once('include/items.inc.php');
 
 	function get_httptest_by_httptestid($httptestid){
 		return DBfetch(DBselect('select * from httptest where httptestid='.$httptestid));
-	}
-
-	function get_httpsteps_by_httptestid($httptestid){
-		return DBselect('select * from httpstep where httptestid='.$httptestid);
-	}
-
-	function get_httpstep_by_httpstepid($httpstepid){
-		return DBfetch(DBselect('select * from httpstep where httpstepid='.$httpstepid));
 	}
 
 	function get_httpstep_by_no($httptestid, $no){
