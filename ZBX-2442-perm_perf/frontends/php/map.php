@@ -97,11 +97,11 @@ set_time_limit(10);
 		$back = imagecreatefromstring($db_image['image']);
 		imagecopy($im,$back,0,0,0,0,imagesx($back),imagesy($back));
 	}
-	else{
-		$x=imagesx($im)/2-ImageFontWidth(4)*zbx_strlen($name)/2;
-		imagetext($im, 10, 0, $x, 25, $colors['Dark Red'], $name);
-	}
 	unset($db_image);
+	
+	$x=imagesx($im)/2-ImageFontWidth(4)*zbx_strlen($name)/2;
+	imagetext($im, 10, 0, $x, 25, $colors['Dark Red'], $name);
+	
 
 	$str = zbx_date2str(S_MAPS_DATE_FORMAT,time(NULL));
 	imagestring($im, 0,imagesx($im)-120,imagesy($im)-12,$str, $colors['Gray']);
@@ -148,7 +148,7 @@ set_time_limit(10);
 
 // Draw MAP
 	drawMapConnectors($im, $map, $map_info);
-	
+
 	if(!isset($_REQUEST['noselements'])){
 		drawMapHighligts($im, $map, $map_info);
 		drawMapSelements($im, $map, $map_info);
@@ -156,7 +156,7 @@ set_time_limit(10);
 
 	drawMapLabels($im, $map, $map_info);
 	drawMapLinkLabels($im, $map, $map_info);
-	
+
 	if(!isset($_REQUEST['noselements']) && ($map['markelements'] == 1)){
 		drawMapSelemetsMarks($im, $map, $map_info);
 	}
@@ -173,6 +173,8 @@ set_time_limit(10);
 	imageOut($im);
 	imagedestroy($im);
 
+?>
+<?php
 
 include_once('include/page_footer.php');
 

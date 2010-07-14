@@ -797,7 +797,7 @@ return $delays;
 }
 
 function get_history_of_actions($limit,&$last_clock=null,$sql_cond=''){
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array(), PERM_RES_IDS_ARRAY);
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array());
 
 	$alerts = array();
 	$clock = array();
@@ -822,7 +822,7 @@ function get_history_of_actions($limit,&$last_clock=null,$sql_cond=''){
 				' AND '.DBcondition('e.objectid',$available_triggers).
 				' AND '.DBin_node('a.alertid').
 			' ORDER BY a.clock DESC';
-	$result=DBselect($sql,$limit);
+	$result = DBselect($sql,$limit);
 	while($row=DBfetch($result)){
 		$alerts[] = $row;
 		$clock[] = $row['clock'];
@@ -830,7 +830,10 @@ function get_history_of_actions($limit,&$last_clock=null,$sql_cond=''){
 
 	$last_clock = !empty($clock)?min($clock):null;
 
-	order_page_result($alerts, 'clock', ZBX_SORT_DOWN);
+	$sortfield = getPageSortField('clock');
+	$sortorder = getPageSortOrder();
+
+	order_result($alerts, $sortfield, $sortorder);
 
 	foreach($alerts as $num => $row){
 		$time=zbx_date2str(S_HISTORY_OF_ACTIONS_DATE_FORMAT,$row['clock']);

@@ -253,7 +253,7 @@
 			ITEM_VALUE_TYPE_FLOAT => array(),
 			ITEM_VALUE_TYPE_STR =>  array(),
 			ITEM_VALUE_TYPE_LOG => array(),
-			ITEM_VALUE_TYPE_UINT64 => array(), 
+			ITEM_VALUE_TYPE_UINT64 => array(),
 			ITEM_VALUE_TYPE_TEXT => array()
 		);
 
@@ -468,7 +468,7 @@
 			error(S_GRAPH.SPACE.'"'.$name.'"'.SPACE.S_GRAPH_TEMPLATE_HOST_CANNOT_OTHER_ITEMS_HOSTS_SMALL);
 			return $result;
 		}
-		
+
 		// $filter = array(
 			// 'name' => $name,
 			// 'hostids' => $graph_hostids
@@ -712,7 +712,7 @@
 		if($result){
 			foreach($graphs as $graphid => $graph){
 				if(isset($host_list[$graphid]))
-					info(sprintf(S_GRAPH_DELETED_FROM_HOSTS, $graph['name'], count($host_list[$graphid]) > 1 ? 's' : '').': '.'"'.implode('","', array_keys($host_list[$graphid])).'"');
+					info(S_GRAPH_DELETED_FROM_HOSTS_PART1.SPACE.$graph['name'].SPACE.S_GRAPH_DELETED_FROM_HOSTS_PART2.SPACE.(count($host_list[$graphid]) > 1 ? 's' : '').SPACE.S_GRAPH_DELETED_FROM_HOSTS_PART3.':'.SPACE.'"'.implode('","', array_keys($host_list[$graphid])).'"');
 			}
 		}
 
@@ -732,15 +732,15 @@
  *
  */
 	function cmp_graphitems(&$gitem1, &$gitem2){
-		if($gitem1["drawtype"]	!= $gitem2["drawtype"])		return 1;
-		if($gitem1["sortorder"]	!= $gitem2["sortorder"])	return 2;
-		if($gitem1["color"]	!= $gitem2["color"])		return 3;
-		if($gitem1["yaxisside"]	!= $gitem2["yaxisside"])	return 4;
+		if($gitem1['drawtype']	!= $gitem2['drawtype'])		return 1;
+		if($gitem1['sortorder']	!= $gitem2['sortorder'])	return 2;
+		if($gitem1['color']	!= $gitem2['color'])		return 3;
+		if($gitem1['yaxisside']	!= $gitem2['yaxisside'])	return 4;
 
-		$item1 = get_item_by_itemid($gitem1["itemid"]);
-		$item2 = get_item_by_itemid($gitem2["itemid"]);
+		$item1 = get_item_by_itemid($gitem1['itemid']);
+		$item2 = get_item_by_itemid($gitem2['itemid']);
 
-		if($item1["key_"] != $item2["key_"])			return 5;
+		if($item1['key_'] != $item2['key_'])			return 5;
 
 		return 0;
 	}
@@ -843,8 +843,8 @@
 					'graphids' => $db_graph['graphid'],
 					'output' => API_OUTPUT_EXTEND
 				));
-				
-				
+
+
 				$filter = array(
 					'name' => $db_graph['name'],
 					'hostids' => $hostid
@@ -861,7 +861,7 @@
 				if($res === false) return false;
 			}
 		}
-		
+
 		return true;
 	}
 
@@ -965,7 +965,7 @@
 			if($update){
 				if(isset($_REQUEST['period']) && ($_REQUEST['period'] >= ZBX_MIN_PERIOD))
 					CProfile::update($idx.'.period',$_REQUEST['period'],PROFILE_TYPE_INT, $idx2);
-					
+
 				if(isset($_REQUEST['stime']))
 					CProfile::update($idx.'.stime',$_REQUEST['stime'], PROFILE_TYPE_STR, $idx2);
 			}
@@ -1179,7 +1179,7 @@
 		$gdinfo = gd_info();
 
 		if($gdinfo['FreeType Support'] && function_exists('imagettftext')){
-		
+
 			if((preg_match(ZBX_PREG_DEF_FONT_STRING, $string) && ($angle != 0)) || (ZBX_FONT_NAME == ZBX_GRAPH_FONT_NAME)){
 				$ttf = ZBX_FONTPATH.'/'.ZBX_FONT_NAME.'.ttf';
 				imagettftext($image, $fontsize, $angle, $x, $y, $color, $ttf, $string);
@@ -1190,7 +1190,7 @@
 			}
 			else{
 				$ttf = ZBX_FONTPATH.'/'.ZBX_GRAPH_FONT_NAME.'.ttf';
-				
+
 				$size = imageTextSize($fontsize, 0, $string);
 
 				$imgg = imagecreatetruecolor($size['width']+1, $size['height']);
@@ -1198,13 +1198,13 @@
 				imagefill($imgg, 0, 0, $transparentColor);
 
 				imagettftext($imgg, $fontsize, 0, 0, $size['height'], $color, $ttf, $string);
-				
+
 				$imgg = imagerotate($imgg, $angle, $transparentColor);
 				ImageAlphaBlending($imgg, false);
 				imageSaveAlpha($imgg, true);
-				
+
 				imagecopy($image, $imgg, $x - $size['height'], $y - $size['width'], 0, 0, $size['height'], $size['width']+1);
-				
+
 				imagedestroy($imgg);
 			}
 /*
@@ -1213,7 +1213,7 @@
 			if(!$angle)	imagerectangle($image, $x, $y+$ar[1], $x+abs($ar[0] - $ar[4]), $y+$ar[5], $color);
 			else imagerectangle($image, $x, $y, $x-abs($ar[0] - $ar[4]), $y+($ar[5]-$ar[1]), $color);
 //*/
-			
+
 		}
 		else{
 			$dims = imageTextSize($fontsize, $angle, $string);
@@ -1252,9 +1252,9 @@
 		$gdinfo = gd_info();
 
 		$result = array();
-		
+
 		if($gdinfo['FreeType Support'] && function_exists('imagettfbbox')){
-		
+
 			if(preg_match(ZBX_PREG_DEF_FONT_STRING, $string) && ($angle != 0)){
 				$ttf = ZBX_FONTPATH.'/'.ZBX_FONT_NAME.'.ttf';
 			}
@@ -1266,6 +1266,7 @@
 
 			$result['height'] = abs($ar[1] - $ar[5]);
 			$result['width'] = abs($ar[0] - $ar[4]);
+			$result['baseline'] = $ar[1];
 		}
 		else{
 			switch($fontsize){
@@ -1285,16 +1286,16 @@
 			if($angle){
 				$result['width'] = imagefontheight($fontsize);
 				$result['height'] = imagefontwidth($fontsize) * zbx_strlen($string);
-			}
-			else{
+			} else{
 				$result['height'] = imagefontheight($fontsize);
 				$result['width'] = imagefontwidth($fontsize) * zbx_strlen($string);
 			}
+			$result['baseline'] = 0;
 		}
 
-	return $result;
+		return $result;
 	}
-	
+
 	function DashedLine($image,$x1,$y1,$x2,$y2,$color){
 		// Style for dashed lines
 		//$style = array($color, $color, $color, $color, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT);
@@ -1310,5 +1311,91 @@
 		DashedLine($image, $x1,$y2,$x2,$y2,$color);
 		DashedLine($image, $x2,$y2,$x2,$y1,$color);
 		DashedLine($image, $x2,$y1,$x1,$y1,$color);
+	}
+
+	function find_period_start($periods,$time){
+		$date = getdate($time);
+		$wday = $date['wday'] == 0 ? 7 : $date['wday'];
+		$curr = $date['hours']*100+$date['minutes'];
+
+		if(isset($periods[$wday])){
+			$next_h = -1;
+			$next_m = -1;
+			foreach($periods[$wday] as $period){
+				$per_start = $period['start_h']*100+$period['start_m'];
+				if($per_start > $curr){
+					if(($next_h == -1 && $next_m == -1) || ($per_start < ($next_h*100 + $next_m))){
+						$next_h = $period['start_h'];
+						$next_m = $period['start_m'];
+					}
+					continue;
+				}
+
+				$per_end = $period['end_h']*100+$period['end_m'];
+				if($per_end <= $curr) continue;
+				return $time;
+			}
+
+			if($next_h >= 0 && $next_m >= 0){
+				return mktime($next_h, $next_m, 0, $date['mon'], $date['mday'], $date['year']);
+			}
+		}
+
+		for($days=1; $days < 7 ; ++$days){
+			$new_wday = (($wday + $days - 1)%7 + 1);
+			if(isset($periods[$new_wday ])){
+				$next_h = -1;
+				$next_m = -1;
+				foreach($periods[$new_wday] as $period){
+					$per_start = $period['start_h']*100+$period['start_m'];
+					if(($next_h == -1 && $next_m == -1) || ($per_start < ($next_h*100 + $next_m))){
+						$next_h = $period['start_h'];
+						$next_m = $period['start_m'];
+					}
+				}
+
+				if($next_h >= 0 && $next_m >= 0){
+					return mktime($next_h, $next_m, 0, $date['mon'], $date['mday'] + $days, $date['year']);
+				}
+			}
+		}
+	return -1;
+	}
+
+	function find_period_end($periods,$time,$max_time){
+		$date = getdate($time);
+		$wday = $date['wday'] == 0 ? 7 : $date['wday'];
+		$curr = $date['hours']*100+$date['minutes'];
+
+		if(isset($periods[$wday])){
+			$next_h = -1;
+			$next_m = -1;
+			foreach($periods[$wday] as $period){
+				$per_start = $period['start_h']*100+$period['start_m'];
+				$per_end = $period['end_h']*100+$period['end_m'];
+				if($per_start > $curr) continue;
+				if($per_end < $curr) continue;
+
+				if(($next_h == -1 && $next_m == -1) || ($per_end > ($next_h*100 + $next_m))){
+					$next_h = $period['end_h'];
+					$next_m = $period['end_m'];
+				}
+			}
+
+			if($next_h >= 0 && $next_m >= 0){
+				$new_time = mktime($next_h, $next_m, 0, $date['mon'], $date['mday'], $date['year']);
+
+				if($new_time == $time) return $time;
+				if($new_time > $max_time) return $max_time;
+
+				$next_time = find_period_end($periods,$new_time,$max_time);
+				if($next_time < 0)
+					return $new_time;
+				else
+					return $next_time;
+			}
+		}
+
+	return -1;
 	}
 ?>

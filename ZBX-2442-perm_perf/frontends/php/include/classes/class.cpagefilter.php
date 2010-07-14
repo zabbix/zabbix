@@ -35,7 +35,7 @@ class CPageFilter{
 		global $page, $ZBX_WITH_ALL_NODES;
 
 		/* options = array(
-			'config' => {DDFirst: [ allow_all, deny_all, select_latest ], 'individual': [true,false]},
+			'config' => {'DDFirst': [ allow_all, deny_all], select_latest: [true,false], 'individual': [true,false]},
 			'groups' => [apiget filters],
 			'hosts' => [apiget filters],
 			'graphs' => [apiget filters],
@@ -67,10 +67,16 @@ class CPageFilter{
 			$this->config['DDFirst'] = $config['dropdown_first_entry'];
 		}
 
-		
+
 		if(!isset($options['groupid'], $options['hostid'])){
 			if(isset($options['graphid'])){
-				$this->_updateGHbyGraph($options);
+				$this->_updateByGraph($options);
+			}
+		}
+
+		if(!isset($options['groupid'])){
+			if(isset($options['hostid'])){
+				$this->_updateByHost($options);
 			}
 		}
 
@@ -80,7 +86,7 @@ class CPageFilter{
 			if(!isset($options['groupid']) && isset($options['hostid'])){
 				$options['groupid'] = 0;
 			}
-			
+
 			$this->_profileIdx['groups'] = 'web.'.$profileSection.'.groupid';
 			$this->_initGroups($options['groupid'], $options['groups']);
 		}
@@ -98,17 +104,33 @@ class CPageFilter{
 		}
 	}
 
-	private function _updateGHbyGraph(&$options){
+	private function _updateByGraph(&$options){
 		$graph = CGraph::get(array(
 			'graphids' => $options['graphid'],
 			'output' => API_OUTPUT_EXTEND,
 			'select_hosts' => API_OUTPUT_REFER,
+			'select_templates' => API_OUTPUT_REFER,
 			'select_groups' => API_OUTPUT_REFER,
 		));
-		$graph = reset($graph);
 
-		$options['groupid'] = $graph ? $graph['groups'][0]['groupid'] : null;
-		$options['hostid'] = $graph ? $graph['hosts'][0]['hostid'] : null;
+		if($graph = reset($graph)){
+			$options['groupid'] = $graph['groups'][0]['groupid'];
+			$options['hostid'] = $graph['hosts'][0]['hostid'];
+
+			if(is_null($options['hostid']))
+				$options['hostid'] = $graph['templates'][0]['templateid'];
+		}
+	}
+
+	private function _updateByHost(&$options){
+		$hosts = CHost::get(array(
+			'hostids' => $options['hostid'],
+			'templated_hosts' => 1,
+			'output' => array('hostid', 'host'),
+			'select_groups' => API_OUTPUT_REFER,
+		));
+
+		if($host = reset($hosts)) $options['groupid'] = $host['groups'][0]['groupid'];
 	}
 
 	private function _initGroups($groupid, $options){
@@ -154,12 +176,12 @@ class CPageFilter{
 			$hostid = 0;
 		}
 		else{
-			$def_ptions = array(
+			$def_options = array(
 				'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
 				'output' => array('hostid', 'host'),
 				'groupids' => (($this->groupid > 0) ? $this->groupid : null),
 			);
-			$options = zbx_array_merge($def_ptions, $options);
+			$options = zbx_array_merge($def_options, $options);
 			$hosts = CHost::get($options);
 
 			foreach($hosts as $host){
@@ -219,6 +241,7 @@ class CPageFilter{
 					$graphid = CProfile::get($this->_profileIdx['graphs']);
 				}
 			}
+
 			if(is_null($graphid)){
 				$graphid = 0;
 			}
@@ -254,7 +277,7 @@ class CPageFilter{
 				$items[$id] = get_node_name_by_elid($id, null, ': ') . $item;
 			}
 		}
-		
+
 		natcasesort($items);
 		$items = array(0 => ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_NONE) ? S_NOT_SELECTED_SMALL : S_ALL_SMALL) + $items;
 

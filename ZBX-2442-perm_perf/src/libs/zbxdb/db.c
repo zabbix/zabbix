@@ -411,6 +411,8 @@ int	zbx_db_begin(void)
 		assert(0);
 	}
 
+	txn_level++;
+
 #ifdef	HAVE_SQLITE3
 	if (PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
 	{
@@ -423,8 +425,8 @@ int	zbx_db_begin(void)
 	rc = zbx_db_execute("%s", "begin;");
 #endif	/* HAVE_MYSQL || HAVE_POSTGRESQL || HAVE_SQLITE3 */
 
-	if (ZBX_DB_OK == rc)
-		txn_level++;
+	if (rc < ZBX_DB_OK)	/* ZBX_DB_FAIL | ZBX_DB_DOWN */
+		txn_level--;
 
 	return rc;
 }
@@ -465,7 +467,7 @@ int	zbx_db_commit(void)
 	(void)OCITransCommit(oracle.svchp, oracle.errhp, OCI_DEFAULT);
 #endif	/* HAVE_ORACLE */
 
-	if (ZBX_DB_OK == rc)
+	if (rc >= ZBX_DB_OK)	/* ZBX_DB_OK or number of changes */
 		txn_level--;
 
 	return rc;
@@ -507,7 +509,7 @@ int	zbx_db_rollback(void)
 	(void)OCITransRollback(oracle.svchp, oracle.errhp, OCI_DEFAULT);
 #endif	/* HAVE_ORACLE */
 
-	if (ZBX_DB_OK == rc)
+	if (rc >= ZBX_DB_OK)	/* ZBX_DB_OK or number of changes */
 		txn_level--;
 
 	return rc;

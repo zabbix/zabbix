@@ -38,13 +38,14 @@
 #	include "ipc.h"
 #endif /* _WINDOWS */
 
-ZBX_COLLECTOR_DATA *collector = NULL;
+ZBX_COLLECTOR_DATA	*collector = NULL;
 
-#define ZBX_GET_SHM_KEY(smk_key)					\
-	if( -1 == (shm_key = zbx_ftok(CONFIG_FILE, (int)'z') ))		\
-	{								\
-		zbx_error("Cannot create IPC key for agent collector");	\
-		exit(1);						\
+#define ZBX_GET_SHM_KEY(shm_key)						\
+										\
+	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_COLLECTOR_ID)))	\
+	{									\
+		zbx_error("Cannot create IPC key for agent collector");		\
+		exit(1);							\
 	}
 
 /******************************************************************************
@@ -300,7 +301,7 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 	if (0 != init_cpu_collector(&(collector->cpus)))
 		close_cpu_collector(&(collector->cpus));
 
-	while(ZBX_IS_RUNNING)
+	while(ZBX_IS_RUNNING())
 	{
 		sec = zbx_time();
 		if (CPU_COLLECTOR_STARTED(collector))

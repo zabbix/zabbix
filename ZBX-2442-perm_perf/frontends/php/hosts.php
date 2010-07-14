@@ -76,6 +76,8 @@ include_once('include/page_header.php');
 		'ipmi_username'=>	array(T_ZBX_STR, O_OPT,	NULL, NULL,				NULL),
 		'ipmi_password'=>	array(T_ZBX_STR, O_OPT,	NULL, NULL,				NULL),
 
+		'mass_clear_tpls'=>		array(T_ZBX_STR, O_OPT, NULL, 			NULL,	NULL),
+
 		'useprofile'=>		array(T_ZBX_STR, O_OPT, NULL, 			NULL,	NULL),
 		'devicetype'=>		array(T_ZBX_STR, O_OPT, NULL, 			NULL,	NULL),
 		'name'=>			array(T_ZBX_STR, O_OPT, NULL, 			NULL,	NULL),
@@ -313,7 +315,7 @@ include_once('include/page_header.php');
 	}
 // HOST MASS UPDATE
 	else if(isset($_REQUEST['go']) && ($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['masssave'])){
-		$hosts = get_request('hosts', array());
+		$hostids = get_request('hosts', array());
 		$visible = get_request('visible', array());
 		$_REQUEST['newgroup'] = get_request('newgroup', '');
 		$_REQUEST['proxy_hostid'] = get_request('proxy_hostid', 0);
@@ -321,7 +323,7 @@ include_once('include/page_header.php');
 
 		try{
 			DBstart();
-			$hosts = array('hosts' => zbx_toObject($hosts, 'hostid'));
+			$hosts = array('hosts' => zbx_toObject($hostids, 'hostid'));
 
 			$properties = array('port', 'useip', 'dns',	'ip', 'proxy_hostid', 'useipmi', 'ipmi_ip', 'ipmi_port', 'ipmi_authtype',
 				'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'status');
@@ -334,12 +336,12 @@ include_once('include/page_header.php');
 						$new_values[$property] = $_REQUEST[$property];
 				}
 			}
-				
+
 // PROFILES {{{
 			if(isset($visible['useprofile'])){
 				$new_values['profile'] = get_request('useprofile', false) ? get_request('host_profile', array()) : array();
 			}
-			
+
 			if(isset($visible['useprofile_ext'])){
 				$new_values['extendedProfile'] = get_request('useprofile_ext', false) ? get_request('ext_host_profiles', array()) : array();
 			}
@@ -349,16 +351,16 @@ include_once('include/page_header.php');
 			if(isset($visible['newgroup']) && !empty($_REQUEST['newgroup'])){
 				$result = CHostGroup::create(array('name' => $_REQUEST['newgroup']));
 				if($result === false) throw new Exception();
-				
+
 				$newgroup = array('groupid' => reset($result['groupids']), 'name' => $_REQUEST['newgroup']);
 			}
-			
+
 			$templates = array();
 			if(isset($visible['template_table']) || isset($visible['template_table_r'])){
 				$tplids = array_keys($_REQUEST['templates']);
 				$templates = zbx_toObject($tplids, 'templateid');
 			}
-		
+
 			if(isset($visible['groups'])){
 				$hosts['groups'] = CHostGroup::get(array(
 					'groupids' => get_request('groups', array()),
@@ -370,23 +372,29 @@ include_once('include/page_header.php');
 				}
 			}
 			if(isset($visible['template_table_r'])){
+				if(isset($_REQUEST['mass_clear_tpls'])){
+					$host_templates = CTemplate::get(array('hostids' => $hostids));
+					$host_templateids = zbx_objectValues($host_templates, 'templateid');
+					$templates_to_del = array_diff($host_templateids, $tplids);
+					$hosts['templates_clear'] = zbx_toObject($templates_to_del, 'templateid');
+				}
 				$hosts['templates'] = $templates;
 			}
 
 			$result = CHost::massUpdate(array_merge($hosts, $new_values));
 			if($result === false) throw new Exception();
 
-			
+
 			$add = array();
 			if(!empty($templates) && isset($visible['template_table'])){
 				$add['templates'] = $templates;
 			}
 			if(!empty($newgroup) && !isset($visible['groups'])){
-				$add['groups'][] = $newgroup;			
+				$add['groups'][] = $newgroup;
 			}
 			if(!empty($add)){
 				$add['hosts'] = $hosts['hosts'];
-				
+
 				$result = CHost::massAdd($add);
 				if($result === false) throw new Exception();
 			}
@@ -419,27 +427,29 @@ include_once('include/page_header.php');
 
 		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY))) access_deny();
 
+		if(isset($_REQUEST['hostid'])){
+			$create_new = false;
+			$msg_ok = S_HOST_UPDATED;
+			$msg_fail = S_CANNOT_UPDATE_HOST;
+		}
+		else{
+			$create_new = true;
+			$msg_ok = S_HOST_ADDED;
+			$msg_fail = S_CANNOT_ADD_HOST;
+		}
+
 		$clone_hostid = false;
 		if($_REQUEST['form'] == 'full_clone'){
+			$create_new = true;
 			$clone_hostid = $_REQUEST['hostid'];
-			unset($_REQUEST['hostid']);
 		}
 
 		$templates = array_keys($templates);
 		$templates = zbx_toObject($templates, 'templateid');
 		$templates_clear = zbx_toObject($templates_clear, 'templateid');
 
-	// START SAVE TRANSACTION {{{
+// START SAVE TRANSACTION {{{
 		DBstart();
-
-		if(isset($_REQUEST['hostid'])){
-			$msg_ok = S_HOST_UPDATED;
-			$msg_fail = S_CANNOT_UPDATE_HOST;
-		}
-		else{
-			$msg_ok = S_HOST_ADDED;
-			$msg_fail = S_CANNOT_ADD_HOST;
-		}
 
 		if(!empty($_REQUEST['newgroup'])){
 				$group = CHostGroup::create(array('name' => $_REQUEST['newgroup']));
@@ -468,22 +478,20 @@ include_once('include/page_header.php');
 				'groups' => $groups,
 				'templates' => $templates,
 				'macros' => get_request('macros', array()),
+				'extendedProfile' => (get_request('useprofile_ext', 'no') == 'yes') ? get_request('ext_host_profiles', array()) : array(),
 			);
 
-			if(isset($_REQUEST['hostid'])){
-				$host['hostid'] = $_REQUEST['hostid'];
-				$host['templates_clear'] = $templates_clear;
-				if(!CHost::update($host)) throw new Exception();
-
-				$hostid = $_REQUEST['hostid'];
-			}
-			else{
+			if($create_new){
 				$host = CHost::create($host);
-
 				if($host){
 					$hostid = reset($host['hostids']);
 				}
 				else throw new Exception();
+			}
+			else{
+				$hostid = $host['hostid'] = $_REQUEST['hostid'];
+				$host['templates_clear'] = $templates_clear;
+				if(!CHost::update($host)) throw new Exception();
 			}
 
 // FULL CLONE {{{
@@ -522,8 +530,6 @@ include_once('include/page_header.php');
 				if(count($graph['hosts']) > 1) continue;
 					if(!copy_graph_to_host($graph['graphid'], $hostid, true)) throw new Exception();
 			}
-
-			$_REQUEST['hostid'] = $clone_hostid;
 		}
 
 // }}} FULL CLONE
@@ -531,7 +537,7 @@ include_once('include/page_header.php');
 //HOSTS PROFILE Section
 			CProfile::update('HOST_PORT', $_REQUEST['port'], PROFILE_TYPE_INT);
 
-			if(isset($_REQUEST['hostid'])){
+			if(!$create_new){
 				delete_host_profile($hostid);
 			}
 
@@ -543,16 +549,6 @@ include_once('include/page_header.php');
 					$_REQUEST['location'],$_REQUEST['notes'])) throw new Exception();
 			}
 
-
-//HOSTS PROFILE EXTANDED Section
-			if(isset($_REQUEST['hostid'])){
-				delete_host_profile_ext($hostid);
-			}
-
-			$ext_host_profiles = get_request('ext_host_profiles', array());
-			if((get_request('useprofile_ext', 'no') == 'yes') && !empty($ext_host_profiles)){
-				if(!add_host_profile_ext($hostid, $ext_host_profiles)) throw new Exception();
-			}
 // }}} SAVE TRANSACTION
 
 			DBend(true);
@@ -571,11 +567,7 @@ include_once('include/page_header.php');
 	}
 // DELETE HOST
 	else if(isset($_REQUEST['delete']) && isset($_REQUEST['hostid'])){
-
-		DBstart();
-			$result = delete_host($_REQUEST['hostid']);
-		$result = DBend($result);
-
+		$result = CHost::delete($_REQUEST['hostid']);
 		show_messages($result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
 
 		if($result){
@@ -600,26 +592,8 @@ include_once('include/page_header.php');
 // DELETE HOST
 	else if($_REQUEST['go'] == 'delete'){
 		$hostids = get_request('hosts', array());
-		$hosts = zbx_toObject($hostids,'hostid');
 
-		DBstart();
-		$options = array(
-			'hostids' => $hostids,
-			'output' => array('hostid', 'host')
-		);
-		//$delHosts = CHost::get($options);
-
-		$go_result = CHost::delete($hosts);
-		/*foreach($delHosts as $hnum => $host){
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, 'Host ['.$host['host'].']');
-		}*/
-
-		$go_result = DBend($go_result);
-
-		if(!$go_result){
-			error(CHost::resetErrors());
-		}
-
+		$go_result = CHost::delete($hostids);
 		show_messages($go_result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
 	}
 // ACTIVATE/DISABLE HOSTS
@@ -713,7 +687,7 @@ include_once('include/page_header.php');
 
 		$sortfield = getPageSortField('host');
 		$sortorder = getPageSortOrder();
-		
+
 		if($pageFilter->groupsSelected){
 		$options = array(
 			'editable' => 1,
@@ -863,11 +837,14 @@ include_once('include/page_header.php');
 			}
 			else{
 				$hostTemplates = array();
+				order_result($host['parentTemplates'], 'host');
 				foreach($host['parentTemplates'] as $htnum => $template){
 					$caption = array();
 					$caption[] = new CLink($template['host'],'templates.php?form=update&templateid='.$template['templateid'],'unknown');
 
 					if(!empty($templates[$template['templateid']]['parentTemplates'])){
+						order_result($templates[$template['templateid']]['parentTemplates'], 'host');
+						
 						$caption[] = ' (';
 						foreach($templates[$template['templateid']]['parentTemplates'] as $tnum => $tpl){
 							$caption[] = new CLink($tpl['host'],'templates.php?form=update&templateid='.$tpl['templateid'], 'unknown');
@@ -915,7 +892,7 @@ include_once('include/page_header.php');
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
-		$goOption->setAttribute('confirm',S_DELETE_SELECTED_HOSTS);
+		$goOption->setAttribute('confirm',S_DELETE_SELECTED_HOSTS_Q);
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
@@ -933,9 +910,11 @@ include_once('include/page_header.php');
 		$form->addItem($table);
 		$hosts_wdgt->addItem($form);
 	}
-	
+
 	$hosts_wdgt->show();
 
+?>
+<?php
 
 include_once('include/page_footer.php');
 

@@ -17,7 +17,6 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -68,7 +67,7 @@ static void run_remote_command(char* host_name, char* command)
 	DC_ITEM         item;
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		*p, *host_esc, key[ITEM_KEY_LEN_MAX];
+	char		*p, *host_esc, *param;
 #ifdef HAVE_OPENIPMI
 	int		val;
 	char		error[MAX_STRING_LEN];
@@ -96,8 +95,6 @@ static void run_remote_command(char* host_name, char* command)
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		*key = '\0';
-
 		memset(&item, 0, sizeof(item));
 
 		ZBX_STR2UINT64(item.host.hostid, row[0]);
@@ -106,8 +103,6 @@ static void run_remote_command(char* host_name, char* command)
 		zbx_strlcpy(item.host.ip, row[3], sizeof(item.host.ip));
 		zbx_strlcpy(item.host.dns, row[4], sizeof(item.host.dns));
 		item.host.port = (unsigned short)atoi(row[5]);
-
-		item.key = key;
 
 		p = command;
 		while (*p == ' ' && *p != '\0')
@@ -127,22 +122,27 @@ static void run_remote_command(char* host_name, char* command)
 			}
 
 			if (SUCCEED == (ret = parse_ipmi_command(p, item.ipmi_sensor, &val)))
+			{
+				item.key = item.ipmi_sensor;
 				ret = set_ipmi_control_value(&item, val, error, sizeof(error));
+			}
 		}
 		else
 		{
 #endif
-			zbx_snprintf(key, sizeof(key), "system.run[%s,nowait]", p);
-
-			alarm(CONFIG_TIMEOUT);
+			param = dyn_escape_param(p);
+			item.key = zbx_dsprintf(NULL, "system.run[\"%s\",\"nowait\"]", param);
+			zbx_free(param);
 
 			init_result(&agent_result);
 
+			alarm(CONFIG_TIMEOUT);
 			ret = get_value_agent(&item, &agent_result);
+			alarm(0);
 
 			free_result(&agent_result);
 
-			alarm(0);
+			zbx_free(item.key);
 #ifdef HAVE_OPENIPMI
 		}
 #endif
@@ -165,7 +165,7 @@ static void run_remote_command(char* host_name, char* command)
  *                               1 if alias is a group name                   *
  *             command - (output) remote command                              *
  *                                                                            *
- * Return value: 0 - correct comand is read                                   *
+ * Return value: 0 - correct command is read                                  *
  *               1 - EOL                                                      *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
@@ -193,7 +193,6 @@ static int get_next_command(char** command_list, char** alias, int* is_group, ch
 	*alias = NULL;
 	*is_group = 0;
 	*command = NULL;
-
 
 	if((*command_list)[0] == '\0' || (*command_list)==NULL) {
 		zabbix_log(LOG_LEVEL_DEBUG, "Result get_next_command [EOL]");
@@ -271,11 +270,13 @@ void	op_run_commands(char *cmd_list)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In run_commands()");
 
-	while (1 != get_next_command(&cmd_list, &alias, &is_group, &command)) {
+	while (1 != get_next_command(&cmd_list, &alias, &is_group, &command))
+	{
 		if (!alias || *alias == '\0' || !command || *command == '\0')
 			continue;
 
-		if (is_group) {
+		if (is_group)
+		{
 			alias_esc = DBdyn_escape_string(alias);
 			result = DBselect("select distinct h.host from hosts_groups hg,hosts h,groups g"
 					" where hg.hostid=h.hostid and hg.groupid=g.groupid and g.name='%s'" DB_NODE,
@@ -287,7 +288,8 @@ void	op_run_commands(char *cmd_list)
 				run_remote_command(row[0], command);
 
 			DBfree_result(result);
-		} else
+		}
+		else
 			run_remote_command(alias, command);
 	}
 	zabbix_log( LOG_LEVEL_DEBUG, "End run_commands()");

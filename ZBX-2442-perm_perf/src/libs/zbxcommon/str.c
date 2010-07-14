@@ -32,7 +32,7 @@
  *                            in each zabbix application                      *
  *                                                                            *
  ******************************************************************************/
-static void app_title()
+static void	app_title()
 {
 	printf("%s v%s (revision %s) (%s)\n", title_message,
 			ZABBIX_VERSION, ZABBIX_REVISION, ZABBIX_REVDATE);
@@ -48,10 +48,10 @@ static void app_title()
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-void version()
+void	version()
 {
 	app_title();
-	printf("Compilation time:  %s %s\n", __DATE__, __TIME__);
+	printf("Compilation time: %s %s\n", __DATE__, __TIME__);
 }
 
 /******************************************************************************
@@ -66,7 +66,7 @@ void version()
  *                            in each zabbix application                      *
  *                                                                            *
  ******************************************************************************/
-void usage()
+void	usage()
 {
 	printf("usage: %s %s\n", progname, usage_message);
 }
@@ -84,7 +84,7 @@ void usage()
  *                            in each zabbix application                      *
  *                                                                            *
  ******************************************************************************/
-void help()
+void	help()
 {
 	const char **p = help_message;
 
@@ -109,14 +109,13 @@ void help()
  *                                                                            *
  ******************************************************************************/
 /* #define ZBX_STDERR_FILE "zbx_errors.log" */
-
-void __zbx_zbx_error(const char *fmt, ...)
+void	__zbx_zbx_error(const char *fmt, ...)
 {
-	va_list args;
-	FILE *f = NULL;
+	va_list	args;
+	FILE	*f;
 
 #if defined(ZBX_STDERR_FILE)
-	f = fopen(ZBX_STDERR_FILE,"a+");
+	f = fopen(ZBX_STDERR_FILE, "a+");
 #else
 	f = stderr;
 #endif /* ZBX_STDERR_FILE */
@@ -151,7 +150,7 @@ void __zbx_zbx_error(const char *fmt, ...)
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-int __zbx_zbx_snprintf(char* str, size_t count, const char *fmt, ...)
+int	__zbx_zbx_snprintf(char *str, size_t count, const char *fmt, ...)
 {
 	va_list	args;
 	int	writen_len = 0;
@@ -187,7 +186,7 @@ int __zbx_zbx_snprintf(char* str, size_t count, const char *fmt, ...)
  * Author: Alexei Vladishev (see also zbx_snprintf)                           *
  *                                                                            *
  ******************************************************************************/
-int zbx_vsnprintf(char* str, size_t count, const char *fmt, va_list args)
+int	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args)
 {
 	int	writen_len = 0;
 
@@ -221,7 +220,7 @@ int zbx_vsnprintf(char* str, size_t count, const char *fmt, va_list args)
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-void __zbx_zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_len, const char *fmt, ...)
+void	__zbx_zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_len, const char *fmt, ...)
 {
 	va_list	args;
 
@@ -2041,7 +2040,7 @@ int	str_in_list(char *list, const char *value, const char delimiter)
  *      maxlen - size of output buffer                                        *
  *                                                                            *
  * Return value:                                                              *
- *      1 - requested parameter missing                                        *
+ *      1 - requested parameter missing                                       *
  *      0 - requested parameter found (value - 'buf' can be empty string)     *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -2051,26 +2050,18 @@ int	str_in_list(char *list, const char *value, const char delimiter)
  ******************************************************************************/
 int	get_key_param(char *param, int num, char *buf, int maxlen)
 {
-	int	ret = 0;
-
-	char *pl, *pr;
+	int	ret;
+	char	*pl, *pr;
 
 	pl = strchr(param, '[');
 	pr = strrchr(param, ']');
 
-	if(pl > pr)
+	if (NULL == pl || NULL == pr || pl > pr)
 		return 1;
 
-	if(!pl || !pr || (pl && !pr) || (!pl && pr))
-		return 1;
-
-	if(pr != NULL)
-		pr[0] = 0;
-
-	ret = get_param(pl+1, num, buf, maxlen);
-
-	if(pr != NULL)
-		pr[0]=']';
+	*pr = '\0';
+	ret = get_param(pl + 1, num, buf, maxlen);
+	*pr = ']';
 
 	return ret;
 }
@@ -2094,35 +2085,88 @@ int	get_key_param(char *param, int num, char *buf, int maxlen)
  ******************************************************************************/
 int	num_key_param(char *param)
 {
-	int	ret = 1;
+	int	ret;
+	char	*pl, *pr;
 
-	char *pl, *pr;
-
-	if(param == NULL)
+	if (NULL == param)
 		return 0;
 
 	pl = strchr(param, '[');
 	pr = strrchr(param, ']');
 
-	if(pl > pr)
+	if (NULL == pl || NULL == pr || pl > pr)
 		return 0;
 
-	if(!pl || !pr || (pl && !pr) || (!pl && pr))
-		return 0;
-
-	if(pl != NULL)
-		pl[0] = 0;
-	if(pr != NULL)
-		pr[0] = 0;
-
-	ret = num_param(pl+1);
-
-	if(pl != NULL)
-		pl[0]='[';
-	if(pr != NULL)
-		pr[0]=']';
+	*pr = '\0';
+	ret = num_param(pl + 1);
+	*pr = ']';
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_escape_param_len                                             *
+ *                                                                            *
+ * Purpose: calculate size of buffer for escaped string                       *
+ *                                                                            *
+ * Parameters: src - [IN] source string                                       *
+ *                                                                            *
+ * Return value: size of escaped string                                       *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static size_t	get_escape_param_len(const char *src)
+{
+	size_t	sz = 1;	/* '\0' */
+
+	for (; '\0' != *src; src++)
+	{
+		if ('"' == *src)
+			sz++;
+		sz++;
+	}
+
+	return sz;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dyn_escape_param                                                 *
+ *                                                                            *
+ * Purpose: escaping source string for using in quoted key parameters         *
+ *                                                                            *
+ * Parameters: src - [IN] source string                                       *
+ *                                                                            *
+ * Return value: escaped string                                               *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+char	*dyn_escape_param(const char *src)
+{
+	size_t	sz;
+	char	*d, *dst = NULL;
+
+	sz = get_escape_param_len(src);
+
+	dst = malloc(sz);
+
+	for (d = dst; '\0' != *src; src++)
+	{
+		if ('"' == *src)
+			*d++ = '\\';
+		*d++ = *src;
+	}
+
+	*d = '\0';
+
+	return dst;
 }
 
 char	*zbx_age2str(int age)

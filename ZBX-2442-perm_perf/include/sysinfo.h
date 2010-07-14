@@ -17,7 +17,6 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-
 #ifndef ZABBIX_SYSINFO_H
 #define ZABBIX_SYSINFO_H
 
@@ -39,7 +38,6 @@ typedef struct zbx_result_s {
 #define AR_STRING	4
 #define AR_MESSAGE	8
 #define AR_TEXT		16
-
 
 /* SET RESULT */
 
@@ -130,8 +128,6 @@ typedef struct zbx_result_s {
 		if(!(exc_type & AR_TEXT))	UNSET_TEXT_RESULT(res)	\
 		if(!(exc_type & AR_MESSAGE))	UNSET_MSG_RESULT(res)	\
 	}
-
-
 
 /* RETRIEVE RESULT VALUE */
 

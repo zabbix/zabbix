@@ -35,7 +35,7 @@
 static	SERVICE_STATUS		serviceStatus;
 static	SERVICE_STATUS_HANDLE	serviceHandle;
 
-int application_status = ZBX_APP_RUNNED;
+int	application_status = ZBX_APP_RUNNING;
 
 static void	parent_signal_handler(int sig)
 {

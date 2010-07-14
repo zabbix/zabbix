@@ -183,13 +183,14 @@ include_once('include/page_header.php');
 
 			show_messages($result, S_TRIGGER_UPDATED, S_CANNOT_UPDATE_TRIGGER);
 		}
-		else {
+		else{
 			DBstart();
 			$triggerid = add_trigger($_REQUEST['expression'],$_REQUEST['description'],$type,
 				$_REQUEST['priority'],$status,$_REQUEST['comments'],$_REQUEST['url'],
 				$deps);
 			$result = DBend($triggerid);
 			show_messages($result, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
+			if($result) $_REQUEST['triggerid'] = $triggerid;
 		}
 		if($result)
 			unset($_REQUEST['form']);
@@ -449,7 +450,6 @@ include_once('include/page_header.php');
 //			$_REQUEST['triggerid'] = 0;
 		}
 	}
-
 	$options = array(
 		'groups' => array('not_proxy_hosts' => 1, 'editable' => 1),
 		'hosts' => array('templated_hosts' => 1, 'editable' => 1),
@@ -462,6 +462,7 @@ include_once('include/page_header.php');
 
 ?>
 <?php
+	$triggers_wdgt = new CWidget();
 
 	$form = new CForm(null, 'get');
 
@@ -470,22 +471,20 @@ include_once('include/page_header.php');
 		$form->addItem(new CButton('form', S_CREATE_TRIGGER));
 	}
 
-	show_table_header(S_CONFIGURATION_OF_TRIGGERS_BIG, $form);
-	echo SBR;
+	$triggers_wdgt->addPageHeader(S_CONFIGURATION_OF_TRIGGERS_BIG, $form);
 ?>
 <?php
 	if(($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['g_triggerid'])){
-		insert_mass_update_trigger_form();
+		$triggers_wdgt->addItem(insert_mass_update_trigger_form());
 	}
 	else if(isset($_REQUEST['form'])){
-		insert_trigger_form();
+		$triggers_wdgt->addItem(insert_trigger_form());
 	}
 	else if(($_REQUEST['go'] == 'copy_to') && isset($_REQUEST['g_triggerid'])){
-		insert_copy_elements_to_forms('g_triggerid');
+		$triggers_wdgt->addItem(insert_copy_elements_to_forms('g_triggerid'));
 	}
 	else{
 /* TABLE */
-		$triggers_wdgt = new CWidget();
 
 // Triggers Header
 		$r_form = new CForm(null, 'get');
@@ -504,7 +503,7 @@ include_once('include/page_header.php');
 
 		$form = new CForm('triggers.php', 'post');
 		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
-		
+
 // Header Host
 		if($_REQUEST['hostid'] > 0){
 			$tbl_header_host = get_header_host_table($_REQUEST['hostid'], array('items', 'applications', 'graphs'));
@@ -610,7 +609,7 @@ include_once('include/page_header.php');
 			}
 // } add dependencies
 
-			if($trigger['status'] != TRIGGER_STATUS_UNKNOWN) $trigger['error'] = '';
+			if($trigger['value'] != TRIGGER_VALUE_UNKNOWN) $trigger['error'] = '';
 
 			$templated = false;
 			foreach($trigger['hosts'] as $hostid => $host){
@@ -640,9 +639,6 @@ include_once('include/page_header.php');
 
 			if($trigger['status'] == TRIGGER_STATUS_DISABLED){
 				$status = new CLink(S_DISABLED, $status_link, 'disabled');
-			}
-			else if($trigger['status'] == TRIGGER_STATUS_UNKNOWN){
-				$status = new CLink(S_UNKNOWN, $status_link, 'unknown');
 			}
 			else if($trigger['status'] == TRIGGER_STATUS_ENABLED){
 				$status = new CLink(S_ENABLED, $status_link, 'enabled');
@@ -705,9 +701,9 @@ include_once('include/page_header.php');
 
 		$form->addItem($table);
 		$triggers_wdgt->addItem($form);
-		$triggers_wdgt->show();
 	}
 
+	$triggers_wdgt->show();
 ?>
 <?php
 

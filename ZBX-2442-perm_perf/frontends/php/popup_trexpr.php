@@ -327,7 +327,7 @@ function InsertText(obj, value){
 <?php
 
 	if(isset($_REQUEST['insert'])){
-		$expression = sprintf("{%s:%s.%s(%s%s)}%s%s",
+		$expression = sprintf('{%s:%s.%s(%s%s)}%s%s',
 			$item_host,
 			$item_data['key_'],
 			$function,
@@ -370,6 +370,7 @@ if(form){
 		));
 
 	$cmbFnc = new CComboBox('expr_type', $expr_type	, 'submit()');
+	$cmbFnc->addStyle('width: auto;');
 	foreach($functions as  $id => $f){
 		foreach($f['operators'] as $op => $txt_op){
 			$cmbFnc->addItem($id.'['.$op.']', str_replace('{OP}', $txt_op, $f['description']));

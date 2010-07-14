@@ -74,6 +74,7 @@ class CHistory extends CZBXAPI{
 // filter
 			'filter'				=> null,
 			'pattern'				=> null,
+			'startPattern'			=> null,
 			'excludePattern'		=> null,
 			'time_from'				=> null,
 			'time_till'				=> null,
@@ -122,7 +123,7 @@ class CHistory extends CZBXAPI{
 				'preservekeys' => 1
 			);
 			if(!is_null($options['itemids'])) $itemOptions['itemids'] = $options['itemids'];
-			$items = CItem::get($options);
+			$items = CItem::get($itemOptions);
 
 			$options['itemids'] = array_keys($items);
 		}
@@ -179,12 +180,15 @@ class CHistory extends CZBXAPI{
 		}
 
 // pattern
-		if(!is_null($options['pattern'])){
-			$sql_parts['where']['value'] = ' UPPER(h.value) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
-		}
-// excludePattern
-		if(!is_null($options['excludePattern'])){
-			$sql_parts['where']['value'] = ' UPPER(h.value) NOT LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
+		if(!zbx_empty($options['pattern'])){
+			$exclude = is_null($options['excludePattern'])?'':' NOT ';
+
+			if(!is_null($options['startPattern'])){
+				$sql_parts['where']['value'] = ' UPPER(h.value) '.$exclude.' LIKE '.zbx_dbstr(zbx_strtoupper($options['pattern']).'%');
+			}
+			else{
+				$sql_parts['where']['value'] = ' UPPER(h.value) '.$exclude.' LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
+			}
 		}
 
 // output
@@ -259,7 +263,7 @@ class CHistory extends CZBXAPI{
 				' WHERE '.$sql_where.
 				$sql_order;
 		$db_res = DBselect($sql, $sql_limit);
-// SDI($sql);
+ //SDI($sql);
 		$count = 0;
 		$group = array();
 		while($data = DBfetch($db_res)){

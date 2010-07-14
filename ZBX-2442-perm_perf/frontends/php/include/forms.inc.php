@@ -226,7 +226,7 @@
 
 		$sql = 'SELECT hostid,host '.
 				' FROM hosts'.
-				' WHERE status IN ('.HOST_STATUS_PROXY.') '.
+				' WHERE status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.') '.
 					' AND '.DBin_node('hostid').
 				' ORDER BY host';
 		$db_proxies = DBselect($sql);
@@ -293,9 +293,9 @@
 				$external_param->addRow(array(S_SNMPV3_SECURITY_NAME, new CTextBox('new_check_snmpv3_securityname', $new_check_snmpv3_securityname)));
 
 				$cmbSecLevel = new CComboBox('new_check_snmpv3_securitylevel', $new_check_snmpv3_securitylevel);
-				$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,'NoAuthPriv');
-				$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,'AuthNoPriv');
-				$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV,'AuthPriv');
+				$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,'noAuthNoPriv');
+				$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,'authNoPriv');
+				$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV,'authPriv');
 
 				$external_param->addRow(array(S_SNMPV3_SECURITY_LEVEL, $cmbSecLevel));
 				$external_param->addRow(array(S_SNMPV3_AUTH_PASSPHRASE, new CTextBox('new_check_snmpv3_authpassphrase', $new_check_snmpv3_authpassphrase)));
@@ -437,7 +437,7 @@
 			new CButton('select_app',S_SELECT,
 				'return PopUp("popup.php?dstfrm='.$form->getName().
 				'&dstfld1=application&srctbl=applications'.
-				'&srcfld1=name&only_hostid='.$_REQUEST['hostid'].'",200,300,"application");')
+				'&srcfld1=name&only_hostid='.$_REQUEST['hostid'].'",500,600,"application");')
 			));
 
 		$form->addRow(S_NAME, new CTextBox('name', $name, 40));
@@ -951,9 +951,8 @@
 
 // Insert form for User Groups
 	function insert_usergroups_form(){
-		$config = select_config();
-
 		$frm_title = S_USER_GROUP;
+		
 		if(isset($_REQUEST['usrgrpid'])){
 			$usrgrp		= CUserGroup::get(array('usrgrpids' => $_REQUEST['usrgrpid'],  'extendoutput' => 1));
 			$usrgrp = reset($usrgrp);
@@ -1013,7 +1012,6 @@
 
 		$frmUserG = new CFormTable($frm_title,'usergrps.php');
 		$frmUserG->setHelp('web.users.groups.php');
-		$frmUserG->addVar('config',get_request('config',1));
 
 		if(isset($_REQUEST['usrgrpid'])){
 			$frmUserG->addVar('usrgrpid',$_REQUEST['usrgrpid']);
@@ -1167,14 +1165,14 @@
 			$frmUserG->addSpanRow(get_rights_of_elements_table($group_rights));
 		}
 
-		$frmUserG->addItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["usrgrpid"])){
+		$frmUserG->addItemToBottomRow(new CButton('save',S_SAVE));
+		if(isset($_REQUEST['usrgrpid'])){
 			$frmUserG->addItemToBottomRow(SPACE);
-			$frmUserG->addItemToBottomRow(new CButtonDelete("Delete selected group?",
-				url_param("form").url_param("config").url_param("usrgrpid")));
+			$frmUserG->addItemToBottomRow(new CButtonDelete('Delete selected group?',
+				url_param('form').url_param('usrgrpid')));
 		}
 		$frmUserG->addItemToBottomRow(SPACE);
-		$frmUserG->addItemToBottomRow(new CButtonCancel(url_param("config")));
+		$frmUserG->addItemToBottomRow(new CButtonCancel());
 
 		return($frmUserG);
 	}
@@ -1309,6 +1307,7 @@
 		$filter_type			= $_REQUEST['filter_type'];
 		$filter_key			= $_REQUEST['filter_key'];
 		$filter_snmp_community		= $_REQUEST['filter_snmp_community'];
+		$filter_snmpv3_securityname	= $_REQUEST['filter_snmpv3_securityname'];
 		$filter_snmp_oid		= $_REQUEST['filter_snmp_oid'];
 		$filter_snmp_port		= $_REQUEST['filter_snmp_port'];
 		$filter_value_type		= $_REQUEST['filter_value_type'];
@@ -1319,7 +1318,6 @@
 		$filter_status			= $_REQUEST['filter_status'];
 		$filter_templated_items		= $_REQUEST['filter_templated_items'];
 		$filter_with_triggers		= $_REQUEST['filter_with_triggers'];
-
 // subfilter
 		$subfilter_hosts		= $_REQUEST['subfilter_hosts'];
 		$subfilter_apps			= $_REQUEST['subfilter_apps'];
@@ -1419,7 +1417,7 @@
 				unset($vItem);
 			}
 
-			if(uint_in_array($it, array(ITEM_TYPE_SNMPV1,ITEM_TYPE_SNMPV2C,ITEM_TYPE_SNMPV3))){
+			if(uint_in_array($it, array(ITEM_TYPE_SNMPV1,ITEM_TYPE_SNMPV2C))){
 				$snmp_types = array(
 					'filter_snmp_community_label', 'filter_snmp_community',
 					'filter_snmp_oid_label', 'filter_snmp_oid',
@@ -1430,50 +1428,63 @@
 					zbx_subarray_push($fTypeVisibility, $it, $vItem);
 				}
 			}
+
+			if($it == ITEM_TYPE_SNMPV3){
+				foreach(array(
+					'filter_snmpv3_securityname_label', 'filter_snmpv3_securityname',
+					'filter_snmp_oid_label', 'filter_snmp_oid',
+					'filter_snmp_port_label', 'filter_snmp_port'
+				) as $vItem)
+				zbx_subarray_push($fTypeVisibility, $it, $vItem);
+	unset($vItem);
+		}
 		}
 
 		zbx_add_post_js("var filterTypeSwitcher = new CViewSwitcher('filter_type', new Array('keyup','click','change'), ".zbx_jsvalue($fTypeVisibility, true).");");
 		$col21 = new CCol(bold(S_TYPE.': '));
-		$col21->setAttribute('style', 'width: 160px');
+		$col21->setAttribute('style', 'width: 170px');
 
 		$col_table2->addRow(array($col21, $cmbType));
 	//second row
-		$label221 = new CSpan(bold(S_UPDATE_INTERVAL_IN_SEC.': '), 'hidden');
+		$label221 = new CSpan(bold(S_UPDATE_INTERVAL_IN_SEC.': '));
 		$label221->setAttribute('id', 'filter_delay_label');
 
 		$field221 = new CNumericBox('filter_delay', $filter_delay, 5, null, true);
-		$field221->setAttribute('id', 'filter_delay');
-		$field221->setClass('biginput hidden');
+		//$field221->setAttribute('id', 'filter_delay');
 		$field221->setEnabled('no');
 
 		$col_table2->addRow(array(array($label221, SPACE), array($field221, SPACE)));
 	//third row
-		$label231 = new CSpan(array(bold(S_SNMP_COMMUNITY), SPACE.S_LIKE_SMALL.': '), 'hidden');
+		$label231 = new CSpan(array(bold(S_SNMP_COMMUNITY), SPACE.S_LIKE_SMALL.': '));
 		$label231->setAttribute('id', 'filter_snmp_community_label');
 
-		$field231 = new CTextBox('filter_snmp_community', $filter_snmp_community, 16);
-		$field231->setAttribute('id', 'filter_snmp_community');
-		$field231->setClass('biginput hidden');
+		$field231 = new CTextBox('filter_snmp_community', $filter_snmp_community, 40);
+		//$field231->setAttribute('id', 'filter_snmp_community');
 		$field231->setEnabled('no');
 
-		$col_table2->addRow(array(array($label231, SPACE), array($field231, SPACE)));
+		$label232 = new CSpan(array(bold(S_SNMPV3_SECURITY_NAME), SPACE.S_LIKE_SMALL.': '));
+		$label232->setAttribute('id', 'filter_snmpv3_securityname_label');
+
+		$field232 = new CTextBox('filter_snmpv3_securityname', $filter_snmpv3_securityname, 40);
+		//$field232->setAttribute('id', 'filter_snmpv3_securityname');
+		$field232->setEnabled('no');
+
+		$col_table2->addRow(array(array($label231, $label232, SPACE), array($field231, $field232, SPACE)));
 	//fourth row
-		$label241 = new CSpan(array(bold(S_SNMP_OID), SPACE.S_LIKE_SMALL.': '), 'hidden');
+		$label241 = new CSpan(array(bold(S_SNMP_OID), SPACE.S_LIKE_SMALL.': '));
 		$label241->setAttribute('id', 'filter_snmp_oid_label');
 
 		$field241 = new CTextBox('filter_snmp_oid', $filter_snmp_oid, 40);
-		$field241->setAttribute('id', 'filter_snmp_oid');
-		$field241->setClass('biginput hidden');
+		//$field241->setAttribute('id', 'filter_snmp_oid');
 		$field241->setEnabled('no');
 
 		$col_table2->addRow(array(array($label241, SPACE), array($field241, SPACE)));
 	//fifth row
-		$label251 = new CSpan(array(bold(S_SNMP_OID), SPACE.S_LIKE_SMALL.': '), 'hidden');
+		$label251 = new CSpan(array(bold(S_SNMP_PORT), SPACE.S_LIKE_SMALL.': '));
 		$label251->setAttribute('id', 'filter_snmp_port_label');
 
 		$field251 = new CNumericBox('filter_snmp_port', $filter_snmp_port, 5 ,null, true);
-		$field251->setAttribute('id', 'filter_snmp_port');
-		$field251->setClass('biginput hidden');
+		//$field251->setAttribute('id', 'filter_snmp_port');
 		$field251->setEnabled('no');
 
 		$col_table2->addRow(array(array($label251, SPACE), array($field251, SPACE)));
@@ -1497,7 +1508,7 @@
 
 		zbx_add_post_js("var filterValueTypeSwitcher = new CViewSwitcher('filter_value_type', new Array('keyup','click','change'), ".zbx_jsvalue($fVTypeVisibility, true).");");
 //second row
-		$label321 = new CSpan(bold(S_DATA_TYPE.': '), 'hidden');
+		$label321 = new CSpan(bold(S_DATA_TYPE.': '));
 		$label321->setAttribute('id', 'filter_data_type_label');
 
 		$field321 = new CComboBox('filter_data_type', $filter_data_type);//, 'submit()');
@@ -1505,8 +1516,7 @@
 		$field321->addItem(ITEM_DATA_TYPE_DECIMAL, item_data_type2str(ITEM_DATA_TYPE_DECIMAL));
 		$field321->addItem(ITEM_DATA_TYPE_OCTAL, item_data_type2str(ITEM_DATA_TYPE_OCTAL));
 		$field321->addItem(ITEM_DATA_TYPE_HEXADECIMAL, item_data_type2str(ITEM_DATA_TYPE_HEXADECIMAL));
-		$field321->setAttribute('id', 'filter_data_type');
-		$field321->setClass('biginput hidden');
+		//$field321->setAttribute('id', 'filter_data_type');
 		$field321->setEnabled('no');
 
 		$col_table3->addRow(array(array($label321, SPACE), array($field321, SPACE)));
@@ -1541,11 +1551,10 @@
 		$col1 = new CCol($col_table1, 'top');
 		$col1->setAttribute('style', 'width: 280px');
 		$col2 = new CCol($col_table2, 'top');
-		$col2->setAttribute('style', 'width: 390px');
+		$col2->setAttribute('style', 'width: 410px');
 		$col3 = new CCol($col_table3, 'top');
 		$col3->setAttribute('style', 'width: 160px');
 		$col4 = new CCol($col_table4, 'top');
-		//$col4->setWidt;
 
 		$table->addRow(array($col1, $col2, $col3, $col4));
 
@@ -1571,7 +1580,6 @@
 		$table_subfilter = new Ctable();
 		$table_subfilter->setClass('filter');
 
-
 // array contains subfilters and number of items in each
 		$item_params = array(
 			'hosts' => array(),
@@ -1592,9 +1600,9 @@
 // hosts
 				$host = reset($item['hosts']);
 
-				if(!isset($item_params['hosts'][$host['hostid']])){
+				if(!isset($item_params['hosts'][$host['hostid']]))
 					$item_params['hosts'][$host['hostid']] = array('name' => $host['host'], 'count' => 0);
-				}
+
 				$show_item = true;
 				foreach($item['subfilters'] as $name => $value){
 					if($name == 'subfilter_hosts') continue;
@@ -1833,52 +1841,69 @@
 		global $USER_DETAILS;
 
 		$frmItem = new CFormTable(S_ITEM, 'items.php', 'post');
+		$frmItem->setAttribute('style','visibility: hidden;');
 		$frmItem->setHelp('web.items.item.php');
 
 		$hostid = get_request('form_hostid', 0);
 
-		$description		= get_request('description','');
+		$description		= get_request('description',		'');
 		$key				= get_request('key',		'');
 		$host				= get_request('host',		null);
 		$delay				= get_request('delay',		30);
 		$history			= get_request('history',	90);
 		$status				= get_request('status',		0);
 		$type				= get_request('type',		0);
-		$snmp_community		= get_request('snmp_community' ,'public');
+		$snmp_community		= get_request('snmp_community',		'public');
 		$snmp_oid			= get_request('snmp_oid',	'interfaces.ifTable.ifEntry.ifInOctets.1');
 		$snmp_port			= get_request('snmp_port',	161);
 		$value_type			= get_request('value_type',	ITEM_VALUE_TYPE_UINT64);
 		$data_type			= get_request('data_type',	ITEM_DATA_TYPE_DECIMAL);
-		$trapper_hosts		= get_request('trapper_hosts'	,'');
+		$trapper_hosts		= get_request('trapper_hosts',		'');
 		$units				= get_request('units',		'');
 		$valuemapid			= get_request('valuemapid',	0);
 		$params				= get_request('params',		'');
 		$multiplier			= get_request('multiplier',	0);
 		$delta				= get_request('delta',		0);
 		$trends				= get_request('trends',		365);
-		$new_application	= get_request('new_application','');
-		$applications		= get_request('applications',array());
-		$delay_flex			= get_request('delay_flex'	,array());
+		$new_application	= get_request('new_application',	'');
+		$applications		= get_request('applications',		array());
+		$delay_flex		= get_request('delay_flex',		array());
 
-		$snmpv3_securityname	= get_request('snmpv3_securityname'	,'');
-		$snmpv3_securitylevel	= get_request('snmpv3_securitylevel'	,0);
-		$snmpv3_authpassphrase	= get_request('snmpv3_authpassphrase'	,'');
-		$snmpv3_privpassphrase	= get_request('snmpv3_privpassphrase'	,'');
-		$ipmi_sensor		= get_request('ipmi_sensor'		,'');
-		$authtype		= get_request('authtype'		,0);
-		$username		= get_request('username'		,'');
-		$password		= get_request('password'		,'');
-		$publickey		= get_request('publickey'		,'');
-		$privatekey		= get_request('privatekey'		,'');
+		$snmpv3_securityname	= get_request('snmpv3_securityname',	'');
+		$snmpv3_securitylevel	= get_request('snmpv3_securitylevel',	0);
+		$snmpv3_authpassphrase	= get_request('snmpv3_authpassphrase',	'');
+		$snmpv3_privpassphrase	= get_request('snmpv3_privpassphrase',	'');
+		$ipmi_sensor		= get_request('ipmi_sensor',		'');
+		$authtype		= get_request('authtype',		0);
+		$username		= get_request('username',		'');
+		$password		= get_request('password',		'');
+		$publickey		= get_request('publickey',		'');
+		$privatekey		= get_request('privatekey',		'');
 
-		$formula	= get_request('formula'		,'1');
-		$logtimefmt	= get_request('logtimefmt'	,'');
+		$formula		= get_request('formula',		'1');
+		$logtimefmt		= get_request('logtimefmt',		'');
 
 		$add_groupid	= get_request('add_groupid', get_request('groupid', 0));
 
 		$limited = null;
+		$types = array(
+				ITEM_TYPE_ZABBIX,
+				ITEM_TYPE_ZABBIX_ACTIVE,
+				ITEM_TYPE_SIMPLE,
+				ITEM_TYPE_SNMPV1,
+				ITEM_TYPE_SNMPV2C,
+				ITEM_TYPE_SNMPV3,
+				ITEM_TYPE_INTERNAL,
+				ITEM_TYPE_TRAPPER,
+				ITEM_TYPE_AGGREGATE,
+				ITEM_TYPE_EXTERNAL,
+				ITEM_TYPE_DB_MONITOR,
+				ITEM_TYPE_IPMI,
+				ITEM_TYPE_SSH,
+				ITEM_TYPE_TELNET,
+				ITEM_TYPE_CALCULATED);
 
-		switch ($type) {
+/*		switch ($type) {
 		case ITEM_TYPE_DB_MONITOR:
 			if (zbx_empty($key) || $key == 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]' ||
 					$key == 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]')
@@ -1908,7 +1933,7 @@
 			if (0 == strncmp($params, "DSN=<database source name>", 26))
 				$params = '';
 			break;
-		}
+		}*/
 
 		if(isset($_REQUEST['itemid'])){
 			$frmItem->addVar('itemid', $_REQUEST['itemid']);
@@ -1922,6 +1947,7 @@
 
 			$hostid	= ($hostid > 0) ? $hostid : $item_data['hostid'];
 			$limited = (($item_data['templateid'] == 0)  && ($item_data['type'] != ITEM_TYPE_HTTPTEST)) ? null : 'yes';
+			$item_data['snmp_port'] = $item_data['snmp_port'] == '0' ? 161 : $item_data['snmp_port'];
 		}
 
 		if(is_null($host)){
@@ -1934,11 +1960,9 @@
 				$host_info = CHost::get($options);
 				$host_info = reset($host_info);
 				$host = $host_info['host'];
-			}
-			else{
+			} else
 				$host = S_NOT_SELECTED_SMALL;
 			}
-		}
 
 		if((isset($_REQUEST['itemid']) && !isset($_REQUEST['form_refresh'])) || isset($limited)){
 			$description		= $item_data['description'];
@@ -1989,7 +2013,7 @@
 						$arr_of_delay = explode('/',$one_db_delay);
 						if(!isset($arr_of_delay[0]) || !isset($arr_of_delay[1])) continue;
 
-						array_push($delay_flex,array('delay'=>$arr_of_delay[0],'period'=>$arr_of_delay[1]));
+						array_push($delay_flex, array('delay'=> $arr_of_delay[0], 'period'=> $arr_of_delay[1]));
 					}
 				}
 
@@ -1997,35 +2021,40 @@
 			}
 		}
 
+		$valueTypeVisibility = array();
+		$authTypeVisibility = array();
+		$typeVisibility = array();
 		$delay_flex_el = array();
 
-		if($type != ITEM_TYPE_TRAPPER && $type != ITEM_TYPE_HTTPTEST){
+		//if($type != ITEM_TYPE_TRAPPER){
 			$i = 0;
 			foreach($delay_flex as $val){
 				if(!isset($val['delay']) && !isset($val['period'])) continue;
 
 				array_push($delay_flex_el,
 					array(
-						new CCheckBox('rem_delay_flex[]', 'no', null,$i),
+						new CCheckBox('rem_delay_flex['.$i.']', 'no', null,$i),
 							$val['delay'],
 							' sec at ',
-							$val['period']
-					),
+						$val['period']),
 					BR());
 				$frmItem->addVar('delay_flex['.$i.'][delay]', $val['delay']);
 				$frmItem->addVar('delay_flex['.$i.'][period]', $val['period']);
+				foreach($types as $it) {
+					if($it == ITEM_TYPE_TRAPPER || $it == ITEM_TYPE_ZABBIX_ACTIVE) continue;
+					zbx_subarray_push($typeVisibility, $it, 'delay_flex['.$i.'][delay]');
+					zbx_subarray_push($typeVisibility, $it, 'delay_flex['.$i.'][period]');
+					zbx_subarray_push($typeVisibility, $it, 'rem_delay_flex['.$i.']');
+				}
 				$i++;
 				if($i >= 7) break;	/* limit count of  intervals
 							* 7 intervals by 30 symbols = 210 characters
 							* db storage field is 256
 							*/
 			}
-		}
+		//}
 
-		if(count($delay_flex_el)==0)
-			array_push($delay_flex_el, S_NO_FLEXIBLE_INTERVALS);
-		else
-			array_push($delay_flex_el, new CButton('del_delay_flex',S_DELETE_SELECTED));
+		array_push($delay_flex_el, count($delay_flex_el)==0 ? S_NO_FLEXIBLE_INTERVALS : new CButton('del_delay_flex',S_DELETE_SELECTED));
 
 		if(count($applications)==0) array_push($applications, 0);
 
@@ -2059,10 +2088,8 @@
 			$caption[] = $item_data['description'];
 			$caption[] = '"';
 			$frmItem->setTitle($caption);
-		}
-		else{
+		}else
 			$frmItem->setTitle(S_ITEM." $host : $description");
-		}
 
 		$frmItem->addVar('form_hostid', $hostid);
 		$frmItem->addRow(S_HOST,array(
@@ -2078,105 +2105,263 @@
 		if(isset($limited)){
 			$frmItem->addRow(S_TYPE,  new CTextBox('typename', item_type2str($type), 40, 'yes'));
 			$frmItem->addVar('type', $type);
-		}
-		else{
-			$cmbType = new CComboBox('type',$type,'submit()');
-			foreach(array(ITEM_TYPE_ZABBIX,ITEM_TYPE_ZABBIX_ACTIVE,ITEM_TYPE_SIMPLE,
-				ITEM_TYPE_SNMPV1,ITEM_TYPE_SNMPV2C,ITEM_TYPE_SNMPV3,ITEM_TYPE_TRAPPER,
-				ITEM_TYPE_INTERNAL,ITEM_TYPE_AGGREGATE,ITEM_TYPE_EXTERNAL,
-				ITEM_TYPE_DB_MONITOR,ITEM_TYPE_IPMI,ITEM_TYPE_SSH,ITEM_TYPE_TELNET,
-				ITEM_TYPE_CALCULATED) as $it)
-					$cmbType->addItem($it,item_type2str($it));
+		}else{
+			$cmbType = new CComboBox('type',$type);
+			foreach($types as $it) $cmbType->addItem($it,item_type2str($it));
 			$frmItem->addRow(S_TYPE, $cmbType);
 		}
 
-		if(($type==ITEM_TYPE_SNMPV1)||($type==ITEM_TYPE_SNMPV2C)){
-			$frmItem->addVar('snmpv3_securityname',$snmpv3_securityname);
-			$frmItem->addVar('snmpv3_securitylevel',$snmpv3_securitylevel);
-			$frmItem->addVar('snmpv3_authpassphrase',$snmpv3_authpassphrase);
-			$frmItem->addVar('snmpv3_privpassphrase',$snmpv3_privpassphrase);
+		//if(($type==ITEM_TYPE_SNMPV1)||($type==ITEM_TYPE_SNMPV2C)){
+			//$frmItem->addVar('snmpv3_securityname',$snmpv3_securityname);
+			//$frmItem->addVar('snmpv3_securitylevel',$snmpv3_securitylevel);
+			//$frmItem->addVar('snmpv3_authpassphrase',$snmpv3_authpassphrase);
+			//$frmItem->addVar('snmpv3_privpassphrase',$snmpv3_privpassphrase);
 
-			$frmItem->addRow(S_SNMP_OID, new CTextBox('snmp_oid',$snmp_oid,40,$limited));
-			$frmItem->addRow(S_SNMP_COMMUNITY, new CTextBox('snmp_community',$snmp_community,16));
-			$frmItem->addRow(S_SNMP_PORT, new CNumericBox('snmp_port',$snmp_port,5));
-		}
-		else if($type==ITEM_TYPE_SNMPV3){
-			$frmItem->addVar('snmp_community',$snmp_community);
+		$row = new CRow(array(new CCol(S_SNMP_OID,'form_row_l'), new CCol(new CTextBox('snmp_oid',$snmp_oid,40,$limited), 'form_row_r')));
+		$row->setAttribute('id', 'row_snmp_oid');
+		$frmItem->addRow($row);
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV1, 'snmp_oid');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV2C, 'snmp_oid');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'snmp_oid');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV1, 'row_snmp_oid');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV2C, 'row_snmp_oid');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'row_snmp_oid');
 
-			$frmItem->addRow(S_SNMP_OID, new CTextBox('snmp_oid',$snmp_oid,40,$limited));
+		$row = new CRow(array(new CCol(S_SNMP_COMMUNITY,'form_row_l'), new CCol(new CTextBox('snmp_community',$snmp_community,16), 'form_row_r')));
+		$row->setAttribute('id', 'row_snmp_community');
+		$frmItem->addRow($row);
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV1, 'snmp_community');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV2C, 'snmp_community');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV1, 'row_snmp_community');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV2C, 'row_snmp_community');
 
-			$frmItem->addRow(S_SNMPV3_SECURITY_NAME, new CTextBox('snmpv3_securityname',$snmpv3_securityname,64));
+		$row = new CRow(array(new CCol(S_SNMPV3_SECURITY_NAME,'form_row_l'), new CCol(new CTextBox('snmpv3_securityname',$snmpv3_securityname,64), 'form_row_r')));
+		$row->setAttribute('id', 'row_snmpv3_securityname');
+		$frmItem->addRow($row);
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'snmpv3_securityname');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'row_snmpv3_securityname');
 
-			$cmbSecLevel = new CComboBox('snmpv3_securitylevel',$snmpv3_securitylevel);
-				$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,'NoAuthPriv');
-				$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,'AuthNoPriv');
-				$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV,'AuthPriv');
-			$frmItem->addRow(S_SNMPV3_SECURITY_LEVEL, $cmbSecLevel);
+		$cmbSecLevel = new CComboBox('snmpv3_securitylevel', $snmpv3_securitylevel);
+		$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,'noAuthPriv');
+		$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,'authNoPriv');
+		$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV,'authPriv');
 
-			$frmItem->addRow(S_SNMPV3_AUTH_PASSPHRASE, new CTextBox('snmpv3_authpassphrase',$snmpv3_authpassphrase,64));
+		$row = new CRow(array(new CCol(S_SNMPV3_SECURITY_LEVEL,'form_row_l'), new CCol($cmbSecLevel, 'form_row_r')));
+		$row->setAttribute('id', 'row_snmpv3_securitylevel');
+		$frmItem->addRow($row);
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'snmpv3_securitylevel');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'row_snmpv3_securitylevel');
 
-			$frmItem->addRow(S_SNMPV3_PRIV_PASSPHRASE, new CTextBox('snmpv3_privpassphrase',$snmpv3_privpassphrase,64));
+		$row = new CRow(array(new CCol(S_SNMPV3_AUTH_PASSPHRASE,'form_row_l'), new CCol(new CTextBox('snmpv3_authpassphrase',$snmpv3_authpassphrase,64), 'form_row_r')));
+		$row->setAttribute('id', 'row_snmpv3_authpassphrase');
+		$frmItem->addRow($row);
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'snmpv3_authpassphrase');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'row_snmpv3_authpassphrase');
 
-			$frmItem->addRow(S_SNMP_PORT, new CNumericBox('snmp_port',$snmp_port,5));
-		}
-		else{
-			$frmItem->addVar('snmp_community',$snmp_community);
-			$frmItem->addVar('snmp_oid',$snmp_oid);
-			$frmItem->addVar('snmp_port',$snmp_port);
-			$frmItem->addVar('snmpv3_securityname',$snmpv3_securityname);
-			$frmItem->addVar('snmpv3_securitylevel',$snmpv3_securitylevel);
-			$frmItem->addVar('snmpv3_authpassphrase',$snmpv3_authpassphrase);
-			$frmItem->addVar('snmpv3_privpassphrase',$snmpv3_privpassphrase);
-		}
+		$row = new CRow(array(new CCol(S_SNMPV3_PRIV_PASSPHRASE,'form_row_l'), new CCol(new CTextBox('snmpv3_privpassphrase',$snmpv3_privpassphrase,64), 'form_row_r')));
+		$row->setAttribute('id', 'row_snmpv3_privpassphrase');
+		$frmItem->addRow($row);
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'snmpv3_privpassphrase');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'row_snmpv3_privpassphrase');
 
-		if ($type == ITEM_TYPE_IPMI)
-		{
-			$frmItem->addRow(S_IPMI_SENSOR, new CTextBox('ipmi_sensor', $ipmi_sensor, 64, $limited));
-		}
-		else
-		{
-			$frmItem->addVar('ipmi_sensor', $ipmi_sensor);
-		}
+		$row = new CRow(array(new CCol(S_SNMP_PORT,'form_row_l'), new CCol(new CNumericBox('snmp_port',$snmp_port,5), 'form_row_r')));
+		$row->setAttribute('id', 'row_snmp_port');
+		$frmItem->addRow($row);
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV1, 'snmp_port');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV2C, 'snmp_port');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'snmp_port');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV1, 'row_snmp_port');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV2C, 'row_snmp_port');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'row_snmp_port');
+		//}elseif($type==ITEM_TYPE_SNMPV3){
+			//$frmItem->addVar('snmp_community',$snmp_community);
 
-		if(isset($limited)){
+		//$frmItem->addRow(S_SNMPV3_SECURITY_NAME, new CTextBox('snmpv3_securityname',$snmpv3_securityname,64));
+
+		//$cmbSecLevel = new CComboBox('snmpv3_securitylevel',$snmpv3_securitylevel);
+		//$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,'NoAuthPriv');
+		//$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,'AuthNoPriv');
+		//$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV,'AuthPriv');
+
+		//$frmItem->addRow(S_SNMPV3_SECURITY_LEVEL, $cmbSecLevel);
+
+		//$frmItem->addRow(S_SNMPV3_AUTH_PASSPHRASE, new CTextBox('snmpv3_authpassphrase',$snmpv3_authpassphrase,64));
+
+		//$frmItem->addRow(S_SNMPV3_PRIV_PASSPHRASE, new CTextBox('snmpv3_privpassphrase',$snmpv3_privpassphrase,64));
+
+		//$frmItem->addRow(S_SNMP_PORT, new CNumericBox('snmp_port',$snmp_port,5));
+//		}else{
+//			$frmItem->addVar('snmp_community',$snmp_community);
+//			$frmItem->addVar('snmp_oid',$snmp_oid);
+//			$frmItem->addVar('snmp_port',$snmp_port);
+//			$frmItem->addVar('snmpv3_securityname',$snmpv3_securityname);
+//			$frmItem->addVar('snmpv3_securitylevel',$snmpv3_securitylevel);
+//			$frmItem->addVar('snmpv3_authpassphrase',$snmpv3_authpassphrase);
+//			$frmItem->addVar('snmpv3_privpassphrase',$snmpv3_privpassphrase);
+//		}
+
+		$row = new CRow(array(new CCol(S_IPMI_SENSOR,'form_row_l'), new CCol(new CTextBox('ipmi_sensor', $ipmi_sensor, 64, $limited),'form_row_r')));
+		$row->setAttribute('id', 'row_ipmi_sensor');
+		$frmItem->addRow($row);
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_IPMI, 'ipmi_sensor');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_IPMI, 'row_ipmi_sensor');
+
+		//if ($type == ITEM_TYPE_IPMI)
+			//$frmItem->addRow(S_IPMI_SENSOR, new CTextBox('ipmi_sensor', $ipmi_sensor, 64, $limited));
+		//else
+			//$frmItem->addVar('ipmi_sensor', $ipmi_sensor);
+
+		if(isset($limited))
 			$btnSelect = null;
-		}
-		else{
+		else
 			$btnSelect = new CButton('btn1',S_SELECT,
 				"return PopUp('popup.php?dstfrm=".$frmItem->getName().
 				"&dstfld1=key&srctbl=help_items&srcfld1=key_&itemtype=".$type."');",
 				'T');
-		}
 
 		$frmItem->addRow(S_KEY, array(new CTextBox('key',$key,40,$limited), $btnSelect));
+		foreach($types as $it) {
+			switch($it) {
+				case ITEM_TYPE_DB_MONITOR:
+					zbx_subarray_push($typeVisibility, $it, Array('id' => 'key', 'defaultValue' => 'db.odbc.select[<unique short description>]'));
+				break;
+				case ITEM_TYPE_SSH:
+					zbx_subarray_push($typeVisibility, $it, Array('id' => 'key', 'defaultValue' => 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]'));
+				break;
+				case ITEM_TYPE_TELNET:
+					zbx_subarray_push($typeVisibility, $it, Array('id' => 'key', 'defaultValue' => 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]'));
+				break;
+				default:
+					zbx_subarray_push($typeVisibility, $it, 'key');
+			}
+		}
+		/*
+		ITEM_TYPE_DB_MONITOR $key = 'db.odbc.select[<unique short description>]'; $params = "DSN=<database source name>\nuser=<user name>\npassword=<password>\nsql=<query>";
+		ITEM_TYPE_SSH $key = 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]'; $params = '';
+		ITEM_TYPE_TELNET $key = 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]'; $params = '';
+		ITEM_TYPE_CALCULATED $key = ''; $params = '';
+		*/
 
-		if (ITEM_TYPE_SSH == $type) {
+		$cmbAuthType = new CComboBox('authtype', $authtype);
+		$cmbAuthType->addItem(ITEM_AUTHTYPE_PASSWORD,S_PASSWORD);
+		$cmbAuthType->addItem(ITEM_AUTHTYPE_PUBLICKEY,S_PUBLIC_KEY);
+
+		$row = new CRow(array(new CCol(S_AUTHENTICATION_METHOD,'form_row_l'), new CCol($cmbAuthType,'form_row_r')));
+		$row->setAttribute('id', 'row_authtype');
+		$frmItem->addRow($row);
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'authtype');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'row_authtype');
+
+		$row = new CRow(array(new CCol(S_USER_NAME,'form_row_l'), new CCol(new CTextBox('username',$username,16),'form_row_r')));
+		$row->setAttribute('id', 'row_username');
+		$frmItem->addRow($row);
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'username');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'row_username');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'username');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'row_username');
+
+		$row = new CRow(array(new CCol(S_PUBLIC_KEY_FILE,'form_row_l'), new CCol(new CTextBox('publickey',$publickey,16),'form_row_r')));
+		$row->setAttribute('id', 'row_publickey');
+		$frmItem->addRow($row);
+		zbx_subarray_push($authTypeVisibility, ITEM_AUTHTYPE_PUBLICKEY, 'publickey');
+		zbx_subarray_push($authTypeVisibility, ITEM_AUTHTYPE_PUBLICKEY, 'row_publickey');
+
+		$row = new CRow(array(new CCol(S_PRIVATE_KEY_FILE,'form_row_l'), new CCol(new CTextBox('privatekey',$privatekey,16),'form_row_r')));
+		$row->setAttribute('id', 'row_privatekey');
+		$frmItem->addRow($row);
+		zbx_subarray_push($authTypeVisibility, ITEM_AUTHTYPE_PUBLICKEY, 'privatekey');
+		zbx_subarray_push($authTypeVisibility, ITEM_AUTHTYPE_PUBLICKEY, 'row_privatekey');
+
+		$row = new CRow(array(new CCol(S_PASSWORD,'form_row_l'), new CCol(new CTextBox('password',$password,16),'form_row_r')));
+		$row->setAttribute('id', 'row_password');
+		$frmItem->addRow($row);
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'password');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'row_password');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'password');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'row_password');
+
+		$spanEC = new CSpan(S_EXECUTED_SCRIPT);
+		$spanEC->setAttribute('id', 'label_executed_script');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'label_executed_script');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'label_executed_script');
+
+		$spanP = new CSpan(S_PARAMS);
+		$spanP->setAttribute('id', 'label_params');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_DB_MONITOR, 'label_params');
+
+		$spanF = new CSpan(S_FORMULA);
+		$spanF->setAttribute('id', 'label_formula');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_CALCULATED, 'label_formula');
+
+		$params_script = get_request('params_script', '');
+		$params_dbmonitor = get_request('params_dbmonitor', $type != ITEM_TYPE_DB_MONITOR ? "DSN=<database source name>\nuser=<user name>\npassword=<password>\nsql=<query>" : '');
+		$params_calculted = get_request('params_calculted', '');
+
+		// swaping values to save hidden values and synchronize actual values
+		switch($type) {
+			case ITEM_TYPE_SSH:
+			case ITEM_TYPE_TELNET:
+				$tmp_params = $params;
+				$params = $params_script;
+				$params_script = $tmp_params;
+			break;
+			case ITEM_TYPE_DB_MONITOR:
+				$tmp_params = $params;
+				$params = $params_dbmonitor;
+				$params_dbmonitor = $tmp_params;
+			break;
+			case ITEM_TYPE_CALCULATED:
+				$tmp_params = $params;
+				$params = $params_calculted;
+				$params_calculted = $tmp_params;
+			break;
+		}
+
+		$row = new CRow(array(new CCol(array($spanEC, $spanP, $spanF),'form_row_l'), new CCol(new CTextArea('params',$params,60,4),'form_row_r')));
+		$row->setAttribute('id', 'row_params');
+		$frmItem->addRow($row);
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, Array('id' => 'params', 'value' => 'params_script'));
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'row_params');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, Array('id' => 'params', 'value' => 'params_script'));
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'row_params');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_DB_MONITOR, Array('id' => 'params', 'value' => 'params_dbmonitor'));
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_DB_MONITOR, 'row_params');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_CALCULATED, Array('id' => 'params', 'value' => 'params_calculted'));
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_CALCULATED, 'row_params');
+		$frmItem->addVar('params_script', $params_script);
+		$frmItem->addVar('params_dbmonitor', $params_dbmonitor);
+		$frmItem->addVar('params_calculted', $params_calculted);
+
+		/*ITEM_TYPE_DB_MONITOR $key = 'db.odbc.select[<unique short description>]'; $params = "DSN=<database source name>\nuser=<user name>\npassword=<password>\nsql=<query>";
+		ITEM_TYPE_SSH $key = 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]'; $params = '';
+		ITEM_TYPE_TELNET $key = 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]'; $params = '';
+		ITEM_TYPE_CALCULATED $key = ''; $params = '';*/
+
+/*		if (ITEM_TYPE_SSH == $type) {
 			$cmbAuthType = new CComboBox('authtype',$authtype,'submit()');
 				$cmbAuthType->addItem(ITEM_AUTHTYPE_PASSWORD,S_PASSWORD);
 				$cmbAuthType->addItem(ITEM_AUTHTYPE_PUBLICKEY,S_PUBLIC_KEY);
+
 			$frmItem->addRow(S_AUTHENTICATION_METHOD, $cmbAuthType);
 			$frmItem->addRow(S_USER_NAME, new CTextBox('username',$username,16));
 			if ($authtype == ITEM_AUTHTYPE_PASSWORD) {
 				$frmItem->addVar('publickey',$publickey);
 				$frmItem->addVar('privatekey',$privatekey);
 				$frmItem->addRow(S_PASSWORD, new CTextBox('password',$password,16));
-			}
-			else {
+			} else {
 				$frmItem->addRow(S_PUBLIC_KEY_FILE, new CTextBox('publickey',$publickey,16));
 				$frmItem->addRow(S_PRIVATE_KEY_FILE, new CTextBox('privatekey',$privatekey,16));
 				$frmItem->addRow(S_PASSPHRASE, new CTextBox('password',$password,16));
 			}
 			$frmItem->addRow(S_EXECUTED_SCRIPT, new CTextArea('params',$params,60,4));
-		}
-		else if (ITEM_TYPE_TELNET == $type) {
+		} elseif (ITEM_TYPE_TELNET == $type) {
 			$frmItem->addVar('authtype',$authtype);
 			$frmItem->addRow(S_USER_NAME, new CTextBox('username',$username,16));
 			$frmItem->addVar('publickey',$publickey);
 			$frmItem->addVar('privatekey',$privatekey);
 			$frmItem->addRow(S_PASSWORD, new CTextBox('password',$password,16));
 			$frmItem->addRow(S_EXECUTED_SCRIPT, new CTextArea('params',$params,60,4));
-		}
-		else{
+		} else {
 			$frmItem->addVar('authtype',$authtype);
 			$frmItem->addVar('username',$username);
 			$frmItem->addVar('publickey',$publickey);
@@ -2190,13 +2375,12 @@
 			else
 				$frmItem->addVar('params',$params);
 		}
-
+*/
 		if(isset($limited)){
 			$frmItem->addVar('value_type', $value_type);
 			$cmbValType = new CTextBox('value_type_name', item_value_type2str($value_type), 40, 'yes');
-		}
-		else{
-			$cmbValType = new CComboBox('value_type',$value_type,'submit()');
+		} else {
+			$cmbValType = new CComboBox('value_type',$value_type);
 			$cmbValType->addItem(ITEM_VALUE_TYPE_UINT64,	S_NUMERIC_UNSIGNED);
 			$cmbValType->addItem(ITEM_VALUE_TYPE_FLOAT,	S_NUMERIC_FLOAT);
 			$cmbValType->addItem(ITEM_VALUE_TYPE_STR, 	S_CHARACTER);
@@ -2206,112 +2390,193 @@
 
 		$frmItem->addRow(S_TYPE_OF_INFORMATION,$cmbValType);
 
-		if ($value_type == ITEM_VALUE_TYPE_UINT64) {
+		//if ($value_type == ITEM_VALUE_TYPE_UINT64) {
 			if(isset($limited)) {
 				$frmItem->addVar('data_type', $data_type);
 				$cmbDataType = new CTextBox('data_type_name', item_data_type2str($data_type), 20, 'yes');
-			}
-			else {
-				$cmbDataType = new CComboBox('data_type', $data_type, 'submit()');
+			} else {
+				$cmbDataType = new CComboBox('data_type', $data_type);
 				$cmbDataType->addItem(ITEM_DATA_TYPE_DECIMAL,		item_data_type2str(ITEM_DATA_TYPE_DECIMAL));
 				$cmbDataType->addItem(ITEM_DATA_TYPE_OCTAL,		item_data_type2str(ITEM_DATA_TYPE_OCTAL));
 				$cmbDataType->addItem(ITEM_DATA_TYPE_HEXADECIMAL, 	item_data_type2str(ITEM_DATA_TYPE_HEXADECIMAL));
 			}
-			$frmItem->addRow(S_DATA_TYPE,$cmbDataType);
-		}
-		else
-			$frmItem->addVar('data_type', $data_type);
 
-		if( ($value_type==ITEM_VALUE_TYPE_FLOAT) || ($value_type==ITEM_VALUE_TYPE_UINT64)){
-			$frmItem->addRow(S_UNITS, new CTextBox('units',$units,40, $limited));
+			$row = new CRow(array(new CCol(S_DATA_TYPE,'form_row_l'), new CCol($cmbDataType,'form_row_r')));
+			$row->setAttribute('id', 'row_data_type');
+			$frmItem->addRow($row);
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'data_type');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_data_type');
+		//} else
+			//$frmItem->addVar('data_type', $data_type);
 
+//		if( $value_type == ITEM_VALUE_TYPE_FLOAT || $value_type == ITEM_VALUE_TYPE_UINT64 ){
+			//$frmItem->addRow(S_UNITS, new CTextBox('units',$units,40, $limited));
+			$row = new CRow(array(new CCol(S_UNITS,'form_row_l'), new CCol(new CTextBox('units',$units,40, $limited),'form_row_r')));
+			$row->setAttribute('id', 'row_units');
+			$frmItem->addRow($row);
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'units');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'row_units');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'units');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_units');
+
+			$mltpbox = Array();
 			if(isset($limited)){
 				$frmItem->addVar('multiplier', $multiplier);
-				$cmbMultipler = new CTextBox('multiplier_name', $multiplier ? S_CUSTOM_MULTIPLIER : S_DO_NOT_USE, 20, 'yes');
+
+				$mcb = new CCheckBox('multiplier', $multiplier == 1 ? 'yes':'no');
+				$mcb->setAttribute('disabled', 'disabled');
+				$mltpbox[] = $mcb;
+				if($multiplier){
+					$mltpbox[] = SPACE;
+					$ctb = new CTextBox('formula', $formula, 10, 1);
+					$ctb->setAttribute('style', 'text-align: right;');
+					$mltpbox[] = $ctb;
 			}
 			else{
-				$cmbMultipler = new CComboBox('multiplier',$multiplier,'submit()');
-				$cmbMultipler->addItem(0,S_DO_NOT_USE);
-				$cmbMultipler->addItem(1,S_CUSTOM_MULTIPLIER);
+					$frmItem->addVar('formula', $formula);
 			}
-			$frmItem->addRow(S_USE_MULTIPLIER, $cmbMultipler);
-
 		}
 		else{
+				$mltpbox[] = new CCheckBox('multiplier',$multiplier == 1 ? 'yes':'no', 'var editbx = document.getElementById(\'formula\'); if(editbx) editbx.disabled = !this.checked;', 1);
+				$mltpbox[] = SPACE;
+				$ctb = new CTextBox('formula', $formula, 10);
+				$ctb->setAttribute('style', 'text-align: right;');
+				$mltpbox[] = $ctb;
+		}
+
+
+
+/*			if($multiplier != 1){
+			$frmItem->addRow(S_CUSTOM_MULTIPLIER, new CTextBox('formula',$formula,40,$limited));
+				end($mltpbox);
+				$mltpbox[key($mltpbox)]->setEnabled('no');
+		}
+*/
+			$row = new CRow(array(new CCol(S_USE_CUSTOM_MULTIPLIER,'form_row_l'), new CCol($mltpbox,'form_row_r')));
+			$row->setAttribute('id', 'row_multiplier');
+			$frmItem->addRow($row);
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'multiplier');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'row_multiplier');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'multiplier');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_multiplier');
+
+//			$frmItem->addRow(S_USE_CUSTOM_MULTIPLIER, $mltpbox);
+/*		}else{
 			$frmItem->addVar('units',$units);
 			$frmItem->addVar('multiplier',$multiplier);
-		}
-
-		if( !is_numeric($formula)) $formula = 1;
-		if($multiplier == 1){
-			$frmItem->addRow(S_CUSTOM_MULTIPLIER, new CTextBox('formula',$formula,40,$limited));
-		}
-		else{
 			$frmItem->addVar('formula',$formula);
+		}*/
+
+//		if($type != ITEM_TYPE_TRAPPER){
+			$row = new CRow(array(new CCol(S_UPDATE_INTERVAL_IN_SEC,'form_row_l'), new CCol(new CNumericBox('delay',$delay,5),'form_row_r')));
+			$row->setAttribute('id', 'row_delay');
+			$frmItem->addRow($row);
+			foreach($types as $it) {
+				if($it == ITEM_TYPE_TRAPPER) continue;
+				zbx_subarray_push($typeVisibility, $it, 'delay');
+				zbx_subarray_push($typeVisibility, $it, 'row_delay');
 		}
 
-
-		if($type != ITEM_TYPE_TRAPPER && $type != ITEM_TYPE_HTTPTEST){
-			$frmItem->addRow(S_UPDATE_INTERVAL_IN_SEC, new CNumericBox('delay',$delay,5));
-			$frmItem->addRow(S_FLEXIBLE_INTERVALS, $delay_flex_el);
-			$frmItem->addRow(S_NEW_FLEXIBLE_INTERVAL,
+//			$frmItem->addRow(S_UPDATE_INTERVAL_IN_SEC, new CNumericBox('delay',$delay,5));
+//			if($type != ITEM_TYPE_ZABBIX_ACTIVE) {
+			$row = new CRow(array(new CCol(S_FLEXIBLE_INTERVALS,'form_row_l'), new CCol($delay_flex_el,'form_row_r')));
+			$row->setAttribute('id', 'row_flex_intervals');
+			$frmItem->addRow($row);
+//				$frmItem->addRow(S_FLEXIBLE_INTERVALS, $delay_flex_el);
+			$row = new CRow(array(new CCol(S_NEW_FLEXIBLE_INTERVAL,'form_row_l'), new CCol(
 				array(
 					S_DELAY, SPACE,
 					new CNumericBox('new_delay_flex[delay]','50',5),
 					S_PERIOD, SPACE,
 					new CTextBox('new_delay_flex[period]','1-7,00:00-23:59',27), BR(),
 					new CButton('add_delay_flex',S_ADD)
-				),'new');
+						),'form_row_r')), 'new');
+			$row->setAttribute('id', 'row_new_delay_flex');
+			$frmItem->addRow($row);
+/*				$frmItem->addRow(S_NEW_FLEXIBLE_INTERVAL,
+					array(
+						S_DELAY, SPACE,
+						new CNumericBox('new_delay_flex[delay]','50',5),
+						S_PERIOD, SPACE,
+						new CTextBox('new_delay_flex[period]','1-7,00:00-23:59',27), BR(),
+						new CButton('add_delay_flex',S_ADD)
+					),'new');*/
+			foreach($types as $it) {
+				if($it == ITEM_TYPE_TRAPPER || $it == ITEM_TYPE_ZABBIX_ACTIVE) continue;
+				zbx_subarray_push($typeVisibility, $it, 'row_flex_intervals');
+				zbx_subarray_push($typeVisibility, $it, 'row_new_delay_flex');
+				zbx_subarray_push($typeVisibility, $it, 'new_delay_flex[delay]');
+				zbx_subarray_push($typeVisibility, $it, 'new_delay_flex[period]');
+				zbx_subarray_push($typeVisibility, $it, 'add_delay_flex');
 		}
-		else{
+/*			}else
+				$frmItem->addVar('delay_flex',null);
+		} else {
 			$frmItem->addVar('delay',$delay);
 			$frmItem->addVar('delay_flex',null);
 		}
-
+*/
 		$frmItem->addRow(S_KEEP_HISTORY_IN_DAYS, array(
 			new CNumericBox('history',$history,8),
 			(!isset($_REQUEST['itemid'])) ? null :
 				new CButtonQMessage('del_history',S_CLEAR_HISTORY,S_HISTORY_CLEARING_CAN_TAKE_A_LONG_TIME_CONTINUE_Q)
 			));
 
-		if(uint_in_array($value_type, array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64)))
+		$row = new CRow(array(new CCol(S_KEEP_TRENDS_IN_DAYS,'form_row_l'), new CCol(new CNumericBox('trends',$trends,8),'form_row_r')));
+		$row->setAttribute('id', 'row_trends');
+		$frmItem->addRow($row);
+		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'trends');
+		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'row_trends');
+		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'trends');
+		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_trends');
+
+/*		if(uint_in_array($value_type, array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64)))
 			$frmItem->addRow(S_KEEP_TRENDS_IN_DAYS, new CNumericBox('trends',$trends,8));
 		else
 			$frmItem->addVar('trends',0);
-
+*/
 		$cmbStatus = new CComboBox('status',$status);
 		foreach(array(ITEM_STATUS_ACTIVE,ITEM_STATUS_DISABLED,ITEM_STATUS_NOTSUPPORTED) as $st)
-			$cmbStatus->addItem($st,item_status2str($st));
-		$frmItem->addRow(S_STATUS,$cmbStatus);
+			$cmbStatus->addItem($st, item_status2str($st));
+		$frmItem->addRow(S_STATUS, $cmbStatus);
 
-		if($value_type==ITEM_VALUE_TYPE_LOG){
+		$row = new CRow(array(new CCol(S_LOG_TIME_FORMAT,'form_row_l'), new CCol(new CTextBox('logtimefmt',$logtimefmt,16,$limited),'form_row_r')));
+		$row->setAttribute('id', 'row_logtimefmt');
+		$frmItem->addRow($row);
+		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_LOG, 'logtimefmt');
+		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_LOG, 'row_logtimefmt');
+
+/*		if($value_type==ITEM_VALUE_TYPE_LOG)
 			$frmItem->addRow(S_LOG_TIME_FORMAT, new CTextBox('logtimefmt',$logtimefmt,16,$limited));
-		}
-		else{
+		else
 			$frmItem->addVar('logtimefmt',$logtimefmt);
-		}
 
 		if( ($value_type==ITEM_VALUE_TYPE_FLOAT) || ($value_type==ITEM_VALUE_TYPE_UINT64)){
-			$cmbDelta= new CComboBox('delta',$delta);
+*/			$cmbDelta= new CComboBox('delta',$delta);
 			$cmbDelta->addItem(0,S_AS_IS);
 			$cmbDelta->addItem(1,S_DELTA_SPEED_PER_SECOND);
 			$cmbDelta->addItem(2,S_DELTA_SIMPLE_CHANGE);
-			$frmItem->addRow(S_STORE_VALUE,$cmbDelta);
-		}
-		else{
-			$frmItem->addVar('delta',0);
-		}
 
-		if(($value_type==ITEM_VALUE_TYPE_UINT64) || ($value_type == ITEM_VALUE_TYPE_STR)){
-			if(isset($limited) && $type != ITEM_TYPE_HTTPTEST){
+			$row = new CRow(array(new CCol(S_STORE_VALUE,'form_row_l'), new CCol($cmbDelta,'form_row_r')));
+			$row->setAttribute('id', 'row_delta');
+			$frmItem->addRow($row);
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'delta');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'row_delta');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'delta');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_delta');
+//			$frmItem->addRow(S_STORE_VALUE,$cmbDelta);
+//		}else
+//			$frmItem->addVar('delta',0);
+
+//		if(($value_type==ITEM_VALUE_TYPE_UINT64) || ($value_type == ITEM_VALUE_TYPE_STR)){
+			if(isset($limited)){
 				$frmItem->addVar('valuemapid', $valuemapid);
 				$map_name = S_AS_IS;
 				if($map_data = DBfetch(DBselect('SELECT name FROM valuemaps WHERE valuemapid='.$valuemapid))){
 					$map_name = $map_data['name'];
 				}
 				$cmbMap = new CTextBox('valuemap_name', $map_name, 20, 'yes');
-			}
-			else{
+			} else {
 				$cmbMap = new CComboBox('valuemapid',$valuemapid);
 				$cmbMap->addItem(0,S_AS_IS);
 				$db_valuemaps = DBselect('SELECT * FROM valuemaps WHERE '.DBin_node('valuemapid'));
@@ -2324,29 +2589,39 @@
 
 			$link = new CLink(S_SHOW_VALUE_MAPPINGS,'config.php?config=6');
 			$link->setAttribute('target','_blank');
-			$frmItem->addRow(array(S_SHOW_VALUE),array($cmbMap, SPACE, $link));
 
-		}
-		else{
-			$frmItem->addVar('valuemapid',0);
-		}
+			$row = new CRow(array(new CCol(S_SHOW_VALUE), new CCol(array($cmbMap, SPACE, $link))));
+			$row->setAttribute('id', 'row_valuemap');
+			$frmItem->addRow($row);
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'valuemapid');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'row_valuemap');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'valuemap_name');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'valuemapid');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_valuemap');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'valuemap_name');
+//			$frmItem->addRow(array(S_SHOW_VALUE.SPACE,$link),$cmbMap);
+//		}else
+//			$frmItem->addVar('valuemapid',0);
 
-		if($type==ITEM_TYPE_TRAPPER){
+		$row = new CRow(array(new CCol(S_ALLOWED_HOSTS,'form_row_l'), new CCol(new CTextBox('trapper_hosts',$trapper_hosts,40),'form_row_r')));
+		$row->setAttribute('id', 'row_trapper_hosts');
+		$frmItem->addRow($row);
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_TRAPPER, 'trapper_hosts');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_TRAPPER, 'row_trapper_hosts');
+
+/*		if($type==ITEM_TYPE_TRAPPER)
 			$frmItem->addRow(S_ALLOWED_HOSTS, new CTextBox('trapper_hosts',$trapper_hosts,40));
-		}
-		else{
+		else
 			$frmItem->addVar('trapper_hosts',$trapper_hosts);
-		}
 
 		if($type==ITEM_TYPE_HTTPTEST){
 			$app_names = get_applications_by_itemid($_REQUEST['itemid'], 'name');
 			$frmItem->addRow(S_APPLICATIONS, new CTextBox('application_name',
 				isset($app_names[0]) ? $app_names[0] : '', 20, $limited));
 			$frmItem->addVar('applications',$applications,6);
-		}
-		else{
+		}else{*/
 			$new_app = new CTextBox('new_application',$new_application,40);
-			$frmItem->addRow(S_NEW_APPLICATION,$new_app);
+			$frmItem->addRow(S_NEW_APPLICATION,$new_app,'new');
 
 			$cmbApps = new CListBox('applications[]',$applications,6);
 			$cmbApps->addItem(0,'-'.S_NONE.'-');
@@ -2360,7 +2635,7 @@
 				$cmbApps->addItem($db_app['applicationid'],$db_app['name']);
 			}
 			$frmItem->addRow(S_APPLICATIONS,$cmbApps);
-		}
+//		}
 
 		$frmRow = array(new CButton('save',S_SAVE));
 		if(isset($_REQUEST['itemid'])){
@@ -2402,7 +2677,15 @@
 		}
 		$frmItem->addItemToBottomRow(array($cmbAction, SPACE, new CButton('register',S_DO_SMALL)));
 
-		$frmItem->show();
+		$json = new CJSON();
+
+		zbx_add_post_js("var valueTypeSwitcher = new CViewSwitcher('value_type', new Array('keyup','click','change'), ".$json->encode($valueTypeVisibility).");");
+		zbx_add_post_js("var authTypeSwitcher = new CViewSwitcher('authtype', new Array('keyup','click','change'), ".$json->encode($authTypeVisibility).");");
+		zbx_add_post_js("var typeSwitcher = new CViewSwitcher('type', new Array('keyup','click','change'), ".$json->encode($typeVisibility).(isset($_REQUEST['itemid'])? ', true': '').');');
+		zbx_add_post_js("var multpStat = document.getElementById('multiplier'); if(multpStat && multpStat.onclick) multpStat.onclick();");
+		zbx_add_post_js("var mnFrmTbl = document.getElementById('web.items.item.php'); if(mnFrmTbl) mnFrmTbl.style.visibility = 'visible';");
+
+		return $frmItem;
 	}
 
 	function insert_mass_update_item_form($elements_array_name){
@@ -2493,9 +2776,9 @@
 			S_ORIGINAL), S_SNMPV3_SECURITY_NAME), new CTextBox('snmpv3_securityname',$snmpv3_securityname,64));
 
 		$cmbSecLevel = new CComboBox('snmpv3_securitylevel',$snmpv3_securitylevel);
-		$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,"NoAuthPriv");
-		$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,"AuthNoPriv");
-		$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV,"AuthPriv");
+		$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,"noAuthNoPriv");
+		$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,"authNoPriv");
+		$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV,"authPriv");
 		$frmItem->addRow(array( new CVisibilityBox('securitylevel_visible',  get_request('securitylevel_visible'), 'snmpv3_securitylevel',
 			S_ORIGINAL), S_SNMPV3_SECURITY_LEVEL), $cmbSecLevel);
 		$frmItem->addRow(array( new CVisibilityBox('authpassphrase_visible', get_request('authpassphrase_visible'),
@@ -2578,10 +2861,11 @@
 					get_node_name_by_elid($db_valuemap["valuemapid"], null, ': ').$db_valuemap["name"]
 					);
 
-		$link = new CLink(S_THROW_MAP_SMALL,"config.php?config=6");
-		$link->setAttribute("target","_blank");
+		$link = new CLink(S_SHOW_VALUE_MAPPINGS,'config.php?config=6');
+		$link->setAttribute('target','_blank');
+
 		$frmItem->addRow(array( new CVisibilityBox('valuemapid_visible', get_request('valuemapid_visible'), 'valuemapid', S_ORIGINAL),
-			S_SHOW_VALUE, SPACE, $link),$cmbMap);
+			S_SHOW_VALUE), array($cmbMap, SPACE, $link));
 
 		$frmItem->addRow(array( new CVisibilityBox('trapper_hosts_visible', get_request('trapper_hosts_visible'), 'trapper_hosts',
 			S_ORIGINAL), S_ALLOWED_HOSTS), new CTextBox('trapper_hosts',$trapper_hosts,40));
@@ -2605,7 +2889,7 @@
 		$frmItem->addItemToBottomRow(array(new CButton("update",S_UPDATE),
 			SPACE, new CButtonCancel(url_param('groupid').url_param("hostid").url_param("config"))));
 
-		$frmItem->show();
+	return $frmItem;
 	}
 
 	function insert_copy_elements_to_forms($elements_array_name){
@@ -2693,7 +2977,7 @@
 		$frmCopy->addItemToBottomRow(array(SPACE,
 			new CButtonCancel(url_param('groupid').url_param("hostid").url_param("config"))));
 
-		$frmCopy->show();
+	return $frmCopy;
 	}
 
 // TRIGGERS
@@ -2767,7 +3051,7 @@
 		$frmMTrig->addItemToBottomRow(new CButton('mass_save',S_SAVE));
 		$frmMTrig->addItemToBottomRow(SPACE);
 		$frmMTrig->addItemToBottomRow(new CButtonCancel(url_param('config').url_param('groupid')));
-		$frmMTrig->show();
+	return $frmMTrig;
 	}
 
 // Insert form for Trigger
@@ -2775,9 +3059,9 @@
 		$frmTrig = new CFormTable(S_TRIGGER,'triggers.php');
 		$frmTrig->setHelp('config_triggers.php');
 
-		if(isset($_REQUEST['hostid'])){
-			$frmTrig->addVar('hostid',$_REQUEST['hostid']);
-		}
+//		if(isset($_REQUEST['hostid'])){
+//			$frmTrig->addVar('hostid',$_REQUEST['hostid']);
+//		}
 
 		$dep_el=array();
 		$dependencies = get_request('dependencies',array());
@@ -3060,7 +3344,6 @@
 		}
 		$frmTrig->addItemToBottomRow(SPACE);
 		$frmTrig->addItemToBottomRow(new CButtonCancel(url_param('groupid').url_param("hostid")));
-		$frmTrig->show();
 
 		$jsmenu = new CPUMenu(null,170);
 		$jsmenu->InsertJavaScript();
@@ -3077,6 +3360,8 @@
 						}
 					}";
 		insert_js($script);
+
+	return $frmTrig;
 	}
 
 	function insert_trigger_comment_form($triggerid){
@@ -3340,8 +3625,8 @@
 
 
 			if($graphtype == GRAPH_TYPE_NORMAL){
-				$percent_left = sprintf("%2.2f",$percent_left);
-				$percent_right = sprintf("%2.2f",$percent_right);
+				$percent_left = sprintf('%2.2f',$percent_left);
+				$percent_right = sprintf('%2.2f',$percent_right);
 
 				$pr_left_input = new CTextBox('percent_left',$percent_left,'5');
 				$pr_left_chkbx = new CCheckBox('visible[percent_left]',1,"javascript: ShowHide('percent_left');",1);
@@ -3825,78 +4110,6 @@
 	return $tblPeriod;
 	}
 
-	function insert_media_type_form(){
-
-		$type		= get_request('type',0);
-		$description	= get_request('description','');
-		$smtp_server	= get_request('smtp_server','localhost');
-		$smtp_helo	= get_request('smtp_helo','localhost');
-		$smtp_email	= get_request('smtp_email','zabbix@localhost');
-		$exec_path	= get_request('exec_path','');
-		$gsm_modem	= get_request('gsm_modem','/dev/ttyS0');
-		$username	= get_request('username','user@server');
-		$password	= get_request('password','');
-
-		if(isset($_REQUEST['mediatypeid']) && !isset($_REQUEST['form_refresh'])){
-			$result = DBselect('select * FROM media_type WHERE mediatypeid='.$_REQUEST['mediatypeid']);
-
-			$row = DBfetch($result);
-			$mediatypeid	= $row['mediatypeid'];
-			$type		= get_request('type',$row['type']);
-			$description	= $row['description'];
-			$smtp_server	= $row['smtp_server'];
-			$smtp_helo	= $row['smtp_helo'];
-			$smtp_email	= $row['smtp_email'];
-			$exec_path	= $row['exec_path'];
-			$gsm_modem	= $row['gsm_modem'];
-			$username	= $row['username'];
-			$password	= $row['passwd'];
-		}
-
-		$frmMeadia = new CFormTable(S_MEDIA);
-		$frmMeadia->setHelp('web.config.medias.php');
-
-		if(isset($_REQUEST['mediatypeid'])){
-			$frmMeadia->addVar('mediatypeid',$_REQUEST['mediatypeid']);
-		}
-
-		$frmMeadia->addRow(S_DESCRIPTION,new CTextBox('description',$description,30));
-		$cmbType = new CComboBox('type',$type,'submit()');
-		$cmbType->addItem(MEDIA_TYPE_EMAIL,S_EMAIL);
-		$cmbType->addItem(MEDIA_TYPE_JABBER,S_JABBER);
-		$cmbType->addItem(MEDIA_TYPE_SMS,S_SMS);
-		$cmbType->addItem(MEDIA_TYPE_EXEC,S_SCRIPT);
-		$frmMeadia->addRow(S_TYPE,$cmbType);
-
-		switch($type){
-		case MEDIA_TYPE_EMAIL:
-			$frmMeadia->addRow(S_SMTP_SERVER,new CTextBox('smtp_server',$smtp_server,30));
-			$frmMeadia->addRow(S_SMTP_HELO,new CTextBox('smtp_helo',$smtp_helo,30));
-			$frmMeadia->addRow(S_SMTP_EMAIL,new CTextBox('smtp_email',$smtp_email,30));
-			break;
-		case MEDIA_TYPE_SMS:
-			$frmMeadia->addRow(S_GSM_MODEM,new CTextBox('gsm_modem',$gsm_modem,50));
-			break;
-		case MEDIA_TYPE_EXEC:
-			$frmMeadia->addRow(S_SCRIPT_NAME,new CTextBox('exec_path',$exec_path,50));
-			break;
-		case MEDIA_TYPE_JABBER:
-			$frmMeadia->addRow(S_JABBER_IDENTIFIER, new CTextBox('username',$username,30));
-			$frmMeadia->addRow(S_PASSWORD, new CPassBox('password',$password,30));
-		}
-
-		$frmMeadia->addItemToBottomRow(new CButton('save',S_SAVE));
-		if(isset($_REQUEST['mediatypeid'])){
-			$frmMeadia->addItemToBottomRow(SPACE);
-			$frmMeadia->addItemToBottomRow(new CButtonDelete(S_DELETE_SELECTED_MEDIA,
-				url_param('form').url_param('mediatypeid')));
-		}
-		$frmMeadia->addItemToBottomRow(SPACE);
-		$frmMeadia->addItemToBottomRow(new CButtonCancel());
-
-	return $frmMeadia;
-	}
-
 	function import_screen_form($rules){
 
 		$form = new CFormTable(S_IMPORT, null, 'post', 'multipart/form-data');
@@ -4154,7 +4367,7 @@
 
 		$sql = 'SELECT hostid,host '.
 				' FROM hosts '.
-				' WHERE status IN ('.HOST_STATUS_PROXY.') '.
+				' WHERE status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.') '.
 					' AND '.DBin_node('hostid').
 				' ORDER BY host';
 		$db_proxies = DBselect($sql);
@@ -4235,10 +4448,24 @@
 		$vbox->setAttribute('id', 'cb_tplrplc');
 		if(isset($visible['template_table'])) $vbox->setAttribute('disabled', 'disabled');
 		$action = $vbox->getAttribute('onclick');
-		$action .= 'if($("cb_tpladd").disabled) $("cb_tpladd").enable(); else $("cb_tpladd").disable();';
+		$action .= <<<JAVASCRIPT
+if($("cb_tpladd").disabled){
+	$("cb_tpladd").enable();
+}
+else{
+	$("cb_tpladd").disable();
+}
+$("clrcbdiv").toggle();
+JAVASCRIPT;
 		$vbox->setAttribute('onclick', $action);
 
-		$frmHost->addRow(array($vbox, S_RELINK_TEMPLATES),	$template_table_r, 'T');
+		$clear_cb = new CCheckBox('mass_clear_tpls', get_request('mass_clear_tpls', false));
+		$div = new CDiv(array($clear_cb, S_CLEAR_WHEN_UNLINKING));
+		$div->setAttribute('id', 'clrcbdiv');
+		$div->addStyle('margin-left: 20px;');
+		if(!isset($visible['template_table_r'])) $div->addStyle('display: none;');
+
+		$frmHost->addRow(array($vbox, S_RELINK_TEMPLATES, $div), $template_table_r, 'T');
 // }}} RELINK TEMPLATES
 
 
@@ -4996,6 +5223,7 @@
 			$highlight =	$row['highlight'];
 			$markelements = $row['markelements'];
 			$expandproblem = $row['expandproblem'];
+			$show_unack = $row['show_unack'];
 		}
 		else{
 			$name		= get_request('name','');
@@ -5007,6 +5235,7 @@
 			$highlight = get_request('highlight',0);
 			$markelements = get_request('markelements',0);
 			$expandproblem = get_request('expandproblem',0);
+			$show_unack = get_request('show_unack', 0);
 		}
 
 		$frmMap = new CFormTable($frm_title,'sysmaps.php');
@@ -5031,11 +5260,8 @@
 		}
 
 		$frmMap->addRow(S_BACKGROUND_IMAGE,$cmbImg);
-
 		$frmMap->addRow(S_ICON_HIGHLIGHTING, new CCheckBox('highlight',$highlight,null,1));
-
 		$frmMap->addRow(S_MARK_ELEMENTS_ON_TRIGGER_STATUS_CHANGE, new CCheckBox('markelements',$markelements,null,1));
-
 		$frmMap->addRow(S_EXPAND_SINGLE_PROBLEM, new CCheckBox('expandproblem',$expandproblem,null,1));
 
 
@@ -5054,6 +5280,19 @@
 		$cmbLocation->addItem(2,S_RIGHT);
 		$cmbLocation->addItem(3,S_TOP);
 		$frmMap->addRow(S_ICON_LABEL_LOCATION,$cmbLocation);
+
+		$config = select_config();
+		$cb = new CComboBox('show_unack', $show_unack);
+		$cb->addItems(array(
+			EXTACK_OPTION_ALL => S_O_ALL,
+			EXTACK_OPTION_BOTH => S_O_SEPARATED,
+			EXTACK_OPTION_UNACK => S_O_UNACKNOWLEDGED_ONLY,
+		));
+		$cb->setEnabled($config['event_ack_enable']);
+		if(!$config['event_ack_enable']){
+			$cb->setAttribute('title', S_EVENT_ACKNOWLEDGING_DISABLED);
+		}
+		$frmMap->addRow(S_PROBLEM_DISPLAY, $cb);
 
 		$frmMap->addItemToBottomRow(new CButton('save',S_SAVE));
 
@@ -5598,7 +5837,7 @@
 			$footer = array(new CButton('save', S_SAVE));
 		}
 
-		return new CFormElement(S_MACROS, $macros_tbl, $footer); 
+		return new CFormElement(S_MACROS, $macros_tbl, $footer);
 
 	}
 

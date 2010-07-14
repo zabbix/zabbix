@@ -1,3 +1,4 @@
+
 /*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
@@ -17,11 +18,14 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#ifndef ZABBIX_ZBXSECURITY_H
-#define ZABBIX_ZBXSECURITY_H
+#ifndef ZABBIX_DISCOVERY_H
+#define ZABBIX_DISCOVERY_H
 
-#include "zbxsock.h"
+#include "zbxjson.h"
+#include "comms.h"
 
-int	check_security(ZBX_SOCKET sock, char *ip_list, int allow_if_empty);
+void	discovery_update_host(DB_DHOST *dhost, const char *ip, int status, int now);
+void	discovery_update_service(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost,
+		char *ip, int port, int status, const char *value, int now);
 
-#endif /* ZABBIX_ZBXSECURITY_H */
+#endif

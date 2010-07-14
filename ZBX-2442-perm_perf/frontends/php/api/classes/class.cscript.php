@@ -31,12 +31,6 @@ class Cscript extends CZBXAPI{
 /**
  * Get Scripts data
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param array $options
  * @param array $options['itemids']
  * @param array $options['hostids'] - depricated (very slow)
@@ -324,12 +318,6 @@ class Cscript extends CZBXAPI{
 /**
  * Get Script ID by host.name and item.key
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param array $script
  * @param array $script['name']
  * @param array $script['hostid']
@@ -357,12 +345,6 @@ class Cscript extends CZBXAPI{
 /**
  * Add Scripts
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param _array $scripts
  * @param array $script['name']
  * @param array $script['hostid']
@@ -372,50 +354,42 @@ class Cscript extends CZBXAPI{
 		$scripts = zbx_toArray($scripts);
 		$scriptids = array();
 
-		$result = false;
-//------
+		try{
+			self::BeginTransaction(__METHOD__);
 
-		self::BeginTransaction(__METHOD__);
-		foreach($scripts as $snum => $script){
-			$script_db_fields = array(
-				'name' => null,
-				'command' => null,
-				'usrgrpid' => 0,
-				'groupid' => 0,
-				'host_access' => 2,
-			);
+			foreach($scripts as $snum => $script){
+				$script_db_fields = array(
+					'name' => null,
+					'command' => null,
+					'usrgrpid' => 0,
+					'groupid' => 0,
+					'host_access' => 2,
+				);
+				if(!check_db_fields($script_db_fields, $script)){
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for script');
+				}
 
-			if(!check_db_fields($script_db_fields, $script)){
-				$result = false;
-				$error = 'Wrong fields for host [ '.$host['host'].' ]';
-				break;
+				$result = add_script($script['name'], $script['command'], $script['usrgrpid'], $script['groupid'], $script['host_access']);
+				if(!$result)
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot add script');
+
+				$scriptids[] = $result;
 			}
 
-			$result = add_script($script['name'],$script['command'],$script['usrgrpid'],$script['groupid'],$script['host_access']);
-			if(!$result) break;
-
-			$scriptids[] = $result;
+			self::EndTransaction(treu, __METHOD__);
+			return array('scriptids' => $scriptids);
 		}
-
-		$result = self::EndTransaction($result, __METHOD__);
-
-		if($result){
-			return array('scriptids'=>$scriptids);
-		}
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
 		}
 	}
 
 /**
  * Update Scripts
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
  *
  * @param _array $scripts
  * @param array $script['name']
@@ -424,48 +398,43 @@ class Cscript extends CZBXAPI{
  */
 	public static function update($scripts){
 		$scripts = zbx_toArray($scripts);
-		$scriptids = array();
+		$scriptids = zbx_objectValues($scripts, 'scriptid');
 
-		$result = false;
-//------
-		$options = array(
-			'scriptids'=>zbx_objectValues($scripts, 'scriptid'),
-			'editable'=>1,
-			'extendoutput'=>1,
-			'preservekeys'=>1
-		);
-		$upd_scripts = self::get($options);
-		foreach($scripts as $snum => $script){
-			if(!isset($upd_scripts[$script['scriptid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				return false;
+		try{
+			self::BeginTransaction(__METHOD__);
+
+			$options = array(
+				'scriptids' => $scriptids,
+				'editable' => 1,
+				'extendoutput' => 1,
+				'preservekeys' => 1
+			);
+			$upd_scripts = self::get($options);
+			foreach($scripts as $snum => $script){
+				if(!isset($upd_scripts[$script['scriptid']])){
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				}
 			}
 
-			$scriptids[] = $script['scriptid'];
-			//add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCRIPT, 'Script ['.$script['name'].']');
-		}
+			foreach($scripts as $num => $script){
+				$script_db_fields = $upd_scripts[$script['scriptid']];
+				if(!check_db_fields($script_db_fields, $script)){
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for script');
+				}
 
-		self::BeginTransaction(__METHOD__);
-		foreach($scripts as $num => $script){
-			$script_db_fields = $upd_scripts[$script['scriptid']];
-
-			if(!check_db_fields($script_db_fields, $script)){
-				$result = false;
-				$error = 'Wrong fields for host [ '.$host['host'].' ]';
-				break;
+				$result = update_script($script['scriptid'], $script['name'], $script['command'], $script['usrgrpid'], $script['groupid'], $script['host_access']);
+				if(!$result)
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'cannot update script');
 			}
 
-			$result = update_script($script['scriptid'], $script['name'],$script['command'],$script['usrgrpid'],$script['groupid'],$script['host_access']);
-			if(!$result) break;
+			self::EndTransaction(true, __METHOD__);
+			return array('scriptids' => $scriptids);
 		}
-
-		$result = self::EndTransaction($result, __METHOD__);
-
-		if($result){
-			return array('scriptids'=>$scriptids);
-		}
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
 		}
 	}
@@ -473,55 +442,47 @@ class Cscript extends CZBXAPI{
 /**
  * Delete Scripts
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param _array $scriptids
  * @param array $scriptids
  * @return boolean
  */
 	public static function delete($scripts){
 		$scripts = zbx_toArray($scripts);
-		$scriptids = array();
+		$scriptids = zbx_objectValues($scripts, 'scriptid');
 
-		$result = false;
-//------
-		$options = array(
-			'scriptids'=>zbx_objectValues($scripts, 'scriptid'),
-			'editable'=>1,
-			'extendoutput'=>1,
-			'preservekeys'=>1
-		);
-		$del_scripts = self::get($options);
-		foreach($scripts as $snum => $script){
-			if(!isset($del_scripts[$script['scriptid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				return false;
+		try{
+			self::BeginTransaction(__METHOD__);
+
+			$options = array(
+				'scriptids' => $scriptids,
+				'editable' => 1,
+				'extendoutput' => 1,
+				'preservekeys' => 1
+			);
+			$del_scripts = self::get($options);
+			foreach($scripts as $snum => $script){
+				if(!isset($del_scripts[$script['scriptid']])){
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				}
 			}
 
-			$scriptids[] = $script['scriptid'];
-			//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCRIPT, 'Script ['.$script['name'].']');
-		}
+			if(!empty($scriptids)){
+				$result = delete_script($scriptids);
+				if(!$result)
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete script');
+			}
+			else{
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ scriptids ]');
+			}
 
-		self::BeginTransaction(__METHOD__);
-		if(!empty($scriptids)){
-			$result = delete_script($scriptids);
+			self::EndTransaction(true, __METHOD__);
+			return array('scriptids' => $scriptids);
 		}
-		else{
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ scriptids ]');
-			$result = false;
-		}
-
-		$result = self::EndTransaction($result, __METHOD__);
-
-		if($result){
-			return array('scriptids'=>$scriptids);
-		}
-		else{
-			self::setError(__METHOD__);
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
 		}
 	}
@@ -536,8 +497,6 @@ class Cscript extends CZBXAPI{
 
 
 	public static function getScriptsByHosts($hostids){
-		global $USER_DETAILS;
-
 		zbx_value2array($hostids);
 
 		$obj_params = array(

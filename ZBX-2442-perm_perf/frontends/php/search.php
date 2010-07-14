@@ -55,14 +55,6 @@ include_once('include/page_header.php');
 			}
 			else if('refresh' == $_REQUEST['action']){
 				switch($_REQUEST['favref']){
-					case 'hat_syssum':
-						$syssum = make_system_summary();
-						$syssum->show();
-						break;
-					case 'hat_stszbx':
-						$stszbx = make_status_of_zbx();
-						$stszbx->show();
-						break;
 				}
 			}
 		}
@@ -176,13 +168,13 @@ include_once('include/page_header.php');
 				$style = null;
 			break;
 		}
-		
-		
+
+
 		$group = reset($host['groups']);
 		$link = 'groupid='.$group['groupid'].'&hostid='.$hostid.'&switch_node='.id2nodeid($hostid);
-		
+
 		$caption = make_decoration($host['host'], $search);
-		
+
 		if(isset($rw_hosts[$hostid])){
 			$host_link = new CLink($caption,'hosts.php?form=update&'.$link, $style);
 			$applications_link = array(new CLink(S_APPLICATIONS,'applications.php?'.$link), ' ('.$host['applications'].')');
@@ -197,7 +189,7 @@ include_once('include/page_header.php');
 			$triggers_link = array(new CSpan(S_TRIGGERS,'unknown'), ' ('.$host['triggers'].')');
 			$graphs_link = array(new CSpan(S_GRAPHS,'unknown'), ' ('.$host['graphs'].')');
 		}
-		
+
 		if(!$admin){
 			$host_link = new CSpan($caption, $style);
 		}

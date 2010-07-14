@@ -59,7 +59,7 @@ include_once('include/page_header.php');
 
 	$graph = new CChart();
 
-	$effectiveperiod = navigation_bar_calc('web.item.graph',$_REQUEST['itemid'],false);
+	$effectiveperiod = navigation_bar_calc('web.item.graph',$_REQUEST['itemid']);
 
 	if(isset($_REQUEST['period']))		$graph->setPeriod($_REQUEST['period']);
 	if(isset($_REQUEST['from']))		$graph->setFrom($_REQUEST['from']);

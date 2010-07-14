@@ -1201,7 +1201,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 				}
 
 				$tblCond->addRow($cond_el);
-				$tblCond->addRow($cond_buttons);
+				$tblCond->addRow(new CCol($cond_buttons));
 
 				$tblNewOperation->addRow(array(S_CONDITIONS, $tblCond));
 				unset($grouped_opconditions, $cond_el, $cond_buttons, $tblCond);
@@ -1318,10 +1318,10 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		$sortfield = getPageSortField('name');
 		$sortorder = getPageSortOrder();
 		$options = array(
-			'extendoutput' => 1,
+			'output' => API_OUTPUT_EXTEND,
 			'eventsource' => $_REQUEST['eventsource'],
-			'select_conditions' => 1,
-			'select_operations' => 1,
+			'select_conditions' => API_OUTPUT_EXTEND,
+			'select_operations' => API_OUTPUT_EXTEND,
 			'editable' => 1,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,

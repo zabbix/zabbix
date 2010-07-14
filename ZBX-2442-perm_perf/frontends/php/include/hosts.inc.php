@@ -228,7 +228,7 @@
 			$host_old = get_host_by_hostid($id);
 			$result = DBexecute('DELETE FROM hosts WHERE hostid='.$id);
 			if ($result) {
-				info(sprintf(S_HOST_HAS_BEEN_DELETED_MSG, $host_old['host']));
+				info(S_HOST_HAS_BEEN_DELETED_MSG_PART1.SPACE.$host_old['host'].SPACE.S_HOST_HAS_BEEN_DELETED_MSG_PART2);
 				/*SDI(
 					'AUDIT_ACTION_DELETE '.AUDIT_ACTION_DELETE.' / '.
 					'AUDIT_RESOURCE_HOST '.AUDIT_RESOURCE_HOST.' / '.
@@ -347,17 +347,17 @@
 		return  false;
 	}
 
-	function db_save_proxy($name,$proxyid=null){
+	function db_save_proxy($name,$status,$useip,$dns,$ip,$port,$proxyid=null){
 		if(!is_string($name)){
 			error(S_INCORRECT_PARAMETERS_FOR_SMALL." 'db_save_proxy'");
 			return false;
 		}
 
 		if(is_null($proxyid))
-			$result = DBselect('SELECT * FROM hosts WHERE status IN ('.HOST_STATUS_PROXY.')'.
+			$result = DBselect('SELECT * FROM hosts WHERE status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')'.
 					' and '.DBin_node('hostid').' AND host='.zbx_dbstr($name));
 		else
-			$result = DBselect('SELECT * FROM hosts WHERE status IN ('.HOST_STATUS_PROXY.')'.
+			$result = DBselect('SELECT * FROM hosts WHERE status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')'.
 					' and '.DBin_node('hostid').' AND host='.zbx_dbstr($name).
 					' and hostid<>'.$proxyid);
 
@@ -368,8 +368,8 @@
 
 		if(is_null($proxyid)){
 			$proxyid=get_dbid('hosts','hostid');
-			if(!DBexecute('INSERT INTO hosts (hostid,host,status)'.
-				' values ('.$proxyid.','.zbx_dbstr($name).','.HOST_STATUS_PROXY.')'))
+			if(!DBexecute('INSERT INTO hosts (hostid,host,status,useip,dns,ip,port)'.
+				' values ('.$proxyid.','.zbx_dbstr($name).','.$status.','.$useip.','.zbx_dbstr($dns).','.zbx_dbstr($ip).','.$port.')'))
 			{
 				return false;
 			}
@@ -377,7 +377,7 @@
 			return $proxyid;
 		}
 		else
-			return DBexecute('update hosts set host='.zbx_dbstr($name).' where hostid='.$proxyid);
+			return DBexecute('update hosts set host='.zbx_dbstr($name).',status='.$status.',useip='.$useip.',dns='.zbx_dbstr($dns).',ip='.zbx_dbstr($ip).',port='.$port.' where hostid='.$proxyid);
 	}
 
 	function delete_proxy($proxyids){
@@ -419,8 +419,8 @@
 		}
 	}
 
-	function add_proxy($name,$hosts=array()){
-		$proxyid = db_save_proxy($name);
+	function add_proxy($name,$status,$useip,$dns,$ip,$port,$hosts=array()){
+		$proxyid = db_save_proxy($name,$status,$useip,$dns,$ip,$port);
 		if(!$proxyid)
 			return	$proxyid;
 
@@ -429,8 +429,8 @@
 		return $proxyid;
 	}
 
-	function update_proxy($proxyid,$name,$hosts){
-		$result = db_save_proxy($name,$proxyid);
+	function update_proxy($proxyid,$name,$status,$useip,$dns,$ip,$port,$hosts){
+		$result = db_save_proxy($name,$status,$useip,$dns,$ip,$port,$proxyid);
 		if(!$result)
 			return	$result;
 
@@ -1565,7 +1565,6 @@ return $result;
 			case HOST_STATUS_MONITORED:	$status = S_MONITORED;		break;
 			case HOST_STATUS_NOT_MONITORED:	$status = S_NOT_MONITORED;	break;
 			case HOST_STATUS_TEMPLATE:	$status = S_TEMPLATE;		break;
-			case HOST_STATUS_DELETED:	$status = S_DELETED;		break;
 			default:
 				$status = S_UNKNOWN;		break;
 		}

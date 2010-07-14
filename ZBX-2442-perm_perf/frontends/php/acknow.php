@@ -19,20 +19,20 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/acknow.inc.php');
-	require_once('include/triggers.inc.php');
-	require_once('include/forms.inc.php');
+require_once('include/config.inc.php');
+require_once('include/acknow.inc.php');
+require_once('include/triggers.inc.php');
+require_once('include/forms.inc.php');
 
-	$page['title']	= 'S_ACKNOWLEDGES';
-	$page['file']	= 'acknow.php';
-	$page['hist_arg'] = array('eventid');
+$page['title']	= 'S_ACKNOWLEDGES';
+$page['file']	= 'acknow.php';
+$page['hist_arg'] = array('eventid');
 
 include_once('include/page_header.php');
 
 ?>
 <?php
-	$_REQUEST['go'] = get_request('go', 'none');
+	$_REQUEST['go'] = get_request('go', null);
 	$bulk = ($_REQUEST['go'] == 'bulkacknowledge');
 
 //		VAR				TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -54,8 +54,8 @@ include_once('include/page_header.php');
 	if(isset($_REQUEST['cancel'])){
 		$last_page = $USER_DETAILS['last_page'];
 		$url = $last_page ? new CUrl($last_page['url']) : new CUrl('tr_status.php?hostid='.CProfile::get('web.tr_status.hostid', 0));
-		redirect($url->getUrl());
-		exit;
+		jsRedirect($url->getUrl());
+		exit();
 	}
 
 	if(!isset($_REQUEST['events']) && !isset($_REQUEST['eventid']) && !isset($_REQUEST['triggers'])){
@@ -119,8 +119,9 @@ include_once('include/page_header.php');
 			else{
 				$url = new CUrl($last_page['url']);
 			}
-			redirect($url->getUrl());
-			exit;
+
+			jsRedirect($url->getUrl());
+			exit();
 		}
 
  	}
@@ -129,7 +130,8 @@ include_once('include/page_header.php');
 <?php
 	$msg = $bulk ? ' BULK ACKNOWLEDGE ' : expand_trigger_description_by_data($event_trigger);
 	show_table_header(array(S_ALARM_ACKNOWLEDGES_BIG.': ', $msg));
-
+	print(SBR);
+	
 	if($bulk){
 		$title = S_ACKNOWLEDGE_ALARM_BY;
 		$btn_txt2 = S_ACKNOWLEDGE.' '.S_AND_SYMB.' '.S_RETURN;
@@ -194,5 +196,9 @@ include_once('include/page_header.php');
 
 	$frmMsg->show(false);
 
+?>
+<?php
+
 include_once('include/page_footer.php');
+
 ?>

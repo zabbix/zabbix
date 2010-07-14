@@ -856,8 +856,9 @@ class CUserMacro extends CZBXAPI{
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
-
-			self::setMethodErrors(__METHOD__, $e->getErrors());
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
 		}
 	}
@@ -971,7 +972,6 @@ class CUserMacro extends CZBXAPI{
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
-
 			$error = $e->getErrors();
 			$error = reset($error);
 			self::setError(__METHOD__, $e->getCode(), $error);

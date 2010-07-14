@@ -24,22 +24,10 @@
 /* USER DEFINES */
 
 	define('ZBX_LOGIN_ATTEMPTS',			5);
-	define('ZBX_LOGIN_BLOCK',				30); // sec
-
-	define('TRIGGERS_OPTION_DISABLED',		0);	// reserved
-	define('TRIGGERS_OPTION_ONLYTRUE',		1);	// use 0 to disable
-	define('TRIGGERS_OPTION_ALL',			2);	// use 0 to disable
-	define('TRIGGERS_OPTION_SHOW_ALL_WITH_UNACKNOWLEDGED',			3);	// use 0 to disable
+	define('ZBX_LOGIN_BLOCK',			30); // sec
 
 	define('TRIGGER_FALSE_PERIOD',			1800);	// 30min, 0 - disable
 	define('TRIGGER_BLINK_PERIOD',			1800);	// 30min,  0 - disable
-
-	define('EVENTS_OPTION_DISABLED',		0);	// reserved
-	define('EVENTS_OPTION_NOEVENT',			1);	// use 0 to disable
-	define('EVENTS_OPTION_ALL',				2);	// use 0 to disable
-	define('EVENTS_OPTION_NOT_ACK',			3);	// use 0 to disable
-	define('EVENTS_OPTION_ONLYTRUE_NOTACK',	0);	// use 0 to disable
-	define('EVENTS_OPTION_EVENT_LAST',		0); // use 0 to disable
 
 	define('ZBX_MIN_PERIOD',				3600);			// 1 hour
 	define('ZBX_MAX_PERIOD',				2*365*86400);	// ~2 years
@@ -59,8 +47,30 @@
 
 /* END OF USERS DEFINES */
 
+	define('ZBX_MAP_HIGHLIGHT', 0x1);
+	define('ZBX_MAP_EXPANDPROBLEM', 0x2);
+	define('ZBX_MAP_MARKELEMENTS', 0x4);
+	define('ZBX_MAP_EXTACK_UNACK', 0x8);
+	define('ZBX_MAP_EXTACK_TOTAL', 0x10);
+	define('ZBX_MAP_EXTACK_SEPARATED', ZBX_MAP_EXTACK_UNACK | ZBX_MAP_EXTACK_TOTAL );
+
+	define('EXTACK_OPTION_ALL', 0);
+	define('EXTACK_OPTION_UNACK', 1);
+	define('EXTACK_OPTION_BOTH', 2);
+
+	define('TRIGGERS_OPTION_ONLYTRUE', 1);
+	define('TRIGGERS_OPTION_ALL', 2);
+
+	define('ZBX_ACK_STS_ANY', 1);
+	define('ZBX_ACK_STS_WITH_UNACK', 2);
+	define('ZBX_ACK_STS_WITH_LAST_UNACK', 3);
+
+	define('EVENTS_OPTION_NOEVENT', 1);
+	define('EVENTS_OPTION_ALL', 2);
+	define('EVENTS_OPTION_NOT_ACK', 3);
+
 	define('ZBX_FONT_NAME',			'DejaVuSans');
-	
+
 	define('ZBX_AUTH_INTERNAL',	0);
 	define('ZBX_AUTH_LDAP',		1);
 	define('ZBX_AUTH_HTTP',		2);
@@ -197,8 +207,9 @@
 	define('HOST_STATUS_NOT_MONITORED',	1);
 //	define('HOST_STATUS_UNREACHABLE',	2);
 	define('HOST_STATUS_TEMPLATE',		3);
-	define('HOST_STATUS_DELETED',		4);
-	define('HOST_STATUS_PROXY',			5);
+//	define('HOST_STATUS_DELETED',		4);
+	define('HOST_STATUS_PROXY_ACTIVE',	5);
+	define('HOST_STATUS_PROXY_PASSIVE',	6);
 
 	define('HOST_MAINTENANCE_STATUS_OFF',	0);
 	define('HOST_MAINTENANCE_STATUS_ON',	1);
@@ -309,7 +320,6 @@
 
 	define('TRIGGER_STATUS_ENABLED',	0);
 	define('TRIGGER_STATUS_DISABLED',	1);
-	define('TRIGGER_STATUS_UNKNOWN',	2);
 
 	define('TRIGGER_VALUE_FALSE',		0);
 	define('TRIGGER_VALUE_TRUE',		1);
@@ -412,10 +422,10 @@
 	define('TIME_TYPE_LOCAL',	0);
 	define('TIME_TYPE_SERVER',	1);
 
-	define('FILTER_TAST_SHOW',		0);
-	define('FILTER_TAST_HIDE',		1);
-	define('FILTER_TAST_MARK',		2);
-	define('FILTER_TAST_INVERT_MARK',	3);
+	define('FILTER_TASK_SHOW',		0);
+	define('FILTER_TASK_HIDE',		1);
+	define('FILTER_TASK_MARK',		2);
+	define('FILTER_TASK_INVERT_MARK',	3);
 
 	define('MARK_COLOR_RED',	1);
 	define('MARK_COLOR_GREEN',	2);
@@ -542,7 +552,7 @@
 
 	define('GRAPH_ZERO_LINE_COLOR_LEFT',	'AAAAAA');
 	define('GRAPH_ZERO_LINE_COLOR_RIGHT',	'888888');
-	
+
 	define('GRAPH_TRIGGER_LINE_OPPOSITE_COLOR',	'000');
 
 	define('ZBX_MAX_TREND_DIFF',		3600);
@@ -588,7 +598,7 @@
 	define('EXPRESSION_TYPE_NOT_INCLUDED',	2);
 	define('EXPRESSION_TYPE_TRUE',		3);
 	define('EXPRESSION_TYPE_FALSE',		4);
-	
+
 	define('EXPRESSION_VALUE_TYPE_UNKNOWN',	'#ERROR_VALUE_TYPE#');
 	define('EXPRESSION_HOST_UNKNOWN',	'#ERROR_HOST#');
 	define('EXPRESSION_HOST_ITEM_UNKNOWN',	'#ERROR_ITEM#');
@@ -618,7 +628,7 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	define('ZBX_PREG_PARAMS', '(['.ZBX_PREG_PRINT.']+?){0,1}');
 	define('ZBX_PREG_SIGN', '([&|><=+*\/#\-])');
 	define('ZBX_PREG_NUMBER', '([\-+]{0,1}[0-9]+[.]{0,1}[0-9]*[KMGTsmhdw]{0,1})');
-	
+
 	define('ZBX_PREG_DEF_FONT_STRING', '/^[0-9\.:% ]+$/');
 //--
 
@@ -626,12 +636,12 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	define('ZBX_PREG_HOST_FORMAT', ZBX_PREG_INTERNAL_NAMES);
 
 	define('ZBX_PREG_NODE_FORMAT', ZBX_PREG_INTERNAL_NAMES);
-	
-	
+
+
 	define('ZBX_PREG_ITEM_KEY_FORMAT', '('.ZBX_PREG_KEY_NAME.'(?(?=,)('.ZBX_PREG_PARAMS.'){0,1}|(\['.ZBX_PREG_PARAMS.'\]){0,1}))');
 	// define('ZBX_PREG_ITEM_KEY_FORMAT', '('.ZBX_PREG_KEY_NAME.'(\['.ZBX_PREG_PARAMS.'\]){0,1})');
 
-	
+
 	define('ZBX_PREG_FUNCTION_FORMAT', '('.ZBX_PREG_INTERNAL_NAMES.'(\('.ZBX_PREG_PARAMS.'\)))');
 
 	define('ZBX_PREG_SIMPLE_EXPRESSION_FORMAT','(\{'.ZBX_PREG_HOST_FORMAT.'\:'.ZBX_PREG_ITEM_KEY_FORMAT.'\.'.ZBX_PREG_FUNCTION_FORMAT.'\})');
@@ -663,7 +673,7 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 
 	define('ZBX_HISTORY_COUNT',5);
 
-	define('ZBX_USER_ONLINE_TIME',600);		// 10min
+	define('ZBX_USER_ONLINE_TIME', 600);		// 10min
 	define('ZBX_GUEST_USER','guest');
 	define('ZBX_DEFAULT_CSS','default.css');
 
@@ -739,20 +749,14 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	define('API_OUTPUT_COUNT', 'count');
 	define('API_OUTPUT_CUSTOM', 'custom');
 
-
 	define('SEC_PER_MIN', 60);
 	define('SEC_PER_HOUR', 3600);
 	define('SEC_PER_DAY', 86400);
 	define('SEC_PER_WEEK', (7*SEC_PER_DAY));
+	define('SEC_PER_MONTH', (30*SEC_PER_DAY));
 	define('SEC_PER_YEAR', (365*SEC_PER_DAY));
-/* Support for PHP5. PHP5 does not have $HTTP_..._VARS */
-	if(!function_exists('version_compare')){
-		$_GET		= $HTTP_GET_VARS;
-		$_POST		= $HTTP_POST_VARS;
-		$_COOKIE	= $HTTP_COOKIE_VARS;
-	}
 
-/* if magic quotes on then get rid of them */
+// if magic quotes on, then get rid of them
 	if(get_magic_quotes_gpc()){
 		$_GET		= zbx_stripslashes($_GET);
 		$_POST		 = zbx_stripslashes($_POST);
@@ -766,6 +770,9 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 // init precision
 	ini_set('precision', 14);
 
-//
+// BC Math scale
 	bcscale(7);
+
+// Numeric Locale to default
+	setLocale(LC_NUMERIC, array('en','en_US','en_US.UTF-8','English_United States.1252'));
 ?>

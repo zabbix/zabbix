@@ -36,9 +36,8 @@ static zbx_strpool_t	strpool;
 
 static zbx_hash_t	__strpool_hash_func(const void *data);
 static int		__strpool_compare_func(const void *d1, const void *d2);
-static void		*__strpool_mem_malloc_func(void *old, size_t size);
-static void		*__strpool_mem_realloc_func(void *old, size_t size);
-static void		__strpool_mem_free_func(void *ptr);
+
+ZBX_MEM_FUNC_DECL(__strpool);
 
 #define INIT_HASHSET_SIZE	1000
 #define	REFCOUNT_FIELD_SIZE	sizeof(uint32_t)
@@ -55,20 +54,7 @@ static int	__strpool_compare_func(const void *d1, const void *d2)
 	return strcmp(d1 + REFCOUNT_FIELD_SIZE, d2 + REFCOUNT_FIELD_SIZE);
 }
 
-static void	*__strpool_mem_malloc_func(void *old, size_t size)
-{
-	return zbx_mem_malloc(strpool.mem_info, old, size);
-}
-
-static void	*__strpool_mem_realloc_func(void *old, size_t size)
-{
-	return zbx_mem_realloc(strpool.mem_info, old, size);
-}
-
-static void	__strpool_mem_free_func(void *ptr)
-{
-	zbx_mem_free(strpool.mem_info, ptr);
-}
+ZBX_MEM_FUNC_IMPL(__strpool, strpool.mem_info);
 
 /* public strpool interface */
 
@@ -80,13 +66,13 @@ void	zbx_strpool_create(size_t size)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, 's')))
+	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_STRPOOL_ID)))
 	{	
 		zabbix_log(LOG_LEVEL_CRIT, "Could not create IPC key for string pool.");
 		exit(FAIL);
 	}
 
-	zbx_mem_create(&strpool.mem_info, shm_key, ZBX_NO_MUTEX, size, "string pool");
+	zbx_mem_create(&strpool.mem_info, shm_key, ZBX_NO_MUTEX, size, "string pool", "CacheSize");
 
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&strpool.pool_lock, ZBX_MUTEX_STRPOOL))
 	{
@@ -129,13 +115,10 @@ const char	*zbx_strpool_intern(const char *str)
 
 	if (NULL == record)
 	{
-		/* zbx_hashset_insert will reference memory just below str */
-		/* strictly speaking, this is not a very safe thing to do, */
-		/* but at least we avoid copying str to a temporary buffer */
-
-		record = zbx_hashset_insert(strpool.hashset,
+		record = zbx_hashset_insert_ext(strpool.hashset,
 						str - REFCOUNT_FIELD_SIZE,
-						REFCOUNT_FIELD_SIZE + strlen(str) + 1);
+						REFCOUNT_FIELD_SIZE + strlen(str) + 1,
+						REFCOUNT_FIELD_SIZE);
 		*(uint32_t *)record = 0;
 	}
 

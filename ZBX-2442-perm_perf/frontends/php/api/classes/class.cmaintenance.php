@@ -31,12 +31,6 @@ class CMaintenance extends CZBXAPI{
 /**
  * Get maintenances data
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param array $options
  * @param array $options['itemids']
  * @param array $options['hostids']
@@ -396,12 +390,6 @@ Copt::memoryPick();
 /**
  * Get Maintenance ID by host.name and item.key
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param array $maintenance
  * @param array $maintenance['name']
  * @param array $maintenance['hostid']
@@ -428,12 +416,6 @@ Copt::memoryPick();
 /**
  * Add maintenances
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
  * @param _array $maintenances
  * @param array $maintenance['name']
  * @param array $maintenance['hostid']
@@ -443,7 +425,6 @@ Copt::memoryPick();
 		$maintenances = zbx_toArray($maintenances);
 		$maintenanceids = array();
 		$result = false;
-//------
 
 		self::BeginTransaction(__METHOD__);
 		foreach($maintenances as $num => $maintenance){
@@ -458,19 +439,13 @@ Copt::memoryPick();
 			return array('maintenanceids'=>$maintenanceids);
 		}
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal Zabbix error');
 			return false;
 		}
 	}
 
 /**
  * Update maintenances
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
  *
  * @param _array $maintenances
  * @param array $maintenance['name']
@@ -512,19 +487,13 @@ Copt::memoryPick();
 			return array('maintenanceids'=>$maintenanceids);
 		}
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal Zabbix error');
 			return false;
 		}
 	}
 
 /**
  * Delete maintenances
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
  *
  * @param _array $maintenanceids
  * @param _array $maintenanceids['maintenanceids']

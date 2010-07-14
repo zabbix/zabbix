@@ -92,7 +92,7 @@ ZBX_THREAD_ENTRY(listener_thread, pSock)
 
 	memcpy(&s, ((zbx_sock_t *)pSock), sizeof(zbx_sock_t));
 
-	while(ZBX_IS_RUNNING)
+	while(ZBX_IS_RUNNING())
 	{
 		zbx_setproctitle("waiting for connection");
 
@@ -121,7 +121,7 @@ ZBX_THREAD_ENTRY(listener_thread, pSock)
 			local_request_failed = 0;
 		}
 
-		if(ZBX_IS_RUNNING)
+		if(ZBX_IS_RUNNING())
 			zbx_sleep(1);
 	}
 
