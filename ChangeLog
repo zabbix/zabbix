@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2685] fixed map elements not always change position when coords are manually set (Vedmak)
  - [ZBX-2664] fixed viewed period and filter status reset in web monitoring (Vedmak)
  - [ZBX-2683] removed dead entries and added some translated strings for the Latvian translation (Richlv)
  - [ZBX-2682] added Czech translation; thanks to Jakub Kalas (Richlv)
