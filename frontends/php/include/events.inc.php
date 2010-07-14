@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2007 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,11 +25,6 @@
 			case EVENT_SOURCE_DISCOVERY:	return S_DISCOVERY;
 			default:			return S_UNKNOWN;
 		}
-	}
-
-	function get_event_by_eventid($eventid){
-		$db_events = DBselect('select * from events where eventid='.$eventid);
-		return DBfetch($db_events);
 	}
 
 	function get_tr_event_by_eventid($eventid){

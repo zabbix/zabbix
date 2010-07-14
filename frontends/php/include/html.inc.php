@@ -74,14 +74,6 @@
 	return $result;
 	}
 
-	function bfirst($str){
-// mark first symbol of string as bold
-		$res = bold($str[0]);
-		for($i=1,$max=zbx_strlen($str); $i<$max; $i++)	$res .= $str[$i];
-		$str = $res;
-		return $str;
-	}
-
 	function nbsp($str){
 		return str_replace(" ",SPACE,$str);
 	}
