@@ -161,7 +161,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 
 		if(isset($_REQUEST['actionid'])){
 			$action['actionid']= $_REQUEST['actionid'];
-			
+
 			$result = CAction::update($action);
 			show_messages($result,S_ACTION_UPDATED,S_CANNOT_UPDATE_ACTION);
 		}
@@ -380,7 +380,9 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			if(!$esc_period) unset($_REQUEST['escalation']);
 		}
 
-		$tblAct->addRow(array(S_NAME, new CTextBox('name', $name, 50)));
+		$name_tb = new CTextBox('name', $name, 50);
+		$name_tb->setAttribute('required', 'required');
+		$tblAct->addRow(array(S_NAME, $name_tb));
 
 		$cmbSource =  new CComboBox('eventsource', $eventsource, 'submit()');
 		$cmbSource->addItem(EVENT_SOURCE_TRIGGERS, S_TRIGGERS);

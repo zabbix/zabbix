@@ -184,8 +184,13 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 			}
 		}
 
-		$frmScr->addRow(S_NAME,new CTextBox('name',$name,80));
-		$frmScr->addRow(S_COMMAND,new CTextBox('command',$command,80));
+		$name_tb = new CTextBox('name',$name,80);
+		$name_tb->setAttribute('required', 'required');
+		$frmScr->addRow(S_NAME, $name_tb);
+
+		$command_tb = new CTextBox('command',$command,80);
+		$command_tb->setAttribute('required', 'required');
+		$frmScr->addRow(S_COMMAND, $command_tb);
 
 		$usr_groups = new CCombobox('usrgrpid',$usrgrpid);
 		$usr_groups->addItem(0,S_ALL_S);

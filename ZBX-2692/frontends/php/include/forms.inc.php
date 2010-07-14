@@ -54,7 +54,9 @@
 			}
 		}
 
-		$form->addRow(S_NAME, new CTextBox('name', $name, 40));
+		$name_tb = new CTextBox('name', $name, 40);
+		$name_tb->setAttribute('required', 'required');
+		$form->addRow(S_NAME, $name_tb);
 
 		$delayBox = new CComboBox('delay', $delay);
 		$delayBox->addItem(10,'10');
@@ -218,7 +220,9 @@
 		$new_check_snmpv3_authpassphrase = get_request('new_check_snmpv3_authpassphrase', '');
 		$new_check_snmpv3_privpassphrase = get_request('new_check_snmpv3_privpassphrase', '');
 
-		$form->addRow(S_NAME, new CTextBox('name', $name, 40));
+		$name_tb = new CTextBox('name', $name, 40);
+		$name_tb->setAttribute('required', 'required');
+		$form->addRow(S_NAME, $name_tb);
 //Proxy
 		$cmbProxy = new CComboBox("proxy_hostid", $proxy_hostid);
 
@@ -235,7 +239,9 @@
 
 		$form->addRow(S_DISCOVERY_BY_PROXY,$cmbProxy);
 //----------
-		$form->addRow(S_IP_RANGE, new CTextBox('iprange', $iprange, 27));
+		$ip_tb = new CTextBox('iprange', $iprange, 27);
+		$ip_tb->setAttribute('required', 'required');
+		$form->addRow(S_IP_RANGE, $ip_tb);
 		$form->addRow(S_DELAY.' (seconds)', new CNumericBox('delay', $delay, 8));
 
 		$form->addVar('dchecks', $dchecks);
@@ -350,8 +356,7 @@
 		return $form;
 	}
 
-	function	insert_httpstep_form()
-	{
+	function insert_httpstep_form(){
 		$form = new CFormTable(S_STEP_OF_SCENARIO, null, 'post');
 		$form->setHelp("web.webmon.httpconf.php");
 
@@ -367,8 +372,12 @@
 		$required = get_request('required', '');
 		$status_codes = get_request('status_codes', '');
 
-		$form->addRow(S_NAME, new CTextBox('name', $name, 50));
-		$form->addRow(S_URL, new CTextBox('url', $url, 80));
+		$n_tb = new CTextBox('name', $name, 50);
+		$n_tb->setAttribute('required', 'required');
+		$form->addRow(S_NAME, $n_tb);
+		$url_tb = new CTextBox('url', $url, 80);
+		$url_tb->setAttribute('required', 'required');
+		$form->addRow(S_URL, $url_tb);
 		$form->addRow(S_POST, new CTextArea('posts', $posts, 50, 10));
 		$form->addRow(S_TIMEOUT, new CNumericBox('timeout', $timeout, 5));
 		$form->addRow(S_REQUIRED, new CTextBox('required', $required, 80));
@@ -431,8 +440,10 @@
 			}
 		}
 
+		$a_tb = new CTextBox('application', $application, 40);
+		$a_tb->setAttribute('required', 'required');
 		$form->addRow(S_APPLICATION,array(
-			new CTextBox('application', $application, 40),
+			$a_tb,
 			SPACE,
 			new CButton('select_app',S_SELECT,
 				'return PopUp("popup.php?dstfrm='.$form->getName().
@@ -440,7 +451,9 @@
 				'&srcfld1=name&only_hostid='.$_REQUEST['hostid'].'",500,600,"application");')
 			));
 
-		$form->addRow(S_NAME, new CTextBox('name', $name, 40));
+		$n_tb = new CTextBox('name', $name, 40);
+		$n_tb->setAttribute('required', 'required');
+		$form->addRow(S_NAME, $n_tb);
 
 		$cmbAuth = new CComboBox('authentication',$authentication,'submit();');
 		$cmbAuth->addItem(HTTPTEST_AUTH_NONE,S_NONE);
@@ -725,17 +738,30 @@
 		if(isset($userid))	$frmUser->addVar('userid',$userid);
 
 		if($profile==0){
-			$frmUser->addRow(S_ALIAS,	new CTextBox('alias',$alias,40));
-			$frmUser->addRow(S_NAME,	new CTextBox('name',$name,40));
-			$frmUser->addRow(S_SURNAME,	new CTextBox('surname',$surname,40));
+			$alias_tb =	new CTextBox('alias',$alias,40);
+			$alias_tb->setAttribute('required', 'required');
+			$frmUser->addRow(S_ALIAS, $alias_tb);
+
+			$name_tb = new CTextBox('name',$name,40);
+			$name_tb->setAttribute('required', 'required');
+			$frmUser->addRow(S_NAME, $name_tb);
+
+			$surname_tb = new CTextBox('surname',$surname,40);
+			$surname_tb->setAttribute('required', 'required');
+			$frmUser->addRow(S_SURNAME,	$surname_tb);
 		}
 
 		$auth_type = isset($userid) ? get_user_system_auth($userid) : $config['authentication_type'];
 
 		if(ZBX_AUTH_INTERNAL == $auth_type){
 			if(!isset($userid) || isset($change_password)){
-				$frmUser->addRow(S_PASSWORD,	new CPassBox('password1',$password1,20));
-				$frmUser->addRow(S_PASSWORD_ONCE_AGAIN,	new CPassBox('password2',$password2,20));
+				$p1_tb = new CPassBox('password1',$password1,20);
+				$p1_tb->setAttribute('required', 'required');
+				$frmUser->addRow(S_PASSWORD, $p1_tb);
+
+				$p2_tb = new CPassBox('password2',$password2,20);
+				$p2_tb->setAttribute('required', 'required');
+				$frmUser->addRow(S_PASSWORD_ONCE_AGAIN,	$p2_tb);
 				if(isset($change_password))
 					$frmUser->addVar('change_password', $change_password);
 			}
@@ -952,7 +978,7 @@
 // Insert form for User Groups
 	function insert_usergroups_form(){
 		$frm_title = S_USER_GROUP;
-		
+
 		if(isset($_REQUEST['usrgrpid'])){
 			$usrgrp		= CUserGroup::get(array('usrgrpids' => $_REQUEST['usrgrpid'],  'extendoutput' => 1));
 			$usrgrp = reset($usrgrp);
@@ -1018,7 +1044,8 @@
 		}
 
 		$grName = new CTextBox('gname',$name,49);
-		$grName->attributes['style'] = 'width: 280px';
+		$grName->setAttribute('required', 'required');
+		$grName->setAttribute('style', 'width: 280px');
 		$frmUserG->addRow(S_GROUP_NAME,$grName);
 
 		$frmUserG->addVar('group_rights', $group_rights);
@@ -3810,7 +3837,9 @@
 
 		$tblMntc = new CTable('','nowrap');
 
-		$tblMntc->addRow(array(S_NAME, new CTextBox('mname', $mname, 50)));
+		$mn_tb = new CTextBox('mname', $mname, 50);
+		$mn_tb->setAttribute('required', 'required');
+		$tblMntc->addRow(array(S_NAME, $mn_tb));
 
 /* form row generation */
 		$cmbType =  new CComboBox('maintenance_type', $maintenance_type);
@@ -4517,7 +4546,10 @@
 		if(isset($_REQUEST['screenid'])){
 			$frmScr->addVar('screenid',$_REQUEST['screenid']);
 		}
-		$frmScr->addRow(S_NAME, new CTextBox('name',$name,32));
+
+		$name_tb = new CTextBox('name',$name,32);
+		$name_tb->setAttribute('required', 'required');
+		$frmScr->addRow(S_NAME, $name_tb);
 		$frmScr->addRow(S_COLUMNS, new CNumericBox('hsize',$hsize,3));
 		$frmScr->addRow(S_ROWS, new CNumericBox('vsize',$vsize,3));
 
@@ -5156,7 +5188,9 @@ JAVASCRIPT;
 		if($_REQUEST['hostid']>0) $frmHost->addVar('hostid', $_REQUEST['hostid']);
 		if($_REQUEST['groupid']>0) $frmHost->addVar('groupid', $_REQUEST['groupid']);
 
-		$host_tbl->addRow(array(S_NAME, new CTextBox('host',$host,54)));
+		$h_tb = new CTextBox('host',$host,54);
+		$h_tb->setAttribute('required', 'required');
+		$host_tbl->addRow(array(S_NAME, $h_tb));
 
 		$grp_tb = new CTweenBox($frmHost, 'groups', $host_groups, 10);
 
@@ -5701,7 +5735,9 @@ JAVASCRIPT;
 		if(isset($_REQUEST['sysmapid']))
 			$frmMap->addVar('sysmapid',$_REQUEST['sysmapid']);
 
-		$frmMap->addRow(S_NAME,new CTextBox('name',$name,32));
+		$name_tb = new CTextBox('name',$name,32);
+		$name_tb->setAttribute('required', 'required');
+		$frmMap->addRow(S_NAME, $name_tb);
 		$frmMap->addRow(S_WIDTH,new CNumericBox('width',$width,5));
 		$frmMap->addRow(S_HEIGHT,new CNumericBox('height',$height,5));
 

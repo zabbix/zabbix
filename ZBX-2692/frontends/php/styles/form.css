@@ -71,3 +71,7 @@ form.thin .biginput{
 	font-size: 11px;
 	height: 14px;
 }
+
+input.biginput:invalid{
+	background-color: #FFBBB8;
+}

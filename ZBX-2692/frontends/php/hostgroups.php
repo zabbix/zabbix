@@ -92,8 +92,8 @@ include_once('include/page_header.php');
 				$groups = CHostGroup::get($options);
 
 				$data = array(
-					'hosts' => $hosts, 
-					'templates' => $templates, 
+					'hosts' => $hosts,
+					'templates' => $templates,
 					'groups' => $groups
 				);
 				$result = CHostGroup::massUpdate($data);
@@ -121,8 +121,8 @@ include_once('include/page_header.php');
 				$groups = CHostGroup::get($options);
 
 				$data = array(
-					'hosts' => $hosts, 
-					'templates' => $templates, 
+					'hosts' => $hosts,
+					'templates' => $templates,
 					'groups' => $groups
 				);
 				$result = CHostGroup::massAdd($data);
@@ -215,7 +215,7 @@ include_once('include/page_header.php');
 		$frmForm = new CForm();
 		$frmForm->addItem(new CButton('form', S_CREATE_GROUP));
 	}
-	
+
 	$groups_wdgt = new CWidget();
 	$groups_wdgt->addPageHeader(S_CONFIGURATION_OF_GROUPS, $frmForm);
 
@@ -253,7 +253,9 @@ include_once('include/page_header.php');
 			$frmHostG->addVar('groupid', $groupid);
 		}
 
-		$frmHostG->addRow(S_GROUP_NAME, new CTextBox('gname', $group_name, 48));
+		$gn_tb = new CTextBox('gname', $group_name, 48);
+		$gn_tb->setAttribute('required', 'required');
+		$frmHostG->addRow(S_GROUP_NAME, $gn_tb);
 
 // select all possible groups
 		$params = array(
@@ -272,9 +274,9 @@ include_once('include/page_header.php');
 			$cmbGroups->addItem($row['groupid'], $row['name']);
 		}
 
-		
+
 		$cmbHosts = new CTweenBox($frmHostG, 'hosts', $hosts, 25);
-		
+
 // get hosts from selected twb_groupid combo
 		$params = array(
 			'groupids' => $twb_groupid,
@@ -304,9 +306,9 @@ include_once('include/page_header.php');
 			'editable' => 1,
 			'output' => API_OUTPUT_SHORTEN
 		);
-		
+
 		$rw_hosts = CHost::get($params);
-		$rw_hosts = zbx_toHash($rw_hosts, 'hostid');	
+		$rw_hosts = zbx_toHash($rw_hosts, 'hostid');
 		foreach($r_hosts as $num => $host){
 			if(isset($rw_hosts[$host['hostid']]))
 				$cmbHosts->addItem($host['hostid'], $host['host']);

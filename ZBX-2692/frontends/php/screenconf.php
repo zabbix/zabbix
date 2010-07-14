@@ -182,9 +182,8 @@ include_once('include/page_header.php');
 ?>
 <?php
 	$form = new CForm(null, 'get');
-
-		$form->addItem(new CButton("form", S_CREATE_SCREEN));
-		$form->addItem(new CButton('form', S_IMPORT_SCREEN));
+	$form->addItem(new CButton('form', S_CREATE_SCREEN));
+	$form->addItem(new CButton('form', S_IMPORT_SCREEN));
 
 	$screen_wdgt = new CWidget();
 	$screen_wdgt->addPageHeader(S_CONFIGURATION_OF_SCREENS_BIG, $form);
@@ -259,7 +258,7 @@ include_once('include/page_header.php');
 
 			$screen_wdgt->addItem($form);
 		}
-	
+
 	$screen_wdgt->show();
 
 include_once('include/page_footer.php');

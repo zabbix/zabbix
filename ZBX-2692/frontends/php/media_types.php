@@ -176,7 +176,9 @@ include_once('include/page_header.php');
 			$frmMeadia->addVar('mediatypeid',$_REQUEST['mediatypeid']);
 		}
 
-		$frmMeadia->addRow(S_DESCRIPTION,new CTextBox('description',$description,30));
+		$descr_tb = new CTextBox('description',$description,30);
+		$descr_tb->setAttribute('required', 'required');
+		$frmMeadia->addRow(S_DESCRIPTION, $descr_tb);
 		$cmbType = new CComboBox('type',$type,'submit()');
 		$cmbType->addItem(MEDIA_TYPE_EMAIL,S_EMAIL);
 		$cmbType->addItem(MEDIA_TYPE_JABBER,S_JABBER);

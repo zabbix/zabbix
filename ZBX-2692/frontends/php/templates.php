@@ -391,7 +391,7 @@ include_once('include/page_header.php');
 
 // Host triggers
 			$result &= copy_triggers($clone_templateid, $templateid);
-			
+
 			// $available_triggers = get_accessible_triggers(PERM_READ_ONLY, array($clone_templateid), PERM_RES_IDS_ARRAY);
 
 			// $sql = 'SELECT DISTINCT t.triggerid, t.description '.
@@ -578,7 +578,9 @@ include_once('include/page_header.php');
 			$template_tbl->setOddRowClass('form_odd_row');
 			$template_tbl->setEvenRowClass('form_even_row');
 // FORM ITEM : Template name text box [  ]
-			$template_tbl->addRow(array(S_NAME, new CTextBox('template_name', $template_name, 54)));
+			$tn_tb = new CTextBox('template_name', $template_name, 54);
+			$tn_tb->setAttribute('required', 'required');
+			$template_tbl->addRow(array(S_NAME, $tn_tb));
 
 // FORM ITEM : Groups tween box [  ] [  ]
 // get all Groups
@@ -939,7 +941,7 @@ include_once('include/page_header.php');
 // GO{
 		$goBox = new CComboBox('go');
 		$goBox->addItem('export', S_EXPORT_SELECTED);
-		
+
 		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
 		$goOption->setAttribute('confirm',S_DELETE_SELECTED_TEMPLATES_Q);
 		$goBox->addItem($goOption);
