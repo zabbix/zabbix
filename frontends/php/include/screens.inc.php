@@ -106,33 +106,6 @@ require_once('include/js.inc.php');
 		return $result;
 	}
 
-/*
-	function add_screen($name,$hsize,$vsize){
-		$screenid=get_dbid("screens","screenid");
-		$sql='INSERT INTO screens (screenid,name,hsize,vsize) '.
-				" VALUES ($screenid,".zbx_dbstr($name).",$hsize,$vsize)";
-		$result=DBexecute($sql);
-
-		if(!$result)
-			return $result;
-
-	return $screenid;
-	}
-
-	function update_screen($screenid,$name,$hsize,$vsize){
-		$sql="update screens set name=".zbx_dbstr($name).",hsize=$hsize,vsize=$vsize where screenid=$screenid";
-	return  DBexecute($sql);
-	}
-*/
-	function delete_screen($screenid){
-		$result=DBexecute('DELETE FROM screens_items where screenid='.$screenid);
-		$result&=DBexecute('DELETE FROM screens_items where resourceid='.$screenid.' and resourcetype='.SCREEN_RESOURCE_SCREEN);
-		$result&=DBexecute('DELETE FROM slides where screenid='.$screenid);
-		$result&=DBexecute("DELETE FROM profiles WHERE idx='web.favorite.screenids' AND source='screenid' AND value_id=$screenid");
-		$result&=DBexecute('DELETE FROM screens where screenid='.$screenid);
-	return	$result;
-	}
-
 	function add_screen_item($resourcetype,$screenid,$x,$y,$resourceid,$width,$height,$colspan,$rowspan,$elements,$valign,$halign,$style,$url,$dynamic){
 		$sql='DELETE FROM screens_items WHERE screenid='.$screenid.' and x='.$x.' and y='.$y;
 		DBexecute($sql);

@@ -169,33 +169,11 @@
 	return $result;
 	}
 
-	function get_link_triggers($linkid){
-		$triggers = array();
-
-		$sql = 'SELECT * FROM sysmaps_link_triggers WHERE linkid='.$linkid;
-		$res = DBselect($sql);
-
-		while($rows = DBfetch($res)){
-			$triggers[] = $rows;
-		}
-	return $triggers;
-	}
-
 	function add_link_trigger($linkid,$triggerid,$drawtype,$color){
 		$linktriggerid=get_dbid("sysmaps_link_triggers","linktriggerid");
 		$sql = 'INSERT INTO sysmaps_link_triggers (linktriggerid,linkid,triggerid,drawtype,color) '.
 					" VALUES ($linktriggerid,$linkid,$triggerid,$drawtype,".zbx_dbstr($color).')';
 	return DBexecute($sql);
-	}
-
-	function update_link_trigger($linkid,$triggerid,$drawtype,$color){
-		$result=delete_link_trigger($linkid,$triggerid);
-		$result&=add_link_trigger($linkid,$triggerid,$drawtype,$color);
-	return $result;
-	}
-
-	function delete_link_trigger($linkid,$triggerid){
-	return DBexecute('DELETE FROM sysmaps_link_triggers WHERE linkid='.$linkid.' AND triggerid='.$triggerid);
 	}
 
 	function delete_all_link_triggers($linkids){
@@ -276,23 +254,6 @@
 					' WHERE '.DBcondition('elementid',$hostids).
 						' AND elementtype='.SYSMAP_ELEMENT_TYPE_HOST);
 
-		$selementids = array();
-		while($db_element = DBfetch($db_elements)){
-			$selementids[$db_element['selementid']] = $db_element['selementid'];
-		}
-		delete_sysmaps_element($selementids);
-
-	return TRUE;
-	}
-
-	function delete_sysmaps_elements_with_sysmapid($sysmapids){
-		zbx_value2array($sysmapids);
-		if(empty($sysmapids)) return true;
-
-		$db_elements = DBselect('SELECT selementid '.
-					' FROM sysmaps_elements '.
-					' WHERE '.DBcondition('elementid',$sysmapids).
-						' AND elementtype='.SYSMAP_ELEMENT_TYPE_MAP);
 		$selementids = array();
 		while($db_element = DBfetch($db_elements)){
 			$selementids[$db_element['selementid']] = $db_element['selementid'];
@@ -464,11 +425,6 @@
 		$jsmenu->InsertJavaScript();
 
 	return $action_map;
-	}
-
-	function get_icon_center_by_selementid($selementid){
-		$element = get_sysmaps_element_by_selementid($selementid);
-	return get_icon_center_by_selement($element);
 	}
 
 	function get_icon_center_by_selement($element, $info=null){
