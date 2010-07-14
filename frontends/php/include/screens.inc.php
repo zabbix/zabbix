@@ -1381,7 +1381,8 @@ require_once('include/js.inc.php');
 						'hostids' => null,
 						'maintenance' => null,
 						'severity' => null,
-						'limit' => null
+						'limit' => null,
+						'extAck' => 0,
 					);
 
 					$item = array(get_table_header(array(S_SYSTEM_STATUS,SPACE,zbx_date2str(S_SCREENS_TRIGGER_FORM_DATE_FORMAT))));
