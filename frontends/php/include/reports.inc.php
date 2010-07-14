@@ -20,12 +20,6 @@
 ?>
 <?php
 
-function show_report2_header($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
-	$form_r = get_report2_header($config,$PAGE_GROUPS, $PAGE_HOSTS);
-
-	show_table_header(S_AVAILABILITY_REPORT_BIG, $form_r);
-}
-
 function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
 	global $USER_DETAILS;
 
@@ -615,7 +609,7 @@ function bar_report_form3(){
 		if(!isset($db_hosts[$host['hostid']]))
 			$host_tb->addItem($host['hostid'],$host['host']);
 	}
-	
+
 	$reportForm->addRow(S_HOSTS, $host_tb->Get(S_SELECTED_HOSTS,array(S_OTHER.SPACE.S_HOSTS.SPACE.'|'.SPACE.S_GROUP.SPACE,$cmbGroups)));
 // ----------
 //*/
