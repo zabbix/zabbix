@@ -418,8 +418,7 @@ function menu_item (o_parent, n_order) {
 	var eldiv = document.createElement('div');
 	eldiv.setAttribute('id', 'e' + o_root.n_id + '_' + this.n_id +'i');
 	eldiv.className = this.getstyle(1, 0);
-	eldiv.appendChild(document.createTextNode(this.a_config[0]));
-
+	eldiv.innerHTML = this.a_config[0];
 	el.appendChild(eldiv);
 	
 //	console.log(el,el.innerHTML);
@@ -443,7 +442,7 @@ function menu_item (o_parent, n_order) {
 }
 
 function A_MENUS_onclick(){	return A_MENUS[this.o_root_n_id].onclick(this.this_n_id); }
-//function A_MENUS_onmouseout(){	}
+// function A_MENUS_onmouseout(){	}
 function A_MENUS_onmouseout(){	return A_MENUS[this.o_root_n_id].onmouseout(this.this_n_id); }//
 function A_MENUS_onmouseover(){	return A_MENUS[this.o_root_n_id].onmouseover(this.this_n_id); }
 function A_MENUS_onmousedown(){	return A_MENUS[this.o_root_n_id].onmousedown(this.this_n_id); }
