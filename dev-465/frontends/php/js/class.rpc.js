@@ -130,7 +130,7 @@ call: function(){
 processRespond: function(resp){
 	this.debug('processRespond');
 //--
-//SDJ(resp);
+///SDJ(resp);
 	var isError = this.processError(resp);
 	if(isError) return false;
 //SDJ(resp.responseJSON.result);

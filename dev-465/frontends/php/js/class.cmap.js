@@ -1512,7 +1512,7 @@ this.selementForm.elementid = e_input_2;
 	var e_td_5 = document.createElement('td');
 this.selementForm.dragHandler = e_td_5;
 	e_td_5.setAttribute('colSpan',"2");
-	e_td_5.className = "form_row_first pointer";
+	e_td_5.className = "form_row_first move";
 	e_tr_4.appendChild(e_td_5);
 
 

@@ -411,7 +411,9 @@ COpt::compare_files_with_menu($ZBX_MENU);
 			$search_div->setAttribute('class','zbx_search');
 			
 			zbx_add_post_js("var sid = createSuggest('search'); $('search').focus(); $('search').select();");
-			zbx_add_post_js("var msglistid = initMessages({});");
+
+			$messaging = getMessageSettings();
+			if($messaging['enabled']) zbx_add_post_js("var msglistid = initMessages({});");
 		}
 
 		$sub_menu_table->addRow(array($menu_divs, $search_div));

@@ -927,7 +927,7 @@
 
 		if($profile){
 			$frmUser->addRow(S_GUI_MESSAGING, new CCheckBox('messages[enabled]', isset($messages['enabled']), 1));
-			$frmUser->addRow(S_MESSAGE_TIMEOUT.SPACE.'('.S_SECONDS_SMALL.')', new CNumericBox("messages[timeout]", $messages['timeout'], 4));
+			$frmUser->addRow(S_MESSAGE_TIMEOUT.SPACE.'('.S_SECONDS_SMALL.')', new CNumericBox("messages[timeout]", $messages['timeout'], 5));
 
 			$severities = array(
 				TRIGGER_SEVERITY_NOT_CLASSIFIED,
@@ -942,18 +942,18 @@
 			$zbxSounds = getSounds();
 			$triggers = new CTable('', 'invisible');
 
-			$soundList = new CComboBox('messages[sounds][ok]', $messages['sounds']['ok']);
+			$soundList = new CComboBox('messages[sounds][recovery]', $messages['sounds']['recovery']);
 			foreach($zbxSounds as $filename => $file) $soundList->addItem($file, $filename);
-			$soundList->setAttribute('id', 'messages[sounds][ok]');
+			$soundList->setAttribute('id', 'messages[sounds][recovery]');
 
-			$jsPlay = "javascript: var soundIdx = $('messages[sounds][ok]').selectedIndex;".
+			$jsPlay = "javascript: var soundIdx = $('messages[sounds][recovery]').selectedIndex;".
 						"var loopIdx = $('messages[sounds][loop]').selectedIndex;".
 						"AudioList.loop(".
-							"$('messages[sounds][ok]').options[soundIdx].value, ".
+							"$('messages[sounds][recovery]').options[soundIdx].value, ".
 							"$('messages[sounds][loop]').options[loopIdx].value);";
 			$resolved = array(
-				new CCheckBox('messages[triggers][ok]', isset($messages['triggers']['ok']), null, 1),
-				S_OK,
+				new CCheckBox('messages[triggers][recovery]', isset($messages['triggers']['recovery']), null, 1),
+				S_RECOVERY,
 				$soundList,
 				new CButton('start', S_PLAY, $jsPlay, false),
 				new CButton('stop', S_STOP, 'javascript: AudioList.stopAll();', false)

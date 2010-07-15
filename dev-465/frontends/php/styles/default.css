@@ -124,7 +124,12 @@ img.borderless	{	border-width: 0px; vertical-align: bottom;	}
 	cursor: pointer;
 }
 
+.move{
+}
 
+.move:hover{
+	cursor: move;
+}
 /**************** HINT BOX *****************/
 
 #hint_box {

@@ -1923,6 +1923,7 @@
 
 //	profile.php
 
+	'S_RECOVERY'=>				'Recovery',
 	'S_GUI_MESSAGING'=>			'GUI Messaging',
 	'S_REPEAT_SOUND'=>			'Repeat sound',
 	'S_MESSAGE_TIMEOUT'=>		'Message timeout',

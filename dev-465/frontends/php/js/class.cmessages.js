@@ -73,6 +73,13 @@ initialize: function($super, messagesListId, args){
 
 	addListener(this.dom.closeAll, 'click', this.closeAllMessages.bindAsEventListener(this));
 	addListener(this.dom.snooze, 'click', this.stopSound.bindAsEventListener(this));
+
+	new Draggable(this.dom.container, {
+		handle: this.dom.header,
+		constraint: 'vertical',
+		scroll: window,
+		snap: function(x,y){ if(y < 0) return [x,0]; else return [x,y]; }
+	});
 //	addListener(this.dom.mute, 'click', this.mute.bindAsEventListener(this));
 
 	if(is_null(this.PEupdater)){
@@ -427,7 +434,7 @@ createMessage: function(){
 // LI
 	this.dom.listItem = document.createElement('li');
 	$(this.list.dom.list).insert({'top': this.dom.listItem});
-	this.dom.listItem.style.border = '2px solid #'+this.color;
+	this.dom.listItem.style.border = '1px solid #FFFFFF';//+this.color;
 
 	this.dom.listItem.className = 'listItem';
 // message

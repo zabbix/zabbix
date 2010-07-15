@@ -63,7 +63,7 @@ include_once('include/page_header.php');
 
 			switch(strtolower($params['caption'])){
 				case 'events':
-					$params['sourceid'] = bcadd($params['sourceid'], 1);
+					$params['sourceid'] = bcadd($params['sourceid'], '1', 0);
 					CProfile::update('web.messages.last.eventid', $params['sourceid'], PROFILE_TYPE_ID);
 					break;
 			}
@@ -88,12 +88,17 @@ include_once('include/page_header.php');
 			$triggerOptions = array(
 				'lastChangeSince' => (time() - $msgsettings['timeout']), // 15 min
 				'filter' => array(
-					'priority' => array_keys($msgsettings['triggers']['severities'])
+					'priority' => array_keys($msgsettings['triggers']['severities']),
 				),
 				'select_hosts' => array('hostid', 'host'),
 				'output' => API_OUTPUT_EXTEND,
 				'expandDescription' => 1
 			);
+
+			if(!$msgsettings['triggers']['recovery']){
+				$triggerOptions['filter']['value'] = array(TRIGGER_VALUE_TRUE);
+			}
+
 			$triggers = CTrigger::get($triggerOptions);
 			$triggers = zbx_toHash($triggers, 'triggerid');
 
@@ -125,7 +130,7 @@ include_once('include/page_header.php');
 				if($event['value'] == TRIGGER_VALUE_FALSE){
 					$priority = 0;
 					$title = S_RESOLVED;
-					$sound = $msgsettings['sounds']['ok'];
+					$sound = $msgsettings['sounds']['recovery'];
 				}
 				else{
 					$priority = $trigger['priority'];

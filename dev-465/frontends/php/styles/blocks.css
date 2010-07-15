@@ -26,50 +26,33 @@ div.messagecontainer{
 	position: absolute;
 	top: 32px;
 	right: 0px;
-/*/background-color: #FFFFFF; /**/
+	background-color: #94A1BB;
 }
 div.messagecontainer .header{
 /*/
 	position: absolute;
 	right: 2px;
+	background: url("../images/gradients/table_head2.gif") repeat-x scroll left top #6D88AD;
 /**/
 	height: 18px;
 	padding: 2px 0px 2px 2px;
 	margin: 0px 2px 0px 2px;
-	background: url("../images/gradients/table_head2.gif") repeat-x scroll left top #6D88AD;
+	cursor: move;
 }
 
 div.messagecontainer ul{
 	clear: right;
 	padding: 0px;
-	margin: 0px 0px 0px 0px;
+	margin: 0px 0px 2px 1px;
 	list-style: none;
 }
 
 div.messagecontainer ul li.listItem{
-	margin: 2px 2px 4px 2px;
+	margin: 1px 2px 1px 2px;
 }
 
 div.messagecontainer ul li.listItem .message{
 	white-space: nowrap;
-}
-
-div.messagecontainer ul li.listItem .messageTable{
-	border: 0px;
-	border-spacing: 0px;
-	margin: 0px;
-}
-
-div.messagecontainer .message .colorbox{
-	width: 20px;
-	height: 100%;
-	float: left;
-}
-
-div.messagecontainer .message .closebox{
-	width: 30px;
-	height: 100%;
-	float: right;
 }
 
 div.messagecontainer .message .messagebox{

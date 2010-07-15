@@ -24,7 +24,7 @@
 /* USER DEFINES */
 
 	define('ZBX_LOGIN_ATTEMPTS',			5);
-	define('ZBX_LOGIN_BLOCK',			30); // sec
+	define('ZBX_LOGIN_BLOCK',				30); // sec
 
 	define('TRIGGER_FALSE_PERIOD',			1800);	// 30min, 0 - disable
 	define('TRIGGER_BLINK_PERIOD',			1800);	// 30min,  0 - disable
