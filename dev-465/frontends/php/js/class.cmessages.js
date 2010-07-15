@@ -47,7 +47,9 @@ messageList:			{},				// list of recieved messages
 messagePipe:			new Array(),	// messageid pipe line
 messageLast:			{},				// last massages sourceid by caption
 
-sounds:{									// sound playback settings
+effectTimeout:			1000,			// effect time out
+
+sounds:{								// sound playback settings
 	'priority': 0,						// max new message priority
 	'sound': null,						// sound to play
 	'repeat':	1						// loop sound for 1,3,5,10 .. times
@@ -70,7 +72,7 @@ initialize: function($super, messagesListId, args){
 	if(IE) this.fixIE();
 
 	addListener(this.dom.closeAll, 'click', this.closeAllMessages.bindAsEventListener(this));
-	addListener(this.dom.snooze, 'click', AudioList.stopAll.bindAsEventListener(AudioList));
+	addListener(this.dom.snooze, 'click', this.stopSound.bindAsEventListener(this));
 //	addListener(this.dom.mute, 'click', this.mute.bindAsEventListener(this));
 
 	if(is_null(this.PEupdater)){
@@ -112,14 +114,47 @@ addMessage: function(newMessage){
 return this.messageList[this.msgcounter];
 },
 
-closeMessage: function(messageid){
+
+playSound: function(){
+	this.debug('playSound');
+//--
+
+	this.sounds.priority = 0;
+	this.sounds.sound = null;
+
+	for(var massegaid in this.messageList){
+		var message = this.messageList[massegaid];
+
+		if(message.priority > this.sounds.priority){
+			this.sounds.priority = message.priority;
+			this.sounds.sound = message.sound;
+		}
+	}
+
+	this.ready = true;
+	if(!is_null(this.sounds.sound)){
+		AudioList.loop(this.sounds.sound, this.sounds.repeat);
+	}
+},
+
+stopSound: function(e){
+	this.debug('stopSound');
+//--
+	if(!is_null(this.sounds.sound)){
+		AudioList.stop(this.sounds.sound);
+	}
+},
+
+closeMessage: function(messageid, withEffect){
 	this.debug('closeMessage', messageid);
 //--
 	if(!isset(messageid, this.messageList)) return true;
 
-	//this.messageList[messageid].close();
-	this.messageList[messageid].remove();
 
+	AudioList.stop(this.messageList[messageid].sound);
+	if(withEffect) this.messageList[messageid].remove();
+	else this.messageList[messageid].close();
+	
 
 	try{
 		delete(this.messageList[messageid]);
@@ -131,21 +166,38 @@ closeMessage: function(messageid){
 	this.messagePipe = new Array();
 	for(var messageid in this.messageList) this.messagePipe.push(messageid);
 
-	if(this.messagePipe.length < 1) $(this.dom.container).hide();
+	if(this.messagePipe.length < 1){
+		this.messagePipe = new Array();
+		this.messageList = {};
+		setTimeout(Element.hide.bind(Element, this.dom.container), this.effectTimeout);
+	}
 },
 
 closeAllMessages: function(e){
 	this.debug('closeAllMessages');
 //--
+	var lastMessageId = this.messagePipe.pop();
 
+	var rpcRequest = {
+		'method': 'message.close',
+		'params': {
+			'caption': this.messageList[lastMessageId].caption,
+			'sourceid': this.messageList[lastMessageId].sourceid,
+			'priority': this.messageList[lastMessageId].priority,
+			'messageid': this.messageList[lastMessageId].messageid
+		},
+//		'onSuccess': function(resp){ SDI(resp)},
+		'onFailure': function(resp){zbx_throw('Messages Widget: message request failed.');}
+	}
+
+	new RPC.Call(rpcRequest);
+
+	Effect.SlideUp(this.dom.container, {duration: (this.effectTimeout / 1000)});
 	for(var messageid in this.messageList){
 		if(empty(this.messageList[messageid])) continue;
 
-		this.closeMessage(messageid);
+		setTimeout(this.closeMessage.bind(this, messageid, false), this.effectTimeout);
 	}
-
-	this.messagePipe = new Array();
-	this.messageList = {};
 },
 
 timeoutMessages: function(){
@@ -153,11 +205,15 @@ timeoutMessages: function(){
 //--
 	var now = parseInt(new Date().getTime()/1000);
 
+	var timeout = 0;
 	for(var messageid in this.messageList){
 		if(empty(this.messageList[messageid])) continue;
 
 		var msg = this.messageList[messageid];
-		if((msg.time + msg.timeout) < now) this.closeMessage(messageid);
+		if((msg.time + parseInt(msg.timeout, 10)) < now){
+			setTimeout(this.closeMessage.bind(this, messageid, true), (500*timeout));
+			timeout++;
+		}
 	}
 },
 
@@ -191,21 +247,12 @@ serverRespond: function(messages){
 	this.debug('serverRespond');
 //--
 
-	this.sounds.priority = 0;
-	this.sounds.sound = null;
-
 	for(var i=0; i < messages.length; i++){
 		var message = this.addMessage(messages[i]);
-
-		if(message.priority > this.sounds.priority){
-			this.sounds.priority = message.priority;
-			this.sounds.sound = message.sound;
-		}
 	}
 
+	this.playSound();
 	this.ready = true;
-//SDJ(this.sound);
-//	if(!is_null(this.sounds.sound)) AudioList.loop(this.sounds.sound, this.sounds.repeat);
 },
 
 updateSettings: function(){
@@ -346,23 +393,10 @@ show: function(){
 close: function(){
 	this.debug('close');
 //--
+	$(this.dom.listItem).remove();
 
-	var rpcRequest = {
-		'method': 'message.close',
-		'params': {
-			'messageListId': this.messageListId,
-			'messageid': this.messageid,
-			'caption': this.caption,
-			'sourceid': this.sourceid,
-			'priority': this.priority
-		},
-//		'onSuccess': this.confirmClose.bind(this),
-		'onFailure': function(resp){zbx_throw('Messages Widget: message request failed.');}
-	}
-
-	new RPC.Call(rpcRequest);
-
-	this.lastupdate = now;
+	if(IE) this.fixIE();
+	this.dom = {};
 },
 
 playSound: function(){
@@ -377,10 +411,12 @@ notify: function(){
 
 remove: function(){
 	this.stopSound();
-	$(this.dom.listItem).remove();
 
-	if(IE) this.fixIE();
-	this.dom = {};
+
+	Effect.BlindUp(this.dom.listItem, {duration: (this.list.effectTimeout / 1000)});
+	Effect.Fade(this.dom.listItem, {duration: (this.list.effectTimeout / 1000)});
+	setTimeout(this.close.bind(this), this.list.effectTimeout);
+
 },
 
 createMessage: function(){

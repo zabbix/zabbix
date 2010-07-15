@@ -58,6 +58,17 @@ include_once('include/page_header.php');
 
 			$result = CHost::get($options);
 			break;
+		case 'message.close':
+			$params = $data['params'];
+
+			switch(strtolower($params['caption'])){
+				case 'events':
+					$params['sourceid'] = bcadd($params['sourceid'], 1);
+					CProfile::update('web.messages.last.eventid', $params['sourceid'], PROFILE_TYPE_ID);
+					break;
+			}
+			
+		break;
 		case 'message.settings':
 			$result = getMessageSettings();
 			break;
@@ -67,6 +78,7 @@ include_once('include/page_header.php');
 			$msgsettings = getMessageSettings();
 
 			$lastEventId = CProfile::get('web.messages.last.eventid', 0);
+//SDI($lastEventId);
 			if(isset($params['messageLast']['events'])){
 				if(bccomp($params['messageLast']['events'], $lastEventId) > 0)
 						$lastEventId = $params['messageLast']['events'];
@@ -101,9 +113,9 @@ include_once('include/page_header.php');
 			}
 
 			$events = CEvent::get($options);
-			order_result($events, 'eventid', ZBX_SORT_UP);
 			order_result($events, 'clock', ZBX_SORT_UP);
 
+			$messages = array();
 			foreach($events as $enum => $event){
 				if(!isset($triggers[$event['objectid']])) continue;
 
@@ -121,7 +133,8 @@ include_once('include/page_header.php');
 					$sound = $msgsettings['sounds'][$trigger['priority']];
 				}
 
-				$result[] = array(
+				if(!isset($messages[$event['clock']])) $messages[$event['clock']] = array();
+				$messages[$event['clock']][] = array(
 					'type' => 3,
 					'caption' => 'events',
 					'sourceid' => $event['eventid'],
@@ -135,10 +148,19 @@ include_once('include/page_header.php');
 						S_DATE.': '.zbx_date2str(S_DATE_FORMAT_YMDHMS, $event['clock']),
 //						S_AGE.': '.zbx_date2age($event['clock'], time()),
 //						S_SEVERITY.': '.get_severity_style($trigger['priority'])
-						S_SOURCE.': '.$event['eventid'].' : '.$event['clock']
+//						S_SOURCE.': '.$event['eventid'].' : '.$event['clock']
 					),
-					'timeout' => $msgsettings['timeout']
+					'timeout' => $msgsettings['timeout'],
+					'options' => $options
 				);
+			}
+
+			foreach($messages as $time => $list){
+				order_result($list, 'sourceid', ZBX_SORT_UP);
+//SDI($list);
+				foreach($list as $lnum => $message){
+					$result[] = $message;
+				}
 			}
 
 		break;
