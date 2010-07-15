@@ -115,16 +115,17 @@ return this.messageList[this.msgcounter];
 },
 
 
-playSound: function(){
+playSound: function(messages){
 	this.debug('playSound');
 //--
 
 	this.sounds.priority = 0;
 	this.sounds.sound = null;
 
-	for(var massegaid in this.messageList){
-		var message = this.messageList[massegaid];
-
+	for(var i=0; i < messages.length; i++){
+		var message = messages[i];
+		if(message.type != 1 && message.type != 3) continue;
+		
 		if(message.priority > this.sounds.priority){
 			this.sounds.priority = message.priority;
 			this.sounds.sound = message.sound;
@@ -251,7 +252,7 @@ serverRespond: function(messages){
 		var message = this.addMessage(messages[i]);
 	}
 
-	this.playSound();
+	this.playSound(messages);
 	this.ready = true;
 },
 
