@@ -47,23 +47,31 @@ messageList:			{},				// list of recieved messages
 messagePipe:			new Array(),	// messageid pipe line
 messageLast:			{},				// last massages sourceid by caption
 
+sounds:{									// sound playback settings
+	'priority': 0,						// max new message priority
+	'sound': null,						// sound to play
+	'repeat':	1						// loop sound for 1,3,5,10 .. times
+},
+
 dom:					{},				// dom object links
 
 initialize: function($super, messagesListId, args){
 	this.messageListId = messagesListId;
 	$super('CMessageList['+messagesListId+']');
 //--
-
+//	return false;
+	
 	this.dom = {};
 	this.messageList = {};
 	this.messageLast = {};
 
-	if(typeof(args) != 'undefined'){
-		if(isset('pipeLength', args))		this.pipeLength = args.pipeLength;
-		if(isset('updateFrequency', args))	this.updateFrequency = args.updateFrequency;
-	}
-
+	this.updateSettings();
 	this.createContainer();
+	if(IE) this.fixIE();
+
+	addListener(this.dom.closeAll, 'click', this.closeAllMessages.bindAsEventListener(this));
+	addListener(this.dom.snooze, 'click', AudioList.stopAll.bindAsEventListener(AudioList));
+//	addListener(this.dom.mute, 'click', this.mute.bindAsEventListener(this));
 
 	if(is_null(this.PEupdater)){
 		this.ready = true;
@@ -99,6 +107,8 @@ addMessage: function(newMessage){
 	this.messageList[this.msgcounter] = new CMessage(this, newMessage);
 	this.messageLast[this.messageList[this.msgcounter].caption] = this.messageList[this.msgcounter].sourceid;
 
+	$(this.dom.container).show();
+
 return this.messageList[this.msgcounter];
 },
 
@@ -110,15 +120,21 @@ closeMessage: function(messageid){
 	//this.messageList[messageid].close();
 	this.messageList[messageid].remove();
 
+
 	try{
 		delete(this.messageList[messageid]);
 	}
 	catch(e){
 		this.messageList[messageid] = null;
 	}
+
+	this.messagePipe = new Array();
+	for(var messageid in this.messageList) this.messagePipe.push(messageid);
+
+	if(this.messagePipe.length < 1) $(this.dom.container).hide();
 },
 
-closeAllMessages: function(){
+closeAllMessages: function(e){
 	this.debug('closeAllMessages');
 //--
 
@@ -128,6 +144,7 @@ closeAllMessages: function(){
 		this.closeMessage(messageid);
 	}
 
+	this.messagePipe = new Array();
 	this.messageList = {};
 },
 
@@ -142,7 +159,6 @@ timeoutMessages: function(){
 		var msg = this.messageList[messageid];
 		if((msg.time + msg.timeout) < now) this.closeMessage(messageid);
 	}
-	
 },
 
 getServerMessages: function(){
@@ -175,21 +191,45 @@ serverRespond: function(messages){
 	this.debug('serverRespond');
 //--
 
-	var playSound = {
-		'priority': 0,
-		'sound': null
-	};
+	this.sounds.priority = 0;
+	this.sounds.sound = null;
+
 	for(var i=0; i < messages.length; i++){
 		var message = this.addMessage(messages[i]);
 
-		if(message.priority > playSound.priority) playSound.sound = message.sound;
+		if(message.priority > this.sounds.priority){
+			this.sounds.priority = message.priority;
+			this.sounds.sound = message.sound;
+		}
 	}
 
 	this.ready = true;
-	
-	if(!is_null(playSound.sound)) AudioList.play(playSound.sound);
+//SDJ(this.sound);
+//	if(!is_null(this.sounds.sound)) AudioList.loop(this.sounds.sound, this.sounds.repeat);
 },
 
+updateSettings: function(){
+	this.debug('updateSettings');
+//--
+
+	var rpcRequest = {
+		'method': 'message.settings',
+		'params': {},
+		'onSuccess': this.setSettings.bind(this),
+		'onFailure': function(resp){zbx_throw('Messages Widget: settings request failed.');}
+	}
+
+//SDJ(rpcRequest.params.messageLast);
+
+	new RPC.Call(rpcRequest);
+},
+
+setSettings: function(settings){
+	this.debug('setSettings');
+//--
+
+	this.sounds.repeat = settings.sounds.loop;
+},
 // DOM creation
 createContainer: function(){
 	this.debug('createContainer');
@@ -204,12 +244,59 @@ createContainer: function(){
 
 	this.dom.container = document.createElement('div');
 	doc_body.appendChild(this.dom.container);
-
+// container
 	this.dom.container.setAttribute('id','zbx_messages');
 	this.dom.container.className = 'messagecontainer';
+	$(this.dom.container).hide();
 
+// Header
+	this.dom.header = document.createElement('div');
+	this.dom.container.appendChild(this.dom.header);
+
+	this.dom.header.className = 'header';
+// close all
+	this.dom.closeAll = document.createElement('div');
+	this.dom.header.appendChild(this.dom.closeAll);
+
+	this.dom.closeAll.setAttribute('title', 'Close all');
+	this.dom.closeAll.className = 'iconclose';
+	this.dom.closeAll.style.cssFloat = 'right';
+	this.dom.closeAll.style.marginRight = '2px';
+
+// snooze
+	this.dom.snooze = document.createElement('div');
+	this.dom.header.appendChild(this.dom.snooze);
+
+	this.dom.snooze.setAttribute('title', 'Snooze');
+	this.dom.snooze.className = 'iconsnooze';
+	this.dom.snooze.style.cssFloat = 'right';
+	this.dom.snooze.style.marginRight = '2px';
+
+// mute
+	this.dom.mute = document.createElement('div');
+	this.dom.header.appendChild(this.dom.mute);
+
+	this.dom.mute.setAttribute('title', 'Mute/Unmute');
+	this.dom.mute.className = 'iconsound';
+	this.dom.mute.style.cssFloat = 'right';
+	this.dom.mute.style.marginRight = '2px';
+
+// Message List
 	this.dom.list = document.createElement('ul');
 	this.dom.container.appendChild(this.dom.list);
+},
+
+fixIE: function(){
+	if(IE6) this.dom.header.style.width = '60px';
+
+	this.dom.closeAll.style.position = 'absolute';
+	this.dom.closeAll.style.right = '2px';
+
+	this.dom.snooze.style.position = 'absolute';
+	this.dom.snooze.style.right = '22px';
+
+	this.dom.mute.style.position = 'absolute';
+	this.dom.mute.style.right = '42px';
 }
 });
 
@@ -217,7 +304,7 @@ createContainer: function(){
 // Message Class
 // Author: Aly
 var CMessage = Class.create(CDebug,{
-messageList:		null,			// link to message list containing this message
+list:				null,			// link to message list containing this message
 messageid:			null,			// msg id
 caption:			'unknown',		// msg caption (events, actions, infos..  e.t.c.)
 sourceid:			null,			// caption + sourceid = identifier for server
@@ -239,7 +326,7 @@ initialize: function($super, messageList, message){
 //--
 
 	this.dom = {};
-	this.messageList = messageList;
+	this.list = messageList;
 
 	for(var key in message){
 		if(empty(message[key]) || !isset(key, this)) continue;
@@ -249,6 +336,8 @@ initialize: function($super, messageList, message){
 	}
 
 	this.createMessage();
+	if(IE) this.fixIE();
+
 },
 
 show: function(){
@@ -289,6 +378,8 @@ notify: function(){
 remove: function(){
 	this.stopSound();
 	$(this.dom.listItem).remove();
+
+	if(IE) this.fixIE();
 	this.dom = {};
 },
 
@@ -298,7 +389,7 @@ createMessage: function(){
 
 // LI
 	this.dom.listItem = document.createElement('li');
-	$(this.messageList.dom.list).insert({'top': this.dom.listItem});
+	$(this.list.dom.list).insert({'top': this.dom.listItem});
 	this.dom.listItem.style.border = '2px solid #'+this.color;
 
 	this.dom.listItem.className = 'listItem';
@@ -308,24 +399,6 @@ createMessage: function(){
 
 	this.dom.message.className = 'message';
 	this.dom.message.style.backgroundColor = '#'+this.color;
-
-/*
-// color box
-	this.dom.colorBox = document.createElement('div');
-	this.dom.message.appendChild(this.dom.colorBox);
-
-	this.dom.colorBox.className = 'colorbox';
-	this.dom.colorBox.style.backgroundColor = '#'+this.color;
-
-
-// close box
-	this.dom.closeBox = document.createElement('div');
-	this.dom.message.appendChild(this.dom.closeBox);
-
-	this.dom.closeBox.className = 'closebox';
-	this.dom.closeBox.style.backgroundColor = '#FFFFFF';
-	//this.dom.colorBox.style.backgroundColor = '#'+this.color;
-//*/
 
 // message box
 	this.dom.messageBox = document.createElement('div');
@@ -353,55 +426,18 @@ createMessage: function(){
 		this.dom.body.appendChild(document.createTextNode(this.body[i]));
 		this.dom.body.className = 'body';
 	}
+},
 
-/* message table
-	this.dom.table = document.createElement('table');
-	//this.dom.listItem.appendChild(this.dom.table);
-	this.dom.message.appendChild(this.dom.table);
+fixIE: function(){
+	if(IE6 || IE7){
+		var maxWidth = 60;
+		for(var tmpmsg in this.list.messageList){
+			var msgDims = getDimensions(this.list.messageList[tmpmsg].dom.message);
+			msgDims.width += 4;
+			if(maxWidth < msgDims.width) maxWidth = msgDims.width;
+		}
 
-	this.dom.table.className = 'messageTable';
-
-	this.dom.tbody = document.createElement('tbody');
-	this.dom.table.appendChild(this.dom.tbody);
-
-	this.dom.row = document.createElement('tr');
-	this.dom.tbody.appendChild(this.dom.row);
-
-// color box
-	this.dom.colorBox = document.createElement('td');
-	this.dom.row.appendChild(this.dom.colorBox);
-
-	this.dom.colorBox.className = 'colorbox';
-	this.dom.colorBox.style.backgroundColor = '#'+this.color;
-
-// message box
-	this.dom.messageBox = document.createElement('td');
-	this.dom.row.appendChild(this.dom.messageBox);
-
-	this.dom.messageBox.className = 'messagebox';
-
-	this.dom.title = document.createElement('span');
-	this.dom.messageBox.appendChild(this.dom.title);
-
-	this.dom.title.appendChild(document.createTextNode(this.title));
-	this.dom.title.className = 'title';
-
-	this.dom.messageBox.appendChild(document.createElement('br'));
-
-	this.dom.body = document.createElement('span');
-	this.dom.messageBox.appendChild(this.dom.body);
-
-	this.dom.body.appendChild(document.createTextNode(this.body));
-	this.dom.body.className = 'body';
-
-
-// close box
-	this.dom.closeBox = document.createElement('td');
-	this.dom.row.appendChild(this.dom.closeBox);
-
-	this.dom.closeBox.className = 'closebox';
-	this.dom.closeBox.style.backgroundColor = '#FFFFFF';
-	//this.dom.colorBox.style.backgroundColor = '#'+this.color;
-//*/
+		this.list.dom.header.style.width = maxWidth+'px';
+	}
 }
 });

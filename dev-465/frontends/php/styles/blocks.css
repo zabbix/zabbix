@@ -24,50 +24,55 @@
 /************************************************************/
 div.messagecontainer{
 	position: absolute;
-	top: 129px;
+	top: 160px;
 	right: 0px;
-
-	overflow: auto;
-
-/*/	height: 768px; /**/
-
-/*/	border: 1px solid yellow; /**/
-/**/background-color: #FFFFFF; /**/
+/*/background-color: #FFFFFF; /**/
+}
+div.messagecontainer .header{
+/*/
+	position: absolute;
+	right: 2px;
+/**/
+	height: 18px;
+	padding: 2px 0px 2px 2px;
+	margin: 0px 2px 0px 2px;
+	background: url("../images/gradients/table_head2.gif") repeat-x scroll left top #6D88AD;
 }
 
 div.messagecontainer ul{
+	clear: right;
 	padding: 0px;
 	margin: 0px 0px 0px 0px;
 	list-style: none;
 }
 
 div.messagecontainer ul li.listItem{
-	margin: 4px 2px 4px 2px;
+	margin: 2px 2px 4px 2px;
 }
 
-ul li.listItem .message{
+div.messagecontainer ul li.listItem .message{
 	white-space: nowrap;
 }
 
-ul li.listItem .messageTable{
+div.messagecontainer ul li.listItem .messageTable{
 	border: 0px;
 	border-spacing: 0px;
 	margin: 0px;
 }
 
-.message .colorbox{
+div.messagecontainer .message .colorbox{
 	width: 20px;
 	height: 100%;
 	float: left;
 }
 
-.message .closebox{
+div.messagecontainer .message .closebox{
 	width: 30px;
 	height: 100%;
 	float: right;
 }
 
-.message .messagebox{
+div.messagecontainer .message .messagebox{
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	padding: 0px 22px 2px 6px;
 	margin-left: 20px;
@@ -76,14 +81,14 @@ ul li.listItem .messageTable{
 	color: #EAEAEA;
 }
 
-.messagebox span.title{
+div.messagecontainer .messagebox span.title{
 	line-height: 22px;
 	font-size: 10pt;
 	font-weight: bold;
 	white-space: nowrap;
 }
 
-.messagebox span.body{
+div.messagecontainer .messagebox span.body{
 	line-height: 14px;
 	font-size: 7pt;
 	white-space: nowrap;
@@ -346,8 +351,6 @@ div.scrollbar .subline .info_period{
 
 div#selection_box{
 	position: absolute;
-
-	-moz-opacity:.40;
 	filter:alpha(opacity=40);
 	opacity:.40;
 	background-color:#0000FF;

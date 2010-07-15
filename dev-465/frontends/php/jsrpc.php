@@ -43,6 +43,7 @@ include_once('include/page_header.php');
 	if(!isset($data['method']) || !isset($data['params'])) fatal_error('Wrong RPC call to JS RPC');
 	if(!is_array($data['params'])) fatal_error('Wrong RPC call to JS RPC');
 
+	$result = array();
 	switch($data['method']){
 		case 'host.get':
 			$pattern = $data['params']['pattern'];
@@ -55,13 +56,10 @@ include_once('include/page_header.php');
 				'limit' => 15
 			);
 
-			$hosts = CHost::get($options);
-
-			$rpcResp = array(
-				'jsonrpc' => '2.0',
-				'result' => $hosts,
-				'id' => $data['id']
-			);
+			$result = CHost::get($options);
+			break;
+		case 'message.settings':
+			$result = getMessageSettings();
 			break;
 		case 'message.get':
 			$params = $data['params'];
@@ -106,8 +104,6 @@ include_once('include/page_header.php');
 			order_result($events, 'eventid', ZBX_SORT_UP);
 			order_result($events, 'clock', ZBX_SORT_UP);
 
-
-			$messages = array();
 			foreach($events as $enum => $event){
 				if(!isset($triggers[$event['objectid']])) continue;
 
@@ -115,20 +111,22 @@ include_once('include/page_header.php');
 				$host = reset($trigger['hosts']);
 
 				if($event['value'] == TRIGGER_VALUE_FALSE){
+					$priority = 0;
 					$title = S_RESOLVED;
 					$sound = $msgsettings['sounds']['ok'];
 				}
 				else{
+					$priority = $trigger['priority'];
 					$title = S_PROBLEM.' '.S_ON_SMALL;
 					$sound = $msgsettings['sounds'][$trigger['priority']];
 				}
 
-				$messages[] = array(
+				$result[] = array(
 					'type' => 3,
 					'caption' => 'events',
 					'sourceid' => $event['eventid'],
 					'time' => $event['clock'],
-					'priority' => $trigger['priority'],
+					'priority' => $priority,
 					'sound' => $sound,
 					'color' => getEventColor($trigger['priority'], $event['value']),
 					'title' => $title.' '.$host['host'],
@@ -143,26 +141,23 @@ include_once('include/page_header.php');
 				);
 			}
 
-			$rpcResp = array(
-				'jsonrpc' => '2.0',
-				'result' => $messages,
-				'id' => $data['id']
-			);
 		break;
-		case 'message.close':
-			$closeMessage = $data['params'];
-			
-			$rpcResp = array(
-				'jsonrpc' => '2.0',
-				'result' => $closeMessage,
-				'id' => $data['id']
-			);
+		case 'message.closeAll':
+			$params = $data['params'];
 		break;
 		default:
 			fatal_error('Wrong RPC call to JS RPC');
 	}
 
-	if(isset($data['id'])) print($json->encode($rpcResp));
+	if(isset($data['id'])){
+		$rpcResp = array(
+			'jsonrpc' => '2.0',
+			'result' => $result,
+			'id' => $data['id']
+		);
+		
+		print($json->encode($rpcResp));
+	}
 ?>
 <?php
 

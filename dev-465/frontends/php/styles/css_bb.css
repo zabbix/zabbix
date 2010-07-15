@@ -364,6 +364,14 @@ div.iconok{
 	background-image: url('../images/general/ok_icon_bb.png');
 }
 
+div.iconsnooze{
+	background-image: url('../images/general/bttn/snooze_bb.png');
+}
+
+div.iconclose{
+	background-image: url('../images/general/bttn/close_bb.png');
+}
+
 div.iconzbxavailable{
 	background-image: url('../images/general/zabbix_available_bb.png');
 }
