@@ -100,7 +100,6 @@ include_once('include/page_header.php');
 		show_messages($result, S_MEDIA_TYPE_DELETED, S_MEDIA_TYPE_WAS_NOT_DELETED);
 
 		if($result){
-			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_MEDIA_TYPE,'Media type ['.$mediatype['description'].']');
 			unset($_REQUEST['form']);
 		}
 	}
@@ -226,8 +225,8 @@ include_once('include/page_header.php');
 		$table=new CTableInfo(S_NO_MEDIA_TYPES_DEFINED);
 		$table->setHeader(array(
 			new CCheckBox('all_media_types',NULL,"checkAll('".$form->getName()."','all_media_types','media_types');"),
-			make_sorting_link(S_TYPE,'type'),
-			make_sorting_link(S_DESCRIPTION,'description'),
+			make_sorting_header(S_TYPE,'type'),
+			make_sorting_header(S_DESCRIPTION,'description'),
 			S_DETAILS
 		));
 
