@@ -121,6 +121,7 @@
 	<link rel="stylesheet" type="text/css" href="css.css" />
 <!--[if IE 6]>
 	<link rel="stylesheet" type="text/css" href="styles/ie.css" />
+	<script type="text/javascript" src="js/ie6fix.js"></script>
 <![endif]-->
 
 <?php

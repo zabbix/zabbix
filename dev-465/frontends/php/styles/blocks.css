@@ -24,21 +24,33 @@
 /************************************************************/
 div.messagecontainer{
 	position: absolute;
-	top: 32px;
+	top: 84px;
 	right: 0px;
 	background-color: #94A1BB;
+	border: 2px solid #FFFFFF;
 }
+
 div.messagecontainer .header{
-/*/
-	position: absolute;
-	right: 2px;
-	background: url("../images/gradients/table_head2.gif") repeat-x scroll left top #6D88AD;
-/**/
 	height: 18px;
 	padding: 2px 0px 2px 2px;
 	margin: 0px 2px 0px 2px;
 	cursor: move;
+	padding-right: 80px;
 }
+
+div.messagecontainer .header .headertext{
+	font-weight: bold;
+	color: #FFFFFF;
+	font-size: 10pt;
+	margin: 0px;
+}
+
+div.messagecontainer .header .controls{
+	position: absolute;
+	right: 1px;
+	top: 2px;
+}
+
 
 div.messagecontainer ul{
 	clear: right;

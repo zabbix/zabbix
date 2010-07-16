@@ -1922,7 +1922,12 @@
 	'S_ZABBIX_CONFIG'=>			'Zabbix config',
 
 //	profile.php
-
+	'S_MOVE'=>					'Move',
+	'S_UNMUTE'=>				'Unmute',
+	'S_MUTE'=>					'Mute',
+	'S_SNOOZE'=>				'Snooze',
+	'S_MESSAGES'=>				'Messages',
+	'S_PROBLEM_ON'=>			'Problem on',
 	'S_RECOVERY'=>				'Recovery',
 	'S_GUI_MESSAGING'=>			'GUI Messaging',
 	'S_REPEAT_SOUND'=>			'Repeat sound',

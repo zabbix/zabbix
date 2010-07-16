@@ -32,7 +32,6 @@ messageListId:			0,				// PMasters reference id
 
 updateFrequency:		60,				// seconds
 timeoutFrequency:		10,				// seconds
-soundFrequency:			1,				// seconds
 
 ready:					false,
 PEupdater:				null,			// PeriodicalExecuter object update
@@ -52,7 +51,8 @@ effectTimeout:			1000,			// effect time out
 sounds:{								// sound playback settings
 	'priority': 0,						// max new message priority
 	'sound': null,						// sound to play
-	'repeat':	1						// loop sound for 1,3,5,10 .. times
+	'repeat':	1,						// loop sound for 1,3,5,10 .. times
+	'mute':		0						// mute alarms
 },
 
 dom:					{},				// dom object links
@@ -73,12 +73,15 @@ initialize: function($super, messagesListId, args){
 
 	addListener(this.dom.closeAll, 'click', this.closeAllMessages.bindAsEventListener(this));
 	addListener(this.dom.snooze, 'click', this.stopSound.bindAsEventListener(this));
+	addListener(this.dom.mute, 'click', this.mute.bindAsEventListener(this));
+
+	//addListener(this.dom.header, 'mouseover', function(this.dom.move){} this.mute.bindAsEventListener(this));
 
 	new Draggable(this.dom.container, {
 		handle: this.dom.header,
 		constraint: 'vertical',
 		scroll: window,
-		snap: function(x,y){ if(y < 0) return [x,0]; else return [x,y]; }
+		snap: function(x,y){if(y < 0) return [x,0]; else return [x,y];}
 	});
 //	addListener(this.dom.mute, 'click', this.mute.bindAsEventListener(this));
 
@@ -94,6 +97,31 @@ initialize: function($super, messagesListId, args){
 		this.PEtimeout = new PeriodicalExecuter(this.timeoutMessages.bind(this), this.timeoutFrequency);
 		this.timeoutMessages();
 	}
+},
+
+setSettings: function(settings){
+	this.debug('setSettings');
+//--
+
+	this.sounds.repeat = settings.sounds.loop;
+	this.sounds.mute = settings.sounds.mute;
+	if(this.sounds.mute == 1){
+		this.dom.mute.className = 'iconmute';
+	}
+},
+
+updateSettings: function(){
+	this.debug('updateSettings');
+//--
+
+	var rpcRequest = {
+		'method': 'message.settings',
+		'params': {},
+		'onSuccess': this.setSettings.bind(this),
+		'onFailure': function(resp){zbx_throw('Messages Widget: settings request failed.');}
+	}
+
+	new RPC.Call(rpcRequest);
 },
 
 addMessage: function(newMessage){
@@ -122,9 +150,30 @@ return this.messageList[this.msgcounter];
 },
 
 
+mute: function(e){
+	this.debug('mute');
+//--
+	e = e || window.event;
+
+	var icon = Event.element(e);
+	var newClass = switchElementsClass(icon, 'iconmute', 'iconsound');
+
+	var rpcRequest = {
+		'method': ((newClass == 'iconmute')?'message.mute':'message.unmute'),
+		'params': {},
+		'onFailure': function(resp){zbx_throw('Messages Widget: mute request failed.');}
+	}
+
+	new RPC.Call(rpcRequest);
+
+	this.stopSound(e);
+},
+
+
 playSound: function(messages){
 	this.debug('playSound');
 //--
+	if(this.sounds.mute == 1) return true;
 
 	this.sounds.priority = 0;
 	this.sounds.sound = null;
@@ -187,7 +236,7 @@ closeAllMessages: function(e){
 	var lastMessageId = this.messagePipe.pop();
 
 	var rpcRequest = {
-		'method': 'message.close',
+		'method': 'message.closeAll',
 		'params': {
 			'caption': this.messageList[lastMessageId].caption,
 			'sourceid': this.messageList[lastMessageId].sourceid,
@@ -263,28 +312,6 @@ serverRespond: function(messages){
 	this.ready = true;
 },
 
-updateSettings: function(){
-	this.debug('updateSettings');
-//--
-
-	var rpcRequest = {
-		'method': 'message.settings',
-		'params': {},
-		'onSuccess': this.setSettings.bind(this),
-		'onFailure': function(resp){zbx_throw('Messages Widget: settings request failed.');}
-	}
-
-//SDJ(rpcRequest.params.messageLast);
-
-	new RPC.Call(rpcRequest);
-},
-
-setSettings: function(settings){
-	this.debug('setSettings');
-//--
-
-	this.sounds.repeat = settings.sounds.loop;
-},
 // DOM creation
 createContainer: function(){
 	this.debug('createContainer');
@@ -308,33 +335,67 @@ createContainer: function(){
 	this.dom.header = document.createElement('div');
 	this.dom.container.appendChild(this.dom.header);
 
-	this.dom.header.className = 'header';
-// close all
-	this.dom.closeAll = document.createElement('div');
-	this.dom.header.appendChild(this.dom.closeAll);
+// Text
+	this.dom.caption = document.createElement('h3');
+	this.dom.caption.className = 'headertext';
+	this.dom.caption.appendChild(document.createTextNode(locale['S_MESSAGES']));
+	this.dom.header.appendChild(this.dom.caption);
 
-	this.dom.closeAll.setAttribute('title', 'Close all');
-	this.dom.closeAll.className = 'iconclose';
-	this.dom.closeAll.style.cssFloat = 'right';
-	this.dom.closeAll.style.marginRight = '2px';
+	this.dom.header.className = 'header';
+
+// controls
+	this.dom.controls = document.createElement('div');
+	this.dom.header.appendChild(this.dom.controls);
+	this.dom.controls.className = 'controls';
+
+// buttons list
+	this.dom.controlList = document.createElement('ul');
+	this.dom.controls.appendChild(this.dom.controlList);
+	this.dom.controlList.style.cssFloat = 'right';
+
+// move
+	this.dom.limove = document.createElement('li');
+	this.dom.controlList.appendChild(this.dom.limove);
+	this.dom.limove.className = 'liniar';
+
+	this.dom.move = document.createElement('div');
+	this.dom.limove.appendChild(this.dom.move);
+
+	this.dom.move.setAttribute('title', locale['S_MOVE']);
+	this.dom.move.className = 'iconmove';
+	this.dom.move.style.display = 'none';
 
 // snooze
-	this.dom.snooze = document.createElement('div');
-	this.dom.header.appendChild(this.dom.snooze);
+	this.dom.lisnooze = document.createElement('li');
+	this.dom.controlList.appendChild(this.dom.lisnooze);
+	this.dom.lisnooze.className = 'liniar';
 
-	this.dom.snooze.setAttribute('title', 'Snooze');
+	this.dom.snooze = document.createElement('div');
+	this.dom.lisnooze.appendChild(this.dom.snooze);
+	this.dom.snooze.setAttribute('title', locale['S_SNOOZE']);
 	this.dom.snooze.className = 'iconsnooze';
-	this.dom.snooze.style.cssFloat = 'right';
-	this.dom.snooze.style.marginRight = '2px';
 
 // mute
-	this.dom.mute = document.createElement('div');
-	this.dom.header.appendChild(this.dom.mute);
+	this.dom.limute = document.createElement('li');
+	this.dom.controlList.appendChild(this.dom.limute);
+	this.dom.limute.className = 'liniar';
 
-	this.dom.mute.setAttribute('title', 'Mute/Unmute');
+	this.dom.mute = document.createElement('div');
+	this.dom.limute.appendChild(this.dom.mute);
+	this.dom.mute.setAttribute('title', locale['S_MUTE']+'/'+locale['S_UNMUTE']);
 	this.dom.mute.className = 'iconsound';
-	this.dom.mute.style.cssFloat = 'right';
-	this.dom.mute.style.marginRight = '2px';
+
+// close all
+	this.dom.licloseAll = document.createElement('li');
+	this.dom.controlList.appendChild(this.dom.licloseAll);
+	this.dom.licloseAll.className = 'liniar';
+
+	this.dom.closeAll = document.createElement('div');
+	this.dom.licloseAll.appendChild(this.dom.closeAll);
+
+	this.dom.closeAll.setAttribute('title', locale['S_CLOSE']);
+	this.dom.closeAll.className = 'iconclose';
+
 
 // Message List
 	this.dom.list = document.createElement('ul');
@@ -342,7 +403,10 @@ createContainer: function(){
 },
 
 fixIE: function(){
-	if(IE6) this.dom.header.style.width = '60px';
+	if(IE6){
+		this.dom.header.style.width = '60px';
+		ie6pngfix.run(this.container);
+	}
 
 	this.dom.closeAll.style.position = 'absolute';
 	this.dom.closeAll.style.right = '2px';
@@ -483,5 +547,34 @@ fixIE: function(){
 
 		this.list.dom.header.style.width = maxWidth+'px';
 	}
+}
+});
+
+// JavaScript Document
+// Message Class
+// Author: Aly
+var DOMList = Class.create({
+classNames:	{
+	'ul':	'',				//
+	'li':	''				//
+},
+node:		null,			// main node (ul)
+list:		new Array(),	// li array
+initialize: function(classNames){
+	classNames = classNames || this.classNames;
+	this.classNames = classNames;
+
+	this.node = document.createElement(ul);
+	this.node.className = this.classNames.ul;
+},
+
+addItem: function(item, className){
+	className = className || this.classNames.li;
+
+	var new_li = document.createElement('li');
+	this.node.appendChild(new_li);
+	this.dom.limove.className = className;
+
+	this.list.push(new_li);
 }
 });

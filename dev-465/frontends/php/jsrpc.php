@@ -58,17 +58,16 @@ include_once('include/page_header.php');
 
 			$result = CHost::get($options);
 			break;
-		case 'message.close':
-			$params = $data['params'];
-
-			switch(strtolower($params['caption'])){
-				case 'events':
-					$params['sourceid'] = bcadd($params['sourceid'], '1', 0);
-					CProfile::update('web.messages.last.eventid', $params['sourceid'], PROFILE_TYPE_ID);
-					break;
-			}
-			
-		break;
+		case 'message.mute':
+			$msgsettings = getMessageSettings();
+			$msgsettings['sounds']['mute'] = 1;
+			updateMessageSettings($msgsettings);
+			break;
+		case 'message.unmute':
+			$msgsettings = getMessageSettings();
+			$msgsettings['sounds']['mute'] = 0;
+			updateMessageSettings($msgsettings);
+			break;
 		case 'message.settings':
 			$result = getMessageSettings();
 			break;
@@ -134,7 +133,7 @@ include_once('include/page_header.php');
 				}
 				else{
 					$priority = $trigger['priority'];
-					$title = S_PROBLEM.' '.S_ON_SMALL;
+					$title = S_PROBLEM_ON;
 					$sound = $msgsettings['sounds'][$trigger['priority']];
 				}
 
@@ -171,6 +170,14 @@ include_once('include/page_header.php');
 		break;
 		case 'message.closeAll':
 			$params = $data['params'];
+
+			switch(strtolower($params['caption'])){
+				case 'events':
+					$params['sourceid'] = bcadd($params['sourceid'], '1', 0);
+					CProfile::update('web.messages.last.eventid', $params['sourceid'], PROFILE_TYPE_ID);
+					break;
+			}
+
 		break;
 		default:
 			fatal_error('Wrong RPC call to JS RPC');

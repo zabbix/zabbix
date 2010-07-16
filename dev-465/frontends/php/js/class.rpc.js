@@ -130,11 +130,12 @@ call: function(){
 processRespond: function(resp){
 	this.debug('processRespond');
 //--
-///SDJ(resp);
+//SDJ(resp);
 	var isError = this.processError(resp);
 	if(isError) return false;
 //SDJ(resp.responseJSON.result);
-	this.userParams.onSuccess(resp.responseJSON.result);
+	if(isset('onSuccess', this.userParams))
+		this.userParams.onSuccess(resp.responseJSON.result);
 
 return true;
 },
@@ -156,7 +157,7 @@ processError: function(resp){
 	}
 
 // RPC responded with error || with incorrect JSON
-	if(isset('error', resp.responseJSON)){
+	if(isset('error', resp.responseJSON) && isset('onFailure', this.userParams)){
 		this.userParams.onFailure(resp.responseJSON.error);
 		return true;
 	}

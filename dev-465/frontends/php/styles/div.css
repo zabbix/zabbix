@@ -341,6 +341,17 @@ div.iconclose{
 div.iconclose:hover{
 }
 
+div.iconmove{
+	height: 18px;
+	width: 18px;
+	background-image: url('../images/general/bttn/move.png');
+	background-repeat:no-repeat;
+	cursor:pointer;
+}
+
+div.iconclose:hover{
+}
+
 div.iconerror{
 	height: 14px;
 	width: 14px;
