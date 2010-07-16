@@ -114,48 +114,28 @@ include_once('include/page_header.php');
 			'maintenance_type' => $_REQUEST['maintenance_type'],
 			'description'=>	$_REQUEST['description'],
 			'active_since'=> zbxDateToTime(get_request('active_since', date('YmdHis'))),
-			'active_till' => zbxDateToTime(get_request('active_till', 0))
+			'active_till' => zbxDateToTime(get_request('active_till', 0)),
+			'timeperiods' => get_request('timeperiods', array()),
+			'hostids' => get_request('hostids', array()),
+			'groupids' => get_request('groupids', array()),
 		);
 
-		$timeperiods = get_request('timeperiods', array());
-
-		DBstart();
-
-		if(isset($_REQUEST['maintenanceid'])) delete_timeperiods_by_maintenanceid($_REQUEST['maintenanceid']);
-
-		$timeperiodids = array();
-		foreach($timeperiods as $id => $timeperiod){
-			$timeperiodid = add_timeperiod($timeperiod);
-			$timeperiodids[$timeperiodid] = $timeperiodid;
-		}
-
 		if(isset($_REQUEST['maintenanceid'])){
+			$maintenance['maintenanceid'] = $_REQUEST['maintenanceid'];
 
-			$maintenanceid=$_REQUEST['maintenanceid'];
-
-			$result = update_maintenance($maintenanceid, $maintenance);
+			$result = CMaintenance::update($maintenance);
 
 			$msg1 = S_MAINTENANCE_UPDATED;
 			$msg2 = S_CANNOT_UPDATE_MAINTENANCE;
 		}
-		else {
-			$result = $maintenanceid = add_maintenance($maintenance);
+		else{
+			$result = CMaintenance::create($maintenance);
 
 			$msg1 = S_MAINTENANCE_ADDED;
 			$msg2 = S_CANNOT_ADD_MAINTENANCE;
 		}
 
-		save_maintenances_windows($maintenanceid, $timeperiodids);
-
-		$hostids = get_request('hostids', array());
-		save_maintenance_host_links($maintenanceid, $hostids);
-
-		$groupids = get_request('groupids', array());
-		save_maintenance_group_links($maintenanceid, $groupids);
-
-		$result = DBend($result);
 		show_messages($result,$msg1,$msg2);
-
 
 		if($result){ // result - OK
 			add_audit(!isset($_REQUEST['maintenanceid'])?AUDIT_ACTION_ADD:AUDIT_ACTION_UPDATE,
@@ -179,9 +159,7 @@ include_once('include/page_header.php');
 			$maintenances[$maintenanceid] = get_maintenance_by_maintenanceid($maintenanceid);
 		}
 
-		DBstart();
-		$go_result = delete_maintenance($maintenanceids);
-		$go_result = DBend($go_result);
+		$go_result = CMaintenance::delete($maintenanceids);
 
 		show_messages($go_result,S_MAINTENANCE_DELETED,S_CANNOT_DELETE_MAINTENANCE);
 		if($go_result){
@@ -418,8 +396,6 @@ include_once('include/page_header.php');
 				'hat_group_link'
 			));
 
-
-
 		$td_l = new CCol($left_tab);
 		$td_l->setAttribute('valign','top');
 
@@ -437,42 +413,16 @@ include_once('include/page_header.php');
 		show_messages();
 		$maintenance_wdgt->addItem($frmMaintenance);
 	}
-	else {
+	else{
 // Table HEADER
-
 		$form = new CForm(null, 'get');
-
 		$form->addItem(array(S_GROUP.SPACE, $pageFilter->getGroupsCB()));
-
 
 		$numrows = new CDiv();
 		$numrows->setAttribute('name','numrows');
-
 		$maintenance_wdgt->addHeader(S_MAINTENANCE_PERIODS_BIG, $form);
 		$maintenance_wdgt->addHeader($numrows);
 // ----
-
-		$sortfield = getPageSortField('name');
-		$sortorder = getPageSortOrder();
-		$options = array(
-			'extendoutput' => 1,
-			'editable' => 1,
-			'sortfield' => $sortfield,
-			'sortorder' => $sortorder,
-			'limit' => ($config['search_limit']+1)
-		);
-		if($pageFilter->groupsSelected){
-			if($pageFilter->groupid > 0)
-				$options['groupids'] = $pageFilter->groupid;
-			else
-				$options['groupids'] = array_keys($pageFilter->groups);
-		}
-		else{
-			$options['groupids'] = array();
-		}
-
-		$maintenances = CMaintenance::get($options);
-
 		$form = new CForm(null,'post');
 		$form->setName('maintenances');
 
@@ -483,43 +433,57 @@ include_once('include/page_header.php');
 			make_sorting_header(S_TYPE,'type'),
 			make_sorting_header(S_STATUS,'status'),
 			S_DESCRIPTION
-			));
+		));
 
-		order_result($maintenances, $sortfield, $sortorder);
-		$paging = getPagingLine($maintenances);
+		if($pageFilter->groupsSelected){
+			$sortfield = getPageSortField('name');
+			$sortorder = getPageSortOrder();
+			$options = array(
+				'extendoutput' => 1,
+				'editable' => 1,
+				'sortfield' => $sortfield,
+				'sortorder' => $sortorder,
+				'limit' => ($config['search_limit']+1)
+			);
+			if($pageFilter->groupid > 0) $options['groupids'] = $pageFilter->groupid;
+			$maintenances = CMaintenance::get($options);
 
-		foreach($maintenances as $mnum => $maintenance){
-			$maintenanceid = $maintenance['maintenanceid'];
+			order_result($maintenances, $sortfield, $sortorder);
+			$paging = getPagingLine($maintenances);
 
-			if($maintenance['active_till'] < time()) $mnt_status = new CSpan(S_EXPIRED,'red');
-			else if($maintenance['active_since'] > time()) $mnt_status = new CSpan(S_APPROACH,'blue');
-			else $mnt_status = new CSpan(S_ACTIVE,'green');
+			foreach($maintenances as $mnum => $maintenance){
+				$maintenanceid = $maintenance['maintenanceid'];
 
-			$table->addRow(array(
-				new CCheckBox('maintenanceids['.$maintenanceid.']',NULL,NULL,$maintenanceid),
-				new CLink($maintenance['name'],'maintenance.php?form=update&maintenanceid='.$maintenanceid.'#form'),
-				$maintenance['maintenance_type']?S_NO_DATA_COLLECTION:S_WITH_DATA_COLLECTION,
-				$mnt_status,
-				$maintenance['description']
+				if($maintenance['active_till'] < time()) $mnt_status = new CSpan(S_EXPIRED,'red');
+				else if($maintenance['active_since'] > time()) $mnt_status = new CSpan(S_APPROACH,'blue');
+				else $mnt_status = new CSpan(S_ACTIVE,'green');
+
+				$table->addRow(array(
+					new CCheckBox('maintenanceids['.$maintenanceid.']',NULL,NULL,$maintenanceid),
+					new CLink($maintenance['name'],'maintenance.php?form=update&maintenanceid='.$maintenanceid.'#form'),
+					$maintenance['maintenance_type']?S_NO_DATA_COLLECTION:S_WITH_DATA_COLLECTION,
+					$mnt_status,
+					$maintenance['description']
 				));
-		}
+			}
 
 // goBox
-		$goBox = new CComboBox('go');
-		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
-		$goOption->setAttribute('confirm',S_DELETE_SELECTED_MAINTENANCE_PERIODS_Q);
-		$goBox->addItem($goOption);
+			$goBox = new CComboBox('go');
+			$goOption = new CComboItem('delete',S_DELETE_SELECTED);
+			$goOption->setAttribute('confirm',S_DELETE_SELECTED_MAINTENANCE_PERIODS_Q);
+			$goBox->addItem($goOption);
 
-		// goButton name is necessary!!!
-		$goButton = new CButton('goButton',S_GO.' (0)');
-		$goButton->setAttribute('id','goButton');
+			// goButton name is necessary!!!
+			$goButton = new CButton('goButton',S_GO.' (0)');
+			$goButton->setAttribute('id','goButton');
 
-		zbx_add_post_js('chkbxRange.pageGoName = "maintenanceids";');
-
-		$footer = get_table_header(array($goBox, $goButton));
+			zbx_add_post_js('chkbxRange.pageGoName = "maintenanceids";');
 //----
 
-		$table = array($paging,$table,$paging,$footer);
+			$footer = get_table_header(array($goBox, $goButton));
+			$table = array($paging,$table,$paging,$footer);
+		}
+
 		$form->addItem($table);
 		$maintenance_wdgt->addItem($form);
 	}
@@ -528,6 +492,5 @@ include_once('include/page_header.php');
 ?>
 <?php
 
-include_once('include/page_footer.php');
-
+	include_once('include/page_footer.php');
 ?>

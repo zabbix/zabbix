@@ -100,8 +100,8 @@ class CMaintenance extends CZBXAPI{
 		}
 // editable + PERMISSION CHECK
 
+		$maintenanceids = array();
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
-			$maintenanceids = array();
 			if(!is_null($options['groupids']) || !is_null($options['hostids'])){
 
 				if(!is_null($options['groupids'])){
@@ -110,9 +110,10 @@ class CMaintenance extends CZBXAPI{
 						' FROM maintenances_groups mmg '.
 						' WHERE '.DBcondition('mmg.groupid', $options['groupids']);
 
+
 					$res = DBselect($sql);
-					while($miantenace = DBfetch($res)){
-						$maintenanceids[] = $miantenace['maintenanceid'];
+					while($maintenance = DBfetch($res)){
+						$maintenanceids[] = $maintenance['maintenanceid'];
 					}
 				}
 
@@ -130,10 +131,9 @@ class CMaintenance extends CZBXAPI{
 					zbx_value2array($options['hostids']);
 					$sql.=' AND '.DBcondition('hg.hostid', $options['hostids']);
 				}
-
 				$res = DBselect($sql);
-				while($miantenace = DBfetch($res)){
-					$maintenanceids[] = $miantenace['maintenanceid'];
+				while($maintenance = DBfetch($res)){
+					$maintenanceids[] = $maintenance['maintenanceid'];
 				}
 
 				$sql_parts['where'][] = DBcondition('m.maintenanceid',$maintenanceids);
@@ -142,7 +142,6 @@ class CMaintenance extends CZBXAPI{
 		else{
 			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
 
-			$maintenanceids = array();
 			$sql = ' SELECT mm.maintenanceid '.
 					' FROM maintenances mm, maintenances_groups mmg, rights r,users_groups ug '.
 					' WHERE r.groupid=ug.usrgrpid  '.
@@ -190,7 +189,6 @@ class CMaintenance extends CZBXAPI{
 				zbx_value2array($options['hostids']);
 				$sql.=' AND '.DBcondition('hg.hostid', $options['hostids']);
 			}
-
 			$res = DBselect($sql);
 			while($miantenace = DBfetch($res)){
 				$maintenanceids[] = $miantenace['maintenanceid'];
@@ -198,6 +196,7 @@ class CMaintenance extends CZBXAPI{
 
 			$sql_parts['where'][] = DBcondition('m.maintenanceid',$maintenanceids);
 		}
+
 
 // nodeids
 		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
@@ -387,23 +386,119 @@ Copt::memoryPick();
  */
 	public static function create($maintenances){
 		$maintenances = zbx_toArray($maintenances);
-		$maintenanceids = array();
-		$result = false;
 
-		self::BeginTransaction(__METHOD__);
-		foreach($maintenances as $num => $maintenance){
-			$result = add_maintenance($maintenance);
-			if(!$result) break;
+		try{
+			self::BeginTransaction(__METHOD__);
 
-			$maintenanceids[] = $result;
-		}
-		$result = self::EndTransaction($result, __METHOD__);
+			$hostids = array();
+			$groupids = array();
+			foreach($maintenances as $maintenance){
+				$hostids = array_merge($hostids, $maintenance['hostids']);
+				$groupids = array_merge($groupids, $maintenance['groupids']);
+			}
 
-		if($result){
+			if(empty($hostids) && empty($groupids)){
+				self::exception(ZBX_API_ERROR_PERMISSIONS, 'At least one host or group should be selected');
+			}
+// hosts permissions
+			$options = array(
+				'hostids' => $hostids,
+				'editable' => 1,
+				'output' => API_OUTPUT_SHORTEN,
+				'preservekeys' => 1,
+			);
+			$upd_hosts = CHost::get($options);
+			foreach($hostids as $hostid){
+				if(!isset($upd_hosts[$hostid])){
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				}
+			}
+// groups permissions
+			$options = array(
+				'hostids' => $groupids,
+				'editable' => 1,
+				'output' => API_OUTPUT_SHORTEN,
+				'preservekeys' => 1,
+			);
+			$upd_groups = CHostGroup::get($options);
+			foreach($groupids as $groupid){
+				if(!isset($upd_groups[$groupid])){
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				}
+			}
+
+
+			$tid = 0;
+			$insert = array();
+			$timeperiods = array();
+			$insert_timeperiods = array();
+			foreach($maintenances as $mnum => $maintenance){
+				$db_fields = array(
+					'name' => null,
+					'active_since'=> time(),
+					'active_till' => time()+86400,
+				);
+				if(!check_db_fields($db_fields, $maintenance)){
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect parameters used for Maintenance');
+				}
+
+				$insert[$mnum] = $maintenance;
+
+				foreach($maintenance['timeperiods'] as $timeperiod){
+					$db_fields = array(
+						'timeperiod_type' => TIMEPERIOD_TYPE_ONETIME,
+						'period' =>	3600,
+						'start_date' =>	time()
+					);
+					check_db_fields($db_fields, $timeperiod);
+
+					$tid++;
+					$insert_timeperiods[$tid] = $timeperiod;
+					$timeperiods[$tid] = $mnum;
+				}
+			}
+			$maintenanceids = DB::insert('maintenances', $insert);
+			$timeperiodids = DB::insert('timeperiods', $insert_timeperiods);
+
+
+			$insert_windows = array();
+			foreach($timeperiods as $tid => $mnum){
+				$insert_windows[] = array(
+					'timeperiodid' => $timeperiodids[$tid],
+					'maintenanceid' => $maintenanceids[$mnum],
+				);
+			}
+			DB::insert('maintenances_windows', $insert_windows);
+
+
+			$insert_hosts = array();
+			$insert_groups = array();
+			foreach($maintenances as $mnum => $maintenance){
+				foreach($maintenance['hostids'] as $hostid){
+					$insert_hosts[] = array(
+						'hostid' => $hostid,
+						'maintenanceid' => $maintenanceids[$mnum],
+					);
+				}
+				foreach($maintenance['groupids'] as $groupid){
+					$insert_groups[] = array(
+						'groupid' => $groupid,
+						'maintenanceid' => $maintenanceids[$mnum],
+					);
+				}
+			}
+			DB::insert('maintenances_hosts', $insert_hosts);
+			DB::insert('maintenances_groups', $insert_groups);
+
+
+			self::EndTransaction(true, __METHOD__);
 			return array('maintenanceids'=>$maintenanceids);
 		}
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal Zabbix error');
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
 		}
 	}
@@ -418,40 +513,142 @@ Copt::memoryPick();
  */
 	public static function update($maintenances){
 		$maintenances = zbx_toArray($maintenances);
-		$maintenanceids = array();
-		$result = false;
-//------
+		$maintenanceids = zbx_objectValues($maintenances, 'maintenanceid');
 
-		$options = array(
-			'maintenanceids'=>zbx_objectValues($maintenances, 'maintenanceid'),
-			'editable'=>1,
-			'extendoutput'=>1,
-			'preservekeys'=>1
-		);
-		$upd_maintenances = self::get($options);
-		foreach($maintenances as $snum => $maintenance){
-			if(!isset($upd_maintenances[$maintenance['maintenanceid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				return false;
+		try{
+			self::BeginTransaction(__METHOD__);
+
+// Maintenance permissions
+			$hostids = array();
+			$groupids = array();
+			$options = array(
+				'maintenanceids' => zbx_objectValues($maintenances, 'maintenanceid'),
+				'editable' => 1,
+				'output' => API_OUTPUT_SHORTEN,
+				'preservekeys' => 1,
+			);
+			$upd_maintenances = self::get($options);
+			foreach($maintenances as $maintenance){
+				if(!isset($upd_maintenances[$maintenance['maintenanceid']])){
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				}
+				$hostids = array_merge($hostids, $maintenance['hostids']);
+				$groupids = array_merge($groupids, $maintenance['groupids']);
 			}
 
-			$maintenanceids[] = $maintenance['maintenanceid'];
-			//add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MAINTENANCE, 'Maintenance ['.$maintenance['name'].']');
-		}
+			if(empty($hostids) && empty($groupids)){
+				self::exception(ZBX_API_ERROR_PERMISSIONS, 'At least one host or group should be selected');
+			}
+// hosts permissions
+			$options = array(
+				'hostids' => $hostids,
+				'editable' => 1,
+				'output' => API_OUTPUT_SHORTEN,
+				'preservekeys' => 1,
+			);
+			$upd_hosts = CHost::get($options);
+			foreach($hostids as $hostid){
+				if(!isset($upd_hosts[$hostid])){
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				}
+			}
+// groups permissions
+			$options = array(
+				'groupids' => $groupids,
+				'editable' => 1,
+				'output' => API_OUTPUT_SHORTEN,
+				'preservekeys' => 1,
+			);
+			$upd_groups = CHostGroup::get($options);
+			foreach($groupids as $groupid){
+				if(!isset($upd_groups[$groupid])){
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				}
+			}
 
-		self::BeginTransaction(__METHOD__);
-		foreach($maintenances as $num => $maintenance){
-			$result = update_maintenance($maintenance['maintenanceid'], $maintenance);
-			if(!$result) break;
-		}
 
-		$result = self::EndTransaction($result, __METHOD__);
+			$timeperiodids = array();
+			$sql = 'SELECT DISTINCT tp.timeperiodid '.
+			' FROM timeperiods tp, maintenances_windows mw '.
+			' WHERE '.DBcondition('mw.maintenanceid',$maintenanceids).
+				' AND tp.timeperiodid=mw.timeperiodid ';
+			$db_timeperiods = DBselect($sql);
+			while($timeperiod = DBfetch($db_timeperiods)){
+				$timeperiodids[] = $timeperiod['timeperiodid'];
+			}
 
-		if($result){
-			return array('maintenanceids'=>$maintenanceids);
+			DB::delete('timeperiods', DBcondition('timeperiodid', $timeperiodids));
+			DB::delete('maintenances_windows', DBcondition('maintenanceid', $maintenanceids));
+
+
+			$tid = 0;
+			$update = array();
+			$timeperiods = array();
+			$insert_timeperiods = array();
+			foreach($maintenances as $mnum => $maintenance){
+				$db_fields = array(
+					'maintenanceid' => null,
+				);
+				if(!check_db_fields($db_fields, $maintenance)){
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect parameters used for Maintenance');
+				}
+
+				$update[$mnum] = array(
+					'values' => $maintenance,
+					'where' => array('maintenanceid='.$maintenance['maintenanceid']),
+				);
+
+				foreach($maintenance['timeperiods'] as $timeperiod){
+					$tid++;
+					$insert_timeperiods[$tid] = $timeperiod;
+					$timeperiods[$tid] = $mnum;
+				}
+			}
+			DB::update('maintenances', $update);
+			$timeperiodids = DB::insert('timeperiods', $insert_timeperiods);
+
+
+			$insert_windows = array();
+			foreach($timeperiods as $tid => $mnum){
+				$insert_windows[] = array(
+					'timeperiodid' => $timeperiodids[$tid],
+					'maintenanceid' => $maintenances[$mnum]['maintenanceid'],
+				);
+			}
+			DB::insert('maintenances_windows', $insert_windows);
+
+
+			DB::delete('maintenances_hosts', DBcondition('maintenanceid', $maintenanceids));
+			DB::delete('maintenances_groups', DBcondition('maintenanceid', $maintenanceids));
+
+			$insert_hosts = array();
+			$insert_groups = array();
+			foreach($maintenances as $mnum => $maintenance){
+				foreach($maintenance['hostids'] as $hostid){
+					$insert_hosts[] = array(
+						'hostid' => $hostid,
+						'maintenanceid' => $maintenance['maintenanceid'],
+					);
+				}
+				foreach($maintenance['groupids'] as $groupid){
+					$insert_groups[] = array(
+						'groupid' => $groupid,
+						'maintenanceid' => $maintenance['maintenanceid'],
+					);
+				}
+			}
+			DB::insert('maintenances_hosts', $insert_hosts);
+			DB::insert('maintenances_groups', $insert_groups);
+
+
+			self::EndTransaction(true, __METHOD__);
+			return true;
 		}
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal Zabbix error');
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
 		}
 	}
@@ -465,40 +662,49 @@ Copt::memoryPick();
  */
 	public static function delete($maintenances){
 		$maintenances = zbx_toArray($maintenances);
-		$maintenanceids = array();
-		$result = false;
-//------
+		$maintenanceids = zbx_objectValues($maintenances, 'maintenanceid');
 
-		$options = array(
-			'maintenanceids'=>zbx_objectValues($maintenances, 'maintenanceid'),
-			'editable'=>1,
-			'extendoutput'=>1,
-			'preservekeys'=>1
-		);
-		$del_maintenances = self::get($options);
-		foreach($maintenances as $snum => $maintenance){
-			if(!isset($del_maintenances[$maintenance['maintenanceid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				return false;
+		try{
+			self::BeginTransaction(__METHOD__);
+			
+			$options = array(
+				'maintenanceids' => $maintenanceids,
+				'editable' => 1,
+				'output' => API_OUTPUT_SHORTEN,
+				'preservekeys' => 1
+			);
+			$del_maintenances = self::get($options);
+			foreach($maintenances as $snum => $maintenance){
+				if(!isset($del_maintenances[$maintenance['maintenanceid']])){
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				}
 			}
 
-			$maintenanceids[] = $maintenance['maintenanceid'];
-			//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MAINTENANCE, 'Maintenance ['.$maintenance['name'].']');
-		}
+			$timeperiodids = array();
+			$sql = 'SELECT DISTINCT tp.timeperiodid '.
+			' FROM timeperiods tp, maintenances_windows mw '.
+			' WHERE '.DBcondition('mw.maintenanceid',$maintenanceids).
+				' AND tp.timeperiodid=mw.timeperiodid ';
+			$db_timeperiods = DBselect($sql);
+			while($timeperiod = DBfetch($db_timeperiods)){
+				$timeperiodids[] = $timeperiod['timeperiodid'];
+			}
 
-		if(!empty($maintenanceids)){
-			$result = delete_maintenance($maintenanceids);
-		}
-		else{
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ maintenanceids ]');
-			$result = false;
-		}
+			$mid_cond = DBcondition('maintenanceid', $maintenanceids);
+			DB::delete('timeperiods', DBcondition('timeperiodid', $timeperiodids));
+			DB::delete('maintenances_windows', $mid_cond);
+			DB::delete('maintenances_hosts', $mid_cond);
+			DB::delete('maintenances_groups', $mid_cond);
+			DB::delete('maintenances', $mid_cond);
 
-		if($result){
-			return array('maintenanceids'=>$maintenanceids);
+			self::EndTransaction(true, __METHOD__);
+			return true;
 		}
-		else{
-			self::setError(__METHOD__);
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
 		}
 	}
