@@ -351,44 +351,21 @@ Copt::memoryPick();
 	}
 
 /**
- * Get Maintenance ID by host.name and item.key
- *
- * @param array $maintenance
- * @param array $maintenance['name']
- * @param array $maintenance['hostid']
- * @return int|boolean
- */
-	public static function getObjects($maintenance){
-		$result = array();
-		$maintenanceids = array();
-
-		$sql = 'SELECT m.maintenanceid '.
-				' FROM maintenances m '.
-				' WHERE m.name='.$maintenance['name'];
-		$res = DBselect($sql);
-		while($maintenance = DBfetch($res)){
-			$maintenanceids[$maintenance['maintenanceid']] = $maintenance['maintenanceid'];
-		}
-
-		if(!empty($maintenanceids))
-			$result = self::get(array('maintenanceids'=>$maintenanceids, 'extendoutput'=>1));
-
-	return $result;
-	}
-
-/**
  * Add maintenances
  *
- * @param _array $maintenances
- * @param array $maintenance['name']
- * @param array $maintenance['hostid']
+ * @param array $maintenances
  * @return boolean
  */
 	public static function create($maintenances){
+		global $USER_DETAILS;
 		$maintenances = zbx_toArray($maintenances);
 
 		try{
 			self::BeginTransaction(__METHOD__);
+
+			if($USER_DETAILS['type'] == USER_TYPE_ZABBIX_USER){
+				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+			}
 
 			$hostids = array();
 			$groupids = array();
@@ -398,7 +375,7 @@ Copt::memoryPick();
 			}
 
 			if(empty($hostids) && empty($groupids)){
-				self::exception(ZBX_API_ERROR_PERMISSIONS, 'At least one host or group should be selected');
+				self::exception(ZBX_API_ERROR_PERMISSIONS, S_GROUP_OR_HOST_NEEDED);
 			}
 // hosts permissions
 			$options = array(
@@ -507,16 +484,19 @@ Copt::memoryPick();
  * Update maintenances
  *
  * @param _array $maintenances
- * @param array $maintenance['name']
- * @param array $maintenance['hostid']
  * @return boolean
  */
 	public static function update($maintenances){
+		global $USER_DETAILS;
 		$maintenances = zbx_toArray($maintenances);
 		$maintenanceids = zbx_objectValues($maintenances, 'maintenanceid');
 
 		try{
 			self::BeginTransaction(__METHOD__);
+
+			if($USER_DETAILS['type'] == USER_TYPE_ZABBIX_USER){
+				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+			}
 
 // Maintenance permissions
 			$hostids = array();
@@ -537,7 +517,7 @@ Copt::memoryPick();
 			}
 
 			if(empty($hostids) && empty($groupids)){
-				self::exception(ZBX_API_ERROR_PERMISSIONS, 'At least one host or group should be selected');
+				self::exception(ZBX_API_ERROR_PERMISSIONS, S_GROUP_OR_HOST_NEEDED);
 			}
 // hosts permissions
 			$options = array(
@@ -661,11 +641,16 @@ Copt::memoryPick();
  * @return boolean
  */
 	public static function delete($maintenances){
+		global $USER_DETAILS;
 		$maintenances = zbx_toArray($maintenances);
 		$maintenanceids = zbx_objectValues($maintenances, 'maintenanceid');
 
 		try{
 			self::BeginTransaction(__METHOD__);
+
+			if($USER_DETAILS['type'] == USER_TYPE_ZABBIX_USER){
+				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+			}
 			
 			$options = array(
 				'maintenanceids' => $maintenanceids,
