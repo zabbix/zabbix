@@ -1195,10 +1195,10 @@ function zbx_subarray_push(&$mainArray, $sIndex, $element) {
 
 
 		if(($page['type'] != PAGE_TYPE_HTML) && defined('ZBX_PAGE_MAIN_HAT')){
-			$link = new CLink($obj,$url,null,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
+			$link = new CLink($obj,$url,null,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');", 'nosid');
 		}
 		else{
-			$link = new CLink($obj,$url);
+			$link = new CLink($obj,$url, null, null, 'nosid');
 		}
 
 		if(isset($_REQUEST['sort']) && ($tabfield == $_REQUEST['sort'])){
