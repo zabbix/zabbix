@@ -137,26 +137,26 @@ function make_favorite_screens(){
 			if(!slideshow_accessible($sourceid, PERM_READ_ONLY)) continue;
 			if(!$slide = get_slideshow_by_slideshowid($sourceid)) continue;
 
-			$link = new CLink(get_node_name_by_elid($sourceid, null, ': ').$slide['name'],'screens.php?config=1&elementid='.$sourceid);
+			$link = new CLink(get_node_name_by_elid($sourceid, null, ': ').$slide['name'],'slides.php?elementid='.$sourceid);
 			$link->setTarget('blank');
 
 			$capt = new CSpan($link);
 			$capt->setAttribute('style','line-height: 14px; vertical-align: middle;');
 
-			$icon = new CLink(new CImg('images/general/chart.png','screen',18,18,'borderless'),'screens.php?config=1&elementid='.$sourceid.'&fullscreen=1');
+			$icon = new CLink(new CImg('images/general/chart.png','screen',18,18,'borderless'),'slides.php?elementid='.$sourceid.'&fullscreen=1');
 			$icon->setTarget('blank');
 		}
 		else{
 			if(!isset($screens[$sourceid])) continue;
 			$screen = $screens[$sourceid];
 
-			$link = new CLink(get_node_name_by_elid($sourceid, null, ': ').$screen['name'],'screens.php?config=0&elementid='.$sourceid);
+			$link = new CLink(get_node_name_by_elid($sourceid, null, ': ').$screen['name'],'screens.php?elementid='.$sourceid);
 			$link->setTarget('blank');
 
 			$capt = new CSpan($link);
 			$capt->setAttribute('style','line-height: 14px; vertical-align: middle;');
 
-			$icon = new CLink(new CImg('images/general/chart.png','screen',18,18,'borderless'),'screens.php?config=0&elementid='.$sourceid.'&fullscreen=1');
+			$icon = new CLink(new CImg('images/general/chart.png','screen',18,18,'borderless'),'screens.php?elementid='.$sourceid.'&fullscreen=1');
 			$icon->setTarget('blank');
 		}
 
