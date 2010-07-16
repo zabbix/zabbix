@@ -108,6 +108,14 @@ static long	zbx_get_eventlog_message_xpath(LPCTSTR wsource, long which, char **o
 	DWORD		array_count = 4;
 	DWORD		dwReturned = 0, dwValuesCount = 0, dwBufferSize = 0;
 	const ULONGLONG	sec_1970 = 116444736000000000;
+	static HMODULE hmod_wevtapi = NULL;
+	static EVT_HANDLE (WINAPI *EvtQuery)(EVT_HANDLE, LPCWSTR, LPCWSTR, DWORD) = NULL;
+	static EVT_HANDLE (WINAPI *EvtCreateRenderContext)(DWORD, LPCWSTR*, DWORD) = NULL;
+	static BOOL (WINAPI *EvtNext)(EVT_HANDLE, DWORD, PEVT_HANDLE, DWORD, DWORD, __out PDWORD) = NULL;
+	static BOOL (WINAPI *EvtRender)(EVT_HANDLE, EVT_HANDLE, DWORD, DWORD, __out_bcount_part_opt(BufferSize, *BufferUsed) PVOID, __out PDWORD, __out PDWORD) = NULL;
+	static EVT_HANDLE (WINAPI *EvtOpenPublisherMetadata)(EVT_HANDLE, LPCWSTR, LPCWSTR, LCID, DWORD) = NULL;
+	static BOOL (WINAPI *EvtFormatMessage)(EVT_HANDLE, EVT_HANDLE, DWORD, DWORD, PEVT_VARIANT, DWORD, DWORD, __out_ecount_part_opt(BufferSize, *BufferUsed) LPWSTR, __out PDWORD) = NULL;
+	static BOOL (WINAPI *EvtClose)(EVT_HANDLE) = NULL;
 
 	assert(out_source);
 	assert(out_message);
@@ -120,6 +128,39 @@ static long	zbx_get_eventlog_message_xpath(LPCTSTR wsource, long which, char **o
 	*out_message	= NULL;
 	*out_severity	= 0;
 	*out_timestamp	= 0;
+
+	/* We have to use LoadLibrary() to load wevtapi.dll to avoid it required even before Vista. */
+	/* load wevtapi.dll once */
+	if (NULL == hmod_wevtapi)
+	{
+		hmod_wevtapi = LoadLibrary(L"wevtapi.dll");
+		if (NULL == hmod_wevtapi)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Can't load wevtapi.dll");
+			goto finish;
+		}
+		zabbix_log(LOG_LEVEL_DEBUG, "wevtapi.dll was loaded");
+		/* get function pointer from wevtapi.dll */
+		(FARPROC)EvtQuery = GetProcAddress(hmod_wevtapi, "EvtQuery");
+		(FARPROC)EvtCreateRenderContext = GetProcAddress(hmod_wevtapi, "EvtCreateRenderContext");
+		(FARPROC)EvtNext = GetProcAddress(hmod_wevtapi, "EvtNext");
+		(FARPROC)EvtRender = GetProcAddress(hmod_wevtapi, "EvtRender");
+		(FARPROC)EvtOpenPublisherMetadata = GetProcAddress(hmod_wevtapi, "EvtOpenPublisherMetadata");
+		(FARPROC)EvtFormatMessage = GetProcAddress(hmod_wevtapi, "EvtFormatMessage");
+		(FARPROC)EvtClose = GetProcAddress(hmod_wevtapi, "EvtClose");
+		if (NULL == EvtQuery ||
+			NULL == EvtCreateRenderContext ||
+			NULL == EvtNext ||
+			NULL == EvtRender ||
+			NULL == EvtOpenPublisherMetadata ||
+			NULL == EvtFormatMessage ||
+			NULL == EvtClose)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Can't load wevtapi.dll functions");
+			goto finish;
+		}
+		zabbix_log(LOG_LEVEL_DEBUG, "wevtapi.dll functions were loaded");
+	}
 
 	if (!wsource || !*wsource)
 	{
