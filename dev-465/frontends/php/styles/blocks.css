@@ -34,7 +34,6 @@ div.messagecontainer .header{
 	height: 18px;
 	padding: 2px 0px 2px 2px;
 	margin: 0px 2px 0px 2px;
-	cursor: move;
 	padding-right: 80px;
 }
 
@@ -61,6 +60,7 @@ div.messagecontainer ul{
 
 div.messagecontainer ul li.listItem{
 	margin: 1px 2px 1px 2px;
+	border: 1px solid #FFFFFF;
 }
 
 div.messagecontainer ul li.listItem .message{

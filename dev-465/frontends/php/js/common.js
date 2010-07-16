@@ -71,6 +71,17 @@ function is_number(obj){
 return false;
 }
 
+function is_object(obj, instance){
+	if((typeof(instance) === 'object') || (typeof(instance) === 'function')){
+		if((typeof(obj) === 'object') && (obj instanceof instance)) return true;
+	}
+	else{
+		if(typeof(obj) === 'object') return true;
+	}
+
+return false;
+}
+
 function is_string(obj){
 	return (typeof(obj) === 'string');
 }
@@ -108,14 +119,15 @@ function SDI(msg){
 
 }
 
-function SDJ(obj){
+function SDJ(obj, name){
 	var debug = '';
 //	debug = obj.toSource();
 //	SDI(debug);
 //return null;
 
+	name = name || 'none';
 	for(var key in obj){
-		if(typeof(obj[key]) == 'function') continue;
+		if(typeof(obj[key]) == name) continue;
 
 		debug+=key+': '+obj[key]+' ('+typeof(obj[key])+')'+'\n';//' key: '+typeof(key)+'\n';
 	}

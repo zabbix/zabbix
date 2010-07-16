@@ -78,7 +78,7 @@ initialize: function($super, messagesListId, args){
 	//addListener(this.dom.header, 'mouseover', function(this.dom.move){} this.mute.bindAsEventListener(this));
 
 	new Draggable(this.dom.container, {
-		handle: this.dom.header,
+		handle: this.dom.caption, //this.dom.header,
 		constraint: 'vertical',
 		scroll: window,
 		snap: function(x,y){if(y < 0) return [x,0]; else return [x,y];}
@@ -174,6 +174,7 @@ playSound: function(messages){
 	this.debug('playSound');
 //--
 	if(this.sounds.mute == 1) return true;
+	this.stopSound();
 
 	this.sounds.priority = 0;
 	this.sounds.sound = null;
@@ -335,13 +336,14 @@ createContainer: function(){
 	this.dom.header = document.createElement('div');
 	this.dom.container.appendChild(this.dom.header);
 
+	this.dom.header.className = 'header';
+
 // Text
 	this.dom.caption = document.createElement('h3');
-	this.dom.caption.className = 'headertext';
+	this.dom.caption.className = 'headertext move';
 	this.dom.caption.appendChild(document.createTextNode(locale['S_MESSAGES']));
 	this.dom.header.appendChild(this.dom.caption);
 
-	this.dom.header.className = 'header';
 
 // controls
 	this.dom.controls = document.createElement('div');
@@ -349,73 +351,49 @@ createContainer: function(){
 	this.dom.controls.className = 'controls';
 
 // buttons list
-	this.dom.controlList = document.createElement('ul');
+	this.dom.controlList = new CList().node;
 	this.dom.controls.appendChild(this.dom.controlList);
 	this.dom.controlList.style.cssFloat = 'right';
 
 // move
-	this.dom.limove = document.createElement('li');
-	this.dom.controlList.appendChild(this.dom.limove);
-	this.dom.limove.className = 'liniar';
-
 	this.dom.move = document.createElement('div');
-	this.dom.limove.appendChild(this.dom.move);
-
 	this.dom.move.setAttribute('title', locale['S_MOVE']);
 	this.dom.move.className = 'iconmove';
-	this.dom.move.style.display = 'none';
+	//this.dom.move.style.display = 'none';
+
+	this.dom.controlList.addItem(this.dom.move, 'linear');
 
 // snooze
-	this.dom.lisnooze = document.createElement('li');
-	this.dom.controlList.appendChild(this.dom.lisnooze);
-	this.dom.lisnooze.className = 'liniar';
-
 	this.dom.snooze = document.createElement('div');
-	this.dom.lisnooze.appendChild(this.dom.snooze);
 	this.dom.snooze.setAttribute('title', locale['S_SNOOZE']);
 	this.dom.snooze.className = 'iconsnooze';
 
-// mute
-	this.dom.limute = document.createElement('li');
-	this.dom.controlList.appendChild(this.dom.limute);
-	this.dom.limute.className = 'liniar';
+	this.dom.controlList.addItem(this.dom.snooze, 'linear');
 
+// mute
 	this.dom.mute = document.createElement('div');
-	this.dom.limute.appendChild(this.dom.mute);
 	this.dom.mute.setAttribute('title', locale['S_MUTE']+'/'+locale['S_UNMUTE']);
 	this.dom.mute.className = 'iconsound';
 
+	this.dom.controlList.addItem(this.dom.mute, 'linear');
+
 // close all
-	this.dom.licloseAll = document.createElement('li');
-	this.dom.controlList.appendChild(this.dom.licloseAll);
-	this.dom.licloseAll.className = 'liniar';
-
 	this.dom.closeAll = document.createElement('div');
-	this.dom.licloseAll.appendChild(this.dom.closeAll);
-
 	this.dom.closeAll.setAttribute('title', locale['S_CLOSE']);
 	this.dom.closeAll.className = 'iconclose';
 
+	this.dom.controlList.addItem(this.dom.closeAll, 'linear');
 
 // Message List
-	this.dom.list = document.createElement('ul');
+	this.dom.list = new CList().node;
 	this.dom.container.appendChild(this.dom.list);
 },
 
 fixIE: function(){
 	if(IE6){
-		this.dom.header.style.width = '60px';
+		this.dom.header.style.width = '100px';
 		ie6pngfix.run(this.container);
 	}
-
-	this.dom.closeAll.style.position = 'absolute';
-	this.dom.closeAll.style.right = '2px';
-
-	this.dom.snooze.style.position = 'absolute';
-	this.dom.snooze.style.right = '22px';
-
-	this.dom.mute.style.position = 'absolute';
-	this.dom.mute.style.right = '42px';
 }
 });
 
@@ -455,8 +433,7 @@ initialize: function($super, messageList, message){
 	}
 
 	this.createMessage();
-	if(IE) this.fixIE();
-
+//	if(IE) this.fixIE();
 },
 
 show: function(){
@@ -467,15 +444,8 @@ close: function(){
 //--
 	$(this.dom.listItem).remove();
 
-	if(IE) this.fixIE();
+//	if(IE) this.fixIE();
 	this.dom = {};
-},
-
-playSound: function(){
-},
-
-stopSound: function(){
-
 },
 
 notify: function(){
@@ -495,18 +465,15 @@ createMessage: function(){
 	this.debug('createMessage');
 //--
 
-// LI
-	this.dom.listItem = document.createElement('li');
-	$(this.list.dom.list).insert({'top': this.dom.listItem});
-	this.dom.listItem.style.border = '1px solid #FFFFFF';//+this.color;
 
-	this.dom.listItem.className = 'listItem';
 // message
 	this.dom.message = document.createElement('div');
-	this.dom.listItem.appendChild(this.dom.message);
-
 	this.dom.message.className = 'message';
 	this.dom.message.style.backgroundColor = '#'+this.color;
+
+// LI
+	this.dom.listItem = new CListItem(this.dom.message, 'listItem').node;
+	$(this.list.dom.list).insert({'top': this.dom.listItem});
 
 // message box
 	this.dom.messageBox = document.createElement('div');
@@ -537,7 +504,7 @@ createMessage: function(){
 },
 
 fixIE: function(){
-	if(IE6 || IE7){
+	if(IE6){
 		var maxWidth = 60;
 		for(var tmpmsg in this.list.messageList){
 			var msgDims = getDimensions(this.list.messageList[tmpmsg].dom.message);
@@ -547,34 +514,5 @@ fixIE: function(){
 
 		this.list.dom.header.style.width = maxWidth+'px';
 	}
-}
-});
-
-// JavaScript Document
-// Message Class
-// Author: Aly
-var DOMList = Class.create({
-classNames:	{
-	'ul':	'',				//
-	'li':	''				//
-},
-node:		null,			// main node (ul)
-list:		new Array(),	// li array
-initialize: function(classNames){
-	classNames = classNames || this.classNames;
-	this.classNames = classNames;
-
-	this.node = document.createElement(ul);
-	this.node.className = this.classNames.ul;
-},
-
-addItem: function(item, className){
-	className = className || this.classNames.li;
-
-	var new_li = document.createElement('li');
-	this.node.appendChild(new_li);
-	this.dom.limove.className = className;
-
-	this.list.push(new_li);
 }
 });

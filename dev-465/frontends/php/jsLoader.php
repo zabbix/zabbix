@@ -24,6 +24,7 @@ $availableJScripts = array(
 	'gtlc.js' => '',
 	'functions.js' => '',
 	'main.js' => '',
+	'dom.js' => '',
 	'class.calendar.js' => '',
 	'class.cdate.js' => '',
 	'class.cdebug.js' => '',
@@ -73,7 +74,7 @@ $tranStrings = array(
 );
 
 if(empty($_GET['files'])){
-	$files = array('prototype.js', 'effects.js', 'dragdrop.js', 'common.js', 'class.cdebug.js', 'class.cdate.js', 'class.cookie.js', 'class.curl.js', 'class.rpc.js', 'class.csuggest.js', 'class.cmessages.js', 'main.js', 'functions.js');
+	$files = array('prototype.js', 'effects.js', 'dragdrop.js', 'common.js', 'dom.js', 'class.cdebug.js', 'class.cdate.js', 'class.cookie.js', 'class.curl.js', 'class.rpc.js', 'class.csuggest.js', 'class.cmessages.js', 'main.js', 'functions.js');
 }
 else{
 	$files = $_GET['files'];

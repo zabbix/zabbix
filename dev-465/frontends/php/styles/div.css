@@ -346,7 +346,7 @@ div.iconmove{
 	width: 18px;
 	background-image: url('../images/general/bttn/move.png');
 	background-repeat:no-repeat;
-	cursor:pointer;
+	cursor: move;
 }
 
 div.iconclose:hover{

@@ -368,10 +368,9 @@ list:		{},		// audio files options
 dom:		{},		// dom objects links
 standart:	{
 	'embed':{
-		'autostart':	'false',
-		'loop':			0,
-		'height':		0,
-		'width':		0
+		'enablejavascript':	'true',
+		'autostart':		'false',
+		'loop':				0
 	},
 	'audio':{
 		'autobuffer':	'autobuffer',
@@ -383,14 +382,28 @@ standart:	{
 play: function(audiofile){
 	if(!this.create(audiofile)) return false;
 
-	if(IE) this.dom[audiofile].Play();
+	if(IE){
+		try{ 
+			this.dom[audiofile].Play();
+		}
+		catch(e){
+			setTimeout(this.play.bind(this, audiofile), 500);
+		}
+	}
 	else this.dom[audiofile].play();
 },
 
 pause: function(audiofile){
 	if(!this.create(audiofile)) return false;
 
-	if(IE) this.dom[audiofile].Stop();
+	if(IE){
+		try{
+			this.dom[audiofile].Stop();
+		}
+		catch(e){ 
+			setTimeout(this.pause.bind(this, audiofile), 1000);
+		}
+	}
 	else this.dom[audiofile].pause();
 },
 
@@ -433,14 +446,20 @@ volume: function(audiofile, vol){
 loop: function(audiofile, loop){
 	if(!this.create(audiofile)) return false;
 
-	if(this.list[audiofile].loop == 0){
-		if(loop != 0) this.startLoop(audiofile, loop);
-		else this.endLoop(audiofile);
-	}
-
-	if(this.list[audiofile].loop != 0){
-		this.list[audiofile].loop--;
+	if(IE){
+//		this.dom[audiofile].setAttribute('loop', loop);
 		this.play(audiofile);
+	}
+	else{
+		if(this.list[audiofile].loop == 0){
+			if(loop != 0) this.startLoop(audiofile, loop);
+			else this.endLoop(audiofile);
+		}
+
+		if(this.list[audiofile].loop != 0){
+			this.list[audiofile].loop--;
+			this.play(audiofile);
+		}
 	}
 },
 
@@ -477,6 +496,7 @@ create: function(audiofile, params){
 		document.getElementsByTagName('body')[0].appendChild(this.dom.audioList);
 
 		this.dom.audioList.setAttribute('id','audiolist');
+		this.dom.audioList.style.border = '1px solid #000000';
 	}
 
 	if(IE){
@@ -492,6 +512,8 @@ create: function(audiofile, params){
 			else if(!is_null(this.standart.embed[key]))
 				this.dom[audiofile].setAttribute(key, this.standart.embed[key]);
 		}
+
+		this.dom[audiofile].style.display = 'none';
 	}
 	else{
 		this.dom[audiofile] = document.createElement('audio');
