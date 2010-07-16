@@ -387,12 +387,12 @@ include_once('include/page_header.php');
 		$table  = new CTableInfo();
 		$table->setHeader(array(
 			new CCheckBox('all_httptests',null, "checkAll('".$form->getName()."','all_httptests','group_httptestid');"),
-			is_show_all_nodes() ? make_sorting_link(S_NODE,'h.hostid') : null,
-			($_REQUEST['hostid']==0) ? make_sorting_link(S_HOST,'h.host'):NULL,
-			array($link, SPACE, make_sorting_link(S_NAME,'wt.name')),
+			is_show_all_nodes() ? make_sorting_header(S_NODE,'h.hostid') : null,
+			($_REQUEST['hostid']==0) ? make_sorting_header(S_HOST,'h.host'):NULL,
+			make_sorting_header(array($link, SPACE, S_NAME),'wt.name'),
 			S_NUMBER_OF_STEPS,
 			S_UPDATE_INTERVAL,
-			make_sorting_link(S_STATUS,'wt.status')));
+			make_sorting_header(S_STATUS,'wt.status')));
 
 		$any_app_exist = false;
 

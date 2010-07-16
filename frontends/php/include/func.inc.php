@@ -1147,7 +1147,20 @@ function zbx_subarray_push(&$mainArray, $sIndex, $element) {
 			$script = "javascript: redirect('".$url."');";
 		}
 
-		$col = array(new CSpan($obj,'underline'));
+		if(is_array($obj)){
+			$col = array();
+			foreach($obj as $el){
+				if(is_object($el) || ($el === SPACE)){
+					$col[] = $el;
+				}
+				else{
+					$col[] = new CSpan($el, 'underline');
+				}
+			}
+		}
+		else{
+			$col = array(new CSpan($obj,'underline'));
+		}
 		if(isset($_REQUEST['sort']) && ($tabfield == $_REQUEST['sort'])){
 			if($sortorder == ZBX_SORT_UP){
 				$img = new CImg('images/general/sort_down.png','down',10,10);
