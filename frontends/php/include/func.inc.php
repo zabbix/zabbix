@@ -1186,22 +1186,13 @@ function zbx_subarray_push(&$mainArray, $sIndex, $element) {
 
 		$sortorder = (isset($_REQUEST['sortorder']) && ($_REQUEST['sortorder'] == ZBX_SORT_UP))?ZBX_SORT_DOWN:ZBX_SORT_UP;
 
-		if(empty($url)){
-			$url='?';
-			$url_params = explode('&',$_SERVER['QUERY_STRING']);
-			foreach($url_params as $id => $param){
-				if(zbx_empty($param)) continue;
+		$link = new Curl($url);
+		if(empty($url)) $link->formatGetArguments();
+		$link->setArgument('sort', $tabfield);
+		$link->setArgument('sortorder', $sortorder);
 
-				list($name,$value) = explode('=',$param);
-				if(zbx_empty($name) || ($name == 'sort') || (($name == 'sortorder'))) continue;
-				$url.=$param.'&';
-			}
-		}
-		else{
-			$url.='&';
-		}
+		$url = $link->getUrl();
 
-		$url.='sort='.$tabfield.'&sortorder='.$sortorder;
 
 		if(($page['type'] != PAGE_TYPE_HTML) && defined('ZBX_PAGE_MAIN_HAT')){
 			$link = new CLink($obj,$url,null,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
