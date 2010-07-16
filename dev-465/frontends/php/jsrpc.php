@@ -116,6 +116,10 @@ include_once('include/page_header.php');
 				$options['eventid_from'] = $lastEventId;
 			}
 
+			if(!$msgsettings['triggers']['recovery']){
+				$options['value'] = TRIGGER_VALUE_TRUE;
+			}
+
 			$events = CEvent::get($options);
 			order_result($events, 'clock', ZBX_SORT_UP);
 
