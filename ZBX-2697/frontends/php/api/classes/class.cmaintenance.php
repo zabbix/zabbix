@@ -392,7 +392,7 @@ Copt::memoryPick();
 			}
 // groups permissions
 			$options = array(
-				'hostids' => $groupids,
+				'groupids' => $groupids,
 				'editable' => 1,
 				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => 1,
@@ -651,7 +651,7 @@ Copt::memoryPick();
 			if($USER_DETAILS['type'] == USER_TYPE_ZABBIX_USER){
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 			}
-			
+
 			$options = array(
 				'maintenanceids' => $maintenanceids,
 				'editable' => 1,
