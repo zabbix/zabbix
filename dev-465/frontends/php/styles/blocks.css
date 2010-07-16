@@ -28,6 +28,7 @@ div.messagecontainer{
 	right: 0px;
 	background-color: #94A1BB;
 	border: 2px solid #FFFFFF;
+	z-index: 1000;
 }
 
 div.messagecontainer .header{

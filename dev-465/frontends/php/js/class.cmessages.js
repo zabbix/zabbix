@@ -344,7 +344,6 @@ createContainer: function(){
 	this.dom.caption.appendChild(document.createTextNode(locale['S_MESSAGES']));
 	this.dom.header.appendChild(this.dom.caption);
 
-
 // controls
 	this.dom.controls = document.createElement('div');
 	this.dom.header.appendChild(this.dom.controls);

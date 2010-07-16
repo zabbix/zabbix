@@ -81,17 +81,13 @@ else{
 }
 
 
-$js = '';
+$js = 'if(typeof(locale) == "undefined") var locale = {};'."\n";
 foreach($files as $file){
 	if(isset($tranStrings[$file])){
 		foreach($tranStrings[$file] as $str){
-			$js .= '"'.$str.'":"'.$translations[$str].'",';
+			$js .= "locale['".$str."'] = '".$translations[$str]."';";
 		}
 	}
-}
-if(!empty($js)){
-	$js = rtrim($js, ',');
-	$js = 'var locale = {'. $js .'};'."\n";
 }
 
 foreach($files as $file){
