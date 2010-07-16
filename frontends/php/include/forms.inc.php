@@ -26,8 +26,6 @@
 		$form = new CFormTable(S_SLIDESHOW, null, 'post');
 		$form->setHelp('config_advanced.php');
 
-		$form->addVar('config', 1);
-
 		if(isset($_REQUEST['slideshowid'])){
 			$form->addVar('slideshowid', $_REQUEST['slideshowid']);
 		}
