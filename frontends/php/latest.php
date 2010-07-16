@@ -207,10 +207,10 @@ include_once('include/page_header.php');
 
 	$table=new CTableInfo();
 	$table->setHeader(array(
-		is_show_all_nodes()?make_sorting_link(S_NODE,'h.hostid') : null,
-		($_REQUEST['hostid'] ==0)?make_sorting_link(S_HOST,'h.host') : NULL,
-		array($link,SPACE,make_sorting_link(S_DESCRIPTION,'i.description')),
-		make_sorting_link(S_LAST_CHECK,'i.lastclock'),
+		is_show_all_nodes()?make_sorting_header(S_NODE,'h.hostid') : null,
+		($_REQUEST['hostid'] ==0)?make_sorting_header(S_HOST,'h.host') : NULL,
+		make_sorting_header(array($link, SPACE, S_DESCRIPTION),'i.description'),
+		make_sorting_header(S_LAST_CHECK,'i.lastclock'),
 		S_LAST_VALUE,
 		S_CHANGE,
 		S_HISTORY));
