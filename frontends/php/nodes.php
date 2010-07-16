@@ -247,13 +247,14 @@
 					$node['nodetype'] ? 'bold' : null)
 				));
 			}
+			
+			$nodes_wdgt->addItem($table);
 		}
 	}
 	else{
-		$table = new CTable(new CCol(S_NOT_DM_SETUP, 'center'));
+		$nodes_wdgt->addItem(new CTable(new CCol(S_NOT_DM_SETUP, 'center')));
 	}
 
-	$nodes_wdgt->addItem($table);
 	$nodes_wdgt->show();
 
 
