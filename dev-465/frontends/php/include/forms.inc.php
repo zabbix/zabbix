@@ -926,9 +926,18 @@
 		}
 
 		if($profile){
-			$frmUser->addRow(S_GUI_MESSAGING, new CCheckBox('messages[enabled]', isset($messages['enabled']), 1));
+			$frmUser->addRow(S_GUI_MESSAGING, new CCheckBox('messages[enabled]', $messages['enabled'], null, 1));
 			$frmUser->addRow(S_MESSAGE_TIMEOUT.SPACE.'('.S_SECONDS_SMALL.')', new CNumericBox("messages[timeout]", $messages['timeout'], 5));
 
+			$repeatSound = new CComboBox('messages[sounds][loop]', $messages['sounds']['loop']);
+			$repeatSound->setAttribute('id', 'messages[sounds][loop]');
+			$repeatSound->addItem(1, S_ONCE);
+			$repeatSound->addItem(10, '10 '.S_SECONDS);
+			$repeatSound->addItem(-1, S_TILL_TIMEOUT);
+
+			$frmUser->addRow(S_PLAY_SOUND, $repeatSound);
+
+// trigger sounds
 			$severities = array(
 				TRIGGER_SEVERITY_NOT_CLASSIFIED,
 				TRIGGER_SEVERITY_INFORMATION,
@@ -938,7 +947,6 @@
 				TRIGGER_SEVERITY_DISASTER
 			);
 
-// trigger sounds
 			$zbxSounds = getSounds();
 			$triggers = new CTable('', 'invisible');
 
@@ -952,7 +960,7 @@
 							"$('messages[sounds][recovery]').options[soundIdx].value, ".
 							"$('messages[sounds][loop]').options[loopIdx].value);";
 			$resolved = array(
-				new CCheckBox('messages[triggers][recovery]', isset($messages['triggers']['recovery']), null, 1),
+				new CCheckBox('messages[triggers][recovery]', $messages['triggers']['recovery'], null, 1),
 				S_RECOVERY,
 				$soundList,
 				new CButton('start', S_PLAY, $jsPlay, false),
@@ -984,16 +992,6 @@
 			}
 
 			$frmUser->addRow(S_TRIGGER_SEVERITY, $triggers);
-
-			$repeatSound = new CComboBox('messages[sounds][loop]', $messages['sounds']['loop']);
-			$repeatSound->setAttribute('id', 'messages[sounds][loop]');
-			$repeatSound->addItem(1, '1 time');
-			$repeatSound->addItem(3, '3 times');
-			$repeatSound->addItem(5, '5 times');
-			$repeatSound->addItem(10, '10 times');
-			$repeatSound->addItem(-1, 'Till timeout');
-
-			$frmUser->addRow(S_REPEAT_SOUND, $repeatSound);
  		}
 
 		$frmUser->addItemToBottomRow(new CButton('save',S_SAVE));

@@ -1922,6 +1922,8 @@
 	'S_ZABBIX_CONFIG'=>			'Zabbix config',
 
 //	profile.php
+	'S_ONCE' =>					'Once',
+	'S_TILL_TIMEOUT' =>			'Till timeout',
 	'S_MOVE'=>					'Move',
 	'S_UNMUTE'=>				'Unmute',
 	'S_MUTE'=>					'Mute',
@@ -1930,7 +1932,7 @@
 	'S_PROBLEM_ON'=>			'Problem on',
 	'S_RECOVERY'=>				'Recovery',
 	'S_GUI_MESSAGING'=>			'GUI Messaging',
-	'S_REPEAT_SOUND'=>			'Repeat sound',
+	'S_PLAY_SOUND'=>			'Play sound',
 	'S_MESSAGE_TIMEOUT'=>		'Message timeout',
 	'S_PLAY'=>					'Play',
 	'S_PAUSE'=>					'Pause',
