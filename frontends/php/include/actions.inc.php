@@ -169,7 +169,15 @@ function condition_value2str($conditiontype, $value){
 			$str_val.= $group['name'];
 			break;
 		case CONDITION_TYPE_TRIGGER:
-			$str_val = expand_trigger_description($value);
+			$trig = CTrigger::get(array(
+				'triggerids' => $value,
+				'expandTriggerDescriptions' => true,
+				'output' => API_OUTPUT_EXTEND,
+				'select_hosts' => API_OUTPUT_EXTEND,
+			));
+			$trig = reset($trig);
+			$host = reset($trig['hosts']);
+			$str_val = $host['host'].':'.$trig['description'];
 			break;
 		case CONDITION_TYPE_HOST:
 		case CONDITION_TYPE_HOST_TEMPLATE:
