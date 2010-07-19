@@ -5610,8 +5610,8 @@ INSERT INTO items VALUES (22164,0,'','',0,10012,'Available physical processors i
 INSERT INTO items VALUES (22165,0,'','',0,10012,'CPU idle time','system.stat[cpu,id]',45,90,365,NULL,NULL,NULL,0,0,'','%',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
 INSERT INTO items VALUES (22166,0,'','',0,10012,'CPU user time','system.stat[cpu,us]',45,90,365,NULL,NULL,NULL,0,0,'','%',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
 INSERT INTO items VALUES (22167,0,'','',0,10012,'Device interrupts','system.stat[faults,in]',45,90,365,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
-INSERT INTO items VALUES (22168,0,'','',0,10012,'Pages swapped in from disk','system.stat[page,fi]',45,90,365,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
-INSERT INTO items VALUES (22169,0,'','',0,10012,'Pages swapped to disk','system.stat[page,fo]',45,90,365,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
+INSERT INTO items VALUES (22168,0,'','',0,10012,'File page-ins','system.stat[page,fi]',45,90,365,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
+INSERT INTO items VALUES (22169,0,'','',0,10012,'File page-outs','system.stat[page,fo]',45,90,365,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
 INSERT INTO items VALUES (22170,0,'','',0,10012,'Free real memory','system.stat[memory,fre]',45,90,365,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
 INSERT INTO items VALUES (22171,0,'','',0,10012,'CPU I/O wait time','system.stat[cpu,wa]',45,90,365,NULL,NULL,NULL,0,0,'','%',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
 INSERT INTO items VALUES (22172,0,'','',0,10012,'Kernel thread context switches','system.stat[faults,cs]',45,90,365,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
