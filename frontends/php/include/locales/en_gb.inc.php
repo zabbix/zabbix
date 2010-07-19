@@ -1240,6 +1240,7 @@
 	'S_MAINTENANCE_BIG'=>			'MAINTENANCE',
 
 //	sysmaps.php
+	'S_IMAGE_IS_USED_IN_ZABBIX_MAP' => 'Image is used in ZABBIX map',
 	'S_EDIT_MAP_ELEMENT'=>			'Edit map element',
 	'S_ICON_DEFAULT'=>			'Icon (default)',
 	'S_APPLY'=>					'Apply',

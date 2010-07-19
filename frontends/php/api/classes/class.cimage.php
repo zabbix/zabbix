@@ -509,7 +509,7 @@ class CImage extends CZBXAPI{
 
 			$errors = array();
 			while($sysmap = DBfetch($db_sysmaps)){
-				$errors[] = 'Image is used in ZABBIX map "'.get_node_name_by_elid($sysmap['sysmapid'],true,':').$sysmap['name'].'"';
+				$errors[] = S_IMAGE_IS_USED_IN_ZABBIX_MAP.' "'.get_node_name_by_elid($sysmap['sysmapid'],true,':').$sysmap['name'].'"';
 			}
 			if(!empty($errors)) self::exception(ZBX_API_ERROR_PARAMETERS, $errors);
 
