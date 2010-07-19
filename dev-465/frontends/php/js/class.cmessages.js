@@ -52,7 +52,8 @@ sounds:{								// sound playback settings
 	'priority': 0,						// max new message priority
 	'sound': null,						// sound to play
 	'repeat':	1,						// loop sound for 1,3,5,10 .. times
-	'mute':		0						// mute alarms
+	'mute':		0,						// mute alarms
+	'timeout':	0
 },
 
 dom:					{},				// dom object links
@@ -186,12 +187,15 @@ playSound: function(messages){
 		if(message.priority > this.sounds.priority){
 			this.sounds.priority = message.priority;
 			this.sounds.sound = message.sound;
+			this.sounds.timeout = message.timeout;
 		}
 	}
 
 	this.ready = true;
 	if(!is_null(this.sounds.sound)){
-		AudioList.loop(this.sounds.sound, this.sounds.repeat);
+		if(this.sounds.repeat == 1) AudioList.play(this.sounds.sound);
+		else if(this.sounds.repeat > 1) AudioList.loop(this.sounds.sound, {'seconds': this.sounds.repeat});
+		else AudioList.loop(this.sounds.sound, {'seconds': this.sounds.timeout});
 	}
 },
 
@@ -451,13 +455,9 @@ notify: function(){
 },
 
 remove: function(){
-	this.stopSound();
-
-
 	Effect.BlindUp(this.dom.listItem, {duration: (this.list.effectTimeout / 1000)});
 	Effect.Fade(this.dom.listItem, {duration: (this.list.effectTimeout / 1000)});
 	setTimeout(this.close.bind(this), this.list.effectTimeout);
-
 },
 
 createMessage: function(){

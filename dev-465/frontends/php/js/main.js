@@ -379,6 +379,8 @@ standart:	{
 	}
 },
 
+timeout:	null,	// timeout object
+
 play: function(audiofile){
 	if(!this.create(audiofile)) return false;
 
@@ -410,6 +412,9 @@ pause: function(audiofile){
 stop: function(audiofile){
 	if(!this.create(audiofile)) return false;
 
+	if(IE) this.dom[audiofile].setAttribute('loop', '0');
+	else this.dom[audiofile].removeAttribute('loop');
+
 	if(!IE){
 		try{
 			if(!this.dom[audiofile].paused){
@@ -436,6 +441,8 @@ stopAll: function(e){
 
 		this.stop(name);
 	}
+
+	clearTimeout(this.timeout);
 },
 
 
@@ -443,23 +450,30 @@ volume: function(audiofile, vol){
 	if(!this.create(audiofile)) return false;
 },
 
-loop: function(audiofile, loop){
+loop: function(audiofile, params){
 	if(!this.create(audiofile)) return false;
 
-	if(IE){
-//		this.dom[audiofile].setAttribute('loop', loop);
-		this.play(audiofile);
-	}
-	else{
-		if(this.list[audiofile].loop == 0){
-			if(loop != 0) this.startLoop(audiofile, loop);
-			else this.endLoop(audiofile);
-		}
+	if(isset('repeat', params)){
+		if(IE) this.play(audiofile);
+		else{
+			if(this.list[audiofile].loop == 0){
+				if(params.repeat != 0) this.startLoop(audiofile, params.repeat);
+				else this.endLoop(audiofile);
+			}
 
-		if(this.list[audiofile].loop != 0){
-			this.list[audiofile].loop--;
-			this.play(audiofile);
+			if(this.list[audiofile].loop != 0){
+				this.list[audiofile].loop--;
+				this.play(audiofile);
+			}
 		}
+	}
+	else if(isset('seconds', params)){
+		if(IE) this.dom[audiofile].setAttribute('loop', '1');
+		else this.dom[audiofile].setAttribute('loop', 'loop');
+
+		this.play(audiofile);
+
+		this.timeout = setTimeout(AudioList.stop.bind(AudioList,audiofile), 1000 * parseInt(params.seconds, 10));
 	}
 },
 
@@ -469,7 +483,7 @@ startLoop: function(audiofile, loop){
 	if(isset('onEnded', this.list[audiofile])) this.endLoop(audiofile);
 
 	this.list[audiofile].loop = parseInt(loop, 10);
-	this.list[audiofile].onEnded = this.loop.bind(this, audiofile, 0);
+	this.list[audiofile].onEnded = this.loop.bind(this, audiofile, {'repeat': 0});
 	addListener(this.dom[audiofile], 'ended', this.list[audiofile].onEnded);
 },
 

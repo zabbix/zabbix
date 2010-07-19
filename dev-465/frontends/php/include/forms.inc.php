@@ -937,7 +937,7 @@
 			$repeatSound->setAttribute('id', 'messages[sounds][loop]');
 			$repeatSound->addItem(1, S_ONCE);
 			$repeatSound->addItem(10, '10 '.S_SECONDS);
-			$repeatSound->addItem(-1, S_TILL_TIMEOUT);
+			$repeatSound->addItem(-1, S_MESSAGE_TIMEOUT);
 
 			$frmUser->addRow(S_PLAY_SOUND, $repeatSound);
 
@@ -958,39 +958,26 @@
 			foreach($zbxSounds as $filename => $file) $soundList->addItem($file, $filename);
 			$soundList->setAttribute('id', 'messages[sounds][recovery]');
 
-			$jsPlay = "javascript: var soundIdx = $('messages[sounds][recovery]').selectedIndex;".
-						"var loopIdx = $('messages[sounds][loop]').selectedIndex;".
-						"AudioList.loop(".
-							"$('messages[sounds][recovery]').options[soundIdx].value, ".
-							"$('messages[sounds][loop]').options[loopIdx].value);";
 			$resolved = array(
 				new CCheckBox('messages[triggers][recovery]', $messages['triggers']['recovery'], null, 1),
 				S_RECOVERY,
 				$soundList,
-				new CButton('start', S_PLAY, $jsPlay, false),
+				new CButton('start', S_PLAY, "javascript: testUserSound('messages[sounds][recovery]');", false),
 				new CButton('stop', S_STOP, 'javascript: AudioList.stopAll();', false)
 			);
 
 			$triggers->addRow($resolved);
 
-			
 			foreach($severities as $snum => $severity){
 				$soundList = new CComboBox('messages[sounds]['.$severity.']', $messages['sounds'][$severity]);
 				foreach($zbxSounds as $filename => $file) $soundList->addItem($file, $filename);
 				$soundList->setAttribute('id', 'messages[sounds]['.$severity.']');
 
-
-				$jsPlay = "javascript: var soundIdx = $('messages[sounds][".$severity."]').selectedIndex;".
-							"var loopIdx = $('messages[sounds][loop]').selectedIndex;".
-							"AudioList.loop(".
-								"$('messages[sounds][".$severity."]').options[soundIdx].value, ".
-								"$('messages[sounds][loop]').options[loopIdx].value);";
-
 				$triggers->addRow(array(
 					new CCheckBox('messages[triggers][severities]['.$severity.']', isset($messages['triggers']['severities'][$severity]), null, 1),
 					getSeverityCaption($severity),
 					$soundList,
-					new CButton('start', S_PLAY, $jsPlay, false),
+					new CButton('start', S_PLAY, "javascript: testUserSound('messages[sounds][".$severity."]');", false),
 					new CButton('stop', S_STOP, 'javascript: AudioList.stopAll();', false)
 				));
 			}

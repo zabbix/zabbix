@@ -1923,7 +1923,6 @@
 
 //	profile.php
 	'S_ONCE' =>					'Once',
-	'S_TILL_TIMEOUT' =>			'Till timeout',
 	'S_MOVE'=>					'Move',
 	'S_UNMUTE'=>				'Unmute',
 	'S_MUTE'=>					'Mute',
