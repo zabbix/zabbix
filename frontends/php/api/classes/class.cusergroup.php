@@ -353,7 +353,7 @@ class CUserGroup extends CZBXAPI{
 				}
 
 				if(self::exists(array('name' => $usrgrp['name'], 'nodeids' => get_current_nodeid(false)))){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_GROUP . SPACE . $usrgrp['name'] . SPACE . S_ALREADY_EXISTS_SMALL);
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_GROUP . ' ' . $usrgrp['name'] . ' ' . S_ALREADY_EXISTS_SMALL);
 				}
 				$insert[$gnum] = $usrgrp;
 			}
@@ -547,7 +547,7 @@ class CUserGroup extends CZBXAPI{
 					));
 					$group_exists = reset($group_exists);
 					if($group_exists['usrgrpid'] != $usrgrpid){
-						self::exception(ZBX_API_ERROR_PARAMETERS, S_GROUP . SPACE . $data['name'] . SPACE . S_ALREADY_EXISTS_SMALL);
+						self::exception(ZBX_API_ERROR_PARAMETERS, S_GROUP . ' ' . $data['name'] . ' ' . S_ALREADY_EXISTS_SMALL);
 					}
 				}
 
