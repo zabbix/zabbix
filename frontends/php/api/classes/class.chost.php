@@ -1096,7 +1096,7 @@ Copt::memoryPick();
 				'preservekeys' => 1));
 			foreach($groupids as $gnum => $groupid){
 				if(!isset($upd_groups[$groupid])){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can add User Groups');
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
 				}
 			}
 // }}} PERMISSIONS
