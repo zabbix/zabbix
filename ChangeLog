@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2719] fixed events delay for one minute in frontend (Vedmak)
  - [ZBX-2720] in actions conditions trigger host is now displayed (Vedmak)
  - [ZBX-2685] fixed map elements not always change position when coords are manually set (Vedmak)
  - [ZBX-2664] fixed viewed period and filter status reset in web monitoring (Vedmak)
