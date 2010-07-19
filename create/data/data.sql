@@ -275,6 +275,7 @@ INSERT INTO applications VALUES (172,10045,'pfLogInterface',0);
 INSERT INTO applications VALUES (173,10045,'pfSrcNodes',0);
 INSERT INTO applications VALUES (174,10045,'pfStateTable',0);
 INSERT INTO applications VALUES (175,10045,'pfStatus',0);
+INSERT INTO applications VALUES (176,10012,'Vmstat',0);
 
 --
 -- Dumping data for table `mappings`
@@ -455,6 +456,7 @@ insert into help_items values(0,'web.page.regexp[host,&lt;path&gt;,&lt;port&gt;,
 insert into help_items values(0,'perf_counter[counter, interval]','Value of any performance counter, where "counter" parameter is the counter path and "interval" parameter is a number of last seconds, for which the agent returns an average value.');
 insert into help_items values(0,'service_state[service]','State of service. 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service');
 insert into help_items values(0,'proc_info[&lt;process&gt;,&lt;attribute&gt;,&lt;type&gt;]','Different information about specific process(es)');
+insert into help_items values(0,'system.stat[resource &lt;,type&gt;]','Virtual memory statistics.');
 
 insert into help_items values(7,'agent.ping','Check the agent usability. Always return 1. Can be used as a TCP ping.');
 insert into help_items values(7,'agent.version','Version of zabbix_agent(d) running on monitored host. String value. Example of returned value: 1.1');
@@ -507,6 +509,7 @@ insert into help_items values(7,'proc_info[&lt;process&gt;,&lt;attribute&gt;,&lt
 insert into help_items values(7,'log[file,&lt;pattern&gt;,&lt;encoding&gt;,&lt;maxlines&gt;,&lt;mode&gt;]','Monitoring of log file. pattern - regular expression');
 insert into help_items values(7,'logrt[file_format,&lt;pattern&gt;,&lt;encoding&gt;,&lt;maxlines&gt;,&lt;mode&gt;]', 'Monitoring of log file with rotation. fileformat - [path][regexp], pattern - regular expression');
 insert into help_items values(7,'eventlog[logtype,&lt;pattern&gt;,&lt;severity&gt;,&lt;source&gt;,&lt;eventid&gt;,&lt;maxlines&gt;,&lt;mode&gt;]','Monitoring of Windows event logs. pattern, severity, eventid - regular expressions');
+insert into help_items values(7,'system.stat[resource &lt;,type&gt;]','Virtual memory statistics.');
 
 --
 -- Dumping data for table items
@@ -5601,6 +5604,32 @@ INSERT INTO items VALUES (22158,1,'public','1.3.6.1.4.1.3224.16.2.1.0',161,10046
 INSERT INTO items VALUES (22159,1,'public','1.3.6.1.4.1.3224.16.2.2.0',161,10046,'NETSCREEN Memory Free','NETSCREEN-RESOURCE-MIB::nsResMemLeft.0',60,90,365,NULL,NULL,NULL,0,3,'','bytes',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
 INSERT INTO items VALUES (22160,1,'public','1.3.6.1.4.1.3224.16.3.2.0',161,10046,'NETSCREEN Session Count','NETSCREEN-RESOURCE-MIB::nsResSessAllocate.0',60,90,365,NULL,NULL,NULL,0,3,'','sessions',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
 INSERT INTO items VALUES (22161,1,'public','1.3.6.1.4.1.3224.16.3.4.0',161,10046,'NETSCREEN Session Failed Count','NETSCREEN-RESOURCE-MIB::nsResSessFailed.0',60,90,365,NULL,NULL,NULL,0,3,'','sessions',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
+INSERT INTO items VALUES (22162,0,'','',0,10012,'Active virtual pages','system.stat[memory,avm]',45,90,365,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
+INSERT INTO items VALUES (22163,0,'','',0,10012,'Amount of data transferred','system.stat[disk,bps]',45,90,365,NULL,NULL,NULL,0,0,'','B',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
+INSERT INTO items VALUES (22164,0,'','',0,10012,'Available physical processors in the shared pool','system.stat[cpu,app]',45,90,365,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
+INSERT INTO items VALUES (22165,0,'','',0,10012,'CPU idle time','system.stat[cpu,id]',45,90,365,NULL,NULL,NULL,0,0,'','%',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
+INSERT INTO items VALUES (22166,0,'','',0,10012,'CPU user time','system.stat[cpu,us]',45,90,365,NULL,NULL,NULL,0,0,'','%',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
+INSERT INTO items VALUES (22167,0,'','',0,10012,'Device interrupts','system.stat[faults,in]',45,90,365,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
+INSERT INTO items VALUES (22168,0,'','',0,10012,'Pages swapped in from disk','system.stat[page,fi]',45,90,365,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
+INSERT INTO items VALUES (22169,0,'','',0,10012,'Pages swapped to disk','system.stat[page,fo]',45,90,365,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
+INSERT INTO items VALUES (22170,0,'','',0,10012,'Free real memory','system.stat[memory,fre]',45,90,365,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
+INSERT INTO items VALUES (22171,0,'','',0,10012,'CPU I/O wait time','system.stat[cpu,wa]',45,90,365,NULL,NULL,NULL,0,0,'','%',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
+INSERT INTO items VALUES (22172,0,'','',0,10012,'Kernel thread context switches','system.stat[faults,cs]',45,90,365,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
+INSERT INTO items VALUES (22173,0,'','',0,10012,'Length of the run queue','system.stat[kthr,r]',45,90,365,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
+INSERT INTO items VALUES (22174,0,'','',0,10012,'Length of the swap queue','system.stat[kthr,b]',45,90,365,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
+INSERT INTO items VALUES (22175,0,'','',0,10012,'Logical processor(s) utilization','system.stat[cpu,lbusy]',45,90,365,NULL,NULL,NULL,0,0,'','%',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
+INSERT INTO items VALUES (22176,0,'','',0,10012,'Number of physical processors consumed','system.stat[cpu,pc]',45,90,365,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
+INSERT INTO items VALUES (22177,0,'','',0,10012,'Number of data transfers','system.stat[disk,tps]',45,90,365,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
+INSERT INTO items VALUES (22178,0,'','',0,10012,'Pages freed (page replacement)','system.stat[page,fr]',45,90,365,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
+INSERT INTO items VALUES (22179,0,'','',0,10012,'Pages paged in from paging space','system.stat[page,pi]',45,90,365,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
+INSERT INTO items VALUES (22180,0,'','',0,10012,'Pages paged out to paging space','system.stat[page,po]',45,90,365,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
+INSERT INTO items VALUES (22181,0,'','',0,10012,'Pages scanned by page-replacement algorithm','system.stat[page,sr]',45,90,365,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
+INSERT INTO items VALUES (22182,0,'','',0,10012,'Percentage of entitled capacity consumed','system.stat[cpu,ec]',45,90,365,NULL,NULL,NULL,0,0,'','%',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
+INSERT INTO items VALUES (22183,0,'','',0,10012,'Number of processor units this partition is entitled to receive','system.stat[ent]',3600,90,365,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
+INSERT INTO items VALUES (22184,15,'','',0,10012,'Size of file cache memory, %','vm.memory.size[pcached]',45,90,365,NULL,NULL,NULL,0,0,'','%',0,0,NULL,'',0,'','','1','',0,'',0,0,'','100*last(vm.memory.size[cached])/last(vm.memory.size[total])','',0,0,'','','','',0);
+INSERT INTO items VALUES (22185,15,'','',0,10012,'Size of used memory, %','vm.memory.size[pused]',45,90,365,NULL,NULL,NULL,0,0,'','%',0,0,NULL,'',0,'','','1','',0,'',0,0,'','100*(last(vm.memory.size[total])-(last(vm.memory.size[cached])+last(vm.memory.size[free])))/last(vm.memory.size[total])','',0,0,'','','','',0);
+INSERT INTO items VALUES (22186,0,'','',0,10012,'System calls','system.stat[faults,sy]',45,90,365,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
+INSERT INTO items VALUES (22187,0,'','',0,10012,'CPU system time','system.stat[cpu,sy]',45,90,365,NULL,NULL,NULL,0,0,'','%',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
 
 --
 -- Dumping data for table triggers
@@ -11057,6 +11086,32 @@ INSERT INTO items_applications VALUES (4005,175,22132);
 INSERT INTO items_applications VALUES (4006,175,22133);
 INSERT INTO items_applications VALUES (4007,175,22134);
 INSERT INTO items_applications VALUES (4008,175,22135);
+INSERT INTO items_applications VALUES (4009,176,22162);
+INSERT INTO items_applications VALUES (4010,176,22163);
+INSERT INTO items_applications VALUES (4011,176,22164);
+INSERT INTO items_applications VALUES (4012,176,22165);
+INSERT INTO items_applications VALUES (4013,176,22166);
+INSERT INTO items_applications VALUES (4014,176,22167);
+INSERT INTO items_applications VALUES (4015,176,22168);
+INSERT INTO items_applications VALUES (4016,176,22169);
+INSERT INTO items_applications VALUES (4017,176,22170);
+INSERT INTO items_applications VALUES (4018,176,22171);
+INSERT INTO items_applications VALUES (4019,176,22172);
+INSERT INTO items_applications VALUES (4020,176,22173);
+INSERT INTO items_applications VALUES (4021,176,22174);
+INSERT INTO items_applications VALUES (4022,176,22175);
+INSERT INTO items_applications VALUES (4023,176,22176);
+INSERT INTO items_applications VALUES (4024,176,22177);
+INSERT INTO items_applications VALUES (4025,176,22178);
+INSERT INTO items_applications VALUES (4026,176,22179);
+INSERT INTO items_applications VALUES (4027,176,22180);
+INSERT INTO items_applications VALUES (4028,176,22181);
+INSERT INTO items_applications VALUES (4029,176,22182);
+INSERT INTO items_applications VALUES (4030,176,22183);
+INSERT INTO items_applications VALUES (4031,176,22184);
+INSERT INTO items_applications VALUES (4032,176,22185);
+INSERT INTO items_applications VALUES (4033,176,22186);
+INSERT INTO items_applications VALUES (4034,176,22187);
 
 --
 -- Dumping data for table `actions`
