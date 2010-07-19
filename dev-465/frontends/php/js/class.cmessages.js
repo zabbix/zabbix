@@ -104,7 +104,7 @@ setSettings: function(settings){
 	this.debug('setSettings');
 //--
 
-	this.sounds.repeat = settings.sounds.loop;
+	this.sounds.repeat = settings.sounds.repeat;
 	this.sounds.mute = settings.sounds.mute;
 	if(this.sounds.mute == 1){
 		this.dom.mute.className = 'iconmute';

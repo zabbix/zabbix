@@ -1086,10 +1086,7 @@ function zbx_str2links($text){
 }
 
 function zbx_subarray_push(&$mainArray, $sIndex, $element) {
-	if(!isset($mainArray[$sIndex])) $mainArray[$sIndex] = Array();
-	
-	if(!is_array($mainArray[$sIndex])) $mainArray[$sIndex]= Array($mainArray[$sIndex]);
-	
+	if(!isset($mainArray[$sIndex])) $mainArray[$sIndex] = array();
 	$mainArray[$sIndex][] = $element;
 }
 /************* END ZBX MISC *************/

@@ -468,12 +468,18 @@ loop: function(audiofile, params){
 		}
 	}
 	else if(isset('seconds', params)){
-		if(IE) this.dom[audiofile].setAttribute('loop', '1');
-		else this.dom[audiofile].setAttribute('loop', 'loop');
+		if(IE){
+			this.dom[audiofile].setAttribute('loop', '1');
+			this.timeout = setTimeout(AudioList.stop.bind(AudioList,audiofile), 1000 * parseInt(params.seconds, 10));
+		}
+		else{
+			this.startLoop(audiofile, 9999999);
 
-		this.play(audiofile);
+			this.list[audiofile].loop--;
+			this.play(audiofile);
 
-		this.timeout = setTimeout(AudioList.stop.bind(AudioList,audiofile), 1000 * parseInt(params.seconds, 10));
+			this.timeout = setTimeout(AudioList.stop.bind(AudioList,audiofile), 1000 * parseInt(params.seconds, 10));
+		}
 	}
 },
 
