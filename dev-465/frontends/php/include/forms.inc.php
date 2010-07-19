@@ -947,7 +947,7 @@
 			$newRow = $frmUser->addRow(S_MESSAGE_TIMEOUT.SPACE.'('.S_SECONDS_SMALL.')', new CNumericBox("messages[timeout]", $messages['timeout'], 5));
 			$newRow->setAttribute('id', 'timeout_row');
 
-			$repeatSound = new CComboBox('messages[sounds][repeat]', $messages['sounds']['repeat']);
+			$repeatSound = new CComboBox('messages[sounds][repeat]', $messages['sounds']['repeat'], 'javascript: if(IE) submit();');
 			$repeatSound->setAttribute('id', 'messages[sounds][repeat]');
 			$repeatSound->addItem(1, S_ONCE);
 			$repeatSound->addItem(10, '10 '.S_SECONDS);

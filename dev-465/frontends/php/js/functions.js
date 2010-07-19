@@ -697,8 +697,6 @@ function testUserSound(idx){
 	var sound = $(idx).options[$(idx).selectedIndex].value;
 	var repeat = $('messages[sounds][repeat]').options[$('messages[sounds][repeat]').selectedIndex].value;
 
-	AudioList.stop(sound);
-
 	if(repeat == 1) AudioList.play(sound);
 	else if(repeat > 1) AudioList.loop(sound, {'seconds': repeat});
 	else AudioList.loop(sound, {'seconds': $('messages[timeout]').value});

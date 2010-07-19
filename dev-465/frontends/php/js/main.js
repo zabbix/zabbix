@@ -451,8 +451,6 @@ volume: function(audiofile, vol){
 },
 
 loop: function(audiofile, params){
-	if(IE) this.remove(audiofile);
-
 	if(!this.create(audiofile)) return false;
 
 	if(isset('repeat', params)){
@@ -525,6 +523,7 @@ create: function(audiofile, params){
 
 		this.dom[audiofile].setAttribute('name', audiofile);
 		this.dom[audiofile].setAttribute('src', 'audio/'+audiofile);
+		this.dom[audiofile].style.display = 'none';
 
 		for(var key in this.standart.embed){
 			if(isset(key, params))
@@ -532,8 +531,6 @@ create: function(audiofile, params){
 			else if(!is_null(this.standart.embed[key]))
 				this.dom[audiofile].setAttribute(key, this.standart.embed[key]);
 		}
-
-		this.dom[audiofile].style.display = 'none';
 	}
 	else{
 		this.dom[audiofile] = document.createElement('audio');
@@ -563,14 +560,8 @@ remove: function(audiofile){
 
 	$(this.dom[audiofile]).remove();
 
-	this.dom[audiofile] = null;
-	this.list[audiofile] = null;
-
-	try{
-		delete(this.dom[audiofile]);
-		delete(this.list[audiofile]);
-	}
-	catch(e){}
+	delete(this.dom[audiofile]);
+	delete(this.list[audiofile]);
 }
 }
 
