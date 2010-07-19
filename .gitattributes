@@ -45,7 +45,6 @@ create/data/images/UPS.png -text svneol=unset#unset
 create/data/images/UPS_small.png -text svneol=unset#unset
 create/data/images/Workstation.png -text svneol=unset#unset
 create/data/images/Workstation_small.png -text svneol=unset#unset
-create/data/recreate.sh -text
 create/schema/gen_php.php -text
 docs/README -text
 frontends/php/api/.htaccess -text
