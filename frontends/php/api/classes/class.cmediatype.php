@@ -406,7 +406,7 @@ Copt::memoryPick();
 
 				$mediatype_exist = self::getObjects(array('description' => $mediatype['description']));
 				if(!empty($mediatype_exist)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_MEDIATYPE_ALREADY_EXISTS . SPACE . $mediatype_exist[0]['description']);
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_MEDIATYPE_ALREADY_EXISTS . ' ' . $mediatype_exist[0]['description']);
 				}
 
 				$insert_mediatypes[$mnum] = $mediatype;
@@ -463,7 +463,7 @@ Copt::memoryPick();
 					$exist_mediatype = reset($exist_mediatypes);
 
 					if($exist_mediatype && ($exist_mediatype['mediatypeid'] != $mediatype['mediatypeid']))
-						self::exception(ZBX_API_ERROR_PARAMETERS, S_MEDIATYPE_ALREADY_EXISTS . SPACE . $mediatype['description']);
+						self::exception(ZBX_API_ERROR_PARAMETERS, S_MEDIATYPE_ALREADY_EXISTS . ' ' . $mediatype['description']);
 				}
 
 				$mediatype_db_fields = array(
@@ -532,7 +532,7 @@ Copt::memoryPick();
 			$actions = CAction::get($options);
 			if(!empty($actions)){
 				$action = reset($actions);
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_MEDIATYPE_USED_BY_ACTIONS . SPACE . $action['name']);
+				self::exception(ZBX_API_ERROR_PARAMETERS, S_MEDIATYPE_USED_BY_ACTIONS . ' ' . $action['name']);
 			}
 
 			DB::delete('media', DBcondition('mediatypeid', $mediatypeids));
