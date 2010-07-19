@@ -50,8 +50,6 @@
  * Purpose: get identifiers and values of the last two events                 *
  *                                                                            *
  * Parameters: triggerid    - [IN] trigger identifier from database           *
- *             prev_eventid - [OUT] previous trigger identifier               *
- *             prev_value   - [OUT] previous trigger value                    *
  *             last_eventid - [OUT] last trigger identifier                   *
  *             last_value   - [OUT] last trigger value                        *
  *                                                                            *
@@ -59,11 +57,10 @@
  *                                                                            *
  * Author: Alexei Vladishev, Alexander Vladishev                              *
  *                                                                            *
- * Comments:                                                                  *
+ * Comments: "UNKNOWN" events will be ignored                                 *
  *                                                                            *
  ******************************************************************************/
 static void	get_latest_event_status(zbx_uint64_t triggerid,
-		zbx_uint64_t *prev_eventid, int *prev_value,
 		zbx_uint64_t *last_eventid, int *last_value)
 {
 	const char	*__function_name = "get_latest_event_status";
@@ -82,43 +79,30 @@ static void	get_latest_event_status(zbx_uint64_t triggerid,
 			" where source=%d"
 				" and object=%d"
 				" and objectid=" ZBX_FS_UI64
+				" and value in (%d,%d)"
 			" order by object desc,objectid desc,eventid desc",
 			EVENT_SOURCE_TRIGGERS,
 			EVENT_OBJECT_TRIGGER,
-			triggerid);
+			triggerid,
+			TRIGGER_VALUE_FALSE, TRIGGER_VALUE_TRUE);
 
-	result = DBselectN(sql, 2);
+	result = DBselectN(sql, 1);
 
 	if (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(*last_eventid, row[0]);
 		*last_value = atoi(row[1]);
-
-		if (NULL != (row = DBfetch(result)))
-		{
-			ZBX_STR2UINT64(*prev_eventid, row[0]);
-			*prev_value = atoi(row[1]);
-		}
-		else
-		{
-			*prev_eventid = 0;
-			*prev_value = TRIGGER_VALUE_UNKNOWN;
-		}
 	}
 	else
 	{
-		*prev_eventid = 0;
-		*prev_value = TRIGGER_VALUE_UNKNOWN;
 		*last_eventid = 0;
 		*last_value = TRIGGER_VALUE_UNKNOWN;
 	}
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() prev_eventid:" ZBX_FS_UI64
-			" prev_value:%d last_eventid:" ZBX_FS_UI64
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() last_eventid:" ZBX_FS_UI64
 			" last_value:%d",
-			__function_name, *prev_eventid, *prev_value,
-			*last_eventid, *last_value);
+			__function_name, *last_eventid, *last_value);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()",
 			__function_name);
@@ -143,8 +127,8 @@ static void	add_trigger_info(DB_EVENT *event)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	triggerid, prev_eventid, last_eventid;
-	int		prev_value, last_value;
+	zbx_uint64_t	triggerid, last_eventid;
+	int		last_value;
 
 	if (event->object == EVENT_OBJECT_TRIGGER && event->objectid != 0)
 	{
@@ -171,11 +155,11 @@ static void	add_trigger_info(DB_EVENT *event)
 		DBfree_result(result);
 
 		/* skip actions in next cases:
-		 * (1)  -any- / -any- /UNKNOWN
-		 * (2)  FALSE /UNKNOWN/ FALSE
-		 * (3) UNKNOWN/UNKNOWN/ FALSE
+		 * (1)  -any- / UNKNOWN	(-any-/-any-/UNKNOWN)
+		 * (2)  FALSE / FALSE	(FALSE/UNKNOWN/FALSE)
+		 * (3) UNKNOWN/ FALSE	(UNKNOWN/UNKNOWN/FALSE)
 		 * if event->trigger_type is not TRIGGER_TYPE_MULTIPLE_TRUE:
-		 * (4)  TRUE  /UNKNOWN/ TRUE
+		 * (4)  TRUE  / TRUE	(TRUE/UNKNOWN/TRUE)
 		 */
 		if (event->value == TRIGGER_VALUE_UNKNOWN)	/* (1) */
 		{
@@ -183,33 +167,29 @@ static void	add_trigger_info(DB_EVENT *event)
 		}
 		else
 		{
-			get_latest_event_status(triggerid, &prev_eventid, &prev_value,
-					&last_eventid, &last_value);
+			get_latest_event_status(triggerid, &last_eventid, &last_value);
 
-			if (last_value == TRIGGER_VALUE_UNKNOWN)	/* (2), (3) & (4) */
+			if (event->value == TRIGGER_VALUE_FALSE &&	/* (2) & (3) */
+					(last_value == TRIGGER_VALUE_FALSE || last_value == TRIGGER_VALUE_UNKNOWN))
 			{
-				if (event->value == TRIGGER_VALUE_FALSE &&	/* (2) & (3) */
-						(prev_value == TRIGGER_VALUE_FALSE || prev_value == TRIGGER_VALUE_UNKNOWN))
-				{
-					event->skip_actions = 1;
-				}
-				else if (event->trigger_type != TRIGGER_TYPE_MULTIPLE_TRUE &&	/* (4) */
-						prev_value == TRIGGER_VALUE_TRUE && event->value == TRIGGER_VALUE_TRUE)
-				{
-					event->skip_actions = 1;
-				}
-
-				/* copy acknowledges in next cases:
-				 * (1) FALSE/UNKNOWN/FALSE
-				 * if event->trigger_type is not TRIGGER_TYPE_MULTIPLE_TRUE:
-				 * (2) TRUE /UNKNOWN/TRUE
-				 */
-				if (prev_value == event->value &&
-						(prev_value == TRIGGER_VALUE_FALSE ||			/* (1) */
-						(event->trigger_type != TRIGGER_TYPE_MULTIPLE_TRUE &&	/* (2) */
-						prev_value == TRIGGER_VALUE_TRUE)))
-					event->ack_eventid = prev_eventid;
+				event->skip_actions = 1;
 			}
+			else if (event->trigger_type != TRIGGER_TYPE_MULTIPLE_TRUE &&	/* (4) */
+					last_value == TRIGGER_VALUE_TRUE && event->value == TRIGGER_VALUE_TRUE)
+			{
+				event->skip_actions = 1;
+			}
+
+			/* copy acknowledges in next cases:
+			 * (1) FALSE/FALSE	(FALSE/UNKNOWN/FALSE)
+			 * if event->trigger_type is not TRIGGER_TYPE_MULTIPLE_TRUE:
+			 * (2) TRUE /TRUE	(TRUE/UNKNOWN/TRUE)
+			 */
+			if (last_value == event->value &&
+					(last_value == TRIGGER_VALUE_FALSE ||			/* (1) */
+					(event->trigger_type != TRIGGER_TYPE_MULTIPLE_TRUE &&	/* (2) */
+					last_value == TRIGGER_VALUE_TRUE)))
+				event->ack_eventid = last_eventid;
 		}
 
 		if (1 == event->skip_actions)
