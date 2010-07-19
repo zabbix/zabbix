@@ -58,7 +58,7 @@
 		'left'=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
 		'right'=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
 		'stime'=>	array(T_ZBX_STR, O_OPT,	 null,	null, null),
-		
+
 		'load'=>			array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL),
 		'fullscreen'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		NULL),
 // filter
@@ -73,7 +73,7 @@
 	);
 
 	check_fields($fields);
-	
+
 /* AJAX */
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
@@ -92,9 +92,9 @@
 		$_REQUEST['triggerid'] = 0;
 		$_REQUEST['hide_unknown'] = 0;
 	}
-	
+
 	$source = get_request('triggerid') > 0 ? EVENT_SOURCE_TRIGGERS : get_request('source', CProfile::get('web.events.source', EVENT_SOURCE_TRIGGERS));
-	
+
 	$_REQUEST['triggerid'] = get_request('triggerid',CProfile::get('web.events.filter.triggerid',0));
 	$_REQUEST['hide_unknown'] = get_request('hide_unknown',CProfile::get('web.events.filter.hide_unknown',0));
 
@@ -103,26 +103,26 @@
 		CProfile::update('web.events.filter.hide_unknown',$_REQUEST['hide_unknown'], PROFILE_TYPE_INT);
 	}
 // --------------
-	
+
 	CProfile::update('web.events.source',$source, PROFILE_TYPE_INT);
 ?>
 <?php
 
 	$events_wdgt = new CWidget();
-	
+
 // PAGE HEADER {{{
 	$url = '?fullscreen='.($_REQUEST['fullscreen']? '0':'1');
 	$fs_icon = new CDiv(SPACE,'fullscreen');
 	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 	$fs_icon->addAction('onclick', "javascript: document.location = '".$url."';");
 	$events_wdgt->addPageHeader(array(S_HISTORY_OF_EVENTS_BIG.SPACE.S_ON_BIG.SPACE, zbx_date2str(S_EVENTS_DATE_FORMAT,time())), $fs_icon);
-// }}}PAGE HEADER	
-	
-	
+// }}}PAGE HEADER
+
+
 // HEADER {{{
 	$r_form = new CForm(null, 'get');
 	$r_form->addVar('fullscreen',$_REQUEST['fullscreen']);
-	
+
 	if(EVENT_SOURCE_TRIGGERS == $source){
 		if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0)){
 			$sql = 'SELECT DISTINCT hg.groupid, hg.hostid '.
@@ -174,11 +174,11 @@
 	}
 
 	$events_wdgt->addHeader(S_EVENTS_BIG, $r_form);
-	
+
 	$numrows = new CDiv();
 	$numrows->setAttribute('name', 'numrows');
 	$events_wdgt->addHeader($numrows);
-// }}} HEADER 
+// }}} HEADER
 
 
 // FILTER {{{
@@ -186,7 +186,7 @@
 		$filterForm = new CFormTable(null, null, 'get');//,'events.php?filter_set=1','POST',null,'sform');
 		$filterForm->setAttribute('name', 'zbx_filter');
 		$filterForm->setAttribute('id', 'zbx_filter');
-	
+
 		$filterForm->addVar('triggerid', get_request('triggerid', 0));
 
 		if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0)){
@@ -210,7 +210,7 @@
 		$unkcbx->setAction('javascript: create_var("'.$filterForm->GetName().'", "hide_unknown", (this.checked?1:0), 0); ');
 
 		$filterForm->addRow(S_HIDE_UNKNOWN,$unkcbx);
-		
+
 		$reset = new CButton('filter_rst',S_RESET);
 		$reset->setType('button');
 		$reset->setAction('javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
@@ -220,16 +220,16 @@
 
 		$events_wdgt->addFlicker($filterForm, CProfile::get('web.events.filter.state',0));
 
-		
+
 		$scroll_div = new CDiv();
 		$scroll_div->setAttribute('id', 'scrollbar_cntr');
 		$events_wdgt->addFlicker($scroll_div, CProfile::get('web.events.filter.state',0));
 	}
 // }}} FILTER
 
-	
+
 	$table = new CTableInfo(S_NO_EVENTS_FOUND);
-	
+
 // CHECK IF EVENTS EXISTS {{{
 	$options = array(
 		'output' => API_OUTPUT_EXTEND,
@@ -238,7 +238,7 @@
 		'nopermissions' => 1,
 		'limit' => 1
 	);
-	
+
 	if($source == EVENT_SOURCE_DISCOVERY){
 		$options['source'] = EVENT_SOURCE_DISCOVERY;
 	}
@@ -253,7 +253,7 @@
 	$_REQUEST['period'] = get_request('period', 604800); // 1 week
 	$effectiveperiod = navigation_bar_calc();
 	$bstime = $_REQUEST['stime'];
-	$from = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
+	$from = zbxDateToTime($_REQUEST['stime']);
 	$till = $from + $effectiveperiod;
 
 	if(empty($firstEvent)){
@@ -262,7 +262,7 @@
 	else{
 		$firstEvent = reset($firstEvent);
 		$starttime = $firstEvent['clock'];
-		
+
 		if($source == EVENT_SOURCE_DISCOVERY){
 			$options = array(
 				'source' => EVENT_SOURCE_DISCOVERY,
@@ -288,7 +288,7 @@
 			$dsc_events = CEvent::get($options);
 			order_result($dsc_events, 'eventid', ZBX_SORT_DOWN);
 
-			
+
 			$objectids = array();
 			foreach($dsc_events as $enum => $event_data){
 				$objectids[$event_data['objectid']] = $event_data['objectid'];
@@ -372,7 +372,7 @@
 				($config['event_ack_enable'])?S_ACK:NULL,
 				S_ACTIONS
 			));
-			
+
 			$trigOpt = array(
 				'nodeids' => get_current_nodeid(),
 				'output' => API_OUTPUT_SHORTEN
@@ -392,7 +392,7 @@
 				$trigOpt['triggerids'] = $_REQUEST['triggerid'];
 			}
 			$triggers = CTrigger::get($trigOpt);
-		
+
 			$options = array(
 				'nodeids' => get_current_nodeid(),
 				'triggerids' => zbx_objectValues($triggers, 'triggerid'),
@@ -407,9 +407,9 @@
 			);
 			if($_REQUEST['hide_unknown']) $options['hide_unknown'] = 1;
 			$events = CEvent::get($options);
-			
+
 			$paging = getPagingLine($events);
-			
+
 			$options = array(
 				'nodeids' => get_current_nodeid(),
 				'eventids' => zbx_objectValues($events,'eventid'),
@@ -495,7 +495,7 @@
 		}
 
 		$table = array($paging, $table, $paging);
-		
+
 		$jsmenu = new CPUMenu(null,170);
 		$jsmenu->InsertJavaScript();
 	}
@@ -521,9 +521,9 @@
 
 	zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 	zbx_add_post_js('timeControl.processObjects();');
-	
+
 	$events_wdgt->show();
-	
-	
+
+
 include_once('include/page_footer.php');
 ?>
