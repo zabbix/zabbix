@@ -106,8 +106,8 @@ include_once('include/page_header.php');
 				'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 				'time_from' => (time() - $msgsettings['timeout']), // 15 min
 				'output' => API_OUTPUT_EXTEND,
-				'sortfield' => 'eventid',
-				'sortorder' => 'DESC',
+				'sortfield' => 'clock',
+				'sortorder' => ZBX_SORT_DOWN,
 				'limit' => 15,
 				'nopermissions' => 1
 			);
@@ -120,10 +120,9 @@ include_once('include/page_header.php');
 				$options['value'] = TRIGGER_VALUE_TRUE;
 			}
 
-			$events = CEvent::get($options);
-			order_result($events, 'clock', ZBX_SORT_UP);
-
 			$messages = array();
+
+			$events = CEvent::get($options);
 			foreach($events as $enum => $event){
 				if(!isset($triggers[$event['objectid']])) continue;
 
@@ -156,7 +155,7 @@ include_once('include/page_header.php');
 						S_DATE.': '.zbx_date2str(S_DATE_FORMAT_YMDHMS, $event['clock']),
 //						S_AGE.': '.zbx_date2age($event['clock'], time()),
 //						S_SEVERITY.': '.get_severity_style($trigger['priority'])
-//						S_SOURCE.': '.$event['eventid'].' : '.$event['clock']
+						S_SOURCE.': '.$event['eventid'].' : '.$event['clock']
 					),
 					'timeout' => $msgsettings['timeout'],
 					'options' => $options

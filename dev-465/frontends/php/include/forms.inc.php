@@ -1002,7 +1002,7 @@
 			$newRow = $frmUser->addRow(S_TRIGGER_SEVERITY, $triggers);
 			$newRow->setAttribute('id', 'triggers_row');
 
-			zbx_add_post_js("var userMessageSwitcher = new CViewSwitcher('messages[enabled]', 'change', ".zbx_jsvalue($msgVisibility, true).");");
+			zbx_add_post_js("var userMessageSwitcher = new CViewSwitcher('messages[enabled]', ['click', 'change'], ".zbx_jsvalue($msgVisibility, true).");");
  		}
 
 		$frmUser->addItemToBottomRow(new CButton('save',S_SAVE));

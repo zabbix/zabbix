@@ -133,8 +133,8 @@ objDisplay: function(obj){
 
 	switch(obj.tagName.toLowerCase()) {
 		case 'th':
-		case 'td': obj.style.display = 'table-cell'; break;
-		case 'tr': obj.style.display = 'table-row'; break;
+		case 'td': obj.style.display = IE?'block':'table-cell'; break;
+		case 'tr': obj.style.display = IE?'block':'table-row'; break;
 		case 'img':
 		case 'div':
 			obj.style.display = 'block';
