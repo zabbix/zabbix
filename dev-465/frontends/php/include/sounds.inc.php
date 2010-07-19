@@ -55,14 +55,14 @@ function getMessageSettings(){
 	$messages['triggers']['recovery'] = CProfile::get('web.messages.triggers.recovery', 1);
 
 	$messages['sounds'] = array();
-	$messages['sounds'][TRIGGER_SEVERITY_NOT_CLASSIFIED] = CProfile::get('web.sounds.severity.0', 'alarm_notclassified.wav');
+	$messages['sounds'][TRIGGER_SEVERITY_NOT_CLASSIFIED] = CProfile::get('web.sounds.severity.0', 'no_sound.wav');
 	$messages['sounds'][TRIGGER_SEVERITY_INFORMATION] = CProfile::get('web.sounds.severity.1',	'alarm_information.wav');
 	$messages['sounds'][TRIGGER_SEVERITY_WARNING] = CProfile::get('web.sounds.severity.2',	'alarm_warning.wav');
 	$messages['sounds'][TRIGGER_SEVERITY_AVERAGE] = CProfile::get('web.sounds.severity.3',	'alarm_average.wav');
 	$messages['sounds'][TRIGGER_SEVERITY_HIGH] = CProfile::get('web.sounds.severity.4', 'alarm_high.wav');
 	$messages['sounds'][TRIGGER_SEVERITY_DISASTER] = CProfile::get('web.sounds.severity.5', 'alarm_disaster.wav');
 
-	$messages['sounds']['recovery'] = CProfile::get('web.sounds.ok', 'trigger_off.wav');
+	$messages['sounds']['recovery'] = CProfile::get('web.sounds.ok', 'alarm_ok.wav');
 	$messages['sounds']['repeat'] = CProfile::get('web.sounds.repeat', 1);
 	$messages['sounds']['mute'] = CProfile::get('web.sounds.mute', 0);
 

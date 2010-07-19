@@ -980,6 +980,8 @@
 				new CButton('stop', S_STOP, 'javascript: AudioList.stopAll();', false)
 			);
 
+			$triggers->addRow($resolved);
+
 			foreach($severities as $snum => $severity){
 				$soundList = new CComboBox('messages[sounds]['.$severity.']', $messages['sounds'][$severity]);
 				foreach($zbxSounds as $filename => $file) $soundList->addItem($file, $filename);

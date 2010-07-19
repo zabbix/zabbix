@@ -159,8 +159,17 @@ mute: function(e){
 	var icon = Event.element(e);
 	var newClass = switchElementsClass(icon, 'iconmute', 'iconsound');
 
+	if(newClass == 'iconmute'){
+		var action = 'message.mute';
+		this.sounds.mute = 1;
+	}
+	else{
+		var action = 'message.unmute';
+		this.sounds.mute = 0;		
+	}
+
 	var rpcRequest = {
-		'method': ((newClass == 'iconmute')?'message.mute':'message.unmute'),
+		'method': action,
 		'params': {},
 		'onFailure': function(resp){zbx_throw('Messages Widget: mute request failed.');}
 	}
