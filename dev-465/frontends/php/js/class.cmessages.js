@@ -84,6 +84,13 @@ initialize: function($super, messagesListId, args){
 		scroll: window,
 		snap: function(x,y){if(y < 0) return [x,0]; else return [x,y];}
 	});
+
+	new Draggable(this.dom.container, {
+		handle: this.dom.move, //this.dom.header,
+		constraint: 'vertical',
+		scroll: window,
+		snap: function(x,y){if(y < 0) return [x,0]; else return [x,y];}
+	});
 //	addListener(this.dom.mute, 'click', this.mute.bindAsEventListener(this));
 
 	if(is_null(this.PEupdater)){
@@ -492,7 +499,7 @@ createMessage: function(){
 	this.dom.title = document.createElement('span');
 	this.dom.messageBox.appendChild(this.dom.title);
 
-	this.dom.title.update(BBCode.Parse(this.title));
+	$(this.dom.title).update(BBCode.Parse(this.title));
 	this.dom.title.className = 'title';
 
 // body
