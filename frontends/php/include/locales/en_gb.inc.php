@@ -1558,6 +1558,7 @@
 	'S_SLIDESHOWS'=>				'Slide shows',
 	'S_SLIDESHOW'=>					'Slide show',
 	'S_CONFIGURATION_OF_SLIDESHOWS_BIG'=>	'CONFIGURATION OF SLIDE SHOWS',
+	'S_CONFIGURATION_OF_SLIDESHOWS'=>	'Configuration of slideshows',
 	'S_SLIDESHOWS_BIG'=>			'SLIDE SHOWS',
 	'S_NO_SLIDESHOWS_DEFINED'=>		'No slide shows defined',
 	'S_COUNT_OF_SLIDES'=>			'Count of slides',
