@@ -155,7 +155,7 @@ include_once('include/page_header.php');
 						S_DATE.': '.zbx_date2str(S_DATE_FORMAT_YMDHMS, $event['clock']),
 //						S_AGE.': '.zbx_date2age($event['clock'], time()),
 //						S_SEVERITY.': '.get_severity_style($trigger['priority'])
-						S_SOURCE.': '.$event['eventid'].' : '.$event['clock']
+//						S_SOURCE.': '.$event['eventid'].' : '.$event['clock']
 					),
 					'timeout' => $msgsettings['timeout'],
 					'options' => $options
