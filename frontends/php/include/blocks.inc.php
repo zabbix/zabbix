@@ -245,7 +245,7 @@ function make_system_status($filter){
 	$groups = CHostGroup::get($options);
 	$groups = zbx_toHash($groups, 'groupid');
 	order_result($groups, 'name');
-	
+
 	$groupids = array();
 	foreach($groups as $gnum => $group){
 		$groupids[] = $group['groupid'];
@@ -302,15 +302,15 @@ function make_system_status($filter){
 		else{
 			$trigger['event'] = reset($event);
 		}
-		
-		foreach($trigger['groups'] as $group){			
+
+		foreach($trigger['groups'] as $group){
 			if($groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count'] < 30){
 				$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['triggers'][] = $trigger;
 			}
 			if(($groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count_unack'] < 30) && !$trigger['event']['acknowledged']){
 				$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['triggers_unack'][] = $trigger;
 			}
-			
+
 			$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count']++;
 			if(!$trigger['event']['acknowledged']){
 				$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count_unack']++;
@@ -344,7 +344,7 @@ function make_system_status($filter){
 					($config['event_ack_enable']) ? S_ACK : NULL,
 					S_ACTIONS
 				));
-				
+
 				foreach($data['triggers'] as $tnum => $trigger){
 					$event = $trigger['event'];
 					if($config['event_ack_enable'] && isset($event['eventid'])){
@@ -358,7 +358,7 @@ function make_system_status($filter){
 						$ack = '-';
 						$actions = S_NO_DATA_SMALL;
 					}
-					
+
 					$table_inf->addRow(array(
 						get_node_name_by_elid($trigger['triggerid']),
 						$trigger['host'],
@@ -369,7 +369,7 @@ function make_system_status($filter){
 					));
 				}
 			}
-			
+
 			if($data['count_unack'] && in_array($filter['extAck'], array(EXTACK_OPTION_UNACK, EXTACK_OPTION_BOTH))){
 				$table_inf_unack = new CTableInfo();
 				$table_inf_unack->setAttribute('style', 'width: 400px;');
@@ -381,10 +381,10 @@ function make_system_status($filter){
 					($config['event_ack_enable']) ? S_ACK : NULL,
 					S_ACTIONS
 				));
-				
+
 				foreach($data['triggers_unack'] as $tnum => $trigger){
 					$event = $trigger['event'];
-					
+
 					if($config['event_ack_enable']){
 						$ack = new CLink(S_NO, 'acknow.php?eventid='.$event['eventid'], 'on');
 						$actions = get_event_actions_status($event['eventid']);
@@ -393,7 +393,7 @@ function make_system_status($filter){
 						$ack = '-';
 						$actions = S_NO_DATA_SMALL;
 					}
-					
+
 					$table_inf_unack->addRow(array(
 						get_node_name_by_elid($trigger['triggerid']),
 						$trigger['host'],
@@ -404,8 +404,8 @@ function make_system_status($filter){
 					));
 				}
 			}
-			
-			
+
+
 			switch($filter['extAck']){
 				case EXTACK_OPTION_ALL:
 					$trigger_count = new CSpan($data['count'], 'pointer');
@@ -419,7 +419,7 @@ function make_system_status($filter){
 					if($trigger_count){
 						$trigger_count = new CSpan($data['count_unack'], 'pointer red bold');
 						$trigger_count->setHint($table_inf_unack);
-					}						
+					}
 					$group_row->addItem(new CCol($trigger_count, get_severity_style($severity, $data['count_unack'])));
 				break;
 				case EXTACK_OPTION_BOTH:
@@ -431,21 +431,21 @@ function make_system_status($filter){
 					else{
 						$unack_count = null;
 					}
-					
+
 					$trigger_count = new CSpan($data['count'], 'pointer');
 					if($data['count'])
 						$trigger_count->setHint($table_inf);
-					
+
 					$group_row->addItem(new CCol(array($unack_count, $trigger_count), get_severity_style($severity, $data['count'])));
 				break;
 			}
 		}
-		
+
 		$table->addRow($group_row);
 	}
 
 	$table->setFooter(new CCol(S_UPDATED.': '.zbx_date2str(S_BLOCKS_SYSTEM_SUMMARY_TIME_FORMAT)));
-	
+
 	return $table;
 }
 
@@ -845,8 +845,6 @@ return $table;
 
 // author Aly
 function make_latest_issues($filter = array()){
-	global $USER_DETAILS;
-
 	$config = select_config();
 
 	$limit = isset($filter['limit']) ? $filter['limit'] : 20;
@@ -899,8 +897,7 @@ function make_latest_issues($filter = array()){
 		S_ACTIONS
 	));
 
-	$cachedGroups = Array();
-
+	$thosts_cache = array();
 	foreach($triggers as $tnum => $trigger){
 // Check for dependencies
 		$group = reset($trigger['groups']);
@@ -923,14 +920,31 @@ function make_latest_issues($filter = array()){
 			$menus = "['".S_TOOLS."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus;
 		}
 
+		if(isset($thosts_cache[$trigger['hostid']])){
+			$hprofile = $thosts_cache[$trigger['hostid']];
+		}
+		else{
+			$hprofile = CHost::get(array(
+				'hostids' => $trigger['hostid'],
+				'output' => API_OUTPUT_SHORTEN,
+				'select_profile' => API_OUTPUT_EXTEND,
+			));
+			$hprofile = reset($hprofile);
+			$thosts_cache[$hprofile['hostid']] = $hprofile;
+		}
+
 		$menus.= "['".S_LINKS."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
 		$menus.= "['".S_LATEST_DATA."',\"javascript: redirect('latest.php?groupid=".$group['groupid'].'&hostid='.$trigger['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+		if(!empty($hprofile['profile']))
+			$menus.= "['".S_PROFILE."',\"javascript: redirect('hostprofiles.php?hostid=".$trigger['hostid']."&prof_type=0')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+		if(!empty($hprofile['profile_ext']))
+			$menus.= "['".S_EXTENDED_PROFILE."',\"javascript: redirect('hostprofiles.php?hostid=".$trigger['hostid']."&prof_type=1')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 
 		$menus = rtrim($menus,',');
 		$menus = 'show_popup_menu(event,['.$menus.'],180);';
 
-		$host = new CSpan($trigger['host'],'link_menu pointer');
-		$host->setAttribute('onclick','javascript: '.$menus);
+		$host = new CSpan($trigger['host'], 'link_menu pointer');
+		$host->setAttribute('onclick', 'javascript: '.$menus);
 		//$host = new CSpan($trigger['host'],'link_menu pointer');
 		//$host->setAttribute('onclick','javascript: '.$menus);
 
@@ -1011,7 +1025,7 @@ function make_latest_issues($filter = array()){
 				$actions
 			));
 		}
-		unset($trigger,$description,$actions,$alerts,$hint);
+		unset($trigger,$description,$actions);
 	}
 
 	$table->setFooter(new CCol(S_UPDATED.': '.zbx_date2str(S_BLOCKS_LATEST_ISSUES_TIME_FORMAT)));
@@ -1021,8 +1035,6 @@ return $table;
 
 // author Aly
 function make_webmon_overview($filter){
-	global $USER_DETAILS;
-
 	$options = array(
 		'groupids' => $filter['groupids'],
 		'monitored_hosts' => 1,
