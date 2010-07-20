@@ -247,6 +247,7 @@ options = array(
 		);
 		$options = zbx_array_merge($def_options, $options);
 		$groups = CHostGroup::get($options);
+		order_result($groups, 'name');
 
 		$this->data['groups'] = array();
 		foreach($groups as $group){
@@ -255,7 +256,7 @@ options = array(
 
 		if(is_null($groupid)) $groupid = $this->_profileIds['groupid'];
 
-		if(!isset($this->data['groups'][$groupid])){
+		if(!isset($this->data['groups'][$groupid]) && (is_null($this->_requestIds['groupid']) || ($this->_requestIds['groupid'] != 0))){
 			$groupids = array_keys($this->data['groups']);
 			$groupid = empty($groupids)?0:reset($groupids);
 		}
@@ -283,6 +284,7 @@ options = array(
 			);
 			$options = zbx_array_merge($def_options, $options);
 			$hosts = CHost::get($options);
+			order_result($hosts, 'host');
 
 			foreach($hosts as $host){
 				$this->data['hosts'][$host['hostid']] = $host['host'];
@@ -290,12 +292,12 @@ options = array(
 
 			if(is_null($hostid)) $hostid = $this->_profileIds['hostid'];
 
-			if(!isset($this->data['hosts'][$hostid])){
+			if(!isset($this->data['hosts'][$hostid]) && (is_null($this->_requestIds['hostid']) || ($this->_requestIds['hostid'] != 0))){
 				$hostids = array_keys($this->data['hosts']);
 				$hostid = empty($hostids)?0:reset($hostids);
 			}
 		}
-		
+
 		if(!is_null($this->_requestIds['hostid'])){
 			CProfile::update($this->_profileIdx['hosts'], $hostid, PROFILE_TYPE_ID);
 			CProfile::update(self::HOST_LATEST_IDX, $hostid, PROFILE_TYPE_ID);
@@ -320,6 +322,7 @@ options = array(
 			);
 			$options = zbx_array_merge($def_ptions, $options);
 			$graphs = CGraph::get($options);
+			order_result($graphs, 'name');
 
 			foreach($graphs as $graph){
 				$this->data['graphs'][$graph['graphid']] = $graph['name'];
@@ -354,6 +357,7 @@ options = array(
 			);
 			$options = zbx_array_merge($def_ptions, $options);
 			$triggers = Ctrigger::get($options);
+			order_result($triggers, 'description');
 
 			foreach($triggers as $trigger){
 				$this->data['triggers'][$trigger['triggerid']] = $trigger['description'];
