@@ -72,16 +72,22 @@ div.messagecontainer .message .messagebox{
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	padding: 0px 22px 2px 6px;
 	margin-left: 20px;
-/*/	margin-right: 30px; /**/
 	background-color: #4F4F4F;
 	color: #EAEAEA;
 }
 
-div.messagecontainer .messagebox span.title{
+div.messagecontainer .message .messagebox span.title{
 	line-height: 22px;
 	font-size: 10pt;
 	font-weight: bold;
 	white-space: nowrap;
+}
+
+div.messagecontainer .messagebox span.title a{
+	font-size: 10pt;
+	color: #EAEAEA;
+	white-space: nowrap;
+	line-height: 22px;
 }
 
 div.messagecontainer .messagebox span.body{

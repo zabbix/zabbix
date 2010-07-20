@@ -120,9 +120,10 @@ include_once('include/page_header.php');
 				$options['value'] = TRIGGER_VALUE_TRUE;
 			}
 
-			$messages = array();
-
 			$events = CEvent::get($options);
+
+			$sortClock = array();
+			$sortEvent = array();
 			foreach($events as $enum => $event){
 				if(!isset($triggers[$event['objectid']])) continue;
 
@@ -140,8 +141,9 @@ include_once('include/page_header.php');
 					$sound = $msgsettings['sounds'][$trigger['priority']];
 				}
 
-				if(!isset($messages[$event['clock']])) $messages[$event['clock']] = array();
-				$messages[$event['clock']][] = array(
+				$url = 'tr_status.php?hostid='.$host['hostid'];
+
+				$result[$enum] = array(
 					'type' => 3,
 					'caption' => 'events',
 					'sourceid' => $event['eventid'],
@@ -149,7 +151,7 @@ include_once('include/page_header.php');
 					'priority' => $priority,
 					'sound' => $sound,
 					'color' => getEventColor($trigger['priority'], $event['value']),
-					'title' => $title.' '.$host['host'],
+					'title' => $title.' [url='.$url.']'.$host['host'].'[/url]',
 					'body' => array(
 						S_DETAILS.': '.$trigger['description'],
 						S_DATE.': '.zbx_date2str(S_DATE_FORMAT_YMDHMS, $event['clock']),
@@ -160,16 +162,12 @@ include_once('include/page_header.php');
 					'timeout' => $msgsettings['timeout'],
 					'options' => $options
 				);
+
+				$sortClock[$enum] = $event['clock'];
+				$sortEvent[$enum] = $event['eventid'];
 			}
 
-			foreach($messages as $time => $list){
-				order_result($list, 'sourceid', ZBX_SORT_UP);
-//SDI($list);
-				foreach($list as $lnum => $message){
-					$result[] = $message;
-				}
-			}
-
+			array_multisort($sortClock, SORT_ASC, $sortEvent, SORT_ASC, $result);
 		break;
 		case 'message.closeAll':
 			$params = $data['params'];

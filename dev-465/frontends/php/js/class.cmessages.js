@@ -492,7 +492,7 @@ createMessage: function(){
 	this.dom.title = document.createElement('span');
 	this.dom.messageBox.appendChild(this.dom.title);
 
-	this.dom.title.appendChild(document.createTextNode(this.title));
+	this.dom.title.update(BBCode.Parse(this.title));
 	this.dom.title.className = 'title';
 
 // body
