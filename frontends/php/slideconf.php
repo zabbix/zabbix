@@ -25,7 +25,7 @@ require_once('include/forms.inc.php');
 require_once('include/maps.inc.php');
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
-$page['title'] = "S_CONFIGURATION_OF_SLIDES";
+$page['title'] = 'S_CONFIGURATION_OF_SLIDESHOWS';
 $page['file'] = 'slideconf.php';
 $page['hist_arg'] = array();
 
