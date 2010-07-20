@@ -117,7 +117,7 @@ include_once('include/page_header.php');
 		if(isset($_REQUEST['new_step'])){
 			if(isset($_REQUEST['new_step']['sid']))
 				$_REQUEST['steps'][$_REQUEST['new_step']['sid']] = $_REQUEST['new_step'];
-			else
+			else if($_REQUEST['new_step']['screenid']>0)
 				$_REQUEST['steps'][] = $_REQUEST['new_step'];
 
 			unset($_REQUEST['add_step'], $_REQUEST['new_step']);

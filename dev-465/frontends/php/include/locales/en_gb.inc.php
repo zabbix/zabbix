@@ -1237,6 +1237,7 @@
 	'S_MAINTENANCE_BIG'=>			'MAINTENANCE',
 
 //	sysmaps.php
+	'S_IMAGE_IS_USED_IN_ZABBIX_MAP' => 'Image is used in ZABBIX map',
 	'S_EDIT_MAP_ELEMENT'=>			'Edit map element',
 	'S_ICON_DEFAULT'=>			'Icon (default)',
 	'S_APPLY'=>					'Apply',
@@ -1294,6 +1295,8 @@
 	'S_OK_BIG'=>			'OK',
 	'S_PROBLEM_BIG'=>		'PROBLEM',
 	'S_ZABBIX_URL'=>		'http://www.zabbix.com',
+	'S_UNACKNOWLEDGED' => 'Unacknowledged',
+	'S_EVENT_ACKNOWLEDGING_DISABLED' => 'Event acknowledging disabled',
 
 //	maps.php
 	'S_NETWORK_MAPS'=>		'Network maps',
@@ -1954,9 +1957,10 @@
 	'S_JAPANESE_JP'=>			'Japanese (JP)',
 	'S_CHINESE_CN'=>			'Chinese (CN)',
 	'S_DUTCH_NL'=>				'Dutch (NL)',
-	'S_HUNGARY_HU'=>			'Hungarian (HU)',
+	'S_HUNGARIAN_HU'=>			'Hungarian (HU)',
 	'S_POLISH_PL'=>				'Polish (PL)',
 	'S_UKRAINIAN_UA'=>			'Ukrainian (UA)',
+	'S_CZECH_CZ'=>				'Czech (CZ)',
 
 //	index.php
 	'S_ZABBIX_BIG'=>			'ZABBIX',
@@ -2017,7 +2021,7 @@
 	'S_EDIT_CONNECTOR'=>			'Edit connector',
 
 //	tr_logform.php
-	'S_INCLUDE'=>		'Include',
+	'S_INCLUDE_S'=>		'Include',
 	'S_EXCLUDE'=>		'Exclude',
 	'S_KEYWORD'=>		'Keyword',
 	'S_POSITION'=>		'Position',
@@ -2125,7 +2129,7 @@
 	'S_NO_ITEM_WITH'=>				'No item with',
 	'S_DELETED_SMALL'=>				'deleted',
 	'S_UNKNOWN_VALUE_TYPE'=>			'Unknown value type',
-	'S_ITEMS_CHECK_KEY_DEFAULT_EXAMPLE_PASSED'=>	'Check key, please. Default example were passed',
+	'S_ITEMS_CHECK_KEY_DEFAULT_EXAMPLE_PASSED'=>	'Check the key, please. Default example was passed',
 
 //	httptest.inc.php
 	'S_SCENARIO_STEP_NUMBER_CANNOT_BE_LESS_ONE'=>	'Scenario step number cannot be less than 1',

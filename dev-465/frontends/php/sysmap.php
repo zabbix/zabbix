@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -85,7 +85,6 @@ include_once('include/page_header.php');
 <?php
 // ACTION /////////////////////////////////////////////////////////////////////////////
 	if(isset($_REQUEST['favobj'])){
-
 		$json = new CJSON();
 		if('sysmap' == $_REQUEST['favobj']){
 			$sysmapid = get_request('sysmapid',0);
@@ -136,10 +135,10 @@ include_once('include/page_header.php');
 						order_result($link['linktriggers'], 'desc_exp');
 						$action .= 'ZBX_SYSMAPS['.$cmapid.'].map.add_link('.zbx_jsvalue($link).'); '."\n";
 					}
-					
+
 					unset($db_map['selements']);
 					unset($db_map['links']);
-					
+
 					$action .= 'ZBX_SYSMAPS['.$cmapid.'].map.sysmap = '.zbx_jsvalue($db_map, true).";\n";
 					$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.updateMapImage(); '."\n";
 					$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.updateSelementsIcon(); '."\n";
@@ -316,7 +315,6 @@ include_once('include/page_header.php');
 			'editable' => 1,
 			'extendoutput' => 1,
 		);
-
 		$maps = CMap::get($options);
 
 		if(empty($maps)) access_deny();
@@ -392,6 +390,8 @@ include_once('include/page_header.php');
 	$gridForm = new CDiv(array($gridSize, $gridAlignAll));
 	$gridForm->setAttribute('id', 'gridalignblock');
 
+	array_push($menuRow, S_MAP . ' "'.$sysmap['name'].'"');
+	array_push($menuRow, SPACE.SPACE);
 	array_push($menuRow, S_ICON.' [',$el_add,$el_rmv,']');
 	array_push($menuRow, SPACE.SPACE);
 	array_push($menuRow, S_LINK.' [',$cn_add,$cn_rmv,']');

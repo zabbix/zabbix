@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2007 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,11 +25,6 @@
 			case EVENT_SOURCE_DISCOVERY:	return S_DISCOVERY;
 			default:			return S_UNKNOWN;
 		}
-	}
-
-	function get_event_by_eventid($eventid){
-		$db_events = DBselect('select * from events where eventid='.$eventid);
-		return DBfetch($db_events);
 	}
 
 	function get_tr_event_by_eventid($eventid){
@@ -466,7 +461,7 @@ function get_history_of_triggers_events($start,$num, $groupid=0, $hostid=0){
 	$sql_from = $sql_cond = '';
 
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST);
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array(), PERM_RES_DATA_ARRAY, get_current_nodeid());
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array());
 
 	if($hostid > 0){
 		$sql_cond = ' AND h.hostid='.$hostid;

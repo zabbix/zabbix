@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -78,44 +78,6 @@
 	return $result;
 	}
 
-	function add_host_group($name, $hosts=array()){
-		$result = CHostGroup::create(array('name' => $name));
-		if(!$result){
-			error(CHostgroup::resetErrors());
-			return false;
-		}
-
-		$groupid = reset($result['groupids']);
-
-		add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_GROUP, $groupid, $name, 'groups', NULL, NULL);
-
-		info(S_ADDED_HOST_GROUP.SPACE.'['.$name.']');
-		if(!empty($hosts))
-			update_host_groups_by_groupid($groupid, $hosts);
-
-	return $groupid;
-	}
-
-	function update_host_group($groupid,$name,$hosts){
-		$hostgroup_old = get_hostgroup_by_groupid($groupid);
-
-		$options = array(array('name' => $name, 'groupid' => $groupid));
-		$result = CHostGroup::update($options);
-
-		if(!$result){
-			error(CHostGroup::resetErrors());
-			return $result;
-		}
-
-		$hostgroup_new = get_hostgroup_by_groupid($groupid);
-		add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST_GROUP, $groupid, $hostgroup_old['name'], 'groups', $hostgroup_old, $hostgroup_new);
-		info(S_UPDATED_HOST_GROUP.SPACE.'['.$name.']');
-		if(!empty($hosts))
-			$result = update_host_groups_by_groupid($groupid,$hosts);
-
-	return $result;
-	}
-
 /*
  * Function: check_circle_host_link
  *
@@ -138,279 +100,6 @@
 				return true;
 
 		return false;
-	}
-
-/*
- * Function: db_save_host
- *
- * Description:
- *     Add or update host
- *
- * Author:
- *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
- *
- * Comments:
- *     if hostid is NULL add new host, in other cases update
- *
- *     NOTE: templates = array(id => name, id2 => name2, ...)
- */
-	function db_save_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates,
-							$useipmi,$ipmi_ip,$ipmi_port,$ipmi_authtype,$ipmi_privilege,$ipmi_username,$ipmi_password,
-							$hostid=null)
-	{
-// check if templetes to link, doesn't contain dependencies on other templates.
-		if(HOST_STATUS_TEMPLATE == $status) {
-			if(!check_templates_trigger_dependencies($templates))
-				return false;
-		}
-
-// if(!eregi('^'.ZBX_EREG_HOST_FORMAT.'$', $host)){
-		if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $host)){
-			error(S_INCORRECT_CHARACTERS_USED_FOR_HOSTNAME);
-			return false;
-		}
-
-// if(!empty($dns) && !eregi('^'.ZBX_EREG_DNS_FORMAT.'$', $dns)){
- 		if(!empty($dns) && !preg_match('/^'.ZBX_PREG_DNS_FORMAT.'$/i', $dns)){
-			error(S_INCORRECT_CHARACTERS_USED_FOR_DNS);
-			return false;
-		}
-
-
-		$sql = 'SELECT h.host '.
-				' FROM hosts h '.
-				' WHERE h.host='.zbx_dbstr($host).
-					' AND '.DBin_node('h.hostid', get_current_nodeid(false)).
-					' AND status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
-					(isset($hostid)? ' AND h.hostid<>'.$hostid:'');
-		if(DBfetch(DBselect($sql))){
-			error(S_HOST.SPACE.'"'.$host.'"'.SPACE.S_ALREADY_EXISTS_SMALL);
-			return false;
-		}
-
-		if(is_null($hostid)){
-			$hostid = get_dbid('hosts','hostid');
-			$result = DBexecute('INSERT INTO hosts '.
-				'(hostid,proxy_hostid,host,port,status,useip,dns,ip,disable_until,available,'.
-					'useipmi,ipmi_port,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,ipmi_ip) '.
-				' VALUES ('.$hostid.','.$proxy_hostid.','.zbx_dbstr($host).','.$port.','.$status.','.$useip.','.zbx_dbstr($dns).','.zbx_dbstr($ip).',0,'
-					.HOST_AVAILABLE_UNKNOWN.','.($useipmi === 'yes' ? 1 : 0).','.$ipmi_port.','.$ipmi_authtype.','.$ipmi_privilege.','.zbx_dbstr($ipmi_username).','
-					.zbx_dbstr($ipmi_password).','.zbx_dbstr($ipmi_ip).')');
-			if($result){
-				add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST, $hostid, $host, 'hosts', NULL, NULL);
-			}
-		}
-		else{
-			if(check_circle_host_link($hostid, $templates)){
-				error(S_CIRCULAR_LINK_CANNOT_BE_CREATED);
-				return false;
-			}
-
-			$host_old = get_host_by_hostid($hostid);
-			$result = DBexecute('UPDATE hosts SET proxy_hostid='.$proxy_hostid.
-							',host='.zbx_dbstr($host).
-							',port='.$port.
-							',status='.$status.
-							',useip='.$useip.
-							',dns='.zbx_dbstr($dns).
-							',ip='.zbx_dbstr($ip).
-							',useipmi='.($useipmi == 'yes' ? 1 : 0).
-							',ipmi_port='.$ipmi_port.
-							',ipmi_authtype='.$ipmi_authtype.
-							',ipmi_privilege='.$ipmi_privilege.
-							',ipmi_username='.zbx_dbstr($ipmi_username).
-							',ipmi_password='.zbx_dbstr($ipmi_password).
-							',ipmi_ip='.zbx_dbstr($ipmi_ip).
-				' WHERE hostid='.$hostid);
-
-			if($result){
-				$host_new = get_host_by_hostid($hostid);
-				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST, $hostid, $host_old['host'], 'hosts', $host_old, $host_new);
-			}
-			update_host_status($hostid, $status);
-		}
-
-		foreach($templates as $id => $name){
-			$hosttemplateid = get_dbid('hosts_templates', 'hosttemplateid');
-			if(!$result = DBexecute('INSERT INTO hosts_templates VALUES ('.$hosttemplateid.','.$hostid.','.$id.')'))
-				break;
-		}
-
-		if($result) $result = $hostid;
-
-	return $result;
-	}
-
-/*
- * Function: add_host
- *
- * Description:
- *     Add new  host
- *
- * Author:
- *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
- *
- * Comments:
- *
- *     NOTE: templates = array(id => name, id2 => name2, ...)
- */
-	function add_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates,
-						$useipmi,$ipmi_ip,$ipmi_port,$ipmi_authtype,$ipmi_privilege,$ipmi_username,$ipmi_password,
-						$newgroup,$groups)
-	{
-		if(zbx_empty($newgroup) && (count($groups) == 0)){
-			info(S_HOST.SPACE.S_MUST_LINKED_LEAST_ONE_HOST_GROUP_SMALL);
-			return false;
-		}
-
-		if(is_null($templates))
-			$templates = array();
-		if(is_null($groups))
-			$groups = array();
-
-		$hostid = db_save_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates,
-								$useipmi,$ipmi_ip,$ipmi_port,$ipmi_authtype,$ipmi_privilege,$ipmi_username,$ipmi_password);
-
-		if(!$hostid)
-			return $hostid;
-		else
-			info(S_ADDED_NEW_HOST.'['.$host.']');
-
-		if(!zbx_empty($newgroup)){
-			$result = CHostGroup::create(array('name' => $newgroup));
-
-			if($result !== false){
-				$options = array(
-					'groupids' => $result['groupids'],
-					'output' => API_OUTPUT_EXTEND
-				);
-				$newgroups = CHostGroups::get($options);
-				$newgroup = reset($newgroups);
-			}
-			else return false;
-
-			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_GROUP, $newgroup['groupid'], $newgroup['name'], 'groups', NULL, NULL);
-			info(S_ADDED_HOST_GROUP.SPACE.'['.$newgroup['name'].']');
-			$groups[] = array('groupid' => $newgroup['groupid']);
-		}
-
-		$hosts = array('hostid' => $hostid);
-//		$groups = zbx_toObject($groups, 'groupid');
-
-// COPY FROM API HostGroup:addHosts
-		$linked = array();
-
-		$tmp_hostids = zbx_objectValues($hosts, 'hostid');
-		$tmp_groupids = zbx_objectValues($groups, 'groupid');
-
-		$sql = 'SELECT hostid, groupid '.
-				' FROM hosts_groups '.
-				' WHERE '.DBcondition('hostid', $tmp_hostids).
-					' AND '.DBcondition('groupid', $tmp_groupids);
-		$linked_db = DBselect($sql);
-		while($pair = DBfetch($linked_db)){
-			$linked[$pair['groupid']] = array($pair['hostid'] => $pair['hostid']);
-		}
-
-		foreach($tmp_groupids as $gnum => $groupid){
-			foreach($tmp_hostids as $hnum => $hostid){
-				if(isset($linked[$groupid]) && isset($linked[$groupid][$hostid])) continue;
-
-				$hostgroupid = get_dbid('hosts_groups', 'hostgroupid');
-				$result = DBexecute('INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES ('.$hostgroupid.','.$hostid.','.$groupid.')');
-				if(!$result){
-					return false;
-				}
-			}
-		}
-//permisssion problems
-//		if(!CHostGroup::createHosts(array('hosts' => $hosts, 'groups' => $groups))) return false;
-//----------
-
-
-	//	if(!update_host_groups($hostid, $groups)) return false;
-
-		sync_host_with_templates($hostid);
-
-	return	$hostid;
-	}
-
-/*
- * Function: update_host
- *
- * Description:
- *     Update host
- *
- * Author:
- *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
- *
- * Comments:
- *
- *     NOTE: templates = array(id => name, id2 => name2, ...)
- */
-	function update_host($hostid,$host,$port,$status,$useip,$dns,$ip,$proxy_hostid,
-							$templates,$useipmi,$ipmi_ip,$ipmi_port,$ipmi_authtype,$ipmi_privilege,$ipmi_username,$ipmi_password,
-							$newgroup,$groups)
-	{
-		if(zbx_empty($newgroup) && (count($groups) == 0)){
-			info(S_HOST.SPACE.'"'.$host.'"'.SPACE.S_MUST_LINKED_LEAST_ONE_HOST_GROUP_SMALL);
-			return false;
-		}
-
-		if(is_null($templates)){
-			$new_templates = array();
-		}
-		else{
-			$old_templates = get_templates_by_hostid($hostid);
-			$new_templates = array_diff($templates, $old_templates);
-
-			$unlinked_templates = array_diff($old_templates, $templates);
-
-			foreach($unlinked_templates as $id => $name){
-				unlink_template($hostid, $id);
-			}
-		}
-
-		$result = (bool) db_save_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$new_templates,
-										$useipmi,$ipmi_ip,$ipmi_port,$ipmi_authtype,$ipmi_privilege,$ipmi_username,$ipmi_password,
-										$hostid);
-		if(!$result)
-			return $result;
-
-		if(!zbx_empty($newgroup)){
-			$result = CHostGroup::create(array('name' => $newgroup));
-			if(!$result){
-				error(CHostGroup::resetErrors());
-				return false;
-			}
-
-			$options = array(
-				'groupids' => $result['groupids'],
-				'output' => API_OUTPUT_EXTEND
-			);
-			$newgroups = CHostGroups::get($options);
-
-			$groups = array_merge($groups, $newgroups);
-		}
-
-		$hosts = array('hostid' => $hostid);
-
-		$groups = zbx_toObject($groups, 'groupid');
-		$result = CHostGroup::massUpdate(array('hosts' => $hosts, 'groups' => $groups));
-
-		if(!$result){
-			error(CHostGroup::resetErrors());
-			return false;
-		}
-
-
-		//$result = update_host_groups($hostid, $groups);
-
-		if(count($new_templates) > 0){
-			sync_host_with_templates($hostid,array_keys($new_templates));
-		}
-
-	return $result;
 	}
 
 /*
@@ -498,30 +187,6 @@
 		delete_template_elements($hostid, $templateid);
 		$res = copy_template_elements($hostid, $templateid);
 		return $res;
-	}
-
-	function delete_groups_by_hostid($hostids){
-		zbx_value2array($hostids);
-
-		$groupids = array();
-		$sql='SELECT DISTINCT groupid FROM hosts_groups WHERE '.DBcondition('hostid'.$hostids);
-		$result=DBselect($sql);
-		while($group=DBfetch($result)){
-			$groupids[$group['groupid']] = $group['groupid'];
-		}
-
-		foreach($hostids as $id => $hostid){
-			$sql='DELETE FROM hosts_groups WHERE hostid='.$hostid.' AND '.DBcondition('groupid', $groupids);
-			DBexecute($sql);
-		}
-
-		$sql='SELECT DISTINCT groupid FROM hosts_groups WHERE '.DBcondition('groupid', $groupids);
-		$result=DBselect($sql);
-		while($group=DBfetch($result)){
-			unset($groupids[$group['groupid']]);
-		}
-
-	return delete_host_group($groupids);
 	}
 
 /*
@@ -755,19 +420,6 @@
 		}
 		error(S_NO_HOST_GROUPS_WITH." groupid=[$groupid]");
 		return  false;
-	}
-
-	function get_groupids_by_host($hostid){
-		$groupids = array();
-
-		$result=DBselect('SELECT DISTINCT hg.groupid '.
-						' FROM hosts_groups hg '.
-						' WHERE hg.hostid='.$hostid);
-		while($row=DBfetch($result)){
-			$groupids[$row['groupid']] = $row['groupid'];
-		}
-
-	return $groupids;
 	}
 
 	function db_save_proxy($name,$status,$useip,$dns,$ip,$port,$proxyid=null){
@@ -1503,7 +1155,7 @@ return $result;
 		global $page;
 
 		$config = select_config();
-		
+
 		$dd_first_entry = $config['dropdown_first_entry'];
 
 		$group_var = 'web.latest.groupid';
@@ -1844,10 +1496,6 @@ return $result;
 		return	false;
 	}
 
-	function get_items_by_applicationid($applicationid){
-		return DBselect("select i.* from items i,items_applications ia where i.itemid=ia.itemid and ia.applicationid=$applicationid");
-	}
-
 	function get_applications_by_hostid($hostid){
 		return DBselect('select * from applications where hostid='.$hostid);
 	}
@@ -1983,27 +1631,6 @@ return $result;
 	return $result;
 	}
 
-	function host_status2str($status){
-		switch($status){
-			case HOST_STATUS_MONITORED:	$status = S_MONITORED;		break;
-			case HOST_STATUS_NOT_MONITORED:	$status = S_NOT_MONITORED;	break;
-			case HOST_STATUS_TEMPLATE:	$status = S_TEMPLATE;		break;
-			default:
-				$status = S_UNKNOWN;		break;
-		}
-		return $status;
-	}
-
-	function host_status2style($status){
-		switch($status){
-			case HOST_STATUS_MONITORED:	$status = 'off';	break;
-			case HOST_STATUS_NOT_MONITORED:	$status = 'on';		break;
-			default:
-				$status = 'unknown';	break;
-		}
-		return $status;
-	}
-
 // Add Host Profile
 
 	function add_host_profile($hostid,$devicetype,$name,$os,$serialno,$tag,$macaddress,$hardware,$software,$contact,$location,$notes){
@@ -2099,19 +1726,6 @@ return $result;
 		$result=DBexecute('DELETE FROM hosts_profiles_ext WHERE '.DBcondition('hostid',$hostids));
 
 	return $result;
-	}
-
-	function expand_host_ipmi_ip_by_data($ipmi_ip, $host){
-		if(zbx_strstr($ipmi_ip, '{HOSTNAME}'))
-			$ipmi_ip = str_replace('{HOSTNAME}', $host['host'], $ipmi_ip);
-		else if(zbx_strstr($ipmi_ip, '{IPADDRESS}'))
-			$ipmi_ip = str_replace('{IPADDRESS}', $host['ip'], $ipmi_ip);
-		else if(zbx_strstr($ipmi_ip, '{HOST.DNS}'))
-			$ipmi_ip = str_replace('{HOST.DNS}', $host['dns'], $ipmi_ip);
-		else if(zbx_strstr($ipmi_ip, '{HOST.CONN}'))
-			$ipmi_ip = str_replace('{HOST.CONN}', $host['useip'] ? $host['ip'] : $host['dns'], $ipmi_ip);
-
-	return $ipmi_ip;
 	}
 
 	function getUnlinkableHosts($groupids=null,$hostids=null){

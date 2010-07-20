@@ -277,9 +277,9 @@ if(defined('USE_PROFILING')){
 
 			if(defined('USE_MEM_PROF')){
 				$debug_str.= S_MEMORY_LIMIT.'	: '.ini_get('memory_limit').OBR;
-				$debug_str.= S_MEMORY_USAGE.'	: '.mem2str($memorystamp[$type]).' - '.mem2str($memory).OBR;
-				$debug_str.= S_MEMORY_LEAK.'	: '.mem2str($memory - $memorystamp[$type]).OBR;
-				$debug_str.= 'Memory Pick	: '.mem2str($pickMemory).OBR;
+				$debug_str.= S_MEMORY_USAGE.'	: '.mem2str($memorystamp[$type]).' - '.mem2str($memory).
+						' ('.mem2str($memory - $memorystamp[$type]).')'.OBR;
+				$debug_str.= 'Memory peak	: '.mem2str($pickMemory).OBR;
 			}
 
 			if(defined('USE_VAR_MON')){

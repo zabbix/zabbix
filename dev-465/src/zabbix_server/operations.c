@@ -17,7 +17,6 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -166,7 +165,7 @@ static void run_remote_command(char* host_name, char* command)
  *                               1 if alias is a group name                   *
  *             command - (output) remote command                              *
  *                                                                            *
- * Return value: 0 - correct comand is read                                   *
+ * Return value: 0 - correct command is read                                  *
  *               1 - EOL                                                      *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
@@ -194,7 +193,6 @@ static int get_next_command(char** command_list, char** alias, int* is_group, ch
 	*alias = NULL;
 	*is_group = 0;
 	*command = NULL;
-
 
 	if((*command_list)[0] == '\0' || (*command_list)==NULL) {
 		zabbix_log(LOG_LEVEL_DEBUG, "Result get_next_command [EOL]");
@@ -272,11 +270,13 @@ void	op_run_commands(char *cmd_list)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In run_commands()");
 
-	while (1 != get_next_command(&cmd_list, &alias, &is_group, &command)) {
+	while (1 != get_next_command(&cmd_list, &alias, &is_group, &command))
+	{
 		if (!alias || *alias == '\0' || !command || *command == '\0')
 			continue;
 
-		if (is_group) {
+		if (is_group)
+		{
 			alias_esc = DBdyn_escape_string(alias);
 			result = DBselect("select distinct h.host from hosts_groups hg,hosts h,groups g"
 					" where hg.hostid=h.hostid and hg.groupid=g.groupid and g.name='%s'" DB_NODE,
@@ -288,7 +288,8 @@ void	op_run_commands(char *cmd_list)
 				run_remote_command(row[0], command);
 
 			DBfree_result(result);
-		} else
+		}
+		else
 			run_remote_command(alias, command);
 	}
 	zabbix_log( LOG_LEVEL_DEBUG, "End run_commands()");

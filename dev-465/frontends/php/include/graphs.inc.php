@@ -167,15 +167,6 @@
 	return $graphDims;
 	}
 
-	function get_graph_by_gitemid($gitemid){
-		$db_graphs = DBselect('SELECT distinct g.* '.
-						' FROM graphs g, graphs_items gi '.
-						' WHERE g.graphid=gi.graphid '.
-							' AND gi.gitemid='.$gitemid);
-
-	return DBfetch($db_graphs);
-	}
-
 	function get_graphs_by_hostid($hostid){
 		$sql = 'SELECT distinct g.* '.
 				' FROM graphs g, graphs_items gi, items i '.
@@ -236,73 +227,6 @@
 	}
 
 /*
- * Function: get_accessible_graphs
- *
- * Description:
- *     returns string of accessible graphid's
- *
- * Author:
- *     Aly
- *
- */
-	function get_accessible_graphs($perm,$hostids,$perm_res=null,$nodeid=null,$cache=1){
-		global $USER_DETAILS;
-		static $available_graphs;
-
-		if(is_null($perm_res)) $perm_res = PERM_RES_IDS_ARRAY;
-		$nodeid_str =(is_array($nodeid))?implode('',$nodeid):strval($nodeid);
-		$hostid_str = implode('',$hostids);
-
-		$cache_hash = md5($perm.$perm_res.$nodeid_str.$hostid_str);
-		if($cache && isset($available_graphs[$cache_hash])){
-			return $available_graphs[$cache_hash];
-		}
-
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, $perm, PERM_RES_IDS_ARRAY, $nodeid);
-
-		$denied_graphs = array();
-		$result = array();
-
-		$sql_where = '';
-		if(!empty($hostids)){
-			$sql_where.= ' AND '.DBcondition('i.hostid',$hostids);
-		}
-		$sql = 	'SELECT DISTINCT g.graphid '.
-				' FROM graphs g, graphs_items gi, items i '.
-				' WHERE g.graphid=gi.graphid '.
-					' AND i.itemid=gi.itemid '.
-					$sql_where.
-					' AND '.DBcondition('i.hostid',$available_hosts, true);
-
-		$db_graphs = DBselect($sql);
-		while($graph = DBfetch($db_graphs)){
-			$denied_graphs[] = $graph['graphid'];
-		}
-
-		$sql = 	'SELECT DISTINCT g.graphid '.
-				' FROM graphs g, graphs_items gi, items i '.
-				' WHERE g.graphid=gi.graphid '.
-					' AND i.itemid=gi.itemid '.
-					$sql_where.
-					(!empty($denied_graphs)?' AND '.DBcondition('g.graphid',$denied_graphs,true):'');
-		$db_graphs = DBselect($sql);
-		while($graph = DBfetch($db_graphs)){
-			$result[$graph['graphid']] = $graph['graphid'];
-		}
-
-		if(PERM_RES_STRING_LINE == $perm_res){
-			if(count($result) == 0)
-				$result = '-1';
-			else
-				$result = implode(',',$result);
-		}
-
-		$available_graphs[$cache_hash] = $result;
-
-	return $result;
-	}
-
-/*
  * Function: get_min_itemclock_by_graphid
  *
  * Description:
@@ -347,7 +271,7 @@
 			ITEM_VALUE_TYPE_FLOAT => array(),
 			ITEM_VALUE_TYPE_STR =>  array(),
 			ITEM_VALUE_TYPE_LOG => array(),
-			ITEM_VALUE_TYPE_UINT64 => array(), 
+			ITEM_VALUE_TYPE_UINT64 => array(),
 			ITEM_VALUE_TYPE_TEXT => array()
 		);
 
@@ -408,27 +332,6 @@
 		$result = is_null($min)?$result:$min;
 
 	return $result;
-	}
-
-	function get_graphitem_by_gitemid($gitemid){
-		$result=DBselect('SELECT * FROM graphs_items WHERE gitemid='.$gitemid);
-		$row=DBfetch($result);
-		if($row){
-			return	$row;
-		}
-		error(S_NO_GRAPH_WITH." gitemid=[$gitemid]");
-
-	return	$result;
-	}
-
-	function get_graphitem_by_itemid($itemid){
-		$result = DBfetch(DBselect('SELECT * FROM graphs_items WHERE itemid='.$itemid));
-		$row=DBfetch($result);
-		if($row)
-		{
-			return	$row;
-		}
-		return	$result;
 	}
 
 	function get_graph_by_graphid($graphid){
@@ -562,7 +465,7 @@
 			error(S_GRAPH.SPACE.'"'.$name.'"'.SPACE.S_GRAPH_TEMPLATE_HOST_CANNOT_OTHER_ITEMS_HOSTS_SMALL);
 			return $result;
 		}
-		
+
 		// $filter = array(
 			// 'name' => $name,
 			// 'hostids' => $graph_hostids
@@ -937,8 +840,8 @@
 					'graphids' => $db_graph['graphid'],
 					'output' => API_OUTPUT_EXTEND
 				));
-				
-				
+
+
 				$filter = array(
 					'name' => $db_graph['name'],
 					'hostids' => $hostid
@@ -955,7 +858,7 @@
 				if($res === false) return false;
 			}
 		}
-		
+
 		return true;
 	}
 
@@ -1059,7 +962,7 @@
 			if($update){
 				if(isset($_REQUEST['period']) && ($_REQUEST['period'] >= ZBX_MIN_PERIOD))
 					CProfile::update($idx.'.period',$_REQUEST['period'],PROFILE_TYPE_INT, $idx2);
-					
+
 				if(isset($_REQUEST['stime']))
 					CProfile::update($idx.'.stime',$_REQUEST['stime'], PROFILE_TYPE_STR, $idx2);
 			}
@@ -1273,7 +1176,7 @@
 		$gdinfo = gd_info();
 
 		if($gdinfo['FreeType Support'] && function_exists('imagettftext')){
-		
+
 			if((preg_match(ZBX_PREG_DEF_FONT_STRING, $string) && ($angle != 0)) || (ZBX_FONT_NAME == ZBX_GRAPH_FONT_NAME)){
 				$ttf = ZBX_FONTPATH.'/'.ZBX_FONT_NAME.'.ttf';
 				imagettftext($image, $fontsize, $angle, $x, $y, $color, $ttf, $string);
@@ -1284,7 +1187,7 @@
 			}
 			else{
 				$ttf = ZBX_FONTPATH.'/'.ZBX_GRAPH_FONT_NAME.'.ttf';
-				
+
 				$size = imageTextSize($fontsize, 0, $string);
 
 				$imgg = imagecreatetruecolor($size['width']+1, $size['height']);
@@ -1292,13 +1195,13 @@
 				imagefill($imgg, 0, 0, $transparentColor);
 
 				imagettftext($imgg, $fontsize, 0, 0, $size['height'], $color, $ttf, $string);
-				
+
 				$imgg = imagerotate($imgg, $angle, $transparentColor);
 				ImageAlphaBlending($imgg, false);
 				imageSaveAlpha($imgg, true);
-				
+
 				imagecopy($image, $imgg, $x - $size['height'], $y - $size['width'], 0, 0, $size['height'], $size['width']+1);
-				
+
 				imagedestroy($imgg);
 			}
 /*
@@ -1307,7 +1210,7 @@
 			if(!$angle)	imagerectangle($image, $x, $y+$ar[1], $x+abs($ar[0] - $ar[4]), $y+$ar[5], $color);
 			else imagerectangle($image, $x, $y, $x-abs($ar[0] - $ar[4]), $y+($ar[5]-$ar[1]), $color);
 //*/
-			
+
 		}
 		else{
 			$dims = imageTextSize($fontsize, $angle, $string);
@@ -1346,9 +1249,9 @@
 		$gdinfo = gd_info();
 
 		$result = array();
-		
+
 		if($gdinfo['FreeType Support'] && function_exists('imagettfbbox')){
-		
+
 			if(preg_match(ZBX_PREG_DEF_FONT_STRING, $string) && ($angle != 0)){
 				$ttf = ZBX_FONTPATH.'/'.ZBX_FONT_NAME.'.ttf';
 			}
@@ -1360,7 +1263,9 @@
 
 			$result['height'] = abs($ar[1] - $ar[5]);
 			$result['width'] = abs($ar[0] - $ar[4]);
-		} else{
+			$result['baseline'] = $ar[1];
+		}
+		else{
 			switch($fontsize){
 				case 5: $fontsize = 1; break;
 				case 6: $fontsize = 1; break;
@@ -1382,11 +1287,12 @@
 				$result['height'] = imagefontheight($fontsize);
 				$result['width'] = imagefontwidth($fontsize) * zbx_strlen($string);
 			}
+			$result['baseline'] = 0;
 		}
 
 		return $result;
 	}
-	
+
 	function DashedLine($image,$x1,$y1,$x2,$y2,$color){
 		// Style for dashed lines
 		//$style = array($color, $color, $color, $color, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT);

@@ -71,7 +71,11 @@ require_once('include/js.inc.php');
 						unset($itemid);
 						break;
 					case SCREEN_RESOURCE_MAP:
-						$result &= sysmap_accessible($ac_data['resourceid'], PERM_READ_ONLY);
+						$sm = CMap::get(array(
+							'sysmapids' => $ac_data['resourceid'],
+							'output' => API_OUTPUT_SHORTEN,
+						));
+						$result &= !empty($sm);
 						break;
 					case SCREEN_RESOURCE_SCREEN:
 						$result &= screen_accessible($ac_data['resourceid'], PERM_READ_ONLY);
@@ -93,33 +97,6 @@ require_once('include/js.inc.php');
 			}
 		}
 		return $result;
-	}
-
-/*
-	function add_screen($name,$hsize,$vsize){
-		$screenid=get_dbid("screens","screenid");
-		$sql='INSERT INTO screens (screenid,name,hsize,vsize) '.
-				" VALUES ($screenid,".zbx_dbstr($name).",$hsize,$vsize)";
-		$result=DBexecute($sql);
-
-		if(!$result)
-			return $result;
-
-	return $screenid;
-	}
-
-	function update_screen($screenid,$name,$hsize,$vsize){
-		$sql="update screens set name=".zbx_dbstr($name).",hsize=$hsize,vsize=$vsize where screenid=$screenid";
-	return  DBexecute($sql);
-	}
-*/
-	function delete_screen($screenid){
-		$result=DBexecute('DELETE FROM screens_items where screenid='.$screenid);
-		$result&=DBexecute('DELETE FROM screens_items where resourceid='.$screenid.' and resourcetype='.SCREEN_RESOURCE_SCREEN);
-		$result&=DBexecute('DELETE FROM slides where screenid='.$screenid);
-		$result&=DBexecute("DELETE FROM profiles WHERE idx='web.favorite.screenids' AND source='screenid' AND value_id=$screenid");
-		$result&=DBexecute('DELETE FROM screens where screenid='.$screenid);
-	return	$result;
 	}
 
 	function add_screen_item($resourcetype,$screenid,$x,$y,$resourceid,$width,$height,$colspan,$rowspan,$elements,$valign,$halign,$style,$url,$dynamic){
@@ -545,7 +522,11 @@ require_once('include/js.inc.php');
 							' WHERE s.sysmapid='.$resourceid);
 
 				while($row=DBfetch($result)){
-					if(!sysmap_accessible($row['sysmapid'],PERM_READ_ONLY)) continue;
+					$sm = CMap::get(array(
+						'sysmapids' => $row['sysmapid'],
+						'output' => API_OUTPUT_SHORTEN,
+					));
+					if(empty($sm)) continue;
 
 					$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
 					$caption = $row['node_name'].$row['name'];
@@ -1087,8 +1068,8 @@ require_once('include/js.inc.php');
 					}
 
 					if($editmode || !$default) $item = new CDiv();
-					else $item = new CLink(null, $action); 
-					
+					else $item = new CLink(null, $action);
+
 					$item->setAttribute('id', $containerid);
 
 					$item = array($item);
@@ -1097,8 +1078,13 @@ require_once('include/js.inc.php');
 						$item[] = new CLink(S_CHANGE, $action);
 					}
 
-					zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
-//					insert_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
+					
+					if($editmode == 2){
+						insert_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
+					}
+					else{
+						zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
+					}
 
 				}
 				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_SIMPLE_GRAPH) ){
@@ -1162,8 +1148,13 @@ require_once('include/js.inc.php');
 						$item[] = new CLink(S_CHANGE, $action);
 					}
 
-//					zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
-					insert_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
+					if($editmode == 2){
+						insert_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
+					}
+					else{
+						zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
+					}
+					
 				}
 				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_MAP) ){
 
@@ -1365,7 +1356,8 @@ require_once('include/js.inc.php');
 						'hostids' => null,
 						'maintenance' => null,
 						'severity' => null,
-						'limit' => null
+						'limit' => null,
+						'extAck' => 0,
 					);
 
 					$item = array(get_table_header(array(S_SYSTEM_STATUS,SPACE,zbx_date2str(S_SCREENS_TRIGGER_FORM_DATE_FORMAT))));

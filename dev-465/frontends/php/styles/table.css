@@ -635,9 +635,9 @@ table.right_table select{
 	width: 200px;
 }
 
-table.right_table tr td.read_write	select.biginput	{ color: #008800; width: 320px;}
-table.right_table tr td.read_only	select.biginput	{ color: #CC8800; width: 320px;}
-table.right_table tr td.deny		select.biginput	{ color: #CC0000; width: 320px;}
+table.right_table tr td.read_write select { color: #008800; width: 320px;}
+table.right_table tr td.read_only select { color: #CC8800; width: 320px;}
+table.right_table tr td.deny select { color: #CC0000; width: 320px;}
 
 /**************** GRAPH ****************/
 

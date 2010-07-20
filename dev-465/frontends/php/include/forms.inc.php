@@ -26,8 +26,6 @@
 		$form = new CFormTable(S_SLIDESHOW, null, 'post');
 		$form->setHelp('config_advanced.php');
 
-		$form->addVar('config', 1);
-
 		if(isset($_REQUEST['slideshowid'])){
 			$form->addVar('slideshowid', $_REQUEST['slideshowid']);
 		}
@@ -437,7 +435,7 @@
 			new CButton('select_app',S_SELECT,
 				'return PopUp("popup.php?dstfrm='.$form->getName().
 				'&dstfld1=application&srctbl=applications'.
-				'&srcfld1=name&only_hostid='.$_REQUEST['hostid'].'",200,300,"application");')
+				'&srcfld1=name&only_hostid='.$_REQUEST['hostid'].'",500,600,"application");')
 			));
 
 		$form->addRow(S_NAME, new CTextBox('name', $name, 40));
@@ -1023,9 +1021,8 @@
 
 // Insert form for User Groups
 	function insert_usergroups_form(){
-		$config = select_config();
-
 		$frm_title = S_USER_GROUP;
+		
 		if(isset($_REQUEST['usrgrpid'])){
 			$usrgrp		= CUserGroup::get(array('usrgrpids' => $_REQUEST['usrgrpid'],  'extendoutput' => 1));
 			$usrgrp = reset($usrgrp);
@@ -1085,7 +1082,6 @@
 
 		$frmUserG = new CFormTable($frm_title,'usergrps.php');
 		$frmUserG->setHelp('web.users.groups.php');
-		$frmUserG->addVar('config',get_request('config',1));
 
 		if(isset($_REQUEST['usrgrpid'])){
 			$frmUserG->addVar('usrgrpid',$_REQUEST['usrgrpid']);
@@ -1239,14 +1235,14 @@
 			$frmUserG->addSpanRow(get_rights_of_elements_table($group_rights));
 		}
 
-		$frmUserG->addItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["usrgrpid"])){
+		$frmUserG->addItemToBottomRow(new CButton('save',S_SAVE));
+		if(isset($_REQUEST['usrgrpid'])){
 			$frmUserG->addItemToBottomRow(SPACE);
-			$frmUserG->addItemToBottomRow(new CButtonDelete("Delete selected group?",
-				url_param("form").url_param("config").url_param("usrgrpid")));
+			$frmUserG->addItemToBottomRow(new CButtonDelete('Delete selected group?',
+				url_param('form').url_param('usrgrpid')));
 		}
 		$frmUserG->addItemToBottomRow(SPACE);
-		$frmUserG->addItemToBottomRow(new CButtonCancel(url_param("config")));
+		$frmUserG->addItemToBottomRow(new CButtonCancel());
 
 		return($frmUserG);
 	}
@@ -5203,7 +5199,7 @@ JAVASCRIPT;
 			$host_tbl->addRow(array(S_ITEMS, $items_lbx));
 
 // Host triggers
-			$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array($_REQUEST['hostid']), PERM_RES_IDS_ARRAY);
+			$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array($_REQUEST['hostid']));
 
 			$trig_lbx = new CListBox('triggers',null,8);
 			$trig_lbx->setAttribute('disabled','disabled');
@@ -5621,6 +5617,7 @@ JAVASCRIPT;
 			$highlight =	$row['highlight'];
 			$markelements = $row['markelements'];
 			$expandproblem = $row['expandproblem'];
+			$show_unack = $row['show_unack'];
 		}
 		else{
 			$name		= get_request('name','');
@@ -5632,6 +5629,7 @@ JAVASCRIPT;
 			$highlight = get_request('highlight',0);
 			$markelements = get_request('markelements',0);
 			$expandproblem = get_request('expandproblem',0);
+			$show_unack = get_request('show_unack', 0);
 		}
 
 		$frmMap = new CFormTable($frm_title,'sysmaps.php');
@@ -5650,17 +5648,14 @@ JAVASCRIPT;
 		$result=DBselect('SELECT * FROM images WHERE imagetype=2 AND '.DBin_node('imageid').' order by name');
 		while($row=DBfetch($result)){
 			$cmbImg->addItem(
-					$row['imageid'],
-					get_node_name_by_elid($row['imageid'], null, ': ').$row['name']
-					);
+				$row['imageid'],
+				get_node_name_by_elid($row['imageid'], null, ': ').$row['name']
+			);
 		}
 
 		$frmMap->addRow(S_BACKGROUND_IMAGE,$cmbImg);
-
 		$frmMap->addRow(S_ICON_HIGHLIGHTING, new CCheckBox('highlight',$highlight,null,1));
-
 		$frmMap->addRow(S_MARK_ELEMENTS_ON_TRIGGER_STATUS_CHANGE, new CCheckBox('markelements',$markelements,null,1));
-
 		$frmMap->addRow(S_EXPAND_SINGLE_PROBLEM, new CCheckBox('expandproblem',$expandproblem,null,1));
 
 
@@ -5679,6 +5674,19 @@ JAVASCRIPT;
 		$cmbLocation->addItem(2,S_RIGHT);
 		$cmbLocation->addItem(3,S_TOP);
 		$frmMap->addRow(S_ICON_LABEL_LOCATION,$cmbLocation);
+
+		$config = select_config();
+		$cb = new CComboBox('show_unack', $show_unack);
+		$cb->addItems(array(
+			EXTACK_OPTION_ALL => S_O_ALL,
+			EXTACK_OPTION_BOTH => S_O_SEPARATED,
+			EXTACK_OPTION_UNACK => S_O_UNACKNOWLEDGED_ONLY,
+		));
+		$cb->setEnabled($config['event_ack_enable']);
+		if(!$config['event_ack_enable']){
+			$cb->setAttribute('title', S_EVENT_ACKNOWLEDGING_DISABLED);
+		}
+		$frmMap->addRow(S_PROBLEM_DISPLAY, $cb);
 
 		$frmMap->addItemToBottomRow(new CButton('save',S_SAVE));
 

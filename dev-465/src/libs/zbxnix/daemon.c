@@ -27,15 +27,25 @@
 
 #include "fatal.h"
 
-char	*APP_PID_FILE	= NULL;
+char	*APP_PID_FILE = NULL;
 
 static int	parent = 0;
 static int	parent_pid = (-1);
 static int	exiting = 0;
 
+#define CHECKED_FIELD(siginfo, field)			(NULL == siginfo ? -1 : siginfo->field)
+#define CHECKED_FIELD_TYPE(siginfo, field, type)	(NULL == siginfo ? (type)-1 : siginfo->field)
+
 void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
-	switch(sig)
+	if (NULL == siginfo)
+		zabbix_log(LOG_LEVEL_DEBUG, "Received [signal:%d(%s)] with NULL siginfo.",
+				sig, get_signal_name(sig));
+	if (NULL == context)
+		zabbix_log(LOG_LEVEL_DEBUG, "Received [signal:%d(%s)] with NULL context.",
+				sig, get_signal_name(sig));
+
+	switch (sig)
 	{
 	case SIGALRM:
 		zabbix_log(LOG_LEVEL_DEBUG, "Timeout while answering request");
@@ -45,16 +55,21 @@ void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 	case SIGSEGV:
 	case SIGBUS:
 		zabbix_log(LOG_LEVEL_CRIT, "Got signal [signal:%d(%s),reason:%d,refaddr:%p]. Crashing ...",
-			sig, get_signal_name(sig), siginfo->si_code, siginfo->si_addr);
+				sig, get_signal_name(sig),
+				CHECKED_FIELD(siginfo, si_code),
+				CHECKED_FIELD_TYPE(siginfo, si_addr, void *));
 		print_fatal_info(sig, siginfo, context);
 		exit(FAIL);
 		break;
 	case SIGQUIT:
 	case SIGINT:
 	case SIGTERM:
-		zabbix_log(siginfo->si_pid == parent_pid ? LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING,
+		zabbix_log(parent_pid == CHECKED_FIELD(siginfo, si_pid) ? LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING,
 				"Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%d,reason:%d]. Exiting ...",
-				sig, get_signal_name(sig), siginfo->si_pid, siginfo->si_uid, siginfo->si_code);
+				sig, get_signal_name(sig),
+				CHECKED_FIELD(siginfo, si_pid),
+				CHECKED_FIELD(siginfo, si_uid),
+				CHECKED_FIELD(siginfo, si_code));
 		if (1 == parent)
 		{
 			if (0 == exiting)
@@ -67,18 +82,21 @@ void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 			exit(FAIL);
 		break;
 	case SIGPIPE:
-		zabbix_log(LOG_LEVEL_DEBUG, "Got SIGPIPE from PID: %d.",
-			siginfo->si_pid);
+		zabbix_log(LOG_LEVEL_DEBUG, "Got signal [signal:%d(%s),sender_pid:%d]. Ignoring ...",
+			sig, get_signal_name(sig),
+			CHECKED_FIELD(siginfo, si_pid));
 		break;
 	default:
-		zabbix_log(LOG_LEVEL_WARNING, "Got signal [signal:%d(%s)]. Ignoring ...",
-			sig, get_signal_name(sig));
+		zabbix_log(LOG_LEVEL_WARNING, "Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%d]. Ignoring ...",
+			sig, get_signal_name(sig),
+			CHECKED_FIELD(siginfo, si_pid),
+			CHECKED_FIELD(siginfo, si_uid));
 	}
 }
 
 static void	parent_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
-	switch(sig)
+	switch (sig)
 	{
 	case SIGCHLD:
 		if (1 == parent)
@@ -86,7 +104,8 @@ static void	parent_signal_handler(int sig, siginfo_t *siginfo, void *context)
 			if (0 == exiting)
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "One child process died (PID:%d,exitcode/signal:%d). Exiting ...",
-						siginfo->si_pid, siginfo->si_status);
+						CHECKED_FIELD(siginfo, si_pid),
+						CHECKED_FIELD(siginfo, si_status));
 				exiting = 1;
 				zbx_on_exit();
 			}
