@@ -379,8 +379,6 @@ standart:	{
 	}
 },
 
-timeout:	null,	// timeout object
-
 play: function(audiofile){
 	if(!this.create(audiofile)) return false;
 
@@ -430,6 +428,10 @@ stop: function(audiofile){
 		}
 	}
 
+	if(!is_null(this.list[audiofile].timeout)){
+		clearTimeout(this.list[audiofile].timeout);
+		this.list[audiofile].timeout = null;
+	}
 	this.pause(audiofile);
 	this.endLoop(audiofile);
 },
@@ -441,8 +443,6 @@ stopAll: function(e){
 
 		this.stop(name);
 	}
-
-	clearTimeout(this.timeout);
 },
 
 
@@ -477,7 +477,7 @@ loop: function(audiofile, params){
 		}
 
 		this.play(audiofile);
-		this.timeout = setTimeout(AudioList.stop.bind(AudioList,audiofile), 1000 * parseInt(params.seconds, 10));
+		this.list[audiofile].timeout = setTimeout(AudioList.stop.bind(AudioList,audiofile), 1000 * parseInt(params.seconds, 10));
 	}
 },
 
@@ -551,6 +551,7 @@ create: function(audiofile, params){
 
 	this.list[audiofile] = params;
 	this.list[audiofile].loop = 0;
+	this.list[audiofile].timeout = null;
 
 return true;
 },

@@ -190,7 +190,7 @@ mute: function(e){
 playSound: function(messages){
 	this.debug('playSound');
 //--
-	if(this.sounds.mute == 1) return true;
+	if(this.sounds.mute != 0) return true;
 	this.stopSound();
 
 	this.sounds.priority = 0;
@@ -200,7 +200,7 @@ playSound: function(messages){
 		var message = messages[i];
 		if(message.type != 1 && message.type != 3) continue;
 		
-		if(message.priority > this.sounds.priority){
+		if(message.priority >= this.sounds.priority){
 			this.sounds.priority = message.priority;
 			this.sounds.sound = message.sound;
 			this.sounds.timeout = message.timeout;
