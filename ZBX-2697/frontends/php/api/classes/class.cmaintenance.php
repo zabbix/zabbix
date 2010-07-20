@@ -53,6 +53,7 @@ class CMaintenance extends CZBXAPI{
 		$userid = $USER_DETAILS['userid'];
 
 		$sort_columns = array('maintenanceid', 'name'); // allowed columns for sorting
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
 
 		$sql_parts = array(
 			'select' => array('maintenance' => 'm.maintenanceid'),
@@ -303,6 +304,12 @@ class CMaintenance extends CZBXAPI{
 					if(!isset($result[$maintenance['maintenanceid']]))
 						$result[$maintenance['maintenanceid']]= array();
 
+					if(!is_null($options['select_groups']) && !isset($result[$maintenance['maintenanceid']]['groups'])){
+						$result[$maintenance['maintenanceid']]['groups'] = array();
+					}
+					if(!is_null($options['select_hosts']) && !isset($result[$maintenance['maintenanceid']]['hosts'])){
+						$result[$maintenance['maintenanceid']]['hosts'] = array();
+					}
 // groupids
 					if(isset($maintenance['groupid']) && is_null($options['select_groups'])){
 						if(!isset($result[$maintenance['maintenanceid']]['groups']))
@@ -333,13 +340,43 @@ Copt::memoryPick();
 			return $result;
 		}
 
-// TODO:
-		if(!is_null($options['select_groups'])){
+// select_groups
+		if(is_array($options['select_groups']) || str_in_array($options['select_groups'], $subselects_allowed_outputs)){
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'maintenanceids' => $maintenanceids,
+				'preservekeys' => 1,
+				'output' => $options['select_groups'],
+			);
+			$groups = CHostGroup::get($obj_params);
 
+			foreach($groups as $groupid => $group){
+				$gmaintenances = $group['maintenances'];
+				unset($group['maintenances']);
+				foreach($gmaintenances as $num => $maintenance){
+					$result[$maintenance['maintenanceid']]['groups'][] = $group;
+				}
+			}
 		}
 
-		if(!is_null($options['select_hosts'])){
 
+// select_hosts
+		if(is_array($options['select_hosts']) || str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'maintenanceids' => $maintenanceids,
+				'preservekeys' => 1,
+				'output' => $options['select_hosts'],
+			);
+			$hosts = CHost::get($obj_params);
+
+			foreach($hosts as $hostid => $host){
+				$hmaintenances = $host['maintenances'];
+				unset($host['maintenances']);
+				foreach($hmaintenances as $num => $maintenance){
+					$result[$maintenance['maintenanceid']]['hosts'][] = $host;
+				}
+			}
 		}
 
 // removing keys (hash -> array)
@@ -640,10 +677,9 @@ Copt::memoryPick();
  * @param _array $maintenanceids['maintenanceids']
  * @return boolean
  */
-	public static function delete($maintenances){
+	public static function delete($maintenanceids){
 		global $USER_DETAILS;
-		$maintenances = zbx_toArray($maintenances);
-		$maintenanceids = zbx_objectValues($maintenances, 'maintenanceid');
+		$maintenanceids = zbx_toArray($maintenanceids);
 
 		try{
 			self::BeginTransaction(__METHOD__);
@@ -659,8 +695,9 @@ Copt::memoryPick();
 				'preservekeys' => 1
 			);
 			$del_maintenances = self::get($options);
-			foreach($maintenances as $snum => $maintenance){
-				if(!isset($del_maintenances[$maintenance['maintenanceid']])){
+
+			foreach($maintenanceids as $snum => $maintenanceid){
+				if(!isset($del_maintenances[$maintenanceid])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				}
 			}

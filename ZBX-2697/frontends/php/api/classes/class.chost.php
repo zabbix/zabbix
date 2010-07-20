@@ -96,6 +96,7 @@ class CHost extends CZBXAPI{
 			'templateids'				=> null,
 			'itemids'					=> null,
 			'triggerids'				=> null,
+			'maintenanceids'			=> null,
 			'graphids'					=> null,
 			'dhostids'					=> null,
 			'dserviceids'				=> null,
@@ -358,6 +359,21 @@ class CHost extends CZBXAPI{
 				$sql_parts['group']['dserviceid'] = 'ds.dserviceid';
 			}
 		}
+// maintenanceids
+		if(!is_null($options['maintenanceids'])){
+			zbx_value2array($options['maintenanceids']);
+			if($options['output'] != API_OUTPUT_SHORTEN){
+				$sql_parts['select']['maintenanceid'] = 'mh.maintenanceid';
+			}
+
+			$sql_parts['from']['maintenances_hosts'] = 'maintenances_hosts mh';
+			$sql_parts['where'][] = DBcondition('mh.maintenanceid', $options['maintenanceids']);
+			$sql_parts['where']['hmh'] = 'h.hostid=mh.hostid';
+
+			if(!is_null($options['groupCount'])){
+				$sql_parts['group']['maintenanceid'] = 'mh.maintenanceid';
+			}
+		}
 
 // node check !!!!!
 // should last, after all ****IDS checks
@@ -481,7 +497,12 @@ class CHost extends CZBXAPI{
 
 			if(isset($options['filter']['hostid']) && !is_null($options['filter']['hostid'])){
 				zbx_value2array($options['filter']['hostid']);
-				$sql_parts['where']['hostid'] = 'h.hostid='.DBcondition($options['filter']['hostid']);
+				$sql_parts['where']['hostid'] = DBcondition('h.hostid', $options['filter']['hostid']);
+			}
+
+			if(isset($options['filter']['templateid']) && !is_null($options['filter']['templateid'])){
+				zbx_value2array($options['filter']['templateid']);
+				$sql_parts['where']['templateid'] = DBcondition('h.templateid', $options['filter']['templateid']);
 			}
 
 			if(isset($options['filter']['host']) && !is_null($options['filter']['host'])){
@@ -665,6 +686,14 @@ class CHost extends CZBXAPI{
 						$result[$host['hostid']]['dservices'][] = array('dserviceid' => $host['dserviceid']);
 						unset($host['dserviceid']);
 					}
+// maintenanceids
+					if(isset($host['maintenanceid'])){
+						if(!isset($result[$host['hostid']]['maintenanceid']))
+							$result[$host['hostid']]['maintenances'] = array();
+
+						$result[$host['hostid']]['maintenances'][] = array('maintenanceid' => $host['maintenanceid']);
+						unset($host['maintenanceid']);
+					}				
 //---
 
 					$result[$host['hostid']] += $host;
