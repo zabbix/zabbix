@@ -60,13 +60,6 @@ int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	return SYSINFO_RET_OK;
 }
 
-int     OLD_CPU(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	/* SKIP REALIZATION */
-
-	return SYSINFO_RET_FAIL;
-}
-
 int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char	tmp[32];
