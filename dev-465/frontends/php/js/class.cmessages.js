@@ -209,6 +209,7 @@ playSound: function(messages){
 
 	this.ready = true;
 	if(!is_null(this.sounds.sound)){
+//SDI(this.sounds.sound+' - '+this.messageLast.events);
 		if(this.sounds.repeat == 1) AudioList.play(this.sounds.sound);
 		else if(this.sounds.repeat > 1) AudioList.loop(this.sounds.sound, {'seconds': this.sounds.repeat});
 		else AudioList.loop(this.sounds.sound, {'seconds': this.sounds.timeout});

@@ -419,12 +419,13 @@ stop: function(audiofile){
 				this.dom[audiofile].currentTime = 0;
 			}
 			else if(this.dom[audiofile].currentTime > 0){
-				this.play(audiofile);
+				this.dom[audiofile].play();
 				this.dom[audiofile].currentTime = 0;
+				this.dom[audiofile].pause();
 			}
 		}
 		catch(e){
-			this.remove(audiofile);
+//			this.remove(audiofile);
 		}
 	}
 
@@ -432,6 +433,7 @@ stop: function(audiofile){
 		clearTimeout(this.list[audiofile].timeout);
 		this.list[audiofile].timeout = null;
 	}
+	
 	this.pause(audiofile);
 	this.endLoop(audiofile);
 },
