@@ -1960,6 +1960,7 @@
 	'S_HOST_PROFILES'=>			'Host profiles',
 	'S_HOST_PROFILES_BIG'=>			'HOST PROFILES',
 	'S_EXTENDED_HOST_PROFILE'=>		'Extended host profile',
+	'S_EXTENDED_PROFILE'=>		'Extended profile',
 	'S_EXTENDED'=>				'Extended',
 
 //	search.php
