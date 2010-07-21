@@ -106,7 +106,11 @@ include_once('include/page_header.php');
 
 // PERMISSIONS
 	if(get_request('triggerid', false)){
-		$triggers = available_triggers($_REQUEST['triggerid'], 1);
+		$options = array(
+			'triggerids' => $_REQUEST['triggerid'],
+			'editable' => 1,
+		);
+		$triggers = CTrigger::get($options);
 		if(empty($triggers)) access_deny();
 	}
 	else if(get_request('hostid', 0) > 0){

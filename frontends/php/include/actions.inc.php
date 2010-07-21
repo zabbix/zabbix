@@ -584,30 +584,45 @@ function validate_condition($conditiontype, $value){
 
 	switch($conditiontype){
 		case CONDITION_TYPE_HOST_GROUP:
-			$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY,null,get_current_nodeid(true));
-			if(!isset($available_groups[$value])){
+			$groups = CHostGroup::get(array(
+				'groupids' => $value,
+				'output' => API_OUTPUT_SHORTEN,
+				'nodeids' => get_current_nodeid(true),
+			));
+			if(empty($groups)){
 				error(S_INCORRECT_GROUP);
 				return false;
 			}
 			break;
 		case CONDITION_TYPE_HOST_TEMPLATE:
-			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,get_current_nodeid(true));
-			if(!isset($available_hosts[$value])){
+			$templates = CTemplate::get(array(
+				'templateids' => $value,
+				'output' => API_OUTPUT_SHORTEN,
+				'nodeids' => get_current_nodeid(true),
+			));
+			if(empty($templates)){
 				error(S_INCORRECT_HOST);
 				return false;
 			}
 			break;
 		case CONDITION_TYPE_TRIGGER:
-			if( !DBfetch(DBselect('select triggerid from triggers where triggerid='.$value)) ||
-				!check_right_on_trigger_by_triggerid(PERM_READ_ONLY, $value) )
-			{
+			$triggers = CTrigger::get(array(
+				'triggerids' => $value,
+				'output' => API_OUTPUT_SHORTEN,
+				'nodeids' => get_current_nodeid(true),
+			));
+			if(empty($triggers)){
 				error(S_INCORRECT_TRIGGER);
 				return false;
 			}
 			break;
 		case CONDITION_TYPE_HOST:
-			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,get_current_nodeid(true));
-			if(!isset($available_hosts[$value])){
+			$hosts = CHost::get(array(
+				'hostids' => $value,
+				'output' => API_OUTPUT_SHORTEN,
+				'nodeids' => get_current_nodeid(true),
+			));
+			if(empty($hosts)){
 				error(S_INCORRECT_HOST);
 				return false;
 			}
@@ -672,7 +687,6 @@ function validate_condition($conditiontype, $value){
 }
 
 function validate_operation($operation){
-	global $USER_DETAILS;
 
 	switch($operation['operationtype']){
 		case OPERATION_TYPE_MESSAGE:
@@ -705,16 +719,24 @@ function validate_operation($operation){
 			break;
 		case OPERATION_TYPE_GROUP_ADD:
 		case OPERATION_TYPE_GROUP_REMOVE:
-			$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
-			if(!isset($available_groups[$operation['objectid']])){
+			$groups = CHostGroup::get(array(
+				'groupids' => $operation['objectid'],
+				'output' => API_OUTPUT_SHORTEN,
+				'editable' => 1,
+			));
+			if(empty($groups)){
 				error(S_INCORRECT_GROUP);
 				return false;
 			}
 			break;
 		case OPERATION_TYPE_TEMPLATE_ADD:
 		case OPERATION_TYPE_TEMPLATE_REMOVE:
-			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
-			if(!isset($available_hosts[$operation['objectid']])){
+			$tpls = CTemplate::get(array(
+				'templateids' => $operation['objectid'],
+				'output' => API_OUTPUT_SHORTEN,
+				'editable' => 1,
+			));
+			if(empty($tpls)){
 				error(S_INCORRECT_HOST);
 				return false;
 			}
