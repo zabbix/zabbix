@@ -789,7 +789,7 @@ show: function(e, obj, hintbox){
 	hintbox.style.zIndex = '999';
 	
 // IE6 z-index bug
-	//showPopupDiv(hintid, 'frame_'+hintid);
+	//if(IE6) showPopupDiv(hintid, 'frame_'+hintid);
 	
 },
 

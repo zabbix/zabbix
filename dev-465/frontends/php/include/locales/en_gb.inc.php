@@ -1925,6 +1925,7 @@
 	'S_ZABBIX_CONFIG'=>			'Zabbix config',
 
 //	profile.php
+	'S_CLEAR' =>				'Clear',
 	'S_ONCE' =>					'Once',
 	'S_MOVE'=>					'Move',
 	'S_UNMUTE'=>				'Unmute',

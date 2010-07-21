@@ -273,7 +273,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 					" ShowHide('div_node_tree',IE6?'block':'table');".
 					' pos.top += 20;'.
 					" \$('div_node_tree').setStyle({top: pos.top+'px'});".
-					" showPopupDiv('div_node_tree','select_iframe');";		// IE6
+					" if(IE6) showPopupDiv('div_node_tree','select_iframe');";		// IE6
 				$button_show_tree = new CButton('show_node_tree', S_SELECT_NODES, $jscript); //sdelatj konstatntu!
 				$button_show_tree->setType('button');
 				$button_show_tree->setAttribute('id', 'button_show_tree');

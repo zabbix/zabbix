@@ -69,7 +69,7 @@ $tranStrings = array(
 		'S_DELETE_SELECTED_ELEMENTS_Q', 'S_PLEASE_SELECT_TWO_ELEMENTS','S_LINK','S_NO_LINKS', 'S_NEW_ELEMENT',
 		'S_SELECT','S_SET_TRIGGER'
 	),
-	'class.cmessages.js' => array('S_MUTE','S_UNMUTE','S_MESSAGES','S_CLOSE','S_SNOOZE','S_MOVE'
+	'class.cmessages.js' => array('S_MUTE','S_UNMUTE','S_MESSAGES','S_CLEAR','S_SNOOZE','S_MOVE'
 	),
 	'class.cookie.js' => array('S_MAX_COOKIE_SIZE_REACHED'
 	)

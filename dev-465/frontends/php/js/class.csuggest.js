@@ -431,9 +431,7 @@ hideSuggests: function(e){
 	if(!is_null(this.dom.suggest)){
 		this.dom.suggest.style.display = 'none';
 
-// IE6 Fix
-		showPopupDiv(this.dom.suggest, 'suggestFrame');
-//		hidePopupDiv('suggestFrame');
+		if(IE6) showPopupDiv(this.dom.suggest, 'suggestFrame');
 	}
 },
 
@@ -449,8 +447,7 @@ positionSuggests: function(e){
 	this.dom.suggest.style.top = (pos.top+dims.height)+'px';
 	this.dom.suggest.style.left = pos.left+'px';
 
-// IE6 Fix
-	showPopupDiv(this.dom.suggest, 'suggestFrame');
+	if(IE6) showPopupDiv(this.dom.suggest, 'suggestFrame');
 },
 
 newSugTab: function(needle){
@@ -500,7 +497,7 @@ newSugTab: function(needle){
 	if(count == 0) this.hideSuggests();
 
 // IE6 Fix
-	if(count > 0) showPopupDiv(this.dom.suggest, 'suggestFrame');
+	if(count > 0 && IE6) showPopupDiv(this.dom.suggest, 'suggestFrame');
 
 	this.suggestCount = count;
 }

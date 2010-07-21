@@ -399,7 +399,7 @@ createContainer: function(){
 
 // close all
 	this.dom.closeAll = document.createElement('div');
-	this.dom.closeAll.setAttribute('title', locale['S_CLOSE']);
+	this.dom.closeAll.setAttribute('title', locale['S_CLEAR']);
 	this.dom.closeAll.className = 'iconclose';
 
 	this.dom.controlList.addItem(this.dom.closeAll, 'linear');
