@@ -23,7 +23,16 @@
 
 #include "log.h"
 #include "eventlog.h"
-#include "winevt.h"
+
+#ifndef WINVER
+#	error "WINVER is not defined"
+#elif WINVER >= 0x0600
+#	define HAVE_WINEVT_H 1 /* header available in Windows Vista or later */
+#endif
+
+#ifdef HAVE_WINEVT_H
+#	include "winevt.h"
+#endif
 
 #define MAX_INSERT_STRS 100
 #define MAX_MSG_LENGTH 1024
@@ -85,6 +94,8 @@ static long	zbx_close_eventlog(HANDLE eventlog_handle)
 
 	return SUCCEED;
 }
+
+#ifdef HAVE_WINEVT_H
 
 static long	zbx_get_eventlog_message_xpath(LPCTSTR wsource, long which, char **out_source, char **out_message,
 		unsigned short *out_severity, unsigned long *out_timestamp)
@@ -296,6 +307,8 @@ finish:
 	return ret;
 }
 
+#endif	/* HAVE_WINEVT_H */
+
 /* get Nth error from event log. 1 is the first. */
 static int	zbx_get_eventlog_message(LPCTSTR wsource, HANDLE eventlog_handle, long which, char **out_source, char **out_message,
 		unsigned short *out_severity, unsigned long *out_timestamp, unsigned long *out_eventid)
@@ -415,27 +428,30 @@ retry:
 
 	if (SUCCEED != err)
 	{
-		OSVERSIONINFO	versionInfo;
 		unsigned short	out_severity_tmp = *out_severity;
 		unsigned long	out_timestamp_tmp = *out_timestamp;
+#ifdef HAVE_WINEVT_H
+		OSVERSIONINFO	versionInfo;
 		long		ex_ret = FAIL;
-
+#endif
 		zbx_free(*out_source);
 		*out_source	= NULL;
 		*out_message	= NULL;
 		*out_severity	= 0;
 		*out_timestamp	= 0;
 
+#ifdef HAVE_WINEVT_H
 		versionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 		GetVersionEx(&versionInfo);
 
-		if (versionInfo.dwMajorVersion >= 6)    /* Windows Vista, Windows 7 or Windows Server 2008 */
+		if (versionInfo.dwMajorVersion >= 6)    /* Windows Vista, Windows Server 2008 or Windows 7 */
 		{
 			ex_ret = zbx_get_eventlog_message_xpath(wsource, which, out_source, out_message, out_severity, out_timestamp);
 		}
 
 		if (versionInfo.dwMajorVersion < 6 || SUCCEED != ex_ret)    /* Before Windows Vista, or zbx_get_eventlog_message_xpath() failed */
 		{
+#endif
 			*out_severity	= out_severity_tmp;
 			*out_timestamp	= out_timestamp_tmp;
 			*out_source = zbx_unicode_to_utf8((LPTSTR)(pELR + 1));	/* copy source name */
@@ -456,7 +472,9 @@ retry:
 					zbx_free(buf);
 				}
 			}
+#ifdef HAVE_WINEVT_H
 		}
+#endif
 	}
 
 	ret = SUCCEED;
