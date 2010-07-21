@@ -107,15 +107,17 @@ div.formElement_header{
 div.formElement_body{
 	border: 1px solid #AAAAAA;
 	background-color: #E5E5E5;
-	}
-	.formElementTable{
-		white-space: nowrap;
-		}
-		.formElementTable tr td{
-			padding-left: 5px;
-			padding-right: 5px;
-			height: 24px;
-			}
+}
+
+.formElementTable{
+	white-space: nowrap;
+}
+
+.formElementTable tr td{
+	padding-left: 5px;
+	padding-right: 5px;
+	height: 24px;
+}
 
 div.formElement_footer{
 	color: #FFFFFF;

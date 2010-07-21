@@ -803,6 +803,7 @@
 			$cmbTheme->addItem(ZBX_DEFAULT_CSS,S_SYSTEM_DEFAULT);
 			$cmbTheme->addItem('css_ob.css',S_ORIGINAL_BLUE);
 			$cmbTheme->addItem('css_bb.css',S_BLACK_AND_BLUE);
+			$cmbTheme->addItem('css_od.css',S_DARK_ORANGE);
 
 		$frmUser->addRow(S_THEME, $cmbTheme);
 
@@ -1418,8 +1419,7 @@
 		$form->addVar('subfilter_interval',		$subfilter_interval);
 
 // FORM FOR FILTER DISPLAY {
-		$table = new CTable();
-		$table->setAttribute('style', 'border: 1px solid #777777; width: 100%; background-color: white;');
+		$table = new CTable('', 'itemfilter');
 		$table->setCellPadding(0);
 		$table->setCellSpacing(0);
 
@@ -3855,7 +3855,6 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 	function get_maintenance_hosts_form(&$form){
 		global $USER_DETAILS;
 		$tblHlink = new CTableInfo();
-		$tblHlink->setAttribute('style', 'background-color: #CCC;');
 
 		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_WRITE);
 
@@ -3930,7 +3929,6 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		global $USER_DETAILS;
 
 		$tblGlink = new CTableInfo();
-		$tblGlink->setAttribute('style','background-color: #CCC;');
 
 		$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
 
@@ -3984,7 +3982,6 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 	function get_maintenance_periods(){
 		$tblPeriod = new CTableInfo();
-		$tblPeriod->setAttribute('style','background-color: #CCC;');
 
 		if(isset($_REQUEST['maintenanceid']) && !isset($_REQUEST["form_refresh"])){
 
@@ -5756,8 +5753,7 @@ JAVASCRIPT;
 			$expressions 	= get_request('expressions',array());
 		}
 
-		$tblRE = new CTable('','nowrap');
-		$tblRE->addStyle('border-left: 1px #AAA solid; border-right: 1px #AAA solid; background-color: #EEE; padding: 2px; padding-left: 6px; padding-right: 6px;');
+		$tblRE = new CTable('','formtable nowrap');
 
 		$tblRE->addRow(array(S_NAME, new CTextBox('rename', $rename, 60)));
 		$tblRE->addRow(array(S_TEST_STRING, new CTextArea('test_string', $test_string, 66, 5)));
@@ -5765,11 +5761,8 @@ JAVASCRIPT;
 		$tabExp = new CTableInfo();
 
 		$td1 = new CCol(S_EXPRESSION);
-		$td1->addStyle('background-color: #CCC;');
 		$td2 = new CCol(S_EXPECTED_RESULT);
-		$td2->addStyle('background-color: #CCC;');
 		$td3 = new CCol(S_RESULT);
-		$td3->addStyle('background-color: #CCC;');
 
 		$tabExp->setHeader(array($td1,$td2,$td3));
 

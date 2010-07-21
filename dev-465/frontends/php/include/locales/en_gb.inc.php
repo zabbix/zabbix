@@ -473,6 +473,7 @@
 	'S_SYSTEM_DEFAULT'=>				'System default',
 	'S_BLACK_AND_BLUE'=>				'Black & Blue',
 	'S_ORIGINAL_BLUE'=>				'Original blue',
+	'S_DARK_ORANGE'=>				'Dark orange',
 	'S_DEFAULT_THEME'=>				'Default theme',
 	'S_EVENT_ACKNOWLEDGES'=>			'Event acknowledges',
 	'S_DAYS'=>					'Days',
