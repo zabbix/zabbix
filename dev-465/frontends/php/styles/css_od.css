@@ -62,6 +62,15 @@ a.history:visited 	{	color:#FF5500;	}
 a.history:hover 	{	color:#FF8800;	}
 a.history:active 	{	color:#FF8800;	}
 
+a.disabled:link		{	color:#EE0000;	}
+a.disabled:visited 	{	color:#EE0000;	}
+a.disabled:hover 	{	color:#CC4444;	}
+a.disabled:active 	{	color:#EE0000;	}
+
+a.on:link		{	color:#EE0000;	}
+a.on:visited 	{	color:#EE0000;	}
+a.on:hover		{	color:#CC4444;	}
+a.on:active 	{	color:#EE0000;	}
 /*////////////////	TABLES	////////////////////*/
 table{
 	color: #DFDFDF;
