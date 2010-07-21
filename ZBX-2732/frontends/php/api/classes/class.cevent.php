@@ -270,6 +270,11 @@ class CEvent extends CZBXAPI{
 		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['events'] = 'e.*';
 		}
+		else if(!is_null($options['select_hosts']) || !is_null($options['select_triggers']) || !is_null($options['select_items'])){
+			$sql_parts['select'][] = 'e.objectid';
+			$sql_parts['select'][] = 'e.object';
+		}
+
 // countOutput
 		if(!is_null($options['countOutput'])){
 			$options['sortfield'] = '';
@@ -337,8 +342,10 @@ class CEvent extends CZBXAPI{
 					$result[$event['eventid']] = array('eventid' => $event['eventid']);
 				}
 				else{
-					if($event['object'] == EVENT_OBJECT_TRIGGER){
-						$triggerids[$event['objectid']] = $event['objectid'];
+					if(!is_null($options['select_hosts']) || !is_null($options['select_triggers']) || !is_null($options['select_items'])){
+						if($event['object'] == EVENT_OBJECT_TRIGGER){
+							$triggerids[$event['objectid']] = $event['objectid'];
+						}
 					}
 
 					if(!isset($result[$event['eventid']])) $result[$event['eventid']]= array();
