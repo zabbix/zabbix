@@ -170,21 +170,30 @@ options = array(
 			$hosts = zbx_toHash($graph['hosts'], 'hostid');
 			$templates = zbx_toHash($graph['templates'], 'templateid');
 
-			if(isset($groups[$this->_profileIds['groupid']]))
+			if(isset($groups[$this->_profileIds['groupid']])){
 				$options['groupid'] = $this->_profileIds['groupid'];
-			else
-				$options['groupid'] = reset(array_keys($groupids));
+			}
+			else{
+				$groupids = array_keys($groupids);
+				$options['groupid'] = reset($groupids);
+			}
 
-			if(isset($hosts[$this->_profileIds['hostid']]))
+			if(isset($hosts[$this->_profileIds['hostid']])){
 				$options['hostid'] = $this->_profileIds['hostid'];
-			else
-				$options['hostid'] = reset(array_keys($hosts));
+			}
+			else{
+				$hostids = array_keys($hosts);
+				$options['hostid'] = reset($hostids);
+			}
 
 			if(is_null($options['hostid'])){
-				if(isset($templates[$this->_profileIds['hostid']]))
+				if(isset($templates[$this->_profileIds['hostid']])){
 					$options['hostid'] = $this->_profileIds['hostid'];
-				else
-					$options['hostid'] = reset(array_keys($templates));
+				}
+				else{
+					$templateids = array_keys($templates);
+					$options['hostid'] = reset($templateids);
+				}
 			}
 		}
 	}
@@ -200,10 +209,13 @@ options = array(
 		if($host = reset($hosts)){
 			$groups = zbx_toHash($host['groups'], 'groupid');
 
-			if(isset($groups[$this->_profileIds['groupid']]))
+			if(isset($groups[$this->_profileIds['groupid']])){
 				$options['groupid'] = $this->_profileIds['groupid'];
-			else
-				$options['groupid'] = reset(array_keys($groupids));
+			}
+			else{
+				$groupids = array_keys($groups);
+				$options['groupid'] = reset($groupids);
+			}
 		}
 	}
 
@@ -221,21 +233,30 @@ options = array(
 			$hosts = zbx_toHash($trigger['hosts'], 'hostid');
 			$templates = zbx_toHash($trigger['templates'], 'templateid');
 
-			if(isset($groups[$this->_profileIds['groupid']]))
+			if(isset($groups[$this->_profileIds['groupid']])){
 				$options['groupid'] = $this->_profileIds['groupid'];
-			else
-				$options['groupid'] = reset(array_keys($groupids));
+			}
+			else{
+				$groupids = array_keys($groupids);
+				$options['groupid'] = reset($groupids);
+			}
 
-			if(isset($hosts[$this->_profileIds['hostid']]))
+			if(isset($hosts[$this->_profileIds['hostid']])){
 				$options['hostid'] = $this->_profileIds['hostid'];
-			else
-				$options['hostid'] = reset(array_keys($hosts));
+			}
+			else{
+				$hostids = array_keys($hosts);
+				$options['hostid'] = reset($hostids);
+			}
 
 			if(is_null($options['hostid'])){
-				if(isset($templates[$this->_profileIds['hostid']]))
+				if(isset($templates[$this->_profileIds['hostid']])){
 					$options['hostid'] = $this->_profileIds['hostid'];
-				else
-					$options['hostid'] = reset(array_keys($templates));
+				}
+				else{
+					$templateids = array_keys($templates);
+					$options['hostid'] = reset($templateids);
+				}
 			}
 		}
 	}
@@ -256,9 +277,14 @@ options = array(
 
 		if(is_null($groupid)) $groupid = $this->_profileIds['groupid'];
 
-		if(!isset($this->data['groups'][$groupid]) && (is_null($this->_requestIds['groupid']) || ($this->_requestIds['groupid'] != 0))){
-			$groupids = array_keys($this->data['groups']);
-			$groupid = empty($groupids)?0:reset($groupids);
+		if(!isset($this->data['groups'][$groupid])){
+			if($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_NONE){
+				$groupid = 0;
+			}
+			else if(is_null($this->_requestIds['groupid']) || ($this->_requestIds['groupid'] != 0)){
+				$groupids = array_keys($this->data['groups']);
+				$groupid = empty($groupids)?0:reset($groupids);
+			}
 		}
 
 		if(!is_null($this->_requestIds['groupid'])){
@@ -292,9 +318,14 @@ options = array(
 
 			if(is_null($hostid)) $hostid = $this->_profileIds['hostid'];
 
-			if(!isset($this->data['hosts'][$hostid]) && (is_null($this->_requestIds['hostid']) || ($this->_requestIds['hostid'] != 0))){
-				$hostids = array_keys($this->data['hosts']);
-				$hostid = empty($hostids)?0:reset($hostids);
+			if(!isset($this->data['hosts'][$hostid])){
+				if($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_NONE){
+					$groupid = 0;
+				}
+				else if(is_null($this->_requestIds['hostid']) || ($this->_requestIds['hostid'] != 0)){
+					$hostids = array_keys($this->data['hosts']);
+					$hostid = empty($hostids)?0:reset($hostids);
+				}
 			}
 		}
 
