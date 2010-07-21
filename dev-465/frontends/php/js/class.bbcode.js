@@ -108,10 +108,10 @@ toHtml: function(mstr, crlf, tag, option, tagEnd, offset, string){
 				this.opentags.push({'bbtag':tag, 'etag': '</span>'});
 				return '<span style="color: ' + option + '">';
 			case 'size':
-				option = option || '1';
+				option = option || '7';
 
 				this.opentags.push({'bbtag':tag, 'etag': '</span>'});
-				return '<span style="font-size: ' + parseInt(option, 10)+'em">';
+				return '<span style="font-size: ' + parseInt(option, 10)+'pt">';
 			default:
 				this.opentags.push({'bbtag':tag, 'etag': '</' + tag + '>'});
 				return '<' + tag + '>';

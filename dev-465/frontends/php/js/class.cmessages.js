@@ -514,7 +514,7 @@ createMessage: function(){
 		this.dom.body = document.createElement('span');
 		this.dom.messageBox.appendChild(this.dom.body);
 
-		this.dom.body.appendChild(document.createTextNode(this.body[i]));
+		$(this.dom.body).update(BBCode.Parse(this.body[i]));
 		this.dom.body.className = 'body';
 	}
 },

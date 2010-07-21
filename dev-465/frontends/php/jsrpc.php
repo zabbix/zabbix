@@ -154,7 +154,7 @@ include_once('include/page_header.php');
 					'title' => $title.' [url='.$url.']'.$host['host'].'[/url]',
 					'body' => array(
 						S_DETAILS.': '.$trigger['description'],
-						S_DATE.': '.zbx_date2str(S_DATE_FORMAT_YMDHMS, $event['clock']),
+						S_DATE.': [b]'.zbx_date2str(S_DATE_FORMAT_YMDHMS, $event['clock']).'[/b]',
 //						S_AGE.': '.zbx_date2age($event['clock'], time()),
 //						S_SEVERITY.': '.get_severity_style($trigger['priority'])
 //						S_SOURCE.': '.$event['eventid'].' : '.$event['clock']
