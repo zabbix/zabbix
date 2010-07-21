@@ -10,7 +10,7 @@
 @media screen {
 	body{
 		background-color:#1A1A1A;
-		color: #EE7700;
+		color: #FF5500;
 	}
 }
 
@@ -19,7 +19,7 @@
 }
 
 .textcolorstyles{
-	color: #EE7700;
+	color: #FF5500;
 }
 
 .textblackwhite{
@@ -44,23 +44,23 @@
 }
 
 /*////////////////	LINKS	////////////////////*/
-a:link 		{	color:#EE7700;  }
-a:visited 	{	color:#EE7700;  }
-a:hover 	{	color:#FFAA00;  }
-a:active 	{	color:#FFAA00;  }
+a:link 		{	color:#FF5500;  }
+a:visited 	{	color:#FF5500;  }
+a:hover 	{	color:#FF8800;  }
+a:active 	{	color:#FF8800;  }
 
 a.highlight 		{ 	font-size:10px; font-weight: bold; }
 a.highlight:link 	{ 	color: #DFDFDF; text-decoration: none;	}
 a.highlight:visited {	color: #DFDFDF; text-decoration: none;	}
-a.highlight:hover	{	color: #FFAA00; }
-a.highlight:active	{	color: #FFAA00; }
+a.highlight:hover	{	color: #FF8800; }
+a.highlight:active	{	color: #FF8800; }
 
 a.footer			{	color:#CCCCCC; }
 
-a.history:link		{	color:#EE7700;	}
-a.history:visited 	{	color:#EE7700;	}
-a.history:hover 	{	color:#FFAA00;	}
-a.history:active 	{	color:#FFAA00;	}
+a.history:link		{	color:#FF5500;	}
+a.history:visited 	{	color:#FF5500;	}
+a.history:hover 	{	color:#FF8800;	}
+a.history:active 	{	color:#FF8800;	}
 
 /*////////////////	TABLES	////////////////////*/
 table{
@@ -166,7 +166,7 @@ table.tableinfo tr.header td.hover_grey {
 }
 
 table.tableinfo tr.header td.hover_grey:hover {
-	color: #FF7700;
+	color: #FF5500;
 	background-color: #6F3F00;
 }
 
@@ -295,8 +295,8 @@ table.menu tr td{
 }
 
 table.menu tr td.active{
-	color: #FF7700;
-	border-color: #FF7700;
+	color: #FF5500;
+	border-color: #FF5500;
 	background: #333333 url('../images/gradients/table_head_bb.gif') repeat-x top left;
 }
 
@@ -305,7 +305,7 @@ table.sub_menu tr{
 }
 
 table.sub_menu tr td span.active a.highlight{
-	color: #FF7700;
+	color: #FF5500;
 }
 
 table.triggers_info tr td.header {
@@ -329,7 +329,7 @@ table.server_info tr.footer td {
 }
 
 table.history td.caption{
-	color: #FFAA00;
+	color: #FF8800;
 }
 
 table.server_info {
@@ -343,7 +343,7 @@ table.msgok{
 }
 
 table.msgok tr td.clr{
-	background-color: #FFAA00;
+	background-color: #FF8800;
 }
 
 table.msgok tr td.msg{
@@ -389,10 +389,10 @@ table.infobox{
 	color: #DADADA;
 }
 
-table.infobox a:link		{	color:#FF7700;	 }
-table.infobox a:visited 	{	color:#FF7700;	 }
-table.infobox a:hover 		{	color:#FFAA00;	 }
-table.infobox a:active 		{	color:#FFAA00;	 }
+table.infobox a:link		{	color:#FF5500;	 }
+table.infobox a:visited 	{	color:#FF5500;	 }
+table.infobox a:hover 		{	color:#FF8800;	 }
+table.infobox a:active 		{	color:#FF8800;	 }
 
 table.chart{
 	background-color: #1A1A1A;
@@ -494,15 +494,15 @@ div.formElement_body{
 }
 
 span.info{
-	color:	#EE7700;
+	color:	#FF5500;
 }
 
 span.link{
-	color: #FF7700;
+	color: #FF5500;
 }
 
 span.link:hover{
-	color: #FFAA00;
+	color: #FF8800;
 }
 
 span.darklink{
@@ -510,26 +510,26 @@ span.darklink{
 }
 
 span.darklink:hover{
-	color: #FF7700;
+	color: #FF5500;
 }
 
 span.biglink{
-	color: #FF7700;
+	color: #FF5500;
 }
 
 span.biglink:hover{
-	color: #FFAA00;
+	color: #FF8800;
 }
 
 
 span.link_menu{
-	color: #FF7700;
-	border-bottom-color: #FF7700;
+	color: #FF5500;
+	border-bottom-color: #FF5500;
 }
 
 span.link_menu:hover{
-	color: #FFAA00;
-	border-bottom-color: #FFAA00;
+	color: #FF8800;
+	border-bottom-color: #FF8800;
 }
 /*////////////////	FORMS	////////////////////*/
 .button{
@@ -539,8 +539,8 @@ span.link_menu:hover{
 }
 
 .button:hover {
-	border-color: #FF7700;
-	color: #EE7700;
+	border-color: #FF5500;
+	color: #FF5500;
 	text-decoration: none;
 }
 
@@ -561,15 +561,15 @@ span.link_menu:hover{
 }
 
 .select:hover{
-	border-color: #FF7700;
+	border-color: #FF5500;
 	background-color: #2F2F2F;
-	color: #FF7700;
+	color: #FF5500;
 }
 
 .select:focus{
-	border-color: #FF7700;
+	border-color: #FF5500;
 	background-color: #2F2F2F;
-	color: #FF7700;
+	color: #FF5500;
 }
 
 .biginput, .biginput[disabled]:hover{
@@ -579,11 +579,11 @@ span.link_menu:hover{
 }
 
 .biginput:focus	{
-	border-color: #FF7700;
-	color: #FF7700;
+	border-color: #FF5500;
+	color: #FF5500;
 }
 
 .biginput:hover	{
-	border-color: #FF7700;
-	color: #FF7700;
+	border-color: #FF5500;
+	color: #FF5500;
 }
