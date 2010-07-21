@@ -106,7 +106,11 @@ include_once('include/page_header.php');
 
 // PERMISSIONS
 	if(get_request('triggerid', false)){
-		$triggers = available_triggers($_REQUEST['triggerid'], 1);
+		$options = array(
+			'triggerids' => $_REQUEST['triggerid'],
+			'editable' => 1,
+		);
+		$triggers = CTrigger::get($options);
 		if(empty($triggers)) access_deny();
 	}
 	else if(get_request('hostid', 0) > 0){
@@ -179,13 +183,14 @@ include_once('include/page_header.php');
 
 			show_messages($result, S_TRIGGER_UPDATED, S_CANNOT_UPDATE_TRIGGER);
 		}
-		else {
+		else{
 			DBstart();
 			$triggerid = add_trigger($_REQUEST['expression'],$_REQUEST['description'],$type,
 				$_REQUEST['priority'],$status,$_REQUEST['comments'],$_REQUEST['url'],
 				$deps);
 			$result = DBend($triggerid);
 			show_messages($result, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
+			if($result) $_REQUEST['triggerid'] = $triggerid;
 		}
 		if($result)
 			unset($_REQUEST['form']);
@@ -445,7 +450,6 @@ include_once('include/page_header.php');
 //			$_REQUEST['triggerid'] = 0;
 		}
 	}
-
 	$options = array(
 		'groups' => array('not_proxy_hosts' => 1, 'editable' => 1),
 		'hosts' => array('templated_hosts' => 1, 'editable' => 1),
@@ -499,7 +503,7 @@ include_once('include/page_header.php');
 
 		$form = new CForm('triggers.php', 'post');
 		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
-		
+
 // Header Host
 		if($_REQUEST['hostid'] > 0){
 			$tbl_header_host = get_header_host_table($_REQUEST['hostid'], array('items', 'applications', 'graphs'));

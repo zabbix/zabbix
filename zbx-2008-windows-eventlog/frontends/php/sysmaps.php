@@ -54,6 +54,7 @@ include_once('include/page_header.php');
 		'backgroundid'=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,				'isset({save})'),
 		'expandproblem'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,1),		null),
 		'markelements'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,1),		null),
+		'show_unack'=>	        array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,2),		null),
 		'highlight'=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,1),		null),
 		'label_type'=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,4),		'isset({save})'),
 		'label_location'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,3),		'isset({save})'),
@@ -142,21 +143,22 @@ include_once('include/page_header.php');
 <?php
 	$_REQUEST['go'] = get_request('go', 'none');
 
-	if(isset($_REQUEST["save"])){
-		if(isset($_REQUEST["sysmapid"])){
+	if(isset($_REQUEST['save'])){
+		if(isset($_REQUEST['sysmapid'])){
 // TODO check permission by new value.
 			$map = array(
-					'sysmapid' => $_REQUEST['sysmapid'],
-					'name' => $_REQUEST['name'],
-					'width' => $_REQUEST['width'],
-					'height' => $_REQUEST['height'],
-					'backgroundid' => $_REQUEST['backgroundid'],
-					'highlight' => get_request('highlight', 0),
-					'markelements' => get_request('markelements', 0),
-					'expandproblem' => get_request('expandproblem', 0),
-					'label_type' => $_REQUEST['label_type'],
-					'label_location' => $_REQUEST['label_location']
-				);
+				'sysmapid' => $_REQUEST['sysmapid'],
+				'name' => $_REQUEST['name'],
+				'width' => $_REQUEST['width'],
+				'height' => $_REQUEST['height'],
+				'backgroundid' => $_REQUEST['backgroundid'],
+				'highlight' => get_request('highlight', 0),
+				'markelements' => get_request('markelements', 0),
+				'expandproblem' => get_request('expandproblem', 0),
+				'label_type' => $_REQUEST['label_type'],
+				'label_location' => $_REQUEST['label_location'],
+				'show_unack' => get_request('show_unack', 0),
+			);
 
 			DBstart();
 			$result = CMap::update($map);
@@ -170,16 +172,17 @@ include_once('include/page_header.php');
 				access_deny();
 
 			$map = array(
-					'name' => $_REQUEST['name'],
-					'width' => $_REQUEST['width'],
-					'height' => $_REQUEST['height'],
-					'backgroundid' => $_REQUEST['backgroundid'],
-					'highlight' => get_request('highlight', 0),
-					'markelements' => get_request('markelements', 0),
-					'expandproblem' => get_request('expandproblem', 0),
-					'label_type' => $_REQUEST['label_type'],
-					'label_location' => $_REQUEST['label_location']
-				);
+				'name' => $_REQUEST['name'],
+				'width' => $_REQUEST['width'],
+				'height' => $_REQUEST['height'],
+				'backgroundid' => $_REQUEST['backgroundid'],
+				'highlight' => get_request('highlight', 0),
+				'markelements' => get_request('markelements', 0),
+				'expandproblem' => get_request('expandproblem', 0),
+				'label_type' => $_REQUEST['label_type'],
+				'label_location' => $_REQUEST['label_location'],
+				'show_unack' => get_request('show_unack', 0),
+			);
 
 			DBstart();
 			$result = CMap::create($map);
@@ -189,11 +192,11 @@ include_once('include/page_header.php');
 			show_messages($result,S_MAP_ADDED,S_CANNOT_ADD_MAP);
 		}
 		if($result){
-			unset($_REQUEST["form"]);
+			unset($_REQUEST['form']);
 		}
 	}
-	else if(isset($_REQUEST["delete"])&&isset($_REQUEST["sysmapid"])){
-		$maps = zbx_toObject($_REQUEST["sysmapid"], 'sysmapid');
+	else if(isset($_REQUEST['delete'])&&isset($_REQUEST['sysmapid'])){
+		$maps = zbx_toObject($_REQUEST['sysmapid'], 'sysmapid');
 
 		DBstart();
 		$result = CMap::delete($maps);
@@ -202,7 +205,7 @@ include_once('include/page_header.php');
 		add_audit_if($result,AUDIT_ACTION_DELETE,AUDIT_RESOURCE_MAP,'Name ['.$sysmap['name'].']');
 		show_messages($result, S_MAP_DELETED, S_CANNOT_DELETE_MAP);
 		if($result){
-			unset($_REQUEST["form"]);
+			unset($_REQUEST['form']);
 		}
 	}
 	else if($_REQUEST['go'] == 'delete'){
@@ -214,7 +217,7 @@ include_once('include/page_header.php');
 		DBstart();
 		$result = CMap::delete($maps);
 		$go_result = DBend($result);
-		
+
 
 		if($go_result){
 			unset($_REQUEST["form"]);
@@ -244,7 +247,7 @@ include_once('include/page_header.php');
 		else if(($_REQUEST['form'] == S_CREATE_MAP) || ($_REQUEST['form'] == 'update'))
 			$map_wdgt->addItem(insert_map_form());
 	}
-	else{		
+	else{
 		$form = new CForm();
 		$form->setName('frm_maps');
 
@@ -310,7 +313,7 @@ include_once('include/page_header.php');
 		$form->addItem($table);
 		$map_wdgt->addItem($form);
 	}
-	
+
 	$map_wdgt->show();
 ?>
 <?php

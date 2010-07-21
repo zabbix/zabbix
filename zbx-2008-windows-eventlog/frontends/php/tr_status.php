@@ -380,7 +380,7 @@ include_once('include/page_header.php');
 		$options['only_true'] = 1;
 	}
 	if($ack_status == ZBX_ACK_STS_WITH_UNACK){
-		$options['with_unacknowledged_events'] = 1;
+		$options['withUnacknowledgedEvents'] = 1;
 	}
 	if($ack_status == ZBX_ACK_STS_WITH_LAST_UNACK){
 		$options['withLastEventUnacknowledged'] = 1;

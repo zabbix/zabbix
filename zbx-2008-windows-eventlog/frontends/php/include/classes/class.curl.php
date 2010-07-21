@@ -161,6 +161,8 @@ class Curl{
 
 	public function formatGetArguments(){
 		$this->arguments = $_GET;
+		if(isset($_COOKIE['zbx_sessionid']))
+			$this->setArgument('sid', substr($_COOKIE['zbx_sessionid'],16,16));
 		$this->formatQuery();
 	}
 

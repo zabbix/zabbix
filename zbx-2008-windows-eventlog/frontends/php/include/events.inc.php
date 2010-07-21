@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2007 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,11 +27,6 @@
 		}
 	}
 
-	function get_event_by_eventid($eventid){
-		$db_events = DBselect('select * from events where eventid='.$eventid);
-		return DBfetch($db_events);
-	}
-
 	function get_tr_event_by_eventid($eventid){
 		$sql = 'SELECT e.*,t.triggerid, t.description,t.priority,t.status,t.type '.
 				' FROM events e,triggers t '.
@@ -42,7 +37,7 @@
 	return $result;
 	}
 
-	function get_events_unacknowledged($db_element, $value_trigger=null, $value_event=null){
+	function get_events_unacknowledged($db_element, $value_trigger=null, $value_event=null, $ack=false){
 		$elements = array('hosts' => array(), 'hosts_groups' => array(), 'triggers' => array());
 
 		get_map_elements($db_element, $elements);
@@ -59,7 +54,7 @@
 			'limit' => ($config['search_limit']+1)
 		);
 		if(!is_null($value_trigger)) $options['filter'] = array('value' => $value_trigger);
-		
+
 		if(!empty($elements['hosts_groups'])) $options['groupids'] = array_unique($elements['hosts_groups']);
 		if(!empty($elements['hosts'])) $options['hostids'] = array_unique($elements['hosts']);
 		if(!empty($elements['triggers'])) $options['triggerids'] = array_unique($elements['triggers']);
@@ -69,7 +64,7 @@
 			'countOutput' => 1,
 			'triggerids' => zbx_objectValues($triggerids, 'triggerid'),
 			'object' => EVENT_OBJECT_TRIGGER,
-			'acknowledged' => 0,
+			'acknowledged' => $ack ? 1 : 0,
 			'value' => is_null($value_event) ? array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE) : $value_event,
 			'nopermissions' => 1
 		);
@@ -330,13 +325,13 @@ function make_small_eventlist($eventid, $trigger_data){
 	$table->setHeader(array(S_TIME, S_STATUS, S_DURATION, S_AGE, S_ACK, S_ACTIONS));
 
 	$options = array(
-		'eventids' => $eventid, 
-		'output' => API_OUTPUT_EXTEND, 
+		'eventids' => $eventid,
+		'output' => API_OUTPUT_EXTEND,
 //		'select_triggers' => API_OUTPUT_EXTEND
 	);
 	$curevent = CEvent::get($options);
 	$curevent = reset($curevent);
-	
+
 	$clock = $curevent['clock'];
 
 	$options = array(
@@ -354,7 +349,7 @@ function make_small_eventlist($eventid, $trigger_data){
 		$trigger = reset($event['triggers']);
 
 		$event['type'] = $trigger['type'];
-		
+
 		$lclock = $clock;
 		$clock = $event['clock'];
 		$duration = zbx_date2age($lclock, $clock);
@@ -466,7 +461,7 @@ function get_history_of_triggers_events($start,$num, $groupid=0, $hostid=0){
 	$sql_from = $sql_cond = '';
 
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST);
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array(), PERM_RES_DATA_ARRAY, get_current_nodeid());
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array());
 
 	if($hostid > 0){
 		$sql_cond = ' AND h.hostid='.$hostid;

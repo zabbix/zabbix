@@ -9,7 +9,7 @@
 	text-decoration: none;
 	background-color: #ECECFF;
 	border: black 1px solid;
-	margin: 0px;
+	margin: 0;
 }
 .pum_o_item:hover {
 	cursor:pointer;
@@ -18,7 +18,7 @@
 }
 .pum_i_item {
 	margin: 3px 0px 0px 8px;
-
+	white-space: nowrap;
 }
 
 /* menu menu item with submenu */
@@ -29,7 +29,7 @@
 	font-weight: bold;
 	background: #ECECFF;
 	border: black 1px solid;
-	margin: 0px;
+	margin: 0;
 }
 .pum_b_submenu:hover {
 	cursor:pointer;
@@ -43,7 +43,7 @@
 	text-decoration: none;
 	background: #ECECFF;
 	border: black 1px solid;
-	margin: 0px;
+	margin: 0;
 }
 .pum_o_submenu:hover {
 	cursor:pointer;
@@ -51,7 +51,7 @@
 	background-color: #FDFDFF;
 }
 .pum_i_submenu{
-	margin: 3px 0px 0px 8px;
+	margin: 3px 0 0 8px;
 
 }
 
@@ -61,7 +61,7 @@
 	text-decoration: none;
 	border: black 1px solid;
 	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;
-	margin: 0px;
+	margin: 0;
 }
 .pum_oheader:hover {
 	cursor:pointer;
@@ -70,7 +70,7 @@
 .pum_iheader {
 	color: #FFFFFF;
 	font-weight: bold;
-	margin: 3px 0px 0px 8px;
+	margin: 3px 0 0 8px;
 }
 
 /************ END OF POPUP MENU ************/

@@ -457,7 +457,10 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 // Any other unit
 //-------------------
 
-	if(zbx_empty($units) && ($convert == ITEM_CONVERT_WITH_UNITS)){
+// black list wich do not require units metrics.. 
+	$blackList = array('%','ms','rpm');
+	if((in_array($units, $blackList)) || (zbx_empty($units) && ($convert == ITEM_CONVERT_WITH_UNITS))){
+//	if(zbx_empty($units) && ($convert == ITEM_CONVERT_WITH_UNITS)){
 		if(abs($value) >= 1)
 			$format = '%.2f';
 		else if(abs($value) >= 0.01)
@@ -470,7 +473,8 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 		$value = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U','$1$2$3', $value);
 		$value = rtrim($value, '.');
 
-	return $value;
+		if(zbx_empty($units)) return $value;
+		else return $value.' '.$units;
 	}
 
 	switch($units){
@@ -507,6 +511,8 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 			);
 
 		foreach($digitUnits[$step] as $dunit => $data){
+// skip mili & micro for values without units
+			if(zbx_empty($units) && ($data['pow'] < 0)) continue;
 			$digitUnits[$step][$dunit]['value'] = bcpow($step, $data['pow'], 9);
 		}
 	}
@@ -1141,7 +1147,20 @@ function zbx_subarray_push(&$mainArray, $sIndex, $element) {
 			$script = "javascript: redirect('".$url."');";
 		}
 
-		$col = array(new CSpan($obj,'underline'));
+		if(is_array($obj)){
+			$col = array();
+			foreach($obj as $el){
+				if(is_object($el) || ($el === SPACE)){
+					$col[] = $el;
+				}
+				else{
+					$col[] = new CSpan($el, 'underline');
+				}
+			}
+		}
+		else{
+			$col = array(new CSpan($obj,'underline'));
+		}
 		if(isset($_REQUEST['sort']) && ($tabfield == $_REQUEST['sort'])){
 			if($sortorder == ZBX_SORT_UP){
 				$img = new CImg('images/general/sort_down.png','down',10,10);
@@ -1167,28 +1186,19 @@ function zbx_subarray_push(&$mainArray, $sIndex, $element) {
 
 		$sortorder = (isset($_REQUEST['sortorder']) && ($_REQUEST['sortorder'] == ZBX_SORT_UP))?ZBX_SORT_DOWN:ZBX_SORT_UP;
 
-		if(empty($url)){
-			$url='?';
-			$url_params = explode('&',$_SERVER['QUERY_STRING']);
-			foreach($url_params as $id => $param){
-				if(zbx_empty($param)) continue;
+		$link = new Curl($url);
+		if(empty($url)) $link->formatGetArguments();
+		$link->setArgument('sort', $tabfield);
+		$link->setArgument('sortorder', $sortorder);
 
-				list($name,$value) = explode('=',$param);
-				if(zbx_empty($name) || ($name == 'sort') || (($name == 'sortorder'))) continue;
-				$url.=$param.'&';
-			}
-		}
-		else{
-			$url.='&';
-		}
+		$url = $link->getUrl();
 
-		$url.='sort='.$tabfield.'&sortorder='.$sortorder;
 
 		if(($page['type'] != PAGE_TYPE_HTML) && defined('ZBX_PAGE_MAIN_HAT')){
-			$link = new CLink($obj,$url,null,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
+			$link = new CLink($obj,$url,null,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');", 'nosid');
 		}
 		else{
-			$link = new CLink($obj,$url);
+			$link = new CLink($obj,$url, null, null, 'nosid');
 		}
 
 		if(isset($_REQUEST['sort']) && ($tabfield == $_REQUEST['sort'])){

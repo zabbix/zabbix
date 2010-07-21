@@ -401,8 +401,8 @@ int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		zbx_snprintf(flag, sizeof(flag), "wait");
 
 	if (0 == strcmp(flag, "wait"))
-		return EXECUTE_STR(cmd,command,flags,result);
-	else if(0 != strcmp(flag,"nowait"))
+		return EXECUTE_STR(cmd, command, flags, result);
+	else if (0 != strcmp(flag, "nowait"))
 		return SYSINFO_RET_FAIL;
 
 #if defined(_WINDOWS)
@@ -411,11 +411,11 @@ int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
 	GetStartupInfo(&si);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "Execute command '%s'",full_command);
+	zabbix_log(LOG_LEVEL_DEBUG, "Executing full command '%s'", full_command);
 
 	wcommand = zbx_utf8_to_unicode(full_command);
 
-	if(!CreateProcess(
+	if (!CreateProcess(
 		NULL,	/* No module name (use command line) */
 		wcommand,/* Name of app to launch */
 		NULL,	/* Default process security attributes */
@@ -427,6 +427,7 @@ int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		&si,	/* Startup Information */
 		&pi))	/* Process information stored upon return */
 	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Creation of the process failed");
 		goto lbl_exit;
 	}
 

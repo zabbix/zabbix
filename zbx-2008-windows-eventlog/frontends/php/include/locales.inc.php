@@ -63,10 +63,11 @@ function set_zbx_locales(){
 	$ZBX_LOCALES = array(
 		'en_gb'=>  S_ENGLISH_GB,
 		'cn_zh'=>  S_CHINESE_CN,
+		'cs_cz'=>  S_CZECH_CZ,
 		'nl_nl'=>  S_DUTCH_NL,
 		'fr_fr'=>  S_FRENCH_FR,
 		'de_de'=>  S_GERMAN_DE,
-		'hu_hu'=>  S_HUNGARY_HU,
+		'hu_hu'=>  S_HUNGARIAN_HU,
 		'it_it'=>  S_ITALIAN_IT,
 		'ko_kr'=>  S_KOREAN_KO,
 		'ja_jp'=>  S_JAPANESE_JP,
