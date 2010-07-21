@@ -17,7 +17,7 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#if defined (_WINDOWS)
+#if defined(_WINDOWS)
 
 #include "common.h"
 
@@ -38,8 +38,6 @@
 #define MAX_MSG_LENGTH 1024
 
 #define EVENTLOG_REG_PATH TEXT("SYSTEM\\CurrentControlSet\\Services\\EventLog\\")
-
-#include "afxres.h"
 
 /* open event logger and return number of records */
 static int    zbx_open_eventlog(LPCTSTR wsource, HANDLE *eventlog_handle, long *pNumRecords, long *pLatestRecord)
@@ -101,6 +99,7 @@ static long	zbx_get_eventlog_message_xpath(LPCTSTR wsource, long which, char **o
 		unsigned short *out_severity, unsigned long *out_timestamp)
 {
 	const char	*__function_name = "zbx_get_eventlog_message_xpath";
+
 	long		ret = FAIL;
 	LPSTR		tmp_str = NULL;
 	LPWSTR		tmp_wstr = NULL;
@@ -119,13 +118,16 @@ static long	zbx_get_eventlog_message_xpath(LPCTSTR wsource, long which, char **o
 	DWORD		array_count = 4;
 	DWORD		dwReturned = 0, dwValuesCount = 0, dwBufferSize = 0;
 	const ULONGLONG	sec_1970 = 116444736000000000;
-	static HMODULE hmod_wevtapi = NULL;
+	
+	static HMODULE	hmod_wevtapi = NULL;
 	static EVT_HANDLE (WINAPI *EvtQuery)(EVT_HANDLE, LPCWSTR, LPCWSTR, DWORD) = NULL;
 	static EVT_HANDLE (WINAPI *EvtCreateRenderContext)(DWORD, LPCWSTR*, DWORD) = NULL;
 	static BOOL (WINAPI *EvtNext)(EVT_HANDLE, DWORD, PEVT_HANDLE, DWORD, DWORD, __out PDWORD) = NULL;
-	static BOOL (WINAPI *EvtRender)(EVT_HANDLE, EVT_HANDLE, DWORD, DWORD, __out_bcount_part_opt(BufferSize, *BufferUsed) PVOID, __out PDWORD, __out PDWORD) = NULL;
+	static BOOL (WINAPI *EvtRender)(EVT_HANDLE, EVT_HANDLE, DWORD, DWORD,
+			__out_bcount_part_opt(BufferSize, *BufferUsed) PVOID, __out PDWORD, __out PDWORD) = NULL;
 	static EVT_HANDLE (WINAPI *EvtOpenPublisherMetadata)(EVT_HANDLE, LPCWSTR, LPCWSTR, LCID, DWORD) = NULL;
-	static BOOL (WINAPI *EvtFormatMessage)(EVT_HANDLE, EVT_HANDLE, DWORD, DWORD, PEVT_VARIANT, DWORD, DWORD, __out_ecount_part_opt(BufferSize, *BufferUsed) LPWSTR, __out PDWORD) = NULL;
+	static BOOL (WINAPI *EvtFormatMessage)(EVT_HANDLE, EVT_HANDLE, DWORD, DWORD, PEVT_VARIANT, DWORD, DWORD,
+			__out_ecount_part_opt(BufferSize, *BufferUsed) LPWSTR, __out PDWORD) = NULL;
 	static BOOL (WINAPI *EvtClose)(EVT_HANDLE) = NULL;
 
 	assert(out_source);
@@ -323,7 +325,7 @@ static int	zbx_get_eventlog_message(LPCTSTR wsource, HANDLE eventlog_handle, lon
 	DWORD		szData, Type;
 	HINSTANCE	hLib = NULL;				/* handle to the messagetable DLL */
 	LPTSTR		pCh, aInsertStrs[MAX_INSERT_STRS];	/* array of pointers to insert */
-	LPTSTR		msgBuf = NULL;				/* hold text of the error message that we */
+	LPTSTR		msgBuf = NULL;				/* hold text of the error message */
 	char		*buf = NULL;
 	long		i, err = 0;
 	int		ret = FAIL;
@@ -553,4 +555,4 @@ int	process_eventlog(const char *source, long *lastlogsize, unsigned long *out_t
 	return ret;
 }
 
-#endif	/*if defined (_WINDOWS)*/
+#endif	/* if defined(_WINDOWS) */
