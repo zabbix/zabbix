@@ -91,7 +91,10 @@ include_once('include/page_header.php');
 				),
 				'select_hosts' => array('hostid', 'host'),
 				'output' => API_OUTPUT_EXTEND,
-				'expandDescription' => 1
+				'expandDescription' => 1,
+				'sortfield' => 'lastchange',
+				'sortorder' => ZBX_SORT_DOWN,
+				'limit' => 15
 			);
 
 			if(!$msgsettings['triggers']['recovery']){
@@ -108,8 +111,7 @@ include_once('include/page_header.php');
 				'output' => API_OUTPUT_EXTEND,
 				'sortfield' => 'clock',
 				'sortorder' => ZBX_SORT_DOWN,
-				'limit' => 15,
-				'nopermissions' => 1
+				'limit' => 15
 			);
 
 			if($lastEventId > 0){
@@ -159,8 +161,7 @@ include_once('include/page_header.php');
 //						S_SEVERITY.': '.get_severity_style($trigger['priority'])
 //						S_SOURCE.': '.$event['eventid'].' : '.$event['clock']
 					),
-					'timeout' => $msgsettings['timeout'],
-					'options' => $options
+					'timeout' => $msgsettings['timeout']
 				);
 
 				$sortClock[$enum] = $event['clock'];
