@@ -756,6 +756,7 @@
 	'S_MAINTENANCE_UPDATED'=>		'Maintenance updated',
 	'S_MAINTENANCE_DELETED'=>		'Maintenance deleted',
 	'S_DELETE_SELECTED_MAINTENANCE_PERIODS_Q'=>'Delete selected maintenance periods?',
+	'S_GROUP_OR_HOST_NEEDED' => 'At least one host or group should be selected',
 
 	'S_IN_MAINTENANCE'=>			'In maintenance',
 	'S_HOSTS_IN_MAINTENANCE'=>		'Hosts in maintenance',
