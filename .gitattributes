@@ -13,14 +13,6 @@ build/win32/project/Makefile_get -text
 build/win32/project/Makefile_get_x64 -text
 build/win32/project/Makefile_sender -text
 build/win32/project/Makefile_sender_x64 -text
-build/win32/project/ZABBIX.sln -text
-build/win32/project/zabbix_agentd.vcproj -text
-build/win32/project/zabbix_agentd_win32.cmd -text
-build/win32/project/zabbix_agentd_win64.cmd -text
-build/win32/project/zabbix_get.vcproj -text
-build/win32/project/zabbix_get_win32.cmd -text
-build/win32/project/zabbix_sender.vcproj -text
-build/win32/project/zabbix_sender_win32.cmd -text
 create/data/create_data_sql/create_data_sql.sh svneol=native#text/x-sh
 create/data/create_data_sql/data_sql_blacklist.txt svneol=native#text/plain
 create/data/create_data_sql/data_sql_filter.txt svneol=native#text/plain
