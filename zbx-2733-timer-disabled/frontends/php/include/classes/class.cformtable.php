@@ -118,12 +118,14 @@ class CFormTable extends CForm{
 
 	public function addRow($item1, $item2=NULL, $class=NULL){
 		if(is_object($item1) && zbx_strtolower(get_class($item1)) == 'crow'){
-		}else if(is_object($item1) && zbx_strtolower(get_class($item1)) == 'ctable'){
+		}
+		else if(is_object($item1) && zbx_strtolower(get_class($item1)) == 'ctable'){
 			$td = new CCol($item1,'form_row_c');
 			$td->setColSpan(2);
 
 			$item1 = new CRow($td);
-		}else{
+		}
+		else{
 			$tmp = $item1;
 			if(is_string($item1)){
 				$item1 = nbsp($item1);
@@ -141,6 +143,8 @@ class CFormTable extends CForm{
 		}
 
 		array_push($this->center_items, $item1);
+
+	return $item1;
 	}
 
 	public function addSpanRow($value, $class=NULL){

@@ -121,6 +121,7 @@
 	<link rel="stylesheet" type="text/css" href="css.css" />
 <!--[if IE 6]>
 	<link rel="stylesheet" type="text/css" href="styles/ie.css" />
+	<script type="text/javascript" src="js/ie6fix.js"></script>
 <![endif]-->
 
 <?php
@@ -272,7 +273,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 					" ShowHide('div_node_tree',IE6?'block':'table');".
 					' pos.top += 20;'.
 					" \$('div_node_tree').setStyle({top: pos.top+'px'});".
-					" showPopupDiv('div_node_tree','select_iframe');";		// IE6
+					" if(IE6) showPopupDiv('div_node_tree','select_iframe');";		// IE6
 				$button_show_tree = new CButton('show_node_tree', S_SELECT_NODES, $jscript); //sdelatj konstatntu!
 				$button_show_tree->setType('button');
 				$button_show_tree->setAttribute('id', 'button_show_tree');
@@ -411,23 +412,13 @@ COpt::compare_files_with_menu($ZBX_MENU);
 			$search_div->setAttribute('class','zbx_search');
 			
 			zbx_add_post_js("var sid = createSuggest('search'); $('search').focus(); $('search').select();");
+			zbx_add_post_js("var msglistid = initMessages({});");
 		}
 
 		$sub_menu_table->addRow(array($menu_divs, $search_div));
 
 		$page_menu->addItem($sub_menu_table);
 //---
-
-/* SEARCH form
-		$search_form = new CForm('search.php');
-		$search_form->addItem(new CDiv(array(S_SEARCH_BIG.': ', new CTextBox('search','',20))));
-
-		$search_div = new CDiv($search_form);
-		$search_div->setAttribute('id','zbx_search');
-		$search_div->setAttribute('class','zbx_search');
-
-		$page_menu->addItem($search_div);
-//*/
 
 		$page_menu->show();
 	}
