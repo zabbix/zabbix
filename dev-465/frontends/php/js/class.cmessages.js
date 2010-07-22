@@ -62,13 +62,13 @@ initialize: function($super, messagesListId, args){
 	this.messageListId = messagesListId;
 	$super('CMessageList['+messagesListId+']');
 //--
-//	return false;
 	
 	this.dom = {};
 	this.messageList = {};
 	this.messageLast = {};
 
 	this.updateSettings();
+
 	this.createContainer();
 	if(IE) this.fixIE();
 
@@ -91,7 +91,10 @@ initialize: function($super, messagesListId, args){
 		scroll: window,
 		snap: function(x,y){if(y < 0) return [x,0]; else return [x,y];}
 	});
-//	addListener(this.dom.mute, 'click', this.mute.bindAsEventListener(this));
+},
+
+start: function(){
+	this.stop();
 
 	if(is_null(this.PEupdater)){
 		this.ready = true;
@@ -107,6 +110,14 @@ initialize: function($super, messagesListId, args){
 	}
 },
 
+stop: function(){
+	if(!is_null(this.PEupdater)) this.PEupdater.stop();
+	if(!is_null(this.PEtimeout)) this.PEtimeout.stop();
+
+	this.PEupdater = null;
+	this.PEtimeout = null;
+},
+
 setSettings: function(settings){
 	this.debug('setSettings');
 //--
@@ -116,6 +127,9 @@ setSettings: function(settings){
 	if(this.sounds.mute == 1){
 		this.dom.mute.className = 'iconmute';
 	}
+
+	if(settings.enabled != 1) this.stop();
+	else this.start();
 },
 
 updateSettings: function(){
@@ -135,6 +149,7 @@ updateSettings: function(){
 addMessage: function(newMessage){
 	this.debug('addMessage');
 //--
+
 	var newMessage = newMessage || {};
 
 	while(isset(this.msgcounter, this.messageList)){
@@ -282,6 +297,7 @@ closeAllMessages: function(e){
 timeoutMessages: function(){
 	this.debug('timeoutMessages');
 //--
+
 	var now = parseInt(new Date().getTime()/1000);
 
 	var timeout = 0;
