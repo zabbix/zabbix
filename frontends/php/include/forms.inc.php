@@ -1062,8 +1062,9 @@
 				if(isset($db_right['node_name']))
 					$db_right['name'] = $db_right['node_name'].':'.$db_right['name'];
 
-				$group_rights[$db_right['name']] = array(
+				$group_rights[$db_right['id']] = array(
 					'permission'	=> $db_right['permission'],
+					'name'		=> $db_right['name'],
 					'id'		=> $db_right['id']
 				);
 			}
@@ -1079,7 +1080,7 @@
 		}
 		$perm_details = get_request('perm_details', 0);
 
-		ksort($group_rights);
+		order_result($group_rights, 'name');
 
 		$frmUserG = new CFormTable($frm_title,'usergrps.php');
 		$frmUserG->setHelp('web.users.groups.php');
@@ -1197,10 +1198,10 @@
 		$lstRead  = new CListBox('right_to_del[read_only][]'	,null	,20);
 		$lstDeny  = new CListBox('right_to_del[deny][]'			,null	,20);
 
-		foreach($group_rights as $name => $element_data){
-			if($element_data['permission'] == PERM_DENY)			$lstDeny->addItem($name, $name);
-			else if($element_data['permission'] == PERM_READ_ONLY)	$lstRead->addItem($name, $name);
-			else if($element_data['permission'] == PERM_READ_WRITE)	$lstWrite->addItem($name, $name);
+		foreach($group_rights as $id => $element_data){
+			if($element_data['permission'] == PERM_DENY)			$lstDeny->addItem($id, $element_data['name']);
+			else if($element_data['permission'] == PERM_READ_ONLY)	$lstRead->addItem($id, $element_data['name']);
+			else if($element_data['permission'] == PERM_READ_WRITE)	$lstWrite->addItem($id, $element_data['name']);
 		}
 
 		$table_Rights->setHeader(array(S_READ_WRITE, S_READ_ONLY, S_DENY),'header');
