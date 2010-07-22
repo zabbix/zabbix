@@ -17,7 +17,6 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-
 #ifndef ZABBIX_EVALFUNC_H
 #define ZABBIX_EVALFUNC_H
 
@@ -32,7 +31,6 @@
 
 extern  int     CONFIG_SERVER_STARTUP_TIME;
 
-/*int	evaluate_function(char *value, DB_ITEM *item, char *function, char *parameter, int now);*/
 int	evaluate_function2(char *value,char *host,char *key,char *function,char *parameter);
 int	replace_value_by_map(char *value, zbx_uint64_t valuemapid);
 int	add_value_suffix(char *value, int max_len, char *units, int value_type);

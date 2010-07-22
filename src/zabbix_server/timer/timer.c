@@ -32,36 +32,87 @@
 
 #define TIMER_DELAY 30
 
+/******************************************************************************
+ *                                                                            *
+ * Function: process_time_functions                                           *
+ *                                                                            *
+ * Purpose: re-calculate and update values of time-driven functions           *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
 static void	process_time_functions()
 {
+	const char	*__function_name = "process_time_functions";
 	DB_RESULT	result;
 	DB_ROW		row;
-	DB_ITEM		item;
+	char		*exp, error[MAX_STRING_LEN];
+	zbx_uint64_t	triggerid;
+	int		trigger_type, trigger_value, exp_value;
+	const char	*trigger_error;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_setproctitle("timer [updating triggers]");
 
-	result = DBselect("select distinct %s,functions f where h.hostid=i.hostid and h.status=%d"
-			" and i.status=%d and f.function in ('nodata','date','dayofweek','time','now')"
-			" and i.itemid=f.itemid and (h.maintenance_status=%d or h.maintenance_type=%d)" DB_NODE,
-			ZBX_SQL_ITEM_SELECT,
-			HOST_STATUS_MONITORED,
+	result = DBselect(
+			"select distinct t.triggerid,t.type,t.value,t.error,t.expression"
+			" from triggers t,functions f,items i,hosts h"
+			" where t.status=%d"
+				" and t.triggerid=f.triggerid"
+				" and f.function in ('nodata','date','dayofweek','time','now')"
+				" and f.itemid=i.itemid"
+				" and i.status=%d"
+				" and i.hostid=h.hostid"
+				" and h.status=%d"
+				" and (h.maintenance_status=%d or h.maintenance_type=%d)"
+				DB_NODE,
+			TRIGGER_STATUS_ENABLED,
 			ITEM_STATUS_ACTIVE,
+			HOST_STATUS_MONITORED,
 			HOST_MAINTENANCE_STATUS_OFF, MAINTENANCE_TYPE_NORMAL,
 			DBnode_local("h.hostid"));
 
+	DBbegin();
+
 	while (NULL != (row = DBfetch(result)))
 	{
-		DBget_item_from_db(&item, row);
+		ZBX_STR2UINT64(triggerid, row[0]);
+		trigger_type = atoi(row[1]);
+		trigger_value = atoi(row[2]);
+		trigger_error = row[3];
+		exp = strdup(row[4]);
 
-		DBbegin();
-		update_triggers(item.itemid);
-		DBcommit();
+		if (SUCCEED != evaluate_expression(&exp_value, &exp, time(NULL), triggerid, trigger_value, error, sizeof(error)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Expression [%s] cannot be evaluated: %s", exp, error);
+			zabbix_syslog("Expression [%s] cannot be evaluated: %s", exp, error);
+
+			DBupdate_trigger_value(triggerid, trigger_type, trigger_value,
+					trigger_error, TRIGGER_VALUE_UNKNOWN, time(NULL), error);
+		}
+		else
+			DBupdate_trigger_value(triggerid, trigger_type, trigger_value,
+					trigger_error, exp_value, time(NULL), NULL);
+
+		zbx_free(exp);
 	}
 
+	DBcommit();
+
 	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-typedef struct zbx_host_maintenance_s {
+typedef struct zbx_host_maintenance_s
+{
 	zbx_uint64_t	hostid;
 	time_t		maintenance_from;
 	zbx_uint64_t	maintenanceid;
@@ -70,7 +121,8 @@ typedef struct zbx_host_maintenance_s {
 	int		host_maintenance_status;
 	int		host_maintenance_type;
 	int		host_maintenance_from;
-} zbx_host_maintenance_t;
+}
+zbx_host_maintenance_t;
 
 static int	get_host_maintenance_nearestindex(zbx_host_maintenance_t *hm, int hm_count,
 		zbx_uint64_t hostid, time_t maintenance_from, zbx_uint64_t maintenanceid)

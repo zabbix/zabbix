@@ -24,7 +24,7 @@
 #include "db.h"
 #include "log.h"
 #include "zlog.h"
-#include "zbxserver.h"
+#include "dbcache.h"
 
 #include "httpmacro.h"
 #include "httptest.h"
@@ -59,7 +59,7 @@ static int process_value(zbx_uint64_t itemid, AGENT_RESULT *value)
 
 	INIT_CHECK_MEMORY();
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In process_value(itemid:" ZBX_FS_UI64 ")",
+	zabbix_log(LOG_LEVEL_DEBUG, "In process_value(itemid:" ZBX_FS_UI64 ")",
 			itemid);
 
 	result = DBselect(
@@ -78,13 +78,12 @@ static int process_value(zbx_uint64_t itemid, AGENT_RESULT *value)
 			itemid,
 			HOST_MAINTENANCE_STATUS_OFF, MAINTENANCE_TYPE_NORMAL,
 			DBnode_local("h.hostid"));
-	row=DBfetch(result);
 
-	if(!row)
+	if (NULL == (row = DBfetch(result)))
 	{
 		DBfree_result(result);
-		zabbix_log( LOG_LEVEL_DEBUG, "End process_value(result:FAIL)");
-		return  FAIL;
+		zabbix_log(LOG_LEVEL_DEBUG, "End process_value(result:FAIL)");
+		return FAIL;
 	}
 
 	value_type = (unsigned char)atoi(row[1]);
@@ -93,7 +92,7 @@ static int process_value(zbx_uint64_t itemid, AGENT_RESULT *value)
 
 	DBfree_result(result);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "End process_value()");
+	zabbix_log(LOG_LEVEL_DEBUG, "End process_value()");
 
 	CHECK_MEMORY("process_value", "end");
 
@@ -119,11 +118,6 @@ static size_t WRITEFUNCTION2( void *ptr, size_t size, size_t nmemb, void *stream
 
 static size_t HEADERFUNCTION2( void *ptr, size_t size, size_t nmemb, void *stream)
 {
-/*
-	ZBX_LIM_PRINT("HEADERFUNCTION", size*nmemb, ptr, 300);
-	zabbix_log(LOG_LEVEL_WARNING, "In HEADERFUNCTION");
-*/
-
 	return size*nmemb;
 }
 
