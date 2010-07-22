@@ -2316,7 +2316,7 @@ quit:
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static ZBX_DC_HISTORY *DCget_history_ptr(zbx_uint64_t itemid, size_t text_len)
+static ZBX_DC_HISTORY	*DCget_history_ptr(zbx_uint64_t itemid, size_t text_len)
 {
 	ZBX_DC_HISTORY	*history;
 	int		index;
@@ -2388,7 +2388,7 @@ retry:
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	DCadd_history(zbx_uint64_t itemid, double value_orig, int clock)
+static void	DCadd_history(zbx_uint64_t itemid, double value_orig, int clock)
 {
 	ZBX_DC_HISTORY	*history;
 
@@ -2426,7 +2426,7 @@ void	DCadd_history(zbx_uint64_t itemid, double value_orig, int clock)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	DCadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value_orig, int clock)
+static void	DCadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value_orig, int clock)
 {
 	ZBX_DC_HISTORY	*history;
 
@@ -2464,7 +2464,7 @@ void	DCadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value_orig, int clock)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	DCadd_history_str(zbx_uint64_t itemid, char *value_orig, int clock)
+static void	DCadd_history_str(zbx_uint64_t itemid, char *value_orig, int clock)
 {
 	ZBX_DC_HISTORY	*history;
 	size_t		len;
@@ -2507,7 +2507,7 @@ void	DCadd_history_str(zbx_uint64_t itemid, char *value_orig, int clock)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	DCadd_history_text(zbx_uint64_t itemid, char *value_orig, int clock)
+static void	DCadd_history_text(zbx_uint64_t itemid, char *value_orig, int clock)
 {
 	ZBX_DC_HISTORY	*history;
 	size_t		len;
@@ -2550,8 +2550,8 @@ void	DCadd_history_text(zbx_uint64_t itemid, char *value_orig, int clock)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	DCadd_history_log(zbx_uint64_t itemid, char *value_orig, int clock, int timestamp, char *source, int severity,
-		int logeventid, int lastlogsize, int mtime)
+static void	DCadd_history_log(zbx_uint64_t itemid, char *value_orig, int clock, int timestamp, char *source, int severity,
+			int logeventid, int lastlogsize, int mtime)
 {
 	ZBX_DC_HISTORY	*history;
 	size_t		len1, len2;
@@ -2594,6 +2594,52 @@ void	DCadd_history_log(zbx_uint64_t itemid, char *value_orig, int clock, int tim
 	cache->stats.history_log_counter++;
 
 	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dc_add_history                                                   *
+ *                                                                            *
+ * Purpose: add new value to the cache                                        *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, AGENT_RESULT *value, int now,
+		int timestamp, char *source, int severity, int logeventid, int lastlogsize, int mtime)
+{
+	switch (value_type)
+	{
+		case ITEM_VALUE_TYPE_FLOAT:
+			if (GET_DBL_RESULT(value))
+				DCadd_history(itemid, value->dbl, now);
+			break;
+		case ITEM_VALUE_TYPE_STR:
+			if (GET_STR_RESULT(value))
+				DCadd_history_str(itemid, value->str, now);
+			break;
+		case ITEM_VALUE_TYPE_LOG:
+			if (GET_STR_RESULT(value))
+				DCadd_history_log(itemid, value->str, now, timestamp, source, severity,
+						logeventid, lastlogsize, mtime);
+			break;
+		case ITEM_VALUE_TYPE_UINT64:
+			if (GET_UI64_RESULT(value))
+				DCadd_history_uint(itemid, value->ui64, now);
+			break;
+		case ITEM_VALUE_TYPE_TEXT:
+			if (GET_TEXT_RESULT(value))
+				DCadd_history_text(itemid, value->text, now);
+			break;
+		default:
+			zabbix_log(LOG_LEVEL_ERR, "Unknown value type [%d] for itemid [" ZBX_FS_UI64 "]",
+				value_type,
+				itemid);
+	}
 }
 
 /******************************************************************************

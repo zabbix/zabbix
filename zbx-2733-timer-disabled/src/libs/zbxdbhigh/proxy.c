@@ -25,7 +25,6 @@
 
 #include "proxy.h"
 #include "dbcache.h"
-#include "zbxserver.h"
 #include "discovery.h"
 
 #define ZBX_HISTORY_FIELD struct history_field_t
