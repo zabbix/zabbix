@@ -157,6 +157,7 @@ class CGraphDraw{
 					$css = $USER_DETAILS['theme'];
 				}
 			}
+			if($css == 'css_od.css') $css = 'css_bb.css';
 
 			$sql_where = ' AND gt.theme='.zbx_dbstr($css);
 		}

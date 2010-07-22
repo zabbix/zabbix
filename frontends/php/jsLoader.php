@@ -24,11 +24,14 @@ $availableJScripts = array(
 	'gtlc.js' => '',
 	'functions.js' => '',
 	'main.js' => '',
+	'dom.js' => '',
+	'class.bbcode.js' => '',
 	'class.calendar.js' => '',
 	'class.cdate.js' => '',
 	'class.cdebug.js' => '',
 	'class.cmap.js' => '',
-	'class.cookie.js' => '',
+	'class.cmessages.js' => '',
+	'class.cookie.js' => '', 
 	'class.cscreen.js' => '',
 	'class.csuggest.js' => '',
 	'class.cswitcher.js' => '',
@@ -66,29 +69,27 @@ $tranStrings = array(
 		'S_DELETE_SELECTED_ELEMENTS_Q', 'S_PLEASE_SELECT_TWO_ELEMENTS','S_LINK','S_NO_LINKS', 'S_NEW_ELEMENT',
 		'S_SELECT','S_SET_TRIGGER'
 	),
+	'class.cmessages.js' => array('S_MUTE','S_UNMUTE','S_MESSAGES','S_CLEAR','S_SNOOZE','S_MOVE'
+	),
 	'class.cookie.js' => array('S_MAX_COOKIE_SIZE_REACHED'
 	)
 );
 
 if(empty($_GET['files'])){
-	$files = array('prototype.js', 'common.js', 'class.cdebug.js', 'class.cookie.js', 'class.rpc.js', 'class.curl.js', 'class.csuggest.js', 'class.cdate.js', 'main.js', 'functions.js');
+	$files = array('prototype.js', 'effects.js', 'dragdrop.js', 'common.js', 'dom.js', 'class.cdebug.js', 'class.cdate.js', 'class.cookie.js', 'class.curl.js', 'class.rpc.js', 'class.bbcode.js', 'class.csuggest.js', 'class.cmessages.js', 'main.js', 'functions.js');
 }
 else{
 	$files = $_GET['files'];
 }
 
 
-$js = '';
+$js = 'if(typeof(locale) == "undefined") var locale = {};'."\n";
 foreach($files as $file){
 	if(isset($tranStrings[$file])){
 		foreach($tranStrings[$file] as $str){
-			$js .= '"'.$str.'":"'.$translations[$str].'",';
+			$js .= "locale['".$str."'] = '".$translations[$str]."';";
 		}
 	}
-}
-if(!empty($js)){
-	$js = rtrim($js, ',');
-	$js = 'var locale = {'. $js .'};'."\n";
 }
 
 foreach($files as $file){

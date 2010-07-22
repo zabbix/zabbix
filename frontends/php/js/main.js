@@ -360,6 +360,213 @@ submitGo: function(e){
 }
 }
 
+/************************************************************************************/
+/*								Audio Control System 								*/
+/************************************************************************************/
+var AudioList = {
+list:		{},		// audio files options
+dom:		{},		// dom objects links
+standart:	{
+	'embed':{
+		'enablejavascript':	'true',
+		'autostart':		'false',
+		'loop':				0
+	},
+	'audio':{
+		'autobuffer':	'autobuffer',
+		'autoplay':		null,
+		'controls':		null
+	}
+},
+
+play: function(audiofile){
+	if(!this.create(audiofile)) return false;
+
+	if(IE){
+		try{ 
+			this.dom[audiofile].Play();
+		}
+		catch(e){
+			setTimeout(this.play.bind(this, audiofile), 500);
+		}
+	}
+	else this.dom[audiofile].play();
+},
+
+pause: function(audiofile){
+	if(!this.create(audiofile)) return false;
+
+	if(IE){
+		try{
+			this.dom[audiofile].Stop();
+		}
+		catch(e){ 
+			setTimeout(this.pause.bind(this, audiofile), 1000);
+		}
+	}
+	else this.dom[audiofile].pause();
+},
+
+stop: function(audiofile){
+	if(!this.create(audiofile)) return false;
+
+	if(IE) this.dom[audiofile].setAttribute('loop', '0');
+	else this.dom[audiofile].removeAttribute('loop');
+
+	if(!IE){
+		try{
+			if(!this.dom[audiofile].paused){
+				this.dom[audiofile].currentTime = 0;
+			}
+			else if(this.dom[audiofile].currentTime > 0){
+				this.dom[audiofile].play();
+				this.dom[audiofile].currentTime = 0;
+				this.dom[audiofile].pause();
+			}
+		}
+		catch(e){
+//			this.remove(audiofile);
+		}
+	}
+
+	if(!is_null(this.list[audiofile].timeout)){
+		clearTimeout(this.list[audiofile].timeout);
+		this.list[audiofile].timeout = null;
+	}
+	
+	this.pause(audiofile);
+	this.endLoop(audiofile);
+},
+
+stopAll: function(e){
+
+	for(var name in this.list){
+		if(empty(this.dom[name])) continue;
+
+		this.stop(name);
+	}
+},
+
+
+volume: function(audiofile, vol){
+	if(!this.create(audiofile)) return false;
+},
+
+loop: function(audiofile, params){
+	if(!this.create(audiofile)) return false;
+
+	if(isset('repeat', params)){
+		if(IE) this.play(audiofile);
+		else{
+			if(this.list[audiofile].loop == 0){
+				if(params.repeat != 0) this.startLoop(audiofile, params.repeat);
+				else this.endLoop(audiofile);
+			}
+
+			if(this.list[audiofile].loop != 0){
+				this.list[audiofile].loop--;
+				this.play(audiofile);
+			}
+		}
+	}
+	else if(isset('seconds', params)){
+		if(IE){
+			this.dom[audiofile].setAttribute('loop', '1');
+		}
+		else{
+			this.startLoop(audiofile, 9999999);
+			this.list[audiofile].loop--;
+		}
+
+		this.play(audiofile);
+		this.list[audiofile].timeout = setTimeout(AudioList.stop.bind(AudioList,audiofile), 1000 * parseInt(params.seconds, 10));
+	}
+},
+
+startLoop: function(audiofile, loop){
+	if(!isset(audiofile, this.list)) return false;
+
+	if(isset('onEnded', this.list[audiofile])) this.endLoop(audiofile);
+
+	this.list[audiofile].loop = parseInt(loop, 10);
+	this.list[audiofile].onEnded = this.loop.bind(this, audiofile, {'repeat': 0});
+	addListener(this.dom[audiofile], 'ended', this.list[audiofile].onEnded);
+},
+
+endLoop: function(audiofile){
+	if(!isset(audiofile, this.list)) return true;
+
+	this.list[audiofile].loop = 0;
+
+	if(isset('onEnded', this.list[audiofile])){
+		removeListener(this.dom[audiofile], 'ended', this.list[audiofile].onEnded);
+		this.list[audiofile].onEnded = null;
+		delete(this.list[audiofile].onEnded);
+	}
+},
+
+create: function(audiofile, params){
+	if(typeof(audiofile) == 'undefined') return false;
+	if(isset(audiofile, this.list)) return true;
+
+	if(typeof(params) == 'undefined') params = {};
+
+	if(!isset('audioList', this.dom)){
+		this.dom.audioList = document.createElement('div');
+		document.getElementsByTagName('body')[0].appendChild(this.dom.audioList);
+
+		this.dom.audioList.setAttribute('id','audiolist');
+		this.dom.audioList.style.border = '1px solid #000000';
+	}
+
+	if(IE){
+		this.dom[audiofile] = document.createElement('embed');
+		this.dom.audioList.appendChild(this.dom[audiofile]);
+
+		this.dom[audiofile].setAttribute('name', audiofile);
+		this.dom[audiofile].setAttribute('src', 'audio/'+audiofile);
+		this.dom[audiofile].style.display = 'none';
+
+		for(var key in this.standart.embed){
+			if(isset(key, params))
+				this.dom[audiofile].setAttribute(key, params[key]);
+			else if(!is_null(this.standart.embed[key]))
+				this.dom[audiofile].setAttribute(key, this.standart.embed[key]);
+		}
+	}
+	else{
+		this.dom[audiofile] = document.createElement('audio');
+		this.dom.audioList.appendChild(this.dom[audiofile]);
+
+		this.dom[audiofile].setAttribute('id', audiofile);
+		this.dom[audiofile].setAttribute('src', 'audio/'+audiofile);
+
+		for(var key in this.standart.audio){
+			if(isset(key, params))
+				this.dom[audiofile].setAttribute(key, params[key]);
+			else if(!is_null(this.standart.audio[key]))
+				this.dom[audiofile].setAttribute(key, this.standart.audio[key]);
+		}
+
+		this.dom[audiofile].load();
+	}
+
+	this.list[audiofile] = params;
+	this.list[audiofile].loop = 0;
+	this.list[audiofile].timeout = null;
+
+return true;
+},
+
+remove: function(audiofile){
+	if(!isset(audiofile, this.dom)) return true;
+
+	$(this.dom[audiofile]).remove();
+
+	delete(this.dom[audiofile]);
+	delete(this.list[audiofile]);
+}
+}
 
 /************************************************************************************/
 /*						Replace Standart Blink functionality						*/
@@ -582,7 +789,7 @@ show: function(e, obj, hintbox){
 	hintbox.style.zIndex = '999';
 	
 // IE6 z-index bug
-	//showPopupDiv(hintid, 'frame_'+hintid);
+	//if(IE6) showPopupDiv(hintid, 'frame_'+hintid);
 	
 },
 
@@ -801,7 +1008,7 @@ function send_params(params){
 						'parameters':params,
 						'onSuccess': function(resp){ },
 //						'onSuccess': function(resp){ SDI(resp.responseText); },
-						'onFailure': function(){ document.location = url.getPath()+'?'+Object.toQueryString(params); }
+						'onFailure': function(){document.location = url.getPath()+'?'+Object.toQueryString(params);}
 					}
 	);
 }

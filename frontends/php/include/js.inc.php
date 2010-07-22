@@ -291,7 +291,7 @@ function insert_javascript_for_visibilitybox(){
 }
 
 function play_sound($filename){
-	insert_js('	if (IE){
+	insert_js('	if(IE){
 			document.writeln(\'<bgsound src="'.$filename.'" loop="0" />\');
 		}
 		else{

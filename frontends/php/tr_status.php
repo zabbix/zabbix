@@ -37,47 +37,6 @@
 ?>
 <?php
 if($page['type'] == PAGE_TYPE_HTML){
-	$tr_hash = calc_trigger_hash();
-
-	$triggers_hash = get_cookie('zbx_triggers_hash', '0,0');
-
-	$new = explode(',', $tr_hash);
-	$old = explode(',', $triggers_hash);
-
-	zbx_set_post_cookie('zbx_triggers_hash', $tr_hash, time()+1800);
-
-	$triggers_hash = get_cookie('zbx_triggers_hash', '0,0');
-
-	$new = explode(',', $tr_hash);
-	$old = explode(',', $triggers_hash);
-
-	if( $old[1] != $new[1] ){
-		if( $new[0] < $old[0] )	// Number of trigger decreased
-			$status = 'off';
-		else			// Number of trigger increased
-			$status = 'on';
-
-		$files_apdx = array(
-			5 => 'disaster',
-			4 => 'high',
-			3 => 'average',
-			2 => 'warning',
-			1 => 'information',
-			0 => 'not_classified');
-
-		$prior_dif = $new[0] - $old[0];
-
-		krsort($files_apdx);
-		foreach($files_apdx as $priority => $apdx){
-			if(round($prior_dif / pow(100, $priority)) != 0){
-				$audio = 'audio/trigger_'.$status.'_'.$apdx.'.wav';
-				break;
-			}
-		}
-
-		if(!isset($audio) || !file_exists($audio))
-			$audio = 'audio/trigger_'.$status.'.wav';
-	}
 	define('ZBX_PAGE_DO_REFRESH', 1);
 }
 

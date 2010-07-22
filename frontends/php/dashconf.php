@@ -207,34 +207,21 @@ include_once('include/page_header.php');
 	$severity = zbx_toHash($severity);
 	$trgSeverities = array();
 
-	$cb = new CCheckBox('trgSeverity[' . TRIGGER_SEVERITY_NOT_CLASSIFIED . ']', isset($severity[TRIGGER_SEVERITY_NOT_CLASSIFIED]), '', 1);
-	$cb->setEnabled($filterEnable);
-	$trgSeverities[] = array($cb, S_NOT_CLASSIFIED);
-	$trgSeverities[] = BR();
-
-	$cb = new CCheckBox('trgSeverity[' . TRIGGER_SEVERITY_INFORMATION . ']', isset($severity[TRIGGER_SEVERITY_INFORMATION]), '', 1);
-	$cb->setEnabled($filterEnable);
-	$trgSeverities[] = array($cb, S_INFORMATION);
-	$trgSeverities[] = BR();
-
-	$cb = new CCheckBox('trgSeverity[' . TRIGGER_SEVERITY_WARNING . ']', isset($severity[TRIGGER_SEVERITY_WARNING]), '', 1);
-	$cb->setEnabled($filterEnable);
-	$trgSeverities[] = array($cb, S_WARNING);
-	$trgSeverities[] = BR();
-
-	$cb = new CCheckBox('trgSeverity[' . TRIGGER_SEVERITY_AVERAGE . ']', isset($severity[TRIGGER_SEVERITY_AVERAGE]), '', 1);
-	$cb->setEnabled($filterEnable);
-	$trgSeverities[] = array($cb, S_AVERAGE);
-	$trgSeverities[] = BR();
-
-	$cb = new CCheckBox('trgSeverity[' . TRIGGER_SEVERITY_HIGH . ']', isset($severity[TRIGGER_SEVERITY_HIGH]), '', 1);
-	$cb->setEnabled($filterEnable);
-	$trgSeverities[] = array($cb, S_HIGH);
-	$trgSeverities[] = BR();
-
-	$cb = new CCheckBox('trgSeverity[' . TRIGGER_SEVERITY_DISASTER . ']', isset($severity[TRIGGER_SEVERITY_DISASTER]), '', 1);
-	$cb->setEnabled($filterEnable);
-	$trgSeverities[] = array($cb, S_DISASTER);
+	$severities = array(
+		TRIGGER_SEVERITY_NOT_CLASSIFIED,
+		TRIGGER_SEVERITY_INFORMATION,
+		TRIGGER_SEVERITY_WARNING,
+		TRIGGER_SEVERITY_AVERAGE,
+		TRIGGER_SEVERITY_HIGH,
+		TRIGGER_SEVERITY_DISASTER
+	);
+	foreach($severities as $snum => $sever){
+		$cb = new CCheckBox('trgSeverity[' . $sever . ']', isset($severity[$sever]), '', 1);
+		$cb->setEnabled($filterEnable);
+		$trgSeverities[] = array($cb, getSeverityCaption($sever));
+		$trgSeverities[] = BR();
+	}
+	array_pop($trgSeverities);
 
 	$dashForm->addRow(S_TRIGGERS_WITH_SEVERITY, $trgSeverities);
 
