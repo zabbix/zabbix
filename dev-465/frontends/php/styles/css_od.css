@@ -52,8 +52,8 @@ a:active 	{	color:#FF8800;  }
 a.highlight 		{ 	font-size:10px; font-weight: bold; }
 a.highlight:link 	{ 	color: #DFDFDF; text-decoration: none;	}
 a.highlight:visited {	color: #DFDFDF; text-decoration: none;	}
-a.highlight:hover	{	color: #FF8800; }
-a.highlight:active	{	color: #FF8800; }
+a.highlight:hover	{	color: #FF5500; }
+a.highlight:active	{	color: #FF5500; }
 
 a.footer			{	color:#CCCCCC; }
 
