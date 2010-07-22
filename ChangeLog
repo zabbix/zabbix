@@ -6,9 +6,10 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2733] fixed the timer process so that it does not recalculate extraneous triggers for an item (asaveljevs)
  - [ZBX-2729] improved host-group and host filter selection (Aly)
  - [DEV-465] added messaging system (Aly)
- - [ZBX-2697] forbid creation of maintenance without hosts\groups (Vedmak)
+ - [ZBX-2697] forbid creation of maintenance without hosts/groups (Vedmak)
  - [ZBX-2711] added links to host profile in dashboard "last 20 issues" host menu (Vedmak)
  - [ZBX-2719] fixed events delay for one minute in frontend (Vedmak)
  - [ZBX-2720] in actions conditions trigger host is now displayed (Vedmak)
