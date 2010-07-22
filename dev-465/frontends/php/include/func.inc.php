@@ -460,9 +460,8 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 	$blackList = array('%','ms','rpm');
 
 	if(in_array(strtolower($units), $blackList) || (zbx_empty($units) && (($convert == ITEM_CONVERT_WITH_UNITS) || ($value < 1)))){
-		$value = round($value, 2);
-		$value = sprintf('%.4f', $value);
-		
+		if(abs($value) >= 1) $value = round($value, 2);
+		$value = sprintf('%.6f', $value);
 
 		$value = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U','$1$2$3', $value);
 		$value = rtrim($value, '.');
