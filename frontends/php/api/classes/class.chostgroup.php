@@ -597,7 +597,6 @@ COpt::memoryPick();
 				self::exception(ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can create HostGroups');
 			}
 
-			$groupids = array();
 			foreach($groups as $num => $group){
 				if(!is_array($group) || !isset($group['name']) || empty($group['name'])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, 'Empty input parameter [ name ]');
@@ -608,7 +607,7 @@ COpt::memoryPick();
 
 				$insert[] = $group;
 			}
-			$groupids[] = DB::insert('groups', $insert);
+			$groupids = DB::insert('groups', $insert);
 
 			self::EndTransaction(true, __METHOD__);
 			return array('groupids' => $groupids);
