@@ -496,14 +496,6 @@ src/zabbix_server/trapper/proxydiscovery.c -text
 src/zabbix_server/trapper/proxydiscovery.h -text
 src/zabbix_server/trapper/proxyhosts.c -text
 src/zabbix_server/trapper/proxyhosts.h -text
-test/env/standalone/conf/template_agent.conf -text
-test/env/standalone/conf/template_proxy.conf -text
-test/env/standalone/conf/template_server.conf -text
-test/env/standalone/create_test.sh -text
-test/env/standalone/data.sender -text
-test/env/standalone/data.sql -text
-test/env/standalone/dump_db.sh -text
-test/env/standalone/sender.sh -text
 upgrades/dbpatches/1.6/mysql/patch/actions.sql -text
 upgrades/dbpatches/1.6/mysql/patch/alerts.sql -text
 upgrades/dbpatches/1.6/mysql/patch/config.sql -text
