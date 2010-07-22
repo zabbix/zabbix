@@ -387,7 +387,7 @@
 				' WHERE hostid='.$item['hostid'].
 					' AND key_='.zbx_dbstr($item['key_']);
 		$db_item = DBfetch(DBselect($sql));
-		if($db_item && (($item['templateid'] == 0) || ($item['templateid'] != $db_item['templateid']))){
+		if($db_item && (($item['templateid'] == 0) || (($db_item['templateid'] != 0) && ($item['templateid'] != 0) && ($item['templateid'] != $db_item['templateid'])))){
 			error(S_AN_ITEM_WITH_THE_KEY.SPACE.'['.$item['key_'].']'.SPACE.S_ALREADY_EXISTS_FOR_HOST_SMALL.SPACE.'['.$host['host'].'].'.SPACE.S_THE_KEY_MUST_BE_UNIQUE);
 			return FALSE;
 		}
