@@ -2673,7 +2673,7 @@
 			$cmbAction->addItem('update in group',S_UPDATE_IN_GROUP);
 			$cmbAction->addItem('delete FROM group',S_DELETE_FROM_GROUP);
 		}
-		$frmItem->addItemToBottomRow(array($cmbAction, SPACE, new CButton('register',S_DO_SMALL)));
+		$frmItem->addItemToBottomRow(array($cmbAction, SPACE, new CButton('register',S_DO)));
 
 		$json = new CJSON();
 
