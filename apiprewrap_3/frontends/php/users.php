@@ -111,9 +111,9 @@ include_once('include/page_header.php');
 		}
 	}
 	else if(isset($_REQUEST['save'])){
-		$config = select_config();		
+		$config = select_config();
 		$auth_type = isset($_REQUEST['userid']) ? get_user_system_auth($_REQUEST['userid']) : $config['authentication_type'];
-		
+
 		if(isset($_REQUEST['userid']) && (ZBX_AUTH_INTERNAL != $auth_type)){
 			$_REQUEST['password1'] = $_REQUEST['password2'] = null;
 		}
@@ -124,7 +124,7 @@ include_once('include/page_header.php');
 			$_REQUEST['password1'] = get_request('password1', null);
 			$_REQUEST['password2'] = get_request('password2', null);
 		}
-		
+
 		if($_REQUEST['password1'] != $_REQUEST['password2']){
 			if(isset($_REQUEST['userid']))
 				show_error_message(S_CANNOT_UPDATE_USER_BOTH_PASSWORDS);
@@ -213,16 +213,9 @@ include_once('include/page_header.php');
 
 	}
 	else if(isset($_REQUEST['delete'])&&isset($_REQUEST['userid'])){
-		$users = CUser::get(array('userids' => $_REQUEST['userid'],  'extendoutput' => 1));
-		$user = reset($users);
-
-		$result = CUser::delete($users);
-		if(!$result) error(CUser::resetErrors());
-
+		$result = CUser::delete($_REQUEST['userid']);
 		show_messages($result, S_USER_DELETED, S_CANNOT_DELETE_USER);
 		if($result){
-			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_USER,'User alias ['.$user['alias'].'] name ['.$user['name'].'] surname ['.$user['surname'].']');
-
 			unset($_REQUEST['userid']);
 			unset($_REQUEST['form']);
 		}
@@ -297,28 +290,8 @@ include_once('include/page_header.php');
 		show_messages($go_result, S_USERS_UNBLOCKED,S_CANNOT_UNBLOCK_USERS);
 	}
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_userid'])){
-		$go_result = false;
-
-		$group_userid = get_request('group_userid', array());
-		$db_users = CUser::get(array('userids' => $group_userid, 'extendoutput' => 1));
-		$db_users = zbx_toHash($db_users, 'userid');
-
-		DBstart();
-		foreach($group_userid as $ugnum => $userid){
-			if(!isset($db_users[$userid])) continue;
-			$user_data = $db_users[$userid];
-
-			$go_result |= (bool) CUser::delete($user_data);
-			if(!$go_result) error(CUser::resetErrors());
-
-			if($go_result){
-				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_USER,
-					'User alias ['.$user_data['alias'].'] name ['.$user_data['name'].'] surname ['.
-					$user_data['surname'].']');
-			}
-		}
-
-		$go_result = DBend($go_result);
+		$group_userids = get_request('group_userid', array());
+		$go_result = CUser::delete($group_userids);
 		show_messages($go_result, S_USER_DELETED,S_CANNOT_DELETE_USER);
 	}
 
@@ -516,7 +489,7 @@ include_once('include/page_header.php');
 
 		$user_wdgt->addItem($form);
 	}
-	
+
 	$user_wdgt->show();
 
 

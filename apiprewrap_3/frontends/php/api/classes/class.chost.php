@@ -693,7 +693,7 @@ class CHost extends CZBXAPI{
 
 						$result[$host['hostid']]['maintenances'][] = array('maintenanceid' => $host['maintenanceid']);
 						unset($host['maintenanceid']);
-					}				
+					}
 //---
 
 					$result[$host['hostid']] += $host;
