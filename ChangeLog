@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2731] fixed permissions problem with hostgroup names containing '[]' (VEedmak)
  - [ZBX-2733] fixed the timer process so that it does not recalculate extraneous triggers for an item (asaveljevs)
  - [ZBX-2729] improved host-group and host filter selection (Aly)
  - [DEV-465] added messaging system (Aly)
