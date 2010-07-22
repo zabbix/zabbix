@@ -417,7 +417,11 @@ include_once('include/page_header.php');
 	$pageFilter = new CPageFilter($options);
 	$_REQUEST['groupid'] = $pageFilter->groupid;
 	$_REQUEST['hostid'] = $pageFilter->hostid;
-	$_REQUEST['triggerid'] = $pageFilter->triggerid;
+
+	if($pageFilter->triggerid > 0){
+		$_REQUEST['triggerid'] = $pageFilter->triggerid;
+	}
+
 ?>
 <?php
 	$triggers_wdgt = new CWidget();

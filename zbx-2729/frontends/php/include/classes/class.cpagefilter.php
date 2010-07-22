@@ -137,13 +137,15 @@ options = array(
 				$this->_profileIds['groupid'] = CProfile::get(self::GROUP_LATEST_IDX);
 				$this->_profileIds['hostid'] = CProfile::get(self::HOST_LATEST_IDX);
 				$this->_profileIds['graphid'] = CProfile::get(self::GRAPH_LATEST_IDX);
-				$this->_profileIds['triggerid'] = CProfile::get(self::TRIGGER_LATEST_IDX);
+//				$this->_profileIds['triggerid'] = CProfile::get(self::TRIGGER_LATEST_IDX);
+				$this->_profileIds['triggerid'] = null;
 			}
 			else{
 				$this->_profileIds['groupid'] = CProfile::get($this->_profileIdx['groups']);
 				$this->_profileIds['hostid'] = CProfile::get($this->_profileIdx['hosts']);
 				$this->_profileIds['graphid'] = CProfile::get($this->_profileIdx['graphs']);
-				$this->_profileIds['triggerid'] = CProfile::get($this->_profileIdx['triggers']);
+//				$this->_profileIds['triggerid'] = CProfile::get($this->_profileIdx['triggers']);
+				$this->_profileIds['triggerid'] = null;
 			}
 		}
 
@@ -399,8 +401,8 @@ options = array(
 		}
 
 		if(!is_null($this->_requestIds['triggerid'])){
-			CProfile::update($this->_profileIdx['triggers'], $triggerid, PROFILE_TYPE_ID);
-			CProfile::update(self::TRIGGER_LATEST_IDX, $triggerid, PROFILE_TYPE_ID);
+//			CProfile::update($this->_profileIdx['triggers'], $triggerid, PROFILE_TYPE_ID);
+//			CProfile::update(self::TRIGGER_LATEST_IDX, $triggerid, PROFILE_TYPE_ID);
 		}
 
 		$this->isSelected['triggersSelected'] = $triggerid > 0;
