@@ -913,6 +913,7 @@ include_once('include/page_header.php');
 		$combo_theme = new CComboBox('default_theme',$config['default_theme']);
 		$combo_theme->addItem('css_ob.css',S_ORIGINAL_BLUE);
 		$combo_theme->addItem('css_bb.css',S_BLACK_AND_BLUE);
+		$combo_theme->addItem('css_od.css',S_DARK_ORANGE);
 
 		$exp_select = new CComboBox('event_ack_enable');
 		$exp_select->addItem(EVENT_ACK_ENABLED,S_ENABLED,$config['event_ack_enable']?'yes':'no');

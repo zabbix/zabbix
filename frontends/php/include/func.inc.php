@@ -456,20 +456,13 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 
 // Any other unit
 //-------------------
-
-// black list wich do not require units metrics.. 
+// black list wich do not require units metrics..
 	$blackList = array('%','ms','rpm');
-	if((in_array($units, $blackList)) || (zbx_empty($units) && ($convert == ITEM_CONVERT_WITH_UNITS))){
-//	if(zbx_empty($units) && ($convert == ITEM_CONVERT_WITH_UNITS)){
-		if(abs($value) >= 1)
-			$format = '%.2f';
-		else if(abs($value) >= 0.01)
-			$format = '%.4f';
-		else
-			$format = '%.6f';
 
+	if(in_array(strtolower($units), $blackList) || (zbx_empty($units) && (($convert == ITEM_CONVERT_WITH_UNITS) || ($value < 1)))){
+		if(abs($value) >= 1) $value = round($value, 2);
+		$value = sprintf('%.6f', $value);
 
-		$value = sprintf($format,$value);
 		$value = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U','$1$2$3', $value);
 		$value = rtrim($value, '.');
 
@@ -512,7 +505,6 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 
 		foreach($digitUnits[$step] as $dunit => $data){
 // skip mili & micro for values without units
-			if(zbx_empty($units) && ($data['pow'] < 0)) continue;
 			$digitUnits[$step][$dunit]['value'] = bcpow($step, $data['pow'], 9);
 		}
 	}
@@ -1086,10 +1078,7 @@ function zbx_str2links($text){
 }
 
 function zbx_subarray_push(&$mainArray, $sIndex, $element) {
-	if(!isset($mainArray[$sIndex])) $mainArray[$sIndex] = Array();
-	
-	if(!is_array($mainArray[$sIndex])) $mainArray[$sIndex]= Array($mainArray[$sIndex]);
-	
+	if(!isset($mainArray[$sIndex])) $mainArray[$sIndex] = array();
 	$mainArray[$sIndex][] = $element;
 }
 /************* END ZBX MISC *************/
