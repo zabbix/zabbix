@@ -74,6 +74,7 @@ class CApplication extends CZBXAPI{
 			'editable'				=> null,
 			'inherited' 			=> null,
 			'nopermissions'			=> null,
+			'monitored'				=> null,
 // Filter
 			'filter'				=> null,
 			'pattern'				=> '',
@@ -214,6 +215,18 @@ class CApplication extends CZBXAPI{
 			}
 		}
 
+// monitored
+		if(!is_null($options['monitored'])){
+			$sql_parts['from']['hosts'] = 'hosts h';
+			$sql_parts['where']['ah'] = 'a.hostid=h.hostid';
+			if($options['monitored']){
+				$sql_parts['where'][] = 'h.status='.HOST_STATUS_MONITORED;
+			}
+			else{
+				$sql_parts['where'][] = 'h.status='.HOST_STATUS_NOT_MONITORED;
+			}
+		}
+
 // extendoutput
 		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['apps'] = 'a.*';
@@ -321,11 +334,11 @@ class CApplication extends CZBXAPI{
 					}
 
 // hostids
-					if(isset($application['hostid']) && is_null($options['select_hosts'])){
+					if(isset($application['hid']) && is_null($options['select_hosts'])){
 						if(!isset($result[$application['applicationid']]['hosts']))
 							$result[$application['applicationid']]['hosts'] = array();
 
-						$result[$application['applicationid']]['hosts'][] = array('hostid' => $application['hostid']);
+						$result[$application['applicationid']]['hosts'][] = array('hostid' => $application['hid']);
 						unset($application['hostid']);
 					}
 

@@ -85,6 +85,7 @@ class CItem extends CZBXAPI{
 			'monitored'				=> null,
 			'editable'				=> null,
 			'nopermissions'			=> null,
+			'withData'				=> null,
 // filter
 			'filter'				=> null,
 
@@ -293,6 +294,15 @@ class CItem extends CZBXAPI{
 			}
 			else{
 				$sql_parts['where'][] = '(h.status<>'.HOST_STATUS_MONITORED.' OR i.status<>'.ITEM_STATUS_ACTIVE.')';
+			}
+		}
+// withData
+		if(!is_null($options['withData'])){
+			if($options['withData']){
+				$sql_parts['where'][] = 'i.lastvalue IS NOT NULL';
+			}
+			else{
+				$sql_parts['where'][] = 'i.lastvalue IS NULL';
 			}
 		}
 

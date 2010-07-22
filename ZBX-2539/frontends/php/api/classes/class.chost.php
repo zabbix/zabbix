@@ -363,7 +363,7 @@ class CHost extends CZBXAPI{
 		if(!is_null($options['maintenanceids'])){
 			zbx_value2array($options['maintenanceids']);
 			if($options['output'] != API_OUTPUT_SHORTEN){
-				$sql_parts['select']['maintenanceid'] = 'mh.maintenanceid';
+				$sql_parts['select']['maintenanceid'] = 'mh.maintenanceid as mid';
 			}
 
 			$sql_parts['from']['maintenances_hosts'] = 'maintenances_hosts mh';
@@ -687,13 +687,13 @@ class CHost extends CZBXAPI{
 						unset($host['dserviceid']);
 					}
 // maintenanceids
-					if(isset($host['maintenanceid'])){
+					if(isset($host['mid'])){
 						if(!isset($result[$host['hostid']]['maintenanceid']))
 							$result[$host['hostid']]['maintenances'] = array();
 
-						$result[$host['hostid']]['maintenances'][] = array('maintenanceid' => $host['maintenanceid']);
+						$result[$host['hostid']]['maintenances'][] = array('maintenanceid' => $host['mid']);
 						unset($host['maintenanceid']);
-					}				
+					}
 //---
 
 					$result[$host['hostid']] += $host;
