@@ -744,7 +744,6 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 
 // ACTION OPERATIONS FORM {{{
 		$tblOper = new CTableInfo(S_NO_OPERATIONS_DEFINED);
-		$tblOper->setAttribute('style','background-color: #AAA;');
 
 		$operations	= get_request('operations',array());
 		if(isset($_REQUEST['actionid']) && !isset($_REQUEST['form_refresh'])){

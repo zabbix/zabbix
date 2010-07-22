@@ -304,62 +304,6 @@ div.zabbix_logo{
 	background-repeat: no-repeat;
 }
 
-div.iconminus{
-	background-image: url('../images/general/bttn/minus_bb.png');
-}
-
-div.iconplus{
-	background-image: url('../images/general/bttn/plus_bb.png');
-}
-
-div.iconmenu{
-	background-image: url('../images/general/bttn/menu_bb.png');
-}
-
-div.arrowup{
-	background-image: url('../images/general/bttn/arrowup_bb.png');
-}
-
-div.arrowdown{
-	background-image: url('../images/general/bttn/arrowdown_bb.png');
-}
-
-div.arrowleft{
-	background-image: url('../images/general/bttn/arrowleft_bb.png');
-}
-
-div.arrowright{
-	background-image: url('../images/general/bttn/arrowright_bb.png');
-}
-
-div.fullscreen{
-	background-image: url('../images/general/bttn/fullscreen_bb.png');
-}
-
-div.iconhelp{
-	background-image: url('../images/general/bttn/help_bb.png');
-}
-
-div.iconconfig{
-	background-image: url('../images/general/bttn/config_bb.png');
-}
-
-div.iconconfig_hl{
-	background-image: url('../images/general/bttn/config_hl_bb.png');
-}
-
-div.iconsound{
-	background-image: url('../images/general/bttn/sound_bb.png');
-}
-
-div.iconmute{
-	background-image: url('../images/general/bttn/mute_bb.png');
-}
-
-div.iconreset{
-	background-image: url('../images/general/bttn/reset_bb.png');
-}
-
 div.iconok{
 	background-image: url('../images/general/ok_icon_bb.png');
 }
@@ -386,6 +330,10 @@ div.icon_sortup{
 
 div.icon_sortdown{
 	background-image: url('../images/general/sort_down_bb.png');
+}
+
+div.messagecontainer{
+	background-color: #8c8a8b;
 }
 
 div#scrolltableft{
