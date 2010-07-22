@@ -161,7 +161,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 
 		if(isset($_REQUEST['actionid'])){
 			$action['actionid']= $_REQUEST['actionid'];
-			
+
 			$result = CAction::update($action);
 			show_messages($result,S_ACTION_UPDATED,S_CANNOT_UPDATE_ACTION);
 		}

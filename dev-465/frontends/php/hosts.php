@@ -317,17 +317,9 @@ include_once('include/page_header.php');
 	else if(isset($_REQUEST['go']) && ($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['masssave'])){
 		$hostids = get_request('hosts', array());
 		$visible = get_request('visible', array());
-		$_REQUEST['groups'] = get_request('groups', array());
 		$_REQUEST['newgroup'] = get_request('newgroup', '');
 		$_REQUEST['proxy_hostid'] = get_request('proxy_hostid', 0);
 		$_REQUEST['templates'] = get_request('templates', array());
-
-		if(count($_REQUEST['groups']) > 0){
-			$accessible_groups = get_accessible_groups_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY);
-			foreach($_REQUEST['groups'] as $gid){
-				if(!isset($accessible_groups[$gid])) access_deny();
-			}
-		}
 
 		try{
 			DBstart();
@@ -371,7 +363,11 @@ include_once('include/page_header.php');
 			}
 
 			if(isset($visible['groups'])){
-				$hosts['groups'] = zbx_toObject($_REQUEST['groups'], 'groupid');
+				$hosts['groups'] = CHostGroup::get(array(
+					'groupids' => get_request('groups', array()),
+					'editable' => 1,
+					'output' => API_OUTPUT_SHORTEN,
+				));
 				if(!empty($newgroup)){
 					$hosts['groups'][] = $newgroup;
 				}
@@ -853,7 +849,7 @@ include_once('include/page_header.php');
 
 					if(!empty($templates[$template['templateid']]['parentTemplates'])){
 						order_result($templates[$template['templateid']]['parentTemplates'], 'host');
-						
+
 						$caption[] = ' (';
 						foreach($templates[$template['templateid']]['parentTemplates'] as $tnum => $tpl){
 							$caption[] = new CLink($tpl['host'],'templates.php?form=update&templateid='.$tpl['templateid'], 'unknown');
