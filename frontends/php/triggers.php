@@ -409,56 +409,22 @@ include_once('include/page_header.php');
 
 ?>
 <?php
-	if(isset($_REQUEST['hostid']) && !isset($_REQUEST['groupid']) && !isset($_REQUEST['triggerid'])){
-		$sql = 'SELECT DISTINCT hg.groupid '.
-				' FROM hosts_groups hg '.
-				' WHERE hg.hostid='.$_REQUEST['hostid'];
-		if($group=DBfetch(DBselect($sql, 1))){
-			$_REQUEST['groupid'] = $group['groupid'];
-		}
-	}
 
-	if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0)){
-		$sql_from = '';
-		$sql_where = '';
-		if(isset($_REQUEST['groupid']) && ($_REQUEST['groupid'] > 0)){
-			$sql_where.= ' AND hg.groupid='.$_REQUEST['groupid'];
-		}
-
-		if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid'] > 0)){
-			$sql_where.= ' AND hg.hostid='.$_REQUEST['hostid'];
-		}
-
-		$sql = 'SELECT DISTINCT hg.groupid, hg.hostid '.
-				' FROM hosts_groups hg '.
-				' WHERE EXISTS( SELECT i.itemid '.
-								' FROM items i, functions f'.
-								' WHERE i.hostid=hg.hostid '.
-									' AND f.itemid=i.itemid '.
-									' AND f.triggerid='.$_REQUEST['triggerid'].')'.
-						$sql_where;
-		if($host_group = DBfetch(DBselect($sql,1))){
-			if(!isset($_REQUEST['groupid']) || !isset($_REQUEST['hostid'])){
-				$_REQUEST['groupid'] = $host_group['groupid'];
-				$_REQUEST['hostid'] = $host_group['hostid'];
-			}
-			else if(($_REQUEST['groupid']!=$host_group['groupid']) || ($_REQUEST['hostid']!=$host_group['hostid'])){
-				$_REQUEST['triggerid'] = 0;
-			}
-		}
-		else{
-//			$_REQUEST['triggerid'] = 0;
-		}
-	}
 	$options = array(
 		'groups' => array('not_proxy_hosts' => 1, 'editable' => 1),
 		'hosts' => array('templated_hosts' => 1, 'editable' => 1),
+		'triggers' => array('editable' => 1),
 		'groupid' => get_request('groupid', null),
 		'hostid' => get_request('hostid', null),
+		'triggerid' => get_request('triggerid', null),
 	);
 	$pageFilter = new CPageFilter($options);
 	$_REQUEST['groupid'] = $pageFilter->groupid;
 	$_REQUEST['hostid'] = $pageFilter->hostid;
+
+	if($pageFilter->triggerid > 0){
+		$_REQUEST['triggerid'] = $pageFilter->triggerid;
+	}
 
 ?>
 <?php

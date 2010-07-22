@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2729] improved host-group and host filter selection (Aly)
  - [DEV-465] added messaging system (Aly)
  - [ZBX-2697] forbid creation of maintenance without hosts\groups (Vedmak)
  - [ZBX-2711] added links to host profile in dashboard "last 20 issues" host menu (Vedmak)
