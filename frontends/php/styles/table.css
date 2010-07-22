@@ -563,6 +563,12 @@ table.flicker a{
 	color: #0BF;
 }
 
+table.itemfilter{
+	border: 1px solid #777777;
+	width: 100%;
+	background-color: white;
+}
+
 /**************** Aknowledges ****************/
 
 table.ack_msgs{

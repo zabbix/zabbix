@@ -17,277 +17,209 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-var CViewSwitcher = Class.create();
+var CViewSwitcher = Class.create({
+inAction:			false,
+mainObj:			null,
+actionsObj:			null,
+changedFields:		{},
+depObjects:			{},
+lastValue:			null,
 
-CViewSwitcher.prototype = {
-  inAction : false,
-  mainObj : null,
-  curObj : null,
-  changedFields : {},
-  fieldsPreChanged : false,
-  depIds : {},
-  lastValue : null,
-
-  initialize : function(objId, objAction, confData, preChangedFields) {
-
-    this.inAction = false;
-    this.fieldsPreChanged = preChangedFields ? true:false;
-    this.depIds = confData;
-this.mainObj = $(objId);
+initialize : function(objId, objAction, confData){
+	this.mainObj = $(objId);
 	if(is_null(this.mainObj)) throw('ViewSwitcher error: main object not found!');
-	
-    if(!is_array(objAction)) objAction = new Array(objAction);
 
-    var me = this; // required for next action;
-    this.mainObj.rebuildView = function () { me.rebuildView(); };
+	this.depObjects = {};
 
-    for(var i = 0; i < objAction.length; i++) {
-      addListener(this.mainObj, objAction[i], this.rebuildView.bindAsEventListener(this));
-    }
+	for(var key in confData){
+		if(empty(confData[key])) continue;
 
-    this.hideAllObjs();
-    this.rebuildView();
-  },
+		this.depObjects[key] = {};
+		for(var vKey in confData[key]){
+			if(empty(confData[key][vKey])) continue;
 
-  rebuildView : function () {
-    if(this.inAction === true) return;
-    this.inAction = true;
+			if(is_string(confData[key][vKey])) this.depObjects[key][vKey] = {'id': confData[key][vKey]};
+			else if(is_object(confData[key][vKey])) this.depObjects[key][vKey] = confData[key][vKey];
+		}
+	}
 
-    var myValue = this.objValue(this.mainObj);
-    if(myValue == this.lastValue) {
-      this.inAction = false;
-      return;
-    }
+	if(!is_array(objAction)) objAction = new Array(objAction);
+	this.actionsObj = objAction;
 
-    if(isset(this.lastValue, this.depIds)) {
-      //alert('HIDING\n'+this.mainObj.id+'\n'+this.lastValue+': '+this.depIds[this.lastValue]);
-      for(var i in this.depIds[this.lastValue]) {
-        if(typeof(this.depIds[this.lastValue][i]) != 'string' && this.depIds[this.lastValue][i] != 'object' && !this.depIds[this.lastValue][i].id) {
-          if(typeof(this.depIds[this.lastValue][i]) != 'function') alert(this.depIds[this.lastValue][i]+': '+typeof(this.depIds[this.lastValue][i]));
-          continue;
-        }
-        //alert('HIDING\n'+this.mainObj.id+'\n'+this.lastValue+': '+this.depIds[this.lastValue][i]);
-        //if(this.depIds[this.lastValue][i] && !this.depIds[this.lastValue][i].id) this.depIds[this.lastValue][i] = {id: this.depIds[this.lastValue][i], value:''};
+	for(var i = 0; i < this.actionsObj.length; i++) {
+		addListener(this.mainObj, objAction[i], this.rebuildView.bindAsEventListener(this));
+	}
 
-        //var elm = document.getElementById(this.depIds[this.lastValue][i].id);
-        var elm = document.getElementById(this.depIds[this.lastValue][i].id ? this.depIds[this.lastValue][i].id : this.depIds[this.lastValue][i]);
-        if(!elm) {
-//          alert(this.depIds[this.lastValue][i]);
-          continue;
-        }
+	this.hideAllObjs();
+	this.rebuildView();
+},
 
-        this.curObj = this.depIds[this.lastValue][i];
-        this.hideObj(elm);
-        this.depIds[this.lastValue][i] = this.curObj;
-        this.curObj = null;
-      }
-    }
+rebuildView: function(e){
+	var myValue = this.objValue(this.mainObj);
 
-    //this.shownIds = null;
-    //this.shownIds = new Array();
+	if(myValue == this.lastValue){
+		this.inAction = false;
+		return true;
+	}
 
-    if(isset(myValue, this.depIds)) {
-      //alert('SHOWING\n'+this.mainObj.id+'\n'+myValue+': '+this.depIds[myValue]);
-      for(var i in this.depIds[myValue]) {
-        if(typeof(this.depIds[myValue][i]) != 'string' && this.depIds[myValue][i] != 'object' && !this.depIds[myValue][i].id) {
-          //if(typeof(this.depIds[myValue][i]) != 'function') alert(this.depIds[myValue][i]+': '+typeof(this.depIds[myValue][i]));
-          continue;
-        }
-        //alert('SHOWING\n'+this.mainObj.id+'\n'+myValue+': '+this.depIds[myValue][i]);
-        //if(this.depIds[myValue][i] && !this.depIds[myValue][i].id) this.depIds[myValue][i] = {id: this.depIds[myValue][i], value:''};
+	if(isset(this.lastValue, this.depObjects)) {
+		for(var key in this.depObjects[this.lastValue]) {
+			if(empty(this.depObjects[this.lastValue][key])) continue;
 
-        //var elm = document.getElementById(this.depIds[myValue][i].id);
-        var elm = $(this.depIds[myValue][i].id ? this.depIds[myValue][i].id : this.depIds[myValue][i]);
-        if(is_null(elm)) {
-//          alert(this.depIds[myValue][i]);
-          continue;
-        }
+			this.hideObj(this.depObjects[this.lastValue][key]);
+		}
+	}
 
-        this.curObj = this.depIds[myValue][i];
-        this.showObj(elm);
-        this.depIds[myValue][i] = this.curObj;
-        this.curObj = null;
-      }
-    }
+	if(isset(myValue, this.depObjects)) {
+		for(var key in this.depObjects[myValue]){
+			if(empty(this.depObjects[myValue][key])) continue;
 
-    this.lastValue = myValue;
-    this.inAction = false;
-  },
+			this.showObj(this.depObjects[myValue][key]);
+		}
+	}
 
-  objValue : function (obj) {
-    var aValue;
+	this.lastValue = myValue;
+},
 
-    if(obj && obj.tagName && !obj.disabled) {
-      switch(obj.tagName.toString().toLowerCase()) {
-        case 'select':
-          aValue = obj.options[obj.selectedIndex].value;
-        break;
-        case 'input':
-          //TO DO should be added support of checkboxes, radio and etc
-          inpType = obj.getAttribute('type') || obj.type;
-          if(inpType) {
-            switch(inpType.toLowerCase()) {
-              case 'checkbox':
-                aValue = obj.checked ? obj.value : null;
-              break;
-              default:
-                aValue = obj.value;
-            }
-          }else {
-            aValue = null;
-          }
-        break;
-        case 'textarea':
-          aValue = obj.value;
-        break;
-        default:
-          aValue = null; //obj.valueOf();
-      }
-    }else if(obj.disabled) {
-      aValue = null;
-    }else
-      aValue = null; //obj.valueOf();
+objValue: function(obj){
+	if(is_null(obj) || obj.disabled) return null;
 
-    return aValue;
-  },
+	var aValue = null;
+	switch(obj.tagName.toLowerCase()) {
+		case 'select':
+			aValue = obj.options[obj.selectedIndex].value;
+			break;
+		case 'input':
+			var inpType = obj.getAttribute('type');
+			if(!is_null(inpType) && (inpType.toLowerCase() == 'checkbox')){
+				aValue = obj.checked ? obj.value : null;
+				break;
+			}
+		case 'textarea':
+		default:
+			aValue = obj.value;
+	}
 
-  setObjValue : function (obj, objVal) {
-    //SDI(objVal);
-    if(obj && obj.tagName && !obj.disabled) {
-      switch(obj.tagName.toString().toLowerCase()) {
-        case 'select':
-          for(var o in obj.options) {
-            if(obj.options[o].value == objVal) {
-              obj.selectedIndex = o;
-              break;
-            }
-          }
-        break;
-        case 'input':
-          //TO DO should be added support of checkboxes, radio and etc
-          inpType = obj.getAttribute('type') || obj.type;
-          if(inpType) {
-            switch(inpType.toLowerCase()) {
-              case 'checkbox':
-              case 'radio':
-                obj.checked = obj.value == objVal;
-              break;
-              default:
-                obj.value = objVal;
-            }
-          }
-        break;
-        case 'textarea':
-          obj.value = objVal;
-        break;
-      }
-    }
-  },
+return aValue;
+},
 
-  objDisplay : function (obj) {
-    //if(obj.className == 'form_odd_even_hide') obj.className = 'form_odd_even';
-    //obj.style.visibility = 'visible';
-    if(obj.tagName) {
-      switch(obj.tagName.toString().toLowerCase()) {
-        case 'th':
-        case 'td':
-          obj.style.display = 'table-cell';
-        break;
-        case 'tr':
-          obj.style.display = 'table-row';
-        break;
-        default:
-          obj.style.display = 'inline';
-      }
-    }
-  },
+setObjValue : function (obj, value) {
+	if(is_null(obj) || !isset('tagName',obj)) return null;
 
-  disableObj : function (obj, disable) {
-    disable = disable ? true : false;
-    if(obj.tagName) {
-      switch(obj.tagName.toString().toLowerCase()) {
-        case 'button':
-        case 'input':
-        case 'optgroup':
-        case 'option':
-        case 'select':
-        case 'textarea':
-          obj.disabled = disable;
-          if(obj.rebuildView) obj.rebuildView();
-        break;
-      }
-    }
-  },
+	switch(obj.tagName.toLowerCase()) {
+		case 'select':
+			for(var idx in obj.options) {
+				if(obj.options[idx].value == value) {
+					obj.selectedIndex = idx;
+					break;
+				}
+			}
+			break;
+		case 'input':
+			var inpType = obj.getAttribute('type');
+			if(!is_null(inpType) && (inpType.toLowerCase() == 'checkbox')){
+				obj.checked = true;
+				obj.value == value;
+				break;
+			}
+		case 'textarea':
+		default:
+			obj.value = value;
+	}
+},
 
-  hideObj : function (obj) {
-    obj.style.display = 'none';
-    //obj.style.visibility = 'collapse';
-    //if(obj.className == 'form_odd_even') obj.className = 'form_odd_even_hide';
-    if(this.curObj && this.curObj.id) {
-      var objVal = this.objValue(obj),
-          elmVal;
+objDisplay: function(obj){
+	if(is_null(obj) || !isset('tagName',obj)) return null;
 
-      if(typeof(this.curObj.value) != 'undefined') {
-        var elm = document.getElementById(this.curObj.value);
-        if(elm) elmVal = this.objValue(elm);
-      }
+	switch(obj.tagName.toLowerCase()) {
+		case 'th':
+		case 'td': obj.style.display = IE?'block':'table-cell'; break;
+		case 'tr': obj.style.display = IE?'block':'table-row'; break;
+		case 'img':
+		case 'div':
+			obj.style.display = 'block';
+			break;
+		default:
+			obj.style.display = 'inline';
+	}
+},
 
-      if(typeof(elmVal) != 'undefined') this.setObjValue(elm, objVal);
+disableObj: function(obj, disable){
+	if(is_null(obj) || !isset('tagName',obj)) return null;
 
-      if(typeof(elmVal) != 'undefined' || typeof(this.curObj.defaultValue) != 'undefined' && objVal === this.curObj.defaultValue && this.changedFields[this.curObj.id] === false) {
-        if(typeof(elmVal) != 'undefined') this.setObjValue(obj, elmVal);
-        else this.setObjValue(obj, null);
-      }
-    }
-      //SDI(this.curObj.id+': '+this.curObj.value);
-//    }
+	obj.disabled = disable;
+	if(obj == this.mainObj)	this.rebuildView();
+},
 
-    this.disableObj(obj, true);
-  },
+hideObj: function(data) {
+	if(is_null($(data.id))) return true;
 
-  showObj : function (obj) {
-    this.disableObj(obj, false);
-    if(this.curObj && this.curObj.id) {
-      var objVal = this.objValue(obj),
-          elmVal;
+	$(data.id).style.display = 'none';
 
-      if(typeof(this.curObj.value) != 'undefined') {
-        var elm = document.getElementById(this.curObj.value);
-        if(elm) elmVal = this.objValue(elm);
-      }
+	var objValue = this.objValue($(data.id));
+	var elmValue = null;
 
-      if(typeof(this.curObj.defaultValue) != 'undefined' && this.changedFields[this.curObj.id] === false && objVal === '' &&
-         (typeof(elmVal) == 'undefined' || elmVal === ''))
-        this.setObjValue(obj, this.curObj.defaultValue);
-      else if(typeof(elmVal) != 'undefined')
-        this.setObjValue(obj, elmVal);
+	if(isset('value', data)){
+		elmValue = this.objValue($(data.value));
+	}
 
-      if(typeof(elmVal) != 'undefined') this.setObjValue(elm, objVal);
-    }
-    this.objDisplay(obj);
-  },
+	if(is_null(elmValue) && isset('defaultValue', data) && (this.changedFields[data.id] === false))
+		this.setObjValue($(data.id), data.defaultValue);
+	else if(!is_null(elmValue))
+		this.setObjValue($(data.id), elmValue);
+},
 
-  hideAllObjs : function () {
+showObj : function(data){
+	if(is_null($(data.id))) return true;
 
-    for(var i in this.depIds) {
-      for(var a in this.depIds[i]) {
-        if(typeof(this.depIds[i][a]) != 'string' && typeof(this.depIds[i][a]) != 'object' && !this.depIds[i][a].id) continue;
-        // if(this.depIds[i][a] && !this.depIds[i][a].id) this.depIds[i][a] = {id: this.depIds[i][a], value:''};
+	this.disableObj($(data.id), false);
 
-        // var elm = document.getElementById(this.depIds[i][a]['id']);
-        var elm = document.getElementById(typeof(this.depIds[i][a]) == 'object' ? this.depIds[i][a].id : this.depIds[i][a]);
-        if(!elm) continue;
+	if(!is_null(data)) {
+		var objValue = this.objValue($(data.id));
+		var elmValue = null;
 
-        this.hideObj(elm);
-        if(this.depIds[i][a].defaultValue) {
-          var me = this;
-          this.changedFields[this.depIds[i][a].id] = this.fieldsPreChanged === false ? false : true;
-          addListener(elm, 'change', function () { me.changedFields[this.getAttribute('id')] = true; });
-          addListener(elm, 'keyup', function () { me.changedFields[this.getAttribute('id')] = true; });
-          addListener(elm, 'keydown', function () { me.changedFields[this.getAttribute('id')] = true; });
-        }
-      }
-    }
-  }
+		if(isset('objValue', data)){
+			elmValue = this.objValue($(data.value));
+		}
+
+		if(is_null(elmValue) && isset('defaultValue', data) && (this.changedFields[data.id] === false))
+			this.setObjValue($(data.id), data.defaultValue);
+		else if(!is_null(elmValue))
+			this.setObjValue($(data.id), elmValue);
+
+		if(!is_null(elmValue)) this.setObjValue($(data.value), objValue);
+	}
+
+	this.objDisplay($(data.id));
+},
+
+hideAllObjs: function(){
+	var hidden = {};
+	for(var i in this.depObjects) {
+		if(empty(this.depObjects[i])) continue;
+
+		for(var a in this.depObjects[i]) {
+			if(empty(this.depObjects[i][a])) continue;
+			if(isset(this.depObjects[i][a].id, hidden)) continue;
+
+			hidden[this.depObjects[i][a].id] = true;
+
+			var elm = $(this.depObjects[i][a].id);
+			if(is_null(elm)) continue;
+
+			this.hideObj(elm);
+			if(isset('defaultValue', this.depObjects[i][a])){
+				this.changedFields[this.depObjects[i][a].id] = false;
+
+				for(var i = 0; i < this.actionsObj.length; i++) {
+					addListener(elm, this.actionsObj[i], this.chageFieldStatus.bindAsEventListener(this, this.depObjects[i][a].id));
+				}
+			}
+		}
+	}
+},
+
+chageFieldStatus: function(e, id){
+	this.changedFields[id] = true;
 }
-
+});

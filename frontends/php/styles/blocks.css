@@ -20,7 +20,94 @@
 */
 
 /************************************************************/
-/*					SCROLLBAR III STYLES						*/
+/*					ZABBIX MESSAGING						*/
+/************************************************************/
+div.messagecontainer{
+	position: absolute;
+	top: 84px;
+	right: 0px;
+	background-color: #94A1BB;
+	border: 2px solid #FFFFFF;
+	z-index: 1000;
+}
+
+div.messagecontainer .header{
+	height: 18px;
+	padding: 2px 0px 2px 2px;
+	margin: 0px 2px 0px 2px;
+	padding-right: 80px;
+}
+
+div.messagecontainer .header .headertext{
+	font-weight: bold;
+	color: #FFFFFF;
+	font-size: 10pt;
+	margin: 0px;
+}
+
+div.messagecontainer .header .controls{
+	position: absolute;
+	right: 1px;
+	top: 2px;
+}
+
+
+div.messagecontainer ul{
+	clear: right;
+	padding: 0px;
+	margin: 0px 0px 2px 1px;
+	list-style: none;
+}
+
+div.messagecontainer ul li.listItem{
+	margin: 1px 2px 1px 2px;
+	border: 1px solid #FFFFFF;
+}
+
+div.messagecontainer ul li.listItem .message{
+	white-space: nowrap;
+}
+
+div.messagecontainer .message .messagebox{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	padding: 0px 22px 2px 6px;
+	margin-left: 20px;
+	background-color: #4F4F4F;
+	color: #EAEAEA;
+}
+
+div.messagecontainer .message .messagebox span.title{
+	line-height: 22px;
+	font-size: 10pt;
+	font-weight: bold;
+	white-space: nowrap;
+}
+
+div.messagecontainer .messagebox span.title a{
+	font-size: 10pt;
+	color: #EAEAEA;
+	white-space: nowrap;
+	line-height: 22px;
+}
+
+div.messagecontainer .messagebox span.body{
+	line-height: 14px;
+	font-size: 7pt;
+	white-space: nowrap;
+}
+/************************************************************/
+/*						SEARCH Suggest						*/
+/************************************************************/
+div.suggest{
+	position: absolute;
+	border: 1px #5C7099 solid;
+	width: 162px;
+	z-index: 100;
+	display: none;
+}
+
+/************************************************************/
+/*					SCROLLBAR III STYLES					*/
 /************************************************************/
 div.scrollbar{
 	position: relative;
@@ -266,8 +353,6 @@ div.scrollbar .subline .info_period{
 
 div#selection_box{
 	position: absolute;
-
-	-moz-opacity:.40;
 	filter:alpha(opacity=40);
 	opacity:.40;
 	background-color:#0000FF;

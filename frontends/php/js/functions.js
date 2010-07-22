@@ -307,7 +307,8 @@ function swapNodesNames(n1,n2){
 		id1 = parseInt(id1.replace(reg,"$1"));
 		id2 = parseInt(id2.replace(reg,"$1"));
 	}
-	if(is_number(id1) && is_number(id2)){
+
+	if(is_number(id1) && is_number(id2)){ 
 		var elm = new Array();
 		elm[0] = document.getElementsByName('expressions['+id1+'][value]')[0];
 		elm[1] = document.getElementsByName('expressions['+id1+'][type]')[0];
@@ -325,6 +326,7 @@ function swapNodesNames(n1,n2){
 
 		return true;
 	}
+
 return false;
 }
 
@@ -333,10 +335,11 @@ function closeform(page){
 	try{
 		msg = (IE)?(document.getElementById('page_msg').innerText):(document.getElementById('page_msg').textContent);
 		opener.location.replace(page+'?msg='+encodeURI(msg));
-	} catch(e){
-		alert(e);
 	}
-
+	catch(e){
+		zbx_throw(e);
+	}
+	
 self.close();
 }
 
@@ -682,4 +685,18 @@ function create_mon_trigger_menu(e, args, items){
 
 //alert(page_menu[id]);
 	show_popup_menu(e,tr_menu,280);
+}
+
+
+//------------------------------------------------------
+//					USERS FORM
+//------------------------------------------------------
+
+function testUserSound(idx){
+	var sound = $(idx).options[$(idx).selectedIndex].value;
+	var repeat = $('messages[sounds][repeat]').options[$('messages[sounds][repeat]').selectedIndex].value;
+
+	if(repeat == 1) AudioList.play(sound);
+	else if(repeat > 1) AudioList.loop(sound, {'seconds': repeat});
+	else AudioList.loop(sound, {'seconds': $('messages[timeout]').value});
 }

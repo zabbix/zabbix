@@ -370,7 +370,7 @@ include_once('include/page_header.php');
 			$description		= get_request('description', '');
 		}
 
-		$tblMntc = new CTable(null, 'tablestripped');
+		$tblMntc = new CTable(null, 'formElementTable');
 
 		$tblMntc->addRow(array(S_NAME, new CTextBox('mname', $mname, 50)));
 
@@ -559,7 +559,7 @@ include_once('include/page_header.php');
 			$host_tb->addItem($host['hostid'], $host['host']);
 		}
 
-		$tblHlink = new CTable(null, 'tablestripped');
+		$tblHlink = new CTable(null, 'formElementTable');
 		$tblHlink->addRow($host_tb->Get(S_IN.SPACE.S_MAINTENANCE, array(S_OTHER.SPACE.S_HOSTS.SPACE.'|'.SPACE.S_GROUP.SPACE, $cmbGroups)));
 
 		$right_tab->addRow(new CFormElement(S_HOSTS_IN_MAINTENANCE, $tblHlink));
@@ -567,7 +567,7 @@ include_once('include/page_header.php');
 
 
 // MAINTENANCE GROUPS {{{
-		$tblGlink = new CTable(null, 'tablestripped');
+		$tblGlink = new CTable(null, 'formElementTable');
 
 		if(isset($_REQUEST['maintenanceid']) && !isset($_REQUEST['form_refresh'])){
 			$groupids = CHostGroup::get(array(

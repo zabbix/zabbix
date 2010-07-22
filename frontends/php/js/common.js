@@ -56,6 +56,7 @@ function empty(obj){
 //if((obj == 0) || (obj == '0')) return true;
 	if(is_string(obj) && (obj === '')) return true;
 	if(is_array(obj) && (obj.length == 0)) return true;
+
 return false;
 }
 
@@ -67,6 +68,17 @@ return false;
 function is_number(obj){
 	if(isNaN(obj)) return false;
 	if(typeof(obj) === 'number') return true;
+return false;
+}
+
+function is_object(obj, instance){
+	if((typeof(instance) === 'object') || (typeof(instance) === 'function')){
+		if((typeof(obj) === 'object') && (obj instanceof instance)) return true;
+	}
+	else{
+		if(typeof(obj) === 'object') return true;
+	}
+
 return false;
 }
 
@@ -89,7 +101,7 @@ function SDI(msg){
 		doc_body.appendChild(div_help);
 		
 		div_help.setAttribute('id','div_help');
-		div_help.setAttribute('style','position: absolute; right: 100px; top: 100px; border: 1px red solid; width: 500px; height: 400px; background-color: white; font-size: 12px; overflow: auto; z-index: 20;');
+		div_help.setAttribute('style','position: absolute; left: 10px; top: 100px; border: 1px red solid; width: 400px; height: 400px; background-color: white; font-size: 12px; overflow: auto; z-index: 20;');
 		
 //		new Draggable(div_help,{});
 	}
@@ -107,38 +119,17 @@ function SDI(msg){
 
 }
 
-function INFO(msg){
-	var div_info = document.getElementById('div_info');
-
-	if((div_info == 'undefined') || empty(div_info)){
-		var div_info = document.createElement('div');
-		var doc_body = document.getElementsByTagName('body')[0];
-		doc_body.appendChild(div_info);
-		
-		div_info.setAttribute('id','div_info');
-		div_info.setAttribute('style','position: absolute; left: 20px; top: 20px; height: 200px; width: 480px; border: 1px grey solid; background-color: white; font-size: 12px; overflow: auto; z-index: 20;');
-	}
-	
-	var pre = document.createElement('pre');
-	pre.appendChild(document.createTextNode(msg));
-	
-	div_info.appendChild(document.createTextNode("INFO: "));
-	div_info.appendChild(document.createElement("br"));
-	div_info.appendChild(pre);
-	div_info.appendChild(document.createElement("br"));
-	
-	div_info.scrollTop = div_info.scrollHeight;
-}
-
-function SDJ(obj){
+function SDJ(obj, name){
 	var debug = '';
 //	debug = obj.toSource();
 //	SDI(debug);
 //return null;
 
+	name = name || 'none';
 	for(var key in obj){
-		var value = obj[key];
-		debug+=key+': '+value+'  key: '+typeof(key)+'\n';
+		if(typeof(obj[key]) == name) continue;
+
+		debug+=key+': '+obj[key]+' ('+typeof(obj[key])+')'+'\n';//' key: '+typeof(key)+'\n';
 	}
 	SDI(debug);
 }
@@ -685,7 +676,9 @@ function switchElementsClass(obj,class1,class2){
 return false;
 }
 
-
+function zbx_throw(msg){
+	throw(msg);
+}
 /************************************************************************************/
 /*									Pages stuff										*/
 /************************************************************************************/
@@ -705,50 +698,4 @@ function ScaleChartToParenElement(obj_name){
 	for(i = obj.length-1; i>=0; i--){
 		obj[i].src += "&width=" + (obj[i].parentNode.offsetWidth - obj[i].parentNode.offsetLeft - 10);
 	}
-}
-
-
-/************************************************************************************/
-/*										IE 6 FIXES 									*/
-/************************************************************************************/
-
-function hidePopupDiv(iFrameID){
-	if(!IE6) return;
-
-	if(!is_null($(iFrameID))){
-		$(iFrameID).hide();
-		$(iFrameID).remove();
-	}
-}
-
-function showPopupDiv(divID,iFrameID){
-	if(!IE6) return;
-
-	var iFrame = $(iFrameID);
-	var divPopup = $(divID);
-
-	if(is_null(iFrame)){
-		var iFrame = document.createElement('iframe');
-		document.body.appendChild(iFrame);
-		
-//Match IFrame position with divPopup
-		iFrame.setAttribute('id',iFrameID);
-		iFrame.style.position='absolute';
-	}
-	
-	if(divPopup.style.display == 'none'){
-		iFrame.style.display = 'none';
-		return;
-	}
-
-//Increase default zIndex of div by 1, so that DIV appears before IFrame
-	divPopup.style.zIndex=divPopup.style.zIndex+1;
-	//iFrame.style.zIndex = 1;
-
-	var divCumOff = $(divID).cumulativeOffset();
-	iFrame.style.display = 'block';
-	iFrame.style.left = divCumOff.left + 'px';
-	iFrame.style.top = divCumOff.top + 'px';
-	iFrame.style.width = divPopup.offsetWidth + 'px';
-	iFrame.style.height = divPopup.offsetHeight + 'px';
 }
