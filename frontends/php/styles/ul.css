@@ -33,3 +33,10 @@ ul.messages li.error{
 	color:#AA0000;
 	list-style: url("../images/general/error_small.gif") inside;
 }
+
+
+ul li.linear{
+	float: left;
+	list-style-type: none;
+	margin-right: 2px;
+}

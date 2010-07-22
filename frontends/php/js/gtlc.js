@@ -2014,7 +2014,7 @@ initialize: function($super, sbid, timelineid, obj, width, height){
 	if(IE){
 		addListener(obj, 'mousedown', this.mousedown.bindAsEventListener(this));
 		obj.onmousemove = this.mousemove.bindAsEventListener(this);
-		//addListener(obj, 'click', function(event){ Event.stop(event); });
+		addListener(obj, 'click', function(event){ Event.stop(event); });
 	}
 	else{
 		addListener(this.dom_obj, 'mousedown', this.mousedown.bindAsEventListener(this),false);

@@ -81,7 +81,7 @@ class CUserGroup extends CZBXAPI{
 			'pattern'					=> '',
 // OutPut
 			'extendoutput'				=> null,
-			'output'				=> API_OUTPUT_REFER,
+			'output'					=> API_OUTPUT_REFER,
 			'editable'					=> null,
 			'select_users'				=> null,
 			'count'						=> null,
@@ -220,6 +220,7 @@ class CUserGroup extends CZBXAPI{
 				WHERE '.DBin_node('g.usrgrpid', $nodeids).
 					$sql_where.
 				$sql_order;
+//SDI($sql);
 		$res = DBselect($sql, $sql_limit);
 		while($usrgrp = DBfetch($res)){
 			if($options['count'])

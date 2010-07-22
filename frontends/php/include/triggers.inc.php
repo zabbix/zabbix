@@ -218,38 +218,61 @@ return $result;
 }
 
 /*
- * Function: get_severity_style
- *
- * Description:
- *	 convert severity constant in to the CSS style name
- *
- * Author:
- *	 Aly
- *
- * Comments:
- *
+ * Function: getEventColor()
+ * Description: convert trigger severity and event value in to the RGB color
+ * Author: Aly
  */
-	function get_severity_style($severity,$type=true){
-		switch($severity){
-			case TRIGGER_SEVERITY_DISASTER:
-				$style='disaster';
-				break;
-			case TRIGGER_SEVERITY_HIGH:
-				$style='high';
-				break;
-			case TRIGGER_SEVERITY_AVERAGE:
-				$style='average';
-				break;
-			case TRIGGER_SEVERITY_WARNING:
-				$style='warning';
-				break;
-			case TRIGGER_SEVERITY_INFORMATION:
-			default:
-				$style='information';
-		}
-		if(!$type) $style='normal';//$style.='_empty';
-	return $style;
+function getEventColor($severity, $value=TRIGGER_VALUE_TRUE){
+	if($value == TRIGGER_VALUE_FALSE) return 'AADDAA';
+
+	switch($severity){
+		case TRIGGER_SEVERITY_DISASTER: $color='FF0000'; break;
+		case TRIGGER_SEVERITY_HIGH: $color='FF8888'; break;
+		case TRIGGER_SEVERITY_AVERAGE: $color='DDAAAA'; break;
+		case TRIGGER_SEVERITY_WARNING: $color='EFEFCC'; break;
+		case TRIGGER_SEVERITY_INFORMATION: $color='CCE2CC'; break;
+		default: $color='BCBCBC';
 	}
+
+return $color;
+}
+
+/*
+ * Function: get_severity_style()
+ * Description: convert severity constant in to the CSS style name
+ * Author: Aly
+ */
+function get_severity_style($severity,$type=true){
+	switch($severity){
+		case TRIGGER_SEVERITY_DISASTER: $style='disaster'; break;
+		case TRIGGER_SEVERITY_HIGH: $style='high'; break;
+		case TRIGGER_SEVERITY_AVERAGE: $style='average'; break;
+		case TRIGGER_SEVERITY_WARNING: $style='warning'; break;
+		case TRIGGER_SEVERITY_INFORMATION:
+		default: $style='information';
+	}
+
+	if(!$type) $style='normal';//$style.='_empty';
+return $style;
+}
+
+/*
+ * Function: getSeverityCaption()
+ * Description: convert severity constant in to the CSS style name
+ * Author: Aly
+ */
+function getSeverityCaption($severity){
+	switch($severity){
+		case TRIGGER_SEVERITY_DISASTER: $caption=S_DISASTER; break;
+		case TRIGGER_SEVERITY_HIGH:		$caption=S_HIGH; break;
+		case TRIGGER_SEVERITY_AVERAGE:	$caption=S_AVERAGE; break;
+		case TRIGGER_SEVERITY_WARNING:	$caption=S_WARNING; break;
+		case TRIGGER_SEVERITY_INFORMATION: $caption=S_INFORMATION; break;
+		default: $caption=S_NOT_CLASSIFIED;
+	}
+
+return $caption;
+}
 
 /*
  * Function: get_service_status_of_trigger
