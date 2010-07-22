@@ -17,11 +17,11 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-
 #ifndef ZABBIX_DBCACHE_H
 #define ZABBIX_DBCACHE_H
 
 #include "db.h"
+#include "sysinfo.h"
 
 #define ZBX_SYNC_PARTIAL	0
 #define	ZBX_SYNC_FULL		1
@@ -106,12 +106,8 @@ DC_ITEM
 	char		password_orig[ITEM_PASSWORD_LEN_MAX], *password;
 };
 
-void	DCadd_history(zbx_uint64_t itemid, double value_orig, int clock);
-void	DCadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value_orig, int clock);
-void	DCadd_history_str(zbx_uint64_t itemid, char *value_orig, int clock);
-void	DCadd_history_text(zbx_uint64_t itemid, char *value_orig, int clock);
-void	DCadd_history_log(zbx_uint64_t itemid, char *value_orig, int clock, int timestamp, char *source, int severity,
-		int logeventid, int lastlogsize, int mtime);
+void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, AGENT_RESULT *value, int now,
+		int timestamp, char *source, int severity, int logeventid, int lastlogsize, int mtime);
 int	DCsync_history(int sync_type);
 void	init_database_cache(unsigned char p);
 void	free_database_cache(void);
