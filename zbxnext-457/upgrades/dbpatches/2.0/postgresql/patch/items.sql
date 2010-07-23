@@ -44,7 +44,7 @@ CREATE TABLE items_tmp (
 	PRIMARY KEY (itemid)
 ) with OIDS;
 
-INSERT INTO items_tmp SELECT itemid,type,snmp_community,snmp_oid,snmp_port,hostid,description,key_,delay,history,trends,lastvalue,lastclock,prevvalue,status,value_type,trapper_hosts,units,multiplier,delta,prevorgvalue,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,formula,error,lastlogsize,logtimefmt,templateid,valuemapid,delay_flex,params,ipmi_sensor,data_type,authtype,username,password,publickey,privatekey,mtime,CASE WHEN lastclock IS NULL THEN NULL ELSE 0 END FROM items;
+INSERT INTO items_tmp SELECT itemid,type,snmp_community,snmp_oid,snmp_port,hostid,description,key_,delay,history,trends,lastvalue,lastclock,prevvalue,status,value_type,trapper_hosts,units,multiplier,delta,prevorgvalue,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,formula,error,lastlogsize,logtimefmt,templateid,valuemapid,delay_flex,params,ipmi_sensor,data_type,authtype,username,password,publickey,privatekey,mtime,NULL FROM items;
 
 drop table items;
 
