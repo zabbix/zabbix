@@ -88,6 +88,7 @@ include_once('include/page_header.php');
 				'lastChangeSince' => (time() - $msgsettings['timeout']), // 15 min
 				'filter' => array(
 					'priority' => array_keys($msgsettings['triggers']['severities']),
+					'value' => array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE)
 				),
 				'select_hosts' => array('hostid', 'host'),
 				'output' => API_OUTPUT_EXTEND,
