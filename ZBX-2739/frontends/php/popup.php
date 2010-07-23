@@ -305,8 +305,24 @@ include_once('include/page_header.php');
 	$pageFilter = new CPageFilter($options);
 
 	$nodeid = get_request('nodeid', get_current_nodeid(false));
-	$groupid = $pageFilter->groupid > 0 ? $pageFilter->groupid : null;
-	$hostid = $pageFilter->hostid;
+	
+	$groupid = null;
+	if($pageFilter->groupsSelected){
+		if($pageFilter->groupid > 0)
+			$groupid = $pageFilter->groupid;
+	}
+	else{
+		$groupid = 0;
+	}
+
+	$hostid = null;
+	if($pageFilter->hostsSelected){
+		if($pageFilter->hostid > 0)
+			$hostid = $pageFilter->hostid;
+	}
+	else{
+		$hostid = 0;
+	}
 
 	$available_nodes = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST);
 	$available_hosts = array_keys($pageFilter->hosts);
@@ -801,6 +817,7 @@ include_once('include/page_header.php');
 
 		$options = array(
 			'nodeids' => $nodeid,
+			'groupids' => $groupid,
 			'hostids' => $hostid,
 			'webitems' => 1,
 			'output' => API_OUTPUT_EXTEND,
