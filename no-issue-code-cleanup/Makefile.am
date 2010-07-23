@@ -23,11 +23,8 @@ dist-hook:
 	mv $(top_distdir)/include/common.h.new $(top_distdir)/include/common.h
 
 	rm -rf `find $(top_distdir) -name ".svn"`
-	rm -f $(top_distdir)/frontends/php/conf/zabbix.conf.php
-	rm -f $(top_distdir)/do
-	rm -f $(top_distdir)/go
-	rm -f $(top_distdir)/splint
 	rm -f $(top_distdir)/include/config.h
+	rm -f $(top_distdir)/frontends/php/conf/zabbix.conf.php
 
 dbschema:
 	create/schema/gen.pl mysql > create/schema/mysql.sql
