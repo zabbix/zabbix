@@ -4,15 +4,15 @@ Changes for 1.9
  - [DEV-449] added system.localtime[local] check (Sasha)
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
-Changes for 1.8.3RC1
+Changes for 1.8.3
 
  - [ZBX-2742] fixed item deletion with postgre (Vedmak)
  - [ZBX-2738] fixed problems with ukrainian locales (Aly)
  - [ZBX-2740] fixed js errors in items section in IE (Aly)
 	
-Changes for 1.8.3
+Changes for 1.8.3rc1
 
- - [ZBX-2731] fixed permissions problem with hostgroup names containing '[]' (VEedmak)
+ - [ZBX-2731] fixed permissions problem with hostgroup names containing '[]' (Vedmak)
  - [ZBX-2733] fixed the timer process so that it does not recalculate extraneous triggers for an item (asaveljevs)
  - [ZBX-2729] improved host-group and host filter selection (Aly)
  - [DEV-465] added messaging system (Aly)
