@@ -71,6 +71,7 @@ return $messages;
 
 function updateMessageSettings($messages){
 	if(!isset($messages['enabled'])) $messages['enabled'] = 0;
+	if(!isset($messages['triggers']['severities'])) $messages['triggers']['severities'] = array();
 	if(!isset($messages['sounds']['mute'])) $messages['sounds']['mute'] = 0;
 	if(!isset($messages['triggers']['recovery'])) $messages['triggers']['recovery'] = 0;
 	if(!isset($messages['sounds']['recovery'])) $messages['sounds']['recovery'] = 0;
