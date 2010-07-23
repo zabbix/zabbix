@@ -178,7 +178,7 @@ showObj : function(data){
 		var objValue = this.objValue($(data.id));
 		var elmValue = null;
 
-		if(isset('objValue', data)){
+		if(isset('value', data)){
 			elmValue = this.objValue($(data.value));
 		}
 
@@ -207,7 +207,7 @@ hideAllObjs: function(){
 			var elm = $(this.depObjects[i][a].id);
 			if(is_null(elm)) continue;
 
-			this.hideObj(elm);
+			this.hideObj(this.depObjects[i][a]);
 			if(isset('defaultValue', this.depObjects[i][a])){
 				this.changedFields[this.depObjects[i][a].id] = false;
 
