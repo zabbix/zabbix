@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3RC1
 
+ - [ZBX-2742] fixed item deletion with postgre (Vedmak)
  - [ZBX-2738] fixed problems with ukrainian locales (Aly)
  - [ZBX-2740] fixed js errors in items section in IE (Aly)
 	
