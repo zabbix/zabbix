@@ -2079,14 +2079,23 @@ return $caption;
 
 	function check_right_on_trigger_by_expression($permission,$expression){
 		global $USER_DETAILS;
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, $permission, null, get_current_nodeid(true));
 
 		$db_hosts = get_hosts_by_expression($expression);
 		while($host_data = DBfetch($db_hosts)){
-			if(!isset($available_hosts[$host_data['hostid']])) return false;
+			$hostids[] = $host_data['hostid'];
+		}
+		$hosts = CHost::get(array(
+			'hostids' => $hostids,
+			'editable' => (($permission == PERM_READ_WRITE) ? 1 : null),
+			'output' => API_OUTPUT_SHORTEN,
+			'templated_hosts' => 1,
+		));
+		$hosts = zbx_toHash($hosts, 'hostid');
+		foreach($hostids as $hostid){
+			if(!isset($hosts[$hostid])) return false;
 		}
 
-	return true;
+		return true;
 	}
 
 
