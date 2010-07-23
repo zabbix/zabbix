@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2739] fixed empty list of items when "all" selected in items popup (Vedmak)
  - [ZBX-2747] improved sql when save triggers (Vedmak)
  - [ZBX-2750] fixed undefined index when delete graph (Vedmak)
  - [ZBX-2742] fixed item deletion with postgre (Vedmak)
