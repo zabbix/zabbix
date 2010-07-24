@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2741] updated French translation; thanks to Alixen (Richlv)
  - [ZBX-2700] updated Czech translation; thanks to Jakub Kalas (Richlv)
  - [ZBX-2739] fixed empty list of items when "all" selected in items popup (Vedmak)
  - [ZBX-2747] improved sql when saving triggers (Vedmak)
