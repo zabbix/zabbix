@@ -23,8 +23,9 @@
 
 	$TRANSLATION=array(
 
-	'S_DATE_FORMAT_YMDHMS'=>		'd M Y H:i:s',
-	'S_DATE_FORMAT_YMD'=>			'd M Y',
+	'S_DATE_FORMAT_YMDHMS'=>		'j. M Y G:i:s',
+	'S_DATE_FORMAT_YMD'=>			'j. M Y',
+	'S_TIMELINE_DATE_FORMAT'=>		'j. M',
 	'S_HTML_CHARSET'=>			'UTF-8',
 
 	'S_YEAR_SHORT'=>			'r',
@@ -35,6 +36,48 @@
 	'S_MINUTE_SHORT'=>			'm',
 	'S_SECOND_SHORT'=>			's',
 	'S_MILLISECOND_SHORT'=>		'ms',
+
+	'S_WEEKDAY_SUNDAY_SHORT'=>		'ne',
+	'S_WEEKDAY_MONDAY_SHORT'=>		'po',
+	'S_WEEKDAY_TUESDAY_SHORT'=>		'út',
+	'S_WEEKDAY_WEDNESDAY_SHORT'=>		'st',
+	'S_WEEKDAY_THURSDAY_SHORT'=>		'čt',
+	'S_WEEKDAY_FRIDAY_SHORT'=>		'pá',
+	'S_WEEKDAY_SATURDAY_SHORT'=>		'so',
+
+	'S_WEEKDAY_SUNDAY_LONG'=>		'neděle',
+	'S_WEEKDAY_MONDAY_LONG'=>		'pondělí',
+	'S_WEEKDAY_TUESDAY_LONG'=>		'úterý',
+	'S_WEEKDAY_WEDNESDAY_LONG'=>		'středa',
+	'S_WEEKDAY_THURSDAY_LONG'=>		'čtvrtek',
+	'S_WEEKDAY_FRIDAY_LONG'=>		'pátek',
+	'S_WEEKDAY_SATURDAY_LONG'=>		'sobota',
+
+	'S_MONTH_JANUARY_SHORT'=>		'led',
+	'S_MONTH_FEBRUARY_SHORT'=>		'ún',
+	'S_MONTH_MARCH_SHORT'=>		'bře',
+	'S_MONTH_APRIL_SHORT'=>		'dub',
+	'S_MONTH_MAY_SHORT'=>			'kvě',
+	'S_MONTH_JUNE_SHORT'=>			'čer',
+	'S_MONTH_JULY_SHORT'=>			'čvc',
+	'S_MONTH_AUGUST_SHORT'=>		'srp',
+	'S_MONTH_SEPTEMBER_SHORT'=>		'zář',
+	'S_MONTH_OCTOBER_SHORT'=>		'říj',
+	'S_MONTH_NOVEMBER_SHORT'=>		'lis',
+	'S_MONTH_DECEMBER_SHORT'=>		'pro',
+
+	'S_MONTH_JANUARY_LONG'=>		'leden',
+	'S_MONTH_FEBRUARY_LONG'=>		'únor',
+	'S_MONTH_MARCH_LONG'=>			'březen',
+	'S_MONTH_APRIL_LONG'=>			'duben',
+	'S_MONTH_MAY_LONG'=>			'květen',
+	'S_MONTH_JUNE_LONG'=>			'červen',
+	'S_MONTH_JULY_LONG'=>			'červenec',
+	'S_MONTH_AUGUST_LONG'=>		'srpen',
+	'S_MONTH_SEPTEMBER_LONG'=>		'září',
+	'S_MONTH_OCTOBER_LONG'=>		'říjen',
+	'S_MONTH_NOVEMBER_LONG'=>		'listopad',
+	'S_MONTH_DECEMBER_LONG'=>		'prosinec',
 
 	'S_ACTIVATE_SELECTED'=>			'Povolit vybrané',
 	'S_DISABLE_SELECTED'=>			'Zakázat vybrané',
@@ -105,6 +148,12 @@
 	'S_MONITORED_HOST'=>			'Sledovaný hostitel',
 	'S_INCORRECT_IP_RANGE'=>		'Neplatný rozsah IP.',
 
+//	auditacts.php
+	'S_AUDITACTS_DESCRIPTION_DATE_FORMAT'=>	'j. M Y G:i:s',
+
+//	auditlogs.php
+	'S_AUDITLOGS_RECORD_DATE_FORMAT'=>	'j. M Y G:i:s',
+
 //	httpdetails.php
 	'S_DETAILS_OF_SCENARIO'=>		'Detaily scénáře',
 	'S_DETAILS_OF_SCENARIO_BIG'=>		'DETAILY SCÉNÁŘE',
@@ -124,6 +173,8 @@
 	'S_STATUS_OF_WEB_MONITORING'=>		'Stav sledování webů',
 	'S_STATUS_OF_WEB_MONITORING_BIG'=>	'STAV SLEDOVÁNÍ WEBŮ',
 	'S_STATE'=>				'Stav',
+	'S_WEB_SCENARIO_DATE_FORMAT'=>		'j. M Y G:i:s',
+	'S_WEB_SCENARIO_IDLE_DATE_FORMAT'=>	'j. M Y G:i:s',
 
 //	httpconf.php
 	'S_SORT'=>					'Řadit',
@@ -181,9 +232,15 @@
 	'S_EXISTING'=>				'Existující',
 	'S_MISSING'=>				'Chybějící',
 	'S_REFRESH'=>				'Aktualizovat',
+	'S_REFRESH_TIME_IN_SECONDS'=> 'Automatická aktualizace v sekundách',
+	'S_REFRESH_TIME_MULTIPLIER'=> 'Multiplikátor času aktualizace',
 	'S_IMPORTED'=>				'Importováno',
 	'S_SUCCESSEFULLY_SMALL'=>		'úspěšně',
 	'S_FAILED_SMALL'=>			'selhal',
+
+//	export.inc.php
+	'S_EXPORT_DATE_ATTRIBUTE_DATE_FORMAT'=>	'd.m.y',
+	'S_EXPORT_TIME_ATTRIBUTE_DATE_FORMAT'=>	'H.i',
 
 //	admin.php
 	'S_PREVIOUS'=>				'Předchozí',
@@ -198,6 +255,11 @@
 	'S_INSTALLATION_UPDATE'=>		'Instalace/Aktualizace',
 	'S_ZABBIX_IS_UNAVAILABLE'=>		'ZABBIX je dočasně nedostupný',
 	'S_REQUIRE_MB_STRING_MODULE'=>		'Modul pro podporu vícebajtového kódování je nutný k běhu frontendu',
+
+//	actions.inc.php
+	'S_HISTORY_OF_ACTIONS_DATE_FORMAT'=>	'j. M Y G:i:s',
+	'S_EVENT_ACTION_MESSAGES_DATE_FORMAT'=>	'j. M Y G:i:s',
+	'S_EVENT_ACTION_CMDS_DATE_FORMAT'=>	'j. M Y G:i:s',
 
 //	node.php
 	'S_TIME_ZONE'=>				'Časové pásmo',
@@ -227,6 +289,10 @@
 	'S_CANNOT_ACKNOWLEDGE_EVENT'=>		'Nelze potvrdit událost',
 	'S_SYS_BULK_ACKNOWLEDGE'=>		'----[HROMADNÉ POTVRZENÍ]----',
 	'S_BULK_ACKNOWLEDGE'=>			'Hromadné potvrzení',
+	'S_ACKNOWLEDGE_DATE_FORMAT'=>		'j. M Y G:i:s',
+
+//	acknow.inc.php
+	'S_ACKNOWINC_BY_EVENTS_DATE_FORMAT'=>	'j. M Y G:i:s',
 
 //	actionconf.php
 	'S_IMMEDIATELY'=>			'Ihned',
@@ -293,6 +359,7 @@
 //	actions.php
 	'S_ACTIONS'=>				'Akce',
 	'S_LOGS'=>				'Logovací soubory',
+	'S_LOGS_BIG'=>				'LOGOVACÍ SOUBORY',
 	'S_ACTIONS_BIG'=>			'AKCE',
 	'S_MESSAGE_ACTIONS'=>			'Akce zpráv',
 	'S_COMMAND_ACTIONS'=>			'Akce příkazů',
@@ -310,8 +377,10 @@
 	'S_DEFAULT_MESSAGE'=>			'Výchozí zpráva',
 	'S_DEFAULT_SUBJECT'=>			'Výchozí předmět',
 	'S_MESSAGE'=>				'Zpráva',
-	'S_ON'=>				'ON',
-	'S_OFF'=>				'OFF',
+	'S_ON_BIG'=>				'ON',
+	'S_OFF_BIG'=>				'OFF',
+	'S_ON'=>					'On',
+	'S_OFF'=>					'Off',
 	'S_NO_ACTIONS_DEFINED'=>		'Nejsou definovány žádné akce',
 	'S_SINGLE_USER'=>			'Jeden uživatel',
 	'S_USER_GROUP'=>			'Skupina uživatelů',
@@ -378,6 +447,19 @@
 	'S_SELECT_GRAPH_DOT_DOT_DOT'=>		'Vybrat graf...',
 	'S_FULLSCREEN'=>			'Celá obrazovka',
 	'S_VIEW'=>				'pohled',
+
+//	class.cchart.php
+	'S_CCHARTS_TIMELINE_HOURS_FORMAT'=>			'G:i',
+	'S_CCHARTS_TIMELINE_DAYS_FORMAT'=>			'D',
+	'S_CCHARTS_TIMELINE_MONTHDAYS_FORMAT'=>			'j.n.',
+	'S_CCHARTS_TIMELINE_START_DATE_FORMAT'=>		'j.n. G:i',
+	'S_CCHARTS_TIMELINE_END_DATE_FORMAT'=>			'j.n. G:i',
+	'S_CCHARTS_TIMELINE_MAINPERIOD_HOURS_FORMAT'=>		'G:i',
+	'S_CCHARTS_TIMELINE_MAINPERIOD_FULL_DAY_TIME_FORMAT'=>	'j.n. G:i',
+	'S_CCHARTS_TIMELINE_MAINPERIOD_MONTHDAYS_FORMAT'=>	'j.n.',
+
+//	class.cuser.php
+	'S_CUSER_ERROR_DATE_FORMAT'=>				'j.n.Y G:i',
 
 // Colours
 
@@ -500,6 +582,9 @@
 	'S_VALUE_MAPS_CREATE_NUM_STRING'=>		'Mapy hodnot se používají k převedení číselných hodnot na text',
 	'S_DELETE_SELECTED_VALUE_MAPPING'=>		'Smazat vybranou mapu hodnot?',
 
+// media_types.php
+	'S_DELETE_SELECTED_MEDIATYPES_Q'=>		'Smazat vybrané typy médií?',
+
 //	nodes.php
 	'S_NOT_DM_SETUP'=>			'Váš systém není nastavený pro distribuovaný monitoring',
 	'S_CONFIGURATION_OF_NODES'=>		'NASTAVENÍ UZLŮ',
@@ -518,6 +603,12 @@
 	'S_DELETE_SELECTED_PROXIES'=>	'Smazat vybrané proxy?',
 	'S_CONFIGURATION_OF_PROXIES'=>	'NASTAVENÍ PROXY',
 	'S_DELETE_SELECTED_PROXY_Q'=>	'Smazat vybrané proxy?',
+	'S_HOST_COUNT'=> 'Počet hostitelů',
+	'S_ITEM_COUNT'=> 'Počet položek',
+	'S_REQUIRED_PERFORMANCE'=> 'Požadovaný výkon (hodnoty/sekundu)',
+	'S_PROXY_MODE'=> 'Mód proxy',
+	'S_PROXY_PASSIVE'=> 'Pasivní',
+	'S_PROXY_ACTIVE'=> 'Aktivní',
 
 //  Authentication
 	'S_AUTHENTICATION'=>			'Autentizace',
@@ -570,7 +661,7 @@
 	'S_SORT_ORDER_0_100'=>			'Řazení (0->100)',
 	'S_YAXIS_SIDE'=>			'Strana osy Y',
 	'S_AXIS_SIDE'=>				'Strana osy',
-	'S_LEFT'=>					'Vlevo',
+	'S_LEFT'=>					'vlevo',
 	'S_FUNCTION'=>				'Funkce',
 	'S_MIN_SMALL'=>				'min',
 	'S_AVG_SMALL'=>				'průměr',
@@ -614,6 +705,7 @@
 	'S_SHOW_TRIGGERS'=>			'Zobrazit spouštěče',
 	'S_3D_VIEW'=>				'3D pohled',
 	'S_LEGEND'=>				'Legenda',
+	'S_SHOW_LEGEND'=>			'Zobrazit legendu',
 	'S_GRAPH_SUM'=>				'Souhrn grafu',
 	'S_GRAPH_ITEM'=>			'Položka grafu',
 	'S_REQUIRED_ITEMS_FOR_GRAPH'=>		'Graf musí obsahovat alespoň jednu položku',
@@ -636,8 +728,7 @@
 	'S_HIDE_UNKNOWN'=>			'Skrýt neznámé',
 	'S_LOG_FILES_SMALL'=>			'logovací soubory',
 	'S_REMOVE_SELECTED'=>			'Odstranit vybrané',
-	'S_LOG_FILES_LIST'=>			'Seznam logovacích souborů',
-
+	'S_ITEMS_LIST'=>				'Seznam položek',
 	'S_SHOW_SELECTED'=>			'Zobrazit vybrané',
 	'S_HIDE_SELECTED'=>			'Skrýt vybrané',
 	'S_MARK_SELECTED'=>			'Označit vybrané',
@@ -650,6 +741,12 @@
 	'S_FAILURE_AUDIT'=>			'Neúspěšný audit',
 	'S_SUCCESS_AUDIT'=>			'Úspěšný audit',
 
+	'S_HISTORY_LOG_ITEM_DATE_FORMAT'=>	'[j. M Y G:i:s]',
+	'S_HISTORY_LOG_LOCALTIME_DATE_FORMAT'=>	'j. M Y G:i:s',
+	'S_HISTORY_LOG_ITEM_PLAINTEXT'=>	'Y-m-d H:i:s',
+	'S_HISTORY_PLAINTEXT_DATE_FORMAT'=>	'Y-m-d H:i:s',
+	'S_HISTORY_ITEM_DATE_FORMAT'=>		'j. M Y G:i:s',
+
 // maintenance.php
 	'S_MAINTENANCE'=>				'Servisní okna',
 	'S_MAINTENANCE_ADDED'=>			'Servisní okno bylo přidáno',
@@ -657,6 +754,7 @@
 	'S_MAINTENANCE_DELETED'=>		'Servisní okno bylo smazáno',
 	'S_DELETE_SELECTED_MAINTENANCE_PERIODS_Q'=>'Smazat vybraná servisní okna?',
 
+	'S_IN_MAINTENANCE'=>			'Probíhá údržba',
 	'S_HOSTS_IN_MAINTENANCE'=>		'Hostitelé v servisním okně',
 	'S_GROUPS_IN_MAINTENANCE'=>		'Skupiny v servisním okně',
 
@@ -672,6 +770,7 @@
 	'S_CREATE_MAINTENANCE_PERIOD'=>		'Vytvořit servisní okno',
 	'S_MAINTENANCE_TYPE'=>			'Typ servisního okna',
 	'S_EXPIRED'=>				'Vypršelo',
+	'S_APPROACH'=>				'Blíží se',
 
 	'S_WITH_DATA_COLLECTION'=>		'se sběrem dat',
 	'S_NO_DATA_COLLECTION'=>		'bez sběru dat',
@@ -704,18 +803,18 @@
 
 	'S_AT'=>				'V',
 
-	'S_JANUARY'=>				'Leden',
-	'S_FEBRUARY'=>				'Únor',
-	'S_MARCH'=>				'Březen',
-	'S_APRIL'=>				'Duben',
-	'S_MAY'=>				'Květen',
-	'S_JUNE'=>				'Červen',
-	'S_JULY'=>				'Červenec',
-	'S_AUGUST'=>				'Srpen',
-	'S_SEPTEMBER'=>				'Září',
-	'S_OCTOBER'=>				'Říjen',
-	'S_NOVEMBER'=>				'Listopad',
-	'S_DECEMBER'=>				'Prosinec',
+	'S_JANUARY'=>				'leden',
+	'S_FEBRUARY'=>				'únor',
+	'S_MARCH'=>				'březen',
+	'S_APRIL'=>				'duben',
+	'S_MAY'=>				'květen',
+	'S_JUNE'=>				'červen',
+	'S_JULY'=>				'červenec',
+	'S_AUGUST'=>				'srpen',
+	'S_SEPTEMBER'=>				'září',
+	'S_OCTOBER'=>				'říjen',
+	'S_NOVEMBER'=>				'listopad',
+	'S_DECEMBER'=>				'prosinec',
 
 	'S_INCORRECT_MAINTENANCE_PERIOD'=>		'Neplatná doba trvání servisu',
 	'S_INCORRECT_MAINTENANCE_DATE'=>		'Neplatné datum servisu',
@@ -733,7 +832,10 @@
 	'S_DELETE_SELECTED_GROUPS'=>		'Smazat vybrané skupiny',
 
 //	hosts.php
+	'S_IMPORT_TEMPLATE'=>			'Importovat šablonu',
+	'S_IMPORT_HOST'=>				'Importovat hostitele',
 	'S_MACROS'=>					'Makra',
+	'S_MACRO'=>					'Makro',
 	'S_WRONG_MACRO'=>				'Neplatné makro',
 	'S_MACRO_TOO_LONG'=>				'Název makra je příliš dlouhý, mesmí přesáhnout 64 znaků.',
 	'S_MACRO_VALUE_TOO_LONG'=>			'Hodnota makra je příliš dlouhá, nesmí přesáhnout 255 znaků.',
@@ -742,10 +844,14 @@
 	'S_EMPTY_MACRO_VALUE'=>				'Prázdná hodnota makra',
 	'S_NO_MACROS_DEFINED'=>				'Nejsou definována žádná makra',
 	'S_MACRO_ADDED'=>				'Makro bylo přidáno',
+	'S_MACROS_UPDATED'=>				'Makra byla aktualizována',
+	'S_CANNOT_UPDATE_MACROS'=>				'Nelze upravit makra',
 	'S_MACROS_DELETED'=>				'Makro bylo smazáno',
 	'S_CANNOT_ADD_MACRO'=>				'Nelze přidat makro',
 	'S_CANNOT_DELETE_MACROS'=>			'Nelze smazat makra',
 	'S_HOST_LIST'=>					'Seznam hostitelů',
+	'S_OTHER_GROUPS'=> 'Další skupiny',
+	'S_IN_GROUPS'=> 'Ve skupinách',
 	'S_IN'=>					'V',
 	'S_APPLICATION'=>				'Aplikace',
 	'S_APPLICATIONS'=>				'Aplikace',
@@ -845,8 +951,9 @@
 	'S_EMPTY_INPUT_PARAMETER'=>			'Prázdný vstupní parametr',
 	'S_ENABLE_SELECTED_HOSTS'=>			'Povolit vybrané hostitele?',
 	'S_DISABLE_SELECTED_HOSTS_Q'=>			'Zakázat vybrané hostitele?',
-	'S_DELETE_SELECTED_HOSTS'=>			'Smazat vybrané hostitele?',
+	'S_DELETE_SELECTED_HOSTS_Q'=>			'Smazat vybrané hostitele?',
 	'S_UPDATED_STATUS_OF_HOST'=>		'Aktualizován stav hostitele',
+	'S_CLEAR_WHEN_UNLINKING'=> 'Pročistit při odpojování',
 
 // templates.php
 	'S_TEMPLATE_LIST'=>			'Seznam šablon',
@@ -878,7 +985,6 @@
 	'S_ADD_TO_GROUP'=>			'Přidat do skupiny',
 	'S_DELETE_FROM_GROUP'=>			'Smazat ze skupiny',
 	'S_UPDATE_IN_GROUP'=>			'Aktualizovat ve skupině',
-	'S_DELETE_SELECTED_HOSTS_Q'=>		'Smazat vybrané hostitele?',
 	'S_CREATE_HOST'=>			'Vytvořit hostitele',
 	'S_CREATE_TEMPLATE'=>			'Vytvořit šablonu',
 	'S_TEMPLATE_LINKAGE'=>			'Propojení šablon',
@@ -1037,12 +1143,11 @@
 	'S_SNMPV3_AUTH_PASSPHRASE'=>				'SNMPv3 auth passphrase',
 	'S_SNMPV3_PRIV_PASSPHRASE'=>				'SNMPv3 priv passphrase',
 	'S_CUSTOM_MULTIPLIER'=>					'Vlastní multiplikátor',
-	'S_DO_NOT_USE'=>					'Nepoužívat',
-	'S_USE_MULTIPLIER'=>					'Použít multiplikátor',
+	'S_USE_CUSTOM_MULTIPLIER'=>				'Použít vlastní multiplikátor',
 	'S_SELECT_HOST_DOT_DOT_DOT'=>				'Vybrat hostitele ...',
 	'S_LOG_TIME_FORMAT'=>					'Formát času pro logování',
 	'S_CREATE_ITEM'=>					'Vytvořit položku',
-	'S_X_ELEMENTS_COPY_TO_DOT_DOT_DOT'=>			'elementů kopírovat do ...',
+	'S_X_ELEMENTS_COPY_TO_DOT_DOT_DOT'=>			'prvků kopírovat do ...',
 	'S_MODE'=>						'Mód',
 	'S_TARGET'=>						'Cíl',
 	'S_TARGET_TYPE'=>					'Typ cíle',
@@ -1076,6 +1181,7 @@
 	'S_COPY_SELECTED_ITEMS_Q'=>				'Zkopírovat vybrané položky?',
 	'S_DELETE_HISTORY_SELECTED_ITEMS_Q'=>			'Smazat historii vybraných položek?',
 	'S_DELETE_SELECTED_ITEMS_Q'=>				'Smazat vybrané položky?',
+	'S_FORMULA'=>						'Vzorec',
 
 //	events.php
 	'S_EVENT'=>				'Událost',
@@ -1085,21 +1191,35 @@
 	'S_HISTORY_OF_EVENTS_BIG'=>		'HISTORIE UDÁLOSTÍ',
 	'S_NO_EVENTS_FOUND'=>			'Nenalezeny žádné události',
 	'S_EVENTS_SINCE'=>			'Události od',
+	'S_EVENTS_DATE_FORMAT'=>		'j. M Y G:i:s',
+	'S_EVENTS_DISCOVERY_TIME_FORMAT'=>	'j. M Y G:i:s',
+	'S_EVENTS_ACTION_TIME_FORMAT'=>		'j. M Y G:i:s',
+
+//	events.inc.php
+	'S_EVENTS_EVENT_DETAILS_DATE_FORMAT'=>			'j. M Y G:i:s',
+	'S_EVENTS_SMALL_EVENT_LIST_DATE_FORMAT'=>		'j. M Y G:i:s',
+	'S_EVENTS_POPUP_EVENT_LIST_DATE_FORMAT'=>		'j. M Y G:i:s',
+	'S_EVENTS_TRIGGERS_EVENTS_HISTORY_LIST_DATE_FORMAT'=>	'j. M Y G:i:s',
 
 //	latest.php
 	'S_LAST_CHECK'=>			'Poslední kontrola',
 	'S_LAST_VALUE'=>			'Poslední hodnota',
+	'S_LATEST_ITEMS_TRIGGERS_DATE_FORMAT'=>	'j. M Y G:i:s',
 
 //	sysmap.php
-	'S_UPPER_LEVEL_MAPS'=>			'Upper level maps',
+	'S_HIDDEN'=>			'skryta',
+	'S_SHOWN'=>				'zobrazena',
+	'S_ALIGN_ICONS'=>		'zarovnat ikony',
+	'S_UPPER_LEVEL_MAPS'=>	'Upper level maps',
 	'S_LINKS'=>				'Odkazy',
 	'S_LINK'=>				'Spojnice',
 	'S_LABEL'=>				'Popisek',
+	'S_GRID'=>				'Mřížka',
 	'S_X'=>					'X',
 	'S_ICON_PROBLEM'=>			'Ikona (problém)',
 	'S_ICON_OK'=>				'Ikona (OK)',
 	'S_ICON_UNKNOWN'=>			'Ikona (neznámý)',
-	'S_ICON_MAINTENANCE'=>			'Ikona (servis)',
+	'S_ICON_MAINTENANCE'=>			'Ikona (údržba)',
 	'S_ICON_DISABLED'=>			'Ikona (zakázáno)',
 	'S_LINK_STATUS_INDICATOR'=>		'Ukazatel stavu spojnice',
 	'S_CONFIGURATION_OF_NETWORK_MAPS'=>	'Nastavení síťových map',
@@ -1108,13 +1228,13 @@
 	'S_MAP_SAVE_OPERATION_FAILED'=>		'Ukládání mapy selhalo.',
 	'S_GET_IMG_ELEMENT_DATA_NOT_FOUND'=>	'Get Img: data prvku nebyla nalezena!',
 
-	'S_ADD_ELEMENT'=>			'Přidat element',
+	'S_ADD_ELEMENT'=>			'Přidat prvek',
 	'S_COORDINATE_X'=>			'Souřadnice X',
 	'S_COORDINATE_Y'=>			'Souřadnice Y',
 
 	'S_CONNECTORS'=>			'Spojnice',
 	'S_UNAVAILABLE_BIG'=>			'NEDOSTUPNÝ',
-	'S_MAINTENANCE_BIG'=>			'SERVISNÍ OKNA',
+	'S_MAINTENANCE_BIG'=>			'ÚDRŽBA',
 
 //	sysmaps.php
 	'S_EDIT_MAP_ELEMENT'=>			'Upravit prvek mapy',
@@ -1139,9 +1259,19 @@
 	'S_MAP_UPDATED'=>				'Síťová mapa byla aktualizována',
 	'S_CANNOT_UPDATE_MAP'=>			'Nelze upravit síťovou mapu',
 	'S_EXPAND_SINGLE_PROBLEM'=>		'Rozvést jeden problém',
+	'S_MARK_ELEMENTS_ON_TRIGGER_STATUS_CHANGE' => 'Mark elements on triggers status change',
+	'S_GET_SELEMENTS_FAILED'=>			'Get selected elements FAILED.',
+	'S_TWO_ELEMENTS_SHOULD_BE_SELECTED'=>		'Musí být vybrané dva prvky',
+	'S_DELETE_SELECTED_ELEMENTS_Q'=>		'Smazat vybrané prvky?',
+	'S_PLEASE_SELECT_TWO_ELEMENTS'=>		'Vyberte, prosím, dva prvky',
+	'S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q'=>	'Smazat spojnice mezi vybranými prvky?',
+	'S_NO_LINKS'=>					'Nejsou definovány žádné spojnice',
+	'S_WRONG_TYPE_OF_ARGUMENTS_PASSED_TO_FUNCTION'=>'Funkci byly předané nesprávné typy argumentů',
+	'S_NEW_ELEMENT'=>				'Nový prvek',
+	'S_SET_TRIGGER'=>				'Set trigger',
 
-	'S_BOTTOM'=>					'Dole',
-	'S_TOP'=>						'Nahoře',
+	'S_BOTTOM'=>					'dole',
+	'S_TOP'=>						'nahoře',
 	'S_LINK_STATUS_INDICATORS'=>	'Ukazatelé stavu spojnice',
 
 	'S_REMOVE_ELEMENT'=>			'Odstranit prvek',
@@ -1164,6 +1294,8 @@
 	'S_OK_BIG'=>			'OK',
 	'S_PROBLEM_BIG'=>		'PROBLÉM',
 	'S_ZABBIX_URL'=>		'http://www.zabbix.com',
+	'S_UNACKNOWLEDGED'=> 'Nepotvrzené',
+	'S_EVENT_ACKNOWLEDGING_DISABLED'=> 'Potvrzování událostí zakázáno',
 
 //	maps.php
 	'S_NETWORK_MAPS'=>		'Síťové mapy',
@@ -1171,9 +1303,10 @@
 	'S_BACKGROUND_IMAGE'=>		'Obrázek na pozadí',
 	'S_ICON_LABEL_TYPE'=>		'Typ popisku ikony',
 	'S_LABEL_LOCATION'=>		'Umístění popisku',
-	'S_ELEMENT_NAME'=>		'Název elementu',
+	'S_ELEMENT_NAME'=>		'Název prvku',
 	'S_STATUS_ONLY'=>		'Pouze stav',
 	'S_NOTHING'=>			'Nic',
+	'S_MAPS_DATE_FORMAT'=>           'j.n.Y G:i:s',
 
 //	media.php
 	'S_CONFIGURATION_OF_MEDIA_TYPES_BIG'=>	'NASTAVENÍ TYPŮ MÉDIÍ',
@@ -1207,6 +1340,7 @@
 	'S_MAXIMIZE'=>				'Maximalizovat',
 	'S_MINIMIZE'=>				'Minimalizovat',
 	'S_LOADING_P'=>				'Nahrávám...',
+	'S_OF' => 'of',
 
 // dashconf.php
 	'S_DASHBOARD_CONFIGURATION'=>	'Nastavení řídícího panelu',
@@ -1216,6 +1350,13 @@
 	'S_SHOW_HOSTS_IN_MAINTENANCE'=> 'Zobrazit hostitele v servisním okně',
 	'S_TRIGGERS_WITH_SEVERITY'=> 'Spouštěče se závažností',
 	'S_DASHBOARD_FILTER'=> 'Filtr řídících panelů',
+	'S_FAVOURITE_GRAPHS'=> 'Oblíbené grafy',
+	'S_FAVOURITE_MAPS'=> 'Oblíbené mapy',
+	'S_FAVOURITE_SCREENS'=> 'Oblíbené obrazovky',
+	'S_O_ALL'=> 'všechny',
+	'S_O_UNACKNOWLEDGED_ONLY'=> 'pouze nepotvrzené',
+	'S_O_SEPARATED' => 'Separated',
+	'S_PROBLEM_DISPLAY'=> 'Zobrazit problémy',
 
 //	overview.php
 	'S_OVERVIEW'=>				'Přehled',
@@ -1244,6 +1385,7 @@
 	'S_MORE_THAN_10_MINUTES'=>		'Více jak 10 minut',
 	'S_TRUNCATED'=>				'zkráceno',
 	'S_DELAYED_BY'=>			'Zpožděno o',
+	'S_QUEUE_NODES_DATE_FORMAT'=>		'j. M Y G:i:s',
 
 //	report1.php
 	'S_REPORT_BIG'=>			'PROTOKOL',
@@ -1276,6 +1418,24 @@
 	'S_BY_HOST'=>				'Podle hostitele',
 	'S_BY_TRIGGER_TEMPLATE'=>		'Podle šablony spouštěče',
 
+//	chart4.php
+	'S_CHART4_HEADER_TITLE_PART1'=>		'',
+	'S_CHART4_HEADER_TITLE_PART2'=>		'(rok',
+	'S_CHART4_HEADER_TITLE_PART3'=>		')',
+	'S_CHART4_HEADER_DATE_FORMAT'=>		'Y',
+	'S_CHART4_TIMELINE_DATE_FORMAT'=>	'd. M',
+
+//	chart5.php
+	'S_CHART5_HEADER_TITLE_PART1'=>		'',
+	'S_CHART5_HEADER_TITLE_PART2'=>		'(rok',
+	'S_CHART5_HEADER_TITLE_PART3'=>		')',
+	'S_CHART5_HEADER_DATE_FORMAT'=>		'Y',
+	'S_CHART5_TIMELINE_DATE_FORMAT'=>	'd. M',
+
+//	chart_bar.php
+	'S_CHARTBAR_HOURLY_DATE_FORMAT'=>		'j. n. Y G:i',
+	'S_CHARTBAR_DAILY_DATE_FORMAT'=>		'j. n. Y',
+
 //	report3.php
 	'S_IT_SERVICES_AVAILABILITY_REPORT'=>		'Protokol dostupnosti IT služeb',
 	'S_IT_SERVICES_AVAILABILITY_REPORT_BIG'=>	'PROTOKOL DOSTUPNOSTI IT SLUŽEB',
@@ -1296,11 +1456,21 @@
 	'S_MONTH'=>					'Měsíc',
 	'S_YEAR'=>					'Rok',
 	'S_YEAR_SMALL'=>				'rok',
-	'S_HOURLY'=>					'Hodinově',
-	'S_DAILY'=>					'Denně',
-	'S_WEEKLY'=>					'Týdně',
-	'S_MONTHLY'=>					'Měsíčně',
-	'S_YEARLY'=>					'Ročně',
+	'S_HOURLY'=>					'hodinově',
+	'S_DAILY'=>					'denně',
+	'S_WEEKLY'=>					'týdně',
+	'S_MONTHLY'=>					'měsíčně',
+	'S_YEARLY'=>					'ročně',
+	'S_REPORT3_ANNUALLY_DATE_FORMAT'=>		'Y',
+	'S_REPORT3_MONTHLY_DATE_FORMAT'=>		'F Y',
+	'S_REPORT3_DAILY_DATE_FORMAT'=>			'j. M Y',
+	'S_REPORT3_WEEKLY_DATE_FORMAT'=>		'j. M Y G:i',
+
+//	services_form.php
+	'S_SERVICES_UPTIME_DATE_FORMAT'=>		'l G:i',
+	'S_SERVICES_DOWNTIME_DATE_FORMAT'=>		'l G:i',
+	'S_SERVICES_ONETIME_DOWNTIME_DATE_FORMAT'=>	'j. M Y G:i',
+	'S_ADD_SMALL'=>								'přidat',
 
 //	locales.php
 	'S_DO_NOT_ADD'=>			'Nepřidávat',
@@ -1315,10 +1485,14 @@
 	'S_LOCALE_TO_EXTEND'=>			'Rozšířit lokalizaci',
 	'S_NEW_ENTRIES'=>			'Nové údaje',
 
-//  report4.php
+//	report4.php
 	'S_NOTIFICATIONS'=>			'Zprávy',
 	'S_NOTIFICATIONS_BIG'=>			'ZPRÁVY',
 	'S_IT_NOTIFICATIONS'=>			'Protokol zpráv',
+	'S_REPORT4_ANNUALLY_DATE_FORMAT'=>	'Y',
+	'S_REPORT4_MONTHLY_DATE_FORMAT'=>	'F Y',
+	'S_REPORT4_DAILY_DATE_FORMAT'=>		'j. M Y',
+	'S_REPORT4_WEEKLY_DATE_FORMAT'=>	'j. M Y G:i',
 
 //	report5.php
 	'S_TRIGGERS_TOP_100'=>			'Nejaktivnější spouštěče TOP 100',
@@ -1340,6 +1514,9 @@
 	'S_PALETTE'=>				'Barevná paleta',
 	'S_DARKEN'=>				'Tmavší',
 	'S_BRIGHTEN'=>				'Světlejší',
+
+//	reports.inc.php
+	'S_REPORTS_BAR_REPORT_DATE_FORMAT'=>	'j. M Y G:i:s',
 
 //	screenconf.php
 	'S_SCREENS'=>				'Obrazovky',
@@ -1368,6 +1545,7 @@
 	'S_WIDTH'=>						'Šířka',
 	'S_HEIGHT'=>					'Výška',
 	'S_CREATE_SCREEN'=>				'Vytvořit obrazovku',
+	'S_CREATE_SLIDESHOW'=>			'Vytvořit prezentaci',
 	'S_EDIT'=>						'Upravit',
 	'S_DYNAMIC_ITEM'=>				'Dynamická položka',
 	'S_DIMENSION_COLS_ROWS'=>		'Rozměr (soupce x řádky)',
@@ -1417,7 +1595,7 @@
 
 	'S_HORIZONTAL_ALIGN'=>			'Vodorovné zarovnání',
 	'S_CENTRE'=>				'Střed',
-	'S_RIGHT'=>				'Vpravo',
+	'S_RIGHT'=>				'vpravo',
 
 	'S_VERTICAL_ALIGN'=>			'Svislé zarovnání',
 	'S_MIDDLE'=>				'Střed',
@@ -1427,7 +1605,7 @@
 
 //	screens.php
 	'S_CUSTOM_SCREENS'=>			'Vlastní obrazovky',
-	'S_SCREENS_BIG'=>			'OBRAZOVKY',
+	'S_SCREENS_BIG'=>				'OBRAZOVKY',
 
 	'S_SLIDESHOW_UPDATED'=>			'Prezentace byla aktualizována',
 	'S_CANNOT_UPDATE_SLIDESHOW'=>		'Nelze upravit prezentaci',
@@ -1436,6 +1614,10 @@
 	'S_SLIDESHOW_DELETED'=>			'Prezentace byla smazána',
 	'S_CANNOT_DELETE_SLIDESHOW'=>		'Nelze smazat prezentaci',
 	'S_DELETE_SLIDESHOW_Q'=>		'Smazat prezentaci?',
+
+// slides.php
+	'S_CUSTOM_SLIDES'=>			'Vlastní prezentace',
+
 
 //	services.php
 	'S_AVERAGE_PROBLEM'=>			'Střední problém',
@@ -1533,7 +1715,7 @@
 	'S_INSERT'=>				'Vložit',
 	'S_SECONDS'=>				'sekund',
 	'S_LAST_OF'=>				'Posledních',
-	'S_MULTIPLE_TRUE_EVENTS'=>		'Opakované události',
+	'S_MULTIPLE_PROBLEM_EVENTS'=>		'opakování události',
 	'S_SHOW_DISABLED_TRIGGERS'=>		'Zobrazit zakázané spouštěče',
 	'S_HIDE_DISABLED_TRIGGERS'=>		'Skrýt zakázané spouštěče',
 	'S_THE_TRIGGER_DEPENDS_ON'=>		'Spouštěč závisí na',
@@ -1577,7 +1759,7 @@
 	'S_NOT_ACKNOWLEDGED'=>			'Nepotvrzeno',
 	'S_SHOW_LAST'=>				'Zobrazit poslední',
 	'S_SHOW_DETAILS'=>			'Zobrazit detaily',
-	'S_SELECT'=>				'Vybrat',
+	'S_FILTER_BY_NAME'=>				'Filtrovat podle jména',
 	'S_TRIGGERS_BIG'=>			'SPOUŠTĚČE',
 	'S_LAST_CHANGE'=>			'Poslední změna',
 	'S_COMMENTS'=>				'Komentáře',
@@ -1586,6 +1768,13 @@
 	'S_NOT_ACK'=>				'Nepotvrzeno',
 	'S_NEVER'=>				'Nikdy',
 	'S_FOUND'=>				'Nalezeno',
+	'S_ACKNOWLEDGE_STATUS'=> 'Stav potvrzení',
+	'S_ANY'=> 'Jakýkoliv',
+	'S_WITH_UNACKNOWLEDGED_EVENTS'=> 'S nepotvrzenými událostmi',
+	'S_WITH_LAST_EVENT_UNACKNOWLEDGED'=> 'S poslední událostí nepotvrzenou',
+	'S_TRIGGERS_STATUS'=> 'Stav spouštěče',
+	'S_AGE_LESS_THAN'=> 'Stáří méně než',
+	'S_SELECT'=> 'Vybrat',
 
 //	users.php
 	'S_ZABBIX_USER'=>				'Zabbix uživatel',
@@ -1624,7 +1813,7 @@
 	'S_API_ACCESS_UPDATED'=>			'Přístup k API byl aktualizován',
 	'S_CANNOT_UPDATE_API_ACCESS'=>			'Nelze upravit přístup k API',
 	'S_DEBUG_MODE_UPDATED'=>			'Ladící mód byl aktualizován',
-	'S_CANNOT_UPDATE_DEBUG_MODE'=>			'Nelze upravit testovací mód',
+	'S_CANNOT_UPDATE_DEBUG_MODE'=>			'Nelze upravit ladící mód',
 	'S_USER_CANNOT_DISABLE_ITSELF'=>		'Uživatel nemůže zakázat sám sebe',
 	'S_USER_CANNOT_CHANGE_STATUS'=>			'Uživatel nemůže měnit svůj stav',
 	'S_USER_CANNOT_CHANGE_GUI_ACCESS'=>		'Uživatel nemůže upravit přístup ke grafickému rozhraní sám sobě',
@@ -1667,8 +1856,8 @@
 	'S_ROWS_PER_PAGE'=>				'Počet řádků na stránku',
 	'S_ENABLE_API'=>				'Povolit přístup k API',
 	'S_DISABLE_API'=>				'Zakázat přístup k API',
-	'S_ENABLE_DEBUG'=>				'Povolit testovací mód',
-	'S_DISABLE_DEBUG'=>				'Zakázat testovací mód',
+	'S_ENABLE_DEBUG'=>				'Povolit ladící mód',
+	'S_DISABLE_DEBUG'=>				'Zakázat ladící mód',
 	'S_BLOCKED'=>					'Blokovaný',
 	'S_UNBLOCK_SELECTED'=>				'Odblokovat vybrané',
 	'S_UBLOCK_SELECTED_USERS_Q'=>			'Odblokovat vybrané uživatele?',
@@ -1679,8 +1868,8 @@
 	'S_DISABLE_SELECTED_GROUPS_Q'=>			'Zakázat vybrané skupiny?',
 	'S_ENABLE_API_SELECTED_GROUPS_Q'=>		'Povolit přístup k API pro vybrané skupiny?',
 	'S_DISABLE_API_SELECTED_GROUPS_Q'=>		'Zakázat přístup k API pro vybrané skupiny?',
-	'S_ENABLE_DEBUG_SELECTED_GROUPS_Q'=>		'Povolit testovací mód pro vybrané skupiny?',
-	'S_DISABLE_DEBUG_SELECTED_GROUPS_Q'=>		'Zakázat testovací mód pro vybrané skupiny?',
+	'S_ENABLE_DEBUG_SELECTED_GROUPS_Q'=>		'Povolit ladící mód pro vybrané skupiny?',
+	'S_DISABLE_DEBUG_SELECTED_GROUPS_Q'=>		'Zakázat ladící mód pro vybrané skupiny?',
 	'S_DELETE_SELECTED_GROUPS_Q'=>			'Smazat vybrané skupiny?',
 
 //scripts.php
@@ -1721,8 +1910,8 @@
 	'S_AUDIT'=>				'Audit',
 	'S_AUDIT_LOGS_BIG'=>			'ZÁZNAMY AUDITU',
 	'S_AUDIT_ACTIONS_BIG'=>			'AKCE AUDITU',
-	'S_ALERTS_BIG'=>			'UPOZORNĚNÍ',
 	'S_ACTION'=>				'Akce',
+	'S_ACTIONS_BIG'=>				'AKCE',
 	'S_DETAILS'=>				'Detaily',
 	'S_UNKNOWN_ACTION'=>			'Neznámá akce',
 	'S_ADDED'=>				'Přidáno',
@@ -1768,6 +1957,7 @@
 	'S_EXTENDED'=>				'Rozšířený',
 
 //	search.php
+	'S_EDIT_HOSTS'=> 'Upravit hostitele',
 	'S_SEARCH_BIG'=>			'HLEDAT',
 	'S_GO'=>				'Proveď',
 	'S_FOUND_SMALL'=>			'nalezených',
@@ -1781,16 +1971,40 @@
 	'S_NO_ITEMS'=>				'Žádné položky',
 	'S_DISCOVERY_RULES_BIG'=>		'PRAVIDLA PRO PRŮZKUM',
 	'S_DISCOVERY_CHECKS_BIG'=>		'KONTROLY PRŮZKUMU',
-	'S_HOSTS_AND_TEMPLATES_BIG'=> 'Hostitelé a šablony',
+	'S_HOSTS_AND_TEMPLATES_BIG'=>		'Hostitelé a šablony',
+	'S_CANNOT_SWITCH_HOSTS'=>		'You can not switch hosts for current selection',
+
+//	popup_period.php
+	'S_POPUP_PERIOD_CAPTION_DATE_FORMAT'=>	'j. M Y G:i:s',
+
+//	blocks.inc.php
+	'S_BLOCKS_SYSTEM_SUMMARY_TIME_FORMAT'=>		'G:i:s',
+	'S_BLOCKS_HOSTSTAT_SUMMARY_TIME_FORMAT'=>	'G:i:s',
+	'S_BLOCKS_ZBX_STATUS_TIME_FORMAT'=>		'G:i:s',
+	'S_BLOCKS_LATEST_ISSUES_DATE_FORMAT'=>		'j. M Y G:i:s',
+	'S_BLOCKS_LATEST_ISSUES_TIME_FORMAT'=>		'G:i:s',
+	'S_BLOCKS_WEBMON_TIME_FORMAT'=>			'G:i:s',
+	'S_BLOCKS_DISCOVERY_STATUS_TIME_FORMAT'=>	'G:i:s',
 
 //	forms.inc.php
+	'S_EXPRESSION_PART_ERROR'=>			'Chyba',
+	'S_EXPRESSION_PART_NO_ERROR'=>			'Nenalezeny žádné chyby',
+	'S_EXPRESSION_SYNTAX_ERROR'=> 			'Chyba syntaxe výrazu',
+	'S_EXPRESSION_UNEXPECTED_END_OF_ELEMENT_ERROR'=>'Neočekávaný konec elementu',
+	'S_CHECK_EXPRESSION_PART_STARTING_FROM_PART1'=>	'Zkontrolujte část výrazu od \'',
+	'S_CHECK_EXPRESSION_PART_STARTING_FROM_PART2'=>	'\'',
+	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_OR_SEQUENCE_ERROR'=>'Ve výrazu byly zjištěny nepovolené znaky nebo posloupnost znaků',
+	'S_EXPRESSION_NOT_ALLOWED_VALUE_IN_ELEMENT_ERROR'=>'V elementu byla zjištěna nepovolená hodnota',
+	'S_EXPRESSION_UNNECESSARY_SYMBOLS_DETECTED_ERROR'=>'Byly zjištěny nadbytečné znaky',
+	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_AFTER_ERROR'=>'Za elementem byly zjištěny nepovolené znaky',
+	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_BEFORE_ERROR'=>'Před elementem byly zjištěny nepovolené znaky',
+
 //	popup_link_tr.php
-	'S_NEW_CONNECTOR'=>			'Nová spojnice',
+	'S_NEW_INDICATORS'=>			'Nový ukazatel',
 	'S_EDIT_CONNECTOR'=>			'Upravit spojnici',
 
-
 //	tr_logform.php
-	'S_INCLUDE'=>		'Včetně',
+	'S_INCLUDE_S'=>		'Včetně',
 	'S_EXCLUDE'=>		'Vyjma',
 	'S_KEYWORD'=>		'Klíčové slovo',
 	'S_POSITION'=>		'Pozice',
@@ -1799,7 +2013,11 @@
 
 //  tr_testexpr.php
 	'S_TEST_DATA'=>		'Testovací data',
-	'S_ITEM_FUNCTION'=>	'Funkce položky',
+	'S_EXPRESSION_VARIABLE_ELEMENTS'=>	'Proměnné výrazu',
+	'S_EXPRESSION_VALUE_TYPE_UNKNOWN'=>	'Neznámý typ proměnné, testování není dostupné',
+	'S_EXPRESSION_HOST_UNKNOWN'=>		'Zadaný hostitel v systému neexistuje',
+	'S_EXPRESSION_HOST_ITEM_UNKNOWN'=>	'Zadaná položka ve vybraném hostiteli neexistuje',
+	'S_EXPRESSION_NOT_A_MACRO_ERROR'=>	'Zadaný výraz není makro',
 	'S_RESULT_TYPE'=>	'Typ výsledku',
 	'S_COMBINED_RESULT'=>	'Kombinovaný výsledek',
 
@@ -1838,6 +2056,12 @@
 	'S_INCORRECT_TYPE_OF_ASORT_BY_KEY'=>	'Neplatný typ asort_by_key',
 	'S_DAYS_SMALL'=>			'dní',
 	'S_B'=>			'B',
+	'S_N_SMALL'=>	'n',
+	'S_NANO'=>		'nano',
+	'S_U_MICRO'=>	'µ',
+	'S_MICRO'=>		'mikro',
+	'S_M_SMALL'=>	'm',
+	'S_MILLI'=>		'mili',
 	'S_K'=>			'k',
 	'S_KILO'=>		'kilo',
 	'S_M'=>			'M',
@@ -1854,14 +2078,15 @@
 	'S_ZETTA'=>		'zetta',
 	'S_Y'=>			'Y',
 	'S_YOTTA'=>		'yotta',
+	'S_FUNCT_UNIXTIMESTAMP_DATE_FORMAT'=>	'Y.m.d H:i:s',
 
 //	forms.inc.php
 	'S_DELETE_SELECTED_USER_Q'=>		'Smazat vybraného uživatele?',
 	'S_SUBFILTER'=>				'Rozšiřující filtr',
 	'S_AFFECTS_ONLY_FILTERED_DATA_SMALL'=>	'ovlivní pouze filtrovaná data!',
-	'S_THROW_MAP_SMALL'=>			'mapování',
+	'S_SHOW_VALUE_MAPPINGS'=>			'zobrazit mapování hodnot',
 	'S_DELETE_SELECTED_ITEM_Q'=>		'Smazat vybranou položku?',
-	'S_DO_SMALL'=>				'proveď',
+	'S_DO'=>				'Do',
 	'S_INCORRECT_LIST_OF_ITEMS'=>		'Neplatný seznam položek.',
 	'S_DELETE_TRIGGER_Q'=>			'Smazat spouštěč?',
 	'S_PROFILE_FOR_THIS_HOST_IS_MISSING'=>	'Chybí profil pro tohoto hostitele',
@@ -1887,6 +2112,7 @@
 	'S_NO_ITEM_WITH'=>				'Neexistuje položka s',
 	'S_DELETED_SMALL'=>				'smazaný',
 	'S_UNKNOWN_VALUE_TYPE'=>			'Neznámý typ hodnoty',
+	'S_ITEMS_CHECK_KEY_DEFAULT_EXAMPLE_PASSED'=>	'Check the key, please. Default example was passed',
 
 //	httptest.inc.php
 	'S_SCENARIO_STEP_NUMBER_CANNOT_BE_LESS_ONE'=>	'Číslo kroku scénáře nesmí být menší než 1',
@@ -1926,6 +2152,8 @@
 	'S_TEMPLATE_WITH_ITEM_KEY'=>			'Šablona s klíčem položky',
 	'S_TEMPLATE_WITH_APPLICATION'=>			'Šablona s aplikací',
 	'S_ALREADY_LINKED_TO_HOST_SMALL'=>		'je již propojená s hostitelem',
+	'S_HOST_HAS_BEEN_DELETED_MSG_PART1'=>		'Hostitel',
+	'S_HOST_HAS_BEEN_DELETED_MSG_PART2'=>		'byl smazán ze systému',
 
 //	validate.inc.php
 	'S_CRITICAL_ERROR'=>				'Kritická chyba',
@@ -1975,6 +2203,11 @@
 	'S_NO_FUNCTION_WITH'=>					'Neexistuje funkce s',
 	'S_SPECIFY_THE_CONDITIONAL_EXPR_FOR_THE_TARGET'=>	'Určete podmínku pro cíl.',
 	'S_0_OR_1'=>						'0 nebo 1',
+	'S_TRIGGER_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR'=>	'Výraz spouštěče musí obsahovat alespoň jednu položku.',
+	'S_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR'=>		'Hostitel neexistuje.',
+	'S_EXPRESSION_HOST_KEY_DOES_NOT_ERROR'=>		'Klíč hostitele neexistuje.',
+	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART1'=>	'Funkce \'',
+	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART2'=>	'\' nepřijímá žádné argumenty.',
 
 //	page_footer.php
 	'S_TRANSACTION_HAVE_NOT_BEEN_CLOSED_ABORTING'=>	'Transakce nebyla uzavřena. Ruším...',
@@ -1987,8 +2220,10 @@
 //	screens.inc.php
 	'S_NO_ROWS_IN_SCREEN'=>				'Neexistují žádné řádky pro obrazovku',
 	'S_DELETE_IT_Q'=>				'Smazat?',
-	'S_THIS_SCREEN_ROW_NOT_EMPTY'=>	'Tento řádek obrazovky není prázdný',
+	'S_THIS_SCREEN_ROW_NOT_EMPTY'=>			'Tento řádek obrazovky není prázdný',
 	'S_THIS_SCREEN_COLUMN_NOT_EMPTY'=>		'Tento sloupec obrazovky není prázdný',
+	'S_SCREENS_PLAIN_TEXT_DATE_FORMAT'=>		'j. M Y G:i:s',
+	'S_SCREENS_TRIGGER_FORM_DATE_FORMAT'=>		'[G:i:s]',
 
 //	graphs.inc.php
 	'S_NO_GRAPH_WITH'=>					'Neexistuje položka grafu s',
@@ -1999,17 +2234,21 @@
 	'S_FOR_TEMPLATE_GRAPH_SMALL'=>				'pro šablonu grafu',
 	'S_UPDATED_FOR_HOSTS'=>					'aktualizován pro hostitele',
 	'S_SKIPPED_COPYING_OF_GRAPH'=>				'Kopírování grafu přeskočeno',
+	'S_GRAPH_DELETED_FROM_HOSTS_PART1'=>			'Graf "',
+	'S_GRAPH_DELETED_FROM_HOSTS_PART2'=>			'" byl smazaný z hostitelů',
+	'S_GRAPH_DELETED_FROM_HOSTS_PART3'=>			'',
 
 //	profiles.inc.php
 	'S_UNABLE_TO_SELECT_CONFIGURATION'=>	'Nepodařilo se načíst nastavení',
 
 //	maintenances.inc.php
-	'S_ON_SMALL'=>			'v',
-	'S_EVERY_SMALL'=>		'každé',
-	'S_DAY_SMALL'=>			'den',
-	'S_OF_EVERY_SMALL'=>		'každého',
-	'S_WEEKS_SMALL'=>		'týdny',
-	'S_WEEK_SMALL'=>		'týden',
+	'S_ON_SMALL'=>				'v',
+	'S_EVERY_SMALL'=>			'každé',
+	'S_DAY_SMALL'=>				'den',
+	'S_OF_EVERY_SMALL'=>			'každého',
+	'S_WEEKS_SMALL'=>			'týdny',
+	'S_WEEK_SMALL'=>			'týden',
+	'S_MAINTENANCES_SCHEDULE_DATE_FORMAT'=>	'j. M Y',
 
 //	services.inc.php
 	'S_SERVICE_CANNOT_BE_PARENT_AND_CHILD_AT_THE_SAME_TIME'=>	'Služba nemůže být nadřazená i podřazená zároveň.',
@@ -2060,18 +2299,72 @@
 	'S_REQUIRES_BCMATH_MODULE'=> 'Vyžaduje modul bcmath',
 	'S_CONFIGURE_PHP_WITH_SMALL'=> 'zkonfigurujte PHP s',
 	'S_REQUIRES_MB_STRING_MODULE'=> 'Vyžaduje modul mbstring',
-	'S_PHP_SOCKETS'=> 'PHP - sokety',
+	'S_PHP_SOCKETS'=> 'PHP - podpora soketů',
 	'S_REQUIRED_SOCKETS_MODULE'=> 'Vyžaduje modul sockets',
 	'S_THE_GD_EXTENSION_IS_NOT_LOADED'=> 'Rozšíření GD není načteno.',
-	'S_GD_PNG_SUPPORT'=> 'Podpora GD PNG',
+	'S_GD_PNG_SUPPORT'=> 'PHP - podpora GD PNG',
 	'S_REQUIRES_IMAGES_GENERATION_SUPPORT'=> 'Vyžaduje podporu generování obrázků',
-	'S_LIBXML_MODULE'=> 'libxml module',
+	'S_LIBXML_MODULE'=> 'PHP - libxml modul',
 	'S_PHPXML_MODULE_IS_NOT_INSTALLED'=> 'php-xml modul není nainstalovaný',
 	'S_CTYPE_MODULE'=> 'modul ctype',
 	'S_REQUIRES_CTYPE_MODULE'=> 'Vyžaduje modul ctype',
 	'S_PHP_UPLOAD_MAX_FILESIZE'=> 'PHP - maximální velikost nahrávaného souboru',
 	'S_IS_MINIMAL_FOR_PHP_ULOAD_FILESIZE_SMALL'=> 'je nejnižší hodnota pro maximální velikost nahrávaného souboru',
+	'S_SESSION_MODULE'=> 'PHP - modul session',
+	'S_REQUIRED_SESSION_MODULE'=> 'Vyžaduje modul session',
 
+//	class.cuser.php
+	'S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_SECONDS_FIRST_PART'=> 'Účet je blokovaný na',
+	'S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_SECONDS_SECOND_PART'=>	'sekund',
+	'S_CUSER_ERROR_LOGIN_OR_PASSWORD_INCORRECT'=>		'Neplatné přihlašovací jméno nebo heslo',
+	'S_CUSER_ERROR_SESSION_TERMINATED'=>			'Relace byla ukončena! Přihlašte se, prosím, znovu.',
+	'S_CUSER_ERROR_TABLE_USERS_EMPTY'=>			'Tabulka uživatelů je prázdná. Databáze je pravděpodobně poškozená.',
+	'S_CUSER_ERROR_LDAP_MODULE_MISSING'=>			'Modul php-ldap pravděpodobně chybí',
+	'S_CUSER_ERROR_FAILED_LOGIN_ATTEMPTS'=>				'neúspěšné pokusy o přihlášení zaznamenány.',
+	'S_CUSER_ERROR_LAST_FAILED_ATTEMPTS'=>				'Poslední neúspěšný pokus o přihlášení byl z',
+	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_CREATE_USERS'=>		'Pouze Super Admini můžou vytvářet uživatele',
+	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_UPDATE_USERS'=>		'Pouze Super Admini můžou aktualizovat uživatele',
+	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_DELETE_USERS'=>		'Pouze Super Admini můžou mazat uživatele',
+	'S_CUSER_ERROR_ONLY_ADMIN_CAN_ADD_USER_MEDIAS'=>	'Pouze Zabbix Admini můžou přidávat média uživatelům',
+	'S_CUSER_ERROR_ONLY_ADMIN_CAN_REMOVE_USER_MEDIAS'=>	'Pouze Zabbix Admini můžou mazat média uživatelům',
+	'S_CUSER_ERROR_ONLY_ADMIN_CAN_CHANGE_USER_MEDIAS'=>	'Pouze Zabbix Admini můžou měnit média uživatelům',
+	'S_CUSER_ERROR_CANT_DELETE_USER_MEDIAS'=>		'Nelze smazat media uživatele',
+	'S_CUSER_ERROR_CANT_UPDATE_USER_MEDIAS'=>		'Nelze aktualizovat média uživatele',
+	'S_CUSER_ERROR_CANT_INSERT_USER_MEDIAS'=>		'Nelze přidat média uživatele',
+	'S_CUSER_ERROR_WRONG_FIELD_FOR_USER'=>			'Nesprávně zadaná pole pro uživatele',
+	'S_CUSER_ERROR_USER_EXISTS_FIRST_PART'=>		'Uživatel [',
+	'S_CUSER_ERROR_USER_EXISTS_SECOND_PART'=>		'] již existuje',
+	'S_CUSER_ERROR_CANT_RENAME_GUEST_USER'=>		'Nelze přejmenovat uživatele guest',
+	'S_CUSER_ERROR_USER_UNABLE_RESTRICT_SELF_GUI_ACCESS_PART1'=>	'Uživatel nemůže omezit přístup ke grafickému rozhraní sám sobě. Skupina "',
+	'S_CUSER_ERROR_USER_UNABLE_RESTRICT_SELF_GUI_ACCESS_PART2'=>	'" omezuje oprávnění',
+	'S_CUSER_ERROR_USER_CANT_DISABLE_SELF_PART1'=>		'Uživatel nemůže zakázat sám sebe. Skupina "',
+	'S_CUSER_ERROR_USER_CANT_DISABLE_SELF_PART2'=>		'" omezuje oprávnění',
+	'S_CUSER_ERROR_INCORRECT_TIME_PERIOD'=>			'Neplatné časové období',
+	'S_CUSER_ERROR_WRONG_PERIOD_PART1'=>			'Neplatné odbobí aktivity média [',
+	'S_CUSER_ERROR_WRONG_PERIOD_PART2'=>			']',
+	'S_CUSER_ERROR_INTERNAL_ZABBIX_ERROR'=>			'Vnitřní chyba Zabbixu',
+
+// class.cmediatype.php
+	'S_CMEDIATYPE_ERROR_WRONG_FIELD_FOR_MEDIATYPE'=>	'Nesprávně zadaná pole pro typ média',
+	'S_CMEDIATYPE_ERROR_CANT_DELETE_MEDIATYPES'=>		'Nelze smazat typy médií',
+	'S_CMEDIATYPE_ERROR_CANT_UPDATE_MEDIATYPES'=>		'Nelze aktualizovat typy médií',
+	'S_CMEDIATYPE_ERROR_CANT_INSERT_MEDIATYPES'=>		'Nelze přidat typy médií',
+	'S_MEDIATYPE_ALREADY_EXISTS'=>				'Typ média již existuje:',
+	'S_MEDIATYPE_USED_BY_ACTIONS'=>	'Typ média je použitý v akci:',
+	'S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_CREATE_MEDIATYPES'=>'Pouze Super Admini můžou vytvářet typy médií',
+	'S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_UPDATE_MEDIATYPES'=>'Pouze Super Admini můžou aktualizovat typy médií',
+	'S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_DELETE_MEDIATYPES'=>'Pouze Super Admini můžou mazat typy médií',
+
+//	config.inc.php
+	'S_CONFIG_NOT_LOGGED_IN_ACCESS_DENIED'=>		'Tuto stránku nemůžete prohlížet jako',
+	'S_CONFIG_ERROR_YOU_MUST_LOGIN'=>			'Pro zobrazení této stránky musíte být přihlášen(a).',
+	'S_CONFIG_NOT_LOGGED_IN_NOTE'=>				'Pokud si myslíte, že tato zpráva je špatně, prosím kontaktuje vašeho administrátora pro přidělení potřebných oprávnění.',
+	'S_CONFIG_ERROR_YOU_ARE_NOT_LOGGED_IN_HEAD'=>		'Nejste přihlášen(a).',
+	'S_CONFIG_ERROR_HEAD'=>					'CHYBA',
+	'S_CONFIG_WARNING_WRONG_MONTH_PART1'=>			'[Neplatná hodnota pro měsíc:',
+	'S_CONFIG_WARNING_WRONG_MONTH_PART2'=>			']',
+	'S_CONFIG_WARNING_WRONG_DOW_PART1'=>			'[Neplatná hodnota pro den v týdnu:',
+	'S_CONFIG_WARNING_WRONG_DOW_PART2'=>			']',
 
 //	Menu
 
@@ -2096,8 +2389,40 @@
 	'S_INCORRECT_DESCRIPTION'=>		'Neplatný popis',
 	'S_CANT_FORMAT_TREE'=>			'Nelze naformátovat navigační strom',
 	'S_NO_PERMISSION'=>				'Nemáte oprávnění k provedení této operace',
-	'S_NO_PERMISSIONS_FOR_SCREEN'=> 'Nemáte oprávnění k obrazovce',
+	'S_NO_PERMISSIONS_FOR_SCREEN'=>	'Nemáte oprávnění k obrazovce',
 	'S_NO_PERMISSIONS_FOR_MAP'=>	'Nemáte oprávnění k mapě',
 	'S_XML_FILE_CONTAINS_ERRORS'=>	'XML soubor obsahuje chyby',
-	);
+
+//	class.calendar.js
+	'S_MONDAY_SHORT_BIG'=>		'po',
+	'S_TUESDAY_SHORT_BIG'=>		'út',
+	'S_WEDNESDAY_SHORT_BIG'=>	'st',
+	'S_THURSDAY_SHORT_BIG'=>	'čt',
+	'S_FRIDAY_SHORT_BIG'=>		'pá',
+	'S_SATURDAY_SHORT_BIG'=>	'so',
+	'S_SUNDAY_SHORT_BIG'=>		'ne',
+
+//	gtlc.js
+	'S_ZOOM'=>			'Zvětšení',
+	'S_FIXED_SMALL'=>		'pevný',
+	'S_DYNAMIC_SMALL'=>		'dynamický',
+	'S_NOW_SMALL'=>			'nyní',
+
+//	functions.js
+	'S_CREATE_LOG_TRIGGER'=>			'Create Log Trigger',
+	'DO_YOU_REPLACE_CONDITIONAL_EXPRESSION_Q'=>	'Do you replace the conditional expression?',
+	'S_ADD_SERVICE'=>				'Přidat službu',
+	'S_EDIT_SERVICE'=>				'Upravit službu',
+	'S_DELETE_SERVICE'=>				'Smazat službu',
+	'S_DELETE_SELECTED_SERVICES_Q'=>		'Smazat vybrané služby?',
+
+//	js.inc.php
+	'S_CANNOT_FIND_OBJECTS_WITH_NAME'=>	'Nelze najít žádné objekty se jménem',
+	'S_CANNOT_CREATE_NEW_ELEMENT'=>		'Nelze vytvořit nový element',
+	'S_OTHER_SMALL'=>			'other',
+
+// class.cookie.js
+	'S_MAX_COOKIE_SIZE_REACHED' => 'We are sorry, the maximum possible number of elements to remember has been reached.',
+
+);
 ?>
