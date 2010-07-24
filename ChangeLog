@@ -6,13 +6,14 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2700] updated Czech translation; thanks to Jakub Kalas (Richlv)
  - [ZBX-2739] fixed empty list of items when "all" selected in items popup (Vedmak)
- - [ZBX-2747] improved sql when save triggers (Vedmak)
- - [ZBX-2750] fixed undefined index when delete graph (Vedmak)
+ - [ZBX-2747] improved sql when saving triggers (Vedmak)
+ - [ZBX-2750] fixed undefined index when deleting graph (Vedmak)
  - [ZBX-2742] fixed item deletion with postgre (Vedmak)
- - [ZBX-2738] fixed problems with ukrainian locales (Aly)
+ - [ZBX-2738] fixed problems with Ukrainian locales (Aly)
  - [ZBX-2740] fixed js errors in items section in IE (Aly)
-	
+
 Changes for 1.8.3rc1
 
  - [ZBX-2731] fixed permissions problem with hostgroup names containing '[]' (Vedmak)
