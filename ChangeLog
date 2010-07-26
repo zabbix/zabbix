@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2759] fixed item form not saving params field (Vedmak)
  - [ZBX-2762] fixed sql error when "all" hosts is selected in application popup (Vedmak)
  - [ZBX-2757] fixed calendar colors in DO theme (Vedmak)
  - [ZBX-2754] fixed possible undefined variables in frontend (Aly)
