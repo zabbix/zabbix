@@ -84,54 +84,21 @@ include_once('include/page_header.php');
 				$lastEventId = bcadd($lastEventId, 1);
 			}
 
-			$triggerOptions = array(
-				'lastChangeSince' => (time() - $msgsettings['timeout']), // 15 min
-				'filter' => array(
-					'priority' => array_keys($msgsettings['triggers']['severities']),
-					'value' => array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE)
-				),
-				'select_hosts' => array('hostid', 'host'),
-				'output' => API_OUTPUT_EXTEND,
-				'expandDescription' => 1,
-				'sortfield' => 'lastchange',
-				'sortorder' => ZBX_SORT_DOWN,
-				'limit' => 15
-			);
-
-			if(!$msgsettings['triggers']['recovery']){
-				$triggerOptions['filter']['value'] = array(TRIGGER_VALUE_TRUE);
-			}
-
-			$triggers = CTrigger::get($triggerOptions);
-			$triggers = zbx_toHash($triggers, 'triggerid');
-
 			$options = array(
-				'object' => EVENT_OBJECT_TRIGGER,
-				'triggerids' => zbx_objectValues($triggers, 'triggerid'),
-				'time_from' => (time() - $msgsettings['timeout']), // 15 min
-				'output' => API_OUTPUT_EXTEND,
-				'sortfield' => 'clock',
-				'sortorder' => ZBX_SORT_DOWN,
+				'lastChangeSince' => (time() - $msgsettings['timeout']),
+				'priority' => array_keys($msgsettings['triggers']['severities']),
+				'value' => array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE),
 				'limit' => 15
 			);
 
-			if($lastEventId > 0){
-				$options['eventid_from'] = $lastEventId;
-			}
+			if($lastEventId > 0) $options['eventid_from'] = $lastEventId;
+			if(!$msgsettings['triggers']['recovery']) $options['value'] = TRIGGER_VALUE_TRUE;
 
-			if(!$msgsettings['triggers']['recovery']){
-				$options['value'] = TRIGGER_VALUE_TRUE;
-			}
-
-			$events = CEvent::get($options);
-
-			$sortClock = array();
-			$sortEvent = array();
+			$events = getLastEvents($options);
+			$events = array_reverse($events);
 			foreach($events as $enum => $event){
-				if(!isset($triggers[$event['objectid']])) continue;
-
-				$trigger = $triggers[$event['objectid']];
-				$host = reset($trigger['hosts']);
+				$trigger = $event['trigger'];
+				$host = $event['host'];
 
 				if($event['value'] == TRIGGER_VALUE_FALSE){
 					$priority = 0;
@@ -166,12 +133,7 @@ include_once('include/page_header.php');
 					),
 					'timeout' => $msgsettings['timeout']
 				);
-
-				$sortClock[$enum] = $event['clock'];
-				$sortEvent[$enum] = $event['eventid'];
 			}
-
-			array_multisort($sortClock, SORT_ASC, $sortEvent, SORT_ASC, $result);
 		break;
 		case 'message.closeAll':
 			$params = $data['params'];

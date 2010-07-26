@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBX-2745] improved screen elements processing (Aly)
  - [ZBX-2757] fixed calendar colors in DO theme (Vedmak)
  - [ZBX-2754] fixed possible undefined variables in frontend (Aly)
  - [ZBX-2761] improved performance in search page (Aly)

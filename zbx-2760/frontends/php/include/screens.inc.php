@@ -1411,7 +1411,38 @@ require_once('include/js.inc.php');
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
 				else if(($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_EVENTS)){
-					$item = array(get_history_of_triggers_events(0, $elements));
+					$events = getLastEvents(array('limit' => $elements));
+
+					$item = new CTableInfo(S_NO_EVENTS_FOUND);
+					$item->setHeader(array(
+							S_TIME,
+							is_show_all_nodes() ? S_NODE : null,
+							S_HOST,
+							S_DESCRIPTION,
+							S_VALUE,
+							S_SEVERITY
+							));
+
+					foreach($events as $enum => $event){
+						$trigger = $event['trigger'];
+						$host = $event['host'];
+
+						$value = new CCol(trigger_value2str($event['value']), get_trigger_value_style($event['value']));
+
+						$item->addRow(array(
+							zbx_date2str(S_EVENTS_TRIGGERS_EVENTS_HISTORY_LIST_DATE_FORMAT,$event['clock']),
+							get_node_name_by_elid($event['eventid']),
+							$host['host'],
+							new CLink(
+								$trigger['description'],
+								'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid']
+								),
+							$value,
+							new CCol(get_severity_description($trigger['priority']), get_severity_style($trigger['priority'])),
+						));
+					}
+
+					$item = array($item);
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
 				else{
