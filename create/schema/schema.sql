@@ -905,7 +905,6 @@ FIELD		|comments	|t_blob		|''	|NOT NULL	|ZBX_SYNC
 FIELD		|error		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|templateid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|triggers
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|ns		|t_nanosec	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|status
 INDEX		|2		|value
 
