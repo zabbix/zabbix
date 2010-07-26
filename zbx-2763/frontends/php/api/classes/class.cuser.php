@@ -121,7 +121,7 @@ class CUser extends CZBXAPI{
 				' )';
 		}
 		else if(!is_null($options['editable']) || ($USER_DETAILS['type']!=USER_TYPE_SUPER_ADMIN)){
-			return array();
+			$options['userids'] = $USER_DETAILS['userid'];
 		}
 
 // nodeids
