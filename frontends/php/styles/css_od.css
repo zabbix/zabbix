@@ -596,3 +596,50 @@ span.link_menu:hover{
 	border-color: #FF5500;
 	color: #FF5500;
 }
+
+/* calendar */
+div.calendar{
+	border: 1px #FF5500 solid;
+}
+div.calendartime{
+	background-color:#1F1F1F;
+}
+table.calendarhat{
+	background-color:#1F1F1F;
+}
+table.calendarhat tr td{
+	color: #DFDFDF;
+}
+table.calendartab{
+	background-color:#666666;
+}
+table.calendartab tr td{
+	background-color:#1F1F1F;
+	color: #FF5500;
+}
+table.calendartab tr td.hollyday{
+	background-color:#2F2F2F;
+}
+table.calendartab tr td.selected{
+	background-color: #FF5500;
+	color: #000000;
+	font-weight: bolder;
+}
+div.calendardays{
+	border:0;
+}
+div.calendar span.title{
+	color:#FF5500;
+}
+div.calendar span.clndr_right_arrow:hover{
+	color: #FF5500;
+}
+div.calendar span.clndr_left_arrow:hover{
+	color: #FF5500;
+}
+
+div.calendar input.calendar_textbox{
+	color: #DFDFDF;
+	border: 1px solid #DFDFDF;
+	background-color: #2F2F2F;
+}
