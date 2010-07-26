@@ -693,9 +693,14 @@
 			$change_password	= get_request('change_password', null);
 			$user_medias		= get_request('user_medias', array());
 
+
 			$messages = get_request('messages', array());
 
 			if(!isset($messages['enabled'])) $messages['enabled'] = 0;
+
+			$pMsgs = getMessageSettings();
+			$messages = array_merge($pMsgs, $messages);
+			
 			if(!isset($messages['sounds']['mute'])) $messages['sounds']['mute'] = 0;
 			if(!isset($messages['sounds']['recovery'])) $messages['sounds']['recovery'] = 0;
 			if(!isset($messages['triggers']['recovery'])) $messages['triggers']['recovery'] = 0;
@@ -2326,44 +2331,28 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$spanF->setAttribute('id', 'label_formula');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_CALCULATED, 'label_formula');
 
-		$params_script = get_request('params_script', '');
-		$params_dbmonitor = get_request('params_dbmonitor', $type != ITEM_TYPE_DB_MONITOR ? "DSN=<database source name>\nuser=<user name>\npassword=<password>\nsql=<query>" : '');
-		$params_calculted = get_request('params_calculted', '');
+		
+		$params_script = new CTextArea('params', $params, 60, 4);
+		$params_script->setAttribute('id', 'params_script');
+		$params_dbmonitor = new CTextArea('params', $params, 60, 4);
+		$params_dbmonitor->setAttribute('id', 'params_dbmonitor');
+		$params_calculted = new CTextArea('params', $params, 60, 4);
+		$params_calculted->setAttribute('id', 'params_calculted');
 
-		// swaping values to save hidden values and synchronize actual values
-		switch($type) {
-			case ITEM_TYPE_SSH:
-			case ITEM_TYPE_TELNET:
-				$tmp_params = $params;
-				$params = $params_script;
-				$params_script = $tmp_params;
-			break;
-			case ITEM_TYPE_DB_MONITOR:
-				$tmp_params = $params;
-				$params = $params_dbmonitor;
-				$params_dbmonitor = $tmp_params;
-			break;
-			case ITEM_TYPE_CALCULATED:
-				$tmp_params = $params;
-				$params = $params_calculted;
-				$params_calculted = $tmp_params;
-			break;
-		}
-
-		$row = new CRow(array(new CCol(array($spanEC, $spanP, $spanF),'form_row_l'), new CCol(new CTextArea('params',$params,60,4),'form_row_r')));
+		$row = new CRow(array(
+			new CCol(array($spanEC, $spanP, $spanF),'form_row_l'), 
+			new CCol(array($params_script, $params_dbmonitor, $params_calculted),'form_row_r')
+		));
 		$row->setAttribute('id', 'row_params');
 		$frmItem->addRow($row);
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, array('id' => 'params', 'objValue' => 'params_script'));
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'params_script');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'row_params');
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, array('id' => 'params', 'objValue' => 'params_script'));
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'params_script');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'row_params');
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_DB_MONITOR, array('id' => 'params', 'objValue' => 'params_dbmonitor'));
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_DB_MONITOR, 'params_dbmonitor');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_DB_MONITOR, 'row_params');
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_CALCULATED, array('id' => 'params', 'objValue' => 'params_calculted'));
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_CALCULATED, 'params_calculted');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_CALCULATED, 'row_params');
-		$frmItem->addVar('params_script', $params_script);
-		$frmItem->addVar('params_dbmonitor', $params_dbmonitor);
-		$frmItem->addVar('params_calculted', $params_calculted);
 
 /*
 ITEM_TYPE_DB_MONITOR $key = 'db.odbc.select[<unique short description>]'; $params = "DSN=<database source name>\nuser=<user name>\npassword=<password>\nsql=<query>";

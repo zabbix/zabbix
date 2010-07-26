@@ -154,6 +154,7 @@ disableObj: function(obj, disable){
 hideObj: function(data) {
 	if(is_null($(data.id))) return true;
 
+	this.disableObj($(data.id), true);
 	$(data.id).style.display = 'none';
 
 	var objValue = this.objValue($(data.id));
