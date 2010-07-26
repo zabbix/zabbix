@@ -89,8 +89,7 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		buffer[MAX_STRING_LEN],
 		proccomm[MAX_STRING_LEN];
 	int	do_task, pagesize, count, i,
-		proc_ok, comm_ok,
-		mib[4];
+		proc_ok, comm_ok;
 
 	double	value = 0.0,
 		memsize = 0;
@@ -98,8 +97,15 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	size_t	sz;
 
-	struct kinfo_proc	*proc = NULL;
 	struct passwd		*usrinfo;
+
+#ifdef KERN_PROC2
+	int			mib[6];
+	struct kinfo_proc2	*proc = NULL;
+#else
+	int			mib[4];
+	struct kinfo_proc	*proc = NULL;
+#endif
 
 	char	**argv = NULL, *args = NULL;
 	size_t	argv_alloc = 0, args_alloc = 0;
@@ -150,7 +156,6 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	pagesize = getpagesize();
 
 	mib[0] = CTL_KERN;
-	mib[1] = KERN_PROC;
 	if (NULL != usrinfo) {
 		mib[2] = KERN_PROC_UID;
 		mib[3] = usrinfo->pw_uid;
@@ -158,6 +163,26 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		mib[2] = KERN_PROC_ALL;
 		mib[3] = 0;
 	}
+
+#ifdef KERN_PROC2
+	mib[1] = KERN_PROC2;
+	mib[4] = sizeof(struct kinfo_proc2);
+	mib[5] = 0;
+
+	sz = 0;
+	if (0 != sysctl(mib, 6, NULL, &sz, NULL, 0))
+		return SYSINFO_RET_FAIL;
+
+	proc = (struct kinfo_proc2 *)zbx_malloc(proc, sz);
+	mib[5] = (int)(sz / sizeof(struct kinfo_proc2));
+	if (0 != sysctl(mib, 6, proc, &sz, NULL, 0)) {
+		zbx_free(proc);
+		return SYSINFO_RET_FAIL;
+	}
+
+	count = sz / sizeof(struct kinfo_proc2);
+#else
+	mib[1] = KERN_PROC;
 
 	sz = 0;
 	if (0 != sysctl(mib, 4, NULL, &sz, NULL, 0))
@@ -170,16 +195,25 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	}
 
 	count = sz / sizeof(struct kinfo_proc);
+#endif
 
 	for (i = 0; i < count; i++) {
 		proc_ok = 0;
 		comm_ok = 0;
 
+#ifdef KERN_PROC2
+		if (*procname == '\0' || 0 == strcmp(procname, proc[i].p_comm))
+#else
 		if (*procname == '\0' || 0 == strcmp(procname, proc[i].kp_proc.p_comm))
+#endif
 			proc_ok = 1;
 
 		if (*proccomm != '\0') {
+#ifdef KERN_PROC2
+			if (SUCCEED == proc_argv(proc[i].p_pid, &argv, &argv_alloc, &argc)) {
+#else
 			if (SUCCEED == proc_argv(proc[i].kp_proc.p_pid, &argv, &argv_alloc, &argc)) {
+#endif
 				collect_args(argv, argc, &args, &args_alloc);
 				if (NULL != zbx_regexp_match(args, proccomm, NULL))
 					comm_ok = 1;
@@ -188,9 +222,15 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 			comm_ok = 1;
 
 		if (proc_ok && comm_ok) {
+#ifdef KERN_PROC2
+			value = proc[i].p_vm_tsize
+				+ proc[i].p_vm_dsize
+				+ proc[i].p_vm_ssize;
+#else
 			value = proc[i].kp_eproc.e_vm.vm_tsize
 				+ proc[i].kp_eproc.e_vm.vm_dsize
 				+ proc[i].kp_eproc.e_vm.vm_ssize;
+#endif
 			value *= pagesize;
 
 			if (0 == proccount++)
@@ -224,15 +264,21 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 		buffer[MAX_STRING_LEN],
 		proccomm[MAX_STRING_LEN];
 	int	zbx_proc_stat, count, i,
-		proc_ok, stat_ok, comm_ok,
-		mib[4];
+		proc_ok, stat_ok, comm_ok;
 
 	int	proccount = 0;
 
 	size_t	sz;
 
-	struct kinfo_proc	*proc = NULL;
 	struct passwd		*usrinfo;
+
+#ifdef KERN_PROC2
+	int			mib[6];
+	struct kinfo_proc2	*proc = NULL;
+#else
+	int			mib[4];
+	struct kinfo_proc	*proc = NULL;
+#endif
 
 	char	**argv = NULL, *args = NULL;
 	size_t	argv_alloc = 0, args_alloc = 0;
@@ -281,7 +327,6 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 		*proccomm = '\0';
 
 	mib[0] = CTL_KERN;
-	mib[1] = KERN_PROC;
 	if (NULL != usrinfo) {
 		mib[2] = KERN_PROC_UID;
 		mib[3] = usrinfo->pw_uid;
@@ -289,6 +334,26 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 		mib[2] = KERN_PROC_ALL;
 		mib[3] = 0;
 	}
+
+#ifdef KERN_PROC2
+	mib[1] = KERN_PROC2;
+	mib[4] = sizeof(struct kinfo_proc2);
+	mib[5] = 0;
+
+	sz = 0;
+	if (0 != sysctl(mib, 6, NULL, &sz, NULL, 0))
+		return SYSINFO_RET_FAIL;
+
+	proc = (struct kinfo_proc2 *)zbx_malloc(proc, sz);
+	mib[5] = (int)(sz / sizeof(struct kinfo_proc2));
+	if (0 != sysctl(mib, 6, proc, &sz, NULL, 0)) {
+		zbx_free(proc);
+		return SYSINFO_RET_FAIL;
+	}
+
+	count = sz / sizeof(struct kinfo_proc2);
+#else
+	mib[1] = KERN_PROC;
 
 	sz = 0;
 	if (0 != sysctl(mib, 4, NULL, &sz, NULL, 0))
@@ -301,35 +366,39 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 	}
 
 	count = sz / sizeof(struct kinfo_proc);
+#endif
 
 	for (i = 0; i < count; i++) {
 		proc_ok = 0;
 		stat_ok = 0;
 		comm_ok = 0;
 
+#ifdef KERN_PROC2
+		if (*procname == '\0' || 0 == strcmp(procname, proc[i].p_comm))
+#else
 		if (*procname == '\0' || 0 == strcmp(procname, proc[i].kp_proc.p_comm))
+#endif
 			proc_ok = 1;
 
-		if (zbx_proc_stat != ZBX_PROC_STAT_ALL) {
-			switch (zbx_proc_stat) {
-			case ZBX_PROC_STAT_RUN:
-				if (proc[i].kp_proc.p_stat == SRUN || proc[i].kp_proc.p_stat == SONPROC)
-					stat_ok = 1;
-				break;
-			case ZBX_PROC_STAT_SLEEP:
-				if (proc[i].kp_proc.p_stat == SSLEEP)
-					stat_ok = 1;
-				break;
-			case ZBX_PROC_STAT_ZOMB:
-				if (proc[i].kp_proc.p_stat == SZOMB || proc[i].kp_proc.p_stat == SDEAD)
-					stat_ok = 1;
-				break;
-			}
-		} else
-			stat_ok = 1;
+
+#ifdef KERN_PROC2
+		stat_ok = (zbx_proc_stat == ZBX_PROC_STAT_ALL ||
+				(zbx_proc_stat == ZBX_PROC_STAT_RUN && (proc[i].p_stat == SRUN || proc[i].p_stat == SONPROC)) ||
+				(zbx_proc_stat == ZBX_PROC_STAT_SLEEP && proc[i].p_stat == SSLEEP) ||
+				(zbx_proc_stat == ZBX_PROC_STAT_ZOMB && (proc[i].p_stat == SZOMB || proc[i].p_stat == SDEAD)));
+#else
+		stat_ok = (zbx_proc_stat == ZBX_PROC_STAT_ALL ||
+				(zbx_proc_stat == ZBX_PROC_STAT_RUN && (proc[i].kp_proc.p_stat == SRUN || proc[i].kp_proc.p_stat == SONPROC)) ||
+				(zbx_proc_stat == ZBX_PROC_STAT_SLEEP && proc[i].kp_proc.p_stat == SSLEEP) ||
+				(zbx_proc_stat == ZBX_PROC_STAT_ZOMB && (proc[i].kp_proc.p_stat == SZOMB || proc[i].kp_proc.p_stat == SDEAD)));
+#endif
 
 		if (*proccomm != '\0') {
+#ifdef KERN_PROC2
+			if (SUCCEED == proc_argv(proc[i].p_pid, &argv, &argv_alloc, &argc)) {
+#else
 			if (SUCCEED == proc_argv(proc[i].kp_proc.p_pid, &argv, &argv_alloc, &argc)) {
+#endif
 				collect_args(argv, argc, &args, &args_alloc);
 				if (zbx_regexp_match(args, proccomm, NULL) != NULL)
 					comm_ok = 1;
