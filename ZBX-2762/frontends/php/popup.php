@@ -325,7 +325,7 @@ include_once('include/page_header.php');
 	}
 
 	$available_nodes = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST);
-	$available_hosts = array_keys($pageFilter->hosts);
+	$available_hosts = empty($pageFilter->hosts) ? array() : array_keys($pageFilter->hosts);
 
 	if(isset($only_hostid)){
 		$hostid = $_REQUEST['hostid'] = $only_hostid;
@@ -880,27 +880,31 @@ include_once('include/page_header.php');
 		$table = new CTableInfo(S_NO_APPLICATIONS_DEFINED);
 		$table->setHeader(array(
 			($hostid>0)?null:S_HOST,
-			S_NAME));
+			S_NAME
+		));
 
-		$sql = 'SELECT DISTINCT h.host,a.* '.
-				' FROM hosts h,applications a '.
-				' WHERE h.hostid=a.hostid '.
-					' AND '.DBin_node('a.applicationid', $nodeid).
-					' AND '.DBcondition('h.hostid',$available_hosts).
-					// ' AND h.status in ('.implode(',', $host_status).')'.
-					' AND h.hostid='.$hostid.
-				' ORDER BY h.host,a.name';
+		$options = array(
+			'nodeids' => $nodeid,
+			'groupids' => $groupid,
+			'hostids' => $hostid,
+			'output' => API_OUTPUT_EXTEND,
+			'expand_data' => true,
+		);
+		if(!is_null($writeonly)) $options['editable'] = 1;
+		if(!is_null($templated)) $options['templated'] = $templated;
+		
+		$apps = CApplication::get($options);
+		morder_result($apps, array('host', 'name'));
+		
+		foreach($apps as $app){
+			$name = new CSpan($app['name'], 'link');
 
-		$result = DBselect($sql);
-		while($row = DBfetch($result)){
-			$name = new CSpan($row["name"],'link');
-
-			$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
-				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
+			$action = get_window_opener($dstfrm, $dstfld1, $app[$srcfld1]).
+				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $app[$srcfld2]) : '');
 
 			$name->setAttribute('onclick',$action." close_window(); return false;");
 
-			$table->addRow(array(($hostid>0)?null:$row['host'], $name));
+			$table->addRow(array(($hostid>0)?null:$app['host'], $name));
 		}
 		$table->show();
 	}
