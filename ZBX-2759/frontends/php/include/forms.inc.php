@@ -693,12 +693,13 @@
 			$change_password	= get_request('change_password', null);
 			$user_medias		= get_request('user_medias', array());
 
+
 			$messages = get_request('messages', array());
 
 			if(!isset($messages['enabled'])) $messages['enabled'] = 0;
-			if(!isset($messages['sounds']['mute'])) $messages['sounds']['mute'] = 0;
-			if(!isset($messages['sounds']['recovery'])) $messages['sounds']['recovery'] = 0;
-			if(!isset($messages['triggers']['recovery'])) $messages['triggers']['recovery'] = 0;
+
+			$pMsgs = getMessageSettings();
+			$messages = array_merge($pMsgs, $messages);
 		}
 
 		if($autologin || !isset($_REQUEST['autologout'])) $autologout = 0;
