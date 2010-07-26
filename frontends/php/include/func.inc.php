@@ -821,6 +821,56 @@ function zbx_rksort(&$array, $flags=NULL){
 	return $array;
 }
 
+
+// used only in morder_result
+function sortSub($array, $sortorder){
+	$result = array();
+	
+	$keys = array_keys($array);
+	natcasesort($keys);
+	
+	
+	if($sortorder != ZBX_SORT_UP)
+		$keys = array_reverse($keys);
+	
+	foreach($keys as $key){
+		$tst = reset($array[$key]);
+		if(isset($tst[0]) && !is_array($tst[0])){
+			$array[$key] = sortSub($array[$key], $sortorder);
+		}
+		
+		foreach($array[$key] as $id){
+			$result[] = $id;
+		}
+	}
+	return $result;
+}
+
+function morder_result(&$array, $sortfields, $sortorder=ZBX_SORT_UP){
+	$tmp = array();
+	$result = array();
+	
+	foreach($array as $key => $el){
+		unset($pointer);
+		$pointer =& $tmp;
+		foreach($sortfields as $f){
+			if(!isset($pointer[$el[$f]])) $pointer[$el[$f]] = array();
+			$pointer =& $pointer[$el[$f]];
+		}
+		$pointer[] = $key;		
+	}
+
+	$order = sortSub($tmp, $sortorder);
+
+	foreach($order as $key){
+		$result[$key] = $array[$key];
+	}
+	
+	$array = $result;
+	return true;
+}
+
+
 function order_result(&$data, $sortfield, $sortorder=ZBX_SORT_UP){
 	if(empty($data)) return false;
 
