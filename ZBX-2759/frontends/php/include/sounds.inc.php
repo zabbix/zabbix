@@ -81,7 +81,7 @@ function updateMessageSettings($messages){
 		if(isset($messages['triggers']['severities']))
 			CProfile::update('web.messages.triggers.severities', serialize($messages['triggers']['severities']), PROFILE_TYPE_STR);
 
-		if(isset($messages['timeout']['recovery']))
+		if(isset($messages['triggers']['recovery']))
 			CProfile::update('web.messages.triggers.recovery', $messages['triggers']['recovery'], PROFILE_TYPE_INT);
 	}
 

@@ -700,6 +700,10 @@
 
 			$pMsgs = getMessageSettings();
 			$messages = array_merge($pMsgs, $messages);
+			
+			if(!isset($messages['sounds']['mute'])) $messages['sounds']['mute'] = 0;
+			if(!isset($messages['sounds']['recovery'])) $messages['sounds']['recovery'] = 0;
+			if(!isset($messages['triggers']['recovery'])) $messages['triggers']['recovery'] = 0;
 		}
 
 		if($autologin || !isset($_REQUEST['autologout'])) $autologout = 0;
