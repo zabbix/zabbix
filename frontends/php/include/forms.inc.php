@@ -618,7 +618,7 @@
 /*			if(bccomp($userid,$USER_DETAILS['userid'])==0) $profile = 1;*/
 			$options = array(
 					'userids' => $userid,
-					'extendoutput' => 1
+					'output' => API_OUTPUT_EXTEND
 				);
 			if($profile) $options['nodeids'] = id2nodeid($userid);
 

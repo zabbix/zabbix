@@ -176,7 +176,7 @@ options = array(
 				$options['groupid'] = $this->_profileIds['groupid'];
 			}
 			else{
-				$groupids = array_keys($groupids);
+				$groupids = array_keys($groups);
 				$options['groupid'] = reset($groupids);
 			}
 
@@ -239,7 +239,7 @@ options = array(
 				$options['groupid'] = $this->_profileIds['groupid'];
 			}
 			else{
-				$groupids = array_keys($groupids);
+				$groupids = array_keys($groups);
 				$options['groupid'] = reset($groupids);
 			}
 
