@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2754] fixed possible undefined variables in frontend (Aly)
  - [ZBX-2761] improved performance in search page (Aly)
  - [ZBX-2683] minor updates for the Latvian translation (Richlv)
  - [ZBX-2741] updated French translation; thanks to Alixen (Richlv)
