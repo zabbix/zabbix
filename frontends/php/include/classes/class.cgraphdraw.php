@@ -147,16 +147,7 @@ class CGraphDraw{
 			$sql_where = ' AND gt.description='.zbx_dbstr($description);
 		}
 		else{
-			$config=select_config();
-			if(isset($config['default_theme']) && file_exists('styles/'.$config['default_theme'])){
-				$css = $config['default_theme'];
-			}
-
-			if(isset($USER_DETAILS['theme']) && ($USER_DETAILS['theme']!=ZBX_DEFAULT_CSS) && ($USER_DETAILS['alias']!=ZBX_GUEST_USER)){
-				if(file_exists('styles/'.$USER_DETAILS['theme'])){
-					$css = $USER_DETAILS['theme'];
-				}
-			}
+			$css = getUserTheme($USER_DETAILS);
 			if($css == 'css_od.css') $css = 'css_bb.css';
 
 			$sql_where = ' AND gt.theme='.zbx_dbstr($css);
@@ -316,9 +307,7 @@ class CGraphDraw{
 			$blue = $this->colorsrgb[$color][2];
 		}
 		else{
-			$red = hexdec(substr($color, 0,2));
-			$green = hexdec(substr($color, 2,2));
-			$blue = hexdec(substr($color, 4,2));
+			list($red, $green, $blue) = hex2rgb($color);
 		}
 
 		if($this->sum > 0){
