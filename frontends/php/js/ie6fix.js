@@ -15,10 +15,9 @@ fnLoadPngs: function(){
 	else{
 		this.root = document;
 	}
+
 	for (var i = this.root.all.length - 1, obj = null; (obj = this.root.all[i]); i--) {
-// background pngs
 		if(obj.currentStyle.backgroundImage.match(/\.png/i) !== null)  this.bg_fnFixPng(obj);
-// image elements
 		if(obj.tagName=='IMG' && obj.src.match(/\.png$/i) !== null) this.el_fnFixPng(obj);
 
 // apply position to 'active' elements
