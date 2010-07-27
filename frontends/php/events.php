@@ -525,6 +525,9 @@
 
 	$events_wdgt->show();
 
+?>
+<?php
 
 include_once('include/page_footer.php');
+
 ?>
