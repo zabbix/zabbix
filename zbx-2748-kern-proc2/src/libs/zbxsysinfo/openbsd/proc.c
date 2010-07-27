@@ -29,6 +29,22 @@
 
 #define ARGS_START_SIZE 64
 
+#ifdef KERN_PROC2
+#	define ZBX_P_CONN	p_comm
+#	define ZBX_P_PID	p_pid
+#	define ZBX_P_STAT	p_stat
+#	define ZBX_P_VM_TSIZE	p_vm_tsize
+#	define ZBX_P_VM_DSIZE	p_vm_dsize
+#	define ZBX_P_VM_SSIZE	p_vm_ssize
+#else
+#	define ZBX_P_CONN	kp_proc.p_comm
+#	define ZBX_P_PID	kp_proc.p_pid
+#	define ZBX_P_STAT	kp_proc.p_stat
+#	define ZBX_P_VM_TSIZE	kp_eproc.e_vm.vm_tsize
+#	define ZBX_P_VM_DSIZE	kp_eproc.e_vm.vm_dsize
+#	define ZBX_P_VM_SSIZE	kp_eproc.e_vm.vm_ssize
+#endif
+
 static int	proc_argv(pid_t pid, char ***argv, size_t *argv_alloc, int *argc)
 {
 	size_t	sz;
@@ -201,19 +217,11 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		proc_ok = 0;
 		comm_ok = 0;
 
-#ifdef KERN_PROC2
-		if (*procname == '\0' || 0 == strcmp(procname, proc[i].p_comm))
-#else
-		if (*procname == '\0' || 0 == strcmp(procname, proc[i].kp_proc.p_comm))
-#endif
+		if (*procname == '\0' || 0 == strcmp(procname, proc[i].ZBX_P_CONN))
 			proc_ok = 1;
 
 		if (*proccomm != '\0') {
-#ifdef KERN_PROC2
-			if (SUCCEED == proc_argv(proc[i].p_pid, &argv, &argv_alloc, &argc)) {
-#else
-			if (SUCCEED == proc_argv(proc[i].kp_proc.p_pid, &argv, &argv_alloc, &argc)) {
-#endif
+			if (SUCCEED == proc_argv(proc[i].ZBX_P_PID, &argv, &argv_alloc, &argc)) {
 				collect_args(argv, argc, &args, &args_alloc);
 				if (NULL != zbx_regexp_match(args, proccomm, NULL))
 					comm_ok = 1;
@@ -222,15 +230,9 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 			comm_ok = 1;
 
 		if (proc_ok && comm_ok) {
-#ifdef KERN_PROC2
-			value = proc[i].p_vm_tsize
-				+ proc[i].p_vm_dsize
-				+ proc[i].p_vm_ssize;
-#else
-			value = proc[i].kp_eproc.e_vm.vm_tsize
-				+ proc[i].kp_eproc.e_vm.vm_dsize
-				+ proc[i].kp_eproc.e_vm.vm_ssize;
-#endif
+			value = proc[i].ZBX_P_VM_TSIZE
+				+ proc[i].ZBX_P_VM_DSIZE
+				+ proc[i].ZBX_P_VM_SSIZE;
 			value *= pagesize;
 
 			if (0 == proccount++)
@@ -373,32 +375,17 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 		stat_ok = 0;
 		comm_ok = 0;
 
-#ifdef KERN_PROC2
-		if (*procname == '\0' || 0 == strcmp(procname, proc[i].p_comm))
-#else
-		if (*procname == '\0' || 0 == strcmp(procname, proc[i].kp_proc.p_comm))
-#endif
+		if (*procname == '\0' || 0 == strcmp(procname, proc[i].ZBX_P_CONN))
 			proc_ok = 1;
 
 
-#ifdef KERN_PROC2
 		stat_ok = (zbx_proc_stat == ZBX_PROC_STAT_ALL ||
-				(zbx_proc_stat == ZBX_PROC_STAT_RUN && (proc[i].p_stat == SRUN || proc[i].p_stat == SONPROC)) ||
-				(zbx_proc_stat == ZBX_PROC_STAT_SLEEP && proc[i].p_stat == SSLEEP) ||
-				(zbx_proc_stat == ZBX_PROC_STAT_ZOMB && (proc[i].p_stat == SZOMB || proc[i].p_stat == SDEAD)));
-#else
-		stat_ok = (zbx_proc_stat == ZBX_PROC_STAT_ALL ||
-				(zbx_proc_stat == ZBX_PROC_STAT_RUN && (proc[i].kp_proc.p_stat == SRUN || proc[i].kp_proc.p_stat == SONPROC)) ||
-				(zbx_proc_stat == ZBX_PROC_STAT_SLEEP && proc[i].kp_proc.p_stat == SSLEEP) ||
-				(zbx_proc_stat == ZBX_PROC_STAT_ZOMB && (proc[i].kp_proc.p_stat == SZOMB || proc[i].kp_proc.p_stat == SDEAD)));
-#endif
+				(zbx_proc_stat == ZBX_PROC_STAT_RUN && (proc[i].ZBX_P_STAT == SRUN || proc[i].ZBX_P_STAT == SONPROC)) ||
+				(zbx_proc_stat == ZBX_PROC_STAT_SLEEP && proc[i].ZBX_P_STAT == SSLEEP) ||
+				(zbx_proc_stat == ZBX_PROC_STAT_ZOMB && (proc[i].ZBX_P_STAT == SZOMB || proc[i].ZBX_P_STAT == SDEAD)));
 
 		if (*proccomm != '\0') {
-#ifdef KERN_PROC2
-			if (SUCCEED == proc_argv(proc[i].p_pid, &argv, &argv_alloc, &argc)) {
-#else
-			if (SUCCEED == proc_argv(proc[i].kp_proc.p_pid, &argv, &argv_alloc, &argc)) {
-#endif
+			if (SUCCEED == proc_argv(proc[i].ZBX_P_PID, &argv, &argv_alloc, &argc)) {
 				collect_args(argv, argc, &args, &args_alloc);
 				if (zbx_regexp_match(args, proccomm, NULL) != NULL)
 					comm_ok = 1;
