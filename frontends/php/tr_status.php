@@ -71,10 +71,7 @@ include_once('include/page_header.php');
 	check_fields($fields);
 
 	if(isset($_REQUEST['favobj'])){
-		if(str_in_array($_REQUEST['favobj'] ,array('sound'))){
-			CProfile::update('web.tr_status.mute',$_REQUEST['state'], PROFILE_TYPE_INT);
-		}
-		else if('filter' == $_REQUEST['favobj']){
+		if('filter' == $_REQUEST['favobj']){
 			CProfile::update('web.tr_status.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 	}
@@ -182,12 +179,7 @@ include_once('include/page_header.php');
 	$fs_icon->setAttribute('title', $_REQUEST['fullscreen'] ? S_NORMAL . ' ' . S_VIEW : S_FULLSCREEN);
 	$fs_icon->addAction('onclick', "javascript: document.location = '" . $url . "';");
 
-	$mute_icon = new CDiv(SPACE, $mute ? 'iconmute' : 'iconsound');
-	$mute_icon->setAttribute('title', S_SOUND . ' ' . S_ON_BIG . '/' . S_OFF_BIG);
-	$mute_icon->addAction('onclick', "javascript: switch_mute(this);");
-
-	//	show_table_header(S_STATUS_OF_TRIGGERS_BIG,array($mute_icon,$fs_icon));
-	$trigg_wdgt->addPageHeader(S_STATUS_OF_TRIGGERS_BIG . ' [' . date(S_DATE_FORMAT_YMDHMS) . ']', array($mute_icon, $fs_icon));
+	$trigg_wdgt->addPageHeader(S_STATUS_OF_TRIGGERS_BIG . ' [' . date(S_DATE_FORMAT_YMDHMS) . ']', array($fs_icon));
 
 	$numrows = new CDiv();
 	$numrows->setAttribute('name', 'numrows');

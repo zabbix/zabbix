@@ -82,6 +82,7 @@ initialize: function($super, messagesListId, args){
 		handle: this.dom.caption, //this.dom.header,
 		constraint: 'vertical',
 		scroll: window,
+		onEnd: this.fixIE.bind(this),
 		snap: function(x,y){if(y < 0) return [x,0]; else return [x,y];}
 	});
 
@@ -89,6 +90,7 @@ initialize: function($super, messagesListId, args){
 		handle: this.dom.move, //this.dom.header,
 		constraint: 'vertical',
 		scroll: window,
+		onEnd: this.fixIE.bind(this),
 		snap: function(x,y){if(y < 0) return [x,0]; else return [x,y];}
 	});
 },
@@ -263,7 +265,8 @@ closeMessage: function(messageid, withEffect){
 	if(this.messagePipe.length < 1){
 		this.messagePipe = new Array();
 		this.messageList = {};
-		setTimeout(Element.hide.bind(Element, this.dom.container), this.effectTimeout);
+
+		setTimeout(Element.hide.bind(Element, this.dom.container), IE6?100:this.effectTimeout);
 	}
 },
 
@@ -287,6 +290,7 @@ closeAllMessages: function(e){
 	new RPC.Call(rpcRequest);
 
 	Effect.SlideUp(this.dom.container, {duration: (this.effectTimeout / 1000)});
+
 	for(var messageid in this.messageList){
 		if(empty(this.messageList[messageid])) continue;
 
@@ -428,7 +432,8 @@ createContainer: function(){
 fixIE: function(){
 	if(IE6){
 		this.dom.header.style.width = '100px';
-		ie6pngfix.run(this.container);
+		showPopupDiv('zbx_messages','zbx_messages_frame');
+//		ie6pngfix.run(false);
 	}
 }
 });
@@ -469,7 +474,7 @@ initialize: function($super, messageList, message){
 	}
 
 	this.createMessage();
-//	if(IE) this.fixIE();
+	if(IE) this.fixIE();
 },
 
 show: function(){
@@ -480,7 +485,7 @@ close: function(){
 //--
 	$(this.dom.listItem).remove();
 
-//	if(IE) this.fixIE();
+	if(IE) this.fixIE();
 	this.dom = {};
 },
 
@@ -488,15 +493,20 @@ notify: function(){
 },
 
 remove: function(){
-	Effect.BlindUp(this.dom.listItem, {duration: (this.list.effectTimeout / 1000)});
-	Effect.Fade(this.dom.listItem, {duration: (this.list.effectTimeout / 1000)});
+	if(IE6){
+		$(this.dom.listItem).hide();
+	}
+	else{
+		Effect.BlindUp(this.dom.listItem, {duration: (this.list.effectTimeout / 1000)});
+		Effect.Fade(this.dom.listItem, {duration: (this.list.effectTimeout / 1000)});
+	}
+
 	setTimeout(this.close.bind(this), this.list.effectTimeout);
 },
 
 createMessage: function(){
 	this.debug('createMessage');
 //--
-
 
 // message
 	this.dom.message = document.createElement('div');
@@ -537,6 +547,7 @@ createMessage: function(){
 
 fixIE: function(){
 	if(IE6){
+/*
 		var maxWidth = 60;
 		for(var tmpmsg in this.list.messageList){
 			var msgDims = getDimensions(this.list.messageList[tmpmsg].dom.message);
@@ -545,6 +556,8 @@ fixIE: function(){
 		}
 
 		this.list.dom.header.style.width = maxWidth+'px';
+//*/
+		showPopupDiv('zbx_messages','zbx_messages_frame');
 	}
 }
 });
