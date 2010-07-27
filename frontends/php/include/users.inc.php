@@ -19,6 +19,15 @@
 **/
 ?>
 <?php
+	function getUserTheme($user){
+		$config = select_config();
+
+		if(isset($config['default_theme'])) $css = $config['default_theme'];
+		if(isset($user['theme']) && ($user['theme']!=ZBX_DEFAULT_CSS) && ($user['alias']!=ZBX_GUEST_USER)) $css = $user['theme'];
+
+	return $css;
+	}
+
 	function user_type2str($user_type=null){
 		$user_types = array(
 			USER_TYPE_ZABBIX_USER => S_ZABBIX_USER,
