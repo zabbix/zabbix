@@ -1393,7 +1393,7 @@ function getPagingLine(&$items, $autotrim=true){
 
 	$page_view = new CSpan($page_view);
 
-	zbx_add_post_js('insert_in_element("numrows",'.zbx_jsvalue($page_view->toString()).');');
+	zbx_add_post_js('insertInElement("numrows",'.zbx_jsvalue($page_view->toString()).',"div");');
 
 return $table;
 }

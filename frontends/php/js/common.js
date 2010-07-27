@@ -448,9 +448,9 @@ function get_scroll_pos(){
 	return [ scrOfX, scrOfY ];
 }
 
-function insert_in_element(element_name, text){
+function insertInElement(element_name, text, tagName){
 	if(IE)
-		var elems = $$('[name='+element_name+']');
+		var elems = $$(tagName+'[name='+element_name+']');
 	else
 		var elems = document.getElementsByName(element_name);
 

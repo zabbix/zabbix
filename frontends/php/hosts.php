@@ -652,7 +652,7 @@ include_once('include/page_header.php');
 		if($_REQUEST['form'] == S_IMPORT_HOST)
 			$hosts_wdgt->addItem(import_host_form());
 		else
-			$hosts_wdgt->addItem(insert_host_form(false));
+			$hosts_wdgt->addItem(insert_host_form());
 	}
 	else{
 
