@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2767] fixed time stamp in german locales (Aly)
  - [ZBX-2764] fixed database monitor values not being accepted from proxy (asaveljevs,Sasha)
  - [ZBX-2752] improved text coloring (Aly)
  - [ZBX-2748] fixed compilation on OpenBSD 4.7 due to undefined KERN_PROC (asaveljevs)
