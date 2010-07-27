@@ -139,8 +139,10 @@ include_once('include/page_header.php');
 			new CCol(array(S_UPTIME.'/',S_DOWNTIME),'center')
 			);
 
+	$css = getUserTheme($USER_DETAILS);
+	$vTextColor = ($css == 'css_od.css')?'&color=white':'';
 	foreach($services as $name => $foo) {
-		$header[] = new CImg('vtext.php?text='.$name);
+		$header[] = new CImg('vtext.php?text='.$name.$vTextColor);
 	}
 
 	$table = new CTableInfo();
