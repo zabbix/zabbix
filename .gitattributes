@@ -38,7 +38,6 @@ create/data/images/UPS_small.png -text svneol=unset#unset
 create/data/images/Workstation.png -text svneol=unset#unset
 create/data/images/Workstation_small.png -text svneol=unset#unset
 create/schema/gen_php.php -text
-docs/README -text
 frontends/php/api/.htaccess -text
 frontends/php/api/classes/class.apiexception.php -text
 frontends/php/api/classes/class.caction.php -text
@@ -411,7 +410,6 @@ misc/init.d/fedora/core5/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_server -text
 misc/init.d/tru64/zabbix_server -text
-/splint -text
 src/libs/zbxalgo/Makefile.am -text
 src/libs/zbxalgo/algodefs.c -text
 src/libs/zbxalgo/binaryheap.c -text
