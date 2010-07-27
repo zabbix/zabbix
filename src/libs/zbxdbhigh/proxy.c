@@ -1275,10 +1275,10 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 				item.host.maintenance_from <= values[i].clock)
 			continue;
 
-		if (item.type != ITEM_TYPE_TRAPPER && item.type != ITEM_TYPE_ZABBIX_ACTIVE)
-			if (0 != proxy_hostid && (item.type == ITEM_TYPE_INTERNAL ||
-						item.type == ITEM_TYPE_AGGREGATE ||
-						item.type == ITEM_TYPE_DB_MONITOR))
+		if (item.type == ITEM_TYPE_INTERNAL || item.type == ITEM_TYPE_AGGREGATE || item.type == ITEM_TYPE_CALCULATED)
+			continue;
+
+		if (0 == proxy_hostid && item.type != ITEM_TYPE_TRAPPER && item.type != ITEM_TYPE_ZABBIX_ACTIVE)
 			continue;
 			
 		if (item.type == ITEM_TYPE_TRAPPER && 0 == proxy_hostid &&
@@ -1318,12 +1318,9 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 						item.host.host, item.key_orig, agent.msg);
 				DCadd_nextcheck(item.itemid, (time_t)values[i].clock, agent.msg);
 			}
-			/* else
-			 * {
-			 *	this should never happen
-			 *	set_result_type() always set MSG result if not SUCCEED
-			 * }
-			 */
+			else
+				THIS_SHOULD_NEVER_HAPPEN; /* set_result_type() always sets MSG result if not SUCCEED */
+
 			free_result(&agent);
 	 	}
 	}
