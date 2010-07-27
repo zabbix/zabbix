@@ -30,14 +30,14 @@
 #define ARGS_START_SIZE 64
 
 #ifdef KERN_PROC2
-#	define ZBX_P_CONN	p_comm
+#	define ZBX_P_COMM	p_comm
 #	define ZBX_P_PID	p_pid
 #	define ZBX_P_STAT	p_stat
 #	define ZBX_P_VM_TSIZE	p_vm_tsize
 #	define ZBX_P_VM_DSIZE	p_vm_dsize
 #	define ZBX_P_VM_SSIZE	p_vm_ssize
 #else
-#	define ZBX_P_CONN	kp_proc.p_comm
+#	define ZBX_P_COMM	kp_proc.p_comm
 #	define ZBX_P_PID	kp_proc.p_pid
 #	define ZBX_P_STAT	kp_proc.p_stat
 #	define ZBX_P_VM_TSIZE	kp_eproc.e_vm.vm_tsize
@@ -217,7 +217,7 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		proc_ok = 0;
 		comm_ok = 0;
 
-		if (*procname == '\0' || 0 == strcmp(procname, proc[i].ZBX_P_CONN))
+		if (*procname == '\0' || 0 == strcmp(procname, proc[i].ZBX_P_COMM))
 			proc_ok = 1;
 
 		if (*proccomm != '\0') {
@@ -375,7 +375,7 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 		stat_ok = 0;
 		comm_ok = 0;
 
-		if (*procname == '\0' || 0 == strcmp(procname, proc[i].ZBX_P_CONN))
+		if (*procname == '\0' || 0 == strcmp(procname, proc[i].ZBX_P_COMM))
 			proc_ok = 1;
 
 
