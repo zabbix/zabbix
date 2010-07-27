@@ -1277,6 +1277,9 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 
 		if (item.type == ITEM_TYPE_INTERNAL || item.type == ITEM_TYPE_AGGREGATE || item.type == ITEM_TYPE_CALCULATED)
 			continue;
+
+		if (0 == proxy_hostid && item.type != ITEM_TYPE_TRAPPER && item.type != ITEM_TYPE_ZABBIX_ACTIVE)
+			continue;
 			
 		if (item.type == ITEM_TYPE_TRAPPER && 0 == proxy_hostid &&
 				FAIL == zbx_tcp_check_security(sock, item.trapper_hosts, 1))
