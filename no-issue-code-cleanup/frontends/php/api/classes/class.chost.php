@@ -189,22 +189,24 @@ class CHost extends CZBXAPI{
 		else{
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
 
-			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sql_parts['from']['rights'] = 'rights r';
-			$sql_parts['from']['users_groups'] = 'users_groups ug';
-			$sql_parts['where']['hgh'] = 'hg.hostid=h.hostid';
-			$sql_parts['where'][] = 'r.id=hg.groupid ';
-			$sql_parts['where'][] = 'r.groupid=ug.usrgrpid';
-			$sql_parts['where'][] = 'ug.userid='.$userid;
-			$sql_parts['where'][] = 'r.permission>='.$permission;
-			$sql_parts['where'][] = 'NOT EXISTS( '.
-									' SELECT hgg.groupid '.
-									' FROM hosts_groups hgg, rights rr, users_groups gg '.
-									' WHERE hgg.hostid=hg.hostid '.
-										' AND rr.id=hgg.groupid '.
+			$sql_parts['where'][] = 'EXISTS ('.
+							' SELECT hh.hostid '.
+							' FROM hosts hh, hosts_groups hgg, rights r, users_groups ug '.
+							' WHERE hh.hostid=h.hostid '.
+								' AND hh.hostid=hgg.hostid '.
+								' AND r.id=hgg.groupid '.
+								' AND r.groupid=ug.usrgrpid '.
+								' AND ug.userid='.$userid.
+								' AND r.permission>='.$permission.
+								' AND NOT EXISTS( '.
+									' SELECT hggg.groupid '.
+									' FROM hosts_groups hggg, rights rr, users_groups gg '.
+									' WHERE hggg.hostid=hgg.hostid '.
+										' AND rr.id=hggg.groupid '.
 										' AND rr.groupid=gg.usrgrpid '.
 										' AND gg.userid='.$userid.
-										' AND rr.permission<'.$permission.')';
+										' AND rr.permission<'.$permission.
+								' )) ';
 		}
 
 // nodeids

@@ -71,26 +71,48 @@ return $messages;
 
 function updateMessageSettings($messages){
 	if(!isset($messages['enabled'])) $messages['enabled'] = 0;
-	if(!isset($messages['triggers']['severities'])) $messages['triggers']['severities'] = array();
-	if(!isset($messages['sounds']['mute'])) $messages['sounds']['mute'] = 0;
-	if(!isset($messages['triggers']['recovery'])) $messages['triggers']['recovery'] = 0;
-	if(!isset($messages['sounds']['recovery'])) $messages['sounds']['recovery'] = 0;
-
+	
 	CProfile::update('web.messages.enabled', $messages['enabled'], PROFILE_TYPE_INT);
-	CProfile::update('web.messages.timeout', $messages['timeout'], PROFILE_TYPE_INT);
-	CProfile::update('web.messages.triggers.severities', serialize($messages['triggers']['severities']), PROFILE_TYPE_STR);
-	CProfile::update('web.messages.triggers.recovery', $messages['triggers']['recovery'], PROFILE_TYPE_INT);
 
-	CProfile::update('web.sounds.severity.0', $messages['sounds'][TRIGGER_SEVERITY_NOT_CLASSIFIED], PROFILE_TYPE_STR);
-	CProfile::update('web.sounds.severity.1', $messages['sounds'][TRIGGER_SEVERITY_INFORMATION], PROFILE_TYPE_STR);
-	CProfile::update('web.sounds.severity.2', $messages['sounds'][TRIGGER_SEVERITY_WARNING], PROFILE_TYPE_STR);
-	CProfile::update('web.sounds.severity.3', $messages['sounds'][TRIGGER_SEVERITY_AVERAGE], PROFILE_TYPE_STR);
-	CProfile::update('web.sounds.severity.4', $messages['sounds'][TRIGGER_SEVERITY_HIGH], PROFILE_TYPE_STR);
-	CProfile::update('web.sounds.severity.5', $messages['sounds'][TRIGGER_SEVERITY_DISASTER], PROFILE_TYPE_STR);
+	if(isset($messages['timeout']))
+		CProfile::update('web.messages.timeout', $messages['timeout'], PROFILE_TYPE_INT);
 
-	CProfile::update('web.sounds.recovery', $messages['sounds']['recovery'], PROFILE_TYPE_STR);
-	CProfile::update('web.sounds.repeat', $messages['sounds']['repeat'], PROFILE_TYPE_INT);
-	CProfile::update('web.sounds.mute', $messages['sounds']['mute'], PROFILE_TYPE_INT);
+	if(isset($messages['triggers'])){
+		if(isset($messages['triggers']['severities']))
+			CProfile::update('web.messages.triggers.severities', serialize($messages['triggers']['severities']), PROFILE_TYPE_STR);
+
+		if(isset($messages['triggers']['recovery']))
+			CProfile::update('web.messages.triggers.recovery', $messages['triggers']['recovery'], PROFILE_TYPE_INT);
+	}
+
+	if(isset($messages['sounds'])){
+		if(isset($messages['sounds'][TRIGGER_SEVERITY_NOT_CLASSIFIED]))
+			CProfile::update('web.sounds.severity.0', $messages['sounds'][TRIGGER_SEVERITY_NOT_CLASSIFIED], PROFILE_TYPE_STR);
+
+		if(isset($messages['sounds'][TRIGGER_SEVERITY_INFORMATION]))
+			CProfile::update('web.sounds.severity.1', $messages['sounds'][TRIGGER_SEVERITY_INFORMATION], PROFILE_TYPE_STR);
+
+		if(isset($messages['sounds'][TRIGGER_SEVERITY_WARNING]))
+			CProfile::update('web.sounds.severity.2', $messages['sounds'][TRIGGER_SEVERITY_WARNING], PROFILE_TYPE_STR);
+
+		if(isset($messages['sounds'][TRIGGER_SEVERITY_AVERAGE]))
+			CProfile::update('web.sounds.severity.3', $messages['sounds'][TRIGGER_SEVERITY_AVERAGE], PROFILE_TYPE_STR);
+
+		if(isset($messages['sounds'][TRIGGER_SEVERITY_HIGH]))
+			CProfile::update('web.sounds.severity.4', $messages['sounds'][TRIGGER_SEVERITY_HIGH], PROFILE_TYPE_STR);
+
+		if(isset($messages['sounds'][TRIGGER_SEVERITY_DISASTER]))
+			CProfile::update('web.sounds.severity.5', $messages['sounds'][TRIGGER_SEVERITY_DISASTER], PROFILE_TYPE_STR);
+
+		if(isset($messages['sounds']['recovery']))
+			CProfile::update('web.sounds.recovery', $messages['sounds']['recovery'], PROFILE_TYPE_STR);
+
+		if(isset($messages['sounds']['repeat']))
+			CProfile::update('web.sounds.repeat', $messages['sounds']['repeat'], PROFILE_TYPE_INT);
+
+		if(isset($messages['sounds']['mute']))
+			CProfile::update('web.sounds.mute', $messages['sounds']['mute'], PROFILE_TYPE_INT);
+	}
 
 return $messages;
 }

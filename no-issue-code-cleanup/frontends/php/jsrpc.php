@@ -144,7 +144,9 @@ include_once('include/page_header.php');
 					$sound = $msgsettings['sounds'][$trigger['priority']];
 				}
 
-				$url = 'tr_status.php?hostid='.$host['hostid'];
+				$url_tr_status = 'tr_status.php?hostid='.$host['hostid'];
+				$url_events = 'events.php?triggerid='.$event['objectid'];
+				$url_tr_events = 'tr_events.php?eventid='.$event['eventid'].'&triggerid='.$event['objectid'];
 
 				$result[$enum] = array(
 					'type' => 3,
@@ -154,10 +156,10 @@ include_once('include/page_header.php');
 					'priority' => $priority,
 					'sound' => $sound,
 					'color' => getEventColor($trigger['priority'], $event['value']),
-					'title' => $title.' [url='.$url.']'.$host['host'].'[/url]',
+					'title' => $title.' [url='.$url_tr_status.']'.$host['host'].'[/url]',
 					'body' => array(
-						S_DETAILS.': '.$trigger['description'],
-						S_DATE.': [b]'.zbx_date2str(S_DATE_FORMAT_YMDHMS, $event['clock']).'[/b]',
+						S_DETAILS.': '.' [url='.$url_events.']'.$trigger['description'].'[/url]',
+						S_DATE.': [b][url='.$url_tr_events.']'.zbx_date2str(S_DATE_FORMAT_YMDHMS, $event['clock']).'[/url][/b]',
 //						S_AGE.': '.zbx_date2age($event['clock'], time()),
 //						S_SEVERITY.': '.get_severity_style($trigger['priority'])
 //						S_SOURCE.': '.$event['eventid'].' : '.$event['clock']
