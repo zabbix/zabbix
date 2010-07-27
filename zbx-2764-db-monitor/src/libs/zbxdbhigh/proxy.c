@@ -1275,9 +1275,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 				item.host.maintenance_from <= values[i].clock)
 			continue;
 
-		if (0 != proxy_hostid && (item.type == ITEM_TYPE_INTERNAL ||
-					item.type == ITEM_TYPE_AGGREGATE ||
-					item.type == ITEM_TYPE_CALCULATED))
+		if (item.type == ITEM_TYPE_INTERNAL || item.type == ITEM_TYPE_AGGREGATE || item.type == ITEM_TYPE_CALCULATED)
 			continue;
 			
 		if (item.type == ITEM_TYPE_TRAPPER && 0 == proxy_hostid &&
