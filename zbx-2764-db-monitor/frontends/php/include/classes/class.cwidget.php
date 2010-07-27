@@ -130,13 +130,13 @@ private $items;
 			$icon_r->setAttribute('id','flicker_icon_r');
 
 			$icons_row = new CTable(null,'whitetext');
-			$icons_row->addRow(array($icon_l,SPACE,S_FILTER,SPACE,$icon_r));
+			$icons_row->addRow(array($icon_l,new CSpan(SPACE.S_FILTER.SPACE),$icon_r));
 
 			$thin_tab = $this->createFlicker($icons_row);
 			$thin_tab->setAttribute('id','filter_icon');
 			$thin_tab->addAction('onclick', "javascript: change_flicker_state('".$flicker_domid."');");
 
-			$flicker_tab->addRow($thin_tab,'textcolorstyles link pointer');
+			$flicker_tab->addRow($thin_tab,'textcolorstyles pointer');
 
 			$flicker_tab->addRow($div);
 

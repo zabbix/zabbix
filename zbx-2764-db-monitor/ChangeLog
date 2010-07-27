@@ -1,5 +1,9 @@
 Changes for 1.8.3
 
+ - [ZBX-2764] fixed database monitor values not being accepted from proxy (asaveljevs,Sasha)
+ - [ZBX-2752] improved text coloring (Aly)
+ - [ZBX-2748] fixed compilation on OpenBSD 4.7 due to undefined KERN_PROC (asaveljevs)
+ - [ZBX-2758] fixed underlined filter label in Opera (Aly)
  - [ZBX-2763] fixed saving user profile (Aly)
  - [ZBX-2759] fixed item form not saving params field (Vedmak)
  - [ZBX-2762] fixed sql error when "all" hosts is selected in application popup (Vedmak)

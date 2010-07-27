@@ -471,10 +471,10 @@ table.tableinfo tr:hover > td.unknown_trigger		{	background-color: #BCB7BC;	bord
 table.tableinfo tr > td.normal				{	background-color: #AAFFAA;	border: 1px #AAFFAA solid; }
 table.tableinfo tr:hover > td.normal			{	background-color: #AAF9AA;	border: 1px #AAF9AA solid; }
 
-table.tableinfo tr > td.active				{	background-color: #AADDAA;	border: 1px #AADDAA solid; }
+table.tableinfo tr > td.active				{	background-color: #AADDAA;	border: 1px #AADDAA solid; color: #222222;}
 table.tableinfo tr:hover > td.active			{	background-color: #AAD9AA;	border: 1px #AAD9AA solid; }
 
-table.tableinfo tr > td.inactive				{	background-color: #FF8888;	border: 1px #FF8888 solid; }
+table.tableinfo tr > td.inactive				{	background-color: #FF8888;	border: 1px #FF8888 solid; color: #222222;}
 table.tableinfo tr:hover > td.inactive			{	background-color: #FA8388;	border: 1px #FA8388 solid; }
 
 table.tableinfo tr.red						{	background-color: #FFBBBB; border: 1px #FFBBBB solid; }
