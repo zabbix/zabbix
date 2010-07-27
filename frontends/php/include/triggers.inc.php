@@ -2573,6 +2573,8 @@ return $caption;
  *
  */
 	function get_triggers_overview($hostids,$view_style=null){
+		global $USER_DETAILS;
+
 		if(is_null($view_style)) $view_style = CProfile::get('web.overview.view.style',STYLE_TOP);
 
 		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
@@ -2625,17 +2627,22 @@ return $caption;
 		}
 		ksort($hosts);
 
-		if($view_style == STYLE_TOP){
-			$header=array(new CCol(S_TRIGGERS,'center'));
+
+		$css = getUserTheme($USER_DETAILS);
+		$vTextColor = ($css == 'css_od.css')?'&color=white':'';
+
+		if($view_style == STYLE_TOP){	
+			$header = array(new CCol(S_TRIGGERS,'center'));
+
 			foreach($hosts as $hostname){
-				$header = array_merge($header,array(new CCol(array(new CImg('vtext.php?text='.$hostname)), 'hosts')));
+				$header = array_merge($header,array(new CCol(array(new CImg('vtext.php?text='.$hostname.$vTextColor)), 'hosts')));
 			}
 			$table->setHeader($header,'vertical_header');
 
 			foreach($triggers as $descr => $trhosts){
 				$table_row = array(nbsp($descr));
 				foreach($hosts as $hostname){
-					$table_row=get_trigger_overview_cells($table_row,$trhosts,$hostname);
+					$table_row = get_trigger_overview_cells($table_row,$trhosts,$hostname);
 				}
 				$table->addRow($table_row);
 			}
@@ -2643,10 +2650,10 @@ return $caption;
 		else{
 			$header=array(new CCol(S_HOSTS,'center'));
 			foreach($triggers as $descr => $trhosts){
-				$descr = array(new CImg('vtext.php?text='.$descr));
+				$descr = array(new CImg('vtext.php?text='.$descr.$vTextColor));
 				array_push($header,$descr);
 			}
-			$table->SetHeader($header,'vertical_header');
+			$table->setHeader($header,'vertical_header');
 
 			foreach($hosts as $hostname){
 				$table_row = array(nbsp($hostname));
