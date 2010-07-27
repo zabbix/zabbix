@@ -77,6 +77,7 @@
 
 		$post_script.= 'cookie.init();'."\n";
 		$post_script.= 'chkbxRange.init();'."\n";
+		$post_script.= 'if(IE6){ie6pngfix.run(false);}'."\n";
 
 		$post_script.='}'."\n";
 //		$post_script.= 'try{ chkbxRange.init(); } catch(e){ throw("Checkbox extension failed!");}';
