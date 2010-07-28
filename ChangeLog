@@ -4,9 +4,13 @@ Changes for 1.9
  - [DEV-449] added system.localtime[local] check (Sasha)
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
-Changes for 1.8.3
 
- - [ZBX-2770] added focusing on search string by pressing "/" (Aly)
+Changes for 1.8.3rc3
+
+ - [DEV-468] improved theme coloring in IE (Aly)
+
+Changes for 1.8.3rc2
+
  - [ZBX-2767] fixed time stamp in german locales (Aly)
  - [ZBX-2764] fixed database monitor values not being accepted from proxy (asaveljevs,Sasha)
  - [ZBX-2752] improved text coloring (Aly)
