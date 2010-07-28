@@ -1,5 +1,5 @@
 /* CSS Document */
-/* Black and Blue Theme by Aly*/
+/* Dark Orange Theme by Aly */
 
 @media print {
 	body{
@@ -406,9 +406,81 @@ table.infobox a:active 		{	color:#FF8800;	 }
 table.chart{
 	background-color: #1A1A1A;
 }
+table.calendarhat{
+	background-color:#1F1F1F;
+}
+table.calendarhat tr td{
+	color: #DFDFDF;
+}
+table.calendartab{
+	background-color:#666666;
+}
+table.calendartab tr td{
+	background-color:#1F1F1F;
+	color: #FF5500;
+}
+table.calendartab tr td.hollyday{
+	background-color:#2F2F2F;
+}
+table.calendartab tr td.selected{
+	background-color: #FF5500;
+	color: #000000;
+	font-weight: bolder;
+}
+
+
+/* Suggest */
+
+table.suggest{
+	background-color: #2F2F2F;
+}
+
+table.suggest tr{
+	background-color: #2F2F2F;
+}
+
+table.suggest tr.highlight{
+	background-color: #6F3F00;
+}
+
+table.suggest tr.highlight td{
+	color: #DFDFDF;
+}
+
+table.suggest tr td{
+	color: #FF5500;
+}
 /*----------*/
 
+
 /*////////////////	DIVS	////////////////////*/
+/* calendar */
+div.calendar{
+	border: 1px #FF5500 solid;
+}
+div.calendartime{
+	background-color:#1F1F1F;
+}
+
+div.calendardays{
+	border:0;
+}
+div.calendar span.title{
+	color:#FF5500;
+}
+div.calendar span.clndr_right_arrow:hover{
+	color: #FF5500;
+}
+div.calendar span.clndr_left_arrow:hover{
+	color: #FF5500;
+}
+
+div.calendar input.calendar_textbox{
+	color: #DFDFDF;
+	border: 1px solid #DFDFDF;
+	background-color: #2F2F2F;
+}
+
 div.scrollbar{
 	background-color: #3F3F3F;
 	border: 1px solid #AA5500;
@@ -540,6 +612,11 @@ span.link_menu:hover{
 	color: #FF8800;
 	border-bottom-color: #FF8800;
 }
+
+div.suggest{
+	border: 1px #FF5500 solid;
+}
+
 /*////////////////	FORMS	////////////////////*/
 .button{
 	border-color: #DFDFDF;
@@ -595,51 +672,4 @@ span.link_menu:hover{
 .biginput:hover	{
 	border-color: #FF5500;
 	color: #FF5500;
-}
-
-/* calendar */
-div.calendar{
-	border: 1px #FF5500 solid;
-}
-div.calendartime{
-	background-color:#1F1F1F;
-}
-table.calendarhat{
-	background-color:#1F1F1F;
-}
-table.calendarhat tr td{
-	color: #DFDFDF;
-}
-table.calendartab{
-	background-color:#666666;
-}
-table.calendartab tr td{
-	background-color:#1F1F1F;
-	color: #FF5500;
-}
-table.calendartab tr td.hollyday{
-	background-color:#2F2F2F;
-}
-table.calendartab tr td.selected{
-	background-color: #FF5500;
-	color: #000000;
-	font-weight: bolder;
-}
-div.calendardays{
-	border:0;
-}
-div.calendar span.title{
-	color:#FF5500;
-}
-div.calendar span.clndr_right_arrow:hover{
-	color: #FF5500;
-}
-div.calendar span.clndr_left_arrow:hover{
-	color: #FF5500;
-}
-
-div.calendar input.calendar_textbox{
-	color: #DFDFDF;
-	border: 1px solid #DFDFDF;
-	background-color: #2F2F2F;
 }
