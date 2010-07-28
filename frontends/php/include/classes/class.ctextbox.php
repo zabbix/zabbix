@@ -28,6 +28,9 @@ class CTextBox extends CTag{
 		$this->attributes['class'] = 'biginput';
 		$this->setAttribute('name', $name);
 		$this->setAttribute('id', $name);
+
+		$this->setAttribute('type', 'text');
+
 		$this->setAttribute('size', $size);
 		$this->setAttribute('value',$value);
 		$this->setReadonly($readonly);
