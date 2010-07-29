@@ -17,7 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-
+?>
+<?php
 require_once('include/config.inc.php');
 
 $page['title'] = "RPC";
@@ -31,7 +32,8 @@ include_once('include/page_header.php');
 //		VAR				TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields = array();
 	check_fields($fields);
-
+?>
+<?php
 // ACTION /////////////////////////////////////////////////////////////////////////////
 	$http_request = new CHTTP_request();
 	$data = $http_request->body();
@@ -60,12 +62,12 @@ include_once('include/page_header.php');
 			break;
 		case 'message.mute':
 			$msgsettings = getMessageSettings();
-			$msgsettings['sounds']['mute'] = 1;
+			$msgsettings['sounds.mute'] = 1;
 			updateMessageSettings($msgsettings);
 			break;
 		case 'message.unmute':
 			$msgsettings = getMessageSettings();
-			$msgsettings['sounds']['mute'] = 0;
+			$msgsettings['sounds.mute'] = 0;
 			updateMessageSettings($msgsettings);
 			break;
 		case 'message.settings':
@@ -87,7 +89,7 @@ include_once('include/page_header.php');
 			$triggerOptions = array(
 				'lastChangeSince' => (time() - $msgsettings['timeout']), // 15 min
 				'filter' => array(
-					'priority' => array_keys($msgsettings['triggers']['severities']),
+					'priority' => array_keys($msgsettings['triggers.severities']),
 					'value' => array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE)
 				),
 				'select_hosts' => array('hostid', 'host'),
@@ -98,7 +100,7 @@ include_once('include/page_header.php');
 				'limit' => 15
 			);
 
-			if(!$msgsettings['triggers']['recovery']){
+			if(!$msgsettings['triggers.recovery']){
 				$triggerOptions['filter']['value'] = array(TRIGGER_VALUE_TRUE);
 			}
 
@@ -119,7 +121,7 @@ include_once('include/page_header.php');
 				$options['eventid_from'] = $lastEventId;
 			}
 
-			if(!$msgsettings['triggers']['recovery']){
+			if(!$msgsettings['triggers.recovery']){
 				$options['value'] = TRIGGER_VALUE_TRUE;
 			}
 
@@ -136,12 +138,12 @@ include_once('include/page_header.php');
 				if($event['value'] == TRIGGER_VALUE_FALSE){
 					$priority = 0;
 					$title = S_RESOLVED;
-					$sound = $msgsettings['sounds']['recovery'];
+					$sound = $msgsettings['sounds.recovery'];
 				}
 				else{
 					$priority = $trigger['priority'];
 					$title = S_PROBLEM_ON;
-					$sound = $msgsettings['sounds'][$trigger['priority']];
+					$sound = $msgsettings['sounds.'.$trigger['priority']];
 				}
 
 				$url_tr_status = 'tr_status.php?hostid='.$host['hostid'];
@@ -156,7 +158,7 @@ include_once('include/page_header.php');
 					'priority' => $priority,
 					'sound' => $sound,
 					'color' => getEventColor($trigger['priority'], $event['value']),
-					'title' => $title.' [url='.$url_tr_status.']'.$host['host'].'[/url]',
+					'title' => $title.'  '.get_node_name_by_elid($host['hostid'],null,':').'[url='.$url_tr_status.']'.$host['host'].'[/url]',
 					'body' => array(
 						S_DETAILS.': '.' [url='.$url_events.']'.$trigger['description'].'[/url]',
 						S_DATE.': [b][url='.$url_tr_events.']'.zbx_date2str(S_DATE_FORMAT_YMDHMS, $event['clock']).'[/url][/b]',
@@ -178,8 +180,8 @@ include_once('include/page_header.php');
 
 			switch(strtolower($params['caption'])){
 				case 'events':
-					$params['sourceid'] = bcadd($params['sourceid'], '1', 0);
-					CProfile::update('web.messages.last.eventid', $params['sourceid'], PROFILE_TYPE_ID);
+					$params['time'] = bcadd($params['time'], '1', 0);
+					CProfile::update('web.messages.last.clock', $params['time'], PROFILE_TYPE_INT);
 					break;
 			}
 

@@ -124,8 +124,8 @@ setSettings: function(settings){
 	this.debug('setSettings');
 //--
 
-	this.sounds.repeat = settings.sounds.repeat;
-	this.sounds.mute = settings.sounds.mute;
+	this.sounds.repeat = settings['sounds.repeat'];
+	this.sounds.mute = settings['sounds.mute'];
 	if(this.sounds.mute == 1){
 		this.dom.mute.className = 'iconmute';
 	}
@@ -280,7 +280,7 @@ closeAllMessages: function(e){
 		'params': {
 			'caption': this.messageList[lastMessageId].caption,
 			'sourceid': this.messageList[lastMessageId].sourceid,
-			'priority': this.messageList[lastMessageId].priority,
+			'clock': this.messageList[lastMessageId].clock,
 			'messageid': this.messageList[lastMessageId].messageid
 		},
 //		'onSuccess': function(resp){ SDI(resp)},
