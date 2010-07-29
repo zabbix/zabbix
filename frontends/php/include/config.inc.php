@@ -196,7 +196,11 @@ function __autoload($class_name){
 		define('ZBX_DISTRIBUTED', false);
 		$show_setup = true;
 	}
-
+	
+	if(isset($DB['DB']) && !is_null($DB['DB'])){
+		$config=select_config();
+	}
+		
 	if(!defined('ZBX_PAGE_NO_AUTHORIZATION')){
 		check_authorisation();
 
