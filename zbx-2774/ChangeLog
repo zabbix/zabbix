@@ -1,5 +1,7 @@
 Changes for 1.8.3rc3
 
+ - [ZBX-2745] improved performance of screen element "History of events" (Aly)
+ - [ZBX-2774] fixed GUI messaging in DM setup (Aly)
  - [ZBX-2775] updated Brazilian Portuguese translation; thanks to Murilo Moreira de Oliveira (Vedmak)
  - [DEV-468] improved theme coloring in IE (Aly)
 
