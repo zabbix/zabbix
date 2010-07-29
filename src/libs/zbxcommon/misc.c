@@ -108,6 +108,45 @@ double	zbx_time(void)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_timespec                                                     *
+ *                                                                            *
+ * Purpose: Gets the current time.                                            *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ *  Comments: Time in seconds since midnight (00:00:00),                      *
+ *            January 1, 1970, coordinated universal time (UTC).              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_timespec(zbx_timespec_t *ts)
+{
+#if defined(_WINDOWS)
+
+	struct _timeb	current;
+
+	_ftime(&current);
+
+	ts->sec = current.time;
+	ts->ns = current.millitm * 1000000;
+
+#else /* not _WINDOWS */
+
+	struct timeval	current;
+
+	gettimeofday(&current, NULL);
+
+	ts->sec = current.tv_sec;
+	ts->ns = current.tv_usec * 1000;
+
+#endif /* _WINDOWS */
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_current_time                                                 *
  *                                                                            *
  * Purpose: Gets the current time including UTC offset                        *
