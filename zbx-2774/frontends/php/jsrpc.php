@@ -146,9 +146,10 @@ include_once('include/page_header.php');
 		case 'message.closeAll':
 			$params = $data['params'];
 
+			$msgsettings = getMessageSettings();
 			switch(strtolower($params['caption'])){
 				case 'events':
-					$msgsettings['last.clock'] = $params['time']+1;
+					$msgsettings['last.clock'] = (int)$params['time']+1;
 					updateMessageSettings($msgsettings);
 					break;
 			}
