@@ -260,6 +260,7 @@
 		$starttime = null;
 	}
 	else{
+		$config = select_config();
 		$firstEvent = reset($firstEvent);
 		$starttime = $firstEvent['clock'];
 
