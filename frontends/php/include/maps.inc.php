@@ -2285,15 +2285,17 @@
 
 		$selements = $map['selements'];
 		$all_strings = '';
-		$all_labels_lines = array();
+		$label_lines = array();
+		$status_lines = array();
 		foreach($selements as $selementid => $selement){
-			if(!isset($all_labels_lines[$selementid])) $all_labels_lines[$selementid] = array();
+			if(!isset($label_lines[$selementid])) $label_lines[$selementid] = array();
+			if(!isset($status_lines[$selementid])) $status_lines[$selementid] = array();
 
 			$msg = expand_map_element_label_by_data($selement);
 			$all_strings .= $msg;
 			$msgs = explode("\n", $msg);
 			foreach($msgs as $msg){
-				$all_labels_lines[$selementid][] = array('msg' => $msg);
+				$label_lines[$selementid][] = array('msg' => $msg);
 			}
 
 			$el_info = $map_info[$selementid];
@@ -2301,7 +2303,7 @@
 			foreach($el_msgs as $key => $caption){
 				if(!isset($el_info['info'][$caption]) || zbx_empty($el_info['info'][$caption]['msg'])) continue;
 
-				$all_labels_lines[$selementid][] = array(
+				$status_lines[$selementid][] = array(
 					'msg' => $el_info['info'][$caption]['msg'],
 					'color' => $el_info['info'][$caption]['color']
 				);
@@ -2340,28 +2342,29 @@
 			$label_location = (is_null($selement['label_location']) || ($selement['label_location'] < 0))
 					? $map['label_location'] : $selement['label_location'];
 
-			$label_lines = array();
+			$label = array();
 			if(($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) && ($map['label_type'] == MAP_LABEL_TYPE_IP)){
 				$host = get_host_by_hostid($selement['elementid']);
-				$label_lines[] = array('msg' => $host['ip']);
+				$label[] = array('msg' => $host['ip']);
+				$label = array_merge($label, $status_lines[$selementid]);
 			}
 			else if($map['label_type'] == MAP_LABEL_TYPE_STATUS){
-				$label_lines = array();
+				$label = $status_lines[$selementid];
 			}
 			else if($map['label_type'] == MAP_LABEL_TYPE_NAME){
-				$label_lines[] = array('msg' => $el_info['name']);
+				$label[] = array('msg' => $el_info['name']);
 			}
 			else{
-				$label_lines = $all_labels_lines[$selementid];
+				$label = array_merge($label_lines[$selementid], $status_lines[$selementid]);
 			}
-			if(zbx_empty($label_lines)) continue;
+			if(zbx_empty($label)) continue;
 
 			$w = 0;
-			foreach($label_lines as $str){
+			foreach($label as $str){
 				$dims = imageTextSize(8, 0, $str['msg']);
 				$w = max($w, $dims['width']);
 			}
-			$h = count($label_lines) * $labelFontHeight;
+			$h = count($label) * $labelFontHeight;
 
 			$x = $selement['x'];
 			$y = $selement['y'];
@@ -2396,7 +2399,7 @@
 //		imagefilledrectangle($im, $x_rec-2, $y_rec-2, $x_rec+$w+2, $y_rec+($oc*4)+$h-2, $colors['White']);
 
 			$increasey = 12;
-			foreach($label_lines as $line){
+			foreach($label as $line){
 				if(zbx_empty($line['msg'])) continue;
 
 				$str = str_replace("\r", '', $line['msg']);
