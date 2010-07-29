@@ -52,8 +52,7 @@ AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   sys/resource.h pthread.h windows.h process.h conio.h sys/wait.h regex.h \
   stdarg.h winsock2.h pdh.h psapi.h sys/sem.h sys/ipc.h sys/shm.h Winldap.h \
   sys/timeb.h Winber.h lber.h ws2tcpip.h inttypes.h sys/file.h grp.h \
-  net/if_mib.h execinfo.h sys/ucontext.h libperfstat.h devstat.h \
-  sys/systemcfg.h)
+  net/if_mib.h execinfo.h sys/ucontext.h libperfstat.h sys/systemcfg.h)
 AC_CHECK_HEADERS(resolv.h, [], [], [
   #ifdef HAVE_SYS_TYPES_H
   #  include <sys/types.h>
@@ -93,6 +92,11 @@ AC_CHECK_HEADERS(sys/mount.h sys/proc.h sys/sysctl.h sys/user.h, [], [], [
 AC_CHECK_HEADERS(sys/swap.h, [], [], [
   #ifdef HAVE_SYS_PARAM_H
   #  include <sys/param.h>
+  #endif
+])
+AC_CHECK_HEADERS(devstat.h, [], [], [
+  #ifdef HAVE_SYS_DKSTAT_H
+  #  include <sys/dkstat.h>
   #endif
 ])
 
