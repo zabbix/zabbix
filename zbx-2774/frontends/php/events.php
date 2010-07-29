@@ -124,27 +124,6 @@
 	$r_form->addVar('fullscreen',$_REQUEST['fullscreen']);
 
 	if(EVENT_SOURCE_TRIGGERS == $source){
-		if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0)){
-			$sql = 'SELECT DISTINCT hg.groupid, hg.hostid '.
-					' FROM hosts_groups hg, functions f, items i'.
-					' WHERE i.itemid=f.itemid '.
-						' AND hg.hostid=i.hostid '.
-						' AND f.triggerid='.$_REQUEST['triggerid'];
-			if($host_group = DBfetch(DBselect($sql,1))){
-				$_REQUEST['groupid'] = $host_group['groupid'];
-				$_REQUEST['hostid'] = $host_group['hostid'];
-			}
-			else{
-				unset($_REQUEST['triggerid']);
-			}
-		}
-
-		if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0)){
-			$triggers = CTrigger::get(array( 'triggerids' => $_REQUEST['triggerid'] ));
-			if(empty($triggers)){
-				unset($_REQUEST['triggerid']);
-			}
-		}
 
 		$options = array(
 			'groups' => array(
@@ -155,12 +134,17 @@
 				'monitored_hosts' => 1,
 				'with_items' => 1,
 			),
+			'triggers' => array(),
 			'hostid' => get_request('hostid', null),
 			'groupid' => get_request('groupid', null),
+			'triggerid' => get_request('triggerid', null)
 		);
 		$pageFilter = new CPageFilter($options);
 		$_REQUEST['groupid'] = $pageFilter->groupid;
 		$_REQUEST['hostid'] = $pageFilter->hostid;
+		if($pageFilter->triggerid > 0){
+			$_REQUEST['triggerid'] = $pageFilter->triggerid;
+		}
 
 		$r_form->addItem(array(S_GROUP.SPACE,$pageFilter->getGroupsCB(true)));
 		$r_form->addItem(array(SPACE.S_HOST.SPACE,$pageFilter->getHostsCB(true)));
