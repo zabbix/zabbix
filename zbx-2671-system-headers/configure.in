@@ -46,7 +46,7 @@ AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   sys/socket.h sys/loadavg.h arpa/inet.h \
   sys/swap.h sys/vmmeter.h strings.h sys/sysctl.h vm/vm_param.h \
   sys/time.h kstat.h sys/syscall.h sys/sysmacros.h sys/procfs.h \
-  stdint.h mach/host_info.h mach/mach_host.h knlist.h pwd.h sys/proc.h \
+  stdint.h mach/host_info.h mach/mach_host.h knlist.h pwd.h \
   sys/var.h arpa/nameser.h assert.h sys/dkstat.h sys/disk.h \
   nlist.h kvm.h linux/kernel.h getopt.h procinfo.h sys/dk.h \
   sys/resource.h pthread.h windows.h process.h conio.h sys/wait.h regex.h \
@@ -82,6 +82,14 @@ AC_CHECK_HEADERS(net/if.h, [], [], [
   #  include <sys/socket.h>
   #endif
 ]) 
+AC_CHECK_HEADERS(sys/proc.h, [], [], [
+  #ifdef HAVE_SYS_TYPES_H
+  #  include <sys/types.h>
+  #endif
+  #ifdef HAVE_SYS_PARAM_H
+  #  include <sys/param.h>
+  #endif
+])
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
