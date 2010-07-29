@@ -41,10 +41,10 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   syslog.h time.h errno.h sys/types.h sys/stat.h netinet/in.h \
   math.h sys/socket.h dirent.h ctype.h \
-  mtent.h fcntl.h sys/param.h sys/mount.h arpa/inet.h \
+  mtent.h fcntl.h sys/param.h arpa/inet.h \
   sys/vfs.h sys/pstat.h sys/sysinfo.h sys/statvfs.h \
   sys/socket.h sys/loadavg.h arpa/inet.h \
-  sys/swap.h sys/vmmeter.h strings.h sys/sysctl.h vm/vm_param.h \
+  sys/swap.h sys/vmmeter.h strings.h vm/vm_param.h \
   sys/time.h kstat.h sys/syscall.h sys/sysmacros.h sys/procfs.h \
   stdint.h mach/host_info.h mach/mach_host.h knlist.h pwd.h \
   sys/var.h arpa/nameser.h assert.h sys/dkstat.h sys/disk.h \
@@ -52,7 +52,7 @@ AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   sys/resource.h pthread.h windows.h process.h conio.h sys/wait.h regex.h \
   stdarg.h winsock2.h pdh.h psapi.h sys/sem.h sys/ipc.h sys/shm.h Winldap.h \
   sys/timeb.h Winber.h lber.h ws2tcpip.h inttypes.h sys/file.h grp.h \
-  net/if_mib.h sys/user.h execinfo.h sys/ucontext.h libperfstat.h devstat.h \
+  net/if_mib.h execinfo.h sys/ucontext.h libperfstat.h devstat.h \
   sys/systemcfg.h)
 AC_CHECK_HEADERS(resolv.h, [], [], [
   #ifdef HAVE_SYS_TYPES_H
@@ -82,7 +82,7 @@ AC_CHECK_HEADERS(net/if.h, [], [], [
   #  include <sys/socket.h>
   #endif
 ]) 
-AC_CHECK_HEADERS(sys/proc.h, [], [], [
+AC_CHECK_HEADERS(sys/mount.h sys/proc.h sys/sysctl.h sys/user.h, [], [], [
   #ifdef HAVE_SYS_TYPES_H
   #  include <sys/types.h>
   #endif
