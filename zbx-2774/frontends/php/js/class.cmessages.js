@@ -167,7 +167,7 @@ addMessage: function(newMessage){
 	newMessage.messageid = this.msgcounter;
 
 	this.messageList[this.msgcounter] = new CMessage(this, newMessage);
-	this.messageLast[this.messageList[this.msgcounter].caption] = this.messageList[this.msgcounter].sourceid;
+	this.messageLast[this.messageList[this.msgcounter].caption] = this.messageList[this.msgcounter];
 
 	$(this.dom.container).show();
 
@@ -280,7 +280,7 @@ closeAllMessages: function(e){
 		'params': {
 			'caption': this.messageList[lastMessageId].caption,
 			'sourceid': this.messageList[lastMessageId].sourceid,
-			'clock': this.messageList[lastMessageId].clock,
+			'time': this.messageList[lastMessageId].time,
 			'messageid': this.messageList[lastMessageId].messageid
 		},
 //		'onSuccess': function(resp){ SDI(resp)},

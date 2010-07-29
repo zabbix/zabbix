@@ -122,6 +122,8 @@
 
 <?php
 	if(isset($DB['DB']) && !is_null($DB['DB'])){
+		$config = select_config();
+
 		$css = getUserTheme($USER_DETAILS);
 		if($css){
 			print('<link rel="stylesheet" type="text/css" href="styles/'.$css.'" />'."\n");

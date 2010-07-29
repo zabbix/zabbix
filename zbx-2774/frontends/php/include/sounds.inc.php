@@ -34,6 +34,10 @@ function getSounds(){
 return $fileList;
 }
 
+function getLatestCloseTime(){
+
+}
+
 function getMessageSettings(){
 	global $USER_DETAILS;
 
@@ -49,6 +53,7 @@ function getMessageSettings(){
 	$messages = array(
 		'enabled' => 0,
 		'timeout' => 60,
+		'last.clock' => 0,
 		'triggers.recovery' => 1,
 		'triggers.severities' => null,
 		'sounds.mute' => 0,

@@ -1411,7 +1411,51 @@ require_once('include/js.inc.php');
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
 				else if(($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_EVENTS)){
-					$item = array(get_history_of_triggers_events(0, $elements));
+
+					$options = array(
+						'monitored' => 1,
+						'limit' => $elements
+					);
+
+					$hide_unknown = CProfile::get('web.events.filter.hide_unknown',0);
+					if($hide_unknown){
+						$options['value'] = array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE);
+					}
+
+					$item = new CTableInfo(S_NO_EVENTS_FOUND);
+					$item->SetHeader(array(
+							S_TIME,
+							is_show_all_nodes() ? S_NODE : null,
+							S_HOST,
+							S_DESCRIPTION,
+							S_VALUE,
+							S_SEVERITY
+							));
+
+					$events = getLastEvents($options);
+					foreach($events as $enum => $event){
+						$trigger = $event['trigger'];
+						$host = $event['host'];
+
+						$value = new CCol(trigger_value2str($event['value']), get_trigger_value_style($event['value']));
+
+//						$row = zbx_array_merge($triggers[$row['triggerid']],$row);
+//						if((1 == $hide_unknown) && (!event_initial_time($row,$hide_unknown))) continue;
+
+						$item->addRow(array(
+							zbx_date2str(S_EVENTS_TRIGGERS_EVENTS_HISTORY_LIST_DATE_FORMAT,$event['clock']),
+							get_node_name_by_elid($event['objectid']),
+							$host['host'],
+							new CLink(
+								$trigger['description'],
+								'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid']
+								),
+							$value,
+							new CCol(get_severity_description($trigger['priority']), get_severity_style($trigger['priority'])),
+						));
+					}
+
+					$item = array($item);
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
 				else{
