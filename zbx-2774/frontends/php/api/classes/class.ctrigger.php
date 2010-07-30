@@ -101,7 +101,7 @@ class CTrigger extends CZBXAPI{
 //
 			'pattern'				=> '',
 // OutPut
-			'expand_data'			=> null,
+			'expandData'			=> null,
 			'expandDescription'		=> null,
 			'output'				=> API_OUTPUT_REFER,
 			'extendoutput'			=> null,
@@ -401,8 +401,8 @@ class CTrigger extends CZBXAPI{
 			$sql_parts['select']['triggers'] = 't.*';
 		}
 
-// expand_data
-		if(!is_null($options['expand_data'])){
+// expandData
+		if(!is_null($options['expandData'])){
 			$sql_parts['select']['host'] = 'h.host';
 			$sql_parts['select']['hostid'] = 'h.hostid';
 			$sql_parts['from']['functions'] = 'functions f';
@@ -621,7 +621,7 @@ class CTrigger extends CZBXAPI{
 
 						$result[$trigger['triggerid']]['hosts'][] = array('hostid' => $trigger['hostid']);
 
-						if(is_null($options['expand_data'])) unset($trigger['hostid']);
+						if(is_null($options['expandData'])) unset($trigger['hostid']);
 					}
 // itemids
 					if(isset($trigger['itemid']) && is_null($options['select_items'])){
@@ -737,7 +737,7 @@ Copt::memoryPick();
 			$obj_params = array(
 				'triggerids' => $depids,
 				'output' => API_OUTPUT_EXTEND,
-				'expand_data' => 1,
+				'expandData' => 1,
 				'preservekeys' => 1
 			);
 			$allowed = self::get($obj_params); //allowed triggerids

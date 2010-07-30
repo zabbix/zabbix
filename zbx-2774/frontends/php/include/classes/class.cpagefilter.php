@@ -295,6 +295,7 @@ options = array(
 		}
 
 		$this->isSelected['groupsSelected'] = (($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL) && !empty($this->data['groups'])) || ($groupid > 0);
+		$this->isSelected['groupsAll'] = (($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL) && !empty($this->data['groups']) && ($groupid == 0));
 		$this->ids['groupid'] = $groupid;
 	}
 
@@ -337,6 +338,8 @@ options = array(
 		}
 
 		$this->isSelected['hostsSelected'] = (($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL) && !empty($this->data['hosts'])) || ($hostid > 0);
+		$this->isSelected['hostsAll'] = (($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL) && !empty($this->data['hosts']) && ($hostid == 0));
+
 		$this->ids['hostid'] = $hostid;
 	}
 
@@ -378,7 +381,7 @@ options = array(
 	private function _initTriggers($triggerid, $options){
 		$this->data['triggers'] = array();
 
-		if(!$this->hostsSelected){
+		if(!$this->hostsSelected || $this->hostsAll){
 			$triggerid = 0;
 		}
 		else{

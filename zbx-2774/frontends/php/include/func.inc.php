@@ -1202,13 +1202,13 @@ function zbx_subarray_push(&$mainArray, $sIndex, $element) {
 		}
 		if(isset($_REQUEST['sort']) && ($tabfield == $_REQUEST['sort'])){
 			if($sortorder == ZBX_SORT_UP){
-				$img = new CImg('images/general/sort_down.png','down',10,10);
+				$img = new CImg('images/general/sort_down.gif','down',15,8);
 			}
 			else{
-				$img = new CImg('images/general/sort_up.png','up',10,10);
+				$img = new CImg('images/general/sort_up.gif','up',15,8);
 			}
 
-			$img->setAttribute('style','line-height: 18px; vertical-align: middle;');
+			$img->setAttribute('style','line-height: 20px; vertical-align: middle;');
 			$col[] = SPACE;
 			$col[] = $img;
 		}

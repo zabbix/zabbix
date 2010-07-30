@@ -358,39 +358,37 @@
 				S_ACTIONS
 			));
 
-			$trigOpt = array(
-				'nodeids' => get_current_nodeid(),
-				'output' => API_OUTPUT_SHORTEN
-			);
+			$triggers = array();
+			if(($pageFilter->hostid > 0) || ($pageFilter->groupid > 0)){
+				$trigOpt = array(
+					'nodeids' => get_current_nodeid(),
+					'output' => API_OUTPUT_SHORTEN
+				);
 
-			if($pageFilter->hostsSelected){
-				if($pageFilter->hostid > 0)
+				if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0))
+					$trigOpt['triggerids'] = $_REQUEST['triggerid'];
+				else if($pageFilter->hostid > 0)
 					$trigOpt['hostids'] = $pageFilter->hostid;
 				else if($pageFilter->groupid > 0)
 					$trigOpt['groupids'] = $pageFilter->groupid;
-			}
-			else{
-				$trigOpt['hostids'] = array();
-			}
 
-			if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0)){
-				$trigOpt['triggerids'] = $_REQUEST['triggerid'];
+				$triggers = CTrigger::get($trigOpt);
 			}
-			$triggers = CTrigger::get($trigOpt);
 
 			$options = array(
 				'nodeids' => get_current_nodeid(),
-				'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 				'object' => EVENT_OBJECT_TRIGGER,
 				'time_from' => $from,
 				'time_till' => $till,
 				'output' => API_OUTPUT_SHORTEN,
-				'sortfield' => 'eventid',
+				'sortfield' => 'clock',
 				'sortorder' => ZBX_SORT_DOWN,
-				'nopermissions' => 1,
 				'limit' => ($config['search_limit']+1)
 			);
+
 			if($_REQUEST['hide_unknown']) $options['hide_unknown'] = 1;
+			if(!empty($triggers)) $options['triggerids'] = zbx_objectValues($triggers, 'triggerid');
+
 			$events = CEvent::get($options);
 
 			$paging = getPagingLine($events);
@@ -399,45 +397,31 @@
 				'nodeids' => get_current_nodeid(),
 				'eventids' => zbx_objectValues($events,'eventid'),
 				'output' => API_OUTPUT_EXTEND,
-				'select_hosts' => API_OUTPUT_EXTEND,
-				'select_triggers' => API_OUTPUT_EXTEND,
-				'select_items' => API_OUTPUT_EXTEND,
 				'sortfield' => 'eventid',
 				'sortorder' => ZBX_SORT_DOWN,
 				'nopermissions' => 1
 			);
+
 			$events = CEvent::get($options);
 			order_result($events, 'clock', ZBX_SORT_DOWN);
 
-			foreach($events as $enum => $event){
-				$trigger = reset($event['triggers']);
-
-				$event['desc'] = expand_trigger_description_by_data($trigger);
-				$event['type'] = $trigger['type'];
-
-				$event += $trigger;
-				if($next_event = get_next_event($event, $events)){
-					$event['duration'] = zbx_date2age($event['clock'], $next_event['clock']);
-				}
-				else{
-					$event['duration'] = zbx_date2age($event['clock']);
-				}
-
-				$event['value_col'] = new CCol(trigger_value2str($event['value']), get_trigger_value_style($event['value']));
-
-				$events[$enum] = $event;
-			}
+			$triggersOptions = array(
+				'triggerids' => zbx_objectValues($events, 'objectid'),
+				'expandDescription' => 1,
+				'select_hosts' => API_OUTPUT_EXTEND,
+				'select_triggers' => API_OUTPUT_EXTEND,
+				'select_items' => API_OUTPUT_EXTEND,
+				'output' => API_OUTPUT_EXTEND
+			);
+			$triggers = CTrigger::get($triggersOptions);
+			$triggers = zbx_toHash($triggers, 'triggerid');
 
 			foreach($events as $enum => $event){
-// Host
-				$host = array_pop($event['hosts']);
+				$trigger = $triggers[$event['objectid']];
+				$host = reset($trigger['hosts']);
 
-// Trigger
-				$trigger = reset($event['triggers']);
-
-// Items
 				$items = array();
-				foreach($event['items'] as $inum => $item){
+				foreach($trigger['items'] as $inum => $item){
 					$i = array();
 					$i['itemid'] = $item['itemid'];
 					$i['action'] = str_in_array($item['value_type'],array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64))? 'showgraph':'showvalues';
@@ -448,6 +432,7 @@
 // Actions
 				$actions = get_event_actions_status($event['eventid']);
 
+
 				if($config['event_ack_enable']){
 					if($event['acknowledged'] == 1){
 						$ack = new CLink(S_YES,'acknow.php?eventid='.$event['eventid']);
@@ -457,11 +442,19 @@
 					}
 				}
 
-				$tr_desc = new CSpan($event['desc'],'pointer');
+				$tr_desc = new CSpan($trigger['description'],'pointer');
 				$tr_desc->addAction('onclick',"create_mon_trigger_menu(event, ".
 										" new Array({'triggerid': '".$trigger['triggerid']."', 'lastchange': '".$event['clock']."'}),".
 										zbx_jsvalue($items, true).");");
 
+// Duration
+				$tr_event = $event + $trigger;
+				if($next_event = get_next_event($tr_event, $events))
+					$event['duration'] = zbx_date2age($tr_event['clock'], $next_event['clock']);
+				else
+					$event['duration'] = zbx_date2age($tr_event['clock']);
+
+				
 				$table->addRow(array(
 					new CLink(zbx_date2str(S_EVENTS_ACTION_TIME_FORMAT,$event['clock']),
 						'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid'],
@@ -470,7 +463,7 @@
 					is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null,
 					$_REQUEST['hostid'] == 0 ? $host['host'] : null,
 					new CSpan($tr_desc, 'link_menu'),
-					$event['value_col'],
+					new CCol(trigger_value2str($event['value']), get_trigger_value_style($event['value'])),
 					new CCol(get_severity_description($trigger['priority']), get_severity_style($trigger['priority'],$event['value'])),
 					$event['duration'],
 					($config['event_ack_enable'])?$ack:NULL,

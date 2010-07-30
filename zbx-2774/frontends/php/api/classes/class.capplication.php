@@ -81,7 +81,7 @@ class CApplication extends CZBXAPI{
 // OutPut
 			'output'				=> API_OUTPUT_REFER,
 			'extendoutput'			=> null,
-			'expand_data'			=> null,
+			'expandData'			=> null,
 			'select_hosts'			=> null,
 			'select_items'			=> null,
 			'countOutput'			=> null,
@@ -162,8 +162,8 @@ class CApplication extends CZBXAPI{
 			}
 		}
 
-// expand_data
-		if(!is_null($options['expand_data'])){
+// expandData
+		if(!is_null($options['expandData'])){
 			$sql_parts['select']['host'] = 'h.host';
 			$sql_parts['from']['hosts'] = 'hosts h';
 			$sql_parts['where']['ah'] = 'a.hostid=h.hostid';
