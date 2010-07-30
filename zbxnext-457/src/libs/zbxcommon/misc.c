@@ -121,7 +121,7 @@ double	zbx_time(void)
  ******************************************************************************/
 void	zbx_timespec(zbx_timespec_t *ts)
 {
-#if defined(_WINDOWS)
+#ifdef _WINDOWS
 
 	struct _timeb	current;
 
@@ -130,7 +130,16 @@ void	zbx_timespec(zbx_timespec_t *ts)
 	ts->sec = current.time;
 	ts->ns = current.millitm * 1000000;
 
-#else /* not _WINDOWS */
+#elif HAVE_TIME_CLOCK_GETTIME
+
+	struct timespec	tp;
+
+	clock_gettime(CLOCK_REALTIME, &tp);
+
+	ts->sec = (int)tp.tv_sec;
+	ts->ns = (int)tp.tv_nsec;
+
+#else
 
 	struct timeval	current;
 
@@ -139,7 +148,7 @@ void	zbx_timespec(zbx_timespec_t *ts)
 	ts->sec = current.tv_sec;
 	ts->ns = current.tv_usec * 1000;
 
-#endif /* _WINDOWS */
+#endif
 }
 
 /******************************************************************************
