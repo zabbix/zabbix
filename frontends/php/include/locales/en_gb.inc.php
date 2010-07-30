@@ -1558,6 +1558,7 @@
 	'S_DIMENSION_COLS_ROWS'=>		'Dimension (cols x rows)',
 	'S_DELETE_SELECTED_SLIDESHOWS_Q'=>	'Delete selected slideshows?',
 
+	'S_SLIDESHOW_MUST_CONTAIN_SLIDES' => 'Slideshow must contain slides',
 	'S_SLIDESHOWS'=>				'Slide shows',
 	'S_SLIDESHOW'=>					'Slide show',
 	'S_CONFIGURATION_OF_SLIDESHOWS_BIG'=>	'CONFIGURATION OF SLIDE SHOWS',
