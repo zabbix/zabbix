@@ -7,6 +7,7 @@ Changes for 1.9
 
 Changes for 1.8.3rc3
 
+ - [ZBX-2792] fixed status sorting in maintenances (Vedmak)
  - [ZBX-2726] fixed statuses for discovery events (Vedmak)
  - [ZBX-2785] creation of empty slideshows prohibited (Vedmak)
  - [ZBX-2791] fixed host menu in "top 100 triggers" in ie7 (Vedmak)

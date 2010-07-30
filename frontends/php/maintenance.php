@@ -651,15 +651,31 @@ include_once('include/page_header.php');
 			S_DESCRIPTION
 		));
 
+		foreach($maintenances as $mnum => $maintenance){
+			if($maintenance['active_till'] < time())
+				$maintenances[$mnum]['status'] = MAINTENANCE_STATUS_EXPIRED;
+			else if($maintenance['active_since'] > time())
+				$maintenances[$mnum]['status'] = MAINTENANCE_STATUS_APPROACH;
+			else
+				$maintenances[$mnum]['status'] = MAINTENANCE_STATUS_ACTIVE;
+		}
 		order_result($maintenances, $sortfield, $sortorder);
 		$paging = getPagingLine($maintenances);
 
 		foreach($maintenances as $mnum => $maintenance){
 			$maintenanceid = $maintenance['maintenanceid'];
 
-			if($maintenance['active_till'] < time()) $mnt_status = new CSpan(S_EXPIRED,'red');
-			else if($maintenance['active_since'] > time()) $mnt_status = new CSpan(S_APPROACH,'blue');
-			else $mnt_status = new CSpan(S_ACTIVE,'green');
+			switch($maintenance['status']){
+				case MAINTENANCE_STATUS_EXPIRED:
+					$mnt_status = new CSpan(S_EXPIRED,'red');
+					break;
+				case MAINTENANCE_STATUS_APPROACH:
+					$mnt_status = new CSpan(S_APPROACH,'blue');
+					break;
+				case MAINTENANCE_STATUS_ACTIVE:
+					$mnt_status = new CSpan(S_ACTIVE,'green');
+					break;
+			}
 
 			$table->addRow(array(
 				new CCheckBox('maintenanceids['.$maintenanceid.']',NULL,NULL,$maintenanceid),
