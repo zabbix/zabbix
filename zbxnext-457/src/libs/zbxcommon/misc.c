@@ -86,12 +86,34 @@ void	zbx_timespec(zbx_timespec_t *ts)
 {
 #ifdef _WINDOWS
 
-	struct _timeb	current;
+	LARGE_INTEGER	tickPerSecond, tick;
+	static int	boottime = 0;
+	BOOL		rc = FALSE;
 
-	_ftime(&current);
+	if (TRUE == (rc = QueryPerformanceFrequency(&tickPerSecond)))
+	{
+		if (TRUE == (rc = QueryPerformanceCounter(&tick)))
+		{
+			ts->ns = (int)(1000000000 * (tick.QuadPart % tickPerSecond.QuadPart) / tickPerSecond.QuadPart);
 
-	ts->sec = current.time;
-	ts->ns = current.millitm * 1000000;
+			tick.QuadPart = tick.QuadPart / tickPerSecond.QuadPart;
+
+			if (0 == boottime)
+				boottime = (int)(time(NULL) - tick.QuadPart);
+	
+			ts->sec = (int)(tick.QuadPart + boottime);
+		}
+	}
+	
+	if (TRUE != rc)
+	{
+		struct _timeb   tb;
+
+		_ftime(&tb);
+
+		ts->sec = (int)tb.time;
+		ts->ns = tb.millitm * 1000000;
+	}
 
 #else	/* not _WINDOWS */
 
