@@ -619,15 +619,19 @@ div.suggest{
 
 /*////////////////	FORMS	////////////////////*/
 .button{
-	border-color: #DFDFDF;
+	border-color: #FF5500;
 	background: #2f2f2f;
-	color: #DFDFDF;
+	color: #FF5500;
 }
 
 .button:hover {
-	border-color: #FF5500;
-	color: #FF5500;
+	border-color: #2f2f2f;
+	color: #2f2f2f;
+	background: #FF5500;
 	text-decoration: none;
+	-webkit-box-shadow: 0 0 6px #FF5500;
+	-moz-box-shadow: 0 0 5px #FF5500;
+	box-shadow: 0 0 5px #FF5500;
 }
 
 .biginput[readonly], .biginput[readonly]:hover{
