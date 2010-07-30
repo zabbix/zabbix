@@ -365,11 +365,10 @@ include_once('include/page_header.php');
 		else{
 			$mname				= get_request('mname', '');
 			$maintenance_type	= get_request('maintenance_type', 0);
-			$active_since		= zbxDateToTime(get_request('active_since', date('YmdHi')));
-			$active_till		= zbxDateToTime(get_request('active_till', date('YmdHi', time()+86400)));
+			$active_since		= zbxDateToTime(get_request('active_since', date('YmdHis')));
+			$active_till		= zbxDateToTime(get_request('active_till', date('YmdHis', time()+86400)));
 			$description		= get_request('description', '');
 		}
-
 		$tblMntc = new CTable(null, 'formElementTable');
 
 		$tblMntc->addRow(array(S_NAME, new CTextBox('mname', $mname, 50)));
@@ -379,8 +378,8 @@ include_once('include/page_header.php');
 		$cmbType->addItem(MAINTENANCE_TYPE_NODATA, S_NO_DATA_COLLECTION);
 		$tblMntc->addRow(array(S_MAINTENANCE_TYPE, $cmbType));
 
-		$tblMntc->addItem(new Cvar('active_since', date('YmdHi', $active_since)));
-		$tblMntc->addItem(new Cvar('active_till', date('YmdHi', $active_till)));
+		$tblMntc->addItem(new Cvar('active_since', date('YmdHis', $active_since)));
+		$tblMntc->addItem(new Cvar('active_till', date('YmdHis', $active_till)));
 
 		$clndr_icon = new CImg('images/general/bar/cal.gif','calendar', 16, 12, 'pointer');
 

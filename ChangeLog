@@ -7,6 +7,7 @@ Changes for 1.9
 
 Changes for 1.8.3rc3
 
+ - [ZBX-2790] fixed maintenance times reset while configure maintenance (Vedmak)
  - [ZBX-2773] changed buttons css for DO theme (Vedmak)
  - [ZBX-2777] fixed map labels when "status only" option is set (Vedmak)
  - [ZBX-2775] updated Brazilian Portuguese translation; thanks to Murilo Moreira de Oliveira (Vedmak)
