@@ -1284,8 +1284,7 @@ static int	DBget_history_value(zbx_uint64_t itemid, char **replace_to,
  *                                                                            *
  * Purpose: retrieve item lastvalue by functionid                             *
  *                                                                            *
- * Parameters: functionid - function identificator from database              *
- *             lastvalue - pointer to result buffer. Must be NULL             *
+ * Parameters:                                                                *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
@@ -1334,8 +1333,7 @@ static int	DBget_history_log_value_by_triggerid(zbx_uint64_t triggerid,
  *                                                                            *
  * Purpose: retrieve item lastvalue by triggerid                              *
  *                                                                            *
- * Parameters: functionid - function identificator from database              *
- *             lastvalue - pointer to result buffer. Must be NULL             *
+ * Parameters:                                                                *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
@@ -1419,8 +1417,7 @@ static int	DBget_item_lastvalue_by_triggerid(zbx_uint64_t triggerid, char **last
  *                                                                            *
  * Purpose: retrieve item lastvalue by triggerid                              *
  *                                                                            *
- * Parameters: functionid - function identificator from database              *
- *             lastvalue - pointer to result buffer. Must be NULL             *
+ * Parameters:                                                                *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
