@@ -1199,6 +1199,10 @@
 	'S_EVENTS_DATE_FORMAT'=>		'd M Y H:i:s',
 	'S_EVENTS_DISCOVERY_TIME_FORMAT'=>	'Y.M.d H:i:s',
 	'S_EVENTS_ACTION_TIME_FORMAT'=>		'Y.M.d H:i:s',
+	'S_UP_BIG'=>		'UP',
+	'S_DOWN_BIG'=>		'DOWN',
+	'S_DISCOVERED_BIG'=>		'DISCOVERED',
+	'S_LOST_BIG'=>		'LOST',
 
 //	events.inc.php
 	'S_EVENTS_EVENT_DETAILS_DATE_FORMAT'=>			'Y.M.d H:i:s',
