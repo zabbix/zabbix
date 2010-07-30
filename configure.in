@@ -242,6 +242,22 @@ AC_DEFINE(HAVE_TM_TM_GMTOFF,1,[Define to 1 if 'tm.tm_gmtoff' exist.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
+dnl Check for function clock_gettime in time.h
+AC_MSG_CHECKING(for clock_gettime in time.h)
+AC_TRY_LINK([
+#ifdef HAVE_TIME_H
+#	include <time.h>
+#elif HAVE_SYS_TIME_H
+#	include <sys/time.h>
+#endif	/* HAVE_SYS_TIME_H */
+],
+[struct timespec tp;
+clock_gettime(CLOCK_REALTIME, &tp);
+],
+AC_DEFINE(HAVE_TIME_CLOCK_GETTIME,1,[Define to 1 if function 'clock_gettime' exist.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
 dnl Check for mem_unit in struct sysinfo
 AC_MSG_CHECKING(for mem_unit in struct sysinfo)
 AC_TRY_COMPILE([#include <sys/sysinfo.h>],
