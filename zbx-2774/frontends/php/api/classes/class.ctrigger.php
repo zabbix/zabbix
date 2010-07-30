@@ -152,7 +152,36 @@ class CTrigger extends CZBXAPI{
 		}
 		else{
 			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
-
+/*/
+			$sql_parts['where'][] = ' EXISTS(  '.
+						' SELECT tt.triggerid  '.
+						' FROM triggers tt,functions ff,items ii,hosts_groups hgg,rights rr,users_groups ugg '.
+						' WHERE t.triggerid=tt.triggerid  '.
+							' AND ff.triggerid=tt.triggerid  '.
+							' AND ff.itemid=ii.itemid  '.
+							' AND hgg.hostid=ii.hostid  '.
+							' AND rr.id=hgg.groupid  '.
+							' AND rr.groupid=ugg.usrgrpid  '.
+							' AND ugg.userid='.$userid.
+							' AND rr.permission>='.$permission.
+							' AND NOT EXISTS(  '.
+								' SELECT fff.triggerid  '.
+								' FROM functions fff, items iii  '.
+								' WHERE fff.triggerid=tt.triggerid '.
+									' AND fff.itemid=iii.itemid '.		'    '.
+									' AND EXISTS( '.
+										' SELECT hggg.groupid '.
+										' FROM hosts_groups hggg, rights rrr, users_groups uggg '.
+										' WHERE hggg.hostid=iii.hostid '.
+											' AND rrr.id=hggg.groupid '.
+											' AND rrr.groupid=uggg.usrgrpid '.
+											' AND uggg.userid='.$userid.
+											' AND rrr.permission<'.$permission.
+										' ) '.
+								' ) '.
+						' ) ';
+//*/
+//*/
 			$sql_parts['from']['functions'] = 'functions f';
 			$sql_parts['from']['items'] = 'items i';
 			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
@@ -178,6 +207,7 @@ class CTrigger extends CZBXAPI{
 														' AND rr.groupid=gg.usrgrpid '.
 														' AND gg.userid='.$userid.
 														' AND rr.permission<'.$permission.'))';
+//*/
 		}
 
 // nodeids
