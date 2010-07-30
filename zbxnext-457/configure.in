@@ -97,6 +97,7 @@ AC_SEARCH_LIBS(socket, socket)
 #Solaris SNMP requires this
 AC_SEARCH_LIBS(kstat_open, kstat)
 AC_SEARCH_LIBS(gethostbyname, nsl)
+AC_SEARCH_LIBS(clock_gettime, rt)
 #AC_SEARCH_LIBS(__res_query, resolv bind socket)
 #Solaris 8 requires this. It does not have symbol __res_query.
 #AC_SEARCH_LIBS(res_query, resolv bind socket)
