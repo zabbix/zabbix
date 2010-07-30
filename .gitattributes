@@ -153,16 +153,10 @@ frontends/php/images/general/snmp_available.png -text
 frontends/php/images/general/snmp_available_bb.png -text
 frontends/php/images/general/snmp_unavailable.png -text
 frontends/php/images/general/snmp_unknown.png -text
-frontends/php/images/general/sort_down.png -text
-frontends/php/images/general/sort_down_bb.png -text
-frontends/php/images/general/sort_downw.gif -text
-frontends/php/images/general/sort_up.png -text
-frontends/php/images/general/sort_up_bb.png -text
-frontends/php/images/general/sort_upw.gif -text
-frontends/php/images/general/sortdown.gif -text svneol=unset#unset
-frontends/php/images/general/sortdown_off.gif -text svneol=unset#unset
-frontends/php/images/general/sortup.gif -text svneol=unset#unset
-frontends/php/images/general/sortup_off.gif -text svneol=unset#unset
+frontends/php/images/general/sort_down.gif -text
+frontends/php/images/general/sort_down_od.gif -text
+frontends/php/images/general/sort_up.gif -text
+frontends/php/images/general/sort_up_od.gif -text
 frontends/php/images/general/tick.png -text
 frontends/php/images/general/tr_space.gif -text
 frontends/php/images/general/tr_top_bottom.gif -text
