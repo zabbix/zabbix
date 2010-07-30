@@ -626,6 +626,10 @@ class CHost extends CZBXAPI{
 						$result[$host['hostid']]['macros'] = array();
 					}
 
+//					if(!is_null($options['select_maintenances']) && !isset($result[$host['hostid']]['maintenances'])){
+//						$result[$host['hostid']]['maintenances'] = array();
+//					}
+
 // groupids
 					if(isset($host['groupid']) && is_null($options['select_groups'])){
 						if(!isset($result[$host['hostid']]['groups']))
@@ -694,7 +698,7 @@ class CHost extends CZBXAPI{
 							$result[$host['hostid']]['maintenances'] = array();
 
 						$result[$host['hostid']]['maintenances'][] = array('maintenanceid' => $host['maintenanceid']);
-						unset($host['maintenanceid']);
+//						unset($host['maintenanceid']);
 					}				
 //---
 
