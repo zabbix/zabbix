@@ -7,6 +7,7 @@ Changes for 1.9
 
 Changes for 1.8.3rc3
 
+ - [ZBX-2785] creation of empty slideshows prohibited (Vedmak)
  - [ZBX-2791] fixed host menu in "top 100 triggers" in ie7 (Vedmak)
  - [ZBX-2790] fixed maintenance times reset while configure maintenance (Vedmak)
  - [ZBX-2773] changed buttons css for DO theme (Vedmak)
