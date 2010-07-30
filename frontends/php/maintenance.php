@@ -646,7 +646,7 @@ include_once('include/page_header.php');
 		$table->setHeader(array(
 			new CCheckBox('all_maintenances',NULL,"checkAll('".$form->GetName()."','all_maintenances','maintenanceids');"),
 			make_sorting_header(S_NAME,'name'),
-			make_sorting_header(S_TYPE,'type'),
+			make_sorting_header(S_TYPE,'maintenance_type'),
 			make_sorting_header(S_STATUS,'status'),
 			S_DESCRIPTION
 		));
