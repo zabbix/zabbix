@@ -7,6 +7,7 @@ Changes for 1.9
 
 Changes for 1.8.3rc3
 
+ - [ZBX-2794] fixed sorting in configuration web (Vedmak)
  - [ZBX-2792] fixed status sorting in maintenances (Vedmak)
  - [ZBX-2726] fixed statuses for discovery events (Vedmak)
  - [ZBX-2785] creation of empty slideshows prohibited (Vedmak)
