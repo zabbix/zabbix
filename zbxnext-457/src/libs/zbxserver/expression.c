@@ -1213,7 +1213,7 @@ static int	DBget_history_value(zbx_uint64_t itemid, char **replace_to,
 		return ret;
 
 	result = DBselect(
-			"select max(clock)"
+			"select distinct clock"
 			" from %s"
 			" where itemid=" ZBX_FS_UI64
 				" and clock=%d"
