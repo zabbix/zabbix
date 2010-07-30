@@ -352,12 +352,11 @@
 				}
 
 				if(!isset($event_data['object_data'])) continue;
-
 				$table->addRow(array(
 					zbx_date2str(S_EVENTS_DISCOVERY_TIME_FORMAT,$event_data['clock']),
 					$event_data['object_data']['ip'],
 					$event_data['description'],
-					new CCol(trigger_value2str($event_data['value']), get_trigger_value_style($event_data['value']))
+					new CCol(discovery_value($event_data['value']), discovery_value_style($event_data['value']))
 				));
 			}
 		}

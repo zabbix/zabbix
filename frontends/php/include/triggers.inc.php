@@ -322,18 +322,6 @@ return $caption;
 		return S_UNKNOWN;
 	}
 
-/*
- * Function: get_trigger_value_style
- *
- * Description:
- *	 convert trigger value in to the CSS style name
- *
- * Author:
- *	 Eugene Grigorjev (eugene.grigorjev@zabbix.com)
- *
- * Comments:
- *
- */
 	function get_trigger_value_style($value){
 		$str_val[TRIGGER_VALUE_FALSE]	= 'off';
 		$str_val[TRIGGER_VALUE_TRUE]	= 'on';
@@ -345,18 +333,6 @@ return $caption;
 		return '';
 	}
 
-/*
- * Function: trigger_value2str
- *
- * Description:
- *	 convert trigger value in to the string representation
- *
- * Author:
- *	 Eugene Grigorjev (eugene.grigorjev@zabbix.com)
- *
- * Comments:
- *
- */
 	function trigger_value2str($value){
 		$str_val[TRIGGER_VALUE_FALSE]	= S_OK_BIG;
 		$str_val[TRIGGER_VALUE_TRUE]	= S_PROBLEM_BIG;
@@ -366,6 +342,34 @@ return $caption;
 			return $str_val[$value];
 
 		return S_UNKNOWN;
+	}
+	
+	function discovery_value($val = null){
+		$array = array(
+			DOBJECT_STATUS_UP => S_UP_BIG,
+			DOBJECT_STATUS_DOWN => S_DOWN_BIG,
+			DOBJECT_STATUS_DISCOVER => S_DISCOVERED_BIG,
+			DOBJECT_STATUS_LOST => S_LOST_BIG,
+		);
+		
+		if(is_null($val))
+			return $array;
+		else if(isset($array[$val]))
+			return $array[$val];
+		else
+			return S_UNKNOWN;
+	}
+	
+	function discovery_value_style($val){
+		switch($val){
+			case DOBJECT_STATUS_UP: $style = 'off'; break;
+			case DOBJECT_STATUS_DOWN: $style = 'on'; break;
+			case DOBJECT_STATUS_DISCOVER: $style = 'off'; break;
+			case DOBJECT_STATUS_LOST: $style = 'unknown'; break;
+			default: $style = '';
+		}
+		
+		return $style;
 	}
 
 /*
