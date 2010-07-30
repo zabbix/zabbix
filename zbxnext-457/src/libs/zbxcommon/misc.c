@@ -32,7 +32,7 @@
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- *  Comments:                                                                 *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 const char	*get_program_name(const char *path)
@@ -58,13 +58,12 @@ const char	*get_program_name(const char *path)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- *  Comments:                                                                 *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	get_nodeid_by_id(zbx_uint64_t id)
 {
 	return (int)(id/__UINT64_C(100000000000000))%1000;
-
 }
 
 /******************************************************************************
@@ -79,13 +78,12 @@ int	get_nodeid_by_id(zbx_uint64_t id)
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- *  Comments: Time in seconds since midnight (00:00:00),                      *
- *            January 1, 1970, coordinated universal time (UTC).              *
+ * Comments: Time in seconds since midnight (00:00:00),                       *
+ *           January 1, 1970, coordinated universal time (UTC).               *
  *                                                                            *
  ******************************************************************************/
 double	zbx_time(void)
 {
-
 #if defined(_WINDOWS)
 
 	struct _timeb current;
@@ -103,7 +101,6 @@ double	zbx_time(void)
 	return (((double)current.tv_sec) + 1.0e-6 * ((double)current.tv_usec));
 
 #endif /* _WINDOWS */
-
 }
 
 /******************************************************************************
@@ -118,8 +115,8 @@ double	zbx_time(void)
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- *  Comments: Time in seconds since midnight (00:00:00),                      *
- *            January 1, 1970, coordinated universal time (UTC).              *
+ * Comments: Time in seconds since midnight (00:00:00),                       *
+ *           January 1, 1970, coordinated universal time (UTC).               *
  *                                                                            *
  ******************************************************************************/
 void	zbx_timespec(zbx_timespec_t *ts)
