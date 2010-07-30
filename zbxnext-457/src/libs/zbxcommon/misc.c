@@ -68,43 +68,6 @@ int	get_nodeid_by_id(zbx_uint64_t id)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_time                                                         *
- *                                                                            *
- * Purpose: Gets the current time.                                            *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value: Time in seconds                                              *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments: Time in seconds since midnight (00:00:00),                       *
- *           January 1, 1970, coordinated universal time (UTC).               *
- *                                                                            *
- ******************************************************************************/
-double	zbx_time(void)
-{
-#if defined(_WINDOWS)
-
-	struct _timeb current;
-
-	_ftime(&current);
-
-	return (((double)current.time) + 1.0e-3 * ((double)current.millitm));
-
-#else /* not _WINDOWS */
-
-	struct timeval current;
-
-	gettimeofday(&current, NULL);
-
-	return (((double)current.tv_sec) + 1.0e-6 * ((double)current.tv_usec));
-
-#endif /* _WINDOWS */
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: zbx_timespec                                                     *
  *                                                                            *
  * Purpose: Gets the current time.                                            *
@@ -130,25 +93,59 @@ void	zbx_timespec(zbx_timespec_t *ts)
 	ts->sec = current.time;
 	ts->ns = current.millitm * 1000000;
 
-#elif HAVE_TIME_CLOCK_GETTIME
+#else	/* not _WINDOWS */
 
+	struct timeval	tv;
+	int		rc = -1;
+#ifdef HAVE_TIME_CLOCK_GETTIME
 	struct timespec	tp;
 
-	clock_gettime(CLOCK_REALTIME, &tp);
+	if (0 == (rc = clock_gettime(CLOCK_REALTIME, &tp)))
+	{
+		ts->sec = (int)tp.tv_sec;
+		ts->ns = (int)tp.tv_nsec;
+	}
 
-	ts->sec = (int)tp.tv_sec;
-	ts->ns = (int)tp.tv_nsec;
+#endif	/* HAVE_TIME_CLOCK_GETTIME */
 
-#else
+	if (0 != rc && 0 == (rc = gettimeofday(&tv, NULL)))
+	{
+		ts->sec = (int)tv.tv_sec;
+		ts->ns = (int)tv.tv_usec * 1000;
+	}
 
-	struct timeval	current;
+	if (0 != rc)
+	{
+		ts->sec = (int)time(NULL);
+		ts->ns = 0;
+	}
 
-	gettimeofday(&current, NULL);
+#endif	/* not _WINDOWS */
+}
 
-	ts->sec = current.tv_sec;
-	ts->ns = current.tv_usec * 1000;
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_time                                                         *
+ *                                                                            *
+ * Purpose: Gets the current time.                                            *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: Time in seconds                                              *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: Time in seconds since midnight (00:00:00),                       *
+ *           January 1, 1970, coordinated universal time (UTC).               *
+ *                                                                            *
+ ******************************************************************************/
+double	zbx_time(void)
+{
+	zbx_timespec_t	ts;
 
-#endif
+	zbx_timespec(&ts);
+
+	return (double)ts.sec + 1.0e-9 * (double)ts.ns;
 }
 
 /******************************************************************************
