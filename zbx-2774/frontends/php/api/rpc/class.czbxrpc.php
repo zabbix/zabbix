@@ -262,6 +262,20 @@ class czbxrpc{
 		self::$result = $result;
 	}
 
+
+// HISTORY
+	private static function history($action, $params){
+
+		CHistory::$error = array();
+
+		switch($action){
+			default:
+			$result = call_user_func(array('CHistory', $action), $params);
+		}
+
+		self::$result = $result;
+	}
+
 // MAINTENANCE
 	private static function maintenance($action, $params){
 

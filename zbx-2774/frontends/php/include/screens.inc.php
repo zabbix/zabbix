@@ -1414,6 +1414,7 @@ require_once('include/js.inc.php');
 
 					$options = array(
 						'monitored' => 1,
+						'value' => array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE),
 						'limit' => $elements
 					);
 
