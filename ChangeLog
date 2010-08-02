@@ -7,6 +7,7 @@ Changes for 1.9
 
 Changes for 1.8.3rc3
 
+ - [ZBX-2781] fixed timeline in case of usertime goes over possible period (Aly)
  - [ZBX-2745] improved performance of screen element "History of events" (Aly)
  - [ZBX-2774] fixed GUI messaging in DM setup (Aly)
  - [ZBX-2803] fixed agent compilation on HP-UX with the native HP-UX C compiler (asaveljevs)
