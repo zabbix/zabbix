@@ -311,15 +311,21 @@ return $caption;
  * Comments:
  *
  */
-	function get_severity_description($severity){
-		if($severity == TRIGGER_SEVERITY_NOT_CLASSIFIED)	return S_NOT_CLASSIFIED;
-		else if($severity == TRIGGER_SEVERITY_INFORMATION)	return S_INFORMATION;
-		else if($severity == TRIGGER_SEVERITY_WARNING)		return S_WARNING;
-		else if($severity == TRIGGER_SEVERITY_AVERAGE)		return S_AVERAGE;
-		else if($severity == TRIGGER_SEVERITY_HIGH)		return S_HIGH;
-		else if($severity == TRIGGER_SEVERITY_DISASTER)		return S_DISASTER;
+	function get_severity_description($severity=null){
+		$severities = array(
+			TRIGGER_SEVERITY_NOT_CLASSIFIED => S_NOT_CLASSIFIED,
+			TRIGGER_SEVERITY_INFORMATION => S_INFORMATION,
+			TRIGGER_SEVERITY_WARNING => S_WARNING,
+			TRIGGER_SEVERITY_AVERAGE => S_AVERAGE,
+			TRIGGER_SEVERITY_HIGH => S_HIGH,
+			TRIGGER_SEVERITY_DISASTER => S_DISASTER,
+		);
 
-		return S_UNKNOWN;
+		if(is_null($severity))
+			return $severities;
+		else if(isset($severities[$severity]))
+			return $severities[$severity];
+		else return S_UNKNOWN;
 	}
 
 	function get_trigger_value_style($value){
@@ -343,7 +349,7 @@ return $caption;
 
 		return S_UNKNOWN;
 	}
-	
+
 	function discovery_value($val = null){
 		$array = array(
 			DOBJECT_STATUS_UP => S_UP_BIG,
@@ -351,7 +357,7 @@ return $caption;
 			DOBJECT_STATUS_DISCOVER => S_DISCOVERED_BIG,
 			DOBJECT_STATUS_LOST => S_LOST_BIG,
 		);
-		
+
 		if(is_null($val))
 			return $array;
 		else if(isset($array[$val]))
@@ -359,7 +365,7 @@ return $caption;
 		else
 			return S_UNKNOWN;
 	}
-	
+
 	function discovery_value_style($val){
 		switch($val){
 			case DOBJECT_STATUS_UP: $style = 'off'; break;
@@ -368,7 +374,7 @@ return $caption;
 			case DOBJECT_STATUS_LOST: $style = 'unknown'; break;
 			default: $style = '';
 		}
-		
+
 		return $style;
 	}
 
@@ -2640,7 +2646,7 @@ return $caption;
 		$css = getUserTheme($USER_DETAILS);
 		$vTextColor = ($css == 'css_od.css')?'&color=white':'';
 
-		if($view_style == STYLE_TOP){	
+		if($view_style == STYLE_TOP){
 			$header = array(new CCol(S_TRIGGERS,'center'));
 
 			foreach($hosts as $hostname){

@@ -297,7 +297,7 @@ include_once('include/page_header.php');
 	else{
 		$options['hosts']['templated_hosts'] = true;
 	}
-	
+
 	if(!is_null($writeonly)){
 		$options['groups']['editable'] = true;
 		$options['hosts']['editable'] = true;
@@ -305,7 +305,7 @@ include_once('include/page_header.php');
 	$pageFilter = new CPageFilter($options);
 
 	$nodeid = get_request('nodeid', get_current_nodeid(false));
-	
+
 	$groupid = null;
 	if($pageFilter->groupsSelected){
 		if($pageFilter->groupid > 0)
@@ -685,24 +685,19 @@ include_once('include/page_header.php');
 		insert_js_function('addSelectedValues');
 		insert_js_function('addValues');
 		insert_js_function('addValue');
-		if($multiselect)
-			$header = array(
-				array(new CCheckBox("all_triggers", NULL, "javascript: checkAll('".$form->getName()."', 'all_triggers','triggers');"), S_NAME),
-				S_SEVERITY,
-				S_STATUS
-			);
-		else
-			$header = array(S_NAME, S_SEVERITY,	S_STATUS);
 
-		$table->setHeader($header);
+		$table->setHeader(array(
+			($multiselect ? new CCheckBox("all_triggers", NULL, "javascript: checkAll('".$form->getName()."', 'all_triggers','triggers');") : null),
+			S_NAME,
+			S_SEVERITY,
+			S_STATUS
+		));
 
 		$options = array(
 			'nodeids' => $nodeid,
 			'hostids' => $hostid,
 			'output' => API_OUTPUT_EXTEND,
 			'select_hosts' => API_OUTPUT_EXTEND,
-			'select_items' => API_OUTPUT_EXTEND,
-			'select_functions' => API_OUTPUT_EXTEND,
 			'select_dependencies' => API_OUTPUT_EXTEND,
 			'expandDescription' => 1,
 		);
@@ -713,10 +708,6 @@ include_once('include/page_header.php');
 		order_result($triggers, 'description');
 
 		foreach($triggers as $tnum => $trigger){
-			$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
-			$trigger['items'] = zbx_toHash($trigger['items'], 'itemid');
-			$trigger['functions'] = zbx_toHash($trigger['functions'], 'functionid');
-
 			$host = reset($trigger['hosts']);
 			$trigger['host'] = $host['host'];
 
@@ -734,7 +725,7 @@ include_once('include/page_header.php');
 					$dstfld2 => $trigger[$srcfld2],
 				);
 
-				$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).','.zbx_jsvalue($values).'); close_window(); return false;';
+				$js_action = 'javascript: addValues('.zbx_jsvalue($reference).','.zbx_jsvalue($values).'); close_window(); return false;';
 			}
 
 			$description->setAttribute('onclick', $js_action);
@@ -759,19 +750,12 @@ include_once('include/page_header.php');
 				break;
 			}
 
-			if($multiselect){
-				$description = new CCol(array(new CCheckBox('triggers['.zbx_jsValue($trigger[$srcfld1]).']', NULL, NULL, $trigger['triggerid']),	$description));
-			}
-
 			$table->addRow(array(
+				($multiselect ? new CCheckBox('triggers['.zbx_jsValue($trigger[$srcfld1]).']', NULL, NULL, $trigger['triggerid']) : null),
 				$description,
 				new CCol(get_severity_description($trigger['priority']), get_severity_style($trigger['priority'])),
 				$status
 			));
-
-
-			unset($description);
-			unset($status);
 		}
 
 		if($multiselect){
@@ -892,10 +876,10 @@ include_once('include/page_header.php');
 		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 		if(!is_null($templated)) $options['templated'] = $templated;
-		
+
 		$apps = CApplication::get($options);
 		morder_result($apps, array('host', 'name'));
-		
+
 		foreach($apps as $app){
 			$name = new CSpan($app['name'], 'link');
 

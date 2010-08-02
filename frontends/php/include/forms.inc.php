@@ -700,7 +700,7 @@
 
 			$pMsgs = getMessageSettings();
 			$messages = array_merge($pMsgs, $messages);
-			
+
 			if(!isset($messages['sounds']['mute'])) $messages['sounds']['mute'] = 0;
 			if(!isset($messages['sounds']['recovery'])) $messages['sounds']['recovery'] = 0;
 			if(!isset($messages['triggers']['recovery'])) $messages['triggers']['recovery'] = 0;
@@ -2331,7 +2331,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$spanF->setAttribute('id', 'label_formula');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_CALCULATED, 'label_formula');
 
-		
+
 		$params_script = new CTextArea('params', $params, 60, 4);
 		$params_script->setAttribute('id', 'params_script');
 		$params_dbmonitor = new CTextArea('params', $params, 60, 4);
@@ -2340,7 +2340,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$params_calculted->setAttribute('id', 'params_calculted');
 
 		$row = new CRow(array(
-			new CCol(array($spanEC, $spanP, $spanF),'form_row_l'), 
+			new CCol(array($spanEC, $spanP, $spanF),'form_row_l'),
 			new CCol(array($params_script, $params_dbmonitor, $params_calculted),'form_row_r')
 		));
 		$row->setAttribute('id', 'row_params');
@@ -2909,9 +2909,8 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 // TRIGGERS
 	function insert_mass_update_trigger_form(){//$elements_array_name){
 		$visible = get_request('visible',array());
-
-		$priority 		= get_request('priority',	'');
-		$dependencies	= get_request('dependencies',array());
+		$priority = get_request('priority',	'');
+		$dependencies = get_request('dependencies',array());
 
 		$original_templates = array();
 
@@ -2921,6 +2920,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$frmMTrig->addVar('massupdate',get_request('massupdate',1));
 		$frmMTrig->addVar('go',get_request('go','massupdate'));
 		$frmMTrig->setAttribute('id', 'massupdate');
+		$frmMTrig->setName('trig_form');
 
 		$triggers = $_REQUEST['g_triggerid'];
 		foreach($triggers as $id => $triggerid){
@@ -2928,12 +2928,12 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		}
 
 		$cmbPrior = new CComboBox("priority",$priority);
-		for($i = 0; $i <= 5; $i++){
-			$cmbPrior->addItem($i,get_severity_description($i));
-		}
-		$frmMTrig->addRow(array(new CVisibilityBox('visible[priority]', isset($visible['priority']), 'priority', S_ORIGINAL), S_SEVERITY),
-						$cmbPrior
-					);
+		$cmbPrior->addItems(get_severity_description());
+
+		$frmMTrig->addRow(array(
+			new CVisibilityBox('visible[priority]', isset($visible['priority']), 'priority', S_ORIGINAL), S_SEVERITY),
+			$cmbPrior
+		);
 
 /* dependencies */
 		$dep_el = array();
@@ -2958,9 +2958,9 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		//$frmMTrig->addVar('new_dependence','0');
 
 		$btnSelect = new CButton('btn1', S_ADD,
-				"return PopUp('popup.php?dstfrm=massupdate&dstact=add_dependence".
-				"&dstfld1=new_dependence[]&srctbl=triggers&objname=triggers&srcfld1=1&multiselect=1".
-				"',600,450);",
+				"return PopUp('popup.php?dstfrm=massupdate&dstact=add_dependence&reference=deptrigger".
+				"&dstfld1=new_dependence[]&srctbl=triggers&objname=triggers&srcfld1=triggerid&multiselect=1".
+				"',1000,700);",
 				'T');
 
 		array_push($dep_el, array(br(),$btnSelect));
@@ -2973,10 +2973,23 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 						);
 /* end new dependency */
 
-
 		$frmMTrig->addItemToBottomRow(new CButton('mass_save',S_SAVE));
 		$frmMTrig->addItemToBottomRow(SPACE);
-		$frmMTrig->addItemToBottomRow(new CButtonCancel(url_param('config').url_param('groupid')));
+		$frmMTrig->addItemToBottomRow(new CButtonCancel(url_param('groupid')));
+
+		$script = "function addPopupValues(list){
+						if(!isset('object', list)) return false;
+
+						if(list.object == 'deptrigger'){
+							for(var i=0; i < list.values.length; i++){
+								create_var('".$frmMTrig->getName()."', 'new_dependence['+i+']', list.values[i], false);
+							}
+
+							create_var('".$frmMTrig->getName()."','add_dependence', 1, true);
+						}
+					}";
+		insert_js($script);
+
 	return $frmMTrig;
 	}
 
@@ -3111,7 +3124,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 					 new CButton('insert',$input_method == IM_TREE ? S_EDIT : S_SELECT,
 								 "return PopUp('popup_trexpr.php?dstfrm=".$frmTrig->getName().
 								 "&dstfld1=${exprfname}&srctbl=expression".
-								 "&srcfld1=expression&expression=' + escape($exprparam),800,200);"));
+								 "&srcfld1=expression&expression=' + escape($exprparam),1000,700);"));
 
 		if(isset($macrobtn)) array_push($row, $macrobtn);
 		if($input_method == IM_TREE){
@@ -3235,7 +3248,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 							'&srcfld1=triggerid'.
 							'&reference=deptrigger'.
 							'&multiselect=1'.
-						"',750,450);",'T');
+						"',1000,700);",'T');
 
 
 		$frmTrig->addRow(S_NEW_DEPENDENCY, $btnSelect, 'new');
