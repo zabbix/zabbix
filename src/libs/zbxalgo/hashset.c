@@ -140,7 +140,7 @@ void	*zbx_hashset_insert_ext(zbx_hashset_t *hs, const void *data, size_t size, s
 	{
 		entry = hs->mem_malloc_func(NULL, sizeof(ZBX_HASHSET_ENTRY_T));
 		entry->data = hs->mem_malloc_func(NULL, size);
-		memcpy(entry->data + offset, data + offset, size - offset);
+		memcpy((char *)entry->data + offset, (const char *)data + offset, size - offset);
 		entry->hash = hash;
 		entry->next = hs->slots[slot];
 		hs->slots[slot] = entry;
