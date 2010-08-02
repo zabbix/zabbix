@@ -279,7 +279,7 @@ options = array(
 
 		if(is_null($groupid)) $groupid = $this->_profileIds['groupid'];
 
-		if(!isset($this->data['groups'][$groupid]) && ($groupid > 0)){
+		if((!isset($this->data['groups'][$groupid]) && ($groupid > 0)) || is_null($groupid)){
 			if($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_NONE){
 				$groupid = 0;
 			}
@@ -321,7 +321,7 @@ options = array(
 
 			if(is_null($hostid)) $hostid = $this->_profileIds['hostid'];
 
-			if(!isset($this->data['hosts'][$hostid]) && ($hostid > 0)){
+			if((!isset($this->data['hosts'][$hostid]) && ($hostid > 0)) || is_null($hostid)){
 				if($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_NONE){
 					$hostid = 0;
 				}
