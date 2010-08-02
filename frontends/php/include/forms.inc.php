@@ -697,13 +697,13 @@
 			$messages = get_request('messages', array());
 
 			if(!isset($messages['enabled'])) $messages['enabled'] = 0;
+			if(!isset($messages['sounds.recovery'])) $messages['sounds.recovery'] = 0;
+			if(!isset($messages['triggers.recovery'])) $messages['triggers.recovery'] = 0;
+			if(!isset($messages['triggers.severities'])) $messages['triggers.severities'] = array();
 
 			$pMsgs = getMessageSettings();
 			$messages = array_merge($pMsgs, $messages);
 
-			if(!isset($messages['sounds']['mute'])) $messages['sounds']['mute'] = 0;
-			if(!isset($messages['sounds']['recovery'])) $messages['sounds']['recovery'] = 0;
-			if(!isset($messages['triggers']['recovery'])) $messages['triggers']['recovery'] = 0;
 		}
 
 		if($autologin || !isset($_REQUEST['autologout'])) $autologout = 0;
@@ -937,9 +937,9 @@
 		if($profile){
 			$msgVisibility = array('1' => array(
 					'messages[timeout]',
-					'messages[sounds][repeat]',
-					'messages[sounds][recovery]',
-					'messages[triggers][recovery]',
+					'messages[sounds.repeat]',
+					'messages[sounds.recovery]',
+					'messages[triggers.recovery]',
 					'timeout_row',
 					'repeat_row',
 					'triggers_row',
@@ -951,8 +951,8 @@
 			$newRow = $frmUser->addRow(S_MESSAGE_TIMEOUT.SPACE.'('.S_SECONDS_SMALL.')', new CNumericBox("messages[timeout]", $messages['timeout'], 5));
 			$newRow->setAttribute('id', 'timeout_row');
 
-			$repeatSound = new CComboBox('messages[sounds][repeat]', $messages['sounds']['repeat'], 'javascript: if(IE) submit();');
-			$repeatSound->setAttribute('id', 'messages[sounds][repeat]');
+			$repeatSound = new CComboBox('messages[sounds.repeat]', $messages['sounds.repeat'], 'javascript: if(IE) submit();');
+			$repeatSound->setAttribute('id', 'messages[sounds.repeat]');
 			$repeatSound->addItem(1, S_ONCE);
 			$repeatSound->addItem(10, '10 '.S_SECONDS);
 			$repeatSound->addItem(-1, S_MESSAGE_TIMEOUT);
@@ -973,34 +973,34 @@
 			$zbxSounds = getSounds();
 			$triggers = new CTable('', 'invisible');
 
-			$soundList = new CComboBox('messages[sounds][recovery]', $messages['sounds']['recovery']);
+			$soundList = new CComboBox('messages[sounds.recovery]', $messages['sounds.recovery']);
 			foreach($zbxSounds as $filename => $file) $soundList->addItem($file, $filename);
 
 			$resolved = array(
-				new CCheckBox('messages[triggers][recovery]', $messages['triggers']['recovery'], null, 1),
+				new CCheckBox('messages[triggers.recovery]', $messages['triggers.recovery'], null, 1),
 				S_RECOVERY,
 				$soundList,
-				new CButton('start', S_PLAY, "javascript: testUserSound('messages[sounds][recovery]');", false),
+				new CButton('start', S_PLAY, "javascript: testUserSound('messages[sounds.recovery]');", false),
 				new CButton('stop', S_STOP, 'javascript: AudioList.stopAll();', false)
 			);
 
 			$triggers->addRow($resolved);
 
 			foreach($severities as $snum => $severity){
-				$soundList = new CComboBox('messages[sounds]['.$severity.']', $messages['sounds'][$severity]);
+				$soundList = new CComboBox('messages[sounds.'.$severity.']', $messages['sounds.'.$severity]);
 				foreach($zbxSounds as $filename => $file) $soundList->addItem($file, $filename);
 
 				$triggers->addRow(array(
-					new CCheckBox('messages[triggers][severities]['.$severity.']', isset($messages['triggers']['severities'][$severity]), null, 1),
+					new CCheckBox('messages[triggers.severities]['.$severity.']', isset($messages['triggers.severities'][$severity]), null, 1),
 					getSeverityCaption($severity),
 					$soundList,
-					new CButton('start', S_PLAY, "javascript: testUserSound('messages[sounds][".$severity."]');", false),
+					new CButton('start', S_PLAY, "javascript: testUserSound('messages[sounds.".$severity."]');", false),
 					new CButton('stop', S_STOP, 'javascript: AudioList.stopAll();', false)
 				));
 
 
-				zbx_subarray_push($msgVisibility, 1, 'messages[triggers][severities]['.$severity.']');
-				zbx_subarray_push($msgVisibility, 1, 'messages[sounds]['.$severity.']');
+				zbx_subarray_push($msgVisibility, 1, 'messages[triggers.severities]['.$severity.']');
+				zbx_subarray_push($msgVisibility, 1, 'messages[sounds.'.$severity.']');
 			}
 
 			$newRow = $frmUser->addRow(S_TRIGGER_SEVERITY, $triggers);

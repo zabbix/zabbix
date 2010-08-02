@@ -17,7 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-
+?>
+<?php
 require_once('include/config.inc.php');
 
 $page['title'] = "RPC";
@@ -31,7 +32,8 @@ include_once('include/page_header.php');
 //		VAR				TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields = array();
 	check_fields($fields);
-
+?>
+<?php
 // ACTION /////////////////////////////////////////////////////////////////////////////
 	$http_request = new CHTTP_request();
 	$data = $http_request->body();
@@ -60,12 +62,12 @@ include_once('include/page_header.php');
 			break;
 		case 'message.mute':
 			$msgsettings = getMessageSettings();
-			$msgsettings['sounds']['mute'] = 1;
+			$msgsettings['sounds.mute'] = 1;
 			updateMessageSettings($msgsettings);
 			break;
 		case 'message.unmute':
 			$msgsettings = getMessageSettings();
-			$msgsettings['sounds']['mute'] = 0;
+			$msgsettings['sounds.mute'] = 0;
 			updateMessageSettings($msgsettings);
 			break;
 		case 'message.settings':
@@ -75,73 +77,41 @@ include_once('include/page_header.php');
 			$params = $data['params'];
 // Events
 			$msgsettings = getMessageSettings();
-
-			$lastEventId = CProfile::get('web.messages.last.eventid', 0);
-//SDI($lastEventId);
+			
+// timeout
+			$timeOut = (time() - $msgsettings['timeout']);
+			$lastMsgTime = 0;
 			if(isset($params['messageLast']['events'])){
-				if(bccomp($params['messageLast']['events'], $lastEventId) > 0)
-						$lastEventId = $params['messageLast']['events'];
-				$lastEventId = bcadd($lastEventId, 1);
+				$lastMsgTime = $params['messageLast']['events']['time'];
 			}
-
-			$triggerOptions = array(
-				'lastChangeSince' => (time() - $msgsettings['timeout']), // 15 min
-				'filter' => array(
-					'priority' => array_keys($msgsettings['triggers']['severities']),
-					'value' => array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE)
-				),
-				'select_hosts' => array('hostid', 'host'),
-				'output' => API_OUTPUT_EXTEND,
-				'expandDescription' => 1,
-				'sortfield' => 'lastchange',
-				'sortorder' => ZBX_SORT_DOWN,
-				'limit' => 15
-			);
-
-			if(!$msgsettings['triggers']['recovery']){
-				$triggerOptions['filter']['value'] = array(TRIGGER_VALUE_TRUE);
-			}
-
-			$triggers = CTrigger::get($triggerOptions);
-			$triggers = zbx_toHash($triggers, 'triggerid');
-
+//---
+			
 			$options = array(
-				'object' => EVENT_OBJECT_TRIGGER,
-				'triggerids' => zbx_objectValues($triggers, 'triggerid'),
-				'time_from' => (time() - $msgsettings['timeout']), // 15 min
-				'output' => API_OUTPUT_EXTEND,
-				'sortfield' => 'clock',
-				'sortorder' => ZBX_SORT_DOWN,
+				'nodeids' => get_current_nodeid(true),
+				'lastChangeSince' => max(array($lastMsgTime, $msgsettings['last.clock'], $timeOut)),
+				'value' => array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE),
+				'priority' => array_keys($msgsettings['triggers.severities']),
 				'limit' => 15
 			);
+			if(!$msgsettings['triggers.recovery']) $options['value'] = array(TRIGGER_VALUE_TRUE);
 
-			if($lastEventId > 0){
-				$options['eventid_from'] = $lastEventId;
-			}
-
-			if(!$msgsettings['triggers']['recovery']){
-				$options['value'] = TRIGGER_VALUE_TRUE;
-			}
-
-			$events = CEvent::get($options);
+			$events = getLastEvents($options);
 
 			$sortClock = array();
 			$sortEvent = array();
 			foreach($events as $enum => $event){
-				if(!isset($triggers[$event['objectid']])) continue;
-
-				$trigger = $triggers[$event['objectid']];
-				$host = reset($trigger['hosts']);
+				$trigger = $event['trigger'];
+				$host = $event['host'];
 
 				if($event['value'] == TRIGGER_VALUE_FALSE){
 					$priority = 0;
 					$title = S_RESOLVED;
-					$sound = $msgsettings['sounds']['recovery'];
+					$sound = $msgsettings['sounds.recovery'];
 				}
 				else{
 					$priority = $trigger['priority'];
 					$title = S_PROBLEM_ON;
-					$sound = $msgsettings['sounds'][$trigger['priority']];
+					$sound = $msgsettings['sounds.'.$trigger['priority']];
 				}
 
 				$url_tr_status = 'tr_status.php?hostid='.$host['hostid'];
@@ -156,7 +126,7 @@ include_once('include/page_header.php');
 					'priority' => $priority,
 					'sound' => $sound,
 					'color' => getEventColor($trigger['priority'], $event['value']),
-					'title' => $title.' [url='.$url_tr_status.']'.$host['host'].'[/url]',
+					'title' => $title.' '.get_node_name_by_elid($host['hostid'],null,':').'[url='.$url_tr_status.']'.$host['host'].'[/url]',
 					'body' => array(
 						S_DETAILS.': '.' [url='.$url_events.']'.$trigger['description'].'[/url]',
 						S_DATE.': [b][url='.$url_tr_events.']'.zbx_date2str(S_DATE_FORMAT_YMDHMS, $event['clock']).'[/url][/b]',
@@ -176,10 +146,11 @@ include_once('include/page_header.php');
 		case 'message.closeAll':
 			$params = $data['params'];
 
+			$msgsettings = getMessageSettings();
 			switch(strtolower($params['caption'])){
 				case 'events':
-					$params['sourceid'] = bcadd($params['sourceid'], '1', 0);
-					CProfile::update('web.messages.last.eventid', $params['sourceid'], PROFILE_TYPE_ID);
+					$msgsettings['last.clock'] = (int)$params['time']+1;
+					updateMessageSettings($msgsettings);
 					break;
 			}
 

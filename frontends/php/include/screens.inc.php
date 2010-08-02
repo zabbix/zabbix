@@ -390,16 +390,16 @@ require_once('include/js.inc.php');
 
 	function get_screen_item_form(){
 		global $USER_DETAILS;
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY,get_current_nodeid(true));
 
 		$form = new CFormTable(S_SCREEN_CELL_CONFIGURATION,'screenedit.php?screenid='.$_REQUEST['screenid']);
 		$form->SetHelp('web.screenedit.cell.php');
 
 		if(isset($_REQUEST['screenitemid'])){
-			$iresult=DBSelect('SELECT * FROM screens_items'.
-							' WHERE screenid='.$_REQUEST['screenid'].
-								' AND screenitemid='.$_REQUEST['screenitemid']
-							);
+			$sql = 'SELECT * '.
+					' FROM screens_items'.
+					' WHERE screenid='.$_REQUEST['screenid'].
+						' AND screenitemid='.$_REQUEST['screenitemid'];
+			$iresult=DBSelect($sql);
 
 			$form->addVar('screenitemid',$_REQUEST['screenitemid']);
 		}
@@ -463,25 +463,28 @@ require_once('include/js.inc.php');
 
 		if($resourcetype == SCREEN_RESOURCE_GRAPH){
 // User-defined graph
-			$resourceid = graph_accessible($resourceid)?$resourceid:0;
+			$options = array(
+				'graphids' => $resourceid,
+				'select_hosts' => array('hostid', 'host'),
+				'output' => API_OUTPUT_EXTEND
+			);
+			$graphs = CGraph::get($options);
 
 			$caption = '';
 			$id=0;
 
-			if($resourceid > 0){
-				$result = DBselect('SELECT DISTINCT g.graphid,g.name,n.name as node_name, h.host'.
-						' FROM graphs g '.
-							' LEFT JOIN graphs_items gi ON g.graphid=gi.graphid '.
-							' LEFT JOIN items i ON gi.itemid=i.itemid '.
-							' LEFT JOIN hosts h ON h.hostid=i.hostid '.
-							' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid('g.graphid').
-						' WHERE g.graphid='.$resourceid);
+			if(!empty($graphs)){
+				$id = $resourceid;
+				$graph = reset($graphs);
 
-				while($row=DBfetch($result)){
-					$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
-					$caption = $row['node_name'].$row['host'].':'.$row['name'];
-					$id = $resourceid;
-				}
+				order_result($graph['hosts'], 'host');
+				$graph['host'] = reset($graph['hosts']);
+
+				$caption = $graph['host']['host'].':'.$graph['name'];
+				
+				$nodeName = get_node_name_by_elid($graph['host']['hostid']);
+				if(!zbx_empty($nodeName))
+					$caption = '('.$nodeName.') '.$caption;
 			}
 
 			$form->addVar('resourceid',$id);
@@ -495,26 +498,27 @@ require_once('include/js.inc.php');
 		}
 		else if($resourcetype == SCREEN_RESOURCE_SIMPLE_GRAPH){
 // Simple graph
+			$options = array(
+				'itemids' => $resourceid,
+				'select_hosts' => array('hostid', 'host'),
+				'output' => API_OUTPUT_EXTEND
+			);
+			$items = CItem::get($options);
+
 			$caption = '';
 			$id=0;
 
-			if($resourceid > 0){
-				$sql = 'SELECT n.name as node_name,h.host,i.description,i.itemid,i.key_ '.
-						' FROM hosts h,items i '.
-							' LEFT JOIN nodes n on n.nodeid='.DBid2nodeid('i.itemid').
-						' WHERE h.hostid=i.hostid '.
-							' AND h.status='.HOST_STATUS_MONITORED.
-							' AND i.status='.ITEM_STATUS_ACTIVE.
-							' AND '.DBcondition('i.hostid',$available_hosts).
-							' AND i.itemid='.$resourceid;
-				$result=DBselect($sql);
-				while($row=DBfetch($result)){
-					$description_ = item_description($row);
-					$row["node_name"] = isset($row["node_name"]) ? "(".$row["node_name"].") " : '';
+			if(!empty($items)){
+				$id = $resourceid;
+				
+				$item = reset($items);
+				$item['host'] = reset($item['hosts']);
 
-					$caption = $row['node_name'].$row['host'].': '.$description_;
-					$id = $resourceid;
-				}
+				$caption = item_description($item);
+
+				$nodeName = get_node_name_by_elid($item['itemid']);
+				if(!zbx_empty($nodeName))
+					$caption = '('.$nodeName.') '.$caption;
 			}
 
 			$form->addVar('resourceid',$id);
@@ -527,26 +531,23 @@ require_once('include/js.inc.php');
 		}
 		else if($resourcetype == SCREEN_RESOURCE_MAP){
 // Map
+			$options = array(
+				'sysmapids' => $resourceid,
+				'output' => API_OUTPUT_EXTEND
+			);
+			$maps = CMap::get($options);
+
 			$caption = '';
 			$id=0;
 
-			if($resourceid > 0){
-				$sql = 'SELECT n.name as node_name, s.sysmapid,s.name '.
-							' FROM sysmaps s'.
-								' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid('s.sysmapid').
-							' WHERE s.sysmapid='.$resourceid;
-				$result=DBselect($sql);
-				while($row=DBfetch($result)){
-					$sm = CMap::get(array(
-						'sysmapids' => $row['sysmapid'],
-						'output' => API_OUTPUT_SHORTEN,
-					));
-					if(empty($sm)) continue;
+			if(!empty($maps)){
+				$id = $resourceid;
+				$map = reset($maps);
 
-					$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
-					$caption = $row['node_name'].$row['name'];
-					$id = $resourceid;
-				}
+				$caption = $map['name'];
+				$nodeName = get_node_name_by_elid($map['sysmapid']);
+				if(!zbx_empty($nodeName))
+					$caption = '('.$nodeName.') '.$caption;
 			}
 
 			$form->addVar('resourceid',$id);
@@ -560,26 +561,27 @@ require_once('include/js.inc.php');
 		}
 		else if($resourcetype == SCREEN_RESOURCE_PLAIN_TEXT){
 // Plain text
+			$options = array(
+				'itemids' => $resourceid,
+				'select_hosts' => array('hostid', 'host'),
+				'output' => API_OUTPUT_EXTEND
+			);
+			$items = CItem::get($options);
+
 			$caption = '';
 			$id=0;
 
-			if($resourceid > 0){
-				$sql = 'SELECT n.name as node_name,h.host,i.description,i.itemid,i.key_ '.
-						' FROM hosts h,items i '.
-							' LEFT JOIN nodes n on n.nodeid='.DBid2nodeid('i.itemid').
-						' WHERE h.hostid=i.hostid '.
-							' AND h.status='.HOST_STATUS_MONITORED.
-							' AND i.status='.ITEM_STATUS_ACTIVE.
-							' AND '.DBcondition('i.hostid',$available_hosts).
-							' AND i.itemid='.$resourceid;
-				$result=DBselect($sql);
-				while($row=DBfetch($result)){
-					$description_=item_description($row);
-					$row["node_name"] = isset($row["node_name"]) ? '('.$row["node_name"].') ' : '';
+			if(!empty($items)){
+				$id = $resourceid;
 
-					$caption = $row['node_name'].$row['host'].': '.$description_;
-					$id = $resourceid;
-				}
+				$item = reset($items);
+				$item['host'] = reset($item['hosts']);
+
+				$caption = item_description($item);
+
+				$nodeName = get_node_name_by_elid($item['itemid']);
+				if(!zbx_empty($nodeName))
+					$caption = '('.$nodeName.') '.$caption;
 			}
 
 			$form->addVar('resourceid',$id);
@@ -1509,7 +1511,52 @@ require_once('include/js.inc.php');
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
 				else if(($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_EVENTS)){
-					$item = array(get_history_of_triggers_events(0, $elements));
+
+					$options = array(
+						'monitored' => 1,
+						'value' => array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE),
+						'limit' => $elements
+					);
+
+					$hide_unknown = CProfile::get('web.events.filter.hide_unknown',0);
+					if($hide_unknown){
+						$options['value'] = array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE);
+					}
+
+					$item = new CTableInfo(S_NO_EVENTS_FOUND);
+					$item->SetHeader(array(
+							S_TIME,
+							is_show_all_nodes() ? S_NODE : null,
+							S_HOST,
+							S_DESCRIPTION,
+							S_VALUE,
+							S_SEVERITY
+							));
+
+					$events = getLastEvents($options);
+					foreach($events as $enum => $event){
+						$trigger = $event['trigger'];
+						$host = $event['host'];
+
+						$value = new CCol(trigger_value2str($event['value']), get_trigger_value_style($event['value']));
+
+//						$row = zbx_array_merge($triggers[$row['triggerid']],$row);
+//						if((1 == $hide_unknown) && (!event_initial_time($row,$hide_unknown))) continue;
+
+						$item->addRow(array(
+							zbx_date2str(S_EVENTS_TRIGGERS_EVENTS_HISTORY_LIST_DATE_FORMAT,$event['clock']),
+							get_node_name_by_elid($event['objectid']),
+							$host['host'],
+							new CLink(
+								$trigger['description'],
+								'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid']
+								),
+							$value,
+							new CCol(get_severity_description($trigger['priority']), get_severity_style($trigger['priority'])),
+						));
+					}
+
+					$item = array($item);
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
 				else{

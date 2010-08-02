@@ -2597,7 +2597,7 @@ return $caption;
 		$options = array(
 			'hostids' => $hostids,
 			'monitored' => 1,
-			'expand_data' => 1,
+			'expandData' => 1,
 			'skipDependent' => 1,
 			'output' => API_OUTPUT_EXTEND,
 			'sortfield' => 'description'

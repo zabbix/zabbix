@@ -261,6 +261,13 @@ class CScreen extends CZBXAPI{
 					break;
 				}
 			}
+
+			$groups_to_check = array_unique($groups_to_check);
+			$hosts_to_check = array_unique($hosts_to_check);
+			$graphs_to_check = array_unique($graphs_to_check);
+			$items_to_check = array_unique($items_to_check);
+			$maps_to_check = array_unique($maps_to_check);
+			$screens_to_check = array_unique($screens_to_check);
 /*
 sdii($graphs_to_check);
 sdii($items_to_check);

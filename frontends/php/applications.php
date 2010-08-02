@@ -346,7 +346,7 @@ include_once('include/page_header.php');
 				'applicationids' => zbx_objectValues($applications, 'applicationid'),
 				'output' => API_OUTPUT_EXTEND,
 				'select_items' => API_OUTPUT_REFER,
-				'expand_data' => 1,
+				'expandData' => 1,
 			);
 			$applications = CApplication::get($options);
 
