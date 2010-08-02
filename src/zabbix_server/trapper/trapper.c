@@ -388,7 +388,7 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 			av.severity	= 0;
 		}
 
-		av.clock = time(NULL);
+		zbx_timespec(&av.ts);
 
 		process_mass_data(sock, 0, &av, 1, NULL);
 

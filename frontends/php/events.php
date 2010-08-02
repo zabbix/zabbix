@@ -427,7 +427,7 @@
 			foreach($events as $enum => $event){
 				$trigger = reset($event['triggers']);
 
-				$event['desc'] = expand_trigger_description_by_data($trigger);
+				$event['desc'] = expand_trigger_description_by_data(zbx_array_merge($trigger, array('clock'=>$event['clock'], 'ns'=>$event['ns'])), ZBX_FLAG_EVENT);
 				$event['type'] = $trigger['type'];
 
 				$event += $trigger;

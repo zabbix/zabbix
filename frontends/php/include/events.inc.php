@@ -28,7 +28,7 @@
 	}
 
 	function get_tr_event_by_eventid($eventid){
-		$sql = 'SELECT e.*,t.triggerid, t.description,t.priority,t.status,t.type '.
+		$sql = 'SELECT e.*,t.triggerid, t.description,t.expression,t.priority,t.status,t.type '.
 				' FROM events e,triggers t '.
 				' WHERE e.eventid='.$eventid.
 					' AND e.object='.EVENT_OBJECT_TRIGGER.
@@ -280,7 +280,7 @@ function make_event_details($eventid){
 
 	$table = new CTableInfo();
 
-	$table->AddRow(array(S_EVENT, expand_trigger_description($event['triggerid'])));
+	$table->AddRow(array(S_EVENT, expand_trigger_description_by_data($event, ZBX_FLAG_EVENT)));
 	$table->AddRow(array(S_TIME, zbx_date2str(S_EVENTS_EVENT_DETAILS_DATE_FORMAT,$event['clock'])));
 
 	$duration = zbx_date2age($event['clock']);
@@ -507,7 +507,7 @@ function get_history_of_triggers_events($start,$num, $groupid=0, $hostid=0){
 			));
 
 	if(!empty($triggers)){
-		$sql = 'SELECT e.eventid, e.objectid as triggerid, e.clock, e.value, e.acknowledged '.
+		$sql = 'SELECT e.eventid, e.objectid as triggerid, e.clock, e.ns, e.value, e.acknowledged '.
 				' FROM events e '.
 				' WHERE e.object='.EVENT_OBJECT_TRIGGER.
 					' AND '.DBcondition('e.objectid', $trigger_list).

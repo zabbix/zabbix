@@ -1557,6 +1557,7 @@ return $caption;
  * Comments: !!! Don't forget sync code with C !!!
  *
  */
+/*
 	function expandTriggerDescription($trigger, $flag = ZBX_FLAG_TRIGGER){
 		if($trigger){
 			$description = expand_trigger_description_constants($trigger['description'], $trigger);
@@ -1610,6 +1611,7 @@ return $caption;
 		}
 	return $description;
 	}
+*/
 
 	/*
 	 * Function: expand_trigger_description_by_data
@@ -1623,6 +1625,7 @@ return $caption;
 	 * Comments: !!! Don't forget sync code with C !!!
 	 *
 	 */
+/*
 	function expand_trigger_description_by_data2($trigger, $flag = ZBX_FLAG_TRIGGER){
 		if($trigger){
 			$description = expand_trigger_description_constants($trigger['description'], $trigger);
@@ -1690,6 +1693,7 @@ return $caption;
 		}
 	return $description;
 	}
+*/
 
 	/*
 	 * Function: expand_trigger_description_by_data
@@ -1748,7 +1752,7 @@ return $caption;
 				if(zbx_strstr($description, $macro)){
 					$value=($flag==ZBX_FLAG_TRIGGER)?
 							trigger_get_func_value($row['expression'],ZBX_FLAG_TRIGGER,$i ? $i : 1, 1):
-							trigger_get_func_value($row['expression'],ZBX_FLAG_EVENT,$i ? $i : 1, $row['clock']);
+							trigger_get_func_value($row['expression'],ZBX_FLAG_EVENT,$i ? $i : 1, $row['clock'], $row['ns']);
 
 					$description = str_replace($macro, $value, $description);
 				}
@@ -3085,18 +3089,18 @@ return $caption;
 	 * Comments:
 	 *
 	 */
-	function trigger_get_func_value($expression, $flag, $function, $param){
+	function trigger_get_func_value($expression, $flag, $function, $param, $ns = 0){
 		$result = NULL;
 
 		$functionid=trigger_get_N_functionid($expression,$function);
 		if(isset($functionid)){
-			$row=DBfetch(DBselect('select i.* from items i, functions f '.
+			$row=DBfetch(DBselect('select i.itemid,i.value_type from items i,functions f '.
 				' where i.itemid=f.itemid and f.functionid='.$functionid));
 			if($row)
 			{
 				$result=($flag == ZBX_FLAG_TRIGGER)?
 					item_get_history($row, $param):
-					item_get_history($row, 0, $param);
+					item_get_history($row, 0, $param, $ns);
 			}
 		}
 		return $result;
