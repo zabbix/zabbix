@@ -124,8 +124,8 @@ setSettings: function(settings){
 	this.debug('setSettings');
 //--
 
-	this.sounds.repeat = settings.sounds.repeat;
-	this.sounds.mute = settings.sounds.mute;
+	this.sounds.repeat = settings['sounds.repeat'];
+	this.sounds.mute = settings['sounds.mute'];
 	if(this.sounds.mute == 1){
 		this.dom.mute.className = 'iconmute';
 	}
@@ -167,7 +167,7 @@ addMessage: function(newMessage){
 	newMessage.messageid = this.msgcounter;
 
 	this.messageList[this.msgcounter] = new CMessage(this, newMessage);
-	this.messageLast[this.messageList[this.msgcounter].caption] = this.messageList[this.msgcounter].sourceid;
+	this.messageLast[this.messageList[this.msgcounter].caption] = this.messageList[this.msgcounter];
 
 	$(this.dom.container).show();
 
@@ -280,7 +280,7 @@ closeAllMessages: function(e){
 		'params': {
 			'caption': this.messageList[lastMessageId].caption,
 			'sourceid': this.messageList[lastMessageId].sourceid,
-			'priority': this.messageList[lastMessageId].priority,
+			'time': this.messageList[lastMessageId].time,
 			'messageid': this.messageList[lastMessageId].messageid
 		},
 //		'onSuccess': function(resp){ SDI(resp)},

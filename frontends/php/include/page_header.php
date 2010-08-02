@@ -22,11 +22,6 @@
 	require_once('include/config.inc.php');
 	require_once('include/perm.inc.php');
 
-	global $USER_DETAILS;
-	global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID, $ZBX_VIEWED_NODES, $ZBX_AVAILABLE_NODES;
-	global $ZBX_CURMASTERID;
-	global $page;
-
 	if(!isset($page['type'])) $page['type'] = PAGE_TYPE_HTML;
 	if(!isset($page['file'])) $page['file'] = basename($_SERVER['PHP_SELF']);
 
@@ -127,6 +122,8 @@
 
 <?php
 	if(isset($DB['DB']) && !is_null($DB['DB'])){
+		$config = select_config();
+
 		$css = getUserTheme($USER_DETAILS);
 		$config=select_config();
 		if($css){
