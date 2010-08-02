@@ -9,9 +9,9 @@ Changes for 1.8.3rc3
 
  - [ZBX-2799] fixed map element host in maintenance (Aly)
  - [ZBX-2781] fixed timeline in case of usertime goes over possible period (Aly)
+ - [ZBX-2803] fixed agent compilation on HP-UX with the native HP-UX C compiler (asaveljevs)
  - [ZBX-2745] improved performance of screen element "History of events" (Aly)
  - [ZBX-2774] fixed GUI messaging in DM setup (Aly)
- - [ZBX-2803] fixed agent compilation on HP-UX with the native HP-UX C compiler (asaveljevs)
  - [ZBX-2786] fixed errors in trigger dependency mass update popup (Vedmak)
  - [ZBX-2536] fixed agent crash when processing proc.mem[] and proc.num[] on NetBSD (asaveljevs)
  - [ZBX-2671] fixed detection of various system headers during ./configure (asaveljevs)
