@@ -75,6 +75,7 @@ initialize: function($super, id, objid){
 	addListener(this.dom.input, 'keyup', this.keyPressed.bindAsEventListener(this));
 	addListener(this.dom.input, 'blur', this.suggestBlur.bindAsEventListener(this));
 	addListener(window, 'resize', this.positionSuggests.bindAsEventListener(this));
+//	addListener(window, 'keypress', this.searchFocus.bindAsEventListener(this));
 
 	this.timeoutNeedle = null;
 },
@@ -123,7 +124,7 @@ searchServer: function(needle){
 			'limit': this.suggestLimit
 		},
 		'onSuccess': this.serverRespond.bind(this, needle),
-		'onFailure': function(resp){ zbx_throw('Suggest Widget: search request failed.'); }
+		'onFailure': function(resp){zbx_throw('Suggest Widget: search request failed.');}
 	}
 
 	new RPC.Call(rpcRequest);
@@ -263,6 +264,21 @@ onSelect: function(selection){
 // -----------------------------------------------------------------------
 // Keyboard
 // -----------------------------------------------------------------------
+searchFocus: function(e){
+	this.debug('keyPressed');
+//---
+	if(!e) var e = window.event;
+
+	var elem = e.element();
+	if(elem.match('input[type=text]') || elem.match('textarea') || elem.match('select')) return true;
+
+	var key = e.keyCode;
+	if(key == 47){
+		e.stop();
+		$(this.dom.input).focus();
+		return void(0);
+	}
+},
 
 keyPressed: function(e){
 	this.debug('keyPressed');

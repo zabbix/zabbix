@@ -18,6 +18,9 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **
 */
+root {
+    display: block;
+}
 
 body{
 	background-color: #E5E5E5;

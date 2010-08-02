@@ -260,6 +260,7 @@
 		$starttime = null;
 	}
 	else{
+		$config = select_config();
 		$firstEvent = reset($firstEvent);
 		$starttime = $firstEvent['clock'];
 
@@ -351,12 +352,11 @@
 				}
 
 				if(!isset($event_data['object_data'])) continue;
-
 				$table->addRow(array(
 					zbx_date2str(S_EVENTS_DISCOVERY_TIME_FORMAT,$event_data['clock']),
 					$event_data['object_data']['ip'],
 					$event_data['description'],
-					new CCol(trigger_value2str($event_data['value']), get_trigger_value_style($event_data['value']))
+					new CCol(discovery_value($event_data['value']), discovery_value_style($event_data['value']))
 				));
 			}
 		}
@@ -453,10 +453,11 @@
 // Items
 				$items = array();
 				foreach($event['items'] as $inum => $item){
-					$item['itemid'] = $item['itemid'];
-					$item['action'] = str_in_array($item['value_type'],array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64))? 'showgraph':'showvalues';
-					$item['description'] = item_description($item);
-					$items[] = $item;
+					$i = array();
+					$i['itemid'] = $item['itemid'];
+					$i['action'] = str_in_array($item['value_type'],array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64))? 'showgraph':'showvalues';
+					$i['description'] = item_description($item);
+					$items[] = $i;
 				}
 
 // Actions
@@ -474,7 +475,7 @@
 				$tr_desc = new CSpan($event['desc'],'pointer');
 				$tr_desc->addAction('onclick',"create_mon_trigger_menu(event, ".
 										" new Array({'triggerid': '".$trigger['triggerid']."', 'lastchange': '".$event['clock']."'}),".
-										zbx_jsvalue($items).");");
+										zbx_jsvalue($items, true).");");
 
 				$table->addRow(array(
 					new CLink(zbx_date2str(S_EVENTS_ACTION_TIME_FORMAT,$event['clock']),
@@ -524,6 +525,9 @@
 
 	$events_wdgt->show();
 
+?>
+<?php
 
 include_once('include/page_footer.php');
+
 ?>

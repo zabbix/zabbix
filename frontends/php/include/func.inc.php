@@ -821,6 +821,56 @@ function zbx_rksort(&$array, $flags=NULL){
 	return $array;
 }
 
+
+// used only in morder_result
+function sortSub($array, $sortorder){
+	$result = array();
+	
+	$keys = array_keys($array);
+	natcasesort($keys);
+	
+	
+	if($sortorder != ZBX_SORT_UP)
+		$keys = array_reverse($keys);
+	
+	foreach($keys as $key){
+		$tst = reset($array[$key]);
+		if(isset($tst[0]) && !is_array($tst[0])){
+			$array[$key] = sortSub($array[$key], $sortorder);
+		}
+		
+		foreach($array[$key] as $id){
+			$result[] = $id;
+		}
+	}
+	return $result;
+}
+
+function morder_result(&$array, $sortfields, $sortorder=ZBX_SORT_UP){
+	$tmp = array();
+	$result = array();
+	
+	foreach($array as $key => $el){
+		unset($pointer);
+		$pointer =& $tmp;
+		foreach($sortfields as $f){
+			if(!isset($pointer[$el[$f]])) $pointer[$el[$f]] = array();
+			$pointer =& $pointer[$el[$f]];
+		}
+		$pointer[] = $key;		
+	}
+
+	$order = sortSub($tmp, $sortorder);
+
+	foreach($order as $key){
+		$result[$key] = $array[$key];
+	}
+	
+	$array = $result;
+	return true;
+}
+
+
 function order_result(&$data, $sortfield, $sortorder=ZBX_SORT_UP){
 	if(empty($data)) return false;
 
@@ -1136,34 +1186,25 @@ function zbx_subarray_push(&$mainArray, $sIndex, $element) {
 			$script = "javascript: redirect('".$url."');";
 		}
 
-		if(is_array($obj)){
-			$col = array();
-			foreach($obj as $el){
-				if(is_object($el) || ($el === SPACE)){
-					$col[] = $el;
-				}
-				else{
-					$col[] = new CSpan($el, 'underline');
-				}
-			}
+		zbx_value2array($obj);
+		$div = new CDiv();
+		$div->setAttribute('style', 'float:left;');
+
+		foreach($obj as $enum => $el){
+			if(is_object($el) || ($el === SPACE)) $div->addItem($el);
+			else $div->addItem(new CSpan($el, 'underline'));
 		}
-		else{
-			$col = array(new CSpan($obj,'underline'));
-		}
+		$div->addItem(SPACE);
+
+		$img = null;
 		if(isset($_REQUEST['sort']) && ($tabfield == $_REQUEST['sort'])){
-			if($sortorder == ZBX_SORT_UP){
-				$img = new CImg('images/general/sort_down.png','down',10,10);
-			}
-			else{
-				$img = new CImg('images/general/sort_up.png','up',10,10);
-			}
+			if($sortorder == ZBX_SORT_UP) $img = new CDiv(SPACE,'icon_sortdown');
+			else $img = new CDiv(SPACE,'icon_sortup');
 
-			$img->setAttribute('style','line-height: 18px; vertical-align: middle;');
-			$col[] = SPACE;
-			$col[] = $img;
+			$img->setAttribute('style','float: left;');
 		}
 
-		$col = new CCol($col, 'hover_grey');
+		$col = new CCol(array($div, $img), 'nowrap hover_grey');
 		$col->setAttribute('onclick', $script);
 
 	return $col;
@@ -1343,7 +1384,7 @@ function getPagingLine(&$items, $autotrim=true){
 
 	$page_view = new CSpan($page_view);
 
-	zbx_add_post_js('insert_in_element("numrows",'.zbx_jsvalue($page_view->toString()).');');
+	zbx_add_post_js('insertInElement("numrows",'.zbx_jsvalue($page_view->toString()).',"div");');
 
 return $table;
 }

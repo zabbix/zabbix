@@ -38,7 +38,6 @@ create/data/images/UPS_small.png -text svneol=unset#unset
 create/data/images/Workstation.png -text svneol=unset#unset
 create/data/images/Workstation_small.png -text svneol=unset#unset
 create/schema/gen_php.php -text
-docs/README -text
 frontends/php/api/.htaccess -text
 frontends/php/api/classes/class.apiexception.php -text
 frontends/php/api/classes/class.caction.php -text
@@ -154,16 +153,10 @@ frontends/php/images/general/snmp_available.png -text
 frontends/php/images/general/snmp_available_bb.png -text
 frontends/php/images/general/snmp_unavailable.png -text
 frontends/php/images/general/snmp_unknown.png -text
-frontends/php/images/general/sort_down.png -text
-frontends/php/images/general/sort_down_bb.png -text
-frontends/php/images/general/sort_downw.gif -text
-frontends/php/images/general/sort_up.png -text
-frontends/php/images/general/sort_up_bb.png -text
-frontends/php/images/general/sort_upw.gif -text
-frontends/php/images/general/sortdown.gif -text svneol=unset#unset
-frontends/php/images/general/sortdown_off.gif -text svneol=unset#unset
-frontends/php/images/general/sortup.gif -text svneol=unset#unset
-frontends/php/images/general/sortup_off.gif -text svneol=unset#unset
+frontends/php/images/general/sort_down.gif -text
+frontends/php/images/general/sort_down_od.gif -text
+frontends/php/images/general/sort_up.gif -text
+frontends/php/images/general/sort_up_od.gif -text
 frontends/php/images/general/tick.png -text
 frontends/php/images/general/tr_space.gif -text
 frontends/php/images/general/tr_top_bottom.gif -text
@@ -368,6 +361,7 @@ frontends/php/styles/default.css -text
 frontends/php/styles/div.css -text
 frontends/php/styles/form.css -text
 frontends/php/styles/ie.css -text
+frontends/php/styles/ie_css_od.css -text
 frontends/php/styles/link.css -text
 frontends/php/styles/p.css -text
 frontends/php/styles/popupmenu.css -text
@@ -411,7 +405,6 @@ misc/init.d/fedora/core5/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_server -text
 misc/init.d/tru64/zabbix_server -text
-/splint -text
 src/libs/zbxalgo/Makefile.am -text
 src/libs/zbxalgo/algodefs.c -text
 src/libs/zbxalgo/binaryheap.c -text

@@ -1,11 +1,15 @@
+/* CSS Document */
+/* Dark Orange Theme by Aly */
+/* IE6 Fixes */
+table.tableinfo tr.odd_row td { background-color: #1F1F1F; }
+table.tableinfo tr.odd_row:hover td { background-color: #6F3F00; }
+
+table.tableinfo tr.even_row td { background-color: #2F2F2F; }
+table.tableinfo tr.even_row:hover td{ background-color: #6F3F00; }
+
+
 table.tableinfo tr.selected td { background-color: #FFFFBB; }
 table.tableinfo tr.selected:hover td { background-color: #BBCCFF; }
-
-table.tableinfo tr.odd_row td { background-color: #DDDDDD; }
-table.tableinfo tr.odd_row:hover td { background-color: #BBCCFF; }
-
-table.tableinfo tr.even_row td { background-color: #EEEEEE; }
-table.tableinfo tr.even_row:hover td{ background-color: #BBCCFF; }
 
 table.tableinfo tr td.center { vertical-align: middle; text-align: center; }
 

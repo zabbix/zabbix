@@ -196,7 +196,7 @@ function __autoload($class_name){
 		define('ZBX_DISTRIBUTED', false);
 		$show_setup = true;
 	}
-
+	
 	if(!defined('ZBX_PAGE_NO_AUTHORIZATION')){
 		check_authorisation();
 
