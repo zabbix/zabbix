@@ -128,6 +128,7 @@
 <?php
 	if(isset($DB['DB']) && !is_null($DB['DB'])){
 		$css = getUserTheme($USER_DETAILS);
+		$config=select_config();
 		if($css){
 			print('<link rel="stylesheet" type="text/css" href="styles/'.$css.'" />'."\n");
 			print('<!--[if IE 6]><link rel="stylesheet" type="text/css" href="styles/ie_'.$css.'" /><![endif]-->'."\n");
