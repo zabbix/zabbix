@@ -471,15 +471,17 @@ include_once('include/page_header.php');
 	if(str_in_array($_REQUEST['action'], array('showvalues', 'showgraph'))){
 		$graphDims = getGraphDims();
 
-// NAV BAR
-		$timeline = array();
-		$timeline['period'] = $period;
-		$timeline['starttime'] = date('YmdHis', get_min_itemclock_by_itemid($item['itemid']));
-		$timeline['usertime'] = null;
 
-		if(isset($_REQUEST['stime'])){
-			$timeline['usertime'] = date('YmdHis', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
-		}
+// NAV BAR
+		$utime = zbxDateToTime($_REQUEST['stime']);
+		$starttime = get_min_itemclock_by_itemid($item['itemid']);
+		if($utime < $starttime) $starttime = $utime;
+
+		$timeline = array(
+			'starttime' => date('YmdHis', $starttime),
+			'period' => $period,
+			'usertime' => date('YmdHis', $utime + $period)
+		);
 
 		$objData = array();
 
