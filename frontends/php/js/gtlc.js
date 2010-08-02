@@ -1361,7 +1361,7 @@ updateTimeLine: function(dim){
 		}
 
 // To properly count TimeZone Diffs
-		if(period > 86400) new_usertime = this.roundTime(new_usertime);
+		if(period >= 86400) new_usertime = this.roundTime(new_usertime);
 
 		if(dim.width != this.position.bar.width){
 			this.timeline.period(new_period);

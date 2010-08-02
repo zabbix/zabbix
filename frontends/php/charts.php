@@ -186,14 +186,15 @@ include_once('include/page_header.php');
 		array_push($icons, $icon, $rst_icon, $fs_icon);
 
 // NAV BAR
-		$timeline = array(
-			'period' => $effectiveperiod,
-			'starttime' => date('YmdHis', get_min_itemclock_by_graphid($_REQUEST['graphid']))
-		);
+		$utime = zbxDateToTime($_REQUEST['stime']);
+		$starttime = get_min_itemclock_by_graphid($_REQUEST['graphid']);
+		if($utime < $starttime) $starttime = $utime;
 
-		if(isset($_REQUEST['stime'])){
-			$timeline['usertime'] = date('YmdHis', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
-		}
+		$timeline = array(
+			'starttime' => date('YmdHis', $starttime),
+			'period' => $effectiveperiod,
+			'usertime' => date('YmdHis', $utime + $effectiveperiod)
+		);
 
 		$dom_graph_id = 'graph';
 		$objData = array(
