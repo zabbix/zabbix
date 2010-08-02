@@ -267,7 +267,7 @@ function make_system_status($filter){
 		'groupids' => $groupids,
 		'monitored' => 1,
 		'maintenance' => $filter['maintenance'],
-		'expand_data' => 1,
+		'expandData' => 1,
 		'skipDependent' => 1,
 		'expandDescription' => 1,
 		'filter' => array(
@@ -488,7 +488,7 @@ function make_hoststat_summary($filter){
 		'nodeids' => get_current_nodeid(),
 		'monitored' => 1,
 		'maintenance' => $filter['maintenance'],
-		'expand_data' => 1,
+		'expandData' => 1,
 		'filter' => array(
 			'priority' => $filter['severity'],
 			'value' => TRIGGER_VALUE_TRUE
