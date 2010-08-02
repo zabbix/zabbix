@@ -130,35 +130,45 @@ class CEvent extends CZBXAPI{
 			}
 
 			if(($options['object'] == EVENT_OBJECT_TRIGGER) || ($options['source'] == EVENT_SOURCE_TRIGGER)){
+				if(!is_null($options['triggerids'])){
+					$triggerOptions = array(
+						'triggerids' => $options['triggerids'],
+						'editable' => $options['editable']
+					);
 
-				$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
+					$triggers = CTrigger::get($triggerOptions);
+					$options['triggerids'] = zbx_objectValues($triggers, 'triggerid');
+				}
+				else{
+					$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
 
-				$sql_parts['from']['functions'] = 'functions f';
-				$sql_parts['from']['items'] = 'items i';
-				$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
-				$sql_parts['from']['rights'] = 'rights r';
-				$sql_parts['from']['users_groups'] = 'users_groups ug';
-				$sql_parts['where']['e'] = 'e.object='.EVENT_OBJECT_TRIGGER;
-				$sql_parts['where']['fe'] = 'f.triggerid=e.objectid';
-				$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
-				$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
-				$sql_parts['where'][] = 'r.id=hg.groupid ';
-				$sql_parts['where'][] = 'r.groupid=ug.usrgrpid';
-				$sql_parts['where'][] = 'ug.userid='.$userid;
-				$sql_parts['where'][] = 'r.permission>='.$permission;
-				$sql_parts['where'][] = 'NOT EXISTS( '.
-												' SELECT ff.triggerid '.
-												' FROM functions ff, items ii '.
-												' WHERE ff.triggerid=e.objectid '.
-													' AND ff.itemid=ii.itemid '.
-													' AND EXISTS( '.
-														' SELECT hgg.groupid '.
-														' FROM hosts_groups hgg, rights rr, users_groups gg '.
-														' WHERE hgg.hostid=ii.hostid '.
-															' AND rr.id=hgg.groupid '.
-															' AND rr.groupid=gg.usrgrpid '.
-															' AND gg.userid='.$userid.
-															' AND rr.permission<'.$permission.'))';
+					$sql_parts['from']['functions'] = 'functions f';
+					$sql_parts['from']['items'] = 'items i';
+					$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
+					$sql_parts['from']['rights'] = 'rights r';
+					$sql_parts['from']['users_groups'] = 'users_groups ug';
+					$sql_parts['where']['e'] = 'e.object='.EVENT_OBJECT_TRIGGER;
+					$sql_parts['where']['fe'] = 'f.triggerid=e.objectid';
+					$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
+					$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
+					$sql_parts['where'][] = 'r.id=hg.groupid ';
+					$sql_parts['where'][] = 'r.groupid=ug.usrgrpid';
+					$sql_parts['where'][] = 'ug.userid='.$userid;
+					$sql_parts['where'][] = 'r.permission>='.$permission;
+					$sql_parts['where'][] = 'NOT EXISTS( '.
+													' SELECT ff.triggerid '.
+													' FROM functions ff, items ii '.
+													' WHERE ff.triggerid=e.objectid '.
+														' AND ff.itemid=ii.itemid '.
+														' AND EXISTS( '.
+															' SELECT hgg.groupid '.
+															' FROM hosts_groups hgg, rights rr, users_groups gg '.
+															' WHERE hgg.hostid=ii.hostid '.
+																' AND rr.id=hgg.groupid '.
+																' AND rr.groupid=gg.usrgrpid '.
+																' AND gg.userid='.$userid.
+																' AND rr.permission<'.$permission.'))';
+				}
 			}
 		}
 

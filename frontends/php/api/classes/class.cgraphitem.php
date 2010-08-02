@@ -63,7 +63,7 @@ class CGraphItem extends CZBXAPI{
 // output
 			'select_graphs'			=> null,
 			'output'				=> API_OUTPUT_REFER,
-			'expand_data'			=> null,
+			'expandData'			=> null,
 			'extendoutput'			=> null,
 			'count'					=> null,
 			'preservekeys'			=> null,
@@ -136,8 +136,8 @@ class CGraphItem extends CZBXAPI{
 		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['gitems'] = 'gi.*';
 		}
-// expand_data
-		if(!is_null($options['expand_data'])){
+// expandData
+		if(!is_null($options['expandData'])){
 			$sql_parts['select']['key'] = 'i.key_';
 			$sql_parts['select']['hostid'] = 'i.hostid';
 			$sql_parts['select']['host'] = 'h.host';

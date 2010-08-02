@@ -872,7 +872,7 @@ include_once('include/page_header.php');
 			'groupids' => $groupid,
 			'hostids' => $hostid,
 			'output' => API_OUTPUT_EXTEND,
-			'expand_data' => true,
+			'expandData' => true,
 		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 		if(!is_null($templated)) $options['templated'] = $templated;
