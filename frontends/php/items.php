@@ -1157,6 +1157,7 @@ switch($itemType) {
 				}
 
 				$menuicon = new CDiv(SPACE,'iconmenu');
+				$menuicon->addStyle('background-color: gray');
 				$menuicon->setAttribute('onclick','javascript: call_triggerlog_menu(event, '.
 														zbx_jsvalue($item['itemid']).','.
 														zbx_jsvalue($item['description_expanded']).','.
