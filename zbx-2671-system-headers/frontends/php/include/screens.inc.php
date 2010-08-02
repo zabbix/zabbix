@@ -225,6 +225,10 @@ require_once('include/js.inc.php');
 	}
 
 	function add_slideshow($name, $delay, $slides){
+		if(empty($slides)){
+			error(S_SLIDESHOW_MUST_CONTAIN_SLIDES);
+			return false;
+		}
 		foreach($slides as $slide){
 			if(!validate_slide($slide)) return false;
 		}
@@ -247,6 +251,10 @@ require_once('include/js.inc.php');
 	}
 
 	function update_slideshow($slideshowid, $name, $delay, $slides){
+		if(empty($slides)){
+			error(S_SLIDESHOW_MUST_CONTAIN_SLIDES);
+			return false;
+		}
 		foreach($slides as $slide){
 			if(!validate_slide($slide))
 				return false;
@@ -1078,7 +1086,7 @@ require_once('include/js.inc.php');
 						$item[] = new CLink(S_CHANGE, $action);
 					}
 
-					
+
 					if($editmode == 2){
 						insert_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 					}
@@ -1154,7 +1162,7 @@ require_once('include/js.inc.php');
 					else{
 						zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 					}
-					
+
 				}
 				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_MAP) ){
 
