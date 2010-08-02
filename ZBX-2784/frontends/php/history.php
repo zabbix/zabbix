@@ -198,6 +198,7 @@ include_once('include/page_header.php');
 				$icon->addAction('onclick', "javascript: rm4favorites('itemid','".$_REQUEST['itemid']."',0);");
 			}
 			else{
+				new ficon(array('itemid' => $_REQUEST['itemid']), 1);
 				$icon = new CDiv(SPACE,'iconplus');
 				$icon->setAttribute('title',S_ADD_TO.' '.S_FAVOURITES);
 				$icon->addAction('onclick', "javascript: add2favorites('itemid','".$_REQUEST['itemid']."');");
@@ -560,10 +561,10 @@ function addPopupValues(list){
 	if(isset(list.object, favorites)){
 		for(var i=0; i < list.values.length; i++){
 			if(!isset(i, list.values) || empty(list.values[i])) continue;
-			
+
 			create_var('zbx_filter', 'itemid['+list.values[i]+']', list.values[i], false);
 		}
-		
+
 		$('zbx_filter').submit();
 	}
 }

@@ -36,7 +36,7 @@
 
 
 
-.unknown	{	
+.unknown	{
 	color: #999999;
 }
 .normal		{
@@ -517,7 +517,6 @@ div.zabbix_logo{
 }
 
 div.iconok{
-	background-image: url('../images/general/ok_icon_bb.png');
 }
 
 div.iconzbxavailable{
@@ -542,6 +541,17 @@ div.icon_sortup{
 
 div.icon_sortdown{
 	background-image: url('../images/general/sort_down_od.gif');
+}
+
+div.iconmenu{
+	background-color: transparent;
+}
+
+div.iconmenu:hover{
+	-webkit-box-shadow: 0 0 6px #FF5500;
+	-moz-box-shadow: 0 0 6px #FF5500;
+	box-shadow: 0 0 6px #FF5500;
+	background-color: #FF5500;
 }
 
 div.messagecontainer{
@@ -630,8 +640,8 @@ div.suggest{
 	background: #FF5500;
 	text-decoration: none;
 	-webkit-box-shadow: 0 0 6px #FF5500;
-	-moz-box-shadow: 0 0 5px #FF5500;
-	box-shadow: 0 0 5px #FF5500;
+	-moz-box-shadow: 0 0 6px #FF5500;
+	box-shadow: 0 0 6px #FF5500;
 }
 
 .biginput[readonly], .biginput[readonly]:hover{

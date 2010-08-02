@@ -112,9 +112,8 @@
 
 // PAGE HEADER {{{
 	$url = '?fullscreen='.($_REQUEST['fullscreen']? '0':'1');
-	$fs_icon = new CDiv(SPACE,'fullscreen');
-	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-	$fs_icon->addAction('onclick', "javascript: document.location = '".$url."';");
+	$fs_icon = new CIcon($_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN, 'fullscreen',
+			"document.location = '".$url."';");
 	$events_wdgt->addPageHeader(array(S_HISTORY_OF_EVENTS_BIG.SPACE.S_ON_BIG.SPACE, zbx_date2str(S_EVENTS_DATE_FORMAT,time())), $fs_icon);
 // }}}PAGE HEADER
 

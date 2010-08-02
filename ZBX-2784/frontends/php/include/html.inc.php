@@ -241,4 +241,19 @@
 		$table = get_table_header($col1, $col2);
 		$table->Show();
 	}
+	
+	function get_icon($name, $params=array()){
+
+		switch($name){
+			case 'favourite':
+			
+				break;
+			case 'fullscreen': 
+			
+				break;
+			
+		}
+		
+		return $icon;
+	}
 ?>
