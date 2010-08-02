@@ -41,19 +41,18 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   syslog.h time.h errno.h sys/types.h sys/stat.h netinet/in.h \
   math.h sys/socket.h dirent.h ctype.h \
-  mtent.h fcntl.h sys/param.h sys/mount.h arpa/inet.h \
+  mtent.h fcntl.h sys/param.h arpa/inet.h \
   sys/vfs.h sys/pstat.h sys/sysinfo.h sys/statvfs.h \
   sys/socket.h sys/loadavg.h arpa/inet.h \
-  sys/swap.h sys/vmmeter.h strings.h sys/sysctl.h vm/vm_param.h \
+  sys/vmmeter.h strings.h vm/vm_param.h \
   sys/time.h kstat.h sys/syscall.h sys/sysmacros.h sys/procfs.h \
-  stdint.h mach/host_info.h mach/mach_host.h knlist.h pwd.h sys/proc.h \
+  stdint.h mach/host_info.h mach/mach_host.h knlist.h pwd.h \
   sys/var.h arpa/nameser.h assert.h sys/dkstat.h sys/disk.h \
   nlist.h kvm.h linux/kernel.h getopt.h procinfo.h sys/dk.h \
   sys/resource.h pthread.h windows.h process.h conio.h sys/wait.h regex.h \
   stdarg.h winsock2.h pdh.h psapi.h sys/sem.h sys/ipc.h sys/shm.h Winldap.h \
   sys/timeb.h Winber.h lber.h ws2tcpip.h inttypes.h sys/file.h grp.h \
-  net/if_mib.h sys/user.h execinfo.h sys/ucontext.h libperfstat.h devstat.h \
-  sys/systemcfg.h)
+  execinfo.h libperfstat.h sys/systemcfg.h)
 AC_CHECK_HEADERS(resolv.h, [], [], [
   #ifdef HAVE_SYS_TYPES_H
   #  include <sys/types.h>
@@ -68,20 +67,50 @@ AC_CHECK_HEADERS(resolv.h, [], [], [
   #  include <netdb.h>
   #endif
 ])
-AC_CHECK_HEADERS(net/if.h, [], [], [
+AC_CHECK_HEADERS(net/if.h net/if_mib.h, [], [], [
   #include <stdio.h>
-  #if STDC_HEADERS
+  #ifdef STDC_HEADERS
   #  include <stdlib.h>
   #  include <stddef.h>
   #else
-  #  if HAVE_STDLIB_H
+  #  ifdef HAVE_STDLIB_H
   #    include <stdlib.h>
   #  endif
   #endif
-  #if HAVE_SYS_SOCKET_H
+  #ifdef HAVE_SYS_TYPES_H
+  #  include <sys/types.h>
+  #endif
+  #ifdef HAVE_SYS_SOCKET_H
   #  include <sys/socket.h>
   #endif
+  /* for net/if_mib.h */
+  #ifdef HAVE_NET_IF_H
+  #  include <net/if.h>
+  #endif
 ]) 
+AC_CHECK_HEADERS(sys/mount.h sys/proc.h sys/sysctl.h sys/user.h, [], [], [
+  #ifdef HAVE_SYS_TYPES_H
+  #  include <sys/types.h>
+  #endif
+  #ifdef HAVE_SYS_PARAM_H
+  #  include <sys/param.h>
+  #endif
+])
+AC_CHECK_HEADERS(sys/swap.h, [], [], [
+  #ifdef HAVE_SYS_PARAM_H
+  #  include <sys/param.h>
+  #endif
+]) 
+AC_CHECK_HEADERS(sys/ucontext.h, [], [], [
+  #ifdef HAVE_SIGNAL_H
+  #  include <signal.h>
+  #endif
+])
+AC_CHECK_HEADERS(devstat.h, [], [], [
+  #ifdef HAVE_SYS_DKSTAT_H
+  #  include <sys/dkstat.h>
+  #endif
+])
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
