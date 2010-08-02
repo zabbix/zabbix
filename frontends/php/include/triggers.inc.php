@@ -2084,6 +2084,7 @@ return $caption;
 	function check_right_on_trigger_by_expression($permission,$expression){
 		global $USER_DETAILS;
 
+		$hostids = array();
 		$db_hosts = get_hosts_by_expression($expression);
 		while($host_data = DBfetch($db_hosts)){
 			$hostids[] = $host_data['hostid'];
