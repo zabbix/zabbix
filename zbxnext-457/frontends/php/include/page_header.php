@@ -118,36 +118,20 @@
   <head>
     <title><?php echo $page_title; ?></title>
 	<meta name="Author" content="ZABBIX SIA" />
+	<link rel="shortcut icon" href="images/general/zabbix.ico" />
 	<link rel="stylesheet" type="text/css" href="css.css" />
 <!--[if IE 6]>
-	<link rel="stylesheet" type="text/css" href="styles/ie.css" />
 	<script type="text/javascript" src="js/ie6fix.js"></script>
+	<link rel="stylesheet" type="text/css" href="styles/ie.css" />
 <![endif]-->
 
 <?php
 	if(isset($DB['DB']) && !is_null($DB['DB'])){
-		$css = false;
+		$css = getUserTheme($USER_DETAILS);
 		$config=select_config();
-		if(isset($config['default_theme']) && file_exists('styles/'.$config['default_theme'])){
-			$css = $config['default_theme'];
-		}
-
-		if(isset($USER_DETAILS['theme']) && ($USER_DETAILS['theme']!=ZBX_DEFAULT_CSS) && ($USER_DETAILS['alias']!=ZBX_GUEST_USER)){
-			if(file_exists('styles/'.$USER_DETAILS['theme'])){
-				$css = $USER_DETAILS['theme'];
-			}
-		}
-
 		if($css){
-			echo '<link rel="stylesheet" type="text/css" href="styles/'.$css.'" />'."\n";
-			$ico = preg_replace('/^[^_\.a-z]+$/','',$css);
-			if(file_exists('images/general/zabbix'.$ico.'.ico'))
-				echo '<link rel="shortcut icon" href="images/general/zabbix'.$ico.'.ico" />';
-			else
-				echo '<link rel="shortcut icon" href="images/general/zabbix.ico" />';
-		}
-		else{
-			echo '<link rel="shortcut icon" href="images/general/zabbix.ico" />';
+			print('<link rel="stylesheet" type="text/css" href="styles/'.$css.'" />'."\n");
+			print('<!--[if IE 6]><link rel="stylesheet" type="text/css" href="styles/ie_'.$css.'" /><![endif]-->'."\n");
 		}
 	}
 
@@ -411,7 +395,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 			$search_div->setAttribute('id','zbx_search');
 			$search_div->setAttribute('class','zbx_search');
 			
-			zbx_add_post_js("var sid = createSuggest('search'); $('search').focus(); $('search').select();");
+			zbx_add_post_js("var sid = createSuggest('search');");
 			zbx_add_post_js("var msglistid = initMessages({});");
 		}
 

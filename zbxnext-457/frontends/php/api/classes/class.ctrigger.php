@@ -546,7 +546,6 @@ class CTrigger extends CZBXAPI{
 					$sql_where.
 				$sql_group.
 				$sql_order;
-//SDI($sql);
 		$db_res = DBselect($sql, $sql_limit);
 		while($trigger = DBfetch($db_res)){
 			if(!is_null($options['countOutput'])){

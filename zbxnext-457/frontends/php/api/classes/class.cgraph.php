@@ -1051,7 +1051,7 @@ COpt::memoryPick();
 			foreach($graphids as $graphid){
 				if(!isset($del_graphs[$graphid]))
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				if($del_graphs['templateid'] != 0){
+				if($del_graphs[$graphid]['templateid'] != 0){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, 'Cannot delete templated graphs');
 				}
 			}

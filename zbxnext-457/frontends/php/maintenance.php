@@ -365,11 +365,10 @@ include_once('include/page_header.php');
 		else{
 			$mname				= get_request('mname', '');
 			$maintenance_type	= get_request('maintenance_type', 0);
-			$active_since		= zbxDateToTime(get_request('active_since', date('YmdHi')));
-			$active_till		= zbxDateToTime(get_request('active_till', date('YmdHi', time()+86400)));
+			$active_since		= zbxDateToTime(get_request('active_since', date('YmdHis')));
+			$active_till		= zbxDateToTime(get_request('active_till', date('YmdHis', time()+86400)));
 			$description		= get_request('description', '');
 		}
-
 		$tblMntc = new CTable(null, 'formElementTable');
 
 		$tblMntc->addRow(array(S_NAME, new CTextBox('mname', $mname, 50)));
@@ -379,8 +378,8 @@ include_once('include/page_header.php');
 		$cmbType->addItem(MAINTENANCE_TYPE_NODATA, S_NO_DATA_COLLECTION);
 		$tblMntc->addRow(array(S_MAINTENANCE_TYPE, $cmbType));
 
-		$tblMntc->addItem(new Cvar('active_since', date('YmdHi', $active_since)));
-		$tblMntc->addItem(new Cvar('active_till', date('YmdHi', $active_till)));
+		$tblMntc->addItem(new Cvar('active_since', date('YmdHis', $active_since)));
+		$tblMntc->addItem(new Cvar('active_till', date('YmdHis', $active_till)));
 
 		$clndr_icon = new CImg('images/general/bar/cal.gif','calendar', 16, 12, 'pointer');
 
@@ -647,20 +646,36 @@ include_once('include/page_header.php');
 		$table->setHeader(array(
 			new CCheckBox('all_maintenances',NULL,"checkAll('".$form->GetName()."','all_maintenances','maintenanceids');"),
 			make_sorting_header(S_NAME,'name'),
-			make_sorting_header(S_TYPE,'type'),
+			make_sorting_header(S_TYPE,'maintenance_type'),
 			make_sorting_header(S_STATUS,'status'),
 			S_DESCRIPTION
 		));
 
+		foreach($maintenances as $mnum => $maintenance){
+			if($maintenance['active_till'] < time())
+				$maintenances[$mnum]['status'] = MAINTENANCE_STATUS_EXPIRED;
+			else if($maintenance['active_since'] > time())
+				$maintenances[$mnum]['status'] = MAINTENANCE_STATUS_APPROACH;
+			else
+				$maintenances[$mnum]['status'] = MAINTENANCE_STATUS_ACTIVE;
+		}
 		order_result($maintenances, $sortfield, $sortorder);
 		$paging = getPagingLine($maintenances);
 
 		foreach($maintenances as $mnum => $maintenance){
 			$maintenanceid = $maintenance['maintenanceid'];
 
-			if($maintenance['active_till'] < time()) $mnt_status = new CSpan(S_EXPIRED,'red');
-			else if($maintenance['active_since'] > time()) $mnt_status = new CSpan(S_APPROACH,'blue');
-			else $mnt_status = new CSpan(S_ACTIVE,'green');
+			switch($maintenance['status']){
+				case MAINTENANCE_STATUS_EXPIRED:
+					$mnt_status = new CSpan(S_EXPIRED,'red');
+					break;
+				case MAINTENANCE_STATUS_APPROACH:
+					$mnt_status = new CSpan(S_APPROACH,'blue');
+					break;
+				case MAINTENANCE_STATUS_ACTIVE:
+					$mnt_status = new CSpan(S_ACTIVE,'green');
+					break;
+			}
 
 			$table->addRow(array(
 				new CCheckBox('maintenanceids['.$maintenanceid.']',NULL,NULL,$maintenanceid),

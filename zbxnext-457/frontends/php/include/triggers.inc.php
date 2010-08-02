@@ -322,18 +322,6 @@ return $caption;
 		return S_UNKNOWN;
 	}
 
-/*
- * Function: get_trigger_value_style
- *
- * Description:
- *	 convert trigger value in to the CSS style name
- *
- * Author:
- *	 Eugene Grigorjev (eugene.grigorjev@zabbix.com)
- *
- * Comments:
- *
- */
 	function get_trigger_value_style($value){
 		$str_val[TRIGGER_VALUE_FALSE]	= 'off';
 		$str_val[TRIGGER_VALUE_TRUE]	= 'on';
@@ -345,18 +333,6 @@ return $caption;
 		return '';
 	}
 
-/*
- * Function: trigger_value2str
- *
- * Description:
- *	 convert trigger value in to the string representation
- *
- * Author:
- *	 Eugene Grigorjev (eugene.grigorjev@zabbix.com)
- *
- * Comments:
- *
- */
 	function trigger_value2str($value){
 		$str_val[TRIGGER_VALUE_FALSE]	= S_OK_BIG;
 		$str_val[TRIGGER_VALUE_TRUE]	= S_PROBLEM_BIG;
@@ -366,6 +342,34 @@ return $caption;
 			return $str_val[$value];
 
 		return S_UNKNOWN;
+	}
+	
+	function discovery_value($val = null){
+		$array = array(
+			DOBJECT_STATUS_UP => S_UP_BIG,
+			DOBJECT_STATUS_DOWN => S_DOWN_BIG,
+			DOBJECT_STATUS_DISCOVER => S_DISCOVERED_BIG,
+			DOBJECT_STATUS_LOST => S_LOST_BIG,
+		);
+		
+		if(is_null($val))
+			return $array;
+		else if(isset($array[$val]))
+			return $array[$val];
+		else
+			return S_UNKNOWN;
+	}
+	
+	function discovery_value_style($val){
+		switch($val){
+			case DOBJECT_STATUS_UP: $style = 'off'; break;
+			case DOBJECT_STATUS_DOWN: $style = 'on'; break;
+			case DOBJECT_STATUS_DISCOVER: $style = 'off'; break;
+			case DOBJECT_STATUS_LOST: $style = 'unknown'; break;
+			default: $style = '';
+		}
+		
+		return $style;
 	}
 
 /*
@@ -2083,14 +2087,24 @@ return $caption;
 
 	function check_right_on_trigger_by_expression($permission,$expression){
 		global $USER_DETAILS;
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, $permission, null, get_current_nodeid(true));
 
+		$hostids = array();
 		$db_hosts = get_hosts_by_expression($expression);
 		while($host_data = DBfetch($db_hosts)){
-			if(!isset($available_hosts[$host_data['hostid']])) return false;
+			$hostids[] = $host_data['hostid'];
+		}
+		$hosts = CHost::get(array(
+			'hostids' => $hostids,
+			'editable' => (($permission == PERM_READ_WRITE) ? 1 : null),
+			'output' => API_OUTPUT_SHORTEN,
+			'templated_hosts' => 1,
+		));
+		$hosts = zbx_toHash($hosts, 'hostid');
+		foreach($hostids as $hostid){
+			if(!isset($hosts[$hostid])) return false;
 		}
 
-	return true;
+		return true;
 	}
 
 
@@ -2568,6 +2582,8 @@ return $caption;
  *
  */
 	function get_triggers_overview($hostids,$view_style=null){
+		global $USER_DETAILS;
+
 		if(is_null($view_style)) $view_style = CProfile::get('web.overview.view.style',STYLE_TOP);
 
 		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
@@ -2620,17 +2636,22 @@ return $caption;
 		}
 		ksort($hosts);
 
-		if($view_style == STYLE_TOP){
-			$header=array(new CCol(S_TRIGGERS,'center'));
+
+		$css = getUserTheme($USER_DETAILS);
+		$vTextColor = ($css == 'css_od.css')?'&color=white':'';
+
+		if($view_style == STYLE_TOP){	
+			$header = array(new CCol(S_TRIGGERS,'center'));
+
 			foreach($hosts as $hostname){
-				$header = array_merge($header,array(new CCol(array(new CImg('vtext.php?text='.$hostname)), 'hosts')));
+				$header = array_merge($header,array(new CCol(array(new CImg('vtext.php?text='.$hostname.$vTextColor)), 'hosts')));
 			}
 			$table->setHeader($header,'vertical_header');
 
 			foreach($triggers as $descr => $trhosts){
 				$table_row = array(nbsp($descr));
 				foreach($hosts as $hostname){
-					$table_row=get_trigger_overview_cells($table_row,$trhosts,$hostname);
+					$table_row = get_trigger_overview_cells($table_row,$trhosts,$hostname);
 				}
 				$table->addRow($table_row);
 			}
@@ -2638,10 +2659,10 @@ return $caption;
 		else{
 			$header=array(new CCol(S_HOSTS,'center'));
 			foreach($triggers as $descr => $trhosts){
-				$descr = array(new CImg('vtext.php?text='.$descr));
+				$descr = array(new CImg('vtext.php?text='.$descr.$vTextColor));
 				array_push($header,$descr);
 			}
-			$table->SetHeader($header,'vertical_header');
+			$table->setHeader($header,'vertical_header');
 
 			foreach($hosts as $hostname){
 				$table_row = array(nbsp($hostname));
