@@ -19,12 +19,12 @@
 **/
 ?>
 <?php
-	define('ZABBIX_VERSION','1.8.3');
+	define('ZABBIX_VERSION','1.8.3rc2');
 	define('ZABBIX_API_VERSION','1.2');
 /* USER DEFINES */
 
 	define('ZBX_LOGIN_ATTEMPTS',			5);
-	define('ZBX_LOGIN_BLOCK',			30); // sec
+	define('ZBX_LOGIN_BLOCK',				30); // sec
 
 	define('TRIGGER_FALSE_PERIOD',			1800);	// 30min, 0 - disable
 	define('TRIGGER_BLINK_PERIOD',			1800);	// 30min,  0 - disable
@@ -213,6 +213,10 @@
 
 	define('HOST_MAINTENANCE_STATUS_OFF',	0);
 	define('HOST_MAINTENANCE_STATUS_ON',	1);
+
+	define('MAINTENANCE_STATUS_ACTIVE',	0);
+	define('MAINTENANCE_STATUS_APPROACH',	1);
+	define('MAINTENANCE_STATUS_EXPIRED',	2);
 
 	define('HOST_AVAILABLE_UNKNOWN',	0);
 	define('HOST_AVAILABLE_TRUE',		1);

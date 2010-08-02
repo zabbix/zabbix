@@ -438,7 +438,7 @@ include_once('include/page_header.php');
 				' LEFT JOIN hosts h on h.hostid=a.hostid '.
 			' WHERE '.DBcondition('a.applicationid',$db_appids).
 				($showdisabled==0?' AND wt.status <> 1':'').
-			order_by('wt.name','h.host');
+			order_by('wt.name,wt.status','h.host');
 //SDI($sql);
 		$db_httptests_res = DBselect($sql);
 		while($httptest_data = DBfetch($db_httptests_res)){
@@ -563,7 +563,7 @@ include_once('include/page_header.php');
 
 		$http_wdgt->addItem($form);
 	}
-	
+
 	$http_wdgt->show();
 
 

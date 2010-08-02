@@ -21,7 +21,6 @@
 #include "sysinfo.h"
 #include "log.h"
 #include "dbcache.h"
-#include "zbxserver.h"
 
 #include "zlog.h"
 
@@ -40,7 +39,7 @@
  * Comments: do nothing if no zabbix[log] items                               *
  *                                                                            *
  ******************************************************************************/
-void __zbx_zabbix_syslog(const char *fmt, ...)
+void	__zbx_zabbix_syslog(const char *fmt, ...)
 {
 	const char	*__function_name = "zabbix_log";
 	va_list		ap;

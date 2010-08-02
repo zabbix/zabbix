@@ -75,6 +75,7 @@ initialize: function($super, id, objid){
 	addListener(this.dom.input, 'keyup', this.keyPressed.bindAsEventListener(this));
 	addListener(this.dom.input, 'blur', this.suggestBlur.bindAsEventListener(this));
 	addListener(window, 'resize', this.positionSuggests.bindAsEventListener(this));
+//	addListener(window, 'keypress', this.searchFocus.bindAsEventListener(this));
 
 	this.timeoutNeedle = null;
 },
@@ -123,7 +124,7 @@ searchServer: function(needle){
 			'limit': this.suggestLimit
 		},
 		'onSuccess': this.serverRespond.bind(this, needle),
-		'onFailure': function(resp){ throw('Suggest Widget: search request failed.'); }
+		'onFailure': function(resp){zbx_throw('Suggest Widget: search request failed.');}
 	}
 
 	new RPC.Call(rpcRequest);
@@ -263,6 +264,21 @@ onSelect: function(selection){
 // -----------------------------------------------------------------------
 // Keyboard
 // -----------------------------------------------------------------------
+searchFocus: function(e){
+	this.debug('keyPressed');
+//---
+	if(!e) var e = window.event;
+
+	var elem = e.element();
+	if(elem.match('input[type=text]') || elem.match('textarea') || elem.match('select')) return true;
+
+	var key = e.keyCode;
+	if(key == 47){
+		e.stop();
+		$(this.dom.input).focus();
+		return void(0);
+	}
+},
 
 keyPressed: function(e){
 	this.debug('keyPressed');
@@ -431,9 +447,7 @@ hideSuggests: function(e){
 	if(!is_null(this.dom.suggest)){
 		this.dom.suggest.style.display = 'none';
 
-// IE6 Fix
-		showPopupDiv(this.dom.suggest, 'suggestFrame');
-//		hidePopupDiv('suggestFrame');
+		if(IE6) showPopupDiv(this.dom.suggest, 'suggestFrame');
 	}
 },
 
@@ -449,8 +463,7 @@ positionSuggests: function(e){
 	this.dom.suggest.style.top = (pos.top+dims.height)+'px';
 	this.dom.suggest.style.left = pos.left+'px';
 
-// IE6 Fix
-	showPopupDiv(this.dom.suggest, 'suggestFrame');
+	if(IE6) showPopupDiv(this.dom.suggest, 'suggestFrame');
 },
 
 newSugTab: function(needle){
@@ -500,7 +513,7 @@ newSugTab: function(needle){
 	if(count == 0) this.hideSuggests();
 
 // IE6 Fix
-	if(count > 0) showPopupDiv(this.dom.suggest, 'suggestFrame');
+	if(count > 0 && IE6) showPopupDiv(this.dom.suggest, 'suggestFrame');
 
 	this.suggestCount = count;
 }

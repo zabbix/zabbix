@@ -463,9 +463,6 @@ updateSelementOption: function(selementid, params){ // params = {'key': value, '
 	for(var key in params){
 		if(is_null(params[key])) continue;
 
-		if((key == 'x') && (parseInt(params[key], 10) > parseInt(this.sysmap.width, 10))) continue;
-		if((key == 'y') && (parseInt(params[key], 10) > parseInt(this.sysmap.height, 10))) continue;
-//SDI(key + ' ' + params[key]);
 		if(is_number(params[key])) params[key] = params[key].toString();
 		this.selements[selementid][key] = params[key];
 	}
@@ -1516,7 +1513,7 @@ this.selementForm.elementid = e_input_2;
 	var e_td_5 = document.createElement('td');
 this.selementForm.dragHandler = e_td_5;
 	e_td_5.setAttribute('colSpan',"2");
-	e_td_5.className = "form_row_first pointer";
+	e_td_5.className = "form_row_first move";
 	e_tr_4.appendChild(e_td_5);
 
 
@@ -2571,11 +2568,19 @@ saveForm_selement: function(e){
 		}
 
 // X & Y
-		if(parseInt(this.selementForm.x.value, 10) > this.sysmap.width) this.selementForm.x.value = 0;
-		if(parseInt(this.selementForm.y.value, 10) > this.sysmap.height) this.selementForm.y.value = 0;
+		var dims = getDimensions(this.selements[selementid].html_obj);
 
-		params.x = this.selementForm.x.value;
-		params.y = this.selementForm.y.value;
+		params.x = parseInt(this.selementForm.x.value, 10);
+		params.y = parseInt(this.selementForm.y.value, 10);
+
+		if((params.x+dims.width) > this.sysmap.width) params.x = this.sysmap.width - dims.width;
+		else if(params.x < 0) params.x = 0;
+
+		if((params.y+dims.height) > this.sysmap.height) params.y = this.sysmap.height - dims.height;
+		else if(params.y < 0) params.y = 0;
+
+		this.selementForm.x.value = params.x;
+		this.selementForm.y.value = params.y;
 
 // URL
 		params.url = this.selementForm.url.value;

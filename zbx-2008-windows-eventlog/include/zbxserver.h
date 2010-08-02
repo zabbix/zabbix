@@ -21,10 +21,8 @@
 #define ZABBIX_ZBXSERVER_H
 
 #include "common.h"
-#include "comms.h"
 #include "db.h"
 #include "dbcache.h"
-#include "sysinfo.h"
 
 #define MACRO_TYPE_TRIGGER_DESCRIPTION	0x0001
 #define MACRO_TYPE_MESSAGE_SUBJECT	0x0002
@@ -43,9 +41,6 @@
 #define MACRO_TYPE_ITEM_EXPRESSION	0x2000
 
 int	evaluate_function(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now);
-void    update_triggers(zbx_uint64_t itemid);
-void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, AGENT_RESULT *value, int now,
-		int timestamp, char *source, int severity, int logeventid, int lastlogsize, int mtime);
 
 int	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, DC_HOST *host,
 		DC_ITEM *dc_item, DB_ESCALATION *escalation, char **data, int macro_type,

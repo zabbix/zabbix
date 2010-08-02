@@ -161,7 +161,7 @@ class CTree{
 						$img= new CImg('images/general/tree/plus.gif','y','22','14');
 						$img->setAttribute('onclick','javascript: '.
 												$this->treename.'.closeSNodeX("'.$id.'",this);'.
-												" showPopupDiv('div_node_tree','select_iframe');"); // IE6 Fix
+												" if(IE6) showPopupDiv('div_node_tree','select_iframe');"); // IE6 Fix
 
 						$img->setAttribute('id','idi_'.$id);
 						$img->setClass('pointer');
@@ -180,7 +180,7 @@ class CTree{
 
 						$img->setAttribute('onclick','javascript: '.
 												$this->treename.'.closeSNodeX("'.$id.'",this);'.
-												" showPopupDiv('div_node_tree','select_iframe');");	// IE6 Fix
+												" if(IE6) showPopupDiv('div_node_tree','select_iframe');");	// IE6 Fix
 
 						$img->setAttribute('id','idi_'.$id);
 						$img->setClass('pointer');

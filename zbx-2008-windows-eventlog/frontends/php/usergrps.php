@@ -122,7 +122,11 @@ include_once('include/page_header.php');
 	else if(isset($_REQUEST['new_right'])){
 		$_REQUEST['group_rights'] = get_request('group_rights', array());
 		foreach($_REQUEST['new_right'] as $id => $right) {
-			$_REQUEST['group_rights'][$right['name']] = array('id' => $id, 'permission' => $right['permission']);
+			$_REQUEST['group_rights'][$id] = array(
+				'name' => $right['name'],
+				'permission' => $right['permission'],
+				'id' => $id,
+			);
 		}
 	}
 	else if(isset($_REQUEST['save'])){

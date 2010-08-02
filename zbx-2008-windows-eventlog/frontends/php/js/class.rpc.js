@@ -43,8 +43,7 @@ rpcurl: function(rpcurl_){
 }
 }
 
-RPC.Base = Class.create();
-RPC.Base.prototype = {
+RPC.Base = Class.create({
 // PRIVATE
 'userParams':		{},		// user OPtions
 'auth':				null,	// authentication hash
@@ -86,7 +85,7 @@ debug: function(fnc_name, id){
 		this.debug_prev = str;
 	}
 }
-}
+});
 
 RPC.Call = Class.create(RPC.Base, {
 initialize: function($super, userParams) {
@@ -134,8 +133,9 @@ processRespond: function(resp){
 //SDJ(resp);
 	var isError = this.processError(resp);
 	if(isError) return false;
-
-	this.userParams.onSuccess(resp.responseJSON.result);
+//SDJ(resp.responseJSON.result);
+	if(isset('onSuccess', this.userParams))
+		this.userParams.onSuccess(resp.responseJSON.result);
 
 return true;
 },
@@ -157,7 +157,7 @@ processError: function(resp){
 	}
 
 // RPC responded with error || with incorrect JSON
-	if(isset('error', resp.responseJSON)){
+	if(isset('error', resp.responseJSON) && isset('onFailure', this.userParams)){
 		this.userParams.onFailure(resp.responseJSON.error);
 		return true;
 	}

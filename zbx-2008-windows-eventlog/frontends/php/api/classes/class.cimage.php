@@ -352,7 +352,7 @@ class CImage extends CZBXAPI{
 					if($DB['TYPE'] == 'SQLITE3')
 						$values['image'] = zbx_dbstr(bin2hex($image['image']));
 					else if($DB['TYPE'] == 'POSTGRESQL')
-						$values['image'] = pg_escape_bytea($image['image']);
+						$values['image'] = "'".pg_escape_bytea($image['image'])."'";
 					else if($DB['TYPE'] == 'MYSQL')
 						$values['image'] = zbx_dbstr($image['image']);
 
@@ -418,7 +418,7 @@ class CImage extends CZBXAPI{
 
 				if(isset($image['image'])){
 					if($DB['TYPE'] == 'POSTGRESQL'){
-						$values['image'] = pg_escape_bytea($image['image']);
+						$values['image'] = "'".pg_escape_bytea($image['image'])."'";
 					}
 					else if($DB['TYPE'] == 'SQLITE3'){
 						$values['image'] = zbx_dbstr(bin2hex($image['image']));

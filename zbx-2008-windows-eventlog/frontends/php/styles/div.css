@@ -107,15 +107,17 @@ div.formElement_header{
 div.formElement_body{
 	border: 1px solid #AAAAAA;
 	background-color: #E5E5E5;
-	}
-	.formElementTable{
-		white-space: nowrap;
-		}
-		.formElementTable tr td{
-			padding-left: 5px;
-			padding-right: 5px;
-			height: 24px;
-			}
+}
+
+.formElementTable{
+	white-space: nowrap;
+}
+
+.formElementTable tr td{
+	padding-left: 5px;
+	padding-right: 5px;
+	height: 24px;
+}
 
 div.formElement_footer{
 	color: #FFFFFF;
@@ -319,6 +321,39 @@ div.iconreset{
 div.iconreset:hover{
 }
 
+div.iconsnooze{
+	height: 18px;
+	width: 18px;
+	background-image: url('../images/general/bttn/snooze.png');
+	background-repeat:no-repeat;
+	cursor:pointer;
+}
+
+div.iconsnooze:hover{
+}
+
+div.iconclose{
+	height: 18px;
+	width: 18px;
+	background-image: url('../images/general/bttn/close.png');
+	background-repeat:no-repeat;
+	cursor:pointer;
+}
+
+div.iconclose:hover{
+}
+
+div.iconmove{
+	height: 18px;
+	width: 18px;
+	background-image: url('../images/general/bttn/move.png');
+	background-repeat:no-repeat;
+	cursor: move;
+}
+
+div.iconclose:hover{
+}
+
 div.iconerror{
 	height: 14px;
 	width: 14px;
@@ -466,17 +501,17 @@ div.sla_red{
 }
 
 div.icon_sortup{
-	height: 10px;
-	width: 10px;
-	background-image: url('../images/general/sort_up.png');
+	height: 16px;
+	width: 19px;
+	background-image: url('../images/general/sort_up.gif');
 	background-repeat:no-repeat;
 	cursor: pointer;
 }
 
 div.icon_sortdown{
-	height: 10px;
-	width: 10px;
-	background-image: url('../images/general/sort_down.png');
+	height: 16px;
+	width: 19px;
+	background-image: url('../images/general/sort_down.gif');
 	background-repeat:no-repeat;
 	cursor: pointer;
 }
