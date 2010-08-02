@@ -7,6 +7,7 @@ Changes for 1.9
 
 Changes for 1.8.3rc3
 
+ - [ZBX-2536] fixed agent crash when processing proc.mem[] and proc.num[] on NetBSD (asaveljevs)
  - [ZBX-2671] fixed detection of various system headers during ./configure (asaveljevs)
  - [ZBX-2800] fixed undefined variable if update trigger with incorrect function (Vedmak)
  - [ZBX-2789] forbid active agent items to have 0 interval (Vedmak)
