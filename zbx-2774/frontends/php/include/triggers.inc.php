@@ -311,29 +311,23 @@ return $caption;
  * Comments:
  *
  */
-	function get_severity_description($severity){
-		if($severity == TRIGGER_SEVERITY_NOT_CLASSIFIED)	return S_NOT_CLASSIFIED;
-		else if($severity == TRIGGER_SEVERITY_INFORMATION)	return S_INFORMATION;
-		else if($severity == TRIGGER_SEVERITY_WARNING)		return S_WARNING;
-		else if($severity == TRIGGER_SEVERITY_AVERAGE)		return S_AVERAGE;
-		else if($severity == TRIGGER_SEVERITY_HIGH)		return S_HIGH;
-		else if($severity == TRIGGER_SEVERITY_DISASTER)		return S_DISASTER;
+	function get_severity_description($severity=null){
+		$severities = array(
+			TRIGGER_SEVERITY_NOT_CLASSIFIED => S_NOT_CLASSIFIED,
+			TRIGGER_SEVERITY_INFORMATION => S_INFORMATION,
+			TRIGGER_SEVERITY_WARNING => S_WARNING,
+			TRIGGER_SEVERITY_AVERAGE => S_AVERAGE,
+			TRIGGER_SEVERITY_HIGH => S_HIGH,
+			TRIGGER_SEVERITY_DISASTER => S_DISASTER,
+		);
 
-		return S_UNKNOWN;
+		if(is_null($severity))
+			return $severities;
+		else if(isset($severities[$severity]))
+			return $severities[$severity];
+		else return S_UNKNOWN;
 	}
 
-/*
- * Function: get_trigger_value_style
- *
- * Description:
- *	 convert trigger value in to the CSS style name
- *
- * Author:
- *	 Eugene Grigorjev (eugene.grigorjev@zabbix.com)
- *
- * Comments:
- *
- */
 	function get_trigger_value_style($value){
 		$str_val[TRIGGER_VALUE_FALSE]	= 'off';
 		$str_val[TRIGGER_VALUE_TRUE]	= 'on';
@@ -345,18 +339,6 @@ return $caption;
 		return '';
 	}
 
-/*
- * Function: trigger_value2str
- *
- * Description:
- *	 convert trigger value in to the string representation
- *
- * Author:
- *	 Eugene Grigorjev (eugene.grigorjev@zabbix.com)
- *
- * Comments:
- *
- */
 	function trigger_value2str($value){
 		$str_val[TRIGGER_VALUE_FALSE]	= S_OK_BIG;
 		$str_val[TRIGGER_VALUE_TRUE]	= S_PROBLEM_BIG;
@@ -366,6 +348,34 @@ return $caption;
 			return $str_val[$value];
 
 		return S_UNKNOWN;
+	}
+
+	function discovery_value($val = null){
+		$array = array(
+			DOBJECT_STATUS_UP => S_UP_BIG,
+			DOBJECT_STATUS_DOWN => S_DOWN_BIG,
+			DOBJECT_STATUS_DISCOVER => S_DISCOVERED_BIG,
+			DOBJECT_STATUS_LOST => S_LOST_BIG,
+		);
+
+		if(is_null($val))
+			return $array;
+		else if(isset($array[$val]))
+			return $array[$val];
+		else
+			return S_UNKNOWN;
+	}
+
+	function discovery_value_style($val){
+		switch($val){
+			case DOBJECT_STATUS_UP: $style = 'off'; break;
+			case DOBJECT_STATUS_DOWN: $style = 'on'; break;
+			case DOBJECT_STATUS_DISCOVER: $style = 'off'; break;
+			case DOBJECT_STATUS_LOST: $style = 'unknown'; break;
+			default: $style = '';
+		}
+
+		return $style;
 	}
 
 /*
@@ -2080,6 +2090,7 @@ return $caption;
 	function check_right_on_trigger_by_expression($permission,$expression){
 		global $USER_DETAILS;
 
+		$hostids = array();
 		$db_hosts = get_hosts_by_expression($expression);
 		while($host_data = DBfetch($db_hosts)){
 			$hostids[] = $host_data['hostid'];
@@ -2631,7 +2642,7 @@ return $caption;
 		$css = getUserTheme($USER_DETAILS);
 		$vTextColor = ($css == 'css_od.css')?'&color=white':'';
 
-		if($view_style == STYLE_TOP){	
+		if($view_style == STYLE_TOP){
 			$header = array(new CCol(S_TRIGGERS,'center'));
 
 			foreach($hosts as $hostname){

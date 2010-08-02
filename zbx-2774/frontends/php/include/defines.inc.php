@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-	define('ZABBIX_VERSION','1.8.3rc2');
+	define('ZABBIX_VERSION','1.8.3rc3');
 	define('ZABBIX_API_VERSION','1.2');
 /* USER DEFINES */
 
@@ -213,6 +213,10 @@
 
 	define('HOST_MAINTENANCE_STATUS_OFF',	0);
 	define('HOST_MAINTENANCE_STATUS_ON',	1);
+
+	define('MAINTENANCE_STATUS_ACTIVE',	0);
+	define('MAINTENANCE_STATUS_APPROACH',	1);
+	define('MAINTENANCE_STATUS_EXPIRED',	2);
 
 	define('HOST_AVAILABLE_UNKNOWN',	0);
 	define('HOST_AVAILABLE_TRUE',		1);

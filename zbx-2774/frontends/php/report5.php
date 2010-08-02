@@ -146,7 +146,7 @@ include_once('include/page_header.php');
 		$tr_desc = new CSpan($description,'pointer');
 		$tr_desc->addAction('onclick',"create_mon_trigger_menu(event, ".
 										" new Array({'triggerid': '".$row['triggerid']."', 'lastchange': '".$row['lastchange']."'},".$tr_conf_link."),".
-										zbx_jsvalue($row['items']).");");
+										zbx_jsvalue($row['items'], true).");");
 
 		$table->addRow(array(
 			get_node_name_by_elid($row['triggerid']),

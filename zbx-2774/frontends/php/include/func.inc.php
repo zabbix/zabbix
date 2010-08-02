@@ -1186,34 +1186,25 @@ function zbx_subarray_push(&$mainArray, $sIndex, $element) {
 			$script = "javascript: redirect('".$url."');";
 		}
 
-		if(is_array($obj)){
-			$col = array();
-			foreach($obj as $el){
-				if(is_object($el) || ($el === SPACE)){
-					$col[] = $el;
-				}
-				else{
-					$col[] = new CSpan($el, 'underline');
-				}
-			}
+		zbx_value2array($obj);
+		$div = new CDiv();
+		$div->setAttribute('style', 'float:left;');
+
+		foreach($obj as $enum => $el){
+			if(is_object($el) || ($el === SPACE)) $div->addItem($el);
+			else $div->addItem(new CSpan($el, 'underline'));
 		}
-		else{
-			$col = array(new CSpan($obj,'underline'));
-		}
+		$div->addItem(SPACE);
+
+		$img = null;
 		if(isset($_REQUEST['sort']) && ($tabfield == $_REQUEST['sort'])){
-			if($sortorder == ZBX_SORT_UP){
-				$img = new CImg('images/general/sort_down.gif','down',15,8);
-			}
-			else{
-				$img = new CImg('images/general/sort_up.gif','up',15,8);
-			}
+			if($sortorder == ZBX_SORT_UP) $img = new CDiv(SPACE,'icon_sortdown');
+			else $img = new CDiv(SPACE,'icon_sortup');
 
-			$img->setAttribute('style','line-height: 20px; vertical-align: middle;');
-			$col[] = SPACE;
-			$col[] = $img;
+			$img->setAttribute('style','float: left;');
 		}
 
-		$col = new CCol($col, 'hover_grey');
+		$col = new CCol(array($div, $img), 'nowrap hover_grey');
 		$col->setAttribute('onclick', $script);
 
 	return $col;

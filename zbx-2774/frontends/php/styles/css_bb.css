@@ -324,14 +324,6 @@ div.sla_green{
 	background-image: url('../images/gradients/sla_blue15.png');
 }
 
-div.icon_sortup{
-	background-image: url('../images/general/sort_up_bb.png');
-}
-
-div.icon_sortdown{
-	background-image: url('../images/general/sort_down_bb.png');
-}
-
 div.messagecontainer{
 	background-color: #8c8a8b;
 }

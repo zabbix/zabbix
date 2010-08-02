@@ -90,8 +90,8 @@ include_once('include/page_header.php');
 
 		if(isset($_REQUEST['slideshowid'])){ /* update */
 			DBstart();
-			update_slideshow($_REQUEST['slideshowid'],$_REQUEST['name'],$_REQUEST['delay'],$slides);
-			$result = DBend();
+			$result = update_slideshow($_REQUEST['slideshowid'],$_REQUEST['name'],$_REQUEST['delay'],$slides);
+			$result = DBend($result);
 
 			$audit_action = AUDIT_ACTION_UPDATE;
 			show_messages($result, S_SLIDESHOW_UPDATED, S_CANNOT_UPDATE_SLIDESHOW);
