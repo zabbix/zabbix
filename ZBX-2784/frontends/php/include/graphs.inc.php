@@ -200,33 +200,6 @@
 	}
 
 /*
- * Function: graph_accessible
- *
- * Description:
- *     Checks if graph is accessible to USER
- *
- * Author:
- *     Aly
- *
- */
-	function graph_accessible($graphid){
-		global $USER_DETAILS;
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY, PERM_RES_IDS_ARRAY,get_current_nodeid(true));
-
-		$sql = 	'SELECT g.graphid '.
-				' FROM graphs g, graphs_items gi, items i '.
-				' WHERE g.graphid='.$graphid.
-					' AND g.graphid=gi.graphid '.
-					' AND i.itemid=gi.itemid '.
-					' AND '.DBcondition('i.hostid',$available_hosts,true);
-
-		if(DBfetch(DBselect($sql,1))){
-			return false;
-		}
-	return true;
-	}
-
-/*
  * Function: get_min_itemclock_by_graphid
  *
  * Description:
