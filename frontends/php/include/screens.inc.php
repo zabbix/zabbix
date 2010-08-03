@@ -1415,7 +1415,7 @@ require_once('include/js.inc.php');
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
 				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_TRIGGERS_INFO) ){
-					$item = new CTriggersInfo($resourceid, $style);
+					$item = new CTriggersInfo($resourceid, null, $style);
 					$item = array($item);
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
