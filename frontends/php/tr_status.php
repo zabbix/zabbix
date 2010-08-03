@@ -120,7 +120,7 @@ include_once('include/page_header.php');
 		}
 		else{
 			$_REQUEST['show_details'] = get_request('show_details',	CProfile::get('web.tr_status.filter.show_details', 0));
-			$_REQUEST['status_change'] = get_request('status_change', CProfile::get('web.tr_status.filter.', 0));
+			$_REQUEST['status_change'] = get_request('status_change', CProfile::get('web.tr_status.filter.status_change', 0));
 			$_REQUEST['show_triggers'] = TRIGGERS_OPTION_ONLYTRUE;
 		}
 		$_REQUEST['show_events'] = get_request('show_events', CProfile::get('web.tr_status.filter.show_events', EVENTS_OPTION_NOEVENT));
