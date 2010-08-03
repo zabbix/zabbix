@@ -682,7 +682,8 @@ function switchElementsClass(obj,class1,class2){
 	}
 	
 	if(IE6){
-		obj.removeAttribute('style');
+		obj.style.filter = '';
+		obj.style.backgroundImage = '';
 		ie6pngfix.run();
 	}
 
