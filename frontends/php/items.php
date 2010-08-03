@@ -1119,7 +1119,7 @@ switch($itemType) {
 			}
 
 			if(!empty($item['triggers'])){
-				$trigger_info = new CSpan(S_TRIGGERS,'link');
+				$trigger_info = new CSpan(S_TRIGGERS,'link_menu');
 				$trigger_info->setHint($trigger_hint);
 				$trigger_info = array($trigger_info);
 				$trigger_info[] = ' ('.count($item['triggers']).')';
@@ -1127,9 +1127,7 @@ switch($itemType) {
 				$trigger_hint = array();
 			}
 			else{
-				$trigger_info = array();
-				$trigger_info[] = new CLink(S_TRIGGERS, 'triggers.php?&hostid='.$item['hostid']);
-				$trigger_info[] = ' ('.count($item['triggers']).')';
+				$trigger_info = SPACE;
 			}
 //-------
 
