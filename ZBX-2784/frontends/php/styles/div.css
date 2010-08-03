@@ -148,9 +148,9 @@ div.zabbix_logo{
 }
 
 div.menu_icon{
+	background-repeat:no-repeat;
 	height: 16px;
 	width: 16px;
-	background-repeat:no-repeat;
 	cursor: pointer;
 	border: 1px solid white;
 	-webkit-border-radius: 2px;
@@ -172,6 +172,10 @@ div.iconplus{
 }
 div.iconmenu{
 	background-image: url('../images/general/bttn/menu.png');
+}
+div.iconmenu_b{
+	background-image: url('../images/general/bttn/menu.png');
+	background-color: #5572AA;
 }
 div.arrowup{
 	background-image: url('../images/general/bttn/arrowup.png');
@@ -220,6 +224,7 @@ div.iconclose{
 }
 div.iconmove{
 	background-image: url('../images/general/bttn/move.png');
+	cursor: move;
 }
 
 

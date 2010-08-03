@@ -162,21 +162,13 @@ include_once('include/page_header.php');
 		$graph_cont->setAttribute('id', $containerid);
 		$table->addRow($graph_cont);
 
-		if(infavorites('web.favorite.graphids',$_REQUEST['graphid'],'graphid')){
-			$action = "rm4favorites('graphid','".$_REQUEST['graphid']."',0);";
-			$icon = new CIcon(S_REMOVE_FROM.' '.S_FAVOURITES, 'iconminus', $action);
-		}
-		else{
-			$action = "add2favorites('graphid','".$_REQUEST['graphid']."');";
-			$icon = new CIcon(S_ADD_TO.' '.S_FAVOURITES, 'iconplus', $action);
-		}
-		$icon->setAttribute('id','addrm_fav');
-
-		$url = '?graphid='.$_REQUEST['graphid'].($_REQUEST['fullscreen']?'':'&fullscreen=1');
-		$fs_icon = new CIcon($_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN, 'fullscreen', "document.location = '".$url."';");
-
-		$rst_icon = new CIcon(S_RESET, 'iconreset', "timeControl.objectReset('".$_REQUEST['graphid']."');");
-
+		$icon = get_icon('favourite', array(
+			'fav' => 'web.favorite.graphids',
+			'elname' => 'graphid',
+			'elid' => $_REQUEST['graphid'],
+		));
+		$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
+		$rst_icon = get_icon('reset', array('id' => $_REQUEST['graphid']));
 		array_push($icons, $icon, $rst_icon, $fs_icon);
 
 // NAV BAR

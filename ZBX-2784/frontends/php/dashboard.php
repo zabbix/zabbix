@@ -237,15 +237,14 @@ include_once('include/page_header.php');
 	$dashboard_wdgt = new CWidget('dashboard_wdgt');
 // Header
 
-	$url = new Curl('?fullscreen='.($_REQUEST['fullscreen']? '0':'1'));
-	$fs_icon = new CIcon($_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN, 'fullscreen', "document.location = '".$url->getUrl()."';");
+	$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
 
 	$style = $dashconf['filterEnable']? 'iconconfig_hl':'iconconfig';
 	$state = S_CONFIGURE.' ('.S_FILTER.' '.($dashconf['filterEnable']?S_ENABLED:S_DISABLED).')';
 	$dc_icon = new CIcon($state, $style, "document.location = 'dashconf.php';");
 
 	$dashboard_wdgt->setClass('header');
-	$dashboard_wdgt->addHeader(S_DASHBOARD_BIG, array($dc_icon,$fs_icon));
+	$dashboard_wdgt->addHeader(S_DASHBOARD_BIG, array($dc_icon, $fs_icon));
 //-------------
 
 	$left_tab = new CTable();
@@ -276,7 +275,7 @@ include_once('include/page_header.php');
 // --------------
 
 // Favorite graphs
-	$graph_menu = new CIcon(S_MENU, 'iconmenu', 'create_page_menu(event,"graphs");');
+	$graph_menu = get_icon('menu', array('menu' => 'graphs'));
 	$fav_grph = new CWidget('hat_favgrph',
 						make_favorite_graphs(),
 						CProfile::get('web.dashboard.hats.hat_favgrph.state',1)
@@ -286,7 +285,7 @@ include_once('include/page_header.php');
 //----------------
 
 // favorite screens
-	$screen_menu = new CIcon(S_MENU, 'iconmenu', 'create_page_menu(event,"screens");');
+	$screen_menu = get_icon('menu', array('menu' => 'screens'));
 	$fav_scr = new CWidget('hat_favscr',
 						make_favorite_screens(),
 						CProfile::get('web.dashboard.hats.hat_favscr.state',1)
@@ -296,7 +295,7 @@ include_once('include/page_header.php');
 //----------------
 
 // Favorite Sysmaps
-	$sysmap_menu = new CIcon(S_MENU, 'iconmenu', 'create_page_menu(event,"sysmaps");');
+	$sysmap_menu = get_icon('menu', array('menu' => 'sysmaps'));
 	$fav_maps = new CWidget('hat_favmap',
 						make_favorite_maps(),
 						CProfile::get('web.dashboard.hats.hat_favmap.state',1)
@@ -339,7 +338,7 @@ include_once('include/page_header.php');
 
 // Status of ZBX
 	if(USER_TYPE_SUPER_ADMIN == $USER_DETAILS['type']){
-		$refresh_menu = new CIcon(S_MENU, 'iconmenu', 'create_page_menu(event,"hat_stszbx");');
+		$refresh_menu = get_icon('menu', array('menu' => 'hat_stszbx'));
 		$zbx_stat = new CWidget('hat_stszbx',
 							new CSpan(S_LOADING_P,'textcolorstyles'),//make_status_of_zbx()
 							CProfile::get('web.dashboard.hats.hat_stszbx.state',1)
@@ -360,7 +359,7 @@ include_once('include/page_header.php');
 //----------------
 
 // Host status
-	$refresh_menu = new CIcon(S_MENU, 'iconmenu', 'create_page_menu(event,"hat_hoststat");');
+	$refresh_menu = get_icon('menu', array('menu' => 'hat_hoststat'));
 	$hoststat = new CWidget('hat_hoststat',
 						new CSpan(S_LOADING_P,'textcolorstyles'),//make_system_summary()
 						CProfile::get('web.dashboard.hats.hat_hoststat.state',1)
@@ -370,7 +369,7 @@ include_once('include/page_header.php');
 //----------------
 
 // Last Issues
-	$refresh_menu = new CIcon(S_MENU, 'iconmenu', 'create_page_menu(event,"hat_lastiss");');
+	$refresh_menu = get_icon('menu', array('menu' => 'hat_lastiss'));
 	$lastiss = new CWidget('hat_lastiss',
 						new CSpan(S_LOADING_P,'textcolorstyles'),//make_latest_issues(),
 						CProfile::get('web.dashboard.hats.hat_lastiss.state',1)
@@ -380,7 +379,7 @@ include_once('include/page_header.php');
 //----------------
 
 // Web monioring
-	$refresh_menu = new CIcon(S_MENU, 'iconmenu', 'create_page_menu(event,"hat_webovr");');
+	$refresh_menu = get_icon('menu', array('menu' => 'hat_webovr'));
 	$web_mon = new CWidget('hat_webovr',
 						new CSpan(S_LOADING_P,'textcolorstyles'),//make_webmon_overview()
 						CProfile::get('web.dashboard.hats.hat_webovr.state',1)
@@ -396,7 +395,7 @@ include_once('include/page_header.php');
 
 		$refresh_tab[] = array(	'id' => 'hat_dscvry','frequency'  => CProfile::get('web.dahsboard.rf_rate.hat_dscvry',60));
 
-		$refresh_menu = new CIcon(S_MENU, 'iconmenu', 'create_page_menu(event,"hat_dscvry");');
+		$refresh_menu = get_icon('menu', array('menu' => 'hat_dscvry'));
 		$web_mon = new CWidget('hat_dscvry',
 							new CSpan(S_LOADING_P,'textcolorstyles'),//make_discovery_status()
 							CProfile::get('web.dashboard.hats.hat_dscvry.state',1)

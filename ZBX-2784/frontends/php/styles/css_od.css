@@ -516,9 +516,6 @@ div.zabbix_logo{
 	background-image:url('../images/general/zabbix_od.png');
 }
 
-div.iconok{
-}
-
 div.iconzbxavailable{
 	background-image: url('../images/general/zabbix_available_bb.png');
 }
@@ -543,15 +540,14 @@ div.icon_sortdown{
 	background-image: url('../images/general/sort_down_od.gif');
 }
 
-div.iconmenu{
-	background-color: transparent;
-}
-
-div.iconmenu:hover{
+div.menu_icon:hover{
 	-webkit-box-shadow: 0 0 6px #FF5500;
 	-moz-box-shadow: 0 0 6px #FF5500;
 	box-shadow: 0 0 6px #FF5500;
 	background-color: #FF5500;
+}
+div.iconmenu_b{
+	background-color: transparent;
 }
 
 div.messagecontainer{

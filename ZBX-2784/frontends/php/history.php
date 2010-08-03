@@ -192,26 +192,15 @@ include_once('include/page_header.php');
 		$header['left'] = array(new CLink($item['host'],'latest.php?hostid='.$item['hostid']),': ',item_description($item));
 
 		if('showgraph' == $_REQUEST['action']){
-			if(infavorites('web.favorite.graphids',$item['itemid'],'itemid')){
-				$icon = new CDiv(SPACE,'iconminus');
-				$icon->setAttribute('title',S_REMOVE_FROM.' '.S_FAVOURITES);
-				$icon->addAction('onclick', "javascript: rm4favorites('itemid','".$_REQUEST['itemid']."',0);");
-			}
-			else{
-				new ficon(array('itemid' => $_REQUEST['itemid']), 1);
-				$icon = new CDiv(SPACE,'iconplus');
-				$icon->setAttribute('title',S_ADD_TO.' '.S_FAVOURITES);
-				$icon->addAction('onclick', "javascript: add2favorites('itemid','".$_REQUEST['itemid']."');");
-			}
-			$icon->setAttribute('id','addrm_fav');
-
-			$header['right'][] = $icon;
+			$header['right'][] = get_icon('favourite', array(
+				'fav' => 'web.favorite.graphids',
+				'elid' => $item['itemid'],
+				'elname' => 'itemid'
+			));
 		}
 	}
 
-	$form = new CForm();
-	$form->setMethod('get');
-
+	$form = new CForm(null, 'get');
 	$form->addVar('itemid',$_REQUEST['itemid']);
 
 	if(isset($_REQUEST['filter_task']))	$form->addVar('filter_task',$_REQUEST['filter_task']);

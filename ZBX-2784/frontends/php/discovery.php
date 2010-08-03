@@ -67,9 +67,7 @@ include_once('include/page_header.php');
 	$druleid = get_request('druleid', 0);
 	$fullscreen = get_request('fullscreen', 0);
 
-	$url = '?fullscreen='.($_REQUEST['fullscreen']?'0':'1').'&amp;druleid='.$druleid;
-	$fs_icon = new CIcon($_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN, 'fullscreen', "document.location = '".$url."';");
-
+	$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
 	$dscvry_wdgt->addPageHeader(S_STATUS_OF_DISCOVERY_BIG, $fs_icon);
 
 // 2nd header

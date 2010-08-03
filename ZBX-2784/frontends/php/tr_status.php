@@ -174,11 +174,7 @@ include_once('include/page_header.php');
 	$r_form->addItem(array(SPACE . S_HOST . SPACE, $pageFilter->getHostsCB(true)));
 	$r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
 
-	$url = 'tr_status.php' . ($_REQUEST['fullscreen'] ? '' : '?fullscreen=1');
-	$fs_icon = new CDiv(SPACE, 'fullscreen');
-	$fs_icon->setAttribute('title', $_REQUEST['fullscreen'] ? S_NORMAL . ' ' . S_VIEW : S_FULLSCREEN);
-	$fs_icon->addAction('onclick', "javascript: document.location = '" . $url . "';");
-
+	$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
 	$trigg_wdgt->addPageHeader(S_STATUS_OF_TRIGGERS_BIG . ' [' . date(S_DATE_FORMAT_YMDHMS) . ']', array($fs_icon));
 
 	$numrows = new CDiv();
