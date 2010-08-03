@@ -258,7 +258,7 @@ include_once('include/page_header.php');
 /*************** FILTER END ******************/
 
   	if($_REQUEST['fullscreen']){
-		$triggerInfo = new CTriggersInfo();
+		$triggerInfo = new CTriggersInfo($_REQUEST['groupid'], $_REQUEST['hostid']);
 		$triggerInfo->HideHeader();
 		$triggerInfo->show();
 	}
