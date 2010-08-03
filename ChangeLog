@@ -5,9 +5,12 @@ Changes for 1.9
  - [DEV-449] added system.localtime[local] check (Sasha)
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
-Changes for 1.8.3rc3
+Changes for 1.8.3
 
  - [ZBX-2766] fixed triggers info in status of triggers page in fullscreen mode (Aly)
+ 
+Changes for 1.8.3rc3
+
  - [ZBX-2799] fixed map element host in maintenance (Aly)
  - [ZBX-2781] fixed timeline in case of usertime goes over possible period (Aly)
  - [ZBX-2803] fixed agent compilation on HP-UX with the native HP-UX C compiler (asaveljevs)
