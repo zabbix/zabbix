@@ -128,11 +128,11 @@ include_once('include/page_header.php');
 	ksort($services);
 
 	$header = array(
-			is_show_all_nodes() ? new CCol(S_NODE, 'center') : null,
-			new CCol(make_sorting_link(S_DISCOVERED_DEVICE,'ip'), 'center'),
-			new CCol(S_MONITORED_HOST, 'center'),
-			new CCol(array(S_UPTIME.'/',S_DOWNTIME),'center')
-			);
+		is_show_all_nodes() ? new CCol(S_NODE, 'left') : null,
+		make_sorting_header(S_DISCOVERED_DEVICE,'ip'),
+		new CCol(S_MONITORED_HOST, 'left'),
+		new CCol(array(S_UPTIME.'/',S_DOWNTIME),'left')
+	);
 
 	$css = getUserTheme($USER_DETAILS);
 	$vTextColor = ($css == 'css_od.css')?'&color=white':'';

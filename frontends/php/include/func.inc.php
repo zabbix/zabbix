@@ -1210,42 +1210,6 @@ function zbx_subarray_push(&$mainArray, $sIndex, $element) {
 	return $col;
 	}
 
-//TODO: should be replaced by "make_sorting_header" for every page.
-	function make_sorting_link($obj,$tabfield,$url=''){
-		global $page;
-
-		$sortorder = (isset($_REQUEST['sortorder']) && ($_REQUEST['sortorder'] == ZBX_SORT_UP))?ZBX_SORT_DOWN:ZBX_SORT_UP;
-
-		$link = new Curl($url);
-		if(empty($url)) $link->formatGetArguments();
-		$link->setArgument('sort', $tabfield);
-		$link->setArgument('sortorder', $sortorder);
-
-		$url = $link->getUrl();
-
-
-		if(($page['type'] != PAGE_TYPE_HTML) && defined('ZBX_PAGE_MAIN_HAT')){
-			$link = new CLink($obj,$url,null,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');", 'nosid');
-		}
-		else{
-			$link = new CLink($obj,$url, null, null, 'nosid');
-		}
-
-		if(isset($_REQUEST['sort']) && ($tabfield == $_REQUEST['sort'])){
-			if($sortorder == ZBX_SORT_UP){
-				$img = new CImg('images/general/sort_down.png','down',10,10);
-			}
-			else{
-				$img = new CImg('images/general/sort_up.png','up',10,10);
-			}
-
-			$img->setAttribute('style','line-height: 18px; vertical-align: middle;');
-			$link = array($link,SPACE,$img);
-		}
-
-	return $link;
-	}
-
 	function getPageSortField($def){
 		global $page;
 		$tabfield = get_request('sort',CProfile::get('web.'.$page['file'].'.sort',$def));
