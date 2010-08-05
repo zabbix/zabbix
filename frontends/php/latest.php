@@ -104,9 +104,7 @@ include_once('include/page_header.php');
 	$latest_wdgt = new CWidget();
 
 // Header
-	$fs_icon = new CDiv(SPACE,'fullscreen');
-	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-	$fs_icon->addAction('onclick', 'javascript: document.location = "?fullscreen='.($_REQUEST['fullscreen']?'0':'1').'";');
+	$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
 	$latest_wdgt->addPageHeader(S_LATEST_DATA_BIG,$fs_icon);
 
 // 2nd header
@@ -179,7 +177,7 @@ include_once('include/page_header.php');
 	if(count($apps) > 35){
 		$apps = array_slice($apps, -35);
 	}
-	
+
 	/* limit opened application count */
 	// while(count($apps) > 25){
 		// array_shift($apps);
@@ -261,7 +259,7 @@ include_once('include/page_header.php');
 		$description = item_description($db_item);
 
 		if(!empty($_REQUEST['select']) && !zbx_stristr($description, $_REQUEST['select']) ) continue;
-		
+
 		if(strpos($db_item['units'], ',') !== false)
 			list($db_item['units'], $db_item['unitsLong']) = explode(',', $db_item['units']);
 		else
@@ -284,8 +282,8 @@ include_once('include/page_header.php');
 
 		$lastvalue = format_lastvalue($db_item);
 
-		if(isset($db_item['lastvalue']) && isset($db_item['prevvalue']) 
-				&& in_array($db_item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64)) 
+		if(isset($db_item['lastvalue']) && isset($db_item['prevvalue'])
+				&& in_array($db_item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
 				&& ($db_item['lastvalue']-$db_item['prevvalue'] != 0)){
 			if($db_item['lastvalue']-$db_item['prevvalue']<0){
 				$change=convert_units($db_item['lastvalue']-$db_item['prevvalue'],$db_item['units']);
@@ -411,7 +409,7 @@ include_once('include/page_header.php');
 		$description = item_description($db_item);
 
 		if(!empty($_REQUEST['select']) && !zbx_stristr($description, $_REQUEST['select']) ) continue;
-		
+
 		if(strpos($db_item['units'], ',') !== false)
 			list($db_item['units'], $db_item['unitsLong']) = explode(',', $db_item['units']);
 		else
