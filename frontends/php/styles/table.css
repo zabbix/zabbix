@@ -62,6 +62,9 @@ table.page_header tr td.page_header_r{
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	font-size: 10pt;
 }
+table.page_header tr td.page_header_r a{
+	margin: 0 5px;
+}
 /* footer */
 
 table.page_footer{
@@ -1008,6 +1011,7 @@ table.setup_wizard div.text{
 
 /***************** <HISTORY> *****************/
 table.history{
+	margin-left: 5px;
 }
 
 table.history tr{
