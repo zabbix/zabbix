@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBX-2809] fixed login problem in case of guest user is disabled (Aly)
  - [ZBX-2766] fixed triggers info in status of triggers page in fullscreen mode (Aly)
  
 Changes for 1.8.3rc3
