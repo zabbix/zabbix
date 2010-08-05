@@ -7,6 +7,7 @@ Changes for 1.9
 
 Changes for 1.8.3rc4
 
+ - [ZBX-2822] fixed js error on node selection (Aly)
  - [ZBX-2821] fixed reference to removed icons (Vedmak)
  - [ZBX-2784] changed icons style (Vedmak)
  - [ZBX-2820] fixed minor visual bugs (Vedmak)

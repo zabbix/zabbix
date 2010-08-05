@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,19 +54,19 @@
 	define('ZBX_MAP_EXTACK_TOTAL', 0x10);
 	define('ZBX_MAP_EXTACK_SEPARATED', ZBX_MAP_EXTACK_UNACK | ZBX_MAP_EXTACK_TOTAL );
 
-	define('EXTACK_OPTION_ALL', 0);
-	define('EXTACK_OPTION_UNACK', 1);
-	define('EXTACK_OPTION_BOTH', 2);
+	define('EXTACK_OPTION_ALL',		0);
+	define('EXTACK_OPTION_UNACK',	1);
+	define('EXTACK_OPTION_BOTH',	2);
 
-	define('TRIGGERS_OPTION_ONLYTRUE', 1);
-	define('TRIGGERS_OPTION_ALL', 2);
+	define('TRIGGERS_OPTION_ONLYTRUE',	1);
+	define('TRIGGERS_OPTION_ALL',		2);
 
-	define('ZBX_ACK_STS_ANY', 1);
-	define('ZBX_ACK_STS_WITH_UNACK', 2);
-	define('ZBX_ACK_STS_WITH_LAST_UNACK', 3);
+	define('ZBX_ACK_STS_ANY',				1);
+	define('ZBX_ACK_STS_WITH_UNACK',		2);
+	define('ZBX_ACK_STS_WITH_LAST_UNACK',	3);
 
 	define('EVENTS_OPTION_NOEVENT', 1);
-	define('EVENTS_OPTION_ALL', 2);
+	define('EVENTS_OPTION_ALL',		2);
 	define('EVENTS_OPTION_NOT_ACK', 3);
 
 	define('ZBX_FONT_NAME',			'DejaVuSans');
@@ -94,19 +94,19 @@
 	define('T_ZBX_STR',			0);
 	define('T_ZBX_INT',			1);
 	define('T_ZBX_DBL',			2);
-	define('T_ZBX_PERIOD',			3);
+	define('T_ZBX_PERIOD',		3);
 	define('T_ZBX_IP',			4);
 	define('T_ZBX_CLR',			5);
-	define('T_ZBX_PORTS',			6);
-	define('T_ZBX_IP_RANGE',		7);
-	define('T_ZBX_INT_RANGE',		8);
+	define('T_ZBX_PORTS',		6);
+	define('T_ZBX_IP_RANGE',	7);
+	define('T_ZBX_INT_RANGE',	8);
 
 	define('O_MAND',			0);
 	define('O_OPT',				1);
 	define('O_NO',				2);
 
 	define('P_SYS',				1);
-	define('P_UNSET_EMPTY',			2);
+	define('P_UNSET_EMPTY',		2);
 //	define('P_USR',				2);
 //	define('P_GET',				4);
 //	define('P_POST',			8);
@@ -119,7 +119,7 @@
 	define('IMAGE_FORMAT_TEXT',		'JPEG');
 
 	define('IMAGE_TYPE_UNKNOWN',		0);
-	define('IMAGE_TYPE_ICON',		1);
+	define('IMAGE_TYPE_ICON',			1);
 	define('IMAGE_TYPE_BACKGROUND',		2);
 
 	define('ITEM_CONVERT_WITH_UNITS',	0);		// - do not convert empty units
@@ -132,7 +132,7 @@
 	define('ZBX_SORT_DOWN',			'DESC');
 //	END OF MISC PARAMETERS
 
-	define('AUDIT_ACTION_ADD',		0);
+	define('AUDIT_ACTION_ADD',			0);
 	define('AUDIT_ACTION_UPDATE',		1);
 	define('AUDIT_ACTION_DELETE',		2);
 	define('AUDIT_ACTION_LOGIN',		3);
@@ -142,17 +142,17 @@
 
 	define('AUDIT_RESOURCE_USER',			0);
 //	define('AUDIT_RESOURCE_ZABBIX',			1);
-	define('AUDIT_RESOURCE_ZABBIX_CONFIG',		2);
+	define('AUDIT_RESOURCE_ZABBIX_CONFIG',	2);
 	define('AUDIT_RESOURCE_MEDIA_TYPE',		3);
 	define('AUDIT_RESOURCE_HOST',			4);
 	define('AUDIT_RESOURCE_ACTION',			5);
 	define('AUDIT_RESOURCE_GRAPH',			6);
-	define('AUDIT_RESOURCE_GRAPH_ELEMENT',		7);
+	define('AUDIT_RESOURCE_GRAPH_ELEMENT',	7);
 //	define('AUDIT_RESOURCE_ESCALATION',		8);
 //	define('AUDIT_RESOURCE_ESCALATION_RULE',	9);
 //	define('AUDIT_RESOURCE_AUTOREGISTRATION',	10);
 	define('AUDIT_RESOURCE_USER_GROUP',		11);
-	define('AUDIT_RESOURCE_APPLICATION',		12);
+	define('AUDIT_RESOURCE_APPLICATION',	12);
 	define('AUDIT_RESOURCE_TRIGGER',		13);
 	define('AUDIT_RESOURCE_HOST_GROUP',		14);
 	define('AUDIT_RESOURCE_ITEM',			15);
@@ -163,45 +163,45 @@
 	define('AUDIT_RESOURCE_SCREEN',			20);
 	define('AUDIT_RESOURCE_NODE',			21);
 	define('AUDIT_RESOURCE_SCENARIO',		22);
-	define('AUDIT_RESOURCE_DISCOVERY_RULE',		23);
+	define('AUDIT_RESOURCE_DISCOVERY_RULE',	23);
 	define('AUDIT_RESOURCE_SLIDESHOW',		24);
 	define('AUDIT_RESOURCE_SCRIPT',			25);
 	define('AUDIT_RESOURCE_PROXY',			26);
-	define('AUDIT_RESOURCE_MAINTENANCE',		27);
+	define('AUDIT_RESOURCE_MAINTENANCE',	27);
 	define('AUDIT_RESOURCE_REGEXP',			28);
 
-	define('CONDITION_TYPE_HOST_GROUP',		0);
-	define('CONDITION_TYPE_HOST',			1);
-	define('CONDITION_TYPE_TRIGGER',		2);
+	define('CONDITION_TYPE_HOST_GROUP',			0);
+	define('CONDITION_TYPE_HOST',				1);
+	define('CONDITION_TYPE_TRIGGER',			2);
 	define('CONDITION_TYPE_TRIGGER_NAME',		3);
 	define('CONDITION_TYPE_TRIGGER_SEVERITY',	4);
 	define('CONDITION_TYPE_TRIGGER_VALUE',		5);
 	define('CONDITION_TYPE_TIME_PERIOD',		6);
-	define('CONDITION_TYPE_DHOST_IP',		7);
+	define('CONDITION_TYPE_DHOST_IP',			7);
 	define('CONDITION_TYPE_DSERVICE_TYPE',		8);
 	define('CONDITION_TYPE_DSERVICE_PORT',		9);
-	define('CONDITION_TYPE_DSTATUS',		10);
-	define('CONDITION_TYPE_DUPTIME',		11);
-	define('CONDITION_TYPE_DVALUE',			12);
+	define('CONDITION_TYPE_DSTATUS',			10);
+	define('CONDITION_TYPE_DUPTIME',			11);
+	define('CONDITION_TYPE_DVALUE',				12);
 	define('CONDITION_TYPE_HOST_TEMPLATE',		13);
 	define('CONDITION_TYPE_EVENT_ACKNOWLEDGED',	14);
 	define('CONDITION_TYPE_APPLICATION',		15);
 	define('CONDITION_TYPE_MAINTENANCE',		16);
-	define('CONDITION_TYPE_NODE',			17);
-	define('CONDITION_TYPE_DRULE',			18);
-	define('CONDITION_TYPE_DCHECK',			19);
-	define('CONDITION_TYPE_PROXY',			20);
-	define('CONDITION_TYPE_DOBJECT',		21);
-	define('CONDITION_TYPE_HOST_NAME',		22);
+	define('CONDITION_TYPE_NODE',				17);
+	define('CONDITION_TYPE_DRULE',				18);
+	define('CONDITION_TYPE_DCHECK',				19);
+	define('CONDITION_TYPE_PROXY',				20);
+	define('CONDITION_TYPE_DOBJECT',			21);
+	define('CONDITION_TYPE_HOST_NAME',			22);
 
-	define('CONDITION_OPERATOR_EQUAL',	0);
+	define('CONDITION_OPERATOR_EQUAL',		0);
 	define('CONDITION_OPERATOR_NOT_EQUAL',	1);
-	define('CONDITION_OPERATOR_LIKE',	2);
+	define('CONDITION_OPERATOR_LIKE',		2);
 	define('CONDITION_OPERATOR_NOT_LIKE',	3);
-	define('CONDITION_OPERATOR_IN',		4);
+	define('CONDITION_OPERATOR_IN',			4);
 	define('CONDITION_OPERATOR_MORE_EQUAL',	5);
 	define('CONDITION_OPERATOR_LESS_EQUAL',	6);
-	define('CONDITION_OPERATOR_NOT_IN',	7);
+	define('CONDITION_OPERATOR_NOT_IN',		7);
 
 	define('HOST_STATUS_MONITORED',		0);
 	define('HOST_STATUS_NOT_MONITORED',	1);
@@ -214,7 +214,7 @@
 	define('HOST_MAINTENANCE_STATUS_OFF',	0);
 	define('HOST_MAINTENANCE_STATUS_ON',	1);
 
-	define('MAINTENANCE_STATUS_ACTIVE',	0);
+	define('MAINTENANCE_STATUS_ACTIVE',		0);
 	define('MAINTENANCE_STATUS_APPROACH',	1);
 	define('MAINTENANCE_STATUS_EXPIRED',	2);
 
@@ -249,11 +249,11 @@
 	define('SYSMAP_ELEMENT_TYPE_HOST_GROUP',3);
 	define('SYSMAP_ELEMENT_TYPE_IMAGE',		4);
 
-	define('SYSMAP_ELEMENT_ICON_ON',		0);
-	define('SYSMAP_ELEMENT_ICON_OFF',		1);
-	define('SYSMAP_ELEMENT_ICON_UNKNOWN',	2);
-	define('SYSMAP_ELEMENT_ICON_MAINTENANCE',3);
-	define('SYSMAP_ELEMENT_ICON_DISABLED',	4);
+	define('SYSMAP_ELEMENT_ICON_ON',			0);
+	define('SYSMAP_ELEMENT_ICON_OFF',			1);
+	define('SYSMAP_ELEMENT_ICON_UNKNOWN',		2);
+	define('SYSMAP_ELEMENT_ICON_MAINTENANCE',	3);
+	define('SYSMAP_ELEMENT_ICON_DISABLED',		4);
 
 	define('SYSMAP_HIGHLIGH_OFF',		0);
 	define('SYSMAP_HIGHLIGH_ON',		1);
@@ -264,21 +264,21 @@
 	define('SYSMAP_MARKELEMENTS_OFF',		0);
 	define('SYSMAP_MARKELEMENTS_ON',		1);
 
-	define('ITEM_TYPE_ZABBIX',		0);
-	define('ITEM_TYPE_SNMPV1',		1);
-	define('ITEM_TYPE_TRAPPER',		2);
-	define('ITEM_TYPE_SIMPLE',		3);
-	define('ITEM_TYPE_SNMPV2C',		4);
-	define('ITEM_TYPE_INTERNAL',	5);
-	define('ITEM_TYPE_SNMPV3',		6);
+	define('ITEM_TYPE_ZABBIX',			0);
+	define('ITEM_TYPE_SNMPV1',			1);
+	define('ITEM_TYPE_TRAPPER',			2);
+	define('ITEM_TYPE_SIMPLE',			3);
+	define('ITEM_TYPE_SNMPV2C',			4);
+	define('ITEM_TYPE_INTERNAL',		5);
+	define('ITEM_TYPE_SNMPV3',			6);
 	define('ITEM_TYPE_ZABBIX_ACTIVE',	7);
 	define('ITEM_TYPE_AGGREGATE',		8);
 	define('ITEM_TYPE_HTTPTEST',		9);
 	define('ITEM_TYPE_EXTERNAL',		10);
 	define('ITEM_TYPE_DB_MONITOR',		11);
-	define('ITEM_TYPE_IPMI',		12);
-	define('ITEM_TYPE_SSH',			13);
-	define('ITEM_TYPE_TELNET',		14);
+	define('ITEM_TYPE_IPMI',			12);
+	define('ITEM_TYPE_SSH',				13);
+	define('ITEM_TYPE_TELNET',			14);
 	define('ITEM_TYPE_CALCULATED',		15);
 
 	define('ITEM_VALUE_TYPE_FLOAT',		0);
@@ -287,8 +287,8 @@
 	define('ITEM_VALUE_TYPE_UINT64',	3);
 	define('ITEM_VALUE_TYPE_TEXT',		4);
 
-	define('ITEM_DATA_TYPE_DECIMAL',	0);
-	define('ITEM_DATA_TYPE_OCTAL',		1);
+	define('ITEM_DATA_TYPE_DECIMAL',		0);
+	define('ITEM_DATA_TYPE_OCTAL',			1);
 	define('ITEM_DATA_TYPE_HEXADECIMAL',	2);
 
 	define('ITEM_STATUS_ACTIVE',		0);
@@ -316,9 +316,9 @@
 	define('GRAPH_ITEM_DRAWTYPE_GRADIENT_LINE',	5);
 	define('GRAPH_ITEM_DRAWTYPE_BOLD_DOT',		6);
 
-	define('MAP_LINK_DRAWTYPE_LINE',		0);
+	define('MAP_LINK_DRAWTYPE_LINE',			0);
 	define('MAP_LINK_DRAWTYPE_BOLD_LINE',		2);
-	define('MAP_LINK_DRAWTYPE_DOT',			3);
+	define('MAP_LINK_DRAWTYPE_DOT',				3);
 	define('MAP_LINK_DRAWTYPE_DASHED_LINE',		4);
 
 	define('SERVICE_ALGORITHM_NONE',	0);
@@ -337,15 +337,15 @@
 
 	define('TRIGGER_SEVERITY_NOT_CLASSIFIED',	0);
 	define('TRIGGER_SEVERITY_INFORMATION',		1);
-	define('TRIGGER_SEVERITY_WARNING',		2);
-	define('TRIGGER_SEVERITY_AVERAGE',		3);
-	define('TRIGGER_SEVERITY_HIGH',			4);
-	define('TRIGGER_SEVERITY_DISASTER',		5);
+	define('TRIGGER_SEVERITY_WARNING',			2);
+	define('TRIGGER_SEVERITY_AVERAGE',			3);
+	define('TRIGGER_SEVERITY_HIGH',				4);
+	define('TRIGGER_SEVERITY_DISASTER',			5);
 
 	define('ALERT_MAX_RETRIES',		3);
 
 	define('ALERT_STATUS_NOT_SENT',		0);
-	define('ALERT_STATUS_SENT',		1);
+	define('ALERT_STATUS_SENT',			1);
 	define('ALERT_STATUS_FAILED',		2);
 
 	define('ALERT_TYPE_MESSAGE',		0);
@@ -361,11 +361,11 @@
 	define('ACTION_STATUS_ENABLED',		0);
 	define('ACTION_STATUS_DISABLED',	1);
 
-	define('OPERATION_TYPE_MESSAGE',	0);
-	define('OPERATION_TYPE_COMMAND',	1);
-	define('OPERATION_TYPE_HOST_ADD',	2);
+	define('OPERATION_TYPE_MESSAGE',		0);
+	define('OPERATION_TYPE_COMMAND',		1);
+	define('OPERATION_TYPE_HOST_ADD',		2);
 	define('OPERATION_TYPE_HOST_REMOVE',	3);
-	define('OPERATION_TYPE_GROUP_ADD',	4);
+	define('OPERATION_TYPE_GROUP_ADD',		4);
 	define('OPERATION_TYPE_GROUP_REMOVE',	5);
 	define('OPERATION_TYPE_TEMPLATE_ADD',	6);
 	define('OPERATION_TYPE_TEMPLATE_REMOVE',7);
@@ -381,10 +381,10 @@
 
 	define('LOGFILE_SEVERITY_NOT_CLASSIFIED',	0);
 	define('LOGFILE_SEVERITY_INFORMATION',		1);
-	define('LOGFILE_SEVERITY_WARNING',		2);
-	define('LOGFILE_SEVERITY_AVERAGE',		3);
-	define('LOGFILE_SEVERITY_HIGH',			4);
-	define('LOGFILE_SEVERITY_DISASTER',		5);
+	define('LOGFILE_SEVERITY_WARNING',			2);
+	define('LOGFILE_SEVERITY_AVERAGE',			3);
+	define('LOGFILE_SEVERITY_HIGH',				4);
+	define('LOGFILE_SEVERITY_DISASTER',			5);
 	define('LOGFILE_SEVERITY_AUDIT_SUCCESS',	6);
 	define('LOGFILE_SEVERITY_AUDIT_FAILURE',	7);
 
@@ -433,9 +433,9 @@
 	define('TIME_TYPE_SERVER',	1);
 	define('TIME_TYPE_HOST',	2);
 
-	define('FILTER_TASK_SHOW',		0);
-	define('FILTER_TASK_HIDE',		1);
-	define('FILTER_TASK_MARK',		2);
+	define('FILTER_TASK_SHOW',			0);
+	define('FILTER_TASK_HIDE',			1);
+	define('FILTER_TASK_MARK',			2);
 	define('FILTER_TASK_INVERT_MARK',	3);
 
 	define('MARK_COLOR_RED',	1);
@@ -443,9 +443,9 @@
 	define('MARK_COLOR_BLUE',	3);
 
 	define('PROFILE_TYPE_UNKNOWN',		0);
-	define('PROFILE_TYPE_ID',		1);
-	define('PROFILE_TYPE_INT',		2);
-	define('PROFILE_TYPE_STR',		3);
+	define('PROFILE_TYPE_ID',			1);
+	define('PROFILE_TYPE_INT',			2);
+	define('PROFILE_TYPE_STR',			3);
 	define('PROFILE_TYPE_ARRAY_ID',		4);
 	define('PROFILE_TYPE_ARRAY_INT',	5);
 	define('PROFILE_TYPE_ARRAY_STR',	6);
@@ -457,8 +457,8 @@
 	define('CALC_FNC_LST',	9);
 
 
-	define('SERVICE_TIME_TYPE_UPTIME',		0);
-	define('SERVICE_TIME_TYPE_DOWNTIME',		1);
+	define('SERVICE_TIME_TYPE_UPTIME',				0);
+	define('SERVICE_TIME_TYPE_DOWNTIME',			1);
 	define('SERVICE_TIME_TYPE_ONETIME_DOWNTIME',	2);
 
 	define('USER_TYPE_ZABBIX_USER',		1);
@@ -468,8 +468,8 @@
 	define('ZBX_NOT_INTERNAL_GROUP',	0);
 	define('ZBX_INTERNAL_GROUP',		1);
 
-	define('GROUP_STATUS_DISABLED',	1);
-	define('GROUP_STATUS_ENABLED',	0);
+	define('GROUP_STATUS_DISABLED',		1);
+	define('GROUP_STATUS_ENABLED',		0);
 
 // IMPORTANT!!!    by priority	DESC
 	define('GROUP_GUI_ACCESS_SYSTEM',	0);
@@ -482,11 +482,11 @@
 	define('GROUP_DEBUG_MODE_DISABLED',	0);
 	define('GROUP_DEBUG_MODE_ENABLED',	1);
 
-	define('PERM_MAX',		3);
+	define('PERM_MAX',			3);
 	define('PERM_READ_WRITE',	3);
 	define('PERM_READ_ONLY',	2);
 	define('PERM_READ_LIST',	1);
-	define('PERM_DENY',		0);
+	define('PERM_DENY',			0);
 
 	define('PERM_RES_STRING_LINE',	0); /* return string of nodes id - '1,2,3,4,5' */
 	define('PERM_RES_IDS_ARRAY',	1); /* return array of nodes id - array(1,2,3,4) */
@@ -516,19 +516,19 @@
 	define('HTTPTEST_STATE_UNKNOWN',3);
 
 	define('HTTPSTEP_ITEM_TYPE_RSPCODE',	0);
-	define('HTTPSTEP_ITEM_TYPE_TIME',	1);
-	define('HTTPSTEP_ITEM_TYPE_IN',		2);
+	define('HTTPSTEP_ITEM_TYPE_TIME',		1);
+	define('HTTPSTEP_ITEM_TYPE_IN',			2);
 	define('HTTPSTEP_ITEM_TYPE_LASTSTEP',	3);
 
 	define('EVENT_ACK_DISABLED',	'0');
-	define('EVENT_ACK_ENABLED',	'1');
+	define('EVENT_ACK_ENABLED',		'1');
 
 	define('EVENTS_NOFALSEFORB_STATUS_ALL',		0);	// used with TRIGGERS_OPTION_NOFALSEFORB
 	define('EVENTS_NOFALSEFORB_STATUS_FALSE',	1);	// used with TRIGGERS_OPTION_NOFALSEFORB
 	define('EVENTS_NOFALSEFORB_STATUS_TRUE',	2);	// used with TRIGGERS_OPTION_NOFALSEFORB
 
-	define('EVENT_SOURCE_TRIGGERS',		0);
-	define('EVENT_SOURCE_DISCOVERY',	1);
+	define('EVENT_SOURCE_TRIGGERS',			0);
+	define('EVENT_SOURCE_DISCOVERY',		1);
 	define('EVENT_SOURCE_AUTO_REGISTRATION',2);
 
 	define('EVENT_OBJECT_TRIGGER',		0);
@@ -536,28 +536,28 @@
 	define('EVENT_OBJECT_DSERVICE',		2);
 
 	define('GRAPH_YAXIS_TYPE_CALCULATED',	0);
-	define('GRAPH_YAXIS_TYPE_FIXED',	1);
+	define('GRAPH_YAXIS_TYPE_FIXED',		1);
 	define('GRAPH_YAXIS_TYPE_ITEM_VALUE',	2);
 
 	define('GRAPH_YAXIS_SIDE_LEFT',		0);
 	define('GRAPH_YAXIS_SIDE_RIGHT',	1);
 
-	define('GRAPH_ITEM_SIMPLE',		0);
+	define('GRAPH_ITEM_SIMPLE',			0);
 	define('GRAPH_ITEM_AGGREGATED',		1);
-	define('GRAPH_ITEM_SUM',		2);
+	define('GRAPH_ITEM_SUM',			2);
 
-	define('GRAPH_TYPE_NORMAL',		0);
+	define('GRAPH_TYPE_NORMAL',			0);
 	define('GRAPH_TYPE_STACKED',		1);
-	define('GRAPH_TYPE_PIE',		2);
+	define('GRAPH_TYPE_PIE',			2);
 	define('GRAPH_TYPE_EXPLODED',		3);
-	define('GRAPH_TYPE_3D',			4);
+	define('GRAPH_TYPE_3D',				4);
 	define('GRAPH_TYPE_3D_EXPLODED',	5);
-	define('GRAPH_TYPE_BAR',		6);
-	define('GRAPH_TYPE_COLUMN',		7);
+	define('GRAPH_TYPE_BAR',			6);
+	define('GRAPH_TYPE_COLUMN',			7);
 	define('GRAPH_TYPE_BAR_STACKED',	8);
 	define('GRAPH_TYPE_COLUMN_STACKED',	9);
 
-	define('GRAPH_3D_ANGLE',		70);
+	define('GRAPH_3D_ANGLE',			70);
 
 	define('GRAPH_STACKED_ALFA',		15);	// 0..100 transparency
 
@@ -571,7 +571,7 @@
 	define('ZBX_GRAPH_MAX_SKIP_CELL',	16);
 	define('ZBX_GRAPH_MAX_SKIP_DELAY',	4);
 
-	define('DOBJECT_STATUS_UP',		0);
+	define('DOBJECT_STATUS_UP',			0);
 	define('DOBJECT_STATUS_DOWN',		1);
 	define('DOBJECT_STATUS_DISCOVER',	2); /* only for events,           */
 	define('DOBJECT_STATUS_LOST',		3); /*     generated by discovery */
@@ -600,15 +600,15 @@
 	define('DHOST_STATUS_ACTIVE',		0);
 	define('DHOST_STATUS_DISABLED',		1);
 
-	define('IM_FORCED',	0);
+	define('IM_FORCED',		0);
 	define('IM_ESTABLISHED',1);
-	define('IM_TREE',	2);
+	define('IM_TREE',		2);
 
-	define('EXPRESSION_TYPE_INCLUDED',	0);
+	define('EXPRESSION_TYPE_INCLUDED',		0);
 	define('EXPRESSION_TYPE_ANY_INCLUDED',	1);
 	define('EXPRESSION_TYPE_NOT_INCLUDED',	2);
-	define('EXPRESSION_TYPE_TRUE',		3);
-	define('EXPRESSION_TYPE_FALSE',		4);
+	define('EXPRESSION_TYPE_TRUE',			3);
+	define('EXPRESSION_TYPE_FALSE',			4);
 
 	define('EXPRESSION_VALUE_TYPE_UNKNOWN',	'#ERROR_VALUE_TYPE#');
 	define('EXPRESSION_HOST_UNKNOWN',	'#ERROR_HOST#');
@@ -664,9 +664,9 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 //-------
 
 // REGEXP IDS
-	define('ZBX_KEY_ID', 1);
-	define('ZBX_KEY_NAME_ID', 2);
-	define('ZBX_KEY_PARAM_ID', 6);
+	define('ZBX_KEY_ID',		1);
+	define('ZBX_KEY_NAME_ID',	2);
+	define('ZBX_KEY_PARAM_ID',	6);
 
 	define('ZBX_SIMPLE_EXPRESSION_HOST_ID', 2);
 	define('ZBX_SIMPLE_EXPRESSION_KEY_ID', 2 + ZBX_KEY_ID);
@@ -694,19 +694,19 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	define('ZBX_ALLOW_UNICODE',1);
 
 // IPMI
-	define('IPMI_AUTHTYPE_DEFAULT', -1);
-	define('IPMI_AUTHTYPE_NONE', 0);
-	define('IPMI_AUTHTYPE_MD2', 1);
-	define('IPMI_AUTHTYPE_MD5', 2);
-	define('IPMI_AUTHTYPE_STRAIGHT', 4);
-	define('IPMI_AUTHTYPE_OEM', 5);
-	define('IPMI_AUTHTYPE_RMCP_PLUS', 6);
+	define('IPMI_AUTHTYPE_DEFAULT',		-1);
+	define('IPMI_AUTHTYPE_NONE',		0);
+	define('IPMI_AUTHTYPE_MD2',			1);
+	define('IPMI_AUTHTYPE_MD5',			2);
+	define('IPMI_AUTHTYPE_STRAIGHT',	4);
+	define('IPMI_AUTHTYPE_OEM',			5);
+	define('IPMI_AUTHTYPE_RMCP_PLUS',	6);
 
-	define('IPMI_PRIVILEGE_CALLBACK', 1);
-	define('IPMI_PRIVILEGE_USER', 2);
-	define('IPMI_PRIVILEGE_OPERATOR', 3);
-	define('IPMI_PRIVILEGE_ADMIN', 4);
-	define('IPMI_PRIVILEGE_OEM', 5);
+	define('IPMI_PRIVILEGE_CALLBACK',	1);
+	define('IPMI_PRIVILEGE_USER',		2);
+	define('IPMI_PRIVILEGE_OPERATOR',	3);
+	define('IPMI_PRIVILEGE_ADMIN',		4);
+	define('IPMI_PRIVILEGE_OEM',		5);
 
 /* Define if your logs are in non-standard format */
 /*	define('ZBX_LOG_ENCODING_DEFAULT', 'Shift_JIS');*/
@@ -769,9 +769,9 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 
 // if magic quotes on, then get rid of them
 	if(get_magic_quotes_gpc()){
-		$_GET		= zbx_stripslashes($_GET);
-		$_POST		 = zbx_stripslashes($_POST);
-		$_COOKIE	= zbx_stripslashes($_COOKIE);
+		$_GET	 = zbx_stripslashes($_GET);
+		$_POST	 = zbx_stripslashes($_POST);
+		$_COOKIE = zbx_stripslashes($_COOKIE);
 	}
 
 // init $_REQUEST
