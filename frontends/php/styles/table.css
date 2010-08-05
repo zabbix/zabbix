@@ -381,10 +381,12 @@ table.tableinfo tr.header td.hover_grey {
 	cursor: pointer;
 }
 
-table.tableinfo tr.header td.hover_grey:hover {
+table.tableinfo tr.header td.hover_grey:hover  {
 	color: #EEEEEE;
 	background-color:#999999;
 }
+
+
 
 table.tableinfo tr.vertical_header td {
 	padding: 5px 0;
@@ -393,9 +395,17 @@ table.tableinfo tr.vertical_header td {
 	word-spacing: 0;
 	font-weight: bold;
 	background-color:#CCCCCC;
-	vertical-align:text-top;
-	text-align: center;
 	width: 20px;
+	padding-left: 5px;
+	text-align: center;
+}
+table.tableinfo tr.vertical_header td.left {
+	text-align: left;
+}
+table.tableinfo tr.vertical_header td.hover_grey:hover{
+	color: #EEEEEE;
+	background-color:#999999;
+	cursor: pointer;
 }
 
 table.tableinfo tr.footer td {
