@@ -191,7 +191,7 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	}
 
 	cp = string_replace(mailsubject, "\r\n", "\n");
-	mailsubject = string_replace(cp, "\n", "\r\n");
+	mailsubject = string_replace(cp, "\n", " ");
 	zbx_free(cp);
 	if (FAIL == is_ascii_string(mailsubject))
 	{
