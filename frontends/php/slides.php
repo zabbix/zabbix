@@ -200,37 +200,27 @@ include_once('include/page_header.php');
 
 		$effectiveperiod = navigation_bar_calc('web.slides',$elementid, true);
 		$screen = get_slideshow($elementid, 0);
-		
+
 // PAGE HEADER {{{
-		if(infavorites('web.favorite.screenids', $elementid, 'slideshowid')){
-			$icon = new CDiv(SPACE, 'iconminus');
-			$icon->setAttribute('title', S_REMOVE_FROM.' '.S_FAVOURITES);
-			if($screen){
-				$icon->addAction('onclick', "javascript: rm4favorites('slideshowid','".$elementid."',0);");
-			}
+
+		if($screen){
+			$icon = get_icon('favourite', array(
+				'fav' => 'web.favorite.screenids',
+				'elname' => 'slideshowid',
+				'elid' => $elementid,
+			));
 		}
 		else{
-			$icon = new CDiv(SPACE,'iconplus');
-			$icon->setAttribute('title',S_ADD_TO.' '.S_FAVOURITES);
-			if($screen){
-				$icon->addAction('onclick', "javascript: add2favorites('slideshowid','".$elementid."');");
-			}
+			$icon = new CIcon(S_FAVOURITES, 'iconplus');
 		}
-		$icon->setAttribute('id','addrm_fav');
+		
+		$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
 
-		$url = '?elementid='.$elementid.($_REQUEST['fullscreen']?'':'&fullscreen=1');
-		$url.=url_param('groupid').url_param('hostid');
-
-		$fs_icon = new CDiv(SPACE,'fullscreen');
-		$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-		$fs_icon->addAction('onclick', "javascript: document.location = '".$url."';");
-
-		$refresh_icon = new CDiv(SPACE,'iconmenu');
-		$refresh_icon->setAttribute('title',S_MENU);
+		$refresh_icon = new CIcon(S_MENU, 'iconmenu');
 		if($screen){
 			$refresh_icon->addAction('onclick', 'javascript: create_page_menu(event,"hat_slides");');
 		}
-		
+
 
 		$slides_wdgt->addPageHeader(S_SLIDESHOWS_BIG, array($formHeader, SPACE, $icon, $refresh_icon, $fs_icon));
 // }}} PAGE HEADER

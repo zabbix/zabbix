@@ -255,6 +255,7 @@ frontends/php/include/classes/class.cgraphdraw.php -text
 frontends/php/include/classes/class.chelp.php -text
 frontends/php/include/classes/class.chostsinfo.php -text
 frontends/php/include/classes/class.chttp_request.php -text
+frontends/php/include/classes/class.cicon.php -text
 frontends/php/include/classes/class.ciframe.php -text
 frontends/php/include/classes/class.cimagetexttable.php -text
 frontends/php/include/classes/class.cimg.php -text
