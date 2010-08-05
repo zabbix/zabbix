@@ -162,27 +162,13 @@ include_once('include/page_header.php');
 		$graph_cont->setAttribute('id', $containerid);
 		$table->addRow($graph_cont);
 
-		if(infavorites('web.favorite.graphids',$_REQUEST['graphid'],'graphid')){
-			$icon = new CDiv(SPACE,'iconminus');
-			$icon->setAttribute('title',S_REMOVE_FROM.' '.S_FAVOURITES);
-			$icon->addAction('onclick', "javascript: rm4favorites('graphid','".$_REQUEST['graphid']."',0);");
-		}
-		else{
-			$icon = new CDiv(SPACE,'iconplus');
-			$icon->setAttribute('title',S_ADD_TO.' '.S_FAVOURITES);
-			$icon->addAction('onclick', "javascript: add2favorites('graphid','".$_REQUEST['graphid']."');");
-		}
-		$icon->setAttribute('id','addrm_fav');
-
-		$url = '?graphid='.$_REQUEST['graphid'].($_REQUEST['fullscreen']?'':'&fullscreen=1');
-		$fs_icon = new CDiv(SPACE,'fullscreen');
-		$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-		$fs_icon->addAction('onclick', "javascript: document.location = '".$url."';");
-
-		$rst_icon = new CDiv(SPACE,'iconreset');
-		$rst_icon->setAttribute('title',S_RESET);
-		$rst_icon->addAction('onclick', "javascript: timeControl.objectReset('".$_REQUEST['graphid']."');");
-
+		$icon = get_icon('favourite', array(
+			'fav' => 'web.favorite.graphids',
+			'elname' => 'graphid',
+			'elid' => $_REQUEST['graphid'],
+		));
+		$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
+		$rst_icon = get_icon('reset', array('id' => $_REQUEST['graphid']));
 		array_push($icons, $icon, $rst_icon, $fs_icon);
 
 // NAV BAR

@@ -111,10 +111,7 @@
 	$events_wdgt = new CWidget();
 
 // PAGE HEADER {{{
-	$url = '?fullscreen='.($_REQUEST['fullscreen']? '0':'1');
-	$fs_icon = new CDiv(SPACE,'fullscreen');
-	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-	$fs_icon->addAction('onclick', "javascript: document.location = '".$url."';");
+	$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
 	$events_wdgt->addPageHeader(array(S_HISTORY_OF_EVENTS_BIG.SPACE.S_ON_BIG.SPACE, zbx_date2str(S_EVENTS_DATE_FORMAT,time())), $fs_icon);
 // }}}PAGE HEADER
 
@@ -453,7 +450,7 @@
 				else
 					$event['duration'] = zbx_date2age($tr_event['clock']);
 
-				
+
 				$table->addRow(array(
 					new CLink(zbx_date2str(S_EVENTS_ACTION_TIME_FORMAT,$event['clock']),
 						'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid'],

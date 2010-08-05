@@ -62,7 +62,7 @@ initialize: function($super, messagesListId, args){
 	this.messageListId = messagesListId;
 	$super('CMessageList['+messagesListId+']');
 //--
-	
+
 	this.dom = {};
 	this.messageList = {};
 	this.messageLast = {};
@@ -127,7 +127,7 @@ setSettings: function(settings){
 	this.sounds.repeat = settings['sounds.repeat'];
 	this.sounds.mute = settings['sounds.mute'];
 	if(this.sounds.mute == 1){
-		this.dom.mute.className = 'iconmute';
+		this.dom.mute.className = 'iconmute menu_icon';
 	}
 
 	if(settings.enabled != 1) this.stop();
@@ -162,7 +162,7 @@ addMessage: function(newMessage){
 		var lastMessageId = this.messagePipe.shift();
 		this.closeMessage(lastMessageId);
 	}
-	
+
 	this.messagePipe.push(this.msgcounter);
 	newMessage.messageid = this.msgcounter;
 
@@ -189,7 +189,7 @@ mute: function(e){
 	}
 	else{
 		var action = 'message.unmute';
-		this.sounds.mute = 0;		
+		this.sounds.mute = 0;
 	}
 
 	var rpcRequest = {
@@ -216,7 +216,7 @@ playSound: function(messages){
 	for(var i=0; i < messages.length; i++){
 		var message = messages[i];
 		if(message.type != 1 && message.type != 3) continue;
-		
+
 		if(message.priority >= this.sounds.priority){
 			this.sounds.priority = message.priority;
 			this.sounds.sound = message.sound;
@@ -250,7 +250,7 @@ closeMessage: function(messageid, withEffect){
 	AudioList.stop(this.messageList[messageid].sound);
 	if(withEffect) this.messageList[messageid].remove();
 	else this.messageList[messageid].close();
-	
+
 
 	try{
 		delete(this.messageList[messageid]);
@@ -398,7 +398,7 @@ createContainer: function(){
 // move
 	this.dom.move = document.createElement('div');
 	this.dom.move.setAttribute('title', locale['S_MOVE']);
-	this.dom.move.className = 'iconmove';
+	this.dom.move.className = 'iconmove menu_icon';
 	//this.dom.move.style.display = 'none';
 
 	this.dom.controlList.addItem(this.dom.move, 'linear');
@@ -406,21 +406,21 @@ createContainer: function(){
 // snooze
 	this.dom.snooze = document.createElement('div');
 	this.dom.snooze.setAttribute('title', locale['S_SNOOZE']);
-	this.dom.snooze.className = 'iconsnooze';
+	this.dom.snooze.className = 'iconsnooze menu_icon';
 
 	this.dom.controlList.addItem(this.dom.snooze, 'linear');
 
 // mute
 	this.dom.mute = document.createElement('div');
 	this.dom.mute.setAttribute('title', locale['S_MUTE']+'/'+locale['S_UNMUTE']);
-	this.dom.mute.className = 'iconsound';
+	this.dom.mute.className = 'iconsound menu_icon';
 
 	this.dom.controlList.addItem(this.dom.mute, 'linear');
 
 // close all
 	this.dom.closeAll = document.createElement('div');
 	this.dom.closeAll.setAttribute('title', locale['S_CLEAR']);
-	this.dom.closeAll.className = 'iconclose';
+	this.dom.closeAll.className = 'iconclose menu_icon';
 
 	this.dom.controlList.addItem(this.dom.closeAll, 'linear');
 
