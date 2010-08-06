@@ -48,7 +48,7 @@ class CTag extends CObject{
 		$this->tag_start = $this->tag_end = $this->tag_body_start = $this->tag_body_end = '';
 
 		if(is_null($body)){
-			$this->tag_end = $this->tag_body_start = "\n";
+			$this->tag_end = $this->tag_body_start = '';
 		}
 		else{
 			CTag::addItem($body);
@@ -81,7 +81,7 @@ class CTag extends CObject{
 
 	public function endToString(){
 		$res = ($this->paired==='yes') ? $this->tag_body_end.'</'.$this->tagname.'>' : '';
-		$res .= $this->tag_end;
+		$res .= $this->tag_end."\n";
 	return $res;
 	}
 
