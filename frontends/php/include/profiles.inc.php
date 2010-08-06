@@ -287,7 +287,7 @@ function add_user_history($page){
 				$url .= url_param($arg, true);
 			}
 		}
-		$url[0] = '?';
+		if(!empty($url)) $url[0] = '?';
 		$url = $page['file'].$url;
 	}
 	else{
