@@ -41,7 +41,7 @@ FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|iprange	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|delay		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|nextcheck	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|unique_dcheckid|t_id		|	|NULL		|ZBX_SYNC,ZBX_PROXY	|2|dchecks	|dcheckid	|RESTRICT
 
 TABLE|dchecks|dcheckid|ZBX_SYNC
@@ -533,7 +533,7 @@ FIELD		|dns		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|useip		|t_integer	|'1'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|ip		|t_varchar(39)	|'127.0.0.1'|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|port		|t_integer	|'10050'|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|disable_until	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|error		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|available	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
@@ -709,8 +709,8 @@ FIELD		|formula	|t_varchar(255)	|'1'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|error		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|lastlogsize	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|logtimefmt	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|templateid	|t_id		|	|NULL		|ZBX_SYNC,ZBX_PROXY	|2|items	|itemid
-FIELD		|valuemapid	|t_id		|	|NULL		|ZBX_SYNC,ZBX_PROXY	|3|valuemaps
+FIELD		|templateid	|t_id		|	|NULL		|ZBX_SYNC		|2|items	|itemid
+FIELD		|valuemapid	|t_id		|	|NULL		|ZBX_SYNC		|3|valuemaps
 FIELD		|delay_flex	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|params		|t_item_param	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|ipmi_sensor	|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
