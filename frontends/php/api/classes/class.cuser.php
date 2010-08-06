@@ -1132,14 +1132,16 @@ Copt::memoryPick();
 				}
 			}
 
-			switch(get_user_auth($login['userid'])){
-				case GROUP_GUI_ACCESS_INTERNAL:
-					$auth_type = ZBX_AUTH_INTERNAL;
-					break;
-				case GROUP_GUI_ACCESS_SYSTEM:
-				case GROUP_GUI_ACCESS_DISABLED:
-				default:
-					break;
+			if($auth_type != ZBX_AUTH_HTTP){
+				switch(get_user_auth($login['userid'])){
+					case GROUP_GUI_ACCESS_INTERNAL:
+						$auth_type = ZBX_AUTH_INTERNAL;
+						break;
+					case GROUP_GUI_ACCESS_SYSTEM:
+					case GROUP_GUI_ACCESS_DISABLED:
+					default:
+						break;
+				}
 			}
 
 			switch($auth_type){
@@ -1358,6 +1360,7 @@ Copt::memoryPick();
 				' WHERE u.alias='.zbx_dbstr(ZBX_GUEST_USER).
 					' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID);
 			$login = $USER_DETAILS = DBfetch(DBselect($sql));
+
 			if(!$USER_DETAILS){
 				$missed_user_guest = true;
 			}

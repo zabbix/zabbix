@@ -29,7 +29,7 @@
 
 	require_once('include/menu.inc.php');
 
-	zbx_define_menu_restrictions();
+	zbx_define_menu_restrictions($page, $ZBX_MENU);
 
 	/* Init CURRENT NODE ID */
 	init_nodes();
@@ -85,7 +85,7 @@
 			}
 
 			if(ZBX_DISTRIBUTED){
-				if($ZBX_VIEWED_NODES['selected'] == 0){ // ALL selected
+				if(isset($ZBX_VIEWED_NODES) && ($ZBX_VIEWED_NODES['selected'] == 0)){ // ALL selected
 					$page_title .= ' ('.S_ALL_NODES.') ';
 				}
 				else if(!empty($ZBX_NODES)){
@@ -102,7 +102,8 @@
 	// construc menu
 	$main_menu	= array();
 	$sub_menus	= array();
-	$denyed_page_requested = zbx_construct_menu($main_menu, $sub_menus);
+
+	$denyed_page_requested = zbx_construct_menu($main_menu, $sub_menus, $page);
 
 	zbx_flush_post_cookies($denyed_page_requested);
 
@@ -137,7 +138,6 @@
 ?>
 <script type="text/javascript">	var PHP_TZ_OFFSET = <?php echo date('Z'); ?>;</script>
 <?php
-
 	$path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&lang='.$USER_DETAILS['lang'];
 	print('<script type="text/javascript" src="'.$path.'"></script>'."\n");
 
