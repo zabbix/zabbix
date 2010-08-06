@@ -345,7 +345,8 @@ include_once('include/page_header.php');
 
 
 	if(isset($_REQUEST['form'])){
-		$user_wdgt->addItem(insert_user_form(get_request('userid', null)));
+		$userForm = getUserForm(get_request('userid', null));
+		$user_wdgt->addItem($userForm);
 	}
 	else{
 		$form = new CForm(null, 'get');

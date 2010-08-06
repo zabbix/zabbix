@@ -34,7 +34,13 @@ function getSounds(){
 return $fileList;
 }
 
+function getLatestCloseTime(){
+
+}
+
 function getMessageSettings(){
+	global $USER_DETAILS;
+
 	$defSeverities = array(
 		TRIGGER_SEVERITY_NOT_CLASSIFIED => 1,
 		TRIGGER_SEVERITY_INFORMATION => 1,
@@ -44,74 +50,89 @@ function getMessageSettings(){
 		TRIGGER_SEVERITY_DISASTER => 1,
 	);
 
-	$messages['enabled'] = CProfile::get('web.messages.enabled', 0);
-	$messages['timeout'] = CProfile::get('web.messages.timeout', 90);
+	$messages = array(
+		'enabled' => 0,
+		'timeout' => 60,
+		'last.clock' => 0,
+		'triggers.recovery' => 1,
+		'triggers.severities' => null,
+		'sounds.mute' => 0,
+		'sounds.repeat' => 1,
+		'sounds.recovery' => 'alarm_ok.wav',
+		'sounds.'.TRIGGER_SEVERITY_NOT_CLASSIFIED => 'no_sound.wav',
+		'sounds.'.TRIGGER_SEVERITY_INFORMATION => 'alarm_information.wav',
+		'sounds.'.TRIGGER_SEVERITY_WARNING => 'alarm_warning.wav',
+		'sounds.'.TRIGGER_SEVERITY_AVERAGE => 'alarm_average.wav',
+		'sounds.'.TRIGGER_SEVERITY_HIGH => 'alarm_high.wav',
+		'sounds.'.TRIGGER_SEVERITY_DISASTER => 'alarm_disaster.wav'
+	);
 
-	$messages['triggers'] = array();
+	$sql = 'SELECT idx, source, value_str '.
+			' FROM profiles '.
+			' WHERE userid='.$USER_DETAILS['userid'].
+				' AND '.DBcondition('idx',array('web.messages'), false, true);
+	$db_profiles = DBselect($sql);
+	while($profile = DBfetch($db_profiles)){
+		$messages[$profile['source']] = $profile['value_str'];
+	}
 
-	$severities = CProfile::get('web.messages.triggers.severities');
-	$messages['triggers']['severities'] = is_null($severities)?$defSeverities:unserialize($severities);
-
-	$messages['triggers']['recovery'] = CProfile::get('web.messages.triggers.recovery', 1);
-
-	$messages['sounds'] = array();
-	$messages['sounds'][TRIGGER_SEVERITY_NOT_CLASSIFIED] = CProfile::get('web.sounds.severity.0', 'no_sound.wav');
-	$messages['sounds'][TRIGGER_SEVERITY_INFORMATION] = CProfile::get('web.sounds.severity.1',	'alarm_information.wav');
-	$messages['sounds'][TRIGGER_SEVERITY_WARNING] = CProfile::get('web.sounds.severity.2',	'alarm_warning.wav');
-	$messages['sounds'][TRIGGER_SEVERITY_AVERAGE] = CProfile::get('web.sounds.severity.3',	'alarm_average.wav');
-	$messages['sounds'][TRIGGER_SEVERITY_HIGH] = CProfile::get('web.sounds.severity.4', 'alarm_high.wav');
-	$messages['sounds'][TRIGGER_SEVERITY_DISASTER] = CProfile::get('web.sounds.severity.5', 'alarm_disaster.wav');
-
-	$messages['sounds']['recovery'] = CProfile::get('web.sounds.ok', 'alarm_ok.wav');
-	$messages['sounds']['repeat'] = CProfile::get('web.sounds.repeat', 1);
-	$messages['sounds']['mute'] = CProfile::get('web.sounds.mute', 0);
+	if(is_null($messages['triggers.severities']))
+		$messages['triggers.severities'] = $defSeverities;
+	else
+		$messages['triggers.severities'] = unserialize($messages['triggers.severities']);
 
 return $messages;
 }
 
 function updateMessageSettings($messages){
+	global $USER_DETAILS;
+
 	if(!isset($messages['enabled'])) $messages['enabled'] = 0;
-	
-	CProfile::update('web.messages.enabled', $messages['enabled'], PROFILE_TYPE_INT);
+	if(isset($messages['triggers.severities']))
+		$messages['triggers.severities'] = serialize($messages['triggers.severities']);
 
-	if(isset($messages['timeout']))
-		CProfile::update('web.messages.timeout', $messages['timeout'], PROFILE_TYPE_INT);
-
-	if(isset($messages['triggers'])){
-		if(isset($messages['triggers']['severities']))
-			CProfile::update('web.messages.triggers.severities', serialize($messages['triggers']['severities']), PROFILE_TYPE_STR);
-
-		if(isset($messages['triggers']['recovery']))
-			CProfile::update('web.messages.triggers.recovery', $messages['triggers']['recovery'], PROFILE_TYPE_INT);
+	$sql = 'SELECT profileid, idx, source, value_str '.
+			' FROM profiles '.
+			' WHERE userid='.$USER_DETAILS['userid'].
+				' AND '.DBcondition('idx',array('web.messages'), false, true);
+	$db_profiles = DBselect($sql);
+	while($profile = DBfetch($db_profiles)){
+		$profile['value'] = $profile['value_str'];
+		$dbMessages[$profile['source']] = $profile;
 	}
 
-	if(isset($messages['sounds'])){
-		if(isset($messages['sounds'][TRIGGER_SEVERITY_NOT_CLASSIFIED]))
-			CProfile::update('web.sounds.severity.0', $messages['sounds'][TRIGGER_SEVERITY_NOT_CLASSIFIED], PROFILE_TYPE_STR);
+	$inserts = array();
+	$updates = array();
 
-		if(isset($messages['sounds'][TRIGGER_SEVERITY_INFORMATION]))
-			CProfile::update('web.sounds.severity.1', $messages['sounds'][TRIGGER_SEVERITY_INFORMATION], PROFILE_TYPE_STR);
+	foreach($messages as $key => $value){
+		$values = array(
+			'userid' => $USER_DETAILS['userid'],
+			'idx' => 'web.messages',
+			'source' => $key,
+			'value_str' =>  $value,
+			'type' => PROFILE_TYPE_STR
+		);
 
-		if(isset($messages['sounds'][TRIGGER_SEVERITY_WARNING]))
-			CProfile::update('web.sounds.severity.2', $messages['sounds'][TRIGGER_SEVERITY_WARNING], PROFILE_TYPE_STR);
+		if(!isset($dbMessages[$key])){
+			$inserts[] = $values;
+		}
+		else if($dbMessages[$key]['value'] != $value){
+			$updates[] = array(
+				'values' => $values,
+				'where' => array('profileid='.$dbMessages[$key]['profileid'])
+			);
+		}
+	}
 
-		if(isset($messages['sounds'][TRIGGER_SEVERITY_AVERAGE]))
-			CProfile::update('web.sounds.severity.3', $messages['sounds'][TRIGGER_SEVERITY_AVERAGE], PROFILE_TYPE_STR);
+	try{
+		DB::insert('profiles', $inserts);
+		DB::update('profiles', $updates);
+	}
+	catch(APIException $e){
+		$errors = $e->getErrors();
+		$error = reset($errors);
 
-		if(isset($messages['sounds'][TRIGGER_SEVERITY_HIGH]))
-			CProfile::update('web.sounds.severity.4', $messages['sounds'][TRIGGER_SEVERITY_HIGH], PROFILE_TYPE_STR);
-
-		if(isset($messages['sounds'][TRIGGER_SEVERITY_DISASTER]))
-			CProfile::update('web.sounds.severity.5', $messages['sounds'][TRIGGER_SEVERITY_DISASTER], PROFILE_TYPE_STR);
-
-		if(isset($messages['sounds']['recovery']))
-			CProfile::update('web.sounds.recovery', $messages['sounds']['recovery'], PROFILE_TYPE_STR);
-
-		if(isset($messages['sounds']['repeat']))
-			CProfile::update('web.sounds.repeat', $messages['sounds']['repeat'], PROFILE_TYPE_INT);
-
-		if(isset($messages['sounds']['mute']))
-			CProfile::update('web.sounds.mute', $messages['sounds']['mute'], PROFILE_TYPE_INT);
+		error($error);
 	}
 
 return $messages;

@@ -120,7 +120,7 @@ include_once('include/page_header.php');
 		}
 		else{
 			$_REQUEST['show_details'] = get_request('show_details',	CProfile::get('web.tr_status.filter.show_details', 0));
-			$_REQUEST['status_change'] = get_request('status_change', CProfile::get('web.tr_status.filter.', 0));
+			$_REQUEST['status_change'] = get_request('status_change', CProfile::get('web.tr_status.filter.status_change', 0));
 			$_REQUEST['show_triggers'] = TRIGGERS_OPTION_ONLYTRUE;
 		}
 		$_REQUEST['show_events'] = get_request('show_events', CProfile::get('web.tr_status.filter.show_events', EVENTS_OPTION_NOEVENT));
@@ -174,11 +174,7 @@ include_once('include/page_header.php');
 	$r_form->addItem(array(SPACE . S_HOST . SPACE, $pageFilter->getHostsCB(true)));
 	$r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
 
-	$url = 'tr_status.php' . ($_REQUEST['fullscreen'] ? '' : '?fullscreen=1');
-	$fs_icon = new CDiv(SPACE, 'fullscreen');
-	$fs_icon->setAttribute('title', $_REQUEST['fullscreen'] ? S_NORMAL . ' ' . S_VIEW : S_FULLSCREEN);
-	$fs_icon->addAction('onclick', "javascript: document.location = '" . $url . "';");
-
+	$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
 	$trigg_wdgt->addPageHeader(S_STATUS_OF_TRIGGERS_BIG . ' [' . date(S_DATE_FORMAT_YMDHMS) . ']', array($fs_icon));
 
 	$numrows = new CDiv();
@@ -258,7 +254,7 @@ include_once('include/page_header.php');
 /*************** FILTER END ******************/
 
   	if($_REQUEST['fullscreen']){
-		$triggerInfo = new CTriggersInfo();
+		$triggerInfo = new CTriggersInfo($_REQUEST['groupid'], $_REQUEST['hostid']);
 		$triggerInfo->HideHeader();
 		$triggerInfo->show();
 	}

@@ -1,5 +1,28 @@
+Changes for 1.8.3rc4
+
+ - [ZBX-2819] fixed showing trends for symbolic items (Vedmak)
+ - [ZBX-2825] made profile form redirect to the last visited page on successful save (Aly)
+ - [ZBX-2809] fixed login problem in case of guest user is disabled (Aly)
+ - [ZBX-2807] fixed email notifications being broken when their subjects have line breaks (asaveljevs)
+ - [ZBX-2203] fixed superfluous line breaks for values returned by eventlog[] (asaveljevs)
+ - [ZBX-2803] added detection of the proper type to use in place of socklen_t (asaveljevs)
+ - [ZBX-2822] fixed js error on node selection (Aly)
+ - [ZBX-2821] fixed reference to removed icons (Vedmak)
+ - [ZBX-2784] changed icons style (Vedmak)
+ - [ZBX-2820] fixed minor visual bugs (Vedmak)
+ - [ZBX-2766] fixed triggers info in status of triggers page in fullscreen mode (Aly)
+ 
 Changes for 1.8.3rc3
 
+ - [ZBX-2799] fixed map element host in maintenance (Aly)
+ - [ZBX-2781] fixed timeline in case of usertime goes over possible period (Aly)
+ - [ZBX-2803] fixed agent compilation on HP-UX with the native HP-UX C compiler (asaveljevs)
+ - [ZBX-2745] improved performance of screen element "History of events" (Aly)
+ - [ZBX-2774] fixed GUI messaging in DM setup (Aly)
+ - [ZBX-2786] fixed errors in trigger dependency mass update popup (Vedmak)
+ - [ZBX-2536] fixed agent crash when processing proc.mem[] and proc.num[] on NetBSD (asaveljevs)
+ - [ZBX-2671] fixed detection of various system headers during ./configure (asaveljevs)
+ - [ZBX-2800] fixed undefined variable if update trigger with incorrect function (Vedmak)
  - [ZBX-2789] forbid active agent items to have 0 interval (Vedmak)
  - [ZBX-2794] fixed sorting in configuration web (Vedmak)
  - [ZBX-2792] fixed status sorting in maintenances (Vedmak)

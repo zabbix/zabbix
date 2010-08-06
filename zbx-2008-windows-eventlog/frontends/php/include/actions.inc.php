@@ -809,12 +809,12 @@ function get_history_of_actions($limit,&$last_clock=null,$sql_cond=''){
 	$clock = array();
 	$table = new CTableInfo(S_NO_ACTIONS_FOUND);
 	$table->setHeader(array(
-			is_show_all_nodes() ? make_sorting_link(S_NODES,'a.alertid') : null,
-			make_sorting_link(S_TIME,'clock'),
-			make_sorting_link(S_TYPE,'description'),
-			make_sorting_link(S_STATUS,'status'),
-			make_sorting_link(S_RETRIES_LEFT,'retries'),
-			make_sorting_link(S_RECIPIENTS,'sendto'),
+			is_show_all_nodes() ? make_sorting_header(S_NODES,'a.alertid') : null,
+			make_sorting_header(S_TIME,'clock'),
+			make_sorting_header(S_TYPE,'description'),
+			make_sorting_header(S_STATUS,'status'),
+			make_sorting_header(S_RETRIES_LEFT,'retries'),
+			make_sorting_header(S_RECIPIENTS,'sendto'),
 			S_MESSAGE,
 			S_ERROR
 			));
