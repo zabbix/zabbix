@@ -270,7 +270,7 @@ include_once('include/page_header.php');
 			$table->addRow(array(
 				new CCheckBox('media_types['.$mediatype['mediatypeid'].']',NULL,NULL,$mediatype['mediatypeid']),
 				media_type2str($mediatype['type']),
-				new CLink($mediatype['description'],'?&form=update&mediatypeid='.$mediatype['mediatypeid']),
+				new CLink($mediatype['description'],'?form=update&mediatypeid='.$mediatype['mediatypeid']),
 				$details));
 		}
 
