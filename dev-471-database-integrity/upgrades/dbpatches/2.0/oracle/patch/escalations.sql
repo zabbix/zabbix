@@ -1,0 +1,14 @@
+ALTER TABLE escalations MODIFY actionid DEFAULT NULL;
+ALTER TABLE escalations MODIFY triggerid DEFAULT NULL;
+ALTER TABLE escalations MODIFY eventid DEFAULT NULL;
+ALTER TABLE escalations MODIFY r_eventid DEFAULT NULL;
+ALTER TABLE escalations MODIFY r_eventid NULL;
+DELETE FROM escalations WHERE NOT actionid IN (SELECT actionid FROM actions);
+DELETE FROM escalations WHERE NOT triggerid IN (SELECT triggerid FROM triggers);
+DELETE FROM escalations WHERE NOT eventid IN (SELECT eventid FROM events);
+UPDATE escalations SET r_eventid=NULL WHERE r_eventid=0;
+DELETE FROM escalations WHERE NOT r_eventid IS NULL AND NOT r_eventid IN (SELECT eventid FROM events);
+ALTER TABLE escalations ADD CONSTRAINT c_escalations_1 FOREIGN KEY (actionid) REFERENCES actions (actionid) ON DELETE CASCADE;
+ALTER TABLE escalations ADD CONSTRAINT c_escalations_2 FOREIGN KEY (triggerid) REFERENCES triggers (triggerid) ON DELETE CASCADE;
+ALTER TABLE escalations ADD CONSTRAINT c_escalations_3 FOREIGN KEY (eventid) REFERENCES events (eventid) ON DELETE CASCADE;
+ALTER TABLE escalations ADD CONSTRAINT c_escalations_4 FOREIGN KEY (r_eventid) REFERENCES events (eventid) ON DELETE CASCADE;

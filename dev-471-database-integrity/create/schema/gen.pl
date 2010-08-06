@@ -105,7 +105,7 @@ ZBX_TABLE	tables[]={
 	"before"	=>	"",
 	"after"		=>	"",
 	"type"		=>	"sql",
-	"exec_cmd"	=>	"\n/\n\n",
+	"exec_cmd"	=>	"\n/\n",
 	"t_id"		=>	"number(20)",
 	"t_integer"	=>	"number(10)",
 	"t_time"	=>	"number(10)",
@@ -174,19 +174,19 @@ sub newstate
 	switch ($state)
 	{
 		case "field"	{
-			if($output{"type"} eq "sql" && $new eq "index") { print "$pkey\n)$output{'table_options'}$output{'exec_cmd'}"; }
-			if($output{"type"} eq "sql" && $new eq "table") { print "$pkey\n)$output{'table_options'}$output{'exec_cmd'}"; }
+			if($output{"type"} eq "sql" && $new eq "index") { print "${pkey}\n)$output{'table_options'}$output{'exec_cmd'}"; }
+			if($output{"type"} eq "sql" && $new eq "table") { print "${pkey}\n)$output{'table_options'}$output{'exec_cmd'}"; }
 			if($output{"type"} eq "code" && $new eq "table") { print ",\n\t\t{0}\n\t\t}\n\t},$output{'exec_cmd'}"; }
 			if($new eq "field") { print ",\n" }
 		}
 		case "index"	{
-			if($output{"type"} eq "sql" && $new eq "table") { print "${statements}"; }
+#			if($output{"type"} eq "sql" && $new eq "table") { print "${statements}"; }
 			if($output{"type"} eq "code" && $new eq "table") { print ",\n\t\t{0}\n\t\t}\n\t},$output{'exec_cmd'}"; }
 		}
-	 	case "table"	{
-			if($output{"type"} eq "sql" && $new eq "table") { print "${statements}"; }
-			print "";
-		}
+#	 	case "table"	{
+#			if($output{"type"} eq "sql" && $new eq "table") { print "${statements}"; }
+#			print "";
+#		}
 	}
 	$state=$new;
 }
@@ -197,7 +197,6 @@ sub process_table
 
 	newstate("table");
 	($table_name,$pkey,$flags)=split(/\|/, $line,4);
-	$statements="";
 
 	if($output{"type"} eq "code")
 	{
@@ -215,7 +214,7 @@ sub process_table
 	{
 		if($pkey ne "")
 		{
-			$pkey=",\n\tPRIMARY KEY ($pkey)";
+			$pkey=",\n\tPRIMARY KEY (${pkey})";
 		}
 		else
 		{
@@ -223,6 +222,8 @@ sub process_table
 		}
 
 		print "CREATE TABLE $table_name (\n";
+
+		$key="";
 	}
 }
 
@@ -231,7 +232,7 @@ sub process_field
 	local $line=$_[0];
 
 	newstate("field");
-	($name,$type,$default,$null,$flags,$rel)=split(/\|/, $line,6);
+	($name,$type,$default,$null,$flags,$relN,$rel,$ref,$ref_option)=split(/\|/, $line,9);
 	($type_short)=split(/\(/, $type,2);
 	if($output{"type"} eq "code")
 	{
@@ -282,7 +283,7 @@ sub process_field
 			$null="\t${null}";
 		}
 
-		$row="\t$name\t\t$type_2\t\t$default${null}";
+		$row="${null}";
 
 		if($type eq "t_serial")
 		{
@@ -297,19 +298,53 @@ sub process_field
 			}
 			elsif($output{"database"} eq "oracle")
 			{
-				$statements="${statements}CREATE SEQUENCE ${table_name}_seq\n";
-				$statements="${statements}START WITH 1\n";
-				$statements="${statements}INCREMENT BY 1\n";
-				$statements="${statements}NOMAXVALUE$output{'exec_cmd'}";
-				$statements="${statements}CREATE TRIGGER ${table_name}_tr\n";
-				$statements="${statements}BEFORE INSERT ON ${table_name}\n";
-				$statements="${statements}FOR EACH ROW\n";
-				$statements="${statements}BEGIN\n";
-				$statements="${statements}SELECT proxy_history_seq.nextval INTO :new.id FROM dual;\n";
-				$statements="${statements}END;$output{'exec_cmd'}";
+				$constraints="${constraints}CREATE SEQUENCE ${table_name}_seq\n";
+				$constraints="${constraints}START WITH 1\n";
+				$constraints="${constraints}INCREMENT BY 1\n";
+				$constraints="${constraints}NOMAXVALUE$output{'exec_cmd'}";
+				$constraints="${constraints}CREATE TRIGGER ${table_name}_tr\n";
+				$constraints="${constraints}BEFORE INSERT ON ${table_name}\n";
+				$constraints="${constraints}FOR EACH ROW\n";
+				$constraints="${constraints}BEGIN\n";
+				$constraints="${constraints}SELECT ${table_name}_seq.nextval INTO :new.id FROM dual;\n";
+				$constraints="${constraints}END;$output{'exec_cmd'}";
 			}
 		}
-		print $row;
+
+		if($relN ne "" and $relN ne "-")
+		{
+			if($ref eq "")
+			{
+				$ref="${name}";
+			}
+
+			if($ref_option eq "")
+			{
+				$ref_option=" ON DELETE CASCADE";
+			}
+			elsif($ref_option eq "RESTRICT")	# not default option
+			{
+				$ref_option="";
+			}
+			else
+			{
+				$ref_option=" ON DELETE ${ref_option}";
+			}
+
+			if($output{"database"} eq "postgresql")
+			{
+				$only = " ONLY";
+			}
+			else
+			{
+				$only = "";
+			}
+
+			$cname = "c_${table_name}_${relN}";
+
+			$constraints = "${constraints}ALTER TABLE${only} ${table_name}\n    ADD CONSTRAINT ${cname}\n        FOREIGN KEY (${name}) REFERENCES ${rel} (${ref})${ref_option}$output{'exec_cmd'}";
+		}
+		printf "\t%-24s %-15s %-25s %s", $name, $type_2, $default, $row;
 	}
 }
 
@@ -385,6 +420,8 @@ sub main
 	}
 }
 
+$constraints = "";
 main();
 newstate("table");
+print $constraints;
 print $output{"after"};
