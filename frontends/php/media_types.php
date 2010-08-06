@@ -25,7 +25,7 @@ require_once('include/forms.inc.php');
 
 $page['title'] = 'S_MEDIA_TYPES';
 $page['file'] = 'media_types.php';
-$page['hist_arg'] = array('form', 'mediatypeid');
+$page['hist_arg'] = array();
 
 include_once('include/page_header.php');
 
