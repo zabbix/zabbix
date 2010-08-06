@@ -45,6 +45,7 @@ function permission2str($group_permission){
 *****************************************/
 
 function check_authorisation(){
+	global $USER_DETAILS;
 	$sessionid = get_cookie('zbx_sessionid');
 
 	$user = array('sessionid'=>$sessionid);
