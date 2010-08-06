@@ -694,7 +694,7 @@ function create_mon_trigger_menu(e, args, items){
 
 function testUserSound(idx){
 	var sound = $(idx).options[$(idx).selectedIndex].value;
-	var repeat = $('messages[sounds][repeat]').options[$('messages[sounds][repeat]').selectedIndex].value;
+	var repeat = $('messages[sounds.repeat]').options[$('messages[sounds.repeat]').selectedIndex].value;
 
 	if(repeat == 1) AudioList.play(sound);
 	else if(repeat > 1) AudioList.loop(sound, {'seconds': repeat});
