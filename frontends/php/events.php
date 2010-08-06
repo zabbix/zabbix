@@ -163,11 +163,13 @@
 
 
 // FILTER {{{
+	$filterForm = null;
+
 	if(EVENT_SOURCE_TRIGGERS == $source){
 		$filterForm = new CFormTable(null, null, 'get');//,'events.php?filter_set=1','POST',null,'sform');
 		$filterForm->setAttribute('name', 'zbx_filter');
 		$filterForm->setAttribute('id', 'zbx_filter');
-
+	
 		$filterForm->addVar('triggerid', get_request('triggerid', 0));
 
 		if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0)){
@@ -198,14 +200,14 @@
 
 		$filterForm->addItemToBottomRow(new CButton('filter_set',S_FILTER));
 		$filterForm->addItemToBottomRow($reset);
-
-		$events_wdgt->addFlicker($filterForm, CProfile::get('web.events.filter.state',0));
-
-
-		$scroll_div = new CDiv();
-		$scroll_div->setAttribute('id', 'scrollbar_cntr');
-		$events_wdgt->addFlicker($scroll_div, CProfile::get('web.events.filter.state',0));
 	}
+
+	$events_wdgt->addFlicker($filterForm, CProfile::get('web.events.filter.state',0));
+
+
+	$scroll_div = new CDiv();
+	$scroll_div->setAttribute('id', 'scrollbar_cntr');
+	$events_wdgt->addFlicker($scroll_div, CProfile::get('web.events.filter.state',0));
 // }}} FILTER
 
 
