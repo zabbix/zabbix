@@ -1,0 +1,16 @@
+ALTER TABLE ONLY alerts ALTER actionid DROP DEFAULT;
+ALTER TABLE ONLY alerts ALTER eventid DROP DEFAULT;
+ALTER TABLE ONLY alerts ALTER userid DROP DEFAULT;
+ALTER TABLE ONLY alerts ALTER userid DROP NOT NULL;
+ALTER TABLE ONLY alerts ALTER mediatypeid DROP DEFAULT;
+ALTER TABLE ONLY alerts ALTER mediatypeid DROP NOT NULL;
+UPDATE alerts SET userid=NULL WHERE userid=0;
+UPDATE alerts SET mediatypeid=NULL WHERE mediatypeid=0;
+DELETE FROM alerts WHERE NOT actionid IN (SELECT actionid FROM actions);
+DELETE FROM alerts WHERE NOT eventid IN (SELECT eventid FROM events);
+DELETE FROM alerts WHERE NOT userid IN (SELECT userid FROM users);
+DELETE FROM alerts WHERE NOT mediatypeid IN (SELECT mediatypeid FROM media_type);
+ALTER TABLE ONLY alerts ADD CONSTRAINT c_alerts_1 FOREIGN KEY (actionid) REFERENCES actions (actionid) ON DELETE CASCADE;
+ALTER TABLE ONLY alerts ADD CONSTRAINT c_alerts_2 FOREIGN KEY (eventid) REFERENCES events (eventid) ON DELETE CASCADE;
+ALTER TABLE ONLY alerts ADD CONSTRAINT c_alerts_3 FOREIGN KEY (userid) REFERENCES users (userid) ON DELETE CASCADE;
+ALTER TABLE ONLY alerts ADD CONSTRAINT c_alerts_4 FOREIGN KEY (mediatypeid) REFERENCES media_type (mediatypeid) ON DELETE CASCADE;
