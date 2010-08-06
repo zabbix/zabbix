@@ -89,35 +89,29 @@
 	$details_wdgt = new CWidget();
 
 // Header
-	$url = '?httptestid='.$_REQUEST['httptestid'].'&fullscreen='.($_REQUEST['fullscreen']?'0':'1');
-	$fs_icon = new CDiv(SPACE, 'fullscreen');
-	$fs_icon->setAttribute('title', $_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-	$fs_icon->addAction('onclick', "javascript: document.location = '".$url."';");
-
-	$rst_icon = new CDiv(SPACE, 'iconreset');
-	$rst_icon->setAttribute('title', S_RESET);
-	$rst_icon->addAction('onclick', "javascript: timeControl.objectReset('".$_REQUEST['httptestid']."');");
+	$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
+	$rst_icon = get_icon('reset', array('id' => $_REQUEST['httptestid']));
 
 	$details_wdgt->addPageHeader(
 		array(S_DETAILS_OF_SCENARIO_BIG.SPACE, bold($httptest_data['name']),' ['.date(S_DATE_FORMAT_YMDHMS, $httptest_data['lastcheck']).']'),
 		array($rst_icon, $fs_icon)
 	);
-//-------------	
-	
+//-------------
+
 // TABLE
 	$table = new CTableInfo();
 	$table->setHeader(array(S_STEP, S_SPEED, S_RESPONSE_TIME, S_RESPONSE_CODE, S_STATUS));
 
 	$sql = 'SELECT * FROM httpstep WHERE httptestid='.$httptest_data['httptestid'].' ORDER BY no';
 	$db_httpsteps = DBselect($sql);
-	
+
 	$totalTime = array(
 		'lastvalue' => 0,
 		'value_type' => null,
 		'valuemapid' => null,
 		'units' => null
 	);
-		
+
 	while($httpstep_data = DBfetch($db_httpsteps)){
 		$status['msg'] = S_OK_BIG;
 		$status['style'] = 'enabled';
@@ -153,7 +147,7 @@
 			$status['style'] = 'unknown';
 			$status['skip'] = true;
 		}
-		
+
 		$itemids = array();
 		$sql = 'SELECT i.*, hi.type as httpitem_type '.
 				' FROM items i, httpstepitem hi '.
@@ -171,7 +165,7 @@
 				$totalTime['valuemapid'] = $item_data['valuemapid'];
 				$totalTime['units'] = $item_data['units'];
 			}
-			
+
 			$itemids[] = $item_data['itemid'];
 		}
 
@@ -210,16 +204,16 @@
 
 	$details_wdgt->addItem($table);
 	$details_wdgt->show();
-	
+
 	echo SBR;
 
 	$graphsWidget = new CWidget();
-	
+
 	$scroll_div = new CDiv();
 	$scroll_div->setAttribute('id','scrollbar_cntr');
 	$graphsWidget->addFlicker($scroll_div, CProfile::get('web.httpdetails.filter.state',0));
 	$graphsWidget->addItem(SPACE);
-	
+
 	$graphTable = new CTableInfo();
 	$graphTable->setAttribute('id','graph');
 
@@ -230,9 +224,9 @@
 	$graph_cont = new CCol();
 	$graph_cont->setAttribute('id', 'graph_2');
 	$graphTable->addRow(array(bold(S_RESPONSE_TIME), $graph_cont));
-	
+
 	$graphsWidget->addItem($graphTable);
-	
+
 // NAV BAR
 	$timeline = array(
 		'period' => get_request('period',ZBX_PERIOD_DEFAULT),
@@ -271,7 +265,7 @@
 	);
 	zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 
-	
+
 	$src ='chart3.php?'.url_param('period').url_param('from').
 		url_param($httptest_data['name'], false,'name').
 		url_param(150, false, 'height').
@@ -312,7 +306,7 @@
 	zbx_add_post_js('timeControl.processObjects();');
 
 	$graphsWidget->show();
-	
+
 ?>
 <?php
 

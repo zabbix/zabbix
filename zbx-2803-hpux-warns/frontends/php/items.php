@@ -1119,7 +1119,7 @@ switch($itemType) {
 			}
 
 			if(!empty($item['triggers'])){
-				$trigger_info = new CSpan(S_TRIGGERS,'link');
+				$trigger_info = new CSpan(S_TRIGGERS,'link_menu');
 				$trigger_info->setHint($trigger_hint);
 				$trigger_info = array($trigger_info);
 				$trigger_info[] = ' ('.count($item['triggers']).')';
@@ -1127,9 +1127,7 @@ switch($itemType) {
 				$trigger_hint = array();
 			}
 			else{
-				$trigger_info = array();
-				$trigger_info[] = new CLink(S_TRIGGERS, 'triggers.php?&hostid='.$item['hostid']);
-				$trigger_info[] = ' ('.count($item['triggers']).')';
+				$trigger_info = SPACE;
 			}
 //-------
 
@@ -1156,14 +1154,11 @@ switch($itemType) {
 					$triggers = '';
 				}
 
-				$menuicon = new CDiv(SPACE,'iconmenu');
-				$menuicon->addStyle('background-color: gray');
-				$menuicon->setAttribute('onclick','javascript: call_triggerlog_menu(event, '.
-														zbx_jsvalue($item['itemid']).','.
-														zbx_jsvalue($item['description_expanded']).','.
-														$ltype.$triggers.');');
+				$menuicon = new CIcon(S_MENU,'iconmenu_b', 
+						'call_triggerlog_menu(event, '.zbx_jsvalue($item['itemid']).','.
+						zbx_jsvalue($item['description_expanded']).','.$ltype.$triggers.');');
 			}
-			else {
+			else{
 				$menuicon = SPACE;
 			}
 
