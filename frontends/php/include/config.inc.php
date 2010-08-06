@@ -99,11 +99,22 @@ function __autoload($class_name){
 
 	require_once('include/users.inc.php');
 // GLOBALS
-	global $USER_DETAILS, $USER_RIGHTS;
+	global $USER_DETAILS, $USER_RIGHTS, $page;
 
+	global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID, $ZBX_CONFIGURATION_FILE, $DB;
+	global $ZBX_SERVER, $ZBX_SERVER_PORT;
+	global $ZBX_LOCALES;
+// END OF GLOBALS
+
+	$page = array();
 	$USER_DETAILS	= array();
 	$USER_RIGHTS	= array();
-// END OF GLOBALS
+
+	$ZBX_LOCALNODEID = 0;
+	$ZBX_LOCMASTERID = 0;
+
+	$ZBX_CONFIGURATION_FILE = './conf/zabbix.conf.php';
+	$ZBX_CONFIGURATION_FILE = realpath(dirname($ZBX_CONFIGURATION_FILE)).'/'.basename($ZBX_CONFIGURATION_FILE);
 
 // Include Tactical Overview modules
 	require_once('include/locales.inc.php');
@@ -125,16 +136,6 @@ function __autoload($class_name){
 	/********** START INITIALIZATION *********/
 
 	set_error_handler('zbx_err_handler');
-
-	global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID, $ZBX_CONFIGURATION_FILE, $DB;
-	global $ZBX_SERVER, $ZBX_SERVER_PORT;
-	global $ZBX_LOCALES;
-
-	$ZBX_LOCALNODEID = 0;
-	$ZBX_LOCMASTERID = 0;
-
-	$ZBX_CONFIGURATION_FILE = './conf/zabbix.conf.php';
-	$ZBX_CONFIGURATION_FILE = realpath(dirname($ZBX_CONFIGURATION_FILE)).'/'.basename($ZBX_CONFIGURATION_FILE);
 
 	unset($show_setup);
 
@@ -196,7 +197,7 @@ function __autoload($class_name){
 		define('ZBX_DISTRIBUTED', false);
 		$show_setup = true;
 	}
-	
+
 	if(!defined('ZBX_PAGE_NO_AUTHORIZATION')){
 		check_authorisation();
 

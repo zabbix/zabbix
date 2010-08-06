@@ -237,8 +237,8 @@ $ZBX_MENU = array(
 	);
 
 
-function zbx_construct_menu(&$main_menu, &$sub_menus) {
-	global $page, $ZBX_MENU, $USER_DETAILS;
+function zbx_construct_menu(&$main_menu, &$sub_menus, &$page) {
+	global $ZBX_MENU, $USER_DETAILS;
 
 	$denyed_page_requested = false;
 
@@ -291,6 +291,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus) {
 
 			$sub_menu_active = ($page['file'] == $sub_page['url']);
 			$sub_menu_active |= (isset($sub_page['sub_pages']) && str_in_array($page['file'], $sub_page['sub_pages']));
+
 			if($sub_menu_active){
 // PERMISSION CHECK
 				$deny &= (($USER_DETAILS['type'] < $menu['user_type']) || ($USER_DETAILS['type'] < $sub_page['user_type']));
@@ -315,6 +316,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus) {
 			define('ZBX_NOT_ALLOW_ALL_NODES', 1);
 		}
 //SDI($label.' : '.$show_menu.' : '.$deny);
+
 		if($page_exists && $deny){
 			$denyed_page_requested = true;
 		}
@@ -343,9 +345,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus) {
 return $denyed_page_requested;
 }
 
-function zbx_define_menu_restrictions(){
-	global $page, $ZBX_MENU;
-
+function zbx_define_menu_restrictions($page, $ZBX_MENU){
 	foreach($ZBX_MENU as $sid => $section){
 		foreach($section['pages'] as $pid => $menu_page) {
 			if (($menu_page['url'] == $page['file']) || (isset($menu_page['sub_pages']) && str_in_array($page['file'], $menu_page['sub_pages']))) {
