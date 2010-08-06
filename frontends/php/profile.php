@@ -29,6 +29,8 @@ $page['file'] = 'profile.php';
 $page['hist_arg'] = array();
 $page['scripts'] = array('class.cviewswitcher.js');
 
+ob_start();
+
 include_once('include/page_header.php');
 
 ?>
@@ -56,6 +58,7 @@ $fields=array(
 	'enable_media'=>	array(T_ZBX_INT, O_OPT,	null, null, null),
 	'disable_media'=>	array(T_ZBX_INT, O_OPT,	null, null, null),
 	'messages'=>		array(T_ZBX_STR, O_OPT,	null, null, null),
+
 /* actions */
 	'save'=>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT, null, null),
 	'cancel'=>			array(T_ZBX_STR, O_OPT,	P_SYS, null, null),
@@ -155,21 +158,29 @@ $fields=array(
 			$result = DBend($result);
 			if(!$result) error(CUser::resetErrors());
 
-			show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
-
 			if($result){
 				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_USER,
-					'User alias ['.$USER_DETAILS['alias'].
-					'] name ['.$USER_DETAILS['name'].'] surname ['.
-					$USER_DETAILS['surname'].'] profile id ['.$USER_DETAILS['userid'].']');
+					'User alias ['.$USER_DETAILS['alias'].'] Name ['.$USER_DETAILS['name'].']'.
+					' Surname ['.$USER_DETAILS['surname'].'] profile id ['.$USER_DETAILS['userid'].']');
+
+				$url = CProfile::get('web.paging.lastpage', 'profile.php');
+				
+				ob_end_clean();
+				redirect($url);
+			}
+			else{
+				show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
 			}
 		}
 	}
+ob_end_flush();
 ?>
 <?php
 	$profile_wdgt = new CWidget();
 	$profile_wdgt->addPageHeader(S_USER_PROFILE_BIG.' : '.$USER_DETAILS['name'].' '.$USER_DETAILS['surname']);
-	$profile_wdgt->addItem(insert_user_form($USER_DETAILS['userid'],1));
+
+	$profileForm = getUserForm($USER_DETAILS['userid'],1);
+	$profile_wdgt->addItem($profileForm);
 	$profile_wdgt->show();
 ?>
 <?php
