@@ -26,85 +26,6 @@ require_once('include/js.inc.php');
 
 ?>
 <?php
-require_once('include/events.inc.php');
-require_once('include/actions.inc.php');
-require_once('include/js.inc.php');
-?>
-<?php
-	function screen_accessible($screenid,$perm){
-		global $USER_DETAILS;
-
-		$result = false;
-
-		if(DBfetch(DBselect('SELECT screenid FROM screens WHERE screenid='.$screenid.' AND '.DBin_node('screenid', get_current_nodeid($perm))))){
-			$result = true;
-
-			$db_result = DBselect('SELECT * FROM screens_items WHERE screenid='.$screenid);
-			while(($ac_data = DBfetch($db_result)) && $result){
-				if($ac_data['resourceid'] == 0) continue;
-
-				switch($ac_data['resourcetype']){
-					case SCREEN_RESOURCE_GRAPH:
-						if(!isset($graphids)){
-							$options = array();
-							$options['nodeids'] = get_current_nodeid(true);
-
-							if($perm == PERM_READ_WRITE) $options['editable'] = 1;
-							$graphids = CGraph::get($options);
-							$graphids = zbx_objectValues($graphids, 'graphid');
-							$graphids = zbx_toHash($graphids, 'graphid');
-						}
-
-						$result &= isset($graphids[$ac_data['resourceid']]);
-					break;
-					case SCREEN_RESOURCE_SIMPLE_GRAPH:
-						// break; /* use same processing as items */
-					case SCREEN_RESOURCE_PLAIN_TEXT:
-						if(!isset($itemid))
-							$itemid = $ac_data['resourceid'];
-
-						$options = array(
-							'countOutput' => 1,
-							'itemids' => $itemid,
-							'webitems' => 1,
-							'nodeids' => get_current_nodeid(true)
-						);
-
-						if($perm == PERM_READ_WRITE) $options['editable'] = 1;
-
-						$items = CItem::get($options);
-						if($items == 0) $result = false;
-
-						unset($itemid);
-						break;
-					case SCREEN_RESOURCE_MAP:
-						$sm = CMap::get(array(
-							'sysmapids' => $ac_data['resourceid'],
-							'output' => API_OUTPUT_SHORTEN,
-						));
-						$result &= !empty($sm);
-						break;
-					case SCREEN_RESOURCE_SCREEN:
-						$result &= screen_accessible($ac_data['resourceid'], PERM_READ_ONLY);
-						break;
-					case SCREEN_RESOURCE_SERVER_INFO:
-					case SCREEN_RESOURCE_HOSTS_INFO:
-					case SCREEN_RESOURCE_TRIGGERS_INFO:
-					case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
-					case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
-					case SCREEN_RESOURCE_HOST_TRIGGERS:
-					case SCREEN_RESOURCE_DATA_OVERVIEW:
-					case SCREEN_RESOURCE_CLOCK:
-					case SCREEN_RESOURCE_URL:
-					case SCREEN_RESOURCE_ACTIONS:
-					case SCREEN_RESOURCE_EVENTS:
-						/* skip */
-						break;
-				}
-			}
-		}
-		return $result;
-	}
 
 	function add_screen_item($resourcetype,$screenid,$x,$y,$resourceid,$width,$height,$colspan,$rowspan,$elements,$valign,$halign,$style,$url,$dynamic){
 		$sql='DELETE FROM screens_items WHERE screenid='.$screenid.' and x='.$x.' and y='.$y;
@@ -224,20 +145,24 @@ require_once('include/js.inc.php');
 		return DBfetch(DBselect('select * from slideshows where slideshowid='.$slideshowid));
 	}
 
-	function validate_slide(&$slide){
-		if(!screen_accessible($slide['screenid'], PERM_READ_ONLY)) return false;
-		if(!isset($slide['delay'])) $slide['delay'] = 0;
-
-	return true;
-	}
-
 	function add_slideshow($name, $delay, $slides){
 		if(empty($slides)){
 			error(S_SLIDESHOW_MUST_CONTAIN_SLIDES);
 			return false;
 		}
+
+		$screenids = zbx_objectValues($slides, 'screenid');
+		$screens = CScreen::get(array(
+			'screenids' => $screenids,
+			'output' => API_OUTPUT_SHORTEN,
+		));
+		$screens = ZBX_toHash($screens, 'screenid');
+		foreach($screenids as $screenid){
+			if(!isset($screens[$screenid])) return false;
+		}
+
 		foreach($slides as $slide){
-			if(!validate_slide($slide)) return false;
+			if(!isset($slide['delay'])) $slide['delay'] = 0;
 		}
 
 		$slideshowid = get_dbid('slideshows','slideshowid');
@@ -262,9 +187,19 @@ require_once('include/js.inc.php');
 			error(S_SLIDESHOW_MUST_CONTAIN_SLIDES);
 			return false;
 		}
+
+		$screenids = zbx_objectValues($slides, 'screenid');
+		$screens = CScreen::get(array(
+			'screenids' => $screenids,
+			'output' => API_OUTPUT_SHORTEN,
+		));
+		$screens = ZBX_toHash($screens, 'screenid');
+		foreach($screenids as $screenid){
+			if(!isset($screens[$screenid])) return false;
+		}
+
 		foreach($slides as $slide){
-			if(!validate_slide($slide))
-				return false;
+			if(!isset($slide['delay'])) $slide['delay'] = 0;
 		}
 
 		if(!$result = DBexecute('UPDATE slideshows SET name='.zbx_dbstr($name).',delay='.$delay.' WHERE slideshowid='.$slideshowid))
@@ -481,7 +416,7 @@ require_once('include/js.inc.php');
 				$graph['host'] = reset($graph['hosts']);
 
 				$caption = $graph['host']['host'].':'.$graph['name'];
-				
+
 				$nodeName = get_node_name_by_elid($graph['host']['hostid']);
 				if(!zbx_empty($nodeName))
 					$caption = '('.$nodeName.') '.$caption;
@@ -510,7 +445,7 @@ require_once('include/js.inc.php');
 
 			if(!empty($items)){
 				$id = $resourceid;
-				
+
 				$item = reset($items);
 				$item['host'] = reset($item['hosts']);
 
@@ -695,7 +630,11 @@ require_once('include/js.inc.php');
 				$result=DBselect($sql);
 
 				while($row=DBfetch($result)){
-					if(!screen_accessible($row['screenid'], PERM_READ_ONLY)) continue;
+					$r = CScreen::get(array(
+						'screenids' => $row['screenid'],
+						'output' => API_OUTPUT_SHORTEN
+					));
+					if(empty($r)) continue;
 					if(check_screen_recursion($_REQUEST['screenid'],$row['screenid'])) continue;
 
 					$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
@@ -863,7 +802,12 @@ require_once('include/js.inc.php');
 		global $USER_DETAILS;
 
 		if($screenid == 0) return new CTableInfo(S_NO_SCREENS_DEFINED);
-		if(!screen_accessible($screenid, ($editmode == 1)?PERM_READ_WRITE:PERM_READ_ONLY))
+		$r = CScreen::get(array(
+			'screenids' => $screenid,
+			'editable' => ($editmode == 1 ? 1 : null),
+			'output' => API_OUTPUT_SHORTEN
+		));
+		if(empty($r))
 			access_deny();
 
 		if(is_null($effectiveperiod))
