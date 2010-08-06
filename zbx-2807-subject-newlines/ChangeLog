@@ -1,5 +1,12 @@
-Changes for 1.8.3
+Changes for 1.8.3rc4
 
+ - [ZBX-2807] fixed email notifications being broken when their subjects have line breaks (asaveljevs)
+ - [ZBX-2203] fixed superfluous line breaks for values returned by eventlog[] (asaveljevs)
+ - [ZBX-2803] added detection of the proper type to use in place of socklen_t (asaveljevs)
+ - [ZBX-2822] fixed js error on node selection (Aly)
+ - [ZBX-2821] fixed reference to removed icons (Vedmak)
+ - [ZBX-2784] changed icons style (Vedmak)
+ - [ZBX-2820] fixed minor visual bugs (Vedmak)
  - [ZBX-2766] fixed triggers info in status of triggers page in fullscreen mode (Aly)
  
 Changes for 1.8.3rc3

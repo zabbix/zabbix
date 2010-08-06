@@ -104,9 +104,7 @@ include_once('include/page_header.php');
 	$latest_wdgt = new CWidget();
 
 // Header
-	$fs_icon = new CDiv(SPACE,'fullscreen');
-	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-	$fs_icon->addAction('onclick', 'javascript: document.location = "?fullscreen='.($_REQUEST['fullscreen']?'0':'1').'";');
+	$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
 	$latest_wdgt->addPageHeader(S_LATEST_DATA_BIG,$fs_icon);
 
 // 2nd header
@@ -179,7 +177,7 @@ include_once('include/page_header.php');
 	if(count($apps) > 35){
 		$apps = array_slice($apps, -35);
 	}
-	
+
 	/* limit opened application count */
 	// while(count($apps) > 25){
 		// array_shift($apps);
@@ -207,9 +205,10 @@ include_once('include/page_header.php');
 
 	$table=new CTableInfo();
 	$table->setHeader(array(
+		$link,
 		is_show_all_nodes()?make_sorting_header(S_NODE,'h.hostid') : null,
 		($_REQUEST['hostid'] ==0)?make_sorting_header(S_HOST,'h.host') : NULL,
-		make_sorting_header(array($link, SPACE, S_DESCRIPTION),'i.description'),
+		make_sorting_header(S_DESCRIPTION,'i.description'),
 		make_sorting_header(S_LAST_CHECK,'i.lastclock'),
 		S_LAST_VALUE,
 		S_CHANGE,
@@ -260,7 +259,7 @@ include_once('include/page_header.php');
 		$description = item_description($db_item);
 
 		if(!empty($_REQUEST['select']) && !zbx_stristr($description, $_REQUEST['select']) ) continue;
-		
+
 		if(strpos($db_item['units'], ',') !== false)
 			list($db_item['units'], $db_item['unitsLong']) = explode(',', $db_item['units']);
 		else
@@ -283,8 +282,8 @@ include_once('include/page_header.php');
 
 		$lastvalue = format_lastvalue($db_item);
 
-		if(isset($db_item['lastvalue']) && isset($db_item['prevvalue']) 
-				&& in_array($db_item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64)) 
+		if(isset($db_item['lastvalue']) && isset($db_item['prevvalue'])
+				&& in_array($db_item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
 				&& ($db_item['lastvalue']-$db_item['prevvalue'] != 0)){
 			if($db_item['lastvalue']-$db_item['prevvalue']<0){
 				$change=convert_units($db_item['lastvalue']-$db_item['prevvalue'],$db_item['units']);
@@ -308,9 +307,10 @@ include_once('include/page_header.php');
 		$item_status = $db_item['status']==3?'unknown': null;
 
 		array_push($app_rows, new CRow(array(
+			SPACE,
 			is_show_all_nodes()?SPACE:null,
 			($_REQUEST['hostid']>0)?NULL:SPACE,
-			new CCol(str_repeat(SPACE,6).$description, $item_status),
+			new CCol(SPACE.SPACE.$description, $item_status),
 			new CCol($lastclock, $item_status),
 			new CCol($lastvalue, $item_status),
 			new CCol($change, $item_status),
@@ -354,14 +354,15 @@ include_once('include/page_header.php');
 		$url.= url_param('groupid').url_param('hostid').url_param('fullscreen').url_param('select');
 		$link = new CLink($img,$url);
 
-		$col = new CCol(array($link,SPACE,bold($db_app['name']),SPACE.'('.$db_app['item_cnt'].SPACE.S_ITEMS.')'));
+		$col = new CCol(array(bold($db_app['name']),SPACE.'('.$db_app['item_cnt'].SPACE.S_ITEMS.')'));
 		$col->setColSpan(5);
 
 		$table->addRow(array(
-				get_node_name_by_elid($db_app['applicationid']),
-				($_REQUEST['hostid'] > 0)?NULL:$db_app['host'],
-				$col
-			));
+			$link,
+			get_node_name_by_elid($db_app['applicationid']),
+			($_REQUEST['hostid'] > 0)?NULL:$db_app['host'],
+			$col
+		));
 
 		foreach($app_rows as $row)
 			$table->addRow($row);
@@ -408,7 +409,7 @@ include_once('include/page_header.php');
 		$description = item_description($db_item);
 
 		if(!empty($_REQUEST['select']) && !zbx_stristr($description, $_REQUEST['select']) ) continue;
-		
+
 		if(strpos($db_item['units'], ',') !== false)
 			list($db_item['units'], $db_item['unitsLong']) = explode(',', $db_item['units']);
 		else
@@ -458,9 +459,10 @@ include_once('include/page_header.php');
 		}
 
 		array_push($app_rows, new CRow(array(
+			SPACE,
 			is_show_all_nodes()?($db_host['item_cnt']?SPACE:get_node_name_by_elid($db_item['itemid'])):null,
 			$_REQUEST['hostid']?NULL:($db_host['item_cnt']?SPACE:$db_item['host']),
-			str_repeat(SPACE, 6).$description,
+			SPACE.SPACE.$description,
 			$lastclock,
 			new CCol($lastvalue),
 			$change,
@@ -505,14 +507,15 @@ include_once('include/page_header.php');
 		$link = new CLink($img,$url);
 
 
-		$col = new CCol(array($link,SPACE,bold(S_MINUS_OTHER_MINUS),SPACE.'('.$db_host['item_cnt'].SPACE.S_ITEMS.')'));
+		$col = new CCol(array(bold(S_MINUS_OTHER_MINUS),SPACE.'('.$db_host['item_cnt'].SPACE.S_ITEMS.')'));
 		$col->setColSpan(5);
 
 		$table->addRow(array(
-				get_node_name_by_elid($db_host['hostid']),
-				($_REQUEST['hostid'] > 0)?NULL:$db_host['host'],
-				$col
-				));
+			$link,
+			get_node_name_by_elid($db_host['hostid']),
+			($_REQUEST['hostid'] > 0)?NULL:$db_host['host'],
+			$col
+		));
 
 		foreach($app_rows as $row)
 			$table->addRow($row);

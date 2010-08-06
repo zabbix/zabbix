@@ -233,10 +233,9 @@ private $items;
 		}
 
 		if(!is_null($this->state)){
-			$icon = new CDiv(SPACE, $this->state?'arrowup':'arrowdown');
+			$icon = new CIcon(S_SHOW.'/'.S_HIDE, $this->state?'arrowup':'arrowdown',
+					"change_hat_state(this,'".$this->domid."');");
 			$icon->setAttribute('id',$this->domid.'_icon');
-			$icon->setAttribute('title',S_SHOW.'/'.S_HIDE);
-			$icon->addAction('onclick', "javascript: change_hat_state(this,'".$this->domid."');");
 			$right_row[] = new CCol($icon);
 		}
 
