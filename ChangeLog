@@ -7,6 +7,7 @@ Changes for 1.9
 
 Changes for 1.8.3rc4
 
+ - [ZBX-2829] fixed web item graphs favourites (Vedmak)
  - [ZBX-2812] updated french translation; thanks to Alixen (Vedmak)
  - [ZBX-2823] updated russian translation; thanks to Pustovalov Alexey (Vedmak)
  - [ZBX-2817] fixed history links for history and media types (Vedmak)
