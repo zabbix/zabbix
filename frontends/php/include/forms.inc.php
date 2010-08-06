@@ -607,7 +607,7 @@
 	}
 
 // Insert form for User
-	function insert_user_form($userid, $profile=0){
+	function getUserForm($userid, $profile=0){
 		global $ZBX_LOCALES;
 		global $USER_DETAILS;
 
@@ -1022,7 +1022,7 @@
 		$frmUser->addItemToBottomRow(SPACE);
 		$frmUser->addItemToBottomRow(new CButtonCancel(url_param("config")));
 
-		return $frmUser;
+	return $frmUser;
 	}
 
 // Insert form for User Groups
