@@ -190,6 +190,35 @@ AC_MSG_RESULT(yes),
 [AC_DEFINE(socklen_t, int, [Define socklen_t type])
 AC_MSG_RESULT(no)])
 
+dnl Check for actual socklen_t parameter type in socket functions
+AC_MSG_CHECKING(for actual socklen_t parameter type in socket functions)
+zbx_socklen_t=
+for arg2 in "struct sockaddr" void; do
+  for arg3 in socklen_t size_t int; do
+    AC_TRY_COMPILE([
+      #ifdef HAVE_SYS_TYPES_H
+      #  include <sys/types.h>
+      #endif
+      #ifdef HAVE_SYS_SOCKET_H
+      #  include <sys/socket.h>
+      #endif
+      extern int getpeername(int sockfd, $arg2 *addr, $arg3 *addrlen);
+    ],[
+      $arg3 addrlen;
+      getpeername(0, 0, &addrlen);
+    ],[
+      zbx_socklen_t="$arg3"
+      break 2
+    ])
+  done
+done
+if test "x$zbx_socklen_t" != "x"; then
+  AC_MSG_RESULT($zbx_socklen_t)
+  AC_DEFINE_UNQUOTED(ZBX_SOCKLEN_T, $zbx_socklen_t, [Define actual socklen_t parameter type in socket functions])
+else
+  AC_MSG_RESULT(leaving undefined)
+fi
+
 dnl Check for /proc filesystem
 AC_MSG_CHECKING(for /proc filesystem)
 if test -d /proc; then
