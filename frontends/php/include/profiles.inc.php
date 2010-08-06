@@ -284,9 +284,10 @@ function add_user_history($page){
 		$url = '';
 		foreach($page['hist_arg'] as $arg){
 			if(isset($_REQUEST[$arg])){
-				$url .= ((empty($url))? '?' : '&').$arg.'='.$_REQUEST[$arg];
+				$url .= url_param($arg, true);
 			}
 		}
+		$url[0] = '?';
 		$url = $page['file'].$url;
 	}
 	else{
