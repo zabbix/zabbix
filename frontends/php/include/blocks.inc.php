@@ -54,7 +54,8 @@ function make_favorite_graphs(){
 	$options = array(
 			'itemids' => $itemids,
 			'select_hosts' => API_OUTPUT_EXTEND,
-			'output' => API_OUTPUT_EXTEND
+			'output' => API_OUTPUT_EXTEND,
+			'webitems' => 1,
 		);
 	$items = CItem::get($options);
 	$items = zbx_toHash($items, 'itemid');
@@ -1225,7 +1226,8 @@ function make_graph_submenu(){
 			'itemids' => $itemids,
 			'nopermissions' => 1,
 			'select_hosts' => API_OUTPUT_EXTEND,
-			'output' => API_OUTPUT_EXTEND
+			'output' => API_OUTPUT_EXTEND,
+			'webitems' => 1,
 		);
 	$items = CItem::get($options);
 	$items = zbx_toHash($items, 'itemid');
