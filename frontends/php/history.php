@@ -379,8 +379,7 @@ include_once('include/page_header.php');
 
 				$data['value'] = trim($data['value'],"\r\n");
 				$data['value'] = encode_log($data['value']);
-
-				array_push($row, zbx_nl2br($data['value']));
+				array_push($row, new CCol($data['value'], 'pre'));
 
 				$crow = new CRow($row);
 				if(is_null($color_style)){
