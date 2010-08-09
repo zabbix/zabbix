@@ -105,6 +105,7 @@ class CFormTable extends CForm{
 		else {
 			return $this->error('Incorrect value for setHelp ['.$value.']');
 		}
+
 	return 0;
 	}
 
@@ -189,8 +190,13 @@ class CFormTable extends CForm{
 			$col = new CCol(NULL,'form_row_first');
 			$col->setColSpan(2);
 
-			if(isset($this->help))			$col->addItem($this->help);
-			if(isset($this->title))		 	$col->addItem($this->title);
+			if(isset($this->help)){
+				$col->addItem($this->help);
+			}
+
+			if(isset($this->title)){
+				$col->addItem($this->title);
+			}
 
 			$tbl->setHeader($col);
 		}

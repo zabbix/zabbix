@@ -174,9 +174,9 @@ else if(isset($_REQUEST['next'])){
 
 	$help->setHint($help_table);
 
-	show_table_header(array($help,S_LOCALES));
+	show_table_header(S_LOCALES);
 
-	$frmLcls = new CFormTable(S_CREATE.SPACE.S_LOCALE_SMALL.SPACE.S_FROM_SMALL.SPACE.$ZBX_LOCALES[$_REQUEST['srclang']],'locales.php?action=1','post',null,'form');
+	$frmLcls = new CFormTable(SPACE.S_CREATE.SPACE.S_LOCALE_SMALL.SPACE.S_FROM_SMALL.SPACE.$ZBX_LOCALES[$_REQUEST['srclang']],'locales.php?action=1','post',null,'form');
 	$frmLcls->setAttribute('id','locales');
 	$frmLcls->setHelp($help);
 
