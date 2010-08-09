@@ -287,7 +287,12 @@ require_once('include/js.inc.php');
 			if($item['valuemapid'] > 0)
 				$value = replace_value_by_map($value, $item['valuemapid']);
 
-			$table->addRow(array(zbx_date2str(S_SCREENS_PLAIN_TEXT_DATE_FORMAT,$data['clock']),	$value));
+			$table->addRow(
+					array(
+						zbx_date2str(S_SCREENS_PLAIN_TEXT_DATE_FORMAT,$data['clock']),
+						new CCol($value, 'pre')
+					)
+				);
 		}
 
 	return $table;
