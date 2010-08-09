@@ -380,10 +380,10 @@ include_once('include/page_header.php');
 				$data['value'] = trim($data['value'],"\r\n");
 				$data['value'] = encode_log($data['value']);
 				
-				$data['value'] = zbx_str_replace(' ', '&nbsp;', $data['value']);
-				$data['value'] = zbx_str_replace("\t", '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', $data['value']);
-				$data['value'] = zbx_nl2br($data['value']);
-				array_push($row, new CCol($data['value']));
+//				$data['value'] = str_replace(' ', '&nbsp;', $data['value']);
+//				$data['value'] = str_replace("\t", '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', $data['value']);
+//				$data['value'] = zbx_nl2br($data['value']);
+				array_push($row, new CCol($data['value'], 'pre'));
 
 				$crow = new CRow($row);
 				if(is_null($color_style)){
