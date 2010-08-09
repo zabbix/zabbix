@@ -202,11 +202,21 @@ div.iconconfig_hl{
 	background-image: url('../images/general/bttn/config_hl.png');
 }
 div.filterclosed{
+	height: 9px;
+	width: 9px;
 	background-image: url('../images/general/closed.gif');
+	background-repeat:no-repeat;
+	cursor:pointer;
 }
+
 div.filteropened{
+	height: 9px;
+	width: 9px;
 	background-image: url('../images/general/opened.gif');
+	background-repeat:no-repeat;
+	cursor:pointer;
 }
+
 div.iconsound{
 	background-image: url('../images/general/bttn/sound.png');
 }
