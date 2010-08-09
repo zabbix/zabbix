@@ -748,19 +748,6 @@ function zbx_strrpos($haystack, $needle){
 	}
 }
 
-function zbx_str_replace($search, $replace, $subject){ 
-	if(defined('ZBX_MBSTRINGS_ENABLED')){
-		$offset = 0; 
-		while(false !== ($pos = mb_strpos($subject, $search, $offset))){ 
-			$offset = $pos + mb_strlen($replace); 
-			$subject = mb_substr($subject, 0, $pos) . $replace . mb_substr($subject, $pos + mb_strlen($search)); 
-		}
-	}
-	else{
-		$subject = str_replace($search, $replace, $subject);
-	}
-    return $subject; 
-} 
 // }}} STRING FUNCTIONS
 
 
