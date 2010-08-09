@@ -49,7 +49,8 @@ class CHostGroup extends CZBXAPI{
 			'from' 		=> array('groups' => 'groups g'),
 			'where' 	=> array(),
 			'order' 	=> array(),
-			'limit' 	=> null);
+			'limit' 	=> null
+		);
 
 		$def_options = array(
 			'nodeids'					=> null,
@@ -524,7 +525,6 @@ COpt::memoryPick();
 			}
 		}
 
-
 COpt::memoryPick();
 // removing keys (hash -> array)
 		if(is_null($options['preservekeys'])){
@@ -543,7 +543,7 @@ COpt::memoryPick();
 	public static function getObjects($hostgroupData){
 		$options = array(
 			'filter' => $hostgroupData,
-			'output'=>API_OUTPUT_EXTEND
+			'output' => API_OUTPUT_EXTEND
 		);
 
 		if(isset($hostgroupData['node']))

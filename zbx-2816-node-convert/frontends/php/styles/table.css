@@ -434,6 +434,10 @@ table.tableinfo tr td.message {
 	text-align: center;
 }
 
+table.tableinfo tr td.pre {
+	white-space: pre;
+}
+
 table.tableinfo tr.selected > td { background-color: #FFFFBB; }
 table.tableinfo tr.selected:hover > td { background-color: #BBCCFF; }
 

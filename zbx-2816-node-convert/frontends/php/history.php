@@ -25,7 +25,7 @@ require_once('include/graphs.inc.php');
 
 $page['file']	= 'history.php';
 $page['title']	= 'S_HISTORY';
-$page['hist_arg'] = array('itemid', 'hostid', 'groupid', 'graphid', 'period', 'dec', 'inc', 'left', 'right', 'stime');
+$page['hist_arg'] = array('itemid', 'hostid', 'groupid', 'graphid', 'period', 'dec', 'inc', 'left', 'right', 'stime', 'action');
 $page['scripts'] = array('effects.js','dragdrop.js','class.calendar.js','gtlc.js');
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
@@ -379,8 +379,11 @@ include_once('include/page_header.php');
 
 				$data['value'] = trim($data['value'],"\r\n");
 				$data['value'] = encode_log($data['value']);
-
-				array_push($row, zbx_nl2br($data['value']));
+				
+				$data['value'] = zbx_str_replace(' ', '&nbsp;', $data['value']);
+				$data['value'] = zbx_str_replace("\t", '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', $data['value']);
+				$data['value'] = zbx_nl2br($data['value']);
+				array_push($row, new CCol($data['value']));
 
 				$crow = new CRow($row);
 				if(is_null($color_style)){

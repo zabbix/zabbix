@@ -393,7 +393,6 @@ COpt::compare_files_with_menu($ZBX_MENU);
 			$search_div->setAttribute('class','zbx_search');
 			
 			zbx_add_post_js("var sid = createSuggest('search');");
-			zbx_add_post_js("var msglistid = initMessages({});");
 		}
 
 		$sub_menu_table->addRow(array($menu_divs, $search_div));
@@ -435,13 +434,8 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		access_deny();
 	}
 
-	if(version_compare(phpversion(), '5.1.0RC1', '>=') && $page['type'] == PAGE_TYPE_HTML){
-		$tmezone = ini_get('date.timezone');
-		if(empty($tmezone)) {
-			info(S_TIMEZONE_FOR_PHP_IS_NOT_SET_PLEASE_SET);
-			date_default_timezone_set('UTC');
-		}
-		unset($tmezone);
+	if($page['type'] == PAGE_TYPE_HTML){
+		zbx_add_post_js("var msglistid = initMessages({});");
 	}
 
 	show_messages();

@@ -167,7 +167,13 @@ addMessage: function(newMessage){
 	newMessage.messageid = this.msgcounter;
 
 	this.messageList[this.msgcounter] = new CMessage(this, newMessage);
-	this.messageLast[this.messageList[this.msgcounter].caption] = this.messageList[this.msgcounter];
+	this.messageLast[this.messageList[this.msgcounter].caption] = {
+		'caption': this.messageList[this.msgcounter].caption,
+		'sourceid': this.messageList[this.msgcounter].sourceid,
+		'time': this.messageList[this.msgcounter].time,
+		'messageid': this.messageList[this.msgcounter].messageid
+	};
+
 
 	$(this.dom.container).show();
 
