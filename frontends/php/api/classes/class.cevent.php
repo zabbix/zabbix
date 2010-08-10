@@ -64,7 +64,7 @@ class CEvent extends CZBXAPI{
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
 
 		$sql_parts = array(
-			'select' => array('events' => 'e.eventid'),
+			'select' => array('events' => array('e.eventid')),
 			'from' => array('events' => 'events e'),
 			'where' => array(),
 			'order' => array(),
@@ -276,10 +276,11 @@ class CEvent extends CZBXAPI{
 
 			$sql_parts['where'][] = DBcondition('e.value', $options['value']);
 		}
-// extendoutput
+// output
 		if($options['output'] == API_OUTPUT_EXTEND){
-			$sql_parts['select']['events'] = 'e.*';
+			$sql_parts['select']['events'] = array('e.*');
 		}
+
 // countOutput
 		if(!is_null($options['countOutput'])){
 			$options['sortfield'] = '';
@@ -299,8 +300,9 @@ class CEvent extends CZBXAPI{
 				$sql_parts['where']['o'] = '(e.object-0)='.EVENT_OBJECT_TRIGGER;
 			}
 
-			if(!str_in_array('e.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('e.*', $sql_parts['select'])){
-				$sql_parts['select'][] = 'e.'.$options['sortfield'];
+			$eventFields = $sql_parts['select']['events'];
+			if(!str_in_array('e.'.$options['sortfield'], $eventFields) && !str_in_array('e.*', $eventFields)){
+				$sql_parts['select']['events'][] = 'e.'.$options['sortfield'];
 			}
 		}
 
@@ -308,11 +310,20 @@ class CEvent extends CZBXAPI{
 		if(zbx_ctype_digit($options['limit']) && $options['limit']){
 			$sql_parts['limit'] = $options['limit'];
 		}
-//---------------
 
+// select_********
+		if(($options['output'] != API_OUTPUT_EXTEND) && (!is_null($options['select_hosts']) || !is_null($options['select_triggers']) || !is_null($options['select_items'])))
+		{
+			$sql_parts['select']['events'][] = 'e.object';
+			$sql_parts['select']['events'][] = 'e.objectid';
+		}
+//---------------
 
 		$eventids = array();
 		$triggerids = array();
+
+// Event fields
+		$sql_parts['select']['events'] = implode(',', array_unique($sql_parts['select']['events']));
 
 		$sql_parts['select'] = array_unique($sql_parts['select']);
 		$sql_parts['from'] = array_unique($sql_parts['from']);
@@ -347,7 +358,7 @@ class CEvent extends CZBXAPI{
 					$result[$event['eventid']] = array('eventid' => $event['eventid']);
 				}
 				else{
-					if($event['object'] == EVENT_OBJECT_TRIGGER){
+					if(isset($event['object']) && ($event['object'] == EVENT_OBJECT_TRIGGER)){
 						$triggerids[$event['objectid']] = $event['objectid'];
 					}
 
