@@ -7,6 +7,7 @@ Changes for 1.9
 
 Changes for 1.8.3rc4
 
+ - [ZBX-2848] fixed permission check for favorites menus (Aly)
  - [ZBX-2846] fixed undefined variables in "History of actions" screen element (Aly)
  - [ZBX-2838] fixed icons in GUI (Aly)
  - [ZBX-2816] fixed corruption of actions and screens in the database when doing node conversion (asaveljevs)
