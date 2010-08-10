@@ -62,7 +62,7 @@ class CTag extends CObject{
 	public function showEnd(){		echo $this->endToString();	}
 
 	public function startToString(){
-		$res = "\n".$this->tag_start.'<'.$this->tagname;
+		$res = "\r".$this->tag_start.'<'.$this->tagname;
 		foreach($this->attributes as $key => $value){
 			$res .= ' '.$key.'="'.$value.'"';
 		}
@@ -81,7 +81,7 @@ class CTag extends CObject{
 
 	public function endToString(){
 		$res = ($this->paired==='yes') ? $this->tag_body_end.'</'.$this->tagname.'>' : '';
-		$res .= $this->tag_end."\n";
+		$res .= $this->tag_end."\r";
 	return $res;
 	}
 
