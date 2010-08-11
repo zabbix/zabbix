@@ -481,8 +481,6 @@ class CStringParser {
 	private function validateFatal() {
 		if(count($this->levelData) == 1) return true;
 
-
-		SDI(count($this->levelData));
 		$this->errors[] = Array('errorCode' => 1,
                                         'errorMsg' => 'Fatal error, '.$this->levelData[count($this->levelData)-1]['levelType'].' ending symbol not found. '.$this->levelData[count($this->levelData)-1]['levelType'].' begins at char '.($this->levelData[count($this->levelData)-1]['openSymbolNum']+1),
 					'errStart' => $this->levelData[count($this->levelData)-1]['openSymbolNum'],
