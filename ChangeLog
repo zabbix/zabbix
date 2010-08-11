@@ -1,3 +1,7 @@
+Changes for 1.8.3
+
+ - [ZBX-2855] fixed new line symbol for latest opera browser (Aly)
+ 
 Changes for 1.8.3rc4
 
  - [ZBX-2226] fixed template item update, when linked to host with existing item with same key (Aly)
