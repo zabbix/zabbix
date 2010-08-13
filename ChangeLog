@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBX-2875] updated Japanese translation; thanks to Kodai Terashima (Richlv)
  - [ZBX-2856] removed debug info (Aly)
  - [ZBX-2855] fixed new line symbol for latest opera browser (Aly)
  
