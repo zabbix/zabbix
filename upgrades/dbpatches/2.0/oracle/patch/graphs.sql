@@ -5,7 +5,7 @@ ALTER TABLE graphs MODIFY ymin_itemid NULL;
 ALTER TABLE graphs MODIFY ymax_itemid DEFAULT NULL;
 ALTER TABLE graphs MODIFY ymax_itemid NULL;
 UPDATE graphs SET templateid=NULL WHERE templateid=0;
---UPDATE graphs SET templateid=NULL WHERE NOT templateid IS NULL AND NOT templateid IN (SELECT graphid FROM graphs);
+UPDATE graphs SET templateid=NULL WHERE NOT templateid IS NULL AND NOT templateid IN (SELECT graphid FROM graphs);
 UPDATE graphs SET ymin_itemid=NULL WHERE ymin_itemid=0;
 UPDATE graphs SET ymax_itemid=NULL WHERE ymax_itemid=0;
 ALTER TABLE graphs ADD CONSTRAINT c_graphs_1 FOREIGN KEY (templateid) REFERENCES graphs (graphid) ON DELETE CASCADE;

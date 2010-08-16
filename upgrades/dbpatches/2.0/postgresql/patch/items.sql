@@ -6,7 +6,7 @@ ALTER TABLE ONLY items ALTER templateid DROP NOT NULL;
 ALTER TABLE ONLY items ALTER valuemapid DROP DEFAULT;
 ALTER TABLE ONLY items ALTER valuemapid DROP NOT NULL;
 UPDATE items SET templateid=NULL WHERE templateid=0;
---UPDATE items SET templateid=NULL WHERE NOT templateid IS NULL AND NOT templateid IN (SELECT itemid FROM items);
+UPDATE items SET templateid=NULL WHERE NOT templateid IS NULL AND NOT templateid IN (SELECT itemid FROM items);
 UPDATE items SET valuemapid=NULL WHERE valuemapid=0;
 UPDATE items SET valuemapid=NULL WHERE NOT valuemapid IS NULL AND NOT valuemapid IN (SELECT valuemapid from valuemaps);
 UPDATE items SET units='Bps' WHERE type=9 AND units='bps';
