@@ -5,6 +5,10 @@ Changes for 1.9
  - [DEV-449] added system.localtime[local] check (Sasha)
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
+Changes for 1.8.4rc1
+
+ - [ZBX-2716] make all example initscripts point to sbin for daemon path (Richlv)
+
 Changes for 1.8.3
 
  - [ZBX-2875] updated Japanese translation; thanks to Kodai Terashima (Richlv)
