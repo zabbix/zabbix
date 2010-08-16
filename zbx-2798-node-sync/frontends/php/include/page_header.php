@@ -22,11 +22,6 @@
 	require_once('include/config.inc.php');
 	require_once('include/perm.inc.php');
 
-	global $USER_DETAILS;
-	global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID, $ZBX_VIEWED_NODES, $ZBX_AVAILABLE_NODES;
-	global $ZBX_CURMASTERID;
-	global $page;
-
 	if(!isset($page['type'])) $page['type'] = PAGE_TYPE_HTML;
 	if(!isset($page['file'])) $page['file'] = basename($_SERVER['PHP_SELF']);
 
@@ -34,7 +29,7 @@
 
 	require_once('include/menu.inc.php');
 
-	zbx_define_menu_restrictions();
+	zbx_define_menu_restrictions($page, $ZBX_MENU);
 
 	/* Init CURRENT NODE ID */
 	init_nodes();
@@ -90,7 +85,7 @@
 			}
 
 			if(ZBX_DISTRIBUTED){
-				if($ZBX_VIEWED_NODES['selected'] == 0){ // ALL selected
+				if(isset($ZBX_VIEWED_NODES) && ($ZBX_VIEWED_NODES['selected'] == 0)){ // ALL selected
 					$page_title .= ' ('.S_ALL_NODES.') ';
 				}
 				else if(!empty($ZBX_NODES)){
@@ -107,7 +102,8 @@
 	// construc menu
 	$main_menu	= array();
 	$sub_menus	= array();
-	$denyed_page_requested = zbx_construct_menu($main_menu, $sub_menus);
+
+	$denyed_page_requested = zbx_construct_menu($main_menu, $sub_menus, $page);
 
 	zbx_flush_post_cookies($denyed_page_requested);
 
@@ -127,6 +123,8 @@
 
 <?php
 	if(isset($DB['DB']) && !is_null($DB['DB'])){
+		$config = select_config();
+
 		$css = getUserTheme($USER_DETAILS);
 		$config=select_config();
 		if($css){
@@ -140,7 +138,6 @@
 ?>
 <script type="text/javascript">	var PHP_TZ_OFFSET = <?php echo date('Z'); ?>;</script>
 <?php
-
 	$path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&lang='.$USER_DETAILS['lang'];
 	print('<script type="text/javascript" src="'.$path.'"></script>'."\n");
 
@@ -292,7 +289,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 				$div_node_tree->addItem($node_tree->getHTML());
 
 				$div_node_tree->addItem(new CButton('select_nodes', S_SELECT, "javascript: ".
-																				" hidePopupDiv('select_iframe');".	//IE6 fix
+																				" if(IE6) hidePopupDiv('select_iframe');".	//IE6 fix
 																				" \$('div_node_tree').setStyle({display:'none'});"));
 
 				$div_node_tree->setAttribute('id', 'div_node_tree');
@@ -396,7 +393,6 @@ COpt::compare_files_with_menu($ZBX_MENU);
 			$search_div->setAttribute('class','zbx_search');
 			
 			zbx_add_post_js("var sid = createSuggest('search');");
-			zbx_add_post_js("var msglistid = initMessages({});");
 		}
 
 		$sub_menu_table->addRow(array($menu_divs, $search_div));
@@ -438,13 +434,8 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		access_deny();
 	}
 
-	if(version_compare(phpversion(), '5.1.0RC1', '>=') && $page['type'] == PAGE_TYPE_HTML){
-		$tmezone = ini_get('date.timezone');
-		if(empty($tmezone)) {
-			info(S_TIMEZONE_FOR_PHP_IS_NOT_SET_PLEASE_SET);
-			date_default_timezone_set('UTC');
-		}
-		unset($tmezone);
+	if($page['type'] == PAGE_TYPE_HTML){
+		zbx_add_post_js("var msglistid = initMessages({});");
 	}
 
 	show_messages();

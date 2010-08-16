@@ -54,7 +54,8 @@ function make_favorite_graphs(){
 	$options = array(
 			'itemids' => $itemids,
 			'select_hosts' => API_OUTPUT_EXTEND,
-			'output' => API_OUTPUT_EXTEND
+			'output' => API_OUTPUT_EXTEND,
+			'webitems' => 1,
 		);
 	$items = CItem::get($options);
 	$items = zbx_toHash($items, 'itemid');
@@ -267,7 +268,7 @@ function make_system_status($filter){
 		'groupids' => $groupids,
 		'monitored' => 1,
 		'maintenance' => $filter['maintenance'],
-		'expand_data' => 1,
+		'expandData' => 1,
 		'skipDependent' => 1,
 		'expandDescription' => 1,
 		'filter' => array(
@@ -488,7 +489,7 @@ function make_hoststat_summary($filter){
 		'nodeids' => get_current_nodeid(),
 		'monitored' => 1,
 		'maintenance' => $filter['maintenance'],
-		'expand_data' => 1,
+		'expandData' => 1,
 		'filter' => array(
 			'priority' => $filter['severity'],
 			'value' => TRIGGER_VALUE_TRUE
@@ -1214,8 +1215,7 @@ function make_graph_submenu(){
 
 	$options = array(
 			'graphids' => $graphids,
-			'nopermissions' => API_OUTPUT_EXTEND,
-			'select_hosts' => API_OUTPUT_EXTEND,
+			'select_hosts' => array('hostid', 'host'),
 			'output' => API_OUTPUT_EXTEND
 		);
 	$graphs = CGraph::get($options);
@@ -1223,14 +1223,14 @@ function make_graph_submenu(){
 
 	$options = array(
 			'itemids' => $itemids,
-			'nopermissions' => 1,
-			'select_hosts' => API_OUTPUT_EXTEND,
-			'output' => API_OUTPUT_EXTEND
+			'select_hosts' => array('hostid', 'host'),
+			'output' => API_OUTPUT_EXTEND,
+			'webitems' => 1,
 		);
 	$items = CItem::get($options);
 	$items = zbx_toHash($items, 'itemid');
 
-	$graphids = array();
+	$favGraphs = array();
 
 	foreach($fav_graphs as $key => $favorite){
 		$source = $favorite['source'];
@@ -1245,7 +1245,7 @@ function make_graph_submenu(){
 
 			$item['description'] = item_description($item);
 
-			$graphids[] = array(
+			$favGraphs[] = array(
 							'name'	=>	$host['host'].':'.$item['description'],
 							'favobj'=>	'itemid',
 							'favid'	=>	$sourceid,
@@ -1259,7 +1259,7 @@ function make_graph_submenu(){
 			$graph = $graphs[$sourceid];
 			$ghost = reset($graph['hosts']);
 
-			$graphids[] = array(
+			$favGraphs[] = array(
 							'name'	=>	$ghost['host'].':'.$graph['name'],
 							'favobj'=>	'graphid',
 							'favid'	=>	$sourceid,
@@ -1269,7 +1269,7 @@ function make_graph_submenu(){
 	}
 
 	if(isset($graph_added)){
-			$graphids[] = array(
+			$favGraphs[] = array(
 			'name'	=>	S_REMOVE.SPACE.S_ALL_S.SPACE.S_GRAPHS,
 			'favobj'=>	'graphid',
 			'favid'	=>	0,
@@ -1278,7 +1278,7 @@ function make_graph_submenu(){
 	}
 
 	if(isset($item_added)){
-		$graphids[] = array(
+		$favGraphs[] = array(
 			'name'	=>	S_REMOVE.SPACE.S_ALL_S.SPACE.S_SIMPLE_GRAPHS,
 			'favobj'=>	'itemid',
 			'favid'	=>	0,
@@ -1286,7 +1286,7 @@ function make_graph_submenu(){
 		);
 	}
 
-return $graphids;
+return $favGraphs;
 }
 
 function make_sysmap_menu(&$menu,&$submenu){
@@ -1310,7 +1310,7 @@ function make_sysmap_menu(&$menu,&$submenu){
 function make_sysmap_submenu(){
 	$fav_sysmaps = get_favorites('web.favorite.sysmapids');
 
-	$maps = array();
+	$favMaps = array();
 	$sysmapids = array();
 	foreach($fav_sysmaps as $key => $favorite){
 		$sysmapids[$favorite['value']] = $favorite['value'];
@@ -1318,13 +1318,12 @@ function make_sysmap_submenu(){
 
 	$options = array(
 			'sysmapids' => $sysmapids,
-			'nopermissions' => 1,
 			'output' => API_OUTPUT_EXTEND,
 		);
 	$sysmaps = CMap::get($options);
 
 	foreach($sysmaps as $snum => $sysmap){
-		$maps[] = array(
+		$favMaps[] = array(
 				'name'	=>	$sysmap['name'],
 				'favobj'=>	'sysmapid',
 				'favid'	=>	$sysmap['sysmapid'],
@@ -1332,8 +1331,8 @@ function make_sysmap_submenu(){
 			);
 	}
 
-	if(!empty($maps)){
-		$maps[] = array(
+	if(!empty($favMaps)){
+		$favMaps[] = array(
 				'name'	=>	S_REMOVE.SPACE.S_ALL_S.SPACE.S_MAPS,
 				'favobj'=>	'sysmapid',
 				'favid'	=>	0,
@@ -1341,7 +1340,7 @@ function make_sysmap_submenu(){
 			);
 	}
 
-return $maps;
+return $favMaps;
 }
 
 function make_screen_menu(&$menu,&$submenu){
@@ -1374,42 +1373,59 @@ function make_screen_menu(&$menu,&$submenu){
 }
 
 function make_screen_submenu(){
-	$screenids = array();
-
 	$fav_screens = get_favorites('web.favorite.screenids');
 
+	$screenids = array();
+	foreach($fav_screens as $key => $favorite){
+		if('screenid' == $favorite['source']){
+			$screenids[$favorite['value']] = $favorite['value'];
+		}
+	}
+
+	$options = array(
+		'screenids' => $screenids,
+		'output' => API_OUTPUT_EXTEND,
+	);
+	$screens = CScreen::get($options);
+	$screens = zbx_toHash($screens, 'screenid');
+
+	$favScreens = array();
 	foreach($fav_screens as $key => $favorite){
 		$source = $favorite['source'];
 		$sourceid = $favorite['value'];
 
 		if('slideshowid' == $source){
+			if(!slideshow_accessible($sourceid, PERM_READ_ONLY)) continue;
 			if(!$slide = get_slideshow_by_slideshowid($sourceid)) continue;
+			
 			$slide_added = true;
 
-			$screenids[] = array(
-								'name'	=>	$slide['name'],
-								'favobj'=>	'slideshowid',
-								'favid'	=>	$sourceid,
-								'action'=>	'remove'
-							);
+			$favScreens[] = array(
+				'name'	=>	$slide['name'],
+				'favobj'=>	'slideshowid',
+				'favid'	=>	$slide['slideshowid'],
+				'action'=>	'remove'
+			);
 
 		}
 		else{
-			if(!$screen = get_screen_by_screenid($sourceid)) continue;
+			if(!isset($screens[$sourceid])) continue;
+			$screen = $screens[$sourceid];
+
 			$screen_added = true;
 
-			$screenids[] = array(
-								'name'	=>	$screen['name'],
-								'favobj'=>	'screenid',
-								'favid'	=>	$sourceid,
-								'action'=>	'remove'
-							);
+			$favScreens[] = array(
+				'name'	=>	$screen['name'],
+				'favobj'=>	'screenid',
+				'favid'	=>	$screen['screenid'],
+				'action'=>	'remove'
+			);
 		}
 	}
 
 
 	if(isset($screen_added)){
-		$screenids[] = array(
+		$favScreens[] = array(
 			'name'	=>	S_REMOVE.SPACE.S_ALL_S.SPACE.S_SCREENS,
 			'favobj'=>	'screenid',
 			'favid'	=>	0,
@@ -1418,7 +1434,7 @@ function make_screen_submenu(){
 	}
 
 	if(isset($slide_added)){
-		$screenids[] = array(
+		$favScreens[] = array(
 			'name'	=>	S_REMOVE.SPACE.S_ALL_S.SPACE.S_SLIDES,
 			'favobj'=>	'slideshowid',
 			'favid'	=>	0,
@@ -1426,7 +1442,7 @@ function make_screen_submenu(){
 		);
 	}
 
-return $screenids;
+return $favScreens;
 }
 
 ?>

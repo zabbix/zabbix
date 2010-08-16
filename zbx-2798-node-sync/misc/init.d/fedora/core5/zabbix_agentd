@@ -16,7 +16,7 @@
 RETVAL=0
 prog="Zabbix Agent"
 CONFIG_FILE="/etc/zabbix/zabbix_agentd.conf"
-ZABBIX_BIN="/usr/bin/zabbix_agentd"
+ZABBIX_BIN="/usr/sbin/zabbix_agentd"
 
 test -x $ZABBIX_BIN || exit 0
 

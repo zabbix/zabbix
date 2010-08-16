@@ -19,20 +19,15 @@
 **/
 ?>
 <?php
-class CHelp extends CIcon{
-	public function __construct($url='index.php',$side=null){
-		if(is_null($side)) $side = 'right';
-		if($side == 'right'){
-			$pside = 'left';
-		}
-		else{
-			$side = 'left';
-			$pside = 'right';
-		}
+class CIcon extends CDiv{
+	public function __construct($title, $class, $action=''){
+		parent::__construct(SPACE, $class.' menu_icon');
 
-		parent::__construct("http://www.zabbix.com/documentation",'iconhelp');//'http://www.zabbix.com/manual/v1.1/'.$url);
-		parent::onClick('window.open("http://www.zabbix.com/documentation/");');
-		$this->attributes['style'] = 'float:'.$side.'; text-decoration: none;';
+		$this->setAttribute('title', $title);
+
+		if(!empty($action)){
+			$this->setAttribute('onclick', 'javascript: '.$action);
+		}
 	}
 }
 ?>

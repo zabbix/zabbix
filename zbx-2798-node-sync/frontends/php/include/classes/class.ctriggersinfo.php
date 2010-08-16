@@ -25,17 +25,19 @@ class CTriggersInfo extends CTable{
 
  public $style;
  public $show_header;
- public $nodeid;
- public $groupid;
+ private $nodeid;
+ private $groupid;
+ private $hostid;
 
-	public function __construct($groupid=0, $style = STYLE_HORISONTAL){
+	public function __construct($groupid=null, $hostid=null, $style = STYLE_HORISONTAL){
 		$this->style = null;
 
 		parent::__construct(NULL,'triggers_info');
 		$this->setOrientation($style);
 		$this->show_header = true;
-		$this->nodeid = id2nodeid($groupid);;
-		$this->groupid = $groupid;
+
+		$this->groupid = is_null($groupid) ? 0 : $groupid;
+		$this->hostid = is_null($hostid) ? 0 : $hostid;
 	}
 
 	public function setOrientation($value){
@@ -63,14 +65,17 @@ class CTriggersInfo extends CTable{
 		$ok = $uncn = $uncl = $info = $warn = $avg = $high = $dis = 0;
 
 		$options = array(
-			'nodeids' => $this->nodeid,
 			'monitored' => 1,
 			'skipDependent' => 1,
 			'output' => API_OUTPUT_SHORTEN
 		);
-		if($this->groupid > 0){
+
+		if($this->hostid > 0)
+			$options['hostids'] = $this->hostid;
+		else if($this->groupid > 0)
 			$options['groupids'] = $this->groupid;
-		}
+
+
 		$triggers = CTrigger::get($options);
 		$triggers = zbx_objectValues($triggers, 'triggerid');
 
@@ -102,10 +107,12 @@ class CTriggersInfo extends CTable{
 		}
 
 		if($this->show_header){
-			$node = get_node_by_nodeid($this->nodeid);
 			$header_str = S_TRIGGERS_INFO.SPACE;
 
-			if($node > 0) $header_str.= '('.$node['name'].')'.SPACE;
+			if(!is_null($this->nodeid)){
+				$node = get_node_by_nodeid($this->nodeid);
+				if($node > 0) $header_str.= '('.$node['name'].')'.SPACE;
+			}
 
 			if(remove_nodes_from_id($this->groupid)>0){
 				$group = get_hostgroup_by_groupid($this->groupid);

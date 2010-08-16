@@ -33,7 +33,7 @@
  * Parameters: old_id - old id, new_id - new node id                          *
  *             old_exp - old expression, new_exp - new expression             *
  *                                                                            *
- * Return value: SUCCESS - converted successfully                             *
+ * Return value: SUCCEED - converted successfully                             *
  *               FAIL - an error occurred                                     *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -91,7 +91,7 @@ static int convert_expression(int old_id, int new_id, zbx_uint64_t prefix, const
  *                                                                            *
  * Parameters: old_id - old id, new_id - new node id                          *
  *                                                                            *
- * Return value: SUCCESS - converted successfully                             *
+ * Return value: SUCCEED - converted successfully                             *
  *               FAIL - an error occurred                                     *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
@@ -144,7 +144,7 @@ static int convert_triggers_expression(int old_id, int new_id)
  *                                                                            *
  * Parameters: old_id - old id, new_id - new node id                          *
  *                                                                            *
- * Return value: SUCCESS - converted successfully                             *
+ * Return value: SUCCEED - converted successfully                             *
  *               FAIL - an error occurred                                     *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
@@ -175,7 +175,7 @@ static int convert_profiles(int old_id, int new_id, const char *field_name)
  *                                                                            *
  * Parameters: old_id - old id, new_id - new node id                          *
  *                                                                            *
- * Return value: SUCCESS - converted successfully                             *
+ * Return value: SUCCEED - converted successfully                             *
  *               FAIL - an error occurred                                     *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
@@ -213,13 +213,67 @@ static int convert_special_field(int old_id, int new_id, const char *table_name,
 
 /******************************************************************************
  *                                                                            *
+ * Function: convert_condition_values                                         *
+ *                                                                            *
+ * Purpose: special processing for "value" field in "conditions" table        *
+ *                                                                            *
+ * Parameters: old_id - old id, new_id - new node id                          *
+ *                                                                            *
+ * Return value: SUCCEED - converted successfully                             *
+ *               FAIL - an error occurred                                     *
+ *                                                                            *
+ * Author: Aleksandrs Saveljevs                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int convert_condition_values(int old_id, int new_id, const char *rel_table_name, int type)
+{
+	zbx_uint64_t	prefix;
+	const ZBX_TABLE	*r_table;
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	value;
+
+	if (NULL == (r_table = DBget_table(rel_table_name)))
+	{
+		printf("conditions.value FAILED\n");
+		return FAIL;
+	}
+
+	prefix = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)new_id;
+	if (r_table->flags & ZBX_SYNC)
+		prefix += (zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)new_id;
+
+	result = DBselect("select conditionid,value"
+			" from conditions"
+			" where conditiontype=%d",
+			type);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(value, row[1]);
+		value += prefix;
+		DBexecute("update conditions"
+			" set value='" ZBX_FS_UI64 "'"
+			" where conditionid=%s",
+			value,
+			row[0]);
+	}
+	DBfree_result(result);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: change_nodeid                                                    *
  *                                                                            *
  * Purpose: convert database data to new node ID                              *
  *                                                                            *
  * Parameters: old_id - old id, new_id - new node id                          *
  *                                                                            *
- * Return value: SUCCESS - converted successfully                             *
+ * Return value: SUCCEED - converted successfully                             *
  *               FAIL - an error occurred                                     *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -231,13 +285,13 @@ int change_nodeid(int old_id, int new_id)
 {
 	struct conv_t
 	{
-	        char	*rel;
-        	int	type;
+	        const char	*rel;
+        	int		type;
 	};
 
 	struct special_conv_t
 	{
-	        char		*table_name, *field_name, *type_field_name;
+	        const char	*table_name, *field_name, *type_field_name;
 		struct conv_t	convs[32];
 	};
 
@@ -285,15 +339,11 @@ int change_nodeid(int old_id, int new_id)
 			{"sysmaps",	SCREEN_RESOURCE_MAP},
 			{"items",	SCREEN_RESOURCE_PLAIN_TEXT},
 			{"groups",	SCREEN_RESOURCE_HOSTS_INFO},
-/*			{"",	SCREEN_RESOURCE_TRIGGERS_INFO},
-			{"",	SCREEN_RESOURCE_SERVER_INFO},
-			{"",	SCREEN_RESOURCE_CLOCK},*/
 			{"screens",	SCREEN_RESOURCE_SCREEN},
 			{"groups",	SCREEN_RESOURCE_TRIGGERS_OVERVIEW},
 			{"groups",	SCREEN_RESOURCE_DATA_OVERVIEW},
-/*			{"",	SCREEN_RESOURCE_URL},
-			{"",	SCREEN_RESOURCE_ACTIONS},
-			{"",	SCREEN_RESOURCE_EVENTS},*/
+			{"groups",	SCREEN_RESOURCE_HOSTGROUP_TRIGGERS},
+			{"hosts",	SCREEN_RESOURCE_HOST_TRIGGERS},
 			{NULL}
 			}
 		},
@@ -332,6 +382,18 @@ int change_nodeid(int old_id, int new_id)
 			}
 		},
 		{NULL}
+	};
+
+	struct conv_t condition_convs[]=
+	{
+		{"groups",	CONDITION_TYPE_HOST_GROUP},
+		{"hosts",	CONDITION_TYPE_HOST},
+		{"hosts",	CONDITION_TYPE_HOST_TEMPLATE},
+		{"hosts",	CONDITION_TYPE_PROXY},
+		{"triggers",	CONDITION_TYPE_TRIGGER},
+		{"dchecks",	CONDITION_TYPE_DCHECK},
+		{"drules",	CONDITION_TYPE_DRULE},
+		{NULL},
 	};
 
 	int		i, j, s, t;
@@ -429,6 +491,10 @@ int change_nodeid(int old_id, int new_id)
 
 	/* Special processing for trigger expressions */
 	convert_triggers_expression(old_id, new_id);
+
+	/* Special processing for condition values */
+	for (i = 0; NULL != condition_convs[i].rel; i++)
+		convert_condition_values(old_id, new_id, condition_convs[i].rel, condition_convs[i].type);
 
 	DBexecute("insert into nodes (nodeid,name,ip,nodetype) values (%d,'Local node','127.0.0.1',1)",
 			new_id);

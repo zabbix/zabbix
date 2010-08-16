@@ -19,11 +19,12 @@
 **/
 ?>
 <?php
-	function getUserTheme($user){
+
+	function getUserTheme($USER_DETAILS){
 		$config = select_config();
 
 		if(isset($config['default_theme'])) $css = $config['default_theme'];
-		if(isset($user['theme']) && ($user['theme']!=ZBX_DEFAULT_CSS) && ($user['alias']!=ZBX_GUEST_USER)) $css = $user['theme'];
+		if(isset($USER_DETAILS['theme']) && ($USER_DETAILS['theme']!=ZBX_DEFAULT_CSS) && ($USER_DETAILS['alias']!=ZBX_GUEST_USER)) $css = $USER_DETAILS['theme'];
 
 	return $css;
 	}

@@ -25,7 +25,7 @@ require_once('include/graphs.inc.php');
 
 $page['file']	= 'history.php';
 $page['title']	= 'S_HISTORY';
-$page['hist_arg'] = array('itemid', 'hostid', 'groupid', 'graphid', 'period', 'dec', 'inc', 'left', 'right', 'stime');
+$page['hist_arg'] = array('itemid', 'hostid', 'groupid', 'graphid', 'period', 'dec', 'inc', 'left', 'right', 'stime', 'action');
 $page['scripts'] = array('effects.js','dragdrop.js','class.calendar.js','gtlc.js');
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
@@ -192,25 +192,15 @@ include_once('include/page_header.php');
 		$header['left'] = array(new CLink($item['host'],'latest.php?hostid='.$item['hostid']),': ',item_description($item));
 
 		if('showgraph' == $_REQUEST['action']){
-			if(infavorites('web.favorite.graphids',$item['itemid'],'itemid')){
-				$icon = new CDiv(SPACE,'iconminus');
-				$icon->setAttribute('title',S_REMOVE_FROM.' '.S_FAVOURITES);
-				$icon->addAction('onclick', "javascript: rm4favorites('itemid','".$_REQUEST['itemid']."',0);");
-			}
-			else{
-				$icon = new CDiv(SPACE,'iconplus');
-				$icon->setAttribute('title',S_ADD_TO.' '.S_FAVOURITES);
-				$icon->addAction('onclick', "javascript: add2favorites('itemid','".$_REQUEST['itemid']."');");
-			}
-			$icon->setAttribute('id','addrm_fav');
-
-			$header['right'][] = $icon;
+			$header['right'][] = get_icon('favourite', array(
+				'fav' => 'web.favorite.graphids',
+				'elid' => $item['itemid'],
+				'elname' => 'itemid'
+			));
 		}
 	}
 
-	$form = new CForm();
-	$form->setMethod('get');
-
+	$form = new CForm(null, 'get');
 	$form->addVar('itemid',$_REQUEST['itemid']);
 
 	if(isset($_REQUEST['filter_task']))	$form->addVar('filter_task',$_REQUEST['filter_task']);
@@ -389,8 +379,11 @@ include_once('include/page_header.php');
 
 				$data['value'] = trim($data['value'],"\r\n");
 				$data['value'] = encode_log($data['value']);
-
-				array_push($row, zbx_nl2br($data['value']));
+				
+//				$data['value'] = str_replace(' ', '&nbsp;', $data['value']);
+//				$data['value'] = str_replace("\t", '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', $data['value']);
+//				$data['value'] = zbx_nl2br($data['value']);
+				array_push($row, new CCol($data['value'], 'pre'));
 
 				$crow = new CRow($row);
 				if(is_null($color_style)){
@@ -471,15 +464,17 @@ include_once('include/page_header.php');
 	if(str_in_array($_REQUEST['action'], array('showvalues', 'showgraph'))){
 		$graphDims = getGraphDims();
 
-// NAV BAR
-		$timeline = array();
-		$timeline['period'] = $period;
-		$timeline['starttime'] = date('YmdHis', get_min_itemclock_by_itemid($item['itemid']));
-		$timeline['usertime'] = null;
 
-		if(isset($_REQUEST['stime'])){
-			$timeline['usertime'] = date('YmdHis', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
-		}
+// NAV BAR
+		$utime = zbxDateToTime($_REQUEST['stime']);
+		$starttime = get_min_itemclock_by_itemid($item['itemid']);
+		if($utime < $starttime) $starttime = $utime;
+
+		$timeline = array(
+			'starttime' => date('YmdHis', $starttime),
+			'period' => $period,
+			'usertime' => date('YmdHis', $utime + $period)
+		);
 
 		$objData = array();
 
@@ -560,10 +555,10 @@ function addPopupValues(list){
 	if(isset(list.object, favorites)){
 		for(var i=0; i < list.values.length; i++){
 			if(!isset(i, list.values) || empty(list.values[i])) continue;
-			
+
 			create_var('zbx_filter', 'itemid['+list.values[i]+']', list.values[i], false);
 		}
-		
+
 		$('zbx_filter').submit();
 	}
 }

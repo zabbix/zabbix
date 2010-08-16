@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-	function get_default_image($image=false){
+	function get_default_image($image=false, $imagetype=IMAGE_TYPE_ICON){
 		if($image){
 			$image = imagecreate(50, 50);
 			$color = imagecolorallocate($image, 250, 50, 50);
@@ -28,7 +28,9 @@
 		else{
 			$sql = 'SELECT i.imageid '.
 				' FROM images i '.
-				' WHERE '.dbin_node('i.imageid', false);
+				' WHERE '.DBin_node('i.imageid', false).
+					' AND imagetype='.$imagetype.
+				' ORDER BY name ASC';
 			$result = DBselect($sql,1);
 			if($image = DBfetch($result)) return $image;
 			else{

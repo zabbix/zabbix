@@ -279,11 +279,11 @@ options = array(
 
 		if(is_null($groupid)) $groupid = $this->_profileIds['groupid'];
 
-		if(!isset($this->data['groups'][$groupid])){
+		if((!isset($this->data['groups'][$groupid]) && ($groupid > 0)) || is_null($groupid)){
 			if($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_NONE){
 				$groupid = 0;
 			}
-			else if(is_null($this->_requestIds['groupid']) || ($this->_requestIds['groupid'] != 0)){
+			else if(is_null($this->_requestIds['groupid']) || ($this->_requestIds['groupid'] > 0)){
 				$groupids = array_keys($this->data['groups']);
 				$groupid = empty($groupids)?0:reset($groupids);
 			}
@@ -295,6 +295,7 @@ options = array(
 		}
 
 		$this->isSelected['groupsSelected'] = (($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL) && !empty($this->data['groups'])) || ($groupid > 0);
+		$this->isSelected['groupsAll'] = (($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL) && !empty($this->data['groups']) && ($groupid == 0));
 		$this->ids['groupid'] = $groupid;
 	}
 
@@ -320,11 +321,11 @@ options = array(
 
 			if(is_null($hostid)) $hostid = $this->_profileIds['hostid'];
 
-			if(!isset($this->data['hosts'][$hostid])){
+			if((!isset($this->data['hosts'][$hostid]) && ($hostid > 0)) || is_null($hostid)){
 				if($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_NONE){
-					$groupid = 0;
+					$hostid = 0;
 				}
-				else if(is_null($this->_requestIds['hostid']) || ($this->_requestIds['hostid'] != 0)){
+				else if(is_null($this->_requestIds['hostid']) || ($this->_requestIds['hostid'] > 0)){
 					$hostids = array_keys($this->data['hosts']);
 					$hostid = empty($hostids)?0:reset($hostids);
 				}
@@ -337,6 +338,8 @@ options = array(
 		}
 
 		$this->isSelected['hostsSelected'] = (($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL) && !empty($this->data['hosts'])) || ($hostid > 0);
+		$this->isSelected['hostsAll'] = (($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL) && !empty($this->data['hosts']) && ($hostid == 0));
+
 		$this->ids['hostid'] = $hostid;
 	}
 
@@ -378,7 +381,7 @@ options = array(
 	private function _initTriggers($triggerid, $options){
 		$this->data['triggers'] = array();
 
-		if(!$this->hostsSelected){
+		if(!$this->hostsSelected || $this->hostsAll){
 			$triggerid = 0;
 		}
 		else{

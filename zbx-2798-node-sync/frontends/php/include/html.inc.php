@@ -136,10 +136,8 @@
 		}
 
 		if(!is_null($state)){
-			$icon = new CDiv(SPACE, $state?'arrowup':'arrowdown');
+			$icon = new CIcon(S_SHOW.'/'.S_HIDE, $state?'arrowup':'arrowdown', "change_hat_state(this,'".$id."');");
 			$icon->setAttribute('id',$id.'_icon');
-			$icon->addAction('onclick', "javascript: change_hat_state(this,'".$id."');");
-			$icon->setAttribute('title',S_SHOW.'/'.S_HIDE);
 			$icons_row[] = $icon;
 		}
 		else{
@@ -240,5 +238,45 @@
 	function show_table_header($col1, $col2=SPACE){
 		$table = get_table_header($col1, $col2);
 		$table->Show();
+	}
+
+	function get_icon($name, $params=array()){
+
+		switch($name){
+			case 'favourite':
+				if(infavorites($params['fav'], $params['elid'], $params['elname'])){
+					$icon = new CIcon(
+						S_REMOVE_FROM.' '.S_FAVOURITES,
+						'iconminus',
+						'rm4favorites("'.$params['elname'].'","'.$params['elid'].'", 0);'
+					);
+				}
+				else{
+					$icon = new CIcon(
+						S_ADD_TO.' '.S_FAVOURITES,
+						'iconplus',
+						'add2favorites("'.$params['elname'].'","'.$params['elid'].'");'
+					);
+				}
+				$icon->setAttribute('id','addrm_fav');
+			break;
+			case 'fullscreen':
+				$url = new Curl();
+				$url->setArgument('fullscreen', $params['fullscreen'] ? '0' : '1');
+				$icon = new CIcon(
+					$_REQUEST['fullscreen'] ? S_NORMAL.' '.S_VIEW : S_FULLSCREEN,
+					'fullscreen',
+					"document.location = '".$url->getUrl()."';"
+				);
+			break;
+			case 'menu':
+				$icon = new CIcon(S_MENU, 'iconmenu', 'create_page_menu(event, "'.$params['menu'].'");');
+			break;
+			case 'reset':
+				$icon = new CIcon(S_RESET, 'iconreset', 'timeControl.objectReset("'.$params['id'].'");');
+			break;
+		}
+
+		return $icon;
 	}
 ?>

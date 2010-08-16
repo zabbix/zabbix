@@ -625,7 +625,7 @@ initialize: function($super,sbid, timelineid, width){ // where to put bar on sta
 	this.scrollbarid = sbid;
 	$super('CScrollBar['+sbid+']');
 
-	try{
+try{
 // Checks
 		if(!isset(timelineid,ZBX_TIMELINES)) throw('Failed to initialize ScrollBar with given TimeLine');
 		if(empty(this.dom.scrollbar)) this.scrollcreate(width);
@@ -661,7 +661,7 @@ initialize: function($super,sbid, timelineid, width){ // where to put bar on sta
 //---------------
 		this.disabled = 0;
 
-//	try{
+//try{
 	} 
 	catch(e){
 		throw "ERROR: ScrollBar initialization failed!";
@@ -1361,7 +1361,7 @@ updateTimeLine: function(dim){
 		}
 
 // To properly count TimeZone Diffs
-		if(period > 86400) new_usertime = this.roundTime(new_usertime);
+		if(period >= 86400) new_usertime = this.roundTime(new_usertime);
 
 		if(dim.width != this.position.bar.width){
 			this.timeline.period(new_period);
