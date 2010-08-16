@@ -17,7 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-
+?>
+<?php
 require_once('include/config.inc.php');
 require_once('include/hosts.inc.php');
 require_once('include/triggers.inc.php');
@@ -33,7 +34,8 @@ define('SHOW_TRIGGERS',0);
 define('SHOW_DATA',1);
 
 include_once('include/page_header.php');
-
+?>
+<?php
 if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 	unset($_REQUEST['groupid']);
 	unset($_REQUEST['hostid']);
@@ -51,7 +53,8 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 	);
 
 	check_fields($fields);
-
+?>
+<?php
 /* AJAX	*/
 	if(isset($_REQUEST['favobj'])){
 		if('hat' == $_REQUEST['favobj']){
@@ -129,12 +132,7 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 
 	$over_wdgt = new CWidget();
 // Header
-	$url = 'overview.php?fullscreen='.($_REQUEST['fullscreen'] ? '0':'1');
-
-	$fs_icon = new CDiv(SPACE,'fullscreen');
-	$fs_icon->setAttribute('title',$_REQUEST['fullscreen'] ? S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-	$fs_icon->addAction('onclick', "javascript: document.location = '".$url."';");
-
+	$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
 	$over_wdgt->addPageHeader(S_OVERVIEW_BIG, array($fs_icon, $help));
 
 // 2nd heder
@@ -153,8 +151,6 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 //	show_table_header(S_OVERVIEW_BIG,$form);
 //-------------
 
-?>
-<?php
 	if($_REQUEST['type']==SHOW_DATA){
 //COpt::profiling_start('get_items_data_overview');
 		$table = get_items_data_overview(array_keys($pageFilter->hosts),$_REQUEST['view_style']);
@@ -169,6 +165,9 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 	$over_wdgt->addItem($table);
 	$over_wdgt->show();
 
+?>
+<?php
 
 include_once('include/page_footer.php');
+
 ?>

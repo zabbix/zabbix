@@ -62,7 +62,7 @@ initialize: function($super, messagesListId, args){
 	this.messageListId = messagesListId;
 	$super('CMessageList['+messagesListId+']');
 //--
-	
+
 	this.dom = {};
 	this.messageList = {};
 	this.messageLast = {};
@@ -82,6 +82,7 @@ initialize: function($super, messagesListId, args){
 		handle: this.dom.caption, //this.dom.header,
 		constraint: 'vertical',
 		scroll: window,
+		onEnd: this.fixIE.bind(this),
 		snap: function(x,y){if(y < 0) return [x,0]; else return [x,y];}
 	});
 
@@ -89,6 +90,7 @@ initialize: function($super, messagesListId, args){
 		handle: this.dom.move, //this.dom.header,
 		constraint: 'vertical',
 		scroll: window,
+		onEnd: this.fixIE.bind(this),
 		snap: function(x,y){if(y < 0) return [x,0]; else return [x,y];}
 	});
 },
@@ -122,10 +124,10 @@ setSettings: function(settings){
 	this.debug('setSettings');
 //--
 
-	this.sounds.repeat = settings.sounds.repeat;
-	this.sounds.mute = settings.sounds.mute;
+	this.sounds.repeat = settings['sounds.repeat'];
+	this.sounds.mute = settings['sounds.mute'];
 	if(this.sounds.mute == 1){
-		this.dom.mute.className = 'iconmute';
+		this.dom.mute.className = 'iconmute menu_icon';
 	}
 
 	if(settings.enabled != 1) this.stop();
@@ -160,12 +162,18 @@ addMessage: function(newMessage){
 		var lastMessageId = this.messagePipe.shift();
 		this.closeMessage(lastMessageId);
 	}
-	
+
 	this.messagePipe.push(this.msgcounter);
 	newMessage.messageid = this.msgcounter;
 
 	this.messageList[this.msgcounter] = new CMessage(this, newMessage);
-	this.messageLast[this.messageList[this.msgcounter].caption] = this.messageList[this.msgcounter].sourceid;
+	this.messageLast[this.messageList[this.msgcounter].caption] = {
+		'caption': this.messageList[this.msgcounter].caption,
+		'sourceid': this.messageList[this.msgcounter].sourceid,
+		'time': this.messageList[this.msgcounter].time,
+		'messageid': this.messageList[this.msgcounter].messageid
+	};
+
 
 	$(this.dom.container).show();
 
@@ -187,7 +195,7 @@ mute: function(e){
 	}
 	else{
 		var action = 'message.unmute';
-		this.sounds.mute = 0;		
+		this.sounds.mute = 0;
 	}
 
 	var rpcRequest = {
@@ -214,7 +222,7 @@ playSound: function(messages){
 	for(var i=0; i < messages.length; i++){
 		var message = messages[i];
 		if(message.type != 1 && message.type != 3) continue;
-		
+
 		if(message.priority >= this.sounds.priority){
 			this.sounds.priority = message.priority;
 			this.sounds.sound = message.sound;
@@ -248,7 +256,7 @@ closeMessage: function(messageid, withEffect){
 	AudioList.stop(this.messageList[messageid].sound);
 	if(withEffect) this.messageList[messageid].remove();
 	else this.messageList[messageid].close();
-	
+
 
 	try{
 		delete(this.messageList[messageid]);
@@ -263,7 +271,8 @@ closeMessage: function(messageid, withEffect){
 	if(this.messagePipe.length < 1){
 		this.messagePipe = new Array();
 		this.messageList = {};
-		setTimeout(Element.hide.bind(Element, this.dom.container), this.effectTimeout);
+
+		setTimeout(Element.hide.bind(Element, this.dom.container), IE6?100:this.effectTimeout);
 	}
 },
 
@@ -277,7 +286,7 @@ closeAllMessages: function(e){
 		'params': {
 			'caption': this.messageList[lastMessageId].caption,
 			'sourceid': this.messageList[lastMessageId].sourceid,
-			'priority': this.messageList[lastMessageId].priority,
+			'time': this.messageList[lastMessageId].time,
 			'messageid': this.messageList[lastMessageId].messageid
 		},
 //		'onSuccess': function(resp){ SDI(resp)},
@@ -287,6 +296,7 @@ closeAllMessages: function(e){
 	new RPC.Call(rpcRequest);
 
 	Effect.SlideUp(this.dom.container, {duration: (this.effectTimeout / 1000)});
+
 	for(var messageid in this.messageList){
 		if(empty(this.messageList[messageid])) continue;
 
@@ -394,7 +404,7 @@ createContainer: function(){
 // move
 	this.dom.move = document.createElement('div');
 	this.dom.move.setAttribute('title', locale['S_MOVE']);
-	this.dom.move.className = 'iconmove';
+	this.dom.move.className = 'iconmove menu_icon';
 	//this.dom.move.style.display = 'none';
 
 	this.dom.controlList.addItem(this.dom.move, 'linear');
@@ -402,21 +412,21 @@ createContainer: function(){
 // snooze
 	this.dom.snooze = document.createElement('div');
 	this.dom.snooze.setAttribute('title', locale['S_SNOOZE']);
-	this.dom.snooze.className = 'iconsnooze';
+	this.dom.snooze.className = 'iconsnooze menu_icon';
 
 	this.dom.controlList.addItem(this.dom.snooze, 'linear');
 
 // mute
 	this.dom.mute = document.createElement('div');
 	this.dom.mute.setAttribute('title', locale['S_MUTE']+'/'+locale['S_UNMUTE']);
-	this.dom.mute.className = 'iconsound';
+	this.dom.mute.className = 'iconsound menu_icon';
 
 	this.dom.controlList.addItem(this.dom.mute, 'linear');
 
 // close all
 	this.dom.closeAll = document.createElement('div');
 	this.dom.closeAll.setAttribute('title', locale['S_CLEAR']);
-	this.dom.closeAll.className = 'iconclose';
+	this.dom.closeAll.className = 'iconclose menu_icon';
 
 	this.dom.controlList.addItem(this.dom.closeAll, 'linear');
 
@@ -428,7 +438,8 @@ createContainer: function(){
 fixIE: function(){
 	if(IE6){
 		this.dom.header.style.width = '100px';
-		ie6pngfix.run(this.container);
+		showPopupDiv('zbx_messages','zbx_messages_frame');
+//		ie6pngfix.run(false);
 	}
 }
 });
@@ -469,7 +480,7 @@ initialize: function($super, messageList, message){
 	}
 
 	this.createMessage();
-//	if(IE) this.fixIE();
+	if(IE) this.fixIE();
 },
 
 show: function(){
@@ -480,7 +491,7 @@ close: function(){
 //--
 	$(this.dom.listItem).remove();
 
-//	if(IE) this.fixIE();
+	if(IE) this.fixIE();
 	this.dom = {};
 },
 
@@ -488,15 +499,20 @@ notify: function(){
 },
 
 remove: function(){
-	Effect.BlindUp(this.dom.listItem, {duration: (this.list.effectTimeout / 1000)});
-	Effect.Fade(this.dom.listItem, {duration: (this.list.effectTimeout / 1000)});
+	if(IE6){
+		$(this.dom.listItem).hide();
+	}
+	else{
+		Effect.BlindUp(this.dom.listItem, {duration: (this.list.effectTimeout / 1000)});
+		Effect.Fade(this.dom.listItem, {duration: (this.list.effectTimeout / 1000)});
+	}
+
 	setTimeout(this.close.bind(this), this.list.effectTimeout);
 },
 
 createMessage: function(){
 	this.debug('createMessage');
 //--
-
 
 // message
 	this.dom.message = document.createElement('div');
@@ -537,6 +553,7 @@ createMessage: function(){
 
 fixIE: function(){
 	if(IE6){
+/*
 		var maxWidth = 60;
 		for(var tmpmsg in this.list.messageList){
 			var msgDims = getDimensions(this.list.messageList[tmpmsg].dom.message);
@@ -545,6 +562,8 @@ fixIE: function(){
 		}
 
 		this.list.dom.header.style.width = maxWidth+'px';
+//*/
+		showPopupDiv('zbx_messages','zbx_messages_frame');
 	}
 }
 });

@@ -516,7 +516,6 @@ create: function(audiofile, params){
 		document.getElementsByTagName('body')[0].appendChild(this.dom.audioList);
 
 		this.dom.audioList.setAttribute('id','audiolist');
-		this.dom.audioList.style.border = '1px solid #000000';
 	}
 
 	if(IE){

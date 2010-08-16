@@ -607,7 +607,7 @@
 	}
 
 // Insert form for User
-	function insert_user_form($userid, $profile=0){
+	function getUserForm($userid, $profile=0){
 		global $ZBX_LOCALES;
 		global $USER_DETAILS;
 
@@ -618,7 +618,7 @@
 /*			if(bccomp($userid,$USER_DETAILS['userid'])==0) $profile = 1;*/
 			$options = array(
 					'userids' => $userid,
-					'extendoutput' => 1
+					'output' => API_OUTPUT_EXTEND
 				);
 			if($profile) $options['nodeids'] = id2nodeid($userid);
 
@@ -693,12 +693,17 @@
 			$change_password	= get_request('change_password', null);
 			$user_medias		= get_request('user_medias', array());
 
+
 			$messages = get_request('messages', array());
 
 			if(!isset($messages['enabled'])) $messages['enabled'] = 0;
-			if(!isset($messages['sounds']['mute'])) $messages['sounds']['mute'] = 0;
-			if(!isset($messages['sounds']['recovery'])) $messages['sounds']['recovery'] = 0;
-			if(!isset($messages['triggers']['recovery'])) $messages['triggers']['recovery'] = 0;
+			if(!isset($messages['sounds.recovery'])) $messages['sounds.recovery'] = 0;
+			if(!isset($messages['triggers.recovery'])) $messages['triggers.recovery'] = 0;
+			if(!isset($messages['triggers.severities'])) $messages['triggers.severities'] = array();
+
+			$pMsgs = getMessageSettings();
+			$messages = array_merge($pMsgs, $messages);
+
 		}
 
 		if($autologin || !isset($_REQUEST['autologout'])) $autologout = 0;
@@ -932,9 +937,9 @@
 		if($profile){
 			$msgVisibility = array('1' => array(
 					'messages[timeout]',
-					'messages[sounds][repeat]',
-					'messages[sounds][recovery]',
-					'messages[triggers][recovery]',
+					'messages[sounds.repeat]',
+					'messages[sounds.recovery]',
+					'messages[triggers.recovery]',
 					'timeout_row',
 					'repeat_row',
 					'triggers_row',
@@ -946,8 +951,8 @@
 			$newRow = $frmUser->addRow(S_MESSAGE_TIMEOUT.SPACE.'('.S_SECONDS_SMALL.')', new CNumericBox("messages[timeout]", $messages['timeout'], 5));
 			$newRow->setAttribute('id', 'timeout_row');
 
-			$repeatSound = new CComboBox('messages[sounds][repeat]', $messages['sounds']['repeat'], 'javascript: if(IE) submit();');
-			$repeatSound->setAttribute('id', 'messages[sounds][repeat]');
+			$repeatSound = new CComboBox('messages[sounds.repeat]', $messages['sounds.repeat'], 'javascript: if(IE) submit();');
+			$repeatSound->setAttribute('id', 'messages[sounds.repeat]');
 			$repeatSound->addItem(1, S_ONCE);
 			$repeatSound->addItem(10, '10 '.S_SECONDS);
 			$repeatSound->addItem(-1, S_MESSAGE_TIMEOUT);
@@ -968,34 +973,34 @@
 			$zbxSounds = getSounds();
 			$triggers = new CTable('', 'invisible');
 
-			$soundList = new CComboBox('messages[sounds][recovery]', $messages['sounds']['recovery']);
+			$soundList = new CComboBox('messages[sounds.recovery]', $messages['sounds.recovery']);
 			foreach($zbxSounds as $filename => $file) $soundList->addItem($file, $filename);
 
 			$resolved = array(
-				new CCheckBox('messages[triggers][recovery]', $messages['triggers']['recovery'], null, 1),
+				new CCheckBox('messages[triggers.recovery]', $messages['triggers.recovery'], null, 1),
 				S_RECOVERY,
 				$soundList,
-				new CButton('start', S_PLAY, "javascript: testUserSound('messages[sounds][recovery]');", false),
+				new CButton('start', S_PLAY, "javascript: testUserSound('messages[sounds.recovery]');", false),
 				new CButton('stop', S_STOP, 'javascript: AudioList.stopAll();', false)
 			);
 
 			$triggers->addRow($resolved);
 
 			foreach($severities as $snum => $severity){
-				$soundList = new CComboBox('messages[sounds]['.$severity.']', $messages['sounds'][$severity]);
+				$soundList = new CComboBox('messages[sounds.'.$severity.']', $messages['sounds.'.$severity]);
 				foreach($zbxSounds as $filename => $file) $soundList->addItem($file, $filename);
 
 				$triggers->addRow(array(
-					new CCheckBox('messages[triggers][severities]['.$severity.']', isset($messages['triggers']['severities'][$severity]), null, 1),
+					new CCheckBox('messages[triggers.severities]['.$severity.']', isset($messages['triggers.severities'][$severity]), null, 1),
 					getSeverityCaption($severity),
 					$soundList,
-					new CButton('start', S_PLAY, "javascript: testUserSound('messages[sounds][".$severity."]');", false),
+					new CButton('start', S_PLAY, "javascript: testUserSound('messages[sounds.".$severity."]');", false),
 					new CButton('stop', S_STOP, 'javascript: AudioList.stopAll();', false)
 				));
 
 
-				zbx_subarray_push($msgVisibility, 1, 'messages[triggers][severities]['.$severity.']');
-				zbx_subarray_push($msgVisibility, 1, 'messages[sounds]['.$severity.']');
+				zbx_subarray_push($msgVisibility, 1, 'messages[triggers.severities]['.$severity.']');
+				zbx_subarray_push($msgVisibility, 1, 'messages[sounds.'.$severity.']');
 			}
 
 			$newRow = $frmUser->addRow(S_TRIGGER_SEVERITY, $triggers);
@@ -1017,7 +1022,7 @@
 		$frmUser->addItemToBottomRow(SPACE);
 		$frmUser->addItemToBottomRow(new CButtonCancel(url_param("config")));
 
-		return $frmUser;
+	return $frmUser;
 	}
 
 // Insert form for User Groups
@@ -1062,8 +1067,9 @@
 				if(isset($db_right['node_name']))
 					$db_right['name'] = $db_right['node_name'].':'.$db_right['name'];
 
-				$group_rights[$db_right['name']] = array(
+				$group_rights[$db_right['id']] = array(
 					'permission'	=> $db_right['permission'],
+					'name'		=> $db_right['name'],
 					'id'		=> $db_right['id']
 				);
 			}
@@ -1079,7 +1085,7 @@
 		}
 		$perm_details = get_request('perm_details', 0);
 
-		ksort($group_rights);
+		order_result($group_rights, 'name');
 
 		$frmUserG = new CFormTable($frm_title,'usergrps.php');
 		$frmUserG->setHelp('web.users.groups.php');
@@ -1197,10 +1203,10 @@
 		$lstRead  = new CListBox('right_to_del[read_only][]'	,null	,20);
 		$lstDeny  = new CListBox('right_to_del[deny][]'			,null	,20);
 
-		foreach($group_rights as $name => $element_data){
-			if($element_data['permission'] == PERM_DENY)			$lstDeny->addItem($name, $name);
-			else if($element_data['permission'] == PERM_READ_ONLY)	$lstRead->addItem($name, $name);
-			else if($element_data['permission'] == PERM_READ_WRITE)	$lstWrite->addItem($name, $name);
+		foreach($group_rights as $id => $element_data){
+			if($element_data['permission'] == PERM_DENY)			$lstDeny->addItem($id, $element_data['name']);
+			else if($element_data['permission'] == PERM_READ_ONLY)	$lstRead->addItem($id, $element_data['name']);
+			else if($element_data['permission'] == PERM_READ_WRITE)	$lstWrite->addItem($id, $element_data['name']);
 		}
 
 		$table_Rights->setHeader(array(S_READ_WRITE, S_READ_ONLY, S_DENY),'header');
@@ -2325,44 +2331,28 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$spanF->setAttribute('id', 'label_formula');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_CALCULATED, 'label_formula');
 
-		$params_script = get_request('params_script', '');
-		$params_dbmonitor = get_request('params_dbmonitor', $type != ITEM_TYPE_DB_MONITOR ? "DSN=<database source name>\nuser=<user name>\npassword=<password>\nsql=<query>" : '');
-		$params_calculted = get_request('params_calculted', '');
 
-		// swaping values to save hidden values and synchronize actual values
-		switch($type) {
-			case ITEM_TYPE_SSH:
-			case ITEM_TYPE_TELNET:
-				$tmp_params = $params;
-				$params = $params_script;
-				$params_script = $tmp_params;
-			break;
-			case ITEM_TYPE_DB_MONITOR:
-				$tmp_params = $params;
-				$params = $params_dbmonitor;
-				$params_dbmonitor = $tmp_params;
-			break;
-			case ITEM_TYPE_CALCULATED:
-				$tmp_params = $params;
-				$params = $params_calculted;
-				$params_calculted = $tmp_params;
-			break;
-		}
+		$params_script = new CTextArea('params', $params, 60, 4);
+		$params_script->setAttribute('id', 'params_script');
+		$params_dbmonitor = new CTextArea('params', $params, 60, 4);
+		$params_dbmonitor->setAttribute('id', 'params_dbmonitor');
+		$params_calculted = new CTextArea('params', $params, 60, 4);
+		$params_calculted->setAttribute('id', 'params_calculted');
 
-		$row = new CRow(array(new CCol(array($spanEC, $spanP, $spanF),'form_row_l'), new CCol(new CTextArea('params',$params,60,4),'form_row_r')));
+		$row = new CRow(array(
+			new CCol(array($spanEC, $spanP, $spanF),'form_row_l'),
+			new CCol(array($params_script, $params_dbmonitor, $params_calculted),'form_row_r')
+		));
 		$row->setAttribute('id', 'row_params');
 		$frmItem->addRow($row);
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, array('id' => 'params', 'objValue' => 'params_script'));
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'params_script');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'row_params');
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, array('id' => 'params', 'objValue' => 'params_script'));
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'params_script');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'row_params');
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_DB_MONITOR, array('id' => 'params', 'objValue' => 'params_dbmonitor'));
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_DB_MONITOR, 'params_dbmonitor');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_DB_MONITOR, 'row_params');
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_CALCULATED, array('id' => 'params', 'objValue' => 'params_calculted'));
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_CALCULATED, 'params_calculted');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_CALCULATED, 'row_params');
-		$frmItem->addVar('params_script', $params_script);
-		$frmItem->addVar('params_dbmonitor', $params_dbmonitor);
-		$frmItem->addVar('params_calculted', $params_calculted);
 
 /*
 ITEM_TYPE_DB_MONITOR $key = 'db.odbc.select[<unique short description>]'; $params = "DSN=<database source name>\nuser=<user name>\npassword=<password>\nsql=<query>";
@@ -2919,9 +2909,8 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 // TRIGGERS
 	function insert_mass_update_trigger_form(){//$elements_array_name){
 		$visible = get_request('visible',array());
-
-		$priority 		= get_request('priority',	'');
-		$dependencies	= get_request('dependencies',array());
+		$priority = get_request('priority',	'');
+		$dependencies = get_request('dependencies',array());
 
 		$original_templates = array();
 
@@ -2931,6 +2920,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$frmMTrig->addVar('massupdate',get_request('massupdate',1));
 		$frmMTrig->addVar('go',get_request('go','massupdate'));
 		$frmMTrig->setAttribute('id', 'massupdate');
+		$frmMTrig->setName('trig_form');
 
 		$triggers = $_REQUEST['g_triggerid'];
 		foreach($triggers as $id => $triggerid){
@@ -2938,12 +2928,12 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		}
 
 		$cmbPrior = new CComboBox("priority",$priority);
-		for($i = 0; $i <= 5; $i++){
-			$cmbPrior->addItem($i,get_severity_description($i));
-		}
-		$frmMTrig->addRow(array(new CVisibilityBox('visible[priority]', isset($visible['priority']), 'priority', S_ORIGINAL), S_SEVERITY),
-						$cmbPrior
-					);
+		$cmbPrior->addItems(get_severity_description());
+
+		$frmMTrig->addRow(array(
+			new CVisibilityBox('visible[priority]', isset($visible['priority']), 'priority', S_ORIGINAL), S_SEVERITY),
+			$cmbPrior
+		);
 
 /* dependencies */
 		$dep_el = array();
@@ -2968,9 +2958,9 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		//$frmMTrig->addVar('new_dependence','0');
 
 		$btnSelect = new CButton('btn1', S_ADD,
-				"return PopUp('popup.php?dstfrm=massupdate&dstact=add_dependence".
-				"&dstfld1=new_dependence[]&srctbl=triggers&objname=triggers&srcfld1=1&multiselect=1".
-				"',600,450);",
+				"return PopUp('popup.php?dstfrm=massupdate&dstact=add_dependence&reference=deptrigger".
+				"&dstfld1=new_dependence[]&srctbl=triggers&objname=triggers&srcfld1=triggerid&multiselect=1".
+				"',1000,700);",
 				'T');
 
 		array_push($dep_el, array(br(),$btnSelect));
@@ -2983,10 +2973,23 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 						);
 /* end new dependency */
 
-
 		$frmMTrig->addItemToBottomRow(new CButton('mass_save',S_SAVE));
 		$frmMTrig->addItemToBottomRow(SPACE);
-		$frmMTrig->addItemToBottomRow(new CButtonCancel(url_param('config').url_param('groupid')));
+		$frmMTrig->addItemToBottomRow(new CButtonCancel(url_param('groupid')));
+
+		$script = "function addPopupValues(list){
+						if(!isset('object', list)) return false;
+
+						if(list.object == 'deptrigger'){
+							for(var i=0; i < list.values.length; i++){
+								create_var('".$frmMTrig->getName()."', 'new_dependence['+i+']', list.values[i], false);
+							}
+
+							create_var('".$frmMTrig->getName()."','add_dependence', 1, true);
+						}
+					}";
+		insert_js($script);
+
 	return $frmMTrig;
 	}
 
@@ -3121,7 +3124,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 					 new CButton('insert',$input_method == IM_TREE ? S_EDIT : S_SELECT,
 								 "return PopUp('popup_trexpr.php?dstfrm=".$frmTrig->getName().
 								 "&dstfld1=${exprfname}&srctbl=expression".
-								 "&srcfld1=expression&expression=' + escape($exprparam),800,200);"));
+								 "&srcfld1=expression&expression=' + escape($exprparam),1000,700);"));
 
 		if(isset($macrobtn)) array_push($row, $macrobtn);
 		if($input_method == IM_TREE){
@@ -3245,7 +3248,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 							'&srcfld1=triggerid'.
 							'&reference=deptrigger'.
 							'&multiselect=1'.
-						"',750,450);",'T');
+						"',1000,700);",'T');
 
 
 		$frmTrig->addRow(S_NEW_DEPENDENCY, $btnSelect, 'new');

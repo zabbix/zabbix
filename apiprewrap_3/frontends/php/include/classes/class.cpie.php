@@ -318,7 +318,7 @@ class CPie extends CGraphDraw{
 			}
 			else{
 				$strvalue = sprintf(S_VALUE.': '.S_NO_DATA_SMALL);
-				$str=sprintf('%s: %s [ '.S_NO_DATA_SMALL.' ]',
+				$str = sprintf('%s: %s [ '.S_NO_DATA_SMALL.' ]',
 					str_pad($this->items[$i]['host'],$max_host_len,' '),
 					str_pad($this->items[$i]['description'],$max_desc_len,' '));
 			}
@@ -326,7 +326,7 @@ class CPie extends CGraphDraw{
 
 			imagefilledrectangle($this->im,
 							$this->shiftXleft,
-							$this->sizeY+$shiftY+14*$i -5,
+							$this->sizeY+$shiftY+14*$i - 5,
 							$this->shiftXleft+10,
 							$this->sizeY+$shiftY+5+14*$i,
 							$color);
@@ -350,7 +350,7 @@ class CPie extends CGraphDraw{
 					);
 
 
-			$shiftX = $this->fullSizeX - $this->shiftlegendright - $this->shiftXright + 10;
+			$shiftX = $this->fullSizeX - $this->shiftlegendright - $this->shiftXright + 25;
 	//		SDI($shiftX.','.$this->sizeX);
 
 			imagefilledrectangle($this->im,
@@ -535,7 +535,7 @@ class CPie extends CGraphDraw{
 
 		$this->shiftY = 30;
 		$this->shiftYLegend = 20;
-		$this->shiftXleft = 30;
+		$this->shiftXleft = 10;
 		$this->shiftXright = 0;
 
 		$this->fullSizeX = $this->sizeX;

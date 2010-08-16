@@ -825,21 +825,31 @@ class CUserMacro extends CZBXAPI{
 
 					$objectids = array_merge($hostids, $templateids);
 
-					$sql = 'SELECT macro, hostid FROM hostmacro WHERE '.DBcondition('hostid', $objectids).' AND '.DBcondition('macro', $macros_macro, false, true);
+					$sql = 'SELECT macro, hostid '.
+						' FROM hostmacro '.
+						' WHERE '.DBcondition('hostid', $objectids).
+							' AND '.DBcondition('macro', $macros_macro, false, true);
 					$linked_db = DBselect($sql);
 					while($pair = DBfetch($linked_db)){
-						$linked[] = array('macro' => $pair['macro'], 'hostid' => $pair['hostid']);
+						$linked[] = array(
+							'macro' => $pair['macro'],
+							'hostid' => $pair['hostid']
+						);
 					}
 
 					foreach($data['macros'] as $mnum => $macro){
-						foreach($objectids as $hostid){
+						foreach($objectids as $onum => $hostid){
 
 							foreach($linked as $link){
 								if(($link['macro'] == $macro['macro']) && ($link['hostid'] == $hostid)) continue 2;
 							}
 
-							$values = array(get_dbid('hostmacro', 'hostmacroid'), $hostid, zbx_dbstr($macro['macro']),
-								zbx_dbstr($macro['value']));
+							$values = array(
+								'hostmacroid' => get_dbid('hostmacro', 'hostmacroid'),
+								'hostid' => $hostid,
+								'macro' => zbx_dbstr($macro['macro']),
+								'value' => zbx_dbstr($macro['value'])
+							);
 							$sql = 'INSERT INTO hostmacro (hostmacroid, hostid, macro, value) VALUES ('. implode(', ', $values) .')';
 
 							if(!DBexecute($sql)){
@@ -901,9 +911,9 @@ class CUserMacro extends CZBXAPI{
 
 		if($result){
 			// $result = self::get(array(
-				// 'groupids' => $groupids,
-				// 'extendoutput' => 1,
-				// 'select_hosts' => 1,
+				// 'hostids' => $hostids,
+				// 'output' => API_OUTPUT_EXTEND,
+				// 'select_hosts' => API_OUTPUT_EXTEND,
 				// 'nopermission' => 1));
 			return $result;
 		}

@@ -1,6 +1,7 @@
 <?php
 // get language translations {{{
 require_once('include/locales/en_gb.inc.php');
+require_once('include/js.inc.php');
 $translations = $TRANSLATION;
 
 if(isset($_GET['lang']) && ($_GET['lang'] != 'en_gb') && preg_match('/^[a-z]{2}_[a-z]{2}$/', $_GET['lang'])){
@@ -87,7 +88,7 @@ $js = 'if(typeof(locale) == "undefined") var locale = {};'."\n";
 foreach($files as $file){
 	if(isset($tranStrings[$file])){
 		foreach($tranStrings[$file] as $str){
-			$js .= "locale['".$str."'] = '".$translations[$str]."';";
+			$js .= "locale['".$str."'] = ".zbx_jsvalue($translations[$str]).";";
 		}
 	}
 }

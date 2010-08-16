@@ -448,9 +448,9 @@ function get_scroll_pos(){
 	return [ scrOfX, scrOfY ];
 }
 
-function insert_in_element(element_name, text){
+function insertInElement(element_name, text, tagName){
 	if(IE)
-		var elems = $$('[name='+element_name+']');
+		var elems = $$(tagName+'[name='+element_name+']');
 	else
 		var elems = document.getElementsByName(element_name);
 
@@ -665,15 +665,29 @@ function switchElementsClass(obj,class1,class2){
 	obj = $(obj);
 	if(!obj) return false;
 
-	if(obj.className == class1){
-		obj.className = class2;
-		return class2;
+	var result = false;
+	if(obj.hasClassName(class1)){
+		obj.removeClassName(class1);
+		obj.className = class2 + ' ' + obj.className;
+		result = class2;
+	}
+	else if(obj.hasClassName(class2)){
+		obj.removeClassName(class2);
+		obj.className =  class1 + ' ' + obj.className;
+		result = class1;
 	}
 	else{
-		obj.className = class1;
-		return class1;
+		obj.className = class1 + ' ' + obj.className;
+		result = class1;
 	}
-return false;
+	
+	if(IE6){
+		obj.style.filter = '';
+		obj.style.backgroundImage = '';
+		ie6pngfix.run();
+	}
+
+return result;
 }
 
 function zbx_throw(msg){

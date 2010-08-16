@@ -95,6 +95,13 @@ div.messagecontainer .messagebox span.body{
 	font-size: 7pt;
 	white-space: nowrap;
 }
+
+div.messagecontainer .messagebox span.body a{
+	color: #EAEAEA;
+	line-height: 14px;
+	font-size: 7pt;
+	white-space: nowrap;
+}
 /************************************************************/
 /*						SEARCH Suggest						*/
 /************************************************************/

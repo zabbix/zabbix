@@ -27,7 +27,7 @@ if [ ! -f ${CONFIG_FILE} ]; then
 		exit 6
 fi
 
-ZABBIX_BIN="/opt/zabbix/bin/zabbix_server"
+ZABBIX_BIN="/opt/zabbix/sbin/zabbix_server"
 ZABBIX_PID="/var/tmp/zabbix_server.pid"
 
 

@@ -77,7 +77,12 @@ include_once('include/page_header.php');
 	CProfile::update('web.screenconf.config', $_REQUEST['config'],PROFILE_TYPE_INT);
 
 	if(isset($_REQUEST['screenid'])){
-		if(!screen_accessible($_REQUEST['screenid'], PERM_READ_WRITE))
+		$r = CScreen::get(array(
+			'screenids' => $_REQUEST['screenid'],
+			'editable' => 1,
+			'output' => API_OUTPUT_SHORTEN
+		));
+		if(empty($r))
 			access_deny();
 	}
 ?>
@@ -259,7 +264,7 @@ include_once('include/page_header.php');
 
 			$screen_wdgt->addItem($form);
 		}
-	
+
 	$screen_wdgt->show();
 
 include_once('include/page_footer.php');

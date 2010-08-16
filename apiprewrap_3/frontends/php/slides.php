@@ -61,9 +61,9 @@ include_once('include/page_header.php');
 	);
 
 	check_fields($fields);
-	
+
 	$tmpstime = get_request('stime');
-	
+
 	if(isset($_REQUEST['favobj'])){
 		$_REQUEST['pmasterid'] = get_request('pmasterid','mainpage');
 
@@ -114,7 +114,7 @@ include_once('include/page_header.php');
 						$element = get_screen($screen['screenid'],2,$effectiveperiod);
 
 						$refresh_multipl = CProfile::get('web.slides.rf_rate.hat_slides', 1, $elementid);
-						
+
 						if($screen['delay'] > 0) $refresh = $screen['delay'];
 						else $refresh = $slideshow['delay'];
 
@@ -138,7 +138,7 @@ include_once('include/page_header.php');
 				$elementid = $_REQUEST['elementid'];
 
 				CProfile::update('web.slides.rf_rate.hat_slides', $_REQUEST['favcnt'], PROFILE_TYPE_STR, $elementid);
-			
+
 				// $script= get_update_doll_script('mainpage', $_REQUEST['favref'], 'frequency', $_REQUEST['favcnt'])*$refresh."\n";
 				// $script.= get_update_doll_script('mainpage', $_REQUEST['favref'], 'stopDoll')."\n";
 				// $script.= get_update_doll_script('mainpage', $_REQUEST['favref'], 'startDoll')."\n";
@@ -190,58 +190,56 @@ include_once('include/page_header.php');
 		$slides_wdgt->addPageHeader(S_SLIDESHOWS_BIG, $formHeader);
 		$slides_wdgt->addItem(BR());
 		$slides_wdgt->addItem(new CTableInfo(S_NO_SLIDESHOWS_DEFINED));
-		$slides_wdgt->show();	
+		$slides_wdgt->show();
 	}
 	else{
 		if(!isset($slideshows[$elementid])){
 			$slideshow = reset($slideshows);
-			$elementid = $slideshow['slideshowid'];	
+			$elementid = $slideshow['slideshowid'];
 		}
-		
+
 		$effectiveperiod = navigation_bar_calc('web.slides',$elementid, true);
-		
+		$screen = get_slideshow($elementid, 0);
+
 // PAGE HEADER {{{
-		if(infavorites('web.favorite.screenids', $elementid, 'slideshowid')){
-			$icon = new CDiv(SPACE, 'iconminus');
-			$icon->setAttribute('title', S_REMOVE_FROM.' '.S_FAVOURITES);
-			$icon->addAction('onclick', "javascript: rm4favorites('slideshowid','".$elementid."',0);");
+
+		if($screen){
+			$icon = get_icon('favourite', array(
+				'fav' => 'web.favorite.screenids',
+				'elname' => 'slideshowid',
+				'elid' => $elementid,
+			));
 		}
 		else{
-			$icon = new CDiv(SPACE,'iconplus');
-			$icon->setAttribute('title',S_ADD_TO.' '.S_FAVOURITES);
-			$icon->addAction('onclick', "javascript: add2favorites('slideshowid','".$elementid."');");
+			$icon = new CIcon(S_FAVOURITES, 'iconplus');
 		}
-		$icon->setAttribute('id','addrm_fav');
-
-		$url = '?elementid='.$elementid.($_REQUEST['fullscreen']?'':'&fullscreen=1');
-		$url.=url_param('groupid').url_param('hostid');
-
-		$fs_icon = new CDiv(SPACE,'fullscreen');
-		$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-		$fs_icon->addAction('onclick', "javascript: document.location = '".$url."';");
-	
-		$refresh_icon = new CDiv(SPACE,'iconmenu');
-		$refresh_icon->addAction('onclick', 'javascript: create_page_menu(event,"hat_slides");');
-		$refresh_icon->setAttribute('title',S_MENU);
 		
+		$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
+
+		$refresh_icon = new CIcon(S_MENU, 'iconmenu');
+		if($screen){
+			$refresh_icon->addAction('onclick', 'javascript: create_page_menu(event,"hat_slides");');
+		}
+
+
 		$slides_wdgt->addPageHeader(S_SLIDESHOWS_BIG, array($formHeader, SPACE, $icon, $refresh_icon, $fs_icon));
 // }}} PAGE HEADER
 
 // HEADER {{{
 		$form = new CForm(null, 'get');
 		$form->addVar('fullscreen', $_REQUEST['fullscreen']);
-		
+
 		$cmbElements = new CComboBox('elementid', $elementid, 'submit()');
 		foreach($slideshows as $snum => $slideshow){
 			$cmbElements->addItem($slideshow['slideshowid'], get_node_name_by_elid($slideshow['slideshowid'], null, ': ').$slideshow['name']);
 		}
 		$form->addItem(array(S_SLIDESHOW.SPACE, $cmbElements));
-		
+
 		$slides_wdgt->addHeader($slideshows[$elementid]['name'], $form);
 // }}} HEADER
-		
-		if($screen = get_slideshow($elementid, 0)){
-		
+
+		if($screen){
+
 			if((2 != $_REQUEST['fullscreen']) && check_dynamic_items($elementid, 1)){
 				if(!isset($_REQUEST['hostid'])){
 					$_REQUEST['groupid'] = $_REQUEST['hostid'] = 0;
@@ -273,12 +271,12 @@ include_once('include/page_header.php');
 				$form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
 			}
 
-			
+
 			$element = get_slideshow_by_slideshowid($elementid);
 			if($screen['delay'] > 0) $element['delay'] = $screen['delay'];
-			
+
 			show_messages();
-			
+
 // js menu arrays
 			$menu = array();
 			$submenu = array();
@@ -295,7 +293,7 @@ include_once('include/page_header.php');
 			));
 			add_doll_objects($refresh_tab);
 
-			
+
 			$effectiveperiod = navigation_bar_calc();
 			if(2 != $_REQUEST['fullscreen']){
 // NAV BAR
@@ -311,8 +309,8 @@ include_once('include/page_header.php');
 				$scroll_div->setAttribute('id','scrollbar_cntr');
 				$slides_wdgt->addFlicker($scroll_div, CProfile::get('web.slides.filter.state',1));
 				$slides_wdgt->addFlicker(BR(), CProfile::get('web.slides.filter.state',1));
-				
-			
+
+
 				$objData = array(
 					'id' => $elementid,
 					'loadSBox' => 0,
@@ -326,20 +324,20 @@ include_once('include/page_header.php');
 				zbx_add_post_js('timeControl.addObject("iframe",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 				zbx_add_post_js('timeControl.processObjects();');
 			}
-			
+
 	//		$screen = get_slideshow($elementid, 0);
 	//		$element = get_screen($screen['screenid'],2,$effectiveperiod);
 
 			$slides_wdgt->addItem(new CSpan(S_LOADING_P, 'textcolorstyles'));
 
-			
+
 			$jsmenu = new CPUMenu(null, 170);
 			$jsmenu->InsertJavaScript();
 		}
 		else{
 			$slides_wdgt->addItem(new CTableInfo(S_NO_SLIDES_DEFINED));
 		}
-		
+
 		$slides_wdgt->show();
 	}
 

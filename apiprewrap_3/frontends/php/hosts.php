@@ -179,7 +179,7 @@ include_once('include/page_header.php');
 			'graphids' => $graphids,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => 1,
-			'expand_data' => 1
+			'expandData' => 1
 		);
 		$gitems = CGraphItem::get($params);
 
@@ -227,7 +227,7 @@ include_once('include/page_header.php');
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => 1,
 			'select_dependencies' => 1,
-			'expand_data' => 1
+			'expandData' => 1
 		);
 		$triggers = CTrigger::get($params);
 		foreach($triggers as $tnum => $trigger){
@@ -652,7 +652,7 @@ include_once('include/page_header.php');
 		if($_REQUEST['form'] == S_IMPORT_HOST)
 			$hosts_wdgt->addItem(import_host_form());
 		else
-			$hosts_wdgt->addItem(insert_host_form(false));
+			$hosts_wdgt->addItem(insert_host_form());
 	}
 	else{
 
