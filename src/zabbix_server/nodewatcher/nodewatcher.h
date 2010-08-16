@@ -20,7 +20,10 @@
 #ifndef ZABBIX_NODEWATCHER_H
 #define ZABBIX_NODEWATCHER_H
 
+int	is_master_node(int current_nodeid, int master_nodeid);
+int	is_slave_node(int current_nodeid, int slave_nodeid);
+int	is_direct_slave_node(int slave_nodeid);
+
 int	main_nodewatcher_loop();
-int	is_master_node(int current_nodeid, int nodeid);
 
 #endif
