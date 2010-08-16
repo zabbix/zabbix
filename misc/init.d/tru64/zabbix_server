@@ -21,7 +21,7 @@
 # Place a startup script in /sbin/init.d, and link to it from /sbin/rc[023].d 
 
 SERVICE="ZABBIX server"
-DAEMON=/usr/local/bin/zabbix_server
+DAEMON=/usr/local/sbin/zabbix_server
 PIDFILE=/tmp/zabbix_server.pid
 
 case $1 in

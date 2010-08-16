@@ -1,3 +1,7 @@
+Changes for 1.8.4rc1
+
+ - [ZBX-2716] make all example initscripts point to sbin for daemon path (Richlv)
+
 Changes for 1.8.3
 
  - [ZBX-2875] updated Japanese translation; thanks to Kodai Terashima (Richlv)

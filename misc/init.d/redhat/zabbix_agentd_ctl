@@ -37,7 +37,7 @@ BASEDIR=/opt/zabbix
 # pid file (as of 1.0 beta 10)
 PIDFILE=/var/tmp/zabbix_agentd.pid
 # binary file
-ZABBIX_AGENTD=$BASEDIR/bin/zabbix_agentd
+ZABBIX_AGENTD=$BASEDIR/sbin/zabbix_agentd
 
 
 # **************
