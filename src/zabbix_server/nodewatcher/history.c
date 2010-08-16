@@ -30,7 +30,7 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: get_history_lastid:                                              *
+ * Function: get_history_lastid                                               *
  *                                                                            *
  * Purpose: get last history id from master node                              *
  *                                                                            *
@@ -81,7 +81,7 @@ disconnect:
 
 /******************************************************************************
  *                                                                            *
- * Function : process_history_table_data:                                     *
+ * Function: process_history_table_data                                       *
  *                                                                            *
  * Purpose: process new history data                                          *
  *                                                                            *
@@ -240,6 +240,7 @@ static void process_history_tables(int master_nodeid, int nodeid)
 		time(NULL) - start,
 		nodeid);
 }
+
 /******************************************************************************
  *                                                                            *
  * Function: main_historysender                                               *

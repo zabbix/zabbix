@@ -17,7 +17,6 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -28,6 +27,7 @@
 
 #include "../events.h"
 #include "../nodewatcher/nodecomms.h"
+#include "../nodewatcher/nodewatcher.h"
 
 static char	*buffer = NULL, *tmp = NULL;
 static int	buffer_allocated, tmp_allocated;
@@ -76,9 +76,9 @@ int	send_history_last_id(zbx_sock_t *sock, const char *data)
 	if (NULL == r)
 		goto error;
 
-	if (FAIL == is_slave_node(sender_nodeid))
+	if (FAIL == is_direct_slave_node(sender_nodeid))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "NODE %d: Received data from unknown node %d [%s]",
+		zabbix_log(LOG_LEVEL_ERR, "NODE %d: Received data from node %d that is not a direct slave node [%s]",
 				CONFIG_NODEID, sender_nodeid, data);
 		goto fail;
 	}
@@ -87,6 +87,13 @@ int	send_history_last_id(zbx_sock_t *sock, const char *data)
 	nodeid = atoi(buffer);
 	if (NULL == r)
 		goto error;
+
+	if (FAIL == is_slave_node(CONFIG_NODEID, nodeid))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "NODE %d: Received data for unknown slave node %d [%s]",
+				CONFIG_NODEID, nodeid, data);
+		goto fail;
+	}
 
 	zbx_get_next_field(&r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER); /* table name */
 	if (NULL == (table = DBget_table(buffer)))
@@ -538,6 +545,21 @@ int	node_history(char *data, size_t datalen)
 			zbx_get_next_field(&r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER); /* nodeid */
 			nodeid=atoi(buffer);
 			zbx_get_next_field(&r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER); /* tablename */
+			
+			if (FAIL == is_direct_slave_node(sender_nodeid))
+			{
+				zabbix_log(LOG_LEVEL_ERR, "NODE %d: Received data from node %d"
+							"that is not a direct slave node",
+						CONFIG_NODEID, sender_nodeid);
+				res = FAIL;
+			}
+
+			if (FAIL == is_slave_node(CONFIG_NODEID, nodeid))
+			{
+				zabbix_log(LOG_LEVEL_ERR, "NODE %d: Received history for unknown slave node %d",
+						CONFIG_NODEID, nodeid);
+				res = FAIL;
+			}
 
 			table = DBget_table(buffer);
 			if (NULL != table && 0 == (table->flags & (ZBX_HISTORY | ZBX_HISTORY_SYNC)))
