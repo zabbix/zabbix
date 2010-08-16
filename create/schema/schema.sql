@@ -710,7 +710,7 @@ FIELD		|error		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|lastlogsize	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|logtimefmt	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|templateid	|t_id		|	|NULL		|ZBX_SYNC		|2|items	|itemid
-FIELD		|valuemapid	|t_id		|	|NULL		|ZBX_SYNC		|3|valuemaps
+FIELD		|valuemapid	|t_id		|	|NULL		|ZBX_SYNC		|3|valuemaps	|		|RESTRICT
 FIELD		|delay_flex	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|params		|t_item_param	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|ipmi_sensor	|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
@@ -747,7 +747,7 @@ FIELD		|mediatypeid	|t_id		|	|NOT NULL	|ZBX_SYNC		|2|media_type
 FIELD		|sendto		|t_varchar(100)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|active		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|severity	|t_integer	|'63'	|NOT NULL	|ZBX_SYNC
-FIELD		|period		|t_varchar(100)	|'1-7,00:00-23:59'|NOT NULL	|ZBX_SYNC
+FIELD		|period		|t_varchar(100)	|'1-7,00:00-24:00'|NOT NULL	|ZBX_SYNC
 INDEX		|1		|userid
 INDEX		|2		|mediatypeid
 
