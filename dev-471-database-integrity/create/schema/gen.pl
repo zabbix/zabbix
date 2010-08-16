@@ -180,13 +180,8 @@ sub newstate
 			if($new eq "field") { print ",\n" }
 		}
 		case "index"	{
-#			if($output{"type"} eq "sql" && $new eq "table") { print "${statements}"; }
 			if($output{"type"} eq "code" && $new eq "table") { print ",\n\t\t{0}\n\t\t}\n\t},$output{'exec_cmd'}"; }
 		}
-#	 	case "table"	{
-#			if($output{"type"} eq "sql" && $new eq "table") { print "${statements}"; }
-#			print "";
-#		}
 	}
 	$state=$new;
 }
@@ -222,8 +217,6 @@ sub process_table
 		}
 
 		print "CREATE TABLE $table_name (\n";
-
-		$key="";
 	}
 }
 
@@ -273,7 +266,6 @@ sub process_field
 			}
 		}
 
-		# Special processing for Oracle "default 'ZZZ' not null" -> "default 'ZZZ'. NULL=='' in Oracle!"
 		if(($output{"database"} eq "oracle") && ((0==index($type_2,"nvarchar2")) || (0==index($type_2,"nclob"))))
 		{
 			$null="";
@@ -374,8 +366,8 @@ sub process_index
 
 sub usage
 {
-	printf "Usage: $0 [c|mysql|oracle|php|postgresql|sqlite]\n";
-	printf "The script generates ZABBIX SQL schemas and C/PHP code for different database engines.\n";
+	printf "Usage: $0 [c|mysql|oracle|postgresql|sqlite]\n";
+	printf "The script generates Zabbix SQL schemas and C code for different database engines.\n";
 	exit;
 }
 
@@ -391,7 +383,6 @@ sub main
 		case "c"		{ %output=%c; }
 		case "mysql"		{ %output=%mysql; }
 		case "oracle"		{ %output=%oracle; }
-		case "php"		{ %output=%php; }
 		case "postgresql"	{ %output=%postgresql; }
 		case "sqlite"		{ %output=%sqlite; }
 		else			{ usage(); }
