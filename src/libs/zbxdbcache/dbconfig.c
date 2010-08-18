@@ -505,7 +505,7 @@ static void	DCsync_items(DB_RESULT result)
 	{
 		ZBX_STR2UINT64(itemid, row[0]);
 		ZBX_STR2UINT64(hostid, row[1]);
-		ZBX_STR2UINT64(proxy_hostid, row[2]);
+		ZBX_DBROW2UINT64(proxy_hostid, row[2])
 		delay = atoi(row[15]);
 		status = (unsigned char)atoi(row[20]);
 
@@ -938,7 +938,7 @@ static void	DCsync_hosts(DB_RESULT result)
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(hostid, row[0]);
-		ZBX_STR2UINT64(proxy_hostid, row[1]);
+		ZBX_DBROW2UINT64(proxy_hostid, row[1]);
 		status = (unsigned char)atoi(row[26]);
 
 		/* array of selected hosts */

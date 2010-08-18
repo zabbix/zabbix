@@ -53,7 +53,7 @@ int	is_master_node(int current_nodeid, int nodeid)
 		current_nodeid);
 
 	if (NULL != (dbrow = DBfetch(dbresult))) {
-		current_nodeid = atoi(dbrow[0]);
+		current_nodeid = (SUCCEED == DBis_null(dbrow[0])) ? 0 : atoi(dbrow[0]);
 		if (current_nodeid == nodeid)
 			res = SUCCEED;
 		else if (0 != current_nodeid)
