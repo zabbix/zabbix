@@ -401,7 +401,7 @@
 			);
 
 			$events = CEvent::get($options);
-			order_result($events, 'clock', ZBX_SORT_DOWN);
+			morder_result($events, array('clock','ns'), ZBX_SORT_DOWN);
 
 			$triggersOptions = array(
 				'triggerids' => zbx_objectValues($events, 'objectid'),
