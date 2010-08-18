@@ -1370,7 +1370,6 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 	int			processed = 0;
 	double			sec;
 	zbx_timespec_t		ts, proxy_timediff;
-	static zbx_timespec_t	last_ts = {0, 0};
 
 #define VALUES_MAX	256
 	static AGENT_VALUE	*values = NULL, *av;
@@ -1453,12 +1452,7 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 				}
 			}
 			else
-			{
-				av->ts.ns = last_ts.ns++;
-				if ((last_ts.ns > 999900000 && last_ts.sec != av->ts.sec) || last_ts.ns == 1000000000)
-					last_ts.ns = 0;
-				last_ts.sec = av->ts.sec;
-			}
+				av->ts.ns = -1;
 		}
 		else
 			zbx_timespec(&av->ts);
