@@ -139,6 +139,7 @@ ZBX_DC_CACHE
 	int		history_num;
 	int		trends_num;
 	int		itemids_alloc, itemids_num;
+	zbx_timespec_t	last_ts;
 };
 
 ZBX_DC_CACHE		*cache = NULL;
@@ -2308,6 +2309,17 @@ retry:
 	return history;
 }
 
+static void	DCcheck_ns(zbx_timespec_t *ts)
+{
+	if (ts->ns >= 0)
+		return;
+
+	ts->ns = cache->last_ts.ns++;
+	if ((cache->last_ts.ns > 999900000 && cache->last_ts.sec != ts->sec) || cache->last_ts.ns == 1000000000)
+		cache->last_ts.ns = 0;
+	cache->last_ts.sec = ts->sec;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: DCadd_history                                                    *
@@ -2328,6 +2340,8 @@ static void	DCadd_history(zbx_uint64_t itemid, double value_orig, zbx_timespec_t
 	ZBX_DC_HISTORY	*history;
 
 	LOCK_CACHE;
+
+	DCcheck_ns(ts);
 
 	history = DCget_history_ptr(itemid, 0);
 
@@ -2368,6 +2382,8 @@ static void	DCadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value_orig, zbx
 
 	LOCK_CACHE;
 
+	DCcheck_ns(ts);
+
 	history = DCget_history_ptr(itemid, 0);
 
 	history->itemid				= itemid;
@@ -2407,6 +2423,8 @@ static void	DCadd_history_str(zbx_uint64_t itemid, char *value_orig, zbx_timespe
 	size_t		len;
 
 	LOCK_CACHE;
+
+	DCcheck_ns(ts);
 
 	if (HISTORY_STR_VALUE_LEN_MAX < (len = strlen(value_orig) + 1))
 		len = HISTORY_STR_VALUE_LEN_MAX;
@@ -2452,6 +2470,8 @@ static void	DCadd_history_text(zbx_uint64_t itemid, char *value_orig, zbx_timesp
 
 	LOCK_CACHE;
 
+	DCcheck_ns(ts);
+
 	if (HISTORY_TEXT_VALUE_LEN_MAX < (len = strlen(value_orig) + 1))
 		len = HISTORY_TEXT_VALUE_LEN_MAX;
 	history = DCget_history_ptr(itemid, len);
@@ -2496,6 +2516,8 @@ static void	DCadd_history_log(zbx_uint64_t itemid, char *value_orig, zbx_timespe
 	size_t		len1, len2;
 
 	LOCK_CACHE;
+
+	DCcheck_ns(ts);
 
 	if (HISTORY_LOG_VALUE_LEN_MAX < (len1 = strlen(value_orig) + 1))
 		len1 = HISTORY_LOG_VALUE_LEN_MAX;
@@ -2682,6 +2704,8 @@ void	init_database_cache(unsigned char p)
 	zbx_mem_create(&trend_mem, trend_shm_key, ZBX_NO_MUTEX, sz, "trend cache", "TrendCacheSize");
 
 	cache->trends_num = 0;
+	cache->last_ts.sec = 0;
+	cache->last_ts.ns = 0;
 
 #define	INIT_HASHSET_SIZE	1000 /* should be calculated dynamically based on trends size? */
 
