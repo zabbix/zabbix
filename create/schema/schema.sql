@@ -399,10 +399,10 @@ UNIQUE		|1		|operationid
 
 TABLE|escalations|escalationid|0
 FIELD		|escalationid	|t_id		|'0'	|NOT NULL	|0
-FIELD		|actionid	|t_id		|	|NOT NULL	|0			|1|actions
-FIELD		|triggerid	|t_id		|	|NOT NULL	|0			|2|triggers
-FIELD		|eventid	|t_id		|	|NOT NULL	|0			|3|events
-FIELD		|r_eventid	|t_id		|	|NULL		|0			|4|events	|eventid
+FIELD		|actionid	|t_id		|	|NOT NULL	|0			|-|actions
+FIELD		|triggerid	|t_id		|	|NOT NULL	|0			|-|triggers
+FIELD		|eventid	|t_id		|	|NOT NULL	|0			|-|events
+FIELD		|r_eventid	|t_id		|	|NULL		|0			|-|events	|eventid
 FIELD		|nextcheck	|t_time		|'0'	|NOT NULL	|0
 FIELD		|esc_step	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
