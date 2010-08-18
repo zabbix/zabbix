@@ -583,6 +583,14 @@ COpt::savesqlrequest(microtime(true)-$time_start,$query);
 			}
 		}
 //*/
+		if($result){
+			foreach($result as $key => $val){
+				if(is_null($val)){
+					$result[$key] = 0;
+				}
+			}
+		}
+
 	return $result;
 	}
 
@@ -874,6 +882,39 @@ else {
 	}
 
 
+	function whereClause($where){
+		$sql = '';
+
+		foreach($where as $cond){
+			$sql .= ($sql == '' ?  '' : ' AND ');
+			$sql .= $cond['field'];
+
+			if($cond['value'] == 0){
+				if($cond['operatot'] == '='){
+					$sql .= ' IS NULL ';
+				}
+				else{
+					$sql .= ' IS NOT NULL ';
+				}
+			}
+			else if(is_array($cond['value'])){
+
+			}
+			else{
+				$sql .= $cond['operatot'] . $cond['value'];
+			}
+		}
+
+		return $sql;
+	}
+
+	function zero2null($val){
+		if($val == 0){
+			return 'NULL';
+		}
+		else return $val;
+	}
+
 
 	class DB{
 		const SCHEMA_FILE = 'schema.inc.php';
@@ -881,7 +922,11 @@ else {
 		const RESERVEIDS_ERROR = 2;
 
 		const FIELD_TYPE_INT = 'int';
-		const FIELD_TYPE_STR = 'str';
+		const FIELD_TYPE_CHAR = 'char';
+		const FIELD_TYPE_ID = 'id';
+		const FIELD_TYPE_FLOAT = 'float';
+		const FIELD_TYPE_UINT = 'uint';
+		const FIELD_TYPE_BLOB = 'blob';
 
 		static $schema = null;
 
@@ -974,8 +1019,11 @@ else {
 					if(!isset($table_schema['fields'][$field])){
 						unset($row[$field]);
 					}
-					else if($table_schema['fields'][$field] == self::FIELD_TYPE_STR){
+					else if($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_CHAR){
 						$row[$field] = zbx_dbstr($v);
+					}
+					else if($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_ID){
+						$row[$field] = zero2null($v);
 					}
 				}
 
@@ -1009,8 +1057,11 @@ else {
 					if(!isset($table_schema['fields'][$field])){
 						continue;
 					}
-					else if($table_schema['fields'][$field] == self::FIELD_TYPE_STR){
+					else if($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_CHAR){
 						$value = zbx_dbstr($value);
+					}
+					else if($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_ID){
+						$value = zero2null($value);
 					}
 
 					$sql_set .= $field.'='.$value.',';

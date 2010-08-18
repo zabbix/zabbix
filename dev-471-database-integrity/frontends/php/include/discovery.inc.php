@@ -170,7 +170,7 @@ require_once('include/perm.inc.php');
 
 		$druleid = get_dbid('drules', 'druleid');
 		$result = DBexecute('insert into drules (druleid,proxy_hostid,name,iprange,delay,status) '.
-			' values ('.$druleid.','.$proxy_hostid.','.zbx_dbstr($name).','.zbx_dbstr($iprange).','.$delay.','.$status.')');
+			' values ('.$druleid.','.zero2null($proxy_hostid).','.zbx_dbstr($name).','.zbx_dbstr($iprange).','.$delay.','.$status.')');
 
 		if($result && isset($dchecks)){
 			$unique_dcheckid = 0;
@@ -182,7 +182,7 @@ require_once('include/perm.inc.php');
 					$unique_dcheckid = $data['dcheckid'];
 			}
 			DBexecute('UPDATE drules'.
-					' SET unique_dcheckid='.$unique_dcheckid.
+					' SET unique_dcheckid='.zero2null($unique_dcheckid).
 					' WHERE druleid='.$druleid);
 
 			$result = $druleid;
@@ -198,7 +198,7 @@ require_once('include/perm.inc.php');
 
 		}
 
-		$result = DBexecute('update drules set proxy_hostid='.$proxy_hostid.',name='.zbx_dbstr($name).',iprange='.zbx_dbstr($iprange).','.
+		$result = DBexecute('update drules set proxy_hostid='.zero2null($proxy_hostid).',name='.zbx_dbstr($name).',iprange='.zbx_dbstr($iprange).','.
 			'delay='.$delay.',status='.$status.' where druleid='.$druleid);
 
 		if($result && isset($dchecks)){
@@ -214,7 +214,7 @@ require_once('include/perm.inc.php');
 			}
 
 			DBexecute('UPDATE drules'.
-					' SET unique_dcheckid='.$unique_dcheckid.
+					' SET unique_dcheckid='.zero2null($unique_dcheckid).
 					' WHERE druleid='.$druleid);
 		}
 

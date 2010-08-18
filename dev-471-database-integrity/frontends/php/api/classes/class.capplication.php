@@ -207,10 +207,10 @@ class CApplication extends CZBXAPI{
 // inherited
 		if(!is_null($options['inherited'])){
 			if($options['inherited']){
-				$sql_parts['where'][] = 'a.templateid<>0';
+				$sql_parts['where'][] = 'a.templateid IS NOT NULL';
 			}
 			else{
-				$sql_parts['where'][] = 'a.templateid=0';
+				$sql_parts['where'][] = 'a.templateid IS NULL';
 			}
 		}
 

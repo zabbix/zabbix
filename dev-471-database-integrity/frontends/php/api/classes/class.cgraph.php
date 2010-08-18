@@ -230,10 +230,10 @@ class CGraph extends CZBXAPI{
 // inherited
 		if(!is_null($options['inherited'])){
 			if($options['inherited']){
-				$sql_parts['where'][] = 'g.templateid<>0';
+				$sql_parts['where'][] = 'g.templateid IS NOT NULL';
 			}
 			else{
-				$sql_parts['where'][] = 'g.templateid=0';
+				$sql_parts['where'][] = 'g.templateid IS NULL';
 			}
 		}
 
@@ -730,31 +730,8 @@ COpt::memoryPick();
 	}
 
 	protected static function createReal($graph){
-		$graphid = get_dbid('graphs', 'graphid');
-
-		$values = array(
-			'graphid' => $graphid,
-			'name' => zbx_dbstr($graph['name'])
-		);
-		if(isset($graph['width'])) $values['width'] = $graph['width'];
-		if(isset($graph['height'])) $values['height'] = $graph['height'];
-		if(isset($graph['ymin_type'])) $values['ymin_type'] = $graph['ymin_type'];
-		if(isset($graph['ymax_type'])) $values['ymax_type'] = $graph['ymax_type'];
-		if(isset($graph['yaxismin'])) $values['yaxismin'] = $graph['yaxismin'];
-		if(isset($graph['yaxismax'])) $values['yaxismax'] = $graph['yaxismax'];
-		if(isset($graph['ymin_itemid'])) $values['ymin_itemid'] = $graph['ymin_itemid'];
-		if(isset($graph['ymax_itemid'])) $values['ymax_itemid'] = $graph['ymax_itemid'];
-		if(isset($graph['show_work_period'])) $values['show_work_period'] = $graph['show_work_period'];
-		if(isset($graph['show_triggers'])) $values['show_triggers'] = $graph['show_triggers'];
-		if(isset($graph['graphtype'])) $values['graphtype'] = $graph['graphtype'];
-		if(isset($graph['show_legend'])) $values['show_legend'] = $graph['show_legend'];
-		if(isset($graph['show_3d'])) $values['show_3d'] = $graph['show_3d'];
-		if(isset($graph['percent_left'])) $values['percent_left'] = $graph['percent_left'];
-		if(isset($graph['percent_right'])) $values['percent_right'] = $graph['percent_right'];
-		if(isset($graph['templateid'])) $values['templateid'] = $graph['templateid'];
-
-		$sql = 'INSERT INTO graphs ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')';
-		DBexecute($sql) or self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+		$graphid = DB::insert('graphs', array($graph));
+		$graphid = reset($graphid);
 
 		foreach($graph['gitems'] as $gitem){
 			$values = array(
@@ -778,33 +755,10 @@ COpt::memoryPick();
 	}
 
 	protected static function updateReal($graph){
-		$values = array(
-			'name' => zbx_dbstr($graph['name'])
-		);
-		if(isset($graph['width'])) $values['width'] = $graph['width'];
-		if(isset($graph['height'])) $values['height'] = $graph['height'];
-		if(isset($graph['ymin_type'])) $values['ymin_type'] = $graph['ymin_type'];
-		if(isset($graph['ymax_type'])) $values['ymax_type'] = $graph['ymax_type'];
-		if(isset($graph['yaxismin'])) $values['yaxismin'] = $graph['yaxismin'];
-		if(isset($graph['yaxismax'])) $values['yaxismax'] = $graph['yaxismax'];
-		if(isset($graph['ymin_itemid'])) $values['ymin_itemid'] = $graph['ymin_itemid'];
-		if(isset($graph['ymax_itemid'])) $values['ymax_itemid'] = $graph['ymax_itemid'];
-		if(isset($graph['show_work_period'])) $values['show_work_period'] = $graph['show_work_period'];
-		if(isset($graph['show_triggers'])) $values['show_triggers'] = $graph['show_triggers'];
-		if(isset($graph['graphtype'])) $values['graphtype'] = $graph['graphtype'];
-		if(isset($graph['show_legend'])) $values['show_legend'] = $graph['show_legend'];
-		if(isset($graph['show_3d'])) $values['show_3d'] = $graph['show_3d'];
-		if(isset($graph['percent_left'])) $values['percent_left'] = $graph['percent_left'];
-		if(isset($graph['percent_right'])) $values['percent_right'] = $graph['percent_right'];
-		if(isset($graph['templateid'])) $values['templateid'] = $graph['templateid'];
-
-		$q = '';
-		foreach($values as $field => $value){
-			$q .= $field.'='.$value.', ';
-		}
-		$q = rtrim($q, ', ');
-		$sql = 'UPDATE graphs SET '.$q.' WHERE graphid='.$graph['graphid'];
-		DBexecute($sql) or self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+		DB::update('graphs', array(
+			'values' => $graph,
+			'where' => array('graphid='.$graph['graphid']),
+		));
 
 
 		DBexecute('DELETE FROM graphs_items WHERE graphid='.$graph['graphid'])

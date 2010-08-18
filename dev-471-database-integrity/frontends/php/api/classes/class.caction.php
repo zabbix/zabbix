@@ -783,22 +783,9 @@ COpt::memoryPick();
 				}
 			}
 
-			$operationids = array();
-			$sql = 'SELECT operationid FROM operations WHERE '.DBcondition('actionid', $actionids);
-			$operations_db = DBselect($sql);
-			while($operationid = DBfetch($operations_db)){
-				$operationids[] = $operationid['operationid'];
-			}
-
-			DB::delete('conditions', DBcondition('actionid', $actionids));
-			DB::delete('opconditions', DBcondition('operationid', $operationids));
-			DB::delete('opmediatypes', DBcondition('operationid', $operationids));
-			DB::delete('alerts', DBcondition('actionid', $actionids));
-			DB::delete('operations', DBcondition('actionid', $actionids));
 			DB::delete('actions', DBcondition('actionid', $actionids));
 
 			self::EndTransaction(true, __METHOD__);
-
 			return array('actionids' => $actionids);
 		}
 		catch(APIException $e){
