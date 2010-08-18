@@ -178,7 +178,7 @@ int	main_alerter_loop()
 		while (NULL != (row = DBfetch(result)))
 		{
 			ZBX_STR2UINT64(alert.alertid, row[0]);
-			alert.mediatypeid	= atoi(row[1]);
+			ZBX_STR2UINT64(alert.mediatypeid, row[1]);
 			alert.sendto		= row[2];
 			alert.subject		= row[3];
 			alert.message		= row[4];

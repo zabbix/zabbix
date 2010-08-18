@@ -293,6 +293,8 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() proxy_hostid:" ZBX_FS_UI64,
 			__function_name, proxy_hostid);
 
+	assert(proxy_hostid);
+
 	for (i = 0; pt[i].table != NULL; i++)
 	{
 		if (NULL == (table = DBget_table(pt[i].table)))
@@ -1616,7 +1618,9 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 					drule.druleid);
 
 			if (NULL != (row = DBfetch(result)))
-				ZBX_STR2UINT64(drule.unique_dcheckid, row[0]);
+			{
+				ZBX_DBROW2UINT64(drule.unique_dcheckid, row[0])
+			}
 			DBfree_result(result);
 
 			last_druleid = drule.druleid;

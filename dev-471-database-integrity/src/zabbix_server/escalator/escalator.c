@@ -640,7 +640,7 @@ static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *r_event, D
 	if (1 == action->recovery_msg)
 	{
 		result = DBselect("select distinct userid,mediatypeid from alerts where actionid=" ZBX_FS_UI64
-				" and eventid=" ZBX_FS_UI64 " and mediatypeid<>0 and alerttype=%d",
+				" and eventid=" ZBX_FS_UI64 " and mediatypeid is not null and alerttype=%d",
 				action->actionid,
 				escalation->eventid,
 				ALERT_TYPE_MESSAGE);
@@ -912,9 +912,9 @@ static void	process_escalations(int now)
 		memset(&escalation, 0, sizeof(escalation));
 		ZBX_STR2UINT64(escalation.escalationid, row[0]);
 		ZBX_STR2UINT64(escalation.actionid, row[1]);
-		ZBX_STR2UINT64(escalation.triggerid, row[2]);
+		ZBX_DBROW2UINT64(escalation.triggerid, row[2]);
 		ZBX_STR2UINT64(escalation.eventid, row[3]);
-		ZBX_STR2UINT64(escalation.r_eventid, row[4]);
+		ZBX_DBROW2UINT64(escalation.r_eventid, row[4])
 		escalation.esc_step	= atoi(row[5]);
 		escalation.status	= atoi(row[6]);
 		escalation.nextcheck	= 0;
