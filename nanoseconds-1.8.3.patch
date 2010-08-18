@@ -27,7 +27,7 @@ Index: include/db.h
 ===================================================================
 --- include/db.h
 +++ include/db.h
-@@ -301,6 +301,7 @@
+@@ -304,6 +304,7 @@
  	char		*trigger_comments;
  	int		trigger_type;
  	zbx_uint64_t	ack_eventid;
@@ -35,7 +35,7 @@ Index: include/db.h
  };
  
  DB_HOST
-@@ -344,6 +345,7 @@
+@@ -347,6 +348,7 @@
  	double	lastvalue_dbl;
  	zbx_uint64_t	lastvalue_uint64;
  	int	lastclock;
@@ -43,7 +43,7 @@ Index: include/db.h
  	int     lastvalue_null;
  	char	*prevvalue_str;
  	double	prevvalue_dbl;
-@@ -572,7 +574,7 @@
+@@ -575,7 +577,7 @@
  void	DBupdate_triggers_status_after_restart(void);
  int	DBget_prev_trigger_value(zbx_uint64_t triggerid);
  int     DBupdate_trigger_value(zbx_uint64_t triggerid, int type, int value,
@@ -103,7 +103,7 @@ Index: configure.in
 ===================================================================
 --- configure.in
 +++ configure.in
-@@ -97,6 +97,7 @@
+@@ -126,6 +126,7 @@
  #Solaris SNMP requires this
  AC_SEARCH_LIBS(kstat_open, kstat)
  AC_SEARCH_LIBS(gethostbyname, nsl)
@@ -111,7 +111,7 @@ Index: configure.in
  #AC_SEARCH_LIBS(__res_query, resolv bind socket)
  #Solaris 8 requires this. It does not have symbol __res_query.
  #AC_SEARCH_LIBS(res_query, resolv bind socket)
-@@ -223,6 +224,22 @@
+@@ -281,6 +282,22 @@
  	AC_MSG_RESULT(no)
  fi
  
@@ -982,7 +982,15 @@ Index: src/libs/zbxdbcache/dbcache.c
  	int		timestamp;
  	int		severity;
  	int		logeventid;
-@@ -848,7 +849,7 @@
+@@ -138,6 +139,7 @@
+ 	int		history_num;
+ 	int		trends_num;
+ 	int		itemids_alloc, itemids_num;
++	zbx_timespec_t	last_ts;
+ };
+ 
+ ZBX_DC_CACHE		*cache = NULL;
+@@ -848,7 +850,7 @@
  		zbx_uint64_t	triggerid;
  		char		*exp;
  		char		*error;
@@ -991,7 +999,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  		unsigned char	type;
  		unsigned char	value;
  	} zbx_trigger_t;
-@@ -920,7 +921,8 @@
+@@ -920,7 +922,8 @@
  			tr_last->value = (unsigned char)atoi(row[2]);
  			tr_last->error = strdup(row[3]);
  			tr_last->exp = strdup(row[4]);
@@ -1001,7 +1009,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  		}
  
  		ZBX_STR2UINT64(itemid, row[5]);
-@@ -929,8 +931,12 @@
+@@ -929,8 +932,12 @@
  		{
  			if (itemid == history[i].itemid)
  			{
@@ -1016,7 +1024,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  				break;
  			}
  		}
-@@ -940,13 +946,13 @@
+@@ -940,13 +947,13 @@
  
  	for (i = 0; i < tr_num; i++)
  	{
@@ -1032,7 +1040,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  					tr[i].triggerid, tr[i].value, error, sizeof(error)))
  		{
  			zabbix_log(LOG_LEVEL_WARNING, "Expression [%s] cannot be evaluated: %s",
-@@ -955,11 +961,11 @@
+@@ -955,11 +962,11 @@
  					tr[i].exp, error);
  
  			DBupdate_trigger_value(tr[i].triggerid, tr[i].type, tr[i].value,
@@ -1046,7 +1054,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  
  		zbx_free(tr[i].error);
  		zbx_free(tr[i].exp);
-@@ -1017,7 +1023,7 @@
+@@ -1017,7 +1024,7 @@
  		uint64_array_add(&ids, &ids_alloc, &ids_num, history[i].itemid, 64);
  
  	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
@@ -1055,7 +1063,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  			" from items"
  			" where");
  
-@@ -1058,6 +1064,10 @@
+@@ -1058,6 +1065,10 @@
  			item.lastclock	= atoi(row[2]);
  		else
  			item.lastclock	= 0;
@@ -1066,7 +1074,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  		if (SUCCEED != DBis_null(row[3]))
  		{
  			item.prevorgvalue_null	= 0;
-@@ -1092,8 +1102,8 @@
+@@ -1092,8 +1103,8 @@
  
  		status = ITEM_STATUS_ACTIVE;
  
@@ -1077,7 +1085,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  
  		switch (h->value_type) {
  		case ITEM_VALUE_TYPE_FLOAT:
-@@ -1114,9 +1124,11 @@
+@@ -1114,9 +1125,11 @@
  				}
  				break;
  			case ITEM_STORE_SPEED_PER_SECOND:
@@ -1091,7 +1099,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  					h->value.value_float = DBmultiply_value_float(&item, h->value.value_float);
  
  					if (SUCCEED == DBchk_double(h->value.value_float))
-@@ -1216,9 +1228,11 @@
+@@ -1216,9 +1229,11 @@
  						h->value.value_uint64);
  				break;
  			case ITEM_STORE_SPEED_PER_SECOND:
@@ -1105,7 +1113,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  					h->value.value_uint64 = DBmultiply_value_uint64(&item, h->value.value_uint64);
  					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
  							",prevvalue=lastvalue,prevorgvalue='" ZBX_FS_UI64 "'"
-@@ -1399,10 +1413,19 @@
+@@ -1399,10 +1414,19 @@
  	zbx_uint64_t	id;
  #ifdef HAVE_MULTIROW_INSERT
  	int		tmp_offset;
@@ -1125,7 +1133,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  #ifdef HAVE_ORACLE
  	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "begin\n");
  #endif
-@@ -1413,7 +1436,8 @@
+@@ -1413,7 +1437,8 @@
  #ifdef HAVE_MULTIROW_INSERT
  	tmp_offset = sql_offset;
  	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
@@ -1135,7 +1143,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  #endif
  
  	for (i = 0; i < history_num; i++)
-@@ -1427,20 +1451,20 @@
+@@ -1427,20 +1452,20 @@
  		if (0 != history[i].value_null)
  			continue;
  
@@ -1165,7 +1173,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  	}
  
  #ifdef HAVE_MULTIROW_INSERT
-@@ -1458,7 +1482,8 @@
+@@ -1458,7 +1483,8 @@
  #ifdef HAVE_MULTIROW_INSERT
  		tmp_offset = sql_offset;
  		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
@@ -1175,7 +1183,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  #endif
  
  		for (i = 0; i < history_num; i++)
-@@ -1472,22 +1497,21 @@
+@@ -1472,22 +1498,21 @@
  			if (0 != history[i].value_null)
  				continue;
  
@@ -1207,7 +1215,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  		}
  
  #ifdef HAVE_MULTIROW_INSERT
-@@ -1507,7 +1531,8 @@
+@@ -1507,7 +1532,8 @@
  #ifdef HAVE_MULTIROW_INSERT
  	tmp_offset = sql_offset;
  	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
@@ -1217,7 +1225,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  #endif
  
  	for (i = 0; i < history_num; i++)
-@@ -1521,20 +1546,20 @@
+@@ -1521,20 +1547,20 @@
  		if (0 != history[i].value_null)
  			continue;
  
@@ -1247,7 +1255,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  	}
  
  #ifdef HAVE_MULTIROW_INSERT
-@@ -1552,7 +1577,8 @@
+@@ -1552,7 +1578,8 @@
  #ifdef HAVE_MULTIROW_INSERT
  		tmp_offset = sql_offset;
  		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
@@ -1257,7 +1265,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  #endif
  
  		for (i = 0; i < history_num; i++)
-@@ -1566,22 +1592,21 @@
+@@ -1566,22 +1593,21 @@
  			if (0 != history[i].value_null)
  				continue;
  
@@ -1289,7 +1297,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  		}
  
  #ifdef HAVE_MULTIROW_INSERT
-@@ -1601,7 +1626,8 @@
+@@ -1601,7 +1627,8 @@
  #ifdef HAVE_MULTIROW_INSERT
  	tmp_offset = sql_offset;
  	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
@@ -1299,7 +1307,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  #endif
  
  	for (i = 0; i < history_num; i++)
-@@ -1616,20 +1642,20 @@
+@@ -1616,20 +1643,20 @@
  			continue;
  
  		value_esc = DBdyn_escape_string_len(history[i].value_orig.value_str, HISTORY_STR_VALUE_LEN);
@@ -1329,7 +1337,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  		zbx_free(value_esc);
  	}
  
-@@ -1648,7 +1674,8 @@
+@@ -1648,7 +1675,8 @@
  #ifdef HAVE_MULTIROW_INSERT
  		tmp_offset = sql_offset;
  		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
@@ -1339,7 +1347,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  #endif
  
  		for (i = 0; i < history_num; i++)
-@@ -1663,22 +1690,21 @@
+@@ -1663,22 +1691,21 @@
  				continue;
  
  			value_esc = DBdyn_escape_string_len(history[i].value_orig.value_str, HISTORY_STR_VALUE_LEN);
@@ -1371,7 +1379,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  			zbx_free(value_esc);
  		}
  
-@@ -1712,7 +1738,8 @@
+@@ -1712,7 +1739,8 @@
  #ifdef HAVE_MULTIROW_INSERT
  		tmp_offset = sql_offset;
  		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
@@ -1381,7 +1389,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  #endif
  
  		for (i = 0; i < history_num; i++)
-@@ -1727,22 +1754,21 @@
+@@ -1727,22 +1755,21 @@
  				continue;
  
  			value_esc = DBdyn_escape_string(history[i].value_orig.value_str);
@@ -1414,7 +1422,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  			zbx_free(value_esc);
  			id++;
  		}
-@@ -1768,7 +1794,8 @@
+@@ -1768,7 +1795,8 @@
  #ifdef HAVE_MULTIROW_INSERT
  		tmp_offset = sql_offset;
  		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
@@ -1424,7 +1432,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  #endif
  
  		for (i = 0; i < history_num; i++)
-@@ -1784,9 +1811,13 @@
+@@ -1784,9 +1812,13 @@
  
  			source_esc = DBdyn_escape_string_len(history[i].source, HISTORY_LOG_SOURCE_LEN);
  			value_esc = DBdyn_escape_string(history[i].value_orig.value_str);
@@ -1440,7 +1448,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  					id,
  					history[i].itemid,
  					history[i].clock,
-@@ -1795,19 +1826,10 @@
+@@ -1795,19 +1827,10 @@
  					history[i].severity,
  					value_esc,
  					history[i].logeventid);
@@ -1464,7 +1472,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  			zbx_free(value_esc);
  			zbx_free(source_esc);
  			id++;
-@@ -1856,6 +1878,9 @@
+@@ -1856,6 +1879,9 @@
  	char		*value_esc, *source_esc;
  #ifdef HAVE_MULTIROW_INSERT
  	int		tmp_offset;
@@ -1474,7 +1482,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  #endif
  
  	zabbix_log(LOG_LEVEL_DEBUG, "In DCmass_proxy_add_history()");
-@@ -1866,104 +1891,58 @@
+@@ -1866,104 +1892,58 @@
  
  #ifdef HAVE_MULTIROW_INSERT
  	tmp_offset = sql_offset;
@@ -1621,7 +1629,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  		}
  	}
  
-@@ -1979,80 +1958,36 @@
+@@ -1979,80 +1959,36 @@
  
  #ifdef HAVE_MULTIROW_INSERT
  	tmp_offset = sql_offset;
@@ -1724,7 +1732,25 @@ Index: src/libs/zbxdbcache/dbcache.c
  	}
  
  #ifdef HAVE_MULTIROW_INSERT
-@@ -2388,7 +2323,7 @@
+@@ -2373,6 +2309,17 @@
+ 	return history;
+ }
+ 
++static void	DCcheck_ns(zbx_timespec_t *ts)
++{
++	if (ts->ns >= 0)
++		return;
++
++	ts->ns = cache->last_ts.ns++;
++	if ((cache->last_ts.ns > 999900000 && cache->last_ts.sec != ts->sec) || cache->last_ts.ns == 1000000000)
++		cache->last_ts.ns = 0;
++	cache->last_ts.sec = ts->sec;
++}
++
+ /******************************************************************************
+  *                                                                            *
+  * Function: DCadd_history                                                    *
+@@ -2388,16 +2335,19 @@
   * Comments:                                                                  *
   *                                                                            *
   ******************************************************************************/
@@ -1733,7 +1759,10 @@ Index: src/libs/zbxdbcache/dbcache.c
  {
  	ZBX_DC_HISTORY	*history;
  
-@@ -2397,7 +2332,8 @@
+ 	LOCK_CACHE;
+ 
++	DCcheck_ns(ts);
++
  	history = DCget_history_ptr(itemid, 0);
  
  	history->itemid			= itemid;
@@ -1743,7 +1772,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  	history->value_type		= ITEM_VALUE_TYPE_FLOAT;
  	history->value_orig.value_float	= value_orig;
  	history->value.value_float	= 0;
-@@ -2426,7 +2362,7 @@
+@@ -2426,16 +2376,19 @@
   * Comments:                                                                  *
   *                                                                            *
   ******************************************************************************/
@@ -1752,7 +1781,10 @@ Index: src/libs/zbxdbcache/dbcache.c
  {
  	ZBX_DC_HISTORY	*history;
  
-@@ -2435,7 +2371,8 @@
+ 	LOCK_CACHE;
+ 
++	DCcheck_ns(ts);
++
  	history = DCget_history_ptr(itemid, 0);
  
  	history->itemid				= itemid;
@@ -1762,7 +1794,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  	history->value_type			= ITEM_VALUE_TYPE_UINT64;
  	history->value_orig.value_uint64	= value_orig;
  	history->value.value_uint64		= 0;
-@@ -2464,7 +2401,7 @@
+@@ -2464,19 +2417,22 @@
   * Comments:                                                                  *
   *                                                                            *
   ******************************************************************************/
@@ -1771,7 +1803,13 @@ Index: src/libs/zbxdbcache/dbcache.c
  {
  	ZBX_DC_HISTORY	*history;
  	size_t		len;
-@@ -2476,7 +2413,8 @@
+ 
+ 	LOCK_CACHE;
+ 
++	DCcheck_ns(ts);
++
+ 	if (HISTORY_STR_VALUE_LEN_MAX < (len = strlen(value_orig) + 1))
+ 		len = HISTORY_STR_VALUE_LEN_MAX;
  	history = DCget_history_ptr(itemid, len);
  
  	history->itemid			= itemid;
@@ -1781,7 +1819,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  	history->value_type		= ITEM_VALUE_TYPE_STR;
  	history->value_orig.value_str	= cache->last_text;
  	history->value.value_str	= NULL;
-@@ -2507,7 +2445,7 @@
+@@ -2507,19 +2463,22 @@
   * Comments:                                                                  *
   *                                                                            *
   ******************************************************************************/
@@ -1790,7 +1828,13 @@ Index: src/libs/zbxdbcache/dbcache.c
  {
  	ZBX_DC_HISTORY	*history;
  	size_t		len;
-@@ -2519,7 +2457,8 @@
+ 
+ 	LOCK_CACHE;
+ 
++	DCcheck_ns(ts);
++
+ 	if (HISTORY_TEXT_VALUE_LEN_MAX < (len = strlen(value_orig) + 1))
+ 		len = HISTORY_TEXT_VALUE_LEN_MAX;
  	history = DCget_history_ptr(itemid, len);
  
  	history->itemid			= itemid;
@@ -1800,7 +1844,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  	history->value_type		= ITEM_VALUE_TYPE_TEXT;
  	history->value_orig.value_str	= cache->last_text;
  	history->value.value_str	= NULL;
-@@ -2550,8 +2489,8 @@
+@@ -2550,14 +2509,16 @@
   * Comments:                                                                  *
   *                                                                            *
   ******************************************************************************/
@@ -1811,7 +1855,15 @@ Index: src/libs/zbxdbcache/dbcache.c
  {
  	ZBX_DC_HISTORY	*history;
  	size_t		len1, len2;
-@@ -2565,7 +2504,8 @@
+ 
+ 	LOCK_CACHE;
+ 
++	DCcheck_ns(ts);
++
+ 	if (HISTORY_LOG_VALUE_LEN_MAX < (len1 = strlen(value_orig) + 1))
+ 		len1 = HISTORY_LOG_VALUE_LEN_MAX;
+ 	if (HISTORY_LOG_SOURCE_LEN_MAX < (len2 = (NULL != source && *source != '\0') ? strlen(source) + 1 : 0))
+@@ -2565,7 +2526,8 @@
  	history = DCget_history_ptr(itemid, len1 + len2);
  
  	history->itemid			= itemid;
@@ -1821,7 +1873,7 @@ Index: src/libs/zbxdbcache/dbcache.c
  	history->value_type		= ITEM_VALUE_TYPE_LOG;
  	history->value_orig.value_str	= cache->last_text;
  	history->value.value_str	= NULL;
-@@ -2609,31 +2549,31 @@
+@@ -2609,31 +2571,31 @@
   * Comments:                                                                  *
   *                                                                            *
   ******************************************************************************/
@@ -1859,6 +1911,15 @@ Index: src/libs/zbxdbcache/dbcache.c
  			break;
  		default:
  			zabbix_log(LOG_LEVEL_ERR, "Unknown value type [%d] for itemid [" ZBX_FS_UI64 "]",
+@@ -2742,6 +2704,8 @@
+ 	zbx_mem_create(&trend_mem, trend_shm_key, ZBX_NO_MUTEX, sz, "trend cache", "TrendCacheSize");
+ 
+ 	cache->trends_num = 0;
++	cache->last_ts.sec = 0;
++	cache->last_ts.ns = 0;
+ 
+ #define	INIT_HASHSET_SIZE	1000 /* should be calculated dynamically based on trends size? */
+ 
 Index: src/libs/zbxdbhigh/proxy.c
 ===================================================================
 --- src/libs/zbxdbhigh/proxy.c
@@ -1907,17 +1968,16 @@ Index: src/libs/zbxdbhigh/proxy.c
  			}
  			else
  				THIS_SHOULD_NEVER_HAPPEN; /* set_result_type() always sets MSG result if not SUCCEED */
-@@ -1368,7 +1369,8 @@
+@@ -1368,7 +1369,7 @@
  	int			ret = SUCCEED;
  	int			processed = 0;
  	double			sec;
 -	time_t			now, proxy_timediff = 0;
 +	zbx_timespec_t		ts, proxy_timediff;
-+	static zbx_timespec_t	last_ts = {0, 0};
  
  #define VALUES_MAX	256
  	static AGENT_VALUE	*values = NULL, *av;
-@@ -1376,15 +1378,31 @@
+@@ -1376,15 +1377,31 @@
  
  	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
  
@@ -1951,7 +2011,7 @@ Index: src/libs/zbxdbhigh/proxy.c
  /* {"request":"ZBX_SENDER_DATA","data":[{"key":"system.cpu.num",...,...},{...},...]}
   *                                     ^
   */	if (NULL == (p = zbx_json_pair_by_name(jp, ZBX_PROTO_TAG_DATA)))
-@@ -1421,9 +1439,29 @@
+@@ -1421,9 +1438,24 @@
  		memset(av, 0, sizeof(AGENT_VALUE));
  
  		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp)))
@@ -1970,12 +2030,7 @@ Index: src/libs/zbxdbhigh/proxy.c
 +				}
 +			}
 +			else
-+			{
-+				av->ts.ns = last_ts.ns++;
-+				if ((last_ts.ns > 999900000 && last_ts.sec != av->ts.sec) || last_ts.ns == 1000000000)
-+					last_ts.ns = 0;
-+				last_ts.sec = av->ts.sec;
-+			}
++				av->ts.ns = -1;
 +		}
  		else
 -			av->clock = now;
@@ -2268,39 +2323,7 @@ Index: frontends/php/include/triggers.inc.php
 ===================================================================
 --- frontends/php/include/triggers.inc.php
 +++ frontends/php/include/triggers.inc.php
-@@ -1557,6 +1557,7 @@
-  * Comments: !!! Don't forget sync code with C !!!
-  *
-  */
-+/*
- 	function expandTriggerDescription($trigger, $flag = ZBX_FLAG_TRIGGER){
- 		if($trigger){
- 			$description = expand_trigger_description_constants($trigger['description'], $trigger);
-@@ -1610,6 +1611,7 @@
- 		}
- 	return $description;
- 	}
-+*/
- 
- 	/*
- 	 * Function: expand_trigger_description_by_data
-@@ -1623,6 +1625,7 @@
- 	 * Comments: !!! Don't forget sync code with C !!!
- 	 *
- 	 */
-+/*
- 	function expand_trigger_description_by_data2($trigger, $flag = ZBX_FLAG_TRIGGER){
- 		if($trigger){
- 			$description = expand_trigger_description_constants($trigger['description'], $trigger);
-@@ -1690,6 +1693,7 @@
- 		}
- 	return $description;
- 	}
-+*/
- 
- 	/*
- 	 * Function: expand_trigger_description_by_data
-@@ -1748,7 +1752,7 @@
+@@ -1754,7 +1754,7 @@
  				if(zbx_strstr($description, $macro)){
  					$value=($flag==ZBX_FLAG_TRIGGER)?
  							trigger_get_func_value($row['expression'],ZBX_FLAG_TRIGGER,$i ? $i : 1, 1):
@@ -2309,7 +2332,7 @@ Index: frontends/php/include/triggers.inc.php
  
  					$description = str_replace($macro, $value, $description);
  				}
-@@ -3085,18 +3089,18 @@
+@@ -3091,18 +3091,18 @@
  	 * Comments:
  	 *
  	 */
@@ -2335,7 +2358,7 @@ Index: frontends/php/include/blocks.inc.php
 ===================================================================
 --- frontends/php/include/blocks.inc.php
 +++ frontends/php/include/blocks.inc.php
-@@ -974,7 +974,7 @@
+@@ -975,7 +975,7 @@
  
  // }}} Maintenance
  
@@ -2344,7 +2367,7 @@ Index: frontends/php/include/blocks.inc.php
  					' FROM events e'.
  					' WHERE e.object='.EVENT_OBJECT_TRIGGER.
  						' AND e.objectid='.$trigger['triggerid'].
-@@ -997,7 +997,7 @@
+@@ -998,7 +998,7 @@
  			}
  
  //			$description = expand_trigger_description($row['triggerid']);
@@ -2357,7 +2380,7 @@ Index: frontends/php/include/items.inc.php
 ===================================================================
 --- frontends/php/include/items.inc.php
 +++ frontends/php/include/items.inc.php
-@@ -1473,7 +1473,7 @@
+@@ -1471,7 +1471,7 @@
   * Comments:
   *
   */
@@ -2366,7 +2389,7 @@ Index: frontends/php/include/items.inc.php
  		$value = NULL;
  
  		switch($db_item["value_type"]){
-@@ -1495,19 +1495,79 @@
+@@ -1493,19 +1493,79 @@
  				break;
  		}
  
@@ -2474,28 +2497,33 @@ Index: frontends/php/include/events.inc.php
  	$table->AddRow(array(S_TIME, zbx_date2str(S_EVENTS_EVENT_DETAILS_DATE_FORMAT,$event['clock'])));
  
  	$duration = zbx_date2age($event['clock']);
-@@ -507,7 +507,7 @@
- 			));
- 
- 	if(!empty($triggers)){
--		$sql = 'SELECT e.eventid, e.objectid as triggerid, e.clock, e.value, e.acknowledged '.
-+		$sql = 'SELECT e.eventid, e.objectid as triggerid, e.clock, e.ns, e.value, e.acknowledged '.
- 				' FROM events e '.
- 				' WHERE e.object='.EVENT_OBJECT_TRIGGER.
- 					' AND '.DBcondition('e.objectid', $trigger_list).
 Index: frontends/php/events.php
 ===================================================================
 --- frontends/php/events.php
 +++ frontends/php/events.php
-@@ -427,7 +427,7 @@
- 			foreach($events as $enum => $event){
- 				$trigger = reset($event['triggers']);
+@@ -401,11 +401,10 @@
+ 			);
  
--				$event['desc'] = expand_trigger_description_by_data($trigger);
-+				$event['desc'] = expand_trigger_description_by_data(zbx_array_merge($trigger, array('clock'=>$event['clock'], 'ns'=>$event['ns'])), ZBX_FLAG_EVENT);
- 				$event['type'] = $trigger['type'];
+ 			$events = CEvent::get($options);
+-			order_result($events, 'clock', ZBX_SORT_DOWN);
++			morder_result($events, array('clock','ns'), ZBX_SORT_DOWN);
  
- 				$event += $trigger;
+ 			$triggersOptions = array(
+ 				'triggerids' => zbx_objectValues($events, 'objectid'),
+-				'expandDescription' => 1,
+ 				'select_hosts' => API_OUTPUT_EXTEND,
+ 				'select_triggers' => API_OUTPUT_EXTEND,
+ 				'select_items' => API_OUTPUT_EXTEND,
+@@ -440,7 +439,8 @@
+ 					}
+ 				}
+ 
+-				$tr_desc = new CSpan($trigger['description'],'pointer');
++				$description = expand_trigger_description_by_data(zbx_array_merge($trigger, array('clock'=>$event['clock'], 'ns'=>$event['ns'])), ZBX_FLAG_EVENT);
++				$tr_desc = new CSpan($description,'pointer');
+ 				$tr_desc->addAction('onclick',"create_mon_trigger_menu(event, ".
+ 										" new Array({'triggerid': '".$trigger['triggerid']."', 'lastchange': '".$event['clock']."'}),".
+ 										zbx_jsvalue($items, true).");");
 Index: create/schema/gen.pl
 ===================================================================
 --- create/schema/gen.pl
