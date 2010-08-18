@@ -400,7 +400,7 @@ UNIQUE		|1		|operationid
 TABLE|escalations|escalationid|0
 FIELD		|escalationid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|actionid	|t_id		|	|NOT NULL	|0			|-|actions
-FIELD		|triggerid	|t_id		|	|NOT NULL	|0			|-|triggers
+FIELD		|triggerid	|t_id		|	|NULL		|0			|-|triggers
 FIELD		|eventid	|t_id		|	|NOT NULL	|0			|-|events
 FIELD		|r_eventid	|t_id		|	|NULL		|0			|-|events	|eventid
 FIELD		|nextcheck	|t_time		|'0'	|NOT NULL	|0
