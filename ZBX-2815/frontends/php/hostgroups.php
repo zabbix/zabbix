@@ -79,11 +79,12 @@ include_once('include/page_header.php');
 
 		$hosts = CHost::get(array('hostids' => $objects, 'output' => API_OUTPUT_SHORTEN));
 		$templates = CTemplate::get(array('templateids' => $objects, 'output' => API_OUTPUT_SHORTEN));
-		$old_group = CHostGroup::get(array('groupids' => $_REQUEST['groupid'],	'output' => API_OUTPUT_EXTEND));
-		$old_group = reset($old_group);
 
 		if(isset($_REQUEST['groupid'])){
 			DBstart();
+			$old_group = CHostGroup::get(array('groupids' => $_REQUEST['groupid'],	'output' => API_OUTPUT_EXTEND));
+			$old_group = reset($old_group);
+		
 			$result = CHostGroup::update(array('groupid' => $_REQUEST['groupid'], 'name' => $_REQUEST['gname']));
 			if($result){
 				$options = array(
