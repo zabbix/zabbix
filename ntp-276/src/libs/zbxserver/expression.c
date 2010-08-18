@@ -1146,12 +1146,11 @@ static int	DBget_drule_value_by_event(DB_EVENT *event, char **replace_to, const 
 
 /******************************************************************************
  *                                                                            *
- * Function: DBget_history_log_value_by_triggerid                             *
+ * Function: DBget_history_value                                              *
  *                                                                            *
- * Purpose: retrieve item lastvalue by functionid                             *
+ * Purpose: retrieve value by clock                                           *
  *                                                                            *
- * Parameters: functionid - function identificator from database              *
- *             lastvalue - pointer to result buffer. Must be NULL             *
+ * Parameters:                                                                *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
@@ -1161,16 +1160,148 @@ static int	DBget_drule_value_by_event(DB_EVENT *event, char **replace_to, const 
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	DBget_history_log_value_by_triggerid(zbx_uint64_t triggerid, char **replace_to, int N_functionid, const char *fieldname)
+static int	DBget_history_value(zbx_uint64_t itemid, char **replace_to,
+		const char *tablename, const char *fieldname, int clock, int ns)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	DB_RESULT	h_result;
-	DB_ROW		h_row;
-	char		expression[TRIGGER_EXPRESSION_LEN_MAX];
-	zbx_uint64_t	functionid;
-	int		value_type, ret = FAIL;
 	char		sql[MAX_STRING_LEN];
+	int		max_clock = 0, ret = FAIL;
+
+	if (0 == CONFIG_NS_SUPPORT)
+	{
+		zbx_snprintf(sql, sizeof(sql),
+				"select %s"
+				" from %s"
+				" where itemid=" ZBX_FS_UI64
+					" and clock<=%d"
+				" order by itemid,clock desc",
+				fieldname, tablename, itemid, clock);
+
+		result = DBselectN(sql, 1);
+
+		if (NULL != (row = DBfetch(result)))
+		{
+			*replace_to = zbx_dsprintf(*replace_to, "%s", row[0]);
+			ret = SUCCEED;
+		}
+
+		DBfree_result(result);
+
+		return ret;
+	}
+
+	zbx_snprintf(sql, sizeof(sql),
+			"select %s"
+			" from %s"
+			" where itemid=" ZBX_FS_UI64
+				" and clock=%d"
+				" and ns=%d",
+			fieldname, tablename, itemid, clock, ns);
+
+	result = DBselectN(sql, 1);
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		*replace_to = zbx_dsprintf(*replace_to, "%s", row[0]);
+		ret = SUCCEED;
+	}
+
+	DBfree_result(result);
+
+	if (SUCCEED == ret)
+		return ret;
+
+	result = DBselect(
+			"select distinct clock"
+			" from %s"
+			" where itemid=" ZBX_FS_UI64
+				" and clock=%d"
+				" and ns<%d",
+			tablename, itemid, clock, ns);
+
+	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
+		max_clock = atoi(row[0]);
+
+	DBfree_result(result);
+
+	if (0 == max_clock)
+	{
+		result = DBselect(
+				"select max(clock)"
+				" from %s"
+				" where itemid=" ZBX_FS_UI64
+					" and clock<%d",
+				tablename, itemid, clock);
+
+		if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
+			max_clock = atoi(row[0]);
+
+		DBfree_result(result);
+	}
+
+	if (0 == max_clock)
+		return ret;
+
+	if (clock == max_clock)
+	{
+		zbx_snprintf(sql, sizeof(sql),
+				"select %s"
+				" from %s"
+				" where itemid=" ZBX_FS_UI64
+					" and clock=%d"
+					" and ns<%d"
+				" order by itemid,clock desc,ns desc",
+				fieldname, tablename, itemid, clock, ns);
+	}
+	else
+	{
+		zbx_snprintf(sql, sizeof(sql),
+				"select %s"
+				" from %s"
+				" where itemid=" ZBX_FS_UI64
+					" and clock=%d"
+				" order by itemid,clock desc,ns desc",
+				fieldname, tablename, itemid, max_clock);
+	}
+
+	result = DBselectN(sql, 1);
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		*replace_to = zbx_dsprintf(*replace_to, "%s", row[0]);
+		ret = SUCCEED;
+	}
+
+	DBfree_result(result);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBget_history_log_value_by_triggerid                             *
+ *                                                                            *
+ * Purpose: retrieve item lastvalue by functionid                             *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBget_history_log_value_by_triggerid(zbx_uint64_t triggerid,
+		char **replace_to, int N_functionid, const char *fieldname, int clock, int ns)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		expression[TRIGGER_EXPRESSION_LEN_MAX];
+	zbx_uint64_t	functionid, itemid;
+	int		value_type, ret = FAIL;
 
 	if (FAIL == DBget_trigger_expression_by_triggerid(triggerid, expression, sizeof(expression)))
 		return FAIL;
@@ -1184,25 +1315,11 @@ static int	DBget_history_log_value_by_triggerid(zbx_uint64_t triggerid, char **r
 
 	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
 	{
+		ZBX_STR2UINT64(itemid, row[0]);
 		value_type = atoi(row[1]);
 
 		if (value_type == ITEM_VALUE_TYPE_LOG)
-		{
-			zbx_snprintf(sql, sizeof(sql), "select %s from history_log"
-					" where itemid=%s order by id desc",
-					fieldname,
-					row[0]);
-
-			h_result = DBselectN(sql, 1);
-
-			if (NULL != (h_row = DBfetch(h_result)) && SUCCEED != DBis_null(h_row[0]))
-			{
-				*replace_to = zbx_dsprintf(*replace_to, "%s", h_row[0]);
-				ret = SUCCEED;
-			}
-
-			DBfree_result(h_result);
-		}
+			ret = DBget_history_value(itemid, replace_to, "history_log", fieldname, clock, ns);
 	}
 
 	DBfree_result(result);
@@ -1216,8 +1333,7 @@ static int	DBget_history_log_value_by_triggerid(zbx_uint64_t triggerid, char **r
  *                                                                            *
  * Purpose: retrieve item lastvalue by triggerid                              *
  *                                                                            *
- * Parameters: functionid - function identificator from database              *
- *             lastvalue - pointer to result buffer. Must be NULL             *
+ * Parameters:                                                                *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
@@ -1301,8 +1417,7 @@ static int	DBget_item_lastvalue_by_triggerid(zbx_uint64_t triggerid, char **last
  *                                                                            *
  * Purpose: retrieve item lastvalue by triggerid                              *
  *                                                                            *
- * Parameters: functionid - function identificator from database              *
- *             lastvalue - pointer to result buffer. Must be NULL             *
+ * Parameters:                                                                *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
@@ -1312,16 +1427,14 @@ static int	DBget_item_lastvalue_by_triggerid(zbx_uint64_t triggerid, char **last
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	DBget_item_value_by_triggerid(zbx_uint64_t triggerid, char **value, int N_functionid, int clock)
+static int	DBget_item_value_by_triggerid(zbx_uint64_t triggerid, char **value, int N_functionid, int clock, int ns)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	DB_RESULT	h_result;
-	DB_ROW		h_row;
 	char		expression[TRIGGER_EXPRESSION_LEN_MAX];
-	zbx_uint64_t	functionid;
+	zbx_uint64_t	functionid, itemid;
 	int		value_type, ret = FAIL;
-	char		tmp[MAX_STRING_LEN], *table;
+	const char	*table;
 
 	if (FAIL == DBget_trigger_expression_by_triggerid(triggerid, expression, sizeof(expression)))
 		return FAIL;
@@ -1335,6 +1448,7 @@ static int	DBget_item_value_by_triggerid(zbx_uint64_t triggerid, char **value, i
 
 	if (NULL != (row = DBfetch(result)))
 	{
+		ZBX_STR2UINT64(itemid, row[0]);
 		value_type = atoi(row[1]);
 
 		switch (value_type) {
@@ -1346,17 +1460,11 @@ static int	DBget_item_value_by_triggerid(zbx_uint64_t triggerid, char **value, i
 			default:			table = "history_log"; break;
 		}
 
-		zbx_snprintf(tmp, sizeof(tmp), "select value from %s where itemid=%s and clock<=%d order by itemid,clock desc",
-				table, row[0], clock);
-		h_result = DBselectN(tmp, 1);
-		if (NULL != (h_row = DBfetch(h_result)))
+		if (SUCCEED == (ret = DBget_history_value(itemid, value, table, "value", clock, ns)))
 		{
 			if (ITEM_VALUE_TYPE_FLOAT == value_type)
-				del_zeroes(h_row[0]);
-			*value = zbx_dsprintf(*value, "%s", h_row[0]);
-			ret = SUCCEED;
+				del_zeroes(*value);
 		}
-		DBfree_result(h_result);
 	}
 	DBfree_result(result);
 
@@ -1856,38 +1964,42 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, 
 				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
 					ret = DBget_item_lastvalue_by_triggerid(event->objectid, &replace_to, N_functionid);
 				else if (0 == strcmp(m, MVAR_ITEM_VALUE))
-					ret = DBget_item_value_by_triggerid(event->objectid, &replace_to, N_functionid, event->clock);
+					ret = DBget_item_value_by_triggerid(event->objectid, &replace_to, N_functionid,
+							event->clock, event->ns);
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_DATE))
 				{
 					if (SUCCEED == (ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to,
-									N_functionid, "timestamp")))
+									N_functionid, "timestamp", event->clock, event->ns)))
 						replace_to = zbx_dsprintf(replace_to, "%s", zbx_date2str((time_t)atoi(replace_to)));
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_TIME))
 				{
 					if (SUCCEED == (ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to,
-									N_functionid, "timestamp")))
+									N_functionid, "timestamp", event->clock, event->ns)))
 						replace_to = zbx_dsprintf(replace_to, "%s", zbx_time2str((time_t)atoi(replace_to)));
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_AGE))
 				{
 					if (SUCCEED == (ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to,
-									N_functionid, "timestamp")))
+									N_functionid, "timestamp", event->clock, event->ns)))
 						replace_to = zbx_dsprintf(replace_to, "%s", zbx_age2str(time(NULL) - atoi(replace_to)));
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_SOURCE))
-					ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to, N_functionid, "source");
+					ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to,
+							N_functionid, "source", event->clock, event->ns);
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_SEVERITY))
 				{
 					if (SUCCEED == (ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to,
-									N_functionid, "severity")))
+									N_functionid, "severity", event->clock, event->ns)))
 						replace_to = zbx_dsprintf(replace_to, "%s",
 								zbx_item_logtype_string((zbx_item_logtype_t)atoi(replace_to)));
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_NSEVERITY))
-					ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to, N_functionid, "severity");
+					ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to,
+							N_functionid, "severity", event->clock, event->ns);
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_EVENTID))
-					ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to, N_functionid, "logeventid");
+					ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to,
+							N_functionid, "logeventid", event->clock, event->ns);
 				else if (0 == strcmp(m, MVAR_DATE))
 					replace_to = zbx_dsprintf(replace_to, "%s", zbx_date2str(time(NULL)));
 				else if (0 == strcmp(m, MVAR_TIME))
@@ -2020,7 +2132,8 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, 
 				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
 					ret = DBget_item_lastvalue_by_triggerid(event->objectid, &replace_to, N_functionid);
 				else if (0 == strcmp(m, MVAR_ITEM_VALUE))
-					ret = DBget_item_value_by_triggerid(event->objectid, &replace_to, N_functionid, event->clock);
+					ret = DBget_item_value_by_triggerid(event->objectid, &replace_to, N_functionid,
+							event->clock, event->ns);
 			}
 		}
 		else if (macro_type & MACRO_TYPE_TRIGGER_EXPRESSION)

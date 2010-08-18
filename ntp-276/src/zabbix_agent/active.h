@@ -81,7 +81,7 @@ typedef struct zbx_active_buffer_element_type
 	char	*source;
 	int	severity;
 	long	lastlogsize;
-	int	clock;
+	zbx_timespec_t	ts;
 	int	logeventid;
 	int	mtime;
 	unsigned char	persistent;
