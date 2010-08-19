@@ -7,6 +7,7 @@ Changes for 1.9
 
 Changes for 1.8.4rc1
 
+ - [ZBX-2894] fixed multiple references on same line in map labels (Vedmak)
  - [ZBX-2888] fixed host profiles export (Vedmak)
  - [ZBX-2890] fixed parsing of negative values in trigger expressions (Vedmak)
  - [ZBX-2798] added more checks for unknown nodes to communication between nodes (asaveljevs)
