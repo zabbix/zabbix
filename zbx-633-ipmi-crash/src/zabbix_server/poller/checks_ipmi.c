@@ -379,7 +379,7 @@ static void	got_thresh_reading(ipmi_sensor_t *sensor, int err, enum ipmi_value_p
 
 	if (NULL == s)
 	{
-		/* this should never happen */
+		THIS_SHOULD_NEVER_HAPPEN;
 		h->err = zbx_dsprintf(h->err, "Fatal error");
 		h->ret = NOTSUPPORTED;
 		h->done = 1;
@@ -429,54 +429,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s",
 			__function_name, zbx_result_string(h->ret));
 }
-/*
-static void	got_discrete_states(ipmi_sensor_t *sensor, int err, ipmi_states_t *states, void *cb_data)
-{
-	int			id, i, val, ret;
-	const char		*e_string, *s_type_string, *s_reading_type_string;
-	ipmi_entity_t		*ent;
-	zbx_ipmi_host_t		*h = cb_data;
-	zbx_ipmi_sensor_t	*s;
 
-	s = get_ipmi_sensor(h, sensor);
-
-	if (NULL == s)
-	{*/
-		/* this should never happen */
-/*		h->err = zbx_dsprintf(h->err, "Fatal error");
-		h->ret = NOTSUPPORTED;
-		h->done = 1;
-		return;
-	}
-
-	if (err)
-	{
-		h->err = zbx_dsprintf(h->err, "Error 0x%x while reading discrete sensor %s@[%s]:%d",
-				s->s_name, h->ip, h->port);
-		h->ret = NOTSUPPORTED;
-		h->done = 1;
-		return;
-	}
-
-	ent = ipmi_sensor_get_entity(sensor);
-	id = ipmi_entity_get_entity_id(ent);
-	e_string = ipmi_get_entity_id_string(id);
-	s_type_string = ipmi_sensor_get_sensor_type_string(sensor);
-	s_reading_type_string = ipmi_sensor_get_event_reading_type_string(sensor);
-
-	for (i = 0; i < 15; i++)
-	{
-		ret = ipmi_sensor_discrete_event_readable(sensor, i, &val);
-		if (ret || !val)
-			continue;
-
-		zabbix_log(LOG_LEVEL_DEBUG, "State [%s | %s | %s | %s | state %d value is %d]",
-				s->s_name, e_string, s_type_string, s_reading_type_string, i, ipmi_is_state_set(states, i));
-
-		s->value = ?;
-	}
-}
-*/
 static void	read_ipmi_sensor(zbx_ipmi_host_t *h, zbx_ipmi_sensor_t *s)
 {
 	const char		*__function_name = "read_ipmi_sensor";
@@ -491,7 +444,8 @@ static void	read_ipmi_sensor(zbx_ipmi_host_t *h, zbx_ipmi_sensor_t *s)
 
 	type = ipmi_sensor_get_event_reading_type(s->sensor);
 
-	switch (type) {
+	switch (type)
+	{
 		case IPMI_EVENT_READING_TYPE_THRESHOLD:
 			if (0 != (ret = ipmi_sensor_get_reading(s->sensor, got_thresh_reading, h)))
 			{
@@ -506,14 +460,6 @@ static void	read_ipmi_sensor(zbx_ipmi_host_t *h, zbx_ipmi_sensor_t *s)
 			h->err = zbx_dsprintf(h->err, "Discrete sensor is not supported.");
 			h->ret = NOTSUPPORTED;
 			goto out;
-/*			if (0 != (ret = ipmi_sensor_get_states(s->sensor, got_discrete_states, h)))
-			{
-				h->err = zbx_dsprintf(h->err, "Cannot read sensor %s."
-						" ipmi_sensor_get_states() return error: 0x%x",
-						s->s_name, ret);
-				h->ret = NOTSUPPORTED;
-				return;
-			}*/
 	}
 
 	tv.tv_sec = 10;
@@ -553,7 +499,7 @@ static void	got_control_reading(ipmi_control_t *control, int err, int *val, void
 
 	if (NULL == c)
 	{
-		/* this should never happen */
+		THIS_SHOULD_NEVER_HAPPEN;
 		h->err = zbx_dsprintf(h->err, "Fatal error");
 		h->ret = NOTSUPPORTED;
 		h->done = 1;
@@ -562,7 +508,7 @@ static void	got_control_reading(ipmi_control_t *control, int err, int *val, void
 
 	if (c->num_values == 0)
 	{
-		/* this should never happen */
+		THIS_SHOULD_NEVER_HAPPEN;
 		h->err = zbx_dsprintf(h->err, "No value present for control");
 		h->ret = NOTSUPPORTED;
 		h->done = 1;
@@ -613,7 +559,7 @@ static void	got_control_setting(ipmi_control_t *control, int err, void *cb_data)
 
 	if (NULL == c)
 	{
-		/* this should never happen */
+		THIS_SHOULD_NEVER_HAPPEN;
 		h->err = zbx_dsprintf(h->err, "Fatal error");
 		h->ret = NOTSUPPORTED;
 		h->done = 1;
@@ -682,7 +628,7 @@ static void	set_ipmi_control(zbx_ipmi_host_t *h, zbx_ipmi_control_t *c, int valu
 
 	if (c->num_values == 0)
 	{
-		/* this should never happen */
+		THIS_SHOULD_NEVER_HAPPEN;
 		h->err = zbx_dsprintf(h->err, "No value present for control");
 		h->ret = NOTSUPPORTED;
 		h->done = 1;
