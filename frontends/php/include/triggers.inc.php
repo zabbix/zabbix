@@ -4138,7 +4138,8 @@ return $caption;
 $triggerExpressionRules['independent'] = Array(
 	'allowedSymbols' => "[0-9KMGTsmhdw. \/*+<>#=&|\-]+",
 	'notAllowedSymbols' => Array(
-					"[.\/*+<>#=&|\-]{2,}",
+					"[.\/*+<>#&|\-]{2,}",
+					"={2,}",
 					"[ .KMGTsmhdw]{2,}",
 					"(^\.|\.$)",
 					"\.\d+\.",
