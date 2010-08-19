@@ -1,3 +1,4 @@
+ALTER TABLE graphs_items MODIFY gitemid DEFAULT NULL;
 ALTER TABLE graphs_items MODIFY graphid DEFAULT NULL;
 ALTER TABLE graphs_items MODIFY itemid DEFAULT NULL;
 DELETE FROM graphs_items WHERE NOT graphid IN (SELECT graphid FROM graphs);

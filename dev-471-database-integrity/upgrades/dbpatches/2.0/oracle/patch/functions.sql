@@ -1,3 +1,4 @@
+ALTER TABLE functions MODIFY functionid DEFAULT NULL;
 ALTER TABLE functions MODIFY itemid DEFAULT NULL;
 ALTER TABLE functions MODIFY triggerid DEFAULT NULL;
 ALTER TABLE functions DROP COLUMN lastvalue;

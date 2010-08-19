@@ -1,3 +1,4 @@
+ALTER TABLE escalations MODIFY escalationid DEFAULT NULL;
 ALTER TABLE escalations MODIFY actionid DEFAULT NULL;
 ALTER TABLE escalations MODIFY triggerid DEFAULT NULL;
 ALTER TABLE escalations MODIFY triggerid NULL;

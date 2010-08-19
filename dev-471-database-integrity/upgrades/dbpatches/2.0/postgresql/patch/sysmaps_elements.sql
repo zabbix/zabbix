@@ -1,14 +1,15 @@
-ALTER TABLE ONLY sysmaps_elements ALTER sysmapid DROP DEFAULT;
-ALTER TABLE ONLY sysmaps_elements ALTER iconid_off DROP DEFAULT;
-ALTER TABLE ONLY sysmaps_elements ALTER iconid_off DROP NOT NULL;
-ALTER TABLE ONLY sysmaps_elements ALTER iconid_on DROP DEFAULT;
-ALTER TABLE ONLY sysmaps_elements ALTER iconid_on DROP NOT NULL;
-ALTER TABLE ONLY sysmaps_elements ALTER iconid_unknown DROP DEFAULT;
-ALTER TABLE ONLY sysmaps_elements ALTER iconid_unknown DROP NOT NULL;
-ALTER TABLE ONLY sysmaps_elements ALTER iconid_disabled DROP DEFAULT;
-ALTER TABLE ONLY sysmaps_elements ALTER iconid_disabled DROP NOT NULL;
-ALTER TABLE ONLY sysmaps_elements ALTER iconid_maintenance DROP DEFAULT;
-ALTER TABLE ONLY sysmaps_elements ALTER iconid_maintenance DROP NOT NULL;
+ALTER TABLE ONLY sysmaps_elements ALTER selementid DROP DEFAULT,
+				  ALTER sysmapid DROP DEFAULT,
+				  ALTER iconid_off DROP DEFAULT,
+				  ALTER iconid_off DROP NOT NULL,
+				  ALTER iconid_on DROP DEFAULT,
+				  ALTER iconid_on DROP NOT NULL,
+				  ALTER iconid_unknown DROP DEFAULT,
+				  ALTER iconid_unknown DROP NOT NULL,
+				  ALTER iconid_disabled DROP DEFAULT,
+				  ALTER iconid_disabled DROP NOT NULL,
+				  ALTER iconid_maintenance DROP DEFAULT,
+				  ALTER iconid_maintenance DROP NOT NULL;
 DELETE FROM sysmaps_elements WHERE sysmapid NOT IN (SELECT sysmapid FROM sysmaps);
 UPDATE sysmaps_elements SET iconid_off=NULL WHERE iconid_off=0;
 UPDATE sysmaps_elements SET iconid_on=NULL WHERE iconid_on=0;

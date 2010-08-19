@@ -1,3 +1,4 @@
+ALTER TABLE config MODIFY configid DEFAULT NULL;
 ALTER TABLE config MODIFY alert_usrgrpid DEFAULT NULL;
 ALTER TABLE config MODIFY alert_usrgrpid NULL;
 ALTER TABLE config MODIFY discovery_groupid DEFAULT NULL;

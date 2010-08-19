@@ -1,3 +1,4 @@
+ALTER TABLE triggers MODIFY triggerid DEFAULT NULL;
 ALTER TABLE triggers MODIFY templateid DEFAULT NULL;
 ALTER TABLE triggers MODIFY templateid NULL;
 UPDATE triggers SET templateid=NULL WHERE templateid=0;

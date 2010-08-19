@@ -1,3 +1,4 @@
+ALTER TABLE hosts_templates MODIFY hosttemplateid DEFAULT NULL;
 ALTER TABLE hosts_templates MODIFY hostid DEFAULT NULL;
 ALTER TABLE hosts_templates MODIFY templateid DEFAULT NULL;
 DELETE FROM hosts_templates WHERE NOT hostid IN (SELECT hostid FROM hosts);

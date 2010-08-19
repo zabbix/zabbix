@@ -1,6 +1,7 @@
-ALTER TABLE ONLY applications ALTER hostid DROP DEFAULT;
-ALTER TABLE ONLY applications ALTER templateid DROP DEFAULT;
-ALTER TABLE ONLY applications ALTER templateid DROP NOT NULL;
+ALTER TABLE ONLY applications ALTER applicationid DROP DEFAULT,
+			      ALTER hostid DROP DEFAULT,
+			      ALTER templateid DROP DEFAULT,
+			      ALTER templateid DROP NOT NULL;
 DELETE FROM applications WHERE NOT hostid IN (SELECT hostid FROM hosts);
 UPDATE applications SET templateid=NULL WHERE templateid=0;
 UPDATE applications SET templateid=NULL WHERE NOT templateid IS NULL AND NOT templateid IN (SELECT applicationid FROM applications);

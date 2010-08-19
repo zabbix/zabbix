@@ -1,3 +1,4 @@
+ALTER TABLE scripts MODIFY scriptid DEFAULT NULL;
 ALTER TABLE scripts MODIFY usrgrpid DEFAULT NULL;
 ALTER TABLE scripts MODIFY usrgrpid NULL;
 ALTER TABLE scripts MODIFY groupid DEFAULT NULL;

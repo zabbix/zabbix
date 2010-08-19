@@ -1,3 +1,4 @@
+ALTER TABLE drules MODIFY druleid DEFAULT NULL;
 ALTER TABLE drules MODIFY proxy_hostid DEFAULT NULL;
 ALTER TABLE drules MODIFY proxy_hostid NULL;
 ALTER TABLE drules MODIFY unique_dcheckid DEFAULT NULL;

@@ -1,3 +1,4 @@
+ALTER TABLE nodes MODIFY nodeid DEFAULT NULL;
 ALTER TABLE nodes MODIFY masterid DEFAULT NULL;
 ALTER TABLE nodes MODIFY masterid NULL;
 UPDATE nodes SET masterid=NULL WHERE masterid=0;

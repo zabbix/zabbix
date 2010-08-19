@@ -1,9 +1,10 @@
-ALTER TABLE ONLY alerts ALTER actionid DROP DEFAULT;
-ALTER TABLE ONLY alerts ALTER eventid DROP DEFAULT;
-ALTER TABLE ONLY alerts ALTER userid DROP DEFAULT;
-ALTER TABLE ONLY alerts ALTER userid DROP NOT NULL;
-ALTER TABLE ONLY alerts ALTER mediatypeid DROP DEFAULT;
-ALTER TABLE ONLY alerts ALTER mediatypeid DROP NOT NULL;
+ALTER TABLE ONLY alerts ALTER alertid DROP DEFAULT,
+			ALTER actionid DROP DEFAULT,
+			ALTER eventid DROP DEFAULT,
+			ALTER userid DROP DEFAULT,
+			ALTER userid DROP NOT NULL,
+			ALTER mediatypeid DROP DEFAULT,
+			ALTER mediatypeid DROP NOT NULL;
 UPDATE alerts SET userid=NULL WHERE userid=0;
 UPDATE alerts SET mediatypeid=NULL WHERE mediatypeid=0;
 DELETE FROM alerts WHERE NOT actionid IN (SELECT actionid FROM actions);

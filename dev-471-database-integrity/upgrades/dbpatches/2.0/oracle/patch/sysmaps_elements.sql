@@ -1,3 +1,4 @@
+ALTER TABLE sysmaps_elements MODIFY selementid DEFAULT NULL;
 ALTER TABLE sysmaps_elements MODIFY sysmapid DEFAULT NULL;
 ALTER TABLE sysmaps_elements MODIFY iconid_off DEFAULT NULL;
 ALTER TABLE sysmaps_elements MODIFY iconid_off NULL;

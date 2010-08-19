@@ -1,6 +1,7 @@
+ALTER TABLE users_groups MODIFY id bigint unsigned NOT NULL,
+			 MODIFY usrgrpid bigint unsigned NOT NULL,
+			 MODIFY userid bigint unsigned NOT NULL;
 DROP INDEX users_groups_1 ON users_groups;
-ALTER TABLE users_groups MODIFY usrgrpid bigint unsigned NOT NULL;
-ALTER TABLE users_groups MODIFY userid bigint unsigned NOT NULL;
 DELETE FROM users_groups WHERE usrgrpid NOT IN (SELECT usrgrpid FROM usrgrp);
 DELETE FROM users_groups WHERE userid NOT IN (SELECT userid FROM users);
 CREATE UNIQUE INDEX users_groups_1 ON users_groups (usrgrpid,userid);

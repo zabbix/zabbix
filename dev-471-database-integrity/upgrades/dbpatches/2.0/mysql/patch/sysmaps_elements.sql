@@ -1,9 +1,10 @@
-ALTER TABLE sysmaps_elements MODIFY sysmapid bigint unsigned NOT NULL;
-ALTER TABLE sysmaps_elements MODIFY iconid_off bigint unsigned NULL;
-ALTER TABLE sysmaps_elements MODIFY iconid_on bigint unsigned NULL;
-ALTER TABLE sysmaps_elements MODIFY iconid_unknown bigint unsigned NULL;
-ALTER TABLE sysmaps_elements MODIFY iconid_disabled bigint unsigned NULL;
-ALTER TABLE sysmaps_elements MODIFY iconid_maintenance bigint unsigned NULL;
+ALTER TABLE sysmaps_elements MODIFY selementid bigint unsigned NOT NULL,
+			     MODIFY sysmapid bigint unsigned NOT NULL,
+			     MODIFY iconid_off bigint unsigned NULL,
+			     MODIFY iconid_on bigint unsigned NULL,
+			     MODIFY iconid_unknown bigint unsigned NULL,
+			     MODIFY iconid_disabled bigint unsigned NULL,
+			     MODIFY iconid_maintenance bigint unsigned NULL;
 DELETE FROM sysmaps_elements WHERE sysmapid NOT IN (SELECT sysmapid FROM sysmaps);
 UPDATE sysmaps_elements SET iconid_off=NULL WHERE iconid_off=0;
 UPDATE sysmaps_elements SET iconid_on=NULL WHERE iconid_on=0;

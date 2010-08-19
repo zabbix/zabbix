@@ -1,7 +1,12 @@
-ALTER TABLE sysmaps MODIFY backgroundid bigint unsigned NULL;
-ALTER TABLE sysmaps ADD expandproblem INTEGER DEFAULT '1' NOT NULL;
-ALTER TABLE sysmaps ADD markelements INTEGER DEFAULT '0' NOT NULL;
-ALTER TABLE sysmaps ADD show_unack INTEGER DEFAULT '0' NOT NULL;
+ALTER TABLE sysmaps MODIFY sysmapid bigint unsigned NOT NULL,
+		    MODIFY width integer DEFAULT '600' NOT NULL,
+		    MODIFY height integer DEFAULT '400' NOT NULL,
+		    MODIFY backgroundid bigint unsigned NULL,
+		    MODIFY label_type integer DEFAULT '2' NOT NULL,
+		    MODIFY label_location integer DEFAULT '3' NOT NULL,
+		    ADD expandproblem INTEGER DEFAULT '1' NOT NULL,
+		    ADD markelements INTEGER DEFAULT '0' NOT NULL,
+		    ADD show_unack INTEGER DEFAULT '0' NOT NULL;
 UPDATE sysmaps SET backgroundid=NULL WHERE backgroundid=0;
 UPDATE sysmaps SET show_unack=1 WHERE highlight>7 AND highlight<16;
 UPDATE sysmaps SET show_unack=2 WHERE highlight>23;

@@ -1,6 +1,7 @@
+ALTER TABLE maintenances_windows MODIFY maintenance_timeperiodid bigint unsigned NOT NULL,
+				 MODIFY maintenanceid bigint unsigned NOT NULL,
+				 MODIFY timeperiodid bigint unsigned NOT NULL;
 DROP INDEX maintenances_windows_1 ON maintenances_windows;
-ALTER TABLE maintenances_windows MODIFY maintenanceid bigint unsigned NOT NULL;
-ALTER TABLE maintenances_windows MODIFY timeperiodid bigint unsigned NOT NULL;
 DELETE FROM maintenances_windows WHERE maintenanceid NOT IN (SELECT maintenanceid FROM maintenances);
 DELETE FROM maintenances_windows WHERE timeperiodid NOT IN (SELECT timeperiodid FROM timeperiods);
 CREATE UNIQUE INDEX maintenances_windows_1 ON maintenances_windows (maintenanceid,timeperiodid);

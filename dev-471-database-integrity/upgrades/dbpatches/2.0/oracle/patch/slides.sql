@@ -1,3 +1,4 @@
+ALTER TABLE slides MODIFY slideid DEFAULT NULL;
 ALTER TABLE slides MODIFY slideshowid DEFAULT NULL;
 ALTER TABLE slides MODIFY screenid DEFAULT NULL;
 DELETE FROM slides WHERE NOT slideshowid IN (SELECT slideshowid FROM slideshows);

@@ -1,3 +1,4 @@
+ALTER TABLE rights MODIFY rightid DEFAULT NULL;
 ALTER TABLE rights MODIFY groupid DEFAULT NULL;
 ALTER TABLE rights MODIFY id NOT NULL;
 DELETE FROM rights WHERE NOT groupid IN (SELECT usrgrpid FROM usrgrp);

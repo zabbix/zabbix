@@ -1,6 +1,7 @@
-DROP INDEX users_groups_1;
+ALTER TABLE users_groups MODIFY id DEFAULT NULL;
 ALTER TABLE users_groups MODIFY usrgrpid DEFAULT NULL;
 ALTER TABLE users_groups MODIFY userid DEFAULT NULL;
+DROP INDEX users_groups_1;
 DELETE FROM users_groups WHERE usrgrpid NOT IN (SELECT usrgrpid FROM usrgrp);
 DELETE FROM users_groups WHERE userid NOT IN (SELECT userid FROM users);
 CREATE UNIQUE INDEX users_groups_1 ON users_groups (usrgrpid,userid);
