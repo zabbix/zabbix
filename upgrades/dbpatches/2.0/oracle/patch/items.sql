@@ -1,3 +1,4 @@
+ALTER TABLE items MODIFY itemid DEFAULT NULL;
 ALTER TABLE items MODIFY hostid DEFAULT NULL;
 ALTER TABLE items MODIFY units nvarchar2(255);
 ALTER TABLE items ADD lastns number(10) NULL;

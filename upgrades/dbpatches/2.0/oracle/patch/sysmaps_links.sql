@@ -1,3 +1,4 @@
+ALTER TABLE sysmaps_links MODIFY linkid DEFAULT NULL;
 ALTER TABLE sysmaps_links MODIFY sysmapid DEFAULT NULL;
 ALTER TABLE sysmaps_links MODIFY selementid1 DEFAULT NULL;
 ALTER TABLE sysmaps_links MODIFY selementid2 DEFAULT NULL;

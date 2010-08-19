@@ -1,6 +1,7 @@
+ALTER TABLE maintenances_hosts MODIFY maintenance_hostid bigint unsigned NOT NULL,
+			       MODIFY maintenanceid bigint unsigned NOT NULL,
+			       MODIFY hostid bigint unsigned NOT NULL;
 DROP INDEX maintenances_hosts_1 ON maintenances_hosts;
-ALTER TABLE maintenances_hosts MODIFY maintenanceid bigint unsigned NOT NULL;
-ALTER TABLE maintenances_hosts MODIFY hostid bigint unsigned NOT NULL;
 DELETE FROM maintenances_hosts WHERE maintenanceid NOT IN (SELECT maintenanceid FROM maintenances);
 DELETE FROM maintenances_hosts WHERE hostid NOT IN (SELECT hostid FROM hosts);
 CREATE UNIQUE INDEX maintenances_hosts_1 ON maintenances_hosts (maintenanceid,hostid);

@@ -1,3 +1,4 @@
+ALTER TABLE autoreg_host MODIFY autoreg_hostid DEFAULT NULL;
 ALTER TABLE autoreg_host MODIFY proxy_hostid DEFAULT NULL;
 ALTER TABLE autoreg_host MODIFY proxy_hostid NULL;
 UPDATE autoreg_host SET proxy_hostid=NULL WHERE proxy_hostid=0;

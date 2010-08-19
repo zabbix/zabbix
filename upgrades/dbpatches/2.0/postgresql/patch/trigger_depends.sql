@@ -1,6 +1,7 @@
+ALTER TABLE ONLY trigger_depends ALTER triggerdepid DROP DEFAULT,
+				 ALTER triggerid_down DROP DEFAULT,
+				 ALTER triggerid_up DROP DEFAULT;
 DROP INDEX trigger_depends_1;
-ALTER TABLE ONLY trigger_depends ALTER triggerid_down DROP DEFAULT;
-ALTER TABLE ONLY trigger_depends ALTER triggerid_up DROP DEFAULT;
 DELETE FROM trigger_depends WHERE triggerid_down NOT IN (SELECT triggerid FROM triggers);
 DELETE FROM trigger_depends WHERE triggerid_up NOT IN (SELECT triggerid FROM triggers);
 CREATE UNIQUE INDEX trigger_depends_1 ON trigger_depends (triggerid_down,triggerid_up);

@@ -1,3 +1,4 @@
+ALTER TABLE acknowledges MODIFY acknowledgeid DEFAULT NULL;
 ALTER TABLE acknowledges MODIFY userid DEFAULT NULL;
 ALTER TABLE acknowledges MODIFY eventid DEFAULT NULL;
 DELETE FROM acknowledges WHERE NOT userid IN (SELECT userid FROM users);

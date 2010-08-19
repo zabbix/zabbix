@@ -1,5 +1,10 @@
+ALTER TABLE sysmaps MODIFY sysmapid DEFAULT NULL;
+ALTER TABLE sysmaps MODIFY width DEFAULT '600';
+ALTER TABLE sysmaps MODIFY height DEFAULT '400';
 ALTER TABLE sysmaps MODIFY backgroundid DEFAULT NULL;
 ALTER TABLE sysmaps MODIFY backgroundid NULL;
+ALTER TABLE sysmaps MODIFY label_type DEFAULT '2';
+ALTER TABLE sysmaps MODIFY label_location DEFAULT '3';
 ALTER TABLE sysmaps ADD expandproblem INTEGER DEFAULT '1' NOT NULL;
 ALTER TABLE sysmaps ADD markelements INTEGER DEFAULT '0' NOT NULL;
 ALTER TABLE sysmaps ADD show_unack INTEGER DEFAULT '0' NOT NULL;

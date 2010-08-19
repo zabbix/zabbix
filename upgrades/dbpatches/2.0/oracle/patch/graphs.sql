@@ -1,3 +1,4 @@
+ALTER TABLE graphs MODIFY graphid DEFAULT NULL;
 ALTER TABLE graphs MODIFY templateid DEFAULT NULL;
 ALTER TABLE graphs MODIFY templateid NULL;
 ALTER TABLE graphs MODIFY ymin_itemid DEFAULT NULL;

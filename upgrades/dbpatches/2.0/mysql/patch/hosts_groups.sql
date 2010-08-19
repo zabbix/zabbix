@@ -1,6 +1,7 @@
+ALTER TABLE hosts_groups MODIFY hostgroupid bigint unsigned NOT NULL,
+			 MODIFY hostid bigint unsigned NOT NULL,
+			 MODIFY groupid bigint unsigned NOT NULL;
 DROP INDEX hosts_groups_1 ON hosts_groups;
-ALTER TABLE hosts_groups MODIFY hostid bigint unsigned NOT NULL;
-ALTER TABLE hosts_groups MODIFY groupid bigint unsigned NOT NULL;
 DELETE FROM hosts_groups WHERE NOT hostid IN (SELECT hostid FROM hosts);
 DELETE FROM hosts_groups WHERE NOT groupid IN (SELECT groupid FROM groups);
 CREATE UNIQUE INDEX hosts_groups_1 ON hosts_groups (hostid,groupid);

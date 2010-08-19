@@ -1,6 +1,7 @@
+ALTER TABLE items_applications MODIFY itemappid bigint unsigned NOT NULL,
+			       MODIFY applicationid bigint unsigned NOT NULL,
+			       MODIFY itemid bigint unsigned NOT NULL;
 DROP INDEX items_applications_1 ON items_applications;
-ALTER TABLE items_applications MODIFY applicationid bigint unsigned NOT NULL;
-ALTER TABLE items_applications MODIFY itemid bigint unsigned NOT NULL;
 DELETE FROM items_applications WHERE applicationid NOT IN (SELECT applicationid FROM applications);
 DELETE FROM items_applications WHERE itemid NOT IN (SELECT itemid FROM items);
 CREATE UNIQUE INDEX items_applications_1 ON items_applications (applicationid,itemid);

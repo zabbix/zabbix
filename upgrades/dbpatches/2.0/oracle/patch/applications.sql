@@ -1,3 +1,4 @@
+ALTER TABLE applications MODIFY applicationid DEFAULT NULL;
 ALTER TABLE applications MODIFY hostid DEFAULT NULL;
 ALTER TABLE applications MODIFY templateid DEFAULT NULL;
 ALTER TABLE applications MODIFY templateid NULL;

@@ -1,6 +1,7 @@
-ALTER TABLE graphs MODIFY templateid bigint unsigned NULL;
-ALTER TABLE graphs MODIFY ymin_itemid bigint unsigned NULL;
-ALTER TABLE graphs MODIFY ymax_itemid bigint unsigned NULL;
+ALTER TABLE graphs MODIFY graphid bigint unsigned NOT NULL,
+		   MODIFY templateid bigint unsigned NULL,
+		   MODIFY ymin_itemid bigint unsigned NULL,
+		   MODIFY ymax_itemid bigint unsigned NULL;
 UPDATE graphs SET templateid=NULL WHERE templateid=0;
 CREATE TEMPORARY TABLE tmp_graphs_graphid (graphid bigint unsigned PRIMARY KEY);
 INSERT INTO tmp_graphs_graphid (graphid) (SELECT graphid FROM graphs);

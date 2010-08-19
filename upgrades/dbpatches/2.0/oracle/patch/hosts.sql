@@ -1,3 +1,4 @@
+ALTER TABLE hosts MODIFY hostid DEFAULT NULL;
 ALTER TABLE hosts MODIFY proxy_hostid DEFAULT NULL;
 ALTER TABLE hosts MODIFY proxy_hostid NULL;
 ALTER TABLE hosts MODIFY maintenanceid DEFAULT NULL;

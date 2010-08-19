@@ -1,6 +1,7 @@
-DROP INDEX maintenances_windows_1;
+ALTER TABLE maintenances_windows MODIFY maintenance_timeperiodid DEFAULT NULL;
 ALTER TABLE maintenances_windows MODIFY maintenanceid DEFAULT NULL;
 ALTER TABLE maintenances_windows MODIFY timeperiodid DEFAULT NULL;
+DROP INDEX maintenances_windows_1;
 DELETE FROM maintenances_windows WHERE maintenanceid NOT IN (SELECT maintenanceid FROM maintenances);
 DELETE FROM maintenances_windows WHERE timeperiodid NOT IN (SELECT timeperiodid FROM timeperiods);
 CREATE UNIQUE INDEX maintenances_windows_1 ON maintenances_windows (maintenanceid,timeperiodid);

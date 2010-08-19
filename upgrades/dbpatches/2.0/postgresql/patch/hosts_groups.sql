@@ -1,6 +1,7 @@
+ALTER TABLE ONLY hosts_groups ALTER hostgroupid DROP DEFAULT,
+			      ALTER hostid DROP DEFAULT,
+			      ALTER groupid DROP DEFAULT;
 DROP INDEX hosts_groups_1;
-ALTER TABLE ONLY hosts_groups ALTER hostid DROP DEFAULT;
-ALTER TABLE ONLY hosts_groups ALTER groupid DROP DEFAULT;
 DELETE FROM hosts_groups WHERE NOT hostid IN (SELECT hostid FROM hosts);
 DELETE FROM hosts_groups WHERE NOT groupid IN (SELECT groupid FROM groups);
 CREATE UNIQUE INDEX hosts_groups_1 ON hosts_groups (hostid,groupid);

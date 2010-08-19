@@ -1,5 +1,6 @@
-ALTER TABLE applications MODIFY hostid bigint unsigned NOT NULL;
-ALTER TABLE applications MODIFY templateid bigint unsigned NULL;
+ALTER TABLE applications MODIFY applicationid bigint unsigned NOT NULL,
+			 MODIFY hostid bigint unsigned NOT NULL,
+			 MODIFY templateid bigint unsigned NULL;
 DELETE FROM applications WHERE NOT hostid IN (SELECT hostid FROM hosts);
 UPDATE applications SET templateid=NULL WHERE templateid=0;
 CREATE TEMPORARY TABLE tmp_applications_applicationid (applicationid bigint unsigned PRIMARY KEY);

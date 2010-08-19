@@ -1,3 +1,4 @@
+ALTER TABLE sysmaps_link_triggers MODIFY linktriggerid DEFAULT NULL;
 ALTER TABLE sysmaps_link_triggers MODIFY linkid DEFAULT NULL;
 ALTER TABLE sysmaps_link_triggers MODIFY triggerid DEFAULT NULL;
 DELETE FROM sysmaps_link_triggers WHERE linkid NOT IN (SELECT linkid FROM sysmaps_links);
