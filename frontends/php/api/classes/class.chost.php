@@ -169,9 +169,6 @@ class CHost extends CZBXAPI{
 			if(!is_null($options['select_macros'])){
 				$options['select_macros'] = API_OUTPUT_EXTEND;
 			}
-			if(!is_null($options['select_profile'])){
-				$options['select_profile'] = API_OUTPUT_EXTEND;
-			}
 		}
 
 		if(is_array($options['output'])){
@@ -734,7 +731,7 @@ Copt::memoryPick();
 		}
 
 // Adding Profiles
-		if(!is_null($options['select_profile']) && str_in_array($options['select_profile'], $subselects_allowed_outputs)){
+		if(!is_null($options['select_profile'])){
 			$sql = 'SELECT hp.* '.
 				' FROM hosts_profiles hp '.
 				' WHERE '.DBcondition('hp.hostid', $hostids);
