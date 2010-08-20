@@ -42,7 +42,6 @@ FIELD		|iprange	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|delay		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|nextcheck	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|unique_dcheckid|t_id		|	|NULL		|ZBX_SYNC,ZBX_PROXY	|2|dchecks	|dcheckid	|RESTRICT
 
 TABLE|dchecks|dcheckid|ZBX_SYNC
 FIELD		|dcheckid	|t_id		|	|NOT NULL	|0
@@ -56,6 +55,12 @@ FIELD		|snmpv3_securitylevel|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|snmpv3_authpassphrase|t_varchar(64)|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|snmpv3_privpassphrase|t_varchar(64)|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 INDEX		|1		|druleid
+
+TABLE|druleuniq|druleuniqid|ZBX_SYNC
+FIELD		|druleuniqid	|t_id		|	|NOT NULL	|0
+FIELD		|druleid	|t_id		|	|NOT NULL	|ZBX_SYNC,ZBX_PROXY	|1|drules
+FIELD		|dcheckid	|t_id		|	|NOT NULL	|ZBX_SYNC,ZBX_PROXY	|2|dchecks
+UNIQUE		|1		|druleid
 
 TABLE|dhosts|dhostid|ZBX_SYNC
 FIELD		|dhostid	|t_id		|	|NOT NULL	|0

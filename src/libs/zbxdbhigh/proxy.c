@@ -275,11 +275,11 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 	};
 
 	static const struct proxytable_t pt[]={
-		{"hosts"},
-		{"items"},
-		{"hosts_templates"},
 		{"globalmacro"},
+		{"hosts"},
+		{"hosts_templates"},
 		{"hostmacro"},
+		{"items"},
 		{"drules"},
 		{"dchecks"},
 		{NULL}
@@ -377,6 +377,8 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 
 		get_proxyconfig_table(proxy_hostid, j, table, condition);
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s", j->buffer);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -503,6 +505,8 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 		pf = NULL;
 		if (NULL == (pf = zbx_json_next_value(&jp_row, pf, buf, sizeof(buf))))
 			goto json_error;
+zabbix_log(LOG_LEVEL_CRIT, ">> %.*s", jp_row.end - pf + 1, pf);
+zabbix_log(LOG_LEVEL_CRIT, "%s", buf);
 
 		ZBX_STR2UINT64(recid, buf);
 
@@ -528,8 +532,11 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
  */		f = 1;
 		while (NULL != (pf = zbx_json_next_value(&jp_row, pf, buf, sizeof(buf))))
 		{
+zabbix_log(LOG_LEVEL_CRIT, ">> %.*s", jp_row.end - pf + 1, pf);
+zabbix_log(LOG_LEVEL_CRIT, "%s", buf);
 			if (f == field_count)
 			{
+zabbix_log(LOG_LEVEL_CRIT, "%s", zbx_json_strerror());
 				zabbix_log(LOG_LEVEL_WARNING, "Invalid number of fields \"%.*s\"",
 						jp_row.end - jp_row.start + 1,
 						jp_row.start);

@@ -595,6 +595,24 @@ static const char	*zbx_json_decodeint(const char *p, char *string, size_t len)
 	return NULL;
 }
 
+static const char	*zbx_json_decodenull(const char *p, char *string, size_t len)
+{
+	char	*o = string;
+
+	while (*p != '\0') /* this should never happen */
+	{
+		if (*p != 'n' || *p != 'u' || *p != 'l')
+		{
+			*o = '\0';
+			return p;
+		}
+		else if ((size_t)(o - string) < len - 1/*'\0'*/)
+			*o++ = *p;
+		p++;
+	}
+	return NULL;
+}
+
 const char	*zbx_json_decodevalue(const char *p, char *string, size_t len)
 {
 	zbx_json_type_t	jt;
@@ -605,6 +623,8 @@ const char	*zbx_json_decodevalue(const char *p, char *string, size_t len)
 	case ZBX_JSON_TYPE_STRING:
 		return zbx_json_decodestring(p, string, len);
 	case ZBX_JSON_TYPE_INT:
+		return zbx_json_decodeint(p, string, len);
+	case ZBX_JSON_TYPE_NULL:
 		return zbx_json_decodeint(p, string, len);
 	default:
 		return NULL;
