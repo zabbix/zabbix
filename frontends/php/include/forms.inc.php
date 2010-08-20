@@ -580,32 +580,6 @@
 		return $form;
 	}
 
-	function insert_configuration_form($file){
-		$type		= get_request('type',		'MYSQL');
-		$server		= get_request('server',		'localhost');
-		$database	= get_request('database',	'zabbix');
-		$user		= get_request('user',		'root');
-		$password	= get_request('password',	'');
-
-		$form = new CFormTable(S_CONFIGURATION_OF_ZABBIX_DATABASE, null, 'post');
-
-		$form->setHelp("install_source_web.php");
-		$cmbType = new CComboBox('type', $type);
-		$cmbType->addItem('MYSQL',	S_MYSQL);
-		$cmbType->addItem('POSTGRESQL',	S_POSTGRESQL);
-		$cmbType->addItem('ORACLE',	S_ORACLE);
-		$form->addRow(S_TYPE, $cmbType);
-
-		$form->addRow(S_HOST, new CTextBox('server', $server));
-		$form->addRow(S_NAME, new CTextBox('database', $database));
-		$form->addRow(S_USER, new CTextBox('user', $user));
-		$form->addRow(S_PASSWORD, new CPassBox('password', $password));
-
-		$form->addItemToBottomRow(new CButton('save',S_SAVE));
-
-		$form->show();
-	}
-
 // Insert form for User
 	function getUserForm($userid, $profile=0){
 		global $ZBX_LOCALES;
@@ -5109,106 +5083,6 @@ JAVASCRIPT;
 	return $frmHostPA;
 	}
 // END:   HOSTS PROFILE EXTENDED Section
-
- 	function insert_template_link_form($available_hosts){
-		global $USER_DETAILS;
-
- 		$frm_title = S_TEMPLATE_LINKAGE;
-
- 		if($_REQUEST['hostid']>0){
- 			$template = get_host_by_hostid($_REQUEST['hostid']);
- 			$frm_title.= ' ['.$template['host'].']';
- 		}
-
- 		if(($_REQUEST['hostid']>0) && !isset($_REQUEST['form_refresh'])){
- 			$name=$template['host'];
- 		}
- 		else{
- 			$name=get_request("tname",'');
- 		}
-
-		$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
-
-		$selected_grp = get_request('twb_groupid', 0);
-		$selected_grp = isset($available_groups[$selected_grp]) ? $selected_grp :  reset($available_groups);
-
-		$cmbGroups = new CComboBox('twb_groupid', $selected_grp, 'submit()');
-//		$cmbGroups->addItem(0,S_ALL_S);
-		$sql = 'SELECT DISTINCT g.groupid, g.name '.
-				' FROM groups g, hosts_groups hg, hosts h '.
-				' WHERE '.DBcondition('g.groupid',$available_groups).
-					' AND g.groupid=hg.groupid '.
-					' AND h.hostid=hg.hostid'.
-					' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.') '.
-				' ORDER BY g.name';
-		$result=DBselect($sql);
-		while($row=DBfetch($result)){
-			$cmbGroups->addItem($row['groupid'],$row['name']);
-		}
-
- 		$frmHostT = new CFormTable($frm_title,'hosts.php');
- 		$frmHostT->setHelp('web.hosts.group.php');
- 		$frmHostT->addVar('config',get_request('config',2));
- 		if($_REQUEST['hostid']>0){
- 			$frmHostT->addVar('hostid',$_REQUEST['hostid']);
- 		}
-
- 		$frmHostT->addRow(S_TEMPLATE,new CTextBox('tname',$name,60,'yes'));
-
-		$hosts_in_tpl = array();
-		$sql_where = '';
-		if(isset($_REQUEST['form_refresh'])){
-
-			$saved_hosts = get_request('hosts', array());
-			$hosts_in_tpl = array_intersect($available_hosts, $saved_hosts);
-
-			$sql = 'SELECT DISTINCT h.hostid,h.host '.
-				' FROM hosts h'.
-				' WHERE '.DBcondition('h.hostid',$hosts_in_tpl).
-				' ORDER BY h.host';
-			$db_hosts=DBselect($sql);
-			while($db_host=DBfetch($db_hosts)){
-				$hosts_in_tpl[$db_host['hostid']] = $db_host['hostid'];
-			}
-		}
-		else{
-			$sql = 'SELECT DISTINCT h.hostid,h.host '.
-				' FROM hosts h,hosts_templates ht'.
-				' WHERE (ht.templateid='.$_REQUEST['hostid'].
-					' AND h.hostid=ht.hostid'.
-					' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.') '.
-					' AND '.DBcondition('h.hostid',$available_hosts).' )'.
-				' ORDER BY h.host';
-			$db_hosts=DBselect($sql);
-			while($db_host=DBfetch($db_hosts)){
-				$hosts_in_tpl[$db_host['hostid']] = $db_host['hostid'];
-			}
-		}
-
- 		$cmbHosts = new CTweenBox($frmHostT,'hosts',$hosts_in_tpl,25);
-
-
-		$sql = 'SELECT DISTINCT h.hostid,h.host '.
-			' FROM hosts h, hosts_groups hg'.
- 			' WHERE ( h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.') '.
- 				' AND '.DBcondition('h.hostid',$available_hosts).
-				' AND hg.groupid='.$selected_grp.
-				' AND h.hostid=hg.hostid)'.
-				' OR '.DBcondition('h.hostid', $hosts_in_tpl).
- 			' ORDER BY h.host';
- 		$db_hosts=DBselect($sql);
-
- 		while($db_host=DBfetch($db_hosts)){
- 			$cmbHosts->addItem($db_host['hostid'],get_node_name_by_elid($db_host['hostid'], null, ': ').$db_host['host']);
- 		}
-
- 		$frmHostT->addRow(S_HOSTS,$cmbHosts->get(S_HOSTS.SPACE.S_IN,array(S_OTHER.SPACE.S_HOSTS.SPACE.'|'.SPACE.S_GROUP.SPACE,$cmbGroups)));
-
- 		$frmHostT->addItemToBottomRow(new CButton('save',S_SAVE));
- 		$frmHostT->addItemToBottomRow(SPACE);
- 		$frmHostT->addItemToBottomRow(new CButtonCancel(url_param('config')));
- 		$frmHostT->show();
-	}
 
 	function import_map_form($rules){
 		global $USER_DETAILS;
