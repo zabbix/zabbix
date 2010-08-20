@@ -68,19 +68,6 @@
 		return false;
 	}
 
-	function get_sysmaps_element_by_selementid($selementid){
-		$sql='select * FROM sysmaps_elements WHERE selementid='.$selementid;
-		$result=DBselect($sql);
-		$row=DBfetch($result);
-		if($row){
-			return	$row;
-		}
-		else{
-			error(S_NO_SYSMAP_ELEMENT_WITH.' selementid=['.$selementid.']');
-		}
-	return	$result;
-	}
-
 // LINKS
 	function add_link($link){
 		$link_db_fields = array(
@@ -749,7 +736,7 @@
 			);
 			$db_item = CItem::get($options);
 			$db_item = reset($db_item);
-	
+
 			if(!$db_item){
 				$label = str_replace($expr, '???', $label);
 				continue;

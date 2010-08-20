@@ -252,23 +252,6 @@
 		return	FALSE;
 	}
 
-	function service_has_parent($serviceid){
-		$row = DBfetch(DBselect('SELECT linkid FROM services_links WHERE servicedownid='.$serviceid));
-		if($row && !zbx_empty($row['linkid'])){
-			return	TRUE;
-		}
-		return	FALSE;
-	}
-
-// Seems not used ant more!
-	function service_has_no_this_parent($parentid,$serviceid){
-		$row = DBfetch(DBselect('SELECT linkid FROM services_links WHERE serviceupid='.$parentid.' AND servicedownid='.$serviceid));
-		if($row && !zbx_empty($row['linkid'])){
-			return	FALSE;
-		}
-		return	TRUE;
-	}
-
 	function add_service_link($servicedownid,$serviceupid,$softlink){
 		if( ($softlink==0) && (is_service_hardlinked($servicedownid)==true) ){
 			error(S_CANNOT_LINK_HARDLINKED_SERVICE);
@@ -289,20 +272,6 @@
 			return $result;
 
 		return $linkid;
-	}
-
-	function update_service_link($linkid,$servicedownid,$serviceupid,$softlink){
-		if( ($softlink==0) && (is_service_hardlinked($servicedownid)==true) ){
-			return	false;
-		}
-
-		if((bccomp($servicedownid, $serviceupid)==0)){
-			error(S_CANNOT_LINK_SERVICE_TO_ITSELF);
-			return	false;
-		}
-
-		$sql="UPDATE services_links SET servicedownid=$servicedownid, serviceupid=$serviceupid, soft=$softlink WHERE linkid=$linkid";
-		return	dbexecute($sql);
 	}
 
 	function remove_service_links($serviceid){
@@ -363,7 +332,7 @@ return ($time['mon'].'/'.$time['mday'].'/'.$time['year'].' '.$time['hours'].':'.
 					$curr_from	= min($curr_from, $period_end);
 
 					$curr_to = $curr_from + ($ts_to - $ts_from);
-					
+
 // SDI('FROM2 '.VDI($curr_from,0));
 // SDI('TO '.VDI($curr_to,0));
 
@@ -585,14 +554,7 @@ if($serviceid == 1 || $serviceid == 2){
 	// return $desc;
 	// }
 
-	function get_num_of_service_childs($serviceid){
-		$row = DBfetch(DBselect("SELECT count(distinct servicedownid) as cnt FROM services_links ".
-					" WHERE serviceupid=".$serviceid));
-	return	$row["cnt"];
-	}
-
-	function	get_service_by_serviceid($serviceid)
-	{
+	function get_service_by_serviceid($serviceid){
 		$res = DBfetch(DBselect("SELECT * FROM services WHERE serviceid=".$serviceid));
 		if(!$res)
 		{
@@ -602,7 +564,7 @@ if($serviceid == 1 || $serviceid == 2){
 		return $res;
 	}
 
-	function	get_services_links_by_linkid($linkid){
+	function get_services_links_by_linkid($linkid){
 		$result=DBselect("SELECT * FROM services_links WHERE linkid=$linkid");
 		$res = DBfetch($result);
 		if(!$res){
