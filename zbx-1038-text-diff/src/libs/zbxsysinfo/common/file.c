@@ -108,6 +108,67 @@ int	VFS_FILE_EXISTS(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	return SYSINFO_RET_OK;
 }
 
+int	VFS_FILE_CONTENTS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	char	filename[MAX_STRING_LEN], encoding[32];
+	char	buf[MAX_BUF_LEN], *utf8, *contents = NULL;
+	int	f, nbytes;
+
+	assert(result);
+
+	init_result(result);
+
+	if (num_param(param) > 2)
+		return SYSINFO_RET_FAIL;
+
+	if (0 != get_param(param, 1, filename, sizeof(filename)))
+		return SYSINFO_RET_FAIL;
+
+	if (0 != get_param(param, 2, encoding, sizeof(encoding)))
+		*encoding = '\0';
+
+	zbx_strupper(encoding);
+
+	if (-1 == (f = zbx_open(filename, O_RDONLY)))
+		return SYSINFO_RET_FAIL;
+
+	while (0 < (nbytes = zbx_read(f, buf, sizeof(buf), encoding)))
+	{
+		utf8 = convert_to_utf8(buf, nbytes, encoding);
+
+		if (NULL == contents)
+			contents = utf8;
+		else
+		{
+			contents = zbx_strdcat(contents, utf8);
+			zbx_free(utf8);
+		}
+	}
+
+ 	close(f);
+
+	if (-1 == nbytes)	/* error occurred */
+	{
+		zbx_free(contents);
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL != contents)
+	{
+		zbx_rtrim(contents, "\n\r\0");
+
+		if ('\0' == *contents)
+			zbx_free(contents);
+	}
+
+	if (NULL == contents)	/* EOF */
+		contents = strdup("EOF");
+
+	SET_TEXT_RESULT(result, contents);
+
+	return SYSINFO_RET_OK;
+}
+
 int	VFS_FILE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char	filename[MAX_STRING_LEN], regexp[MAX_STRING_LEN], encoding[32];
