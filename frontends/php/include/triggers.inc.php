@@ -2314,36 +2314,6 @@ return $caption;
 	return $result;
 	}
 
-// Deny linking templates with dependency on other template
-	function check_templates_trigger_dependencies($templates) {
-		$result = true;
-
-		foreach($templates as $templateid => $templatename) {
-
-			$triggerids = array();
-			$db_triggers = get_triggers_by_hostid($templateid);
-			while($trigger = DBfetch($db_triggers)) {
-				$triggerids[$trigger['triggerid']] = $trigger['triggerid'];
-			}
-
-			$sql = 'SELECT DISTINCT h.hostid, h.host '.
-					' FROM trigger_depends td, functions f, items i, hosts h '.
-					' WHERE (('.DBcondition('td.triggerid_down',$triggerids).' AND f.triggerid=td.triggerid_up) '.
-						' OR ('.DBcondition('td.triggerid_up',$triggerids).' AND f.triggerid=td.triggerid_down)) '.
-						' AND i.itemid=f.itemid '.
-						' AND h.hostid=i.hostid '.
-						' AND h.hostid<>'.$templateid.
-						' AND h.status='.HOST_STATUS_TEMPLATE;
-
-			$db_dephosts = DBselect($sql);
-			while($db_dephost = DBfetch($db_dephosts)) {
-				error(S_TRIGGER_IN_TEMPLATE.SPACE.'"'.$templatename.'"'.SPACE.S_HAS_DEPENDENCY_WITH_TRIGGER_IN_TEMPLATE.' : '.$db_dephost['host']);
-				$result = false;
-			}
-		}
-		return $result;
-	}
-
 // Deny adding dependency between templates ifthey are not high level templates
 	function validate_trigger_dependency($expression, $deps) {
 		$result = true;
@@ -2857,18 +2827,6 @@ return $caption;
 	return $table_row;
 	}
 
-	function get_function_by_functionid($functionid){
-		$result=DBselect('SELECT * FROM functions WHERE functionid='.$functionid);
-		$row=DBfetch($result);
-		if($row){
-			return	$row;
-		}
-		else{
-			error(S_NO_FUNCTION_WITH.' functionid=['.$functionid.']');
-		}
-	return $item;
-	}
-
 	function calculate_availability($triggerid,$period_start,$period_end){
 		$start_value = -1;
 
@@ -3110,37 +3068,6 @@ return $caption;
 			}
 		}
 		return $result;
-	}
-
-	function get_row_for_nofalseforb($row,$sql){
-		$res_events = DBSelect($sql,1);
-
-		if(!$e_row=DBfetch($res_events)){
-			return false;
-		}
-		else{
-			$row = array_merge($row,$e_row);
-		}
-
-		if(($row['value']!=TRIGGER_VALUE_TRUE) && (!event_initial_time($row))){
-			if(!$eventid = first_initial_eventid($row,0)){
-				return false;
-			}
-
-			$sql = 'SELECT e.eventid, e.value '.
-					' FROM events e '.
-					' WHERE e.eventid='.$eventid.
-						' AND e.acknowledged=0';
-
-			$res_events = DBSelect($sql,1);
-			if(!$e_row=DBfetch($res_events)){
-				return false;
-			}
-			else{
-				$row = array_merge($row,$e_row);
-			}
-		}
-	return $row;
 	}
 
 	function get_triggers_unacknowledged($db_element, $count_problems=null, $ack=false){

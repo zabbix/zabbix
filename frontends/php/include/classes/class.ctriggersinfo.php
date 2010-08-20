@@ -47,14 +47,6 @@ class CTriggersInfo extends CTable{
 		$this->style = $value;
 	}
 
-	public function setNodeid($nodeid){
-		$this->nodeid = (int)$nodeid;
-	}
-
-	public function set_host_group($groupid){
-		$this->groupid = $groupid;
-	}
-
 	public function hideHeader(){
 		$this->show_header = false;
 	}

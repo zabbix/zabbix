@@ -24,7 +24,7 @@ class CChart extends CGraphDraw{
 
 	public function __construct($type = GRAPH_TYPE_NORMAL){
 		parent::__construct($type);
-		
+
 		$this->yaxismin = null;
 		$this->yaxismax = null;
 
@@ -35,7 +35,7 @@ class CChart extends CGraphDraw{
 
 		$this->yaxisright=0;
 		$this->yaxisleft=0;
-		
+
 		$this->skipLeftScale = 0;		// in case if left axis should be drawn but dosn't contain any data
 		$this->skipRightScale = 0;		// in case if right axis should be drawn but dosn't contain any data
 
@@ -610,7 +610,7 @@ class CChart extends CGraphDraw{
 				if($this->type == GRAPH_TYPE_STACKED){
 					$min_val_shift = min(count($val), count($shift_val));
 					for($ci=0; $ci < $min_val_shift; $ci++){
-						if($shift_val[$ci] < 0){						
+						if($shift_val[$ci] < 0){
 							$val[$ci] += bcadd($shift_val[$ci], $val[$ci]);
 						}
 					}
@@ -756,7 +756,7 @@ class CChart extends CGraphDraw{
 				}
 			}
 		}
-		
+
 // SIDES
 		$side = GRAPH_YAXIS_SIDE_LEFT;
 		$other_side = GRAPH_YAXIS_SIDE_RIGHT;
@@ -778,7 +778,7 @@ class CChart extends CGraphDraw{
 		$max = $this->m_maxY[$side];
 
 		$dist = bcmul(5, bcpow(10, 18));
-		
+
 		$interval = 0;
 		foreach($intervals as $num => $int){
 			$t = abs($int - $columnInterval);
@@ -1135,7 +1135,7 @@ class CChart extends CGraphDraw{
 	}
 
 	private function drawTimeGrid(){
-		$this->calctimeInterval();
+		$this->calcTimeInterval();
 		$this->drawSubTimeGrid();
 //		$this->drawMainTimeGrid();
 	}
@@ -1170,22 +1170,22 @@ class CChart extends CGraphDraw{
 
 // MAIN Interval Checks
 			if(($interval < 3600) && (date('i',$new_time) == 0)){
-				$this->DrawMainPeriod($new_time, $new_pos);
+				$this->drawMainPeriod($new_time, $new_pos);
 				continue;
 			}
 
 			if(($interval >= 3600) && ($interval < 86400) && (date('H',$new_time) == 0)){
-				$this->DrawMainPeriod($new_time, $new_pos);
+				$this->drawMainPeriod($new_time, $new_pos);
 				continue;
 			}
 
 			if(($interval == 86400) && (date('N',$new_time) == 7)){
-				$this->DrawMainPeriod($new_time, $new_pos);
+				$this->drawMainPeriod($new_time, $new_pos);
 				continue;
 			}
 
 			if(($interval > 86400) && (($i*$interval % $main_interval + $offset) == $main_offset)){
-				$this->DrawMainPeriod($new_time, $new_pos);
+				$this->drawMainPeriod($new_time, $new_pos);
 				continue;
 			}
 //----------
@@ -1311,7 +1311,7 @@ class CChart extends CGraphDraw{
 
 			$tmpY = $this->sizeY/2+$this->shiftY+$dims['height']/2;
 			if($tmpY < $dims['height']) $tmpY = $dims['height'] + 6;
-			
+
 			imageText($this->im,
 				9,
 				90,
@@ -1398,7 +1398,7 @@ class CChart extends CGraphDraw{
 
 			$tmpY = $this->sizeY/2+$this->shiftY+$dims['height']/2;
 			if($tmpY < $dims['height']) $tmpY = $dims['height'] + 6;
-			
+
 			imageText($this->im,
 				9,
 				90,
