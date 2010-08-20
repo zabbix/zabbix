@@ -646,7 +646,7 @@ static void	process_discovery(int now)
 	DB_DRULE	drule;
 
 	result = DBselect(
-			"select r.druleid,r.iprange,r.name,u.unique_dcheckid"
+			"select r.druleid,r.iprange,r.name,u.dcheckid"
 			" from drules r"
 			" left join druleuniq u on u.druleid=r.druleid"
 			" where r.proxy_hostid is null"

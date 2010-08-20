@@ -282,6 +282,7 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 		{"items"},
 		{"drules"},
 		{"dchecks"},
+		{"druleuniq"},
 		{NULL}
 	};
 
@@ -342,7 +343,7 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 					proxy_hostid,
 					DRULE_STATUS_MONITORED);
 		}
-		else if (0 == strcmp(pt[i].table, "dchecks"))
+		else if (0 == strcmp(pt[i].table, "dchecks") || 0 == strcmp(pt[i].table, "druleuniq"))
 		{
 			zbx_snprintf(condition, sizeof(condition),
 					", drules r where t.druleid=r.druleid"
