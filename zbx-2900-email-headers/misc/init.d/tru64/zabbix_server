@@ -17,10 +17,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-# Start/Stop the secure shell daemon.
+# Start/Stop the Zabbix server daemon.
 # Place a startup script in /sbin/init.d, and link to it from /sbin/rc[023].d 
 
-SERVICE="ZABBIX server"
+SERVICE="Zabbix server"
 DAEMON=/usr/local/sbin/zabbix_server
 PIDFILE=/tmp/zabbix_server.pid
 
