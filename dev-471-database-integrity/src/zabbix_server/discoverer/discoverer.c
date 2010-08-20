@@ -646,19 +646,20 @@ static void	process_discovery(int now)
 	DB_DRULE	drule;
 
 	result = DBselect(
-			"select druleid,iprange,name,unique_dcheckid"
-			" from drules"
-			" where proxy_hostid is null"
-				" and status=%d"
-				" and (nextcheck<=%d or nextcheck>%d+delay)"
-				" and " ZBX_SQL_MOD(druleid,%d) "=%d"
+			"select r.druleid,r.iprange,r.name,u.unique_dcheckid"
+			" from drules r"
+			" left join druleuniq u on u.druleid=r.druleid"
+			" where r.proxy_hostid is null"
+				" and r.status=%d"
+				" and (r.nextcheck<=%d or r.nextcheck>%d+r.delay)"
+				" and " ZBX_SQL_MOD(r.druleid,%d) "=%d"
 				DB_NODE,
 			DRULE_STATUS_MONITORED,
 			now,
 			now,
 			CONFIG_DISCOVERER_FORKS,
 			discoverer_num - 1,
-			DBnode_local("druleid"));
+			DBnode_local("r.druleid"));
 
 	while (NULL != (row = DBfetch(result))) {
 		memset(&drule, 0, sizeof(drule));
