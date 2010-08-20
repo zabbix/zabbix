@@ -220,12 +220,16 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	/* e-mail header and content format is based on MIME standard since UTF-8 is used both in mailsubject and mailbody */
 	/* =?charset?encoding?encoded text?= format must be used for subject field */
 	/* e-mails are sent in 'SMTP/MIME e-mail' format, this should be documented */
-	cp = zbx_dsprintf(cp, "From:<%s>\r\nTo:<%s>\r\nDate: %s\r\n"
+	cp = zbx_dsprintf(cp,
+			"From: <%s>\r\n"
+			"To: <%s>\r\n"
+			"Date: %s\r\n"
 			"Subject: %s\r\n"
 			"MIME-Version: 1.0\r\n"
 			"Content-Type: text/plain; charset=\"UTF-8\"\r\n"
 			"Content-Transfer-Encoding: base64\r\n"
-			"\r\n%s",
+			"\r\n"
+			"%s",
 			smtp_email, mailto, str_time, mailsubject, mailbody);
 	e=write(s.socket,cp,strlen(cp));
 	zbx_free(cp);
