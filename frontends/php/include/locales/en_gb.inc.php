@@ -1925,7 +1925,6 @@
 	'S_AUDIT_LOGS_BIG'=>			'AUDIT LOGS',
 	'S_AUDIT_ACTIONS_BIG'=>			'AUDIT ACTIONS',
 	'S_ACTION'=>				'Action',
-	'S_ACTIONS_BIG'=>				'ACTIONS',
 	'S_DETAILS'=>				'Details',
 	'S_UNKNOWN_ACTION'=>			'Unknown action',
 	'S_ADDED'=>				'Added',
