@@ -155,7 +155,7 @@ int	VFS_FILE_CONTENTS(const char *cmd, const char *param, unsigned flags, AGENT_
 
 	if (NULL != contents)
 	{
-		zbx_rtrim(contents, "\n\r\0");
+		zbx_rtrim(contents, "\r\n");
 
 		if ('\0' == *contents)
 			zbx_free(contents);
