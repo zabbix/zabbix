@@ -1379,6 +1379,7 @@
 				'filter' => array('value' => array(TRIGGER_VALUE_UNKNOWN, TRIGGER_VALUE_TRUE)),
 				'nodeids' => get_current_nodeid(true),
 				'active' => true,
+				'skipDependent' => 1,
 			);
 			$triggers = CTrigger::get($options);
 
