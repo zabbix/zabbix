@@ -1,11 +1,13 @@
 ALTER TABLE ONLY items ALTER itemid DROP DEFAULT,
 		       ALTER hostid DROP DEFAULT,
+		       ALTER lastvalue TYPE text,
+		       ALTER prevvalue TYPE text,
 		       ALTER units TYPE varchar(255),
-		       ADD lastns integer NULL,
 		       ALTER templateid DROP DEFAULT,
 		       ALTER templateid DROP NOT NULL,
 		       ALTER valuemapid DROP DEFAULT,
-		       ALTER valuemapid DROP NOT NULL;
+		       ALTER valuemapid DROP NOT NULL,
+		       ADD lastns integer NULL;
 UPDATE items SET templateid=NULL WHERE templateid=0;
 UPDATE items SET templateid=NULL WHERE NOT templateid IS NULL AND NOT templateid IN (SELECT itemid FROM items);
 UPDATE items SET valuemapid=NULL WHERE valuemapid=0;
