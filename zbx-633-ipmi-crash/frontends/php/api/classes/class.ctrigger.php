@@ -78,6 +78,7 @@ class CTrigger extends CZBXAPI{
 			'applicationids'		=> null,
 			'functions'				=> null,
 			'monitored' 			=> null,
+			'active' 				=> null,
 			'templated'				=> null,
 			'maintenance'			=> null,
 			'inherited'				=> null,
@@ -315,6 +316,24 @@ class CTrigger extends CZBXAPI{
 										' ii.status<>'.ITEM_STATUS_ACTIVE.
 										' OR hh.status<>'.HOST_STATUS_MONITORED.
 									' )'.
+						' )'.
+				' )';
+			$sql_parts['where']['status'] = 't.status='.TRIGGER_STATUS_ENABLED;
+		}
+
+// active
+		if(!is_null($options['active'])){
+			$sql_parts['where']['active'] = ''.
+				' NOT EXISTS ('.
+					' SELECT ff.functionid'.
+					' FROM functions ff'.
+					' WHERE ff.triggerid=t.triggerid'.
+						' AND EXISTS ('.
+							' SELECT ii.itemid'.
+							' FROM items ii, hosts hh'.
+							' WHERE ff.itemid=ii.itemid'.
+								' AND hh.hostid=ii.hostid'.
+								' AND  hh.status<>'.HOST_STATUS_MONITORED.
 						' )'.
 				' )';
 			$sql_parts['where']['status'] = 't.status='.TRIGGER_STATUS_ENABLED;
