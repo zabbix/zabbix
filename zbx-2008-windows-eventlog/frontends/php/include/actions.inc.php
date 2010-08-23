@@ -803,6 +803,7 @@ return $delays;
 }
 
 function get_history_of_actions($limit,&$last_clock=null,$sql_cond=''){
+	validate_sort_and_sortorder('clock', ZBX_SORT_DOWN);
 	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array());
 
 	$alerts = array();

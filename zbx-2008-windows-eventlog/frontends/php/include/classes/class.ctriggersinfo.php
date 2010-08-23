@@ -47,14 +47,6 @@ class CTriggersInfo extends CTable{
 		$this->style = $value;
 	}
 
-	public function setNodeid($nodeid){
-		$this->nodeid = (int)$nodeid;
-	}
-
-	public function set_host_group($groupid){
-		$this->groupid = $groupid;
-	}
-
 	public function hideHeader(){
 		$this->show_header = false;
 	}
@@ -107,10 +99,12 @@ class CTriggersInfo extends CTable{
 		}
 
 		if($this->show_header){
-			$node = get_node_by_nodeid($this->nodeid);
 			$header_str = S_TRIGGERS_INFO.SPACE;
 
-			if($node > 0) $header_str.= '('.$node['name'].')'.SPACE;
+			if(!is_null($this->nodeid)){
+				$node = get_node_by_nodeid($this->nodeid);
+				if($node > 0) $header_str.= '('.$node['name'].')'.SPACE;
+			}
 
 			if(remove_nodes_from_id($this->groupid)>0){
 				$group = get_hostgroup_by_groupid($this->groupid);

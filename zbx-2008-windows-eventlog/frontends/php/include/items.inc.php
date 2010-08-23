@@ -356,7 +356,6 @@
 
 		if($item['type'] == ITEM_TYPE_AGGREGATE){
 			/* grpfunc['group','key','itemfunc','numeric param'] */
-//			if(eregi('^((.)*)(\[\"((.)*)\"\,\"((.)*)\"\,\"((.)*)\"\,\"([0-9]+)\"\])$', $item['key_'], $arr)){
 			if(preg_match('/^((.)*)(\[\"((.)*)\"\,\"((.)*)\"\,\"((.)*)\"\,\"([0-9]+)\"\])$/i', $item['key_'], $arr)){
 				$g=$arr[1];
 				if(!str_in_array($g,array("grpmax","grpmin","grpsum","grpavg"))){
@@ -562,17 +561,16 @@
 			$item['data_type'] = 0;
 		}
 
-		$sql = 'SELECT itemid '.
+		$sql = 'SELECT itemid, hostid, templateid '.
 				' FROM items '.
 				' WHERE hostid='.$item['hostid'].
-					' and itemid<>'.$itemid.
-					' and key_='.zbx_dbstr($item['key_']);
+					' AND itemid<>'.$itemid.
+					' AND key_='.zbx_dbstr($item['key_']);
 		$db_item = DBfetch(DBselect($sql));
-		if($db_item && $item['templateid'] == 0){
+		if($db_item && (($db_item['templateid'] != 0) || ($item['templateid'] == 0))){
 			error(S_AN_ITEM_WITH_THE_KEY.SPACE.'['.$item['key_'].']'.SPACE.S_ALREADY_EXISTS_FOR_HOST_SMALL.SPACE.'['.$host['host'].'].'.SPACE.S_THE_KEY_MUST_BE_UNIQUE);
 			return FALSE;
 		}
-
 // first update child items
 		$db_tmp_items = DBselect('SELECT itemid, hostid FROM items WHERE templateid='.$itemid);
 		while($db_tmp_item = DBfetch($db_tmp_items)){
