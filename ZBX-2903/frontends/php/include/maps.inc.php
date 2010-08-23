@@ -1054,7 +1054,8 @@
 			'priority' => $i['priority'],
 			'info' => array(),
 		);
-
+		$has_problem = false;
+		$has_status = false;
 
 		if($i['problem']){
 			$info['iconid'] = $selement['iconid_on'];
@@ -1087,6 +1088,7 @@
 					'color' => $colors['Gray']
 				);
 			}
+			$has_problem = true;
 		}
 		else if($i['unknown']){
 			if(!isset($info['iconid'])){
@@ -1097,10 +1099,11 @@
 				'msg' => $i['unknown'] . ' ' . S_UNKNOWN,
 				'color' => $colors['Gray']
 			);
+			$has_problem = true;
 		}
 
 		if($i['maintenance']){
-			if(!isset($info['iconid'])){
+			if(!$has_problem){
 				$info['iconid'] = $selement['iconid_maintenance'];
 				$info['icon_type'] = SYSMAP_ELEMENT_ICON_MAINTENANCE;
 			}
@@ -1108,9 +1111,10 @@
 				'msg' => $i['maintenance'] . ' ' .S_MAINTENANCE,
 				'color' => $colors['Orange'],
 			);
+			$has_status = true;
 		}
 		else if($i['disabled']){
-			if(!isset($info['iconid'])){
+			if(!$has_problem){
 				$info['icon_type'] = SYSMAP_ELEMENT_ICON_DISABLED;
 				$info['iconid'] = $selement['iconid_disabled'];
 			}
@@ -1118,8 +1122,10 @@
 				'msg' => S_DISABLED_BIG,
 				'color' => $colors['Dark Red']
 			);
+			$has_status = true;
 		}
-		else{
+
+		if(!$has_status && !$has_problem){
 			if(!isset($info['iconid'])){
 				$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
 				$info['iconid'] = $selement['iconid_off'];
@@ -1142,6 +1148,8 @@
 			'info' => array(),
 		);
 
+		$has_problem = false;
+		$has_status = false;
 
 		if($i['problem']){
 			$info['iconid'] = $selement['iconid_on'];
@@ -1173,19 +1181,21 @@
 					'color' => $colors['Gray']
 				);
 			}
+			$has_problem = true;
 		}
 		else if($i['unknown']){
 			$info['iconid'] = $selement['iconid_unknown'];
 			$info['icon_type'] = SYSMAP_ELEMENT_ICON_UNKNOWN;
-			
+
 			$info['info']['unknown'] = array(
 				'msg' => $i['unknown'] . ' ' . S_UNKNOWN,
 				'color' => $colors['Gray']
 			);
+			$has_problem = true;
 		}
 
 		if($i['maintenance']){
-			if(!isset($info['iconid'])){
+			if(!$has_problem){
 				$info['iconid'] = $selement['iconid_maintenance'];
 				$info['icon_type'] = SYSMAP_ELEMENT_ICON_MAINTENANCE;
 			}
@@ -1193,9 +1203,10 @@
 				'msg' => $i['maintenance'] . ' ' .S_MAINTENANCE,
 				'color' => $colors['Orange'],
 			);
+			$has_status = true;
 		}
 		else if($i['disabled']){
-			if(!isset($info['iconid'])){
+			if(!$has_problem){
 				$info['icon_type'] = SYSMAP_ELEMENT_ICON_DISABLED;
 				$info['iconid'] = $selement['iconid_disabled'];
 			}
@@ -1203,8 +1214,10 @@
 				'msg' => S_DISABLED_BIG,
 				'color' => $colors['Dark Red']
 			);
+			$has_status = true;
 		}
-		else{
+
+		if(!$has_status && !$has_problem){
 			if(!isset($info['iconid'])){
 				$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
 				$info['iconid'] = $selement['iconid_off'];
@@ -1238,10 +1251,9 @@
 		$hosts_map = array();
 
 		$selements = zbx_toHash($sysmap['selements'], 'selementid');
-		foreach($selements as $snum => $selement){
-
-			$selements[$snum]['hosts'] = array();
-			$selements[$snum]['triggers'] = array();
+		foreach($selements as $selementid => $selement){
+			$selements[$selementid]['hosts'] = array();
+			$selements[$selementid]['triggers'] = array();
 
 			switch($selement['elementtype']){
 				case SYSMAP_ELEMENT_TYPE_MAP:
@@ -1262,16 +1274,16 @@
 							foreach($map['selements'] as $sel){
 								switch($sel['elementtype']){
 									case SYSMAP_ELEMENT_TYPE_MAP:
-										$mapids[] = $selement['elementid'];
+										$mapids[] = $sel['elementid'];
 									break;
 									case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-										$hostgroups_map[$sel['elementid']][$selement['selementid']] = $selement['selementid'];
+										$hostgroups_map[$sel['elementid']][$selementid] = $selementid;
 									break;
 									case SYSMAP_ELEMENT_TYPE_HOST:
-										$hosts_map[$sel['elementid']][$selement['selementid']] = $selement['selementid'];
+										$hosts_map[$sel['elementid']][$selementid] = $selementid;
 									break;
 									case SYSMAP_ELEMENT_TYPE_TRIGGER:
-										$triggers_map[$sel['elementid']][$selement['selementid']] = $selement['selementid'];
+										$triggers_map[$sel['elementid']][$selementid] = $selementid;
 									break;
 								}
 							}
