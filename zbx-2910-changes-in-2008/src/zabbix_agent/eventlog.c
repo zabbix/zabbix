@@ -24,16 +24,6 @@
 #include "log.h"
 #include "eventlog.h"
 
-#ifndef WINVER
-#	error "WINVER is not defined"
-#elif WINVER >= 0x0600
-#	define HAVE_WINEVT_H 1 /* header available in Windows Vista or later */
-#endif
-
-#ifdef HAVE_WINEVT_H
-#	include "winevt.h"
-#endif
-
 #define MAX_INSERT_STRS 100
 #define MAX_MSG_LENGTH 1024
 
@@ -92,213 +82,6 @@ static int	zbx_close_eventlog(HANDLE eventlog_handle)
 
 	return SUCCEED;
 }
-
-#ifdef HAVE_WINEVT_H
-
-static int	zbx_get_eventlog_message_xpath(LPCTSTR wsource, long which, char **out_source, char **out_message,
-		unsigned short *out_severity, unsigned long *out_timestamp)
-{
-	const char	*__function_name = "zbx_get_eventlog_message_xpath";
-
-	int		ret = FAIL;
-	LPSTR		tmp_str = NULL;
-	LPWSTR		tmp_wstr = NULL;
-	LPWSTR		event_query = NULL; /* L"Event/System[EventRecordID=WHICH]" */
-	DWORD		status = ERROR_SUCCESS;
-	PEVT_VARIANT	eventlog_array = NULL;
-	HANDLE		eventlog_handle = NULL;
-	HANDLE		eventlog_each_handle = NULL;
-	HANDLE		eventlog_context_handle = NULL;
-	HANDLE		eventlog_providermetadata_handle = NULL;
-	LPWSTR		query_array[] = {
-			L"/Event/System/Provider/@Name",
-			L"/Event/System/EventRecordID",
-			L"/Event/System/Level",
-			L"/Event/System/TimeCreated/@SystemTime"};
-	DWORD		array_count = 4;
-	DWORD		dwReturned = 0, dwValuesCount = 0, dwBufferSize = 0;
-	const ULONGLONG	sec_1970 = 116444736000000000;
-	
-	static HMODULE	hmod_wevtapi = NULL;
-	static EVT_HANDLE (WINAPI *EvtQuery)(EVT_HANDLE, LPCWSTR, LPCWSTR, DWORD) = NULL;
-	static EVT_HANDLE (WINAPI *EvtCreateRenderContext)(DWORD, LPCWSTR*, DWORD) = NULL;
-	static BOOL (WINAPI *EvtNext)(EVT_HANDLE, DWORD, PEVT_HANDLE, DWORD, DWORD, __out PDWORD) = NULL;
-	static BOOL (WINAPI *EvtRender)(EVT_HANDLE, EVT_HANDLE, DWORD, DWORD,
-			__out_bcount_part_opt(BufferSize, *BufferUsed) PVOID, __out PDWORD, __out PDWORD) = NULL;
-	static EVT_HANDLE (WINAPI *EvtOpenPublisherMetadata)(EVT_HANDLE, LPCWSTR, LPCWSTR, LCID, DWORD) = NULL;
-	static BOOL (WINAPI *EvtFormatMessage)(EVT_HANDLE, EVT_HANDLE, DWORD, DWORD, PEVT_VARIANT, DWORD, DWORD,
-			__out_ecount_part_opt(BufferSize, *BufferUsed) LPWSTR, __out PDWORD) = NULL;
-	static BOOL (WINAPI *EvtClose)(EVT_HANDLE) = NULL;
-
-	assert(out_source);
-	assert(out_message);
-	assert(out_severity);
-	assert(out_timestamp);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() which:%ld", __function_name, which);
-
-	*out_source	= NULL;
-	*out_message	= NULL;
-	*out_severity	= 0;
-	*out_timestamp	= 0;
-
-	/* We have to use LoadLibrary() to load wevtapi.dll to avoid it required even before Vista. */
-	/* load wevtapi.dll once */
-	if (NULL == hmod_wevtapi)
-	{
-		hmod_wevtapi = LoadLibrary(L"wevtapi.dll");
-		if (NULL == hmod_wevtapi)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "Can't load wevtapi.dll");
-			goto finish;
-		}
-		zabbix_log(LOG_LEVEL_DEBUG, "wevtapi.dll was loaded");
-		/* get function pointer from wevtapi.dll */
-		(FARPROC)EvtQuery = GetProcAddress(hmod_wevtapi, "EvtQuery");
-		(FARPROC)EvtCreateRenderContext = GetProcAddress(hmod_wevtapi, "EvtCreateRenderContext");
-		(FARPROC)EvtNext = GetProcAddress(hmod_wevtapi, "EvtNext");
-		(FARPROC)EvtRender = GetProcAddress(hmod_wevtapi, "EvtRender");
-		(FARPROC)EvtOpenPublisherMetadata = GetProcAddress(hmod_wevtapi, "EvtOpenPublisherMetadata");
-		(FARPROC)EvtFormatMessage = GetProcAddress(hmod_wevtapi, "EvtFormatMessage");
-		(FARPROC)EvtClose = GetProcAddress(hmod_wevtapi, "EvtClose");
-		if (NULL == EvtQuery ||
-			NULL == EvtCreateRenderContext ||
-			NULL == EvtNext ||
-			NULL == EvtRender ||
-			NULL == EvtOpenPublisherMetadata ||
-			NULL == EvtFormatMessage ||
-			NULL == EvtClose)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "Can't load wevtapi.dll functions");
-			goto finish;
-		}
-		zabbix_log(LOG_LEVEL_DEBUG, "wevtapi.dll functions were loaded");
-	}
-
-	if (!wsource || !*wsource)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "Can't open eventlog with empty name");
-		goto finish;
-	}
-
-	tmp_str = zbx_dsprintf(NULL, "Event/System[EventRecordID=%ld]", which);
-	event_query = zbx_utf8_to_unicode(tmp_str);
-	zbx_free(tmp_str);
-
-	eventlog_handle = EvtQuery(NULL, wsource, event_query, EvtQueryChannelPath);
-	if (NULL == eventlog_handle)
-	{
-		if (ERROR_EVT_CHANNEL_NOT_FOUND == (status = GetLastError()))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "Missed eventlog: [%s]", strerror_from_system(status));
-		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "EvtQuery failed: [%s]", strerror_from_system(status));
-		}
-		goto finish;
-	}
-
-	eventlog_context_handle = EvtCreateRenderContext(array_count, (LPCWSTR *)query_array, EvtRenderContextValues);
-	if (NULL == eventlog_context_handle)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "EvtCreateRenderContext failed: [%s]", strerror_from_system(GetLastError()));
-		goto finish;
-	}
-
-	if (!EvtNext(eventlog_handle, 1, &eventlog_each_handle, INFINITE, 0, &dwReturned))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "First EvtNext failed: [%s]", strerror_from_system(GetLastError()));
-		goto finish;
-	}
-
-	if (!EvtRender(eventlog_context_handle, eventlog_each_handle, EvtRenderEventValues,
-			dwBufferSize, eventlog_array, &dwReturned, &dwValuesCount))
-	{
-		if (ERROR_INSUFFICIENT_BUFFER == (status = GetLastError()))
-		{
-			dwBufferSize = dwReturned;
-			eventlog_array = (PEVT_VARIANT)zbx_malloc(eventlog_array, dwBufferSize);
-
-			if (!EvtRender(eventlog_context_handle, eventlog_each_handle, EvtRenderEventValues,
-					dwBufferSize, eventlog_array, &dwReturned, &dwValuesCount))
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "EvtRender failed: [%s]", strerror_from_system(GetLastError()));
-				goto finish;
-			}
-		}
-		else		
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "EvtRender failed: [%s]", strerror_from_system(status));
-			goto finish;
-		}
-	}
-
-	*out_source = zbx_unicode_to_utf8(eventlog_array[0].StringVal);
-
-	eventlog_providermetadata_handle = EvtOpenPublisherMetadata(NULL, eventlog_array[0].StringVal, NULL, 0, 0);
-	if (NULL == eventlog_providermetadata_handle)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "EvtOpenPublisherMetadata failed: [%s]", strerror_from_system(GetLastError()));
-		goto finish;
-	}
-
-	dwBufferSize = 0;
-	dwReturned = 0;
-
-	if (!EvtFormatMessage(eventlog_providermetadata_handle, eventlog_each_handle, 0, 0,
-			NULL, EvtFormatMessageEvent, dwBufferSize, tmp_wstr, &dwReturned))
-	{
-		if (ERROR_INSUFFICIENT_BUFFER == (status = GetLastError()))
-		{
-			dwBufferSize = dwReturned;
-			tmp_wstr = (LPWSTR)zbx_malloc(tmp_wstr, dwBufferSize * sizeof(WCHAR));
-
-			if (!EvtFormatMessage(eventlog_providermetadata_handle, eventlog_each_handle, 0, 0,
-					NULL, EvtFormatMessageEvent, dwBufferSize, tmp_wstr, &dwReturned))
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "EvtFormatMessage failed: [%s]", strerror_from_system(GetLastError()));
-				goto finish;
-			}
-		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "EvtFormatMessage failed: [%s]", strerror_from_system(status));
-			goto finish;
-		}
-	}
-
-	*out_message= zbx_unicode_to_utf8(tmp_wstr);
-	zbx_free(tmp_wstr);
-	*out_severity = eventlog_array[2].ByteVal;
-	*out_timestamp = (unsigned long)((eventlog_array[3].FileTimeVal - sec_1970) / 10000000);
-	ret = SUCCEED;
-
-finish:
-	zbx_free(tmp_str);
-	zbx_free(tmp_wstr);
-	zbx_free(event_query);
-	zbx_free(eventlog_array);
-	if (eventlog_each_handle)
-		EvtClose(eventlog_each_handle);
-	if (eventlog_context_handle)
-		EvtClose(eventlog_context_handle);
-	if (eventlog_handle)
-		EvtClose(eventlog_handle);
-	if (eventlog_providermetadata_handle)
-		EvtClose(eventlog_providermetadata_handle);
-	if (FAIL == ret)
-	{
-		zbx_free(*out_source);
-		zbx_free(*out_message);
-	}
-	
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
-}
-
-#endif	/* HAVE_WINEVT_H */
 
 /* get Nth error from event log. 1 is the first. */
 static int	zbx_get_eventlog_message(LPCTSTR wsource, HANDLE eventlog_handle, long which, char **out_source, char **out_message,
@@ -421,53 +204,22 @@ retry:
 
 	if (SUCCEED != err)
 	{
-		unsigned short	out_severity_tmp = *out_severity;
-		unsigned long	out_timestamp_tmp = *out_timestamp;
-#ifdef HAVE_WINEVT_H
-		OSVERSIONINFO	versionInfo;
-		int		ex_ret = FAIL;
-#endif
-		zbx_free(*out_source);
-		*out_source	= NULL;
-		*out_message	= NULL;
-		*out_severity	= 0;
-		*out_timestamp	= 0;
-
-#ifdef HAVE_WINEVT_H
-		versionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-		GetVersionEx(&versionInfo);
-
-		if (versionInfo.dwMajorVersion >= 6)    /* Windows Vista, Windows Server 2008 or Windows 7 */
+		*out_message = zbx_strdcatf(*out_message, "The description for Event ID (%lu) in Source (%s) cannot be found."
+				" The local computer may not have the necessary registry information or message DLL files to"
+				" display messages from a remote computer.", *out_eventid, NULL == *out_source ? "" : *out_source);
+		if (pELR->NumStrings)
+			*out_message = zbx_strdcatf(*out_message, " The following information is part of the event: ");
+		for (i = 0; i < pELR->NumStrings && i < MAX_INSERT_STRS; i++)
 		{
-			ex_ret = zbx_get_eventlog_message_xpath(wsource, which, out_source, out_message, out_severity, out_timestamp);
-		}
-
-		if (versionInfo.dwMajorVersion < 6 || SUCCEED != ex_ret)    /* Before Windows Vista, or zbx_get_eventlog_message_xpath() failed */
-		{
-#endif
-			*out_severity	= out_severity_tmp;
-			*out_timestamp	= out_timestamp_tmp;
-			*out_source = zbx_unicode_to_utf8((LPTSTR)(pELR + 1));	/* copy source name */
-
-			*out_message = zbx_strdcatf(*out_message, "The description for Event ID (%lu) in Source (%s) cannot be found."
-					" The local computer may not have the necessary registry information or message DLL files to"
-					" display messages from a remote computer.", *out_eventid, NULL == *out_source ? "" : *out_source);
-			if (pELR->NumStrings)
-				*out_message = zbx_strdcatf(*out_message, " The following information is part of the event: ");
-			for (i = 0; i < pELR->NumStrings && i < MAX_INSERT_STRS; i++)
+			if (i > 0)
+				*out_message = zbx_strdcatf(*out_message, "; ");
+			if (aInsertStrs[i])
 			{
-				if (i > 0)
-					*out_message = zbx_strdcatf(*out_message, "; ");
-				if (aInsertStrs[i])
-				{
-					buf = zbx_unicode_to_utf8(aInsertStrs[i]);
-					*out_message = zbx_strdcatf(*out_message, "%s", buf);
-					zbx_free(buf);
-				}
+				buf = zbx_unicode_to_utf8(aInsertStrs[i]);
+				*out_message = zbx_strdcatf(*out_message, "%s", buf);
+				zbx_free(buf);
 			}
-#ifdef HAVE_WINEVT_H
 		}
-#endif
 	}
 
 	ret = SUCCEED;
