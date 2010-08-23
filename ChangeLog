@@ -7,6 +7,7 @@ Changes for 1.9
 
 Changes for 1.8.4rc1
 
+ - [ZBX-886] removed duplicate locale string S_ACTIONS_BIG (Richlv)
  - [ZBX-633] fixed server crash on disconnected IPMI devices (asaveljevs)
  - [ZBX-2904] fixed some unknown triggers not shown in status of triggers screen (Vedmak)
  - [ZBX-2900] added spaces to "From:" and "To:" email headers (asaveljevs)
