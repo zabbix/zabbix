@@ -1393,20 +1393,17 @@
 		}
 		$all_triggers = zbx_toHash($all_triggers, 'triggerid');
 
-		$unack_triggerids = array();
-		if(in_array($show_unack, array(EXTACK_OPTION_UNACK, EXTACK_OPTION_BOTH))){
-			$options = array(
-				'triggerids' => array_keys($all_triggers),
-				'withLastEventUnacknowledged' => true,
-				'output' => API_OUTPUT_SHORTEN,
-				'nodeids' => get_current_nodeid(true),
-				'nopermissions' => 1,
-				'active' => 1,
-				'filter' => array('value' => TRIGGER_VALUE_TRUE),
-			);
-			$unack_triggerids = CTrigger::get($options);
-			$unack_triggerids = zbx_toHash($unack_triggerids, 'triggerid');
-		}
+		$options = array(
+			'triggerids' => array_keys($all_triggers),
+			'withLastEventUnacknowledged' => true,
+			'output' => API_OUTPUT_SHORTEN,
+			'nodeids' => get_current_nodeid(true),
+			'nopermissions' => 1,
+			'active' => 1,
+			'filter' => array('value' => TRIGGER_VALUE_TRUE),
+		);
+		$unack_triggerids = CTrigger::get($options);
+		$unack_triggerids = zbx_toHash($unack_triggerids, 'triggerid');
 // }}}
 
 
