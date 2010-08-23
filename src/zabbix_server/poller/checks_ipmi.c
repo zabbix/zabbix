@@ -56,10 +56,10 @@ typedef struct zbx_ipmi_host {
 	int			domain_up, done;
 	char			*err;
 	int			ret;
+	struct zbx_ipmi_host	*next;
 } zbx_ipmi_host_t;
 
 static zbx_ipmi_host_t	*hosts = NULL;
-static int		host_count = 0;
 static os_handler_t	*os_hnd;
 
 static zbx_ipmi_host_t	*get_ipmi_host(const char *ip, const int port,
@@ -67,21 +67,20 @@ static zbx_ipmi_host_t	*get_ipmi_host(const char *ip, const int port,
 		const char *password)
 {
 	const char	*__function_name = "get_ipmi_host";
-	zbx_ipmi_host_t	*h = NULL;
-	int		i;
+	zbx_ipmi_host_t	*h;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d'",
 			__function_name, ip, port);
 
-	for (i = 0; i < host_count; i ++)
+	h = hosts;
+	while (NULL != h)
 	{
-		if (0 == strcmp(ip, hosts[i].ip) && port == hosts[i].port && authtype == hosts[i].authtype
-				&& privilege == hosts[i].privilege && 0 == strcmp(username, hosts[i].username)
-				&& 0 == strcmp(password, hosts[i].password))
-		{
-			h = &hosts[i];
+		if (0 == strcmp(ip, h->ip) && port == h->port && authtype == h->authtype
+				&& privilege == h->privilege && 0 == strcmp(username, h->username)
+				&& 0 == strcmp(password, h->password))
 			break;
-		}
+
+		h = h->next;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, h);
@@ -93,21 +92,12 @@ static zbx_ipmi_host_t  *allocate_ipmi_host(const char *ip, int port, int authty
 		const char *username, const char *password)
 {
 	const char	*__function_name = "allocate_ipmi_host";
-	size_t		sz;
 	zbx_ipmi_host_t	*h;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d'",
 			__function_name, ip, port);
 
-	host_count++;
-	sz = host_count * sizeof(zbx_ipmi_host_t);
-
-	if (NULL == hosts)
-		hosts = zbx_malloc(hosts, sz);
-	else
-		hosts = zbx_realloc(hosts, sz);
-
-	h = &hosts[host_count - 1];
+	h = zbx_malloc(NULL, sizeof(zbx_ipmi_host_t));
 
 	memset(h, 0, sizeof(zbx_ipmi_host_t));
 
@@ -117,6 +107,9 @@ static zbx_ipmi_host_t  *allocate_ipmi_host(const char *ip, int port, int authty
 	h->privilege = privilege;
 	h->username = strdup(username);
 	h->password = strdup(password);
+
+	h->next = hosts;
+	hosts = h;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p",
 			__function_name, h);
@@ -386,7 +379,7 @@ static void	got_thresh_reading(ipmi_sensor_t *sensor, int err, enum ipmi_value_p
 
 	if (NULL == s)
 	{
-		/* this should never happen */
+		THIS_SHOULD_NEVER_HAPPEN;
 		h->err = zbx_dsprintf(h->err, "Fatal error");
 		h->ret = NOTSUPPORTED;
 		h->done = 1;
@@ -436,54 +429,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s",
 			__function_name, zbx_result_string(h->ret));
 }
-/*
-static void	got_discrete_states(ipmi_sensor_t *sensor, int err, ipmi_states_t *states, void *cb_data)
-{
-	int			id, i, val, ret;
-	const char		*e_string, *s_type_string, *s_reading_type_string;
-	ipmi_entity_t		*ent;
-	zbx_ipmi_host_t		*h = cb_data;
-	zbx_ipmi_sensor_t	*s;
 
-	s = get_ipmi_sensor(h, sensor);
-
-	if (NULL == s)
-	{*/
-		/* this should never happen */
-/*		h->err = zbx_dsprintf(h->err, "Fatal error");
-		h->ret = NOTSUPPORTED;
-		h->done = 1;
-		return;
-	}
-
-	if (err)
-	{
-		h->err = zbx_dsprintf(h->err, "Error 0x%x while reading discrete sensor %s@[%s]:%d",
-				s->s_name, h->ip, h->port);
-		h->ret = NOTSUPPORTED;
-		h->done = 1;
-		return;
-	}
-
-	ent = ipmi_sensor_get_entity(sensor);
-	id = ipmi_entity_get_entity_id(ent);
-	e_string = ipmi_get_entity_id_string(id);
-	s_type_string = ipmi_sensor_get_sensor_type_string(sensor);
-	s_reading_type_string = ipmi_sensor_get_event_reading_type_string(sensor);
-
-	for (i = 0; i < 15; i++)
-	{
-		ret = ipmi_sensor_discrete_event_readable(sensor, i, &val);
-		if (ret || !val)
-			continue;
-
-		zabbix_log(LOG_LEVEL_DEBUG, "State [%s | %s | %s | %s | state %d value is %d]",
-				s->s_name, e_string, s_type_string, s_reading_type_string, i, ipmi_is_state_set(states, i));
-
-		s->value = ?;
-	}
-}
-*/
 static void	read_ipmi_sensor(zbx_ipmi_host_t *h, zbx_ipmi_sensor_t *s)
 {
 	const char		*__function_name = "read_ipmi_sensor";
@@ -498,7 +444,8 @@ static void	read_ipmi_sensor(zbx_ipmi_host_t *h, zbx_ipmi_sensor_t *s)
 
 	type = ipmi_sensor_get_event_reading_type(s->sensor);
 
-	switch (type) {
+	switch (type)
+	{
 		case IPMI_EVENT_READING_TYPE_THRESHOLD:
 			if (0 != (ret = ipmi_sensor_get_reading(s->sensor, got_thresh_reading, h)))
 			{
@@ -513,14 +460,6 @@ static void	read_ipmi_sensor(zbx_ipmi_host_t *h, zbx_ipmi_sensor_t *s)
 			h->err = zbx_dsprintf(h->err, "Discrete sensor is not supported.");
 			h->ret = NOTSUPPORTED;
 			goto out;
-/*			if (0 != (ret = ipmi_sensor_get_states(s->sensor, got_discrete_states, h)))
-			{
-				h->err = zbx_dsprintf(h->err, "Cannot read sensor %s."
-						" ipmi_sensor_get_states() return error: 0x%x",
-						s->s_name, ret);
-				h->ret = NOTSUPPORTED;
-				return;
-			}*/
 	}
 
 	tv.tv_sec = 10;
@@ -560,7 +499,7 @@ static void	got_control_reading(ipmi_control_t *control, int err, int *val, void
 
 	if (NULL == c)
 	{
-		/* this should never happen */
+		THIS_SHOULD_NEVER_HAPPEN;
 		h->err = zbx_dsprintf(h->err, "Fatal error");
 		h->ret = NOTSUPPORTED;
 		h->done = 1;
@@ -569,7 +508,7 @@ static void	got_control_reading(ipmi_control_t *control, int err, int *val, void
 
 	if (c->num_values == 0)
 	{
-		/* this should never happen */
+		THIS_SHOULD_NEVER_HAPPEN;
 		h->err = zbx_dsprintf(h->err, "No value present for control");
 		h->ret = NOTSUPPORTED;
 		h->done = 1;
@@ -620,7 +559,7 @@ static void	got_control_setting(ipmi_control_t *control, int err, void *cb_data)
 
 	if (NULL == c)
 	{
-		/* this should never happen */
+		THIS_SHOULD_NEVER_HAPPEN;
 		h->err = zbx_dsprintf(h->err, "Fatal error");
 		h->ret = NOTSUPPORTED;
 		h->done = 1;
@@ -689,7 +628,7 @@ static void	set_ipmi_control(zbx_ipmi_host_t *h, zbx_ipmi_control_t *c, int valu
 
 	if (c->num_values == 0)
 	{
-		/* this should never happen */
+		THIS_SHOULD_NEVER_HAPPEN;
 		h->err = zbx_dsprintf(h->err, "No value present for control");
 		h->ret = NOTSUPPORTED;
 		h->done = 1;
@@ -915,34 +854,37 @@ int	init_ipmi_handler()
 int	free_ipmi_handler()
 {
 	const char	*__function_name = "free_ipmi_handler";
-	struct timeval	tv;
-	int		h, s;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	tv.tv_sec = 10;
-	tv.tv_usec = 0;
-
-	for (h = 0; h < host_count; h ++)
+	while (NULL != hosts)
 	{
-		hosts[h].con->close_connection(hosts[h].con);
+		int		i;
+		zbx_ipmi_host_t	*h;
 
-		for (s = 0; s < hosts[h].sensor_count; s ++)
-			zbx_free(hosts[h].sensors[s].s_name);
+		h = hosts;
+		hosts = hosts->next;
 
-		for (s = 0; s < hosts[h].control_count; s ++)
+		h->con->close_connection(h->con);
+
+		for (i = 0; i < h->sensor_count; i++)
+			zbx_free(h->sensors[i].s_name);
+
+		for (i = 0; i < h->control_count; i++)
 		{
-			zbx_free(hosts[h].controls[s].c_name);
-			zbx_free(hosts[h].controls[s].val);
+			zbx_free(h->controls[i].c_name);
+			zbx_free(h->controls[i].val);
 		}
 
-		zbx_free(hosts[h].sensors);
-		zbx_free(hosts[h].ip);
-		zbx_free(hosts[h].username);
-		zbx_free(hosts[h].password);
-		zbx_free(hosts[h].err);
+		zbx_free(h->sensors);
+		zbx_free(h->controls);
+		zbx_free(h->ip);
+		zbx_free(h->username);
+		zbx_free(h->password);
+		zbx_free(h->err);
+
+		zbx_free(h);
 	}
-	zbx_free(hosts);
 
 	os_hnd->free_os_handler(os_hnd);
 
@@ -1188,4 +1130,5 @@ int	set_ipmi_control_value(DC_ITEM *item, int value, char *error, size_t error_m
 
 	return h->ret;
 }
+
 #endif	/* HAVE_OPENIPMI */
