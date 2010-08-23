@@ -1283,7 +1283,7 @@
 										$hosts_map[$sel['elementid']][$selementid] = $selementid;
 									break;
 									case SYSMAP_ELEMENT_TYPE_TRIGGER:
-										$triggers_map[$sel['elementid']][$selementid] = $selementid;
+										$triggers_map_submaps[$sel['elementid']][$selementid] = $selementid;
 									break;
 								}
 							}
@@ -1354,6 +1354,7 @@
 
 // get triggers data {{{
 		$all_triggers = array();
+// triggers from current map, select all
 		if(!empty($triggers_map)){
 			$options = array(
 				'triggerids' => array_keys($triggers_map),
@@ -1371,6 +1372,26 @@
 			}
 		}
 
+// triggers from submaps, skip dependent
+		if(!empty($triggers_map_submaps)){
+			$options = array(
+				'triggerids' => array_keys($triggers_map_submaps),
+				'output' => API_OUTPUT_EXTEND,
+				'nopermissions' => 1,
+				'filter' => array('value' => array(TRIGGER_VALUE_UNKNOWN, TRIGGER_VALUE_TRUE)),
+				'nodeids' => get_current_nodeid(true),
+				'skipDependent' => 1,
+			);
+			$triggers = CTrigger::get($options);
+			$all_triggers = array_merge($all_triggers, $triggers);
+			foreach($triggers as $trigger){
+				foreach($triggers_map_submaps[$trigger['triggerid']] as $belongs_to_sel){
+					$selements[$belongs_to_sel]['triggers'][$trigger['triggerid']] = $trigger['triggerid'];
+				}
+			}
+		}
+
+// triggers from all hosts/hostgroups, skip dependent
 		if(!empty($monitored_hostids)){
 			$options = array(
 				'hostids' => $monitored_hostids,
