@@ -973,12 +973,12 @@
 			'latelyChanged' => $i['latelyChanged'],
 			'ack' => $i['ack'],
 			'priority' => $i['priority'],
+			'info' => array(),
 		);
 
 		if($i['problem']){
 			$info['iconid'] = $selement['iconid_on'];
 			$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
-			$info['info'] = array();
 
 			if(in_array($show_unack, array(EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH))){
 				if($i['problem'] > 1)
@@ -1012,7 +1012,6 @@
 			$info['iconid'] = $selement['iconid_unknown'];
 			$info['icon_type'] = SYSMAP_ELEMENT_ICON_UNKNOWN;
 
-			$info['info'] = array();
 			$info['info']['unknown'] = array(
 				'msg' => $i['unknown'] . ' ' . S_UNKNOWN,
 				'color' => $colors['Gray']
@@ -1021,31 +1020,25 @@
 		else if($i['maintenance']){
 			$info['iconid'] = $selement['iconid_maintenance'];
 			$info['icon_type'] = SYSMAP_ELEMENT_ICON_MAINTENANCE;
-			$info['info'] = array(
-				'status' => array(
-					'msg' => S_MAINTENANCE_BIG . ' ('.$i['maintenance_title'] . ')',
-					'color' => $colors['Orange'],
-				)
+			$info['info']['maintenance'] = array(
+				'msg' => S_MAINTENANCE_BIG . ' ('.$i['maintenance_title'] . ')',
+				'color' => $colors['Orange'],
 			);
 		}
 		else if($i['disabled']){
 			$info['iconid'] = $selement['iconid_disabled'];
 			$info['icon_type'] = SYSMAP_ELEMENT_ICON_DISABLED;
-			$info['info'] = array(
-				'status' => array(
-					'msg' => S_DISABLED_BIG,
-					'color' => $colors['Dark Red']
-				)
+			$info['info']['status'] = array(
+				'msg' => S_DISABLED_BIG,
+				'color' => $colors['Dark Red']
 			);
 		}
 		else{
 			$info['iconid'] = $selement['iconid_off'];
 			$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
-			$info['info'] = array(
-				'unknown' => array(
-					'msg' => S_OK_BIG,
-					'color' => $colors['Dark Green'],
-				)
+			$info['info']['unknown'] = array(
+				'msg' => S_OK_BIG,
+				'color' => $colors['Dark Green'],
 			);
 		}
 
@@ -1059,13 +1052,13 @@
 			'latelyChanged' => $i['latelyChanged'],
 			'ack' => $i['ack'],
 			'priority' => $i['priority'],
+			'info' => array(),
 		);
 
 
 		if($i['problem']){
 			$info['iconid'] = $selement['iconid_on'];
 			$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
-			$info['info'] = array();
 
 			if(in_array($show_unack, array(EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH))){
 				if($i['problem'] > 1)
@@ -1100,22 +1093,20 @@
 				$info['iconid'] = $selement['iconid_unknown'];
 				$info['icon_type'] = SYSMAP_ELEMENT_ICON_UNKNOWN;
 			}
-			$info['info'] = array();
 			$info['info']['unknown'] = array(
 				'msg' => $i['unknown'] . ' ' . S_UNKNOWN,
 				'color' => $colors['Gray']
 			);
 		}
-		else if($i['maintenance']){
+
+		if($i['maintenance']){
 			if(!isset($info['iconid'])){
 				$info['iconid'] = $selement['iconid_maintenance'];
 				$info['icon_type'] = SYSMAP_ELEMENT_ICON_MAINTENANCE;
 			}
-			$info['info'] = array(
-				'status' => array(
-					'msg' => $i['maintenance'] . ' ' .S_MAINTENANCE,
-					'color' => $colors['Orange'],
-				)
+			$info['info']['maintenance'] = array(
+				'msg' => $i['maintenance'] . ' ' .S_MAINTENANCE,
+				'color' => $colors['Orange'],
 			);
 		}
 		else if($i['disabled']){
@@ -1123,11 +1114,9 @@
 				$info['icon_type'] = SYSMAP_ELEMENT_ICON_DISABLED;
 				$info['iconid'] = $selement['iconid_disabled'];
 			}
-			$info['info'] = array(
-				'status' => array(
-					'msg' => S_DISABLED_BIG,
-					'color' => $colors['Dark Red']
-				)
+			$info['info']['disabled'] = array(
+				'msg' => S_DISABLED_BIG,
+				'color' => $colors['Dark Red']
 			);
 		}
 		else{
@@ -1135,11 +1124,9 @@
 				$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
 				$info['iconid'] = $selement['iconid_off'];
 			}
-			$info['info'] = array(
-				'unknown' => array(
-					'msg' => S_OK_BIG,
-					'color' => $colors['Dark Green'],
-				)
+			$info['info']['unknown'] = array(
+				'msg' => S_OK_BIG,
+				'color' => $colors['Dark Green'],
 			);
 		}
 		return $info;
@@ -1152,13 +1139,13 @@
 			'latelyChanged' => $i['latelyChanged'],
 			'ack' => $i['ack'],
 			'priority' => $i['priority'],
+			'info' => array(),
 		);
 
 
 		if($i['problem']){
 			$info['iconid'] = $selement['iconid_on'];
 			$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
-			$info['info'] = array();
 			if(in_array($show_unack, array(EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH))){
 				if($i['problem'] > 1)
 					$msg = $i['problem'].' '.S_PROBLEMS;
@@ -1188,26 +1175,23 @@
 			}
 		}
 		else if($i['unknown']){
-			if(!isset($info['iconid'])){
-				$info['iconid'] = $selement['iconid_unknown'];
-				$info['icon_type'] = SYSMAP_ELEMENT_ICON_UNKNOWN;
-			}
-			$info['info'] = array();
+			$info['iconid'] = $selement['iconid_unknown'];
+			$info['icon_type'] = SYSMAP_ELEMENT_ICON_UNKNOWN;
+			
 			$info['info']['unknown'] = array(
 				'msg' => $i['unknown'] . ' ' . S_UNKNOWN,
 				'color' => $colors['Gray']
 			);
 		}
-		else if($i['maintenance']){
+
+		if($i['maintenance']){
 			if(!isset($info['iconid'])){
 				$info['iconid'] = $selement['iconid_maintenance'];
 				$info['icon_type'] = SYSMAP_ELEMENT_ICON_MAINTENANCE;
 			}
-			$info['info'] = array(
-				'status' => array(
-					'msg' => $i['maintenance'] . ' ' .S_MAINTENANCE,
-					'color' => $colors['Orange'],
-				)
+			$info['info']['maintenance'] = array(
+				'msg' => $i['maintenance'] . ' ' .S_MAINTENANCE,
+				'color' => $colors['Orange'],
 			);
 		}
 		else if($i['disabled']){
@@ -1215,11 +1199,9 @@
 				$info['icon_type'] = SYSMAP_ELEMENT_ICON_DISABLED;
 				$info['iconid'] = $selement['iconid_disabled'];
 			}
-			$info['info'] = array(
-				'status' => array(
-					'msg' => S_DISABLED_BIG,
-					'color' => $colors['Dark Red']
-				)
+			$info['info']['disabled'] = array(
+				'msg' => S_DISABLED_BIG,
+				'color' => $colors['Dark Red']
 			);
 		}
 		else{
@@ -1227,11 +1209,9 @@
 				$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
 				$info['iconid'] = $selement['iconid_off'];
 			}
-			$info['info'] = array(
-				'unknown' => array(
-					'msg' => S_OK_BIG,
-					'color' => $colors['Dark Green'],
-				)
+			$info['info']['unknown'] = array(
+				'msg' => S_OK_BIG,
+				'color' => $colors['Dark Green'],
 			);
 		}
 
@@ -1243,6 +1223,7 @@
 			'iconid' => $selement['iconid_off'],
 			'icon_type' => SYSMAP_ELEMENT_ICON_OFF,
 			'name' => S_IMAGE,
+			'latelyChanged' => false,
 		);
 
 		return $info;
@@ -2029,7 +2010,7 @@
 			}
 
 			$el_info = $map_info[$selementid];
-			$el_msgs = array('problem', 'unack', 'maintenances', 'unknown', 'ok', 'status');
+			$el_msgs = array('problem', 'unack', 'maintenance', 'unknown', 'ok', 'status');
 			foreach($el_msgs as $key => $caption){
 				if(!isset($el_info['info'][$caption]) || zbx_empty($el_info['info'][$caption]['msg'])) continue;
 
