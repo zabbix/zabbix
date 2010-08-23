@@ -112,6 +112,7 @@ int	VFS_FILE_CONTENTS(const char *cmd, const char *param, unsigned flags, AGENT_
 {
 	char	filename[MAX_STRING_LEN], encoding[32];
 	char	buf[MAX_BUF_LEN], *utf8, *contents = NULL;
+	int	contents_alloc = 512, contents_offset = 0;
 	int	f, nbytes;
 
 	assert(result);
@@ -132,17 +133,13 @@ int	VFS_FILE_CONTENTS(const char *cmd, const char *param, unsigned flags, AGENT_
 	if (-1 == (f = zbx_open(filename, O_RDONLY)))
 		return SYSINFO_RET_FAIL;
 
+	contents = zbx_malloc(contents, contents_alloc);
+
 	while (0 < (nbytes = zbx_read(f, buf, sizeof(buf), encoding)))
 	{
 		utf8 = convert_to_utf8(buf, nbytes, encoding);
-
-		if (NULL == contents)
-			contents = utf8;
-		else
-		{
-			contents = zbx_strdcat(contents, utf8);
-			zbx_free(utf8);
-		}
+		zbx_strcpy_alloc(&contents, &contents_alloc, &contents_offset, utf8);
+		zbx_free(utf8);
 	}
 
  	close(f);
@@ -153,7 +150,7 @@ int	VFS_FILE_CONTENTS(const char *cmd, const char *param, unsigned flags, AGENT_
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (NULL != contents)
+	if (0 != contents_offset)
 	{
 		zbx_rtrim(contents, "\r\n");
 
