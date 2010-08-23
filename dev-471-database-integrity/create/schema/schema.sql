@@ -696,9 +696,9 @@ FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|delay		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|history	|t_integer	|'90'	|NOT NULL	|ZBX_SYNC
 FIELD		|trends		|t_integer	|'365'	|NOT NULL	|ZBX_SYNC
-FIELD		|lastvalue	|t_varchar(255)	|	|NULL		|0
+FIELD		|lastvalue	|t_history_text	|	|NULL		|0
 FIELD		|lastclock	|t_time		|	|NULL		|0
-FIELD		|prevvalue	|t_varchar(255)	|	|NULL		|0
+FIELD		|prevvalue	|t_history_text	|	|NULL		|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|value_type	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|trapper_hosts	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY

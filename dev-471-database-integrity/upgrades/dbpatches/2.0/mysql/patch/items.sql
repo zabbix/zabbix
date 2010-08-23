@@ -1,9 +1,11 @@
 ALTER TABLE items MODIFY itemid bigint unsigned NOT NULL,
 		  MODIFY hostid bigint unsigned NOT NULL,
+		  MODIFY lastvalue text NULL,
+		  MODIFY prevvalue text NULL,
 		  MODIFY units varchar(255) DEFAULT '' NOT NULL,
-		  ADD lastns integer NULL,
 		  MODIFY templateid bigint unsigned NULL,
-		  MODIFY valuemapid bigint unsigned NULL;
+		  MODIFY valuemapid bigint unsigned NULL,
+		  ADD lastns integer NULL;
 UPDATE items SET templateid=NULL WHERE templateid=0;
 CREATE TEMPORARY TABLE tmp_items_itemid (itemid bigint unsigned PRIMARY KEY);
 INSERT INTO tmp_items_itemid (itemid) (SELECT itemid FROM items);
