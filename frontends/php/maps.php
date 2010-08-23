@@ -92,18 +92,14 @@ include_once('include/page_header.php');
 	$map_wdgt = new CWidget('hat_maps');
 	$table = new CTable(S_NO_MAPS_DEFINED, 'map');
 
-	$icon = null;
-	$fs_icon = null;
-
 	$options = array(
-				'extendoutput' => 1,
-				'nodeids' => get_current_nodeid(),
-				'select_selements' => 1
-		);
+		'extendoutput' => 1,
+		'nodeids' => get_current_nodeid(),
+		'select_selements' => 1
+	);
 
 	$maps = CMap::get($options);
 	$maps = zbx_toHash($maps, 'sysmapid');
-
 	if(!empty($maps)){
 		if(!isset($maps[$_REQUEST['sysmapid']])){
 			$first_map = reset($maps);
@@ -125,12 +121,12 @@ include_once('include/page_header.php');
 
 // GET MAP PARENT MAPS {{{
 		$parent_maps = array();
-//$parent_maps = array_pad($parent_maps, 40, array(SPACE.SPACE, new Clink('Map name 123', 'sdf')));
 		foreach($maps as $sysmapid => $map){
 			foreach($map['selements'] as $enum => $selement){
 				if(($selement['elementid'] == $_REQUEST['sysmapid']) && ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP)){
 					$parent_maps[] = SPACE.SPACE;
 					$parent_maps[] = new Clink($map['name'], 'maps.php?sysmapid='.$map['sysmapid'].'&fullscreen='.$_REQUEST['fullscreen']);
+					break;
 				}
 			}
 		}
