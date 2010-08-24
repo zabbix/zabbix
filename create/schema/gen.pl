@@ -265,10 +265,6 @@ sub process_field
 			{
 				$fk_type = "ZBX_FK_RESTRICT";
 			}
-			else
-			{
-				$fk_type = "0";
-			}
 		}
 		else
 		{
@@ -336,25 +332,21 @@ sub process_field
 
 		if($relN ne "" and $relN ne "-")
 		{
-			if($fk_field eq "")
+			if ($fk_field eq "")
 			{
 				$fk_field="${name}";
 			}
 
-			if($fk_type eq "")
+			if ($fk_type eq "")
 			{
-				$fk_type=" ON DELETE CASCADE";
+				$fk_type=" ON UPDATE CASCADE ON DELETE CASCADE";
 			}
-			elsif($fk_type eq "RESTRICT")	# not default option
+			elsif ($fk_type eq "RESTRICT")	# not default option
 			{
-				$fk_type="";
-			}
-			else
-			{
-				$fk_type=" ON DELETE ${fk_type}";
+				$fk_type=" ON UPDATE CASCADE";
 			}
 
-			if($output{"database"} eq "postgresql")
+			if ($output{"database"} eq "postgresql")
 			{
 				$only = " ONLY";
 			}
