@@ -751,7 +751,7 @@ COpt::memoryPick();
 		}
 
 		DB::insert('opconditions', $opcondition_inserts);
-		DB::insert('opmediatypes', $opmediatype_inserts);
+		DB::insert('opmediatypes', $opmediatype_inserts, false);
 
 		return true;
 	}
