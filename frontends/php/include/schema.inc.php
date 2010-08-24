@@ -7,7 +7,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'name' => array(
 				'null' => false,
@@ -30,7 +29,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'slideshowid' => array(
 				'null' => false,
@@ -67,7 +65,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'proxy_hostid' => array(
 				'null' => true,
@@ -106,13 +103,6 @@ return array(
 				'length' => 10,
 				'default' => '0',
 			),
-			'unique_dcheckid' => array(
-				'null' => true,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'dchecks',
-				'ref_field' => 'dcheckid',
-			),
 		),
 	),
 	'dchecks' => array(
@@ -122,7 +112,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'druleid' => array(
 				'null' => false,
@@ -181,6 +170,30 @@ return array(
 			),
 		),
 	),
+	'druleuniq' => array(
+		'key' => 'druleuniqid',
+		'fields' => array(
+			'druleuniqid' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			),
+			'druleid' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'drules',
+				'ref_field' => 'druleid',
+			),
+			'dcheckid' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'dchecks',
+				'ref_field' => 'dcheckid',
+			),
+		),
+	),
 	'dhosts' => array(
 		'key' => 'dhostid',
 		'fields' => array(
@@ -188,7 +201,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'druleid' => array(
 				'null' => false,
@@ -224,7 +236,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'dhostid' => array(
 				'null' => false,
@@ -326,7 +337,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'name' => array(
 				'null' => false,
@@ -434,7 +444,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'httptestid' => array(
 				'null' => false,
@@ -494,7 +503,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'httpstepid' => array(
 				'null' => false,
@@ -525,7 +533,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'httptestid' => array(
 				'null' => false,
@@ -556,7 +563,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '0',
 			),
 			'name' => array(
 				'null' => false,
@@ -629,7 +635,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'cksumtype' => array(
 				'null' => false,
@@ -658,7 +663,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'serviceid' => array(
 				'null' => false,
@@ -700,7 +704,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'actionid' => array(
 				'null' => false,
@@ -1015,7 +1018,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'itemid' => array(
 				'null' => false,
@@ -1075,7 +1077,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'itemid' => array(
 				'null' => false,
@@ -1236,7 +1237,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'source' => array(
 				'null' => false,
@@ -1373,7 +1373,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'userid' => array(
 				'null' => false,
@@ -1410,7 +1409,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'userid' => array(
 				'null' => false,
@@ -1470,7 +1468,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'auditid' => array(
 				'null' => false,
@@ -1512,7 +1509,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'serviceid' => array(
 				'null' => false,
@@ -1542,7 +1538,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'name' => array(
 				'null' => false,
@@ -1613,7 +1608,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'actionid' => array(
 				'null' => false,
@@ -1691,7 +1685,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'operationid' => array(
 				'null' => false,
@@ -1727,7 +1720,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'operationid' => array(
 				'null' => false,
@@ -1752,7 +1744,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'actionid' => array(
 				'null' => false,
@@ -1762,7 +1753,7 @@ return array(
 				'ref_field' => 'actionid',
 			),
 			'triggerid' => array(
-				'null' => false,
+				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 				'ref_table' => 'triggers',
@@ -1809,7 +1800,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'hostid' => array(
 				'null' => false,
@@ -1840,7 +1830,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'actionid' => array(
 				'null' => false,
@@ -1876,7 +1865,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'alert_history' => array(
 				'null' => false,
@@ -1988,7 +1976,7 @@ return array(
 				'default' => '1',
 			),
 			'discovery_groupid' => array(
-				'null' => true,
+				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 				'ref_table' => 'groups',
@@ -2021,7 +2009,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'itemid' => array(
 				'null' => false,
@@ -2058,7 +2045,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'name' => array(
 				'null' => false,
@@ -2174,7 +2160,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'graphid' => array(
 				'null' => false,
@@ -2241,7 +2226,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'description' => array(
 				'null' => false,
@@ -2342,7 +2326,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'name' => array(
 				'null' => false,
@@ -2388,7 +2371,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'proxy_hostid' => array(
 				'null' => true,
@@ -2599,7 +2581,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'macro' => array(
 				'null' => false,
@@ -2622,7 +2603,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'hostid' => array(
 				'null' => false,
@@ -2652,7 +2632,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'hostid' => array(
 				'null' => false,
@@ -3115,7 +3094,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'hostid' => array(
 				'null' => false,
@@ -3140,7 +3118,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'tablename' => array(
 				'null' => false,
@@ -3158,7 +3135,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 				'ref_table' => 'items',
 				'ref_field' => 'value',
 			),
@@ -3171,7 +3147,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'imagetype' => array(
 				'null' => false,
@@ -3200,7 +3175,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'type' => array(
 				'null' => false,
@@ -3266,7 +3240,7 @@ return array(
 			'lastvalue' => array(
 				'null' => true,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
+				'length' => 2048,
 			),
 			'lastclock' => array(
 				'null' => true,
@@ -3276,7 +3250,7 @@ return array(
 			'prevvalue' => array(
 				'null' => true,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
+				'length' => 2048,
 			),
 			'status' => array(
 				'null' => false,
@@ -3455,7 +3429,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'applicationid' => array(
 				'null' => false,
@@ -3480,7 +3453,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'valuemapid' => array(
 				'null' => false,
@@ -3510,7 +3482,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'userid' => array(
 				'null' => false,
@@ -3559,7 +3530,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'type' => array(
 				'null' => false,
@@ -3624,7 +3594,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'userid' => array(
 				'null' => false,
@@ -3684,7 +3653,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'groupid' => array(
 				'null' => false,
@@ -3715,7 +3683,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'name' => array(
 				'null' => false,
@@ -3758,7 +3725,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'name' => array(
 				'null' => false,
@@ -3787,7 +3753,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'screenid' => array(
 				'null' => false,
@@ -3889,7 +3854,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'name' => array(
 				'null' => false,
@@ -3943,7 +3907,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'serviceupid' => array(
 				'null' => false,
@@ -4004,7 +3967,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'sysmapid' => array(
 				'null' => false,
@@ -4054,7 +4016,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'linkid' => array(
 				'null' => false,
@@ -4091,7 +4052,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'sysmapid' => array(
 				'null' => false,
@@ -4185,7 +4145,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'name' => array(
 				'null' => false,
@@ -4197,13 +4156,13 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '0',
+				'default' => '600',
 			),
 			'height' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '0',
+				'default' => '400',
 			),
 			'backgroundid' => array(
 				'null' => true,
@@ -4216,13 +4175,13 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '0',
+				'default' => '2',
 			),
 			'label_location' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '0',
+				'default' => '3',
 			),
 			'highlight' => array(
 				'null' => false,
@@ -4257,7 +4216,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'expression' => array(
 				'null' => false,
@@ -4341,7 +4299,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'triggerid_down' => array(
 				'null' => false,
@@ -4366,7 +4323,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'alias' => array(
 				'null' => false,
@@ -4465,7 +4421,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'name' => array(
 				'null' => false,
@@ -4506,7 +4461,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'usrgrpid' => array(
 				'null' => false,
@@ -4531,7 +4485,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'name' => array(
 				'null' => false,
@@ -4548,7 +4501,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'name' => array(
 				'null' => false,
@@ -4589,7 +4541,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'maintenanceid' => array(
 				'null' => false,
@@ -4614,7 +4565,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'maintenanceid' => array(
 				'null' => false,
@@ -4639,7 +4589,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'maintenanceid' => array(
 				'null' => false,
@@ -4664,7 +4613,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'timeperiod_type' => array(
 				'null' => false,
@@ -4723,7 +4671,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'name' => array(
 				'null' => false,
@@ -4746,7 +4693,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'userid' => array(
 				'null' => false,
@@ -4824,7 +4770,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'regexpid' => array(
 				'null' => false,
@@ -4866,7 +4811,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => '0',
 			),
 			'proxy_hostid' => array(
 				'null' => true,
