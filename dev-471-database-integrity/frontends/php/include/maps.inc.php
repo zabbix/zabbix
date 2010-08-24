@@ -2014,7 +2014,7 @@
 			$iconX = imagesx($img);
 			$iconY = imagesy($img);
 
-			if(($map['highlight']%2) == SYSMAP_HIGHLIGH_ON){
+			if(($map['highlight']%2) == SYSMAP_HIGHLIGHT_ON){
 				$hl_color = null;
 				$st_color = null;
 
@@ -2139,7 +2139,7 @@
 
 			$hl_color = null;
 			$st_color = null;
-			if(!isset($_REQUEST['noselements']) && (($map['highlight']%2) == SYSMAP_HIGHLIGH_ON)){
+			if(!isset($_REQUEST['noselements']) && (($map['highlight']%2) == SYSMAP_HIGHLIGHT_ON)){
 				if($el_info['icon_type'] == SYSMAP_ELEMENT_ICON_ON) $hl_color = true;
 				if($el_info['icon_type'] == SYSMAP_ELEMENT_ICON_UNKNOWN) $hl_color = true;
 
@@ -2323,7 +2323,7 @@
 
 			$hl_color = null;
 			$st_color = null;
-			if(!isset($_REQUEST['noselements']) && (($map['highlight']%2) == SYSMAP_HIGHLIGH_ON)){
+			if(!isset($_REQUEST['noselements']) && (($map['highlight']%2) == SYSMAP_HIGHLIGHT_ON)){
 				if($el_info['icon_type'] == SYSMAP_ELEMENT_ICON_ON) $hl_color = true;
 				if($el_info['icon_type'] == SYSMAP_ELEMENT_ICON_UNKNOWN) $hl_color = true;
 

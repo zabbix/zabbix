@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,10 +20,9 @@
 ?>
 <?php
 
-require_once('include/perm.inc.php');
+	require_once('include/perm.inc.php');
 
-?>
-<?php
+
 	function check_right_on_discovery($permission){
 		global $USER_DETAILS;
 
@@ -35,8 +34,6 @@ require_once('include/perm.inc.php');
 	}
 
 	function svc_default_port($type_int){
-		$port = '0';
-
 		switch($type_int){
 			case SVC_SSH:		$port = '22';		break;
 			case SVC_LDAP:		$port = '389';		break;
@@ -52,31 +49,31 @@ require_once('include/perm.inc.php');
 			case SVC_SNMPv2:	$port = '161';		break;
 			case SVC_SNMPv3:	$port = '161';		break;
 			case SVC_ICMPPING:	$port = '0';		break;
+			default: 			$port = '0';		break;
 		}
 
-	return $port;
+		return $port;
 	}
 
 	function discovery_check_type2str($type_int){
-		$str_type[SVC_SSH]	= S_SSH;
-		$str_type[SVC_LDAP]	= S_LDAP;
-		$str_type[SVC_SMTP]	= S_SMTP;
-		$str_type[SVC_FTP]	= S_FTP;
-		$str_type[SVC_HTTP]	= S_HTTP;
-		$str_type[SVC_POP]	= S_POP;
-		$str_type[SVC_NNTP]	= S_NNTP;
-		$str_type[SVC_IMAP]	= S_IMAP;
-		$str_type[SVC_TCP]	= S_TCP;
-		$str_type[SVC_AGENT]	= S_ZABBIX_AGENT;
-		$str_type[SVC_SNMPv1]	= S_SNMPV1_AGENT;
-		$str_type[SVC_SNMPv2]	= S_SNMPV2_AGENT;
-		$str_type[SVC_SNMPv3]	= S_SNMPV3_AGENT;
-		$str_type[SVC_ICMPPING]	= S_ICMPPING;
-
-		if(isset($str_type[$type_int]))
-			return $str_type[$type_int];
-
-		return S_UNKNOWN;
+		$types = array(
+			SVC_SSH => S_SSH,
+			SVC_LDAP => S_LDAP,
+			SVC_SMTP => S_SMTP,
+			SVC_FTP => S_FTP,
+			SVC_HTTP => S_HTTP,
+			SVC_POP => S_POP,
+			SVC_NNTP => S_NNTP,
+			SVC_IMAP => S_IMAP,
+			SVC_TCP => S_TCP,
+			SVC_AGENT => S_ZABBIX_AGENT,
+			SVC_SNMPv1 => S_SNMPV1_AGENT,
+			SVC_SNMPv2 => S_SNMPV2_AGENT,
+			SVC_SNMPv3 => S_SNMPV3_AGENT,
+			SVC_ICMPPING => S_ICMPPING,
+		);
+		
+		return isset($types[$type_int]) ? $types[$type_int] : S_UNKNOWN;
 	}
 
 	function discovery_check2str($type, $snmp_community, $key_, $ports){
@@ -107,35 +104,29 @@ require_once('include/perm.inc.php');
 	function discovery_status2str($status_int){
 		switch($status_int){
 			case DRULE_STATUS_ACTIVE:	$status = S_ACTIVE;		break;
-			case DRULE_STATUS_DISABLED:	$status = S_DISABLED;		break;
-			default:
-				$status = S_UNKNOWN;		break;
+			case DRULE_STATUS_DISABLED:	$status = S_DISABLED;	break;
+			default:					$status = S_UNKNOWN;	break;
 		}
-
-	return $status;
+		return $status;
 	}
 
 	function discovery_status2style($status){
 		switch($status){
-			case DRULE_STATUS_ACTIVE:	$status = 'off';	break;
-			case DRULE_STATUS_DISABLED:	$status = 'on';		break;
-			default:
-				$status = 'unknown';	break;
+			case DRULE_STATUS_ACTIVE: $status = 'off'; break;
+			case DRULE_STATUS_DISABLED: $status = 'on'; break;
+			default: $status = 'unknown'; break;
 		}
-
-	return $status;
+		return $status;
 	}
 
 	function discovery_object_status2str($status){
-		$str_stat[DOBJECT_STATUS_UP] = S_UP;
-		$str_stat[DOBJECT_STATUS_DOWN] = S_DOWN;
-		$str_stat[DOBJECT_STATUS_DISCOVER] = S_DISCOVERED;
-		$str_stat[DOBJECT_STATUS_LOST] = S_LOST;
-
-		if(isset($str_stat[$status]))
-			return $str_stat[$status];
-
-		return S_UNKNOWN;
+		$statuses = array(
+			DOBJECT_STATUS_UP => S_UP,
+			DOBJECT_STATUS_DOWN => S_DOWN,
+			DOBJECT_STATUS_DISCOVER => S_DISCOVERED,
+			DOBJECT_STATUS_LOST => S_LOST,
+		);
+		return isset($statuses[$status]) ? $statuses[$status] : S_UNKNOWN;
 	}
 
 	function get_discovery_rule_by_druleid($druleid){
@@ -178,12 +169,11 @@ require_once('include/perm.inc.php');
 				$data['dcheckid'] = add_discovery_check($druleid, $data['type'], $data['ports'], $data['key'],
 						$data['snmp_community'], $data['snmpv3_securityname'], $data['snmpv3_securitylevel'],
 						$data['snmpv3_authpassphrase'], $data['snmpv3_privpassphrase']);
-				if ($uniqueness_criteria == $id && $data['dcheckid'])
+				if($uniqueness_criteria == $id && $data['dcheckid'])
 					$unique_dcheckid = $data['dcheckid'];
 			}
-			DBexecute('UPDATE drules'.
-					' SET unique_dcheckid='.zero2null($unique_dcheckid).
-					' WHERE druleid='.$druleid);
+			if($unique_dcheckid)
+				DBexecute('INSERT INTO druleuniq (druleid, dcheckid) VALUES('.$druleid.', '.$unique_dcheckid.')');
 
 			$result = $druleid;
 		}
@@ -192,10 +182,9 @@ require_once('include/perm.inc.php');
 	}
 
 	function update_discovery_rule($druleid, $proxy_hostid, $name, $iprange, $delay, $status, $dchecks,	$uniqueness_criteria, $dchecks_deleted){
-		if( !validate_ip_range($iprange) ){
+		if(!validate_ip_range($iprange)){
 			error(S_INCORRECT_IP_RANGE);
 			return false;
-
 		}
 
 		$result = DBexecute('update drules set proxy_hostid='.zero2null($proxy_hostid).',name='.zbx_dbstr($name).',iprange='.zbx_dbstr($iprange).','.
@@ -209,13 +198,20 @@ require_once('include/perm.inc.php');
 							$data['snmp_community'], $data['snmpv3_securityname'], $data['snmpv3_securitylevel'],
 							$data['snmpv3_authpassphrase'], $data['snmpv3_privpassphrase']);
 				}
-				if ($uniqueness_criteria == $id && $data['dcheckid'])
+				if($uniqueness_criteria == $id && $data['dcheckid'])
 					$unique_dcheckid = $data['dcheckid'];
 			}
 
-			DBexecute('UPDATE drules'.
-					' SET unique_dcheckid='.zero2null($unique_dcheckid).
-					' WHERE druleid='.$druleid);
+			if($unique_dcheckid){
+				$sql = 'SELECT dcheckid FROM druleuniq WHERE druleid='.$druleid;
+				$uniq = DBfetch(DBselect($sql));
+				if($uniq['dcheckid'] && ($uniq['dcheckid'] != $unique_dcheckid)){
+					DBexecute('UPDATE druleuniq SET dcheckid='.$unique_dcheckid);
+				}
+				else{
+					DBexecute('INSERT INTO druleuniq (druleid, dcheckid) VALUES('.$druleid.', '.$unique_dcheckid.')');
+				}
+			}
 		}
 
 		if($result && isset($dchecks_deleted) && !empty($dchecks_deleted))
@@ -248,14 +244,10 @@ require_once('include/perm.inc.php');
 					' AND '.DBcondition('value', $dcheckids, false, true));	// FIXED[POSIBLE value type violation]!!!
 		}
 
-		DBexecute('DELETE FROM dservices WHERE '.DBcondition('dcheckid', $dcheckids));
-
 		DBexecute('DELETE FROM dchecks WHERE '.DBcondition('dcheckid', $dcheckids));
 	}
 
 	function delete_discovery_rule($druleid){
-		$result = true;
-
 		$actionids = array();
 // conditions
 		$sql = 'SELECT DISTINCT actionid '.
@@ -279,23 +271,7 @@ require_once('include/perm.inc.php');
 					" AND value='$druleid'");
 		}
 
-		if($result){
-			$db_dhosts = DBselect('select dhostid from dhosts'.
-					' where druleid='.$druleid.' and '.DBin_node('dhostid'));
-
-			while ($result && ($db_dhost = DBfetch($db_dhosts)))
-				$result = DBexecute('delete from dservices where'.
-						' dhostid='.$db_dhost['dhostid']);
-		}
-
-		if ($result)
-			$result = DBexecute('delete from dhosts where druleid='.$druleid);
-
-		if ($result)
-			$result = DBexecute('delete from dchecks where druleid='.$druleid);
-
-		if ($result)
-			$result = DBexecute('delete from drules where druleid='.$druleid);
+		$result = DBexecute('delete from drules where druleid='.$druleid);
 
 		return $result;
 	}

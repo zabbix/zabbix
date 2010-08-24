@@ -146,7 +146,6 @@ include_once('include/page_header.php');
 	if(isset($_REQUEST['save'])){
 
 		$map = array(
-			'sysmapid' => $_REQUEST['sysmapid'],
 			'name' => $_REQUEST['name'],
 			'width' => $_REQUEST['width'],
 			'height' => $_REQUEST['height'],
