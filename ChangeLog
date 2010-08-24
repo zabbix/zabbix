@@ -7,6 +7,7 @@ Changes for 1.9
 
 Changes for 1.8.4rc1
 
+ - [ZBX-2923] fixed triggers that depends on problem trigger are shown as problem on map (Vedmak)
  - [ZBX-2683] minor updates for the Latvian translation (Richlv)
  - [ZBX-2916] fixed duplicate map parent links in monitoring maps (Vedmak) 
  - [ZBX-2905] fixed single trigger name expand on maps, unknown problem count, duplicate elements count (Vedmak)
