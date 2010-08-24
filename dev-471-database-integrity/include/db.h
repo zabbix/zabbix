@@ -637,4 +637,5 @@ char	*DBget_unique_hostname_by_sample(char *host_name_sample);
 
 char	*DBsql_id_cmp(zbx_uint64_t id);
 char	*DBsql_id_ins(zbx_uint64_t id);
+
 #endif
