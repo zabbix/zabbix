@@ -1003,18 +1003,16 @@ else {
  * @param array $values pair of fieldname => fieldvalue
  * @return array of ids
  */
-		public static function insert($table, $values){
+		public static function insert($table, $values, $getids=true){
 			if(empty($values)) return true;
 			$result_ids = array();
 
-			$id = self::reserveIds($table, count($values));
+			if($getids)
+				$id = self::reserveIds($table, count($values));
+				
 			$table_schema = self::getSchema($table);
 
 			foreach($values as $key => $row){
-				$result_ids[$key] = $id;
-
-				unset($row[$table_schema['key']]);
-
 				foreach($row as $field => $v){
 					if(!isset($table_schema['fields'][$field])){
 						unset($row[$field]);
@@ -1026,13 +1024,18 @@ else {
 						$row[$field] = zero2null($v);
 					}
 				}
+				
+				if($getids){
+					$result_ids[$key] = $id;
+					$row[$table_schema['key']] = $id;
+					$id = bcadd($id, 1, 0);
+				}
 
-				$sql = 'INSERT INTO '.$table.' ('.$table_schema['key'].','.implode(',',array_keys($row)).')'.
-					' VALUES ('.$id.','.implode(',',array_values($row)).')';
-
-				$id = bcadd($id, 1, 0);
+				$sql = 'INSERT INTO '.$table.' ('.implode(',',array_keys($row)).')'.
+					' VALUES ('.implode(',',array_values($row)).')';
 				if(!DBexecute($sql)) self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
 			}
+			
 			return $result_ids;
 		}
 
