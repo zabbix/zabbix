@@ -538,9 +538,9 @@ static void	DBclear_parents_from_trigger()
 	{
 		ZBX_STR2UINT64(serviceid, row[0]);
 
-		DBexecute("update services s"
-				" set s.triggerid=null"
-				" where s.serviceid=" ZBX_FS_UI64, serviceid);
+		DBexecute("update services"
+				" set triggerid=null"
+				" where serviceid=" ZBX_FS_UI64, serviceid);
 	}
 	DBfree_result(result);
 }
@@ -1913,7 +1913,7 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t host
 						"comments,url,type,value,templateid)"
 					" values (" ZBX_FS_UI64 ",'%s',%d,%d,"
 						"'%s','%s',%d,%d," ZBX_FS_UI64 ");\n",
-					*new_triggerid, description_esc,(int)priority,
+					*new_triggerid, description_esc, (int)priority,
 					(int)status, comments_esc, url_esc, (int)type,
 					TRIGGER_VALUE_UNKNOWN, triggerid);
 
