@@ -477,8 +477,8 @@ FIELD		|percent_left	|t_double	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|percent_right	|t_double	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|ymin_type	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|ymax_type	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|ymin_itemid	|t_id		|	|NULL		|ZBX_SYNC		|2|items	|itemid
-FIELD		|ymax_itemid	|t_id		|	|NULL		|ZBX_SYNC		|3|items	|itemid
+FIELD		|ymin_itemid	|t_id		|	|NULL		|ZBX_SYNC		|2|items	|itemid		|RESTRICT
+FIELD		|ymax_itemid	|t_id		|	|NULL		|ZBX_SYNC		|3|items	|itemid		|RESTRICT
 INDEX		|graphs_1	|name
 
 TABLE|graphs_items|gitemid|ZBX_SYNC
