@@ -889,8 +889,8 @@ COpt::memoryPick();
 			DB::delete('items_applications', array($itemids_condition));
 			DB::delete('items', array($itemids_condition));
 			DB::delete('profiles', array(
-				'idx="web.favorite.graphids"',
-				'source="itemid"',
+				'idx='.zbx_dbstr('web.favorite.graphids'),
+				'source='.zbx_dbstr('itemid'),
 				DBcondition('value_id', $itemids)
 			));
 

@@ -19,11 +19,11 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
+require_once('include/config.inc.php');
 
-	$page['title'] = "S_IT_NOTIFICATIONS";
-	$page['file'] = 'report4.php';
-	$page['hist_arg'] = array('media_type','period','year');
+$page['title'] = "S_IT_NOTIFICATIONS";
+$page['file'] = 'report4.php';
+$page['hist_arg'] = array('media_type','period','year');
 
 include_once('include/page_header.php');
 
@@ -89,13 +89,15 @@ include_once('include/page_header.php');
 	$_REQUEST['period']	= $period;
 	$_REQUEST['media_type']	= $media_type;
 
+	$css = getUserTheme($USER_DETAILS);
+	$vTextColor = ($css == 'css_od.css')?'&color=white':'';
 
-        $table = new CTableInfo();
+    $table = new CTableInfo();
 
 	$header = array();
 	$db_users = DBselect('select * from users where '.DBin_node('userid').' order by alias,userid');
 	while($user_data = DBfetch($db_users)){
-		array_push($header, new CImg('vtext.php?text='.$user_data['alias']));
+		array_push($header, new CImg('vtext.php?text='.$user_data['alias'].$vTextColor));
 		$users[$user_data['userid']] = $user_data['alias'];
 	}
 
@@ -118,7 +120,7 @@ include_once('include/page_header.php');
 			array_unshift($header, new CCol(S_YEAR,'center'));
 			function get_time($y)	{	return mktime(0,0,0,1,1,$y);		}
 			function format_time($t){	return zbx_date2str(S_REPORT4_ANNUALLY_DATE_FORMAT, $t);}
-			function format_time2($t){	return null; };
+			function format_time2($t){	return null; }
 			break;
 		case 'monthly':
 			$from	= 1;
@@ -126,7 +128,7 @@ include_once('include/page_header.php');
 			array_unshift($header, new CCol(S_MONTH,'center'));
 			function get_time($m)	{	global $year;	return mktime(0,0,0,$m,1,$year);	}
 			function format_time($t){	return zbx_date2str(S_REPORT4_MONTHLY_DATE_FORMAT,$t);	}
-			function format_time2($t){	return null; };
+			function format_time2($t){	return null; }
 			break;
 		case 'dayly':
 			$from	= 1;
@@ -134,7 +136,7 @@ include_once('include/page_header.php');
 			array_unshift($header, new CCol(S_DAY,'center'));
 			function get_time($d)	{	global $year;	return mktime(0,0,0,1,$d,$year);	}
 			function format_time($t){	return zbx_date2str(S_REPORT4_DAILY_DATE_FORMAT,$t);	}
-			function format_time2($t){	return null; };
+			function format_time2($t){	return null; }
 			break;
 		case 'weekly':
 		default:
@@ -151,7 +153,7 @@ include_once('include/page_header.php');
 				return ($time + ($w*7 - $wd)*24*3600);
 			}
 			function format_time($t){	return zbx_date2str(S_REPORT4_WEEKLY_DATE_FORMAT,$t);	}
-			function format_time2($t){	return format_time($t); };
+			function format_time2($t){	return format_time($t); }
 			break;
 
 	}
@@ -196,6 +198,9 @@ include_once('include/page_header.php');
 		$table->Show();
 	}
 
+?>
+<?php
 
-include_once 'include/page_footer.php';
+include_once('include/page_footer.php');
+
 ?>

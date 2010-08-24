@@ -29,7 +29,6 @@
 #include "nodecomms.h"
 #include "../trapper/nodesync.h"
 
-
 /******************************************************************************
  *                                                                            *
  * Function: calculate_checksums                                              *
@@ -177,9 +176,9 @@ int calculate_checksums(int nodeid, const char *tablename, const zbx_uint64_t id
 
 /******************************************************************************
  *                                                                            *
- * Function: send_config_data                                                 *
+ * Function: get_config_data                                                  *
  *                                                                            *
- * Purpose: send configuration changes to required node                       *
+ * Purpose: obtain configuration changes to required node                     *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
@@ -645,7 +644,7 @@ void node_sync_unlock(int nodeid)
  *                                                                            *
  * Function: process_nodes                                                    *
  *                                                                            *
- * Purpose: calculates checkssum of config data                               *
+ * Purpose: calculates checksums of config data                               *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
@@ -653,7 +652,7 @@ void node_sync_unlock(int nodeid)
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
- * Comments: never returns                                                    *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void process_nodes()

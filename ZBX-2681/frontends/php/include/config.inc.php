@@ -90,6 +90,7 @@ function __autoload($class_name){
 	require_once('include/services.inc.php');
 	require_once('include/httptest.inc.php');
 
+	require_once('include/sounds.inc.php');
 	require_once('include/images.inc.php');
 	require_once('include/events.inc.php');
 	require_once('include/scripts.inc.php');
@@ -98,11 +99,22 @@ function __autoload($class_name){
 
 	require_once('include/users.inc.php');
 // GLOBALS
-	global $USER_DETAILS, $USER_RIGHTS;
+	global $USER_DETAILS, $USER_RIGHTS, $page;
 
+	global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID, $ZBX_CONFIGURATION_FILE, $DB;
+	global $ZBX_SERVER, $ZBX_SERVER_PORT;
+	global $ZBX_LOCALES;
+// END OF GLOBALS
+
+	$page = array();
 	$USER_DETAILS	= array();
 	$USER_RIGHTS	= array();
-// END OF GLOBALS
+
+	$ZBX_LOCALNODEID = 0;
+	$ZBX_LOCMASTERID = 0;
+
+	$ZBX_CONFIGURATION_FILE = './conf/zabbix.conf.php';
+	$ZBX_CONFIGURATION_FILE = realpath(dirname($ZBX_CONFIGURATION_FILE)).'/'.basename($ZBX_CONFIGURATION_FILE);
 
 // Include Tactical Overview modules
 	require_once('include/locales.inc.php');
@@ -124,16 +136,6 @@ function __autoload($class_name){
 	/********** START INITIALIZATION *********/
 
 	set_error_handler('zbx_err_handler');
-
-	global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID, $ZBX_CONFIGURATION_FILE, $DB;
-	global $ZBX_SERVER, $ZBX_SERVER_PORT;
-	global $ZBX_LOCALES;
-
-	$ZBX_LOCALNODEID = 0;
-	$ZBX_LOCMASTERID = 0;
-
-	$ZBX_CONFIGURATION_FILE = './conf/zabbix.conf.php';
-	$ZBX_CONFIGURATION_FILE = realpath(dirname($ZBX_CONFIGURATION_FILE)).'/'.basename($ZBX_CONFIGURATION_FILE);
 
 	unset($show_setup);
 
@@ -552,35 +554,6 @@ function __autoload($class_name){
 		}
 
 	return $result;
-	}
-
-//	The hash has form <md5sum of triggerid>,<sum of priorities>
-	function calc_trigger_hash(){
-
-		$priority = array(0=>0, 1=>0, 2=>0, 3=>0, 4=>0, 5=>0);
-		$triggerids='';
-
-		$options = array(
-			'filter' => array(
-				'value' => TRIGGER_VALUE_TRUE
-			),
-			'withUnacknowledgedEvents' => 1,
-			'output' => array('triggerid', 'priority')
-		);
-		$triggers = CTrigger::get($options);
-
-		foreach($triggers as $tnum => $row){
-			$triggerids.= ','.$row['triggerid'];
-			$priority[$row['priority']]++;
-		}
-
-		$md5sum = md5($triggerids);
-
-		$priorities = 0;
-		for($i=0; $i<=5; $i++)
-			$priorities += pow(100,$i)*$priority[$i];
-
-	return	$priorities.','.$md5sum;
 	}
 
 	function parse_period($str){

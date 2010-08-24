@@ -25,7 +25,7 @@ require_once('include/forms.inc.php');
 require_once('include/maps.inc.php');
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
-$page['title'] = "S_CONFIGURATION_OF_SLIDES";
+$page['title'] = 'S_CONFIGURATION_OF_SLIDESHOWS';
 $page['file'] = 'slideconf.php';
 $page['hist_arg'] = array();
 
@@ -90,8 +90,8 @@ include_once('include/page_header.php');
 
 		if(isset($_REQUEST['slideshowid'])){ /* update */
 			DBstart();
-			update_slideshow($_REQUEST['slideshowid'],$_REQUEST['name'],$_REQUEST['delay'],$slides);
-			$result = DBend();
+			$result = update_slideshow($_REQUEST['slideshowid'],$_REQUEST['name'],$_REQUEST['delay'],$slides);
+			$result = DBend($result);
 
 			$audit_action = AUDIT_ACTION_UPDATE;
 			show_messages($result, S_SLIDESHOW_UPDATED, S_CANNOT_UPDATE_SLIDESHOW);
@@ -117,7 +117,7 @@ include_once('include/page_header.php');
 		if(isset($_REQUEST['new_step'])){
 			if(isset($_REQUEST['new_step']['sid']))
 				$_REQUEST['steps'][$_REQUEST['new_step']['sid']] = $_REQUEST['new_step'];
-			else
+			else if($_REQUEST['new_step']['screenid']>0)
 				$_REQUEST['steps'][] = $_REQUEST['new_step'];
 
 			unset($_REQUEST['add_step'], $_REQUEST['new_step']);

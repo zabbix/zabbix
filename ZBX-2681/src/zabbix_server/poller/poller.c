@@ -21,10 +21,10 @@
 
 #include "zlog.h"
 #include "db.h"
+#include "dbcache.h"
 #include "sysinfo.h"
 #include "daemon.h"
 #include "zbxserver.h"
-#include "dbcache.h"
 
 #include "poller.h"
 

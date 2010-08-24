@@ -356,7 +356,6 @@
 
 		if($item['type'] == ITEM_TYPE_AGGREGATE){
 			/* grpfunc['group','key','itemfunc','numeric param'] */
-//			if(eregi('^((.)*)(\[\"((.)*)\"\,\"((.)*)\"\,\"((.)*)\"\,\"([0-9]+)\"\])$', $item['key_'], $arr)){
 			if(preg_match('/^((.)*)(\[\"((.)*)\"\,\"((.)*)\"\,\"((.)*)\"\,\"([0-9]+)\"\])$/i', $item['key_'], $arr)){
 				$g=$arr[1];
 				if(!str_in_array($g,array("grpmax","grpmin","grpsum","grpavg"))){
@@ -387,7 +386,7 @@
 				' WHERE hostid='.$item['hostid'].
 					' AND key_='.zbx_dbstr($item['key_']);
 		$db_item = DBfetch(DBselect($sql));
-		if($db_item && (($item['templateid'] == 0) || ($item['templateid'] != $db_item['templateid']))){
+		if($db_item && (($item['templateid'] == 0) || (($db_item['templateid'] != 0) && ($item['templateid'] != 0) && ($item['templateid'] != $db_item['templateid'])))){
 			error(S_AN_ITEM_WITH_THE_KEY.SPACE.'['.$item['key_'].']'.SPACE.S_ALREADY_EXISTS_FOR_HOST_SMALL.SPACE.'['.$host['host'].'].'.SPACE.S_THE_KEY_MUST_BE_UNIQUE);
 			return FALSE;
 		}
@@ -562,17 +561,16 @@
 			$item['data_type'] = 0;
 		}
 
-		$sql = 'SELECT itemid '.
+		$sql = 'SELECT itemid, hostid, templateid '.
 				' FROM items '.
 				' WHERE hostid='.$item['hostid'].
-					' and itemid<>'.$itemid.
-					' and key_='.zbx_dbstr($item['key_']);
+					' AND itemid<>'.$itemid.
+					' AND key_='.zbx_dbstr($item['key_']);
 		$db_item = DBfetch(DBselect($sql));
-		if($db_item && $item['templateid'] == 0){
+		if($db_item && (($db_item['templateid'] != 0) || ($item['templateid'] == 0))){
 			error(S_AN_ITEM_WITH_THE_KEY.SPACE.'['.$item['key_'].']'.SPACE.S_ALREADY_EXISTS_FOR_HOST_SMALL.SPACE.'['.$host['host'].'].'.SPACE.S_THE_KEY_MUST_BE_UNIQUE);
 			return FALSE;
 		}
-
 // first update child items
 		$db_tmp_items = DBselect('SELECT itemid, hostid FROM items WHERE templateid='.$itemid);
 		while($db_tmp_item = DBfetch($db_tmp_items)){
@@ -1166,6 +1164,7 @@
  *
  */
 	function get_items_data_overview($hostids,$view_style=null){
+		global $USER_DETAILS;
 
 		if(is_null($view_style)) $view_style = CProfile::get('web.overview.view.style',STYLE_TOP);
 
@@ -1226,10 +1225,12 @@
 // COpt::profiling_stop('prepare_data');
 // COpt::profiling_start('prepare_table');
 
+		$css = getUserTheme($USER_DETAILS);
+		$vTextColor = ($css == 'css_od.css')?'&color=white':'';
 		if($view_style == STYLE_TOP){
 			$header=array(new CCol(S_ITEMS,'center'));
 			foreach($hosts as $hostname){
-				$header = array_merge($header,array(new CImg('vtext.php?text='.$hostname)));
+				$header = array_merge($header,array(new CImg('vtext.php?text='.$hostname.$vTextColor)));
 			}
 
 			$table->SetHeader($header,'vertical_header');
@@ -1246,7 +1247,7 @@
 		else{
 			$header=array(new CCol(S_HOSTS,'center'));
 			foreach($items as $descr => $ithosts){
-				$header = array_merge($header,array(new CImg('vtext.php?text='.$descr)));
+				$header = array_merge($header,array(new CImg('vtext.php?text='.$descr.$vTextColor)));
 			}
 
 			$table->SetHeader($header,'vertical_header');
@@ -1311,8 +1312,8 @@
 			}
 		}
 
-//		if($value == '-')	$css_class = 'center';
-		$value_col = new CCol(array($value,$ack),$css_class.' link');
+		if($value != '-')	$value = new CSpan($value,'link');
+		$value_col = new CCol(array($value,$ack),$css_class);
 
 		if(isset($it_ov_menu)){
 			$it_ov_menu  = new CPUMenu($it_ov_menu,170);

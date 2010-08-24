@@ -455,6 +455,7 @@ insert into help_items values(0,'web.page.regexp[host,&lt;path&gt;,&lt;port&gt;,
 insert into help_items values(0,'perf_counter[counter, interval]','Value of any performance counter, where "counter" parameter is the counter path and "interval" parameter is a number of last seconds, for which the agent returns an average value.');
 insert into help_items values(0,'service_state[service]','State of service. 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service');
 insert into help_items values(0,'proc_info[&lt;process&gt;,&lt;attribute&gt;,&lt;type&gt;]','Different information about specific process(es)');
+insert into help_items values(0,'system.stat[resource &lt;,type&gt;]','Virtual memory statistics.');
 
 insert into help_items values(7,'agent.ping','Check the agent usability. Always return 1. Can be used as a TCP ping.');
 insert into help_items values(7,'agent.version','Version of zabbix_agent(d) running on monitored host. String value. Example of returned value: 1.1');
@@ -507,6 +508,7 @@ insert into help_items values(7,'proc_info[&lt;process&gt;,&lt;attribute&gt;,&lt
 insert into help_items values(7,'log[file,&lt;pattern&gt;,&lt;encoding&gt;,&lt;maxlines&gt;]','Monitoring of log file. pattern - regular expression');
 insert into help_items values(7,'logrt[file_format,&lt;pattern&gt;,&lt;encoding&gt;,&lt;maxlines&gt;]', 'Monitoring of log file with rotation. fileformat - [path][regexp], pattern - regular expression');
 insert into help_items values(7,'eventlog[logtype,&lt;pattern&gt;,&lt;severity&gt;,&lt;source&gt;,&lt;eventid&gt;,&lt;maxlines&gt;]','Monitoring of Windows event logs. pattern, severity, eventid - regular expressions');
+insert into help_items values(7,'system.stat[resource &lt;,type&gt;]','Virtual memory statistics.');
 
 --
 -- Dumping data for table items

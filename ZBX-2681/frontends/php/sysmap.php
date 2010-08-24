@@ -326,33 +326,19 @@ include_once('include/page_header.php');
 	echo SBR;
 
 // ELEMENTS
-	$el_add = new CDiv(SPACE,'iconplus');
-	$el_add->setAttribute('title',S_ADD_ELEMENT);
+	$el_add = new CIcon(S_ADD_ELEMENT, 'iconplus');
 	$el_add->setAttribute('id','selement_add');
 
-	$el_rmv = new CDiv(SPACE,'iconminus');
-	$el_rmv->setAttribute('title',S_REMOVE_ELEMENT);
+	$el_rmv = new CIcon(S_REMOVE_ELEMENT, 'iconminus');
 	$el_rmv->setAttribute('id','selement_rmv');
 //-----------------
 
 // CONNECTORS
-	$cn_add = new CDiv(SPACE,'iconplus');
-	$cn_add->setAttribute('title',S_ADD_LINK);
+	$cn_add = new CIcon(S_ADD_LINK, 'iconplus');
 	$cn_add->setAttribute('id','link_add');
 
-	$cn_rmv = new CDiv(SPACE,'iconminus');
-	$cn_rmv->setAttribute('title',S_REMOVE_LINK);
+	$cn_rmv = new CIcon(S_REMOVE_LINK, 'iconminus');
 	$cn_rmv->setAttribute('id','link_rmv');
-//------------------------
-
-// GRID
-	$gr_add = new CDiv(SPACE,'iconplus');
-	$gr_add->setAttribute('title',S_ADD_LINK);
-	$gr_add->setAttribute('id','link_add');
-
-	$gr_rmv = new CDiv(SPACE,'iconminus');
-	$gr_rmv->setAttribute('title',S_REMOVE_LINK);
-	$gr_rmv->setAttribute('id','link_rmv');
 //------------------------
 
 // Side Menu
@@ -390,6 +376,8 @@ include_once('include/page_header.php');
 	$gridForm = new CDiv(array($gridSize, $gridAlignAll));
 	$gridForm->setAttribute('id', 'gridalignblock');
 
+	array_push($menuRow, S_MAP . ' "'.$sysmap['name'].'"');
+	array_push($menuRow, SPACE.SPACE);
 	array_push($menuRow, S_ICON.' [',$el_add,$el_rmv,']');
 	array_push($menuRow, SPACE.SPACE);
 	array_push($menuRow, S_LINK.' [',$cn_add,$cn_rmv,']');

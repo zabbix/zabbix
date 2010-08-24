@@ -73,7 +73,7 @@ include_once('include/page_header.php');
 
 	$_REQUEST['applications'] = get_request('applications', get_favorites('web.httpmon.applications'));
 	$_REQUEST['applications'] = zbx_objectValues($_REQUEST['applications'], 'value');
-	
+
 	if(isset($_REQUEST['open'])){
 		if(!isset($_REQUEST['applicationid'])){
 			$_REQUEST['applications'] = array();
@@ -112,12 +112,7 @@ include_once('include/page_header.php');
 	$httpmon_wdgt = new CWidget();
 
 // Table HEADER
-	$url = 'httpmon.php?fullscreen='.($_REQUEST['fullscreen']?'0':'1');
-
-	$fs_icon = new CDiv(SPACE,'fullscreen');
-	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-	$fs_icon->addAction('onclick', "javascript: document.location = '".$url."';");
-
+	$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
 	$httpmon_wdgt->addPageHeader(S_STATUS_OF_WEB_MONITORING_BIG, $fs_icon);
 
 // 2nd header
@@ -160,9 +155,9 @@ include_once('include/page_header.php');
 
 	$table  = new CTableInfo();
 	$table->SetHeader(array(
-		is_show_all_nodes() ? make_sorting_link(S_NODE,'h.hostid') : null,
-		$_REQUEST['hostid'] ==0 ? make_sorting_link(S_HOST,'h.host') : NULL,
-		array($link, SPACE, make_sorting_link(S_NAME,'wt.name')),
+		is_show_all_nodes() ? make_sorting_header(S_NODE,'h.hostid') : null,
+		$_REQUEST['hostid'] ==0 ? make_sorting_header(S_HOST,'h.host') : NULL,
+		make_sorting_header(array($link, SPACE, S_NAME),'wt.name'),
 		S_NUMBER_OF_STEPS,
 		S_STATE,
 		S_LAST_CHECK,

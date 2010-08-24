@@ -337,13 +337,13 @@ class CImage extends CZBXAPI{
 					$stmt = oci_parse($DB['DB'], $sql);
 					if(!$stmt){
 						$e = oci_error($stmt);
-						self::exception(ZBX_API_ERROR_PARAMETERS, S_PARSE_SQL_ERROR.' ['.$e['message'].']'.SPACE.S_IN_SMALL.SPACE.'['.$e['sqltext'].']');
+						self::exception(ZBX_API_ERROR_PARAMETERS, S_PARSE_SQL_ERROR.' ['.$e['message'].'] '.S_IN_SMALL.' ['.$e['sqltext'].']');
 					}
 
 					oci_bind_by_name($stmt, ':imgdata', $lob, -1, OCI_B_BLOB);
 					if(!oci_execute($stmt)){
 						$e = oci_error($stid);
-						self::exception(ZBX_API_ERROR_PARAMETERS, S_EXECUTE_SQL_ERROR.SPACE.'['.$e['message'].']'.SPACE.S_IN_SMALL.SPACE.'['.$e['sqltext'].']');
+						self::exception(ZBX_API_ERROR_PARAMETERS, S_EXECUTE_SQL_ERROR.' ['.$e['message'].'] '.S_IN_SMALL.' ['.$e['sqltext'].']');
 					}
 					oci_free_statement($stmt);
 
@@ -352,7 +352,7 @@ class CImage extends CZBXAPI{
 					if($DB['TYPE'] == 'SQLITE3')
 						$values['image'] = zbx_dbstr(bin2hex($image['image']));
 					else if($DB['TYPE'] == 'POSTGRESQL')
-						$values['image'] = pg_escape_bytea($image['image']);
+						$values['image'] = "'".pg_escape_bytea($image['image'])."'";
 					else if($DB['TYPE'] == 'MYSQL')
 						$values['image'] = zbx_dbstr($image['image']);
 
@@ -418,7 +418,7 @@ class CImage extends CZBXAPI{
 
 				if(isset($image['image'])){
 					if($DB['TYPE'] == 'POSTGRESQL'){
-						$values['image'] = pg_escape_bytea($image['image']);
+						$values['image'] = "'".pg_escape_bytea($image['image'])."'";
 					}
 					else if($DB['TYPE'] == 'SQLITE3'){
 						$values['image'] = zbx_dbstr(bin2hex($image['image']));
@@ -509,7 +509,7 @@ class CImage extends CZBXAPI{
 
 			$errors = array();
 			while($sysmap = DBfetch($db_sysmaps)){
-				$errors[] = 'Image is used in ZABBIX map "'.get_node_name_by_elid($sysmap['sysmapid'],true,':').$sysmap['name'].'"';
+				$errors[] = S_IMAGE_IS_USED_IN_ZABBIX_MAP.' "'.get_node_name_by_elid($sysmap['sysmapid'],true,':').$sysmap['name'].'"';
 			}
 			if(!empty($errors)) self::exception(ZBX_API_ERROR_PARAMETERS, $errors);
 

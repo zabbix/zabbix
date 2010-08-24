@@ -81,30 +81,30 @@ table.calendartab tr td.selected{
 
 /* SPAN */
 
-span.title{
+div.calendar span.title{
 	text-align:center;
 	color:#000099;
 }
 
-span.clndr_left_arrow{
+div.calendar span.clndr_left_arrow{
 	padding-left: 5px;
 }
 
-span.clndr_left_arrow:hover{
+div.calendar span.clndr_left_arrow:hover{
 	cursor: pointer;
 }
 
-span.clndr_right_arrow{
+div.calendar span.clndr_right_arrow{
 	padding-right: 5px;
 }
 
-span.clndr_right_arrow:hover{
+div.calendar span.clndr_right_arrow:hover{
 	cursor: pointer;
 }
 
 /* INPUT */
 
-input.calendar_textbox{
+div.calendar input.calendar_textbox{
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	font-size: 11px;
 	text-align: center;

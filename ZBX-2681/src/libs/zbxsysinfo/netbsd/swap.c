@@ -320,41 +320,6 @@ SWP_FNCLIST
 	return SYSINFO_RET_FAIL;
 }
 
-int	OLD_SWAP(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	char	key[MAX_STRING_LEN];
-	int	ret;
-
-	assert(result);
-
-	init_result(result);
-
-	if(num_param(param) > 1)
-	{
-		return SYSINFO_RET_FAIL;
-	}
-
-	if(get_param(param, 1, key, MAX_STRING_LEN) != 0)
-	{
-		return SYSINFO_RET_FAIL;
-	}
-
-	if(strcmp(key,"free") == 0)
-	{
-		ret = SYSTEM_SWAP_FREE(cmd, param, flags, result);
-	}
-	else if(strcmp(key,"total") == 0)
-	{
-		ret = SYSTEM_SWAP_TOTAL(cmd, param, flags, result);
-	}
-	else
-	{
-		ret = SYSINFO_RET_FAIL;
-	}
-
-	return ret;
-}
-
 int	SYSTEM_SWAP_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	/* in this moment this function for this platform unsupported */

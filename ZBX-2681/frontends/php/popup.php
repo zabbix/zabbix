@@ -286,6 +286,7 @@ include_once('include/page_header.php');
 		'groupid' => get_request('groupid', null),
 		'hostid' => get_request('hostid', null),
 	);
+
 	if($monitored_hosts){
 		$options['groups']['monitored_hosts'] = true;
 		$options['hosts']['monitored_hosts'] = true;
@@ -296,7 +297,7 @@ include_once('include/page_header.php');
 	else{
 		$options['hosts']['templated_hosts'] = true;
 	}
-	
+
 	if(!is_null($writeonly)){
 		$options['groups']['editable'] = true;
 		$options['hosts']['editable'] = true;
@@ -304,11 +305,27 @@ include_once('include/page_header.php');
 	$pageFilter = new CPageFilter($options);
 
 	$nodeid = get_request('nodeid', get_current_nodeid(false));
-	$groupid = $pageFilter->groupid;
-	$hostid = $pageFilter->hostid;
+
+	$groupid = null;
+	if($pageFilter->groupsSelected){
+		if($pageFilter->groupid > 0)
+			$groupid = $pageFilter->groupid;
+	}
+	else{
+		$groupid = 0;
+	}
+
+	$hostid = null;
+	if($pageFilter->hostsSelected){
+		if($pageFilter->hostid > 0)
+			$hostid = $pageFilter->hostid;
+	}
+	else{
+		$hostid = 0;
+	}
 
 	$available_nodes = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST);
-	$available_hosts = array_keys($pageFilter->hosts);
+	$available_hosts = empty($pageFilter->hosts) ? array() : array_keys($pageFilter->hosts);
 
 	if(isset($only_hostid)){
 		$hostid = $_REQUEST['hostid'] = $only_hostid;
@@ -456,8 +473,6 @@ include_once('include/page_header.php');
 				foreach($new_templates as $id => $name){
 					$script .= 'add_variable(null,"templates['.$id.']",'.zbx_jsvalue($name).','.zbx_jsvalue($dstfrm).',window.opener.document);'."\n";
 				}
-
-
 			} // if count new_templates > 0
 
 			$script.= 'var form = window.opener.document.forms['.zbx_jsvalue($dstfrm).'];'.
@@ -472,11 +487,11 @@ include_once('include/page_header.php');
 		$table->setHeader(array(S_NAME));
 
 		$options = array(
-				'nodeids' => $nodeid,
-				'groupids' => $groupid,
-				'extendoutput' => 1,
-				'sortfield' => 'host'
-			);
+			'nodeids' => $nodeid,
+			'groupids' => $groupid,
+			'extendoutput' => 1,
+			'sortfield' => 'host'
+		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 
 		$template_list = CTemplate::get($options);
@@ -670,24 +685,19 @@ include_once('include/page_header.php');
 		insert_js_function('addSelectedValues');
 		insert_js_function('addValues');
 		insert_js_function('addValue');
-		if($multiselect)
-			$header = array(
-				array(new CCheckBox("all_triggers", NULL, "javascript: checkAll('".$form->getName()."', 'all_triggers','triggers');"), S_NAME),
-				S_SEVERITY,
-				S_STATUS
-			);
-		else
-			$header = array(S_NAME, S_SEVERITY,	S_STATUS);
 
-		$table->setHeader($header);
+		$table->setHeader(array(
+			($multiselect ? new CCheckBox("all_triggers", NULL, "javascript: checkAll('".$form->getName()."', 'all_triggers','triggers');") : null),
+			S_NAME,
+			S_SEVERITY,
+			S_STATUS
+		));
 
 		$options = array(
 			'nodeids' => $nodeid,
 			'hostids' => $hostid,
 			'output' => API_OUTPUT_EXTEND,
 			'select_hosts' => API_OUTPUT_EXTEND,
-			'select_items' => API_OUTPUT_EXTEND,
-			'select_functions' => API_OUTPUT_EXTEND,
 			'select_dependencies' => API_OUTPUT_EXTEND,
 			'expandDescription' => 1,
 		);
@@ -698,10 +708,6 @@ include_once('include/page_header.php');
 		order_result($triggers, 'description');
 
 		foreach($triggers as $tnum => $trigger){
-			$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
-			$trigger['items'] = zbx_toHash($trigger['items'], 'itemid');
-			$trigger['functions'] = zbx_toHash($trigger['functions'], 'functionid');
-
 			$host = reset($trigger['hosts']);
 			$trigger['host'] = $host['host'];
 
@@ -719,7 +725,7 @@ include_once('include/page_header.php');
 					$dstfld2 => $trigger[$srcfld2],
 				);
 
-				$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).','.zbx_jsvalue($values).'); close_window(); return false;';
+				$js_action = 'javascript: addValues('.zbx_jsvalue($reference).','.zbx_jsvalue($values).'); close_window(); return false;';
 			}
 
 			$description->setAttribute('onclick', $js_action);
@@ -744,19 +750,12 @@ include_once('include/page_header.php');
 				break;
 			}
 
-			if($multiselect){
-				$description = new CCol(array(new CCheckBox('triggers['.zbx_jsValue($trigger[$srcfld1]).']', NULL, NULL, $trigger['triggerid']),	$description));
-			}
-
 			$table->addRow(array(
+				($multiselect ? new CCheckBox('triggers['.zbx_jsValue($trigger[$srcfld1]).']', NULL, NULL, $trigger['triggerid']) : null),
 				$description,
 				new CCol(get_severity_description($trigger['priority']), get_severity_style($trigger['priority'])),
 				$status
 			));
-
-
-			unset($description);
-			unset($status);
 		}
 
 		if($multiselect){
@@ -802,6 +801,7 @@ include_once('include/page_header.php');
 
 		$options = array(
 			'nodeids' => $nodeid,
+			'groupids' => $groupid,
 			'hostids' => $hostid,
 			'webitems' => 1,
 			'output' => API_OUTPUT_EXTEND,
@@ -864,27 +864,31 @@ include_once('include/page_header.php');
 		$table = new CTableInfo(S_NO_APPLICATIONS_DEFINED);
 		$table->setHeader(array(
 			($hostid>0)?null:S_HOST,
-			S_NAME));
+			S_NAME
+		));
 
-		$sql = 'SELECT DISTINCT h.host,a.* '.
-				' FROM hosts h,applications a '.
-				' WHERE h.hostid=a.hostid '.
-					' AND '.DBin_node('a.applicationid', $nodeid).
-					' AND '.DBcondition('h.hostid',$available_hosts).
-					// ' AND h.status in ('.implode(',', $host_status).')'.
-					' AND h.hostid='.$hostid.
-				' ORDER BY h.host,a.name';
+		$options = array(
+			'nodeids' => $nodeid,
+			'groupids' => $groupid,
+			'hostids' => $hostid,
+			'output' => API_OUTPUT_EXTEND,
+			'expandData' => true,
+		);
+		if(!is_null($writeonly)) $options['editable'] = 1;
+		if(!is_null($templated)) $options['templated'] = $templated;
 
-		$result = DBselect($sql);
-		while($row = DBfetch($result)){
-			$name = new CSpan($row["name"],'link');
+		$apps = CApplication::get($options);
+		morder_result($apps, array('host', 'name'));
 
-			$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
-				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
+		foreach($apps as $app){
+			$name = new CSpan($app['name'], 'link');
+
+			$action = get_window_opener($dstfrm, $dstfld1, $app[$srcfld1]).
+				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $app[$srcfld2]) : '');
 
 			$name->setAttribute('onclick',$action." close_window(); return false;");
 
-			$table->addRow(array(($hostid>0)?null:$row['host'], $name));
+			$table->addRow(array(($hostid>0)?null:$app['host'], $name));
 		}
 		$table->show();
 	}

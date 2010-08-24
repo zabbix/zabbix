@@ -27,8 +27,11 @@ require_once('include/media.inc.php');
 $page['title'] = 'S_USER_PROFILE';
 $page['file'] = 'profile.php';
 $page['hist_arg'] = array();
+$page['scripts'] = array('class.cviewswitcher.js');
 
-include_once 'include/page_header.php';
+ob_start();
+
+include_once('include/page_header.php');
 
 ?>
 <?php
@@ -54,6 +57,8 @@ $fields=array(
 	'new_media'=>		array(T_ZBX_STR, O_OPT,	null, null, null),
 	'enable_media'=>	array(T_ZBX_INT, O_OPT,	null, null, null),
 	'disable_media'=>	array(T_ZBX_INT, O_OPT,	null, null, null),
+	'messages'=>		array(T_ZBX_STR, O_OPT,	null, null, null),
+
 /* actions */
 	'save'=>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT, null, null),
 	'cancel'=>			array(T_ZBX_STR, O_OPT,	P_SYS, null, null),
@@ -115,7 +120,6 @@ $fields=array(
 			show_error_message(S_PASSWORD_SHOULD_NOT_BE_EMPTY);
 		}
 		else{
-
 			$user = array();
 			$user['userid'] = $USER_DETAILS['userid'];
 //			$user['name'] = $USER_DETAILS['name'];
@@ -133,7 +137,15 @@ $fields=array(
 			$user['user_groups'] = null;
 			$user['user_medias'] = get_request('user_medias', array());
 
+			$messages = get_request('messages', array());
+			if(!isset($messages['enabled'])) $messages['enabled'] = 0;
+			if(!isset($messages['sounds.recovery'])) $messages['sounds.recovery'] = 0;
+			if(!isset($messages['triggers.recovery'])) $messages['triggers.recovery'] = 0;
+			if(!isset($messages['triggers.severities'])) $messages['triggers.severities'] = array();
+
 			DBstart();
+			updateMessageSettings($messages);
+			
 			$result = CUser::updateProfile($user);
 			if($result && ($USER_DETAILS['type'] > USER_TYPE_ZABBIX_USER)){
 				$data = array(
@@ -146,20 +158,29 @@ $fields=array(
 			$result = DBend($result);
 			if(!$result) error(CUser::resetErrors());
 
-			show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
-
-			if($result)
+			if($result){
 				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_USER,
-					'User alias ['.$USER_DETAILS['alias'].
-					'] name ['.$USER_DETAILS['name'].'] surname ['.
-					$USER_DETAILS['surname'].'] profile id ['.$USER_DETAILS['userid'].']');
+					'User alias ['.$USER_DETAILS['alias'].'] Name ['.$USER_DETAILS['name'].']'.
+					' Surname ['.$USER_DETAILS['surname'].'] profile id ['.$USER_DETAILS['userid'].']');
+
+				$url = CProfile::get('web.paging.lastpage', 'profile.php');
+				
+				ob_end_clean();
+				redirect($url);
+			}
+			else{
+				show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
+			}
 		}
 	}
+ob_end_flush();
 ?>
 <?php
 	$profile_wdgt = new CWidget();
 	$profile_wdgt->addPageHeader(S_USER_PROFILE_BIG.' : '.$USER_DETAILS['name'].' '.$USER_DETAILS['surname']);
-	$profile_wdgt->addItem(insert_user_form($USER_DETAILS['userid'],1));
+
+	$profileForm = getUserForm($USER_DETAILS['userid'],1);
+	$profile_wdgt->addItem($profileForm);
 	$profile_wdgt->show();
 ?>
 <?php

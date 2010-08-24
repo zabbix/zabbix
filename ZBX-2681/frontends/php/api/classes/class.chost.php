@@ -96,6 +96,7 @@ class CHost extends CZBXAPI{
 			'templateids'				=> null,
 			'itemids'					=> null,
 			'triggerids'				=> null,
+			'maintenanceids'			=> null,
 			'graphids'					=> null,
 			'dhostids'					=> null,
 			'dserviceids'				=> null,
@@ -168,9 +169,6 @@ class CHost extends CZBXAPI{
 			if(!is_null($options['select_macros'])){
 				$options['select_macros'] = API_OUTPUT_EXTEND;
 			}
-			if(!is_null($options['select_profile'])){
-				$options['select_profile'] = API_OUTPUT_EXTEND;
-			}
 		}
 
 		if(is_array($options['output'])){
@@ -188,22 +186,24 @@ class CHost extends CZBXAPI{
 		else{
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
 
-			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sql_parts['from']['rights'] = 'rights r';
-			$sql_parts['from']['users_groups'] = 'users_groups ug';
-			$sql_parts['where']['hgh'] = 'hg.hostid=h.hostid';
-			$sql_parts['where'][] = 'r.id=hg.groupid ';
-			$sql_parts['where'][] = 'r.groupid=ug.usrgrpid';
-			$sql_parts['where'][] = 'ug.userid='.$userid;
-			$sql_parts['where'][] = 'r.permission>='.$permission;
-			$sql_parts['where'][] = 'NOT EXISTS( '.
-									' SELECT hgg.groupid '.
-									' FROM hosts_groups hgg, rights rr, users_groups gg '.
-									' WHERE hgg.hostid=hg.hostid '.
-										' AND rr.id=hgg.groupid '.
+			$sql_parts['where'][] = 'EXISTS ('.
+							' SELECT hh.hostid '.
+							' FROM hosts hh, hosts_groups hgg, rights r, users_groups ug '.
+							' WHERE hh.hostid=h.hostid '.
+								' AND hh.hostid=hgg.hostid '.
+								' AND r.id=hgg.groupid '.
+								' AND r.groupid=ug.usrgrpid '.
+								' AND ug.userid='.$userid.
+								' AND r.permission>='.$permission.
+								' AND NOT EXISTS( '.
+									' SELECT hggg.groupid '.
+									' FROM hosts_groups hggg, rights rr, users_groups gg '.
+									' WHERE hggg.hostid=hgg.hostid '.
+										' AND rr.id=hggg.groupid '.
 										' AND rr.groupid=gg.usrgrpid '.
 										' AND gg.userid='.$userid.
-										' AND rr.permission<'.$permission.')';
+										' AND rr.permission<'.$permission.
+								' )) ';
 		}
 
 // nodeids
@@ -358,6 +358,21 @@ class CHost extends CZBXAPI{
 				$sql_parts['group']['dserviceid'] = 'ds.dserviceid';
 			}
 		}
+// maintenanceids
+		if(!is_null($options['maintenanceids'])){
+			zbx_value2array($options['maintenanceids']);
+			if($options['output'] != API_OUTPUT_SHORTEN){
+				$sql_parts['select']['maintenanceid'] = 'mh.maintenanceid';
+			}
+
+			$sql_parts['from']['maintenances_hosts'] = 'maintenances_hosts mh';
+			$sql_parts['where'][] = DBcondition('mh.maintenanceid', $options['maintenanceids']);
+			$sql_parts['where']['hmh'] = 'h.hostid=mh.hostid';
+
+			if(!is_null($options['groupCount'])){
+				$sql_parts['group']['maintenanceid'] = 'mh.maintenanceid';
+			}
+		}
 
 // node check !!!!!
 // should last, after all ****IDS checks
@@ -481,7 +496,12 @@ class CHost extends CZBXAPI{
 
 			if(isset($options['filter']['hostid']) && !is_null($options['filter']['hostid'])){
 				zbx_value2array($options['filter']['hostid']);
-				$sql_parts['where']['hostid'] = 'h.hostid='.DBcondition($options['filter']['hostid']);
+				$sql_parts['where']['hostid'] = DBcondition('h.hostid', $options['filter']['hostid']);
+			}
+
+			if(isset($options['filter']['templateid']) && !is_null($options['filter']['templateid'])){
+				zbx_value2array($options['filter']['templateid']);
+				$sql_parts['where']['templateid'] = DBcondition('h.templateid', $options['filter']['templateid']);
 			}
 
 			if(isset($options['filter']['host']) && !is_null($options['filter']['host'])){
@@ -603,6 +623,10 @@ class CHost extends CZBXAPI{
 						$result[$host['hostid']]['macros'] = array();
 					}
 
+//					if(!is_null($options['select_maintenances']) && !isset($result[$host['hostid']]['maintenances'])){
+//						$result[$host['hostid']]['maintenances'] = array();
+//					}
+
 // groupids
 					if(isset($host['groupid']) && is_null($options['select_groups'])){
 						if(!isset($result[$host['hostid']]['groups']))
@@ -665,6 +689,14 @@ class CHost extends CZBXAPI{
 						$result[$host['hostid']]['dservices'][] = array('dserviceid' => $host['dserviceid']);
 						unset($host['dserviceid']);
 					}
+// maintenanceids
+					if(isset($host['maintenanceid'])){
+						if(!isset($result[$host['hostid']]['maintenanceid']))
+							$result[$host['hostid']]['maintenances'] = array();
+
+						$result[$host['hostid']]['maintenances'][] = array('maintenanceid' => $host['maintenanceid']);
+//						unset($host['maintenanceid']);
+					}				
 //---
 
 					$result[$host['hostid']] += $host;
@@ -699,7 +731,7 @@ Copt::memoryPick();
 		}
 
 // Adding Profiles
-		if(!is_null($options['select_profile']) && str_in_array($options['select_profile'], $subselects_allowed_outputs)){
+		if(!is_null($options['select_profile'])){
 			$sql = 'SELECT hp.* '.
 				' FROM hosts_profiles hp '.
 				' WHERE '.DBcondition('hp.hostid', $hostids);
@@ -1096,7 +1128,7 @@ Copt::memoryPick();
 				'preservekeys' => 1));
 			foreach($groupids as $gnum => $groupid){
 				if(!isset($upd_groups[$groupid])){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can add User Groups');
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
 				}
 			}
 // }}} PERMISSIONS
@@ -1277,17 +1309,20 @@ Copt::memoryPick();
  *
  * @param array $data
  * @param array $data['groups']
- * @param array $data['hosts']
- * @return boolean
+ * @param array $data['templates']
+ * @param array $data['macros']
+ * @return array
  */
 	public static function massAdd($data){
+		$data['hosts'] = zbx_toArray($data['hosts']);
+
 		try{
 			self::BeginTransaction(__METHOD__);
 
 			if(isset($data['groups'])){
 				$options = array(
 					'groups' => zbx_toArray($data['groups']),
-					'hosts' => zbx_toArray($data['hosts'])
+					'hosts' => $data['hosts']
 				);
 				$result = CHostGroup::massAdd($options);
 				if(!$result) self::exception();
@@ -1295,7 +1330,7 @@ Copt::memoryPick();
 
 			if(isset($data['templates'])){
 				$options = array(
-					'hosts' => zbx_toArray($data['hosts']),
+					'hosts' => $data['hosts'],
 					'templates' => zbx_toArray($data['templates'])
 				);
 				$result = CTemplate::massAdd($options);
@@ -1304,7 +1339,7 @@ Copt::memoryPick();
 
 			if(isset($data['macros'])){
 				$options = array(
-					'hosts' => zbx_toArray($data['hosts']),
+					'hosts' => $data['hosts'],
 					'macros' => $data['macros']
 				);
 				$result = CUserMacro::massAdd($options);
@@ -1312,7 +1347,7 @@ Copt::memoryPick();
 			}
 
 			self::EndTransaction(true, __METHOD__);
-			return true;
+			return array('hostids' => zbx_objectValues($data['hosts'], 'hostid'));
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
@@ -1355,7 +1390,7 @@ Copt::memoryPick();
 			$options = array(
 				'hostids' => $hostids,
 				'editable' => 1,
-				'extendoutput' => 1,
+				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1,
 			);
 			$upd_hosts = self::get($options);
@@ -1494,7 +1529,7 @@ Copt::memoryPick();
 
 // UPDATE MACROS {{{
 			if(isset($data['macros']) && !is_null($data['macros'])){
-				$host_macros = CUserMacro::get(array('hostids' => $hostids, 'extendoutput' => 1));
+				$host_macros = CUserMacro::get(array('hostids' => $hostids, 'output' => API_OUTPUT_EXTEND,));
 
 				$macros_to_del = array();
 				foreach($host_macros as $hmacro){
@@ -1628,9 +1663,7 @@ Copt::memoryPick();
 // }}} EXTENDED PROFILE
 
 			self::EndTransaction(true, __METHOD__);
-
-			$upd_hosts = self::get(array('hostids' => $hostids, 'extendoutput' => 1, 'nopermissions' => 1));
-			return $upd_hosts;
+			return array('hostids' => $hostids);
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
@@ -1645,18 +1678,21 @@ Copt::memoryPick();
  * remove Hosts to HostGroups. All Hosts are added to all HostGroups.
  *
  * @param array $data
- * @param array $data['groups']
  * @param array $data['hosts']
- * @return boolean
+ * @param array $data['templates']
+ * @param array $data['macros']
+ * @return array
  */
 	public static function massRemove($data){
+		$data['hosts'] = zbx_toArray($data['hosts']);
+
 		try{
 			self::BeginTransaction(__METHOD__);
 
 			if(isset($data['groups'])){
 				$options = array(
-					'groups' => zbx_toArray($data['groups']),
-					'hosts' => zbx_toArray($data['hosts'])
+					'hosts' => $data['hosts'],
+					'groups' => zbx_toArray($data['groups'])
 				);
 				$result = CHostGroup::massRemove($options);
 				if(!$result) self::exception();
@@ -1664,7 +1700,7 @@ Copt::memoryPick();
 
 			if(isset($data['templates'])){
 				$options = array(
-					'hosts' => zbx_toArray($data['hosts']),
+					'hosts' => $data['hosts'],
 					'templates' => zbx_toArray($data['templates'])
 				);
 				$result = CTemplate::massRemove($options);
@@ -1673,7 +1709,7 @@ Copt::memoryPick();
 
 			if(isset($data['macros'])){
 				$options = array(
-					'hosts' => zbx_toArray($data['hosts']),
+					'hosts' => $data['hosts'],
 					'macros' => $data['macros']
 				);
 				$result = CUserMacro::massRemove($options);
@@ -1681,7 +1717,7 @@ Copt::memoryPick();
 			}
 
 			self::EndTransaction(true, __METHOD__);
-			return true;
+			return array('hostids' => zbx_objectValues($data['hosts'], 'hostid'));
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);

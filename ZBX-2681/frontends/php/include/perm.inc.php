@@ -45,11 +45,12 @@ function permission2str($group_permission){
 *****************************************/
 
 function check_authorisation(){
+	global $USER_DETAILS;
 	$sessionid = get_cookie('zbx_sessionid');
 
 	$user = array('sessionid'=>$sessionid);
 	if(!$auth = CUser::checkAuthentication($user)){
-		
+
 		include_once('include/locales/en_gb.inc.php');
 		process_locales();
 
@@ -132,18 +133,6 @@ function get_user_auth($userid){
 return $result;
 }
 
-function get_user_api_access($userid){
-	$sql = 'SELECT g.usrgrpid '.
-			' FROM usrgrp g, users_groups ug '.
-			' WHERE ug.userid = '.$userid.
-				' AND g.usrgrpid = ug.usrgrpid '.
-				' AND g.api_access = '.GROUP_API_ACCESS_ENABLED;
-	if($res = DBfetch(DBselect($sql,1))){
-		return true;
-	}
-return false;
-}
-
 function get_user_debug_mode($userid){
 	$sql = 'SELECT g.usrgrpid '.
 			' FROM usrgrp g, users_groups ug '.
@@ -168,7 +157,7 @@ return false;
  */
 function get_user_system_auth($userid){
 	$config = select_config();
-	
+
 	$result = get_user_auth($userid);
 
 	switch($result){
@@ -225,16 +214,6 @@ function available_triggers($triggerids, $editable=null){
 	$triggers = CTrigger::get($options);
 
 return zbx_objectValues($triggers, 'triggerid');
-}
-
-function available_graphs($graphids, $editable=null){
-	$options = array();
-	$options['graphids'] = $graphids;
-	$options['editable'] = $editable;
-	$options['nodes'] = get_current_nodeid(true);
-
-	$graphs = CGraph::get($options);
-return zbx_objectValues($graphs, 'graphid');
 }
 
 function get_accessible_hosts_by_user(&$user_data,$perm,$perm_res=null,$nodeid=null,$cache=1){

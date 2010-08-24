@@ -473,6 +473,7 @@
 	'S_SYSTEM_DEFAULT'=>				'System default',
 	'S_BLACK_AND_BLUE'=>				'Black & Blue',
 	'S_ORIGINAL_BLUE'=>				'Original blue',
+	'S_DARK_ORANGE'=>				'Dark orange',
 	'S_DEFAULT_THEME'=>				'Default theme',
 	'S_EVENT_ACKNOWLEDGES'=>			'Event acknowledges',
 	'S_DAYS'=>					'Days',
@@ -753,6 +754,7 @@
 	'S_MAINTENANCE_UPDATED'=>		'Maintenance updated',
 	'S_MAINTENANCE_DELETED'=>		'Maintenance deleted',
 	'S_DELETE_SELECTED_MAINTENANCE_PERIODS_Q'=>'Delete selected maintenance periods?',
+	'S_GROUP_OR_HOST_NEEDED' => 'At least one host or group should be selected',
 
 	'S_IN_MAINTENANCE'=>			'In maintenance',
 	'S_HOSTS_IN_MAINTENANCE'=>		'Hosts in maintenance',
@@ -1194,6 +1196,10 @@
 	'S_EVENTS_DATE_FORMAT'=>		'd M Y H:i:s',
 	'S_EVENTS_DISCOVERY_TIME_FORMAT'=>	'Y.M.d H:i:s',
 	'S_EVENTS_ACTION_TIME_FORMAT'=>		'Y.M.d H:i:s',
+	'S_UP_BIG'=>		'UP',
+	'S_DOWN_BIG'=>		'DOWN',
+	'S_DISCOVERED_BIG'=>		'DISCOVERED',
+	'S_LOST_BIG'=>		'LOST',
 
 //	events.inc.php
 	'S_EVENTS_EVENT_DETAILS_DATE_FORMAT'=>			'Y.M.d H:i:s',
@@ -1237,6 +1243,7 @@
 	'S_MAINTENANCE_BIG'=>			'MAINTENANCE',
 
 //	sysmaps.php
+	'S_IMAGE_IS_USED_IN_ZABBIX_MAP' => 'Image is used in Zabbix map',
 	'S_EDIT_MAP_ELEMENT'=>			'Edit map element',
 	'S_ICON_DEFAULT'=>			'Icon (default)',
 	'S_APPLY'=>					'Apply',
@@ -1444,6 +1451,7 @@
 	'S_TILL'=>					'Till',
 	'S_TO'=>					'To',
 	'S_OK'=>					'Ok',
+	'S_RESOLVED'=>				'Resolved',
 	'S_PROBLEM'=>					'Problem',
 	'S_PROBLEMS'=>					'Problems',
 	'S_PERCENTAGE'=>				'Percentage',
@@ -1551,9 +1559,11 @@
 	'S_DIMENSION_COLS_ROWS'=>		'Dimension (cols x rows)',
 	'S_DELETE_SELECTED_SLIDESHOWS_Q'=>	'Delete selected slideshows?',
 
+	'S_SLIDESHOW_MUST_CONTAIN_SLIDES' => 'Slideshow must contain slides',
 	'S_SLIDESHOWS'=>				'Slide shows',
 	'S_SLIDESHOW'=>					'Slide show',
 	'S_CONFIGURATION_OF_SLIDESHOWS_BIG'=>	'CONFIGURATION OF SLIDE SHOWS',
+	'S_CONFIGURATION_OF_SLIDESHOWS'=>	'Configuration of slideshows',
 	'S_SLIDESHOWS_BIG'=>			'SLIDE SHOWS',
 	'S_NO_SLIDESHOWS_DEFINED'=>		'No slide shows defined',
 	'S_COUNT_OF_SLIDES'=>			'Count of slides',
@@ -1911,7 +1921,6 @@
 	'S_AUDIT_LOGS_BIG'=>			'AUDIT LOGS',
 	'S_AUDIT_ACTIONS_BIG'=>			'AUDIT ACTIONS',
 	'S_ACTION'=>				'Action',
-	'S_ACTIONS_BIG'=>				'ACTIONS',
 	'S_DETAILS'=>				'Details',
 	'S_UNKNOWN_ACTION'=>			'Unknown action',
 	'S_ADDED'=>				'Added',
@@ -1923,10 +1932,26 @@
 	'S_ZABBIX_CONFIG'=>			'Zabbix config',
 
 //	profile.php
-	'S_USER_PROFILE_BIG'=>			'USER PROFILE',
+	'S_CLEAR' =>				'Clear',
+	'S_ONCE' =>					'Once',
+	'S_MOVE'=>					'Move',
+	'S_UNMUTE'=>				'Unmute',
+	'S_MUTE'=>					'Mute',
+	'S_SNOOZE'=>				'Snooze',
+	'S_MESSAGES'=>				'Messages',
+	'S_PROBLEM_ON'=>			'Problem on',
+	'S_RECOVERY'=>				'Recovery',
+	'S_GUI_MESSAGING'=>			'GUI Messaging',
+	'S_PLAY_SOUND'=>			'Play sound',
+	'S_MESSAGE_TIMEOUT'=>		'Message timeout',
+	'S_PLAY'=>					'Play',
+	'S_PAUSE'=>					'Pause',
+	'S_STOP'=>					'Stop',
+	'S_LOOP'=>					'Loop',
+	'S_USER_PROFILE_BIG'=>		'USER PROFILE',
 	'S_USER_PROFILE'=>			'User profile',
 	'S_LANGUAGE'=>				'Language',
-	'S_THEME'=>				'Theme',
+	'S_THEME'=>					'Theme',
 	'S_ENGLISH_GB'=>			'English (GB)',
 	'S_FRENCH_FR'=>				'French (FR)',
 	'S_GERMAN_DE'=>				'German (DE)',
@@ -1940,9 +1965,10 @@
 	'S_JAPANESE_JP'=>			'Japanese (JP)',
 	'S_CHINESE_CN'=>			'Chinese (CN)',
 	'S_DUTCH_NL'=>				'Dutch (NL)',
-	'S_HUNGARY_HU'=>			'Hungarian (HU)',
+	'S_HUNGARIAN_HU'=>			'Hungarian (HU)',
 	'S_POLISH_PL'=>				'Polish (PL)',
 	'S_UKRAINIAN_UA'=>			'Ukrainian (UA)',
+	'S_CZECH_CZ'=>				'Czech (CZ)',
 
 //	index.php
 	'S_ZABBIX_BIG'=>			'ZABBIX',
@@ -1953,6 +1979,7 @@
 	'S_HOST_PROFILES'=>			'Host profiles',
 	'S_HOST_PROFILES_BIG'=>			'HOST PROFILES',
 	'S_EXTENDED_HOST_PROFILE'=>		'Extended host profile',
+	'S_EXTENDED_PROFILE'=>		'Extended profile',
 	'S_EXTENDED'=>				'Extended',
 
 //	search.php

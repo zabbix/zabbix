@@ -61,7 +61,6 @@ include_once('include/page_header.php');
 //--------
 ?>
 <?php
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array());
 
 	if(isset($_REQUEST['serviceid'])){
@@ -285,16 +284,11 @@ include_once('include/page_header.php');
 
 			$r_form->addItem(array(S_PERIOD.SPACE, $period_combo));
 
-			$url = '?period='.$period.'&fullscreen='.($_REQUEST['fullscreen']? '0':'1');
-			$fs_icon = new CDiv(SPACE, 'fullscreen');
-			$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-			$fs_icon->addAction('onclick', "javascript: document.location = '".$url."';");
+			$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
 
 			$srv_wdgt = new CWidget('hat_services', $tree->getHTML());
-
 			$srv_wdgt->addPageHeader(S_IT_SERVICES_BIG, $fs_icon);
 			$srv_wdgt->addHeader(S_IT_SERVICES_BIG, $r_form);
-
 			$srv_wdgt->show();
 		}
 		else {

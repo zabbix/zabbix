@@ -64,7 +64,7 @@ class CEvent extends CZBXAPI{
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
 
 		$sql_parts = array(
-			'select' => array('events' => 'e.eventid'),
+			'select' => array('events' => array('e.eventid')),
 			'from' => array('events' => 'events e'),
 			'where' => array(),
 			'order' => array(),
@@ -130,35 +130,45 @@ class CEvent extends CZBXAPI{
 			}
 
 			if(($options['object'] == EVENT_OBJECT_TRIGGER) || ($options['source'] == EVENT_SOURCE_TRIGGER)){
+				if(!is_null($options['triggerids'])){
+					$triggerOptions = array(
+						'triggerids' => $options['triggerids'],
+						'editable' => $options['editable']
+					);
 
-				$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
+					$triggers = CTrigger::get($triggerOptions);
+					$options['triggerids'] = zbx_objectValues($triggers, 'triggerid');
+				}
+				else{
+					$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
 
-				$sql_parts['from']['functions'] = 'functions f';
-				$sql_parts['from']['items'] = 'items i';
-				$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
-				$sql_parts['from']['rights'] = 'rights r';
-				$sql_parts['from']['users_groups'] = 'users_groups ug';
-				$sql_parts['where']['e'] = 'e.object='.EVENT_OBJECT_TRIGGER;
-				$sql_parts['where']['fe'] = 'f.triggerid=e.objectid';
-				$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
-				$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
-				$sql_parts['where'][] = 'r.id=hg.groupid ';
-				$sql_parts['where'][] = 'r.groupid=ug.usrgrpid';
-				$sql_parts['where'][] = 'ug.userid='.$userid;
-				$sql_parts['where'][] = 'r.permission>='.$permission;
-				$sql_parts['where'][] = 'NOT EXISTS( '.
-												' SELECT ff.triggerid '.
-												' FROM functions ff, items ii '.
-												' WHERE ff.triggerid=e.objectid '.
-													' AND ff.itemid=ii.itemid '.
-													' AND EXISTS( '.
-														' SELECT hgg.groupid '.
-														' FROM hosts_groups hgg, rights rr, users_groups gg '.
-														' WHERE hgg.hostid=ii.hostid '.
-															' AND rr.id=hgg.groupid '.
-															' AND rr.groupid=gg.usrgrpid '.
-															' AND gg.userid='.$userid.
-															' AND rr.permission<'.$permission.'))';
+					$sql_parts['from']['functions'] = 'functions f';
+					$sql_parts['from']['items'] = 'items i';
+					$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
+					$sql_parts['from']['rights'] = 'rights r';
+					$sql_parts['from']['users_groups'] = 'users_groups ug';
+					$sql_parts['where']['e'] = 'e.object='.EVENT_OBJECT_TRIGGER;
+					$sql_parts['where']['fe'] = 'f.triggerid=e.objectid';
+					$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
+					$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
+					$sql_parts['where'][] = 'r.id=hg.groupid ';
+					$sql_parts['where'][] = 'r.groupid=ug.usrgrpid';
+					$sql_parts['where'][] = 'ug.userid='.$userid;
+					$sql_parts['where'][] = 'r.permission>='.$permission;
+					$sql_parts['where'][] = 'NOT EXISTS( '.
+													' SELECT ff.triggerid '.
+													' FROM functions ff, items ii '.
+													' WHERE ff.triggerid=e.objectid '.
+														' AND ff.itemid=ii.itemid '.
+														' AND EXISTS( '.
+															' SELECT hgg.groupid '.
+															' FROM hosts_groups hgg, rights rr, users_groups gg '.
+															' WHERE hgg.hostid=ii.hostid '.
+																' AND rr.id=hgg.groupid '.
+																' AND rr.groupid=gg.usrgrpid '.
+																' AND gg.userid='.$userid.
+																' AND rr.permission<'.$permission.'))';
+				}
 			}
 		}
 
@@ -266,14 +276,17 @@ class CEvent extends CZBXAPI{
 
 			$sql_parts['where'][] = DBcondition('e.value', $options['value']);
 		}
-// extendoutput
+// output
 		if($options['output'] == API_OUTPUT_EXTEND){
-			$sql_parts['select']['events'] = 'e.*';
+			$sql_parts['select']['events'] = array('e.*');
 		}
+
 // countOutput
 		if(!is_null($options['countOutput'])){
 			$options['sortfield'] = '';
-			$sql_parts['select'] = array('COUNT(DISTINCT e.eventid) as rowscount');
+			$sql_parts['select'] = array(
+				'events' => array('COUNT(DISTINCT e.eventid) as rowscount')
+			);
 		}
 
 // order
@@ -289,8 +302,9 @@ class CEvent extends CZBXAPI{
 				$sql_parts['where']['o'] = '(e.object-0)='.EVENT_OBJECT_TRIGGER;
 			}
 
-			if(!str_in_array('e.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('e.*', $sql_parts['select'])){
-				$sql_parts['select'][] = 'e.'.$options['sortfield'];
+			$eventFields = $sql_parts['select']['events'];
+			if(!str_in_array('e.'.$options['sortfield'], $eventFields) && !str_in_array('e.*', $eventFields)){
+				$sql_parts['select']['events'][] = 'e.'.$options['sortfield'];
 			}
 		}
 
@@ -298,11 +312,20 @@ class CEvent extends CZBXAPI{
 		if(zbx_ctype_digit($options['limit']) && $options['limit']){
 			$sql_parts['limit'] = $options['limit'];
 		}
-//---------------
 
+// select_********
+		if(($options['output'] != API_OUTPUT_EXTEND) && (!is_null($options['select_hosts']) || !is_null($options['select_triggers']) || !is_null($options['select_items'])))
+		{
+			$sql_parts['select']['events'][] = 'e.object';
+			$sql_parts['select']['events'][] = 'e.objectid';
+		}
+//---------------
 
 		$eventids = array();
 		$triggerids = array();
+
+// Event fields
+		$sql_parts['select']['events'] = implode(',', array_unique($sql_parts['select']['events']));
 
 		$sql_parts['select'] = array_unique($sql_parts['select']);
 		$sql_parts['from'] = array_unique($sql_parts['from']);
@@ -326,7 +349,7 @@ class CEvent extends CZBXAPI{
 				' WHERE '.$sql_where.
 				$sql_order;
 		$db_res = DBselect($sql, $sql_limit);
- //sdi($sql);
+ //SDI($sql);
 		while($event = DBfetch($db_res)){
 			if($options['countOutput'])
 				$result = $event;
@@ -337,7 +360,7 @@ class CEvent extends CZBXAPI{
 					$result[$event['eventid']] = array('eventid' => $event['eventid']);
 				}
 				else{
-					if($event['object'] == EVENT_OBJECT_TRIGGER){
+					if(isset($event['object']) && ($event['object'] == EVENT_OBJECT_TRIGGER)){
 						$triggerids[$event['objectid']] = $event['objectid'];
 					}
 

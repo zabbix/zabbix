@@ -23,6 +23,7 @@
 
 #include "nodesync.h"
 #include "../nodewatcher/nodesender.h"
+#include "../nodewatcher/nodewatcher.h"
 
 static char	*sql = NULL, *buf = NULL, *fld = NULL, *tmp = NULL;
 static int	sql_alloc = 4096, sql_offset, buf_alloc = 128,
@@ -496,6 +497,30 @@ int	node_sync(char *data, int *sender_nodeid, int *nodeid)
 
 	if (0 != *sender_nodeid && 0 != *nodeid)
 	{
+		if (CONFIG_MASTER_NODEID != *sender_nodeid && FAIL == is_direct_slave_node(*sender_nodeid))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "NODE %d: Received configuration changes from unknown node %d",
+					CONFIG_NODEID, *sender_nodeid);
+			res = FAIL;
+			goto quit;
+		}
+
+		if (CONFIG_MASTER_NODEID != *sender_nodeid && CONFIG_NODEID == *nodeid)
+		{
+			zabbix_log(LOG_LEVEL_ERR, "NODE %d: Received configuration changes for this node from a non-master node %d",
+					CONFIG_NODEID, *sender_nodeid);
+			res = FAIL;
+			goto quit;
+		}
+
+		if (CONFIG_NODEID != *nodeid && FAIL == is_slave_node(CONFIG_NODEID, *nodeid))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "NODE %d: Received configuration changes for unknown node %d",
+					CONFIG_NODEID, *nodeid);
+			res = FAIL;
+			goto quit;
+		}
+
 		zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Received configuration changes from %s node %d for node %d datalen %d",
 				CONFIG_NODEID, (sender_nodetype == ZBX_NODE_SLAVE) ? "slave" : "master",
 				*sender_nodeid, *nodeid, datalen);
@@ -523,6 +548,7 @@ int	node_sync(char *data, int *sender_nodeid, int *nodeid)
 			zbx_free(sql);
 		}
 	}
+quit:
 	zbx_free(tmp);
 
 	return res;

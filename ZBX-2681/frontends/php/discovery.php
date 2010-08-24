@@ -67,12 +67,7 @@ include_once('include/page_header.php');
 	$druleid = get_request('druleid', 0);
 	$fullscreen = get_request('fullscreen', 0);
 
-	$url = '?fullscreen='.($_REQUEST['fullscreen']?'0':'1').'&amp;druleid='.$druleid;
-
-	$fs_icon = new CDiv(SPACE,'fullscreen');
-	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-	$fs_icon->addAction('onclick', "javascript: document.location = '".$url."';");
-
+	$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
 	$dscvry_wdgt->addPageHeader(S_STATUS_OF_DISCOVERY_BIG, $fs_icon);
 
 // 2nd header
@@ -133,14 +128,16 @@ include_once('include/page_header.php');
 	ksort($services);
 
 	$header = array(
-			is_show_all_nodes() ? new CCol(S_NODE, 'center') : null,
-			new CCol(make_sorting_link(S_DISCOVERED_DEVICE,'ip'), 'center'),
-			new CCol(S_MONITORED_HOST, 'center'),
-			new CCol(array(S_UPTIME.'/',S_DOWNTIME),'center')
-			);
+		is_show_all_nodes() ? new CCol(S_NODE, 'left') : null,
+		make_sorting_header(S_DISCOVERED_DEVICE,'ip'),
+		new CCol(S_MONITORED_HOST, 'left'),
+		new CCol(array(S_UPTIME.'/',S_DOWNTIME),'left')
+	);
 
+	$css = getUserTheme($USER_DETAILS);
+	$vTextColor = ($css == 'css_od.css')?'&color=white':'';
 	foreach($services as $name => $foo) {
-		$header[] = new CImg('vtext.php?text='.$name);
+		$header[] = new CImg('vtext.php?text='.$name.$vTextColor);
 	}
 
 	$table = new CTableInfo();

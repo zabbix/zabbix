@@ -61,40 +61,5 @@ int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
         init_result(result);
 
-	return	SYSINFO_RET_FAIL;
-}
-
-int     OLD_KERNEL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	char    key[MAX_STRING_LEN];
-        int     ret;
-
-        assert(result);
-
-        init_result(result);
-
-        if(num_param(param) > 1)
-        {
-                return SYSINFO_RET_FAIL;
-        }
-
-        if(get_param(param, 1, key, MAX_STRING_LEN) != 0)
-        {
-                return SYSINFO_RET_FAIL;
-        }
-
-        if(strcmp(key,"maxfiles") == 0)
-        {
-                ret = KERNEL_MAXFILES(cmd, param, flags, result);
-        }
-        else if(strcmp(key,"maxproc") == 0)
-        {
-                ret = KERNEL_MAXPROC(cmd, param, flags, result);
-        }
-        else
-        {
-                ret = SYSINFO_RET_FAIL;
-        }
-
-        return ret;
+	return SYSINFO_RET_FAIL;
 }

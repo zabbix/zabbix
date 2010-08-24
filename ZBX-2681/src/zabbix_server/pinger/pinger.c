@@ -24,8 +24,8 @@
 #include "log.h"
 #include "zlog.h"
 #include "sysinfo.h"
-#include "zbxicmpping.h"
 #include "zbxserver.h"
+#include "zbxicmpping.h"
 
 #include "pinger.h"
 #include "dbcache.h"
