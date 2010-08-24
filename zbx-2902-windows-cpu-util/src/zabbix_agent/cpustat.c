@@ -513,7 +513,7 @@ static void	apply_cpustat(
 		SAVE_CPU_CLOCK_FOR(15);
 	}
 
-#define CALC_CPU_LOAD(type, time)								\
+#define CALC_CPU_UTIL(type, time)								\
 	if ((type) - (type ## time) > 0 && (all) - (all ## time) > 0)				\
 	{											\
 		curr_cpu->type[ZBX_AVG ## time] = 100. * ((double)((type) - (type ## time))) /	\
@@ -524,37 +524,37 @@ static void	apply_cpustat(
 		curr_cpu->type[ZBX_AVG ## time] = 0.;						\
 	}
 
-	CALC_CPU_LOAD(user, 1);
-	CALC_CPU_LOAD(user, 5);
-	CALC_CPU_LOAD(user, 15);
+	CALC_CPU_UTIL(user, 1);
+	CALC_CPU_UTIL(user, 5);
+	CALC_CPU_UTIL(user, 15);
 
-	CALC_CPU_LOAD(system, 1);
-	CALC_CPU_LOAD(system, 5);
-	CALC_CPU_LOAD(system, 15);
+	CALC_CPU_UTIL(system, 1);
+	CALC_CPU_UTIL(system, 5);
+	CALC_CPU_UTIL(system, 15);
 
-	CALC_CPU_LOAD(nice, 1);
-	CALC_CPU_LOAD(nice, 5);
-	CALC_CPU_LOAD(nice, 15);
+	CALC_CPU_UTIL(nice, 1);
+	CALC_CPU_UTIL(nice, 5);
+	CALC_CPU_UTIL(nice, 15);
 
-	CALC_CPU_LOAD(idle, 1);
-	CALC_CPU_LOAD(idle, 5);
-	CALC_CPU_LOAD(idle, 15);
+	CALC_CPU_UTIL(idle, 1);
+	CALC_CPU_UTIL(idle, 5);
+	CALC_CPU_UTIL(idle, 15);
 
-	CALC_CPU_LOAD(interrupt, 1);
-	CALC_CPU_LOAD(interrupt, 5);
-	CALC_CPU_LOAD(interrupt, 15);
+	CALC_CPU_UTIL(interrupt, 1);
+	CALC_CPU_UTIL(interrupt, 5);
+	CALC_CPU_UTIL(interrupt, 15);
 
-	CALC_CPU_LOAD(iowait, 1);
-	CALC_CPU_LOAD(iowait, 5);
-	CALC_CPU_LOAD(iowait, 15);
+	CALC_CPU_UTIL(iowait, 1);
+	CALC_CPU_UTIL(iowait, 5);
+	CALC_CPU_UTIL(iowait, 15);
 
-	CALC_CPU_LOAD(softirq, 1);
-	CALC_CPU_LOAD(softirq, 5);
-	CALC_CPU_LOAD(softirq, 15);
+	CALC_CPU_UTIL(softirq, 1);
+	CALC_CPU_UTIL(softirq, 5);
+	CALC_CPU_UTIL(softirq, 15);
 
-	CALC_CPU_LOAD(steal, 1);
-	CALC_CPU_LOAD(steal, 5);
-	CALC_CPU_LOAD(steal, 15);
+	CALC_CPU_UTIL(steal, 1);
+	CALC_CPU_UTIL(steal, 5);
+	CALC_CPU_UTIL(steal, 15);
 }
 
 #endif /* not _WINDOWS */
