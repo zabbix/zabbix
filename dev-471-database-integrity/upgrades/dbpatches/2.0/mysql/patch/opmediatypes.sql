@@ -1,6 +1,8 @@
-ALTER TABLE opmediatypes MODIFY opmediatypeid bigint unsigned NOT NULL,
+DROP INDEX opmediatypes_1 ON opmediatypes;
+ALTER TABLE opmediatypes DROP opmediatypeid,
 			 MODIFY operationid bigint unsigned NOT NULL,
-			 MODIFY mediatypeid bigint unsigned NOT NULL;
+			 MODIFY mediatypeid bigint unsigned NOT NULL,
+			 ADD PRIMARY KEY (operationid);
 DELETE FROM opmediatypes WHERE operationid NOT IN (SELECT operationid FROM operations);
 DELETE FROM opmediatypes WHERE mediatypeid NOT IN (SELECT mediatypeid FROM media_type);
 ALTER TABLE opmediatypes ADD CONSTRAINT c_opmediatypes_1 FOREIGN KEY (operationid) REFERENCES operations (operationid) ON DELETE CASCADE;

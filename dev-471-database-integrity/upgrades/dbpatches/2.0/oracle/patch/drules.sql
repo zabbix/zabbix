@@ -1,10 +1,8 @@
 CREATE TABLE druleuniq (
-	druleuniqid              number(20)                                	NOT NULL,
-	druleid                  number(20)                                	NOT NULL,
-	dcheckid                 number(20)                                	NOT NULL,
-	PRIMARY KEY (druleuniqid)
+	druleid number(20) NOT NULL,
+	dcheckid number(20) NOT NULL,
+	PRIMARY KEY (druleid)
 );
-CREATE UNIQUE INDEX druleuniq_1 on druleuniq (druleid);
 ALTER TABLE druleuniq ADD CONSTRAINT c_druleuniq_1 FOREIGN KEY (druleid) REFERENCES drules (druleid) ON DELETE CASCADE;
 ALTER TABLE druleuniq ADD CONSTRAINT c_druleuniq_2 FOREIGN KEY (dcheckid) REFERENCES dchecks (dcheckid) ON DELETE CASCADE;
 

@@ -225,28 +225,59 @@ sub process_field
 	local $line=$_[0];
 
 	newstate("field");
-	($name,$type,$default,$null,$flags,$relN,$rel,$ref,$ref_option)=split(/\|/, $line,9);
+	($name,$type,$default,$null,$flags,$relN,$fk_table,$fk_field,$fk_type)=split(/\|/, $line,9);
 	($type_short)=split(/\(/, $type,2);
 	if($output{"type"} eq "code")
 	{
-		$type=$output{$type_short};
-#{"linkid",      ZBX_TYPE_INT,   ZBX_SYNC},
-		if ($null eq "NOT NULL") {
-			if ($flags ne "0") {
+		$type = $output{$type_short};
+
+		if ($null eq "NOT NULL")
+		{
+			if ($flags ne "0")
+			{
 				$flags="ZBX_NOTNULL | ".$flags;
-			} else {
+			}
+			else
+			{
 				$flags="ZBX_NOTNULL";
 			}
 		}
-		for ($flags) {
+
+		for ($flags)
+		{
 			s/,/ \| /;
 		}
-		if ($rel) {
-			$rel = "\"${rel}\"";
-		} else {
-			$rel = "NULL";
+
+		if ($fk_table)
+		{
+			if($fk_field eq "")
+			{
+				$fk_field = "${name}";
+			}
+			$fk_table = "\"${fk_table}\"";
+			$fk_field = "\"${fk_field}\"";
+
+			if ($fk_type eq "")
+			{
+				$fk_type = "ZBX_FK_CASCADE_DELETE";
+			}
+			elsif ($fk_type eq "RESTRICT")
+			{
+				$fk_type = "ZBX_FK_RESTRICT";
+			}
+			else
+			{
+				$fk_type = "0";
+			}
 		}
-		print "\t\t{\"${name}\",\t$type,\t${flags},\t${rel}}";
+		else
+		{
+			$fk_table = "NULL";
+			$fk_field = "NULL";
+			$fk_type = "0";
+		}
+
+		print "\t\t{\"${name}\",\t$type,\t${flags},\t${fk_table},\t${fk_field},\t${fk_type}}";
 	}
 	else
 	{
@@ -305,22 +336,22 @@ sub process_field
 
 		if($relN ne "" and $relN ne "-")
 		{
-			if($ref eq "")
+			if($fk_field eq "")
 			{
-				$ref="${name}";
+				$fk_field="${name}";
 			}
 
-			if($ref_option eq "")
+			if($fk_type eq "")
 			{
-				$ref_option=" ON DELETE CASCADE";
+				$fk_type=" ON DELETE CASCADE";
 			}
-			elsif($ref_option eq "RESTRICT")	# not default option
+			elsif($fk_type eq "RESTRICT")	# not default option
 			{
-				$ref_option="";
+				$fk_type="";
 			}
 			else
 			{
-				$ref_option=" ON DELETE ${ref_option}";
+				$fk_type=" ON DELETE ${fk_type}";
 			}
 
 			if($output{"database"} eq "postgresql")
@@ -334,7 +365,7 @@ sub process_field
 
 			$cname = "c_${table_name}_${relN}";
 
-			$constraints = "${constraints}ALTER TABLE${only} ${table_name}\n    ADD CONSTRAINT ${cname}\n        FOREIGN KEY (${name}) REFERENCES ${rel} (${ref})${ref_option}$output{'exec_cmd'}";
+			$constraints = "${constraints}ALTER TABLE${only} ${table_name}\n    ADD CONSTRAINT ${cname}\n        FOREIGN KEY (${name}) REFERENCES ${fk_table} (${fk_field})${fk_type}$output{'exec_cmd'}";
 		}
 		printf "\t%-24s %-15s %-25s %s", $name, $type_2, $default, $row;
 	}
