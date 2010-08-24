@@ -9,6 +9,6 @@ UPDATE graphs SET templateid=NULL WHERE NOT templateid IS NULL AND NOT templatei
 DROP TABLE tmp_graphs_graphid;
 UPDATE graphs SET ymin_itemid=NULL WHERE ymin_itemid=0;
 UPDATE graphs SET ymax_itemid=NULL WHERE ymax_itemid=0;
-ALTER TABLE graphs ADD CONSTRAINT c_graphs_1 FOREIGN KEY (templateid) REFERENCES graphs (graphid) ON DELETE CASCADE;
-ALTER TABLE graphs ADD CONSTRAINT c_graphs_2 FOREIGN KEY (ymin_itemid) REFERENCES items (itemid) ON DELETE CASCADE;
-ALTER TABLE graphs ADD CONSTRAINT c_graphs_3 FOREIGN KEY (ymax_itemid) REFERENCES items (itemid) ON DELETE CASCADE;
+ALTER TABLE graphs ADD CONSTRAINT c_graphs_1 FOREIGN KEY (templateid) REFERENCES graphs (graphid) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE graphs ADD CONSTRAINT c_graphs_2 FOREIGN KEY (ymin_itemid) REFERENCES items (itemid) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE graphs ADD CONSTRAINT c_graphs_3 FOREIGN KEY (ymax_itemid) REFERENCES items (itemid) ON UPDATE CASCADE ON DELETE CASCADE;

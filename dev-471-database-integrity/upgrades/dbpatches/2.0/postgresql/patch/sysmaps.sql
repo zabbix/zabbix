@@ -17,4 +17,4 @@ UPDATE sysmaps SET markelements=1 WHERE highlight>3  AND highlight<8;
 UPDATE sysmaps SET highlight=(highlight-4) WHERE highlight>3;
 UPDATE sysmaps SET expandproblem=0 WHERE highlight>1 AND highlight<4;
 UPDATE sysmaps SET highlight=(highlight-2) WHERE highlight>1;
-ALTER TABLE ONLY sysmaps ADD CONSTRAINT c_sysmaps_1 FOREIGN KEY (backgroundid) REFERENCES images (imageid);
+ALTER TABLE ONLY sysmaps ADD CONSTRAINT c_sysmaps_1 FOREIGN KEY (backgroundid) REFERENCES images (imageid) ON UPDATE CASCADE;
