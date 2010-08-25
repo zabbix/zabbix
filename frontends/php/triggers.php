@@ -290,7 +290,8 @@ include_once('include/page_header.php');
 		$options = array(
 			'triggerids' => $_REQUEST['g_triggerid'],
 			'editable' => 1,
-			'output' => API_OUTPUT_EXTEND
+			'output' => API_OUTPUT_EXTEND,
+			'select_hosts' => API_OUTPUT_EXTEND
 		);
 
 		$triggers = CTrigger::get($options);
@@ -315,10 +316,12 @@ include_once('include/page_header.php');
 				$serv_status = (isset($_REQUEST['group_enable']))?get_service_status_of_trigger($trigger['triggerid']):0;
 
 				update_services($trigger['triggerid'], $serv_status); // updating status to all services by the dependency
+
+				$host = reset($trigger['hosts]']);
 				add_audit_ext(AUDIT_ACTION_UPDATE,
 								AUDIT_RESOURCE_TRIGGER,
 								$trigger['triggerid'],
-								$trigger['description'],
+								$host['host'].':'.$trigger['description'],
 								'triggers',
 								$status_old,
 								$status_new);
@@ -372,7 +375,7 @@ include_once('include/page_header.php');
 		show_messages($go_result, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
 	}
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['g_triggerid'])){
-		$options = array('extendoutput'=>1, 'editable'=>1);
+		$options = array('extendoutput'=>1, 'editable'=>1, 'select_hosts' => API_OUTPUT_EXTEND);
 		$options['triggerids'] = $_REQUEST['g_triggerid'];
 
 		$triggers = CTrigger::get($options);
@@ -387,8 +390,9 @@ include_once('include/page_header.php');
 				error(S_CANNOT_DELETE_TRIGGER.' [ '.$description.' ] ('.S_TEMPLATED_TRIGGER.')');
 				continue;
 			}
+			$host = reset($trigger['hosts]']);
 
-			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $triggerid, $description, NULL, NULL, NULL);
+			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $triggerid, $host['host'].':'.$description, NULL, NULL, NULL);
 		}
 
 		$go_result = !empty($triggers);
