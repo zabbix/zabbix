@@ -140,7 +140,7 @@ if(isset($_REQUEST['make'])){
 	$frmLcls->Show();
 }
 else if(isset($_REQUEST['next'])){
-	$help = new CHelp('web.view.php','left');
+	$help = new CHelp('web.view.php');
 	$help_table = new CTableInfo();
 	$help_table->setAttribute('style', 'width: 600px;');
 
