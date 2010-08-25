@@ -25,7 +25,6 @@ typedef enum {
 	ZBX_TCP_ERR_TIMEOUT
 } zbx_tcp_errors;
 
-
 #if defined(SOCKET) || defined(_WINDOWS)
 	typedef SOCKET ZBX_SOCKET;
 #else /* not SOCKET && not _WINDOWS */

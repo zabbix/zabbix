@@ -106,96 +106,6 @@ class czbxrpc{
 
 		self::$result = $result;
 	}
-// USER
-	private static function user($action, $params){
-
-		CUser::$error = array();
-
-		switch($action){
-			default:
-			$result = call_user_func(array('CUser', $action), $params);
-		}
-
-		self::$result = $result;
-	}
-
-// HOST GROUP
-	private static function hostgroup($action, $params){
-
-		CHostGroup::$error = array();
-
-		switch($action){
-			default:
-			$result = call_user_func(array('CHostGroup', $action), $params);
-		}
-
-		self::$result = $result;
-	}
-
-// TEMPLATE
-	private static function template($action, $params){
-
-		CTemplate::$error = array();
-
-		switch($action){
-			default:
-			$result = call_user_func(array('CTemplate', $action), $params);
-		}
-
-		self::$result = $result;
-	}
-
-// HOST
-	private static function host($action, $params){
-
-		CHost::$error = array();
-
-		switch($action){
-			default:
-			$result = call_user_func(array('CHost', $action), $params);
-		}
-
-		self::$result = $result;
-	}
-
-// ITEM
-	private static function item($action, $params){
-
-		CItem::$error = array();
-
-		switch($action){
-			default:
-			$result = call_user_func(array('CItem', $action), $params);
-		}
-
-		self::$result = $result;
-	}
-
-// TRIGGER
-	private static function trigger($action, $params){
-
-		CTrigger::$error = array();
-
-		switch($action){
-			default:
-			$result = call_user_func(array('CTrigger', $action), $params);
-		}
-
-		self::$result = $result;
-	}
-
-// GRAPH
-	private static function graph($action, $params){
-
-		CGraph::$error = array();
-
-		switch($action){
-			default:
-			$result = call_user_func(array('CGraph', $action), $params);
-		}
-
-		self::$result = $result;
-	}
 
 // ACTION
 	private static function action($action, $params){
@@ -236,6 +146,58 @@ class czbxrpc{
 		self::$result = $result;
 	}
 
+// DCheck
+	private static function dcheck($action, $params){
+
+		CDCheck::$error = array();
+
+		switch($action){
+			default:
+			$result = call_user_func(array('CDCheck', $action), $params);
+		}
+
+		self::$result = $result;
+	}
+
+// DHost
+	private static function dhost($action, $params){
+
+		CDHost::$error = array();
+
+		switch($action){
+			default:
+			$result = call_user_func(array('CDHost', $action), $params);
+		}
+
+		self::$result = $result;
+	}
+
+// DRule
+	private static function drule($action, $params){
+
+		CDRule::$error = array();
+
+		switch($action){
+			default:
+			$result = call_user_func(array('CDRule', $action), $params);
+		}
+
+		self::$result = $result;
+	}
+
+// DService
+	private static function dservice($action, $params){
+
+		CDService::$error = array();
+
+		switch($action){
+			default:
+			$result = call_user_func(array('CDService', $action), $params);
+		}
+
+		self::$result = $result;
+	}
+
 // EVENT
 	private static function event($action, $params){
 
@@ -244,6 +206,19 @@ class czbxrpc{
 		switch($action){
 			default:
 			$result = call_user_func(array('CEvent', $action), $params);
+		}
+
+		self::$result = $result;
+	}
+
+// GRAPH
+	private static function graph($action, $params){
+
+		CGraph::$error = array();
+
+		switch($action){
+			default:
+			$result = call_user_func(array('CGraph', $action), $params);
 		}
 
 		self::$result = $result;
@@ -276,6 +251,58 @@ class czbxrpc{
 		self::$result = $result;
 	}
 
+// HOST
+	private static function host($action, $params){
+
+		CHost::$error = array();
+
+		switch($action){
+			default:
+			$result = call_user_func(array('CHost', $action), $params);
+		}
+
+		self::$result = $result;
+	}
+
+// HOST GROUP
+	private static function hostgroup($action, $params){
+
+		CHostGroup::$error = array();
+
+		switch($action){
+			default:
+			$result = call_user_func(array('CHostGroup', $action), $params);
+		}
+
+		self::$result = $result;
+	}
+
+// IMAGE
+	private static function image($action, $params){
+
+		CImage::$error = array();
+
+		switch($action){
+			default:
+			$result = call_user_func(array('CImage', $action), $params);
+		}
+
+		self::$result = $result;
+	}
+
+// ITEM
+	private static function item($action, $params){
+
+		CItem::$error = array();
+
+		switch($action){
+			default:
+			$result = call_user_func(array('CItem', $action), $params);
+		}
+
+		self::$result = $result;
+	}
+
 // MAINTENANCE
 	private static function maintenance($action, $params){
 
@@ -302,6 +329,32 @@ class czbxrpc{
 		self::$result = $result;
 	}
 
+// MEDIATYPE
+	private static function mediatype($action, $params){
+
+		CMediatype::$error = array();
+
+		switch($action){
+			default:
+			$result = call_user_func(array('CMediatype', $action), $params);
+		}
+
+		self::$result = $result;
+	}
+
+// PROXY
+	private static function proxy($action, $params){
+
+		CProxy::$error = array();
+
+		switch($action){
+			default:
+			$result = call_user_func(array('CProxy', $action), $params);
+		}
+
+		self::$result = $result;
+	}
+
 // SCREEN
 	private static function screen($action, $params){
 
@@ -323,6 +376,47 @@ class czbxrpc{
 		switch($action){
 			default:
 			$result = call_user_func(array('CScript', $action), $params);
+		}
+
+		self::$result = $result;
+	}
+
+// TEMPLATE
+	private static function template($action, $params){
+
+		CTemplate::$error = array();
+
+		switch($action){
+			default:
+			$result = call_user_func(array('CTemplate', $action), $params);
+		}
+
+		self::$result = $result;
+	}
+
+
+// TRIGGER
+	private static function trigger($action, $params){
+
+		CTrigger::$error = array();
+
+		switch($action){
+			default:
+			$result = call_user_func(array('CTrigger', $action), $params);
+		}
+
+		self::$result = $result;
+	}
+
+
+// USER
+	private static function user($action, $params){
+
+		CUser::$error = array();
+
+		switch($action){
+			default:
+			$result = call_user_func(array('CUser', $action), $params);
 		}
 
 		self::$result = $result;

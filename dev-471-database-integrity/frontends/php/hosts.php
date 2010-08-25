@@ -483,16 +483,35 @@ include_once('include/page_header.php');
 			);
 
 			if($create_new){
-				$host = CHost::create($host);
-				if($host){
-					$hostid = reset($host['hostids']);
+				$hostids = CHost::create($host);
+				if($hostids){
+					$hostid = reset($hostids['hostids']);
 				}
 				else throw new Exception();
+
+				add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST,
+					$hostid,
+					$host['host'],
+					null,null,null);
 			}
 			else{
 				$hostid = $host['hostid'] = $_REQUEST['hostid'];
 				$host['templates_clear'] = $templates_clear;
+
+				$host_old = CHost::get(array('hostids' => $hostid, 'editable' => 1, 'output' => API_OUTPUT_EXTEND));
+				$host_old = reset($host_old);
+
 				if(!CHost::update($host)) throw new Exception();
+
+				$host_new = CHost::get(array('hostids' => $hostid, 'editable' => 1, 'output' => API_OUTPUT_EXTEND));
+				$host_new = reset($host_new);
+
+				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST,
+					$host['hostid'],
+					$host['host'],
+					'hosts',
+					$host_old,
+					$host_new);
 			}
 
 // FULL CLONE {{{

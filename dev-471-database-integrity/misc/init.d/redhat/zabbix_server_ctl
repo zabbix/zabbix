@@ -37,7 +37,7 @@ BASEDIR=/opt/zabbix
 # PID file
 PIDFILE=/var/tmp/zabbix_server.pid
 # binary file
-ZABBIX_SUCKERD=$BASEDIR/bin/zabbix_server
+ZABBIX_SUCKERD=$BASEDIR/sbin/zabbix_server
 
 
 # **************

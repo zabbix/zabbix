@@ -176,7 +176,8 @@ retry:
 			{
 				/* Format the message from the message DLL with the insert strings */
 				if (0 != FormatMessage(FORMAT_MESSAGE_FROM_HMODULE | FORMAT_MESSAGE_ALLOCATE_BUFFER |
-						FORMAT_MESSAGE_ARGUMENT_ARRAY | FORMAT_MESSAGE_FROM_SYSTEM,
+						FORMAT_MESSAGE_ARGUMENT_ARRAY | FORMAT_MESSAGE_FROM_SYSTEM |
+						FORMAT_MESSAGE_MAX_WIDTH_MASK,	/* do not generate new line breaks */
 						hLib,				/* the messagetable DLL handle */
 						pELR->EventID,			/* message ID */
 						MAKELANGID(LANG_NEUTRAL, SUBLANG_ENGLISH_US),	/* language ID */
@@ -185,6 +186,7 @@ retry:
 						(va_list *)aInsertStrs))			/* array of insert strings for the message */
 				{
 					*out_message = zbx_unicode_to_utf8(msgBuf);
+					zbx_rtrim(*out_message, "\r\n ");
 
 					/* Free the buffer that FormatMessage allocated for us. */
 					LocalFree((HLOCAL)msgBuf);

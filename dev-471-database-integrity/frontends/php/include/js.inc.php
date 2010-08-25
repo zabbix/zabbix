@@ -115,18 +115,17 @@ function insert_show_color_picker_javascript(){
 	if($SHOW_COLOR_PICKER_SCRIPT_ISERTTED) return;
 	$SHOW_COLOR_PICKER_SCRIPT_ISERTTED = true;
 
-	$table = '';
+	$table = new CTable();
 
-	$table .= '<table cellspacing="0" cellpadding="1">';
-	$table .= '<tr>';
-	/* gray colors */
+// gray colors
+	$row = array();
 	foreach(array('0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F') as $c){
 		$color = $c.$c.$c.$c.$c.$c;
-		$table .= '<td>'.unpack_object(new CColorCell(null, $color, 'set_color(\\\''.$color.'\\\')')).'</td>';
+		$row[] = new CColorCell(null, $color, 'set_color("'.$color.'");');
 	}
-	$table .= '</tr>';
+	$table->addRow($row);
 
-	/* other colors */
+// other colors
 	$colors = array(
 		array('r' => 0, 'g' => 0, 'b' => 1),
 		array('r' => 0, 'g' => 1, 'b' => 0),
@@ -134,7 +133,7 @@ function insert_show_color_picker_javascript(){
 		array('r' => 0, 'g' => 1, 'b' => 1),
 		array('r' => 1, 'g' => 0, 'b' => 1),
 		array('r' => 1, 'g' => 1, 'b' => 0)
-		);
+	);
 
 	$brigs  = array(
 		array(0 => '0', 1 => '3'),
@@ -156,27 +155,27 @@ function insert_show_color_picker_javascript(){
 		);
 
 	foreach($colors as $c){
-		$table .= '<tr>';
+		$row = array();
 		foreach($brigs as $br){
 			$r = $br[$c['r']];
 			$g = $br[$c['g']];
 			$b = $br[$c['b']];
 
 			$color = $r.$r.$g.$g.$b.$b;
-
-			$table .= '<td>'.unpack_object(new CColorCell(null, $color, 'set_color(\\\''.$color.'\\\')')).'</td>';
+			$row[] = new CColorCell(null, $color, 'set_color("'.$color.'");');
 		}
-		$table .= '</tr>';
+		$table->addRow($row);
 	}
-	$table .= '</table>';
-	$cancel = '<span onclick="javascript:hide_color_picker();" class="link">'.S_CANCEL.'</span>';
 
+	$cancel = new CSpan(S_CANCEL, 'link');
+	$cancel->setAttribute('onclick', 'javascript:hide_color_picker();');
 
 	$script = 'var color_picker = null;
 				var curr_lbl = null;
 				var curr_txt = null;'."\n";
 
-	$script.= "var color_table = '".$table.$cancel."'\n";
+	$tmp = array($table, $cancel);
+	$script.= "var color_table = ".zbx_jsvalue(unpack_object($tmp))."\n";
 	insert_js($script);
 
 	zbx_add_post_js('create_color_picker();');

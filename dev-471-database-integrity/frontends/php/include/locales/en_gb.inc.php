@@ -1246,7 +1246,7 @@
 	'S_MAINTENANCE_BIG'=>			'MAINTENANCE',
 
 //	sysmaps.php
-	'S_IMAGE_IS_USED_IN_ZABBIX_MAP' => 'Image is used in ZABBIX map',
+	'S_IMAGE_IS_USED_IN_ZABBIX_MAP' => 'Image is used in Zabbix map',
 	'S_EDIT_MAP_ELEMENT'=>			'Edit map element',
 	'S_ICON_DEFAULT'=>			'Icon (default)',
 	'S_APPLY'=>					'Apply',
@@ -1925,7 +1925,6 @@
 	'S_AUDIT_LOGS_BIG'=>			'AUDIT LOGS',
 	'S_AUDIT_ACTIONS_BIG'=>			'AUDIT ACTIONS',
 	'S_ACTION'=>				'Action',
-	'S_ACTIONS_BIG'=>				'ACTIONS',
 	'S_DETAILS'=>				'Details',
 	'S_UNKNOWN_ACTION'=>			'Unknown action',
 	'S_ADDED'=>				'Added',

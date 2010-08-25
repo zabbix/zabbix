@@ -274,17 +274,18 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 		/* Slave node history ? */
 		if (strncmp(s, "History", 7) == 0)
 		{
-/*			zabbix_log( LOG_LEVEL_WARNING, "Slave node history received [len:%d]", strlen(s)); */
-			if (node_history(s, datalen) == SUCCEED)
+			const char	*reply;
+
+			reply = (SUCCEED == node_history(s, datalen) ? "OK" : "FAIL");
+
+			alarm(CONFIG_TIMEOUT);
+			if (SUCCEED != zbx_tcp_send_raw(sock, reply))
 			{
-				alarm(CONFIG_TIMEOUT);
-				if (zbx_tcp_send_raw(sock,"OK") != SUCCEED)
-				{
-					zabbix_log( LOG_LEVEL_WARNING, "Error sending confirmation to node");
-					zabbix_syslog("Trapper: error sending confirmation to node");
-				}
-				alarm(0);
+				zabbix_log(LOG_LEVEL_WARNING, "Error sending %s to node", reply);
+				zabbix_syslog("Trapper: error sending %s to node", reply);
 			}
+			alarm(0);
+
 			return ret;
 		}
 		/* JSON protocol? */

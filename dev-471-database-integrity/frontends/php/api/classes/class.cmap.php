@@ -589,9 +589,7 @@ COpt::memoryPick();
  * @param array $sysmaps['sysmapid']
  * @return boolean
  */
-	public static function delete($sysmaps){
-		$sysmapids = zbx_objectValues($sysmaps, 'sysmapid');
-
+	public static function delete($sysmapids){
 		try{
 			self::BeginTransaction(__METHOD__);
 

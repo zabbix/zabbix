@@ -16,7 +16,7 @@
 RETVAL=0
 prog="Zabbix Server"
 CONFIG_FILE="/etc/zabbix/zabbix_server.conf"
-ZABBIX_BIN="/usr/bin/zabbix_server"
+ZABBIX_BIN="/usr/sbin/zabbix_server"
 
 test -x $ZABBIX_BIN || exit 0
 

@@ -169,9 +169,6 @@ class CHost extends CZBXAPI{
 			if(!is_null($options['select_macros'])){
 				$options['select_macros'] = API_OUTPUT_EXTEND;
 			}
-			if(!is_null($options['select_profile'])){
-				$options['select_profile'] = API_OUTPUT_EXTEND;
-			}
 		}
 
 		if(is_array($options['output'])){
@@ -734,7 +731,7 @@ Copt::memoryPick();
 		}
 
 // Adding Profiles
-		if(!is_null($options['select_profile']) && str_in_array($options['select_profile'], $subselects_allowed_outputs)){
+		if(!is_null($options['select_profile'])){
 			$sql = 'SELECT hp.* '.
 				' FROM hosts_profiles hp '.
 				' WHERE '.DBcondition('hp.hostid', $hostids);
@@ -1276,17 +1273,20 @@ Copt::memoryPick();
  *
  * @param array $data
  * @param array $data['groups']
- * @param array $data['hosts']
- * @return boolean
+ * @param array $data['templates']
+ * @param array $data['macros']
+ * @return array
  */
 	public static function massAdd($data){
+		$data['hosts'] = zbx_toArray($data['hosts']);
+
 		try{
 			self::BeginTransaction(__METHOD__);
 
 			if(isset($data['groups'])){
 				$options = array(
 					'groups' => zbx_toArray($data['groups']),
-					'hosts' => zbx_toArray($data['hosts'])
+					'hosts' => $data['hosts']
 				);
 				$result = CHostGroup::massAdd($options);
 				if(!$result) self::exception();
@@ -1294,7 +1294,7 @@ Copt::memoryPick();
 
 			if(isset($data['templates'])){
 				$options = array(
-					'hosts' => zbx_toArray($data['hosts']),
+					'hosts' => $data['hosts'],
 					'templates' => zbx_toArray($data['templates'])
 				);
 				$result = CTemplate::massAdd($options);
@@ -1303,7 +1303,7 @@ Copt::memoryPick();
 
 			if(isset($data['macros'])){
 				$options = array(
-					'hosts' => zbx_toArray($data['hosts']),
+					'hosts' => $data['hosts'],
 					'macros' => $data['macros']
 				);
 				$result = CUserMacro::massAdd($options);
@@ -1311,7 +1311,7 @@ Copt::memoryPick();
 			}
 
 			self::EndTransaction(true, __METHOD__);
-			return true;
+			return array('hostids' => zbx_objectValues($data['hosts'], 'hostid'));
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
@@ -1354,7 +1354,7 @@ Copt::memoryPick();
 			$options = array(
 				'hostids' => $hostids,
 				'editable' => 1,
-				'extendoutput' => 1,
+				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1,
 			);
 			$upd_hosts = self::get($options);
@@ -1480,7 +1480,7 @@ Copt::memoryPick();
 
 // UPDATE MACROS {{{
 			if(isset($data['macros']) && !is_null($data['macros'])){
-				$host_macros = CUserMacro::get(array('hostids' => $hostids, 'extendoutput' => 1));
+				$host_macros = CUserMacro::get(array('hostids' => $hostids, 'output' => API_OUTPUT_EXTEND,));
 
 				$macros_to_del = array();
 				foreach($host_macros as $hmacro){
@@ -1614,9 +1614,7 @@ Copt::memoryPick();
 // }}} EXTENDED PROFILE
 
 			self::EndTransaction(true, __METHOD__);
-
-			$upd_hosts = self::get(array('hostids' => $hostids, 'extendoutput' => 1, 'nopermissions' => 1));
-			return $upd_hosts;
+			return array('hostids' => $hostids);
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
@@ -1631,18 +1629,21 @@ Copt::memoryPick();
  * remove Hosts to HostGroups. All Hosts are added to all HostGroups.
  *
  * @param array $data
- * @param array $data['groups']
  * @param array $data['hosts']
- * @return boolean
+ * @param array $data['templates']
+ * @param array $data['macros']
+ * @return array
  */
 	public static function massRemove($data){
+		$data['hosts'] = zbx_toArray($data['hosts']);
+
 		try{
 			self::BeginTransaction(__METHOD__);
 
 			if(isset($data['groups'])){
 				$options = array(
-					'groups' => zbx_toArray($data['groups']),
-					'hosts' => zbx_toArray($data['hosts'])
+					'hosts' => $data['hosts'],
+					'groups' => zbx_toArray($data['groups'])
 				);
 				$result = CHostGroup::massRemove($options);
 				if(!$result) self::exception();
@@ -1650,7 +1651,7 @@ Copt::memoryPick();
 
 			if(isset($data['templates'])){
 				$options = array(
-					'hosts' => zbx_toArray($data['hosts']),
+					'hosts' => $data['hosts'],
 					'templates' => zbx_toArray($data['templates'])
 				);
 				$result = CTemplate::massRemove($options);
@@ -1659,7 +1660,7 @@ Copt::memoryPick();
 
 			if(isset($data['macros'])){
 				$options = array(
-					'hosts' => zbx_toArray($data['hosts']),
+					'hosts' => $data['hosts'],
 					'macros' => $data['macros']
 				);
 				$result = CUserMacro::massRemove($options);
@@ -1667,7 +1668,7 @@ Copt::memoryPick();
 			}
 
 			self::EndTransaction(true, __METHOD__);
-			return true;
+			return array('hostids' => zbx_objectValues($data['hosts'], 'hostid'));
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
