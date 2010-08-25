@@ -1,7 +1,7 @@
 var ie6pngfix = {
 root:				false,
 applyPositioning:	false,
-shim:				'images/genereal/x.gif',	// Path to a transparent GIF image
+shim:				'images/general/x.gif',	// Path to a transparent GIF image
 
 run: function(el) {
 	this.root = el;
