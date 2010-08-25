@@ -7,6 +7,7 @@ Changes for 1.9
 
 Changes for 1.8.4rc1
 
+ - [ZBX-2925] empty values for translations wont be written to resulting file (Vedmak)
  - [ZBX-2933] fixed js error in IE when Print button pressed (Vedmak)
  - [ZBX-2937] fixed not found style files for is (Vedmak)
  - [ZBX-2864] fixed print button creating multiple sid url parameters (Vedmak)

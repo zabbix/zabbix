@@ -89,7 +89,8 @@ $output = '<?php
 			$value = str_replace('\"', '"', addslashes($value));
 
 //			$value = preg_replace("/([^\\\])\'/uU", "$1\\\'", $value);
-			$output.= "'".zbx_strtoupper($key)."'=>\t\t\t'".$value."',\n\t";
+			if(!empty($value))
+				$output.= "'".zbx_strtoupper($key)."'=>\t\t\t'".$value."',\n\t";
 		}
 
 $output.='
