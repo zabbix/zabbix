@@ -7,6 +7,7 @@ Changes for 1.9
 
 Changes for 1.8.4rc1
 
+ - [ZBX-2914] Gentoo initscript cleanup (Richlv)
  - [ZBX-2914] fixed incorrect references in Fedora initscripts (Richlv)
  - [ZBX-2925] empty values for translations won't be written to resulting file (Vedmak)
  - [ZBX-2933] fixed js error in IE when Print button pressed (Vedmak)
