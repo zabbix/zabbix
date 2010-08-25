@@ -5,7 +5,7 @@
 #				Tested on Fedora Core 2 - 5
 #				Should work on all Fedora Core versions
 #
-# @name:	zabbix_serverd
+# @name:	zabbix_server
 # @author:	Alexander Hagenah <hagenah@topconcepts.com>
 # @created:	18.04.2006
 #
@@ -111,4 +111,3 @@ EOF
 esac
 
 exit 0
-
