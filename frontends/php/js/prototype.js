@@ -178,9 +178,9 @@ var Class = (function() {
       case 'boolean': return object.toString();
     }
 
-    if (object === null) return 'null';
-    if (object.toJSON) return object.toJSON();
-    if (isElement(object)) return;
+	if (object === null) return 'null';
+	if (object.toJSON) return object.toJSON();
+	if (isElement(object)) return;
 
     var results = [];
     for (var property in object) {

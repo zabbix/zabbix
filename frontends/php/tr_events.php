@@ -93,11 +93,7 @@
 // Main widget header
 	$text = array(S_EVENTS_BIG.': "'.$trigger['exp_desc'].'"');
 
-	$url = '?fullscreen='.($_REQUEST['fullscreen']?'0':'1').url_param('triggerid').url_param('eventid');
-	$fs_icon = new CDiv(SPACE, 'fullscreen');
-	$fs_icon->setAttribute('title',$_REQUEST['fullscreen'] ? S_NORMAL.' '.S_VIEW : S_FULLSCREEN);
-	$fs_icon->addAction('onclick', "javascript: document.location = '".$url."';");
-
+	$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
 	$tr_event_wdgt->addHeader($text, $fs_icon);
 //-------
 

@@ -233,10 +233,9 @@ private $items;
 		}
 
 		if(!is_null($this->state)){
-			$icon = new CDiv(SPACE, $this->state?'arrowup':'arrowdown');
+			$icon = new CIcon(S_SHOW.'/'.S_HIDE, $this->state?'arrowup':'arrowdown',
+					"change_hat_state(this,'".$this->domid."');");
 			$icon->setAttribute('id',$this->domid.'_icon');
-			$icon->setAttribute('title',S_SHOW.'/'.S_HIDE);
-			$icon->addAction('onclick', "javascript: change_hat_state(this,'".$this->domid."');");
 			$right_row[] = new CCol($icon);
 		}
 
@@ -269,7 +268,7 @@ private $items;
 			hide_form_items($col1);
 			hide_form_items($col2);
 //if empty header than do not show it
-			if(($col1 == SPACE) && ($col2 == SPACE)) return new CJSscript('');
+			if(($col1 === SPACE) && ($col2 === SPACE)) return new CJSscript('');
 		}
 
 		$td_r = new CCol($col2,'header_r');

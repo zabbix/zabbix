@@ -25,7 +25,7 @@ require_once('include/forms.inc.php');
 
 $page['title'] = 'S_MEDIA_TYPES';
 $page['file'] = 'media_types.php';
-$page['hist_arg'] = array('form', 'mediatypeid');
+$page['hist_arg'] = array();
 
 include_once('include/page_header.php');
 
@@ -270,7 +270,7 @@ include_once('include/page_header.php');
 			$table->addRow(array(
 				new CCheckBox('media_types['.$mediatype['mediatypeid'].']',NULL,NULL,$mediatype['mediatypeid']),
 				media_type2str($mediatype['type']),
-				new CLink($mediatype['description'],'?&form=update&mediatypeid='.$mediatype['mediatypeid']),
+				new CLink($mediatype['description'],'?form=update&mediatypeid='.$mediatype['mediatypeid']),
 				$details));
 		}
 

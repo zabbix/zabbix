@@ -111,10 +111,7 @@
 	$events_wdgt = new CWidget();
 
 // PAGE HEADER {{{
-	$url = '?fullscreen='.($_REQUEST['fullscreen']? '0':'1');
-	$fs_icon = new CDiv(SPACE,'fullscreen');
-	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-	$fs_icon->addAction('onclick', "javascript: document.location = '".$url."';");
+	$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
 	$events_wdgt->addPageHeader(array(S_HISTORY_OF_EVENTS_BIG.SPACE.S_ON_BIG.SPACE, zbx_date2str(S_EVENTS_DATE_FORMAT,time())), $fs_icon);
 // }}}PAGE HEADER
 
@@ -166,11 +163,13 @@
 
 
 // FILTER {{{
+	$filterForm = null;
+
 	if(EVENT_SOURCE_TRIGGERS == $source){
 		$filterForm = new CFormTable(null, null, 'get');//,'events.php?filter_set=1','POST',null,'sform');
 		$filterForm->setAttribute('name', 'zbx_filter');
 		$filterForm->setAttribute('id', 'zbx_filter');
-
+	
 		$filterForm->addVar('triggerid', get_request('triggerid', 0));
 
 		if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0)){
@@ -201,14 +200,14 @@
 
 		$filterForm->addItemToBottomRow(new CButton('filter_set',S_FILTER));
 		$filterForm->addItemToBottomRow($reset);
-
-		$events_wdgt->addFlicker($filterForm, CProfile::get('web.events.filter.state',0));
-
-
-		$scroll_div = new CDiv();
-		$scroll_div->setAttribute('id', 'scrollbar_cntr');
-		$events_wdgt->addFlicker($scroll_div, CProfile::get('web.events.filter.state',0));
 	}
+
+	$events_wdgt->addFlicker($filterForm, CProfile::get('web.events.filter.state',0));
+
+
+	$scroll_div = new CDiv();
+	$scroll_div->setAttribute('id', 'scrollbar_cntr');
+	$events_wdgt->addFlicker($scroll_div, CProfile::get('web.events.filter.state',0));
 // }}} FILTER
 
 
@@ -402,11 +401,10 @@
 			);
 
 			$events = CEvent::get($options);
-			order_result($events, 'clock', ZBX_SORT_DOWN);
+			morder_result($events, array('clock','ns'), ZBX_SORT_DOWN);
 
 			$triggersOptions = array(
 				'triggerids' => zbx_objectValues($events, 'objectid'),
-				'expandDescription' => 1,
 				'select_hosts' => API_OUTPUT_EXTEND,
 				'select_triggers' => API_OUTPUT_EXTEND,
 				'select_items' => API_OUTPUT_EXTEND,
@@ -441,7 +439,8 @@
 					}
 				}
 
-				$tr_desc = new CSpan($trigger['description'],'pointer');
+				$description = expand_trigger_description_by_data(zbx_array_merge($trigger, array('clock'=>$event['clock'], 'ns'=>$event['ns'])), ZBX_FLAG_EVENT);
+				$tr_desc = new CSpan($description,'pointer');
 				$tr_desc->addAction('onclick',"create_mon_trigger_menu(event, ".
 										" new Array({'triggerid': '".$trigger['triggerid']."', 'lastchange': '".$event['clock']."'}),".
 										zbx_jsvalue($items, true).");");
@@ -453,7 +452,7 @@
 				else
 					$event['duration'] = zbx_date2age($tr_event['clock']);
 
-				
+
 				$table->addRow(array(
 					new CLink(zbx_date2str(S_EVENTS_ACTION_TIME_FORMAT,$event['clock']),
 						'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid'],

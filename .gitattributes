@@ -255,6 +255,7 @@ frontends/php/include/classes/class.cgraphdraw.php -text
 frontends/php/include/classes/class.chelp.php -text
 frontends/php/include/classes/class.chostsinfo.php -text
 frontends/php/include/classes/class.chttp_request.php -text
+frontends/php/include/classes/class.cicon.php -text
 frontends/php/include/classes/class.ciframe.php -text
 frontends/php/include/classes/class.cimagetexttable.php -text
 frontends/php/include/classes/class.cimg.php -text
@@ -361,6 +362,8 @@ frontends/php/styles/default.css -text
 frontends/php/styles/div.css -text
 frontends/php/styles/form.css -text
 frontends/php/styles/ie.css -text
+frontends/php/styles/ie_css_bb.css -text
+frontends/php/styles/ie_css_ob.css -text
 frontends/php/styles/ie_css_od.css -text
 frontends/php/styles/link.css -text
 frontends/php/styles/p.css -text
