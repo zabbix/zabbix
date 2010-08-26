@@ -159,8 +159,6 @@
 		if(isset($_REQUEST['druleid'])){
 			if($rule_data = DBfetch(DBselect('SELECT * FROM drules WHERE druleid='.$_REQUEST['druleid'])))
 				$frm_title = S_DISCOVERY_RULE.' "'.$rule_data['name'].'"';
-			$rule_uniq = DBfetch(DBselect('SELECT dcheckid FROM druleuniq WHERE druleid='.$_REQUEST['druleid']));
-			$rule_uniq = $rule_uniq['dcheckid'];
 		}
 
 		$form = new CFormTable($frm_title, null, 'post');
@@ -182,7 +180,7 @@
 			//TODO init checks
 			$dchecks = array();
 			$db_checks = DBselect('SELECT dcheckid,type,ports,key_,snmp_community,snmpv3_securityname,'.
-						'snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase'.
+						'snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase, uniq'.
 						' FROM dchecks'.
 						' WHERE druleid='.$_REQUEST['druleid']);
 			while($check_data = DBfetch($db_checks)){
@@ -193,7 +191,7 @@
 						'snmpv3_securitylevel' => $check_data['snmpv3_securitylevel'],
 						'snmpv3_authpassphrase' => $check_data['snmpv3_authpassphrase'],
 						'snmpv3_privpassphrase' => $check_data['snmpv3_privpassphrase']));
-				if($check_data['dcheckid'] == $rule_uniq)
+				if($check_data['uniq'])
 					$uniqueness_criteria = $count - 1;
 			}
 			$dchecks_deleted = get_request('dchecks_deleted',array());

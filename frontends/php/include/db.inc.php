@@ -755,12 +755,12 @@ else {
 
 		$found = false;
 		do{
-			$min=bcadd(bcmul($nodeid,'100000000000000'),bcmul($ZBX_LOCALNODEID,'100000000000'));
-			$max=bcadd(bcadd(bcmul($nodeid,'100000000000000'),bcmul($ZBX_LOCALNODEID,'100000000000')),'99999999999');
+			$min=bcadd(bcmul($nodeid,'100000000000000'),bcmul($ZBX_LOCALNODEID,'100000000000'), 0);
+			$max=bcadd(bcadd(bcmul($nodeid,'100000000000000'),bcmul($ZBX_LOCALNODEID,'100000000000')),'99999999999', 0);
 			$row = DBfetch(DBselect('SELECT nextid FROM ids WHERE nodeid='.$nodeid .' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field)));
 			if(!$row){
 				$row = DBfetch(DBselect('SELECT max('.$field.') AS id FROM '.$table.' WHERE '.$field.'>='.$min.' AND '.$field.'<='.$max));
-				if(!$row || is_null($row['id'])){
+				if(!$row || ($row['id'] == 0)){
 					DBexecute("INSERT INTO ids (nodeid,table_name,field_name,nextid) VALUES ($nodeid,'$table','$field',$min)");
 				}
 				else{
@@ -946,9 +946,10 @@ else {
 
 			$sql = 'SELECT nextid '.
 				' FROM ids '.
-				' WHERE nodeid='.$nodeid .'
-					AND table_name='.zbx_dbstr($table).
-					' AND field_name='.zbx_dbstr($id_name);
+				' WHERE nodeid='.$nodeid .
+					' AND table_name='.zbx_dbstr($table).
+					' AND field_name='.zbx_dbstr($id_name).
+					' FOR UPDATE';
 			$res = DBfetch(DBselect($sql));
 			if($res){
 				$nextid = bcadd($res['nextid'], 1, 0);
@@ -970,7 +971,7 @@ else {
 							' AND '.$id_name.'<='.$max;
 				$row = DBfetch(DBselect($sql));
 
-				$nextid = (!$row || is_null($row['id'])) ? $min : $row['id'];
+				$nextid = (!$row || ($row['id'] == 0)) ? $min : $row['id'];
 
 				$sql = 'INSERT INTO ids (nodeid,table_name,field_name,nextid) '.
 					' VALUES ('.$nodeid.','.zbx_dbstr($table).','.zbx_dbstr($id_name).','.bcadd($nextid, $count, 0).')';

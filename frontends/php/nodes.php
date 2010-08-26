@@ -134,7 +134,7 @@
 				$frm_title .= ' "'.$node_data['name'].'"';
 			}
 
-			$master_node = DBfetch(DBselect('SELECT name FROM nodes WHERE masterid=0 AND nodetype='.ZBX_NODE_LOCAL));
+			$master_node = DBfetch(DBselect('SELECT name FROM nodes WHERE masterid IS NULL AND nodetype='.ZBX_NODE_LOCAL));
 			$has_master = (!$master_node) ? true : false;
 
 
