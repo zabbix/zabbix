@@ -54,11 +54,8 @@ FIELD		|snmpv3_securityname|t_varchar(64)|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|snmpv3_securitylevel|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|snmpv3_authpassphrase|t_varchar(64)|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|snmpv3_privpassphrase|t_varchar(64)|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|uniq		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 INDEX		|1		|druleid
-
-TABLE|druleuniq|druleid|ZBX_SYNC
-FIELD		|druleid	|t_id		|	|NOT NULL	|0			|1|drules
-FIELD		|dcheckid	|t_id		|	|NOT NULL	|ZBX_SYNC,ZBX_PROXY	|2|dchecks
 
 TABLE|dhosts|dhostid|ZBX_SYNC
 FIELD		|dhostid	|t_id		|	|NOT NULL	|0
@@ -384,6 +381,7 @@ FIELD		|esc_step_from	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|esc_step_to	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|default_msg	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|evaltype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|mediatypeid	|t_id		|	|NULL		|ZBX_SYNC		|2|media_type
 INDEX		|1		|actionid
 
 TABLE|opconditions|opconditionid|ZBX_SYNC
@@ -393,10 +391,6 @@ FIELD		|conditiontype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|operator	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|operationid
-
-TABLE|opmediatypes|operationid|ZBX_SYNC
-FIELD		|operationid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|operations
-FIELD		|mediatypeid	|t_id		|	|NOT NULL	|ZBX_SYNC		|2|media_type
 
 TABLE|escalations|escalationid|0
 FIELD		|escalationid	|t_id		|	|NOT NULL	|0
