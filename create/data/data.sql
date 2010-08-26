@@ -10981,10 +10981,10 @@ INSERT INTO conditions VALUES (7,3,12,2,'Windows');
 -- Dumping data for table `operations`
 --
 
-INSERT INTO operations VALUES (3,2,6,0,10001,'','',0,1,1,0,0);
-INSERT INTO operations VALUES (4,2,4,0,2,'','',0,1,1,0,0);
-INSERT INTO operations VALUES (5,3,4,0,3,'','',0,1,1,0,0);
-INSERT INTO operations VALUES (6,3,6,0,10002,'','',0,1,1,0,0);
+INSERT INTO operations VALUES (3,2,6,0,10001,'','',0,1,1,0,0,NULL);
+INSERT INTO operations VALUES (4,2,4,0,2,'','',0,1,1,0,0,NULL);
+INSERT INTO operations VALUES (5,3,4,0,3,'','',0,1,1,0,0,NULL);
+INSERT INTO operations VALUES (6,3,6,0,10002,'','',0,1,1,0,0,NULL);
 
 --
 -- Dumping data for table `drules`
@@ -10997,7 +10997,7 @@ INSERT INTO drules VALUES (2,NULL,'Local network','192.168.1.1-255',3600,0,1);
 -- Dumping data for table `dchecks`
 --
 
-INSERT INTO dchecks VALUES (2,2,9,'system.uname','','10050','',0,'','');
+INSERT INTO dchecks VALUES (2,2,9,'system.uname','','10050','',0,'','',0);
 
 --
 -- Dumping data for table graphs
