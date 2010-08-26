@@ -758,16 +758,16 @@ FIELD		|gsm_modem	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|username	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|passwd		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 
-TABLE|profiles|profileid|ZBX_SYNC
+TABLE|profiles|profileid|0
 FIELD		|profileid	|t_id		|	|NOT NULL	|0
-FIELD		|userid		|t_id		|	|NOT NULL	|ZBX_SYNC		|1|users
-FIELD		|idx		|t_varchar(96)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|idx2		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|value_id	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|value_int	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|value_str	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|source		|t_varchar(96)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|userid		|t_id		|	|NOT NULL	|0			|1|users
+FIELD		|idx		|t_varchar(96)	|''	|NOT NULL	|0
+FIELD		|idx2		|t_id		|'0'	|NOT NULL	|0
+FIELD		|value_id	|t_id		|'0'	|NOT NULL	|0
+FIELD		|value_int	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|value_str	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|source		|t_varchar(96)	|''	|NOT NULL	|0
+FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|userid,idx,idx2
 INDEX		|2		|userid,profileid
 

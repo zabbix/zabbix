@@ -436,11 +436,12 @@ DB_OPERATION
 {
 	zbx_uint64_t	operationid;
 	zbx_uint64_t	actionid;
-	int		operationtype;
-	int		object;
 	zbx_uint64_t	objectid;
+	zbx_uint64_t	mediatypeid;
 	char		*shortdata;
 	char		*longdata;
+	int		operationtype;
+	int		object;
 	int		esc_period;
 	int		default_msg;
 	int		evaltype;

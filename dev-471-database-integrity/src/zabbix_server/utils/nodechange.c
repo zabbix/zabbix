@@ -195,9 +195,9 @@ static int convert_special_field(int old_id, int new_id, const char *table_name,
 		return FAIL;
 	}
 
-	prefix = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)new_id;
+	prefix = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)new_id;
 	if (r_table->flags & ZBX_SYNC)
-		prefix += (zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)new_id;
+		prefix += (zbx_uint64_t)__UINT64_C(100000000000) * (zbx_uint64_t)new_id;
 
 	DBexecute("update %s set %s=%s+" ZBX_FS_UI64 " where %s=%d and %s>0",
 			table_name,
@@ -418,7 +418,17 @@ int change_nodeid(int old_id, int new_id)
 
 	DBbegin();
 
-	printf("Converting tables ");
+	printf("Dropping foreign keys ");
+	fflush(stdout);
+
+	for (i = 0; NULL != db_schema_fkeys_drop[i]; i++)
+	{
+		DBexecute("%s", db_schema_fkeys_drop[i]);
+		printf(".");
+		fflush(stdout);
+	}
+
+	printf(" done.\nConverting tables ");
 	fflush(stdout);
 
 	for (i = 0; NULL != tables[i].table; i++)
@@ -444,48 +454,48 @@ int change_nodeid(int old_id, int new_id)
 				continue;
 			}
 
-			if (tables[i].fields[j].type == ZBX_TYPE_ID)
+			if (tables[i].fields[j].type != ZBX_TYPE_ID)
+				continue;
+
+			if (0 == strcmp(tables[i].fields[j].name, tables[i].recid))	/* primary key */
 			{
-				if (0 == strcmp(tables[i].fields[j].name, tables[i].recid))	/* primary key */
-				{
-					prefix = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)new_id;
+				prefix = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)new_id;
 
-					if (tables[i].flags & ZBX_SYNC)
-						prefix += (zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)new_id;
-				}
-				else if (NULL != tables[i].fields[j].rel)	/* relations */
-				{
-					if (NULL == (r_table = DBget_table(tables[i].fields[j].rel)))
-					{
-						printf("%s.%s FAILED\n", tables[i].table, tables[i].fields[j].name);
-						fflush(stdout);
-						continue;
-					}
-
-					prefix = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)new_id;
-
-					if (r_table->flags & ZBX_SYNC)
-						prefix += (zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)new_id;
-				}
-				else if (0 == strcmp("profiles", tables[i].table))	/* special processing for table 'profiles' */
-				{
-					convert_profiles(old_id, new_id, tables[i].fields[j].name);
-					continue;
-				}
-				else
+				if (tables[i].flags & ZBX_SYNC)
+					prefix += (zbx_uint64_t)__UINT64_C(100000000000) * (zbx_uint64_t)new_id;
+			}
+			else if (NULL != tables[i].fields[j].fk_table)	/* relations */
+			{
+				if (NULL == (r_table = DBget_table(tables[i].fields[j].fk_table)))
 				{
 					printf("%s.%s FAILED\n", tables[i].table, tables[i].fields[j].name);
 					fflush(stdout);
 					continue;
 				}
 
-				DBexecute("update %s set %s=%s+" ZBX_FS_UI64 " where %s>0",
-						tables[i].table,
-						tables[i].fields[j].name,
-						tables[i].fields[j].name,
-						prefix,
-						tables[i].fields[j].name);
+				prefix = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)new_id;
+
+				if (r_table->flags & ZBX_SYNC)
+					prefix += (zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)new_id;
 			}
+			else if (0 == strcmp("profiles", tables[i].table))	/* special processing for table 'profiles' */
+			{
+				convert_profiles(old_id, new_id, tables[i].fields[j].name);
+				continue;
+			}
+			else
+			{
+				printf("%s.%s FAILED\n", tables[i].table, tables[i].fields[j].name);
+				fflush(stdout);
+				continue;
+			}
+
+			DBexecute("update %s set %s=%s+" ZBX_FS_UI64 " where %s>0",
+					tables[i].table,
+					tables[i].fields[j].name,
+					tables[i].fields[j].name,
+					prefix,
+					tables[i].fields[j].name);
 		}
 	}
 
@@ -499,10 +509,22 @@ int change_nodeid(int old_id, int new_id)
 	DBexecute("insert into nodes (nodeid,name,ip,nodetype) values (%d,'Local node','127.0.0.1',1)",
 			new_id);
 
+	printf(" done.\nCreating foreign keys ");
+	fflush(stdout);
+
+	for (i = 0; NULL != db_schema_fkeys[i]; i++)
+	{
+		DBexecute("%s", db_schema_fkeys[i]);
+		printf(".");
+		fflush(stdout);
+	}
+
+	printf(" done.\nConversion completed.\n");
+	fflush(stdout);
+
 	DBcommit();
 
 	DBclose();
-	printf(" done.\nConversion completed.\n");
 
 	return SUCCEED;
 }
