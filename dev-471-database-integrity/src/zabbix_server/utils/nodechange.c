@@ -19,6 +19,7 @@
 
 #include "common.h"
 
+#ifndef HAVE_SQLITE3
 #include "cfg.h"
 #include "db.h"
 #include "log.h"
@@ -281,7 +282,7 @@ static int convert_condition_values(int old_id, int new_id, const char *rel_tabl
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int change_nodeid(int old_id, int new_id)
+int	change_nodeid(int old_id, int new_id)
 {
 	struct conv_t
 	{
@@ -400,13 +401,13 @@ int change_nodeid(int old_id, int new_id)
 	zbx_uint64_t	prefix;
 	const ZBX_TABLE	*r_table;
 
-	if(old_id!=0)
+	if (old_id != 0)
 	{
 		printf("Conversion from non-zero node id is not supported.\n");
 		return FAIL;
 	}
 
-	if(new_id>999 || new_id<0)
+	if (new_id > 999 || new_id < 0)
 	{
 		printf("Node ID must be in range of 0-999.\n");
 		return FAIL;
@@ -528,3 +529,11 @@ int change_nodeid(int old_id, int new_id)
 
 	return SUCCEED;
 }
+#else	/* HAVE_SQLITE3 */
+int	change_nodeid(int old_id, int new_id)
+{
+	printf("Distributed monitoring with SQLite3 is not supported.\n");
+	return FAIL;
+}
+#endif
+
