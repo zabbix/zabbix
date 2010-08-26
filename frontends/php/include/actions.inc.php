@@ -174,10 +174,12 @@ function condition_value2str($conditiontype, $value){
 				'expandTriggerDescriptions' => true,
 				'output' => API_OUTPUT_EXTEND,
 				'select_hosts' => API_OUTPUT_EXTEND,
+				'nodeids' => get_current_nodeid(true),
 			));
 			$trig = reset($trig);
 			$host = reset($trig['hosts']);
-			$str_val = $host['host'].':'.$trig['description'];
+			if(id2nodeid($value) != get_current_nodeid()) $str_val = get_node_name_by_elid($value, true, ': ');
+			$str_val .= $host['host'].':'.$trig['description'];
 			break;
 		case CONDITION_TYPE_HOST:
 		case CONDITION_TYPE_HOST_TEMPLATE:
