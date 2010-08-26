@@ -2371,6 +2371,16 @@ char	*zbx_dservice_type_string(zbx_dservice_type_t service)
 	}
 }
 
+const char	*zbx_nodetype_string(unsigned char nodetype)
+{
+	switch (nodetype)
+	{
+		case ZBX_NODE_MASTER: return "MASTER";
+		case ZBX_NODE_SLAVE: return "SLAVE";
+		default: return "unknown";
+	}
+}
+
 #ifdef _WINDOWS
 static int	get_codepage(const char *encoding, unsigned int *codepage)
 {

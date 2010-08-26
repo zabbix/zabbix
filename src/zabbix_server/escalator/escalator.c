@@ -221,20 +221,12 @@ static void	add_object_msg(int source, zbx_uint64_t triggerid, DB_OPERATION *ope
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	mediatypeid = 0, userid;
-
-	result = DBselect("select mediatypeid from opmediatypes where operationid=" ZBX_FS_UI64,
-			operation->operationid);
-
-	if (NULL != (row = DBfetch(result)))
-		ZBX_STR2UINT64(mediatypeid, row[0]);
-
-	DBfree_result(result);
+	zbx_uint64_t	userid;
 
 	switch (operation->object)
 	{
 		case OPERATION_OBJECT_USER:
-			add_user_msg(source, operation->objectid, mediatypeid, triggerid, user_msg, subject, message);
+			add_user_msg(source, operation->objectid, operation->mediatypeid, triggerid, user_msg, subject, message);
 			break;
 		case OPERATION_OBJECT_GROUP:
 			result = DBselect("select ug.userid from users_groups ug,usrgrp g"
@@ -245,7 +237,7 @@ static void	add_object_msg(int source, zbx_uint64_t triggerid, DB_OPERATION *ope
 			while (NULL != (row = DBfetch(result)))
 			{
 				ZBX_STR2UINT64(userid, row[0]);
-				add_user_msg(source, userid, mediatypeid, triggerid, user_msg, subject, message);
+				add_user_msg(source, userid, operation->mediatypeid, triggerid, user_msg, subject, message);
 			}
 
 			DBfree_result(result);
@@ -513,8 +505,12 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 
 	if (0 == action->esc_period)
 	{
-		result = DBselect("select operationid,operationtype,object,objectid,default_msg,shortdata,longdata"
-				",esc_period,evaltype from operations where actionid=" ZBX_FS_UI64 " and operationtype in (%d,%d)",
+		result = DBselect(
+				"select operationid,operationtype,object,objectid,default_msg,"
+					"shortdata,longdata,esc_period,evaltype,mediatypeid"
+				" from operations"
+				" where actionid=" ZBX_FS_UI64
+					" and operationtype in (%d,%d)",
 				action->actionid,
 				OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND);
 	}
@@ -522,9 +518,12 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 	{
 		escalation->esc_step++;
 
-		result = DBselect("select operationid,operationtype,object,objectid,default_msg,shortdata,longdata"
-				",esc_period,evaltype from operations where actionid=" ZBX_FS_UI64 " and operationtype in (%d,%d)"
-				" and esc_step_from<=%d and (esc_step_to=0 or esc_step_to>=%d)",
+		result = DBselect("select operationid,operationtype,object,objectid,default_msg,"
+					"shortdata,longdata,esc_period,evaltype,mediatypeid"
+				" from operations where actionid=" ZBX_FS_UI64
+					" and operationtype in (%d,%d)"
+					" and esc_step_from<=%d"
+					" and (esc_step_to=0 or esc_step_to>=%d)",
 				action->actionid,
 				OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND,
 				escalation->esc_step,
@@ -544,6 +543,7 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 		operation.longdata	= strdup(row[6]);
 		operation.esc_period	= atoi(row[7]);
 		operation.evaltype	= atoi(row[8]);
+		ZBX_DBROW2UINT64(operation.mediatypeid, row[9]);
 
 		if (SUCCEED == check_operation_conditions(event, &operation))
 		{

@@ -646,9 +646,11 @@ static void	process_discovery(int now)
 	DB_DRULE	drule;
 
 	result = DBselect(
-			"select r.druleid,r.iprange,r.name,u.dcheckid"
+			"select distinct r.druleid,r.iprange,r.name,c.dcheckid"
 			" from drules r"
-			" left join druleuniq u on u.druleid=r.druleid"
+				" left join dchecks c"
+					" on c.druleid=r.druleid"
+						" and uniq=1"
 			" where r.proxy_hostid is null"
 				" and r.status=%d"
 				" and (r.nextcheck<=%d or r.nextcheck>%d+r.delay)"

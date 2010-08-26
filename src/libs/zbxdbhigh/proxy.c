@@ -338,7 +338,6 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 		{"items"},
 		{"drules"},
 		{"dchecks"},
-		{"druleuniq"},
 		{NULL}
 	};
 
@@ -349,7 +348,7 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 	int		condition_alloc = 512, condition_offset;
 	zbx_uint64_t	*hostids = NULL;
 	int		hostids_alloc = 0, hostids_num = 0;
-zabbix_set_log_level(LOG_LEVEL_DEBUG);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() proxy_hostid:" ZBX_FS_UI64,
 			__function_name, proxy_hostid);
 
@@ -407,7 +406,7 @@ zabbix_set_log_level(LOG_LEVEL_DEBUG);
 					proxy_hostid,
 					DRULE_STATUS_MONITORED);
 		}
-		else if (0 == strcmp(pt[i].table, "dchecks") || 0 == strcmp(pt[i].table, "druleuniq"))
+		else if (0 == strcmp(pt[i].table, "dchecks"))
 		{
 			zbx_snprintf_alloc(&condition, &condition_alloc, &condition_offset, 256,
 					", drules r where t.druleid=r.druleid"
@@ -434,7 +433,6 @@ zabbix_set_log_level(LOG_LEVEL_DEBUG);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s", j->buffer);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-zabbix_set_log_level(LOG_LEVEL_WARNING);
 }
 
 /******************************************************************************
@@ -1663,8 +1661,9 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 		{
 			result = DBselect(
 					"select dcheckid"
-					" from druleuniq"
-					" where druleid=" ZBX_FS_UI64,
+					" from dchecks"
+					" where druleid=" ZBX_FS_UI64
+						" and uniq=1",
 					drule.druleid);
 
 			if (NULL != (row = DBfetch(result)))
