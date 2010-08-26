@@ -755,20 +755,20 @@ table.sub_menu tr td span.active a.highlight{
 table.triggers_info {
 	width: 100%;
 	background-color: #FFFFFF;
-	border: 1px gray dotted;
+	border: 0px;
 }
 
 table.triggers_info tr td {
 	border: 0;
 	white-space: nowrap;
-	word-spacing:	0;
-	padding-left: 5px;
-	padding-right: 5px;
+	word-spacing: 0;
+	padding: 0 5px;
 	font-weight: bold;
 	color: #191970;
 	text-align: left;
 	font-family: Verdana, Helvetica, Geneva;
 	font-size: 11px;
+	height: 18px;
 }
 
 table.triggers_info tr td.header {

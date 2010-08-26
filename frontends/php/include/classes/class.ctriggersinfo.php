@@ -57,7 +57,7 @@ class CTriggersInfo extends CTable{
 		$ok = $uncn = $uncl = $info = $warn = $avg = $high = $dis = 0;
 
 		$options = array(
-			'monitored' => 1,
+			'active' => 1,
 			'skipDependent' => 1,
 			'output' => API_OUTPUT_SHORTEN
 		);
@@ -116,7 +116,7 @@ class CTriggersInfo extends CTable{
 
 			$header = new CCol($header_str,'header');
 			if($this->style == STYLE_HORISONTAL)
-				$header->SetColspan(7);
+				$header->SetColspan(8);
 			$this->addRow($header);
 		}
 
@@ -131,11 +131,12 @@ class CTriggersInfo extends CTable{
 
 
 		if(STYLE_HORISONTAL == $this->style){
-			$this->addRow(array($trok, $uncn, $info, $warn, $avg, $high, $dis));
+			$this->addRow(array($trok, $uncn, $uncl, $info, $warn, $avg, $high, $dis));
 		}
 		else{
 			$this->addRow($trok);
 			$this->addRow($uncn);
+			$this->addRow($uncl);
 			$this->addRow($info);
 			$this->addRow($warn);
 			$this->addRow($avg);
