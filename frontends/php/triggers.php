@@ -317,7 +317,7 @@ include_once('include/page_header.php');
 
 				update_services($trigger['triggerid'], $serv_status); // updating status to all services by the dependency
 
-				$host = reset($trigger['hosts]']);
+				$host = reset($trigger['hosts']);
 				add_audit_ext(AUDIT_ACTION_UPDATE,
 								AUDIT_RESOURCE_TRIGGER,
 								$trigger['triggerid'],
