@@ -800,7 +800,6 @@ upgrades/dbpatches/2.0/mysql/patch/config.sql -text
 upgrades/dbpatches/2.0/mysql/patch/dchecks.sql -text
 upgrades/dbpatches/2.0/mysql/patch/dhosts.sql -text
 upgrades/dbpatches/2.0/mysql/patch/drules.sql -text
-upgrades/dbpatches/2.0/mysql/patch/druleuniq.sql -text
 upgrades/dbpatches/2.0/mysql/patch/dservices.sql -text
 upgrades/dbpatches/2.0/mysql/patch/escalations.sql -text
 upgrades/dbpatches/2.0/mysql/patch/events.sql -text
@@ -889,7 +888,6 @@ upgrades/dbpatches/2.0/oracle/patch/config.sql -text
 upgrades/dbpatches/2.0/oracle/patch/dchecks.sql -text
 upgrades/dbpatches/2.0/oracle/patch/dhosts.sql -text
 upgrades/dbpatches/2.0/oracle/patch/drules.sql -text
-upgrades/dbpatches/2.0/oracle/patch/druleuniq.sql -text
 upgrades/dbpatches/2.0/oracle/patch/dservices.sql -text
 upgrades/dbpatches/2.0/oracle/patch/escalations.sql -text
 upgrades/dbpatches/2.0/oracle/patch/events.sql -text
@@ -977,7 +975,6 @@ upgrades/dbpatches/2.0/postgresql/patch/config.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/dchecks.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/dhosts.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/drules.sql -text
-upgrades/dbpatches/2.0/postgresql/patch/druleuniq.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/dservices.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/escalations.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/events.sql -text

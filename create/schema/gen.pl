@@ -22,11 +22,14 @@ use Switch;
 use File::Basename;
 
 $file = dirname($0)."/schema.sql";	# Name the file
-open(INFO, $file);			# Open the file
-@lines = <INFO>;			# Read it into an array
-close(INFO);				# Close the file
 
 local $output;
+local $eol, $fk_bol, $fk_eol;
+local $ltab, $szcol1, $szcol2, $szcol3, $szcol4;
+local $sequences;
+local $sql_suffix;
+local $fkeys, $fkeys_prefix, $fkeys_suffix;
+local $fkeys_drop;
 
 %mysql=(
 	"database"	=>	"mysql",
@@ -34,7 +37,6 @@ local $output;
 	"before"	=>	"",
 	"after"		=>	"",
 	"table_options"	=>	" ENGINE=InnoDB",
-	"exec_cmd"	=>	";\n",
 	"t_bigint"	=>	"bigint unsigned",
 	"t_id"		=>	"bigint unsigned",
 	"t_integer"	=>	"integer",
@@ -57,7 +59,6 @@ local $output;
 %c=(	"type"		=>	"code",
 	"database"	=>	"",
 	"after"		=>	"\t{0}\n};\n",
-	"exec_cmd"	=>	"\n",
 	"t_bigint"	=>	"ZBX_TYPE_UINT",
 	"t_id"		=>	"ZBX_TYPE_ID",
 	"t_integer"	=>	"ZBX_TYPE_INT",
@@ -105,7 +106,6 @@ ZBX_TABLE	tables[]={
 	"before"	=>	"",
 	"after"		=>	"",
 	"type"		=>	"sql",
-	"exec_cmd"	=>	"\n/\n",
 	"t_id"		=>	"number(20)",
 	"t_integer"	=>	"number(10)",
 	"t_time"	=>	"number(10)",
@@ -128,7 +128,6 @@ ZBX_TABLE	tables[]={
 	"after"		=>	"",
 	"type"		=>	"sql",
 	"table_options"	=>	" with OIDS",
-	"exec_cmd"	=>	";\n",
 	"t_id"		=>	"bigint",
 	"t_integer"	=>	"integer",
 	"t_serial"	=>	"serial",
@@ -147,10 +146,9 @@ ZBX_TABLE	tables[]={
 
 %sqlite=("t_bigint"	=>	"bigint",
 	"database"	=>	"sqlite",
-	"before"	=>	"BEGIN TRANSACTION;\n",
-	"after"		=>	"COMMIT;\n",
+	"before"	=>	"",
+	"after"		=>	"",
 	"type"		=>	"sql",
-	"exec_cmd"	=>	";\n",
 	"t_id"		=>	"bigint",
 	"t_integer"	=>	"integer",
 	"t_time"	=>	"integer",
@@ -169,54 +167,55 @@ ZBX_TABLE	tables[]={
 
 sub newstate
 {
-	local $new=$_[0];
+	local $new = $_[0];
 
 	switch ($state)
 	{
-		case "field"	{
-			if($output{"type"} eq "sql" && $new eq "index") { print "${pkey}\n)$output{'table_options'}$output{'exec_cmd'}"; }
-			if($output{"type"} eq "sql" && $new eq "table") { print "${pkey}\n)$output{'table_options'}$output{'exec_cmd'}"; }
-			if($output{"type"} eq "code" && $new eq "table") { print ",\n\t\t{0}\n\t\t}\n\t},$output{'exec_cmd'}"; }
-			if($new eq "field") { print ",\n" }
+		case "field"
+		{
+			if ($output{"type"} eq "sql" && $new eq "index") { print "${pkey}${eol}\n)$output{'table_options'};${eol}\n"; }
+			if ($output{"type"} eq "sql" && $new eq "table") { print "${pkey}${eol}\n)$output{'table_options'};${eol}\n"; }
+			if ($output{"type"} eq "code" && $new eq "table") { print ",\n\t\t{0}\n\t\t}\n\t},\n"; }
+			if ($new eq "field") { print ",${eol}\n" }
 		}
-		case "index"	{
-			if($output{"type"} eq "code" && $new eq "table") { print ",\n\t\t{0}\n\t\t}\n\t},$output{'exec_cmd'}"; }
+		case "index"
+		{
+			if ($output{"type"} eq "code" && $new eq "table") { print ",\n\t\t{0}\n\t\t}\n\t},\n"; }
 		}
 	}
-	$state=$new;
+	$state = $new;
 }
 
 sub process_table
 {
-	local $line=$_[0];
+	local $line = $_[0];
 
 	newstate("table");
-	($table_name,$pkey,$flags)=split(/\|/, $line,4);
 
-	if($output{"type"} eq "code")
+	($table_name, $pkey, $flags) = split(/\|/, $line, 3);
+
+	if ($output{"type"} eq "code")
 	{
-#	        {"services",    "serviceid",    ZBX_SYNC,
 		if($flags eq "")
 		{
 			$flags="0";
 		}
-		for ($flags) {
+
+		for ($flags)
+		{
 			s/,/ \| /;
 		}
+
 		print "\t{\"${table_name}\",\t\"${pkey}\",\t${flags},\n\t\t{\n";
 	}
 	else
 	{
-		if($pkey ne "")
+		if ($pkey ne "")
 		{
-			$pkey=",\n\tPRIMARY KEY (${pkey})";
-		}
-		else
-		{
-			$pkey="";
+			$pkey = ",${eol}\n${ltab}PRIMARY KEY (${pkey})";
 		}
 
-		print "CREATE TABLE $table_name (\n";
+		print "CREATE TABLE ${table_name} (${eol}\n";
 	}
 }
 
@@ -225,9 +224,11 @@ sub process_field
 	local $line=$_[0];
 
 	newstate("field");
-	($name,$type,$default,$null,$flags,$relN,$fk_table,$fk_field,$fk_flags)=split(/\|/, $line,9);
-	($type_short)=split(/\(/, $type,2);
-	if($output{"type"} eq "code")
+
+	($name, $type, $default, $null, $flags, $relN, $fk_table, $fk_field, $fk_flags) = split(/\|/, $line, 9);
+	($type_short) = split(/\(/, $type, 2);
+
+	if ($output{"type"} eq "code")
 	{
 		$type = $output{$type_short};
 
@@ -235,11 +236,11 @@ sub process_field
 		{
 			if ($flags ne "0")
 			{
-				$flags="ZBX_NOTNULL | ".$flags;
+				$flags = "ZBX_NOTNULL | ${flags}";
 			}
 			else
 			{
-				$flags="ZBX_NOTNULL";
+				$flags = "ZBX_NOTNULL";
 			}
 		}
 
@@ -250,20 +251,21 @@ sub process_field
 
 		if ($fk_table)
 		{
-			if($fk_field eq "")
+			if ($fk_field eq "")
 			{
 				$fk_field = "${name}";
 			}
+
 			$fk_table = "\"${fk_table}\"";
 			$fk_field = "\"${fk_field}\"";
 
 			if ($fk_flags eq "")
 			{
-				$fk_flags = "ZBX_FK_CASCADE_UPDATE | ZBX_FK_CASCADE_DELETE";
+				$fk_flags = "ZBX_FK_CASCADE_DELETE";
 			}
 			elsif ($fk_flags eq "RESTRICT")
 			{
-				$fk_flags = "ZBX_FK_CASCADE_UPDATE";
+				$fk_flags = "0";
 			}
 		}
 		else
@@ -277,73 +279,77 @@ sub process_field
 	}
 	else
 	{
-		$a=$output{$type_short};
-		$_=$type;
+		$a = $output{$type_short};
+		$_ = $type;
 		s/$type_short/$a/g;
-		$type_2=$_;
+		$type_2 = $_;
 
-		if($default ne ""){
-			$default="DEFAULT $default"; 
+		if ($default ne "")
+		{
+			$default = "DEFAULT $default";
 		}
 		
-		if($output{"database"} eq "mysql"){
-			@text_fields = ('blob','longblob','text','longtext');
-			if(grep /$output{$type_short}/, @text_fields){ 
-				$default=""; 
+		if ($output{"database"} eq "mysql")
+		{
+			@text_fields = ('blob', 'longblob', 'text', 'longtext');
+
+			if (grep /$output{$type_short}/, @text_fields)
+			{
+				$default="";
 			}
 		}
 
-		if(($output{"database"} eq "oracle") && ((0==index($type_2,"nvarchar2")) || (0==index($type_2,"nclob"))))
+		if (($output{"database"} eq "oracle") && (0 == index($type_2, "nvarchar2") || 0 == index($type_2, "nclob")))
 		{
-			$null="";
+			$null = "";
 		}
 		else
 		{
-			$null="\t${null}";
+			$null = "${null}";
 		}
 
-		$row="${null}";
+		$row = "${null}";
 
-		if($type eq "t_serial")
+		if ($type eq "t_serial")
 		{
-			if($output{"database"} eq "sqlite")
+			if ($output{"database"} eq "sqlite")
 			{
-				$row="$row\tPRIMARY KEY AUTOINCREMENT";
+				$row = sprintf("%-*s PRIMARY KEY AUTOINCREMENT", $szcol4, $row);
 				$pkey="";
 			}
-			elsif($output{"database"} eq "mysql")
+			elsif ($output{"database"} eq "mysql")
 			{
-				$row="$row\tauto_increment unique";
+				$row = sprintf("%-*s auto_increment unique", $szcol4, $row);
 			}
-			elsif($output{"database"} eq "oracle")
+			elsif ($output{"database"} eq "oracle")
 			{
-				$constraints="${constraints}CREATE SEQUENCE ${table_name}_seq\n";
-				$constraints="${constraints}START WITH 1\n";
-				$constraints="${constraints}INCREMENT BY 1\n";
-				$constraints="${constraints}NOMAXVALUE$output{'exec_cmd'}";
-				$constraints="${constraints}CREATE TRIGGER ${table_name}_tr\n";
-				$constraints="${constraints}BEFORE INSERT ON ${table_name}\n";
-				$constraints="${constraints}FOR EACH ROW\n";
-				$constraints="${constraints}BEGIN\n";
-				$constraints="${constraints}SELECT ${table_name}_seq.nextval INTO :new.id FROM dual;\n";
-				$constraints="${constraints}END;$output{'exec_cmd'}";
+				$sequences = "${sequences}CREATE SEQUENCE ${table_name}_seq${eol}\n";
+				$sequences = "${sequences}START WITH 1${eol}\n";
+				$sequences = "${sequences}INCREMENT BY 1${eol}\n";
+				$sequences = "${sequences}NOMAXVALUE${eol}\n/${eol}\n";
+				$sequences = "${sequences}CREATE TRIGGER ${table_name}_tr${eol}\n";
+				$sequences = "${sequences}BEFORE INSERT ON ${table_name}${eol}\n";
+				$sequences = "${sequences}FOR EACH ROW${eol}\n";
+				$sequences = "${sequences}BEGIN${eol}\n";
+				$sequences = "${sequences}SELECT ${table_name}_seq.nextval INTO :new.id FROM dual;${eol}\n";
+				$sequences = "${sequences}END;${eol}\n/${eol}\n";
 			}
 		}
 
-		if($relN ne "" and $relN ne "-")
+		if ($relN ne "" and $relN ne "-")
 		{
 			if ($fk_field eq "")
 			{
-				$fk_field="${name}";
+				$fk_field = "${name}";
 			}
 
 			if ($fk_flags eq "")
 			{
-				$fk_flags=" ON UPDATE CASCADE ON DELETE CASCADE";
+				$fk_flags = " ON DELETE CASCADE";
 			}
 			elsif ($fk_flags eq "RESTRICT")	# not default option
 			{
-				$fk_flags=" ON UPDATE CASCADE";
+				$fk_flags = "";
 			}
 
 			if ($output{"database"} eq "postgresql")
@@ -357,34 +363,49 @@ sub process_field
 
 			$cname = "c_${table_name}_${relN}";
 
-			$constraints = "${constraints}ALTER TABLE${only} ${table_name}\n    ADD CONSTRAINT ${cname}\n        FOREIGN KEY (${name}) REFERENCES ${fk_table} (${fk_field})${fk_flags}$output{'exec_cmd'}";
+			if ($output{"database"} eq "sqlite")
+			{
+				$references = " REFERENCES ${fk_table} (${fk_field})${fk_flags}";
+			}
+			else
+			{
+				$references = "";
+				$fkeys = "${fkeys}${fk_bol}ALTER TABLE${only} ${table_name} ADD CONSTRAINT ${cname} FOREIGN KEY (${name}) REFERENCES ${fk_table} (${fk_field})${fk_flags}${fk_eol}\n";
+
+				if ($output{"database"} eq "mysql")
+				{
+					$fkeys_drop = "${fkeys_drop}${fk_bol}ALTER TABLE${only} ${table_name} DROP FOREIGN KEY ${cname}${fk_eol}\n";
+				}
+				else
+				{
+					$fkeys_drop = "${fkeys_drop}${fk_bol}ALTER TABLE${only} ${table_name} DROP CONSTRAINT ${cname}${fk_eol}\n";
+				}
+			}
 		}
-		printf "\t%-24s %-15s %-25s %s", $name, $type_2, $default, $row;
+		else
+		{
+			$references = "";
+		}
+
+		printf "${ltab}%-*s %-*s %-*s ${row}${references}", $szcol1, $name, $szcol2, $type_2, $szcol3, $default;
 	}
 }
 
 sub process_index
 {
-	local $line=$_[0];
-	local $unique=$_[1];
+	local $line = $_[0];
+	local $unique = $_[1];
 
 	newstate("index");
 
-	if($output{"type"} eq "code")
+	if ($output{"type"} eq "code")
 	{
 		return;
 	}
 
-	($name,$fields)=split(/\|/, $line,2);
+	($name, $fields) = split(/\|/, $line, 2);
 
-	if($unique == 1)
-	{
-		print "CREATE UNIQUE INDEX ${table_name}_$name\ on $table_name ($fields)$output{'exec_cmd'}";
-	}
-	else
-	{
-		print "CREATE INDEX ${table_name}_$name\ on $table_name ($fields)$output{'exec_cmd'}";
-	}
+	print "CREATE${unique} INDEX ${table_name}_$name\ on $table_name ($fields);${eol}\n";
 }
 
 sub usage
@@ -394,48 +415,112 @@ sub usage
 	exit;
 }
 
-sub main
+sub process
 {
-	if($#ARGV!=0)
-	{
-		usage();
-	};
-
-	$format=$ARGV[0];
-	switch ($format) {
-		case "c"		{ %output=%c; }
-		case "mysql"		{ %output=%mysql; }
-		case "oracle"		{ %output=%oracle; }
-		case "postgresql"	{ %output=%postgresql; }
-		case "sqlite"		{ %output=%sqlite; }
-		else			{ usage(); }
-	}
-
 	print $output{"before"};
+
+	$fkeys = "";
+	$fkeys_drop = "";
+	$sequences = "";
+
+	open(INFO, $file);			# Open the file
+	@lines = <INFO>;			# Read it into an array
+	close(INFO);				# Close the file
 
 	foreach $line (@lines)
 	{
 		$_ = $line;
 		$line = tr/\t//d;
 		$line=$_;
-	
+
 		chop($line);
-	
+
 		($type,$line)=split(/\|/, $line,2);
 
 		utf8::decode($type);
-	
-		switch ($type) {
+
+		switch ($type)
+		{
 			case "TABLE"	{ process_table($line); }
-			case "INDEX"	{ process_index($line,0); }
-			case "UNIQUE"	{ process_index($line,1); }
+			case "INDEX"	{ process_index($line, ""); }
+			case "UNIQUE"	{ process_index($line, " ${type}"); }
 			case "FIELD"	{ process_field($line); }
 		}
 	}
+
+	newstate("table");
+
+	print $sequences.$sql_suffix;
+	print $fkeys_prefix.$fkeys.$fkeys_suffix;
+	print $output{"after"};
 }
 
-$constraints = "";
+sub main
+{
+	if ($#ARGV != 0)
+	{
+		usage();
+	}
+
+	$format = $ARGV[0];
+	$eol = "";
+	$fk_bol = "";
+	$fk_eol = ";";
+	$ltab = "\t";
+	$szcol1 = 24;
+	$szcol2 = 15;
+	$szcol3 = 25;
+	$szcol4 = 7;
+	$sql_suffix="";
+	$fkeys_prefix = "";
+	$fkeys_suffix = "";
+	$fkeys_drop_prefix = "";
+
+	switch ($format)
+	{
+		case "c"		{ %output = %c; }
+		case "mysql"		{ %output = %mysql; }
+		case "oracle"		{ %output = %oracle; }
+		case "postgresql"	{ %output = %postgresql; }
+		case "sqlite"		{ %output = %sqlite; }
+		else			{ usage(); }
+	}
+
+	process();
+
+	if ($format eq "c")
+	{
+		$eol = "\\n\\";
+		$fk_bol = "\t\"";
+		$fk_eol = "\",";
+		$ltab = "";
+		$szcol1 = 0;
+		$szcol2 = 0;
+		$szcol3 = 0;
+		$szcol4 = 0;
+		$sql_suffix="\";\n";
+		$fkeys_prefix = "const char *db_schema_fkeys[] = {\n";
+		$fkeys_suffix = "\tNULL\n};\n";
+		$fkeys_drop_prefix = "const char *db_schema_fkeys_drop[] = {\n";
+
+		print "\n#ifdef HAVE_MYSQL\nconst char *db_schema= \"\\\n";
+		%output = %mysql;
+		process();
+		print $fkeys_drop_prefix.$fkeys_drop.$fkeys_suffix;
+		print "#elif HAVE_ORACLE\nconst char *db_schema= \"\\\n";
+		%output = %oracle;
+		process();
+		print $fkeys_drop_prefix.$fkeys_drop.$fkeys_suffix;
+		print "#elif HAVE_POSTGRESQL\nconst char *db_schema= \"\\\n";
+		%output = %postgresql;
+		process();
+		print $fkeys_drop_prefix.$fkeys_drop.$fkeys_suffix;
+		print "#elif HAVE_SQLITE3\nconst char *db_schema= \"\\\n";
+		%output = %sqlite;
+		process();
+		print $fkeys_drop_prefix.$fkeys_drop.$fkeys_suffix;
+		print "#endif\t/* HAVE_SQLITE3 */\n";
+	}
+}
+
 main();
-newstate("table");
-print $constraints;
-print $output{"after"};

@@ -7,5 +7,5 @@ CREATE TEMPORARY TABLE tmp_applications_applicationid (applicationid bigint unsi
 INSERT INTO tmp_applications_applicationid (applicationid) (SELECT applicationid FROM applications);
 UPDATE applications SET templateid=NULL WHERE NOT templateid IS NULL AND NOT templateid IN (SELECT applicationid FROM tmp_applications_applicationid);
 DROP TABLE tmp_applications_applicationid;
-ALTER TABLE applications ADD CONSTRAINT c_applications_1 FOREIGN KEY (hostid) REFERENCES hosts (hostid) ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE applications ADD CONSTRAINT c_applications_2 FOREIGN KEY (templateid) REFERENCES applications (applicationid) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE applications ADD CONSTRAINT c_applications_1 FOREIGN KEY (hostid) REFERENCES hosts (hostid) ON DELETE CASCADE;
+ALTER TABLE applications ADD CONSTRAINT c_applications_2 FOREIGN KEY (templateid) REFERENCES applications (applicationid) ON DELETE CASCADE;
