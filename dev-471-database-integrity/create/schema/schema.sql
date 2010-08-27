@@ -991,19 +991,19 @@ FIELD		|name		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|test_string	|t_blob		|''	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|name
 
-TABLE|user_history|userhistoryid|ZBX_SYNC
+TABLE|user_history|userhistoryid|0
 FIELD		|userhistoryid	|t_id		|	|NOT NULL	|0
-FIELD		|userid		|t_id		|	|NOT NULL	|ZBX_SYNC		|1|users
-FIELD		|title1		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|url1		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|title2		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|url2		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|title3		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|url3		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|title4		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|url4		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|title5		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|url5		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|userid		|t_id		|	|NOT NULL	|0			|1|users
+FIELD		|title1		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|url1		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|title2		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|url2		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|title3		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|url3		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|title4		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|url4		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|title5		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|url5		|t_varchar(255)	|''	|NOT NULL	|0
 UNIQUE		|1		|userid
 
 TABLE|expressions|expressionid|ZBX_SYNC

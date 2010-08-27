@@ -23,6 +23,7 @@ use File::Basename;
 
 $file = dirname($0)."/schema.sql";	# Name the file
 
+local $state;
 local $output;
 local $eol, $fk_bol, $fk_eol;
 local $ltab, $szcol1, $szcol2, $szcol3, $szcol4;
@@ -30,6 +31,7 @@ local $sequences;
 local $sql_suffix;
 local $fkeys, $fkeys_prefix, $fkeys_suffix;
 local $fkeys_drop;
+local $uniq;
 
 %mysql=(
 	"database"	=>	"mysql",
@@ -169,20 +171,18 @@ sub newstate
 {
 	local $new = $_[0];
 
-	switch ($state)
+	if ($state eq "field")
 	{
-		case "field"
-		{
-			if ($output{"type"} eq "sql" && $new eq "index") { print "${pkey}${eol}\n)$output{'table_options'};${eol}\n"; }
-			if ($output{"type"} eq "sql" && $new eq "table") { print "${pkey}${eol}\n)$output{'table_options'};${eol}\n"; }
-			if ($output{"type"} eq "code" && $new eq "table") { print ",\n\t\t{0}\n\t\t}\n\t},\n"; }
-			if ($new eq "field") { print ",${eol}\n" }
-		}
-		case "index"
-		{
-			if ($output{"type"} eq "code" && $new eq "table") { print ",\n\t\t{0}\n\t\t}\n\t},\n"; }
-		}
+		if ($output{"type"} eq "sql" && $new eq "index") { print "${pkey}${eol}\n)$output{'table_options'};${eol}\n"; }
+		if ($output{"type"} eq "sql" && $new eq "table") { print "${pkey}${eol}\n)$output{'table_options'};${eol}\n"; }
+		if ($new eq "field") { print ",${eol}\n" }
 	}
+
+	if ($state ne "bof")
+	{
+		if ($output{"type"} eq "code" && $new eq "table") { print ",\n\t\t{0}\n\t\t}${uniq}\n\t},\n"; $uniq = ""; }
+	}
+
 	$state = $new;
 }
 
@@ -203,7 +203,7 @@ sub process_table
 
 		for ($flags)
 		{
-			s/,/ \| /;
+			s/,/ \| /g;
 		}
 
 		print "\t{\"${table_name}\",\t\"${pkey}\",\t${flags},\n\t\t{\n";
@@ -246,7 +246,7 @@ sub process_field
 
 		for ($flags)
 		{
-			s/,/ \| /;
+			s/,/ \| /g;
 		}
 
 		if ($fk_table)
@@ -398,14 +398,22 @@ sub process_index
 
 	newstate("index");
 
-	if ($output{"type"} eq "code")
-	{
-		return;
-	}
-
 	($name, $fields) = split(/\|/, $line, 2);
 
-	print "CREATE${unique} INDEX ${table_name}_$name\ on $table_name ($fields);${eol}\n";
+	if ($output{"type"} eq "code")
+	{
+		if (1 == $unique)
+		{
+			$uniq = ",\n\t\t\"${fields}\"";
+		}
+	}
+	else
+	{
+		if (1 == $unique) { $unique = " UNIQUE"; }
+		else { $unique = ""; }
+
+		print "CREATE${unique} INDEX ${table_name}_$name\ on $table_name ($fields);${eol}\n";
+	}
 }
 
 sub usage
@@ -419,9 +427,11 @@ sub process
 {
 	print $output{"before"};
 
+	$state = "bof";
 	$fkeys = "";
 	$fkeys_drop = "";
 	$sequences = "";
+	$uniq = "";
 
 	open(INFO, $file);			# Open the file
 	@lines = <INFO>;			# Read it into an array
@@ -435,15 +445,15 @@ sub process
 
 		chop($line);
 
-		($type,$line)=split(/\|/, $line,2);
+		($type, $line) = split(/\|/, $line, 2);
 
 		utf8::decode($type);
 
 		switch ($type)
 		{
 			case "TABLE"	{ process_table($line); }
-			case "INDEX"	{ process_index($line, ""); }
-			case "UNIQUE"	{ process_index($line, " ${type}"); }
+			case "INDEX"	{ process_index($line, 0); }
+			case "UNIQUE"	{ process_index($line, 1); }
 			case "FIELD"	{ process_field($line); }
 		}
 	}
