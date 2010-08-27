@@ -440,16 +440,17 @@ include_once('include/page_header.php');
 // ---------- GO ---------
 	else if(str_in_array($_REQUEST['go'], array('delete', 'delete_and_clear')) && isset($_REQUEST['templates'])){
 		$unlink_mode = false;
-		if(isset($_REQUEST['delete'])){
+		if($_REQUEST['go'] == 'delete'){
 			$unlink_mode = true;
 		}
 
+		DBstart();
 		$go_result = true;
 		$templates = get_request('templates', array());
 		$del_hosts = CTemplate::get(array('templateids' => $templates, 'editable' => 1));
 		$del_hosts = zbx_objectValues($del_hosts, 'templateid');
 
-		DBstart();
+		
 		$go_result = delete_host($del_hosts, $unlink_mode);
 		$go_result = DBend($go_result);
 
