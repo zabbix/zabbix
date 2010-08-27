@@ -455,7 +455,6 @@ COpt::memoryPick();
 			$res = DBselect($sql);
 			while($operation = DBfetch($res)){
 				$operation['opconditions'] = array();
-				$operation['opmediatypes'] = array();
 
 				$operations[$operation['operationid']] = $operation;
 				$operationids[$operation['operationid']] = $operation['operationid'];
@@ -465,12 +464,6 @@ COpt::memoryPick();
 			$res = DBselect($sql);
 			while($opcondition = DBfetch($res)){
 				$operations[$opcondition['operationid']]['opconditions'][] = $opcondition;
-			}
-
-			$sql = 'SELECT op.* FROM opmediatypes op WHERE '.DBcondition('op.operationid', $operationids);
-			$res = DBselect($sql);
-			while($opmediatype = DBfetch($res)){
-				$operations[$opmediatype['operationid']]['opmediatypes'][] = $opmediatype;
 			}
 
 			foreach($operations as $num => $operation){
@@ -638,7 +631,6 @@ COpt::memoryPick();
 
 			DB::delete('conditions', DBcondition('actionid', $actionids));
 			DB::delete('opconditions', DBcondition('operationid', $operationids));
-			DB::delete('opmediatypes', DBcondition('operationid', $operationids));
 			DB::delete('operations', DBcondition('actionid', $actionids));
 
 			self::addOperations($operations);
@@ -741,17 +733,9 @@ COpt::memoryPick();
 					$opcondition_inserts[] = $opcondition;
 				}
 			}
-
-			if($operation['mediatypeid'] > 0){
-				$opmediatype_inserts[] = array(
-					'operationid' => $operationids[$onum],
-					'mediatypeid' => $operation['mediatypeid'],
-				);
-			}
 		}
 
 		DB::insert('opconditions', $opcondition_inserts);
-		DB::insert('opmediatypes', $opmediatype_inserts, false);
 
 		return true;
 	}

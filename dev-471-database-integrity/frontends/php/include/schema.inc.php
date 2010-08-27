@@ -168,29 +168,11 @@ return array(
 				'length' => 64,
 				'default' => '',
 			),
-		),
-	),
-	'druleuniq' => array(
-		'key' => 'druleuniqid',
-		'fields' => array(
-			'druleuniqid' => array(
+			'uniq' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-			),
-			'druleid' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'drules',
-				'ref_field' => 'druleid',
-			),
-			'dcheckid' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'dchecks',
-				'ref_field' => 'dcheckid',
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
 			),
 		),
 	),
@@ -1676,6 +1658,13 @@ return array(
 				'length' => 10,
 				'default' => '0',
 			),
+			'mediatypeid' => array(
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'media_type',
+				'ref_field' => 'mediatypeid',
+			),
 		),
 	),
 	'opconditions' => array(
@@ -1710,30 +1699,6 @@ return array(
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
 				'default' => '',
-			),
-		),
-	),
-	'opmediatypes' => array(
-		'key' => 'opmediatypeid',
-		'fields' => array(
-			'opmediatypeid' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-			),
-			'operationid' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'operations',
-				'ref_field' => 'operationid',
-			),
-			'mediatypeid' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'media_type',
-				'ref_field' => 'mediatypeid',
 			),
 		),
 	),

@@ -138,14 +138,14 @@
 	}
 
 	function add_discovery_check($druleid, $type, $ports, $key, $snmp_community,
-			$snmpv3_securityname, $snmpv3_securitylevel, $snmpv3_authpassphrase, $snmpv3_privpassphrase)
+			$snmpv3_securityname, $snmpv3_securitylevel, $snmpv3_authpassphrase, $snmpv3_privpassphrase, $uniq=0)
 	{
 		$dcheckid = get_dbid('dchecks', 'dcheckid');
 		$result = DBexecute('insert into dchecks (dcheckid,druleid,type,ports,key_,snmp_community'.
-				',snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase) '.
+				',snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase, uniq) '.
 				' values ('.$dcheckid.','.$druleid.','.$type.','.zbx_dbstr($ports).','.
 				zbx_dbstr($key).','.zbx_dbstr($snmp_community).','.zbx_dbstr($snmpv3_securityname).','.
-				$snmpv3_securitylevel.','.zbx_dbstr($snmpv3_authpassphrase).','.zbx_dbstr($snmpv3_privpassphrase).')');
+				$snmpv3_securitylevel.','.zbx_dbstr($snmpv3_authpassphrase).','.zbx_dbstr($snmpv3_privpassphrase).','.zero2null($uniq).')');
 
 		if(!$result)
 			return $result;
@@ -168,13 +168,9 @@
 			foreach($dchecks as $id => $data){
 				$data['dcheckid'] = add_discovery_check($druleid, $data['type'], $data['ports'], $data['key'],
 						$data['snmp_community'], $data['snmpv3_securityname'], $data['snmpv3_securitylevel'],
-						$data['snmpv3_authpassphrase'], $data['snmpv3_privpassphrase']);
-				if($uniqueness_criteria == $id && $data['dcheckid'])
-					$unique_dcheckid = $data['dcheckid'];
+						$data['snmpv3_authpassphrase'], $data['snmpv3_privpassphrase'], 
+						($uniqueness_criteria == $id) ? 1 : 0);
 			}
-			if($unique_dcheckid)
-				DBexecute('INSERT INTO druleuniq (druleid, dcheckid) VALUES('.$druleid.', '.$unique_dcheckid.')');
-
 			$result = $druleid;
 		}
 
@@ -201,16 +197,13 @@
 				if($uniqueness_criteria == $id && $data['dcheckid'])
 					$unique_dcheckid = $data['dcheckid'];
 			}
+			
+			$sql = 'UPDATE dchecks SET uniq=NULL WHERE druleid='.$druleid;
+			DBexecute($sql);
 
 			if($unique_dcheckid){
-				$sql = 'SELECT dcheckid FROM druleuniq WHERE druleid='.$druleid;
-				$uniq = DBfetch(DBselect($sql));
-				if($uniq['dcheckid'] && ($uniq['dcheckid'] != $unique_dcheckid)){
-					DBexecute('UPDATE druleuniq SET dcheckid='.$unique_dcheckid);
-				}
-				else{
-					DBexecute('INSERT INTO druleuniq (druleid, dcheckid) VALUES('.$druleid.', '.$unique_dcheckid.')');
-				}
+				$sql = 'UPDATE dchecks SET uniq=1 WHERE dcheckid='.$unique_dcheckid;
+				DBexecute($sql);
 			}
 		}
 
