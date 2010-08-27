@@ -7,6 +7,7 @@ Changes for 1.9
 
 Changes for 1.8.4rc1
 
+ - [ZBX-2934] added new conf. constants for roundoff configuration (Vedmak)
  - [ZBX-2907] fixed errors when action condition has trigger from another node (Vedmak)
  - [ZBX-2928] fixed "triggers info" unknown counter, added not classified triggers count (Vedmak)
  - [ZBX-2914] Gentoo initscript cleanup (Richlv)
