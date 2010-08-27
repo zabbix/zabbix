@@ -65,6 +65,7 @@ ZBX_TABLE
 	char		*recid;
 	unsigned char	flags;
 	ZBX_FIELD	fields[ZBX_MAX_FIELDS];
+	char		*uniq;
 };
 
 extern ZBX_TABLE	tables[];
