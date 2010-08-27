@@ -186,7 +186,7 @@ include_once('include/page_header.php');
 			'hostids' => $templateids,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => 1,
-			'select_dependencies' => 1,
+			'select_dependencies' => API_OUTPUT_EXTEND,
 			'expandData' => 1
 		);
 		$triggers = CTrigger::get($params);
