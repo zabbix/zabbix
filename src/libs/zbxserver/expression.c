@@ -24,6 +24,8 @@
 #include "log.h"
 #include "zlog.h"
 
+static DB_MACROS	*macros = NULL;
+
 /******************************************************************************
  *                                                                            *
  * Function: trigger_get_N_functionid                                         *
@@ -803,8 +805,8 @@ static int	get_host_profile_value_by_triggerid(zbx_uint64_t triggerid, char **re
  *                                                                            *
  * Function: item_description                                                 *
  *                                                                            *
- * Purpose: substitute key parameters in the item description string          *
- *          with real values                                                  *
+ * Purpose: substitute key parameters and user macros in                      *
+ *          the item description string with real values                      *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
@@ -815,31 +817,62 @@ static int	get_host_profile_value_by_triggerid(zbx_uint64_t triggerid, char **re
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	item_description(char **data, const char *key)
+static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
 {
-	char	*p, *m, *str_out = NULL, params[MAX_STRING_LEN], param[MAX_STRING_LEN];
+	char	c, *p, *m, *n, *str_out = NULL, *replace_to = NULL, params[MAX_STRING_LEN], param[MAX_STRING_LEN];
 
-	if (2 /* key with parameters */ != parse_command(key, NULL, 0, params, sizeof(params)))
-		return;
+	switch (parse_command(key, NULL, 0, params, sizeof(params)))
+	{
+		case 0:
+			return;
+		case 1:
+			params[0] = '\0';
+		case 2:
+			/* do nothing */;
+	}
 
 	p = *data;
 	while (NULL != (m = strchr(p, '$')))
 	{
-		*m = '\0';
-		str_out = zbx_strdcat(str_out, p);
-		*m++ = '$';
-
-		if (*m >= '1' && *m <= '9')
+		if (m > p && *(m - 1) == '{' && (n = strchr(m + 1, '}')) != NULL)	/* user defined macros */
 		{
+			c = *++n;
+			*n = '\0';
+			zbxmacros_get_value(macros, &hostid, 1, m - 1, &replace_to);
+
+			if (NULL != replace_to)
+			{
+				*(m - 1) = '\0';
+				str_out = zbx_strdcat(str_out, p);
+				*(m - 1) = '{';
+
+				str_out = zbx_strdcat(str_out, replace_to);
+				zbx_free(replace_to);
+			}
+			else
+				str_out = zbx_strdcat(str_out, p);
+
+			*n = c;
+			p = n;
+		}
+		else if (*(m + 1) >= '1' && *(m + 1) <= '9' && params[0] != '\0')	/* macros $1, $2, ... */
+		{
+			*m = '\0';
+			str_out = zbx_strdcat(str_out, p);
+			*m++ = '$';
+
 			if (0 != get_param(params, *m - '0', param, sizeof(param)))
 				*param = '\0';
 
 			str_out = zbx_strdcat(str_out, param);
 			p = m + 1;
 		}
-		else
+		else									/* just a dollar sign */
 		{
-			str_out = zbx_strdcat(str_out, "$");
+			c = *++m;
+			*m = '\0';
+			str_out = zbx_strdcat(str_out, p);
+			*m = c;
 			p = m;
 		}
 	}
@@ -856,11 +889,10 @@ static void	item_description(char **data, const char *key)
  *                                                                            *
  * Function: DBget_trigger_value_by_triggerid                                 *
  *                                                                            *
- * Purpose: retrieve trigger value by functionid and field name               *
+ * Purpose: retrieve a particular value associated with the trigger's         *
+ *          N_functionid'th function                                          *
  *                                                                            *
- * Parameters: functionid - function identificator from database              *
- *             value - pointer to result buffer. Must be NULL                 *
- *             fieldname - field name in tables 'hosts' or 'items'            *
+ * Parameters:                                                                *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
@@ -923,7 +955,7 @@ static int	DBget_trigger_value_by_triggerid(zbx_uint64_t triggerid, char **repla
 			break;
 		case ZBX_REQUEST_ITEM_NAME:
 			*replace_to = zbx_dsprintf(*replace_to, "%s", item.description);
-			item_description(replace_to, item.key);
+			item_description(replace_to, item.key, item.hostid);
 			ret = SUCCEED;
 			break;
 		case ZBX_REQUEST_ITEM_KEY:
@@ -1839,7 +1871,7 @@ static const char	*ex_suffix[EX_SUFFIX_NUM] = {"}", "1}", "2}", "3}", "4}", "5}"
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: {DATE},{TIME},{HOSTNAME},{IPADDRESS},{STATUS},                   *
+ * Comments: {DATE}, {TIME}, {HOSTNAME}, {IPADDRESS}, {STATUS},               *
  *           {TRIGGER.NAME}, {TRIGGER.KEY}, {TRIGGER.SEVERITY}                *
  *                                                                            *
  ******************************************************************************/
@@ -1851,8 +1883,6 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, 
 	const char	*suffix, *m;
 	int		i, n, N_functionid, ret, res = SUCCEED;
 	size_t		len;
-
-	static DB_MACROS	*macros = NULL;
 
 	if (NULL == macros)
 		zbxmacros_init(&macros);
@@ -1915,7 +1945,6 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, 
 				if (0 == strcmp(m, MVAR_TRIGGER_NAME))
 				{
 					replace_to = zbx_dsprintf(replace_to, "%s", event->trigger_description);
-					/* Why it was here? *//* For substituting macros in trigger description :) */
 					substitute_simple_macros(event, action, item, dc_host, dc_item, escalation, &replace_to,
 							MACRO_TYPE_TRIGGER_DESCRIPTION, error, maxerrlen);
 				}
@@ -2134,6 +2163,8 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, 
 				else if (0 == strcmp(m, MVAR_ITEM_VALUE))
 					ret = DBget_item_value_by_triggerid(event->objectid, &replace_to, N_functionid,
 							event->clock, event->ns);
+				else if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+					zbxmacros_get_value_by_triggerid(macros, event->objectid, m, &replace_to);
 			}
 		}
 		else if (macro_type & MACRO_TYPE_TRIGGER_EXPRESSION)
