@@ -17,7 +17,8 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#if defined (_WINDOWS)
+#if defined(_WINDOWS)
+
 #include "common.h"
 
 #include "log.h"
@@ -72,9 +73,9 @@ out:
 
 	return ret;
 }
-#include "afxres.h"
+
 /* close event logger */
-static long	zbx_close_eventlog(HANDLE eventlog_handle)
+static int	zbx_close_eventlog(HANDLE eventlog_handle)
 {
 	if (NULL != eventlog_handle)
 		CloseEventLog(eventlog_handle);
@@ -96,7 +97,7 @@ static int	zbx_get_eventlog_message(LPCTSTR wsource, HANDLE eventlog_handle, lon
 	DWORD		szData, Type;
 	HINSTANCE	hLib = NULL;				/* handle to the messagetable DLL */
 	LPTSTR		pCh, aInsertStrs[MAX_INSERT_STRS];	/* array of pointers to insert */
-	LPTSTR		msgBuf = NULL;				/* hold text of the error message that we */
+	LPTSTR		msgBuf = NULL;				/* hold text of the error message */
 	char		*buf = NULL;
 	long		i, err = 0;
 	int		ret = FAIL;
@@ -181,9 +182,9 @@ retry:
 						hLib,				/* the messagetable DLL handle */
 						pELR->EventID,			/* message ID */
 						MAKELANGID(LANG_NEUTRAL, SUBLANG_ENGLISH_US),	/* language ID */
-						(LPTSTR)&msgBuf,			/* address of pointer to buffer for message */
+						(LPTSTR)&msgBuf,		/* address of pointer to buffer for message */
 						0,
-						(va_list *)aInsertStrs))			/* array of insert strings for the message */
+						(va_list *)aInsertStrs))	/* array of insert strings for the message */
 				{
 					*out_message = zbx_unicode_to_utf8(msgBuf);
 					zbx_rtrim(*out_message, "\r\n ");
@@ -203,7 +204,7 @@ retry:
 
 	if (SUCCEED != err)
 	{
-		*out_message = zbx_strdcatf(*out_message, "The description for Event ID ( %lu ) in Source ( %s ) cannot be found."
+		*out_message = zbx_strdcatf(*out_message, "The description for Event ID (%lu) in Source (%s) cannot be found."
 				" The local computer may not have the necessary registry information or message DLL files to"
 				" display messages from a remote computer.", *out_eventid, NULL == *out_source ? "" : *out_source);
 		if (pELR->NumStrings)
@@ -219,7 +220,6 @@ retry:
 				zbx_free(buf);
 			}
 		}
-
 	}
 
 	ret = SUCCEED;
@@ -231,11 +231,11 @@ out:
 	return ret;
 }
 
-int process_eventlog(const char *source, long *lastlogsize, unsigned long *out_timestamp, char **out_source,
+int	process_eventlog(const char *source, long *lastlogsize, unsigned long *out_timestamp, char **out_source,
 		unsigned short *out_severity, char **out_message, unsigned long	*out_eventid, unsigned char skip_old_data)
 {
-	int		ret = FAIL;
 	const char	*__function_name = "process_eventlog";
+	int		ret = FAIL;
 	HANDLE		eventlog_handle;
 	long		FirstID, LastID;
 	register long	i;
@@ -253,7 +253,6 @@ int process_eventlog(const char *source, long *lastlogsize, unsigned long *out_t
 	*out_severity	= 0;
 	*out_message	= NULL;
 	*out_eventid	= 0;
-
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() source:'%s' lastlogsize:%ld",
 			__function_name, source, *lastlogsize);
@@ -300,7 +299,10 @@ int process_eventlog(const char *source, long *lastlogsize, unsigned long *out_t
 				source, strerror_from_system(GetLastError()));
 
 	zbx_free(wsource);
+	
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
-#endif	/*if defined (_WINDOWS)*/
+
+#endif	/* if defined(_WINDOWS) */
