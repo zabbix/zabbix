@@ -694,7 +694,7 @@ void    *zbx_realloc2(char *filename, int line, void *src, size_t size);
 
 #define THIS_SHOULD_NEVER_HAPPEN	zbx_error("ERROR [file:%s,line:%d] "				\
 							"Something impossible has just happened.",	\
-							__FILE__, __LINE__);
+							__FILE__, __LINE__)
 
 #define MIN_ZABBIX_PORT 1024u
 #define MAX_ZABBIX_PORT 65535u
