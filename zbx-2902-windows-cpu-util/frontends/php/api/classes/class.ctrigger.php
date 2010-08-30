@@ -755,7 +755,7 @@ Copt::memoryPick();
 
 			$obj_params = array(
 				'triggerids' => $depids,
-				'output' => API_OUTPUT_EXTEND,
+				'output' => $options['select_dependencies'],
 				'expandData' => 1,
 				'preservekeys' => 1
 			);

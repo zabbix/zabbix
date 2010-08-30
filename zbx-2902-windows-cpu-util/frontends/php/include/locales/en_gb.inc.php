@@ -968,9 +968,11 @@
 	'S_TEMPLATE_DELETED'=>			'Template deleted',
 	'S_CANNOT_DELETE_TEMPLATE'=>		'Cannot delete template',
 	'S_LINK_WITH_TEMPLATE'=>		'Link with template',
-	'S_DELETE_AND_CLEAR'=>			'Delete AND clear',
+	'S_DELETE_AND_CLEAR'=>			'Delete and clear',
 	'S_DELETE_SELECTED_TEMPLATES_Q'=>	'Delete selected templates?',
-	'S_WARNING_THIS_DELETE_TEMPLATES_AND_CLEAR'=>'Warning: this will delete selected templates and clear all linked hosts',
+	'S_WARNING_THIS_DELETE_TEMPLATES_AND_CLEAR'=>'Delete and clear selected templates? (Warning: all linked hosts will be cleared!)',
+	'S_DELETE_TEMPLATE_Q' => 'Delete template?',
+	'S_DELETE_AND_CLEAR_TEMPLATE_Q' => 'Delete and clear template? (Warning: all linked hosts will be cleared!)',
 
 //	Host profiles
 	'S_HOST_PROFILE'=>			'Host profile',
@@ -1492,6 +1494,19 @@
 	'S_TAKE_DEF_LOCALE'=>			'Take for default locale',
 	'S_LOCALE_TO_EXTEND'=>			'Locale to extend',
 	'S_NEW_ENTRIES'=>			'New entries',
+
+	'S_NEW_LOCALE_STEP_1' => 'Download newly created locale file by pressing "Download".',
+	'S_NEW_LOCALE_STEP_2' => 'Place it to "/PATH_TO_ZABBIX_FRONTEND/include/locales".',
+	'S_NEW_LOCALE_STEP_3_1' => 'The locale file name must be made of a prefix: "ISO 639-1 language code"-"ISO 3166-1 alpha-2 country code". Like "en_gb"',
+	'S_NEW_LOCALE_STEP_3_2' => 'and a postfix ".inc.php". Like "en_gb.inc.php".',
+	'S_NEW_LOCALE_STEP_4_1' => 'To make new locale visible by Zabbix frontend - extend the php script "/PATH_TO_ZABBIX_FRONTEND/include/locales.inc.php".',
+	'S_NEW_LOCALE_STEP_4_2' => 'There You will find an array containing "keys" => "values".',
+	'S_NEW_LOCALE_STEP_4_3' => 'Extend this array with Your locale like "your_prefix" => "display_like".',
+	'S_NEW_LOCALE_STEP_4_4' => 'You can set "display_like" value in new locale file by adding it or You may leave it as hardcoded string.',
+	'S_NEW_LOCALE_STEP_4_5' => 'For example see implementation of other locales.',
+	'S_UPDATE_LOCALE_1' => 'Download newly created locale file by pressing "Download".',
+	'S_UPDATE_LOCALE_2' => 'Place it to "/PATH_TO_ZABBIX_FRONTEND/include/locales".',
+	'S_UPDATE_LOCALE_3' => 'Replace previous locale file with one you have downloaded.',
 
 //	report4.php
 	'S_NOTIFICATIONS'=>			'Notifications',

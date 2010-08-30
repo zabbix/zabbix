@@ -156,12 +156,13 @@
 	define ('PAGE_HEADER_LOADED', 1);
 
 	if(isset($_REQUEST['print'])){
-		define('ZBX_PAGE_NO_MENU', 1);
-		
+		if(!defined('ZBX_PAGE_NO_MENU'))
+			define('ZBX_PAGE_NO_MENU', 1);
+
 		$req = new CUrl();
 		$req->setArgument('print', null);
-		
-		$link = new CLink(bold('&laquo;'.S_BACK_BIG), $req->getUrl(), 'small_font');
+
+		$link = new CLink(bold('&laquo;'.S_BACK_BIG), $req->getUrl(), 'small_font', null, 'nosid');
 		$link->setAttribute('style','padding-left: 10px;');
 
 		$printview = new CDiv($link,'printless');
@@ -177,7 +178,10 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$help->setTarget('_blank');
 		$support = new CLink(S_GET_SUPPORT, 'http://www.zabbix.com/support.php', 'small_font', null, 'nosid');
 		$support->setTarget('_blank');
-		$printview = new CLink(S_PRINT, $_SERVER['REQUEST_URI'].(empty($_GET)?'?':'&').'print=1', 'small_font');
+
+		$req = new CUrl($_SERVER['REQUEST_URI']);
+		$req->setArgument('print', 1);
+		$printview = new CLink(S_PRINT, $req->getUrl(), 'small_font', null, 'nosid');
 
 		$page_header_r_col = array($help,'|',$support,'|',$printview);
 
@@ -391,7 +395,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 			$search_div = new CDiv($search_form);
 			$search_div->setAttribute('id','zbx_search');
 			$search_div->setAttribute('class','zbx_search');
-			
+
 			zbx_add_post_js("var sid = createSuggest('search');");
 		}
 

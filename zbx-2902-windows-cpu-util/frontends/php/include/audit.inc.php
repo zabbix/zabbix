@@ -45,6 +45,8 @@
 		$str_resource[AUDIT_RESOURCE_REGEXP] = S_REGULAR_EXPRESSION;
 		$str_resource[AUDIT_RESOURCE_MAINTENANCE] = S_MAINTENANCE;
 		$str_resource[AUDIT_RESOURCE_SCRIPT] = S_SCRIPT;
+		$str_resource[AUDIT_RESOURCE_MACRO] = S_MACRO;
+		$str_resource[AUDIT_RESOURCE_TEMPLATE] = S_TEMPLATE;
 
 		if(isset($str_resource[$resource_type]))
 			return $str_resource[$resource_type];

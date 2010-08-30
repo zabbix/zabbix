@@ -64,7 +64,6 @@
 		HQUERY		pdh_query;
 		PDH_RAW_COUNTER	queue;
 		PDH_HCOUNTER	queue_counter;
-
 	}
 	ZBX_CPUS_STAT_DATA;
 

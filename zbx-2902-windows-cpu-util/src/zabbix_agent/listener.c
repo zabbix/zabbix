@@ -43,7 +43,7 @@ static void	process_listener(zbx_sock_t *s)
 
 	if (SUCCEED == (ret = zbx_tcp_recv_to(s, &command, CONFIG_TIMEOUT)))
 	{
-		zbx_rtrim(command, "\r\n\0");
+		zbx_rtrim(command, "\r\n");
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Requested [%s]", command);
 
