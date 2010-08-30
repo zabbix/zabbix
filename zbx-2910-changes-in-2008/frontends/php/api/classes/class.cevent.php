@@ -535,7 +535,7 @@ Copt::memoryPick();
 
 		$eventids = array();
 		$result = true;
-		
+
 		$options = array(
 			'triggerids' => zbx_objectValues($events, 'objectid'),
 			'output' => API_OUTPUT_EXTEND,
@@ -628,7 +628,7 @@ Copt::memoryPick();
 			$result = DBexecute($sql);
 		}
 		else{
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ eventids ]');
+			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, S_EMPTY_INPUT_PARAMETER.' [ eventids ]');
 			$result = false;
 		}
 
@@ -669,7 +669,7 @@ Copt::memoryPick();
 		global $USER_DETAILS;
 
 		if(empty($events_data['events'])) return array('eventids' => array());
-		
+
 		$events = isset($events_data['events']) ? zbx_toArray($events_data['events']) : array();
 		$eventids = zbx_objectValues($events, 'eventid');
 		$eventids = array_combine($eventids, $eventids);
@@ -687,7 +687,7 @@ Copt::memoryPick();
 			$allowed_events = self::get($options);
 			foreach($events as $num => $event){
 				if(!isset($allowed_events[$event['eventid']])){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, 'You do not have enough rights for operation');
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
 				}
 			}
 // }}} PERMISSIONS
@@ -695,7 +695,7 @@ Copt::memoryPick();
 			foreach($allowed_events as $event){
 				$trig = reset($event['triggers']);
 				if(!(($trig['type'] == TRIGGER_MULT_EVENT_ENABLED) && ($event['value'] == TRIGGER_VALUE_TRUE))){
-				
+
 					$val = ($event['value'] == TRIGGER_VALUE_TRUE ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE);
 
 					$sql = ' SELECT eventid, object, objectid'.
@@ -719,7 +719,7 @@ Copt::memoryPick();
 					$last = DBfetch(DBselect($sql, 1));
 					$last_sql = $last ? ' AND e.eventid < '.$last['eventid'] : '';
 
-					
+
 					$sql = 'SELECT e.eventid'.
 						' FROM events e'.
 						' WHERE e.objectid = '.$event['objectid'].

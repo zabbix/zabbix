@@ -500,9 +500,10 @@ include_once('include/page_header.php');
 			try{
 				DBstart();
 				$global_macros = CUserMacro::get(array('globalmacro' => 1, 'extendoutput' => 1));
+				$global_macros = zbx_toHash($global_macros, 'globalmacroid');
 
 				$macros = get_request('macros', array());
-				
+
 				$macros_to_del = array();
 				foreach($global_macros as $gmacro){
 					$del = true;
@@ -526,11 +527,30 @@ include_once('include/page_header.php');
 					throw new Exception('Cannot update macro');
 				}
 
-				$result = CUsermacro::createGlobal($macros);
-				if(!$result){
+				$new_macroids = CUsermacro::createGlobal($macros);
+				if(!$new_macroids){
 					throw new Exception('Cannot add macro');
 				}
-				
+
+				$new_macros = CUserMacro::get(array(
+					'globalmacroids' => $new_macroids['globalmacroids'],
+					'globalmacro' => 1,
+					'extendoutput' => 1
+				));
+				$new_macros = zbx_toHash($new_macros, 'globalmacroid');
+				foreach($macros_to_del as $delm){
+					add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MACRO,
+						$delm['globalmacroid'],
+						$global_macros[$delm['globalmacroid']]['macro'],
+						null,null,null);
+				}
+				foreach($new_macroids['globalmacroids'] as $newid){
+					add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MACRO,
+						$newid,
+						$new_macros[$newid]['macro'],
+						null,null,null);
+				}
+
 				DBend(true);
 				show_messages(true, S_MACROS_UPDATED, S_CANNOT_UPDATE_MACROS);
 			}
@@ -540,7 +560,7 @@ include_once('include/page_header.php');
 				show_messages(false, S_MACROS_UPDATED, S_CANNOT_UPDATE_MACROS);
 			}
 		}
-		
+
 	}
 ?>
 
@@ -577,7 +597,7 @@ include_once('include/page_header.php');
 
 	$cnf_wdgt = new CWidget();
 	$cnf_wdgt->addPageHeader(S_CONFIGURATION_OF_ZABBIX_BIG, $form);
-	
+
 
 	if(isset($_REQUEST['config'])){
 		$config = select_config(false);
@@ -853,7 +873,7 @@ include_once('include/page_header.php');
 				$valueamaps[$db_valuemap['valuemapid']] = $db_valuemap;
 				$valueamaps[$db_valuemap['valuemapid']]['maps'] = array();
 			}
-			
+
 			$db_maps = DBselect('SELECT valuemapid, value, newvalue FROM mappings WHERE '.DBin_node('mappingid'));
 			while($db_map = DBfetch($db_maps)){
 				$valueamaps[$db_map['valuemapid']]['maps'][] = array(
@@ -861,7 +881,7 @@ include_once('include/page_header.php');
 					'newvalue' => $db_map['newvalue']
 				);
 			}
-			
+
 
 			order_result($valueamaps, 'name');
 			foreach($valueamaps as $valuemap){
@@ -1090,7 +1110,7 @@ include_once('include/page_header.php');
 /////////////////////////////
 //  config = 11 // Macros  //
 /////////////////////////////
-	else if($_REQUEST['config']==11){	// Macros		
+	else if($_REQUEST['config']==11){	// Macros
 		$form = new CForm();
 		$tbl = new CTable();
 		$tbl->addRow(get_macros_widget());

@@ -82,6 +82,11 @@ $page['file']	= 'index.php';
 		if($login){
 			$url = is_null($request)?$USER_DETAILS['url']:$request;
 
+			add_audit_ext(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER,
+				$USER_DETAILS['userid'],
+				'',
+				null,null,null);
+
 			jsRedirect($url);
 			exit();
 		}
@@ -105,7 +110,7 @@ include_once('include/page_header.php');
 				$lt = new CTextBox('name');
 				$lt->addStyle('width: 150px');
 				$frmLogin->addRow(S_LOGIN_NAME, $lt);
-				
+
 				$pt = new CPassBox('password');
 				$pt->addStyle('width: 150px');
 				$frmLogin->addRow(S_PASSWORD, $pt);
