@@ -24,7 +24,7 @@ require_once('include/hosts.inc.php');
 require_once('include/triggers.inc.php');
 require_once('include/items.inc.php');
 
-$page['title'] = 'S_TRIGGER_LOG';
+$page['title'] = 'S_TRIGGER_LOG_FORM';
 $page['file'] = 'tr_logform.php';
 $page['scripts'] = array();
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
