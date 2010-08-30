@@ -901,7 +901,7 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const
 	else
 	{
 		zbx_snprintf(sql, sizeof(sql),
-				"select value,clock"
+				"select value"
 				" from %s"
 				" where itemid=" ZBX_FS_UI64
 					" and clock<=%d"
@@ -1390,7 +1390,8 @@ static int	evaluate_ABSCHANGE(char *value, DB_ITEM *item, const char *function, 
 	if (item->lastvalue_null == 1 || item->prevvalue_null == 1)
 		goto clean;
 
-	switch (item->value_type) {
+	switch (item->value_type)
+	{
 		case ITEM_VALUE_TYPE_FLOAT:
 			zbx_snprintf(value, MAX_STRING_LEN, ZBX_FS_DBL,
 					(double)abs(item->lastvalue_dbl - item->prevvalue_dbl));
@@ -1446,7 +1447,8 @@ static int	evaluate_CHANGE(char *value, DB_ITEM *item, const char *function, con
 	if (item->lastvalue_null == 1 || item->prevvalue_null == 1)
 		goto clean;
 
-	switch (item->value_type) {
+	switch (item->value_type)
+	{
 		case ITEM_VALUE_TYPE_FLOAT:
 			zbx_snprintf(value, MAX_STRING_LEN, ZBX_FS_DBL,
 					item->lastvalue_dbl - item->prevvalue_dbl);
@@ -1502,7 +1504,8 @@ static int	evaluate_DIFF(char *value, DB_ITEM *item, const char *function, const
 	if (item->lastvalue_null == 1 || item->prevvalue_null == 1)
 		goto clean;
 
-	switch (item->value_type) {
+	switch (item->value_type)
+	{
 		case ITEM_VALUE_TYPE_FLOAT:
 			if (0 == cmp_double(item->lastvalue_dbl, item->prevvalue_dbl))
 				zbx_strlcpy(value, "0", MAX_STRING_LEN);
@@ -2044,13 +2047,13 @@ static void	add_value_suffix_s(char *value, int max_len)
 
 /******************************************************************************
  *                                                                            *
- * Function: add_value_suffix_normsl                                          *
+ * Function: add_value_suffix_normal                                          *
  *                                                                            *
  * Purpose: Process normal values and add K,M,G,T                             *
  *                                                                            *
  * Parameters: value - value for adjusting                                    *
  *             max_len - max len of the value                                 *
- *             units - units (bps, b, B, etc)                                  *
+ *             units - units (bps, b, B, etc)                                 *
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *

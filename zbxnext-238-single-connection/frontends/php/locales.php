@@ -89,7 +89,8 @@ $output = '<?php
 			$value = str_replace('\"', '"', addslashes($value));
 
 //			$value = preg_replace("/([^\\\])\'/uU", "$1\\\'", $value);
-			$output.= "'".zbx_strtoupper($key)."'=>\t\t\t'".$value."',\n\t";
+			if(!empty($value))
+				$output.= "'".zbx_strtoupper($key)."'=>\t\t\t'".$value."',\n\t";
 		}
 
 $output.='
@@ -140,7 +141,7 @@ if(isset($_REQUEST['make'])){
 	$frmLcls->Show();
 }
 else if(isset($_REQUEST['next'])){
-	$help = new CHelp('web.view.php','left');
+	$help = new CHelp('web.view.php');
 	$help_table = new CTableInfo();
 	$help_table->setAttribute('style', 'width: 600px;');
 
