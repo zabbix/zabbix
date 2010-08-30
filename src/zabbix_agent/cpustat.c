@@ -20,9 +20,9 @@
 #include "common.h"
 #include "cpustat.h"
 
-	#include "log.h"
+#include "log.h"
+
 #ifdef _WINDOWS
-	#include "log.h"
 	#include "perfmon.h"
 #endif /* _WINDOWS */
 
@@ -44,7 +44,6 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-
 int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 {
 #ifdef _WINDOWS
@@ -56,7 +55,8 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In init_cpu_collector()");
 
-	if (ERROR_SUCCESS != (status = PdhOpenQuery(NULL, 0, &pcpus->pdh_query))) {
+	if (ERROR_SUCCESS != (status = PdhOpenQuery(NULL, 0, &pcpus->pdh_query)))
+	{
 		zabbix_log(LOG_LEVEL_ERR, "Call to PdhOpenQuery() failed: %s",
 				strerror_from_module(status, TEXT("PDH.DLL")));
 		return 1;
@@ -69,7 +69,8 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	cpe.dwInstanceIndex = -1;
 	cpe.szCounterName = GetCounterName(PCI_PROCESSOR_TIME);
 
-	for(i = 0 /* 0 : _Total; >0 : cpu */; i <= pcpus->count; i++) {
+	for(i = 0 /* 0 : _Total; >0 : cpu */; i <= pcpus->count; i++)
+	{
 		if (i == 0)
 			zbx_wsnprintf(cpu, sizeof(cpu)/sizeof(TCHAR), TEXT("_Total"));
 		else
@@ -84,7 +85,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 		}
 
 		if (ERROR_SUCCESS != (status = PdhAddCounter(pcpus->pdh_query, counter_path, 0,
-				&pcpus->cpu[i].usage_couter)))
+				&pcpus->cpu[i].usage_counter)))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "Unable to add performance counter to query: %s",
 					strerror_from_module(status, TEXT("PDH.DLL")));
@@ -101,7 +102,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 
 	for(i = 1; i <= pcpus->count; i++)
 	{
-		PdhGetRawCounterValue(pcpus->cpu[i].usage_couter, NULL, &pcpus->cpu[i].usage_old);
+		PdhGetRawCounterValue(pcpus->cpu[i].usage_counter, NULL, &pcpus->cpu[i].usage_old);
 	}
 
 	cpe.szObjectName = GetCounterName(PCI_SYSTEM);
@@ -123,6 +124,9 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 				strerror_from_module(status, TEXT("PDH.DLL")));
 		return 2;
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of init_cpu_collector()");
+
 #endif /* _WINDOWS */
 
 	return 0;
@@ -144,7 +148,6 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-
 void	close_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 {
 #ifdef _WINDOWS
@@ -160,10 +163,10 @@ void	close_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 
 	for (i = 0; i < pcpus->count; i++)
 	{
-		if(pcpus->cpu[i].usage_couter)
+		if(pcpus->cpu[i].usage_counter)
 		{
-			PdhRemoveCounter(pcpus->cpu[i].usage_couter);
-			pcpus->cpu[i].usage_couter = NULL;
+			PdhRemoveCounter(pcpus->cpu[i].usage_counter);
+			pcpus->cpu[i].usage_counter = NULL;
 		}
 	}
 
@@ -172,6 +175,9 @@ void	close_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 		PdhCloseQuery(pcpus->pdh_query);
 		pcpus->pdh_query = NULL;
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of close_cpu_collector()");
+
 #endif /* _WINDOWS */
 }
 
@@ -444,7 +450,7 @@ static void	apply_cpustat(
 	zbx_uint64_t cpu_steal
 	)
 {
-	register int	i	= 0;
+	register int	i = 0;
 
 	int		time = 0, time1 = 0, time5 = 0, time15 = 0;
 	zbx_uint64_t	user = 0, user1 = 0, user5 = 0, user15 = 0,
@@ -457,8 +463,7 @@ static void	apply_cpustat(
 			steal = 0, steal1 = 0, steal5 = 0, steal15 = 0,
 			all = 0, all1 = 0, all5 = 0, all15 = 0;
 
-	ZBX_SINGLE_CPU_STAT_DATA
-			*curr_cpu = &pcpus->cpu[cpuid];
+	ZBX_SINGLE_CPU_STAT_DATA	*curr_cpu = &pcpus->cpu[cpuid];
 
 	for (i = 0; i < MAX_CPU_HISTORY; i++)
 	{
@@ -508,7 +513,7 @@ static void	apply_cpustat(
 		SAVE_CPU_CLOCK_FOR(15);
 	}
 
-#define CALC_CPU_LOAD(type, time)								\
+#define CALC_CPU_UTIL(type, time)								\
 	if ((type) - (type ## time) > 0 && (all) - (all ## time) > 0)				\
 	{											\
 		curr_cpu->type[ZBX_AVG ## time] = 100. * ((double)((type) - (type ## time))) /	\
@@ -519,37 +524,37 @@ static void	apply_cpustat(
 		curr_cpu->type[ZBX_AVG ## time] = 0.;						\
 	}
 
-	CALC_CPU_LOAD(user, 1);
-	CALC_CPU_LOAD(user, 5);
-	CALC_CPU_LOAD(user, 15);
+	CALC_CPU_UTIL(user, 1);
+	CALC_CPU_UTIL(user, 5);
+	CALC_CPU_UTIL(user, 15);
 
-	CALC_CPU_LOAD(system, 1);
-	CALC_CPU_LOAD(system, 5);
-	CALC_CPU_LOAD(system, 15);
+	CALC_CPU_UTIL(system, 1);
+	CALC_CPU_UTIL(system, 5);
+	CALC_CPU_UTIL(system, 15);
 
-	CALC_CPU_LOAD(nice, 1);
-	CALC_CPU_LOAD(nice, 5);
-	CALC_CPU_LOAD(nice, 15);
+	CALC_CPU_UTIL(nice, 1);
+	CALC_CPU_UTIL(nice, 5);
+	CALC_CPU_UTIL(nice, 15);
 
-	CALC_CPU_LOAD(idle, 1);
-	CALC_CPU_LOAD(idle, 5);
-	CALC_CPU_LOAD(idle, 15);
+	CALC_CPU_UTIL(idle, 1);
+	CALC_CPU_UTIL(idle, 5);
+	CALC_CPU_UTIL(idle, 15);
 
-	CALC_CPU_LOAD(interrupt, 1);
-	CALC_CPU_LOAD(interrupt, 5);
-	CALC_CPU_LOAD(interrupt, 15);
+	CALC_CPU_UTIL(interrupt, 1);
+	CALC_CPU_UTIL(interrupt, 5);
+	CALC_CPU_UTIL(interrupt, 15);
 
-	CALC_CPU_LOAD(iowait, 1);
-	CALC_CPU_LOAD(iowait, 5);
-	CALC_CPU_LOAD(iowait, 15);
+	CALC_CPU_UTIL(iowait, 1);
+	CALC_CPU_UTIL(iowait, 5);
+	CALC_CPU_UTIL(iowait, 15);
 
-	CALC_CPU_LOAD(softirq, 1);
-	CALC_CPU_LOAD(softirq, 5);
-	CALC_CPU_LOAD(softirq, 15);
+	CALC_CPU_UTIL(softirq, 1);
+	CALC_CPU_UTIL(softirq, 5);
+	CALC_CPU_UTIL(softirq, 15);
 
-	CALC_CPU_LOAD(steal, 1);
-	CALC_CPU_LOAD(steal, 5);
-	CALC_CPU_LOAD(steal, 15);
+	CALC_CPU_UTIL(steal, 1);
+	CALC_CPU_UTIL(steal, 5);
+	CALC_CPU_UTIL(steal, 15);
 }
 
 #endif /* not _WINDOWS */
@@ -560,13 +565,12 @@ void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus)
 
 	PDH_FMT_COUNTERVALUE	value;
 	PDH_STATUS		status;
-	LONG			sum;
-	int			i, j, n;
+	int			i, n;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In collect_cpustat()");
 
 	if (!pcpus->pdh_query)
 		return;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In collect_cpustat()");
 
 	if ((status = PdhCollectQueryData(pcpus->pdh_query)) != ERROR_SUCCESS)
 	{
@@ -576,53 +580,51 @@ void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus)
 	}
 
 	/* Process CPU utilization data */
-	for(i=0; i <= pcpus->count; i++)
+	for (i = 0; i <= pcpus->count; i++)
 	{
-		if(!pcpus->cpu[i].usage_couter)
+		ZBX_SINGLE_CPU_STAT_DATA	*curr_cpu = &pcpus->cpu[i];
+
+		if (!curr_cpu->usage_counter)
 			continue;
 
 		PdhGetRawCounterValue(
-			pcpus->cpu[i].usage_couter,
+			curr_cpu->usage_counter,
 			NULL,
-			&pcpus->cpu[i].usage);
+			&curr_cpu->usage);
 
 		PdhCalculateCounterFromRawValue(
-			pcpus->cpu[i].usage_couter,
+			curr_cpu->usage_counter,
 			PDH_FMT_LONG,
-			&pcpus->cpu[i].usage,
-			&pcpus->cpu[i].usage_old,
+			&curr_cpu->usage,
+			&curr_cpu->usage_old,
 			&value);
+			
+		curr_cpu->usage_old = curr_cpu->usage;
 
-		pcpus->cpu[i].h_usage[pcpus->cpu[i].h_usage_index] = value.longValue;
-		pcpus->cpu[i].usage_old = pcpus->cpu[i].usage;
+		/* Calculate average CPU usage */
 
-		/* Calculate average cpu usage */
-		for(n = pcpus->cpu[i].h_usage_index, j = 0, sum = 0; j < MAX_CPU_HISTORY; j++, n--)
-		{
-			if(n < 0) n = MAX_CPU_HISTORY - 1;
+		curr_cpu->util15sum -= curr_cpu->h_usage[curr_cpu->h_usage_index];
+		curr_cpu->h_usage[curr_cpu->h_usage_index] = value.longValue;
+		curr_cpu->util15sum += value.longValue;
 
-			sum += pcpus->cpu[i].h_usage[n];
+		n = curr_cpu->h_usage_index - 5 * SEC_PER_MIN;
+		curr_cpu->util5sum -= curr_cpu->h_usage[n < 0 ? n + MAX_CPU_HISTORY : n];
+		curr_cpu->util5sum += value.longValue;
 
-			if(j == 60) /* cpu usage for last minute */
-			{
-				pcpus->cpu[i].util1 = ((double)sum)/(double)j;
-			}
-			else if(j == 300) /* cpu usage for last five minutes */
-			{
-				pcpus->cpu[i].util5 = ((double)sum)/(double)j;
-			}
-		}
+		n = curr_cpu->h_usage_index - 1 * SEC_PER_MIN;
+		curr_cpu->util1sum -= curr_cpu->h_usage[n < 0 ? n + MAX_CPU_HISTORY : n];
+		curr_cpu->util1sum += value.longValue;
 
-		/* cpu usage for last fifteen minutes */
-		pcpus->cpu[i].util15 = ((double)sum)/(double)MAX_CPU_HISTORY;
+		curr_cpu->util15 = curr_cpu->util15sum / (double)MAX_CPU_HISTORY;
+		curr_cpu->util5 = curr_cpu->util5sum / (double)(5 * SEC_PER_MIN);
+		curr_cpu->util1 = curr_cpu->util1sum / (double)(1 * SEC_PER_MIN);
 
-		pcpus->cpu[i].h_usage_index++;
-		if (pcpus->cpu[i].h_usage_index == MAX_CPU_HISTORY)
-			pcpus->cpu[i].h_usage_index = 0;
+		curr_cpu->h_usage_index++;
+		if (curr_cpu->h_usage_index == MAX_CPU_HISTORY)
+			curr_cpu->h_usage_index = 0;
 	}
 
-
-	if(pcpus->queue_counter)
+	if (pcpus->queue_counter)
 	{
 		/* Process CPU queue length data */
 		PdhGetRawCounterValue(
@@ -637,33 +639,30 @@ void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus)
 			NULL,
 			&value);
 
+		/* Calculate average processor load */
+
+		pcpus->load15sum -= pcpus->h_queue[pcpus->h_queue_index];
 		pcpus->h_queue[pcpus->h_queue_index] = value.longValue;
+		pcpus->load15sum += value.longValue;
+		
+		n = pcpus->h_queue_index - 5 * SEC_PER_MIN;
+		pcpus->load5sum -= pcpus->h_queue[n < 0 ? n + MAX_CPU_HISTORY : n];
+		pcpus->load5sum += value.longValue;
 
-		/* Calculate average cpu usage */
-		for(n = pcpus->h_queue_index, j = 0, sum = 0; j < MAX_CPU_HISTORY; j++, n--)
-		{
-			if(n < 0) n = MAX_CPU_HISTORY - 1;
+		n = pcpus->h_queue_index - 1 * SEC_PER_MIN;
+		pcpus->load1sum -= pcpus->h_queue[n < 0 ? n + MAX_CPU_HISTORY : n];
+		pcpus->load1sum += value.longValue;
 
-			sum += pcpus->h_queue[n];
-
-			if(j == 60) /* processor(s) load for last minute */
-			{
-				pcpus->load1 = ((double)sum)/(double)j;
-			}
-			else if(j == 300) /* processor(s) load for last five minutes */
-			{
-				pcpus->load5 = ((double)sum)/(double)j;
-			}
-		}
-
-		/* cpu usage for last fifteen minutes */
-		pcpus->load15 = ((double)sum)/(double)MAX_CPU_HISTORY;
+		pcpus->load15 = pcpus->load15sum / (double)MAX_CPU_HISTORY;
+		pcpus->load5 = pcpus->load5sum / (double)(5 * SEC_PER_MIN);
+		pcpus->load1 = pcpus->load1sum / (double)(1 * SEC_PER_MIN);
 
 		pcpus->h_queue_index++;
-
 		if (pcpus->h_queue_index == MAX_CPU_HISTORY)
 			pcpus->h_queue_index = 0;
 	}
+	
+	zabbix_log(LOG_LEVEL_DEBUG, "End of collect_cpustat()");
 
 #else /* not _WINDOWS */
 
@@ -672,7 +671,7 @@ void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus)
 
 	zbx_uint64_t cpu_user, cpu_nice, cpu_system, cpu_idle, cpu_interrupt, cpu_iowait, cpu_softirq, cpu_steal;
 
-	for ( i= 0; i <= pcpus->count; i++)
+	for (i= 0; i <= pcpus->count; i++)
 	{
 		if(0 != get_cpustat(i, &now, &cpu_user, &cpu_system, &cpu_nice, &cpu_idle, &cpu_interrupt, &cpu_iowait, &cpu_softirq, &cpu_steal))
 			continue;
