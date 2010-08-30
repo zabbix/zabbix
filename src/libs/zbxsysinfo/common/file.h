@@ -26,6 +26,7 @@
 int	VFS_FILE_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	VFS_FILE_TIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	VFS_FILE_EXISTS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	VFS_FILE_CONTENTS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	VFS_FILE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	VFS_FILE_REGMATCH(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
