@@ -263,6 +263,10 @@
 	'S_HISTORY_OF_ACTIONS_DATE_FORMAT'=>	'd M Y H:i:s',
 	'S_EVENT_ACTION_MESSAGES_DATE_FORMAT'=>	'd M Y H:i:s',
 	'S_EVENT_ACTION_CMDS_DATE_FORMAT'=>	'Y.M.d H:i:s',
+	'S_INCORRECT_PARAMETER_USED_FOR_CONDITIONS'=>	'Incorrect parameter used for Conditions',
+	'S_INCORRECT_PARAMETER_USED_FOR_OPERATIONS'=>	'Incorrect parameter used for Operations',
+	'S_INCORRECT_PARAMETER_USED_FOR_ACTION'=>	'Incorrect parameter used for Action',
+	'S_EMPTY_INPUT_PARAMETER'=>	'Empty input parameter',
 
 //	node.php
 	'S_TIME_ZONE'=>				'Time zone',
@@ -353,6 +357,7 @@
 	'S_INCORRECT_PORT'=>			'Incorrect port',
 	'S_INCORRECT_DISCOVERY_STATUS'=>	'Incorrect discovery status',
 	'S_INCORRECT_CONDITION_TYPE'=>		'Incorrect condition type',
+	'S_INCORRECT_OBJECT_TYPE'=>		'Incorrect object type',
 
 	'S_INCORRECT_OPERATION_TYPE'=>		'Incorrect operation type',
 	'S_INCORRECT_USER'=>			'Incorrect user',
@@ -1768,6 +1773,8 @@
 	'S_COPY_SELECTED_TRIGGERS_Q'=>		'Copy selected triggers?',
 	'S_DELETE_SELECTED_TRIGGERS_Q'=>	'Delete selected triggers?',
 
+	'S_TRIGGER_LOG_FORM'=>	'Log trigger form',
+
 //	tr_comments.php
 	'S_TRIGGER_COMMENTS'=>			'Trigger comments',
 	'S_TRIGGER_COMMENTS_BIG'=>		'TRIGGER COMMENTS',
@@ -2071,6 +2078,10 @@
 	'S_ACTIVATE_SELECTED_APPLICATIONS' => 'Activate selected applications?',
 	'S_DISABLE_SELECTED_APPLICATIONS' => 'Disable selected applications?',
 	'S_DELETE_SELECTED_APPLICATIONS'  => 'Delete selected applications?',
+	'S_CANNOT_CREATE_APPLICATION'  => 'Cannot create application',
+	'S_INCORRECT_FIELDS_FOR_APPLICATIONS'  => 'Incorrect fields for application',
+	'S_CANNOT_UPDATE_APPLICATION'  => 'Cannot update application',
+	'S_CANNOT_DELETE_APPLICATION'  => 'Cannot delete application',
 
 // popup_media.php
 	'S_INCORRECT_TIME_PERIOD'=>	'Incorrect time period',
