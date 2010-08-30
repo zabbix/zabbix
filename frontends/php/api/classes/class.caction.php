@@ -516,7 +516,7 @@ COpt::memoryPick();
 					'evaltype' => null,
 				);
 				if(!check_db_fields($action_db_fields, $action)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect parameters used for Action [ '.$action['name'].' ]');
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_PARAMETER_USED_FOR_ACTION.' [ '.$action['name'].' ]');
 				}
 
 				$insert[$anum] = $action;
@@ -532,7 +532,7 @@ COpt::memoryPick();
 				}
 
 				if(!isset($action['operations']) || empty($action['operations'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect parameters used for Action [ '.$action['name'].' ]');
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_PARAMETER_USED_FOR_ACTION.' [ '.$action['name'].' ]');
 				}
 				else{
 					foreach($action['operations'] as $operation){
@@ -599,7 +599,7 @@ COpt::memoryPick();
 					'actionid' => null
 				);
 				if(!check_db_fields($action_db_fields, $action)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect parameters used for Action [ '.$action['name'].' ]');
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_PARAMETER_USED_FOR_ACTION.' [ '.$action['name'].' ]');
 				}
 
 				if(isset($action['conditions']) && !empty($action['conditions'])){
@@ -609,7 +609,7 @@ COpt::memoryPick();
 				}
 
 				if(!isset($action['operations']) || empty($action['operations'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect parameters used for Action [ '.$action['name'].' ]');
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_PARAMETER_USED_FOR_ACTION.' [ '.$action['name'].' ]');
 				}
 				else{
 					foreach($action['operations'] as $operation){
@@ -671,12 +671,12 @@ COpt::memoryPick();
 		$conditions_insert = array();
 
 		if(!check_permission_for_action_conditions($conditions)){
-			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NOPERMISSIONS);
+			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
 		}
 
 		foreach($conditions as $cnum => $condition){
 			if(!validate_condition($condition['type'], $condition['value'])){
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect parameters used for Conditions');
+				self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_PARAMETER_USED_FOR_CONDITIONS);
 			}
 			$conditions_insert[] = $condition;
 		}
@@ -726,7 +726,7 @@ COpt::memoryPick();
 				'operationtype' => null,
 			);
 			if(!check_db_fields($operation_db_fields, $operation)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect parameters used for Operations');
+				self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_PARAMETER_USED_FOR_OPERATIONS);
 			}
 
 			$operation_inserts[$onum] = $operation;
