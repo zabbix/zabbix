@@ -378,9 +378,10 @@ static zbx_task_t parse_commandline(int argc, char **argv)
 	return task;
 }
 
+#define VALUES_MAX	250
+
 int main(int argc, char **argv)
 {
-#define VALUES_MAX	250
 	FILE	*in;
 
 	char	in_line[MAX_BUF_LEN],
@@ -393,7 +394,11 @@ int main(int argc, char **argv)
 		total_count = 0,
 		succeed_count = 0,
 		buffer_count = 0,
+		read_more = 0,
 		ret = SUCCEED;
+
+	double	last_send = 0;
+
 	const char	*p;
 
 	ZBX_THREAD_SENDVAL_ARGS sentdval_args;
@@ -496,13 +501,42 @@ int main(int argc, char **argv)
 			succeed_count++;
 			buffer_count++;
 
-			if (VALUES_MAX == buffer_count || (stdin == in && 1 == REAL_TIME))
+			if (stdin == in && 1 == REAL_TIME)
+			{
+				/* if there is nothing on standard input after 1/5 seconds, we send what we have */
+				/* otherwise, we keep reading, but we should send data at least once per second */
+
+				struct timeval	tv;
+				fd_set		read_set;
+
+				tv.tv_sec = 0;
+				tv.tv_usec = 200000;
+
+				FD_ZERO(&read_set);
+				FD_SET(0, &read_set);	/* stdin is file descriptor 0 */
+
+				if (-1 == (read_more = select(1, &read_set, NULL, NULL, &tv)))
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "select() failed with errno:%d error:[%s]",
+							errno, strerror(errno));
+				}
+				else if (1 <= read_more)
+				{
+					if (0 == last_send)
+						last_send = zbx_time();
+					else if (zbx_time() - last_send >= 1)
+						read_more = 0;
+				}
+			}
+
+			if (VALUES_MAX == buffer_count || (stdin == in && 1 == REAL_TIME && 0 >= read_more))
 			{
 				zbx_json_close(&sentdval_args.json);
 
 				if (1 == WITH_TIMESTAMPS)
 					zbx_json_adduint64(&sentdval_args.json, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
 
+				last_send = zbx_time();
 
 				ret = zbx_thread_wait(zbx_thread_start(send_value, &sentdval_args));
 
@@ -519,7 +553,6 @@ int main(int argc, char **argv)
 		{
 			if (1 == WITH_TIMESTAMPS)
 				zbx_json_adduint64(&sentdval_args.json, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
-
 
 			ret = zbx_thread_wait(zbx_thread_start(send_value, &sentdval_args));
 		}
