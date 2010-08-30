@@ -83,19 +83,20 @@ $output = '<?php
 <?php
 	global $TRANSLATION;
 
-	$TRANSLATION=array('."\n\n\t";
+	$TRANSLATION=array('."\n\n";
 
 		foreach($_REQUEST['langTo'] as $key => $value){
 			$value = str_replace('\"', '"', addslashes($value));
 
 //			$value = preg_replace("/([^\\\])\'/uU", "$1\\\'", $value);
 			if(!empty($value))
-				$output.= "'".zbx_strtoupper($key)."'=>\t\t\t'".$value."',\n\t";
+				$output.= "\t'".zbx_strtoupper($key)."'=>\t\t\t'".$value."',\n";
 		}
 
 $output.='
 	);
-?>';
+?>
+';
 		print($output);
 		die();
 	}
@@ -222,7 +223,6 @@ else{
 	$frmLcls->addItemToBottomRow(new CButton('next',S_NEXT.' >>'));
 	$frmLcls->show();
 }
-
 
 include_once "include/page_footer.php";
 ?>
