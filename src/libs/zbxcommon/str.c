@@ -241,7 +241,7 @@ void	__zbx_zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_l
 		*str = zbx_realloc(*str, *alloc_len);
 	}
 
-	*offset += zbx_vsnprintf(*str+*offset, max_len, fmt, args);
+	*offset += zbx_vsnprintf(*str + *offset, max_len, fmt, args);
 
 	va_end(args);
 }
@@ -274,8 +274,10 @@ void	zbx_strcpy_alloc(char **str, int *alloc_len, int *offset, const char *src)
 
 	sz = (int)strlen(src);
 
-	if (*offset + sz >= *alloc_len) {
-		*alloc_len += sz < 32 ? 64 : 2 * sz;
+	if (*offset + sz >= *alloc_len)
+	{
+		while (*offset + sz >= *alloc_len)
+			*alloc_len *= 2;
 		*str = zbx_realloc(*str, *alloc_len);
 	}
 
@@ -802,8 +804,8 @@ char* zbx_dvsprintf(char *dest, const char *f, va_list args)
 
 	va_list curr;
 
-	while(1) {
-
+	while(1)
+	{
 		string = zbx_malloc(string, size);
 
 		va_copy(curr, args);

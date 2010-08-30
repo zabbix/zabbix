@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "sysinfo.h"
+#include "log.h"
 #include "md5.h"
 #include "file.h"
 
@@ -104,6 +105,75 @@ int	VFS_FILE_EXISTS(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	if (0 == zbx_stat(filename, &buf))	/* File exists */
 		if (S_ISREG(buf.st_mode))	/* Regular file */
 			SET_UI64_RESULT(result, 1);
+
+	return SYSINFO_RET_OK;
+}
+
+int	VFS_FILE_CONTENTS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	char		filename[MAX_STRING_LEN], encoding[32];
+	char		read_buf[MAX_BUF_LEN], *utf8, *contents = NULL;
+	int		contents_alloc = 512, contents_offset = 0;
+	int		f, nbytes;
+	struct stat	stat_buf;
+
+	assert(result);
+
+	init_result(result);
+
+	if (num_param(param) > 2)
+		return SYSINFO_RET_FAIL;
+
+	if (0 != get_param(param, 1, filename, sizeof(filename)))
+		return SYSINFO_RET_FAIL;
+
+	if (0 != get_param(param, 2, encoding, sizeof(encoding)))
+		*encoding = '\0';
+
+	zbx_strupper(encoding);
+
+	if (0 != zbx_stat(filename, &stat_buf))
+		return SYSINFO_RET_FAIL;
+
+	if (stat_buf.st_size > 65535)	/* files larger than 64 kB cannot be stored in the database */
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Item %s not supported: file too big (%lu bytes)",
+				cmd, (size_t)stat_buf.st_size);
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (-1 == (f = zbx_open(filename, O_RDONLY)))
+		return SYSINFO_RET_FAIL;
+
+	contents = zbx_malloc(contents, contents_alloc);
+
+	while (0 < (nbytes = zbx_read(f, read_buf, sizeof(read_buf), encoding)))
+	{
+		utf8 = convert_to_utf8(read_buf, nbytes, encoding);
+		zbx_strcpy_alloc(&contents, &contents_alloc, &contents_offset, utf8);
+		zbx_free(utf8);
+	}
+
+ 	close(f);
+
+	if (-1 == nbytes)	/* error occurred */
+	{
+		zbx_free(contents);
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (0 != contents_offset)
+	{
+		zbx_rtrim(contents, "\r\n");
+
+		if ('\0' == *contents)
+			zbx_free(contents);
+	}
+
+	if (NULL == contents)	/* EOF */
+		contents = strdup("EOF");
+
+	SET_TEXT_RESULT(result, contents);
 
 	return SYSINFO_RET_OK;
 }
