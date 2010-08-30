@@ -422,7 +422,7 @@
 			);
 
 		if ($result)
-			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_ITEM, $itemid, $item['description'], NULL, NULL, NULL);
+			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_ITEM, $itemid, $host['host'].':'.$item['description'], NULL, NULL, NULL);
 		else
 			return $result;
 
@@ -477,8 +477,9 @@
 
 				$result &= DBexecute($sql);
 				if ($result){
+					$host=get_host_by_hostid($row['hostid']);
 					$item_new = get_item_by_itemid($row['itemid']);
-					add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, $row['itemid'], $row['description'], 'items', $row, $item_new);
+					add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, $row['itemid'], $host['host'].':'.$row['description'], 'items', $row, $item_new);
 				}
 			}
 		}
@@ -658,7 +659,7 @@
 
 		if ($result){
 			$item_new = get_item_by_itemid($itemid);
-			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, $itemid, $item_old['description'], 'items', $item_old, $item_new);
+			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, $itemid, $host['host'].':'.$item_old['description'], 'items', $item_old, $item_new);
 		}
 
 		update_item_status($itemid, $item['status']);

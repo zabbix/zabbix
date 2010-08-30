@@ -195,34 +195,25 @@ include_once('include/page_header.php');
 			unset($_REQUEST['form']);
 		}
 	}
-	else if(isset($_REQUEST['delete'])&&isset($_REQUEST['sysmapid'])){
-		$maps = zbx_toObject($_REQUEST['sysmapid'], 'sysmapid');
-
-		DBstart();
-		$result = CMap::delete($maps);
-		$result = DBend($result);
-
-		add_audit_if($result,AUDIT_ACTION_DELETE,AUDIT_RESOURCE_MAP,'Name ['.$sysmap['name'].']');
-		show_messages($result, S_MAP_DELETED, S_CANNOT_DELETE_MAP);
-		if($result){
-			unset($_REQUEST['form']);
+	else if((isset($_REQUEST['delete'])&&isset($_REQUEST['sysmapid'])) || ($_REQUEST['go'] == 'delete')){
+		$sysmapids = get_request('maps', array());
+		if(isset($_REQUEST['sysmapid'])){
+			$sysmapids[] = $_REQUEST['sysmapid'];
 		}
-	}
-	else if($_REQUEST['go'] == 'delete'){
-		$go_result = true;
-		$maps = get_request('maps', array());
 
-		$maps = zbx_toObject($maps, 'sysmapid');
+		$maps = CMap::get(array('sysmapids' => $sysmapids, 'output' => API_OUTPUT_EXTEND, 'editable => 1'));
+		$go_result = CMap::delete($sysmapids);
 
-		DBstart();
-		$result = CMap::delete($maps);
-		$go_result = DBend($result);
-
-
-		if($go_result){
-			unset($_REQUEST["form"]);
-		}
 		show_messages($go_result, S_MAP_DELETED, S_CANNOT_DELETE_MAP);
+		if($go_result){
+			unset($_REQUEST['form']);
+			foreach($maps as $map){
+				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MAP,
+					$map['sysmapid'],
+					$map['name'],
+					null,null,null);
+			}
+		}
 	}
 
 	if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){

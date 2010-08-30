@@ -514,7 +514,7 @@ SDI('/////////////////////////////////');
 				'preservekeys' => 1,
 			));
 			foreach($hostgroups as $id){
-				if(!isset($result[$id])) self::exception(ZBX_API_ERROR_PERMISSIONS, S_HOSTGROUP);
+				if(!isset($result[$id])) self::exception(ZBX_API_ERROR_PERMISSIONS, S_HOST_GROUP);
 			}
 		}
 		if(!empty($hosts)){

@@ -28,17 +28,22 @@
 
 	typedef struct s_single_cpu_stat_data
 	{
-		PDH_HCOUNTER	usage_couter;
+		PDH_HCOUNTER	usage_counter;
 		PDH_RAW_COUNTER	usage;
 		PDH_RAW_COUNTER	usage_old;
 
-		double util1;
-		double util5;
-		double util15;
+		double	util1;
+		double	util5;
+		double	util15;
+
+		LONG	util1sum;
+		LONG	util5sum;
+		LONG	util15sum;
 
 		LONG	h_usage[MAX_CPU_HISTORY]; /* usage history */
 		int	h_usage_index;
-	} ZBX_SINGLE_CPU_STAT_DATA;
+	}
+	ZBX_SINGLE_CPU_STAT_DATA;
 
 	typedef struct s_cpus_stat_data
 	{
@@ -49,14 +54,18 @@
 		double	load5;
 		double	load15;
 
+		LONG	load1sum;
+		LONG	load5sum;
+		LONG	load15sum;
+
 		LONG	h_queue[MAX_CPU_HISTORY]; /* queue history */
 		int	h_queue_index;
 
 		HQUERY		pdh_query;
 		PDH_RAW_COUNTER	queue;
 		PDH_HCOUNTER	queue_counter;
-
-	} ZBX_CPUS_STAT_DATA;
+	}
+	ZBX_CPUS_STAT_DATA;
 
 #	define CPU_COLLECTOR_STARTED(collector)	((collector) && (collector)->cpus.pdh_query)
 
@@ -86,17 +95,19 @@
 		double	iowait[ZBX_AVGMAX];
 		double	softirq[ZBX_AVGMAX];
 		double	steal[ZBX_AVGMAX];
-	} ZBX_SINGLE_CPU_STAT_DATA;
+	}
+	ZBX_SINGLE_CPU_STAT_DATA;
 
 	typedef struct s_cpus_stat_data
 	{
 		int	count;
 		ZBX_SINGLE_CPU_STAT_DATA *cpu; /* count + 1 */
-	} ZBX_CPUS_STAT_DATA;
+	}
+	ZBX_CPUS_STAT_DATA;
 
-#	define CPU_COLLECTOR_STARTED(pcpus)	(collector)
+#	define CPU_COLLECTOR_STARTED(collector)	(collector)
+
 #endif /* _WINDOWS */
-
 
 int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus);
 void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus);
