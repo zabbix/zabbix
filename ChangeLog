@@ -8,6 +8,7 @@ Changes for 1.9
 
 Changes for 1.8.4rc1
 
+ - [ZBX-2902] fixed system.cpu.load[] and system.cpu.util[] being slightly exaggerated on Windows (asaveljevs)
  - [ZBX-2954] fixed translations in template delete popups (Vedmak)
  - [ZBX-2938] fixed not showing problems on map for hosts in maintenance (Vedmak)
  - [ZBXNEXT-238] made zabbix_sender gather as much data as possible before sending (asaveljevs)
