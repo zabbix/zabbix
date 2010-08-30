@@ -102,60 +102,12 @@ $output.='
 }
 
 
-if(isset($_REQUEST['make'])){
-	show_table_header(S_LOCALES);
-
-	$frmLcls = new CFormTable(S_CREATE.SPACE.S_LOCALE_SMALL,'locales.php','post',null,'form');
-
-	if($_REQUEST['extlang'] == 'new'){
-		define('S_NEW_LOCALE_STEP_1','Download newly created locale file by pressing "Download".');
-		define('S_NEW_LOCALE_STEP_2','Place it to "/PATH_TO_ZABBIX_FRONTEND/include/locales".');
-		define('S_NEW_LOCALE_STEP_3_1','The locale file name must be made of a prefix: "ISO 639-1 language code"_"ISO 3166-1 alpha-2 country code". Like "en_gb"');
-		define('S_NEW_LOCALE_STEP_3_2','and a postfix ".inc.php". Like "en_gb.inc.php".');
-		define('S_NEW_LOCALE_STEP_4_1','To make new locale visible by ZABBIX frontend - extend the php script "/PATH_TO_ZABBIX_FRONTEND/include/locales.inc.php".');
-		define('S_NEW_LOCALE_STEP_4_2','ll find an array containing "keys" => "values".');
-		define('S_NEW_LOCALE_STEP_4_3','Extend this array with your locale like "your_prefix" => "display_like".');
-		define('S_NEW_LOCALE_STEP_4_4','You can set "display_like" value in your locale file by adding it to your locale file or you can leave it hardcoded string.');
-		define('S_NEW_LOCALE_STEP_4_5','For example see implementation of other locales.');
-
-		$frmLcls->addRow(S_STEP.SPACE.'1:',S_NEW_LOCALE_STEP_1);
-		$frmLcls->addRow(S_STEP.SPACE.'2:',S_NEW_LOCALE_STEP_2);
-		$frmLcls->addRow(S_STEP.SPACE.'3:',array(S_NEW_LOCALE_STEP_3_1,BR(),
-												S_NEW_LOCALE_STEP_3_2));
-		$frmLcls->addRow(S_STEP.SPACE.'4:',array(S_NEW_LOCALE_STEP_4_1,BR(),
-												S_NEW_LOCALE_STEP_4_2,BR(),
-												S_NEW_LOCALE_STEP_4_3,BR(),
-												S_NEW_LOCALE_STEP_4_4,BR(),
-												S_NEW_LOCALE_STEP_4_5));
-	}
-	else{
-
-		$frmLcls->addRow(S_STEP.SPACE.'1:','Download newly created locale file by pressing "Download".');
-		$frmLcls->addRow(S_STEP.SPACE.'2:','Place it to "/PATH_TO_ZABBIX_FRONTEND/include/locales".');
-		$frmLcls->addRow(S_STEP.SPACE.'3:','Replace previous locale file with one you have downloaded.');
-	}
-
-	$lang = serialize($_REQUEST['langTo']);
-	$frmLcls->addVar('lang',$lang);
-	$frmLcls->addItemToBottomRow(new CButton('download',S_DOWNLOAD,'PopUp("locales")'));
-	$frmLcls->Show();
-}
-else if(isset($_REQUEST['next'])){
+if(isset($_REQUEST['next'])){
 	$help = new CHelp('web.view.php');
 	$help_table = new CTableInfo();
 	$help_table->setAttribute('style', 'width: 600px;');
 
 	if($_REQUEST['extlang'] == 'new'){
-		define('S_NEW_LOCALE_STEP_1','Download newly created locale file by pressing "Download".');
-		define('S_NEW_LOCALE_STEP_2','Place it to "/PATH_TO_ZABBIX_FRONTEND/include/locales".');
-		define('S_NEW_LOCALE_STEP_3_1','The locale file name must be made of a prefix: "ISO 639-1 language code"-"ISO 3166-1 alpha-2 country code". Like "en-gb"');
-		define('S_NEW_LOCALE_STEP_3_2','and a postfix ".inc.php". Like "en-gb.inc.php".');
-		define('S_NEW_LOCALE_STEP_4_1','To make new locale visible by ZABBIX frontend - extend the php script "/PATH_TO_ZABBIX_FRONTEND/include/locales.inc.php".');
-		define('S_NEW_LOCALE_STEP_4_2','There You will find an array containing "keys" => "values".');
-		define('S_NEW_LOCALE_STEP_4_3','Extend this array with Your locale like "your_prefix" => "display_like".');
-		define('S_NEW_LOCALE_STEP_4_4','You can set "display_like" value in new locale file by adding it or You may leave it as hardcoded string.');
-		define('S_NEW_LOCALE_STEP_4_5','For example see implementation of other locales.');
-
 		$help_table->addRow(array(S_STEP.SPACE.'1:',S_NEW_LOCALE_STEP_1));
 		$help_table->addRow(array(S_STEP.SPACE.'2:',S_NEW_LOCALE_STEP_2));
 		$help_table->addRow(array(S_STEP.SPACE.'3:',array(S_NEW_LOCALE_STEP_3_1,BR(),
@@ -167,10 +119,9 @@ else if(isset($_REQUEST['next'])){
 												S_NEW_LOCALE_STEP_4_5)));
 	}
 	else{
-
-		$help_table->addRow(array(S_STEP.SPACE.'1:','Download newly created locale file by pressing "Download".'));
-		$help_table->addRow(array(S_STEP.SPACE.'2:','Place it to "/PATH_TO_ZABBIX_FRONTEND/include/locales".'));
-		$help_table->addRow(array(S_STEP.SPACE.'3:','Replace previous locale file with one you have downloaded.'));
+		$help_table->addRow(array(S_STEP.SPACE.'1:',S_UPDATE_LOCALE_1));
+		$help_table->addRow(array(S_STEP.SPACE.'2:',S_UPDATE_LOCALE_2));
+		$help_table->addRow(array(S_STEP.SPACE.'3:',S_UPDATE_LOCALE_3));
 	}
 
 	$help->setHint($help_table);
