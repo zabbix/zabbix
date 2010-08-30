@@ -971,9 +971,11 @@
 	'S_TEMPLATE_DELETED'=>			'Template deleted',
 	'S_CANNOT_DELETE_TEMPLATE'=>		'Cannot delete template',
 	'S_LINK_WITH_TEMPLATE'=>		'Link with template',
-	'S_DELETE_AND_CLEAR'=>			'Delete AND clear',
+	'S_DELETE_AND_CLEAR'=>			'Delete and clear',
 	'S_DELETE_SELECTED_TEMPLATES_Q'=>	'Delete selected templates?',
-	'S_WARNING_THIS_DELETE_TEMPLATES_AND_CLEAR'=>'Warning: this will delete selected templates and clear all linked hosts',
+	'S_WARNING_THIS_DELETE_TEMPLATES_AND_CLEAR'=>'Delete and clear selected templates? (Warning: all linked hosts will be cleared!)',
+	'S_DELETE_TEMPLATE_Q' => 'Delete template?',
+	'S_DELETE_AND_CLEAR_TEMPLATE_Q' => 'Delete and clear template? (Warning: all linked hosts will be cleared!)',
 
 //	Host profiles
 	'S_HOST_PROFILE'=>			'Host profile',
