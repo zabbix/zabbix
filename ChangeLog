@@ -8,6 +8,7 @@ Changes for 1.9
 
 Changes for 1.8.4rc1
 
+ - [ZBXNEXT-458] user macros (e.g., {$MACRO}) can now be used in item and trigger descriptions (asaveljevs,Vedmak)
  - [ZBX-2959] fix trailing whitespace & missing trailing newline in downloaded translations (Richlv)
  - [ZBX-2910] fixed 'strerror_from_system undefined' compilation warning on Windows; thanks to Takanori Suzuki (asaveljevs)
  - [ZBX-2902] fixed system.cpu.load[] and system.cpu.util[] being slightly exaggerated on Windows (asaveljevs)

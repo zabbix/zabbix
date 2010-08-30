@@ -1133,6 +1133,14 @@
 			$descr=str_replace("$$i",get_n_param($key,$i),$descr);
 		}
 
+		if($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $descr, $arr)){
+			$macros = CuserMacro::getMacros($arr[1], array('itemid' => $item['itemid']));
+			
+			$search = array_keys($macros);
+			$values = array_values($macros);
+			$descr = str_replace($search, $values, $descr);
+		}
+
 	return $descr;
 	}
 
