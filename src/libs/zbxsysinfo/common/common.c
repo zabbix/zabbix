@@ -303,7 +303,7 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
 	zabbix_log(LOG_LEVEL_DEBUG, "Before");
 
-	zbx_rtrim(cmd_result,"\n\r\0");
+	zbx_rtrim(cmd_result, "\r\n");
 
 	/* We got EOL only */
 	if(cmd_result[0] == '\0')
