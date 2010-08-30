@@ -20,6 +20,8 @@
 #include "common.h"
 #include "mutexs.h"
 
+#include "log.h"
+
 #if !defined(_WINDOWS)
 
 #	if !HAVE_SEMUN
