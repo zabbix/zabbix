@@ -217,7 +217,7 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 
 	memset(&av, 0, sizeof(AGENT_VALUE));
 	
-	zbx_rtrim(s, " \r\n\0");
+	zbx_rtrim(s, " \r\n");
 
 	datalen = strlen(s);
 	zabbix_log(LOG_LEVEL_DEBUG, "Trapper got [%s] len %zd", s, datalen);
