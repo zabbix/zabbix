@@ -433,7 +433,7 @@ COpt::memoryPick();
 				$result = add_application($application['name'], $application['hostid']);
 
 				if(!$result)
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot create application');
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_CANNOT_CREATE_APPLICATION);
 				$applicationids[] = $result;
 			}
 
@@ -482,12 +482,12 @@ COpt::memoryPick();
 				$application_db_fields = $upd_applications[$application['applicationid']];
 
 				if(!check_db_fields($application_db_fields, $application)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect fields for application');
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_FIELDS_FOR_APPLICATIONS);
 				}
 
 				$result = update_application($application['applicationid'], $application['name'], $application['hostid']);
 				if(!$result)
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot update application');
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_CANNOT_UPDATE_APPLICATION);
 			}
 
 			self::EndTransaction(true, __METHOD__);
@@ -532,7 +532,7 @@ COpt::memoryPick();
 
 			$result = delete_application($applicationids);
 			if(!$result)
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete application');
+				self::exception(ZBX_API_ERROR_PARAMETERS, S_CANNOT_DELETE_APPLICATION);
 
 			self::EndTransaction(true, __METHOD__);
 			return array('applicationids' => $applicationids);
