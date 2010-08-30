@@ -213,7 +213,7 @@ include_once('include/page_header.php');
 		else{
 			$icon = new CIcon(S_FAVOURITES, 'iconplus');
 		}
-		
+
 		$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
 
 		$refresh_icon = new CIcon(S_MENU, 'iconmenu');
@@ -239,7 +239,6 @@ include_once('include/page_header.php');
 // }}} HEADER
 
 		if($screen){
-
 			if((2 != $_REQUEST['fullscreen']) && check_dynamic_items($elementid, 1)){
 				if(!isset($_REQUEST['hostid'])){
 					$_REQUEST['groupid'] = $_REQUEST['hostid'] = 0;
@@ -281,7 +280,14 @@ include_once('include/page_header.php');
 			$menu = array();
 			$submenu = array();
 			$refresh_multipl = CProfile::get('web.slides.rf_rate.hat_slides', 1, $elementid);
-			make_refresh_menu('mainpage','hat_slides', $refresh_multipl, array('elementid'=> $elementid), $menu, $submenu, 2);
+			
+// workaround for 1.8.2 upgrade, earlier value was integer type, now str
+			if(empty($refresh_multipl)){
+				$refresh_multipl = 1;
+				CProfile::update('web.slides.rf_rate.hat_slides', $refresh_multipl, PROFILE_TYPE_STR, $elementid);
+			}
+
+			make_refresh_menu('mainpage', 'hat_slides', $refresh_multipl, array('elementid'=> $elementid), $menu, $submenu, 2);
 			insert_js('var page_menu='.zbx_jsvalue($menu).";\n".'var page_submenu='.zbx_jsvalue($submenu).";\n");
 // --------------
 

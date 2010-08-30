@@ -268,7 +268,7 @@ private $items;
 			hide_form_items($col1);
 			hide_form_items($col2);
 //if empty header than do not show it
-			if(($col1 == SPACE) && ($col2 == SPACE)) return new CJSscript('');
+			if(($col1 === SPACE) && ($col2 === SPACE)) return new CJSscript('');
 		}
 
 		$td_r = new CCol($col2,'header_r');
