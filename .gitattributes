@@ -402,6 +402,8 @@ man/zabbix_sender.man -text
 man/zabbix_server.man -text
 misc/clock/clock.fla -text
 misc/conf/zabbix_agentd.win.conf -text
+misc/conf/zabbix_agentd/userparameter_examples.conf -text
+misc/conf/zabbix_agentd/userparameter_mysql.conf -text
 misc/conf/zabbix_proxy.conf -text
 misc/init.d/aix/zabbix_agentd svneol=native#text/x-sh
 misc/init.d/fedora/core5/zabbix_agentd -text
