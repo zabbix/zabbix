@@ -78,6 +78,7 @@ class CTrigger extends CZBXAPI{
 			'applicationids'		=> null,
 			'functions'				=> null,
 			'monitored' 			=> null,
+			'active' 				=> null,
 			'templated'				=> null,
 			'maintenance'			=> null,
 			'inherited'				=> null,
@@ -101,7 +102,7 @@ class CTrigger extends CZBXAPI{
 //
 			'pattern'				=> '',
 // OutPut
-			'expand_data'			=> null,
+			'expandData'			=> null,
 			'expandDescription'		=> null,
 			'output'				=> API_OUTPUT_REFER,
 			'extendoutput'			=> null,
@@ -152,7 +153,36 @@ class CTrigger extends CZBXAPI{
 		}
 		else{
 			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
-
+/*/
+			$sql_parts['where'][] = ' EXISTS(  '.
+						' SELECT tt.triggerid  '.
+						' FROM triggers tt,functions ff,items ii,hosts_groups hgg,rights rr,users_groups ugg '.
+						' WHERE t.triggerid=tt.triggerid  '.
+							' AND ff.triggerid=tt.triggerid  '.
+							' AND ff.itemid=ii.itemid  '.
+							' AND hgg.hostid=ii.hostid  '.
+							' AND rr.id=hgg.groupid  '.
+							' AND rr.groupid=ugg.usrgrpid  '.
+							' AND ugg.userid='.$userid.
+							' AND rr.permission>='.$permission.
+							' AND NOT EXISTS(  '.
+								' SELECT fff.triggerid  '.
+								' FROM functions fff, items iii  '.
+								' WHERE fff.triggerid=tt.triggerid '.
+									' AND fff.itemid=iii.itemid '.		'    '.
+									' AND EXISTS( '.
+										' SELECT hggg.groupid '.
+										' FROM hosts_groups hggg, rights rrr, users_groups uggg '.
+										' WHERE hggg.hostid=iii.hostid '.
+											' AND rrr.id=hggg.groupid '.
+											' AND rrr.groupid=uggg.usrgrpid '.
+											' AND uggg.userid='.$userid.
+											' AND rrr.permission<'.$permission.
+										' ) '.
+								' ) '.
+						' ) ';
+//*/
+//*/
 			$sql_parts['from']['functions'] = 'functions f';
 			$sql_parts['from']['items'] = 'items i';
 			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
@@ -178,6 +208,7 @@ class CTrigger extends CZBXAPI{
 														' AND rr.groupid=gg.usrgrpid '.
 														' AND gg.userid='.$userid.
 														' AND rr.permission<'.$permission.'))';
+//*/
 		}
 
 // nodeids
@@ -290,6 +321,24 @@ class CTrigger extends CZBXAPI{
 			$sql_parts['where']['status'] = 't.status='.TRIGGER_STATUS_ENABLED;
 		}
 
+// active
+		if(!is_null($options['active'])){
+			$sql_parts['where']['active'] = ''.
+				' NOT EXISTS ('.
+					' SELECT ff.functionid'.
+					' FROM functions ff'.
+					' WHERE ff.triggerid=t.triggerid'.
+						' AND EXISTS ('.
+							' SELECT ii.itemid'.
+							' FROM items ii, hosts hh'.
+							' WHERE ff.itemid=ii.itemid'.
+								' AND hh.hostid=ii.hostid'.
+								' AND  hh.status<>'.HOST_STATUS_MONITORED.
+						' )'.
+				' )';
+			$sql_parts['where']['status'] = 't.status='.TRIGGER_STATUS_ENABLED;
+		}
+
 // maintenance
 		if(!is_null($options['maintenance'])){
 			$sql_parts['where'][] = (($options['maintenance'] == 0) ? ' NOT ':'').
@@ -371,8 +420,8 @@ class CTrigger extends CZBXAPI{
 			$sql_parts['select']['triggers'] = 't.*';
 		}
 
-// expand_data
-		if(!is_null($options['expand_data'])){
+// expandData
+		if(!is_null($options['expandData'])){
 			$sql_parts['select']['host'] = 'h.host';
 			$sql_parts['select']['hostid'] = 'h.hostid';
 			$sql_parts['from']['functions'] = 'functions f';
@@ -427,6 +476,12 @@ class CTrigger extends CZBXAPI{
 				zbx_value2array($options['filter']['status']);
 
 				$sql_parts['where']['status'] = DBcondition('t.status', $options['filter']['status']);
+			}
+//templateid
+			if(isset($options['filter']['templateid']) && !is_null($options['filter']['templateid'])){
+				zbx_value2array($options['filter']['templateid']);
+
+				$sql_parts['where']['templateid'] = DBcondition('t.templateid', $options['filter']['templateid']);
 			}
 // value
 			if(isset($options['filter']['value']) && !is_null($options['filter']['value'])){
@@ -585,7 +640,7 @@ class CTrigger extends CZBXAPI{
 
 						$result[$trigger['triggerid']]['hosts'][] = array('hostid' => $trigger['hostid']);
 
-						if(is_null($options['expand_data'])) unset($trigger['hostid']);
+						if(is_null($options['expandData'])) unset($trigger['hostid']);
 					}
 // itemids
 					if(isset($trigger['itemid']) && is_null($options['select_items'])){
@@ -678,7 +733,7 @@ Copt::memoryPick();
 			foreach($result as $triggerid => $trigger){
 				if(!isset($correct_triggerids[$triggerid])){
 					unset($result[$triggerid]);
-					unset($triggerids[$triggerid]);					
+					unset($triggerids[$triggerid]);
 				}
 
 			}
@@ -700,8 +755,8 @@ Copt::memoryPick();
 
 			$obj_params = array(
 				'triggerids' => $depids,
-				'output' => API_OUTPUT_EXTEND,
-				'expand_data' => 1,
+				'output' => $options['select_dependencies'],
+				'expandData' => 1,
 				'preservekeys' => 1
 			);
 			$allowed = self::get($obj_params); //allowed triggerids

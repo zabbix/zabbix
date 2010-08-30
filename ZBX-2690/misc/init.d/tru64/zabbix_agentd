@@ -17,11 +17,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-# Start/Stop the secure shell daemon.
+# Start/Stop the Zabbix agent daemon.
 # Place a startup script in /sbin/init.d, and link to it from /sbin/rc[023].d 
 
-SERVICE="ZABBIX agent"
-DAEMON=/usr/local/bin/zabbix_agentd
+SERVICE="Zabbix agent"
+DAEMON=/usr/local/sbin/zabbix_agentd
 PIDFILE=/tmp/zabbix_agentd.pid
 
 case $1 in

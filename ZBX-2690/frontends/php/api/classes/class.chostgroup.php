@@ -49,7 +49,8 @@ class CHostGroup extends CZBXAPI{
 			'from' 		=> array('groups' => 'groups g'),
 			'where' 	=> array(),
 			'order' 	=> array(),
-			'limit' 	=> null);
+			'limit' 	=> null
+		);
 
 		$def_options = array(
 			'nodeids'					=> null,
@@ -58,6 +59,7 @@ class CHostGroup extends CZBXAPI{
 			'templateids'				=> null,
 			'graphids'					=> null,
 			'triggerids'				=> null,
+			'maintenanceids'			=> null,
 			'monitored_hosts'			=> null,
 			'templated_hosts' 			=> null,
 			'real_hosts' 				=> null,
@@ -186,6 +188,17 @@ class CHostGroup extends CZBXAPI{
 			$sql_parts['where']['hgg'] = 'hg.groupid=g.groupid';
 			$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
 			$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
+		}
+
+// maintenanceids
+		if(!is_null($options['maintenanceids'])){
+			zbx_value2array($options['maintenanceids']);
+			if($options['output'] != API_OUTPUT_SHORTEN){
+				$sql_parts['select']['maintenanceid'] = 'mg.maintenanceid';
+			}
+			$sql_parts['from']['maintenances_groups'] = 'maintenances_groups mg';
+			$sql_parts['where'][] = DBcondition('mg.maintenanceid', $options['maintenanceids']);
+			$sql_parts['where']['hmh'] = 'g.groupid=mg.groupid';
 		}
 
 // monitored_hosts, real_hosts, templated_hosts, not_proxy_hosts
@@ -392,6 +405,16 @@ class CHostGroup extends CZBXAPI{
 						$result[$group['groupid']]['graphs'][] = array('graphid' => $group['graphid']);
 						unset($group['hostid']);
 					}
+					
+// maintenanceids
+					if(isset($group['maintenanceid'])){
+						if(!isset($result[$group['groupid']]['maintenanceid']))
+							$result[$group['groupid']]['maintenances'] = array();
+
+
+						$result[$group['groupid']]['maintenances'][] = array('maintenanceid' => $group['maintenanceid']);
+						unset($group['maintenanceid']);
+					}
 
 // triggerids
 					if(isset($group['triggerid'])){
@@ -502,7 +525,6 @@ COpt::memoryPick();
 			}
 		}
 
-
 COpt::memoryPick();
 // removing keys (hash -> array)
 		if(is_null($options['preservekeys'])){
@@ -521,7 +543,7 @@ COpt::memoryPick();
 	public static function getObjects($hostgroupData){
 		$options = array(
 			'filter' => $hostgroupData,
-			'output'=>API_OUTPUT_EXTEND
+			'output' => API_OUTPUT_EXTEND
 		);
 
 		if(isset($hostgroupData['node']))
@@ -575,7 +597,6 @@ COpt::memoryPick();
 				self::exception(ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can create HostGroups');
 			}
 
-			$groupids = array();
 			foreach($groups as $num => $group){
 				if(!is_array($group) || !isset($group['name']) || empty($group['name'])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, 'Empty input parameter [ name ]');
@@ -586,7 +607,7 @@ COpt::memoryPick();
 
 				$insert[] = $group;
 			}
-			$groupids[] = DB::insert('groups', $insert);
+			$groupids = DB::insert('groups', $insert);
 
 			self::EndTransaction(true, __METHOD__);
 			return array('groupids' => $groupids);

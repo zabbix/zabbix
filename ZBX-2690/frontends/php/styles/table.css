@@ -62,6 +62,9 @@ table.page_header tr td.page_header_r{
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	font-size: 10pt;
 }
+table.page_header tr td.page_header_r a{
+	margin: 0 5px;
+}
 /* footer */
 
 table.page_footer{
@@ -378,10 +381,12 @@ table.tableinfo tr.header td.hover_grey {
 	cursor: pointer;
 }
 
-table.tableinfo tr.header td.hover_grey:hover {
+table.tableinfo tr.header td.hover_grey:hover  {
 	color: #EEEEEE;
 	background-color:#999999;
 }
+
+
 
 table.tableinfo tr.vertical_header td {
 	padding: 5px 0;
@@ -390,9 +395,17 @@ table.tableinfo tr.vertical_header td {
 	word-spacing: 0;
 	font-weight: bold;
 	background-color:#CCCCCC;
-	vertical-align:text-top;
-	text-align: center;
 	width: 20px;
+	padding-left: 5px;
+	text-align: center;
+}
+table.tableinfo tr.vertical_header td.left {
+	text-align: left;
+}
+table.tableinfo tr.vertical_header td.hover_grey:hover{
+	color: #EEEEEE;
+	background-color:#999999;
+	cursor: pointer;
 }
 
 table.tableinfo tr.footer td {
@@ -419,6 +432,10 @@ table.tableinfo tr td.wraptext {
 
 table.tableinfo tr td.message {
 	text-align: center;
+}
+
+table.tableinfo tr td.pre {
+	white-space: pre;
 }
 
 table.tableinfo tr.selected > td { background-color: #FFFFBB; }
@@ -471,10 +488,10 @@ table.tableinfo tr:hover > td.unknown_trigger		{	background-color: #BCB7BC;	bord
 table.tableinfo tr > td.normal				{	background-color: #AAFFAA;	border: 1px #AAFFAA solid; }
 table.tableinfo tr:hover > td.normal			{	background-color: #AAF9AA;	border: 1px #AAF9AA solid; }
 
-table.tableinfo tr > td.active				{	background-color: #AADDAA;	border: 1px #AADDAA solid; }
+table.tableinfo tr > td.active				{	background-color: #AADDAA;	border: 1px #AADDAA solid; color: #222222;}
 table.tableinfo tr:hover > td.active			{	background-color: #AAD9AA;	border: 1px #AAD9AA solid; }
 
-table.tableinfo tr > td.inactive				{	background-color: #FF8888;	border: 1px #FF8888 solid; }
+table.tableinfo tr > td.inactive				{	background-color: #FF8888;	border: 1px #FF8888 solid; color: #222222;}
 table.tableinfo tr:hover > td.inactive			{	background-color: #FA8388;	border: 1px #FA8388 solid; }
 
 table.tableinfo tr.red						{	background-color: #FFBBBB; border: 1px #FFBBBB solid; }
@@ -561,6 +578,12 @@ table.flicker tr td.flicker_r{
 
 table.flicker a{
 	color: #0BF;
+}
+
+table.itemfilter{
+	border: 1px solid #777777;
+	width: 100%;
+	background-color: white;
 }
 
 /**************** Aknowledges ****************/
@@ -732,20 +755,20 @@ table.sub_menu tr td span.active a.highlight{
 table.triggers_info {
 	width: 100%;
 	background-color: #FFFFFF;
-	border: 1px gray dotted;
+	border: 0px;
 }
 
 table.triggers_info tr td {
 	border: 0;
 	white-space: nowrap;
-	word-spacing:	0;
-	padding-left: 5px;
-	padding-right: 5px;
+	word-spacing: 0;
+	padding: 0 5px;
 	font-weight: bold;
 	color: #191970;
 	text-align: left;
 	font-family: Verdana, Helvetica, Geneva;
 	font-size: 11px;
+	height: 18px;
 }
 
 table.triggers_info tr td.header {
@@ -1002,6 +1025,7 @@ table.setup_wizard div.text{
 
 /***************** <HISTORY> *****************/
 table.history{
+	margin-left: 5px;
 }
 
 table.history tr{

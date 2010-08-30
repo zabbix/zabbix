@@ -58,6 +58,10 @@
 #	define ZBX_SOCKADDR struct sockaddr_in
 #endif
 
+#if !defined(ZBX_SOCKLEN_T)
+#	define ZBX_SOCKLEN_T socklen_t
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tcp_strerror                                                 *
@@ -912,7 +916,7 @@ int	zbx_tcp_accept(zbx_sock_t *s)
 	ZBX_SOCKADDR	serv_addr;
 	fd_set		sock_set;
 	ZBX_SOCKET	accepted_socket;
-	socklen_t	nlen;
+	ZBX_SOCKLEN_T	nlen;
 	int		i, n = 0;
 
 	zbx_tcp_unaccept(s);
@@ -1139,7 +1143,7 @@ cleanup:
 char	*get_ip_by_socket(zbx_sock_t *s)
 {
 	ZBX_SOCKADDR	sa;
-	socklen_t	sz;
+	ZBX_SOCKLEN_T	sz;
 	static char	buffer[64];
 
 	*buffer = '\0';
@@ -1197,7 +1201,7 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 	int		i[4], j[4];
 #endif
 	ZBX_SOCKADDR	name;
-	socklen_t	nlen;
+	ZBX_SOCKLEN_T	nlen;
 
 	char	tmp[MAX_STRING_LEN],
 		sname[MAX_STRING_LEN],

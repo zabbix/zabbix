@@ -106,7 +106,11 @@ include_once('include/page_header.php');
 
 // PERMISSIONS
 	if(get_request('triggerid', false)){
-		$triggers = available_triggers($_REQUEST['triggerid'], 1);
+		$options = array(
+			'triggerids' => $_REQUEST['triggerid'],
+			'editable' => 1,
+		);
+		$triggers = CTrigger::get($options);
 		if(empty($triggers)) access_deny();
 	}
 	else if(get_request('hostid', 0) > 0){
@@ -196,16 +200,19 @@ include_once('include/page_header.php');
 
 		$options = array(
 			'triggerids' => $_REQUEST['triggerid'],
-			'output' => API_OUTPUT_EXTEND
+			'extendoutput'=>1, 
+			'editable'=>1, 
+			'select_hosts' => API_OUTPUT_EXTEND,
 		);
-
 		$triggers = CTrigger::get($options);
+		
 		if($trigger_data = reset($triggers)){
+			$host = reset($trigger_data['hosts']);
 			DBstart();
 			$result = CTrigger::delete($triggers);
 			$result = DBend($result);
 			if($result){
-				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $_REQUEST['triggerid'], $trigger_data['description'], NULL, NULL, NULL);
+				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $_REQUEST['triggerid'], $host['host'].':'.$trigger_data['description'], NULL, NULL, NULL);
 			}
 		}
 
@@ -286,7 +293,8 @@ include_once('include/page_header.php');
 		$options = array(
 			'triggerids' => $_REQUEST['g_triggerid'],
 			'editable' => 1,
-			'output' => API_OUTPUT_EXTEND
+			'output' => API_OUTPUT_EXTEND,
+			'select_hosts' => API_OUTPUT_EXTEND
 		);
 
 		$triggers = CTrigger::get($options);
@@ -311,10 +319,12 @@ include_once('include/page_header.php');
 				$serv_status = (isset($_REQUEST['group_enable']))?get_service_status_of_trigger($trigger['triggerid']):0;
 
 				update_services($trigger['triggerid'], $serv_status); // updating status to all services by the dependency
+
+				$host = reset($trigger['hosts']);
 				add_audit_ext(AUDIT_ACTION_UPDATE,
 								AUDIT_RESOURCE_TRIGGER,
 								$trigger['triggerid'],
-								$trigger['description'],
+								$host['host'].':'.$trigger['description'],
 								'triggers',
 								$status_old,
 								$status_new);
@@ -368,12 +378,16 @@ include_once('include/page_header.php');
 		show_messages($go_result, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
 	}
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['g_triggerid'])){
-		$options = array('extendoutput'=>1, 'editable'=>1);
-		$options['triggerids'] = $_REQUEST['g_triggerid'];
-
+		DBstart();
+		
+		$options = array(
+			'extendoutput'=>1, 
+			'editable'=>1, 
+			'select_hosts' => API_OUTPUT_EXTEND,
+			'triggerids' => $_REQUEST['g_triggerid'],
+		);
 		$triggers = CTrigger::get($options);
 
-		DBstart();
 		foreach($triggers as $tnum => $trigger){
 			$triggerid = $trigger['triggerid'];
 
@@ -383,8 +397,9 @@ include_once('include/page_header.php');
 				error(S_CANNOT_DELETE_TRIGGER.' [ '.$description.' ] ('.S_TEMPLATED_TRIGGER.')');
 				continue;
 			}
+			$host = reset($trigger['hosts']);
 
-			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $triggerid, $description, NULL, NULL, NULL);
+			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $triggerid, $host['host'].':'.$description, NULL, NULL, NULL);
 		}
 
 		$go_result = !empty($triggers);
@@ -405,56 +420,22 @@ include_once('include/page_header.php');
 
 ?>
 <?php
-	if(isset($_REQUEST['hostid']) && !isset($_REQUEST['groupid']) && !isset($_REQUEST['triggerid'])){
-		$sql = 'SELECT DISTINCT hg.groupid '.
-				' FROM hosts_groups hg '.
-				' WHERE hg.hostid='.$_REQUEST['hostid'];
-		if($group=DBfetch(DBselect($sql, 1))){
-			$_REQUEST['groupid'] = $group['groupid'];
-		}
-	}
 
-	if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0)){
-		$sql_from = '';
-		$sql_where = '';
-		if(isset($_REQUEST['groupid']) && ($_REQUEST['groupid'] > 0)){
-			$sql_where.= ' AND hg.groupid='.$_REQUEST['groupid'];
-		}
-
-		if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid'] > 0)){
-			$sql_where.= ' AND hg.hostid='.$_REQUEST['hostid'];
-		}
-
-		$sql = 'SELECT DISTINCT hg.groupid, hg.hostid '.
-				' FROM hosts_groups hg '.
-				' WHERE EXISTS( SELECT i.itemid '.
-								' FROM items i, functions f'.
-								' WHERE i.hostid=hg.hostid '.
-									' AND f.itemid=i.itemid '.
-									' AND f.triggerid='.$_REQUEST['triggerid'].')'.
-						$sql_where;
-		if($host_group = DBfetch(DBselect($sql,1))){
-			if(!isset($_REQUEST['groupid']) || !isset($_REQUEST['hostid'])){
-				$_REQUEST['groupid'] = $host_group['groupid'];
-				$_REQUEST['hostid'] = $host_group['hostid'];
-			}
-			else if(($_REQUEST['groupid']!=$host_group['groupid']) || ($_REQUEST['hostid']!=$host_group['hostid'])){
-				$_REQUEST['triggerid'] = 0;
-			}
-		}
-		else{
-//			$_REQUEST['triggerid'] = 0;
-		}
-	}
 	$options = array(
 		'groups' => array('not_proxy_hosts' => 1, 'editable' => 1),
 		'hosts' => array('templated_hosts' => 1, 'editable' => 1),
+		'triggers' => array('editable' => 1),
 		'groupid' => get_request('groupid', null),
 		'hostid' => get_request('hostid', null),
+		'triggerid' => get_request('triggerid', null),
 	);
 	$pageFilter = new CPageFilter($options);
 	$_REQUEST['groupid'] = $pageFilter->groupid;
 	$_REQUEST['hostid'] = $pageFilter->hostid;
+
+	if($pageFilter->triggerid > 0){
+		$_REQUEST['triggerid'] = $pageFilter->triggerid;
+	}
 
 ?>
 <?php

@@ -19,29 +19,41 @@
 **/
 ?>
 <?php
-	define('ZBX_PAGE_NO_AUTHORIZATION', 1);
+define('ZBX_PAGE_NO_AUTHORIZATION', 1);
 
-	require_once('include/config.inc.php');
+require_once('include/config.inc.php');
 
-	$page['file'] = 'vtext.php';
-	$page['type'] = PAGE_TYPE_IMAGE;
+$page['file'] = 'vtext.php';
+$page['type'] = PAGE_TYPE_IMAGE;
 
-	require_once ('include/page_header.php');
-
+require_once('include/page_header.php');
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'text'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,		null),
+		'text'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,			null),
 		'font'=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(1,5),	null),
+		'color'=>		array(T_ZBX_STR, O_OPT,	null,	null,			null),
 	);
 
 	check_fields($fields);
 ?>
 <?php
-  
-	$text = get_request('text', ' ');;
+
+	$text = get_request('text', ' ');
 	$font = get_request('font', 9);
+	$color = get_request('color', 'black');
+
+	switch($color){
+		case 'white':
+			$color = array('red' => 255, 'green' => 255, 'blue' => 255);
+			$shadow = array('red' => 105, 'green' => 105, 'blue' => 105);
+			break;
+		case 'black':
+		default:
+			$color = array('red' => 0, 'green' => 0, 'blue' => 0);
+			$shadow = array('red' => 175, 'green' => 175, 'blue' => 175);
+	}
 
 	$size = imageTextSize($font, $angle, $text);
 
@@ -50,15 +62,15 @@
 	$width = imagesx($im);
 	$height = imagesy($im);
 	
-	$white = imagecolorallocate($im, 205, 205, 205);
+	$white = imagecolorallocate($im, $shadow['red'], $shadow['green'], $shadow['blue']);
 	imagefilledrectangle($im, 0 ,0, $width-1, $height-1, $white);	
 
-	$text_color = imagecolorallocate($im, 0, 0, 0);
+	$text_color = imagecolorallocate($im, $color['red'], $color['green'], $color['blue']);
 	imageText($im, $font, 0, 0, $size['height'], $text_color, $text);
 	
 	
 	$newImage = imagecreatetruecolor($height, $width);	
-	$white = imagecolorallocate($newImage, 205, 205, 205);
+	$white = imagecolorallocate($newImage, $shadow['red'], $shadow['green'], $shadow['blue']);
 	
 	// imagealphablending($newImage, false);
 	// imagesavealpha($newImage, true);
@@ -74,6 +86,9 @@
 	imagedestroy($newImage);
 	imagedestroy($im);
 
+?>
+<?php
 
 include_once('include/page_footer.php');
+
 ?>

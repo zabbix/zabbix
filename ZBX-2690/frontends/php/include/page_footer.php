@@ -36,7 +36,7 @@
 //------------------------------------- </HISTORY> --------------------------------------
 
 	CProfile::flush();
-	
+
 // END Transactions if havn't been -----------------
 	if(isset($DB) && isset($DB['TRANSACTIONS']) && ($DB['TRANSACTIONS'] != 0)){
 		error(S_TRANSACTION_HAVE_NOT_BEEN_CLOSED_ABORTING);
@@ -77,9 +77,9 @@
 
 		$post_script.= 'cookie.init();'."\n";
 		$post_script.= 'chkbxRange.init();'."\n";
+		$post_script.= 'if(IE6){ie6pngfix.run(false);}'."\n";
 
 		$post_script.='}'."\n";
-//		$post_script.= 'try{ chkbxRange.init(); } catch(e){ throw("Checkbox extension failed!");}';
 
 		if(!defined('ZBX_PAGE_NO_MENU') && !defined('ZBX_PAGE_NO_FOOTER')){
 			$table = new CTable(NULL,"page_footer");

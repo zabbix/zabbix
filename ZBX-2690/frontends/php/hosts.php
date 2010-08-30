@@ -179,7 +179,7 @@ include_once('include/page_header.php');
 			'graphids' => $graphids,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => 1,
-			'expand_data' => 1
+			'expandData' => 1
 		);
 		$gitems = CGraphItem::get($params);
 
@@ -226,8 +226,8 @@ include_once('include/page_header.php');
 			'hostids' => $hostids,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => 1,
-			'select_dependencies' => 1,
-			'expand_data' => 1
+			'select_dependencies' => API_OUTPUT_EXTEND,
+			'expandData' => 1
 		);
 		$triggers = CTrigger::get($params);
 		foreach($triggers as $tnum => $trigger){
@@ -317,17 +317,9 @@ include_once('include/page_header.php');
 	else if(isset($_REQUEST['go']) && ($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['masssave'])){
 		$hostids = get_request('hosts', array());
 		$visible = get_request('visible', array());
-		$_REQUEST['groups'] = get_request('groups', array());
 		$_REQUEST['newgroup'] = get_request('newgroup', '');
 		$_REQUEST['proxy_hostid'] = get_request('proxy_hostid', 0);
 		$_REQUEST['templates'] = get_request('templates', array());
-
-		if(count($_REQUEST['groups']) > 0){
-			$accessible_groups = get_accessible_groups_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY);
-			foreach($_REQUEST['groups'] as $gid){
-				if(!isset($accessible_groups[$gid])) access_deny();
-			}
-		}
 
 		try{
 			DBstart();
@@ -371,7 +363,11 @@ include_once('include/page_header.php');
 			}
 
 			if(isset($visible['groups'])){
-				$hosts['groups'] = zbx_toObject($_REQUEST['groups'], 'groupid');
+				$hosts['groups'] = CHostGroup::get(array(
+					'groupids' => get_request('groups', array()),
+					'editable' => 1,
+					'output' => API_OUTPUT_SHORTEN,
+				));
 				if(!empty($newgroup)){
 					$hosts['groups'][] = $newgroup;
 				}
@@ -487,16 +483,35 @@ include_once('include/page_header.php');
 			);
 
 			if($create_new){
-				$host = CHost::create($host);
-				if($host){
-					$hostid = reset($host['hostids']);
+				$hostids = CHost::create($host);
+				if($hostids){
+					$hostid = reset($hostids['hostids']);
 				}
 				else throw new Exception();
+
+				add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST,
+					$hostid,
+					$host['host'],
+					null,null,null);
 			}
 			else{
 				$hostid = $host['hostid'] = $_REQUEST['hostid'];
 				$host['templates_clear'] = $templates_clear;
+
+				$host_old = CHost::get(array('hostids' => $hostid, 'editable' => 1, 'output' => API_OUTPUT_EXTEND));
+				$host_old = reset($host_old);
+
 				if(!CHost::update($host)) throw new Exception();
+
+				$host_new = CHost::get(array('hostids' => $hostid, 'editable' => 1, 'output' => API_OUTPUT_EXTEND));
+				$host_new = reset($host_new);
+
+				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST,
+					$host['hostid'],
+					$host['host'],
+					'hosts',
+					$host_old,
+					$host_new);
 			}
 
 // FULL CLONE {{{
@@ -656,7 +671,7 @@ include_once('include/page_header.php');
 		if($_REQUEST['form'] == S_IMPORT_HOST)
 			$hosts_wdgt->addItem(import_host_form());
 		else
-			$hosts_wdgt->addItem(insert_host_form(false));
+			$hosts_wdgt->addItem(insert_host_form());
 	}
 	else{
 
@@ -853,7 +868,7 @@ include_once('include/page_header.php');
 
 					if(!empty($templates[$template['templateid']]['parentTemplates'])){
 						order_result($templates[$template['templateid']]['parentTemplates'], 'host');
-						
+
 						$caption[] = ' (';
 						foreach($templates[$template['templateid']]['parentTemplates'] as $tnum => $tpl){
 							$caption[] = new CLink($tpl['host'],'templates.php?form=update&templateid='.$tpl['templateid'], 'unknown');

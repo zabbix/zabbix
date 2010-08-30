@@ -167,10 +167,10 @@ return $day;
  */
 function zbx_date2str($format, $value = null){
 	static $weekdaynames, $weekdaynameslong, $months, $monthslong;
-	
-	if(is_null($value)) $value = time();	
+
+	if(is_null($value)) $value = time();
 	else if(!$value) return S_NEVER;
-	
+
 	if(!is_array($weekdaynames)) {
 		$weekdaynames = array(
 					0 => S_WEEKDAY_SUNDAY_SHORT,
@@ -181,7 +181,7 @@ function zbx_date2str($format, $value = null){
 					5 => S_WEEKDAY_FRIDAY_SHORT,
 					6 => S_WEEKDAY_SATURDAY_SHORT);
 	}
-	
+
 	if(!is_array($weekdaynameslong)) {
 		$weekdaynameslong = array(
 					0 => S_WEEKDAY_SUNDAY_LONG,
@@ -224,14 +224,14 @@ function zbx_date2str($format, $value = null){
 					11 => S_MONTH_NOVEMBER_LONG,
 					12 => S_MONTH_DECEMBER_LONG);
 	}
-	
+
 	$rplcs = array(
 		'l' => $weekdaynameslong[date('w',$value)],
 		'F' => $monthslong[date('n',$value)],
 		'D' => $weekdaynames[date('w',$value)],
 		'M' => $months[date('n',$value)]
 	);
-	
+
 	$output = '';
 	$part = '';
 	$length = zbx_strlen($format);
@@ -247,9 +247,9 @@ function zbx_date2str($format, $value = null){
 			$part .= $char;
 		}
 	}
-	
+
 	$output .= (zbx_strlen($part) > 0) ? date($part, $value) : '';
-	
+
 return $output;
 }
 
@@ -358,7 +358,7 @@ function hex2rgb($color){
 		return false;
 	}
 
-	$r = hexdec($r); 
+	$r = hexdec($r);
 	$g = hexdec($g);
 	$b = hexdec($b);
 
@@ -456,20 +456,14 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 
 // Any other unit
 //-------------------
-
-// black list wich do not require units metrics.. 
+// black list wich do not require units metrics..
 	$blackList = array('%','ms','rpm');
-	if((in_array($units, $blackList)) || (zbx_empty($units) && ($convert == ITEM_CONVERT_WITH_UNITS))){
-//	if(zbx_empty($units) && ($convert == ITEM_CONVERT_WITH_UNITS)){
-		if(abs($value) >= 1)
-			$format = '%.2f';
-		else if(abs($value) >= 0.01)
-			$format = '%.4f';
-		else
-			$format = '%.6f';
 
+	if(in_array(strtolower($units), $blackList) || (zbx_empty($units) && (($convert == ITEM_CONVERT_WITH_UNITS) || ($value < 1)))){
+		if(abs($value) >= ZBX_UNITS_ROUNDOFF_THRESHOLD)
+			$value = round($value, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT);
+		$value = sprintf('%.'.ZBX_UNITS_ROUNDOFF_LOWER_LIMIT.'f', $value);
 
-		$value = sprintf($format,$value);
 		$value = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U','$1$2$3', $value);
 		$value = rtrim($value, '.');
 
@@ -512,7 +506,6 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 
 		foreach($digitUnits[$step] as $dunit => $data){
 // skip mili & micro for values without units
-			if(zbx_empty($units) && ($data['pow'] < 0)) continue;
 			$digitUnits[$step][$dunit]['value'] = bcpow($step, $data['pow'], 9);
 		}
 	}
@@ -537,12 +530,12 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 
 //------
 	switch($convert){
-		case 0: $units = trim($units); 
+		case 0: $units = trim($units);
 		case 1: $desc = $valUnit['short']; break;
 		case 2: $desc = $valUnit['long']; break;
 	}
 
-	$value = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U','$1$2$3', round($valUnit['value'],2));
+	$value = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U','$1$2$3', round($valUnit['value'], ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
 	$value = rtrim($value, '.');
 
 return sprintf('%s %s%s', $value, $desc, $units);
@@ -621,7 +614,7 @@ function zbx_strlen($str){
 	else{
 		return strlen($str);
 	}
-	
+
 /*
 	$zbx_strlen = strlen($zbx_strlen);
 
@@ -669,7 +662,7 @@ function zbx_stristr($haystack, $needle){
 
 function zbx_substring($haystack, $start, $end=null){
 	if(!is_null($end) && ($end < $start)) return '';
-	
+
 	if(defined('ZBX_MBSTRINGS_ENABLED')){
 		if(is_null($end))
 			$result = mb_substr($haystack, $start);
@@ -682,12 +675,12 @@ function zbx_substring($haystack, $start, $end=null){
 		else
 			$result = substr($haystack, $start, ($end - $start));
 	}
-	
+
 	return $result;
 }
 
 function zbx_substr($string, $start, $length=null){
-	
+
 	if(defined('ZBX_MBSTRINGS_ENABLED')){
 		if(is_null($length))
 			$result = mb_substr($string, $start);
@@ -700,23 +693,23 @@ function zbx_substr($string, $start, $length=null){
 		else
 			$result = substr($string, $start, $length);
 	}
-	
+
 	return $result;
 }
 
 function zbx_str_revert($str){
 	if(defined('ZBX_MBSTRINGS_ENABLED')){
 		$result = '';
-		
+
 		$stop = mb_strlen($str);
-		for($idx=0; $idx<$stop; $idx++){ 
-			$result = mb_substr($str, $idx, 1) . $result; 
-		} 
+		for($idx=0; $idx<$stop; $idx++){
+			$result = mb_substr($str, $idx, 1) . $result;
+		}
 	}
 	else{
 		$result = strrev($str);
 	}
-	
+
 	return $result;
 }
 
@@ -828,6 +821,56 @@ function zbx_rksort(&$array, $flags=NULL){
 	}
 	return $array;
 }
+
+
+// used only in morder_result
+function sortSub($array, $sortorder){
+	$result = array();
+
+	$keys = array_keys($array);
+	natcasesort($keys);
+
+
+	if($sortorder != ZBX_SORT_UP)
+		$keys = array_reverse($keys);
+
+	foreach($keys as $key){
+		$tst = reset($array[$key]);
+		if(isset($tst[0]) && !is_array($tst[0])){
+			$array[$key] = sortSub($array[$key], $sortorder);
+		}
+
+		foreach($array[$key] as $id){
+			$result[] = $id;
+		}
+	}
+	return $result;
+}
+
+function morder_result(&$array, $sortfields, $sortorder=ZBX_SORT_UP){
+	$tmp = array();
+	$result = array();
+
+	foreach($array as $key => $el){
+		unset($pointer);
+		$pointer =& $tmp;
+		foreach($sortfields as $f){
+			if(!isset($pointer[$el[$f]])) $pointer[$el[$f]] = array();
+			$pointer =& $pointer[$el[$f]];
+		}
+		$pointer[] = $key;
+	}
+
+	$order = sortSub($tmp, $sortorder);
+
+	foreach($order as $key){
+		$result[$key] = $array[$key];
+	}
+
+	$array = $result;
+	return true;
+}
+
 
 function order_result(&$data, $sortfield, $sortorder=ZBX_SORT_UP){
 	if(empty($data)) return false;
@@ -1058,7 +1101,7 @@ function zbx_array_mintersect($keys, $array){
 					$result[$sub_field] = $array[$sub_field];
 					break;
 				}
-			}				
+			}
 		}
 		else if(isset($array[$field])){
 			$result[$field] = $array[$field];
@@ -1071,25 +1114,22 @@ function zbx_str2links($text){
 // $value = preg_replace('#(https?|ftp|file)://[^\n\t\r ]+#u', '<a href="$0">$0</a>', $value);
 	$result = array();
 	if(empty($text)) return $result;
-	
+
 	preg_match_all('#https?://[^\n\t\r ]+#u', $text, $matches, PREG_OFFSET_CAPTURE);
-	
+
 	$start = 0;
 	foreach($matches[0] as $match){
 		$result[] = zbx_substr($text, $start, $match[1]-$start);
 		$result[] = new CLink($match[0], $match[0], null, null, true);
 		$start = $match[1] + zbx_strlen($match[0]);
 	}
-	
+
 	$result[] = zbx_substr($text, $start, zbx_strlen($text));
 	return $result;
 }
 
 function zbx_subarray_push(&$mainArray, $sIndex, $element) {
-	if(!isset($mainArray[$sIndex])) $mainArray[$sIndex] = Array();
-	
-	if(!is_array($mainArray[$sIndex])) $mainArray[$sIndex]= Array($mainArray[$sIndex]);
-	
+	if(!isset($mainArray[$sIndex])) $mainArray[$sIndex] = array();
 	$mainArray[$sIndex][] = $element;
 }
 /************* END ZBX MISC *************/
@@ -1147,69 +1187,28 @@ function zbx_subarray_push(&$mainArray, $sIndex, $element) {
 			$script = "javascript: redirect('".$url."');";
 		}
 
-		$col = array(new CSpan($obj,'underline'));
-		if(isset($_REQUEST['sort']) && ($tabfield == $_REQUEST['sort'])){
-			if($sortorder == ZBX_SORT_UP){
-				$img = new CImg('images/general/sort_down.png','down',10,10);
-			}
-			else{
-				$img = new CImg('images/general/sort_up.png','up',10,10);
-			}
+		zbx_value2array($obj);
+		$div = new CDiv();
+		$div->setAttribute('style', 'float:left;');
 
-			$img->setAttribute('style','line-height: 18px; vertical-align: middle;');
-			$col[] = SPACE;
-			$col[] = $img;
+		foreach($obj as $enum => $el){
+			if(is_object($el) || ($el === SPACE)) $div->addItem($el);
+			else $div->addItem(new CSpan($el, 'underline'));
+		}
+		$div->addItem(SPACE);
+
+		$img = null;
+		if(isset($_REQUEST['sort']) && ($tabfield == $_REQUEST['sort'])){
+			if($sortorder == ZBX_SORT_UP) $img = new CDiv(SPACE,'icon_sortdown');
+			else $img = new CDiv(SPACE,'icon_sortup');
+
+			$img->setAttribute('style','float: left;');
 		}
 
-		$col = new CCol($col, 'hover_grey');
+		$col = new CCol(array($div, $img), 'nowrap hover_grey');
 		$col->setAttribute('onclick', $script);
 
 	return $col;
-	}
-
-//TODO: should be replaced by "make_sorting_header" for every page.
-	function make_sorting_link($obj,$tabfield,$url=''){
-		global $page;
-
-		$sortorder = (isset($_REQUEST['sortorder']) && ($_REQUEST['sortorder'] == ZBX_SORT_UP))?ZBX_SORT_DOWN:ZBX_SORT_UP;
-
-		if(empty($url)){
-			$url='?';
-			$url_params = explode('&',$_SERVER['QUERY_STRING']);
-			foreach($url_params as $id => $param){
-				if(zbx_empty($param)) continue;
-
-				list($name,$value) = explode('=',$param);
-				if(zbx_empty($name) || ($name == 'sort') || (($name == 'sortorder'))) continue;
-				$url.=$param.'&';
-			}
-		}
-		else{
-			$url.='&';
-		}
-
-		$url.='sort='.$tabfield.'&sortorder='.$sortorder;
-
-		if(($page['type'] != PAGE_TYPE_HTML) && defined('ZBX_PAGE_MAIN_HAT')){
-			$link = new CLink($obj,$url,null,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
-		}
-		else{
-			$link = new CLink($obj,$url);
-		}
-
-		if(isset($_REQUEST['sort']) && ($tabfield == $_REQUEST['sort'])){
-			if($sortorder == ZBX_SORT_UP){
-				$img = new CImg('images/general/sort_down.png','down',10,10);
-			}
-			else{
-				$img = new CImg('images/general/sort_up.png','up',10,10);
-			}
-
-			$img->setAttribute('style','line-height: 18px; vertical-align: middle;');
-			$link = array($link,SPACE,$img);
-		}
-
-	return $link;
 	}
 
 	function getPageSortField($def){
@@ -1350,7 +1349,7 @@ function getPagingLine(&$items, $autotrim=true){
 
 	$page_view = new CSpan($page_view);
 
-	zbx_add_post_js('insert_in_element("numrows",'.zbx_jsvalue($page_view->toString()).');');
+	zbx_add_post_js('insertInElement("numrows",'.zbx_jsvalue($page_view->toString()).',"div");');
 
 return $table;
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,6 +45,7 @@
 		$str_resource[AUDIT_RESOURCE_REGEXP] = S_REGULAR_EXPRESSION;
 		$str_resource[AUDIT_RESOURCE_MAINTENANCE] = S_MAINTENANCE;
 		$str_resource[AUDIT_RESOURCE_SCRIPT] = S_SCRIPT;
+		$str_resource[AUDIT_RESOURCE_MACRO] = S_MACRO;
 
 		if(isset($str_resource[$resource_type]))
 			return $str_resource[$resource_type];

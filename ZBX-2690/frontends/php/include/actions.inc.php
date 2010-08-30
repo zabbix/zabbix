@@ -169,7 +169,18 @@ function condition_value2str($conditiontype, $value){
 			$str_val.= $group['name'];
 			break;
 		case CONDITION_TYPE_TRIGGER:
-			$str_val = expand_trigger_description($value);
+			$trig = CTrigger::get(array(
+				'triggerids' => $value,
+				'expandTriggerDescriptions' => true,
+				'output' => API_OUTPUT_EXTEND,
+				'select_hosts' => API_OUTPUT_EXTEND,
+				'nodeids' => get_current_nodeid(true),
+			));
+			$trig = reset($trig);
+			$host = reset($trig['hosts']);
+			$str_val = '';
+			if(id2nodeid($value) != get_current_nodeid()) $str_val = get_node_name_by_elid($value, true, ': ');
+			$str_val .= $host['host'].':'.$trig['description'];
 			break;
 		case CONDITION_TYPE_HOST:
 		case CONDITION_TYPE_HOST_TEMPLATE:
@@ -576,30 +587,45 @@ function validate_condition($conditiontype, $value){
 
 	switch($conditiontype){
 		case CONDITION_TYPE_HOST_GROUP:
-			$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY,null,get_current_nodeid(true));
-			if(!isset($available_groups[$value])){
+			$groups = CHostGroup::get(array(
+				'groupids' => $value,
+				'output' => API_OUTPUT_SHORTEN,
+				'nodeids' => get_current_nodeid(true),
+			));
+			if(empty($groups)){
 				error(S_INCORRECT_GROUP);
 				return false;
 			}
 			break;
 		case CONDITION_TYPE_HOST_TEMPLATE:
-			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,get_current_nodeid(true));
-			if(!isset($available_hosts[$value])){
+			$templates = CTemplate::get(array(
+				'templateids' => $value,
+				'output' => API_OUTPUT_SHORTEN,
+				'nodeids' => get_current_nodeid(true),
+			));
+			if(empty($templates)){
 				error(S_INCORRECT_HOST);
 				return false;
 			}
 			break;
 		case CONDITION_TYPE_TRIGGER:
-			if( !DBfetch(DBselect('select triggerid from triggers where triggerid='.$value)) ||
-				!check_right_on_trigger_by_triggerid(PERM_READ_ONLY, $value) )
-			{
+			$triggers = CTrigger::get(array(
+				'triggerids' => $value,
+				'output' => API_OUTPUT_SHORTEN,
+				'nodeids' => get_current_nodeid(true),
+			));
+			if(empty($triggers)){
 				error(S_INCORRECT_TRIGGER);
 				return false;
 			}
 			break;
 		case CONDITION_TYPE_HOST:
-			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,get_current_nodeid(true));
-			if(!isset($available_hosts[$value])){
+			$hosts = CHost::get(array(
+				'hostids' => $value,
+				'output' => API_OUTPUT_SHORTEN,
+				'nodeids' => get_current_nodeid(true),
+			));
+			if(empty($hosts)){
 				error(S_INCORRECT_HOST);
 				return false;
 			}
@@ -664,7 +690,6 @@ function validate_condition($conditiontype, $value){
 }
 
 function validate_operation($operation){
-	global $USER_DETAILS;
 
 	switch($operation['operationtype']){
 		case OPERATION_TYPE_MESSAGE:
@@ -697,16 +722,24 @@ function validate_operation($operation){
 			break;
 		case OPERATION_TYPE_GROUP_ADD:
 		case OPERATION_TYPE_GROUP_REMOVE:
-			$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
-			if(!isset($available_groups[$operation['objectid']])){
+			$groups = CHostGroup::get(array(
+				'groupids' => $operation['objectid'],
+				'output' => API_OUTPUT_SHORTEN,
+				'editable' => 1,
+			));
+			if(empty($groups)){
 				error(S_INCORRECT_GROUP);
 				return false;
 			}
 			break;
 		case OPERATION_TYPE_TEMPLATE_ADD:
 		case OPERATION_TYPE_TEMPLATE_REMOVE:
-			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
-			if(!isset($available_hosts[$operation['objectid']])){
+			$tpls = CTemplate::get(array(
+				'templateids' => $operation['objectid'],
+				'output' => API_OUTPUT_SHORTEN,
+				'editable' => 1,
+			));
+			if(empty($tpls)){
 				error(S_INCORRECT_HOST);
 				return false;
 			}
@@ -773,18 +806,19 @@ return $delays;
 }
 
 function get_history_of_actions($limit,&$last_clock=null,$sql_cond=''){
+	validate_sort_and_sortorder('clock', ZBX_SORT_DOWN);
 	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array());
 
 	$alerts = array();
 	$clock = array();
 	$table = new CTableInfo(S_NO_ACTIONS_FOUND);
 	$table->setHeader(array(
-			is_show_all_nodes() ? make_sorting_link(S_NODES,'a.alertid') : null,
-			make_sorting_link(S_TIME,'clock'),
-			make_sorting_link(S_TYPE,'description'),
-			make_sorting_link(S_STATUS,'status'),
-			make_sorting_link(S_RETRIES_LEFT,'retries'),
-			make_sorting_link(S_RECIPIENTS,'sendto'),
+			is_show_all_nodes() ? make_sorting_header(S_NODES,'a.alertid') : null,
+			make_sorting_header(S_TIME,'clock'),
+			make_sorting_header(S_TYPE,'description'),
+			make_sorting_header(S_STATUS,'status'),
+			make_sorting_header(S_RETRIES_LEFT,'retries'),
+			make_sorting_header(S_RECIPIENTS,'sendto'),
 			S_MESSAGE,
 			S_ERROR
 			));

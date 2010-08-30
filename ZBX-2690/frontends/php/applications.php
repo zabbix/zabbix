@@ -89,11 +89,11 @@ include_once('include/page_header.php');
 	if(isset($_REQUEST['save'])){
 		DBstart();
 		if(isset($_REQUEST['applicationid'])){
-			$result = update_application($_REQUEST['applicationid'],$_REQUEST['appname'], $_REQUEST['apphostid']);
+			$applicationid = update_application($_REQUEST['applicationid'],$_REQUEST['appname'], $_REQUEST['apphostid']);
 			$action		= AUDIT_ACTION_UPDATE;
 			$msg_ok		= S_APPLICATION_UPDATED;
 			$msg_fail	= S_CANNOT_UPDATE_APPLICATION;
-			$applicationid = $_REQUEST['applicationid'];
+			
 		}
 		else {
 			$applicationid = add_application($_REQUEST['appname'], $_REQUEST['apphostid']);
@@ -346,7 +346,7 @@ include_once('include/page_header.php');
 				'applicationids' => zbx_objectValues($applications, 'applicationid'),
 				'output' => API_OUTPUT_EXTEND,
 				'select_items' => API_OUTPUT_REFER,
-				'expand_data' => 1,
+				'expandData' => 1,
 			);
 			$applications = CApplication::get($options);
 

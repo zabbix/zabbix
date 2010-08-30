@@ -916,7 +916,7 @@ COpt::memoryPick();
 							'graphids' => $chd_graph['graphid'],
 							'output' => API_OUTPUT_EXTEND,
 							'preservekeys' => 1,
-							'expand_data' => 1,
+							'expandData' => 1,
 							'nopermissions' => 1
 						);
 						$chd_graph_items = CGraphItem::get($options);
@@ -1051,7 +1051,7 @@ COpt::memoryPick();
 			foreach($graphids as $graphid){
 				if(!isset($del_graphs[$graphid]))
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				if($del_graphs['templateid'] != 0){
+				if($del_graphs[$graphid]['templateid'] != 0){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, 'Cannot delete templated graphs');
 				}
 			}

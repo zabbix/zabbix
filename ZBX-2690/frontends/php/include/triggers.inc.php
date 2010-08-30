@@ -218,38 +218,61 @@ return $result;
 }
 
 /*
- * Function: get_severity_style
- *
- * Description:
- *	 convert severity constant in to the CSS style name
- *
- * Author:
- *	 Aly
- *
- * Comments:
- *
+ * Function: getEventColor()
+ * Description: convert trigger severity and event value in to the RGB color
+ * Author: Aly
  */
-	function get_severity_style($severity,$type=true){
-		switch($severity){
-			case TRIGGER_SEVERITY_DISASTER:
-				$style='disaster';
-				break;
-			case TRIGGER_SEVERITY_HIGH:
-				$style='high';
-				break;
-			case TRIGGER_SEVERITY_AVERAGE:
-				$style='average';
-				break;
-			case TRIGGER_SEVERITY_WARNING:
-				$style='warning';
-				break;
-			case TRIGGER_SEVERITY_INFORMATION:
-			default:
-				$style='information';
-		}
-		if(!$type) $style='normal';//$style.='_empty';
-	return $style;
+function getEventColor($severity, $value=TRIGGER_VALUE_TRUE){
+	if($value == TRIGGER_VALUE_FALSE) return 'AADDAA';
+
+	switch($severity){
+		case TRIGGER_SEVERITY_DISASTER: $color='FF0000'; break;
+		case TRIGGER_SEVERITY_HIGH: $color='FF8888'; break;
+		case TRIGGER_SEVERITY_AVERAGE: $color='DDAAAA'; break;
+		case TRIGGER_SEVERITY_WARNING: $color='EFEFCC'; break;
+		case TRIGGER_SEVERITY_INFORMATION: $color='CCE2CC'; break;
+		default: $color='BCBCBC';
 	}
+
+return $color;
+}
+
+/*
+ * Function: get_severity_style()
+ * Description: convert severity constant in to the CSS style name
+ * Author: Aly
+ */
+function get_severity_style($severity,$type=true){
+	switch($severity){
+		case TRIGGER_SEVERITY_DISASTER: $style='disaster'; break;
+		case TRIGGER_SEVERITY_HIGH: $style='high'; break;
+		case TRIGGER_SEVERITY_AVERAGE: $style='average'; break;
+		case TRIGGER_SEVERITY_WARNING: $style='warning'; break;
+		case TRIGGER_SEVERITY_INFORMATION:
+		default: $style='information';
+	}
+
+	if(!$type) $style='normal';//$style.='_empty';
+return $style;
+}
+
+/*
+ * Function: getSeverityCaption()
+ * Description: convert severity constant in to the CSS style name
+ * Author: Aly
+ */
+function getSeverityCaption($severity){
+	switch($severity){
+		case TRIGGER_SEVERITY_DISASTER: $caption=S_DISASTER; break;
+		case TRIGGER_SEVERITY_HIGH:		$caption=S_HIGH; break;
+		case TRIGGER_SEVERITY_AVERAGE:	$caption=S_AVERAGE; break;
+		case TRIGGER_SEVERITY_WARNING:	$caption=S_WARNING; break;
+		case TRIGGER_SEVERITY_INFORMATION: $caption=S_INFORMATION; break;
+		default: $caption=S_NOT_CLASSIFIED;
+	}
+
+return $caption;
+}
 
 /*
  * Function: get_service_status_of_trigger
@@ -288,29 +311,23 @@ return $result;
  * Comments:
  *
  */
-	function get_severity_description($severity){
-		if($severity == TRIGGER_SEVERITY_NOT_CLASSIFIED)	return S_NOT_CLASSIFIED;
-		else if($severity == TRIGGER_SEVERITY_INFORMATION)	return S_INFORMATION;
-		else if($severity == TRIGGER_SEVERITY_WARNING)		return S_WARNING;
-		else if($severity == TRIGGER_SEVERITY_AVERAGE)		return S_AVERAGE;
-		else if($severity == TRIGGER_SEVERITY_HIGH)		return S_HIGH;
-		else if($severity == TRIGGER_SEVERITY_DISASTER)		return S_DISASTER;
+	function get_severity_description($severity=null){
+		$severities = array(
+			TRIGGER_SEVERITY_NOT_CLASSIFIED => S_NOT_CLASSIFIED,
+			TRIGGER_SEVERITY_INFORMATION => S_INFORMATION,
+			TRIGGER_SEVERITY_WARNING => S_WARNING,
+			TRIGGER_SEVERITY_AVERAGE => S_AVERAGE,
+			TRIGGER_SEVERITY_HIGH => S_HIGH,
+			TRIGGER_SEVERITY_DISASTER => S_DISASTER,
+		);
 
-		return S_UNKNOWN;
+		if(is_null($severity))
+			return $severities;
+		else if(isset($severities[$severity]))
+			return $severities[$severity];
+		else return S_UNKNOWN;
 	}
 
-/*
- * Function: get_trigger_value_style
- *
- * Description:
- *	 convert trigger value in to the CSS style name
- *
- * Author:
- *	 Eugene Grigorjev (eugene.grigorjev@zabbix.com)
- *
- * Comments:
- *
- */
 	function get_trigger_value_style($value){
 		$str_val[TRIGGER_VALUE_FALSE]	= 'off';
 		$str_val[TRIGGER_VALUE_TRUE]	= 'on';
@@ -322,18 +339,6 @@ return $result;
 		return '';
 	}
 
-/*
- * Function: trigger_value2str
- *
- * Description:
- *	 convert trigger value in to the string representation
- *
- * Author:
- *	 Eugene Grigorjev (eugene.grigorjev@zabbix.com)
- *
- * Comments:
- *
- */
 	function trigger_value2str($value){
 		$str_val[TRIGGER_VALUE_FALSE]	= S_OK_BIG;
 		$str_val[TRIGGER_VALUE_TRUE]	= S_PROBLEM_BIG;
@@ -343,6 +348,34 @@ return $result;
 			return $str_val[$value];
 
 		return S_UNKNOWN;
+	}
+
+	function discovery_value($val = null){
+		$array = array(
+			DOBJECT_STATUS_UP => S_UP_BIG,
+			DOBJECT_STATUS_DOWN => S_DOWN_BIG,
+			DOBJECT_STATUS_DISCOVER => S_DISCOVERED_BIG,
+			DOBJECT_STATUS_LOST => S_LOST_BIG,
+		);
+
+		if(is_null($val))
+			return $array;
+		else if(isset($array[$val]))
+			return $array[$val];
+		else
+			return S_UNKNOWN;
+	}
+
+	function discovery_value_style($val){
+		switch($val){
+			case DOBJECT_STATUS_UP: $style = 'off'; break;
+			case DOBJECT_STATUS_DOWN: $style = 'on'; break;
+			case DOBJECT_STATUS_DISCOVER: $style = 'off'; break;
+			case DOBJECT_STATUS_LOST: $style = 'unknown'; break;
+			default: $style = '';
+		}
+
+		return $style;
 	}
 
 /*
@@ -861,7 +894,7 @@ return $result;
 		}
 
 		if($result)
-			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TRIGGER,	$triggerid,	$description, NULL,	NULL, NULL);
+			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TRIGGER,	$triggerid,	$trig_host['host'].':'.$description, NULL,	NULL, NULL);
 
 		return $triggerid;
 	}
@@ -954,7 +987,7 @@ return $result;
 		}
 
 		info(S_ADDED_TRIGGER.SPACE.'"'.$trigger['description'].'"'.SPACE.S_TO_HOST_SMALL.SPACE.'"'.$host['host'].'"');
-		add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TRIGGER, $newtriggerid, $trigger['description'], NULL, NULL, NULL);
+		add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TRIGGER, $newtriggerid, $host['host'].':'.$trigger['description'], NULL, NULL, NULL);
 // Copy triggers to the child hosts
 		$child_hosts = get_hosts_by_templateid($hostid);
 		while($child_host = DBfetch($child_hosts)){
@@ -2038,7 +2071,7 @@ return $result;
 
 		if($result) {
 			$trigger_new = get_trigger_by_triggerid($triggerid);
-			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER,	$triggerid,	$trigger['description'], 'triggers', $trigger, $trigger_new);
+			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER,	$triggerid,	$trig_host['host'].':'.$trigger['description'], 'triggers', $trigger, $trigger_new);
 		}
 
 		$result = $result?$triggerid:$result;
@@ -2056,14 +2089,24 @@ return $result;
 
 	function check_right_on_trigger_by_expression($permission,$expression){
 		global $USER_DETAILS;
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, $permission, null, get_current_nodeid(true));
 
+		$hostids = array();
 		$db_hosts = get_hosts_by_expression($expression);
 		while($host_data = DBfetch($db_hosts)){
-			if(!isset($available_hosts[$host_data['hostid']])) return false;
+			$hostids[] = $host_data['hostid'];
+		}
+		$hosts = CHost::get(array(
+			'hostids' => $hostids,
+			'editable' => (($permission == PERM_READ_WRITE) ? 1 : null),
+			'output' => API_OUTPUT_SHORTEN,
+			'templated_hosts' => 1,
+		));
+		$hosts = zbx_toHash($hosts, 'hostid');
+		foreach($hostids as $hostid){
+			if(!isset($hosts[$hostid])) return false;
 		}
 
-	return true;
+		return true;
 	}
 
 
@@ -2265,36 +2308,6 @@ return $result;
 		}
 
 	return $result;
-	}
-
-// Deny linking templates with dependency on other template
-	function check_templates_trigger_dependencies($templates) {
-		$result = true;
-
-		foreach($templates as $templateid => $templatename) {
-
-			$triggerids = array();
-			$db_triggers = get_triggers_by_hostid($templateid);
-			while($trigger = DBfetch($db_triggers)) {
-				$triggerids[$trigger['triggerid']] = $trigger['triggerid'];
-			}
-
-			$sql = 'SELECT DISTINCT h.hostid, h.host '.
-					' FROM trigger_depends td, functions f, items i, hosts h '.
-					' WHERE (('.DBcondition('td.triggerid_down',$triggerids).' AND f.triggerid=td.triggerid_up) '.
-						' OR ('.DBcondition('td.triggerid_up',$triggerids).' AND f.triggerid=td.triggerid_down)) '.
-						' AND i.itemid=f.itemid '.
-						' AND h.hostid=i.hostid '.
-						' AND h.hostid<>'.$templateid.
-						' AND h.status='.HOST_STATUS_TEMPLATE;
-
-			$db_dephosts = DBselect($sql);
-			while($db_dephost = DBfetch($db_dephosts)) {
-				error(S_TRIGGER_IN_TEMPLATE.SPACE.'"'.$templatename.'"'.SPACE.S_HAS_DEPENDENCY_WITH_TRIGGER_IN_TEMPLATE.' : '.$db_dephost['host']);
-				$result = false;
-			}
-		}
-		return $result;
 	}
 
 // Deny adding dependency between templates ifthey are not high level templates
@@ -2541,6 +2554,8 @@ return $result;
  *
  */
 	function get_triggers_overview($hostids,$view_style=null){
+		global $USER_DETAILS;
+
 		if(is_null($view_style)) $view_style = CProfile::get('web.overview.view.style',STYLE_TOP);
 
 		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
@@ -2548,7 +2563,7 @@ return $result;
 		$options = array(
 			'hostids' => $hostids,
 			'monitored' => 1,
-			'expand_data' => 1,
+			'expandData' => 1,
 			'skipDependent' => 1,
 			'output' => API_OUTPUT_EXTEND,
 			'sortfield' => 'description'
@@ -2593,17 +2608,22 @@ return $result;
 		}
 		ksort($hosts);
 
+
+		$css = getUserTheme($USER_DETAILS);
+		$vTextColor = ($css == 'css_od.css')?'&color=white':'';
+
 		if($view_style == STYLE_TOP){
-			$header=array(new CCol(S_TRIGGERS,'center'));
+			$header = array(new CCol(S_TRIGGERS,'center'));
+
 			foreach($hosts as $hostname){
-				$header = array_merge($header,array(new CCol(array(new CImg('vtext.php?text='.$hostname)), 'hosts')));
+				$header = array_merge($header,array(new CCol(array(new CImg('vtext.php?text='.$hostname.$vTextColor)), 'hosts')));
 			}
 			$table->setHeader($header,'vertical_header');
 
 			foreach($triggers as $descr => $trhosts){
 				$table_row = array(nbsp($descr));
 				foreach($hosts as $hostname){
-					$table_row=get_trigger_overview_cells($table_row,$trhosts,$hostname);
+					$table_row = get_trigger_overview_cells($table_row,$trhosts,$hostname);
 				}
 				$table->addRow($table_row);
 			}
@@ -2611,10 +2631,10 @@ return $result;
 		else{
 			$header=array(new CCol(S_HOSTS,'center'));
 			foreach($triggers as $descr => $trhosts){
-				$descr = array(new CImg('vtext.php?text='.$descr));
+				$descr = array(new CImg('vtext.php?text='.$descr.$vTextColor));
 				array_push($header,$descr);
 			}
-			$table->SetHeader($header,'vertical_header');
+			$table->setHeader($header,'vertical_header');
 
 			foreach($hosts as $hostname){
 				$table_row = array(nbsp($hostname));
@@ -2801,18 +2821,6 @@ return $result;
 		array_push($table_row,$status_col);
 
 	return $table_row;
-	}
-
-	function get_function_by_functionid($functionid){
-		$result=DBselect('SELECT * FROM functions WHERE functionid='.$functionid);
-		$row=DBfetch($result);
-		if($row){
-			return	$row;
-		}
-		else{
-			error(S_NO_FUNCTION_WITH.' functionid=['.$functionid.']');
-		}
-	return $item;
 	}
 
 	function calculate_availability($triggerid,$period_start,$period_end){
@@ -3056,37 +3064,6 @@ return $result;
 			}
 		}
 		return $result;
-	}
-
-	function get_row_for_nofalseforb($row,$sql){
-		$res_events = DBSelect($sql,1);
-
-		if(!$e_row=DBfetch($res_events)){
-			return false;
-		}
-		else{
-			$row = array_merge($row,$e_row);
-		}
-
-		if(($row['value']!=TRIGGER_VALUE_TRUE) && (!event_initial_time($row))){
-			if(!$eventid = first_initial_eventid($row,0)){
-				return false;
-			}
-
-			$sql = 'SELECT e.eventid, e.value '.
-					' FROM events e '.
-					' WHERE e.eventid='.$eventid.
-						' AND e.acknowledged=0';
-
-			$res_events = DBSelect($sql,1);
-			if(!$e_row=DBfetch($res_events)){
-				return false;
-			}
-			else{
-				$row = array_merge($row,$e_row);
-			}
-		}
-	return $row;
 	}
 
 	function get_triggers_unacknowledged($db_element, $count_problems=null, $ack=false){
@@ -4084,7 +4061,9 @@ return $result;
 $triggerExpressionRules['independent'] = Array(
 	'allowedSymbols' => "[0-9KMGTsmhdw. \/*+<>#=&|\-]+",
 	'notAllowedSymbols' => Array(
-					"[.\/*+<>#=&|\-]{2,}",
+					"[.\/*<>#&|=]{2,}",
+					"-{2,}",
+					"\+{2,}",
 					"[ .KMGTsmhdw]{2,}",
 					"(^\.|\.$)",
 					"\.\d+\.",

@@ -139,7 +139,7 @@ include_once('include/page_header.php');
 			'graphids' => $graphids,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => 1,
-			'expand_data' => 1
+			'expandData' => 1
 		);
 		$gitems = CGraphItem::get($params);
 
@@ -186,8 +186,8 @@ include_once('include/page_header.php');
 			'hostids' => $templateids,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => 1,
-			'select_dependencies' => 1,
-			'expand_data' => 1
+			'select_dependencies' => API_OUTPUT_EXTEND,
+			'expandData' => 1
 		);
 		$triggers = CTrigger::get($params);
 		foreach($triggers as $tnum => $trigger){
@@ -391,22 +391,6 @@ include_once('include/page_header.php');
 
 // Host triggers
 			$result &= copy_triggers($clone_templateid, $templateid);
-			
-			// $available_triggers = get_accessible_triggers(PERM_READ_ONLY, array($clone_templateid), PERM_RES_IDS_ARRAY);
-
-			// $sql = 'SELECT DISTINCT t.triggerid, t.description '.
-					// ' FROM triggers t, items i, functions f'.
-					// ' WHERE i.hostid='.$clone_templateid.
-						// ' AND f.itemid=i.itemid '.
-						// ' AND t.triggerid=f.triggerid '.
-						// ' AND '.DBcondition('t.triggerid', $available_triggers).
-						// ' AND t.templateid=0 '.
-					// ' ORDER BY t.description';
-
-			// $res = DBselect($sql);
-			// while($db_trig = DBfetch($res)){
-				// $result &= (bool) copy_trigger_to_host($db_trig['triggerid'], $templateid, true);
-			// }
 
 // Host graphs
 			$options = array(
@@ -456,16 +440,17 @@ include_once('include/page_header.php');
 // ---------- GO ---------
 	else if(str_in_array($_REQUEST['go'], array('delete', 'delete_and_clear')) && isset($_REQUEST['templates'])){
 		$unlink_mode = false;
-		if(isset($_REQUEST['delete'])){
+		if($_REQUEST['go'] == 'delete'){
 			$unlink_mode = true;
 		}
 
+		DBstart();
 		$go_result = true;
 		$templates = get_request('templates', array());
 		$del_hosts = CTemplate::get(array('templateids' => $templates, 'editable' => 1));
 		$del_hosts = zbx_objectValues($del_hosts, 'templateid');
 
-		DBstart();
+		
 		$go_result = delete_host($del_hosts, $unlink_mode);
 		$go_result = DBend($go_result);
 

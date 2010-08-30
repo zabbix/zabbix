@@ -82,8 +82,10 @@ include_once('include/page_header.php');
 
 		if(isset($_REQUEST['groupid'])){
 			DBstart();
+			$old_group = CHostGroup::get(array('groupids' => $_REQUEST['groupid'],	'output' => API_OUTPUT_EXTEND));
+			$old_group = reset($old_group);
+		
 			$result = CHostGroup::update(array('groupid' => $_REQUEST['groupid'], 'name' => $_REQUEST['gname']));
-			if($result === false) error(CHostGroup::resetErrors());
 			if($result){
 				$options = array(
 					'groupids' => $result['groupids'],
@@ -92,18 +94,20 @@ include_once('include/page_header.php');
 				$groups = CHostGroup::get($options);
 
 				$data = array(
-					'hosts' => $hosts, 
-					'templates' => $templates, 
+					'hosts' => $hosts,
+					'templates' => $templates,
 					'groups' => $groups
 				);
 				$result = CHostGroup::massUpdate($data);
 			}
-			if($result === false) error(CHostGroup::resetErrors());
-			$result = ($result) ? true : false;
 			$result = DBend($result);
+			if($result){
+				$group = reset($groups);
+				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST_GROUP, $group['groupid'], $group['name'], 'groups', array('name' => $old_group['name']), array('name' => $group['name']));
+			}
 
-			$msg_ok		= S_GROUP_UPDATED;
-			$msg_fail	= S_CANNOT_UPDATE_GROUP;
+			$msg_ok = S_GROUP_UPDATED;
+			$msg_fail = S_CANNOT_UPDATE_GROUP;
 		}
 		else{
 			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
@@ -111,8 +115,6 @@ include_once('include/page_header.php');
 
 			DBstart();
 			$result = CHostgroup::create(array('name' => $_REQUEST['gname']));
-
-			if($result === false) error(CHostGroup::resetErrors());
 			if($result){
 				$options = array(
 					'groupids' => $result['groupids'],
@@ -121,11 +123,16 @@ include_once('include/page_header.php');
 				$groups = CHostGroup::get($options);
 
 				$data = array(
-					'hosts' => $hosts, 
-					'templates' => $templates, 
+					'hosts' => $hosts,
+					'templates' => $templates,
 					'groups' => $groups
 				);
 				$result = CHostGroup::massAdd($data);
+
+				if($result){
+					$group = reset($groups);
+					add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_GROUP, $group['groupid'], $group['name'], null, null, null);
+				}
 			}
 			if($result === false) error(CHostGroup::resetErrors());
 			$result = ($result) ? true : false;
@@ -185,15 +192,23 @@ include_once('include/page_header.php');
 		$groups = get_request('groups', array());
 		if(!empty($groups)){
 			DBstart();
-			$hosts = CHost::get(array('groupids' => $groups, 'editable' => 1));
+			$hosts = CHost::get(array('groupids' => $groups, 'editable' => 1, 'output' => API_OUTPUT_EXTEND));
 
 			if(empty($hosts)){
 				$go_result = true;
 			}
 			else{
 				$go_result = CHost::massUpdate(array('hosts' => $hosts, 'status' => $status));
-				if($go_result === false)
-					error(CHost::resetErrors());
+				if($go_result){
+					foreach($hosts as $host){
+						add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST,
+							$host['hostid'],
+							$host['host'],
+							'hosts',
+							array('status' => $host['status']),
+							array('status' => $status));
+					}
+				}
 			}
 
 			$go_result = DBend($go_result);
@@ -215,7 +230,7 @@ include_once('include/page_header.php');
 		$frmForm = new CForm();
 		$frmForm->addItem(new CButton('form', S_CREATE_GROUP));
 	}
-	
+
 	$groups_wdgt = new CWidget();
 	$groups_wdgt->addPageHeader(S_CONFIGURATION_OF_GROUPS, $frmForm);
 
@@ -272,9 +287,9 @@ include_once('include/page_header.php');
 			$cmbGroups->addItem($row['groupid'], $row['name']);
 		}
 
-		
+
 		$cmbHosts = new CTweenBox($frmHostG, 'hosts', $hosts, 25);
-		
+
 // get hosts from selected twb_groupid combo
 		$params = array(
 			'groupids' => $twb_groupid,
@@ -304,9 +319,9 @@ include_once('include/page_header.php');
 			'editable' => 1,
 			'output' => API_OUTPUT_SHORTEN
 		);
-		
+
 		$rw_hosts = CHost::get($params);
-		$rw_hosts = zbx_toHash($rw_hosts, 'hostid');	
+		$rw_hosts = zbx_toHash($rw_hosts, 'hostid');
 		foreach($r_hosts as $num => $host){
 			if(isset($rw_hosts[$host['hostid']]))
 				$cmbHosts->addItem($host['hostid'], $host['host']);

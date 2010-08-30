@@ -24,7 +24,7 @@ if [ ! -f ${CONFIG_FILE} ]; then
 		exit 6
 fi
 
-ZABBIX_BIN="/home/zabbix/bin/zabbix_agentd"
+ZABBIX_BIN="/home/zabbix/sbin/zabbix_agentd"
 ZABBIX_PID="/home/zabbix/lock/zabbix_agentd.pid"
 
 
