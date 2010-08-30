@@ -8,6 +8,7 @@ Changes for 1.9
 
 Changes for 1.8.4rc1
 
+ - [ZBX-2959] fix trailing whitespace & missing trailing newline in downloaded translations (Richlv)
  - [ZBX-2910] fixed 'strerror_from_system undefined' compilation warning on Windows; thanks to Takanori Suzuki (asaveljevs)
  - [ZBX-2902] fixed system.cpu.load[] and system.cpu.util[] being slightly exaggerated on Windows (asaveljevs)
  - [ZBX-2954] fixed translations in template delete popups (Vedmak)
@@ -44,7 +45,7 @@ Changes for 1.8.3
 
  - [ZBX-2875] updated Japanese translation; thanks to Kodai Terashima (Richlv)
  - [ZBX-2856] removed debug info (Aly)
- - [ZBX-2855] fixed new line symbol for latest opera browser (Aly)
+ - [ZBX-2855] fixed new line symbol for latest Opera browser (Aly)
  
 Changes for 1.8.3rc4
 
