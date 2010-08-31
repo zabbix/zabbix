@@ -745,20 +745,20 @@ ZBX_TASK_EX
 
 char	*string_replace(char *str, char *sub_str1, char *sub_str2);
 
-int	is_double_prefix(char *str);
-int	is_double(char *c);
+int	is_double_prefix(const char *str);
+int	is_double(const char *c);
 int	is_uint_prefix(const char *c);
-int	is_uint(char *c);
-int	is_uint64(register char *str, zbx_uint64_t *value);
-int	is_uoct(char *str);
-int	is_uhex(char *str);
+int	is_uint(const char *c);
+int	is_uint64(const char *str, zbx_uint64_t *value);
+int	is_uoct(const char *str);
+int	is_uhex(const char *str);
 int	is_hex_string(const char *str);
 int	is_ascii_string(const char *str);
 void	zbx_rtrim(char *str, const char *charlist);
 void	zbx_ltrim(register char *str, const char *charlist);
 void	zbx_remove_chars(register char *str, const char *charlist);
 #define zbx_remove_spaces(str)		zbx_remove_chars(str, " ");
-#define zbx_remove_whitespace(str)	zbx_remove_chars(str, " \t\n\r");
+#define zbx_remove_whitespace(str)	zbx_remove_chars(str, " \t\r\n");
 void	compress_signs(char *str);
 void	ltrim_spaces(char *c);
 void	rtrim_spaces(char *c);
