@@ -1171,7 +1171,7 @@ int	cmp_double(double a,double b)
  * Comments: the function supports suffixes K,M,G,T,s,m,h,d,w                 *
  *                                                                            *
  ******************************************************************************/
-int	is_double_prefix(char *c)
+int	is_double_prefix(const char *c)
 {
 	int i;
 	int dot=-1;
@@ -1221,22 +1221,7 @@ int	is_double_prefix(char *c)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-/*int is_double(char *str)
-{
-	const char *endstr = str + strlen(str);
-	char *endptr = NULL;
-	double x;
-
-	x = strtod(str, &endptr);
-
-	if(endptr == str || errno != 0)
-		return FAIL;
-	if (endptr == endstr)
-		return SUCCEED;
-	return FAIL;
-}*/
-
-int	is_double(char *c)
+int	is_double(const char *c)
 {
 	int i;
 	int dot=-1;
@@ -1335,7 +1320,7 @@ int	is_uint_prefix(const char *c)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	is_uint(char *c)
+int	is_uint(const char *c)
 {
 	int	i;
 	int	len;
@@ -1401,7 +1386,7 @@ int	_wis_uint(const wchar_t *wide_string)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	is_uint64(register char *str, zbx_uint64_t *value)
+int	is_uint64(const char *str, zbx_uint64_t *value)
 {
 	register zbx_uint64_t	max_uint64 = ~(zbx_uint64_t)__UINT64_C(0);
 	register zbx_uint64_t	value_uint64 = 0, c;
@@ -1443,7 +1428,7 @@ int	is_uint64(register char *str, zbx_uint64_t *value)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	is_uoct(char *str)
+int	is_uoct(const char *str)
 {
 	int	res = FAIL;
 
@@ -1483,7 +1468,7 @@ int	is_uoct(char *str)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	is_uhex(char *str)
+int	is_uhex(const char *str)
 {
 	int	res = FAIL;
 
