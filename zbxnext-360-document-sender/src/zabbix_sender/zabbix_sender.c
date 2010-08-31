@@ -45,6 +45,7 @@ const char	*help_message[] = {
 	"",
 	"  -i --input-file <Input file>         Load values from input file. Specify - for standard input",
 	"                                       Each line of file contains blanks delimited: <hostname> <key> <value>",
+	"                                       Specify - in <hostname> to use hostname from configuration file or --host argument",
 	"  -T --with-timestamps                 Each line of file contains blanks delimited: <hostname> <key> <timestamp> <value>",
 	"                                       This can be used with --input-file option",
 	"  -r --real-time                       Send metrics one by one as soon as they are received",
@@ -72,6 +73,7 @@ const char	*help_message[] = {
 	"",
 	"  -i <Input file>              Load values from input file. Specify - for standard input",
 	"                               Each line of file contains blanks delimited: <hostname> <key> <value>",
+	"                               Specify - in <hostname> to use hostname from configuration file or --host argument",
 	"  -T                           Each line of file contains blanks delimited: <hostname> <key> <timestamp> <value>",
 	"                               This can be used with -i option",
 	"  -r                           Send metrics one by one as soon as they are received",
@@ -451,7 +453,7 @@ int main(int argc, char **argv)
 			goto exit;
 		}
 
-		while (NULL != fgets(in_line, sizeof(in_line), in) && SUCCEED == ret)	/* <hostname> <key> <value> */
+		while (NULL != fgets(in_line, sizeof(in_line), in) && SUCCEED == ret)	/* <hostname> <key> [<timestamp>] <value> */
 		{
 			total_count++; /* also used as inputline */
 
