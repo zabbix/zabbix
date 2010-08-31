@@ -180,7 +180,7 @@
 			//TODO init checks
 			$dchecks = array();
 			$db_checks = DBselect('SELECT dcheckid,type,ports,key_,snmp_community,snmpv3_securityname,'.
-						'snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase, uniq'.
+						'snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,uniq'.
 						' FROM dchecks'.
 						' WHERE druleid='.$_REQUEST['druleid']);
 			while($check_data = DBfetch($db_checks)){

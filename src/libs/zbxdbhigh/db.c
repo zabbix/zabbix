@@ -1911,7 +1911,7 @@ void	DBproxy_register_host(const char *host)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void DBexecute_overflowed_sql(char **sql, int *sql_allocated, int *sql_offset)
+void	DBexecute_overflowed_sql(char **sql, int *sql_allocated, int *sql_offset)
 {
 	if (*sql_offset > ZBX_MAX_SQL_SIZE)
 	{
