@@ -100,7 +100,7 @@ $c{"before"}="/*
 #include \"common.h\"
 #include \"dbschema.h\"
 
-ZBX_TABLE	tables[]={
+const ZBX_TABLE	tables[]={
 ";
 
 %oracle=("t_bigint"	=>	"number(20)",
@@ -509,23 +509,23 @@ sub main
 		$szcol3 = 0;
 		$szcol4 = 0;
 		$sql_suffix="\";\n";
-		$fkeys_prefix = "const char *db_schema_fkeys[] = {\n";
+		$fkeys_prefix = "const char *const db_schema_fkeys[] = {\n";
 		$fkeys_suffix = "\tNULL\n};\n";
-		$fkeys_drop_prefix = "const char *db_schema_fkeys_drop[] = {\n";
+		$fkeys_drop_prefix = "const char *const db_schema_fkeys_drop[] = {\n";
 
-		print "\n#ifdef HAVE_MYSQL\nconst char *db_schema= \"\\\n";
+		print "\n#ifdef HAVE_MYSQL\nconst char *const db_schema= \"\\\n";
 		%output = %mysql;
 		process();
 		print $fkeys_drop_prefix.$fkeys_drop.$fkeys_suffix;
-		print "#elif HAVE_ORACLE\nconst char *db_schema= \"\\\n";
+		print "#elif HAVE_ORACLE\nconst char *const db_schema= \"\\\n";
 		%output = %oracle;
 		process();
 		print $fkeys_drop_prefix.$fkeys_drop.$fkeys_suffix;
-		print "#elif HAVE_POSTGRESQL\nconst char *db_schema= \"\\\n";
+		print "#elif HAVE_POSTGRESQL\nconst char *const db_schema= \"\\\n";
 		%output = %postgresql;
 		process();
 		print $fkeys_drop_prefix.$fkeys_drop.$fkeys_suffix;
-		print "#elif HAVE_SQLITE3\nconst char *db_schema= \"\\\n";
+		print "#elif HAVE_SQLITE3\nconst char *const db_schema= \"\\\n";
 		%output = %sqlite;
 		process();
 		print $fkeys_drop_prefix.$fkeys_drop.$fkeys_suffix;
