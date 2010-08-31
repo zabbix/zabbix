@@ -388,13 +388,17 @@ static void	DMcollect_table_data(int nodeid, int dest_nodetype, const ZBX_TABLE 
 				else
 				{
 					if (table->fields[f].type == ZBX_TYPE_BLOB)
-						rowlen = atoi(row2[++j]);
+						rowlen = atoi(row2[j + 1]);
 					else
 						rowlen = strlen(row2[j]);
-					zbx_binary2hex((u_char *)row2[j], rowlen, &hex, &hex_allocated);
-					zbx_snprintf_alloc(data, data_alloc, data_offset, strlen(hex) + 1, "%s", hex);
+					rowlen = zbx_binary2hex((u_char *)row2[j], rowlen, &hex, &hex_allocated);
+					zbx_snprintf_alloc(data, data_alloc, data_offset, rowlen + 1, "%s", hex);
 				}
-				j++;
+
+				if (table->fields[f].type == ZBX_TYPE_BLOB)
+					j += 2;
+				else
+					j++;
 			}
 			s += 2;
 			f++;
