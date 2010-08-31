@@ -17,9 +17,8 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-
-#ifndef ZABBIX_DBSYNC_H
-#define ZABBIX_DBSYNC_H
+#ifndef ZABBIX_DBSCHEMA_H
+#define ZABBIX_DBSCHEMA_H
 
 /* Flags */
 #define	ZBX_SYNC		0x01
@@ -44,11 +43,11 @@
 #define ZBX_FIELD struct zbx_field_type
 ZBX_FIELD
 {
-	char    	*name;
+	const char    	*name;
 	unsigned char	type;
 	unsigned char	flags;
-	char		*fk_table;
-	char		*fk_field;
+	const char	*fk_table;
+	const char	*fk_field;
 	unsigned char	fk_flags;
 };
 
@@ -61,16 +60,16 @@ ZBX_FIELD
 #define ZBX_TABLE struct zbx_table_type
 ZBX_TABLE
 {
-	char    	*table;
-	char		*recid;
+	const char    	*table;
+	const char	*recid;
 	unsigned char	flags;
 	ZBX_FIELD	fields[ZBX_MAX_FIELDS];
-	char		*uniq;
+	const char	*uniq;
 };
 
-extern ZBX_TABLE	tables[];
-extern const char	*db_schema;
-extern const char	*db_schema_fkeys[];
-extern const char	*db_schema_fkeys_drop[];
+extern const ZBX_TABLE	tables[];
+extern const char	*const db_schema;
+extern const char	*const db_schema_fkeys[];
+extern const char	*const db_schema_fkeys_drop[];
 
 #endif

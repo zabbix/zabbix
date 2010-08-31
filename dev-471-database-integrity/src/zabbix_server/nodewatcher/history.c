@@ -43,7 +43,7 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int get_history_lastid(int master_nodeid, int nodeid, ZBX_TABLE *table, zbx_uint64_t *lastid)
+static int get_history_lastid(int master_nodeid, int nodeid, const ZBX_TABLE *table, zbx_uint64_t *lastid)
 {
 	zbx_sock_t	sock;
 	char		data[MAX_STRING_LEN], *answer;
@@ -94,7 +94,7 @@ disconnect:
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	process_history_table_data(ZBX_TABLE *table, int master_nodeid, int nodeid)
+static void	process_history_table_data(const ZBX_TABLE *table, int master_nodeid, int nodeid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
