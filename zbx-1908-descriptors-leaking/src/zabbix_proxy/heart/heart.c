@@ -27,23 +27,23 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: process_nodes                                                    *
+ * Function: send_heartbeat                                                   *
  *                                                                            *
- * Purpose: calculates checksum of config data                                *
+ * Purpose:                                                                   *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: never returns                                                    *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	send_heartbeat()
 {
-	zbx_sock_t		sock;
-	struct zbx_json		j;
+	zbx_sock_t	sock;
+	struct zbx_json	j;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In send_heartbeat()");
 
@@ -62,7 +62,7 @@ static void	send_heartbeat()
 
 /******************************************************************************
  *                                                                            *
- * Function: main_watchdog_loop                                               *
+ * Function: main_heart_loop                                                  *
  *                                                                            *
  * Purpose: periodically send heartbeat message to the server                 *
  *                                                                            *
@@ -70,9 +70,9 @@ static void	send_heartbeat()
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: check database availability every 60 seconds (hardcoded)         *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void main_heart_loop()
@@ -82,7 +82,6 @@ void main_heart_loop()
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_heart_loop()");
 
-/*	phan.sa_handler = child_signal_handler;*/
         phan.sa_sigaction = child_signal_handler;
 	sigemptyset(&phan.sa_mask);
 	phan.sa_flags = SA_SIGINFO;
@@ -94,7 +93,6 @@ void main_heart_loop()
 		for (;;) /* Do nothing */
 			sleep(3600);
 	}
-
 
 	for (;;) {
 		start = time(NULL);

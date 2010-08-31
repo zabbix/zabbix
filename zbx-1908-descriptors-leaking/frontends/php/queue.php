@@ -22,7 +22,7 @@
 	require_once 'include/config.inc.php';
 	require_once 'include/items.inc.php';
 
-	$page['title'] = 'S_QUEUE_BIG';
+	$page['title'] = 'S_QUEUE';
 	$page['file'] = 'queue.php';
 	$page['hist_arg'] = array('config');
 
@@ -262,11 +262,11 @@ include_once 'include/page_header.php';
 
 	$queue_wdgt->addItem($table);
 	$queue_wdgt->Show();
-	
+
 	if($_REQUEST["config"]!=0){
 		show_table_header(S_TOTAL.": ".$table->GetNumRows().($truncated ? ' ('.S_TRUNCATED.')' : ''));
 	}
 
-	
+
 include_once "include/page_footer.php";
 ?>

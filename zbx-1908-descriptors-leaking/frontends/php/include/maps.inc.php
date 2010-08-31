@@ -962,6 +962,7 @@
 			'priority' => $i['priority'],
 			'info' => array(),
 		);
+		$has_problem = false;
 
 		if($i['problem']){
 			$info['iconid'] = $selement['iconid_on'];
@@ -994,6 +995,7 @@
 					'color' => $colors['Gray']
 				);
 			}
+			$has_problem = true;
 		}
 		else if($i['unknown']){
 			$info['iconid'] = $selement['iconid_unknown'];
@@ -1003,8 +1005,10 @@
 				'msg' => $i['unknown'] . ' ' . S_UNKNOWN,
 				'color' => $colors['Gray']
 			);
+			$has_problem = true;
 		}
-		else if($i['maintenance']){
+
+		if($i['maintenance']){
 			$info['iconid'] = $selement['iconid_maintenance'];
 			$info['icon_type'] = SYSMAP_ELEMENT_ICON_MAINTENANCE;
 			$info['info']['maintenance'] = array(
@@ -1020,7 +1024,7 @@
 				'color' => $colors['Dark Red']
 			);
 		}
-		else{
+		else if(!$has_problem){
 			$info['iconid'] = $selement['iconid_off'];
 			$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
 			$info['info']['unknown'] = array(
@@ -1078,10 +1082,8 @@
 			$has_problem = true;
 		}
 		else if($i['unknown']){
-			if(!isset($info['iconid'])){
-				$info['iconid'] = $selement['iconid_unknown'];
-				$info['icon_type'] = SYSMAP_ELEMENT_ICON_UNKNOWN;
-			}
+			$info['iconid'] = $selement['iconid_unknown'];
+			$info['icon_type'] = SYSMAP_ELEMENT_ICON_UNKNOWN;
 			$info['info']['unknown'] = array(
 				'msg' => $i['unknown'] . ' ' . S_UNKNOWN,
 				'color' => $colors['Gray']
@@ -1113,10 +1115,8 @@
 		}
 
 		if(!$has_status && !$has_problem){
-			if(!isset($info['iconid'])){
-				$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
-				$info['iconid'] = $selement['iconid_off'];
-			}
+			$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
+			$info['iconid'] = $selement['iconid_off'];
 			$info['info']['unknown'] = array(
 				'msg' => S_OK_BIG,
 				'color' => $colors['Dark Green'],
@@ -1205,10 +1205,8 @@
 		}
 
 		if(!$has_status && !$has_problem){
-			if(!isset($info['iconid'])){
-				$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
-				$info['iconid'] = $selement['iconid_off'];
-			}
+			$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
+			$info['iconid'] = $selement['iconid_off'];
 			$info['info']['unknown'] = array(
 				'msg' => S_OK_BIG,
 				'color' => $colors['Dark Green'],
@@ -1333,7 +1331,7 @@
 
 		$monitored_hostids = array();
 		foreach($all_hosts as $hostid => $host){
-			if(($host['status'] == HOST_STATUS_MONITORED) && ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_OFF))
+			if(($host['status'] == HOST_STATUS_MONITORED))
 				$monitored_hostids[$hostid] = $hostid;
 		}
 // }}}
@@ -1452,7 +1450,7 @@
 				$i['problem_title'] = expand_trigger_description_by_data($all_triggers[$last_problemid]);
 			}
 
-			if($sysmap['expandproblem'] && ($i['maintenance'] == 1) && ($i['problem'] == 0) && ($i['unknown'] == 0)){
+			if(($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) && ($i['maintenance'] == 1)){
 				$mnt = get_maintenance_by_maintenanceid($all_hosts[$last_hostid]['maintenanceid']);
 				$i['maintenance_title'] = $mnt['name'];
 			}

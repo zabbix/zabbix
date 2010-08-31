@@ -894,7 +894,7 @@ return $caption;
 		}
 
 		if($result)
-			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TRIGGER,	$triggerid,	$description, NULL,	NULL, NULL);
+			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TRIGGER,	$triggerid,	$trig_host['host'].':'.$description, NULL,	NULL, NULL);
 
 		return $triggerid;
 	}
@@ -987,7 +987,7 @@ return $caption;
 		}
 
 		info(S_ADDED_TRIGGER.SPACE.'"'.$trigger['description'].'"'.SPACE.S_TO_HOST_SMALL.SPACE.'"'.$host['host'].'"');
-		add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TRIGGER, $newtriggerid, $trigger['description'], NULL, NULL, NULL);
+		add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TRIGGER, $newtriggerid, $host['host'].':'.$trigger['description'], NULL, NULL, NULL);
 // Copy triggers to the child hosts
 		$child_hosts = get_hosts_by_templateid($hostid);
 		while($child_host = DBfetch($child_hosts)){
@@ -1551,151 +1551,6 @@ return $caption;
 
 		return $description;
 	}
-/*
- * Function: expandTriggerDescription
- *
- * Description:
- *	 substitute simple macros in data string with real values
- *
- * Author:
- *	 Aly
- *
- * Comments: !!! Don't forget sync code with C !!!
- *
- */
-	function expandTriggerDescription($trigger, $flag = ZBX_FLAG_TRIGGER){
-		if($trigger){
-			$description = expand_trigger_description_constants($trigger['description'], $trigger);
-
-			for($i=0; $i<10; $i++){
-				$macro = '{HOSTNAME'.($i ? $i : '').'}';
-				if(zbx_strstr($description, $macro)) {
-					$functionid = trigger_get_N_functionid($trigger['expression'], $i ? $i : 1);
-
-					if(isset($functionid)) {
-						if(!isset($trigger['functions'][$functionid])) $triggerData = array('host' => $macro);
-					else
-						$triggerData = $trigger['functions'][$functionid];
-						$triggerData+= $trigger['items'][$triggerData['itemid']];
-						$triggerData+= $trigger['hosts'][$triggerData['hostid']];
-
-						$description = str_replace($macro, $triggerData['host'], $description);
-					}
-				}
-			}
-
-			for($i=0; $i<10; $i++){
-				$macro = '{ITEM.LASTVALUE'.($i ? $i : '').'}';
-				if(zbx_strstr($description, $macro)) {
-					$functionid = trigger_get_N_functionid($trigger['expression'], $i ? $i : 1);
-
-					if(isset($functionid)){
-						$triggerData = $trigger['functions'][$functionid];
-						$triggerData+= $trigger['items'][$triggerData['itemid']];
-						$triggerData+= $trigger['hosts'][$triggerData['hostid']];
-
-						$description = str_replace($macro, $triggerData['lastvalue'], $description);
-					}
-				}
-			}
-
-			for($i=0; $i<10; $i++){
-				$macro = '{ITEM.VALUE'.($i ? $i : '').'}';
-				if(zbx_strstr($description, $macro)){
-					$value=($flag==ZBX_FLAG_TRIGGER)?
-							trigger_get_func_value($trigger['expression'],ZBX_FLAG_TRIGGER,$i ? $i : 1, 1):
-							trigger_get_func_value($trigger['expression'],ZBX_FLAG_EVENT,$i ? $i : 1, $trigger['clock']);
-
-					$description = str_replace($macro, $value, $description);
-				}
-
-			}
-		}
-		else{
-			$description = '*ERROR*';
-		}
-	return $description;
-	}
-
-	/*
-	 * Function: expand_trigger_description_by_data
-	 *
-	 * Description:
-	 *	 substitute simple macros in data string with real values
-	 *
-	 * Author:
-	 *	 Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments: !!! Don't forget sync code with C !!!
-	 *
-	 */
-	function expand_trigger_description_by_data2($trigger, $flag = ZBX_FLAG_TRIGGER){
-		if($trigger){
-			$description = expand_trigger_description_constants($trigger['description'], $trigger);
-
-			for($i=0; $i<10; $i++){
-				$macro = '{HOSTNAME'.($i ? $i : '').'}';
-				if(zbx_strstr($description, $macro)) {
-					$functionid = trigger_get_N_functionid($trigger['expression'], $i ? $i : 1);
-
-					if(isset($functionid)) {
-						if(!isset($trigger['functions'][$functionid])) $triggerData = array('host' => $macro);
-					else
-						$triggerData = $trigger['functions'][$functionid];
-						$triggerData+= $trigger['items'][$triggerData['itemid']];
-						$triggerData+= $trigger['hosts'][$triggerData['hostid']];
-
-						$description = str_replace($macro, $triggerData['host'], $description);
-					}
-				}
-			}
-
-			for($i=0; $i<10; $i++){
-				$macro = '{ITEM.LASTVALUE'.($i ? $i : '').'}';
-				if(zbx_strstr($description, $macro)) {
-					$functionid = trigger_get_N_functionid($trigger['expression'], $i ? $i : 1);
-
-					if(isset($functionid)){
-						$triggerData = $trigger['functions'][$functionid];
-						$triggerData+= $trigger['items'][$triggerData['itemid']];
-						$triggerData+= $trigger['hosts'][$triggerData['hostid']];
-
-						if($triggerData['value_type']!=ITEM_VALUE_TYPE_LOG){
-							$description = str_replace($macro, $triggerData['lastvalue'], $description);
-						}
-						else{
-							$sql = 'SELECT MAX(clock) as max FROM history_log WHERE itemid='.$triggerData['itemid'];
-							$trigger3=DBfetch(DBselect($sql));
-							if($trigger3 && !is_null($trigger3['max'])){
-								$sql = 'SELECT value '.
-										' FROM history_log '.
-										' WHERE itemid='.$triggerData['itemid'].
-											' AND clock='.$trigger3['max'];
-								$trigger4=DBfetch(DBselect($sql));
-								$description = str_replace($macro, $trigger4['value'], $description);
-							}
-						}
-					}
-				}
-			}
-
-			for($i=0; $i<10; $i++){
-				$macro = '{ITEM.VALUE'.($i ? $i : '').'}';
-				if(zbx_strstr($description, $macro)){
-					$value=($flag==ZBX_FLAG_TRIGGER)?
-							trigger_get_func_value($trigger['expression'],ZBX_FLAG_TRIGGER,$i ? $i : 1, 1):
-							trigger_get_func_value($trigger['expression'],ZBX_FLAG_EVENT,$i ? $i : 1, $trigger['clock']);
-
-					$description = str_replace($macro, $value, $description);
-				}
-
-			}
-		}
-		else{
-			$description = '*ERROR*';
-		}
-	return $description;
-	}
 
 	/*
 	 * Function: expand_trigger_description_by_data
@@ -1759,6 +1614,15 @@ return $caption;
 					$description = str_replace($macro, $value, $description);
 				}
 
+			}
+
+			if($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $description, $arr)){
+				$macros = CUserMacro::getMacros($arr[1], array('triggerid' => $row['triggerid']));
+
+				$search = array_keys($macros);
+				$values = array_values($macros);
+
+				$description = str_replace($search, $values, $description);
 			}
 		}
 		else{
@@ -2071,7 +1935,7 @@ return $caption;
 
 		if($result) {
 			$trigger_new = get_trigger_by_triggerid($triggerid);
-			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER,	$triggerid,	$trigger['description'], 'triggers', $trigger, $trigger_new);
+			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER,	$triggerid,	$trig_host['host'].':'.$trigger['description'], 'triggers', $trigger, $trigger_new);
 		}
 
 		$result = $result?$triggerid:$result;
