@@ -36,7 +36,7 @@ static int	poller_num;
 /*some defines so the `fping' and `fping6' could successfully process pings*/
 #define 	MIN_COUNT		1
 #define 	MAX_COUNT		10000
-#define 	MIN_INTERVAL		10
+#define 	MIN_INTERVAL		20
 #define		MIN_SIZE		24
 #define		MAX_SIZE		65507
 #define		MIN_TIMEOUT		50
@@ -166,8 +166,8 @@ static void	process_values(icmpitem_t *items, int first_index, int last_index, Z
 	DCflush_nextchecks();
 }
 
-static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *icmpping, char **addr,
-		int *count, int *interval, int *size, int *timeout, icmppingsec_type_t *type)
+static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *icmpping, char **addr, int *count,
+		int *interval, int *size, int *timeout, icmppingsec_type_t *type, char *error, int max_error_len)
 {
 	char	cmd[MAX_STRING_LEN], params[MAX_STRING_LEN], buffer[MAX_STRING_LEN];
 	int	num_params;
@@ -175,48 +175,61 @@ static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *
 	if (0 == parse_command(key, cmd, sizeof(cmd), params, sizeof(params)))
 		return NOTSUPPORTED;
 
+	if (0 == strcmp(cmd, SERVER_ICMPPING_KEY))
+		*icmpping = ICMPPING;
+	else if (0 == strcmp(cmd, SERVER_ICMPPINGLOSS_KEY))
+		*icmpping = ICMPPINGLOSS;
+	else if (0 == strcmp(cmd, SERVER_ICMPPINGSEC_KEY))
+		*icmpping = ICMPPINGSEC;
+	else
+	{
+		zbx_snprintf(error, max_error_len, "Unsupported pinger key");
+		return NOTSUPPORTED;
+	}
+
 	num_params = num_param(params);
 
-	if (0 == strcmp(cmd, SERVER_ICMPPING_KEY))
+	if (num_params > 6 || (*icmpping != ICMPPINGSEC && num_params > 5))
 	{
-		if (num_params > 5)
-			return NOTSUPPORTED;
-		*icmpping = ICMPPING;
-	}
-	else if (0 == strcmp(cmd, SERVER_ICMPPINGLOSS_KEY))
-	{
-		if (num_params > 5)
-			return NOTSUPPORTED;
-		*icmpping = ICMPPINGLOSS;
-	}
-	else if (0 == strcmp(cmd, SERVER_ICMPPINGSEC_KEY))
-	{
-		if (num_params > 6)
-			return NOTSUPPORTED;
-		*icmpping = ICMPPINGSEC;
-	}
-	else
+		zbx_snprintf(error, max_error_len, "Too many arguments");
 		return NOTSUPPORTED;
+	}
 
 	if (0 != get_param(params, 2, buffer, sizeof(buffer)) || *buffer == '\0')
 		*count = 3;
-	else if ( ( ( *count = atoi(buffer) ) < MIN_COUNT ) || ( *count > MAX_COUNT ) )
+	else if (FAIL == is_uint(buffer) || (*count = atoi(buffer)) < MIN_COUNT || *count > MAX_COUNT)
+	{
+		zbx_snprintf(error, max_error_len, "Number of packets [%s] is not between %d and %d",
+				buffer, MIN_COUNT, MAX_COUNT);
 		return NOTSUPPORTED;
+	}
 
 	if (0 != get_param(params, 3, buffer, sizeof(buffer)) || *buffer == '\0')
 		*interval = 0;
-	else if ( ( *interval = atoi(buffer) ) < MIN_INTERVAL )
+	else if (FAIL == is_uint(buffer) || (*interval = atoi(buffer)) < MIN_INTERVAL)
+	{
+		zbx_snprintf(error, max_error_len, "Interval [%s] should be at least %d",
+				buffer, MIN_INTERVAL);
 		return NOTSUPPORTED;
+	}
 
 	if (0 != get_param(params, 4, buffer, sizeof(buffer)) || *buffer == '\0')
 		*size = 0;
-	else if ( ( *size = atoi(buffer) ) < MIN_SIZE || ( *size > MAX_SIZE ) )
+	else if (FAIL == is_uint(buffer) || (*size = atoi(buffer)) < MIN_SIZE || *size > MAX_SIZE)
+	{
+		zbx_snprintf(error, max_error_len, "Packet size [%s] is not between %d and %d",
+				buffer, MIN_SIZE, MAX_SIZE);
 		return NOTSUPPORTED;
+	}
 
 	if (0 != get_param(params, 5, buffer, sizeof(buffer)) || *buffer == '\0')
 		*timeout = 0;
-	else if ( ( *timeout = atoi(buffer) ) < MIN_TIMEOUT )
+	else if (FAIL == is_uint(buffer) || (*timeout = atoi(buffer)) < MIN_TIMEOUT)
+	{
+		zbx_snprintf(error, max_error_len, "Timeout [%s] should be at least %d",
+				buffer, MIN_TIMEOUT);
 		return NOTSUPPORTED;
+	}
 
 	if (0 != get_param(params, 6, buffer, sizeof(buffer)) || *buffer == '\0')
 		*type = ICMPPINGSEC_AVG;
@@ -229,7 +242,10 @@ static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *
 		else if (0 == strcmp(buffer, "max"))
 			*type = ICMPPINGSEC_MAX;
 		else
+		{
+			zbx_snprintf(error, max_error_len, "Mode [%s] is not supported", buffer);
 			return NOTSUPPORTED;
+		}
 	}
 
 	if (0 != get_param(params, 1, buffer, sizeof(buffer)) || *buffer == '\0')
@@ -331,7 +347,7 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 	const char		*__function_name = "get_pinger_hosts";
 	DC_ITEM			items[MAX_ITEMS];
 	int			i, num, count, interval, size, timeout;
-	char			*addr = NULL, *conn;
+	char			error[MAX_STRING_LEN], *addr = NULL, *conn;
 	icmpping_t		icmpping;
 	icmppingsec_type_t	type;
 
@@ -348,14 +364,14 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 				&items[i].key, MACRO_TYPE_ITEM_KEY, NULL, 0);
 
 		conn = items[i].host.useip == 1 ? items[i].host.ip : items[i].host.dns;
-		if (SUCCEED == parse_key_params(items[i].key, conn, &icmpping, &addr,
-					&count, &interval, &size, &timeout, &type))
+		if (SUCCEED == parse_key_params(items[i].key, conn, &icmpping, &addr, &count,
+					&interval, &size, &timeout, &type, error, sizeof(error)))
 		{
 			add_icmpping_item(icmp_items, icmp_items_alloc, icmp_items_count, count, interval, size,
 					timeout, items[i].itemid, addr, icmpping, type);
 		}
 		else
-			DCadd_nextcheck(items[i].itemid, now, "Unsupported parameters");	/* update error & status field in items table */
+			DCadd_nextcheck(items[i].itemid, now, error);	/* update error & status field in items table */
 
 		zbx_free(items[i].key);
 	}
