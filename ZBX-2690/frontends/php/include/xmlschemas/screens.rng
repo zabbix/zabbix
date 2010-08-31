@@ -28,6 +28,9 @@
 												<element name="name">
 													<text/>
 												</element>
+												<element name="host">
+													<text/>
+												</element>
 												<group>
 													<interleave>
 														<element name="name">
