@@ -145,7 +145,7 @@
 				',snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,uniq) '.
 				' values ('.$dcheckid.','.$druleid.','.$type.','.zbx_dbstr($ports).','.
 				zbx_dbstr($key).','.zbx_dbstr($snmp_community).','.zbx_dbstr($snmpv3_securityname).','.
-				$snmpv3_securitylevel.','.zbx_dbstr($snmpv3_authpassphrase).','.zbx_dbstr($snmpv3_privpassphrase).','.zero2null($uniq).')');
+				$snmpv3_securitylevel.','.zbx_dbstr($snmpv3_authpassphrase).','.zbx_dbstr($snmpv3_privpassphrase).','.$uniq.')');
 
 		if(!$result)
 			return $result;
@@ -198,7 +198,7 @@
 					$unique_dcheckid = $data['dcheckid'];
 			}
 			
-			$sql = 'UPDATE dchecks SET uniq=NULL WHERE druleid='.$druleid;
+			$sql = 'UPDATE dchecks SET uniq=0 WHERE druleid='.$druleid;
 			DBexecute($sql);
 
 			if($unique_dcheckid){
