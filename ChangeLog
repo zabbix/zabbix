@@ -8,6 +8,7 @@ Changes for 1.9
 
 Changes for 1.8.4rc1
 
+ - [ZBXNEXT-360] zabbix_sender now allows "-" for default hostname in input files; thanks to Dennis Jacobfeuerborn (asaveljevs)
  - [ZBX-1908] fixed file and socket descriptors leaking to child processes; thanks to Dan Horak (asaveljevs)
  - [ZBX-2960] split agentd userparameters out using includable files, add more MySQL examples (Richlv)
  - [ZBXNEXT-458] user macros (e.g., {$MACRO}) can now be used in item and trigger descriptions (asaveljevs,Vedmak)

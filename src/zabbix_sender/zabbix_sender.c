@@ -465,6 +465,18 @@ int main(int argc, char **argv)
 				continue;
 			}
 
+			if (0 == strcmp(hostname, "-"))
+			{
+			       if (NULL == ZABBIX_HOSTNAME)
+			       {
+				       zabbix_log(LOG_LEVEL_WARNING, "[line %d] '-' encountered as 'Hostname', "
+							"but no default hostname was specified", total_count);
+				       continue;
+			       }
+			       else
+				       zbx_strlcpy(hostname, ZABBIX_HOSTNAME, sizeof(hostname));
+			}
+
 			if ('\0' == *p || NULL == (p = get_string(p, key, sizeof(key))) || '\0' == *key)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "[line %d] 'Key' required", total_count);
