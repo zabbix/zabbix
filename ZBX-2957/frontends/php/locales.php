@@ -22,7 +22,7 @@
 include_once('include/config.inc.php');
 
 if(isset($_REQUEST['download'])){
-	$page['type'] = PAGE_TYPE_XML;
+	$page['type'] = PAGE_TYPE_HTML_BLOCK;
 	$page['file'] = 'new_locale.inc.php';
 }
 else{
