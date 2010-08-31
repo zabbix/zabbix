@@ -47,21 +47,28 @@
  */
 ssize_t smtp_readln(int fd, char *buf, int buf_len)
 {
-	ssize_t	nbytes, read_bytes = 0;
+	ssize_t	nbytes, read_bytes;
 
-	buf_len --;	/* '\0' */
+	buf_len--;	/* '\0' */
+
 	do
 	{
-		if (-1 == (nbytes = read(fd, &((char*)buf)[read_bytes], 1)))
-			return nbytes;				/* Error */
+		read_bytes = 0;
 
-		read_bytes += nbytes;
+		do
+		{
+			if (-1 == (nbytes = read(fd, &((char*)buf)[read_bytes], 1)))
+				return nbytes;				/* Error */
+
+			read_bytes += nbytes;
+		}
+		while (nbytes > 0 &&					/* End Of File (socket closed) */
+				read_bytes < buf_len &&			/* End of Buffer */
+				((char*)buf)[read_bytes - 1] != '\n' );	/* new line */
+
+		buf[read_bytes] = '\0';
 	}
-	while (nbytes > 0 &&					/* End Of File (socket closed) */
-			read_bytes < buf_len &&			/* End of Buffer */
-			((char*)buf)[read_bytes - 1] != '\n' );	/* new line */
-
-	buf[read_bytes] = '\0';
+	while (read_bytes >= 4 && isdigit(buf[0]) && isdigit(buf[1]) && isdigit(buf[2]) && buf[3] == '-');
 
 	return read_bytes;
 }
