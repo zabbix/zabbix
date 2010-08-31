@@ -102,7 +102,7 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 #define ZBX_MAX_INCLUDE_LEVEL 10
 
 #define ZBX_CFG_LTRIM_CHARS "\t "
-#define ZBX_CFG_RTRIM_CHARS ZBX_CFG_LTRIM_CHARS "\r\n\0"
+#define ZBX_CFG_RTRIM_CHARS ZBX_CFG_LTRIM_CHARS "\r\n"
 
 	register int
 		i, lineno;

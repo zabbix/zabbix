@@ -83,12 +83,16 @@ int	create_pid_file(const char *pidfile)
 	/* lock file */
 	fdpid = fileno(fpid);
 #ifdef HAVE_FCNTL_H
-	if(-1 != fdpid) fcntl(fdpid, F_SETLK, &fl);
+	if(-1 != fdpid)
+	{
+		fcntl(fdpid, F_SETLK, &fl);
+		fcntl(fdpid, F_SETFD, FD_CLOEXEC);
+	}
 #else
 	if(-1 != fdpid) flock(fdpid, LOCK_EX);
 #endif /* HAVE_FCNTL_H */
 
-	/* frite pid to file */
+	/* write pid to file */
 	fprintf(fpid, "%li", zbx_get_thread_id());
 	fflush(fpid);
 

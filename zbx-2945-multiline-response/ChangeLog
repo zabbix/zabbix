@@ -1,5 +1,19 @@
 Changes for 1.8.4rc1
 
+ - [ZBX-2945] email sender now knows how to handle multiline responses from SMTP servers (asaveljevs)
+ - [ZBXNEXT-360] zabbix_sender now allows "-" for default hostname in input files; thanks to Dennis Jacobfeuerborn (asaveljevs)
+ - [ZBX-1908] fixed file and socket descriptors leaking to child processes; thanks to Dan Horak (asaveljevs)
+ - [ZBX-2960] split agentd userparameters out using includable files, add more MySQL examples (Richlv)
+ - [ZBXNEXT-458] user macros (e.g., {$MACRO}) can now be used in item and trigger descriptions (asaveljevs,Vedmak)
+ - [ZBX-2959] fix trailing whitespace & missing trailing newline in downloaded translations (Richlv)
+ - [ZBX-2910] fixed 'strerror_from_system undefined' compilation warning on Windows; thanks to Takanori Suzuki (asaveljevs)
+ - [ZBX-2902] fixed system.cpu.load[] and system.cpu.util[] being slightly exaggerated on Windows (asaveljevs)
+ - [ZBX-2954] fixed translations in template delete popups (Vedmak)
+ - [ZBX-2938] fixed not showing problems on map for hosts in maintenance (Vedmak)
+ - [ZBXNEXT-238] made zabbix_sender gather as much data as possible before sending (asaveljevs)
+ - [ZBX-2948] fixed export of trigger dependencies (Vedmak)
+ - [ZBX-2949] fixed Templates screen Go action 'Delete' (Vedmak)
+ - [ZBX-2934] added new conf. constants for roundoff configuration (Vedmak)
  - [ZBX-2907] fixed errors when action condition has trigger from another node (Vedmak)
  - [ZBX-2928] fixed "triggers info" unknown counter, added not classified triggers count (Vedmak)
  - [ZBX-2914] Gentoo initscript cleanup (Richlv)
@@ -28,7 +42,7 @@ Changes for 1.8.3
 
  - [ZBX-2875] updated Japanese translation; thanks to Kodai Terashima (Richlv)
  - [ZBX-2856] removed debug info (Aly)
- - [ZBX-2855] fixed new line symbol for latest opera browser (Aly)
+ - [ZBX-2855] fixed new line symbol for latest Opera browser (Aly)
  
 Changes for 1.8.3rc4
 

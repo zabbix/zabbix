@@ -275,6 +275,14 @@ int	parse_command(const char *command, char *cmd, int cmd_max_len,
 	if (NULL == pl && NULL != pr)
 		return 0;
 
+	if (NULL == pl && NULL == pr) /* simple check? */
+	{
+		if (NULL != (pl = strchr(command, ',')))
+		{
+			for (pr = pl + 1; '\0' != *pr; pr++);
+		}
+	}
+
 	if (NULL != cmd)
 	{
 		if (NULL != pl)

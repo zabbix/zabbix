@@ -178,6 +178,7 @@ function condition_value2str($conditiontype, $value){
 			));
 			$trig = reset($trig);
 			$host = reset($trig['hosts']);
+			$str_val = '';
 			if(id2nodeid($value) != get_current_nodeid()) $str_val = get_node_name_by_elid($value, true, ': ');
 			$str_val .= $host['host'].':'.$trig['description'];
 			break;

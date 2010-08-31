@@ -62,6 +62,10 @@
 #	define ZBX_SOCKLEN_T socklen_t
 #endif
 
+#if !defined(SOCK_CLOEXEC)
+#	define SOCK_CLOEXEC 0	/* SOCK_CLOEXEC is Linux-specific, available since 2.6.23 */
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tcp_strerror                                                 *
@@ -410,11 +414,15 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 		goto out;
 	}
 
-	if (ZBX_SOCK_ERROR == (s->socket = socket(ai->ai_family, ai->ai_socktype, ai->ai_protocol)))
+	if (ZBX_SOCK_ERROR == (s->socket = socket(ai->ai_family, ai->ai_socktype | SOCK_CLOEXEC, ai->ai_protocol)))
 	{
 		zbx_set_tcp_strerror("Cannot create socket [%s]:%d [%s]", ip, port, strerror_from_system(zbx_sock_last_error()));
 		goto out;
 	}
+
+#if !defined(_WINDOWS) && defined(HAVE_FCNTL_H) && !SOCK_CLOEXEC
+	fcntl(s->socket, F_SETFD, FD_CLOEXEC);
+#endif
 
 	if (NULL != source_ip)
 	{
@@ -475,11 +483,15 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 	servaddr_in.sin_addr.s_addr	= ((struct in_addr *)(hp->h_addr))->s_addr;
 	servaddr_in.sin_port		= htons(port);
 
-	if (ZBX_SOCK_ERROR == (s->socket = socket(AF_INET, SOCK_STREAM, 0)))
+	if (ZBX_SOCK_ERROR == (s->socket = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0)))
 	{
 		zbx_set_tcp_strerror("Cannot create socket [%s:%d] [%s]", ip, port, strerror_from_system(zbx_sock_last_error()));
 		return FAIL;
 	}
+
+#if !defined(_WINDOWS) && defined(HAVE_FCNTL_H) && !SOCK_CLOEXEC
+	fcntl(s->socket, F_SETFD, FD_CLOEXEC);
+#endif
 
 	if (NULL != source_ip)
 	{
@@ -720,12 +732,16 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 				continue;
 
 			if (ZBX_SOCK_ERROR == (s->sockets[s->num_socks] =
-					socket(current_ai->ai_family, current_ai->ai_socktype, current_ai->ai_protocol)))
+					socket(current_ai->ai_family, current_ai->ai_socktype | SOCK_CLOEXEC, current_ai->ai_protocol)))
 			{
 				zbx_set_tcp_strerror("socket() for [[%s]:%s] failed with error %d: %s",
 						ip, port, zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
 				goto out;
 			}
+
+#if !defined(_WINDOWS) && defined(HAVE_FCNTL_H) && !SOCK_CLOEXEC
+			fcntl(s->sockets[s->num_socks], F_SETFD, FD_CLOEXEC);
+#endif
 
 			/* Enable address reuse */
 			/* This is to immediately use the address even if it is in TIME_WAIT state */
@@ -828,12 +844,16 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 			goto out;
 		}
 
-		if (ZBX_SOCK_ERROR == (s->sockets[s->num_socks] = socket(AF_INET, SOCK_STREAM, 0)))
+		if (ZBX_SOCK_ERROR == (s->sockets[s->num_socks] = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0)))
 		{
 			zbx_set_tcp_strerror("socket() for [[%s]:%hu] failed with error %d: %s",
 					ip, listen_port, zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
 			goto out;
 		}
+
+#if !defined(_WINDOWS) && defined(HAVE_FCNTL_H) && !SOCK_CLOEXEC
+		fcntl(s->sockets[s->num_socks], F_SETFD, FD_CLOEXEC);
+#endif
 
 		/* Enable address reuse */
 		/* This is to immediately use the address even if it is in TIME_WAIT state */
