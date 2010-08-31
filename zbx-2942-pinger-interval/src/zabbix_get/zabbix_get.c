@@ -150,7 +150,7 @@ static int	get_value(
 		{
 			if( SUCCEED == (ret = zbx_tcp_recv_ext(&s, &buf, ZBX_TCP_READ_UNTIL_CLOSE, 0)) )
 			{
-				zbx_rtrim(buf,"\r\n\0");
+				zbx_rtrim(buf, "\r\n");
 				*value = strdup(buf);
 			}
 		}

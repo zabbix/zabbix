@@ -49,7 +49,7 @@ static int	get_http_page(char *host, char *param, unsigned short port, char *buf
 		{
 			if (SUCCEED == (ret = zbx_tcp_recv_ext(&s, &buf, ZBX_TCP_READ_UNTIL_CLOSE, 0)))
 			{
-				zbx_rtrim(buf, "\n\r\0");
+				zbx_rtrim(buf, "\r\n");
 
 				zbx_snprintf(buffer, max_buf_len, "%s", buf);
 			}
