@@ -65,7 +65,7 @@
 										</optional>
 										<element name="x">
 											<data type="integer"/>
-										</element>							
+										</element>
 										<element name="y">
 											<data type="integer"/>
 										</element>
