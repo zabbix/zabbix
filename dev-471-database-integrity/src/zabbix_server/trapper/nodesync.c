@@ -379,8 +379,8 @@ static void	process_updated_records(int nodeid, char *data, int sender_nodetype)
 
 				zbx_snprintf_alloc(&isql, &isql_alloc, &isql_offset,
 						50 + ZBX_TABLENAME_LEN + ZBX_FIELDNAME_LEN + ifld_offset + ival_offset,
-						"insert into %s (%s,%s) values (" ZBX_FS_UI64 ",%s);\n"
-						, table->table, table->recid, ifld, recid, ival);
+						"insert into %s (%s,%s) values (" ZBX_FS_UI64 ",%s);\n",
+						table->table, table->recid, ifld, recid, ival);
 			}
 
 			if (0 != ufld_offset)

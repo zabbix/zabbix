@@ -204,7 +204,7 @@ static void	DMcollect_table_data(int nodeid, int dest_nodetype, const ZBX_TABLE 
 	char	*hex = NULL, *sql = NULL, sync[129], *s,
 		*curr_cksum, *d_curr_cksum, *prev_cksum, *d_prev_cksum;
 	int	sql_offset = 0;
-	int	hex_allocated=1024, sql_allocated=8*1024;
+	int	hex_allocated = 1024, sql_allocated = 8 * 1024;
 	int	f, j, rowlen;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [table:'%s']", __function_name, table->table);
@@ -228,7 +228,7 @@ static void	DMcollect_table_data(int nodeid, int dest_nodetype, const ZBX_TABLE 
 			" union all "
 			/* Find updated records */
 			"select curr.recordid,prev.cksum,curr.cksum,prev.sync"
-			" from node_cksum curr, node_cksum prev"
+			" from node_cksum curr,node_cksum prev"
 			" where curr.nodeid=prev.nodeid"
 				" and curr.tablename=prev.tablename"
 				" and curr.recordid=prev.recordid"
@@ -281,7 +281,8 @@ static void	DMcollect_table_data(int nodeid, int dest_nodetype, const ZBX_TABLE 
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, "select ");
 
-		do {
+		do
+		{
 			while (0 == (table->fields[f].flags & ZBX_SYNC))
 				f++;
 
@@ -325,9 +326,10 @@ static void	DMcollect_table_data(int nodeid, int dest_nodetype, const ZBX_TABLE 
 			}
 			else
 				curr_cksum = NULL;
-		} while (d_prev_cksum != NULL || d_curr_cksum != NULL);
+		}
+		while (d_prev_cksum != NULL || d_curr_cksum != NULL);
 
-		if (sql[sql_offset-1] != ',')
+		if (sql[sql_offset - 1] != ',')
 			continue;
 
 		sql_offset--;
@@ -348,7 +350,8 @@ static void	DMcollect_table_data(int nodeid, int dest_nodetype, const ZBX_TABLE 
 		f = 0;
 		j = 0;
 
-		do {
+		do
+		{
 			while (0 == (table->fields[f].flags & ZBX_SYNC))
 				f++;
 
@@ -411,7 +414,8 @@ static void	DMcollect_table_data(int nodeid, int dest_nodetype, const ZBX_TABLE 
 			}
 			else
 				curr_cksum = NULL;
-		} while (d_prev_cksum != NULL || d_curr_cksum != NULL);
+		}
+		while (d_prev_cksum != NULL || d_curr_cksum != NULL);
 out:
 		DBfree_result(result2);
 	}
