@@ -731,9 +731,9 @@ include_once('include/page_header.php');
 // HOSTS FILTER {{{
 		$filter_table = new CTable('', 'filter_config');
 		$filter_table->addRow(array(
-			array(bold(S_HOST.': '), new CTextBox('filter_host', $_REQUEST['filter_host'], 20)),
-			array(bold(S_DNS.': '), new CTextBox('filter_dns', $_REQUEST['filter_dns'], 20)),
-			array(bold(S_IP.': '), new CTextBox('filter_ip', $_REQUEST['filter_ip'], 20)),
+			array(array(bold(S_HOST), SPACE.S_LIKE_SMALL.': '), new CTextBox('filter_host', $_REQUEST['filter_host'], 20)),
+			array(array(bold(S_DNS), SPACE.S_LIKE_SMALL.': '), new CTextBox('filter_dns', $_REQUEST['filter_dns'], 20)),
+			array(array(bold(S_IP), SPACE.S_LIKE_SMALL.': '), new CTextBox('filter_ip', $_REQUEST['filter_ip'], 20)),
 			array(bold(S_PORT.': '), new CTextBox('filter_port', $_REQUEST['filter_port'], 20))
 		));
 
