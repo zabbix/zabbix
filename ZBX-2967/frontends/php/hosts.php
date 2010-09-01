@@ -786,7 +786,15 @@ include_once('include/page_header.php');
 				'editable' => 1,
 				'sortfield' => $sortfield,
 				'sortorder' => $sortorder,
-				'limit' => ($config['search_limit']+1)
+				'limit' => ($config['search_limit']+1),
+				'search' => array(
+					'host' => (empty($_REQUEST['filter_host']) ? null : $_REQUEST['filter_host']),
+					'ip' => (empty($_REQUEST['filter_ip']) ? null : $_REQUEST['filter_ip']),
+					'dns' => (empty($_REQUEST['filter_dns']) ? null : $_REQUEST['filter_dns']),
+				),
+				'filter' => array(
+					'port' => (empty($_REQUEST['filter_port']) ? null : $_REQUEST['filter_port']),
+				)
 			);
 
 			if($pageFilter->groupid > 0) $options['groupids'] = $pageFilter->groupid;
@@ -808,14 +816,6 @@ include_once('include/page_header.php');
 			'select_graphs' => API_OUTPUT_COUNT,
 			'select_applications' => API_OUTPUT_COUNT,
 			'nopermissions' => 1,
-			'search' => array(
-				'host' => (empty($_REQUEST['filter_host']) ? null : $_REQUEST['filter_host']),
-				'ip' => (empty($_REQUEST['filter_ip']) ? null : $_REQUEST['filter_ip']),
-				'dns' => (empty($_REQUEST['filter_dns']) ? null : $_REQUEST['filter_dns']),
-			),
-			'filter' => array(
-				'port' => (empty($_REQUEST['filter_port']) ? null : $_REQUEST['filter_port']),
-			)
 		);
 		$hosts = CHost::get($options);
 
