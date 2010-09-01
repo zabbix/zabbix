@@ -345,14 +345,11 @@ class zbxXML{
 	}
 
 	public static function import($file){
-		$result = true;
 
 		libxml_use_internal_errors(true);
 
-		self::$xml = new DOMDocument();
-		$result = self::$xml->load($file);
-
-		if(!$result){
+		$xml = new DOMDocument();
+		if(!$xml->load($file)){
 			foreach(libxml_get_errors() as $error){
 				$text = '';
 
@@ -377,24 +374,58 @@ class zbxXML{
 			return false;
 		}
 
+		if($xml->childNodes->item(0)->nodeName != 'zabbix_export'){
+			$xml2 = self::createDOMDocument();
+			$xml2->appendChild($xml2->ownerDocument->importNode($xml->childNodes->item(0), true));
+			self::$xml = $xml2->ownerDocument;
+		}
+		else
+			self::$xml = $xml;
+
 	return true;
 	}
 
+	private static function validate($schema){
+		libxml_use_internal_errors(true);
+
+		$result = self::$xml->relaxNGValidate($schema);
+
+		if(!$result){
+			$errors = libxml_get_errors();
+			libxml_clear_errors();
+			
+			foreach($errors as $error){
+				$text = '';
+
+				switch($error->level){
+					case LIBXML_ERR_WARNING:
+						$text .= S_XML_FILE_CONTAINS_ERRORS.'. Warning '.$error->code.': ';
+					break;
+					case LIBXML_ERR_ERROR:
+						$text .= S_XML_FILE_CONTAINS_ERRORS.'. Error '.$error->code.': ';
+					break;
+					case LIBXML_ERR_FATAL:
+						$text .= S_XML_FILE_CONTAINS_ERRORS.'. Fatal Error '.$error->code.': ';
+					break;
+				}
+
+				$text .= trim($error->message) . ' [ Line: '.$error->line.' | Column: '.$error->column.' ]';
+				throw new Exception($text);
+			}
+		}		
+		return true;
+	}
+	
 	public static function parseScreen($rules){
-		$importScreens = self::XMLtoArray(self::$xml);
-
-		if(!isset($importScreens['zabbix_export'])){
-			$importScreens['zabbix_export'] = $importScreens;
-		}
-		if(!isset($importScreens['zabbix_export']['screens'])){
-			info(S_EXPORT_HAVE_NO_SCREENS);
-			return false;
-		}
-		$importScreens = $importScreens['zabbix_export']['screens'];
-
-		$result = true;
-		$screens = array();
 		try{
+			self::validate(dirname(__FILE__).'/xmlschemas/screens.rng');
+			
+			$importScreens = self::XMLtoArray(self::$xml);
+			$importScreens = $importScreens['zabbix_export']['screens'];
+
+			$result = true;
+			$screens = array();
+		
 			foreach($importScreens as $mnum => &$screen){
 				unset($screen['screenid']);
 				$exists = CScreen::exists(array('name' => $screen['name']));
