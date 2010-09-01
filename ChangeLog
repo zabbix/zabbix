@@ -9,6 +9,7 @@ Changes for 1.9
 
 Changes for 1.8.4rc1
 
+ - [ZBX-2969] improved SQL statement for synchronizing of nodes; thanks to Łukasz Reszka (Sasha)
  - [ZBX-2962] fixed template macro update (Vedmak)
  - [ZBX-2572] added configuration define for zapcat compatibility mode (Vedmak)
  - [ZBX-2690] added validation for screens xml (Vedmak)
