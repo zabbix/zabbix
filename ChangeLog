@@ -9,6 +9,7 @@ Changes for 1.9
 
 Changes for 1.8.4rc1
 
+ - [ZBX-2572] added configuration define for zapcat compatibility mode (Vedmak)
  - [ZBX-2690] added validation for screens xml (Vedmak)
  - [ZBX-2942] increased minimum interval for ICMP pings to 20 ms; thanks to nelsonab (asaveljevs)
  - [ZBX-2945] email sender now knows how to handle multiline responses from SMTP servers (asaveljevs)
