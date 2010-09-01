@@ -1505,7 +1505,7 @@
 
 	'S_NEW_LOCALE_STEP_1' => 'Download newly created locale file by pressing "Download".',
 	'S_NEW_LOCALE_STEP_2' => 'Place it to "/PATH_TO_ZABBIX_FRONTEND/include/locales".',
-	'S_NEW_LOCALE_STEP_3_1' => 'The locale file name must be made of a prefix: "ISO 639-1 language code"-"ISO 3166-1 alpha-2 country code". Like "en_gb"',
+	'S_NEW_LOCALE_STEP_3_1' => 'The locale file name must be made of a prefix: "ISO 639-1 language code"_"ISO 3166-1 alpha-2 country code". Like "en_gb"',
 	'S_NEW_LOCALE_STEP_3_2' => 'and a postfix ".inc.php". Like "en_gb.inc.php".',
 	'S_NEW_LOCALE_STEP_4_1' => 'To make new locale visible by Zabbix frontend - extend the php script "/PATH_TO_ZABBIX_FRONTEND/include/locales.inc.php".',
 	'S_NEW_LOCALE_STEP_4_2' => 'There You will find an array containing "keys" => "values".',
