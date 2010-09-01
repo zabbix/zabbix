@@ -48,7 +48,7 @@ int			discoverer_num;
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void proxy_update_service(DB_DRULE *drule, DB_DCHECK *dcheck, char *ip, int port, int status, const char *value, int now)
+static void	proxy_update_service(DB_DRULE *drule, DB_DCHECK *dcheck, char *ip, int port, int status, const char *value, int now)
 {
 	char	*ip_esc, *key_esc, *value_esc;
 
@@ -88,7 +88,7 @@ static void proxy_update_service(DB_DRULE *drule, DB_DCHECK *dcheck, char *ip, i
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void proxy_update_host(DB_DRULE *drule, char *ip, int status, int now)
+static void	proxy_update_host(DB_DRULE *drule, char *ip, int status, int now)
 {
 	char	*ip_esc;
 
@@ -119,7 +119,7 @@ static void proxy_update_host(DB_DRULE *drule, char *ip, int status, int now)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
+static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 {
 	const char	*__function_name = "discover_service";
 	int		ret = SUCCEED;
@@ -286,7 +286,7 @@ static int discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void process_check(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost, int *host_status, char *ip)
+static void	process_check(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost, int *host_status, char *ip)
 {
 	const char	*__function_name = "process_check";
 	int		port, first, last, now;
@@ -423,7 +423,7 @@ static void	process_checks(DB_DRULE *drule, DB_DHOST *dhost, int *host_status, c
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void process_rule(DB_DRULE *drule)
+static void	process_rule(DB_DRULE *drule)
 {
 	const char	*__function_name = "process_rule";
 	DB_DHOST	dhost;
@@ -639,21 +639,29 @@ static void process_rule(DB_DRULE *drule)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void process_discovery(int now)
+static void	process_discovery(int now)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_DRULE	drule;
 
-	result = DBselect("select druleid,iprange,name,unique_dcheckid from drules"
-			" where proxy_hostid=0 and status=%d and (nextcheck<=%d or nextcheck>%d+delay)"
-			" and " ZBX_SQL_MOD(druleid,%d) "=%d" DB_NODE,
+	result = DBselect(
+			"select distinct r.druleid,r.iprange,r.name,c.dcheckid"
+			" from drules r"
+				" left join dchecks c"
+					" on c.druleid=r.druleid"
+						" and uniq=1"
+			" where r.proxy_hostid is null"
+				" and r.status=%d"
+				" and (r.nextcheck<=%d or r.nextcheck>%d+r.delay)"
+				" and " ZBX_SQL_MOD(r.druleid,%d) "=%d"
+				DB_NODE,
 			DRULE_STATUS_MONITORED,
 			now,
 			now,
 			CONFIG_DISCOVERER_FORKS,
 			discoverer_num - 1,
-			DBnode_local("druleid"));
+			DBnode_local("r.druleid"));
 
 	while (NULL != (row = DBfetch(result))) {
 		memset(&drule, 0, sizeof(drule));
@@ -661,7 +669,7 @@ static void process_discovery(int now)
 		ZBX_STR2UINT64(drule.druleid, row[0]);
 		drule.iprange 	= row[1];
 		drule.name	= row[2];
-		ZBX_STR2UINT64(drule.unique_dcheckid, row[3]);
+		ZBX_DBROW2UINT64(drule.unique_dcheckid, row[3]);
 
 		process_rule(&drule);
 
@@ -672,14 +680,19 @@ static void process_discovery(int now)
 	DBfree_result(result);
 }
 
-static int get_minnextcheck(int now)
+static int	get_minnextcheck(int now)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		res = FAIL;
 
-	result = DBselect("select count(*),min(nextcheck) from drules where proxy_hostid=0 and status=%d"
-			" and " ZBX_SQL_MOD(druleid,%d) "=%d" DB_NODE,
+	result = DBselect(
+			"select count(*),min(nextcheck)"
+			" from drules"
+			" where proxy_hostid is null"
+				" and status=%d"
+				" and " ZBX_SQL_MOD(druleid,%d) "=%d"
+				DB_NODE,
 			DRULE_STATUS_MONITORED,
 			CONFIG_DISCOVERER_FORKS,
 			discoverer_num - 1,
@@ -712,7 +725,7 @@ static int get_minnextcheck(int now)
  * Comments: executes once per 30 seconds (hardcoded)                         *
  *                                                                            *
  ******************************************************************************/
-void main_discoverer_loop(unsigned char p, int num)
+void	main_discoverer_loop(unsigned char p, int num)
 {
 	struct		sigaction phan;
 	int		now, nextcheck, sleeptime;

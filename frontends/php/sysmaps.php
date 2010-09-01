@@ -144,49 +144,33 @@ include_once('include/page_header.php');
 	$_REQUEST['go'] = get_request('go', 'none');
 
 	if(isset($_REQUEST['save'])){
+
+		$map = array(
+			'name' => $_REQUEST['name'],
+			'width' => $_REQUEST['width'],
+			'height' => $_REQUEST['height'],
+			'backgroundid' => $_REQUEST['backgroundid'],
+			'highlight' => get_request('highlight', 0),
+			'markelements' => get_request('markelements', 0),
+			'expandproblem' => get_request('expandproblem', 0),
+			'label_type' => $_REQUEST['label_type'],
+			'label_location' => $_REQUEST['label_location'],
+			'show_unack' => get_request('show_unack', 0),
+		);
+
 		if(isset($_REQUEST['sysmapid'])){
 // TODO check permission by new value.
-			$map = array(
-				'sysmapid' => $_REQUEST['sysmapid'],
-				'name' => $_REQUEST['name'],
-				'width' => $_REQUEST['width'],
-				'height' => $_REQUEST['height'],
-				'backgroundid' => $_REQUEST['backgroundid'],
-				'highlight' => get_request('highlight', 0),
-				'markelements' => get_request('markelements', 0),
-				'expandproblem' => get_request('expandproblem', 0),
-				'label_type' => $_REQUEST['label_type'],
-				'label_location' => $_REQUEST['label_location'],
-				'show_unack' => get_request('show_unack', 0),
-			);
-
-			DBstart();
+			$map['sysmapid'] = $_REQUEST['sysmapid'];
 			$result = CMap::update($map);
-			$result = DBend($result);
 
 			add_audit_if($result,AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MAP,'Name ['.$_REQUEST['name'].']');
 			show_messages($result,S_MAP_UPDATED,S_CANNOT_UPDATE_MAP);
 		}
-		else {
+		else{
 			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 				access_deny();
-
-			$map = array(
-				'name' => $_REQUEST['name'],
-				'width' => $_REQUEST['width'],
-				'height' => $_REQUEST['height'],
-				'backgroundid' => $_REQUEST['backgroundid'],
-				'highlight' => get_request('highlight', 0),
-				'markelements' => get_request('markelements', 0),
-				'expandproblem' => get_request('expandproblem', 0),
-				'label_type' => $_REQUEST['label_type'],
-				'label_location' => $_REQUEST['label_location'],
-				'show_unack' => get_request('show_unack', 0),
-			);
-
-			DBstart();
+			
 			$result = CMap::create($map);
-			$result = DBend($result);
 
 			add_audit_if($result,AUDIT_ACTION_ADD,AUDIT_RESOURCE_MAP,'Name ['.$_REQUEST['name'].']');
 			show_messages($result,S_MAP_ADDED,S_CANNOT_ADD_MAP);

@@ -17,17 +17,38 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
+#ifndef ZABBIX_DBSCHEMA_H
+#define ZABBIX_DBSCHEMA_H
 
-#ifndef ZABBIX_DBSYNC_H
-#define ZABBIX_DBSYNC_H
+/* Flags */
+#define	ZBX_SYNC		0x01
+#define ZBX_NOTNULL		0x02
+#define ZBX_HISTORY		0x04
+#define ZBX_HISTORY_SYNC	0x08
+#define ZBX_HISTORY_TRENDS	0x10
+#define ZBX_PROXY		0x20
+
+/* FK Flags */
+#define ZBX_FK_CASCADE_DELETE	0x01
+
+/* Field types */
+#define	ZBX_TYPE_INT		0
+#define	ZBX_TYPE_CHAR		1
+#define	ZBX_TYPE_FLOAT		2
+#define	ZBX_TYPE_BLOB		3
+#define	ZBX_TYPE_TEXT		4
+#define	ZBX_TYPE_UINT		5
+#define	ZBX_TYPE_ID		6
 
 #define ZBX_FIELD struct zbx_field_type
 ZBX_FIELD
 {
-	char    *name;
-	int	type;
-	int	flags;
-	char	*rel;
+	const char    	*name;
+	unsigned char	type;
+	unsigned char	flags;
+	const char	*fk_table;
+	const char	*fk_field;
+	unsigned char	fk_flags;
 };
 
 #define ZBX_MAX_FIELDS		64
@@ -39,23 +60,16 @@ ZBX_FIELD
 #define ZBX_TABLE struct zbx_table_type
 ZBX_TABLE
 {
-	char    	*table;
-	char		*recid;
-	int		flags;
+	const char    	*table;
+	const char	*recid;
+	unsigned char	flags;
 	ZBX_FIELD	fields[ZBX_MAX_FIELDS];
+	const char	*uniq;
 };
 
-#ifdef HAVE_ORACLE
-#	define ZBX_DBTYPE_INT64 "number(20)"
-#elif HAVE_POSTGRESQL
-#	define ZBX_DBTYPE_INT64 "bigint"
-#elif HAVE_MYSQL
-#	define ZBX_DBTYPE_INT64 "bigint unsigned"
-#elif HAVE_SQLITE3
-#	define ZBX_DBTYPE_INT64 "bigint"
-#endif
-
-extern ZBX_TABLE	tables[];
-extern const char	*db_schema;
+extern const ZBX_TABLE	tables[];
+extern const char	*const db_schema;
+extern const char	*const db_schema_fkeys[];
+extern const char	*const db_schema_fkeys_drop[];
 
 #endif

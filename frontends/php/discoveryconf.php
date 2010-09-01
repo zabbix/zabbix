@@ -152,11 +152,11 @@ include_once('include/page_header.php');
 		}
 	}
 	else if(inarr_isset(array('clone','druleid'))){
-		unset($_REQUEST["druleid"]);
+		unset($_REQUEST['druleid']);
 		$dchecks = $_REQUEST['dchecks'];
 		foreach($dchecks as $id => $data)
 			unset($dchecks[$id]['dcheckid']);
-		$_REQUEST["form"] = "clone";
+		$_REQUEST['form'] = 'clone';
 	}
 	else if(inarr_isset(array('delete', 'druleid'))){
 		$result = delete_discovery_rule($_REQUEST['druleid']);

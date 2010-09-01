@@ -1399,7 +1399,7 @@ static int	DBget_item_lastvalue_by_triggerid(zbx_uint64_t triggerid, char **last
 	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[4])/*i.lastvalue may be NULL*/)
 	{
 		value_type = atoi(row[1]);
-		ZBX_STR2UINT64(valuemapid, row[2]);
+		ZBX_DBROW2UINT64(valuemapid, row[2])
 
 		switch (value_type) {
 			case ITEM_VALUE_TYPE_LOG:
@@ -1561,7 +1561,7 @@ static int	get_escalation_history(DB_EVENT *event, DB_ESCALATION *escalation, ch
 
 	result = DBselect("select a.clock,a.status,m.description,a.sendto,a.error,a.esc_step,a.userid"
 			" from alerts a"
-			" left join media_type m on m.mediatypeid = a.mediatypeid"
+			" left join media_type m on m.mediatypeid=a.mediatypeid"
 			" where a.eventid=" ZBX_FS_UI64 " and a.alerttype=%d order by a.clock",
 			escalation != NULL ? escalation->eventid : event->eventid,
 			ALERT_TYPE_MESSAGE);
@@ -1570,7 +1570,7 @@ static int	get_escalation_history(DB_EVENT *event, DB_ESCALATION *escalation, ch
 		now		= atoi(row[0]);
 		status		= atoi(row[1]);
 		esc_step	= atoi(row[5]);
-		ZBX_STR2UINT64(userid, row[6]);
+		ZBX_DBROW2UINT64(userid, row[6])
 
 		if (esc_step != 0)
 			zbx_snprintf_alloc(&buf, &buf_allocated, &buf_offset, 16, "%d. ", esc_step);

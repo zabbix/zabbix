@@ -252,6 +252,62 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+void	get_proxy_monitored_hostids(zbx_uint64_t proxy_hostid, zbx_uint64_t **hostids, int *hostids_alloc, int *hostids_num)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	hostid, *ids = NULL;
+	int		ids_alloc = 0, ids_num = 0;
+	char		*sql = NULL;
+	int		sql_alloc = 612, sql_offset;
+
+	sql = zbx_malloc(sql, sql_alloc * sizeof(char));
+
+	result = DBselect(
+			"select hostid"
+			" from hosts"
+			" where proxy_hostid=" ZBX_FS_UI64
+				" and status=%d",
+			proxy_hostid,
+			HOST_STATUS_MONITORED);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(hostid, row[0])
+
+		uint64_array_add(hostids, hostids_alloc, hostids_num, hostid, 64);
+		uint64_array_add(&ids, &ids_alloc, &ids_num, hostid, 64);
+	}
+	DBfree_result(result);
+
+	while (0 != ids_num)
+	{
+		sql_offset = 0;
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 45,
+				"select templateid"
+				" from hosts_templates"
+				" where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
+				"hostid", ids, ids_num);
+
+		ids_num = 0;
+
+		result = DBselect("%s", sql);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			ZBX_STR2UINT64(hostid, row[0])
+
+			uint64_array_add(hostids, hostids_alloc, hostids_num, hostid, 64);
+			uint64_array_add(&ids, &ids_alloc, &ids_num, hostid, 64);
+		}
+		DBfree_result(result);
+	}
+
+	zbx_free(ids);	
+	zbx_free(sql);	
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: get_proxyconfig_data                                             *
@@ -275,11 +331,11 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 	};
 
 	static const struct proxytable_t pt[]={
-		{"hosts"},
-		{"items"},
-		{"hosts_templates"},
 		{"globalmacro"},
+		{"hosts"},
+		{"hosts_templates"},
 		{"hostmacro"},
+		{"items"},
 		{"drules"},
 		{"dchecks"},
 		{NULL}
@@ -288,27 +344,37 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 	const char	*__function_name = "get_proxyconfig_data";
 	int		i;
 	const ZBX_TABLE	*table;
-	char		condition[512];
+	char		*condition = NULL;
+	int		condition_alloc = 512, condition_offset;
+	zbx_uint64_t	*hostids = NULL;
+	int		hostids_alloc = 0, hostids_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() proxy_hostid:" ZBX_FS_UI64,
 			__function_name, proxy_hostid);
+
+	assert(proxy_hostid);
+
+	condition = zbx_malloc(condition, condition_alloc * sizeof(char));
+
+	get_proxy_monitored_hostids(proxy_hostid, &hostids, &hostids_alloc, &hostids_num);
 
 	for (i = 0; pt[i].table != NULL; i++)
 	{
 		if (NULL == (table = DBget_table(pt[i].table)))
 			continue;
 
+		condition_offset = 0;
+
 		if (0 == strcmp(pt[i].table, "hosts"))
 		{
-			zbx_snprintf(condition, sizeof(condition),
-					" where t.proxy_hostid=" ZBX_FS_UI64
-						" and t.status=%d",
-					proxy_hostid,
-					HOST_STATUS_MONITORED);
+			zbx_snprintf_alloc(&condition, &condition_alloc, &condition_offset, 256,
+					" where");
+			DBadd_condition_alloc(&condition, &condition_alloc, &condition_offset,
+					"t.hostid", hostids, hostids_num);
 		}
 		else if (0 == strcmp(pt[i].table, "items"))
 		{
-			zbx_snprintf(condition, sizeof(condition),
+			zbx_snprintf_alloc(&condition, &condition_alloc, &condition_offset, 256,
 					", hosts r where t.hostid=r.hostid"
 						" and r.proxy_hostid=" ZBX_FS_UI64
 						" and r.status=%d"
@@ -325,7 +391,7 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 		}
 		else if (0 == strcmp(pt[i].table, "hosts_templates"))
 		{
-			zbx_snprintf(condition, sizeof(condition),
+			zbx_snprintf_alloc(&condition, &condition_alloc, &condition_offset, 256,
 					", hosts r where t.hostid=r.hostid"
 						" and r.proxy_hostid=" ZBX_FS_UI64
 						" and r.status=%d",
@@ -334,7 +400,7 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 		}
 		else if (0 == strcmp(pt[i].table, "drules"))
 		{
-			zbx_snprintf(condition, sizeof(condition),
+			zbx_snprintf_alloc(&condition, &condition_alloc, &condition_offset, 256,
 					" where t.proxy_hostid=" ZBX_FS_UI64
 						" and t.status=%d",
 					proxy_hostid,
@@ -342,7 +408,7 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 		}
 		else if (0 == strcmp(pt[i].table, "dchecks"))
 		{
-			zbx_snprintf(condition, sizeof(condition),
+			zbx_snprintf_alloc(&condition, &condition_alloc, &condition_offset, 256,
 					", drules r where t.druleid=r.druleid"
 						" and r.proxy_hostid=" ZBX_FS_UI64
 						" and r.status=%d",
@@ -351,30 +417,20 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 		}
 		else if (0 == strcmp(pt[i].table, "hostmacro"))
 		{
-			zbx_snprintf(condition, sizeof(condition),
-					" where t.hostid in ("
-							"select hostid"
-							" from hosts"
-							" where proxy_hostid=" ZBX_FS_UI64
-								" and status=%d"
-							")"
-						" or t.hostid in ("
-							"select t.templateid"
-							" from hosts_templates t,hosts h"
-							" where h.hostid=t.hostid"
-								" and h.proxy_hostid=" ZBX_FS_UI64
-								" and h.status=%d"
-							")",
-					proxy_hostid,
-					HOST_STATUS_MONITORED,
-					proxy_hostid,
-					HOST_STATUS_MONITORED);
+			zbx_snprintf_alloc(&condition, &condition_alloc, &condition_offset, 256,
+					" where");
+			DBadd_condition_alloc(&condition, &condition_alloc, &condition_offset,
+					"t.hostid", hostids, hostids_num);
 		}
 		else
 			*condition = '\0';
 
 		get_proxyconfig_table(proxy_hostid, j, table, condition);
 	}
+
+	zbx_free(condition);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s", j->buffer);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -1604,13 +1660,16 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 		if (0 == last_druleid || drule.druleid != last_druleid)
 		{
 			result = DBselect(
-					"select unique_dcheckid"
-					" from drules"
-					" where druleid=" ZBX_FS_UI64,
+					"select dcheckid"
+					" from dchecks"
+					" where druleid=" ZBX_FS_UI64
+						" and uniq=1",
 					drule.druleid);
 
 			if (NULL != (row = DBfetch(result)))
-				ZBX_STR2UINT64(drule.unique_dcheckid, row[0]);
+			{
+				ZBX_STR2UINT64(drule.unique_dcheckid, row[0])
+			}
 			DBfree_result(result);
 
 			last_druleid = drule.druleid;

@@ -352,7 +352,6 @@ class CScript extends CZBXAPI{
  */
 	public static function create($scripts){
 		$scripts = zbx_toArray($scripts);
-		$scriptids = array();
 
 		try{
 			self::BeginTransaction(__METHOD__);
@@ -361,22 +360,15 @@ class CScript extends CZBXAPI{
 				$script_db_fields = array(
 					'name' => null,
 					'command' => null,
-					'usrgrpid' => 0,
-					'groupid' => 0,
-					'host_access' => 2,
 				);
 				if(!check_db_fields($script_db_fields, $script)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for script');
 				}
-
-				$result = add_script($script['name'], $script['command'], $script['usrgrpid'], $script['groupid'], $script['host_access']);
-				if(!$result)
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot add script');
-
-				$scriptids[] = $result;
 			}
 
-			self::EndTransaction(treu, __METHOD__);
+			$scriptids = DB::insert('scripts', $scripts);
+
+			self::EndTransaction(true, __METHOD__);
 			return array('scriptids' => $scriptids);
 		}
 		catch(APIException $e){
@@ -406,7 +398,7 @@ class CScript extends CZBXAPI{
 			$options = array(
 				'scriptids' => $scriptids,
 				'editable' => 1,
-				'extendoutput' => 1,
+				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => 1
 			);
 			$upd_scripts = self::get($options);
@@ -416,16 +408,14 @@ class CScript extends CZBXAPI{
 				}
 			}
 
+			$update = array();
 			foreach($scripts as $num => $script){
-				$script_db_fields = $upd_scripts[$script['scriptid']];
-				if(!check_db_fields($script_db_fields, $script)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for script');
-				}
-
-				$result = update_script($script['scriptid'], $script['name'], $script['command'], $script['usrgrpid'], $script['groupid'], $script['host_access']);
-				if(!$result)
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'cannot update script');
+				$update[] = array(
+					'values' => $script,
+					'where' => array('scriptid='.$script['scriptid']),
+				);
 			}
+			DB::update('scripts', $update);
 
 			self::EndTransaction(true, __METHOD__);
 			return array('scriptids' => $scriptids);
