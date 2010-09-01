@@ -248,21 +248,20 @@
 		DBexecute('DELETE FROM applications WHERE '.DBcondition('hostid',$hostids));
 
 // delete host
-		foreach ($hostids as $id) {	/* The section should be improved */
+		foreach($hostids as $id) {	/* The section should be improved */
 			$host_old = get_host_by_hostid($id);
 			$result = DBexecute('DELETE FROM hosts WHERE hostid='.$id);
 			if ($result) {
-				info(S_HOST_HAS_BEEN_DELETED_MSG_PART1.SPACE.$host_old['host'].SPACE.S_HOST_HAS_BEEN_DELETED_MSG_PART2);
-				/*SDI(
-					'AUDIT_ACTION_DELETE '.AUDIT_ACTION_DELETE.' / '.
-					'AUDIT_RESOURCE_HOST '.AUDIT_RESOURCE_HOST.' / '.
-					'$id '.$id.' / '.
-					'$host_old[\'host\'] '.$host_old['host'].' / '.
-					'hosts / '.
-					'NULL / NULL'
-					);*/
-				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $id, $host_old['host'], 'hosts', NULL, NULL);
-			}else
+				if($host_old['status'] == HOST_STATUS_TEMPLATE){
+					info(S_TEMPLATE.SPACE.$host_old['host'].SPACE.S_HOST_HAS_BEEN_DELETED_MSG_PART2);
+					add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TEMPLATE, $id, $host_old['host'], 'hosts', NULL, NULL);
+				}
+				else{
+					info(S_HOST_HAS_BEEN_DELETED_MSG_PART1.SPACE.$host_old['host'].SPACE.S_HOST_HAS_BEEN_DELETED_MSG_PART2);
+					add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $id, $host_old['host'], 'hosts', NULL, NULL);
+				}
+			}
+			else
 				break;
 		}
 

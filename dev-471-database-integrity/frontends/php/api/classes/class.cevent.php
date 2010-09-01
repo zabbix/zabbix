@@ -674,7 +674,7 @@ Copt::memoryPick();
 			$allowed_events = self::get($options);
 			foreach($events as $num => $event){
 				if(!isset($allowed_events[$event['eventid']])){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, 'You do not have enough rights for operation');
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
 				}
 			}
 // }}} PERMISSIONS

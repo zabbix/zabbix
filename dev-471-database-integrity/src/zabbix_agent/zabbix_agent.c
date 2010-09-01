@@ -186,7 +186,7 @@ int	main(int argc, char **argv)
 	{
 		if( SUCCEED == (ret = zbx_tcp_recv(&s_in, &command)) )
 		{
-			zbx_rtrim(command, "\r\n\0");
+			zbx_rtrim(command, "\r\n");
 
 			zabbix_log(LOG_LEVEL_DEBUG, "Requested [%s]", command);
 
