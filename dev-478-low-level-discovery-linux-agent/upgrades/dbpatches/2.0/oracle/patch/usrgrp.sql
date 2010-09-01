@@ -1,0 +1,1 @@
+ALTER TABLE usrgrp MODIFY usrgrpid DEFAULT NULL;
