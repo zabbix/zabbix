@@ -66,7 +66,6 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 	if(isset($_REQUEST['action'])){
 
 		if(isset($_REQUEST['save'])){
-
 			$cond = (isset($_REQUEST['scriptid']))?(' AND scriptid<>'.$_REQUEST['scriptid']):('');
 			$scripts = DBfetch(DBselect('SELECT count(scriptid) as cnt FROM scripts WHERE name='.zbx_dbstr($_REQUEST['name']).$cond.' and '.DBin_node('scriptid', get_current_nodeid(false)),1));
 
@@ -75,19 +74,27 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 				show_messages(null,S_ERROR,S_CANNOT_ADD_SCRIPT);
 			}
 			else{
+				$script = array(
+					'name' => $_REQUEST['name'],
+					'command' => $_REQUEST['command'],
+					'usrgrpid' => $_REQUEST['usrgrpid'],
+					'groupid' => $_REQUEST['groupid'],
+					'host_access' => $_REQUEST['access'],
+				);
 
 				if(isset($_REQUEST['scriptid'])){
-					$result = update_script($_REQUEST['scriptid'],$_REQUEST['name'],$_REQUEST['command'],$_REQUEST['usrgrpid'],$_REQUEST['groupid'],$_REQUEST['access']);
+					$script['scriptid'] = $_REQUEST['scriptid'];
 
+					$result = CScript::update($script);
 					show_messages($result, S_SCRIPT_UPDATED, S_CANNOT_UPDATE_SCRIPT);
 					$scriptid = $_REQUEST['scriptid'];
 					$audit_acrion = AUDIT_ACTION_UPDATE;
 				}
-				else {
-					$result = add_script($_REQUEST['name'],$_REQUEST['command'],$_REQUEST['usrgrpid'],$_REQUEST['groupid'],$_REQUEST['access']);
+				else{
+					$result = CScript::create($script);
 
 					show_messages($result, S_SCRIPT_ADDED, S_CANNOT_ADD_SCRIPT);
-					$scriptid = $result;
+					$scriptid = reset($result['scriptids']);
 					$audit_acrion = AUDIT_ACTION_ADD;
 				}
 

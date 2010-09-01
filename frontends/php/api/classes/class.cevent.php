@@ -532,76 +532,75 @@ Copt::memoryPick();
  */
 	public static function create($events){
 		$events = zbx_toArray($events);
-
 		$eventids = array();
-		$result = true;
 
-		$options = array(
-			'triggerids' => zbx_objectValues($events, 'objectid'),
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => 1
-		);
-		$triggers = CTrigger::get($options);
+		try{
+			self::BeginTransaction(__METHOD__);
 
-		foreach($events as $num => $event){
-			if($event['object'] != EVENT_OBJECT_TRIGGER) continue;
-
-			if(isset($triggers[$event['objectid']])){
-				$trigger = $triggers[$event['objectid']];
-
-				if(($event['value'] != $trigger['value']) || (($event['value'] == TRIGGER_VALUE_TRUE) && ($trigger['type'] == TRIGGER_MULT_EVENT_ENABLED))){
-					continue;
-				}
-			}
-
-			unset($events[$num]);
-		}
-
-		self::BeginTransaction(__METHOD__);
-		foreach($events as $num => $event){
-			$event_db_fields = array(
-				'source'		=> null,
-				'object'		=> null,
-				'objectid'		=> null,
-				'clock'			=> time(),
-				'value'			=> 0,
-				'acknowledged'	=> 0
+			$options = array(
+				'triggerids' => zbx_objectValues($events, 'objectid'),
+				'output' => API_OUTPUT_EXTEND,
+				'preservekeys' => 1
 			);
+			$triggers = CTrigger::get($options);
 
-			if(!check_db_fields($event_db_fields, $event)){
-				$result = false;
-				break;
+			foreach($events as $num => $event){
+				if($event['object'] != EVENT_OBJECT_TRIGGER) continue;
+
+				if(isset($triggers[$event['objectid']])){
+					$trigger = $triggers[$event['objectid']];
+
+					if(($event['value'] != $trigger['value']) || (($event['value'] == TRIGGER_VALUE_TRUE) && ($trigger['type'] == TRIGGER_MULT_EVENT_ENABLED))){
+						continue;
+					}
+				}
+
+				unset($events[$num]);
 			}
 
-			$eventid = get_dbid('events','eventid');
-			$sql = 'INSERT INTO events (eventid, source, object, objectid, clock, value, acknowledged) '.
-					' VALUES ('.$eventid.','.
-								$event['source'].','.
-								$event['object'].','.
-								$event['objectid'].','.
-								$event['clock'].','.
-								$event['value'].','.
-								$event['acknowledged'].
-							')';
-			$result = DBexecute($sql);
-			if(!$result) break;
+			foreach($events as $num => $event){
+				$event_db_fields = array(
+					'source'		=> null,
+					'object'		=> null,
+					'objectid'		=> null,
+					'clock'			=> time(),
+					'value'			=> 0,
+					'acknowledged'	=> 0
+				);
+
+				if(!check_db_fields($event_db_fields, $event)){
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for Event');
+				}
+
+				$eventid = get_dbid('events','eventid');
+				$sql = 'INSERT INTO events (eventid, source, object, objectid, clock, value, acknowledged) '.
+						' VALUES ('.$eventid.','.
+									$event['source'].','.
+									$event['object'].','.
+									$event['objectid'].','.
+									$event['clock'].','.
+									$event['value'].','.
+									$event['acknowledged'].
+								')';
+				if(!DBexecute($sql))
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 
 //			$triggers[] = array('triggerid' => $event['objectid'], 'value'=> $event['value'], 'lastchange'=> $event['clock']);
 
-			$eventids[$eventid] = $eventid;
-		}
+				$eventids[$eventid] = $eventid;
+			}
 
-		if($result){
 // This will create looping (Trigger->Event->Trigger->Event)
 //			$result = CTrigger::update($triggers);
-		}
 
-		$result = self::EndTransaction($result, __METHOD__);
-		if($result){
+			self::EndTransaction(true, __METHOD__);
 			return $eventids;
 		}
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal Zabbix error');
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
 		}
 	}
@@ -609,33 +608,23 @@ Copt::memoryPick();
 /**
  * Delete events by eventids
  *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $eventids
+ * @param array $eventids
  * @param array $eventids['eventids']
  * @return boolean
  */
-	public static function delete($events){
-		$events = zbx_toArray($events);
-		$eventids = zbx_objectValues($events, 'eventid');
-
-		if(!empty($eventids)){
+	public static function delete($eventids){
+		try{
 			$sql = 'DELETE FROM events WHERE '.DBcondition('eventid', $eventids);
-			$result = DBexecute($sql);
-		}
-		else{
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, S_EMPTY_INPUT_PARAMETER.' [ eventids ]');
-			$result = false;
-		}
+			if(!DBexecute($sql))
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 
-		if($result)
 			return true;
-		else{
-			self::setError(__METHOD__);
+		}
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
 		}
 	}
@@ -643,24 +632,22 @@ Copt::memoryPick();
 	/**
 	 * Delete events by triggerids
 	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param _array $triggerids
+	 * @param array $triggerids
 	 * @return boolean
 	 */
 	public static function deleteByTriggerIDs($triggerids){
 		zbx_value2array($triggerids);
-		$sql = 'DELETE FROM events e WHERE e.object='.EVENT_OBJECT_TRIGGER.' AND '.DBcondition('e.objectid', $triggerids);
-		$result = DBexecute($sql);
 
-		if($result)
-			return true;
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal Zabbix error');
+		try{
+			$sql = 'DELETE FROM events e WHERE e.object='.EVENT_OBJECT_TRIGGER.' AND '.DBcondition('e.objectid', $triggerids);
+			if(!DBexecute($sql))
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+		}
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
 		}
 	}

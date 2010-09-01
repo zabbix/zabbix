@@ -2007,25 +2007,30 @@ int	zbx_get_next_field(const char **line, char **output, int *olen, char separat
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	str_in_list(char *list, const char *value, const char delimiter)
+int	str_in_list(const char *list, const char *value, const char delimiter)
 {
-	char	*start, *end;
-	int	ret = FAIL;
+	const char	*start, *end;
+	size_t		sz, vsz;
 
-	for (start = list; *start != '\0' && ret == FAIL;) {
+	vsz = strlen(value);
+
+	for (start = list; *start != '\0'; )
+	{
 		if (NULL != (end = strchr(start, delimiter)))
-			*end = '\0';
+			sz = end - start;
+		else
+			sz = strlen(start);
 
-		if (0 == strcmp(start, value))
-			ret = SUCCEED;
+		if (vsz == sz && 0 == strncmp(start, value, sz))
+			return SUCCEED;
 
-		if (end != NULL) {
-			*end = delimiter;
+		if (end != NULL)
 			start = end + 1;
-		} else
+		else
 			break;
 	}
-	return ret;
+
+	return FAIL;
 }
 
 /******************************************************************************
@@ -2370,6 +2375,16 @@ char	*zbx_dservice_type_string(zbx_dservice_type_t service)
 	case SVC_SNMPv3: return "SNMPv3 agent";
 	case SVC_ICMPPING: return "ICMP Ping";
 	default: return "unknown";
+	}
+}
+
+const char	*zbx_nodetype_string(unsigned char nodetype)
+{
+	switch (nodetype)
+	{
+		case ZBX_NODE_MASTER: return "MASTER";
+		case ZBX_NODE_SLAVE: return "SLAVE";
+		default: return "unknown";
 	}
 }
 

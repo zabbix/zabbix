@@ -840,7 +840,7 @@ return $caption;
 		$result=DBexecute('INSERT INTO triggers '.
 			'  (triggerid,description,type,priority,status,comments,url,value,error,templateid) '.
 			" values ($triggerid,".zbx_dbstr($description).",$type,$priority,$status,".zbx_dbstr($comments).','.
-			zbx_dbstr($url).",2,'Trigger just added. No status update so far.',$templateid)");
+			zbx_dbstr($url).",2,'Trigger just added. No status update so far.',".zero2null($templateid).")");
 
 		if(!$result){
 			return	$result;
@@ -946,7 +946,7 @@ return $caption;
 					' (triggerid,description,type,priority,status,comments,url,value,expression,templateid)'.
 					' VALUES ('.$newtriggerid.','.zbx_dbstr($trigger['description']).','.$trigger['type'].','.$trigger['priority'].','.
 					$trigger['status'].','.zbx_dbstr($trigger['comments']).','.
-					zbx_dbstr($trigger['url']).",2,'0',".($copy_mode ? 0 : $triggerid).')');
+					zbx_dbstr($trigger['url']).",2,'0',".($copy_mode ? 'NULL' : $triggerid).')');
 
 		if(!$result)
 			return $result;
@@ -2026,7 +2026,7 @@ return $caption;
 							' WHERE i.hostid='.$hostid.
 								' AND f.itemid=i.itemid '.
 								' AND f.triggerid=t.triggerid '.
-								' AND t.templateid > 0';
+								' AND t.templateid IS NOT NULL';
 		$result = DBselect($sql);
 		while($trigger = DBfetch($result)){
 			if($trigger['templateid'] > 0){
@@ -2350,7 +2350,7 @@ return $caption;
 			}
 
 			if($unlink_mode){
-				if(DBexecute('UPDATE triggers SET templateid=0 WHERE triggerid='.$trigger['triggerid'])){
+				if(DBexecute('UPDATE triggers SET templateid=NULL WHERE triggerid='.$trigger['triggerid'])){
 						info('Trigger "'.$trigger['description'].'" unlinked');
 				}
 			}

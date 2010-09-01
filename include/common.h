@@ -592,14 +592,6 @@ char	*zbx_item_logtype_string(zbx_item_logtype_t logtype);
 #define	NODE_CONFIGLOG_OP_ADD		1
 #define	NODE_CONFIGLOG_OP_DELETE	2
 
-#define	ZBX_TYPE_INT	0
-#define	ZBX_TYPE_CHAR	1
-#define	ZBX_TYPE_FLOAT	2
-#define	ZBX_TYPE_BLOB	3
-#define	ZBX_TYPE_TEXT	4
-#define	ZBX_TYPE_UINT	5
-#define	ZBX_TYPE_ID	6
-
 /* HTTP item types */
 typedef enum
 {
@@ -628,17 +620,13 @@ typedef enum
 
 const char *zbx_permission_string(int perm);
 
-/* Flags */
-#define	ZBX_SYNC		0x01
-#define ZBX_NOTNULL		0x02
-#define ZBX_HISTORY		0x04
-#define ZBX_HISTORY_SYNC	0x08
-#define ZBX_HISTORY_TRENDS	0x10
-#define ZBX_PROXY		0x20
-
 /* Types of nodes */
 #define	ZBX_NODE_TYPE_REMOTE	0
 #define	ZBX_NODE_TYPE_LOCAL	1
+
+#define	ZBX_NODE_MASTER	0
+#define	ZBX_NODE_SLAVE	1
+const char	*zbx_nodetype_string(unsigned char nodetype);
 
 #define	POLLER_DELAY	5
 #define DISCOVERER_DELAY	60
@@ -787,7 +775,7 @@ int	zbx_pg_unescape_bytea(u_char *io);
 #endif
 int	zbx_get_field(const char *line, char *result, int num, char separator);
 int	zbx_get_next_field(const char **line, char **output, int *olen, char separator);
-int	str_in_list(char *list, const char *value, const char delimiter);
+int	str_in_list(const char *list, const char *value, const char delimiter);
 
 #ifdef HAVE___VA_ARGS__
 #	define zbx_setproctitle(fmt, ...) __zbx_zbx_setproctitle(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)

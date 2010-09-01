@@ -22,13 +22,10 @@
 
 #include "mutexs.h"
 
-#define	ZBX_NODE_MASTER	0
-#define	ZBX_NODE_SLAVE	1
-
 extern	ZBX_MUTEX node_sync_access;
 
 int	calculate_checksums(int nodeid, const char *tablename, const zbx_uint64_t id);
-char	*get_config_data(int nodeid, int dest_nodetype);
+char	*DMget_config_data(int nodeid, int dest_nodetype);
 int	update_checksums(int nodeid, int synked_nodetype, int synked, const char *tablename, const zbx_uint64_t id, char *fields);
 void	node_sync_lock(int nodeid);
 void	node_sync_unlock(int nodeid);

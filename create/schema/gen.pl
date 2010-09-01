@@ -22,11 +22,16 @@ use Switch;
 use File::Basename;
 
 $file = dirname($0)."/schema.sql";	# Name the file
-open(INFO, $file);			# Open the file
-@lines = <INFO>;			# Read it into an array
-close(INFO);				# Close the file
 
+local $state;
 local $output;
+local $eol, $fk_bol, $fk_eol;
+local $ltab, $szcol1, $szcol2, $szcol3, $szcol4;
+local $sequences;
+local $sql_suffix;
+local $fkeys, $fkeys_prefix, $fkeys_suffix;
+local $fkeys_drop;
+local $uniq;
 
 %mysql=(
 	"database"	=>	"mysql",
@@ -34,7 +39,6 @@ local $output;
 	"before"	=>	"",
 	"after"		=>	"",
 	"table_options"	=>	" ENGINE=InnoDB",
-	"exec_cmd"	=>	";\n",
 	"t_bigint"	=>	"bigint unsigned",
 	"t_id"		=>	"bigint unsigned",
 	"t_integer"	=>	"integer",
@@ -57,7 +61,6 @@ local $output;
 %c=(	"type"		=>	"code",
 	"database"	=>	"",
 	"after"		=>	"\t{0}\n};\n",
-	"exec_cmd"	=>	"\n",
 	"t_bigint"	=>	"ZBX_TYPE_UINT",
 	"t_id"		=>	"ZBX_TYPE_ID",
 	"t_integer"	=>	"ZBX_TYPE_INT",
@@ -97,7 +100,7 @@ $c{"before"}="/*
 #include \"common.h\"
 #include \"dbschema.h\"
 
-ZBX_TABLE	tables[]={
+const ZBX_TABLE	tables[]={
 ";
 
 %oracle=("t_bigint"	=>	"number(20)",
@@ -105,7 +108,6 @@ ZBX_TABLE	tables[]={
 	"before"	=>	"",
 	"after"		=>	"",
 	"type"		=>	"sql",
-	"exec_cmd"	=>	"\n/\n\n",
 	"t_id"		=>	"number(20)",
 	"t_integer"	=>	"number(10)",
 	"t_time"	=>	"number(10)",
@@ -128,7 +130,6 @@ ZBX_TABLE	tables[]={
 	"after"		=>	"",
 	"type"		=>	"sql",
 	"table_options"	=>	" with OIDS",
-	"exec_cmd"	=>	";\n",
 	"t_id"		=>	"bigint",
 	"t_integer"	=>	"integer",
 	"t_serial"	=>	"serial",
@@ -147,10 +148,9 @@ ZBX_TABLE	tables[]={
 
 %sqlite=("t_bigint"	=>	"bigint",
 	"database"	=>	"sqlite",
-	"before"	=>	"BEGIN TRANSACTION;\n",
-	"after"		=>	"COMMIT;\n",
+	"before"	=>	"",
+	"after"		=>	"",
 	"type"		=>	"sql",
-	"exec_cmd"	=>	";\n",
 	"t_id"		=>	"bigint",
 	"t_integer"	=>	"integer",
 	"t_time"	=>	"integer",
@@ -169,60 +169,53 @@ ZBX_TABLE	tables[]={
 
 sub newstate
 {
-	local $new=$_[0];
+	local $new = $_[0];
 
-	switch ($state)
+	if ($state eq "field")
 	{
-		case "field"	{
-			if($output{"type"} eq "sql" && $new eq "index") { print "$pkey\n)$output{'table_options'}$output{'exec_cmd'}"; }
-			if($output{"type"} eq "sql" && $new eq "table") { print "$pkey\n)$output{'table_options'}$output{'exec_cmd'}"; }
-			if($output{"type"} eq "code" && $new eq "table") { print ",\n\t\t{0}\n\t\t}\n\t},$output{'exec_cmd'}"; }
-			if($new eq "field") { print ",\n" }
-		}
-		case "index"	{
-			if($output{"type"} eq "sql" && $new eq "table") { print "${statements}"; }
-			if($output{"type"} eq "code" && $new eq "table") { print ",\n\t\t{0}\n\t\t}\n\t},$output{'exec_cmd'}"; }
-		}
-	 	case "table"	{
-			if($output{"type"} eq "sql" && $new eq "table") { print "${statements}"; }
-			print "";
-		}
+		if ($output{"type"} eq "sql" && $new eq "index") { print "${pkey}${eol}\n)$output{'table_options'};${eol}\n"; }
+		if ($output{"type"} eq "sql" && $new eq "table") { print "${pkey}${eol}\n)$output{'table_options'};${eol}\n"; }
+		if ($new eq "field") { print ",${eol}\n" }
 	}
-	$state=$new;
+
+	if ($state ne "bof")
+	{
+		if ($output{"type"} eq "code" && $new eq "table") { print ",\n\t\t{0}\n\t\t}${uniq}\n\t},\n"; $uniq = ""; }
+	}
+
+	$state = $new;
 }
 
 sub process_table
 {
-	local $line=$_[0];
+	local $line = $_[0];
 
 	newstate("table");
-	($table_name,$pkey,$flags)=split(/\|/, $line,4);
-	$statements="";
 
-	if($output{"type"} eq "code")
+	($table_name, $pkey, $flags) = split(/\|/, $line, 3);
+
+	if ($output{"type"} eq "code")
 	{
-#	        {"services",    "serviceid",    ZBX_SYNC,
 		if($flags eq "")
 		{
 			$flags="0";
 		}
-		for ($flags) {
-			s/,/ \| /;
+
+		for ($flags)
+		{
+			s/,/ \| /g;
 		}
+
 		print "\t{\"${table_name}\",\t\"${pkey}\",\t${flags},\n\t\t{\n";
 	}
 	else
 	{
-		if($pkey ne "")
+		if ($pkey ne "")
 		{
-			$pkey=",\n\tPRIMARY KEY ($pkey)";
-		}
-		else
-		{
-			$pkey="";
+			$pkey = ",${eol}\n${ltab}PRIMARY KEY (${pkey})";
 		}
 
-		print "CREATE TABLE $table_name (\n";
+		print "CREATE TABLE ${table_name} (${eol}\n";
 	}
 }
 
@@ -231,160 +224,313 @@ sub process_field
 	local $line=$_[0];
 
 	newstate("field");
-	($name,$type,$default,$null,$flags,$rel)=split(/\|/, $line,6);
-	($type_short)=split(/\(/, $type,2);
-	if($output{"type"} eq "code")
-	{
-		$type=$output{$type_short};
-#{"linkid",      ZBX_TYPE_INT,   ZBX_SYNC},
-		if ($null eq "NOT NULL") {
-			if ($flags ne "0") {
-				$flags="ZBX_NOTNULL | ".$flags;
-			} else {
-				$flags="ZBX_NOTNULL";
-			}
-		}
-		for ($flags) {
-			s/,/ \| /;
-		}
-		if ($rel) {
-			$rel = "\"${rel}\"";
-		} else {
-			$rel = "NULL";
-		}
-		print "\t\t{\"${name}\",\t$type,\t${flags},\t${rel}}";
-	}
-	else
-	{
-		$a=$output{$type_short};
-		$_=$type;
-		s/$type_short/$a/g;
-		$type_2=$_;
 
-		if($default ne ""){
-			$default="DEFAULT $default"; 
-		}
-		
-		if($output{"database"} eq "mysql"){
-			@text_fields = ('blob','longblob','text','longtext');
-			if(grep /$output{$type_short}/, @text_fields){ 
-				$default=""; 
-			}
-		}
+	($name, $type, $default, $null, $flags, $relN, $fk_table, $fk_field, $fk_flags) = split(/\|/, $line, 9);
+	($type_short) = split(/\(/, $type, 2);
 
-		# Special processing for Oracle "default 'ZZZ' not null" -> "default 'ZZZ'. NULL=='' in Oracle!"
-		if(($output{"database"} eq "oracle") && ((0==index($type_2,"nvarchar2")) || (0==index($type_2,"nclob"))))
+	if ($output{"type"} eq "code")
+	{
+		$type = $output{$type_short};
+
+		if ($null eq "NOT NULL")
 		{
-			$null="";
+			if ($flags ne "0")
+			{
+				$flags = "ZBX_NOTNULL | ${flags}";
+			}
+			else
+			{
+				$flags = "ZBX_NOTNULL";
+			}
+		}
+
+		for ($flags)
+		{
+			s/,/ \| /g;
+		}
+
+		if ($fk_table)
+		{
+			if ($fk_field eq "")
+			{
+				$fk_field = "${name}";
+			}
+
+			$fk_table = "\"${fk_table}\"";
+			$fk_field = "\"${fk_field}\"";
+
+			if ($fk_flags eq "")
+			{
+				$fk_flags = "ZBX_FK_CASCADE_DELETE";
+			}
+			elsif ($fk_flags eq "RESTRICT")
+			{
+				$fk_flags = "0";
+			}
 		}
 		else
 		{
-			$null="\t${null}";
+			$fk_table = "NULL";
+			$fk_field = "NULL";
+			$fk_flags = "0";
 		}
 
-		$row="\t$name\t\t$type_2\t\t$default${null}";
+		print "\t\t{\"${name}\",\t$type,\t${flags},\t${fk_table},\t${fk_field},\t${fk_flags}}";
+	}
+	else
+	{
+		$a = $output{$type_short};
+		$_ = $type;
+		s/$type_short/$a/g;
+		$type_2 = $_;
 
-		if($type eq "t_serial")
+		if ($default ne "")
 		{
-			if($output{"database"} eq "sqlite")
+			$default = "DEFAULT $default";
+		}
+		
+		if ($output{"database"} eq "mysql")
+		{
+			@text_fields = ('blob', 'longblob', 'text', 'longtext');
+
+			if (grep /$output{$type_short}/, @text_fields)
 			{
-				$row="$row\tPRIMARY KEY AUTOINCREMENT";
+				$default="";
+			}
+		}
+
+		if (($output{"database"} eq "oracle") && (0 == index($type_2, "nvarchar2") || 0 == index($type_2, "nclob")))
+		{
+			$null = "";
+		}
+		else
+		{
+			$null = "${null}";
+		}
+
+		$row = "${null}";
+
+		if ($type eq "t_serial")
+		{
+			if ($output{"database"} eq "sqlite")
+			{
+				$row = sprintf("%-*s PRIMARY KEY AUTOINCREMENT", $szcol4, $row);
 				$pkey="";
 			}
-			elsif($output{"database"} eq "mysql")
+			elsif ($output{"database"} eq "mysql")
 			{
-				$row="$row\tauto_increment unique";
+				$row = sprintf("%-*s auto_increment unique", $szcol4, $row);
 			}
-			elsif($output{"database"} eq "oracle")
+			elsif ($output{"database"} eq "oracle")
 			{
-				$statements="${statements}CREATE SEQUENCE ${table_name}_seq\n";
-				$statements="${statements}START WITH 1\n";
-				$statements="${statements}INCREMENT BY 1\n";
-				$statements="${statements}NOMAXVALUE$output{'exec_cmd'}";
-				$statements="${statements}CREATE TRIGGER ${table_name}_tr\n";
-				$statements="${statements}BEFORE INSERT ON ${table_name}\n";
-				$statements="${statements}FOR EACH ROW\n";
-				$statements="${statements}BEGIN\n";
-				$statements="${statements}SELECT proxy_history_seq.nextval INTO :new.id FROM dual;\n";
-				$statements="${statements}END;$output{'exec_cmd'}";
+				$sequences = "${sequences}CREATE SEQUENCE ${table_name}_seq${eol}\n";
+				$sequences = "${sequences}START WITH 1${eol}\n";
+				$sequences = "${sequences}INCREMENT BY 1${eol}\n";
+				$sequences = "${sequences}NOMAXVALUE${eol}\n/${eol}\n";
+				$sequences = "${sequences}CREATE TRIGGER ${table_name}_tr${eol}\n";
+				$sequences = "${sequences}BEFORE INSERT ON ${table_name}${eol}\n";
+				$sequences = "${sequences}FOR EACH ROW${eol}\n";
+				$sequences = "${sequences}BEGIN${eol}\n";
+				$sequences = "${sequences}SELECT ${table_name}_seq.nextval INTO :new.id FROM dual;${eol}\n";
+				$sequences = "${sequences}END;${eol}\n/${eol}\n";
 			}
 		}
-		print $row;
+
+		if ($relN ne "" and $relN ne "-")
+		{
+			if ($fk_field eq "")
+			{
+				$fk_field = "${name}";
+			}
+
+			if ($fk_flags eq "")
+			{
+				$fk_flags = " ON DELETE CASCADE";
+			}
+			elsif ($fk_flags eq "RESTRICT")	# not default option
+			{
+				$fk_flags = "";
+			}
+
+			if ($output{"database"} eq "postgresql")
+			{
+				$only = " ONLY";
+			}
+			else
+			{
+				$only = "";
+			}
+
+			$cname = "c_${table_name}_${relN}";
+
+			if ($output{"database"} eq "sqlite")
+			{
+				$references = " REFERENCES ${fk_table} (${fk_field})${fk_flags}";
+			}
+			else
+			{
+				$references = "";
+				$fkeys = "${fkeys}${fk_bol}ALTER TABLE${only} ${table_name} ADD CONSTRAINT ${cname} FOREIGN KEY (${name}) REFERENCES ${fk_table} (${fk_field})${fk_flags}${fk_eol}\n";
+
+				if ($output{"database"} eq "mysql")
+				{
+					$fkeys_drop = "${fkeys_drop}${fk_bol}ALTER TABLE${only} ${table_name} DROP FOREIGN KEY ${cname}${fk_eol}\n";
+				}
+				else
+				{
+					$fkeys_drop = "${fkeys_drop}${fk_bol}ALTER TABLE${only} ${table_name} DROP CONSTRAINT ${cname}${fk_eol}\n";
+				}
+			}
+		}
+		else
+		{
+			$references = "";
+		}
+
+		printf "${ltab}%-*s %-*s %-*s ${row}${references}", $szcol1, $name, $szcol2, $type_2, $szcol3, $default;
 	}
 }
 
 sub process_index
 {
-	local $line=$_[0];
-	local $unique=$_[1];
+	local $line = $_[0];
+	local $unique = $_[1];
 
 	newstate("index");
 
-	if($output{"type"} eq "code")
-	{
-		return;
-	}
+	($name, $fields) = split(/\|/, $line, 2);
 
-	($name,$fields)=split(/\|/, $line,2);
-
-	if($unique == 1)
+	if ($output{"type"} eq "code")
 	{
-		print "CREATE UNIQUE INDEX ${table_name}_$name\ on $table_name ($fields)$output{'exec_cmd'}";
+		if (1 == $unique)
+		{
+			$uniq = ",\n\t\t\"${fields}\"";
+		}
 	}
 	else
 	{
-		print "CREATE INDEX ${table_name}_$name\ on $table_name ($fields)$output{'exec_cmd'}";
+		if (1 == $unique) { $unique = " UNIQUE"; }
+		else { $unique = ""; }
+
+		print "CREATE${unique} INDEX ${table_name}_$name\ on $table_name ($fields);${eol}\n";
 	}
 }
 
 sub usage
 {
-	printf "Usage: $0 [c|mysql|oracle|php|postgresql|sqlite]\n";
-	printf "The script generates ZABBIX SQL schemas and C/PHP code for different database engines.\n";
+	printf "Usage: $0 [c|mysql|oracle|postgresql|sqlite]\n";
+	printf "The script generates Zabbix SQL schemas and C code for different database engines.\n";
 	exit;
 }
 
-sub main
+sub process
 {
-	if($#ARGV!=0)
-	{
-		usage();
-	};
-
-	$format=$ARGV[0];
-	switch ($format) {
-		case "c"		{ %output=%c; }
-		case "mysql"		{ %output=%mysql; }
-		case "oracle"		{ %output=%oracle; }
-		case "php"		{ %output=%php; }
-		case "postgresql"	{ %output=%postgresql; }
-		case "sqlite"		{ %output=%sqlite; }
-		else			{ usage(); }
-	}
-
 	print $output{"before"};
+
+	$state = "bof";
+	$fkeys = "";
+	$fkeys_drop = "";
+	$sequences = "";
+	$uniq = "";
+
+	open(INFO, $file);			# Open the file
+	@lines = <INFO>;			# Read it into an array
+	close(INFO);				# Close the file
 
 	foreach $line (@lines)
 	{
 		$_ = $line;
 		$line = tr/\t//d;
 		$line=$_;
-	
+
 		chop($line);
-	
-		($type,$line)=split(/\|/, $line,2);
+
+		($type, $line) = split(/\|/, $line, 2);
 
 		utf8::decode($type);
-	
-		switch ($type) {
+
+		switch ($type)
+		{
 			case "TABLE"	{ process_table($line); }
-			case "INDEX"	{ process_index($line,0); }
-			case "UNIQUE"	{ process_index($line,1); }
+			case "INDEX"	{ process_index($line, 0); }
+			case "UNIQUE"	{ process_index($line, 1); }
 			case "FIELD"	{ process_field($line); }
 		}
+	}
+
+	newstate("table");
+
+	print $sequences.$sql_suffix;
+	print $fkeys_prefix.$fkeys.$fkeys_suffix;
+	print $output{"after"};
+}
+
+sub main
+{
+	if ($#ARGV != 0)
+	{
+		usage();
+	}
+
+	$format = $ARGV[0];
+	$eol = "";
+	$fk_bol = "";
+	$fk_eol = ";";
+	$ltab = "\t";
+	$szcol1 = 24;
+	$szcol2 = 15;
+	$szcol3 = 25;
+	$szcol4 = 7;
+	$sql_suffix="";
+	$fkeys_prefix = "";
+	$fkeys_suffix = "";
+	$fkeys_drop_prefix = "";
+
+	switch ($format)
+	{
+		case "c"		{ %output = %c; }
+		case "mysql"		{ %output = %mysql; }
+		case "oracle"		{ %output = %oracle; }
+		case "postgresql"	{ %output = %postgresql; }
+		case "sqlite"		{ %output = %sqlite; }
+		else			{ usage(); }
+	}
+
+	process();
+
+	if ($format eq "c")
+	{
+		$eol = "\\n\\";
+		$fk_bol = "\t\"";
+		$fk_eol = "\",";
+		$ltab = "";
+		$szcol1 = 0;
+		$szcol2 = 0;
+		$szcol3 = 0;
+		$szcol4 = 0;
+		$sql_suffix="\";\n";
+		$fkeys_prefix = "const char *const db_schema_fkeys[] = {\n";
+		$fkeys_suffix = "\tNULL\n};\n";
+		$fkeys_drop_prefix = "const char *const db_schema_fkeys_drop[] = {\n";
+
+		print "\n#ifdef HAVE_MYSQL\nconst char *const db_schema= \"\\\n";
+		%output = %mysql;
+		process();
+		print $fkeys_drop_prefix.$fkeys_drop.$fkeys_suffix;
+		print "#elif HAVE_ORACLE\nconst char *const db_schema= \"\\\n";
+		%output = %oracle;
+		process();
+		print $fkeys_drop_prefix.$fkeys_drop.$fkeys_suffix;
+		print "#elif HAVE_POSTGRESQL\nconst char *const db_schema= \"\\\n";
+		%output = %postgresql;
+		process();
+		print $fkeys_drop_prefix.$fkeys_drop.$fkeys_suffix;
+		print "#elif HAVE_SQLITE3\nconst char *const db_schema= \"\\\n";
+		%output = %sqlite;
+		process();
+		print $fkeys_drop_prefix.$fkeys_drop.$fkeys_suffix;
+		print "#endif\t/* HAVE_SQLITE3 */\n";
 	}
 }
 
 main();
-newstate("table");
-print $output{"after"};

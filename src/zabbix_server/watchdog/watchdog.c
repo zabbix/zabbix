@@ -42,8 +42,8 @@ ZBX_RECIPIENT
 
 ZBX_RECIPIENT	recipients[ZBX_MAX_RECIPIENTS];
 
-static	int num = 0;
-static	int lastsent = 0;
+static int	num = 0;
+static int	lastsent = 0;
 
 /******************************************************************************
  *                                                                            *
@@ -60,19 +60,20 @@ static	int lastsent = 0;
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void send_alerts()
+static void	send_alerts()
 {
 	int	i,now;
 	char	error[MAX_STRING_LEN];
 
 	now = time(NULL);
 
-	if(now>lastsent+900)
+	if (now > lastsent + 900)
 	{
-		for(i=0;i<num;i++)
+		for (i = 0; i < num; i++)
 		{
 			execute_action(&recipients[i].alert,&recipients[i].mediatype, error, sizeof(error));
 		}
+
 		lastsent = now;
 	}
 }
@@ -92,36 +93,46 @@ static void send_alerts()
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void init_config()
+static void	init_config()
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In init_config()");
 
-	result = DBselect("select mt.mediatypeid, mt.type, mt.description, mt.smtp_server, mt.smtp_helo, mt.smtp_email, mt.exec_path, mt.gsm_modem, mt.username, mt.passwd, m.mediaid,m.userid,m.mediatypeid,m.sendto,m.severity,m.period from media m, users_groups u, config c,media_type mt where m.userid=u.userid and u.usrgrpid=c.alert_usrgrpid and m.mediatypeid=mt.mediatypeid and m.active=%d",
-		MEDIA_STATUS_ACTIVE);
-	while((row=DBfetch(result)))
+	result = DBselect(
+			"select mt.mediatypeid,mt.type,mt.description,mt.smtp_server,"
+				"mt.smtp_helo,mt.smtp_email,mt.exec_path,mt.gsm_modem,"
+				"mt.username,mt.passwd,m.sendto"
+			" from media m,users_groups u,config c,media_type mt"
+			" where m.userid=u.userid"
+				" and u.usrgrpid=c.alert_usrgrpid"
+				" and m.mediatypeid=mt.mediatypeid"
+				" and m.active=%d",
+			MEDIA_STATUS_ACTIVE);
+
+	while (NULL != (row = DBfetch(result)))
 	{
-		if(num>=ZBX_MAX_RECIPIENTS)	break;
+		if (num >= ZBX_MAX_RECIPIENTS)
+			break;
 
 		memset(&recipients[num].mediatype, 0, sizeof(DB_MEDIATYPE));
 		memset(&recipients[num].alert, 0, sizeof(DB_ALERT));
 
-		ZBX_STR2UINT64(recipients[num].mediatype.mediatypeid,row[0]);
-		recipients[num].mediatype.type=atoi(row[1]);
-		recipients[num].mediatype.description=strdup(row[2]);
-		recipients[num].mediatype.smtp_server=strdup(row[3]);
-		recipients[num].mediatype.smtp_helo=strdup(row[4]);
-		recipients[num].mediatype.smtp_email=strdup(row[5]);
-		recipients[num].mediatype.exec_path=strdup(row[6]);
-		recipients[num].mediatype.gsm_modem=strdup(row[7]);
-		recipients[num].mediatype.username=strdup(row[8]);
-		recipients[num].mediatype.passwd=strdup(row[9]);
+		ZBX_STR2UINT64(recipients[num].mediatype.mediatypeid, row[0]);
+		recipients[num].mediatype.type = atoi(row[1]);
+		recipients[num].mediatype.description = strdup(row[2]);
+		recipients[num].mediatype.smtp_server = strdup(row[3]);
+		recipients[num].mediatype.smtp_helo = strdup(row[4]);
+		recipients[num].mediatype.smtp_email = strdup(row[5]);
+		recipients[num].mediatype.exec_path = strdup(row[6]);
+		recipients[num].mediatype.gsm_modem = strdup(row[7]);
+		recipients[num].mediatype.username = strdup(row[8]);
+		recipients[num].mediatype.passwd = strdup(row[9]);
 
-		recipients[num].alert.sendto=strdup(row[13]);
-		recipients[num].alert.subject=strdup("Zabbix database is down.");
-		recipients[num].alert.message=strdup("Zabbix database is down.");
+		recipients[num].alert.sendto = strdup(row[10]);
+		recipients[num].alert.subject = strdup("Zabbix database is down.");
+		recipients[num].alert.message = strdup("Zabbix database is down.");
 
 		num++;
 	}
@@ -144,19 +155,18 @@ static void init_config()
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void ping_database()
+static void	ping_database()
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In ping_database()");
+
 	/* This is test SQL query, it does nothing */
-	if(DBping() == FAIL)
+	if (DBping() == FAIL)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Watchdog: Database is down");
 		send_alerts();
 	}
 	else
-	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Watchdog: Database is up");
-	}
 }
 
 /******************************************************************************
@@ -175,7 +185,7 @@ static void ping_database()
  * Comments: check database availability every 60 seconds (hardcoded)         *
  *                                                                            *
  ******************************************************************************/
-void main_watchdog_loop()
+void	main_watchdog_loop()
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_watchdog_loop()");
 
@@ -188,11 +198,10 @@ void main_watchdog_loop()
 
 	DBclose();
 
-	for (;;) {
+	for (;;)
+	{
 		ping_database();
 
 		sleep(60);
 	}
-
-	/* We will never reach this point */
 }

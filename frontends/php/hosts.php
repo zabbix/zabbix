@@ -527,7 +527,7 @@ include_once('include/page_header.php');
 			$sql = 'SELECT DISTINCT i.itemid, i.description '.
 					' FROM items i '.
 					' WHERE i.hostid='.$clone_hostid.
-						' AND i.templateid=0 '.
+						' AND i.templateid IS NULL '.
 					' ORDER BY i.description';
 
 			$res = DBselect($sql);

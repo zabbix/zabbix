@@ -138,7 +138,7 @@ typedef enum {
 #define ITEM_SNMP_COMMUNITY_LEN_MAX	ITEM_SNMP_COMMUNITY_LEN+1
 #define ITEM_SNMP_OID_LEN		255
 #define ITEM_SNMP_OID_LEN_MAX		ITEM_SNMP_OID_LEN+1
-#define ITEM_LASTVALUE_LEN		255
+#define ITEM_LASTVALUE_LEN		65535
 #define ITEM_LASTVALUE_LEN_MAX		ITEM_LASTVALUE_LEN+1
 #define ITEM_ERROR_LEN			128
 #define ITEM_ERROR_LEN_MAX		ITEM_ERROR_LEN+1
@@ -247,6 +247,11 @@ typedef enum {
 #define	ZBX_SQL_STRVAL_EQ(str)	"=", str
 #define	ZBX_SQL_STRVAL_NE(str)	"<>", str
 #endif
+
+#define ZBX_DBROW2UINT64(uint, row)	if (SUCCEED == DBis_null(row))		\
+						uint = 0;			\
+					else					\
+						sscanf(row, ZBX_FS_UI64, &uint);
 
 #define ZBX_MAX_SQL_LEN		65535
 
@@ -431,11 +436,12 @@ DB_OPERATION
 {
 	zbx_uint64_t	operationid;
 	zbx_uint64_t	actionid;
-	int		operationtype;
-	int		object;
 	zbx_uint64_t	objectid;
+	zbx_uint64_t	mediatypeid;
 	char		*shortdata;
 	char		*longdata;
+	int		operationtype;
+	int		object;
 	int		esc_period;
 	int		default_msg;
 	int		evaltype;
@@ -539,7 +545,6 @@ void    DBconnect(int flag);
 void	DBinit();
 
 void    DBclose(void);
-void    DBvacuum(void);
 
 #ifdef HAVE___VA_ARGS__
 #	define DBexecute(fmt, ...) __zbx_DBexecute(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
@@ -569,8 +574,6 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num);
 zbx_uint64_t	DBget_nextid(const char *tablename, int num);
 
 int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *error);
-int	DBadd_service_alarm(zbx_uint64_t serviceid, int status, int clock);
-int	DBadd_alert(zbx_uint64_t actionid, zbx_uint64_t eventid, zbx_uint64_t userid, zbx_uint64_t mediatypeid, char *sendto, char *subject, char *message);
 int	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid);
 int	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid);
 int	DBremove_escalation(zbx_uint64_t escalationid);
@@ -635,4 +638,8 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, int now);
 void	DBproxy_register_host(const char *host);
 void	DBexecute_overflowed_sql(char **sql, int *sql_allocated, int *sql_offset);
 char	*DBget_unique_hostname_by_sample(char *host_name_sample);
+
+char	*DBsql_id_cmp(zbx_uint64_t id);
+char	*DBsql_id_ins(zbx_uint64_t id);
+
 #endif

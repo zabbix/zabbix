@@ -339,7 +339,7 @@ static zbx_uint64_t	select_discovered_host(DB_EVENT *event)
 		break;
 	case EVENT_OBJECT_ZABBIX_ACTIVE:
 		result = DBselect("select h.hostid from hosts h,autoreg_host a"
-				" where a.proxy_hostid=h.proxyhostid and a.host=h.host and a.autoreg_hostid=" ZBX_FS_UI64,
+				" where a.proxy_hostid=h.proxy_hostid and a.host=h.host and a.autoreg_hostid=" ZBX_FS_UI64,
 				event->objectid);
 		break;
 	default:
@@ -492,13 +492,12 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 	result = DBselect(
 			"select discovery_groupid"
 			" from config"
-			" where 1=1"
-				DB_NODE,
+			" where 1=1" DB_NODE,
 			DBnode_local("configid"));
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(groupid, row[0]);
+		ZBX_DBROW2UINT64(groupid, row[0]);
 	}
 	else
 	{
@@ -541,7 +540,7 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(proxy_hostid, row[0]);
+		ZBX_DBROW2UINT64(proxy_hostid, row[0])
 
 		if (EVENT_OBJECT_ZABBIX_ACTIVE == event->object)
 		{
@@ -560,23 +559,23 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 				hostid = DBget_maxid("hosts");
 
 				DBexecute("insert into hosts (hostid,proxy_hostid,host,useip,dns)"
-						" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s',0,'%s')",
+						" values (" ZBX_FS_UI64 ",%s,'%s',0,'%s')",
 						hostid,
-						proxy_hostid,
+						DBsql_id_ins(proxy_hostid),
 						host_esc,
 						host_esc);
 			}
 			else
 			{
 				ZBX_STR2UINT64(hostid, row2[0]);
-				ZBX_STR2UINT64(host_proxy_hostid, row2[1]);
+				ZBX_DBROW2UINT64(host_proxy_hostid, row2[1]);
 
 				if (host_proxy_hostid != proxy_hostid)
 				{
 					DBexecute("update hosts"
-							" set proxy_hostid=" ZBX_FS_UI64
+							" set proxy_hostid=%s"
 							" where hostid=" ZBX_FS_UI64,
-							proxy_hostid,
+							DBsql_id_ins(proxy_hostid),
 							hostid);
 				}
 			}
@@ -624,10 +623,9 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 				host_unique_esc = DBdyn_escape_string(host_unique);
 				
 				DBexecute("insert into hosts (hostid,proxy_hostid,host,useip,ip,dns,port)"
-						" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s',1,'%s','%s',%d)",
+						" values (" ZBX_FS_UI64 ",%s,'%s',1,'%s','%s',%d)",
 						hostid,
-						proxy_hostid,
-						/*(*host != '\0' ? host_esc : ip_esc),*/ /* Use host name if exists, IP otherwise */
+						DBsql_id_ins(proxy_hostid),
 						host_unique_esc,
 						ip_esc,
 						host_esc,
@@ -639,14 +637,14 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 			else
 			{
 				ZBX_STR2UINT64(hostid, row2[0]);
-				ZBX_STR2UINT64(host_proxy_hostid, row2[3]);
+				ZBX_DBROW2UINT64(host_proxy_hostid, row2[3]);
 
 				if (0 != strcmp(host, row2[1]) || host_proxy_hostid != proxy_hostid)
 				{
 					DBexecute("update hosts"
-							" set dns='%s',proxy_hostid=" ZBX_FS_UI64
+							" set dns='%s',proxy_hostid=%s"
 							" where hostid=" ZBX_FS_UI64,
-							host_esc, proxy_hostid,
+							host_esc, DBsql_id_ins(proxy_hostid),
 							hostid);
 				}
 			}

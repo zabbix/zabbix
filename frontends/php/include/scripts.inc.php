@@ -10,37 +10,12 @@ function get_script_by_scriptid($scriptid){
 return $rows;
 }
 
-function add_script($name,$command,$usrgrpid,$groupid,$access){
-	$scriptid = get_dbid('scripts','scriptid');
-	$sql = 'INSERT INTO scripts (scriptid,name,command,usrgrpid,groupid,host_access) '.
-				" VALUES ($scriptid,".zbx_dbstr($name).','.zbx_dbstr($command).",$usrgrpid,$groupid,$access)";
-	$result = DBexecute($sql);
-	if($result){
-		$result = $scriptid;
-	}
-return $result;
-}
-
 function delete_script($scriptids){
 	zbx_value2array($scriptids);
 
 	$sql = 'DELETE FROM scripts WHERE '.DBcondition('scriptid',$scriptids);
 	$result = DBexecute($sql);
 
-return $result;
-}
-
-function update_script($scriptid,$name,$command,$usrgrpid,$groupid,$access){
-
-	$sql = 'UPDATE scripts SET '.
-				' name='.zbx_dbstr($name).
-				' ,command='.zbx_dbstr($command).
-				' ,usrgrpid='.$usrgrpid.
-				' ,groupid='.$groupid.
-				' ,host_access='.$access.
-			' WHERE scriptid='.$scriptid;
-
-	$result = DBexecute($sql);
 return $result;
 }
 
@@ -64,7 +39,7 @@ function script_make_command($scriptid,$hostid){
 
 function execute_script($scriptid,$hostid){
 	global $ZBX_SERVER, $ZBX_SERVER_PORT, $ZBX_MESSAGES;
-	
+
 	if(!$socket = fsockopen($ZBX_SERVER, $ZBX_SERVER_PORT, $errorCode, $errorMsg, ZBX_SCRIPT_TIMEOUT)){
 		array_pop($ZBX_MESSAGES);
 		error(S_SCRIPT_ERROR_DESCRIPTION.': '.$errorMsg);
@@ -105,7 +80,7 @@ function execute_script($scriptid,$hostid){
 			return false;
 		}
 	}
-	
+
 	if(!feof($socket)) {
 		if(time()-$now >= ZBX_SCRIPT_TIMEOUT) {
 			error(S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_TIMEOUT_ERROR);
@@ -121,7 +96,7 @@ function execute_script($scriptid,$hostid){
 			return false;
 		}
 	}
-	
+
 	if(zbx_strlen($response) > 0){
 		$json = new CJSON();
 		$rcv = $json->decode($response, true);

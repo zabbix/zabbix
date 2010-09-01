@@ -266,9 +266,9 @@ class CItem extends CZBXAPI{
 // inherited
 		if(!is_null($options['inherited'])){
 			if($options['inherited'])
-				$sql_parts['where'][] = 'i.templateid>0';
+				$sql_parts['where'][] = 'i.templateid IS NOT NULL';
 			else
-				$sql_parts['where'][] = 'i.templateid=0';
+				$sql_parts['where'][] = 'i.templateid IS NULL';
 		}
 
 // templated
