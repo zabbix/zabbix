@@ -1273,14 +1273,14 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
 			value_esc = DBdyn_escape_string_len(h->value_orig.value_str, ITEM_LASTVALUE_LEN);
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 576,
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 34 + strlen(value_esc),
 					",prevvalue=lastvalue,lastvalue='%s'",
 					value_esc);
 			zbx_free(value_esc);
 			break;
 		case ITEM_VALUE_TYPE_LOG:
 			value_esc = DBdyn_escape_string_len(h->value_orig.value_str, ITEM_LASTVALUE_LEN);
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 600,
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 74 + strlen(value_esc),
 					",prevvalue=lastvalue,lastvalue='%s',lastlogsize=%d,mtime=%d",
 					value_esc,
 					h->lastlogsize,

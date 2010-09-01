@@ -414,9 +414,9 @@
 						zbx_dbstr($item['trapper_hosts']).','.$item['snmp_port'].','.zbx_dbstr($item['units']).','.(!$item['multiplier'] ? '0':$item['multiplier']).','.
 						intval($item['delta']).','.zbx_dbstr($item['snmpv3_securityname']).','.intval($item['snmpv3_securitylevel']).','.
 						zbx_dbstr($item['snmpv3_authpassphrase']).','.zbx_dbstr($item['snmpv3_privpassphrase']).','.
-						zbx_dbstr($item['formula']).','.(!$item['trends'] ? '0':$item['trends']).','.zbx_dbstr($item['logtimefmt']).','.(!$item['valuemapid'] ? '0':$item['valuemapid']).','.
+						zbx_dbstr($item['formula']).','.(!$item['trends'] ? '0':$item['trends']).','.zbx_dbstr($item['logtimefmt']).','.(!$item['valuemapid'] ? 'NULL':$item['valuemapid']).','.
 						zbx_dbstr($item['delay_flex']).','.zbx_dbstr($item['params']).','.
-						zbx_dbstr($item['ipmi_sensor']).','.$item['templateid'].','.intval($item['authtype']).','.
+						zbx_dbstr($item['ipmi_sensor']).','.zero2null($item['templateid']).','.intval($item['authtype']).','.
 						zbx_dbstr($item['username']).','.zbx_dbstr($item['password']).','.
 						zbx_dbstr($item['publickey']).','.zbx_dbstr($item['privatekey']).')'
 			);
@@ -645,11 +645,11 @@
 				'formula='.zbx_dbstr($item['formula']).','.
 				'trends='.$item['trends'].','.
 				'logtimefmt='.zbx_dbstr($item['logtimefmt']).','.
-				'valuemapid='.$item['valuemapid'].','.
+				'valuemapid='.zero2null($item['valuemapid']).','.
 				'delay_flex='.zbx_dbstr($item['delay_flex']).','.
 				'params='.zbx_dbstr($item['params']).','.
 				'ipmi_sensor='.zbx_dbstr($item['ipmi_sensor']).','.
-				'templateid='.$item['templateid'].','.
+				'templateid='.zero2null($item['templateid']).','.
 				'authtype='.$item['authtype'].','.
 				'username='.zbx_dbstr($item['username']).','.
 				'password='.zbx_dbstr($item['password']).','.
@@ -767,7 +767,7 @@
 			}
 
 			if($unlink_mode){
-				if(DBexecute('UPDATE items SET templateid=0 WHERE itemid='.$db_item["itemid"])){
+				if(DBexecute('UPDATE items SET templateid=NULL WHERE itemid='.$db_item["itemid"])){
 					info("Item '".$db_item["key_"]."' unlinked");
 				}
 			}

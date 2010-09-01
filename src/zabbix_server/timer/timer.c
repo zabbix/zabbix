@@ -206,6 +206,8 @@ static void	process_maintenance_hosts(zbx_host_maintenance_t **hm, int *hm_alloc
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	assert(maintenanceid);
+
 	result = DBselect(
 			"select h.hostid,h.maintenanceid,h.maintenance_status,h.maintenance_type,h.maintenance_from "
 			"from maintenances_hosts mh,hosts h "
@@ -218,7 +220,7 @@ static void	process_maintenance_hosts(zbx_host_maintenance_t **hm, int *hm_alloc
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(host_hostid, row[0]);
-		ZBX_STR2UINT64(host_maintenanceid, row[1]);
+		ZBX_DBROW2UINT64(host_maintenanceid, row[1]);
 		host_maintenance_status = atoi(row[2]);
 		host_maintenance_type = atoi(row[3]);
 		host_maintenance_from = atoi(row[4]);
@@ -242,7 +244,7 @@ static void	process_maintenance_hosts(zbx_host_maintenance_t **hm, int *hm_alloc
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(host_hostid, row[0]);
-		ZBX_STR2UINT64(host_maintenanceid, row[1]);
+		ZBX_DBROW2UINT64(host_maintenanceid, row[1]);
 		host_maintenance_status = atoi(row[2]);
 		host_maintenance_type = atoi(row[3]);
 		host_maintenance_from = atoi(row[4]);
@@ -473,7 +475,7 @@ static void	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count)
 	sql_offset = 0;
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128,
 			"update hosts"
-			" set maintenanceid=0,"
+			" set maintenanceid=null,"
 				"maintenance_status=%d,"
 				"maintenance_type=0,"
 				"maintenance_from=0"

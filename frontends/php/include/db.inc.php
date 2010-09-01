@@ -583,6 +583,14 @@ COpt::savesqlrequest(microtime(true)-$time_start,$query);
 			}
 		}
 //*/
+		if($result){
+			foreach($result as $key => $val){
+				if(is_null($val)){
+					$result[$key] = 0;
+				}
+			}
+		}
+
 	return $result;
 	}
 
@@ -747,12 +755,12 @@ else {
 
 		$found = false;
 		do{
-			$min=bcadd(bcmul($nodeid,'100000000000000'),bcmul($ZBX_LOCALNODEID,'100000000000'));
-			$max=bcadd(bcadd(bcmul($nodeid,'100000000000000'),bcmul($ZBX_LOCALNODEID,'100000000000')),'99999999999');
+			$min=bcadd(bcmul($nodeid,'100000000000000'),bcmul($ZBX_LOCALNODEID,'100000000000'), 0);
+			$max=bcadd(bcadd(bcmul($nodeid,'100000000000000'),bcmul($ZBX_LOCALNODEID,'100000000000')),'99999999999', 0);
 			$row = DBfetch(DBselect('SELECT nextid FROM ids WHERE nodeid='.$nodeid .' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field)));
 			if(!$row){
 				$row = DBfetch(DBselect('SELECT max('.$field.') AS id FROM '.$table.' WHERE '.$field.'>='.$min.' AND '.$field.'<='.$max));
-				if(!$row || is_null($row['id'])){
+				if(!$row || ($row['id'] == 0)){
 					DBexecute("INSERT INTO ids (nodeid,table_name,field_name,nextid) VALUES ($nodeid,'$table','$field',$min)");
 				}
 				else{
@@ -874,6 +882,39 @@ else {
 	}
 
 
+	function whereClause($where){
+		$sql = '';
+
+		foreach($where as $cond){
+			$sql .= ($sql == '' ?  '' : ' AND ');
+			$sql .= $cond['field'];
+
+			if($cond['value'] == 0){
+				if($cond['operatot'] == '='){
+					$sql .= ' IS NULL ';
+				}
+				else{
+					$sql .= ' IS NOT NULL ';
+				}
+			}
+			else if(is_array($cond['value'])){
+
+			}
+			else{
+				$sql .= $cond['operatot'] . $cond['value'];
+			}
+		}
+
+		return $sql;
+	}
+
+	function zero2null($val){
+		if($val == 0){
+			return 'NULL';
+		}
+		else return $val;
+	}
+
 
 	class DB{
 		const SCHEMA_FILE = 'schema.inc.php';
@@ -881,7 +922,11 @@ else {
 		const RESERVEIDS_ERROR = 2;
 
 		const FIELD_TYPE_INT = 'int';
-		const FIELD_TYPE_STR = 'str';
+		const FIELD_TYPE_CHAR = 'char';
+		const FIELD_TYPE_ID = 'id';
+		const FIELD_TYPE_FLOAT = 'float';
+		const FIELD_TYPE_UINT = 'uint';
+		const FIELD_TYPE_BLOB = 'blob';
 
 		static $schema = null;
 
@@ -901,9 +946,10 @@ else {
 
 			$sql = 'SELECT nextid '.
 				' FROM ids '.
-				' WHERE nodeid='.$nodeid .'
-					AND table_name='.zbx_dbstr($table).
-					' AND field_name='.zbx_dbstr($id_name);
+				' WHERE nodeid='.$nodeid .
+					' AND table_name='.zbx_dbstr($table).
+					' AND field_name='.zbx_dbstr($id_name).
+					' FOR UPDATE';
 			$res = DBfetch(DBselect($sql));
 			if($res){
 				$nextid = bcadd($res['nextid'], 1, 0);
@@ -925,7 +971,7 @@ else {
 							' AND '.$id_name.'<='.$max;
 				$row = DBfetch(DBselect($sql));
 
-				$nextid = (!$row || is_null($row['id'])) ? $min : $row['id'];
+				$nextid = (!$row || ($row['id'] == 0)) ? $min : $row['id'];
 
 				$sql = 'INSERT INTO ids (nodeid,table_name,field_name,nextid) '.
 					' VALUES ('.$nodeid.','.zbx_dbstr($table).','.zbx_dbstr($id_name).','.bcadd($nextid, $count, 0).')';
@@ -958,33 +1004,39 @@ else {
  * @param array $values pair of fieldname => fieldvalue
  * @return array of ids
  */
-		public static function insert($table, $values){
+		public static function insert($table, $values, $getids=true){
 			if(empty($values)) return true;
 			$result_ids = array();
 
-			$id = self::reserveIds($table, count($values));
+			if($getids)
+				$id = self::reserveIds($table, count($values));
+				
 			$table_schema = self::getSchema($table);
 
 			foreach($values as $key => $row){
-				$result_ids[$key] = $id;
-
-				unset($row[$table_schema['key']]);
-
 				foreach($row as $field => $v){
 					if(!isset($table_schema['fields'][$field])){
 						unset($row[$field]);
 					}
-					else if($table_schema['fields'][$field] == self::FIELD_TYPE_STR){
+					else if($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_CHAR){
 						$row[$field] = zbx_dbstr($v);
 					}
+					else if($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_ID){
+						$row[$field] = zero2null($v);
+					}
+				}
+				
+				if($getids){
+					$result_ids[$key] = $id;
+					$row[$table_schema['key']] = $id;
+					$id = bcadd($id, 1, 0);
 				}
 
-				$sql = 'INSERT INTO '.$table.' ('.$table_schema['key'].','.implode(',',array_keys($row)).')'.
-					' VALUES ('.$id.','.implode(',',array_values($row)).')';
-
-				$id = bcadd($id, 1, 0);
+				$sql = 'INSERT INTO '.$table.' ('.implode(',',array_keys($row)).')'.
+					' VALUES ('.implode(',',array_values($row)).')';
 				if(!DBexecute($sql)) self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
 			}
+			
 			return $result_ids;
 		}
 
@@ -1009,8 +1061,11 @@ else {
 					if(!isset($table_schema['fields'][$field])){
 						continue;
 					}
-					else if($table_schema['fields'][$field] == self::FIELD_TYPE_STR){
+					else if($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_CHAR){
 						$value = zbx_dbstr($value);
+					}
+					else if($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_ID){
+						$value = zero2null($value);
 					}
 
 					$sql_set .= $field.'='.$value.',';

@@ -157,7 +157,7 @@
 		$frm_title = S_DISCOVERY_RULE;
 
 		if(isset($_REQUEST['druleid'])){
-			if( ($rule_data = DBfetch(DBselect('SELECT * FROM drules WHERE druleid='.$_REQUEST['druleid']))))
+			if($rule_data = DBfetch(DBselect('SELECT * FROM drules WHERE druleid='.$_REQUEST['druleid'])))
 				$frm_title = S_DISCOVERY_RULE.' "'.$rule_data['name'].'"';
 		}
 
@@ -180,7 +180,7 @@
 			//TODO init checks
 			$dchecks = array();
 			$db_checks = DBselect('SELECT dcheckid,type,ports,key_,snmp_community,snmpv3_securityname,'.
-						'snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase'.
+						'snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,uniq'.
 						' FROM dchecks'.
 						' WHERE druleid='.$_REQUEST['druleid']);
 			while($check_data = DBfetch($db_checks)){
@@ -191,7 +191,7 @@
 						'snmpv3_securitylevel' => $check_data['snmpv3_securitylevel'],
 						'snmpv3_authpassphrase' => $check_data['snmpv3_authpassphrase'],
 						'snmpv3_privpassphrase' => $check_data['snmpv3_privpassphrase']));
-				if ($check_data['dcheckid'] == $rule_data['unique_dcheckid'])
+				if($check_data['uniq'])
 					$uniqueness_criteria = $count - 1;
 			}
 			$dchecks_deleted = get_request('dchecks_deleted',array());
@@ -348,8 +348,7 @@
 		return $form;
 	}
 
-	function	insert_httpstep_form()
-	{
+	function insert_httpstep_form(){
 		$form = new CFormTable(S_STEP_OF_SCENARIO, null, 'post');
 		$form->setHelp("web.webmon.httpconf.php");
 

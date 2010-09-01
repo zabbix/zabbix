@@ -770,7 +770,8 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 					'esc_step_from'	=>	$operation_data['esc_step_from'],
 					'esc_step_to'	=>	$operation_data['esc_step_to'],
 					'default_msg'	=>	$operation_data['default_msg'],
-					'evaltype'	=>	$operation_data['evaltype']);
+					'evaltype'	=>	$operation_data['evaltype'],
+					'mediatypeid'	=>	$operation_data['mediatypeid']);
 
 				$operation_data['opconditions'] = array();
 
@@ -778,12 +779,6 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 				$db_opconds = DBselect($sql);
 				while($db_opcond = DBfetch($db_opconds)){
 					$operation_data['opconditions'][] = $db_opcond;
-				}
-
-				$sql = 'SELECT * from opmediatypes WHERE operationid='.$operation_data['operationid'];
-				$db_opmtypes = DBSelect($sql);
-				if($db_opmtype = DBfetch($db_opmtypes)){
-					$operation_data['mediatypeid'] = $db_opmtype['mediatypeid'];
 				}
 
 				if(str_in_array($operation_data, $operations)) continue;

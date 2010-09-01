@@ -57,7 +57,7 @@ static int	get_hostid_by_host(const char *host, zbx_uint64_t *hostid, char *erro
 			" from hosts"
 			" where host='%s'"
 				" and status in (%d,%d)"
-		       		" and proxy_hostid=0"
+		       		" and proxy_hostid is null"
 				DB_NODE,
 			host_esc,
 			HOST_STATUS_MONITORED,
@@ -154,7 +154,7 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request, unsigned char zb
 	zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset, 1024,
 			"select i.key_,i.delay,i.lastlogsize from items i,hosts h"
 			" where i.hostid=h.hostid and h.status=%d and i.type=%d and h.hostid=" ZBX_FS_UI64
-			" and h.proxy_hostid=0",
+			" and h.proxy_hostid is null",
 			HOST_STATUS_MONITORED,
 			ITEM_TYPE_ZABBIX_ACTIVE,
 			hostid);
@@ -286,7 +286,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp,
 	sql_offset = 0;
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 1024,
 			"select %s where i.hostid=h.hostid and h.status=%d and i.type=%d and h.hostid=" ZBX_FS_UI64
-			" and h.proxy_hostid=0",
+			" and h.proxy_hostid is null",
 			ZBX_SQL_ITEM_SELECT,
 			HOST_STATUS_MONITORED,
 			ITEM_TYPE_ZABBIX_ACTIVE,

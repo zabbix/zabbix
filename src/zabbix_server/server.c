@@ -466,11 +466,9 @@ int MAIN_ZABBIX_ENTRY(void)
 	}
 	DBfree_result(result);
 
-	result = DBselect("select masterid from nodes where nodeid=%d",
-		CONFIG_NODEID);
-	row = DBfetch(result);
+	result = DBselect("select masterid from nodes where nodeid=%d", CONFIG_NODEID);
 
-	if( (row != NULL) && DBis_null(row[0]) != SUCCEED)
+	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
 	{
 		CONFIG_MASTER_NODEID = atoi(row[0]);
 	}

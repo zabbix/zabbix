@@ -696,7 +696,7 @@ class CHost extends CZBXAPI{
 
 						$result[$host['hostid']]['maintenances'][] = array('maintenanceid' => $host['maintenanceid']);
 //						unset($host['maintenanceid']);
-					}				
+					}
 //---
 
 					$result[$host['hostid']] += $host;
@@ -1137,21 +1137,7 @@ Copt::memoryPick();
 			foreach($hosts as $num => $host){
 				$host_db_fields = array(
 					'host' => null,
-					'port' => 0,
-					'status' => 0,
-					'useip' => 0,
-					'dns' => '',
-					'ip' => '0.0.0.0',
-					'proxy_hostid' => 0,
-					'useipmi' => 0,
-					'ipmi_ip' => '',
-					'ipmi_port' => 623,
-					'ipmi_authtype' => 0,
-					'ipmi_privilege' => 0,
-					'ipmi_username' => '',
-					'ipmi_password' => '',
 				);
-
 				if(!check_db_fields($host_db_fields, $host)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for host [ '.$host['host'].' ]');
 				}
@@ -1171,31 +1157,9 @@ Copt::memoryPick();
 				}
 
 
-				$hostid = get_dbid('hosts', 'hostid');
-				$hostids[] = $hostid;
-				$result = DBexecute('INSERT INTO hosts (hostid, proxy_hostid, host, port, status, useip, dns, ip, disable_until, available,'.
-					'useipmi,ipmi_port,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,ipmi_ip) VALUES ('.
-					$hostid.','.
-					$host['proxy_hostid'].','.
-					zbx_dbstr($host['host']).','.
-					$host['port'].','.
-					$host['status'].','.
-					$host['useip'].','.
-					zbx_dbstr($host['dns']).','.
-					zbx_dbstr($host['ip']).
-					',0,'.
-					HOST_AVAILABLE_UNKNOWN.','.
-					$host['useipmi'].','.
-					$host['ipmi_port'].','.
-					$host['ipmi_authtype'].','.
-					$host['ipmi_privilege'].','.
-					zbx_dbstr($host['ipmi_username']).','.
-					zbx_dbstr($host['ipmi_password']).','.
-					zbx_dbstr($host['ipmi_ip']).')'
-				);
-				if(!$result){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-				}
+				$hostid = DB::insert('hosts', array($host));
+				$hostids[] = $hostid = reset($hostid);
+
 
 				$host['hostid'] = $hostid;
 				$options = array();
@@ -1436,28 +1400,15 @@ Copt::memoryPick();
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect characters used for DNS [ '.$data['dns'].' ]');
 			}
 
-			$sql_set = array();
-			if(isset($data['proxy_hostid'])) $sql_set[] = 'proxy_hostid='.$data['proxy_hostid'];
-			if(isset($data['host'])) $sql_set[] = 'host='.zbx_dbstr($data['host']);
-			if(isset($data['port'])) $sql_set[] = 'port='.$data['port'];
-			if(isset($data['status'])) $sql_set[] = 'status='.$data['status'];
-			if(isset($data['useip'])) $sql_set[] = 'useip='.$data['useip'];
-			if(isset($data['dns'])) $sql_set[] = 'dns='.zbx_dbstr($data['dns']);
-			if(isset($data['ip'])) $sql_set[] = 'ip='.zbx_dbstr($data['ip']);
-			if(isset($data['useipmi'])) $sql_set[] = 'useipmi='.$data['useipmi'];
-			if(isset($data['ipmi_port'])) $sql_set[] = 'ipmi_port='.$data['ipmi_port'];
-			if(isset($data['ipmi_authtype'])) $sql_set[] = 'ipmi_authtype='.$data['ipmi_authtype'];
-			if(isset($data['ipmi_privilege'])) $sql_set[] = 'ipmi_privilege='.$data['ipmi_privilege'];
-			if(isset($data['ipmi_username'])) $sql_set[] = 'ipmi_username='.zbx_dbstr($data['ipmi_username']);
-			if(isset($data['ipmi_password'])) $sql_set[] = 'ipmi_password='.zbx_dbstr($data['ipmi_password']);
-			if(isset($data['ipmi_ip'])) $sql_set[] = 'ipmi_ip='.zbx_dbstr($data['ipmi_ip']);
 
-			if(!empty($sql_set)){
-				$sql = 'UPDATE hosts SET ' . implode(', ', $sql_set) . ' WHERE '.DBcondition('hostid', $hostids);
-				$result = DBexecute($sql);
-				if(isset($data['status']))
-					update_host_status($hostids, $data['status']);
-			}
+			$update = array(
+				'values' => $data,
+				'where' => array(DBcondition('hostid', $hostids))
+			);
+			DB::update('hosts', $update);
+			if(isset($data['status']))
+				update_host_status($hostids, $data['status']);
+
 // }}} UPDATE HOSTS PROPERTIES
 
 

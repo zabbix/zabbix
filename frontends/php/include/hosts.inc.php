@@ -1267,14 +1267,14 @@ return $result;
 			$applicationid_new = get_dbid('applications', 'applicationid');
 
 			$sql = 'INSERT INTO applications (applicationid, name, hostid, templateid) '.
-				" VALUES ($applicationid_new, ".zbx_dbstr($name).", $hostid, $templateid)";
+				" VALUES ($applicationid_new, ".zbx_dbstr($name).", $hostid, ".zero2null($templateid).")";
 			if($result = DBexecute($sql)){
 				info(S_ADDED_NEW_APPLICATION.SPACE.$host['host'].':'.$name);
 			}
 		}
 		else{
 			$old_app = get_application_by_applicationid($applicationid);
-			$result = DBexecute('UPDATE applications SET name='.zbx_dbstr($name).', hostid='.$hostid.', templateid='.$templateid.
+			$result = DBexecute('UPDATE applications SET name='.zbx_dbstr($name).', hostid='.$hostid.', templateid='.zero2null($templateid).
 				' WHERE applicationid='.$applicationid);
 			if($result)
 				info(S_UPDATED_APPLICATION.SPACE.$host['host'].':'.$old_app['name']);
@@ -1484,7 +1484,7 @@ return $result;
 			}
 
 			if($unlink_mode){
-				if(DBexecute("update applications set templateid=0 where applicationid=".$db_app["applicationid"])){
+				if(DBexecute("update applications set templateid=NULL where applicationid=".$db_app["applicationid"])){
 					info(S_APPLICATION.SPACE."'".$db_app["name"]."'".SPACE.S_UNLINKED_SMALL);
 				}
 			}

@@ -350,55 +350,6 @@ DB_RESULT	DBselectN(const char *query, int n)
 	return rc;
 }
 
-/* SUCCEED if latest service alarm has this status */
-/* Rewrite required to simplify logic ?*/
-int	latest_service_alarm(zbx_uint64_t serviceid, int status)
-{
-	const char	*__function_name = "latest_service_alarm";
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		ret = FAIL;
-	char		sql[MAX_STRING_LEN];
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): serviceid [" ZBX_FS_UI64 "] status [%d]",
-			__function_name, serviceid, status);
-
-	zbx_snprintf(sql, sizeof(sql), "select servicealarmid,value"
-					" from service_alarms"
-					" where serviceid=" ZBX_FS_UI64
-					" order by servicealarmid desc", serviceid);
-
-	result = DBselectN(sql, 1);
-	row = DBfetch(result);
-
-	if (NULL != row && FAIL == DBis_null(row[1]) && status == atoi(row[1]))
-	{
-		ret = SUCCEED;
-	}
-
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
-}
-
-int	DBadd_service_alarm(zbx_uint64_t serviceid, int status, int clock)
-{
-	zabbix_log(LOG_LEVEL_DEBUG, "In add_service_alarm()");
-
-	if (SUCCEED != latest_service_alarm(serviceid, status))
-	{
-		DBexecute("insert into service_alarms (servicealarmid,serviceid,clock,value)"
-			" values(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d)",
-			DBget_maxid("service_alarms"), serviceid, clock, status);
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of add_service_alarm()");
-
-	return SUCCEED;
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: trigger_dependent_rec                                            *
@@ -582,54 +533,6 @@ int	DBupdate_trigger_value(zbx_uint64_t triggerid, int trigger_type, int trigger
 			__function_name, zbx_result_string(ret));
 
 	return ret;
-}
-
-void	DBdelete_service(zbx_uint64_t serviceid)
-{
-	DBexecute("delete from services_links where servicedownid=" ZBX_FS_UI64 " or serviceupid=" ZBX_FS_UI64,
-		serviceid,
-		serviceid);
-	DBexecute("delete from services where serviceid=" ZBX_FS_UI64,
-		serviceid);
-}
-
-void	DBdelete_services_by_triggerid(zbx_uint64_t triggerid)
-{
-	zbx_uint64_t	serviceid;
-	DB_RESULT	result;
-	DB_ROW		row;
-
-	zabbix_log(LOG_LEVEL_DEBUG,"In DBdelete_services_by_triggerid(" ZBX_FS_UI64 ")",
-		triggerid);
-	result = DBselect("select serviceid from services where triggerid=" ZBX_FS_UI64,
-		triggerid);
-
-	while((row=DBfetch(result)))
-	{
-		ZBX_STR2UINT64(serviceid, row[0]);
-		DBdelete_service(serviceid);
-	}
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG,"End of DBdelete_services_by_triggerid(" ZBX_FS_UI64 ")",
-		triggerid);
-}
-
-void	DBdelete_trigger(zbx_uint64_t triggerid)
-{
-	DBexecute("delete from trigger_depends where triggerid_down=" ZBX_FS_UI64 " or triggerid_up=" ZBX_FS_UI64,
-		triggerid,
-		triggerid);
-	DBexecute("delete from functions where triggerid=" ZBX_FS_UI64,
-		triggerid);
-	DBexecute("delete from events where object=%d and objectid=" ZBX_FS_UI64,
-		EVENT_OBJECT_TRIGGER,
-		triggerid);
-
-	DBdelete_services_by_triggerid(triggerid);
-
-	DBexecute("delete from sysmaps_link_triggers where triggerid=" ZBX_FS_UI64,triggerid);
-	DBexecute("delete from triggers where triggerid=" ZBX_FS_UI64,triggerid);
 }
 
 void	DBupdate_triggers_status_after_restart(void)
@@ -936,7 +839,7 @@ int	DBget_queue_count(int from, int to)
 		item_type	= atoi(row[1]);
 		delay		= atoi(row[2]);
 		delay_flex	= row[3];
-		ZBX_STR2UINT64(proxy_hostid, row[5]);
+		ZBX_DBROW2UINT64(proxy_hostid, row[5]);
 
 		if (FAIL == (lastclock = DCget_item_lastclock(itemid)))
 			lastclock = (time_t)atoi(row[4]);
@@ -1013,40 +916,6 @@ zbx_uint64_t	DBget_proxy_lastaccess(const char *hostname)
 	return lastaccess;
 }
 
-int	DBadd_alert(zbx_uint64_t actionid, zbx_uint64_t userid, zbx_uint64_t eventid,
-		zbx_uint64_t mediatypeid, char *sendto, char *subject, char *message)
-{
-	int	now;
-	char	*sendto_esc, *subject_esc, *message_esc;
-
-	zabbix_log(LOG_LEVEL_DEBUG,"In add_alert(eventid:" ZBX_FS_UI64 ")",
-		eventid);
-
-	now = time(NULL);
-
-	sendto_esc = DBdyn_escape_string_len(sendto, ALERT_SENDTO_LEN);
-	subject_esc = DBdyn_escape_string_len(subject, ALERT_SUBJECT_LEN);
-	message_esc = DBdyn_escape_string(message);
-
-	DBexecute("insert into alerts (alertid,actionid,eventid,userid,clock,mediatypeid,sendto,subject,message,status,retries)"
-		" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",'%s','%s','%s',0,0)",
-		DBget_maxid("alerts"),
-		actionid,
-		eventid,
-		userid,
-		now,
-		mediatypeid,
-		sendto_esc,
-		subject_esc,
-		message_esc);
-
-	zbx_free(sendto_esc);
-	zbx_free(subject_esc);
-	zbx_free(message_esc);
-
-	return SUCCEED;
-}
-
 int	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid)
 {
 	zbx_uint64_t	escalationid;
@@ -1054,11 +923,11 @@ int	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64
 	/* remove older active escalations... */
 	DBexecute("delete from escalations"
 			" where actionid=" ZBX_FS_UI64
-				" and triggerid=" ZBX_FS_UI64
+				" and triggerid%s"
 				" and status not in (%d,%d,%d)"
 				" and (esc_step<>0 or status<>%d)",
 			actionid,
-			triggerid,
+			DBsql_id_cmp(triggerid),
 			ESCALATION_STATUS_RECOVERY,
 			ESCALATION_STATUS_SUPERSEDED_ACTIVE,
 			ESCALATION_STATUS_SUPERSEDED_RECOVERY,
@@ -1068,21 +937,21 @@ int	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64
 	DBexecute("update escalations"
 			" set status=%d"
 			" where actionid=" ZBX_FS_UI64
-				" and triggerid=" ZBX_FS_UI64
+				" and triggerid%s"
 				" and esc_step=0"
 				" and status=%d",
 			ESCALATION_STATUS_SUPERSEDED_ACTIVE,
 			actionid,
-			triggerid,
+			DBsql_id_cmp(triggerid),
 			ESCALATION_STATUS_ACTIVE);
 
 	escalationid = DBget_maxid("escalations");
 
 	DBexecute("insert into escalations (escalationid,actionid,triggerid,eventid,status)"
-			" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d)",
+			" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%s," ZBX_FS_UI64 ",%d)",
 			escalationid,
 			actionid,
-			triggerid,
+			DBsql_id_ins(triggerid),
 			eventid,
 			ESCALATION_STATUS_ACTIVE);
 
@@ -1103,11 +972,11 @@ int	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_
 			"select escalationid,esc_step,status"
 			" from escalations"
 			" where actionid=" ZBX_FS_UI64
-				" and triggerid=" ZBX_FS_UI64
+				" and triggerid%s"
 				" and status not in (%d,%d)"
 			" order by escalationid desc",
 			actionid,
-			triggerid,
+			DBsql_id_cmp(triggerid),
 			ESCALATION_STATUS_RECOVERY,
 			ESCALATION_STATUS_SUPERSEDED_RECOVERY);
 
@@ -1147,29 +1016,6 @@ int	DBremove_escalation(zbx_uint64_t escalationid)
 			escalationid);
 
 	return SUCCEED;
-}
-
-void	DBvacuum(void)
-{
-#ifdef	HAVE_POSTGRESQL
-	char	*table_for_housekeeping[] = {"services", "services_links", "graphs_items", "graphs", "sysmaps_links",
-			"sysmaps_elements", "sysmaps_link_triggers","sysmaps", "config", "groups", "hosts_groups", "alerts",
-			"actions", "events", "functions", "history", "history_str", "hosts", "trends",
-			"items", "media", "media_type", "triggers", "trigger_depends", "users",
-			"sessions", "rights", "service_alarms", "profiles", "screens", "screens_items",
-			NULL};
-
-	char	*table;
-	int	i;
-
-	zbx_setproctitle("housekeeper [vacuum DB]");
-
-	i = 0;
-	while (NULL != (table = table_for_housekeeping[i++]))
-	{
-		DBexecute("vacuum analyze %s", table);
-	}
-#endif
 }
 
 /******************************************************************************
@@ -1557,7 +1403,7 @@ void	DBget_item_from_db(DB_ITEM *item, DB_ROW row)
 	item->multiplier		= atoi(row[18]);
 	item->formula			= row[19];
 	item->status			= atoi(row[20]);
-	ZBX_STR2UINT64(item->valuemapid, row[21]);
+	ZBX_DBROW2UINT64(item->valuemapid, row[21]);
 	item->host_dns			= row[22];
 
 	item->lastlogsize		= atoi(row[24]);
@@ -1986,8 +1832,13 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, int now)
 
 	host_esc = DBdyn_escape_string_len(host, HOST_HOST_LEN);
 
-	result = DBselect("select autoreg_hostid from autoreg_host where proxy_hostid=" ZBX_FS_UI64 " and host='%s'" DB_NODE,
-			proxy_hostid,
+	result = DBselect(
+			"select autoreg_hostid"
+			" from autoreg_host"
+			" where proxy_hostid%s"
+				" and host='%s'"
+				DB_NODE,
+			DBsql_id_cmp(proxy_hostid),
 			host_esc,
 			DBnode_local("autoreg_hostid"));
 
@@ -1996,9 +1847,9 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, int now)
 	else
 	{
 		autoreg_hostid = DBget_maxid("autoreg_host");
-		DBexecute("insert into autoreg_host (autoreg_hostid,proxy_hostid,host) values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s')",
+		DBexecute("insert into autoreg_host (autoreg_hostid,proxy_hostid,host) values (" ZBX_FS_UI64 ",%s,'%s')",
 				autoreg_hostid,
-				proxy_hostid,
+				DBsql_id_ins(proxy_hostid),
 				host_esc);
 	}
 	DBfree_result(result);
@@ -2060,7 +1911,7 @@ void	DBproxy_register_host(const char *host)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void DBexecute_overflowed_sql(char **sql, int *sql_allocated, int *sql_offset)
+void	DBexecute_overflowed_sql(char **sql, int *sql_allocated, int *sql_offset)
 {
 	if (*sql_offset > ZBX_MAX_SQL_SIZE)
 	{
@@ -2142,4 +1993,68 @@ char	*DBget_unique_hostname_by_sample(char *host_name_sample)
 			host_name_temp);
 
 	return host_name_temp;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBsql_id_cmp                                                     *
+ *                                                                            *
+ * Purpose: construct where condition                                         *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: "=<id>" if id not equal zero,                                *
+ *               otherwise " is null"                                         *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+char	*DBsql_id_cmp(zbx_uint64_t id)
+{
+	static unsigned char	n = 0;
+	static char		buf[4][22];	/* 1 - '=', 20 - value size, 1 - '\0' */
+	static char		is_null[9] = " is null";
+
+	if (0 == id)
+		return is_null;
+
+	n++; n = n % 4;
+
+	zbx_snprintf(buf[n], sizeof(buf[n]), "=" ZBX_FS_UI64, id);
+
+	return buf[n];
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBsql_id_ins                                                     *
+ *                                                                            *
+ * Purpose: construct insert statement                                        *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: "<id>" if id not equal zero,                                 *
+ *               otherwise "null"                                             *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+char	*DBsql_id_ins(zbx_uint64_t id)
+{
+	static unsigned char	n = 0;
+	static char		buf[4][21];	/* 20 - value size, 1 - '\0' */
+	static char		null[5] = "null";
+
+	if (0 == id)
+		return null;
+
+	n++; n = n % 4;
+
+	zbx_snprintf(buf[n], sizeof(buf[n]), ZBX_FS_UI64, id);
+
+	return buf[n];
 }

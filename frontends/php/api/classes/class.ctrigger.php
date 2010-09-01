@@ -408,10 +408,10 @@ class CTrigger extends CZBXAPI{
 // inherited
 		if(!is_null($options['inherited'])){
 			if($options['inherited']){
-				$sql_parts['where'][] = 't.templateid<>0';
+				$sql_parts['where'][] = 't.templateid IS NOT NULL';
 			}
 			else{
-				$sql_parts['where'][] = 't.templateid=0';
+				$sql_parts['where'][] = 't.templateid IS NULL';
 			}
 		}
 
