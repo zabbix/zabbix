@@ -3889,7 +3889,13 @@ return $caption;
 		$noErrors = true;
 		foreach($expressions as $key => $str) {
 			if(!isset($triggersData[$str])) {
-				if($scparser->parse($str)) {
+
+				if(ZAPCAT_COMPATIBILITY)
+					$tmp_expr = zbx_str_replace('][', ',,', $str);
+				else
+					$tmp_expr = $str;
+
+				if($scparser->parse($tmp_expr)) {
 					$triggersData[$str]['expressions'] = $scparser->getElements('expression');
 					$triggersData[$str]['hosts'] = $scparser->getElements('server');
 					$triggersData[$str]['keys'] = $scparser->getElements('keyName');
