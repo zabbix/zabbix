@@ -186,7 +186,7 @@ include_once('include/page_header.php');
 			'hostids' => $templateids,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => 1,
-			'select_dependencies' => 1,
+			'select_dependencies' => API_OUTPUT_EXTEND,
 			'expandData' => 1
 		);
 		$triggers = CTrigger::get($params);
@@ -429,7 +429,7 @@ include_once('include/page_header.php');
 		$result = delete_host($_REQUEST['templateid'], $unlink_mode);
 		$result = DBend($result);
 
-		show_messages($result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
+		show_messages($result, S_TEMPLATE_DELETED, S_CANNOT_DELETE_TEMPLATE);
 		if($result){
 /*				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST,'Host ['.$host['host'].']');*/
 			unset($_REQUEST['form']);
@@ -440,16 +440,17 @@ include_once('include/page_header.php');
 // ---------- GO ---------
 	else if(str_in_array($_REQUEST['go'], array('delete', 'delete_and_clear')) && isset($_REQUEST['templates'])){
 		$unlink_mode = false;
-		if(isset($_REQUEST['delete'])){
+		if($_REQUEST['go'] == 'delete'){
 			$unlink_mode = true;
 		}
 
+		DBstart();
 		$go_result = true;
 		$templates = get_request('templates', array());
 		$del_hosts = CTemplate::get(array('templateids' => $templates, 'editable' => 1));
 		$del_hosts = zbx_objectValues($del_hosts, 'templateid');
 
-		DBstart();
+
 		$go_result = delete_host($del_hosts, $unlink_mode);
 		$go_result = DBend($go_result);
 
@@ -715,9 +716,9 @@ include_once('include/page_header.php');
 				$host_footer[] = SPACE;
 				$host_footer[] = new CButton('full_clone', S_FULL_CLONE);
 				$host_footer[] = SPACE;
-				$host_footer[] = new CButtonDelete(S_DELETE_SELECTED_HOST_Q, url_param('form').url_param('templateid').url_param('groupid'));
+				$host_footer[] = new CButtonDelete(S_DELETE_TEMPLATE_Q, url_param('form').url_param('templateid').url_param('groupid'));
 				$host_footer[] = SPACE;
-				$host_footer[] = new CButtonQMessage('delete_and_clear', S_DELETE_AND_CLEAR, S_DELETE_SELECTED_HOSTS_Q, url_param('form').
+				$host_footer[] = new CButtonQMessage('delete_and_clear', S_DELETE_AND_CLEAR, S_DELETE_AND_CLEAR_TEMPLATE_Q, url_param('form').
 					url_param('templateid').url_param('groupid'));
 			}
 			array_push($host_footer, SPACE, new CButtonCancel(url_param('groupid')));
@@ -923,7 +924,7 @@ include_once('include/page_header.php');
 // GO{
 		$goBox = new CComboBox('go');
 		$goBox->addItem('export', S_EXPORT_SELECTED);
-		
+
 		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
 		$goOption->setAttribute('confirm',S_DELETE_SELECTED_TEMPLATES_Q);
 		$goBox->addItem($goOption);

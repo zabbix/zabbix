@@ -263,6 +263,10 @@
 	'S_HISTORY_OF_ACTIONS_DATE_FORMAT'=>	'd M Y H:i:s',
 	'S_EVENT_ACTION_MESSAGES_DATE_FORMAT'=>	'd M Y H:i:s',
 	'S_EVENT_ACTION_CMDS_DATE_FORMAT'=>	'Y.M.d H:i:s',
+	'S_INCORRECT_PARAMETER_USED_FOR_CONDITIONS'=>	'Incorrect parameter used for Conditions',
+	'S_INCORRECT_PARAMETER_USED_FOR_OPERATIONS'=>	'Incorrect parameter used for Operations',
+	'S_INCORRECT_PARAMETER_USED_FOR_ACTION'=>	'Incorrect parameter used for Action',
+	'S_EMPTY_INPUT_PARAMETER'=>	'Empty input parameter',
 
 //	node.php
 	'S_TIME_ZONE'=>				'Time zone',
@@ -353,6 +357,7 @@
 	'S_INCORRECT_PORT'=>			'Incorrect port',
 	'S_INCORRECT_DISCOVERY_STATUS'=>	'Incorrect discovery status',
 	'S_INCORRECT_CONDITION_TYPE'=>		'Incorrect condition type',
+	'S_INCORRECT_OBJECT_TYPE'=>		'Incorrect object type',
 
 	'S_INCORRECT_OPERATION_TYPE'=>		'Incorrect operation type',
 	'S_INCORRECT_USER'=>			'Incorrect user',
@@ -971,9 +976,11 @@
 	'S_TEMPLATE_DELETED'=>			'Template deleted',
 	'S_CANNOT_DELETE_TEMPLATE'=>		'Cannot delete template',
 	'S_LINK_WITH_TEMPLATE'=>		'Link with template',
-	'S_DELETE_AND_CLEAR'=>			'Delete AND clear',
+	'S_DELETE_AND_CLEAR'=>			'Delete and clear',
 	'S_DELETE_SELECTED_TEMPLATES_Q'=>	'Delete selected templates?',
-	'S_WARNING_THIS_DELETE_TEMPLATES_AND_CLEAR'=>'Warning: this will delete selected templates and clear all linked hosts',
+	'S_WARNING_THIS_DELETE_TEMPLATES_AND_CLEAR'=>'Delete and clear selected templates? (Warning: all linked hosts will be cleared!)',
+	'S_DELETE_TEMPLATE_Q' => 'Delete template?',
+	'S_DELETE_AND_CLEAR_TEMPLATE_Q' => 'Delete and clear template? (Warning: all linked hosts will be cleared!)',
 
 //	Host profiles
 	'S_HOST_PROFILE'=>			'Host profile',
@@ -1496,6 +1503,19 @@
 	'S_LOCALE_TO_EXTEND'=>			'Locale to extend',
 	'S_NEW_ENTRIES'=>			'New entries',
 
+	'S_NEW_LOCALE_STEP_1' => 'Download newly created locale file by pressing "Download".',
+	'S_NEW_LOCALE_STEP_2' => 'Place it to "/PATH_TO_ZABBIX_FRONTEND/include/locales".',
+	'S_NEW_LOCALE_STEP_3_1' => 'The locale file name must be made of a prefix: "ISO 639-1 language code"-"ISO 3166-1 alpha-2 country code". Like "en_gb"',
+	'S_NEW_LOCALE_STEP_3_2' => 'and a postfix ".inc.php". Like "en_gb.inc.php".',
+	'S_NEW_LOCALE_STEP_4_1' => 'To make new locale visible by Zabbix frontend - extend the php script "/PATH_TO_ZABBIX_FRONTEND/include/locales.inc.php".',
+	'S_NEW_LOCALE_STEP_4_2' => 'There You will find an array containing "keys" => "values".',
+	'S_NEW_LOCALE_STEP_4_3' => 'Extend this array with Your locale like "your_prefix" => "display_like".',
+	'S_NEW_LOCALE_STEP_4_4' => 'You can set "display_like" value in new locale file by adding it or You may leave it as hardcoded string.',
+	'S_NEW_LOCALE_STEP_4_5' => 'For example see implementation of other locales.',
+	'S_UPDATE_LOCALE_1' => 'Download newly created locale file by pressing "Download".',
+	'S_UPDATE_LOCALE_2' => 'Place it to "/PATH_TO_ZABBIX_FRONTEND/include/locales".',
+	'S_UPDATE_LOCALE_3' => 'Replace previous locale file with one you have downloaded.',
+
 //	report4.php
 	'S_NOTIFICATIONS'=>			'Notifications',
 	'S_NOTIFICATIONS_BIG'=>			'NOTIFICATIONS',
@@ -1752,6 +1772,8 @@
 	'S_MASS_UPDATE_SELECTED_TRIGGERS_Q'=>	'Mass update selected triggers?',
 	'S_COPY_SELECTED_TRIGGERS_Q'=>		'Copy selected triggers?',
 	'S_DELETE_SELECTED_TRIGGERS_Q'=>	'Delete selected triggers?',
+
+	'S_TRIGGER_LOG_FORM'=>	'Log trigger form',
 
 //	tr_comments.php
 	'S_TRIGGER_COMMENTS'=>			'Trigger comments',
@@ -2056,6 +2078,10 @@
 	'S_ACTIVATE_SELECTED_APPLICATIONS' => 'Activate selected applications?',
 	'S_DISABLE_SELECTED_APPLICATIONS' => 'Disable selected applications?',
 	'S_DELETE_SELECTED_APPLICATIONS'  => 'Delete selected applications?',
+	'S_CANNOT_CREATE_APPLICATION'  => 'Cannot create application',
+	'S_INCORRECT_FIELDS_FOR_APPLICATIONS'  => 'Incorrect fields for application',
+	'S_CANNOT_UPDATE_APPLICATION'  => 'Cannot update application',
+	'S_CANNOT_DELETE_APPLICATION'  => 'Cannot delete application',
 
 // popup_media.php
 	'S_INCORRECT_TIME_PERIOD'=>	'Incorrect time period',

@@ -1019,58 +1019,75 @@ class CUserMacro extends CZBXAPI{
 
 	public static function getMacros($macros, $options){
 		zbx_value2array($macros);
-
-		$def_options = array(
-			'itemid' => null,
-			'triggerid' => null
-		);
-		$options = zbx_array_merge($def_options, $options);
-
-		$hmacro = array();
-		$obj_options = array(
-			'extendoutput' => 1,
-			'globalmacro' => 1,
-			'nopermissions' => 1,
-			'macros' => $macros
-		);
-		$gmacros = self::get($obj_options);
-
+		$result = array();
+		
 		$obj_options = array(
 			'nopermissions' => 1,
 			'preservekeys' => 1,
-			'itemids' => $options['itemid'],
-			'triggerids' => $options['triggerid']
+			'output' => API_OUTPUT_SHORTEN,
+			'itemids' => isset($options['itemid']) ? $options['itemid'] : null,
+			'triggerids' => isset($options['triggerid']) ? $options['triggerid'] : null,
 		);
-		$hosts = CHost::get($obj_options);
-		$hostids = array_keys($hosts);
+		$hosts = CHost::get($obj_options);		
 
-		$hmacros = array();
-		while((count($hmacro) < count($macros)) && !empty($hosts)){
+		do{
 			$obj_options = array(
 				'nopermissions' => 1,
 				'extendoutput' => 1,
 				'preservekeys' => 1,
+				'output' => API_OUTPUT_EXTEND,
 				'macros' => $macros,
-				'hostids' => $hostids
+				'hostids' => array_keys($hosts),
 			);
+			$hmacros = self::get($obj_options);
 
-			$tmacros = self::get($obj_options);
-			$hmacros = zbx_array_merge($tmacros, $hmacros);
+			$host_macros = array();
+			foreach($hmacros as $hmacroid => $hmacro){
+				$h = reset($hmacro['hosts']);
+				$host_macros[$h['hostid']] = $hmacro;
+			}
+			ksort($host_macros);
+			
+			foreach($macros as $mnum => $macro){
+				foreach($host_macros as $hostid => $hmacro){
+					if($macro == $hmacro['macro']){
+						$result[$macro] = $hmacro['value'];
+						unset($host_macros[$hostid], $macros[$mnum]);
+						break;
+					}
+				}
+			}
 
+			if(!empty($macros)){
+				$obj_options = array(
+					'nopermissions' => 1,
+					'preservekeys' => 1,
+					'output' => API_OUTPUT_SHORTEN,
+					'hostids' => array_keys($hosts),
+				);
+				$hosts = CTemplate::get($obj_options);
+			}
+		}while(!empty($macros) && !empty($hosts));
+
+		
+		if(!empty($macros)){
 			$obj_options = array(
+				'extendoutput' => 1,
+				'globalmacro' => 1,
 				'nopermissions' => 1,
-				'preservekeys' => 1,
-				'hostids' => $hostids
+				'macros' => $macros
 			);
-			$hosts = CTemplate::get($obj_options);
-			$hostids = array_keys($hosts);
-		}
-
-		$macros = zbx_array_merge($gmacros + $hmacros);
-
-		$result = array();
-		foreach($macros as $macroid => $macro){
-			$result[$macro['macro']] = $macro['value'];
+			$gmacros = self::get($obj_options);
+		
+			foreach($macros as $macro){
+				foreach($gmacros as $mid => $gmacro){
+					if($macro == $gmacro['macro']){
+						$result[$macro] = $gmacro['value'];
+						unset($gmacros[$mid]);
+						break;
+					}
+				}
+			}
 		}
 
 		return $result;

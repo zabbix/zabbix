@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-#       /etc/rc.d/init.d/dovecot
+#       /etc/rc.d/init.d/zabbix_server
 #
 # Starts the zabbix_server daemon
 #
@@ -76,4 +76,3 @@ case "$1" in
 esac
 
 exit $RETVAL
-
