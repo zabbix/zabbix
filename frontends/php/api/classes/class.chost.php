@@ -696,7 +696,7 @@ class CHost extends CZBXAPI{
 
 						$result[$host['hostid']]['maintenances'][] = array('maintenanceid' => $host['maintenanceid']);
 //						unset($host['maintenanceid']);
-					}				
+					}
 //---
 
 					$result[$host['hostid']] += $host;
@@ -1529,7 +1529,10 @@ Copt::memoryPick();
 
 // UPDATE MACROS {{{
 			if(isset($data['macros']) && !is_null($data['macros'])){
-				$host_macros = CUserMacro::get(array('hostids' => $hostids, 'output' => API_OUTPUT_EXTEND,));
+				$host_macros = CUserMacro::get(array(
+					'hostids' => $hostids,
+					'output' => API_OUTPUT_EXTEND,
+				));
 
 				$macros_to_del = array();
 				foreach($host_macros as $hmacro){
