@@ -50,6 +50,7 @@
 	define('ZBX_UNITS_ROUNDOFF_LOWER_LIMIT', 6);
 
 /* END OF USERS DEFINES */
+	define('ZAPCAT_COMPATIBILITY', false);
 
 	define('ZBX_MAP_HIGHLIGHT', 0x1);
 	define('ZBX_MAP_EXPANDPROBLEM', 0x2);
