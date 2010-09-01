@@ -236,6 +236,7 @@ static void	DMcollect_table_data(int nodeid, int dest_nodetype, const ZBX_TABLE 
 				" and curr.tablename='%s'"
 				" and curr.cksumtype=%d"
 				" and prev.cksumtype=%d"
+				" and curr.cksum<>prev.cksum"
 			" union all "
 			/* Find deleted records */
 			"select prev.recordid,prev.cksum,curr.cksum,prev.sync"
@@ -591,29 +592,44 @@ int update_checksums(int nodeid, int synked_nodetype, int synked, const char *ta
 		*sql[1] = '\0';
 	}
 
-	/* Find updated records */
-	result = DBselect("select curr.tablename,curr.recordid,prev.cksum,curr.cksum,prev.sync "
-		"from node_cksum curr, node_cksum prev "
-		"where curr.nodeid=%d and prev.nodeid=curr.nodeid and "
-		"curr.tablename=prev.tablename and curr.recordid=prev.recordid and "
-		"curr.cksumtype=%d and prev.cksumtype=%d%s "
-		"union all "
-	/* Find new records */
-		"select curr.tablename,curr.recordid,prev.cksum,curr.cksum,NULL "
-		"from node_cksum curr left join node_cksum prev "
-		"on prev.nodeid=curr.nodeid and prev.tablename=curr.tablename and "
-		"prev.recordid=curr.recordid and prev.cksumtype=%d "
-		"where curr.nodeid=%d and curr.cksumtype=%d and prev.tablename is null%s "
-		"union all "
-	/* Find deleted records */
-		"select prev.tablename,prev.recordid,prev.cksum,curr.cksum,prev.sync "
-		"from node_cksum prev left join node_cksum curr "
-		"on curr.nodeid=prev.nodeid and curr.tablename=prev.tablename and "
-		"curr.recordid=prev.recordid and curr.cksumtype=%d "
-		"where prev.nodeid=%d and prev.cksumtype=%d and curr.tablename is null%s",
-		nodeid, NODE_CKSUM_TYPE_NEW, NODE_CKSUM_TYPE_OLD, sql[0],
-		NODE_CKSUM_TYPE_OLD, nodeid, NODE_CKSUM_TYPE_NEW, sql[0],
-		NODE_CKSUM_TYPE_NEW, nodeid, NODE_CKSUM_TYPE_OLD, sql[1]);
+	result = DBselect(
+			/* Find new records */
+			"select curr.tablename,curr.recordid,prev.cksum,curr.cksum,NULL"
+			" from node_cksum curr"
+				" left join node_cksum prev"
+					" on prev.nodeid=curr.nodeid"
+						" and prev.tablename=curr.tablename"
+						" and prev.recordid=curr.recordid"
+						" and prev.cksumtype=%d"
+			" where curr.nodeid=%d"
+				" and curr.cksumtype=%d"
+				" and prev.tablename is null%s"
+			" union all "
+			/* Find updated records */
+			"select curr.tablename,curr.recordid,prev.cksum,curr.cksum,prev.sync"
+			" from node_cksum curr, node_cksum prev"
+			" where curr.nodeid=%d"
+				" and prev.nodeid=curr.nodeid"
+				" and curr.tablename=prev.tablename"
+				" and curr.recordid=prev.recordid"
+				" and curr.cksumtype=%d"
+				" and prev.cksumtype=%d"
+				" and curr.cksum<>prev.cksum%s"
+			" union all "
+			/* Find deleted records */
+			"select prev.tablename,prev.recordid,prev.cksum,curr.cksum,prev.sync"
+			" from node_cksum prev"
+				" left join node_cksum curr"
+					" on curr.nodeid=prev.nodeid"
+						" and curr.tablename=prev.tablename"
+						" and curr.recordid=prev.recordid"
+						" and curr.cksumtype=%d"
+			" where prev.nodeid=%d"
+				" and prev.cksumtype=%d"
+				" and curr.tablename is null%s",
+			NODE_CKSUM_TYPE_OLD, nodeid, NODE_CKSUM_TYPE_NEW, sql[0],
+			nodeid, NODE_CKSUM_TYPE_NEW, NODE_CKSUM_TYPE_OLD, sql[0],
+			NODE_CKSUM_TYPE_NEW, nodeid, NODE_CKSUM_TYPE_OLD, sql[1]);
 
 	while (NULL != (row = DBfetch(result)))
 	{
