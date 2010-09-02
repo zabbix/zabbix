@@ -72,7 +72,8 @@ table.page_footer{
 	background: #5C7099 url('../images/gradients/table_head.gif') repeat-x top left;
 	font-weight: bold;
 	border-color: #E5E5E5;
-	border-top: 17px solid;
+	border-top-width: 17px;
+	border-top-style: solid;
 	width: 100%;
 }
 
@@ -388,13 +389,14 @@ table.tableinfo tr.header td.hover_grey:hover  {
 
 
 table.tableinfo tr.vertical_header td {
-	padding: 5px 0 5px 5px;
+	padding: 5px 0;
 	margin: 0;
 	white-space: nowrap;
 	word-spacing: 0;
 	font-weight: bold;
 	background-color:#CCCCCC;
 	width: 20px;
+	padding-left: 5px;
 	text-align: center;
 }
 table.tableinfo tr.vertical_header td.left {
@@ -408,7 +410,8 @@ table.tableinfo tr.vertical_header td.hover_grey:hover{
 
 table.tableinfo tr.footer td {
 	color: #FFFFFF;
-	background: #6d88ad url('../images/gradients/table_head2.gif') repeat-x top left;
+	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;
+	background-color: #6d88ad;
 	vertical-align: middle;
 	padding-right: 5px;
 	padding-left: 5px;
@@ -505,7 +508,8 @@ table.tableinfo tr.blue:hover 				{	background-color: #AAAAEE; border: 1px #AAAA
 table.header{
 	width: 100%;
 	color: #FFFFFF;
-	background: #6d88ad url('../images/gradients/table_head2.gif') repeat-x top left;
+	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;
+	background-color: #6d88ad;
 	border: 0 solid #000000;
 	vertical-align: middle;
 }
@@ -540,7 +544,8 @@ table.bottom_space{
 table.flicker{
 	width: 100%;
 	color: #FFFFFF;
-	background: #6d88ad url('../images/gradients/menu_not_active2.gif') repeat-x top left;
+	background: #5C7099 url('../images/gradients/menu_not_active2.gif') repeat-x top left;
+	background-color: #6d88ad;
 	border: 0 #000000 solid;
 	vertical-align:middle;
 }
@@ -693,7 +698,13 @@ table.menu td{
 	font-family: verdana, arial, helvetica, sans-serif;
 	font-size:10px;
 	font-weight: bold;
-	border: 1px solid #aaaaaa;
+
+	border-color: #aaaaaa;
+	border-width:1px;
+	border-top-style: solid;
+	border-left-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
 }
 
 table.menu tr td:hover{
@@ -721,7 +732,12 @@ table.sub_menu tr{
 	font-family:verdana, arial, helvetica, sans-serif;
 	font-size:10px;
 	background: #5C7099 url('../images/gradients/table_head.gif') repeat-x top left;
-	border: 0 solid #000000;
+	border-color: #000000;
+	border-width:0;
+	border-top-style: solid;
+	border-left-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
 	padding-right: 5px;
 	padding-left: 5px;
 }
@@ -739,7 +755,7 @@ table.sub_menu tr td span.active a.highlight{
 table.triggers_info {
 	width: 100%;
 	background-color: #FFFFFF;
-	border: 0;
+	border: 0px;
 }
 
 table.triggers_info tr td {
@@ -838,9 +854,10 @@ table.server_info tr.status td{
 table.warning{
 	border-spacing:	0; /* cellspacing */
 	border-collapse: collapse;
-	border: 2px solid gray;
-	border-right-color: #3F3F3F;
-	border-bottom-color: #3F3F3F;
+	border-top:		2px gray solid;
+	border-left:	2px gray solid;
+	border-right:	2px #3F3F3F solid;
+	border-bottom:	2px #3F3F3F solid;
 	background-color: #EAEAEA;
 }
 
@@ -1159,7 +1176,6 @@ table.filter_config tr td {
 	padding-left: 6px;
 	padding-right: 4px;
 }
-
 /********** </FILTER> ************/
 
 /********** <INVISIBLE> ************/
