@@ -29,6 +29,7 @@ ZBX_METRIC	parameters_specific[]=
 
 	{"vfs.fs.size",		CF_USEUPARAM,	VFS_FS_SIZE,		NULL,	"/,free"},
 	{"vfs.fs.inode",	CF_USEUPARAM,	VFS_FS_INODE,		NULL,	"/,free"},
+	{"vfs.fs.discovery",	0,		VFS_FS_DISCOVERY,	NULL,	NULL},
 
 	{"vfs.dev.read",	CF_USEUPARAM,	VFS_DEV_READ,		NULL,	"sda,operations"},
 	{"vfs.dev.write",	CF_USEUPARAM,	VFS_DEV_WRITE,		NULL,	"sda,sectors"},

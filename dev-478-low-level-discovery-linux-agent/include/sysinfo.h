@@ -239,7 +239,10 @@ int     VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_R
 int     VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int     VFS_FILE_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int     VFS_FS_INODE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+
 int     VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int     VFS_FS_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+
 int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 
 int	SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
