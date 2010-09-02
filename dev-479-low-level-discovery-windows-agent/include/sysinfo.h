@@ -235,6 +235,7 @@ int     VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_
 int     VFS_FILE_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int     VFS_FS_INODE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int     VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int     VFS_FS_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 
 int     NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);

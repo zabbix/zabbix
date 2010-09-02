@@ -256,11 +256,11 @@ int     NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AG
 
 int	NET_IF_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	DWORD			dwSize, dwRetVal, i;
-	int			ret = SYSINFO_RET_FAIL;
+	DWORD		dwSize, dwRetVal, i;
+	int		ret = SYSINFO_RET_FAIL;
 	/* variables used for GetIfTable and GetIfEntry */
-	MIB_IFTABLE		*pIfTable = NULL;
-	MIB_IFROW		pIfRow;
+	MIB_IFTABLE	*pIfTable = NULL;
+	MIB_IFROW	pIfRow;
 	struct zbx_json	j;
 
 	assert(result);
