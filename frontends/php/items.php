@@ -829,8 +829,6 @@ switch($itemType) {
 
 		$show_host = true;
 
-
-
 // Items Header
 		$numrows = new CDiv();
 		$numrows->setAttribute('name', 'numrows');
@@ -1154,7 +1152,7 @@ switch($itemType) {
 					$triggers = '';
 				}
 
-				$menuicon = new CIcon(S_MENU,'iconmenu_b', 
+				$menuicon = new CIcon(S_MENU,'iconmenu_b',
 						'call_triggerlog_menu(event, '.zbx_jsvalue($item['itemid']).','.
 						zbx_jsvalue($item['description_expanded']).','.$ltype.$triggers.');');
 			}
