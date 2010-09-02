@@ -293,7 +293,6 @@ include_once('include/page_header.php');
 		if(!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY)))
 			access_deny();
 
-
 		$clone_templateid = false;
 		if($_REQUEST['form'] == 'full_clone'){
 			$clone_templateid = $templateid;
@@ -404,7 +403,6 @@ include_once('include/page_header.php');
 			}
 		}
 // }
-
 
 		$result = DBend($result);
 
