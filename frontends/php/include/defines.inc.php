@@ -88,6 +88,7 @@
 	define('PAGE_TYPE_HTML_BLOCK',		5);	// simple block of html (as text)
 	define('PAGE_TYPE_JSON',			6);	// simple JSON
 	define('PAGE_TYPE_JSON_RPC',		7);	// api call
+	define('PAGE_TYPE_TEXT_FILE',		8);	// api call
 
 
 	define('ZBX_SESSION_ACTIVE',		0);
