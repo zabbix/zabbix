@@ -1482,7 +1482,7 @@
 					'nopermissions' => 1,
 					'output' => API_OUTPUT_EXTEND,
 				));
-				zbx_toHash($maps, 'sysmapid');
+				$maps = zbx_toHash($maps, 'sysmapid');
 				foreach($elems['sysmaps'] as $elem){
 					$info[$elem['selementid']]['name'] = $maps[$elem['elementid']]['name'];
 				}
@@ -1493,7 +1493,7 @@
 					'nopermissions' => 1,
 					'output' => API_OUTPUT_EXTEND,
 				));
-				zbx_toHash($hostgroups, 'groupid');
+				$hostgroups = zbx_toHash($hostgroups, 'groupid');
 				foreach($elems['hostgroups'] as $elem){
 					$info[$elem['selementid']]['name'] = $hostgroups[$elem['elementid']]['name'];
 				}
