@@ -1155,7 +1155,16 @@ require_once('include/js.inc.php');
 					$image_map = new CImg("map.php?noedit=1&sysmapid=$resourceid"."&width=$width&height=$height");
 
 					if($editmode == 0){
-						$action_map = get_action_map_by_sysmapid($resourceid);
+						$options = array(
+							'sysmapids' => $resourceid,
+							'output' => API_OUTPUT_EXTEND,
+							'select_selements' => API_OUTPUT_EXTEND,
+							'nopermissions' => 1
+						);
+						$sysmaps = CMap::get($options);
+						$sysmap = reset($sysmaps);
+
+						$action_map = getActionMapBySysmap($sysmap);
 						$image_map->setMap($action_map->getName());
 						$item = array($action_map,$image_map);
 					}

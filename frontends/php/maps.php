@@ -137,7 +137,7 @@ include_once('include/page_header.php');
 		}
 // }}} GET MAP PARENT MAPS
 
-		$action_map = get_action_map_by_sysmapid($_REQUEST['sysmapid']);
+		$action_map = getActionMapBySysmap($maps[$_REQUEST['sysmapid']]);
 
 		$table->addRow($action_map);
 
