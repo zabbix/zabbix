@@ -780,7 +780,7 @@ int	DBget_items_unsupported_count()
 
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %s %d", __function_name, count);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %d", __function_name, count);
 
 	return count;
 }
