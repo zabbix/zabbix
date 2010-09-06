@@ -273,7 +273,7 @@ char	*get_config_data(int nodeid, int dest_nodetype)
 		}
 
 		r[0] = DBis_null(row[2]) == SUCCEED ? NULL : row[2];
-		r[1] = DBis_null(row[3]) == SUCCEED ? NULL : row[3];
+		r[1] = row[3];
 		f = 0;
 		sql_offset = 0;
 
@@ -320,7 +320,7 @@ char	*get_config_data(int nodeid, int dest_nodetype)
 			row[1]);
 
 		result2 = DBselect("%s", sql);
-		if (NULL == (row2=DBfetch(result2)))
+		if (NULL == (row2 = DBfetch(result2)))
 			goto out;
 
 		zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 128, "\n%s%c%s%c%d",
@@ -331,7 +331,7 @@ char	*get_config_data(int nodeid, int dest_nodetype)
 			NODE_CONFIGLOG_OP_UPDATE);
 
 		r[0] = DBis_null(row[2]) == SUCCEED ? NULL : row[2];
-		r[1] = DBis_null(row[3]) == SUCCEED ? NULL : row[3];
+		r[1] = row[3];
 		s = sync;
 		f = 0;
 		j = 0;
@@ -512,7 +512,7 @@ int update_checksums(int nodeid, int synked_nodetype, int synked, const char *ta
 		*ck = '\0';
 
 		r[0] = DBis_null(row[2]) == SUCCEED ? NULL : row[2];
-		r[1] = DBis_null(row[3]) == SUCCEED ? NULL : row[3];
+		r[1] = row[3];
 		f = 0;
 
 		do {
