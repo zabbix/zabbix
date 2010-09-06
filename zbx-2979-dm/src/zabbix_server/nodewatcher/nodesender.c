@@ -488,7 +488,7 @@ int update_checksums(int nodeid, int synked_nodetype, int synked, const char *ta
 		}
 
 		/* Special (simpler) processing for operation DELETE */
-		if (DBis_null(row[3]) == SUCCEED)
+		if (SUCCEED == DBis_null(row[3]))
 		{
 			zbx_snprintf_alloc(&exsql, &exsql_alloc, &exsql_offset, 256,
 					"delete from node_cksum"
@@ -502,7 +502,7 @@ int update_checksums(int nodeid, int synked_nodetype, int synked, const char *ta
 			continue;
 		}
 
-		if (DBis_null(row[4]) == FAIL)
+		if (FAIL == DBis_null(row[4]))
 			zbx_strlcpy(sync, row[4], sizeof(sync));
 		else
 			memset(sync, ' ', sizeof(sync));
@@ -579,8 +579,8 @@ int update_checksums(int nodeid, int synked_nodetype, int synked, const char *ta
 		*s = '\0';
 		*--ck = '\0';
 
-		if (DBis_null(row[2]) == SUCCEED || DBis_null(row[3]) == SUCCEED ||
-			strcmp(row[4], sync) != 0 || strcmp(row[2], row[3]) != 0)
+		if (SUCCEED == DBis_null(row[2]) || 0 != strcmp(row[4], sync)
+				|| 0 != strcmp(row[2], row[3]))
 		{
 			cksumtype = (DBis_null(row[2]) == SUCCEED) ? NODE_CKSUM_TYPE_NEW : NODE_CKSUM_TYPE_OLD;
 			zbx_snprintf_alloc(&exsql, &exsql_alloc, &exsql_offset, 2560,
