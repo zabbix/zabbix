@@ -1509,13 +1509,12 @@ class zbxXML{
 
 				$options = array(
 					'itemids' => $itemminmaxids,
-					'extendoutput' => 1,
+					'output' => API_OUTPUT_EXTEND,
+					'templated_hosts' => 1,
 					'nopermissions' => 1
 				);
-
 				$itemminmaxs = CItem::get($options);
 				$itemminmaxs = zbx_toHash($itemminmaxs, 'itemid');
-
 
 				$hostminmaxs = CHost::get($options);
 				$hostminmaxs = zbx_toHash($hostminmaxs, 'hostid');
@@ -1529,17 +1528,15 @@ class zbxXML{
 
 						if($graph['ymin_itemid'] > 0){
 							$graph['ymin_item_key'] = $hostminmaxs[$itemminmaxs[$graph['ymin_itemid']]['hostid']]['host'].':'.
-														$itemminmaxs[$graph['ymin_itemid']]['key_'];
+									$itemminmaxs[$graph['ymin_itemid']]['key_'];
 						}
 
 						if($graph['ymax_itemid'] > 0){
 							$graph['ymax_item_key'] = $hostminmaxs[$itemminmaxs[$graph['ymax_itemid']]['hostid']]['host'].':'.
-														$itemminmaxs[$graph['ymax_itemid']]['key_'];
+									$itemminmaxs[$graph['ymax_itemid']]['key_'];
 						}
 
-
 						$graph_node = self::addChildData($graphs_node, XML_TAG_GRAPH, $graph);
-
 
 						if(isset($data['graphs_items'])){
 							$graph_elements_node = $graph_node->appendChild(new DOMElement(XML_TAG_GRAPH_ELEMENTS));
