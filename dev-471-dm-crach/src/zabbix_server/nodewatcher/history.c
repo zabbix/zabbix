@@ -156,32 +156,45 @@ static void	process_history_table_data(const ZBX_TABLE *table, int master_nodeid
 	}
 
 	result = DBselectN(tmp, 10000);
-	while (NULL != (row = DBfetch(result))) {
-		if (table->flags & ZBX_HISTORY_SYNC) {
+	while (NULL != (row = DBfetch(result)))
+	{
+		if (table->flags & ZBX_HISTORY_SYNC)
+		{
 			ZBX_STR2UINT64(lastid, row[0]);
 			fld = 1;
-		} else
+		}
+		else
 			fld = 0;
 
-		zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 128, "\n");
+		zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 2, "\n");
 
-		for (f = 0; table->fields[f].name != 0; f++) {
+		for (f = 0; NULL != table->fields[f].name; f++)
+		{
 			if ((table->flags & ZBX_HISTORY_SYNC) && 0 == (table->fields[f].flags & ZBX_HISTORY_SYNC))
 				continue;
 
-			len = (int)strlen(row[fld]);
-
 			if (table->fields[f].type == ZBX_TYPE_INT ||
-				table->fields[f].type == ZBX_TYPE_UINT ||
-				table->fields[f].type == ZBX_TYPE_ID ||
-				table->fields[f].type == ZBX_TYPE_FLOAT)
+					table->fields[f].type == ZBX_TYPE_UINT ||
+					table->fields[f].type == ZBX_TYPE_ID ||
+					table->fields[f].type == ZBX_TYPE_FLOAT)
 			{
-				zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 128, "%s%c",
-					row[fld], ZBX_DM_DELIMITER);
-			} else { /* ZBX_TYPE_CHAR ZBX_TYPE_BLOB ZBX_TYPE_TEXT */
+				if (SUCCEED == DBis_null(row[fld]))
+				{
+					zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 6, "NULL%c",
+							ZBX_DM_DELIMITER);
+				}
+				else
+				{
+					zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 128, "%s%c",
+							row[fld], ZBX_DM_DELIMITER);
+				}
+			}
+			else
+			{ /* ZBX_TYPE_CHAR ZBX_TYPE_BLOB ZBX_TYPE_TEXT */
+				len = (int)strlen(row[fld]);
 				len = zbx_binary2hex((u_char *)row[fld], len, &tmp, &tmp_allocated);
 				zbx_snprintf_alloc(&data, &data_allocated, &data_offset, len + 8, "%s%c",
-					tmp, ZBX_DM_DELIMITER);
+						tmp, ZBX_DM_DELIMITER);
 			}
 			fld++;
 		}
