@@ -52,7 +52,7 @@ ZBX_COLLECTOR_DATA	*collector = NULL;
  *                                                                            *
  * Function: zbx_get_cpu_num                                                  *
  *                                                                            *
- * Purpose: returns the number of processors which are currently inline       *
+ * Purpose: returns the number of processors which are currently online       *
  *          (i.e., available).                                                *
  *                                                                            *
  * Return value: number of CPUs                                               *
@@ -152,7 +152,6 @@ return_one:
  * Comments: Linux version allocates memory as shared.                        *
  *                                                                            *
  ******************************************************************************/
-
 void	init_collector_data(void)
 {
 	int	cpu_count;
@@ -243,7 +242,6 @@ lbl_create:
  * Comments: Linux version allocates memory as shared.                        *
  *                                                                            *
  ******************************************************************************/
-
 void	free_collector_data(void)
 {
 
@@ -275,7 +273,6 @@ void	free_collector_data(void)
 	collector = NULL;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: collector_thread                                                 *
@@ -291,19 +288,15 @@ void	free_collector_data(void)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-
 ZBX_THREAD_ENTRY(collector_thread, args)
 {
-	double	sec;
-
-	zabbix_log( LOG_LEVEL_INFORMATION, "zabbix_agentd collector started");
+	zabbix_log(LOG_LEVEL_INFORMATION, "zabbix_agentd collector started");
 
 	if (0 != init_cpu_collector(&(collector->cpus)))
 		close_cpu_collector(&(collector->cpus));
 
-	while(ZBX_IS_RUNNING())
+	while (ZBX_IS_RUNNING())
 	{
-		sec = zbx_time();
 		if (CPU_COLLECTOR_STARTED(collector))
 			collect_cpustat(&(collector->cpus));
 #ifdef _WINDOWS
@@ -315,7 +308,6 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 #ifdef _AIX
 		collect_vmstat_data(&collector->vmstat);
 #endif
-
 		zbx_sleep(1);
 	}
 
@@ -325,7 +317,7 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 	if (CPU_COLLECTOR_STARTED(collector))
 		close_cpu_collector(&(collector->cpus));
 
-	zabbix_log( LOG_LEVEL_INFORMATION, "zabbix_agentd collector stopped");
+	zabbix_log(LOG_LEVEL_INFORMATION, "zabbix_agentd collector stopped");
 
 	ZBX_DO_EXIT();
 

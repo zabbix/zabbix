@@ -47,21 +47,28 @@
  */
 ssize_t smtp_readln(int fd, char *buf, int buf_len)
 {
-	ssize_t	nbytes, read_bytes = 0;
+	ssize_t	nbytes, read_bytes;
 
-	buf_len --;	/* '\0' */
+	buf_len--;	/* '\0' */
+
 	do
 	{
-		if (-1 == (nbytes = read(fd, &((char*)buf)[read_bytes], 1)))
-			return nbytes;				/* Error */
+		read_bytes = 0;
 
-		read_bytes += nbytes;
+		do
+		{
+			if (-1 == (nbytes = read(fd, &((char*)buf)[read_bytes], 1)))
+				return nbytes;				/* Error */
+
+			read_bytes += nbytes;
+		}
+		while (nbytes > 0 &&					/* End Of File (socket closed) */
+				read_bytes < buf_len &&			/* End of Buffer */
+				((char*)buf)[read_bytes - 1] != '\n' );	/* new line */
+
+		buf[read_bytes] = '\0';
 	}
-	while (nbytes > 0 &&					/* End Of File (socket closed) */
-			read_bytes < buf_len &&			/* End of Buffer */
-			((char*)buf)[read_bytes - 1] != '\n' );	/* new line */
-
-	buf[read_bytes] = '\0';
+	while (read_bytes >= 4 && isdigit(buf[0]) && isdigit(buf[1]) && isdigit(buf[2]) && buf[3] == '-');
 
 	return read_bytes;
 }
@@ -220,12 +227,16 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	/* e-mail header and content format is based on MIME standard since UTF-8 is used both in mailsubject and mailbody */
 	/* =?charset?encoding?encoded text?= format must be used for subject field */
 	/* e-mails are sent in 'SMTP/MIME e-mail' format, this should be documented */
-	cp = zbx_dsprintf(cp, "From:<%s>\r\nTo:<%s>\r\nDate: %s\r\n"
+	cp = zbx_dsprintf(cp,
+			"From: <%s>\r\n"
+			"To: <%s>\r\n"
+			"Date: %s\r\n"
 			"Subject: %s\r\n"
 			"MIME-Version: 1.0\r\n"
 			"Content-Type: text/plain; charset=\"UTF-8\"\r\n"
 			"Content-Transfer-Encoding: base64\r\n"
-			"\r\n%s",
+			"\r\n"
+			"%s",
 			smtp_email, mailto, str_time, mailsubject, mailbody);
 	e=write(s.socket,cp,strlen(cp));
 	zbx_free(cp);

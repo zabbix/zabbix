@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-	define('ZABBIX_VERSION','1.8.3rc4');
+	define('ZABBIX_VERSION','1.8.4rc1');
 	define('ZABBIX_API_VERSION','1.3');
 /* USER DEFINES */
 
@@ -45,7 +45,12 @@
 
 	define('ZBX_MAX_IMAGE_SIZE',			1024*1024);
 
+	define('ZBX_UNITS_ROUNDOFF_THRESHOLD', 0.01);
+	define('ZBX_UNITS_ROUNDOFF_UPPER_LIMIT', 2);
+	define('ZBX_UNITS_ROUNDOFF_LOWER_LIMIT', 6);
+
 /* END OF USERS DEFINES */
+	define('ZAPCAT_COMPATIBILITY', false);
 
 	define('ZBX_MAP_HIGHLIGHT', 0x1);
 	define('ZBX_MAP_EXPANDPROBLEM', 0x2);
@@ -83,6 +88,7 @@
 	define('PAGE_TYPE_HTML_BLOCK',		5);	// simple block of html (as text)
 	define('PAGE_TYPE_JSON',			6);	// simple JSON
 	define('PAGE_TYPE_JSON_RPC',		7);	// api call
+	define('PAGE_TYPE_TEXT_FILE',		8);	// api call
 
 
 	define('ZBX_SESSION_ACTIVE',		0);
@@ -169,6 +175,8 @@
 	define('AUDIT_RESOURCE_PROXY',			26);
 	define('AUDIT_RESOURCE_MAINTENANCE',	27);
 	define('AUDIT_RESOURCE_REGEXP',			28);
+	define('AUDIT_RESOURCE_MACRO',			29);
+	define('AUDIT_RESOURCE_TEMPLATE',			30);
 
 	define('CONDITION_TYPE_HOST_GROUP',			0);
 	define('CONDITION_TYPE_HOST',				1);
@@ -350,7 +358,8 @@
 	define('MEDIA_TYPE_SMS',		2);
 	define('MEDIA_TYPE_JABBER',		3);
 
-	define('ACTION_DEFAULT_MSG', '{TRIGGER.NAME}: {STATUS}');
+	define('ACTION_DEFAULT_SUBJ',		'{TRIGGER.NAME}: {TRIGGER.STATUS}');
+	define('ACTION_DEFAULT_MSG',		"{TRIGGER.NAME}: {TRIGGER.STATUS}\nLast value: {ITEM.LASTVALUE}\n\n{TRIGGER.URL}");
 
 	define('ACTION_STATUS_ENABLED',		0);
 	define('ACTION_STATUS_DISABLED',	1);

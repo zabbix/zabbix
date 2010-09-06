@@ -113,8 +113,8 @@
 #define OFF	0
 
 #define	APPLICATION_NAME	"Zabbix Agent"
-#define	ZABBIX_REVDATE		"10 August 2010"
-#define	ZABBIX_VERSION		"1.8.3rc4"
+#define	ZABBIX_REVDATE		"16 August 2010"
+#define	ZABBIX_VERSION		"1.8.4rc1"
 #define	ZABBIX_REVISION		"{ZABBIX_REVISION}"
 
 #if defined(_WINDOWS)
@@ -687,7 +687,7 @@ void    *zbx_realloc2(char *filename, int line, void *src, size_t size);
 
 #define THIS_SHOULD_NEVER_HAPPEN	zbx_error("ERROR [file:%s,line:%d] "				\
 							"Something impossible has just happened.",	\
-							__FILE__, __LINE__);
+							__FILE__, __LINE__)
 
 #define MIN_ZABBIX_PORT 1024u
 #define MAX_ZABBIX_PORT 65535u
@@ -738,20 +738,20 @@ ZBX_TASK_EX
 
 char	*string_replace(char *str, char *sub_str1, char *sub_str2);
 
-int	is_double_prefix(char *str);
-int	is_double(char *c);
+int	is_double_prefix(const char *str);
+int	is_double(const char *c);
 int	is_uint_prefix(const char *c);
-int	is_uint(char *c);
-int	is_uint64(register char *str, zbx_uint64_t *value);
-int	is_uoct(char *str);
-int	is_uhex(char *str);
+int	is_uint(const char *c);
+int	is_uint64(const char *str, zbx_uint64_t *value);
+int	is_uoct(const char *str);
+int	is_uhex(const char *str);
 int	is_hex_string(const char *str);
 int	is_ascii_string(const char *str);
 void	zbx_rtrim(char *str, const char *charlist);
 void	zbx_ltrim(register char *str, const char *charlist);
 void	zbx_remove_chars(register char *str, const char *charlist);
 #define zbx_remove_spaces(str)		zbx_remove_chars(str, " ");
-#define zbx_remove_whitespace(str)	zbx_remove_chars(str, " \t\n\r");
+#define zbx_remove_whitespace(str)	zbx_remove_chars(str, " \t\r\n");
 void	compress_signs(char *str);
 void	ltrim_spaces(char *c);
 void	rtrim_spaces(char *c);

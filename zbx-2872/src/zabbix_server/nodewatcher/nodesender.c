@@ -29,7 +29,6 @@
 #include "nodecomms.h"
 #include "../trapper/nodesync.h"
 
-
 /******************************************************************************
  *                                                                            *
  * Function: calculate_checksums                                              *
@@ -177,9 +176,9 @@ int calculate_checksums(int nodeid, const char *tablename, const zbx_uint64_t id
 
 /******************************************************************************
  *                                                                            *
- * Function: send_config_data                                                 *
+ * Function: get_config_data                                                  *
  *                                                                            *
- * Purpose: send configuration changes to required node                       *
+ * Purpose: obtain configuration changes to required node                     *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
@@ -222,7 +221,7 @@ char	*get_config_data(int nodeid, int dest_nodetype)
 		"from node_cksum curr, node_cksum prev "
 		"where curr.nodeid=%d and prev.nodeid=curr.nodeid and "
 		"curr.tablename=prev.tablename and curr.recordid=prev.recordid and "
-		"curr.cksumtype=%d and prev.cksumtype=%d "
+		"curr.cksumtype=%d and prev.cksumtype=%d and curr.cksum<>prev.cksum"
 		"union all "
 	/* Find new records */
 		"select curr.tablename,curr.recordid,prev.cksum,curr.cksum,curr.sync "
@@ -459,7 +458,7 @@ int update_checksums(int nodeid, int synked_nodetype, int synked, const char *ta
 		"from node_cksum curr, node_cksum prev "
 		"where curr.nodeid=%d and prev.nodeid=curr.nodeid and "
 		"curr.tablename=prev.tablename and curr.recordid=prev.recordid and "
-		"curr.cksumtype=%d and prev.cksumtype=%d%s "
+		"curr.cksumtype=%d and prev.cksumtype=%d and curr.cksum<>prev.cksum%s"
 		"union all "
 	/* Find new records */
 		"select curr.tablename,curr.recordid,prev.cksum,curr.cksum,NULL "
@@ -645,7 +644,7 @@ void node_sync_unlock(int nodeid)
  *                                                                            *
  * Function: process_nodes                                                    *
  *                                                                            *
- * Purpose: calculates checkssum of config data                               *
+ * Purpose: calculates checksums of config data                               *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
@@ -653,7 +652,7 @@ void node_sync_unlock(int nodeid)
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
- * Comments: never returns                                                    *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void process_nodes()

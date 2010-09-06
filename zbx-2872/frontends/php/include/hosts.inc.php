@@ -19,57 +19,6 @@
 **/
 ?>
 <?php
-// HOST GROUP functions
-	function update_host_groups_by_groupid($groupid,$hosts=array()){
-		$options = array(
-				'groupids'=>$groupid,
-				'editable'=>1,
-				'preservekeys' => 1
-			);
-		$grp_hosts = CHost::get($options);
-		$grp_hostids = zbx_objectValues($grp_hosts, 'hostid');
-
-// unlinked hosts
-		$missed_hostids = array_diff($grp_hostids, $hosts);
-// hosts that allowed to be unlinked
-		$unlinkable_hostids = getUnlinkableHosts($groupid);
-
-// hosts that have been unlinked improperly
-		$err_hostids = array_diff($missed_hostids, $unlinkable_hostids);
-
-		foreach($err_hostids as $num => $hostid){
-			$host = get_host_by_hostid($hostid);
-			error(S_HOST.SPACE.'"'.$host['host'].'"'.SPACE.S_CANNOT_EXIST_WITHOUT_GROUP);
-
-			return false;
-		}
-		$result = DBexecute('DELETE FROM hosts_groups WHERE groupid='.$groupid);
-		$hosts = zbx_toObject($hosts, 'hostid');
-
-		$options = array(
-				'hosts' => $hosts,
-				'groups' => array('groupid' => $groupid)
-			);
-		$result = CHostGroup::createHosts();
-
-	return $result;
-	}
-
-/*
-	function update_host_groups($hostid,$groups=array()){
-		if(empty($groups)){
-			$host = get_host_by_hostid($hostid);
-			error('Host "'.$host['host'].'" can not exist without group');
-			return false;
-		}
-		DBexecute('DELETE FROM hosts_groups WHERE hostid='.$hostid);
-		foreach($groups as $groupid){
-			$result = CHostGroup::createHosts(array('hosts' => array($hostid), 'groups' => $groupid));
-		}
-	return $result;
-	}
- */
-
 	function setHostGroupInternal($groupids, $internal=ZBX_NOT_INTERNAL_GROUP){
 		zbx_value2array($groupids);
 
@@ -299,21 +248,20 @@
 		DBexecute('DELETE FROM applications WHERE '.DBcondition('hostid',$hostids));
 
 // delete host
-		foreach ($hostids as $id) {	/* The section should be improved */
+		foreach($hostids as $id) {	/* The section should be improved */
 			$host_old = get_host_by_hostid($id);
 			$result = DBexecute('DELETE FROM hosts WHERE hostid='.$id);
 			if ($result) {
-				info(S_HOST_HAS_BEEN_DELETED_MSG_PART1.SPACE.$host_old['host'].SPACE.S_HOST_HAS_BEEN_DELETED_MSG_PART2);
-				/*SDI(
-					'AUDIT_ACTION_DELETE '.AUDIT_ACTION_DELETE.' / '.
-					'AUDIT_RESOURCE_HOST '.AUDIT_RESOURCE_HOST.' / '.
-					'$id '.$id.' / '.
-					'$host_old[\'host\'] '.$host_old['host'].' / '.
-					'hosts / '.
-					'NULL / NULL'
-					);*/
-				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $id, $host_old['host'], 'hosts', NULL, NULL);
-			}else
+				if($host_old['status'] == HOST_STATUS_TEMPLATE){
+					info(S_TEMPLATE.SPACE.$host_old['host'].SPACE.S_HOST_HAS_BEEN_DELETED_MSG_PART2);
+					add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TEMPLATE, $id, $host_old['host'], 'hosts', NULL, NULL);
+				}
+				else{
+					info(S_HOST_HAS_BEEN_DELETED_MSG_PART1.SPACE.$host_old['host'].SPACE.S_HOST_HAS_BEEN_DELETED_MSG_PART2);
+					add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $id, $host_old['host'], 'hosts', NULL, NULL);
+				}
+			}
+			else
 				break;
 		}
 

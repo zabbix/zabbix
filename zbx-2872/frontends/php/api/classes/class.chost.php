@@ -116,6 +116,7 @@ class CHost extends CZBXAPI{
 
 // filter
 			'filter'					=> null,
+			'search'					=> null,
 			'pattern'					=> null,
 			'startPattern'				=> null,
 			'extendPattern'				=> null,
@@ -169,9 +170,6 @@ class CHost extends CZBXAPI{
 			}
 			if(!is_null($options['select_macros'])){
 				$options['select_macros'] = API_OUTPUT_EXTEND;
-			}
-			if(!is_null($options['select_profile'])){
-				$options['select_profile'] = API_OUTPUT_EXTEND;
 			}
 		}
 
@@ -493,6 +491,18 @@ class CHost extends CZBXAPI{
 			}
 		}
 
+// search
+		if(!is_null($options['search'])){
+			if(isset($options['search']['host']) && !is_null($options['search']['host'])){
+				$sql_parts['where']['host'] = ' UPPER(h.host) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['search']['host']).'%');
+			}
+			if(isset($options['search']['ip']) && !is_null($options['search']['ip'])){
+				$sql_parts['where']['ip'] = ' h.ip LIKE '.zbx_dbstr('%'.$options['search']['ip'].'%');
+			}
+			if(isset($options['search']['dns']) && !is_null($options['search']['dns'])){
+				$sql_parts['where']['dns'] = ' h.dns LIKE '.zbx_dbstr('%'.$options['search']['dns'].'%');
+			}
+		}
 
 // filter
 		if(!is_null($options['filter'])){
@@ -502,22 +512,22 @@ class CHost extends CZBXAPI{
 				zbx_value2array($options['filter']['hostid']);
 				$sql_parts['where']['hostid'] = DBcondition('h.hostid', $options['filter']['hostid']);
 			}
-
 			if(isset($options['filter']['templateid']) && !is_null($options['filter']['templateid'])){
 				zbx_value2array($options['filter']['templateid']);
 				$sql_parts['where']['templateid'] = DBcondition('h.templateid', $options['filter']['templateid']);
 			}
-
 			if(isset($options['filter']['host']) && !is_null($options['filter']['host'])){
 				zbx_value2array($options['filter']['host']);
 				$sql_parts['where']['host'] = DBcondition('h.host', $options['filter']['host'], false, true);
 			}
-
 			if(isset($options['filter']['ip']) && !is_null($options['filter']['ip'])){
 				zbx_value2array($options['filter']['ip']);
 				$sql_parts['where']['ip'] = DBcondition('h.ip', $options['filter']['ip'], false, true);
 			}
-
+			if(isset($options['filter']['port']) && !is_null($options['filter']['port'])){
+				zbx_value2array($options['filter']['port']);
+				$sql_parts['where']['port'] = DBcondition('h.port', $options['filter']['port'], false, true);
+			}
 			if(isset($options['filter']['maintenance_status']) && !is_null($options['filter']['maintenance_status'])){
 				zbx_value2array($options['filter']['maintenance_status']);
 				$sql_parts['where']['maintenance_status'] = DBcondition('h.maintenance_status', $options['filter']['maintenance_status']);
@@ -700,7 +710,7 @@ class CHost extends CZBXAPI{
 
 						$result[$host['hostid']]['maintenances'][] = array('maintenanceid' => $host['maintenanceid']);
 //						unset($host['maintenanceid']);
-					}				
+					}
 //---
 
 					$result[$host['hostid']] += $host;
@@ -735,7 +745,7 @@ Copt::memoryPick();
 		}
 
 // Adding Profiles
-		if(!is_null($options['select_profile']) && str_in_array($options['select_profile'], $subselects_allowed_outputs)){
+		if(!is_null($options['select_profile'])){
 			$sql = 'SELECT hp.* '.
 				' FROM hosts_profiles hp '.
 				' WHERE '.DBcondition('hp.hostid', $hostids);
@@ -1546,7 +1556,10 @@ Copt::memoryPick();
 
 // UPDATE MACROS {{{
 			if(isset($data['macros']) && !is_null($data['macros'])){
-				$host_macros = CUserMacro::get(array('hostids' => $hostids, 'output' => API_OUTPUT_EXTEND,));
+				$host_macros = CUserMacro::get(array(
+					'hostids' => $hostids,
+					'output' => API_OUTPUT_EXTEND,
+				));
 
 				$macros_to_del = array();
 				foreach($host_macros as $hmacro){

@@ -78,6 +78,7 @@ class CTrigger extends CZBXAPI{
 			'applicationids'		=> null,
 			'functions'				=> null,
 			'monitored' 			=> null,
+			'active' 				=> null,
 			'templated'				=> null,
 			'maintenance'			=> null,
 			'inherited'				=> null,
@@ -315,6 +316,24 @@ class CTrigger extends CZBXAPI{
 										' ii.status<>'.ITEM_STATUS_ACTIVE.
 										' OR hh.status<>'.HOST_STATUS_MONITORED.
 									' )'.
+						' )'.
+				' )';
+			$sql_parts['where']['status'] = 't.status='.TRIGGER_STATUS_ENABLED;
+		}
+
+// active
+		if(!is_null($options['active'])){
+			$sql_parts['where']['active'] = ''.
+				' NOT EXISTS ('.
+					' SELECT ff.functionid'.
+					' FROM functions ff'.
+					' WHERE ff.triggerid=t.triggerid'.
+						' AND EXISTS ('.
+							' SELECT ii.itemid'.
+							' FROM items ii, hosts hh'.
+							' WHERE ff.itemid=ii.itemid'.
+								' AND hh.hostid=ii.hostid'.
+								' AND  hh.status<>'.HOST_STATUS_MONITORED.
 						' )'.
 				' )';
 			$sql_parts['where']['status'] = 't.status='.TRIGGER_STATUS_ENABLED;
@@ -736,7 +755,7 @@ Copt::memoryPick();
 
 			$obj_params = array(
 				'triggerids' => $depids,
-				'output' => API_OUTPUT_EXTEND,
+				'output' => $options['select_dependencies'],
 				'expandData' => 1,
 				'preservekeys' => 1
 			);
@@ -788,6 +807,7 @@ Copt::memoryPick();
 				foreach($hosts as $hostid => $host){
 					unset($hosts[$hostid]['triggers']);
 
+					$count = array();
 					foreach($host['triggers'] as $tnum => $trigger){
 						if(!is_null($options['limitSelects'])){
 							if(!isset($count[$trigger['triggerid']])) $count[$trigger['triggerid']] = 0;
@@ -855,6 +875,7 @@ Copt::memoryPick();
 			}
 		}
 
+// expandDescription
 		if(!is_null($options['expandDescription'])){
 // Function compare values {{{
 			foreach($result as $tnum => $trigger){
@@ -869,7 +890,6 @@ Copt::memoryPick();
 // }}}
 
 			$functionids = array();
-
 			$triggers_to_expand_hosts = array();
 			$triggers_to_expand_items = array();
 			$triggers_to_expand_items2 = array();
@@ -954,6 +974,17 @@ Copt::memoryPick();
 
 						$result[$func['triggerid']]['description'] = str_replace('{ITEM.VALUE'.$fnum.'}', $func['lastvalue'], $result[$func['triggerid']]['description']);
 					}
+				}
+			}
+
+			foreach($result as $tnum => $trigger){
+				if($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $trigger['description'], $arr)){
+					$macros = CUserMacro::getMacros($arr[1], array('triggerid' => $trigger['triggerid']));
+
+					$search = array_keys($macros);
+					$values = array_values($macros);
+
+					$result[$tnum]['description'] = str_replace($search, $values, $trigger['description']);
 				}
 			}
 		}

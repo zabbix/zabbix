@@ -44,8 +44,9 @@ const char	*help_message[] = {
 	"  -o --value <Key value>               Specify value of the key",
 	"",
 	"  -i --input-file <Input file>         Load values from input file. Specify - for standard input",
-	"                                       Each line of file contains blanks delimited: <hostname> <key> <value>",
-	"  -T --with-timestamps                 Each line of file contains blanks delimited: <hostname> <key> <timestamp> <value>",
+	"                                       Each line of file contains whitespace delimited: <hostname> <key> <value>",
+	"                                       Specify - in <hostname> to use hostname from configuration file or --host argument",
+	"  -T --with-timestamps                 Each line of file contains whitespace delimited: <hostname> <key> <timestamp> <value>",
 	"                                       This can be used with --input-file option",
 	"  -r --real-time                       Send metrics one by one as soon as they are received",
 	"                                       This can be used when reading from standard input",
@@ -71,8 +72,9 @@ const char	*help_message[] = {
 	"  -o <Key value>               Specify value of the key",
 	"",
 	"  -i <Input file>              Load values from input file. Specify - for standard input",
-	"                               Each line of file contains blanks delimited: <hostname> <key> <value>",
-	"  -T                           Each line of file contains blanks delimited: <hostname> <key> <timestamp> <value>",
+	"                               Each line of file contains whitespace delimited: <hostname> <key> <value>",
+	"                               Specify - in <hostname> to use hostname from configuration file or --host argument",
+	"  -T                           Each line of file contains whitespace delimited: <hostname> <key> <timestamp> <value>",
 	"                               This can be used with -i option",
 	"  -r                           Send metrics one by one as soon as they are received",
 	"                               This can be used when reading from standard input",
@@ -378,9 +380,10 @@ static zbx_task_t parse_commandline(int argc, char **argv)
 	return task;
 }
 
+#define VALUES_MAX	250
+
 int main(int argc, char **argv)
 {
-#define VALUES_MAX	250
 	FILE	*in;
 
 	char	in_line[MAX_BUF_LEN],
@@ -393,7 +396,11 @@ int main(int argc, char **argv)
 		total_count = 0,
 		succeed_count = 0,
 		buffer_count = 0,
+		read_more = 0,
 		ret = SUCCEED;
+
+	double	last_send = 0;
+
 	const char	*p;
 
 	ZBX_THREAD_SENDVAL_ARGS sentdval_args;
@@ -446,7 +453,7 @@ int main(int argc, char **argv)
 			goto exit;
 		}
 
-		while (NULL != fgets(in_line, sizeof(in_line), in) && SUCCEED == ret)	/* <hostname> <key> <value> */
+		while (NULL != fgets(in_line, sizeof(in_line), in) && SUCCEED == ret)	/* <hostname> <key> [<timestamp>] <value> */
 		{
 			total_count++; /* also used as inputline */
 
@@ -458,6 +465,18 @@ int main(int argc, char **argv)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "[line %d] 'Hostname' required", total_count);
 				continue;
+			}
+
+			if (0 == strcmp(hostname, "-"))
+			{
+			       if (NULL == ZABBIX_HOSTNAME)
+			       {
+				       zabbix_log(LOG_LEVEL_WARNING, "[line %d] '-' encountered as 'Hostname', "
+							"but no default hostname was specified", total_count);
+				       continue;
+			       }
+			       else
+				       zbx_strlcpy(hostname, ZABBIX_HOSTNAME, sizeof(hostname));
 			}
 
 			if ('\0' == *p || NULL == (p = get_string(p, key, sizeof(key))) || '\0' == *key)
@@ -496,13 +515,42 @@ int main(int argc, char **argv)
 			succeed_count++;
 			buffer_count++;
 
-			if (VALUES_MAX == buffer_count || (stdin == in && 1 == REAL_TIME))
+			if (stdin == in && 1 == REAL_TIME)
+			{
+				/* if there is nothing on standard input after 1/5 seconds, we send what we have */
+				/* otherwise, we keep reading, but we should send data at least once per second */
+
+				struct timeval	tv;
+				fd_set		read_set;
+
+				tv.tv_sec = 0;
+				tv.tv_usec = 200000;
+
+				FD_ZERO(&read_set);
+				FD_SET(0, &read_set);	/* stdin is file descriptor 0 */
+
+				if (-1 == (read_more = select(1, &read_set, NULL, NULL, &tv)))
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "select() failed with errno:%d error:[%s]",
+							errno, strerror(errno));
+				}
+				else if (1 <= read_more)
+				{
+					if (0 == last_send)
+						last_send = zbx_time();
+					else if (zbx_time() - last_send >= 1)
+						read_more = 0;
+				}
+			}
+
+			if (VALUES_MAX == buffer_count || (stdin == in && 1 == REAL_TIME && 0 >= read_more))
 			{
 				zbx_json_close(&sentdval_args.json);
 
 				if (1 == WITH_TIMESTAMPS)
 					zbx_json_adduint64(&sentdval_args.json, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
 
+				last_send = zbx_time();
 
 				ret = zbx_thread_wait(zbx_thread_start(send_value, &sentdval_args));
 
@@ -519,7 +567,6 @@ int main(int argc, char **argv)
 		{
 			if (1 == WITH_TIMESTAMPS)
 				zbx_json_adduint64(&sentdval_args.json, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
-
 
 			ret = zbx_thread_wait(zbx_thread_start(send_value, &sentdval_args));
 		}
