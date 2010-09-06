@@ -88,6 +88,7 @@
 	define('PAGE_TYPE_HTML_BLOCK',		5);	// simple block of html (as text)
 	define('PAGE_TYPE_JSON',			6);	// simple JSON
 	define('PAGE_TYPE_JSON_RPC',		7);	// api call
+	define('PAGE_TYPE_TEXT_FILE',		8);	// api call
 
 
 	define('ZBX_SESSION_ACTIVE',		0);
@@ -357,7 +358,8 @@
 	define('MEDIA_TYPE_SMS',		2);
 	define('MEDIA_TYPE_JABBER',		3);
 
-	define('ACTION_DEFAULT_MSG', '{TRIGGER.NAME}: {STATUS}');
+	define('ACTION_DEFAULT_SUBJ',		'{TRIGGER.NAME}: {TRIGGER.STATUS}');
+	define('ACTION_DEFAULT_MSG',		"{TRIGGER.NAME}: {TRIGGER.STATUS}\nLast value: {ITEM.LASTVALUE}\n\n{TRIGGER.URL}");
 
 	define('ACTION_STATUS_ENABLED',		0);
 	define('ACTION_STATUS_DISABLED',	1);

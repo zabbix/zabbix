@@ -120,10 +120,20 @@ include_once('include/page_header.php');
 // other
 		'form'=>				array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 		'form_refresh'=>		array(T_ZBX_STR, O_OPT, null,	null,	null),
-
 // Import
 		'rules' =>				array(T_ZBX_STR, O_OPT,	null,			DB_ID,	null),
-		'import' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null)
+		'import' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+// Filter
+		'filter_set' =>			array(T_ZBX_STR, O_OPT,	P_ACT,	null,	null),
+
+		'filter_host'=>		array(T_ZBX_STR, O_OPT,  null,	null,	null),
+		'filter_ip'=>		array(T_ZBX_STR, O_OPT,  null,	null,	null),
+		'filter_dns'=>		array(T_ZBX_STR, O_OPT,  null,	null,	null),
+		'filter_port'=>		array(T_ZBX_STR, O_OPT,  null,	null,	null),
+//ajax
+		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("filter"=={favobj})')
 	);
 
 // OUTER DATA
@@ -144,6 +154,19 @@ include_once('include/page_header.php');
 	}
 ?>
 <?php
+	/* AJAX */
+	if(isset($_REQUEST['favobj'])){
+		if('filter' == $_REQUEST['favobj']){
+			CProfile::update('web.hosts.filter.state', $_REQUEST['state'], PROFILE_TYPE_INT);
+		}
+	}
+
+	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		include_once('include/page_footer.php');
+		exit();
+	}
+//--------
+
 	$hostids = get_request('hosts', array());
 
 	if($EXPORT_DATA){
@@ -289,6 +312,25 @@ include_once('include/page_header.php');
 		$result &= zbxXML::parseMain($rules);
 		$result = DBend($result);
 		show_messages($result, S_IMPORTED.SPACE.S_SUCCESSEFULLY_SMALL, S_IMPORT.SPACE.S_FAILED_SMALL);
+	}
+
+/* FILTER */
+	if(isset($_REQUEST['filter_set'])){
+		$_REQUEST['filter_ip'] = get_request('filter_ip');
+		$_REQUEST['filter_dns'] = get_request('filter_dns');
+		$_REQUEST['filter_host'] = get_request('filter_host');
+		$_REQUEST['filter_port'] = get_request('filter_port');
+
+		CProfile::update('web.hosts.filter_ip', $_REQUEST['filter_ip'], PROFILE_TYPE_STR);
+		CProfile::update('web.hosts.filter_dns', $_REQUEST['filter_dns'], PROFILE_TYPE_STR);
+		CProfile::update('web.hosts.filter_host', $_REQUEST['filter_host'], PROFILE_TYPE_STR);
+		CProfile::update('web.hosts.filter_port', $_REQUEST['filter_port'], PROFILE_TYPE_STR);
+	}
+	else{
+		$_REQUEST['filter_ip'] = CProfile::get('web.hosts.filter_ip');
+		$_REQUEST['filter_dns'] = CProfile::get('web.hosts.filter_dns');
+		$_REQUEST['filter_host'] = CProfile::get('web.hosts.filter_host');
+		$_REQUEST['filter_port'] = CProfile::get('web.hosts.filter_port');
 	}
 ?>
 <?php
@@ -686,6 +728,33 @@ include_once('include/page_header.php');
 		$hosts_wdgt->addHeader(S_HOSTS_BIG, $frmForm);
 		$hosts_wdgt->addHeader($numrows);
 
+// HOSTS FILTER {{{
+		$filter_table = new CTable('', 'filter_config');
+		$filter_table->addRow(array(
+			array(array(bold(S_HOST), SPACE.S_LIKE_SMALL.': '), new CTextBox('filter_host', $_REQUEST['filter_host'], 20)),
+			array(array(bold(S_DNS), SPACE.S_LIKE_SMALL.': '), new CTextBox('filter_dns', $_REQUEST['filter_dns'], 20)),
+			array(array(bold(S_IP), SPACE.S_LIKE_SMALL.': '), new CTextBox('filter_ip', $_REQUEST['filter_ip'], 20)),
+			array(bold(S_PORT.': '), new CTextBox('filter_port', $_REQUEST['filter_port'], 20))
+		));
+
+		$reset = new CSpan( S_RESET,'biglink');
+		$reset->onClick("javascript: clearAllForm('zbx_filter');");
+		$filter = new CSpan(S_FILTER,'biglink');
+		$filter->onClick("javascript: create_var('zbx_filter', 'filter_set', '1', true);");
+
+		$footer_col = new CCol(array($filter, SPACE, SPACE, SPACE, $reset), 'center');
+		$footer_col->setColSpan(4);
+
+		$filter_table->addRow($footer_col);
+
+		$filter_form = new CForm(null, 'get');
+		$filter_form->setAttribute('name','zbx_filter');
+		$filter_form->setAttribute('id','zbx_filter');
+		$filter_form->addItem($filter_table);
+// }}} HOSTS FILTER
+		$hosts_wdgt->addFlicker($filter_form, CProfile::get('web.hosts.filter.state', 0));
+
+
 // table HOSTS
 		$form = new CForm();
 		$form->setName('hosts');
@@ -717,7 +786,15 @@ include_once('include/page_header.php');
 				'editable' => 1,
 				'sortfield' => $sortfield,
 				'sortorder' => $sortorder,
-				'limit' => ($config['search_limit']+1)
+				'limit' => ($config['search_limit']+1),
+				'search' => array(
+					'host' => (empty($_REQUEST['filter_host']) ? null : $_REQUEST['filter_host']),
+					'ip' => (empty($_REQUEST['filter_ip']) ? null : $_REQUEST['filter_ip']),
+					'dns' => (empty($_REQUEST['filter_dns']) ? null : $_REQUEST['filter_dns']),
+				),
+				'filter' => array(
+					'port' => (empty($_REQUEST['filter_port']) ? null : $_REQUEST['filter_port']),
+				)
 			);
 
 			if($pageFilter->groupid > 0) $options['groupids'] = $pageFilter->groupid;
@@ -738,7 +815,7 @@ include_once('include/page_header.php');
 			'select_triggers' => API_OUTPUT_COUNT,
 			'select_graphs' => API_OUTPUT_COUNT,
 			'select_applications' => API_OUTPUT_COUNT,
-			'nopermissions' => 1
+			'nopermissions' => 1,
 		);
 		$hosts = CHost::get($options);
 
