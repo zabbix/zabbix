@@ -1,0 +1,70 @@
+#! /bin/sh
+# Copyright (c) 07/2004 A.Tophofen, Germany
+#
+# init.d/zabbix_agentd
+#
+### BEGIN INIT INFO
+# Provides:       zabbix_server
+# Required-Start: $network $remote_fs $syslog
+# Required-Stop:
+# Default-Start:  3 
+# Default-Stop:
+# Description:    Starts Zabbix_Agentd
+### END INIT INFO
+
+. /etc/rc.status
+rc_reset
+NAME="Zabbix_Server"
+CONFIG_FILE="/etc/zabbix/zabbix_server.conf"
+
+if [ ! -f ${CONFIG_FILE} ]; then
+		echo -n "${NAME}configuration file ${CONFIG_FILE} does not exist. "
+		# Tell the user this has skipped
+		rc_status -s
+		exit 6
+fi
+
+ZABBIX_BIN="/home/zabbix/sbin/zabbix_server"
+ZABBIX_PID="/home/zabbix/lock/zabbix_server.pid"
+
+
+if [ ! -x ${ZABBIX_BIN} ] ; then
+	echo -n "${ZABBIX_BIN} not installed! "
+	# Tell the user this has skipped
+	rc_status -s
+	exit 5
+fi
+
+
+export PATH="/sbin:/usr/sbin:/bin:/usr/bin:/home/zabbix/bin"
+
+case "$1" in
+    start)
+	echo -n "Starting ${NAME} "
+	checkproc -p ${ZABBIX_PID} ${ZABBIX_BIN}
+	case $? in
+		0) echo -n "- Warning: ${NAME} already running! " ;;
+		1) echo -n "- Warning: ${ZABBIX_PID} exists! " ;;
+	esac
+	
+	startproc -p ${ZABBIX_PID} ${ZABBIX_BIN} -u zabbix
+	rc_status -v
+	;;
+    stop)
+	echo -n "Shutting down ${NAME}"
+	checkproc -p ${ZABBIX_PID} ${ZABBIX_BIN} || echo -n "- Warning: ${NAME} not running! "
+	killproc -p ${ZABBIX_PID} -TERM ${ZABBIX_BIN}
+	rc_status -v
+	;;
+    restart)
+	$0 stop
+	$0 start
+	rc_status
+	;;
+        *)
+	echo "Usage: $0 {start|stop|restart}"
+	exit 1
+	;;
+esac
+rc_exit
+
