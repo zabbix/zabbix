@@ -669,7 +669,7 @@ static int	check_discovery_condition(DB_EVENT *event, DB_CONDITION *condition)
 		{
 			result = DBselect(
 					"select ip"
-					" from dservices s"
+					" from dservices"
 					" where dserviceid=" ZBX_FS_UI64,
 					event->objectid);
 		}
