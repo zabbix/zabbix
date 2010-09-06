@@ -9,6 +9,7 @@ Changes for 1.9
 
 Changes for 1.8.4rc1
 
+ - [ZBX-2977] fixed removing unused records in node_cksum table; thanks to Łukasz Reszka (Sasha)
  - [ZBX-2946] fixed building from FreeBSD ports with libexecinfo installed; thanks to Dmitry Yakovlev (asaveljevs)
  - [ZBX-2957] changed mime type for downloadable locale file (Vedmak)
  - [ZBX-2493] fixed obsolete macro used by default; start using different subject and message for default action messages (Richlv)
