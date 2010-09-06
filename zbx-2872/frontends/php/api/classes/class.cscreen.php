@@ -71,9 +71,13 @@ class CScreen extends CZBXAPI{
 			'screenitemids'				=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
+
 // filter
 			'filter'					=> null,
-			'pattern'					=> '',
+			'pattern'					=> null,
+			'startPattern'				=> null,
+			'excludePattern'			=> null,
+
 // OutPut
 			'extendoutput'				=> null,
 			'output'					=> API_OUTPUT_REFER,
@@ -132,7 +136,14 @@ class CScreen extends CZBXAPI{
 
 // pattern
 		if(!zbx_empty($options['pattern'])){
-			$sql_parts['where'][] = ' UPPER(s.name) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
+			$exclude = is_null($options['excludePattern'])?'':' NOT ';
+
+			if(!is_null($options['startPattern'])){
+				$sql_parts['where']['name'] = ' UPPER(s.name) '.$exclude.' LIKE '.zbx_dbstr(zbx_strtoupper($options['pattern']).'%');
+			}
+			else{
+				$sql_parts['where']['name'] = ' UPPER(s.name) '.$exclude.' LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
+			}
 		}
 
 // filter
@@ -140,10 +151,13 @@ class CScreen extends CZBXAPI{
 			zbx_value2array($options['filter']);
 
 			if(isset($options['filter']['screenid'])){
-				$sql_parts['where']['screenid'] = 's.screenid='.$options['filter']['screenid'];
+				zbx_value2array($options['filter']['screenid']);
+				$sql_parts['where']['screenid'] = DBcondition('s.screenid', $options['filter']['screenid']);
 			}
+
 			if(isset($options['filter']['name'])){
-				$sql_parts['where']['name'] = 's.name='.zbx_dbstr($options['filter']['name']);
+				zbx_value2array($options['filter']['name']);
+				$sql_parts['where']['name'] = DBcondition('s.name', $options['filter']['name'], false, true);
 			}
 		}
 

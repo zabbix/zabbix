@@ -113,10 +113,11 @@ class CHost extends CZBXAPI{
 			'with_graphs'				=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
+
 // filter
 			'filter'					=> null,
-			'startPattern'				=> null,
 			'pattern'					=> null,
+			'startPattern'				=> null,
 			'extendPattern'				=> null,
 			'excludePattern'			=> null,
 
@@ -1072,6 +1073,7 @@ Copt::memoryPick();
 			'nopermissions' => 1,
 			'limit' => 1
 		);
+
 		if(isset($object['node']))
 			$options['nodeids'] = getNodeIdByNodeName($object['node']);
 		else if(isset($object['nodeids']))
@@ -1321,6 +1323,18 @@ Copt::memoryPick();
 
 		try{
 			self::BeginTransaction(__METHOD__);
+
+			$options = array(
+				'hostids' => zbx_objectValues($data['hosts'], 'hostid'),
+				'editable' => 1,
+				'preservekeys' => 1
+			);
+			$upd_hosts = self::get($options);
+			foreach($data['hosts'] as $hnum => $host){
+				if(!isset($upd_hosts[$host['hostid']])){
+					self::exception(ZBX_API_ERROR_PERMISSIONS, 'You do not have enough rights for operation');
+				}
+			}
 
 			if(isset($data['groups'])){
 				$options = array(
@@ -1692,6 +1706,18 @@ Copt::memoryPick();
 		try{
 			self::BeginTransaction(__METHOD__);
 
+			$options = array(
+				'hostids' => zbx_objectValues($data['hosts'], 'hostid'),
+				'editable' => 1,
+				'preservekeys' => 1
+			);
+			$upd_hosts = self::get($options);
+			foreach($data['hosts'] as $hnum => $host){
+				if(!isset($upd_hosts[$host['hostid']])){
+					self::exception(ZBX_API_ERROR_PERMISSIONS, 'You do not have enough rights for operation');
+				}
+			}
+			
 			if(isset($data['groups'])){
 				$options = array(
 					'hosts' => $data['hosts'],

@@ -77,8 +77,13 @@ class CUser extends CZBXAPI{
 			'mediatypeids'				=> null,
 			'users' 					=> null,
 			'type'						=> null,
+
 // filter
+			'filter'					=> null,
 			'pattern'					=> '',
+			'startPattern'				=> null,
+			'excludePattern'			=> null,
+
 // OutPut
 			'extendoutput'				=> null,
 			'output'					=> API_OUTPUT_REFER,
@@ -192,7 +197,29 @@ class CUser extends CZBXAPI{
 
 // pattern
 		if(!zbx_empty($options['pattern'])){
-			$sql_parts['where'][] = ' UPPER(u.alias) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
+			$exclude = is_null($options['excludePattern'])?'':' NOT ';
+
+			if(!is_null($options['startPattern'])){
+				$sql_parts['where']['alias'] = ' UPPER(u.alias) '.$exclude.' LIKE '.zbx_dbstr(zbx_strtoupper($options['pattern']).'%');
+			}
+			else{
+				$sql_parts['where']['alias'] = ' UPPER(u.alias) '.$exclude.' LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
+			}
+		}
+
+// filter
+		if(!is_null($options['filter'])){
+			zbx_value2array($options['filter']);
+
+			if(isset($options['filter']['userid'])){
+				zbx_value2array($options['filter']['userid']);
+				$sql_parts['where']['userid'] = DBcondition('u.userid', $options['filter']['userid']);
+			}
+
+			if(isset($options['filter']['alias'])){
+				zbx_value2array($options['filter']['alias']);
+				$sql_parts['where']['alias'] = DBcondition('u.alias', $options['filter']['alias'], false, true);
+			}
 		}
 
 // order
