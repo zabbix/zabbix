@@ -736,7 +736,11 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 			{
 				zbx_set_tcp_strerror("socket() for [[%s]:%s] failed with error %d: %s",
 						ip, port, zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
-				goto out;
+
+				if (EAFNOSUPPORT == errno)
+					continue;
+				else
+					goto out;
 			}
 
 #if !defined(_WINDOWS) && defined(HAVE_FCNTL_H) && !SOCK_CLOEXEC
