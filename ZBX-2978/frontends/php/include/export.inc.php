@@ -1335,38 +1335,30 @@ class zbxXML{
 								continue; // break if not update exist
 							}
 
-							if($current_graph){
-								if(!empty($graph_db['ymin_item_key'])){
-									$graph_db['ymin_item_key'] = explode(':', $graph_db['ymin_item_key']);
-									if(count($graph_db['ymin_item_key']) < 2){
-										error('Incorrect y min item for graph ['.$graph_db['name'].']');
-									}
-
-									$current_graph['host']	= array_shift($graph_db['ymin_item_key']);
-									$current_graph['ymin_item_key']	= implode(':', $graph_db['ymin_item_key']);
-
-									if(!$item = get_item_by_key($current_graph['ymin_item_key'], $current_graph['host'])){
-										error('Missed item ['.$current_graph['ymin_item_key'].'] for host ['.$current_graph['host'].']');
-									}
-
-									$current_graph['ymin_itemid'] = $item['itemid'];
+							if($graph_db['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE){
+								$item_data = explode(':', $graph_db['ymin_item_key'], 2);
+								if(count($item_data) < 2){
+									throw new APIException(1, 'Incorrect y min item for graph ['.$graph_db['name'].']');
+								}
+								
+								if(!$item = get_item_by_key($item_data[1], $item_data[0])){
+									throw new APIException(1, 'Missed item ['.$graph_db['ymin_item_key'].'] for host ['.$host_db['host'].']');
 								}
 
-								if(!empty($graph_db['ymax_item_key'])){
-									$graph_db['ymax_item_key'] = explode(':', $graph_db['ymax_item_key']);
-									if(count($graph_db['ymax_item_key']) < 2){
-										error('Incorrect y max item for graph ['.$graph_db['name'].']');
-									}
+								$graph_db['ymin_itemid'] = $item['itemid'];
+							}
 
-									$current_graph['host']	= array_shift($graph_db['ymax_item_key']);
-									$current_graph['ymax_item_key']	= implode(':', $graph_db['ymax_item_key']);
-
-									if(!$item = get_item_by_key($current_graph['ymax_item_key'], $current_graph['host'])){
-										error('Missed item ['.$current_graph['ymax_item_key'].'] for host ['.$current_graph['host'].']');
-									}
-
-									$current_graph['ymax_itemid'] = $item['itemid'];
+							if($graph_db['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE){
+								$item_data = explode(':', $graph_db['ymax_item_key'], 2);
+								if(count($item_data) < 2){
+									throw new APIException(1, 'Incorrect y max item for graph ['.$graph_db['name'].']');
 								}
+
+								if(!$item = get_item_by_key($item_data[1], $item_data[0])){
+									throw new APIException(1, 'Missed item ['.$graph_db['ymax_item_key'].'] for host ['.$host_db['host'].']');
+								}
+
+								$graph_db['ymax_itemid'] = $item['itemid'];
 							}
 
 
