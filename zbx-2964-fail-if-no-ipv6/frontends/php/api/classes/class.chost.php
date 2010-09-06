@@ -115,6 +115,7 @@ class CHost extends CZBXAPI{
 			'nopermissions'				=> null,
 // filter
 			'filter'					=> null,
+			'search'					=> null,
 			'startPattern'				=> null,
 			'pattern'					=> null,
 			'extendPattern'				=> null,
@@ -489,6 +490,18 @@ class CHost extends CZBXAPI{
 			}
 		}
 
+// search
+		if(!is_null($options['search'])){
+			if(isset($options['search']['host']) && !is_null($options['search']['host'])){
+				$sql_parts['where']['host'] = ' UPPER(h.host) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['search']['host']).'%');
+			}
+			if(isset($options['search']['ip']) && !is_null($options['search']['ip'])){
+				$sql_parts['where']['ip'] = ' h.ip LIKE '.zbx_dbstr('%'.$options['search']['ip'].'%');
+			}
+			if(isset($options['search']['dns']) && !is_null($options['search']['dns'])){
+				$sql_parts['where']['dns'] = ' h.dns LIKE '.zbx_dbstr('%'.$options['search']['dns'].'%');
+			}
+		}
 
 // filter
 		if(!is_null($options['filter'])){
@@ -498,22 +511,22 @@ class CHost extends CZBXAPI{
 				zbx_value2array($options['filter']['hostid']);
 				$sql_parts['where']['hostid'] = DBcondition('h.hostid', $options['filter']['hostid']);
 			}
-
 			if(isset($options['filter']['templateid']) && !is_null($options['filter']['templateid'])){
 				zbx_value2array($options['filter']['templateid']);
 				$sql_parts['where']['templateid'] = DBcondition('h.templateid', $options['filter']['templateid']);
 			}
-
 			if(isset($options['filter']['host']) && !is_null($options['filter']['host'])){
 				zbx_value2array($options['filter']['host']);
 				$sql_parts['where']['host'] = DBcondition('h.host', $options['filter']['host'], false, true);
 			}
-
 			if(isset($options['filter']['ip']) && !is_null($options['filter']['ip'])){
 				zbx_value2array($options['filter']['ip']);
 				$sql_parts['where']['ip'] = DBcondition('h.ip', $options['filter']['ip'], false, true);
 			}
-
+			if(isset($options['filter']['port']) && !is_null($options['filter']['port'])){
+				zbx_value2array($options['filter']['port']);
+				$sql_parts['where']['port'] = DBcondition('h.port', $options['filter']['port'], false, true);
+			}
 			if(isset($options['filter']['maintenance_status']) && !is_null($options['filter']['maintenance_status'])){
 				zbx_value2array($options['filter']['maintenance_status']);
 				$sql_parts['where']['maintenance_status'] = DBcondition('h.maintenance_status', $options['filter']['maintenance_status']);
