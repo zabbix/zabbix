@@ -736,8 +736,11 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 			{
 				zbx_set_tcp_strerror("socket() for [[%s]:%s] failed with error %d: %s",
 						ip, port, zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
-
-				if (EAFNOSUPPORT == errno)
+#ifdef _WINDOWS
+				if (WSAEAFNOSUPPORT == zbx_sock_last_error())
+#else
+				if (EAFNOSUPPORT == zbx_sock_last_error())
+#endif
 					continue;
 				else
 					goto out;
@@ -764,9 +767,9 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 						ip, port, zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
 				zbx_sock_close(s->sockets[s->num_socks]);
 #ifdef _WINDOWS
-				if (WSAEADDRINUSE == errno)
+				if (WSAEADDRINUSE == zbx_sock_last_error())
 #else
-				if (EADDRINUSE == errno)
+				if (EADDRINUSE == zbx_sock_last_error())
 #endif
 					continue;
 				else
