@@ -510,23 +510,25 @@ COpt::memoryPick();
  * @param array $applications[0,...]['applicationid']
  * @return boolean
  */
-	public static function delete($applications){
-		$applications = zbx_toArray($applications);
-		$applicationids = zbx_objectValues($applications, 'applicationid');
-
+	public static function delete($applicationids){
+		$applicationids = zbx_toArray($applicationids);
 		try{
 			self::BeginTransaction(__METHOD__);
 
 			$options = array(
 				'applicationids' => $applicationids,
 				'editable' => 1,
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1
 			);
 			$del_applications = self::get($options);
-			foreach($applications as $anum => $application){
-				if(!isset($del_applications[$application['applicationid']])){
+			
+			foreach($applicationids as $applicationid){
+				if(!isset($del_applications[$applicationid])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
+				}
+				if($del_applications[$applicationid]['templateid'] != 0){
+					self::exception(ZBX_API_ERROR_PERMISSIONS, 'Cannot delete templated application');
 				}
 			}
 
