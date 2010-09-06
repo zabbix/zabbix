@@ -9,7 +9,8 @@ Changes for 1.9
 
 Changes for 1.8.4rc1
 
- - [ZBX-2957] changed mime type for downloadable lacale file (Vedmak)
+ - [ZBX-2946] fixed building from FreeBSD ports with libexecinfo installed; thanks to Dmitry Yakovlev (asaveljevs)
+ - [ZBX-2957] changed mime type for downloadable locale file (Vedmak)
  - [ZBX-2493] fixed obsolete macro used by default; start using different subject and message for default action messages (Richlv)
  - [ZBX-2976] fixed server crash when performing zabbix[items_unsupported] under DebugLevel=4 (asaveljevs)
  - [ZBX-2950] added popup menus for map elements (Vedmak)
@@ -24,7 +25,7 @@ Changes for 1.8.4rc1
  - [ZBX-1908] fixed file and socket descriptors leaking to child processes; thanks to Dan Horak (asaveljevs)
  - [ZBX-2960] split agentd userparameters out using includable files, add more MySQL examples (Richlv)
  - [ZBXNEXT-458] user macros (e.g., {$MACRO}) can now be used in item and trigger descriptions (asaveljevs,Vedmak)
- - [ZBX-2959] fix trailing whitespace & missing trailing newline in downloaded translations (Richlv)
+ - [ZBX-2959] fixed trailing whitespace & missing trailing newline in downloaded translations (Richlv)
  - [ZBX-2910] fixed 'strerror_from_system undefined' compilation warning on Windows; thanks to Takanori Suzuki (asaveljevs)
  - [ZBX-2902] fixed system.cpu.load[] and system.cpu.util[] being slightly exaggerated on Windows (asaveljevs)
  - [ZBX-2954] fixed translations in template delete popups (Vedmak)
