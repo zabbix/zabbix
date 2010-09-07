@@ -1358,6 +1358,7 @@
 	'S_MINIMIZE'=>				'Minimize',
 	'S_LOADING_P'=>				'Loading...',
 	'S_OF' => 'of',
+	'S_ZABBIX_SERVER_IP_OR_PORT_IS_NOT_SET' => 'Zabbix server ip or port is not set!',
 
 // dashconf.php
 	'S_DASHBOARD_CONFIGURATION' =>	'Dashboard configuration',
