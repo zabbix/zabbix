@@ -145,36 +145,8 @@ include_once('include/page_header.php');
 	$filterForm->addRow(S_ACTION, $cmbAction);
 
 	$cmbResource = new CComboBox('resourcetype',$_REQUEST['resourcetype']);
-		$cmbResource->addItem(-1,S_ALL_S);
-		$cmbResource->addItem(AUDIT_RESOURCE_USER,			S_USER);
-//		$cmbResource->addItem(AUDIT_RESOURCE_ZABBIX,		S_ZABBIX);
-		$cmbResource->addItem(AUDIT_RESOURCE_ZABBIX_CONFIG,	S_ZABBIX_CONFIG);
-		$cmbResource->addItem(AUDIT_RESOURCE_MEDIA_TYPE,	S_MEDIA_TYPE);
-		$cmbResource->addItem(AUDIT_RESOURCE_HOST,			S_HOST);
-		$cmbResource->addItem(AUDIT_RESOURCE_ACTION,		S_ACTION);
-		$cmbResource->addItem(AUDIT_RESOURCE_GRAPH,			S_GRAPH);
-		$cmbResource->addItem(AUDIT_RESOURCE_GRAPH_ELEMENT,		S_GRAPH_ELEMENT);
-//		$cmbResource->addItem(AUDIT_RESOURCE_ESCALATION,		S_ESCALATION);
-//		$cmbResource->addItem(AUDIT_RESOURCE_ESCALATION_RULE,	S_ESCALATION_RULE);
-//		$cmbResource->addItem(AUDIT_RESOURCE_AUTOREGISTRATION,	S_AUTOREGISTRATION);
-		$cmbResource->addItem(AUDIT_RESOURCE_USER_GROUP,	S_USER_GROUP);
-		$cmbResource->addItem(AUDIT_RESOURCE_APPLICATION,	S_APPLICATION);
-		$cmbResource->addItem(AUDIT_RESOURCE_TRIGGER,		S_TRIGGER);
-		$cmbResource->addItem(AUDIT_RESOURCE_HOST_GROUP,	S_HOST_GROUP);
-		$cmbResource->addItem(AUDIT_RESOURCE_ITEM,			S_ITEM);
-		$cmbResource->addItem(AUDIT_RESOURCE_IMAGE,			S_IMAGE);
-		$cmbResource->addItem(AUDIT_RESOURCE_VALUE_MAP,		S_VALUE_MAP);
-		$cmbResource->addItem(AUDIT_RESOURCE_IT_SERVICE,	S_IT_SERVICE);
-		$cmbResource->addItem(AUDIT_RESOURCE_MAP,			S_MAP);
-		$cmbResource->addItem(AUDIT_RESOURCE_SCREEN,		S_SCREEN);
-		$cmbResource->addItem(AUDIT_RESOURCE_NODE,			S_NODE);
-		$cmbResource->addItem(AUDIT_RESOURCE_SCENARIO,		S_SCENARIO);
-		$cmbResource->addItem(AUDIT_RESOURCE_DISCOVERY_RULE,S_DISCOVERY_RULE);
-		$cmbResource->addItem(AUDIT_RESOURCE_SLIDESHOW,		S_SLIDESHOW);
-		$cmbResource->addItem(AUDIT_RESOURCE_SCRIPT,		S_SCRIPT);
-		$cmbResource->addItem(AUDIT_RESOURCE_PROXY,			S_PROXY);
-		$cmbResource->addItem(AUDIT_RESOURCE_MAINTENANCE,	S_MAINTENANCE);
-		$cmbResource->addItem(AUDIT_RESOURCE_REGEXP,		S_REGULAR_EXPRESSION);
+	$resources = array_merge(array(-1 => S_ALL_S), audit_resource2str());
+	$cmbResource->addItems($resources);
 
 	$filterForm->addRow(S_RESOURCE, $cmbResource);
 
