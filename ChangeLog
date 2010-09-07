@@ -9,6 +9,7 @@ Changes for 1.9
 
 Changes for 1.8.4rc1
 
+ - [ZBX-2974] fixed possibility to delete templated applications (Vedmak)
  - [ZBX-1172] added sorting for audit resource dropdown (Vedmak)
  - [ZBX-2982] added ip and port of zabbix server in dashboard widget "Status of Zabbix" (Vedmak)
  - [ZBX-2964] fixed processes failing to start when no IPv6 is available on the system (asaveljevs,Sasha)
