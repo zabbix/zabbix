@@ -132,8 +132,10 @@ AC_SEARCH_LIBS(clock_gettime, rt)
 #AC_SEARCH_LIBS(res_query, resolv bind socket)
 #Aix 6.x requires this
 AC_SEARCH_LIBS(perfstat_memory_total, perfstat, [AC_DEFINE([HAVE_LIBPERFSTAT], 1, [Define to 1 if you have the 'libperfstat' library (-lperfstat)])])
-AC_SEARCH_LIBS(devstat_getdevs, devstat, [AC_DEFINE([HAVE_DEVSTAT], 1, [Define to 1 if you have the 'libdevstat' library (-ldevstat)])])
-AC_SEARCH_LIBS(getdevs, devstat, [AC_DEFINE([HAVE_DEVSTAT], 1, [Define to 1 if you have the 'libdevstat' library (-ldevstat)])])
+AC_SEARCH_LIBS(devstat_getdevs, devstat, [AC_DEFINE([HAVE_LIBDEVSTAT], 1, [Define to 1 if you have the 'libdevstat' library (-ldevstat)])])
+AC_SEARCH_LIBS(getdevs, devstat, [AC_DEFINE([HAVE_LIBDEVSTAT], 1, [Define to 1 if you have the 'libdevstat' library (-ldevstat)])])
+dnl On FreeBSD we have to link with -lexecinfo to get backtraces
+AC_SEARCH_LIBS(backtrace_symbols, execinfo, [AC_DEFINE([HAVE_LIBEXECINFO], 1, [Define to 1 if you have the 'libexecinfo' library (-lexecinfo)])])
 AC_CHECK_LIB(m, main)
 AC_CHECK_LIB(kvm, main)
 dnl AC_CHECK_LIB(pthread, main)
@@ -898,12 +900,12 @@ AC_CHECK_FUNCS(putenv)
 dnl Option -rdynamic is needed for readable backtraces.
 AC_MSG_CHECKING(for -rdynamic linking option)
 saved_LDFLAGS="$LDFLAGS"
-LDFLAGS="-rdynamic"
+LDFLAGS="-rdynamic $LDFLAGS"
 AC_TRY_LINK([#include <execinfo.h>],
 [void *bcktrc[6];
 (void)backtrace(bcktrc, 6);
 ],
-LDFLAGS="$saved_LDFLAGS -rdynamic"
+LDFLAGS="-rdynamic $saved_LDFLAGS"
 AC_MSG_RESULT(yes),
 LDFLAGS="$saved_LDFLAGS"
 AC_MSG_RESULT(no))

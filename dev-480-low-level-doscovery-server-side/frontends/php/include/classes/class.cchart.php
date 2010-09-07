@@ -1476,7 +1476,7 @@ class CChart extends CGraphDraw{
 			$this->shiftY,
 			$this->sizeX+$this->shiftXleft-2,	// -2 border
 			$this->sizeY+$this->shiftY,
-			$this->getColor($this->graphtheme['noneworktimecolor'], 0)
+			$this->getColor($this->graphtheme['nonworktimecolor'], 0)
 		);
 
 		$now = time();

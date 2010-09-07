@@ -117,7 +117,7 @@ include_once('include/page_header.php');
 				$host = get_host_by_hostid($app['hostid']);
 
 				DBstart();
-				$result = delete_application($_REQUEST['applicationid']);
+				$result = CApplication::delete($_REQUEST['applicationid']);
 				$result = DBend($result);
 			}
 			show_messages($result, S_APPLICATION_DELETED, S_CANNOT_DELETE_APPLICATION);
@@ -146,7 +146,7 @@ include_once('include/page_header.php');
 		while($db_app = DBfetch($db_applications)){
 			if(!isset($applications[$db_app['applicationid']]))	continue;
 
-			$go_result &= delete_application($db_app['applicationid']);
+			$go_result &= (bool) CApplication::delete($db_app['applicationid']);
 
 			if($go_result){
 				$host = get_host_by_hostid($db_app['hostid']);
