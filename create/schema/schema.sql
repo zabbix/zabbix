@@ -503,7 +503,7 @@ FIELD		|textcolor	|t_varchar(6)	|'202020'|NOT NULL	|0
 FIELD		|highlightcolor	|t_varchar(6)	|'AA4444'|NOT NULL	|0
 FIELD		|leftpercentilecolor|t_varchar(6)|'11CC11'|NOT NULL	|0
 FIELD		|rightpercentilecolor|t_varchar(6)|'CC1111'|NOT NULL	|0
-FIELD		|noneworktimecolor|t_varchar(6)	|'CCCCCC'|NOT NULL	|0
+FIELD		|nonworktimecolor|t_varchar(6)	|'CCCCCC'|NOT NULL	|0
 FIELD		|gridview	|t_integer	|1	|NOT NULL	|0
 FIELD		|legendview	|t_integer	|1	|NOT NULL	|0
 INDEX		|1		|description
