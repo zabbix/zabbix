@@ -1,5 +1,6 @@
 Changes for 1.9
 
+ - [DEV-471] field graph_theme.noneworktimecolor renamed to nonworktimecolor (Sasha)
  - [DEV-471] database integrity - added foreign keys (Sasha,Vedmak)
  - [ZBXNEXT-483] added vfs.file.contents[file,encoding] check (asaveljevs)
  - [ZBXNEXT-457] added support of nanoseconds for history tables (Sasha)
