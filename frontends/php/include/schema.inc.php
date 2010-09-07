@@ -2264,7 +2264,7 @@ return array(
 				'length' => 6,
 				'default' => 'CC1111',
 			),
-			'noneworktimecolor' => array(
+			'nonworktimecolor' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 6,
