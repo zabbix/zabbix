@@ -1788,10 +1788,11 @@ Copt::memoryPick();
 				'hostids' => $hostids,
 				'editable' => 1,
 				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => 1,
+				'preservekeys' => 1
 			);
+
 			$del_hosts = self::get($options);
-			foreach($hostids as $hostid){
+			foreach($hostids as $hnum => $hostid){
 				if(!isset($del_hosts[$hostid])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				}
@@ -1801,7 +1802,7 @@ Copt::memoryPick();
 			if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete host');
 
 			self::EndTransaction(true, __METHOD__);
-			return true;
+			return array('hostids' => $hostids);
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
