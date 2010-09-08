@@ -363,17 +363,21 @@ class CUserGroup extends CZBXAPI{
 
 			foreach($usrgrps as $gnum => $usrgrp){
 				$mass_add = array();
-				if(isset($usrgrp['users'])){
-					$mass_add['userids'] = $usrgrp['users'];
+				if(isset($usrgrp['userids'])){
+					$mass_add['userids'] = $usrgrp['userids'];
 				}
 				if(isset($usrgrp['rights'])){
 					$mass_add['rights'] = $usrgrp['rights'];
 				}
+				echo '<xmp>';
+				print_r($mass_add);
+				echo '</xmp>';
 				if(!empty($mass_add)){
 					$mass_add['usrgrpids'] = $usrgrpids[$gnum];
 					if(!self::massAdd($mass_add))
 						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot add users');
 				}
+
 			}
 
 			self::EndTransaction(true, __METHOD__);
