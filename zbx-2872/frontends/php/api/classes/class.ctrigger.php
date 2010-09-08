@@ -770,7 +770,9 @@ Copt::memoryPick();
 			$deps = array();
 			$depids = array();
 
-			$sql = 'SELECT triggerid_up, triggerid_down FROM trigger_depends WHERE '.DBcondition('triggerid_down', $triggerids);
+			$sql = 'SELECT triggerid_up, triggerid_down '.
+				' FROM trigger_depends '.
+				' WHERE '.DBcondition('triggerid_down', $triggerids);
 			$db_deps = DBselect($sql);
 			while($db_dep = DBfetch($db_deps)){
 				if(!isset($deps[$db_dep['triggerid_down']])) $deps[$db_dep['triggerid_down']] = array();
@@ -1086,6 +1088,7 @@ COpt::memoryPick();
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => 1,
 		);
+
 		if(isset($object['node']))
 			$options['nodeids'] = getNodeIdByNodeName($object['node']);
 		else if(isset($object['nodeids']))
@@ -1230,13 +1233,11 @@ COpt::memoryPick();
 /**
  * Delete triggers
  *
- * @param array $triggers multidimensional array with trigger objects
- * @param array $triggers[0,...]['triggerid']
- * @return deleted triggers
+ * @param array $triggerids array with trigger ids
+ * @return deleted triggerids
  */
-	public static function delete($triggers){
-		$triggers = zbx_toArray($triggers);
-		$triggerids = zbx_objectValues($triggers, 'triggerid');
+	public static function delete($triggerids){
+		$triggerids = zbx_toArray($triggerids);
 
 		try{
 			self::BeginTransaction(__METHOD__);
@@ -1248,8 +1249,8 @@ COpt::memoryPick();
 				'preservekeys' => 1
 			);
 			$del_triggers = self::get($options);
-			foreach($triggers as $gnum => $trigger){
-				if(!isset($del_triggers[$trigger['triggerid']])){
+			foreach($triggerids as $gnum => $triggerid){
+				if(!isset($del_triggers[$triggerid])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 				}
 			}
@@ -1278,25 +1279,27 @@ COpt::memoryPick();
 /**
  * Add dependency for trigger
  *
- * @param _array $triggers_data
+ * @param _array $triggersData
  * @param array $triggers_data['triggerid]
- * @param array $triggers_data['depends_on_triggerid']
+ * @param array $triggers_data['dependsOnTriggerid']
  * @return boolean
  */
-	public static function addDependencies($triggers_data){
-		$triggers_data = zbx_toArray($triggers_data);
-
+	public static function addDependencies($triggersData){
+		$triggersData = zbx_toArray($triggersData);
+		$triggerids = array();
 		try{
 			self::BeginTransaction(__METHOD__);
 
-			foreach($triggers_data as $num => $dep){
-				$result = (bool) insert_dependency($dep['triggerid'], $dep['depends_on_triggerid']);
+			foreach($triggersData as $num => $dep){
+				$triggerids[$dep['triggerid']] = $dep['triggerid'];
+
+				$result = (bool) insert_dependency($dep['triggerid'], $dep['dependsOnTriggerid']);
 				if(!$result)
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot create dependency');
 			}
 
 			self::EndTransaction(true, __METHOD__);
-			return true;
+			return array('triggerids' => $triggerids);
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
@@ -1310,15 +1313,15 @@ COpt::memoryPick();
 /**
  * Delete trigger dependencis
  *
- * @param _array $triggers multidimensional array with trigger objects
+ * @param _array $triggersData multidimensional array with trigger objects
  * @param array $triggers[0,...]['triggerid']
  * @return boolean
  */
-	public static function deleteDependencies($triggers){
-		$triggers = zbx_toArray($triggers);
+	public static function deleteDependencies($triggersData){
+		$triggersData = zbx_toArray($triggersData);
 
 		$triggerids = array();
-		foreach($triggers as $num => $trigger){
+		foreach($triggersData as $num => $trigger){
 			$triggerids[] = $trigger['triggerid'];
 		}
 
@@ -1330,7 +1333,7 @@ COpt::memoryPick();
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete dependency');
 
 			self::EndTransaction(true, __METHOD__);
-			return true;
+			return array('triggerids' => zbx_objectValues($triggersData, 'triggerid'));
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
