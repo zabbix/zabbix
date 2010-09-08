@@ -37,7 +37,7 @@ include_once('include/page_header.php');
 // media form
 		'media_types'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 		'mediatypeid'=>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,'(isset({form})&&({form}=="update"))'),
-		'type'=>			array(T_ZBX_INT, O_OPT,	NULL,	IN(implode(',',array(MEDIA_TYPE_EMAIL,MEDIA_TYPE_EXEC,MEDIA_TYPE_SMS,MEDIA_TYPE_JABBER))),'(isset({save}))'),
+		'type'=>			array(T_ZBX_INT, O_OPT,	NULL,	IN(implode(',',array_keys(media_type2str()))),'(isset({save}))'),
 		'description'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'(isset({save}))'),
 		'smtp_server'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.MEDIA_TYPE_EMAIL.')&&isset({save})'),
 		'smtp_helo'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.MEDIA_TYPE_EMAIL.')&&isset({save})'),
@@ -45,7 +45,7 @@ include_once('include/page_header.php');
 		'exec_path'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.MEDIA_TYPE_EXEC.')&&isset({save})'),
 		'gsm_modem'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.MEDIA_TYPE_SMS.')&&isset({save})'),
 		'username'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'(isset({type})&&{type}=='.MEDIA_TYPE_JABBER.')&&isset({save})'),
-		'password'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.MEDIA_TYPE_JABBER.')&&isset({save})'),
+		'password'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.MEDIA_TYPE_JABBER.'||{type}=='.MEDIA_TYPE_EZ_TEXTING.')&&isset({save})'),
 /* actions */
 		'save'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'delete'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -128,26 +128,14 @@ include_once('include/page_header.php');
 	$form = new CForm(null, 'get');
 
 	if(!isset($_REQUEST['form']))
-		$form->addItem(new CButton('form',S_CREATE_MEDIA_TYPE));
+		$form->addItem(new CButton('form', S_CREATE_MEDIA_TYPE));
 
 	$medias_wdgt->addPageHeader(S_CONFIGURATION_OF_MEDIA_TYPES_BIG, $form);
 
 ?>
 <?php
 	if(isset($_REQUEST['form'])){
-
-		$type		= get_request('type',0);
-		$description	= get_request('description','');
-		$smtp_server	= get_request('smtp_server','localhost');
-		$smtp_helo	= get_request('smtp_helo','localhost');
-		$smtp_email	= get_request('smtp_email','zabbix@localhost');
-		$exec_path	= get_request('exec_path','');
-		$gsm_modem	= get_request('gsm_modem','/dev/ttyS0');
-		$username	= get_request('username','user@server');
-		$password	= get_request('password','');
-
 		if(isset($_REQUEST['mediatypeid']) && !isset($_REQUEST['form_refresh'])){
-
 			$options = array(
 				'mediatypeids' => $_REQUEST['mediatypeid'],
 				'output' => API_OUTPUT_EXTEND,
@@ -155,59 +143,72 @@ include_once('include/page_header.php');
 			$mediatypes = CMediatype::get($options);
 			$mediatype = reset($mediatypes);
 
-			$mediatypeid	= $mediatype['mediatypeid'];
-			$type			= get_request('type',$mediatype['type']);
-			$description	= $mediatype['description'];
-			$smtp_server	= $mediatype['smtp_server'];
+			$mediatypeid = $mediatype['mediatypeid'];
+			$type = $mediatype['type'];
+			$description = $mediatype['description'];
+			$smtp_server = $mediatype['smtp_server'];
+			$smtp_helo = $mediatype['smtp_helo'];
+			$smtp_email = $mediatype['smtp_email'];
+			$exec_path = $mediatype['exec_path'];
+			$gsm_modem = $mediatype['gsm_modem'];
+			$username = $mediatype['username'];
+			$password = $mediatype['passwd'];
+		}
+		else{
+			$type = get_request('type', 0);
+			$description = get_request('description', '');
+			$smtp_server = get_request('smtp_server', 'localhost');
+			$smtp_helo = get_request('smtp_helo', 'localhost');
+			$smtp_email = get_request('smtp_email', 'zabbix@localhost');
+			$exec_path = get_request('exec_path', '');
+			$gsm_modem = get_request('gsm_modem', '/dev/ttyS0');
 
-			$smtp_helo	= $mediatype['smtp_helo'];
-			$smtp_email	= $mediatype['smtp_email'];
-			$exec_path	= $mediatype['exec_path'];
-			$gsm_modem	= $mediatype['gsm_modem'];
-			$username	= $mediatype['username'];
-			$password	= $mediatype['passwd'];
+			$default_username = ($type == MEDIA_TYPE_EZ_TEXTING) ? 'username' : 'user@server';
+			$username = get_request('username', $default_username);
+			$password = get_request('password', '');
 		}
 
 		$frmMeadia = new CFormTable(S_MEDIA);
-		$frmMeadia->setHelp('web.config.medias.php');
+//		$frmMeadia->setHelp('web.config.medias.php');
 
 		if(isset($_REQUEST['mediatypeid'])){
-			$frmMeadia->addVar('mediatypeid',$_REQUEST['mediatypeid']);
+			$frmMeadia->addVar('mediatypeid', $_REQUEST['mediatypeid']);
 		}
 
-		$frmMeadia->addRow(S_DESCRIPTION,new CTextBox('description',$description,30));
-		$cmbType = new CComboBox('type',$type,'submit()');
-		$cmbType->addItem(MEDIA_TYPE_EMAIL,S_EMAIL);
-		$cmbType->addItem(MEDIA_TYPE_JABBER,S_JABBER);
-		$cmbType->addItem(MEDIA_TYPE_SMS,S_SMS);
-		$cmbType->addItem(MEDIA_TYPE_EXEC,S_SCRIPT);
-		$frmMeadia->addRow(S_TYPE,$cmbType);
+		$frmMeadia->addRow(S_DESCRIPTION, new CTextBox('description', $description, 30));
+
+		$cmbType = new CComboBox('type', $type, 'submit()');
+		$cmbType->addItems(media_type2str());
+		$frmMeadia->addRow(S_TYPE, $cmbType);
 
 		switch($type){
-		case MEDIA_TYPE_EMAIL:
-			$frmMeadia->addRow(S_SMTP_SERVER,new CTextBox('smtp_server',$smtp_server,30));
-			$frmMeadia->addRow(S_SMTP_HELO,new CTextBox('smtp_helo',$smtp_helo,30));
-			$frmMeadia->addRow(S_SMTP_EMAIL,new CTextBox('smtp_email',$smtp_email,30));
-			break;
-		case MEDIA_TYPE_SMS:
-			$frmMeadia->addRow(S_GSM_MODEM,new CTextBox('gsm_modem',$gsm_modem,50));
-			break;
-		case MEDIA_TYPE_EXEC:
-			$frmMeadia->addRow(S_SCRIPT_NAME,new CTextBox('exec_path',$exec_path,50));
-			break;
-		case MEDIA_TYPE_JABBER:
-			$frmMeadia->addRow(S_JABBER_IDENTIFIER, new CTextBox('username',$username,30));
-			$frmMeadia->addRow(S_PASSWORD, new CPassBox('password',$password,30));
+			case MEDIA_TYPE_EMAIL:
+				$frmMeadia->addRow(S_SMTP_SERVER,new CTextBox('smtp_server', $smtp_server, 30));
+				$frmMeadia->addRow(S_SMTP_HELO,new CTextBox('smtp_helo', $smtp_helo, 30));
+				$frmMeadia->addRow(S_SMTP_EMAIL,new CTextBox('smtp_email', $smtp_email, 30));
+				break;
+			case MEDIA_TYPE_SMS:
+				$frmMeadia->addRow(S_GSM_MODEM,new CTextBox('gsm_modem', $gsm_modem, 50));
+				break;
+			case MEDIA_TYPE_EXEC:
+				$frmMeadia->addRow(S_SCRIPT_NAME,new CTextBox('exec_path', $exec_path, 50));
+				break;
+			case MEDIA_TYPE_JABBER:
+				$frmMeadia->addRow(S_JABBER_IDENTIFIER, new CTextBox('username', $username, 30));
+				$frmMeadia->addRow(S_PASSWORD, new CPassBox('password', $password, 30));
+				break;
+			case MEDIA_TYPE_EZ_TEXTING:
+				$frmMeadia->addRow(S_USERNAME, new CTextBox('username', $username, 30));
+				$frmMeadia->addRow(S_PASSWORD, new CPassBox('password', $password, 30));
+				break;
 		}
 
-		$frmMeadia->addItemToBottomRow(new CButton('save',S_SAVE));
+		$frmMeadia->addItemToBottomRow(new CButton('save', S_SAVE));
 		if(isset($_REQUEST['mediatypeid'])){
-			$frmMeadia->addItemToBottomRow(SPACE);
-			$frmMeadia->addItemToBottomRow(new CButtonDelete(S_DELETE_SELECTED_MEDIA,
-				url_param('form').url_param('mediatypeid')));
+			$frmMeadia->addItemToBottomRow(array(SPACE, new CButtonDelete(S_DELETE_SELECTED_MEDIA,
+				url_param('form').url_param('mediatypeid'))));
 		}
-		$frmMeadia->addItemToBottomRow(SPACE);
-		$frmMeadia->addItemToBottomRow(new CButtonCancel());
+		$frmMeadia->addItemToBottomRow(array(SPACE, new CButtonCancel()));
 
 		$medias_wdgt->addItem($frmMeadia);
 	}
@@ -218,15 +219,14 @@ include_once('include/page_header.php');
 		$medias_wdgt->addHeader(S_MEDIA_TYPES_BIG);
 		$medias_wdgt->addHeader($numrows);
 
-
 		$form = new CForm();
 		$form->setName('frm_media_types');
 
 		$table=new CTableInfo(S_NO_MEDIA_TYPES_DEFINED);
 		$table->setHeader(array(
 			new CCheckBox('all_media_types',NULL,"checkAll('".$form->getName()."','all_media_types','media_types');"),
-			make_sorting_header(S_TYPE,'type'),
 			make_sorting_header(S_DESCRIPTION,'description'),
+			make_sorting_header(S_TYPE,'type'),
 			S_DETAILS
 		));
 
@@ -263,15 +263,19 @@ include_once('include/page_header.php');
 				case MEDIA_TYPE_JABBER:
 					$details = S_JABBER_IDENTIFIER.': "'.$mediatype['username'].'"';
 					break;
+				case MEDIA_TYPE_EZ_TEXTING:
+					$details = S_USERNAME.': "'.$mediatype['username'].'"';
+					break;
 				default:
 					$details = '';
 			}
 
 			$table->addRow(array(
 				new CCheckBox('media_types['.$mediatype['mediatypeid'].']',NULL,NULL,$mediatype['mediatypeid']),
-				media_type2str($mediatype['type']),
 				new CLink($mediatype['description'],'?form=update&mediatypeid='.$mediatype['mediatypeid']),
-				$details));
+				media_type2str($mediatype['type']),
+				$details
+			));
 		}
 
 //----- GO ------
