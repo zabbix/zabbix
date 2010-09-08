@@ -57,26 +57,30 @@ require_once('include/perm.inc.php');
 	return $port;
 	}
 
-	function discovery_check_type2str($type_int){
-		$str_type[SVC_SSH]	= S_SSH;
-		$str_type[SVC_LDAP]	= S_LDAP;
-		$str_type[SVC_SMTP]	= S_SMTP;
-		$str_type[SVC_FTP]	= S_FTP;
-		$str_type[SVC_HTTP]	= S_HTTP;
-		$str_type[SVC_POP]	= S_POP;
-		$str_type[SVC_NNTP]	= S_NNTP;
-		$str_type[SVC_IMAP]	= S_IMAP;
-		$str_type[SVC_TCP]	= S_TCP;
-		$str_type[SVC_AGENT]	= S_ZABBIX_AGENT;
-		$str_type[SVC_SNMPv1]	= S_SNMPV1_AGENT;
-		$str_type[SVC_SNMPv2]	= S_SNMPV2_AGENT;
-		$str_type[SVC_SNMPv3]	= S_SNMPV3_AGENT;
-		$str_type[SVC_ICMPPING]	= S_ICMPPING;
+	function discovery_check_type2str($type=null){
+		$discovery_types = array(
+			SVC_SSH => S_SSH,
+			SVC_LDAP => S_LDAP,
+			SVC_SMTP => S_SMTP,
+			SVC_FTP => S_FTP,
+			SVC_HTTP => S_HTTP,
+			SVC_POP => S_POP,
+			SVC_NNTP => S_NNTP,
+			SVC_IMAP => S_IMAP,
+			SVC_TCP => S_TCP,
+			SVC_AGENT => S_ZABBIX_AGENT,
+			SVC_SNMPv1 => S_SNMPV1_AGENT,
+			SVC_SNMPv2 => S_SNMPV2_AGENT,
+			SVC_SNMPv3 => S_SNMPV3_AGENT,
+			SVC_ICMPPING => S_ICMPPING,
+		);
 
-		if(isset($str_type[$type_int]))
-			return $str_type[$type_int];
-
-		return S_UNKNOWN;
+		if(is_null($type))
+			return $discovery_types;
+		else if(isset($discovery_types[$type]))
+			return $discovery_types[$type];
+		else
+			return S_UNKNOWN;
 	}
 
 	function discovery_check2str($type, $snmp_community, $key_, $ports){
