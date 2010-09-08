@@ -207,6 +207,7 @@
 	'S_REQUIRED'=>					'Required',
 	'S_STEP_OF_SCENARIO'=>				'Step of scenario',
 	'S_BASIC_AUTHENTICATION'=>			'Basic authentication',
+	'S_NTLM_AUTHENTICATION'=>			'NTLM authentication',
 	'S_ENABLE_SELECTED_WEB_SCENARIOS_Q'=>		'Enable selected WEB scenarios?',
 	'S_DISABLE_SELECTED_WEB_SCENARIOS_Q'=>		'Disable selected WEB scenarios?',
 	'S_DELETE_HISTORY_SELECTED_WEB_SCENARIOS_Q'=>	'Delete history of selected WEB scenarios?',
