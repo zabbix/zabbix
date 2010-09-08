@@ -145,10 +145,10 @@ include_once('include/page_header.php');
 		show_messages($result, $msg_ok, $msg_fail);
 
 		if($result){ // result - OK
-			add_audit(!isset($_REQUEST["druleid"]) ? AUDIT_ACTION_ADD : AUDIT_ACTION_UPDATE,
+			add_audit(!isset($_REQUEST['druleid']) ? AUDIT_ACTION_ADD : AUDIT_ACTION_UPDATE,
 				AUDIT_RESOURCE_DISCOVERY_RULE, '['.$druleid.'] '.$_REQUEST['name']);
 
-			unset($_REQUEST["form"]);
+			unset($_REQUEST['form']);
 		}
 	}
 	else if(inarr_isset(array('clone','druleid'))){
@@ -257,14 +257,14 @@ include_once('include/page_header.php');
 			$dchecks_deleted = get_request('dchecks_deleted',array());
 		}
 		else{
-			$proxy_hostid = get_request("proxy_hostid",0);
-			$name = get_request('name','');
-			$iprange = get_request('iprange','192.168.0.1-255');
-			$delay = get_request('delay',3600);
-			$status = get_request('status',DRULE_STATUS_ACTIVE);
+			$proxy_hostid = get_request('proxy_hostid', 0);
+			$name = get_request('name', '');
+			$iprange = get_request('iprange', '192.168.0.1-255');
+			$delay = get_request('delay', 3600);
+			$status = get_request('status', DRULE_STATUS_ACTIVE);
 
-			$dchecks = get_request('dchecks',array());
-			$dchecks_deleted = get_request('dchecks_deleted',array());
+			$dchecks = get_request('dchecks', array());
+			$dchecks_deleted = get_request('dchecks_deleted', array());
 		}
 
 		$new_check_type	= get_request('new_check_type', SVC_HTTP);
@@ -303,11 +303,8 @@ include_once('include/page_header.php');
 		$cmbUniquenessCriteria->addItem(-1, S_IP_ADDRESS);
 		foreach($dchecks as $id => $data){
 			$str = discovery_check2str($data['type'], $data['snmp_community'], $data['key'], $data['ports']);
-			$dchecks[$id] = array(
-				new CCheckBox('selected_checks[]',null,null,$id),
-				$str,
-				BR()
-			);
+			$dchecks[$id] = array(new CCheckBox('selected_checks[]', null, null, $id), $str, BR());
+			
 			if(in_array($data['type'], array(SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2, SVC_SNMPv3)))
 				$cmbUniquenessCriteria->addItem($id, $str);
 		}
@@ -374,7 +371,6 @@ include_once('include/page_header.php');
 				$form->addVar('new_check_snmpv3_authpassphrase', '');
 				$form->addVar('new_check_snmpv3_privpassphrase', '');
 		}
-
 
 
 		if($external_param->getNumRows() == 0) $external_param = null;

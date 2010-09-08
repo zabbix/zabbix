@@ -85,7 +85,6 @@ require_once('include/perm.inc.php');
 
 	function discovery_check2str($type, $snmp_community, $key_, $ports){
 		$external_param = null;
-		$port_def = svc_default_port($type);
 
 		switch($type){
 			case SVC_SNMPv1:
@@ -96,14 +95,14 @@ require_once('include/perm.inc.php');
 				break;
 		}
 
-		return discovery_check_type2str($type).($port_def == $ports ? '' : ' ('.$ports.')').$external_param;
+		return discovery_check_type2str($type).' ('.$ports.')'.$external_param;
 	}
 
 	function discovery_port2str($type_int, $port){
-		$port_def = svc_default_port($type_int);
-
-		if ($port != $port_def)
-			return '['.$port.']';
+//		$port_def = svc_default_port($type_int);
+//
+//		if ($port != $port_def)
+			return ' ('.$port.')';
 
 	return '';
 	}
