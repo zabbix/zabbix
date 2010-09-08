@@ -44,7 +44,7 @@ include_once('include/page_header.php');
 		'smtp_email'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.MEDIA_TYPE_EMAIL.')&&isset({save})'),
 		'exec_path'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.MEDIA_TYPE_EXEC.')&&isset({save})'),
 		'gsm_modem'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.MEDIA_TYPE_SMS.')&&isset({save})'),
-		'username'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'(isset({type})&&{type}=='.MEDIA_TYPE_JABBER.')&&isset({save})'),
+		'username'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.MEDIA_TYPE_JABBER.'||{type}=='.MEDIA_TYPE_EZ_TEXTING.')&&isset({save})'),
 		'password'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.MEDIA_TYPE_JABBER.'||{type}=='.MEDIA_TYPE_EZ_TEXTING.')&&isset({save})'),
 /* actions */
 		'save'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),

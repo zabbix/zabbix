@@ -353,11 +353,11 @@
 	define('ALERT_TYPE_MESSAGE',		0);
 	define('ALERT_TYPE_COMMAND',		1);
 
-	define('MEDIA_TYPE_EMAIL', 0);
-	define('MEDIA_TYPE_EXEC', 1);
-	define('MEDIA_TYPE_SMS', 2);
-	define('MEDIA_TYPE_JABBER', 3);
-	define('MEDIA_TYPE_EZ_TEXTING', 100);
+	define('MEDIA_TYPE_EMAIL',		0);
+	define('MEDIA_TYPE_EXEC',		1);
+	define('MEDIA_TYPE_SMS',		2);
+	define('MEDIA_TYPE_JABBER',		3);
+	define('MEDIA_TYPE_EZ_TEXTING',	100);
 
 	define('ACTION_DEFAULT_SUBJ',		'{TRIGGER.NAME}: {TRIGGER.STATUS}');
 	define('ACTION_DEFAULT_MSG',		"{TRIGGER.NAME}: {TRIGGER.STATUS}\nLast value: {ITEM.LASTVALUE}\n\n{TRIGGER.URL}");
