@@ -62,7 +62,7 @@ ssize_t smtp_readln(int fd, char *buf, int buf_len)
 
 			read_bytes += nbytes;
 		}
-		while (nbytes > 0 &&					/* End Of File (socket closed) */
+		while (nbytes > 0 &&					/* End of File (socket closed) */
 				read_bytes < buf_len &&			/* End of Buffer */
 				((char*)buf)[read_bytes - 1] != '\n' );	/* new line */
 
