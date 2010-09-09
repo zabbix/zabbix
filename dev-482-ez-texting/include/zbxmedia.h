@@ -25,11 +25,11 @@
 extern char	*CONFIG_SOURCE_IP;
 
 int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_email, const char *mailto,
-		char *mailsubject, char *mailbody, char *error, int max_error_len);
+		const char *mailsubject, const char *mailbody, char *error, int max_error_len);
 int	send_ez_texting(const char *username, const char *password, const char *sendto,
 		const char *subject, const char *message, char *error, int max_error_len);
 #ifdef HAVE_JABBER
-int	send_jabber(const char *username, const char *passwd, const char *sendto,
+int	send_jabber(const char *username, const char *password, const char *sendto,
 		const char *subject, const char *message, char *error, int max_error_len);
 #endif
 int	send_sms(const char *device, const char *number, const char *message, char *error, int max_error_len);
