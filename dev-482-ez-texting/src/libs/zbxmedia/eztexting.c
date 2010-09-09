@@ -80,7 +80,7 @@ static size_t	HEADERFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userda
  *                                                                            *
  ******************************************************************************/
 int	send_ez_texting(const char *username, const char *password, const char *sendto,
-			const char *subject, const char *message, char *error, int max_error_len)
+		const char *subject, const char *message, char *error, int max_error_len)
 {
 #ifdef HAVE_LIBCURL
 

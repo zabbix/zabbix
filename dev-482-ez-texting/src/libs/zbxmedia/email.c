@@ -40,7 +40,7 @@
 #include "comms.h"
 #include "base64.h"
 
-#include "email.h"
+#include "zbxmedia.h"
 
 /*
  * smtp_readln reads a until a 0x0a
@@ -76,7 +76,8 @@ ssize_t smtp_readln(int fd, char *buf, int buf_len)
 /*
  * Send email
  */
-int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,char *mailsubject,char *mailbody, char *error, int max_error_len)
+int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_email, const char *mailto,
+		char *mailsubject, char *mailbody, char *error, int max_error_len)
 {
 	int		ret = FAIL;
 	zbx_sock_t	s;

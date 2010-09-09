@@ -737,7 +737,7 @@ ZBX_TASK_EX
 	int		flags;
 };
 
-char	*string_replace(char *str, char *sub_str1, char *sub_str2);
+char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2);
 
 int	is_double_prefix(const char *str);
 int	is_double(const char *c);

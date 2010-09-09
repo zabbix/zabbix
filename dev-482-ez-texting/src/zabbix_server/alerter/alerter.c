@@ -23,11 +23,6 @@
 #include "db.h"
 #include "log.h"
 #include "zlog.h"
-#include "email.h"
-#include "sms.h"
-#if defined(HAVE_JABBER)
-#	include "jabber.h"
-#endif
 #include "daemon.h"
 #include "zbxmedia.h"
 #include "zbxserver.h"

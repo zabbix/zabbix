@@ -319,12 +319,12 @@ void	zbx_chrcpy_alloc(char **str, int *alloc_len, int *offset, const char src)
 }
 
 /* Has to be rewritten to avoid malloc */
-char	*string_replace(char *str, char *sub_str1, char *sub_str2)
+char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2)
 {
         char *new_str = NULL;
-        char *p;
-        char *q;
-        char *r;
+        const char *p;
+        const char *q;
+        const char *r;
         char *t;
         long len;
         long diff;
@@ -361,7 +361,6 @@ char	*string_replace(char *str, char *sub_str1, char *sub_str2)
 	*t = '\0';
 
         return new_str;
-
 }
 
 /******************************************************************************
