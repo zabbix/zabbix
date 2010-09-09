@@ -41,12 +41,12 @@ static size_t	WRITEFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userdat
 	/* first piece of data */
 	if (NULL == page.data)
 	{
-		page.allocated = MAX(8096, r_size);
+		page.allocated = MAX(64, r_size);
 		page.offset = 0;
 		page.data = zbx_malloc(page.data, page.allocated);
 	}
 
-	zbx_snprintf_alloc(&page.data, &page.allocated, &page.offset, MAX(8096, r_size), "%s", ptr);
+	zbx_snprintf_alloc(&page.data, &page.allocated, &page.offset, MAX(64, r_size), "%s", ptr);
 
 	return r_size;
 }
@@ -56,12 +56,17 @@ static size_t	HEADERFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userda
 	return size * nmemb;
 }
 
-#define EZ_TEXTING_VALID_CHARS	"~=+\\/@#%.,:;!?()-_$&"	/* also a-z, A-Z, and 0-9 */
-#define EZ_TEXTING_DOUBLE_CHARS	"~=+\\/@#%\r\n"		/* chars that count as two */
+#define EZ_TEXTING_VALID_CHARS		"~=+\\/@#%.,:;!?()-_$&"	/* also " \t\r\n", a-z, A-Z, 0-9 */
+#define EZ_TEXTING_DOUBLE_CHARS		"~=+\\/@#%"		/* these characters count as two */
 
-#define EZ_TEXTING_TIMEOUT	15
-#define EZ_TEXTING_MAX_LEN	136
-#define EZ_TEXTING_API_URL	"https://app.eztexting.com/api/sending"
+#define EZ_TEXTING_LIMIT_USA		0
+#define EZ_TEXTING_LIMIT_CANADA		1
+
+#define EZ_TEXTING_LENGTH_USA		160
+#define EZ_TEXTING_LENGTH_CANADA	136
+
+#define EZ_TEXTING_TIMEOUT		15
+#define EZ_TEXTING_API_URL		"https://app.eztexting.com/api/sending"
 
 /******************************************************************************
  *                                                                            *
@@ -80,7 +85,7 @@ static size_t	HEADERFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userda
  *                                                                            *
  ******************************************************************************/
 int	send_ez_texting(const char *username, const char *password, const char *sendto,
-		const char *subject, const char *message, char *error, int max_error_len)
+		const char *message, const char *limit, char *error, int max_error_len)
 {
 #ifdef HAVE_LIBCURL
 
@@ -88,12 +93,13 @@ int	send_ez_texting(const char *username, const char *password, const char *send
 
 	int		ret = FAIL;
 	int		i, len, err;
+	int		max_message_len;
 	char		*postfields = NULL;
 	char		*message_esc = NULL;
 	char		postcontents[MAX_STRING_LEN];
 	CURL		*easy_handle = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): sendto [%s] text [%s|%s]", __function_name, sendto, subject, message);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): sendto [%s] message [%s]", __function_name, sendto, message);
 
 	assert(error);
 	*error = '\0';
@@ -102,14 +108,30 @@ int	send_ez_texting(const char *username, const char *password, const char *send
 
 	/* replace UTF-8 and invalid ASCII characters, and make sure the message is not too long */
 
+	switch (atoi(limit))
+	{
+		case EZ_TEXTING_LIMIT_USA:
+			max_message_len = EZ_TEXTING_LENGTH_USA;
+			break;
+		case EZ_TEXTING_LIMIT_CANADA:
+			max_message_len = EZ_TEXTING_LENGTH_CANADA;
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			zbx_snprintf(error, max_error_len, "Could not determine proper length limit: [%s]", limit);
+			goto clean;
+	}
+
 	if (NULL == (message_esc = zbx_replace_utf8(message, '?')))
 	{
 		zbx_snprintf(error, max_error_len, "Could not replace UTF-8 characters: [%s]", message);
 		goto clean;
 	}
 
-	for (i = 0, len = 0; '\0' != message_esc[i] && len < EZ_TEXTING_MAX_LEN; i++, len++)
+	for (i = 0, len = 0; '\0' != message_esc[i] && len < max_message_len; i++, len++)
 	{
+		if (NULL != strchr(" \t\r\n", message_esc[i]))
+			continue;
 		if ('a' <= message_esc[i] && message_esc[i] <= 'z')
 			continue;
 		if ('A' <= message_esc[i] && message_esc[i] <= 'Z')
@@ -122,7 +144,7 @@ int	send_ez_texting(const char *username, const char *password, const char *send
 			len++;
 	}
 
-	if (len > EZ_TEXTING_MAX_LEN)
+	if (len > max_message_len)
 		i--;
 
 	message_esc[i] = '\0';
