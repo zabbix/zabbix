@@ -398,8 +398,18 @@ return $table;
 
 function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
 
+	$config = select_config();
+
 	$table = new CTableInfo();
-	$table->setHeader(array(S_TIME,S_STATUS,S_DURATION, S_AGE, S_ACK));
+	
+	//if acknowledges are turned on, we show 'ack' column
+	if ($config['event_ack_enable']) {
+		$table->setHeader(array(S_TIME,S_STATUS,S_DURATION, S_AGE, S_ACK));
+	}
+	else {
+		$table->setHeader(array(S_TIME,S_STATUS,S_DURATION, S_AGE));
+	}
+
 	$table->setAttribute('style', 'width: 400px;');
 
 	$event_list = array();
@@ -445,7 +455,7 @@ function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
 			$value,
 			$duration,
 			zbx_date2age($event['clock']),
-			$ack
+			$config['event_ack_enable']? $ack : NULL //hide acknowledges if they are turned off
 		));
 	}
 
