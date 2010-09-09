@@ -2156,6 +2156,7 @@ this.selementForm.url = e_input_6;
 	e_input_6.className = "button";
 	e_input_6.setAttribute('value',locale['S_APPLY']);
 
+
 	addListener(e_input_6, 'click', this.saveForm_selement.bindAsEventListener(this));
 
 	e_td_5.appendChild(document.createTextNode(' '));
@@ -3388,7 +3389,14 @@ saveForm_link: function(e){
 //SDJ(this.links[linkid]);
 
 	this.update_linkContainer(e);
-	this.hideForm_link(e);
+
+	/**
+	 * Commented out, because form does not need to be hidden when "apply" is pressed
+	 * @see ZBX-1442
+	 * @author Konstantin Buravcov
+	 * @since 08.09.2010
+	 */
+	//this.hideForm_link(e);
 
 	this.updateMapImage();
 },
