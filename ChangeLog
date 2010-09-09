@@ -1,5 +1,6 @@
 Changes for 1.8.4rc1
 
+ - [ZBX-2986] acknowledges now are hidden in last 20 issue popup, when are turned off (KB)
  - [ZBX-2988] fixed {ITEM.VALUE} macro in Monitoring/Events screen (Sasha)
  - [ZBX-2974] fixed possibility to delete templated applications (Vedmak)
  - [ZBX-1172] added sorting for audit resource dropdown (Vedmak)
