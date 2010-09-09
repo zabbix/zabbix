@@ -549,6 +549,9 @@
 	'S_INCORRECT_GROUP'=>				'Incorrect group',
 	'S_NOTHING_TO_DO'=>				'Nothing to do',
 	'S_INCORRECT_WORK_PERIOD'=>			'Incorrect work period',
+	'S_EZ_TEXTING_USA' => 'USA (160 characters)',
+	'S_EZ_TEXTING_CANADA' => 'Canada (136 characters)',
+	'S_MESSAGE_TEXT_LIMIT' => 'Message text limit',
 
 	'S_REGULAR_EXPRESSIONS'=>			'Regular expressions',
 	'S_REGULAR_EXPRESSION'=>			'Regular expression',

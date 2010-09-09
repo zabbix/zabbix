@@ -200,6 +200,12 @@ include_once('include/page_header.php');
 			case MEDIA_TYPE_EZ_TEXTING:
 				$frmMeadia->addRow(S_USERNAME, new CTextBox('username', $username, 30));
 				$frmMeadia->addRow(S_PASSWORD, new CPassBox('password', $password, 30));
+				$limit_cb = new CComboBox('exec_path', $exec_path);
+				$limit_cb->addItems(array(
+					EZ_TEXTING_LIMIT_USA => S_EZ_TEXTING_USA, 
+					EZ_TEXTING_LIMIT_CANADA => S_EZ_TEXTING_CANADA,
+				));
+				$frmMeadia->addRow(S_MESSAGE_TEXT_LIMIT, $limit_cb);
 				break;
 		}
 
