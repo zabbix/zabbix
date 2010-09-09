@@ -17,24 +17,13 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-
-#include <string.h>
-
-#include <errno.h>
-
-#include <termios.h>
-
 #include "common.h"
 #include "log.h"
 #include "zlog.h"
 
 #include "zbxmedia.h"
+
+#include <termios.h>
 
 static int	write_gsm(int fd, const char *str, char *error, int max_error_len)
 {
