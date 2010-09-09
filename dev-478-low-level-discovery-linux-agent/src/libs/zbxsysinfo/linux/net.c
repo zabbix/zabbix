@@ -265,7 +265,7 @@ int	NET_IF_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 				;
 
 			zbx_json_addobject(&j, NULL);
-			zbx_json_addstring(&j, "ifname", p, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, "{#IFNAME}", p, ZBX_JSON_TYPE_STRING);
 			zbx_json_close(&j);
 		}
 
