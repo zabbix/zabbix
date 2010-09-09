@@ -10,6 +10,7 @@ Changes for 1.9
 
 Changes for 1.8.4rc1
 
+ - [ZBX-1442] When linking objects during map editing, link "apply" does not close the form any more (KB)
  - [ZBX-2986] acknowledges now are hidden in last 20 issue popup, when are turned off (KB)
  - [ZBX-2974] fixed possibility to delete templated applications (Vedmak)
  - [ZBX-1172] added sorting for audit resource dropdown (Vedmak)
