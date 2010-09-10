@@ -56,7 +56,7 @@ static size_t	HEADERFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userda
 	return size * nmemb;
 }
 
-#define EZ_TEXTING_VALID_CHARS		"~=+\\/@#%.,:;!?()-_$&"	/* also " \t\r\n", a-z, A-Z, 0-9 */
+#define EZ_TEXTING_VALID_CHARS		"~=+\\/@#%.,:;!?()-_$&"	/* also " \r\n", a-z, A-Z, 0-9 */
 #define EZ_TEXTING_DOUBLE_CHARS		"~=+\\/@#%"		/* these characters count as two */
 
 #define EZ_TEXTING_LIMIT_USA		0
@@ -130,7 +130,7 @@ int	send_ez_texting(const char *username, const char *password, const char *send
 
 	for (i = 0, len = 0; '\0' != message_esc[i] && len < max_message_len; i++, len++)
 	{
-		if (NULL != strchr(" \t\r\n", message_esc[i]))
+		if (' ' == message_esc[i])
 			continue;
 		if ('a' <= message_esc[i] && message_esc[i] <= 'z')
 			continue;
@@ -138,10 +138,34 @@ int	send_ez_texting(const char *username, const char *password, const char *send
 			continue;
 		if ('0' <= message_esc[i] && message_esc[i] <= '9')
 			continue;
+
+		if ('\t' == message_esc[i])	/* \t is not part of GSM character set */
+		{
+			message_esc[i] = ' ';
+			continue;
+		}
+		if ('\r' == message_esc[i])	/* line end counts as two, regardless of... */
+		{
+			if ('\n' != message_esc[i + 1])
+				len++;
+			continue;
+		}
+		if ('\n' == message_esc[i])	/* ... how it is specified: \r, \n, or \r\n */
+		{
+			if (0 < i && '\r' != message_esc[i - 1])
+				len++;
+			continue;
+		}
 		if (NULL == (strchr(EZ_TEXTING_VALID_CHARS, message_esc[i])))
+		{
 			message_esc[i] = '?';
-		else if (NULL != (strchr(EZ_TEXTING_DOUBLE_CHARS, message_esc[i])))
+			continue;
+		}
+		if (NULL != (strchr(EZ_TEXTING_DOUBLE_CHARS, message_esc[i])))
+		{
 			len++;
+			continue;
+		}
 	}
 
 	if (len > max_message_len)
