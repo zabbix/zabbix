@@ -2641,25 +2641,9 @@ saveForm_selement: function(e){
 deleteForm_selement: function(e){
 	this.debug('deleteForm_selement');
 //--
+	//removing all selected elements
+	this.remove_selements();
 
-	var selementid = this.selementForm.selementid.value;
-	var selement = this.selements[selementid];
-
-	var typeName;
-	switch(selement.elementtype-0){
-		case 0: typeName = locale['S_HOST']; break;
-		case 1: typeName = locale['S_MAP']; break;
-		case 2: typeName = locale['S_TRIGGER']; break;
-		case 3: typeName = locale['S_HOST_GROUP']; break;
-		case 4: typeName = locale['S_IMAGE']; break;
-	}
-
-	if(Confirm(locale['S_REMOVE']+' '+typeName+'?')){
-		this.remove_selement(selementid, true);
-		this.hideForm(e);
-	}
-	else
-		return false;
 },
 
 //**************************************************************************************************************************************************
