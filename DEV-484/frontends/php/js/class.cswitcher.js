@@ -18,64 +18,66 @@
 **/
 
 var CSwitcher = Class.create({
-initProc: null,		// on if init method is running
-switcherName : '',
+switcherId : null,
 switchers : {},
 classOpened : 'filteropened',
 classClosed : 'filterclosed',
 
-initialize : function(name){
-	this.init = true;
-	this.switcherName = name;
+initialize : function(id){
+	this.switcherId = id;
 
-	var element = $(this.switcherName);
+	var mainSwitcher = $(this.switcherId);
 
-	if(!is_null(element)){
-		addListener(element, 'click', this.showHide.bindAsEventListener(this));
+	var eventHandler = this.showHide.bind(this);
 
-		var state_all = cookie.read(this.switcherName+'_all');
-		if(!is_null(state_all)){
-			if(state_all == 1){
-				element.className = this.classOpened;
-			}
+	if(!is_null(mainSwitcher)){
+		mainSwitcher.observe('click', eventHandler);
+
+		var state_all = cookie.read(this.switcherId + '_all');
+		if(!is_null(state_all) && (state_all == 1)){
+			mainSwitcher.className = this.classOpened;
 		}
 	}
-	
-	var divs = $$('div[data-switcherid]');
 
+	var divs = $$('div[data-switcherid]');
 	for(var i=0; i<divs.length; i++){
 		if(!isset(i, divs)) continue;
 
-		addListener(divs[i], 'click', this.showHide.bindAsEventListener(this));
-		
+		divs[i].observe('click', eventHandler);
+
 		var switcherid = divs[i].getAttribute('data-switcherid');
-		this.switchers[switcherid] = {};
-		this.switchers[switcherid]['object'] = divs[i];
+		this.switchers[switcherid] = {
+			'object' : divs[i],
+			'state' : false,
+			'dependentElems' : []
+		};
 	}
-		
-	if((to_change = cookie.readArray(this.switcherName)) != null){
-		for(var i=0; i<to_change.length; i++){
-			if(!isset(i, to_change)) continue;
 
-			this.open(to_change[i]);
-		}	
-	}
-	
-	this.init = false;
-},
+	var dependentElements = $$('tr[data-parentid]');
+	for(var i=0; i<dependentElements.length; i++){
+		if(!isset(i, dependentElements)) continue;
 
-open : function(switcherid){
-	if(isset(switcherid, this.switchers)){
-		$(this.switchers[switcherid]['object']).className = this.classOpened;
-		var elements = $$('tr[data-parentid='+switcherid+']');
-		for(var i=0; i<elements.length; i++){
-			if(!isset(i, elements)) continue;
-			elements[i].style.display = '';
+		var parentid = dependentElements[i].getAttribute('data-parentid');
+		if(isset(parentid, this.switchers)){
+			this.switchers[parentid]['dependentElems'].push(dependentElements[i]);
 		}
-		
-		this.switchers[switcherid]['state'] = 1;
+	}
 
-		if(this.init === false) this.storeCookie();
+	var to_change;
+	if((to_change = cookie.readArray(this.switcherId)) != null){
+		for(var i=0; i<to_change.length; i++){
+			if(isset(i, to_change) && isset(to_change[i], this.switchers)){
+				var switcherid = to_change[i];
+				this.switchers[switcherid]['object'].className = this.classOpened;
+				this.switchers[switcherid]['state'] = 1;
+
+				for(var j = 0; j < this.switchers[switcherid]['dependentElems'].length; j++){
+					if(!isset(j, this.switchers[switcherid]['dependentElems'])) continue;
+
+					this.switchers[switcherid]['dependentElems'][j].style.display = '';
+				}
+			}
+		}
 	}
 },
 
@@ -84,65 +86,61 @@ showHide : function(e){
 
 	var obj = Event.element(e);
 	var switcherid = obj.getAttribute('data-switcherid');
+	var id = obj.getAttribute('id');
 
 	if(obj.className == this.classClosed){
 		var state = 1;
 		var newClassName = this.classOpened;
-		var oldClassName = this.classClosed;
+		var displayStyle = '';
 	}
 	else{
 		var state = 0;
 		var newClassName = this.classClosed;
-		var oldClassName = this.classOpened;
+		var displayStyle = 'none';
 	}
-	obj.className = newClassName;
 
-	if(empty(switcherid)){
-		cookie.create(this.switcherName+'_all', state);
+	if(id == this.switcherId){
+		cookie.create(this.switcherId+'_all', state);
+		obj.className = newClassName;
 
-		var divs = $$('div.'+oldClassName);
-		for(var i=0; i < divs.length; i++){
-			if(empty(divs[i])) continue;
-			divs[i].className = newClassName;
-		}
-	}
-	
-	var elements = $$('tr[data-parentid]');
-	for(var i=0; i<elements.length; i++){
-		if(empty(elements[i])) continue;
-
-		if(empty(switcherid) || elements[i].getAttribute('data-parentid') == switcherid){
-			if(state){
-				elements[i].style.display = '';
-			}
-			else{
-				elements[i].style.display = 'none';
-			}
-		}
-	}
-	
-	if(empty(switcherid)){
 		for(var i in this.switchers){
-			this.switchers[i]['state'] = state;
+			if(this.switchers[i]['state'] != state){
+				this.switchers[i]['object'].className = newClassName;
+				this.switchers[i]['state'] = state;
+
+				for(var j = 0; j < this.switchers[i]['dependentElems'].length; j++){
+					if(empty(this.switchers[i]['dependentElems'][j])) continue;
+
+					this.switchers[i]['dependentElems'][j].style.display = displayStyle;
+				}
+			}
 		}
 	}
-	else{
+	else if(isset(switcherid, this.switchers)){
+		this.switchers[switcherid]['object'].className = newClassName;
 		this.switchers[switcherid]['state'] = state;
+
+		for(var j = 0; j < this.switchers[switcherid]['dependentElems'].length; j++){
+			if(empty(this.switchers[switcherid]['dependentElems'][j])) continue;
+
+			this.switchers[switcherid]['dependentElems'][j].style.display = displayStyle;
+		}
 	}
+
 	this.storeCookie();
 },
 
 storeCookie : function(){
 //	cookie.erase(this.switcherName);
-	
+
 	var storeArray = new Array();
-	
+
 	for(var i in this.switchers){
 		if(this.switchers[i]['state'] == 1){
 			storeArray.push(i);
 		}
 	}
 
-	cookie.createArray(this.switcherName, storeArray);
+	cookie.createArray(this.switcherId, storeArray);
 }
 });
