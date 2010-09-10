@@ -104,8 +104,6 @@ mlinktrigger: {
 
 selementForm:		{},					// container for Selement form dom objects
 linkForm:			{},					// container for link form dom objects
-debug_status:	0,				// debug status: 0 - off, 1 - on, 2 - SDI;
-debug_info:		'',				// debug string
 
 initialize: function($super, container, sysmapid, id){
 	this.id = id;
