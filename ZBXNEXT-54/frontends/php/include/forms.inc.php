@@ -3529,7 +3529,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			$items_table = $dedlete_button = null;
 		}
 
-//		$frmGraph->addRow(S_SHOW_LEGEND, new CCheckBox('legend',$legend, null, 1));
+		$frmGraph->addRow(S_SHOW_LEGEND, new CCheckBox('legend',$legend, null, 1));
 
 		if(($graphtype == GRAPH_TYPE_NORMAL) || ($graphtype == GRAPH_TYPE_STACKED)){
 			$frmGraph->addRow(S_SHOW_WORKING_TIME,new CCheckBox('showworkperiod',$showworkperiod,null,1));
@@ -3648,7 +3648,6 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			$frmGraph->addRow(S_YAXIS_MAX_VALUE, $yaxis_max);
 		}
 		else{
-			$frmGraph->addRow(S_SHOW_LEGEND, new CCheckBox('legend',$legend, null, 1));
 			$frmGraph->addRow(S_3D_VIEW,new CCheckBox('graph3d',$graph3d,null,1));
 		}
 
