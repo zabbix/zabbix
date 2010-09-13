@@ -376,26 +376,18 @@ include_once('include/page_header.php');
 	}
 
 
-	//all the host ids that are used in report will be collected in this array
-	$item_host_ids = array();
-
-	$trigger_hosts = array();
+	$tr_hostids = array();
 	foreach($triggers as $tnum => $trigger){
-		$trigger_hosts = array_merge($trigger_hosts, $trigger['hosts']);
 		$triggers[$tnum]['events'] = array();
 
 		//getting all host ids and names
-		foreach($trigger['hosts'] as $tr_hosts)
-		{
-			$used_hosts[$tr_hosts['hostid']] = $tr_hosts['host'];
+		foreach($trigger['hosts'] as $tr_hosts){
+			$tr_hostids[$tr_hosts['hostid']] = $tr_hosts['hostid'];
 		}
 	}
 
-	
 
-	$trigger_hostids = zbx_objectValues($trigger_hosts, 'hostid');
-
-	$scripts_by_hosts = Cscript::getScriptsByHosts($trigger_hostids);
+	$scripts_by_hosts = Cscript::getScriptsByHosts($tr_hostids);
 
 	if($show_events != EVENTS_OPTION_NOEVENT){
 		$ev_options = array(
@@ -429,13 +421,29 @@ include_once('include/page_header.php');
 
 
 	foreach($triggers as $tnum => $trigger){
+		
 		$trigger['desc'] = $description = expand_trigger_description($trigger['triggerid']);
 
 		$items = array();
+
+		$used_hosts = array();
+		foreach($trigger['hosts'] as $th){
+			$used_hosts[$th['hostid']] = $th['host'];
+		}
+		$used_host_count = count($used_hosts);
+
 		foreach($trigger['items'] as $inum => $item){
+
+			$item_description = item_description($item);
+
+			//if we have items from different hosts, we must prefix a host name
+			if ($used_host_count > 1) {
+				$item_description = $used_hosts[$item['hostid']].':'.$item_description;
+			}
+
 			$items[$inum]['itemid'] = $item['itemid'];
 			$items[$inum]['action'] = str_in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64)) ? 'showgraph' : 'showvalues';
-			$items[$inum]['description'] = $used_hosts[$item['hostid']].':'.item_description($item);
+			$items[$inum]['description'] = $item_description;
 		}
 		$trigger['items'] = $items;
 
