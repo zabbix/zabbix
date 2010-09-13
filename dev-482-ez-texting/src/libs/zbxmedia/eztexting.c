@@ -94,9 +94,9 @@ int	send_ez_texting(const char *username, const char *password, const char *send
 	int		ret = FAIL;
 	int		i, len, err;
 	int		max_message_len;
-	char		*postfields = NULL;
-	char		*message_esc = NULL;
-	char		postcontents[MAX_STRING_LEN];
+	char		*message_ascii = NULL;
+	char		*username_esc = NULL, *password_esc = NULL, *sendto_esc = NULL, *message_esc = NULL;
+	char		postfields[MAX_STRING_LEN];
 	CURL		*easy_handle = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): sendto [%s] message [%s]", __function_name, sendto, message);
@@ -122,46 +122,46 @@ int	send_ez_texting(const char *username, const char *password, const char *send
 			goto clean;
 	}
 
-	if (NULL == (message_esc = zbx_replace_utf8(message, '?')))
+	if (NULL == (message_ascii = zbx_replace_utf8(message, '?')))
 	{
 		zbx_snprintf(error, max_error_len, "Could not replace UTF-8 characters: [%s]", message);
 		goto clean;
 	}
 
-	for (i = 0, len = 0; '\0' != message_esc[i] && len < max_message_len; i++, len++)
+	for (i = 0, len = 0; '\0' != message_ascii[i] && len < max_message_len; i++, len++)
 	{
-		if (' ' == message_esc[i])
+		if (' ' == message_ascii[i])
 			continue;
-		if ('a' <= message_esc[i] && message_esc[i] <= 'z')
+		if ('a' <= message_ascii[i] && message_ascii[i] <= 'z')
 			continue;
-		if ('A' <= message_esc[i] && message_esc[i] <= 'Z')
+		if ('A' <= message_ascii[i] && message_ascii[i] <= 'Z')
 			continue;
-		if ('0' <= message_esc[i] && message_esc[i] <= '9')
+		if ('0' <= message_ascii[i] && message_ascii[i] <= '9')
 			continue;
 
-		if ('\t' == message_esc[i])	/* \t is not part of GSM character set */
+		if ('\t' == message_ascii[i])	/* \t is not part of GSM character set */
 		{
-			message_esc[i] = ' ';
+			message_ascii[i] = ' ';
 			continue;
 		}
-		if ('\r' == message_esc[i])	/* line end counts as two, regardless of... */
+		if ('\r' == message_ascii[i])	/* line end counts as two, regardless of... */
 		{
-			if ('\n' != message_esc[i + 1])
+			if ('\n' != message_ascii[i + 1])
 				len++;
 			continue;
 		}
-		if ('\n' == message_esc[i])	/* ... how it is specified: \r, \n, or \r\n */
+		if ('\n' == message_ascii[i])	/* ... how it is specified: \r, \n, or \r\n */
 		{
-			if (0 < i && '\r' != message_esc[i - 1])
+			if (0 < i && '\r' != message_ascii[i - 1])
 				len++;
 			continue;
 		}
-		if (NULL == (strchr(EZ_TEXTING_VALID_CHARS, message_esc[i])))
+		if (NULL == (strchr(EZ_TEXTING_VALID_CHARS, message_ascii[i])))
 		{
-			message_esc[i] = '?';
+			message_ascii[i] = '?';
 			continue;
 		}
-		if (NULL != (strchr(EZ_TEXTING_DOUBLE_CHARS, message_esc[i])))
+		if (NULL != (strchr(EZ_TEXTING_DOUBLE_CHARS, message_ascii[i])))
 		{
 			len++;
 			continue;
@@ -171,12 +171,9 @@ int	send_ez_texting(const char *username, const char *password, const char *send
 	if (len > max_message_len)
 		i--;
 
-	message_esc[i] = '\0';
+	message_ascii[i] = '\0';
 
 	/* prepare and make cURL request to Ez Texting API */
-
-	zbx_snprintf(postcontents, sizeof(postcontents), "user=%s&pass=%s&phonenumber=%s&subject=&message=%s",
-			username, password, sendto, message_esc);
 
 	if (NULL == (easy_handle = curl_easy_init()))
 	{
@@ -184,18 +181,24 @@ int	send_ez_texting(const char *username, const char *password, const char *send
 		goto clean;
 	}
 
-	if (NULL == (postfields = curl_easy_escape(easy_handle, postcontents, strlen(postcontents))))
+	if (NULL == (username_esc = curl_easy_escape(easy_handle, username, strlen(username))) ||
+			NULL == (password_esc = curl_easy_escape(easy_handle, password, strlen(password))) ||
+			NULL == (sendto_esc = curl_easy_escape(easy_handle, sendto, strlen(sendto))) ||
+			NULL == (message_esc = curl_easy_escape(easy_handle, message_ascii, strlen(message_ascii))))
 	{
-		zbx_snprintf(error, max_error_len, "Could not URL encode POST contents");
+		zbx_snprintf(error, max_error_len, "Could not URL encode POST fields");
 		goto clean;
 	}
+
+	zbx_snprintf(postfields, sizeof(postfields), "user=%s&pass=%s&phonenumber=%s&subject=&message=%s",
+			username_esc, password_esc, sendto_esc, message_esc);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easy_handle, CURLOPT_USERAGENT, "Zabbix " ZABBIX_VERSION)) ||
 			CURLE_OK != (err = curl_easy_setopt(easy_handle, CURLOPT_FOLLOWLOCATION, 1)) ||
 			CURLE_OK != (err = curl_easy_setopt(easy_handle, CURLOPT_WRITEFUNCTION, WRITEFUNCTION2)) ||
 			CURLE_OK != (err = curl_easy_setopt(easy_handle, CURLOPT_HEADERFUNCTION, HEADERFUNCTION2)) ||
-			CURLE_OK != (err = curl_easy_setopt(easy_handle, CURLOPT_SSL_VERIFYPEER, 0)) ||
-			CURLE_OK != (err = curl_easy_setopt(easy_handle, CURLOPT_SSL_VERIFYHOST, 0)) ||
+			CURLE_OK != (err = curl_easy_setopt(easy_handle, CURLOPT_SSL_VERIFYPEER, 1)) ||
+			CURLE_OK != (err = curl_easy_setopt(easy_handle, CURLOPT_SSL_VERIFYHOST, 1)) ||
 			CURLE_OK != (err = curl_easy_setopt(easy_handle, CURLOPT_POSTFIELDS, postfields)) ||
 			CURLE_OK != (err = curl_easy_setopt(easy_handle, CURLOPT_POST, 1)) ||
 			CURLE_OK != (err = curl_easy_setopt(easy_handle, CURLOPT_URL, EZ_TEXTING_API_URL)) ||
@@ -253,12 +256,18 @@ int	send_ez_texting(const char *username, const char *password, const char *send
 			break;
 	}
 clean:
+	if (NULL != message_ascii)
+		zbx_free(message_ascii);
+	if (NULL != username_esc)
+		zbx_free(username_esc);
+	if (NULL != password_esc)
+		zbx_free(password_esc);
+	if (NULL != sendto_esc)
+		zbx_free(sendto_esc);
 	if (NULL != message_esc)
 		zbx_free(message_esc);
 	if (NULL != page.data)
 		zbx_free(page.data);
-	if (NULL != postfields)
-		curl_free(postfields);
 	if (NULL != easy_handle)
 		curl_easy_cleanup(easy_handle);
 
