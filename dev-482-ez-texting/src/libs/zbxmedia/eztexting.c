@@ -94,7 +94,7 @@ int	send_ez_texting(const char *username, const char *password, const char *send
 	int		ret = FAIL;
 	int		i, len, err;
 	int		max_message_len;
-	char		*message_ascii = NULL;
+	char		*sendto_digits = NULL, *message_ascii = NULL;
 	char		*username_esc = NULL, *password_esc = NULL, *sendto_esc = NULL, *message_esc = NULL;
 	char		postfields[MAX_STRING_LEN];
 	CURL		*easy_handle = NULL;
@@ -181,9 +181,12 @@ int	send_ez_texting(const char *username, const char *password, const char *send
 		goto clean;
 	}
 
+	sendto_digits = strdup(sendto);
+	zbx_remove_chars(sendto_digits, "() -"); /* allow phone numbers to be specified like "(123) 456-7890" */
+
 	if (NULL == (username_esc = curl_easy_escape(easy_handle, username, strlen(username))) ||
 			NULL == (password_esc = curl_easy_escape(easy_handle, password, strlen(password))) ||
-			NULL == (sendto_esc = curl_easy_escape(easy_handle, sendto, strlen(sendto))) ||
+			NULL == (sendto_esc = curl_easy_escape(easy_handle, sendto_digits, strlen(sendto_digits))) ||
 			NULL == (message_esc = curl_easy_escape(easy_handle, message_ascii, strlen(message_ascii))))
 	{
 		zbx_snprintf(error, max_error_len, "Could not URL encode POST fields");
@@ -258,6 +261,8 @@ int	send_ez_texting(const char *username, const char *password, const char *send
 clean:
 	if (NULL != message_ascii)
 		zbx_free(message_ascii);
+	if (NULL != sendto_digits)
+		zbx_free(sendto_digits);
 	if (NULL != username_esc)
 		zbx_free(username_esc);
 	if (NULL != password_esc)
