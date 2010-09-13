@@ -193,6 +193,7 @@ class CGraphItem extends CZBXAPI{
 				' WHERE '.DBin_node('gi.gitemid', $nodeids).
 					$sql_where.
 				$sql_order;
+//SDI($sql);
 		$db_res = DBselect($sql, $sql_limit);
 		while($gitem = DBfetch($db_res)){
 			if($options['count'])

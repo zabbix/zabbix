@@ -198,7 +198,7 @@ function __autoload($class_name){
 		$show_setup = true;
 	}
 
-	if(!defined('ZBX_PAGE_NO_AUTHORIZATION')){
+	if(!defined('ZBX_PAGE_NO_AUTHORIZATION') && !defined('ZBX_RPC_REQUEST')){
 		check_authorisation();
 
 		if(file_exists('include/locales/'.$USER_DETAILS['lang'].'.inc.php')){
