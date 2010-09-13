@@ -59,7 +59,8 @@ include_once('include/page_header.php');
 	$options = array(
 		'nodeids' => get_current_nodeid(true),
 		'graphids' => $_REQUEST['graphid'],
-		'output' => API_OUTPUT_EXTEND
+		'output' => API_OUTPUT_EXTEND,
+		'templated_hosts' => 1,
 	);
 	$host = CHost::get($options);
 	$host = reset($host);

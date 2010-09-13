@@ -1601,6 +1601,7 @@
 	'S_CANNOT_FIND_GRAPH'=>			'Cannot find graph',
 	'S_CANNOT_FIND_ITEM'=>			'Cannot find item',
 	'S_USED_IN_EXPORTED_SCREEN_SMALL'=>'used in exported screen',
+	'S_TEMPLATED'=>'Templated',
 
 //	screenedit.php
 	'S_MAP'=>					'Map',
