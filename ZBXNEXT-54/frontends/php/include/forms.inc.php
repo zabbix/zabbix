@@ -3363,7 +3363,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			$ymax_itemid	= get_request('ymax_itemid', 0);
 			$showworkperiod = get_request('showworkperiod', 0);
 			$showtriggers	= get_request('showtriggers', 0);
-			$legend = get_request('legend' ,0);
+			$legend = get_request('legend', 1);
 			$graph3d	= get_request('graph3d', 0);
 			$visible = get_request('visible');
 			$percent_left  = 0;
