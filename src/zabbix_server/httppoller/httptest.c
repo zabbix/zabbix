@@ -421,10 +421,26 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 			}
 		}
 
-		if( !err_str && httptest->authentication == HTTPTEST_AUTH_BASIC )
+		if (NULL == err_str && httptest->authentication != HTTPTEST_AUTH_NONE)
 		{
+			long	curlauth = 0;
+
 			zabbix_log(LOG_LEVEL_DEBUG, "WEBMonitor: Setting HTTPAUTH [%d]", httptest->authentication);
-			if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPAUTH, CURLAUTH_BASIC)))
+
+			switch (httptest->authentication)
+			{
+				case HTTPTEST_AUTH_BASIC:
+					curlauth = CURLAUTH_BASIC;
+					break;
+				case HTTPTEST_AUTH_NTLM:
+					curlauth = CURLAUTH_NTLM;
+					break;
+				default:
+					THIS_SHOULD_NEVER_HAPPEN;
+					break;
+			}
+
+			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPAUTH, curlauth)))
 			{
 				zabbix_log(LOG_LEVEL_ERR, "Cannot set HTTPAUTH [%s]",
 						curl_easy_strerror(err));
@@ -432,13 +448,14 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 				lastfailedstep = httpstep.no;
 			}
 		}
-		if( !err_str && httptest->authentication == HTTPTEST_AUTH_BASIC)
+
+		if (NULL == err_str && httptest->authentication != HTTPTEST_AUTH_NONE)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "WEBMonitor: Using basic authentication");
+			zabbix_log(LOG_LEVEL_DEBUG, "WEBMonitor: Setting USERPWD for authentication");
 
 			zbx_snprintf(auth, sizeof(auth), "%s:%s", httptest->http_user, httptest->http_password);
 
-			if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERPWD, auth)))
+			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERPWD, auth)))
 			{
 				zabbix_log(LOG_LEVEL_ERR, "Cannot set USERPWD [%s]",
 					curl_easy_strerror(err));
@@ -446,6 +463,7 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 				lastfailedstep = httpstep.no;
 			}
 		}
+
 		if( !err_str )
 		{
 			if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_TIMEOUT, httpstep.timeout)))
