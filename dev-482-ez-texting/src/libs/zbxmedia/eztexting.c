@@ -184,10 +184,6 @@ int	send_ez_texting(const char *username, const char *password, const char *send
 	sendto_digits = strdup(sendto);
 	zbx_remove_chars(sendto_digits, "() -"); /* allow phone numbers to be specified like "(123) 456-7890" */
 
-#ifndef HAVE_FUNCTION_CURL_EASY_ESCAPE
-#define curl_easy_escape(handle, string, length)	curl_escape(string, length)
-#endif
-
 	if (NULL == (username_esc = curl_easy_escape(easy_handle, username, strlen(username))) ||
 			NULL == (password_esc = curl_easy_escape(easy_handle, password, strlen(password))) ||
 			NULL == (sendto_esc = curl_easy_escape(easy_handle, sendto_digits, strlen(sendto_digits))) ||

@@ -241,7 +241,8 @@ x=CURLOPT_VERBOSE;
 		[Define curl_free() as free() if our version of curl lacks curl_free.]))
 
            AC_CHECK_FUNC(curl_easy_escape,
-  	      AC_DEFINE(HAVE_FUNCTION_CURL_EASY_ESCAPE,1,[Define to 1 if function 'curl_easy_escape' exists.]))
+  	      AC_DEFINE(HAVE_FUNCTION_CURL_EASY_ESCAPE,1,
+		[Define to 1 if function 'curl_easy_escape' exists.]))
 
 		LIBS="${_save_curl_libs}"
 		LDFLAGS="${_save_curl_ldflags}"
