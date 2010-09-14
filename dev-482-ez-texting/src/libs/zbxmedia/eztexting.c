@@ -99,7 +99,7 @@ int	send_ez_texting(const char *username, const char *password, const char *send
 	char		postfields[MAX_STRING_LEN];
 	CURL		*easy_handle = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): sendto [%s] message [%s]", __function_name, sendto, message);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sendto:'%s' message:'%s'", __function_name, sendto, message);
 
 	assert(error);
 	*error = '\0';
@@ -212,7 +212,6 @@ int	send_ez_texting(const char *username, const char *password, const char *send
 		goto clean;
 	}
 
-
 	if (CURLE_OK != (err = curl_easy_perform(easy_handle)))
 	{
 		zbx_snprintf(error, max_error_len, "Error doing curl_easy_perform(): [%s]", curl_easy_strerror(err));
@@ -276,7 +275,7 @@ clean:
 	if (NULL != easy_handle)
 		curl_easy_cleanup(easy_handle);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 
