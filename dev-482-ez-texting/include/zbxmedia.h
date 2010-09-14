@@ -20,7 +20,7 @@
 #ifndef ZABBIX_ZBXMEDIA_H
 #define ZABBIX_ZBXMEDIA_H
 
-#include "config.h"
+#include "sysinc.h"
 
 extern char	*CONFIG_SOURCE_IP;
 
