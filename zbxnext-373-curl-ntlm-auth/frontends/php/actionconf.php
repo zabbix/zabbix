@@ -367,14 +367,14 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			if(isset($_REQUEST['escalation']) && (0 == $_REQUEST['esc_period']))
 				$_REQUEST['esc_period'] = 3600;
 
-			$name = get_request('name');
-			$eventsource = get_request('eventsource');
-			$esc_period = get_request('esc_period',0);
-			$status = get_request('status');
-			$def_shortdata = get_request('def_shortdata', ACTION_DEFAULT_SUBJ);
-			$def_longdata = get_request('def_longdata', ACTION_DEFAULT_MSG);
-			$recovery_msg = get_request('recovery_msg',0);
-			$r_shortdata = get_request('r_shortdata', ACTION_DEFAULT_MSG);
+			$name		= get_request('name');
+			$eventsource	= get_request('eventsource');
+			$esc_period	= get_request('esc_period',0);
+			$status		= get_request('status');
+			$def_shortdata	= get_request('def_shortdata', ACTION_DEFAULT_SUBJ);
+			$def_longdata	= get_request('def_longdata', ACTION_DEFAULT_MSG);
+			$recovery_msg	= get_request('recovery_msg',0);
+			$r_shortdata	= get_request('r_shortdata', ACTION_DEFAULT_SUBJ);
 			$r_longdata	= get_request('r_longdata', ACTION_DEFAULT_MSG);
 
 			if(!$esc_period) unset($_REQUEST['escalation']);
