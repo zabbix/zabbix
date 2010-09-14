@@ -2420,6 +2420,22 @@
 	'S_CONFIG_WARNING_WRONG_DOW_PART1'=>			'[Wrong value for day of week:',
 	'S_CONFIG_WARNING_WRONG_DOW_PART2'=>			']',
 
+// info.php
+
+	'S_ZABBIX_VERSION' => 'Zabbix version',
+	'S_ZABBIX_API_VERSION' => 'Zabbix API version',
+	'S_PHP_INFO' => 'PHP info',
+	'S_DATABASE_INFO' => 'Database info',
+	'S_SYSTEM' => 'System',
+	'S_SAPI' => 'SAPI',
+	'S_INT_MAX' => 'Integer max.',
+	'S_INT_SIZE' => 'Integer size',
+	'S_DATABASE' => 'Database',
+	'S_INT_MAX' => 'Max. integer',
+	'S_INT_MAX' => 'Max. integer',
+	'S_EXTENSIONS' => 'Extensions',
+	'S_VERSION' => 'Version',
+	
 //	Menu
 
 	'S_HELP'=>				'Help',
@@ -2438,6 +2454,7 @@
 	'S_LOGOUT'=>				'Logout',
 	'S_PRINT'=>				'Print',
 	'S_LATEST_DATA'=>			'Latest data',
+	'S_ZABBIX_INFO'=>			'Zabbix info',
 
 //	Errors
 	'S_INCORRECT_DESCRIPTION'=>		'Incorrect description',

@@ -33,6 +33,7 @@ class CTable extends CTag{
  protected $rownum;
 
  protected $message;
+ protected $caption = '';
 
 	public function __construct($message=NULL,$class=NULL){
 		parent::__construct('table','yes');
@@ -135,9 +136,16 @@ class CTable extends CTag{
 		return $this->rownum;
 	}
 
+	public function setCaption($caption){
+		$c = new CTag('caption', 'yes');
+		$c->addItem($caption);
+		$this->caption = $c->toString();
+	}
+
 /* protected */
 	public function startToString(){
 		$ret = parent::startToString();
+		$ret .= $this->caption;
 		$ret .= $this->header;
 	return $ret;
 	}

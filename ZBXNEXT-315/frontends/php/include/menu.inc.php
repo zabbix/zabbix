@@ -221,7 +221,10 @@ $ZBX_MENU = array(
 				array('url'=>'instal.php',
 						'label'=>S_INSTALLATION,
 						'sub_pages'=>array('setup.php','warning.php')
-					)
+					),
+				array('url'=>'info.php',
+					'label'=>S_ZABBIX_INFO,
+				)
 			)
 	),
 	'login'=>array(

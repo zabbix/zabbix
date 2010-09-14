@@ -1033,6 +1033,34 @@ table.history td.caption{
 /**************** </HISTORY> *****************/
 
 
+/***************** <ZABBIXINFO> *****************/
+table.zabbixinfo{
+	width: 60%;
+	margin: 10px auto;
+	border-collapse: collapse;
+}
+table.zabbixinfo caption{
+	border: 1px solid black;
+	background-color: #cccccc;
+}
+table.zabbixinfo tr:nth-child(odd){
+	background-color: #eeeeee;
+}
+table.zabbixinfo tr:nth-child(even){
+	background-color: #DDD;
+}
+table.zabbixinfo tr td:first-child{
+	width: 1px;
+	white-space: nowrap;
+}
+table.zabbixinfo tr td{
+	border: 1px solid black;
+	padding: 5px;
+}
+
+/**************** </ZABBIXINFO> *****************/
+
+
 /***************** <MESSAGE> *****************/
 table.msgok{
 	width: 100%;
