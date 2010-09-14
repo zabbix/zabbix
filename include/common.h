@@ -719,7 +719,8 @@ typedef enum
 typedef enum
 {
 	HTTPTEST_AUTH_NONE = 0,
-	HTTPTEST_AUTH_BASIC
+	HTTPTEST_AUTH_BASIC,
+	HTTPTEST_AUTH_NTLM
 } zbx_httptest_auth_t;
 
 #define ZBX_TASK_FLAG_MULTIPLE_AGENTS 0x01
