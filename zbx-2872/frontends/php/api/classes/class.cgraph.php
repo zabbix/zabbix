@@ -1121,6 +1121,7 @@ COpt::memoryPick();
 			if(!isset($graph['name'])) continue;
 
 			$options = array(
+				'nodeids' => get_current_nodeid(true),
 				'filter' => array('name' => $graph['name']),
 				'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
 				'nopermissions' => 1

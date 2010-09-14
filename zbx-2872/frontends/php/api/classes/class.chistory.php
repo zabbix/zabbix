@@ -176,7 +176,7 @@ class CHistory extends CZBXAPI{
 // time_till
 		if(!is_null($options['time_till'])){
 			$sql_parts['select']['clock'] = 'h.clock';
-			$sql_parts['where']['clock_til'] = 'h.clock<='.$options['time_till'];
+			$sql_parts['where']['clock_till'] = 'h.clock<='.$options['time_till'];
 		}
 
 // pattern

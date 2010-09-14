@@ -54,7 +54,7 @@ class CScreen extends CZBXAPI{
 		$user_type = $USER_DETAILS['type'];
 		$userid = $USER_DETAILS['userid'];
 
-		$sort_columns = array('name'); // allowed columns for sorting
+		$sort_columns = array('screenid', 'name'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
 
 
@@ -82,7 +82,7 @@ class CScreen extends CZBXAPI{
 			'extendoutput'				=> null,
 			'output'					=> API_OUTPUT_REFER,
 			'select_screenitems'		=> null,
-			'count'						=> null,
+			'countOutput'				=> null,
 			'preservekeys'				=> null,
 
 			'sortfield'					=> '',
@@ -127,8 +127,8 @@ class CScreen extends CZBXAPI{
 			$sql_parts['select']['screens'] = 's.*';
 		}
 
-// count
-		if(!is_null($options['count'])){
+// countOutput
+		if(!is_null($options['countOutput'])){
 			$options['sortfield'] = '';
 
 			$sql_parts['select'] = array('count(DISTINCT s.screenid) as rowscount');
@@ -204,8 +204,8 @@ class CScreen extends CZBXAPI{
 				$sql_order;
 		$res = DBselect($sql, $sql_limit);
 		while($screen = DBfetch($res)){
-			if(!is_null($options['count'])){
-				$result = $screen;
+			if(!is_null($options['countOutput'])){
+				$result = $screen['rowscount'];
 			}
 			else{
 				$screenids[$screen['screenid']] = $screen['screenid'];
@@ -414,7 +414,7 @@ SDI('/////////////////////////////////');
 			}
 		}
 
-		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['count'])){
+		if(!is_null($options['countOutput'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
@@ -748,7 +748,7 @@ SDI('/////////////////////////////////');
 			DB::delete('screens', DBcondition('screenid', $screenids));
 
 			self::EndTransaction(true, __METHOD__);
-			return true;
+			return array('screenids' => $screenids);
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);

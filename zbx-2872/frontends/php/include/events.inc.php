@@ -457,6 +457,7 @@ function getLastEvents($options){
 
 	$triggerOptions = array(
 		'filter' => array(),
+		'skipDependent'	=> 1,
 		'select_hosts' => array('hostid', 'host'),
 		'output' => API_OUTPUT_EXTEND,
 		'expandDescription' => 1,
