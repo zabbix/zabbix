@@ -10,6 +10,7 @@ Changes for 1.9
 
 Changes for 1.8.4rc1
 
+ - [ZBX-2844] added HTML escaping of screen names in combox box output in monitoring (KB)
  - [ZBXNEXT-373] added support for NTLM authentication to Web monitoring (asaveljevs,Vedmak)
  - [ZBX-1486] when multiple map elements are selected, pressing "Remove" in editing form removes all selected elements (KB)
  - [ZBX-1442] when linking objects during map editing, link "apply" does not close the form any more (KB)
