@@ -44,7 +44,11 @@ class czbxrpc{
 
 		if(!str_in_array($method, $without_auth)){
 // Authentication {{{
-			if(empty($sessionid) && (($resource != 'user') || ($action != 'authenticate'))){
+//
+// compatibility mode
+			if(($resource == 'user') && ($action == 'authenticate')) $action = 'login';
+//----------
+			if(empty($sessionid) && (($resource != 'user') || ($action != 'login'))){
 				self::$result = array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'Not authorized');
 				return self::$result;
 			}

@@ -75,8 +75,6 @@ class CUser extends CZBXAPI{
 			'userids'					=> null,
 			'mediaids'					=> null,
 			'mediatypeids'				=> null,
-			'users' 					=> null,
-			'type'						=> null,
 
 // filter
 			'filter'					=> null,
@@ -92,7 +90,7 @@ class CUser extends CZBXAPI{
 			'select_medias'				=> null,
 			'select_mediatypes'			=> null,
 			'get_access'				=> null,
-			'count'						=> null,
+			'countOutput'				=> null,
 			'preservekeys'				=> null,
 
 			'sortfield'					=> '',
@@ -171,25 +169,13 @@ class CUser extends CZBXAPI{
 			$sql_parts['where']['mu'] = 'm.userid=u.userid';
 		}
 
-// users
-		if(!is_null($options['users'])){
-			zbx_value2array($options['users']);
-			$sql_parts['where'][] = DBcondition('u.alias', $options['users'], false, true);
-		}
-
-// type
-		if(!is_null($options['type'])){
-			$sql_parts['where'][] = 'u.type='.$options['type'];
-		}
-
-
 // extendoutput
 		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['users'] = 'u.*';
 		}
 
-// count
-		if(!is_null($options['count'])){
+// countOutput
+		if(!is_null($options['countOutput'])){
 			$options['sortfield'] = '';
 
 			$sql_parts['select'] = array('count(u.userid) as rowscount');
@@ -220,6 +206,12 @@ class CUser extends CZBXAPI{
 				zbx_value2array($options['filter']['alias']);
 				$sql_parts['where']['alias'] = DBcondition('u.alias', $options['filter']['alias'], false, true);
 			}
+
+			if(isset($options['filter']['type'])){
+				zbx_value2array($options['filter']['type']);
+				$sql_parts['where']['type'] = DBcondition('u.type', $options['filter']['type']);
+			}
+
 		}
 
 // order
@@ -265,8 +257,8 @@ class CUser extends CZBXAPI{
 //SDI($sql);
 		$res = DBselect($sql, $sql_limit);
 		while($user = DBfetch($res)){
-			if(!is_null($options['count'])){
-				$result = $user;
+			if(!is_null($options['countOutput'])){
+				$result = $user['rowscount'];
 			}
 			else{
 				$userids[$user['userid']] = $user['userid'];
@@ -313,9 +305,8 @@ class CUser extends CZBXAPI{
 		}
 
 Copt::memoryPick();
-		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['count'])){
+		if(!is_null($options['countOutput'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
-
 			return $result;
 		}
 
@@ -579,7 +570,7 @@ Copt::memoryPick();
 
 		$options = array(
 			'userids' => zbx_objectValues($users, 'userid'),
-			'extendoutput' => 1,
+			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => 1
 		);
 		$upd_users = self::get($options);
@@ -670,10 +661,12 @@ Copt::memoryPick();
 			if($result && isset($user['usrgrps']) && !is_null($user['usrgrps'])){
 				DBexecute('DELETE FROM users_groups WHERE userid='.$user['userid']);
 
-				$usrgrps = CUserGroup::get(array(
+				$options = array(
 					'usrgrpids' => zbx_objectValues($user['usrgrps'], 'usrgrpid'),
-					'extendoutput' => 1,
-					'preservekeys' => 1));
+					'output' => API_OUTPUT_EXTEND,
+					'preservekeys' => 1
+				);
+				$usrgrps = CUserGroup::get($options);
 
 				foreach($usrgrps as $groupid => $group){
 					if(!$result) break;
@@ -761,7 +754,7 @@ Copt::memoryPick();
 		$options = array(
 			'nodeids' => id2nodeid($USER_DETAILS['userid']),
 			'userids' => $USER_DETAILS['userid'],
-			'extendoutput' => 1,
+			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => 1
 		);
 		$upd_users = self::get($options);
@@ -848,8 +841,8 @@ Copt::memoryPick();
 		$result = true;
 
 		$options = array(
-			'userids'=>zbx_objectValues($users, 'userid'),
-			'extendoutput'=>1,
+			'userids'=> zbx_objectValues($users, 'userid'),
+			'output'=> API_OUTPUT_EXTEND,
 			'preservekeys'=>1
 		);
 		$del_users = self::get($options);
@@ -1028,7 +1021,9 @@ Copt::memoryPick();
 			$del_medias = array();
 
 			$userids = zbx_objectValues($users, 'userid');
-			$sql = 'SELECT m.mediaid FROM media m WHERE '.DBcondition('userid', $userids);
+			$sql = 'SELECT m.mediaid '.
+					' FROM media m '.
+					' WHERE '.DBcondition('userid', $userids);
 			$result = DBselect($sql);
 			while($media = DBfetch($result)){
 				$del_medias[$media['mediaid']] = $media;
@@ -1098,6 +1093,68 @@ Copt::memoryPick();
 //  LOGIN Methods
 // ******************************************************************************
 
+	public static function login($user){
+		$config = select_config();
+		$user['auth_type'] = $config['authentication_type'];
+
+		$login = self::authenticate($user);
+
+		if($login){
+// TODO: why we need to recheck authentication???
+			self::checkAuthentication($login);
+			return $login;
+		}
+		else{
+			self::$error[] = array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => $_REQUEST['message']);
+			return false;
+		}
+	}
+
+	public static function ldapLogin($user){
+		$name = $user['user'];
+		$passwd = $user['password'];
+		$cnf = isset($user['cnf'])?$user['cnf']:null;
+
+		if(is_null($cnf)){
+			$config = select_config();
+			foreach($config as $id => $value){
+				if(zbx_strpos($id,'ldap_') !== false){
+					$cnf[str_replace('ldap_','',$id)] = $config[$id];
+				}
+			}
+		}
+
+		if(!function_exists('ldap_connect')){
+			info(S_CUSER_ERROR_LDAP_MODULE_MISSING);
+			return false;
+		}
+
+		$ldap = new CLdap($cnf);
+		$ldap->connect();
+
+		$result = $ldap->checkPass($name,$passwd);
+
+	return $result;
+	}
+
+	public static function logout($sessionid){
+		global $ZBX_LOCALNODEID;
+
+		$sql = 'SELECT s.* '.
+			' FROM sessions s '.
+			' WHERE s.sessionid='.zbx_dbstr($sessionid).
+				' AND s.status='.ZBX_SESSION_ACTIVE.
+				' AND '.DBin_node('s.userid', $ZBX_LOCALNODEID);
+
+		$session = DBfetch(DBselect($sql));
+		if(!$session) return false;
+
+		zbx_unsetcookie('zbx_sessionid');
+		DBexecute('DELETE FROM sessions WHERE status='.ZBX_SESSION_PASSIVE.' AND userid='.zbx_dbstr($session['userid']));
+		DBexecute('UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.' WHERE sessionid='.zbx_dbstr($sessionid));
+
+	return true;
+	}
 /**
  * Authenticate user
  *
@@ -1113,22 +1170,6 @@ Copt::memoryPick();
  * @return string session ID
  */
 	public static function authenticate($user){
-		$config = select_config();
-		$user['auth_type'] = $config['authentication_type'];
-
-		$login = self::login($user);
-
-		if($login){
-			self::checkAuthentication($login);
-			return $login;
-		}
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => $_REQUEST['message']);
-			return false;
-		}
-	}
-
-	public static function login($user){
 		global $USER_DETAILS, $ZBX_LOCALNODEID;
 
 		$name = $user['user'];
@@ -1234,52 +1275,6 @@ Copt::memoryPick();
 		}
 
 	return $login;
-	}
-
-	public static function ldapLogin($user){
-		$name = $user['user'];
-		$passwd = $user['password'];
-		$cnf = isset($user['cnf'])?$user['cnf']:null;
-
-		if(is_null($cnf)){
-			$config = select_config();
-			foreach($config as $id => $value){
-				if(zbx_strpos($id,'ldap_') !== false){
-					$cnf[str_replace('ldap_','',$id)] = $config[$id];
-				}
-			}
-		}
-
-		if(!function_exists('ldap_connect')){
-			info(S_CUSER_ERROR_LDAP_MODULE_MISSING);
-			return false;
-		}
-
-		$ldap = new CLdap($cnf);
-		$ldap->connect();
-
-		$result = $ldap->checkPass($name,$passwd);
-
-	return $result;
-	}
-
-	public static function logout($sessionid){
-		global $ZBX_LOCALNODEID;
-
-		$sql = 'SELECT s.* '.
-			' FROM sessions s '.
-			' WHERE s.sessionid='.zbx_dbstr($sessionid).
-				' AND s.status='.ZBX_SESSION_ACTIVE.
-				' AND '.DBin_node('s.userid', $ZBX_LOCALNODEID);
-
-		$session = DBfetch(DBselect($sql));
-		if(!$session) return false;
-
-		zbx_unsetcookie('zbx_sessionid');
-		DBexecute('DELETE FROM sessions WHERE status='.ZBX_SESSION_PASSIVE.' AND userid='.zbx_dbstr($session['userid']));
-		DBexecute('UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.' WHERE sessionid='.zbx_dbstr($sessionid));
-
-	return true;
 	}
 
 /**

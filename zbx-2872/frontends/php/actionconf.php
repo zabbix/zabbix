@@ -971,14 +971,14 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 					if($new_operation['object'] == OPERATION_OBJECT_GROUP) {
 						$object_srctbl = 'usrgrp';
 						$object_srcfld1 = 'usrgrpid';
-						$object_name = CUserGroup::get(array('usrgrpids' => $new_operation['objectid'], 'extendoutput' => 1));
+						$object_name = CUserGroup::get(array('usrgrpids' => $new_operation['objectid'], 'output' => API_OUTPUT_EXTEND));
 						$object_name = reset($object_name);
 						$display_name = 'name';
 					}
 					else {
 						$object_srctbl = 'users';
 						$object_srcfld1 = 'userid';
-						$object_name = CUser::get(array('userids' => $new_operation['objectid'], 'extendoutput' => 1));
+						$object_name = CUser::get(array('userids' => $new_operation['objectid'], 'output' => API_OUTPUT_EXTEND));
 						$object_name = reset($object_name);
 						$display_name = 'alias';
 					}

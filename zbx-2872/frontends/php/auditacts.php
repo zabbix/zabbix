@@ -162,7 +162,7 @@ include_once('include/page_header.php');
 		'limit' => ($config['search_limit']+1)
 	);
 	if($_REQUEST['alias']){
-		$user = CUser::getObjects(array('alias' => $_REQUEST['alias']));
+		$user = CUser::get(array('filter' => array('alias' => $_REQUEST['alias'])));
 		$user = reset($user);
 		$options['userids'] = $user['userid'];
 	}
