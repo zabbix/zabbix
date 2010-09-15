@@ -186,6 +186,9 @@ void	DCflush_nextchecks()
 	zbx_uint64_t	*ids = NULL;
 	int		ids_allocated = 32, ids_num = 0;
 
+	zbx_uint64_t	*triggerids = NULL;
+	int		triggerids_allocated = 32, triggerids_num = 0;
+
 	struct event_objectid_clock 	*events = NULL;
 	int		events_num = 0, events_allocated = 32;
 
@@ -196,6 +199,7 @@ void	DCflush_nextchecks()
 
 	sql = zbx_malloc(sql, sql_allocated);
 	ids = zbx_malloc(ids, ids_allocated * sizeof(zbx_uint64_t));
+	triggerids = zbx_malloc(triggerids, triggerids_allocated * sizeof(zbx_uint64_t));
 
 	DBbegin();
 
@@ -252,13 +256,18 @@ void	DCflush_nextchecks()
 			ZBX_STR2UINT64(triggerid, row[0]);
 			ZBX_STR2UINT64(itemid, row[1]);
 
+			/* do not generate multiple unknown events for a trigger */
+			if (SUCCEED == uint64_array_exists(triggerids, triggerids_num, triggerid))
+				continue;
+
+			uint64_array_add(&triggerids, &triggerids_allocated, &triggerids_num, triggerid, 64);
+
 			/* index `i' will surely contain necessary itemid */
 			i = get_nearestindex(nextchecks, sizeof(ZBX_DC_NEXTCHECK), nextcheck_num, itemid);
 
 			if (i == nextcheck_num || nextchecks[i].itemid != itemid)
 			{
-				/* this branch can never be reached */
-				zabbix_log(LOG_LEVEL_ERR, "Item [" ZBX_FS_UI64 "] was not found in `nextchecks' items list.", itemid);
+				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
 			}
 
