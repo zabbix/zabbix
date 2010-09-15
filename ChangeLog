@@ -10,6 +10,7 @@ Changes for 1.9
 
 Changes for 1.8.4rc1
 
+ - [ZBX-1425] option ALL is added to host group dropdown when adding or editing host group (KB)
  - [ZBX-1675] fixed map element coordinates do not update after the element has been dragged (Vedmak)
  - [ZBX-1292] item names are now prefixed with host names, if they are from different hosts in trigger discription popup (KB)
  - [ZBX-2844] added HTML escaping of screen names in combox box output in monitoring (KB)
