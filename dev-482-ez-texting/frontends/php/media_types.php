@@ -45,7 +45,7 @@ include_once('include/page_header.php');
 		'exec_path'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.MEDIA_TYPE_EXEC.')&&isset({save})'),
 		'gsm_modem'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.MEDIA_TYPE_SMS.')&&isset({save})'),
 		'username'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.MEDIA_TYPE_JABBER.'||{type}=='.MEDIA_TYPE_EZ_TEXTING.')&&isset({save})'),
-		'password'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.MEDIA_TYPE_JABBER.'||{type}=='.MEDIA_TYPE_EZ_TEXTING.')&&isset({save})'),
+		'password'=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL, NULL),
 /* actions */
 		'save'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'delete'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -76,6 +76,8 @@ include_once('include/page_header.php');
 			'username' => get_request('username'),
 			'passwd' => get_request('password')
 		);
+		
+		if(is_null($mediatype['passwd'])) unset($mediatype['passwd']);
 
 		if(isset($_REQUEST['mediatypeid'])){
 			$action = AUDIT_ACTION_UPDATE;
@@ -135,14 +137,17 @@ include_once('include/page_header.php');
 ?>
 <?php
 	if(isset($_REQUEST['form'])){
-		if(isset($_REQUEST['mediatypeid']) && !isset($_REQUEST['form_refresh'])){
+		if(isset($_REQUEST['mediatypeid'])){
 			$options = array(
 				'mediatypeids' => $_REQUEST['mediatypeid'],
 				'output' => API_OUTPUT_EXTEND,
 			);
 			$mediatypes = CMediatype::get($options);
 			$mediatype = reset($mediatypes);
-
+			$password = $mediatype['passwd'];
+		}
+		
+		if(isset($_REQUEST['mediatypeid']) && !isset($_REQUEST['form_refresh'])){
 			$mediatypeid = $mediatype['mediatypeid'];
 			$type = $mediatype['type'];
 			$description = $mediatype['description'];
@@ -152,7 +157,6 @@ include_once('include/page_header.php');
 			$exec_path = $mediatype['exec_path'];
 			$gsm_modem = $mediatype['gsm_modem'];
 			$username = $mediatype['username'];
-			$password = $mediatype['passwd'];
 		}
 		else{
 			$type = get_request('type', 0);
@@ -165,59 +169,81 @@ include_once('include/page_header.php');
 
 			$default_username = ($type == MEDIA_TYPE_EZ_TEXTING) ? 'username' : 'user@server';
 			$username = get_request('username', $default_username);
-			$password = get_request('password', '');
 		}
 
-		$frmMeadia = new CFormTable(S_MEDIA);
+		$frmMedia = new CFormTable(S_MEDIA);
 //		$frmMeadia->setHelp('web.config.medias.php');
 
 		if(isset($_REQUEST['mediatypeid'])){
-			$frmMeadia->addVar('mediatypeid', $_REQUEST['mediatypeid']);
+			$frmMedia->addVar('mediatypeid', $_REQUEST['mediatypeid']);
 		}
 
-		$frmMeadia->addRow(S_DESCRIPTION, new CTextBox('description', $description, 30));
+		$frmMedia->addRow(S_DESCRIPTION, new CTextBox('description', $description, 30));
 
 		$cmbType = new CComboBox('type', $type, 'submit()');
-		$cmbType->addItems(media_type2str());
-		$frmMeadia->addRow(S_TYPE, $cmbType);
+		$cmbType->addItems(array(
+			MEDIA_TYPE_EMAIL => S_EMAIL,
+			MEDIA_TYPE_EXEC => S_SCRIPT,
+			MEDIA_TYPE_SMS => S_SMS,
+			MEDIA_TYPE_JABBER => S_JABBER,
+		));
+		$cmbType->addItemsInGroup(S_COMMERCIAL, array(MEDIA_TYPE_EZ_TEXTING => S_EZ_TEXTING));
+		
+		$row = array($cmbType);
+		if($type == MEDIA_TYPE_EZ_TEXTING){
+			$ez_texting_link = new CLink('https://app.eztexting.com', 'https://app.eztexting.com/', null, null, 'nosid');
+			$ez_texting_link->setTarget('_blank');
+			$row[] = $ez_texting_link;
+		}
+		$frmMedia->addRow(S_TYPE, $row);
 
-		switch($type){
-			case MEDIA_TYPE_EMAIL:
-				$frmMeadia->addRow(S_SMTP_SERVER,new CTextBox('smtp_server', $smtp_server, 30));
-				$frmMeadia->addRow(S_SMTP_HELO,new CTextBox('smtp_helo', $smtp_helo, 30));
-				$frmMeadia->addRow(S_SMTP_EMAIL,new CTextBox('smtp_email', $smtp_email, 30));
-				break;
-			case MEDIA_TYPE_SMS:
-				$frmMeadia->addRow(S_GSM_MODEM,new CTextBox('gsm_modem', $gsm_modem, 50));
-				break;
-			case MEDIA_TYPE_EXEC:
-				$frmMeadia->addRow(S_SCRIPT_NAME,new CTextBox('exec_path', $exec_path, 50));
-				break;
-			case MEDIA_TYPE_JABBER:
-				$frmMeadia->addRow(S_JABBER_IDENTIFIER, new CTextBox('username', $username, 30));
-				$frmMeadia->addRow(S_PASSWORD, new CPassBox('password', $password, 30));
-				break;
-			case MEDIA_TYPE_EZ_TEXTING:
-				$frmMeadia->addRow(SPACE, new CLink('https://app.eztexting.com', 'https://app.eztexting.com/', null, null, 'nosid'));
-				$frmMeadia->addRow(S_USERNAME, new CTextBox('username', $username, 30));
-				$frmMeadia->addRow(S_PASSWORD, new CPassBox('password', $password, 30));
+		if($type == MEDIA_TYPE_EMAIL){
+			$frmMedia->addRow(S_SMTP_SERVER,new CTextBox('smtp_server', $smtp_server, 30));
+			$frmMedia->addRow(S_SMTP_HELO,new CTextBox('smtp_helo', $smtp_helo, 30));
+			$frmMedia->addRow(S_SMTP_EMAIL,new CTextBox('smtp_email', $smtp_email, 30));
+		}
+		else if($type == MEDIA_TYPE_SMS){
+			$frmMedia->addRow(S_GSM_MODEM,new CTextBox('gsm_modem', $gsm_modem, 50));
+		}
+		else if($type == MEDIA_TYPE_EXEC){
+			$frmMedia->addRow(S_SCRIPT_NAME,new CTextBox('exec_path', $exec_path, 50));
+		}
+		else if($type == MEDIA_TYPE_JABBER || $type == MEDIA_TYPE_EZ_TEXTING){
+			if(isset($_REQUEST['mediatypeid']) && !empty($password)){
+				$chPass_btn = new CButton('chPass_btn', S_CHANGE_PASSWORD, 'this.style.display="none"; $("password").enable().show().focus();', false);
+				$pass_txt = new CPassBox('password', '', 30);
+				$pass_txt->setAttribute('disabled', 'disabled');
+				$pass_txt->addStyle('display: none;');
+				$pass_fields = array($chPass_btn, $pass_txt);
+			}
+			else{
+				$pass_fields = new CPassBox('password', '', 30);
+			}
+
+			if($type == MEDIA_TYPE_JABBER){
+				$frmMedia->addRow(S_JABBER_IDENTIFIER, new CTextBox('username', $username, 30));
+				$frmMedia->addRow(S_PASSWORD, $pass_fields);
+			}
+			else{
+				$frmMedia->addRow(S_USERNAME, new CTextBox('username', $username, 30));
+				$frmMedia->addRow(S_PASSWORD, $pass_fields);
 				$limit_cb = new CComboBox('exec_path', $exec_path);
 				$limit_cb->addItems(array(
 					EZ_TEXTING_LIMIT_USA => S_EZ_TEXTING_USA, 
 					EZ_TEXTING_LIMIT_CANADA => S_EZ_TEXTING_CANADA,
 				));
-				$frmMeadia->addRow(S_MESSAGE_TEXT_LIMIT, $limit_cb);
-				break;
+				$frmMedia->addRow(S_MESSAGE_TEXT_LIMIT, $limit_cb);
+			}
 		}
 
-		$frmMeadia->addItemToBottomRow(new CButton('save', S_SAVE));
+		$frmMedia->addItemToBottomRow(new CButton('save', S_SAVE));
 		if(isset($_REQUEST['mediatypeid'])){
-			$frmMeadia->addItemToBottomRow(array(SPACE, new CButtonDelete(S_DELETE_SELECTED_MEDIA,
+			$frmMedia->addItemToBottomRow(array(SPACE, new CButtonDelete(S_DELETE_SELECTED_MEDIA,
 				url_param('form').url_param('mediatypeid'))));
 		}
-		$frmMeadia->addItemToBottomRow(array(SPACE, new CButtonCancel()));
+		$frmMedia->addItemToBottomRow(array(SPACE, new CButtonCancel()));
 
-		$medias_wdgt->addItem($frmMeadia);
+		$medias_wdgt->addItem($frmMedia);
 	}
 	else{
 		$numrows = new CDiv();
@@ -231,7 +257,7 @@ include_once('include/page_header.php');
 
 		$table=new CTableInfo(S_NO_MEDIA_TYPES_DEFINED);
 		$table->setHeader(array(
-			new CCheckBox('all_media_types',NULL,"checkAll('".$form->getName()."','all_media_types','media_types');"),
+			new CCheckBox('all_media_types', NULL, "checkAll('".$form->getName()."','all_media_types','media_types');"),
 			make_sorting_header(S_DESCRIPTION,'description'),
 			make_sorting_header(S_TYPE,'type'),
 			S_DETAILS
