@@ -1556,39 +1556,51 @@ Copt::memoryPick();
 
 // UPDATE MACROS {{{
 			if(isset($data['macros']) && !is_null($data['macros'])){
-				$host_macros = CUserMacro::get(array(
+				$macrosToAdd = zbx_toHash($data['macros'], 'macro');
+
+				$hostMacros = CUserMacro::get(array(
 					'hostids' => $hostids,
 					'output' => API_OUTPUT_EXTEND,
 				));
+				$hostMacros = zbx_toHash($hostMacros, 'macro');
 
-				$macros_to_del = array();
-				foreach($host_macros as $hmacro){
-					$del = true;
-					foreach($data['macros'] as $nmacro){
-						if($hmacro['macro'] == $nmacro['macro']){
-							$del = false;
-							break;
-						}
-					}
-					if($del){
-						$macros_to_del[] = $hmacro;
+// Delete
+				$macrosToDelete = array();
+				foreach($hostMacros as $hmnum => $hmacro){
+					if(!isset($macrosToAdd[$hmacro['macro']])){
+						$macrosToDelete[] = $hmacro;
 					}
 				}
-				if(!empty($macros_to_del)){
-					$result = self::massRemove(array('hosts' => $hosts, 'macros' => $macros_to_del));
+
+// Update
+				$macrosToUpdate = array();
+				foreach($macrosToAdd as $nhmnum => $nhmacro){
+					if(isset($hostMacros[$nhmacro['macro']])){
+						$macrosToUpdate[] = $nhmacro;
+						unset($macrosToAdd[$nhmnum]);
+					}
+				}
+//----
+
+				if(!empty($macrosToDelete)){
+					$result = self::massRemove(array('hosts' => $hosts, 'macros' => $macrosToDelete));
 					if(!$result){
 						self::exception(ZBX_API_ERROR_PARAMETERS, 'Can\'t remove macro');
 					}
 				}
 
-				$result = CUsermacro::massUpdate(array('hosts' => $hosts, 'macros' => $data['macros']));
-				if(!$result){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot update macro');
+				if(!empty($macrosToUpdate)){
+					$result = CUsermacro::massUpdate(array('hosts' => $hosts, 'macros' => $macrosToUpdate));
+					if(!$result){
+						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot update macro');
+					}
 				}
 
-				$result = self::massAdd(array('hosts' => $hosts, 'macros' => $data['macros']));
-				if(!$result){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot add macro');
+				if(!empty($macrosToAdd)){
+					$result = self::massAdd(array('hosts' => $hosts, 'macros' => $macrosToAdd));
+					if(!$result){
+						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot add macro');
+					}
 				}
 			}
 // }}} UPDATE MACROS

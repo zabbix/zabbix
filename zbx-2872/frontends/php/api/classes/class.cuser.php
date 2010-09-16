@@ -908,33 +908,37 @@ Copt::memoryPick();
 		$medias = zbx_toArray($media_data['medias']);
 		$users = zbx_toArray($media_data['users']);
 
+		$userids = array();
+
 		if($USER_DETAILS['type'] < USER_TYPE_ZABBIX_ADMIN){
 			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_CUSER_ERROR_ONLY_ADMIN_CAN_ADD_USER_MEDIAS);
 			return false;
 		}
 
 		foreach($users as $unum => $user){
+			$userids[] = $user['userid'];
+
 			foreach($medias as $mnum => $media){
-					if(!validate_period($media['period'])){
-						self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_INCORRECT_TIME_PERIOD);
-						return false;
-					}
+				if(!validate_period($media['period'])){
+					self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_INCORRECT_TIME_PERIOD);
+					return false;
+				}
 
-					$mediaid = get_dbid('media','mediaid');
+				$mediaid = get_dbid('media','mediaid');
 
-					$sql='INSERT INTO media (mediaid,userid,mediatypeid,sendto,active,severity,period) '.
-							' VALUES ('.$mediaid.','.$user['userid'].','.$media['mediatypeid'].','.
-										zbx_dbstr($media['sendto']).','.$media['active'].','.$media['severity'].','.
-										zbx_dbstr($media['period']).')';
+				$sql='INSERT INTO media (mediaid,userid,mediatypeid,sendto,active,severity,period) '.
+						' VALUES ('.$mediaid.','.$user['userid'].','.$media['mediatypeid'].','.
+									zbx_dbstr($media['sendto']).','.$media['active'].','.$media['severity'].','.
+									zbx_dbstr($media['period']).')';
 
-					$result = DBexecute($sql);
+				$result = DBexecute($sql);
 
 				if(!$result) break 2;
 			}
 		}
 
 		if($result){
-			return $medias;
+			return array('userids'=>$userids);
 		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => S_CUSER_ERROR_INTERNAL_ZABBIX_ERROR);
@@ -970,7 +974,7 @@ Copt::memoryPick();
 		$result = DBexecute($sql);
 
 		if($result){
-			return true;
+			return array('mediaids'=>$mediaids);
 		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => S_CUSER_ERROR_INTERNAL_ZABBIX_ERROR);
@@ -1076,6 +1080,7 @@ Copt::memoryPick();
 			}
 
 			$result = self::EndTransaction($result, __METHOD__);
+			return array('userids'=>$userids);
 		}
 		catch(APIException $e){
 			if($transaction) self::EndTransaction(false, __METHOD__);
@@ -1085,8 +1090,6 @@ Copt::memoryPick();
 			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
 		}
-
-	return true;
 	}
 
 // ******************************************************************************

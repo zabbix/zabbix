@@ -1004,8 +1004,9 @@ else {
 			$table_schema = self::getSchema($table);
 
 			foreach($data as $rnum => $row){
-				$sql_set = '';
 				zbx_value2array($row['where']);
+
+				$sql_set = '';
 				foreach($row['values'] as $field => $value){
 					if(!isset($table_schema['fields'][$field])){
 						continue;

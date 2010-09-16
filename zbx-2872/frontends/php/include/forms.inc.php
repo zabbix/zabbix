@@ -5642,11 +5642,11 @@ JAVASCRIPT;
 			$macros = get_request('macros', array());
 		}
 		else if($hostid > 0){
-			$macros = CUserMacro::get(array('extendoutput' => 1, 'hostids' => $hostid));
+			$macros = CUserMacro::get(array('output' => API_OUTPUT_EXTEND, 'hostids' => $hostid));
 			order_result($macros, 'macro');
 		}
 		else if($hostid === null){
-			$macros = CUserMacro::get(array('extendoutput' => 1, 'globalmacro' => 1));
+			$macros = CUserMacro::get(array('output' => API_OUTPUT_EXTEND, 'globalmacro' => 1));
 			order_result($macros, 'macro');
 		}
 		else{

@@ -79,12 +79,14 @@ class CUserGroup extends CZBXAPI{
 // filter
 			'filter'                    => null,
 			'pattern'					=> '',
+			'startPattern'				=> null,
+			'excludePattern'			=> null,
 // OutPut
 			'extendoutput'				=> null,
-			'output'					=> API_OUTPUT_REFER,
 			'editable'					=> null,
+			'output'					=> API_OUTPUT_REFER,
 			'select_users'				=> null,
-			'count'						=> null,
+			'countOutput'						=> null,
 			'preservekeys'				=> null,
 
 			'sortfield'					=> '',
@@ -160,8 +162,8 @@ class CUserGroup extends CZBXAPI{
 			$sql_parts['select']['usrgrp'] = 'g.*';
 		}
 
-// count
-		if(!is_null($options['count'])){
+// countOutput
+		if(!is_null($options['countOutput'])){
 			$options['sortfield'] = '';
 
 			$sql_parts['select'] = array('count(g.usrgrpid) as rowscount');
@@ -172,8 +174,22 @@ class CUserGroup extends CZBXAPI{
 			$sql_parts['where']['name'] = ' UPPER(g.name) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
 		}
 
+// pattern
+		if(!zbx_empty($options['pattern'])){
+			$exclude = is_null($options['excludePattern'])?'':' NOT ';
+
+			if(!is_null($options['startPattern'])){
+				$sql_parts['where']['name'] = ' UPPER(g.name) '.$exclude.' LIKE '.zbx_dbstr(zbx_strtoupper($options['pattern']).'%');
+			}
+			else{
+				$sql_parts['where']['name'] = ' UPPER(g.name) '.$exclude.' LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
+			}
+		}
+
 // filter
 		if(!is_null($options['filter'])){
+			zbx_value2array($options['filter']);
+
 			if(isset($options['filter']['name'])){
 				zbx_value2array($options['filter']['name']);
 				$sql_parts['where']['name'] = DBcondition('g.name', $options['filter']['name'], false, true);
@@ -223,8 +239,9 @@ class CUserGroup extends CZBXAPI{
 //SDI($sql);
 		$res = DBselect($sql, $sql_limit);
 		while($usrgrp = DBfetch($res)){
-			if($options['count'])
-				$result = $usrgrp;
+			if($options['countOutput']){
+				$result = $usrgrp['rowscount'];
+			}
 			else{
 				$usrgrpids[$usrgrp['usrgrpid']] = $usrgrp['usrgrpid'];
 
@@ -252,7 +269,7 @@ class CUserGroup extends CZBXAPI{
 			}
 		}
 
-		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['count'])){
+		if(!is_null($options['countOutput'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
@@ -263,7 +280,7 @@ class CUserGroup extends CZBXAPI{
 			$obj_params = array(
 				'output' => $options['select_users'],
 				'usrgrpids' => $usrgrpids,
-				'get_access' => 1,
+				'get_access' => ($options['select_users'] == API_OUTPUT_EXTEND)?true:null,
 				'preservekeys' => 1
 			);
 			$users = CUser::get($obj_params);
@@ -354,7 +371,7 @@ class CUserGroup extends CZBXAPI{
 				}
 
 				if(self::exists(array('name' => $usrgrp['name'], 'nodeids' => get_current_nodeid(false)))){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_GROUP . ' ' . $usrgrp['name'] . ' ' . S_ALREADY_EXISTS_SMALL);
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_USER_GROUP.' [ '.$usrgrp['name'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
 				$insert[$gnum] = $usrgrp;
 			}
@@ -401,6 +418,8 @@ class CUserGroup extends CZBXAPI{
 		}
 
 		$usrgrps = zbx_toArray($usrgrps);
+		$usrgrpids = zbx_objectValues($usrgrps, 'usrgrpid');
+
 		try{
 			self::BeginTransaction(__METHOD__);
 
@@ -418,7 +437,7 @@ class CUserGroup extends CZBXAPI{
 			}
 
 			self::EndTransaction(true, __METHOD__);
-			return true;
+		return array('usrgrpids'=> $usrgrpids);
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
@@ -443,10 +462,11 @@ class CUserGroup extends CZBXAPI{
 			self::BeginTransaction(__METHOD__);
 
 			if(!is_null($userids)){
-				$usrgrps = self::get(array(
+				$options = array(
 					'usrgrpids' => $usrgrpids,
 					'output' => API_OUTPUT_EXTEND,
-				));
+				);
+				$usrgrps = self::get($options);
 				foreach($usrgrps as $usrgrp){
 					if((($usrgrp['gui_access'] == GROUP_GUI_ACCESS_DISABLED)
 							|| ($usrgrp['users_status'] == GROUP_STATUS_DISABLED))
@@ -457,9 +477,9 @@ class CUserGroup extends CZBXAPI{
 
 				$linked_users = array();
 				$sql = 'SELECT usrgrpid, userid'.
-						' FROM users_groups'.
-						' WHERE '.DBcondition('usrgrpid', $usrgrpids).
-							' AND '.DBcondition('userid', $userids);
+					' FROM users_groups'.
+					' WHERE '.DBcondition('usrgrpid', $usrgrpids).
+						' AND '.DBcondition('userid', $userids);
 				$linked_users_db = DBselect($sql);
 				while($link = DBfetch($linked_users_db)){
 					if(!isset($linked_users[$link['usrgrpid']])) $linked_users[$link['usrgrpid']] = array();
@@ -508,7 +528,7 @@ class CUserGroup extends CZBXAPI{
 			}
 
 			self::EndTransaction(true, __METHOD__);
-			return true;
+			return array('usrgrpids' => $usrgrpids);
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
@@ -526,11 +546,9 @@ class CUserGroup extends CZBXAPI{
 		}
 
 		$usrgrpids = zbx_toArray($data['usrgrpids']);
-		unset($data['usrgrpids']);
 		$userids = (isset($data['userids']) && !is_null($data['userids'])) ? zbx_toArray($data['userids']) : null;;
-		unset($data['userids']);
 		$rights = zbx_toArray($data['rights']);
-		unset($data['rights']);
+
 		$update = array();
 
 		try{
@@ -540,7 +558,7 @@ class CUserGroup extends CZBXAPI{
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Multiple Name column');
 			}
 
-			foreach($usrgrpids as $usrgrpid){
+			foreach($usrgrpids as $ugnum => $usrgrpid){
 				if(isset($data['name'])){
 					$group_exists = self::get(array(
 						'filter' => array('name' => $data['name']),
@@ -625,7 +643,7 @@ class CUserGroup extends CZBXAPI{
 				$rights_update = array();
 				$rights_to_unlink = array();
 				foreach($usrgrpids as $usrgrpid){
-					foreach($rights as $right){
+					foreach($rights as $rnum => $right){
 						if(!isset($linked_rights[$usrgrpid][$right['id']])){
 							$rights_insert[] = array(
 								'groupid' => $usrgrpid,
@@ -647,20 +665,25 @@ class CUserGroup extends CZBXAPI{
 					}
 				}
 
-				if(!empty($rights_insert))
+				if(!empty($rights_insert)){
 					DB::insert('rights', $rights_insert);
-				if(!empty($rights_to_unlink))
+				}
+
+				if(!empty($rights_to_unlink)){
 					DB::delete('rights', array(
 						DBcondition('id', $rights_to_unlink),
 						DBcondition('groupid', $usrgrpids),
 					));
-				if(!empty($rights_update))
+				}
+
+				if(!empty($rights_update)){
 					DB::update('rights', $rights_update);
+				}
 			}
 
 
 			self::EndTransaction(true, __METHOD__);
-			return true;
+			return array('usrgrpids' => $usrgrpids);
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
@@ -671,7 +694,7 @@ class CUserGroup extends CZBXAPI{
 		}
 	}
 
-	public static function massDelete($data){
+	public static function massRemove($data){
 
 	}
 
@@ -699,7 +722,7 @@ class CUserGroup extends CZBXAPI{
 			DB::delete('usrgrp', array(DBcondition('usrgrpid', $usrgrpids)));
 
 			self::EndTransaction(true, __METHOD__);
-			return true;
+			return array('usrgrpids' => $usrgrpids);
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);

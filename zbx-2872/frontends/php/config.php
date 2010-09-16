@@ -499,12 +499,12 @@ include_once('include/page_header.php');
 		if(isset($_REQUEST['save'])){
 			try{
 				DBstart();
-				$global_macros = CUserMacro::get(array('globalmacro' => 1, 'extendoutput' => 1));
+				$global_macros = CUserMacro::get(array('globalmacro' => 1, 'output' => API_OUTPUT_EXTEND));
 				$global_macros = zbx_toHash($global_macros, 'globalmacroid');
 
 				$macros = get_request('macros', array());
 
-				$macros_to_del = array();
+				$macrosToDelete = array();
 				foreach($global_macros as $gmacro){
 					$del = true;
 					foreach($macros as $nmacro){
@@ -514,11 +514,11 @@ include_once('include/page_header.php');
 						}
 					}
 					if($del){
-						$macros_to_del[] = $gmacro;
+						$macrosToDelete[] = $gmacro['macro'];
 					}
 				}
-				if(!empty($macros_to_del)){
-					if(!CUserMacro::deleteGlobal($macros_to_del))
+				if(!empty($macrosToDelete)){
+					if(!CUserMacro::deleteGlobal($macrosToDelete))
 						throw new Exception('Can\'t remove macro');
 				}
 
@@ -535,10 +535,10 @@ include_once('include/page_header.php');
 				$new_macros = CUserMacro::get(array(
 					'globalmacroids' => $new_macroids['globalmacroids'],
 					'globalmacro' => 1,
-					'extendoutput' => 1
+					'output' => API_OUTPUT_EXTEND
 				));
 				$new_macros = zbx_toHash($new_macros, 'globalmacroid');
-				foreach($macros_to_del as $delm){
+				foreach($macrosToDelete as $delm){
 					add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MACRO,
 						$delm['globalmacroid'],
 						$global_macros[$delm['globalmacroid']]['macro'],

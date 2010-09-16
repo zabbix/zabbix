@@ -623,10 +623,10 @@ COpt::memoryPick();
 
 			foreach($groups as $num => $group){
 				if(!is_array($group) || !isset($group['name']) || empty($group['name'])){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, 'Empty input parameter [ name ]');
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ name ]');
 				}
 				if(self::exists(array('name' => $group['name']))){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, 'HostGroup [ '.$group['name'].' ] already exists');
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'HostGroup [ '.$group['name'].' ] already exists');
 				}
 
 				$insert[] = $group;
@@ -794,6 +794,7 @@ COpt::memoryPick();
 
 			$hosts = isset($data['hosts']) ? zbx_toArray($data['hosts']) : null;
 			$hostids = is_null($hosts) ? array() : zbx_objectValues($hosts, 'hostid');
+
 			$templates = isset($data['templates']) ? zbx_toArray($data['templates']) : null;
 			$templateids = is_null($templates) ? array() : zbx_objectValues($templates, 'templateid');
 
