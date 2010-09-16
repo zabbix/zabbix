@@ -250,11 +250,11 @@ class CMaintenance extends CZBXAPI{
 			//maintenance name
 			if(isset($options['filter']['name']) && !is_null($options['filter']['name'])){
 				zbx_value2array($options['filter']['name']);
-				$sql_parts['where']['name'] = DBcondition('m.name', $options['filter']['name'], false, true);//false - not integer, true - is a string
+				$sql_parts['where']['name'] = DBcondition('m.name', $options['filter']['name'], false, true);//false - NOT IN, true - is a string
 			}
 			//maintenance id
 			if(isset($options['filter']['maintenanceid']) && !is_null($options['filter']['maintenanceid'])){
-				zbx_value2array($options['filter']['name']);
+				zbx_value2array($options['filter']['maintenanceid']);
 				$sql_parts['where']['maintenanceid'] = DBcondition('m.maintenanceid', $options['filter']['maintenanceid']);
 			}
 
@@ -410,6 +410,29 @@ Copt::memoryPick();
 
 	return $result;
 	}
+
+	
+	/**
+	 * Determine, whether an object already exists
+	 *
+	 * @param array $object
+	 * @return bool
+	 */
+	public static function exists($object){
+		$keyFields = array(array('maintenanceid', 'name'));
+
+		$options = array(
+			'filter' => zbx_array_mintersect($keyFields, $object),
+			'output' => API_OUTPUT_SHORTEN,
+			'nopermissions' => 1,
+			'limit' => 1
+		);
+
+		$objs = self::get($options);
+
+	return !empty($objs);
+	}
+
 
 /**
  * Add maintenances
@@ -585,10 +608,10 @@ Copt::memoryPick();
 									'name'=>$maintenance['name']
 								)
 				);
-				$res = CMaintenance::get($options);
+				$recieved_maintenaces = CMaintenance::get($options);
 				//now going though a result, to find records with different id, then our object
-				foreach($res as $r){
-					if ($r['maintenanceid'] != $maintenance['maintenanceid']) {
+				foreach($recieved_maintenaces as $r_maintenace){
+					if ($r_maintenace['maintenanceid'] != $maintenance['maintenanceid']) {
 						//error! Maintenance with this name already exists
 						self::exception(ZBX_API_ERROR_PARAMETERS, S_MAINTENANCE.' [ '.$maintenance['name'].' ] '.S_ALREADY_EXISTS_SMALL);
 					}
@@ -777,26 +800,7 @@ Copt::memoryPick();
 	}
 
 
-	/**
-	 * Determine, whether an object already exists
-	 *
-	 * @param array $object
-	 * @return bool
-	 */
-	public static function exists($object){
-		$keyFields = array(array('maintenanceid', 'name'));
 
-		$options = array(
-			'filter' => zbx_array_mintersect($keyFields, $object),
-			'output' => API_OUTPUT_SHORTEN,
-			'nopermissions' => 1,
-			'limit' => 1
-		);
-
-		$objs = self::get($options);
-
-	return !empty($objs);
-	}
 
 }
 ?>
