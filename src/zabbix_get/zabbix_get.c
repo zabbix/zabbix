@@ -114,13 +114,13 @@ static void	get_signal_handler(int sig)
  *                                                                            *
  * Purpose: connect to Zabbix agent and receive value for given key           *
  *                                                                            *
- * Parameters: host   - server name or IP address                               *
+ * Parameters: host   - server name or IP address                             *
  *             port   - port number                                           *
  *             key    - item's key                                            *
  *             value_max_len - maximal size of value                          *
  *                                                                            *
  * Return value: SUCCEED - ok, FAIL - otherwise                               *
- *             value  - retrieved value                                      *
+ *             value  - retrieved value                                       *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
