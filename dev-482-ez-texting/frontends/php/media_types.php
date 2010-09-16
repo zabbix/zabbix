@@ -198,7 +198,7 @@ include_once('include/page_header.php');
 				$frmMeadia->addRow(S_PASSWORD, new CPassBox('password', $password, 30));
 				break;
 			case MEDIA_TYPE_EZ_TEXTING:
-				$frmMeadia->addRow(SPACE, new CLink('https://app.eztexting.com/', 'https://app.eztexting.com/', null, null, 'nosid'));
+				$frmMeadia->addRow(SPACE, new CLink('https://app.eztexting.com', 'https://app.eztexting.com/', null, null, 'nosid'));
 				$frmMeadia->addRow(S_USERNAME, new CTextBox('username', $username, 30));
 				$frmMeadia->addRow(S_PASSWORD, new CPassBox('password', $password, 30));
 				$limit_cb = new CComboBox('exec_path', $exec_path);
