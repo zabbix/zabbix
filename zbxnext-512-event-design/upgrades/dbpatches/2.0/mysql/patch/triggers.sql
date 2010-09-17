@@ -1,5 +1,6 @@
 ALTER TABLE triggers MODIFY triggerid bigint unsigned NOT NULL,
-		     MODIFY templateid bigint unsigned NULL;
+		     MODIFY templateid bigint unsigned NULL,
+		     DROP dep_level;
 UPDATE triggers SET templateid=NULL WHERE templateid=0;
 CREATE TEMPORARY TABLE tmp_triggers_triggerid (triggerid bigint unsigned PRIMARY KEY);
 INSERT INTO tmp_triggers_triggerid (triggerid) (SELECT triggerid FROM triggers);
