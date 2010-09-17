@@ -8,6 +8,7 @@ ALTER TABLE items MODIFY templateid NULL;
 ALTER TABLE items MODIFY valuemapid DEFAULT NULL;
 ALTER TABLE items MODIFY valuemapid NULL;
 ALTER TABLE items ADD lastns number(10) NULL;
+ALTER TABLE items ADD description_details nvarchar2(2048) DEFAULT '';
 UPDATE items SET templateid=NULL WHERE templateid=0;
 UPDATE items SET templateid=NULL WHERE NOT templateid IS NULL AND NOT templateid IN (SELECT itemid FROM items);
 UPDATE items SET valuemapid=NULL WHERE valuemapid=0;
