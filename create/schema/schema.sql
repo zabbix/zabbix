@@ -893,7 +893,6 @@ FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|value		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|priority	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|lastchange	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|dep_level	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|comments	|t_blob		|''	|NOT NULL	|ZBX_SYNC
 FIELD		|error		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|templateid	|t_id		|	|NULL		|ZBX_SYNC		|1|triggers	|triggerid
