@@ -41,6 +41,7 @@ include_once('include/page_header.php');
 		'resourcetype'=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,16),	'isset({save})'),
 		'caption'=>		array(T_ZBX_STR, O_OPT,  null,  null,	null),
 		'resourceid'=>	array(T_ZBX_INT, O_OPT,  null,  DB_ID, 	'isset({save})'),
+		'templateid'=>	array(T_ZBX_INT, O_OPT,  null,  DB_ID, 	null),
 		'width'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	null),
 		'height'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	null),
 		'colspan'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,100),		null),
@@ -243,36 +244,6 @@ include_once('include/page_header.php');
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN,' Name ['.$screen['name'].'] Items switched');
 		}
 	}
-
-
-// tpl screen kostilj -->
-	$_REQUEST['screen_templateid'] = templated_screen($_REQUEST['screenid']);
-	$screen_type = $_REQUEST['screen_templateid'] ? SCREEN_TYPE_TEMPLATED : SCREEN_TYPE_NORMAL;
-
-	$change_screen_type = get_request('screen_type');
-	if(!is_null($change_screen_type) && ($screen_type != $change_screen_type)){
-		$screen_type = $change_screen_type;
-		$sql = 'DELETE FROM screens_items WHERE screenid='.$_REQUEST['screenid'];
-		$db_sitems = DBexecute($sql);
-		$_REQUEST['screen_templateid'] = false;
-	}
-	$_REQUEST['screen_type'] = $screen_type;
-
-	$type_form = new CForm();
-	$type_form->setName('screen_type_form');
-	$type_form->addVar('screenid', $_REQUEST['screenid']);
-	if($_REQUEST['screen_type'] == SCREEN_TYPE_NORMAL){
-		$norm_link = new CSpan(S_NORMAL);
-		$tpl_link = new CLink(S_TEMPLATED, '#', null, 'if(confirm("delete all")) create_var('.$type_form->getName().', "screen_type", '.SCREEN_TYPE_TEMPLATED.', true)');
-	}
-	else{
-		$norm_link = new CLink(S_NORMAL, '#', null, 'if(confirm("delete all")) create_var('.$type_form->getName().', "screen_type", '.SCREEN_TYPE_NORMAL.', true)');
-		$tpl_link = new CSpan(S_TEMPLATED);
-	}
-	$type_form->addItem(array(S_TYPE.': ', $norm_link, SPACE, $tpl_link));
-
-	$trigg_wdgt->addHeader($type_form);
-
 
 	$table = get_screen($_REQUEST['screenid'], 1);
 	$trigg_wdgt->addItem($table);

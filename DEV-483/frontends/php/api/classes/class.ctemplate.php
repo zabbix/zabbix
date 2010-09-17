@@ -82,6 +82,7 @@ class CTemplate extends CZBXAPI{
 			'select_graphs'				=> null,
 			'select_applications'		=> null,
 			'select_macros'				=> null,
+			'select_screens'			=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -334,7 +335,7 @@ class CTemplate extends CZBXAPI{
 			$options['sortfield'] = '';
 			$sql_parts['select'] = array('count(DISTINCT h.hostid) as rowscount');
 
-//groupCount
+// groupCount
 			if(!is_null($options['groupCount'])){
 				foreach($sql_parts['group'] as $key => $fields){
 					$sql_parts['select'][$key] = $fields;
@@ -394,7 +395,7 @@ class CTemplate extends CZBXAPI{
 		if(!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
 		if(!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
 		if(!empty($sql_parts['where']))		$sql_where.= ' AND '.implode(' AND ',$sql_parts['where']);
-		if(!empty($sql_parts['group']))		$sql_where.= ' GROUP BY '.implode(',',$sql_parts['group']);
+		if(!empty($sql_parts['group']))		$sql_group.= ' GROUP BY '.implode(',',$sql_parts['group']);
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
@@ -425,34 +426,32 @@ class CTemplate extends CZBXAPI{
 					if(!is_null($options['select_groups']) && !isset($result[$template['templateid']]['groups'])){
 						$template['groups'] = array();
 					}
-
 					if(!is_null($options['select_templates']) && !isset($result[$template['templateid']]['templates'])){
 						$template['templates'] = array();
 					}
-
 					if(!is_null($options['select_hosts']) && !isset($result[$template['templateid']]['hosts'])){
 						$template['hosts'] = array();
 					}
 					if(!is_null($options['selectParentTemplates']) && !isset($result[$template['templateid']]['parentTemplates'])){
 						$template['parentTemplates'] = array();
 					}
-
 					if(!is_null($options['select_items']) && !isset($result[$template['templateid']]['items'])){
 						$template['items'] = array();
 					}
-
 					if(!is_null($options['select_triggers']) && !isset($result[$template['templateid']]['triggers'])){
 						$template['triggers'] = array();
 					}
-
 					if(!is_null($options['select_graphs']) && !isset($result[$template['templateid']]['graphs'])){
 						$template['graphs'] = array();
 					}
 					if(!is_null($options['select_applications']) && !isset($result[$template['templateid']]['applications'])){
 						$template['applications'] = array();
 					}
-					if(!is_null($options['select_macros']) && !isset($result[$host['hostid']]['macros'])){
+					if(!is_null($options['select_macros']) && !isset($result[$template['templateid']]['macros'])){
 						$template['macros'] = array();
+					}
+					if(!is_null($options['select_screens']) && !isset($result[$template['templateid']]['screens'])){
+						$template['screens'] = array();
 					}
 
 // groupids
@@ -729,7 +728,7 @@ Copt::memoryPick();
 
 				if(!is_null($options['limitSelects'])) order_result($triggers, 'description');
 				foreach($triggers as $triggerid => $trigger){
-					unset($trigger[$triggerid]['hosts']);
+					unset($triggers[$triggerid]['hosts']);
 
 					foreach($trigger['hosts'] as $hnum => $host){
 						if(!is_null($options['limitSelects'])){
@@ -739,7 +738,7 @@ Copt::memoryPick();
 							if($count[$host['hostid']] > $options['limitSelects']) continue;
 						}
 
-						$result[$host['hostid']]['triggers'][] = &$trigger[$triggerid];
+						$result[$host['hostid']]['triggers'][] = &$triggers[$triggerid];
 					}
 				}
 			}
@@ -773,7 +772,7 @@ Copt::memoryPick();
 
 				if(!is_null($options['limitSelects'])) order_result($graphs, 'name');
 				foreach($graphs as $graphid => $graph){
-					unset($graph[$graphid]['hosts']);
+					unset($graphs[$graphid]['hosts']);
 
 					foreach($graph['hosts'] as $hnum => $host){
 						if(!is_null($options['limitSelects'])){
@@ -783,7 +782,7 @@ Copt::memoryPick();
 							if($count[$host['hostid']] > $options['limitSelects']) continue;
 						}
 
-						$result[$host['hostid']]['graphs'][] = &$graph[$graphid];
+						$result[$host['hostid']]['graphs'][] = &$graphs[$graphid];
 					}
 				}
 			}
@@ -817,7 +816,7 @@ Copt::memoryPick();
 
 				if(!is_null($options['limitSelects'])) order_result($applications, 'name');
 				foreach($applications as $applicationid => $application){
-					unset($application[$applicationid]['hosts']);
+					unset($applications[$applicationid]['hosts']);
 
 					foreach($application['hosts'] as $hnum => $host){
 						if(!is_null($options['limitSelects'])){
@@ -827,7 +826,7 @@ Copt::memoryPick();
 							if($count[$host['hostid']] > $options['limitSelects']) continue;
 						}
 
-						$result[$host['hostid']]['applications'][] = &$application[$applicationid];
+						$result[$host['hostid']]['applications'][] = &$applications[$applicationid];
 					}
 				}
 			}
@@ -846,6 +845,52 @@ Copt::memoryPick();
 			}
 		}
 
+// Adding screens
+		if(!is_null($options['select_screens'])){
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'templateids' => $templateids,
+				'nopermissions' => 1,
+				'preservekeys' => 1
+			);
+
+			if(is_array($options['select_screens']) || str_in_array($options['select_screens'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['select_screens'];
+				$screens = CScreen::get($obj_params);
+
+				if(!is_null($options['limitSelects'])) order_result($screens, 'name');
+				foreach($screens as $screenid => $screen){
+					unset($screens[$screenid]['templates']);
+
+					$count = array();
+					foreach($screen['templates'] as $template){
+						if(!is_null($options['limitSelects'])){
+							if(!isset($count[$template['templateid']]))
+								$count[$template['templateid']] = 0;
+							$count[$template['templateid']]++;
+
+							if($count[$template['templateid']] > $options['limitSelects']) continue;
+						}
+
+						$result[$template['templateid']]['screens'][] = &$screens[$screenid];
+					}
+				}
+			}
+			else if(API_OUTPUT_COUNT == $options['select_screens']){
+				$obj_params['countOutput'] = 1;
+				$obj_params['groupCount'] = 1;
+
+				$screens = CScreen::get($obj_params);
+				$screens = zbx_toHash($screens, 'templateid');
+				foreach($result as $templateid => $template){
+					if(isset($screens[$templateid]))
+						$result[$templateid]['screens'] = $screens[$templateid]['rowscount'];
+					else
+						$result[$templateid]['screens'] = 0;
+				}
+			}
+		}
+
 // Adding macros
 		if(!is_null($options['select_macros']) && str_in_array($options['select_macros'], $subselects_allowed_outputs)){
 			$obj_params = array(
@@ -856,10 +901,10 @@ Copt::memoryPick();
 			);
 			$macros = CUserMacro::get($obj_params);
 			foreach($macros as $macroid => $macro){
-				$mhosts = $macro['hosts'];
-				unset($macro['hosts']);
-				foreach($mhosts as $hnum => $host){
-					$result[$host['hostid']]['macros'][] = $macro;
+				unset($macros[$macroid]['hosts']);
+
+				foreach($macro['hosts'] as $hnum => $host){
+					$result[$host['hostid']]['macros'][] = $macros[$macroid];
 				}
 			}
 		}

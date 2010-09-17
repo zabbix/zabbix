@@ -4051,48 +4051,46 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 	}
 
 	function insert_screen_form(){
+		$frmScr = new CFormTable();
 
-		$frm_title = S_SCREEN;
 		if(isset($_REQUEST['screenid'])){
 			$result=DBselect('SELECT screenid,name,hsize,vsize '.
 						' FROM screens g '.
 						' WHERE screenid='.$_REQUEST['screenid']);
 			$row=DBfetch($result);
-			$frm_title = S_SCREEN.' "'.$row['name'].'"';
-		}
-		if(isset($_REQUEST['screenid']) && !isset($_REQUEST['form_refresh'])){
-			$name=$row['name'];
-			$hsize=$row['hsize'];
-			$vsize=$row['vsize'];
-		}
-		else{
-			$name=get_request('name','');
-			$hsize=get_request('hsize',1);
-			$vsize=get_request('bsize',1);
-		}
 
-		$frmScr = new CFormTable($frm_title,'screenconf.php');
-		$frmScr->setHelp('web.screenconf.screen.php');
-
-		$frmScr->addVar('config', 0);
-
-		if(isset($_REQUEST['screenid'])){
+			$frmScr->setTitle(S_SCREEN.' "'.$row['name'].'"');
 			$frmScr->addVar('screenid',$_REQUEST['screenid']);
 		}
-		$frmScr->addRow(S_NAME, new CTextBox('name',$name,32));
-		$frmScr->addRow(S_COLUMNS, new CNumericBox('hsize',$hsize,3));
-		$frmScr->addRow(S_ROWS, new CNumericBox('vsize',$vsize,3));
+		else{
+			$frmScr->setTitle(S_SCREEN);
+		}
 
-		$frmScr->addItemToBottomRow(new CButton('save',S_SAVE));
+
+		if(isset($_REQUEST['screenid']) && !isset($_REQUEST['form_refresh'])){
+			$name = $row['name'];
+			$hsize = $row['hsize'];
+			$vsize = $row['vsize'];
+		}
+		else{
+			$name = get_request('name', '');
+			$hsize = get_request('hsize', 1);
+			$vsize = get_request('bsize', 1);
+			$frmScr->addVar('templateid', get_request('templateid'));
+		}
+
+
+		$frmScr->addRow(S_NAME, new CTextBox('name', $name, 32));
+		$frmScr->addRow(S_COLUMNS, new CNumericBox('hsize', $hsize, 3));
+		$frmScr->addRow(S_ROWS, new CNumericBox('vsize', $vsize, 3));
+
+		$frmScr->addItemToBottomRow(new CButton('save', S_SAVE));
 		if(isset($_REQUEST['screenid'])){
 			/* $frmScr->addItemToBottomRow(SPACE);
 			$frmScr->addItemToBottomRow(new CButton('clone',S_CLONE)); !!! TODO */
-			$frmScr->addItemToBottomRow(SPACE);
-			$frmScr->addItemToBottomRow(new CButtonDelete(S_DELETE_SCREEN_Q,
-				url_param('form').url_param('screenid')));
+			$frmScr->addItemToBottomRow(array(SPACE, new CButtonDelete(S_DELETE_SCREEN_Q, url_param('form').url_param('screenid'))));
 		}
-		$frmScr->addItemToBottomRow(SPACE);
-		$frmScr->addItemToBottomRow(new CButtonCancel());
+		$frmScr->addItemToBottomRow(array(SPACE, new CButtonCancel(url_param('templateid'))));
 
 		return $frmScr;
 	}
@@ -5534,24 +5532,34 @@ JAVASCRIPT;
 * @param array $elemnts [items, triggers, graphs, applications]
 * @return object
 */
-	function get_header_host_table($hostid, $elements){
+	function get_header_host_table($hostid, $current){
+		$elements = array(
+			'items' => 'items',
+			'triggers' => 'triggers',
+			'graphs' => 'graphs',
+			'applications' => 'applications',
+			'screens' => 'screens',
+		);
+		unset($current);
+
 		$header_host_opt = array(
 			'hostids' => $hostid,
-			'extendoutput' => 1,
+			'output' => API_OUTPUT_EXTEND,
 			'templated_hosts' => 1,
 		);
-		if(str_in_array('items', $elements))
-			$header_host_opt['select_items'] = 1;
-		if(str_in_array('triggers', $elements))
-			$header_host_opt['select_triggers'] = 1;
-		if(str_in_array('graphs', $elements))
-			$header_host_opt['select_graphs'] = 1;
-		if(str_in_array('applications', $elements))
-			$header_host_opt['select_applications'] = 1;
+		if(isset($elements['items']))
+			$header_host_opt['select_items'] = API_OUTPUT_COUNT;
+		if(isset($elements['triggers']))
+			$header_host_opt['select_triggers'] = API_OUTPUT_COUNT;
+		if(isset($elements['graphs']))
+			$header_host_opt['select_graphs'] = API_OUTPUT_COUNT;
+		if(isset($elements['applications']))
+			$header_host_opt['select_applications'] = API_OUTPUT_COUNT;
+		if(isset($elements['screens']))
+			$header_host_opt['select_screens'] = API_OUTPUT_COUNT;
 
 		$header_host = CHost::get($header_host_opt);
 		$header_host = array_pop($header_host);
-
 
 		$description = array();
 		if($header_host['proxy_hostid']){
@@ -5560,32 +5568,38 @@ JAVASCRIPT;
 		}
 		$description[] = $header_host['host'];
 
-		if(str_in_array('items', $elements)){
+		if(isset($elements['items'])){
 			$items = array(new CLink(S_ITEMS, 'items.php?hostid='.$header_host['hostid']),
-				' ('.count($header_host['items']).')');
+				' ('.$header_host['items'].')');
 		}
-		if(str_in_array('triggers', $elements)){
+		if(isset($elements['triggers'])){
 			$triggers = array(new CLink(S_TRIGGERS, 'triggers.php?hostid='.$header_host['hostid']),
-				' ('.count($header_host['triggers']).')');
+				' ('.$header_host['triggers'].')');
 		}
-		if(str_in_array('graphs', $elements)){
+		if(isset($elements['graphs'])){
 			$graphs = array(new CLink(S_GRAPHS, 'graphs.php?hostid='.$header_host['hostid']),
-				' ('.count($header_host['graphs']).')');
+				' ('.$header_host['graphs'].')');
 		}
-		if(str_in_array('applications', $elements)){
+		if(isset($elements['applications'])){
 			$applications = array(new CLink(S_APPLICATIONS, 'applications.php?hostid='.$header_host['hostid']),
-				' ('.count($header_host['applications']).')');
+				' ('.$header_host['applications'].')');
 		}
+
 
 		$tbl_header_host = new CTable();
 		if($header_host['status'] == HOST_STATUS_TEMPLATE){
+			if(isset($elements['screens'])){
+				$screens = array(new CLink(S_SCREENS, 'screenconf.php?templateid='.$header_host['hostid']),
+					' ('.$header_host['screens'].')');
+			}
 
 			$tbl_header_host->addRow(array(
 				new CLink(bold(S_TEMPLATE_LIST), 'templates.php?templateid='.$header_host['hostid'].url_param('groupid')),
-				(str_in_array('applications', $elements) ? $applications : null),
-				(str_in_array('items', $elements) ? $items : null),
-				(str_in_array('triggers', $elements) ? $triggers : null),
-				(str_in_array('graphs', $elements) ? $graphs : null),
+				(isset($elements['applications']) ? $applications : null),
+				(isset($elements['items']) ? $items : null),
+				(isset($elements['triggers']) ? $triggers : null),
+				(isset($elements['graphs']) ? $graphs : null),
+				(isset($elements['screens']) ? $screens : null),
 				array(bold(S_TEMPLATE.': '), $description)
 			));
 		}
@@ -5600,28 +5614,28 @@ JAVASCRIPT;
 
 			switch($header_host['status']){
 				case HOST_STATUS_MONITORED:
-					$status=new CSpan(S_MONITORED, 'off');
+					$status = new CSpan(S_MONITORED, 'off');
 					break;
 				case HOST_STATUS_NOT_MONITORED:
-					$status=new CSpan(S_NOT_MONITORED, 'off');
+					$status = new CSpan(S_NOT_MONITORED, 'off');
 					break;
 				default:
-					$status=S_UNKNOWN;
+					$status = S_UNKNOWN;
 			}
 
 			if($header_host['available'] == HOST_AVAILABLE_TRUE)
-				$available=new CSpan(S_AVAILABLE,'off');
+				$available = new CSpan(S_AVAILABLE, 'off');
 			else if($header_host['available'] == HOST_AVAILABLE_FALSE)
-				$available=new CSpan(S_NOT_AVAILABLE,'on');
+				$available = new CSpan(S_NOT_AVAILABLE, 'on');
 			else if($header_host['available'] == HOST_AVAILABLE_UNKNOWN)
-				$available=new CSpan(S_UNKNOWN,'unknown');
+				$available = new CSpan(S_UNKNOWN, 'unknown');
 
 			$tbl_header_host->addRow(array(
 				new CLink(bold(S_HOST_LIST), 'hosts.php?hostid='.$header_host['hostid'].url_param('groupid')),
-				(str_in_array('applications', $elements) ? $applications : null),
-				(str_in_array('items', $elements) ? $items : null),
-				(str_in_array('triggers', $elements) ? $triggers : null),
-				(str_in_array('graphs', $elements) ? $graphs : null),
+				(isset($elements['applications']) ? $applications : null),
+				(isset($elements['items']) ? $items : null),
+				(isset($elements['triggers']) ? $triggers : null),
+				(isset($elements['graphs']) ? $graphs : null),
 				array(bold(S_HOST.': '),$description),
 				array(bold(S_DNS.': '), $dns),
 				array(bold(S_IP.': '), $ip),

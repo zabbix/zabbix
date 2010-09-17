@@ -12204,7 +12204,7 @@ INSERT INTO sysmaps_elements VALUES (2,2,10017,0,19,NULL,NULL,'Zabbix server',NU
 -- Dumping data for table `screens`
 --
 
-INSERT INTO screens VALUES (2,'Zabbix server',2,3);
+INSERT INTO screens VALUES (2,'Zabbix server',2,3,NULL);
 
 --
 -- Dumping data for table `screens_items`
