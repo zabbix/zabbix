@@ -553,6 +553,9 @@
 	'S_INCORRECT_GROUP'=>				'Incorrect group',
 	'S_NOTHING_TO_DO'=>				'Nothing to do',
 	'S_INCORRECT_WORK_PERIOD'=>			'Incorrect work period',
+	'S_EZ_TEXTING_USA' => 'USA (160 characters)',
+	'S_EZ_TEXTING_CANADA' => 'Canada (136 characters)',
+	'S_MESSAGE_TEXT_LIMIT' => 'Message text limit',
 
 	'S_REGULAR_EXPRESSIONS'=>			'Regular expressions',
 	'S_REGULAR_EXPRESSION'=>			'Regular expression',
@@ -594,6 +597,7 @@
 
 // media_types.php
 	'S_DELETE_SELECTED_MEDIATYPES_Q'=>		'Delete selected media types?',
+	'S_COMMERCIAL' => 'Commercial',
 
 //	nodes.php
 	'S_NOT_DM_SETUP'=>			'Your setup is not configured for distributed monitoring',
@@ -1122,9 +1126,11 @@
 	'S_NOT_SUPPORTED'=>					'Not supported',
 	'S_EMAIL'=>						'Email',
 	'S_JABBER'=>						'Jabber',
-	'S_JABBER_IDENTIFIER'=>					'Jabber Identifier',
+	'S_JABBER_IDENTIFIER'=>					'Jabber identifier',
 	'S_SMS'=>						'SMS',
 	'S_SCRIPT'=>						'Script',
+	'S_EZ_TEXTING'=>						'Ez Texting',
+	'S_USERNAME'=>						'Username',
 	'S_GSM_MODEM'=>						'GSM modem',
 	'S_UNITS'=>						'Units',
 	'S_UPDATE_INTERVAL_IN_SEC'=>				'Update interval (in sec)',
@@ -2405,6 +2411,7 @@
 
 // class.cmediatype.php
 	'S_CMEDIATYPE_ERROR_WRONG_FIELD_FOR_MEDIATYPE' =>	'Wrong fields for media type',
+	'S_CMEDIATYPE_ERROR_PASSWORD_REQUIRED' =>	'Password required for mediatype',
 	'S_CMEDIATYPE_ERROR_CANT_DELETE_MEDIATYPES'=>		'Can\'t delete media types',
 	'S_CMEDIATYPE_ERROR_CANT_UPDATE_MEDIATYPES'=>		'Can\'t update media types',
 	'S_CMEDIATYPE_ERROR_CANT_INSERT_MEDIATYPES'=>		'Can\'t insert media types',

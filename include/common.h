@@ -396,7 +396,8 @@ typedef enum
 	MEDIA_TYPE_EMAIL = 0,
 	MEDIA_TYPE_EXEC,
 	MEDIA_TYPE_SMS,
-	MEDIA_TYPE_JABBER
+	MEDIA_TYPE_JABBER,
+	MEDIA_TYPE_EZ_TEXTING = 100
 } zbx_media_type_t;
 
 /* Alert statuses */
@@ -657,11 +658,11 @@ const char	*zbx_nodetype_string(unsigned char nodetype);
 #endif
 
 /* Secure string copy */
-#define strscpy(x,y) zbx_strlcpy(x,y,sizeof(x))
-#define strnscpy(x,y,n) zbx_strlcpy(x,y,n);
+#define strscpy(x, y)		zbx_strlcpy(x, y, sizeof(x))
+#define strnscpy(x, y, n)	zbx_strlcpy(x, y, n);
 
-#define	zbx_malloc(old, size) zbx_malloc2(__FILE__, __LINE__, old , size)
-#define	zbx_realloc(old, size) zbx_realloc2(__FILE__, __LINE__, old , size)
+#define zbx_malloc(old, size)	zbx_malloc2(__FILE__, __LINE__, old , size)
+#define zbx_realloc(old, size)	zbx_realloc2(__FILE__, __LINE__, old , size)
 
 void    *zbx_malloc2(char *filename, int line, void *old, size_t size);
 void    *zbx_realloc2(char *filename, int line, void *src, size_t size);
@@ -732,12 +733,13 @@ ZBX_TASK_EX
 	int		flags;
 };
 
-char	*string_replace(char *str, char *sub_str1, char *sub_str2);
+char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2);
 
 int	is_double_prefix(const char *str);
 int	is_double(const char *c);
 int	is_uint_prefix(const char *c);
 int	is_uint(const char *c);
+int	is_int_prefix(const char *c);
 int	is_uint64(const char *str, zbx_uint64_t *value);
 int	is_uoct(const char *str);
 int	is_uhex(const char *str);
@@ -916,6 +918,7 @@ void	zbx_strupper(char *str);
 #if defined(_WINDOWS) || defined(HAVE_ICONV)
 char	*convert_to_utf8(char *in, size_t in_size, const char *encoding);
 #endif	/* HAVE_ICONV */
+char	*zbx_replace_utf8(const char *text, char replacement);
 
 void	win2unix_eol(char *text);
 int	str2uint(const char *str);

@@ -575,7 +575,7 @@ static void	got_control_setting(ipmi_control_t *control, int err, void *cb_data)
 
 	h->done = 1;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s():%s",
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s",
 			__function_name, zbx_result_string(h->ret));
 }
 

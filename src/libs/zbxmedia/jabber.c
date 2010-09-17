@@ -21,7 +21,7 @@
 #include "log.h"
 #include "zlog.h"
 
-#include "jabber.h"
+#include "zbxmedia.h"
 
 #include <iksemel.h>
 
@@ -476,7 +476,8 @@ lbl_fail:
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	send_jabber(char *username, char *passwd, char *sendto, char *subject, char *message, char *error, int max_error_len)
+int	send_jabber(const char *username, const char *password, const char *sendto,
+		const char *subject, const char *message, char *error, int max_error_len)
 {
 	const char	*__function_name = "send_jabber";
 	iks		*x;
@@ -492,7 +493,7 @@ int	send_jabber(char *username, char *passwd, char *sendto, char *subject, char 
 	jabber_error = error;
 	jabber_error_len = max_error_len;
 
-	if (SUCCEED != connect_jabber(username, passwd, 1, IKS_JABBER_PORT))
+	if (SUCCEED != connect_jabber(username, password, 1, IKS_JABBER_PORT))
 		goto lbl_fail;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s: sending",

@@ -1360,7 +1360,7 @@ int	_wis_uint(const wchar_t *wide_string)
 	{
 		if (0 != iswdigit(*wide_char))
 		{
-			wide_char ++;
+			wide_char++;
 			continue;
 		}
 		return FAIL;
@@ -1369,6 +1369,38 @@ int	_wis_uint(const wchar_t *wide_string)
 	return SUCCEED;
 }
 #endif
+
+/******************************************************************************
+ *                                                                            *
+ * Function: is_int_prefix                                                    *
+ *                                                                            *
+ * Purpose: check if the beginning of string is a signed integer              *
+ *                                                                            *
+ * Parameters: c - string to check                                            *
+ *                                                                            *
+ * Return value:  SUCCEED - the beginning of string is a signed integer       *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ * Author: Aleksandrs Saveljevs                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	is_int_prefix(const char *c)
+{
+	int	i = 0;
+
+	while (c[i]==' ') /* trim left spaces */
+		i++;
+
+	if (c[i]=='-' || c[i]=='+')
+		i++;
+	
+	if (!isdigit(c[i]))
+		return FAIL;
+
+	return SUCCEED;
+}
 
 /******************************************************************************
  *                                                                            *
