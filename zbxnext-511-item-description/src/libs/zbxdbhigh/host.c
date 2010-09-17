@@ -2337,7 +2337,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 			*ipmi_sensor_esc, *snmp_community_esc, *snmp_oid_esc,
 			*snmpv3_securityname_esc, *snmpv3_authpassphrase_esc,
 			*snmpv3_privpassphrase_esc, *username_esc, *password_esc,
-			*publickey_esc, *privatekey_esc;
+			*publickey_esc, *privatekey_esc, *description_details_esc;
 	char		*sql = NULL;
 	int		sql_offset = 0, sql_alloc = 16384,
 			i, res = SUCCEED;
@@ -2355,7 +2355,8 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 				"ti.snmp_port,ti.snmpv3_securityname,"
 				"ti.snmpv3_securitylevel,ti.snmpv3_authpassphrase,"
 				"ti.snmpv3_privpassphrase,ti.authtype,ti.username,"
-				"ti.password,ti.publickey,ti.privatekey,hi.itemid"
+				"ti.password,ti.publickey,ti.privatekey,ti.description_details,"
+				"hi.itemid"
 			" from items ti"
 			" left join items hi on hi.key_=ti.key_"
 				" and hi.hostid=" ZBX_FS_UI64
@@ -2390,10 +2391,11 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 		password_esc			= DBdyn_escape_string(row[29]);
 		publickey_esc			= DBdyn_escape_string(row[30]);
 		privatekey_esc			= DBdyn_escape_string(row[31]);
+		description_details_esc		= DBdyn_escape_string(row[32]);
 
-		if (SUCCEED != (DBis_null(row[32])))
+		if (SUCCEED != (DBis_null(row[33])))
 		{
-			ZBX_STR2UINT64(itemid, row[32]);
+			ZBX_STR2UINT64(itemid, row[33]);
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8192,
 					"update items"
@@ -2427,6 +2429,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 						"password='%s',"
 						"publickey='%s',"
 						"privatekey='%s',"
+						"description_details='%s',"
 						"templateid=" ZBX_FS_UI64
 					" where itemid=" ZBX_FS_UI64 ";\n",
 					description_esc,
@@ -2459,6 +2462,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 					password_esc,
 					publickey_esc,
 					privatekey_esc,
+					description_details_esc,
 					template_itemid,
 					itemid);
 		}
@@ -2476,11 +2480,12 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 						"ipmi_sensor,snmp_community,snmp_oid,snmp_port,"
 						"snmpv3_securityname,snmpv3_securitylevel,"
 						"snmpv3_authpassphrase,snmpv3_privpassphrase,"
-						"authtype,username,password,publickey,privatekey,templateid)"
+						"authtype,username,password,publickey,privatekey,"
+						"description_details,templateid)"
 					" values"
 						" (" ZBX_FS_UI64 ",'%s','%s'," ZBX_FS_UI64 ",%s,%s,%s,"
 						"%s,'%s',%s,%s,%s,'%s','%s',%s,%s,'%s','%s',%s,'%s','%s',"
-						"'%s','%s',%s,'%s',%s,'%s','%s',%s,'%s','%s','%s',"
+						"'%s','%s',%s,'%s',%s,'%s','%s',%s,'%s','%s','%s','%s',"
 						"'%s'," ZBX_FS_UI64 ");\n",
 					itemid,
 					description_esc,
@@ -2515,6 +2520,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 					password_esc,
 					publickey_esc,
 					privatekey_esc,
+					description_details_esc,
 					template_itemid);
 
 			zbx_free(key_esc);
@@ -2522,6 +2528,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 
 		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 
+		zbx_free(description_details_esc);
 		zbx_free(privatekey_esc);
 		zbx_free(publickey_esc);
 		zbx_free(password_esc);
