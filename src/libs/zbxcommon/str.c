@@ -321,12 +321,12 @@ void	zbx_chrcpy_alloc(char **str, int *alloc_len, int *offset, const char src)
 }
 
 /* Has to be rewritten to avoid malloc */
-char	*string_replace(char *str, char *sub_str1, char *sub_str2)
+char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2)
 {
         char *new_str = NULL;
-        char *p;
-        char *q;
-        char *r;
+        const char *p;
+        const char *q;
+        const char *r;
         char *t;
         long len;
         long diff;
@@ -363,7 +363,6 @@ char	*string_replace(char *str, char *sub_str1, char *sub_str2)
 	*t = '\0';
 
         return new_str;
-
 }
 
 /******************************************************************************
@@ -2639,6 +2638,49 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 	return out;
 }
 #endif	/* HAVE_ICONV */
+
+char	*zbx_replace_utf8(const char *text, char replacement)
+{
+	int	n;
+	char	*out, *p;
+
+	out = p = zbx_malloc(NULL, strlen(text) + 1);
+
+	while ('\0' != *text)
+	{
+		if (0 == (0x80 & *text))		/* ASCII */
+			n = 1;
+		else if (0xf0 == (0xf0 & *text))	/* 11110000-11110100 is a start of 4-byte sequence */
+			n = 4;
+		else if (0xe0 == (0xe0 & *text))	/* 11100000-11101111 is a start of 3-byte sequence */
+			n = 3;
+		else if (0xc0 == (0xc0 & *text))	/* 11000010-11011111 is a start of 2-byte sequence */
+			n = 2;
+		else
+			goto bad;
+
+		if (1 == n)
+			*p++ = *text++;
+		else
+		{
+			*p++ = replacement;
+
+			while (0 != n)
+			{
+				if ('\0' == *text)
+					goto bad;
+				n--;
+				text++;
+			}
+		}
+	}
+
+	*p = '\0';
+	return out;
+bad:
+	zbx_free(out);
+	return NULL;
+}
 
 void	win2unix_eol(char *text)
 {

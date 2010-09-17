@@ -10,6 +10,8 @@ Changes for 1.9
 
 Changes for 1.8.4rc1
 
+ - [ZBX-3011] passwords are no longer shown in HTML when editing media types (Vedmak)
+ - [ZBXNEXT-510] sending of SMS messages through Ez Texting is now integrated into Zabbix (asaveljevs,Vedmak)
  - [ZBX-1425] option ALL is added to host group dropdown when adding or editing host group (KB)
  - [ZBX-1675] fixed map element coordinates do not update after the element has been dragged (Vedmak)
  - [ZBX-1292] item names are now prefixed with host names, if they are from different hosts in trigger discription popup (KB)

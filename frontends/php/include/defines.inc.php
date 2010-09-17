@@ -363,7 +363,11 @@
 	define('MEDIA_TYPE_EXEC',		1);
 	define('MEDIA_TYPE_SMS',		2);
 	define('MEDIA_TYPE_JABBER',		3);
-
+	define('MEDIA_TYPE_EZ_TEXTING',	100);
+	
+	define('EZ_TEXTING_LIMIT_USA',		0);
+	define('EZ_TEXTING_LIMIT_CANADA',	1);
+	
 	define('ACTION_DEFAULT_SUBJ',		'{TRIGGER.NAME}: {TRIGGER.STATUS}');
 	define('ACTION_DEFAULT_MSG',		"{TRIGGER.NAME}: {TRIGGER.STATUS}\nLast value: {ITEM.LASTVALUE}\n\n{TRIGGER.URL}");
 

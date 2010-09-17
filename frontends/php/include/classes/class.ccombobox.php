@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,10 +20,10 @@
 ?>
 <?php
 class CComboBox extends CTag{
- public $value;
+	public $value;
 
-	public function __construct($name='combobox',$value=NULL,$action=NULL){
-		parent::__construct('select','yes');
+	public function __construct($name='combobox', $value=NULL, $action=NULL){
+		parent::__construct('select', 'yes');
 		$this->tag_end = '';
 
 		$this->attributes['id'] = $name;
@@ -46,7 +46,7 @@ class CComboBox extends CTag{
 
 	public function addItem($value, $caption='', $selected=NULL, $enabled='yes'){
 //			if($enabled=='no') return;	/* disable item method 1 */
-		if(is_object($value) && zbx_strtolower(get_class($value))=='ccomboitem'){
+		if(is_object($value) && (zbx_strtolower(get_class($value)) == 'ccomboitem')){
 			parent::addItem($value);
 		}
 		else{
@@ -65,7 +65,7 @@ class CComboBox extends CTag{
 				}
 			}
 
-			parent::addItem(new CComboItem($value,$caption,$selected,$enabled));
+			parent::addItem(new CComboItem($value, $caption, $selected, $enabled));
 		}
 	}
 
@@ -74,7 +74,24 @@ class CComboBox extends CTag{
 			$selected = (int) ($value == $this->value);
 			parent::addItem(new CComboItem($value, $caption, $selected));
 		}
-
+	}
+	
+	public function addItemsInGroup($label, $items){
+		$group = new COptGroup($label);
+		foreach($items as $value => $caption){
+			$selected = (int) ($value == $this->value);
+			$group->addItem(new CComboItem($value, $caption, $selected));
+		}
+		parent::addItem($group);
 	}
 }
+
+class COptGroup extends CTag{
+	public function __construct($label){
+		parent::__construct('optgroup', 'yes');
+		
+		$this->setAttribute('label', $label);	
+	}
+}
+
 ?>
