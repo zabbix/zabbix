@@ -10,6 +10,7 @@ Changes for 1.9
 
 Changes for 1.8.4rc1
 
+ - [ZBX-3008] fixed server generating multiple unknown events for triggers with multiple items (asaveljevs)
  - [ZBX-3011] passwords are no longer shown in HTML when editing media types (Vedmak)
  - [ZBXNEXT-510] sending of SMS messages through Ez Texting is now integrated into Zabbix (asaveljevs,Vedmak)
  - [ZBX-1425] option ALL is added to host group dropdown when adding or editing host group (KB)
@@ -28,7 +29,7 @@ Changes for 1.8.4rc1
  - [ZBX-2946] fixed building from FreeBSD ports with libexecinfo installed; thanks to Dmitry Yakovlev (asaveljevs)
  - [ZBX-2957] changed mime type for downloadable locale file (Vedmak)
  - [ZBX-2493] fixed obsolete macro used by default; start using different subject and message for default action messages (Richlv)
- - [ZBX-2976] fixed server crash when performing zabbix[items_unsupported] under DebugLevel=4 (asaveljevs)
+ - [ZBX-2976] fixed server crash when processing zabbix[items_unsupported] under DebugLevel=4 (asaveljevs)
  - [ZBX-2950] added popup menus for map elements (Vedmak)
  - [ZBX-2967] added filter for hosts configuration screen (Vedmak)
  - [ZBX-2969] improved SQL statement for synchronizing of nodes; thanks to Łukasz Reszka (Sasha)
