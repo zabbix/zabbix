@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -61,7 +61,8 @@ class CMaintenance extends CZBXAPI{
 			'where' => array(),
 			'group' => array(),
 			'order' => array(),
-			'limit' => null);
+			'limit' => null
+		);
 
 		$def_options = array(
 			'nodeids'				=> null,
@@ -70,8 +71,12 @@ class CMaintenance extends CZBXAPI{
 			'maintenanceids'		=> null,
 			'editable'				=> null,
 			'nopermissions'			=> null,
+
 // filter
-			'pattern'				=> '',
+			'filter'				=> null,
+			'pattern'				=> null,
+			'startPattern'			=> null,
+			'excludePattern'		=> null,
 
 // OutPut
 			'output'				=> API_OUTPUT_REFER,
@@ -239,7 +244,29 @@ class CMaintenance extends CZBXAPI{
 
 // pattern
 		if(!zbx_empty($options['pattern'])){
-			$sql_parts['where'][] = ' UPPER(m.name) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
+			$exclude = is_null($options['excludePattern'])?'':' NOT ';
+
+			if(!is_null($options['startPattern'])){
+				$sql_parts['where']['name'] = ' UPPER(m.name) '.$exclude.' LIKE '.zbx_dbstr(zbx_strtoupper($options['pattern']).'%');
+			}
+			else{
+				$sql_parts['where']['name'] = ' UPPER(m.name) '.$exclude.' LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
+			}
+		}
+
+// filter
+		if(!is_null($options['filter'])){
+			zbx_value2array($options['filter']);
+
+			if(isset($options['filter']['maintenanceid']) && !is_null($options['filter']['maintenanceid'])){
+				zbx_value2array($options['filter']['maintenanceid']);
+				$sql_parts['where']['maintenanceid'] = DBcondition('n.maintenanceid', $options['filter']['maintenanceid']);
+			}
+
+			if(isset($options['filter']['name']) && !is_null($options['filter']['name'])){
+				zbx_value2array($options['filter']['name']);
+				$sql_parts['where']['name'] = DBcondition('m.name', $options['filter']['name'], false, true);
+			}
 		}
 
 // order
@@ -379,6 +406,7 @@ Copt::memoryPick();
 			}
 		}
 
+Copt::memoryPick();
 // removing keys (hash -> array)
 		if(is_null($options['preservekeys'])){
 			$result = zbx_cleanHashes($result);
@@ -440,7 +468,7 @@ Copt::memoryPick();
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				}
 			}
-
+//---
 
 			$tid = 0;
 			$insert = array();

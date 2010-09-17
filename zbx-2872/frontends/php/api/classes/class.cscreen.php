@@ -464,11 +464,13 @@ SDI('/////////////////////////////////');
 	}
 
 	public static function exists($data){
+		$keyFields = array(array('screenid', 'name'));
+
 		$options = array(
-			'filter' => $data,
-			'preservekeys' => 1,
+			'filter' => zbx_array_mintersect($keyFields, $object),
 			'output' => API_OUTPUT_SHORTEN,
-			'nopermissions' => 1
+			'nopermissions' => 1,
+			'limit' => 1
 		);
 
 		if(isset($data['node']))
@@ -601,18 +603,23 @@ SDI('/////////////////////////////////');
 		try{
 			self::BeginTransaction(__METHOD__);
 
+			$newScreenNames = zbx_objectValues($screens, 'name');
+// Exists
+			$options = array(
+				'filter' => array('name' => $newScreenNames),
+				'output' => 'extend',
+				'nopermissions' => 1
+			);
+			$db_screens = self::get($options);
+			foreach($db_screens as $dbsnum => $db_screen){
+				self::exception(ZBX_API_ERROR_PARAMETERS, S_SCREEN.' [ '.$db_screen['name'].' ] '.S_ALREADY_EXISTS_SMALL);
+			}
+//---
+
 			foreach($screens as $snum => $screen){
 				$screen_db_fields = array('name' => null);
 				if(!check_db_fields($screen_db_fields, $screen)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for screen [ '.$screen['name'].' ]');
-				}
-
-				$sql = 'SELECT screenid '.
-					' FROM screens '.
-					' WHERE name='.zbx_dbstr($screen['name']).
-						' AND '.DBin_node('screenid', false);
-				if(DBfetch(DBselect($sql))){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_SCREEN.' [ '.$screen['name'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
 
 				$iscr = array('name' => $screen['name']);

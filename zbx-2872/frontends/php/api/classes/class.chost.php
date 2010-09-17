@@ -1226,8 +1226,7 @@ Copt::memoryPick();
 					self::exception();
 				}
 
-			if(isset($host['profile']) && !empty($host['extendedProfile'])){
-
+				if(isset($host['profile']) && !empty($host['extendedProfile'])){
 					$fields = array_keys($host['profile']);
 					$fields = implode(', ', $fields);
 
@@ -1237,7 +1236,7 @@ Copt::memoryPick();
 					DBexecute('INSERT INTO hosts_profiles (hostid, '.$fields.') VALUES ('.$hostid.', '.$values.')');
 				}
 
-			if(isset($host['extendedProfile']) && !empty($host['extendedProfile'])){
+				if(isset($host['extendedProfile']) && !empty($host['extendedProfile'])){
 					$fields = array_keys($host['extendedProfile']);
 					$fields = implode(', ', $fields);
 
