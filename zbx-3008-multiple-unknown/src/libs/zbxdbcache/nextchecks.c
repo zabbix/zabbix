@@ -184,10 +184,10 @@ void	DCflush_nextchecks()
 
 	/* a crutch for the function `DBadd_condition_alloc' */
 	zbx_uint64_t	*ids = NULL;
-	int		ids_allocated = 32, ids_num = 0;
+	int		ids_allocated = 0, ids_num = 0;
 
 	zbx_uint64_t	*triggerids = NULL;
-	int		triggerids_allocated = 32, triggerids_num = 0;
+	int		triggerids_allocated = 0, triggerids_num = 0;
 
 	struct event_objectid_clock 	*events = NULL;
 	int		events_num = 0, events_allocated = 32;
@@ -198,8 +198,6 @@ void	DCflush_nextchecks()
 		return;
 
 	sql = zbx_malloc(sql, sql_allocated);
-	ids = zbx_malloc(ids, ids_allocated * sizeof(zbx_uint64_t));
-	triggerids = zbx_malloc(triggerids, triggerids_allocated * sizeof(zbx_uint64_t));
 
 	DBbegin();
 
@@ -323,6 +321,7 @@ void	DCflush_nextchecks()
 
 	zbx_free(sql);
 	zbx_free(ids);
+	zbx_free(triggerids);
 
 	DCrelease_nextchecks();
 
