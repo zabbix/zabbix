@@ -785,6 +785,7 @@ include_once('include/page_header.php');
 			S_ITEMS,
 			S_TRIGGERS,
 			S_GRAPHS,
+			S_SCREENS,
 			S_LINKED_TEMPLATES,
 			S_LINKED_TO
 		));
@@ -824,7 +825,8 @@ include_once('include/page_header.php');
 			'select_triggers' => API_OUTPUT_COUNT,
 			'select_graphs' => API_OUTPUT_COUNT,
 			'select_applications' => API_OUTPUT_COUNT,
-			'nopermissions' => 1
+			'select_screens' => API_OUTPUT_COUNT,
+			'nopermissions' => 1,
 		);
 
 		$templates = CTemplate::get($options);
@@ -846,6 +848,8 @@ include_once('include/page_header.php');
 				' ('.$template['triggers'].')');
 			$graphs = array(new CLink(S_GRAPHS,'graphs.php?groupid='.$_REQUEST['groupid'].'&hostid='.$template['templateid']),
 				' ('.$template['graphs'].')');
+			$screens = array(new CLink(S_SCREENS,'screenconf.php?templateid='.$template['templateid']),
+				' ('.$template['screens'].')');
 
 
 			$i = 0;
@@ -914,6 +918,7 @@ include_once('include/page_header.php');
 				$items,
 				$triggers,
 				$graphs,
+				$screens,
 				(empty($linked_templates_output) ? '-' : new CCol($linked_templates_output,'wraptext')),
 				(empty($linked_to_output) ? '-' : new CCol($linked_to_output,'wraptext'))
 			));

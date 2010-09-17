@@ -63,14 +63,17 @@ class CScreen extends CZBXAPI{
 			'from' => array('screens' => 'screens s'),
 			'where' => array(),
 			'order' => array(),
+			'group' => array(),
 			'limit' => null);
 
 		$def_options = array(
 			'nodeids'					=> null,
 			'screenids'					=> null,
 			'screenitemids'				=> null,
+			'templateids'	 			=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
+			'templated'					=> null,
 // filter
 			'filter'					=> null,
 			'pattern'					=> '',
@@ -79,6 +82,8 @@ class CScreen extends CZBXAPI{
 			'output'					=> API_OUTPUT_REFER,
 			'select_screenitems'		=> null,
 			'count'						=> null,
+			'countOutput'				=> null,
+			'groupCount'				=> null,
 			'preservekeys'				=> null,
 
 			'sortfield'					=> '',
@@ -118,16 +123,44 @@ class CScreen extends CZBXAPI{
 			$sql_parts['where'][] = DBcondition('si.screenitemid', $options['screenitemids']);
 		}
 
+// templateids
+		if(!is_null($options['templateids'])){
+			zbx_value2array($options['templateids']);
+
+			if($options['output'] != API_OUTPUT_EXTEND){
+				$sql_parts['select']['templateid'] = 's.templateid';
+			}
+
+			if(!is_null($options['groupCount'])){
+				$sql_parts['group']['templateid'] = 's.templateid';
+			}
+
+			$sql_parts['where']['ti'] = DBcondition('s.templateid', $options['templateids']);
+		}
+// templated
+		if(!is_null($options['templated'])){
+			if($options['templated'])
+				$sql_parts['where'][] = 's.templateid IS NOT NULL';
+			else
+				$sql_parts['where'][] = 's.templateid IS NULL';
+		}
+
 // extendoutput
 		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['screens'] = 's.*';
 		}
 
-// count
-		if(!is_null($options['count'])){
+// countOutput
+		if(!is_null($options['countOutput'])){
 			$options['sortfield'] = '';
-
 			$sql_parts['select'] = array('count(DISTINCT s.screenid) as rowscount');
+
+// groupCount
+			if(!is_null($options['groupCount'])){
+				foreach($sql_parts['group'] as $key => $fields){
+					$sql_parts['select'][$key] = $fields;
+				}
+			}
 		}
 
 // pattern
@@ -171,15 +204,18 @@ class CScreen extends CZBXAPI{
 		$sql_parts['select'] = array_unique($sql_parts['select']);
 		$sql_parts['from'] = array_unique($sql_parts['from']);
 		$sql_parts['where'] = array_unique($sql_parts['where']);
+		$sql_parts['group'] = array_unique($sql_parts['group']);
 		$sql_parts['order'] = array_unique($sql_parts['order']);
 
 		$sql_select = '';
 		$sql_from = '';
 		$sql_where = '';
+		$sql_group = '';
 		$sql_order = '';
 		if(!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
 		if(!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
 		if(!empty($sql_parts['where']))		$sql_where.= ' AND '.implode(' AND ',$sql_parts['where']);
+		if(!empty($sql_parts['group']))		$sql_group.= ' GROUP BY '.implode(',',$sql_parts['group']);
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
@@ -187,11 +223,15 @@ class CScreen extends CZBXAPI{
 				FROM '.$sql_from.'
 				WHERE '.DBin_node('s.screenid', $nodeids).
 					$sql_where.
+				$sql_group.
 				$sql_order;
 		$res = DBselect($sql, $sql_limit);
 		while($screen = DBfetch($res)){
-			if(!is_null($options['count'])){
-				$result = $screen;
+			if(!is_null($options['countOutput'])){
+				if(!is_null($options['groupCount']))
+					$result[] = $screen;
+				else
+					$result = $screen['rowscount'];
 			}
 			else{
 				$screenids[$screen['screenid']] = $screen['screenid'];
@@ -212,6 +252,14 @@ class CScreen extends CZBXAPI{
 
 						$result[$screen['screenid']]['screenitems'][] = array('screenitemid' => $screen['screenitemid']);
 						unset($screen['screenitemid']);
+					}
+
+					if(isset($screen['templateid'])){
+						if(!isset($result[$screen['screenid']]['templates']))
+							$result[$screen['screenid']]['templates'] = array();
+
+						$result[$screen['screenid']]['templates'][] = array('templateid' => $screen['templateid']);
+						unset($screen['templateid']);
 					}
 
 					$result[$screen['screenid']] += $screen;
@@ -581,13 +629,13 @@ SDI('/////////////////////////////////');
  */
 	public static function create($screens){
 		$screens = zbx_toArray($screens);
-		$insert_screens = array();
 		$insert_screen_items = array();
 
 		try{
 			self::BeginTransaction(__METHOD__);
 
 			foreach($screens as $snum => $screen){
+
 				$screen_db_fields = array('name' => null);
 				if(!check_db_fields($screen_db_fields, $screen)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for screen [ '.$screen['name'].' ]');
@@ -600,21 +648,16 @@ SDI('/////////////////////////////////');
 				if(DBfetch(DBselect($sql))){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_SCREEN.' [ '.$screen['name'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
-
-				$iscr = array('name' => $screen['name']);
-				if(isset($screen['hsize'])) $iscr['hsize'] = $screen['hsize'];
-				if(isset($screen['vsize'])) $iscr['vsize'] = $screen['vsize'];
-				$insert_screens[$snum] = $iscr;
 			}
-			$screenids = DB::insert('screens', $insert_screens);
+			$screenids = DB::insert('screens', $screens);
 
 			foreach($screens as $snum => $screen){
 				if(isset($screen['screenitems'])){
 					foreach($screen['screenitems'] as $screenitem){
 						$screenitem['screenid'] = $screenids[$snum];
 						$insert_screen_items[] = $screenitem;
+					}
 				}
-			}
 			}
 			self::addItems($insert_screen_items);
 

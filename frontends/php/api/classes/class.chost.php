@@ -811,7 +811,6 @@ Copt::memoryPick();
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
-
 			if(is_array($options['select_items']) || str_in_array($options['select_items'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['select_items'];
 				$items = CItem::get($obj_params);
@@ -834,7 +833,7 @@ Copt::memoryPick();
 			else if(API_OUTPUT_COUNT == $options['select_items']){
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
-
+				
 				$items = CItem::get($obj_params);
 				$items = zbx_toHash($items, 'hostid');
 				foreach($result as $hostid => $host){
