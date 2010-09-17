@@ -385,16 +385,16 @@ Copt::memoryPick();
  */
 	public static function create($mediatypes){
 		global $USER_DETAILS;
-		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
-			self::exception(ZBX_API_ERROR_PERMISSIONS, S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_CREATE_MEDIATYPES);
-		}
-
-		$mediatypes = zbx_toArray($mediatypes);
-		$insert_mediatypes = array();
-
+		
 		try{
 			self::BeginTransaction(__METHOD__);
+			
+			if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
+				self::exception(ZBX_API_ERROR_PERMISSIONS, S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_CREATE_MEDIATYPES);
+			}
 
+			$mediatypes = zbx_toArray($mediatypes);
+		
 			foreach($mediatypes as $mnum => $mediatype){
 				$mediatype_db_fields = array(
 					'type' => null,
@@ -403,15 +403,19 @@ Copt::memoryPick();
 				if(!check_db_fields($mediatype_db_fields, $mediatype)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_CMEDIATYPE_ERROR_WRONG_FIELD_FOR_MEDIATYPE);
 				}
+				
+				if(in_array($mediatype['type'], array(MEDIA_TYPE_JABBER, MEDIA_TYPE_EZ_TEXTING)) 
+						&& (!isset($mediatype['passwd']) || empty($mediatype['passwd']))){
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_CMEDIATYPE_ERROR_PASSWORD_REQUIRED);
+				}
 
 				$mediatype_exist = self::getObjects(array('description' => $mediatype['description']));
 				if(!empty($mediatype_exist)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_MEDIATYPE_ALREADY_EXISTS . ' ' . $mediatype_exist[0]['description']);
 				}
 
-				$insert_mediatypes[$mnum] = $mediatype;
 			}
-			$mediatypeids = DB::insert('media_type', $insert_mediatypes);
+			$mediatypeids = DB::insert('media_type', $mediatypes);
 
 			self::EndTransaction(true, __METHOD__);
 			return array('mediatypeids' => $mediatypeids);
@@ -442,17 +446,25 @@ Copt::memoryPick();
  */
 	public static function update($mediatypes){
 		global $USER_DETAILS;
-		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
-			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
-		}
-		$mediatypes = zbx_toArray($mediatypes);
-		$mediatypeids = array();
-		$update = array();
-
+		
 		try{
 			self::BeginTransaction(__METHOD__);
-
+			
+			if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
+				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
+			}
+			$mediatypes = zbx_toArray($mediatypes);
+			
+			
+			$update = array();
 			foreach($mediatypes as $mnum => $mediatype){
+				$mediatype_db_fields = array(
+					'mediatypeid' => null,
+				);
+				if(!check_db_fields($mediatype_db_fields, $mediatype)){
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_CMEDIATYPE_ERROR_WRONG_FIELD_FOR_MEDIATYPE);
+				}
+				
 				if(isset($mediatype['description'])){
 					$options = array(
 						'filter' => array('description' => $mediatype['description']),
@@ -465,12 +477,13 @@ Copt::memoryPick();
 					if($exist_mediatype && ($exist_mediatype['mediatypeid'] != $mediatype['mediatypeid']))
 						self::exception(ZBX_API_ERROR_PARAMETERS, S_MEDIATYPE_ALREADY_EXISTS . ' ' . $mediatype['description']);
 				}
-
-				$mediatype_db_fields = array(
-					'mediatypeid' => null,
-				);
-				if(!check_db_fields($mediatype_db_fields, $mediatype)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_CMEDIATYPE_ERROR_WRONG_FIELD_FOR_MEDIATYPE);
+				
+				if(array_key_exists('passwd', $mediatype) && empty($mediatype['passwd'])){
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_CMEDIATYPE_ERROR_PASSWORD_REQUIRED);
+				}
+				
+				if(!in_array($mediatype['type'], array(MEDIA_TYPE_JABBER, MEDIA_TYPE_EZ_TEXTING))){
+					$mediatype['passwd'] = '';
 				}
 
 				$mediatypeid = $mediatype['mediatypeid'];
@@ -483,7 +496,6 @@ Copt::memoryPick();
 					);
 				}
 			}
-
 			$mediatypeids = DB::update('media_type', $update);
 
 			self::EndTransaction(true, __METHOD__);

@@ -398,7 +398,7 @@ static int	zbxmacros_get_value_hosts(DB_MACROS *macros, zbx_uint64_t *hostids, i
 
 	zbx_free(tmplids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }

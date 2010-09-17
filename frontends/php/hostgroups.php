@@ -261,6 +261,8 @@ include_once('include/page_header.php');
 			}
 		}
 
+		
+
 		$frmHostG = new CFormTable($frm_title, 'hostgroups.php');
 		$frmHostG->setName('hg_form');
 
@@ -277,27 +279,55 @@ include_once('include/page_header.php');
 			'editable' => 1,
 			'extendoutput' => 1);
 		$db_groups = CHostGroup::get($params);
-		$twb_groupid = get_request('twb_groupid', 0);
-		if($twb_groupid == 0){
+		$twb_groupid = get_request('twb_groupid', -1);
+		if($twb_groupid == -1){
 			$gr = reset($db_groups);
 			$twb_groupid = $gr['groupid'];
 		}
+		
+		
+
+		
+		//creating <select> with list of host groups
 		$cmbGroups = new CComboBox('twb_groupid', $twb_groupid, 'submit()');
+
+		/**
+		 * Adding option 'All' to combobox list
+		 * @see ZBX-1425
+		 * @author Konstantin Buravcov
+		 */
+		$cmbGroups->addItem('0', S_O_ALL);
+
 		foreach($db_groups as $row){
 			$cmbGroups->addItem($row['groupid'], $row['name']);
 		}
 
 
+
+
 		$cmbHosts = new CTweenBox($frmHostG, 'hosts', $hosts, 25);
 
-// get hosts from selected twb_groupid combo
-		$params = array(
-			'groupids' => $twb_groupid,
-			'templated_hosts' => 1,
-			'sortfield' => 'host',
-			'editable' => 1,
-			'extendoutput' => 1);
+		//if $twb_groupid is '0', we need to get all hosts, if not, hosts from given group
+		if ($twb_groupid == 0) {
+			//get all hosts from all groups
+			$params = array(
+				'templated_hosts' => 1,
+				'sortfield' => 'host',
+				'editable' => 1,
+				'extendoutput' => 1);
+
+		} else {
+			// get hosts from selected twb_groupid combo
+			$params = array(
+				'groupids' => $twb_groupid,
+				'templated_hosts' => 1,
+				'sortfield' => 'host',
+				'editable' => 1,
+				'extendoutput' => 1);
+		}
+
 		$db_hosts = CHost::get($params);
+
 		foreach($db_hosts as $num => $db_host){
 // add all except selected hosts
 			if(!isset($hosts[$db_host['hostid']]))
