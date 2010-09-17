@@ -1,0 +1,1 @@
+ALTER TABLE users MODIFY userid DEFAULT NULL;
