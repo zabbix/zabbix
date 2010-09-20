@@ -1,5 +1,6 @@
 Changes for 1.8.4rc1
 
+ - [ZBX-3019] fixed templated graphs not being copied to discovered hosts in DM setup; thanks to Alexander Ignatyev (asaveljevs)
  - [ZBX-3008] fixed server generating multiple unknown events for triggers with multiple items (asaveljevs)
  - [ZBX-3011] passwords are no longer shown in HTML when editing media types (Vedmak)
  - [ZBXNEXT-510] sending of SMS messages through Ez Texting is now integrated into Zabbix (asaveljevs,Vedmak)
