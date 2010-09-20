@@ -2202,8 +2202,16 @@ return $caption;
 				}
 
 				foreach($map as $hostid => $templates){
-					foreach($tpls as $tplid){
-						if(!isset($templates[$tplid])){
+					$set_with_dep = false;
+					
+					foreach($templateids as $tplid){
+						if(isset($templates[$tplid])){
+							$set_with_dep = true;
+							break;
+						}
+					}
+					foreach($dep_templateids as $dep_tplid){
+						if(!isset($templates[$dep_tplid]) && $set_with_dep){
 							error('Not all Templates are linked to host [ '.reset($templates).' ]');
 							$result = false;
 							break 2;
