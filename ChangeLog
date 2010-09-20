@@ -10,6 +10,7 @@ Changes for 1.9
 
 Changes for 1.8.4rc1
 
+ - [ZBX-3017] fixed error when try to add dependency to template trigger that is linked to a host (Vedmak)
  - [ZBX-3008] fixed server generating multiple unknown events for triggers with multiple items (asaveljevs)
  - [ZBX-3011] passwords are no longer shown in HTML when editing media types (Vedmak)
  - [ZBXNEXT-510] sending of SMS messages through Ez Texting is now integrated into Zabbix (asaveljevs,Vedmak)
