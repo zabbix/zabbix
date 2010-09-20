@@ -830,12 +830,13 @@ COpt::memoryPick();
 					self::exception(S_CIRCULAR_LINK_CANNOT_BE_CREATED.' "'.$selement['label'].'"');
 				}
 
-				$update[] = array('sysmaps_elements', array(
+				$update[] = array(
 					'values' => $selement,
 					'where' => array('selementid='.$selement['selementid']),				
-				));
+				);
 				$selementids[] = $selement['selementid'];
 			}
+			DB::update('sysmaps_elements', $update);
 
 			self::EndTransaction(true, __METHOD__);
 			return $selementids;
