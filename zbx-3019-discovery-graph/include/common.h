@@ -508,17 +508,6 @@ typedef enum
 #define HOST_AVAILABLE_TRUE	1
 #define HOST_AVAILABLE_FALSE	2
 
-/* Use host IP or host name */
-#define HOST_USE_HOSTNAME	0
-#define HOST_USE_IP		1
-
-/* Trigger statuses */
-/*#define TRIGGER_STATUS_FALSE	0
-#define TRIGGER_STATUS_TRUE	1
-#define TRIGGER_STATUS_DISABLED	2
-#define TRIGGER_STATUS_UNKNOWN	3
-#define TRIGGER_STATUS_NOTSUPPORTED	4*/
-
 /* Trigger statuses */
 #define TRIGGER_STATUS_ENABLED	0
 #define TRIGGER_STATUS_DISABLED	1

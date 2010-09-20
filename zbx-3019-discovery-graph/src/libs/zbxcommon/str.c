@@ -2238,9 +2238,6 @@ static int	zbx_strncasecmp(const char *s1, const char *s2, size_t n)
 
 char	*zbx_strcasestr(const char *haystack, const char *needle)
 {
-/*#ifdef HAVE_STRCASESTR
-	return strcasestr(haystack, needle);
-#else*/
 	size_t		sz_h, sz_n;
 	const char	*p;
 
@@ -2262,7 +2259,6 @@ char	*zbx_strcasestr(const char *haystack, const char *needle)
 	}
 
 	return NULL;
-/*#endif*/
 }
 
 int	starts_with(const char *str, const char *prefix)
