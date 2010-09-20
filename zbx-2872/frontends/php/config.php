@@ -126,6 +126,8 @@ include_once('include/page_header.php');
 					error(S_IMAGE_SIZE_MUST_BE_LESS_THAN_MB);
 					return false;
 				}
+
+				$image = base64_encode($image);
 			}
 
 			if(isset($_REQUEST['imageid'])){
@@ -172,7 +174,7 @@ include_once('include/page_header.php');
 		else if(isset($_REQUEST['delete'])&&isset($_REQUEST['imageid'])) {
 			$image = get_image_by_imageid($_REQUEST['imageid']);
 
-			$result = CImage::delete(array('imageids' => $_REQUEST['imageid']));
+			$result = CImage::delete($_REQUEST['imageid']);
 
 			show_messages($result, S_IMAGE_DELETED, S_CANNOT_DELETE_IMAGE);
 			if($result){
@@ -699,20 +701,21 @@ include_once('include/page_header.php');
 
 			$tr = 0;
 			$row = new CRow();
-			$sql = 'SELECT imageid,imagetype,name '.
-					' FROM images'.
-					' WHERE '.DBin_node('imageid').
-						' AND imagetype='.$imagetype.
-					' ORDER BY name';
-			$result=DBselect($sql);
-			while($image = DBfetch($result)){
+
+			$options = array(
+				'filter'=> array('imagetype'=> $imagetype),
+				'output'=> API_OUTPUT_EXTEND,
+				'sortfield'=> 'name'
+			);
+			$images = CImage::get($options);
+			foreach($images as $inum => $image){
 				switch($image['imagetype']){
 					case IMAGE_TYPE_ICON:
-						$imagetype=S_ICON;
+						$imagetype = S_ICON;
 						$img = new CImg('imgstore.php?iconid='.$image['imageid'],'no image');
 					break;
 					case IMAGE_TYPE_BACKGROUND:
-						$imagetype=S_BACKGROUND;
+						$imagetype = S_BACKGROUND;
 						$img = new CImg('imgstore.php?iconid='.$image['imageid'],'no image',200);
 					break;
 					default: $imagetype=S_UNKNOWN;

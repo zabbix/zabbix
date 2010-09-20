@@ -116,7 +116,11 @@ class CHost extends CZBXAPI{
 
 // filter
 			'filter'					=> null,
+
 			'search'					=> null,
+			'startSearch'				=> null,
+			'exludeSearch'				=> null,
+
 			'pattern'					=> null,
 			'startPattern'				=> null,
 			'extendPattern'				=> null,
@@ -474,33 +478,36 @@ class CHost extends CZBXAPI{
 
 // pattern
 		if(!zbx_empty($options['pattern'])){
+			$start = is_null($options['startPattern'])?'%':'';
 			$exclude = is_null($options['excludePattern'])?'':' NOT ';
 
-			if(!is_null($options['startPattern'])){
-				$sql_parts['where']['host'] = ' UPPER(h.host) '.$exclude.' LIKE '.zbx_dbstr(zbx_strtoupper($options['pattern']).'%');
-			}
-			else if(!is_null($options['extendPattern'])){
+			if(!is_null($options['extendPattern'])){
 				$sql_parts['where'][] = ' ( '.
-											'UPPER(h.host) '.$exclude.' LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%').' OR '.
-											'h.ip '.$exclude.' LIKE '.zbx_dbstr('%'.$options['pattern'].'%').' OR '.
-											'UPPER(h.dns) '.$exclude.' LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%').
+											'UPPER(h.host) '.$exclude.' LIKE '.zbx_dbstr($start.zbx_strtoupper($options['pattern']).'%').' OR '.
+											'h.ip '.$exclude.' LIKE '.zbx_dbstr($start.$options['pattern'].'%').' OR '.
+											'UPPER(h.dns) '.$exclude.' LIKE '.zbx_dbstr($start.zbx_strtoupper($options['pattern']).'%').
 										' ) ';
 			}
 			else{
-				$sql_parts['where']['host'] = ' UPPER(h.host) '.$exclude.' LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
+				$sql_parts['where']['host'] = ' UPPER(h.host) '.$exclude.' LIKE '.zbx_dbstr($start.zbx_strtoupper($options['pattern']).'%');
 			}
 		}
 
 // search
 		if(!is_null($options['search'])){
+			zbx_value2array($options['search']);
+
+			$start = is_null($options['startSearch'])?'%':'';
+			$exclude = is_null($options['excludeSearch'])?'':' NOT ';
+
 			if(isset($options['search']['host']) && !is_null($options['search']['host'])){
-				$sql_parts['where']['host'] = ' UPPER(h.host) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['search']['host']).'%');
+				$sql_parts['where']['host'] = ' UPPER(h.host) '.$exclude.' LIKE '.zbx_dbstr($start.zbx_strtoupper($options['search']['host']).'%');
 			}
 			if(isset($options['search']['ip']) && !is_null($options['search']['ip'])){
-				$sql_parts['where']['ip'] = ' h.ip LIKE '.zbx_dbstr('%'.$options['search']['ip'].'%');
+				$sql_parts['where']['ip'] = ' h.ip '.$exclude.' LIKE '.zbx_dbstr($start.$options['search']['ip'].'%');
 			}
 			if(isset($options['search']['dns']) && !is_null($options['search']['dns'])){
-				$sql_parts['where']['dns'] = ' h.dns LIKE '.zbx_dbstr('%'.$options['search']['dns'].'%');
+				$sql_parts['where']['dns'] = ' h.dns '.$exclude.' LIKE '.zbx_dbstr($start.$options['search']['dns'].'%');
 			}
 		}
 

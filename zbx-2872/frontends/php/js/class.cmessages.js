@@ -28,7 +28,7 @@ return messagesListId;
 // Puppet master Class
 // Author: Aly
 var CMessageList = Class.create(CDebug,{
-messageListId:			0,				// PMasters reference id
+messageListId:			0,				// reference id
 
 updateFrequency:		60,				// seconds
 timeoutFrequency:		10,				// seconds
