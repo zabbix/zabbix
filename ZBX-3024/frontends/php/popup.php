@@ -832,7 +832,7 @@ include_once('include/page_header.php');
 					$dstfld2 => $row[$srcfld2],
 				);
 
-				$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).','.zbx_jsvalue($values).'); return false;';
+				$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).','.zbx_jsvalue($values).', true); return false;';
 			}
 
 			$description->setAttribute('onclick', $js_action);
