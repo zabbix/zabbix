@@ -145,7 +145,7 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #define	NETWORK_ERROR	(-3)
 #define	TIMEOUT_ERROR	(-4)
 #define	AGENT_ERROR	(-5)
-char	*zbx_result_string(int result);
+const char	*zbx_result_string(int result);
 
 #define MAX_STRING_LEN	2048
 #define MAX_BUF_LEN	65536
@@ -216,7 +216,7 @@ typedef enum
 	ITEM_VALUE_TYPE_UINT64,
 	ITEM_VALUE_TYPE_TEXT
 } zbx_item_value_type_t;
-char	*zbx_item_value_type_string(zbx_item_value_type_t value_type);
+const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type);
 
 /* Item data types */
 typedef enum
@@ -251,7 +251,7 @@ typedef enum
 	SVC_ICMPPING,
 	SVC_SNMPv3
 } zbx_dservice_type_t;
-char	*zbx_dservice_type_string(zbx_dservice_type_t service);
+const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 
 /* Item snmpv3 security levels */
 #define ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV	0
@@ -527,7 +527,7 @@ typedef enum
 	TRIGGER_SEVERITY_HIGH,
 	TRIGGER_SEVERITY_DISASTER
 } zbx_trigger_severity_t;
-char	*zbx_trigger_severity_string(zbx_trigger_severity_t severity);
+const char	*zbx_trigger_severity_string(zbx_trigger_severity_t severity);
 
 typedef enum
 {
@@ -537,7 +537,7 @@ typedef enum
 	ITEM_LOGTYPE_FAILURE_AUDIT = 7,
 	ITEM_LOGTYPE_SUCCESS_AUDIT
 } zbx_item_logtype_t;
-char	*zbx_item_logtype_string(zbx_item_logtype_t logtype);
+const char	*zbx_item_logtype_string(zbx_item_logtype_t logtype);
 /* Media statuses */
 #define MEDIA_STATUS_ACTIVE	0
 #define MEDIA_STATUS_DISABLED	1
@@ -609,7 +609,7 @@ typedef enum
 	PERM_MAX = 3
 } zbx_user_permission_t;
 
-const char *zbx_permission_string(int perm);
+const char	*zbx_permission_string(int perm);
 
 /* Flags */
 #define	ZBX_SYNC		0x01
