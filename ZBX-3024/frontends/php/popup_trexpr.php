@@ -427,8 +427,7 @@ if(form){
 			'output' => API_OUTPUT_EXTEND
 		);
 		$selectedItems = CItem::get($options);
-		$selectedItem = reset($selectedItems);
-		if (isset($selectedItem['value_type'])) {
+		if($selectedItem = reset($selectedItems)){
 			$itemValueType = $selectedItem['value_type'];
 		}
 	}

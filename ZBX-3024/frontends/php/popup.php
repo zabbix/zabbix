@@ -260,6 +260,7 @@ include_once('include/page_header.php');
 	if($value_types)
 		$frmTitle->addVar('value_types', $value_types);
 
+//adding param to a form, so that it would remain when page is refreshed
 	$frmTitle->addVar('dstfrm', $dstfrm);
 	$frmTitle->addVar('dstact', $dstact);
 	$frmTitle->addVar('dstfld1', $dstfld1);
@@ -269,8 +270,7 @@ include_once('include/page_header.php');
 	$frmTitle->addVar('srcfld2', $srcfld2);
 	$frmTitle->addVar('multiselect', $multiselect);
 	$frmTitle->addVar('writeonly', $writeonly);
-	$frmTitle->addVar('reference', $reference	);
-	//KB: adding 'submitParent' param to a for, so that it would remain when page is refreshed
+	$frmTitle->addVar('reference', $reference);
 	$frmTitle->addVar('submitParent', $submitParent	);
 
 	if(!is_null($existed_templates))
@@ -838,13 +838,8 @@ include_once('include/page_header.php');
 					$dstfld2 => $row[$srcfld2],
 				);
 
-				//if we need to submit parent window
-				if ($submitParent) {
-					$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).','.zbx_jsvalue($values).', true); return false;';
-				} else {
-					$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).','.zbx_jsvalue($values).'); return false;';
-				}
-
+//if we need to submit parent window
+				$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).','.zbx_jsvalue($values).', '.($submitParent?'true':'false').'); return false;';
 			}
 
 			$description->setAttribute('onclick', $js_action);
