@@ -522,8 +522,7 @@ function insert_js_function($fnct_name){
 					}
 
 					if(!is_null(tmpStorage) && submitParent){
-						var parentForm = tmpStorage.form;
-						parentForm.submit()
+						tmpStorage.form.submit();
 					}
 
 					close_window();

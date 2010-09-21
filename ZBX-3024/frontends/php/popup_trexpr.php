@@ -88,228 +88,148 @@
 	 * by selected item
 	 * @see http://www.zabbix.com/documentation/1.8/manual/config/triggers
 	 */
+	$allowed_types_any = array(
+		ITEM_VALUE_TYPE_FLOAT => 1,
+		ITEM_VALUE_TYPE_STR => 1,
+		ITEM_VALUE_TYPE_LOG => 1,
+		ITEM_VALUE_TYPE_UINT64 => 1,
+		ITEM_VALUE_TYPE_TEXT => 1
+	);
+	$allowed_types_numeric = array(
+		ITEM_VALUE_TYPE_FLOAT => 1,
+		ITEM_VALUE_TYPE_UINT64 => 1
+	);
+	$allowed_types_str = array(
+		ITEM_VALUE_TYPE_STR => 1,
+		ITEM_VALUE_TYPE_LOG => 1,
+		ITEM_VALUE_TYPE_TEXT => 1
+	);
+	$allowed_types_log = array(
+		ITEM_VALUE_TYPE_LOG => 1
+	);
+
 	$functions = array(
 		'abschange'	=> array(
 			'description'	=> 'Absolute difference between last and previous value {OP} N',
 			'operators'	=> $operators,
-			'allowed_types' => array(
-				ITEM_VALUE_TYPE_FLOAT, //0
-				ITEM_VALUE_TYPE_STR, //1
-				ITEM_VALUE_TYPE_LOG, //2
-				ITEM_VALUE_TYPE_UINT64, //3
-				ITEM_VALUE_TYPE_TEXT, //4
-				)
+			'allowed_types' => $allowed_types_any
 			),
 		'avg'		=> array(
 			'description'	=> 'Average value for period of T times {OP} N',
 			'operators'	=> $operators,
 			'params'	=> $param1_sec_count,
-			'allowed_types' => array(
-				ITEM_VALUE_TYPE_FLOAT, //0
-				ITEM_VALUE_TYPE_UINT64, //3
-				)
+			'allowed_types' => $allowed_types_numeric
 			),
 		'delta'		=> array(
 			'description'	=> 'Difference between MAX and MIN value of T times {OP} N',
 			'operators'	=> $operators,
 			'params'	=> $param1_sec_count,
-			'allowed_types' => array(
-				ITEM_VALUE_TYPE_FLOAT, //0
-				ITEM_VALUE_TYPE_UINT64, //3
-				)
+			'allowed_types' => $allowed_types_numeric
 			),
 		'change'	=> array(
 			'description'	=> 'Difference between last and previous value of T times {OP} N.',
 			'operators'	=> $operators,
-			'allowed_types' => array(
-				ITEM_VALUE_TYPE_FLOAT, //0
-				ITEM_VALUE_TYPE_STR, //1
-				ITEM_VALUE_TYPE_LOG, //2
-				ITEM_VALUE_TYPE_UINT64, //3
-				ITEM_VALUE_TYPE_TEXT, //4
-				)
+			'allowed_types' => $allowed_types_any
 			),
 		'count'		=> array(
 			'description'	=> 'Number of successfully retrieved values V for period of time T {OP} N.',
 			'operators'     => $operators,
 			'params'	=> $param2_sec_val,
-			'allowed_types' => array(
-				ITEM_VALUE_TYPE_FLOAT, //0
-				ITEM_VALUE_TYPE_STR, //1
-				ITEM_VALUE_TYPE_LOG, //2
-				ITEM_VALUE_TYPE_UINT64, //3
-				ITEM_VALUE_TYPE_TEXT, //4
-				)
+			'allowed_types' => $allowed_types_any
 			),
 		'diff'		=> array(
 			'description'	=> 'N {OP} X, where X is 1 - if last and previous values differs, 0 - otherwise.',
 			'operators'     => $limited_operators,
-			'allowed_types' => array(
-				ITEM_VALUE_TYPE_FLOAT, //0
-				ITEM_VALUE_TYPE_STR, //1
-				ITEM_VALUE_TYPE_LOG, //2
-				ITEM_VALUE_TYPE_UINT64, //3
-				ITEM_VALUE_TYPE_TEXT, //4
-				)
+			'allowed_types' => $allowed_types_any
 			),
 		'last'	=> array(
 			'description'	=> 'Last value {OP} N',
 			'operators'	=> $operators,
-			'allowed_types' => array(
-				ITEM_VALUE_TYPE_FLOAT, //0
-				ITEM_VALUE_TYPE_STR, //1
-				ITEM_VALUE_TYPE_LOG, //2
-				ITEM_VALUE_TYPE_UINT64, //3
-				ITEM_VALUE_TYPE_TEXT, //4
-				)
+			'allowed_types' => $allowed_types_any
 			),
 		'max'		=> array(
 			'description'	=> 'Maximal value for period of time T {OP} N.',
 			'operators'     => $operators,
 			'params'	=> $param1_sec_count,
-			'allowed_types' => array(
-				ITEM_VALUE_TYPE_FLOAT, //0
-				ITEM_VALUE_TYPE_UINT64, //3
-				)
+			'allowed_types' => $allowed_types_numeric
 			),
 		'min'		=> array(
 			'description'	=> 'Minimal value for period of time T {OP} N.',
 			'operators'     => $operators,
 			'params'	=> $param1_sec_count,
-			'allowed_types' => array(
-				ITEM_VALUE_TYPE_FLOAT, //0
-				ITEM_VALUE_TYPE_UINT64, //3
-				)
+			'allowed_types' => $allowed_types_numeric
 			),
 		'prev'		=> array(
 			'description'	=> 'Previous value {OP} N.',
 			'operators'     => $operators,
-			'allowed_types' => array(
-				ITEM_VALUE_TYPE_FLOAT, //0
-				ITEM_VALUE_TYPE_STR, //1
-				ITEM_VALUE_TYPE_LOG, //2
-				ITEM_VALUE_TYPE_UINT64, //3
-				ITEM_VALUE_TYPE_TEXT, //4
-				)
+			'allowed_types' => $allowed_types_any
 			),
 		'str'		=> array(
 			'description'	=> 'Find string T last value. N {OP} X, where X is 1 - if found, 0 - otherwise',
 			'operators'     => $limited_operators,
 			'params'	=> $param1_str,
-			'allowed_types' => array(
-				ITEM_VALUE_TYPE_STR, //1
-				ITEM_VALUE_TYPE_LOG, //2
-				ITEM_VALUE_TYPE_TEXT, //4
-				)
+			'allowed_types' => $allowed_types_str
 			),
 		'sum'		=> array(
 			'description'	=> 'Sum of values for period of time T {OP} N',
 			'operators'     => $operators,
 			'params'	=> $param1_sec_count,
-			'allowed_types' => array(
-				ITEM_VALUE_TYPE_FLOAT, //0
-				ITEM_VALUE_TYPE_UINT64, //3
-				)
+			'allowed_types' => $allowed_types_numeric
 			),
 		'date' => array(
 			'description' => 'Current date is {OP} N.',
 			'operators' => $operators,
-			'allowed_types' => array(
-				ITEM_VALUE_TYPE_FLOAT, //0
-				ITEM_VALUE_TYPE_STR, //1
-				ITEM_VALUE_TYPE_LOG, //2
-				ITEM_VALUE_TYPE_UINT64, //3
-				ITEM_VALUE_TYPE_TEXT, //4
-				)
+			'allowed_types' => $allowed_types_any
 		),
 		'dayofweek' => array(
 			'description' => 'Day of week is {OP} N.',
 			'operators' => $operators,
-			'allowed_types' => array(
-				ITEM_VALUE_TYPE_FLOAT, //0
-				ITEM_VALUE_TYPE_STR, //1
-				ITEM_VALUE_TYPE_LOG, //2
-				ITEM_VALUE_TYPE_UINT64, //3
-				ITEM_VALUE_TYPE_TEXT, //4
-				)
+			'allowed_types' => $allowed_types_any
 		),
 		'fuzzytime' => array(
 			'description' => 'N {OP} X, where X is 1 - if timestamp is equal with Zabbix server time for T seconds, 0 - otherwise',
 			'operators' => $limited_operators,
 			'params' => $param1_sec_count,
-			'allowed_types' => array(
-				ITEM_VALUE_TYPE_FLOAT, //0
-				ITEM_VALUE_TYPE_UINT64, //3
-				)
+			'allowed_types' => $allowed_types_numeric
 		),
 		'regexp' => array(
 			'description' => 'N {OP} X, where X is 1 - last value matches regular expression V for last T seconds, 0 - otherwise.',
 			'operators' => $limited_operators,
 			'params' => $param2_val_sec,
-			'allowed_types' => array(
-				ITEM_VALUE_TYPE_STR, //1
-				ITEM_VALUE_TYPE_LOG, //2
-				ITEM_VALUE_TYPE_TEXT, //4
-				)
+			'allowed_types' => $allowed_types_str
 		),
 		'iregexp' => array(
 			'description' => 'N {OP} X, where X is 1 - last value matches regular expression V for last T seconds, 0 - otherwise. (non case-sensitive)',
 			'operators' => $limited_operators,
 			'params' => $param2_val_sec,
-			'allowed_types' => array(
-				ITEM_VALUE_TYPE_STR, //1
-				ITEM_VALUE_TYPE_LOG, //2
-				ITEM_VALUE_TYPE_TEXT, //4
-				)
+			'allowed_types' => $allowed_types_str
 		),
 		'logseverity' => array(
 			'description' => 'Log severity of the last log entry is {OP} N',
 			'operators' => $operators,
-			'allowed_types' => array(
-				ITEM_VALUE_TYPE_LOG, //2
-				)
+			'allowed_types' => $allowed_types_log
 		),
 		'logsource' => array(
 			'description' => 'N {OP} X, where X is 1 - last log source of the last log entry matches T',
 			'operators' => $limited_operators,
 			'params' => $param1_str,
-			'allowed_types' => array(
-				ITEM_VALUE_TYPE_LOG, //2
-				)
+			'allowed_types' => $allowed_types_log
 		),
 		'now' => array(
 			'description' => 'Number of seconds since the Epoch is {OP} N.',
 			'operators' => $operators,
-			'allowed_types' => array(
-				ITEM_VALUE_TYPE_FLOAT, //0
-				ITEM_VALUE_TYPE_STR, //1
-				ITEM_VALUE_TYPE_LOG, //2
-				ITEM_VALUE_TYPE_UINT64, //3
-				ITEM_VALUE_TYPE_TEXT, //4
-				)
+			'allowed_types' => $allowed_types_any
 		),
 		'time' => array(
 			'description' => 'Current time is {OP} N.',
 			'operators' => $operators,
-			'allowed_types' => array(
-				ITEM_VALUE_TYPE_FLOAT, //0
-				ITEM_VALUE_TYPE_STR, //1
-				ITEM_VALUE_TYPE_LOG, //2
-				ITEM_VALUE_TYPE_UINT64, //3
-				ITEM_VALUE_TYPE_TEXT, //4
-				)
+			'allowed_types' => $allowed_types_any
 		),
 		'nodata' => array(
 			'description' => 'N {OP} X, where X is 1 - no data received during period of T seconds, 0 - otherwise',
 			'operators' => $operators,
 			'params' => $param1_sec,
-			'allowed_types' => array(
-				ITEM_VALUE_TYPE_FLOAT, //0
-				ITEM_VALUE_TYPE_STR, //1
-				ITEM_VALUE_TYPE_LOG, //2
-				ITEM_VALUE_TYPE_UINT64, //3
-				ITEM_VALUE_TYPE_TEXT, //4
-				)
+			'allowed_types' => $allowed_types_any
 		),
 	);
 
@@ -491,7 +411,7 @@ if(form){
 	$form->addRow(S_ITEM, array(
 		new CTextBox('description', $description, 50, 'yes'),
 		new CButton('select', S_SELECT, "return PopUp('popup.php?dstfrm=".$form->GetName().
-				"&dstfld1=itemid&dstfld2=description&".
+				"&dstfld1=itemid&dstfld2=description&submitParent=1&".
 				"srctbl=items&srcfld1=itemid&srcfld2=description',0,0,'zbx_popup_item');")
 		));
 
@@ -506,16 +426,17 @@ if(form){
 			'itemids' => array($_REQUEST['itemid']),
 			'output' => API_OUTPUT_EXTEND
 		);
-		$selectedItem = CItem::get($options);
-		if (isset($selectedItem[0]['value_type'])) {
-			$itemValueType = $selectedItem[0]['value_type'];
+		$selectedItems = CItem::get($options);
+		$selectedItem = reset($selectedItems);
+		if (isset($selectedItem['value_type'])) {
+			$itemValueType = $selectedItem['value_type'];
 		}
 	}
 
 	foreach($functions as  $id => $f){
 		foreach($f['operators'] as $op => $txt_op){
 			//if user has selected an item, we are filtering out the triggers that can't work with it
-			if (!isset($itemValueType) || in_array($itemValueType, $f['allowed_types'])) {
+			if (!isset($itemValueType) || isset($f['allowed_types'][$itemValueType])) {
 				$cmbFnc->addItem($id.'['.$op.']', str_replace('{OP}', $txt_op, $f['description']));
 			}
 		}
