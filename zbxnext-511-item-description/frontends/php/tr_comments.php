@@ -48,25 +48,27 @@ include_once('include/page_header.php');
 ?>
 <?php
 
-	if(!isset($_REQUEST['triggerid'])) fatal_error(S_NO_TRIGGER_DEFINED);
-
 	$options = array(
 		'nodeids' => get_current_nodeid(true),
 		'triggerids' => $_REQUEST['triggerid'],
-		'output' => API_OUTPUT_SHORTEN,
+		'output' => API_OUTPUT_EXTEND,
+		'select_hosts' => API_OUTPUT_EXTEND,
 	);
-	$db_data = CTrigger::get($options);
-	if(empty($db_data)) access_deny();
+	$trigger = CTrigger::get($options);
+	$trigger = reset($trigger);
+
+	if(!$trigger)
+		access_deny();
 
 
 	if(isset($_REQUEST['save'])){
-		$result = update_trigger_comments($_REQUEST['triggerid'],$_REQUEST['comments']);
-		show_messages($result, S_COMMENT_UPDATED, S_CANNOT_UPDATE_COMMENT);
+		$result = update_trigger_comments($_REQUEST['triggerid'], $_REQUEST['comments']);
+		show_messages($result, S_DESCRIPTION_UPDATED, S_CANNOT_UPDATE_DESCRIPTION);
 
 		if($result){
-			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_TRIGGER,
-				S_TRIGGER.' ['.$_REQUEST['triggerid'].'] ['.expand_trigger_description($_REQUEST['triggerid']).'] '.
-				S_COMMENTS.' ['.$_REQUEST['comments'].']');
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER, S_TRIGGER . ' [' .
+					$_REQUEST['triggerid'] . '] [' . expand_trigger_description(
+				$_REQUEST['triggerid']) . '] ' . S_DESCRIPTION . ' [' . $_REQUEST['comments'] . ']');
 		}
 	}
 	else if(isset($_REQUEST['cancel'])){
@@ -74,8 +76,17 @@ include_once('include/page_header.php');
 		exit();
 	}
 
-	show_table_header(S_TRIGGER_COMMENTS_BIG);
-	insert_trigger_comment_form($_REQUEST["triggerid"]);
+	show_table_header(S_TRIGGER.SPACE.S_DESCRIPTION);
+
+	$host = reset($trigger['hosts']);
+
+	$frmComent = new CFormTable(S_DESCRIPTION." for ".$host['host']." : \"".expand_trigger_description_by_data($trigger).'"');
+	$frmComent->addVar('triggerid', $_REQUEST['triggerid']);
+	$frmComent->addRow(S_DESCRIPTION, new CTextArea('comments',$trigger['comments'],100,25));
+	$frmComent->addItemToBottomRow(new CButton('save', S_SAVE));
+	$frmComent->addItemToBottomRow(new CButtonCancel('&triggerid='.$_REQUEST['triggerid']));
+
+	$frmComent->show();
 
 ?>
 <?php

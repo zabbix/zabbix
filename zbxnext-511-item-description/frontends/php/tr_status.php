@@ -291,7 +291,7 @@ include_once('include/page_header.php');
 		is_show_all_nodes() ? S_NODE : null,
 		S_HOST,
 		make_sorting_header(S_NAME, 'description'),
-		S_COMMENTS
+		S_DESCRIPTION
 	));
 
 
@@ -421,7 +421,7 @@ include_once('include/page_header.php');
 
 
 	foreach($triggers as $tnum => $trigger){
-		
+
 		$trigger['desc'] = $description = expand_trigger_description($trigger['triggerid']);
 
 		$items = array();
@@ -473,7 +473,7 @@ include_once('include/page_header.php');
 			zbx_jsvalue($items, true).");"
 		);
 
-		
+
 // }}} trigger description js menu
 
 		if($_REQUEST['show_details']){
@@ -548,8 +548,8 @@ include_once('include/page_header.php');
 
 			$menus = rtrim($menus,',');
 			$menus = 'show_popup_menu(event,['.$menus.'],180);';
-			
-			
+
+
 
 			$maint_span = null;
 			if($trigger_host['maintenance_status']){
@@ -569,7 +569,7 @@ include_once('include/page_header.php');
 				$maint_span->setHint($maint_hint);
 			}
 
-			
+
 
 
 			$hosts_span = new CSpan($trigger_host['host'], 'link_menu');
@@ -578,7 +578,7 @@ include_once('include/page_header.php');
 			$hosts_list[] = $maint_span;
 			$hosts_list[] = ', ';
 
-			
+
 		}
 
 		array_pop($hosts_list);
@@ -586,7 +586,7 @@ include_once('include/page_header.php');
 		$host->addStyle('white-space: normal;');
 // }}} host JS menu
 
-		
+
 
 
 		$status = new CSpan(trigger_value2str($trigger['value']), get_trigger_value_style($trigger['value']));

@@ -410,19 +410,30 @@
 					'snmpv3_privpassphrase,formula,trends,logtimefmt,valuemapid,'.
 					'delay_flex,params,ipmi_sensor,templateid,authtype,username,password,publickey,privatekey,description_details)'.
 			' VALUES ('.$itemid.','.zbx_dbstr($item['description']).','.zbx_dbstr($item['key_']).','.(!$item['hostid']? '0':$item['hostid']).','.
-						(!$item['delay']? '0':$item['delay']).','.(!$item['history']? '0':$item['history']).','.(!$item['status']? '0':$item['status']).','.(!$item['type']? '0':$item['type']).','.
-						zbx_dbstr($item['snmp_community']).','.zbx_dbstr($item['snmp_oid']).','.(!$item['value_type']? '0':$item['value_type']).','.(!$item['data_type']? '0':$item['data_type']).','.
-						zbx_dbstr($item['trapper_hosts']).','.$item['snmp_port'].','.zbx_dbstr($item['units']).','.(!$item['multiplier'] ? '0':$item['multiplier']).','.
-						intval($item['delta']).','.zbx_dbstr($item['snmpv3_securityname']).','.intval($item['snmpv3_securitylevel']).','.
-						zbx_dbstr($item['snmpv3_authpassphrase']).','.zbx_dbstr($item['snmpv3_privpassphrase']).','.
-						zbx_dbstr($item['formula']).','.(!$item['trends'] ? '0':$item['trends']).','.zbx_dbstr($item['logtimefmt']).','.(!$item['valuemapid'] ? 'NULL':$item['valuemapid']).','.
-						zbx_dbstr($item['delay_flex']).','.zbx_dbstr($item['params']).','.
-						zbx_dbstr($item['ipmi_sensor']).','.zero2null($item['templateid']).','.
-						intval($item['authtype']).','.
-						zbx_dbstr($item['username']).','.zbx_dbstr($item['password']).','.
-						zbx_dbstr($item['publickey']).','.zbx_dbstr($item['privatekey'].','.
-						zbx_dbstr($item['description_details']).')')
-			);
+				(!$item['delay']? '0':$item['delay']).','.
+				(!$item['history']? '0':$item['history']).','.
+				(!$item['status']? '0':$item['status']).','.
+				(!$item['type']? '0':$item['type']).','.
+				zbx_dbstr($item['snmp_community']).','.
+				zbx_dbstr($item['snmp_oid']).','.
+				(!$item['value_type']? '0':$item['value_type']).','.
+				(!$item['data_type']? '0':$item['data_type']).','.
+				zbx_dbstr($item['trapper_hosts']).','.
+				$item['snmp_port'].','.
+				zbx_dbstr($item['units']).','.
+				(!$item['multiplier'] ? '0':$item['multiplier']).','.
+				intval($item['delta']).','.zbx_dbstr($item['snmpv3_securityname']).','.intval($item['snmpv3_securitylevel']).','.
+				zbx_dbstr($item['snmpv3_authpassphrase']).','.zbx_dbstr($item['snmpv3_privpassphrase']).','.
+				zbx_dbstr($item['formula']).','.(!$item['trends'] ? '0':$item['trends']).','.zbx_dbstr($item['logtimefmt']).','.(!$item['valuemapid'] ? 'NULL':$item['valuemapid']).','.
+				zbx_dbstr($item['delay_flex']).','.zbx_dbstr($item['params']).','.
+				zbx_dbstr($item['ipmi_sensor']).','.zero2null($item['templateid']).','.
+				intval($item['authtype']).','.
+				zbx_dbstr($item['username']).','.
+				zbx_dbstr($item['password']).','.
+				zbx_dbstr($item['publickey']).','.
+				zbx_dbstr($item['privatekey']).','.
+				zbx_dbstr($item['description_details']).')'
+		);
 
 		if ($result)
 			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_ITEM, $itemid, $host['host'].':'.$item['description'], NULL, NULL, NULL);

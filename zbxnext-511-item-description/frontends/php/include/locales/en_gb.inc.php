@@ -1783,6 +1783,8 @@
 	'S_COMMENT_UPDATED'=>			'Comment updated',
 	'S_CANNOT_UPDATE_COMMENT'=>		'Cannot update comment',
 	'S_ADD'=>						'Add',
+	'S_DESCRIPTION_UPDATED'=>						'Description updated',
+	'S_CANNOT_UPDATE_DESCRIPTION'=>						'Cannot update description',
 
 //	tr_status.php
 	'S_SOUND'=>							'Sound',
