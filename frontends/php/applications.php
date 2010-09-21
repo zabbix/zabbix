@@ -93,7 +93,7 @@ include_once('include/page_header.php');
 			$action		= AUDIT_ACTION_UPDATE;
 			$msg_ok		= S_APPLICATION_UPDATED;
 			$msg_fail	= S_CANNOT_UPDATE_APPLICATION;
-			
+
 		}
 		else {
 			$applicationid = add_application($_REQUEST['appname'], $_REQUEST['apphostid']);
@@ -309,7 +309,7 @@ include_once('include/page_header.php');
 		if($pageFilter->hostsSelected){
 // Header Host
 			if($_REQUEST['hostid'] > 0){
-				$tbl_header_host = get_header_host_table($_REQUEST['hostid'], array('items', 'triggers', 'graphs'));
+				$tbl_header_host = get_header_host_table($_REQUEST['hostid'], 'applications');
 				$app_wdgt->addItem($tbl_header_host);
 			}
 

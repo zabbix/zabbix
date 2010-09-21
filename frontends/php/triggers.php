@@ -200,12 +200,12 @@ include_once('include/page_header.php');
 
 		$options = array(
 			'triggerids' => $_REQUEST['triggerid'],
-			'extendoutput'=>1, 
-			'editable'=>1, 
+			'extendoutput'=>1,
+			'editable'=>1,
 			'select_hosts' => API_OUTPUT_EXTEND,
 		);
 		$triggers = CTrigger::get($options);
-		
+
 		if($trigger_data = reset($triggers)){
 			$host = reset($trigger_data['hosts']);
 			DBstart();
@@ -379,10 +379,10 @@ include_once('include/page_header.php');
 	}
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['g_triggerid'])){
 		DBstart();
-		
+
 		$options = array(
-			'extendoutput'=>1, 
-			'editable'=>1, 
+			'extendoutput'=>1,
+			'editable'=>1,
 			'select_hosts' => API_OUTPUT_EXTEND,
 			'triggerids' => $_REQUEST['g_triggerid'],
 		);
@@ -483,7 +483,7 @@ include_once('include/page_header.php');
 
 // Header Host
 		if($_REQUEST['hostid'] > 0){
-			$tbl_header_host = get_header_host_table($_REQUEST['hostid'], array('items', 'applications', 'graphs'));
+			$tbl_header_host = get_header_host_table($_REQUEST['hostid'],'triggers');
 			$triggers_wdgt->addItem($tbl_header_host);
 		}
 

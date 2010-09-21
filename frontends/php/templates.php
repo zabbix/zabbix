@@ -21,6 +21,7 @@
 <?php
 require_once('include/config.inc.php');
 require_once('include/hosts.inc.php');
+require_once('include/screens.inc.php');
 require_once('include/forms.inc.php');
 require_once('include/ident.inc.php');
 
@@ -162,6 +163,16 @@ include_once('include/page_header.php');
 		);
 		$macros = CUserMacro::get($params);
 
+// SELECT SCREENS
+		$params = array(
+			'templateids' => $templateids,
+			'preservekeys' => 1,
+			'select_screenitems' => API_OUTPUT_EXTEND,
+			'output' => API_OUTPUT_EXTEND
+		);
+		$screens = CScreen::get($params);
+		prepareScreenExport($screens);
+
 // SELECT ITEMS
 		$params = array(
 			'hostids' => $templateids,
@@ -224,7 +235,8 @@ include_once('include/page_header.php');
 			'macros' => $macros,
 			'hosts_groups' => $groups,
 			'triggers' => $triggers,
-			'dependencies' => $dependencies
+			'dependencies' => $dependencies,
+			'screens' => $screens,
 		);
 
 		$xml = zbxXML::export($data);
