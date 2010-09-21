@@ -507,7 +507,7 @@ int	DBupdate_trigger_value(zbx_uint64_t triggerid, int trigger_type, int trigger
 			event.ns = ts->ns;
 
 			/* Processing event */
-			if (FAIL == (ret = process_event(&event)))
+			if (FAIL == (ret = process_event(&event, 0)))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "Event not added for triggerid [" ZBX_FS_UI64 "]",
 						triggerid);
@@ -1867,7 +1867,7 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, int now)
 	event.value	= TRIGGER_VALUE_TRUE;
 
 	/* Processing event */
-	process_event(&event);
+	process_event(&event, 0);
 }
 
 /******************************************************************************
