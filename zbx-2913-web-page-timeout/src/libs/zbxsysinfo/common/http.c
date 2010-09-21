@@ -26,15 +26,14 @@
 
 #include "http.h"
 
-#define ZABBIX_MAX_WEBPAGE_SIZE	1*1024*1024
+#define ZBX_MAX_WEBPAGE_SIZE	(1 * 1024 * 1024)
 
-static int	get_http_page(const char *host, const char *path, unsigned short port, char *buffer, int max_buf_len)
+static int	get_http_page(const char *host, const char *path, unsigned short port, char *buffer, int max_buffer_len)
 {
 	int		ret;
-	char		*buf, request[MAX_STRING_LEN];
+	char		*recv_buffer;
+	char		request[MAX_STRING_LEN];
 	zbx_sock_t	s;
-
-	assert(buffer);
 
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, MAX(CONFIG_TIMEOUT - 1, 1))))
 	{
@@ -48,11 +47,10 @@ static int	get_http_page(const char *host, const char *path, unsigned short port
 
 		if (SUCCEED == (ret = zbx_tcp_send_raw(&s, request)))
 		{
-			if (SUCCEED == (ret = zbx_tcp_recv_ext(&s, &buf, ZBX_TCP_READ_UNTIL_CLOSE, 0)))
+			if (SUCCEED == (ret = zbx_tcp_recv_ext(&s, &recv_buffer, ZBX_TCP_READ_UNTIL_CLOSE, 0)))
 			{
-				zbx_rtrim(buf, "\r\n");
-
-				zbx_snprintf(buffer, max_buf_len, "%s", buf);
+				if (NULL != buffer)
+					zbx_strlcpy(buffer, recv_buffer, max_buffer_len);
 			}
 		}
 	}
@@ -74,7 +72,7 @@ int	WEB_PAGE_GET(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	char	path[MAX_STRING_LEN];
 	char	port_str[MAX_STRING_LEN];
 
-	char	*buffer = NULL;
+	char	buffer[DB_TEXT_LEN_MAX];
 
 	assert(result);
 
@@ -94,17 +92,13 @@ int	WEB_PAGE_GET(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	else if (FAIL == is_uint(port_str))
 		return SYSINFO_RET_FAIL;
 
-	buffer = zbx_malloc(buffer, ZABBIX_MAX_WEBPAGE_SIZE);
-
-	if (SYSINFO_RET_OK == get_http_page(hostname, path, (unsigned short)atoi(port_str), buffer, ZABBIX_MAX_WEBPAGE_SIZE))
+	if (SYSINFO_RET_OK == get_http_page(hostname, path, (unsigned short)atoi(port_str), buffer, sizeof(buffer)))
 	{
-		SET_TEXT_RESULT(result, buffer);
+		zbx_rtrim(buffer, "\r\n");
+		SET_TEXT_RESULT(result, strdup(buffer));
 	}
 	else
-	{
-		zbx_free(buffer);
 		SET_TEXT_RESULT(result, strdup("EOF"));
-	}
 
 	return SYSINFO_RET_OK;
 }
@@ -114,8 +108,6 @@ int	WEB_PAGE_PERF(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	char	hostname[MAX_STRING_LEN];
 	char	path[MAX_STRING_LEN];
 	char	port_str[MAX_STRING_LEN];
-
-	char	*buffer = NULL;
 
 	double	start_time;
 
@@ -137,18 +129,14 @@ int	WEB_PAGE_PERF(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	else if (FAIL == is_uint(port_str))
 		return SYSINFO_RET_FAIL;
 
-	buffer = zbx_malloc(buffer, ZABBIX_MAX_WEBPAGE_SIZE);
-
 	start_time = zbx_time();
 
-	if (SYSINFO_RET_OK == get_http_page(hostname, path, (unsigned short)atoi(port_str), buffer, ZABBIX_MAX_WEBPAGE_SIZE))
+	if (SYSINFO_RET_OK == get_http_page(hostname, path, (unsigned short)atoi(port_str), NULL, 0))
 	{
 		SET_DBL_RESULT(result, zbx_time() - start_time);
 	}
 	else
 		SET_DBL_RESULT(result, 0.0);
-
-	zbx_free(buffer);
 
 	return SYSINFO_RET_OK;
 }
@@ -160,10 +148,9 @@ int	WEB_PAGE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	char	port_str[MAX_STRING_LEN];
 	char	regexp[MAX_STRING_LEN];
 	char	len_str[MAX_STRING_LEN];
-	char	back[MAX_STRING_LEN];
+	char	back[DB_TEXT_LEN_MAX];
 
-	char	*buffer = NULL;
-	char	*found;
+	char	*buffer = NULL, *found;
 
 	int	len, found_len;
 
@@ -189,13 +176,13 @@ int	WEB_PAGE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
                 return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 5, len_str, sizeof(len_str)) || '\0' == len_str[0])
-		zbx_snprintf(len_str, sizeof(len_str), "%d", ZABBIX_MAX_WEBPAGE_SIZE);
+		zbx_snprintf(len_str, sizeof(len_str), "%d", DB_TEXT_LEN);
 	else if (FAIL == is_uint(len_str))
 		return SYSINFO_RET_FAIL;
 
-	buffer = zbx_malloc(buffer, ZABBIX_MAX_WEBPAGE_SIZE);
+	buffer = zbx_malloc(buffer, ZBX_MAX_WEBPAGE_SIZE);
 
-	if (SYSINFO_RET_OK == get_http_page(hostname, path, (unsigned short)atoi(port_str), buffer, ZABBIX_MAX_WEBPAGE_SIZE))
+	if (SYSINFO_RET_OK == get_http_page(hostname, path, (unsigned short)atoi(port_str), buffer, ZBX_MAX_WEBPAGE_SIZE))
 	{
 		if (NULL != (found = zbx_regexp_match(buffer, regexp, &found_len)))
 		{
