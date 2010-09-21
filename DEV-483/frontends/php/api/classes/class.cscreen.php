@@ -52,7 +52,6 @@ class CScreen extends CZBXAPI{
 
 		$result = array();
 		$user_type = $USER_DETAILS['type'];
-		$userid = $USER_DETAILS['userid'];
 
 		$sort_columns = array('name'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
@@ -178,6 +177,9 @@ class CScreen extends CZBXAPI{
 			if(isset($options['filter']['name'])){
 				$sql_parts['where']['name'] = 's.name='.zbx_dbstr($options['filter']['name']);
 			}
+			if(isset($options['filter']['templateid'])){
+				$sql_parts['where']['templateid'] = 's.templateid='.$options['filter']['templateid'];
+			}
 		}
 
 // order
@@ -252,14 +254,6 @@ class CScreen extends CZBXAPI{
 
 						$result[$screen['screenid']]['screenitems'][] = array('screenitemid' => $screen['screenitemid']);
 						unset($screen['screenitemid']);
-					}
-
-					if(isset($screen['templateid'])){
-						if(!isset($result[$screen['screenid']]['templates']))
-							$result[$screen['screenid']]['templates'] = array();
-
-						$result[$screen['screenid']]['templates'][] = array('templateid' => $screen['templateid']);
-						unset($screen['templateid']);
 					}
 
 					$result[$screen['screenid']] += $screen;
@@ -499,20 +493,27 @@ SDI('/////////////////////////////////');
 
 	public static function exists($data){
 		$options = array(
-			'filter' => $data,
+			'filter' => array(),
 			'preservekeys' => 1,
 			'output' => API_OUTPUT_SHORTEN,
 			'nopermissions' => 1
 		);
+
+		if(isset($data['screenid']))
+			$options['filter']['screenid'] = $data['screenid'];
+		if(isset($data['name']))
+			$options['filter']['name'] = $data['name'];
+
+		$options['filter']['templateid'] = isset($data['templateid']) ? $data['templateid'] : 0;
 
 		if(isset($data['node']))
 			$options['nodeids'] = getNodeIdByNodeName($data['node']);
 		else if(isset($data['nodeids']))
 			$options['nodeids'] = $data['nodeids'];
 
-		$sysmaps = self::get($options);
+		$screens = self::get($options);
 
-	return !empty($sysmaps);
+		return !empty($screens);
 	}
 
 	protected static function checkItems($screenitems){
@@ -641,11 +642,7 @@ SDI('/////////////////////////////////');
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for screen [ '.$screen['name'].' ]');
 				}
 
-				$sql = 'SELECT screenid '.
-					' FROM screens '.
-					' WHERE name='.zbx_dbstr($screen['name']).
-						' AND '.DBin_node('screenid', false);
-				if(DBfetch(DBselect($sql))){
+				if(self::exists($screen)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_SCREEN.' [ '.$screen['name'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
 			}
@@ -690,33 +687,36 @@ SDI('/////////////////////////////////');
 		try{
 			self::BeginTransaction(__METHOD__);
 
-		$options = array(
+			$options = array(
 				'screenids' => zbx_objectValues($screens, 'screenid'),
 				'editable' => 1,
 				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => 1,
-		);
-		$upd_screens = self::get($options);
-		foreach($screens as $gnum => $screen){
-				if(!isset($screen['screenid'], $upd_screens[$screen['screenid']])){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+			);
+			$upd_screens = self::get($options);
+			foreach($screens as $gnum => $screen){
+					if(!isset($screen['screenid'], $upd_screens[$screen['screenid']])){
+						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				}
 			}
-		}
 
 			foreach($screens as $snum => $screen){
 				if(isset($screen['name'])){
-				$options = array(
-					'filter' => array('name' => $screen['name']),
-					'preservekeys' => 1,
+					$options = array(
+						'filter' => array(
+							'name' => $screen['name'],
+							'templateid' => (isset($screen['templateid']) ? $screen['templateid'] : null)
+						),
+						'preservekeys' => 1,
 						'nopermissions' => 1,
 						'output' => API_OUTPUT_SHORTEN,
-				);
-				$exist_screens = self::get($options);
-					$exist_screen = reset($exist_screens);
+					);
+					$exist_screen = self::get($options);
+					$exist_screen = reset($exist_screen);
 
 					if($exist_screen && ($exist_screen['screenid'] != $screen['screenid']))
 						self::exception(ZBX_API_ERROR_PERMISSIONS, S_SCREEN.' [ '.$screen['name'].' ] '.S_ALREADY_EXISTS_SMALL);
-					}
+				}
 
 				$screenid = $screen['screenid'];
 				unset($screen['screenid']);
@@ -724,7 +724,7 @@ SDI('/////////////////////////////////');
 					$update[] = array(
 						'values' => $screen,
 						'where' => array('screenid='.$screenid),
-				);
+					);
 				}
 
 				if(isset($screen['screenitems'])){

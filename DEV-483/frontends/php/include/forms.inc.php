@@ -4288,7 +4288,14 @@ JAVASCRIPT;
 		$table = new CTable();
 		$table->setHeader(array(S_ELEMENT, S_UPDATE.SPACE.S_EXISTING, S_ADD.SPACE.S_MISSING), 'bold');
 
-		$titles = array('host' => $template?S_TEMPLATE:S_HOST, 'template' => S_TEMPLATE_LINKAGE, 'item' => S_ITEM, 'trigger' => S_TRIGGER, 'graph' => S_GRAPH);
+		$titles = array(
+			'host' => $template?S_TEMPLATE:S_HOST,
+			'template' => S_TEMPLATE_LINKAGE,
+			'item' => S_ITEM,
+			'trigger' => S_TRIGGER,
+			'graph' => S_GRAPH,
+			'screens' => S_SCREENS,
+		);
 		foreach($titles as $key => $title){
 			$cbExist = new CCheckBox('rules['.$key.'][exist]', true);
 
@@ -5339,7 +5346,7 @@ JAVASCRIPT;
 			'applications' => 'applications',
 			'screens' => 'screens',
 		);
-		unset($current);
+		unset($elements[$current]);
 
 		$header_host_opt = array(
 			'hostids' => $hostid,
