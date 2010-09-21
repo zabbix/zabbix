@@ -10,6 +10,7 @@ Changes for 1.9
 
 Changes for 1.8.4rc1
 
+ - [ZBX-3024] In trigger expression selection popup, expressions are now filtered, depending on item type (KB)
  - [ZBX-3023] fixed repeated notifications after maintenance period (Sasha)
  - [ZBX-3017] fixed error when try to add dependency to template trigger that is linked to a host (Vedmak)
  - [ZBX-3008] fixed server generating multiple unknown events for triggers with multiple items (asaveljevs)
@@ -82,7 +83,7 @@ Changes for 1.8.3
  - [ZBX-2875] updated Japanese translation; thanks to Kodai Terashima (Richlv)
  - [ZBX-2856] removed debug info (Aly)
  - [ZBX-2855] fixed new line symbol for latest Opera browser (Aly)
- 
+
 Changes for 1.8.3rc4
 
  - [ZBX-2226] fixed template item update, when linked to host with existing item with same key (Aly)
@@ -106,7 +107,7 @@ Changes for 1.8.3rc4
  - [ZBX-2784] changed icons style (Vedmak)
  - [ZBX-2820] fixed minor visual bugs (Vedmak)
  - [ZBX-2766] fixed triggers info in status of triggers page in fullscreen mode (Aly)
- 
+
 Changes for 1.8.3rc3
 
  - [ZBX-2799] fixed map element host in maintenance (Aly)
@@ -154,7 +155,7 @@ Changes for 1.8.3rc2
  - [ZBX-2740] fixed js errors in items section in IE (Aly)
 
 Changes for 1.8.3rc1
- 
+
  - [DEV-468] added new frontend theme - Dark orange (Aly)
  - [ZBX-2731] fixed permissions problem with hostgroup names containing '[]' (Vedmak)
  - [ZBX-2733] fixed the timer process so that it does not recalculate extraneous triggers for an item (asaveljevs)
@@ -263,7 +264,7 @@ Changes for 1.8.3rc1
  - [ZBX-1357] updated German translation; thanks to Peter Schultz (Richlv)
  - [ZBX-2319] fixed escaping locales on download (Aly)
  - [ZBX-2460] fixed auto adding host group to updated host (Aly)
- - [ZBX-2367] improved using DISTINCT rule in queries in API (Aly) 
+ - [ZBX-2367] improved using DISTINCT rule in queries in API (Aly)
  - [ZBX-2408] fixed mute button in status of triggers page (Aly)
  - [ZBX-2477] fixed dynamic graphs disappear from screens (Vedmak)
  - [ZBX-1346] clarify some parameter values in the example configuration files (Richlv)
@@ -300,7 +301,7 @@ Changes for 1.8.3rc1
  - [ZBX-2253] fixed delete confirmation dialogue referring to empty element (Vedmak)
  - [ZBX-2370] fixed duration value in monitoring events for multiple problem triggers (Vedmak)
  - [ZBX-507] made UserParameters work with zabbix_agent(d) -p and -t (asaveljevs)
- - [ZBX-2326] fixed XSS vulnerability in triggers page; later independently discovered by VUPEN Security (Aly) 
+ - [ZBX-2326] fixed XSS vulnerability in triggers page; later independently discovered by VUPEN Security (Aly)
  - [ZBX-2326] fixed dynamic chart titles, now all symbols are rendered correctly (Maxim Andruhovich / AM)
  - [ZBX-2250] value mapping is now applied for {ITEM.LASTVALUE} macro inside triggers description (Vedmak)
  - [ZBX-1436] fixed trigger events display after next steps  monitoring -> triggers -> click on any event time (Maxim Andruhovich / AM)
@@ -350,7 +351,7 @@ Changes for 1.8.3rc1
  - [ZBX-2337] fixed error when selecting a web item in trigger configuration (Vedmak)
  - [ZBX-2306] fixed links for graphs in screens (Aly)
  - [ZBX-633] removed linkage of OpenIPMI library to Agents in "configure" script (Sasha)
- - [ZBX-633] more debug information in checks_ipmi.c module (Sasha) 
+ - [ZBX-633] more debug information in checks_ipmi.c module (Sasha)
  - [ZBX-2362] fixed processing of logrt[] checks under Windows (Sasha)
  - [ZBX-2356] fixed error while performing group actions when creating an item (Vedmak)
  - [ZBX-2355] fixed error when trying to massupdate trigger severity (Vedmak)
