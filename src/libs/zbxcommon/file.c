@@ -49,7 +49,7 @@ int	__zbx_open(const char *pathname, int flags)
  * Reads in at most one less than size characters from a file descriptor and stores them into the buffer pointed to by s.
  * Reading stops after a newline. If a newline is read, it is stored into the buffer.
  *
- * On success, the  number of bytes read is returned (zero indicates end of file).
+ * On success, the number of bytes read is returned (zero indicates end of file).
  * On error, -1 is returned, and errno is set appropriately.
  */
 int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
@@ -120,4 +120,3 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 
 	return i;
 }
-
