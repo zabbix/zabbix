@@ -46,14 +46,24 @@
 
 	$param1_sec_count = array(
 			array(
-				'C' => S_LAST_OF.' T',	/* caption */
+				'C' => S_LAST_OF.' (T)',	/* caption */
+				'T' => T_ZBX_INT,	/* type */
+				'M' => $metrics		/* metrcis */
+			     ),
+			array(
+				'C' => S_TIME_SHIFT.' ',	/* caption */
+				'T' => T_ZBX_INT,	/* type */
+			));
+	$param1_sec_count_no_timeshift = array(
+		array(
+				'C' => S_LAST_OF.' (T)',	/* caption */
 				'T' => T_ZBX_INT,	/* type */
 				'M' => $metrics		/* metrcis */
 			     )
-		);
+	);
 	$param1_sec = array(
 			array(
-				'C' => S_LAST_OF.' T',	/* caption */
+				'C' => S_LAST_OF.' (T)',	/* caption */
 				'T' => T_ZBX_INT,	/* type */
 			     ));
 
@@ -65,7 +75,7 @@
 
 	$param2_sec_val = array(
 		array(
-			'C' => S_LAST_OF.' T',	/* caption */
+			'C' => S_LAST_OF.' (T)',	/* caption */
 			'T' => T_ZBX_INT,
 			 ),
 		array(
@@ -79,7 +89,7 @@
 			'T' => T_ZBX_STR,
 		),
 		array(
-			'C' => S_LAST_OF . ' T', /* caption */
+			'C' => S_LAST_OF . ' (T)', /* caption */
 			'T' => T_ZBX_INT,
 		)
 	);
@@ -190,7 +200,7 @@
 		'fuzzytime' => array(
 			'description' => 'N {OP} X, where X is 1 - if timestamp is equal with Zabbix server time for T seconds, 0 - otherwise',
 			'operators' => $limited_operators,
-			'params' => $param1_sec_count,
+			'params' => $param1_sec_count_no_timeshift,
 			'allowed_types' => $allowed_types_numeric
 		),
 		'regexp' => array(
@@ -449,7 +459,7 @@ if(form){
 			$pv = (isset($param[$pid])) ? $param[$pid] : null;
 
 			if($pf['T'] == T_ZBX_INT){
-				if( 0 == $pid ){
+				if( 0 == $pid ||  1 == $pid ){
 					if( isset($pf['M']) && is_array($pf['M'])){
 						$cmbParamType = new CComboBox('paramtype', $paramtype);
 						foreach( $pf['M'] as $mid => $caption ){
@@ -466,7 +476,7 @@ if(form){
 				}
 
 
-				$form->addRow(S_LAST_OF.' ', array(
+				$form->addRow($pf['C'].' ', array(
 					new CNumericBox('param['.$pid.']', $pv, 10),
 					$cmbParamType
 					));
