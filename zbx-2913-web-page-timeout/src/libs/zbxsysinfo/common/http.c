@@ -36,7 +36,7 @@ static int	get_http_page(const char *host, const char *path, unsigned short port
 
 	assert(buffer);
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, 0)))
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, MAX(CONFIG_TIMEOUT - 1, 1))))
 	{
 		zbx_snprintf(request, sizeof(request),
 				"GET /%s HTTP/1.1\r\n"
