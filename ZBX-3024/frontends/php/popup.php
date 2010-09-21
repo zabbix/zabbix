@@ -176,7 +176,9 @@ include_once('include/page_header.php');
 		'reference'=>		array(T_ZBX_STR, O_OPT, null,   null,		null),
 		'writeonly'=>		array(T_ZBX_STR, O_OPT, null,   null,		null),
 
-		'select'=>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,	null)
+		'select'=>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,	null),
+
+		'submitParent'=>	array(T_ZBX_INT, O_OPT, null,   BETWEEN(0,15),	null),
 	);
 
 	$allowed_item_types = array(ITEM_TYPE_ZABBIX,ITEM_TYPE_ZABBIX_ACTIVE,ITEM_TYPE_SIMPLE,ITEM_TYPE_INTERNAL,ITEM_TYPE_AGGREGATE);
@@ -208,6 +210,8 @@ include_once('include/page_header.php');
 
 // items
  	$value_types		= get_request('value_types', null);
+
+	$submitParent = get_request('submitParent', false);
 
 	$host_status = null;
 	$templated = null;
@@ -256,6 +260,7 @@ include_once('include/page_header.php');
 	if($value_types)
 		$frmTitle->addVar('value_types', $value_types);
 
+//adding param to a form, so that it would remain when page is refreshed
 	$frmTitle->addVar('dstfrm', $dstfrm);
 	$frmTitle->addVar('dstact', $dstact);
 	$frmTitle->addVar('dstfld1', $dstfld1);
@@ -265,7 +270,8 @@ include_once('include/page_header.php');
 	$frmTitle->addVar('srcfld2', $srcfld2);
 	$frmTitle->addVar('multiselect', $multiselect);
 	$frmTitle->addVar('writeonly', $writeonly);
-	$frmTitle->addVar('reference', $reference	);
+	$frmTitle->addVar('reference', $reference);
+	$frmTitle->addVar('submitParent', $submitParent	);
 
 	if(!is_null($existed_templates))
 		$frmTitle->addVar('existed_templates', $existed_templates);
@@ -832,7 +838,8 @@ include_once('include/page_header.php');
 					$dstfld2 => $row[$srcfld2],
 				);
 
-				$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).','.zbx_jsvalue($values).'); return false;';
+//if we need to submit parent window
+				$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).','.zbx_jsvalue($values).', '.($submitParent?'true':'false').'); return false;';
 			}
 
 			$description->setAttribute('onclick', $js_action);
