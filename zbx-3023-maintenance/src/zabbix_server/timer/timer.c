@@ -259,7 +259,7 @@ static void	process_maintenance_hosts(zbx_host_maintenance_t **hm, int *hm_alloc
  *                                                                            *
  * Purpose: get trigger values for specified period                           *
  *                                                                            *
- * Parameters: triggerid        - [IN] trigger identificator from database    *
+ * Parameters: triggerid        - [IN] trigger identifier from database       *
  *             maintenance_from - [IN] maintenance period start               *
  *             maintenance_to   - [IN] maintenance period stop                *
  *             value_before     - [OUT] trigger value before maintenance      *
@@ -277,7 +277,7 @@ static void	process_maintenance_hosts(zbx_host_maintenance_t **hm, int *hm_alloc
 static void	get_trigger_values(zbx_uint64_t triggerid, int maintenance_from, int maintenance_to,
 		int *value_before, int *value_inside, int *value_after)
 {
-	const char	*__function_name = "trigger_value_changed";
+	const char	*__function_name = "get_trigger_values";
 
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -394,8 +394,8 @@ out:
  *          before maintenance and became TRUE after maintenance, also in     *
  *          case if it was TRUE before and FALSE after.                       *
  *                                                                            *
- * Parameters: hostid - host identificator from database                      *
- *             maintenance_from -                                             *
+ * Parameters: hostid - host identifier from database                         *
+ *             maintenance_from, maintenance_to - maintenance period bounds   *
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
