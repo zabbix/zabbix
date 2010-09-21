@@ -120,6 +120,7 @@ switch($itemType) {
 		'params_script'=>	array(T_ZBX_STR, O_OPT, NULL, NULL, NULL),
 		'params_dbmonitor'=>	array(T_ZBX_STR, O_OPT, NULL, NULL, NULL),
 		'params_calculted'=>	array(T_ZBX_STR, O_OPT, NULL, NULL, NULL),
+		'description_details'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,'isset({save})'),
 
 		'snmp_community'=>	array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,		'isset({save})&&isset({type})&&'.IN(
 													ITEM_TYPE_SNMPV1.','.
@@ -422,7 +423,8 @@ switch($itemType) {
 				'privatekey'		=> get_request('privatekey'),
 				'params'			=> get_request('params'),
 				'ipmi_sensor'		=> get_request('ipmi_sensor'),
-			'data_type'		=> get_request('data_type')
+			'data_type'		=> get_request('data_type'),
+			'description_details'		=> get_request('description_details')
 		);
 
 		if(isset($_REQUEST['itemid'])){
@@ -447,7 +449,8 @@ switch($itemType) {
 // sdii($db_item['applications']);
 
 			foreach($item as $field => $value){
-				if($item[$field] == $db_item[$field]) $item[$field] = null;
+				if($item[$field] == $db_item[$field])
+					$item[$field] = null;
 			}
 
 			if($new_appid){
