@@ -70,7 +70,7 @@ static void	add_trigger_info(DB_EVENT *event)
 		}
 		DBfree_result(result);
 
-		if (TRIGGER_VALUE_CHANGED_NO == event->value)
+		if (TRIGGER_VALUE_CHANGED_NO == event->value_changed)
 			zabbix_log(LOG_LEVEL_DEBUG, "Skip actions");
 	}
 }

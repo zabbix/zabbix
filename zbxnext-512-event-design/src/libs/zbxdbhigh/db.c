@@ -365,8 +365,10 @@ DB_RESULT	DBselectN(const char *query, int n)
  * Comments: Recursive function!                                              *
  *                                                                            *
  ******************************************************************************/
-static int	trigger_dependent_rec(zbx_uint64_t triggerid, int *level)
+static int	trigger_dependent_rec(zbx_uint64_t triggerid, int level)
 {
+	const char	*__function_name = "trigger_dependent_rec";
+
 	int		ret = FAIL;
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -374,37 +376,36 @@ static int	trigger_dependent_rec(zbx_uint64_t triggerid, int *level)
 	zbx_uint64_t	triggerid_tmp;
 	int		value_tmp;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In trigger_dependent_rec(triggerid:" ZBX_FS_UI64 ",level:%d)",
-		triggerid,
-		*level);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64 " level:%d",
+			__function_name, triggerid, level);
 
-	(*level)++;
-
-	if(*level > 32)
+	if (level > 32)
 	{
-		zabbix_log( LOG_LEVEL_CRIT, "Recursive trigger dependency detected! Please fix. Triggerid:" ZBX_FS_UI64,
-			triggerid);
+		zabbix_log(LOG_LEVEL_CRIT, "Recursive trigger dependency detected! Please fix. Triggerid:" ZBX_FS_UI64, triggerid);
 		return ret;
 	}
 
-	result = DBselect("select t.triggerid, t.value from trigger_depends d,triggers t where d.triggerid_down=" ZBX_FS_UI64 " and d.triggerid_up=t.triggerid",
-		triggerid);
-	while((row=DBfetch(result)))
+	result = DBselect("select t.triggerid,t.value"
+				" from trigger_depends d,triggers t"
+				" where d.triggerid_down=" ZBX_FS_UI64
+					" and d.triggerid_up=t.triggerid",
+					triggerid);
+	while (NULL != (row=DBfetch(result)))
 	{
 		ZBX_STR2UINT64(triggerid_tmp, row[0]);
 		value_tmp = atoi(row[1]);
-		if(TRIGGER_VALUE_TRUE == value_tmp || trigger_dependent_rec(triggerid_tmp, level) == SUCCEED)
+
+		if (TRIGGER_VALUE_TRUE == value_tmp || SUCCEED == trigger_dependent_rec(triggerid_tmp, level + 1))
 		{
-			zabbix_log( LOG_LEVEL_DEBUG, "This trigger depends on " ZBX_FS_UI64 ". Will not apply actions",
-				triggerid_tmp);
+			zabbix_log(LOG_LEVEL_DEBUG, "This trigger depends on " ZBX_FS_UI64 ". Will not apply actions", triggerid_tmp);
 			ret = SUCCEED;
 			break;
 		}
 	}
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of trigger_dependent_rec():%s",
-			zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s",
+			__function_name, zbx_result_string(ret));
 
 	return ret;
 }
@@ -429,11 +430,10 @@ static int	trigger_dependent(zbx_uint64_t triggerid)
 	const char	*__function_name = "trigger_dependent";
 
 	int	ret;
-	int	level = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64 "", __function_name, triggerid);
 
-	ret = trigger_dependent_rec(triggerid, &level);
+	ret = trigger_dependent_rec(triggerid, 0);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
