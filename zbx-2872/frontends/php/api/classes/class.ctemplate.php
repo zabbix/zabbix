@@ -1150,6 +1150,7 @@ COpt::memoryPick();
 				'editable' => 1,
 				'preservekeys' => 1
 			));
+
 			foreach($templates as $tnum => $template){
 				if(!isset($upd_templates[$template['templateid']])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -1323,7 +1324,7 @@ COpt::memoryPick();
 // UPDATE TEMPLATE LINKAGE {{{
 // firstly need to unlink all things, to correctly check circulars
 
-			if(isset($data['hosts']) && !is_null($data['hosts'])){
+			if(isset($data['hosts']) && !empty($data['hosts'])){
 				$template_hosts = CHost::get(array('templateids' => $templateids, 'templated_hosts' => 1));
 				$template_hostids = zbx_objectValues($template_hosts, 'hostid');
 				$new_hostids = zbx_objectValues($data['hosts'], 'hostid');
@@ -1339,7 +1340,7 @@ COpt::memoryPick();
 				}
 			}
 
-			if(isset($data['templates_link']) && !is_null($data['templates_link'])){
+			if(isset($data['templates_link']) && !empty($data['templates_link'])){
 				$template_templates = CTemplate::get(array('hostids' => $templateids));
 				$template_templateids = zbx_objectValues($template_templates, 'templateid');
 				$new_templateids = zbx_objectValues($data['templates_link'], 'templateid');
@@ -1354,7 +1355,7 @@ COpt::memoryPick();
 				}
 			}
 
-			if(isset($data['hosts']) && !is_null($data['hosts'])){
+			if(isset($data['hosts']) && !empty($data['hosts'])){
 
 				$hosts_to_add = array_diff($new_hostids, $template_hostids);
 				if(!empty($hosts_to_add)){
@@ -1379,7 +1380,7 @@ COpt::memoryPick();
 
 
 // UPDATE MACROS {{{
-			if(isset($data['macros']) && !is_null($data['macros'])){
+			if(isset($data['macros']) && !empty($data['macros'])){
 				$host_macros = CUserMacro::get(array(
 					'hostids' => $templateids,
 					'output' => API_OUTPUT_EXTEND,

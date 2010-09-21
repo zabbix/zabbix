@@ -572,7 +572,7 @@ COpt::memoryPick();
  * @param array $data['items']
  * @return boolean
  */
-	public static function addItems($data){
+	public static function massAdd($data){
 		if(empty($data['applications'])) return true;
 
 		$applications = zbx_toArray($data['applications']);

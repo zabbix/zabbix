@@ -90,7 +90,7 @@ class CAction extends CZBXAPI{
 			'output'				=> API_OUTPUT_REFER,
 			'select_conditions'		=> null,
 			'select_operations'		=> null,
-			'count'					=> null,
+			'countOutput'			=> null,
 			'preservekeys'			=> null,
 
 			'sortfield'				=> '',
@@ -352,8 +352,8 @@ class CAction extends CZBXAPI{
 			$sql_parts['select']['actions'] = 'a.*';
 		}
 
-// count
-		if(!is_null($options['count'])){
+// countOutput
+		if(!is_null($options['countOutput'])){
 			$options['sortfield'] = '';
 
 			$sql_parts['select'] = array('COUNT(DISTINCT a.actionid) as rowscount');
@@ -409,8 +409,8 @@ class CAction extends CZBXAPI{
 		$db_res = DBselect($sql, $sql_limit);
 		while($action = DBfetch($db_res)){
 
-			if($options['count']){
-				$result = $action;
+			if($options['countOutputcount']){
+				$result = $action['rowscount'];
 			}
 			else{
 				$actionids[$action['actionid']] = $action['actionid'];

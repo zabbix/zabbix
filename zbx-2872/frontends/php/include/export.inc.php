@@ -1171,7 +1171,7 @@ class zbxXML{
 								$current_item = CItem::get($options);
 							}
 
-							$r = CApplication::addItems(array(
+							$r = CApplication::massAdd(array(
 								'applications' => $item_applications,
 								'items' => $current_item
 							));

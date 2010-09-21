@@ -323,18 +323,19 @@ include_once('include/page_header.php');
 		$templates_clear = zbx_toObject($templates_clear, 'templateid');
 
 		$hosts = zbx_toObject($hosts, 'hostid');
+		$macros = array_filter(get_request('macros', array()), 'zbx_empty');
 
+		$template = array(
+			'host' => $template_name,
+			'groups' => $groups,
+			'templates' => $templates,
+			'hosts' => $hosts,
+			'macros' => $macros
+		);
 // CREATE/UPDATE TEMPLATE {{{
 		if($templateid){
-			$template = array(
-				'templateid' => $templateid,
-				'host' => $template_name,
-				'groups' => $groups,
-				'templates' => $templates,
-				'templates_clear' => $templates_clear,
-				'hosts' => $hosts,
-				'macros' => get_request('macros', array())
-			);
+			$template['templateid'] = $templateid;
+			$template['templates_clear'] = $templates_clear;
 
 			$result = CTemplate::update($template);
 			if(!$result){
@@ -346,13 +347,6 @@ include_once('include/page_header.php');
 			$msg_fail = S_CANNOT_UPDATE_TEMPLATE;
 		}
 		else{
-			$template = array(
-				'host' => $template_name,
-				'groups' => $groups,
-				'templates' => $templates,
-				'hosts' => $hosts,
-				'macros' => get_request('macros', array())
-			);
 			$result = CTemplate::create($template);
 
 			if($result){

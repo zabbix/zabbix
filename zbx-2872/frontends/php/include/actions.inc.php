@@ -902,11 +902,13 @@ function get_action_msgs_for_event($eventid){
 
 	$alerts = CAlert::get(array(
 		'eventids' => $eventid,
-		'alerttype' => ALERT_TYPE_MESSAGE,
-		'extendoutput' => 1,
+		'filter' => array(
+			'alerttype' => ALERT_TYPE_MESSAGE,
+		),
+		'output' => API_OUTPUT_EXTEND,
+		'select_mediatypes' => API_OUTPUT_EXTEND,
 		'sortfield' => 'clock',
-		'sortorder' => ZBX_SORT_DOWN,
-		'select_mediatypes' => 1
+		'sortorder' => ZBX_SORT_DOWN
 	));
 
 	foreach($alerts as $alertid => $row){
@@ -975,8 +977,10 @@ function get_action_cmds_for_event($eventid){
 
 	$alerts = CAlert::get(array(
 		'eventids' => $eventid,
-		'alerttype' => ALERT_TYPE_COMMAND,
-		'extendoutput' => 1,
+		'filter' => array(
+			'alerttype' => ALERT_TYPE_COMMAND
+		),
+		'output' => API_OUTPUT_EXTEND,
 		'sortfield' => 'clock',
 		'sortorder' => ZBX_SORT_DOWN
 	));
