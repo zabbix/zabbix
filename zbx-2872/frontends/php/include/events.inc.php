@@ -70,7 +70,7 @@
 		);
 		$event_count = CEvent::get($options);
 
-	return $event_count['rowscount'];
+	return $event_count;
 	}
 
 /* function:

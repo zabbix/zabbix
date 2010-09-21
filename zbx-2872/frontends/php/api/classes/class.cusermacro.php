@@ -94,9 +94,9 @@ class CUserMacro extends CZBXAPI{
 			'nopermissions'				=> null,
 // filter
 			'filter'					=> null,
-			'pattern'					=> '',
-			'startPattern'				=> null,
-			'excludePattern'			=> null,
+			'search'					=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
 // OutPut
 			'output'					=> API_OUTPUT_REFER,
 			'extendoutput'				=> null,
@@ -215,18 +215,11 @@ class CUserMacro extends CZBXAPI{
 			$sql_parts['where']['hht'] = 'hm.hostid=ht.macroid';
 		}
 
-// pattern
-		if(!zbx_empty($options['pattern'])){
-			$exclude = is_null($options['excludePattern'])?'':' NOT ';
 
-			if(!is_null($options['startPattern'])){
-				$sql_parts['where'][] = ' UPPER(hm.macro) '.$exclude.' LIKE '.zbx_dbstr(zbx_strtoupper($options['pattern']).'%');
-				$sql_parts_global['where'][] = ' UPPER(gm.macro) '.$exclude.' LIKE '.zbx_dbstr(zbx_strtoupper($options['pattern']).'%');
-			}
-			else{
-				$sql_parts['where'][] = ' UPPER(hm.macro) '.$exclude.' LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
-				$sql_parts_global['where'][] = ' UPPER(gm.macro) '.$exclude.' LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
-			}
+// search
+		if(!is_null($options['search'])){
+			zbx_db_search('hostmacro hm', $options, $sql_parts);
+			zbx_db_search('globalmacro gm', $options, $sql_parts_global);
 		}
 
 // filter

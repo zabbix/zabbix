@@ -72,10 +72,13 @@ class CMediatype extends CZBXAPI{
 			'mediatypeids'				=> null,
 			'mediaids'					=> null,
 			'userids'					=> null,
+
 // filter
 			'filter'					=> null,
-			'pattern'					=> null,
-			'startPattern'				=> null,
+			'search'					=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
+
 // OutPut
 			'extendoutput'				=> null,
 			'output'					=> API_OUTPUT_REFER,
@@ -167,16 +170,10 @@ class CMediatype extends CZBXAPI{
 			$sql_parts['where'][] = DBin_node('mt.mediatypeid', $nodeids);
 		}
 
-// pattern
-		if(!zbx_empty($options['pattern'])){
-			if($options['startPattern']){
-				$sql_parts['where']['description'] = ' UPPER(mt.description) LIKE '.zbx_dbstr(zbx_strtoupper($options['pattern']).'%');
-			}
-			else{
-				$sql_parts['where']['description'] = ' UPPER(mt.description) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
-			}
+// search
+		if(!is_null($options['search'])){
+			zbx_db_search('media_type mt', $options, $sql_parts);
 		}
-
 
 // filter
 		if(!is_null($options['filter'])){

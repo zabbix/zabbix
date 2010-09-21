@@ -818,6 +818,31 @@ else {
 		);
 	}
 
+	function zbx_db_search($table, &$options, &$sql_parts){
+		list($table, $tableShort) = explode(' ', $table);
+
+		$tableSchema = DB::getSchema($table);
+		if(!$tableSchema) info('Error in search request for table ['.$table.']');
+
+		zbx_value2array($options['search']);
+
+		$start = is_null($options['startSearch'])?'%':'';
+		$exclude = is_null($options['excludeSearch'])?'':' NOT ';
+
+		$search = array();
+		foreach($options['search'] as $field => $pattern){
+			if(!isset($tableSchema['fields'][$field]) || zbx_empty($pattern)) continue;
+			if($tableSchema['fields'][$field] != DB::FIELD_TYPE_STR) continue;
+
+			$search[$field] =
+				' UPPER('.$tableShort.'.'.$field.') '.
+				$exclude.' LIKE '.
+				zbx_dbstr($start.zbx_strtoupper($pattern).'%');
+		}
+
+		if(!empty($search)) $sql_parts['where']['search'] = '( '.implode(' OR ', $search).' )';
+	}
+
 	function remove_nodes_from_id($id){
 		return bcmod($id,'100000000000');
 	}
@@ -883,7 +908,7 @@ else {
 		const FIELD_TYPE_INT = 'int';
 		const FIELD_TYPE_STR = 'str';
 
-		static $schema = null;
+		private static $schema = null;
 
 		private static function exception($code, $errors=array()){
 			throw new APIException($code, $errors);
@@ -939,7 +964,7 @@ else {
 		}
 
 
-		protected static function getSchema($table=null){
+		public static function getSchema($table=null){
 			if(is_null(self::$schema)){
 				self::$schema = include(self::SCHEMA_FILE);
 			}

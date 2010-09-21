@@ -77,9 +77,9 @@ class CHostGroup extends CZBXAPI{
 
 // filter
 			'filter'					=> null,
-			'pattern'					=> '',
-			'startPattern'				=> null,
-			'excludePattern'			=> null,
+			'search'					=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
 
 // output
 			'output'					=> API_OUTPUT_REFER,
@@ -138,6 +138,19 @@ class CHostGroup extends CZBXAPI{
 		if(!is_null($options['groupids'])){
 			zbx_value2array($options['groupids']);
 			$sql_parts['where']['groupid'] = DBcondition('g.groupid', $options['groupids']);
+		}
+
+// templateids
+		if(!is_null($options['templateids'])){
+			zbx_value2array($options['templateids']);
+
+			if(!is_null($options['hostids'])){
+				zbx_value2array($options['hostids']);
+				$options['hostids'] = array_merge($options['hostids'], $options['templateids']);
+			}
+			else{
+				$options['hostids'] = $options['templateids'];
+			}
 		}
 
 // hostids
@@ -321,18 +334,6 @@ class CHostGroup extends CZBXAPI{
 			}
 		}
 
-// pattern
-		if(!zbx_empty($options['pattern'])){
-			$exclude = is_null($options['excludePattern'])?'':' NOT ';
-
-			if(!is_null($options['startPattern'])){
-				$sql_parts['where']['name'] = ' UPPER(g.name) '.$exclude.' LIKE '.zbx_dbstr(zbx_strtoupper($options['pattern']).'%');
-			}
-			else{
-				$sql_parts['where']['name'] = ' UPPER(g.name) '.$exclude.' LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
-			}
-		}
-
 // filter
 		if(!is_null($options['filter'])){
 			zbx_value2array($options['filter']);
@@ -347,6 +348,12 @@ class CHostGroup extends CZBXAPI{
 				$sql_parts['where']['name'] = DBcondition('g.name', $options['filter']['name'], false, true);
 			}
 		}
+
+// search
+		if(!is_null($options['search'])){
+			zbx_db_search('groups g', $options, $sql_parts);
+		}
+
 // order
 // restrict not allowed columns for sorting
 		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';

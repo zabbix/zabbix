@@ -74,12 +74,17 @@ class CAction extends CZBXAPI{
 			'userids'				=> null,
 			'nopermissions'			=> null,
 // filter
+			'filter'				=> null,
+			'search'				=> null,
+			'startSearch'			=> null,
+			'excludeSearch'			=> null,
+
 			'eventsource'			=> null,
 			'evaltype'				=> null,
 			'status'				=> null,
 			'esc_period'			=> null,
 			'recovery_msg'			=> null,
-			'pattern'				=> '',
+
 // OutPut
 			'extendoutput'			=> null,
 			'output'				=> API_OUTPUT_REFER,
@@ -354,9 +359,9 @@ class CAction extends CZBXAPI{
 			$sql_parts['select'] = array('COUNT(DISTINCT a.actionid) as rowscount');
 		}
 
-// pattern
-		if(!zbx_empty($options['pattern'])){
-			$sql_parts['where'][] = ' UPPER(a.name) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
+// search
+		if(!is_null($options['search'])){
+			zbx_db_search('actions a', $options, $sql_parts);
 		}
 
 // order

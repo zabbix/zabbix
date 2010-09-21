@@ -78,9 +78,9 @@ class CUser extends CZBXAPI{
 
 // filter
 			'filter'					=> null,
-			'pattern'					=> '',
-			'startPattern'				=> null,
-			'excludePattern'			=> null,
+			'search'					=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
 
 // OutPut
 			'extendoutput'				=> null,
@@ -181,16 +181,12 @@ class CUser extends CZBXAPI{
 			$sql_parts['select'] = array('count(u.userid) as rowscount');
 		}
 
-// pattern
-		if(!zbx_empty($options['pattern'])){
-			$exclude = is_null($options['excludePattern'])?'':' NOT ';
+// search
+		if(!is_null($options['search'])){
+			zbx_value2array($options['search']);
+			unset($options['search']['passwd']);
 
-			if(!is_null($options['startPattern'])){
-				$sql_parts['where']['alias'] = ' UPPER(u.alias) '.$exclude.' LIKE '.zbx_dbstr(zbx_strtoupper($options['pattern']).'%');
-			}
-			else{
-				$sql_parts['where']['alias'] = ' UPPER(u.alias) '.$exclude.' LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
-			}
+			zbx_db_search('users u', $options, $sql_parts);
 		}
 
 // filter

@@ -99,7 +99,9 @@ class CDHost extends CZBXAPI{
 			'nopermissions'				=> null,
 // filter
 			'filter'					=> null,
-			'pattern'					=> null,
+			'search'					=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
 
 // OutPut
 			'output'					=> API_OUTPUT_REFER,

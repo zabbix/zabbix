@@ -77,10 +77,10 @@ class CUserGroup extends CZBXAPI{
 			'with_gui_access'			=> null,
 			'with_api_access'			=> null,
 // filter
-			'filter'                    => null,
-			'pattern'					=> '',
-			'startPattern'				=> null,
-			'excludePattern'			=> null,
+			'filter'					=> null,
+			'search'					=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
 // OutPut
 			'extendoutput'				=> null,
 			'editable'					=> null,
@@ -169,21 +169,9 @@ class CUserGroup extends CZBXAPI{
 			$sql_parts['select'] = array('count(g.usrgrpid) as rowscount');
 		}
 
-// pattern
-		if(!zbx_empty($options['pattern'])){
-			$sql_parts['where']['name'] = ' UPPER(g.name) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
-		}
-
-// pattern
-		if(!zbx_empty($options['pattern'])){
-			$exclude = is_null($options['excludePattern'])?'':' NOT ';
-
-			if(!is_null($options['startPattern'])){
-				$sql_parts['where']['name'] = ' UPPER(g.name) '.$exclude.' LIKE '.zbx_dbstr(zbx_strtoupper($options['pattern']).'%');
-			}
-			else{
-				$sql_parts['where']['name'] = ' UPPER(g.name) '.$exclude.' LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
-			}
+// search
+		if(!is_null($options['search'])){
+			zbx_db_search('usrgrps g', $options, $sql_parts);
 		}
 
 // filter

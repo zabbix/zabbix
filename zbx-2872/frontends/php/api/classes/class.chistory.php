@@ -72,10 +72,11 @@ class CHistory extends CZBXAPI{
 			'nopermissions'			=> null,
 
 // filter
-			'filter'				=> null,
-			'pattern'				=> null,
-			'startPattern'			=> null,
-			'excludePattern'		=> null,
+			'filter'					=> null,
+			'search'					=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
+
 			'time_from'				=> null,
 			'time_till'				=> null,
 
@@ -179,16 +180,9 @@ class CHistory extends CZBXAPI{
 			$sql_parts['where']['clock_till'] = 'h.clock<='.$options['time_till'];
 		}
 
-// pattern
-		if(!zbx_empty($options['pattern'])){
-			$exclude = is_null($options['excludePattern'])?'':' NOT ';
-
-			if(!is_null($options['startPattern'])){
-				$sql_parts['where']['value'] = ' UPPER(h.value) '.$exclude.' LIKE '.zbx_dbstr(zbx_strtoupper($options['pattern']).'%');
-			}
-			else{
-				$sql_parts['where']['value'] = ' UPPER(h.value) '.$exclude.' LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
-			}
+// search
+		if(!is_null($options['search'])){
+			zbx_db_search($sql_parts['from']['history'], $options, $sql_parts);
 		}
 
 // output

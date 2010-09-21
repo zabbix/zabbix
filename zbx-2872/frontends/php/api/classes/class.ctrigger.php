@@ -95,15 +95,15 @@ class CTrigger extends CZBXAPI{
 			'lastChangeSince'		=> null,
 			'lastChangeTill'		=> null,
 // filter
-			'filter'				=> null,
 			'group'					=> null,
 			'host'					=> null,
 			'only_true'				=> null,
 			'min_severity'			=> null,
 
-			'pattern'					=> null,
-			'startPattern'				=> null,
-			'excludePattern'			=> null,
+			'filter'					=> null,
+			'search'					=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
 
 // OutPut
 			'expandData'			=> null,
@@ -432,16 +432,9 @@ class CTrigger extends CZBXAPI{
 			}
 		}
 
-// pattern
-		if(!zbx_empty($options['pattern'])){
-			$exclude = is_null($options['excludePattern'])?'':' NOT ';
-
-			if(!is_null($options['startPattern'])){
-				$sql_parts['where']['description'] = ' UPPER(t.description) '.$exclude.' LIKE '.zbx_dbstr(zbx_strtoupper($options['pattern']).'%');
-			}
-			else{
-				$sql_parts['where']['description'] = ' UPPER(t.description) '.$exclude.' LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
-			}
+// search
+		if(!is_null($options['search'])){
+			zbx_db_search('triggers t', $options, $sql_parts);
 		}
 
 // --- FILTER ---

@@ -67,8 +67,11 @@ class CDRule extends CZBXAPI{
 			'selectDChecks'			=> null,
 			
 // filter
-			'filter'				=> '',
-			'pattern'				=> '',
+			'filter'					=> null,
+			'search'					=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
+
 // output
 			'output'				=> API_OUTPUT_REFER,
 			'countOutput'			=> null,
@@ -176,9 +179,9 @@ class CDRule extends CZBXAPI{
 			}
 		}
 
-// pattern
-		if(!zbx_empty($options['pattern'])){
-			$sql_parts['where']['name'] = ' UPPER(dr.name) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
+// search
+		if(!is_null($options['search'])){
+			zbx_db_search('drules dr', $options, $sql_parts);
 		}
 
 // filter

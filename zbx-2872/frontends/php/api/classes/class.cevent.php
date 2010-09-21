@@ -351,8 +351,9 @@ class CEvent extends CZBXAPI{
 		$db_res = DBselect($sql, $sql_limit);
  //SDI($sql);
 		while($event = DBfetch($db_res)){
-			if($options['countOutput'])
-				$result = $event;
+			if($options['countOutput']){
+				$result = $event['rowscount'];
+			}
 			else{
 				$eventids[$event['eventid']] = $event['eventid'];
 

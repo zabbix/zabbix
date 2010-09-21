@@ -95,11 +95,11 @@ class CItem extends CZBXAPI{
 
 			'belongs'				=> null,
 			'with_triggers'			=> null,
-//
-			'pattern'					=> null,
-			'patternKey'				=> null,
-			'startPattern'				=> null,
-			'excludePattern'			=> null,
+// filter
+			'filter'					=> null,
+			'search'					=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
 
 // OutPut
 			'output'				=> API_OUTPUT_REFER,
@@ -313,28 +313,10 @@ class CItem extends CZBXAPI{
 			}
 		}
 
-// pattern
-		if(!zbx_empty($options['pattern'])){
-			$exclude = is_null($options['excludePattern'])?'':' NOT ';
 
-			if(!is_null($options['startPattern'])){
-				$sql_parts['where']['description'] = ' UPPER(i.description) '.$exclude.' LIKE '.zbx_dbstr(zbx_strtoupper($options['pattern']).'%');
-			}
-			else{
-				$sql_parts['where']['description'] = ' UPPER(i.description) '.$exclude.' LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
-			}
-		}
-
-// patternKey
-		if(!zbx_empty($options['patternKey'])){
-			$exclude = is_null($options['excludePattern'])?'':' NOT ';
-
-			if(!is_null($options['startPattern'])){
-				$sql_parts['where']['key_'] = ' UPPER(i.key_) '.$exclude.' LIKE '.zbx_dbstr(zbx_strtoupper($options['patternKey']).'%');
-			}
-			else{
-				$sql_parts['where']['key_'] = ' UPPER(i.key_) '.$exclude.' LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['patternKey']).'%');
-			}
+// search
+		if(!is_null($options['search'])){
+			zbx_db_search('items i', $options, $sql_parts);
 		}
 
 // --- FILTER ---

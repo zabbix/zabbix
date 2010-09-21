@@ -68,8 +68,12 @@ class CScript extends CZBXAPI{
 			'hostids'				=> null,
 			'scriptids'				=> null,
 			'editable'				=> null,
-// Filter
-			'pattern'				=> '',
+
+// filter
+			'filter'					=> null,
+			'search'					=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
 
 // OutPut
 			'extendoutput'			=> null,
@@ -168,9 +172,10 @@ class CScript extends CZBXAPI{
 			$sql_parts['select'] = array('count(s.scriptid) as rowscount');
 		}
 
-// pattern
-		if(!zbx_empty($options['pattern'])){
-			$sql_parts['where'][] = ' UPPER(s.name) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
+
+// search
+		if(!is_null($options['search'])){
+			zbx_db_search('scripts s', $options, $sql_parts);
 		}
 
 // order

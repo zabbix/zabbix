@@ -65,11 +65,12 @@ class CGraph extends CZBXAPI{
 			'inherited'				=> null,
 			'editable'				=> null,
 			'nopermissions'			=> null,
+
 // filter
-			'filter'				=> null,
-			'pattern'				=> null,
-			'startPattern'			=> null,
-			'excludePattern'		=> null,
+			'filter'					=> null,
+			'search'					=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
 
 // output
 			'output'				=> API_OUTPUT_REFER,
@@ -272,16 +273,9 @@ class CGraph extends CZBXAPI{
 			}
 		}
 
-// pattern
-		if(!zbx_empty($options['pattern'])){
-			$exclude = is_null($options['excludePattern'])?'':' NOT ';
-
-			if(!is_null($options['startPattern'])){
-				$sql_parts['where']['name'] = ' UPPER(g.name) '.$exclude.' LIKE '.zbx_dbstr(zbx_strtoupper($options['pattern']).'%');
-			}
-			else{
-				$sql_parts['where']['name'] = ' UPPER(g.name) '.$exclude.' LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
-			}
+// search
+		if(!is_null($options['search'])){
+			zbx_db_search('graphs g', $options, $sql_parts);
 		}
 
 // filter
