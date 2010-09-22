@@ -2291,7 +2291,11 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TRAPPER, 'row_trapper_hosts');
 
 
-		$frmItem->addRow(S_DESCRIPTION, new CTextArea('description_details', $description_details));
+		$description_ta = new CTextArea('description_details', $description_details);
+		if(isset($limited)){
+			$description_ta->setReadonly('yes');
+		}
+		$frmItem->addRow(S_DESCRIPTION, $description_ta);
 
 		$new_app = new CTextBox('new_application', $new_application, 40);
 		$frmItem->addRow(S_NEW_APPLICATION, $new_app, 'new');
