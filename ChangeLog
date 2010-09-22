@@ -10,7 +10,8 @@ Changes for 1.9
 
 Changes for 1.8.4rc1
 
- - [ZBX-3024] In trigger expression selection popup, expressions are now filtered, depending on item type (KB)
+ - [ZBX-2995] fixed crash in zbx_mem_realloc(), reduced memory usage and memory fragmentation in configuration cache (asaveljevs)
+ - [ZBX-3024] in trigger expression selection popup, expressions are now filtered, depending on item type (KB)
  - [ZBX-3023] fixed repeated notifications after maintenance period (Sasha)
  - [ZBX-3017] fixed error when try to add dependency to template trigger that is linked to a host (Vedmak)
  - [ZBX-3008] fixed server generating multiple unknown events for triggers with multiple items (asaveljevs)
@@ -2223,6 +2224,7 @@ Integrated from 1.1.x
  - fixed processing of item calculated as delta speed per second (Alexei)
 
 1.1.3
+
  - added Dutch translation (Alexei)
  - fixed processing of SNMP HEX and OCTET string values (Alexei)
  - fixed system.swap.in[] and system.swap.out[] under Linux 2.4 (Alexei)
@@ -3374,8 +3376,7 @@ Changes for 1.0beta8:
  - WIN32 agent. Listener thread now will not exit on any accept() error (Victor)
  - WIN32 agent. Added some parameters for agent statistics monitoring: number of accepted and rejected connections, processing errors, etc. (Victor)
  - WIN32 agent. Fixed bug in calculation of md5_hash[] and cksum[] parameters for zero-length files (Victor)
- - WIN32 agent. md5_hash[] and cksum[] now ruturns UNSUPPORTED for files larger than 64MB (due to high performance impact caused by checksum computing for large files). (Victor)
-
+ - WIN32 agent. md5_hash[] and cksum[] now returns UNSUPPORTED for files larger than 64MB (due to high performance impact caused by checksum computing for large files). (Victor)
 
 Changes for 1.0beta7:
 
