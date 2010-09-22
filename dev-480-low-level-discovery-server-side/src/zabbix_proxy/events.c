@@ -37,7 +37,7 @@
  * Comments: Cannot use action->userid as it may also be groupid              *
  *                                                                            *
  ******************************************************************************/
-int	process_event(DB_EVENT *event)
+int	process_event(DB_EVENT *event, int force_actions)
 {
 /*	zabbix_log(LOG_LEVEL_DEBUG,"In [proxy]process_event(eventid:" ZBX_FS_UI64 ",object:%d,objectid:" ZBX_FS_UI64 ")",
 			event->eventid,
