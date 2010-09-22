@@ -1363,10 +1363,8 @@ AC_OUTPUT([
 	src/libs/zbxconf/Makefile
 	src/libs/zbxdbcache/Makefile
 	src/libs/zbxdbhigh/Makefile
-	src/libs/zbxemail/Makefile
+	src/libs/zbxmedia/Makefile
 	src/libs/zbxsysinfo/Makefile
-	src/libs/zbxsms/Makefile
-	src/libs/zbxjabber/Makefile
 	src/libs/zbxcommon/Makefile
 	src/libs/zbxsysinfo/common/Makefile
 	src/libs/zbxsysinfo/simple/Makefile

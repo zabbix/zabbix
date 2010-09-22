@@ -387,6 +387,7 @@ include/zbxalgo.h -text
 include/zbxicmpping.h -text
 include/zbxjson.h -text
 include/zbxmacros.h -text
+include/zbxmedia.h -text
 include/zbxodbc.h -text
 m4/ax_lib_oracle_oci.m4 -text
 m4/iconv.m4 -text
@@ -428,6 +429,8 @@ src/libs/zbxicmpping/Makefile.am -text
 src/libs/zbxicmpping/icmpping.c -text
 src/libs/zbxjson/Makefile.am -text
 src/libs/zbxjson/json.c -text
+src/libs/zbxmedia/Makefile.am -text
+src/libs/zbxmedia/eztexting.c -text
 src/libs/zbxmemory/Makefile.am -text
 src/libs/zbxmemory/memalloc.c -text
 src/libs/zbxmemory/strpool.c -text

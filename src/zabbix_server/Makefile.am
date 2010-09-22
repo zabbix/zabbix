@@ -26,10 +26,6 @@ zabbix_server_SOURCES = \
 	zlog.c \
 	server.c
 
-if JABBER 
-JABBER_LDADD = $(top_srcdir)/src/libs/zbxjabber/libzbxjabber.a
-endif
-
 zabbix_server_LDADD = \
 	alerter/libzbxalerter.a \
 	dbsyncer/libzbxdbsyncer.a \
@@ -57,8 +53,7 @@ zabbix_server_LDADD = \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/src/libs/zbxsys/libzbxsys.a \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
-	$(top_srcdir)/src/libs/zbxemail/libzbxemail.a \
-	$(top_srcdir)/src/libs/zbxsms/libzbxsms.a \
+	$(top_srcdir)/src/libs/zbxmedia/libzbxmedia.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
@@ -68,7 +63,6 @@ zabbix_server_LDADD = \
 	$(top_srcdir)/src/libs/zbxicmpping/libzbxicmpping.a \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
 	$(top_srcdir)/src/libs/zbxdb/libzbxdb.a \
-	$(JABBER_LDADD) \
 	@SERVER_LIBS@
 
 zabbix_server_LDFLAGS = \

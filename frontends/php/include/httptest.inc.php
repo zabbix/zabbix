@@ -22,6 +22,20 @@
 require_once('include/defines.inc.php');
 require_once('include/items.inc.php');
 
+	function httptest_authentications($type=null){
+		$authentication_types = array(
+			HTTPTEST_AUTH_NONE => S_NONE,
+			HTTPTEST_AUTH_BASIC => S_BASIC_AUTHENTICATION,
+			HTTPTEST_AUTH_NTLM => S_NTLM_AUTHENTICATION,
+		);
+
+		if(is_null($type))
+			return $authentication_types;
+		else if(isset($authentication_types[$type]))
+			return $authentication_types[$type];
+		else
+			return S_UNKNOWN;
+	}
 
 	function httptest_status2str($status){
 		switch($status){

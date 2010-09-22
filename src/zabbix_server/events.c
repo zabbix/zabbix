@@ -319,7 +319,7 @@ static void	free_trigger_info(DB_EVENT *event)
  * Comments: Cannot use action->userid as it may also be groupid              *
  *                                                                            *
  ******************************************************************************/
-int	process_event(DB_EVENT *event)
+int	process_event(DB_EVENT *event, int force_actions)
 {
 	const char	*__function_name = "process_event";
 	int		ret = SUCCEED;
@@ -347,7 +347,7 @@ int	process_event(DB_EVENT *event)
 	if (0 != event->ack_eventid)
 		copy_acknowledges(event->ack_eventid, event->eventid);
 
-	if (0 == event->skip_actions)
+	if (0 == event->skip_actions || 1 == force_actions)
 		process_actions(event);
 
 	if (event->object == EVENT_OBJECT_TRIGGER)
