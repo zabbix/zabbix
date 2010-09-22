@@ -2292,9 +2292,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 
 		$description_ta = new CTextArea('description_details', $description_details);
-		if(isset($limited)){
-			$description_ta->setReadonly('yes');
-		}
+
 		$frmItem->addRow(S_DESCRIPTION, $description_ta);
 
 		$new_app = new CTextBox('new_application', $new_application, 40);

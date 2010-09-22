@@ -734,7 +734,7 @@
 					'params'		=> array('template' => 1),
 					'delay_flex'		=> array('template' => 1),
 					'ipmi_sensor'		=> array(),
-					'description_details'	=> array()
+					'description_details'	=> array('template' => 1)
 		);
 
 		foreach($restore_rules as $var_name => $info){
