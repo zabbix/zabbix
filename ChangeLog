@@ -36,7 +36,6 @@ Changes for 1.8.4rc1
  - [ZBX-2976] fixed server crash when processing zabbix[items_unsupported] under DebugLevel=4 (asaveljevs)
  - [ZBX-2950] added popup menus for map elements (Vedmak)
  - [ZBX-2967] added filter for hosts configuration screen (Vedmak)
- - [ZBX-2969] improved SQL statement for synchronizing of nodes; thanks to Łukasz Reszka (Sasha)
  - [ZBX-2962] fixed template macro update (Vedmak)
  - [ZBX-2572] added configuration define for zapcat compatibility mode (Vedmak)
  - [ZBX-2690] added validation for screens xml (Vedmak)
