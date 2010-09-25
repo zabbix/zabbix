@@ -221,7 +221,7 @@ char	*get_config_data(int nodeid, int dest_nodetype)
 		"from node_cksum curr, node_cksum prev "
 		"where curr.nodeid=%d and prev.nodeid=curr.nodeid and "
 		"curr.tablename=prev.tablename and curr.recordid=prev.recordid and "
-		"curr.cksumtype=%d and prev.cksumtype=%d and curr.cksum<>prev.cksum "
+		"curr.cksumtype=%d and prev.cksumtype=%d "
 		"union all "
 	/* Find new records */
 		"select curr.tablename,curr.recordid,prev.cksum,curr.cksum,curr.sync "
@@ -458,7 +458,7 @@ int update_checksums(int nodeid, int synked_nodetype, int synked, const char *ta
 		"from node_cksum curr, node_cksum prev "
 		"where curr.nodeid=%d and prev.nodeid=curr.nodeid and "
 		"curr.tablename=prev.tablename and curr.recordid=prev.recordid and "
-		"curr.cksumtype=%d and prev.cksumtype=%d and curr.cksum<>prev.cksum%s "
+		"curr.cksumtype=%d and prev.cksumtype=%d%s "
 		"union all "
 	/* Find new records */
 		"select curr.tablename,curr.recordid,prev.cksum,curr.cksum,NULL "
