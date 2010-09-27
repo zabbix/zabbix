@@ -10,6 +10,7 @@ Changes for 1.9
 
 Changes for 1.8.4rc1
 
+ - [ZBX-2507] minimal graph dimension size is set to 20 pixels (Vedmak)
  - [ZBX-2665] web scenario steps on graphs now are in correct order (Vedmak)
  - [ZBX-2995] fixed crash in zbx_mem_realloc(), reduced memory usage and memory fragmentation in configuration cache (asaveljevs)
  - [ZBX-3024] in trigger expression selection popup, expressions are now filtered, depending on item type (KB)
