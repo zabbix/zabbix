@@ -20,6 +20,11 @@
 #include "common.h"
 #include "log.h"
 
+#if defined(_WINDOWS)
+char	ZABBIX_SERVICE_NAME[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
+char	ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Function: get_program_name                                                 *
@@ -32,7 +37,7 @@
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- *  Comments:                                                                 *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 const char	*get_program_name(const char *path)
@@ -58,7 +63,7 @@ const char	*get_program_name(const char *path)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- *  Comments:                                                                 *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	get_nodeid_by_id(zbx_uint64_t id)
@@ -78,8 +83,8 @@ int	get_nodeid_by_id(zbx_uint64_t id)
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- *  Comments: Time in seconds since midnight (00:00:00),                      *
- *            January 1, 1970, coordinated universal time (UTC).              *
+ * Comments: Time in seconds since midnight (00:00:00),                       *
+ *           January 1, 1970, coordinated universal time (UTC).               *
  *                                                                            *
  ******************************************************************************/
 double	zbx_time()
