@@ -269,7 +269,7 @@ int	NET_IF_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
-	zbx_json_addarray(&j, "net.if.discovery");
+	zbx_json_addarray(&j, cmd);
 
 	/* Allocate memory for our pointers. */
 	dwSize = sizeof(MIB_IFTABLE);
@@ -299,7 +299,7 @@ int	NET_IF_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 		}
 
 		zbx_json_addobject(&j, NULL);
-		zbx_json_addstring(&j, "ifname", pIfRow.bDescr, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&j, "{#IFNAME}", pIfRow.bDescr, ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&j);
 	}
 

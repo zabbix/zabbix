@@ -73,7 +73,7 @@ int	VFS_FS_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
-	zbx_json_addarray(&j, "vfs.fs.discovery");
+	zbx_json_addarray(&j, cmd);
 
 	/* Make an initial call to GetLogicalDriveStrings to
 	   get the necessary size into the dwSize variable */
@@ -92,7 +92,7 @@ int	VFS_FS_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 		utf8 = zbx_unicode_to_utf8(p);
 
 		zbx_json_addobject(&j, NULL);
-		zbx_json_addstring(&j, "fsname", utf8, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&j, "{#FSNAME}", utf8, ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&j);
 
 		zbx_free(utf8);
