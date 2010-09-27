@@ -18,13 +18,7 @@
 **/
 
 #include "common.h"
-#include "log.h"
 #include "base64.h"
-
-#if defined (_WINDOWS)
-char ZABBIX_SERVICE_NAME[ZBX_SERVICE_NAME_LEN] = {APPLICATION_NAME};
-char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN] = {APPLICATION_NAME};
-#endif /* _WINDOWS */
 
 int	comms_parse_response(char *xml, char *host, int host_len, char *key, int key_len, char *data, int data_len,
 		char *lastlogsize, int lastlogsize_len, char *timestamp, int timestamp_len,

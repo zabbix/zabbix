@@ -28,6 +28,9 @@
 
 #define EVENTLOG_REG_PATH TEXT("SYSTEM\\CurrentControlSet\\Services\\EventLog\\")
 
+char	ZABBIX_SERVICE_NAME[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
+char	ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
+
 /*
  * Static data
  */
@@ -364,7 +367,6 @@ int ZabbixRemoveService(void)
 
 	return ret;
 }
-
 
 /*
  * Start service
