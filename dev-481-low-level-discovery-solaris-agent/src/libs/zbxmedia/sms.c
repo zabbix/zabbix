@@ -17,26 +17,15 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-
-#include <string.h>
-
-#include <errno.h>
-
-#include <termios.h>
-
 #include "common.h"
 #include "log.h"
 #include "zlog.h"
 
-#include "sms.h"
+#include "zbxmedia.h"
 
-static int write_gsm(int fd, char *str, char *error, int max_error_len)
+#include <termios.h>
+
+static int	write_gsm(int fd, const char *str, char *error, int max_error_len)
 {
 	int	i = 0,
 		wlen = 0,
@@ -185,12 +174,12 @@ out:
 }
 
 typedef struct {
-	char		*message;
+	const char	*message;
 	const char	*result;
 	int		timeout_sec;
 } zbx_sms_scenario;
 
-int	send_sms(char *device,char *number,char *message, char *error, int max_error_len)
+int	send_sms(const char *device, const char *number, const char *message, char *error, int max_error_len)
 {
 	const char	*__function_name = "send_sms";
 #define	ZBX_AT_ESC	"\x1B"

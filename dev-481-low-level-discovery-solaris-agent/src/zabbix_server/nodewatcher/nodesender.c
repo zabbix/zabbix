@@ -236,7 +236,6 @@ static void	DMcollect_table_data(int nodeid, int dest_nodetype, const ZBX_TABLE 
 				" and curr.tablename='%s'"
 				" and curr.cksumtype=%d"
 				" and prev.cksumtype=%d"
-				" and curr.cksum<>prev.cksum"
 			" union all "
 			/* Find deleted records */
 			"select prev.recordid,prev.cksum,curr.cksum,prev.sync"
@@ -613,8 +612,7 @@ int update_checksums(int nodeid, int synked_nodetype, int synked, const char *ta
 				" and curr.tablename=prev.tablename"
 				" and curr.recordid=prev.recordid"
 				" and curr.cksumtype=%d"
-				" and prev.cksumtype=%d"
-				" and curr.cksum<>prev.cksum%s"
+				" and prev.cksumtype=%d%s"
 			" union all "
 			/* Find deleted records */
 			"select prev.tablename,prev.recordid,prev.cksum,curr.cksum,prev.sync"

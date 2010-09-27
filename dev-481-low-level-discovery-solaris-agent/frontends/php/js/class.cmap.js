@@ -27,7 +27,7 @@ var ZBX_SYSMAPS = new Array();			// sysmaps obj reference
 // sysmapid ALWAYS must be a STRING (js doesn't support uint64) !!!!
 function create_map(container,sysmapid,id){
 	if(typeof(id) == 'undefined'){
-		var id = ZBX_SYSMAPS.length;
+		id = ZBX_SYSMAPS.length;
 	}
 
 	if(is_number(sysmapid) && (sysmapid > 100000000000000)){
@@ -133,7 +133,7 @@ initialize: function($super, container, sysmapid, id){
 			'gridautoalign': $('gridautoalign'),
 			'gridshow': $('gridshow'),
 			'gridalignall': $('gridalignall')
-		}
+		};
 
 		this.grid = new CGrid(this.id, gridCtrlElemetns);
 
@@ -155,7 +155,7 @@ initialize: function($super, container, sysmapid, id){
 
 
 // SYSMAP
-getSysmapBySysmapid: function(sysmapid){
+getSysmapBySysmapid: function(){
 	this.debug('getSysmapBySysmapid');
 
 	var url = new Curl(location.href);
@@ -164,21 +164,21 @@ getSysmapBySysmapid: function(sysmapid){
 		'favid':	this.id,
 		'sysmapid': this.sysmapid,
 		'action':	'get'
-	}
+	};
 
 	new Ajax.Request(url.getPath()+'?output=ajax'+'&sid='+url.getArgument('sid'),
 					{
 						'method': 'post',
 						'parameters':params,
 //						'onSuccess': function(resp){ SDI(resp.responseText); },
-						'onSuccess': function(resp){ },
+						'onSuccess': function(){ },
 						'onFailure': function(){ throw('Get selements FAILED.'); }
 					}
 	);
 },
 
-sysmapUpdate: function(dragable,e){
-	this.debug('sysmapUpdate');
+selementDragEnd: function(dragable) {
+	this.debug('selementDragEnd');
 
 	this.deactivate_menu();
 
@@ -193,8 +193,20 @@ sysmapUpdate: function(dragable,e){
 	this.selements[selementid].y = pos.y;
 	this.selements[selementid].x = pos.x;
 
-
 	this.alignSelement(selementid);
+
+	if(isset('selementid', this.selementForm) && isset('x', this.selementForm) && isset('y', this.selementForm)){
+		if(this.selementForm.selementid.value == selementid){
+			this.selementForm.x.value = this.selements[selementid].x;
+			this.selementForm.y.value = this.selements[selementid].y;
+		}
+	}
+
+	this.sysmapUpdate();
+},
+
+sysmapUpdate: function(){
+	this.debug('sysmapUpdate');
 	this.updateMapImage();
 //	alert(id+' : '+this.selementids[id]);
 },
@@ -220,7 +232,7 @@ addNewElement: function(){
 		'favid':	this.id,
 		'sysmapid':	this.sysmapid,
 		'action':	'new_selement'
-	}
+	};
 
 	params['selements'] = Object.toJSON({'0': selement});
 
@@ -228,7 +240,7 @@ addNewElement: function(){
 					{
 						'method': 'post',
 						'parameters':params,
-						'onSuccess': function(resp){ },
+						'onSuccess': function(){ },
 //						'onSuccess': function(resp){ SDI(resp.responseText); },
 						'onFailure': function(){ document.location = url.getPath()+'?'+Object.toQueryString(params); }
 					}
@@ -275,21 +287,6 @@ add_empty_link: function(e){
 	this.update_linkContainer(e);
 },
 
-
-add_empty_linktrigger: function(linkid){
-	this.debug('add_empty_link');
-
-	var id = this.linkids[linkid];
-
-	var mlinktrigger = {};
-	for(var key in this.mlinktrigger){
-		mlinktrigger[key] = this.mlinktrigger[key];
-	}
-
-
-	this.add_linktrigger(id, mlinktrigger, 1);
-},
-
 // SYSMAP FORM
 saveSysmap: function(){
 	this.debug('saveSysmap');
@@ -300,7 +297,7 @@ saveSysmap: function(){
 		'favid':	this.id,
 		'sysmapid':	this.sysmapid,
 		'action':	'save'
-	}
+	};
 
 	params = this.get_update_params(params);
 //SDJ(params);
@@ -308,7 +305,7 @@ saveSysmap: function(){
 					{
 						'method': 'post',
 						'parameters':params,
-						'onSuccess': function(resp){ },
+						'onSuccess': function(){ },
 //						'onSuccess': function(resp){ SDI(resp.responseText); },
 						'onFailure': function(){ document.location = url.getPath()+'?'+Object.toQueryString(params); }
 					}
@@ -362,11 +359,9 @@ select_selement: function(selementid, multi){
 
 		if(!multi && (this.selection.count > 1)){
 			for(var i=0; i<this.selection.position; i++){
-				if(!isset(i,this.selection.selements) || (this.selection.selements[i] == selementid)) continue;;
+				if(!isset(i,this.selection.selements) || (this.selection.selements[i] == selementid)) continue;
 
 				this.selection.count--;
-
-				var tmp_selementid = this.selection.selements[i];
 
 				this.selements[this.selection.selements[i]].selected = null;
 				this.selements[this.selection.selements[i]].html_obj.style.border = '0px';
@@ -489,7 +484,7 @@ updateSelement: function(selement){
 					{
 						'method': 'post',
 						'parameters':params,
-						'onSuccess': function(resp){ },
+						'onSuccess': function(){ },
 //						'onSuccess': function(resp){ SDI(resp.responseText); },
 						'onFailure': function(){ document.location = url.getPath()+'?'+Object.toQueryString(params); }
 					}
@@ -546,7 +541,7 @@ get_linkid_by_selementids: function(selementid1,selementid2){
 	this.debug('get_linkid_by_selementids');
 //--
 
-	if(typeof(selementid2) == 'undefined') var selementid2 = null;
+	if(typeof(selementid2) == 'undefined') selementid2 = null;
 
 	var links = {};
 	for(var linkid in this.links){
@@ -858,7 +853,7 @@ makeSelementDragable: function(selement){
 	new Draggable(selement,{
 				ghosting: true,
 				snap: this.get_dragable_dimensions.bind(this),
-				onEnd: this.sysmapUpdate.bind(this)
+				onEnd: this.selementDragEnd.bind(this)
 				});
 
 },
@@ -881,7 +876,7 @@ updateMapImage: function(){
 		'sysmapid': this.sysmapid,
 		'noselements':	1,
 		'nolinks':	1
-	}
+	};
 
 	params = this.get_update_params(params);
 //SDJ(params);
@@ -893,7 +888,7 @@ updateMapImage: function(){
 						'parameters':params,
 //						'onSuccess': function(resp){SDI(resp.responseText);},
 						'onSuccess': this.set_mapimg.bind(this),
-						'onFailure': function(resp){ alert('failed'); }
+						'onFailure': function(){ alert('failed'); }
 					}
 	);
 },
@@ -987,7 +982,7 @@ get_update_params: function(params){
 	this.debug('get_update_params');
 
 	if(typeof(params) == 'undefined'){
-		var params = {};
+		params = {};
 	}
 
 	params = this.get_selements_params(params);
@@ -1000,7 +995,7 @@ get_selements_params: function(params, selementid){
 	this.debug('get_selements_params');
 
 	if(typeof(params) == 'undefined'){
-		var params = {};
+		params = {};
 	}
 
 	if(typeof(selementid) != 'undefined'){
@@ -1019,7 +1014,7 @@ get_links_params: function(params, linkid){
 	this.debug('get_links_params');
 
 	if(typeof(params) == 'undefined'){
-		var params = {};
+		params = {};
 	}
 
 	if(typeof(linkid) != 'undefined'){
@@ -1119,13 +1114,12 @@ showForm: function(e, selementid){
 
 hideForm: function(e){
 	this.debug('hideForm');
-//--
 
 	var divForm = $('divSelementForm');
 	if(!is_null(divForm)) divForm.hide();
 
 	for(var i=0; i<this.selection.position; i++){
-		if(!isset(i,this.selection.selements)) continue;;
+		if(!isset(i,this.selection.selements)) continue;
 
 		this.select_selement(this.selection.selements[i], true);
 	}
@@ -1830,7 +1824,7 @@ this.selementForm.typeDOM.iconid_on = e_tr_4;
 	e_td_5.className = "form_row_l";
 
 	var e_input_6 = document.createElement('input');
-this.selementForm.massEdit.chkboxIconid_on = e_input_6
+this.selementForm.massEdit.chkboxIconid_on = e_input_6;
 	e_input_6.setAttribute('type', 'checkbox');
 	e_input_6.setAttribute('name', "chkboxIconid_on");
 	e_input_6.setAttribute('id', "chkboxIconid_on");
@@ -1885,7 +1879,7 @@ this.selementForm.typeDOM.iconid_unknown = e_tr_4;
 	e_td_5.className = "form_row_l";
 
 	var e_input_6 = document.createElement('input');
-this.selementForm.massEdit.chkboxIconid_unknown = e_input_6
+this.selementForm.massEdit.chkboxIconid_unknown = e_input_6;
 	e_input_6.setAttribute('type', 'checkbox');
 	e_input_6.setAttribute('name', "chkboxIconid_unknown");
 	e_input_6.setAttribute('id', "chkboxIconid_unknown");
@@ -1940,7 +1934,7 @@ this.selementForm.typeDOM.iconid_maintenance = e_tr_4;
 	e_td_5.className = "form_row_l";
 
 	var e_input_6 = document.createElement('input');
-this.selementForm.massEdit.chkboxIconid_maintenance = e_input_6
+this.selementForm.massEdit.chkboxIconid_maintenance = e_input_6;
 	e_input_6.setAttribute('type', 'checkbox');
 	e_input_6.setAttribute('name', "chkboxIconid_maintenance");
 	e_input_6.setAttribute('id', "chkboxIconid_maintenance");
@@ -1995,7 +1989,7 @@ this.selementForm.typeDOM.iconid_disabled = e_tr_4;
 	e_td_5.className = "form_row_l";
 
 	var e_input_6 = document.createElement('input');
-this.selementForm.massEdit.chkboxIconid_disabled = e_input_6
+this.selementForm.massEdit.chkboxIconid_disabled = e_input_6;
 	e_input_6.setAttribute('type', 'checkbox');
 	e_input_6.setAttribute('name', "chkboxIconid_disabled");
 	e_input_6.setAttribute('id', "chkboxIconid_disabled");
@@ -2110,7 +2104,7 @@ this.selementForm.y = e_input_6;
 	e_td_5.className = "form_row_l";
 
 	var e_input_6 = document.createElement('input');
-this.selementForm.massEdit.chkboxURL = e_input_6
+this.selementForm.massEdit.chkboxURL = e_input_6;
 	e_input_6.setAttribute('type', 'checkbox');
 	e_input_6.setAttribute('name', "chkboxURL");
 	e_input_6.setAttribute('id', "chkboxURL");
@@ -2155,6 +2149,7 @@ this.selementForm.url = e_input_6;
 	e_input_6.setAttribute('name',"apply");
 	e_input_6.className = "button";
 	e_input_6.setAttribute('value',locale['S_APPLY']);
+
 
 	addListener(e_input_6, 'click', this.saveForm_selement.bindAsEventListener(this));
 
@@ -2228,7 +2223,7 @@ updateForm_selement: function(e, selementid){
 		var advanced_icons = false;
 
 // Icon PROBLEM
-		advanced_icons = (advanced_icons || (selement.iconid_on != 0))?true:false;
+		advanced_icons = advanced_icons || (selement.iconid_on != 0);
 		for(var i=0; i<this.selementForm.iconid_on.options.length; i++){
 			if(!isset(i, this.selementForm.iconid_on.options)) continue;
 
@@ -2238,7 +2233,7 @@ updateForm_selement: function(e, selementid){
 		}
 
 // Icon UNKNOWN
-		advanced_icons = (advanced_icons || (selement.iconid_unknown != 0))?true:false;
+		advanced_icons = advanced_icons || (selement.iconid_unknown != 0);
 		for(var i=0; i<this.selementForm.iconid_unknown.options.length; i++){
 			if(!isset(i, this.selementForm.iconid_unknown.options)) continue;
 
@@ -2248,7 +2243,7 @@ updateForm_selement: function(e, selementid){
 		}
 
 // Icon MAINTENANCE
-		advanced_icons =(advanced_icons || (selement.iconid_maintenance != 0))?true:false;
+		advanced_icons = advanced_icons || (selement.iconid_maintenance != 0);
 		for(var i=0; i<this.selementForm.iconid_maintenance.options.length; i++){
 			if(!isset(i, this.selementForm.iconid_maintenance.options)) continue;
 
@@ -2259,7 +2254,7 @@ updateForm_selement: function(e, selementid){
 
 // Icon DISABLED
 
-		advanced_icons = (advanced_icons || (selement.iconid_disabled != 0))?true:false;
+		advanced_icons = advanced_icons || (selement.iconid_disabled != 0);
 		for(var i=0; i<this.selementForm.iconid_disabled.options.length; i++){
 			if(!isset(i, this.selementForm.iconid_disabled.options)) continue;
 
@@ -2340,7 +2335,7 @@ updateForm_selementByIcons: function(e){
 updateForm_selementByType: function(e, multi){
 	this.debug('updateForm_selementByType');
 //--
-	if(typeof(multi) == 'undefined') var multi = false;
+	if(typeof(multi) == 'undefined') multi = false;
 	var display_style = IE?'block':'table-row';
 
 	if(multi){
@@ -2509,8 +2504,6 @@ saveForm_selement: function(e){
 
 	if(this.selection.count == 1){
 		var selementid = this.selementForm.selementid.value;
-		var selement = this.selements[selementid];
-
 		var params = {};
 
 // Element Type
@@ -2640,25 +2633,9 @@ saveForm_selement: function(e){
 deleteForm_selement: function(e){
 	this.debug('deleteForm_selement');
 //--
+	//removing all selected elements
+	this.remove_selements();
 
-	var selementid = this.selementForm.selementid.value;
-	var selement = this.selements[selementid];
-
-	var typeName;
-	switch(selement.elementtype-0){
-		case 0: typeName = locale['S_HOST']; break;
-		case 1: typeName = locale['S_MAP']; break;
-		case 2: typeName = locale['S_TRIGGER']; break;
-		case 3: typeName = locale['S_HOST_GROUP']; break;
-		case 4: typeName = locale['S_IMAGE']; break;
-	}
-
-	if(Confirm(locale['S_REMOVE']+' '+typeName+'?')){
-		this.remove_selement(selementid, true);
-		this.hideForm(e);
-	}
-	else
-		return false;
 },
 
 //**************************************************************************************************************************************************
@@ -3388,7 +3365,14 @@ saveForm_link: function(e){
 //SDJ(this.links[linkid]);
 
 	this.update_linkContainer(e);
-	this.hideForm_link(e);
+
+	/**
+	 * Commented out, because form does not need to be hidden when "apply" is pressed
+	 * @see ZBX-1442
+	 * @author Konstantin Buravcov
+	 * @since 08.09.2010
+	 */
+	//this.hideForm_link(e);
 
 	this.updateMapImage();
 },
@@ -3551,7 +3535,7 @@ initialize: function($super, sysmap, params){
 			'favid':	this.id,
 			'sysmapid':	this.sysmapid,
 			'action':	'new_selement'
-		}
+		};
 
 		params['selements'] = Object.toJSON({'0': selement});
 
