@@ -595,16 +595,7 @@ COpt::memoryPick();
 				}
 
 // check ymin, ymax items
-				$axis_items = array();
-				if(isset($graph['ymin_type']) && ($graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE)){
-					$axis_items[] = $graph['ymin_itemid'];
-				}
-				if(isset($graph['ymax_type']) && ($graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE)){
-					$axis_items[] = $graph['ymax_itemid'];
-				}
-				if(!empty($axis_items))
-				self::checkAxisItems($axis_items, $templated_graph);
-
+				self::checkAxisItems($graph, $templated_graph);
 
 				$graphid = self::createReal($graph);
 
@@ -699,16 +690,7 @@ COpt::memoryPick();
 // }}} EXCEPTION: MESS TEMPLATED ITEMS
 
 // check ymin, ymax items
-				$axis_items = array();
-				if(isset($graph['ymin_type']) && ($graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE)){
-					$axis_items[] = $graph['ymin_itemid'];
-				}
-				if(isset($graph['ymax_type']) && $graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE){
-					$axis_items[] = $graph['ymax_itemid'];
-				}
-				if(!empty($axis_items))
-					self::checkAxisItems($axis_items, $templated_graph);
-
+				self::checkAxisItems($graph, $templated_graph);
 
 				self::updateReal($graph);
 
@@ -1040,7 +1022,7 @@ COpt::memoryPick();
 				foreach($graph['gitems'] as $gitem){
 					if($gitem['type'] == GRAPH_ITEM_SUM) $sum_items++;
 				}
-				if($sum_items > 1) self::exception(ZBX_API_ERROR_PARAMETERS, S_ANOTHER_ITEM_SUM);
+				if($sum_items > 1) self::exception(ZBX_API_ERROR_PARAMETERS, S_ANOTHER_ITEM_SUM.' [ '.$graph['name'].' ]');
 			}
 // }}} EXCEPTION
 
@@ -1082,26 +1064,36 @@ COpt::memoryPick();
 		return true;
 	}
 
-	protected static function checkAxisItems($items, $tpl=false){
+	protected static function checkAxisItems($graph, $tpl=false){
 
-		$items = array_unique($items);
-		$cnt = count($items);
+		$axis_items = array();
+		if(isset($graph['ymin_type']) && ($graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE)){
+			$axis_items[$graph['ymin_itemid']] = $graph['ymin_itemid'];
+		}
+		if(isset($graph['ymax_type']) && $graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE){
+			$axis_items[$graph['ymax_itemid']] = $graph['ymax_itemid'];
+		}
+		
+		if(!empty($axis_items)){
+			$cnt = count($axis_items);
 
-		$options = array(
-			'itemids' => $items,
-			'output' => API_OUTPUT_SHORTEN,
-			'templated_hosts' => 1,
-			'countOutput' => 1
-		);
-		if($tpl)
-			$options['hostids'] = $tpl;
-		else
-			$options['monitored_hosts'] = 1;
+			$options = array(
+				'itemids' => $axis_items,
+				'output' => API_OUTPUT_SHORTEN,
+				'countOutput' => 1,
+			);
+			if($tpl)
+				$options['hostids'] = $tpl;
+			else
+				$options['templated'] = false;
 
-		$cnt_exist = CHost::get($options);
+			$cnt_exist = CItem::get($options);
 
-		if($cnt != $cnt_exist) self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect item for axis value item');
-		else return true;
+			if($cnt != $cnt_exist) 
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect item for axis value item');
+		}
+		
+		return true;
 	}
 
 }
