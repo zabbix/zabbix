@@ -61,7 +61,7 @@ class CDRule extends CZBXAPI{
 			'dhostids'				=> null,
 			'dserviceids'			=> null,
 			'dcheckids'				=> null,
-			'editable'					=> null,
+			'editable'				=> null,
 			'selectDHosts'			=> null,
 			'selectDServices'		=> null,
 			'selectDChecks'			=> null,
@@ -417,31 +417,6 @@ COpt::memoryPick();
 	return $result;
 	}
 
-
-/**
- * Get druleid by drule name
- *
- * params: hostids, name
- *
- * @static
- * @param array $druleData
- * @return string|boolean
- */
-	public static function getObjects($druleData){
-		$options = array(
-			'filter' => $druleData,
-			'output'=>API_OUTPUT_EXTEND
-		);
-
-		if(isset($druleData['node']))
-			$options['nodeids'] = getNodeIdByNodeName($druleData['node']);
-		else if(isset($druleData['nodeids']))
-			$options['nodeids'] = $druleData['nodeids'];
-
-		$result = self::get($options);
-
-	return $result;
-	}
 
 	public static function exists($object){
 		$options = array(

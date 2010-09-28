@@ -295,7 +295,7 @@ closeAllMessages: function(e){
 
 	new RPC.Call(rpcRequest);
 
-	Effect.SlideUp(this.dom.container, {duration: (this.effectTimeout / 1000)});
+	Effect.BlindUp(this.dom.container, {duration: (this.effectTimeout / 1000)});
 
 	for(var messageid in this.messageList){
 		if(empty(this.messageList[messageid])) continue;

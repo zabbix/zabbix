@@ -288,11 +288,10 @@ class CHistory extends CZBXAPI{
 					}
 
 // itemids
-					if(isset($data['itemid']) && !is_null($options['itemids'])){
-						if(!isset($result[$count]['items'])) $result[$count]['items'] = array();
-
-						$result[$count]['items'][] = array('itemid' => $data['itemid']);
-					}
+//					if(isset($data['itemid']) && !is_null($options['itemids'])){
+//						if(!isset($result[$count]['items'])) $result[$count]['items'] = array();
+//						$result[$count]['items'][] = array('itemid' => $data['itemid']);
+//					}
 
 					$result[$count] += $data;
 

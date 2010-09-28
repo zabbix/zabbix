@@ -23,7 +23,7 @@
 class CZBXAPI{
 public static $error = array();
 private static $transaction = array('counter' => 0);
-
+	
 // TRANSACTION METHODS{
 	protected static function BeginTransaction($caller = 'CZBXAPI'){
 		global $DB;
@@ -149,9 +149,11 @@ private static $transaction = array('counter' => 0);
 
 	return $errors;
 	}
+
 // ERROR METHODS}
 
 	protected static function exception($code=ZBX_API_ERROR_INTERNAL, $errors=array()){
 		throw new APIException($code, $errors);	
 	}
+
 }

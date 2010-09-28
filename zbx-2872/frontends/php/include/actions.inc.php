@@ -17,9 +17,6 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-
-include_once 'include/discovery.inc.php';
-
 ?>
 <?php
 function check_permission_for_action_conditions($conditions){
