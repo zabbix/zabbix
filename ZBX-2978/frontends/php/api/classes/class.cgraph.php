@@ -1068,7 +1068,7 @@ COpt::memoryPick();
 				foreach($graph['gitems'] as $gitem){
 					if($gitem['type'] == GRAPH_ITEM_SUM) $sum_items++;
 				}
-				if($sum_items > 1) self::exception(ZBX_API_ERROR_PARAMETERS, S_ANOTHER_ITEM_SUM);
+				if($sum_items > 1) self::exception(ZBX_API_ERROR_PARAMETERS, S_ANOTHER_ITEM_SUM.' ['.$graph['name'].' ]');
 			}
 // }}} EXCEPTION
 
