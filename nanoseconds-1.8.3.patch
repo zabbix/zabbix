@@ -10373,6 +10373,18 @@ Index: create/schema/schema.sql
  UNIQUE		|1		|hostid,key_
  INDEX		|3		|status
  INDEX		|4		|templateid
+Index: frontends/php/api/classes/class.citem.php
+===================================================================
+--- frontends/php/api/classes/class.citem.php	(revision 14482)
++++ frontends/php/api/classes/class.citem.php	(working copy)
+@@ -786,6 +786,7 @@
+ 				unset($item_db_fields['prevvalue']);
+ 				unset($item_db_fields['lastclock']);
+ 				unset($item_db_fields['prevorgvalue']);
++				unset($item_db_fields['lastns']);
+ 				if(!check_db_fields($item_db_fields, $item)){
+ 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect parameters used for Item');
+ 				}
 Index: frontends/php/events.php
 ===================================================================
 --- frontends/php/events.php	(revision 14482)
