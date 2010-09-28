@@ -1500,11 +1500,13 @@ class zbxXML{
 // GRAPHS
 			if(isset($data['graphs'])){
 				$graphs_node = $host_node->appendChild(new DOMElement(XML_TAG_GRAPHS));
-						$itemminmaxids = array();
+				$itemminmaxids = array();
 
 				foreach($data['graphs'] as $num => $graph){
-					$itemminmaxids[$graph['ymin_itemid']] = $graph['ymin_itemid'];
-					$itemminmaxids[$graph['ymax_itemid']] = $graph['ymax_itemid'];
+					if($graph['ymin_itemid'])
+						$itemminmaxids[$graph['ymin_itemid']] = $graph['ymin_itemid'];
+					if($graph['ymax_itemid'])
+						$itemminmaxids[$graph['ymax_itemid']] = $graph['ymax_itemid'];
 				}
 
 				$options = array(
