@@ -768,7 +768,7 @@ function make_hoststat_summary($filter){
 
 // Author: Aly
 function make_status_of_zbx(){
-	global $USER_DETAILS;
+	global $USER_DETAILS, $ZBX_SERVER, $ZBX_SERVER_PORT;
 
 	$table = new CTableInfo();
 	$table->setHeader(array(
@@ -778,11 +778,13 @@ function make_status_of_zbx(){
 	));
 
 	show_messages(); //because in function get_status(); function clear_messages() is called when fsockopen() fails.
-	$status=get_status();
+	$status = get_status();
 
-	$table->addRow(array(S_ZABBIX_SERVER_IS_RUNNING,
-	new CSpan($status['zabbix_server'], ($status['zabbix_server'] == S_YES ? 'off' : 'on')),' - '));
-	//	$table->addRow(array(S_VALUES_STORED,$status['history_count']));$table->addRow(array(S_TRENDS_STORED,$status['trends_count']));
+	$table->addRow(array(
+		S_ZABBIX_SERVER_IS_RUNNING,
+		new CSpan($status['zabbix_server'], ($status['zabbix_server'] == S_YES ? 'off' : 'on')),
+		isset($ZBX_SERVER, $ZBX_SERVER_PORT) ? $ZBX_SERVER.':'.$ZBX_SERVER_PORT : S_ZABBIX_SERVER_IP_OR_PORT_IS_NOT_SET
+	));
 	$title = new CSpan(S_NUMBER_OF_HOSTS);
 	$title->setAttribute('title', 'asdad');
 	$table->addRow(array(S_NUMBER_OF_HOSTS ,$status['hosts_count'],
@@ -1015,7 +1017,7 @@ function make_latest_issues($filter = array()){
 
 			$description = new CCol($description,get_severity_style($trigger['priority']));
 			$description->setHint(make_popup_eventlist($row_event['eventid'], $trigger['type'], $trigger['triggerid']), '', '', false);
-
+		
 			$table->addRow(array(
 				get_node_name_by_elid($trigger['triggerid']),
 				$host,
@@ -1397,7 +1399,7 @@ function make_screen_submenu(){
 		if('slideshowid' == $source){
 			if(!slideshow_accessible($sourceid, PERM_READ_ONLY)) continue;
 			if(!$slide = get_slideshow_by_slideshowid($sourceid)) continue;
-			
+
 			$slide_added = true;
 
 			$favScreens[] = array(

@@ -555,7 +555,7 @@ int	DBupdate_trigger_value(zbx_uint64_t triggerid, int trigger_type, int trigger
 			event.value = new_value;
 
 			/* Processing event */
-			if (FAIL == (ret = process_event(&event)))
+			if (FAIL == (ret = process_event(&event, 0)))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "Event not added for triggerid [" ZBX_FS_UI64 "]",
 						triggerid);
@@ -633,7 +633,7 @@ void	DBdelete_trigger(zbx_uint64_t triggerid)
 
 void	DBupdate_triggers_status_after_restart(void)
 {
-	const char	*__function_name = "DBupdate_triggers_after_restart";
+	const char	*__function_name = "DBupdate_triggers_status_after_restart";
 	DB_RESULT	result;
 	DB_RESULT	result2;
 	DB_ROW		row;
@@ -659,12 +659,14 @@ void	DBupdate_triggers_status_after_restart(void)
 				" and i.status in (%d)"
 				" and i.type not in (%d)"
 				" and i.key_ not in ('%s','%s')"
-				" and t.status in (%d)",
+				" and t.status in (%d)"
+				DB_NODE,
 			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE,
 			ITEM_TYPE_TRAPPER,
 			SERVER_STATUS_KEY, SERVER_ZABBIXLOG_KEY,
-			TRIGGER_STATUS_ENABLED);
+			TRIGGER_STATUS_ENABLED,
+			DBnode_local("t.triggerid"));
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -2009,7 +2011,7 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, int now)
 	event.value	= TRIGGER_VALUE_TRUE;
 
 	/* Processing event */
-	process_event(&event);
+	process_event(&event, 0);
 }
 
 /******************************************************************************

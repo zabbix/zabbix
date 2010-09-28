@@ -282,9 +282,12 @@ static void	*__mem_malloc(zbx_mem_info_t *info, uint32_t size)
 			chunk = mem_get_next_chunk(chunk);
 		}
 
-		if (counter >= 100)
-			zabbix_log(LOG_LEVEL_DEBUG, "__mem_malloc: chunk #%d size %u asked %u skip_min %u skip_max %u",
-					counter, CHUNK_SIZE(chunk), size, skip_min, skip_max);
+		if (NULL == chunk)
+			zabbix_log(LOG_LEVEL_CRIT, "__mem_malloc: skipped %d asked %u skip_min %u skip_max %u",
+					counter, size, skip_min, skip_max);
+		else if (counter >= 100)
+			zabbix_log(LOG_LEVEL_DEBUG, "__mem_malloc: skipped %d asked %u skip_min %u skip_max %u size %u",
+					counter, size, skip_min, skip_max, CHUNK_SIZE(chunk));
 	}
 
 	if (NULL == chunk)

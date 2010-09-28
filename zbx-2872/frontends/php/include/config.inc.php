@@ -590,7 +590,7 @@ function __autoload($class_name){
 			clear_messages();
 			$status['zabbix_server'] = S_NO;
 		}
-		else {
+		else{
 			$status['zabbix_server'] = S_YES;
 		}
 // triggers
