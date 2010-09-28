@@ -1503,9 +1503,9 @@ class zbxXML{
 				$itemminmaxids = array();
 
 				foreach($data['graphs'] as $num => $graph){
-					if($graph['ymin_itemid'])
+					if($graph['ymin_itemid'] && ($graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE))
 						$itemminmaxids[$graph['ymin_itemid']] = $graph['ymin_itemid'];
-					if($graph['ymax_itemid'])
+					if($graph['ymax_itemid'] && ($graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE))
 						$itemminmaxids[$graph['ymax_itemid']] = $graph['ymax_itemid'];
 				}
 
@@ -1518,24 +1518,30 @@ class zbxXML{
 				$itemminmaxs = CItem::get($options);
 				$itemminmaxs = zbx_toHash($itemminmaxs, 'itemid');
 
+
 				$hostminmaxs = CHost::get($options);
 				$hostminmaxs = zbx_toHash($hostminmaxs, 'hostid');
 
+				
 				foreach($data['graphs'] as $num => $graph){
 					$graph['hosts'] = zbx_toHash($graph['hosts'], 'hostid');
+					
 					if(isset($graph['hosts'][$host['hostid']])){
-
-						$graph['ymin_item_key'] = '';
-						$graph['ymax_item_key'] = '';
-
-						if($graph['ymin_itemid'] > 0){
+					
+						if($graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE){
 							$graph['ymin_item_key'] = $hostminmaxs[$itemminmaxs[$graph['ymin_itemid']]['hostid']]['host'].':'.
 									$itemminmaxs[$graph['ymin_itemid']]['key_'];
 						}
+						else{
+							$graph['ymin_item_key'] = '';
+						}
 
-						if($graph['ymax_itemid'] > 0){
+						if($graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE){
 							$graph['ymax_item_key'] = $hostminmaxs[$itemminmaxs[$graph['ymax_itemid']]['hostid']]['host'].':'.
 									$itemminmaxs[$graph['ymax_itemid']]['key_'];
+						}
+						else{
+							$graph['ymax_item_key'] = '';
 						}
 
 						$graph_node = self::addChildData($graphs_node, XML_TAG_GRAPH, $graph);
