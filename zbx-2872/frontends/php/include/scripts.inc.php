@@ -74,12 +74,12 @@ function execute_script($scriptid,$hostid){
 
 	$json = new CJSON();
 
-	$array = Array(
-					'request' => 'command',
-					'nodeid' => id2nodeid($hostid),
-					'scriptid' => $scriptid,
-					'hostid' => $hostid
-					);
+	$array = array(
+		'request' => 'command',
+		'nodeid' => id2nodeid($hostid),
+		'scriptid' => $scriptid,
+		'hostid' => $hostid
+	);
 
 	$dataToSend = $json->encode($array, false);
 
@@ -94,32 +94,35 @@ function execute_script($scriptid,$hostid){
 
 	if(!defined('ZBX_SCRIPT_BYTES_LIMIT')) define('ZBX_SCRIPT_BYTES_LIMIT', 1073741824);
 	$response = '';
+
 	$pbl = ZBX_SCRIPT_BYTES_LIMIT > 8192 ? 8192 : ZBX_SCRIPT_BYTES_LIMIT; // PHP read bytes limit
 	$now = time();
-	for($i = 0; !feof($socket) && (time()-$now) < ZBX_SCRIPT_TIMEOUT && $i*$pbl < ZBX_SCRIPT_BYTES_LIMIT; $i++) {
+	while(!feof($socket)){
+		if( (time()-$now) >= ZBX_SCRIPT_TIMEOUT ){
+			error(S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_TIMEOUT_ERROR);
+			show_messages(false, '', S_SCRIPT_ERROR);
+			return false;
+		}
+		else if( ($i*$pbl) >= ZBX_SCRIPT_BYTES_LIMIT ){
+			error(S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_BYTES_LIMIT_ERROR);
+			show_messages(false, '', S_SCRIPT_ERROR);
+			return false;
+		}
+
 		if(($out = fread($socket, $pbl)) !== false) {
 			$response .= $out;
-		}else{
+		}
+		else{
 			error(S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_READ_ERROR);
 			show_messages(false, '', S_SCRIPT_ERROR);
 			return false;
 		}
 	}
-	
+
 	if(!feof($socket)) {
-		if(time()-$now >= ZBX_SCRIPT_TIMEOUT) {
-			error(S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_TIMEOUT_ERROR);
-			show_messages(false, '', S_SCRIPT_ERROR);
-			return false;
-		}else if($i*$pbl >= ZBX_SCRIPT_BYTES_LIMIT) {
-			error(S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_BYTES_LIMIT_ERROR);
-			show_messages(false, '', S_SCRIPT_ERROR);
-			return false;
-		}else {
-			error(S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_UNKNOWN_ERROR);
-			show_messages(false, '', S_SCRIPT_ERROR);
-			return false;
-		}
+		error(S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_UNKNOWN_ERROR);
+		show_messages(false, '', S_SCRIPT_ERROR);
+		return false;
 	}
 	
 	if(zbx_strlen($response) > 0){

@@ -55,7 +55,7 @@ class CProxy extends CZBXAPI{
 		$user_type = $USER_DETAILS['type'];
 		$userid = $USER_DETAILS['userid'];
 
-		$sort_columns = array('hostid', 'host', 'status', 'dns', 'ip'); // allowed columns for sorting
+		$sort_columns = array('hostid', 'host', 'status'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
 
 
@@ -80,7 +80,7 @@ class CProxy extends CZBXAPI{
 // OutPut
 			'extendoutput'				=> null,
 			'output'					=> API_OUTPUT_REFER,
-			'count'						=> null,
+			'countOutput'				=> null,
 			'preservekeys'				=> null,
 			
 			'select_hosts'				=> null,
@@ -116,21 +116,27 @@ class CProxy extends CZBXAPI{
 			$sql_parts['where'][] = DBcondition('h.hostid', $options['proxyids']);
 		}
 
-// extendoutput
-		if($options['output'] == API_OUTPUT_EXTEND){
-			$sql_parts['select']['hosts'] = 'h.*';
-		}
-
-// count
-		if(!is_null($options['count'])){
-			$options['sortfield'] = '';
-
-			$sql_parts['select'] = array('count(DISTINCT h.hostid) as rowscount');
+// filter
+		if(!is_null($options['filter'])){
+			zbx_db_filter('hosts h', $options, $sql_parts);
 		}
 
 // search
 		if(!is_null($options['search'])){
 			zbx_db_search('hosts h', $options, $sql_parts);
+		}
+
+
+// extendoutput
+		if($options['output'] == API_OUTPUT_EXTEND){
+			$sql_parts['select']['hosts'] = 'h.hostid, h.host, h.status';
+		}
+
+// countOutput
+		if(!is_null($options['countOutput'])){
+			$options['sortfield'] = '';
+
+			$sql_parts['select'] = array('count(DISTINCT h.hostid) as rowscount');
 		}
 
 // order
@@ -177,8 +183,9 @@ class CProxy extends CZBXAPI{
 // sdi($sql);
 		$res = DBselect($sql, $sql_limit);
 		while($proxy = DBfetch($res)){
-			if($options['count'])
-				$result = $proxy;
+			if($options['countOutput']){
+				$result = $proxy['rowscount'];
+			}
 			else{
 				$proxyids[$proxy['hostid']] = $proxy['hostid'];
 
@@ -200,7 +207,7 @@ class CProxy extends CZBXAPI{
 			}
 		}
 
-		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['count'])){
+		if(!is_null($options['countOutput'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}

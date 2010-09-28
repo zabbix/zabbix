@@ -60,7 +60,8 @@ class CScript extends CZBXAPI{
 			'from' => array('scripts s'),
 			'where' => array(),
 			'order' => array(),
-			'limit' => null);
+			'limit' => null
+		);
 
 		$def_options = array(
 			'nodeids'				=> null,
@@ -68,19 +69,20 @@ class CScript extends CZBXAPI{
 			'hostids'				=> null,
 			'scriptids'				=> null,
 			'editable'				=> null,
+			'nopermissions'			=> null,
 
 // filter
-			'filter'					=> null,
-			'search'					=> null,
-			'startSearch'				=> null,
-			'excludeSearch'				=> null,
+			'filter'				=> null,
+			'search'				=> null,
+			'startSearch'			=> null,
+			'excludeSearch'			=> null,
 
 // OutPut
 			'extendoutput'			=> null,
 			'output'				=> API_OUTPUT_REFER,
 			'select_groups'			=> null,
 			'select_hosts'			=> null,
-			'count'					=> null,
+			'countOutput'			=> null,
 			'preservekeys'			=> null,
 
 			'sortfield'				=> '',
@@ -165,17 +167,21 @@ class CScript extends CZBXAPI{
 			$sql_parts['select']['scripts'] = 's.*';
 		}
 
-// count
-		if(!is_null($options['count'])){
-			$options['sortfield'] = '';
-
-			$sql_parts['select'] = array('count(s.scriptid) as rowscount');
-		}
-
-
 // search
 		if(!is_null($options['search'])){
 			zbx_db_search('scripts s', $options, $sql_parts);
+		}
+
+// filter
+		if(!is_null($options['filter'])){
+			zbx_db_filter('scripts s', $options, $sql_parts);
+		}
+
+// countOutput
+		if(!is_null($options['countOutput'])){
+			$options['sortfield'] = '';
+
+			$sql_parts['select'] = array('count(s.scriptid) as rowscount');
 		}
 
 // order
@@ -221,8 +227,9 @@ class CScript extends CZBXAPI{
 				$sql_order;
 		$res = DBselect($sql, $sql_limit);
 		while($script = DBfetch($res)){
-			if($options['count'])
-				$result = $script;
+			if($options['countOutput']){
+				$result = $script['rowscount'];
+			}
 			else{
 				$scriptids[$script['scriptid']] = $script['scriptid'];
 
@@ -263,7 +270,7 @@ class CScript extends CZBXAPI{
 			}
 		}
 
-		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['count'])){
+		if(!is_null($options['countOutput'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
@@ -356,6 +363,12 @@ class CScript extends CZBXAPI{
  * @return boolean
  */
 	public static function create($scripts){
+		global $USER_DETAILS;
+		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
+			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_CREATE_SCRIPTS);
+			return false;
+		}
+
 		$scripts = zbx_toArray($scripts);
 		$scriptids = array();
 
@@ -402,6 +415,12 @@ class CScript extends CZBXAPI{
  * @return boolean
  */
 	public static function update($scripts){
+		global $USER_DETAILS;
+		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
+			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_UPDATE_SCRIPTS);
+			return false;
+		}
+
 		$scripts = zbx_toArray($scripts);
 		$scriptids = zbx_objectValues($scripts, 'scriptid');
 
@@ -411,7 +430,7 @@ class CScript extends CZBXAPI{
 			$options = array(
 				'scriptids' => $scriptids,
 				'editable' => 1,
-				'extendoutput' => 1,
+				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1
 			);
 			$upd_scripts = self::get($options);
@@ -451,34 +470,38 @@ class CScript extends CZBXAPI{
  * @param array $scriptids
  * @return boolean
  */
-	public static function delete($scripts){
-		$scripts = zbx_toArray($scripts);
-		$scriptids = zbx_objectValues($scripts, 'scriptid');
+	public static function delete($scriptids){
+		global $USER_DETAILS;
+		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
+			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_DELETE_SCRIPTS);
+			return false;
+		}
+
+		$scripts = zbx_toArray($scriptids);
 
 		try{
 			self::BeginTransaction(__METHOD__);
 
+			if(empty($scriptids)){
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ scriptids ]');
+			}
+
 			$options = array(
 				'scriptids' => $scriptids,
 				'editable' => 1,
-				'extendoutput' => 1,
+				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1
 			);
 			$del_scripts = self::get($options);
-			foreach($scripts as $snum => $script){
-				if(!isset($del_scripts[$script['scriptid']])){
+			foreach($scriptids as $snum => $scriptid){
+				if(!isset($del_scripts[$scriptid])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				}
 			}
 
-			if(!empty($scriptids)){
-				$result = delete_script($scriptids);
-				if(!$result)
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete script');
-			}
-			else{
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ scriptids ]');
-			}
+			$sql = 'DELETE FROM scripts WHERE '.DBcondition('scriptid',$scriptids);
+			if(!$result = DBexecute($sql))
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete script');
 
 			self::EndTransaction(true, __METHOD__);
 			return array('scriptids' => $scriptids);

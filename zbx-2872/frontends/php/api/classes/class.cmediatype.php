@@ -72,17 +72,15 @@ class CMediatype extends CZBXAPI{
 			'mediatypeids'				=> null,
 			'mediaids'					=> null,
 			'userids'					=> null,
-
+			'editable'					=> null,
 // filter
 			'filter'					=> null,
 			'search'					=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
-
 // OutPut
 			'extendoutput'				=> null,
 			'output'					=> API_OUTPUT_REFER,
-			'editable'					=> null,
 			'select_users'				=> null,
 			'select_medias'				=> null,
 			'countOutput'				=> null,
@@ -334,38 +332,6 @@ Copt::memoryPick();
 	}
 
 /**
- * Get Mediatype ID by Mediatype alias
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $mediatype_data
- * @param array $mediatype_data['alias'] Mediatype alias
- * @return string|boolean
- */
-	public static function getObjects($mediatype_data){
-		$result = array();
-		$mediatypeids = array();
-
-		$sql = 'SELECT mt.mediatypeid '.
-				' FROM media_type mt '.
-				' WHERE mt.description='.zbx_dbstr($mediatype_data['description']).
-					' AND '.DBin_node('mt.mediatypeid', false);
-		$res = DBselect($sql);
-		while($mediatype = DBfetch($res)){
-			$mediatypeids[] = $mediatype['mediatypeid'];
-		}
-
-		if(!empty($mediatypeids))
-			$result = self::get(array('mediatypeids' => $mediatypeids, 'output' => API_OUTPUT_EXTEND));
-
-	return $result;
-	}
-
-/**
  * Add Media types
  *
  * @param array $mediatypes
@@ -401,7 +367,11 @@ Copt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_CMEDIATYPE_ERROR_WRONG_FIELD_FOR_MEDIATYPE);
 				}
 
-				$mediatype_exist = self::getObjects(array('description' => $mediatype['description']));
+				$options = array(
+					'filter' => array('description' => $mediatype['description']),
+					'output' => API_OUTPUT_EXTEND
+				);
+				$mediatype_exist = self::get($options);
 				if(!empty($mediatype_exist)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_MEDIATYPE_ALREADY_EXISTS . ' ' . $mediatype_exist[0]['description']);
 				}
@@ -537,7 +507,7 @@ Copt::memoryPick();
 			DB::delete('media_type', DBcondition('mediatypeid', $mediatypeids));
 
 			self::EndTransaction(true, __METHOD__);
-			return true;
+			return array('mediatypeids' => $mediatypeids);
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
