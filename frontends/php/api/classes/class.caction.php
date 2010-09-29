@@ -300,14 +300,12 @@ class CAction extends CZBXAPI{
 			zbx_value2array($options['mediatypeids']);
 
 			if($options['output'] != API_OUTPUT_SHORTEN){
-				$sql_parts['select']['mediatypeid'] = 'opm.mediatypeid';
+				$sql_parts['select']['mediatypeid'] = 'o.mediatypeid';
 			}
 
-			$sql_parts['from']['opmediatypes'] = 'opmediatypes opm';
 			$sql_parts['from']['operations'] = 'operations o';
 
-			$sql_parts['where'][] = DBcondition('opm.mediatypeid', $options['mediatypeids']);
-			$sql_parts['where']['oopm'] = 'opm.operationid=o.operationid';
+			$sql_parts['where'][] = DBcondition('o.mediatypeid', $options['mediatypeids']);
 			$sql_parts['where']['ao'] = 'a.actionid=o.actionid';
 		}
 
