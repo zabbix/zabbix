@@ -1757,6 +1757,7 @@
 	'S_INSERT'=>				'Insert',
 	'S_SECONDS'=>				'Seconds',
 	'S_LAST_OF'=>				'Last of',
+	'S_TIME_SHIFT'=>			'Time shift',
 	'S_MULTIPLE_PROBLEM_EVENTS'=>		'Multiple PROBLEM events',
 	'S_SHOW_DISABLED_TRIGGERS'=>		'Show disabled triggers',
 	'S_HIDE_DISABLED_TRIGGERS'=>		'Hide disabled triggers',
