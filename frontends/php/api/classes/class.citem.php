@@ -786,6 +786,7 @@ COpt::memoryPick();
 				unset($item_db_fields['prevvalue']);
 				unset($item_db_fields['lastclock']);
 				unset($item_db_fields['prevorgvalue']);
+				unset($item_db_fields['lastns']);
 				if(!check_db_fields($item_db_fields, $item)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect parameters used for Item');
 				}
