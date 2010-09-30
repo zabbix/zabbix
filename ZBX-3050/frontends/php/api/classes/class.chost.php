@@ -1411,6 +1411,10 @@ Copt::memoryPick();
 				if(!isset($upd_hosts[$host['hostid']])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				}
+				//can't add host with the same name as existing template
+				if(CTemplate::exists(array('host' => $host['host']))){
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
+				}
 			}
 
 // CHECK IF HOSTS HAVE AT LEAST 1 GROUP {{{

@@ -1239,6 +1239,10 @@ COpt::memoryPick();
 				if(!empty($template_exists) && ($template_exists['templateid'] != $cur_template['templateid'])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE . ' [ ' . $data['host'] . ' ] ' . S_ALREADY_EXISTS_SMALL);
 				}
+				//can't set the same name as existing host
+				if(CHost::exists(array('host' => $cur_template['host']))){
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$template['host'].' ] '.S_ALREADY_EXISTS_SMALL);
+				}
 			}
 
 			if(isset($data['host']) && !preg_match('/^' . ZBX_PREG_HOST_FORMAT . '$/i', $data['host'])){
