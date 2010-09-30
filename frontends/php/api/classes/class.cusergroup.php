@@ -683,6 +683,8 @@ class CUserGroup extends CZBXAPI{
  */
 	public static function delete($usrgrpids){
 		global $USER_DETAILS;
+		
+		$usrgrpids = zbx_toArray($usrgrpids);
 
 		if(empty($usrgrpids)) return true;
 
