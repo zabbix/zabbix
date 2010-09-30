@@ -2103,14 +2103,7 @@ this.selementForm.y = e_input_6;
 	var e_td_5 = document.createElement('td');
 	e_td_5.className = "form_row_l";
 
-	var e_input_6 = document.createElement('input');
-this.selementForm.massEdit.chkboxURL = e_input_6;
-	e_input_6.setAttribute('type', 'checkbox');
-	e_input_6.setAttribute('name', "chkboxURL");
-	e_input_6.setAttribute('id', "chkboxURL");
-
-	e_input_6.className = 'checkbox';
-	e_td_5.appendChild(e_input_6);
+this.selementForm.massEdit.chkboxURL = e_tr_4;
 
 	e_td_5.appendChild(document.createTextNode(' '));
 	e_td_5.appendChild(document.createTextNode(locale['S_URL']));
@@ -2346,7 +2339,7 @@ updateForm_selementByType: function(e, multi){
 		this.selementForm.massEdit.chkboxIconid_unknown.style.display = 'inline';
 		this.selementForm.massEdit.chkboxIconid_maintenance.style.display = 'inline';
 		this.selementForm.massEdit.chkboxIconid_disabled.style.display = 'inline';
-		this.selementForm.massEdit.chkboxURL.style.display = 'inline';
+		this.selementForm.massEdit.chkboxURL.style.display = 'none';
 
 		this.selementForm.massEdit.elementtype.style.display = 'none';
 		this.selementForm.massEdit.elementName.style.display = 'none';
@@ -2375,7 +2368,7 @@ updateForm_selementByType: function(e, multi){
 		this.selementForm.massEdit.chkboxIconid_unknown.style.display = 'none';
 		this.selementForm.massEdit.chkboxIconid_maintenance.style.display = 'none';
 		this.selementForm.massEdit.chkboxIconid_disabled.style.display = 'none';
-		this.selementForm.massEdit.chkboxURL.style.display = 'none';
+		this.selementForm.massEdit.chkboxURL.style.display = display_style;
 
 		this.selementForm.massEdit.chkboxLabel.checked = false;
 		this.selementForm.massEdit.chkboxLabelLocation.checked = false;

@@ -83,6 +83,7 @@ class CMap extends CZBXAPI{
 			'output'					=> API_OUTPUT_REFER,
 			'select_selements'			=> null,
 			'select_links'				=> null,
+			'select_urls'				=> null,
 			'count'						=> null,
 			'preservekeys'				=> null,
 
@@ -412,6 +413,15 @@ COpt::memoryPick();
 			}
 		}
 
+// Adding Urls
+		if(!is_null($options['select_urls'])){
+			$sql = 'SELECT su.* FROM sysmap_url su WHERE '.DBcondition('su.sysmapid', $sysmapids);
+			$db_urls = DBselect($sql);
+			while($url = DBfetch($db_urls)){
+				$result[$url['sysmapid']]['urls'][] = $url;
+			}
+		}
+
 COpt::memoryPick();
 // removing keys (hash -> array)
 		if(is_null($options['preservekeys'])){
@@ -544,7 +554,7 @@ COpt::memoryPick();
 			}
 
 			$update = array();
-			foreach($maps as $mnum => $map){			
+			foreach($maps as $mnum => $map){
 				if(isset($map['name'])){
 					$options = array(
 						'filter' => array(
@@ -750,7 +760,7 @@ COpt::memoryPick();
 				if(!check_db_fields($selement_db_fields, $selement)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for element');
 				}
-				
+
 				if(check_circle_elements_link($selement['sysmapid'],$selement['elementid'],$selement['elementtype'])){
 					self::exception(S_CIRCULAR_LINK_CANNOT_BE_CREATED.' "'.$selement['label'].'"');
 				}
@@ -832,7 +842,7 @@ COpt::memoryPick();
 
 				$update[] = array(
 					'values' => $selement,
-					'where' => array('selementid='.$selement['selementid']),				
+					'where' => array('selementid='.$selement['selementid']),
 				);
 				$selementids[] = $selement['selementid'];
 			}
