@@ -893,7 +893,6 @@ AC_CHECK_FUNCS(asprintf)
 AC_CHECK_FUNCS(vsnprintf)
 AC_CHECK_FUNCS(hstrerror)
 AC_CHECK_FUNCS(getopt_long)
-AC_CHECK_FUNCS(strcasestr)
 AC_CHECK_FUNCS(getenv)
 AC_CHECK_FUNCS(putenv)
 

@@ -11,6 +11,7 @@ Changes for 1.9
 
 Changes for 1.8.4rc1
 
+ - [ZBX-3019] fixed templated graphs not being copied to discovered hosts in DM setup; thanks to Alexander Ignatyev (asaveljevs)
  - [ZBX-2860] fixed usergroup renaming (Vedmak)
  - [ZBX-3027] avg, delta, max, min, sum functions in popup_trexpr.php have a time shift input, so that this parameter now can be specified through GUI (KB)
  - [ZBX-2827] added checks when adding or updating maintenances, so that duplicate names could not be added (KB)
