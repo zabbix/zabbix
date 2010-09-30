@@ -111,8 +111,7 @@ int	CONFIG_LISTEN_PORT		= 10051;
 char	*CONFIG_LISTEN_IP		= NULL;
 char	*CONFIG_SOURCE_IP		= NULL;
 int	CONFIG_TRAPPER_TIMEOUT		= ZABBIX_TRAPPER_TIMEOUT;
-/**/
-/*int	CONFIG_NOTIMEWAIT		= 0;*/
+
 int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
 int	CONFIG_MAX_HOUSEKEEPER_DELETE	= 500;		/* applies for every separate field value */
 int	CONFIG_SENDER_FREQUENCY		= 30;
@@ -124,7 +123,6 @@ int	CONFIG_DBCONFIG_SIZE		= 8388608;	/* 8MB */
 int	CONFIG_HISTORY_CACHE_SIZE	= 8388608;	/* 8MB */
 int	CONFIG_TRENDS_CACHE_SIZE	= 4194304;	/* 4MB */
 int	CONFIG_TEXT_CACHE_SIZE		= 16777216;	/* 16MB */
-/*int	CONFIG_DISABLE_PINGER		= 0;*/
 int	CONFIG_DISABLE_HOUSEKEEPING	= 0;
 int	CONFIG_UNREACHABLE_PERIOD	= 45;
 int	CONFIG_UNREACHABLE_DELAY	= 15;
@@ -223,11 +221,9 @@ void	init_config(void)
 		{"ListenIP",&CONFIG_LISTEN_IP,0,TYPE_STRING,PARM_OPT,0,0},
 		{"ListenPort",&CONFIG_LISTEN_PORT,0,TYPE_INT,PARM_OPT,1024,32767},
 		{"SourceIP",&CONFIG_SOURCE_IP,0,TYPE_STRING,PARM_OPT,0,0},
-/*		{"NoTimeWait",&CONFIG_NOTIMEWAIT,0,TYPE_INT,PARM_OPT,0,1},*/
-/*		{"DisablePinger",&CONFIG_DISABLE_PINGER,0,TYPE_INT,PARM_OPT,0,1},*/
 		{"DisableHousekeeping",&CONFIG_DISABLE_HOUSEKEEPING,0,TYPE_INT,PARM_OPT,0,1},
 		{"DebugLevel",&CONFIG_LOG_LEVEL,0,TYPE_INT,PARM_OPT,0,4},
-		{"PidFile",&APP_PID_FILE,0,TYPE_STRING,PARM_OPT,0,0},
+		{"PidFile",&CONFIG_PID_FILE,0,TYPE_STRING,PARM_OPT,0,0},
 		{"LogFile",&CONFIG_LOG_FILE,0,TYPE_STRING,PARM_OPT,0,0},
 		{"LogFileSize",&CONFIG_LOG_FILE_SIZE,0,TYPE_INT,PARM_OPT,0,1024},
 		{"AlertScriptsPath",&CONFIG_ALERT_SCRIPTS_PATH,0,TYPE_STRING,PARM_OPT,0,0},
@@ -251,7 +247,6 @@ void	init_config(void)
 
 	CONFIG_SERVER_STARTUP_TIME = time(NULL);
 
-
 	parse_cfg_file(CONFIG_FILE, cfg);
 
 	if(CONFIG_DBNAME == NULL)
@@ -259,9 +254,9 @@ void	init_config(void)
 		zabbix_log( LOG_LEVEL_CRIT, "DBName not in config file");
 		exit(1);
 	}
-	if(APP_PID_FILE == NULL)
+	if(CONFIG_PID_FILE == NULL)
 	{
-		APP_PID_FILE=strdup("/tmp/zabbix_server.pid");
+		CONFIG_PID_FILE=strdup("/tmp/zabbix_server.pid");
 	}
 	if(CONFIG_ALERT_SCRIPTS_PATH == NULL)
 	{
@@ -360,7 +355,8 @@ int main(int argc, char **argv)
 	init_ipmi_handler();
 #endif
 
-	switch (task) {
+	switch (task)
+	{
 		case ZBX_TASK_CHANGE_NODEID:
 			change_nodeid(0,nodeid);
 			exit(-1);

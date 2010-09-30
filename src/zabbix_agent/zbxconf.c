@@ -36,14 +36,8 @@
 #	include "zbxplugin.h"
 #endif /* WITH_PLUGINS */
 
-
-#ifdef USE_PID_FILE
-	static char	DEFAULT_PID_FILE[]	= "/tmp/zabbix_agentd.pid";
-#endif /* USE_PID_FILE */
-
 char	*CONFIG_HOSTS_ALLOWED		= NULL;
 char	*CONFIG_HOSTNAME		= NULL;
-
 
 int	CONFIG_DISABLE_ACTIVE		= 0;
 int	CONFIG_DISABLE_PASSIVE		= 0;
@@ -56,7 +50,6 @@ int	CONFIG_REFRESH_ACTIVE_CHECKS	= 120;
 char	*CONFIG_LISTEN_IP		= NULL;
 char	*CONFIG_SOURCE_IP		= NULL;
 int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
-char	CONFIG_LOG_UNRES_SYMB		= 0;
 
 int	CONFIG_BUFFER_SIZE		= 100;
 int	CONFIG_BUFFER_SEND		= 5;
@@ -75,7 +68,7 @@ void    load_config()
 		{"BufferSend",		&CONFIG_BUFFER_SEND,	0,TYPE_INT,	PARM_OPT,	1,3600},
 
 #ifdef USE_PID_FILE
-		{"PidFile",		&APP_PID_FILE,		0,TYPE_STRING,	PARM_OPT,	0,0},
+		{"PidFile",		&CONFIG_PID_FILE,	0,TYPE_STRING,	PARM_OPT,	0,0},
 #endif /* USE_PID_FILE */
 
 		{"LogFile",		&CONFIG_LOG_FILE,	0,TYPE_STRING,	PARM_OPT,	0,0},
@@ -90,12 +83,10 @@ void    load_config()
 
 		{"DebugLevel",		&CONFIG_LOG_LEVEL,	0,TYPE_INT,	PARM_OPT,	0,4},
 
-		{"StartAgents",		&CONFIG_ZABBIX_FORKS,		0,TYPE_INT,	PARM_OPT,	1,16},
+		{"StartAgents",		&CONFIG_ZABBIX_FORKS,		0,TYPE_INT,	PARM_OPT,1,16},
 		{"RefreshActiveChecks",	&CONFIG_REFRESH_ACTIVE_CHECKS,	0,TYPE_INT,	PARM_OPT,60,3600},
 		{"MaxLinesPerSecond",	&CONFIG_MAX_LINES_PER_SECOND,	0,TYPE_INT,	PARM_OPT,1,1000},
 		{"AllowRoot",		&CONFIG_ALLOW_ROOT,		0,TYPE_INT,	PARM_OPT,0,1},
-
-		{"LogUnresolvedSymbols",&CONFIG_LOG_UNRES_SYMB,		0,	TYPE_STRING,PARM_OPT,0,1},
 
 		{0}
 	};
@@ -108,9 +99,9 @@ void    load_config()
 	parse_cfg_file(CONFIG_FILE, cfg);
 
 #ifdef USE_PID_FILE
-	if(APP_PID_FILE == NULL)
+	if(CONFIG_PID_FILE == NULL)
 	{
-		APP_PID_FILE = DEFAULT_PID_FILE;
+		CONFIG_PID_FILE = "/tmp/zabbix_agentd.pid";
 	}
 #endif /* USE_PID_FILE */
 

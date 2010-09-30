@@ -105,8 +105,7 @@ int	CONFIG_LISTEN_PORT		= 10051;
 char	*CONFIG_LISTEN_IP		= NULL;
 char	*CONFIG_SOURCE_IP		= NULL;
 int	CONFIG_TRAPPER_TIMEOUT		= ZABBIX_TRAPPER_TIMEOUT;
-/**/
-/*int	CONFIG_NOTIMEWAIT		= 0;*/
+
 int	CONFIG_DISABLE_HOUSEKEEPING	= 0;
 int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1; /* h */
 int	CONFIG_PROXY_LOCAL_BUFFER	= 0; /* 24h */
@@ -233,10 +232,8 @@ void	init_config(void)
 		{"ListenIP",&CONFIG_LISTEN_IP,0,TYPE_STRING,PARM_OPT,0,0},
 		{"ListenPort",&CONFIG_LISTEN_PORT,0,TYPE_INT,PARM_OPT,1024,32767},
 		{"SourceIP",&CONFIG_SOURCE_IP,0,TYPE_STRING,PARM_OPT,0,0},
-/*		{"NoTimeWait",&CONFIG_NOTIMEWAIT,0,TYPE_INT,PARM_OPT,0,1},*/
-/*		{"DisablePinger",&CONFIG_DISABLE_PINGER,0,TYPE_INT,PARM_OPT,0,1},*/
 		{"DebugLevel",&CONFIG_LOG_LEVEL,0,TYPE_INT,PARM_OPT,0,4},
-		{"PidFile",&APP_PID_FILE,0,TYPE_STRING,PARM_OPT,0,0},
+		{"PidFile",&CONFIG_PID_FILE,0,TYPE_STRING,PARM_OPT,0,0},
 		{"LogFile",&CONFIG_LOG_FILE,0,TYPE_STRING,PARM_OPT,0,0},
 		{"LogFileSize",&CONFIG_LOG_FILE_SIZE,0,TYPE_INT,PARM_OPT,0,1024},
 /*		{"AlertScriptsPath",&CONFIG_ALERT_SCRIPTS_PATH,0,TYPE_STRING,PARM_OPT,0,0},*/
@@ -305,13 +302,9 @@ void	init_config(void)
 		zabbix_log( LOG_LEVEL_CRIT, "DBName not in config file");
 		exit(1);
 	}
-	if(APP_PID_FILE == NULL)
+	if(CONFIG_PID_FILE == NULL)
 	{
-		APP_PID_FILE=strdup("/tmp/zabbix_proxy.pid");
-	}
-	if(CONFIG_ALERT_SCRIPTS_PATH == NULL)
-	{
-		CONFIG_ALERT_SCRIPTS_PATH=strdup("/home/zabbix/bin");
+		CONFIG_PID_FILE=strdup("/tmp/zabbix_proxy.pid");
 	}
 	if(CONFIG_TMPDIR == NULL)
 	{

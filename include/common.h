@@ -107,7 +107,11 @@
 #undef vsprintf
 #endif
 #define vsprintf	ERROR_DO_NOT_USE_VSPRINTF_FUNCTION_TRY_TO_USE_VSNPRINTF
-/*#define strncat		ERROR_DO_NOT_USE_STRNCAT_FUNCTION_TRY_TO_USE_ZBX_STRLCAT*/
+
+#ifdef strncat
+#undef strncat
+#endif
+#define strncat		ERROR_DO_NOT_USE_STRNCAT_FUNCTION_TRY_TO_USE_ZBX_STRLCAT
 
 #define ON	1
 #define OFF	0
@@ -145,7 +149,7 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #define	NETWORK_ERROR	(-3)
 #define	TIMEOUT_ERROR	(-4)
 #define	AGENT_ERROR	(-5)
-char	*zbx_result_string(int result);
+const char	*zbx_result_string(int result);
 
 #define MAX_STRING_LEN	2048
 #define MAX_BUF_LEN	65536
@@ -223,7 +227,7 @@ typedef enum
 	ITEM_VALUE_TYPE_UINT64,
 	ITEM_VALUE_TYPE_TEXT
 } zbx_item_value_type_t;
-char	*zbx_item_value_type_string(zbx_item_value_type_t value_type);
+const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type);
 
 /* Item data types */
 typedef enum
@@ -258,7 +262,7 @@ typedef enum
 	SVC_ICMPPING,
 	SVC_SNMPv3
 } zbx_dservice_type_t;
-char	*zbx_dservice_type_string(zbx_dservice_type_t service);
+const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 
 /* Item snmpv3 security levels */
 #define ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV	0
@@ -515,17 +519,6 @@ typedef enum
 #define HOST_AVAILABLE_TRUE	1
 #define HOST_AVAILABLE_FALSE	2
 
-/* Use host IP or host name */
-#define HOST_USE_HOSTNAME	0
-#define HOST_USE_IP		1
-
-/* Trigger statuses */
-/*#define TRIGGER_STATUS_FALSE	0
-#define TRIGGER_STATUS_TRUE	1
-#define TRIGGER_STATUS_DISABLED	2
-#define TRIGGER_STATUS_UNKNOWN	3
-#define TRIGGER_STATUS_NOTSUPPORTED	4*/
-
 /* Trigger statuses */
 #define TRIGGER_STATUS_ENABLED	0
 #define TRIGGER_STATUS_DISABLED	1
@@ -545,7 +538,7 @@ typedef enum
 	TRIGGER_SEVERITY_HIGH,
 	TRIGGER_SEVERITY_DISASTER
 } zbx_trigger_severity_t;
-char	*zbx_trigger_severity_string(zbx_trigger_severity_t severity);
+const char	*zbx_trigger_severity_string(zbx_trigger_severity_t severity);
 
 typedef enum
 {
@@ -555,7 +548,7 @@ typedef enum
 	ITEM_LOGTYPE_FAILURE_AUDIT = 7,
 	ITEM_LOGTYPE_SUCCESS_AUDIT
 } zbx_item_logtype_t;
-char	*zbx_item_logtype_string(zbx_item_logtype_t logtype);
+const char	*zbx_item_logtype_string(zbx_item_logtype_t logtype);
 /* Media statuses */
 #define MEDIA_STATUS_ACTIVE	0
 #define MEDIA_STATUS_DISABLED	1
@@ -619,7 +612,7 @@ typedef enum
 	PERM_MAX = 3
 } zbx_user_permission_t;
 
-const char *zbx_permission_string(int perm);
+const char	*zbx_permission_string(int perm);
 
 /* Types of nodes */
 #define	ZBX_NODE_TYPE_REMOTE	0
@@ -664,8 +657,8 @@ const char	*zbx_nodetype_string(unsigned char nodetype);
 #define zbx_malloc(old, size)	zbx_malloc2(__FILE__, __LINE__, old , size)
 #define zbx_realloc(old, size)	zbx_realloc2(__FILE__, __LINE__, old , size)
 
-void    *zbx_malloc2(char *filename, int line, void *old, size_t size);
-void    *zbx_realloc2(char *filename, int line, void *src, size_t size);
+void    *zbx_malloc2(const char *filename, int line, void *old, size_t size);
+void    *zbx_realloc2(const char *filename, int line, void *src, size_t size);
 
 #define zbx_free(ptr)		\
 	if (ptr)		\
@@ -793,9 +786,9 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 #define SEC_PER_WEEK (7*SEC_PER_DAY)
 #define SEC_PER_YEAR (365*SEC_PER_DAY)
 #define ZBX_JAN_1970_IN_SEC   2208988800.0        /* 1970 - 1900 in seconds */
-double	zbx_time(void);
+double	zbx_time();
 void	zbx_timespec(zbx_timespec_t *ts);
-double	zbx_current_time(void);
+double	zbx_current_time();
 
 #ifdef HAVE___VA_ARGS__
 #	define zbx_error(fmt, ...) __zbx_zbx_error(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
@@ -842,7 +835,7 @@ char	*zbx_strdcat(char *dest, const char *src);
 #else
 #	define zbx_strdcatf __zbx_zbx_strdcatf
 #endif /* HAVE___VA_ARGS__ */
-char* __zbx_zbx_strdcatf(char *dest, const char *f, ...);
+char	* __zbx_zbx_strdcatf(char *dest, const char *f, ...);
 
 int	xml_get_data_dyn(const char *xml, const char *tag, char **data);
 void	xml_free_data_dyn(char **data);
