@@ -255,12 +255,17 @@ static void	process_maintenance_hosts(zbx_host_maintenance_t **hm, int *hm_alloc
 
 /******************************************************************************
  *                                                                            *
- * Function: get_trigger_value                                                *
+ * Function: get_trigger_values                                               *
  *                                                                            *
- * Purpose: get trigger value for specified time                              *
+ * Purpose: get trigger values for specified period                           *
  *                                                                            *
- * Parameters: triggerid - trigger identificator from database                *
- *             now -                                                          *
+ * Parameters: triggerid        - [IN] trigger identifier from database       *
+ *             maintenance_from - [IN] maintenance period start               *
+ *             maintenance_to   - [IN] maintenance period stop                *
+ *             value_before     - [OUT] trigger value before maintenance      *
+ *             value_inside     - [OUT] trigger value inside maintenance      *
+ *                                      (only if value_before=value_after)    * 
+ *             value_after      - [OUT] trigger value after maintenance       *
  *                                                                            *
  * Return value: SUCCEED if found event with OK or PROBLEM statuses           *
  *                                                                            *
@@ -269,13 +274,62 @@ static void	process_maintenance_hosts(zbx_host_maintenance_t **hm, int *hm_alloc
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	get_trigger_value(zbx_uint64_t triggerid, time_t now, int *value)
+static void	get_trigger_values(zbx_uint64_t triggerid, int maintenance_from, int maintenance_to,
+		int *value_before, int *value_inside, int *value_after)
 {
+	const char	*__function_name = "get_trigger_values";
+
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		sql[MAX_STRING_LEN];
-	int		ret = FAIL;
+	char		sql[256];
+	int		clock;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() from:'%s %s'", __function_name,
+			zbx_date2str(maintenance_from), zbx_time2str(maintenance_from));
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() to:'%s %s'", __function_name,
+			zbx_date2str(maintenance_to), zbx_time2str(maintenance_to));
+
+	/* check for value after maintenance period */
+	zbx_snprintf(sql, sizeof(sql),
+			"select clock,value"
+			" from events"
+			" where source=%d"
+				" and object=%d"
+				" and objectid=" ZBX_FS_UI64
+				" and clock<%d"
+				" and value in (%d,%d)"
+			" order by object desc,objectid desc,eventid desc",
+			EVENT_SOURCE_TRIGGERS,
+			EVENT_OBJECT_TRIGGER,
+			triggerid,
+			maintenance_to,
+			TRIGGER_VALUE_FALSE, TRIGGER_VALUE_TRUE);
+
+	result = DBselectN(sql, 1);
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		clock = atoi(row[0]);
+		*value_after = atoi(row[1]);
+	}
+	else
+	{
+		clock = 0;
+		*value_after = TRIGGER_VALUE_UNKNOWN;
+	}
+	DBfree_result(result);
+
+	/* if no events inside maintenance */
+	if (clock < maintenance_from)
+	{
+		*value_before = *value_after;
+		*value_inside = *value_after;
+		goto out;
+	}
+
+	/* check for value before maintenance period */
 	zbx_snprintf(sql, sizeof(sql),
 			"select value"
 			" from events"
@@ -283,24 +337,52 @@ static int	get_trigger_value(zbx_uint64_t triggerid, time_t now, int *value)
 				" and object=%d"
 				" and objectid=" ZBX_FS_UI64
 				" and clock<%d"
-				" and value in(%d,%d)"
-			" order by clock desc",
+				" and value in (%d,%d)"
+			" order by object desc,objectid desc,eventid desc",
 			EVENT_SOURCE_TRIGGERS,
 			EVENT_OBJECT_TRIGGER,
 			triggerid,
-			(int)now,
+			maintenance_from,
 			TRIGGER_VALUE_FALSE, TRIGGER_VALUE_TRUE);
 
 	result = DBselectN(sql, 1);
 
 	if (NULL != (row = DBfetch(result)))
-	{
-		*value = atoi(row[0]);
-		ret = SUCCEED;
-	}
+		*value_before = atoi(row[0]);
+	else
+		*value_before = TRIGGER_VALUE_UNKNOWN;
 	DBfree_result(result);
 
-	return ret;
+	if (*value_after != *value_before)
+	{
+		*value_inside = TRIGGER_VALUE_UNKNOWN;	/* not important what value is here */
+		goto out;
+	}
+
+	/* check for value inside maintenance period */
+	result = DBselect(
+			"select value"
+			" from events"
+			" where source=%d"
+				" and object=%d"
+				" and objectid=" ZBX_FS_UI64
+				" and clock between %d and %d"
+				" and value in (%d)"
+			" order by object desc,objectid desc,eventid desc",
+			EVENT_SOURCE_TRIGGERS,
+			EVENT_OBJECT_TRIGGER,
+			triggerid,
+			maintenance_from, maintenance_to - 1,
+			*value_after == TRIGGER_VALUE_FALSE ? TRIGGER_VALUE_TRUE : TRIGGER_VALUE_FALSE);
+
+	if (NULL != (row = DBfetch(result)))
+		*value_inside = atoi(row[0]);
+	else
+		*value_inside = *value_before;
+	DBfree_result(result);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() before:%d inside:%d after:%d",
+			__function_name, *value_before, *value_inside, *value_after);
 }
 
 /******************************************************************************
@@ -312,8 +394,8 @@ static int	get_trigger_value(zbx_uint64_t triggerid, time_t now, int *value)
  *          before maintenance and became TRUE after maintenance, also in     *
  *          case if it was TRUE before and FALSE after.                       *
  *                                                                            *
- * Parameters: hostid - host identificator from database                      *
- *             maintenance_from -                                             *
+ * Parameters: hostid - host identifier from database                         *
+ *             maintenance_from, maintenance_to - maintenance period bounds   *
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
@@ -322,19 +404,16 @@ static int	get_trigger_value(zbx_uint64_t triggerid, time_t now, int *value)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	generate_events(zbx_uint64_t hostid, int maintenance_from)
+static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maintenance_to)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	triggerid;
-	int		value_before, value_after;
+	int		value_before, value_inside, value_after;
 	DB_EVENT	event;
-	time_t		now;
-
-	now = time(NULL);
 
 	result = DBselect(
-			"select t.triggerid"
+			"select distinct t.triggerid"
 			" from triggers t,functions f,items i"
 			" where t.triggerid=f.triggerid"
 				" and f.itemid=i.itemid"
@@ -349,13 +428,10 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from)
 	{
 		ZBX_STR2UINT64(triggerid, row[0]);
 
-		if (SUCCEED != get_trigger_value(triggerid, maintenance_from, &value_before))
-			continue;
+		get_trigger_values(triggerid, maintenance_from, maintenance_to,
+				&value_before, &value_inside, &value_after);
 
-		if (SUCCEED != get_trigger_value(triggerid, now, &value_after))
-			continue;
-
-		if (value_before == value_after)
+		if (value_before == value_inside && value_inside == value_after)
 			continue;
 
 		/* Preparing event for processing */
@@ -363,15 +439,15 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from)
 		event.source = EVENT_SOURCE_TRIGGERS;
 		event.object = EVENT_OBJECT_TRIGGER;
 		event.objectid = triggerid;
-		event.clock = now;
+		event.clock = maintenance_to;
 		event.value = value_after;
 
-		process_event(&event);
+		process_event(&event, 1);
 	}
 	DBfree_result(result);
 }
 
-static void	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count)
+static void	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, int now)
 {
 	typedef struct maintenance_s
 	{
@@ -489,7 +565,7 @@ static void	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count)
 	zbx_free(ids);
 
 	for (m = maintenances; m != NULL; m = m->next)
-		generate_events(m->hostid, m->maintenance_from);
+		generate_events(m->hostid, m->maintenance_from, now);
 
 	for (m = maintenances; m != NULL; m = maintenances)
 	{
@@ -663,7 +739,7 @@ static void	process_maintenance()
 	}
 	DBfree_result(result);
 
-	update_maintenance_hosts(hm, hm_count);
+	update_maintenance_hosts(hm, hm_count, (int)now);
 }
 
 /******************************************************************************
