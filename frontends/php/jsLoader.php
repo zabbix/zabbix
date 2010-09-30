@@ -32,7 +32,7 @@ $availableJScripts = array(
 	'class.cdebug.js' => '',
 	'class.cmap.js' => '',
 	'class.cmessages.js' => '',
-	'class.cookie.js' => '', 
+	'class.cookie.js' => '',
 	'class.cscreen.js' => '',
 	'class.csuggest.js' => '',
 	'class.cswitcher.js' => '',
@@ -40,6 +40,7 @@ $availableJScripts = array(
 	'class.curl.js' => '',
 	'class.rpc.js' => '',
 	'class.pmaster.js' => '',
+	'class.curllist.js' => '',
 	'class.cviewswitcher.js' => ''
 );
 
@@ -77,7 +78,24 @@ $tranStrings = array(
 );
 
 if(empty($_GET['files'])){
-	$files = array('prototype.js', 'effects.js', 'dragdrop.js', 'common.js', 'dom.js', 'class.cdebug.js', 'class.cdate.js', 'class.cookie.js', 'class.curl.js', 'class.rpc.js', 'class.bbcode.js', 'class.csuggest.js', 'class.cmessages.js', 'main.js', 'functions.js');
+	$files = array(
+		'prototype.js',
+		'effects.js',
+		'dragdrop.js',
+		'common.js',
+		'dom.js',
+		'class.cdebug.js',
+		'class.cdate.js',
+		'class.cookie.js',
+		'class.curl.js',
+		'class.rpc.js',
+		'class.bbcode.js',
+		'class.csuggest.js',
+		'class.cmessages.js',
+		'main.js',
+		'class.curllist.js',
+		'functions.js'
+	);
 }
 else{
 	$files = $_GET['files'];
