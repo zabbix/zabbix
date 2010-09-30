@@ -20,6 +20,11 @@
 #include "common.h"
 #include "log.h"
 
+#if defined(_WINDOWS)
+char	ZABBIX_SERVICE_NAME[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
+char	ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Function: get_program_name                                                 *
@@ -32,7 +37,7 @@
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- *  Comments:                                                                 *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 const char	*get_program_name(const char *path)
@@ -58,13 +63,12 @@ const char	*get_program_name(const char *path)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- *  Comments:                                                                 *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	get_nodeid_by_id(zbx_uint64_t id)
 {
 	return (int)(id/__UINT64_C(100000000000000))%1000;
-
 }
 
 /******************************************************************************
@@ -79,11 +83,11 @@ int	get_nodeid_by_id(zbx_uint64_t id)
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- *  Comments: Time in seconds since midnight (00:00:00),                      *
- *            January 1, 1970, coordinated universal time (UTC).              *
+ * Comments: Time in seconds since midnight (00:00:00),                       *
+ *           January 1, 1970, coordinated universal time (UTC).               *
  *                                                                            *
  ******************************************************************************/
-double	zbx_time(void)
+double	zbx_time()
 {
 
 #if defined(_WINDOWS)
@@ -119,10 +123,92 @@ double	zbx_time(void)
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-
-double zbx_current_time(void)
+double	zbx_current_time()
 {
-	return (zbx_time() + ZBX_JAN_1970_IN_SEC);
+	return zbx_time() + ZBX_JAN_1970_IN_SEC;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_malloc2                                                      *
+ *                                                                            *
+ * Purpose: allocates size bytes of memory                                    *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: returns a pointer to the newly allocated memory              *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void    *zbx_malloc2(const char *filename, int line, void *old, size_t size)
+{
+	int	max_attempts;
+	void	*ptr = NULL;
+
+	/* Old pointer must be NULL */
+	if (NULL != old)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_malloc: allocating already allocated memory. "
+				"Please report this to Zabbix developers.",
+				filename, line);
+		/* Exit if defined DEBUG. Ignore otherwise. */
+		zbx_dbg_assert(0);
+	}
+
+	for (
+		max_attempts = 10, size = MAX(size, 1);
+		max_attempts > 0 && NULL == ptr;
+		ptr = malloc(size), max_attempts--
+	);
+
+	if (NULL != ptr)
+		return ptr;
+
+	zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_malloc: out of memory. Requested %lu bytes.", filename, line, size);
+	exit(FAIL);
+
+	/* Program will never reach this point. */
+	return ptr;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_realloc2                                                     *
+ *                                                                            *
+ * Purpose: changes the size of the memory block pointed to by src            *
+ *          to size bytes                                                     *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: returns a pointer to the newly allocated memory              *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void    *zbx_realloc2(const char *filename, int line, void *src, size_t size)
+{
+	int	max_attempts;
+	void	*ptr = NULL;
+
+	for (
+		max_attempts = 10, size = MAX(size, 1);
+		max_attempts > 0 && NULL == ptr;
+		ptr = realloc(src, size), max_attempts--
+	);
+
+	if (NULL != ptr)
+		return ptr;
+
+	zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_realloc: out of memory. Requested %lu bytes.", filename, line, size);
+	exit(FAIL);
+
+	/* Program will never reach this point. */
+	return ptr;
 }
 
 /******************************************************************************

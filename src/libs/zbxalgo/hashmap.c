@@ -119,7 +119,7 @@ int	zbx_hashmap_get(zbx_hashmap_t *hm, zbx_uint64_t key)
 	zbx_hash_t		hash;
 	ZBX_HASHMAP_SLOT_T	*slot;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key[" ZBX_FS_UI64 "]", __function_name, key);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:" ZBX_FS_UI64, __function_name, key);
 	
 	hash = hm->hash_func(&key);
 	slot = &hm->slots[hash % hm->num_slots];
@@ -131,7 +131,7 @@ int	zbx_hashmap_get(zbx_hashmap_t *hm, zbx_uint64_t key)
 			break;
 		}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() key[" ZBX_FS_UI64 "] value[%d]", __function_name, key, value);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() key:" ZBX_FS_UI64 " value:%d", __function_name, key, value);
 
 	return value;
 }
@@ -144,7 +144,7 @@ void	zbx_hashmap_set(zbx_hashmap_t *hm, zbx_uint64_t key, int value)
 	zbx_hash_t		hash;
 	ZBX_HASHMAP_SLOT_T	*slot;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key[" ZBX_FS_UI64 "] value[%d]", __function_name, key, value);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:" ZBX_FS_UI64 " value:%d", __function_name, key, value);
 
 	hash = hm->hash_func(&key);
 	slot = &hm->slots[hash % hm->num_slots];
@@ -211,7 +211,7 @@ void	zbx_hashmap_remove(zbx_hashmap_t *hm, zbx_uint64_t key)
 	zbx_hash_t		hash;
 	ZBX_HASHMAP_SLOT_T	*slot;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key[" ZBX_FS_UI64 "]", __function_name, key);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:" ZBX_FS_UI64, __function_name, key);
 	
 	hash = hm->hash_func(&key);
 	slot = &hm->slots[hash % hm->num_slots];
