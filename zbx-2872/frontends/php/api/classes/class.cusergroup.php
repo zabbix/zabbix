@@ -553,7 +553,7 @@ class CUserGroup extends CZBXAPI{
 						'output' => API_OUTPUT_SHORTEN,
 					));
 					$group_exists = reset($group_exists);
-					if($group_exists['usrgrpid'] != $usrgrpid){
+					if($group_exists && ($group_exists['usrgrpid'] != $usrgrpid)){
 						self::exception(ZBX_API_ERROR_PARAMETERS, S_GROUP . ' ' . $data['name'] . ' ' . S_ALREADY_EXISTS_SMALL);
 					}
 				}
@@ -694,6 +694,8 @@ class CUserGroup extends CZBXAPI{
  */
 	public static function delete($usrgrpids){
 		global $USER_DETAILS;
+		
+		$usrgrpids = zbx_toArray($usrgrpids);
 
 		if(empty($usrgrpids)) return true;
 

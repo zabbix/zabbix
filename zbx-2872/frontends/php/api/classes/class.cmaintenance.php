@@ -77,6 +77,7 @@ class CMaintenance extends CZBXAPI{
 			'search'					=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
+			'filter'				=> null,
 
 // OutPut
 			'output'				=> API_OUTPUT_REFER,
@@ -202,6 +203,10 @@ class CMaintenance extends CZBXAPI{
 
 			$sql_parts['where'][] = DBcondition('m.maintenanceid',$maintenanceids);
 		}
+
+
+
+
 
 
 // nodeids
@@ -408,6 +413,29 @@ Copt::memoryPick();
 	return $result;
 	}
 
+	
+	/**
+	 * Determine, whether an object already exists
+	 *
+	 * @param array $object
+	 * @return bool
+	 */
+	public static function exists($object){
+		$keyFields = array(array('maintenanceid', 'name'));
+
+		$options = array(
+			'filter' => zbx_array_mintersect($keyFields, $object),
+			'output' => API_OUTPUT_SHORTEN,
+			'nopermissions' => 1,
+			'limit' => 1
+		);
+
+		$objs = self::get($options);
+
+	return !empty($objs);
+	}
+
+
 /**
  * Add maintenances
  *
@@ -475,6 +503,10 @@ Copt::memoryPick();
 				);
 				if(!check_db_fields($db_fields, $maintenance)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect parameters used for Maintenance');
+				}
+				//checkig wheter a maintence with this name already exists
+				if(self::exists(array('name' => $maintenance['name']))){
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_MAINTENANCE.' [ '.$maintenance['name'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
 
 				$insert[$mnum] = $maintenance;
@@ -570,6 +602,23 @@ Copt::memoryPick();
 				if(!isset($upd_maintenances[$maintenance['maintenanceid']])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				}
+
+				//checkig wheter a maintence with this name and different already exists
+				//first, getting all maintences with the same name as this
+				$options = array(
+					'filter' => array(
+									'name'=>$maintenance['name']
+								)
+				);
+				$recieved_maintenaces = CMaintenance::get($options);
+				//now going though a result, to find records with different id, then our object
+				foreach($recieved_maintenaces as $r_maintenace){
+					if ($r_maintenace['maintenanceid'] != $maintenance['maintenanceid']) {
+						//error! Maintenance with this name already exists
+						self::exception(ZBX_API_ERROR_PARAMETERS, S_MAINTENANCE.' [ '.$maintenance['name'].' ] '.S_ALREADY_EXISTS_SMALL);
+					}
+				}
+
 				$hostids = array_merge($hostids, $maintenance['hostids']);
 				$groupids = array_merge($groupids, $maintenance['groupids']);
 			}
@@ -751,6 +800,9 @@ Copt::memoryPick();
 			return false;
 		}
 	}
+
+
+
 
 }
 ?>

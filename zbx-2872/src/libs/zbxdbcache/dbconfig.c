@@ -1191,7 +1191,7 @@ void	DCsync_configuration()
 				i, config->queues[i].elems_num, config->queues[i].elems_alloc);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() pqueue     : %d (%d allocated)", __function_name,
-			i, config->pqueue.elems_num, config->pqueue.elems_alloc);
+			config->pqueue.elems_num, config->pqueue.elems_alloc);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() configfree : " ZBX_FS_DBL "%%", __function_name,
 			100 * ((double)config_mem->free_size / config_mem->orig_size));
