@@ -3088,7 +3088,25 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$frmComent->setHelp("web.tr_comments.comments.php");
 		$frmComent->addVar("triggerid",$triggerid);
 		$frmComent->addRow(S_COMMENTS,new CTextArea("comments",$trigger["comments"],100,25));
-		$frmComent->addItemToBottomRow(new CButton("save",S_SAVE));
+		
+		//if user has no pertimitions to edit comments, no "save" button for him
+		$can_edit_this = true;
+		$triggers = CTrigger::get(array(
+			'editable' => 1,
+			'trigegrids' => array($triggerid),
+			'output' => API_OUTPUT_SHORTEN,
+		));
+		$triggers = zbx_toHash($triggers, 'triggerid');
+
+		if(!isset($triggers[$triggerid])){
+			$can_edit_this = false;
+		}
+		
+		if ($can_edit_this) {
+			$frmComent->addItemToBottomRow(new CButton("save",S_SAVE));
+		}
+
+
 		$frmComent->addItemToBottomRow(new CButtonCancel('&triggerid='.$triggerid));
 
 		$frmComent->show();
