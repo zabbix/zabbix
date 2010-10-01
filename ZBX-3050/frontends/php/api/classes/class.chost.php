@@ -1411,10 +1411,6 @@ Copt::memoryPick();
 				if(!isset($upd_hosts[$host['hostid']])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				}
-				//can't add host with the same name as existing template
-				if(CTemplate::exists(array('host' => $host['host']))){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
-				}
 			}
 
 // CHECK IF HOSTS HAVE AT LEAST 1 GROUP {{{
@@ -1439,11 +1435,15 @@ Copt::memoryPick();
 					'editable' => 1,
 					'nopermissions' => 1
 				);
-				$host_exists = self::get($options);
-				$host_exists = reset($host_exists);
-				if(!empty($host_exists) && ($host_exists['hostid'] != $cur_host['hostid'])){
+				$host_exists = self::get($options);				
+				$host_exist = reset($host_exists);
+				if(!is_null($host_exist) && ($host_exist['hostid'] != $cur_host['hostid'])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
+
+//can't add host with the same name as existing template
+				if(CTemplate::exists(array('host' => $cur_host['host'])))
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$cur_host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 			}
 
 			if(isset($data['host']) && !preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $data['host'])){
