@@ -833,7 +833,6 @@ COpt::memoryPick();
 		if(empty($itemids)) return true;
 
 		$itemids = zbx_toArray($itemids);
-		$delete = array();
 		$insert = array();
 
 		try{

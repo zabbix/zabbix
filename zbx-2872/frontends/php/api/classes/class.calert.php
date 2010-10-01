@@ -323,6 +323,7 @@ class CAlert extends CZBXAPI{
 
 		$alertids = array();
 		$userids = array();
+		$hostids = array();
 		$mediatypeids = array();
 
 		$sql_parts['select'] = array_unique($sql_parts['select']);
@@ -355,7 +356,8 @@ class CAlert extends CZBXAPI{
 
 				if(isset($alert['userid']))
 					$userids[$alert['userid']] = $alert['userid'];
-
+				if(isset($alert['hostid']))
+					$hostids[$alert['hostid']] = $alert['hostid'];
 				if(isset($alert['mediatypeid']))
 					$mediatypeids[$alert['mediatypeid']] = $alert['mediatypeid'];
 

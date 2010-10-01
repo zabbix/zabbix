@@ -33,7 +33,6 @@ class CDCheck extends CZBXAPI{
 		$result = array();
 		$nodeCheck = false;
 		$user_type = $USER_DETAILS['type'];
-		$userid = $USER_DETAILS['userid'];
 
 		$sort_columns = array('dcheckid', 'druleid'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM); // allowed output options for [ select_* ] params
@@ -237,8 +236,6 @@ class CDCheck extends CZBXAPI{
 //-------
 
 
-		$dserviceids = array();
-
 		$sql_parts['select'] = array_unique($sql_parts['select']);
 		$sql_parts['from'] = array_unique($sql_parts['from']);
 		$sql_parts['where'] = array_unique($sql_parts['where']);
@@ -344,6 +341,7 @@ Copt::memoryPick();
 				if(!is_null($options['limitSelects'])) order_result($drules, 'name');
 				foreach($drules as $druleid => $drule){
 					unset($drules[$druleid]['dchecks']);
+					$count = array();
 					foreach($drule['dchecks'] as $dnum => $dcheck){
 						if(!is_null($options['limitSelects'])){
 							if(!isset($count[$dcheck['dcheckid']])) $count[$dcheck['dcheckid']] = 0;

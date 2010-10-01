@@ -235,7 +235,6 @@ class CHistory extends CZBXAPI{
 
 
 		$itemids = array();
-		$triggerids = array();
 
 		$sql_parts['select'] = array_unique($sql_parts['select']);
 		$sql_parts['from'] = array_unique($sql_parts['from']);
@@ -270,7 +269,6 @@ class CHistory extends CZBXAPI{
 					$result[$count] = array('itemid' => $data['itemid']);
 				}
 				else{
-
 // hostids
 					if(isset($data['hostid'])){
 						if(!isset($result[$count]['hosts'])) $result[$count]['hosts'] = array();
@@ -278,7 +276,6 @@ class CHistory extends CZBXAPI{
 						$result[$count]['hosts'][] = array('hostid' => $data['hostid']);
 						unset($data['hostid']);
 					}
-
 // triggerids
 					if(isset($data['triggerid'])){
 						if(!isset($result[$count]['triggers'])) $result[$count]['triggers'] = array();
@@ -286,7 +283,6 @@ class CHistory extends CZBXAPI{
 						$result[$count]['triggers'][] = array('triggerid' => $data['triggerid']);
 						unset($data['triggerid']);
 					}
-
 // itemids
 //					if(isset($data['itemid']) && !is_null($options['itemids'])){
 //						if(!isset($result[$count]['items'])) $result[$count]['items'] = array();

@@ -724,6 +724,7 @@ Copt::memoryPick();
 				if(!is_null($options['limitSelects'])) order_result($templates, 'host');
 				foreach($templates as $templateid => $template){
 					unset($templates[$templateid]['hosts']);
+					$count = array();
 					foreach($template['hosts'] as $hnum => $host){
 						if(!is_null($options['limitSelects'])){
 							if(!isset($count[$host['hostid']])) $count[$host['hostid']] = 0;
@@ -1690,7 +1691,7 @@ Copt::memoryPick();
 					self::exception(ZBX_API_ERROR_PERMISSIONS, 'You do not have enough rights for operation');
 				}
 			}
-			
+
 			if(isset($data['groups'])){
 				$options = array(
 					'hosts' => $data['hosts'],

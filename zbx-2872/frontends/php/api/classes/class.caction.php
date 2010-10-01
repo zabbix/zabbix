@@ -501,7 +501,6 @@ COpt::memoryPick();
  */
 	public static function create($actions){
 		$actions = zbx_toArray($actions);
-		$insert = array();
 		$conditions = array();
 		$operations = array();
 
@@ -730,7 +729,7 @@ COpt::memoryPick();
 /**
  * add operations
  *
- * @param _array $operations multidimensional array with operations data
+ * @param array $operations multidimensional array with operations data
  * @param array $operations[0,...]['actionid']
  * @param array $operations[0,...]['operationtype']
  * @param array $operations[0,...]['object']

@@ -366,7 +366,7 @@ Copt::memoryPick();
  * @since 1.8
  * @version 1
  *
- * @param _array $user_data
+ * @param array $user_data
  * @param array $user_data['alias'] User alias
  * @return string|boolean
  */
@@ -1001,16 +1001,11 @@ Copt::memoryPick();
 	public static function updateMedia($media_data){
 		global $USER_DETAILS;
 
-		$errors = array();
-
-		$result = false;
-		$transaction = false;
-
 		$new_medias = zbx_toArray($media_data['medias']);
 		$users = zbx_toArray($media_data['users']);
 
 		try{
-			$transaction = self::BeginTransaction(__METHOD__);
+			self::BeginTransaction(__METHOD__);
 
 			if($USER_DETAILS['type'] < USER_TYPE_ZABBIX_ADMIN){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_CUSER_ERROR_ONLY_ADMIN_CAN_CHANGE_USER_MEDIAS);
@@ -1075,11 +1070,11 @@ Copt::memoryPick();
 				}
 			}
 
-			$result = self::EndTransaction($result, __METHOD__);
+			self::EndTransaction(true, __METHOD__);
 			return array('userids'=>$userids);
 		}
 		catch(APIException $e){
-			if($transaction) self::EndTransaction(false, __METHOD__);
+			self::EndTransaction(false, __METHOD__);
 
 			$error = $e->getErrors();
 			$error = reset($error);
@@ -1220,7 +1215,6 @@ Copt::memoryPick();
 					break;
 				case ZBX_AUTH_INTERNAL:
 				default:
-					$alt_auth = ZBX_AUTH_INTERNAL;
 					$login = true;
 			}
 		}
@@ -1289,7 +1283,6 @@ Copt::memoryPick();
  * @return boolean
  */
 	public static function simpleAuth($sessionid){
-		global	$PHP_AUTH_USER,$PHP_AUTH_PW;
 		global	$USER_DETAILS;
 		global	$ZBX_LOCALNODEID;
 		global	$ZBX_NODES;
@@ -1345,8 +1338,6 @@ Copt::memoryPick();
  * @return boolean
  */
 	public static function checkAuthentication($user=null){
-		global	$page;
-		global	$PHP_AUTH_USER,$PHP_AUTH_PW;
 		global	$USER_DETAILS;
 		global	$ZBX_LOCALNODEID;
 		global	$ZBX_NODES;

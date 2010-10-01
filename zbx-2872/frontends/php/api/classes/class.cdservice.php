@@ -74,7 +74,6 @@ class CDService extends CZBXAPI{
 		$result = array();
 		$nodeCheck = false;
 		$user_type = $USER_DETAILS['type'];
-		$userid = $USER_DETAILS['userid'];
 
 		$sort_columns = array('dserviceid', 'dhostid'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM); // allowed output options for [ select_* ] params
@@ -179,7 +178,7 @@ class CDService extends CZBXAPI{
 			if($options['output'] != API_OUTPUT_SHORTEN){
 				$sql_parts['select']['dcheckid'] = 'dc.dcheckid';
 			}
-			
+
 			$sql_parts['from']['dhosts'] = 'dhosts dh';
 			$sql_parts['from']['dchecks'] = 'dchecks dc';
 
@@ -407,6 +406,7 @@ Copt::memoryPick();
 				if(!is_null($options['limitSelects'])) order_result($drules, 'name');
 				foreach($drules as $druleid => $drule){
 					unset($drules[$druleid]['dservices']);
+					$count = array();
 					foreach($drule['dservices'] as $dnum => $dservice){
 						if(!is_null($options['limitSelects'])){
 							if(!isset($count[$dservice['dserviceid']])) $count[$dservice['dserviceid']] = 0;
@@ -575,91 +575,6 @@ Copt::memoryPick();
 		$objs = self::get($options);
 
 	return !empty($objs);
-	}
-
-/**
- * Add Service
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $dservices multidimensional array with Services data
- */
-	public static function create($dservices){
-		$errors = array();
-		$dservices = zbx_toArray($dservices);
-		$dserviceids = array();
-		$groupids = array();
-		$result = false;
-
-		if($result){
-			return array('dserviceids' => $dserviceids);
-		}
-		else{
-			self::setMethodErrors(__METHOD__, $errors);
-			return false;
-		}
-	}
-
-/**
- * Update DService
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $dservices multidimensional array with Services data
- */
-	public static function update($dservices){
-		$errors = array();
-		$result = true;
-
-		$dservices = zbx_toArray($dservices);
-		$dserviceids = zbx_objectValues($dservices, 'hostid');
-
-		try{
-			return array('dserviceids' => $dserviceids);
-		}
-		catch(APIException $e){
-			if(isset($transaction)) self::EndTransaction(false, __METHOD__);
-
-			$error = $e->getErrors();
-			$error = reset($error);
-
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
-	}
-
-/**
- * Delete Discovered Service
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param array $dservices
- * @param array $dservices[0, ...]['hostid'] Service ID to delete
- * @return array|boolean
- */
-	public static function delete($dservices){
-		$dservices = zbx_toArray($dservices);
-		$dserviceids = array();
-
-		if($result){
-			return array('hostids' => $dserviceids);
-		}
-		else{
-			self::setError(__METHOD__);
-			return false;
-		}
 	}
 
 }

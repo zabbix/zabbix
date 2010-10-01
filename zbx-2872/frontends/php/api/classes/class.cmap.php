@@ -502,9 +502,7 @@ COpt::memoryPick();
  * @return boolean | array
  */
 	public static function create($maps){
-		$errors = array();
 		$sysmapids = array();
-		$result = true;
 
 		$maps = zbx_toArray($maps);
 
@@ -524,7 +522,6 @@ COpt::memoryPick();
 			}
 //--
 
-			$data_insert = array();
 			foreach($maps as $mnum => $map){
 				if($map['markelements'] == 1) $map['highlight'] = $map['highlight'] | ZBX_MAP_MARKELEMENTS;
 				if($map['expandproblem'] == 0) $map['highlight'] = $map['highlight'] | ZBX_MAP_EXPANDPROBLEM;
@@ -562,7 +559,7 @@ COpt::memoryPick();
 				$data_map[] = $map;
 			}
 			$sysmapids = DB::insert('sysmaps', $data_map);
-			
+
 			$data_elements = array();
 
 			$sysmapid = reset($sysmapids);
@@ -577,7 +574,7 @@ COpt::memoryPick();
 				$sysmapid = next($sysmapids);
 			}
 
-			$selements = self::addElements($data_elements);
+			self::addElements($data_elements);
 			self::EndTransaction(true, __METHOD__);
 
 			return array('sysmapids' => $sysmapids);
@@ -698,7 +695,6 @@ COpt::memoryPick();
  */
 	public static function delete($sysmapids){
 		$result = true;
-		$errors = array();
 
 		try{
 			self::BeginTransaction(__METHOD__);

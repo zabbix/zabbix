@@ -40,7 +40,6 @@ class CDRule extends CZBXAPI{
 		$result = array();
 		$nodeCheck = false;
 		$user_type = $USER_DETAILS['type'];
-		$userid = $USER_DETAILS['userid'];
 		$result = array();
 
 		$sort_columns = array('druleid','name'); // allowed columns for sorting
@@ -65,7 +64,7 @@ class CDRule extends CZBXAPI{
 			'selectDHosts'			=> null,
 			'selectDServices'		=> null,
 			'selectDChecks'			=> null,
-			
+
 // filter
 			'filter'					=> null,
 			'search'					=> null,
@@ -271,11 +270,9 @@ class CDRule extends CZBXAPI{
 					if(!is_null($options['selectDHosts']) && !isset($result[$drule['druleid']]['dhosts'])){
 						$result[$drule['druleid']]['dhosts'] = array();
 					}
-
 					if(!is_null($options['selectDChecks']) && !isset($result[$drule['druleid']]['dchecks'])){
 						$result[$drule['druleid']]['dchecks'] = array();
 					}
-
 					if(!is_null($options['selectDServices']) && !isset($result[$drule['druleid']]['dservices'])){
 						$result[$drule['druleid']]['dservices'] = array();
 					}
@@ -337,6 +334,7 @@ COpt::memoryPick();
 				if(!is_null($options['limitSelects'])) order_result($dchecks, 'name');
 				foreach($dchecks as $dcheckid => $dcheck){
 					unset($dchecks[$dcheckid]['dhosts']);
+					$count = array();
 					foreach($dcheck['dhosts'] as $dnum => $dhost){
 						if(!is_null($options['limitSelects'])){
 							if(!isset($count[$dhost['dhostid']])) $count[$dhost['dhostid']] = 0;
@@ -532,128 +530,6 @@ COpt::memoryPick();
 			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
 		}
-	}
-
-// DEPRECATED
-	public static function addChecks($checks){
-
-		$error = 'Unknown Zabbix internal error';
-		$result_ids = array();
-		$result = false;
-		$tpl_drule = false;
-
-		$druleid = $checks['druleid'];
-		$checks_tmp = $checks['checks'];
-		$checks = array();
-		$checkids = array();
-
-		foreach($checks_tmp as $check){
-
-			$drule_db_fields = array(
-				'checkid'	=> null,
-				'color'		=> '000000',
-				'drawtype'	=> 0,
-				'sortorder'	=> 0,
-				'yaxisside'	=> 1,
-				'calc_fnc'	=> 2,
-				'type'		=> 0,
-				'periods_cnt'	=> 5
-			);
-
-			if(!check_db_fields($drule_db_fields, $check)){
-				self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Wrong fields for check [ '.$check['checkid'].' ]');
-				return false;
-			}
-			$checks[$check['checkid']] = $check;
-			$checkids[$check['checkid']] = $check['checkid'];
-		}
-
-// check if drule is templated drule, then checks cannot be added
-		$drule = self::get(array('druleids' => $druleid,  'extendoutput' => 1));
-		$drule = reset($drule);
-
-		if($drule['templateid'] != 0){
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Cannot edit templated drule : '.$drule['name']);
-			return false;
-		}
-
-		// check if drule belongs to template, if so, only checks from same template can be added
-		$tmp_hosts = get_hosts_by_druleid($druleid);
-		$host = DBfetch($tmp_hosts); // if drule belongs to template, only one host is possible
-
-		if($host["status"] == HOST_STATUS_TEMPLATE ){
-			$sql = 'SELECT DISTINCT count(i.hostid) as count
-					FROM checks i
-					WHERE i.hostid<>'.$host['hostid'].
-						' AND '.DBcondition('i.checkid', $checkids);
-
-			$host_count = DBfetch(DBselect($sql));
-			if ($host_count['count']){
-				self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'You must use checks only from host : '.$host['host'].' for template drule : '.$drule['name']);
-				return false;
-			}
-			$tpl_drule = true;
-		}
-
-		self::BeginTransaction(__METHOD__);
-		$result = self::addchecks_rec($druleid, $checks, $tpl_drule);
-		$result = self::EndTransaction($result, __METHOD__);
-
-		if($result){
-			return $result;
-		}
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);//'Internal Zabbix error');
-			return false;
-		}
-	}
-
-// DEPRECATED
-	public static function deleteChecks($check_list, $force=false){
-		$error = 'Unknown Zabbix internal error';
-		$result = true;
-
-		$druleid = $check_list['druleid'];
-		$checks = $check_list['checks'];
-
-		if(!$force){
-			// check if drule is templated drule, then checks cannot be deleted
-			$drule = self::get(array('druleids' => $druleid,  'extendoutput' => 1));
-			$drule = reset($drule);
-
-			if($drule['templateid'] != 0){
-				self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Cannot edit templated drule : '.$drule['name']);
-				return false;
-			}
-		}
-
-		$chd_drules = get_drules_by_templateid($druleid);
-		while($chd_drule = DBfetch($chd_drules)){
-			$check_list['druleid'] = $chd_drule['druleid'];
-			$result = self::deletechecks($check_list, true);
-			if(!$result) return false;
-		}
-
-
-		$sql = 'SELECT curr.checkid
-				FROM drules_checks gi, checks curr, checks src
-				WHERE gi.druleid='.$druleid.
-					' AND gi.checkid=curr.checkid
-					AND curr.key_=src.key_
-					AND '.DBcondition('src.checkid', $checks);
-		$db_checks = DBselect($sql);
-		$gchecks = array();
-		while($curr_check = DBfetch($db_checks)){
-			$gchecks[$curr_check['checkid']] = $curr_check['checkid'];
-		}
-
-		$sql = 'DELETE
-				FROM drules_checks
-				WHERE druleid='.$druleid.
-					' AND '.DBcondition('checkid', $gchecks);
-		$result = DBselect($sql);
-
-		return $result;
 	}
 
 }

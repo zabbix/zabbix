@@ -53,7 +53,6 @@ class CProxy extends CZBXAPI{
 
 		$result = array();
 		$user_type = $USER_DETAILS['type'];
-		$userid = $USER_DETAILS['userid'];
 
 		$sort_columns = array('hostid', 'host', 'status'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
@@ -82,7 +81,7 @@ class CProxy extends CZBXAPI{
 			'output'					=> API_OUTPUT_REFER,
 			'countOutput'				=> null,
 			'preservekeys'				=> null,
-			
+
 			'select_hosts'				=> null,
 
 			'sortfield'					=> '',
@@ -197,7 +196,7 @@ class CProxy extends CZBXAPI{
 				}
 				else{
 					if(!isset($result[$proxy['proxyid']])) $result[$proxy['proxyid']]= array();
-					
+
 					if(!is_null($options['select_hosts']) && !isset($result[$proxy['proxyid']]['hosts'])){
 						$result[$proxy['proxyid']]['hosts'] = array();
 					}
@@ -238,6 +237,6 @@ class CProxy extends CZBXAPI{
 
 	return $result;
 	}
-	
+
 }
 ?>

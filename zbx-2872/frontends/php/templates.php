@@ -280,6 +280,7 @@ include_once('include/page_header.php');
 	}
 // save
 	else if(isset($_REQUEST['save'])){
+
 		$groups = get_request('groups', array());
 		$hosts = get_request('hosts', array());
 		$templates = get_request('templates', array());
@@ -323,7 +324,11 @@ include_once('include/page_header.php');
 		$templates_clear = zbx_toObject($templates_clear, 'templateid');
 
 		$hosts = zbx_toObject($hosts, 'hostid');
-		$macros = array_filter(get_request('macros', array()), 'zbx_empty');
+
+		$macros = get_request('macros', array());
+		foreach($macros as $mnum => $macro){
+			if(zbx_empty($macro['value'])) unset($macros[$mnum]);
+		}
 
 		$template = array(
 			'host' => $template_name,
@@ -332,6 +337,7 @@ include_once('include/page_header.php');
 			'hosts' => $hosts,
 			'macros' => $macros
 		);
+
 // CREATE/UPDATE TEMPLATE {{{
 		if($templateid){
 			$template['templateid'] = $templateid;

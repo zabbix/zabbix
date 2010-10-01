@@ -74,7 +74,6 @@ class CDHost extends CZBXAPI{
 		$result = array();
 		$nodeCheck = false;
 		$user_type = $USER_DETAILS['type'];
-		$userid = $USER_DETAILS['userid'];
 
 		$sort_columns = array('dhostid', 'druleid'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM); // allowed output options for [ select_* ] params
@@ -429,6 +428,7 @@ Copt::memoryPick();
 				if(!is_null($options['limitSelects'])) order_result($drules, 'name');
 				foreach($drules as $druleid => $drule){
 					unset($drules[$druleid]['dhosts']);
+					$count = array();
 					foreach($drule['dhosts'] as $dnum => $dhost){
 						if(!is_null($options['limitSelects'])){
 							if(!isset($count[$dhost['dhostid']])) $count[$dhost['dhostid']] = 0;
@@ -632,7 +632,6 @@ Copt::memoryPick();
 		$errors = array();
 		$dhosts = zbx_toArray($dhosts);
 		$dhostids = array();
-		$groupids = array();
 		$result = false;
 
 		if($result){
@@ -656,9 +655,6 @@ Copt::memoryPick();
  * @param _array $dhosts multidimensional array with Hosts data
  */
 	public static function update($dhosts){
-		$errors = array();
-		$result = true;
-
 		$dhosts = zbx_toArray($dhosts);
 		$dhostids = zbx_objectValues($dhosts, 'hostid');
 
@@ -666,38 +662,12 @@ Copt::memoryPick();
 			return array('dhostids' => $dhostids);
 		}
 		catch(APIException $e){
-			if(isset($transaction)) self::EndTransaction(false, __METHOD__);
+			self::EndTransaction(false, __METHOD__);
 
 			$error = $e->getErrors();
 			$error = reset($error);
 
 			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
-	}
-
-/**
- * Delete Discovered Host
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param array $dhosts
- * @param array $dhosts[0, ...]['hostid'] Host ID to delete
- * @return array|boolean
- */
-	public static function delete($dhosts){
-		$dhosts = zbx_toArray($dhosts);
-		$dhostids = array();
-
-		if($result){
-			return array('hostids' => $dhostids);
-		}
-		else{
-			self::setError(__METHOD__);
 			return false;
 		}
 	}

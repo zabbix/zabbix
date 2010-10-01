@@ -477,8 +477,6 @@ class CScript extends CZBXAPI{
 			return false;
 		}
 
-		$scripts = zbx_toArray($scriptids);
-
 		try{
 			self::BeginTransaction(__METHOD__);
 

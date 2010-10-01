@@ -342,8 +342,6 @@ class CEvent extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$distinct = (count($sql_parts['from']) > 1)?'DISTINCT':'';
-
 		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.
 				' FROM '.$sql_from.
 				' WHERE '.$sql_where.
@@ -698,8 +696,8 @@ Copt::memoryPick();
 				'preservekeys' => 1
 			);
 			$allowedEvents = self::get($options);
-			foreach($events as $num => $event){
-				if(!isset($allowedEvents[$event['eventid']])){
+			foreach($eventids as $num => $eventid){
+				if(!isset($allowedEvents[$eventid])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
 				}
 			}
@@ -751,8 +749,6 @@ Copt::memoryPick();
 			if(!DBexecute($sql)) self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 
 			$time = time();
-			$message = zbx_dbstr($data['message']);
-
 			$dataInsert = array();
 			foreach($eventids as $enum => $eventid){
 				$dataInsert[] = array(
@@ -763,7 +759,7 @@ Copt::memoryPick();
 				);
 			}
 
-			$acknowledgeids = DB::insert('acknowledges', $dataInsert);
+			DB::insert('acknowledges', $dataInsert);
 
 			self::EndTransaction(true, __METHOD__);
 

@@ -892,6 +892,7 @@ class CUserMacro extends CZBXAPI{
 			);
 			$db_macros = self::get($options);
 
+			$existing_macros = array();
 			foreach($db_macros as $dbnum => $db_macro){
 				if(!isset($existing_macros[$db_macro['macro']])) $existing_macros[$db_macro['macro']] = array();
 				$existing_macros[$db_macro['macro']][$db_macro['hostid']] = $db_macro;

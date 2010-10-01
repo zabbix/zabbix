@@ -502,7 +502,11 @@ include_once('include/page_header.php');
 				else throw new Exception();
 			}
 			$groups = zbx_toObject($groups, 'groupid');
-			$macros = array_filter(get_request('macros', array()), 'zbx_empty');
+
+			$macros = get_request('macros', array());
+			foreach($macros as $mnum => $macro){
+				if(zbx_empty($macro['value'])) unset($macros[$mnum]);
+			}
 
 			$host = array(
 				'host' => $_REQUEST['host'],
