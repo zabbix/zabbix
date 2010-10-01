@@ -280,15 +280,6 @@ int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	return ret;
 }
 
-int	NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	assert(result);
-
-	init_result(result);
-
-	return SYSINFO_RET_FAIL;
-}
-
 int	NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	struct net_stat_s	ns;
@@ -317,6 +308,118 @@ int	NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_
 	{
 		SET_UI64_RESULT(result, ns.colls);
 	}
+
+	return ret;
+}
+
+int	NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	FILE		*f = NULL;
+	char		tmp[MAX_STRING_LEN], pattern[64];
+	unsigned short	port;
+	zbx_uint64_t	listen = 0;
+	int		ret = SYSINFO_RET_FAIL;
+
+	if (num_param(param) > 1)
+		return ret;
+
+	if (0 != get_param(param, 1, tmp, sizeof(tmp)))
+		return ret;
+
+	if (SUCCEED != is_ushort(tmp, &port))
+		return ret;
+
+	if (NULL != (f = fopen("/proc/net/tcp", "r")))
+	{
+		zbx_snprintf(pattern, sizeof(pattern), "%04X 00000000:0000 0A", (unsigned int)port);
+
+		while (NULL != fgets(tmp, sizeof(tmp), f))
+		{
+			if (NULL != strstr(tmp, pattern))
+			{
+				listen = 1;
+				break;
+			}
+		}
+		zbx_fclose(f);
+
+		ret = SYSINFO_RET_OK;
+	}
+
+	if (0 == listen && NULL != (f = fopen("/proc/net/tcp6", "r")))
+	{
+		zbx_snprintf(pattern, sizeof(pattern), "%04X 00000000000000000000000000000000:0000 0A", (unsigned int)port);
+
+		while (NULL != fgets(tmp, sizeof(tmp), f))
+		{
+			if (NULL != strstr(tmp, pattern))
+			{
+				listen = 1;
+				break;
+			}
+		}
+		zbx_fclose(f);
+
+		ret = SYSINFO_RET_OK;
+	}
+
+	SET_UI64_RESULT(result, listen);
+
+	return ret;
+}
+
+int	NET_UDP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	FILE		*f = NULL;
+	char		tmp[MAX_STRING_LEN], pattern[64];
+	unsigned short	port;
+	zbx_uint64_t	listen = 0;
+	int		ret = SYSINFO_RET_FAIL;
+
+	if (num_param(param) > 1)
+		return ret;
+
+	if (0 != get_param(param, 1, tmp, sizeof(tmp)))
+		return ret;
+
+	if (SUCCEED != is_ushort(tmp, &port))
+		return ret;
+
+	if (NULL != (f = fopen("/proc/net/udp", "r")))
+	{
+		zbx_snprintf(pattern, sizeof(pattern), "%04X 00000000:0000 07", (unsigned int)port);
+
+		while (NULL != fgets(tmp, sizeof(tmp), f))
+		{
+			if (NULL != strstr(tmp, pattern))
+			{
+				listen = 1;
+				break;
+			}
+		}
+		zbx_fclose(f);
+
+		ret = SYSINFO_RET_OK;
+	}
+
+	if (0 == listen && NULL != (f = fopen("/proc/net/udp6", "r")))
+	{
+		zbx_snprintf(pattern, sizeof(pattern), "%04X 00000000000000000000000000000000:0000 07", (unsigned int)port);
+
+		while (NULL != fgets(tmp, sizeof(tmp), f))
+		{
+			if (NULL != strstr(tmp, pattern))
+			{
+				listen = 1;
+				break;
+			}
+		}
+		zbx_fclose(f);
+
+		ret = SYSINFO_RET_OK;
+	}
+
+	SET_UI64_RESULT(result, listen);
 
 	return ret;
 }
