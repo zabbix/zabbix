@@ -321,8 +321,18 @@ return $table;
 
 function make_small_eventlist($eventid, $trigger_data){
 
+	//getting current cunfiguration settings
+	$config = select_config();
+
 	$table = new CTableInfo();
-	$table->setHeader(array(S_TIME, S_STATUS, S_DURATION, S_AGE, S_ACK, S_ACTIONS));
+
+	//if we need to chow acks
+	if ($config['event_ack_enable']) {
+		$table->setHeader(array(S_TIME, S_STATUS, S_DURATION, S_AGE, S_ACK, S_ACTIONS));
+	}
+	else {
+		$table->setHeader(array(S_TIME, S_STATUS, S_DURATION, S_AGE, S_ACTIONS));
+	}
 
 	$options = array(
 		'eventids' => $eventid,
@@ -363,34 +373,57 @@ function make_small_eventlist($eventid, $trigger_data){
 
 		$value = new CCol(trigger_value2str($event['value']), get_trigger_value_style($event['value']));
 
-		$ack = new CSpan(S_NO, 'on');
-		if(1 == $event['acknowledged']){
-			$db_acks = get_acknowledges_by_eventid($event['eventid']);
-			$rows=0;
-			while($a=DBfetch($db_acks))	$rows++;
+		//if acknowledges are not disabled by confuguration, let's show them
+		if ($config['event_ack_enable']) {
+			$ack = new CSpan(S_NO, 'on');
+			if(1 == $event['acknowledged']){
+				$db_acks = get_acknowledges_by_eventid($event['eventid']);
+				$rows=0;
+				while($a=DBfetch($db_acks))	$rows++;
 
-			$ack=array(
-				new CLink(new CSpan(S_YES,'off'),'acknow.php?eventid='.$event['eventid']),
-				SPACE.'('.$rows.')'
-			);
+
+					$ack=array(
+						new CLink(new CSpan(S_YES,'off'),'acknow.php?eventid='.$event['eventid']),
+						SPACE.'('.$rows.')'
+					);
+			}
+		}
+		else
+		{
+			$ack = '';
 		}
 
 //actions
 		$actions = get_event_actions_stat_hints($event['eventid']);
 //--------
 
-		$table->addRow(array(
-			new CLink(
-				zbx_date2str(S_EVENTS_SMALL_EVENT_LIST_DATE_FORMAT,$event['clock']),
-				'tr_events.php?triggerid='.$trigger_data['triggerid'].'&eventid='.$event['eventid'],
-				'action'
-			),
-			$value,
-			$duration,
-			zbx_date2age($event['clock']),
-			$ack,
-			$actions
-		));
+		if ($config['event_ack_enable']) {
+			$table->addRow(array(
+				new CLink(
+					zbx_date2str(S_EVENTS_SMALL_EVENT_LIST_DATE_FORMAT,$event['clock']),
+					'tr_events.php?triggerid='.$trigger_data['triggerid'].'&eventid='.$event['eventid'],
+					'action'
+				),
+				$value,
+				$duration,
+				zbx_date2age($event['clock']),
+				$ack,
+				$actions
+			));
+		}
+		else {
+			$table->addRow(array(
+				new CLink(
+					zbx_date2str(S_EVENTS_SMALL_EVENT_LIST_DATE_FORMAT,$event['clock']),
+					'tr_events.php?triggerid='.$trigger_data['triggerid'].'&eventid='.$event['eventid'],
+					'action'
+				),
+				$value,
+				$duration,
+				zbx_date2age($event['clock']),
+				$actions
+			));
+		}
 	}
 
 return $table;
