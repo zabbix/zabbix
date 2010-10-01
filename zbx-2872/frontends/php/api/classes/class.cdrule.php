@@ -496,15 +496,14 @@ COpt::memoryPick();
  * @param array $drules['druleids']
  * @return boolean
  */
-	public static function delete($drules){
-		$drules = zbx_toArray($drules);
+	public static function delete($druleids){
+		$druleids = zbx_toArray($druleids);
 
 		try{
 			self::BeginTransaction(__METHOD__);
-
-			$druleids = array();
+// permissions
 			$options = array(
-				'druleids' => zbx_objectValues($drules, 'druleid'),
+				'druleids' => $druleids,
 				'editable' => 1,
 				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => 1
@@ -513,12 +512,33 @@ COpt::memoryPick();
 			foreach($drules as $gnum => $drule){
 				if(!isset($del_drules[$drule['druleid']]))
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-
-				$druleids[] = $drule['druleid'];
+			}
+//----
+//
+// Conditions
+			$sql = 'SELECT DISTINCT actionid, name '.
+					' FROM conditions '.
+					' WHERE conditiontype='.CONDITION_TYPE_DRULE.
+						' AND value='.zbx_dbstr($druleids);
+			$db_actions = DBselect($sql);
+			while($db_action = DBfetch($db_actions)){
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'Discovery rule is used in Action condition ['.$db_action['name'].'].');
 			}
 
-			if(!delete_drule($druleids))
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete Discoverys');
+
+			$dhostids = array();
+			$sql = 'select dhostid '.
+					' from dhosts'.
+					' where '.DBcondition('druleid',$druleids).
+						' and '.DBin_node('dhostid');
+			$db_dhosts = DBselect($sql);
+			while($db_dhost = DBfetch($db_dhosts))
+				$dhostids[$db_dhost['dhostid']] = $db_dhost['dhostid'];
+
+			DBexecute('DELETE FROM dservices WHERE '.DBcondition('dhostid',$dhostids));
+			DBexecute('DELETE FROM dhosts WHERE '.DBcondition('druleid',$druleids));
+			DBexecute('DELETE FROM dchecks WHERE '.DBcondition('druleid',$druleids));
+			DBexecute('DELETE FROM drules WHERE '.DBcondition('druleid',$druleids));
 
 			self::EndTransaction(true, __METHOD__);
 			return array('druleids' => $druleids);
