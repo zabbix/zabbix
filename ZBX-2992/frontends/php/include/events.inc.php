@@ -326,13 +326,16 @@ function make_small_eventlist($eventid, $trigger_data){
 
 	$table = new CTableInfo();
 
-	//if we need to chow acks
-	if ($config['event_ack_enable']) {
-		$table->setHeader(array(S_TIME, S_STATUS, S_DURATION, S_AGE, S_ACK, S_ACTIONS));
-	}
-	else {
-		$table->setHeader(array(S_TIME, S_STATUS, S_DURATION, S_AGE, S_ACTIONS));
-	}
+	
+	$table->setHeader(array(
+		S_TIME,
+		S_STATUS,
+		S_DURATION,
+		S_AGE,
+		($config['event_ack_enable'] ? S_ACK : null), //if we need to chow acks
+		S_ACTIONS
+	));
+
 
 	$options = array(
 		'eventids' => $eventid,
@@ -388,42 +391,23 @@ function make_small_eventlist($eventid, $trigger_data){
 					);
 			}
 		}
-		else
-		{
-			$ack = '';
-		}
 
 //actions
 		$actions = get_event_actions_stat_hints($event['eventid']);
 //--------
 
-		if ($config['event_ack_enable']) {
-			$table->addRow(array(
-				new CLink(
-					zbx_date2str(S_EVENTS_SMALL_EVENT_LIST_DATE_FORMAT,$event['clock']),
-					'tr_events.php?triggerid='.$trigger_data['triggerid'].'&eventid='.$event['eventid'],
-					'action'
-				),
-				$value,
-				$duration,
-				zbx_date2age($event['clock']),
-				$ack,
-				$actions
-			));
-		}
-		else {
-			$table->addRow(array(
-				new CLink(
-					zbx_date2str(S_EVENTS_SMALL_EVENT_LIST_DATE_FORMAT,$event['clock']),
-					'tr_events.php?triggerid='.$trigger_data['triggerid'].'&eventid='.$event['eventid'],
-					'action'
-				),
-				$value,
-				$duration,
-				zbx_date2age($event['clock']),
-				$actions
-			));
-		}
+		$table->addRow(array(
+			new CLink(
+				zbx_date2str(S_EVENTS_SMALL_EVENT_LIST_DATE_FORMAT,$event['clock']),
+				'tr_events.php?triggerid='.$trigger_data['triggerid'].'&eventid='.$event['eventid'],
+				'action'
+			),
+			$value,
+			$duration,
+			zbx_date2age($event['clock']),
+			($config['event_ack_enable'] ? $ack : null),
+			$actions
+		));
 	}
 
 return $table;
