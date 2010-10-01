@@ -529,35 +529,6 @@ Copt::memoryPick();
 	return $result;
 	}
 
-/**
- * Get DService ID by DService fields
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $dservice_data
- * @param string $dservice_data['host']
- * @return int|boolean
- */
-	public static function getObjects($dserviceData){
-		$options = array(
-			'filter' => $dserviceData,
-			'output'=>API_OUTPUT_EXTEND
-		);
-
-		if(isset($dserviceData['node']))
-			$options['nodeids'] = getNodeIdByNodeName($dserviceData['node']);
-		else if(isset($dserviceData['nodeids']))
-			$options['nodeids'] = $dserviceData['nodeids'];
-
-		$result = self::get($options);
-
-	return $result;
-	}
-
 	public static function exists($object){
 		$keyFields = array(array('dserviceid'));
 
@@ -575,6 +546,91 @@ Copt::memoryPick();
 		$objs = self::get($options);
 
 	return !empty($objs);
+	}
+
+/**
+ * Add Service
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $dservices multidimensional array with Services data
+ */
+	public static function create($dservices){
+		$errors = array();
+		$dservices = zbx_toArray($dservices);
+		$dserviceids = array();
+		$groupids = array();
+		$result = false;
+
+		if($result){
+			return array('dserviceids' => $dserviceids);
+		}
+		else{
+			self::setMethodErrors(__METHOD__, $errors);
+			return false;
+		}
+	}
+
+/**
+ * Update DService
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $dservices multidimensional array with Services data
+ */
+	public static function update($dservices){
+		$errors = array();
+		$result = true;
+
+		$dservices = zbx_toArray($dservices);
+		$dserviceids = zbx_objectValues($dservices, 'hostid');
+
+		try{
+			return array('dserviceids' => $dserviceids);
+		}
+		catch(APIException $e){
+			if(isset($transaction)) self::EndTransaction(false, __METHOD__);
+
+			$error = $e->getErrors();
+			$error = reset($error);
+
+			self::setError(__METHOD__, $e->getCode(), $error);
+			return false;
+		}
+	}
+
+/**
+ * Delete Discovered Service
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param array $dservices
+ * @param array $dservices[0, ...]['hostid'] Service ID to delete
+ * @return array|boolean
+ */
+	public static function delete($dservices){
+		$dservices = zbx_toArray($dservices);
+		$dserviceids = array();
+
+		if($result){
+			return array('hostids' => $dserviceids);
+		}
+		else{
+			self::setError(__METHOD__);
+			return false;
+		}
 	}
 
 }

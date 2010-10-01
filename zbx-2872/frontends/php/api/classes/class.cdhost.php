@@ -569,35 +569,6 @@ Copt::memoryPick();
 	return $result;
 	}
 
-/**
- * Get DHost ID by DHost fields
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $dhost_data
- * @param string $dhost_data['host']
- * @return int|boolean
- */
-	public static function getObjects($dhostData){
-		$options = array(
-			'filter' => $dhostData,
-			'output'=>API_OUTPUT_EXTEND
-		);
-
-		if(isset($dhostData['node']))
-			$options['nodeids'] = getNodeIdByNodeName($dhostData['node']);
-		else if(isset($dhostData['nodeids']))
-			$options['nodeids'] = $dhostData['nodeids'];
-
-		$result = self::get($options);
-
-	return $result;
-	}
-
 	public static function exists($object){
 		$keyFields = array(array('dhostid'));
 
@@ -672,5 +643,30 @@ Copt::memoryPick();
 		}
 	}
 
+/**
+ * Delete Discovered Host
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param array $dhosts
+ * @param array $dhosts[0, ...]['hostid'] Host ID to delete
+ * @return array|boolean
+ */
+	public static function delete($dhostids){
+		$result = false;
+		$dhostids = zbx_toArray($dhostids);
+
+		if($result){
+			return array('hostids' => $dhostids);
+		}
+		else{
+			self::setError(__METHOD__);
+			return false;
+		}
+	}
 }
 ?>
