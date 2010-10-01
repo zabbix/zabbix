@@ -3089,7 +3089,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$frmComent->addVar("triggerid",$triggerid);
 		$frmComent->addRow(S_COMMENTS,new CTextArea("comments",$trigger["comments"],100,25));
 		
-		//if user has no pertimitions to edit comments, no "save" button for him
+		//if user has no permissions to edit comments, no "save" button for him
 		$can_edit_this = true;
 		$triggers = CTrigger::get(array(
 			'editable' => 1,
