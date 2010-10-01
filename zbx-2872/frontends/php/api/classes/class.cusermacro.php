@@ -553,7 +553,7 @@ class CUserMacro extends CZBXAPI{
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 			}
 //--
-			
+
 			self::validate($macros);
 
 // Check on existing
@@ -766,7 +766,7 @@ class CUserMacro extends CZBXAPI{
 
 		$hostids = zbx_objectValues($hosts, 'hostid');
 		$templateids = zbx_objectValues($templates, 'templateid');
-		
+
 		try{
 			self::BeginTransaction(__METHOD__);
 
@@ -825,7 +825,7 @@ class CUserMacro extends CZBXAPI{
 //--
 
 			self::validate($data['macros']);
-			
+
 			$insertData = array();
 			foreach($data['macros'] as $mnum => $macro){
 				foreach($objectids as $onum => $hostid){
@@ -952,7 +952,7 @@ class CUserMacro extends CZBXAPI{
 
 		try{
 			self::BeginTransaction(__METHOD__);
-				
+
 			if(!isset($data['macros']) || empty($data['macros']))
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Not set input parameter [ macros ]');
 			else if(empty($hosts) && empty($templates))
@@ -1048,7 +1048,7 @@ class CUserMacro extends CZBXAPI{
 	public static function getMacros($macros, $options){
 		zbx_value2array($macros);
 		$result = array();
-		
+
 		$obj_options = array(
 			'itemids' => isset($options['itemid']) ? $options['itemid'] : null,
 			'triggerids' => isset($options['triggerid']) ? $options['triggerid'] : null,
@@ -1056,7 +1056,7 @@ class CUserMacro extends CZBXAPI{
 			'preservekeys' => 1,
 			'output' => API_OUTPUT_SHORTEN,
 		);
-		$hosts = CHost::get($obj_options);		
+		$hosts = CHost::get($obj_options);
 
 		do{
 			$obj_options = array(
@@ -1075,7 +1075,7 @@ class CUserMacro extends CZBXAPI{
 				$host_macros[$h['hostid']] = $hmacro;
 			}
 			ksort($host_macros);
-			
+
 			foreach($macros as $mnum => $macro){
 				foreach($host_macros as $hostid => $hmacro){
 					if($macro == $hmacro['macro']){
@@ -1097,16 +1097,16 @@ class CUserMacro extends CZBXAPI{
 			}
 		}while(!empty($macros) && !empty($hosts));
 
-		
+
 		if(!empty($macros)){
 			$obj_options = array(
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => API_OUTPUT_EXTEND,
 				'globalmacro' => 1,
 				'nopermissions' => 1,
 				'macros' => $macros
 			);
 			$gmacros = self::get($obj_options);
-		
+
 			foreach($macros as $macro){
 				foreach($gmacros as $mid => $gmacro){
 					if($macro == $gmacro['macro']){
