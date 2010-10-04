@@ -245,7 +245,6 @@ class CDHost extends CZBXAPI{
 			$sql_parts['where'][] = DBin_node('dh.dhostid', $nodeids);
 		}
 
-
 // output
 		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['dhosts'] = 'dh.*';

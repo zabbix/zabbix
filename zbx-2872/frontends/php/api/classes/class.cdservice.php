@@ -85,7 +85,8 @@ class CDService extends CZBXAPI{
 			'where' => array(),
 			'group' => array(),
 			'order' => array(),
-			'limit' => null);
+			'limit' => null
+		);
 
 		$def_options = array(
 			'nodeids'					=> null,

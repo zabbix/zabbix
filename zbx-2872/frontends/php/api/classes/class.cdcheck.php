@@ -285,10 +285,6 @@ class CDCheck extends CZBXAPI{
 						$result[$dcheck['dcheckid']]['dhosts'] = array();
 					}
 
-					if(!is_null($options['selectDChecks']) && !isset($result[$dcheck['dcheckid']]['dchecks'])){
-						$result[$dcheck['dcheckid']]['dchecks'] = array();
-					}
-
 					if(!is_null($options['selectHosts']) && !isset($result[$dcheck['dcheckid']]['hosts'])){
 						$result[$dcheck['dcheckid']]['hosts'] = array();
 					}
@@ -305,13 +301,6 @@ class CDCheck extends CZBXAPI{
 							$result[$dcheck['dcheckid']]['dhosts'] = array();
 
 						$result[$dcheck['dcheckid']]['dhosts'][] = array('dhostid' => $dcheck['dhostid']);
-					}
-// dcheckids
-					if(isset($dcheck['dcheckid']) && is_null($options['selectDChecks'])){
-						if(!isset($result[$dcheck['dcheckid']]['dchecks']))
-							$result[$dcheck['dcheckid']]['dchecks'] = array();
-
-						$result[$dcheck['dcheckid']]['dchecks'][] = array('dcheckid' => $dcheck['dcheckid']);
 					}
 
 					$result[$dcheck['dcheckid']] += $dcheck;
