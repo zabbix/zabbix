@@ -11,8 +11,9 @@ Changes for 1.9
 
 Changes for 1.8.4rc1
 
- - [ZBX-2992] acknowledges are now hidden in event details when are turned off (KB)
- - [ZBX-3050] fixed that host can be named like an existant template and oterwise (KB)
+ - [ZBX-453] fixed --disable-static enabling static compilation (asaveljevs)
+ - [ZBX-2992] acknowledges are now hidden in event details when turned off (KB)
+ - [ZBX-3050] fixed that host can be named like an existing template and otherwise (KB)
  - [ZBX-3019] fixed templated graphs not being copied to discovered hosts in DM setup; thanks to Alexander Ignatyev (asaveljevs)
  - [ZBX-2860] fixed usergroup renaming (Vedmak)
  - [ZBX-3027] avg, delta, max, min, sum functions in popup_trexpr.php have a time shift input, so that this parameter now can be specified through GUI (KB)
@@ -57,7 +58,7 @@ Changes for 1.8.4rc1
  - [ZBXNEXT-458] user macros (e.g., {$MACRO}) can now be used in item and trigger descriptions (asaveljevs,Vedmak)
  - [ZBX-2959] fixed trailing whitespace & missing trailing newline in downloaded translations (Richlv)
  - [ZBX-2910] fixed 'strerror_from_system undefined' compilation warning on Windows; thanks to Takanori Suzuki (asaveljevs)
- - [ZBX-2902] fixed system.cpu.load[] and system.cpu.util[] being slightly exaggerated on Windows (asaveljevs)
+ - [ZBX-2902] fixed system.cpu.load[] and system.cpu.util[] being slightly exaggerated on Windows; thanks to Kodai Terashima (asaveljevs)
  - [ZBX-2954] fixed translations in template delete popups (Vedmak)
  - [ZBX-2938] fixed not showing problems on map for hosts in maintenance (Vedmak)
  - [ZBXNEXT-238] made zabbix_sender gather as much data as possible before sending (asaveljevs)
