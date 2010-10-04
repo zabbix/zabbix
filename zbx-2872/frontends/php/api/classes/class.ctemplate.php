@@ -356,21 +356,6 @@ class CTemplate extends CZBXAPI{
 			zbx_db_search('hosts h', $options, $sql_parts);
 		}
 
-// filter
-		if(!is_null($options['filter'])){
-			zbx_value2array($options['filter']);
-
-			if(isset($options['filter']['templateid'])){
-				zbx_value2array($options['filter']['templateid']);
-				$sql_parts['where']['templateid'] = DBcondition('h.hostid', $options['filter']['templateid']);
-			}
-
-			if(isset($options['filter']['host']) && !is_null($options['filter']['host'])){
-				zbx_value2array($options['filter']['host']);
-				$sql_parts['where']['host'] = DBcondition('h.host', $options['filter']['host'], false, true);
-			}
-		}
-
 // order
 // restrict not allowed columns for sorting
 		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
