@@ -827,9 +827,11 @@ return $caption;
 			showExpressionErrors($expression, $expressionData[$expression]['errors']);
 			return false;
 		}
-		if( !validate_trigger_dependency($expression, $deps))
+		if( !validate_trigger_dependency($expression, $deps)){
+			error(S_WRONG_DEPENDENCY_ERROR);
 			return false;
-
+		}
+		
 		if(CTrigger::exists(array('description' => $description, 'expression' => $expression))){
 			error('Trigger '.$description.' already exists');
 			return false;
@@ -1812,7 +1814,10 @@ return $caption;
 			return false;
 		}
 
-		if(!validate_trigger_dependency($expression, $deps)) return false;
+		if(!validate_trigger_dependency($expression, $deps)) {
+			error(S_WRONG_DEPENDENCY_ERROR);
+			return false;
+		}
 
 		if(is_null($description)){
 			$description = $trigger['description'];
@@ -2178,24 +2183,41 @@ return $caption;
 	function validate_trigger_dependency($expression, $deps) {
 		$result = true;
 
+		//if we have atleast one dependency
 		if(!empty($deps)){
 			$templates = array();
 			$templateids = array();
+			$trigger_from_host = false;
 			$db_triggerhosts = get_hosts_by_expression($expression);
+
 			while($triggerhost = DBfetch($db_triggerhosts)){
-				if($triggerhost['status'] == HOST_STATUS_TEMPLATE){ //template
+				if($triggerhost['status'] == HOST_STATUS_TEMPLATE){ //is template
 					$templates[$triggerhost['hostid']] = $triggerhost;
 					$templateids[$triggerhost['hostid']] = $triggerhost['hostid'];
+				}
+				else{
+					//atleast one item from expressions comes from hosts
+					$trigger_from_host = true;
 				}
 			}
 
 			$dep_templateids = array();
+			$dep_from_host = false;
 			$db_dephosts = get_hosts_by_triggerid($deps);
 			while($dephost = DBfetch($db_dephosts)) {
-				if($dephost['status'] == HOST_STATUS_TEMPLATE){ //template
+				if($dephost['status'] == HOST_STATUS_TEMPLATE){ //is template
 					$templates[$dephost['hostid']] = $dephost;
 					$dep_templateids[$dephost['hostid']] = $dephost['hostid'];
 				}
+				else{
+					//atleast one item from dependencies comes from hosts
+					$dep_from_host = true;
+				}
+			}
+
+			//we have a host trigger added to template trigger or otherwise
+			if ($dep_from_host != $trigger_from_host){
+				return false; //this can not happen
 			}
 
 			$tdiff = array_diff($dep_templateids, $templateids);
