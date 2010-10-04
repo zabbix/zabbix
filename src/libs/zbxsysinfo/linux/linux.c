@@ -40,6 +40,9 @@ ZBX_METRIC	parameters_specific[]=
 	{"net.if.total",	CF_USEUPARAM,	NET_IF_TOTAL,		0,	"lo,bytes"},
 	{"net.if.collisions",	CF_USEUPARAM,	NET_IF_COLLISIONS,	0,	"lo"},
 
+	{"net.tcp.listen",	CF_USEUPARAM,	NET_TCP_LISTEN,		NULL,	"80"},
+	{"net.udp.listen",	CF_USEUPARAM,	NET_UDP_LISTEN,		NULL,	"68"},
+
 	{"vm.memory.size",	CF_USEUPARAM,	VM_MEMORY_SIZE,		0,	"total"},
 
 	{"proc.num",		CF_USEUPARAM,	PROC_NUM,		0,	"inetd,,,"},
