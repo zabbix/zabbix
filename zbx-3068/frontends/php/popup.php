@@ -411,7 +411,7 @@ include_once('include/page_header.php');
 		$options = array(
 			'nodeids' => $nodeid,
 			'groupids'=>$groupid,
-			'extendoutput' => 1,
+			'output' => API_OUTPUT_EXTEND,
 			'sortfield'=>'host'
 		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
@@ -495,7 +495,7 @@ include_once('include/page_header.php');
 		$options = array(
 			'nodeids' => $nodeid,
 			'groupids' => $groupid,
-			'extendoutput' => 1,
+			'output' => API_OUTPUT_EXTEND,
 			'sortfield' => 'host'
 		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
@@ -536,7 +536,7 @@ include_once('include/page_header.php');
 
 		$options = array(
 				'nodeids' => $nodeid,
-				'extendoutput' => 1
+				'output' => API_OUTPUT_EXTEND
 			);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 
@@ -565,7 +565,7 @@ include_once('include/page_header.php');
 		$options = array(
 			'nodeids' => $nodeid,
 			'groupids' => $groupid,
-			'extendoutput' => 1,
+			'output' => API_OUTPUT_EXTEND,
 			'sortfield' => 'host'
 			);
 		if(!is_null($writeonly)) $options['editable'] = 1;
@@ -590,7 +590,7 @@ include_once('include/page_header.php');
 		$options = array(
 			'nodeids' => $nodeid,
 			'groupids' => $groupid,
-			'extendoutput' => 1,
+			'output' => API_OUTPUT_EXTEND,
 			'sortfield'=>'host'
 		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
@@ -619,7 +619,7 @@ include_once('include/page_header.php');
 
 		$options = array(
 				'nodeids' => $nodeid,
-				'extendoutput' => 1
+				'output' => API_OUTPUT_EXTEND
 			);
 
 		$usergroups = CUserGroup::get($options);
@@ -643,7 +643,7 @@ include_once('include/page_header.php');
 
 		$options = array(
 				'nodeids' => $nodeid,
-				'extendoutput' => 1
+				'output' => API_OUTPUT_EXTEND
 			);
 
 		$users = CUser::get($options);
@@ -1127,7 +1127,7 @@ include_once('include/page_header.php');
 
 		$options = array(
 			'nodeids' => $nodeid,
-			'extendoutput' => 1
+			'output' => API_OUTPUT_EXTEND
 		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 
@@ -1392,7 +1392,7 @@ include_once('include/page_header.php');
 		$options = array(
 				'nodeids' => $nodeid,
 				'monitored_hosts' => 1,
-				'extendoutput' => 1
+				'output' => API_OUTPUT_EXTEND
 			);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 
@@ -1422,7 +1422,7 @@ include_once('include/page_header.php');
 
 		$options = array(
 				'nodeids' => $nodeid,
-				'extendoutput' => 1
+				'output' => API_OUTPUT_EXTEND
 			);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 

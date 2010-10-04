@@ -70,7 +70,7 @@
 		);
 		$event_count = CEvent::get($options);
 
-	return $event_count['rowscount'];
+	return $event_count;
 	}
 
 /* function:
@@ -484,6 +484,7 @@ function getLastEvents($options){
 
 	$triggerOptions = array(
 		'filter' => array(),
+		'skipDependent'	=> 1,
 		'select_hosts' => array('hostid', 'host'),
 		'output' => API_OUTPUT_EXTEND,
 		'expandDescription' => 1,
