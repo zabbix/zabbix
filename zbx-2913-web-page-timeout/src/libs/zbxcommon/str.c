@@ -427,7 +427,7 @@ int	zbx_rtrim(char *str, const char *charlist)
 	if (NULL == str || '\0' == *str)
 		return 0;
 
-	for (p = str + strlen(str) - 1; p >= str && NULL != strchr(charlist,*p); p--)
+	for (p = str + strlen(str) - 1; p >= str && NULL != strchr(charlist, *p); p--)
 		*p = '\0';
 
 	return (int)(p - str);
