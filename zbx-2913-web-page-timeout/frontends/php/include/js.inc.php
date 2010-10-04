@@ -508,13 +508,21 @@ function insert_js_function($fnct_name){
 		break;
 		case 'addValues':
 			insert_js('
-				function addValues(frame, values) {
+				function addValues(frame, values, submitParent) {
 					var parent_document = window.opener.document;
 					if(!parent_document) return close_window();
 
+					var submitParent = submitParent || false;
+
+					var tmpStorage = null;
 					for(var key in values){
 						if(is_null(values[key])) continue;
-						parent_document.getElementById(key).value = values[key];
+						tmpStorage = parent_document.getElementById(key);
+						tmpStorage.value = values[key];
+					}
+
+					if(!is_null(tmpStorage) && submitParent){
+						tmpStorage.form.submit();
 					}
 
 					close_window();

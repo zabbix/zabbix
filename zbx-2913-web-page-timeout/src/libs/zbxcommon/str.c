@@ -2239,9 +2239,6 @@ static int	zbx_strncasecmp(const char *s1, const char *s2, size_t n)
 
 char	*zbx_strcasestr(const char *haystack, const char *needle)
 {
-/*#ifdef HAVE_STRCASESTR
-	return strcasestr(haystack, needle);
-#else*/
 	size_t		sz_h, sz_n;
 	const char	*p;
 
@@ -2263,7 +2260,6 @@ char	*zbx_strcasestr(const char *haystack, const char *needle)
 	}
 
 	return NULL;
-/*#endif*/
 }
 
 int	starts_with(const char *str, const char *prefix)
@@ -2284,7 +2280,7 @@ int	cmp_key_id(const char *key_1, const char *key_2)
 	return ((*p == '\0' || *p == '[' || *p == ',') && (*q == '\0' || *q == '[' || *q == ',') ? SUCCEED : FAIL);
 }
 
-const char *zbx_permission_string(int perm)
+const char	*zbx_permission_string(int perm)
 {
 	switch (perm) {
 	case PERM_DENY:
@@ -2300,7 +2296,7 @@ const char *zbx_permission_string(int perm)
 	}
 }
 
-char	*zbx_item_value_type_string(zbx_item_value_type_t value_type)
+const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type)
 {
 	switch (value_type) {
 	case ITEM_VALUE_TYPE_FLOAT: return "Numeric (float)";
@@ -2312,7 +2308,7 @@ char	*zbx_item_value_type_string(zbx_item_value_type_t value_type)
 	}
 }
 
-char	*zbx_result_string(int result)
+const char	*zbx_result_string(int result)
 {
 	switch (result) {
 	case SUCCEED: return "SUCCEED";
@@ -2325,7 +2321,7 @@ char	*zbx_result_string(int result)
 	}
 }
 
-char	*zbx_trigger_severity_string(zbx_trigger_severity_t severity)
+const char	*zbx_trigger_severity_string(zbx_trigger_severity_t severity)
 {
 	switch (severity) {
 	case TRIGGER_SEVERITY_NOT_CLASSIFIED: return "Not classified";
@@ -2338,7 +2334,7 @@ char	*zbx_trigger_severity_string(zbx_trigger_severity_t severity)
 	}
 }
 
-char	*zbx_item_logtype_string(zbx_item_logtype_t logtype)
+const char	*zbx_item_logtype_string(zbx_item_logtype_t logtype)
 {
 	switch (logtype) {
 	case ITEM_LOGTYPE_INFORMATION: return "Information";
@@ -2350,7 +2346,7 @@ char	*zbx_item_logtype_string(zbx_item_logtype_t logtype)
 	}
 }
 
-char	*zbx_dservice_type_string(zbx_dservice_type_t service)
+const char	*zbx_dservice_type_string(zbx_dservice_type_t service)
 {
 	switch (service) {
 	case SVC_SSH: return "SSH";
