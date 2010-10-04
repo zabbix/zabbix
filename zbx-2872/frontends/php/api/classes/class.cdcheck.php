@@ -189,33 +189,15 @@ class CDCheck extends CZBXAPI{
 		}
 
 // filter
-		if(!is_null($options['filter'])){
-			zbx_value2array($options['filter']);
-
-			if(isset($options['filter']['dhostid']) && !is_null($options['filter']['dhostid'])){
-				$sql_parts['where']['dhostid'] = 'dc.dhostid='.$options['filter']['dhostid'];
-			}
-
-			if(isset($options['filter']['type']) && !is_null($options['filter']['type'])){
-				zbx_value2array($options['filter']['type']);
-				$sql_parts['where']['type'] = DBcondition('dc.type', $options['filter']['type']);
-			}
-
-			if(isset($options['filter']['key_']) && !is_null($options['filter']['key_'])){
-				zbx_value2array($options['filter']['key_']);
-				$sql_parts['where']['key_'] = DBcondition('dc.key_', $options['filter']['key_'], false, true);
-			}
-
-			if(isset($options['filter']['ports']) && !is_null($options['filter']['ports'])){
-				zbx_value2array($options['filter']['ports']);
-				$sql_parts['where']['ports'] = DBcondition('dc.ports', $options['filter']['ports'], false, true);
-			}
-
-			if(isset($options['filter']['snmp_community']) && !is_null($options['filter']['snmp_community'])){
-				zbx_value2array($options['filter']['snmp_community']);
-				$sql_parts['where']['snmp_community'] = DBcondition('dc.snmp_community', $options['filter']['snmp_community'], false, true);
-			}
+		if(is_array($options['filter'])){
+			zbx_db_filter('dchecks dc', $options, $sql_parts);
 		}
+
+// search
+		if(is_array($options['search'])){
+			zbx_db_search('dchecks dc', $options, $sql_parts);
+		}
+
 // order
 // restrict not allowed columns for sorting
 		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';

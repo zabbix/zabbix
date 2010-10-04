@@ -335,22 +335,12 @@ class CHostGroup extends CZBXAPI{
 		}
 
 // filter
-		if(!is_null($options['filter'])){
-			zbx_value2array($options['filter']);
-
-			if(isset($options['filter']['groupid'])){
-				zbx_value2array($options['filter']['groupid']);
-				$sql_parts['where']['groupid'] = DBcondition('g.groupid', $options['filter']['groupid']);
-			}
-
-			if(isset($options['filter']['name'])){
-				zbx_value2array($options['filter']['name']);
-				$sql_parts['where']['name'] = DBcondition('g.name', $options['filter']['name'], false, true);
-			}
+		if(is_array($options['filter'])){
+			zbx_db_filter('groups g', $options, $sql_parts);
 		}
 
 // search
-		if(!is_null($options['search'])){
+		if(is_array($options['search'])){
 			zbx_db_search('groups g', $options, $sql_parts);
 		}
 
@@ -436,7 +426,7 @@ class CHostGroup extends CZBXAPI{
 						$result[$group['groupid']]['graphs'][] = array('graphid' => $group['graphid']);
 						unset($group['hostid']);
 					}
-					
+
 // maintenanceids
 					if(isset($group['maintenanceid'])){
 						if(!isset($result[$group['groupid']]['maintenanceid']))

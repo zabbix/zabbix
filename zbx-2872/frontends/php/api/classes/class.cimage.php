@@ -132,29 +132,14 @@ class CImage extends CZBXAPI{
 		}
 
 
-// search
-		if(!is_null($options['search'])){
-			zbx_db_search('images i', $options, $sql_parts);
+// filter
+		if(is_array($options['filter'])){
+			zbx_db_filter('images i', $options, $sql_parts);
 		}
 
-// filter
-		if(!is_null($options['filter'])){
-			zbx_value2array($options['filter']);
-
-			if(isset($options['filter']['imageid']) && !is_null($options['filter']['imageid'])){
-				zbx_value2array($options['filter']['imageid']);
-				$sql_parts['where']['imageid'] = DBcondition('i.imageid', $options['filter']['imageid']);
-			}
-
-			if(isset($options['filter']['name']) && !is_null($options['filter']['name'])){
-				zbx_value2array($options['filter']['name']);
-				$sql_parts['where']['name'] = DBcondition('i.name', $options['filter']['name'], false, true);
-			}
-
-			if(isset($options['filter']['imagetype']) && !is_null($options['filter']['imagetype'])){
-				zbx_value2array($options['filter']['imagetype']);
-				$sql_parts['where']['imagetype'] = DBcondition('i.imagetype', $options['filter']['imagetype']);
-			}
+// search
+		if(is_array($options['search'])){
+			zbx_db_search('images i', $options, $sql_parts);
 		}
 
 // order

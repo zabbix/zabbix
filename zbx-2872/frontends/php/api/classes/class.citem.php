@@ -315,12 +315,12 @@ class CItem extends CZBXAPI{
 
 
 // search
-		if(!is_null($options['search'])){
+		if(is_array($options['search'])){
 			zbx_db_search('items i', $options, $sql_parts);
 		}
 
 // --- FILTER ---
-		if(!is_null($options['filter'])){
+		if(is_array($options['filter'])){
 			zbx_value2array($options['filter']);
 
 			if(isset($options['filter']['host'])){

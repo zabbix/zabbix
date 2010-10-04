@@ -256,28 +256,13 @@ class CAlert extends CZBXAPI{
 		}
 
 // filter
-		if(!is_null($options['filter'])){
-			zbx_value2array($options['filter']);
+		if(is_array($options['filter'])){
+			zbx_db_filter('alerts a', $options, $sql_parts);
+		}
 
-			if(isset($options['filter']['alertid']) && !is_null($options['filter']['alertid'])){
-				zbx_value2array($options['filter']['alertid']);
-				$sql_parts['where']['alertid'] = DBcondition('a.alertid', $options['filter']['alertid']);
-			}
-
-			if(isset($options['filter']['sendto']) && !is_null($options['filter']['sendto'])){
-				zbx_value2array($options['filter']['sendto']);
-				$sql_parts['where']['sendto'] = DBcondition('a.sendto', $options['filter']['sendto'], false, true);
-			}
-
-			if(isset($options['filter']['alerttype']) && !is_null($options['filter']['alerttype'])){
-				zbx_value2array($options['filter']['alerttype']);
-				$sql_parts['where']['alerttype'] = DBcondition('a.alerttype', $options['filter']['alerttype']);
-			}
-
-			if(isset($options['filter']['status']) && !is_null($options['filter']['status'])){
-				zbx_value2array($options['filter']['status']);
-				$sql_parts['where']['status'] = DBcondition('a.status', $options['filter']['status']);
-			}
+// search
+		if(is_array($options['search'])){
+			zbx_db_search('alerts a', $options, $sql_parts);
 		}
 
 // time_from

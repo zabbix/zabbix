@@ -29,8 +29,6 @@
  */
 class CTrigger extends CZBXAPI{
 
-	public static $error = array();
-
 /**
  * Get Triggers data
  *
@@ -433,13 +431,12 @@ class CTrigger extends CZBXAPI{
 		}
 
 // search
-		if(!is_null($options['search'])){
+		if(is_array($options['search'])){
 			zbx_db_search('triggers t', $options, $sql_parts);
 		}
 
 // --- FILTER ---
-		if(!is_null($options['filter'])){
-			zbx_value2array($options['filter']);
+		if(is_array($options['filter'])){
 
 			if(isset($options['filter']['description']) && !is_null($options['filter']['description'])){
 				zbx_value2array($options['filter']['description']);

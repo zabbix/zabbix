@@ -116,12 +116,12 @@ class CProxy extends CZBXAPI{
 		}
 
 // filter
-		if(!is_null($options['filter'])){
+		if(is_array($options['filter'])){
 			zbx_db_filter('hosts h', $options, $sql_parts);
 		}
 
 // search
-		if(!is_null($options['search'])){
+		if(is_array($options['search'])){
 			zbx_db_search('hosts h', $options, $sql_parts);
 		}
 

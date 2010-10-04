@@ -168,12 +168,12 @@ class CScript extends CZBXAPI{
 		}
 
 // search
-		if(!is_null($options['search'])){
+		if(is_array($options['search'])){
 			zbx_db_search('scripts s', $options, $sql_parts);
 		}
 
 // filter
-		if(!is_null($options['filter'])){
+		if(is_array($options['filter'])){
 			zbx_db_filter('scripts s', $options, $sql_parts);
 		}
 

@@ -250,20 +250,14 @@ class CApplication extends CZBXAPI{
 			}
 		}
 
-// filter
-		if(!is_null($options['filter'])){
-			zbx_value2array($options['filter']);
-
-			if(isset($options['filter']['name']))
-				$sql_parts['where']['name'] = 'a.name='.zbx_dbstr($options['filter']['name']);
-
-			if(isset($options['filter']['hostid']))
-				$sql_parts['where']['hostid'] = 'a.hostid='.$options['filter']['hostid'];
+// search
+		if(is_array($options['search'])){
+			zbx_db_search('applications a', $options, $sql_parts);
 		}
 
-// search
-		if(!is_null($options['search'])){
-			zbx_db_search('applications a', $options, $sql_parts);
+// filter
+		if(is_array($options['filter'])){
+			zbx_db_filter('applications a', $options, $sql_parts);
 		}
 
 // order
@@ -540,7 +534,7 @@ COpt::memoryPick();
 				'preservekeys' => 1
 			);
 			$del_applications = self::get($options);
-			
+
 			foreach($applicationids as $applicationid){
 				if(!isset($del_applications[$applicationid])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);

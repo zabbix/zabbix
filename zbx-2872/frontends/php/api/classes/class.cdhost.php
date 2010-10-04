@@ -264,27 +264,13 @@ class CDHost extends CZBXAPI{
 		}
 
 // filter
-		if(!is_null($options['filter'])){
-			zbx_value2array($options['filter']);
+		if(is_array($options['filter'])){
+			zbx_db_filter('dhosts dh', $options, $sql_parts);
+		}
 
-			if(isset($options['filter']['dhostid']) && !is_null($options['filter']['dhostid'])){
-				$sql_parts['where']['dhostid'] = 'dh.dhostid='.$options['filter']['dhostid'];
-			}
-
-			if(isset($options['filter']['status']) && !is_null($options['filter']['status'])){
-				zbx_value2array($options['filter']['status']);
-				$sql_parts['where']['status'] = DBcondition('dh.status', $options['filter']['status']);
-			}
-
-			if(isset($options['filter']['lastup']) && !is_null($options['filter']['lastup'])){
-				zbx_value2array($options['filter']['lastup']);
-				$sql_parts['where']['lastup'] = DBcondition('dh.lastup', $options['filter']['lastup']);
-			}
-
-			if(isset($options['filter']['lastdown']) && !is_null($options['filter']['lastdown'])){
-				zbx_value2array($options['filter']['lastdown']);
-				$sql_parts['where']['lastdown'] = DBcondition('dh.lastdown', $options['filter']['lastdown']);
-			}
+// search
+		if(is_array($options['search'])){
+			zbx_db_search('dhosts dh', $options, $sql_parts);
 		}
 
 // order

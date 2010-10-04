@@ -217,15 +217,13 @@ class CUserMacro extends CZBXAPI{
 
 
 // search
-		if(!is_null($options['search'])){
+		if(is_array($options['search'])){
 			zbx_db_search('hostmacro hm', $options, $sql_parts);
 			zbx_db_search('globalmacro gm', $options, $sql_parts_global);
 		}
 
 // filter
-		if(!is_null($options['filter'])){
-			zbx_value2array($options['filter']);
-
+		if(is_array($options['filter'])){
 			if(isset($options['filter']['macro'])){
 				zbx_value2array($options['filter']['macro']);
 

@@ -274,13 +274,12 @@ class CGraph extends CZBXAPI{
 		}
 
 // search
-		if(!is_null($options['search'])){
+		if(is_array($options['search'])){
 			zbx_db_search('graphs g', $options, $sql_parts);
 		}
 
 // filter
-		if(!is_null($options['filter'])){
-			zbx_value2array($options['filter']);
+		if(is_array($options['filter'])){
 
 			if(isset($options['filter']['name'])){
 				zbx_value2array($options['filter']['name']);
@@ -782,7 +781,7 @@ COpt::memoryPick();
 
 			foreach($graph['gitems'] as $inum => $gitem){
 				$gitem['graphid'] = $graph['graphid'];
-				
+
 				$result = DB::insert('graphs_items', array($gitem));
 				if(!$result)
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
@@ -799,7 +798,7 @@ COpt::memoryPick();
 			'nopermissions' => 1,
 		);
 		$graph_templates = CTemplate::get($options);
-		
+
 		if(empty($graph_templates)) return true;
 //-----
 
@@ -1124,7 +1123,7 @@ COpt::memoryPick();
 		if(isset($graph['ymax_type']) && $graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE){
 			$axis_items[$graph['ymax_itemid']] = $graph['ymax_itemid'];
 		}
-		
+
 		if(!empty($axis_items)){
 			$cnt = count($axis_items);
 
@@ -1140,10 +1139,10 @@ COpt::memoryPick();
 
 			$cnt_exist = CItem::get($options);
 
-			if($cnt != $cnt_exist) 
+			if($cnt != $cnt_exist)
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect item for axis value item');
 		}
-		
+
 	return true;
 	}
 }

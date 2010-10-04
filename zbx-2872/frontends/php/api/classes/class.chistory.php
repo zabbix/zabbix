@@ -180,8 +180,13 @@ class CHistory extends CZBXAPI{
 			$sql_parts['where']['clock_till'] = 'h.clock<='.$options['time_till'];
 		}
 
+// filter
+		if(is_array($options['filter'])){
+			zbx_db_filter($sql_parts['from']['history'], $options, $sql_parts);
+		}
+
 // search
-		if(!is_null($options['search'])){
+		if(is_array($options['search'])){
 			zbx_db_search($sql_parts['from']['history'], $options, $sql_parts);
 		}
 
@@ -235,6 +240,7 @@ class CHistory extends CZBXAPI{
 
 
 		$itemids = array();
+		$triggerids = array();
 
 		$sql_parts['select'] = array_unique($sql_parts['select']);
 		$sql_parts['from'] = array_unique($sql_parts['from']);
@@ -269,6 +275,7 @@ class CHistory extends CZBXAPI{
 					$result[$count] = array('itemid' => $data['itemid']);
 				}
 				else{
+					$result[$count] = array();
 // hostids
 					if(isset($data['hostid'])){
 						if(!isset($result[$count]['hosts'])) $result[$count]['hosts'] = array();

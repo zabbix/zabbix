@@ -241,43 +241,13 @@ class CDService extends CZBXAPI{
 		}
 
 // filter
-		if(!is_null($options['filter'])){
-			zbx_value2array($options['filter']);
+		if(is_array($options['filter'])){
+			zbx_db_filter('dservices ds', $options, $sql_parts);
+		}
 
-			if(isset($options['filter']['dserviceid']) && !is_null($options['filter']['dserviceid'])){
-				zbx_value2array($options['filter']['dserviceid']);
-				$sql_parts['where']['dserviceid'] = DBcondition('ds.dserviceid',$options['filter']['dserviceid']);
-			}
-
-			if(isset($options['filter']['dhostid']) && !is_null($options['filter']['dhostid'])){
-				zbx_value2array($options['filter']['dhostid']);
-				$sql_parts['where']['dhostid'] = DBcondition('ds.dhostid',$options['filter']['dhostid']);
-			}
-
-			if(isset($options['filter']['type']) && !is_null($options['filter']['type'])){
-				zbx_value2array($options['filter']['type']);
-				$sql_parts['where']['type'] = DBcondition('ds.type', $options['filter']['type']);
-			}
-
-			if(isset($options['filter']['status']) && !is_null($options['filter']['status'])){
-				zbx_value2array($options['filter']['status']);
-				$sql_parts['where']['status'] = DBcondition('ds.status', $options['filter']['status']);
-			}
-
-			if(isset($options['filter']['key_']) && !is_null($options['filter']['key_'])){
-				zbx_value2array($options['filter']['key_']);
-				$sql_parts['where']['key_'] = DBcondition('ds.key_', $options['filter']['key_'], false, true);
-			}
-
-			if(isset($options['filter']['port']) && !is_null($options['filter']['port'])){
-				zbx_value2array($options['filter']['port']);
-				$sql_parts['where']['port'] = DBcondition('ds.port', $options['filter']['port']);
-			}
-
-			if(isset($options['filter']['ip']) && !is_null($options['filter']['ip'])){
-				zbx_value2array($options['filter']['ip']);
-				$sql_parts['where']['ip'] = DBcondition('ds.ip', $options['filter']['ip'], false, true);
-			}
+// search
+		if(is_array($options['search'])){
+			zbx_db_search('dservices ds', $options, $sql_parts);
 		}
 
 // order

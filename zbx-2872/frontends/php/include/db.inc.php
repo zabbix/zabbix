@@ -818,13 +818,11 @@ else {
 		);
 	}
 
-	function zbx_db_search($table, &$options, &$sql_parts){
+	function zbx_db_search($table, $options, &$sql_parts){
 		list($table, $tableShort) = explode(' ', $table);
 
 		$tableSchema = DB::getSchema($table);
 		if(!$tableSchema) info('Error in search request for table ['.$table.']');
-
-		zbx_value2array($options['search']);
 
 		$start = is_null($options['startSearch'])?'%':'';
 		$exclude = is_null($options['excludeSearch'])?'':' NOT ';
@@ -844,13 +842,11 @@ else {
 	}
 
 
-	function zbx_db_filter($table, &$options, &$sql_parts){
+	function zbx_db_filter($table, $options, &$sql_parts){
 		list($table, $tableShort) = explode(' ', $table);
 
 		$tableSchema = DB::getSchema($table);
 		if(!$tableSchema) info('Error in search request for table ['.$table.']');
-
-		zbx_value2array($options['filter']);
 
 		$filter = array();
 		foreach($options['filter'] as $field => $value){
@@ -863,6 +859,7 @@ else {
 					break;
 				case DB::FIELD_TYPE_INT:
 				case DB::FIELD_TYPE_FLOAT:
+				case DB::FIELD_TYPE_ID:
 					$filter[$field] = DBcondition($tableShort.'.'.$field, $value);
 					break;
 				default:

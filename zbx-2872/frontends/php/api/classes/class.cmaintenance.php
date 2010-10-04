@@ -247,24 +247,14 @@ class CMaintenance extends CZBXAPI{
 			}
 		}
 
-// search
-		if(!is_null($options['search'])){
-			zbx_db_search('maintenances m', $options, $sql_parts);
+// filter
+		if(is_array($options['filter'])){
+			zbx_db_filter('maintenances m', $options, $sql_parts);
 		}
 
-// filter
-		if(!is_null($options['filter'])){
-			zbx_value2array($options['filter']);
-
-			if(isset($options['filter']['maintenanceid']) && !is_null($options['filter']['maintenanceid'])){
-				zbx_value2array($options['filter']['maintenanceid']);
-				$sql_parts['where']['maintenanceid'] = DBcondition('n.maintenanceid', $options['filter']['maintenanceid']);
-			}
-
-			if(isset($options['filter']['name']) && !is_null($options['filter']['name'])){
-				zbx_value2array($options['filter']['name']);
-				$sql_parts['where']['name'] = DBcondition('m.name', $options['filter']['name'], false, true);
-			}
+// search
+		if(is_array($options['search'])){
+			zbx_db_search('maintenances m', $options, $sql_parts);
 		}
 
 // order
@@ -413,7 +403,7 @@ Copt::memoryPick();
 	return $result;
 	}
 
-	
+
 	/**
 	 * Determine, whether an object already exists
 	 *

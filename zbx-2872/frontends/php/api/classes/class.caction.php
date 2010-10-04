@@ -318,12 +318,12 @@ class CAction extends CZBXAPI{
 		}
 
 // filter
-		if(!is_null($options['filter'])){
+		if(is_array($options['filter'])){
 			zbx_db_filter('actions a', $options, $sql_parts);
 		}
 
 // search
-		if(!is_null($options['search'])){
+		if(is_array($options['search'])){
 			zbx_db_search('actions a', $options, $sql_parts);
 		}
 

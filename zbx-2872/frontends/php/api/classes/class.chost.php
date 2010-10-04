@@ -472,12 +472,12 @@ class CHost extends CZBXAPI{
 		}
 
 // search
-		if(!is_null($options['search'])){
+		if(is_array($options['search'])){
 			zbx_db_search('hosts h', $options, $sql_parts);
 		}
 
 // filter
-		if(!is_null($options['filter'])){
+		if(is_array($options['filter'])){
 			zbx_db_filter('hosts h', $options, $sql_parts);
 		}
 
@@ -542,7 +542,7 @@ class CHost extends CZBXAPI{
 					$result[$host['hostid']] = array('hostid' => $host['hostid']);
 				}
 				else{
-					if(!isset($result[$host['hostid']])) $result[$host['hostid']]= array();
+					if(!isset($result[$host['hostid']])) $result[$host['hostid']] = array();
 
 					if(!is_null($options['select_groups']) && !isset($result[$host['hostid']]['groups'])){
 						$result[$host['hostid']]['groups'] = array();

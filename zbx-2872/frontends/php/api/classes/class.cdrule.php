@@ -184,28 +184,13 @@ class CDRule extends CZBXAPI{
 		}
 
 // filter
-		if(!is_null($options['filter'])){
-			zbx_value2array($options['filter']);
+		if(is_array($options['filter'])){
+			zbx_db_filter('drules dr', $options, $sql_parts);
+		}
 
-			if(isset($options['filter']['name']) && !is_null($options['filter']['name'])){
-				zbx_value2array($options['filter']['name']);
-				$sql_parts['where']['name'] = DBcondition('dr.name', $options['filter']['name'], false, true);
-			}
-
-			if(isset($options['filter']['delay']) && !is_null($options['filter']['delay'])){
-				zbx_value2array($options['filter']['delay']);
-				$sql_parts['where']['delay'] = DBcondition('dr.delay', $options['filter']['delay']);
-			}
-
-			if(isset($options['filter']['status']) && !is_null($options['filter']['status'])){
-				zbx_value2array($options['filter']['status']);
-				$sql_parts['where']['status'] = DBcondition('dr.status', $options['filter']['status']);
-			}
-
-			if(isset($options['filter']['nextcheck']) && !is_null($options['filter']['nextcheck'])){
-				zbx_value2array($options['filter']['nextcheck']);
-				$sql_parts['where']['nextcheck'] = DBcondition('dr.nextcheck', $options['filter']['nextcheck']);
-			}
+// search
+		if(is_array($options['search'])){
+			zbx_db_search('drules dr', $options, $sql_parts);
 		}
 
 // order

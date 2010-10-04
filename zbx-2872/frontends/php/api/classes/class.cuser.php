@@ -181,33 +181,15 @@ class CUser extends CZBXAPI{
 			$sql_parts['select'] = array('count(u.userid) as rowscount');
 		}
 
-// search
-		if(!is_null($options['search'])){
-			zbx_value2array($options['search']);
-			unset($options['search']['passwd']);
-
-			zbx_db_search('users u', $options, $sql_parts);
+// filter
+		if(is_array($options['filter'])){
+			zbx_db_filter('users u', $options, $sql_parts);
 		}
 
-// filter
-		if(!is_null($options['filter'])){
-			zbx_value2array($options['filter']);
-
-			if(isset($options['filter']['userid'])){
-				zbx_value2array($options['filter']['userid']);
-				$sql_parts['where']['userid'] = DBcondition('u.userid', $options['filter']['userid']);
-			}
-
-			if(isset($options['filter']['alias'])){
-				zbx_value2array($options['filter']['alias']);
-				$sql_parts['where']['alias'] = DBcondition('u.alias', $options['filter']['alias'], false, true);
-			}
-
-			if(isset($options['filter']['type'])){
-				zbx_value2array($options['filter']['type']);
-				$sql_parts['where']['type'] = DBcondition('u.type', $options['filter']['type']);
-			}
-
+// search
+		if(is_array($options['search'])){
+			unset($options['search']['passwd']);
+			zbx_db_search('users u', $options, $sql_parts);
 		}
 
 // order

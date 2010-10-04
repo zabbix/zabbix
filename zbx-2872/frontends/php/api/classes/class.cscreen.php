@@ -133,25 +133,14 @@ class CScreen extends CZBXAPI{
 			$sql_parts['select'] = array('count(DISTINCT s.screenid) as rowscount');
 		}
 
-
-// search
-		if(!is_null($options['search'])){
-			zbx_db_search('screens s', $options, $sql_parts);
+// filter
+		if(is_array($options['filter'])){
+			zbx_db_filter('screens s', $options, $sql_parts);
 		}
 
-// filter
-		if(!is_null($options['filter'])){
-			zbx_value2array($options['filter']);
-
-			if(isset($options['filter']['screenid'])){
-				zbx_value2array($options['filter']['screenid']);
-				$sql_parts['where']['screenid'] = DBcondition('s.screenid', $options['filter']['screenid']);
-			}
-
-			if(isset($options['filter']['name'])){
-				zbx_value2array($options['filter']['name']);
-				$sql_parts['where']['name'] = DBcondition('s.name', $options['filter']['name'], false, true);
-			}
+// search
+		if(is_array($options['search'])){
+			zbx_db_search('screens s', $options, $sql_parts);
 		}
 
 // order

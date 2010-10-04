@@ -169,19 +169,14 @@ class CUserGroup extends CZBXAPI{
 			$sql_parts['select'] = array('count(g.usrgrpid) as rowscount');
 		}
 
-// search
-		if(!is_null($options['search'])){
-			zbx_db_search('usrgrps g', $options, $sql_parts);
+// filter
+		if(is_array($options['filter'])){
+			zbx_db_filter('usrgrps g', $options, $sql_parts);
 		}
 
-// filter
-		if(!is_null($options['filter'])){
-			zbx_value2array($options['filter']);
-
-			if(isset($options['filter']['name'])){
-				zbx_value2array($options['filter']['name']);
-				$sql_parts['where']['name'] = DBcondition('g.name', $options['filter']['name'], false, true);
-			}
+// search
+		if(is_array($options['search'])){
+			zbx_db_search('usrgrps g', $options, $sql_parts);
 		}
 
 // order
@@ -694,7 +689,7 @@ class CUserGroup extends CZBXAPI{
  */
 	public static function delete($usrgrpids){
 		global $USER_DETAILS;
-		
+
 		$usrgrpids = zbx_toArray($usrgrpids);
 
 		if(empty($usrgrpids)) return true;
