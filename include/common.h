@@ -154,6 +154,9 @@ const char	*zbx_result_string(int result);
 #define MAX_STRING_LEN	2048
 #define MAX_BUF_LEN	65536
 
+#define DB_TEXT_LEN	65535
+#define DB_TEXT_LEN_MAX	DB_TEXT_LEN+1
+
 #define ZBX_DM_DELIMITER	'\255'
 
 typedef struct zbx_timespec
@@ -739,8 +742,8 @@ int	is_uoct(const char *str);
 int	is_uhex(const char *str);
 int	is_hex_string(const char *str);
 int	is_ascii_string(const char *str);
-void	zbx_rtrim(char *str, const char *charlist);
-void	zbx_ltrim(register char *str, const char *charlist);
+int	zbx_rtrim(char *str, const char *charlist);
+void	zbx_ltrim(char *str, const char *charlist);
 void	zbx_remove_chars(register char *str, const char *charlist);
 #define zbx_remove_spaces(str)		zbx_remove_chars(str, " ");
 #define zbx_remove_whitespace(str)	zbx_remove_chars(str, " \t\r\n");

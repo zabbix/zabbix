@@ -260,7 +260,7 @@ void	__zbx_zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_l
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 void	zbx_strcpy_alloc(char **str, int *alloc_len, int *offset, const char *src)
@@ -300,7 +300,7 @@ void	zbx_strcpy_alloc(char **str, int *alloc_len, int *offset, const char *src)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 void	zbx_chrcpy_alloc(char **str, int *alloc_len, int *offset, const char src)
@@ -414,24 +414,24 @@ void	del_zeroes(char *s)
  * Parameters: str - string for processing                                    *
  *             charlist - null terminated list of characters                  *
  *                                                                            *
- * Return value: Stripped string                                              *
+ * Return value: length of stripped string                                    *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	zbx_rtrim(char *str, const char *charlist)
+int	zbx_rtrim(char *str, const char *charlist)
 {
-	register char *p;
+	char	*p;
 
-	if( !str || !charlist || !*str || !*charlist ) return;
+	if (NULL == str || '\0' == *str)
+		return 0;
 
-	for(
-		p = str + strlen(str) - 1;
-		p >= str && NULL != strchr(charlist,*p);
-		p--)
-			*p = '\0';
+	for (p = str + strlen(str) - 1; p >= str && NULL != strchr(charlist, *p); p--)
+		*p = '\0';
+
+	return (int)(p - str);
 }
 
 /******************************************************************************
@@ -443,18 +443,18 @@ void	zbx_rtrim(char *str, const char *charlist)
  * Parameters: str - string for processing                                    *
  *             charlist - null terminated list of characters                  *
  *                                                                            *
- * Return value: Stripped string                                              *
+ * Return value:                                                              *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	zbx_ltrim(register char *str, const char *charlist)
+void	zbx_ltrim(char *str, const char *charlist)
 {
-	register char *p;
+	char	*p;
 
-	if (NULL == str || NULL == charlist || '\0' == *str || '\0' == *charlist)
+	if (NULL == str || '\0' == *str)
 		return;
 
 	for (p = str; '\0' != *p && NULL != strchr(charlist, *p); p++)
@@ -480,7 +480,7 @@ void	zbx_ltrim(register char *str, const char *charlist)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -714,7 +714,7 @@ void	lrtrim_spaces(char *c)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-size_t zbx_strlcpy(char *dst, const char *src, size_t siz)
+size_t	zbx_strlcpy(char *dst, const char *src, size_t siz)
 {
 	char *d = dst;
 	const char *s = src;
@@ -756,7 +756,7 @@ size_t zbx_strlcpy(char *dst, const char *src, size_t siz)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-size_t zbx_strlcat(char *dst, const char *src, size_t siz)
+size_t	zbx_strlcat(char *dst, const char *src, size_t siz)
 {
 	char *d = dst;
 	const char *s = src;
@@ -796,14 +796,14 @@ size_t zbx_strlcat(char *dst, const char *src, size_t siz)
  * Comments:  required free allocated string with function 'zbx_free'         *
  *                                                                            *
  ******************************************************************************/
-char* zbx_dvsprintf(char *dest, const char *f, va_list args)
+char	*zbx_dvsprintf(char *dest, const char *f, va_list args)
 {
 	char	*string = NULL;
 	int	n, size = MAX_STRING_LEN >> 1;
 
 	va_list curr;
 
-	while(1)
+	while (1)
 	{
 		string = zbx_malloc(string, size);
 
@@ -838,7 +838,7 @@ char* zbx_dvsprintf(char *dest, const char *f, va_list args)
  * Comments:  required free allocated string with function 'zbx_free'         *
  *                                                                            *
  ******************************************************************************/
-char* __zbx_zbx_dsprintf(char *dest, const char *f, ...)
+char	*__zbx_zbx_dsprintf(char *dest, const char *f, ...)
 {
 	char	*string = NULL;
 	va_list args;
