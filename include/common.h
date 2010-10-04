@@ -734,6 +734,7 @@ int	is_uint_prefix(const char *c);
 int	is_uint(const char *c);
 int	is_int_prefix(const char *c);
 int	is_uint64(const char *str, zbx_uint64_t *value);
+int	is_ushort(const char *str, unsigned short *value);
 int	is_uoct(const char *str);
 int	is_uhex(const char *str);
 int	is_hex_string(const char *str);

@@ -11,6 +11,7 @@ Changes for 1.9
 
 Changes for 1.8.4rc1
 
+ - [ZBXNEXT-430] added support of net.tcp.listen and net.udp.listen under Linux (Sasha)
  - [ZBX-453] fixed --disable-static enabling static compilation (asaveljevs)
  - [ZBX-2992] acknowledges are now hidden in event details when turned off (KB)
  - [ZBX-3050] fixed that host can be named like an existing template and otherwise (KB)
