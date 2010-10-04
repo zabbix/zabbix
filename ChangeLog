@@ -11,6 +11,7 @@ Changes for 1.9
 
 Changes for 1.8.4rc1
 
+ - [ZBX-2992] acknowledges are now hidden in event details when are turned off (KB)
  - [ZBX-3050] fixed that host can be named like an existant template and oterwise (KB)
  - [ZBX-3019] fixed templated graphs not being copied to discovered hosts in DM setup; thanks to Alexander Ignatyev (asaveljevs)
  - [ZBX-2860] fixed usergroup renaming (Vedmak)
