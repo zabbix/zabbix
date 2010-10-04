@@ -573,14 +573,16 @@ class zbxXML{
 				foreach($images as $inum => $image){
 					if(CImage::exists($image)){
 						if((($image['imagetype'] == IMAGE_TYPE_ICON) && isset($rules['icons']['exist']))
-							|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && (isset($rules['background']['exist'])))){
+							|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && (isset($rules['background']['exist']))))
+						{
 
 							$options = array(
 								'filter' => array('name' => $image['name']),
 								'output' => API_OUTPUT_SHORTEN
 							);
-							$img = CImage::get($options);
-							$img = reset($img);
+							$imgs = CImage::get($options);
+							$img = reset($imgs);
+							
 							$image['imageid'] = $img['imageid'];
 							$image['image'] = base64_decode($image['encodedImage']);
 							unset($image['encodedImage']);
@@ -590,9 +592,12 @@ class zbxXML{
 					}
 					else{
 						if((($image['imagetype'] == IMAGE_TYPE_ICON) && isset($rules['icons']['missed']))
-							|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && isset($rules['background']['missed']))){
+							|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && isset($rules['background']['missed'])))
+						{
 
-							$image['image'] = base64_decode($image['encodedImage']);
+// No need to decode_base64
+							$image['image'] = $image['encodedImage'];
+
 							unset($image['encodedImage']);
 							$images_to_add[] = $image;
 						}
@@ -1166,7 +1171,7 @@ class zbxXML{
 								$current_item = CItem::get($options);
 							}
 
-							$r = CApplication::addItems(array(
+							$r = CApplication::massAdd(array(
 								'applications' => $item_applications,
 								'items' => $current_item
 							));

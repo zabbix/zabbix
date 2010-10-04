@@ -85,7 +85,8 @@ include_once('include/page_header.php');
 <?php
 	if(inarr_isset(array('add_check', 'new_check_type', 'new_check_ports', 'new_check_key', 'new_check_snmp_community',
 			'new_check_snmpv3_securitylevel', 'new_check_snmpv3_securityname', 'new_check_snmpv3_authpassphrase',
-			'new_check_snmpv3_privpassphrase'))){
+			'new_check_snmpv3_privpassphrase')))
+	{
 		$new_dcheck = array(
 			'type' => $_REQUEST['new_check_type'],
 			'ports'=> $_REQUEST['new_check_ports'],
