@@ -2269,7 +2269,6 @@
 	'S_EXPRESSION_HOST_KEY_DOES_NOT_ERROR'=>		'Host key does not exist.',
 	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART1'=>	'Function \'',
 	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART2'=>	'\' does not accept parameters.',
-	'S_WRONG_DEPENDENCY_ERROR'=>	'Error adding dependencies. It is not possible to add a dependency from a host trigger to a template trigger and from a template trigger to a host trigger or a trigger from template that has a link to another template.',
     'S_WRONG_DEPENDENCY_ERROR'=>	'Error adding dependencies. Fallowing dependencies are not allowed: 1) from a host trigger to a template trigger; 2) from a template trigger to a host trigger; 3) between template triggers, where templates have links to other templates.',
 		
 //	page_footer.php
