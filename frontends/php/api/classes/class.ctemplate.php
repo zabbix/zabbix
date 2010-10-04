@@ -898,7 +898,7 @@ COpt::memoryPick();
 	}
 
 	public static function exists($object){
-		$keyFields = array(array('hostid', 'host'));
+		$keyFields = array(array('templateid', 'host'));
 
 		$options = array(
 			'filter' => zbx_array_mintersect($keyFields, $object),
@@ -1233,11 +1233,15 @@ COpt::memoryPick();
 					'nopermissions' => 1
 				);
 				$template_exists = self::get($options);
+				$template_exist = reset($template_exists);
 
-				$template_exists = reset($template_exists);
-
-				if(!empty($template_exists) && ($template_exists['templateid'] != $cur_template['templateid'])){
+				if(!is_null($template_exist) && ($template_exist['templateid'] != $cur_template['templateid'])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE . ' [ ' . $data['host'] . ' ] ' . S_ALREADY_EXISTS_SMALL);
+				}
+
+//can't set the same name as existing host
+				if(CHost::exists(array('host' => $cur_template['host']))){
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$template['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
 			}
 
