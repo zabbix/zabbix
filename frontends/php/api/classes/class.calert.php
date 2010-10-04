@@ -78,7 +78,10 @@ class CAlert extends CZBXAPI{
 			'nopermissions'			=> null,
 
 // filter
-			'filter'				=> null,
+			'filter'					=> null,
+			'search'					=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
 			'time_from'				=> null,
 			'time_till'				=> null,
 
@@ -389,7 +392,7 @@ class CAlert extends CZBXAPI{
 		}
 
 COpt::memoryPick();
-		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['count'])){
+		if(!is_null($options['countOutput'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
