@@ -72,10 +72,11 @@ class CHistory extends CZBXAPI{
 			'nopermissions'			=> null,
 
 // filter
-			'filter'				=> null,
-			'pattern'				=> null,
-			'startPattern'			=> null,
-			'excludePattern'		=> null,
+			'filter'					=> null,
+			'search'					=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
+
 			'time_from'				=> null,
 			'time_till'				=> null,
 
@@ -176,19 +177,17 @@ class CHistory extends CZBXAPI{
 // time_till
 		if(!is_null($options['time_till'])){
 			$sql_parts['select']['clock'] = 'h.clock';
-			$sql_parts['where']['clock_til'] = 'h.clock<='.$options['time_till'];
+			$sql_parts['where']['clock_till'] = 'h.clock<='.$options['time_till'];
 		}
 
-// pattern
-		if(!zbx_empty($options['pattern'])){
-			$exclude = is_null($options['excludePattern'])?'':' NOT ';
+// filter
+		if(is_array($options['filter'])){
+			zbx_db_filter($sql_parts['from']['history'], $options, $sql_parts);
+		}
 
-			if(!is_null($options['startPattern'])){
-				$sql_parts['where']['value'] = ' UPPER(h.value) '.$exclude.' LIKE '.zbx_dbstr(zbx_strtoupper($options['pattern']).'%');
-			}
-			else{
-				$sql_parts['where']['value'] = ' UPPER(h.value) '.$exclude.' LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
-			}
+// search
+		if(is_array($options['search'])){
+			zbx_db_search($sql_parts['from']['history'], $options, $sql_parts);
 		}
 
 // output
@@ -276,7 +275,7 @@ class CHistory extends CZBXAPI{
 					$result[$count] = array('itemid' => $data['itemid']);
 				}
 				else{
-
+					$result[$count] = array();
 // hostids
 					if(isset($data['hostid'])){
 						if(!isset($result[$count]['hosts'])) $result[$count]['hosts'] = array();
@@ -284,7 +283,6 @@ class CHistory extends CZBXAPI{
 						$result[$count]['hosts'][] = array('hostid' => $data['hostid']);
 						unset($data['hostid']);
 					}
-
 // triggerids
 					if(isset($data['triggerid'])){
 						if(!isset($result[$count]['triggers'])) $result[$count]['triggers'] = array();
@@ -292,13 +290,11 @@ class CHistory extends CZBXAPI{
 						$result[$count]['triggers'][] = array('triggerid' => $data['triggerid']);
 						unset($data['triggerid']);
 					}
-
 // itemids
-					if(isset($data['itemid']) && !is_null($options['itemids'])){
-						if(!isset($result[$count]['items'])) $result[$count]['items'] = array();
-
-						$result[$count]['items'][] = array('itemid' => $data['itemid']);
-					}
+//					if(isset($data['itemid']) && !is_null($options['itemids'])){
+//						if(!isset($result[$count]['items'])) $result[$count]['items'] = array();
+//						$result[$count]['items'][] = array('itemid' => $data['itemid']);
+//					}
 
 					$result[$count] += $data;
 

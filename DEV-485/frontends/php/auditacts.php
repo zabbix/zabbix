@@ -161,11 +161,12 @@ include_once('include/page_header.php');
 		'sortorder' => ZBX_SORT_DOWN,
 		'limit' => ($config['search_limit']+1)
 	);
+
 	if($_REQUEST['alias']){
-		$user = CUser::getObjects(array('alias' => $_REQUEST['alias']));
-		$user = reset($user);
-		$options['userids'] = $user['userid'];
+		$users = CUser::get(array('filter' => array('alias' => $_REQUEST['alias'])));
+		$options['userids'] = zbx_objectValues($users, 'userid');
 	}
+
 	$alerts = CAlert::get($options);
 
 // get first event for selected filters, to get starttime for timeline bar

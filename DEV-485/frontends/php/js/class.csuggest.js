@@ -117,8 +117,8 @@ searchServer: function(needle){
 	var rpcRequest = {
 		'method': 'host.get',
 		'params': {
-			'startPattern': true,
-			'pattern': needle,
+			'startSearch': 1,
+			'search': {'host': needle},
 			'output': ['hostid', 'host'],
 			'sortfield': 'host',
 			'limit': this.suggestLimit
