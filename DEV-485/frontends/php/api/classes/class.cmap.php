@@ -207,7 +207,9 @@ class CMap extends CZBXAPI{
 					if(!is_null($options['select_links']) && !isset($result[$sysmap['sysmapid']]['links'])){
 						$result[$sysmap['sysmapid']]['links'] = array();
 					}
-
+					if(!is_null($options['select_urls']) && !isset($result[$sysmap['sysmapid']]['urls'])){
+						$result[$sysmap['sysmapid']]['urls'] = array();
+					}
 
 					$result[$sysmap['sysmapid']] += $sysmap;
 				}
