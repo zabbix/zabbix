@@ -622,7 +622,7 @@ class CUserMacro extends CZBXAPI{
 
 			foreach($globalmacros as $mnum => $gmacro){
 				if(!isset($db_gmacros[$gmacro['macro']]))
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_MACROS.' [ '.$gmacro['macro'].' ] '.S_DOES_NOT_EXISTS_SMALL);
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_MACROS.' [ '.$gmacro['macro'].' ] '.S_DOES_NOT_EXIST_SMALL);
 			}
 //--------
 			$globalmacroids = zbx_objectValues($db_gmacros, 'globalmacroid');
@@ -899,7 +899,7 @@ class CUserMacro extends CZBXAPI{
 			foreach($data['macros'] as $hmnum => $updMacro){
 				foreach($objectids as $hnum => $objectid){
 					if(!isset($existing_macros[$updMacro['macro']][$objectid]))
-						self::exception(ZBX_API_ERROR_PERMISSIONS, S_MACRO.' [ '.$updMacro['macro'].' ] '.S_DOES_NOT_EXISTS_SMALL);
+						self::exception(ZBX_API_ERROR_PERMISSIONS, S_MACRO.' [ '.$updMacro['macro'].' ] '.S_DOES_NOT_EXIST_SMALL);
 				}
 			}
 
@@ -1008,7 +1008,7 @@ class CUserMacro extends CZBXAPI{
 			foreach($data['macros'] as $hmnum => $updMacro){
 				foreach($objectids as $hnum => $objectid){
 					if(!isset($existing_macros[$updMacro['macro']][$objectid]))
-						self::exception(ZBX_API_ERROR_PERMISSIONS, S_MACRO.' [ '.$updMacro['macro'].' ] '.S_DOES_NOT_EXISTS_SMALL);
+						self::exception(ZBX_API_ERROR_PERMISSIONS, S_MACRO.' [ '.$updMacro['macro'].' ] '.S_DOES_NOT_EXIST_SMALL);
 				}
 			}
 //*/
