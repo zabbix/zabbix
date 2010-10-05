@@ -280,6 +280,7 @@ include_once('include/page_header.php');
 	}
 // save
 	else if(isset($_REQUEST['save'])){
+
 		$groups = get_request('groups', array());
 		$hosts = get_request('hosts', array());
 		$templates = get_request('templates', array());
@@ -324,17 +325,23 @@ include_once('include/page_header.php');
 
 		$hosts = zbx_toObject($hosts, 'hostid');
 
+		$macros = get_request('macros', array());
+		foreach($macros as $mnum => $macro){
+			if(zbx_empty($macro['value'])) unset($macros[$mnum]);
+		}
+
+		$template = array(
+			'host' => $template_name,
+			'groups' => $groups,
+			'templates' => $templates,
+			'hosts' => $hosts,
+			'macros' => $macros
+		);
+
 // CREATE/UPDATE TEMPLATE {{{
 		if($templateid){
-			$template = array(
-				'templateid' => $templateid,
-				'host' => $template_name,
-				'groups' => $groups,
-				'templates' => $templates,
-				'templates_clear' => $templates_clear,
-				'hosts' => $hosts,
-				'macros' => get_request('macros', array())
-			);
+			$template['templateid'] = $templateid;
+			$template['templates_clear'] = $templates_clear;
 
 			$result = CTemplate::update($template);
 			if(!$result){
@@ -346,13 +353,6 @@ include_once('include/page_header.php');
 			$msg_fail = S_CANNOT_UPDATE_TEMPLATE;
 		}
 		else{
-			$template = array(
-				'host' => $template_name,
-				'groups' => $groups,
-				'templates' => $templates,
-				'hosts' => $hosts,
-				'macros' => get_request('macros', array())
-			);
 			$result = CTemplate::create($template);
 
 			if($result){
