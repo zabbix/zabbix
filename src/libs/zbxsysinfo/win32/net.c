@@ -449,7 +449,7 @@ int	NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	MIB_TCPTABLE	*pTcpTable = NULL;
 	DWORD		dwSize, dwRetVal;
 	int		i, ret = SYSINFO_RET_FAIL;
-	zbx_uint64_t	port;
+	unsigned short	port;
 	char		tmp[8];
 
 	assert(result);
@@ -462,10 +462,7 @@ int	NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	if (0 != get_param(param, 1, tmp, sizeof(tmp)))
 		return SYSINFO_RET_FAIL;
 
-	if (SUCCEED != is_uint64(tmp, &port))
-		return SYSINFO_RET_FAIL;
-
-	if (port > 65535)
+	if (SUCCEED != is_ushort(tmp, &port))
 		return SYSINFO_RET_FAIL;
 
 	dwSize = sizeof(MIB_TCPTABLE);
@@ -483,7 +480,7 @@ int	NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RES
 		for (i = 0; i < (int) pTcpTable->dwNumEntries; i++)
 		{
 			if (MIB_TCP_STATE_LISTEN == pTcpTable->table[i].dwState &&
-					(u_short)port == ntohs((u_short)pTcpTable->table[i].dwLocalPort))
+					port == ntohs((u_short)pTcpTable->table[i].dwLocalPort))
 			{
 				SET_UI64_RESULT(result, 1);
 				break;
