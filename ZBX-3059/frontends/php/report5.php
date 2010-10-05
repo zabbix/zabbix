@@ -113,6 +113,7 @@ include_once('include/page_header.php');
 		$item['itemid'] = $row['itemid'];
 		$item['action'] = str_in_array($row['value_type'],array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64))?'showgraph':'showvalues';
 		$item['description'] = item_description($row);
+		$item['value_type'] = $row['value_type']; //ZBX-3059: So it would be possible to show different caption for history for chars and numbers (KB)
 
 		$triggers[$row['triggerid']]['items'][$row['itemid']] = $item;
 	}
