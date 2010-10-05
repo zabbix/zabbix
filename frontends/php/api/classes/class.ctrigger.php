@@ -459,6 +459,12 @@ class CTrigger extends CZBXAPI{
 
 			if(isset($options['filter']['hostid']) && !is_null($options['filter']['hostid'])){
 				zbx_value2array($options['filter']['hostid']);
+				
+				$sql_parts['from']['functions'] = 'functions f';
+				$sql_parts['from']['items'] = 'items i';
+				$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
+				$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
+				
 				$sql_parts['where']['hostid'] = DBcondition('i.hostid', $options['filter']['hostid']);
 			}
 
