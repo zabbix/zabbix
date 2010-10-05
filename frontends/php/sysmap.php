@@ -26,7 +26,7 @@ require_once('include/forms.inc.php');
 $page['title'] = 'S_CONFIGURATION_OF_NETWORK_MAPS';
 $page['file'] = 'sysmap.php';
 $page['hist_arg'] = array('sysmapid');
-$page['scripts'] = array('effects.js', 'dragdrop.js','class.cmap.js');
+$page['scripts'] = array('effects.js', 'dragdrop.js','sysmap.tpl.js','class.cmap.js');
 $page['type'] = detect_page_type();
 
 include_once('include/page_header.php');
@@ -282,7 +282,7 @@ include_once('include/page_header.php');
 						$action = '';
 						$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.add_selement('.zbx_jsvalue($selement).',1);';
 						$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.updateMapImage();';
-						$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.show_selement_list();';
+						//$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.show_selement_list();';
 
 						print($action);
 					}
