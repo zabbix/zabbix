@@ -310,24 +310,23 @@ include_once('include/page_header.php');
 			$table_map->addRow(S_ICON_LABEL_LOCATION, $cmbLocation);
 
 			$config = select_config();
-			$cb = new CComboBox('show_unack', $show_unack);
-			$cb->addItems(array(
+			$selectShowUnack = new CComboBox('show_unack', $show_unack);
+			$selectShowUnack->addItems(array(
 				EXTACK_OPTION_ALL => S_O_ALL,
 				EXTACK_OPTION_BOTH => S_O_SEPARATED,
 				EXTACK_OPTION_UNACK => S_O_UNACKNOWLEDGED_ONLY,
 			));
-			$cb->setEnabled($config['event_ack_enable']);
+			$selectShowUnack->setEnabled($config['event_ack_enable']);
 			if(!$config['event_ack_enable']){
-				$cb->setAttribute('title', S_EVENT_ACKNOWLEDGING_DISABLED);
+				$selectShowUnack->setAttribute('title', S_EVENT_ACKNOWLEDGING_DISABLED);
 			}
-			$table_map->addRow(S_PROBLEM_DISPLAY, $cb);
+			$table_map->addRow(S_PROBLEM_DISPLAY, $selectShowUnack);
 
-
-
+// TODO: remove test variable
 			$urls = array(
 				array('name' => 'asd', 'url' => 'asdasd', 'elementtype' => 2),
 			);
-
+//--
 			$url_table = new Ctable();
 			$url_table->setHeader(array(S_NAME, S_URL, S_ELEMENT, SPACE));
 
