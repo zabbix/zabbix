@@ -898,7 +898,7 @@ COpt::memoryPick();
 	}
 
 	public static function exists($object){
-		$keyFields = array(array('hostid', 'host'));
+		$keyFields = array(array('templateid', 'host'));
 
 		$options = array(
 			'filter' => zbx_array_mintersect($keyFields, $object),
@@ -1218,7 +1218,6 @@ COpt::memoryPick();
 
 
 // UPDATE TEMPLATES PROPERTIES {{{
-
 			if(isset($data['host'])){
 				if(count($templates) > 1){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot mass update template name');
@@ -1234,11 +1233,15 @@ COpt::memoryPick();
 					'nopermissions' => 1
 				);
 				$template_exists = self::get($options);
+				$template_exist = reset($template_exists);
 
-				$template_exists = reset($template_exists);
-
-				if(!empty($template_exists) && ($template_exists['templateid'] != $cur_template['templateid'])){
+				if(!is_null($template_exist) && ($template_exist['templateid'] != $cur_template['templateid'])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE . ' [ ' . $data['host'] . ' ] ' . S_ALREADY_EXISTS_SMALL);
+				}
+
+//can't set the same name as existing host
+				if(CHost::exists(array('host' => $cur_template['host']))){
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$template['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
 			}
 
@@ -1356,12 +1359,10 @@ COpt::memoryPick();
 
 // UPDATE MACROS {{{
 			if(isset($data['macros']) && !is_null($data['macros'])){
-				$host_macros = CUserMacro::get(array('hostids' => $templateids, 'extendoutput' => 1));
-
-				$result = self::massAdd(array('templates' => $templates, 'macros' => $data['macros']));
-				if(!$result){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Can\'t add macro');
-				}
+				$host_macros = CUserMacro::get(array(
+					'hostids' => $templateids,
+					'output' => API_OUTPUT_EXTEND,
+				));
 
 				$macros_to_del = array();
 				foreach($host_macros as $hmacro){
@@ -1376,12 +1377,21 @@ COpt::memoryPick();
 						$macros_to_del[] = $hmacro;
 					}
 				}
-
 				if(!empty($macros_to_del)){
 					$result = self::massRemove(array('templates' => $templates, 'macros' => $macros_to_del));
 					if(!$result){
 						self::exception(ZBX_API_ERROR_PARAMETERS, 'Can\'t remove macro');
 					}
+				}
+
+				$result = CUsermacro::massUpdate(array('templates' => $templates, 'macros' => $data['macros']));
+				if(!$result){
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot update macro');
+				}
+
+				$result = self::massAdd(array('templates' => $templates, 'macros' => $data['macros']));
+				if(!$result){
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot add macro');
 				}
 			}
 // }}} UPDATE MACROS

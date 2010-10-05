@@ -246,7 +246,7 @@ include_once('include/page_header.php');
 		require_once('include/export.inc.php');
 		DBstart();
 		$result = zbxXML::import($_FILES['import_file']['tmp_name']);
-		$result &= zbxXML::parseMain($rules);
+		if($result) $result = zbxXML::parseMain($rules);
 		$result = DBend($result);
 		show_messages($result, S_IMPORTED.SPACE.S_SUCCESSEFULLY_SMALL, S_IMPORT.SPACE.S_FAILED_SMALL);
 	}
@@ -292,7 +292,6 @@ include_once('include/page_header.php');
 
 		if(!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY)))
 			access_deny();
-
 
 		$clone_templateid = false;
 		if($_REQUEST['form'] == 'full_clone'){
@@ -404,7 +403,6 @@ include_once('include/page_header.php');
 			}
 		}
 // }
-
 
 		$result = DBend($result);
 

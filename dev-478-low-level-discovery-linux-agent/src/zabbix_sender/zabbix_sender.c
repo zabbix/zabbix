@@ -33,19 +33,20 @@ const char	usage_message[] = "[-Vhv] {[-zpsI] -ko | [-zpI] -T -i <file> -r} [-c 
 #ifdef HAVE_GETOPT_LONG
 const char	*help_message[] = {
 	"Options:",
-	"  -c --config <File>                   Specify configuration file",
+	"  -c --config <file>                   Specify configuration file",
 	"",
-	"  -z --zabbix-server <Server>          Hostname or IP address of Zabbix Server",
-	"  -p --port <Server port>              Specify port number of server trapper running on the server. Default is 10051",
-	"  -s --host <Hostname>                 Specify host name. Host IP address and DNS name will not work",
-	"  -I --source-address <ip address>     Specify source IP address",
+	"  -z --zabbix-server <server>          Hostname or IP address of Zabbix Server",
+	"  -p --port <server port>              Specify port number of server trapper running on the server. Default is 10051",
+	"  -s --host <hostname>                 Specify host name. Host IP address and DNS name will not work",
+	"  -I --source-address <IP address>     Specify source IP address",
 	"",
-	"  -k --key <Key>                       Specify metric name (key) we want to send",
-	"  -o --value <Key value>               Specify value of the key",
+	"  -k --key <key>                       Specify item key",
+	"  -o --value <key value>               Specify value",
 	"",
-	"  -i --input-file <Input file>         Load values from input file. Specify - for standard input",
-	"                                       Each line of file contains blanks delimited: <hostname> <key> <value>",
-	"  -T --with-timestamps                 Each line of file contains blanks delimited: <hostname> <key> <timestamp> <value>",
+	"  -i --input-file <input file>         Load values from input file. Specify - for standard input",
+	"                                       Each line of file contains whitespace delimited: <hostname> <key> <value>",
+	"                                       Specify - in <hostname> to use hostname from configuration file or --host argument",
+	"  -T --with-timestamps                 Each line of file contains whitespace delimited: <hostname> <key> <timestamp> <value>",
 	"                                       This can be used with --input-file option",
 	"  -r --real-time                       Send metrics one by one as soon as they are received",
 	"                                       This can be used when reading from standard input",
@@ -60,19 +61,20 @@ const char	*help_message[] = {
 #else
 const char	*help_message[] = {
 	"Options:",
-	"  -c <File>                    Specify configuration file",
+	"  -c <file>                    Specify configuration file",
 	"",
-	"  -z <Server>                  Hostname or IP address of Zabbix Server",
-	"  -p <Server port>             Specify port number of server trapper running on the server. Default is 10051",
-	"  -s <Hostname>                Specify hostname or IP address of a host",
-	"  -I <ip address>              Specify source IP address",
+	"  -z <server>                  Hostname or IP address of Zabbix Server",
+	"  -p <server port>             Specify port number of server trapper running on the server. Default is 10051",
+	"  -s <hostname>                Specify hostname or IP address of a host",
+	"  -I <IP address>              Specify source IP address",
 	"",
-	"  -k <Key>                     Specify metric name (key) we want to send",
-	"  -o <Key value>               Specify value of the key",
+	"  -k <key>                     Specify item key",
+	"  -o <key value>               Specify value",
 	"",
-	"  -i <Input file>              Load values from input file. Specify - for standard input",
-	"                               Each line of file contains blanks delimited: <hostname> <key> <value>",
-	"  -T                           Each line of file contains blanks delimited: <hostname> <key> <timestamp> <value>",
+	"  -i <input file>              Load values from input file. Specify - for standard input",
+	"                               Each line of file contains whitespace delimited: <hostname> <key> <value>",
+	"                               Specify - in <hostname> to use hostname from configuration file or --host argument",
+	"  -T                           Each line of file contains whitespace delimited: <hostname> <key> <timestamp> <value>",
 	"                               This can be used with -i option",
 	"  -r                           Send metrics one by one as soon as they are received",
 	"                               This can be used when reading from standard input",
@@ -451,7 +453,7 @@ int main(int argc, char **argv)
 			goto exit;
 		}
 
-		while (NULL != fgets(in_line, sizeof(in_line), in) && SUCCEED == ret)	/* <hostname> <key> <value> */
+		while (NULL != fgets(in_line, sizeof(in_line), in) && SUCCEED == ret)	/* <hostname> <key> [<timestamp>] <value> */
 		{
 			total_count++; /* also used as inputline */
 

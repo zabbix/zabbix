@@ -88,6 +88,7 @@
 	define('PAGE_TYPE_HTML_BLOCK',		5);	// simple block of html (as text)
 	define('PAGE_TYPE_JSON',			6);	// simple JSON
 	define('PAGE_TYPE_JSON_RPC',		7);	// api call
+	define('PAGE_TYPE_TEXT_FILE',		8);	// api call
 
 
 	define('ZBX_SESSION_ACTIVE',		0);
@@ -362,8 +363,13 @@
 	define('MEDIA_TYPE_EXEC',		1);
 	define('MEDIA_TYPE_SMS',		2);
 	define('MEDIA_TYPE_JABBER',		3);
-
-	define('ACTION_DEFAULT_MSG', '{TRIGGER.NAME}: {STATUS}');
+	define('MEDIA_TYPE_EZ_TEXTING',	100);
+	
+	define('EZ_TEXTING_LIMIT_USA',		0);
+	define('EZ_TEXTING_LIMIT_CANADA',	1);
+	
+	define('ACTION_DEFAULT_SUBJ',		'{TRIGGER.NAME}: {TRIGGER.STATUS}');
+	define('ACTION_DEFAULT_MSG',		"{TRIGGER.NAME}: {TRIGGER.STATUS}\nLast value: {ITEM.LASTVALUE}\n\n{TRIGGER.URL}");
 
 	define('ACTION_STATUS_ENABLED',		0);
 	define('ACTION_STATUS_DISABLED',	1);
@@ -514,6 +520,7 @@
 
 	define('HTTPTEST_AUTH_NONE',	0);
 	define('HTTPTEST_AUTH_BASIC',	1);
+	define('HTTPTEST_AUTH_NTLM',	2);
 
 	define('HTTPTEST_STATUS_ACTIVE',	0);
 	define('HTTPTEST_STATUS_DISABLED',	1);

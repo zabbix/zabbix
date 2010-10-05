@@ -546,13 +546,13 @@ int	get_value_telnet(DC_ITEM *item, AGENT_RESULT *result)
 	if ('\0' != *port)
 	{
 		port_int = atoi(port);
-		if (port_int < 1 || port_int > 65536)
+		if (port_int < 1 || port_int > 65535)
 			return NOTSUPPORTED;
 
 		item->host.port = (unsigned short)port_int;
 	}
 	else
-		item->host.port = 23;
+		item->host.port = ZBX_DEFAULT_TELNET_PORT;
 
 	return telnet_run(item, result, encoding);
 }

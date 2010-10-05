@@ -90,7 +90,7 @@ void	zbx_vector_ ## __id ## _remove_noorder(zbx_vector_ ## __id ## _t *vector, i
 {														\
 	if (!(0 <= index && index < vector->values_num))							\
 	{													\
-		zabbix_log(LOG_LEVEL_CRIT, "removing a non-existent element at index [%d]", index);		\
+		zabbix_log(LOG_LEVEL_CRIT, "removing a non-existent element at index %d", index);		\
 		exit(FAIL);											\
 	}													\
 														\

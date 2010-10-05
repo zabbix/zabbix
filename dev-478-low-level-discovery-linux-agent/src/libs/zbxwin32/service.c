@@ -365,7 +365,6 @@ int ZabbixRemoveService(void)
 	return ret;
 }
 
-
 /*
  * Start service
  */
