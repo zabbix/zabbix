@@ -126,6 +126,8 @@ include_once('include/page_header.php');
 					error(S_IMAGE_SIZE_MUST_BE_LESS_THAN_MB);
 					return false;
 				}
+
+				$image = base64_encode($image);
 			}
 
 			if(isset($_REQUEST['imageid'])){
@@ -172,7 +174,7 @@ include_once('include/page_header.php');
 		else if(isset($_REQUEST['delete'])&&isset($_REQUEST['imageid'])) {
 			$image = get_image_by_imageid($_REQUEST['imageid']);
 
-			$result = CImage::delete(array('imageids' => $_REQUEST['imageid']));
+			$result = CImage::delete($_REQUEST['imageid']);
 
 			show_messages($result, S_IMAGE_DELETED, S_CANNOT_DELETE_IMAGE);
 			if($result){
@@ -499,56 +501,74 @@ include_once('include/page_header.php');
 		if(isset($_REQUEST['save'])){
 			try{
 				DBstart();
-				$global_macros = CUserMacro::get(array('globalmacro' => 1, 'extendoutput' => 1));
-				$global_macros = zbx_toHash($global_macros, 'globalmacroid');
 
-				$macros = get_request('macros', array());
+				$newMacros = get_request('macros', array());
+				foreach($newMacros as $mnum => $nmacro){
+					if(zbx_empty($nmacro['value'])) unset($newMacros[$mnum]);
+				}
 
-				$macros_to_del = array();
+				$global_macros = CUserMacro::get(array(
+					'globalmacro' => 1,
+					'output' => API_OUTPUT_EXTEND
+				));
+				$global_macros = zbx_toHash($global_macros, 'macro');
+
+				$newMacroMacros = zbx_objectValues($newMacros, 'macro');
+				$newMacroMacros = zbx_toHash($newMacroMacros, 'macro');
+
+// Delete
+				$macrosToDelete = array();
 				foreach($global_macros as $gmacro){
-					$del = true;
-					foreach($macros as $nmacro){
-						if($gmacro['macro'] == $nmacro['macro']){
-							$del = false;
-							break;
-						}
-					}
-					if($del){
-						$macros_to_del[] = $gmacro;
+					if(!isset($newMacroMacros[$gmacro['macro']])){
+						$macrosToDelete[] = $gmacro['macro'];
 					}
 				}
-				if(!empty($macros_to_del)){
-					if(!CUserMacro::deleteGlobal($macros_to_del))
+
+// Update
+				$macrosToUpdate = array();
+				foreach($newMacros as $mnum => $nmacro){
+					if(isset($global_macros[$nmacro['macro']])){
+						$macrosToUpdate[] = $nmacro;
+						unset($newMacros[$mnum]);
+					}
+				}
+//----
+				if(!empty($macrosToDelete)){
+					if(!CUserMacro::deleteGlobal($macrosToDelete))
 						throw new Exception('Can\'t remove macro');
 				}
 
-				$result = CUsermacro::updateGlobal($macros);
-				if(!$result){
-					throw new Exception('Cannot update macro');
+				if(!empty($macrosToUpdate)){
+					if(!CUsermacro::updateGlobal($macrosToUpdate))
+						throw new Exception('Cannot update macro');
 				}
 
-				$new_macroids = CUsermacro::createGlobal($macros);
-				if(!$new_macroids){
-					throw new Exception('Cannot add macro');
+				if(!empty($newMacros)){
+					$macrosToAdd = array_values($newMacros);
+					$new_macroids = CUsermacro::createGlobal($macrosToAdd);
+					if(!$new_macroids)
+						throw new Exception('Cannot add macro');
 				}
 
-				$new_macros = CUserMacro::get(array(
-					'globalmacroids' => $new_macroids['globalmacroids'],
-					'globalmacro' => 1,
-					'extendoutput' => 1
-				));
-				$new_macros = zbx_toHash($new_macros, 'globalmacroid');
-				foreach($macros_to_del as $delm){
-					add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MACRO,
-						$delm['globalmacroid'],
-						$global_macros[$delm['globalmacroid']]['macro'],
-						null,null,null);
-				}
-				foreach($new_macroids['globalmacroids'] as $newid){
-					add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MACRO,
-						$newid,
-						$new_macros[$newid]['macro'],
-						null,null,null);
+				if(!empty($macrosToAdd)){
+					$new_macros = CUserMacro::get(array(
+						'globalmacroids' => $new_macroids['globalmacroids'],
+						'globalmacro' => 1,
+						'output' => API_OUTPUT_EXTEND
+					));
+					$new_macros = zbx_toHash($new_macros, 'globalmacroid');
+					foreach($macrosToDelete as $delm){
+						add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MACRO,
+							$delm['globalmacroid'],
+							$global_macros[$delm['globalmacroid']]['macro'],
+							null,null,null);
+					}
+					foreach($new_macroids['globalmacroids'] as $newid){
+						add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MACRO,
+							$newid,
+							$new_macros[$newid]['macro'],
+							null,null,null);
+					}
 				}
 
 				DBend(true);
@@ -699,20 +719,21 @@ include_once('include/page_header.php');
 
 			$tr = 0;
 			$row = new CRow();
-			$sql = 'SELECT imageid,imagetype,name '.
-					' FROM images'.
-					' WHERE '.DBin_node('imageid').
-						' AND imagetype='.$imagetype.
-					' ORDER BY name';
-			$result=DBselect($sql);
-			while($image = DBfetch($result)){
+
+			$options = array(
+				'filter'=> array('imagetype'=> $imagetype),
+				'output'=> API_OUTPUT_EXTEND,
+				'sortfield'=> 'name'
+			);
+			$images = CImage::get($options);
+			foreach($images as $inum => $image){
 				switch($image['imagetype']){
 					case IMAGE_TYPE_ICON:
-						$imagetype=S_ICON;
+						$imagetype = S_ICON;
 						$img = new CImg('imgstore.php?iconid='.$image['imageid'],'no image');
 					break;
 					case IMAGE_TYPE_BACKGROUND:
-						$imagetype=S_BACKGROUND;
+						$imagetype = S_BACKGROUND;
 						$img = new CImg('imgstore.php?iconid='.$image['imageid'],'no image',200);
 					break;
 					default: $imagetype=S_UNKNOWN;
