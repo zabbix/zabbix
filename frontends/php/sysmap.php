@@ -208,12 +208,11 @@ include_once('include/page_header.php');
 						}
 
 						foreach($links as $id => $link){
+							$link['sysmapid'] = $sysmapid;
 							if(isset($link['new'])){
-								$link['sysmapid'] = $sysmapid;
 								$result = add_link($link);
 							}
 							else{
-								$link['sysmapid'] = $sysmapid;
 								$result = update_link($link);
 								unset($db_linkids[$link['linkid']]);
 							}

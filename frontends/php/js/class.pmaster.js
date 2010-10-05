@@ -37,7 +37,7 @@ initialize: function($super, pmid, obj4upd){
 //--
 	
 	var doll = new Array();
-	for(id in obj4upd){
+	for(var id in obj4upd){
 		if((typeof(obj4upd[id]) != 'undefined') && (!is_null(obj4upd[id]))){
 			doll = obj4upd[id];
 			
@@ -136,7 +136,7 @@ var CDoll = Class.create(CDebug,{
 _pmasterid:		0,			// PMasters id to which doll belongs
 _domobj:		null,		// DOM obj for update
 _domid:			null,		// DOM obj id
-_domdark:		null,		// DOM div fro darken updated obj
+_domdark:		null,		// DOM div for darken updated obj
 _url:			'',
 _frequency:		60,			// min 5 sec
 _darken:		0,			// make updated object darken - 1

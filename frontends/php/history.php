@@ -322,10 +322,10 @@ include_once('include/page_header.php');
 					S_VALUE),'header');
 
 			if(isset($_REQUEST['filter']) && !zbx_empty($_REQUEST['filter']) && in_array($_REQUEST['filter_task'], array(FILTER_TASK_SHOW, FILTER_TASK_HIDE))){
-				$options['pattern'] = $_REQUEST['filter'];
+				$options['search'] = array('value' => $_REQUEST['filter']);
 
 				if($_REQUEST['filter_task'] == FILTER_TASK_HIDE)
-					$options['excludePattern'] = 1;
+					$options['excludeSearch'] = 1;
 			}
 
 			$options['sortfield'] = 'id';
