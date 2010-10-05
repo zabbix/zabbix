@@ -52,12 +52,12 @@ selements: {},						// map selements array
 links:	{},							// map links array
 
 selection: {
-	count: 0,						// numer of selected elements
-	position: 0,					// elements numerate
-	selements: new Array()			// selected SElements
+	count: 0,						// number of selected elements
+	selements: {}					// selected SElements
 },
 
 menu_active: 0,						// To recognize D&D
+debug_status: 0,
 
 mselement: {
 	selementid:			0,			// ALWAYS must be a STRING (js doesn't support uint64)
@@ -74,7 +74,7 @@ mselement: {
 	label_location:		3,
 	x:					0,
 	y:					0,
-	url:				'',
+	urls:				{},
 	html_obj:			null,			// reference to html obj
 	html_objid:			null,			// html elements id
 	selected:			0				// element is not selected
@@ -256,14 +256,14 @@ add_empty_link: function(e){
 		var selementid1 = null;
 		var selementid2 = null;
 
-		for(var i=0; i < this.selection.position; i++){
-			if(!isset(i, this.selection.selements)) continue;
+		for(var selementid in this.selection.selements){
+			if(!isset(selementid, this.selements)) continue;
 
 			if(is_null(selementid1)){
-				selementid1 = this.selection.selements[i];
+				selementid1 = selementid;
 			}
 			else{
-				selementid2 = this.selection.selements[i];
+				selementid2 = selementid;
 				break;
 			}
 		}
@@ -325,30 +325,24 @@ select_selement: function(selementid, multi){
 	var selement = this.selements[selementid];
 
 	if((typeof(this.selements[selementid]) != 'undefiend') && !empty(this.selements[selementid])){
-		var position = null;
-
 		if(is_null(this.selements[selementid].selected)){
-			position = this.selection.position;
-
-			this.selection.selements[position] = selementid;
-			this.selements[selementid].selected = position;
+			this.selection.selements[selementid] = selementid;
+			this.selements[selementid].selected = selementid;
 
 			selement.html_obj.style.border = '1px #3333FF solid';
 			selement.html_obj.style.backgroundColor = '#00AAAA';
 			selement.html_obj.style.opacity = '.60';
 
 			this.selection.count++;
-			this.selection.position++;
 		}
 		else if((this.selection.count > 1) && !multi){
 // if selected several selements and then we clicked on one of them
 		}
 		else{
 			this.selection.count--;
-			position = selement.selected;
 
-			this.selection.selements[position] = null;
-			delete(this.selection.selements[position]);
+			this.selection.selements[selement.selementid] = null;
+			delete(this.selection.selements[selement.selementid]);
 
 			this.selements[selementid].selected = null;
 
@@ -358,18 +352,19 @@ select_selement: function(selementid, multi){
 		}
 
 		if(!multi && (this.selection.count > 1)){
-			for(var i=0; i<this.selection.position; i++){
-				if(!isset(i,this.selection.selements) || (this.selection.selements[i] == selementid)) continue;
+
+			for(var selectedSelementid in this.selection.selements){
+				if(empty(this.selection.selements[selectedSelementid]) || (selectedSelementid == selementid)) continue;
 
 				this.selection.count--;
 
-				this.selements[this.selection.selements[i]].selected = null;
-				this.selements[this.selection.selements[i]].html_obj.style.border = '0px';
-				this.selements[this.selection.selements[i]].html_obj.style.backgroundColor = 'transparent';
-				this.selements[this.selection.selements[i]].html_obj.style.opacity = '1';
+				this.selements[selectedSelementid].selected = null;
+				this.selements[selectedSelementid].html_obj.style.border = '0px';
+				this.selements[selectedSelementid].html_obj.style.backgroundColor = 'transparent';
+				this.selements[selectedSelementid].html_obj.style.opacity = '1';
 
-				this.selection.selements[i] = null;
-				delete(this.selection.selements[i]);
+				this.selection.selements[selectedSelementid] = null;
+				delete(this.selection.selements[selectedSelementid]);
 			}
 		}
 	}
@@ -445,6 +440,14 @@ add_selement: function(selement, update_icon){
 		selement.image = null;
 	}
 
+	if(isset('urls', selement)){
+		var urls = selement.urls;
+		selement.urls = {};
+		for(var i=0; i < urls.length; i++){
+			selement.urls[urls[i].name] = urls[i];
+		}
+	}
+
 	this.selements[selementid] = selement;
 },
 
@@ -484,7 +487,7 @@ updateSelement: function(selement){
 					{
 						'method': 'post',
 						'parameters':params,
-						'onSuccess': function(){ },
+//						'onSuccess': function(){ },
 //						'onSuccess': function(resp){ SDI(resp.responseText); },
 						'onFailure': function(){ document.location = url.getPath()+'?'+Object.toQueryString(params); }
 					}
@@ -496,13 +499,13 @@ remove_selements: function(e){
 //--
 
 	if(Confirm(locale['S_DELETE_SELECTED_ELEMENTS_Q'])){
-		for(var i=0; i<this.selection.position; i++){
-			if(!isset(i, this.selection.selements)) continue;
+		for(var selementid in this.selection.selements){
+			if(!isset(selementid, this.selements)) continue;
 
-			this.remove_selement(this.selection.selements[i]);
+			this.remove_selement(selementid);
 		}
 
-		this.hideForm(e);
+		this.formHide(e);
 		this.updateMapImage();
 	}
 },
@@ -515,8 +518,8 @@ remove_selement: function(selementid, update_map){
 
 // Unselect
 	this.selection.count--;
-	this.selection.selements[this.selements[selementid].selected] = null;
-	delete(this.selection.selements[this.selements[selementid].selected]);
+	this.selection.selements[selementid] = null;
+	delete(this.selection.selements[selementid]);
 
 // Remove related links
 	this.remove_links_by_selementid(selementid);
@@ -645,14 +648,14 @@ remove_links: function(e){
 		var selementid1 = null;
 		var selementid2 = null;
 
-		for(var i=0; i < this.selection.position; i++){
-			if(!isset(i, this.selection.selements)) continue;
+		for(var selementid in this.selection.selements){
+			if(!isset(selementid, this.selements)) continue;
 
 			if(is_null(selementid1)){
-				selementid1 = this.selection.selements[i];
+				selementid1 = selementid;
 			}
 			else{
-				selementid2 = this.selection.selements[i];
+				selementid2 = selementid;
 				break;
 			}
 		}
@@ -670,7 +673,7 @@ remove_links: function(e){
 				this.remove_link(linkid);
 			}
 
-			this.hideForm(e);
+			this.formHide(e);
 			this.updateMapImage();
 		}
 	}
@@ -872,7 +875,7 @@ updateMapImage: function(){
 //--
 
 	var params = {
-		'output': 'ajax',
+		'output': 'text',
 		'sysmapid': this.sysmapid,
 		'noselements':	1,
 		'nolinks':	1
@@ -1061,10 +1064,15 @@ show_menu: function(e){
 	}
 
 	if(this.selection.count == 0){
-		this.hideForm(e);
+		this.formHide(e);
 	}
 	else{
-		this.showForm(e, selementid);
+		for(var selementid in this.selection.selements){
+			if(!isset(selementid, this.selements)) continue;
+			break;
+		}
+
+		this.formShow(e, selementid);
 	}
 },
 
@@ -1072,8 +1080,8 @@ show_menu: function(e){
 //  Form  ------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------
 
-showForm: function(e, selementid){
-	this.debug('showForm');
+formShow: function(e, selementid){
+	this.debug('formShow');
 //--
 
 	var divForm = document.getElementById('divSelementForm');
@@ -1097,10 +1105,10 @@ showForm: function(e, selementid){
 
 
 // Form init
-	this.updateForm_selement(e, selementid);
+	this.form_selement_update(e, selementid);
 	this.update_multiContainer(e);
 	this.update_linkContainer(e);
-	this.hideForm_link(e);
+	this.form_link_hide(e);
 //---
 
 	new Draggable(divForm,{
@@ -1112,16 +1120,16 @@ showForm: function(e, selementid){
 	$(divForm).show();
 },
 
-hideForm: function(e){
-	this.debug('hideForm');
+formHide: function(e){
+	this.debug('formHide');
 
 	var divForm = $('divSelementForm');
 	if(!is_null(divForm)) divForm.hide();
 
-	for(var i=0; i<this.selection.position; i++){
-		if(!isset(i,this.selection.selements)) continue;
+	for(var selementid in this.selection.selements){
+		if(!isset(selementid, this.selements)) continue;
 
-		this.select_selement(this.selection.selements[i], true);
+		this.select_selement(selementid, true);
 	}
 },
 
@@ -1219,12 +1227,11 @@ update_multiContainer: function(e){
 
 	var count = 0;
 	var selement = null;
-	for(var i=0; i<this.selection.position; i++){
-		if(!isset(i, this.selection.selements)) continue;
-		if(!isset(this.selection.selements[i], this.selements)) continue;
+	for(var selementid in this.selection.selements){
+		if(!isset(selementid, this.selements)) continue;
 
 		count++;
-		selement = this.selements[this.selection.selements[i]];
+		selement = this.selements[selementid];
 
 		if(count > 4) this.multiContainer.container.style.height = '127px';
 		else this.multiContainer.container.style.height = 'auto';
@@ -1366,11 +1373,8 @@ update_linkContainer: function(e){
 
 	var selementid = 0;
 	var linkids = {};
-	for(var i=0; i<this.selection.position; i++){
-		if(!isset(i, this.selection.selements)) continue;
-		if(!isset(this.selection.selements[i], this.selements)) continue;
-
-		selementid = this.selection.selements[i];
+	for(var selementid in this.selection.selements){
+		if(!isset(selementid, this.selements)) continue;
 
 		var current_linkids = this.get_linkid_by_selementids(selementid);
 		for(var linkid in current_linkids){
@@ -1403,7 +1407,7 @@ update_linkContainer: function(e){
 
 		var e_span_5 = document.createElement('span');
 		e_span_5.className = "link";
-		addListener(e_span_5, 'click', this.updateForm_link.bindAsEventListener(this, linkid));
+		addListener(e_span_5, 'click', this.form_link_update.bindAsEventListener(this, linkid));
 		e_span_5.appendChild(document.createTextNode(locale['S_LINK']+' '+count));
 		e_td_4.appendChild(e_span_5);
 
@@ -1447,9 +1451,21 @@ update_linkContainer: function(e){
 
 //  SELEMENTS FORM ----------------------------------------------------------------------------
 //---------------------------------------------------------------------------------------------
+form_selement_newUrl: function(e){
+	this.debug('form_selement_newUrl');
+//--
 
-createForm_selement: function(e){
-this.debug('createForm_selement');
+	var selementid = this.selementForm.selementid.value;
+
+	var ll = $(this.selementForm.urls).select('input[name="remove"]').length;
+	var sysmapelementurlid = selementid+''+ll;
+	var tpl = new Template(ZBX_TPL.selementFormUrls);
+	
+	$('urlfooter').insert({'before' : tpl.evaluate({'sysmapelementurlid': sysmapelementurlid})});
+},
+
+form_selement_create: function(e){
+this.debug('form_selement_create');
 
 // var initialization of diferent types of form
 	this.selementForm.typeDOM = {};
@@ -1553,7 +1569,7 @@ this.selementForm.elementtype = e_select_6;
 	e_select_6.setAttribute('id',"elementtype");
 	e_td_5.appendChild(e_select_6);
 
-	addListener(e_select_6, 'change', this.updateForm_selementByType.bindAsEventListener(this,false));
+	addListener(e_select_6, 'change', this.form_selement_updateByType.bindAsEventListener(this,false));
 
 
 	var e_option_7 = document.createElement('option');
@@ -1798,7 +1814,7 @@ this.selementForm.advanced_icons = e_input_6;
 	e_input_6.setAttribute('id', "advanced_icons");
 	e_input_6.className = 'checkbox';
 	e_td_5.appendChild(e_input_6);
-	addListener(e_input_6, 'click', this.updateForm_selementByIcons.bindAsEventListener(this));
+	addListener(e_input_6, 'click', this.form_selement_updateByIcons.bindAsEventListener(this));
 
 	var icons = zbxSelementIcons['icons'];
 	for(var iconid in icons){
@@ -2094,37 +2110,17 @@ this.selementForm.y = e_input_6;
 	e_td_5.appendChild(e_input_6);
 
 
-// URL
+// URLS
 	var e_tr_4 = document.createElement('tr');
+this.selementForm.urls = e_tr_4;
 	e_tr_4.className = "even_row";
 	e_tbody_3.appendChild(e_tr_4);
 
 
-	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_l";
 
-this.selementForm.massEdit.chkboxURL = e_tr_4;
+	$(e_tr_4).update(ZBX_TPL.selementFormUrlContainer);
 
-	e_td_5.appendChild(document.createTextNode(' '));
-	e_td_5.appendChild(document.createTextNode(locale['S_URL']));
-	e_tr_4.appendChild(e_td_5);
-
-
-	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_r";
-	e_tr_4.appendChild(e_td_5);
-
-
-	var e_input_6 = document.createElement('input');
-this.selementForm.url = e_input_6;
-	e_input_6.setAttribute('value', '');
-	e_input_6.setAttribute('size',"56");
-	e_input_6.setAttribute('id',"url");
-	e_input_6.setAttribute('name',"url");
-	e_input_6.className = "biginput";
-	e_td_5.appendChild(e_input_6);
-
-
+// Footer
 	var e_tr_4 = document.createElement('tr');
 	e_tr_4.className = "footer";
 	e_tbody_3.appendChild(e_tr_4);
@@ -2144,7 +2140,7 @@ this.selementForm.url = e_input_6;
 	e_input_6.setAttribute('value',locale['S_APPLY']);
 
 
-	addListener(e_input_6, 'click', this.saveForm_selement.bindAsEventListener(this));
+	addListener(e_input_6, 'click', this.form_selement_save.bindAsEventListener(this));
 
 	e_td_5.appendChild(document.createTextNode(' '));
 	e_td_5.appendChild(e_input_6);
@@ -2156,7 +2152,7 @@ this.selementForm.url = e_input_6;
 	e_input_6.className = "button";
 	e_input_6.setAttribute('value',locale['S_REMOVE']);
 
-	addListener(e_input_6, 'click', this.deleteForm_selement.bindAsEventListener(this));
+	addListener(e_input_6, 'click', this.form_selement_delete.bindAsEventListener(this));
 
 	e_td_5.appendChild(document.createTextNode(' '));
 	e_td_5.appendChild(e_input_6);
@@ -2168,26 +2164,31 @@ this.selementForm.url = e_input_6;
 	e_input_6.className = "button";
 	e_input_6.setAttribute('value',locale['S_CLOSE']);
 
-	addListener(e_input_6, 'click', this.hideForm.bindAsEventListener(this));
+	addListener(e_input_6, 'click', this.formHide.bindAsEventListener(this));
 
 	e_td_5.appendChild(e_input_6);
 },
 
-updateForm_selement: function(e, selementid){
-	this.debug('updateForm_selement');
+form_selement_update: function(e, selementid){
+	this.debug('form_selement_update');
 //--
 
 // Create if not exists
 	if(is_null($('selementForm'))){
-		this.createForm_selement(e);
+		this.form_selement_create(e);
 		$('divSelementForm').appendChild(this.selementForm.form);
-		$('divSelementForm').appendChild(document.createElement('br'));
+
+// assigning Listeners
+		$('newSelementUrl').observe('click', this.form_selement_newUrl.bindAsEventListener(this));
 	}
+//--
+
+// cleaning URLS
+	$(this.selementForm.urls).select('tr[id^=urlrow]').each(function(e){$(e).remove();});
 //--
 
 	if(this.selection.count == 1){
 		var selement = this.selements[selementid];
-
 // SELEMENT
 		this.selementForm.selementid.value = selementid;
 
@@ -2264,10 +2265,15 @@ updateForm_selement: function(e, selementid){
 		$(this.selementForm.x).value = selement.x;
 		$(this.selementForm.y).value = selement.y;
 
-// URL
-		this.selementForm.url.value = selement.url;
+// URLS
+		for(var urlid in selement.urls){
+			if(empty(selement.urls[urlid])) continue;
 
-		this.updateForm_selementByType(e, false);
+			var tpl = new Template(ZBX_TPL.selementFormUrls);
+			$('urlfooter').insert({'before' : tpl.evaluate(selement.urls[urlid])});
+		}
+
+		this.form_selement_updateByType(e, false);
 	}
 	else{
 // SELEMENT
@@ -2294,16 +2300,13 @@ updateForm_selement: function(e, selementid){
 // Icon DISABLED
 		this.selementForm.iconid_disabled.selectedIndex = 0;
 
-// URL
-		this.selementForm.url.value = '';
-
-		this.updateForm_selementByType(e,true);
+		this.form_selement_updateByType(e,true);
 	}
 },
 
 // UPDATE FORM BY element TYPE
-updateForm_selementByIcons: function(e){
-	this.debug('updateForm_selementByIcons');
+form_selement_updateByIcons: function(e){
+	this.debug('form_selement_updateByIcons');
 //--
 
 	var advanced = this.selementForm.advanced_icons.checked;
@@ -2325,8 +2328,8 @@ updateForm_selementByIcons: function(e){
 },
 
 // UPDATE FORM BY element TYPE
-updateForm_selementByType: function(e, multi){
-	this.debug('updateForm_selementByType');
+form_selement_updateByType: function(e, multi){
+	this.debug('form_selement_updateByType');
 //--
 	if(typeof(multi) == 'undefined') multi = false;
 	var display_style = IE?'block':'table-row';
@@ -2339,7 +2342,6 @@ updateForm_selementByType: function(e, multi){
 		this.selementForm.massEdit.chkboxIconid_unknown.style.display = 'inline';
 		this.selementForm.massEdit.chkboxIconid_maintenance.style.display = 'inline';
 		this.selementForm.massEdit.chkboxIconid_disabled.style.display = 'inline';
-		this.selementForm.massEdit.chkboxURL.style.display = 'none';
 
 		this.selementForm.massEdit.elementtype.style.display = 'none';
 		this.selementForm.massEdit.elementName.style.display = 'none';
@@ -2355,9 +2357,11 @@ updateForm_selementByType: function(e, multi){
 		this.selementForm.massEdit.x.style.display = 'none';
 		this.selementForm.massEdit.y.style.display = 'none';
 
+		this.selementForm.urls.style.display = 'none';
+
 		this.selementForm.advanced_icons.checked = true;
 
-		this.updateForm_selementByIcons(e);
+		this.form_selement_updateByIcons(e);
 		return true;
 	}
 	else{
@@ -2368,7 +2372,6 @@ updateForm_selementByType: function(e, multi){
 		this.selementForm.massEdit.chkboxIconid_unknown.style.display = 'none';
 		this.selementForm.massEdit.chkboxIconid_maintenance.style.display = 'none';
 		this.selementForm.massEdit.chkboxIconid_disabled.style.display = 'none';
-		this.selementForm.massEdit.chkboxURL.style.display = display_style;
 
 		this.selementForm.massEdit.chkboxLabel.checked = false;
 		this.selementForm.massEdit.chkboxLabelLocation.checked = false;
@@ -2377,12 +2380,13 @@ updateForm_selementByType: function(e, multi){
 		this.selementForm.massEdit.chkboxIconid_unknown.checked = false;
 		this.selementForm.massEdit.chkboxIconid_maintenance.checked = false;
 		this.selementForm.massEdit.chkboxIconid_disabled.checked = false;
-		this.selementForm.massEdit.chkboxURL.checked = false;
 
 		this.selementForm.massEdit.elementtype.style.display = display_style;
 		this.selementForm.massEdit.elementName.style.display = display_style;
 		this.selementForm.massEdit.x.style.display = display_style;
 		this.selementForm.massEdit.y.style.display = display_style;
+
+		this.selementForm.urls.style.display = display_style;
 	}
 
 	var selementid = this.selementForm.selementid.value;
@@ -2488,11 +2492,11 @@ updateForm_selementByType: function(e, multi){
 		this.selementForm.elementTypeSelect.onclick =  function(){ PopUp(popup_url,450,450);};
 	}
 
-	this.updateForm_selementByIcons(e);
+	this.form_selement_updateByIcons(e);
 },
 
-saveForm_selement: function(e){
-	this.debug('saveForm_selement');
+form_selement_save: function(e){
+	this.debug('form_selement_save');
 //--
 
 	if(this.selection.count == 1){
@@ -2569,7 +2573,7 @@ saveForm_selement: function(e){
 		this.selementForm.y.value = params.y;
 
 // URL
-		params.url = this.selementForm.url.value;
+		//params.url = this.selementForm.url.value;
 
 		this.updateSelementOption(selementid, params);
 	}
@@ -2608,11 +2612,8 @@ saveForm_selement: function(e){
 		if(this.selementForm.massEdit.chkboxURL.checked)
 			params.url = this.selementForm.url.value;
 
-		for(var i=0; i < this.selection.position; i++){
-			if(!isset(i, this.selection.selements)) continue;
-			if(!isset(this.selection.selements[i], this.selements)) continue;
-
-			var selementid = this.selection.selements[i];
+		for(var selementid in this.selection.selements){
+			if(!isset(selementid, this.selements)) continue;
 			this.updateSelementOption(selementid, params);
 		}
 		this.updateSelementOption(selementid, params);
@@ -2620,11 +2621,11 @@ saveForm_selement: function(e){
 
 	this.updateMapImage();
 	this.update_multiContainer(e);
-//	this.hideForm();
+//	this.formHide();
 },
 
-deleteForm_selement: function(e){
-	this.debug('deleteForm_selement');
+form_selement_delete: function(e){
+	this.debug('form_selement_delete');
 //--
 	//removing all selected elements
 	this.remove_selements();
@@ -2652,8 +2653,8 @@ deleteForm_selement: function(e){
 //**************************************************************************************************************************************************
 //**************************************************************************************************************************************************
 
-hideForm_link: function(e){
-	this.debug('hideForm_link');
+form_link_hide: function(e){
+	this.debug('form_link_hide');
 //--
 
 	if(!isset('form', this.linkForm) || empty(this.linkForm.form)) return false;
@@ -2662,8 +2663,8 @@ hideForm_link: function(e){
 	this.linkForm.form = null;
 },
 
-createForm_link: function(e){
-	this.debug('createForm_link');
+form_link_create: function(e){
+	this.debug('form_link_create');
 //--
 
 
@@ -2950,7 +2951,7 @@ this.linkForm.colorPicker = e_div_6;
 	e_input_6.className = "button";
 	e_input_6.setAttribute('value',locale['S_APPLY']);
 	e_td_5.appendChild(e_input_6);
-	addListener(e_input_6, 'click', this.saveForm_link.bindAsEventListener(this));
+	addListener(e_input_6, 'click', this.form_link_save.bindAsEventListener(this));
 
 
 	e_td_5.appendChild(document.createTextNode(' '));
@@ -2962,7 +2963,7 @@ this.linkForm.colorPicker = e_div_6;
 	e_input_6.className = "button";
 	e_input_6.setAttribute('value',locale['S_REMOVE']);
 	e_td_5.appendChild(e_input_6);
-	addListener(e_input_6, 'click', this.deleteForm_link.bindAsEventListener(this));
+	addListener(e_input_6, 'click', this.form_link_delete.bindAsEventListener(this));
 
 
 	e_td_5.appendChild(document.createTextNode(' '));
@@ -2973,20 +2974,20 @@ this.linkForm.colorPicker = e_div_6;
 	e_input_6.setAttribute('name',"close");
 	e_input_6.className = "button";
 	e_input_6.setAttribute('value',locale['S_CLOSE']);
-	addListener(e_input_6, 'click', this.hideForm_link.bindAsEventListener(this));
+	addListener(e_input_6, 'click', this.form_link_hide.bindAsEventListener(this));
 
 
 	e_td_5.appendChild(e_input_6);
 },
 
-updateForm_link: function(e, linkid){
-	this.debug('updateForm_link');
+form_link_update: function(e, linkid){
+	this.debug('form_link_update');
 //--
 
 	if(!isset(linkid, this.links)) return false;
 
 	if(is_null($('linkForm'))){
-		this.createForm_link(e);
+		this.form_link_create(e);
 		$('divSelementForm').appendChild(this.linkForm.form);
 	}
 
@@ -3092,7 +3093,7 @@ this.linkForm.linkIndicatorsBody = e_tbody_7;
 	for(var linktriggerid in maplink.linktriggers){
 		if(empty(maplink.linktriggers[linktriggerid])) continue;
 
-		this.linkForm_addLinktrigger(maplink.linktriggers[linktriggerid]);
+		this.form_link_addLinktrigger(maplink.linktriggers[linktriggerid]);
 	}
 
 	$(this.linkForm.linkIndicatorsTable).update(e_table_6);
@@ -3137,8 +3138,8 @@ this.linkForm.linkIndicatorsBody = e_tbody_7;
 },
 
 
-linkForm_addLinktrigger: function(linktrigger){
-	this.debug('linkForm_addLinktrigger');
+form_link_addLinktrigger: function(linktrigger){
+	this.debug('form_link_addLinktrigger');
 //--
 
 	var triggerid = linktrigger.triggerid;
@@ -3291,8 +3292,8 @@ linkForm_addLinktrigger: function(linktrigger){
 	e_td_9.appendChild(e_div_10);
 },
 
-saveForm_link: function(e){
-	this.debug('saveForm_link');
+form_link_save: function(e){
+	this.debug('form_link_save');
 //--
 
 	var linkid = this.linkForm.linkid.value;
@@ -3365,13 +3366,13 @@ saveForm_link: function(e){
 	 * @author Konstantin Buravcov
 	 * @since 08.09.2010
 	 */
-	//this.hideForm_link(e);
+	//this.form_link_hide(e);
 
 	this.updateMapImage();
 },
 
-deleteForm_link: function(e){
-	this.debug('deleteForm_link');
+form_link_delete: function(e){
+	this.debug('form_link_delete');
 //--
 
 	var linkid = this.linkForm.linkid.value;
@@ -3382,7 +3383,7 @@ deleteForm_link: function(e){
 	if(Confirm('Remove link between "'+this.selements[maplink.selementid1].label+'" and "'+this.selements[maplink.selementid2].label+'"?')){
 		this.remove_link(linkid, true);
 		this.update_linkContainer(e);
-		this.hideForm_link(e);
+		this.form_link_hide(e);
 	}
 	else
 		return false;
@@ -3489,6 +3490,7 @@ updateMapView: function(e){
 });
 //]]
 
+/*
 // *******************************************************************
 //		SELEMENT object (unfinished)
 // *******************************************************************
@@ -3770,4 +3772,5 @@ makeDragable: function(){
 
 }
 });
+*/
 //]]

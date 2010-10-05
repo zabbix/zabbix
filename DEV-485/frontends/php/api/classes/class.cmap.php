@@ -235,17 +235,17 @@ class CMap extends CZBXAPI{
 					' WHERE '.DBcondition('sl.sysmapid', $sysmapids).
 						' AND sl.linkid=slt.linkid';
 				$db_link_triggers = DBselect($sql);
-
 				while($link_trigger = DBfetch($db_link_triggers)){
 					$link_triggers[$link_trigger['sysmapid']] = $link_trigger['triggerid'];
 				}
 
-				$all_triggers = CTrigger::get(array(
+				$options = array(
 					'triggerids' => $link_triggers,
 					'editable' => $options['editable'],
 					'output' => API_OUTPUT_SHORTEN,
 					'preservekeys' => 1
-				));
+				);
+				$all_triggers = CTrigger::get($options);
 				foreach($link_triggers as $id => $triggerid){
 					if(!isset($all_triggers[$triggerid])){
 						unset($result[$id]);
@@ -380,6 +380,8 @@ COpt::memoryPick();
 						' WHERE '.DBcondition('se.sysmapid', $sysmapids);
 				$db_selements = DBselect($sql);
 				while($selement = DBfetch($db_selements)){
+					$selement['urls'] = array();
+					$selement['urls'] = array(array('sysmapelementurlid' => '1212', 'name' => 'URLName', 'url'=> 'http://one.lv'));
 					$map_selements[$selement['selementid']] = $selement;
 				}
 			}

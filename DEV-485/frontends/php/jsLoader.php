@@ -26,6 +26,7 @@ $availableJScripts = array(
 	'functions.js' => '',
 	'main.js' => '',
 	'dom.js' => '',
+// classes
 	'class.bbcode.js' => '',
 	'class.calendar.js' => '',
 	'class.cdate.js' => '',
@@ -41,7 +42,9 @@ $availableJScripts = array(
 	'class.rpc.js' => '',
 	'class.pmaster.js' => '',
 	'class.curllist.js' => '',
-	'class.cviewswitcher.js' => ''
+	'class.cviewswitcher.js' => '',
+// templates
+	'sysmap.tpl.js' => 'templates/'
 );
 
 $tranStrings = array(
