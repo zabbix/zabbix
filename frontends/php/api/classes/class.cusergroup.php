@@ -171,12 +171,12 @@ class CUserGroup extends CZBXAPI{
 
 // filter
 		if(is_array($options['filter'])){
-			zbx_db_filter('usrgrps g', $options, $sql_parts);
+			zbx_db_filter('usrgrp g', $options, $sql_parts);
 		}
 
 // search
 		if(is_array($options['search'])){
-			zbx_db_search('usrgrps g', $options, $sql_parts);
+			zbx_db_search('usrgrp g', $options, $sql_parts);
 		}
 
 // order
