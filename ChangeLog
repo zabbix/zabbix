@@ -11,7 +11,7 @@ Changes for 1.9
 
 Changes for 1.8.4rc1
 
- - [ZBX-2772] greatly improved API methods consistency (Aly)
+ - [ZBX-2872] greatly improved API methods consistency (Aly)
  - [ZBX-3070] fixed event date format inconsistency (Vedmak)
  - [ZBX-3068] fixed possible crash of server while processing passive proxies (Sasha)
  - [ZBX-3068] fixed server memory leak while processing passive proxies (Sasha)
