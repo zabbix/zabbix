@@ -420,8 +420,24 @@ options = array(
 		return $this->_getCB('groupid', $this->groupid, $this->groups, $withNode);
 	}
 
-	public function getGraphsCB($withNode=false){
-		return $this->_getCB('graphid', $this->graphid, $this->graphs, $withNode);
+	public function getGraphsCB($withNode=false){		
+		$cmb = new CComboBox('graphid', $this->graphid, 'javascript: submit();');
+		$items = $this->graphs;
+
+		if($withNode){
+			foreach($items as $id => $item){
+				$items[$id] = get_node_name_by_elid($id, null, ': ') . $item;
+			}
+		}
+
+		natcasesort($items);
+		$items = array(0 => S_NOT_SELECTED_SMALL) + $items;
+
+		foreach($items as $id => $name){
+			$cmb->addItem($id, $name);
+		}
+
+		return $cmb;
 	}
 
 	public function getTriggerCB($withNode=false){
