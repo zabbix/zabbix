@@ -426,12 +426,12 @@ options = array(
 
 		if($withNode){
 			foreach($items as $id => $item){
-				$titems[$id] = get_node_name_by_elid($id, null, ': ') . $item;
+				$items[$id] = get_node_name_by_elid($id, null, ': ') . $item;
 			}
 		}
 
 		natcasesort($items);
-		$items = array(0 => S_NOT_SELECTED_SMALL) + $titems;
+		$items = array(0 => S_NOT_SELECTED_SMALL) + $items;
 
 		foreach($items as $id => $name){
 			$cmb->addItem($id, $name);
