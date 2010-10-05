@@ -2456,7 +2456,7 @@
 	'S_LATEST_DATA'=>			'Latest data',
 
 //	Errors
-	'S_DOES_NOT_EXISTS_SMALL'=>		'does not exists',
+	'S_DOES_NOT_EXIST_SMALL'=>		'does not exist',
 	'S_INCORRECT_DESCRIPTION'=>		'Incorrect description',
 	'S_CANT_FORMAT_TREE'=>			'Can\'t format Tree',
 	'S_NO_PERMISSION'=>				'You do not have permission to perform this operation',
