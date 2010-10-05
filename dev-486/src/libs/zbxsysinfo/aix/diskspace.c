@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "sysinfo.h"
+#include "zbxjson.h"
 
 static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *free,
 		zbx_uint64_t *used, double *pfree, double *pused)
@@ -168,4 +169,48 @@ FS_FNCLIST
 			return (fl[i].function)(fsname, result);
 
 	return SYSINFO_RET_FAIL;
+}
+
+int	VFS_FS_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	int		rc, sz, i, ret = SYSINFO_RET_FAIL;
+	struct vmount	*vm = NULL;
+	struct zbx_json	j;
+
+	/* check how many bytes to allocate for the mounted filesystems */
+	if (-1 == (rc = mntctl(MCTL_QUERY, sizeof(sz), (char *)&sz)))
+		return ret;
+
+	vm = zbx_malloc(vm, (size_t)sz);
+
+	/* get the list of mounted filesystems */
+	/* return code is number of filesystems returned */
+	if (-1 == (rc = mntctl(MCTL_QUERY, sz, (char *)vm)))
+		goto error;
+
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+
+	zbx_json_addarray(&j, cmd);
+
+	for (i = 0; i < rc; i++)
+	{
+		zbx_json_addobject(&j, NULL);
+		zbx_json_addstring(&j, "{#FSNAME}", (char *)vm + vm->vmt_data[VMT_STUB].vmt_off, ZBX_JSON_TYPE_STRING);
+		zbx_json_close(&j);
+
+		/* goto the next vmount structure */
+		vm = (struct vmount *)((char *)vm + vm->vmt_length);
+	}
+
+	zbx_json_close(&j);
+
+	SET_STR_RESULT(result, strdup(j.buffer));
+
+	zbx_json_free(&j);
+
+	ret = SYSINFO_RET_OK;
+error:
+	zbx_free(vm);
+
+	return ret;
 }

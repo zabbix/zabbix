@@ -19,8 +19,9 @@
 
 #include "common.h"
 #include "sysinfo.h"
+#include "zbxjson.h"
 
-static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *free,
+static int	get_fs_size_stat(const char *fsname, zbx_uint64_t *total, zbx_uint64_t *free,
 		zbx_uint64_t *used, double *pfree, double *pused)
 {
 #ifdef HAVE_SYS_STATVFS_H
@@ -32,9 +33,9 @@ static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *f
 #endif
 	struct ZBX_STATFS	s;
 
-	assert(fs);
+	assert(fsname);
 
-	if (0 != ZBX_STATFS(fs, &s))
+	if (0 != ZBX_STATFS(fsname, &s))
 		return SYSINFO_RET_FAIL;
 
 	if (total)
@@ -63,88 +64,11 @@ static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *f
 	return SYSINFO_RET_OK;
 }
 
-static int	VFS_FS_USED(const char *fs, AGENT_RESULT *result)
-{
-	zbx_uint64_t	value = 0;
-
-	if (SYSINFO_RET_OK != get_fs_size_stat(fs, NULL, NULL, &value, NULL, NULL))
-		return SYSINFO_RET_FAIL;
-
-	SET_UI64_RESULT(result, value);
-
-	return SYSINFO_RET_OK;
-}
-
-static int	VFS_FS_FREE(const char *fs, AGENT_RESULT *result)
-{
-	zbx_uint64_t	value = 0;
-
-	if (SYSINFO_RET_OK != get_fs_size_stat(fs, NULL, &value, NULL, NULL, NULL))
-		return SYSINFO_RET_FAIL;
-
-	SET_UI64_RESULT(result, value);
-
-	return SYSINFO_RET_OK;
-}
-
-static int	VFS_FS_TOTAL(const char *fs, AGENT_RESULT *result)
-{
-	zbx_uint64_t	value = 0;
-
-	if (SYSINFO_RET_OK != get_fs_size_stat(fs, &value, NULL, NULL, NULL, NULL))
-		return SYSINFO_RET_FAIL;
-
-	SET_UI64_RESULT(result, value);
-
-	return SYSINFO_RET_OK;
-
-}
-
-static int	VFS_FS_PFREE(const char *fs, AGENT_RESULT *result)
-{
-	double	value = 0;
-
-	if (SYSINFO_RET_OK != get_fs_size_stat(fs, NULL, NULL, NULL, &value, NULL))
-		return SYSINFO_RET_FAIL;
-
-	SET_DBL_RESULT(result, value);
-
-	return SYSINFO_RET_OK;
-}
-
-static int	VFS_FS_PUSED(const char *fs, AGENT_RESULT *result)
-{
-	double	value = 0;
-
-	if (SYSINFO_RET_OK != get_fs_size_stat(fs, NULL, NULL, NULL, NULL, &value))
-		return SYSINFO_RET_FAIL;
-
-	SET_DBL_RESULT(result, value);
-
-	return SYSINFO_RET_OK;
-}
-
 int	VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#define FS_FNCLIST struct fs_fnclist_s
-FS_FNCLIST
-{
-	char	*mode;
-	int	(*function)();
-};
-
-	FS_FNCLIST fl[] =
-	{
-		{"free",	VFS_FS_FREE},
-		{"total",	VFS_FS_TOTAL},
-		{"used",	VFS_FS_USED},
-		{"pfree",	VFS_FS_PFREE},
-		{"pused",	VFS_FS_PUSED},
-		{0,		0}
-	};
-
-	char	fsname[MAX_STRING_LEN], mode[8];
-	int	i;
+	char		fsname[MAX_STRING_LEN], mode[8];
+	zbx_uint64_t	total, free, used;
+	double		pfree, pused;
 
 	assert(result);
 
@@ -159,13 +83,78 @@ FS_FNCLIST
 	if (0 != get_param(param, 2, mode, sizeof(mode)))
 		*mode = '\0';
 
+	if (SYSINFO_RET_OK != get_fs_size_stat(fsname, &total, &free, &used, &pfree, &pused))
+		return SYSINFO_RET_FAIL;
+
 	/* default parameter */
-	if ('\0' == *mode)
-		zbx_snprintf(mode, sizeof(mode), "total");
+	if ('\0' == *mode || 0 == strcmp(mode, "total"))	/* default parameter */
+	{
+		SET_UI64_RESULT(result, total);
+	}
+	else if (0 == strcmp(mode, "free"))
+	{
+		SET_UI64_RESULT(result, free);
+	}
+	else if (0 == strcmp(mode, "used"))
+	{
+		SET_UI64_RESULT(result, used);
+	}
+	else if (0 == strcmp(mode, "pfree"))
+	{
+		SET_DBL_RESULT(result, pfree);
+	}
+	else if (0 == strcmp(mode, "pused"))
+	{
+		SET_DBL_RESULT(result, pused);
+	}
+	else
+		return SYSINFO_RET_FAIL;
 
-	for (i = 0; fl[i].mode != 0; i++)
-		if (0 == strcmp(mode, fl[i].mode))
-			return (fl[i].function)(fsname, result);
+	return SYSINFO_RET_OK;
+}
 
-	return SYSINFO_RET_FAIL;
+int	VFS_FS_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	int		ret = SYSINFO_RET_FAIL;
+	char		line[MAX_STRING_LEN], *p, *mpoint;
+	FILE		*f;
+	struct zbx_json	j;
+
+	assert(result);
+
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+
+	zbx_json_addarray(&j, cmd);
+
+	if (NULL != (f = fopen("/proc/mounts", "r")))
+	{
+		while (NULL != fgets(line, sizeof(line), f))
+		{
+			if (NULL == (p = strstr(line, " ")))
+				continue;
+
+			mpoint = ++p;
+
+			if (NULL == (p = strstr(mpoint, " ")))
+				continue;
+
+			*p = '\0';
+
+			zbx_json_addobject(&j, NULL);
+			zbx_json_addstring(&j, "{#FSNAME}", mpoint, ZBX_JSON_TYPE_STRING);
+			zbx_json_close(&j);
+		}
+
+		zbx_fclose(f);
+
+		ret = SYSINFO_RET_OK;
+	}
+
+	zbx_json_close(&j);
+
+	SET_STR_RESULT(result, strdup(j.buffer));
+
+	zbx_json_free(&j);
+
+	return ret;
 }

@@ -19,8 +19,9 @@
 
 #include "common.h"
 #include "sysinfo.h"
+#include "zbxjson.h"
 
-struct net_stat_s
+typedef struct net_stat_s
 {
 	zbx_uint64_t ibytes;
 	zbx_uint64_t ipackets;
@@ -31,64 +32,55 @@ struct net_stat_s
 	zbx_uint64_t oerr;
 	zbx_uint64_t odrop;
 	zbx_uint64_t colls;
-};
+}
+net_stat_t;
 
-static int get_net_stat(const char *if_name, struct net_stat_s *result)
+static int	get_net_stat(const char *if_name, net_stat_t *result)
 {
-	int ret = SYSINFO_RET_FAIL;
-	char line[MAX_STRING_LEN];
-
-	char name[MAX_STRING_LEN];
-	zbx_uint64_t tmp = 0;
-
-	FILE *f;
-	char	*p;
+	int	ret = SYSINFO_RET_FAIL;
+	char	line[MAX_STRING_LEN], name[MAX_STRING_LEN], *p;
+	FILE	*f;
 
 	assert(result);
 
-	if(NULL != (f = fopen("/proc/net/dev","r") ))
+	if (NULL != (f = fopen("/proc/net/dev", "r")))
 	{
-		while(fgets(line,MAX_STRING_LEN,f) != NULL)
+		while (NULL != fgets(line, sizeof(line), f))
 		{
-			p = strstr(line,":");
-			if(p) p[0]='\t';
+			if (NULL == (p = strstr(line, ":")))
+				continue;
 
-			if(sscanf(line,"%s\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
-					ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t \
-					" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
-					ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\n",
-				name,
-				&(result->ibytes),	/* bytes */
-				&(result->ipackets),	/* packets */
-				&(result->ierr),	/* errs */
-				&(result->idrop),	/* drop */
-				&(tmp),			/* fifo */
-				&(tmp),			/* frame */
-				&(tmp),			/* compressed */
-				&(tmp),			/* multicast */
-				&(result->obytes),	/* bytes */
-				&(result->opackets),	/* packets*/
-				&(result->oerr),	/* errs */
-				&(result->odrop),	/* drop */
-				&(tmp),			/* fifo */
-				&(result->colls),	/* icolls */
-				&(tmp),			/* carrier */
-				&(tmp)			/* compressed */
-				) == 17)
+			*p = '\t';
+
+			if (10 == sscanf(line, "%s\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
+					ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t%*s\t%*s\t%*s\t%*s\t"
+					ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
+					ZBX_FS_UI64 "\t%*s\t" ZBX_FS_UI64 "\t%*s\t%*s\n",
+					name,
+					&(result->ibytes),	/* bytes */
+					&(result->ipackets),	/* packets */
+					&(result->ierr),	/* errs */
+					&(result->idrop),	/* drop */
+					&(result->obytes),	/* bytes */
+					&(result->opackets),	/* packets*/
+					&(result->oerr),	/* errs */
+					&(result->odrop),	/* drop */
+					&(result->colls)))	/* icolls */
 			{
-				if(strncmp(name, if_name, MAX_STRING_LEN) == 0)
+				if (0 == strcmp(name, if_name))
 				{
 					ret = SYSINFO_RET_OK;
 					break;
 				}
 			}
 		}
+
 		zbx_fclose(f);
 	}
 
-	if(ret != SYSINFO_RET_OK)
+	if (ret != SYSINFO_RET_OK)
 	{
-		memset(result, 0, sizeof(struct net_stat_s));
+		memset(result, 0, sizeof(net_stat_t));
 	}
 
 	return ret;
@@ -96,218 +88,197 @@ static int get_net_stat(const char *if_name, struct net_stat_s *result)
 
 int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	struct net_stat_s	ns;
-
-	char	if_name[MAX_STRING_LEN];
-	char	mode[MAX_STRING_LEN];
-
-	int ret = SYSINFO_RET_FAIL;
+	net_stat_t	ns;
+	char		if_name[MAX_STRING_LEN], mode[16];
 
 	assert(result);
 
 	init_result(result);
 
-	if(num_param(param) > 2)
-	{
+	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
-	}
 
-	if(get_param(param, 1, if_name, sizeof(if_name)) != 0)
-	{
+	if (0 != get_param(param, 1, if_name, sizeof(if_name)))
 		return SYSINFO_RET_FAIL;
-	}
 
-	if(get_param(param, 2, mode, sizeof(mode)) != 0)
+	if (0 != get_param(param, 2, mode, sizeof(mode)))
+		*mode = '\0';
+
+	if (SYSINFO_RET_OK != get_net_stat(if_name, &ns))
+		return SYSINFO_RET_FAIL;
+
+	if ('\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
 	{
-		mode[0] = '\0';
+		SET_UI64_RESULT(result, ns.ibytes);
 	}
-	if(mode[0] == '\0')
+	else if (0 == strcmp(mode, "packets"))
 	{
-		/* default parameter */
-		zbx_snprintf(mode, sizeof(mode), "bytes");
+		SET_UI64_RESULT(result, ns.ipackets);
 	}
-
-	ret = get_net_stat(if_name, &ns);
-
-	if(ret == SYSINFO_RET_OK)
+	else if (0 == strcmp(mode, "errors"))
 	{
-		if(strncmp(mode, "bytes", MAX_STRING_LEN) == 0)
-		{
-			SET_UI64_RESULT(result, ns.ibytes);
-		}
-		else if(strncmp(mode, "packets", MAX_STRING_LEN) == 0)
-		{
-			SET_UI64_RESULT(result, ns.ipackets);
-		}
-		else if(strncmp(mode, "errors", MAX_STRING_LEN) == 0)
-		{
-			SET_UI64_RESULT(result, ns.ierr);
-		}
-		else if(strncmp(mode, "dropped", MAX_STRING_LEN) == 0)
-		{
-			SET_UI64_RESULT(result, ns.idrop);
-		}
-		else
-		{
-			ret = SYSINFO_RET_FAIL;
-		}
+		SET_UI64_RESULT(result, ns.ierr);
 	}
+	else if (0 == strcmp(mode, "dropped"))
+	{
+		SET_UI64_RESULT(result, ns.idrop);
+	}
+	else
+		return SYSINFO_RET_FAIL;
 
-	return ret;
+	return SYSINFO_RET_OK;
 }
 
 int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	struct net_stat_s	ns;
-
-	char	if_name[MAX_STRING_LEN];
-	char	mode[MAX_STRING_LEN];
-
-	int	ret = SYSINFO_RET_FAIL;
+	net_stat_t	ns;
+	char		if_name[MAX_STRING_LEN], mode[16];
 
 	assert(result);
 
 	init_result(result);
 
-	if(num_param(param) > 2)
-	{
+	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
-	}
 
-	if(get_param(param, 1, if_name, sizeof(if_name)) != 0)
+	if (0 != get_param(param, 1, if_name, sizeof(if_name)))
+		return SYSINFO_RET_FAIL;
+
+	if (0 != get_param(param, 2, mode, sizeof(mode)))
+		*mode = '\0';
+
+	if (SYSINFO_RET_OK != get_net_stat(if_name, &ns))
+		return SYSINFO_RET_FAIL;
+
+	if ('\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
 	{
-	return SYSINFO_RET_FAIL;
+		SET_UI64_RESULT(result, ns.obytes);
 	}
-
-	if(get_param(param, 2, mode, sizeof(mode)) != 0)
+	else if (0 == strcmp(mode, "packets"))
 	{
-		mode[0] = '\0';
+		SET_UI64_RESULT(result, ns.opackets);
 	}
-	if(mode[0] == '\0')
+	else if (0 == strcmp(mode, "errors"))
 	{
-		/* default parameter */
-		zbx_snprintf(mode, sizeof(mode), "bytes");
+		SET_UI64_RESULT(result, ns.oerr);
 	}
-
-	ret = get_net_stat(if_name, &ns);
-
-	if(ret == SYSINFO_RET_OK)
+	else if (0 == strcmp(mode, "dropped"))
 	{
-		if(strncmp(mode, "bytes", MAX_STRING_LEN) == 0)
-		{
-			SET_UI64_RESULT(result, ns.obytes);
-		}
-		else if(strncmp(mode, "packets", MAX_STRING_LEN) == 0)
-		{
-			SET_UI64_RESULT(result, ns.opackets);
-		}
-		else if(strncmp(mode, "errors", MAX_STRING_LEN) == 0)
-		{
-			SET_UI64_RESULT(result, ns.oerr);
-		}
-		else if(strncmp(mode, "dropped", MAX_STRING_LEN) == 0)
-		{
-			SET_UI64_RESULT(result, ns.odrop);
-		}
-		else
-		{
-			ret = SYSINFO_RET_FAIL;
-		}
+		SET_UI64_RESULT(result, ns.odrop);
 	}
+	else
+		return SYSINFO_RET_FAIL;
 
-	return ret;
+	return SYSINFO_RET_OK;
 }
 
 int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	struct net_stat_s	ns;
-
-	char	if_name[MAX_STRING_LEN];
-	char	mode[MAX_STRING_LEN];
-
-	int ret = SYSINFO_RET_FAIL;
+	net_stat_t	ns;
+	char		if_name[MAX_STRING_LEN], mode[16];
 
 	assert(result);
 
 	init_result(result);
 
-	if(num_param(param) > 2)
-	{
+	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
-	}
 
-	if(get_param(param, 1, if_name, sizeof(if_name)) != 0)
-	{
+	if (0 != get_param(param, 1, if_name, sizeof(if_name)))
 		return SYSINFO_RET_FAIL;
-	}
 
-	if(get_param(param, 2, mode, sizeof(mode)) != 0)
+	if (0 != get_param(param, 2, mode, sizeof(mode)))
+		*mode = '\0';
+
+	if (SYSINFO_RET_OK != get_net_stat(if_name, &ns))
+		return SYSINFO_RET_FAIL;
+
+	if ('\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
 	{
-		mode[0] = '\0';
+		SET_UI64_RESULT(result, ns.ibytes + ns.obytes);
 	}
-	if(mode[0] == '\0')
+	else if (0 == strcmp(mode, "packets"))
 	{
-		/* default parameter */
-		zbx_snprintf(mode, sizeof(mode), "bytes");
+		SET_UI64_RESULT(result, ns.ipackets + ns.opackets);
 	}
-
-	ret = get_net_stat(if_name, &ns);
-
-	if(ret == SYSINFO_RET_OK)
+	else if (0 == strcmp(mode, "errors"))
 	{
-		if(strncmp(mode, "bytes", MAX_STRING_LEN) == 0)
-		{
-			SET_UI64_RESULT(result, ns.ibytes + ns.obytes);
-		}
-		else if(strncmp(mode, "packets", MAX_STRING_LEN) == 0)
-		{
-			SET_UI64_RESULT(result, ns.ipackets + ns.opackets);
-		}
-		else if(strncmp(mode, "errors", MAX_STRING_LEN) == 0)
-		{
-			SET_UI64_RESULT(result, ns.ierr + ns.oerr);
-		}
-		else if(strncmp(mode, "dropped", MAX_STRING_LEN) == 0)
-		{
-			SET_UI64_RESULT(result, ns.idrop + ns.odrop);
-		}
-		else
-		{
-			ret = SYSINFO_RET_FAIL;
-		}
+		SET_UI64_RESULT(result, ns.ierr + ns.oerr);
 	}
+	else if (0 == strcmp(mode, "dropped"))
+	{
+		SET_UI64_RESULT(result, ns.idrop + ns.odrop);
+	}
+	else
+		return SYSINFO_RET_FAIL;
 
-	return ret;
+	return SYSINFO_RET_OK;
 }
 
 int	NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	struct net_stat_s	ns;
-
-	char	if_name[MAX_STRING_LEN];
-
-	int ret = SYSINFO_RET_FAIL;
+	net_stat_t	ns;
+	char		if_name[MAX_STRING_LEN];
 
 	assert(result);
 
 	init_result(result);
 
-	if(num_param(param) > 1)
-	{
+	if (num_param(param) > 1)
 		return SYSINFO_RET_FAIL;
-	}
 
-	if(get_param(param, 1, if_name, MAX_STRING_LEN) != 0)
-	{
+	if (0 != get_param(param, 1, if_name, sizeof(if_name)))
 		return SYSINFO_RET_FAIL;
-	}
 
-	ret = get_net_stat(if_name, &ns);
+	if (SYSINFO_RET_OK != get_net_stat(if_name, &ns))
+		return SYSINFO_RET_FAIL;
 
-	if(ret == SYSINFO_RET_OK)
+	SET_UI64_RESULT(result, ns.colls);
+
+	return SYSINFO_RET_OK;
+}
+
+int	NET_IF_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	int		ret = SYSINFO_RET_FAIL;
+	char		line[MAX_STRING_LEN], *p;
+	FILE		*f;
+	struct zbx_json	j;
+
+	assert(result);
+
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+
+	zbx_json_addarray(&j, cmd);
+
+	if (NULL != (f = fopen("/proc/net/dev", "r")))
 	{
-		SET_UI64_RESULT(result, ns.colls);
+		while (NULL != fgets(line, sizeof(line), f))
+		{
+			if (NULL == (p = strstr(line, ":")))
+				continue;
+
+			*p = '\0';
+
+			/* trim left spaces */
+			for (p = line; ' ' == *p && '\0' != *p; p++)
+				;
+
+			zbx_json_addobject(&j, NULL);
+			zbx_json_addstring(&j, "{#IFNAME}", p, ZBX_JSON_TYPE_STRING);
+			zbx_json_close(&j);
+		}
+
+		zbx_fclose(f);
+
+		ret = SYSINFO_RET_OK;
 	}
+
+	zbx_json_close(&j);
+
+	SET_STR_RESULT(result, strdup(j.buffer));
+
+	zbx_json_free(&j);
 
 	return ret;
 }
