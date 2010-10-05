@@ -303,7 +303,7 @@ void	op_run_commands(char *cmd_list)
  *                                                                            *
  * Parameters: dhostid - discovered host id                                   *
  *                                                                            *
- * Return value: hostid - existing hostid, o - if not found                   *
+ * Return value: hostid - existing hostid, 0 - if not found                   *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
