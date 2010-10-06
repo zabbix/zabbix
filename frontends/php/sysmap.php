@@ -281,7 +281,7 @@ include_once('include/page_header.php');
 						$selement['image'] = get_selement_iconid($selement);
 
 						$action = '';
-						$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.add_selement('.zbx_jsvalue($selement).',1);';
+						$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.add_selement('.zbx_jsvalue($selement, true).',1);';
 						$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.updateMapImage();';
 						//$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.show_selement_list();';
 
