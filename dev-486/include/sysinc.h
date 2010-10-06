@@ -420,4 +420,8 @@
 #	include <fcntl.h>
 #endif
 
+#ifdef HAVE_SYS_MNTTAB_H
+#	include <sys/mnttab.h>
+#endif
+
 #endif
