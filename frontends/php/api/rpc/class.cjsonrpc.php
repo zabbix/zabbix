@@ -38,7 +38,7 @@ private $zbx2json_error_list;
 		$this->error = false;
 		$this->response = array();
 		$this->multicall = false;
-		$this->init_errors();
+		$this->initErrors();
 
 	}
 
@@ -150,7 +150,7 @@ private $zbx2json_error_list;
 			$this->response = $formed_error;
 	}
 
-	private function init_errors(){
+	private function initErrors(){
 		$this->error_list = array(
 			'-32700' => array(
 					'code' => -32700,

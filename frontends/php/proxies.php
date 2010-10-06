@@ -343,16 +343,17 @@
 
 
 // CALCULATE ITEMS {{{
-		$proxy_items = CItem::get(array(
+		$options = array(
 			'groupCount' => 1,
 			'countOutput' => 1,
 			'proxyids' => $proxyids,
 			'webitems' => 1,
 			'monitored' => 1,
-		));
+		);
+		$proxy_items = CItem::get($options);
 		foreach($proxy_items as $pitems){
 			if(!isset($proxies[$pitems['proxy_hostid']]['item_count'])) $proxies[$pitems['proxy_hostid']]['item_count'] = 0;
-			$proxies[$pitems['proxy_hostid']]['item_count'] += $pitems['rowscount'];
+			$proxies[$pitems['proxy_hostid']]['item_count'] += $pitems;
 		}
 // }}} CALCULATE ITEMS
 

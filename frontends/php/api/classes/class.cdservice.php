@@ -74,7 +74,6 @@ class CDService extends CZBXAPI{
 		$result = array();
 		$nodeCheck = false;
 		$user_type = $USER_DETAILS['type'];
-		$userid = $USER_DETAILS['userid'];
 
 		$sort_columns = array('dserviceid', 'dhostid'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM); // allowed output options for [ select_* ] params
@@ -86,7 +85,8 @@ class CDService extends CZBXAPI{
 			'where' => array(),
 			'group' => array(),
 			'order' => array(),
-			'limit' => null);
+			'limit' => null
+		);
 
 		$def_options = array(
 			'nodeids'					=> null,
@@ -96,9 +96,12 @@ class CDService extends CZBXAPI{
 			'druleids'					=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
+
 // filter
 			'filter'					=> null,
-			'pattern'					=> null,
+			'search'					=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
 
 // OutPut
 			'output'					=> API_OUTPUT_REFER,
@@ -176,7 +179,7 @@ class CDService extends CZBXAPI{
 			if($options['output'] != API_OUTPUT_SHORTEN){
 				$sql_parts['select']['dcheckid'] = 'dc.dcheckid';
 			}
-			
+
 			$sql_parts['from']['dhosts'] = 'dhosts dh';
 			$sql_parts['from']['dchecks'] = 'dchecks dc';
 
@@ -238,43 +241,13 @@ class CDService extends CZBXAPI{
 		}
 
 // filter
-		if(!is_null($options['filter'])){
-			zbx_value2array($options['filter']);
+		if(is_array($options['filter'])){
+			zbx_db_filter('dservices ds', $options, $sql_parts);
+		}
 
-			if(isset($options['filter']['dserviceid']) && !is_null($options['filter']['dserviceid'])){
-				zbx_value2array($options['filter']['dserviceid']);
-				$sql_parts['where']['dserviceid'] = DBcondition('ds.dserviceid',$options['filter']['dserviceid']);
-			}
-
-			if(isset($options['filter']['dhostid']) && !is_null($options['filter']['dhostid'])){
-				zbx_value2array($options['filter']['dhostid']);
-				$sql_parts['where']['dhostid'] = DBcondition('ds.dhostid',$options['filter']['dhostid']);
-			}
-
-			if(isset($options['filter']['type']) && !is_null($options['filter']['type'])){
-				zbx_value2array($options['filter']['type']);
-				$sql_parts['where']['type'] = DBcondition('ds.type', $options['filter']['type']);
-			}
-
-			if(isset($options['filter']['status']) && !is_null($options['filter']['status'])){
-				zbx_value2array($options['filter']['status']);
-				$sql_parts['where']['status'] = DBcondition('ds.status', $options['filter']['status']);
-			}
-
-			if(isset($options['filter']['key_']) && !is_null($options['filter']['key_'])){
-				zbx_value2array($options['filter']['key_']);
-				$sql_parts['where']['key_'] = DBcondition('ds.key_', $options['filter']['key_'], false, true);
-			}
-
-			if(isset($options['filter']['port']) && !is_null($options['filter']['port'])){
-				zbx_value2array($options['filter']['port']);
-				$sql_parts['where']['port'] = DBcondition('ds.port', $options['filter']['port']);
-			}
-
-			if(isset($options['filter']['ip']) && !is_null($options['filter']['ip'])){
-				zbx_value2array($options['filter']['ip']);
-				$sql_parts['where']['ip'] = DBcondition('ds.ip', $options['filter']['ip'], false, true);
-			}
+// search
+		if(is_array($options['search'])){
+			zbx_db_search('dservices ds', $options, $sql_parts);
 		}
 
 // order
@@ -404,6 +377,7 @@ Copt::memoryPick();
 				if(!is_null($options['limitSelects'])) order_result($drules, 'name');
 				foreach($drules as $druleid => $drule){
 					unset($drules[$druleid]['dservices']);
+					$count = array();
 					foreach($drule['dservices'] as $dnum => $dservice){
 						if(!is_null($options['limitSelects'])){
 							if(!isset($count[$dservice['dserviceid']])) $count[$dservice['dserviceid']] = 0;
@@ -522,35 +496,6 @@ Copt::memoryPick();
 		if(is_null($options['preservekeys'])){
 			$result = zbx_cleanHashes($result);
 		}
-
-	return $result;
-	}
-
-/**
- * Get DService ID by DService fields
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $dservice_data
- * @param string $dservice_data['host']
- * @return int|boolean
- */
-	public static function getObjects($dserviceData){
-		$options = array(
-			'filter' => $dserviceData,
-			'output'=>API_OUTPUT_EXTEND
-		);
-
-		if(isset($dserviceData['node']))
-			$options['nodeids'] = getNodeIdByNodeName($dserviceData['node']);
-		else if(isset($dserviceData['nodeids']))
-			$options['nodeids'] = $dserviceData['nodeids'];
-
-		$result = self::get($options);
 
 	return $result;
 	}

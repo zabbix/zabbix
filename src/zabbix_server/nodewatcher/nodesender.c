@@ -236,7 +236,6 @@ static void	DMcollect_table_data(int nodeid, int dest_nodetype, const ZBX_TABLE 
 				" and curr.tablename='%s'"
 				" and curr.cksumtype=%d"
 				" and prev.cksumtype=%d"
-				" and curr.cksum<>prev.cksum"
 			" union all "
 			/* Find deleted records */
 			"select prev.recordid,prev.cksum,curr.cksum,prev.sync"
@@ -613,8 +612,7 @@ int update_checksums(int nodeid, int synked_nodetype, int synked, const char *ta
 				" and curr.tablename=prev.tablename"
 				" and curr.recordid=prev.recordid"
 				" and curr.cksumtype=%d"
-				" and prev.cksumtype=%d"
-				" and curr.cksum<>prev.cksum%s"
+				" and prev.cksumtype=%d%s"
 			" union all "
 			/* Find deleted records */
 			"select prev.tablename,prev.recordid,prev.cksum,curr.cksum,prev.sync"
@@ -641,21 +639,6 @@ int update_checksums(int nodeid, int synked_nodetype, int synked, const char *ta
 			continue;
 		}
 
-		/* Special (simpler) processing for operation DELETE */
-		if (SUCCEED == DBis_null(row[3]))
-		{
-			zbx_snprintf_alloc(&exsql, &exsql_alloc, &exsql_offset, 256,
-					"delete from node_cksum"
-					" where nodeid=%d"
-						" and cksumtype=%d"
-						" and tablename='%s'"
-						" and recordid=%s;\n",
-					nodeid, NODE_CKSUM_TYPE_OLD, row[0], row[1]);
-
-			DBexecute_overflowed_sql(&exsql, &exsql_alloc, &exsql_offset);
-			continue;
-		}
-
 		if (FAIL == DBis_null(row[4]))
 			zbx_strlcpy(sync, row[4], sizeof(sync));
 		else
@@ -665,76 +648,108 @@ int update_checksums(int nodeid, int synked_nodetype, int synked, const char *ta
 		ck = cksum;
 		*ck = '\0';
 
-		r[0] = DBis_null(row[2]) == SUCCEED ? NULL : row[2];
-		r[1] = row[3];
-		f = 0;
-
-		do {
-			while ((table->fields[f].flags & ZBX_SYNC) == 0)
-				f++;
-
-			d[0] = NULL;
-			d[1] = NULL;
-			if (NULL != r[0] && NULL != (d[0] = strchr(r[0], ',')))
-				*d[0] = '\0';
-			if (NULL != r[1] && NULL != (d[1] = strchr(r[1], ',')))
-				*d[1] = '\0';
-
-			if (NULL == tablename || SUCCEED == str_in_list(fields, table->fields[f].name, ','))
+		/* Special (simpler) processing for operation DELETE */
+		if (SUCCEED == DBis_null(row[3]))
+		{
+			if (synked == SUCCEED)
 			{
-				ck += zbx_snprintf(ck, 64, "%s,", NULL != r[1] ? r[1] : r[0]);
+				if (synked_nodetype == ZBX_NODE_SLAVE)
+					s[0] = c[1];
+				else if (synked_nodetype == ZBX_NODE_MASTER)
+					s[1] = c[1];
+			}
 
-				if (r[0] == NULL || r[1] == NULL || strcmp(r[0], r[1]) != 0)
+			if ((0 == CONFIG_MASTER_NODEID || s[1] == c[1]) &&
+					(CONFIG_NODEID == nodeid || s[0] == c[1]))
+			{
+				zbx_snprintf_alloc(&exsql, &exsql_alloc, &exsql_offset, 256,
+						"delete from node_cksum"
+						" where nodeid=%d"
+							" and cksumtype=%d"
+							" and tablename='%s'"
+							" and recordid=%s;\n",
+						nodeid, NODE_CKSUM_TYPE_OLD, row[0], row[1]);
+
+				DBexecute_overflowed_sql(&exsql, &exsql_alloc, &exsql_offset);
+				continue;
+			}
+
+			s += 2;
+		}
+		else
+		{
+			r[0] = DBis_null(row[2]) == SUCCEED ? NULL : row[2];
+			r[1] = row[3];
+			f = 0;
+
+			do {
+				while ((table->fields[f].flags & ZBX_SYNC) == 0)
+					f++;
+
+				d[0] = NULL;
+				d[1] = NULL;
+				if (NULL != r[0] && NULL != (d[0] = strchr(r[0], ',')))
+					*d[0] = '\0';
+				if (NULL != r[1] && NULL != (d[1] = strchr(r[1], ',')))
+					*d[1] = '\0';
+
+				if (NULL == tablename || SUCCEED == str_in_list(fields, table->fields[f].name, ','))
 				{
-					if (synked_nodetype == ZBX_NODE_SLAVE)
+					ck += zbx_snprintf(ck, 64, "%s,", NULL != r[1] ? r[1] : r[0]);
+
+					if (r[0] == NULL || r[1] == NULL || strcmp(r[0], r[1]) != 0)
 					{
-						s[0] = c[0];
-						s[1] = ' ';
+						if (synked_nodetype == ZBX_NODE_SLAVE)
+						{
+							s[0] = c[0];
+							s[1] = ' ';
+						}
+						else if (synked_nodetype == ZBX_NODE_MASTER)
+						{
+							s[0] = ' ';
+							s[1] = c[0];
+						}
 					}
-					else if (synked_nodetype == ZBX_NODE_MASTER)
+					else
 					{
-						s[0] = ' ';
-						s[1] = c[0];
+						if (synked == SUCCEED)
+						{
+							if (synked_nodetype == ZBX_NODE_SLAVE)
+								s[0] = c[0];
+							else if (synked_nodetype == ZBX_NODE_MASTER)
+								s[1] = c[0];
+						}
 					}
 				}
 				else
+					ck += zbx_snprintf(ck, 64, "%s,", NULL != r[0] ? r[0] : "");
+				s += 2;
+				f++;
+
+				if (d[0] != NULL)
 				{
-					if (synked == SUCCEED)
-					{
-						if (synked_nodetype == ZBX_NODE_SLAVE)
-							s[0] = c[0];
-						else if (synked_nodetype == ZBX_NODE_MASTER)
-							s[1] = c[0];
-					}
+					*d[0] = ',';
+					r[0] = d[0] + 1;
 				}
-			}
-			else
-				ck += zbx_snprintf(ck, 64, "%s,", NULL != r[0] ? r[0] : "");
-			s += 2;
-			f++;
+				else
+					r[0] = NULL;
 
-			if (d[0] != NULL)
-			{
-				*d[0] = ',';
-				r[0] = d[0] + 1;
-			}
-			else
-				r[0] = NULL;
+				if (d[1] != NULL)
+				{
+					*d[1] = ',';
+					r[1] = d[1] + 1;
+				}
+				else
+					r[1] = NULL;
+			} while (d[0] != NULL || d[1] != NULL);
 
-			if (d[1] != NULL)
-			{
-				*d[1] = ',';
-				r[1] = d[1] + 1;
-			}
-			else
-				r[1] = NULL;
-		} while (d[0] != NULL || d[1] != NULL);
+			*--ck = '\0';
+		}
 
 		*s = '\0';
-		*--ck = '\0';
 
-		if (SUCCEED == DBis_null(row[2]) || 0 != strcmp(row[4], sync)
-				|| 0 != strcmp(row[2], row[3]))
+		if (SUCCEED == DBis_null(row[2]) || SUCCEED == DBis_null(row[3]) ||
+				0 != strcmp(row[4], sync) || 0 != strcmp(row[2], row[3]))
 		{
 			cksumtype = (DBis_null(row[2]) == SUCCEED) ? NODE_CKSUM_TYPE_NEW : NODE_CKSUM_TYPE_OLD;
 			zbx_snprintf_alloc(&exsql, &exsql_alloc, &exsql_offset, 2560,
