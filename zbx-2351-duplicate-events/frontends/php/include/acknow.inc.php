@@ -42,8 +42,8 @@ function make_acktab_by_eventid($eventid){
 	$acks = get_acknowledges_by_eventid($eventid);
 
 	while($ack = DBfetch($acks)){
-		//$user = CUser::get(array('userids' => $ack['userid'],  'extendoutput' => 1));
-		//$user = reset($user);
+		//$users = CUser::get(array('userids' => $ack['userid'],  'output' => API_OUTPUT_EXTEND));
+		//$user = reset($users);
 
 		$table->addRow(array(
 			zbx_date2str(S_ACKNOWINC_BY_EVENTS_DATE_FORMAT,$ack['clock']),

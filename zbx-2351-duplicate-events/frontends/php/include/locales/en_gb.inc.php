@@ -1208,18 +1208,18 @@
 	'S_NO_EVENTS_FOUND'=>			'No events found',
 	'S_EVENTS_SINCE'=>			'Events since',
 	'S_EVENTS_DATE_FORMAT'=>		'd M Y H:i:s',
-	'S_EVENTS_DISCOVERY_TIME_FORMAT'=>	'Y.M.d H:i:s',
-	'S_EVENTS_ACTION_TIME_FORMAT'=>		'Y.M.d H:i:s',
+	'S_EVENTS_DISCOVERY_TIME_FORMAT'=>	'd M Y H:i:s',
+	'S_EVENTS_ACTION_TIME_FORMAT'=>		'd M Y H:i:s',
 	'S_UP_BIG'=>		'UP',
 	'S_DOWN_BIG'=>		'DOWN',
 	'S_DISCOVERED_BIG'=>		'DISCOVERED',
 	'S_LOST_BIG'=>		'LOST',
 
 //	events.inc.php
-	'S_EVENTS_EVENT_DETAILS_DATE_FORMAT'=>			'Y.M.d H:i:s',
-	'S_EVENTS_SMALL_EVENT_LIST_DATE_FORMAT'=>		'Y.M.d H:i:s',
+	'S_EVENTS_EVENT_DETAILS_DATE_FORMAT'=>			'd M Y H:i:s',
+	'S_EVENTS_SMALL_EVENT_LIST_DATE_FORMAT'=>		'd M Y H:i:s',
 	'S_EVENTS_POPUP_EVENT_LIST_DATE_FORMAT'=>		'd M Y H:i:s',
-	'S_EVENTS_TRIGGERS_EVENTS_HISTORY_LIST_DATE_FORMAT'=>	'Y.M.d H:i:s',
+	'S_EVENTS_TRIGGERS_EVENTS_HISTORY_LIST_DATE_FORMAT'=>	'd M Y H:i:s',
 
 //	latest.php
 	'S_LAST_CHECK'=>			'Last check',
@@ -2384,6 +2384,9 @@
 	'S_CUSER_ERROR_LDAP_MODULE_MISSING'=>			'Probably php-ldap module is missing',
 	'S_CUSER_ERROR_FAILED_LOGIN_ATTEMPTS'=>				'failed login attempts logged.',
 	'S_CUSER_ERROR_LAST_FAILED_ATTEMPTS'=>				'Last failed attempt was from',
+	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_CREATE_SCRIPTS'=>		'Only Super Admins can create Scripts',
+	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_UPDATE_SCRIPTS'=>		'Only Super Admins can update Scripts',
+	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_DELETE_SCRIPTS'=>		'Only Super Admins can delete Scripts',
 	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_CREATE_USERS'=>		'Only Super Admins can create Users',
 	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_UPDATE_USERS'=>		'Only Super Admins can update Users',
 	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_DELETE_USERS'=>		'Only Super Admins can delete Users',
@@ -2449,6 +2452,7 @@
 	'S_LATEST_DATA'=>			'Latest data',
 
 //	Errors
+	'S_DOES_NOT_EXIST_SMALL'=>		'does not exist',
 	'S_INCORRECT_DESCRIPTION'=>		'Incorrect description',
 	'S_CANT_FORMAT_TREE'=>			'Can\'t format Tree',
 	'S_NO_PERMISSION'=>				'You do not have permission to perform this operation',

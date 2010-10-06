@@ -40,7 +40,6 @@ class CDRule extends CZBXAPI{
 		$result = array();
 		$nodeCheck = false;
 		$user_type = $USER_DETAILS['type'];
-		$userid = $USER_DETAILS['userid'];
 		$result = array();
 
 		$sort_columns = array('druleid','name'); // allowed columns for sorting
@@ -61,14 +60,17 @@ class CDRule extends CZBXAPI{
 			'dhostids'				=> null,
 			'dserviceids'			=> null,
 			'dcheckids'				=> null,
-			'editable'					=> null,
+			'editable'				=> null,
 			'selectDHosts'			=> null,
 			'selectDServices'		=> null,
 			'selectDChecks'			=> null,
-			
+
 // filter
-			'filter'				=> '',
-			'pattern'				=> '',
+			'filter'					=> null,
+			'search'					=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
+
 // output
 			'output'				=> API_OUTPUT_REFER,
 			'countOutput'			=> null,
@@ -176,34 +178,19 @@ class CDRule extends CZBXAPI{
 			}
 		}
 
-// pattern
-		if(!zbx_empty($options['pattern'])){
-			$sql_parts['where']['name'] = ' UPPER(dr.name) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
+// search
+		if(!is_null($options['search'])){
+			zbx_db_search('drules dr', $options, $sql_parts);
 		}
 
 // filter
-		if(!is_null($options['filter'])){
-			zbx_value2array($options['filter']);
+		if(is_array($options['filter'])){
+			zbx_db_filter('drules dr', $options, $sql_parts);
+		}
 
-			if(isset($options['filter']['name']) && !is_null($options['filter']['name'])){
-				zbx_value2array($options['filter']['name']);
-				$sql_parts['where']['name'] = DBcondition('dr.name', $options['filter']['name'], false, true);
-			}
-
-			if(isset($options['filter']['delay']) && !is_null($options['filter']['delay'])){
-				zbx_value2array($options['filter']['delay']);
-				$sql_parts['where']['delay'] = DBcondition('dr.delay', $options['filter']['delay']);
-			}
-
-			if(isset($options['filter']['status']) && !is_null($options['filter']['status'])){
-				zbx_value2array($options['filter']['status']);
-				$sql_parts['where']['status'] = DBcondition('dr.status', $options['filter']['status']);
-			}
-
-			if(isset($options['filter']['nextcheck']) && !is_null($options['filter']['nextcheck'])){
-				zbx_value2array($options['filter']['nextcheck']);
-				$sql_parts['where']['nextcheck'] = DBcondition('dr.nextcheck', $options['filter']['nextcheck']);
-			}
+// search
+		if(is_array($options['search'])){
+			zbx_db_search('drules dr', $options, $sql_parts);
 		}
 
 // order
@@ -268,11 +255,9 @@ class CDRule extends CZBXAPI{
 					if(!is_null($options['selectDHosts']) && !isset($result[$drule['druleid']]['dhosts'])){
 						$result[$drule['druleid']]['dhosts'] = array();
 					}
-
 					if(!is_null($options['selectDChecks']) && !isset($result[$drule['druleid']]['dchecks'])){
 						$result[$drule['druleid']]['dchecks'] = array();
 					}
-
 					if(!is_null($options['selectDServices']) && !isset($result[$drule['druleid']]['dservices'])){
 						$result[$drule['druleid']]['dservices'] = array();
 					}
@@ -334,6 +319,7 @@ COpt::memoryPick();
 				if(!is_null($options['limitSelects'])) order_result($dchecks, 'name');
 				foreach($dchecks as $dcheckid => $dcheck){
 					unset($dchecks[$dcheckid]['dhosts']);
+					$count = array();
 					foreach($dcheck['dhosts'] as $dnum => $dhost){
 						if(!is_null($options['limitSelects'])){
 							if(!isset($count[$dhost['dhostid']])) $count[$dhost['dhostid']] = 0;
@@ -415,31 +401,6 @@ COpt::memoryPick();
 	}
 
 
-/**
- * Get druleid by drule name
- *
- * params: hostids, name
- *
- * @static
- * @param array $druleData
- * @return string|boolean
- */
-	public static function getObjects($druleData){
-		$options = array(
-			'filter' => $druleData,
-			'output'=>API_OUTPUT_EXTEND
-		);
-
-		if(isset($druleData['node']))
-			$options['nodeids'] = getNodeIdByNodeName($druleData['node']);
-		else if(isset($druleData['nodeids']))
-			$options['nodeids'] = $druleData['nodeids'];
-
-		$result = self::get($options);
-
-	return $result;
-	}
-
 	public static function exists($object){
 		$options = array(
 			'filter' => array(),
@@ -520,15 +481,14 @@ COpt::memoryPick();
  * @param array $drules['druleids']
  * @return boolean
  */
-	public static function delete($drules){
-		$drules = zbx_toArray($drules);
+	public static function delete($druleids){
+		$druleids = zbx_toArray($druleids);
 
 		try{
 			self::BeginTransaction(__METHOD__);
-
-			$druleids = array();
+// permissions
 			$options = array(
-				'druleids' => zbx_objectValues($drules, 'druleid'),
+				'druleids' => $druleids,
 				'editable' => 1,
 				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => 1
@@ -537,12 +497,33 @@ COpt::memoryPick();
 			foreach($drules as $gnum => $drule){
 				if(!isset($del_drules[$drule['druleid']]))
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-
-				$druleids[] = $drule['druleid'];
+			}
+//----
+//
+// Conditions
+			$sql = 'SELECT DISTINCT actionid, name '.
+					' FROM conditions '.
+					' WHERE conditiontype='.CONDITION_TYPE_DRULE.
+						' AND value='.zbx_dbstr($druleids);
+			$db_actions = DBselect($sql);
+			while($db_action = DBfetch($db_actions)){
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'Discovery rule is used in Action condition ['.$db_action['name'].'].');
 			}
 
-			if(!delete_drule($druleids))
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete Discoverys');
+
+			$dhostids = array();
+			$sql = 'select dhostid '.
+					' from dhosts'.
+					' where '.DBcondition('druleid',$druleids).
+						' and '.DBin_node('dhostid');
+			$db_dhosts = DBselect($sql);
+			while($db_dhost = DBfetch($db_dhosts))
+				$dhostids[$db_dhost['dhostid']] = $db_dhost['dhostid'];
+
+			DBexecute('DELETE FROM dservices WHERE '.DBcondition('dhostid',$dhostids));
+			DBexecute('DELETE FROM dhosts WHERE '.DBcondition('druleid',$druleids));
+			DBexecute('DELETE FROM dchecks WHERE '.DBcondition('druleid',$druleids));
+			DBexecute('DELETE FROM drules WHERE '.DBcondition('druleid',$druleids));
 
 			self::EndTransaction(true, __METHOD__);
 			return array('druleids' => $druleids);
@@ -677,6 +658,5 @@ COpt::memoryPick();
 
 		return $result;
 	}
-
 }
 ?>
