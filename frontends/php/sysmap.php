@@ -115,6 +115,7 @@ include_once('include/page_header.php');
 						$info = $map_info[$selement['selementid']];
 //						$element['image'] = get_base64_icon($element);
 						$selement['image'] = get_selement_iconid($selement, $info);
+						$selement['urls'] = zbx_toHash($selement['urls'], 'name');
 						$action .= 'ZBX_SYSMAPS['.$cmapid.'].map.add_selement('.zbx_jsvalue($selement).'); '."\n";
 					}
 
