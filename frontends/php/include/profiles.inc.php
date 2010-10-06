@@ -50,6 +50,10 @@ class CProfile{
 	}
 
 	public static function flush(){
+		if(is_null(self::$profiles)){
+			self::init();
+		}
+		
 		if(self::$userDetails['userid'] <= 0) return;
 
 		if(!empty(self::$insert) || !empty(self::$update)){
