@@ -121,14 +121,22 @@
 	$right_tab->setCellSpacing(3);
 	$right_tab->setAttribute('border',0);
 
+	//getting current cunfiguration settings
+	$config = select_config();
+
 // event ack
-	$event_ack = new CWidget(
-		'hat_eventack',
-		make_acktab_by_eventid($_REQUEST['eventid']),
-		CProfile::get('web.tr_events.hats.hat_eventack.state', 1)
-	);
-	$event_ack->addHeader(S_ACKNOWLEDGES);
-	$right_tab->addRow($event_ack);
+
+	//if acknowledges are not disabled by confuguration, let's show them
+	if ($config['event_ack_enable']) {
+		$event_ack = new CWidget(
+			'hat_eventack',
+			make_acktab_by_eventid($_REQUEST['eventid']),
+			CProfile::get('web.tr_events.hats.hat_eventack.state', 1)
+		);
+		$event_ack->addHeader(S_ACKNOWLEDGES);
+		$right_tab->addRow($event_ack);
+	}
+
 //----------------
 
 // event sms actions
@@ -152,6 +160,7 @@
 //----------------
 
 // event history
+
 	$events_histry = new CWidget(
 		'hat_eventlist',
 		make_small_eventlist($_REQUEST['eventid'], $trigger),
@@ -159,6 +168,7 @@
 	);
 	$events_histry->addHeader(S_EVENTS.SPACE.S_LIST.SPACE.'['.S_PREVIOUS.' 20]');
 	$right_tab->addRow($events_histry);
+	
 //----------------
 
 	$td_l = new CCol($left_tab);
