@@ -842,6 +842,7 @@ switch($itemType) {
 		$sortorder = getPageSortOrder();
 		$options = array(
 			'filter' => array(),
+			'search' => array(),
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => 1,
 			'select_hosts' => API_OUTPUT_EXTEND,
@@ -866,13 +867,13 @@ switch($itemType) {
 			$options['application'] = $_REQUEST['filter_application'];
 
 		if(isset($_REQUEST['filter_description']) && !zbx_empty($_REQUEST['filter_description']))
-			$options['pattern'] = $_REQUEST['filter_description'];
+			$options['search']['description'] = $_REQUEST['filter_description'];
 
 		if(isset($_REQUEST['filter_type']) && !zbx_empty($_REQUEST['filter_type']) && ($_REQUEST['filter_type'] != -1))
 			$options['filter']['type'] = $_REQUEST['filter_type'];
 
 		if(isset($_REQUEST['filter_key']) && !zbx_empty($_REQUEST['filter_key']))
-			$options['patternKey'] = $_REQUEST['filter_key'];
+			$options['search']['key_'] = $_REQUEST['filter_key'];
 
 		if(isset($_REQUEST['filter_snmp_community']) && !zbx_empty($_REQUEST['filter_snmp_community']))
 			$options['filter']['snmp_community'] = $_REQUEST['filter_snmp_community'];

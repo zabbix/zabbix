@@ -53,7 +53,7 @@ class CScreen extends CZBXAPI{
 		$result = array();
 		$user_type = $USER_DETAILS['type'];
 
-		$sort_columns = array('name'); // allowed columns for sorting
+		$sort_columns = array('screenid', 'name'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
 
 
@@ -75,12 +75,15 @@ class CScreen extends CZBXAPI{
 			'templated'					=> null,
 // filter
 			'filter'					=> null,
-			'pattern'					=> '',
+			'search'					=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
+
 // OutPut
 			'extendoutput'				=> null,
 			'output'					=> API_OUTPUT_REFER,
 			'select_screenitems'		=> null,
-			'count'						=> null,
+			'countOutput'				=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -162,21 +165,14 @@ class CScreen extends CZBXAPI{
 			}
 		}
 
-// pattern
-		if(!zbx_empty($options['pattern'])){
-			$sql_parts['where'][] = ' UPPER(s.name) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
+// filter
+		if(is_array($options['filter'])){
+			zbx_db_filter('screens s', $options, $sql_parts);
 		}
 
-// filter
-		if(!is_null($options['filter'])){
-			zbx_value2array($options['filter']);
-
-			if(isset($options['filter']['screenid'])){
-				$sql_parts['where']['screenid'] = 's.screenid='.$options['filter']['screenid'];
-			}
-			if(isset($options['filter']['name'])){
-				$sql_parts['where']['name'] = 's.name='.zbx_dbstr($options['filter']['name']);
-			}
+// search
+		if(is_array($options['search'])){
+			zbx_db_search('screens s', $options, $sql_parts);
 			if(isset($options['filter']['templateid'])){
 				$sql_parts['where']['templateid'] = 's.templateid='.$options['filter']['templateid'];
 			}
@@ -442,7 +438,7 @@ SDI('/////////////////////////////////');
 			}
 		}
 
-		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['count'])){
+		if(!is_null($options['countOutput'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
@@ -492,11 +488,14 @@ SDI('/////////////////////////////////');
 	}
 
 	public static function exists($data){
+		$keyFields = array(array('screenid', 'name'));
+
 		$options = array(
-			'filter' => array(),
+			'filter' => zbx_array_mintersect($keyFields, $data),
 			'preservekeys' => 1,
 			'output' => API_OUTPUT_SHORTEN,
-			'nopermissions' => 1
+			'nopermissions' => 1,
+			'limit' => 1
 		);
 
 		if(isset($data['screenid']))
@@ -634,6 +633,19 @@ SDI('/////////////////////////////////');
 
 		try{
 			self::BeginTransaction(__METHOD__);
+
+			$newScreenNames = zbx_objectValues($screens, 'name');
+// Exists
+			$options = array(
+				'filter' => array('name' => $newScreenNames),
+				'output' => 'extend',
+				'nopermissions' => 1
+			);
+			$db_screens = self::get($options);
+			foreach($db_screens as $dbsnum => $db_screen){
+				self::exception(ZBX_API_ERROR_PARAMETERS, S_SCREEN.' [ '.$db_screen['name'].' ] '.S_ALREADY_EXISTS_SMALL);
+			}
+//---
 
 			foreach($screens as $snum => $screen){
 
@@ -777,7 +789,7 @@ SDI('/////////////////////////////////');
 			DB::delete('screens', DBcondition('screenid', $screenids));
 
 			self::EndTransaction(true, __METHOD__);
-			return true;
+			return array('screenids' => $screenids);
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
