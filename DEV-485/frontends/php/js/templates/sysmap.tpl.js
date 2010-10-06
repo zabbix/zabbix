@@ -15,12 +15,11 @@ Object.extend(ZBX_TPL,{
 			'<tr id="urlfooter"><td colspan="3"><input id="newSelementUrl" type="button" value="Add" class="button"></td></tr>'+
 		'</tbody></table>'+
 		'</td>',
-'selementFormUrls': '<tr id="urlrow[#{sysmapelementurlid}]">'+
+'selementFormUrls': '<tr id="urlrow_#{sysmapelementurlid}">'+
 			'<td>'+
-				'<input name="urlid" type="hidden" value="#{sysmapelementurlid}">'+
-				'<input class="biginput" name="urls[#{sysmapelementurlid}][name]" id="urls[#{sysmapelementurlid}][name]" type="text" size="16" value="#{name}">'+
+				'<input class="biginput" name="name" id="url_name_#{sysmapelementurlid}" type="text" size="16" value="#{name}">'+
 			'</td>'+
-			'<td><input class="biginput" name="urls[#{sysmapelementurlid}][url]" id="urls[#{sysmapelementurlid}][url]" type="text" size="32" value="#{url}"></td>'+
+			'<td><input class="biginput" name="url" id="url_url_#{sysmapelementurlid}" type="text" size="32" value="#{url}"></td>'+
 			'<td><input class="button" type="button" value="X" name="remove" title="Remove" onclick="$(\'urlrow[#{sysmapelementurlid}]\').remove();"></td>'+
 		'</tr>'
 }

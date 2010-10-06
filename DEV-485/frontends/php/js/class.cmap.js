@@ -305,8 +305,8 @@ saveSysmap: function(){
 					{
 						'method': 'post',
 						'parameters':params,
-						'onSuccess': function(){ },
-//						'onSuccess': function(resp){ SDI(resp.responseText); },
+//						'onSuccess': function(){ },
+						'onSuccess': function(resp){ SDI(resp.responseText); },
 						'onFailure': function(){ document.location = url.getPath()+'?'+Object.toQueryString(params); }
 					}
 	);
@@ -440,14 +440,6 @@ add_selement: function(selement, update_icon){
 		selement.image = null;
 	}
 
-	if(isset('urls', selement)){
-		var urls = selement.urls;
-		selement.urls = {};
-		for(var i=0; i < urls.length; i++){
-			selement.urls[urls[i].name] = urls[i];
-		}
-	}
-
 	this.selements[selementid] = selement;
 },
 
@@ -459,7 +451,21 @@ updateSelementOption: function(selementid, params){ // params = {'key': value, '
 
 
 	for(var key in params){
-		if(is_null(params[key])) continue;
+		if(empty(params[key])) continue;
+
+		if(key == 'urls'){
+			for(var urlname in params[key]){
+				if(empty(params[key][urlname])) continue;
+
+				if(isset(urlname, this.selements[selementid].urls)){
+					this.selements[selementid].urls[urlname].url = params[key][urlname].url;
+				}
+				else{
+					this.selements[selementid].urls[urlname] = params[key][urlname];
+					this.selements[selementid].urls[urlname]['new'] = 'new';
+				}
+			}
+		}
 
 		if(is_number(params[key])) params[key] = params[key].toString();
 		this.selements[selementid][key] = params[key];
@@ -2266,11 +2272,11 @@ form_selement_update: function(e, selementid){
 		$(this.selementForm.y).value = selement.y;
 
 // URLS
-		for(var urlid in selement.urls){
-			if(empty(selement.urls[urlid])) continue;
+		for(var urlname in selement.urls){
+			if(empty(selement.urls[urlname])) continue;
 
 			var tpl = new Template(ZBX_TPL.selementFormUrls);
-			$('urlfooter').insert({'before' : tpl.evaluate(selement.urls[urlid])});
+			$('urlfooter').insert({'before' : tpl.evaluate(selement.urls[urlname])});
 		}
 
 		this.form_selement_updateByType(e, false);
@@ -2572,8 +2578,20 @@ form_selement_save: function(e){
 		this.selementForm.x.value = params.x;
 		this.selementForm.y.value = params.y;
 
-// URL
-		//params.url = this.selementForm.url.value;
+// URLS
+		params.urls = {};
+		var urlrows = $(this.selementForm.urls).select('tr[id^=urlrow]');
+
+		for(var i=0; i < urlrows.length; i++){
+			var urlid = urlrows[i].id.split('_')[1];
+
+			var url = {
+				'sysmapelementurlid': urlid,
+				'name': $('url_name_'+urlid).value,
+				'url': $('url_url_'+urlid).value
+			};
+			params.urls[url.name] = url;
+		}
 
 		this.updateSelementOption(selementid, params);
 	}
@@ -2607,10 +2625,6 @@ form_selement_save: function(e){
 // Icon DISABLED
 		if(this.selementForm.massEdit.chkboxIconid_disabled.checked)
 			params.iconid_disabled = this.selementForm.iconid_disabled.options[this.selementForm.iconid_disabled.selectedIndex].value;
-
-// URL
-		if(this.selementForm.massEdit.chkboxURL.checked)
-			params.url = this.selementForm.url.value;
 
 		for(var selementid in this.selection.selements){
 			if(!isset(selementid, this.selements)) continue;
