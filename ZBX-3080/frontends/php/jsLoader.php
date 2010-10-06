@@ -99,7 +99,17 @@ foreach($files as $file){
 }
 
 
+$ETag = md5(strlen($js));
+if(isset($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] == $ETag){
+	header('HTTP/1.1 304 Not Modified');
+	header('ETag: '.$ETag);
+	exit();
+}
+
 header('Content-type: text/javascript; charset=UTF-8');
+header('Content-length: '.strlen($js));
+header('Cache-Control: public, must-revalidate');
+header('ETag: '.$ETag);
 
 echo $js;
 
