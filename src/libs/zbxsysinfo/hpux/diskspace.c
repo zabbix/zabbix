@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "sysinfo.h"
+#include "zbxjson.h"
 
 static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *free,
 		zbx_uint64_t *used, double *pfree, double *pused)
@@ -168,4 +169,42 @@ FS_FNCLIST
 			return (fl[i].function)(fsname, result);
 
 	return SYSINFO_RET_FAIL;
+}
+
+int	VFS_FS_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	int		ret = SYSINFO_RET_FAIL;
+	struct mntent	*mt;
+	FILE		*f;
+	struct zbx_json	j;
+
+	assert(result);
+
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+
+	zbx_json_addarray(&j, cmd);
+
+	/* opening the mounted filesystems file */
+	if (NULL != (f = setmntent(MNT_MNTTAB, "r")))
+	{
+		/* fill mnttab structure from file */
+		while (NULL != (mt = getmntent(f)))
+		{
+			zbx_json_addobject(&j, NULL);
+			zbx_json_addstring(&j, "{#FSNAME}", mt->mnt_dir, ZBX_JSON_TYPE_STRING);
+			zbx_json_close(&j);
+		}
+
+		endmntent(f);
+
+		ret = SYSINFO_RET_OK;
+	}
+
+	zbx_json_close(&j);
+
+	SET_STR_RESULT(result, strdup(j.buffer));
+
+	zbx_json_free(&j);
+
+	return ret;
 }
