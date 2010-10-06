@@ -424,4 +424,8 @@
 #	include <sys/mnttab.h>
 #endif
 
+#ifdef HAVE_MNTENT_H
+#	include <mntent.h>
+#endif
+
 #endif
