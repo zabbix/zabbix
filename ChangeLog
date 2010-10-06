@@ -9,9 +9,13 @@ Changes for 1.9
  - [DEV-449] added system.localtime[local] check (Sasha)
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
+Changes for 1.8.4rc2
+
+ - [ZBX-2351] fixed server trying to insert duplicate eventids into the database (asaveljevs,Sasha)
+ - [ZBX-3069] renamed monitoring graphs combobox "All" entry to "not selected" (Vedmak)
+
 Changes for 1.8.4rc1
 
- - [ZBX-3069] renamed monitoring graphs combobox "All" entry to "not selected" (Vedmak)
  - [ZBX-2872] greatly improved API methods consistency (Aly)
  - [ZBX-3070] fixed event date format inconsistency (Vedmak)
  - [ZBX-3068] fixed possible crash of server while processing passive proxies (Sasha)
