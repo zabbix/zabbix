@@ -20,7 +20,7 @@ Object.extend(ZBX_TPL,{
 				'<input class="biginput" name="name" id="url_name_#{sysmapelementurlid}" type="text" size="16" value="#{name}">'+
 			'</td>'+
 			'<td><input class="biginput" name="url" id="url_url_#{sysmapelementurlid}" type="text" size="32" value="#{url}"></td>'+
-			'<td><input class="button" type="button" value="X" name="remove" title="Remove" onclick="$(\'urlrow[#{sysmapelementurlid}]\').remove();"></td>'+
+			'<td><input class="button" type="button" value="X" name="remove" title="Remove" onclick="$(\'urlrow_#{sysmapelementurlid}\').remove();"></td>'+
 		'</tr>'
 }
 );
