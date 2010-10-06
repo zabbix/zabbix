@@ -481,6 +481,7 @@ div.calendar input.calendar_textbox{
 	background-color: #2F2F2F;
 }
 
+/* SCROLLBAR */
 div.scrollbar{
 	background-color: #3F3F3F;
 	border: 1px solid #AA5500;
@@ -496,6 +497,13 @@ div.scrollbar .subline .info_period{
 
 div.scrollbar .subline .nav_links .text{
 	color: #DFDFDF;
+}
+
+/* MESAGES */
+div.messagecontainer .message .messagebox{
+	margin-right: 15px;
+	margin-left: 0px;
+	margin-bottom: 0px;
 }
 
 div.formElement_header{
