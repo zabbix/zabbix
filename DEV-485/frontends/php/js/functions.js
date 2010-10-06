@@ -632,6 +632,24 @@ function display_element(name){
 	}
 }
 
+function cloneRow(elementid, count){
+	if(typeof(cloneRow.count) == 'undefined'){
+		cloneRow.count = count;
+	}
+	cloneRow.count++;
+
+	var tpl = new Template($(elementid).cloneNode(true).wrap('div').innerHTML);
+
+	var emptyEntry = tpl.evaluate({'id' : cloneRow.count});
+
+	var newEntry = $(elementid).insert({'before' : emptyEntry}).previousSibling;
+
+	$(newEntry).descendants().each(function(e){e.removeAttribute('disabled');});
+	newEntry.setAttribute('id', 'entry_'+cloneRow.count);
+	newEntry.style.display = '';
+}
+
+
 //------------------------------------------------------
 //					DASHBOARD JS MENU
 //------------------------------------------------------

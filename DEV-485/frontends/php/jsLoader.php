@@ -41,7 +41,6 @@ $availableJScripts = array(
 	'class.curl.js' => '',
 	'class.rpc.js' => '',
 	'class.pmaster.js' => '',
-	'class.curllist.js' => '',
 	'class.cviewswitcher.js' => '',
 // templates
 	'sysmap.tpl.js' => 'templates/'
@@ -96,7 +95,6 @@ if(empty($_GET['files'])){
 		'class.csuggest.js',
 		'class.cmessages.js',
 		'main.js',
-		'class.curllist.js',
 		'functions.js'
 	);
 }
