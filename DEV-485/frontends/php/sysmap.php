@@ -116,7 +116,7 @@ include_once('include/page_header.php');
 //						$element['image'] = get_base64_icon($element);
 						$selement['image'] = get_selement_iconid($selement, $info);
 						$selement['urls'] = zbx_toHash($selement['urls'], 'name');
-						$action .= 'ZBX_SYSMAPS['.$cmapid.'].map.add_selement('.zbx_jsvalue($selement).'); '."\n";
+						$action .= 'ZBX_SYSMAPS['.$cmapid.'].map.add_selement('.zbx_jsvalue($selement, true).'); '."\n";
 					}
 
 					foreach($db_map['links'] as $enum => $link){
@@ -261,7 +261,7 @@ include_once('include/page_header.php');
 					$selement['label_expanded'] = expand_map_element_label_by_data($selement);
 
 					$action = '';
-					$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.add_selement('.zbx_jsvalue($selement).',1);';
+					$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.add_selement('.zbx_jsvalue($selement, true).',1);';
 //					$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.updateMapImage();';
 
 					print($action);
