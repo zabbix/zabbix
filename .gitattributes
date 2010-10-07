@@ -808,6 +808,7 @@ upgrades/dbpatches/2.0/mysql/patch/events.sql -text
 upgrades/dbpatches/2.0/mysql/patch/expressions.sql -text
 upgrades/dbpatches/2.0/mysql/patch/functions.sql -text
 upgrades/dbpatches/2.0/mysql/patch/globalmacro.sql -text
+upgrades/dbpatches/2.0/mysql/patch/graph_discovery.sql -text
 upgrades/dbpatches/2.0/mysql/patch/graph_theme.sql -text
 upgrades/dbpatches/2.0/mysql/patch/graphs.sql -text
 upgrades/dbpatches/2.0/mysql/patch/graphs_items.sql -text
@@ -825,6 +826,7 @@ upgrades/dbpatches/2.0/mysql/patch/httptest.sql -text
 upgrades/dbpatches/2.0/mysql/patch/httptestitem.sql -text
 upgrades/dbpatches/2.0/mysql/patch/ids.sql -text
 upgrades/dbpatches/2.0/mysql/patch/images.sql -text
+upgrades/dbpatches/2.0/mysql/patch/item_discovery.sql -text
 upgrades/dbpatches/2.0/mysql/patch/items.sql -text
 upgrades/dbpatches/2.0/mysql/patch/items_applications.sql -text
 upgrades/dbpatches/2.0/mysql/patch/maintenances.sql -text
@@ -860,6 +862,7 @@ upgrades/dbpatches/2.0/mysql/patch/sysmaps_link_triggers.sql -text
 upgrades/dbpatches/2.0/mysql/patch/sysmaps_links.sql -text
 upgrades/dbpatches/2.0/mysql/patch/timeperiods.sql -text
 upgrades/dbpatches/2.0/mysql/patch/trigger_depends.sql -text
+upgrades/dbpatches/2.0/mysql/patch/trigger_discovery.sql -text
 upgrades/dbpatches/2.0/mysql/patch/triggers.sql -text
 upgrades/dbpatches/2.0/mysql/patch/user_history.sql -text
 upgrades/dbpatches/2.0/mysql/patch/users.sql -text
@@ -896,6 +899,7 @@ upgrades/dbpatches/2.0/oracle/patch/events.sql -text
 upgrades/dbpatches/2.0/oracle/patch/expressions.sql -text
 upgrades/dbpatches/2.0/oracle/patch/functions.sql -text
 upgrades/dbpatches/2.0/oracle/patch/globalmacro.sql -text
+upgrades/dbpatches/2.0/oracle/patch/graph_discovery.sql -text
 upgrades/dbpatches/2.0/oracle/patch/graph_theme.sql -text
 upgrades/dbpatches/2.0/oracle/patch/graphs.sql -text
 upgrades/dbpatches/2.0/oracle/patch/graphs_items.sql -text
@@ -913,6 +917,7 @@ upgrades/dbpatches/2.0/oracle/patch/httptest.sql -text
 upgrades/dbpatches/2.0/oracle/patch/httptestitem.sql -text
 upgrades/dbpatches/2.0/oracle/patch/ids.sql -text
 upgrades/dbpatches/2.0/oracle/patch/images.sql -text
+upgrades/dbpatches/2.0/oracle/patch/item_discovery.sql -text
 upgrades/dbpatches/2.0/oracle/patch/items.sql -text
 upgrades/dbpatches/2.0/oracle/patch/items_applications.sql -text
 upgrades/dbpatches/2.0/oracle/patch/maintenances.sql -text
@@ -948,6 +953,7 @@ upgrades/dbpatches/2.0/oracle/patch/sysmaps_link_triggers.sql -text
 upgrades/dbpatches/2.0/oracle/patch/sysmaps_links.sql -text
 upgrades/dbpatches/2.0/oracle/patch/timeperiods.sql -text
 upgrades/dbpatches/2.0/oracle/patch/trigger_depends.sql -text
+upgrades/dbpatches/2.0/oracle/patch/trigger_discovery.sql -text
 upgrades/dbpatches/2.0/oracle/patch/triggers.sql -text
 upgrades/dbpatches/2.0/oracle/patch/user_history.sql -text
 upgrades/dbpatches/2.0/oracle/patch/users.sql -text
@@ -983,6 +989,7 @@ upgrades/dbpatches/2.0/postgresql/patch/events.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/expressions.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/functions.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/globalmacro.sql -text
+upgrades/dbpatches/2.0/postgresql/patch/graph_discovery.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/graph_theme.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/graphs.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/graphs_items.sql -text
@@ -1000,6 +1007,7 @@ upgrades/dbpatches/2.0/postgresql/patch/httptest.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/httptestitem.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/ids.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/images.sql -text
+upgrades/dbpatches/2.0/postgresql/patch/item_discovery.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/items.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/items_applications.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/maintenances.sql -text
@@ -1035,6 +1043,7 @@ upgrades/dbpatches/2.0/postgresql/patch/sysmaps_link_triggers.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/sysmaps_links.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/timeperiods.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/trigger_depends.sql -text
+upgrades/dbpatches/2.0/postgresql/patch/trigger_discovery.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/triggers.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/user_history.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/users.sql -text
