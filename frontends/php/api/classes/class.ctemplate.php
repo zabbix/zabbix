@@ -873,7 +873,7 @@ Copt::memoryPick();
 				$obj_params['groupCount'] = 1;
 
 				$screens = CTemplateScreen::get($obj_params);
-				$screens = zbx_toHash($screens, 'templateid');
+				$screens = zbx_toHash($screens, 'hostid');
 				foreach($result as $templateid => $template){
 					if(isset($screens[$templateid]))
 						$result[$templateid]['screens'] = $screens[$templateid]['rowscount'];

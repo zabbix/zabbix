@@ -964,6 +964,7 @@ Copt::memoryPick();
 				$obj_params['groupCount'] = 1;
 
 				$applications = CApplication::get($obj_params);
+
 				$applications = zbx_toHash($applications, 'hostid');
 				foreach($result as $hostid => $host){
 					if(isset($applications[$hostid]))
