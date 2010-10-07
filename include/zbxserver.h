@@ -51,6 +51,6 @@ void	substitute_macros(DB_EVENT *event, DB_ACTION *action, DB_ESCALATION *escala
 int	evaluate_expression(int *result, char **expression, time_t now,
 		zbx_uint64_t trigggerid, int trigger_value, char *error, int maxerrlen);
 int	evaluate(double *value, char *exp, char *error, int maxerrlen);
-void	substitute_discovery_macros(char **data, size_t *data_alloc, zbx_json_parse_t *jp_row);
+void	substitute_discovery_macros(char **data, size_t *data_alloc, struct zbx_json_parse *jp_row);
 
 #endif
