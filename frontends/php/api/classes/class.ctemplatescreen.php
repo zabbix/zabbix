@@ -63,7 +63,8 @@ class CTemplateScreen extends CScreen{
 			'where' => array('template' => 's.templateid IS NOT NULL'),
 			'order' => array(),
 			'group' => array(),
-			'limit' => null);
+			'limit' => null
+		);
 
 		$def_options = array(
 			'nodeids'					=> null,
@@ -92,6 +93,16 @@ class CTemplateScreen extends CScreen{
 		);
 
 		$options = zbx_array_merge($def_options, $options);
+
+
+		if(is_array($options['output'])){
+			unset($sql_parts['select']['screens']);
+			foreach($options['output'] as $key => $field){
+				$sql_parts['select'][$field] = ' s.'.$field;
+			}
+
+			$options['output'] = API_OUTPUT_CUSTOM;
+		}
 
 // editable + PERMISSION CHECK
 
@@ -133,6 +144,7 @@ class CTemplateScreen extends CScreen{
 										' AND rr.permission<'.$permission.')';
 			}
 		}
+
 // nodeids
 		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
@@ -452,13 +464,6 @@ class CTemplateScreen extends CScreen{
 			'limit' => 1
 		);
 
-		if(isset($data['screenid']))
-			$options['filter']['screenid'] = $data['screenid'];
-		if(isset($data['name']))
-			$options['filter']['name'] = $data['name'];
-
-		$options['filter']['templateid'] = isset($data['templateid']) ? $data['templateid'] : 0;
-
 		if(isset($data['node']))
 			$options['nodeids'] = getNodeIdByNodeName($data['node']);
 		else if(isset($data['nodeids']))
@@ -466,403 +471,7 @@ class CTemplateScreen extends CScreen{
 
 		$screens = self::get($options);
 
-		return !empty($screens);
+	return !empty($screens);
 	}
-
-	protected static function checkItems($screenitems){
-		$hostgroups = array();
-		$hosts = array();
-		$graphs = array();
-		$items = array();
-		$maps = array();
-		$screens = array();
-
-		foreach($screenitems as $item){
-			if((isset($item['resourcetype']) && !isset($item['resourceid'])) ||
-				(!isset($item['resourcetype']) && isset($item['resourceid']))){
-				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-			}
-			switch($item['resourcetype']){
-				case SCREEN_RESOURCE_HOSTS_INFO:
-				case SCREEN_RESOURCE_TRIGGERS_INFO:
-				case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
-				case SCREEN_RESOURCE_DATA_OVERVIEW:
-				case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
-					$hostgroups[] = $item['resourceid'];
-				break;
-				case SCREEN_RESOURCE_HOST_TRIGGERS:
-					$hosts[] = $item['resourceid'];
-				break;
-				case SCREEN_RESOURCE_GRAPH:
-					$graphs[] = $item['resourceid'];
-				break;
-				case SCREEN_RESOURCE_SIMPLE_GRAPH:
-				case SCREEN_RESOURCE_PLAIN_TEXT:
-					$items[] = $item['resourceid'];
-				break;
-				case SCREEN_RESOURCE_MAP:
-					$maps[] = $item['resourceid'];
-				break;
-				case SCREEN_RESOURCE_SCREEN:
-					$screens[] = $item['resourceid'];
-				break;
-			}
-		}
-
-		if(!empty($hostgroups)){
-			$result = CHostGroup::get(array(
-				'groupids' => $hostgroups,
-				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => 1,
-			));
-			foreach($hostgroups as $id){
-				if(!isset($result[$id])) self::exception(ZBX_API_ERROR_PERMISSIONS, S_HOST_GROUP);
-			}
-		}
-		if(!empty($hosts)){
-			$result = CHost::get(array(
-				'hostids' => $hosts,
-				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => 1,
-			));
-			foreach($hosts as $id){
-				if(!isset($result[$id])) self::exception(ZBX_API_ERROR_PERMISSIONS, S_HOST);
-			}
-		}
-		if(!empty($graphs)){
-			$result = CGraph::get(array(
-				'graphids' => $graphs,
-				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => 1,
-			));
-			foreach($graphs as $id){
-				if(!isset($result[$id])) self::exception(ZBX_API_ERROR_PERMISSIONS, S_GRAPH);
-			}
-		}
-		if(!empty($items)){
-			$result = CItem::get(array(
-				'itemids' => $items,
-				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => 1,
-				'webitems' => 1,
-			));
-			foreach($items as $id){
-				if(!isset($result[$id])) self::exception(ZBX_API_ERROR_PERMISSIONS, S_ITEM);
-			}
-		}
-		if(!empty($maps)){
-			$result = CMap::get(array(
-				'sysmapids' => $maps,
-				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => 1,
-			));
-			foreach($maps as $id){
-				if(!isset($result[$id])) self::exception(ZBX_API_ERROR_PERMISSIONS, S_MAP);
-			}
-		}
-		if(!empty($screens)){
-			$result = self::get(array(
-				'screenids' => $screens,
-				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => 1,
-			));
-			foreach($screens as $id){
-				if(!isset($result[$id])) self::exception(ZBX_API_ERROR_PERMISSIONS, S_SCREEN);
-			}
-		}
-	}
-
-/**
- * Create Screen
- *
- * @param _array $screens
- * @param string $screens['name']
- * @param array $screens['hsize']
- * @param int $screens['vsize']
- * @return array
- */
-	public static function create($screens){
-		$screens = zbx_toArray($screens);
-		$insert_screen_items = array();
-
-		try{
-			self::BeginTransaction(__METHOD__);
-
-			$newScreenNames = zbx_objectValues($screens, 'name');
-// Exists
-			$options = array(
-				'filter' => array('name' => $newScreenNames),
-				'output' => 'extend',
-				'nopermissions' => 1
-			);
-			$db_screens = self::get($options);
-			foreach($db_screens as $dbsnum => $db_screen){
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_SCREEN.' [ '.$db_screen['name'].' ] '.S_ALREADY_EXISTS_SMALL);
-			}
-//---
-
-			foreach($screens as $snum => $screen){
-
-				$screen_db_fields = array('name' => null);
-				if(!check_db_fields($screen_db_fields, $screen)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for screen [ '.$screen['name'].' ]');
-				}
-
-				if(self::exists($screen)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_SCREEN.' [ '.$screen['name'].' ] '.S_ALREADY_EXISTS_SMALL);
-				}
-			}
-			$screenids = DB::insert('screens', $screens);
-
-			foreach($screens as $snum => $screen){
-				if(isset($screen['screenitems'])){
-					foreach($screen['screenitems'] as $screenitem){
-						$screenitem['screenid'] = $screenids[$snum];
-						$insert_screen_items[] = $screenitem;
-					}
-				}
-			}
-			self::addItems($insert_screen_items);
-
-			self::EndTransaction(true, __METHOD__);
-			return array('screenids' => $screenids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
-	}
-
-/**
- * Update Screen
- *
- * @param _array $screens multidimensional array with Hosts data
- * @param string $screens['screenid']
- * @param int $screens['name']
- * @param int $screens['hsize']
- * @param int $screens['vsize']
- * @return boolean
- */
-	public static function update($screens){
-		$screens = zbx_toArray($screens);
-		$update = array();
-
-		try{
-			self::BeginTransaction(__METHOD__);
-
-			$options = array(
-				'screenids' => zbx_objectValues($screens, 'screenid'),
-				'editable' => 1,
-				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => 1,
-			);
-			$upd_screens = self::get($options);
-			foreach($screens as $gnum => $screen){
-					if(!isset($screen['screenid'], $upd_screens[$screen['screenid']])){
-						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				}
-			}
-
-			foreach($screens as $snum => $screen){
-				if(isset($screen['name'])){
-					$options = array(
-						'filter' => array(
-							'name' => $screen['name'],
-							'templateid' => (isset($screen['templateid']) ? $screen['templateid'] : null)
-						),
-						'preservekeys' => 1,
-						'nopermissions' => 1,
-						'output' => API_OUTPUT_SHORTEN,
-					);
-					$exist_screen = self::get($options);
-					$exist_screen = reset($exist_screen);
-
-					if($exist_screen && ($exist_screen['screenid'] != $screen['screenid']))
-						self::exception(ZBX_API_ERROR_PERMISSIONS, S_SCREEN.' [ '.$screen['name'].' ] '.S_ALREADY_EXISTS_SMALL);
-				}
-
-				$screenid = $screen['screenid'];
-				unset($screen['screenid']);
-				if(!empty($screen)){
-					$update[] = array(
-						'values' => $screen,
-						'where' => array('screenid='.$screenid),
-					);
-				}
-
-				if(isset($screen['screenitems'])){
-					$update_items = array(
-						'screenids' => $screenid,
-						'screenitems' => $screen['screenitems'],
-					);
-					self::updateItems($update_items);
-				}
-			}
-			DB::update('screens', $update);
-
-			self::EndTransaction(true, __METHOD__);
-			return true;
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
-	}
-
-/**
- * Delete Screen
- *
- * @param array $screenids
- * @return boolean
- */
-	public static function delete($screenids){
-		$screenids = zbx_toArray($screenids);
-
-		try{
-			self::BeginTransaction(__METHOD__);
-
-		$options = array(
-				'screenids' => $screenids,
-				'editable' => 1,
-				'preservekeys' => 1,
-		);
-		$del_screens = self::get($options);
-			foreach($screenids as $screenid){
-				if(!isset($del_screens[$screenid])) self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-			}
-
-			DB::delete('screens_items', DBcondition('screenid', $screenids));
-			DB::delete('screens_items', array(DBcondition('resourceid', $screenids), 'resourcetype='.SCREEN_RESOURCE_SCREEN));
-			DB::delete('slides', DBcondition('screenid', $screenids));
-			DB::delete('screens', DBcondition('screenid', $screenids));
-
-			self::EndTransaction(true, __METHOD__);
-			return array('screenids' => $screenids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
-	}
-
-/**
- * Add ScreenItem
- *
- * @param array $screenitems
- * @return boolean
- */
-	protected static function addItems($screenitems){
-		$insert = array();
-
-		self::checkItems($screenitems);
-
-		foreach($screenitems as $screenitem){
-			$items_db_fields = array(
-				'screenid' => null,
-					'resourcetype' => null,
-				'resourceid' => null,
-				'x' => null,
-				'y' => null,
-				);
-			if(!check_db_fields($items_db_fields, $screenitem)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for screen items');
-				}
-
-			$insert[] = $screenitem;
-				}
-		DB::insert('screens_items', $insert);
-		return true;
-			}
-
-	protected static function updateItems($data){
-		$screenids = zbx_toArray($data['screenids']);
-		$insert = array();
-		$update = array();
-		$delete = array();
-
-
-		self::checkItems($data['screenitems']);
-
-		$options = array(
-			'screenids' => $screenids,
-			'nopermissions' => 1,
-			'output' => API_OUTPUT_EXTEND,
-			'select_screenitems' => API_OUTPUT_EXTEND,
-			'preservekeys' => 1,
-		);
-		$screens = self::get($options);
-
-
-		foreach($data['screenitems'] as $new_item){
-			$items_db_fields = array(
-				'x' => null,
-				'y' => null,
-			);
-			if(!check_db_fields($items_db_fields, $new_item)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for screen items');
-		}
-	}
-
-		foreach($screens as $screen){
-			$new_items = $data['screenitems'];
-
-			foreach($screen['screenitems'] as $cnum => $current_item){
-				foreach($new_items as $nnum => $new_item){
-					if(($current_item['x'] == $new_item['x']) && ($current_item['y'] == $new_item['y'])){
-
-						$tmpupd = array(
-							'where' => array(
-								'screenid='.$screen['screenid'],
-								'x='.$new_item['x'],
-								'y='.$new_item['y']
-							)
-						);
-
-						unset($new_item['screenid'], $new_item['screenitemid'], $new_item['x'], $new_item['y']);
-						$tmpupd['values'] = $new_item;
-
-						$update[] = $tmpupd;
-
-						unset($screen['screenitems'][$cnum]);
-						unset($new_items[$nnum]);
-						break;
-		}
-			}
-		}
-
-			foreach($new_items as $new_item){
-				$items_db_fields = array(
-					'resourcetype' => null,
-					'resourceid' => null,
-				);
-				if(!check_db_fields($items_db_fields, $new_item)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for screen items');
-				}
-
-				$new_item['screenid'] = $screen['screenid'];
-				$insert[] = $new_item;
-			}
-
-			foreach($screen['screenitems'] as $del_item){
-				$delete[] = $del_item['screenitemid'];
-				}
-			}
-
-		if(!empty($insert)) DB::insert('screens_items', $insert);
-		if(!empty($update)) DB::update('screens_items', $update);
-		if(!empty($delete)) DB::delete('screens_items', DBcondition('screenitemid', $delete));
-
-			return true;
-		}
-
 }
 ?>

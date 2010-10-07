@@ -60,20 +60,19 @@ class CScreen extends CZBXAPI{
 		$sql_parts = array(
 			'select' => array('screens' => 's.screenid'),
 			'from' => array('screens' => 'screens s'),
-			'where' => array(),
+			'where' => array('template' => 's.templateid IS NULL'),
 			'order' => array(),
 			'group' => array(),
-			'limit' => null);
+			'limit' => null
+		);
 
 		$def_options = array(
 			'nodeids'					=> null,
 			'screenids'					=> null,
 			'screenitemids'				=> null,
-			'templateids'	 			=> null,
-			'hostids'					=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
-			'templated'					=> null,
+
 // filter
 			'filter'					=> null,
 			'search'					=> null,
@@ -104,7 +103,14 @@ class CScreen extends CZBXAPI{
 			}
 		}
 
-// editable + PERMISSION CHECK
+		if(is_array($options['output'])){
+			unset($sql_parts['select']['screens']);
+			foreach($options['output'] as $key => $field){
+				$sql_parts['select'][$field] = ' s.'.$field;
+			}
+
+			$options['output'] = API_OUTPUT_CUSTOM;
+		}
 
 // nodeids
 		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
@@ -126,29 +132,6 @@ class CScreen extends CZBXAPI{
 			$sql_parts['where'][] = DBcondition('si.screenitemid', $options['screenitemids']);
 		}
 
-// templateids
-		if(!is_null($options['templateids'])){
-			zbx_value2array($options['templateids']);
-
-			if($options['output'] != API_OUTPUT_EXTEND){
-				$sql_parts['select']['templateid'] = 's.templateid';
-			}
-
-			if(!is_null($options['groupCount'])){
-				$sql_parts['group']['templateid'] = 's.templateid';
-			}
-
-			$sql_parts['where']['ti'] = DBcondition('s.templateid', $options['templateids']);
-		}
-
-// templated
-		if(!is_null($options['templated'])){
-			if($options['templated'])
-				$sql_parts['where'][] = 's.templateid IS NOT NULL';
-			else
-				$sql_parts['where'][] = 's.templateid IS NULL';
-		}
-
 // filter
 		if(is_array($options['filter'])){
 			zbx_db_filter('screens s', $options, $sql_parts);
@@ -159,7 +142,7 @@ class CScreen extends CZBXAPI{
 			zbx_db_search('screens s', $options, $sql_parts);
 		}
 
-// extendoutput
+// output
 		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['screens'] = 's.*';
 		}
@@ -256,6 +239,7 @@ class CScreen extends CZBXAPI{
 			}
 		}
 
+// editable + PERMISSION CHECK
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){}
 		else if(!empty($result)){
 			$groups_to_check = array();
@@ -480,13 +464,6 @@ SDI('/////////////////////////////////');
 			'nopermissions' => 1,
 			'limit' => 1
 		);
-
-		if(isset($data['screenid']))
-			$options['filter']['screenid'] = $data['screenid'];
-		if(isset($data['name']))
-			$options['filter']['name'] = $data['name'];
-
-		$options['filter']['templateid'] = isset($data['templateid']) ? $data['templateid'] : 0;
 
 		if(isset($data['node']))
 			$options['nodeids'] = getNodeIdByNodeName($data['node']);
