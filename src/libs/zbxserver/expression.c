@@ -2589,3 +2589,69 @@ out:
 
 	return ret;
 }
+
+void	substitute_discovery_macros(char **data, size_t *data_alloc, zbx_json_parse_t *jp_row)
+{
+	const char	*__function_name = "substitute_discovery_macros";
+
+	char		*src, *dst, *replace_to = NULL, c;
+	size_t		l, r, sz_data, sz_macro, sz_value, replace_to_alloc = 0;
+	int		res;
+
+	assert(data);
+	assert(*data);
+	assert(data_alloc);
+	assert(jp_row);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [data:'%s']", __function_name, *data);
+
+	sz_data = strlen(*data);
+
+	for (l = 0; l < sz_data; l++)
+	{
+		if ((*data)[l] != '{' || (*data)[l + 1] != '#')
+			continue;
+
+		for (r = l + 2; r < sz_data && (*data)[r] != '}'; r++)
+			;
+
+		if (r == sz_data)
+			break;
+
+		c = (*data)[r + 1];
+		(*data)[r + 1] = '\0';
+
+		res = zbx_json_value_by_name_dyn(jp_row, &(*data)[l], &replace_to, &replace_to_alloc);
+
+		(*data)[r + 1] = c;
+
+		sz_macro = r - l + 1;
+
+		if (SUCCEED == res)
+		{
+			sz_value = strlen(replace_to);
+
+			sz_data += sz_value - sz_macro;
+
+			while (*data_alloc <= sz_data)
+			{
+				*data_alloc *= 2;
+				*data = realloc(*data, *data_alloc);
+			}
+
+			src = *data + l + sz_macro;
+			dst = *data + l + sz_value;
+
+			memmove(dst, src, sz_data - l - sz_value + 1);
+
+			memcpy(&(*data)[l], replace_to, sz_value);
+		}
+		else
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() Can't substutite macro: \"%.*s\" is not found in value set",
+					__function_name, (int)sz_macro, *data + l);
+	}
+
+	zbx_free(replace_to);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() [data:'%s']", __function_name, *data);
+}
