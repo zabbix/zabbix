@@ -5,7 +5,9 @@ ALTER TABLE items MODIFY itemid bigint unsigned NOT NULL,
 		  MODIFY units varchar(255) DEFAULT '' NOT NULL,
 		  MODIFY templateid bigint unsigned NULL,
 		  MODIFY valuemapid bigint unsigned NULL,
-		  ADD lastns integer NULL;
+		  ADD lastns integer NULL,
+		  ADD flags integer DEFAULT '0' NOT NULL,
+		  ADD filter text NOT NULL;
 UPDATE items SET templateid=NULL WHERE templateid=0;
 CREATE TEMPORARY TABLE tmp_items_itemid (itemid bigint unsigned PRIMARY KEY);
 INSERT INTO tmp_items_itemid (itemid) (SELECT itemid FROM items);
