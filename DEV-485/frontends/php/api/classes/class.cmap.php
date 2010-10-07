@@ -391,12 +391,9 @@ COpt::memoryPick();
 						' WHERE '.DBcondition('sysmapid', $sysmapids);
 				$db_map_urls = DBselect($sql);
 				while($map_url = DBfetch($db_map_urls)){
-
 					foreach($selements as $snum => $selement){
-						if(($selement['sysmapid'] == $map_url['sysmapid'])
-								&& ($selement['elementtype'] == $map_url['elementtype']))
-						{
-							$selements[$snum]['urls'][] = $map_url;
+						if(($selement['sysmapid'] == $map_url['sysmapid']) && ($selement['elementtype'] == $map_url['elementtype'])){
+							$selements[$snum]['urls'][] = self::expandUrlMacro($map_url, $selement);
 						}
 					}
 				}
@@ -407,7 +404,7 @@ COpt::memoryPick();
 					' WHERE '.DBcondition('selementid', array_keys($selements));
 			$db_selement_urls = DBselect($sql);
 			while($selement_url = DBfetch($db_selement_urls)){
-				$selements[$selement_url['selementid']]['urls'][] = $selement_url;
+				$selements[$selement_url['selementid']]['urls'][] = self::expandUrlMacro($selement_url, $selements[$selement_url['selementid']]);
 			}
 
 			foreach($selements as $num => $selement){
@@ -1086,6 +1083,21 @@ COpt::memoryPick();
 			self::setMethodErrors(__METHOD__, $errors);
 			return false;
 		}
+	}
+
+	private static function expandUrlMacro($url, $selement){
+
+		switch($selement['elementtype']){
+			case SYSMAP_ELEMENT_TYPE_HOST_GROUP: $macro = '{HOSTGROUP.ID}' ; break;
+			case SYSMAP_ELEMENT_TYPE_TRIGGER: $macro = '{TRIGGER.ID}' ; break;
+			case SYSMAP_ELEMENT_TYPE_MAP: $macro = '{MAP.ID}' ; break;
+			case SYSMAP_ELEMENT_TYPE_HOST: $macro = '{HOST.ID}' ; break;
+			default: $macro = false;
+		}
+
+		if($macro)
+			$url['url'] = str_replace($macro, $selement['elementid'], $url['url']);
+		return $url;
 	}
 
 }
