@@ -239,13 +239,13 @@ class CMap extends CZBXAPI{
 					$link_triggers[$link_trigger['sysmapid']] = $link_trigger['triggerid'];
 				}
 
-				$options = array(
+				$trig_options = array(
 					'triggerids' => $link_triggers,
 					'editable' => $options['editable'],
 					'output' => API_OUTPUT_SHORTEN,
 					'preservekeys' => 1
 				);
-				$all_triggers = CTrigger::get($options);
+				$all_triggers = CTrigger::get($trig_options);
 				foreach($link_triggers as $id => $triggerid){
 					if(!isset($all_triggers[$triggerid])){
 						unset($result[$id]);
@@ -364,7 +364,6 @@ SDI('///////////////////////////////////////');
 			}
 		}
 
-COpt::memoryPick();
 		if(!is_null($options['countOutput'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
