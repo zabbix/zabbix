@@ -84,7 +84,6 @@ class CScreen extends CZBXAPI{
 			'output'					=> API_OUTPUT_REFER,
 			'select_screenitems'		=> null,
 			'countOutput'				=> null,
-			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
 

@@ -83,7 +83,6 @@ class CTemplateScreen extends CScreen{
 			'output'					=> API_OUTPUT_REFER,
 			'select_screenitems'		=> null,
 			'countOutput'				=> null,
-			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
 
@@ -321,11 +320,6 @@ class CTemplateScreen extends CScreen{
 			}
 		}
 
-		if(!is_null($options['countOutput'])){
-			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
-			return $result;
-		}
-
 // Adding ScreenItems
 		if(!is_null($options['select_screenitems']) && str_in_array($options['select_screenitems'], $subselects_allowed_outputs)){
 			$graphItems = array();
@@ -413,10 +407,8 @@ class CTemplateScreen extends CScreen{
 // creating copies of templated screens (inheritance)
 		$vrtResult = array();
 		foreach($result as $screenid => $screen){
-			if(!isset($templatesChain[$screen['templateid']])){
-				$vrtResult[$screen['templateid']] = $screen;
-				continue;
-			}
+			$vrtResult[$screen['templateid']] = $screen;
+			$vrtResult[$screen['templateid']]['hostid'] = $screen['templateid'];
 
 			foreach($templatesChain[$screen['templateid']] as $hnum => $hostid){
 				$vrtResult[$hostid] = $screen;
@@ -444,6 +436,11 @@ class CTemplateScreen extends CScreen{
 
 		$result = $vrtResult;
 //-----
+
+		if(!is_null($options['countOutput'])){
+			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
+			return $result;
+		}
 
 // removing keys (hash -> array)
 		if(is_null($options['preservekeys'])){

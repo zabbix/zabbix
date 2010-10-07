@@ -452,6 +452,9 @@ table.suggest tr td{
 }
 /*----------*/
 
+table.filter_config{
+	background-color: #2F2F2F;
+}
 
 /*////////////////	DIVS	////////////////////*/
 /* calendar */

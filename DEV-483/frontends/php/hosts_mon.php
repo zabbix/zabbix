@@ -203,6 +203,7 @@ include_once('include/page_header.php');
 		'select_triggers' => API_OUTPUT_COUNT,
 		'select_graphs' => API_OUTPUT_COUNT,
 		'select_applications' => API_OUTPUT_COUNT,
+		'selectScreens' => API_OUTPUT_COUNT,
 		'nopermissions' => 1,
 	);
 	$hosts = CHost::get($options);
@@ -217,6 +218,8 @@ include_once('include/page_header.php');
 			' ('.$host['triggers'].')');
 		$graphs = array(new CLink(S_GRAPHS, 'graphs.php?groupid='.$_REQUEST['groupid'].'&hostid='.$host['hostid']),
 			' ('.$host['graphs'].')');
+		$screens = array(new CLink(S_SCREENS, 'screens.php?groupid='.$_REQUEST['groupid'].'&hostid='.$host['hostid']),
+			' ('.$host['screens'].')');
 
 		$description = array();
 		if($host['proxy_hostid']){
@@ -287,6 +290,7 @@ include_once('include/page_header.php');
 			$items,
 			$triggers,
 			$graphs,
+			$screens,
 			$address,
 			$av_table
 		));
