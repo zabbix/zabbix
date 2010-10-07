@@ -63,6 +63,7 @@ frontends/php/api/classes/class.cproxy.php -text
 frontends/php/api/classes/class.cscreen.php -text
 frontends/php/api/classes/class.cscript.php -text
 frontends/php/api/classes/class.ctemplate.php -text
+frontends/php/api/classes/class.ctemplatescreen.php -text
 frontends/php/api/classes/class.ctrigger.php -text
 frontends/php/api/classes/class.cuser.php -text
 frontends/php/api/classes/class.cusergroup.php -text

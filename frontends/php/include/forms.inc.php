@@ -5342,7 +5342,7 @@ JAVASCRIPT;
 		if(isset($elements['applications']))
 			$header_host_opt['select_applications'] = API_OUTPUT_COUNT;
 		if(isset($elements['screens']))
-			$header_host_opt['select_screens'] = API_OUTPUT_COUNT;
+			$header_host_opt['selectScreens'] = API_OUTPUT_COUNT;
 
 		$header_host = CHost::get($header_host_opt);
 		$header_host = array_pop($header_host);

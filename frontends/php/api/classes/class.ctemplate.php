@@ -86,7 +86,7 @@ class CTemplate extends CZBXAPI{
 			'select_graphs'				=> null,
 			'select_applications'		=> null,
 			'select_macros'				=> null,
-			'select_screens'			=> null,
+			'selectScreens'			=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -329,6 +329,16 @@ class CTemplate extends CZBXAPI{
 						' AND i.itemid=gi.itemid)';
 		}
 
+// filter
+		if(is_array($options['filter'])){
+			zbx_db_filter('hosts h', $options, $sql_parts);
+		}
+
+// search
+		if(is_array($options['search'])){
+			zbx_db_search('hosts h', $options, $sql_parts);
+		}
+
 // extendoutput
 		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['templates'] = 'h.*';
@@ -345,16 +355,6 @@ class CTemplate extends CZBXAPI{
 					$sql_parts['select'][$key] = $fields;
 				}
 			}
-		}
-
-// filter
-		if(is_array($options['filter'])){
-			zbx_db_filter('hosts h', $options, $sql_parts);
-		}
-
-// search
-		if(is_array($options['search'])){
-			zbx_db_search('hosts h', $options, $sql_parts);
 		}
 
 // order
@@ -447,7 +447,7 @@ class CTemplate extends CZBXAPI{
 					if(!is_null($options['select_macros']) && !isset($result[$template['templateid']]['macros'])){
 						$template['macros'] = array();
 					}
-					if(!is_null($options['select_screens']) && !isset($result[$template['templateid']]['screens'])){
+					if(!is_null($options['selectScreens']) && !isset($result[$template['templateid']]['screens'])){
 						$template['screens'] = array();
 					}
 
@@ -845,7 +845,7 @@ Copt::memoryPick();
 		}
 
 // Adding screens
-		if(!is_null($options['select_screens'])){
+		if(!is_null($options['selectScreens'])){
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'templateids' => $templateids,
@@ -853,29 +853,22 @@ Copt::memoryPick();
 				'preservekeys' => 1
 			);
 
-			if(is_array($options['select_screens']) || str_in_array($options['select_screens'], $subselects_allowed_outputs)){
-				$obj_params['output'] = $options['select_screens'];
-				$screens = CScreen::get($obj_params);
+			if(is_array($options['selectScreens']) || str_in_array($options['selectScreens'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['selectScreens'];
 
+				$screens = CTemplateScreen::get($obj_params);
 				if(!is_null($options['limitSelects'])) order_result($screens, 'name');
+
 				foreach($screens as $screenid => $screen){
-					unset($screens[$screenid]['templates']);
-
-					$count = array();
-					foreach($screen['templates'] as $template){
-						if(!is_null($options['limitSelects'])){
-							if(!isset($count[$template['templateid']]))
-								$count[$template['templateid']] = 0;
-							$count[$template['templateid']]++;
-
-							if($count[$template['templateid']] > $options['limitSelects']) continue;
-						}
-
-						$result[$template['templateid']]['screens'][] = &$screens[$screenid];
+					if(!is_null($options['limitSelects'])){
+						if(count($result[$screen['hostid']]['screens']) >= $options['limitSelects']) continue;
 					}
+
+					unset($screens[$screenid]['templates']);
+					$result[$screen['hostid']]['screens'][] = &$screens[$screenid];
 				}
 			}
-			else if(API_OUTPUT_COUNT == $options['select_screens']){
+			else if(API_OUTPUT_COUNT == $options['selectScreens']){
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 

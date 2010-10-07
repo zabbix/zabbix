@@ -48,6 +48,7 @@ function __autoload($class_name){
 		'cscreen' => 1,
 		'cscript' => 1,
 		'ctemplate' => 1,
+		'ctemplatescreen' => 1,
 		'ctrigger' => 1,
 		'cuser' => 1,
 		'cusergroup' => 1,
