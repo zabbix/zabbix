@@ -1859,7 +1859,7 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, int now)
 			DBnode_local("autoreg_hostid"));
 
 	if (NULL != (row = DBfetch(result)))
-		ZBX_STR2UINT64(autoreg_hostid, row[0])
+		ZBX_STR2UINT64(autoreg_hostid, row[0]);
 	else
 	{
 		autoreg_hostid = DBget_maxid("autoreg_host");

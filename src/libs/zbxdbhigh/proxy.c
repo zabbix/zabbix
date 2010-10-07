@@ -273,7 +273,7 @@ void	get_proxy_monitored_hostids(zbx_uint64_t proxy_hostid, zbx_uint64_t **hosti
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(hostid, row[0])
+		ZBX_STR2UINT64(hostid, row[0]);
 
 		uint64_array_add(hostids, hostids_alloc, hostids_num, hostid, 64);
 		uint64_array_add(&ids, &ids_alloc, &ids_num, hostid, 64);
@@ -296,7 +296,7 @@ void	get_proxy_monitored_hostids(zbx_uint64_t proxy_hostid, zbx_uint64_t **hosti
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			ZBX_STR2UINT64(hostid, row[0])
+			ZBX_STR2UINT64(hostid, row[0]);
 
 			uint64_array_add(hostids, hostids_alloc, hostids_num, hostid, 64);
 			uint64_array_add(&ids, &ids_alloc, &ids_num, hostid, 64);
@@ -1059,7 +1059,7 @@ static void	proxy_get_lastid(const ZBX_HISTORY_TABLE *ht, zbx_uint64_t *lastid)
 	if (NULL == (row = DBfetch(result)))
 		*lastid = 0;
 	else
-		ZBX_STR2UINT64(*lastid, row[0])
+		ZBX_STR2UINT64(*lastid, row[0]);
 
 	DBfree_result(result);
 
@@ -1180,7 +1180,7 @@ static int	proxy_get_history_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *h
 	{
 		zbx_json_addobject(j, NULL);
 
-		ZBX_STR2UINT64(*lastid, row[0])
+		ZBX_STR2UINT64(*lastid, row[0]);
 
 		for (f = 0; ht->fields[f].field != NULL; f++)
 		{
@@ -1668,7 +1668,7 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 
 			if (NULL != (row = DBfetch(result)))
 			{
-				ZBX_STR2UINT64(drule.unique_dcheckid, row[0])
+				ZBX_STR2UINT64(drule.unique_dcheckid, row[0]);
 			}
 			DBfree_result(result);
 
