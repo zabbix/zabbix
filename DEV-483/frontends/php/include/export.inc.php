@@ -432,7 +432,7 @@ class zbxXML{
 				$exists = CScreen::exists(array('name' => $screen['name']));
 
 				if($exists && isset($rules['screens']['exist'])){
-					$db_screens = CScreen::getObjects(array('name' => $screen['name']));
+					$db_screens = CScreen::get(array('filter' => array('name' => $screen['name'])));
 					if(empty($db_screens)) throw new Exception(S_NO_PERMISSIONS_FOR_SCREEN.' "'.$screen['name'].'" import');
 
 					$db_screen = reset($db_screens);
@@ -510,7 +510,7 @@ class zbxXML{
 								$screenitem['resourceid'] = $tmp['sysmapid'];
 							break;
 							case SCREEN_RESOURCE_SCREEN:
-								$db_screens = CScreen::getObjects($screenitem['resourceid']);
+								$db_screens = CScreen::get(array('screenids' => $screenitem['resourceid']));
 								if(empty($db_screens)){
 									$error = S_CANNOT_FIND_SCREEN.' "'.$nodeCaption.$screenitem['resourceid']['name'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
 									throw new Exception($error);

@@ -60,7 +60,7 @@ class CItem extends CZBXAPI{
 		$userid = $USER_DETAILS['userid'];
 
 		$sort_columns = array('itemid','description','key_','delay','history','trends','type','status'); // allowed columns for sorting
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM); // allowed output options for [ select_* ] params
 
 		$sql_parts = array(
 			'select' => array('items' => 'i.itemid'),
@@ -96,10 +96,10 @@ class CItem extends CZBXAPI{
 			'belongs'				=> null,
 			'with_triggers'			=> null,
 // filter
-			'filter'					=> null,
-			'search'					=> null,
-			'startSearch'				=> null,
-			'excludeSearch'				=> null,
+			'filter'				=> null,
+			'search'				=> null,
+			'startSearch'			=> null,
+			'excludeSearch'			=> null,
 
 // OutPut
 			'output'				=> API_OUTPUT_REFER,
@@ -138,6 +138,15 @@ class CItem extends CZBXAPI{
 			}
 		}
 
+
+		if(is_array($options['output'])){
+			unset($sql_parts['select']['items']);
+			foreach($options['output'] as $key => $field){
+				$sql_parts['select'][$field] = ' i.'.$field;
+			}
+
+			$options['output'] = API_OUTPUT_CUSTOM;
+		}
 
 // editable + PERMISSION CHECK
 
@@ -331,69 +340,7 @@ class CItem extends CZBXAPI{
 				$sql_parts['where']['h'] = DBcondition('h.host', $options['filter']['host'], false, true);
 			}
 
-			if(isset($options['filter']['hostid'])){
-				zbx_value2array($options['filter']['hostid']);
-				$sql_parts['where']['hostid'] = DBcondition('i.hostid', $options['filter']['hostid']);
-			}
-
-			if(isset($options['filter']['itemid'])){
-				zbx_value2array($options['filter']['itemid']);
-				$sql_parts['where']['itemid'] = DBcondition('i.itemid', $options['filter']['itemid']);
-			}
-
-			if(isset($options['filter']['description'])){
-				zbx_value2array($options['filter']['description']);
-				$sql_parts['where']['description'] = DBcondition('i.description', $options['filter']['description'], false, true);
-			}
-
-			if(isset($options['filter']['key_'])){
-				zbx_value2array($options['filter']['key_']);
-				$sql_parts['where']['key_'] = DBcondition('i.key_', $options['filter']['key_'], false, true);
-			}
-
-			if(isset($options['filter']['type'])){
-				zbx_value2array($options['filter']['type']);
-				$sql_parts['where']['type'] = DBcondition('i.type', $options['filter']['type']);
-			}
-
-			if(isset($options['filter']['status'])){
-				zbx_value2array($options['filter']['status']);
-				$sql_parts['where']['status'] = DBcondition('i.status', $options['filter']['status']);
-			}
-
-			if(isset($options['filter']['snmp_community']))
-				$sql_parts['where'][] = 'i.snmp_community='.zbx_dbstr($options['filter']['snmp_community']);
-
-			if(isset($options['filter']['snmpv3_securityname']))
-				$sql_parts['where'][] = 'i.snmpv3_securityname='.zbx_dbstr($options['filter']['snmpv3_securityname']);
-
-			if(isset($options['filter']['snmp_oid']))
-				$sql_parts['where'][] = 'i.snmp_oid='.zbx_dbstr($options['filter']['snmp_oid']);
-
-			if(isset($options['filter']['snmp_port']))
-				$sql_parts['where'][] = 'i.snmp_port='.$options['filter']['snmp_port'];
-
-			if(isset($options['filter']['value_type'])){
-				zbx_value2array($options['filter']['value_type']);
-				$sql_parts['where']['value_type'] = DBCondition('i.value_type', $options['filter']['value_type']);
-			}
-
-			if(isset($options['filter']['ipmi_sensor']))
-				$sql_parts['where'][] = 'i.ipmi_sensor='.zbx_dbstr($options['filter']['ipmi_sensor']);
-
-			if(isset($options['filter']['data_type']))
-				$sql_parts['where'][] = 'i.data_type='.$options['filter']['data_type'];
-
-			if(isset($options['filter']['delay'])){
-				zbx_value2array($options['filter']['delay']);
-				$sql_parts['where']['delay'] = DBCondition('i.delay', $options['filter']['delay']);
-			}
-
-			if(isset($options['filter']['trends']))
-				$sql_parts['where'][] = 'i.trends='.$options['filter']['trends'];
-
-			if(isset($options['filter']['history']))
-				$sql_parts['where'][] = 'i.history='.$options['filter']['history'];
+			zbx_db_filter('items i', $options, $sql_parts);
 		}
 
 // group

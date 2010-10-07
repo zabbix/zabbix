@@ -42,7 +42,7 @@ class CGraph extends CZBXAPI{
 		$result = array();
 
 		$sort_columns = array('graphid','name'); // allowed columns for sorting
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND. API_OUTPUT_CUSTOM); // allowed output options for [ select_* ] params
 
 		$sql_parts = array(
 			'select' => array('graphs' => 'g.graphid'),
@@ -112,6 +112,15 @@ class CGraph extends CZBXAPI{
 			}
 		}
 
+
+		if(is_array($options['output'])){
+			unset($sql_parts['select']['graphs']);
+			foreach($options['output'] as $key => $field){
+				$sql_parts['select'][$field] = ' g.'.$field;
+			}
+
+			$options['output'] = API_OUTPUT_CUSTOM;
+		}
 
 // editable + PERMISSION CHECK
 

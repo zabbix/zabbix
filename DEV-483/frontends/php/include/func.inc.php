@@ -987,6 +987,17 @@ function zbx_value2array(&$values){
 	}
 }
 
+// creates chain of relation parent -> childs, for all chain levels
+function createParentToChildRelation(&$chain, $link, $parentField, $childField){
+	if(!isset($chain[$link[$parentField]]))
+		$chain[$link[$parentField]] = array();
+
+	$chain[$link[$parentField]][$link[$childField]] = $link[$childField];
+	if(isset($chain[$link[$childField]])){
+		$chain[$link[$parentField]] = zbx_array_merge($chain[$link[$parentField]], $chain[$link[$childField]]);
+	}
+}
+
 // fuunction: zbx_toHash
 // object or array of objects to hash
 // author: Aly
