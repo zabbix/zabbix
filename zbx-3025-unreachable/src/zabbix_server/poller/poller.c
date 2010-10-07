@@ -43,7 +43,7 @@
 #include "checks_calculated.h"
 
 #define MAX_NORMAL_ITEMS	64
-#define MAX_UNREACHABLE_ITEMS	8	/* must not be greater than MAX_NORMAL_ITEMS to avoid buffer overflow */
+#define MAX_UNREACHABLE_ITEMS	1	/* must not be greater than MAX_NORMAL_ITEMS to avoid buffer overflow */
 
 AGENT_RESULT    result;
 
