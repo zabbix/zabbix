@@ -331,6 +331,9 @@ include_once('include/page_header.php');
 			$url_table = new Ctable();
 			$url_table->setHeader(array(S_NAME, S_URL, S_ELEMENT, SPACE));
 
+			if(empty($urls)){
+				$urls[] = array('name' => '', 'url' => '', 'elementtype' => 0);
+			}
 			$i = 0;
 			foreach($urls as $url){
 				$url_label = new CTextBox('urls['.$i.'][name]', $url['name'], 16);
@@ -338,7 +341,7 @@ include_once('include/page_header.php');
 
 				$url_etype = new CCombobox('urls['.$i.'][elementtype]', $url['elementtype']);
 				$url_etype->addItems(sysmap_element_types());
-				$rem_button = new CButton('button', S_REMOVE, '$("urlEntry_'.$i.'").remove();', false);
+				$rem_button = new CButton('button', 'X', '$("urlEntry_'.$i.'").remove();', false);
 
 				$urlRow = new CRow(array($url_label, $url_link, $url_etype, $rem_button));
 				$urlRow->setAttribute('id', 'urlEntry_'.$i.'');
@@ -355,7 +358,7 @@ include_once('include/page_header.php');
 			$tpl_url_etype = new CCombobox('urls[#{id}][elementtype]');
 			$tpl_url_etype->setAttribute('disabled', 'disabled');
 			$tpl_url_etype->addItems(sysmap_element_types());
-			$tpl_rem_button = new CButton('button', S_REMOVE, '$("entry_#{id}").remove();', false);
+			$tpl_rem_button = new CButton('button', 'X', '$("entry_#{id}").remove();', false);
 
 			$tpl_urlRow = new CRow(array($tpl_url_label, $tpl_url_link, $tpl_url_etype, $tpl_rem_button));
 			$tpl_urlRow->addStyle('display: none');
