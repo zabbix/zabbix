@@ -354,10 +354,7 @@ include_once('include/page_header.php');
 			$tpl_url_link->setAttribute('disabled', 'disabled');
 			$tpl_url_etype = new CCombobox('urls[#{id}][elementtype]');
 			$tpl_url_etype->setAttribute('disabled', 'disabled');
-			$tpl_url_etype->addItems(array(
-				1 => 'host',
-				2 => 'hostgroup',
-			));
+			$tpl_url_etype->addItems(sysmap_element_types());
 			$tpl_rem_button = new CButton('button', S_REMOVE, '$("entry_#{id}").remove();', false);
 
 			$tpl_urlRow = new CRow(array($tpl_url_label, $tpl_url_link, $tpl_url_etype, $tpl_rem_button));
