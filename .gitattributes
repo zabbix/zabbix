@@ -1032,6 +1032,8 @@ upgrades/dbpatches/2.0/postgresql/patch/services_times.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/sessions.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/slides.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/slideshows.sql -text
+upgrades/dbpatches/2.0/postgresql/patch/sysmap_element_url.sql -text
+upgrades/dbpatches/2.0/postgresql/patch/sysmap_url.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/sysmaps.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/sysmaps_elements.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/sysmaps_link_triggers.sql -text
