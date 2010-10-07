@@ -1927,6 +1927,38 @@ void	uint64_array_remove(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values
 
 /******************************************************************************
  *                                                                            *
+ * Function: uint64_array_remove_both                                         *
+ *                                                                            *
+ * Purpose: remove equal values from both arrays                              *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	uint64_array_remove_both(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values, int *rm_num)
+{
+	int	rindex, index;
+
+	for (rindex = 0; rindex < *rm_num; rindex++)
+	{
+		index = get_nearestindex(values, sizeof(zbx_uint64_t), *num, rm_values[rindex]);
+		if (index == *num || values[index] != rm_values[rindex])
+			continue;
+
+		memmove(&values[index], &values[index + 1], sizeof(zbx_uint64_t) * ((*num) - index - 1));
+		(*num)--;
+		memmove(&rm_values[rindex], &rm_values[rindex + 1], sizeof(zbx_uint64_t) * ((*rm_num) - rindex - 1));
+		(*rm_num)--; rindex--;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: str2uint                                                         *
  *                                                                            *
  * Purpose: convert string to unsigned integer (currently 31bit uint)         *
