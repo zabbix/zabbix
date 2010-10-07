@@ -38,6 +38,24 @@
 			    );
 	}
 
+	function sysmap_element_types($type=null){
+		$types = array(
+			SYSMAP_ELEMENT_TYPE_HOST => S_HOST,
+			SYSMAP_ELEMENT_TYPE_HOST_GROUP => S_HOST_GROUP,
+			SYSMAP_ELEMENT_TYPE_TRIGGER => S_TRIGGER,
+			SYSMAP_ELEMENT_TYPE_MAP => S_MAP,
+			SYSMAP_ELEMENT_TYPE_IMAGE => S_IMAGE,
+		);
+
+		if(is_null($type)){
+			natsort($types);
+			return $types;
+		}
+		else if(isset($types[$type]))
+			return $types[$type];
+		else
+			return S_UNKNOWN;
+	}
 /*
  * Function: map_link_drawtype2str
  *
