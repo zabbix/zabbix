@@ -228,7 +228,7 @@ static int	DBcmp_triggers(zbx_uint64_t triggerid1, const char *expression1,
 			" from functions f1,functions f2,items i1,items i2"
 			" where f1.function=f2.function"
 				" and f1.parameter=f2.parameter"
-				" and i1.key_=i2.key_ "
+				" and i1.key_=i2.key_"
 				" and i1.itemid=f1.itemid"
 				" and i2.itemid=f2.itemid"
 				" and f1.triggerid=" ZBX_FS_UI64
@@ -406,7 +406,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_uint64_t templateid,
 
 		hresult = DBselect(
 				"select distinct g.graphid"
-				" from graphs g,graphs_items gi,items i "
+				" from graphs g,graphs_items gi,items i"
 				" where g.graphid=gi.graphid"
 					" and gi.itemid=i.itemid"
 					" and i.hostid=" ZBX_FS_UI64
@@ -779,7 +779,7 @@ static void	DBupdate_services_status_all(void)
 	}
 	DBfree_result(result);
 
-	result = DBselect("select max(sl.servicedownid),sl.serviceupid "
+	result = DBselect("select max(sl.servicedownid),sl.serviceupid"
 			" from services_links sl"
 			" where sl.servicedownid not in (select distinct serviceupid from services_links)"
 			" group by sl.serviceupid");
@@ -2748,7 +2748,7 @@ static int	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
 
 	result = DBselect(
 			"select distinct g.graphid"
-			" from graphs g,graphs_items gi,items i "
+			" from graphs g,graphs_items gi,items i"
 			" where g.graphid=gi.graphid"
 				" and gi.itemid=i.itemid"
 				" and i.hostid=" ZBX_FS_UI64
