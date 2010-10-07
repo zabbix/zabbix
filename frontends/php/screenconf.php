@@ -176,7 +176,11 @@ include_once('include/page_header.php');
 			if(isset($_REQUEST['screenid'])){
 				$screenids[] = $_REQUEST['screenid'];
 			}
-			$screens = CScreen::get(array('screenids' => $screenids, 'output' => API_OUTPUT_EXTEND, 'editable => 1'));
+			$screens = CScreen::get(array(
+				'screenids' => $screenids,
+				'output' => API_OUTPUT_EXTEND,
+				'editable => 1'
+			));
 
 			$go_result = CScreen::delete($screenids);
 
@@ -251,12 +255,14 @@ include_once('include/page_header.php');
 			'editable' => 1,
 			'output' => API_OUTPUT_EXTEND,
 			'templateids' => $templateid,
-			'templated' => ($templateid ? true : false),
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
 		);
-		$screens = CScreen::get($options);
+		if($templateid)
+			$screens = CTemplateScreen::get($options);
+		else
+			$screens = CScreen::get($options);
 
 		order_result($screens, $sortfield, $sortorder);
 		$paging = getPagingLine($screens);

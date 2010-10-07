@@ -134,7 +134,7 @@
 
 	$screens = CScreen::get(array(
 		'nodeids' => get_current_nodeid(),
-		'extendoutput' => 1
+		'output' => API_OUTPUT_EXTEND
 	));
 	$screens = zbx_toHash($screens, 'screenid');
 	order_result($screens, 'name');
