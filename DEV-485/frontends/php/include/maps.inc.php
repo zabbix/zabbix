@@ -341,6 +341,14 @@
 				$links_menus.= "['".S_STATUS_OF_TRIGGERS."',\"javascript: redirect('events.php?source=0&groupid=".$db_element['elementid']."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 			}
 
+			/**
+			 * Adding user defined links to popup menu
+			 * @see DEV-485
+			 */
+			foreach($db_element['urls'] as $url){
+				$links_menus.= "['".$url['name']."',\"javascript: redirect('".$url['url']."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+			}
+
 
 			if(!empty($db_element['url']) || !empty($links_menus)){
 				$menus .= "['".S_LINKS."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
