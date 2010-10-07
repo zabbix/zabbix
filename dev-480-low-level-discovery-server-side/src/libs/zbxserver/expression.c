@@ -2590,7 +2590,7 @@ out:
 	return ret;
 }
 
-void	substitute_discovery_macros(char **data, size_t *data_alloc, zbx_json_parse_t *jp_row)
+void	substitute_discovery_macros(char **data, size_t *data_alloc, struct zbx_json_parse *jp_row)
 {
 	const char	*__function_name = "substitute_discovery_macros";
 
