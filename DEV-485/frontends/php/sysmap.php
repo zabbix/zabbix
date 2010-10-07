@@ -156,7 +156,6 @@ include_once('include/page_header.php');
 						);
 					$sysmaps = CMap::get($options);
 					if(empty($sysmaps)) print('alert("Access denied!");');
-
 					$selements = get_request('selements', '[]');
 					$selements = $json->decode($selements, true);
 
