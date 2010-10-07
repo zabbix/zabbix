@@ -691,7 +691,7 @@ void	main_poller_loop(unsigned char p, int type, int num)
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Poller %s#%d spent " ZBX_FS_DBL " seconds while updating %3d values."
 				" Sleeping for %d seconds",
-				poller_num, ZBX_POLLER_TYPE_NORMAL == poller_type ? "" : "for unreachable hosts ",
+				ZBX_POLLER_TYPE_NORMAL == poller_type ? "" : "for unreachable hosts ", poller_num,
 				sec, processed, sleeptime);
 
 		if (sleeptime > 0)
