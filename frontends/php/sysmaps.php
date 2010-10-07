@@ -146,6 +146,12 @@ include_once('include/page_header.php');
 
 	if(isset($_REQUEST['save'])){
 
+		$urls = get_request('urls', array());
+		foreach($urls as $unum => $url){
+			if(empty($url['name']))
+				unset($urls[$unum]);
+		}
+
 		$map = array(
 			'name' => $_REQUEST['name'],
 			'width' => $_REQUEST['width'],
@@ -157,6 +163,7 @@ include_once('include/page_header.php');
 			'label_type' => $_REQUEST['label_type'],
 			'label_location' => $_REQUEST['label_location'],
 			'show_unack' => get_request('show_unack', 0),
+			'urls' => $urls,
 		);
 
 		if(isset($_REQUEST['sysmapid'])){
@@ -227,7 +234,6 @@ include_once('include/page_header.php');
 			if(isset($_REQUEST['sysmapid'])){
 				$options = array(
 					'sysmapids' => $_REQUEST['sysmapid'],
-					'select_urls' => true,
 					'output' => API_OUTPUT_EXTEND
 				);
 				$sysmaps = CMap::get($options);
@@ -322,11 +328,6 @@ include_once('include/page_header.php');
 			}
 			$table_map->addRow(S_PROBLEM_DISPLAY, $selectShowUnack);
 
-// TODO: remove test variable
-			$urls = array(
-				array('name' => 'asd', 'url' => 'asdasd', 'elementtype' => 2),
-			);
-//--
 			$url_table = new Ctable();
 			$url_table->setHeader(array(S_NAME, S_URL, S_ELEMENT, SPACE));
 
@@ -336,10 +337,7 @@ include_once('include/page_header.php');
 				$url_link = new CTextBox('urls['.$i.'][url]', $url['url'], 16);
 
 				$url_etype = new CCombobox('urls['.$i.'][elementtype]', $url['elementtype']);
-				$url_etype->addItems(array(
-					1 => 'host',
-					2 => 'hostgroup',
-				));
+				$url_etype->addItems(sysmap_element_types());
 				$rem_button = new CButton('button', S_REMOVE, '$("urlEntry_'.$i.'").remove();', false);
 
 				$urlRow = new CRow(array($url_label, $url_link, $url_etype, $rem_button));

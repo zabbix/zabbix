@@ -88,7 +88,7 @@ class CMap extends CZBXAPI{
 			'select_selements'			=> null,
 			'select_links'				=> null,
 			'countOutput'				=> null,
-			'select_urls'				=> null,
+			'expand_urls' 				=> null,
 			'preservekeys'				=> null,
 
 			'sortfield'					=> '',
@@ -215,7 +215,7 @@ class CMap extends CZBXAPI{
 					if(!is_null($options['select_links']) && !isset($result[$sysmap['sysmapid']]['links'])){
 						$result[$sysmap['sysmapid']]['links'] = array();
 					}
-					if(!is_null($options['select_urls']) && !isset($result[$sysmap['sysmapid']]['urls'])){
+					if(!isset($result[$sysmap['sysmapid']]['urls'])){
 						$result[$sysmap['sysmapid']]['urls'] = array();
 					}
 
@@ -426,11 +426,13 @@ COpt::memoryPick();
 		}
 
 // Adding Urls
-		if(!is_null($options['select_urls'])){
+		if($options['output'] != API_OUTPUT_SHORTEN){
 			$sql = 'SELECT su.* FROM sysmap_url su WHERE '.DBcondition('su.sysmapid', $sysmapids);
 			$db_urls = DBselect($sql);
 			while($url = DBfetch($db_urls)){
-				$result[$url['sysmapid']]['urls'][] = $url;
+				$sysmapid = $url['sysmapid'];
+				unset($url['sysmapid']);
+				$result[$sysmapid]['urls'][] = $url;
 			}
 		}
 
@@ -500,8 +502,6 @@ COpt::memoryPick();
  * @return boolean | array
  */
 	public static function create($maps){
-		$sysmapids = array();
-
 		$maps = zbx_toArray($maps);
 
 		try{
@@ -531,26 +531,30 @@ COpt::memoryPick();
 				if(self::exists(array('name' => $map['name']))){
 					self::exception(ZBX_API_ERROR_PARAMETERS,'Map [ '.$map['name'].' ] already exists.');
 				}
-
-				$data_map[] = $map;
 			}
-			$sysmapids = DB::insert('sysmaps', $data_map);
+			$sysmapids = DB::insert('sysmaps', $maps);
 
 			$data_elements = array();
-
-			$sysmapid = reset($sysmapids);
-			foreach($data_map as $mnum => $map){
-				if(!$sysmapid) self::exception(ZBX_API_ERROR_PARAMETERS, 'DBEXECUTE_ERROR');
-
-				foreach($map['selements'] as $snum => $selement){
-					$selement['sysmapid'] = $sysmapid;
-					$data_elements[] = $selement;
+			$insert_urls = array();
+			foreach($sysmapids as $mnum => $sysmapid){
+				if(isset($maps[$mnum]['urls'])){
+					foreach($maps[$mnum]['urls'] as $url){
+						$url['sysmapid'] = $sysmapid;
+						$insert_urls[] = $url;
+					}
 				}
 
-				$sysmapid = next($sysmapids);
+				if(isset($maps[$mnum]['selements'])){
+					foreach($maps[$mnum]['selements'] as $selement){
+						$selement['sysmapid'] = $sysmapid;
+						$data_elements[] = $selement;
+					}
+				}
 			}
+			DB::insert('sysmap_url', $insert_urls);
 
 			self::addElements($data_elements);
+
 			self::EndTransaction(true, __METHOD__);
 
 			return array('sysmapids' => $sysmapids);
@@ -579,13 +583,13 @@ COpt::memoryPick();
  */
 	public static function update($maps){
 		$maps = zbx_toArray($maps);
-		$sysmapids = array();
+		$sysmapids = zbx_objectValues($maps, 'sysmapid');
 
 		try{
 			self::BeginTransaction(__METHOD__);
 
 			$options = array(
-				'sysmapids' => zbx_objectValues($maps, 'sysmapid'),
+				'sysmapids' => $sysmapids,
 				'preservekeys' => 1,
 				'output' => API_OUTPUT_EXTEND,
 			);
@@ -594,10 +598,10 @@ COpt::memoryPick();
 				if(!isset($db_sysmaps[$map['sysmapid']])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Map with ID ['.$map['sysmapid'].'] does not exist');
 				}
-				$sysmapids[] = $map['sysmapid'];
 			}
 
 			$update = array();
+			$urlidsToDelete = $urlsToUpdate = $urlsToAdd = array();
 			foreach($maps as $mnum => $map){
 				if(isset($map['name'])){
 					$options = array(
@@ -611,7 +615,7 @@ COpt::memoryPick();
 					$map_exists = self::get($options);
 					$map_exists = reset($map_exists);
 
-					if(!empty($map_exists) && ($map_exists['sysmapid'] != $map['sysmapid'])){
+					if($map_exists && ($map_exists['sysmapid'] != $map['sysmapid'])){
 						self::exception(ZBX_API_ERROR_PARAMETERS, 'Map [ '.$map['name'].' ] '.S_ALREADY_EXISTS_SMALL);
 					}
 				}
@@ -620,8 +624,44 @@ COpt::memoryPick();
 					'values' => $map,
 					'where' => array('sysmapid='.$map['sysmapid']),
 				);
+
+
+				if(isset($map['urls'])){
+					foreach($db_sysmaps[$map['sysmapid']]['urls'] as $existing_url){
+						$toUpdate = false;
+						foreach($map['urls'] as $unum => $new_url){
+							if($existing_url['name'] == $new_url['name']){
+								$toUpdate = array(
+									'values' => $new_url,
+									'where' => array('sysmapurlid='.$existing_url['sysmapurlid'])
+								);
+								unset($map['urls'][$unum]);
+
+								break;
+							}
+						}
+
+						if($toUpdate){
+							$urlsToUpdate[] = $toUpdate;
+						}
+						else{
+							$urlidsToDelete[] = $existing_url['sysmapurlid'];
+						}
+					}
+
+					foreach($map['urls'] as $newUrl){
+						$newUrl['sysmapid'] = $map['sysmapid'];
+						$urlsToAdd[] = $newUrl;
+					}
+
+				}
 			}
 			DB::update('sysmaps', $update);
+
+			if(!empty($urlidsToDelete))
+				DB::delete('sysmap_url', DBcondition('sysmapurlid', $urlidsToDelete));
+			DB::update('sysmap_url', $urlsToUpdate);
+			DB::insert('sysmap_url', $urlsToAdd);
 
 			self::EndTransaction(true, __METHOD__);
 			return array('sysmapids' => $sysmapids);
@@ -660,49 +700,14 @@ COpt::memoryPick();
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 			}
 //---
+
 // delete maps from selements of other maps
-			$selementids = array();
-			$sql = 'SELECT se.selementid '.
-					' FROM sysmaps_elements se'.
-					' WHERE '.DBcondition('se.elementid',$sysmapids).
-						' AND se.elementtype='.SYSMAP_ELEMENT_TYPE_MAP;
-			$db_elements = DBselect($sql);
-			while($db_element = DBfetch($db_elements)){
-				$selementids[$db_element['selementid']] = $db_element['selementid'];
-			}
-
-			if(!empty($selementids)){
-				$sysmap_linkids = array();
-				$sql = 'SELECT linkid '.
-						' FROM sysmaps_links '.
-						' WHERE '.DBcondition('selementid1',$selementids).
-							' OR '.DBcondition('selementid2',$selementids);
-
-				$res=DBselect($sql);
-				while($rows = DBfetch($res)){
-					$sysmap_linkids[$rows['linkid']] = $rows['linkid'];
-				}
-
-				if(!empty($sysmap_linkids)){
-					DBexecute('DELETE FROM sysmaps_link_triggers WHERE '.DBcondition('linkid',$sysmap_linkids));
-					DBexecute('DELETE FROM sysmaps_links WHERE '.DBcondition('linkid',$sysmap_linkids));
-				}
-
-				DBexecute('DELETE FROM sysmaps_elements WHERE '.DBcondition('selementid',$selementids));
-			}
-	//----
-
-			$res = DBselect('SELECT linkid FROM sysmaps_links WHERE '.DBcondition('sysmapid', $sysmapids));
-			while($rows = DBfetch($res)){
-				$result = delete_link($rows['linkid']);
-				if(!$result)
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete link');
-			}
-
-			DBexecute('DELETE FROM sysmaps_elements WHERE '.DBcondition('sysmapid', $sysmapids));
-			DBexecute("DELETE FROM profiles WHERE idx='web.favorite.sysmapids' AND source='sysmapid' AND ".DBcondition('value_id', $sysmapids));
-			DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid', $sysmapids).' AND resourcetype='.SCREEN_RESOURCE_MAP);
-			DBexecute('DELETE FROM sysmaps WHERE '.DBcondition('sysmapid', $sysmapids));
+			DB::delete('sysmaps_elements', array(
+				DBcondition('elementid', $sysmapids),
+				'elementtype='.SYSMAP_ELEMENT_TYPE_MAP
+			));
+//----
+			DB::delete('sysmaps', array(DBcondition('sysmapid', $sysmapids)));
 
 			self::EndTransaction(true, __METHOD__);
 			return array('sysmapids' => $sysmapids);
@@ -785,17 +790,13 @@ COpt::memoryPick();
  * @param array $elements[0,...]['label_location']
  */
 	public static function addElements($selements){
-		$errors = array();
-		$selementids = array();
 		$selements = zbx_toArray($selements);
-
-		$sysmapids = zbx_objectValues($selements, 'sysmapid');
 
 		try{
 			self::BeginTransaction(__METHOD__);
 
 			$options = array(
-				'sysmapids' => $sysmapids,
+				'sysmapids' => zbx_objectValues($selements, 'sysmapid'),
 				'editable' => 1,
 				'preservekeys' => 1,
 				'output' => API_OUTPUT_SHORTEN,
@@ -858,8 +859,6 @@ COpt::memoryPick();
  * @param array $elements[0,...]['label_location']
  */
 	public static function updateElements($selements){
-		$result = true;
-
 		$selements = zbx_toArray($selements);
 		$selementids = array();
 
@@ -926,8 +925,6 @@ COpt::memoryPick();
  * @param array $selements[0, ...]['selementid'] selementid to delete
  */
     public static function deleteElements($selements){
-		$result = true;
-
         $selements = zbx_toArray($selements);
         $selementids = zbx_objectValues($selements, 'selementid');
 
@@ -939,7 +936,8 @@ COpt::memoryPick();
 			$options = array(
 				'sysmapids' => $sysmapids,
 				'editable' => 1,
-				'preservekeys' => 1
+				'preservekeys' => 1,
+				'output' => API_OUTPUT_SHORTEN,
 			);
 			$upd_maps = self::get($options);
 
@@ -950,18 +948,16 @@ COpt::memoryPick();
 			}
 
 	        $result = delete_sysmaps_element($selementids);
-		    $result = self::EndTransaction($result, __METHOD__);
-
 			if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Map delete elements failed');
+
+			self::EndTransaction(true, __METHOD__);
 
 			return $selementids;
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
-
 			$errors = $e->getErrors();
 			$error = reset($errors);
-
 			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, $error);
 			return false;
 		}
