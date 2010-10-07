@@ -1,10 +1,10 @@
 ALTER TABLE sysmaps_elements MODIFY selementid bigint unsigned NOT NULL,
-			     MODIFY sysmapid bigint unsigned NOT NULL,
-			     MODIFY iconid_off bigint unsigned NULL,
-			     MODIFY iconid_on bigint unsigned NULL,
-			     MODIFY iconid_unknown bigint unsigned NULL,
-			     MODIFY iconid_disabled bigint unsigned NULL,
-			     MODIFY iconid_maintenance bigint unsigned NULL;
+                 MODIFY sysmapid bigint unsigned NOT NULL,
+                 MODIFY iconid_off bigint unsigned NULL,
+                 MODIFY iconid_on bigint unsigned NULL,
+                 MODIFY iconid_unknown bigint unsigned NULL,
+                 MODIFY iconid_disabled bigint unsigned NULL,
+                 MODIFY iconid_maintenance bigint unsigned NULL;
 DELETE FROM sysmaps_elements WHERE sysmapid NOT IN (SELECT sysmapid FROM sysmaps);
 UPDATE sysmaps_elements SET iconid_off=NULL WHERE iconid_off=0;
 UPDATE sysmaps_elements SET iconid_on=NULL WHERE iconid_on=0;
@@ -22,3 +22,4 @@ ALTER TABLE sysmaps_elements ADD CONSTRAINT c_sysmaps_elements_3 FOREIGN KEY (ic
 ALTER TABLE sysmaps_elements ADD CONSTRAINT c_sysmaps_elements_4 FOREIGN KEY (iconid_unknown) REFERENCES images (imageid);
 ALTER TABLE sysmaps_elements ADD CONSTRAINT c_sysmaps_elements_5 FOREIGN KEY (iconid_disabled) REFERENCES images (imageid);
 ALTER TABLE sysmaps_elements ADD CONSTRAINT c_sysmaps_elements_6 FOREIGN KEY (iconid_maintenance) REFERENCES images (imageid);
+
