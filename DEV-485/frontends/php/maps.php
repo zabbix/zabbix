@@ -93,11 +93,11 @@ include_once('include/page_header.php');
 	$table = new CTable(S_NO_MAPS_DEFINED, 'map');
 
 	$options = array(
-		'extendoutput' => 1,
+		'output' => API_OUTPUT_EXTEND,
 		'nodeids' => get_current_nodeid(),
-		'select_selements' => 1
+		'expand_urls' => true,
+		'select_selements' => API_OUTPUT_EXTEND,
 	);
-
 	$maps = CMap::get($options);
 	$maps = zbx_toHash($maps, 'sysmapid');
 	if(!empty($maps)){
