@@ -372,8 +372,8 @@ COpt::memoryPick();
 
 // Adding Elements
 		if(!is_null($options['select_selements']) && str_in_array($options['select_selements'], $subselects_allowed_outputs)){
-			if(!isset($map_selements)){
-				$map_selements = array();
+			if(!isset($selements)){
+				$selements = array();
 
 				$sql = 'SELECT se.* '.
 						' FROM sysmaps_elements se '.
@@ -381,39 +381,44 @@ COpt::memoryPick();
 				$db_selements = DBselect($sql);
 				while($selement = DBfetch($db_selements)){
 					$selement['urls'] = array();
-					$selement['urls'] = array(array('sysmapelementurlid' => '1212', 'name' => 'URLName', 'url'=> 'http://one.lv'));
-					$map_selements[$selement['selementid']] = $selement;
+					$selements[$selement['selementid']] = $selement;
 				}
 			}
 
-			foreach($map_selements as $num => $selement){
+			$sql = 'SELECT sysmapelementurlid, selementid, name, url  '.
+					' FROM sysmap_element_url '.
+					' WHERE '.DBcondition('selementid', array_keys($selements));
+			$db_selement_urls = DBselect($sql);
+			while($selement_url = DBfetch($db_selement_urls)){
+				$selements[$selement_url['selementid']]['urls'][] = $selement_url;
+			}
+
+			foreach($selements as $num => $selement){
 				if(!isset($result[$selement['sysmapid']]['selements'])){
 					$result[$selement['sysmapid']]['selements'] = array();
 				}
-				$result[$selement['sysmapid']]['selements'][] = $selement;
+				$result[$selement['sysmapid']]['selements'][$selement['selementid']] = $selement;
 			}
 		}
 
 // Adding Links
 		if(!is_null($options['select_links']) && str_in_array($options['select_links'], $subselects_allowed_outputs)){
-			if(!isset($map_links)){
-				$linkids = array();
-				$map_links = array();
+			$linkids = array();
+			$map_links = array();
 
-				$sql = 'SELECT sl.* FROM sysmaps_links sl WHERE '.DBcondition('sl.sysmapid', $sysmapids);
-				$db_links = DBselect($sql);
-				while($link = DBfetch($db_links)){
-					$link['linktriggers'] = array();
+			$sql = 'SELECT sl.* FROM sysmaps_links sl WHERE '.DBcondition('sl.sysmapid', $sysmapids);
+			$db_links = DBselect($sql);
+			while($link = DBfetch($db_links)){
+				$link['linktriggers'] = array();
 
-					$map_links[$link['linkid']] = $link;
-					$linkids[$link['linkid']] = $link['linkid'];
-				}
+				$map_links[$link['linkid']] = $link;
+				$linkids[$link['linkid']] = $link['linkid'];
+			}
 
-				$sql = 'SELECT DISTINCT slt.* FROM sysmaps_link_triggers slt WHERE '.DBcondition('slt.linkid', $linkids);
-				$db_link_triggers = DBselect($sql);
-				while($link_trigger = DBfetch($db_link_triggers)){
-					$map_links[$link_trigger['linkid']]['linktriggers'][] = $link_trigger;
-				}
+			$sql = 'SELECT DISTINCT slt.* FROM sysmaps_link_triggers slt WHERE '.DBcondition('slt.linkid', $linkids);
+			$db_link_triggers = DBselect($sql);
+			while($link_trigger = DBfetch($db_link_triggers)){
+				$map_links[$link_trigger['linkid']]['linktriggers'][] = $link_trigger;
 			}
 
 			foreach($map_links as $num => $link){
@@ -825,6 +830,18 @@ COpt::memoryPick();
 			}
 			$selementids = DB::insert('sysmaps_elements', $selements);
 
+			$insert_urls = array();
+			foreach($selementids as $snum => $selementid){
+				if(isset($selements[$snum]['urls'])){
+					foreach($selements[$snum]['urls'] as $url){
+						$url['selementid'] = $selementid;
+						$insert_urls[] = $url;
+					}
+				}
+
+			}
+			DB::insert('sysmap_element_url', $insert_urls);
+
 			self::EndTransaction(true, __METHOD__);
 
 			return $selementids;
@@ -871,6 +888,7 @@ COpt::memoryPick();
 				'sysmapids' => $sysmapids,
 				'editable' => 1,
 				'preservekeys' => 1,
+				'select_selements' => API_OUTPUT_EXTEND,
 				'output' => API_OUTPUT_SHORTEN,
 			);
 			$upd_maps = self::get($options);
@@ -882,6 +900,7 @@ COpt::memoryPick();
 			}
 
 			$update = array();
+			$urlidsToDelete = $urlsToUpdate = $urlsToAdd = array();
 			foreach($selements as $snumm => $selement){
 				$selement_db_fields = array(
 					'sysmapid' => null,
@@ -901,8 +920,43 @@ COpt::memoryPick();
 					'where' => array('selementid='.$selement['selementid']),
 				);
 				$selementids[] = $selement['selementid'];
+
+				if(isset($selement['urls'])){
+					foreach($upd_maps[$selement['sysmapid']]['selements'][$selement['selementid']]['urls'] as $existing_url){
+						$toUpdate = false;
+						foreach($selement['urls'] as $unum => $new_url){
+							if($existing_url['name'] == $new_url['name']){
+								$toUpdate = array(
+									'values' => $new_url,
+									'where' => array('sysmapelementurlid ='.$existing_url['sysmapelementurlid'])
+								);
+								unset($selement['urls'][$unum]);
+
+								break;
+							}
+						}
+
+						if($toUpdate){
+							$urlsToUpdate[] = $toUpdate;
+						}
+						else{
+							$urlidsToDelete[] = $existing_url['sysmapelementurlid'];
+						}
+					}
+
+					foreach($selement['urls'] as $newUrl){
+						$newUrl['selementid'] = $selement['selementid'];
+						$urlsToAdd[] = $newUrl;
+					}
+
+				}
 			}
 			DB::update('sysmaps_elements', $update);
+
+			if(!empty($urlidsToDelete))
+				DB::delete('sysmap_element_url', DBcondition('sysmapelementurlid', $urlidsToDelete));
+			DB::update('sysmap_element_url', $urlsToUpdate);
+			DB::insert('sysmap_element_url', $urlsToAdd);
 
 			self::EndTransaction(true, __METHOD__);
 			return $selementids;
