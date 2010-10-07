@@ -359,9 +359,11 @@
 				$links_menus.= "['".S_STATUS_OF_TRIGGERS."',\"javascript: redirect('events.php?source=0&groupid=".$db_element['elementid']."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 			}
 
-// Adding user defined links to popup menu
+			/*
+			 * Adding user defined links to popup menu
+			 */
 			foreach($db_element['urls'] as $url){
-				$links_menus.= "['".$url['name']."','".$url['url']."', 'nosid'],";
+				$links_menus.= "['".$url['name']."','".$url['url']."', 'nosid']";
 			}
 
 			if(!empty($links_menus)){
@@ -1591,10 +1593,19 @@
 		try{
 			foreach($exportMaps as $mnum => &$sysmap){
 				unset($sysmap['sysmapid']);
+				foreach($sysmap['urls'] as $unum => $url){
+					unset($sysmap['urls'][$unum]['sysmapurlid']);
+				}
+
 				$sysmap['backgroundid'] = ($sysmap['backgroundid'] > 0)?$images[$sysmap['backgroundid']]:'';
 
 				foreach($sysmap['selements'] as $snum => &$selement){
 					unset($selement['sysmapid']);
+					unset($selement['selementid']);
+
+					foreach($selement['urls'] as $unum => $url){
+						unset($selement['urls'][$unum]['sysmapelementurlid']);
+					}
 					switch($selement['elementtype']){
 						case SYSMAP_ELEMENT_TYPE_MAP:
 							$selement['elementid'] = $sysmaps[$selement['elementid']];
