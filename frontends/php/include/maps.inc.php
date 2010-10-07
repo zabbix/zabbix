@@ -367,14 +367,6 @@
 				$links_menus.= "['".$url['name']."',\"javascript: redirect('".$url['url']."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 			}
 
-
-			if(!empty($db_element['url']) || !empty($links_menus)){
-				$menus .= "['".S_LINKS."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
-				$menus .= $links_menus;
-				if(!empty($db_element['url']))
-					$menus .= "['".S_URL."',\"javascript: location.replace('".$db_element['url']."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
-			}
-
 			$menus = trim($menus,',');
 			$menus = 'show_popup_menu(event,['.$menus.'],180); cancelEvent(event);';
 

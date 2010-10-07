@@ -648,6 +648,8 @@ upgrades/dbpatches/1.8/mysql/patch/regexps.sql -text
 upgrades/dbpatches/1.8/mysql/patch/rights.sql -text
 upgrades/dbpatches/1.8/mysql/patch/services.sql -text
 upgrades/dbpatches/1.8/mysql/patch/sessions.sql -text
+upgrades/dbpatches/1.8/mysql/patch/sysmap_element_url.sql -text
+upgrades/dbpatches/1.8/mysql/patch/sysmap_url.sql -text
 upgrades/dbpatches/1.8/mysql/patch/sysmaps.sql -text
 upgrades/dbpatches/1.8/mysql/patch/sysmaps_elements.sql -text
 upgrades/dbpatches/1.8/mysql/patch/sysmaps_links.sql -text
