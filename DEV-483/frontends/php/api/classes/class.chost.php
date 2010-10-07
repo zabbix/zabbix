@@ -1021,7 +1021,7 @@ Copt::memoryPick();
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
-				$screens = CScreen::get($obj_params);
+				$screens = CTemplateScreen::get($obj_params);
 				$screens = zbx_toHash($screens, 'hostid');
 				foreach($result as $hostid => $host){
 					if(isset($screens[$hostid]))
