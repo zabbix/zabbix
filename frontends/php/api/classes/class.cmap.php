@@ -385,6 +385,23 @@ COpt::memoryPick();
 				}
 			}
 
+			if(!is_null($options['expand_urls'])){
+				$sql = 'SELECT sysmapid, name, url, elementtype'.
+						' FROM sysmap_url'.
+						' WHERE '.DBcondition('sysmapid', $sysmapids);
+				$db_map_urls = DBselect($sql);
+				while($map_url = DBfetch($db_map_urls)){
+
+					foreach($selements as $snum => $selement){
+						if(($selement['sysmapid'] == $map_url['sysmapid'])
+								&& ($selement['elementtype'] == $map_url['elementtype']))
+						{
+							$selements[$snum]['urls'][] = $map_url;
+						}
+					}
+				}
+			}
+
 			$sql = 'SELECT sysmapelementurlid, selementid, name, url  '.
 					' FROM sysmap_element_url '.
 					' WHERE '.DBcondition('selementid', array_keys($selements));
