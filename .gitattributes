@@ -648,8 +648,6 @@ upgrades/dbpatches/1.8/mysql/patch/regexps.sql -text
 upgrades/dbpatches/1.8/mysql/patch/rights.sql -text
 upgrades/dbpatches/1.8/mysql/patch/services.sql -text
 upgrades/dbpatches/1.8/mysql/patch/sessions.sql -text
-upgrades/dbpatches/1.8/mysql/patch/sysmap_element_url.sql -text
-upgrades/dbpatches/1.8/mysql/patch/sysmap_url.sql -text
 upgrades/dbpatches/1.8/mysql/patch/sysmaps.sql -text
 upgrades/dbpatches/1.8/mysql/patch/sysmaps_elements.sql -text
 upgrades/dbpatches/1.8/mysql/patch/sysmaps_links.sql -text
@@ -857,6 +855,8 @@ upgrades/dbpatches/2.0/mysql/patch/services_times.sql -text
 upgrades/dbpatches/2.0/mysql/patch/sessions.sql -text
 upgrades/dbpatches/2.0/mysql/patch/slides.sql -text
 upgrades/dbpatches/2.0/mysql/patch/slideshows.sql -text
+upgrades/dbpatches/2.0/mysql/patch/sysmap_element_url.sql -text
+upgrades/dbpatches/2.0/mysql/patch/sysmap_url.sql -text
 upgrades/dbpatches/2.0/mysql/patch/sysmaps.sql -text
 upgrades/dbpatches/2.0/mysql/patch/sysmaps_elements.sql -text
 upgrades/dbpatches/2.0/mysql/patch/sysmaps_link_triggers.sql -text
