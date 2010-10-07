@@ -364,7 +364,12 @@
 			 * @see DEV-485
 			 */
 			foreach($db_element['urls'] as $url){
-				$links_menus.= "['".$url['name']."',\"javascript: redirect('".$url['url']."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+				$links_menus.= "['".$url['name']."','".$url['url']."', 'nosid']";
+			}
+
+			if(!empty($links_menus)){
+				$menus .= "['".S_LINKS."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
+				$menus .= $links_menus;
 			}
 
 			$menus = trim($menus,',');

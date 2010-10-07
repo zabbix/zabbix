@@ -385,7 +385,10 @@ function menu_item (o_parent, n_order) {
 		this.n_y -= this.getprop('height') * (o_parent.a_config.length - item_offset);
 	}
 
-	if(!is_null(this.a_config[1]) && (this.a_config[1].indexOf('javascript') == -1)){
+	if(!is_null(this.a_config[1])
+		&& (this.a_config[1].indexOf('javascript') == -1)
+		&& !(!is_null(this.a_config[2]) || this.a_config[2] == 'nosid')){
+		console.log(this.a_config);
 		var url = new Curl(this.a_config[1]);
 		this.a_config[1] = url.getUrl();
 	}
