@@ -106,23 +106,26 @@ class CTemplateScreen extends CScreen{
 // editable + PERMISSION CHECK
 
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){}
-		else if(!empty($result)){
-			if(!is_null($options['templateids'])){
+		else{
 // TODO: think how we could combine templateids && hostids options
+			if(!is_null($options['templateids'])){
 				unset($options['hostids']);
 
 				$options['templateids'] = CTemplate::get(array(
 					'templateids' => $options['templateids'],
+					'editable' => $options['editable'],
 					'preservekeys' => 1
 				));
 			}
 			else if(!is_null($options['hostids'])){
 				$options['templateids'] = CHost::get(array(
 					'hostids' => $options['hostids'],
+					'editable' => $options['editable'],
 					'preservekeys' => 1
 				));
 			}
 			else{
+// TODO: get screen
 				$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
 
 				$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
@@ -185,7 +188,7 @@ class CTemplateScreen extends CScreen{
 // collecting template chain
 			$linkedTemplateIds = $options['hostids'];
 			$childTemplateIds = $options['hostids'];
-			while(!empty($childTemplateIds)){
+			while(is_null($options['editable']) && !empty($childTemplateIds)){
 				$sql = 'SELECT ht.* '.
 					' FROM hosts_templates ht '.
 					' WHERE '.DBcondition('hostid', $childTemplateIds);
@@ -286,6 +289,7 @@ class CTemplateScreen extends CScreen{
 					$sql_where.
 				$sql_group.
 				$sql_order;
+//SDI($sql);
 		$res = DBselect($sql, $sql_limit);
 		while($screen = DBfetch($res)){
 			if(!is_null($options['countOutput'])){
@@ -319,6 +323,9 @@ class CTemplateScreen extends CScreen{
 				}
 			}
 		}
+
+// hashing
+		$options['hostids'] = zbx_toHash($options['hostids']);
 
 // Adding ScreenItems
 		if(!is_null($options['select_screenitems']) && str_in_array($options['select_screenitems'], $subselects_allowed_outputs)){
@@ -404,19 +411,29 @@ class CTemplateScreen extends CScreen{
 			}
 		}
 
+
 // creating copies of templated screens (inheritance)
+
+// screenNum is needed due to we can't refer to screenid/hostid/templateid as they will repeat
+		$screenNum = 0;
+
 		$vrtResult = array();
 		foreach($result as $screenid => $screen){
-			$vrtResult[$screen['templateid']] = $screen;
-			$vrtResult[$screen['templateid']]['hostid'] = $screen['templateid'];
+			if(is_null($options['hostids']) || isset($options['hostids'][$screen['templateid']])){
+				$vrtResult[$screenNum] = $screen;
+				$vrtResult[$screenNum]['hostid'] = $screen['templateid'];
+				$screenNum++;
+			}
+
+			if(!isset($templatesChain[$screen['templateid']])) continue;
 
 			foreach($templatesChain[$screen['templateid']] as $hnum => $hostid){
-				$vrtResult[$hostid] = $screen;
-				$vrtResult[$hostid]['hostid'] = $hostid;
+				$vrtResult[$screenNum] = $screen;
+				$vrtResult[$screenNum]['hostid'] = $hostid;
 
-				if(!isset($vrtResult[$hostid]['screenitems'])) continue;
+				if(!isset($vrtResult[$screenNum]['screenitems'])) continue;
 				
-				foreach($vrtResult[$hostid]['screenitems'] as $snum => &$screenitem){
+				foreach($vrtResult[$screenNum]['screenitems'] as $snum => &$screenitem){
 					switch($screenitem['resourcetype']){
 						case SCREEN_RESOURCE_GRAPH:
 							$graphName = $tplGraphs[$screenitem['resourceid']]['name'];
@@ -430,7 +447,7 @@ class CTemplateScreen extends CScreen{
 					}
 				}
 				unset($screenitem);
-				
+				$screenNum++;
 			}
 		}
 

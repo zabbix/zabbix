@@ -999,6 +999,7 @@ Copt::memoryPick();
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'hostids' => $hostids,
+				'editable' => $options['editable'],
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);

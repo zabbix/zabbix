@@ -163,6 +163,7 @@ include_once('include/page_header.php');
 		S_ITEMS,
 		S_TRIGGERS,
 		S_GRAPHS,
+		S_SCREENS,
 		S_IP,
 		S_AVAILABILITY
 	));
@@ -212,13 +213,13 @@ include_once('include/page_header.php');
 	foreach($hosts as $num => $host){
 		$applications = array(new CLink(S_APPLICATIONS, 'applications.php?groupid='.$_REQUEST['groupid'].'&hostid='.$host['hostid']),
 			' ('.$host['applications'].')');
-		$items = array(new CLink(S_ITEMS, 'items.php?filter_set=1&hostid='.$host['hostid']),
+		$items = array(new CLink(S_ITEMS, 'latest.php?filter_set=1&hostid='.$host['hostid']),
 			' ('.$host['items'].')');
-		$triggers = array(new CLink(S_TRIGGERS, 'triggers.php?groupid='.$_REQUEST['groupid'].'&hostid='.$host['hostid']),
+		$triggers = array(new CLink(S_TRIGGERS, 'tr_status.php?groupid='.$_REQUEST['groupid'].'&hostid='.$host['hostid']),
 			' ('.$host['triggers'].')');
-		$graphs = array(new CLink(S_GRAPHS, 'graphs.php?groupid='.$_REQUEST['groupid'].'&hostid='.$host['hostid']),
+		$graphs = array(new CLink(S_GRAPHS, 'charts.php?groupid='.$_REQUEST['groupid'].'&hostid='.$host['hostid']),
 			' ('.$host['graphs'].')');
-		$screens = array(new CLink(S_SCREENS, 'screens.php?groupid='.$_REQUEST['groupid'].'&hostid='.$host['hostid']),
+		$screens = array(new CLink(S_SCREENS, 'host_screen.php?groupid='.$_REQUEST['groupid'].'&hostid='.$host['hostid']),
 			' ('.$host['screens'].')');
 
 		$description = array();
@@ -298,7 +299,8 @@ include_once('include/page_header.php');
 
 	$hosts_wdgt->addItem(array($paging, $table, $paging));
 	$hosts_wdgt->show();
-
+?>
+<?php
 
 include_once('include/page_footer.php');
 
