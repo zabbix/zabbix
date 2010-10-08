@@ -1803,7 +1803,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max
 	 			old_nextcheck = dc_item->nextcheck;
 				dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, now);
 
-				DCupdate_item_queue(dc_item, old_poller_type, dc_item->nextcheck);
+				DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
 				continue;
 			}
 		}
