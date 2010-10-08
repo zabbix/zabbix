@@ -42,8 +42,7 @@ switch($itemType) {
 }
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'hostid'=>			array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,			'(!isset({form}) || (isset({form})&&!isset({itemid})))'),
-		'itemid'=>			array(T_ZBX_INT, O_NO,	 P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))'),
+		'parent_itemid'=>			array(T_ZBX_INT, O_MAND,	 P_SYS,	DB_ID,			null),
 
 		'description'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),
 		'key'=>				array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,		'isset({save})'),
@@ -130,7 +129,7 @@ switch($itemType) {
 	$_REQUEST['go'] = get_request('go', 'none');
 
 // PERMISSIONS
-	if(get_request('itemid', false)){
+	if(get_request('parent_itemid', false)){
 		$options = array(
 			'itemids' => $_REQUEST['itemid'],
 			'output' => API_OUTPUT_EXTEND,
@@ -719,11 +718,10 @@ switch($itemType) {
 		$form = new CForm();
 		$form->setName('items');
 
-		$table  = new CTableInfo();
+		$table = new CTableInfo();
 		$table->setHeader(array(
 			new CCheckBox('all_items',null,"checkAll('".$form->GetName()."','all_items','group_itemid');"),
 			make_sorting_header(S_DESCRIPTION,'description'),
-			'Subrules',
 			make_sorting_header(S_KEY,'key_'),
 			make_sorting_header(S_INTERVAL,'delay'),
 			make_sorting_header(S_TYPE,'type'),
@@ -783,13 +781,12 @@ switch($itemType) {
 				$applications = implode(', ', $applications);
 			}
 
-			$subrules = array(new CLink('subrule', 'host_subrule.php?&parent_itemid='.$item['itemid']),
+			$subrules = array(new CLink('subrule', 'host_discovery.php?&itemid='.$item['itemid']),
 				' ('.'1'.')');
 
 			$table->addRow(array(
 				new CCheckBox('group_itemid['.$item['itemid'].']',null,null,$item['itemid']),
 				$description,
-				$subrules,
 				$item['key_'],
 				$item['delay'],
 				item_type2str($item['type']),
