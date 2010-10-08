@@ -792,7 +792,7 @@ FIELD		|screenid	|t_id		|	|NOT NULL	|0
 FIELD		|name		|t_varchar(255)	|	|NOT NULL	|ZBX_SYNC
 FIELD		|hsize		|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|vsize		|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
-FIELD		|templateid	|t_id		|NULL	|NULL		|ZBX_SYNC		|1|hosts	|hostid		|RESTRICT
+FIELD		|templateid	|t_id		|	|NULL		|ZBX_SYNC		|1|hosts	|hostid
 
 TABLE|screens_items|screenitemid|ZBX_SYNC
 FIELD		|screenitemid	|t_id		|	|NOT NULL	|0
