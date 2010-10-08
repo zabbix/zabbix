@@ -648,6 +648,8 @@ COpt::memoryPick();
 
 
 				if(isset($map['urls'])){
+					$map['urls'] = zbx_toHash($map['urls'], 'name');
+					
 					foreach($db_sysmaps[$map['sysmapid']]['urls'] as $existing_url){
 						$toUpdate = false;
 						foreach($map['urls'] as $unum => $new_url){
@@ -669,7 +671,7 @@ COpt::memoryPick();
 							$urlidsToDelete[] = $existing_url['sysmapurlid'];
 						}
 					}
-
+					
 					foreach($map['urls'] as $newUrl){
 						$newUrl['sysmapid'] = $map['sysmapid'];
 						$urlsToAdd[] = $newUrl;
