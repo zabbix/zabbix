@@ -189,7 +189,7 @@
 // HEADER {{{
 		$form = new CForm(null, 'get');
 		$form->addVar('fullscreen', $_REQUEST['fullscreen']);
-		$form->addItem(array(S_GROUP.SPACE, $pageFilter->getGroupsCB(true)));
+		//$form->addItem(array(S_GROUP.SPACE, $pageFilter->getGroupsCB(true)));
 
 		$screens_wdgt->addHeader($screen['name'], $form);
 // }}} HEADER
@@ -213,7 +213,7 @@
 				$screenLink = new CLink($displayed_screen_name, 'host_screen.php?screenid='.$cbScreen['screenid'].'&hostid='.$_REQUEST['hostid']);
 			}
 			$screenList[] = $screenLink;
-			$screenList[] = ', ';
+			$screenList[] = ' ';
 		}
 		array_pop($screenList);
 		$screens_wdgt->addItem(new CDiv($screenList, 'objectlist'));
