@@ -318,7 +318,8 @@ clean:
 
 static char	*get_if_type_string(DWORD type)
 {
-	switch (type) {
+	switch (type)
+	{
 		case IF_TYPE_OTHER:			return "Other";
 		case IF_TYPE_ETHERNET_CSMACD:		return "Ethernet";
 		case IF_TYPE_ISO88025_TOKENRING:	return "Token Ring";
@@ -334,7 +335,8 @@ static char	*get_if_type_string(DWORD type)
 
 static char	*get_if_adminstatus_string(DWORD status)
 {
-	switch (status) {
+	switch (status)
+	{
 		case 0:		return "disabled";
 		case 1:		return "enabled";
 		default:	return "unknown";
@@ -445,7 +447,6 @@ clean:
 
 int	NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	/* Declare and initialize variables */
 	MIB_TCPTABLE	*pTcpTable = NULL;
 	DWORD		dwSize, dwRetVal;
 	int		i, ret = SYSINFO_RET_FAIL;
@@ -477,7 +478,7 @@ int	NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	   the actual data we require */
 	if (NO_ERROR == (dwRetVal = GetTcpTable(pTcpTable, &dwSize, TRUE)))
 	{
-		for (i = 0; i < (int) pTcpTable->dwNumEntries; i++)
+		for (i = 0; i < (int)pTcpTable->dwNumEntries; i++)
 		{
 			if (MIB_TCP_STATE_LISTEN == pTcpTable->table[i].dwState &&
 					port == ntohs((u_short)pTcpTable->table[i].dwLocalPort))

@@ -33,7 +33,7 @@ static int	get_kstat_named_field(const char *name, const char *field, kstat_name
 		if (NULL != (kp = kstat_lookup(kc, NULL, -1, (char *)name)) &&
 				-1 != kstat_read(kc, kp, 0))
 		{
-			if (NULL != (kn = (kstat_named_t *)kstat_data_lookup(kp, (char*)field)))
+			if (NULL != (kn = (kstat_named_t *)kstat_data_lookup(kp, (char *)field)))
 			{
 				*returned_data = *kn;
 				ret = SUCCEED;
@@ -154,7 +154,7 @@ static int	NET_IF_TOTAL_BYTES(const char *if_name, AGENT_RESULT *result)
 	{
 		SET_UI64_RESULT(result, ikn.value.ui64 + okn.value.ui64);
 	}
-	else if ( SUCCEED == get_kstat_named_field(if_name, "rbytes", &ikn) &&
+	else if (SUCCEED == get_kstat_named_field(if_name, "rbytes", &ikn) &&
 			SUCCEED == get_kstat_named_field(if_name, "obytes", &okn))
 	{
 		SET_UI64_RESULT(result, ikn.value.ui32 + okn.value.ui32);
@@ -204,6 +204,10 @@ int	NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_
 {
 	kstat_named_t	kn;
 	char		if_name[MAX_STRING_LEN];
+
+	assert(result);
+
+	init_result(result);
 
 	if (num_param(param) > 1)
 		return SYSINFO_RET_FAIL;
