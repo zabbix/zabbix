@@ -71,10 +71,6 @@ int	VFS_FS_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	assert(result);
 
-	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
-
-	zbx_json_addarray(&j, cmd);
-
 	/* Make an initial call to GetLogicalDriveStrings to
 	   get the necessary size into the dwSize variable */
 	if (0 == (dwSize = GetLogicalDriveStrings(0, buffer)))
@@ -85,7 +81,14 @@ int	VFS_FS_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 	/* Make a second call to GetLogicalDriveStrings to get
 	   the actual data we require */
 	if (0 == (dwSize = GetLogicalDriveStrings(dwSize, buffer)))
+	{
+		zbx_free(buffer);
 		return SYSINFO_RET_FAIL;
+	}
+
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+
+	zbx_json_addarray(&j, cmd);
 
 	for (p = buffer, sz = wcslen(p); sz > 0; p += sz + 1, sz = wcslen(p))
 	{
