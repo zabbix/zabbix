@@ -184,6 +184,7 @@ include_once('include/page_header.php');
 				'dns' => (empty($_REQUEST['filter_dns']) ? null : $_REQUEST['filter_dns']),
 			),
 			'filter' => array(
+				'status' => HOST_STATUS_MONITORED,
 				'port' => (empty($_REQUEST['filter_port']) ? null : $_REQUEST['filter_port']),
 			)
 		);
@@ -205,7 +206,7 @@ include_once('include/page_header.php');
 		'select_graphs' => API_OUTPUT_COUNT,
 		'select_applications' => API_OUTPUT_COUNT,
 		'selectScreens' => API_OUTPUT_COUNT,
-		'nopermissions' => 1,
+		'nopermissions' => 1
 	);
 	$hosts = CHost::get($options);
 	order_result($hosts, $sortfield, $sortorder);

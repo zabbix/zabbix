@@ -416,7 +416,6 @@ class CTemplateScreen extends CScreen{
 
 // screenNum is needed due to we can't refer to screenid/hostid/templateid as they will repeat
 		$screenNum = 0;
-
 		$vrtResult = array();
 		foreach($result as $screenid => $screen){
 			if(is_null($options['hostids']) || isset($options['hostids'][$screen['templateid']])){
@@ -428,6 +427,8 @@ class CTemplateScreen extends CScreen{
 			if(!isset($templatesChain[$screen['templateid']])) continue;
 
 			foreach($templatesChain[$screen['templateid']] as $hnum => $hostid){
+				$screenNum++;
+
 				$vrtResult[$screenNum] = $screen;
 				$vrtResult[$screenNum]['hostid'] = $hostid;
 
@@ -447,11 +448,9 @@ class CTemplateScreen extends CScreen{
 					}
 				}
 				unset($screenitem);
-				$screenNum++;
 			}
 		}
-
-		$result = $vrtResult;
+		$result = array_values($vrtResult);
 //-----
 
 		if(!is_null($options['countOutput'])){

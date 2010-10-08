@@ -279,4 +279,133 @@
 
 		return $icon;
 	}
+
+/**
+* returns Ctable object with host header
+*
+* {@source}
+* @access public
+* @static
+* @version 1
+*
+* @param string $hostid
+* @param array $elemnts [items, triggers, graphs, applications]
+* @return object
+*/
+	function get_header_host_table($hostid, $current){
+		$elements = array(
+			'items' => 'items',
+			'triggers' => 'triggers',
+			'graphs' => 'graphs',
+			'applications' => 'applications',
+			'screens' => 'screens',
+		);
+		unset($elements[$current]);
+
+		$header_host_opt = array(
+			'hostids' => $hostid,
+			'output' => API_OUTPUT_EXTEND,
+			'templated_hosts' => 1,
+		);
+		if(isset($elements['items']))
+			$header_host_opt['select_items'] = API_OUTPUT_COUNT;
+		if(isset($elements['triggers']))
+			$header_host_opt['select_triggers'] = API_OUTPUT_COUNT;
+		if(isset($elements['graphs']))
+			$header_host_opt['select_graphs'] = API_OUTPUT_COUNT;
+		if(isset($elements['applications']))
+			$header_host_opt['select_applications'] = API_OUTPUT_COUNT;
+		if(isset($elements['screens']))
+			$header_host_opt['selectScreens'] = API_OUTPUT_COUNT;
+
+		$header_host = CHost::get($header_host_opt);
+		$header_host = array_pop($header_host);
+
+		$description = array();
+		if($header_host['proxy_hostid']){
+			$proxy = get_host_by_hostid($header_host['proxy_hostid']);
+			$description[] = $proxy['host'].':';
+		}
+		$description[] = $header_host['host'];
+
+		if(isset($elements['items'])){
+			$items = array(new CLink(S_ITEMS, 'items.php?hostid='.$header_host['hostid']),
+				' ('.$header_host['items'].') ');
+		}
+		if(isset($elements['triggers'])){
+			$triggers = array(new CLink(S_TRIGGERS, 'triggers.php?hostid='.$header_host['hostid']),
+				' ('.$header_host['triggers'].') ');
+		}
+		if(isset($elements['graphs'])){
+			$graphs = array(new CLink(S_GRAPHS, 'graphs.php?hostid='.$header_host['hostid']),
+				' ('.$header_host['graphs'].') ');
+		}
+		if(isset($elements['applications'])){
+			$applications = array(new CLink(S_APPLICATIONS, 'applications.php?hostid='.$header_host['hostid']),
+				' ('.$header_host['applications'].') ');
+		}
+
+
+		$tbl_header_host = new CDiv();
+		if($header_host['status'] == HOST_STATUS_TEMPLATE){
+			if(isset($elements['screens'])){
+				$screens = array(new CLink(S_SCREENS, 'screenconf.php?templateid='.$header_host['hostid']),
+					' ('.$header_host['screens'].') ');
+			}
+
+			$tbl_header_host->addItem(array(
+				new CLink(bold(S_TEMPLATE_LIST), 'templates.php?templateid='.$header_host['hostid'].url_param('groupid')),
+				(isset($elements['applications']) ? $applications : null),
+				(isset($elements['items']) ? $items : null),
+				(isset($elements['triggers']) ? $triggers : null),
+				(isset($elements['graphs']) ? $graphs : null),
+				(isset($elements['screens']) ? $screens : null),
+				new CSpan(array(bold(S_TEMPLATE.': '), $description))
+			));
+		}
+		else{
+			$dns = empty($header_host['dns']) ? '-' : $header_host['dns'];
+			$ip = empty($header_host['ip']) ? '-' : $header_host['ip'];
+			$port = empty($header_host['port']) ? '-' : $header_host['port'];
+			if(1 == $header_host['useip'])
+				$ip = bold($ip);
+			else
+				$dns = bold($dns);
+
+			switch($header_host['status']){
+				case HOST_STATUS_MONITORED:
+					$status = new CSpan(S_MONITORED, 'off');
+					break;
+				case HOST_STATUS_NOT_MONITORED:
+					$status = new CSpan(S_NOT_MONITORED, 'off');
+					break;
+				default:
+					$status = S_UNKNOWN;
+			}
+
+			if($header_host['available'] == HOST_AVAILABLE_TRUE)
+				$available = new CSpan(S_AVAILABLE, 'off');
+			else if($header_host['available'] == HOST_AVAILABLE_FALSE)
+				$available = new CSpan(S_NOT_AVAILABLE, 'on');
+			else if($header_host['available'] == HOST_AVAILABLE_UNKNOWN)
+				$available = new CSpan(S_UNKNOWN, 'unknown');
+
+			$tbl_header_host->addItem(array(
+				new CSpan(new CLink(bold(S_HOST_LIST), 'hosts.php?hostid='.$header_host['hostid'].url_param('groupid'))),
+				new CSpan((isset($elements['applications']) ? $applications : null)),
+				new CSpan((isset($elements['items']) ? $items : null)),
+				new CSpan((isset($elements['triggers']) ? $triggers : null)),
+				new CSpan((isset($elements['graphs']) ? $graphs : null)),
+				new CSpan(array(bold(S_HOST.': '), $description)), SPACE,
+				new CSpan(array(bold(S_DNS.': '), $dns)), SPACE,
+				new CSpan(array(bold(S_IP.': '), $ip)), SPACE,
+				new CSpan(array(bold(S_PORT.': '), $port)), SPACE,
+				new CSpan(array(bold(S_STATUS.': '), $status)), SPACE,
+				new CSpan(array(bold(S_AVAILABILITY.': '), $available))
+			));
+		}
+		$tbl_header_host->setClass('infobox');
+
+		return $tbl_header_host;
+	}
 ?>

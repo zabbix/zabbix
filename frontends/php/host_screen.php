@@ -48,7 +48,7 @@
 		'tr_groupid'=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 		'tr_hostid'=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 
-		'elementid'=>	array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,NULL),
+		'screenid'=>	array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,NULL),
 		'step'=>		array(T_ZBX_INT, O_OPT,  P_SYS,		BETWEEN(0,65535),NULL),
 
 		'period'=>		array(T_ZBX_INT, O_OPT,  P_SYS, 	null,NULL),
@@ -130,10 +130,10 @@
 	$_REQUEST['groupid'] = $pageFilter->groupid;
 	$_REQUEST['hostid'] = $pageFilter->hostid;
 
-	$elementid = get_request('elementid', CProfile::get('web.hostscreen.screenid', null));
+	$screenid = get_request('screenid', CProfile::get('web.hostscreen.screenid', null));
 
 	if(2 != $_REQUEST['fullscreen'])
-		CProfile::update('web.hostscreen.screenid',$elementid, PROFILE_TYPE_ID);
+		CProfile::update('web.hostscreen.screenid',$screenid, PROFILE_TYPE_ID);
 
 
 	$screens_wdgt = new CWidget();
@@ -153,7 +153,6 @@
 		'hostids' => $_REQUEST['hostid'],
 		'output' => API_OUTPUT_EXTEND
 	));
-
 	$screens = zbx_toHash($screens, 'screenid');
 	order_result($screens, 'name');
 
@@ -164,7 +163,7 @@
 		$screens_wdgt->show();
 	}
 	else{
-		$screen = (!isset($screens[$elementid]))?reset($screens):$screens[$elementid];
+		$screen = (!isset($screens[$screenid]))?reset($screens):$screens[$screenid];
 		$tmpScreens = CTemplateScreen::get(array(
 			'screenids' => $screen['screenid'],
 			'hostids' => $_REQUEST['hostid'],
@@ -184,7 +183,6 @@
 		$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
 
 		$screens_wdgt->addPageHeader(S_SCREENS_BIG, array($formHeader, SPACE, $icon, $fs_icon));
-		$screens_wdgt->addItem(BR());
 // }}} PAGE HEADER
 
 
@@ -196,8 +194,15 @@
 		$screens_wdgt->addHeader($screen['name'], $form);
 // }}} HEADER
 
+// Header Host
+		if($_REQUEST['hostid'] > 0){
+			$tbl_header_host = get_header_host_table($_REQUEST['hostid'], 'screens');
+			$screens_wdgt->addItem($tbl_header_host);
+			$show_host = false;
+		}
+
 // Host Screen List
-		$screenList = new CDiv(null, 'objectlist');
+		$screenList = array();
 		foreach($screens as $snum => $cbScreen){
 			$displayed_screen_name = get_node_name_by_elid($cbScreen['screenid'], null, ': ').$cbScreen['name'];
 
@@ -205,12 +210,13 @@
 				$screenLink = new CSpan($displayed_screen_name);
 			}
 			else{
-				$screenLink = new CLink($displayed_screen_name, 'host_screen?screenid='.$cbScreen['screenid'].'&hostid='.$_REQUEST['hostid']);
+				$screenLink = new CLink($displayed_screen_name, 'host_screen.php?screenid='.$cbScreen['screenid'].'&hostid='.$_REQUEST['hostid']);
 			}
-			$screenList->addItem($screenLink);
+			$screenList[] = $screenLink;
+			$screenList[] = ', ';
 		}
-
-		$screens_wdgt->addItem($screenList);
+		array_pop($screenList);
+		$screens_wdgt->addItem(new CDiv($screenList, 'objectlist'));
 //-----
 		$element = get_screen($screen, 0, $effectiveperiod);
 

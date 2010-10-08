@@ -1010,13 +1010,13 @@ Copt::memoryPick();
 				$screens = CTemplateScreen::get($obj_params);
 				if(!is_null($options['limitSelects'])) order_result($screens, 'name');
 
-				foreach($screens as $screenid => $screen){
+				foreach($screens as $snum => $screen){
 					if(!is_null($options['limitSelects'])){
 						if(count($result[$screen['hostid']]['screens']) >= $options['limitSelects']) continue;
 					}
 
-					unset($screens[$screenid]['hosts']);
-					$result[$screen['hostid']]['screens'][] = &$screens[$screenid];
+					unset($screens[$snum]['hosts']);
+					$result[$screen['hostid']]['screens'][] = &$screens[$snum];
 				}
 			}
 			else if(API_OUTPUT_COUNT == $options['selectScreens']){
@@ -1025,6 +1025,7 @@ Copt::memoryPick();
 
 				$screens = CTemplateScreen::get($obj_params);
 				$screens = zbx_toHash($screens, 'hostid');
+
 				foreach($result as $hostid => $host){
 					if(isset($screens[$hostid]))
 						$result[$hostid]['screens'] = $screens[$hostid]['rowscount'];

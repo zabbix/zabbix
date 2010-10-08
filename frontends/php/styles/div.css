@@ -362,10 +362,42 @@ div.icon_sortdown{
 }
 
 div.objectlist{
-	margin: 5px;
-	padding: 4px;
+	margin: 0px 5px 5px 5px;
+	padding: 3px 5px 3px 0px;
 	border: 1px solid #6C80B9;
+	background-color: #FFFFFF;
+	text-align: justify;
 }
+
+div.objectlist span{
+	margin: 5px 0px 5px 5px;
+	white-space: nowrap;
+	font-weight: bold;
+	font-size: 1.3em;
+}
+
+div.objectlist a{
+	margin: 5px 0px 5px 5px;
+	white-space: nowrap;
+	font-size: 1.1em;
+}
+
+
+/********** <INFOBOX> ************/
+div.infobox{
+	border: 1px #3377AA solid;
+	background-color: #FFFFFF;
+	margin: 5px 5px 5px 5px;
+	padding: 3px 0px 3px 0px;
+}
+
+div.infobox > span{
+	margin: 2px 10px 2px 5px;
+	white-space: nowrap;
+}
+
+/********** </INFOBOX> ************/
+
 /********* DIV IMG END *********/
 
 .link{
