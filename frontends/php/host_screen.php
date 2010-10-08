@@ -24,7 +24,7 @@
 	require_once('include/screens.inc.php');
 	require_once('include/blocks.inc.php');
 
-	$page['title'] = 'S_CUSTOM_SCREENS';
+	$page['title'] = 'S_HOST_SCREENS';
 	$page['file'] = 'screens.php';
 	$page['hist_arg'] = array('elementid');
 	$page['scripts'] = array('effects.js','dragdrop.js','class.calendar.js','gtlc.js');
@@ -196,8 +196,7 @@
 
 // Header Host
 		if($_REQUEST['hostid'] > 0){
-			$tbl_header_host = get_header_host_table($_REQUEST['hostid'], 'screens');
-			$screens_wdgt->addItem($tbl_header_host);
+			$screens_wdgt->addItem(get_header_host_table($_REQUEST['hostid'], 'screens'));
 			$show_host = false;
 		}
 

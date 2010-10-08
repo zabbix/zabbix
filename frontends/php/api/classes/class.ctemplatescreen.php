@@ -134,7 +134,7 @@ class CTemplateScreen extends CScreen{
 				$sql_parts['where'][] = 'hg.hostid=s.templateid';
 				$sql_parts['where'][] = 'r.id=hg.groupid ';
 				$sql_parts['where'][] = 'r.groupid=ug.usrgrpid';
-				$sql_parts['where'][] = 'ug.userid='.$userid;
+				$sql_parts['where'][] = 'ug.userid='.$USER_DETAILS['userid'];
 				$sql_parts['where'][] = 'r.permission>='.$permission;
 				$sql_parts['where'][] = 'NOT EXISTS( '.
 									' SELECT hgg.groupid '.
@@ -142,7 +142,7 @@ class CTemplateScreen extends CScreen{
 									' WHERE hgg.hostid=hg.hostid '.
 										' AND rr.id=hgg.groupid '.
 										' AND rr.groupid=gg.usrgrpid '.
-										' AND gg.userid='.$userid.
+										' AND gg.userid='.$USER_DETAILS['userid'].
 										' AND rr.permission<'.$permission.')';
 			}
 		}
@@ -329,9 +329,6 @@ class CTemplateScreen extends CScreen{
 
 // Adding ScreenItems
 		if(!is_null($options['select_screenitems']) && str_in_array($options['select_screenitems'], $subselects_allowed_outputs)){
-			$graphItems = array();
-			$itemItems = array();
-
 			$screens_items = array();
 			$db_sitems = DBselect('SELECT * FROM screens_items WHERE '.DBcondition('screenid', $screenids));
 			while($sitem = DBfetch($db_sitems)){
@@ -433,7 +430,7 @@ class CTemplateScreen extends CScreen{
 				$vrtResult[$screenNum]['hostid'] = $hostid;
 
 				if(!isset($vrtResult[$screenNum]['screenitems'])) continue;
-				
+
 				foreach($vrtResult[$screenNum]['screenitems'] as $snum => &$screenitem){
 					switch($screenitem['resourcetype']){
 						case SCREEN_RESOURCE_GRAPH:
