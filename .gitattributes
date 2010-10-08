@@ -91,6 +91,7 @@ frontends/php/conf/zabbix.conf.php.example -text
 frontends/php/dashboard.php -text
 frontends/php/dashconf.php -text
 frontends/php/fonts/DejaVuSans.ttf -text
+frontends/php/host_discovery.php -text
 frontends/php/hostgroups.php -text
 frontends/php/images/flash/zbxclock.swf -text svneol=unset#unset
 frontends/php/images/general/arrowdown.gif -text

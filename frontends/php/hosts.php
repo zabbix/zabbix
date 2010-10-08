@@ -772,6 +772,7 @@ include_once('include/page_header.php');
 			S_ITEMS,
 			S_TRIGGERS,
 			S_GRAPHS,
+			S_DISCOVERY,
 			make_sorting_header(S_DNS, 'dns'),
 			make_sorting_header(S_IP, 'ip'),
 			S_PORT,
@@ -851,6 +852,8 @@ include_once('include/page_header.php');
 				' ('.$host['triggers'].')');
 			$graphs = array(new CLink(S_GRAPHS, 'graphs.php?groupid='.$_REQUEST['groupid'].'&hostid='.$host['hostid']),
 				' ('.$host['graphs'].')');
+			$discoveries = array(new CLink(S_DISCOVERY, 'host_discovery.php?&hostid='.$host['hostid']),
+				' ('.'1'.')');
 
 			$description = array();
 			if($host['proxy_hostid']){
@@ -975,6 +978,7 @@ include_once('include/page_header.php');
 				$items,
 				$triggers,
 				$graphs,
+				$discoveries,
 				$dns,
 				$ip,
 				empty($host['port']) ? '-' : $host['port'],
