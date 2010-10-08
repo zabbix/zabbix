@@ -172,8 +172,14 @@ include_once('include/page_header.php');
 						}
 
 						$transaction = DBstart();
-
+						
 						foreach($selements as $id => $selement){
+							if(isset($selement['urls'])){
+								foreach($selement['urls'] as $unum => $url){
+									if(empty($url['name'])) unset($selement['urls'][$unum]);
+								}
+							}
+							
 							if($selement['elementid'] == 0){
 								$selement['elementtype'] = SYSMAP_ELEMENT_TYPE_IMAGE;
 							}
