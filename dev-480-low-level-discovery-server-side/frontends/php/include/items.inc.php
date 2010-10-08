@@ -66,123 +66,90 @@
 		}
 	}
 
-/*
- * Function: item_type2str
- *
- * Description:
- *     Represent integer value of item type as string
- *
- * Author:
- *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
- *
- * Comments:
- *
- */
-	function item_type2str($type){
-		switch($type){
-			case ITEM_TYPE_ZABBIX:		$type = S_ZABBIX_AGENT;			break;
-			case ITEM_TYPE_SNMPV1:		$type = S_SNMPV1_AGENT;			break;
-			case ITEM_TYPE_TRAPPER:		$type = S_ZABBIX_TRAPPER;		break;
-			case ITEM_TYPE_SIMPLE:		$type = S_SIMPLE_CHECK;			break;
-			case ITEM_TYPE_SNMPV2C:		$type = S_SNMPV2_AGENT;			break;
-			case ITEM_TYPE_INTERNAL:	$type = S_ZABBIX_INTERNAL;		break;
-			case ITEM_TYPE_SNMPV3:		$type = S_SNMPV3_AGENT;			break;
-			case ITEM_TYPE_ZABBIX_ACTIVE:	$type = S_ZABBIX_AGENT_ACTIVE;		break;
-			case ITEM_TYPE_AGGREGATE:	$type = S_ZABBIX_AGGREGATE;		break;
-			case ITEM_TYPE_HTTPTEST:	$type = S_WEB_MONITORING;		break;
-			case ITEM_TYPE_EXTERNAL:	$type = S_EXTERNAL_CHECK;		break;
-			case ITEM_TYPE_DB_MONITOR:	$type = S_ZABBIX_DATABASE_MONITOR;	break;
-			case ITEM_TYPE_IPMI:		$type = S_IPMI_AGENT;			break;
-			case ITEM_TYPE_SSH:		$type = S_SSH_AGENT;			break;
-			case ITEM_TYPE_TELNET:		$type = S_TELNET_AGENT;			break;
-			case ITEM_TYPE_CALCULATED:	$type = S_CALCULATED;			break;
-			default:$type = S_UNKNOWN;			break;
+	function item_type2str($type=null){
+		$types = array(
+			ITEM_TYPE_ZABBIX => S_ZABBIX_AGENT,
+			ITEM_TYPE_SNMPV1 => S_SNMPV1_AGENT,
+			ITEM_TYPE_TRAPPER => S_ZABBIX_TRAPPER,
+			ITEM_TYPE_SIMPLE => S_SIMPLE_CHECK,
+			ITEM_TYPE_SNMPV2C => S_SNMPV2_AGENT,
+			ITEM_TYPE_INTERNAL => S_ZABBIX_INTERNAL,
+			ITEM_TYPE_SNMPV3 => S_SNMPV3_AGENT,
+			ITEM_TYPE_ZABBIX_ACTIVE => S_ZABBIX_AGENT_ACTIVE,
+			ITEM_TYPE_AGGREGATE => S_ZABBIX_AGGREGATE,
+			ITEM_TYPE_HTTPTEST => S_WEB_MONITORING,
+			ITEM_TYPE_EXTERNAL => S_EXTERNAL_CHECK,
+			ITEM_TYPE_DB_MONITOR => S_ZABBIX_DATABASE_MONITOR,
+			ITEM_TYPE_IPMI => S_IPMI_AGENT,
+			ITEM_TYPE_SSH => S_SSH_AGENT,
+			ITEM_TYPE_TELNET => S_TELNET_AGENT,
+			ITEM_TYPE_CALCULATED => S_CALCULATED,
+		);
+
+		if(is_null($type)){
+			natsort($types);
+			return $types;
 		}
-	return $type;
+		else if(isset($types[$type]))
+			return $types[$type];
+		else
+			return S_UNKNOWN;
 	}
 
-	/*
-	 * Function: item_value_type2str
-	 *
-	 * Description:
-	 *     Represent integer value of item value type as string
-	 *
-	 * Author:
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments:
-	 *
-	 */
-	function item_value_type2str($value_type){
-		switch($value_type){
-			case ITEM_VALUE_TYPE_UINT64:	$value_type = S_NUMERIC_UNSIGNED;		break;
-			case ITEM_VALUE_TYPE_FLOAT:	$value_type = S_NUMERIC_FLOAT;		break;
-			case ITEM_VALUE_TYPE_STR:	$value_type = S_CHARACTER;		break;
-			case ITEM_VALUE_TYPE_LOG:	$value_type = S_LOG;			break;
-			case ITEM_VALUE_TYPE_TEXT:	$value_type = S_TEXT;			break;
-			default:$value_type = S_UNKNOWN;			break;
+	function item_value_type2str($type=null){
+		$types = array(
+			ITEM_VALUE_TYPE_UINT64 => S_NUMERIC_UNSIGNED,
+			ITEM_VALUE_TYPE_FLOAT => S_NUMERIC_FLOAT,
+			ITEM_VALUE_TYPE_STR => S_CHARACTER,
+			ITEM_VALUE_TYPE_LOG => S_LOG,
+			ITEM_VALUE_TYPE_TEXT => S_TEXT,
+		);
+
+		if(is_null($type)){
+			natsort($types);
+			return $types;
 		}
-	return $value_type;
+		else if(isset($types[$type]))
+			return $types[$type];
+		else
+			return S_UNKNOWN;
 	}
 
-	/*
-	 * Function: item_data_type2str
-	 *
-	 * Description:
-	 *     Represent integer value of item data type as string
-	 *
-	 * Author:
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments:
-	 *
-	 */
-	function item_data_type2str($data_type){
-		switch($data_type){
-			case ITEM_DATA_TYPE_DECIMAL:		$data_type = S_DECIMAL;		break;
-			case ITEM_DATA_TYPE_OCTAL:		$data_type = S_OCTAL;		break;
-			case ITEM_DATA_TYPE_HEXADECIMAL:	$data_type = S_HEXADECIMAL;	break;
-			default:$data_type = S_UNKNOWN;		break;
+	function item_data_type2str($type=null){
+		$types = array(
+			ITEM_DATA_TYPE_DECIMAL => S_DECIMAL,
+			ITEM_DATA_TYPE_OCTAL => S_OCTAL,
+			ITEM_DATA_TYPE_HEXADECIMAL => S_HEXADECIMAL,
+		);
+
+		if(is_null($type)){
+			natsort($types);
+			return $types;
 		}
-	return $data_type;
+		else if(isset($types[$type]))
+			return $types[$type];
+		else
+			return S_UNKNOWN;
 	}
 
-	/*
-	 * Function: item_status2str
-	 *
-	 * Description:
-	 *     Represent integer value of item status as string
-	 *
-	 * Author:
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments:
-	 *
-	 */
-	function	item_status2str($status){
-		switch($status){
-			case ITEM_STATUS_ACTIVE:	$status = S_ACTIVE;		break;
-			case ITEM_STATUS_DISABLED:	$status = S_DISABLED;		break;
-			case ITEM_STATUS_NOTSUPPORTED:	$status = S_NOT_SUPPORTED;	break;
-			default:
-				$status = S_UNKNOWN;		break;
+	function item_status2str($type=null){
+		$types = array(
+			ITEM_STATUS_ACTIVE => S_ACTIVE,
+			ITEM_STATUS_DISABLED => S_DISABLED,
+			ITEM_STATUS_NOTSUPPORTED => S_NOT_SUPPORTED,
+		);
+
+		if(is_null($type)){
+			natsort($types);
+			return $types;
 		}
-	return $status;
+		else if(isset($types[$type]))
+			return $types[$type];
+		else
+			return S_UNKNOWN;
 	}
 
-	/*
-	 * Function: item_status2style
-	 *
-	 * Description:
-	 *     Represent integer value of item status as CSS style name
-	 *
-	 * Author:
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments:
-	 *
-	 */
-	function	item_status2style($status){
+	function item_status2style($status){
 		switch($status){
 			case ITEM_STATUS_ACTIVE:	$status = 'off';	break;
 			case ITEM_STATUS_DISABLED:	$status = 'on';		break;
@@ -1135,7 +1102,7 @@
 
 		if($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $descr, $arr)){
 			$macros = CuserMacro::getMacros($arr[1], array('itemid' => $item['itemid']));
-			
+
 			$search = array_keys($macros);
 			$values = array_values($macros);
 			$descr = str_replace($search, $values, $descr);
