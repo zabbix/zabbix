@@ -1,11 +1,10 @@
-CREATE TABLE IF NOT EXISTS sysmap_url (
-  sysmapurlid bigint(20) unsigned NOT NULL,
-  sysmapid bigint(20) unsigned NOT NULL,
-  name varchar(255) NOT NULL DEFAULT '',
-  url varchar(255) NOT NULL DEFAULT '',
-  elementtype int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (sysmapurlid),
-  UNIQUE KEY sysmap_url_1 (sysmapid,name)
+CREATE TABLE sysmap_url (
+	sysmapurlid              bigint unsigned                           NOT NULL,
+	sysmapid                 bigint unsigned                           NOT NULL,
+	name                     varchar(255)                              NOT NULL,
+	url                      varchar(255)    DEFAULT ''                NOT NULL,
+	elementtype              integer         DEFAULT '0'               NOT NULL,
+	PRIMARY KEY (sysmapurlid)
 ) ENGINE=InnoDB;
-
-ALTER TABLE sysmap_url ADD CONSTRAINT c_sysmapid_1 FOREIGN KEY (sysmapid) REFERENCES sysmaps (sysmapid) ON DELETE CASCADE;
+CREATE UNIQUE INDEX sysmap_url_1 on sysmap_url (sysmapid,name);
+ALTER TABLE sysmap_url ADD CONSTRAINT c_sysmap_url_1 FOREIGN KEY (sysmapid) REFERENCES sysmaps (sysmapid) ON DELETE CASCADE;
