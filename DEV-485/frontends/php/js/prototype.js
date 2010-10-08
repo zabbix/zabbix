@@ -504,11 +504,11 @@ Object.extend(String.prototype, (function() {
   }
 
   function escapeHTML() {
-    return this.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    return this.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;');
   }
 
   function unescapeHTML() {
-    return this.stripTags().replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&');
+    return this.stripTags().replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&').replace(/&quot;/g,'"');
   }
 
 
@@ -686,6 +686,10 @@ var Template = Class.create({
       if (before == '\\') return match[2];
 
       var ctx = object, expr = match[3];
+
+	  var ctx = object, expr = match[3], notEscHTML = expr.startsWith('*');
+	  if(notEscHTML) expr = expr.substring(1);
+
       var pattern = /^([^.[]+|\[((?:.*?[^\\])?)\])(\.|\[|$)/;
       match = pattern.exec(expr);
       if (match == null) return before;
@@ -698,7 +702,8 @@ var Template = Class.create({
         match = pattern.exec(expr);
       }
 
-      return before + String.interpret(ctx);
+	  ctx = String.interpret(ctx);
+	  return before + (notEscHTML ? ctx : ctx.escapeHTML());
     });
   }
 });
