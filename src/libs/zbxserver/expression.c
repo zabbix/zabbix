@@ -2603,7 +2603,7 @@ void	substitute_discovery_macros(char **data, size_t *data_alloc, struct zbx_jso
 	assert(data_alloc);
 	assert(jp_row);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [data:'%s']", __function_name, *data);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __function_name, *data);
 
 	sz_data = strlen(*data);
 
@@ -2647,11 +2647,11 @@ void	substitute_discovery_macros(char **data, size_t *data_alloc, struct zbx_jso
 			memcpy(&(*data)[l], replace_to, sz_value);
 		}
 		else
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() Can't substutite macro: \"%.*s\" is not found in value set",
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() Can't substitute macro: \"%.*s\" is not found in value set",
 					__function_name, (int)sz_macro, *data + l);
 	}
 
 	zbx_free(replace_to);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() [data:'%s']", __function_name, *data);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() data:'%s'", __function_name, *data);
 }
