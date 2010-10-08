@@ -363,7 +363,7 @@
 			 * Adding user defined links to popup menu
 			 */
 			foreach($db_element['urls'] as $url){
-				$links_menus.= "['".$url['name']."','".$url['url']."', 'nosid']";
+				$links_menus.= "['".$url['name']."','".$url['url']."', 'nosid'],";
 			}
 
 			if(!empty($links_menus)){
