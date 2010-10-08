@@ -144,11 +144,12 @@ static int	get_value(
 
 	*value = NULL;
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, source_ip, host, port, SENDER_TIMEOUT))) {
-		zbx_snprintf(request, sizeof(request),"%s\n",key);
-		if( SUCCEED == (ret = zbx_tcp_send(&s, request)) )
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, source_ip, host, port, GET_SENDER_TIMEOUT)))
+	{
+		zbx_snprintf(request, sizeof(request), "%s\n", key);
+		if (SUCCEED == (ret = zbx_tcp_send(&s, request)))
 		{
-			if( SUCCEED == (ret = zbx_tcp_recv_ext(&s, &buf, ZBX_TCP_READ_UNTIL_CLOSE, 0)) )
+			if (SUCCEED == (ret = zbx_tcp_recv_ext(&s, &buf, ZBX_TCP_READ_UNTIL_CLOSE, 0)))
 			{
 				zbx_rtrim(buf, "\r\n");
 				*value = strdup(buf);
