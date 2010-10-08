@@ -83,8 +83,7 @@ include_once('include/page_header.php');
 			'editable' => 1,
 			'output' => API_OUTPUT_SHORTEN
 		));
-		if(empty($r))
-			access_deny();
+		if(empty($r)) access_deny();
 	}
 ?>
 <?php
@@ -270,9 +269,9 @@ include_once('include/page_header.php');
 		foreach($screens as $num => $screen){
 			$table->addRow(array(
 				new CCheckBox('screens['.$screen['screenid'].']', NULL, NULL, $screen['screenid']),
-				new CLink($screen['name'],'screenedit.php?screenid='.$screen['screenid']),
+				new CLink($screen['name'],'screenedit.php?screenid='.$screen['screenid'].url_param('templateid')),
 				$screen['hsize'].' x '.$screen['vsize'],
-				new CLink(S_EDIT,'?form=update&screenid='.$screen['screenid'])
+				new CLink(S_EDIT,'?form=update&screenid='.$screen['screenid'].url_param('templateid'))
 			));
 		}
 
@@ -301,6 +300,9 @@ include_once('include/page_header.php');
 	}
 
 	$screen_wdgt->show();
+?>
+<?php
 
 include_once('include/page_footer.php');
+
 ?>

@@ -361,6 +361,11 @@ div.icon_sortdown{
 	cursor: pointer;
 }
 
+div.objectlist{
+	margin: 5px;
+	padding: 4px;
+	border: 1px solid #6C80B9;
+}
 /********* DIV IMG END *********/
 
 .link{

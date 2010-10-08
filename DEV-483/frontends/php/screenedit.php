@@ -82,15 +82,17 @@ include_once('include/page_header.php');
 	$trigg_wdgt = new CWidget();
 	$trigg_wdgt->addPageHeader(S_CONFIGURATION_OF_SCREEN_BIG);
 
-	//show_table_header(S_CONFIGURATION_OF_SCREEN_BIG);
-
 	$options = array(
 		'screenids' => $_REQUEST['screenid'],
 		'editable' => 1,
-		'output' => API_OUTPUT_EXTEND
+		'output' => API_OUTPUT_EXTEND,
+		'select_screenitems' => API_OUTPUT_EXTEND
 	);
 	$screens = CScreen::get($options);
-	if(empty($screens)) access_deny();
+	if(empty($screens)){
+		$screens = CTemplateScreen::get($options);
+		if(empty($screens)) access_deny();
+	}
 
 	$screen = reset($screens);
 
@@ -245,7 +247,7 @@ include_once('include/page_header.php');
 		}
 	}
 
-	$table = get_screen($_REQUEST['screenid'], 1);
+	$table = get_screen($screen, 1);
 	$trigg_wdgt->addItem($table);
 	zbx_add_post_js('init_screen("'.$_REQUEST['screenid'].'","iframe","'.$_REQUEST['screenid'].'");');
 	zbx_add_post_js('timeControl.processObjects();');

@@ -49,7 +49,8 @@ $ZBX_MENU = array(
 					),
 				array(
 						'url'=>'hosts_mon.php',
-						'label'=>S_HOSTS
+						'label'=>S_HOSTS,
+						'sub_pages'=>array('host_screen.php')
 					),
 				array(
 						'url'=>'tr_status.php',

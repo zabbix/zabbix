@@ -70,16 +70,16 @@
 <?php
 	if(isset($_REQUEST['favobj'])){
 		if('hat' == $_REQUEST['favobj']){
-			CProfile::update('web.screens.hats.'.$_REQUEST['favref'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.hostscreen.hats.'.$_REQUEST['favref'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 
 		if('filter' == $_REQUEST['favobj']){
-			CProfile::update('web.screens.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.hostscreen.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 
 		if('timeline' == $_REQUEST['favobj']){
 			if(isset($_REQUEST['elementid']) && isset($_REQUEST['period'])){
-				navigation_bar_calc('web.screens', $_REQUEST['elementid'],true);
+				navigation_bar_calc('web.hostscreen', $_REQUEST['elementid'],true);
 			}
 		}
 
@@ -113,17 +113,34 @@
 	}
 ?>
 <?php
-	$elementid = get_request('elementid', CProfile::get('web.screens.elementid', null));
+	$options = array(
+		'groups' => array(
+			'monitored_hosts' => 1,
+			'with_monitored_items' => 1,
+		),
+		'hosts' => array(
+			'monitored_hosts' => 1,
+			'with_monitored_items' => 1,
+		),
+		'hostid' => get_request('hostid', null),
+		'groupid' => get_request('groupid', null),
+	);
+
+	$pageFilter = new CPageFilter($options);
+	$_REQUEST['groupid'] = $pageFilter->groupid;
+	$_REQUEST['hostid'] = $pageFilter->hostid;
+
+	$elementid = get_request('elementid', CProfile::get('web.hostscreen.screenid', null));
 
 	if(2 != $_REQUEST['fullscreen'])
-		CProfile::update('web.screens.elementid',$elementid, PROFILE_TYPE_ID);
+		CProfile::update('web.hostscreen.screenid',$elementid, PROFILE_TYPE_ID);
 
 
 	$screens_wdgt = new CWidget();
 
 	$scroll_div = new CDiv();
 	$scroll_div->setAttribute('id','scrollbar_cntr');
-	$screens_wdgt->addFlicker($scroll_div, CProfile::get('web.screens.filter.state',1));
+	$screens_wdgt->addFlicker($scroll_div, CProfile::get('web.hostscreen.filter.state',1));
 
 	$formHeader = new CForm();
 	$cmbConfig = new CComboBox('config', 'screens.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
@@ -132,8 +149,8 @@
 	$formHeader->addItem($cmbConfig);
 
 
-	$screens = CScreen::get(array(
-		'nodeids' => get_current_nodeid(),
+	$screens = CTemplateScreen::get(array(
+		'hostids' => $_REQUEST['hostid'],
 		'output' => API_OUTPUT_EXTEND
 	));
 
@@ -148,8 +165,9 @@
 	}
 	else{
 		$screen = (!isset($screens[$elementid]))?reset($screens):$screens[$elementid];
-		$tmpScreens = CScreen::get(array(
+		$tmpScreens = CTemplateScreen::get(array(
 			'screenids' => $screen['screenid'],
+			'hostids' => $_REQUEST['hostid'],
 			'output' => API_OUTPUT_EXTEND,
 			'select_screenitems' => API_OUTPUT_EXTEND
 		));
@@ -164,7 +182,7 @@
 			'elid' => $screen['screenid'],
 		));
 		$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
-		
+
 		$screens_wdgt->addPageHeader(S_SCREENS_BIG, array($formHeader, SPACE, $icon, $fs_icon));
 		$screens_wdgt->addItem(BR());
 // }}} PAGE HEADER
@@ -173,47 +191,27 @@
 // HEADER {{{
 		$form = new CForm(null, 'get');
 		$form->addVar('fullscreen', $_REQUEST['fullscreen']);
-
-		$cmbElements = new CComboBox('elementid', $screen['screenid'], 'submit()');
-		foreach($screens as $snum => $cbScreen){
-			$displayed_screen_name = get_node_name_by_elid($cbScreen['screenid'], null, ': ').$cbScreen['name'];
-			$cmbElements->addItem($cbScreen['screenid'], $displayed_screen_name);
-		}
-		$form->addItem(array(S_SCREENS.SPACE, $cmbElements));
+		$form->addItem(array(S_GROUP.SPACE, $pageFilter->getGroupsCB(true)));
 
 		$screens_wdgt->addHeader($screen['name'], $form);
 // }}} HEADER
 
-		if((2 != $_REQUEST['fullscreen']) && check_dynamic_items($screen['screenid'], 0)){
-			$options = array(
-				'groups' => array(
-					'monitored_hosts' => 1,
-					'with_monitored_items' => 1,
-				),
-				'hosts' => array(
-					'monitored_hosts' => 1,
-					'with_monitored_items' => 1,
-				),
-				'hostid' => get_request('hostid', null),
-				'groupid' => get_request('groupid', null),
-			);
+// Host Screen List
+		$screenList = new CDiv(null, 'objectlist');
+		foreach($screens as $snum => $cbScreen){
+			$displayed_screen_name = get_node_name_by_elid($cbScreen['screenid'], null, ': ').$cbScreen['name'];
 
-			$pageFilter = new CPageFilter($options);
-			$_REQUEST['groupid'] = $pageFilter->groupid;
-			$_REQUEST['hostid'] = $pageFilter->hostid;
-
-			$form->addItem(array(S_GROUP.SPACE, $pageFilter->getGroupsCB(true)));
-
-
-			$cb_hosts = $pageFilter->hosts;
-			$cb_hosts['0'] = S_DEFAULT;
-			$cmbHosts = new CComboBox('hostid', $_REQUEST['hostid'], 'javascript: submit();');
-			foreach($cb_hosts as $hostid => $name){
-				$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid, null, ': ').$name);
+			if(bccomp($cbScreen['screenid'],$screen['screenid']) == 0){
+				$screenLink = new CSpan($displayed_screen_name);
 			}
-			$form->addItem(array(SPACE.S_HOST.SPACE, $cmbHosts));
+			else{
+				$screenLink = new CLink($displayed_screen_name, 'host_screen?screenid='.$cbScreen['screenid'].'&hostid='.$_REQUEST['hostid']);
+			}
+			$screenList->addItem($screenLink);
 		}
 
+		$screens_wdgt->addItem($screenList);
+//-----
 		$element = get_screen($screen, 0, $effectiveperiod);
 
 		if(2 != $_REQUEST['fullscreen']){
