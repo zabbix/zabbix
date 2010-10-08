@@ -869,12 +869,12 @@ FIELD		|y		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|iconid_disabled|t_id		|	|NULL		|ZBX_SYNC		|5|images	|imageid	|RESTRICT
 FIELD		|iconid_maintenance|t_id	|	|NULL		|ZBX_SYNC		|6|images	|imageid	|RESTRICT
 
-TABLE|sysmap_element_url|sysmapelementurlid|ZBX_SYNC 
-FIELD		|sysmapelementurlid|t_id	|	|NOT NULL	|0 
-FIELD		|selementid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1		|sysmaps_elements 
-FIELD		|name		|t_varchar(255) |	|NOT NULL	|ZBX_SYNC 
-FIELD		|url		|t_varchar(255) |''	|NOT NULL	|ZBX_SYNC 
-UNIQUE		|1		|selementid, name 
+TABLE|sysmap_element_url|sysmapelementurlid|ZBX_SYNC
+FIELD		|sysmapelementurlid|t_id	|	|NOT NULL	|0
+FIELD		|selementid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1		|sysmaps_elements
+FIELD		|name		|t_varchar(255)	|	|NOT NULL	|ZBX_SYNC
+FIELD		|url		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
+UNIQUE		|1		|selementid,name
 
 TABLE|sysmaps|sysmapid|ZBX_SYNC
 FIELD		|sysmapid	|t_id		|	|NOT NULL	|0
@@ -890,13 +890,13 @@ FIELD		|markelements	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|show_unack	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|name
 
-TABLE|sysmap_url|sysmapurlid|ZBX_SYNC 
-FIELD		|sysmapurlid	|t_id		|	|NOT NULL	|0 
-FIELD		|sysmapid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|sysmaps 
-FIELD		|name		|t_varchar(255)	|	|NOT NULL	|ZBX_SYNC 
-FIELD		|url		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC 
-FIELD		|elementtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC 
-UNIQUE		|1		|sysmapid, name 
+TABLE|sysmap_url|sysmapurlid|ZBX_SYNC
+FIELD		|sysmapurlid	|t_id		|	|NOT NULL	|0
+FIELD		|sysmapid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|sysmaps
+FIELD		|name		|t_varchar(255)	|	|NOT NULL	|ZBX_SYNC
+FIELD		|url		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|elementtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+UNIQUE		|1		|sysmapid,name
 
 TABLE|triggers|triggerid|ZBX_SYNC
 FIELD		|triggerid	|t_id		|	|NOT NULL	|0
