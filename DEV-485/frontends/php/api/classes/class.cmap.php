@@ -403,6 +403,9 @@ SDI('///////////////////////////////////////');
 					' WHERE '.DBcondition('selementid', array_keys($selements));
 			$db_selement_urls = DBselect($sql);
 			while($selement_url = DBfetch($db_selement_urls)){
+				if(is_null($options['expand_urls']))
+					$selements[$selement_url['selementid']]['urls'][] = $selement_url;
+				else
 				$selements[$selement_url['selementid']]['urls'][] = self::expandUrlMacro($selement_url, $selements[$selement_url['selementid']]);
 			}
 
