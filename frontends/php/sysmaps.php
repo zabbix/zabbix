@@ -341,7 +341,8 @@ include_once('include/page_header.php');
 
 				$url_etype = new CCombobox('urls['.$i.'][elementtype]', $url['elementtype']);
 				$url_etype->addItems(sysmap_element_types());
-				$rem_button = new CButton('button', 'X', '$("urlEntry_'.$i.'").remove();', false);
+				$rem_button = new CSpan(S_REMOVE, 'link_menu');
+				$rem_button->addAction('onclick', '$("urlEntry_'.$i.'").remove();');
 
 				$urlRow = new CRow(array($url_label, $url_link, $url_etype, $rem_button));
 				$urlRow->setAttribute('id', 'urlEntry_'.$i.'');
@@ -358,7 +359,8 @@ include_once('include/page_header.php');
 			$tpl_url_etype = new CCombobox('urls[#{id}][elementtype]');
 			$tpl_url_etype->setAttribute('disabled', 'disabled');
 			$tpl_url_etype->addItems(sysmap_element_types());
-			$tpl_rem_button = new CButton('button', 'X', '$("entry_#{id}").remove();', false);
+			$tpl_rem_button = new CSpan(S_REMOVE, 'link_menu');
+			$tpl_rem_button->addAction('onclick', '$("entry_#{id}").remove();');
 
 			$tpl_urlRow = new CRow(array($tpl_url_label, $tpl_url_link, $tpl_url_etype, $tpl_rem_button));
 			$tpl_urlRow->addStyle('display: none');
@@ -366,7 +368,8 @@ include_once('include/page_header.php');
 			$url_table->addRow($tpl_urlRow);
 // }}} empty template row
 
-			$add_button = new CButton('button', S_ADD, 'cloneRow("urlEntryTpl", '.$i.')', false);
+			$add_button = new CSpan(S_ADD, 'link_menu');
+			$add_button->addAction('onclick', 'cloneRow("urlEntryTpl", '.$i.')');
 			$add_button_col = new CCol($add_button);
 			$add_button_col->setColSpan(4);
 			$url_table->addRow($add_button_col);
