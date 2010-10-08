@@ -268,17 +268,17 @@ table.header_wide a:visited 	{	color:#2288FF;	 }
 table.header_wide a:hover 		{	color:#22CCFF;	 }
 table.header_wide a:active 		{	color:#22CCFF;	 }
 
-table.infobox{
+div.infobox{
 	border: 1px #AAAAAA solid;
 	background-color:#444444;
 	
 	color: #DADADA;
 }
 
-table.infobox a:link		{	color:#2288FF;	 }
-table.infobox a:visited 	{	color:#2288FF;	 }
-table.infobox a:hover 		{	color:#22CCFF;	 }
-table.infobox a:active 		{	color:#22CCFF;	 }
+div.infobox a:link		{	color:#2288FF;	 }
+div.infobox a:visited 	{	color:#2288FF;	 }
+div.infobox a:hover 		{	color:#22CCFF;	 }
+div.infobox a:active 		{	color:#22CCFF;	 }
 /*----------*/
 
 /*////////////////	DIVS	////////////////////*/
@@ -342,6 +342,20 @@ div#selection_box{
 	background-color:#6666FF;
 }
 
+div.objectlist{
+	border: 1px #AAAAAA solid;
+	background-color:#444444;
+
+	color: #DADADA;
+}
+
+div.objectlist a{
+	color: #0088FF;
+}
+
+div.objectlist a:hover{
+	color: #00CCFF;
+}
 
 span.green{
 	color:	#0088FF;
