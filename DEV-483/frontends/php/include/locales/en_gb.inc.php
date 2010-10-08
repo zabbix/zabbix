@@ -1649,6 +1649,7 @@
 //	screens.php
 	'S_CUSTOM_SCREENS'=>			'Custom screens',
 	'S_SCREENS_BIG'=>				'SCREENS',
+	'S_HOST_SCREENS'=>				'Host screens',
 
 	'S_SLIDESHOW_UPDATED'=>			'Slideshow updated',
 	'S_CANNOT_UPDATE_SLIDESHOW'=>		'Cannot_update slideshow',
