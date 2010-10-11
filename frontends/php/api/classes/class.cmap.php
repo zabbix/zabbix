@@ -552,6 +552,11 @@ COpt::memoryPick();
 				if(self::exists(array('name' => $map['name']))){
 					self::exception(ZBX_API_ERROR_PARAMETERS,'Map [ '.$map['name'].' ] already exists.');
 				}
+
+				foreach($map['urls'] as $url){
+					if(empty($url['name']) || empty($url['url']))
+						self::exception(ZBX_API_ERROR_PARAMETERS, 'Url should have both "name" and "url" fields.');
+				}
 			}
 			$sysmapids = DB::insert('sysmaps', $maps);
 
@@ -648,8 +653,13 @@ COpt::memoryPick();
 
 
 				if(isset($map['urls'])){
+					foreach($map['urls'] as $url){
+						if(empty($url['name']) || empty($url['url']))
+							self::exception(ZBX_API_ERROR_PARAMETERS, 'Url should have both "name" and "url" fields.');
+					}
+
 					$map['urls'] = zbx_toHash($map['urls'], 'name');
-					
+
 					foreach($db_sysmaps[$map['sysmapid']]['urls'] as $existing_url){
 						$toUpdate = false;
 						foreach($map['urls'] as $unum => $new_url){
@@ -671,18 +681,18 @@ COpt::memoryPick();
 							$urlidsToDelete[] = $existing_url['sysmapurlid'];
 						}
 					}
-					
+
 					foreach($map['urls'] as $newUrl){
 						$newUrl['sysmapid'] = $map['sysmapid'];
 						$urlsToAdd[] = $newUrl;
 					}
-
 				}
 			}
 			DB::update('sysmaps', $update);
 
 			if(!empty($urlidsToDelete))
 				DB::delete('sysmap_url', DBcondition('sysmapurlid', $urlidsToDelete));
+			
 			DB::update('sysmap_url', $urlsToUpdate);
 			DB::insert('sysmap_url', $urlsToAdd);
 
