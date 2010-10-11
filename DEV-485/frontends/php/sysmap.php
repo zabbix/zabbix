@@ -116,7 +116,9 @@ include_once('include/page_header.php');
 //						$element['image'] = get_base64_icon($element);
 						$selement['image'] = get_selement_iconid($selement, $info);
 						$selement['urls'] = zbx_toHash($selement['urls'], 'name');
+
 						$action .= 'ZBX_SYSMAPS['.$cmapid.'].map.add_selement('.zbx_jsvalue($selement, true).'); '."\n";
+
 					}
 
 					foreach($db_map['links'] as $enum => $link){
@@ -156,6 +158,7 @@ include_once('include/page_header.php');
 						);
 					$sysmaps = CMap::get($options);
 					if(empty($sysmaps)) print('alert("Access denied!");');
+
 					$selements = get_request('selements', '[]');
 					$selements = $json->decode($selements, true);
 
