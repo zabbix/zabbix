@@ -202,7 +202,7 @@ static int	check_response(char *response)
 	return ret;
 }
 
-static ZBX_THREAD_ENTRY(send_value, args)
+static	ZBX_THREAD_ENTRY(send_value, args)
 {
 	ZBX_THREAD_SENDVAL_ARGS *sentdval_args;
 
@@ -223,29 +223,25 @@ static ZBX_THREAD_ENTRY(send_value, args)
 	signal(SIGALRM, send_signal_handler);
 #endif /* NOT _WINDOWS */
 
-	if (SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, CONFIG_SOURCE_IP, sentdval_args->server, sentdval_args->port, SENDER_TIMEOUT))) {
-		tcp_ret = zbx_tcp_send(&sock, sentdval_args->json.buffer);
-
-		if( SUCCEED == tcp_ret )
+	if (SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, CONFIG_SOURCE_IP, sentdval_args->server, sentdval_args->port, GET_SENDER_TIMEOUT)))
+	{
+		if (SUCCEED == (tcp_ret = zbx_tcp_send(&sock, sentdval_args->json.buffer)))
 		{
-			if( SUCCEED == (tcp_ret = zbx_tcp_recv(&sock, &answer)) )
+			if (SUCCEED == (tcp_ret = zbx_tcp_recv(&sock, &answer)))
 			{
-				zabbix_log( LOG_LEVEL_DEBUG, "Answer [%s]", answer);
-				if( !answer || check_response(answer) != SUCCEED )
+				zabbix_log(LOG_LEVEL_DEBUG, "Answer [%s]", answer);
+				if (NULL == answer || SUCCEED != check_response(answer))
 				{
-					zabbix_log( LOG_LEVEL_WARNING, "Incorrect answer from server [%s]", answer);
+					zabbix_log(LOG_LEVEL_WARNING, "Incorrect answer from server [%s]", answer);
 				}
 				else
-				{
 					ret = SUCCEED;
-				}
 			}
 		}
-
 	}
 	zbx_tcp_close(&sock);
 
-	if( FAIL == tcp_ret )
+	if (FAIL == tcp_ret)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Send value error: %s", zbx_tcp_strerror());
 	}
