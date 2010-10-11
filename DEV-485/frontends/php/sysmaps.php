@@ -148,7 +148,7 @@ include_once('include/page_header.php');
 
 		$urls = get_request('urls', array());
 		foreach($urls as $unum => $url){
-			if(empty($url['name']))
+			if(empty($url['name']) && empty($url['url']))
 				unset($urls[$unum]);
 		}
 
@@ -171,23 +171,23 @@ include_once('include/page_header.php');
 			$map['sysmapid'] = $_REQUEST['sysmapid'];
 			$result = CMap::update($map);
 
-			add_audit_if($result,AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MAP,'Name ['.$_REQUEST['name'].']');
-			show_messages($result,S_MAP_UPDATED,S_CANNOT_UPDATE_MAP);
+			add_audit_if($result, AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MAP, 'Name ['.$_REQUEST['name'].']');
+			show_messages($result, S_MAP_UPDATED, S_CANNOT_UPDATE_MAP);
 		}
 		else{
-			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
+			if(!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY)))
 				access_deny();
 
 			$result = CMap::create($map);
 
-			add_audit_if($result,AUDIT_ACTION_ADD,AUDIT_RESOURCE_MAP,'Name ['.$_REQUEST['name'].']');
-			show_messages($result,S_MAP_ADDED,S_CANNOT_ADD_MAP);
+			add_audit_if($result, AUDIT_ACTION_ADD,AUDIT_RESOURCE_MAP, 'Name ['.$_REQUEST['name'].']');
+			show_messages($result, S_MAP_ADDED,S_CANNOT_ADD_MAP);
 		}
 		if($result){
 			unset($_REQUEST['form']);
 		}
 	}
-	else if((isset($_REQUEST['delete'])&&isset($_REQUEST['sysmapid'])) || ($_REQUEST['go'] == 'delete')){
+	else if((isset($_REQUEST['delete']) && isset($_REQUEST['sysmapid'])) || ($_REQUEST['go'] == 'delete')){
 		$sysmapids = get_request('maps', array());
 		if(isset($_REQUEST['sysmapid'])){
 			$sysmapids[] = $_REQUEST['sysmapid'];
@@ -329,7 +329,7 @@ include_once('include/page_header.php');
 			$table_map->addRow(S_PROBLEM_DISPLAY, $selectShowUnack);
 
 			$url_table = new Ctable();
-			$url_table->setHeader(array(S_NAME, S_URL, S_ELEMENT, SPACE));
+			$url_table->setHeader(array(S_NAME, S_URL_C, S_ELEMENT, SPACE));
 
 			if(empty($urls)){
 				$urls[] = array('name' => '', 'url' => '', 'elementtype' => 0);
@@ -374,7 +374,7 @@ include_once('include/page_header.php');
 			$add_button_col->setColSpan(4);
 			$url_table->addRow($add_button_col);
 
-			$table_map->addRow(S_URL, $url_table);
+			$table_map->addRow(S_LINKS, $url_table);
 
 			$footer = array(new CButton('save', S_SAVE));
 			if(isset($_REQUEST['sysmapid'])){
