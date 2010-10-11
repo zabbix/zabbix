@@ -1463,7 +1463,7 @@ form_selement_newUrl: function(e){
 
 	var selementid = this.selementForm.selementid.value;
 
-	var ll = $(this.selementForm.urls).select('input[name="remove"]').length;
+	var ll = $(this.selementForm.urls).select('span[name="remove"]').length;
 	var sysmapelementurlid = selementid+''+ll;
 	var tpl = new Template(ZBX_TPL.selementFormUrls);
 	
@@ -2272,11 +2272,17 @@ form_selement_update: function(e, selementid){
 		$(this.selementForm.y).value = selement.y;
 
 // URLS
+		var emptyUrls = true;
 		for(var urlname in selement.urls){
 			if(empty(selement.urls[urlname])) continue;
 
 			var tpl = new Template(ZBX_TPL.selementFormUrls);
 			$('urlfooter').insert({'before' : tpl.evaluate(selement.urls[urlname])});
+			emptyUrls = false;
+		}
+
+		if(emptyUrls){
+			this.form_selement_newUrl(e);
 		}
 
 		this.form_selement_updateByType(e, false);
@@ -2590,6 +2596,12 @@ form_selement_save: function(e){
 				'name': $('url_name_'+urlid).value,
 				'url': $('url_url_'+urlid).value
 			};
+
+			if(empty(url.name) || empty(url.url)){
+				alert('Incorrect map element link is given');
+				return true;
+			}
+			
 			params.urls[url.name] = url;
 		}
 
