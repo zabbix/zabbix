@@ -1480,7 +1480,7 @@ COpt::memoryPick();
 				}
 			}
 
-			if(isset($data['groups'])){
+			if(isset($data['groupids'])){
 				$options = array(
 					'groupids' => zbx_toArray($data['groupids']),
 					'templateids' => $templateids
