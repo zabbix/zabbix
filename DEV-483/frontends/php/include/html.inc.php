@@ -307,16 +307,11 @@
 			'output' => API_OUTPUT_EXTEND,
 			'templated_hosts' => 1,
 		);
-		if(isset($elements['items']))
-			$header_host_opt['select_items'] = API_OUTPUT_COUNT;
-		if(isset($elements['triggers']))
-			$header_host_opt['select_triggers'] = API_OUTPUT_COUNT;
-		if(isset($elements['graphs']))
-			$header_host_opt['select_graphs'] = API_OUTPUT_COUNT;
-		if(isset($elements['applications']))
-			$header_host_opt['select_applications'] = API_OUTPUT_COUNT;
-		if(isset($elements['screens']))
-			$header_host_opt['selectScreens'] = API_OUTPUT_COUNT;
+		if(isset($elements['items'])) $header_host_opt['select_items'] = API_OUTPUT_COUNT;
+		if(isset($elements['triggers'])) $header_host_opt['select_triggers'] = API_OUTPUT_COUNT;
+		if(isset($elements['graphs'])) $header_host_opt['select_graphs'] = API_OUTPUT_COUNT;
+		if(isset($elements['applications'])) $header_host_opt['select_applications'] = API_OUTPUT_COUNT;
+		if(isset($elements['screens'])) $header_host_opt['selectScreens'] = API_OUTPUT_COUNT;
 
 		$header_host = CHost::get($header_host_opt);
 		$header_host = array_pop($header_host);
@@ -328,40 +323,38 @@
 		}
 		$description[] = $header_host['host'];
 
+		$list = new CList();
+		if($header_host['status'] == HOST_STATUS_TEMPLATE)
+			$list->addItem(new CLink(bold(S_TEMPLATE_LIST), 'templates.php?templateid='.$header_host['hostid'].url_param('groupid')));
+		else
+			$list->addItem(new CLink(bold(S_HOST_LIST), 'hosts.php?hostid='.$header_host['hostid'].url_param('groupid')));
+
 		if(isset($elements['items'])){
-			$items = array(new CLink(S_ITEMS, 'items.php?hostid='.$header_host['hostid']),
-				' ('.$header_host['items'].') ');
+			$list->addItem(array(new CLink(S_ITEMS, 'items.php?hostid='.$header_host['hostid']),' ('.$header_host['items'].')'));
 		}
+
 		if(isset($elements['triggers'])){
-			$triggers = array(new CLink(S_TRIGGERS, 'triggers.php?hostid='.$header_host['hostid']),
-				' ('.$header_host['triggers'].') ');
+			$list->addItem(array(new CLink(S_TRIGGERS, 'triggers.php?hostid='.$header_host['hostid']),' ('.$header_host['triggers'].')'));
 		}
+
 		if(isset($elements['graphs'])){
-			$graphs = array(new CLink(S_GRAPHS, 'graphs.php?hostid='.$header_host['hostid']),
-				' ('.$header_host['graphs'].') ');
+			$list->addItem(array(new CLink(S_GRAPHS, 'graphs.php?hostid='.$header_host['hostid']),' ('.$header_host['graphs'].')'));
 		}
+		
 		if(isset($elements['applications'])){
-			$applications = array(new CLink(S_APPLICATIONS, 'applications.php?hostid='.$header_host['hostid']),
-				' ('.$header_host['applications'].') ');
+			$list->addItem(array(new CLink(S_APPLICATIONS, 'applications.php?hostid='.$header_host['hostid']),' ('.$header_host['applications'].')'));
 		}
 
 
 		$tbl_header_host = new CDiv();
 		if($header_host['status'] == HOST_STATUS_TEMPLATE){
 			if(isset($elements['screens'])){
-				$screens = array(new CLink(S_SCREENS, 'screenconf.php?templateid='.$header_host['hostid']),
-					' ('.$header_host['screens'].') ');
+				$list->addItem(array(new CLink(S_SCREENS, 'screenconf.php?templateid='.$header_host['hostid']), ' ('.$header_host['screens'].')'));
 			}
 
-			$tbl_header_host->addItem(array(
-				new CLink(bold(S_TEMPLATE_LIST), 'templates.php?templateid='.$header_host['hostid'].url_param('groupid')),
-				(isset($elements['applications']) ? $applications : null),
-				(isset($elements['items']) ? $items : null),
-				(isset($elements['triggers']) ? $triggers : null),
-				(isset($elements['graphs']) ? $graphs : null),
-				(isset($elements['screens']) ? $screens : null),
-				new CSpan(array(bold(S_TEMPLATE.': '), $description))
-			));
+			$list->addItem(array(bold(S_TEMPLATE.': '), $description));
+
+			$tbl_header_host->addItem($list);
 		}
 		else{
 			$dns = empty($header_host['dns']) ? '-' : $header_host['dns'];
@@ -390,21 +383,16 @@
 			else if($header_host['available'] == HOST_AVAILABLE_UNKNOWN)
 				$available = new CSpan(S_UNKNOWN, 'unknown');
 
-			$tbl_header_host->addItem(array(
-				new CSpan(new CLink(bold(S_HOST_LIST), 'hosts.php?hostid='.$header_host['hostid'].url_param('groupid'))),
-				new CSpan((isset($elements['applications']) ? $applications : null)),
-				new CSpan((isset($elements['items']) ? $items : null)),
-				new CSpan((isset($elements['triggers']) ? $triggers : null)),
-				new CSpan((isset($elements['graphs']) ? $graphs : null)),
-				new CSpan(array(bold(S_HOST.': '), $description)), SPACE,
-				new CSpan(array(bold(S_DNS.': '), $dns)), SPACE,
-				new CSpan(array(bold(S_IP.': '), $ip)), SPACE,
-				new CSpan(array(bold(S_PORT.': '), $port)), SPACE,
-				new CSpan(array(bold(S_STATUS.': '), $status)), SPACE,
-				new CSpan(array(bold(S_AVAILABILITY.': '), $available))
-			));
+			$list->addItem(array(bold(S_HOST.': '), $description));
+			$list->addItem(array(bold(S_DNS.': '), $dns));
+			$list->addItem(array(bold(S_IP.': '), $ip));
+			$list->addItem(array(bold(S_PORT.': '), $port));
+			$list->addItem(array(bold(S_STATUS.': '), $status));
+			$list->addItem(array(bold(S_AVAILABILITY.': '), $available));
+
+			$tbl_header_host->addItem($list);
 		}
-		$tbl_header_host->setClass('infobox');
+		$tbl_header_host->setClass('objectlist');
 
 		return $tbl_header_host;
 	}

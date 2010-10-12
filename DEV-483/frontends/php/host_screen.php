@@ -201,20 +201,16 @@
 		}
 
 // Host Screen List
-		$screenList = array();
+		$screenList = new CList();
 		foreach($screens as $snum => $cbScreen){
 			$displayed_screen_name = get_node_name_by_elid($cbScreen['screenid'], null, ': ').$cbScreen['name'];
 
-			if(bccomp($cbScreen['screenid'],$screen['screenid']) == 0){
-				$screenLink = new CSpan($displayed_screen_name);
-			}
-			else{
-				$screenLink = new CLink($displayed_screen_name, 'host_screen.php?screenid='.$cbScreen['screenid'].'&hostid='.$_REQUEST['hostid']);
-			}
-			$screenList[] = $screenLink;
-			$screenList[] = ' ';
+			if(bccomp($cbScreen['screenid'],$screen['screenid']) == 0)
+				$screenList->addItem($displayed_screen_name, 'selected');
+			else
+				$screenList->addItem(new CLink($displayed_screen_name, 'host_screen.php?screenid='.$cbScreen['screenid'].'&hostid='.$_REQUEST['hostid']));
 		}
-		array_pop($screenList);
+
 		$screens_wdgt->addItem(new CDiv($screenList, 'objectlist'));
 //-----
 		$element = get_screen($screen, 0, $effectiveperiod);
