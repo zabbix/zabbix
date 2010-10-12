@@ -405,7 +405,6 @@
 
 			$triggersOptions = array(
 				'triggerids' => zbx_objectValues($events, 'objectid'),
-				'expandDescription' => 1,
 				'select_hosts' => API_OUTPUT_EXTEND,
 				'select_triggers' => API_OUTPUT_EXTEND,
 				'select_items' => API_OUTPUT_EXTEND,
@@ -440,7 +439,8 @@
 					}
 				}
 
-				$tr_desc = new CSpan($trigger['description'],'pointer');
+				$description = expand_trigger_description_by_data(zbx_array_merge($trigger, array('clock'=>$event['clock'])), ZBX_FLAG_EVENT);
+				$tr_desc = new CSpan($description,'pointer');
 				$tr_desc->addAction('onclick',"create_mon_trigger_menu(event, ".
 										" new Array({'triggerid': '".$trigger['triggerid']."', 'lastchange': '".$event['clock']."'}),".
 										zbx_jsvalue($items, true).");");

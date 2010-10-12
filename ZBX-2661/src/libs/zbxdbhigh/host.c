@@ -2643,7 +2643,7 @@ static int	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
 	name_esc = DBdyn_escape_string(name);
 
 	sql_offset = 0;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 320,
 			"select 0,dst.itemid,dst.key_,gi.drawtype,gi.sortorder,"
 				"gi.color,gi.yaxisside,gi.calc_fnc,"
 				"gi.type,gi.periods_cnt"

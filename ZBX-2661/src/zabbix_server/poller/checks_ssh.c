@@ -343,13 +343,13 @@ int	get_value_ssh(DC_ITEM *item, AGENT_RESULT *result)
 	if ('\0' != *port)
 	{
 		port_int = atoi(port);
-		if (port_int < 1 || port_int > 65536)
+		if (port_int < 1 || port_int > 65535)
 			return NOTSUPPORTED;
 
 		item->host.port = (unsigned short)port_int;
 	}
 	else
-		item->host.port = 22;
+		item->host.port = ZBX_DEFAULT_SSH_PORT;
 
 	return ssh_run(item, result, encoding);
 }

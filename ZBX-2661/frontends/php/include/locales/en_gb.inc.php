@@ -207,6 +207,7 @@
 	'S_REQUIRED'=>					'Required',
 	'S_STEP_OF_SCENARIO'=>				'Step of scenario',
 	'S_BASIC_AUTHENTICATION'=>			'Basic authentication',
+	'S_NTLM_AUTHENTICATION'=>			'NTLM authentication',
 	'S_ENABLE_SELECTED_WEB_SCENARIOS_Q'=>		'Enable selected WEB scenarios?',
 	'S_DISABLE_SELECTED_WEB_SCENARIOS_Q'=>		'Disable selected WEB scenarios?',
 	'S_DELETE_HISTORY_SELECTED_WEB_SCENARIOS_Q'=>	'Delete history of selected WEB scenarios?',
@@ -549,6 +550,9 @@
 	'S_INCORRECT_GROUP'=>				'Incorrect group',
 	'S_NOTHING_TO_DO'=>				'Nothing to do',
 	'S_INCORRECT_WORK_PERIOD'=>			'Incorrect work period',
+	'S_EZ_TEXTING_USA' => 'USA (160 characters)',
+	'S_EZ_TEXTING_CANADA' => 'Canada (136 characters)',
+	'S_MESSAGE_TEXT_LIMIT' => 'Message text limit',
 
 	'S_REGULAR_EXPRESSIONS'=>			'Regular expressions',
 	'S_REGULAR_EXPRESSION'=>			'Regular expression',
@@ -590,6 +594,7 @@
 
 // media_types.php
 	'S_DELETE_SELECTED_MEDIATYPES_Q'=>		'Delete selected media types?',
+	'S_COMMERCIAL' => 'Commercial',
 
 //	nodes.php
 	'S_NOT_DM_SETUP'=>			'Your setup is not configured for distributed monitoring',
@@ -1118,9 +1123,11 @@
 	'S_NOT_SUPPORTED'=>					'Not supported',
 	'S_EMAIL'=>						'Email',
 	'S_JABBER'=>						'Jabber',
-	'S_JABBER_IDENTIFIER'=>					'Jabber Identifier',
+	'S_JABBER_IDENTIFIER'=>					'Jabber identifier',
 	'S_SMS'=>						'SMS',
 	'S_SCRIPT'=>						'Script',
+	'S_EZ_TEXTING'=>						'Ez Texting',
+	'S_USERNAME'=>						'Username',
 	'S_GSM_MODEM'=>						'GSM modem',
 	'S_UNITS'=>						'Units',
 	'S_UPDATE_INTERVAL_IN_SEC'=>				'Update interval (in sec)',
@@ -1201,18 +1208,18 @@
 	'S_NO_EVENTS_FOUND'=>			'No events found',
 	'S_EVENTS_SINCE'=>			'Events since',
 	'S_EVENTS_DATE_FORMAT'=>		'd M Y H:i:s',
-	'S_EVENTS_DISCOVERY_TIME_FORMAT'=>	'Y.M.d H:i:s',
-	'S_EVENTS_ACTION_TIME_FORMAT'=>		'Y.M.d H:i:s',
+	'S_EVENTS_DISCOVERY_TIME_FORMAT'=>	'd M Y H:i:s',
+	'S_EVENTS_ACTION_TIME_FORMAT'=>		'd M Y H:i:s',
 	'S_UP_BIG'=>		'UP',
 	'S_DOWN_BIG'=>		'DOWN',
 	'S_DISCOVERED_BIG'=>		'DISCOVERED',
 	'S_LOST_BIG'=>		'LOST',
 
 //	events.inc.php
-	'S_EVENTS_EVENT_DETAILS_DATE_FORMAT'=>			'Y.M.d H:i:s',
-	'S_EVENTS_SMALL_EVENT_LIST_DATE_FORMAT'=>		'Y.M.d H:i:s',
+	'S_EVENTS_EVENT_DETAILS_DATE_FORMAT'=>			'd M Y H:i:s',
+	'S_EVENTS_SMALL_EVENT_LIST_DATE_FORMAT'=>		'd M Y H:i:s',
 	'S_EVENTS_POPUP_EVENT_LIST_DATE_FORMAT'=>		'd M Y H:i:s',
-	'S_EVENTS_TRIGGERS_EVENTS_HISTORY_LIST_DATE_FORMAT'=>	'Y.M.d H:i:s',
+	'S_EVENTS_TRIGGERS_EVENTS_HISTORY_LIST_DATE_FORMAT'=>	'd M Y H:i:s',
 
 //	latest.php
 	'S_LAST_CHECK'=>			'Last check',
@@ -1746,6 +1753,7 @@
 	'S_INSERT'=>				'Insert',
 	'S_SECONDS'=>				'Seconds',
 	'S_LAST_OF'=>				'Last of',
+	'S_TIME_SHIFT'=>			'Time shift',
 	'S_MULTIPLE_PROBLEM_EVENTS'=>		'Multiple PROBLEM events',
 	'S_SHOW_DISABLED_TRIGGERS'=>		'Show disabled triggers',
 	'S_HIDE_DISABLED_TRIGGERS'=>		'Hide disabled triggers',
@@ -2376,6 +2384,9 @@
 	'S_CUSER_ERROR_LDAP_MODULE_MISSING'=>			'Probably php-ldap module is missing',
 	'S_CUSER_ERROR_FAILED_LOGIN_ATTEMPTS'=>				'failed login attempts logged.',
 	'S_CUSER_ERROR_LAST_FAILED_ATTEMPTS'=>				'Last failed attempt was from',
+	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_CREATE_SCRIPTS'=>		'Only Super Admins can create Scripts',
+	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_UPDATE_SCRIPTS'=>		'Only Super Admins can update Scripts',
+	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_DELETE_SCRIPTS'=>		'Only Super Admins can delete Scripts',
 	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_CREATE_USERS'=>		'Only Super Admins can create Users',
 	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_UPDATE_USERS'=>		'Only Super Admins can update Users',
 	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_DELETE_USERS'=>		'Only Super Admins can delete Users',
@@ -2400,6 +2411,7 @@
 
 // class.cmediatype.php
 	'S_CMEDIATYPE_ERROR_WRONG_FIELD_FOR_MEDIATYPE' =>	'Wrong fields for media type',
+	'S_CMEDIATYPE_ERROR_PASSWORD_REQUIRED' =>	'Password required for mediatype',
 	'S_CMEDIATYPE_ERROR_CANT_DELETE_MEDIATYPES'=>		'Can\'t delete media types',
 	'S_CMEDIATYPE_ERROR_CANT_UPDATE_MEDIATYPES'=>		'Can\'t update media types',
 	'S_CMEDIATYPE_ERROR_CANT_INSERT_MEDIATYPES'=>		'Can\'t insert media types',
@@ -2440,6 +2452,7 @@
 	'S_LATEST_DATA'=>			'Latest data',
 
 //	Errors
+	'S_DOES_NOT_EXIST_SMALL'=>		'does not exist',
 	'S_INCORRECT_DESCRIPTION'=>		'Incorrect description',
 	'S_CANT_FORMAT_TREE'=>			'Can\'t format Tree',
 	'S_NO_PERMISSION'=>				'You do not have permission to perform this operation',

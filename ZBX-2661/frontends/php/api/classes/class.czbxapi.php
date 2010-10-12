@@ -91,7 +91,6 @@ private static $transaction = array('counter' => 0);
 	protected static function endAPITransactions($result){
 		if((self::$transaction['counter'] > 0) && (self::$transaction['owner'] != 'DB_CLASS')){
 			unset(self::$transaction['owner']);
-			self::$transaction[$caller] = 0;
 			self::$transaction['counter'] = 0;
 
 			$result = DBend($result);
@@ -149,9 +148,11 @@ private static $transaction = array('counter' => 0);
 
 	return $errors;
 	}
+
 // ERROR METHODS}
 
 	protected static function exception($code=ZBX_API_ERROR_INTERNAL, $errors=array()){
-		throw new APIException($code, $errors);	
+		throw new APIException($code, $errors);
 	}
+
 }

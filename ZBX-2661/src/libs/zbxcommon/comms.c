@@ -18,13 +18,7 @@
 **/
 
 #include "common.h"
-#include "log.h"
 #include "base64.h"
-
-#if defined (_WINDOWS)
-char ZABBIX_SERVICE_NAME[ZBX_SERVICE_NAME_LEN] = {APPLICATION_NAME};
-char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN] = {APPLICATION_NAME};
-#endif /* _WINDOWS */
 
 int	comms_parse_response(char *xml, char *host, int host_len, char *key, int key_len, char *data, int data_len,
 		char *lastlogsize, int lastlogsize_len, char *timestamp, int timestamp_len,
@@ -93,86 +87,6 @@ int	comms_parse_response(char *xml, char *host, int host_len, char *key, int key
 	return ret;
 }
 
-void    *zbx_malloc2(char *filename, int line, void *old, size_t size)
-{
-	register int max_attempts;
-	void *ptr = NULL;
-
-/*	Old pointer must be NULL */
-	if(old != NULL)
-	{
-		zabbix_log(LOG_LEVEL_CRIT,"[file:%s,line:%d] zbx_malloc: allocating already allocated memory. Please report this to Zabbix developers.",
-			filename,
-			line);
-		/* Exit if defined DEBUG. Ignore otherwise. */
-		zbx_dbg_assert(0);
-	}
-
-/*	zabbix_log(LOG_LEVEL_DEBUG,"In zbx_malloc(size:%d)", size); */
-
-	for(
-		max_attempts = 10, size = MAX(size, 1);
-		max_attempts > 0 && !ptr;
-		ptr = malloc(size),
-		max_attempts--
-	);
-
-	if (ptr)
-	{
-/*		fprintf(stderr, "%-6li => [file:%s,line:%d] zbx_malloc: %p %lu bytes\n", (long int)getpid(), filename, line, ptr, size);*/
-		return ptr;
-	}
-
-	zabbix_log(LOG_LEVEL_CRIT,"[file:%s,line:%d] zbx_malloc: out of memory. requested '%lu' bytes.", filename, line, size);
-	exit(FAIL);
-
-	/* Program will never reach this point. */
-	return ptr;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_realloc                                                      *
- *                                                                            *
- * Purpose: changes the size of the memory block pointed to by src            *
- *          to size bytes.                                                    *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value: returns a pointer to the newly allocated memory              *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-void    *zbx_realloc2(char *filename, int line, void *src, size_t size)
-{
-	register int max_attempts;
-	void *ptr = NULL;
-
-/*	zabbix_log(LOG_LEVEL_DEBUG,"In zbx_realloc(size:%d)", size); */
-
-	for(
-		max_attempts = 10, size = MAX(size, 1);
-		max_attempts > 0 && !ptr;
-		ptr = realloc(src, size),
-		max_attempts--
-	);
-
-	if (ptr)
-	{
-/*		fprintf(stderr, "%-6li => [file:%s,line:%d] zbx_realloc: %p %lu bytes\n", (long int)getpid(), filename, line, ptr, size);*/
-		return ptr;
-	}
-
-	zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_realloc: out of memory. requested '%lu' bytes.", filename, line, size);
-	exit(FAIL);
-
-	/* Program will never reach this point. */
-	return ptr;
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_htole_uint64                                                 *
@@ -190,24 +104,22 @@ void    *zbx_realloc2(char *filename, int line, void *src, size_t size)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-zbx_uint64_t	zbx_htole_uint64(
-		zbx_uint64_t	data
-	)
+zbx_uint64_t	zbx_htole_uint64(zbx_uint64_t data)
 {
-	unsigned char buf[8];
+	unsigned char	buf[8];
 
-	buf[0] = (unsigned char) (data);	data >>= 8;
-	buf[1] = (unsigned char) (data);	data >>= 8;
-	buf[2] = (unsigned char) (data);	data >>= 8;
-	buf[3] = (unsigned char) (data);	data >>= 8;
-	buf[4] = (unsigned char) (data);	data >>= 8;
-	buf[5] = (unsigned char) (data);	data >>= 8;
-	buf[6] = (unsigned char) (data);	data >>= 8;
-	buf[7] = (unsigned char) (data);
+	buf[0] = (unsigned char)data;	data >>= 8;
+	buf[1] = (unsigned char)data;	data >>= 8;
+	buf[2] = (unsigned char)data;	data >>= 8;
+	buf[3] = (unsigned char)data;	data >>= 8;
+	buf[4] = (unsigned char)data;	data >>= 8;
+	buf[5] = (unsigned char)data;	data >>= 8;
+	buf[6] = (unsigned char)data;	data >>= 8;
+	buf[7] = (unsigned char)data;
 
 	memcpy(&data, buf, sizeof(buf));
 
-	return  data;
+	return data;
 }
 
 /******************************************************************************
@@ -227,25 +139,23 @@ zbx_uint64_t	zbx_htole_uint64(
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-zbx_uint64_t	zbx_letoh_uint64(
-		zbx_uint64_t	data
-	)
+zbx_uint64_t	zbx_letoh_uint64(zbx_uint64_t data)
 {
-	unsigned char buf[8];
+	unsigned char	buf[8];
 
 	memset(buf, 0, sizeof(buf));
 	memcpy(buf, &data, sizeof(buf));
 
 	data = 0;
 
-	data  = (zbx_uint64_t) buf[7];		data <<= 8;
-	data |= (zbx_uint64_t) buf[6];		data <<= 8;
-	data |= (zbx_uint64_t) buf[5];		data <<= 8;
-	data |= (zbx_uint64_t) buf[4];		data <<= 8;
-	data |= (zbx_uint64_t) buf[3];		data <<= 8;
-	data |= (zbx_uint64_t) buf[2];		data <<= 8;
-	data |= (zbx_uint64_t) buf[1];		data <<= 8;
-	data |= (zbx_uint64_t) buf[0];
+	data  = (zbx_uint64_t)buf[7];	data <<= 8;
+	data |= (zbx_uint64_t)buf[6];	data <<= 8;
+	data |= (zbx_uint64_t)buf[5];	data <<= 8;
+	data |= (zbx_uint64_t)buf[4];	data <<= 8;
+	data |= (zbx_uint64_t)buf[3];	data <<= 8;
+	data |= (zbx_uint64_t)buf[2];	data <<= 8;
+	data |= (zbx_uint64_t)buf[1];	data <<= 8;
+	data |= (zbx_uint64_t)buf[0];
 
-	return	data;
+	return data;
 }

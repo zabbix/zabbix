@@ -377,6 +377,9 @@
 
 #ifdef HAVE_LIBCURL
 #	include <curl/curl.h>
+#	if !defined(HAVE_FUNCTION_CURL_EASY_ESCAPE)
+#		define curl_easy_escape(handle, string, length) curl_escape(string, length)
+#	endif
 #endif
 
 /* NET-SNMP is used */

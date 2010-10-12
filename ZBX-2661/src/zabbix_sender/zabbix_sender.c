@@ -33,17 +33,17 @@ const char	usage_message[] = "[-Vhv] {[-zpsI] -ko | [-zpI] -T -i <file> -r} [-c 
 #ifdef HAVE_GETOPT_LONG
 const char	*help_message[] = {
 	"Options:",
-	"  -c --config <File>                   Specify configuration file",
+	"  -c --config <file>                   Specify configuration file",
 	"",
-	"  -z --zabbix-server <Server>          Hostname or IP address of Zabbix Server",
-	"  -p --port <Server port>              Specify port number of server trapper running on the server. Default is 10051",
-	"  -s --host <Hostname>                 Specify host name. Host IP address and DNS name will not work",
-	"  -I --source-address <ip address>     Specify source IP address",
+	"  -z --zabbix-server <server>          Hostname or IP address of Zabbix Server",
+	"  -p --port <server port>              Specify port number of server trapper running on the server. Default is 10051",
+	"  -s --host <hostname>                 Specify host name. Host IP address and DNS name will not work",
+	"  -I --source-address <IP address>     Specify source IP address",
 	"",
-	"  -k --key <Key>                       Specify metric name (key) we want to send",
-	"  -o --value <Key value>               Specify value of the key",
+	"  -k --key <key>                       Specify item key",
+	"  -o --value <key value>               Specify value",
 	"",
-	"  -i --input-file <Input file>         Load values from input file. Specify - for standard input",
+	"  -i --input-file <input file>         Load values from input file. Specify - for standard input",
 	"                                       Each line of file contains whitespace delimited: <hostname> <key> <value>",
 	"                                       Specify - in <hostname> to use hostname from configuration file or --host argument",
 	"  -T --with-timestamps                 Each line of file contains whitespace delimited: <hostname> <key> <timestamp> <value>",
@@ -61,17 +61,17 @@ const char	*help_message[] = {
 #else
 const char	*help_message[] = {
 	"Options:",
-	"  -c <File>                    Specify configuration file",
+	"  -c <file>                    Specify configuration file",
 	"",
-	"  -z <Server>                  Hostname or IP address of Zabbix Server",
-	"  -p <Server port>             Specify port number of server trapper running on the server. Default is 10051",
-	"  -s <Hostname>                Specify hostname or IP address of a host",
-	"  -I <ip address>              Specify source IP address",
+	"  -z <server>                  Hostname or IP address of Zabbix Server",
+	"  -p <server port>             Specify port number of server trapper running on the server. Default is 10051",
+	"  -s <hostname>                Specify hostname or IP address of a host",
+	"  -I <IP address>              Specify source IP address",
 	"",
-	"  -k <Key>                     Specify metric name (key) we want to send",
-	"  -o <Key value>               Specify value of the key",
+	"  -k <key>                     Specify item key",
+	"  -o <key value>               Specify value",
 	"",
-	"  -i <Input file>              Load values from input file. Specify - for standard input",
+	"  -i <input file>              Load values from input file. Specify - for standard input",
 	"                               Each line of file contains whitespace delimited: <hostname> <key> <value>",
 	"                               Specify - in <hostname> to use hostname from configuration file or --host argument",
 	"  -T                           Each line of file contains whitespace delimited: <hostname> <key> <timestamp> <value>",
@@ -202,7 +202,7 @@ static int	check_response(char *response)
 	return ret;
 }
 
-static ZBX_THREAD_ENTRY(send_value, args)
+static	ZBX_THREAD_ENTRY(send_value, args)
 {
 	ZBX_THREAD_SENDVAL_ARGS *sentdval_args;
 
@@ -223,29 +223,25 @@ static ZBX_THREAD_ENTRY(send_value, args)
 	signal(SIGALRM, send_signal_handler);
 #endif /* NOT _WINDOWS */
 
-	if (SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, CONFIG_SOURCE_IP, sentdval_args->server, sentdval_args->port, SENDER_TIMEOUT))) {
-		tcp_ret = zbx_tcp_send(&sock, sentdval_args->json.buffer);
-
-		if( SUCCEED == tcp_ret )
+	if (SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, CONFIG_SOURCE_IP, sentdval_args->server, sentdval_args->port, GET_SENDER_TIMEOUT)))
+	{
+		if (SUCCEED == (tcp_ret = zbx_tcp_send(&sock, sentdval_args->json.buffer)))
 		{
-			if( SUCCEED == (tcp_ret = zbx_tcp_recv(&sock, &answer)) )
+			if (SUCCEED == (tcp_ret = zbx_tcp_recv(&sock, &answer)))
 			{
-				zabbix_log( LOG_LEVEL_DEBUG, "Answer [%s]", answer);
-				if( !answer || check_response(answer) != SUCCEED )
+				zabbix_log(LOG_LEVEL_DEBUG, "Answer [%s]", answer);
+				if (NULL == answer || SUCCEED != check_response(answer))
 				{
-					zabbix_log( LOG_LEVEL_WARNING, "Incorrect answer from server [%s]", answer);
+					zabbix_log(LOG_LEVEL_WARNING, "Incorrect answer from server [%s]", answer);
 				}
 				else
-				{
 					ret = SUCCEED;
-				}
 			}
 		}
-
 	}
 	zbx_tcp_close(&sock);
 
-	if( FAIL == tcp_ret )
+	if (FAIL == tcp_ret)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Send value error: %s", zbx_tcp_strerror());
 	}

@@ -205,8 +205,8 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 	}
 	else if(inarr_isset(array('del_condition','g_conditionid'))){
 		$_REQUEST['conditions'] = get_request('conditions',array());
-		foreach($_REQUEST['g_conditionid'] as $val){
-			unset($_REQUEST['conditions'][$val]);
+		foreach($_REQUEST['g_conditionid'] as $condition){
+			unset($_REQUEST['conditions'][$condition]);
 		}
 	}
 	else if(inarr_isset(array('add_opcondition','new_opcondition'))){
@@ -227,8 +227,8 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 	else if(inarr_isset(array('del_opcondition','g_opconditionid'))){
 		$new_operation = get_request('new_operation',array());
 
-		foreach($_REQUEST['g_opconditionid'] as $val){
-			unset($new_operation['opconditions'][$val]);
+		foreach($_REQUEST['g_opconditionid'] as $condition){
+			unset($new_operation['opconditions'][$condition]);
 		}
 
 		$_REQUEST['new_operation'] = $new_operation;
@@ -263,8 +263,8 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 	}
 	else if(inarr_isset(array('del_operation','g_operationid'))){
 		$_REQUEST['operations'] = get_request('operations',array());
-		foreach($_REQUEST['g_operationid'] as $val){
-			unset($_REQUEST['operations'][$val]);
+		foreach($_REQUEST['g_operationid'] as $condition){
+			unset($_REQUEST['operations'][$condition]);
 		}
 	}
 	else if(inarr_isset(array('edit_operationid'))){
@@ -339,8 +339,16 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 
 		$action = null;
 		if(isset($_REQUEST['actionid'])){
-			$action = get_action_by_actionid($_REQUEST['actionid']);
-			$frmAction->addVar('actionid',$_REQUEST['actionid']);
+			$options = array(
+				'actionids' => $_REQUEST['actionid'],
+				'select_operations' => API_OUTPUT_EXTEND,
+				'select_conditions' => API_OUTPUT_EXTEND,
+				'output' => API_OUTPUT_EXTEND
+			);
+			$actions = CAction::get($options);
+			$action = reset($actions);
+
+			$frmAction->addVar('actionid', $_REQUEST['actionid']);
 		}
 
 		$left_tab = new CTable();
@@ -367,14 +375,14 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			if(isset($_REQUEST['escalation']) && (0 == $_REQUEST['esc_period']))
 				$_REQUEST['esc_period'] = 3600;
 
-			$name = get_request('name');
-			$eventsource = get_request('eventsource');
-			$esc_period = get_request('esc_period',0);
-			$status = get_request('status');
-			$def_shortdata = get_request('def_shortdata', ACTION_DEFAULT_SUBJ);
-			$def_longdata = get_request('def_longdata', ACTION_DEFAULT_MSG);
-			$recovery_msg = get_request('recovery_msg',0);
-			$r_shortdata = get_request('r_shortdata', ACTION_DEFAULT_MSG);
+			$name		= get_request('name');
+			$eventsource	= get_request('eventsource');
+			$esc_period	= get_request('esc_period',0);
+			$status		= get_request('status');
+			$def_shortdata	= get_request('def_shortdata', ACTION_DEFAULT_SUBJ);
+			$def_longdata	= get_request('def_longdata', ACTION_DEFAULT_MSG);
+			$recovery_msg	= get_request('recovery_msg',0);
+			$r_shortdata	= get_request('r_shortdata', ACTION_DEFAULT_SUBJ);
 			$r_longdata	= get_request('r_longdata', ACTION_DEFAULT_MSG);
 
 			if(!$esc_period) unset($_REQUEST['escalation']);
@@ -453,21 +461,11 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			$eventsource = $action['eventsource'];
 			$evaltype = $action['evaltype'];
 
-			$sql = 'SELECT conditiontype, operator, value '.
-					' FROM conditions '.
-					' WHERE actionid='.$_REQUEST['actionid'].
-					' ORDER BY conditiontype,conditionid';
-			$db_conditions = DBselect($sql);
-			while($condition_data = DBfetch($db_conditions)){
-				$condition_data = array(
-					'type' => $condition_data['conditiontype'],
-					'operator' => $condition_data['operator'],
-					'value' => $condition_data['value']
-				);
-
-				if(str_in_array($condition_data, $conditions)) continue;
-				array_push($conditions, $condition_data);
+			$conditions = $action['conditions'];
+			foreach($conditions as $acrow => &$condition_data){
+				$condition_data['type'] = $condition_data['conditiontype'];
 			}
+			unset($condition_data);
 		}
 		else{
 			$evaltype = get_request('evaltype');
@@ -479,29 +477,29 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 // show CONDITION LIST
 		zbx_rksort($conditions);
 
-		/* group conditions by type */
+// group conditions by type
 		$grouped_conditions = array();
 		$cond_el = new CTable(S_NO_CONDITIONS_DEFINED);
 		$i=0;
 
-		foreach($conditions as $id => $val){
-			if(!isset($val['type'])) $val['type'] = 0;
-			if(!isset($val['operator'])) $val['operator'] = 0;
-			if(!isset($val['value'])) $val['value'] = 0;
+		foreach($conditions as $id => $condition){
+			if(!isset($condition['type'])) $condition['type'] = 0;
+			if(!isset($condition['operator'])) $condition['operator'] = 0;
+			if(!isset($condition['value'])) $condition['value'] = 0;
 
-			if(!str_in_array($val['type'], $allowed_conditions)) continue;
+			if(!str_in_array($condition['type'], $allowed_conditions)) continue;
 
 			$label = chr(ord('A') + $i);
 			$cond_el->addRow(array('('.$label.')',array(
 				new CCheckBox('g_conditionid[]', 'no', null,$i),
-				get_condition_desc($val['type'], $val['operator'], $val['value']))
+				get_condition_desc($condition['type'], $condition['operator'], $condition['value']))
 			));
 
-			$tblCond->addItem(new CVar("conditions[$i][type]", $val['type']));
-			$tblCond->addItem(new CVar("conditions[$i][operator]", $val['operator']));
-			$tblCond->addItem(new CVar("conditions[$i][value]", $val['value']));
+			$tblCond->addItem(new CVar("conditions[$i][type]", $condition['type']));
+			$tblCond->addItem(new CVar("conditions[$i][operator]", $condition['operator']));
+			$tblCond->addItem(new CVar("conditions[$i][value]", $condition['value']));
 
-			$grouped_conditions[$val['type']][] = $label;
+			$grouped_conditions[$condition['type']][] = $label;
 
 			$i++;
 		}
@@ -523,8 +521,8 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 				default: $group_op = S_OR; $glog_op = S_AND; break;
 			}
 
-			foreach($grouped_conditions as $id => $val)
-				$grouped_conditions[$id] = '('.implode(' '.$group_op.' ', $val).')';
+			foreach($grouped_conditions as $id => $condition)
+				$grouped_conditions[$id] = '('.implode(' '.$group_op.' ', $condition).')';
 
 			$grouped_conditions = implode(' '.$glog_op.' ', $grouped_conditions);
 
@@ -552,7 +550,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			if(isset($_REQUEST['actionid']) && !isset($_REQUEST['form_refresh'])){
 				$eventsource = $action['eventsource'];
 				$evaltype = $action['evaltype'];
-		}
+			}
 			else{
 				$evaltype = get_request('evaltype');
 				$eventsource = get_request('eventsource');
@@ -751,44 +749,12 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			$evaltype	= $action['evaltype'];
 			$esc_period	= $action['esc_period'];
 
-			/* prepate operations */
-			$sql = 'SELECT * '.
-					' FROM operations'.
-					' WHERE actionid='.$_REQUEST['actionid'].
-					' ORDER BY esc_step_from,operationtype,object,operationid';
-			$db_operations = DBselect($sql);
-
-			while($operation_data = DBfetch($db_operations)){
-				$operation_data = array(
-					'operationtype'	=>	$operation_data['operationtype'],
-					'operationid'	=>	$operation_data['operationid'],
-					'object'	=>	$operation_data['object'],
-					'objectid'	=>	$operation_data['objectid'],
-					'shortdata'	=>	$operation_data['shortdata'],
-					'longdata'	=>	$operation_data['longdata'],
-					'esc_period'	=>	$operation_data['esc_period'],
-					'esc_step_from'	=>	$operation_data['esc_step_from'],
-					'esc_step_to'	=>	$operation_data['esc_step_to'],
-					'default_msg'	=>	$operation_data['default_msg'],
-					'evaltype'	=>	$operation_data['evaltype']);
-
-				$operation_data['opconditions'] = array();
-
-				$sql = 'SELECT * FROM opconditions WHERE operationid='.$operation_data['operationid'];
-				$db_opconds = DBselect($sql);
-				while($db_opcond = DBfetch($db_opconds)){
-					$operation_data['opconditions'][] = $db_opcond;
-				}
-
-				$sql = 'SELECT * from opmediatypes WHERE operationid='.$operation_data['operationid'];
-				$db_opmtypes = DBSelect($sql);
-				if($db_opmtype = DBfetch($db_opmtypes)){
+			$operations	= $action['operations'];
+			foreach($operations as $aorow => &$operation_data){
+				if($db_opmtype = reset($operation_data['opmediatypes']))
 					$operation_data['mediatypeid'] = $db_opmtype['mediatypeid'];
-				}
-
-				if(str_in_array($operation_data, $operations)) continue;
-				array_push($operations, $operation_data);
 			}
+			unset($operation_data);
 		}
 		else{
 			$eventsource = get_request('eventsource');
@@ -819,30 +785,30 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		$allowed_operations = get_operations_by_eventsource($eventsource);
 
 		$delay = count_operations_delay($operations,$esc_period);
-		foreach($operations as $id => $val){
-			if(!str_in_array($val['operationtype'], $allowed_operations)) continue;
+		foreach($operations as $id => $condition){
+			if(!str_in_array($condition['operationtype'], $allowed_operations)) continue;
 
-			if(!isset($val['default_msg'])) $val['default_msg'] = 0;
-			if(!isset($val['opconditions'])) $val['opconditions'] = array();
-			if(!isset($val['mediatypeid'])) $val['mediatypeid'] = 0;
+			if(!isset($condition['default_msg'])) $condition['default_msg'] = 0;
+			if(!isset($condition['opconditions'])) $condition['opconditions'] = array();
+			if(!isset($condition['mediatypeid'])) $condition['mediatypeid'] = 0;
 
-			$oper_details = new CSpan(get_operation_desc(SHORT_DESCRITION, $val));
-			$oper_details->setHint(nl2br(get_operation_desc(LONG_DESCRITION, $val)));
+			$oper_details = new CSpan(get_operation_desc(SHORT_DESCRITION, $condition));
+			$oper_details->setHint(nl2br(get_operation_desc(LONG_DESCRITION, $condition)));
 
 			$esc_steps_txt = null;
 			$esc_period_txt = null;
 			$esc_delay_txt = null;
 
-			if($val['esc_step_from'] < 1) $val['esc_step_from'] = 1;
+			if($condition['esc_step_from'] < 1) $condition['esc_step_from'] = 1;
 
 			if(isset($_REQUEST['escalation'])){
-				$esc_steps_txt = $val['esc_step_from'].' - '.$val['esc_step_to'];
+				$esc_steps_txt = $condition['esc_step_from'].' - '.$condition['esc_step_to'];
 				/* Display N-N as N */
-				$esc_steps_txt = ($val['esc_step_from']==$val['esc_step_to'])?
-					$val['esc_step_from']:$val['esc_step_from'].' - '.$val['esc_step_to'];
+				$esc_steps_txt = ($condition['esc_step_from']==$condition['esc_step_to'])?
+					$condition['esc_step_from']:$condition['esc_step_from'].' - '.$condition['esc_step_to'];
 
-				$esc_period_txt = $val['esc_period']?$val['esc_period']:S_DEFAULT;
-				$esc_delay_txt = $delay[$val['esc_step_from']]?convert_units($delay[$val['esc_step_from']],'uptime'):S_IMMEDIATELY;
+				$esc_period_txt = $condition['esc_period']?$condition['esc_period']:S_DEFAULT;
+				$esc_delay_txt = $delay[$condition['esc_step_from']]?convert_units($delay[$condition['esc_step_from']],'uptime'):S_IMMEDIATELY;
 			}
 
 			$tblOper->addRow(array(
@@ -854,19 +820,19 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 				new CButton('edit_operationid['.$id.']',S_EDIT)
 			));
 
-			$tblOper->addItem(new CVar('operations['.$id.'][operationtype]'	,$val['operationtype']));
-			$tblOper->addItem(new CVar('operations['.$id.'][object]'	,$val['object']	));
-			$tblOper->addItem(new CVar('operations['.$id.'][objectid]'	,$val['objectid']));
-			$tblOper->addItem(new CVar('operations['.$id.'][mediatypeid]'	,$val['mediatypeid']));
-			$tblOper->addItem(new CVar('operations['.$id.'][shortdata]'	,$val['shortdata']));
-			$tblOper->addItem(new CVar('operations['.$id.'][longdata]'	,$val['longdata']));
-			$tblOper->addItem(new CVar('operations['.$id.'][esc_period]'	,$val['esc_period']	));
-			$tblOper->addItem(new CVar('operations['.$id.'][esc_step_from]'	,$val['esc_step_from']));
-			$tblOper->addItem(new CVar('operations['.$id.'][esc_step_to]'	,$val['esc_step_to']));
-			$tblOper->addItem(new CVar('operations['.$id.'][default_msg]'	,$val['default_msg']));
-			$tblOper->addItem(new CVar('operations['.$id.'][evaltype]'	,$val['evaltype']));
+			$tblOper->addItem(new CVar('operations['.$id.'][operationtype]'	,$condition['operationtype']));
+			$tblOper->addItem(new CVar('operations['.$id.'][object]'	,$condition['object']	));
+			$tblOper->addItem(new CVar('operations['.$id.'][objectid]'	,$condition['objectid']));
+			$tblOper->addItem(new CVar('operations['.$id.'][mediatypeid]'	,$condition['mediatypeid']));
+			$tblOper->addItem(new CVar('operations['.$id.'][shortdata]'	,$condition['shortdata']));
+			$tblOper->addItem(new CVar('operations['.$id.'][longdata]'	,$condition['longdata']));
+			$tblOper->addItem(new CVar('operations['.$id.'][esc_period]'	,$condition['esc_period']	));
+			$tblOper->addItem(new CVar('operations['.$id.'][esc_step_from]'	,$condition['esc_step_from']));
+			$tblOper->addItem(new CVar('operations['.$id.'][esc_step_to]'	,$condition['esc_step_to']));
+			$tblOper->addItem(new CVar('operations['.$id.'][default_msg]'	,$condition['default_msg']));
+			$tblOper->addItem(new CVar('operations['.$id.'][evaltype]'	,$condition['evaltype']));
 
-			foreach($val['opconditions'] as $opcondid => $opcond){
+			foreach($condition['opconditions'] as $opcondid => $opcond){
 				foreach($opcond as $field => $value)
 					$tblOper->addItem(new CVar('operations['.$id.'][opconditions]['.$opcondid.']['.$field.']',$value));
 			}
@@ -952,7 +918,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 				));
 
 				$tblNewOperation->addRow(array(S_STEP, $tblStep));
-		}
+			}
 			else{
 				$tblOper->addItem(new CVar('new_operation[esc_period]', $new_operation['esc_period']));
 				$tblOper->addItem(new CVar('new_operation[esc_step_from]', $new_operation['esc_step_from']));
@@ -971,14 +937,14 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 					if($new_operation['object'] == OPERATION_OBJECT_GROUP) {
 						$object_srctbl = 'usrgrp';
 						$object_srcfld1 = 'usrgrpid';
-						$object_name = CUserGroup::get(array('usrgrpids' => $new_operation['objectid'], 'extendoutput' => 1));
+						$object_name = CUserGroup::get(array('usrgrpids' => $new_operation['objectid'], 'output' => API_OUTPUT_EXTEND));
 						$object_name = reset($object_name);
 						$display_name = 'name';
 					}
 					else {
 						$object_srctbl = 'users';
 						$object_srcfld1 = 'userid';
-						$object_name = CUser::get(array('userids' => $new_operation['objectid'], 'extendoutput' => 1));
+						$object_name = CUser::get(array('userids' => $new_operation['objectid'], 'output' => API_OUTPUT_EXTEND));
 						$object_name = reset($object_name);
 						$display_name = 'alias';
 					}
@@ -1012,9 +978,9 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 						$sql = 'SELECT DISTINCT mt.mediatypeid,mt.description,m.userid ' .
 								' FROM media_type mt, media m ' .
 								' WHERE ' . DBin_node('mt.mediatypeid') .
-								' AND m.mediatypeid=mt.mediatypeid ' .
-								' AND m.userid=' . $new_operation['objectid'] .
-								' AND m.active=' . ACTION_STATUS_ENABLED .
+									' AND m.mediatypeid=mt.mediatypeid ' .
+									' AND m.userid=' . $new_operation['objectid'] .
+									' AND m.active=' . ACTION_STATUS_ENABLED .
 								' ORDER BY mt.description';
 						$db_mediatypes = DBselect($sql);
 						while($db_mediatype = DBfetch($db_mediatypes)){
@@ -1039,10 +1005,10 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 						$sql = 'SELECT mt.description,m.sendto,m.period,m.severity ' .
 								' FROM media_type mt,media m ' .
 								' WHERE ' . DBin_node('mt.mediatypeid') .
-								' AND mt.mediatypeid=m.mediatypeid ' .
-								' AND m.userid=' . $new_operation['objectid'] .
-								($new_operation['mediatypeid'] ? ' AND m.mediatypeid=' . $new_operation['mediatypeid'] : '') .
-								' AND m.active=' . ACTION_STATUS_ENABLED .
+									' AND mt.mediatypeid=m.mediatypeid ' .
+									' AND m.userid=' . $new_operation['objectid'] .
+									($new_operation['mediatypeid'] ? ' AND m.mediatypeid=' . $new_operation['mediatypeid'] : '') .
+									' AND m.active=' . ACTION_STATUS_ENABLED .
 								' ORDER BY mt.description,m.sendto';
 						$db_medias = DBselect($sql);
 						while($db_media = DBfetch($db_medias)) {
@@ -1051,8 +1017,8 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 								new CSpan($db_media['sendto'], 'nowrap'),
 								new CSpan($db_media['period'], 'nowrap'),
 								media_severity2str($db_media['severity'])
-				));
-		}
+							));
+						}
 
 						$tblNewOperation->addRow(array(S_USER_MEDIAS, $media_table));
 					}
@@ -1138,24 +1104,24 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 				$cond_el = new CTable(S_NO_CONDITIONS_DEFINED);
 				$i = 0;
 
-				foreach($opconditions as $val){
-					if(!isset($val['conditiontype'])) $val['conditiontype'] = 0;
-					if(!isset($val['operator'])) $val['operator'] = 0;
-					if(!isset($val['value'])) $val['value'] = 0;
+				foreach($opconditions as $condition){
+					if(!isset($condition['conditiontype'])) $condition['conditiontype'] = 0;
+					if(!isset($condition['operator'])) $condition['operator'] = 0;
+					if(!isset($condition['value'])) $condition['value'] = 0;
 
-					if(!str_in_array($val['conditiontype'], $allowed_opconditions)) continue;
+					if(!str_in_array($condition['conditiontype'], $allowed_opconditions)) continue;
 
 					$label = chr(ord('A') + $i);
 					$cond_el->addRow(array('(' . $label . ')', array(
 						new CCheckBox('g_opconditionid[]', 'no', null, $i),
-						get_condition_desc($val['conditiontype'], $val['operator'], $val['value']))
+						get_condition_desc($condition['conditiontype'], $condition['operator'], $condition['value']))
 					));
 
-					$tblCond->addItem(new CVar("new_operation[opconditions][$i][conditiontype]", $val["conditiontype"]));
-					$tblCond->addItem(new CVar("new_operation[opconditions][$i][operator]", $val["operator"]));
-					$tblCond->addItem(new CVar("new_operation[opconditions][$i][value]", $val["value"]));
+					$tblCond->addItem(new CVar("new_operation[opconditions][$i][conditiontype]", $condition["conditiontype"]));
+					$tblCond->addItem(new CVar("new_operation[opconditions][$i][operator]", $condition["operator"]));
+					$tblCond->addItem(new CVar("new_operation[opconditions][$i][value]", $condition["value"]));
 
-					$grouped_opconditions[$val["conditiontype"]][] = $label;
+					$grouped_opconditions[$condition["conditiontype"]][] = $label;
 
 					$i++;
 				}
@@ -1185,8 +1151,8 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 							break;
 					}
 
-					foreach($grouped_opconditions as $id => $val)
-						$grouped_opconditions[$id] = '(' . implode(' ' . $group_op . ' ', $val) . ')';
+					foreach($grouped_opconditions as $id => $condition)
+						$grouped_opconditions[$id] = '(' . implode(' ' . $group_op . ' ', $condition) . ')';
 
 					$grouped_opconditions = implode(' ' . $glog_op . ' ', $grouped_opconditions);
 
@@ -1323,7 +1289,9 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		$sortorder = getPageSortOrder();
 		$options = array(
 			'output' => API_OUTPUT_EXTEND,
-			'eventsource' => $_REQUEST['eventsource'],
+			'filter' => array(
+				'eventsource' => array($_REQUEST['eventsource'])
+			),
 			'select_conditions' => API_OUTPUT_EXTEND,
 			'select_operations' => API_OUTPUT_EXTEND,
 			'editable' => 1,
@@ -1405,6 +1373,9 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 
 	$action_wdgt->show();
 
+?>
+<?php
 
 include_once('include/page_footer.php');
+
 ?>

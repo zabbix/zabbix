@@ -107,13 +107,17 @@
 #undef vsprintf
 #endif
 #define vsprintf	ERROR_DO_NOT_USE_VSPRINTF_FUNCTION_TRY_TO_USE_VSNPRINTF
-/*#define strncat		ERROR_DO_NOT_USE_STRNCAT_FUNCTION_TRY_TO_USE_ZBX_STRLCAT*/
+
+#ifdef strncat
+#undef strncat
+#endif
+#define strncat		ERROR_DO_NOT_USE_STRNCAT_FUNCTION_TRY_TO_USE_ZBX_STRLCAT
 
 #define ON	1
 #define OFF	0
 
 #define	APPLICATION_NAME	"Zabbix Agent"
-#define	ZABBIX_REVDATE		"16 August 2010"
+#define	ZABBIX_REVDATE		"4 October 2010"
 #define	ZABBIX_VERSION		"1.8.4rc1"
 #define	ZABBIX_REVISION		"{ZABBIX_REVISION}"
 
@@ -145,10 +149,13 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #define	NETWORK_ERROR	(-3)
 #define	TIMEOUT_ERROR	(-4)
 #define	AGENT_ERROR	(-5)
-char	*zbx_result_string(int result);
+const char	*zbx_result_string(int result);
 
 #define MAX_STRING_LEN	2048
 #define MAX_BUF_LEN	65536
+
+#define DB_TEXT_LEN	65535
+#define DB_TEXT_LEN_MAX	DB_TEXT_LEN+1
 
 #define ZBX_DM_DELIMITER	'\255'
 
@@ -216,7 +223,7 @@ typedef enum
 	ITEM_VALUE_TYPE_UINT64,
 	ITEM_VALUE_TYPE_TEXT
 } zbx_item_value_type_t;
-char	*zbx_item_value_type_string(zbx_item_value_type_t value_type);
+const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type);
 
 /* Item data types */
 typedef enum
@@ -251,7 +258,7 @@ typedef enum
 	SVC_ICMPPING,
 	SVC_SNMPv3
 } zbx_dservice_type_t;
-char	*zbx_dservice_type_string(zbx_dservice_type_t service);
+const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 
 /* Item snmpv3 security levels */
 #define ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV	0
@@ -389,7 +396,8 @@ typedef enum
 	MEDIA_TYPE_EMAIL = 0,
 	MEDIA_TYPE_EXEC,
 	MEDIA_TYPE_SMS,
-	MEDIA_TYPE_JABBER
+	MEDIA_TYPE_JABBER,
+	MEDIA_TYPE_EZ_TEXTING = 100
 } zbx_media_type_t;
 
 /* Alert statuses */
@@ -507,17 +515,6 @@ typedef enum
 #define HOST_AVAILABLE_TRUE	1
 #define HOST_AVAILABLE_FALSE	2
 
-/* Use host IP or host name */
-#define HOST_USE_HOSTNAME	0
-#define HOST_USE_IP		1
-
-/* Trigger statuses */
-/*#define TRIGGER_STATUS_FALSE	0
-#define TRIGGER_STATUS_TRUE	1
-#define TRIGGER_STATUS_DISABLED	2
-#define TRIGGER_STATUS_UNKNOWN	3
-#define TRIGGER_STATUS_NOTSUPPORTED	4*/
-
 /* Trigger statuses */
 #define TRIGGER_STATUS_ENABLED	0
 #define TRIGGER_STATUS_DISABLED	1
@@ -537,7 +534,7 @@ typedef enum
 	TRIGGER_SEVERITY_HIGH,
 	TRIGGER_SEVERITY_DISASTER
 } zbx_trigger_severity_t;
-char	*zbx_trigger_severity_string(zbx_trigger_severity_t severity);
+const char	*zbx_trigger_severity_string(zbx_trigger_severity_t severity);
 
 typedef enum
 {
@@ -547,7 +544,7 @@ typedef enum
 	ITEM_LOGTYPE_FAILURE_AUDIT = 7,
 	ITEM_LOGTYPE_SUCCESS_AUDIT
 } zbx_item_logtype_t;
-char	*zbx_item_logtype_string(zbx_item_logtype_t logtype);
+const char	*zbx_item_logtype_string(zbx_item_logtype_t logtype);
 /* Media statuses */
 #define MEDIA_STATUS_ACTIVE	0
 #define MEDIA_STATUS_DISABLED	1
@@ -619,7 +616,7 @@ typedef enum
 	PERM_MAX = 3
 } zbx_user_permission_t;
 
-const char *zbx_permission_string(int perm);
+const char	*zbx_permission_string(int perm);
 
 /* Flags */
 #define	ZBX_SYNC		0x01
@@ -629,29 +626,17 @@ const char *zbx_permission_string(int perm);
 #define ZBX_HISTORY_TRENDS	0x10
 #define ZBX_PROXY		0x20
 
-/* Types of nodes */
-#define	ZBX_NODE_TYPE_REMOTE	0
-#define	ZBX_NODE_TYPE_LOCAL	1
-
-#define	POLLER_DELAY	5
+#define POLLER_DELAY		5
 #define DISCOVERER_DELAY	60
 
 #define	ZBX_NO_POLLER			255
 #define	ZBX_POLLER_TYPE_NORMAL		0
-#define	ZBX_POLLER_TYPE_IPMI		1
-#define	ZBX_POLLER_TYPE_PINGER		2
-#define	ZBX_POLLER_TYPE_COUNT		3	/* number of poller types */
+#define	ZBX_POLLER_TYPE_UNREACHABLE	1
+#define	ZBX_POLLER_TYPE_IPMI		2
+#define	ZBX_POLLER_TYPE_PINGER		3
+#define	ZBX_POLLER_TYPE_COUNT		4	/* number of poller types */
 
-#define	POLLER_TIMEOUT	5
-/* Do not perform more than this number of checks during unavailability period */
-/*#define SLEEP_ON_UNREACHABLE		60*/
-/*#define CHECKS_PER_UNAVAILABLE_PERIOD	4*/
-
-#define	AGENT_TIMEOUT	3
-
-#define	SENDER_TIMEOUT		60
-#define	ZABBIX_TRAPPER_TIMEOUT	300
-#define	SNMPTRAPPER_TIMEOUT	5
+#define	GET_SENDER_TIMEOUT	60
 
 #ifndef MAX
 #	define MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -662,14 +647,14 @@ const char *zbx_permission_string(int perm);
 #endif
 
 /* Secure string copy */
-#define strscpy(x,y) zbx_strlcpy(x,y,sizeof(x))
-#define strnscpy(x,y,n) zbx_strlcpy(x,y,n);
+#define strscpy(x, y)		zbx_strlcpy(x, y, sizeof(x))
+#define strnscpy(x, y, n)	zbx_strlcpy(x, y, n);
 
-#define	zbx_malloc(old, size) zbx_malloc2(__FILE__, __LINE__, old , size)
-#define	zbx_realloc(old, size) zbx_realloc2(__FILE__, __LINE__, old , size)
+#define zbx_malloc(old, size)	zbx_malloc2(__FILE__, __LINE__, old , size)
+#define zbx_realloc(old, size)	zbx_realloc2(__FILE__, __LINE__, old , size)
 
-void    *zbx_malloc2(char *filename, int line, void *old, size_t size);
-void    *zbx_realloc2(char *filename, int line, void *src, size_t size);
+void    *zbx_malloc2(const char *filename, int line, void *old, size_t size);
+void    *zbx_realloc2(const char *filename, int line, void *src, size_t size);
 
 #define zbx_free(ptr)		\
 	if (ptr)		\
@@ -724,7 +709,8 @@ typedef enum
 typedef enum
 {
 	HTTPTEST_AUTH_NONE = 0,
-	HTTPTEST_AUTH_BASIC
+	HTTPTEST_AUTH_BASIC,
+	HTTPTEST_AUTH_NTLM
 } zbx_httptest_auth_t;
 
 #define ZBX_TASK_FLAG_MULTIPLE_AGENTS 0x01
@@ -736,19 +722,21 @@ ZBX_TASK_EX
 	int		flags;
 };
 
-char	*string_replace(char *str, char *sub_str1, char *sub_str2);
+char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2);
 
 int	is_double_prefix(const char *str);
 int	is_double(const char *c);
 int	is_uint_prefix(const char *c);
 int	is_uint(const char *c);
+int	is_int_prefix(const char *c);
 int	is_uint64(const char *str, zbx_uint64_t *value);
+int	is_ushort(const char *str, unsigned short *value);
 int	is_uoct(const char *str);
 int	is_uhex(const char *str);
 int	is_hex_string(const char *str);
 int	is_ascii_string(const char *str);
-void	zbx_rtrim(char *str, const char *charlist);
-void	zbx_ltrim(register char *str, const char *charlist);
+int	zbx_rtrim(char *str, const char *charlist);
+void	zbx_ltrim(char *str, const char *charlist);
 void	zbx_remove_chars(register char *str, const char *charlist);
 #define zbx_remove_spaces(str)		zbx_remove_chars(str, " ");
 #define zbx_remove_whitespace(str)	zbx_remove_chars(str, " \t\r\n");
@@ -795,8 +783,8 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 #define SEC_PER_WEEK (7*SEC_PER_DAY)
 #define SEC_PER_YEAR (365*SEC_PER_DAY)
 #define ZBX_JAN_1970_IN_SEC   2208988800.0        /* 1970 - 1900 in seconds */
-double	zbx_time(void);
-double	zbx_current_time(void);
+double	zbx_time();
+double	zbx_current_time();
 
 #ifdef HAVE___VA_ARGS__
 #	define zbx_error(fmt, ...) __zbx_zbx_error(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
@@ -843,7 +831,7 @@ char	*zbx_strdcat(char *dest, const char *src);
 #else
 #	define zbx_strdcatf __zbx_zbx_strdcatf
 #endif /* HAVE___VA_ARGS__ */
-char* __zbx_zbx_strdcatf(char *dest, const char *f, ...);
+char	* __zbx_zbx_strdcatf(char *dest, const char *f, ...);
 
 int	xml_get_data_dyn(const char *xml, const char *tag, char **data);
 void	xml_free_data_dyn(char **data);
@@ -919,6 +907,7 @@ void	zbx_strupper(char *str);
 #if defined(_WINDOWS) || defined(HAVE_ICONV)
 char	*convert_to_utf8(char *in, size_t in_size, const char *encoding);
 #endif	/* HAVE_ICONV */
+char	*zbx_replace_utf8(const char *text, char replacement);
 
 void	win2unix_eol(char *text);
 int	str2uint(const char *str);

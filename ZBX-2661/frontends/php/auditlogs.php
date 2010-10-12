@@ -145,7 +145,7 @@ include_once('include/page_header.php');
 	$filterForm->addRow(S_ACTION, $cmbAction);
 
 	$cmbResource = new CComboBox('resourcetype',$_REQUEST['resourcetype']);
-	$resources = array_merge(array(-1 => S_ALL_S), audit_resource2str());
+	$resources = array(-1 => S_ALL_S) + audit_resource2str();
 	$cmbResource->addItems($resources);
 
 	$filterForm->addRow(S_RESOURCE, $cmbResource);

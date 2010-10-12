@@ -152,8 +152,7 @@
 		return $form;
 	}
 
-	function	insert_httpstep_form()
-	{
+	function insert_httpstep_form(){
 		$form = new CFormTable(S_STEP_OF_SCENARIO, null, 'post');
 		$form->setHelp("web.webmon.httpconf.php");
 
@@ -181,207 +180,6 @@
 		$form->addItemToBottomRow(new CButtonCancel(null,'close_window();'));
 
 		$form->show();
-	}
-
-	function insert_httptest_form(){
-
-		$form = new CFormTable(S_SCENARIO, null, 'post');
-		$form->setName('form_scenario');
-
-		if($_REQUEST['groupid'] > 0)
-			$form->addVar('groupid', $_REQUEST['groupid']);
-
-		$form->addVar('hostid', $_REQUEST['hostid']);
-
-		if(isset($_REQUEST['httptestid'])){
-			$form->addVar('httptestid', $_REQUEST['httptestid']);
-		}
-
-		$name		= get_request('name', '');
-		$application	= get_request('application', '');
-		$delay		= get_request('delay', 60);
-		$status		= get_request('status', HTTPTEST_STATUS_ACTIVE);
-		$agent		= get_request('agent', '');
-		$macros		= get_request('macros', array());
-		$steps		= get_request('steps', array());
-
-		$authentication = get_request('authentication', HTTPTEST_AUTH_NONE);
-		$http_user	= get_request('http_user', '');
-		$http_password 	= get_request('http_password', '');
-
-		if((isset($_REQUEST["httptestid"]) && !isset($_REQUEST["form_refresh"])) || isset($limited)){
-			$httptest_data = DBfetch(DBselect("SELECT wt.*, a.name as application ".
-				" FROM httptest wt,applications a WHERE wt.httptestid=".$_REQUEST["httptestid"].
-				" AND a.applicationid=wt.applicationid"));
-
-			$name		= $httptest_data['name'];
-			$application	= $httptest_data['application'];
-			$delay		= $httptest_data['delay'];
-			$status		= $httptest_data['status'];
-			$agent		= $httptest_data['agent'];
-			$macros		= $httptest_data['macros'];
-
-			$authentication = $httptest_data['authentication'];
-			$http_user 	= $httptest_data['http_user'];
-			$http_password 	= $httptest_data['http_password'];
-
-			$steps		= array();
-			$db_steps = DBselect('SELECT * FROM httpstep WHERE httptestid='.$_REQUEST["httptestid"].' order by no');
-			while($step_data = DBfetch($db_steps))
-			{
-				$steps[] = $step_data;
-			}
-		}
-
-		$form->addRow(S_APPLICATION,array(
-			new CTextBox('application', $application, 40),
-			SPACE,
-			new CButton('select_app',S_SELECT,
-				'return PopUp("popup.php?dstfrm='.$form->getName().
-				'&dstfld1=application&srctbl=applications'.
-				'&srcfld1=name&only_hostid='.$_REQUEST['hostid'].'",500,600,"application");')
-			));
-
-		$form->addRow(S_NAME, new CTextBox('name', $name, 40));
-
-		$cmbAuth = new CComboBox('authentication',$authentication,'submit();');
-		$cmbAuth->addItem(HTTPTEST_AUTH_NONE,S_NONE);
-		$cmbAuth->addItem(HTTPTEST_AUTH_BASIC,S_BASIC_AUTHENTICATION);
-
-		$form->addRow(S_BASIC_AUTHENTICATION, $cmbAuth);
-		if($authentication == HTTPTEST_AUTH_BASIC){
-			$form->addRow(S_USER, new CTextBox('http_user', $http_user, 32));
-			$form->addRow(S_PASSWORD, new CTextBox('http_password', $http_password, 40));
-		}
-
-		$form->addRow(S_UPDATE_INTERVAL_IN_SEC, new CNumericBox("delay",$delay,5));
-
-		$cmbAgent = new CEditableComboBox('agent', $agent, 80);
-// IE6
-		$cmbAgent->addItem('Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 2.0.50727)',
-			'Internet Explorer 6.0 on Windows XP SP2 with .NET Framework 2.0 installed');
-// IE7
-		$cmbAgent->addItem('Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.648; .NET CLR 3.5.21022)', 'Internet Explorer 7.0 on Windows XP SP3 with .NET Framework 3.5 installed');
-// FF 1.5
-		$cmbAgent->addItem('Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.0.7) Gecko/20060909 Firefox/1.5.0.7',
-			'Mozilla Firefox 1.5.0.7 on Windows XP');
-		$cmbAgent->addItem('Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.0.7) Gecko/20060909 Firefox/1.5.0.7',
-			'Mozilla Firefox 1.5.0.7 on Linux');
-// FF 2.0
-		$cmbAgent->addItem('Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.18) Gecko/20081029 Firefox/2.0.0.18',
-			'Mozilla Firefox 2.0.0.18 on Windows XP');
-		$cmbAgent->addItem('Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.18) Gecko/20081029 Firefox/2.0.0.18',
-			'Mozilla Firefox 2.0.0.18 on Linux');
-// FF 3.0
-		$cmbAgent->addItem('Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.1) Gecko/2008070208 Firefox/3.0.1',
-			'Mozilla Firefox 3.0.1 on Windows XP');
-		$cmbAgent->addItem('Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.1) Gecko/2008070208 Firefox/3.0.1',
-			'Mozilla Firefox 3.0.1 on Linux');
-// OP 9.0
-		$cmbAgent->addItem('Opera/9.02 (Windows NT 5.1; U; en)',
-			'Opera 9.02 on Windows XP');
-		$cmbAgent->addItem('Opera/9.02 (X11; Linux i686; U; en)',
-			'Opera 9.02 on Linux');
-// OP 9.6
-		$cmbAgent->addItem('Opera/9.61 (Windows NT 5.1; U; en) Presto/2.1.1',
-			'Opera 9.61 on Windows XP');
-		$cmbAgent->addItem('Opera/9.61 (X11; Linux i686; U; en) Presto/2.1.1',
-			'Opera 9.61 on Linux');
-// SF 3.1
-		$cmbAgent->addItem('Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) AppleWebKit/525.19 (KHTML, like Gecko) Version/3.1.2 Safari/525.21',
-			'Safari 3.1.2 on Windows XP');
-		$cmbAgent->addItem('Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_5_4; en-us) AppleWebKit/527.2+ (KHTML, like Gecko) Version/3.1.2 Safari/525.20.1',
-			'Safari 3.1.2 on Intel Mac OS X 10.5.4');
-		$cmbAgent->addItem('Mozilla/5.0 (iPhone; U; CPU iPhone OS 2_1 like Mac OS X; fr-fr) AppleWebKit/525.18.1 (KHTML, like Gecko) Mobile/5F136',
-			'Safari on iPhone');
-
-		$cmbAgent->addItem('Lynx/2.8.4rel.1 libwww-FM/2.14',
-			'Lynx 2.8.4rel.1 on Linux');
-		$cmbAgent->addItem('Googlebot/2.1 (+http://www.google.com/bot.html)',
-			'Googlebot');
-		$form->addRow(S_AGENT, $cmbAgent);
-
-		$cmbStatus = new CComboBox("status", $status);
-		foreach(array(HTTPTEST_STATUS_ACTIVE, HTTPTEST_STATUS_DISABLED) as $st)
-			$cmbStatus->addItem($st, httptest_status2str($st));
-		$form->addRow(S_STATUS,$cmbStatus);
-
-		$form->addRow(S_VARIABLES, new CTextArea('macros', $macros, 84, 5));
-
-		$tblSteps = new CTableInfo();
-		$tblSteps->setHeader(array(S_NAME,S_TIMEOUT,S_URL,S_REQUIRED,S_STATUS,S_SORT));
-		if(count($steps) > 0){
-			$first = min(array_keys($steps));
-			$last = max(array_keys($steps));
-		}
-		foreach($steps as $stepid => $s){
-			if(!isset($s['name']))		$s['name'] = '';
-			if(!isset($s['timeout']))	$s['timeout'] = 15;
-			if(!isset($s['url']))		$s['url'] = '';
-			if(!isset($s['posts']))		$s['posts'] = '';
-			if(!isset($s['required']))	$s['required'] = '';
-
-			$up = null;
-			if($stepid != $first){
-				$up = new CSpan(S_UP,'link');
-				$up->onClick("return create_var('".$form->getName()."','move_up',".$stepid.", true);");
-			}
-
-			$down = null;
-			if($stepid != $last){
-				$down = new CLink(S_DOWN,'link');
-				$down->onClick("return create_var('".$form->getName()."','move_down',".$stepid.", true);");
-			}
-
-			$name = new CSpan($s['name'],'link');
-			$name->onClick('return PopUp("popup_httpstep.php?dstfrm='.$form->getName().
-				'&list_name=steps&stepid='.$stepid.
-				url_param($s['name'],false,'name').
-				url_param($s['timeout'],false,'timeout').
-				url_param($s['url'],false,'url').
-				url_param($s['posts'],false,'posts').
-				url_param($s['required'],false,'required').
-				url_param($s['status_codes'],false,'status_codes').
-				'");');
-
-			if(zbx_strlen($s['url']) > 70){
-				$url = new CTag('span','yes', substr($s['url'],0,35).SPACE.'...'.SPACE.substr($s['url'],zbx_strlen($s['url'])-25,25));
-				$url->setHint($s['url']);
-			}
-			else{
-				$url = $s['url'];
-			}
-
-			$tblSteps->addRow(array(
-				array(new CCheckBox('sel_step[]',null,null,$stepid), $name),
-				$s['timeout'].SPACE.S_SEC_SMALL,
-				$url,
-				$s['required'],
-				$s['status_codes'],
-				array($up, isset($up) && isset($down) ? SPACE : null, $down)
-				));
-		}
-		$form->addVar('steps', $steps);
-
-		$form->addRow(S_STEPS, array(
-			(count($steps) > 0) ? array ($tblSteps, BR()) : null ,
-			new CButton('add_step',S_ADD,
-				'return PopUp("popup_httpstep.php?dstfrm='.$form->getName().'");'),
-			(count($steps) > 0) ? new CButton('del_sel_step',S_DELETE_SELECTED) : null
-			));
-
-		$form->addItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["httptestid"])){
-			$form->addItemToBottomRow(SPACE);
-			$form->addItemToBottomRow(new CButton("clone",S_CLONE));
-			$form->addItemToBottomRow(SPACE);
-			$form->addItemToBottomRow(new CButtonDelete(S_DELETE_SCENARIO_Q,
-				url_param("form").url_param("httptestid").url_param('hostid')));
-		}
-		$form->addItemToBottomRow(SPACE);
-		$form->addItemToBottomRow(new CButtonCancel());
-
-		return $form;
 	}
 
 // Insert form for User
@@ -5027,26 +4825,6 @@ JAVASCRIPT;
 		return $frmMap;
 	}
 
-	function insert_command_result_form($scriptid,$hostid){
-		$result = execute_script($scriptid,$hostid);
-
-		$sql = 'SELECT name '.
-				' FROM scripts '.
-				' WHERE scriptid='.$scriptid;
-		$script_info = DBfetch(DBselect($sql));
-
-		$frmResult = new CFormTable($script_info['name'].': '.script_make_command($scriptid,$hostid));
-		$message = $result['value'];
-		if($result['response'] == 'failed'){
-			error($message);
-			$message = '';
-		}
-
-		$frmResult->addRow(S_RESULT,new CTextArea('message',$message,100,25,'yes'));
-		$frmResult->addItemToBottomRow(new CButton('close',S_CLOSE,'window.close();'));
-		$frmResult->show();
-	}
-
 	function get_regexp_form(){
 		$frm_title = S_REGULAR_EXPRESSION;
 
@@ -5446,11 +5224,11 @@ JAVASCRIPT;
 			$macros = get_request('macros', array());
 		}
 		else if($hostid > 0){
-			$macros = CUserMacro::get(array('extendoutput' => 1, 'hostids' => $hostid));
+			$macros = CUserMacro::get(array('output' => API_OUTPUT_EXTEND, 'hostids' => $hostid));
 			order_result($macros, 'macro');
 		}
 		else if($hostid === null){
-			$macros = CUserMacro::get(array('extendoutput' => 1, 'globalmacro' => 1));
+			$macros = CUserMacro::get(array('output' => API_OUTPUT_EXTEND, 'globalmacro' => 1));
 			order_result($macros, 'macro');
 		}
 		else{

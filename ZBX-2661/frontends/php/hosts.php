@@ -309,7 +309,7 @@ include_once('include/page_header.php');
 		require_once('include/export.inc.php');
 		DBstart();
 		$result = zbxXML::import($_FILES['import_file']['tmp_name']);
-		$result &= zbxXML::parseMain($rules);
+		if($result) $result = zbxXML::parseMain($rules);
 		$result = DBend($result);
 		show_messages($result, S_IMPORTED.SPACE.S_SUCCESSEFULLY_SMALL, S_IMPORT.SPACE.S_FAILED_SMALL);
 	}
@@ -503,6 +503,11 @@ include_once('include/page_header.php');
 			}
 			$groups = zbx_toObject($groups, 'groupid');
 
+			$macros = get_request('macros', array());
+			foreach($macros as $mnum => $macro){
+				if(zbx_empty($macro['value'])) unset($macros[$mnum]);
+			}
+
 			$host = array(
 				'host' => $_REQUEST['host'],
 				'port' => $_REQUEST['port'],
@@ -520,7 +525,7 @@ include_once('include/page_header.php');
 				'ipmi_password' => $_REQUEST['ipmi_password'],
 				'groups' => $groups,
 				'templates' => $templates,
-				'macros' => get_request('macros', array()),
+				'macros' => $macros,
 				'extendedProfile' => (get_request('useprofile_ext', 'no') == 'yes') ? get_request('ext_host_profiles', array()) : array(),
 			);
 

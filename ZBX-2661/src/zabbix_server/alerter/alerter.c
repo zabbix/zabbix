@@ -23,12 +23,8 @@
 #include "db.h"
 #include "log.h"
 #include "zlog.h"
-#include "email.h"
-#include "sms.h"
-#if defined(HAVE_JABBER)
-#	include "jabber.h"
-#endif
 #include "daemon.h"
+#include "zbxmedia.h"
 #include "zbxserver.h"
 
 #include "alerter.h"
@@ -79,6 +75,12 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 	{
 		/* SMS uses its own timeouts */
 		res = send_sms(mediatype->gsm_modem, alert->sendto, alert->message, error, max_error_len);
+	}
+	else if (MEDIA_TYPE_EZ_TEXTING == mediatype->type)
+	{
+		/* Ez Texting uses its own timeouts */
+		res = send_ez_texting(mediatype->username, mediatype->passwd,
+				alert->sendto, alert->message, mediatype->exec_path, error, max_error_len);
 	}
 	else if (MEDIA_TYPE_EXEC == mediatype->type)
 	{

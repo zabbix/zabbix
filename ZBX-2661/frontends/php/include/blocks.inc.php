@@ -1017,7 +1017,7 @@ function make_latest_issues($filter = array()){
 
 			$description = new CCol($description,get_severity_style($trigger['priority']));
 			$description->setHint(make_popup_eventlist($row_event['eventid'], $trigger['type'], $trigger['triggerid']), '', '', false);
-
+		
 			$table->addRow(array(
 				get_node_name_by_elid($trigger['triggerid']),
 				$host,

@@ -20,16 +20,23 @@
 ?>
 <?php
 
-	function media_type2str($type){
-		$str_type[MEDIA_TYPE_EMAIL]	= S_EMAIL;
-		$str_type[MEDIA_TYPE_EXEC]	= S_SCRIPT;
-		$str_type[MEDIA_TYPE_SMS]	= S_SMS;
-		$str_type[MEDIA_TYPE_JABBER]	= S_JABBER;
+	function media_type2str($type=null){
+		$media_types = array(
+			MEDIA_TYPE_EMAIL => S_EMAIL,
+			MEDIA_TYPE_EXEC => S_SCRIPT,
+			MEDIA_TYPE_SMS => S_SMS,
+			MEDIA_TYPE_JABBER => S_JABBER,
+			MEDIA_TYPE_EZ_TEXTING => S_EZ_TEXTING,
+		);
 
-		if(isset($str_type[$type]))
-			return $str_type[$type];
-
-		return S_UNKNOWN;
+		if(is_null($type)){
+			natsort($media_types);
+			return $media_types;
+		}
+		else if(isset($media_types[$type]))
+			return $media_types[$type];
+		else
+			return S_UNKNOWN;
 	}
 
 	function media_severity2str($severity){

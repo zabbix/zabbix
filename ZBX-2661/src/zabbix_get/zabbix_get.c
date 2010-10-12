@@ -27,21 +27,21 @@
 
 const char	*progname = NULL;
 const char	title_message[] = "Zabbix Get";
-const char	usage_message[] = "[-hV] -s<host name or IP> [-p<port>] [-I<ip address>] -k<key>";
+const char	usage_message[] = "[-hV] -s <host name or IP> [-p <port>] [-I <IP address>] -k <key>";
 
 #ifdef HAVE_GETOPT_LONG
 const char	*help_message[] = {
         "Options:",
 	"  -s --host <host name or IP>          Specify host name or IP address of a host.",
 	"  -p --port <port number>              Specify port number of agent running on the host. Default is 10050.",
-	"  -I --source-address <ip address>     Specify source IP address",
+	"  -I --source-address <IP address>     Specify source IP address",
 	"",
-	"  -k --key <key of metric>             Specify metric name (key) we want to retrieve.",
+	"  -k --key <key of metric>             Specify item key to retrieve.",
 	"",
 	"  -h --help                            Give this help",
 	"  -V --version                         Display version number",
 	"",
-	"Example: zabbix_get -s127.0.0.1 -p10050 -k\"system.cpu.load[all,avg1]\"",
+	"Example: zabbix_get -s 127.0.0.1 -p 10050 -k \"system.cpu.load[all,avg1]\"",
         0 /* end of text */
 };
 #else
@@ -49,14 +49,14 @@ const char	*help_message[] = {
         "Options:",
 	"  -s <host name or IP>         Specify host name or IP address of a host.",
 	"  -p <port number>             Specify port number of agent running on the host. Default is 10050.",
-	"  -I <ip address>              Specify source IP address",
+	"  -I <IP address>              Specify source IP address",
 	"",
-	"  -k <key of metric>           Specify metric name (key) we want to retrieve.",
+	"  -k <key of metric>           Specify item key to retrieve.",
 	"",
 	"  -h                           Give this help",
 	"  -V                           Display version number",
 	"",
-	"Example: zabbix_get -s127.0.0.1 -p10050 -k\"system.cpu.load[all,avg1]\"",
+	"Example: zabbix_get -s 127.0.0.1 -p 10050 -k \"system.cpu.load[all,avg1]\"",
         0 /* end of text */
 };
 #endif
@@ -114,13 +114,13 @@ static void	get_signal_handler(int sig)
  *                                                                            *
  * Purpose: connect to Zabbix agent and receive value for given key           *
  *                                                                            *
- * Parameters: host   - serv name or IP address                               *
+ * Parameters: host   - server name or IP address                             *
  *             port   - port number                                           *
  *             key    - item's key                                            *
  *             value_max_len - maximal size of value                          *
  *                                                                            *
  * Return value: SUCCEED - ok, FAIL - otherwise                               *
- *             value   - retrieved value                                      *
+ *             value  - retrieved value                                       *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -144,11 +144,12 @@ static int	get_value(
 
 	*value = NULL;
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, source_ip, host, port, SENDER_TIMEOUT))) {
-		zbx_snprintf(request, sizeof(request),"%s\n",key);
-		if( SUCCEED == (ret = zbx_tcp_send(&s, request)) )
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, source_ip, host, port, GET_SENDER_TIMEOUT)))
+	{
+		zbx_snprintf(request, sizeof(request), "%s\n", key);
+		if (SUCCEED == (ret = zbx_tcp_send(&s, request)))
 		{
-			if( SUCCEED == (ret = zbx_tcp_recv_ext(&s, &buf, ZBX_TCP_READ_UNTIL_CLOSE, 0)) )
+			if (SUCCEED == (ret = zbx_tcp_recv_ext(&s, &buf, ZBX_TCP_READ_UNTIL_CLOSE, 0)))
 			{
 				zbx_rtrim(buf, "\r\n");
 				*value = strdup(buf);

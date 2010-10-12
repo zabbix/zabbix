@@ -2989,9 +2989,16 @@ zbx_uint64_t	DCget_nextid_shared(const char *table_name)
 
 	UNLOCK_CACHE_IDS;
 
+retry:
 	nextid = DBget_nextid(table_name, ZBX_RESERVE) - 1;
 
 	LOCK_CACHE_IDS;
+
+	if (nextid < id->lastid)
+	{
+		UNLOCK_CACHE_IDS;
+		goto retry;
+	}
 
 	if (0 == id->reserved)
 	{

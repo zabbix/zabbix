@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -61,7 +61,8 @@ class CMaintenance extends CZBXAPI{
 			'where' => array(),
 			'group' => array(),
 			'order' => array(),
-			'limit' => null);
+			'limit' => null
+		);
 
 		$def_options = array(
 			'nodeids'				=> null,
@@ -70,8 +71,13 @@ class CMaintenance extends CZBXAPI{
 			'maintenanceids'		=> null,
 			'editable'				=> null,
 			'nopermissions'			=> null,
+
 // filter
-			'pattern'				=> '',
+			'filter'					=> null,
+			'search'					=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
+			'filter'				=> null,
 
 // OutPut
 			'output'				=> API_OUTPUT_REFER,
@@ -199,6 +205,10 @@ class CMaintenance extends CZBXAPI{
 		}
 
 
+
+
+
+
 // nodeids
 		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
@@ -237,9 +247,14 @@ class CMaintenance extends CZBXAPI{
 			}
 		}
 
-// pattern
-		if(!zbx_empty($options['pattern'])){
-			$sql_parts['where'][] = ' UPPER(m.name) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
+// filter
+		if(is_array($options['filter'])){
+			zbx_db_filter('maintenances m', $options, $sql_parts);
+		}
+
+// search
+		if(is_array($options['search'])){
+			zbx_db_search('maintenances m', $options, $sql_parts);
 		}
 
 // order
@@ -379,6 +394,7 @@ Copt::memoryPick();
 			}
 		}
 
+Copt::memoryPick();
 // removing keys (hash -> array)
 		if(is_null($options['preservekeys'])){
 			$result = zbx_cleanHashes($result);
@@ -386,6 +402,29 @@ Copt::memoryPick();
 
 	return $result;
 	}
+
+
+	/**
+	 * Determine, whether an object already exists
+	 *
+	 * @param array $object
+	 * @return bool
+	 */
+	public static function exists($object){
+		$keyFields = array(array('maintenanceid', 'name'));
+
+		$options = array(
+			'filter' => zbx_array_mintersect($keyFields, $object),
+			'output' => API_OUTPUT_SHORTEN,
+			'nopermissions' => 1,
+			'limit' => 1
+		);
+
+		$objs = self::get($options);
+
+	return !empty($objs);
+	}
+
 
 /**
  * Add maintenances
@@ -440,7 +479,7 @@ Copt::memoryPick();
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				}
 			}
-
+//---
 
 			$tid = 0;
 			$insert = array();
@@ -454,6 +493,10 @@ Copt::memoryPick();
 				);
 				if(!check_db_fields($db_fields, $maintenance)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect parameters used for Maintenance');
+				}
+				//checkig wheter a maintence with this name already exists
+				if(self::exists(array('name' => $maintenance['name']))){
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_MAINTENANCE.' [ '.$maintenance['name'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
 
 				$insert[$mnum] = $maintenance;
@@ -549,6 +592,23 @@ Copt::memoryPick();
 				if(!isset($upd_maintenances[$maintenance['maintenanceid']])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				}
+
+				//checkig wheter a maintence with this name and different already exists
+				//first, getting all maintences with the same name as this
+				$options = array(
+					'filter' => array(
+									'name'=>$maintenance['name']
+								)
+				);
+				$recieved_maintenaces = CMaintenance::get($options);
+				//now going though a result, to find records with different id, then our object
+				foreach($recieved_maintenaces as $r_maintenace){
+					if ($r_maintenace['maintenanceid'] != $maintenance['maintenanceid']) {
+						//error! Maintenance with this name already exists
+						self::exception(ZBX_API_ERROR_PARAMETERS, S_MAINTENANCE.' [ '.$maintenance['name'].' ] '.S_ALREADY_EXISTS_SMALL);
+					}
+				}
+
 				$hostids = array_merge($hostids, $maintenance['hostids']);
 				$groupids = array_merge($groupids, $maintenance['groupids']);
 			}
@@ -730,6 +790,9 @@ Copt::memoryPick();
 			return false;
 		}
 	}
+
+
+
 
 }
 ?>
