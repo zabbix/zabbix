@@ -17,7 +17,7 @@ Object.extend(ZBX_TPL,{
 		'</td>',
 'selementFormUrls': '<tr id="urlrow_#{sysmapelementurlid}">'+
 			'<td>'+
-				'<input class="biginput" name="name" id="url_name_#{sysmapelementurlid}" type="text" size="16" value="#{name}">'+
+				'<input class="biginput" name="name" id="url_name_#{sysmapelementurlid}" type="text" size="16" maxlength="16" value="#{name}">'+
 			'</td>'+
 			'<td><input class="biginput" name="url" id="url_url_#{sysmapelementurlid}" type="text" size="32" value="#{url}"></td>'+
 			'<td><span class="link_menu" onclick="$(\'urlrow_#{sysmapelementurlid}\').remove();">'+locale['S_REMOVE']+'</span></td>'+

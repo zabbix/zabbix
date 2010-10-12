@@ -337,6 +337,7 @@ include_once('include/page_header.php');
 			$i = 0;
 			foreach($urls as $url){
 				$url_label = new CTextBox('urls['.$i.'][name]', $url['name'], 16);
+				$url_label->setAttribute('maxlength', '16');
 				$url_link = new CTextBox('urls['.$i.'][url]', $url['url'], 16);
 
 				$url_etype = new CCombobox('urls['.$i.'][elementtype]', $url['elementtype']);
@@ -354,6 +355,7 @@ include_once('include/page_header.php');
 // empty template row {{{
 			$tpl_url_label = new CTextBox('urls[#{id}][name]', '', 16);
 			$tpl_url_label->setAttribute('disabled', 'disabled');
+			$tpl_url_label->setAttribute('maxlength', '16');
 			$tpl_url_link = new CTextBox('urls[#{id}][url]', '', 16);
 			$tpl_url_link->setAttribute('disabled', 'disabled');
 			$tpl_url_etype = new CCombobox('urls[#{id}][elementtype]');
