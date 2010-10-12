@@ -212,7 +212,7 @@ include_once('include/page_header.php');
 // items
  	$value_types		= get_request('value_types', null);
 
-	$submitParent = get_request('submitParent', false);
+	$submitParent = get_request('submitParent', 0);
 
 	$host_status = null;
 	$templated = null;

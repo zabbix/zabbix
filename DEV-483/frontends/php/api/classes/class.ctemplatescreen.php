@@ -188,6 +188,7 @@ class CTemplateScreen extends CScreen{
 // collecting template chain
 			$linkedTemplateIds = $options['hostids'];
 			$childTemplateIds = $options['hostids'];
+
 			while(is_null($options['editable']) && !empty($childTemplateIds)){
 				$sql = 'SELECT ht.* '.
 					' FROM hosts_templates ht '.
@@ -414,6 +415,7 @@ class CTemplateScreen extends CScreen{
 // screenNum is needed due to we can't refer to screenid/hostid/templateid as they will repeat
 		$screenNum = 0;
 		$vrtResult = array();
+
 		foreach($result as $screenid => $screen){
 			if(is_null($options['hostids']) || isset($options['hostids'][$screen['templateid']])){
 				$vrtResult[$screenNum] = $screen;
@@ -424,6 +426,7 @@ class CTemplateScreen extends CScreen{
 			if(!isset($templatesChain[$screen['templateid']])) continue;
 
 			foreach($templatesChain[$screen['templateid']] as $hnum => $hostid){
+				if(!isset($options['hostids'][$hostid])) continue;
 				$screenNum++;
 
 				$vrtResult[$screenNum] = $screen;

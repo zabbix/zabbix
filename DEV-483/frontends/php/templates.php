@@ -829,6 +829,7 @@ include_once('include/page_header.php');
 
 		$options = array(
 			'templateids' => zbx_objectValues($templates, 'templateid'),
+			'editable' => 1,
 			'output' => API_OUTPUT_EXTEND,
 			'select_hosts' => array('hostid','host','status'),
 			'select_templates' => array('hostid','host','status'),
@@ -844,6 +845,7 @@ include_once('include/page_header.php');
 		$templates = CTemplate::get($options);
 		order_result($templates, $sortfield, $sortorder);
 //-----
+
 		foreach($templates as $tnum => $template){
 			$templates_output = array();
 			if($template['proxy_hostid']){
