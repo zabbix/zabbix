@@ -1238,6 +1238,7 @@
 	'S_LINK'=>				'Link',
 	'S_LABEL'=>				'Label',
 	'S_GRID'=>				'Grid',
+	'S_GO_TO'=>				'Go to',
 	'S_X'=>					'X',
 	'S_ICON_PROBLEM'=>			'Icon (problem)',
 	'S_ICON_OK'=>				'Icon (OK)',

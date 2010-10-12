@@ -338,14 +338,17 @@
 				$host = $hosts[$db_element['elementid']];
 				if($host['status'] == HOST_STATUS_MONITORED){
 					$host_nodeid = id2nodeid($db_element['elementid']);
+					$tools_menus = '';
 					foreach($scripts_by_hosts[$db_element['elementid']] as $id => $script){
 						$script_nodeid = id2nodeid($script['scriptid']);
 						if((bccomp($host_nodeid ,$script_nodeid ) == 0))
-							$menus.= "['".$script['name']."',\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$db_element["elementid"]."&scriptid=".$script['scriptid']."','".S_TOOLS."',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+							$tools_menus.= "['".$script['name']."',\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$db_element["elementid"]."&scriptid=".$script['scriptid']."','".S_TOOLS."',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 					}
 
-					$menus = "['".S_TOOLS."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}]," . $menus;
-
+					if(!empty($tools_menus)){
+						$menus .= "['".S_TOOLS."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
+						$menus .= $tools_menus;
+					}
 					$links_menus .= "['".S_STATUS_OF_TRIGGERS."',\"javascript: redirect('tr_status.php?hostid=".$db_element['elementid']."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 				}
 			}
@@ -359,16 +362,17 @@
 				$links_menus.= "['".S_STATUS_OF_TRIGGERS."',\"javascript: redirect('events.php?source=0&groupid=".$db_element['elementid']."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 			}
 
-			/*
-			 * Adding user defined links to popup menu
-			 */
-			foreach($db_element['urls'] as $url){
-				$links_menus.= "['".$url['name']."','".$url['url']."', 'nosid'],";
+			if(!empty($links_menus)){
+				$menus .= "['".S_GO_TO."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
+				$menus .= $links_menus;
 			}
 
-			if(!empty($links_menus)){
+			if(!empty($db_element['urls'])){
+				order_result($db_element['urls'], 'name');
 				$menus .= "['".S_LINKS."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
-				$menus .= $links_menus;
+				foreach($db_element['urls'] as $url){
+					$menus.= "['".htmlentities($url['name'], ENT_QUOTES)."','".$url['url']."', 'nosid'],";
+				}
 			}
 
 			$menus = trim($menus,',');
