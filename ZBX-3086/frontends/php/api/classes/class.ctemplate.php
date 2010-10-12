@@ -1148,23 +1148,23 @@ COpt::memoryPick();
 				}
 			}
 
-			if(isset($data['groups'])){
+			if(isset($data['groups']) && !empty($data['groups'])){
 				$options = array('groups' => $data['groups'], 'templates' => $templates);
 				$result = CHostGroup::massAdd($options);
 				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Can\'t link groups');
 			}
 
-			if(isset($data['hosts'])){
+			if(isset($data['hosts']) && !empty($data['hosts'])){
 				$hostids = zbx_objectValues($data['hosts'], 'hostid');
 				self::link($templateids, $hostids);
 			}
 
-			if(isset($data['templates_link'])){
+			if(isset($data['templates_link']) && !empty($data['templates_link'])){
 				$templates_linkids = zbx_objectValues($data['templates_link'], 'templateid');
 				self::link($templates_linkids, $templateids);
 			}
 
-			if(isset($data['macros'])){
+			if(isset($data['macros']) && !empty($data['macros'])){
 				$options = array('templates' => zbx_toArray($data['templates']), 'macros' => $data['macros']);
 				$result = CUserMacro::massAdd($options);
 				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Can\'t link macros');
@@ -1509,10 +1509,10 @@ COpt::memoryPick();
 				}
 			}
 
-			if(isset($data['macroids'])){
+			if(isset($data['macros'])){
 				$options = array(
 					'templateids' => $templateids,
-					'macroids' => zbx_toArray($data['macros'])
+					'macros' => zbx_toArray($data['macros'])
 				);
 				$result = CUserMacro::massRemove($options);
 				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Can\'t remove macros');
