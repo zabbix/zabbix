@@ -361,7 +361,7 @@
 			else if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP){
 				$links_menus.= "['".S_STATUS_OF_TRIGGERS."',\"javascript: redirect('events.php?source=0&groupid=".$db_element['elementid']."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 			}
-
+ 
 			if(!empty($links_menus)){
 				$menus .= "['".S_GO_TO."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
 				$menus .= $links_menus;
@@ -371,7 +371,7 @@
 				order_result($db_element['urls'], 'name');
 				$menus .= "['".S_LINKS."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
 				foreach($db_element['urls'] as $url){
-					$menus.= "['".htmlentities($url['name'], ENT_QUOTES)."','".$url['url']."', 'nosid'],";
+					$menus.= "[".zbx_jsvalue($url['name']).",".zbx_jsvalue($url['url']).", 'nosid'],";
 				}
 			}
 
