@@ -2,7 +2,7 @@ ALTER TABLE graphs MODIFY graphid bigint unsigned NOT NULL,
 		   MODIFY templateid bigint unsigned NULL,
 		   MODIFY ymin_itemid bigint unsigned NULL,
 		   MODIFY ymax_itemid bigint unsigned NULL,
-		   MODIFY show_legend int NOT NULL DEFAULT 1;
+		   MODIFY show_legend integer NOT NULL DEFAULT 1;
 UPDATE graphs SET templateid=NULL WHERE templateid=0;
 UPDATE graphs SET show_legend=1 WHERE graphtype=0 OR graphtype=1;
 CREATE TEMPORARY TABLE tmp_graphs_graphid (graphid bigint unsigned PRIMARY KEY);
