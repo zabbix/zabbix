@@ -302,12 +302,18 @@ include_once('include/page_header.php');
 
 		$cmbUniquenessCriteria = new CComboBox('uniqueness_criteria', $uniqueness_criteria);
 		$cmbUniquenessCriteria->addItem(-1, S_IP_ADDRESS);
+
 		foreach($dchecks as $id => $data){
-			$str = discovery_check2str($data['type'], $data['snmp_community'], $data['key'], $data['ports']);
-			$dchecks[$id] = array(new CCheckBox('selected_checks[]', null, null, $id), $str, BR());
-			
+			$dchecks[$id]['name'] = discovery_check2str($data['type'], $data['snmp_community'], $data['key'], $data['ports']);
+		}
+		order_result($dchecks, 'name');
+
+		foreach($dchecks as $id => $data){
+			$label = new CLabel($data['name'], 'selected_checks['.$id.']');
+			$dchecks[$id] = array(new CCheckBox('selected_checks['.$id.']', null, null, $id), $label, BR());
+
 			if(in_array($data['type'], array(SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2, SVC_SNMPv3)))
-				$cmbUniquenessCriteria->addItem($id, $str);
+				$cmbUniquenessCriteria->addItem($id, $data['name']);
 		}
 
 		if(count($dchecks)){
@@ -443,6 +449,7 @@ include_once('include/page_header.php');
 				if(!isset($checks[$check_data['type']]))
 					$checks[$check_data['type']] = discovery_check_type2str($check_data['type']);
 			}
+			order_result($checks);
 
 			$status = new CCol(new CLink(discovery_status2str($rule_data["status"]),
 				'?g_druleid%5B%5D='.$rule_data['druleid'].

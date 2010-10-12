@@ -35,26 +35,23 @@ require_once('include/perm.inc.php');
 	}
 
 	function svc_default_port($type_int){
-		$port = '0';
+		$port = 0;
 
 		switch($type_int){
-			case SVC_SSH:		$port = '22';		break;
-			case SVC_LDAP:		$port = '389';		break;
-			case SVC_SMTP:		$port = '25';		break;
-			case SVC_FTP:		$port = '21';		break;
-			case SVC_HTTP:		$port = '80';		break;
-			case SVC_POP:		$port = '110';		break;
-			case SVC_NNTP:		$port = '119';		break;
-			case SVC_IMAP:		$port = '143';		break;
-			case SVC_TCP:		$port = '80';		break;
-			case SVC_AGENT:		$port = '10050';	break;
-			case SVC_SNMPv1:	$port = '161';		break;
-			case SVC_SNMPv2:	$port = '161';		break;
-			case SVC_SNMPv3:	$port = '161';		break;
-			case SVC_ICMPPING:	$port = '0';		break;
+			case SVC_SSH: $port = '22'; break;
+			case SVC_LDAP: $port = '389'; break;
+			case SVC_SMTP: $port = '25'; break;
+			case SVC_FTP: $port = '21'; break;
+			case SVC_HTTP: $port = '80'; break;
+			case SVC_POP: $port = '110'; break;
+			case SVC_NNTP: $port = '119'; break;
+			case SVC_IMAP: $port = '143'; break;
+			case SVC_AGENT: $port = '10050'; break;
+			case SVC_SNMPv1: $port = '161'; break;
+			case SVC_SNMPv2: $port = '161'; break;
+			case SVC_SNMPv3: $port = '161'; break;
 		}
-
-	return $port;
+		return $port;
 	}
 
 	function discovery_check_type2str($type=null){
@@ -75,16 +72,18 @@ require_once('include/perm.inc.php');
 			SVC_ICMPPING => S_ICMPPING,
 		);
 
-		if(is_null($type))
+		if(is_null($type)){
+			order_result($discovery_types);
 			return $discovery_types;
+		}
 		else if(isset($discovery_types[$type]))
 			return $discovery_types[$type];
 		else
 			return S_UNKNOWN;
 	}
 
-	function discovery_check2str($type, $snmp_community, $key_, $ports){
-		$external_param = null;
+	function discovery_check2str($type, $snmp_community, $key_, $port){
+		$external_param = '';
 
 		switch($type){
 			case SVC_SNMPv1:
@@ -94,8 +93,12 @@ require_once('include/perm.inc.php');
 				$external_param = ' "'.$key_.'"';
 				break;
 		}
+		$result = discovery_check_type2str($type);
+		if(svc_default_port($type) != $port)
+			$result .= ' ('.$port.')';
+		$result .= $external_param;
 
-		return discovery_check_type2str($type).' ('.$ports.')'.$external_param;
+		return $result;
 	}
 
 	function discovery_port2str($type_int, $port){
