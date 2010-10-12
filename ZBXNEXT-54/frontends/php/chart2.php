@@ -91,7 +91,6 @@ include_once('include/page_header.php');
 
 	$graph->showLegend($db_data['show_legend']);
 	
-//	$graph->showLegend($db_data['show_legend']);
 	$graph->showWorkPeriod($db_data['show_work_period']);
 	$graph->showTriggers($db_data['show_triggers']);
 
