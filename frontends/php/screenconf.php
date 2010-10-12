@@ -77,16 +77,18 @@ include_once('include/page_header.php');
 
 	CProfile::update('web.screenconf.config', $_REQUEST['config'],PROFILE_TYPE_INT);
 
-	$options = array(
-		'screenids' => $_REQUEST['screenid'],
-		'editable' => 1,
-		'output' => API_OUTPUT_EXTEND,
-		'select_screenitems' => API_OUTPUT_EXTEND
-	);
-	$screens = CScreen::get($options);
-	if(empty($screens)){
-		$screens = CTemplateScreen::get($options);
-		if(empty($screens)) access_deny();
+	if(isset($_REQUEST['screenid'])){
+		$options = array(
+			'screenids' => $_REQUEST['screenid'],
+			'editable' => 1,
+			'output' => API_OUTPUT_EXTEND,
+			'select_screenitems' => API_OUTPUT_EXTEND
+		);
+		$screens = CScreen::get($options);
+		if(empty($screens)){
+			$screens = CTemplateScreen::get($options);
+			if(empty($screens)) access_deny();
+		}
 	}
 ?>
 <?php
