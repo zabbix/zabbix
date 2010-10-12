@@ -146,7 +146,7 @@
 	$cmbConfig = new CComboBox('config', 'screens.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
 		$cmbConfig->addItem('screens.php', S_SCREENS);
 		$cmbConfig->addItem('slides.php', S_SLIDESHOWS);
-	$formHeader->addItem($cmbConfig);
+//	$formHeader->addItem($cmbConfig);
 
 
 	$screens = CTemplateScreen::get(array(
