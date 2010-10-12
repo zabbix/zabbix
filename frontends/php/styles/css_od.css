@@ -580,16 +580,9 @@ div.objectlist{
 	background-color: #2F2F2F;
 }
 
-div.infobox{
-	border: 1px #AA5500 solid;
-	background-color: #2F2F2F;
-
+div.objectlist ul li{
 	color: #DADADA;
 }
-div.infobox a:link		{	color:#FF5500;	 }
-div.infobox a:visited 	{	color:#FF5500;	 }
-div.infobox a:hover 		{	color:#FF8800;	 }
-div.infobox a:active 		{	color:#FF8800;	 }
 
 .formElementTable tr td{
 	color: #DFDFDF;

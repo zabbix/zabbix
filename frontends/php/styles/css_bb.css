@@ -267,18 +267,6 @@ table.header_wide a:link		{	color:#2288FF;	 }
 table.header_wide a:visited 	{	color:#2288FF;	 }
 table.header_wide a:hover 		{	color:#22CCFF;	 }
 table.header_wide a:active 		{	color:#22CCFF;	 }
-
-div.infobox{
-	border: 1px #AAAAAA solid;
-	background-color:#444444;
-	
-	color: #DADADA;
-}
-
-div.infobox a:link		{	color:#2288FF;	 }
-div.infobox a:visited 	{	color:#2288FF;	 }
-div.infobox a:hover 		{	color:#22CCFF;	 }
-div.infobox a:active 		{	color:#22CCFF;	 }
 /*----------*/
 
 /*////////////////	DIVS	////////////////////*/
