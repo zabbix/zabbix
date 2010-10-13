@@ -1363,7 +1363,7 @@ Copt::memoryPick();
 				);
 				$host_exists = self::get($options);
 				$host_exist = reset($host_exists);
-				if(!is_null($host_exist) && ($host_exist['hostid'] != $cur_host['hostid'])){
+				if($host_exist && ($host_exist['hostid'] != $cur_host['hostid'])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
 
