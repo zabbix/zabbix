@@ -292,7 +292,7 @@
 * @param array $elemnts [items, triggers, graphs, applications]
 * @return object
 */
-	function get_header_host_table($hostid, $current){
+	function get_header_host_table($hostid, $current=null){
 		$elements = array(
 			'items' => 'items',
 			'triggers' => 'triggers',
@@ -300,7 +300,9 @@
 			'applications' => 'applications',
 			'screens' => 'screens',
 		);
-		unset($elements[$current]);
+		
+		if(!is_null($current))
+			unset($elements[$current]);
 
 		$header_host_opt = array(
 			'hostids' => $hostid,
@@ -340,7 +342,7 @@
 		if(isset($elements['graphs'])){
 			$list->addItem(array(new CLink(S_GRAPHS, 'graphs.php?hostid='.$header_host['hostid']),' ('.$header_host['graphs'].')'));
 		}
-		
+
 		if(isset($elements['applications'])){
 			$list->addItem(array(new CLink(S_APPLICATIONS, 'applications.php?hostid='.$header_host['hostid']),' ('.$header_host['applications'].')'));
 		}
