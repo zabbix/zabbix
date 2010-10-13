@@ -77,7 +77,7 @@ const char	usage_message[] =
 #if defined(_WINDOWS)
 	" [-idsx] [-m]"
 #endif /* _WINDOWS */
-	" [-c <file>] [-t <metric>]";
+	" [-c <file>] [-t <item>]";
 
 /*end of application USAGE message */
 
@@ -91,9 +91,9 @@ const char	*help_message[] = {
 	"  -c --config <file>    Specify configuration file. Use absolute path",
 	"  -h --help             give this help",
 	"  -V --version          display version number",
-	"  -p --print            print supported metrics and exit",
-	"  -t --test <metric>    test specified metric and exit",
-/*	"  -u --usage <metric> test specified metric and exit",	*/ /* !!! TODO - print metric usage !!! */
+	"  -p --print            print supported items and exit",
+	"  -t --test <item>      test specified item and exit",
+/*	"  -u --usage <item>     test specified item and exit",	*/ /* !!! TODO - print item usage !!! */
 
 #if defined (_WINDOWS)
 

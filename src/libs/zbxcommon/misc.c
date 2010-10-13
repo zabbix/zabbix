@@ -20,6 +20,11 @@
 #include "common.h"
 #include "log.h"
 
+#if defined(_WINDOWS)
+char	ZABBIX_SERVICE_NAME[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
+char	ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Function: get_program_name                                                 *
@@ -127,7 +132,6 @@ void	zbx_timespec(zbx_timespec_t *ts)
 		ts->sec = (int)tp.tv_sec;
 		ts->ns = (int)tp.tv_nsec;
 	}
-
 #endif	/* HAVE_TIME_CLOCK_GETTIME */
 
 	if (0 != rc && 0 == (rc = gettimeofday(&tv, NULL)))
@@ -161,7 +165,7 @@ void	zbx_timespec(zbx_timespec_t *ts)
  *           January 1, 1970, coordinated universal time (UTC).               *
  *                                                                            *
  ******************************************************************************/
-double	zbx_time(void)
+double	zbx_time()
 {
 	zbx_timespec_t	ts;
 
@@ -183,10 +187,92 @@ double	zbx_time(void)
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-
-double zbx_current_time(void)
+double	zbx_current_time()
 {
-	return (zbx_time() + ZBX_JAN_1970_IN_SEC);
+	return zbx_time() + ZBX_JAN_1970_IN_SEC;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_malloc2                                                      *
+ *                                                                            *
+ * Purpose: allocates size bytes of memory                                    *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: returns a pointer to the newly allocated memory              *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void    *zbx_malloc2(const char *filename, int line, void *old, size_t size)
+{
+	int	max_attempts;
+	void	*ptr = NULL;
+
+	/* Old pointer must be NULL */
+	if (NULL != old)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_malloc: allocating already allocated memory. "
+				"Please report this to Zabbix developers.",
+				filename, line);
+		/* Exit if defined DEBUG. Ignore otherwise. */
+		zbx_dbg_assert(0);
+	}
+
+	for (
+		max_attempts = 10, size = MAX(size, 1);
+		max_attempts > 0 && NULL == ptr;
+		ptr = malloc(size), max_attempts--
+	);
+
+	if (NULL != ptr)
+		return ptr;
+
+	zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_malloc: out of memory. Requested %lu bytes.", filename, line, size);
+	exit(FAIL);
+
+	/* Program will never reach this point. */
+	return ptr;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_realloc2                                                     *
+ *                                                                            *
+ * Purpose: changes the size of the memory block pointed to by src            *
+ *          to size bytes                                                     *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: returns a pointer to the newly allocated memory              *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void    *zbx_realloc2(const char *filename, int line, void *src, size_t size)
+{
+	int	max_attempts;
+	void	*ptr = NULL;
+
+	for (
+		max_attempts = 10, size = MAX(size, 1);
+		max_attempts > 0 && NULL == ptr;
+		ptr = realloc(src, size), max_attempts--
+	);
+
+	if (NULL != ptr)
+		return ptr;
+
+	zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_realloc: out of memory. Requested %lu bytes.", filename, line, size);
+	exit(FAIL);
+
+	/* Program will never reach this point. */
+	return ptr;
 }
 
 /******************************************************************************
@@ -1440,6 +1526,51 @@ int	is_uint64(const char *str, zbx_uint64_t *value)
 
 	if (NULL != value)
 		*value = value_uint64;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: is_ushort                                                        *
+ *                                                                            *
+ * Purpose: check if the string is 16bit unsigned integer                     *
+ *                                                                            *
+ * Parameters: str - string to check                                          *
+ *                                                                            *
+ * Return value:  SUCCEED - the string is unsigned integer                    *
+ *                FAIL - the string is not number or overflow                 *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	is_ushort(const char *str, unsigned short *value)
+{
+	register unsigned short	max_ushort = 0xFFFF;
+	register unsigned short	value_ushort = 0, c;
+
+	if ('\0' == *str)
+		return FAIL;
+
+	while ('\0' != *str)
+	{
+		if (*str >= '0' && *str <= '9')
+		{
+			c = (unsigned short)(unsigned char)(*str - '0');
+			if ((max_ushort - c) / 10 >= value_ushort)
+				value_ushort = value_ushort * 10 + c;
+			else
+				return FAIL;	/* overflow */
+			str++;
+		}
+		else
+			return FAIL;	/* not a digit */
+	}
+
+	if (NULL != value)
+		*value = value_ushort;
 
 	return SUCCEED;
 }

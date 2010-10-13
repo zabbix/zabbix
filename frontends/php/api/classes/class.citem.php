@@ -73,6 +73,7 @@ class CItem extends CZBXAPI{
 		$def_options = array(
 			'nodeids'				=> null,
 			'groupids'				=> null,
+			'templateids'			=> null,
 			'hostids'				=> null,
 			'proxyids'				=> null,
 			'itemids'				=> null,
@@ -94,8 +95,11 @@ class CItem extends CZBXAPI{
 
 			'belongs'				=> null,
 			'with_triggers'			=> null,
-//
-			'pattern'				=> null,
+// filter
+			'filter'					=> null,
+			'search'					=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
 
 // OutPut
 			'output'				=> API_OUTPUT_REFER,
@@ -177,6 +181,19 @@ class CItem extends CZBXAPI{
 
 			if(!is_null($options['groupCount'])){
 				$sql_parts['group']['hg'] = 'hg.groupid';
+			}
+		}
+
+// templateids
+		if(!is_null($options['templateids'])){
+			zbx_value2array($options['templateids']);
+
+			if(!is_null($options['hostids'])){
+				zbx_value2array($options['hostids']);
+				$options['hostids'] = array_merge($options['hostids'], $options['templateids']);
+			}
+			else{
+				$options['hostids'] = $options['templateids'];
 			}
 		}
 
@@ -296,22 +313,14 @@ class CItem extends CZBXAPI{
 			}
 		}
 
-// API_OUTPUT_EXTEND
-		if($options['output'] == API_OUTPUT_EXTEND){
-			$sql_parts['select']['items'] = 'i.*';
+
+// search
+		if(is_array($options['search'])){
+			zbx_db_search('items i', $options, $sql_parts);
 		}
-
-// pattern
-		if(!is_null($options['pattern'])){
-			$sql_parts['where']['description'] = ' UPPER(i.description) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
-		}
-
-		if(isset($options['patternKey']))
-			$sql_parts['where']['key_'] = ' UPPER(i.key_) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['patternKey']).'%');
-
 
 // --- FILTER ---
-		if(!is_null($options['filter'])){
+		if(is_array($options['filter'])){
 			zbx_value2array($options['filter']);
 
 			if(isset($options['filter']['host'])){
@@ -433,6 +442,12 @@ class CItem extends CZBXAPI{
 				$sql_parts['where'][] = ' EXISTS ( SELECT functionid FROM functions ff WHERE ff.itemid=i.itemid )';
 			else
 				$sql_parts['where'][] = 'NOT EXISTS ( SELECT functionid FROM functions ff WHERE ff.itemid=i.itemid )';
+		}
+
+
+// output
+		if($options['output'] == API_OUTPUT_EXTEND){
+			$sql_parts['select']['items'] = 'i.*';
 		}
 
 // countOutput
@@ -786,6 +801,7 @@ COpt::memoryPick();
 				unset($item_db_fields['prevvalue']);
 				unset($item_db_fields['lastclock']);
 				unset($item_db_fields['prevorgvalue']);
+				unset($item_db_fields['lastns']);
 				if(!check_db_fields($item_db_fields, $item)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect parameters used for Item');
 				}
@@ -816,8 +832,8 @@ COpt::memoryPick();
  */
 	public static function delete($itemids){
 		if(empty($itemids)) return true;
+
 		$itemids = zbx_toArray($itemids);
-		$delete = array();
 		$insert = array();
 
 		try{
@@ -874,10 +890,10 @@ COpt::memoryPick();
 			}
 
 			if(!empty($del_graphs)){
-				$result = delete_graph($del_graphs);
+				$result = CGraph::delete($del_graphs);
 				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete item');
 			}
-
+//--
 
 			$itemids_condition = DBcondition('itemid', $itemids);
 
@@ -904,6 +920,7 @@ COpt::memoryPick();
 				'history_str',
 				'history',
 			);
+
 			foreach($itemids as $id => $itemid){
 				foreach($item_data_tables as $table){
 					$insert[] = array(
@@ -916,7 +933,7 @@ COpt::memoryPick();
 			DB::insert('housekeeper', $insert);
 
 			self::EndTransaction(true, __METHOD__);
-			return true;
+			return array('itemids' => $itemids);
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);

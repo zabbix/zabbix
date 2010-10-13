@@ -70,7 +70,7 @@
 		);
 		$event_count = CEvent::get($options);
 
-	return $event_count['rowscount'];
+	return $event_count;
 	}
 
 /* function:
@@ -321,8 +321,21 @@ return $table;
 
 function make_small_eventlist($eventid, $trigger_data){
 
+	//getting current cunfiguration settings
+	$config = select_config();
+
 	$table = new CTableInfo();
-	$table->setHeader(array(S_TIME, S_STATUS, S_DURATION, S_AGE, S_ACK, S_ACTIONS));
+
+	
+	$table->setHeader(array(
+		S_TIME,
+		S_STATUS,
+		S_DURATION,
+		S_AGE,
+		($config['event_ack_enable'] ? S_ACK : null), //if we need to chow acks
+		S_ACTIONS
+	));
+
 
 	$options = array(
 		'eventids' => $eventid,
@@ -363,16 +376,20 @@ function make_small_eventlist($eventid, $trigger_data){
 
 		$value = new CCol(trigger_value2str($event['value']), get_trigger_value_style($event['value']));
 
-		$ack = new CSpan(S_NO, 'on');
-		if(1 == $event['acknowledged']){
-			$db_acks = get_acknowledges_by_eventid($event['eventid']);
-			$rows=0;
-			while($a=DBfetch($db_acks))	$rows++;
+		//if acknowledges are not disabled by confuguration, let's show them
+		if ($config['event_ack_enable']) {
+			$ack = new CSpan(S_NO, 'on');
+			if(1 == $event['acknowledged']){
+				$db_acks = get_acknowledges_by_eventid($event['eventid']);
+				$rows=0;
+				while($a=DBfetch($db_acks))	$rows++;
 
-			$ack=array(
-				new CLink(new CSpan(S_YES,'off'),'acknow.php?eventid='.$event['eventid']),
-				SPACE.'('.$rows.')'
-			);
+
+					$ack=array(
+						new CLink(new CSpan(S_YES,'off'),'acknow.php?eventid='.$event['eventid']),
+						SPACE.'('.$rows.')'
+					);
+			}
 		}
 
 //actions
@@ -388,7 +405,7 @@ function make_small_eventlist($eventid, $trigger_data){
 			$value,
 			$duration,
 			zbx_date2age($event['clock']),
-			$ack,
+			($config['event_ack_enable'] ? $ack : null),
 			$actions
 		));
 	}
@@ -467,6 +484,7 @@ function getLastEvents($options){
 
 	$triggerOptions = array(
 		'filter' => array(),
+		'skipDependent'	=> 1,
 		'select_hosts' => array('hostid', 'host'),
 		'output' => API_OUTPUT_EXTEND,
 		'expandDescription' => 1,

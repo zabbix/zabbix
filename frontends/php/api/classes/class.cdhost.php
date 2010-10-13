@@ -74,7 +74,6 @@ class CDHost extends CZBXAPI{
 		$result = array();
 		$nodeCheck = false;
 		$user_type = $USER_DETAILS['type'];
-		$userid = $USER_DETAILS['userid'];
 
 		$sort_columns = array('dhostid', 'druleid'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM); // allowed output options for [ select_* ] params
@@ -99,7 +98,9 @@ class CDHost extends CZBXAPI{
 			'nopermissions'				=> null,
 // filter
 			'filter'					=> null,
-			'pattern'					=> null,
+			'search'					=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
 
 // OutPut
 			'output'					=> API_OUTPUT_REFER,
@@ -244,7 +245,6 @@ class CDHost extends CZBXAPI{
 			$sql_parts['where'][] = DBin_node('dh.dhostid', $nodeids);
 		}
 
-
 // output
 		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['dhosts'] = 'dh.*';
@@ -264,27 +264,13 @@ class CDHost extends CZBXAPI{
 		}
 
 // filter
-		if(!is_null($options['filter'])){
-			zbx_value2array($options['filter']);
+		if(is_array($options['filter'])){
+			zbx_db_filter('dhosts dh', $options, $sql_parts);
+		}
 
-			if(isset($options['filter']['dhostid']) && !is_null($options['filter']['dhostid'])){
-				$sql_parts['where']['dhostid'] = 'dh.dhostid='.$options['filter']['dhostid'];
-			}
-
-			if(isset($options['filter']['status']) && !is_null($options['filter']['status'])){
-				zbx_value2array($options['filter']['status']);
-				$sql_parts['where']['status'] = DBcondition('dh.status', $options['filter']['status']);
-			}
-
-			if(isset($options['filter']['lastup']) && !is_null($options['filter']['lastup'])){
-				zbx_value2array($options['filter']['lastup']);
-				$sql_parts['where']['lastup'] = DBcondition('dh.lastup', $options['filter']['lastup']);
-			}
-
-			if(isset($options['filter']['lastdown']) && !is_null($options['filter']['lastdown'])){
-				zbx_value2array($options['filter']['lastdown']);
-				$sql_parts['where']['lastdown'] = DBcondition('dh.lastdown', $options['filter']['lastdown']);
-			}
+// search
+		if(is_array($options['search'])){
+			zbx_db_search('dhosts dh', $options, $sql_parts);
 		}
 
 // order
@@ -427,6 +413,7 @@ Copt::memoryPick();
 				if(!is_null($options['limitSelects'])) order_result($drules, 'name');
 				foreach($drules as $druleid => $drule){
 					unset($drules[$druleid]['dhosts']);
+					$count = array();
 					foreach($drule['dhosts'] as $dnum => $dhost){
 						if(!is_null($options['limitSelects'])){
 							if(!isset($count[$dhost['dhostid']])) $count[$dhost['dhostid']] = 0;
@@ -567,35 +554,6 @@ Copt::memoryPick();
 	return $result;
 	}
 
-/**
- * Get DHost ID by DHost fields
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $dhost_data
- * @param string $dhost_data['host']
- * @return int|boolean
- */
-	public static function getObjects($dhostData){
-		$options = array(
-			'filter' => $dhostData,
-			'output'=>API_OUTPUT_EXTEND
-		);
-
-		if(isset($dhostData['node']))
-			$options['nodeids'] = getNodeIdByNodeName($dhostData['node']);
-		else if(isset($dhostData['nodeids']))
-			$options['nodeids'] = $dhostData['nodeids'];
-
-		$result = self::get($options);
-
-	return $result;
-	}
-
 	public static function exists($object){
 		$keyFields = array(array('dhostid'));
 
@@ -630,7 +588,6 @@ Copt::memoryPick();
 		$errors = array();
 		$dhosts = zbx_toArray($dhosts);
 		$dhostids = array();
-		$groupids = array();
 		$result = false;
 
 		if($result){
@@ -654,9 +611,6 @@ Copt::memoryPick();
  * @param _array $dhosts multidimensional array with Hosts data
  */
 	public static function update($dhosts){
-		$errors = array();
-		$result = true;
-
 		$dhosts = zbx_toArray($dhosts);
 		$dhostids = zbx_objectValues($dhosts, 'hostid');
 
@@ -664,7 +618,7 @@ Copt::memoryPick();
 			return array('dhostids' => $dhostids);
 		}
 		catch(APIException $e){
-			if(isset($transaction)) self::EndTransaction(false, __METHOD__);
+			self::EndTransaction(false, __METHOD__);
 
 			$error = $e->getErrors();
 			$error = reset($error);
@@ -687,9 +641,9 @@ Copt::memoryPick();
  * @param array $dhosts[0, ...]['hostid'] Host ID to delete
  * @return array|boolean
  */
-	public static function delete($dhosts){
-		$dhosts = zbx_toArray($dhosts);
-		$dhostids = array();
+	public static function delete($dhostids){
+		$result = false;
+		$dhostids = zbx_toArray($dhostids);
 
 		if($result){
 			return array('hostids' => $dhostids);
@@ -699,6 +653,5 @@ Copt::memoryPick();
 			return false;
 		}
 	}
-
 }
 ?>

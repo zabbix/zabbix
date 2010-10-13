@@ -22,6 +22,6 @@
 
 #include "db.h"
 
-int	process_event(DB_EVENT *event);
+int	process_event(DB_EVENT *event, int force_actions);
 
 #endif

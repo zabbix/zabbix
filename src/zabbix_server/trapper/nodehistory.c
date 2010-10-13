@@ -206,7 +206,7 @@ static int	process_record_event(int sender_nodeid, int nodeid, const ZBX_TABLE *
 		}
 	}
 
-	return process_event(&event);
+	return process_event(&event, 0);
 error:
 	zabbix_log( LOG_LEVEL_ERR, "NODE %d: Received invalid record from node %d for node %d [%s]",
 		CONFIG_NODEID,
