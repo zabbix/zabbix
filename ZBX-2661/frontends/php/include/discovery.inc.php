@@ -94,7 +94,7 @@ require_once('include/perm.inc.php');
 				break;
 		}
 		$result = discovery_check_type2str($type);
-		if(svc_default_port($type) != $port)
+		if((svc_default_port($type) != $port) || ($type == SVC_TCP))
 			$result .= ' ('.$port.')';
 		$result .= $external_param;
 
