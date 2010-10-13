@@ -262,6 +262,7 @@ frontends/php/include/classes/class.cimg.php -text
 frontends/php/include/classes/class.cipbox.php -text
 frontends/php/include/classes/class.cjson.php -text
 frontends/php/include/classes/class.cjsscript.php -text
+frontends/php/include/classes/class.clabel.php -text
 frontends/php/include/classes/class.cldap.php -text
 frontends/php/include/classes/class.clink.php -text
 frontends/php/include/classes/class.clist.php -text
