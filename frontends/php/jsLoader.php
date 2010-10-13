@@ -11,7 +11,7 @@ if(isset($_GET['lang']) && ($_GET['lang'] != 'en_gb') && preg_match('/^[a-z]{2}_
 // }}} get language translations
 
 
-// available scriptas 'scriptFileName' => 'path relative to js/'
+// available scripts 'scriptFileName' => 'path relative to js/'
 $availableJScripts = array(
 	'common.js' => '',
 	'menu.js' => '',
@@ -99,9 +99,18 @@ foreach($files as $file){
 }
 
 
+$jsLength = strlen($js);
+$ETag = md5($jsLength);
+if(isset($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] == $ETag){
+	header('HTTP/1.1 304 Not Modified');
+	header('ETag: '.$ETag);
+	exit();
+}
+
 header('Content-type: text/javascript; charset=UTF-8');
+header('Content-length: '.$jsLength);
+header('Cache-Control: public, must-revalidate');
+header('ETag: '.$ETag);
 
 echo $js;
-
-return;
 ?>
