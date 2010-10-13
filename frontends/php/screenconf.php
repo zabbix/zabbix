@@ -84,9 +84,12 @@ include_once('include/page_header.php');
 			'output' => API_OUTPUT_EXTEND,
 			'select_screenitems' => API_OUTPUT_EXTEND
 		);
-		$screens = CScreen::get($options);
-		if(empty($screens)){
+		if(isset($_REQUEST['templateid']))
 			$screens = CTemplateScreen::get($options);
+		else
+			$screens = CScreen::get($options);
+
+		if(empty($screens)){
 			if(empty($screens)) access_deny();
 		}
 	}
@@ -135,71 +138,85 @@ include_once('include/page_header.php');
 <?php
 	$_REQUEST['go'] = get_request('go', 'none');
 
-		if(isset($_REQUEST['clone']) && isset($_REQUEST['screenid'])){
-			unset($_REQUEST['screenid']);
-			$_REQUEST['form'] = 'clone';
-		}
-		else if(isset($_REQUEST['save'])){
-			if(isset($_REQUEST['screenid'])){
-				$screen = array(
-					'screenid' => $_REQUEST['screenid'],
-					'name' => $_REQUEST['name'],
-					'hsize' => $_REQUEST['hsize'],
-					'vsize' => $_REQUEST['vsize']
-				);
+	if(isset($_REQUEST['clone']) && isset($_REQUEST['screenid'])){
+		unset($_REQUEST['screenid']);
+		$_REQUEST['form'] = 'clone';
+	}
+	else if(isset($_REQUEST['save'])){
+		if(isset($_REQUEST['screenid'])){
+			$screen = array(
+				'screenid' => $_REQUEST['screenid'],
+				'name' => $_REQUEST['name'],
+				'hsize' => $_REQUEST['hsize'],
+				'vsize' => $_REQUEST['vsize'],
+				'templateid' => get_request('templateid')
+			);
+			if(isset($_REQUEST['templateid']))
+				$result = CTemplateScreen::update($screen);
+			else
 				$result = CScreen::update($screen);
 
-				$audit_action = AUDIT_ACTION_UPDATE;
-				show_messages($result, S_SCREEN_UPDATED, S_CANNOT_UPDATE_SCREEN);
-			}
-			else{
-				if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
-					access_deny();
+			$audit_action = AUDIT_ACTION_UPDATE;
+			show_messages($result, S_SCREEN_UPDATED, S_CANNOT_UPDATE_SCREEN);
+		}
+		else{
+			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
+				access_deny();
 
-				$screen = array(
-					'name' => $_REQUEST['name'],
-					'hsize' => $_REQUEST['hsize'],
-					'vsize' => $_REQUEST['vsize'],
-				);
-				$templateid = get_request('templateid');
-				if($templateid) $screen['templateid'] = $templateid;
+			$screen = array(
+				'name' => $_REQUEST['name'],
+				'hsize' => $_REQUEST['hsize'],
+				'vsize' => $_REQUEST['vsize'],
+				'templateid' => get_request('templateid')
+			);
 
+			if(isset($_REQUEST['templateid']))
+				$result = CTemplateScreen::create($screen);
+			else
 				$result = CScreen::create($screen);
 
-				$audit_action = AUDIT_ACTION_ADD;
-				show_messages($result, S_SCREEN_ADDED, S_CANNOT_ADD_SCREEN);
-			}
-			if($result){
-				add_audit($audit_action,AUDIT_RESOURCE_SCREEN,' Name ['.$_REQUEST['name'].'] ');
-				unset($_REQUEST['form']);
-				unset($_REQUEST['screenid']);
-			}
+			$audit_action = AUDIT_ACTION_ADD;
+			show_messages($result, S_SCREEN_ADDED, S_CANNOT_ADD_SCREEN);
 		}
-		else if(isset($_REQUEST['delete']) && isset($_REQUEST['screenid']) || ($_REQUEST['go'] == 'delete')){
-			$screenids = get_request('screens', array());
-			if(isset($_REQUEST['screenid'])){
-				$screenids[] = $_REQUEST['screenid'];
-			}
-			$screens = CScreen::get(array(
-				'screenids' => $screenids,
-				'output' => API_OUTPUT_EXTEND,
-				'editable => 1'
-			));
+		if($result){
+			add_audit($audit_action,AUDIT_RESOURCE_SCREEN,' Name ['.$_REQUEST['name'].'] ');
+			unset($_REQUEST['form']);
+			unset($_REQUEST['screenid']);
+		}
+	}
+	else if(isset($_REQUEST['delete']) && isset($_REQUEST['screenid']) || ($_REQUEST['go'] == 'delete')){
+		$screenids = get_request('screens', array());
+		if(isset($_REQUEST['screenid'])){
+			$screenids[] = $_REQUEST['screenid'];
+		}
 
+		$options = array(
+			'screenids' => $screenids,
+			'output' => API_OUTPUT_EXTEND,
+			'editable => 1'
+		);
+
+		if(isset($_REQUEST['templateid'])){
+			$screens = CTemplateScreen::get($options);
+			$go_result = CTemplateScreen::delete($screenids);
+		}
+		else{
+			$screens = CScreen::get($options);
 			$go_result = CScreen::delete($screenids);
-
-			if($go_result){
-				unset($_REQUEST['screenid'], $_REQUEST['form']);
-				foreach($screens as $screen){
-					add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCREEN,
-						$screen['screenid'],
-						$screen['name'],
-						null,null,null);
-				}
-			}
-
-			show_messages($go_result, S_SCREEN_DELETED, S_CANNOT_DELETE_SCREEN);
 		}
+
+		if($go_result){
+			unset($_REQUEST['screenid'], $_REQUEST['form']);
+			foreach($screens as $screen){
+				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCREEN,
+					$screen['screenid'],
+					$screen['name'],
+					null,null,null);
+			}
+		}
+
+		show_messages($go_result, S_SCREEN_DELETED, S_CANNOT_DELETE_SCREEN);
+	}
 
 	if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
 		$url = new CUrl();
@@ -227,8 +244,62 @@ include_once('include/page_header.php');
 	if(isset($_REQUEST['form'])){
 		if($_REQUEST['form'] == S_IMPORT_SCREEN)
 			$screen_wdgt->addItem(import_screen_form($rules));
-		else if(($_REQUEST['form'] == S_CREATE_SCREEN) || ($_REQUEST['form'] == 'update'))
-			$screen_wdgt->addItem(insert_screen_form());
+		else if(($_REQUEST['form'] == S_CREATE_SCREEN) || ($_REQUEST['form'] == 'update')){
+			$frmScr = new CFormTable();
+
+			if(isset($_REQUEST['screenid'])){
+				$options = array(
+					'screenids' => $_REQUEST['screenid'],
+					'editable' => 1,
+					'output' => API_OUTPUT_EXTEND
+				);
+				if(isset($_REQUEST['templateid']))
+					$screens = CTemplateScreen::get($options);
+				else
+					$screens = CScreen::get($options);
+
+				$screen = reset($screens);
+
+				$frmScr->setTitle(S_SCREEN.' "'.$screen['name'].'"');
+				$frmScr->addVar('screenid',$_REQUEST['screenid']);
+			}
+			else{
+				$frmScr->setTitle(S_SCREEN);
+			}
+
+
+			if(isset($_REQUEST['screenid']) && !isset($_REQUEST['form_refresh'])){
+				$name = $screen['name'];
+				$hsize = $screen['hsize'];
+				$vsize = $screen['vsize'];
+
+				$templateid = ($screen['templateid'] > 0) ? $screen['templateid'] : null;
+			}
+			else{
+				$name = get_request('name', '');
+				$hsize = get_request('hsize', 1);
+				$vsize = get_request('bsize', 1);
+
+				$templateid = get_request('templateid');
+			}
+
+			$frmScr->addVar('templateid', $templateid);
+
+			$frmScr->addRow(S_NAME, new CTextBox('name', $name, 32));
+			$frmScr->addRow(S_COLUMNS, new CNumericBox('hsize', $hsize, 3));
+			$frmScr->addRow(S_ROWS, new CNumericBox('vsize', $vsize, 3));
+
+
+			$frmScr->addItemToBottomRow(new CButton('save', S_SAVE));
+			if(isset($_REQUEST['screenid'])){
+				/* $frmScr->addItemToBottomRow(SPACE);
+				$frmScr->addItemToBottomRow(new CButton('clone',S_CLONE)); !!! TODO */
+				$frmScr->addItemToBottomRow(array(SPACE, new CButtonDelete(S_DELETE_SCREEN_Q, url_param('form').url_param('screenid'))));
+			}
+			$frmScr->addItemToBottomRow(array(SPACE, new CButtonCancel(url_param('templateid'))));
+
+			$screen_wdgt->addItem($frmScr);
+		}
 	}
 	else{
 		$form = new CForm();
