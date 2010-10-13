@@ -871,8 +871,15 @@ function morder_result(&$array, $sortfields, $sortorder=ZBX_SORT_UP){
 }
 
 
-function order_result(&$data, $sortfield, $sortorder=ZBX_SORT_UP){
+function order_result(&$data, $sortfield=null, $sortorder=ZBX_SORT_UP){
 	if(empty($data)) return false;
+
+	if(is_null($sortfield)){
+		natcasesort($data);
+		if($sortorder != ZBX_SORT_UP)
+			$data = array_reverse($data, true);
+		return true;
+	}
 
 	$sort = array();
 	foreach($data as $key => $arr){

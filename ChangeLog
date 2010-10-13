@@ -11,6 +11,10 @@ Changes for 1.9
 
 Changes for 1.8.4rc2
 
+ - [ZBX-3080] fixed javascript not cached by browsers (Vedmak)
+ - [ZBX-2661] improved displaying discovery checks in configuration (Vedmak)
+ - [ZBX-3086] fixed errors when edit hostgroup linkage for hosts and templates (Vedmak)
+ - [ZBX-3025] resurrected unreachable pollers and StartPollersUnreachable configuration parameter (asaveljevs,Sasha)
  - [ZBX-2351] fixed server trying to insert duplicate eventids into the database (asaveljevs,Sasha)
  - [ZBX-3069] renamed monitoring graphs combobox "All" entry to "not selected" (Vedmak)
 

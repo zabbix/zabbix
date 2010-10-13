@@ -834,44 +834,44 @@ COpt::memoryPick();
  * Remove Hosts from HostGroups
  *
  * @param array $data
- * @param array $data['groups']
- * @param array $data['hosts']
- * @param array $data['templates']
+ * @param array $data['groupids']
+ * @param array $data['hostids']
+ * @param array $data['templateids']
  * @return boolean
  */
 	public static function massRemove($data){
-		$groups = zbx_toArray($data['groups']);
-		$groupids = zbx_objectValues($groups, 'groupid');
+		$groupids = zbx_toArray($data['groupids'], 'groupid');
 		try{
 			self::BeginTransaction(__METHOD__);
 
 			$options = array(
 				'groupids' => $groupids,
 				'editable' => 1,
-				'preservekeys' => 1
+				'preservekeys' => 1,
+				'output' => API_OUTPUT_SHORTEN
 			);
 			$upd_groups = self::get($options);
-			foreach($groups as $gnum => $group){
-				if(!isset($upd_groups[$group['groupid']])){
+			foreach($groupids as $groupid){
+				if(!isset($upd_groups[$groupid])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				}
 			}
 
-			$hosts = isset($data['hosts']) ? zbx_toArray($data['hosts']) : null;
-			$hostids = is_null($hosts) ? array() : zbx_objectValues($hosts, 'hostid');
-			$templates = isset($data['templates']) ? zbx_toArray($data['templates']) : null;
-			$templateids = is_null($templates) ? array() : zbx_objectValues($templates, 'templateid');
+			$hostids = isset($data['hostids']) ? zbx_toArray($data['hostids']) : array();
+			$templateids = isset($data['templateids']) ? zbx_toArray($data['templateids']) : array();
 
 			$objectids_to_unlink = array_merge($hostids, $templateids);
-			$unlinkable = getUnlinkableHosts($groupids, $objectids_to_unlink);
-			if(count($objectids_to_unlink) != count($unlinkable)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'One of the Objects is left without Hostgroup');
-			}
+			if(!empty($objectids_to_unlink)){
+				$unlinkable = getUnlinkableHosts($groupids, $objectids_to_unlink);
+				if(count($objectids_to_unlink) != count($unlinkable)){
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'One of the Objects is left without Hostgroup');
+				}
 
-			DB::delete('hosts_groups', array(
-				DBcondition('hostid', $objectids_to_unlink),
-				DBcondition('groupid', $groupids)
-			));
+				DB::delete('hosts_groups', array(
+					DBcondition('hostid', $objectids_to_unlink),
+					DBcondition('groupid', $groupids)
+				));
+			}
 
 			self::EndTransaction(true, __METHOD__);
 			return array('groupids' => $groupids);
