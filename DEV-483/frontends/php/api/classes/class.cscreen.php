@@ -597,7 +597,7 @@ SDI('/////////////////////////////////');
 // Exists
 			$options = array(
 				'filter' => array('name' => $newScreenNames),
-				'output' => 'extend',
+				'output' => API_OUTPUT_EXTEND,
 				'nopermissions' => 1
 			);
 			$db_screens = self::get($options);
@@ -676,7 +676,6 @@ SDI('/////////////////////////////////');
 					$options = array(
 						'filter' => array(
 							'name' => $screen['name'],
-							'templateid' => (isset($screen['templateid']) ? $screen['templateid'] : null)
 						),
 						'preservekeys' => 1,
 						'nopermissions' => 1,
@@ -777,16 +776,19 @@ SDI('/////////////////////////////////');
 				'resourceid' => null,
 				'x' => null,
 				'y' => null,
-				);
+			);
+			
 			if(!check_db_fields($items_db_fields, $screenitem)){
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for screen items');
-				}
+			}
 
 			$insert[] = $screenitem;
-				}
+		}
+
 		DB::insert('screens_items', $insert);
-		return true;
-			}
+
+	return true;
+	}
 
 	protected static function updateItems($data){
 		$screenids = zbx_toArray($data['screenids']);
@@ -814,8 +816,8 @@ SDI('/////////////////////////////////');
 			);
 			if(!check_db_fields($items_db_fields, $new_item)){
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for screen items');
+			}
 		}
-	}
 
 		foreach($screens as $screen){
 			$new_items = $data['screenitems'];
@@ -840,9 +842,9 @@ SDI('/////////////////////////////////');
 						unset($screen['screenitems'][$cnum]);
 						unset($new_items[$nnum]);
 						break;
-		}
+					}
+				}
 			}
-		}
 
 			foreach($new_items as $new_item){
 				$items_db_fields = array(
@@ -859,15 +861,14 @@ SDI('/////////////////////////////////');
 
 			foreach($screen['screenitems'] as $del_item){
 				$delete[] = $del_item['screenitemid'];
-				}
 			}
+		}
 
 		if(!empty($insert)) DB::insert('screens_items', $insert);
 		if(!empty($update)) DB::update('screens_items', $update);
 		if(!empty($delete)) DB::delete('screens_items', DBcondition('screenitemid', $delete));
 
-			return true;
-		}
-
+	return true;
+	}
 }
 ?>

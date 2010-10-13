@@ -3849,51 +3849,6 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		return $form;
 	}
 
-	function insert_screen_form(){
-		$frmScr = new CFormTable();
-
-		if(isset($_REQUEST['screenid'])){
-			$result=DBselect('SELECT screenid,name,hsize,vsize '.
-						' FROM screens g '.
-						' WHERE screenid='.$_REQUEST['screenid']);
-			$row=DBfetch($result);
-
-			$frmScr->setTitle(S_SCREEN.' "'.$row['name'].'"');
-			$frmScr->addVar('screenid',$_REQUEST['screenid']);
-		}
-		else{
-			$frmScr->setTitle(S_SCREEN);
-		}
-
-
-		if(isset($_REQUEST['screenid']) && !isset($_REQUEST['form_refresh'])){
-			$name = $row['name'];
-			$hsize = $row['hsize'];
-			$vsize = $row['vsize'];
-		}
-		else{
-			$name = get_request('name', '');
-			$hsize = get_request('hsize', 1);
-			$vsize = get_request('bsize', 1);
-			$frmScr->addVar('templateid', get_request('templateid'));
-		}
-
-
-		$frmScr->addRow(S_NAME, new CTextBox('name', $name, 32));
-		$frmScr->addRow(S_COLUMNS, new CNumericBox('hsize', $hsize, 3));
-		$frmScr->addRow(S_ROWS, new CNumericBox('vsize', $vsize, 3));
-
-		$frmScr->addItemToBottomRow(new CButton('save', S_SAVE));
-		if(isset($_REQUEST['screenid'])){
-			/* $frmScr->addItemToBottomRow(SPACE);
-			$frmScr->addItemToBottomRow(new CButton('clone',S_CLONE)); !!! TODO */
-			$frmScr->addItemToBottomRow(array(SPACE, new CButtonDelete(S_DELETE_SCREEN_Q, url_param('form').url_param('screenid'))));
-		}
-		$frmScr->addItemToBottomRow(array(SPACE, new CButtonCancel(url_param('templateid'))));
-
-		return $frmScr;
-	}
-
 // HOSTS
 	function insert_mass_update_host_form(){//$elements_array_name){
 		global $USER_DETAILS;

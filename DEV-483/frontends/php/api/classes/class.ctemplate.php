@@ -1128,7 +1128,7 @@ COpt::memoryPick();
 		$options = array(
 			'templateids' => zbx_objectValues($templates, 'templateid'),
 			'editable' => 1,
-			'extendoutput' => 1,
+			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => 1
 		);
 		$del_templates = self::get($options);
