@@ -11,7 +11,7 @@ if(isset($_GET['lang']) && ($_GET['lang'] != 'en_gb') && preg_match('/^[a-z]{2}_
 // }}} get language translations
 
 
-// available scriptas 'scriptFileName' => 'path relative to js/'
+// available scripts 'scriptFileName' => 'path relative to js/'
 $availableJScripts = array(
 	'common.js' => '',
 	'menu.js' => '',
@@ -113,6 +113,4 @@ header('Cache-Control: public, must-revalidate');
 header('ETag: '.$ETag);
 
 echo $js;
-
-return;
 ?>
