@@ -1002,6 +1002,7 @@ class zbxXML{
 							$current_hostid = reset($result['hostids']);
 						}
 					}
+					$current_hostname = $host_db['host'];
 
 
 // ITEMS {{{
@@ -1329,7 +1330,7 @@ class zbxXML{
 
 						foreach($importScreens as $mnum => $screen){
 
-							$current_screen = CScreen::get(array(
+							$current_screen = CTemplateScreen::get(array(
 								'filter' => array('name' => $screen['name']),
 								'templateids' => $current_hostid,
 								'output' => API_OUTPUT_EXTEND,
@@ -1346,40 +1347,42 @@ class zbxXML{
 								continue;
 							}
 
-							foreach($screen['screenitems'] as $snum => &$screenitem){
-								$nodeCaption = isset($screenitem['resourceid']['node'])?$screenitem['resourceid']['node'].':':'';
+							if(isset($screen['screenitems'])){
+								foreach($screen['screenitems'] as $snum => &$screenitem){
+									$nodeCaption = isset($screenitem['resourceid']['node'])?$screenitem['resourceid']['node'].':':'';
 
-								if(!isset($screenitem['resourceid']))
-									$screenitem['resourceid'] = 0;
+									if(!isset($screenitem['resourceid']))
+										$screenitem['resourceid'] = 0;
 
-								if(is_array($screenitem['resourceid'])){
-									switch($screenitem['resourcetype']){
-										case SCREEN_RESOURCE_GRAPH:
-											$db_graphs = CGraph::getObjects($screenitem['resourceid']);
+									if(is_array($screenitem['resourceid'])){
+										switch($screenitem['resourcetype']){
+											case SCREEN_RESOURCE_GRAPH:
+												$db_graphs = CGraph::getObjects($screenitem['resourceid']);
 
-											if(empty($db_graphs)){
-												$error = S_CANNOT_FIND_GRAPH.' "'.$nodeCaption.$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['name'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
-												throw new Exception($error);
-											}
+												if(empty($db_graphs)){
+													$error = S_CANNOT_FIND_GRAPH.' "'.$nodeCaption.$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['name'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
+													throw new Exception($error);
+												}
 
-											$tmp = reset($db_graphs);
-											$screenitem['resourceid'] = $tmp['graphid'];
-										break;
-										case SCREEN_RESOURCE_SIMPLE_GRAPH:
-										case SCREEN_RESOURCE_PLAIN_TEXT:
-											$db_items = CItem::getObjects($screenitem['resourceid']);
+												$tmp = reset($db_graphs);
+												$screenitem['resourceid'] = $tmp['graphid'];
+											break;
+											case SCREEN_RESOURCE_SIMPLE_GRAPH:
+											case SCREEN_RESOURCE_PLAIN_TEXT:
+												$db_items = CItem::getObjects($screenitem['resourceid']);
 
-											if(empty($db_items)){
-												$error = S_CANNOT_FIND_ITEM.' "'.$nodeCaption.$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['key_'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
-												throw new Exception($error);
-											}
+												if(empty($db_items)){
+													$error = S_CANNOT_FIND_ITEM.' "'.$nodeCaption.$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['key_'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
+													throw new Exception($error);
+												}
 
-											$tmp = reset($db_items);
-											$screenitem['resourceid'] = $tmp['itemid'];
-										break;
-										default:
-											$screenitem['resourceid'] = 0;
-										break;
+												$tmp = reset($db_items);
+												$screenitem['resourceid'] = $tmp['itemid'];
+											break;
+											default:
+												$screenitem['resourceid'] = 0;
+											break;
+										}
 									}
 								}
 							}
@@ -1388,16 +1391,16 @@ class zbxXML{
 							if($current_screen){
 								$screen['screenid'] = $current_screen['screenid'];
 
-								$result = CScreen::update($screen);
+								$result = CTemplateScreen::update($screen);
 								if(!$result) throw new Exception('Cannot update screen');
 
-								info(S_SCREEN.' ['.$screen['name'].'] '.S_UPDATED_SMALL);
+								info('['.$current_hostname.'] '.S_SCREEN.' ['.$screen['name'].'] '.S_UPDATED_SMALL);
 							}
 							else{
-								$result = CScreen::create($screen);
+								$result = CTemplateScreen::create($screen);
 								if(!$result) throw new Exception('Cannot create screen');
 
-								info(S_SCREEN.' ['.$screen['name'].'] '.S_ADDED_SMALL);
+								info('['.$current_hostname.'] '.S_SCREEN.' ['.$screen['name'].'] '.S_ADDED_SMALL);
 							}
 						}
 					}

@@ -957,7 +957,7 @@ COpt::memoryPick();
 /**
  * Add Template
  *
- * @param _array $templates multidimensional array with templates data
+ * @param array $templates multidimensional array with templates data
  * @param string $templates['host']
  * @param string $templates['port']
  * @param string $templates['status']

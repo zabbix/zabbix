@@ -515,12 +515,12 @@ class CTemplateScreen extends CScreen{
 		try{
 			self::BeginTransaction(__METHOD__);
 
-			$screenNames = zbxtoHash($screens, 'name');
+			$screenNames = zbx_objectValues($screens, 'name');
 			$templateids = zbx_objectValues($screens, 'templateid');
 // Exists
 			$options = array(
 				'filter' => array(
-					'name' => $newScreenNames,
+					'name' => $screenNames,
 					'templateid' => $templateids
 				),
 				'output' => API_OUTPUT_EXTEND,

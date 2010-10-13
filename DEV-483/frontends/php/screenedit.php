@@ -79,9 +79,6 @@ include_once('include/page_header.php');
 	$_REQUEST['dynmic'] = get_request('dynamic', SCREEN_SIMPLE_ITEM);
 ?>
 <?php
-	$trigg_wdgt = new CWidget();
-	$trigg_wdgt->addPageHeader(S_CONFIGURATION_OF_SCREEN_BIG);
-
 	$options = array(
 		'screenids' => $_REQUEST['screenid'],
 		'editable' => 1,
@@ -95,9 +92,6 @@ include_once('include/page_header.php');
 	}
 
 	$screen = reset($screens);
-
-	$trigg_wdgt->addHeader($screen['name']);
-	$trigg_wdgt->addItem(BR());
 
 	if(isset($_REQUEST['save'])){
 		if(!isset($_REQUEST['elements'])) $_REQUEST['elements'] = 0;
@@ -247,12 +241,21 @@ include_once('include/page_header.php');
 		}
 	}
 
+	$screen_wdgt = new CWidget();
+	$screen_wdgt->addPageHeader(S_CONFIGURATION_OF_SCREEN_BIG);
+
+	$screen_wdgt->addHeader($screen['name']);
+	$screen_wdgt->addItem(BR());
+
+	if($screen['templateid'])
+		$screen_wdgt->addItem(get_header_host_table($screen['templateid']));
+
 	$table = get_screen($screen, 1);
-	$trigg_wdgt->addItem($table);
+	$screen_wdgt->addItem($table);
 	zbx_add_post_js('init_screen("'.$_REQUEST['screenid'].'","iframe","'.$_REQUEST['screenid'].'");');
 	zbx_add_post_js('timeControl.processObjects();');
 
-	$trigg_wdgt->show();
+	$screen_wdgt->show();
 ?>
 <?php
 
