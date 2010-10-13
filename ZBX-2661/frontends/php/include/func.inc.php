@@ -878,7 +878,7 @@ function order_result(&$data, $sortfield=null, $sortorder=ZBX_SORT_UP){
 		natcasesort($data);
 		if($sortorder != ZBX_SORT_UP)
 			$data = array_reverse($data, true);
-
+		return true;
 	}
 
 	$sort = array();

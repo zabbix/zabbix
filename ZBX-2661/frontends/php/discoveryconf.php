@@ -321,7 +321,7 @@ include_once('include/page_header.php');
 			$form->addRow(S_CHECKS, $dchecks);
 		}
 
-		$cmbChkType = new CComboBox('new_check_type',$new_check_type, "if(add_variable(this, 'type_changed', 1)) submit()");
+		$cmbChkType = new CComboBox('new_check_type', $new_check_type, "if(add_variable(this, 'type_changed', 1)) submit()");
 		$cmbChkType->addItems(discovery_check_type2str());
 
 		if(isset($_REQUEST['type_changed'])){
