@@ -1463,7 +1463,7 @@ form_selement_newUrl: function(e){
 
 	var selementid = this.selementForm.selementid.value;
 
-	var ll = $(this.selementForm.urls).select('span[name="remove"]').length;
+	var ll = $(this.selementForm.urls).select('tr[id^=urlrow]').length;
 	var sysmapelementurlid = selementid+''+ll;
 	var tpl = new Template(ZBX_TPL.selementFormUrls);
 	
@@ -2597,9 +2597,11 @@ form_selement_save: function(e){
 				'url': $('url_url_'+urlid).value
 			};
 
+			if(empty(url.name) && empty(url.url)) continue;
+
 			if(empty(url.name) || empty(url.url)){
 				alert('Incorrect map element link is given');
-				return true;
+				return false;
 			}
 			
 			params.urls[url.name] = url;
