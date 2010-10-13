@@ -583,7 +583,7 @@ class zbxXML{
 							);
 							$imgs = CImage::get($options);
 							$img = reset($imgs);
-							
+
 							$image['imageid'] = $img['imageid'];
 							$image['image'] = base64_decode($image['encodedImage']);
 							unset($image['encodedImage']);
@@ -1275,7 +1275,7 @@ class zbxXML{
 								if(count($item_data) < 2){
 									throw new APIException(1, 'Incorrect y min item for graph ['.$graph_db['name'].']');
 								}
-								
+
 								if(!$item = get_item_by_key($item_data[1], $item_data[0])){
 									throw new APIException(1, 'Missed item ['.$graph_db['ymin_item_key'].'] for host ['.$host_db['host'].']');
 								}
@@ -1552,12 +1552,12 @@ class zbxXML{
 				$hostminmaxs = CHost::get($options);
 				$hostminmaxs = zbx_toHash($hostminmaxs, 'hostid');
 
-				
+
 				foreach($data['graphs'] as $num => $graph){
 					$graph['hosts'] = zbx_toHash($graph['hosts'], 'hostid');
-					
+
 					if(isset($graph['hosts'][$host['hostid']])){
-					
+
 						if($graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE){
 							$graph['ymin_item_key'] = $hostminmaxs[$itemminmaxs[$graph['ymin_itemid']]['hostid']]['host'].':'.
 									$itemminmaxs[$graph['ymin_itemid']]['key_'];

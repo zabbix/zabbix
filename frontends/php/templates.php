@@ -166,11 +166,12 @@ include_once('include/page_header.php');
 // SELECT SCREENS
 		$params = array(
 			'templateids' => $templateids,
-			'preservekeys' => 1,
 			'select_screenitems' => API_OUTPUT_EXTEND,
-			'output' => API_OUTPUT_EXTEND
+			'output' => API_OUTPUT_EXTEND,
+			'noInheritance' => true
 		);
-		$screens = CScreen::get($params);
+		$screens = CTemplateScreen::get($params);
+
 		prepareScreenExport($screens);
 
 // SELECT ITEMS
