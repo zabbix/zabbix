@@ -1732,10 +1732,12 @@ require_once('include/js.inc.php');
 		try{
 			foreach($exportScreens as $snum => &$screen){
 				unset($screen['screenid']);
+				unset($screen['hostid']);
 
 				foreach($screen['screenitems'] as $snum => &$screenItem){
 					unset($screenItem['screenid']);
 					unset($screenItem['screenitemid']);
+					unset($screenItem['dynamic']);
 					if($screenItem['resourceid'] == 0) continue;
 
 					switch($screenItem['resourcetype']){
