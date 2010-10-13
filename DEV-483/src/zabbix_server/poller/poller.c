@@ -42,7 +42,8 @@
 #include "checks_telnet.h"
 #include "checks_calculated.h"
 
-#define MAX_ITEMS	64
+#define MAX_NORMAL_ITEMS	64
+#define MAX_UNREACHABLE_ITEMS	1	/* must not be greater than MAX_NORMAL_ITEMS to avoid buffer overflow */
 
 AGENT_RESULT    result;
 
@@ -448,7 +449,7 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 static int	get_values()
 {
 	const char	*__function_name = "get_values";
-	DC_ITEM		items[MAX_ITEMS];
+	DC_ITEM		items[MAX_NORMAL_ITEMS];
 	AGENT_RESULT	agent;
 	zbx_uint64_t	*ids = NULL, *snmpids = NULL, *ipmiids = NULL;
 	int		ids_alloc = 0, snmpids_alloc = 0, ipmiids_alloc = 0,
@@ -463,7 +464,8 @@ static int	get_values()
 
 	DCinit_nextchecks();
 
-	num = DCconfig_get_poller_items(poller_type, items, MAX_ITEMS);
+	num = DCconfig_get_poller_items(poller_type, items, ZBX_POLLER_TYPE_NORMAL == poller_type
+								? MAX_NORMAL_ITEMS : MAX_UNREACHABLE_ITEMS);
 
 	for (i = 0; i < num; i++)
 	{
@@ -662,15 +664,16 @@ void	main_poller_loop(unsigned char p, int type, int num)
 	phan.sa_flags = SA_SIGINFO;
 	sigaction(SIGALRM, &phan, NULL);
 
-	zbx_process	= p;
-	poller_type	= type;
-	poller_num	= num - 1;
+	zbx_process = p;
+	poller_type = type;
+	poller_num = num - 1;
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for (;;)
 	{
-		zbx_setproctitle("poller [getting values]");
+		zbx_setproctitle("poller %s[getting values]",
+				ZBX_POLLER_TYPE_NORMAL == poller_type ? "" : "for unreachable hosts ");
 
 		sec = zbx_time();
 		processed = get_values();
@@ -687,12 +690,15 @@ void	main_poller_loop(unsigned char p, int type, int num)
 				sleeptime = POLLER_DELAY;
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Poller #%d spent " ZBX_FS_DBL " seconds while updating %3d values."
-				" Sleeping for %d seconds", poller_num, sec, processed, sleeptime);
+		zabbix_log(LOG_LEVEL_DEBUG, "Poller %s#%d spent " ZBX_FS_DBL " seconds while updating %3d values."
+				" Sleeping for %d seconds",
+				ZBX_POLLER_TYPE_NORMAL == poller_type ? "" : "for unreachable hosts ", poller_num,
+				sec, processed, sleeptime);
 
 		if (sleeptime > 0)
 		{
-			zbx_setproctitle("poller [sleeping for %d seconds]", sleeptime);
+			zbx_setproctitle("poller %s[sleeping for %d seconds]",
+					ZBX_POLLER_TYPE_NORMAL == poller_type ? "" : "for unreachable hosts ", sleeptime);
 			sleep(sleeptime);
 		}
 	}

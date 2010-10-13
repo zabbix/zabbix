@@ -1406,7 +1406,7 @@ Copt::memoryPick();
 					'editable' => 1,
 					'nopermissions' => 1
 				);
-				$host_exists = self::get($options);				
+				$host_exists = self::get($options);
 				$host_exist = reset($host_exists);
 				if(!is_null($host_exist) && ($host_exist['hostid'] != $cur_host['hostid'])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
@@ -1447,16 +1447,19 @@ Copt::memoryPick();
 				$groups_to_add = array_diff($new_groupids, $host_groupids);
 
 				if(!empty($groups_to_add)){
-					$result = self::massAdd(array('hosts' => $hosts, 'groups' => $groups_to_add));
+					$result = self::massAdd(array(
+						'hosts' => $hosts,
+						'groups' => zbx_toObject($groups_to_add, 'groupid')
+					));
 					if(!$result){
 						self::exception(ZBX_API_ERROR_PARAMETERS, 'Can\'t add group');
 					}
 				}
 
-				$groups_to_del = array_diff($host_groupids, $new_groupids);
+				$groupids_to_del = array_diff($host_groupids, $new_groupids);
 
-				if(!empty($groups_to_del)){
-					$result = self::massRemove(array('hosts' => $hosts, 'groups' => $groups_to_del));
+				if(!empty($groupids_to_del)){
+					$result = self::massRemove(array('hostids' => $hostids, 'groupids' => $groupids_to_del));
 					if(!$result){
 						self::exception(ZBX_API_ERROR_PARAMETERS, 'Can\'t remove group');
 					}
@@ -1480,16 +1483,21 @@ Copt::memoryPick();
 
 // UPDATE TEMPLATE LINKAGE {{{
 			if(isset($data['templates']) && !is_null($data['templates'])){
-				$host_templates = CTemplate::get(array('hostids' => $hostids));
+				$opt = array(
+					'hostids' => $hostids,
+					'output' => API_OUTPUT_SHORTEN,
+					'preservekeys' => true,
+				);
+				$host_templates = CTemplate::get($opt);
 
-				$host_templateids = zbx_objectValues($host_templates, 'templateid');
+				$host_templateids = array_keys($host_templates);
 				$new_templateids = zbx_objectValues($data['templates'], 'templateid');
 
 				$templates_to_del = array_diff($host_templateids, $new_templateids);
 				$templates_to_del = array_diff($templates_to_del, $cleared_templateids);
 
 				if(!empty($templates_to_del)){
-					$result = self::massRemove(array('hosts' => $hosts, 'templates' => $templates_to_del));
+					$result = self::massRemove(array('hostids' => $hostids, 'templateids' => $templates_to_del));
 					if(!$result){
 						self::exception(ZBX_API_ERROR_PARAMETERS, S_CANNOT_UNLINK_TEMPLATE);
 					}
@@ -1502,7 +1510,7 @@ Copt::memoryPick();
 			}
 // }}} UPDATE TEMPLATE LINKAGE
 
-
+			
 // UPDATE MACROS {{{
 			if(isset($data['macros']) && !is_null($data['macros'])){
 				$macrosToAdd = zbx_toHash($data['macros'], 'macro');
@@ -1517,10 +1525,9 @@ Copt::memoryPick();
 				$macrosToDelete = array();
 				foreach($hostMacros as $hmnum => $hmacro){
 					if(!isset($macrosToAdd[$hmacro['macro']])){
-						$macrosToDelete[] = $hmacro;
+						$macrosToDelete[] = $hmacro['macro'];
 					}
 				}
-
 // Update
 				$macrosToUpdate = array();
 				foreach($macrosToAdd as $nhmnum => $nhmacro){
@@ -1532,7 +1539,7 @@ Copt::memoryPick();
 //----
 
 				if(!empty($macrosToDelete)){
-					$result = self::massRemove(array('hosts' => $hosts, 'macros' => $macrosToDelete));
+					$result = self::massRemove(array('hostids' => $hostids, 'macros' => $macrosToDelete));
 					if(!$result){
 						self::exception(ZBX_API_ERROR_PARAMETERS, 'Can\'t remove macro');
 					}
@@ -1666,45 +1673,47 @@ Copt::memoryPick();
 	}
 
 /**
- * remove Hosts to HostGroups. All Hosts are added to all HostGroups.
+ * remove Hosts from HostGroups. All Hosts are removed from all HostGroups.
  *
  * @param array $data
- * @param array $data['hosts']
- * @param array $data['templates']
- * @param array $data['macros']
+ * @param array $data['hostids']
+ * @param array $data['groupids']
+ * @param array $data['templateids']
+ * @param array $data['macroids']
  * @return array
  */
 	public static function massRemove($data){
-		$data['hosts'] = zbx_toArray($data['hosts']);
+		$hostids = zbx_toArray($data['hostids']);
 
 		try{
 			self::BeginTransaction(__METHOD__);
 
 			$options = array(
-				'hostids' => zbx_objectValues($data['hosts'], 'hostid'),
+				'hostids' => $hostids,
 				'editable' => 1,
-				'preservekeys' => 1
+				'preservekeys' => 1,
+				'output' => API_OUTPUT_SHORTEN,
 			);
 			$upd_hosts = self::get($options);
-			foreach($data['hosts'] as $hnum => $host){
-				if(!isset($upd_hosts[$host['hostid']])){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, 'You do not have enough rights for operation');
+			foreach($hostids as $hostid){
+				if(!isset($upd_hosts[$hostid])){
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				}
 			}
 
-			if(isset($data['groups'])){
+			if(isset($data['groupids'])){
 				$options = array(
-					'hosts' => $data['hosts'],
-					'groups' => zbx_toArray($data['groups'])
+					'hostids' => $hostids,
+					'groupids' => zbx_toArray($data['groupids'])
 				);
 				$result = CHostGroup::massRemove($options);
 				if(!$result) self::exception();
 			}
 
-			if(isset($data['templates'])){
+			if(isset($data['templateids'])){
 				$options = array(
-					'hosts' => $data['hosts'],
-					'templates' => zbx_toArray($data['templates'])
+					'hostids' => $hostids,
+					'templateids' => zbx_toArray($data['templateids'])
 				);
 				$result = CTemplate::massRemove($options);
 				if(!$result) self::exception();
@@ -1712,15 +1721,15 @@ Copt::memoryPick();
 
 			if(isset($data['macros'])){
 				$options = array(
-					'hosts' => $data['hosts'],
-					'macros' => $data['macros']
+					'hostids' => $hostids,
+					'macros' => zbx_toArray($data['macros'])
 				);
 				$result = CUserMacro::massRemove($options);
 				if(!$result) self::exception();
 			}
 
 			self::EndTransaction(true, __METHOD__);
-			return array('hostids' => zbx_objectValues($data['hosts'], 'hostid'));
+			return array('hostids' => $hostids);
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
