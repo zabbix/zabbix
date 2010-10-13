@@ -860,60 +860,46 @@ class CUserMacro extends CZBXAPI{
  * @version 1
  *
  * @param array $data
- * @param array $data['groups']
- * @param array $data['hosts']
- * @param array $data['templates']
+ * @param array $data['hostids']
+ * @param array $data['templateids']
  * @return boolean
  */
 	public static function massRemove($data){
-		$hosts = isset($data['hosts']) ? zbx_toArray($data['hosts']) : array();
-		$templates = isset($data['templates']) ? zbx_toArray($data['templates']) : array();
-
-		$hostids = zbx_objectValues($hosts, 'hostid');
-		$templateids = zbx_objectValues($templates, 'templateid');
-
 		try{
 			self::BeginTransaction(__METHOD__);
 
-			if(!isset($data['macros']) || empty($data['macros']))
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Not set input parameter [ macros ]');
-			else if(empty($hosts) && empty($templates))
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Not set input parameter [ hosts ] or [ templates ]');
+			$macros = zbx_toArray($data['macros'], 'macro');
 
+			$hostids = isset($data['hostids']) ? zbx_toArray($data['hostids']) : array();
+			$templateids = isset($data['templateids']) ? zbx_toArray($data['templateids']) : array();
 			$objectids = array_merge($hostids, $templateids);
+
 // Check on existing
 			$options = array(
 				'hostids' => $objectids,
-				'filter' => array('macro' => zbx_objectValues($data['macros'], 'macro')),
-				'editable' => 1,
-				'output' => API_OUTPUT_EXTEND
+				'templated_hosts' => 1,
+				'editable' => true,
+				'output' => API_OUTPUT_SHORTEN,
+				'preservekeys' => true
+			);
+			$db_objects = CHost::get($options);
+
+			foreach($objectids as $objectid){
+				if(!isset($db_objects[$objectid]))
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+			}
+
+			$options = array(
+				'hostids' => $objectids,
+				'filter' => array('macro' => $macros),
+				'nopermissions' => true,
+				'output' => API_OUTPUT_SHORTEN,
+				'preservekeys' => true
 			);
 			$db_macros = self::get($options);
+			$hostmacroids = array_keys($db_macros);
 
-			$existing_macros = array();
-			foreach($db_macros as $dbnum => $db_macro){
-				if(!isset($existing_macros[$db_macro['macro']])) $existing_macros[$db_macro['macro']] = array();
-				$existing_macros[$db_macro['macro']][$db_macro['hostid']] = $db_macro;
-			}
-
-			foreach($data['macros'] as $hmnum => $updMacro){
-				foreach($objectids as $hnum => $objectid){
-					if(!isset($existing_macros[$updMacro['macro']][$objectid]))
-						self::exception(ZBX_API_ERROR_PERMISSIONS, S_MACRO.' [ '.$updMacro['macro'].' ] '.S_DOES_NOT_EXIST_SMALL);
-				}
-			}
-
-			$hostmacroids = zbx_objectValues($db_macros, 'hostmacroid');
-//--
-
-			$macros = zbx_objectValues($data['macros'], 'macro');
-
-			$data_delete = array(
-				DBcondition('hostid', $objectids),
-				DBcondition('macro', $macros, false, true)
-			);
-
-			DB::delete('hostmacro', $data_delete);
+			DB::delete('hostmacro', array(DBcondition('hostmacroid', $hostmacroids)));
 
 			self::EndTransaction(true, __METHOD__);
 			return array('hostmacroids' => $hostmacroids);

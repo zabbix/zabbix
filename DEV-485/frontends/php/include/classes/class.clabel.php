@@ -1,6 +1,7 @@
+<?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,24 +17,14 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
+?>
+<?php
+class CLabel extends CTag{
+	public function __construct($label, $for=null, $id=null){
+		parent::__construct('label', 'yes', $label);
 
-#ifndef ZABBIX_POLLER_H
-#define ZABBIX_POLLER_H
-
-#include "common.h"
-#include "dbcache.h"
-#include "sysinfo.h"
-
-extern int	server_num;
-
-extern int	CONFIG_TIMEOUT;
-extern int	CONFIG_POLLER_FORKS;
-extern int	CONFIG_UNREACHABLE_POLLER_FORKS;
-extern int	CONFIG_IPMIPOLLER_FORKS;
-extern int	CONFIG_UNAVAILABLE_DELAY;
-extern int	CONFIG_UNREACHABLE_PERIOD;
-extern int	CONFIG_UNREACHABLE_DELAY;
-
-void	main_poller_loop(unsigned char p, int type, int num);
-
-#endif
+		if(!is_null($id)) $this->setAttribute('id', $id);
+		if(!is_null($for)) $this->setAttribute('for', $for);
+	}
+}
+?>
