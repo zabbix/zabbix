@@ -437,12 +437,7 @@ class CTrigger extends CZBXAPI{
 
 // --- FILTER ---
 		if(is_array($options['filter'])){
-
-			if(isset($options['filter']['description']) && !is_null($options['filter']['description'])){
-				zbx_value2array($options['filter']['description']);
-
-				$sql_parts['where']['description'] = DBcondition('t.description',$options['filter']['description'], false, true);
-			}
+			zbx_db_filter('triggers t', $options, $sql_parts);
 
 			if(isset($options['filter']['host']) && !is_null($options['filter']['host'])){
 				zbx_value2array($options['filter']['host']);
@@ -466,32 +461,6 @@ class CTrigger extends CZBXAPI{
 				$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
 				
 				$sql_parts['where']['hostid'] = DBcondition('i.hostid', $options['filter']['hostid']);
-			}
-
-// severity
-			if(isset($options['filter']['priority']) && !is_null($options['filter']['priority'])){
-				zbx_value2array($options['filter']['priority']);
-
-				$sql_parts['where']['priority'] = DBcondition('t.priority', $options['filter']['priority']);
-			}
-
-//status
-			if(isset($options['filter']['status']) && !is_null($options['filter']['status'])){
-				zbx_value2array($options['filter']['status']);
-
-				$sql_parts['where']['status'] = DBcondition('t.status', $options['filter']['status']);
-			}
-//templateid
-			if(isset($options['filter']['templateid']) && !is_null($options['filter']['templateid'])){
-				zbx_value2array($options['filter']['templateid']);
-
-				$sql_parts['where']['templateid'] = DBcondition('t.templateid', $options['filter']['templateid']);
-			}
-// value
-			if(isset($options['filter']['value']) && !is_null($options['filter']['value'])){
-				zbx_value2array($options['filter']['value']);
-
-				$sql_parts['where']['value'] = DBcondition('t.value', $options['filter']['value']);
 			}
 		}
 
