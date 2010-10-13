@@ -337,7 +337,6 @@ include_once('include/page_header.php');
 			$i = 0;
 			foreach($urls as $url){
 				$url_label = new CTextBox('urls['.$i.'][name]', $url['name'], 16);
-				$url_label->setAttribute('maxlength', '16');
 				$url_link = new CTextBox('urls['.$i.'][url]', $url['url'], 16);
 
 				$url_etype = new CCombobox('urls['.$i.'][elementtype]', $url['elementtype']);
