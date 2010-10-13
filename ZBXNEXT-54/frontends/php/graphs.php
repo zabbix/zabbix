@@ -119,7 +119,7 @@ include_once('include/page_header.php');
 	$_REQUEST['items'] = get_request('items', array());
 	$_REQUEST['group_gid'] = get_request('group_gid', array());
 	$_REQUEST['graph3d'] = get_request('graph3d', 0);
-	$_REQUEST['legend'] = get_request('legend', 1);
+	$_REQUEST['legend'] = get_request('legend', 0);
 
 // ---- <ACTIONS> ----
 	if(isset($_REQUEST['clone']) && isset($_REQUEST['graphid'])){
