@@ -446,7 +446,9 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maint
 		event.object = EVENT_OBJECT_TRIGGER;
 		event.objectid = triggerid;
 		event.clock = maintenance_to;
+		event.ns = 0;
 		event.value = value_after;
+		event.value_changed = TRIGGER_VALUE_CHANGED_NO;
 
 		process_event(&event, 1);
 	}
