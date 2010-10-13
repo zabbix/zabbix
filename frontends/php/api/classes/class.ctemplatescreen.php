@@ -530,7 +530,7 @@ class CTemplateScreen extends CScreen{
 //---
 
 			foreach($screens as $snum => $screen){
-				$screen_db_fields = array('name' => null);
+				$screen_db_fields = array('name' => null, 'templateid' => null);
 				if(!check_db_fields($screen_db_fields, $screen)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for screen [ '.$screen['name'].' ]');
 				}
