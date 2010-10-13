@@ -354,7 +354,6 @@ include_once('include/page_header.php');
 // empty template row {{{
 			$tpl_url_label = new CTextBox('urls[#{id}][name]', '', 16);
 			$tpl_url_label->setAttribute('disabled', 'disabled');
-			$tpl_url_label->setAttribute('maxlength', '16');
 			$tpl_url_link = new CTextBox('urls[#{id}][url]', '', 16);
 			$tpl_url_link->setAttribute('disabled', 'disabled');
 			$tpl_url_etype = new CCombobox('urls[#{id}][elementtype]');
