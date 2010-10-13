@@ -553,9 +553,15 @@ COpt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS,'Map [ '.$map['name'].' ] already exists.');
 				}
 
-				foreach($map['urls'] as $url){
+				$urlNames = zbx_toHash($map['urls'], 'name');
+				foreach($map['urls'] as $unum => $url){
 					if(empty($url['name']) || empty($url['url']))
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Url should have both "name" and "url" fields.');
+						self::exception(ZBX_API_ERROR_PARAMETERS, 'Link should have both "name" and "url" fields.');
+
+					if(!isset($urlNames[$url['name']]))
+						self::exception(ZBX_API_ERROR_PARAMETERS, 'Link name should be unique.');
+
+					unset($urlNames[$url['name']]);
 				}
 			}
 			$sysmapids = DB::insert('sysmaps', $maps);
@@ -639,9 +645,9 @@ COpt::memoryPick();
 						'nopermissions' => 1
 					);
 					$map_exists = self::get($options);
-					$map_exists = reset($map_exists);
+					$map_exist = reset($map_exists);
 
-					if($map_exists && ($map_exists['sysmapid'] != $map['sysmapid'])){
+					if($map_exist && ($map_exist['sysmapid'] != $map['sysmapid'])){
 						self::exception(ZBX_API_ERROR_PARAMETERS, 'Map [ '.$map['name'].' ] '.S_ALREADY_EXISTS_SMALL);
 					}
 				}
@@ -653,9 +659,15 @@ COpt::memoryPick();
 
 
 				if(isset($map['urls'])){
-					foreach($map['urls'] as $url){
+					$urlNames = zbx_toHash($map['urls'], 'name');
+					foreach($map['urls'] as $unum => $url){
 						if(empty($url['name']) || empty($url['url']))
-							self::exception(ZBX_API_ERROR_PARAMETERS, 'Url should have both "name" and "url" fields.');
+							self::exception(ZBX_API_ERROR_PARAMETERS, 'Link should have both "name" and "url" fields.');
+
+						if(!isset($urlNames[$url['name']]))
+							self::exception(ZBX_API_ERROR_PARAMETERS, 'Link name should be unique.');
+
+						unset($urlNames[$url['name']]);
 					}
 
 					$map['urls'] = zbx_toHash($map['urls'], 'name');
