@@ -585,7 +585,8 @@ COpt::memoryPick();
 			}
 			DB::insert('sysmap_url', $insert_urls);
 
-			self::addElements($data_elements);
+			if(!empty($data_elements))
+				self::addElements($data_elements);
 
 			self::EndTransaction(true, __METHOD__);
 
@@ -868,6 +869,7 @@ COpt::memoryPick();
 					self::exception(S_CIRCULAR_LINK_CANNOT_BE_CREATED.' "'.$selement['label'].'"');
 				}
 			}
+
 			$selementids = DB::insert('sysmaps_elements', $selements);
 
 			$insert_urls = array();
@@ -884,7 +886,7 @@ COpt::memoryPick();
 
 			self::EndTransaction(true, __METHOD__);
 
-			return $selementids;
+		return $selementids;
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
