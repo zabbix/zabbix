@@ -407,13 +407,8 @@ require_once('include/js.inc.php');
 		$form->setName('screen_item_form');
 
 		if(isset($_REQUEST['screenitemid'])){
-			$sql = 'SELECT * '.
-					' FROM screens_items'.
-					' WHERE screenid='.$_REQUEST['screenid'].
-						' AND screenitemid='.$_REQUEST['screenitemid'];
-			$iresult=DBSelect($sql);
-
 			$form->addVar('screenitemid',$_REQUEST['screenitemid']);
+			$screenItems = zbx_toHash($screen['screenitems'], 'screenitemid');
 		}
 		else{
 			$form->addVar('x',$_REQUEST['x']);
@@ -421,19 +416,20 @@ require_once('include/js.inc.php');
 		}
 
 		if(isset($_REQUEST['screenitemid']) && !isset($_REQUEST['form_refresh'])){
-			$irow = DBfetch($iresult);
-			$resourcetype	= $irow['resourcetype'];
-			$resourceid	= $irow['resourceid'];
-			$width		= $irow['width'];
-			$height		= $irow['height'];
-			$colspan	= $irow['colspan'];
-			$rowspan	= $irow['rowspan'];
-			$elements	= $irow['elements'];
-			$valign		= $irow['valign'];
-			$halign		= $irow['halign'];
-			$style		= $irow['style'];
-			$url		= $irow['url'];
-			$dynamic	= $irow['dynamic'];
+			$screenItem = $screenItems[$_REQUEST['screenitemid']];
+
+			$resourcetype	= $screenItem['resourcetype'];
+			$resourceid	= $screenItem['resourceid'];
+			$width		= $screenItem['width'];
+			$height		= $screenItem['height'];
+			$colspan	= $screenItem['colspan'];
+			$rowspan	= $screenItem['rowspan'];
+			$elements	= $screenItem['elements'];
+			$valign		= $screenItem['valign'];
+			$halign		= $screenItem['halign'];
+			$style		= $screenItem['style'];
+			$url		= $screenItem['url'];
+			$dynamic	= $screenItem['dynamic'];
 		}
 		else{
 			$resourcetype	= get_request('resourcetype',	0);
@@ -875,7 +871,7 @@ require_once('include/js.inc.php');
 		$form->addRow(S_ROW_SPAN,	new CNumericBox('rowspan',$rowspan,2));
 
 // dynamic AddOn
-		if(in_array($resourcetype, array(SCREEN_RESOURCE_GRAPH,SCREEN_RESOURCE_SIMPLE_GRAPH,SCREEN_RESOURCE_PLAIN_TEXT))){
+		if(($screen['templateid'] == 0) && in_array($resourcetype, array(SCREEN_RESOURCE_GRAPH,SCREEN_RESOURCE_SIMPLE_GRAPH,SCREEN_RESOURCE_PLAIN_TEXT))){
 			$form->addRow(S_DYNAMIC_ITEM,	new CCheckBox('dynamic',$dynamic,null,1));
 		}
 
