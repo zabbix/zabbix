@@ -110,7 +110,7 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 		else if(isset($_REQUEST['delete'])){
 			$scriptid = get_request('scriptid', 0);
 
-			$result = delete_script($scriptid);
+			$result = CScript::delete($scriptid);
 
 			if($result){
 				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCRIPT, S_SCRIPT.' ['.$scriptid.']');
@@ -125,15 +125,12 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 		}
 	// ------ GO -----
 		else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['scripts'])){
-			$scripts = $_REQUEST['scripts'];
+			$scriptids = $_REQUEST['scripts'];
 
-			$go_result = true;
-			foreach($scripts as $scriptid){
-				$go_result &= delete_script($scriptid);
-
-				if($go_result){
+			$go_result = CScript::delete($scriptids);
+			if($go_result){
+				foreach($scriptids as $snum => $scriptid)
 					add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCRIPT, S_SCRIPT.' ['.$scriptid.']');
-				}
 			}
 
 			show_messages($go_result, S_SCRIPT_DELETED, S_CANNOT_DELETE_SCRIPT);
@@ -330,6 +327,9 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 
 	$scripts_wdgt->show();
 
+?>
+<?php
 
 include_once('include/page_footer.php');
+
 ?>

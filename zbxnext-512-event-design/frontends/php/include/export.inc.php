@@ -573,14 +573,16 @@ class zbxXML{
 				foreach($images as $inum => $image){
 					if(CImage::exists($image)){
 						if((($image['imagetype'] == IMAGE_TYPE_ICON) && isset($rules['icons']['exist']))
-							|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && (isset($rules['background']['exist'])))){
+							|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && (isset($rules['background']['exist']))))
+						{
 
 							$options = array(
 								'filter' => array('name' => $image['name']),
 								'output' => API_OUTPUT_SHORTEN
 							);
-							$img = CImage::get($options);
-							$img = reset($img);
+							$imgs = CImage::get($options);
+							$img = reset($imgs);
+							
 							$image['imageid'] = $img['imageid'];
 							$image['image'] = base64_decode($image['encodedImage']);
 							unset($image['encodedImage']);
@@ -590,9 +592,12 @@ class zbxXML{
 					}
 					else{
 						if((($image['imagetype'] == IMAGE_TYPE_ICON) && isset($rules['icons']['missed']))
-							|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && isset($rules['background']['missed']))){
+							|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && isset($rules['background']['missed'])))
+						{
 
-							$image['image'] = base64_decode($image['encodedImage']);
+// No need to decode_base64
+							$image['image'] = $image['encodedImage'];
+
 							unset($image['encodedImage']);
 							$images_to_add[] = $image;
 						}
@@ -1166,7 +1171,7 @@ class zbxXML{
 								$current_item = CItem::get($options);
 							}
 
-							$r = CApplication::addItems(array(
+							$r = CApplication::massAdd(array(
 								'applications' => $item_applications,
 								'items' => $current_item
 							));
@@ -1335,38 +1340,30 @@ class zbxXML{
 								continue; // break if not update exist
 							}
 
-							if($current_graph){
-								if(!empty($graph_db['ymin_item_key'])){
-									$graph_db['ymin_item_key'] = explode(':', $graph_db['ymin_item_key']);
-									if(count($graph_db['ymin_item_key']) < 2){
-										error('Incorrect y min item for graph ['.$graph_db['name'].']');
-									}
-
-									$current_graph['host']	= array_shift($graph_db['ymin_item_key']);
-									$current_graph['ymin_item_key']	= implode(':', $graph_db['ymin_item_key']);
-
-									if(!$item = get_item_by_key($current_graph['ymin_item_key'], $current_graph['host'])){
-										error('Missed item ['.$current_graph['ymin_item_key'].'] for host ['.$current_graph['host'].']');
-									}
-
-									$current_graph['ymin_itemid'] = $item['itemid'];
+							if($graph_db['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE){
+								$item_data = explode(':', $graph_db['ymin_item_key'], 2);
+								if(count($item_data) < 2){
+									throw new APIException(1, 'Incorrect y min item for graph ['.$graph_db['name'].']');
+								}
+								
+								if(!$item = get_item_by_key($item_data[1], $item_data[0])){
+									throw new APIException(1, 'Missed item ['.$graph_db['ymin_item_key'].'] for host ['.$host_db['host'].']');
 								}
 
-								if(!empty($graph_db['ymax_item_key'])){
-									$graph_db['ymax_item_key'] = explode(':', $graph_db['ymax_item_key']);
-									if(count($graph_db['ymax_item_key']) < 2){
-										error('Incorrect y max item for graph ['.$graph_db['name'].']');
-									}
+								$graph_db['ymin_itemid'] = $item['itemid'];
+							}
 
-									$current_graph['host']	= array_shift($graph_db['ymax_item_key']);
-									$current_graph['ymax_item_key']	= implode(':', $graph_db['ymax_item_key']);
-
-									if(!$item = get_item_by_key($current_graph['ymax_item_key'], $current_graph['host'])){
-										error('Missed item ['.$current_graph['ymax_item_key'].'] for host ['.$current_graph['host'].']');
-									}
-
-									$current_graph['ymax_itemid'] = $item['itemid'];
+							if($graph_db['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE){
+								$item_data = explode(':', $graph_db['ymax_item_key'], 2);
+								if(count($item_data) < 2){
+									throw new APIException(1, 'Incorrect y max item for graph ['.$graph_db['name'].']');
 								}
+
+								if(!$item = get_item_by_key($item_data[1], $item_data[0])){
+									throw new APIException(1, 'Missed item ['.$graph_db['ymax_item_key'].'] for host ['.$host_db['host'].']');
+								}
+
+								$graph_db['ymax_itemid'] = $item['itemid'];
 							}
 
 
@@ -1508,19 +1505,21 @@ class zbxXML{
 // GRAPHS
 			if(isset($data['graphs'])){
 				$graphs_node = $host_node->appendChild(new DOMElement(XML_TAG_GRAPHS));
-						$itemminmaxids = array();
+				$itemminmaxids = array();
 
 				foreach($data['graphs'] as $num => $graph){
-					$itemminmaxids[$graph['ymin_itemid']] = $graph['ymin_itemid'];
-					$itemminmaxids[$graph['ymax_itemid']] = $graph['ymax_itemid'];
+					if($graph['ymin_itemid'] && ($graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE))
+						$itemminmaxids[$graph['ymin_itemid']] = $graph['ymin_itemid'];
+					if($graph['ymax_itemid'] && ($graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE))
+						$itemminmaxids[$graph['ymax_itemid']] = $graph['ymax_itemid'];
 				}
 
 				$options = array(
 					'itemids' => $itemminmaxids,
-					'extendoutput' => 1,
+					'output' => API_OUTPUT_EXTEND,
+					'templated_hosts' => 1,
 					'nopermissions' => 1
 				);
-
 				$itemminmaxs = CItem::get($options);
 				$itemminmaxs = zbx_toHash($itemminmaxs, 'itemid');
 
@@ -1528,26 +1527,29 @@ class zbxXML{
 				$hostminmaxs = CHost::get($options);
 				$hostminmaxs = zbx_toHash($hostminmaxs, 'hostid');
 
+				
 				foreach($data['graphs'] as $num => $graph){
 					$graph['hosts'] = zbx_toHash($graph['hosts'], 'hostid');
+					
 					if(isset($graph['hosts'][$host['hostid']])){
-
-						$graph['ymin_item_key'] = '';
-						$graph['ymax_item_key'] = '';
-
-						if($graph['ymin_itemid'] > 0){
+					
+						if($graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE){
 							$graph['ymin_item_key'] = $hostminmaxs[$itemminmaxs[$graph['ymin_itemid']]['hostid']]['host'].':'.
-														$itemminmaxs[$graph['ymin_itemid']]['key_'];
+									$itemminmaxs[$graph['ymin_itemid']]['key_'];
+						}
+						else{
+							$graph['ymin_item_key'] = '';
 						}
 
-						if($graph['ymax_itemid'] > 0){
+						if($graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE){
 							$graph['ymax_item_key'] = $hostminmaxs[$itemminmaxs[$graph['ymax_itemid']]['hostid']]['host'].':'.
-														$itemminmaxs[$graph['ymax_itemid']]['key_'];
+									$itemminmaxs[$graph['ymax_itemid']]['key_'];
 						}
-
+						else{
+							$graph['ymax_item_key'] = '';
+						}
 
 						$graph_node = self::addChildData($graphs_node, XML_TAG_GRAPH, $graph);
-
 
 						if(isset($data['graphs_items'])){
 							$graph_elements_node = $graph_node->appendChild(new DOMElement(XML_TAG_GRAPH_ELEMENTS));

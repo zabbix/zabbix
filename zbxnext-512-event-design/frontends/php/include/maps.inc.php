@@ -1606,7 +1606,7 @@
 			$formatted[] = array(
 				'name' => $image['name'],
 				'imagetype' => $image['imagetype'],
-				'encodedImage' => base64_encode($image['image']),
+				'encodedImage' => $image['image'],
 			);
 		}
 		return $formatted;

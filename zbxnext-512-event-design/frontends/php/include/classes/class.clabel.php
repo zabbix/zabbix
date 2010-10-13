@@ -1,6 +1,7 @@
+<?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,24 +17,14 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
+?>
+<?php
+class CLabel extends CTag{
+	public function __construct($label, $for=null, $id=null){
+		parent::__construct('label', 'yes', $label);
 
-#ifndef ZABBIX_ZBXCONF_H
-#define ZABBIX_ZBXCONF_H
-
-extern char	*CONFIG_HOSTS_ALLOWED;
-extern char	*CONFIG_HOSTNAME;
-extern int	CONFIG_DISABLE_ACTIVE;
-extern int	CONFIG_DISABLE_PASSIVE;
-extern int	CONFIG_ENABLE_REMOTE_COMMANDS;
-extern int	CONFIG_UNSAFE_USER_PARAMETERS;
-extern int	CONFIG_LISTEN_PORT;
-extern int	CONFIG_SERVER_PORT;
-extern int	CONFIG_REFRESH_ACTIVE_CHECKS;
-extern char	*CONFIG_LISTEN_IP;
-extern int	CONFIG_LOG_LEVEL;
-extern int	CONFIG_MAX_LINES_PER_SECOND;
-
-void    load_config();
-void    load_user_parameters(int optional);
-
-#endif /* ZABBIX_ZBXCONF_H */
+		if(!is_null($id)) $this->setAttribute('id', $id);
+		if(!is_null($for)) $this->setAttribute('for', $for);
+	}
+}
+?>

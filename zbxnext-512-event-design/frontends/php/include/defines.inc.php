@@ -38,13 +38,13 @@
 	define('ZBX_FONTPATH',					realpath('fonts'));	// where to search for font (GD > 2.0.18)
 	define('ZBX_GRAPH_FONT_NAME',			'DejaVuSans');		// font file name
 
-	define('ZBX_SCRIPT_TIMEOUT',			360); // in seconds
-	define('ZBX_SCRIPT_BYTES_LIMIT',		1073741824); // 1073741824 is 1MB in bytes
+	define('ZBX_SCRIPT_TIMEOUT',			60); // in seconds
+	define('ZBX_SCRIPT_BYTES_LIMIT',		1048576); // 1048576 is 1MB in bytes
 
 	define('GRAPH_YAXIS_SIDE_DEFAULT',		0); // 0 - LEFT SIDE, 1 - RIGHT SIDE
 
 	define('ZBX_MAX_IMAGE_SIZE',			1024*1024);
-
+ 
 	define('ZBX_UNITS_ROUNDOFF_THRESHOLD', 0.01);
 	define('ZBX_UNITS_ROUNDOFF_UPPER_LIMIT', 2);
 	define('ZBX_UNITS_ROUNDOFF_LOWER_LIMIT', 6);
@@ -760,12 +760,12 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	define('ZBX_DEFAULT_IMPORT_HOST_GROUP', 'Imported hosts');
 
 // API errors //
-	define('ZBX_API_ERROR_NO_HOST', 1);
 	define('ZBX_API_ERROR_INTERNAL', 111);
 	define('ZBX_API_ERROR_PARAMETERS', 100);
 	define('ZBX_API_ERROR_PERMISSIONS', 120);
 	define('ZBX_API_ERROR_NO_AUTH', 200);
 	define('ZBX_API_ERROR_NO_METHOD', 300);
+
 	//define('ZBX_API_ERROR_PARAMETERS', 100);
 
 	define('API_OUTPUT_SHORTEN', 'shorten');

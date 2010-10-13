@@ -107,7 +107,7 @@ const char	*zbx_strpool_intern(const char *str)
 	void		*record;
 	uint32_t	*refcount;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() str[%s]", __function_name, str);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() str:'%s'", __function_name, str);
 
 	LOCK_POOL;
 
@@ -138,7 +138,7 @@ const char	*zbx_strpool_acquire(const char *str)
 
 	uint32_t	*refcount;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() str[%s]", __function_name, str);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() str:'%s'", __function_name, str);
 
 	LOCK_POOL;
 
@@ -158,7 +158,7 @@ void	zbx_strpool_release(const char *str)
 
 	uint32_t	*refcount;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() str[%s]", __function_name, str);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() str:'%s'", __function_name, str);
 
 	LOCK_POOL;
 

@@ -51,7 +51,7 @@ class CTag extends CObject{
 			$this->tag_end = $this->tag_body_start = '';
 		}
 		else{
-			CTag::addItem($body);
+			$this->addItem($body);
 		}
 
 		$this->setClass($class);

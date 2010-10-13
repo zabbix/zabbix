@@ -31,44 +31,43 @@
 
 include_once "include/page_header.php";
 
-//---------------------------------- CHECKS ------------------------------------
-
 //		VAR							TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-
-	$fields=array(
-		'hostid'=>				array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,	'isset({execute})'),
-		'scriptid'=>			array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,	'isset({execute})'),
-		'execute'=>				array(T_ZBX_INT, O_OPT,  P_ACT, 		IN('0,1'),	null),
-	);
-
+$fields=array(
+	'hostid'=>				array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,	'isset({execute})'),
+	'scriptid'=>			array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,	'isset({execute})'),
+	'execute'=>				array(T_ZBX_INT, O_OPT,  P_ACT, 		IN('0,1'),	null),
+);
 check_fields($fields);
 
 if(isset($_REQUEST['execute'])){
-	if($script = get_script_by_scriptid($_REQUEST['scriptid'])){
-		if($script['host_access'] == PERM_READ_WRITE){
-			$hosts_read_write = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY);
+	$scriptid = $_REQUEST['scriptid'];
+	$hostid = $_REQUEST['hostid'];
 
-			if(isset($hosts_read_write[$_REQUEST['hostid']])){
-//SDI('WRITE: '.$_REQUEST['scriptid'].' : '.$_REQUEST['hostid']);
-//				$result = execute_script($_REQUEST['scriptid'],$_REQUEST['hostid']);
-//				insert_command_result_form($result["flag"],$result["message"]);
-				insert_command_result_form($_REQUEST['scriptid'],$_REQUEST['hostid']);
-/*				echo nl2br(htmlspecialchars($result));*/
-			}
-		}
-		else {
-			$hosts_read_only  = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
+	$sql = 'SELECT name '.
+			' FROM scripts '.
+			' WHERE scriptid='.$scriptid;
+	$script_info = DBfetch(DBselect($sql));
 
-			if(isset($hosts_read_only[$_REQUEST['hostid']])){
-//SDI('READ: '.$_REQUEST['scriptid'].' : '.$_REQUEST['hostid']);
-//				$result = execute_script($_REQUEST['scriptid'],$_REQUEST['hostid']);
-//				insert_command_result_form($result["flag"],$result["message"]);
-				insert_command_result_form($_REQUEST['scriptid'],$_REQUEST['hostid']);
-/*				echo nl2br(htmlspecialchars($result));*/
-			}
-		}
+	$result = CScript::execute(array('hostid' => $hostid, 'scriptid' => $scriptid));
+	if($result === false){
+		show_messages(false, '', S_SCRIPT_ERROR);
 	}
+	else{
+		$message = $result['value'];
+		if($result['response'] == 'failed'){
+			error($message);
+			show_messages(false, '', S_SCRIPT_ERROR);
+			$message = '';
+		}
+
+		$frmResult = new CFormTable($script_info['name'].': '.script_make_command($scriptid, $hostid));
+		$frmResult->addRow(S_RESULT, new CTextArea('message', $message, 100, 25, 'yes'));
+		$frmResult->addItemToBottomRow(new CButton('close', S_CLOSE, 'window.close();'));
+		$frmResult->show();
+	}
+
 }
+
 ?>
 <?php
 include_once "include/page_footer.php";

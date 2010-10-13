@@ -213,7 +213,7 @@ include_once('include/page_header.php');
 
 	}
 	else if(isset($_REQUEST['delete'])&&isset($_REQUEST['userid'])){
-		$users = CUser::get(array('userids' => $_REQUEST['userid'],  'extendoutput' => 1));
+		$users = CUser::get(array('userids' => $_REQUEST['userid'],  'output' => API_OUTPUT_EXTEND));
 		$user = reset($users);
 
 		$result = CUser::delete($users);
@@ -232,7 +232,7 @@ include_once('include/page_header.php');
 		$user = CUser::get(array('userids'=>$_REQUEST['userid'],'extendoutput'=>1));
 		$user = reset($user);
 
-		$group = CUserGroup::get(array('usrgrpids' => $_REQUEST['usrgrpid'],  'extendoutput' => 1));
+		$group = CUserGroup::get(array('usrgrpids' => $_REQUEST['usrgrpid'],  'output' => API_OUTPUT_EXTEND));
 		$group = reset($group);
 
 		DBstart();
@@ -255,7 +255,7 @@ include_once('include/page_header.php');
 		$user = CUser::get(array('userids'=>$_REQUEST['userid'],'extendoutput'=>1));
 		$user = reset($user);
 
-		$group = CUserGroup::get(array('usrgrpids' => $_REQUEST['usrgrpid'],  'extendoutput' => 1));
+		$group = CUserGroup::get(array('usrgrpids' => $_REQUEST['usrgrpid'],  'output' => API_OUTPUT_EXTEND));
 		$group = reset($group);
 
 		DBstart();
@@ -284,8 +284,10 @@ include_once('include/page_header.php');
 		$go_result = DBend($go_result);
 
 		if($go_result){
-			$options = array('userids'=>$group_userid,
-							'extendoutput' => 1);
+			$options = array(
+				'userids'=>$group_userid,
+				'output' => API_OUTPUT_EXTEND
+			);
 			$users = CUser::get($options);
 			foreach($users as $unum => $user){
 				info('User '.$user['alias'].' unblocked');
@@ -300,7 +302,7 @@ include_once('include/page_header.php');
 		$go_result = false;
 
 		$group_userid = get_request('group_userid', array());
-		$db_users = CUser::get(array('userids' => $group_userid, 'extendoutput' => 1));
+		$db_users = CUser::get(array('userids' => $group_userid, 'output' => API_OUTPUT_EXTEND));
 		$db_users = zbx_toHash($db_users, 'userid');
 
 		DBstart();

@@ -111,7 +111,7 @@ static void	free_trigger_info(DB_EVENT *event)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	process_event(DB_EVENT *event)
+int	process_event(DB_EVENT *event, int force_actions)
 {
 	const char	*__function_name = "process_event";
 
@@ -137,7 +137,7 @@ int	process_event(DB_EVENT *event)
 			event->value,
 			event->value_changed);
 
-	if (TRIGGER_VALUE_CHANGED_YES == event->value_changed)
+	if (TRIGGER_VALUE_CHANGED_YES == event->value_changed || 1 == force_actions)
 	{
 		add_trigger_info(event);
 

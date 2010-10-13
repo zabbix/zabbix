@@ -144,7 +144,7 @@ void	zbx_binary_heap_create_ext(zbx_binary_heap_t *heap, zbx_compare_func_t comp
 {
 	const char	*__function_name = "zbx_binary_heap_create";
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() options[%d]", __function_name, options);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() options:%d", __function_name, options);
 
 	heap->elems = NULL;
 	heap->elems_num = 0;
@@ -225,7 +225,7 @@ void	zbx_binary_heap_insert(zbx_binary_heap_t *heap, zbx_binary_heap_elem_t *ele
 
 	int		index;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key[" ZBX_FS_UI64 "]", __function_name, elem->key);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:" ZBX_FS_UI64, __function_name, elem->key);
 
 	if (HAS_DIRECT_OPTION(heap) && FAIL != zbx_hashmap_get(heap->key_index, elem->key))
 	{
@@ -252,7 +252,7 @@ void	zbx_binary_heap_update_direct(zbx_binary_heap_t *heap, zbx_binary_heap_elem
 
 	int		index;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key[" ZBX_FS_UI64 "]", __function_name, elem->key);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:" ZBX_FS_UI64, __function_name, elem->key);
 
 	if (!HAS_DIRECT_OPTION(heap))
 	{
@@ -269,7 +269,7 @@ void	zbx_binary_heap_update_direct(zbx_binary_heap_t *heap, zbx_binary_heap_elem
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Element with key[" ZBX_FS_UI64 "] not found in heap for update.",
+		zabbix_log(LOG_LEVEL_CRIT, "Element with key " ZBX_FS_UI64 " not found in heap for update.",
 				elem->key);
 		exit(FAIL);
 	}
@@ -312,7 +312,7 @@ void	zbx_binary_heap_remove_direct(zbx_binary_heap_t *heap, zbx_uint64_t key)
 
 	int		index;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key[" ZBX_FS_UI64 "]", __function_name, key);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:" ZBX_FS_UI64, __function_name, key);
 
 	if (!HAS_DIRECT_OPTION(heap))
 	{
@@ -334,7 +334,7 @@ void	zbx_binary_heap_remove_direct(zbx_binary_heap_t *heap, zbx_uint64_t key)
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Element with key[" ZBX_FS_UI64 "] not found in heap for remove.",
+		zabbix_log(LOG_LEVEL_CRIT, "Element with key " ZBX_FS_UI64 " not found in heap for remove.",
 				key);
 		exit(FAIL);
 	}
