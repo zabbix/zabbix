@@ -285,12 +285,14 @@ function make_system_status($filter){
 		$options = array(
 			'nodeids' => get_current_nodeid(),
 			'triggerids' => $trigger['triggerid'],
-			'object' => EVENT_SOURCE_TRIGGERS,
-			'value' => TRIGGER_VALUE_TRUE,
+			'filter' => array(
+				'object' => EVENT_SOURCE_TRIGGERS,
+				'value' => TRIGGER_VALUE_TRUE,
+			),
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => 1,
 			'limit' => 1,
-			'sortfield' => 'eventid',
+			'sortfield' => 'clock',
 			'sortorder' => ZBX_SORT_DOWN
 		);
 		$event = CEvent::get($options);
