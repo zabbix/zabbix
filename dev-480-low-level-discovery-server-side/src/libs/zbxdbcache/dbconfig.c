@@ -65,6 +65,7 @@ ZBX_DC_ITEM
 	unsigned char 	poller_type;
 	unsigned char	status;
 	unsigned char	in_queue;
+	unsigned char	flags;
 };
 
 ZBX_DC_ITEM_HK
@@ -218,7 +219,7 @@ static const char	*INTERNED_SERVER_ZABBIXLOG_KEY;
  */
 static void	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t proxy_hostid,
 				unsigned char item_type, const char *key,
-				unsigned char *poller_type)
+				unsigned char flags, unsigned char *poller_type)
 {
 	if (0 != proxy_hostid && (ITEM_TYPE_INTERNAL != item_type &&
 				ITEM_TYPE_AGGREGATE != item_type &&
@@ -229,6 +230,12 @@ static void	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t proxy_hostid,
 	}
 
 	if (INTERNED_SERVER_STATUS_KEY == key || INTERNED_SERVER_ZABBIXLOG_KEY == key)
+	{
+		*poller_type = ZBX_NO_POLLER;
+		return;
+	}
+
+	if (0 != (flags & ZBX_FLAG_DISCOVERY_CHILD))
 	{
 		*poller_type = ZBX_NO_POLLER;
 		return;
@@ -539,8 +546,13 @@ static void	DCsync_items(DB_RESULT result)
 		item->hostid = hostid;
 		item->type = (unsigned char)atoi(row[3]);
 		item->data_type = (unsigned char)atoi(row[4]);
-		item->value_type = (unsigned char)atoi(row[5]);
 		DCstrpool_replace(found, &item->key, row[6]);
+		item->flags = (unsigned char)atoi(row[26]);
+
+		if (item->flags & ZBX_FLAG_DISCOVERY)
+			item->value_type = ITEM_VALUE_TYPE_TEXT;
+		else
+			item->value_type = (unsigned char)atoi(row[5]);
 
 		/* update item_hk index, if needed */
 		if (!found || update_index)
@@ -580,7 +592,7 @@ static void	DCsync_items(DB_RESULT result)
 		item->delay = delay;
 
  		old_poller_type = item->poller_type;
- 		poller_by_item(itemid, proxy_hostid, item->type, item->key, &item->poller_type);
+ 		poller_by_item(itemid, proxy_hostid, item->type, item->key, item->flags, &item->poller_type);
 		if (ZBX_POLLER_TYPE_UNREACHABLE == old_poller_type &&
 				(ZBX_POLLER_TYPE_NORMAL == item->poller_type || ZBX_POLLER_TYPE_IPMI == item->poller_type))
 			item->poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
@@ -1101,7 +1113,8 @@ void	DCsync_configuration()
 				"i.snmp_community,i.snmp_oid,i.snmp_port,i.snmpv3_securityname,"
 				"i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,"
 				"i.ipmi_sensor,i.delay,i.delay_flex,i.trapper_hosts,i.logtimefmt,i.params,"
-				"i.status,i.authtype,i.username,i.password,i.publickey,i.privatekey"
+				"i.status,i.authtype,i.username,i.password,i.publickey,i.privatekey,"
+				"i.flags"
 			" from items i,hosts h"
 			" where i.hostid=h.hostid"
 				" and h.status in (%d)"
@@ -1518,6 +1531,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 	*dst_item->trapper_hosts = '\0';
 	*dst_item->logtimefmt = '\0';
 	*dst_item->delay_flex = '\0';
+	dst_item->flags = src_item->flags;
 
 	if (NULL != (flexitem = zbx_hashset_search(&config->flexitems, &src_item->itemid)))
 		strscpy(dst_item->delay_flex, flexitem->delay_flex);
@@ -1798,7 +1812,8 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max
 			if (ZBX_POLLER_TYPE_UNREACHABLE == poller_type)
 			{
 				old_poller_type = dc_item->poller_type;
- 				poller_by_item(dc_item->itemid, dc_host->proxy_hostid, dc_item->type, dc_item->key, &dc_item->poller_type);
+ 				poller_by_item(dc_item->itemid, dc_host->proxy_hostid, dc_item->type, dc_item->key,
+						dc_item->flags, &dc_item->poller_type);
 
 	 			old_nextcheck = dc_item->nextcheck;
 				dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, now);
@@ -1904,6 +1919,9 @@ int	DCconfig_get_items(zbx_uint64_t hostid, const char *key, DC_ITEM **items)
 		if (NULL == (dc_item = DCfind_item(dc_host->hostid, key)))
 			continue;
 
+		if (0 != (dc_item->flags & ZBX_FLAG_DISCOVERY_CHILD))
+			continue;
+
 		if (CONFIG_REFRESH_UNSUPPORTED == 0 &&
 				ITEM_STATUS_NOTSUPPORTED == dc_item->status)
 			continue;
@@ -1942,7 +1960,8 @@ void	DCrequeue_reachable_item(zbx_uint64_t itemid, unsigned char status, int now
 		old_poller_type = dc_item->poller_type;
 		if (ZBX_POLLER_TYPE_UNREACHABLE == dc_item->poller_type)
 			if (NULL != (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
- 				poller_by_item(dc_item->itemid, dc_host->proxy_hostid, dc_item->type, dc_item->key, &dc_item->poller_type);
+ 				poller_by_item(dc_item->itemid, dc_host->proxy_hostid, dc_item->type,
+						dc_item->key, dc_item->flags, &dc_item->poller_type);
 
  		old_nextcheck = dc_item->nextcheck;
 		dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, now);

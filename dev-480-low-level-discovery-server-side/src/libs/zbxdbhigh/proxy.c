@@ -22,6 +22,7 @@
 #include "log.h"
 #include "zlog.h"
 #include "sysinfo.h"
+#include "zbxserver.h"
 
 #include "proxy.h"
 #include "dbcache.h"
@@ -1317,6 +1318,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 	AGENT_RESULT	agent;
 	DC_ITEM		item;
 	int		i;
+	char		error[ITEM_ERROR_LEN_MAX];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1357,14 +1359,26 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 			init_result(&agent);
 
 			if (SUCCEED == set_result_type(&agent, item.value_type,
-						proxy_hostid ? ITEM_DATA_TYPE_DECIMAL : item.data_type, values[i].value))
+					proxy_hostid ? ITEM_DATA_TYPE_DECIMAL : item.data_type, values[i].value))
 			{
 				if (ITEM_VALUE_TYPE_LOG == item.value_type)
 					calc_timestamp(values[i].value, &values[i].timestamp, item.logtimefmt);
 
-				dc_add_history(item.itemid, item.value_type, &agent, &values[i].ts,
-						values[i].timestamp, values[i].source, values[i].severity,
-						values[i].logeventid, values[i].lastlogsize, values[i].mtime);
+				/* check for low-level discovery (lld) item */
+				if (0 != (item.flags & ZBX_FLAG_DISCOVERY))
+				{
+					if (NOTSUPPORTED == DBlld_process_discovery_rule(item.itemid,
+								agent.text, error, strlen(error)))
+					{
+						zabbix_log(LOG_LEVEL_WARNING, "Item [%s:%s] error: %s",
+								item.host.host, item.key_orig, error);
+						DCadd_nextcheck(item.itemid, (time_t)values[i].ts.sec, error);
+					}
+				}
+				else
+					dc_add_history(item.itemid, item.value_type, &agent, &values[i].ts,
+							values[i].timestamp, values[i].source, values[i].severity,
+							values[i].logeventid, values[i].lastlogsize, values[i].mtime);
 
 				if (NULL != processed)
 					(*processed)++;
@@ -1786,4 +1800,1436 @@ exit:
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s",
 			__function_name, zbx_result_string(ret));
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBget_applications_by_itemid                                     *
+ *                                                                            *
+ * Purpose: retrieve applications for specified item                          *
+ *                                                                            *
+ * Parameters:  hostid - host identificator from database                     *
+ *              template_itemid - template item identificator from database   *
+ *              appids - result buffer                                        *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBget_applications_by_itemid(zbx_uint64_t itemid,
+		zbx_uint64_t **appids, int *appids_alloc, int *appids_num)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	applicationid;
+
+	result = DBselect(
+			"select applicationid"
+			" from items_applications"
+			" where itemid=" ZBX_FS_UI64,
+			itemid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(applicationid, row[0]);
+		uint64_array_add(appids, appids_alloc, appids_num, applicationid, 4);
+	}
+	DBfree_result(result);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBlld_expand_trigger_expression                                  *
+ *                                                                            *
+ * Purpose: expand trigger expression                                         *
+ *                                                                            *
+ * Parameters: triggerid  - [IN] trigger identificator from database          *
+ *             expression - [IN] trigger short expression                     *
+ *             jp_row     - [IN] received discovery record                    *
+ *                                                                            *
+ * Return value: pointer to expanded expression                               *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static char	*DBlld_expand_trigger_expression(zbx_uint64_t triggerid, const char *expression,
+		struct zbx_json_parse *jp_row)
+{
+	const char	*__function_name = "DBlld_expand_trigger_expression";
+
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		search[23], *expr, *old_expr,
+			*key = NULL, *replace = NULL;
+	size_t		sz_h, sz_k, sz_f, sz_p,
+			key_alloc = 0;
+	int		replace_alloc = 1024, replace_offset;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, expression);
+
+	expr = strdup(expression);
+	replace = zbx_malloc(replace, replace_alloc);
+
+	result = DBselect(
+			"select f.functionid,h.host,i.key_,f.function,f.parameter,i.flags"
+			" from functions f,items i,hosts h"
+			" where f.itemid=i.itemid"
+				" and i.hostid=h.hostid"
+				" and f.triggerid=" ZBX_FS_UI64,
+			triggerid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		if (key_alloc < (sz_k = strlen(row[2]) + 1))
+		{
+			key_alloc = MAX(sz_k, 1024);
+			key = zbx_realloc(key, key_alloc);
+		}
+		memcpy(key, row[2], sz_k);
+
+		if (NULL != jp_row && (ZBX_FLAG_DISCOVERY_CHILD & (unsigned char)atoi(row[5])))
+			substitute_discovery_macros(&key, &key_alloc, jp_row);
+
+		sz_h = strlen(row[1]);
+		sz_k = strlen(key);
+		sz_f = strlen(row[3]);
+		sz_p = strlen(row[4]);
+		replace_offset = 0;
+
+		zbx_snprintf(search, sizeof(search), "{%s}", row[0]);
+		zbx_snprintf_alloc(&replace, &replace_alloc, &replace_offset, sz_h + sz_k + sz_f + sz_p + 7,
+				"{%s:%s.%s(%s)}", row[1], key, row[3], row[4]);
+
+		old_expr = expr;
+		expr = string_replace(old_expr, search, replace);
+		zbx_free(old_expr);
+	}
+	DBfree_result(result);
+
+	zbx_free(key);
+	zbx_free(replace);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() expr:'%s'", __function_name, expr);
+
+	return expr;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBlld_compare_triggers                                           *
+ *                                                                            *
+ * Purpose: compare two triggers                                              *
+ *                                                                            *
+ * Parameters: triggerid1  - [IN] first trigger identificator from database   *
+ *             expression1 - [IN] fist trigger short expression               *
+ *             triggerid2  - [IN] second trigger identificator from database  *
+ *             expression2 - [IN] second trigger short expression             *
+ *                                                                            *
+ * Return value: SUCCEED - if triggers coincide                               *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBlld_compare_triggers(zbx_uint64_t triggerid1, const char *expression1,
+		zbx_uint64_t triggerid2, const char *expression2, struct zbx_json_parse *jp_row)
+{
+	const char	*__function_name = "DBlld_compare_triggers";
+
+	char		*expr1, *expr2;
+	int		res = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	expr1 = DBlld_expand_trigger_expression(triggerid1, expression1, jp_row);
+	expr2 = DBlld_expand_trigger_expression(triggerid2, expression2, NULL);
+
+	if (0 != strcmp(expr1, expr2))
+		res = FAIL;
+
+	zbx_free(expr2);
+	zbx_free(expr1);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+
+	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBlld_get_item                                                   *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBlld_get_item(zbx_uint64_t hostid, const char *tmpl_key,
+		struct zbx_json_parse *jp_row, zbx_uint64_t *itemid)
+{
+	const char	*__function_name = "DBlld_get_item";
+
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*key = NULL, *key_esc;
+	size_t		key_alloc, sz_k;
+	int		res = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	sz_k = strlen(tmpl_key) + 1;
+	key_alloc = MAX(sz_k, 1024);
+	key = zbx_realloc(key, key_alloc);
+	memcpy(key, tmpl_key, sz_k);
+
+	substitute_discovery_macros(&key, &key_alloc, jp_row);
+	key_esc = DBdyn_escape_string(key);
+
+	result = DBselect(
+			"select itemid"
+			" from items"
+			" where hostid=" ZBX_FS_UI64
+				" and key_='%s'",
+			hostid, key_esc);
+
+	zbx_free(key_esc);
+
+	if (NULL == (row = DBfetch(result)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() Can't find item [%s] on the host",
+				__function_name, key);
+		res = FAIL;
+	}
+	else
+		ZBX_STR2UINT64(*itemid, row[0]);
+
+	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+
+	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBlld_copy_trigger                                               *
+ *                                                                            *
+ * Purpose: copy specified trigger to host                                    *
+ *                                                                            *
+ * Parameters: hostid - host identificator from database                      *
+ *             triggerid - trigger identificator from database                *
+ *             description - trigger description                              *
+ *             expression - trigger expression                                *
+ *             status - trigger status                                        *
+ *             type - trigger type                                            *
+ *             priority - trigger priority                                    *
+ *             comments - trigger comments                                    *
+ *             url - trigger url                                              *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBlld_copy_trigger(zbx_uint64_t hostid, zbx_uint64_t triggerid, const char *description,
+		const char *expression, unsigned char status, unsigned char type, unsigned char priority,
+		const char *comments, const char *url, struct zbx_json_parse *jp_row)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	h_itemid, h_triggerid, functionid, new_triggerid, triggerdiscoveryid;
+	char		search[23], replace[23],
+			*old_expression, *new_expression, *expression_esc,
+			*description_esc, *comments_esc, *url_esc,
+			*function_esc, *parameter_esc;
+	int		res = FAIL;
+
+	description_esc = DBdyn_escape_string(description);
+
+	/* The trigger already exists? */
+	result = DBselect(
+			"select distinct t.triggerid,t.expression"
+			" from triggers t,functions f,items i"
+			" where t.triggerid=f.triggerid"
+				" and f.itemid=i.itemid"
+				" and i.hostid=" ZBX_FS_UI64
+				" and t.description='%s'"
+				" and not t.flags & %d",
+			hostid, description_esc, ZBX_FLAG_DISCOVERY_CHILD);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(h_triggerid, row[0]);
+
+		if (SUCCEED != DBlld_compare_triggers(triggerid, expression, h_triggerid, row[1], jp_row))
+			continue;
+
+		res = SUCCEED;
+		break;
+	}
+	DBfree_result(result);
+
+	/* trigger creation */
+	if (SUCCEED != res)
+	{
+		char	*sql = NULL;
+		int	sql_alloc = 256, sql_offset = 0;
+
+		res = SUCCEED;
+
+		sql = zbx_malloc(sql, sql_alloc);
+
+#ifdef HAVE_ORACLE
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
+#endif
+
+		new_triggerid = DBget_maxid("triggers");
+		triggerdiscoveryid = DBget_maxid("trigger_discovery");
+		new_expression = strdup(expression);
+
+		comments_esc = DBdyn_escape_string(comments);
+		url_esc = DBdyn_escape_string(url);
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 192 +
+				strlen(description_esc) +
+				strlen(comments_esc) + strlen(url_esc),
+				"insert into triggers"
+					" (triggerid,description,priority,status,"
+						"comments,url,type,value)"
+					" values (" ZBX_FS_UI64 ",'%s',%d,%d,"
+						"'%s','%s',%d,%d);\n",
+					new_triggerid, description_esc, (int)priority,
+					(int)status, comments_esc, url_esc, (int)type,
+					TRIGGER_VALUE_UNKNOWN);
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 152,
+				"insert into trigger_discovery"
+					" (triggerdiscoveryid,triggerid,parent_triggerid)"
+				" values"
+					" (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ");\n",
+				triggerdiscoveryid, new_triggerid, triggerid);
+
+		zbx_free(url_esc);
+		zbx_free(comments_esc);
+
+		/* Loop: functions */
+		result = DBselect(
+				"select f.itemid,f.functionid,f.function,f.parameter,i.key_,i.flags"
+				" from functions f,items i"
+				" where f.itemid=i.itemid"
+					" and f.triggerid=" ZBX_FS_UI64,
+				triggerid);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			if (ZBX_FLAG_DISCOVERY_CHILD & (unsigned char)atoi(row[5]))
+			{
+				if (FAIL == (res = DBlld_get_item(hostid, row[4], jp_row, &h_itemid)))
+					break;
+			}
+			else
+				ZBX_STR2UINT64(h_itemid, row[0]);
+
+			functionid = DBget_maxid("functions");
+
+			zbx_snprintf(search, sizeof(search), "{%s}", row[1]);
+			zbx_snprintf(replace, sizeof(replace), "{" ZBX_FS_UI64 "}", functionid);
+
+			function_esc = DBdyn_escape_string(row[2]);
+			parameter_esc = DBdyn_escape_string(row[3]);
+
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					160 + strlen(function_esc) + strlen(parameter_esc),
+					"insert into functions"
+					" (functionid,itemid,triggerid,function,parameter)"
+					" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ","
+						ZBX_FS_UI64 ",'%s','%s');\n",
+					functionid, h_itemid, new_triggerid,
+					function_esc, parameter_esc);
+
+			old_expression = new_expression;
+			new_expression = string_replace(old_expression, search, replace);
+
+			zbx_free(old_expression);
+			zbx_free(parameter_esc);
+			zbx_free(function_esc);
+		}
+		DBfree_result(result);
+
+		if (SUCCEED == res)
+		{
+			expression_esc = DBdyn_escape_string_len(new_expression, TRIGGER_EXPRESSION_LEN);
+
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 96 + strlen(expression_esc),
+					"update triggers set expression='%s' where triggerid=" ZBX_FS_UI64 ";\n",
+					expression_esc, new_triggerid);
+
+			zbx_free(expression_esc);
+
+#ifdef HAVE_ORACLE
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
+#endif
+
+			DBexecute("%s", sql);
+		}
+
+		zbx_free(new_expression);
+
+		zbx_free(sql);
+	}
+
+	zbx_free(description_esc);
+
+	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBlld_update_triggers                                            *
+ *                                                                            *
+ * Purpose: add or update triggers for discovered items                       *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_itemid,
+		struct zbx_json_parse *jp_data)
+{
+	const char		*__function_name = "DBlld_update_triggers";
+
+	DB_RESULT		result;
+	DB_ROW			row;
+	struct zbx_json_parse	jp_row;
+	const char		*p;
+	zbx_uint64_t		triggerid;
+	char			*description = NULL;
+	size_t			sz, description_alloc = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	result = DBselect(
+			"select distinct t.triggerid,t.description,t.expression,"
+				"t.status,t.type,t.priority,t.comments,t.url"
+			" from triggers t,functions f,items i,item_discovery d"
+			" where f.triggerid=t.triggerid"
+				" and f.itemid=i.itemid"
+				" and i.itemid=d.itemid"
+				" and d.parent_itemid=" ZBX_FS_UI64,
+			discovery_itemid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(triggerid, row[0]);
+
+		if (description_alloc < (sz = strlen(row[1]) + 1))
+		{
+			description_alloc = sz;
+			description = zbx_realloc(description, sizeof(char) * description_alloc);
+		}
+
+		p = NULL;
+/* {"net.if.discovery":[{"ifname":"eth0"},{"ifname":"lo"},...]}
+ *                      ^
+ */ 		while (NULL != (p = zbx_json_next(jp_data, p)))
+		{
+/* {"net.if.discovery":[{"ifname":"eth0"},{"ifname":"lo"},...]}
+ *                      ^---------------^
+ */			if (FAIL == zbx_json_brackets_open(p, &jp_row))
+				continue;
+
+			memcpy(description, row[1], sz);
+			substitute_discovery_macros(&description, &description_alloc, &jp_row);
+
+			DBlld_copy_trigger(hostid, triggerid, description,
+					row[2],				/* expression */
+					(unsigned char)atoi(row[3]),	/* status */
+					(unsigned char)atoi(row[4]),	/* type */
+					(unsigned char)atoi(row[5]),	/* priority */
+					row[6],				/* comments */
+					row[7],				/* url */
+					&jp_row);
+		}
+	}
+	DBfree_result(result);
+
+	zbx_free(description);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBlld_update_item                                                *
+ *                                                                            *
+ * Purpose: add or update discovered item                                     *
+ *                                                                            *
+ * Parameters: parent_itemid - discovery rule identificator from database     *
+ *             key - new key descriptor with substituted macros               *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBlld_update_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, const char *description_esc,
+		const char *key_orig, const char *key_last, unsigned char type, unsigned char value_type,
+		unsigned char data_type, int delay, const char *delay_flex_esc, int history, int trends,
+		unsigned char status, const char *trapper_hosts_esc, const char *units_esc, int multiplier,
+		int delta, const char *formula_esc, const char *logtimefmt_esc, zbx_uint64_t valuemapid,
+		const char *params_esc, const char *ipmi_sensor_esc, const char *snmp_community_esc,
+		const char *snmp_oid_esc, unsigned short snmp_port, const char *snmpv3_securityname_esc,
+		unsigned char snmpv3_securitylevel, const char *snmpv3_authpassphrase_esc,
+		const char *snmpv3_privpassphrase_esc, unsigned char authtype, const char *username_esc,
+		const char *password_esc, const char *publickey_esc, const char *privatekey_esc,
+		struct zbx_json_parse *jp_row)
+{
+	const char	*__function_name = "DBlld_update_item";
+
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	itemid = 0, itemdiscoveryid, db_parent_itemid, itemappid;
+	char		*key_esc;
+	char		*sql = NULL;
+	int		sql_offset = 0, sql_alloc = 16384,
+			i, res = SUCCEED;
+	zbx_uint64_t	*appids = NULL, *rmids = NULL;
+	int		appids_alloc = 0, appids_num,
+			rmids_alloc = 0, rmids_num;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() jp_row:'%.*s'", __function_name,
+			jp_row->end - jp_row->start + 1, jp_row->start);
+
+	key_esc = DBdyn_escape_string(key_orig);
+
+	appids_num = rmids_num = 0;
+	DBget_applications_by_itemid(parent_itemid, &appids, &appids_alloc, &appids_num);
+
+	result = DBselect(
+			"select i.itemid,d.parent_itemid"
+			" from items i"
+			" left join item_discovery d"
+				" on d.itemid=i.itemid"
+			" where i.hostid=" ZBX_FS_UI64
+				" and i.key_='%s'",
+			hostid, key_esc);
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
+#endif
+
+	if (NULL == (row = DBfetch(result)))
+	{
+		if (NULL != key_last && 0 != strcmp(key_orig, key_last))
+		{
+			DB_RESULT	result;
+			DB_ROW		row;
+			char		*key_esc;
+			zbx_uint64_t	id;
+
+			key_esc = DBdyn_escape_string(key_last ? key_last : key_orig);
+
+			result = DBselect(
+					"select i.itemid,d.parent_itemid"
+					" from items i"
+					" left join item_discovery d"
+						" on d.itemid=i.itemid"
+					" where i.hostid=" ZBX_FS_UI64
+						" and i.key_='%s'",
+					hostid, key_esc);
+
+			zbx_free(key_esc);
+
+			if (NULL != (row = DBfetch(result)))
+			{
+				ZBX_DBROW2UINT64(id, row[1]);
+
+				if (id == parent_itemid)
+				{
+					ZBX_STR2UINT64(itemid, row[0]);
+					db_parent_itemid = id;
+				}
+			}
+			DBfree_result(result);
+		}
+	}
+	else
+	{
+		ZBX_STR2UINT64(itemid, row[0]);
+		ZBX_DBROW2UINT64(db_parent_itemid, row[1]);
+	}
+
+	if (0 == itemid)
+	{
+		itemid = DBget_maxid("items");
+		itemdiscoveryid = DBget_maxid("item_discovery");
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8192,
+				"insert into items"
+					" (itemid,description,key_,hostid,type,value_type,data_type,"
+					"delay,delay_flex,history,trends,status,trapper_hosts,units,"
+					"multiplier,delta,formula,logtimefmt,valuemapid,params,"
+					"ipmi_sensor,snmp_community,snmp_oid,snmp_port,"
+					"snmpv3_securityname,snmpv3_securitylevel,"
+					"snmpv3_authpassphrase,snmpv3_privpassphrase,"
+					"authtype,username,password,publickey,privatekey)"
+				" values"
+					" (" ZBX_FS_UI64 ",'%s','%s'," ZBX_FS_UI64 ",%d,%d,%d,"
+					"%d,'%s',%d,%d,%d,'%s','%s',%d,%d,'%s','%s',%s,'%s','%s',"
+					"'%s','%s',%d,'%s',%d,'%s','%s',%d,'%s','%s','%s',"
+					"'%s');\n",
+				itemid, description_esc, key_esc, hostid, (int)type, (int)value_type, (int)data_type,
+				delay, delay_flex_esc, history, trends, (int)status, trapper_hosts_esc, units_esc,
+				multiplier, delta, formula_esc, logtimefmt_esc, DBsql_id_ins(valuemapid), params_esc,
+				ipmi_sensor_esc, snmp_community_esc, snmp_oid_esc, (int)snmp_port,
+				snmpv3_securityname_esc, (int)snmpv3_securitylevel,
+				snmpv3_authpassphrase_esc, snmpv3_privpassphrase_esc,
+				(int)authtype, username_esc, password_esc, publickey_esc, privatekey_esc);
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 140,
+				"insert into item_discovery"
+					" (itemdiscoveryid,itemid,parent_itemid)"
+				" values"
+					" (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ");\n",
+				itemdiscoveryid, itemid, parent_itemid);
+	}
+	else if (db_parent_itemid == parent_itemid)
+	{
+		DBget_applications_by_itemid(itemid, &rmids, &rmids_alloc, &rmids_num);
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8192,
+				"update items"
+					" set description='%s',"
+					"key_='%s',"
+					"type=%d,"
+					"value_type=%d,"
+					"data_type=%d,"
+					"delay=%d,"
+					"delay_flex='%s',"
+					"history=%d,"
+					"trends=%d,"
+					"trapper_hosts='%s',"
+					"units='%s',"
+					"multiplier=%d,"
+					"delta=%d,"
+					"formula='%s',"
+					"logtimefmt='%s',"
+					"valuemapid=%s,"
+					"params='%s',"
+					"ipmi_sensor='%s',"
+					"snmp_community='%s',"
+					"snmp_oid='%s',"
+					"snmp_port=%d,"
+					"snmpv3_securityname='%s',"
+					"snmpv3_securitylevel=%d,"
+					"snmpv3_authpassphrase='%s',"
+					"snmpv3_privpassphrase='%s',"
+					"authtype=%d,"
+					"username='%s',"
+					"password='%s',"
+					"publickey='%s',"
+					"privatekey='%s'"
+				" where itemid=" ZBX_FS_UI64 ";\n",
+				description_esc, key_esc, (int)type, (int)value_type, (int)data_type,
+				delay, delay_flex_esc, history, trends, trapper_hosts_esc, units_esc,
+				multiplier, delta, formula_esc, logtimefmt_esc, DBsql_id_ins(valuemapid), params_esc,
+				ipmi_sensor_esc, snmp_community_esc, snmp_oid_esc, (int)snmp_port,
+				snmpv3_securityname_esc, (int)snmpv3_securitylevel,
+				snmpv3_authpassphrase_esc, snmpv3_privpassphrase_esc,
+				(int)authtype, username_esc, password_esc, publickey_esc, privatekey_esc, itemid);
+
+		uint64_array_remove_both(appids, &appids_num, rmids, &rmids_num);
+
+		if (0 != appids_num)
+		{
+			itemappid = DBget_maxid_num("items_applications", appids_num);
+
+			for (i = 0; i < appids_num; i++)
+			{
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 160,
+						"insert into items_applications"
+						" (itemappid,itemid,applicationid)"
+						" values"
+						" (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ");\n",
+						itemappid++, itemid, appids[i]);
+			}
+		}
+
+		if (0 != rmids_num)
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 160,
+					"delete from items_applications"
+					" where itemid=" ZBX_FS_UI64
+						" and",
+					itemid);
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
+				"applicationid", rmids, rmids_num);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
+		}
+	}
+	DBfree_result(result);
+
+	zbx_free(rmids);
+	zbx_free(appids);
+	zbx_free(key_esc);
+
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
+#endif
+
+	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
+		DBexecute("%s", sql);
+
+	zbx_free(sql);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+
+	return res;
+}
+
+static int	DBlld_check_record(struct zbx_json_parse *jp_row, const char *macro,
+		const char *filter, ZBX_REGEXP *regexps, int regexps_num)
+{
+	const char	*__function_name = "DBlld_update_items";
+
+	char		*value = NULL;
+	size_t		value_alloc = 0;
+	int		res = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() jp_row:'%.*s'", __function_name,
+			jp_row->end - jp_row->start + 1, jp_row->start);
+
+	if (NULL == macro || NULL == filter)
+		goto out;
+
+	if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, macro, &value, &value_alloc))
+		res = regexp_match_ex(regexps, regexps_num, value, filter, ZBX_CASE_SENSITIVE);
+
+	zbx_free(value);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+
+	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBlld_update_items                                               *
+ *                                                                            *
+ * Purpose: add or update items for discovered items                          *
+ *                                                                            *
+ * Parameters: parent_itemid - [IN] discovery item identificator              *
+ *                                  from database                             *
+ *             key_orig      - [IN] original template item key                *
+ *             key_last      - [IN] previous original template item key       *
+ *             jp_data       - [IN] received discovery data                   *
+ *             filter        - [IN] optional filter                           *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, const char *description_esc,
+		const char *key_orig, const char *key_last, unsigned char type, unsigned char value_type,
+		unsigned char data_type, int delay, const char *delay_flex_esc, int history, int trends,
+		unsigned char status, const char *trapper_hosts_esc, const char *units_esc, int multiplier,
+		int delta, const char *formula_esc, const char *logtimefmt_esc, zbx_uint64_t valuemapid,
+		const char *params_esc, const char *ipmi_sensor_esc, const char *snmp_community_esc,
+		const char *snmp_oid_esc, unsigned short snmp_port, const char *snmpv3_securityname_esc,
+		unsigned char snmpv3_securitylevel, const char *snmpv3_authpassphrase_esc,
+		const char *snmpv3_privpassphrase_esc, unsigned char authtype, const char *username_esc,
+		const char *password_esc, const char *publickey_esc, const char *privatekey_esc, char *filter,
+		struct zbx_json_parse *jp_data)
+{
+	const char		*__function_name = "DBlld_update_items";
+
+	char			*korig = NULL, *klast = NULL, *f_macro = NULL, *f_filter = NULL, *f_filter_esc;
+	size_t			korig_sz, korig_alloc, klast_sz = 0, klast_alloc;
+	struct zbx_json_parse	jp_row;
+	const char		*p;
+	ZBX_REGEXP		*regexps = NULL;
+	int			regexps_alloc = 0, regexps_num = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' filter:'%s'", __function_name, key_orig, filter);
+
+	if (NULL != (f_filter = strchr(filter, ':')))
+	{
+		f_macro = filter;
+		*f_filter++ = '\0';
+
+		if ('@' == *f_filter)
+		{
+			DB_RESULT	result;
+			DB_ROW		row;
+
+			f_filter_esc = DBdyn_escape_string(f_filter + 1);
+
+			result = DBselect("select r.name,e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
+					" from regexps r,expressions e"
+					" where r.regexpid=e.regexpid"
+						" and r.name='%s'",
+					f_filter_esc);
+
+			zbx_free(f_filter_esc);
+
+			while (NULL != (row = DBfetch(result)))
+				add_regexp_ex(&regexps, &regexps_alloc, &regexps_num,
+						row[0], row[1], atoi(row[2]), row[3][0], atoi(row[4]));
+			DBfree_result(result);
+		}
+	}
+
+	korig_sz = korig_alloc = strlen(key_orig) + 1;
+	korig = zbx_malloc(korig, korig_alloc);
+
+	if (NULL != key_last && 0 != strcmp(key_orig, key_last))
+	{
+		klast_sz = klast_alloc = strlen(key_last) + 1;
+		klast = zbx_malloc(klast, klast_alloc);
+	}
+
+	p = NULL;
+/* {"net.if.discovery":[{"ifname":"eth0"},{"ifname":"lo"},...]}
+ *                      ^
+ */ 	while (NULL != (p = zbx_json_next(jp_data, p)))
+	{
+/* {"net.if.discovery":[{"ifname":"eth0"},{"ifname":"lo"},...]}
+ *                      ^---------------^
+ */		if (FAIL == zbx_json_brackets_open(p, &jp_row))
+			continue;
+
+		memcpy(korig, key_orig, korig_sz);
+		substitute_discovery_macros(&korig, &korig_alloc, &jp_row);
+
+		if (NULL != klast)
+		{
+			memcpy(klast, key_last, klast_sz);
+			substitute_discovery_macros(&klast, &klast_alloc, &jp_row);
+		}
+
+		if (SUCCEED != DBlld_check_record(&jp_row, f_macro, f_filter, regexps, regexps_num))
+			continue;
+
+		DBlld_update_item(hostid, parent_itemid, description_esc, korig, klast, type,
+				value_type, data_type, delay, delay_flex_esc, history, trends,
+				status, trapper_hosts_esc, units_esc, multiplier, delta,
+				formula_esc, logtimefmt_esc, valuemapid, params_esc,
+				ipmi_sensor_esc, snmp_community_esc, snmp_oid_esc, snmp_port,
+				snmpv3_securityname_esc, snmpv3_securitylevel,
+				snmpv3_authpassphrase_esc, snmpv3_privpassphrase_esc, authtype,
+				username_esc, password_esc, publickey_esc, privatekey_esc,
+				&jp_row);
+	}
+
+	zbx_free(korig);
+	zbx_free(klast);
+	zbx_free(regexps);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBlld_cmp_graphitems                                             *
+ *                                                                            *
+ * Purpose: Compare graph items from two graphs                               *
+ *                                                                            *
+ * Parameters: gitems1     - [IN] first graph items, sorted by itemid         *
+ *             gitems1_num - [IN] number of first graph items                 *
+ *             gitems2     - [IN] second graph items, sorted by itemid        *
+ *             gitems2_num - [IN] number of second graph items                *
+ *                                                                            *
+ * Return value: SUCCEED if graph items coincide                              *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBlld_cmp_graphitems(ZBX_GRAPH_ITEMS *gitems1, int gitems1_num,
+		ZBX_GRAPH_ITEMS *gitems2, int gitems2_num)
+{
+	const char	*__function_name = "DBlld_cmp_graphitems";
+	int		res = FAIL, i;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (gitems1_num != gitems2_num)
+		goto clean;
+
+	for (i = 0; i < gitems1_num; i++)
+		if (gitems1[i].itemid != gitems2[i].itemid)
+			goto clean;
+
+	res = SUCCEED;
+clean:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s",
+			__function_name, zbx_result_string(res));
+
+	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBlld_update_graph                                               *
+ *                                                                            *
+ * Purpose: add or update graph                                               *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBlld_update_graph(zbx_uint64_t hostid, zbx_uint64_t graphid,
+		const char *name, int width, int height, double yaxismin,
+		double yaxismax, unsigned char show_work_period,
+		unsigned char show_triggers, unsigned char graphtype,
+		unsigned char show_legend, unsigned char show_3d,
+		double percent_left, double percent_right,
+		unsigned char ymin_type, unsigned char ymax_type,
+		zbx_uint64_t ymin_itemid, zbx_uint64_t ymax_itemid,
+		struct zbx_json_parse *jp_row)
+{
+	const char		*__function_name = "DBlld_update_graph";
+
+	char			*sql = NULL, *key = NULL, *name_esc, *color_esc;
+	int			sql_alloc = 1024, sql_offset = 0, i;
+	ZBX_GRAPH_ITEMS 	*gitems = NULL, *chd_gitems = NULL;
+	int			gitems_alloc = 0, gitems_num = 0,
+				chd_gitems_alloc = 0, chd_gitems_num = 0,
+				res = SUCCEED;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_uint64_t		new_graphid = 0, new_gitemid, graphdiscoveryid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() jp_row:'%.*s'", __function_name,
+			jp_row->end - jp_row->start + 1, jp_row->start);
+
+	sql = zbx_malloc(sql, sql_alloc);
+	name_esc = DBdyn_escape_string(name);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
+			"select gi.gitemid,0,i.key_,gi.drawtype,gi.sortorder,gi.color,"
+				"gi.yaxisside,gi.calc_fnc,gi.type,gi.periods_cnt,i.flags"
+			" from graphs_items gi,items i"
+			" where gi.itemid=i.itemid"
+				" and gi.graphid=" ZBX_FS_UI64,
+			graphid);
+
+	DBget_graphitems(sql, &gitems, &gitems_alloc, &gitems_num);
+
+	for (i = 0; i < gitems_num; i++)
+	{
+		if (ZBX_FLAG_DISCOVERY_CHILD & gitems[i].flags)
+			if (FAIL == (res = DBlld_get_item(hostid, gitems[i].key, jp_row, &gitems[i].itemid)))
+				break;
+	}
+
+	if (FAIL == res)
+		goto out;
+
+	zbx_sort_array(gitems, sizeof(ZBX_GRAPH_ITEMS), gitems_num);
+
+	result = DBselect(
+			"select distinct g.graphid"
+			" from graphs g,graphs_items gi,items i"
+			" where g.graphid=gi.graphid"
+				" and gi.itemid=i.itemid"
+				" and i.hostid=" ZBX_FS_UI64
+				" and g.name='%s'"
+				" and not g.flags & %d",
+			hostid, name_esc, ZBX_FLAG_DISCOVERY_CHILD);
+
+	/* compare graphs */
+	if (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(new_graphid, row[0]);
+
+		sql_offset = 0;
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
+				"select gi.gitemid,i.itemid,i.key_,"
+					"gi.drawtype,gi.sortorder,"
+					"gi.color,gi.yaxisside,"
+					"gi.calc_fnc,gi.type,"
+					"gi.periods_cnt,i.flags"
+				" from graphs_items gi,items i"
+				" where gi.itemid=i.itemid"
+					" and gi.graphid=" ZBX_FS_UI64
+				" order by i.itemid",
+				new_graphid);
+
+		DBget_graphitems(sql, &chd_gitems, &chd_gitems_alloc, &chd_gitems_num);
+
+		if (SUCCEED != DBlld_cmp_graphitems(gitems, gitems_num, chd_gitems, chd_gitems_num))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() Graph [%s] already exists on the host (items are not identical)",
+					__function_name, name);
+			res = FAIL;
+		}
+	}
+	DBfree_result(result);
+
+	if (FAIL == res)
+		goto out;
+
+	sql_offset = 0;
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
+#endif
+
+	if (0 != new_graphid)
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 1024,
+				"update graphs"
+				" set name='%s',"
+					"width=%d,"
+					"height=%d,"
+					"yaxismin=" ZBX_FS_DBL ","
+					"yaxismax=" ZBX_FS_DBL ","
+					"show_work_period=%d,"
+					"show_triggers=%d,"
+					"graphtype=%d,"
+					"show_legend=%d,"
+					"show_3d=%d,"
+					"percent_left=" ZBX_FS_DBL ","
+					"percent_right=" ZBX_FS_DBL ","
+					"ymin_type=%d,"
+					"ymax_type=%d,"
+					"ymin_itemid=%s,"
+					"ymax_itemid=%s"
+				" where graphid=" ZBX_FS_UI64 ";\n",
+				name_esc, width, height, yaxismin, yaxismax,
+				(int)show_work_period, (int)show_triggers,
+				(int)graphtype, (int)show_legend, (int)show_3d, 
+				percent_left, percent_right, (int)ymin_type, (int)ymax_type,
+				DBsql_id_ins(ymin_itemid), DBsql_id_ins(ymax_itemid),
+				new_graphid);
+
+		for (i = 0; i < gitems_num; i++)
+		{
+			color_esc = DBdyn_escape_string(gitems[i].color);
+
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
+					"update graphs_items"
+					" set drawtype=%d,"
+						"sortorder=%d,"
+						"color='%s',"
+						"yaxisside=%d,"
+						"calc_fnc=%d,"
+						"type=%d,"
+						"periods_cnt=%d"
+					" where gitemid=" ZBX_FS_UI64 ";\n",
+					gitems[i].drawtype,
+					gitems[i].sortorder,
+					color_esc,
+					gitems[i].yaxisside,
+					gitems[i].calc_fnc,
+					gitems[i].type,
+					gitems[i].periods_cnt,
+					chd_gitems[i].gitemid);
+
+			zbx_free(color_esc);
+		}
+	}
+	else
+	{
+		new_graphid = DBget_maxid("graphs");
+		graphdiscoveryid = DBget_maxid("graph_discovery");
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 1024,
+				"insert into graphs"
+					" (graphid,name,width,height,yaxismin,yaxismax,show_work_period,"
+					"show_triggers,graphtype,show_legend,show_3d,percent_left,"
+					"percent_right,ymin_type,ymax_type,ymin_itemid,ymax_itemid)"
+				" values"
+					" (" ZBX_FS_UI64 ",'%s',%d,%d," ZBX_FS_DBL ","
+					ZBX_FS_DBL ",%d,%d,%d,%d,%d," ZBX_FS_DBL ","
+					ZBX_FS_DBL ",%d,%d,%s,%s);\n",
+				new_graphid, name_esc, width, height, yaxismin, yaxismax,
+				(int)show_work_period, (int)show_triggers,
+				(int)graphtype, (int)show_legend, (int)show_3d,
+				percent_left, percent_right, (int)ymin_type, (int)ymax_type,
+				DBsql_id_ins(ymin_itemid), DBsql_id_ins(ymax_itemid));
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 144,
+				"insert into graph_discovery"
+					" (graphdiscoveryid,graphid,parent_graphid)"
+				" values"
+					" (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ");\n",
+				graphdiscoveryid, new_graphid, graphid);
+
+		new_gitemid = DBget_maxid_num("graphs_items", gitems_num);
+
+		for (i = 0; i < gitems_num; i++)
+		{
+			color_esc = DBdyn_escape_string(gitems[i].color);
+
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
+					"insert into graphs_items"
+						" (gitemid,graphid,itemid,drawtype,sortorder,color,"
+						"yaxisside,calc_fnc,type,periods_cnt)"
+					" values"
+						" (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64
+						",%d,%d,'%s',%d,%d,%d,%d);\n",
+					new_gitemid, new_graphid, gitems[i].itemid,
+					gitems[i].drawtype, gitems[i].sortorder, color_esc,
+					gitems[i].yaxisside, gitems[i].calc_fnc, gitems[i].type,
+					gitems[i].periods_cnt);
+			new_gitemid++;
+
+			zbx_free(color_esc);
+		}
+	}
+
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
+#endif
+	DBexecute("%s", sql);
+out:
+	zbx_free(key);
+	zbx_free(sql);
+	zbx_free(gitems);
+	zbx_free(chd_gitems);
+	zbx_free(name_esc);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+
+	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBlld_update_graphs                                              *
+ *                                                                            *
+ * Purpose: add or update graphs for discovery item                           *
+ *                                                                            *
+ * Parameters: hostid  - [IN] host identificator from database                *
+ *             agent   - [IN] discovery item identificator from database      *
+ *             jp_data - [IN] received data                                   *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_itemid,
+		struct zbx_json_parse *jp_data)
+{
+	const char		*__function_name = "DBlld_update_graphs";
+
+	DB_RESULT		result;
+	DB_ROW			row;
+	struct zbx_json_parse	jp_row;
+	const char		*p;
+	zbx_uint64_t		graphid, ymin_itemid, ymax_itemid;
+	char			*name = NULL;
+	size_t			sz, name_alloc = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	result = DBselect(
+			"select distinct g.graphid,g.name,g.width,g.height,g.yaxismin,"
+				"g.yaxismax,g.show_work_period,g.show_triggers,"
+				"g.graphtype,g.show_legend,g.show_3d,g.percent_left,"
+				"g.percent_right,g.ymin_type,g.ymax_type,g.ymin_itemid,"
+				"g.ymax_itemid"
+			" from graphs g,graphs_items gi,items i,item_discovery d"
+			" where g.graphid=gi.graphid"
+				" and gi.itemid=i.itemid"
+				" and i.itemid=d.itemid"
+				" and d.parent_itemid=" ZBX_FS_UI64,
+			discovery_itemid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(graphid, row[0]);
+		ZBX_DBROW2UINT64(ymin_itemid, row[15]);
+		ZBX_DBROW2UINT64(ymax_itemid, row[16]);
+
+		if (name_alloc < (sz = strlen(row[1]) + 1))
+		{
+			name_alloc = sz;
+			name = zbx_realloc(name, sizeof(char) * name_alloc);
+		}
+
+		p = NULL;
+/* {"net.if.discovery":[{"ifname":"eth0"},{"ifname":"lo"},...]}
+ *                      ^
+ */	 	while (NULL != (p = zbx_json_next(jp_data, p)))
+		{
+/* {"net.if.discovery":[{"ifname":"eth0"},{"ifname":"lo"},...]}
+ *                      ^---------------^
+ */			if (FAIL == zbx_json_brackets_open(p, &jp_row))
+				continue;
+
+			memcpy(name, row[1], sz);
+			substitute_discovery_macros(&name, &name_alloc, &jp_row);
+
+			DBlld_update_graph(hostid, graphid, name,
+				atoi(row[2]),			/* width */
+				atoi(row[3]),			/* height */
+				atof(row[4]),			/* yaxismin */
+				atof(row[5]),			/* yaxismax */
+				(unsigned char)atoi(row[6]),	/* show_work_period */
+				(unsigned char)atoi(row[7]),	/* show_triggers */
+				(unsigned char)atoi(row[8]),	/* graphtype */
+				(unsigned char)atoi(row[9]),	/* show_legend */
+				(unsigned char)atoi(row[10]),	/* show_3d */
+				atof(row[11]),			/* percent_left */
+				atof(row[12]),			/* percent_right */
+				(unsigned char)atoi(row[13]),	/* ymin_type */
+				(unsigned char)atoi(row[14]),	/* ymax_type */
+				ymin_itemid,
+				ymax_itemid,
+				&jp_row);
+		}
+	}
+	DBfree_result(result);
+
+	zbx_free(name);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBlld_process_discovery_rule                                     *
+ *                                                                            *
+ * Purpose: add or update items, triggers and graphs for discovery item       *
+ *                                                                            *
+ * Parameters: discovery_itemid - [IN] discovery item identificator           *
+ *                                     from database                          *
+ *             value            - [IN] received value from agent              *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value,
+		char *error, size_t mex_error_len)
+{
+	const char		*__function_name = "DBlld_process_discovery_rule";
+
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_uint64_t		hostid = 0, itemid, valuemapid;
+	struct zbx_json_parse	jp, jp_data;
+	char			*description_esc, *delay_flex_esc, *trapper_hosts_esc,
+				*units_esc, *formula_esc, *logtimefmt_esc, *params_esc,
+				*ipmi_sensor_esc, *snmp_community_esc, *snmp_oid_esc,
+				*snmpv3_securityname_esc, *snmpv3_authpassphrase_esc,
+				*snmpv3_privpassphrase_esc, *username_esc, *password_esc,
+				*publickey_esc, *privatekey_esc, *discovery_key = NULL,
+				*filter = NULL;
+	unsigned char		status = 0;
+	int			res = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, discovery_key);
+
+	result = DBselect(
+			"select hostid,key_,status,filter"
+			" from items"
+			" where itemid=" ZBX_FS_UI64,
+			discovery_itemid);
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(hostid, row[0]);
+		discovery_key = strdup(row[1]);
+		status = (unsigned char)atoi(row[2]);
+		filter = strdup(row[3]);
+	}
+	else
+	{
+		zbx_snprintf(error, mex_error_len, "Invalid discovery rule ID [" ZBX_FS_UI64 "]", discovery_itemid);
+		res = NOTSUPPORTED;
+	}
+	DBfree_result(result);
+
+	if (NOTSUPPORTED == res)
+		goto error;
+
+	if (SUCCEED != zbx_json_open(value, &jp))
+	{
+		zbx_snprintf(error, mex_error_len, "%s", "Value should be JSON object");
+		res = NOTSUPPORTED;
+		goto error;
+	}
+
+/* {"net.if.discovery":[{"ifname":"eth0"},{"ifname":"lo"},...]}
+ *                     ^-------------------------------------^
+ */	if (SUCCEED != zbx_json_brackets_by_name(&jp, discovery_key, &jp_data))
+	{
+		zbx_snprintf(error, mex_error_len, "%s", "Wrong data in JSON object");
+		res = NOTSUPPORTED;
+		goto error;
+	}
+
+	result = DBselect(
+			"select i.itemid,i.description,i.key_,i.lastvalue,i.type,"
+				"i.value_type,i.data_type,i.delay,i.delay_flex,"
+				"i.history,i.trends,i.status,i.trapper_hosts,"
+				"i.units,i.multiplier,i.delta,i.formula,"
+				"i.logtimefmt,i.valuemapid,i.params,"
+				"i.ipmi_sensor,i.snmp_community,i.snmp_oid,"
+				"i.snmp_port,i.snmpv3_securityname,"
+				"i.snmpv3_securitylevel,i.snmpv3_authpassphrase,"
+				"i.snmpv3_privpassphrase,i.authtype,i.username,"
+				"i.password,i.publickey,i.privatekey,di.filter"
+			" from items i,item_discovery d,items di"
+			" where i.itemid=d.itemid"
+				" and d.parent_itemid=di.itemid"
+				" and i.hostid=" ZBX_FS_UI64
+				" and i.flags & %d"
+				" and d.parent_itemid=" ZBX_FS_UI64,
+			hostid, ZBX_FLAG_DISCOVERY_CHILD, discovery_itemid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(itemid, row[0]);
+		ZBX_DBROW2UINT64(valuemapid, row[18]);
+
+		description_esc			= DBdyn_escape_string(row[1]);
+		delay_flex_esc			= DBdyn_escape_string(row[8]);
+		trapper_hosts_esc		= DBdyn_escape_string(row[12]);
+		units_esc			= DBdyn_escape_string(row[13]);
+		formula_esc			= DBdyn_escape_string(row[16]);
+		logtimefmt_esc			= DBdyn_escape_string(row[17]);
+		params_esc			= DBdyn_escape_string(row[19]);
+		ipmi_sensor_esc			= DBdyn_escape_string(row[20]);
+		snmp_community_esc		= DBdyn_escape_string(row[21]);
+		snmp_oid_esc			= DBdyn_escape_string(row[22]);
+		snmpv3_securityname_esc		= DBdyn_escape_string(row[24]);
+		snmpv3_authpassphrase_esc	= DBdyn_escape_string(row[26]);
+		snmpv3_privpassphrase_esc	= DBdyn_escape_string(row[27]);
+		username_esc			= DBdyn_escape_string(row[29]);
+		password_esc			= DBdyn_escape_string(row[30]);
+		publickey_esc			= DBdyn_escape_string(row[31]);
+		privatekey_esc			= DBdyn_escape_string(row[32]);
+
+		DBlld_update_items(
+				hostid,
+				itemid,
+				description_esc,
+				row[2],				/* key */
+				SUCCEED == DBis_null(row[3]) ? NULL : row[3],	/* prior key */
+				(unsigned char)atoi(row[4]),	/* type */
+				(unsigned char)atoi(row[5]),	/* value_type */
+				(unsigned char)atoi(row[6]),	/* data_type */
+				atoi(row[7]),			/* delay */
+				delay_flex_esc,
+				atoi(row[9]),			/* history */
+				atoi(row[10]),			/* trends */
+				(unsigned char)atoi(row[11]),	/* status */
+				trapper_hosts_esc,
+				units_esc,
+				atoi(row[14]),			/* multiplier */
+				atoi(row[15]),			/* delta */
+				formula_esc,
+				logtimefmt_esc,
+				valuemapid,
+				params_esc,
+				ipmi_sensor_esc,
+				snmp_community_esc,
+				snmp_oid_esc,			/* snmp_oid */
+				(unsigned short)atoi(row[23]),	/* snmp_port */
+				snmpv3_securityname_esc,
+				(unsigned char)atoi(row[25]),	/* snmpv3_securitylevel */
+				snmpv3_authpassphrase_esc,
+				snmpv3_privpassphrase_esc,
+				(unsigned char)atoi(row[28]),	/* authtype */
+				username_esc,
+				password_esc,
+				publickey_esc,
+				privatekey_esc,
+				row[33],			/* filter */
+				&jp_data);
+
+		zbx_free(privatekey_esc);
+		zbx_free(publickey_esc);
+		zbx_free(password_esc);
+		zbx_free(username_esc);
+		zbx_free(snmpv3_privpassphrase_esc);
+		zbx_free(snmpv3_authpassphrase_esc);
+		zbx_free(snmpv3_securityname_esc);
+		zbx_free(snmp_oid_esc);
+		zbx_free(snmp_community_esc);
+		zbx_free(ipmi_sensor_esc);
+		zbx_free(params_esc);
+		zbx_free(logtimefmt_esc);
+		zbx_free(formula_esc);
+		zbx_free(units_esc);
+		zbx_free(trapper_hosts_esc);
+		zbx_free(delay_flex_esc);
+		zbx_free(description_esc);
+
+		if (SUCCEED == DBis_null(row[3]) || 0 != strcmp(row[2], row[3]))
+		{
+			DBexecute("update items"
+					" set lastvalue=key_"
+					" where itemid=" ZBX_FS_UI64,
+					itemid);
+		}
+	}
+	DBfree_result(result);
+
+	DBlld_update_triggers(hostid, discovery_itemid, &jp_data);
+	DBlld_update_graphs(hostid, discovery_itemid, &jp_data);
+
+
+	if (ITEM_STATUS_NOTSUPPORTED == status)
+	{
+		char	*message = NULL;
+
+		message = zbx_dsprintf(message, "Parameter [" ZBX_FS_UI64 "][%s] became supported",
+				discovery_itemid, zbx_host_key_string(discovery_itemid));
+		zabbix_log(LOG_LEVEL_WARNING, "%s", message);
+		zabbix_syslog("%s", message);
+		zbx_free(message);
+
+		DBexecute("update items set status=%d,error='' where itemid=" ZBX_FS_UI64,
+				ITEM_STATUS_ACTIVE, discovery_itemid);
+	}
+error:
+	zbx_free(discovery_key);
+	zbx_free(filter);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+
+	return res;
 }

@@ -573,6 +573,29 @@ const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname);
 zbx_uint64_t	DBget_maxid_num(const char *tablename, int num);
 zbx_uint64_t	DBget_nextid(const char *tablename, int num);
 
+/******************************************************************************
+ *                                                                            *
+ * Type: ZBX_GRAPH_ITEMS                                                      *
+ *                                                                            *
+ * Purpose: represent graph item data                                         *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ ******************************************************************************/
+typedef struct {
+	/* The itemid should be on the first place for the correct sorting */
+	zbx_uint64_t	itemid, gitemid;
+	char		key[ITEM_KEY_LEN_MAX];
+	int		drawtype;
+	int		sortorder;
+	char		color[GRAPH_ITEM_COLOR_LEN_MAX];
+	int		yaxisside;
+	int		calc_fnc;
+	int		type;
+	int		periods_cnt;
+	unsigned char	flags;
+} ZBX_GRAPH_ITEMS;
+
 int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *error);
 int	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid);
 int	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid);
@@ -618,6 +641,7 @@ int	DBadd_graph_item_to_linked_hosts(int gitemid,int hostid);
 int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_uint64_t templateid);
 int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_uint64_t templateid);
 int	DBdelete_host(zbx_uint64_t hostid);
+void	DBget_graphitems(const char *sql, ZBX_GRAPH_ITEMS **gitems, int *gitems_alloc, int *gitems_num);
 void	DBupdate_services(zbx_uint64_t triggerid, int status, int clock);
 
 /* History related functions */

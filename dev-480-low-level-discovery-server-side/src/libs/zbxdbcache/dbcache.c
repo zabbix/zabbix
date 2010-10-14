@@ -853,6 +853,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 		zbx_timespec_t	ts;
 		unsigned char	type;
 		unsigned char	value;
+		unsigned char	flags;
 	} zbx_trigger_t;
 
 	zbx_trigger_t	*tr = NULL, *tr_last = NULL;
@@ -864,11 +865,12 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 	DB_ROW		row;
 	int		sql_offset = 0, i;
 	zbx_uint64_t	itemid, triggerid;
+	unsigned char	flags;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 1024,
-			"select distinct t.triggerid,t.type,t.value,t.error,t.expression,f.itemid"
+			"select distinct t.triggerid,t.type,t.value,t.error,t.expression,f.itemid,i.flags"
 			" from triggers t,functions f,items i"
 			" where i.status not in (%d)"
 				" and i.itemid=f.itemid"
@@ -924,6 +926,15 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 			tr_last->exp = strdup(row[4]);
 			tr_last->ts.sec = 0;
 			tr_last->ts.ns = 0;
+			tr_last->flags = 0x00;
+		}
+
+		flags = (unsigned char)atoi(row[6]);
+
+		if (0 != (ZBX_FLAG_DISCOVERY_CHILD & flags))
+		{
+			tr_last->flags = flags;
+			continue;
 		}
 
 		ZBX_STR2UINT64(itemid, row[5]);
@@ -947,6 +958,10 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 
 	for (i = 0; i < tr_num; i++)
 	{
+		/* skip triggers with expression with discovery child items */
+		if (0 != (ZBX_FLAG_DISCOVERY_CHILD & tr_last->flags))
+			continue;
+
 		if (0 == tr[i].ts.sec)
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
