@@ -228,7 +228,6 @@ class CMap extends CZBXAPI{
 		}
 		else{
 			if(!empty($result)){
-
 				$link_triggers = array();
 				$sql = 'SELECT slt.triggerid, sl.sysmapid'.
 					' FROM sysmaps_link_triggers slt, sysmaps_links sl'.
@@ -239,17 +238,18 @@ class CMap extends CZBXAPI{
 					$link_triggers[$link_trigger['sysmapid']] = $link_trigger['triggerid'];
 				}
 
-				$trig_options = array(
-					'triggerids' => $link_triggers,
-					'editable' => $options['editable'],
-					'output' => API_OUTPUT_SHORTEN,
-					'preservekeys' => 1
-				);
-				$all_triggers = CTrigger::get($trig_options);
-				foreach($link_triggers as $id => $triggerid){
-					if(!isset($all_triggers[$triggerid])){
-						unset($result[$id]);
-						unset($sysmapids[$id]);
+				if(!empty($link_triggers)){
+					$trig_options = array(
+						'triggerids' => $link_triggers,
+						'editable' => $options['editable'],
+						'output' => API_OUTPUT_SHORTEN,
+						'preservekeys' => 1,
+					);
+					$all_triggers = CTrigger::get($trig_options);
+					foreach($link_triggers as $id => $triggerid){
+						if(!isset($all_triggers[$triggerid])){
+								unset($result[$id], $sysmapids[$id]);
+						}
 					}
 				}
 
@@ -266,16 +266,16 @@ class CMap extends CZBXAPI{
 
 					switch($selement['elementtype']){
 						case SYSMAP_ELEMENT_TYPE_HOST:
-							$hosts_to_check[] = $selement['elementid'];
+							$hosts_to_check[$selement['elementid']] = $selement['elementid'];
 						break;
 						case SYSMAP_ELEMENT_TYPE_MAP:
-							$maps_to_check[] = $selement['elementid'];
+							$maps_to_check[$selement['elementid']] = $selement['elementid'];
 						break;
 						case SYSMAP_ELEMENT_TYPE_TRIGGER:
-							$triggers_to_check[] = $selement['elementid'];
+							$triggers_to_check[$selement['elementid']] = $selement['elementid'];
 						break;
 						case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-							$host_groups_to_check[] = $selement['elementid'];
+							$host_groups_to_check[$selement['elementid']] = $selement['elementid'];
 						break;
 					}
 				}
@@ -286,84 +286,95 @@ class CMap extends CZBXAPI{
 // sdi($host_groups_to_check);
 
 				$nodeids = get_current_nodeid(true);
-				$host_options = array('hostids' => $hosts_to_check,
+
+				if(!empty($hosts_to_check)){
+					$host_options = array(
+						'hostids' => $hosts_to_check,
 									'nodeids' => $nodeids,
 									'editable' => $options['editable'],
-									'preservekeys'=>1);
+						'preservekeys' => 1,
+						'output' => API_OUTPUT_SHORTEN,
+					);
 				$allowed_hosts = CHost::get($host_options);
-				$allowed_hosts = zbx_objectValues($allowed_hosts, 'hostid');
 
-				$map_options = array('sysmapids' => $maps_to_check,
-									'nodeids' => $nodeids,
-									'editable' => $options['editable'],
-									'preservekeys'=>1);
-				$allowed_maps = self::get($map_options);
-				$allowed_maps = zbx_objectValues($allowed_maps, 'sysmapid');
-
-				$trigger_options = array('triggerids' => $triggers_to_check,
-									'nodeids' => $nodeids,
-									'editable' => $options['editable'],
-									'preservekeys'=>1);
-				$allowed_triggers = CTrigger::get($trigger_options);
-				$allowed_triggers = zbx_objectValues($allowed_triggers, 'triggerid');
-
-				$hostgroup_options = array('groupids' => $host_groups_to_check,
-									'nodeids' => $nodeids,
-									'editable' => $options['editable'],
-									'preservekeys'=>1);
-				$allowed_host_groups = CHostGroup::get($hostgroup_options);
-				$allowed_host_groups = zbx_objectValues($allowed_host_groups, 'groupid');
-
-				$restr_hosts = array_diff($hosts_to_check, $allowed_hosts);
-				$restr_maps = array_diff($maps_to_check, $allowed_maps);
-				$restr_triggers = array_diff($triggers_to_check, $allowed_triggers);
-				$restr_host_groups = array_diff($host_groups_to_check, $allowed_host_groups);
-/*
-SDI('-------------------------------------');
-SDII($restr_hosts);
-SDII($restr_maps);
-SDII($restr_triggers);
-SDII($restr_host_groups);
-SDI('///////////////////////////////////////');
-//*/
-				foreach($restr_hosts as $elementid){
+					foreach($hosts_to_check as $elementid){
+						if(!isset($allowed_hosts[$elementid])){
 					foreach($selements as $selementid => $selement){
 						if(($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) && ($selement['elementid'] == $elementid)){
-							unset($result[$selement['sysmapid']]);
-							unset($selements[$selementid]);
+									unset($result[$selement['sysmapid']], $selements[$selementid]);
 						}
 					}
 				}
+					}
+				}
 
-				foreach($restr_maps as $elementid){
+				if(!empty($maps_to_check)){
+					$map_options = array(
+						'sysmapids' => $maps_to_check,
+						'nodeids' => $nodeids,
+						'editable' => $options['editable'],
+						'preservekeys' => 1,
+						'output' => API_OUTPUT_SHORTEN,
+					);
+					$allowed_maps = self::get($map_options);
+
+					foreach($maps_to_check as $elementid){
+						if(!isset($allowed_maps[$elementid])){
 					foreach($selements as $selementid => $selement){
 						if(($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP) && ($selement['elementid'] == $elementid)){
-							unset($result[$selement['sysmapid']]);
-							unset($selements[$selementid]);
+									unset($result[$selement['sysmapid']], $selements[$selementid]);
 						}
 					}
 				}
+					}
+				}
 
-				foreach($restr_triggers as $elementid){
+				if(!empty($triggers_to_check)){
+					$trigger_options = array(
+						'triggerids' => $triggers_to_check,
+						'nodeids' => $nodeids,
+						'editable' => $options['editable'],
+						'preservekeys' => 1,
+						'output' => API_OUTPUT_SHORTEN,
+					);
+					$allowed_triggers = CTrigger::get($trigger_options);
+
+					foreach($triggers_to_check as $elementid){
+						if(!isset($allowed_triggers[$elementid])){
 					foreach($selements as $selementid => $selement){
 						if(($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) && ($selement['elementid'] == $elementid)){
-							unset($result[$selement['sysmapid']]);
-							unset($selements[$selementid]);
+									unset($result[$selement['sysmapid']], $selements[$selementid]);
 						}
 					}
 				}
+					}
+				}
 
-				foreach($restr_host_groups as $elementid){
+				if(!empty($host_groups_to_check)){
+					$hostgroup_options = array(
+						'groupids' => $host_groups_to_check,
+						'nodeids' => $nodeids,
+						'editable' => $options['editable'],
+						'preservekeys' => 1,
+						'output' => API_OUTPUT_SHORTEN,
+					);
+					$allowed_host_groups = CHostGroup::get($hostgroup_options);
+
+					foreach($host_groups_to_check as $elementid){
+						if(!isset($allowed_host_groups[$elementid])){
 					foreach($selements as $selementid => $selement){
 						if(($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP) && ($selement['elementid'] == $elementid)){
-							unset($result[$selement['sysmapid']]);
-							unset($selements[$selementid]);
+									unset($result[$selement['sysmapid']], $selements[$selementid]);
 						}
 					}
 				}
 			}
 		}
 
+			}
+		}
+
+COpt::memoryPick();
 		if(!is_null($options['countOutput'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
@@ -705,7 +716,7 @@ COpt::memoryPick();
 
 			if(!empty($urlidsToDelete))
 				DB::delete('sysmap_url', DBcondition('sysmapurlid', $urlidsToDelete));
-			
+
 			DB::update('sysmap_url', $urlsToUpdate);
 			DB::insert('sysmap_url', $urlsToAdd);
 
