@@ -1078,7 +1078,7 @@ COpt::memoryPick();
  * @param array $links[0,...]['drawtype']
  * @param array $links[0,...]['color']
  */
-	public static function addLinkTrigger($linktriggers){
+	private static function addLinkTrigger($linktriggers){
 		$errors = array();
 		$result_linktriggers = array();
 		$result = false;
