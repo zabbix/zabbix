@@ -341,6 +341,7 @@ frontends/php/js/scriptaculous/dragdrop.js -text
 frontends/php/js/scriptaculous/effects.js -text
 frontends/php/js/scriptaculous/slider.js -text
 frontends/php/js/scriptaculous/sound.js -text
+frontends/php/js/templates/sysmap.tpl.js -text
 frontends/php/jsLoader.php -text
 frontends/php/jsrpc.php -text
 frontends/php/locales.php -text
@@ -855,6 +856,8 @@ upgrades/dbpatches/2.0/mysql/patch/services_times.sql -text
 upgrades/dbpatches/2.0/mysql/patch/sessions.sql -text
 upgrades/dbpatches/2.0/mysql/patch/slides.sql -text
 upgrades/dbpatches/2.0/mysql/patch/slideshows.sql -text
+upgrades/dbpatches/2.0/mysql/patch/sysmap_element_url.sql -text
+upgrades/dbpatches/2.0/mysql/patch/sysmap_url.sql -text
 upgrades/dbpatches/2.0/mysql/patch/sysmaps.sql -text
 upgrades/dbpatches/2.0/mysql/patch/sysmaps_elements.sql -text
 upgrades/dbpatches/2.0/mysql/patch/sysmaps_link_triggers.sql -text
@@ -943,6 +946,8 @@ upgrades/dbpatches/2.0/oracle/patch/services_times.sql -text
 upgrades/dbpatches/2.0/oracle/patch/sessions.sql -text
 upgrades/dbpatches/2.0/oracle/patch/slides.sql -text
 upgrades/dbpatches/2.0/oracle/patch/slideshows.sql -text
+upgrades/dbpatches/2.0/oracle/patch/sysmap_element_url.sql -text
+upgrades/dbpatches/2.0/oracle/patch/sysmap_url.sql -text
 upgrades/dbpatches/2.0/oracle/patch/sysmaps.sql -text
 upgrades/dbpatches/2.0/oracle/patch/sysmaps_elements.sql -text
 upgrades/dbpatches/2.0/oracle/patch/sysmaps_link_triggers.sql -text
@@ -1030,6 +1035,8 @@ upgrades/dbpatches/2.0/postgresql/patch/services_times.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/sessions.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/slides.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/slideshows.sql -text
+upgrades/dbpatches/2.0/postgresql/patch/sysmap_element_url.sql -text
+upgrades/dbpatches/2.0/postgresql/patch/sysmap_url.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/sysmaps.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/sysmaps_elements.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/sysmaps_link_triggers.sql -text

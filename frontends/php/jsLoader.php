@@ -26,13 +26,14 @@ $availableJScripts = array(
 	'functions.js' => '',
 	'main.js' => '',
 	'dom.js' => '',
+// classes
 	'class.bbcode.js' => '',
 	'class.calendar.js' => '',
 	'class.cdate.js' => '',
 	'class.cdebug.js' => '',
 	'class.cmap.js' => '',
 	'class.cmessages.js' => '',
-	'class.cookie.js' => '', 
+	'class.cookie.js' => '',
 	'class.cscreen.js' => '',
 	'class.csuggest.js' => '',
 	'class.cswitcher.js' => '',
@@ -40,7 +41,9 @@ $availableJScripts = array(
 	'class.curl.js' => '',
 	'class.rpc.js' => '',
 	'class.pmaster.js' => '',
-	'class.cviewswitcher.js' => ''
+	'class.cviewswitcher.js' => '',
+// templates
+	'sysmap.tpl.js' => 'templates/'
 );
 
 $tranStrings = array(
@@ -61,13 +64,13 @@ $tranStrings = array(
 		'S_TYPE','S_LABEL','S_GET_SELEMENTS_FAILED','S_SHOW','S_HIDE',
 		'S_LABEL_LOCATION','S_HOST', 'S_MAP','S_TRIGGER','S_SELECT', 'S_HOST_GROUP','S_IMAGE','S_ICON_OK',
 		'S_ICON_PROBLEM','S_ICON_UNKNOWN', 'S_ICON_MAINTENANCE','S_ICON_DISABLED','S_ICON_DEFAULT',
-		'S_COORDINATE_X','S_COORDINATE_Y', 'S_URL','S_BOTTOM','S_TOP','S_LEFT','S_RIGHT','S_DEFAULT',
+		'S_COORDINATE_X','S_COORDINATE_Y', 'S_URL_C','S_BOTTOM','S_TOP','S_LEFT','S_RIGHT','S_DEFAULT',
 		'S_APPLY','S_REMOVE','S_CLOSE','S_PLEASE_SELECT_TWO_ELEMENTS','S_MAP_ELEMENTS','S_CONNECTORS',
 		'S_ELEMENT','S_LINK_STATUS_INDICATOR', 'S_LINK','S_EDIT_CONNECTOR','S_TRIGGERS','S_COLOR',
 		'S_ADD','S_TYPE_OK','S_COLOR_OK','S_LINK_INDICATORS', 'S_DESCRIPTION',
 		'S_LINE','S_BOLD_LINE','S_DOT','S_DASHED_LINE','S_USE_ADVANCED_ICONS',
 		'S_WRONG_TYPE_OF_ARGUMENTS_PASSED_TO_FUNCTION', 'S_TWO_ELEMENTS_SHOULD_BE_SELECTED',
-		'S_DELETE_SELECTED_ELEMENTS_Q', 'S_PLEASE_SELECT_TWO_ELEMENTS','S_LINK','S_NO_LINKS', 'S_NEW_ELEMENT',
+		'S_DELETE_SELECTED_ELEMENTS_Q', 'S_PLEASE_SELECT_TWO_ELEMENTS','S_LINK','S_LINKS','S_NO_LINKS', 'S_NEW_ELEMENT',
 		'S_SELECT','S_SET_TRIGGER'
 	),
 	'class.cmessages.js' => array('S_MUTE','S_UNMUTE','S_MESSAGES','S_CLEAR','S_SNOOZE','S_MOVE'
@@ -77,7 +80,23 @@ $tranStrings = array(
 );
 
 if(empty($_GET['files'])){
-	$files = array('prototype.js', 'effects.js', 'dragdrop.js', 'common.js', 'dom.js', 'class.cdebug.js', 'class.cdate.js', 'class.cookie.js', 'class.curl.js', 'class.rpc.js', 'class.bbcode.js', 'class.csuggest.js', 'class.cmessages.js', 'main.js', 'functions.js');
+	$files = array(
+		'prototype.js',
+		'effects.js',
+		'dragdrop.js',
+		'common.js',
+		'dom.js',
+		'class.cdebug.js',
+		'class.cdate.js',
+		'class.cookie.js',
+		'class.curl.js',
+		'class.rpc.js',
+		'class.bbcode.js',
+		'class.csuggest.js',
+		'class.cmessages.js',
+		'main.js',
+		'functions.js'
+	);
 }
 else{
 	$files = $_GET['files'];

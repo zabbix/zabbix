@@ -30,7 +30,7 @@ class CForm extends CTag{
 
 		if(isset($_COOKIE['zbx_sessionid']))
 			$this->addVar('sid', substr($_COOKIE['zbx_sessionid'],16,16));
-			
+
 		$this->addVar('form_refresh',get_request('form_refresh',0)+1);
 	}
 

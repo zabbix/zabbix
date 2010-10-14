@@ -1,5 +1,6 @@
 Changes for 1.9
 
+ - [DEV-485] added multiple urls for map elements (Vedmak)
  - [ZBX-3045] fixed deleting mediatype (Vedmak)
  - [DEV-471] field graph_theme.noneworktimecolor renamed to nonworktimecolor (Sasha)
  - [DEV-471] database integrity - added foreign keys (Sasha,Vedmak)
