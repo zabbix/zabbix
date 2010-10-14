@@ -2323,6 +2323,15 @@ Index: frontends/php/include/triggers.inc.php
 ===================================================================
 --- frontends/php/include/triggers.inc.php	(revision 14881)
 +++ frontends/php/include/triggers.inc.php	(working copy)
+@@ -1604,7 +1604,7 @@
+ 				if(zbx_strstr($description, $macro)){
+ 					$value=($flag==ZBX_FLAG_TRIGGER)?
+ 							trigger_get_func_value($trigger['expression'],ZBX_FLAG_TRIGGER,$i ? $i : 1, 1):
+-							trigger_get_func_value($trigger['expression'],ZBX_FLAG_EVENT,$i ? $i : 1, $trigger['clock']);
++							trigger_get_func_value($trigger['expression'],ZBX_FLAG_EVENT,$i ? $i : 1, $trigger['clock'], $trigger['ns']);
+ 
+ 					$description = str_replace($macro, $value, $description);
+ 				}
 @@ -1754,7 +1754,7 @@
  				if(zbx_strstr($description, $macro)){
  					$value=($flag==ZBX_FLAG_TRIGGER)?
