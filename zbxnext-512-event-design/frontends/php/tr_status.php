@@ -393,6 +393,7 @@ include_once('include/page_header.php');
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 			'nopermissions' => 1,
 			'output' => API_OUTPUT_EXTEND,
+			'select_acknowledges' => API_OUTPUT_COUNT,
 			'time_from' => time() - ($config['event_expire']*86400),
 			'time_till' => time(),
 			'sortfield' => 'eventid',
@@ -585,9 +586,8 @@ include_once('include/page_header.php');
 // }}} host JS menu
 
 		
-
-
-		$status = new CSpan(trigger_value2str($trigger['value']), get_trigger_value_style($trigger['value']));
+		$stat = ($trigger['value_flags'] == TRIGGER_VALUE_FLAG_NORMAL) ? '': '?';
+		$status = new CSpan(trigger_value2str($trigger['value']).$stat, get_trigger_value_style($trigger['value']));
 		if((time() - $trigger['lastchange']) < TRIGGER_BLINK_PERIOD){
 			$status->setAttribute('name', 'blink');
 		}
@@ -647,21 +647,7 @@ include_once('include/page_header.php');
 
 				$status = new CSpan(trigger_value2str($row_event['value']), get_trigger_value_style($row_event['value']));
 
-				if($config['event_ack_enable']){
-					if($row_event['value'] == TRIGGER_VALUE_TRUE){
-						if($row_event['acknowledged'] == 1){
-							$acks_cnt = DBfetch(DBselect('SELECT COUNT(*) as cnt FROM acknowledges WHERE eventid='.$row_event['eventid']));
-							$ack = array(new CSpan(S_YES, 'off'),SPACE.'('.$acks_cnt['cnt'].SPACE,
-								new CLink(S_SHOW,'acknow.php?eventid='.$row_event['eventid']),')');
-						}
-						else{
-							$ack = new CLink(S_NOT_ACKNOWLEDGED, 'acknow.php?eventid='.$row_event['eventid'], 'on');
-						}
-					}
-					else{
-						$ack = SPACE;
-					}
-				}
+				$ack = getEventAckState($row_event);
 
 				if(($row_event['acknowledged'] == 0) && ($row_event['value'] == TRIGGER_VALUE_TRUE)){
 					$ack_cb = new CCheckBox('events['.$row_event['eventid'].']', 'no', NULL, $row_event['eventid']);

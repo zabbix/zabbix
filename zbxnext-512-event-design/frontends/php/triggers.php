@@ -584,7 +584,7 @@ include_once('include/page_header.php');
 			}
 // } add dependencies
 
-			if($trigger['value'] != TRIGGER_VALUE_UNKNOWN) $trigger['error'] = '';
+			if($trigger['value_flags'] == TRIGGER_VALUE_FLAG_NORMAL) $trigger['error'] = '';
 
 			$templated = false;
 			foreach($trigger['hosts'] as $hostid => $host){

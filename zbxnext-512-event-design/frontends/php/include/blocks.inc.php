@@ -982,6 +982,7 @@ function make_latest_issues($filter = array()){
 					' WHERE e.object='.EVENT_OBJECT_TRIGGER.
 						' AND e.objectid='.$trigger['triggerid'].
 						' AND e.value='.TRIGGER_VALUE_TRUE.
+						' AND e.value_flags='.TRIGGER_VALUE_CHANGED_YES.
 					' ORDER by e.object DESC, e.objectid DESC, e.eventid DESC';
 		$res_events = DBSelect($event_sql,1);
 		while($row_event=DBfetch($res_events)){
