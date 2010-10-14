@@ -27,7 +27,7 @@ function zbx_jsvalue($value, $object = null){
 
 	foreach($value as $id => $v){
 		if((!isset($is_object) && is_string($id)) || $object) $is_object = true;
-		$value[$id] = (isset($is_object) ? '\''.$id.'\' : ' : '').zbx_jsvalue($v, $object);
+		$value[$id] = (isset($is_object) ? '\''.str_replace('\'','\\\'', $id).'\' : ' : '').zbx_jsvalue($v, $object);
 	}
 
 	if(isset($is_object))

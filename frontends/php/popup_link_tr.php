@@ -201,7 +201,7 @@ function addLinkTriggers(mapid,triggers,drawtype,color){
 			'color': color
 		};
 
-		window.opener.ZBX_SYSMAPS[mapid].map.linkForm_addLinktrigger(linktrigger);
+		window.opener.ZBX_SYSMAPS[mapid].map.form_link_addLinktrigger(linktrigger);
 	}
 	
 	window.close();
