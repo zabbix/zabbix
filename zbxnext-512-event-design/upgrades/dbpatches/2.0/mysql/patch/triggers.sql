@@ -11,7 +11,7 @@ ALTER TABLE events MODIFY eventid bigint unsigned NOT NULL,
 -- Begin event redesign patch
 
 CREATE TEMPORARY TABLE tmp_events_eventid (eventid bigint unsigned PRIMARY KEY);
-CREATE INDEX tmp_events_index on events (source, object, objectid, value, eventid);
+CREATE INDEX tmp_events_index on events (source, object, objectid, clock, eventid, value);
 
 -- Which OK events should have value_changed flag set?
 -- Those that have a PROBLEM event (or no event) before them.
@@ -28,9 +28,14 @@ INSERT INTO tmp_events_eventid (eventid)
 				WHERE e2.source=e1.source
 					AND e2.object=e1.object
 					AND e2.objectid=e1.objectid
-					AND e2.value<>2					-- TRIGGER_VALUE_UNKNOWN
-					AND e2.eventid<e1.eventid
-				ORDER BY e2.eventid DESC
+					AND (e2.clock<e1.clock OR (e2.clock=e1.clock AND e2.eventid<e1.eventid))
+					AND e2.value<2					-- TRIGGER_VALUE_UNKNOWN
+				ORDER BY e2.source DESC,
+						e2.object DESC,
+						e2.objectid DESC,
+						e2.clock DESC,
+						e2.eventid DESC,
+						e2.value DESC
 				LIMIT 1)<>e1.value 					-- (NULL) or TRIGGER_VALUE_TRUE
 );
 
@@ -47,20 +52,25 @@ INSERT INTO tmp_events_eventid (eventid)
 			AND e1.objectid=t.triggerid
 			AND e1.value=1							-- TRIGGER_VALUE_TRUE
 			AND
-				(
-					(t.type=0					-- TRIGGER_TYPE_NORMAL
-						AND (SELECT e2.value
-							FROM events e2
-							WHERE e2.source=e1.source
-								AND e2.object=e1.object
-								AND e2.objectid=e1.objectid
-								AND e2.value<>2		-- TRIGGER_VALUE_UNKNOWN
-								AND e2.eventid<e1.eventid
-							ORDER BY e2.eventid DESC
-							LIMIT 1)<>e1.value) 		-- (NULL) or TRIGGER_VALUE_FALSE
-					OR
-					(t.type=1)					-- TRIGGER_TYPE_MULTIPLE_TRUE
-				)
+			(
+				(t.type=0						-- TRIGGER_TYPE_NORMAL
+					AND (SELECT e2.value
+						FROM events e2
+						WHERE e2.source=e1.source
+							AND e2.object=e1.object
+							AND e2.objectid=e1.objectid
+							AND (e2.clock<e1.clock OR (e2.clock=e1.clock AND e2.eventid<e1.eventid))
+							AND e2.value<2			-- TRIGGER_VALUE_UNKNOWN
+						ORDER BY e2.source DESC,
+								e2.object DESC,
+								e2.objectid DESC,
+								e2.clock DESC,
+								e2.eventid DESC,
+								e2.value DESC
+						LIMIT 1)<>e1.value) 			-- (NULL) or TRIGGER_VALUE_FALSE
+				OR
+				(t.type=1)						-- TRIGGER_TYPE_MULTIPLE_TRUE
+			)
 );
 
 -- Update the value_changed flag.
@@ -96,11 +106,11 @@ INSERT INTO tmp_triggers (triggerid, eventid)
 (
 	SELECT t.triggerid, MAX(e.eventid)
 		FROM triggers t, events e
-		WHERE t.value=2							-- TRIGGER_VALUE_UNKNOWN
-			AND e.source=0						-- EVENT_SOURCE_TRIGGERS	
-			AND e.object=0						-- EVENT_OBJECT_TRIGGER
+		WHERE t.value=2				-- TRIGGER_VALUE_UNKNOWN
+			AND e.source=0			-- EVENT_SOURCE_TRIGGERS	
+			AND e.object=0			-- EVENT_OBJECT_TRIGGER
 			AND e.objectid=t.triggerid
-			AND e.value<>2						-- TRIGGER_VALUE_UNKNOWN
+			AND e.value<>2			-- TRIGGER_VALUE_UNKNOWN
 		GROUP BY t.triggerid
 );
 
@@ -111,9 +121,9 @@ UPDATE triggers t1, tmp_triggers t2, events e
 		AND t2.eventid=e.eventid;
 
 UPDATE triggers
-	SET value=0,								-- TRIGGER_VALUE_FALSE
+	SET value=0,					-- TRIGGER_VALUE_FALSE
 		value_flags=1
-	WHERE value=2;								-- TRIGGER_VALUE_UNKNOWN
+	WHERE value=2;					-- TRIGGER_VALUE_UNKNOWN
 
 DROP TABLE tmp_triggers;
 
