@@ -1605,10 +1605,10 @@
 
 				foreach($sysmap['selements'] as $snum => &$selement){
 					unset($selement['sysmapid']);
-					unset($selement['selementid']);
 
 					foreach($selement['urls'] as $unum => $url){
 						unset($selement['urls'][$unum]['sysmapelementurlid']);
+						unset($selement['urls'][$unum]['selementid']);
 					}
 					switch($selement['elementtype']){
 						case SYSMAP_ELEMENT_TYPE_MAP:
