@@ -1786,6 +1786,7 @@ return $caption;
 
 		$expressionData = parseTriggerExpressions($expression, true);
 
+		$error = null;
 		if(is_null($expression)){
 			/* Restore expression */
 			$expression = explode_exp($trigger['expression'],0);
@@ -1793,6 +1794,7 @@ return $caption;
 		}
 		else if(!isset($expressionData[$expression]['errors']) && $expression != explode_exp($trigger['expression'],0)){
 			$event_to_unknown = true;
+			$error = 'Trigger expression updated. No status update so far.';
 		}
 
 		if( isset($expressionData[$expression]['errors']) ) {
@@ -1868,7 +1870,8 @@ return $caption;
 						$comments,
 						$url,
 						replace_template_dependencies($deps, $chd_trig_host['hostid']),
-						$triggerid);
+						$triggerid
+					);
 				}
 			}
 		}
@@ -1890,12 +1893,13 @@ return $caption;
 		if(!is_null($comments)) $update_values['comments'] = $comments;
 		if(!is_null($url)) $update_values['url'] = $url;
 		if(!is_null($templateid)) $update_values['templateid'] = $templateid;
+		if(!is_null($error)) $update_values['error'] = $error;
 
 		if($event_to_unknown || (!is_null($status) && ($status != TRIGGER_STATUS_ENABLED))){
-			if($trigger['value'] != TRIGGER_VALUE_UNKNOWN){
+			if($trigger['value_flags'] == TRIGGER_VALUE_FLAG_NORMAL){
 				addEvent($triggerid, TRIGGER_VALUE_UNKNOWN);
 
-				$update_values['value'] = TRIGGER_VALUE_UNKNOWN;
+				$update_values['value_flags'] = TRIGGER_VALUE_FLAG_UNKNOWN;
 				$update_values['lastchange'] = time();
 			}
 		}
@@ -2955,19 +2959,21 @@ return $caption;
 	}
 
 // author: Aly
-	function make_trigger_details($triggerid,&$trigger_data){
+	function make_trigger_details($trigger){
 		$table = new CTableInfo();
 
 		if(is_show_all_nodes()){
-			$table->addRow(array(S_NODE, get_node_name_by_elid($triggerid)));
+			$table->addRow(array(S_NODE, get_node_name_by_elid($trigger['triggerid'])));
 		}
 
-		$table->addRow(array(S_HOST, $trigger_data['host']));
-		$table->addRow(array(S_TRIGGER, $trigger_data['exp_desc']));
-		$table->addRow(array(S_SEVERITY, new CCol(get_severity_description($trigger_data['priority']), get_severity_style($trigger_data['priority']))));
-		$table->addRow(array(S_EXPRESSION, $trigger_data['exp_expr']));
-		$table->addRow(array(S_EVENT_GENERATION, S_NORMAL.((TRIGGER_MULT_EVENT_ENABLED==$trigger_data['type'])?SPACE.'+'.SPACE.S_MULTIPLE_PROBLEM_EVENTS:'')));
-		$table->addRow(array(S_DISABLED, ((TRIGGER_STATUS_ENABLED==$trigger_data['status'])?new CCol(S_NO,'off'):new CCol(S_YES,'on')) ));
+		$expression = explode_exp($trigger['expression'], 1, false, true);
+
+		$table->addRow(array(S_HOST, $trigger['host']));
+		$table->addRow(array(S_TRIGGER, $trigger['description']));
+		$table->addRow(array(S_SEVERITY, new CCol(get_severity_description($trigger['priority']), get_severity_style($trigger['priority']))));
+		$table->addRow(array(S_EXPRESSION, $expression));
+		$table->addRow(array(S_EVENT_GENERATION, S_NORMAL.((TRIGGER_MULT_EVENT_ENABLED==$trigger['type'])?SPACE.'+'.SPACE.S_MULTIPLE_PROBLEM_EVENTS:'')));
+		$table->addRow(array(S_DISABLED, ((TRIGGER_STATUS_ENABLED==$trigger['status'])?new CCol(S_NO,'off'):new CCol(S_YES,'on')) ));
 
 	return $table;
 	}

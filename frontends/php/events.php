@@ -375,7 +375,10 @@
 
 			$options = array(
 				'nodeids' => get_current_nodeid(),
-				'object' => EVENT_OBJECT_TRIGGER,
+				'filter' => array(
+					'object' => EVENT_OBJECT_TRIGGER,
+					'value_changed' => null
+				),
 				'time_from' => $from,
 				'time_till' => $till,
 				'output' => API_OUTPUT_SHORTEN,
@@ -384,7 +387,7 @@
 				'limit' => ($config['search_limit']+1)
 			);
 
-			if($_REQUEST['hide_unknown']) $options['hide_unknown'] = 1;
+			if($_REQUEST['hide_unknown']) unset($options['filter']['value_changed']);
 			if(!empty($triggers)) $options['triggerids'] = zbx_objectValues($triggers, 'triggerid');
 
 			$events = CEvent::get($options);
@@ -394,14 +397,16 @@
 			$options = array(
 				'nodeids' => get_current_nodeid(),
 				'eventids' => zbx_objectValues($events,'eventid'),
+				'filter' => array('value_changed' => null),
 				'output' => API_OUTPUT_EXTEND,
+				'select_acknowledges' => API_OUTPUT_COUNT,
 				'sortfield' => 'eventid',
 				'sortorder' => ZBX_SORT_DOWN,
 				'nopermissions' => 1
 			);
 
 			$events = CEvent::get($options);
-			morder_result($events, array('clock','ns'), ZBX_SORT_DOWN);
+			order_result($events, array('clock','ns'), ZBX_SORT_DOWN);
 
 			$triggersOptions = array(
 				'triggerids' => zbx_objectValues($events, 'objectid'),
@@ -429,15 +434,7 @@
 // Actions
 				$actions = get_event_actions_status($event['eventid']);
 
-
-				if($config['event_ack_enable']){
-					if($event['acknowledged'] == 1){
-						$ack = new CLink(S_YES,'acknow.php?eventid='.$event['eventid']);
-					}
-					else{
-						$ack = new CLink(S_NO,'acknow.php?eventid='.$event['eventid'],'on');
-					}
-				}
+				$ack = getEventAckState($event);
 
 				$description = expand_trigger_description_by_data(zbx_array_merge($trigger, array('clock'=>$event['clock'], 'ns'=>$event['ns'])), ZBX_FLAG_EVENT);
 				$tr_desc = new CSpan($description,'pointer');
