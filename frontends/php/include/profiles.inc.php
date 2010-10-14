@@ -22,7 +22,7 @@
 /********** USER PROFILE ***********/
 
 class CProfile{
-
+	private static $userDetails = array();
 	private static $profiles = null;
 	private static $update = array();
 	private static $insert = array();
@@ -30,11 +30,12 @@ class CProfile{
 	public static function init(){
 		global $USER_DETAILS;
 
+		self::$userDetails = $USER_DETAILS;
 		self::$profiles = array();
 
 		$sql = 'SELECT * '.
 				' FROM profiles '.
-				' WHERE userid='.$USER_DETAILS['userid'].
+				' WHERE userid='.self::$userDetails['userid'].
 					' AND '.DBin_node('profileid', false).
 				' ORDER BY userid ASC, profileid ASC';
 		$db_profiles = DBselect($sql);
@@ -49,13 +50,17 @@ class CProfile{
 	}
 
 	public static function flush(){
+// if not initialised, no changes were made
+		if(is_null(self::$profiles)) return true;
+
+		if(self::$userDetails['userid'] <= 0) return;
 
 		if(!empty(self::$insert) || !empty(self::$update)){
 
 			DBstart();
 			foreach(self::$insert as $idx => $profile){
 				foreach($profile as $idx2 => $data){
-					$result = self::insertDB($idx, $data['value'], $data['type'], $idx2);
+					self::insertDB($idx, $data['value'], $data['type'], $idx2);
 				}
 			}
 
@@ -87,8 +92,6 @@ class CProfile{
 	}
 
 	public static function update($idx, $value, $type, $idx2=0){
-		global $USER_DETAILS;
-
 		if(is_null(self::$profiles)){
 			self::init();
 		}
@@ -123,13 +126,11 @@ class CProfile{
 	}
 
 	private static function insertDB($idx, $value, $type, $idx2){
-		global $USER_DETAILS;
-
 		$value_type = self::getFieldByType($type);
 
 		$values = array(
 			'profileid' => get_dbid('profiles', 'profileid'),
-			'userid' => $USER_DETAILS['userid'],
+			'userid' => self::$userDetails['userid'],
 			'idx' => zbx_dbstr($idx),
 			$value_type => ($value_type == 'value_str') ? zbx_dbstr($value) : $value,
 			'type' => $type,
@@ -142,8 +143,6 @@ class CProfile{
 	}
 
 	private static function updateDB($idx, $value, $type, $idx2){
-		global $USER_DETAILS;
-
 		$sql_cond = '';
 // dirty fix, but havn't figureout something better
 		if($idx != 'web.nodes.switch_node') $sql_cond .= ' AND '.DBin_node('profileid', false);
@@ -156,7 +155,7 @@ class CProfile{
 		$sql = 'UPDATE profiles SET '.
 					$value_type.'='.$value.','.
 					' type='.$type.
-				' WHERE userid='.$USER_DETAILS['userid'].
+				' WHERE userid='.self::$userDetails['userid'].
 					' AND idx='.zbx_dbstr($idx).
 					$sql_cond;
 

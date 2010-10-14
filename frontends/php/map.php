@@ -54,7 +54,6 @@ set_time_limit(10);
 		'select_links' => API_OUTPUT_EXTEND,
 		'output' => API_OUTPUT_EXTEND
 	);
-
 	$maps = CMap::get($options);
 
 	if(empty($maps)) access_deny();
@@ -98,10 +97,10 @@ set_time_limit(10);
 		imagecopy($im,$back,0,0,0,0,imagesx($back),imagesy($back));
 	}
 	unset($db_image);
-	
+
 	$x=imagesx($im)/2-ImageFontWidth(4)*zbx_strlen($name)/2;
 	imagetext($im, 10, 0, $x, 25, $colors['Dark Red'], $name);
-	
+
 
 	$str = zbx_date2str(S_MAPS_DATE_FORMAT,time(NULL));
 	imagestring($im, 0,imagesx($im)-120,imagesy($im)-12,$str, $colors['Gray']);
