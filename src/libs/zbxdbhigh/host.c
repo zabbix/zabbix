@@ -26,27 +26,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Type: ZBX_GRAPH_ITEMS                                                      *
- *                                                                            *
- * Purpose: represent graph item data                                         *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- ******************************************************************************/
-typedef struct {
-	zbx_uint64_t	gitemid, itemid;
-	char		key[ITEM_KEY_LEN_MAX];
-	int		drawtype;
-	int		sortorder;
-	char		color[GRAPH_ITEM_COLOR_LEN_MAX];
-	int		yaxisside;
-	int		calc_fnc;
-	int		type;
-	int		periods_cnt;
-} ZBX_GRAPH_ITEMS;
-
-/******************************************************************************
- *                                                                            *
  * Function: validate_template                                                *
  *                                                                            *
  * Description: Check collisions between templates                            *
@@ -257,7 +236,7 @@ static int	DBcmp_triggers(zbx_uint64_t triggerid1, const char *expression1,
 	return res;
 }
 
-static void	DBget_graphitems(const char *sql, ZBX_GRAPH_ITEMS **gitems,
+void	DBget_graphitems(const char *sql, ZBX_GRAPH_ITEMS **gitems,
 		int *gitems_alloc, int *gitems_num)
 {
 	const char	*__function_name = "DBget_graphitems";
@@ -291,6 +270,7 @@ static void	DBget_graphitems(const char *sql, ZBX_GRAPH_ITEMS **gitems,
 		gitem->calc_fnc = atoi(row[7]);
 		gitem->type = atoi(row[8]);
 		gitem->periods_cnt = atoi(row[9]);
+		gitem->flags = (unsigned char)atoi(row[10]);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() [%d] itemid:" ZBX_FS_UI64 " key:'%s'",
 				__function_name, *gitems_num, gitem->itemid, gitem->key);
@@ -307,7 +287,6 @@ static void	DBget_graphitems(const char *sql, ZBX_GRAPH_ITEMS **gitems,
  * Function: DBcmp_graphitems                                                 *
  *                                                                            *
  * Purpose: Compare graph items from two graphs                               *
- *          Also assigns appropriate identifiers (gitemid,itemid)             *
  *                                                                            *
  * Parameters: gitems1     - [IN] first graph items, sorted by itemid         *
  *             gitems1_num - [IN] number of first graph items                 *
@@ -393,7 +372,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_uint64_t templateid,
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
 				"select 0,0,i.key_,gi.drawtype,gi.sortorder,"
 					"gi.color,gi.yaxisside,gi.calc_fnc,"
-					"gi.type,gi.periods_cnt"
+					"gi.type,gi.periods_cnt,i.flags"
 				" from graphs_items gi,items i"
 				" where gi.itemid=i.itemid"
 					" and gi.graphid=" ZBX_FS_UI64
@@ -427,7 +406,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_uint64_t templateid,
 						"gi.drawtype,gi.sortorder,"
 						"gi.color,gi.yaxisside,"
 						"gi.calc_fnc,gi.type,"
-						"gi.periods_cnt"
+						"gi.periods_cnt,i.flags"
 					" from graphs_items gi,items i"
 					" where gi.itemid=i.itemid"
 						" and gi.graphid=" ZBX_FS_UI64
@@ -2735,7 +2714,7 @@ static int	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 320,
 			"select 0,dst.itemid,dst.key_,gi.drawtype,gi.sortorder,"
 				"gi.color,gi.yaxisside,gi.calc_fnc,"
-				"gi.type,gi.periods_cnt"
+				"gi.type,gi.periods_cnt,i.flags"
 			" from graphs_items gi,items i,items dst"
 			" where gi.itemid=i.itemid"
 				" and i.key_=dst.key_"
@@ -2766,7 +2745,7 @@ static int	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
 				"select gi.gitemid,i.itemid,i.key_,gi.drawtype,"
 					"gi.sortorder,gi.color,gi.yaxisside,"
-					"gi.calc_fnc,gi.type,gi.periods_cnt"
+					"gi.calc_fnc,gi.type,gi.periods_cnt,i.flags"
 				" from graphs_items gi,items i"
 				" where gi.itemid=i.itemid"
 					" and gi.graphid=" ZBX_FS_UI64

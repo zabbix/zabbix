@@ -1804,6 +1804,29 @@ int	get_nearestindex(void *p, size_t sz, int num, zbx_uint64_t id)
 	}
 }
 
+void	zbx_sort_array(void *p, size_t sz, int num)
+{
+	int	src, dst, num_sorted = 0;
+	void	*buf = NULL;
+
+	buf = zbx_malloc(buf, sz);
+
+	for (src = 0; src < num; src++)
+	{
+		dst = get_nearestindex(p, sz, num_sorted, *(zbx_uint64_t *)((char *)p + src * sz));
+
+		if (dst != src)
+		{
+			memmove(buf, (char *)p + src * sz, sz);
+			memmove((char *)p + (dst + 1) * sz, (char *)p + dst * sz, sz * (src - dst));
+			memmove((char *)p + dst * sz, buf, sz);
+		}
+		num_sorted++;
+	}
+
+	zbx_free(buf);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: uint64_array_add                                                 *
