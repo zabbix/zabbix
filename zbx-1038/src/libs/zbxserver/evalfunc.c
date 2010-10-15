@@ -1394,7 +1394,7 @@ static int	evaluate_ABSCHANGE(char *value, DB_ITEM *item, const char *function, 
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
 			zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL,
-					(double)abs(item->lastvalue_dbl - item->prevvalue_dbl));
+					fabs(item->lastvalue_dbl - item->prevvalue_dbl));
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
 			/* To avoid overflow */
