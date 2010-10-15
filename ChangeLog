@@ -1,5 +1,6 @@
 Changes for 1.8.4rc2
 
+ - [ZBX-3103] updated French translation; thanks to Alixen (Richlv)
  - [ZBX-3095] fixed processing of 'Host template' condition in actions (Sasha)
  - [ZBX-2981] removed unnecessary queries in map permission checks (Vedmak)
  - [ZBX-3080] fixed javascript not cached by browsers (Vedmak)
