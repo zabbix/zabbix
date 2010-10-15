@@ -3296,7 +3296,6 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 	}
 
 	function insert_graph_form(){
-
 		$frmGraph = new CFormTable(S_GRAPH, null, 'post');
 		$frmGraph->setName('frm_graph');
 		//$frmGraph->setHelp("web.graphs.graph.php");
@@ -3308,7 +3307,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 			$options = array(
 						'graphids' => $_REQUEST['graphid'],
-						'extendoutput' => 1
+						'output' => API_OUTPUT_EXTEND
 					);
 			$graphs = CGraph::get($options);
 			$row = reset($graphs);
@@ -3363,7 +3362,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			$ymax_itemid	= get_request('ymax_itemid', 0);
 			$showworkperiod = get_request('showworkperiod', 0);
 			$showtriggers	= get_request('showtriggers', 0);
-			$legend = get_request('legend', 1);
+			$legend = get_request('legend', 0);
 			$graph3d	= get_request('graph3d', 0);
 			$visible = get_request('visible');
 			$percent_left  = 0;
@@ -3372,6 +3371,13 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			if(isset($visible['percent_left'])) $percent_left = get_request('percent_left', 0);
 			if(isset($visible['percent_right'])) $percent_right = get_request('percent_right', 0);
 		}
+
+
+		if(!isset($_REQUEST['graphid']) && isset($_REQUEST['form_refresh']) && ($_REQUEST['form_refresh'] < 2)){
+			$legend = $_REQUEST['legend'] = 1;
+		}
+
+
 
 /* reinit $_REQUEST */
 		$_REQUEST['items']		= $items;
