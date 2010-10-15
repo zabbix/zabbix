@@ -1,5 +1,6 @@
 Changes for 1.9
 
+ - [DEV-485] added multiple urls for map elements (Vedmak)
  - [ZBX-3045] fixed deleting mediatype (Vedmak)
  - [DEV-471] field graph_theme.noneworktimecolor renamed to nonworktimecolor (Sasha)
  - [DEV-471] database integrity - added foreign keys (Sasha,Vedmak)
@@ -11,6 +12,7 @@ Changes for 1.9
 
 Changes for 1.8.4rc2
 
+ - [ZBX-2981] removed unnecessary queries in map permission checks (Vedmak)
  - [ZBX-3080] fixed javascript not cached by browsers (Vedmak)
  - [ZBX-2661] improved displaying discovery checks in configuration (Vedmak)
  - [ZBX-3086] fixed errors when edit hostgroup linkage for hosts and templates (Vedmak)
