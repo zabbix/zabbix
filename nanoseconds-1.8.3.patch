@@ -2557,15 +2557,13 @@ Index: frontends/php/jsrpc.php
 ===================================================================
 --- frontends/php/jsrpc.php	(revision 14881)
 +++ frontends/php/jsrpc.php	(working copy)
-@@ -129,7 +129,7 @@
- 					'title' => $title.' '.get_node_name_by_elid($host['hostid'],null,':').'[url='.$url_tr_status.']'.$host['host'].'[/url]',
- 					'body' => array(
- 						S_DETAILS.': '.' [url='.$url_events.']'.$trigger['description'].'[/url]',
--						S_DATE.': [b][url='.$url_tr_events.']'.zbx_date2str(S_DATE_FORMAT_YMDHMS, $event['clock']).'[/url][/b]',
-+						S_DATE.': [b][url='.$url_tr_events.']'.zbx_date2str(S_DATE_FORMAT_YMDHMS, $event['clock']).':'.$event['ns'].'[/url][/b]',
- //						S_AGE.': '.zbx_date2age($event['clock'], time()),
- //						S_SEVERITY.': '.get_severity_style($trigger['priority'])
- //						S_SOURCE.': '.$event['eventid'].' : '.$event['clock']
+@@ -173,4 +173,4 @@
+ 
+ include_once('include/page_footer.php');
+ 
+-?>
+\ No newline at end of file
++?>
 Index: frontends/php/api/classes/class.citem.php
 ===================================================================
 --- frontends/php/api/classes/class.citem.php	(revision 14881)
