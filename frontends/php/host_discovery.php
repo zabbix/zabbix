@@ -662,7 +662,7 @@ switch($itemType) {
 		$items_wdgt->addHeader(S_ITEMS_BIG, SPACE);
 		$items_wdgt->addHeader($numrows, SPACE);
 
-		$items_wdgt->addItem(get_header_host_table($_REQUEST['hostid'], array('triggers', 'applications', 'graphs')));
+		$items_wdgt->addItem(get_header_host_table($_REQUEST['hostid']));
 // ----------------
 
 		$form = new CForm();
