@@ -65,7 +65,7 @@ class CGraphItem extends CZBXAPI{
 			'output'				=> API_OUTPUT_REFER,
 			'expandData'			=> null,
 			'extendoutput'			=> null,
-			'count'					=> null,
+			'countOutput'			=> null,
 			'preservekeys'			=> null,
 
 			'sortfield'				=> '',
@@ -128,14 +128,17 @@ class CGraphItem extends CZBXAPI{
 			}
 			$sql_parts['where'][] = DBcondition('gi.itemid', $options['itemids']);
 		}
+
 // type
 		if(!is_null($options['type'] )){
 			$sql_parts['where'][] = 'gi.type='.$options['type'];
 		}
-// extendoutput
+
+// output
 		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['gitems'] = 'gi.*';
 		}
+
 // expandData
 		if(!is_null($options['expandData'])){
 			$sql_parts['select']['key'] = 'i.key_';
@@ -147,10 +150,13 @@ class CGraphItem extends CZBXAPI{
 			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
 		}
 
-// count
-		if(!is_null($options['count'])){
-			$sql_parts['select'] = array('count(*) as count');
+
+// countOutput
+		if(!is_null($options['countOutput'])){
+			$options['sortfield'] = '';
+			$sql_parts['select'] = array('count(DISTINCT gi.gitemid) as rowscount');
 		}
+
 
 // order
 // restrict not allowed columns for sorting
@@ -193,17 +199,19 @@ class CGraphItem extends CZBXAPI{
 				' WHERE '.DBin_node('gi.gitemid', $nodeids).
 					$sql_where.
 				$sql_order;
+//SDI($sql);
 		$db_res = DBselect($sql, $sql_limit);
 		while($gitem = DBfetch($db_res)){
-			if($options['count'])
-				$result = $gitem;
+			if(!is_null($options['countOutput'])){
+				$result = $gitem['rowscount'];
+			}
 			else{
+				$gitemids[$gitem['gitemid']] = $gitem['gitemid'];
+
 				if($options['output'] == API_OUTPUT_SHORTEN){
 					$result[$gitem['gitemid']] = array('gitemid' => $gitem['gitemid']);
 				}
 				else{
-					$gitemids[$gitem['gitemid']] = $gitem['gitemid'];
-
 					if(!isset($result[$gitem['gitemid']]))
 						$result[$gitem['gitemid']]= array();
 
@@ -212,7 +220,7 @@ class CGraphItem extends CZBXAPI{
 						if(!isset($result[$gitem['gitemid']]['graphs'])) $result[$gitem['gitemid']]['graphs'] = array();
 
 						$result[$gitem['gitemid']]['graphs'][] = array('graphid' => $gitem['graphid']);
-						unset($gitem['graphid']);
+//						unset($gitem['graphid']);
 					}
 
 					$result[$gitem['gitemid']] += $gitem;
@@ -220,11 +228,28 @@ class CGraphItem extends CZBXAPI{
 			}
 		}
 
-		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['count'])){
+		if(!is_null($options['countOutput'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
 
+// Adding graphs
+		if(!is_null($options['select_graphs']) && str_in_array($options['select_graphs'], $subselects_allowed_outputs)){
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'output' => $options['select_graphs'],
+				'gitemids' => $gitemids,
+				'preservekeys' => 1
+			);
+			$graphs = CGraph::get($obj_params);
+			foreach($graphs as $graphid => $graph){
+				$gitems = $graph['gitems'];
+				unset($graph['gitems']);
+				foreach($gitems as $inum => $item){
+					$result[$gitem['gitemid']]['graphs'][] = $graph;
+				}
+			}
+		}
 
 // removing keys (hash -> array)
 		if(is_null($options['preservekeys'])){

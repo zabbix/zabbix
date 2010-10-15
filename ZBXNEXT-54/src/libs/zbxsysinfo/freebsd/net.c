@@ -195,7 +195,7 @@ int     NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT
 	if (FAIL == is_uint64(tmp, &port))
 		return SYSINFO_RET_FAIL;
 
-	if (port < 1 || port > 65536)
+	if (port < 1 || port > 65535)
 		return SYSINFO_RET_FAIL;
 
 	zbx_snprintf(command, sizeof(command), "netstat -an | grep '*." ZBX_FS_UI64 "\\>' | wc -l", port);

@@ -78,10 +78,10 @@ class CAlert extends CZBXAPI{
 			'nopermissions'			=> null,
 
 // filter
-			'status'				=> null,
-			'retries'				=> null,
-			'sendto'				=> null,
-			'alerttype'				=> null,
+			'filter'					=> null,
+			'search'					=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
 			'time_from'				=> null,
 			'time_till'				=> null,
 
@@ -91,7 +91,7 @@ class CAlert extends CZBXAPI{
 			'select_mediatypes'		=> null,
 			'select_users'			=> null,
 			'select_hosts'			=> null,
-			'count'					=> null,
+			'countOutput'			=> null,
 			'preservekeys'			=> null,
 			'editable'				=> null,
 
@@ -258,19 +258,14 @@ class CAlert extends CZBXAPI{
 			$sql_parts['where'][] = DBcondition('a.mediatypeid', $options['mediatypeids']);
 		}
 
-// status
-		if(!is_null($options['status'])){
-			$sql_parts['where'][] = 'a.status='.$options['status'];
+// filter
+		if(is_array($options['filter'])){
+			zbx_db_filter('alerts a', $options, $sql_parts);
 		}
 
-// sendto
-		if(!is_null($options['sendto'])){
-			$sql_parts['where'][] = 'a.sendto='.$options['sendto'];
-		}
-
-// alerttype
-		if(!is_null($options['alerttype'])){
-			$sql_parts['where'][] = 'a.alerttype='.$options['alerttype'];
+// search
+		if(is_array($options['search'])){
+			zbx_db_search('alerts a', $options, $sql_parts);
 		}
 
 // time_from
@@ -288,8 +283,8 @@ class CAlert extends CZBXAPI{
 			$sql_parts['select']['alerts'] = 'a.*';
 		}
 
-// count
-		if(!is_null($options['count'])){
+// countOutput
+		if(!is_null($options['countOutput'])){
 			$options['sortfield'] = '';
 
 			$sql_parts['select'] = array('COUNT(DISTINCT a.alertid) as rowscount');
@@ -316,6 +311,7 @@ class CAlert extends CZBXAPI{
 
 		$alertids = array();
 		$userids = array();
+		$hostids = array();
 		$mediatypeids = array();
 
 		$sql_parts['select'] = array_unique($sql_parts['select']);
@@ -340,14 +336,16 @@ class CAlert extends CZBXAPI{
 				$sql_order;
 		$db_res = DBselect($sql, $sql_limit);
 		while($alert = DBfetch($db_res)){
-			if($options['count'])
-				$result = $alert;
+			if($options['countOutput']){
+				$result = $alert['rowscount'];
+			}
 			else{
 				$alertids[$alert['alertid']] = $alert['alertid'];
 
 				if(isset($alert['userid']))
 					$userids[$alert['userid']] = $alert['userid'];
-
+				if(isset($alert['hostid']))
+					$hostids[$alert['hostid']] = $alert['hostid'];
 				if(isset($alert['mediatypeid']))
 					$mediatypeids[$alert['mediatypeid']] = $alert['mediatypeid'];
 
@@ -394,7 +392,7 @@ class CAlert extends CZBXAPI{
 		}
 
 COpt::memoryPick();
-		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['count'])){
+		if(!is_null($options['countOutput'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
@@ -535,10 +533,10 @@ COpt::memoryPick();
 			self::BeginTransaction(__METHOD__);
 
 			$options = array(
-				'alertids' => $alertids,
-				'editable' => 1,
-				'extendoutput' => 1,
-				'preservekeys' => 1
+			'alertids' => zbx_objectValues($alerts, 'alertid'),
+			'editable' => 1,
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => 1
 			);
 			$del_alerts = self::get($options);
 			foreach($alertids as $snum => $alertid){

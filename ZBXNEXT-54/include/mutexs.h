@@ -23,6 +23,8 @@
 #if defined(_WINDOWS)
 
 #	define ZBX_MUTEX		HANDLE
+#	define ZBX_MUTEX_NULL		NULL
+
 #	define ZBX_MUTEX_ERROR		(0)
 #	define ZBX_MUTEX_OK		(1)
 
@@ -34,6 +36,7 @@
 #else /* not _WINDOWS */
 
 #	define ZBX_MUTEX		int
+#	define ZBX_MUTEX_NULL		0
 
 #	define ZBX_MUTEX_ERROR		(-1)
 #	define ZBX_MUTEX_OK		(1)

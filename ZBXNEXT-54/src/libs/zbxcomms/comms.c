@@ -93,7 +93,7 @@ int	zbx_tcp_error(void)
 	return ZBX_TCP_ERR_NETWORK;
 }
 
-static char zbx_tcp_strerror_message[ZBX_TCP_MAX_STRERROR];
+static char	zbx_tcp_strerror_message[ZBX_TCP_MAX_STRERROR];
 
 const char	*zbx_tcp_strerror(void)
 {

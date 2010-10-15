@@ -85,15 +85,30 @@ if(isset($_REQUEST['save_trigger'])){
 
 		//if(isset($_REQUEST['type']))	{ $type=TRIGGER_MULT_EVENT_ENABLED; }
 		//else{ $type=TRIGGER_MULT_EVENT_DISABLED; }
-		$type=TRIGGER_MULT_EVENT_ENABLED;
-
-		$deps = get_request('dependences',array());
+		$type = TRIGGER_MULT_EVENT_ENABLED;
 
 		if(isset($_REQUEST['triggerid'])){
-			$trigger_data = get_trigger_by_triggerid($_REQUEST['triggerid']);
-			if($trigger_data['templateid']){
-				$_REQUEST['description'] = $trigger_data['description'];
-				$expression = explode_exp($trigger_data['expression'],0);
+			$options = array(
+				'triggerids' => $_REQUEST['triggerid'],
+				'output' => API_OUTPUT_EXTEND,
+				'select_dependencies' => API_OUTPUT_REFER
+			);
+			$triggersData = CTrigger::get($options);
+			$triggerData = reset($triggersData);
+
+// Saving dependencies
+// TODO: add dependencies to CTrigger::update
+			$deps = array();
+			foreach($triggerData['dependencies'] as $dnum => $depTrigger){
+				$deps[] = array(
+					'triggerid' => $triggerData['triggerid'],
+					'dependsOnTriggerid' => $depTrigger['triggerid']
+				);
+			}
+//---
+			if($triggerData['templateid']){
+				$_REQUEST['description'] = $triggerData['description'];
+				$expression = explode_exp($triggerData['expression'],0);
 			}
 
 			$trigger = array();
@@ -108,9 +123,7 @@ if(isset($_REQUEST['save_trigger'])){
 
 			DBstart();
 			$result = CTrigger::update($trigger);
-//			update_trigger($_REQUEST['triggerid'],$expression,$_REQUEST["description"],$type,$_REQUEST["priority"],$status,$_REQUEST["comments"],$_REQUEST["url"],$deps, $trigger_data['templateid']);
 
-			$result &= CTrigger::deleteDependencies($trigger);
 			$result &= CTrigger::addDependencies($deps);
 //REVERT
 			$result = DBend($result);
@@ -147,11 +160,6 @@ if(isset($_REQUEST['save_trigger'])){
 					$result = false;
 				}
 			}
-
-//			$triggerid=add_trigger($expression,$_REQUEST["description"],$type,$_REQUEST["priority"],$status,$_REQUEST["comments"],$_REQUEST["url"],$deps);
-
-			$result &= CTrigger::addDependencies($deps);
-
 
 			$result = DBend($result);
 
@@ -421,6 +429,9 @@ if(isset($_REQUEST['sform'])){
 }
 //------------------------ </FORM> ---------------------------
 
+?>
+<?php
 
 include_once('include/page_footer.php');
+
 ?>

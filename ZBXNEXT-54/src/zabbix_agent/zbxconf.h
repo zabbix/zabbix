@@ -22,7 +22,6 @@
 
 extern char	*CONFIG_HOSTS_ALLOWED;
 extern char	*CONFIG_HOSTNAME;
-/* extern int	CONFIG_NOTIMEWAIT;		*/
 extern int	CONFIG_DISABLE_ACTIVE;
 extern int	CONFIG_DISABLE_PASSIVE;
 extern int	CONFIG_ENABLE_REMOTE_COMMANDS;
@@ -32,7 +31,6 @@ extern int	CONFIG_SERVER_PORT;
 extern int	CONFIG_REFRESH_ACTIVE_CHECKS;
 extern char	*CONFIG_LISTEN_IP;
 extern int	CONFIG_LOG_LEVEL;
-extern char	CONFIG_LOG_UNRES_SYMB;
 extern int	CONFIG_MAX_LINES_PER_SECOND;
 
 void    load_config();

@@ -1,6 +1,6 @@
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,15 +20,16 @@
 var agt = navigator.userAgent.toLowerCase();
 var OP = (agt.indexOf("opera") != -1) && window.opera;
 var IE = (agt.indexOf("msie") != -1) && document.all && !OP;
+var IE9 = (agt.indexOf("msie 9.0") != -1) && document.all && !OP;
 var IE8 = (agt.indexOf("msie 8.0") != -1) && document.all && !OP;
-var IE7 = IE && !IE8 && document.all && !OP;
+var IE7 = (agt.indexOf("msie 7.0") != -1) && document.all && !OP;
 var IE6 = (agt.indexOf("msie 6.0") != -1) && document.all && !OP;
 var CR = (agt.indexOf("chrome") != -1);
 var SF = (agt.indexOf("safari") != -1) && !CR;
 var WK = (agt.indexOf("applewebkit") != -1);
 var KQ = (agt.indexOf("khtml") != -1) && !WK;
 var GK = (agt.indexOf("gecko") != -1) && !KQ && !WK;
-var MC = (agt.indexOf("mac") != -1)
+var MC = (agt.indexOf("mac") != -1);
 
 function checkBrowser(){
  if(OP) alert('Opera');
@@ -36,6 +37,7 @@ function checkBrowser(){
  if(IE6) alert('IE6');
  if(IE7) alert('IE7');
  if(IE8) alert('IE8');
+ if(IE9) alert('IE9');
  if(CR) alert('Chrome');
  if(SF) alert('Safari');
  if(WK) alert('Apple Webkit');
@@ -46,8 +48,7 @@ return 0;
 }
 
 function isset(key, obj){
-	if(typeof(obj[key]) != 'undefined') return true;
-return false;
+	return (typeof(obj[key]) != 'undefined');
 }
 
 function empty(obj){
@@ -55,20 +56,17 @@ function empty(obj){
 	if(obj === false) return true;
 //if((obj == 0) || (obj == '0')) return true;
 	if(is_string(obj) && (obj === '')) return true;
-	if(is_array(obj) && (obj.length == 0)) return true;
 
-return false;
+	return is_array(obj) && obj.length == 0;
 }
 
 function is_null(obj){
-	if(obj==null) return true;
-return false;
+	return obj == null;
 }
 
 function is_number(obj){
 	if(isNaN(obj)) return false;
-	if(typeof(obj) === 'number') return true;
-return false;
+	return typeof(obj) === 'number';
 }
 
 function is_object(obj, instance){
@@ -91,41 +89,49 @@ function is_array(obj) {
 }
 
 function SDI(msg){
+	if(GK || WK){
+		console.log(msg);
+		return true;
+	}
+
 	var div_help = document.getElementById('div_help');
 
-	if((div_help == 'undefined') || empty(div_help)){
+	if((typeof(div_help) == 'undefined') || empty(div_help)){
 		var div_help = document.createElement('div');
 		var doc_body = document.getElementsByTagName('body')[0];
 		if(empty(doc_body)) return false;
-		
+
 		doc_body.appendChild(div_help);
-		
+
 		div_help.setAttribute('id','div_help');
 		div_help.setAttribute('style','position: absolute; left: 10px; top: 100px; border: 1px red solid; width: 400px; height: 400px; background-color: white; font-size: 12px; overflow: auto; z-index: 20;');
-		
+
 		//new Draggable(div_help,{});
 	}
-	
+
 	var pre = document.createElement('pre');
 	pre.appendChild(document.createTextNode(msg));
-	
+
 	div_help.appendChild(document.createTextNode("DEBUG INFO: "));
 	div_help.appendChild(document.createElement("br"));
 	div_help.appendChild(pre);
 	div_help.appendChild(document.createElement("br"));
 	div_help.appendChild(document.createElement("br"));
-	
+
 	div_help.scrollTop = div_help.scrollHeight;
 
+	return true;
 }
 
 function SDJ(obj, name){
-	var debug = '';
-//	debug = obj.toSource();
-//	SDI(debug);
-//return null;
+	if(GK || WK){
+		console.dir(obj);
+		return true;
+	}
 
-	name = name || 'none';
+	var debug = '';
+
+	var name = name || 'none';
 	for(var key in obj){
 		if(typeof(obj[key]) == name) continue;
 
@@ -142,19 +148,19 @@ function addListener(element, eventname, expression, bubbling){
 	if(element.addEventListener){
 		element.addEventListener(eventname, expression, bubbling);
 		return true;
-	} 
+	}
 	else if(element.attachEvent){
 		element.attachEvent('on'+eventname, expression);
 		return true;
-	} 
+	}
 	else return false;
 }
 
 function add_variable(o_el, s_name, x_value, s_formname, o_document){
 	var form;
-	
+
 	if(!o_document)	o_document = document;
-	
+
 	if(s_formname){
 		if( !(form = o_document.forms[s_formname]) )
 			 throw "Missing form with name '"+s_formname+"'.";
@@ -167,23 +173,23 @@ function add_variable(o_el, s_name, x_value, s_formname, o_document){
 		if( !(form = this.form) )
 			throw "Missing form in 'this' object";
 	}
-	
+
 	var o_variable = o_document.createElement('input');
-	
+
 	if( !o_variable )	throw "Can't create element";
-	
+
 	o_variable.type = 'hidden';
 	o_variable.name = s_name;
 	o_variable.id = s_name;
 	o_variable.value = x_value;
 
 	form.appendChild(o_variable);
-	
+
 return true;
 }
 
 function cancelEvent(e){
-	if(!e) var e = window.event;
+	if(!e) e = window.event;
 //SDI(e.type);
 	if(e){
 		if(IE){
@@ -222,8 +228,7 @@ return true;
 
 function clearAllForm(form){
 	form = $(form);
-	var count = 0;
-	
+
 	var inputs = form.getElementsByTagName('input');
 	for(var i=0; i<inputs.length;i++){
 		var type = inputs[i].getAttribute('type');
@@ -247,7 +252,7 @@ function clearAllForm(form){
 	for(var i=0; i<selects.length;i++){
 		selects[i].selectedIndex = 0;
 	}
-	
+
 	var areas = form.getElementsByTagName('textarea');
 	for(var i=0; i<areas.length;i++){
 		areas[i].innerHTML = '';
@@ -257,16 +262,12 @@ return true;
 }
 
 function close_window(){
-	
 	window.setTimeout('window.close();', 500); /* Solve bug for Internet Explorer */
 	return false;
 }
 
 function Confirm(msg){
-	if(confirm(msg,'title'))
-		return true;
-	else
-		return false;
+	return confirm(msg, 'title');
 }
 
 function create_var(form_name, var_name, var_val, subm){
@@ -279,11 +280,11 @@ function create_var(form_name, var_name, var_val, subm){
 	if(is_null(objVar)){
 		objVar = document.createElement('input');
 		objVar.setAttribute('type',	'hidden');
-		
+
 		if(!objVar) return false;
 
 		frmForm.appendChild(objVar);
-		
+
 		objVar.setAttribute('name',	var_name);
 		objVar.setAttribute('id',	var_name);
 	}
@@ -294,7 +295,7 @@ function create_var(form_name, var_name, var_val, subm){
 	else{
 		objVar.value = var_val;
 	}
-	
+
 	if(subm)
 		frmForm.submit();
 
@@ -314,9 +315,9 @@ function deselectAll(){
 
 function getDimensions(obj, trueSide){
 	obj = $(obj);
-	
+
 	if(typeof(trueSide) == 'undefined') trueSide = false;
-	
+
 	var dim = {
 		'left':		0,
 		'top':		0,
@@ -324,7 +325,7 @@ function getDimensions(obj, trueSide){
 		'bottom':	0,
 		'width':	0,
 		'height':	0
-	}
+	};
 
 	if(!is_null(obj) && (typeof(obj.offsetParent) != 'undefined')){
 		var dim = {
@@ -334,19 +335,19 @@ function getDimensions(obj, trueSide){
 			'bottom':	parseInt(obj.style.bottom,10),
 			'width':	parseInt(obj.style.width,10),
 			'height':	parseInt(obj.style.height,10)
-		}
+		};
 
 		if(!is_number(dim.top)) dim.top = parseInt(obj.offsetTop,10);
 		if(!is_number(dim.left)) dim.left = parseInt(obj.offsetLeft,10);
 		if(!is_number(dim.width)) dim.width = parseInt(obj.offsetWidth,10);
 		if(!is_number(dim.height)) dim.height = parseInt(obj.offsetHeight,10);
-		
+
 		if(!trueSide){
 			dim.right = dim.left + dim.width;
 			dim.bottom = dim.top + dim.height;
 		}
 	}
-	
+
 return dim;
 }
 
@@ -418,7 +419,7 @@ function get_cursor_position(e){
 	if(e.pageX || e.pageY){
 		cursor.x = e.pageX;
 		cursor.y = e.pageY;
-	} 
+	}
 	else {
 		var de = document.documentElement;
 		var b = document.body;
@@ -462,14 +463,14 @@ function insertInElement(element_name, text, tagName){
 }
 
 function openWinCentered(loc, winname, iwidth, iheight, params){
-		var uri = new Curl(loc);
-		loc = uri.getUrl();
+	var uri = new Curl(loc);
+	loc = uri.getUrl();
 
-		tp=Math.ceil((screen.height-iheight)/2);
-		lf=Math.ceil((screen.width-iwidth)/2);
-		if (params.length > 0){
-			params = ', ' + params;
-		}
+	var tp = Math.ceil((screen.height - iheight) / 2);
+	var lf = Math.ceil((screen.width - iwidth) / 2);
+	if (params.length > 0){
+		params = ', ' + params;
+	}
 
 	var WinObjReferer = window.open(loc,winname,"width="+iwidth+",height="+iheight+",top="+tp+",left="+lf+params);
 	WinObjReferer.focus();
@@ -480,7 +481,7 @@ function PopUp(url,width,height,form_name){
 	if(!height) height = 480;
 	if(!form_name) form_name = 'zbx_popup';
 
-	var left = (screen.width-(width+150))/2; 
+	var left = (screen.width-(width+150))/2;
 	var top = (screen.height-(height+150))/2;
 
 	var popup = window.open(url,form_name,'width=' + width +',height=' + height + ',top='+ top +',left='+ left +
@@ -536,11 +537,11 @@ function removeListener(element, eventname, expression, bubbling){
 	if(element.removeEventListener){
 		element.removeEventListener(eventname, expression, bubbling);
 		return true;
-	} 
+	}
 	else if(element.detachEvent){
 		element.detachEvent('on'+eventname, expression);
 		return true;
-	} 
+	}
 	else return false;
 }
 
@@ -549,12 +550,11 @@ function remove_childs(form_name,rmvbyname,tag){
 	var frmForm = document.forms[form_name];
 	for (var i=0; i < frmForm.length; i++){
 		if(frmForm.elements[i].type != 'checkbox') continue;
-		if(frmForm.elements[i].disabled == true) continue;
+		if(frmForm.elements[i].disabled) continue;
 		if(frmForm.elements[i].checked != true) continue;
 
 		var splt = frmForm.elements[i].name.split('[');
 		var name = splt[0];
-		var serviceid = splt[1];
 
 		if(rmvbyname && rmvbyname != name) continue;
 //		if(frmForm.elements[i].name != rmvbyname+'['+serviceid+'[serviceid]') continue;
@@ -569,10 +569,10 @@ function remove_element(elmnt,tag){
 	if(!is_null(elmnt)){
 		if(('undefined' != typeof(elmnt.nodeName)) && (elmnt.nodeName.toLowerCase() == tag.toLowerCase())){
 			elmnt.parentNode.removeChild(elmnt);
-		} 
+		}
 		else if(elmnt.nodeType == 9){
 			return false;
-		} 
+		}
 		else {
 			remove_element(elmnt.parentNode,tag);
 		}
@@ -581,14 +581,13 @@ return true;
 }
 
 function ShowHide(obj,style){
-	if(typeof(style) == 'undefined') var style = 'inline';
+	if(typeof(style) == 'undefined') style = 'inline';
 
 	if(is_string(obj))
 		obj = document.getElementById(obj);
 
 	if(!obj){
 		throw 'ShowHide(): Object not found.';
-		return false;
 	}
 
 	if(obj.style.display != 'none'){
@@ -602,33 +601,30 @@ function ShowHide(obj,style){
 }
 
 function showHideByName(name, style){
-	if(typeof(style) == 'undefined') var style = 'none';
+	if(typeof(style) == 'undefined') style = 'none';
 
 	var objs = $$('[name='+name+']');
 
 	if(empty(objs)){
 		throw 'ShowHide(): Object not found.';
-		return false;
 	}
-	
+
 	for(var i=0; i<objs.length; i++){
 		var obj = objs[i];
 		obj.style.display = style;
 	}
-
 }
 
 function showHideEffect(obj, eff, time, cb_afterFinish){
 	obj = $(obj);
 	if(!obj){
 		throw 'showHideEffect(): Object not found.';
-		return false;
 	}
 
 	if(typeof(Effect) == 'undefined'){
 		eff = 'none';
 	}
-	
+
 	if(typeof(cb_afterFinish) == 'undefined'){
 		cb_afterFinish = function(){};
 	}
@@ -680,7 +676,7 @@ function switchElementsClass(obj,class1,class2){
 		obj.className = class1 + ' ' + obj.className;
 		result = class1;
 	}
-	
+
 	if(IE6){
 		obj.style.filter = '';
 		obj.style.backgroundImage = '';
@@ -697,10 +693,10 @@ function zbx_throw(msg){
 /*									Pages stuff										*/
 /************************************************************************************/
 function openPage(start){
-	var lnk = new Curl(location.href); 
+	var lnk = new Curl(location.href);
 	lnk.setArgument('start', start);
 	location.href = lnk.getUrl();
-	
+
 return false;
 }
 
@@ -709,7 +705,7 @@ function ScaleChartToParenElement(obj_name){
 
 	if(obj.length <= 0) throw "Can't find objects with name [" + obj_name +"]";
 
-	for(i = obj.length-1; i>=0; i--){
+	for(var i = obj.length-1; i>=0; i--){
 		obj[i].src += "&width=" + (obj[i].parentNode.offsetWidth - obj[i].parentNode.offsetLeft - 10);
 	}
 }

@@ -34,6 +34,8 @@
 	}
 
 	function svc_default_port($type_int){
+		$port = 0;
+
 		switch($type_int){
 			case SVC_SSH:		$port = '22';		break;
 			case SVC_LDAP:		$port = '389';		break;
@@ -43,20 +45,17 @@
 			case SVC_POP:		$port = '110';		break;
 			case SVC_NNTP:		$port = '119';		break;
 			case SVC_IMAP:		$port = '143';		break;
-			case SVC_TCP:		$port = '80';		break;
 			case SVC_AGENT:		$port = '10050';	break;
 			case SVC_SNMPv1:	$port = '161';		break;
 			case SVC_SNMPv2:	$port = '161';		break;
 			case SVC_SNMPv3:	$port = '161';		break;
-			case SVC_ICMPPING:	$port = '0';		break;
 			default: 			$port = '0';		break;
 		}
-
 		return $port;
 	}
 
-	function discovery_check_type2str($type_int){
-		$types = array(
+	function discovery_check_type2str($type=null){
+		$discovery_types = array(
 			SVC_SSH => S_SSH,
 			SVC_LDAP => S_LDAP,
 			SVC_SMTP => S_SMTP,
@@ -72,13 +71,19 @@
 			SVC_SNMPv3 => S_SNMPV3_AGENT,
 			SVC_ICMPPING => S_ICMPPING,
 		);
-		
-		return isset($types[$type_int]) ? $types[$type_int] : S_UNKNOWN;
+
+		if(is_null($type)){
+			order_result($discovery_types);
+			return $discovery_types;
+		}
+		else if(isset($discovery_types[$type]))
+			return $discovery_types[$type];
+		else
+			return S_UNKNOWN;
 	}
 
-	function discovery_check2str($type, $snmp_community, $key_, $ports){
-		$external_param = null;
-		$port_def = svc_default_port($type);
+	function discovery_check2str($type, $snmp_community, $key_, $port){
+		$external_param = '';
 
 		switch($type){
 			case SVC_SNMPv1:
@@ -88,15 +93,19 @@
 				$external_param = ' "'.$key_.'"';
 				break;
 		}
+		$result = discovery_check_type2str($type);
+		if((svc_default_port($type) != $port) || ($type == SVC_TCP))
+			$result .= ' ('.$port.')';
+		$result .= $external_param;
 
-		return discovery_check_type2str($type).($port_def == $ports ? '' : ' ('.$ports.')').$external_param;
+		return $result;
 	}
 
 	function discovery_port2str($type_int, $port){
-		$port_def = svc_default_port($type_int);
-
-		if ($port != $port_def)
-			return '['.$port.']';
+//		$port_def = svc_default_port($type_int);
+//
+//		if ($port != $port_def)
+			return ' ('.$port.')';
 
 	return '';
 	}

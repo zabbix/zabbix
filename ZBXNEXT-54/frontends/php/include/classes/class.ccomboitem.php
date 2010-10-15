@@ -20,8 +20,8 @@
 ?>
 <?php
 class CComboItem extends CTag{
-	public function __construct($value,$caption=NULL,$selected=NULL, $enabled=NULL){
-		parent::__construct('option','yes');
+	public function __construct($value, $caption=NULL, $selected=NULL, $enabled=NULL){
+		parent::__construct('option', 'yes');
 		$this->tag_body_start = '';
 		$this->attributes['value'] = $value;
 		$this->attributes['title'] = $caption;
@@ -46,9 +46,7 @@ class CComboItem extends CTag{
 	}
 
 	public function setSelected($value='yes'){
-		if((is_string($value) && ($value == 'yes' || $value == 'selected' || $value=='on')) ||
-			(is_int($value) && $value<>0))
-		{
+		if((is_string($value) && ($value == 'yes' || $value == 'selected' || $value=='on')) || (is_int($value) && $value<>0)){
 			return $this->attributes['selected'] = 'selected';
 		}
 

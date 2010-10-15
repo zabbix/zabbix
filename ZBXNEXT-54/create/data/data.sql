@@ -12198,7 +12198,7 @@ INSERT INTO sysmaps VALUES (2,'Local network',980,200,NULL,1,2,1,1,0,0);
 -- Dumping data for table `sysmaps_elements`
 --
 
-INSERT INTO sysmaps_elements VALUES (2,2,10017,0,19,NULL,NULL,'Zabbix server',NULL,100,100,'',NULL,NULL);
+INSERT INTO sysmaps_elements VALUES (2,2,10017,0,19,NULL,NULL,'Zabbix server',NULL,100,100,NULL,NULL);
 
 --
 -- Dumping data for table `screens`

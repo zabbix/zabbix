@@ -260,7 +260,7 @@ void	__zbx_zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_l
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 void	zbx_strcpy_alloc(char **str, int *alloc_len, int *offset, const char *src)
@@ -300,7 +300,7 @@ void	zbx_strcpy_alloc(char **str, int *alloc_len, int *offset, const char *src)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 void	zbx_chrcpy_alloc(char **str, int *alloc_len, int *offset, const char src)
@@ -321,12 +321,12 @@ void	zbx_chrcpy_alloc(char **str, int *alloc_len, int *offset, const char src)
 }
 
 /* Has to be rewritten to avoid malloc */
-char	*string_replace(char *str, char *sub_str1, char *sub_str2)
+char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2)
 {
         char *new_str = NULL;
-        char *p;
-        char *q;
-        char *r;
+        const char *p;
+        const char *q;
+        const char *r;
         char *t;
         long len;
         long diff;
@@ -363,7 +363,6 @@ char	*string_replace(char *str, char *sub_str1, char *sub_str2)
 	*t = '\0';
 
         return new_str;
-
 }
 
 /******************************************************************************
@@ -415,24 +414,24 @@ void	del_zeroes(char *s)
  * Parameters: str - string for processing                                    *
  *             charlist - null terminated list of characters                  *
  *                                                                            *
- * Return value: Stripped string                                              *
+ * Return value: length of stripped string                                    *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	zbx_rtrim(char *str, const char *charlist)
+int	zbx_rtrim(char *str, const char *charlist)
 {
-	register char *p;
+	char	*p;
 
-	if( !str || !charlist || !*str || !*charlist ) return;
+	if (NULL == str || '\0' == *str)
+		return 0;
 
-	for(
-		p = str + strlen(str) - 1;
-		p >= str && NULL != strchr(charlist,*p);
-		p--)
-			*p = '\0';
+	for (p = str + strlen(str) - 1; p >= str && NULL != strchr(charlist, *p); p--)
+		*p = '\0';
+
+	return (int)(p - str);
 }
 
 /******************************************************************************
@@ -444,18 +443,18 @@ void	zbx_rtrim(char *str, const char *charlist)
  * Parameters: str - string for processing                                    *
  *             charlist - null terminated list of characters                  *
  *                                                                            *
- * Return value: Stripped string                                              *
+ * Return value:                                                              *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	zbx_ltrim(register char *str, const char *charlist)
+void	zbx_ltrim(char *str, const char *charlist)
 {
-	register char *p;
+	char	*p;
 
-	if (NULL == str || NULL == charlist || '\0' == *str || '\0' == *charlist)
+	if (NULL == str || '\0' == *str)
 		return;
 
 	for (p = str; '\0' != *p && NULL != strchr(charlist, *p); p++)
@@ -481,7 +480,7 @@ void	zbx_ltrim(register char *str, const char *charlist)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -715,7 +714,7 @@ void	lrtrim_spaces(char *c)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-size_t zbx_strlcpy(char *dst, const char *src, size_t siz)
+size_t	zbx_strlcpy(char *dst, const char *src, size_t siz)
 {
 	char *d = dst;
 	const char *s = src;
@@ -757,7 +756,7 @@ size_t zbx_strlcpy(char *dst, const char *src, size_t siz)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-size_t zbx_strlcat(char *dst, const char *src, size_t siz)
+size_t	zbx_strlcat(char *dst, const char *src, size_t siz)
 {
 	char *d = dst;
 	const char *s = src;
@@ -797,14 +796,14 @@ size_t zbx_strlcat(char *dst, const char *src, size_t siz)
  * Comments:  required free allocated string with function 'zbx_free'         *
  *                                                                            *
  ******************************************************************************/
-char* zbx_dvsprintf(char *dest, const char *f, va_list args)
+char	*zbx_dvsprintf(char *dest, const char *f, va_list args)
 {
 	char	*string = NULL;
 	int	n, size = MAX_STRING_LEN >> 1;
 
 	va_list curr;
 
-	while(1)
+	while (1)
 	{
 		string = zbx_malloc(string, size);
 
@@ -839,7 +838,7 @@ char* zbx_dvsprintf(char *dest, const char *f, va_list args)
  * Comments:  required free allocated string with function 'zbx_free'         *
  *                                                                            *
  ******************************************************************************/
-char* __zbx_zbx_dsprintf(char *dest, const char *f, ...)
+char	*__zbx_zbx_dsprintf(char *dest, const char *f, ...)
 {
 	char	*string = NULL;
 	va_list args;
@@ -2246,9 +2245,6 @@ static int	zbx_strncasecmp(const char *s1, const char *s2, size_t n)
 
 char	*zbx_strcasestr(const char *haystack, const char *needle)
 {
-/*#ifdef HAVE_STRCASESTR
-	return strcasestr(haystack, needle);
-#else*/
 	size_t		sz_h, sz_n;
 	const char	*p;
 
@@ -2270,7 +2266,6 @@ char	*zbx_strcasestr(const char *haystack, const char *needle)
 	}
 
 	return NULL;
-/*#endif*/
 }
 
 int	starts_with(const char *str, const char *prefix)
@@ -2291,7 +2286,7 @@ int	cmp_key_id(const char *key_1, const char *key_2)
 	return ((*p == '\0' || *p == '[' || *p == ',') && (*q == '\0' || *q == '[' || *q == ',') ? SUCCEED : FAIL);
 }
 
-const char *zbx_permission_string(int perm)
+const char	*zbx_permission_string(int perm)
 {
 	switch (perm) {
 	case PERM_DENY:
@@ -2307,7 +2302,7 @@ const char *zbx_permission_string(int perm)
 	}
 }
 
-char	*zbx_item_value_type_string(zbx_item_value_type_t value_type)
+const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type)
 {
 	switch (value_type) {
 	case ITEM_VALUE_TYPE_FLOAT: return "Numeric (float)";
@@ -2319,7 +2314,7 @@ char	*zbx_item_value_type_string(zbx_item_value_type_t value_type)
 	}
 }
 
-char	*zbx_result_string(int result)
+const char	*zbx_result_string(int result)
 {
 	switch (result) {
 	case SUCCEED: return "SUCCEED";
@@ -2332,7 +2327,7 @@ char	*zbx_result_string(int result)
 	}
 }
 
-char	*zbx_trigger_severity_string(zbx_trigger_severity_t severity)
+const char	*zbx_trigger_severity_string(zbx_trigger_severity_t severity)
 {
 	switch (severity) {
 	case TRIGGER_SEVERITY_NOT_CLASSIFIED: return "Not classified";
@@ -2345,7 +2340,7 @@ char	*zbx_trigger_severity_string(zbx_trigger_severity_t severity)
 	}
 }
 
-char	*zbx_item_logtype_string(zbx_item_logtype_t logtype)
+const char	*zbx_item_logtype_string(zbx_item_logtype_t logtype)
 {
 	switch (logtype) {
 	case ITEM_LOGTYPE_INFORMATION: return "Information";
@@ -2357,7 +2352,7 @@ char	*zbx_item_logtype_string(zbx_item_logtype_t logtype)
 	}
 }
 
-char	*zbx_dservice_type_string(zbx_dservice_type_t service)
+const char	*zbx_dservice_type_string(zbx_dservice_type_t service)
 {
 	switch (service) {
 	case SVC_SSH: return "SSH";
@@ -2639,6 +2634,49 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 	return out;
 }
 #endif	/* HAVE_ICONV */
+
+char	*zbx_replace_utf8(const char *text, char replacement)
+{
+	int	n;
+	char	*out, *p;
+
+	out = p = zbx_malloc(NULL, strlen(text) + 1);
+
+	while ('\0' != *text)
+	{
+		if (0 == (0x80 & *text))		/* ASCII */
+			n = 1;
+		else if (0xf0 == (0xf0 & *text))	/* 11110000-11110100 is a start of 4-byte sequence */
+			n = 4;
+		else if (0xe0 == (0xe0 & *text))	/* 11100000-11101111 is a start of 3-byte sequence */
+			n = 3;
+		else if (0xc0 == (0xc0 & *text))	/* 11000010-11011111 is a start of 2-byte sequence */
+			n = 2;
+		else
+			goto bad;
+
+		if (1 == n)
+			*p++ = *text++;
+		else
+		{
+			*p++ = replacement;
+
+			while (0 != n)
+			{
+				if ('\0' == *text)
+					goto bad;
+				n--;
+				text++;
+			}
+		}
+	}
+
+	*p = '\0';
+	return out;
+bad:
+	zbx_free(out);
+	return NULL;
+}
 
 void	win2unix_eol(char *text)
 {

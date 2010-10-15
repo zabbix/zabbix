@@ -893,7 +893,6 @@ AC_CHECK_FUNCS(asprintf)
 AC_CHECK_FUNCS(vsnprintf)
 AC_CHECK_FUNCS(hstrerror)
 AC_CHECK_FUNCS(getopt_long)
-AC_CHECK_FUNCS(strcasestr)
 AC_CHECK_FUNCS(getenv)
 AC_CHECK_FUNCS(putenv)
 
@@ -910,10 +909,12 @@ AC_MSG_RESULT(yes),
 LDFLAGS="$saved_LDFLAGS"
 AC_MSG_RESULT(no))
 
-dnl Check if we want to compile everything with static
 AC_ARG_ENABLE(static,[  --enable-static         Build statically linked binaries],
-[ LDFLAGS="${LDFLAGS} -static";
- enable_static=yes])
+[case "${enableval}" in
+  yes) LDFLAGS="${LDFLAGS} -static" ;;
+  no) ;;
+  *) AC_MSG_ERROR([bad value ${enableval} for --enable-static]) ;;
+esac])
 
 AC_ARG_ENABLE(server,[  --enable-server         Turn on build of server],
 [case "${enableval}" in
@@ -1363,10 +1364,8 @@ AC_OUTPUT([
 	src/libs/zbxconf/Makefile
 	src/libs/zbxdbcache/Makefile
 	src/libs/zbxdbhigh/Makefile
-	src/libs/zbxemail/Makefile
+	src/libs/zbxmedia/Makefile
 	src/libs/zbxsysinfo/Makefile
-	src/libs/zbxsms/Makefile
-	src/libs/zbxjabber/Makefile
 	src/libs/zbxcommon/Makefile
 	src/libs/zbxsysinfo/common/Makefile
 	src/libs/zbxsysinfo/simple/Makefile

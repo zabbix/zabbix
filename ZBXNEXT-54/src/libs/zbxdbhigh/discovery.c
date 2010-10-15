@@ -49,7 +49,7 @@ static void	discovery_add_event(int object, zbx_uint64_t objectid, int now, int 
 	event.clock 	= now;
 	event.value 	= value;
 
-	process_event(&event);
+	process_event(&event, 0);
 }
 
 static DB_RESULT	discovery_get_dhost_by_value(zbx_uint64_t dcheckid, const char *value)

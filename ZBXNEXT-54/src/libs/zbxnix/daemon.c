@@ -27,7 +27,7 @@
 
 #include "fatal.h"
 
-char	*APP_PID_FILE = NULL;
+char	*CONFIG_PID_FILE = NULL;
 
 static int	parent = 0;
 static int	parent_pid = (-1);
@@ -219,7 +219,7 @@ int	daemon_start(int allow_root)
 
 /*------------------------------------------------*/
 
-	if( FAIL == create_pid_file(APP_PID_FILE))
+	if( FAIL == create_pid_file(CONFIG_PID_FILE))
 	{
 		exit(FAIL);
 	}
@@ -246,12 +246,12 @@ int	daemon_start(int allow_root)
 	return MAIN_ZABBIX_ENTRY();
 }
 
-void	daemon_stop(void)
+void	daemon_stop()
 {
-	drop_pid_file(APP_PID_FILE);
+	drop_pid_file(CONFIG_PID_FILE);
 }
 
-void	init_main_process(void)
+void	init_main_process()
 {
 	struct sigaction	phan;
 
