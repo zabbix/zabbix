@@ -1047,11 +1047,11 @@ else {
 					else if($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_CHAR){
 						$row[$field] = zbx_dbstr($v);
 					}
-					else if($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_ID){
+					else if(isset($table_schema['fields'][$field]['ref_table'])){
 						$row[$field] = zero2null($v);
 					}
 				}
-				
+
 				if($getids){
 					$result_ids[$key] = $id;
 					$row[$table_schema['key']] = $id;
@@ -1091,7 +1091,7 @@ else {
 					else if($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_CHAR){
 						$value = zbx_dbstr($value);
 					}
-					else if($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_ID){
+					else if(isset($table_schema['fields'][$field]['ref_table'])){
 						$value = zero2null($value);
 					}
 
