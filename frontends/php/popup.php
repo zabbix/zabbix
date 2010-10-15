@@ -168,6 +168,7 @@ include_once('include/page_header.php');
 		'excludeids'=>		array(T_ZBX_STR, O_OPT,	null,	null,		null),
 		'only_hostid'=>		array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 		'monitored_hosts'=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
+		'templated_hosts'=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
 		'real_hosts'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
 
 		'itemtype'=>		array(T_ZBX_INT, O_OPT, null,   null,		null),
@@ -211,7 +212,7 @@ include_once('include/page_header.php');
 // items
  	$value_types		= get_request('value_types', null);
 
-	$submitParent = get_request('submitParent', false);
+	$submitParent = get_request('submitParent', 0);
 
 	$host_status = null;
 	$templated = null;
@@ -253,9 +254,10 @@ include_once('include/page_header.php');
 
 	if($monitored_hosts)
 		$frmTitle->addVar('monitored_hosts', 1);
-
 	if($real_hosts)
 		$frmTitle->addVar('real_hosts', 1);
+	if($templated_hosts)
+		$frmTitle->addVar('templated_hosts', 1);
 
 	if($value_types)
 		$frmTitle->addVar('value_types', $value_types);
@@ -300,8 +302,9 @@ include_once('include/page_header.php');
 	else if($real_hosts){
 		$options['groups']['real_hosts'] = true;
 	}
-	else{
+	else if($templated_hosts){
 		$options['hosts']['templated_hosts'] = true;
+		$options['groups']['templated_hosts'] = true;
 	}
 
 	if(!is_null($writeonly)){
