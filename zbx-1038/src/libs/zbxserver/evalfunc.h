@@ -31,8 +31,9 @@
 
 extern  int     CONFIG_SERVER_STARTUP_TIME;
 
-int	evaluate_function2(char *value,char *host,char *key,char *function,char *parameter);
-int	replace_value_by_map(char *value, zbx_uint64_t valuemapid);
-int	add_value_suffix(char *value, int max_len, char *units, int value_type);
+int	evaluate_macro_function(char *value, const char *host, const char *key, const char *function, const char *parameter);
+
+int	replace_value_by_map(char *value, int max_len, zbx_uint64_t valuemapid);
+int	add_value_suffix(char *value, int max_len, const char *units, int value_type);
 
 #endif

@@ -1280,12 +1280,13 @@ static int	DBget_item_lastvalue_by_triggerid(zbx_uint64_t triggerid, char **last
 			" where i.itemid=f.itemid and f.functionid=" ZBX_FS_UI64,
 			functionid);
 
-	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[4])/*i.lastvalue may be NULL*/)
+	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[4]))
 	{
 		value_type = atoi(row[1]);
 		ZBX_STR2UINT64(valuemapid, row[2]);
 
-		switch (value_type) {
+		switch (value_type)
+		{
 			case ITEM_VALUE_TYPE_LOG:
 			case ITEM_VALUE_TYPE_TEXT:
 				zbx_snprintf(tmp, sizeof(tmp), "select value from %s where itemid=%s order by id desc",
@@ -1304,14 +1305,14 @@ static int	DBget_item_lastvalue_by_triggerid(zbx_uint64_t triggerid, char **last
 			case ITEM_VALUE_TYPE_STR:
 				zbx_strlcpy(tmp, row[4], sizeof(tmp));
 
-				replace_value_by_map(tmp, valuemapid);
+				replace_value_by_map(tmp, sizeof(tmp), valuemapid);
 
 				*lastvalue = zbx_dsprintf(*lastvalue, "%s", tmp);
 				break;
 			default:
 				zbx_strlcpy(tmp, row[4], sizeof(tmp));
 
-				if (SUCCEED != replace_value_by_map(tmp, valuemapid))
+				if (SUCCEED != replace_value_by_map(tmp, sizeof(tmp), valuemapid))
 					add_value_suffix(tmp, sizeof(tmp), row[3], value_type);
 				if (ITEM_VALUE_TYPE_FLOAT == value_type)
 					del_zeroes(tmp);
@@ -2228,10 +2229,9 @@ void	substitute_macros(DB_EVENT *event, DB_ACTION *action, DB_ESCALATION *escala
 		str_out = zbx_strdcat(str_out, pl);
 		pr[0] = '{';
 
-
 		/* copy original name of variable */
-		replace_to = zbx_dsprintf(replace_to, "%s}", pr);	/* in format used '}' */
-									/* cose in 'pr' string symbol '}' is changed to '\0' by 'pme'*/
+		replace_to = zbx_dsprintf(replace_to, "%s}", pr);	/* in format used '}' because in 'pr' string */
+									/* symbol '}' is changed to '\0' by 'pme' */
 		pl = pr + strlen(replace_to);
 
 		pms = pr + 1;
@@ -2261,16 +2261,15 @@ void	substitute_macros(DB_EVENT *event, DB_ACTION *action, DB_ESCALATION *escala
 						*p = ')';
 						pms = p + 1;
 
-						/* function 'evaluate_function2' require 'replace_to' with size 'MAX_STRING_LEN' */
+						/* function 'evaluate_macro_function' requires 'replace_to' with size 'MAX_BUFFER_LEN' */
 						zbx_free(replace_to);
-						replace_to = zbx_malloc(replace_to, MAX_STRING_LEN);
+						replace_to = zbx_malloc(replace_to, MAX_BUFFER_LEN);
 
-						if(evaluate_function2(replace_to,host,key,function,parameter) != SUCCEED)
-							zbx_snprintf(replace_to, MAX_STRING_LEN, "%s", STR_UNKNOWN_VARIABLE);
+						if(evaluate_macro_function(replace_to, host, key, function, parameter) != SUCCEED)
+							zbx_snprintf(replace_to, MAX_BUFFER_LEN, "%s", STR_UNKNOWN_VARIABLE);
 					}
 				}
 			}
-
 		}
 		pme[0] = '}';
 
@@ -2283,8 +2282,8 @@ void	substitute_macros(DB_EVENT *event, DB_ACTION *action, DB_ESCALATION *escala
 
 	*data = str_out;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "End substitute_macros(result:%s)",
-		*data );
+	zabbix_log(LOG_LEVEL_DEBUG, "End substitute_macros(result:%s)",
+		*data);
 }
 
 /******************************************************************************
@@ -2311,7 +2310,7 @@ static int	substitute_functions(char **exp, time_t now, char *error, int maxerrl
 	char	functionid[ID_LEN], *e, *f;
 	char	*out = NULL;
 	int	out_alloc = 64, out_offset = 0;
-	char	value[MAX_STRING_LEN];
+	char	value[MAX_BUFFER_LEN];
 
 	DB_RESULT	result;
 	DB_ROW		row;
