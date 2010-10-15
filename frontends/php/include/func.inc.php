@@ -948,9 +948,9 @@ return $result;
 
 function uint_in_array($needle,$haystack){
 //TODO: REMOVE
-	if(!empty($haystack) && !is_numeric(key($haystack))){
+//	if(!empty($haystack) && !is_numeric(key($haystack))){
 //		info('uint_in_array: possible pasted associated array');
-	}
+//	}
 //----
 
 	foreach($haystack as $id => $value)
@@ -991,6 +991,17 @@ function zbx_value2array(&$values){
 			$tmp[$values] = $values;
 
 		$values = $tmp;
+	}
+}
+
+// creates chain of relation parent -> childs, for all chain levels
+function createParentToChildRelation(&$chain, $link, $parentField, $childField){
+	if(!isset($chain[$link[$parentField]]))
+		$chain[$link[$parentField]] = array();
+
+	$chain[$link[$parentField]][$link[$childField]] = $link[$childField];
+	if(isset($chain[$link[$childField]])){
+		$chain[$link[$parentField]] = zbx_array_merge($chain[$link[$parentField]], $chain[$link[$childField]]);
 	}
 }
 

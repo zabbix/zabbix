@@ -1609,6 +1609,7 @@
 	'S_CANNOT_FIND_GRAPH'=>			'Cannot find graph',
 	'S_CANNOT_FIND_ITEM'=>			'Cannot find item',
 	'S_USED_IN_EXPORTED_SCREEN_SMALL'=>'used in exported screen',
+	'S_TEMPLATED'=>'Templated',
 
 //	screenedit.php
 	'S_MAP'=>					'Map',
@@ -1649,6 +1650,7 @@
 //	screens.php
 	'S_CUSTOM_SCREENS'=>			'Custom screens',
 	'S_SCREENS_BIG'=>				'SCREENS',
+	'S_HOST_SCREENS'=>				'Host screens',
 
 	'S_SLIDESHOW_UPDATED'=>			'Slideshow updated',
 	'S_CANNOT_UPDATE_SLIDESHOW'=>		'Cannot_update slideshow',
