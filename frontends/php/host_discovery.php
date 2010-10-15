@@ -24,7 +24,7 @@ require_once('include/hosts.inc.php');
 require_once('include/items.inc.php');
 require_once('include/forms.inc.php');
 
-$page['title'] = 'S_CONFIGURATION_OF_ITEMS';
+$page['title'] = 'S_CONFIGURATION_OF_DISCOVERY';
 $page['file'] = 'host_discovery.php';
 $page['scripts'] = array('effects.js', 'class.cviewswitcher.js');
 $page['hist_arg'] = array();
@@ -42,7 +42,7 @@ switch($itemType) {
 }
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'hostid'=>			array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,			'(!isset({form}) || (isset({form})&&!isset({itemid})))'),
+		'hostid'=>			array(T_ZBX_INT, O_OPT,  null,	DB_ID,			'(!isset({form}) || (isset({form})&&!isset({itemid})))'),
 		'itemid'=>			array(T_ZBX_INT, O_NO,	 P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))'),
 
 		'description'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),
@@ -97,8 +97,6 @@ switch($itemType) {
 		'snmpv3_privpassphrase'=>array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.'))'),
 
 		'ipmi_sensor'=>		array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,	'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_IPMI.'))', S_IPMI_SENSOR),
-
-		'formula'=>			array(T_ZBX_DBL, O_OPT,  null,  NOT_ZERO,	'isset({save})', S_CUSTOM_MULTIPLIER),
 
 		'new_application'=>	array(T_ZBX_STR, O_OPT, null,	null,	'isset({save})'),
 		'applications'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID, null),
@@ -194,114 +192,65 @@ switch($itemType) {
 		$_REQUEST['form'] = 'clone';
 	}
 	else if(isset($_REQUEST['save'])){
-		$applications = get_request('applications',array());
-		$delay_flex = get_request('delay_flex',array());
-		$db_delay_flex = '';
+		$applications = get_request('applications', array());
+		$delay_flex = get_request('delay_flex', array());
 
+		$db_delay_flex = '';
 		foreach($delay_flex as $num => $val){
 			$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
 		}
-
 		$db_delay_flex = trim($db_delay_flex,';');
 
+		if(!zbx_empty($_REQUEST['new_application'])){
+			if($new_appid = add_application($_REQUEST['new_application'], $_REQUEST['hostid']))
+				$applications[$new_appid] = $new_appid;
+		}
+
 		$item = array(
-			'description'	=> get_request('description'),
-			'key_'			=> get_request('key'),
-			'hostid'		=> get_request('form_hostid'),
-			'delay'			=> get_request('delay'),
-			'history'		=> get_request('history'),
-			'status'		=> get_request('status'),
-			'type'			=> get_request('type'),
-			'snmp_community'=> get_request('snmp_community'),
-			'snmp_oid'		=> get_request('snmp_oid'),
-			'value_type'	=> get_request('value_type'),
-			'trapper_hosts'	=> get_request('trapper_hosts'),
-			'snmp_port'		=> get_request('snmp_port'),
-			'units'			=> get_request('units'),
-			'multiplier'	=> get_request('multiplier', 0),
-			'delta'			=> get_request('delta'),
-			'snmpv3_securityname'	=> get_request('snmpv3_securityname'),
-			'snmpv3_securitylevel'	=> get_request('snmpv3_securitylevel'),
-			'snmpv3_authpassphrase'	=> get_request('snmpv3_authpassphrase'),
-			'snmpv3_privpassphrase'	=> get_request('snmpv3_privpassphrase'),
-			'formula'			=> get_request('formula'),
-			'trends'			=> get_request('trends'),
-			'logtimefmt'		=> get_request('logtimefmt'),
-			'valuemapid'		=> get_request('valuemapid'),
-			'delay_flex'		=> $db_delay_flex,
-			'authtype'		=> get_request('authtype'),
-			'username'		=> get_request('username'),
-			'password'		=> get_request('password'),
-			'publickey'		=> get_request('publickey'),
-			'privatekey'		=> get_request('privatekey'),
-			'params'			=> get_request('params'),
-			'ipmi_sensor'		=> get_request('ipmi_sensor'),
-			'data_type'		=> get_request('data_type')
+			'description' => get_request('description'),
+			'key_' => get_request('key'),
+			'hostid' => get_request('hostid'),
+			'delay' => get_request('delay'),
+			'status' => get_request('status'),
+			'type' => get_request('type'),
+			'snmp_community' => get_request('snmp_community'),
+			'snmp_oid' => get_request('snmp_oid'),
+			'snmp_port' => get_request('snmp_port'),
+			'snmpv3_securityname' => get_request('snmpv3_securityname'),
+			'snmpv3_securitylevel' => get_request('snmpv3_securitylevel'),
+			'snmpv3_authpassphrase' => get_request('snmpv3_authpassphrase'),
+			'snmpv3_privpassphrase' => get_request('snmpv3_privpassphrase'),
+			'delay_flex' => $db_delay_flex,
+			'authtype' => get_request('authtype'),
+			'username' => get_request('username'),
+			'password' => get_request('password'),
+			'publickey' => get_request('publickey'),
+			'privatekey' => get_request('privatekey'),
+			'params' => get_request('params'),
+			'ipmi_sensor' => get_request('ipmi_sensor'),
+			'applications' => $applications,
+			'flags' => ZBX_FLAG_DISCOVERY,
 		);
 
 		if(isset($_REQUEST['itemid'])){
 			DBstart();
 
-			$new_appid = true;
-			$result = false;
-
-			if(!zbx_empty($_REQUEST['new_application'])){
-				if($new_appid = add_application($_REQUEST['new_application'],$_REQUEST['form_hostid']))
-					$applications[$new_appid] = $new_appid;
-			}
-
-			if((count($applications) == 1) && in_array(0, $applications))
-				$applications = array();
-			$item['applications'] = $applications;
-
 			$db_item = get_item_by_itemid_limited($_REQUEST['itemid']);
 			$db_item['applications'] = get_applications_by_itemid($_REQUEST['itemid']);
 
-// sdii($item['applications']);
-// sdii($db_item['applications']);
-
-			foreach($item as $field => $value){
-				if($item[$field] == $db_item[$field]) $item[$field] = null;
-			}
-
-			if($new_appid){
-				$result = smart_update_item($_REQUEST['itemid'],$item);
-			}
-
+			$result = smart_update_item($_REQUEST['itemid'], $item);
 			$result = DBend($result);
-
-			$itemid = $_REQUEST['itemid'];
-/*			$action = AUDIT_ACTION_UPDATE;*/
 
 			show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 		}
 		else{
 			DBstart();
-
-			$new_appid = true;
-			$itemid = false;
-			if(!zbx_empty($_REQUEST['new_application'])){
-				if($new_appid = add_application($_REQUEST['new_application'],$_REQUEST['form_hostid']))
-					$applications[$new_appid] = $new_appid;
-			}
-
-			$item['applications'] = $applications;
-
-			if($new_appid){
-				$itemid = add_item($item);
-			}
-
-			$result = DBend($itemid);
-
-/*			$action = AUDIT_ACTION_ADD;*/
+			$result = add_item($item);
+			$result = DBend($result);
 			show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 		}
 
 		if($result){
-/*			$host = get_host_by_hostid($_REQUEST['hostid']);
-
-			add_audit($action, AUDIT_RESOURCE_ITEM, S_ITEM.' ['.$_REQUEST['key'].'] ['.$itemid.'] '.S_HOST.' ['.$host['host'].']');*/
-
 			unset($_REQUEST['itemid']);
 			unset($_REQUEST['form']);
 		}
@@ -370,13 +319,13 @@ switch($itemType) {
 	else{
 		$form = null;
 	}
-	$items_wdgt->addPageHeader(S_CONFIGURATION_OF_ITEMS_BIG, $form);
+	$items_wdgt->addPageHeader(S_CONFIGURATION_OF_DISCOVERY_BIG, $form);
 
 
 	if(isset($_REQUEST['form'])){
 		$frmItem = new CFormTable();
 		$frmItem->setName('items');
-		$frmItem->setTitle(S_ITEM);
+		$frmItem->setTitle(S_RULE);
 		$frmItem->setAttribute('style','visibility: hidden;');
 
 		$hostid = get_request('hostid');
@@ -717,6 +666,7 @@ switch($itemType) {
 // ----------------
 
 		$form = new CForm();
+		$form->addVar('hostid', $_REQUEST['hostid']);
 		$form->setName('items');
 
 		$table  = new CTableInfo();
@@ -739,6 +689,7 @@ switch($itemType) {
 			'hostids' => $_REQUEST['hostid'],
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => 1,
+			'filter' => array('flags' => ZBX_FLAG_DISCOVERY),
 			'select_applications' => API_OUTPUT_EXTEND,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
@@ -770,7 +721,6 @@ switch($itemType) {
 				$error = new CDiv(SPACE, 'iconerror');
 				$error->setHint($item['error'], '', 'on');
 			}
-
 
 			if(empty($item['applications'])){
 				$applications = '-';

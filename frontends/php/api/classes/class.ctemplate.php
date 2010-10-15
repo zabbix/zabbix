@@ -82,6 +82,7 @@ class CTemplate extends CZBXAPI{
 			'select_templates'			=> null,
 			'selectParentTemplates'		=> null,
 			'select_items'				=> null,
+			'select_discoveries'		=> null,
 			'select_triggers'			=> null,
 			'select_graphs'				=> null,
 			'select_applications'		=> null,
@@ -422,26 +423,24 @@ class CTemplate extends CZBXAPI{
 					if(!is_null($options['select_groups']) && !isset($result[$template['templateid']]['groups'])){
 						$template['groups'] = array();
 					}
-
 					if(!is_null($options['select_templates']) && !isset($result[$template['templateid']]['templates'])){
 						$template['templates'] = array();
 					}
-
 					if(!is_null($options['select_hosts']) && !isset($result[$template['templateid']]['hosts'])){
 						$template['hosts'] = array();
 					}
 					if(!is_null($options['selectParentTemplates']) && !isset($result[$template['templateid']]['parentTemplates'])){
 						$template['parentTemplates'] = array();
 					}
-
 					if(!is_null($options['select_items']) && !isset($result[$template['templateid']]['items'])){
 						$template['items'] = array();
 					}
-
+					if(!is_null($options['select_discoveries']) && !isset($result[$template['hostid']]['discoveries'])){
+						$result[$template['hostid']]['discoveries'] = array();
+					}
 					if(!is_null($options['select_triggers']) && !isset($result[$template['templateid']]['triggers'])){
 						$template['triggers'] = array();
 					}
-
 					if(!is_null($options['select_graphs']) && !isset($result[$template['templateid']]['graphs'])){
 						$template['graphs'] = array();
 					}
@@ -709,6 +708,50 @@ Copt::memoryPick();
 						$result[$templateid]['items'] = $items[$templateid]['rowscount'];
 					else
 						$result[$templateid]['items'] = 0;
+				}
+			}
+		}
+
+// Adding Discoveries
+		if(!is_null($options['select_discoveries'])){
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'hostids' => $templateids,
+				'filter' => array('flags' => ZBX_FLAG_DISCOVERY),
+				'nopermissions' => 1,
+				'preservekeys' => 1,
+			);
+
+			if(is_array($options['select_discoveries']) || str_in_array($options['select_discoveries'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['select_discoveries'];
+				$items = CItem::get($obj_params);
+
+				if(!is_null($options['limitSelects'])) order_result($items, 'description');
+				foreach($items as $itemid => $item){
+					unset($items[$itemid]['hosts']);
+					foreach($item['hosts'] as $hnum => $host){
+						if(!is_null($options['limitSelects'])){
+							if(!isset($count[$host['hostid']])) $count[$host['hostid']] = 0;
+							$count[$host['hostid']]++;
+
+							if($count[$host['hostid']] > $options['limitSelects']) continue;
+						}
+
+						$result[$host['hostid']]['discoveries'][] = &$items[$itemid];
+					}
+				}
+			}
+			else if(API_OUTPUT_COUNT == $options['select_discoveries']){
+				$obj_params['countOutput'] = 1;
+				$obj_params['groupCount'] = 1;
+
+				$items = CItem::get($obj_params);
+				$items = zbx_toHash($items, 'hostid');
+				foreach($result as $hostid => $host){
+					if(isset($items[$hostid]))
+						$result[$hostid]['discoveries'] = $items[$hostid]['rowscount'];
+					else
+						$result[$hostid]['discoveries'] = 0;
 				}
 			}
 		}

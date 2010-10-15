@@ -821,6 +821,7 @@ include_once('include/page_header.php');
 			'select_triggers' => API_OUTPUT_COUNT,
 			'select_graphs' => API_OUTPUT_COUNT,
 			'select_applications' => API_OUTPUT_COUNT,
+			'select_discoveries' => API_OUTPUT_COUNT,
 			'nopermissions' => 1,
 		);
 		$hosts = CHost::get($options);
@@ -853,7 +854,7 @@ include_once('include/page_header.php');
 			$graphs = array(new CLink(S_GRAPHS, 'graphs.php?groupid='.$_REQUEST['groupid'].'&hostid='.$host['hostid']),
 				' ('.$host['graphs'].')');
 			$discoveries = array(new CLink(S_DISCOVERY, 'host_discovery.php?&hostid='.$host['hostid']),
-				' ('.'1'.')');
+				' ('.$host['discoveries'].')');
 
 			$description = array();
 			if($host['proxy_hostid']){

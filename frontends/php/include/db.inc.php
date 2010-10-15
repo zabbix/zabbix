@@ -883,7 +883,7 @@ else {
 		return bcmod($id,'100000000000');
 	}
 
-	function check_db_fields(&$db_fields, &$args){
+	function check_db_fields($db_fields, &$args){
 		if(!is_array($args)) return false;
 
 		foreach($db_fields as $field => $def){
@@ -1051,7 +1051,7 @@ else {
 						$row[$field] = zero2null($v);
 					}
 				}
-				
+
 				if($getids){
 					$result_ids[$key] = $id;
 					$row[$table_schema['key']] = $id;
