@@ -265,7 +265,8 @@
 				'params'		=> '',
 				'ipmi_sensor'		=> '',
 				'applications'		=> array(),
-				'templateid'		=> 0);
+				'templateid'		=> 0
+		);
 
 		if(!check_db_fields($item_db_fields, $item)){
 			error(S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION.SPACE.'[add_item]');
@@ -374,7 +375,7 @@
 					'snmp_port,units,multiplier,'.
 					'delta,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,'.
 					'snmpv3_privpassphrase,formula,trends,logtimefmt,valuemapid,'.
-					'delay_flex,params,ipmi_sensor,templateid,authtype,username,password,publickey,privatekey)'.
+					'delay_flex,params,ipmi_sensor,templateid,authtype,username,password,publickey,privatekey, flags)'.
 			' VALUES ('.$itemid.','.zbx_dbstr($item['description']).','.zbx_dbstr($item['key_']).','.(!$item['hostid']? '0':$item['hostid']).','.
 						(!$item['delay']? '0':$item['delay']).','.(!$item['history']? '0':$item['history']).','.(!$item['status']? '0':$item['status']).','.(!$item['type']? '0':$item['type']).','.
 						zbx_dbstr($item['snmp_community']).','.zbx_dbstr($item['snmp_oid']).','.(!$item['value_type']? '0':$item['value_type']).','.(!$item['data_type']? '0':$item['data_type']).','.
@@ -385,7 +386,7 @@
 						zbx_dbstr($item['delay_flex']).','.zbx_dbstr($item['params']).','.
 						zbx_dbstr($item['ipmi_sensor']).','.zero2null($item['templateid']).','.intval($item['authtype']).','.
 						zbx_dbstr($item['username']).','.zbx_dbstr($item['password']).','.
-						zbx_dbstr($item['publickey']).','.zbx_dbstr($item['privatekey']).')'
+						zbx_dbstr($item['publickey']).','.zbx_dbstr($item['privatekey']).','.$item['flags'].')'
 			);
 
 		if ($result)
@@ -873,7 +874,7 @@
 					'snmp_community,snmp_oid,value_type,data_type,trapper_hosts,snmp_port,units,multiplier,delta,'.
 					'snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,'.
 					'formula,trends,logtimefmt,valuemapid,delay_flex,params,ipmi_sensor,templateid,'.
-					'authtype,username,password,publickey,privatekey '.
+					'authtype,username,password,publickey,privatekey,flags '.
 			' FROM items '.
 			' WHERE itemid='.$itemid;
 		$row = DBfetch(DBselect($sql));

@@ -941,9 +941,9 @@ return $result;
 
 function uint_in_array($needle,$haystack){
 //TODO: REMOVE
-	if(!empty($haystack) && !is_numeric(key($haystack))){
+//	if(!empty($haystack) && !is_numeric(key($haystack))){
 //		info('uint_in_array: possible pasted associated array');
-	}
+//	}
 //----
 
 	foreach($haystack as $id => $value)

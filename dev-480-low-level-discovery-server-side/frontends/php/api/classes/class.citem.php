@@ -321,7 +321,7 @@ class CItem extends CZBXAPI{
 
 // --- FILTER ---
 		if(is_array($options['filter'])){
-			zbx_value2array($options['filter']);
+			zbx_db_filter('items i', $options, $sql_parts);
 
 			if(isset($options['filter']['host'])){
 				zbx_value2array($options['filter']['host']);
@@ -330,70 +330,6 @@ class CItem extends CZBXAPI{
 				$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
 				$sql_parts['where']['h'] = DBcondition('h.host', $options['filter']['host'], false, true);
 			}
-
-			if(isset($options['filter']['hostid'])){
-				zbx_value2array($options['filter']['hostid']);
-				$sql_parts['where']['hostid'] = DBcondition('i.hostid', $options['filter']['hostid']);
-			}
-
-			if(isset($options['filter']['itemid'])){
-				zbx_value2array($options['filter']['itemid']);
-				$sql_parts['where']['itemid'] = DBcondition('i.itemid', $options['filter']['itemid']);
-			}
-
-			if(isset($options['filter']['description'])){
-				zbx_value2array($options['filter']['description']);
-				$sql_parts['where']['description'] = DBcondition('i.description', $options['filter']['description'], false, true);
-			}
-
-			if(isset($options['filter']['key_'])){
-				zbx_value2array($options['filter']['key_']);
-				$sql_parts['where']['key_'] = DBcondition('i.key_', $options['filter']['key_'], false, true);
-			}
-
-			if(isset($options['filter']['type'])){
-				zbx_value2array($options['filter']['type']);
-				$sql_parts['where']['type'] = DBcondition('i.type', $options['filter']['type']);
-			}
-
-			if(isset($options['filter']['status'])){
-				zbx_value2array($options['filter']['status']);
-				$sql_parts['where']['status'] = DBcondition('i.status', $options['filter']['status']);
-			}
-
-			if(isset($options['filter']['snmp_community']))
-				$sql_parts['where'][] = 'i.snmp_community='.zbx_dbstr($options['filter']['snmp_community']);
-
-			if(isset($options['filter']['snmpv3_securityname']))
-				$sql_parts['where'][] = 'i.snmpv3_securityname='.zbx_dbstr($options['filter']['snmpv3_securityname']);
-
-			if(isset($options['filter']['snmp_oid']))
-				$sql_parts['where'][] = 'i.snmp_oid='.zbx_dbstr($options['filter']['snmp_oid']);
-
-			if(isset($options['filter']['snmp_port']))
-				$sql_parts['where'][] = 'i.snmp_port='.$options['filter']['snmp_port'];
-
-			if(isset($options['filter']['value_type'])){
-				zbx_value2array($options['filter']['value_type']);
-				$sql_parts['where']['value_type'] = DBCondition('i.value_type', $options['filter']['value_type']);
-			}
-
-			if(isset($options['filter']['ipmi_sensor']))
-				$sql_parts['where'][] = 'i.ipmi_sensor='.zbx_dbstr($options['filter']['ipmi_sensor']);
-
-			if(isset($options['filter']['data_type']))
-				$sql_parts['where'][] = 'i.data_type='.$options['filter']['data_type'];
-
-			if(isset($options['filter']['delay'])){
-				zbx_value2array($options['filter']['delay']);
-				$sql_parts['where']['delay'] = DBCondition('i.delay', $options['filter']['delay']);
-			}
-
-			if(isset($options['filter']['trends']))
-				$sql_parts['where'][] = 'i.trends='.$options['filter']['trends'];
-
-			if(isset($options['filter']['history']))
-				$sql_parts['where'][] = 'i.history='.$options['filter']['history'];
 		}
 
 // group
@@ -869,10 +805,6 @@ COpt::memoryPick();
 				}
 			} while(!empty($parent_itemids));
 
-// delete triggers
-			$result = delete_triggers_by_itemid($itemids);
-			if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete item');
-
 // delete graphs
 			$del_graphs = array();
 			$sql = 'SELECT gi.graphid' .
@@ -897,12 +829,10 @@ COpt::memoryPick();
 
 			$itemids_condition = DBcondition('itemid', $itemids);
 
-			DB::delete('graphs_items', array($itemids_condition));
 			DB::delete('screens_items', array(
 				DBcondition('resourceid', $itemids),
 				DBcondition('resourcetype', array(SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT)),
 			));
-			DB::delete('items_applications', array($itemids_condition));
 			DB::delete('items', array($itemids_condition));
 			DB::delete('profiles', array(
 				'idx='.zbx_dbstr('web.favorite.graphids'),

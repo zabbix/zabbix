@@ -1201,6 +1201,7 @@
 	'S_DELETE_HISTORY_SELECTED_ITEMS_Q'=>			'Delete history of selected items?',
 	'S_DELETE_SELECTED_ITEMS_Q'=>				'Delete selected items?',
 	'S_FORMULA'=>						'Formula',
+	'S_RULE'=>						'Rule',
 
 //	events.php
 	'S_EVENT'=>				'Event',

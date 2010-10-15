@@ -785,6 +785,7 @@ include_once('include/page_header.php');
 			S_ITEMS,
 			S_TRIGGERS,
 			S_GRAPHS,
+			S_DISCOVERY,
 			S_LINKED_TEMPLATES,
 			S_LINKED_TO
 		));
@@ -824,6 +825,7 @@ include_once('include/page_header.php');
 			'select_triggers' => API_OUTPUT_COUNT,
 			'select_graphs' => API_OUTPUT_COUNT,
 			'select_applications' => API_OUTPUT_COUNT,
+			'select_discoveries' => API_OUTPUT_COUNT,
 			'nopermissions' => 1
 		);
 
@@ -846,6 +848,8 @@ include_once('include/page_header.php');
 				' ('.$template['triggers'].')');
 			$graphs = array(new CLink(S_GRAPHS,'graphs.php?groupid='.$_REQUEST['groupid'].'&hostid='.$template['templateid']),
 				' ('.$template['graphs'].')');
+			$discoveries = array(new CLink(S_DISCOVERY, 'host_discovery.php?&hostid='.$template['hostid']),
+				' ('.$template['discoveries'].')');
 
 
 			$i = 0;
@@ -914,6 +918,7 @@ include_once('include/page_header.php');
 				$items,
 				$triggers,
 				$graphs,
+				$discoveries,
 				(empty($linked_templates_output) ? '-' : new CCol($linked_templates_output,'wraptext')),
 				(empty($linked_to_output) ? '-' : new CCol($linked_to_output,'wraptext'))
 			));
