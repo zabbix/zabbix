@@ -796,7 +796,7 @@ static int	evaluate_AVG(char *value, DB_ITEM *item, const char *function, const 
 			zabbix_log(LOG_LEVEL_DEBUG, "Result for AVG is empty" );
 		else
 		{
-			zbx_snprintf(value,MAX_STRING_LEN, ZBX_FS_DBL, sum / (double)rows);
+			zbx_snprintf(value, MAX_STRING_LEN, ZBX_FS_DBL, sum / (double)rows);
 			res = SUCCEED;
 		}
 	}
@@ -1778,7 +1778,7 @@ clean:
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int evaluate_function(char *value, DB_ITEM *item, const char *function, const char *parameter, time_t now)
+int	evaluate_function(char *value, DB_ITEM *item, const char *function, const char *parameter, time_t now)
 {
 	int	ret;
 	struct  tm      *tm;
@@ -2296,7 +2296,7 @@ int	replace_value_by_map(char *value, zbx_uint64_t valuemapid)
  * Comments: Used for evaluation of notification macros                       *
  *                                                                            *
  ******************************************************************************/
-int evaluate_function2(char *value,char *host,char *key,char *function,char *parameter)
+int	evaluate_function2(char *value,char *host,char *key,char *function,char *parameter)
 {
 	DB_ITEM	item;
 	DB_RESULT result;

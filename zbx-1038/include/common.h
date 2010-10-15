@@ -154,9 +154,6 @@ const char	*zbx_result_string(int result);
 #define MAX_STRING_LEN	2048
 #define MAX_BUF_LEN	65536
 
-#define DB_TEXT_LEN	65535
-#define DB_TEXT_LEN_MAX	DB_TEXT_LEN+1
-
 #define ZBX_DM_DELIMITER	'\255'
 
 /* Item types */
