@@ -60,7 +60,7 @@ class CEvent extends CZBXAPI{
 		$user_type = $USER_DETAILS['type'];
 		$userid = $USER_DETAILS['userid'];
 
-		$sort_columns = array('eventid', 'clock'); // allowed columns for sorting
+		$sort_columns = array('eventid', 'object', 'clock'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
 
 		$sql_parts = array(
@@ -261,7 +261,8 @@ class CEvent extends CZBXAPI{
 		}
 // hide_unknown
 		if(!is_null($options['hide_unknown'])){
-			$sql_parts['where'][] = 'e.value<>'.TRIGGER_VALUE_UNKNOWN;
+			if(is_null($options['filter'])) $options['filter'] = array();
+			$options['filter']['value_changed'] = TRIGGER_VALUE_CHANGED_YES;
 		}
 // time_from
 		if(!is_null($options['time_from'])){
@@ -318,18 +319,34 @@ class CEvent extends CZBXAPI{
 // restrict not allowed columns for sorting
 		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
 		if(!zbx_empty($options['sortfield'])){
-
 			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN)?ZBX_SORT_DOWN:ZBX_SORT_UP;
 
-			$sql_parts['order'][] = 'e.'.$options['sortfield'].' '.$sortorder;
+			if($options['sortfield'] == 'clock'){
+				$sql_parts['order'][] = 'e.clock '.$sortorder;
+				$sql_parts['order'][] = 'e.ns '.$sortorder;
 
-			if(!is_null($options['triggerids']) && ($options['sortfield'] == 'clock')){
-				$sql_parts['where']['o'] = '(e.object-0)='.EVENT_OBJECT_TRIGGER;
+				if(!str_in_array('e.*', $sql_parts['select']['events'])){
+					$sql_parts['select']['events'][] = 'e.clock';
+					$sql_parts['select']['events'][] = 'e.ns';
+				}
+
+				if(!is_null($options['triggerids'])){
+					$sql_parts['where']['o'] = '(e.object-0)='.EVENT_OBJECT_TRIGGER;
+				}
 			}
 
-			$eventFields = $sql_parts['select']['events'];
-			if(!str_in_array('e.'.$options['sortfield'], $eventFields) && !str_in_array('e.*', $eventFields)){
-				$sql_parts['select']['events'][] = 'e.'.$options['sortfield'];
+			if($options['sortfield'] == 'object'){
+				$sql_parts['order'][] = 'e.object '.$sortorder;
+				$sql_parts['order'][] = 'e.objectid '.$sortorder;
+				$sql_parts['order'][] = 'e.clock '.$sortorder;
+				$sql_parts['order'][] = 'e.ns '.$sortorder;
+
+				if(!str_in_array('e.*', $sql_parts['select']['events'])){
+					$sql_parts['select']['events'][] = 'e.object';
+					$sql_parts['select']['events'][] = 'e.objectid';
+					$sql_parts['select']['events'][] = 'e.clock';
+					$sql_parts['select']['events'][] = 'e.ns';
+				}
 			}
 		}
 

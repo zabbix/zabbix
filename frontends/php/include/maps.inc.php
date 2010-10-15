@@ -1192,6 +1192,7 @@
 		$show_unack = $config['event_ack_enable'] ? $sysmap['show_unack'] : EXTACK_OPTION_ALL;
 
 		$triggers_map = array();
+		$triggers_map_submaps = array();
 		$hostgroups_map = array();
 		$hosts_map = array();
 
@@ -1228,7 +1229,7 @@
 										$hosts_map[$sel['elementid']][$selementid] = $selementid;
 									break;
 									case SYSMAP_ELEMENT_TYPE_TRIGGER:
-										$triggers_map[$sel['elementid']][$selementid] = $selementid;
+										$triggers_map_submaps[$sel['elementid']][$selementid] = $selementid;
 									break;
 								}
 							}
@@ -1300,17 +1301,20 @@
 // get triggers data {{{
 		$all_triggers = array();
 // triggers from current map, select all
+
 		if(!empty($triggers_map)){
 			$options = array(
-				'triggerids' => array_keys($triggers_map),
-				'output' => API_OUTPUT_EXTEND,
-				'nopermissions' => 1,
-				'filter' => array('value' => array(TRIGGER_VALUE_UNKNOWN, TRIGGER_VALUE_TRUE)),
 				'nodeids' => get_current_nodeid(true),
-				'skipDependent' => 1,
+				'triggerids' => array_keys($triggers_map),
+				'filter' => array(
+					'value_flags' => null
+				),
+				'output' => API_OUTPUT_EXTEND,
+				'nopermissions' => 1
 			);
 			$triggers = CTrigger::get($options);
 			$all_triggers = array_merge($all_triggers, $triggers);
+
 			foreach($triggers as $trigger){
 				foreach($triggers_map[$trigger['triggerid']] as $belongs_to_sel){
 					$selements[$belongs_to_sel]['triggers'][$trigger['triggerid']] = $trigger['triggerid'];
@@ -1318,13 +1322,38 @@
 			}
 		}
 
+// triggers from submaps, skip dependent
+		if(!empty($triggers_map_submaps)){
+			$options = array(
+				'nodeids' => get_current_nodeid(true),
+				'triggerids' => array_keys($triggers_map_submaps),
+				'filter' => array(
+					'value' => array(TRIGGER_VALUE_TRUE)
+				),
+				'skipDependent' => 1,
+				'output' => API_OUTPUT_EXTEND,
+				'nopermissions' => 1,
+			);
+			$triggers = CTrigger::get($options);
+			$all_triggers = array_merge($all_triggers, $triggers);
+			foreach($triggers as $trigger){
+				foreach($triggers_map_submaps[$trigger['triggerid']] as $belongs_to_sel){
+					$selements[$belongs_to_sel]['triggers'][$trigger['triggerid']] = $trigger['triggerid'];
+				}
+			}
+		}
+
+
 // triggers from all hosts/hostgroups, skip dependent
 		if(!empty($monitored_hostids)){
 			$options = array(
 				'hostids' => $monitored_hostids,
 				'output' => API_OUTPUT_EXTEND,
 				'nopermissions' => 1,
-				'filter' => array('value' => array(TRIGGER_VALUE_UNKNOWN, TRIGGER_VALUE_TRUE)),
+				'filter' => array(
+					'value' => array(TRIGGER_VALUE_TRUE),
+					'value_flags' => null,
+				),
 				'nodeids' => get_current_nodeid(true),
 				'active' => true,
 				'skipDependent' => 1,
@@ -1393,7 +1422,8 @@
 						if($i['priority'] < $trigger['priority'])
 							$i['priority'] = $trigger['priority'];
 					}
-					else if($trigger['value'] == TRIGGER_VALUE_UNKNOWN){
+					else if($trigger['value_flags'] == TRIGGER_VALUE_FLAG_UNKNOWN){
+// TODO: we never get here since triggers.value_flags introduced
 						$i['unknown']++;
 					}
 
@@ -1459,6 +1489,7 @@
 					$info[$elem['selementid']]['name'] = $hostgroups[$elem['elementid']]['name'];
 				}
 			}
+
 			if(!empty($elems['triggers'])){
 				foreach($elems['triggers'] as $elem){
 					$info[$elem['selementid']]['name'] = expand_trigger_description_by_data($all_triggers[$elem['elementid']]);

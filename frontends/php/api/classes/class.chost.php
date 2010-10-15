@@ -652,10 +652,11 @@ class CHost extends CZBXAPI{
 					}
 // maintenanceids
 					if(isset($host['maintenanceid'])){
-						if(!isset($result[$host['hostid']]['maintenanceid']))
+						if(!isset($result[$host['hostid']]['maintenances']))
 							$result[$host['hostid']]['maintenances'] = array();
 
-						$result[$host['hostid']]['maintenances'][] = array('maintenanceid' => $host['maintenanceid']);
+						if($host['maintenanceid'] > 0)
+							$result[$host['hostid']]['maintenances'][] = array('maintenanceid' => $host['maintenanceid']);
 //						unset($host['maintenanceid']);
 					}
 //---
