@@ -1354,13 +1354,13 @@ static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, con
 		return res;
 
 	if (item->lastclock + arg1 > now)
-		strcpy(value, "0");
+		zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
 	else
 	{
 		if (CONFIG_SERVER_STARTUP_TIME + arg1 > now)
 			return FAIL;
 
-		strcpy(value, "1");
+		zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 	}
 
 	res = SUCCEED;
@@ -2374,7 +2374,7 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 
 	int	res;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' key:'%s' function:'%s' parameter:'%s'",
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() function:'%s:%s.%s(%s)'",
 			__function_name, host, key, function, parameter);
 
 	DBescape_string(host, host_esc, MAX_STRING_LEN);
@@ -2407,7 +2407,8 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 
 	DBfree_result(result); /* Cannot call DBfree_result until evaluate_FUNC. */
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() value:'%s'", __function_name, value);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s value:'%s'", __function_name,
+			zbx_result_string(res), value);
 
 	return res;
 }

@@ -2251,10 +2251,9 @@ void	substitute_macros(DB_EVENT *event, DB_ACTION *action, DB_ESCALATION *escala
 						pms = p + 1;
 
 						/* function 'evaluate_macro_function' requires 'replace_to' with size 'MAX_BUFFER_LEN' */
-						zbx_free(replace_to);
-						replace_to = zbx_malloc(replace_to, MAX_BUFFER_LEN);
+						replace_to = zbx_realloc(replace_to, MAX_BUFFER_LEN);
 
-						if(evaluate_macro_function(replace_to, host, key, function, parameter) != SUCCEED)
+						if (SUCCEED != evaluate_macro_function(replace_to, host, key, function, parameter))
 							zbx_snprintf(replace_to, MAX_BUFFER_LEN, "%s", STR_UNKNOWN_VARIABLE);
 					}
 				}
