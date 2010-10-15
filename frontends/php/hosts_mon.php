@@ -174,10 +174,8 @@ include_once('include/page_header.php');
 
 	if($pageFilter->groupsSelected){
 		$options = array(
+			'with_monitored_items' => 1,
 			'output' => API_OUTPUT_SHORTEN,
-			'sortfield' => $sortfield,
-			'sortorder' => $sortorder,
-			'limit' => ($config['search_limit']+1),
 			'search' => array(
 				'host' => (empty($_REQUEST['filter_host']) ? null : $_REQUEST['filter_host']),
 				'ip' => (empty($_REQUEST['filter_ip']) ? null : $_REQUEST['filter_ip']),
@@ -186,7 +184,10 @@ include_once('include/page_header.php');
 			'filter' => array(
 				'status' => HOST_STATUS_MONITORED,
 				'port' => (empty($_REQUEST['filter_port']) ? null : $_REQUEST['filter_port']),
-			)
+			),
+			'sortfield' => $sortfield,
+			'sortorder' => $sortorder,
+			'limit' => ($config['search_limit']+1)
 		);
 		if($pageFilter->groupid > 0) $options['groupids'] = $pageFilter->groupid;
 
