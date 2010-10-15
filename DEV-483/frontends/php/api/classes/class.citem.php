@@ -330,7 +330,7 @@ class CItem extends CZBXAPI{
 
 // --- FILTER ---
 		if(is_array($options['filter'])){
-			zbx_value2array($options['filter']);
+			zbx_db_filter('items i', $options, $sql_parts);
 
 			if(isset($options['filter']['host'])){
 				zbx_value2array($options['filter']['host']);
@@ -339,8 +339,6 @@ class CItem extends CZBXAPI{
 				$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
 				$sql_parts['where']['h'] = DBcondition('h.host', $options['filter']['host'], false, true);
 			}
-
-			zbx_db_filter('items i', $options, $sql_parts);
 		}
 
 // group

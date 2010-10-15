@@ -50,6 +50,9 @@ class CProfile{
 	}
 
 	public static function flush(){
+// if not initialised, no changes were made
+		if(is_null(self::$profiles)) return true;
+
 		if(self::$userDetails['userid'] <= 0) return;
 
 		if(!empty(self::$insert) || !empty(self::$update)){
@@ -57,7 +60,7 @@ class CProfile{
 			DBstart();
 			foreach(self::$insert as $idx => $profile){
 				foreach($profile as $idx2 => $data){
-					$result = self::insertDB($idx, $data['value'], $data['type'], $idx2);
+					self::insertDB($idx, $data['value'], $data['type'], $idx2);
 				}
 			}
 

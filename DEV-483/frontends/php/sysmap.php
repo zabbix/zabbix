@@ -26,7 +26,7 @@ require_once('include/forms.inc.php');
 $page['title'] = 'S_CONFIGURATION_OF_NETWORK_MAPS';
 $page['file'] = 'sysmap.php';
 $page['hist_arg'] = array('sysmapid');
-$page['scripts'] = array('effects.js', 'dragdrop.js','class.cmap.js');
+$page['scripts'] = array('effects.js', 'dragdrop.js','sysmap.tpl.js','class.cmap.js');
 $page['type'] = detect_page_type();
 
 include_once('include/page_header.php');
@@ -115,7 +115,10 @@ include_once('include/page_header.php');
 						$info = $map_info[$selement['selementid']];
 //						$element['image'] = get_base64_icon($element);
 						$selement['image'] = get_selement_iconid($selement, $info);
-						$action .= 'ZBX_SYSMAPS['.$cmapid.'].map.add_selement('.zbx_jsvalue($selement).'); '."\n";
+						$selement['urls'] = zbx_toHash($selement['urls'], 'name');
+
+						$action .= 'ZBX_SYSMAPS['.$cmapid.'].map.add_selement('.zbx_jsvalue($selement, true).'); '."\n";
+
 					}
 
 					foreach($db_map['links'] as $enum => $link){
@@ -174,6 +177,12 @@ include_once('include/page_header.php');
 						$transaction = DBstart();
 
 						foreach($selements as $id => $selement){
+							if(isset($selement['urls'])){
+								foreach($selement['urls'] as $unum => $url){
+									if(empty($url['name'])) unset($selement['urls'][$unum]);
+								}
+							}
+
 							if($selement['elementid'] == 0){
 								$selement['elementtype'] = SYSMAP_ELEMENT_TYPE_IMAGE;
 							}
@@ -261,7 +270,7 @@ include_once('include/page_header.php');
 					$selement['label_expanded'] = expand_map_element_label_by_data($selement);
 
 					$action = '';
-					$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.add_selement('.zbx_jsvalue($selement).',1);';
+					$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.add_selement('.zbx_jsvalue($selement, true).',1);';
 //					$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.updateMapImage();';
 
 					print($action);
@@ -280,9 +289,9 @@ include_once('include/page_header.php');
 						$selement['image'] = get_selement_iconid($selement);
 
 						$action = '';
-						$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.add_selement('.zbx_jsvalue($selement).',1);';
+						$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.add_selement('.zbx_jsvalue($selement, true).',1);';
 						$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.updateMapImage();';
-						$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.show_selement_list();';
+						//$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.show_selement_list();';
 
 						print($action);
 					}

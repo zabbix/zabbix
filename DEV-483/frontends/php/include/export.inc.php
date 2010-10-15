@@ -585,7 +585,7 @@ class zbxXML{
 							$img = reset($imgs);
 
 							$image['imageid'] = $img['imageid'];
-							$image['image'] = base64_decode($image['encodedImage']);
+							$image['image'] = $image['encodedImage'];
 							unset($image['encodedImage']);
 
 							$images_to_update[] = $image;
