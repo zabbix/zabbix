@@ -42,7 +42,17 @@ switch($itemType) {
 }
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'parent_itemid'=>			array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			'!isset({form})'),
+		'parent_itemid' =>	array(T_ZBX_INT, O_MAND,	 P_SYS,	DB_ID,		null),
+		'itemid' =>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,		'(isset({form})&&({form}=="update"))'),
+
+		'groupid'=>			array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			null),
+		'hostid'=>			array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,			null),
+
+		'add_groupid'=>		array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			'(isset({register})&&({register}=="go"))'),
+		'action'=>			array(T_ZBX_STR, O_OPT,	 P_SYS,	NOT_EMPTY,		'(isset({register})&&({register}=="go"))'),
+
+		'copy_type'=>			array(T_ZBX_INT, O_OPT,	 P_SYS,	IN('0,1'),	'isset({copy})'),
+		'copy_mode'=>			array(T_ZBX_INT, O_OPT,	 P_SYS,	IN('0'),	null),
 
 		'description'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),
 		'key'=>				array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,		'isset({save})'),
@@ -53,12 +63,22 @@ switch($itemType) {
 		'new_delay_flex'=>		array(T_ZBX_STR, O_OPT,  NOT_EMPTY,  '',	'isset({add_delay_flex})&&(isset({type})&&({type}!=2))'),
 		'rem_delay_flex'=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,86400),null),
 		'delay_flex'=>		array(T_ZBX_STR, O_OPT,  null,  '',null),
+		'history'=>			array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),'isset({save})'),
 		'status'=>			array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),'isset({save})'),
 		'type'=>			array(T_ZBX_INT, O_OPT,  null,
 				IN(array(-1,ITEM_TYPE_ZABBIX,ITEM_TYPE_SNMPV1,ITEM_TYPE_TRAPPER,ITEM_TYPE_SIMPLE,
 					ITEM_TYPE_SNMPV2C,ITEM_TYPE_INTERNAL,ITEM_TYPE_SNMPV3,ITEM_TYPE_ZABBIX_ACTIVE,
 					ITEM_TYPE_AGGREGATE,ITEM_TYPE_EXTERNAL,ITEM_TYPE_DB_MONITOR,
 					ITEM_TYPE_IPMI,ITEM_TYPE_SSH,ITEM_TYPE_TELNET,ITEM_TYPE_CALCULATED)),'isset({save})'),
+		'trends'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	'isset({save})&&isset({value_type})&&'.IN(
+												ITEM_VALUE_TYPE_FLOAT.','.
+												ITEM_VALUE_TYPE_UINT64, 'value_type')),
+		'value_type'=>		array(T_ZBX_INT, O_OPT,  null,  IN('0,1,2,3,4'),	'isset({save})'),
+		'data_type'=>		array(T_ZBX_INT, O_OPT,  null,  IN(ITEM_DATA_TYPE_DECIMAL.','.ITEM_DATA_TYPE_OCTAL.','.ITEM_DATA_TYPE_HEXADECIMAL),
+					'isset({save})&&(isset({value_type})&&({value_type}=='.ITEM_VALUE_TYPE_UINT64.'))'),
+		'valuemapid'=>		array(T_ZBX_INT, O_OPT,	 null,	DB_ID,		'isset({save})&&isset({value_type})&&'.IN(
+												ITEM_VALUE_TYPE_FLOAT.','.
+												ITEM_VALUE_TYPE_UINT64, 'value_type')),
 		'authtype'=>		array(T_ZBX_INT, O_OPT,  NULL,	IN(ITEM_AUTHTYPE_PASSWORD.','.ITEM_AUTHTYPE_PUBLICKEY),
 											'isset({save})&&isset({type})&&({type}=='.ITEM_TYPE_SSH.')'),
 		'username'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,		'isset({save})&&isset({type})&&'.IN(
@@ -74,7 +94,7 @@ switch($itemType) {
 												ITEM_TYPE_DB_MONITOR.','.
 												ITEM_TYPE_TELNET.','.
 												ITEM_TYPE_CALCULATED,'type'), $paramsFieldName),
-//hidden fields for better gui
+		//hidden fields for better gui
 		'params_script'=>	array(T_ZBX_STR, O_OPT, NULL, NULL, NULL),
 		'params_dbmonitor'=>	array(T_ZBX_STR, O_OPT, NULL, NULL, NULL),
 		'params_calculted'=>	array(T_ZBX_STR, O_OPT, NULL, NULL, NULL),
@@ -90,6 +110,7 @@ switch($itemType) {
 													ITEM_TYPE_SNMPV1.','.
 													ITEM_TYPE_SNMPV2C.','.
 													ITEM_TYPE_SNMPV3,'type')),
+
 		'snmpv3_securitylevel'=>array(T_ZBX_INT, O_OPT,  null,  IN('0,1,2'),	'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.'))'),
 		'snmpv3_securityname'=>	array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.'))'),
 		'snmpv3_authpassphrase'=>array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.'))'),
@@ -97,24 +118,39 @@ switch($itemType) {
 
 		'ipmi_sensor'=>		array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,	'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_IPMI.'))', S_IPMI_SENSOR),
 
-		'formula'=>			array(T_ZBX_DBL, O_OPT,  null,  NOT_ZERO,	'isset({save})', S_CUSTOM_MULTIPLIER),
+		'trapper_hosts'=>	array(T_ZBX_STR, O_OPT,  null,  null,			'isset({save})&&isset({type})&&({type}==2)'),
+		'units'=>		array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&isset({value_type})&&'.IN('0,3','value_type')),
+		'multiplier'=>		array(T_ZBX_INT, O_OPT,  null,  null,		null),
+		'delta'=>		array(T_ZBX_INT, O_OPT,  null,  IN('0,1,2'),	'isset({save})&&isset({value_type})&&'.IN('0,3','value_type')),
 
+		'formula'=>		array(T_ZBX_DBL, O_OPT,  null,  NOT_ZERO,	'isset({save})&&isset({multiplier})&&({multiplier}==1)&&'.IN('0,3','value_type'), S_CUSTOM_MULTIPLIER),
+		'logtimefmt'=>		array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({value_type})&&({value_type}==2))'),
+
+		'group_itemid'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID, null),
+		'copy_targetid'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID, null),
+		'filter_groupid'=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	'isset({copy})&&(isset({copy_type})&&({copy_type}==0))'),
 		'new_application'=>	array(T_ZBX_STR, O_OPT, null,	null,	'isset({save})'),
 		'applications'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID, null),
 
+		'del_history'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'add_delay_flex'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'del_delay_flex'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 // Actions
-		'go'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
-		'group_itemid'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID, null),
+		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
 // form
+		'register'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'save'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'clone'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'update'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'copy'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'select'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'delete'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'cancel'=>			array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 		'form'=>			array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		'massupdate'=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	null,	null,	null),
+// filter
+		'filter_set' =>		array(T_ZBX_STR, O_OPT,	P_ACT,	null,	null),
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
@@ -193,20 +229,24 @@ switch($itemType) {
 		$_REQUEST['form'] = 'clone';
 	}
 	else if(isset($_REQUEST['save'])){
-		$applications = get_request('applications',array());
-		$delay_flex = get_request('delay_flex',array());
-		$db_delay_flex = '';
+		$applications = get_request('applications', array());
+		$delay_flex = get_request('delay_flex', array());
 
+		$db_delay_flex = '';
 		foreach($delay_flex as $num => $val){
 			$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
 		}
-
 		$db_delay_flex = trim($db_delay_flex,';');
+
+		if(!zbx_empty($_REQUEST['new_application'])){
+			if($new_appid = add_application($_REQUEST['new_application'], $_REQUEST['hostid']))
+				$applications[$new_appid] = $new_appid;
+		}
 
 		$item = array(
 			'description'	=> get_request('description'),
 			'key_'			=> get_request('key'),
-			'hostid'		=> get_request('form_hostid'),
+			'hostid'		=> get_request('hostid'),
 			'delay'			=> get_request('delay'),
 			'history'		=> get_request('history'),
 			'status'		=> get_request('status'),
@@ -235,72 +275,30 @@ switch($itemType) {
 			'privatekey'		=> get_request('privatekey'),
 			'params'			=> get_request('params'),
 			'ipmi_sensor'		=> get_request('ipmi_sensor'),
-			'data_type'		=> get_request('data_type')
+			'data_type'		=> get_request('data_type'),
+			'flags' => ZBX_FLAG_DISCOVERY_CHILD,
+			'parent_itemid' => get_request('parent_itemid'),
 		);
 
 		if(isset($_REQUEST['itemid'])){
 			DBstart();
 
-			$new_appid = true;
-			$result = false;
-
-			if(!zbx_empty($_REQUEST['new_application'])){
-				if($new_appid = add_application($_REQUEST['new_application'],$_REQUEST['form_hostid']))
-					$applications[$new_appid] = $new_appid;
-			}
-
-			if((count($applications) == 1) && in_array(0, $applications))
-				$applications = array();
-			$item['applications'] = $applications;
-
 			$db_item = get_item_by_itemid_limited($_REQUEST['itemid']);
 			$db_item['applications'] = get_applications_by_itemid($_REQUEST['itemid']);
 
-// sdii($item['applications']);
-// sdii($db_item['applications']);
-
-			foreach($item as $field => $value){
-				if($item[$field] == $db_item[$field]) $item[$field] = null;
-			}
-
-			if($new_appid){
-				$result = smart_update_item($_REQUEST['itemid'],$item);
-			}
-
+			$result = smart_update_item($_REQUEST['itemid'], $item);
 			$result = DBend($result);
-
-			$itemid = $_REQUEST['itemid'];
-/*			$action = AUDIT_ACTION_UPDATE;*/
 
 			show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 		}
 		else{
 			DBstart();
-
-			$new_appid = true;
-			$itemid = false;
-			if(!zbx_empty($_REQUEST['new_application'])){
-				if($new_appid = add_application($_REQUEST['new_application'],$_REQUEST['form_hostid']))
-					$applications[$new_appid] = $new_appid;
-			}
-
-			$item['applications'] = $applications;
-
-			if($new_appid){
-				$itemid = add_item($item);
-			}
-
-			$result = DBend($itemid);
-
-/*			$action = AUDIT_ACTION_ADD;*/
+			$result = add_item($item);
+			$result = DBend($result);
 			show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 		}
 
 		if($result){
-/*			$host = get_host_by_hostid($_REQUEST['hostid']);
-
-			add_audit($action, AUDIT_RESOURCE_ITEM, S_ITEM.' ['.$_REQUEST['key'].'] ['.$itemid.'] '.S_HOST.' ['.$host['host'].']');*/
-
 			unset($_REQUEST['itemid']);
 			unset($_REQUEST['form']);
 		}
@@ -363,7 +361,7 @@ switch($itemType) {
 
 	if(!isset($_REQUEST['form'])){
 		$form = new CForm(null, 'get');
-		$form->addVar('hostid', $_REQUEST['hostid']);
+		$form->addVar('parent_itemid', $_REQUEST['parent_itemid']);
 		$form->addItem(new CButton('form', S_CREATE_RULE));
 	}
 	else{
@@ -406,6 +404,7 @@ switch($itemType) {
 		$sortorder = getPageSortOrder();
 		$options = array(
 			'hostids' => $_REQUEST['hostid'],
+			'discoveryids' => $_REQUEST['parent_itemid'],
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => 1,
 			'select_applications' => API_OUTPUT_EXTEND,
@@ -426,7 +425,7 @@ switch($itemType) {
 				$description[] = ':';
 			}
 			$item['description_expanded'] = item_description($item);
-			$description[] = new CLink($item['description_expanded'], '?form=update&itemid='.$item['itemid']);
+			$description[] = new CLink($item['description_expanded'], '?form=update&itemid='.$item['itemid'].'&parent_itemid='.$_REQUEST['parent_itemid']);
 
 			$status = new CCol(new CLink(item_status2str($item['status']), '?group_itemid='.$item['itemid'].'&go='.
 				($item['status']? 'activate':'disable'), item_status2style($item['status'])));

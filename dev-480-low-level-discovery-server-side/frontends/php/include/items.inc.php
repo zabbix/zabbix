@@ -273,7 +273,7 @@
 			return false;
 		}
 
-		$host=get_host_by_hostid($item['hostid']);
+		$host = get_host_by_hostid($item['hostid']);
 		if(!$host){
 			return false;
 		}
@@ -388,6 +388,19 @@
 						zbx_dbstr($item['username']).','.zbx_dbstr($item['password']).','.
 						zbx_dbstr($item['publickey']).','.zbx_dbstr($item['privatekey']).','.$item['flags'].')'
 			);
+
+		if(isset($item['parent_itemid'])){
+			try{
+				$val = array(array(
+					'itemid' => $itemid,
+					'parent_itemid' => $item['parent_itemid'],
+				));
+				DB::insert('item_discovery', $val);
+			}
+			catch(APIException $e){
+				$result = false;
+			}
+		}
 
 		if ($result)
 			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_ITEM, $itemid, $host['host'].':'.$item['description'], NULL, NULL, NULL);

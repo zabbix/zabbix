@@ -1486,116 +1486,87 @@
 
 // Insert form for Item information
 	function insert_item_form(){
-		global $USER_DETAILS;
 
-		$frmItem = new CFormTable(S_ITEM, 'items.php', 'post');
+		$frmItem = new CFormTable(S_ITEM);
 		$frmItem->setAttribute('style','visibility: hidden;');
 		$frmItem->setHelp('web.items.item.php');
 
-		$hostid			= get_request('form_hostid',		0);
+		$parent_itemid = get_request('parent_itemid', false);
+		if($parent_itemid)
+			$frmItem->addVar('parent_itemid', $parent_itemid);
 
-		$description		= get_request('description',		'');
-		$key			= get_request('key',			'');
-		$host			= get_request('host',			null);
-		$delay			= get_request('delay',			30);
-		$history		= get_request('history',		90);
-		$status			= get_request('status',			0);
-		$type			= get_request('type',			0);
-		$snmp_community		= get_request('snmp_community',		'public');
-		$snmp_oid		= get_request('snmp_oid',		'interfaces.ifTable.ifEntry.ifInOctets.1');
-		$snmp_port		= get_request('snmp_port',		161);
-		$value_type		= get_request('value_type',		ITEM_VALUE_TYPE_UINT64);
-		$data_type		= get_request('data_type',		ITEM_DATA_TYPE_DECIMAL);
-		$trapper_hosts		= get_request('trapper_hosts',		'');
-		$units			= get_request('units',			'');
-		$valuemapid		= get_request('valuemapid',		0);
-		$params			= get_request('params',			'');
-		$multiplier		= get_request('multiplier',		0);
-		$delta			= get_request('delta',			0);
-		$trends			= get_request('trends',			365);
-		$new_application	= get_request('new_application',	'');
-		$applications		= get_request('applications',		array());
-		$delay_flex		= get_request('delay_flex',		array());
+		$hostid = get_request('form_hostid', 0);
 
-		$snmpv3_securityname	= get_request('snmpv3_securityname',	'');
-		$snmpv3_securitylevel	= get_request('snmpv3_securitylevel',	0);
-		$snmpv3_authpassphrase	= get_request('snmpv3_authpassphrase',	'');
-		$snmpv3_privpassphrase	= get_request('snmpv3_privpassphrase',	'');
-		$ipmi_sensor		= get_request('ipmi_sensor',		'');
-		$authtype		= get_request('authtype',		0);
-		$username		= get_request('username',		'');
-		$password		= get_request('password',		'');
-		$publickey		= get_request('publickey',		'');
-		$privatekey		= get_request('privatekey',		'');
+		$description = get_request('description', '');
+		$key = get_request('key', '');
+		$host = get_request('host', null);
+		$delay = get_request('delay', 30);
+		$history = get_request('history', 90);
+		$status = get_request('status', 0);
+		$type = get_request('type', 0);
+		$snmp_community = get_request('snmp_community', 'public');
+		$snmp_oid = get_request('snmp_oid', 'interfaces.ifTable.ifEntry.ifInOctets.1');
+		$snmp_port = get_request('snmp_port', 161);
+		$value_type = get_request('value_type', ITEM_VALUE_TYPE_UINT64);
+		$data_type = get_request('data_type', ITEM_DATA_TYPE_DECIMAL);
+		$trapper_hosts = get_request('trapper_hosts', '');
+		$units = get_request('units', '');
+		$valuemapid = get_request('valuemapid', 0);
+		$params = get_request('params', '');
+		$multiplier = get_request('multiplier', 0);
+		$delta = get_request('delta', 0);
+		$trends = get_request('trends', 365);
+		$new_application = get_request('new_application', '');
+		$applications = get_request('applications', array());
+		$delay_flex = get_request('delay_flex', array());
 
-		$formula		= get_request('formula',		'1');
-		$logtimefmt		= get_request('logtimefmt',		'');
+		$snmpv3_securityname = get_request('snmpv3_securityname', '');
+		$snmpv3_securitylevel = get_request('snmpv3_securitylevel', 0);
+		$snmpv3_authpassphrase = get_request('snmpv3_authpassphrase', '');
+		$snmpv3_privpassphrase = get_request('snmpv3_privpassphrase', '');
+		$ipmi_sensor = get_request('ipmi_sensor', '');
+		$authtype = get_request('authtype', 0);
+		$username = get_request('username', '');
+		$password = get_request('password', '');
+		$publickey = get_request('publickey', '');
+		$privatekey = get_request('privatekey', '');
 
-		$add_groupid		= get_request('add_groupid', 		get_request('groupid', 0));
+		$formula = get_request('formula', '1');
+		$logtimefmt = get_request('logtimefmt', '');
 
-		$limited		= null;
+		$add_groupid = get_request('add_groupid', get_request('groupid', 0));
+
+		$limited = false;
 		$types = array(
-				ITEM_TYPE_ZABBIX,
-				ITEM_TYPE_ZABBIX_ACTIVE,
-				ITEM_TYPE_SIMPLE,
-				ITEM_TYPE_SNMPV1,
-				ITEM_TYPE_SNMPV2C,
-				ITEM_TYPE_SNMPV3,
-				ITEM_TYPE_INTERNAL,
-				ITEM_TYPE_TRAPPER,
-				ITEM_TYPE_AGGREGATE,
-				ITEM_TYPE_EXTERNAL,
-				ITEM_TYPE_DB_MONITOR,
-				ITEM_TYPE_IPMI,
-				ITEM_TYPE_SSH,
-				ITEM_TYPE_TELNET,
-				ITEM_TYPE_CALCULATED);
-
-/*		switch ($type) {
-		case ITEM_TYPE_DB_MONITOR:
-			if (zbx_empty($key) || $key == 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]' ||
-					$key == 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]')
-				$key = 'db.odbc.select[<unique short description>]';
-			if (zbx_empty($params))
-				$params = "DSN=<database source name>\nuser=<user name>\npassword=<password>\nsql=<query>";
-			break;
-		case ITEM_TYPE_SSH:
-			if (zbx_empty($key) || $key == 'db.odbc.select[<unique short description>]' ||
-					$key == 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]')
-				$key = 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]';
-			if (0 == strncmp($params, "DSN=<database source name>", 26))
-				$params = '';
-			break;
-		case ITEM_TYPE_TELNET:
-			if (zbx_empty($key) || $key == 'db.odbc.select[<unique short description>]' ||
-					$key == 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]')
-				$key = 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]';
-			if (0 == strncmp($params, "DSN=<database source name>", 26))
-				$params = '';
-			break;
-		default:
-			if ($key == 'db.odbc.select[<unique short description>]' ||
-					$key == 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]' ||
-					$key == 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]')
-				$key = '';
-			if (0 == strncmp($params, "DSN=<database source name>", 26))
-				$params = '';
-			break;
-		}*/
+			ITEM_TYPE_ZABBIX,
+			ITEM_TYPE_ZABBIX_ACTIVE,
+			ITEM_TYPE_SIMPLE,
+			ITEM_TYPE_SNMPV1,
+			ITEM_TYPE_SNMPV2C,
+			ITEM_TYPE_SNMPV3,
+			ITEM_TYPE_INTERNAL,
+			ITEM_TYPE_TRAPPER,
+			ITEM_TYPE_AGGREGATE,
+			ITEM_TYPE_EXTERNAL,
+			ITEM_TYPE_DB_MONITOR,
+			ITEM_TYPE_IPMI,
+			ITEM_TYPE_SSH,
+			ITEM_TYPE_TELNET,
+			ITEM_TYPE_CALCULATED
+		);
 
 		if(isset($_REQUEST['itemid'])){
 			$frmItem->addVar('itemid', $_REQUEST['itemid']);
 
 			$options = array(
 				'itemids' => $_REQUEST['itemid'],
-				'output' => API_OUTPUT_EXTEND
+				'output' => API_OUTPUT_EXTEND,
 			);
 			$item_data = CItem::get($options);
 			$item_data = reset($item_data);
 
 			$hostid	= ($hostid > 0) ? $hostid : $item_data['hostid'];
-			$limited = (($item_data['templateid'] == 0)  && ($item_data['type'] != ITEM_TYPE_HTTPTEST)) ? null : 'yes';
-			$item_data['snmp_port'] = $item_data['snmp_port'] == '0' ? 161 : $item_data['snmp_port'];
+			$limited = ($item_data['templateid'] != 0);
 		}
 
 		if(is_null($host)){
@@ -1608,11 +1579,12 @@
 				$host_info = CHost::get($options);
 				$host_info = reset($host_info);
 				$host = $host_info['host'];
-			} else
+			}
+			else
 				$host = S_NOT_SELECTED_SMALL;
 		}
 
-		if((isset($_REQUEST['itemid']) && !isset($_REQUEST['form_refresh'])) || isset($limited)){
+		if((isset($_REQUEST['itemid']) && !isset($_REQUEST['form_refresh'])) || $limited){
 			$description		= $item_data['description'];
 			$key			= $item_data['key_'];
 //			$host			= $item_data['host'];
@@ -1647,7 +1619,7 @@
 
 			$new_application	= get_request('new_application',	'');
 
-			if(!isset($limited) || !isset($_REQUEST['form_refresh'])){
+			if(!$limited || !isset($_REQUEST['form_refresh'])){
 				$delay		= $item_data['delay'];
 				$history	= $item_data['history'];
 				$status		= $item_data['status'];
@@ -1740,18 +1712,20 @@
 		else
 			$frmItem->setTitle(S_ITEM." $host : $description");
 
-		$frmItem->addVar('form_hostid', $hostid);
-		$frmItem->addRow(S_HOST,array(
-			new CTextBox('host',$host,32,true),
-			new CButton('btn_host', S_SELECT,
-				"return PopUp('popup.php?dstfrm=".$frmItem->getName().
-				"&dstfld1=host&dstfld2=form_hostid&srctbl=hosts_and_templates&srcfld1=host&srcfld2=hostid',450,450);",
-				'H')
-			));
+		if(!$parent_itemid){
+			$frmItem->addVar('form_hostid', $hostid);
+			$frmItem->addRow(S_HOST,array(
+				new CTextBox('host',$host,32,true),
+				new CButton('btn_host', S_SELECT,
+					"return PopUp('popup.php?dstfrm=".$frmItem->getName().
+					"&dstfld1=host&dstfld2=form_hostid&srctbl=hosts_and_templates&srcfld1=host&srcfld2=hostid',450,450);",
+					'H')
+				));
+		}
 
 		$frmItem->addRow(S_DESCRIPTION, new CTextBox('description',$description,40, $limited));
 
-		if(isset($limited)){
+		if($limited){
 			$frmItem->addRow(S_TYPE,  new CTextBox('typename', item_type2str($type), 40, 'yes'));
 			$frmItem->addVar('type', $type);
 		}
@@ -1825,7 +1799,7 @@
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_IPMI, 'ipmi_sensor');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_IPMI, 'row_ipmi_sensor');
 
-		if(isset($limited))
+		if($limited)
 			$btnSelect = null;
 		else
 			$btnSelect = new CButton('btn1',S_SELECT,
@@ -1931,15 +1905,8 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_CALCULATED, 'params_calculted');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_CALCULATED, 'row_params');
 
-/*
-ITEM_TYPE_DB_MONITOR $key = 'db.odbc.select[<unique short description>]'; $params = "DSN=<database source name>\nuser=<user name>\npassword=<password>\nsql=<query>";
-ITEM_TYPE_SSH $key = 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]'; $params = '';
-ITEM_TYPE_TELNET $key = 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]'; $params = '';
-ITEM_TYPE_CALCULATED $key = ''; $params = '';
-//*/
 
-
-		if(isset($limited)){
+		if($limited){
 			$frmItem->addVar('value_type', $value_type);
 			$cmbValType = new CTextBox('value_type_name', item_value_type2str($value_type), 40, 'yes');
 		}
@@ -1954,7 +1921,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 		$frmItem->addRow(S_TYPE_OF_INFORMATION,$cmbValType);
 
-		if(isset($limited)) {
+		if($limited) {
 			$frmItem->addVar('data_type', $data_type);
 			$cmbDataType = new CTextBox('data_type_name', item_data_type2str($data_type), 20, 'yes');
 		}
@@ -1980,7 +1947,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_units');
 
 		$mltpbox = Array();
-		if(isset($limited)){
+		if($limited){
 			$frmItem->addVar('multiplier', $multiplier);
 
 			$mcb = new CCheckBox('multiplier', $multiplier == 1 ? 'yes':'no');
@@ -2026,6 +1993,9 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$row = new CRow(array(new CCol(S_FLEXIBLE_INTERVALS,'form_row_l'), new CCol($delay_flex_el,'form_row_r')));
 		$row->setAttribute('id', 'row_flex_intervals');
 		$frmItem->addRow($row);
+
+// Filter
+		$frmItem->addRow(S_FILTER, new CTextArea('item_filter','',40, 3), null);
 
 		$row = new CRow(array(new CCol(S_NEW_FLEXIBLE_INTERVAL,'form_row_l'), new CCol(
 					array(
@@ -2085,7 +2055,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'delta');
 		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_delta');
 
-		if(isset($limited)){
+		if($limited){
 			$frmItem->addVar('valuemapid', $valuemapid);
 			$map_name = S_AS_IS;
 			if($map_data = DBfetch(DBselect('SELECT name FROM valuemaps WHERE valuemapid='.$valuemapid))){
@@ -2146,7 +2116,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 				SPACE,
 				new CButton('clone',S_CLONE));
 
-			if(!isset($limited)){
+			if(!$limited){
 				array_push($frmRow,
 					SPACE,
 					new CButtonDelete(S_DELETE_SELECTED_ITEM_Q,
@@ -2160,25 +2130,27 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 		$frmItem->addSpanRow($frmRow,'form_row_last');
 
+		if(!$parent_itemid){
 // GROUP OPERATIONS
-		$cmbGroups = new CComboBox('add_groupid',$add_groupid);
-		$groups = CHostGroup::get(array(
-			'editable' => 1,
-			'output' => API_OUTPUT_EXTEND,
-		));
-		order_result($groups, 'name');
-		foreach($groups as $group){
-			$cmbGroups->addItem($group['groupid'], get_node_name_by_elid($group['groupid'], null, ': ').$group['name']);
-		}
-		$frmItem->addRow(S_GROUP,$cmbGroups);
+			$cmbGroups = new CComboBox('add_groupid',$add_groupid);
+			$groups = CHostGroup::get(array(
+				'editable' => 1,
+				'output' => API_OUTPUT_EXTEND,
+			));
+			order_result($groups, 'name');
+			foreach($groups as $group){
+				$cmbGroups->addItem($group['groupid'], get_node_name_by_elid($group['groupid'], null, ': ').$group['name']);
+			}
+			$frmItem->addRow(S_GROUP,$cmbGroups);
 
-		$cmbAction = new CComboBox('action');
-		$cmbAction->addItem('add to group',S_ADD_TO_GROUP);
-		if(isset($_REQUEST['itemid'])){
-			$cmbAction->addItem('update in group',S_UPDATE_IN_GROUP);
-			$cmbAction->addItem('delete FROM group',S_DELETE_FROM_GROUP);
+			$cmbAction = new CComboBox('action');
+			$cmbAction->addItem('add to group',S_ADD_TO_GROUP);
+			if(isset($_REQUEST['itemid'])){
+				$cmbAction->addItem('update in group',S_UPDATE_IN_GROUP);
+				$cmbAction->addItem('delete FROM group',S_DELETE_FROM_GROUP);
+			}
+			$frmItem->addItemToBottomRow(array($cmbAction, SPACE, new CButton('register',S_DO)));
 		}
-		$frmItem->addItemToBottomRow(array($cmbAction, SPACE, new CButton('register',S_DO)));
 
 		$json = new CJSON();
 
