@@ -1351,7 +1351,7 @@ static int	DBget_item_value_by_triggerid(zbx_uint64_t triggerid, char **value, i
 	char		expression[TRIGGER_EXPRESSION_LEN_MAX];
 	zbx_uint64_t	functionid;
 	int		value_type, ret = FAIL;
-	char		tmp[MAX_STRING_LEN], *table;
+	char		tmp[MAX_STRING_LEN];
 
 	if (FAIL == DBget_trigger_expression_by_triggerid(triggerid, expression, sizeof(expression)))
 		return FAIL;
@@ -1367,18 +1367,9 @@ static int	DBget_item_value_by_triggerid(zbx_uint64_t triggerid, char **value, i
 	{
 		value_type = atoi(row[1]);
 
-		switch (value_type)
-		{
-			case ITEM_VALUE_TYPE_FLOAT:	table = "history"; break;
-			case ITEM_VALUE_TYPE_UINT64:	table = "history_uint"; break;
-			case ITEM_VALUE_TYPE_TEXT:	table = "history_text"; break;
-			case ITEM_VALUE_TYPE_STR:	table = "history_str"; break;
-			case ITEM_VALUE_TYPE_LOG:
-			default:			table = "history_log"; break;
-		}
-
 		zbx_snprintf(tmp, sizeof(tmp), "select value from %s where itemid=%s and clock<=%d order by itemid,clock desc",
-				table, row[0], clock);
+				get_table_by_value_type(value_type), row[0], clock);
+
 		h_result = DBselectN(tmp, 1);
 		if (NULL != (h_row = DBfetch(h_result)))
 		{

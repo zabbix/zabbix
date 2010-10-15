@@ -25,29 +25,29 @@
 
 #include "evalfunc.h"
 
-static const char	*get_table_by_value_type(int value_type)
+const char	*get_table_by_value_type(int value_type)
 {
-	switch (value_type) {
-	case ITEM_VALUE_TYPE_FLOAT: return "history"; break;
-	case ITEM_VALUE_TYPE_UINT64: return "history_uint"; break;
-	case ITEM_VALUE_TYPE_STR: return "history_str"; break;
-	case ITEM_VALUE_TYPE_TEXT: return "history_text"; break;
-	case ITEM_VALUE_TYPE_LOG: return "history_log"; break;
-	default:
-		return NULL;
+	switch (value_type)
+	{
+		case ITEM_VALUE_TYPE_FLOAT:	return "history";
+		case ITEM_VALUE_TYPE_UINT64:	return "history_uint";
+		case ITEM_VALUE_TYPE_STR:	return "history_str";
+		case ITEM_VALUE_TYPE_TEXT:	return "history_text";
+		case ITEM_VALUE_TYPE_LOG:	return "history_log";
+		default:			return NULL;
 	}
 }
 
-static const char	*get_key_by_value_type(int value_type)
+const char	*get_key_by_value_type(int value_type)
 {
-	switch (value_type) {
-	case ITEM_VALUE_TYPE_FLOAT:
-	case ITEM_VALUE_TYPE_UINT64:
-	case ITEM_VALUE_TYPE_STR: return "clock"; break;
-	case ITEM_VALUE_TYPE_TEXT:
-	case ITEM_VALUE_TYPE_LOG: return "id"; break;
-	default:
-		return NULL;
+	switch (value_type)
+	{
+		case ITEM_VALUE_TYPE_FLOAT:
+		case ITEM_VALUE_TYPE_UINT64:
+		case ITEM_VALUE_TYPE_STR:	return "clock";
+		case ITEM_VALUE_TYPE_TEXT:
+		case ITEM_VALUE_TYPE_LOG:	return "id";
+		default:			return NULL;
 	}
 }
 
@@ -1766,9 +1766,7 @@ clean:
  *                                                                            *
  * Parameters: item - item to calculate function for                          *
  *             function - function (for example, 'max')                       *
- *             parameter - parameter of the function)                         *
- *             flag - if EVALUATE_FUNCTION_SUFFIX, then include units and     *
- *                    suffix (K,M,G) into result value (for example, 15GB)    *
+ *             parameter - parameter of the function                          *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, value contains its value   *
  *               FAIL - evaluation failed                                     *
