@@ -829,7 +829,7 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const
 	const char	*__function_name = "evaluate_LAST";
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		arg1, flag, time_shift = 0, time_shift_flag, res = FAIL, rows = 0;
+	int		arg1, flag, time_shift = 0, time_shift_flag, res = FAIL, rows = 0, written_len;
 	char		sql[128];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -866,6 +866,8 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const
 	{
 		if (1 != item->lastvalue_null)
 		{
+			res = SUCCEED;
+
 			switch (item->value_type) {
 			case ITEM_VALUE_TYPE_FLOAT:
 				zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL, item->lastvalue_dbl);
@@ -874,16 +876,19 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const
 				zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_UI64, item->lastvalue_uint64);
 				break;
 			default:
-				zbx_snprintf(value, MAX_BUFFER_LEN, "%s", item->lastvalue_str);
+				written_len = zbx_snprintf(value, MAX_BUFFER_LEN, "%s", item->lastvalue_str);
+				if (ITEM_LASTVALUE_LEN == written_len && ITEM_VALUE_TYPE_STR != item->value_type)
+					goto history;
 				break;
 			}
-			res = SUCCEED;
 		}
 	}
 	else if (time_shift == 0 && arg1 == 2)
 	{
 		if (1 != item->prevvalue_null)
 		{
+			res = SUCCEED;
+
 			switch (item->value_type) {
 			case ITEM_VALUE_TYPE_FLOAT:
 				zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL, item->prevvalue_dbl);
@@ -892,14 +897,16 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const
 				zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_UI64, item->prevvalue_uint64);
 				break;
 			default:
-				zbx_snprintf(value, MAX_BUFFER_LEN, "%s", item->prevvalue_str);
+				written_len = zbx_snprintf(value, MAX_BUFFER_LEN, "%s", item->prevvalue_str);
+				if (ITEM_LASTVALUE_LEN == written_len && ITEM_VALUE_TYPE_STR != item->value_type)
+					goto history;
 				break;
 			}
-			res = SUCCEED;
 		}
 	}
 	else
 	{
+history:
 		zbx_snprintf(sql, sizeof(sql),
 				"select value"
 				" from %s"
@@ -1365,6 +1372,66 @@ static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, con
 
 /******************************************************************************
  *                                                                            *
+ * Function: compare_last_and_prev                                            *
+ *                                                                            *
+ * Purpose: compare lastvalue_str and prevvalue_str for an item               *
+ *                                                                            *
+ * Parameters: item - item (performance metric)                               *
+ *                                                                            *
+ * Return value: 0 - values are equal                                         *
+ *               non-zero - otherwise                                         *
+ *                                                                            *
+ * Author: Aleksandrs Saveljevs                                               *
+ *                                                                            *
+ * Comments: To be used by functions abchange(), change(), and diff().        *
+ *                                                                            *
+ ******************************************************************************/
+static int	compare_last_and_prev(const DB_ITEM *item, time_t now)
+{
+	int		i, res;
+	char		sql[128];
+	DB_RESULT	result;
+	DB_ROW		row_last;
+	DB_ROW		row_prev;
+
+	for (i = 0; '\0' != item->lastvalue_str[i] || '\0' != item->prevvalue_str[i]; i++)
+	{
+		if (item->lastvalue_str[i] != item->prevvalue_str[i])
+			return 1;
+	}
+	
+	if (ITEM_LASTVALUE_LEN > i || ITEM_VALUE_TYPE_STR == item->value_type)
+		return 0;
+
+	res = 0; /* if values are no longer in history, consider them equal */
+
+	zbx_snprintf(sql, sizeof(sql),
+			"select value"
+			" from %s"
+			" where itemid=" ZBX_FS_UI64
+				" and clock<=%d"
+			" order by %s desc",
+			get_table_by_value_type(item->value_type),
+			item->itemid,
+			now,
+			get_key_by_value_type(item->value_type));
+
+	result = DBselectN(sql, 2);
+
+	if (NULL == (row_last = DBfetch(result)))
+		goto clean;
+	if (NULL == (row_prev = DBfetch(result)))
+		goto clean;
+
+	res = strcmp(row_last[0], row_prev[0]);
+clean:
+	DBfree_result(result);
+	
+	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: evaluate_ABSCHANGE                                               *
  *                                                                            *
  * Purpose: evaluate function 'abschange' for the item                        *
@@ -1406,7 +1473,7 @@ static int	evaluate_ABSCHANGE(char *value, DB_ITEM *item, const char *function, 
 						item->prevvalue_uint64 - item->lastvalue_uint64);
 			break;
 		default:
-			if (0 == strcmp(item->lastvalue_str, item->prevvalue_str))
+			if (0 == compare_last_and_prev(item, now))
 				zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
 			else
 				zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
@@ -1463,7 +1530,7 @@ static int	evaluate_CHANGE(char *value, DB_ITEM *item, const char *function, con
 						item->prevvalue_uint64 - item->lastvalue_uint64);
 			break;
 		default:
-			if (0 == strcmp(item->lastvalue_str, item->prevvalue_str))
+			if (0 == compare_last_and_prev(item, now))
 				zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
 			else
 				zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
@@ -1519,7 +1586,7 @@ static int	evaluate_DIFF(char *value, DB_ITEM *item, const char *function, const
 				zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 			break;
 		default:
-			if (0 == strcmp(item->lastvalue_str, item->prevvalue_str))
+			if (0 == compare_last_and_prev(item, now))
 				zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
 			else
 				zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
