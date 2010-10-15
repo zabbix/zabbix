@@ -3695,7 +3695,6 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
-				'default' => 'Screen',
 			),
 			'hsize' => array(
 				'null' => false,
@@ -3708,6 +3707,13 @@ return array(
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '1',
+			),
+			'templateid' => array(
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'hosts',
+				'ref_field' => 'hostid',
 			),
 		),
 	),

@@ -266,7 +266,7 @@
 
 	define('SYSMAP_HIGHLIGHT_OFF',		0);
 	define('SYSMAP_HIGHLIGHT_ON',		1);
-	
+
 	define('SYSMAP_EXPANDPROBLEM_OFF',		0);
 	define('SYSMAP_EXPANDPROBLEM_ON',		1);
 
@@ -422,6 +422,9 @@
 	define('SCREEN_RESOURCE_HOSTGROUP_TRIGGERS',14);
 	define('SCREEN_RESOURCE_SYSTEM_STATUS',		15);
 	define('SCREEN_RESOURCE_HOST_TRIGGERS',		16);
+
+	define('SCREEN_TYPE_NORMAL', 0);
+	define('SCREEN_TYPE_TEMPLATED', 1);
 
 /* alignes */
 	define('HALIGN_DEFAULT',0);

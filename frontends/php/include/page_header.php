@@ -129,6 +129,9 @@
 	<script type="text/javascript" src="js/ie6fix.js"></script>
 	<link rel="stylesheet" type="text/css" href="styles/ie.css" />
 <![endif]-->
+<!--[if IE 7]>
+	<link rel="stylesheet" type="text/css" href="styles/ie.css" />
+<![endif]-->
 
 <?php
 	if(isset($DB['DB']) && !is_null($DB['DB'])){
