@@ -216,6 +216,7 @@
 // CHECK IF EVENTS EXISTS {{{
 	$options = array(
 		'output' => API_OUTPUT_EXTEND,
+		'filter' => array(),
 		'sortfield' => 'eventid',
 		'sortorder' => ZBX_SORT_UP,
 		'nopermissions' => 1,
@@ -223,10 +224,10 @@
 	);
 
 	if($source == EVENT_SOURCE_DISCOVERY){
-		$options['source'] = EVENT_SOURCE_DISCOVERY;
+		$options['filter']['source'] = EVENT_SOURCE_DISCOVERY;
 	}
 	else if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid'] > 0)){
-		$options['object'] = EVENT_OBJECT_TRIGGER;
+		$options['filter']['object'] = EVENT_OBJECT_TRIGGER;
 		$options['triggerids'] = $_REQUEST['triggerid'];
 	}
 
@@ -249,7 +250,9 @@
 
 		if($source == EVENT_SOURCE_DISCOVERY){
 			$options = array(
-				'source' => EVENT_SOURCE_DISCOVERY,
+				'filter' => array(
+					'source' => EVENT_SOURCE_DISCOVERY
+				),
 				'time_from' => $from,
 				'time_till' => $till,
 				'output' => API_OUTPUT_SHORTEN,
@@ -262,12 +265,14 @@
 			$paging = getPagingLine($dsc_events);
 
 			$options = array(
-				'source' => EVENT_SOURCE_DISCOVERY,
+				'filter' => array(
+					'source' => EVENT_SOURCE_DISCOVERY
+				),
 				'eventids' => zbx_objectValues($dsc_events,'eventid'),
 				'output' => API_OUTPUT_EXTEND,
 				'select_hosts' => API_OUTPUT_EXTEND,
 				'select_triggers' => API_OUTPUT_EXTEND,
-				'select_items' => API_OUTPUT_EXTEND,
+				'select_items' => API_OUTPUT_EXTEND
 			);
 			$dsc_events = CEvent::get($options);
 			order_result($dsc_events, 'eventid', ZBX_SORT_DOWN);
@@ -375,7 +380,9 @@
 
 			$options = array(
 				'nodeids' => get_current_nodeid(),
-				'object' => EVENT_OBJECT_TRIGGER,
+				'filter' => array(
+					'object' => EVENT_OBJECT_TRIGGER
+				),
 				'time_from' => $from,
 				'time_till' => $till,
 				'output' => API_OUTPUT_SHORTEN,

@@ -91,7 +91,7 @@ include_once('include/page_header.php');
 		else if(isset($_REQUEST['triggers'])){
 			$options = array(
 				'output' => API_OUTPUT_SHORTEN,
-				'acknowledged' => 0,
+				'filter' => array( 'acknowledged' => 0),
 				'triggerids' => $_REQUEST['triggers']
 			);
 			$_REQUEST['events'] = CEvent::get($options);

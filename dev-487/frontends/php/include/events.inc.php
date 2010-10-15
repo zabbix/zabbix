@@ -61,11 +61,13 @@
 		$triggerids = CTrigger::get($options);
 
 		$options = array(
-			'countOutput' => 1,
 			'triggerids' => zbx_objectValues($triggerids, 'triggerid'),
-			'object' => EVENT_OBJECT_TRIGGER,
-			'acknowledged' => $ack ? 1 : 0,
-			'value' => is_null($value_event) ? array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE) : $value_event,
+			'filter' => array(
+				'object' => EVENT_OBJECT_TRIGGER,
+				'acknowledged' => $ack ? 1 : 0,
+				'value' => is_null($value_event) ? array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE) : $value_event,
+			),
+			'countOutput' => 1,
 			'nopermissions' => 1
 		);
 		$event_count = CEvent::get($options);
