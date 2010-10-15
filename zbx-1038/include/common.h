@@ -152,7 +152,7 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 const char	*zbx_result_string(int result);
 
 #define MAX_STRING_LEN	2048
-#define MAX_BUF_LEN	65536
+#define MAX_BUFFER_LEN	65536
 
 #define ZBX_DM_DELIMITER	'\255'
 

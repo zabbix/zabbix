@@ -70,7 +70,7 @@ int	WEB_PAGE_GET(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	char	hostname[MAX_STRING_LEN];
 	char	path[MAX_STRING_LEN];
 	char	port_str[8];
-	char	buffer[MAX_BUF_LEN];
+	char	buffer[MAX_BUFFER_LEN];
 
 	assert(result);
 
@@ -145,7 +145,7 @@ int	WEB_PAGE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	char	port_str[8];
 	char	regexp[MAX_STRING_LEN];
 	char	len_str[16];
-	char	back[MAX_BUF_LEN];
+	char	back[MAX_BUFFER_LEN];
 	char	*buffer = NULL, *found;
 	int	len, found_len;
 
@@ -171,7 +171,7 @@ int	WEB_PAGE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
                 return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 5, len_str, sizeof(len_str)) || '\0' == *len_str)
-		zbx_snprintf(len_str, sizeof(len_str), "%d", MAX_BUF_LEN - 1);
+		zbx_snprintf(len_str, sizeof(len_str), "%d", MAX_BUFFER_LEN - 1);
 	else if (FAIL == is_uint(len_str))
 		return SYSINFO_RET_FAIL;
 
