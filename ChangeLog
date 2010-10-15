@@ -13,6 +13,7 @@ Changes for 1.9
 
 Changes for 1.8.4rc2
 
+ - [ZBX-3095] fixed processing of 'Host template' condition in actions (Sasha)
  - [ZBX-2981] removed unnecessary queries in map permission checks (Vedmak)
  - [ZBX-3080] fixed javascript not cached by browsers (Vedmak)
  - [ZBX-2661] improved displaying discovery checks in configuration (Vedmak)
