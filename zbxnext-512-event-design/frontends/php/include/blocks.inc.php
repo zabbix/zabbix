@@ -858,10 +858,11 @@ function make_latest_issues($filter = array()){
 		'skipDependent' => 1,
 		'filter' => array(
 			'priority' => $filter['severity'],
-			'value' => TRIGGER_VALUE_TRUE
+			'value' => TRIGGER_VALUE_TRUE,
+			'value_flags' => TRIGGER_VALUE_FLAG_NORMAL
 		),
 		'select_groups' => API_OUTPUT_EXTEND,
-		'select_hosts' => API_OUTPUT_EXTEND,
+		'select_hosts' => array('hostid', 'host', 'maintenance_status', 'maintenanceid'),
 		'output' => API_OUTPUT_EXTEND,
 		'sortfield' => 'lastchange',
 		'sortorder' => ZBX_SORT_DOWN,
@@ -977,38 +978,30 @@ function make_latest_issues($filter = array()){
 
 // }}} Maintenance
 
-		$event_sql = 'SELECT e.eventid, e.value, e.clock, e.ns, e.objectid as triggerid, e.acknowledged'.
-					' FROM events e'.
-					' WHERE e.object='.EVENT_OBJECT_TRIGGER.
-						' AND e.objectid='.$trigger['triggerid'].
-						' AND e.value='.TRIGGER_VALUE_TRUE.
-						' AND e.value_changed='.TRIGGER_VALUE_CHANGED_YES.
-					' ORDER by e.object DESC, e.objectid DESC, e.eventid DESC';
-		$res_events = DBSelect($event_sql,1);
-		while($row_event=DBfetch($res_events)){
-			$ack = NULL;
-			if($config['event_ack_enable']){
-				if($row_event['acknowledged'] == 1){
-					$ack_info = make_acktab_by_eventid($row_event['eventid']);
-					$ack_info->setAttribute('style','width: auto;');
+		$options = array(
+			'output' => API_OUTPUT_EXTEND,
+			'select_acknowledges' => API_OUTPUT_COUNT,
+			'triggerids' => $trigger['triggerid'],
+			'filter' => array(
+				'object' => EVENT_OBJECT_TRIGGER,
+				'value' => TRIGGER_VALUE_TRUE,
+			),
+			'sortfield' => 'object',
+			'sortorder' => ZBX_SORT_DOWN,
+			'limit' => 1
+		);
+		$events = CEvent::get($options);
+		if($event = reset($events)){
+			$ack = getEventAckState($event);
 
-					$ack=new CLink(S_YES,'acknow.php?eventid='.$row_event['eventid'],'off');
-					$ack->setHint($ack_info, '', '', false);
-				}
-				else{
-					$ack= new CLink(S_NO,'acknow.php?eventid='.$row_event['eventid'],'on');
-				}
-			}
-
-//			$description = expand_trigger_description($row['triggerid']);
-			$description = expand_trigger_description_by_data(zbx_array_merge($trigger, array('clock'=>$row_event['clock'], 'ns'=>$row_event['ns'])),ZBX_FLAG_EVENT);
+			$description = expand_trigger_description_by_data(zbx_array_merge($trigger, array('clock'=>$event['clock'], 'ns'=>$event['ns'])),ZBX_FLAG_EVENT);
 
 //actions
-			$actions = get_event_actions_stat_hints($row_event['eventid']);
+			$actions = get_event_actions_stat_hints($event['eventid']);
 
 			$clock = new CLink(
-					zbx_date2str(S_BLOCKS_LATEST_ISSUES_DATE_FORMAT,$row_event['clock']),
-					'events.php?triggerid='.$trigger['triggerid'].'&source=0&show_unknown=1&nav_time='.$row_event['clock']
+					zbx_date2str(S_BLOCKS_LATEST_ISSUES_DATE_FORMAT,$event['clock']),
+					'events.php?triggerid='.$trigger['triggerid'].'&source=0&show_unknown=1&nav_time='.$event['clock']
 					);
 
 			if($trigger['url'])
@@ -1017,14 +1010,14 @@ function make_latest_issues($filter = array()){
 				$description = new CSpan($description,'pointer');
 
 			$description = new CCol($description,get_severity_style($trigger['priority']));
-			$description->setHint(make_popup_eventlist($row_event['eventid'], $trigger['type'], $trigger['triggerid']), '', '', false);
+			$description->setHint(make_popup_eventlist($event['eventid'], $trigger['type'], $trigger['triggerid']), '', '', false);
 		
 			$table->addRow(array(
 				get_node_name_by_elid($trigger['triggerid']),
 				$host,
 				$description,
 				$clock,
-				zbx_date2age($row_event['clock']),
+				zbx_date2age($event['clock']),
 				$ack,
 				$actions
 			));

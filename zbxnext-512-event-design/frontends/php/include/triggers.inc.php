@@ -331,6 +331,7 @@ return $caption;
 	function get_trigger_value_style($value){
 		$str_val[TRIGGER_VALUE_FALSE]	= 'off';
 		$str_val[TRIGGER_VALUE_TRUE]	= 'on';
+// keep it for events
 		$str_val[TRIGGER_VALUE_UNKNOWN]	= 'unknown';
 
 		if(isset($str_val[$value]))
@@ -342,6 +343,7 @@ return $caption;
 	function trigger_value2str($value){
 		$str_val[TRIGGER_VALUE_FALSE]	= S_OK_BIG;
 		$str_val[TRIGGER_VALUE_TRUE]	= S_PROBLEM_BIG;
+// keep it for events
 		$str_val[TRIGGER_VALUE_UNKNOWN]	= S_UNKNOWN_BIG;
 
 		if(isset($str_val[$value]))
@@ -1491,7 +1493,7 @@ return $caption;
 
 		if($status != TRIGGER_STATUS_ENABLED){
 			addEvent($triggerids, TRIGGER_VALUE_UNKNOWN);
-			DBexecute('UPDATE triggers SET lastchange='.time().', value='.TRIGGER_VALUE_UNKNOWN.' WHERE '.DBcondition('triggerid',$triggerids).' AND value<>'.TRIGGER_VALUE_UNKNOWN);
+			DBexecute('UPDATE triggers SET value_flags='.TRIGGER_VALUE_FLAG_UNKNOWN.' WHERE '.DBcondition('triggerid',$triggerids).' AND value_flags='.TRIGGER_VALUE_FLAG_NORMAL);
 		}
 
 	return true;
@@ -1657,7 +1659,7 @@ return $caption;
 		}
 
 		if(!empty($triggers)){
-			DBexecute('UPDATE triggers SET value='.TRIGGER_VALUE_UNKNOWN.', lastchange='.$now.' WHERE '.DBcondition('triggerid',$triggers));
+			DBexecute('UPDATE triggers SET value_flags='.TRIGGER_VALUE_FLAG_UNKNOWN.' WHERE '.DBcondition('triggerid',$triggerids).' AND value_flags='.TRIGGER_VALUE_FLAG_NORMAL);
 		}
 	return true;
 	}
@@ -1900,7 +1902,6 @@ return $caption;
 				addEvent($triggerid, TRIGGER_VALUE_UNKNOWN);
 
 				$update_values['value_flags'] = TRIGGER_VALUE_FLAG_UNKNOWN;
-				$update_values['lastchange'] = time();
 			}
 		}
 
