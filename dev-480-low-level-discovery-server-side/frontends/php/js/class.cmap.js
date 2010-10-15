@@ -305,8 +305,8 @@ saveSysmap: function(){
 					{
 						'method': 'post',
 						'parameters':params,
-//						'onSuccess': function(){ },
-						'onSuccess': function(resp){ SDI(resp.responseText); },
+						'onSuccess': function(){ },
+//						'onSuccess': function(resp){ SDI(resp.responseText); },
 						'onFailure': function(){ document.location = url.getPath()+'?'+Object.toQueryString(params); }
 					}
 	);

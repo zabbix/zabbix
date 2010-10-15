@@ -391,18 +391,6 @@ table.header_wide tr.first td.header_r{
 	color: #DFDFDF;
 }
 
-table.infobox{
-	border: 1px #AAAAAA solid;
-	background-color:#444444;
-
-	color: #DADADA;
-}
-
-table.infobox a:link		{	color:#FF5500;	 }
-table.infobox a:visited 	{	color:#FF5500;	 }
-table.infobox a:hover 		{	color:#FF8800;	 }
-table.infobox a:active 		{	color:#FF8800;	 }
-
 table.chart{
 	background-color: #1A1A1A;
 }
@@ -452,6 +440,9 @@ table.suggest tr td{
 }
 /*----------*/
 
+table.filter_config{
+	background-color: #2F2F2F;
+}
 
 /*////////////////	DIVS	////////////////////*/
 /* calendar */
@@ -577,11 +568,20 @@ div#selection_box{
 }
 
 div.formElement{
-	border: 1px solid #5A5A5A;;
+	border: 1px solid #5A5A5A;
 }
 
 div.formElement_body{
 	background-color: #1A1A1A;
+}
+
+div.objectlist{
+	border-color: #AA5500;
+	background-color: #2F2F2F;
+}
+
+div.objectlist ul li{
+	color: #DADADA;
 }
 
 .formElementTable tr td{

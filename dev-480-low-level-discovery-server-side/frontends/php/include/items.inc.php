@@ -1216,7 +1216,6 @@
 			}
 
 			$table->SetHeader($header,'vertical_header');
-			$curr_rime = time();
 
 			foreach($items as $descr => $ithosts){
 				$table_row = array(nbsp($descr));
@@ -1233,7 +1232,6 @@
 			}
 
 			$table->SetHeader($header,'vertical_header');
-			$curr_rime = time();
 
 			foreach($hosts as $hostname){
 				$table_row = array(nbsp($hostname));

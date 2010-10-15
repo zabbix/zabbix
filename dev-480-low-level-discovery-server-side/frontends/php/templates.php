@@ -21,6 +21,7 @@
 <?php
 require_once('include/config.inc.php');
 require_once('include/hosts.inc.php');
+require_once('include/screens.inc.php');
 require_once('include/forms.inc.php');
 require_once('include/ident.inc.php');
 
@@ -162,6 +163,17 @@ include_once('include/page_header.php');
 		);
 		$macros = CUserMacro::get($params);
 
+// SELECT SCREENS
+		$params = array(
+			'templateids' => $templateids,
+			'select_screenitems' => API_OUTPUT_EXTEND,
+			'output' => API_OUTPUT_EXTEND,
+			'noInheritance' => true
+		);
+		$screens = CTemplateScreen::get($params);
+
+		prepareScreenExport($screens);
+
 // SELECT ITEMS
 		$params = array(
 			'hostids' => $templateids,
@@ -224,7 +236,8 @@ include_once('include/page_header.php');
 			'macros' => $macros,
 			'hosts_groups' => $groups,
 			'triggers' => $triggers,
-			'dependencies' => $dependencies
+			'dependencies' => $dependencies,
+			'screens' => $screens,
 		);
 
 		$xml = zbxXML::export($data);
@@ -785,6 +798,7 @@ include_once('include/page_header.php');
 			S_ITEMS,
 			S_TRIGGERS,
 			S_GRAPHS,
+			S_SCREENS,
 			S_DISCOVERY,
 			S_LINKED_TEMPLATES,
 			S_LINKED_TO
@@ -817,6 +831,7 @@ include_once('include/page_header.php');
 
 		$options = array(
 			'templateids' => zbx_objectValues($templates, 'templateid'),
+			'editable' => 1,
 			'output' => API_OUTPUT_EXTEND,
 			'select_hosts' => array('hostid','host','status'),
 			'select_templates' => array('hostid','host','status'),
@@ -826,12 +841,14 @@ include_once('include/page_header.php');
 			'select_graphs' => API_OUTPUT_COUNT,
 			'select_applications' => API_OUTPUT_COUNT,
 			'select_discoveries' => API_OUTPUT_COUNT,
-			'nopermissions' => 1
+			'selectScreens' => API_OUTPUT_COUNT,
+			'nopermissions' => 1,
 		);
 
 		$templates = CTemplate::get($options);
 		order_result($templates, $sortfield, $sortorder);
 //-----
+
 		foreach($templates as $tnum => $template){
 			$templates_output = array();
 			if($template['proxy_hostid']){
@@ -848,6 +865,8 @@ include_once('include/page_header.php');
 				' ('.$template['triggers'].')');
 			$graphs = array(new CLink(S_GRAPHS,'graphs.php?groupid='.$_REQUEST['groupid'].'&hostid='.$template['templateid']),
 				' ('.$template['graphs'].')');
+			$screens = array(new CLink(S_SCREENS,'screenconf.php?templateid='.$template['templateid']),
+				' ('.$template['screens'].')');
 			$discoveries = array(new CLink(S_DISCOVERY, 'host_discovery.php?&hostid='.$template['hostid']),
 				' ('.$template['discoveries'].')');
 
@@ -918,6 +937,7 @@ include_once('include/page_header.php');
 				$items,
 				$triggers,
 				$graphs,
+				$screens,
 				$discoveries,
 				(empty($linked_templates_output) ? '-' : new CCol($linked_templates_output,'wraptext')),
 				(empty($linked_to_output) ? '-' : new CCol($linked_to_output,'wraptext'))

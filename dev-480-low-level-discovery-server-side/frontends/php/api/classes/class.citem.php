@@ -60,7 +60,7 @@ class CItem extends CZBXAPI{
 		$userid = $USER_DETAILS['userid'];
 
 		$sort_columns = array('itemid','description','key_','delay','history','trends','type','status'); // allowed columns for sorting
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM); // allowed output options for [ select_* ] params
 
 		$sql_parts = array(
 			'select' => array('items' => 'i.itemid'),
@@ -97,10 +97,10 @@ class CItem extends CZBXAPI{
 			'belongs'				=> null,
 			'with_triggers'			=> null,
 // filter
-			'filter'					=> null,
-			'search'					=> null,
-			'startSearch'				=> null,
-			'excludeSearch'				=> null,
+			'filter'				=> null,
+			'search'				=> null,
+			'startSearch'			=> null,
+			'excludeSearch'			=> null,
 
 // OutPut
 			'output'				=> API_OUTPUT_REFER,
@@ -139,6 +139,15 @@ class CItem extends CZBXAPI{
 			}
 		}
 
+
+		if(is_array($options['output'])){
+			unset($sql_parts['select']['items']);
+			foreach($options['output'] as $key => $field){
+				$sql_parts['select'][$field] = ' i.'.$field;
+			}
+
+			$options['output'] = API_OUTPUT_CUSTOM;
+		}
 
 // editable + PERMISSION CHECK
 

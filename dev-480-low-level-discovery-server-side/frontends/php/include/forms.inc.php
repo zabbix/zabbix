@@ -3626,53 +3626,6 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		return $form;
 	}
 
-	function insert_screen_form(){
-
-		$frm_title = S_SCREEN;
-		if(isset($_REQUEST['screenid'])){
-			$result=DBselect('SELECT screenid,name,hsize,vsize '.
-						' FROM screens g '.
-						' WHERE screenid='.$_REQUEST['screenid']);
-			$row=DBfetch($result);
-			$frm_title = S_SCREEN.' "'.$row['name'].'"';
-		}
-		if(isset($_REQUEST['screenid']) && !isset($_REQUEST['form_refresh'])){
-			$name=$row['name'];
-			$hsize=$row['hsize'];
-			$vsize=$row['vsize'];
-		}
-		else{
-			$name=get_request('name','');
-			$hsize=get_request('hsize',1);
-			$vsize=get_request('bsize',1);
-		}
-
-		$frmScr = new CFormTable($frm_title,'screenconf.php');
-		$frmScr->setHelp('web.screenconf.screen.php');
-
-		$frmScr->addVar('config', 0);
-
-		if(isset($_REQUEST['screenid'])){
-			$frmScr->addVar('screenid',$_REQUEST['screenid']);
-		}
-		$frmScr->addRow(S_NAME, new CTextBox('name',$name,32));
-		$frmScr->addRow(S_COLUMNS, new CNumericBox('hsize',$hsize,3));
-		$frmScr->addRow(S_ROWS, new CNumericBox('vsize',$vsize,3));
-
-		$frmScr->addItemToBottomRow(new CButton('save',S_SAVE));
-		if(isset($_REQUEST['screenid'])){
-			/* $frmScr->addItemToBottomRow(SPACE);
-			$frmScr->addItemToBottomRow(new CButton('clone',S_CLONE)); !!! TODO */
-			$frmScr->addItemToBottomRow(SPACE);
-			$frmScr->addItemToBottomRow(new CButtonDelete(S_DELETE_SCREEN_Q,
-				url_param('form').url_param('screenid')));
-		}
-		$frmScr->addItemToBottomRow(SPACE);
-		$frmScr->addItemToBottomRow(new CButtonCancel());
-
-		return $frmScr;
-	}
-
 // HOSTS
 	function insert_mass_update_host_form(){//$elements_array_name){
 		global $USER_DETAILS;
@@ -4067,7 +4020,14 @@ JAVASCRIPT;
 		$table = new CTable();
 		$table->setHeader(array(S_ELEMENT, S_UPDATE.SPACE.S_EXISTING, S_ADD.SPACE.S_MISSING), 'bold');
 
-		$titles = array('host' => $template?S_TEMPLATE:S_HOST, 'template' => S_TEMPLATE_LINKAGE, 'item' => S_ITEM, 'trigger' => S_TRIGGER, 'graph' => S_GRAPH);
+		$titles = array(
+			'host' => $template?S_TEMPLATE:S_HOST,
+			'template' => S_TEMPLATE_LINKAGE,
+			'item' => S_ITEM,
+			'trigger' => S_TRIGGER,
+			'graph' => S_GRAPH,
+			'screens' => S_SCREENS,
+		);
 		foreach($titles as $key => $title){
 			$cbExist = new CCheckBox('rules['.$key.'][exist]', true);
 
@@ -4968,119 +4928,6 @@ JAVASCRIPT;
 		$tblExpFooter->setFooter($td);
 // end of condition list preparation
 	return $tblExpFooter;
-	}
-
-/**
-* returns Ctable object with host header
-*
-* {@source}
-* @access public
-* @static
-* @version 1
-*
-* @param string $hostid
-* @param array $elemnts [items, triggers, graphs, applications]
-* @return object
-*/
-	function get_header_host_table($hostid, $elements){
-		$header_host_opt = array(
-			'hostids' => $hostid,
-			'extendoutput' => 1,
-			'templated_hosts' => 1,
-		);
-		if(str_in_array('items', $elements))
-			$header_host_opt['select_items'] = 1;
-		if(str_in_array('triggers', $elements))
-			$header_host_opt['select_triggers'] = 1;
-		if(str_in_array('graphs', $elements))
-			$header_host_opt['select_graphs'] = 1;
-		if(str_in_array('applications', $elements))
-			$header_host_opt['select_applications'] = 1;
-
-		$header_host = CHost::get($header_host_opt);
-		$header_host = array_pop($header_host);
-
-
-		$description = array();
-		if($header_host['proxy_hostid']){
-			$proxy = get_host_by_hostid($header_host['proxy_hostid']);
-			$description[] = $proxy['host'].':';
-		}
-		$description[] = $header_host['host'];
-
-		if(str_in_array('items', $elements)){
-			$items = array(new CLink(S_ITEMS, 'items.php?hostid='.$header_host['hostid']),
-				' ('.count($header_host['items']).')');
-		}
-		if(str_in_array('triggers', $elements)){
-			$triggers = array(new CLink(S_TRIGGERS, 'triggers.php?hostid='.$header_host['hostid']),
-				' ('.count($header_host['triggers']).')');
-		}
-		if(str_in_array('graphs', $elements)){
-			$graphs = array(new CLink(S_GRAPHS, 'graphs.php?hostid='.$header_host['hostid']),
-				' ('.count($header_host['graphs']).')');
-		}
-		if(str_in_array('applications', $elements)){
-			$applications = array(new CLink(S_APPLICATIONS, 'applications.php?hostid='.$header_host['hostid']),
-				' ('.count($header_host['applications']).')');
-		}
-
-		$tbl_header_host = new CTable();
-		if($header_host['status'] == HOST_STATUS_TEMPLATE){
-
-			$tbl_header_host->addRow(array(
-				new CLink(bold(S_TEMPLATE_LIST), 'templates.php?templateid='.$header_host['hostid'].url_param('groupid')),
-				(str_in_array('applications', $elements) ? $applications : null),
-				(str_in_array('items', $elements) ? $items : null),
-				(str_in_array('triggers', $elements) ? $triggers : null),
-				(str_in_array('graphs', $elements) ? $graphs : null),
-				array(bold(S_TEMPLATE.': '), $description)
-			));
-		}
-		else{
-			$dns = empty($header_host['dns']) ? '-' : $header_host['dns'];
-			$ip = empty($header_host['ip']) ? '-' : $header_host['ip'];
-			$port = empty($header_host['port']) ? '-' : $header_host['port'];
-			if(1 == $header_host['useip'])
-				$ip = bold($ip);
-			else
-				$dns = bold($dns);
-
-			switch($header_host['status']){
-				case HOST_STATUS_MONITORED:
-					$status=new CSpan(S_MONITORED, 'off');
-					break;
-				case HOST_STATUS_NOT_MONITORED:
-					$status=new CSpan(S_NOT_MONITORED, 'off');
-					break;
-				default:
-					$status=S_UNKNOWN;
-			}
-
-			if($header_host['available'] == HOST_AVAILABLE_TRUE)
-				$available=new CSpan(S_AVAILABLE,'off');
-			else if($header_host['available'] == HOST_AVAILABLE_FALSE)
-				$available=new CSpan(S_NOT_AVAILABLE,'on');
-			else if($header_host['available'] == HOST_AVAILABLE_UNKNOWN)
-				$available=new CSpan(S_UNKNOWN,'unknown');
-
-			$tbl_header_host->addRow(array(
-				new CLink(bold(S_HOST_LIST), 'hosts.php?hostid='.$header_host['hostid'].url_param('groupid')),
-				(str_in_array('applications', $elements) ? $applications : null),
-				(str_in_array('items', $elements) ? $items : null),
-				(str_in_array('triggers', $elements) ? $triggers : null),
-				(str_in_array('graphs', $elements) ? $graphs : null),
-				array(bold(S_HOST.': '),$description),
-				array(bold(S_DNS.': '), $dns),
-				array(bold(S_IP.': '), $ip),
-				array(bold(S_PORT.': '), $port),
-				array(bold(S_STATUS.': '), $status),
-				array(bold(S_AVAILABILITY.': '), $available)
-			));
-		}
-		$tbl_header_host->setClass('infobox');
-
-		return $tbl_header_host;
 	}
 
 	function get_macros_widget($hostid = null){
