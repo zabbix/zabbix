@@ -97,8 +97,11 @@ include_once('include/page_header.php');
 // FIND Hosts
 	$params = array(
 		'nodeids'=> get_current_nodeid(true),
-		'pattern' => $search,
-		'extendPattern' => true,
+		'search' => array(
+			'host' => $search,
+			'dns' => $search,
+			'ip' => $search
+		),
 		'limit' => $rows_per_page,
 		'select_groups' => API_OUTPUT_EXTEND,
 		'select_items' => API_OUTPUT_COUNT,
@@ -124,16 +127,11 @@ include_once('include/page_header.php');
 
 	$params = array(
 		'nodeids'=> get_current_nodeid(true),
-		'pattern' => $search,
-		'extendPattern' => true,
-		'count' => 1,
-	);
-	$hosts_count = CHost::get($params);
-
-	$params = array(
-		'nodeids'=> get_current_nodeid(true),
-		'pattern' => $search,
-		'extendPattern' => true,
+		'search' => array(
+			'host' => $search,
+			'dns' => $search,
+			'ip' => $search
+		),
 		'countOutput' => 1,
 	);
 
@@ -225,8 +223,8 @@ include_once('include/page_header.php');
 // Find Host groups
 	$params = array(
 		'nodeids'=> get_current_nodeid(true),
-		'extendoutput' => 1,
-		'pattern' => $search,
+		'output' => API_OUTPUT_EXTEND,
+		'search' => array('name' => $search),
 		'limit' => $rows_per_page,
 	);
 
@@ -247,12 +245,10 @@ include_once('include/page_header.php');
 
 	$params = array(
 		'nodeids'=> get_current_nodeid(true),
-		'pattern' => $search,
-		'count' => 1,
+		'search' => array('name' => $search),
+		'countOutput' => 1
 	);
-
-	$groups_count = CHostGroup::get($params);
-	$overalCount = $groups_count['rowscount'];
+	$overalCount = CHostGroup::get($params);
 	$viewCount = count($hostGroups);
 
 	$header = array(
@@ -309,7 +305,7 @@ include_once('include/page_header.php');
 	if($admin){
 		$params = array(
 			'nodeids'=> get_current_nodeid(true),
-			'pattern' => $search,
+			'search' => array('host' => $search),
 			'output' => API_OUTPUT_EXTEND,
 			'select_groups' => API_OUTPUT_REFER,
 			'sortfield' => 'host',
@@ -335,7 +331,7 @@ include_once('include/page_header.php');
 
 		$params = array(
 			'nodeids'=> get_current_nodeid(true),
-			'pattern' => $search,
+			'search' => array('host' => $search),
 			'countOutput' => 1,
 			'editable' => 1
 		);

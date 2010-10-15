@@ -26,42 +26,42 @@
 
 #include "http.h"
 
-#define	ZABBIX_MAX_WEBPAGE_SIZE	1*1024*1024
+#define ZBX_MAX_WEBPAGE_SIZE	(1 * 1024 * 1024)
 
-static int	get_http_page(char *host, char *param, unsigned short port, char *buffer, int max_buf_len)
+static int	get_http_page(const char *host, const char *path, unsigned short port, char *buffer, int max_buffer_len)
 {
-	char
-		*buf,
-		request[MAX_STRING_LEN];
+	int		ret;
+	char		*recv_buffer;
+	char		request[MAX_STRING_LEN];
+	zbx_sock_t	s;
 
-	zbx_sock_t		s;
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, MAX(CONFIG_TIMEOUT - 1, 1))))
+	{
+		zbx_snprintf(request, sizeof(request),
+				"GET /%s HTTP/1.1\r\n"
+				"Host: %s\r\n"
+				"Connection: close\r\n"
+				"\r\n",
+				path, host);
 
-	int	ret;
-
-	assert(buffer);
-
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, 0))) {
-		zbx_snprintf(request, sizeof(request), "GET /%s HTTP/1.1\r\nHost: %s\r\nConnection: close\r\n\r\n",
-			param,
-			host);
-
-		if( SUCCEED == (ret = zbx_tcp_send_raw(&s, request)) )
+		if (SUCCEED == (ret = zbx_tcp_send_raw(&s, request)))
 		{
-			if (SUCCEED == (ret = zbx_tcp_recv_ext(&s, &buf, ZBX_TCP_READ_UNTIL_CLOSE, 0)))
+			if (SUCCEED == (ret = zbx_tcp_recv_ext(&s, &recv_buffer, ZBX_TCP_READ_UNTIL_CLOSE, 0)))
 			{
-				zbx_rtrim(buf, "\r\n");
-
-				zbx_snprintf(buffer, max_buf_len, "%s", buf);
+				if (NULL != buffer)
+					zbx_strlcpy(buffer, recv_buffer, max_buffer_len);
 			}
 		}
 	}
+
 	zbx_tcp_close(&s);
 
-	if( FAIL == ret )
+	if (FAIL == ret)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "HTTP get error: %s", zbx_tcp_strerror());
 		return SYSINFO_RET_FAIL;
 	}
+
 	return SYSINFO_RET_OK;
 }
 
@@ -69,49 +69,34 @@ int	WEB_PAGE_GET(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 {
 	char	hostname[MAX_STRING_LEN];
 	char	path[MAX_STRING_LEN];
-	char	port_str[MAX_STRING_LEN];
-
-	char	*buffer;
+	char	port_str[8];
+	char	buffer[DB_TEXT_LEN_MAX];
 
 	assert(result);
 
 	init_result(result);
 
-	if(num_param(param) > 3)
-	{
+        if (num_param(param) > 3)
+                return SYSINFO_RET_FAIL;
+
+	if (0 != get_param(param, 1, hostname, sizeof(hostname)))
+                return SYSINFO_RET_FAIL;
+
+	if (0 != get_param(param, 2, path, sizeof(path)))
+		*path = '\0';
+
+	if (0 != get_param(param, 3, port_str, sizeof(port_str)) || '\0' == *port_str)
+		zbx_snprintf(port_str, sizeof(port_str), "%d", ZBX_DEFAULT_HTTP_PORT);
+	else if (FAIL == is_uint(port_str))
 		return SYSINFO_RET_FAIL;
-	}
 
-	if(get_param(param, 1, hostname, MAX_STRING_LEN) != 0)
+	if (SYSINFO_RET_OK == get_http_page(hostname, path, (unsigned short)atoi(port_str), buffer, sizeof(buffer)))
 	{
-		return SYSINFO_RET_FAIL;
-	}
-
-	if(get_param(param, 2, path, MAX_STRING_LEN) != 0)
-	{
-		path[0]='\0';
-	}
-
-	if(get_param(param, 3, port_str, MAX_STRING_LEN) != 0)
-	{
-		strscpy(port_str, "80");
-	}
-
-	if(port_str[0]=='\0')
-	{
-		strscpy(port_str, "80");
-	}
-
-	buffer = calloc(1, ZABBIX_MAX_WEBPAGE_SIZE);
-	if(SYSINFO_RET_OK == get_http_page(hostname, path, (unsigned short)atoi(port_str), buffer, ZABBIX_MAX_WEBPAGE_SIZE))
-	{
-		SET_TEXT_RESULT(result, buffer);
+		zbx_rtrim(buffer, "\r\n");
+		SET_TEXT_RESULT(result, strdup(buffer));
 	}
 	else
-	{
-		free(buffer);
 		SET_TEXT_RESULT(result, strdup("EOF"));
-	}
 
 	return SYSINFO_RET_OK;
 }
@@ -120,53 +105,35 @@ int	WEB_PAGE_PERF(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 {
 	char	hostname[MAX_STRING_LEN];
 	char	path[MAX_STRING_LEN];
-	char	port_str[MAX_STRING_LEN];
-
-	char	*buffer;
-
+	char	port_str[8];
 	double	start_time;
 
         assert(result);
 
         init_result(result);
 
-        if(num_param(param) > 3)
-        {
+        if (num_param(param) > 3)
                 return SYSINFO_RET_FAIL;
-        }
 
-	if(get_param(param, 1, hostname, MAX_STRING_LEN) != 0)
-	{
+	if (0 != get_param(param, 1, hostname, sizeof(hostname)))
                 return SYSINFO_RET_FAIL;
-	}
 
-	if(get_param(param, 2, path, MAX_STRING_LEN) != 0)
-	{
-		path[0]='\0';
-	}
+	if (0 != get_param(param, 2, path, sizeof(path)))
+		*path = '\0';
 
-	if(get_param(param, 3, port_str, MAX_STRING_LEN) != 0)
-	{
-		strscpy(port_str, "80");
-	}
-
-	if(port_str[0]=='\0')
-	{
-		strscpy(port_str, "80");
-	}
+	if (0 != get_param(param, 3, port_str, sizeof(port_str)) || '\0' == *port_str)
+		zbx_snprintf(port_str, sizeof(port_str), "%d", ZBX_DEFAULT_HTTP_PORT);
+	else if (FAIL == is_uint(port_str))
+		return SYSINFO_RET_FAIL;
 
 	start_time = zbx_time();
 
-	buffer = calloc(1, ZABBIX_MAX_WEBPAGE_SIZE);
-	if(get_http_page(hostname, path, (unsigned short)atoi(port_str), buffer, ZABBIX_MAX_WEBPAGE_SIZE) == SYSINFO_RET_OK)
+	if (SYSINFO_RET_OK == get_http_page(hostname, path, (unsigned short)atoi(port_str), NULL, 0))
 	{
 		SET_DBL_RESULT(result, zbx_time() - start_time);
 	}
 	else
-	{
 		SET_DBL_RESULT(result, 0.0);
-	}
-	free(buffer);
 
 	return SYSINFO_RET_OK;
 }
@@ -175,77 +142,59 @@ int	WEB_PAGE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
 {
 	char	hostname[MAX_STRING_LEN];
 	char	path[MAX_STRING_LEN];
-	char	port_str[MAX_STRING_LEN];
+	char	port_str[8];
 	char	regexp[MAX_STRING_LEN];
 	char	len_str[MAX_STRING_LEN];
-	char	back[MAX_STRING_LEN];
-
-	char	*buffer;
-	char	*found;
-
-	int	l;
-
-	int	ret = SYSINFO_RET_OK;
+	char	back[DB_TEXT_LEN_MAX];
+	char	*buffer = NULL, *found;
+	int	len, found_len;
 
         assert(result);
 
         init_result(result);
 
-        if(num_param(param) > 5)
-        {
+        if (num_param(param) > 5)
                 return SYSINFO_RET_FAIL;
-        }
 
-	if(get_param(param, 1, hostname, MAX_STRING_LEN) != 0)
-	{
+	if (0 != get_param(param, 1, hostname, sizeof(hostname)))
                 return SYSINFO_RET_FAIL;
-	}
 
-	if(get_param(param, 2, path, MAX_STRING_LEN) != 0)
-	{
-		path[0]='\0';
-	}
+	if (0 != get_param(param, 2, path, sizeof(path)))
+		*path = '\0';
 
-	if(get_param(param, 3, port_str, MAX_STRING_LEN) != 0)
-	{
-		strscpy(port_str, "80");
-	}
+	if (0 != get_param(param, 3, port_str, sizeof(port_str)) || '\0' == *port_str)
+		zbx_snprintf(port_str, sizeof(port_str), "%d", ZBX_DEFAULT_HTTP_PORT);
+	else if (FAIL == is_uint(port_str))
+		return SYSINFO_RET_FAIL;
 
-	if(port_str[0]=='\0')
-	{
-		strscpy(port_str, "80");
-	}
-
-	if(get_param(param, 4, regexp, MAX_STRING_LEN) != 0)
-	{
+	if (0 != get_param(param, 4, regexp, sizeof(regexp)))
                 return SYSINFO_RET_FAIL;
-	}
 
-	if(get_param(param, 5, len_str, MAX_STRING_LEN) != 0)
-	{
-		len_str[0] = '\0';
-                /* return SYSINFO_RET_FAIL;  */ /* TODO develope !!! */
-	}
+	if (0 != get_param(param, 5, len_str, sizeof(len_str)) || '\0' == *len_str)
+		zbx_snprintf(len_str, sizeof(len_str), "%d", DB_TEXT_LEN);
+	else if (FAIL == is_uint(len_str))
+		return SYSINFO_RET_FAIL;
 
-	buffer = calloc(1, ZABBIX_MAX_WEBPAGE_SIZE);
-	if(SYSINFO_RET_OK == get_http_page(hostname, path, (unsigned short)atoi(port_str), buffer, ZABBIX_MAX_WEBPAGE_SIZE))
+	buffer = zbx_malloc(buffer, ZBX_MAX_WEBPAGE_SIZE);
+
+	if (SYSINFO_RET_OK == get_http_page(hostname, path, (unsigned short)atoi(port_str), buffer, ZBX_MAX_WEBPAGE_SIZE))
 	{
-		found = zbx_regexp_match(buffer,regexp,&l);
-		if(NULL != found)
+		if (NULL != (found = zbx_regexp_match(buffer, regexp, &found_len)))
 		{
-			zbx_strlcpy(back,found, l+1);
+			len = atoi(len_str) + 1;
+			len = MIN(len, found_len + 1);
+			len = MIN(len, sizeof(back));
+
+			zbx_strlcpy(back, found, len);
 			SET_STR_RESULT(result, strdup(back));
 		}
 		else
-		{
 			SET_STR_RESULT(result, strdup("EOF"));
-		}
 	}
 	else
-	{
 		SET_STR_RESULT(result, strdup("EOF"));
-	}
-	free(buffer);
 
-	return ret;
+	zbx_free(buffer);
+
+	return SYSINFO_RET_OK;
 }

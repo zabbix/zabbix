@@ -80,56 +80,6 @@ int	tcp_expect(const char *host, unsigned short port, const char *request,
 	return SYSINFO_RET_OK;
 }
 
-int	TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-#ifdef HAVE_PROC
-	FILE	*f = NULL;
-	char	c[MAX_STRING_LEN];
-	char	porthex[MAX_STRING_LEN];
-	char	pattern[MAX_STRING_LEN];
-	int	ret = SYSINFO_RET_FAIL;
-
-	assert(result);
-
-	init_result(result);
-
-	if(num_param(param) > 1)
-	{
-		return SYSINFO_RET_FAIL;
-	}
-
-	if(get_param(param, 1, porthex, MAX_STRING_LEN) != 0)
-	{
-		return SYSINFO_RET_FAIL;
-	}
-
-	strscpy(pattern,porthex);
-	zbx_strlcat(pattern," 00000000:0000 0A", MAX_STRING_LEN);
-
-	if(NULL == (f = fopen("/proc/net/tcp","r")))
-	{
-		return	SYSINFO_RET_FAIL;
-	}
-
-	while (NULL != fgets(c,MAX_STRING_LEN,f))
-	{
-		if(NULL != strstr(c,pattern))
-		{
-			SET_UI64_RESULT(result, 1);
-			ret = SYSINFO_RET_OK;
-			break;
-		}
-	}
-	zbx_fclose(f);
-
-	SET_UI64_RESULT(result, 0);
-
-	return ret;
-#else
-	return	SYSINFO_RET_FAIL;
-#endif
-}
-
 int	CHECK_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	short	port=0;

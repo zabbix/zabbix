@@ -2202,8 +2202,16 @@ return $caption;
 				}
 
 				foreach($map as $hostid => $templates){
-					foreach($tpls as $tplid){
-						if(!isset($templates[$tplid])){
+					$set_with_dep = false;
+					
+					foreach($templateids as $tplid){
+						if(isset($templates[$tplid])){
+							$set_with_dep = true;
+							break;
+						}
+					}
+					foreach($dep_templateids as $dep_tplid){
+						if(!isset($templates[$dep_tplid]) && $set_with_dep){
 							error('Not all Templates are linked to host [ '.reset($templates).' ]');
 							$result = false;
 							break 2;
@@ -3891,7 +3899,7 @@ return $caption;
 			if(!isset($triggersData[$str])) {
 
 				if(ZAPCAT_COMPATIBILITY)
-					$tmp_expr = zbx_str_replace('][', ',,', $str);
+					$tmp_expr = str_replace('][', ',,', $str);
 				else
 					$tmp_expr = $str;
 

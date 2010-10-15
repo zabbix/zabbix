@@ -67,7 +67,7 @@ int	zbx_fork()
 
 ZBX_THREAD_HANDLE zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), void *args)
 {
-	ZBX_THREAD_HANDLE thread = 0;
+	ZBX_THREAD_HANDLE thread = ZBX_THREAD_HANDLE_NULL;
 
 #if defined(_WINDOWS)
 
@@ -100,7 +100,7 @@ ZBX_THREAD_HANDLE zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), void *args
 
 #endif /* _WINDOWS */
 
-	return (ZBX_THREAD_HANDLE)(thread);
+	return thread;
 }
 
 /******************************************************************************

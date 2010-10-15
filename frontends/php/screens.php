@@ -174,7 +174,14 @@
 
 		$cmbElements = new CComboBox('elementid', $elementid, 'submit()');
 		foreach($screens as $snum => $screen){
-			$cmbElements->addItem($screen['screenid'], get_node_name_by_elid($screen['screenid'], null, ': ').$screen['name']);
+			/**
+			 * Adding htmlspecialchars function to output of the screen name, so
+			 * that it would be available to use symbols like ">" in screen names
+			 * @see ZBX-2844
+			 * @author Konstantin Buravcov
+			 */
+			$displayed_screen_name = htmlspecialchars(get_node_name_by_elid($screen['screenid'], null, ': ').$screen['name']);
+			$cmbElements->addItem($screen['screenid'], $displayed_screen_name);
 		}
 		$form->addItem(array(S_SCREENS.SPACE, $cmbElements));
 

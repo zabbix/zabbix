@@ -27,7 +27,7 @@ var ZBX_SYSMAPS = new Array();			// sysmaps obj reference
 // sysmapid ALWAYS must be a STRING (js doesn't support uint64) !!!!
 function create_map(container,sysmapid,id){
 	if(typeof(id) == 'undefined'){
-		var id = ZBX_SYSMAPS.length;
+		id = ZBX_SYSMAPS.length;
 	}
 
 	if(is_number(sysmapid) && (sysmapid > 100000000000000)){
@@ -52,12 +52,12 @@ selements: {},						// map selements array
 links:	{},							// map links array
 
 selection: {
-	count: 0,						// numer of selected elements
-	position: 0,					// elements numerate
-	selements: new Array()			// selected SElements
+	count: 0,						// number of selected elements
+	selements: {}					// selected SElements
 },
 
 menu_active: 0,						// To recognize D&D
+debug_status: 0,
 
 mselement: {
 	selementid:			0,			// ALWAYS must be a STRING (js doesn't support uint64)
@@ -74,7 +74,7 @@ mselement: {
 	label_location:		3,
 	x:					0,
 	y:					0,
-	url:				'',
+	urls:				{},
 	html_obj:			null,			// reference to html obj
 	html_objid:			null,			// html elements id
 	selected:			0				// element is not selected
@@ -133,7 +133,7 @@ initialize: function($super, container, sysmapid, id){
 			'gridautoalign': $('gridautoalign'),
 			'gridshow': $('gridshow'),
 			'gridalignall': $('gridalignall')
-		}
+		};
 
 		this.grid = new CGrid(this.id, gridCtrlElemetns);
 
@@ -155,7 +155,7 @@ initialize: function($super, container, sysmapid, id){
 
 
 // SYSMAP
-getSysmapBySysmapid: function(sysmapid){
+getSysmapBySysmapid: function(){
 	this.debug('getSysmapBySysmapid');
 
 	var url = new Curl(location.href);
@@ -164,21 +164,21 @@ getSysmapBySysmapid: function(sysmapid){
 		'favid':	this.id,
 		'sysmapid': this.sysmapid,
 		'action':	'get'
-	}
+	};
 
 	new Ajax.Request(url.getPath()+'?output=ajax'+'&sid='+url.getArgument('sid'),
 					{
 						'method': 'post',
 						'parameters':params,
 //						'onSuccess': function(resp){ SDI(resp.responseText); },
-						'onSuccess': function(resp){ },
+						'onSuccess': function(){ },
 						'onFailure': function(){ throw('Get selements FAILED.'); }
 					}
 	);
 },
 
-sysmapUpdate: function(dragable,e){
-	this.debug('sysmapUpdate');
+selementDragEnd: function(dragable) {
+	this.debug('selementDragEnd');
 
 	this.deactivate_menu();
 
@@ -193,8 +193,20 @@ sysmapUpdate: function(dragable,e){
 	this.selements[selementid].y = pos.y;
 	this.selements[selementid].x = pos.x;
 
-
 	this.alignSelement(selementid);
+
+	if(isset('selementid', this.selementForm) && isset('x', this.selementForm) && isset('y', this.selementForm)){
+		if(this.selementForm.selementid.value == selementid){
+			this.selementForm.x.value = this.selements[selementid].x;
+			this.selementForm.y.value = this.selements[selementid].y;
+		}
+	}
+
+	this.sysmapUpdate();
+},
+
+sysmapUpdate: function(){
+	this.debug('sysmapUpdate');
 	this.updateMapImage();
 //	alert(id+' : '+this.selementids[id]);
 },
@@ -220,7 +232,7 @@ addNewElement: function(){
 		'favid':	this.id,
 		'sysmapid':	this.sysmapid,
 		'action':	'new_selement'
-	}
+	};
 
 	params['selements'] = Object.toJSON({'0': selement});
 
@@ -228,7 +240,7 @@ addNewElement: function(){
 					{
 						'method': 'post',
 						'parameters':params,
-						'onSuccess': function(resp){ },
+						'onSuccess': function(){ },
 //						'onSuccess': function(resp){ SDI(resp.responseText); },
 						'onFailure': function(){ document.location = url.getPath()+'?'+Object.toQueryString(params); }
 					}
@@ -244,14 +256,14 @@ add_empty_link: function(e){
 		var selementid1 = null;
 		var selementid2 = null;
 
-		for(var i=0; i < this.selection.position; i++){
-			if(!isset(i, this.selection.selements)) continue;
+		for(var selementid in this.selection.selements){
+			if(!isset(selementid, this.selements)) continue;
 
 			if(is_null(selementid1)){
-				selementid1 = this.selection.selements[i];
+				selementid1 = selementid;
 			}
 			else{
-				selementid2 = this.selection.selements[i];
+				selementid2 = selementid;
 				break;
 			}
 		}
@@ -275,21 +287,6 @@ add_empty_link: function(e){
 	this.update_linkContainer(e);
 },
 
-
-add_empty_linktrigger: function(linkid){
-	this.debug('add_empty_link');
-
-	var id = this.linkids[linkid];
-
-	var mlinktrigger = {};
-	for(var key in this.mlinktrigger){
-		mlinktrigger[key] = this.mlinktrigger[key];
-	}
-
-
-	this.add_linktrigger(id, mlinktrigger, 1);
-},
-
 // SYSMAP FORM
 saveSysmap: function(){
 	this.debug('saveSysmap');
@@ -300,7 +297,7 @@ saveSysmap: function(){
 		'favid':	this.id,
 		'sysmapid':	this.sysmapid,
 		'action':	'save'
-	}
+	};
 
 	params = this.get_update_params(params);
 //SDJ(params);
@@ -308,7 +305,7 @@ saveSysmap: function(){
 					{
 						'method': 'post',
 						'parameters':params,
-						'onSuccess': function(resp){ },
+						'onSuccess': function(){ },
 //						'onSuccess': function(resp){ SDI(resp.responseText); },
 						'onFailure': function(){ document.location = url.getPath()+'?'+Object.toQueryString(params); }
 					}
@@ -328,30 +325,24 @@ select_selement: function(selementid, multi){
 	var selement = this.selements[selementid];
 
 	if((typeof(this.selements[selementid]) != 'undefiend') && !empty(this.selements[selementid])){
-		var position = null;
-
 		if(is_null(this.selements[selementid].selected)){
-			position = this.selection.position;
-
-			this.selection.selements[position] = selementid;
-			this.selements[selementid].selected = position;
+			this.selection.selements[selementid] = selementid;
+			this.selements[selementid].selected = selementid;
 
 			selement.html_obj.style.border = '1px #3333FF solid';
 			selement.html_obj.style.backgroundColor = '#00AAAA';
 			selement.html_obj.style.opacity = '.60';
 
 			this.selection.count++;
-			this.selection.position++;
 		}
 		else if((this.selection.count > 1) && !multi){
 // if selected several selements and then we clicked on one of them
 		}
 		else{
 			this.selection.count--;
-			position = selement.selected;
 
-			this.selection.selements[position] = null;
-			delete(this.selection.selements[position]);
+			this.selection.selements[selement.selementid] = null;
+			delete(this.selection.selements[selement.selementid]);
 
 			this.selements[selementid].selected = null;
 
@@ -361,20 +352,19 @@ select_selement: function(selementid, multi){
 		}
 
 		if(!multi && (this.selection.count > 1)){
-			for(var i=0; i<this.selection.position; i++){
-				if(!isset(i,this.selection.selements) || (this.selection.selements[i] == selementid)) continue;;
+
+			for(var selectedSelementid in this.selection.selements){
+				if(empty(this.selection.selements[selectedSelementid]) || (selectedSelementid == selementid)) continue;
 
 				this.selection.count--;
 
-				var tmp_selementid = this.selection.selements[i];
+				this.selements[selectedSelementid].selected = null;
+				this.selements[selectedSelementid].html_obj.style.border = '0px';
+				this.selements[selectedSelementid].html_obj.style.backgroundColor = 'transparent';
+				this.selements[selectedSelementid].html_obj.style.opacity = '1';
 
-				this.selements[this.selection.selements[i]].selected = null;
-				this.selements[this.selection.selements[i]].html_obj.style.border = '0px';
-				this.selements[this.selection.selements[i]].html_obj.style.backgroundColor = 'transparent';
-				this.selements[this.selection.selements[i]].html_obj.style.opacity = '1';
-
-				this.selection.selements[i] = null;
-				delete(this.selection.selements[i]);
+				this.selection.selements[selectedSelementid] = null;
+				delete(this.selection.selements[selectedSelementid]);
 			}
 		}
 	}
@@ -461,7 +451,21 @@ updateSelementOption: function(selementid, params){ // params = {'key': value, '
 
 
 	for(var key in params){
-		if(is_null(params[key])) continue;
+		if(empty(params[key])) continue;
+
+		if(key == 'urls'){
+			for(var urlname in params[key]){
+				if(empty(params[key][urlname])) continue;
+
+				if(isset(urlname, this.selements[selementid].urls)){
+					this.selements[selementid].urls[urlname].url = params[key][urlname].url;
+				}
+				else{
+					this.selements[selementid].urls[urlname] = params[key][urlname];
+					this.selements[selementid].urls[urlname]['new'] = 'new';
+				}
+			}
+		}
 
 		if(is_number(params[key])) params[key] = params[key].toString();
 		this.selements[selementid][key] = params[key];
@@ -489,7 +493,7 @@ updateSelement: function(selement){
 					{
 						'method': 'post',
 						'parameters':params,
-						'onSuccess': function(resp){ },
+//						'onSuccess': function(){ },
 //						'onSuccess': function(resp){ SDI(resp.responseText); },
 						'onFailure': function(){ document.location = url.getPath()+'?'+Object.toQueryString(params); }
 					}
@@ -501,13 +505,13 @@ remove_selements: function(e){
 //--
 
 	if(Confirm(locale['S_DELETE_SELECTED_ELEMENTS_Q'])){
-		for(var i=0; i<this.selection.position; i++){
-			if(!isset(i, this.selection.selements)) continue;
+		for(var selementid in this.selection.selements){
+			if(!isset(selementid, this.selements)) continue;
 
-			this.remove_selement(this.selection.selements[i]);
+			this.remove_selement(selementid);
 		}
 
-		this.hideForm(e);
+		this.formHide(e);
 		this.updateMapImage();
 	}
 },
@@ -520,8 +524,8 @@ remove_selement: function(selementid, update_map){
 
 // Unselect
 	this.selection.count--;
-	this.selection.selements[this.selements[selementid].selected] = null;
-	delete(this.selection.selements[this.selements[selementid].selected]);
+	this.selection.selements[selementid] = null;
+	delete(this.selection.selements[selementid]);
 
 // Remove related links
 	this.remove_links_by_selementid(selementid);
@@ -546,7 +550,7 @@ get_linkid_by_selementids: function(selementid1,selementid2){
 	this.debug('get_linkid_by_selementids');
 //--
 
-	if(typeof(selementid2) == 'undefined') var selementid2 = null;
+	if(typeof(selementid2) == 'undefined') selementid2 = null;
 
 	var links = {};
 	for(var linkid in this.links){
@@ -650,14 +654,14 @@ remove_links: function(e){
 		var selementid1 = null;
 		var selementid2 = null;
 
-		for(var i=0; i < this.selection.position; i++){
-			if(!isset(i, this.selection.selements)) continue;
+		for(var selementid in this.selection.selements){
+			if(!isset(selementid, this.selements)) continue;
 
 			if(is_null(selementid1)){
-				selementid1 = this.selection.selements[i];
+				selementid1 = selementid;
 			}
 			else{
-				selementid2 = this.selection.selements[i];
+				selementid2 = selementid;
 				break;
 			}
 		}
@@ -675,7 +679,7 @@ remove_links: function(e){
 				this.remove_link(linkid);
 			}
 
-			this.hideForm(e);
+			this.formHide(e);
 			this.updateMapImage();
 		}
 	}
@@ -858,7 +862,7 @@ makeSelementDragable: function(selement){
 	new Draggable(selement,{
 				ghosting: true,
 				snap: this.get_dragable_dimensions.bind(this),
-				onEnd: this.sysmapUpdate.bind(this)
+				onEnd: this.selementDragEnd.bind(this)
 				});
 
 },
@@ -877,11 +881,11 @@ updateMapImage: function(){
 //--
 
 	var params = {
-		'output': 'ajax',
+		'output': 'text',
 		'sysmapid': this.sysmapid,
 		'noselements':	1,
 		'nolinks':	1
-	}
+	};
 
 	params = this.get_update_params(params);
 //SDJ(params);
@@ -893,7 +897,7 @@ updateMapImage: function(){
 						'parameters':params,
 //						'onSuccess': function(resp){SDI(resp.responseText);},
 						'onSuccess': this.set_mapimg.bind(this),
-						'onFailure': function(resp){ alert('failed'); }
+						'onFailure': function(){ alert('failed'); }
 					}
 	);
 },
@@ -987,7 +991,7 @@ get_update_params: function(params){
 	this.debug('get_update_params');
 
 	if(typeof(params) == 'undefined'){
-		var params = {};
+		params = {};
 	}
 
 	params = this.get_selements_params(params);
@@ -1000,7 +1004,7 @@ get_selements_params: function(params, selementid){
 	this.debug('get_selements_params');
 
 	if(typeof(params) == 'undefined'){
-		var params = {};
+		params = {};
 	}
 
 	if(typeof(selementid) != 'undefined'){
@@ -1019,7 +1023,7 @@ get_links_params: function(params, linkid){
 	this.debug('get_links_params');
 
 	if(typeof(params) == 'undefined'){
-		var params = {};
+		params = {};
 	}
 
 	if(typeof(linkid) != 'undefined'){
@@ -1066,10 +1070,15 @@ show_menu: function(e){
 	}
 
 	if(this.selection.count == 0){
-		this.hideForm(e);
+		this.formHide(e);
 	}
 	else{
-		this.showForm(e, selementid);
+		for(var selementid in this.selection.selements){
+			if(!isset(selementid, this.selements)) continue;
+			break;
+		}
+
+		this.formShow(e, selementid);
 	}
 },
 
@@ -1077,8 +1086,8 @@ show_menu: function(e){
 //  Form  ------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------
 
-showForm: function(e, selementid){
-	this.debug('showForm');
+formShow: function(e, selementid){
+	this.debug('formShow');
 //--
 
 	var divForm = document.getElementById('divSelementForm');
@@ -1102,10 +1111,10 @@ showForm: function(e, selementid){
 
 
 // Form init
-	this.updateForm_selement(e, selementid);
+	this.form_selement_update(e, selementid);
 	this.update_multiContainer(e);
 	this.update_linkContainer(e);
-	this.hideForm_link(e);
+	this.form_link_hide(e);
 //---
 
 	new Draggable(divForm,{
@@ -1117,17 +1126,16 @@ showForm: function(e, selementid){
 	$(divForm).show();
 },
 
-hideForm: function(e){
-	this.debug('hideForm');
-//--
+formHide: function(e){
+	this.debug('formHide');
 
 	var divForm = $('divSelementForm');
 	if(!is_null(divForm)) divForm.hide();
 
-	for(var i=0; i<this.selection.position; i++){
-		if(!isset(i,this.selection.selements)) continue;;
+	for(var selementid in this.selection.selements){
+		if(!isset(selementid, this.selements)) continue;
 
-		this.select_selement(this.selection.selements[i], true);
+		this.select_selement(selementid, true);
 	}
 },
 
@@ -1225,12 +1233,11 @@ update_multiContainer: function(e){
 
 	var count = 0;
 	var selement = null;
-	for(var i=0; i<this.selection.position; i++){
-		if(!isset(i, this.selection.selements)) continue;
-		if(!isset(this.selection.selements[i], this.selements)) continue;
+	for(var selementid in this.selection.selements){
+		if(!isset(selementid, this.selements)) continue;
 
 		count++;
-		selement = this.selements[this.selection.selements[i]];
+		selement = this.selements[selementid];
 
 		if(count > 4) this.multiContainer.container.style.height = '127px';
 		else this.multiContainer.container.style.height = 'auto';
@@ -1372,11 +1379,8 @@ update_linkContainer: function(e){
 
 	var selementid = 0;
 	var linkids = {};
-	for(var i=0; i<this.selection.position; i++){
-		if(!isset(i, this.selection.selements)) continue;
-		if(!isset(this.selection.selements[i], this.selements)) continue;
-
-		selementid = this.selection.selements[i];
+	for(var selementid in this.selection.selements){
+		if(!isset(selementid, this.selements)) continue;
 
 		var current_linkids = this.get_linkid_by_selementids(selementid);
 		for(var linkid in current_linkids){
@@ -1409,7 +1413,7 @@ update_linkContainer: function(e){
 
 		var e_span_5 = document.createElement('span');
 		e_span_5.className = "link";
-		addListener(e_span_5, 'click', this.updateForm_link.bindAsEventListener(this, linkid));
+		addListener(e_span_5, 'click', this.form_link_update.bindAsEventListener(this, linkid));
 		e_span_5.appendChild(document.createTextNode(locale['S_LINK']+' '+count));
 		e_td_4.appendChild(e_span_5);
 
@@ -1453,9 +1457,21 @@ update_linkContainer: function(e){
 
 //  SELEMENTS FORM ----------------------------------------------------------------------------
 //---------------------------------------------------------------------------------------------
+form_selement_newUrl: function(e){
+	this.debug('form_selement_newUrl');
+//--
 
-createForm_selement: function(e){
-this.debug('createForm_selement');
+	var selementid = this.selementForm.selementid.value;
+
+	var ll = $(this.selementForm.urls).select('tr[id^=urlrow]').length;
+	var sysmapelementurlid = selementid+''+ll;
+	var tpl = new Template(ZBX_TPL.selementFormUrls);
+	
+	$('urlfooter').insert({'before' : tpl.evaluate({'sysmapelementurlid': sysmapelementurlid})});
+},
+
+form_selement_create: function(e){
+this.debug('form_selement_create');
 
 // var initialization of diferent types of form
 	this.selementForm.typeDOM = {};
@@ -1559,7 +1575,7 @@ this.selementForm.elementtype = e_select_6;
 	e_select_6.setAttribute('id',"elementtype");
 	e_td_5.appendChild(e_select_6);
 
-	addListener(e_select_6, 'change', this.updateForm_selementByType.bindAsEventListener(this,false));
+	addListener(e_select_6, 'change', this.form_selement_updateByType.bindAsEventListener(this,false));
 
 
 	var e_option_7 = document.createElement('option');
@@ -1804,7 +1820,7 @@ this.selementForm.advanced_icons = e_input_6;
 	e_input_6.setAttribute('id', "advanced_icons");
 	e_input_6.className = 'checkbox';
 	e_td_5.appendChild(e_input_6);
-	addListener(e_input_6, 'click', this.updateForm_selementByIcons.bindAsEventListener(this));
+	addListener(e_input_6, 'click', this.form_selement_updateByIcons.bindAsEventListener(this));
 
 	var icons = zbxSelementIcons['icons'];
 	for(var iconid in icons){
@@ -1830,7 +1846,7 @@ this.selementForm.typeDOM.iconid_on = e_tr_4;
 	e_td_5.className = "form_row_l";
 
 	var e_input_6 = document.createElement('input');
-this.selementForm.massEdit.chkboxIconid_on = e_input_6
+this.selementForm.massEdit.chkboxIconid_on = e_input_6;
 	e_input_6.setAttribute('type', 'checkbox');
 	e_input_6.setAttribute('name', "chkboxIconid_on");
 	e_input_6.setAttribute('id', "chkboxIconid_on");
@@ -1885,7 +1901,7 @@ this.selementForm.typeDOM.iconid_unknown = e_tr_4;
 	e_td_5.className = "form_row_l";
 
 	var e_input_6 = document.createElement('input');
-this.selementForm.massEdit.chkboxIconid_unknown = e_input_6
+this.selementForm.massEdit.chkboxIconid_unknown = e_input_6;
 	e_input_6.setAttribute('type', 'checkbox');
 	e_input_6.setAttribute('name', "chkboxIconid_unknown");
 	e_input_6.setAttribute('id', "chkboxIconid_unknown");
@@ -1940,7 +1956,7 @@ this.selementForm.typeDOM.iconid_maintenance = e_tr_4;
 	e_td_5.className = "form_row_l";
 
 	var e_input_6 = document.createElement('input');
-this.selementForm.massEdit.chkboxIconid_maintenance = e_input_6
+this.selementForm.massEdit.chkboxIconid_maintenance = e_input_6;
 	e_input_6.setAttribute('type', 'checkbox');
 	e_input_6.setAttribute('name', "chkboxIconid_maintenance");
 	e_input_6.setAttribute('id', "chkboxIconid_maintenance");
@@ -1995,7 +2011,7 @@ this.selementForm.typeDOM.iconid_disabled = e_tr_4;
 	e_td_5.className = "form_row_l";
 
 	var e_input_6 = document.createElement('input');
-this.selementForm.massEdit.chkboxIconid_disabled = e_input_6
+this.selementForm.massEdit.chkboxIconid_disabled = e_input_6;
 	e_input_6.setAttribute('type', 'checkbox');
 	e_input_6.setAttribute('name', "chkboxIconid_disabled");
 	e_input_6.setAttribute('id', "chkboxIconid_disabled");
@@ -2100,44 +2116,17 @@ this.selementForm.y = e_input_6;
 	e_td_5.appendChild(e_input_6);
 
 
-// URL
+// URLS
 	var e_tr_4 = document.createElement('tr');
+this.selementForm.urls = e_tr_4;
 	e_tr_4.className = "even_row";
 	e_tbody_3.appendChild(e_tr_4);
 
 
-	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_l";
 
-	var e_input_6 = document.createElement('input');
-this.selementForm.massEdit.chkboxURL = e_input_6
-	e_input_6.setAttribute('type', 'checkbox');
-	e_input_6.setAttribute('name', "chkboxURL");
-	e_input_6.setAttribute('id', "chkboxURL");
+	$(e_tr_4).update(ZBX_TPL.selementFormUrlContainer);
 
-	e_input_6.className = 'checkbox';
-	e_td_5.appendChild(e_input_6);
-
-	e_td_5.appendChild(document.createTextNode(' '));
-	e_td_5.appendChild(document.createTextNode(locale['S_URL']));
-	e_tr_4.appendChild(e_td_5);
-
-
-	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_r";
-	e_tr_4.appendChild(e_td_5);
-
-
-	var e_input_6 = document.createElement('input');
-this.selementForm.url = e_input_6;
-	e_input_6.setAttribute('value', '');
-	e_input_6.setAttribute('size',"56");
-	e_input_6.setAttribute('id',"url");
-	e_input_6.setAttribute('name',"url");
-	e_input_6.className = "biginput";
-	e_td_5.appendChild(e_input_6);
-
-
+// Footer
 	var e_tr_4 = document.createElement('tr');
 	e_tr_4.className = "footer";
 	e_tbody_3.appendChild(e_tr_4);
@@ -2157,7 +2146,7 @@ this.selementForm.url = e_input_6;
 	e_input_6.setAttribute('value',locale['S_APPLY']);
 
 
-	addListener(e_input_6, 'click', this.saveForm_selement.bindAsEventListener(this));
+	addListener(e_input_6, 'click', this.form_selement_save.bindAsEventListener(this));
 
 	e_td_5.appendChild(document.createTextNode(' '));
 	e_td_5.appendChild(e_input_6);
@@ -2169,7 +2158,7 @@ this.selementForm.url = e_input_6;
 	e_input_6.className = "button";
 	e_input_6.setAttribute('value',locale['S_REMOVE']);
 
-	addListener(e_input_6, 'click', this.deleteForm_selement.bindAsEventListener(this));
+	addListener(e_input_6, 'click', this.form_selement_delete.bindAsEventListener(this));
 
 	e_td_5.appendChild(document.createTextNode(' '));
 	e_td_5.appendChild(e_input_6);
@@ -2181,26 +2170,31 @@ this.selementForm.url = e_input_6;
 	e_input_6.className = "button";
 	e_input_6.setAttribute('value',locale['S_CLOSE']);
 
-	addListener(e_input_6, 'click', this.hideForm.bindAsEventListener(this));
+	addListener(e_input_6, 'click', this.formHide.bindAsEventListener(this));
 
 	e_td_5.appendChild(e_input_6);
 },
 
-updateForm_selement: function(e, selementid){
-	this.debug('updateForm_selement');
+form_selement_update: function(e, selementid){
+	this.debug('form_selement_update');
 //--
 
 // Create if not exists
 	if(is_null($('selementForm'))){
-		this.createForm_selement(e);
+		this.form_selement_create(e);
 		$('divSelementForm').appendChild(this.selementForm.form);
-		$('divSelementForm').appendChild(document.createElement('br'));
+
+// assigning Listeners
+		$('newSelementUrl').observe('click', this.form_selement_newUrl.bindAsEventListener(this));
 	}
+//--
+
+// cleaning URLS
+	$(this.selementForm.urls).select('tr[id^=urlrow]').each(function(e){$(e).remove();});
 //--
 
 	if(this.selection.count == 1){
 		var selement = this.selements[selementid];
-
 // SELEMENT
 		this.selementForm.selementid.value = selementid;
 
@@ -2229,7 +2223,7 @@ updateForm_selement: function(e, selementid){
 		var advanced_icons = false;
 
 // Icon PROBLEM
-		advanced_icons = (advanced_icons || (selement.iconid_on != 0))?true:false;
+		advanced_icons = advanced_icons || (selement.iconid_on != 0);
 		for(var i=0; i<this.selementForm.iconid_on.options.length; i++){
 			if(!isset(i, this.selementForm.iconid_on.options)) continue;
 
@@ -2239,7 +2233,7 @@ updateForm_selement: function(e, selementid){
 		}
 
 // Icon UNKNOWN
-		advanced_icons = (advanced_icons || (selement.iconid_unknown != 0))?true:false;
+		advanced_icons = advanced_icons || (selement.iconid_unknown != 0);
 		for(var i=0; i<this.selementForm.iconid_unknown.options.length; i++){
 			if(!isset(i, this.selementForm.iconid_unknown.options)) continue;
 
@@ -2249,7 +2243,7 @@ updateForm_selement: function(e, selementid){
 		}
 
 // Icon MAINTENANCE
-		advanced_icons =(advanced_icons || (selement.iconid_maintenance != 0))?true:false;
+		advanced_icons = advanced_icons || (selement.iconid_maintenance != 0);
 		for(var i=0; i<this.selementForm.iconid_maintenance.options.length; i++){
 			if(!isset(i, this.selementForm.iconid_maintenance.options)) continue;
 
@@ -2260,7 +2254,7 @@ updateForm_selement: function(e, selementid){
 
 // Icon DISABLED
 
-		advanced_icons = (advanced_icons || (selement.iconid_disabled != 0))?true:false;
+		advanced_icons = advanced_icons || (selement.iconid_disabled != 0);
 		for(var i=0; i<this.selementForm.iconid_disabled.options.length; i++){
 			if(!isset(i, this.selementForm.iconid_disabled.options)) continue;
 
@@ -2277,10 +2271,21 @@ updateForm_selement: function(e, selementid){
 		$(this.selementForm.x).value = selement.x;
 		$(this.selementForm.y).value = selement.y;
 
-// URL
-		this.selementForm.url.value = selement.url;
+// URLS
+		var emptyUrls = true;
+		for(var urlname in selement.urls){
+			if(empty(selement.urls[urlname])) continue;
 
-		this.updateForm_selementByType(e, false);
+			var tpl = new Template(ZBX_TPL.selementFormUrls);
+			$('urlfooter').insert({'before' : tpl.evaluate(selement.urls[urlname])});
+			emptyUrls = false;
+		}
+
+		if(emptyUrls){
+			this.form_selement_newUrl(e);
+		}
+
+		this.form_selement_updateByType(e, false);
 	}
 	else{
 // SELEMENT
@@ -2307,16 +2312,13 @@ updateForm_selement: function(e, selementid){
 // Icon DISABLED
 		this.selementForm.iconid_disabled.selectedIndex = 0;
 
-// URL
-		this.selementForm.url.value = '';
-
-		this.updateForm_selementByType(e,true);
+		this.form_selement_updateByType(e,true);
 	}
 },
 
 // UPDATE FORM BY element TYPE
-updateForm_selementByIcons: function(e){
-	this.debug('updateForm_selementByIcons');
+form_selement_updateByIcons: function(e){
+	this.debug('form_selement_updateByIcons');
 //--
 
 	var advanced = this.selementForm.advanced_icons.checked;
@@ -2338,10 +2340,10 @@ updateForm_selementByIcons: function(e){
 },
 
 // UPDATE FORM BY element TYPE
-updateForm_selementByType: function(e, multi){
-	this.debug('updateForm_selementByType');
+form_selement_updateByType: function(e, multi){
+	this.debug('form_selement_updateByType');
 //--
-	if(typeof(multi) == 'undefined') var multi = false;
+	if(typeof(multi) == 'undefined') multi = false;
 	var display_style = IE?'block':'table-row';
 
 	if(multi){
@@ -2352,7 +2354,6 @@ updateForm_selementByType: function(e, multi){
 		this.selementForm.massEdit.chkboxIconid_unknown.style.display = 'inline';
 		this.selementForm.massEdit.chkboxIconid_maintenance.style.display = 'inline';
 		this.selementForm.massEdit.chkboxIconid_disabled.style.display = 'inline';
-		this.selementForm.massEdit.chkboxURL.style.display = 'inline';
 
 		this.selementForm.massEdit.elementtype.style.display = 'none';
 		this.selementForm.massEdit.elementName.style.display = 'none';
@@ -2368,9 +2369,11 @@ updateForm_selementByType: function(e, multi){
 		this.selementForm.massEdit.x.style.display = 'none';
 		this.selementForm.massEdit.y.style.display = 'none';
 
+		this.selementForm.urls.style.display = 'none';
+
 		this.selementForm.advanced_icons.checked = true;
 
-		this.updateForm_selementByIcons(e);
+		this.form_selement_updateByIcons(e);
 		return true;
 	}
 	else{
@@ -2381,7 +2384,6 @@ updateForm_selementByType: function(e, multi){
 		this.selementForm.massEdit.chkboxIconid_unknown.style.display = 'none';
 		this.selementForm.massEdit.chkboxIconid_maintenance.style.display = 'none';
 		this.selementForm.massEdit.chkboxIconid_disabled.style.display = 'none';
-		this.selementForm.massEdit.chkboxURL.style.display = 'none';
 
 		this.selementForm.massEdit.chkboxLabel.checked = false;
 		this.selementForm.massEdit.chkboxLabelLocation.checked = false;
@@ -2390,12 +2392,13 @@ updateForm_selementByType: function(e, multi){
 		this.selementForm.massEdit.chkboxIconid_unknown.checked = false;
 		this.selementForm.massEdit.chkboxIconid_maintenance.checked = false;
 		this.selementForm.massEdit.chkboxIconid_disabled.checked = false;
-		this.selementForm.massEdit.chkboxURL.checked = false;
 
 		this.selementForm.massEdit.elementtype.style.display = display_style;
 		this.selementForm.massEdit.elementName.style.display = display_style;
 		this.selementForm.massEdit.x.style.display = display_style;
 		this.selementForm.massEdit.y.style.display = display_style;
+
+		this.selementForm.urls.style.display = display_style;
 	}
 
 	var selementid = this.selementForm.selementid.value;
@@ -2501,17 +2504,15 @@ updateForm_selementByType: function(e, multi){
 		this.selementForm.elementTypeSelect.onclick =  function(){ PopUp(popup_url,450,450);};
 	}
 
-	this.updateForm_selementByIcons(e);
+	this.form_selement_updateByIcons(e);
 },
 
-saveForm_selement: function(e){
-	this.debug('saveForm_selement');
+form_selement_save: function(e){
+	this.debug('form_selement_save');
 //--
 
 	if(this.selection.count == 1){
 		var selementid = this.selementForm.selementid.value;
-		var selement = this.selements[selementid];
-
 		var params = {};
 
 // Element Type
@@ -2583,8 +2584,28 @@ saveForm_selement: function(e){
 		this.selementForm.x.value = params.x;
 		this.selementForm.y.value = params.y;
 
-// URL
-		params.url = this.selementForm.url.value;
+// URLS
+		params.urls = {};
+		var urlrows = $(this.selementForm.urls).select('tr[id^=urlrow]');
+
+		for(var i=0; i < urlrows.length; i++){
+			var urlid = urlrows[i].id.split('_')[1];
+
+			var url = {
+				'sysmapelementurlid': urlid,
+				'name': $('url_name_'+urlid).value,
+				'url': $('url_url_'+urlid).value
+			};
+
+			if(empty(url.name) && empty(url.url)) continue;
+
+			if(empty(url.name) || empty(url.url)){
+				alert('Incorrect map element link is given');
+				return false;
+			}
+			
+			params.urls[url.name] = url;
+		}
 
 		this.updateSelementOption(selementid, params);
 	}
@@ -2619,15 +2640,8 @@ saveForm_selement: function(e){
 		if(this.selementForm.massEdit.chkboxIconid_disabled.checked)
 			params.iconid_disabled = this.selementForm.iconid_disabled.options[this.selementForm.iconid_disabled.selectedIndex].value;
 
-// URL
-		if(this.selementForm.massEdit.chkboxURL.checked)
-			params.url = this.selementForm.url.value;
-
-		for(var i=0; i < this.selection.position; i++){
-			if(!isset(i, this.selection.selements)) continue;
-			if(!isset(this.selection.selements[i], this.selements)) continue;
-
-			var selementid = this.selection.selements[i];
+		for(var selementid in this.selection.selements){
+			if(!isset(selementid, this.selements)) continue;
 			this.updateSelementOption(selementid, params);
 		}
 		this.updateSelementOption(selementid, params);
@@ -2635,11 +2649,11 @@ saveForm_selement: function(e){
 
 	this.updateMapImage();
 	this.update_multiContainer(e);
-//	this.hideForm();
+//	this.formHide();
 },
 
-deleteForm_selement: function(e){
-	this.debug('deleteForm_selement');
+form_selement_delete: function(e){
+	this.debug('form_selement_delete');
 //--
 	//removing all selected elements
 	this.remove_selements();
@@ -2667,8 +2681,8 @@ deleteForm_selement: function(e){
 //**************************************************************************************************************************************************
 //**************************************************************************************************************************************************
 
-hideForm_link: function(e){
-	this.debug('hideForm_link');
+form_link_hide: function(e){
+	this.debug('form_link_hide');
 //--
 
 	if(!isset('form', this.linkForm) || empty(this.linkForm.form)) return false;
@@ -2677,8 +2691,8 @@ hideForm_link: function(e){
 	this.linkForm.form = null;
 },
 
-createForm_link: function(e){
-	this.debug('createForm_link');
+form_link_create: function(e){
+	this.debug('form_link_create');
 //--
 
 
@@ -2965,7 +2979,7 @@ this.linkForm.colorPicker = e_div_6;
 	e_input_6.className = "button";
 	e_input_6.setAttribute('value',locale['S_APPLY']);
 	e_td_5.appendChild(e_input_6);
-	addListener(e_input_6, 'click', this.saveForm_link.bindAsEventListener(this));
+	addListener(e_input_6, 'click', this.form_link_save.bindAsEventListener(this));
 
 
 	e_td_5.appendChild(document.createTextNode(' '));
@@ -2977,7 +2991,7 @@ this.linkForm.colorPicker = e_div_6;
 	e_input_6.className = "button";
 	e_input_6.setAttribute('value',locale['S_REMOVE']);
 	e_td_5.appendChild(e_input_6);
-	addListener(e_input_6, 'click', this.deleteForm_link.bindAsEventListener(this));
+	addListener(e_input_6, 'click', this.form_link_delete.bindAsEventListener(this));
 
 
 	e_td_5.appendChild(document.createTextNode(' '));
@@ -2988,20 +3002,20 @@ this.linkForm.colorPicker = e_div_6;
 	e_input_6.setAttribute('name',"close");
 	e_input_6.className = "button";
 	e_input_6.setAttribute('value',locale['S_CLOSE']);
-	addListener(e_input_6, 'click', this.hideForm_link.bindAsEventListener(this));
+	addListener(e_input_6, 'click', this.form_link_hide.bindAsEventListener(this));
 
 
 	e_td_5.appendChild(e_input_6);
 },
 
-updateForm_link: function(e, linkid){
-	this.debug('updateForm_link');
+form_link_update: function(e, linkid){
+	this.debug('form_link_update');
 //--
 
 	if(!isset(linkid, this.links)) return false;
 
 	if(is_null($('linkForm'))){
-		this.createForm_link(e);
+		this.form_link_create(e);
 		$('divSelementForm').appendChild(this.linkForm.form);
 	}
 
@@ -3107,7 +3121,7 @@ this.linkForm.linkIndicatorsBody = e_tbody_7;
 	for(var linktriggerid in maplink.linktriggers){
 		if(empty(maplink.linktriggers[linktriggerid])) continue;
 
-		this.linkForm_addLinktrigger(maplink.linktriggers[linktriggerid]);
+		this.form_link_addLinktrigger(maplink.linktriggers[linktriggerid]);
 	}
 
 	$(this.linkForm.linkIndicatorsTable).update(e_table_6);
@@ -3152,8 +3166,8 @@ this.linkForm.linkIndicatorsBody = e_tbody_7;
 },
 
 
-linkForm_addLinktrigger: function(linktrigger){
-	this.debug('linkForm_addLinktrigger');
+form_link_addLinktrigger: function(linktrigger){
+	this.debug('form_link_addLinktrigger');
 //--
 
 	var triggerid = linktrigger.triggerid;
@@ -3306,8 +3320,8 @@ linkForm_addLinktrigger: function(linktrigger){
 	e_td_9.appendChild(e_div_10);
 },
 
-saveForm_link: function(e){
-	this.debug('saveForm_link');
+form_link_save: function(e){
+	this.debug('form_link_save');
 //--
 
 	var linkid = this.linkForm.linkid.value;
@@ -3380,13 +3394,13 @@ saveForm_link: function(e){
 	 * @author Konstantin Buravcov
 	 * @since 08.09.2010
 	 */
-	//this.hideForm_link(e);
+	//this.form_link_hide(e);
 
 	this.updateMapImage();
 },
 
-deleteForm_link: function(e){
-	this.debug('deleteForm_link');
+form_link_delete: function(e){
+	this.debug('form_link_delete');
 //--
 
 	var linkid = this.linkForm.linkid.value;
@@ -3397,7 +3411,7 @@ deleteForm_link: function(e){
 	if(Confirm('Remove link between "'+this.selements[maplink.selementid1].label+'" and "'+this.selements[maplink.selementid2].label+'"?')){
 		this.remove_link(linkid, true);
 		this.update_linkContainer(e);
-		this.hideForm_link(e);
+		this.form_link_hide(e);
 	}
 	else
 		return false;
@@ -3504,6 +3518,7 @@ updateMapView: function(e){
 });
 //]]
 
+/*
 // *******************************************************************
 //		SELEMENT object (unfinished)
 // *******************************************************************
@@ -3543,7 +3558,7 @@ initialize: function($super, sysmap, params){
 			'favid':	this.id,
 			'sysmapid':	this.sysmapid,
 			'action':	'new_selement'
-		}
+		};
 
 		params['selements'] = Object.toJSON({'0': selement});
 
@@ -3785,4 +3800,5 @@ makeDragable: function(){
 
 }
 });
+*/
 //]]

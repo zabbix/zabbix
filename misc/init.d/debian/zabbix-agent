@@ -1,18 +1,15 @@
-#! /bin/sh
+#!/bin/sh
 #
 # Zabbix agent start/stop script.
 #
 # Written by Alexei Vladishev <alexei.vladishev@zabbix.com>.
 
 NAME=zabbix_agentd
-PATH=/bin:/usr/bin:/sbin:/usr/sbin:/home/zabbix/bin
-DAEMON=/home/zabbix/bin/${NAME}
+DAEMON=/usr/local/sbin/${NAME}
 DESC="Zabbix agent daemon"
 PID=/tmp/$NAME.pid
 
 test -f $DAEMON || exit 0
-
-set -e
 
 case "$1" in
   start)
@@ -26,24 +23,11 @@ case "$1" in
 		--exec $DAEMON
 	;;
   restart|force-reload)
-	#
-	#	If the "reload" option is implemented, move the "force-reload"
-	#	option to the "reload" entry above. If not, "force-reload" is
-	#	just the same as "restart".
-	#
-#	echo -n "Restarting $DESC: zabbix_agent"
 	$0 stop
 	$0 start
-#	start-stop-daemon --stop --quiet --pidfile \
-#		/tmp/$NAME.pid --user zabbix --exec $DAEMON
-#	sleep 1
-#	start-stop-daemon --start --quiet --pidfile \
-#		/tmp/$NAME.pid --user zabbix --exec $DAEMON
-#	echo "$NAME."
 	;;
   *)
 	N=/etc/init.d/$NAME
-	# echo "Usage: $N {start|stop|restart|force-reload}" >&2
 	echo "Usage: $N {start|stop|restart|force-reload}" >&2
 	exit 1
 	;;

@@ -90,6 +90,9 @@ function __autoload($class_name){
 	require_once('include/services.inc.php');
 	require_once('include/httptest.inc.php');
 
+	include_once('include/actions.inc.php');
+	include_once('include/discovery.inc.php');
+
 	require_once('include/sounds.inc.php');
 	require_once('include/images.inc.php');
 	require_once('include/events.inc.php');
@@ -198,7 +201,7 @@ function __autoload($class_name){
 		$show_setup = true;
 	}
 
-	if(!defined('ZBX_PAGE_NO_AUTHORIZATION')){
+	if(!defined('ZBX_PAGE_NO_AUTHORIZATION') && !defined('ZBX_RPC_REQUEST')){
 		check_authorisation();
 
 		if(file_exists('include/locales/'.$USER_DETAILS['lang'].'.inc.php')){
@@ -308,6 +311,9 @@ function __autoload($class_name){
 	function detect_page_type($default=PAGE_TYPE_HTML){
 		if(isset($_REQUEST['output'])){
 			switch($_REQUEST['output']){
+				case 'text':
+					return PAGE_TYPE_TEXT;
+					break;
 				case 'ajax':
 					return PAGE_TYPE_JS;
 					break;

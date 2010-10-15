@@ -321,7 +321,7 @@ include_once('include/page_header.php');
 
 
 	if(!zbx_empty($_REQUEST['txt_select'])){
-		$options['pattern'] = $_REQUEST['txt_select'];
+		$options['search'] = array('description' => $_REQUEST['txt_select']);
 	}
 	if($show_triggers == TRIGGERS_OPTION_ONLYTRUE){
 		$options['only_true'] = 1;
@@ -369,20 +369,23 @@ include_once('include/page_header.php');
 				'value' => TRIGGER_VALUE_TRUE,
 				'nopermissions' => 1
 			);
-			$event_count = CEvent::get($options);
-
-			$triggers[$tnum]['event_count'] = $event_count['rowscount'];
+			$triggers[$tnum]['event_count'] = CEvent::get($options);
 		}
 	}
 
-	$trigger_hosts = array();
-	foreach($triggers as $tnum => $trigger){
-		$trigger_hosts = array_merge($trigger_hosts, $trigger['hosts']);
-		$triggers[$tnum]['events'] = array();
-	}
-	$trigger_hostids = zbx_objectValues($trigger_hosts, 'hostid');
 
-	$scripts_by_hosts = Cscript::getScriptsByHosts($trigger_hostids);
+	$tr_hostids = array();
+	foreach($triggers as $tnum => $trigger){
+		$triggers[$tnum]['events'] = array();
+
+		//getting all host ids and names
+		foreach($trigger['hosts'] as $tr_hosts){
+			$tr_hostids[$tr_hosts['hostid']] = $tr_hosts['hostid'];
+		}
+	}
+
+
+	$scripts_by_hosts = Cscript::getScriptsByHosts($tr_hostids);
 
 	if($show_events != EVENTS_OPTION_NOEVENT){
 		$ev_options = array(
@@ -416,16 +419,33 @@ include_once('include/page_header.php');
 
 
 	foreach($triggers as $tnum => $trigger){
+		
 		$trigger['desc'] = $description = expand_trigger_description($trigger['triggerid']);
 
-// Items
 		$items = array();
+
+		$used_hosts = array();
+		foreach($trigger['hosts'] as $th){
+			$used_hosts[$th['hostid']] = $th['host'];
+		}
+		$used_host_count = count($used_hosts);
+
 		foreach($trigger['items'] as $inum => $item){
+
+			$item_description = item_description($item);
+
+			//if we have items from different hosts, we must prefix a host name
+			if ($used_host_count > 1) {
+				$item_description = $used_hosts[$item['hostid']].':'.$item_description;
+			}
+
 			$items[$inum]['itemid'] = $item['itemid'];
 			$items[$inum]['action'] = str_in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64)) ? 'showgraph' : 'showvalues';
-			$items[$inum]['description'] = item_description($item);
+			$items[$inum]['description'] = $item_description;
 		}
 		$trigger['items'] = $items;
+
+
 //----
 
 		$description = new CSpan($description, 'link_menu');
@@ -450,6 +470,8 @@ include_once('include/page_header.php');
 				"', 'lastchange': '".$trigger['lastchange']."'}, ".$menu_trigger_conf.", ".$menu_trigger_url."),".
 			zbx_jsvalue($items, true).");"
 		);
+
+		
 // }}} trigger description js menu
 
 		if($_REQUEST['show_details']){
@@ -524,6 +546,8 @@ include_once('include/page_header.php');
 
 			$menus = rtrim($menus,',');
 			$menus = 'show_popup_menu(event,['.$menus.'],180);';
+			
+			
 
 			$maint_span = null;
 			if($trigger_host['maintenance_status']){
@@ -543,18 +567,24 @@ include_once('include/page_header.php');
 				$maint_span->setHint($maint_hint);
 			}
 
+			
+
 
 			$hosts_span = new CSpan($trigger_host['host'], 'link_menu');
 			$hosts_span->setAttribute('onclick','javascript: '.$menus);
 			$hosts_list[] = $hosts_span;
 			$hosts_list[] = $maint_span;
 			$hosts_list[] = ', ';
+
+			
 		}
 
 		array_pop($hosts_list);
 		$host = new CCol($hosts_list);
 		$host->addStyle('white-space: normal;');
 // }}} host JS menu
+
+		
 
 
 		$status = new CSpan(trigger_value2str($trigger['value']), get_trigger_value_style($trigger['value']));

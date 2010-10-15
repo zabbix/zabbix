@@ -1,5 +1,7 @@
 Changes for 1.9
 
+ - [DEV-485] added multiple urls for map elements (Vedmak)
+ - [ZBX-3045] fixed deleting mediatype (Vedmak)
  - [DEV-471] field graph_theme.noneworktimecolor renamed to nonworktimecolor (Sasha)
  - [DEV-471] database integrity - added foreign keys (Sasha,Vedmak)
  - [ZBXNEXT-483] added vfs.file.contents[file,encoding] check (asaveljevs)
@@ -8,23 +10,63 @@ Changes for 1.9
  - [DEV-449] added system.localtime[local] check (Sasha)
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
+Changes for 1.8.4rc2
+
+ - [ZBX-2981] removed unnecessary queries in map permission checks (Vedmak)
+ - [ZBX-3080] fixed javascript not cached by browsers (Vedmak)
+ - [ZBX-2661] improved displaying discovery checks in configuration (Vedmak)
+ - [ZBX-3086] fixed errors when edit hostgroup linkage for hosts and templates (Vedmak)
+ - [ZBX-3025] resurrected unreachable pollers and StartPollersUnreachable configuration parameter (asaveljevs,Sasha)
+ - [ZBX-2351] fixed server trying to insert duplicate eventids into the database (asaveljevs,Sasha)
+ - [ZBX-3069] renamed monitoring graphs combobox "All" entry to "not selected" (Vedmak)
+
 Changes for 1.8.4rc1
 
-- [ZBX-1486] When multiple map elements are selected, if you press "Remove" in editig form, all selected elements are now removed (KB)
- - [ZBX-1442] When linking objects during map editing, link "apply" does not close the form any more (KB)
- - [ZBX-2986] acknowledges now are hidden in last 20 issue popup, when are turned off (KB)
+ - [ZBX-2872] greatly improved API methods consistency (Aly)
+ - [ZBX-3070] fixed event date format inconsistency (Vedmak)
+ - [ZBX-3068] fixed possible crash of server while processing passive proxies (Sasha)
+ - [ZBX-3068] fixed server memory leak while processing passive proxies (Sasha)
+ - [ZBX-2749] fixed length parameter being ignored for web.page.regexp[] (asaveljevs)
+ - [ZBX-2749] fixed agent crash in web.page.regexp[] on very long matched fragments (asaveljevs)
+ - [ZBX-2913] fixed agent becoming unresponsive due to web.page.* checks (asaveljevs)
+ - [ZBXNEXT-430] added support of net.tcp.listen and net.udp.listen under Linux (Sasha)
+ - [ZBX-453] fixed --disable-static enabling static compilation (asaveljevs)
+ - [ZBX-2992] acknowledges are now hidden in event details when turned off (KB)
+ - [ZBX-3050] fixed that host can be named like an existing template and otherwise (KB)
+ - [ZBX-3019] fixed templated graphs not being copied to discovered hosts in DM setup; thanks to Alexander Ignatyev (asaveljevs)
+ - [ZBX-2860] fixed usergroup renaming (Vedmak)
+ - [ZBX-3027] avg, delta, max, min, sum functions in popup_trexpr.php have a time shift input, so that this parameter now can be specified through GUI (KB)
+ - [ZBX-2827] added checks when adding or updating maintenances, so that duplicate names could not be added (KB)
+ - [ZBX-2978] fixed graphs import with Y axis set to an item (Vedmak)
+ - [ZBX-2507] minimal graph dimension size is set to 20 pixels (Vedmak)
+ - [ZBX-2665] web scenario steps on graphs now are in correct order (Vedmak)
+ - [ZBX-2995] fixed crash in zbx_mem_realloc(), reduced memory usage and memory fragmentation in configuration cache (asaveljevs)
+ - [ZBX-3024] in trigger expression selection popup, expressions are now filtered, depending on item type (KB)
+ - [ZBX-3023] fixed repeated notifications after maintenance period (Sasha)
+ - [ZBX-3017] fixed error when try to add dependency to template trigger that is linked to a host (Vedmak)
+ - [ZBX-3008] fixed server generating multiple unknown events for triggers with multiple items (asaveljevs)
+ - [ZBX-3011] passwords are no longer shown in HTML when editing media types (Vedmak)
+ - [ZBXNEXT-510] sending of SMS messages through Ez Texting is now integrated into Zabbix (asaveljevs,Vedmak)
+ - [ZBX-1425] option ALL is added to host group dropdown when adding or editing host group (KB)
+ - [ZBX-1675] fixed map element coordinates do not update after the element has been dragged (Vedmak)
+ - [ZBX-1292] item names are now prefixed with host names, if they are from different hosts in trigger discription popup (KB)
+ - [ZBX-2844] added HTML escaping of screen names in combox box output in monitoring (KB)
+ - [ZBXNEXT-373] added support for NTLM authentication to Web monitoring (asaveljevs,Vedmak)
+ - [ZBX-1486] when multiple map elements are selected, pressing "Remove" in editing form removes all selected elements (KB)
+ - [ZBX-1442] when linking objects during map editing, link "apply" does not close the form any more (KB)
+ - [ZBX-2986] acknowledges now are hidden in last 20 issue popup when turned off (KB)
+ - [ZBX-2988] fixed {ITEM.VALUE} macro in Monitoring/Events screen (Sasha)
  - [ZBX-2974] fixed possibility to delete templated applications (Vedmak)
  - [ZBX-1172] added sorting for audit resource dropdown (Vedmak)
- - [ZBX-2982] added ip and port of zabbix server in dashboard widget "Status of Zabbix" (Vedmak)
+ - [ZBX-2982] added IP and port of Zabbix server in dashboard widget "Status of Zabbix" (Vedmak)
  - [ZBX-2964] fixed processes failing to start when no IPv6 is available on the system (asaveljevs,Sasha)
  - [ZBX-2977] fixed removing unused records in node_cksum table; thanks to Łukasz Reszka (Sasha)
  - [ZBX-2946] fixed building from FreeBSD ports with libexecinfo installed; thanks to Dmitry Yakovlev (asaveljevs)
  - [ZBX-2957] changed mime type for downloadable locale file (Vedmak)
  - [ZBX-2493] fixed obsolete macro used by default; start using different subject and message for default action messages (Richlv)
- - [ZBX-2976] fixed server crash when performing zabbix[items_unsupported] under DebugLevel=4 (asaveljevs)
+ - [ZBX-2976] fixed server crash when processing zabbix[items_unsupported] under DebugLevel=4 (asaveljevs)
  - [ZBX-2950] added popup menus for map elements (Vedmak)
  - [ZBX-2967] added filter for hosts configuration screen (Vedmak)
- - [ZBX-2969] improved SQL statement for synchronizing of nodes; thanks to Łukasz Reszka (Sasha)
  - [ZBX-2962] fixed template macro update (Vedmak)
  - [ZBX-2572] added configuration define for zapcat compatibility mode (Vedmak)
  - [ZBX-2690] added validation for screens xml (Vedmak)
@@ -36,7 +78,7 @@ Changes for 1.8.4rc1
  - [ZBXNEXT-458] user macros (e.g., {$MACRO}) can now be used in item and trigger descriptions (asaveljevs,Vedmak)
  - [ZBX-2959] fixed trailing whitespace & missing trailing newline in downloaded translations (Richlv)
  - [ZBX-2910] fixed 'strerror_from_system undefined' compilation warning on Windows; thanks to Takanori Suzuki (asaveljevs)
- - [ZBX-2902] fixed system.cpu.load[] and system.cpu.util[] being slightly exaggerated on Windows (asaveljevs)
+ - [ZBX-2902] fixed system.cpu.load[] and system.cpu.util[] being slightly exaggerated on Windows; thanks to Kodai Terashima (asaveljevs)
  - [ZBX-2954] fixed translations in template delete popups (Vedmak)
  - [ZBX-2938] fixed not showing problems on map for hosts in maintenance (Vedmak)
  - [ZBXNEXT-238] made zabbix_sender gather as much data as possible before sending (asaveljevs)
@@ -72,7 +114,7 @@ Changes for 1.8.3
  - [ZBX-2875] updated Japanese translation; thanks to Kodai Terashima (Richlv)
  - [ZBX-2856] removed debug info (Aly)
  - [ZBX-2855] fixed new line symbol for latest Opera browser (Aly)
- 
+
 Changes for 1.8.3rc4
 
  - [ZBX-2226] fixed template item update, when linked to host with existing item with same key (Aly)
@@ -96,7 +138,7 @@ Changes for 1.8.3rc4
  - [ZBX-2784] changed icons style (Vedmak)
  - [ZBX-2820] fixed minor visual bugs (Vedmak)
  - [ZBX-2766] fixed triggers info in status of triggers page in fullscreen mode (Aly)
- 
+
 Changes for 1.8.3rc3
 
  - [ZBX-2799] fixed map element host in maintenance (Aly)
@@ -144,7 +186,7 @@ Changes for 1.8.3rc2
  - [ZBX-2740] fixed js errors in items section in IE (Aly)
 
 Changes for 1.8.3rc1
- 
+
  - [DEV-468] added new frontend theme - Dark orange (Aly)
  - [ZBX-2731] fixed permissions problem with hostgroup names containing '[]' (Vedmak)
  - [ZBX-2733] fixed the timer process so that it does not recalculate extraneous triggers for an item (asaveljevs)
@@ -253,7 +295,7 @@ Changes for 1.8.3rc1
  - [ZBX-1357] updated German translation; thanks to Peter Schultz (Richlv)
  - [ZBX-2319] fixed escaping locales on download (Aly)
  - [ZBX-2460] fixed auto adding host group to updated host (Aly)
- - [ZBX-2367] improved using DISTINCT rule in queries in API (Aly) 
+ - [ZBX-2367] improved using DISTINCT rule in queries in API (Aly)
  - [ZBX-2408] fixed mute button in status of triggers page (Aly)
  - [ZBX-2477] fixed dynamic graphs disappear from screens (Vedmak)
  - [ZBX-1346] clarify some parameter values in the example configuration files (Richlv)
@@ -290,7 +332,7 @@ Changes for 1.8.3rc1
  - [ZBX-2253] fixed delete confirmation dialogue referring to empty element (Vedmak)
  - [ZBX-2370] fixed duration value in monitoring events for multiple problem triggers (Vedmak)
  - [ZBX-507] made UserParameters work with zabbix_agent(d) -p and -t (asaveljevs)
- - [ZBX-2326] fixed XSS vulnerability in triggers page; later independently discovered by VUPEN Security (Aly) 
+ - [ZBX-2326] fixed XSS vulnerability in triggers page; later independently discovered by VUPEN Security (Aly)
  - [ZBX-2326] fixed dynamic chart titles, now all symbols are rendered correctly (Maxim Andruhovich / AM)
  - [ZBX-2250] value mapping is now applied for {ITEM.LASTVALUE} macro inside triggers description (Vedmak)
  - [ZBX-1436] fixed trigger events display after next steps  monitoring -> triggers -> click on any event time (Maxim Andruhovich / AM)
@@ -340,7 +382,7 @@ Changes for 1.8.3rc1
  - [ZBX-2337] fixed error when selecting a web item in trigger configuration (Vedmak)
  - [ZBX-2306] fixed links for graphs in screens (Aly)
  - [ZBX-633] removed linkage of OpenIPMI library to Agents in "configure" script (Sasha)
- - [ZBX-633] more debug information in checks_ipmi.c module (Sasha) 
+ - [ZBX-633] more debug information in checks_ipmi.c module (Sasha)
  - [ZBX-2362] fixed processing of logrt[] checks under Windows (Sasha)
  - [ZBX-2356] fixed error while performing group actions when creating an item (Vedmak)
  - [ZBX-2355] fixed error when trying to massupdate trigger severity (Vedmak)
@@ -2212,6 +2254,7 @@ Integrated from 1.1.x
  - fixed processing of item calculated as delta speed per second (Alexei)
 
 1.1.3
+
  - added Dutch translation (Alexei)
  - fixed processing of SNMP HEX and OCTET string values (Alexei)
  - fixed system.swap.in[] and system.swap.out[] under Linux 2.4 (Alexei)
@@ -3363,8 +3406,7 @@ Changes for 1.0beta8:
  - WIN32 agent. Listener thread now will not exit on any accept() error (Victor)
  - WIN32 agent. Added some parameters for agent statistics monitoring: number of accepted and rejected connections, processing errors, etc. (Victor)
  - WIN32 agent. Fixed bug in calculation of md5_hash[] and cksum[] parameters for zero-length files (Victor)
- - WIN32 agent. md5_hash[] and cksum[] now ruturns UNSUPPORTED for files larger than 64MB (due to high performance impact caused by checksum computing for large files). (Victor)
-
+ - WIN32 agent. md5_hash[] and cksum[] now returns UNSUPPORTED for files larger than 64MB (due to high performance impact caused by checksum computing for large files). (Victor)
 
 Changes for 1.0beta7:
 

@@ -34,7 +34,7 @@ include_once('include/page_header.php');
 	$fields=array(
 		'period'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	BETWEEN(ZBX_MIN_PERIOD,ZBX_MAX_PERIOD),	null),
 		'stime'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	null,			null),
-		
+
 		'httptestid'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	null,			null),
 		'http_item_type'=>	array(T_ZBX_INT, O_OPT,	null,	null,			null),
 
@@ -85,24 +85,24 @@ include_once('include/page_header.php');
 		);
 
 		$items = array();
-		$sql = 'SELECT i.*'.
+		$sql = 'SELECT i.itemid'.
 				' FROM httpstepitem hi, items i, httpstep hs'.
 				' WHERE i.itemid=hi.itemid'.
 					' AND hs.httptestid='.$httptestid.
 					' AND hs.httpstepid=hi.httpstepid'.
 					' AND hi.type='.get_request('http_item_type', HTTPSTEP_ITEM_TYPE_TIME).
-				' ORDER BY hs.no ASC';
+				' ORDER BY hs.no DESC';
 
 		$db_items = DBselect($sql);
 		while($item_data = DBfetch($db_items)){
 			$item_color = $color[$color['current'] = $color[$color['current']]['next']]['color'];
-			
+
 			$items[] = array(
 				'itemid' => $item_data['itemid'],
 				'color' => $item_color
 			);
 		}
-		
+
 		$httptest = get_httptest_by_httptestid($httptestid);
 		$graph_name = $httptest['name'];
 	}
@@ -113,9 +113,9 @@ include_once('include/page_header.php');
 		$options = array(
 			'webitems' => 1,
 			'itemids' => zbx_objectValues($items, 'itemid'),
-			'nodeids' => get_current_nodeid(true)
+			'nodeids' => get_current_nodeid(true),
+			'output' => API_OUTPUT_SHORTEN,
 		);
-
 		$db_data = CItem::get($options);
 		$db_data = zbx_toHash($db_data, 'itemid');
 		foreach($items as $id => $gitem){
@@ -168,6 +168,6 @@ include_once('include/page_header.php');
 	}
 	$graph->draw();
 
-	
+
 include_once('include/page_footer.php');
 ?>

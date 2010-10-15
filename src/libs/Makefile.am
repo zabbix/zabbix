@@ -6,8 +6,7 @@ DIST_SUBDIRS = \
 	zbxdb \
 	zbxmemory \
 	zbxalgo \
-	zbxemail \
-	zbxsms \
+	zbxmedia \
 	zbxcrypto \
 	zbxcommon \
 	zbxcomms \
@@ -18,7 +17,6 @@ DIST_SUBDIRS = \
 	zbxsysinfo \
 	zbxplugin \
 	zbxsys \
-	zbxjabber \
 	zbxjson \
 	zbxserver \
 	zbxicmpping
@@ -41,14 +39,9 @@ SERVER_SUBDIRS = \
 	zbxdbcache \
 	zbxdbhigh \
 	zbxmemory \
-	zbxemail \
-	zbxsms \
 	zbxserver \
-	zbxicmpping
-endif
-
-if JABBER
-JABBER_SUBDIRS = zbxjabber
+	zbxicmpping \
+	zbxmedia
 endif
 
 SUBDIRS = \
@@ -63,7 +56,6 @@ SUBDIRS = \
 	zbxsys \
 	zbxcomms \
 	zbxjson \
-	$(JABBER_SUBDIRS) \
 	$(PROXY_SUBDIRS) \
 	$(SERVER_SUBDIRS)
 

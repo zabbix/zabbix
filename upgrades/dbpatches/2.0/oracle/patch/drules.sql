@@ -7,6 +7,6 @@ UPDATE dchecks SET uniq=1 WHERE dcheckid IN (SELECT unique_dcheckid FROM drules)
 ALTER TABLE drules MODIFY druleid DEFAULT NULL;
 ALTER TABLE drules MODIFY proxy_hostid DEFAULT NULL;
 ALTER TABLE drules MODIFY proxy_hostid NULL;
-ALTER TABLE drules DROP unique_dcheckid;
+ALTER TABLE drules DROP COLUMN unique_dcheckid;
 UPDATE drules SET proxy_hostid=NULL WHERE NOT proxy_hostid IN (SELECT hostid FROM hosts);
 ALTER TABLE drules ADD CONSTRAINT c_drules_1 FOREIGN KEY (proxy_hostid) REFERENCES hosts (hostid);

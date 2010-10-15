@@ -1,6 +1,7 @@
+<?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,12 +17,14 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
+?>
+<?php
+class CLabel extends CTag{
+	public function __construct($label, $for=null, $id=null){
+		parent::__construct('label', 'yes', $label);
 
-
-#ifndef ZABBIX_JABBER_H
-#define ZABBIX_JABBER_H
-
-int	send_jabber(char *username, char *passwd, char *sendto, char *subject, char *message, char *error, int max_error_len);
-
-#endif /* ZABBIX_JABBER_H */
-
+		if(!is_null($id)) $this->setAttribute('id', $id);
+		if(!is_null($for)) $this->setAttribute('for', $for);
+	}
+}
+?>

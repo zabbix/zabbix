@@ -30,15 +30,15 @@
 
 const char	*progname = NULL;
 const char	title_message[] = "Zabbix Agent";
-const char	usage_message[] = "[-Vhp] [-c <file>] [-t <metric>]";
+const char	usage_message[] = "[-Vhp] [-c <file>] [-t <item>]";
 #ifndef HAVE_GETOPT_LONG
 const char	*help_message[] = {
 	"Options:",
 	"  -c <file>     Specify configuration file. Use absolute path",
 	"  -h            give this help",
 	"  -V            display version number",
-	"  -p            print supported metrics and exit",
-	"  -t <metric>   test specified metric and exit",
+	"  -p            print supported items and exit",
+	"  -t <item>     test specified item and exit",
 	0 /* end of text */
 };
 #else
@@ -47,8 +47,8 @@ const char	*help_message[] = {
 	"  -c --config <file>  Specify configuration file. Use absolute path",
 	"  -h --help           give this help",
 	"  -V --version        display version number",
-	"  -p --print          print supported metrics and exit",
-	"  -t --test <metric>  test specified metric and exit",
+	"  -p --print          print supported items and exit",
+	"  -t --test <item>    test specified item and exit",
 	0 /* end of text */
 };
 #endif

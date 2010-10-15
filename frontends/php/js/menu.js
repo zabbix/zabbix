@@ -38,7 +38,7 @@ function show_popup_menu(e, content, width){
 
 	var cursor = get_cursor_position(e);
 
-	new popup_menu (content, pos, cursor.x, cursor.y);
+	new popup_menu(content, pos, cursor.x, cursor.y);
 
 	return false;
 }
@@ -385,7 +385,9 @@ function menu_item (o_parent, n_order) {
 		this.n_y -= this.getprop('height') * (o_parent.a_config.length - item_offset);
 	}
 
-	if(!is_null(this.a_config[1]) && (this.a_config[1].indexOf('javascript') == -1)){
+	if(!is_null(this.a_config[1])
+		&& (this.a_config[1].indexOf('javascript') == -1)
+		&& !(!is_null(this.a_config[2]) || this.a_config[2] == 'nosid')){
 		var url = new Curl(this.a_config[1]);
 		this.a_config[1] = url.getUrl();
 	}
@@ -418,9 +420,18 @@ function menu_item (o_parent, n_order) {
 	var eldiv = document.createElement('div');
 	eldiv.setAttribute('id', 'e' + o_root.n_id + '_' + this.n_id +'i');
 	eldiv.className = this.getstyle(1, 0);
-	eldiv.innerHTML = this.a_config[0];
+
+	//truncating long strings - they don't fit in the popup menu'
+	if(typeof(this.a_config[0])=='string' && this.a_config[0].length > 20){
+		eldiv.innerHTML = this.a_config[0].substring(0, 20) + '...';
+		eldiv.setAttribute('title', this.a_config[0]);
+	}
+	else{
+		eldiv.innerHTML = this.a_config[0];
+	}
+
 	el.appendChild(eldiv);
-	
+
 //	console.log(el,el.innerHTML);
 	document.body.appendChild(el);
 
