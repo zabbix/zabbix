@@ -1468,6 +1468,51 @@ int	is_uint64(const char *str, zbx_uint64_t *value)
 
 /******************************************************************************
  *                                                                            *
+ * Function: is_ushort                                                        *
+ *                                                                            *
+ * Purpose: check if the string is 16bit unsigned integer                     *
+ *                                                                            *
+ * Parameters: str - string to check                                          *
+ *                                                                            *
+ * Return value:  SUCCEED - the string is unsigned integer                    *
+ *                FAIL - the string is not number or overflow                 *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	is_ushort(const char *str, unsigned short *value)
+{
+	register unsigned short	max_ushort = 0xFFFF;
+	register unsigned short	value_ushort = 0, c;
+
+	if ('\0' == *str)
+		return FAIL;
+
+	while ('\0' != *str)
+	{
+		if (*str >= '0' && *str <= '9')
+		{
+			c = (unsigned short)(unsigned char)(*str - '0');
+			if ((max_ushort - c) / 10 >= value_ushort)
+				value_ushort = value_ushort * 10 + c;
+			else
+				return FAIL;	/* overflow */
+			str++;
+		}
+		else
+			return FAIL;	/* not a digit */
+	}
+
+	if (NULL != value)
+		*value = value_ushort;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: is_uoct                                                          *
  *                                                                            *
  * Purpose: check if the string is unsigned octal                             *

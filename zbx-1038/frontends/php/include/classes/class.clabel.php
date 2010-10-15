@@ -1,6 +1,7 @@
+<?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,17 +17,14 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
+?>
+<?php
+class CLabel extends CTag{
+	public function __construct($label, $for=null, $id=null){
+		parent::__construct('label', 'yes', $label);
 
-#if !defined(SYSINFO_COMMON_NET_H_INCLUDED)
-
-#include "sysinfo.h"
-
-extern char	*CONFIG_SOURCE_IP;
-
-int	tcp_expect(const char *host, unsigned short port, const char *request,
-		const char *expect, const char *sendtoclose, int *value_int);
-int	CHECK_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	CHECK_DNS_QUERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-
-#endif /* SYSINFO_COMMON_NET_H_INCLUDED */
+		if(!is_null($id)) $this->setAttribute('id', $id);
+		if(!is_null($for)) $this->setAttribute('for', $for);
+	}
+}
+?>

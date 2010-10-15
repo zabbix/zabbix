@@ -748,21 +748,6 @@ function zbx_strrpos($haystack, $needle){
 		return strrpos($haystack, $needle);
 	}
 }
-
-function zbx_str_replace($search, $replace, $subject){
-	if(defined('ZBX_MBSTRINGS_ENABLED')){
-		$offset = 0;
-		while(false !== ($pos = mb_strpos($subject, $search, $offset))){
-			$offset = $pos + mb_strlen($replace);
-			$subject = mb_substr($subject, 0, $pos) . $replace . mb_substr($subject, $pos + mb_strlen($search));
-		}
-	}
-	else{
-		$subject = str_replace($search, $replace, $subject);
-	}
-    return $subject;
-}
-
 // }}} STRING FUNCTIONS
 
 
@@ -886,8 +871,15 @@ function morder_result(&$array, $sortfields, $sortorder=ZBX_SORT_UP){
 }
 
 
-function order_result(&$data, $sortfield, $sortorder=ZBX_SORT_UP){
+function order_result(&$data, $sortfield=null, $sortorder=ZBX_SORT_UP){
 	if(empty($data)) return false;
+
+	if(is_null($sortfield)){
+		natcasesort($data);
+		if($sortorder != ZBX_SORT_UP)
+			$data = array_reverse($data, true);
+		return true;
+	}
 
 	$sort = array();
 	foreach($data as $key => $arr){
@@ -1142,9 +1134,9 @@ function zbx_str2links($text){
 	return $result;
 }
 
-function zbx_subarray_push(&$mainArray, $sIndex, $element) {
+function zbx_subarray_push(&$mainArray, $sIndex, $element = null) {
 	if(!isset($mainArray[$sIndex])) $mainArray[$sIndex] = array();
-	$mainArray[$sIndex][] = $element;
+	$mainArray[$sIndex][] = is_null($element) ? $sIndex : $element;
 }
 /************* END ZBX MISC *************/
 

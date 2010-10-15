@@ -1,5 +1,26 @@
+Changes for 1.8.4rc2
+
+ - [ZBX-2981] removed unnecessary queries in map permission checks (Vedmak)
+ - [ZBX-3080] fixed javascript not cached by browsers (Vedmak)
+ - [ZBX-2661] improved displaying discovery checks in configuration (Vedmak)
+ - [ZBX-3086] fixed errors when edit hostgroup linkage for hosts and templates (Vedmak)
+ - [ZBX-3025] resurrected unreachable pollers and StartPollersUnreachable configuration parameter (asaveljevs,Sasha)
+ - [ZBX-2351] fixed server trying to insert duplicate eventids into the database (asaveljevs,Sasha)
+ - [ZBX-3069] renamed monitoring graphs combobox "All" entry to "not selected" (Vedmak)
+
 Changes for 1.8.4rc1
 
+ - [ZBX-2872] greatly improved API methods consistency (Aly)
+ - [ZBX-3070] fixed event date format inconsistency (Vedmak)
+ - [ZBX-3068] fixed possible crash of server while processing passive proxies (Sasha)
+ - [ZBX-3068] fixed server memory leak while processing passive proxies (Sasha)
+ - [ZBX-2749] fixed length parameter being ignored for web.page.regexp[] (asaveljevs)
+ - [ZBX-2749] fixed agent crash in web.page.regexp[] on very long matched fragments (asaveljevs)
+ - [ZBX-2913] fixed agent becoming unresponsive due to web.page.* checks (asaveljevs)
+ - [ZBXNEXT-430] added support of net.tcp.listen and net.udp.listen under Linux (Sasha)
+ - [ZBX-453] fixed --disable-static enabling static compilation (asaveljevs)
+ - [ZBX-2992] acknowledges are now hidden in event details when turned off (KB)
+ - [ZBX-3050] fixed that host can be named like an existing template and otherwise (KB)
  - [ZBX-3019] fixed templated graphs not being copied to discovered hosts in DM setup; thanks to Alexander Ignatyev (asaveljevs)
  - [ZBX-2860] fixed usergroup renaming (Vedmak)
  - [ZBX-3027] avg, delta, max, min, sum functions in popup_trexpr.php have a time shift input, so that this parameter now can be specified through GUI (KB)
@@ -45,7 +66,7 @@ Changes for 1.8.4rc1
  - [ZBXNEXT-458] user macros (e.g., {$MACRO}) can now be used in item and trigger descriptions (asaveljevs,Vedmak)
  - [ZBX-2959] fixed trailing whitespace & missing trailing newline in downloaded translations (Richlv)
  - [ZBX-2910] fixed 'strerror_from_system undefined' compilation warning on Windows; thanks to Takanori Suzuki (asaveljevs)
- - [ZBX-2902] fixed system.cpu.load[] and system.cpu.util[] being slightly exaggerated on Windows (asaveljevs)
+ - [ZBX-2902] fixed system.cpu.load[] and system.cpu.util[] being slightly exaggerated on Windows; thanks to Kodai Terashima (asaveljevs)
  - [ZBX-2954] fixed translations in template delete popups (Vedmak)
  - [ZBX-2938] fixed not showing problems on map for hosts in maintenance (Vedmak)
  - [ZBXNEXT-238] made zabbix_sender gather as much data as possible before sending (asaveljevs)

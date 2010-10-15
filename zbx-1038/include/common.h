@@ -117,7 +117,7 @@
 #define OFF	0
 
 #define	APPLICATION_NAME	"Zabbix Agent"
-#define	ZABBIX_REVDATE		"16 August 2010"
+#define	ZABBIX_REVDATE		"4 October 2010"
 #define	ZABBIX_VERSION		"1.8.4rc1"
 #define	ZABBIX_REVISION		"{ZABBIX_REVISION}"
 
@@ -153,6 +153,9 @@ const char	*zbx_result_string(int result);
 
 #define MAX_STRING_LEN	2048
 #define MAX_BUF_LEN	65536
+
+#define DB_TEXT_LEN	65535
+#define DB_TEXT_LEN_MAX	DB_TEXT_LEN+1
 
 #define ZBX_DM_DELIMITER	'\255'
 
@@ -623,29 +626,17 @@ const char	*zbx_permission_string(int perm);
 #define ZBX_HISTORY_TRENDS	0x10
 #define ZBX_PROXY		0x20
 
-/* Types of nodes */
-#define	ZBX_NODE_TYPE_REMOTE	0
-#define	ZBX_NODE_TYPE_LOCAL	1
-
-#define	POLLER_DELAY	5
+#define POLLER_DELAY		5
 #define DISCOVERER_DELAY	60
 
 #define	ZBX_NO_POLLER			255
 #define	ZBX_POLLER_TYPE_NORMAL		0
-#define	ZBX_POLLER_TYPE_IPMI		1
-#define	ZBX_POLLER_TYPE_PINGER		2
-#define	ZBX_POLLER_TYPE_COUNT		3	/* number of poller types */
+#define	ZBX_POLLER_TYPE_UNREACHABLE	1
+#define	ZBX_POLLER_TYPE_IPMI		2
+#define	ZBX_POLLER_TYPE_PINGER		3
+#define	ZBX_POLLER_TYPE_COUNT		4	/* number of poller types */
 
-#define	POLLER_TIMEOUT	5
-/* Do not perform more than this number of checks during unavailability period */
-/*#define SLEEP_ON_UNREACHABLE		60*/
-/*#define CHECKS_PER_UNAVAILABLE_PERIOD	4*/
-
-#define	AGENT_TIMEOUT	3
-
-#define	SENDER_TIMEOUT		60
-#define	ZABBIX_TRAPPER_TIMEOUT	300
-#define	SNMPTRAPPER_TIMEOUT	5
+#define	GET_SENDER_TIMEOUT	60
 
 #ifndef MAX
 #	define MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -739,12 +730,13 @@ int	is_uint_prefix(const char *c);
 int	is_uint(const char *c);
 int	is_int_prefix(const char *c);
 int	is_uint64(const char *str, zbx_uint64_t *value);
+int	is_ushort(const char *str, unsigned short *value);
 int	is_uoct(const char *str);
 int	is_uhex(const char *str);
 int	is_hex_string(const char *str);
 int	is_ascii_string(const char *str);
-void	zbx_rtrim(char *str, const char *charlist);
-void	zbx_ltrim(register char *str, const char *charlist);
+int	zbx_rtrim(char *str, const char *charlist);
+void	zbx_ltrim(char *str, const char *charlist);
 void	zbx_remove_chars(register char *str, const char *charlist);
 #define zbx_remove_spaces(str)		zbx_remove_chars(str, " ");
 #define zbx_remove_whitespace(str)	zbx_remove_chars(str, " \t\r\n");

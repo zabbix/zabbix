@@ -152,202 +152,6 @@
 		return $form;
 	}
 
-	function insert_drule_form(){
-
-		$frm_title = S_DISCOVERY_RULE;
-
-		if(isset($_REQUEST['druleid'])){
-			if( ($rule_data = DBfetch(DBselect('SELECT * FROM drules WHERE druleid='.$_REQUEST['druleid']))))
-				$frm_title = S_DISCOVERY_RULE.' "'.$rule_data['name'].'"';
-		}
-
-		$form = new CFormTable($frm_title, null, 'post');
-		$form->setHelp("web.discovery.rule.php");
-
-		if(isset($_REQUEST['druleid'])){
-			$form->addVar('druleid', $_REQUEST['druleid']);
-		}
-
-		$uniqueness_criteria = -1;
-
-		if(isset($_REQUEST['druleid']) && $rule_data && (!isset($_REQUEST["form_refresh"]) || isset($_REQUEST["register"]))){
-			$proxy_hostid	= $rule_data['proxy_hostid'];
-			$name		= $rule_data['name'];
-			$iprange	= $rule_data['iprange'];
-			$delay		= $rule_data['delay'];
-			$status		= $rule_data['status'];
-
-			//TODO init checks
-			$dchecks = array();
-			$db_checks = DBselect('SELECT dcheckid,type,ports,key_,snmp_community,snmpv3_securityname,'.
-						'snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase'.
-						' FROM dchecks'.
-						' WHERE druleid='.$_REQUEST['druleid']);
-			while($check_data = DBfetch($db_checks)){
-				$count = array_push($dchecks, array('dcheckid' => $check_data['dcheckid'], 'type' => $check_data['type'],
-						'ports' => $check_data['ports'], 'key' => $check_data['key_'],
-						'snmp_community' => $check_data['snmp_community'],
-						'snmpv3_securityname' => $check_data['snmpv3_securityname'],
-						'snmpv3_securitylevel' => $check_data['snmpv3_securitylevel'],
-						'snmpv3_authpassphrase' => $check_data['snmpv3_authpassphrase'],
-						'snmpv3_privpassphrase' => $check_data['snmpv3_privpassphrase']));
-				if ($check_data['dcheckid'] == $rule_data['unique_dcheckid'])
-					$uniqueness_criteria = $count - 1;
-			}
-			$dchecks_deleted = get_request('dchecks_deleted',array());
-		}
-		else{
-			$proxy_hostid	= get_request("proxy_hostid",0);
-			$name		= get_request('name','');
-			$iprange	= get_request('iprange','192.168.0.1-255');
-			$delay		= get_request('delay',3600);
-			$status		= get_request('status',DRULE_STATUS_ACTIVE);
-
-			$dchecks	= get_request('dchecks',array());
-			$dchecks_deleted = get_request('dchecks_deleted',array());
-		}
-
-		$new_check_type	= get_request('new_check_type', SVC_HTTP);
-		$new_check_ports= get_request('new_check_ports', '80');
-		$new_check_key= get_request('new_check_key', '');
-		$new_check_snmp_community= get_request('new_check_snmp_community', '');
-		$new_check_snmpv3_securitylevel = get_request('new_check_snmpv3_securitylevel', ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV);
-		$new_check_snmpv3_securityname = get_request('new_check_snmpv3_securityname', '');
-		$new_check_snmpv3_authpassphrase = get_request('new_check_snmpv3_authpassphrase', '');
-		$new_check_snmpv3_privpassphrase = get_request('new_check_snmpv3_privpassphrase', '');
-
-		$form->addRow(S_NAME, new CTextBox('name', $name, 40));
-//Proxy
-		$cmbProxy = new CComboBox("proxy_hostid", $proxy_hostid);
-
-		$cmbProxy->addItem(0, S_NO_PROXY);
-
-		$sql = 'SELECT hostid,host '.
-				' FROM hosts'.
-				' WHERE status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.') '.
-					' AND '.DBin_node('hostid').
-				' ORDER BY host';
-		$db_proxies = DBselect($sql);
-		while($db_proxy = DBfetch($db_proxies))
-			$cmbProxy->addItem($db_proxy['hostid'], $db_proxy['host']);
-
-		$form->addRow(S_DISCOVERY_BY_PROXY,$cmbProxy);
-//----------
-		$form->addRow(S_IP_RANGE, new CTextBox('iprange', $iprange, 27));
-		$form->addRow(S_DELAY.' (seconds)', new CNumericBox('delay', $delay, 8));
-
-		$form->addVar('dchecks', $dchecks);
-		$form->addVar('dchecks_deleted', $dchecks_deleted);
-
-		$cmbUniquenessCriteria = new CComboBox('uniqueness_criteria', $uniqueness_criteria);
-		$cmbUniquenessCriteria->addItem(-1, S_IP_ADDRESS);
-		foreach($dchecks as $id => $data){
-			$str = discovery_check2str($data['type'], $data['snmp_community'], $data['key'], $data['ports']);
-			$dchecks[$id] = array(
-				new CCheckBox('selected_checks[]',null,null,$id),
-				$str,
-				BR()
-			);
-			if(in_array($data['type'], array(SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2, SVC_SNMPv3)))
-				$cmbUniquenessCriteria->addItem($id, $str);
-		}
-
-		if(count($dchecks)){
-			$dchecks[] = new CButton('delete_ckecks', S_DELETE_SELECTED);
-			$form->addRow(S_CHECKS, $dchecks);
-		}
-
-		$cmbChkType = new CComboBox('new_check_type',$new_check_type,
-			"if(add_variable(this, 'type_changed', 1)) submit()"
-			);
-		foreach(array(SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP, SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2, SVC_SNMPv3, SVC_ICMPPING) as $type_int)
-			$cmbChkType->addItem($type_int, discovery_check_type2str($type_int));
-
-		if(isset($_REQUEST['type_changed'])){
-			$new_check_ports = svc_default_port($new_check_type);
-		}
-
-
-		$external_param = new CTable();
-
-		if($new_check_type != SVC_ICMPPING){
-			$external_param->addRow(array(S_PORTS_SMALL, new CTextBox('new_check_ports', $new_check_ports, 20)));
-		}
-		switch($new_check_type){
-			case SVC_SNMPv1:
-			case SVC_SNMPv2:
-				$external_param->addRow(array(S_SNMP_COMMUNITY, new CTextBox('new_check_snmp_community', $new_check_snmp_community)));
-				$external_param->addRow(array(S_SNMP_OID, new CTextBox('new_check_key', $new_check_key)));
-
-				$form->addVar('new_check_snmpv3_securitylevel', ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV);
-				$form->addVar('new_check_snmpv3_securityname', '');
-				$form->addVar('new_check_snmpv3_authpassphrase', '');
-				$form->addVar('new_check_snmpv3_privpassphrase', '');
-			break;
-			case SVC_SNMPv3:
-				$form->addVar('new_check_snmp_community', '');
-
-				$external_param->addRow(array(S_SNMP_OID, new CTextBox('new_check_key', $new_check_key)));
-				$external_param->addRow(array(S_SNMPV3_SECURITY_NAME, new CTextBox('new_check_snmpv3_securityname', $new_check_snmpv3_securityname)));
-
-				$cmbSecLevel = new CComboBox('new_check_snmpv3_securitylevel', $new_check_snmpv3_securitylevel);
-				$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,'noAuthNoPriv');
-				$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,'authNoPriv');
-				$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV,'authPriv');
-
-				$external_param->addRow(array(S_SNMPV3_SECURITY_LEVEL, $cmbSecLevel));
-				$external_param->addRow(array(S_SNMPV3_AUTH_PASSPHRASE, new CTextBox('new_check_snmpv3_authpassphrase', $new_check_snmpv3_authpassphrase)));
-				$external_param->addRow(array(S_SNMPV3_PRIV_PASSPHRASE, new CTextBox('new_check_snmpv3_privpassphrase', $new_check_snmpv3_privpassphrase), BR()));
-			break;
-			case SVC_AGENT:
-				$form->addVar('new_check_snmp_community', '');
-				$form->addVar('new_check_snmpv3_securitylevel', ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV);
-				$form->addVar('new_check_snmpv3_securityname', '');
-				$form->addVar('new_check_snmpv3_authpassphrase', '');
-				$form->addVar('new_check_snmpv3_privpassphrase', '');
-				$external_param->addRow(array(S_KEY, new CTextBox('new_check_key', $new_check_key), BR()));
-			break;
-			case SVC_ICMPPING:
-				$form->addVar('new_check_ports', '0');
-			default:
-				$form->addVar('new_check_snmp_community', '');
-				$form->addVar('new_check_key', '');
-				$form->addVar('new_check_snmpv3_securitylevel', ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV);
-				$form->addVar('new_check_snmpv3_securityname', '');
-				$form->addVar('new_check_snmpv3_authpassphrase', '');
-				$form->addVar('new_check_snmpv3_privpassphrase', '');
-		}
-
-
-
-		if($external_param->getNumRows() == 0) $external_param = null;
-		$form->addRow(S_NEW_CHECK, array(
-			$cmbChkType, SPACE,
-			new CButton('add_check', S_ADD),
-			$external_param
-		),'new');
-
-		$form->addRow(S_DEVICE_UNIQUENESS_CRITERIA, $cmbUniquenessCriteria);
-
-		$cmbStatus = new CComboBox("status", $status);
-		foreach(array(DRULE_STATUS_ACTIVE, DRULE_STATUS_DISABLED) as $st)
-			$cmbStatus->addItem($st, discovery_status2str($st));
-		$form->addRow(S_STATUS,$cmbStatus);
-
-		$form->addItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["druleid"])){
-			$form->addItemToBottomRow(SPACE);
-			$form->addItemToBottomRow(new CButton("clone",S_CLONE));
-			$form->addItemToBottomRow(SPACE);
-			$form->addItemToBottomRow(new CButtonDelete(S_DELETE_RULE_Q,
-				url_param("form").url_param("druleid")));
-		}
-		$form->addItemToBottomRow(SPACE);
-		$form->addItemToBottomRow(new CButtonCancel());
-
-		return $form;
-	}
-
 	function insert_httpstep_form(){
 		$form = new CFormTable(S_STEP_OF_SCENARIO, null, 'post');
 		$form->setHelp("web.webmon.httpconf.php");
@@ -5021,26 +4825,6 @@ JAVASCRIPT;
 		return $frmMap;
 	}
 
-	function insert_command_result_form($scriptid,$hostid){
-		$result = execute_script($scriptid,$hostid);
-
-		$sql = 'SELECT name '.
-				' FROM scripts '.
-				' WHERE scriptid='.$scriptid;
-		$script_info = DBfetch(DBselect($sql));
-
-		$frmResult = new CFormTable($script_info['name'].': '.script_make_command($scriptid,$hostid));
-		$message = $result['value'];
-		if($result['response'] == 'failed'){
-			error($message);
-			$message = '';
-		}
-
-		$frmResult->addRow(S_RESULT,new CTextArea('message',$message,100,25,'yes'));
-		$frmResult->addItemToBottomRow(new CButton('close',S_CLOSE,'window.close();'));
-		$frmResult->show();
-	}
-
 	function get_regexp_form(){
 		$frm_title = S_REGULAR_EXPRESSION;
 
@@ -5440,11 +5224,11 @@ JAVASCRIPT;
 			$macros = get_request('macros', array());
 		}
 		else if($hostid > 0){
-			$macros = CUserMacro::get(array('extendoutput' => 1, 'hostids' => $hostid));
+			$macros = CUserMacro::get(array('output' => API_OUTPUT_EXTEND, 'hostids' => $hostid));
 			order_result($macros, 'macro');
 		}
 		else if($hostid === null){
-			$macros = CUserMacro::get(array('extendoutput' => 1, 'globalmacro' => 1));
+			$macros = CUserMacro::get(array('output' => API_OUTPUT_EXTEND, 'globalmacro' => 1));
 			order_result($macros, 'macro');
 		}
 		else{

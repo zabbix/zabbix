@@ -17,9 +17,6 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-
-include_once 'include/discovery.inc.php';
-
 ?>
 <?php
 function check_permission_for_action_conditions($conditions){
@@ -275,13 +272,13 @@ function get_operation_desc($type=SHORT_DESCRITION, $data){
 				case OPERATION_TYPE_MESSAGE:
 					switch($data['object']){
 						case OPERATION_OBJECT_USER:
-							$obj_data = CUser::get(array('userids' => $data['objectid'],  'extendoutput' => 1));
+							$obj_data = CUser::get(array('userids' => $data['objectid'],  'output' => API_OUTPUT_EXTEND));
 							$obj_data = reset($obj_data);
 
 							$obj_data = S_USER.' "'.$obj_data['alias'].'"';
 							break;
 						case OPERATION_OBJECT_GROUP:
-							$obj_data = CUserGroup::get(array('usrgrpids' => $data['objectid'],  'extendoutput' => 1));
+							$obj_data = CUserGroup::get(array('usrgrpids' => $data['objectid'],  'output' => API_OUTPUT_EXTEND));
 							$obj_data = reset($obj_data);
 
 							$obj_data = S_GROUP.' "'.$obj_data['name'].'"';
@@ -695,14 +692,14 @@ function validate_operation($operation){
 		case OPERATION_TYPE_MESSAGE:
 			switch($operation['object']){
 				case OPERATION_OBJECT_USER:
-					$users = CUser::get(array('userids' => $operation['objectid'],  'extendoutput' => 1));
+					$users = CUser::get(array('userids' => $operation['objectid'],  'output' => API_OUTPUT_EXTEND));
 					if(empty($users)){
 						error(S_INCORRECT_USER);
 						return false;
 					}
 					break;
 				case OPERATION_OBJECT_GROUP:
-					$usrgrps = CUserGroup::get(array('usrgrpids' => $operation['objectid'],  'extendoutput' => 1));
+					$usrgrps = CUserGroup::get(array('usrgrpids' => $operation['objectid'],  'output' => API_OUTPUT_EXTEND));
 					if(empty($usrgrps)){
 						error(S_INCORRECT_GROUP);
 						return false;
@@ -902,11 +899,13 @@ function get_action_msgs_for_event($eventid){
 
 	$alerts = CAlert::get(array(
 		'eventids' => $eventid,
-		'alerttype' => ALERT_TYPE_MESSAGE,
-		'extendoutput' => 1,
+		'filter' => array(
+			'alerttype' => ALERT_TYPE_MESSAGE,
+		),
+		'output' => API_OUTPUT_EXTEND,
+		'select_mediatypes' => API_OUTPUT_EXTEND,
 		'sortfield' => 'clock',
-		'sortorder' => ZBX_SORT_DOWN,
-		'select_mediatypes' => 1
+		'sortorder' => ZBX_SORT_DOWN
 	));
 
 	foreach($alerts as $alertid => $row){
@@ -975,8 +974,10 @@ function get_action_cmds_for_event($eventid){
 
 	$alerts = CAlert::get(array(
 		'eventids' => $eventid,
-		'alerttype' => ALERT_TYPE_COMMAND,
-		'extendoutput' => 1,
+		'filter' => array(
+			'alerttype' => ALERT_TYPE_COMMAND
+		),
+		'output' => API_OUTPUT_EXTEND,
 		'sortfield' => 'clock',
 		'sortorder' => ZBX_SORT_DOWN
 	));

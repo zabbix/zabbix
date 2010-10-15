@@ -97,10 +97,11 @@ include_once('include/page_header.php');
 			$_REQUEST['events'] = CEvent::get($options);
 		}
 
-		$events_data = array(
-			'events' => $_REQUEST['events'],
-			'message' => $_REQUEST['message']);
-		$result = CEvent::acknowledge($events_data);
+		$eventsData = array(
+			'eventids' => zbx_objectValues($_REQUEST['events'], 'eventid'),
+			'message' => $_REQUEST['message']
+		);
+		$result = CEvent::acknowledge($eventsData);
 
 		show_messages($result, S_EVENT_ACKNOWLEDGED, S_CANNOT_ACKNOWLEDGE_EVENT);
 		if($result){
@@ -143,8 +144,8 @@ include_once('include/page_header.php');
 			$table->setAlign('center');
 
 			while($db_ack = DBfetch($db_acks)){
-				//$db_user = CUser::get(array('userids' => $db_ack['userid'], 'extendoutput' => 1));
-				//$db_user = reset($db_user);
+				//$db_users = CUser::get(array('userids' => $db_ack['userid'], 'output' => API_OUTPUT_EXTEND));
+				//$db_user = reset($db_users);
 
 				$table->addRow(array(
 					new CCol($db_ack['alias'], 'user'),

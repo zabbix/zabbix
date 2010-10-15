@@ -321,7 +321,7 @@ include_once('include/page_header.php');
 
 
 	if(!zbx_empty($_REQUEST['txt_select'])){
-		$options['pattern'] = $_REQUEST['txt_select'];
+		$options['search'] = array('description' => $_REQUEST['txt_select']);
 	}
 	if($show_triggers == TRIGGERS_OPTION_ONLYTRUE){
 		$options['only_true'] = 1;
@@ -369,9 +369,7 @@ include_once('include/page_header.php');
 				'value' => TRIGGER_VALUE_TRUE,
 				'nopermissions' => 1
 			);
-			$event_count = CEvent::get($options);
-
-			$triggers[$tnum]['event_count'] = $event_count['rowscount'];
+			$triggers[$tnum]['event_count'] = CEvent::get($options);
 		}
 	}
 

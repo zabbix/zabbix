@@ -873,10 +873,12 @@ AC_MSG_RESULT(yes),
 LDFLAGS="$saved_LDFLAGS"
 AC_MSG_RESULT(no))
 
-dnl Check if we want to compile everything with static
 AC_ARG_ENABLE(static,[  --enable-static         Build statically linked binaries],
-[ LDFLAGS="${LDFLAGS} -static";
- enable_static=yes])
+[case "${enableval}" in
+  yes) LDFLAGS="${LDFLAGS} -static" ;;
+  no) ;;
+  *) AC_MSG_ERROR([bad value ${enableval} for --enable-static]) ;;
+esac])
 
 AC_ARG_ENABLE(server,[  --enable-server         Turn on build of server],
 [case "${enableval}" in
