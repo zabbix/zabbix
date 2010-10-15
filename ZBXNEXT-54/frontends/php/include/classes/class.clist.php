@@ -37,8 +37,9 @@ class CList extends CTag{
 
 	public function addItem($value,$class=null){
 		if(is_array($value)){
-			foreach($value as $el)
-				parent::addItem($this->prepareItem($el,$class));
+			parent::addItem($this->prepareItem($value,$class));
+			//foreach($value as $el)
+				//parent::addItem($this->prepareItem($el,$class));
 		}
 		else{
 			parent::addItem($this->prepareItem($value,$class));

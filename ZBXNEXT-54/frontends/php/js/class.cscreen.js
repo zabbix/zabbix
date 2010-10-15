@@ -27,13 +27,13 @@ Position.includeScrollOffsets = true;
 // screenid ALWAYS must be a STRING (js doesn't support uint64) !!!!
 function init_screen(screenid, obj_id, id){
 	if(typeof(id) == 'undefined'){
-		var id = ZBX_SCREENS.length;
+		id = ZBX_SCREENS.length;
 	}
 
 	if(is_number(screenid) && (screenid > 100000000000000)){
 		throw('Error: Wrong type of arguments passed to function [init_screen]');
 	}
-	
+
 	ZBX_SCREENS[id] = new Object;
 	ZBX_SCREENS[id].screen = new Cscreen(screenid, obj_id, id);
 }
@@ -53,17 +53,17 @@ debug_info: '',						// debug string
 
 initialize: function(screenid, obj_id, id){
 	this.debug('initialize');
-	
+
 	this.screenid = screenid;
 	this.id = id;
-	
+
 	this.screen_obj = $(obj_id);
 //	this.add_divs(this.screen_obj, 'td', 'draggable');
-	
+
 	var trs = this.screen_obj.getElementsByTagName("tr");
 
 	function wedge(event){ return false }
-	
+
 	for (var i = 0; i < trs.length; i++){
 		var divs = document.getElementsByClassName("draggable", trs[i]);
 		for (var j = 0; j < divs.length; ++j){
@@ -104,34 +104,34 @@ on_drop: function(element, dropon, event){
 
 	element.style.top = '0px';
 	element.style.left = '0px';
-	
+
 	var pos = element.id.split('_');
 	var r1 = pos[1];
 	var c1 = pos[2];
-	
+
 	pos = dropon.id.split('_');
 	var r2 = pos[1];
 	var c2 = pos[2];
-	
+
 	var url = new Curl(location.href);
-	
+
 	var args = url.getArguments();
 	for(a in args){
 		if(a == 'screenid') continue;
 		url.unsetArgument(a);
 	}
-	
+
 	url.setArgument('sw_pos[0]',r1);
 	url.setArgument('sw_pos[1]',c1);
 	url.setArgument('sw_pos[2]',r2);
 	url.setArgument('sw_pos[3]',c2);
-	
-	
+
+
 	// url.unsetArgument('add_row');
 	// url.unsetArgument('add_col');
 	// url.unsetArgument('rmv_row');
 	// url.unsetArgument('rmv_col');
-		
+
 	location.href = url.getUrl();
 },
 
@@ -154,10 +154,10 @@ deactivate_drag: function(){
 debug: function(str){
 	if(this.debug_status){
 		this.debug_info += str + '\n';
-		
+
 		if(this.debug_status == 2){
 			SDI(str);
 		}
-	}	
+	}
 }
 }

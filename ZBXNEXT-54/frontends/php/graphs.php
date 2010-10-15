@@ -403,7 +403,7 @@ include_once('include/page_header.php');
 
 // Header Host
 		if($_REQUEST['hostid'] > 0){
-			$tbl_header_host = get_header_host_table($_REQUEST['hostid'], array('items', 'triggers', 'applications'));
+			$tbl_header_host = get_header_host_table($_REQUEST['hostid'], 'graphs');
 			$graphs_wdgt->addItem($tbl_header_host);
 		}
 
