@@ -400,6 +400,18 @@ class czbxrpc{
 		self::$result = $result;
 	}
 
+// TEMPLATESCREEN
+	private static function templateScreen($action, $params){
+
+		CTemplateScreen::$error = array();
+
+		switch($action){
+			default:
+			$result = call_user_func(array('CTemplateScreen', $action), $params);
+		}
+
+		self::$result = $result;
+	}
 
 // TRIGGER
 	private static function trigger($action, $params){
