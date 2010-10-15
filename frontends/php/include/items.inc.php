@@ -1135,7 +1135,7 @@
 
 		if($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $descr, $arr)){
 			$macros = CuserMacro::getMacros($arr[1], array('itemid' => $item['itemid']));
-			
+
 			$search = array_keys($macros);
 			$values = array_values($macros);
 			$descr = str_replace($search, $values, $descr);
@@ -1235,7 +1235,6 @@
 			}
 
 			$table->SetHeader($header,'vertical_header');
-			$curr_rime = time();
 
 			foreach($items as $descr => $ithosts){
 				$table_row = array(nbsp($descr));
@@ -1252,7 +1251,6 @@
 			}
 
 			$table->SetHeader($header,'vertical_header');
-			$curr_rime = time();
 
 			foreach($hosts as $hostname){
 				$table_row = array(nbsp($hostname));

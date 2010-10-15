@@ -924,7 +924,7 @@ switch($itemType) {
 
 // Header Host
 		if($hostid > 0){
-			$tbl_header_host = get_header_host_table($hostid, array('triggers', 'applications', 'graphs'));
+			$tbl_header_host = get_header_host_table($hostid, 'items');
 			$items_wdgt->addItem($tbl_header_host);
 			$show_host = false;
 		}

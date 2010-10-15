@@ -133,6 +133,7 @@ class CHost extends CZBXAPI{
 			'select_dservices'			=> null,
 			'select_applications'		=> null,
 			'select_macros'				=> null,
+			'selectScreens'				=> null,
 			'select_profile'			=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
@@ -584,6 +585,9 @@ class CHost extends CZBXAPI{
 						$result[$host['hostid']]['macros'] = array();
 					}
 
+					if(!is_null($options['selectScreens']) && !isset($result[$host['hostid']]['screens'])){
+						$result[$host['hostid']]['screens'] = array();
+					}
 //					if(!is_null($options['select_maintenances']) && !isset($result[$host['hostid']]['maintenances'])){
 //						$result[$host['hostid']]['maintenances'] = array();
 //					}
@@ -761,7 +765,6 @@ Copt::memoryPick();
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
-
 			if(is_array($options['select_items']) || str_in_array($options['select_items'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['select_items'];
 				$items = CItem::get($obj_params);
@@ -784,7 +787,7 @@ Copt::memoryPick();
 			else if(API_OUTPUT_COUNT == $options['select_items']){
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
-
+				
 				$items = CItem::get($obj_params);
 				$items = zbx_toHash($items, 'hostid');
 				foreach($result as $hostid => $host){
@@ -962,6 +965,7 @@ Copt::memoryPick();
 				$obj_params['groupCount'] = 1;
 
 				$applications = CApplication::get($obj_params);
+
 				$applications = zbx_toHash($applications, 'hostid');
 				foreach($result as $hostid => $host){
 					if(isset($applications[$hostid]))
@@ -987,6 +991,47 @@ Copt::memoryPick();
 				unset($macro['hosts']);
 				foreach($mhosts as $num => $host){
 					$result[$host['hostid']]['macros'][] = $macro;
+				}
+			}
+		}
+
+// Adding screens
+		if(!is_null($options['selectScreens'])){
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'hostids' => $hostids,
+				'editable' => $options['editable'],
+				'nopermissions' => 1,
+				'preservekeys' => 1
+			);
+
+			if(is_array($options['selectScreens']) || str_in_array($options['selectScreens'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['selectScreens'];
+
+				$screens = CTemplateScreen::get($obj_params);
+				if(!is_null($options['limitSelects'])) order_result($screens, 'name');
+
+				foreach($screens as $snum => $screen){
+					if(!is_null($options['limitSelects'])){
+						if(count($result[$screen['hostid']]['screens']) >= $options['limitSelects']) continue;
+					}
+
+					unset($screens[$snum]['hosts']);
+					$result[$screen['hostid']]['screens'][] = &$screens[$snum];
+				}
+			}
+			else if(API_OUTPUT_COUNT == $options['selectScreens']){
+				$obj_params['countOutput'] = 1;
+				$obj_params['groupCount'] = 1;
+
+				$screens = CTemplateScreen::get($obj_params);
+				$screens = zbx_toHash($screens, 'hostid');
+
+				foreach($result as $hostid => $host){
+					if(isset($screens[$hostid]))
+						$result[$hostid]['screens'] = $screens[$hostid]['rowscount'];
+					else
+						$result[$hostid]['screens'] = 0;
 				}
 			}
 		}

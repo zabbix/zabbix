@@ -1109,16 +1109,6 @@ table.requirements tr td{
 
 /********** </REQUIREMENTS> ************/
 
-/********** <INFOBOX> ************/
-table.infobox{
-	width: 100%;
-	margin-top: 4px;
-	border: 1px #3377AA solid;
-	background-color: #FFFFFF;
-	text-align: center;
-}
-/********** </INFOBOX> ************/
-
 /********** <FILTER> ************/
 table.filter{
 	width: 100%;
