@@ -1180,10 +1180,9 @@ static int	DBget_drule_value_by_event(DB_EVENT *event, char **replace_to, const 
  *                                                                            *
  * Function: DBget_history_log_value_by_triggerid                             *
  *                                                                            *
- * Purpose: retrieve item lastvalue by functionid                             *
+ * Purpose: retrieve a particular attribute of a log value                    *
  *                                                                            *
- * Parameters: functionid - function identificator from database              *
- *             lastvalue - pointer to result buffer. Must be NULL             *
+ * Parameters:                                                                *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
@@ -1248,8 +1247,7 @@ static int	DBget_history_log_value_by_triggerid(zbx_uint64_t triggerid, char **r
  *                                                                            *
  * Purpose: retrieve item lastvalue by triggerid                              *
  *                                                                            *
- * Parameters: functionid - function identificator from database              *
- *             lastvalue - pointer to result buffer. Must be NULL             *
+ * Parameters:                                                                *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
@@ -1332,10 +1330,9 @@ static int	DBget_item_lastvalue_by_triggerid(zbx_uint64_t triggerid, char **last
  *                                                                            *
  * Function: DBget_item_value_by_triggerid                                    *
  *                                                                            *
- * Purpose: retrieve item lastvalue by triggerid                              *
+ * Purpose: retrieve item value by triggerid                                  *
  *                                                                            *
- * Parameters: functionid - function identificator from database              *
- *             lastvalue - pointer to result buffer. Must be NULL             *
+ * Parameters:                                                                *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
@@ -1362,7 +1359,7 @@ static int	DBget_item_value_by_triggerid(zbx_uint64_t triggerid, char **value, i
 	if (FAIL == trigger_get_N_functionid(expression, N_functionid, &functionid))
 		return FAIL;
 
-	result = DBselect("select i.itemid,i.value_type from items i,functions f "
+	result = DBselect("select i.itemid,i.value_type from items i,functions f"
 			" where i.itemid=f.itemid and f.functionid=" ZBX_FS_UI64,
 			functionid);
 
@@ -1370,7 +1367,8 @@ static int	DBget_item_value_by_triggerid(zbx_uint64_t triggerid, char **value, i
 	{
 		value_type = atoi(row[1]);
 
-		switch (value_type) {
+		switch (value_type)
+		{
 			case ITEM_VALUE_TYPE_FLOAT:	table = "history"; break;
 			case ITEM_VALUE_TYPE_UINT64:	table = "history_uint"; break;
 			case ITEM_VALUE_TYPE_TEXT:	table = "history_text"; break;
