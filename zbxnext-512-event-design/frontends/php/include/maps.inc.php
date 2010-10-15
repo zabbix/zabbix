@@ -1416,15 +1416,15 @@
 					$i['trigger_disabled']++;
 				}
 				else{
-					if($trigger['value'] == TRIGGER_VALUE_TRUE){
+					if(false && $trigger['value_flags'] == TRIGGER_VALUE_FLAG_UNKNOWN){
+// TODO: correct actions in that case
+						//$i['unknown']++;
+					}
+					else if($trigger['value'] == TRIGGER_VALUE_TRUE){
 						$i['problem']++;
 						$last_problemid = $triggerid;
 						if($i['priority'] < $trigger['priority'])
 							$i['priority'] = $trigger['priority'];
-					}
-					else if($trigger['value_flags'] == TRIGGER_VALUE_FLAG_UNKNOWN){
-// TODO: we never get here since triggers.value_flags introduced
-						$i['unknown']++;
 					}
 
 					if(isset($unack_triggerids[$triggerid]))
