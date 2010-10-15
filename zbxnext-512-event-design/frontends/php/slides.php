@@ -111,19 +111,33 @@ include_once('include/page_header.php');
 						$slideshow = get_slideshow_by_slideshowid($elementid);
 						$screen = get_slideshow($elementid, $step);
 
-						$element = get_screen($screen['screenid'],2,$effectiveperiod);
+						$screens = CScreen::get(array(
+							'screenids' => $elementid
+						));
+						if(empty($screens)){
+							print alert('No permissions');
+						}
+						else{
+							$screens = CScreen::get(array(
+								'screenids' => $screen['screenid'],
+								'output' => API_OUTPUT_EXTEND,
+								'select_screenitems' => API_OUTPUT_EXTEND
+							));
+							$screen = reset($screens);
+							$element = get_screen($screen,2,$effectiveperiod);
 
-						$refresh_multipl = CProfile::get('web.slides.rf_rate.hat_slides', 1, $elementid);
+							$refresh_multipl = CProfile::get('web.slides.rf_rate.hat_slides', 1, $elementid);
 
-						if($screen['delay'] > 0) $refresh = $screen['delay'];
-						else $refresh = $slideshow['delay'];
+							if($screen['delay'] > 0) $refresh = $screen['delay'];
+							else $refresh = $slideshow['delay'];
 
-						$element->show();
+							$element->show();
 
-						$script = get_update_doll_script('mainpage', $_REQUEST['favref'], 'frequency', $refresh*$refresh_multipl)."\n";
-						$script.= get_update_doll_script('mainpage', $_REQUEST['favref'], 'restartDoll')."\n";
-						$script.= 'timeControl.processObjects();';
-						insert_js($script);
+							$script = get_update_doll_script('mainpage', $_REQUEST['favref'], 'frequency', $refresh*$refresh_multipl)."\n";
+							$script.= get_update_doll_script('mainpage', $_REQUEST['favref'], 'restartDoll')."\n";
+							$script.= 'timeControl.processObjects();';
+							insert_js($script);
+						}
 					}
 					else{
 						print(SBR.S_NO_SLIDESHOWS_DEFINED);

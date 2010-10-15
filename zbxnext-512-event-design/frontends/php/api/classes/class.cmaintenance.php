@@ -204,11 +204,6 @@ class CMaintenance extends CZBXAPI{
 			$sql_parts['where'][] = DBcondition('m.maintenanceid',$maintenanceids);
 		}
 
-
-
-
-
-
 // nodeids
 		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
