@@ -39,7 +39,7 @@ else{
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 	$page['title'] = 'S_CONFIGURATION_OF_SCREENS';
 	$page['file'] = 'screenconf.php';
-	$page['hist_arg'] = array();
+	$page['hist_arg'] = array('templateid');
 }
 
 include_once('include/page_header.php');
@@ -196,14 +196,13 @@ include_once('include/page_header.php');
 			'editable => 1'
 		);
 
-		if(isset($_REQUEST['templateid'])){
-			$screens = CTemplateScreen::get($options);
-			$go_result = CTemplateScreen::delete($screenids);
-		}
-		else{
-			$screens = CScreen::get($options);
+		$screens = CScreen::get($options);
+		$templatedScreens = CTemplateScreen::get($options);
+
+		if(!empty($screens))
 			$go_result = CScreen::delete($screenids);
-		}
+		else
+			$go_result = CTemplateScreen::delete($screenids);
 
 		if($go_result){
 			unset($_REQUEST['screenid'], $_REQUEST['form']);
