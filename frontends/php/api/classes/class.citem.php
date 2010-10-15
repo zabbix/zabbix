@@ -80,6 +80,7 @@ class CItem extends CZBXAPI{
 			'graphids'				=> null,
 			'triggerids'			=> null,
 			'applicationids'		=> null,
+			'discoveryids'			=> null,
 			'webitems'				=> null,
 			'inherited'				=> null,
 			'templated'				=> null,
@@ -273,6 +274,19 @@ class CItem extends CZBXAPI{
 			$sql_parts['from']['graphs_items'] = 'graphs_items gi';
 			$sql_parts['where'][] = DBcondition('gi.graphid', $options['graphids']);
 			$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
+		}
+
+// discoveryids
+		if(!is_null($options['discoveryids'])){
+			zbx_value2array($options['discoveryids']);
+
+			if($options['output'] != API_OUTPUT_SHORTEN){
+				$sql_parts['select']['discoveryid'] = 'id.parent_itemid';
+			}
+
+			$sql_parts['from']['item_discovery'] = 'item_discovery id';
+			$sql_parts['where'][] = DBcondition('id.parent_itemid', $options['discoveryids']);
+			$sql_parts['where']['idi'] = 'i.itemid=id.itemid';
 		}
 
 // webitems
