@@ -533,6 +533,10 @@ function getLastEvents($options){
 
 		$sortClock[$enum] = $event['clock'];
 		$sortEvent[$enum] = $event['eventid'];
+
+		//expanding description for the state where event was
+		$merged_event = array_merge($event, $triggers[$event['objectid']]);
+		$events[$enum]['trigger']['description'] = expand_trigger_description_by_data($merged_event, ZBX_FLAG_EVENT);
 	}
 
 	array_multisort($sortClock, SORT_DESC, $sortEvent, SORT_DESC, $events);
