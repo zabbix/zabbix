@@ -35,10 +35,9 @@ include_once('include/page_header.php');
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields = array(
-//  NEW  templates.php; hosts.php; items.php; triggers.php; graphs.php; maintenances.php;
-// 	OLD  0 - hosts; 1 - groups; 2 - linkages; 3 - templates; 4 - applications; 5 - Proxies; 6 - maintenance
 		'groupid'=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,	NULL),
 		'hostid'=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,	NULL),
+		'parent_itemid'=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,	NULL),
 
 		'copy_type'	=>array(T_ZBX_INT, O_OPT,	 P_SYS,	IN('0,1'),'isset({copy})'),
 		'copy_mode'	=>array(T_ZBX_INT, O_OPT,	 P_SYS,	IN('0'),NULL),
@@ -353,9 +352,12 @@ include_once('include/page_header.php');
 <?php
 	$form = new CForm(null, 'get');
 
+	$parent_itemid = get_request('parent_itemid');
 // Config
-	if(!isset($_REQUEST['form']))
+	if(!isset($_REQUEST['form'])){
 		$form->addItem(new CButton('form', S_CREATE_GRAPH));
+		if($parent_itemid) $form->addVar('parent_itemid', $parent_itemid);
+	}
 
 	show_table_header(S_CONFIGURATION_OF_GRAPHS_BIG,$form);
 
@@ -381,7 +383,7 @@ include_once('include/page_header.php');
 		}
 		$table->show();
 	}
-	else {
+	else{
 /* Table HEADER */
 		$graphs_wdgt = new CWidget();
 
@@ -391,8 +393,10 @@ include_once('include/page_header.php');
 
 		$r_form = new CForm(null, 'get');
 
-		$r_form->addItem(array(S_GROUP.SPACE,$pageFilter->getGroupsCB()));
-		$r_form->addItem(array(SPACE.S_HOST.SPACE,$pageFilter->getHostsCB()));
+		if(!$parent_itemid){
+			$r_form->addItem(array(S_GROUP.SPACE,$pageFilter->getGroupsCB()));
+			$r_form->addItem(array(SPACE.S_HOST.SPACE,$pageFilter->getHostsCB()));
+		}
 
 		$numrows = new CDiv();
 		$numrows->setAttribute('name','numrows');
@@ -410,6 +414,7 @@ include_once('include/page_header.php');
 		$form = new CForm();
 		$form->setName('graphs');
 		$form->addVar('hostid',$_REQUEST['hostid']);
+		if($parent_itemid) $form->addVar('parent_itemid', $parent_itemid);
 
 		$table = new CTableInfo(S_NO_GRAPHS_DEFINED);
 		$table->setHeader(array(
@@ -430,6 +435,7 @@ include_once('include/page_header.php');
 			$options = array(
 				'editable' => 1,
 				'extendoutput' => 1,
+				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
 				'sortfield' => $sortfield,
 				'sortorder' => $sortorder,
 				'limit' => ($config['search_limit']+1)

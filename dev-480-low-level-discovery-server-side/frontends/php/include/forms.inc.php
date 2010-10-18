@@ -1921,11 +1921,11 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 		$frmItem->addRow(S_TYPE_OF_INFORMATION,$cmbValType);
 
-		if($limited) {
+		if($limited){
 			$frmItem->addVar('data_type', $data_type);
 			$cmbDataType = new CTextBox('data_type_name', item_data_type2str($data_type), 20, 'yes');
 		}
-		else {
+		else{
 			$cmbDataType = new CComboBox('data_type', $data_type);
 			$cmbDataType->addItem(ITEM_DATA_TYPE_DECIMAL,		item_data_type2str(ITEM_DATA_TYPE_DECIMAL));
 			$cmbDataType->addItem(ITEM_DATA_TYPE_OCTAL,		item_data_type2str(ITEM_DATA_TYPE_OCTAL));
@@ -1984,7 +1984,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$row = new CRow(array(new CCol(S_UPDATE_INTERVAL_IN_SEC,'form_row_l'), new CCol(new CNumericBox('delay',$delay,5),'form_row_r')));
 		$row->setAttribute('id', 'row_delay');
 		$frmItem->addRow($row);
-		foreach($types as $it) {
+		foreach($types as $it){
 			if($it == ITEM_TYPE_TRAPPER) continue;
 			zbx_subarray_push($typeVisibility, $it, 'delay');
 			zbx_subarray_push($typeVisibility, $it, 'row_delay');
@@ -1993,9 +1993,6 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$row = new CRow(array(new CCol(S_FLEXIBLE_INTERVALS,'form_row_l'), new CCol($delay_flex_el,'form_row_r')));
 		$row->setAttribute('id', 'row_flex_intervals');
 		$frmItem->addRow($row);
-
-// Filter
-		$frmItem->addRow(S_FILTER, new CTextArea('item_filter','',40, 3), null);
 
 		$row = new CRow(array(new CCol(S_NEW_FLEXIBLE_INTERVAL,'form_row_l'), new CCol(
 					array(
@@ -2126,7 +2123,8 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		}
 		array_push($frmRow,
 			SPACE,
-			new CButtonCancel(url_param('groupid')));
+			new CButtonCancel(url_param('groupid').url_param('parent_itemid'))
+		);
 
 		$frmItem->addSpanRow($frmRow,'form_row_last');
 
@@ -2877,45 +2875,47 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$frmGraph->setName('frm_graph');
 		//$frmGraph->setHelp("web.graphs.graph.php");
 
+		$parent_itemid = get_request('parent_itemid');
+		if($parent_itemid) $frmGraph->addVar('parent_itemid', $parent_itemid);
+
 		$items = get_request('items', array());
 
 		if(isset($_REQUEST['graphid'])){
 			$frmGraph->addVar('graphid', $_REQUEST['graphid']);
 
 			$options = array(
-						'graphids' => $_REQUEST['graphid'],
-						'extendoutput' => 1
-					);
+				'graphids' => $_REQUEST['graphid'],
+				'extendoutput' => 1
+			);
 			$graphs = CGraph::get($options);
-			$row = reset($graphs);
+			$graph = reset($graphs);
 
-			$frmGraph->setTitle(S_GRAPH.' "'.$row['name'].'"');
+			$frmGraph->setTitle(S_GRAPH.' "'.$graph['name'].'"');
 		}
 
 		if(isset($_REQUEST['graphid']) && !isset($_REQUEST['form_refresh'])){
-			$name = $row['name'];
-			$width = $row['width'];
-			$height = $row['height'];
-			$ymin_type = $row['ymin_type'];
-			$ymax_type = $row['ymax_type'];
-			$yaxismin = $row['yaxismin'];
-			$yaxismax = $row['yaxismax'];
-			$ymin_itemid = $row['ymin_itemid'];
-			$ymax_itemid = $row['ymax_itemid'];
-			$showworkperiod = $row['show_work_period'];
-			$showtriggers = $row['show_triggers'];
-			$graphtype = $row['graphtype'];
-			$legend = $row['show_legend'];
-			$graph3d = $row['show_3d'];
-			$percent_left = $row['percent_left'];
-			$percent_right = $row['percent_right'];
+			$name = $graph['name'];
+			$width = $graph['width'];
+			$height = $graph['height'];
+			$ymin_type = $graph['ymin_type'];
+			$ymax_type = $graph['ymax_type'];
+			$yaxismin = $graph['yaxismin'];
+			$yaxismax = $graph['yaxismax'];
+			$ymin_itemid = $graph['ymin_itemid'];
+			$ymax_itemid = $graph['ymax_itemid'];
+			$showworkperiod = $graph['show_work_period'];
+			$showtriggers = $graph['show_triggers'];
+			$graphtype = $graph['graphtype'];
+			$legend = $graph['show_legend'];
+			$graph3d = $graph['show_3d'];
+			$percent_left = $graph['percent_left'];
+			$percent_right = $graph['percent_right'];
 
 			$options = array(
-						'graphids' => $_REQUEST['graphid'],
-						'sortfield' => 'sortorder',
-						'extendoutput' => 1
-					);
-
+				'graphids' => $_REQUEST['graphid'],
+				'sortfield' => 'sortorder',
+				'output' => API_OUTPUT_EXTEND,
+			);
 			$items = CGraphItem::get($options);
 		}
 		else{
@@ -2929,8 +2929,8 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			else{
 				$width = get_request('width', 900);
 				$height = get_request('height', 200);
-
 			}
+
 			$ymin_type = get_request('ymin_type', GRAPH_YAXIS_TYPE_CALCULATED);
 			$ymax_type = get_request('ymax_type', GRAPH_YAXIS_TYPE_CALCULATED);
 			$yaxismin = get_request('yaxismin', 0.00);
@@ -2950,27 +2950,27 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		}
 
 /* reinit $_REQUEST */
-		$_REQUEST['items']		= $items;
-		$_REQUEST['name']		= $name;
-		$_REQUEST['width']		= $width;
-		$_REQUEST['height']		= $height;
+		$_REQUEST['items'] = $items;
+		$_REQUEST['name'] = $name;
+		$_REQUEST['width'] = $width;
+		$_REQUEST['height'] = $height;
 
-		$_REQUEST['ymin_type']		= $ymin_type;
-		$_REQUEST['ymax_type']		= $ymax_type;
+		$_REQUEST['ymin_type'] = $ymin_type;
+		$_REQUEST['ymax_type'] = $ymax_type;
 
-		$_REQUEST['yaxismin']		= $yaxismin;
-		$_REQUEST['yaxismax']		= $yaxismax;
+		$_REQUEST['yaxismin'] = $yaxismin;
+		$_REQUEST['yaxismax'] = $yaxismax;
 
-		$_REQUEST['ymin_itemid']	= $ymin_itemid;
-		$_REQUEST['ymax_itemid']	= $ymax_itemid;
+		$_REQUEST['ymin_itemid'] = $ymin_itemid;
+		$_REQUEST['ymax_itemid'] = $ymax_itemid;
 
-		$_REQUEST['showworkperiod']	= $showworkperiod;
-		$_REQUEST['showtriggers']	= $showtriggers;
-		$_REQUEST['graphtype']		= $graphtype;
-		$_REQUEST['legend']		= $legend;
-		$_REQUEST['graph3d']		= $graph3d;
-		$_REQUEST['percent_left']	= $percent_left;
-		$_REQUEST['percent_right']	= $percent_right;
+		$_REQUEST['showworkperiod'] = $showworkperiod;
+		$_REQUEST['showtriggers'] = $showtriggers;
+		$_REQUEST['graphtype'] = $graphtype;
+		$_REQUEST['legend'] = $legend;
+		$_REQUEST['graph3d'] = $graph3d;
+		$_REQUEST['percent_left'] = $percent_left;
+		$_REQUEST['percent_right'] = $percent_right;
 /********************/
 
 		if($graphtype != GRAPH_TYPE_NORMAL){
@@ -3236,6 +3236,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 						url_param($only_hostid, false, 'only_hostid').
 						url_param($monitored_hosts, false, 'monitored_hosts').
 						url_param($graphtype, false, 'graphtype').
+						url_param('parent_itemid').
 						"',550,400,'graph_item_form');"),
 					$dedlete_button
 				));

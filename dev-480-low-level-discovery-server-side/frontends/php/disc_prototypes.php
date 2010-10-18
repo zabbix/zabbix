@@ -171,10 +171,10 @@ switch($itemType) {
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => 1
 		);
-		$item = CItem::get($options);
-		$item = reset($item);
-		if(!$item) access_deny();
-		$_REQUEST['hostid'] = $item['hostid'];
+		$discovery_rule = CItem::get($options);
+		$discovery_rule = reset($discovery_rule);
+		if(!$discovery_rule) access_deny();
+		$_REQUEST['hostid'] = $discovery_rule['hostid'];
 	}
 	else if(get_request('hostid', 0) > 0){
 		$options = array(
@@ -276,6 +276,7 @@ switch($itemType) {
 			'params'			=> get_request('params'),
 			'ipmi_sensor'		=> get_request('ipmi_sensor'),
 			'data_type'		=> get_request('data_type'),
+			'applications' => $applications,
 			'flags' => ZBX_FLAG_DISCOVERY_CHILD,
 			'parent_itemid' => get_request('parent_itemid'),
 		);
@@ -367,7 +368,7 @@ switch($itemType) {
 	else{
 		$form = null;
 	}
-	$items_wdgt->addPageHeader(S_CONFIGURATION_OF_ITEMS_BIG, $form);
+	$items_wdgt->addPageHeader(S_CONFIGURATION_OF_PROTOTYPES_BIG, $form);
 
 
 	if(isset($_REQUEST['form'])){
@@ -378,7 +379,7 @@ switch($itemType) {
 		$numrows = new CDiv();
 		$numrows->setAttribute('name', 'numrows');
 
-		$items_wdgt->addHeader(S_ITEMS_BIG, SPACE);
+		$items_wdgt->addHeader(S_PROTOTYPES_OF_BIG.SPACE.$discovery_rule['description'], SPACE);
 		$items_wdgt->addHeader($numrows, SPACE);
 
 		$items_wdgt->addItem(get_header_host_table($_REQUEST['hostid']));
@@ -392,6 +393,8 @@ switch($itemType) {
 		$table->setHeader(array(
 			new CCheckBox('all_items',null,"checkAll('".$form->GetName()."','all_items','group_itemid');"),
 			make_sorting_header(S_DESCRIPTION,'description'),
+			S_TRIGGERS,
+			S_GRAPHS,
 			make_sorting_header(S_KEY,'key_'),
 			make_sorting_header(S_INTERVAL,'delay'),
 			make_sorting_header(S_TYPE,'type'),
@@ -452,18 +455,22 @@ switch($itemType) {
 				$applications = implode(', ', $applications);
 			}
 
-			$subrules = array(new CLink('subrule', 'host_discovery.php?&itemid='.$item['itemid']),
-				' ('.'1'.')');
+			$subtriggers = array(new CLink('triggers', 'triggers.php?&parent_itemid='.$item['itemid']),
+				' ('.'#'.')');
+			$subgraphs = array(new CLink('graphs', 'graphs.php?&parent_itemid='.$item['itemid']),
+				' ('.'#'.')');
 
 			$table->addRow(array(
 				new CCheckBox('group_itemid['.$item['itemid'].']',null,null,$item['itemid']),
 				$description,
+				$subtriggers,
+				$subgraphs,
 				$item['key_'],
 				$item['delay'],
 				item_type2str($item['type']),
 				$status,
 				new CCol($applications, 'wraptext'),
-				$error
+				$error,
 			));
 		}
 

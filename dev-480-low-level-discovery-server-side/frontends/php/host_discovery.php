@@ -319,7 +319,7 @@ switch($itemType) {
 	else{
 		$form = null;
 	}
-	$items_wdgt->addPageHeader(S_CONFIGURATION_OF_DISCOVERY_BIG, $form);
+	$items_wdgt->addPageHeader(S_CONFIGURATION_OF_DISCOVERY_RULES_BIG, $form);
 
 
 	if(isset($_REQUEST['form'])){
@@ -586,6 +586,9 @@ switch($itemType) {
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_CALCULATED, 'params_calculted');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_CALCULATED, 'row_params');
 
+// Filter
+		$frmItem->addRow(S_FILTER, new CTextArea('item_filter','',40, 3), null);
+
 // Update interval (in sec)
 		$frmItem->addRow(S_UPDATE_INTERVAL_IN_SEC, new CNumericBox('delay',$delay,5), null, 'row_delay');
 		foreach($types as $it) {
@@ -593,9 +596,6 @@ switch($itemType) {
 			zbx_subarray_push($typeVisibility, $it, 'delay');
 			zbx_subarray_push($typeVisibility, $it, 'row_delay');
 		}
-
-// Filter
-		$frmItem->addRow(S_FILTER, new CTextArea('item_filter','',40, 3), null);
 
 // Flexible intervals (sec)
 		$frmItem->addRow(S_FLEXIBLE_INTERVALS, $delay_flex_el, null, 'row_flex_intervals');
@@ -659,10 +659,10 @@ switch($itemType) {
 		$numrows = new CDiv();
 		$numrows->setAttribute('name', 'numrows');
 
-		$items_wdgt->addHeader(S_ITEMS_BIG, SPACE);
+		$items_wdgt->addHeader(S_DISCOVERY_RULES_BIG, SPACE);
 		$items_wdgt->addHeader($numrows, SPACE);
 
-		$items_wdgt->addItem(get_header_host_table($_REQUEST['hostid']));
+		$items_wdgt->addItem(get_header_host_table($_REQUEST['hostid'], 'discoveries'));
 // ----------------
 
 		$form = new CForm();
@@ -673,7 +673,7 @@ switch($itemType) {
 		$table->setHeader(array(
 			new CCheckBox('all_items',null,"checkAll('".$form->GetName()."','all_items','group_itemid');"),
 			make_sorting_header(S_DESCRIPTION,'description'),
-			'Subrules',
+			S_PROTOTYPES,
 			make_sorting_header(S_KEY,'key_'),
 			make_sorting_header(S_INTERVAL,'delay'),
 			make_sorting_header(S_TYPE,'type'),
@@ -691,6 +691,7 @@ switch($itemType) {
 			'editable' => 1,
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY),
 			'select_applications' => API_OUTPUT_EXTEND,
+			'select_subrules' => API_OUTPUT_COUNT,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
@@ -733,8 +734,8 @@ switch($itemType) {
 				$applications = implode(', ', $applications);
 			}
 
-			$subrules = array(new CLink('subrule', 'host_subrule.php?&parent_itemid='.$item['itemid']),
-				' ('.'1'.')');
+			$subrules = array(new CLink(S_PROTOTYPES, 'disc_prototypes.php?&parent_itemid='.$item['itemid']),
+				' ('.$item['subrules'].')');
 
 			$table->addRow(array(
 				new CCheckBox('group_itemid['.$item['itemid'].']',null,null,$item['itemid']),
