@@ -1390,6 +1390,7 @@ static int	compare_last_and_prev(const DB_ITEM *item, time_t now)
 {
 	int		i, res;
 	char		sql[128];
+	char		*last = NULL;
 	DB_RESULT	result;
 	DB_ROW		row_last;
 	DB_ROW		row_prev;
@@ -1420,11 +1421,15 @@ static int	compare_last_and_prev(const DB_ITEM *item, time_t now)
 
 	if (NULL == (row_last = DBfetch(result)))
 		goto clean;
+	else
+		last = strdup(row_last[0]);
+
 	if (NULL == (row_prev = DBfetch(result)))
 		goto clean;
 
-	res = strcmp(row_last[0], row_prev[0]);
+	res = strcmp(last, row_prev[0]);
 clean:
+	zbx_free(last);
 	DBfree_result(result);
 	
 	return res;
