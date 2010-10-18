@@ -423,6 +423,16 @@
 			$item['applications'] = get_same_applications_for_host($item['applications'], $db_host['hostid']);
 			$item['templateid'] = $itemid;
 
+			if(isset($item['parent_itemid'])){
+				$sql = 'SELECT parent_itemid FROM item_discovery WHERE itemid='.$itemid;
+				$current_parentid = DBfetch(DBselect($sql));
+				$sql = 'SELECT itemid FROM items WHERE templateid='.
+						$current_parentid['parent_itemid'].' AND hostid='.$item['hostid'];
+				$new_parentid = DBfetch(DBselect($sql));
+
+				$item['parent_itemid'] = $new_parentid['itemid'];
+			}
+
 			$result = add_item($item);
 			if(!$result) break;
 		}

@@ -1203,6 +1203,14 @@
 	'S_FORMULA'=>						'Formula',
 	'S_RULE'=>						'Rule',
 
+// host_discovery.php
+	'S_CONFIGURATION_OF_DISCOVERY_RULES_BIG' => 'CONFIGURATION OF DISCOVERY RULES',
+	'S_PROTOTYPES' => 'Prototypes',
+	
+// disc_prototypes.php
+	'S_CONFIGURATION_OF_PROTOTYPES_BIG' => 'CONFIGURATION OF PROTOTYPES', 
+	'S_PROTOTYPES_OF_BIG' => 'PROTOTYPES OF', 
+	
 //	events.php
 	'S_EVENT'=>				'Event',
 	'S_EVENT_DETAILS'=>			'Event details',

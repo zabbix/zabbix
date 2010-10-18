@@ -841,7 +841,7 @@ switch($itemType) {
 		$sortfield = getPageSortField('description');
 		$sortorder = getPageSortOrder();
 		$options = array(
-			'filter' => array(),
+			'filter' => array('flags' => 0),
 			'search' => array(),
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => 1,

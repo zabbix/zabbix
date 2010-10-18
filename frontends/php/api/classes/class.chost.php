@@ -757,6 +757,7 @@ Copt::memoryPick();
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'hostids' => $hostids,
+				'filter' => array('flags' => 0),
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
@@ -782,7 +783,7 @@ Copt::memoryPick();
 			else if(API_OUTPUT_COUNT == $options['select_items']){
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
-				
+
 				$items = CItem::get($obj_params);
 				$items = zbx_toHash($items, 'hostid');
 				foreach($result as $hostid => $host){
@@ -1550,7 +1551,7 @@ Copt::memoryPick();
 			}
 // }}} UPDATE TEMPLATE LINKAGE
 
-			
+
 // UPDATE MACROS {{{
 			if(isset($data['macros']) && !is_null($data['macros'])){
 				$macrosToAdd = zbx_toHash($data['macros'], 'macro');

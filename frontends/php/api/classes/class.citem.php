@@ -109,6 +109,7 @@ class CItem extends CZBXAPI{
 			'select_triggers'		=> null,
 			'select_graphs'			=> null,
 			'select_applications'	=> null,
+			'select_subrules'		=> null,
 			'countOutput'			=> null,
 			'groupCount'			=> null,
 			'preservekeys'			=> null,
@@ -290,12 +291,16 @@ class CItem extends CZBXAPI{
 			zbx_value2array($options['discoveryids']);
 
 			if($options['output'] != API_OUTPUT_SHORTEN){
-				$sql_parts['select']['discoveryid'] = 'id.parent_itemid';
+				$sql_parts['select']['discoveryid'] = 'id.parent_itemid as discoveryid';
 			}
 
 			$sql_parts['from']['item_discovery'] = 'item_discovery id';
 			$sql_parts['where'][] = DBcondition('id.parent_itemid', $options['discoveryids']);
 			$sql_parts['where']['idi'] = 'i.itemid=id.itemid';
+
+			if(!is_null($options['groupCount'])){
+				$sql_parts['group']['id'] = 'id.parent_itemid';
+			}
 		}
 
 // webitems
@@ -498,6 +503,9 @@ class CItem extends CZBXAPI{
 					if(!is_null($options['select_applications']) && !isset($result[$item['itemid']]['applications'])){
 						$result[$item['itemid']]['applications'] = array();
 					}
+					if(!is_null($options['select_subrules']) && !isset($result[$item['itemid']]['subrules'])){
+						$result[$item['itemid']]['subrules'] = array();
+					}
 
 // hostids
 					if(isset($item['hostid']) && is_null($options['select_hosts'])){
@@ -625,6 +633,51 @@ COpt::memoryPick();
 				unset($application['items']);
 				foreach($aitems as $inum => $item){
 					$result[$item['itemid']]['applications'][] = $application;
+				}
+			}
+		}
+
+// Adding subrules
+		if(!is_null($options['select_subrules'])){
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'discoveryids' => $itemids,
+				'nopermissions' => 1,
+				'preservekeys' => 1,
+			);
+
+			if(is_array($options['select_subrules']) || str_in_array($options['select_subrules'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['select_subrules'];
+				$subrules = self::get($obj_params);
+
+				if(!is_null($options['limitSelects'])) order_result($subrules, 'description');
+				foreach($subrules as $itemid => $subrule){
+					unset($subrules[$itemid]['discoveries']);
+					$count = array();
+					foreach($subrule['discoveries'] as $discovery){
+						if(!is_null($options['limitSelects'])){
+							if(!isset($count[$discovery['itemid']])) $count[$discovery['itemid']] = 0;
+							$count[$discovery['itemid']]++;
+
+							if($count[$discovery['itemid']] > $options['limitSelects']) continue;
+						}
+
+						$result[$discovery['itemid']]['subrules'][] = &$subrules[$itemid];
+					}
+				}
+			}
+			else if(API_OUTPUT_COUNT == $options['select_subrules']){
+				$obj_params['countOutput'] = 1;
+				$obj_params['groupCount'] = 1;
+
+				$subrules = CItem::get($obj_params);
+
+				$subrules = zbx_toHash($subrules, 'parent_itemid');
+				foreach($result as $itemid => $item){
+					if(isset($subrules[$itemid]))
+						$result[$itemid]['subrules'] = $subrules[$itemid]['rowscount'];
+					else
+						$result[$itemid]['subrules'] = 0;
 				}
 			}
 		}
