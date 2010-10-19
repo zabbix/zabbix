@@ -109,14 +109,15 @@ class CItem extends CZBXAPI{
 			'select_triggers'		=> null,
 			'select_graphs'			=> null,
 			'select_applications'	=> null,
-			'select_subrules'		=> null,
+			'select_prototypes'		=> null,
 			'countOutput'			=> null,
 			'groupCount'			=> null,
 			'preservekeys'			=> null,
 
 			'sortfield'				=> '',
 			'sortorder'				=> '',
-			'limit'					=> null
+			'limit'					=> null,
+			'limitSelects'			=> null
 		);
 
 
@@ -291,7 +292,7 @@ class CItem extends CZBXAPI{
 			zbx_value2array($options['discoveryids']);
 
 			if($options['output'] != API_OUTPUT_SHORTEN){
-				$sql_parts['select']['discoveryid'] = 'id.parent_itemid as discoveryid';
+				$sql_parts['select']['discoveryid'] = 'id.parent_itemid';
 			}
 
 			$sql_parts['from']['item_discovery'] = 'item_discovery id';
@@ -348,7 +349,13 @@ class CItem extends CZBXAPI{
 		}
 
 // --- FILTER ---
+		if(is_null($options['filter']))
+			$options['filter'] = array();
+
 		if(is_array($options['filter'])){
+			if(!array_key_exists('flags', $options['filter']))
+    			$options['filter']['flags'] = 0;
+
 			zbx_db_filter('items i', $options, $sql_parts);
 
 			if(isset($options['filter']['host'])){
@@ -503,8 +510,8 @@ class CItem extends CZBXAPI{
 					if(!is_null($options['select_applications']) && !isset($result[$item['itemid']]['applications'])){
 						$result[$item['itemid']]['applications'] = array();
 					}
-					if(!is_null($options['select_subrules']) && !isset($result[$item['itemid']]['subrules'])){
-						$result[$item['itemid']]['subrules'] = array();
+					if(!is_null($options['select_prototypes']) && !isset($result[$item['itemid']]['prototypes'])){
+						$result[$item['itemid']]['prototypes'] = array();
 					}
 
 // hostids
@@ -584,37 +591,89 @@ COpt::memoryPick();
 		}
 
 // Adding triggers
-		if(!is_null($options['select_triggers']) && str_in_array($options['select_triggers'], $subselects_allowed_outputs)){
+		if(!is_null($options['select_triggers'])){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'output' => $options['select_triggers'],
 				'itemids' => $itemids,
 				'preservekeys' => 1
 			);
-			$triggers = CTrigger::get($obj_params);
-			foreach($triggers as $triggerid => $trigger){
-				$titems = $trigger['items'];
-				unset($trigger['items']);
-				foreach($titems as $inum => $item){
-					$result[$item['itemid']]['triggers'][] = $trigger;
+
+			if(in_array($options['select_triggers'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['select_triggers'];
+				$triggers = CTrigger::get($obj_params);
+
+				if(!is_null($options['limitSelects'])) order_result($triggers, 'name');
+				foreach($triggers as $triggerid => $trigger){
+					unset($triggers[$triggerid]['items']);
+					$count = array();
+					foreach($trigger['items'] as $item){
+						if(!is_null($options['limitSelects'])){
+							if(!isset($count[$item['itemid']])) $count[$item['itemid']] = 0;
+							$count[$item['itemid']]++;
+
+							if($count[$item['itemid']] > $options['limitSelects']) continue;
+						}
+
+						$result[$item['itemid']]['triggers'][] = &$triggers[$triggerid];
+					}
+				}
+			}
+			else if(API_OUTPUT_COUNT == $options['select_triggers']){
+				$obj_params['countOutput'] = 1;
+				$obj_params['groupCount'] = 1;
+
+				$triggers = CTrigger::get($obj_params);
+
+				$triggers = zbx_toHash($triggers, 'itemid');
+				foreach($result as $itemid => $item){
+					if(isset($triggers[$itemid]))
+						$result[$itemid]['triggers'] = $triggers[$itemid]['rowscount'];
+					else
+						$result[$itemid]['triggers'] = 0;
 				}
 			}
 		}
 
 // Adding graphs
-		if(!is_null($options['select_graphs']) && str_in_array($options['select_graphs'], $subselects_allowed_outputs)){
+		if(!is_null($options['select_graphs'])){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'output' => $options['select_graphs'],
 				'itemids' => $itemids,
 				'preservekeys' => 1
 			);
-			$graphs = CGraph::get($obj_params);
-			foreach($graphs as $graphid => $graph){
-				$gitems = $graph['items'];
-				unset($graph['items']);
-				foreach($gitems as $inum => $item){
-					$result[$item['itemid']]['graphs'][] = $graph;
+
+			if(in_array($options['select_graphs'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['select_graphs'];
+				$graphs = CGraph::get($obj_params);
+
+				if(!is_null($options['limitSelects'])) order_result($graphs, 'name');
+				foreach($graphs as $graphid => $graph){
+					unset($graphs[$graphid]['items']);
+					$count = array();
+					foreach($graph['items'] as $item){
+						if(!is_null($options['limitSelects'])){
+							if(!isset($count[$item['itemid']])) $count[$item['itemid']] = 0;
+							$count[$item['itemid']]++;
+
+							if($count[$item['itemid']] > $options['limitSelects']) continue;
+						}
+
+						$result[$item['itemid']]['graphs'][] = &$graphs[$graphid];
+					}
+				}
+			}
+			else if(API_OUTPUT_COUNT == $options['select_graphs']){
+				$obj_params['countOutput'] = 1;
+				$obj_params['groupCount'] = 1;
+
+				$graphs = CGraph::get($obj_params);
+
+				$graphs = zbx_toHash($graphs, 'itemid');
+				foreach($result as $itemid => $item){
+					if(isset($graphs[$itemid]))
+						$result[$itemid]['graphs'] = $graphs[$itemid]['rowscount'];
+					else
+						$result[$itemid]['graphs'] = 0;
 				}
 			}
 		}
@@ -637,22 +696,23 @@ COpt::memoryPick();
 			}
 		}
 
-// Adding subrules
-		if(!is_null($options['select_subrules'])){
+// Adding prototypes
+		if(!is_null($options['select_prototypes'])){
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'discoveryids' => $itemids,
+				'filter' => array('flags' => null),
 				'nopermissions' => 1,
 				'preservekeys' => 1,
 			);
 
-			if(is_array($options['select_subrules']) || str_in_array($options['select_subrules'], $subselects_allowed_outputs)){
-				$obj_params['output'] = $options['select_subrules'];
-				$subrules = self::get($obj_params);
+			if(is_array($options['select_prototypes']) || str_in_array($options['select_prototypes'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['select_prototypes'];
+				$prototypes = self::get($obj_params);
 
-				if(!is_null($options['limitSelects'])) order_result($subrules, 'description');
-				foreach($subrules as $itemid => $subrule){
-					unset($subrules[$itemid]['discoveries']);
+				if(!is_null($options['limitSelects'])) order_result($prototypes, 'description');
+				foreach($prototypes as $itemid => $subrule){
+					unset($prototypes[$itemid]['discoveries']);
 					$count = array();
 					foreach($subrule['discoveries'] as $discovery){
 						if(!is_null($options['limitSelects'])){
@@ -662,22 +722,22 @@ COpt::memoryPick();
 							if($count[$discovery['itemid']] > $options['limitSelects']) continue;
 						}
 
-						$result[$discovery['itemid']]['subrules'][] = &$subrules[$itemid];
+						$result[$discovery['itemid']]['prototypes'][] = &$prototypes[$itemid];
 					}
 				}
 			}
-			else if(API_OUTPUT_COUNT == $options['select_subrules']){
+			else if(API_OUTPUT_COUNT == $options['select_prototypes']){
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
-				$subrules = CItem::get($obj_params);
+				$prototypes = self::get($obj_params);
 
-				$subrules = zbx_toHash($subrules, 'parent_itemid');
+				$prototypes = zbx_toHash($prototypes, 'parent_itemid');
 				foreach($result as $itemid => $item){
-					if(isset($subrules[$itemid]))
-						$result[$itemid]['subrules'] = $subrules[$itemid]['rowscount'];
+					if(isset($prototypes[$itemid]))
+						$result[$itemid]['prototypes'] = $prototypes[$itemid]['rowscount'];
 					else
-						$result[$itemid]['subrules'] = 0;
+						$result[$itemid]['prototypes'] = 0;
 				}
 			}
 		}

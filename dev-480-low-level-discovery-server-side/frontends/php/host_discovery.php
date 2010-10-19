@@ -674,6 +674,8 @@ switch($itemType) {
 			new CCheckBox('all_items',null,"checkAll('".$form->GetName()."','all_items','group_itemid');"),
 			make_sorting_header(S_DESCRIPTION,'description'),
 			S_PROTOTYPES,
+			S_TRIGGERS,
+			S_GRAPHS,
 			make_sorting_header(S_KEY,'key_'),
 			make_sorting_header(S_INTERVAL,'delay'),
 			make_sorting_header(S_TYPE,'type'),
@@ -681,7 +683,6 @@ switch($itemType) {
 			S_APPLICATIONS,
 			S_ERROR
 		));
-
 
 		$sortfield = getPageSortField('description');
 		$sortorder = getPageSortOrder();
@@ -691,7 +692,7 @@ switch($itemType) {
 			'editable' => 1,
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY),
 			'select_applications' => API_OUTPUT_EXTEND,
-			'select_subrules' => API_OUTPUT_COUNT,
+			'select_prototypes' => API_OUTPUT_COUNT,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
@@ -700,6 +701,16 @@ switch($itemType) {
 
 		order_result($items, $sortfield, $sortorder);
 		$paging = getPagingLine($items);
+
+		$options = array(
+			'discoveryids' => zbx_objectValues($items, 'itemid'),
+			'filter' => array('flags' => null),
+			'output' => API_OUTPUT_COUNT,
+			'groupCount' => true,
+			'countOutput' => true,
+		);
+		$graphs = CGraph::get($options);
+		$graphs = zbx_toHash($graphs, 'parent_itemid');
 
 		foreach($items as $inum => $item){
 			$description = array();
@@ -710,6 +721,7 @@ switch($itemType) {
 			}
 			$item['description_expanded'] = item_description($item);
 			$description[] = new CLink($item['description_expanded'], '?form=update&itemid='.$item['itemid']);
+
 
 			$status = new CCol(new CLink(item_status2str($item['status']), '?group_itemid='.$item['itemid'].'&go='.
 				($item['status']? 'activate':'disable'), item_status2style($item['status'])));
@@ -723,24 +735,24 @@ switch($itemType) {
 				$error->setHint($item['error'], '', 'on');
 			}
 
-			if(empty($item['applications'])){
-				$applications = '-';
-			}
-			else{
-				$applications = array();
-				foreach($item['applications'] as $anum => $app){
-					$applications[] = $app['name'];
-				}
-				$applications = implode(', ', $applications);
-			}
+			$applications = zbx_objectValues($item['applications'], 'name');
+			$applications = implode(', ', $applications);
 
-			$subrules = array(new CLink(S_PROTOTYPES, 'disc_prototypes.php?&parent_itemid='.$item['itemid']),
-				' ('.$item['subrules'].')');
+			$prototypes = array(new CLink(S_PROTOTYPES, 'disc_prototypes.php?&parent_discoveryid='.$item['itemid']),
+				' ('.$item['prototypes'].')');
+			$prototriggers = array(new CLink(S_TRIGGERS, 'triggers.php?&parent_discoveryid='.$item['itemid']),
+				' ('.$item['triggers'].')');
+
+			$graphs_count = isset($graphs[$item['itemid']]['rowscount']) ? $graphs[$item['itemid']]['rowscount'] : 0;
+			$protographs = array(new CLink(S_GRAPHS, 'graph_prototypes.php?&parent_discoveryid='.$item['itemid']),
+				' ('.$graphs_count.')');
 
 			$table->addRow(array(
 				new CCheckBox('group_itemid['.$item['itemid'].']',null,null,$item['itemid']),
 				$description,
-				$subrules,
+				$prototypes,
+				$prototriggers,
+				$protographs,
 				$item['key_'],
 				$item['delay'],
 				item_type2str($item['type']),

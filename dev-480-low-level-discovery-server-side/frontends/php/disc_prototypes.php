@@ -25,7 +25,7 @@ require_once('include/items.inc.php');
 require_once('include/forms.inc.php');
 
 $page['title'] = 'S_CONFIGURATION_OF_ITEMS';
-$page['file'] = 'host_subrule.php';
+$page['file'] = 'disc_prototypes.php';
 $page['scripts'] = array('effects.js', 'class.cviewswitcher.js');
 $page['hist_arg'] = array();
 
@@ -42,7 +42,7 @@ switch($itemType) {
 }
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'parent_itemid' =>	array(T_ZBX_INT, O_MAND,	 P_SYS,	DB_ID,		null),
+		'parent_discoveryid' =>	array(T_ZBX_INT, O_MAND,	 P_SYS,	DB_ID,		null),
 		'itemid' =>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,		'(isset({form})&&({form}=="update"))'),
 
 		'groupid'=>			array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			null),
@@ -165,26 +165,17 @@ switch($itemType) {
 	$_REQUEST['go'] = get_request('go', 'none');
 
 // PERMISSIONS
-	if(get_request('parent_itemid', false)){
+	if(get_request('parent_discoveryid', false)){
 		$options = array(
-			'itemids' => $_REQUEST['parent_itemid'],
+			'itemids' => $_REQUEST['parent_discoveryid'],
 			'output' => API_OUTPUT_EXTEND,
+			'filter' => array('flags' => null),
 			'editable' => 1
 		);
 		$discovery_rule = CItem::get($options);
 		$discovery_rule = reset($discovery_rule);
 		if(!$discovery_rule) access_deny();
 		$_REQUEST['hostid'] = $discovery_rule['hostid'];
-	}
-	else if(get_request('hostid', 0) > 0){
-		$options = array(
-			'hostids' => $_REQUEST['hostid'],
-			'extendoutput' => 1,
-			'templated_hosts' => 1,
-			'editable' => 1
-		);
-		$hosts = CHost::get($options);
-		if(empty($hosts)) access_deny();
 	}
 ?>
 <?php
@@ -278,7 +269,7 @@ switch($itemType) {
 			'data_type'		=> get_request('data_type'),
 			'applications' => $applications,
 			'flags' => ZBX_FLAG_DISCOVERY_CHILD,
-			'parent_itemid' => get_request('parent_itemid'),
+			'parent_itemid' => get_request('parent_discoveryid'),
 		);
 
 		if(isset($_REQUEST['itemid'])){
@@ -362,7 +353,7 @@ switch($itemType) {
 
 	if(!isset($_REQUEST['form'])){
 		$form = new CForm(null, 'get');
-		$form->addVar('parent_itemid', $_REQUEST['parent_itemid']);
+		$form->addVar('parent_discoveryid', $_REQUEST['parent_discoveryid']);
 		$form->addItem(new CButton('form', S_CREATE_RULE));
 	}
 	else{
@@ -387,14 +378,12 @@ switch($itemType) {
 
 		$form = new CForm();
 		$form->setName('items');
-		$form->addVar('parent_itemid', $_REQUEST['parent_itemid']);
+		$form->addVar('parent_discoveryid', $_REQUEST['parent_discoveryid']);
 
 		$table = new CTableInfo();
 		$table->setHeader(array(
 			new CCheckBox('all_items',null,"checkAll('".$form->GetName()."','all_items','group_itemid');"),
 			make_sorting_header(S_DESCRIPTION,'description'),
-			S_TRIGGERS,
-			S_GRAPHS,
 			make_sorting_header(S_KEY,'key_'),
 			make_sorting_header(S_INTERVAL,'delay'),
 			make_sorting_header(S_TYPE,'type'),
@@ -407,9 +396,9 @@ switch($itemType) {
 		$sortfield = getPageSortField('description');
 		$sortorder = getPageSortOrder();
 		$options = array(
-			'hostids' => $_REQUEST['hostid'],
-			'discoveryids' => $_REQUEST['parent_itemid'],
+			'discoveryids' => $_REQUEST['parent_discoveryid'],
 			'output' => API_OUTPUT_EXTEND,
+			'filter' => array('flags' => null),
 			'editable' => 1,
 			'select_applications' => API_OUTPUT_EXTEND,
 			'sortfield' => $sortfield,
@@ -429,7 +418,7 @@ switch($itemType) {
 				$description[] = ':';
 			}
 			$item['description_expanded'] = item_description($item);
-			$description[] = new CLink($item['description_expanded'], '?form=update&itemid='.$item['itemid'].'&parent_itemid='.$_REQUEST['parent_itemid']);
+			$description[] = new CLink($item['description_expanded'], '?form=update&itemid='.$item['itemid'].'&parent_discoveryid='.$_REQUEST['parent_discoveryid']);
 
 			$status = new CCol(new CLink(item_status2str($item['status']), '?group_itemid='.$item['itemid'].'&go='.
 				($item['status']? 'activate':'disable'), item_status2style($item['status'])));
@@ -444,27 +433,12 @@ switch($itemType) {
 			}
 
 
-			if(empty($item['applications'])){
-				$applications = '-';
-			}
-			else{
-				$applications = array();
-				foreach($item['applications'] as $anum => $app){
-					$applications[] = $app['name'];
-				}
-				$applications = implode(', ', $applications);
-			}
-
-			$subtriggers = array(new CLink('triggers', 'triggers.php?&parent_itemid='.$item['itemid']),
-				' ('.'#'.')');
-			$subgraphs = array(new CLink('graphs', 'graphs.php?&parent_itemid='.$item['itemid']),
-				' ('.'#'.')');
+			$applications = zbx_objectValues($item['applications'], 'name');
+			$applications = implode(', ', $applications);
 
 			$table->addRow(array(
 				new CCheckBox('group_itemid['.$item['itemid'].']',null,null,$item['itemid']),
 				$description,
-				$subtriggers,
-				$subgraphs,
 				$item['key_'],
 				$item['delay'],
 				item_type2str($item['type']),
