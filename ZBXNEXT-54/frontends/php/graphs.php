@@ -354,8 +354,10 @@ include_once('include/page_header.php');
 	$form = new CForm(null, 'get');
 
 // Config
-	if(!isset($_REQUEST['form']))
+	if(!isset($_REQUEST['form'])){
+		$form->cleanItems();
 		$form->addItem(new CButton('form', S_CREATE_GRAPH));
+	}
 
 	show_table_header(S_CONFIGURATION_OF_GRAPHS_BIG,$form);
 

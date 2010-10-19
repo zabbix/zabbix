@@ -2977,7 +2977,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		}
 
 
-		if(!isset($_REQUEST['graphid']) && isset($_REQUEST['form_refresh']) && ($_REQUEST['form_refresh'] < 2)){
+		if(!isset($_REQUEST['graphid']) && !isset($_REQUEST['form_refresh'])){
 			$legend = $_REQUEST['legend'] = 1;
 		}
 
