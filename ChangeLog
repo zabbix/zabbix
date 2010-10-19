@@ -13,6 +13,7 @@ Changes for 1.9
 
 Changes for 1.8.4rc2
 
+ - [ZBX-3042] fixed submitParent field error (KB)
  - [ZBX-1038] fixed last(), prev(), diff(), change(), and abschange() not working properly with long textual values (asaveljevs)
  - [ZBXNEXT-532] specify timestamp format in zabbix_sender manpage and help output; hint at required item configuration in zabbix_sender manpage (Richlv)
  - [ZBX-3103] updated French translation; thanks to Alixen (Richlv)
