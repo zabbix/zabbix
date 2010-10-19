@@ -681,7 +681,7 @@ FIELD		|snmp_community	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|snmp_oid	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|snmp_port	|t_integer	|'161'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|hostid		|t_id		|	|NOT NULL	|ZBX_SYNC,ZBX_PROXY	|1|hosts
-FIELD		|description	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|delay		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|history	|t_integer	|'90'	|NOT NULL	|ZBX_SYNC
@@ -717,7 +717,7 @@ FIELD		|publickey	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|privatekey	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|mtime		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|lastns		|t_nanosec	|	|NULL		|0
-FIELD		|description_details|t_blob	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|description	|t_text	|''	|NOT NULL	|ZBX_SYNC
 UNIQUE		|1		|hostid,key_
 INDEX		|3		|status
 INDEX		|4		|templateid
@@ -750,7 +750,7 @@ INDEX		|2		|mediatypeid
 TABLE|media_type|mediatypeid|ZBX_SYNC
 FIELD		|mediatypeid	|t_id		|	|NOT NULL	|0
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|description	|t_varchar(100)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|name		|t_varchar(100)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|smtp_server	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|smtp_helo	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|smtp_email	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
@@ -888,14 +888,14 @@ INDEX		|1		|name
 TABLE|triggers|triggerid|ZBX_SYNC
 FIELD		|triggerid	|t_id		|	|NOT NULL	|0
 FIELD		|expression	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|description	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|url		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|value		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|priority	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|lastchange	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|dep_level	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|comments	|t_blob		|''	|NOT NULL	|ZBX_SYNC
+FIELD		|description	|t_text		|''	|NOT NULL	|ZBX_SYNC
 FIELD		|error		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|templateid	|t_id		|	|NULL		|ZBX_SYNC		|1|triggers	|triggerid
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
@@ -952,7 +952,7 @@ TABLE|maintenances|maintenanceid|ZBX_SYNC
 FIELD		|maintenanceid	|t_id		|	|NOT NULL	|0
 FIELD		|name		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|maintenance_type|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|description	|t_blob		|''	|NOT NULL	|ZBX_SYNC
+FIELD		|description	|t_text		|''	|NOT NULL	|ZBX_SYNC
 FIELD		|active_since	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|active_till	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|active_since,active_till

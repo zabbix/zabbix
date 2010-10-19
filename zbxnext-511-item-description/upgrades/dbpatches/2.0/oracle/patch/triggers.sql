@@ -1,3 +1,5 @@
+ALTER TABLE triggers RENAME COLUMN description to name;
+ALTER TABLE triggers RENAME COLUMN comments to description;
 ALTER TABLE triggers MODIFY triggerid DEFAULT NULL;
 ALTER TABLE triggers MODIFY templateid DEFAULT NULL;
 ALTER TABLE triggers MODIFY templateid NULL;

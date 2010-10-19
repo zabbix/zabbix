@@ -1,4 +1,6 @@
 ALTER TABLE triggers MODIFY triggerid bigint unsigned NOT NULL,
+			 CHANGE COLUMN description name VARCHAR(255) NOT NULL DEFAULT '',
+			 CHANGE COLUMN comments description TEXT NOT NULL DEFAULT '',
 		     MODIFY templateid bigint unsigned NULL;
 UPDATE triggers SET templateid=NULL WHERE templateid=0;
 CREATE TEMPORARY TABLE tmp_triggers_triggerid (triggerid bigint unsigned PRIMARY KEY);

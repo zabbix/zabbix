@@ -1,4 +1,5 @@
 ALTER TABLE items MODIFY itemid bigint unsigned NOT NULL,
+		  CHANGE COLUMN description name VARCHAR(255) NOT NULL DEFAULT '',
 		  MODIFY hostid bigint unsigned NOT NULL,
 		  MODIFY lastvalue text NULL,
 		  MODIFY prevvalue text NULL,
@@ -6,7 +7,7 @@ ALTER TABLE items MODIFY itemid bigint unsigned NOT NULL,
 		  MODIFY templateid bigint unsigned NULL,
 		  MODIFY valuemapid bigint unsigned NULL,
 		  ADD lastns integer NULL,
-		  ADD description_details blob NOT NULL;
+		  ADD description text NOT NULL;
 UPDATE items SET templateid=NULL WHERE templateid=0;
 CREATE TEMPORARY TABLE tmp_items_itemid (itemid bigint unsigned PRIMARY KEY);
 INSERT INTO tmp_items_itemid (itemid) (SELECT itemid FROM items);
