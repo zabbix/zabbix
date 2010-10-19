@@ -1354,7 +1354,8 @@
 				'nodeids' => get_current_nodeid(true),
 				'triggerids' => array_keys($triggers_map_submaps),
 				'filter' => array(
-					'value' => array(TRIGGER_VALUE_TRUE)
+//					'value' => TRIGGER_VALUE_TRUE,
+					'value_flags' => null
 				),
 				'skipDependent' => 1,
 				'output' => API_OUTPUT_EXTEND,
@@ -1377,7 +1378,7 @@
 				'output' => API_OUTPUT_EXTEND,
 				'nopermissions' => 1,
 				'filter' => array(
-					'value' => array(TRIGGER_VALUE_TRUE),
+//					'value' => TRIGGER_VALUE_TRUE,
 					'value_flags' => null,
 				),
 				'nodeids' => get_current_nodeid(true),
@@ -1404,7 +1405,10 @@
 			'nodeids' => get_current_nodeid(true),
 			'nopermissions' => 1,
 			'active' => 1,
-			'filter' => array('value' => TRIGGER_VALUE_TRUE),
+			'filter' => array(
+				'value' => TRIGGER_VALUE_TRUE,
+				'value_flags' => null
+			),
 		);
 		$unack_triggerids = CTrigger::get($options);
 		$unack_triggerids = zbx_toHash($unack_triggerids, 'triggerid');
@@ -1442,9 +1446,9 @@
 					$i['trigger_disabled']++;
 				}
 				else{
-					if(false && $trigger['value_flags'] == TRIGGER_VALUE_FLAG_UNKNOWN){
+					if($trigger['value_flags'] == TRIGGER_VALUE_FLAG_UNKNOWN){
 // TODO: correct actions in that case
-						//$i['unknown']++;
+						$i['unknown']++;
 					}
 					else if($trigger['value'] == TRIGGER_VALUE_TRUE){
 						$i['problem']++;
@@ -2086,6 +2090,7 @@
 			}
 			else if($map['label_type'] == MAP_LABEL_TYPE_NAME){
 				$label[] = array('msg' => $el_info['name']);
+				$label = array_merge($label, $status_lines[$selementid]);
 			}
 			else{
 				$label = array_merge($label_lines[$selementid], $status_lines[$selementid]);

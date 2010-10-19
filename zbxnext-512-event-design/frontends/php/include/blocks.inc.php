@@ -342,29 +342,32 @@ function make_system_status($filter){
 					S_HOST,
 					S_ISSUE,
 					S_AGE,
+					S_INFO,
 					($config['event_ack_enable']) ? S_ACK : NULL,
 					S_ACTIONS
 				));
 
 				foreach($data['triggers'] as $tnum => $trigger){
 					$event = $trigger['event'];
-					if($config['event_ack_enable'] && isset($event['eventid'])){
-						$ack = $event['acknowledged']
-								? new CLink(S_YES, 'acknow.php?eventid='.$event['eventid'], 'off')
-								: new CLink(S_NO, 'acknow.php?eventid='.$event['eventid'], 'on');
+					$ack = getEventAckState($event);
 
-						$actions = get_event_actions_status($event['eventid']);
-					}
-					else{
-						$ack = '-';
-						$actions = S_NO_DATA_SMALL;
-					}
+					if(isset($event['eventid'])) $actions = get_event_actions_status($event['eventid']);
+					else $actions = S_NO_DATA_SMALL;
 
+// Unknown triggers
+					$unknown = new CDiv(SPACE,'iconok');
+					if($trigger['value_flags'] == TRIGGER_VALUE_FLAG_UNKNOWN){
+						$unknown = new CDiv(SPACE,'iconunknown');
+						$unknown->setHint($trigger['error'], '', 'on');
+					}
+//----
+	
 					$table_inf->addRow(array(
 						get_node_name_by_elid($trigger['triggerid']),
 						$trigger['host'],
 						new CCol($trigger['description'], get_severity_style($trigger['priority'])),
 						zbx_date2age($event['clock']),
+						$unknown,
 						($config['event_ack_enable']) ? (new CCol($ack, 'center')) : NULL,
 						$actions
 					));
@@ -379,27 +382,32 @@ function make_system_status($filter){
 					S_HOST,
 					S_ISSUE,
 					S_AGE,
+					S_INFO,
 					($config['event_ack_enable']) ? S_ACK : NULL,
 					S_ACTIONS
 				));
 
 				foreach($data['triggers_unack'] as $tnum => $trigger){
 					$event = $trigger['event'];
+					$ack = getEventAckState($event);
 
-					if($config['event_ack_enable']){
-						$ack = new CLink(S_NO, 'acknow.php?eventid='.$event['eventid'], 'on');
-						$actions = get_event_actions_status($event['eventid']);
+					if(isset($event['eventid'])) $actions = get_event_actions_status($event['eventid']);
+					else $actions = S_NO_DATA_SMALL;
+
+// Unknown triggers
+					$unknown = new CDiv(SPACE,'iconok');
+					if($trigger['value_flags'] == TRIGGER_VALUE_FLAG_UNKNOWN){
+						$unknown = new CDiv(SPACE,'iconunknown');
+						$unknown->setHint($trigger['error'], '', 'on');
 					}
-					else{
-						$ack = '-';
-						$actions = S_NO_DATA_SMALL;
-					}
+//----
 
 					$table_inf_unack->addRow(array(
 						get_node_name_by_elid($trigger['triggerid']),
 						$trigger['host'],
 						new CCol($trigger['description'], get_severity_style($trigger['priority'])),
 						zbx_date2age($event['clock']),
+						$unknown,
 						($config['event_ack_enable']) ? (new CCol($ack, 'center')) : NULL,
 						$actions
 					));
@@ -859,7 +867,6 @@ function make_latest_issues($filter = array()){
 		'filter' => array(
 			'priority' => $filter['severity'],
 			'value' => TRIGGER_VALUE_TRUE,
-			'value_flags' => TRIGGER_VALUE_FLAG_NORMAL
 		),
 		'select_groups' => API_OUTPUT_EXTEND,
 		'select_hosts' => array('hostid', 'host', 'maintenance_status', 'maintenanceid'),
@@ -897,6 +904,7 @@ function make_latest_issues($filter = array()){
 		S_ISSUE,
 		S_LAST_CHANGE,
 		S_AGE,
+		S_INFO,
 		($config['event_ack_enable'])? S_ACK : NULL,
 		S_ACTIONS
 	));
@@ -920,7 +928,7 @@ function make_latest_issues($filter = array()){
 				$menus.= "[".zbx_jsvalue($script['name']).",\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$trigger['hostid']."&scriptid=".$script['scriptid']."','".S_TOOLS."',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 		}
 
-		if(!empty($scripts_by_hosts)){
+		if(!empty($scripts_by_hosts[$trigger['hostid']])){
 			$menus = "['".S_TOOLS."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus;
 		}
 
@@ -975,9 +983,15 @@ function make_latest_issues($filter = array()){
 		$host = new CSpan($trigger['host'], $style.' pointer');
 		$host->setAttribute('onclick','javascript: '.$menus);
 		if(!is_null($text)) $host->setHint($text, '', '', false);
-
 // }}} Maintenance
 
+// Unknown triggers
+		$unknown = new CDiv(SPACE,'iconok');
+		if($trigger['value_flags'] == TRIGGER_VALUE_FLAG_UNKNOWN){
+			$unknown = new CDiv(SPACE,'iconunknown');
+			$unknown->setHint($trigger['error'], '', 'on');
+		}
+//----
 		$options = array(
 			'output' => API_OUTPUT_EXTEND,
 			'select_acknowledges' => API_OUTPUT_COUNT,
@@ -1018,6 +1032,7 @@ function make_latest_issues($filter = array()){
 				$description,
 				$clock,
 				zbx_date2age($event['clock']),
+				$unknown,
 				$ack,
 				$actions
 			));

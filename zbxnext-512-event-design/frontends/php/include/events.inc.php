@@ -81,35 +81,32 @@
  *
  * author: Aly
  */
-function get_next_event($event, $event_list=array()){
-
-	if(!empty($event_list)){
-		$next_event = false;
-		if((TRIGGER_VALUE_TRUE == $event['value']) && (TRIGGER_MULT_EVENT_ENABLED == $event['type'])){
-			foreach($event_list as $e){
-				if(($e['objectid'] == $event['objectid']) && ($e['eventid'] > $event['eventid'])
-						&& ($e['value'] != TRIGGER_VALUE_UNKNOWN)){
-					$next_event = $e;
-				}
+function get_next_event($currentEvent, $eventList = null){
+	if(!is_null($eventList)){
+		$nextEvent = reset($eventList);
+		foreach($eventList as $enum => $event){
+			if(bccomp($event['eventid'], $currentEvent['eventid']) == 0){
+				if(bccomp($event['eventid'], $nextEvent['eventid']) == 0) $nextEvent = false;
+				break;
 			}
-		}
-		else{
-			foreach($event_list as $e){
-				if(($e['objectid'] == $event['objectid']) && ($e['eventid'] > $event['eventid'])
-						&& ($e['value'] != TRIGGER_VALUE_UNKNOWN) && ($e['value'] != $event['value'])){
-					$next_event = $e;
-				}
-			}
-		}
 
-		if($next_event) return $next_event;
+			if(($event['object'] == $currentEvent['object']) &&
+				(bccomp($event['objectid'], $currentEvent['objectid']) == 0) &&
+				($event['clock'] >= $currentEvent['clock']) &&
+				(bccomp($event['eventid'], $currentEvent['eventid']) != 0)
+			){
+				$nextEvent = $event;
+			}
+
+		}
+		if($nextEvent) return $nextEvent;
 	}
 
 
-	$sql = 'SELECT e.eventid, e.value, e.clock '.
-		' FROM events e'.
-		' WHERE e.objectid='.$event['objectid'].
-			' AND e.eventid > '.$event['eventid'].
+	$sql = 'SELECT e.* '.
+		' FROM events e '.
+		' WHERE e.objectid='.$currentEvent['objectid'].
+			' AND e.eventid > '.$currentEvent['eventid'].
 			' AND e.object='.EVENT_OBJECT_TRIGGER.
 			' AND e.value_changed='.TRIGGER_VALUE_CHANGED_YES.
 		' ORDER BY e.object, e.objectid, e.eventid';

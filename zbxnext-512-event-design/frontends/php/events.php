@@ -65,7 +65,7 @@
 		'filter_rst'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
 		'filter_set'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,	NULL),
 
-		'hide_unknown'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
+		'showUnknown'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
@@ -90,17 +90,17 @@
 // FILTER
 	if(isset($_REQUEST['filter_rst'])){
 		$_REQUEST['triggerid'] = 0;
-		$_REQUEST['hide_unknown'] = 0;
+		$_REQUEST['showUnknown'] = 0;
 	}
 
 	$source = get_request('triggerid') > 0 ? EVENT_SOURCE_TRIGGERS : get_request('source', CProfile::get('web.events.source', EVENT_SOURCE_TRIGGERS));
 
 	$_REQUEST['triggerid'] = get_request('triggerid',CProfile::get('web.events.filter.triggerid',0));
-	$_REQUEST['hide_unknown'] = get_request('hide_unknown',CProfile::get('web.events.filter.hide_unknown',0));
+	$_REQUEST['showUnknown'] = get_request('showUnknown',CProfile::get('web.events.filter.showUnknown',0));
 
 	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
 		CProfile::update('web.events.filter.triggerid',$_REQUEST['triggerid'], PROFILE_TYPE_ID);
-		CProfile::update('web.events.filter.hide_unknown',$_REQUEST['hide_unknown'], PROFILE_TYPE_INT);
+		CProfile::update('web.events.filter.showUnknown',$_REQUEST['showUnknown'], PROFILE_TYPE_INT);
 	}
 // --------------
 
@@ -188,11 +188,11 @@
 		));
 		$filterForm->addRow($row);
 
-		$filterForm->addVar('hide_unknown',$_REQUEST['hide_unknown']);
-		$unkcbx = new CCheckBox('hide_unk',$_REQUEST['hide_unknown'],null,'1');
-		$unkcbx->setAction('javascript: create_var("'.$filterForm->GetName().'", "hide_unknown", (this.checked?1:0), 0); ');
+		$filterForm->addVar('showUnknown',$_REQUEST['showUnknown']);
+		$unkcbx = new CCheckBox('hide_unk',$_REQUEST['showUnknown'],null,'1');
+		$unkcbx->setAction('javascript: create_var("'.$filterForm->GetName().'", "showUnknown", (this.checked?1:0), 0); ');
 
-		$filterForm->addRow(S_HIDE_UNKNOWN,$unkcbx);
+		$filterForm->addRow(S_SHOW_UNKNOWN_EVENTS,$unkcbx);
 
 		$reset = new CButton('filter_rst',S_RESET);
 		$reset->setType('button');
@@ -377,7 +377,6 @@
 				'nodeids' => get_current_nodeid(),
 				'filter' => array(
 					'object' => EVENT_OBJECT_TRIGGER,
-					'value_changed' => null
 				),
 				'time_from' => $from,
 				'time_till' => $till,
@@ -387,7 +386,7 @@
 				'limit' => ($config['search_limit']+1)
 			);
 
-			if($_REQUEST['hide_unknown']) unset($options['filter']['value_changed']);
+			if($_REQUEST['showUnknown']) $options['filter']['value_changed'] = null;
 			if(!empty($triggers)) $options['triggerids'] = zbx_objectValues($triggers, 'triggerid');
 
 			$events = CEvent::get($options);
@@ -443,11 +442,11 @@
 										zbx_jsvalue($items, true).");");
 
 // Duration
-				$tr_event = $event + $trigger;
-				if($next_event = get_next_event($tr_event, $events))
-					$event['duration'] = zbx_date2age($tr_event['clock'], $next_event['clock']);
+
+				if($nextEvent = get_next_event($event, $events))
+					$event['duration'] = zbx_date2age($event['clock'], $nextEvent['clock']);
 				else
-					$event['duration'] = zbx_date2age($tr_event['clock']);
+					$event['duration'] = zbx_date2age($event['clock']);
 
 
 				$table->addRow(array(

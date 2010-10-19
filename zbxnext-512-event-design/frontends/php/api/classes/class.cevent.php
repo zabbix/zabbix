@@ -84,7 +84,7 @@ class CEvent extends CZBXAPI{
 			'acknowledged'			=> null,
 			'nopermissions'			=> null,
 // filter
-			'hide_unknown'			=> null,
+			'showUnknown'			=> null,
 			'value'					=> null,
 			'time_from'				=> null,
 			'time_till'				=> null,
@@ -259,10 +259,10 @@ class CEvent extends CZBXAPI{
 		if(!is_null($options['acknowledged'])){
 			$sql_parts['where'][] = 'e.acknowledged='.($options['acknowledged']?1:0);
 		}
-// hide_unknown
-		if(!is_null($options['hide_unknown'])){
+// showUnknown
+		if(!is_null($options['showUnknown'])){
 			if(is_null($options['filter'])) $options['filter'] = array();
-			$options['filter']['value_changed'] = TRIGGER_VALUE_CHANGED_YES;
+			$options['filter']['value_changed'] = null;
 		}
 // time_from
 		if(!is_null($options['time_from'])){
