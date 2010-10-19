@@ -1491,9 +1491,9 @@
 		$frmItem->setAttribute('style','visibility: hidden;');
 		$frmItem->setHelp('web.items.item.php');
 
-		$parent_itemid = get_request('parent_itemid', false);
-		if($parent_itemid)
-			$frmItem->addVar('parent_itemid', $parent_itemid);
+		$parent_discoveryid = get_request('parent_discoveryid', false);
+		if($parent_discoveryid)
+			$frmItem->addVar('parent_discoveryid', $parent_discoveryid);
 
 		$hostid = get_request('form_hostid', 0);
 
@@ -1560,6 +1560,7 @@
 
 			$options = array(
 				'itemids' => $_REQUEST['itemid'],
+				'filter' => array('flags' => null),
 				'output' => API_OUTPUT_EXTEND,
 			);
 			$item_data = CItem::get($options);
@@ -1712,7 +1713,7 @@
 		else
 			$frmItem->setTitle(S_ITEM." $host : $description");
 
-		if(!$parent_itemid){
+		if(!$parent_discoveryid){
 			$frmItem->addVar('form_hostid', $hostid);
 			$frmItem->addRow(S_HOST,array(
 				new CTextBox('host',$host,32,true),
@@ -1995,13 +1996,13 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$frmItem->addRow($row);
 
 		$row = new CRow(array(new CCol(S_NEW_FLEXIBLE_INTERVAL,'form_row_l'), new CCol(
-					array(
-						S_DELAY, SPACE,
-						new CNumericBox('new_delay_flex[delay]','50',5),
-						S_PERIOD, SPACE,
-						new CTextBox('new_delay_flex[period]','1-7,00:00-23:59',27), BR(),
-						new CButton('add_delay_flex',S_ADD)
-					),'form_row_r')), 'new');
+			array(
+				S_DELAY, SPACE,
+				new CNumericBox('new_delay_flex[delay]','50',5),
+				S_PERIOD, SPACE,
+				new CTextBox('new_delay_flex[period]','1-7,00:00-23:59',27), BR(),
+				new CButton('add_delay_flex',S_ADD)
+			),'form_row_r')), 'new');
 		$row->setAttribute('id', 'row_new_delay_flex');
 		$frmItem->addRow($row);
 
@@ -2123,12 +2124,12 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		}
 		array_push($frmRow,
 			SPACE,
-			new CButtonCancel(url_param('groupid').url_param('parent_itemid'))
+			new CButtonCancel(url_param('groupid').url_param('parent_discoveryid'))
 		);
 
 		$frmItem->addSpanRow($frmRow,'form_row_last');
 
-		if(!$parent_itemid){
+		if(!$parent_discoveryid){
 // GROUP OPERATIONS
 			$cmbGroups = new CComboBox('add_groupid',$add_groupid);
 			$groups = CHostGroup::get(array(
@@ -2871,21 +2872,20 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 	function insert_graph_form(){
 
-		$frmGraph = new CFormTable(S_GRAPH, null, 'post');
+		$frmGraph = new CFormTable(S_GRAPH);
 		$frmGraph->setName('frm_graph');
-		//$frmGraph->setHelp("web.graphs.graph.php");
 
-		$parent_itemid = get_request('parent_itemid');
-		if($parent_itemid) $frmGraph->addVar('parent_itemid', $parent_itemid);
+		$parent_discoveryid = get_request('parent_discoveryid');
+		if($parent_discoveryid) $frmGraph->addVar('parent_discoveryid', $parent_discoveryid);
 
-		$items = get_request('items', array());
 
 		if(isset($_REQUEST['graphid'])){
 			$frmGraph->addVar('graphid', $_REQUEST['graphid']);
 
 			$options = array(
 				'graphids' => $_REQUEST['graphid'],
-				'extendoutput' => 1
+				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
+				'output' => API_OUTPUT_EXTEND,
 			);
 			$graphs = CGraph::get($options);
 			$graph = reset($graphs);
@@ -2947,6 +2947,8 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 			if(isset($visible['percent_left'])) $percent_left = get_request('percent_left', 0);
 			if(isset($visible['percent_right'])) $percent_right = get_request('percent_right', 0);
+
+			$items = get_request('items', array());
 		}
 
 /* reinit $_REQUEST */
@@ -3004,18 +3006,11 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$frmGraph->addVar('ymax_itemid', $ymax_itemid);
 
 		$frmGraph->addRow(S_NAME, new CTextBox('name', $name, 32));
-
 		$frmGraph->addRow(S_WIDTH, new CNumericBox('width', $width, 5));
 		$frmGraph->addRow(S_HEIGHT, new CNumericBox('height', $height, 5));
 
 		$cmbGType = new CComboBox('graphtype', $graphtype, 'graphs.submit(this)');
-		$cmbGType->addItem(GRAPH_TYPE_NORMAL, S_NORMAL);
-		$cmbGType->addItem(GRAPH_TYPE_STACKED, S_STACKED);
-		$cmbGType->addItem(GRAPH_TYPE_PIE, S_PIE);
-		$cmbGType->addItem(GRAPH_TYPE_EXPLODED, S_EXPLODED);
-
-		zbx_add_post_js('graphs.graphtype = '.$graphtype.";\n");
-
+		$cmbGType->addItems(graphType());
 		$frmGraph->addRow(S_GRAPH_TYPE, $cmbGType);
 
 
@@ -3082,7 +3077,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 							graph_item_calc_fnc2str($gitem["calc_fnc"],$gitem["type"]),
 							graph_item_type2str($gitem['type'],$gitem["periods_cnt"]),
 							$color,
-							array( $do_up, SPACE."|".SPACE, $do_down )
+							array( $do_up, ((!is_null($do_up) && !is_null($do_down)) ? SPACE."|".SPACE : ''), $do_down )
 						));
 				}
 				else{
@@ -3113,10 +3108,10 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 
 			if($graphtype == GRAPH_TYPE_NORMAL){
-				$percent_left = sprintf('%2.2f',$percent_left);
-				$percent_right = sprintf('%2.2f',$percent_right);
+				$percent_left = sprintf('%2.2f', $percent_left);
+				$percent_right = sprintf('%2.2f', $percent_right);
 
-				$pr_left_input = new CTextBox('percent_left',$percent_left,'5');
+				$pr_left_input = new CTextBox('percent_left', $percent_left, '5');
 				$pr_left_chkbx = new CCheckBox('visible[percent_left]',1,"javascript: ShowHide('percent_left');",1);
 				if($percent_left == 0){
 					$pr_left_input->setAttribute('style','display: none;');
@@ -3130,9 +3125,8 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 					$pr_right_chkbx->setChecked(0);
 				}
 
-				$frmGraph->addRow(S_PERCENTILE_LINE.' ('.S_LEFT.')',array($pr_left_chkbx,$pr_left_input));
-
-				$frmGraph->addRow(S_PERCENTILE_LINE.' ('.S_RIGHT.')',array($pr_right_chkbx,$pr_right_input));
+				$frmGraph->addRow(S_PERCENTILE_LINE.' ('.S_LEFT.')',array($pr_left_chkbx, $pr_left_input));
+				$frmGraph->addRow(S_PERCENTILE_LINE.' ('.S_RIGHT.')',array($pr_right_chkbx, $pr_right_input));
 			}
 
 			$yaxis_min = array();
@@ -3160,17 +3154,17 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 				if(count($items)){
 					$yaxis_min[] = new CTextBox("ymin_name",$ymin_name,80,'yes');
 					$yaxis_min[] = new CButton('yaxis_min',S_SELECT,'javascript: '.
-													"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
-													url_param($only_hostid, false, 'only_hostid').
-													url_param($monitored_hosts, false, 'monitored_hosts').
-														"&dstfld1=ymin_itemid".
-														"&dstfld2=ymin_name".
-														"&srctbl=items".
-														"&srcfld1=itemid".
-														"&srcfld2=description',0,0,'zbx_popup_item');");
+						"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
+						url_param($only_hostid, false, 'only_hostid').
+						url_param($monitored_hosts, false, 'monitored_hosts').
+							"&dstfld1=ymin_itemid".
+							"&dstfld2=ymin_name".
+							"&srctbl=items".
+							"&srcfld1=itemid".
+							"&srcfld2=description',0,0,'zbx_popup_item');");
 				}
 				else{
-					$yaxis_min[] = SPACE.S_ADD_GRAPH_ITEMS;
+					$yaxis_min[] = S_ADD_GRAPH_ITEMS;
 				}
 			}
 			else{
@@ -3204,21 +3198,22 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 				if(count($items)){
 					$yaxis_max[] = new CTextBox("ymax_name",$ymax_name,80,'yes');
 					$yaxis_max[] = new CButton('yaxis_max',S_SELECT,'javascript: '.
-													"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
-													url_param($only_hostid, false, 'only_hostid').
-													url_param($monitored_hosts, false, 'monitored_hosts').
-														"&dstfld1=ymax_itemid".
-														"&dstfld2=ymax_name".
-														"&srctbl=items".
-														"&srcfld1=itemid".
-														"&srcfld2=description',0,0,'zbx_popup_item');");
+							"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
+							url_param($only_hostid, false, 'only_hostid').
+							url_param($monitored_hosts, false, 'monitored_hosts').
+							"&dstfld1=ymax_itemid".
+							"&dstfld2=ymax_name".
+							"&srctbl=items".
+							"&srcfld1=itemid".
+							"&srcfld2=description',0,0,'zbx_popup_item');"
+					);
 				}
 				else{
-					$yaxis_max[] = SPACE.S_ADD_GRAPH_ITEMS;
+					$yaxis_max[] = S_ADD_GRAPH_ITEMS;
 				}
 			}
 			else{
-				$frmGraph->addVar('yaxismax',$yaxismax);
+				$frmGraph->addVar('yaxismax', $yaxismax);
 			}
 
 			$frmGraph->addRow(S_YAXIS_MAX_VALUE, $yaxis_max);
@@ -3228,35 +3223,37 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			$frmGraph->addRow(S_3D_VIEW,new CCheckBox('graph3d',$graph3d,null,1));
 		}
 
-		$frmGraph->addRow(S_ITEMS,
-				array(
-					$items_table,
-					new CButton('add_item',S_ADD,
-						"return PopUp('popup_gitem.php?dstfrm=".$frmGraph->getName().
-						url_param($only_hostid, false, 'only_hostid').
-						url_param($monitored_hosts, false, 'monitored_hosts').
-						url_param($graphtype, false, 'graphtype').
-						url_param('parent_itemid').
-						"',550,400,'graph_item_form');"),
-					$dedlete_button
-				));
-		unset($items_table, $dedlete_button);
-
-		$preView = new CButton('preview',S_PREVIEW);
-		//$preView->setAttribute('style', 'float: left;');
-
-		$frmGraph->addItemToBottomRow($preView);
-		$frmGraph->addItemToBottomRow(SPACE);
-		$frmGraph->addItemToBottomRow(new CButton('save',S_SAVE));
-		if(isset($_REQUEST['graphid'])){
-			$frmGraph->addItemToBottomRow(SPACE);
-			$frmGraph->addItemToBottomRow(new CButton('clone',S_CLONE));
-			$frmGraph->addItemToBottomRow(SPACE);
-			$frmGraph->addItemToBottomRow(new CButtonDelete(S_DELETE_GRAPH_Q,url_param('graphid').
-				url_param('groupid').url_param('hostid')));
+		$addProtoBtn = null;
+		if($parent_discoveryid){
+			$addProtoBtn = new CButton('add_protoitem', S_ADD_PROTOTYPE,
+				"return PopUp('popup_gitem.php?dstfrm=".$frmGraph->getName().
+				url_param($graphtype, false, 'graphtype').
+				url_param('parent_discoveryid').
+				"',700,400,'graph_item_form');");
 		}
-		$frmGraph->addItemToBottomRow(SPACE);
-		$frmGraph->addItemToBottomRow(new CButtonCancel(url_param('groupid').url_param('hostid')));
+
+		$frmGraph->addRow(S_ITEMS, array(
+			$items_table,
+			new CButton('add_item',S_ADD,
+				"return PopUp('popup_gitem.php?dstfrm=".$frmGraph->getName().
+				url_param($only_hostid, false, 'only_hostid').
+				url_param($monitored_hosts, false, 'monitored_hosts').
+				url_param($graphtype, false, 'graphtype').
+				"',700,400,'graph_item_form');"),
+			$addProtoBtn,
+			$dedlete_button
+		));
+
+		$footer = array(
+			new CButton('preview', S_PREVIEW),
+			new CButton('save', S_SAVE),
+		);
+		if(isset($_REQUEST['graphid'])){
+			$footer[] = new CButton('clone', S_CLONE);
+			$footer[] = new CButtonDelete(S_DELETE_GRAPH_Q,url_param('graphid').url_param('parent_discoveryid'));
+		}
+		$footer[] = new CButtonCancel(url_param('parent_discoveryid'));
+		$frmGraph->addItemToBottomRow($footer);
 
 		$frmGraph->show();
 	}

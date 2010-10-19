@@ -52,6 +52,7 @@
 /* END OF USERS DEFINES */
 	define('ZAPCAT_COMPATIBILITY', false);
 
+	define('ZBX_FLAG_DISCOVERY_NORMAL', 0x0);
 	define('ZBX_FLAG_DISCOVERY', 0x1);
 	define('ZBX_FLAG_DISCOVERY_CHILD', 0x2);
 

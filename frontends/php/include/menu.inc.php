@@ -159,7 +159,8 @@ $ZBX_MENU = array(
 						'popup_trexpr.php',
 						'popup_gitem.php',
 						'host_discovery.php',
-						'host_subrule.php'
+						'disc_prototypes.php',
+						'graph_prototypes.php',
 					)
 				),
 				array(

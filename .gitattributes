@@ -93,6 +93,7 @@ frontends/php/dashboard.php -text
 frontends/php/dashconf.php -text
 frontends/php/disc_prototypes.php -text
 frontends/php/fonts/DejaVuSans.ttf -text
+frontends/php/graph_prototypes.php -text
 frontends/php/host_discovery.php -text
 frontends/php/host_screen.php -text
 frontends/php/hostgroups.php -text

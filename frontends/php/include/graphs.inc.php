@@ -19,16 +19,25 @@
 **/
 ?>
 <?php
-/*
- * Function: graph_item_type2str
- *
- * Description:
- *     Represent integer value of graph item type into the string
- *
- * Author:
- *     Eugene Grigorjev
- *
- */
+
+	function graphType($type=null){
+		$types = array(
+			GRAPH_TYPE_STACKED => S_STACKED,
+			GRAPH_TYPE_PIE => S_PIE,
+			GRAPH_TYPE_EXPLODED => S_EXPLODED,
+			GRAPH_TYPE_NORMAL => S_NORMAL,
+		);
+
+		if(is_null($type)){
+			order_result($types);
+			return $types;
+		}
+		else if(isset($types[$type]))
+			return $types[$type];
+		else
+			return S_UNKNOWN;
+	}
+
 	function graph_item_type2str($type,$count=null){
 		switch($type){
 			case GRAPH_ITEM_SUM:
@@ -45,16 +54,6 @@
 	return $type;
 	}
 
-/*
- * Function: graph_item_drawtypes
- *
- * Description:
- *     Return available drawing types for graph item
- *
- * Author:
- *     Eugene Grigorjev
- *
- */
 	function graph_item_drawtypes(){
 		return array(
 				GRAPH_ITEM_DRAWTYPE_LINE,
