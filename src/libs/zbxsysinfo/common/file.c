@@ -111,7 +111,7 @@ int	VFS_FILE_EXISTS(const char *cmd, const char *param, unsigned flags, AGENT_RE
 int	VFS_FILE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char	filename[MAX_STRING_LEN], regexp[MAX_STRING_LEN], encoding[32];
-	char	buf[MAX_BUF_LEN], *utf8;
+	char	buf[MAX_BUFFER_LEN], *utf8;
 	int	f, nbytes, len;
 
 	assert(result);
@@ -161,7 +161,7 @@ int	VFS_FILE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
 int	VFS_FILE_REGMATCH(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char	filename[MAX_STRING_LEN], regexp[MAX_STRING_LEN], encoding[32];
-	char	buf[MAX_BUF_LEN], *utf8;
+	char	buf[MAX_BUFFER_LEN], *utf8;
 	int	f, nbytes, len, res;
 
 	assert(result);

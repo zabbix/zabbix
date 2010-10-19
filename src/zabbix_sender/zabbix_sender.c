@@ -383,10 +383,10 @@ int main(int argc, char **argv)
 {
 	FILE	*in;
 
-	char	in_line[MAX_BUF_LEN],
+	char	in_line[MAX_BUFFER_LEN],
 		hostname[MAX_STRING_LEN],
 		key[MAX_STRING_LEN],
-		key_value[MAX_BUF_LEN],
+		key_value[MAX_BUFFER_LEN],
 		clock[32];
 
 	int	task = ZBX_TASK_START,

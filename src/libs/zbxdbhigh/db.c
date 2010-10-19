@@ -285,7 +285,6 @@ int	DBis_null(char *field)
 
 DB_ROW	DBfetch(DB_RESULT result)
 {
-
 	return zbx_db_fetch(result);
 }
 
