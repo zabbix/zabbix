@@ -304,7 +304,9 @@ include_once('include/page_header.php');
 	}
 	else if($templated_hosts){
 		$options['hosts']['templated_hosts'] = true;
-		$options['groups']['templated_hosts'] = true;
+
+// TODO: inconsistancy in "templated_hosts" parameter for host and host group
+//		$options['groups']['templated_hosts'] = true;
 	}
 
 	if(!is_null($writeonly)){
@@ -816,6 +818,7 @@ include_once('include/page_header.php');
 			'output' => API_OUTPUT_EXTEND,
 			'select_hosts' => API_OUTPUT_EXTEND
 		);
+
 		if(!is_null($writeonly)) $options['editable'] = 1;
 		if(!is_null($templated)) $options['templated'] = $templated;
 		if(!is_null($value_types)) $options['filter']['value_type'] = $value_types;
