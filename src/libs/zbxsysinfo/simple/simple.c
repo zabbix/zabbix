@@ -100,7 +100,7 @@ static int	check_ssh(const char *host, unsigned short port, int *value_int)
 {
 	int		ret;
 	zbx_sock_t	s;
-	char		send_buf[MAX_BUF_LEN];
+	char		send_buf[MAX_BUFFER_LEN];
 	char		*recv_buf;
 	char		*ssh_server, *ssh_proto;
 

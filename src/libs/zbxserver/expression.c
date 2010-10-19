@@ -1314,7 +1314,7 @@ static int	DBget_history_value(zbx_uint64_t itemid, char **replace_to,
  *                                                                            *
  * Function: DBget_history_log_value_by_triggerid                             *
  *                                                                            *
- * Purpose: retrieve item lastvalue by functionid                             *
+ * Purpose: retrieve a particular attribute of a log value                    *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
@@ -1396,12 +1396,13 @@ static int	DBget_item_lastvalue_by_triggerid(zbx_uint64_t triggerid, char **last
 			" where i.itemid=f.itemid and f.functionid=" ZBX_FS_UI64,
 			functionid);
 
-	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[4])/*i.lastvalue may be NULL*/)
+	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[4]))
 	{
 		value_type = atoi(row[1]);
 		ZBX_DBROW2UINT64(valuemapid, row[2])
 
-		switch (value_type) {
+		switch (value_type)
+		{
 			case ITEM_VALUE_TYPE_LOG:
 			case ITEM_VALUE_TYPE_TEXT:
 				zbx_snprintf(tmp, sizeof(tmp), "select value from %s where itemid=%s order by id desc",
@@ -1420,14 +1421,14 @@ static int	DBget_item_lastvalue_by_triggerid(zbx_uint64_t triggerid, char **last
 			case ITEM_VALUE_TYPE_STR:
 				zbx_strlcpy(tmp, row[4], sizeof(tmp));
 
-				replace_value_by_map(tmp, valuemapid);
+				replace_value_by_map(tmp, sizeof(tmp), valuemapid);
 
 				*lastvalue = zbx_dsprintf(*lastvalue, "%s", tmp);
 				break;
 			default:
 				zbx_strlcpy(tmp, row[4], sizeof(tmp));
 
-				if (SUCCEED != replace_value_by_map(tmp, valuemapid))
+				if (SUCCEED != replace_value_by_map(tmp, sizeof(tmp), valuemapid))
 					add_value_suffix(tmp, sizeof(tmp), row[3], value_type);
 				if (ITEM_VALUE_TYPE_FLOAT == value_type)
 					del_zeroes(tmp);
@@ -1447,7 +1448,7 @@ static int	DBget_item_lastvalue_by_triggerid(zbx_uint64_t triggerid, char **last
  *                                                                            *
  * Function: DBget_item_value_by_triggerid                                    *
  *                                                                            *
- * Purpose: retrieve item lastvalue by triggerid                              *
+ * Purpose: retrieve item value by triggerid                                  *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
@@ -1466,7 +1467,6 @@ static int	DBget_item_value_by_triggerid(zbx_uint64_t triggerid, char **value, i
 	char		expression[TRIGGER_EXPRESSION_LEN_MAX];
 	zbx_uint64_t	functionid, itemid;
 	int		value_type, ret = FAIL;
-	const char	*table;
 
 	if (FAIL == DBget_trigger_expression_by_triggerid(triggerid, expression, sizeof(expression)))
 		return FAIL;
@@ -1474,7 +1474,7 @@ static int	DBget_item_value_by_triggerid(zbx_uint64_t triggerid, char **value, i
 	if (FAIL == trigger_get_N_functionid(expression, N_functionid, &functionid))
 		return FAIL;
 
-	result = DBselect("select i.itemid,i.value_type from items i,functions f "
+	result = DBselect("select i.itemid,i.value_type from items i,functions f"
 			" where i.itemid=f.itemid and f.functionid=" ZBX_FS_UI64,
 			functionid);
 
@@ -1483,16 +1483,7 @@ static int	DBget_item_value_by_triggerid(zbx_uint64_t triggerid, char **value, i
 		ZBX_STR2UINT64(itemid, row[0]);
 		value_type = atoi(row[1]);
 
-		switch (value_type) {
-			case ITEM_VALUE_TYPE_FLOAT:	table = "history"; break;
-			case ITEM_VALUE_TYPE_UINT64:	table = "history_uint"; break;
-			case ITEM_VALUE_TYPE_TEXT:	table = "history_text"; break;
-			case ITEM_VALUE_TYPE_STR:	table = "history_str"; break;
-			case ITEM_VALUE_TYPE_LOG:
-			default:			table = "history_log"; break;
-		}
-
-		if (SUCCEED == (ret = DBget_history_value(itemid, value, table, "value", clock, ns)))
+		if (SUCCEED == (ret = DBget_history_value(itemid, value, get_table_by_value_type(value_type), "value", clock, ns)))
 		{
 			if (ITEM_VALUE_TYPE_FLOAT == value_type)
 				del_zeroes(*value);
@@ -2341,10 +2332,9 @@ void	substitute_macros(DB_EVENT *event, DB_ACTION *action, DB_ESCALATION *escala
 		str_out = zbx_strdcat(str_out, pl);
 		pr[0] = '{';
 
-
 		/* copy original name of variable */
-		replace_to = zbx_dsprintf(replace_to, "%s}", pr);	/* in format used '}' */
-									/* cose in 'pr' string symbol '}' is changed to '\0' by 'pme'*/
+		replace_to = zbx_dsprintf(replace_to, "%s}", pr);	/* in format used '}' because in 'pr' string */
+									/* symbol '}' is changed to '\0' by 'pme' */
 		pl = pr + strlen(replace_to);
 
 		pms = pr + 1;
@@ -2374,16 +2364,14 @@ void	substitute_macros(DB_EVENT *event, DB_ACTION *action, DB_ESCALATION *escala
 						*p = ')';
 						pms = p + 1;
 
-						/* function 'evaluate_function2' require 'replace_to' with size 'MAX_STRING_LEN' */
-						zbx_free(replace_to);
-						replace_to = zbx_malloc(replace_to, MAX_STRING_LEN);
+						/* function 'evaluate_macro_function' requires 'replace_to' with size 'MAX_BUFFER_LEN' */
+						replace_to = zbx_realloc(replace_to, MAX_BUFFER_LEN);
 
-						if(evaluate_function2(replace_to,host,key,function,parameter) != SUCCEED)
-							zbx_snprintf(replace_to, MAX_STRING_LEN, "%s", STR_UNKNOWN_VARIABLE);
+						if (SUCCEED != evaluate_macro_function(replace_to, host, key, function, parameter))
+							zbx_snprintf(replace_to, MAX_BUFFER_LEN, "%s", STR_UNKNOWN_VARIABLE);
 					}
 				}
 			}
-
 		}
 		pme[0] = '}';
 
@@ -2396,8 +2384,8 @@ void	substitute_macros(DB_EVENT *event, DB_ACTION *action, DB_ESCALATION *escala
 
 	*data = str_out;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "End substitute_macros(result:%s)",
-		*data );
+	zabbix_log(LOG_LEVEL_DEBUG, "End substitute_macros(result:%s)",
+		*data);
 }
 
 /******************************************************************************
@@ -2424,7 +2412,7 @@ static int	substitute_functions(char **exp, time_t now, char *error, int maxerrl
 	char	functionid[ID_LEN], *e, *f;
 	char	*out = NULL;
 	int	out_alloc = 64, out_offset = 0;
-	char	value[MAX_STRING_LEN];
+	char	value[MAX_BUFFER_LEN];
 
 	DB_RESULT	result;
 	DB_ROW		row;

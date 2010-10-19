@@ -1421,7 +1421,7 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 
 	struct zbx_json_parse   jp_data, jp_row;
 	const char		*p;
-	char			tmp[MAX_BUF_LEN];
+	char			tmp[MAX_BUFFER_LEN];
 	int			ret = SUCCEED;
 	int			processed = 0;
 	double			sec;
