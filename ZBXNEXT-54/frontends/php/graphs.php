@@ -432,7 +432,7 @@ include_once('include/page_header.php');
 		if($pageFilter->hostsSelected){
 			$options = array(
 				'editable' => 1,
-				'extendoutput' => 1,
+				'output' => array('graphid', 'name', 'graphtype'),
 				'sortfield' => $sortfield,
 				'sortorder' => $sortorder,
 				'limit' => ($config['search_limit']+1)
@@ -444,6 +444,19 @@ include_once('include/page_header.php');
 				$options['groupids'] = $pageFilter->groupid;
 
 			$graphs = CGraph::get($options);
+		}
+
+// Change graphtype from numbers to names, for correct sorting
+		if($sortfield == 'graphtype'){
+			foreach($graphs as $gnum => $graph){
+				switch($graph['graphtype']){
+					case GRAPH_TYPE_STACKED: $graphtype = S_STACKED; break;
+					case GRAPH_TYPE_PIE: $graphtype = S_PIE; break;
+					case GRAPH_TYPE_EXPLODED: $graphtype = S_EXPLODED; break;
+					default: $graphtype = S_NORMAL; break;
+				}
+				$graphs[$gnum]['graphtype'] = $graphtype;
+			}
 		}
 
 // sorting && paging
@@ -460,21 +473,13 @@ include_once('include/page_header.php');
 		);
 		$graphs = CGraph::get($options);
 
-		// Change graphtype from numbers to names, for correct sorting
+// Change graphtype from numbers to names, for correct sorting
 		foreach($graphs as $gnum => $graph){
 			switch($graph['graphtype']){
-				case GRAPH_TYPE_STACKED:
-					$graphtype = S_STACKED;
-				break;
-				case GRAPH_TYPE_PIE:
-					$graphtype = S_PIE;
-				break;
-				case GRAPH_TYPE_EXPLODED:
-					$graphtype = S_EXPLODED;
-				break;
-				default:
-					$graphtype = S_NORMAL;
-				break;
+				case GRAPH_TYPE_STACKED: $graphtype = S_STACKED; break;
+				case GRAPH_TYPE_PIE: $graphtype = S_PIE; break;
+				case GRAPH_TYPE_EXPLODED: $graphtype = S_EXPLODED; break;
+				default: $graphtype = S_NORMAL; break;
 			}
 			$graphs[$gnum]['graphtype'] = $graphtype;
 		}
