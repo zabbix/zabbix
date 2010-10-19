@@ -178,8 +178,9 @@ include_once('include/page_header.php');
 
 		'select'=>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,	null),
 
-		'submitParent'=>	array(T_ZBX_INT, O_OPT, null,   BETWEEN(0,15),	null),
+		'submitParent'=>	array(T_ZBX_INT, O_OPT, null,   IN('0,1'),	null),
 	);
+
 
 	$allowed_item_types = array(ITEM_TYPE_ZABBIX,ITEM_TYPE_ZABBIX_ACTIVE,ITEM_TYPE_SIMPLE,ITEM_TYPE_INTERNAL,ITEM_TYPE_AGGREGATE);
 
@@ -211,7 +212,7 @@ include_once('include/page_header.php');
 // items
  	$value_types		= get_request('value_types', null);
 
-	$submitParent = get_request('submitParent', false);
+	$submitParent = get_request('submitParent', 0);
 
 	$host_status = null;
 	$templated = null;
