@@ -712,6 +712,9 @@ switch($itemType) {
 		$graphs = CGraph::get($options);
 		$graphs = zbx_toHash($graphs, 'parent_itemid');
 
+		$triggers = CTrigger::get($options);
+		$triggers = zbx_toHash($triggers, 'parent_itemid');
+
 		foreach($items as $inum => $item){
 			$description = array();
 			if($item['templateid']){
@@ -740,12 +743,14 @@ switch($itemType) {
 
 			$prototypes = array(new CLink(S_PROTOTYPES, 'disc_prototypes.php?&parent_discoveryid='.$item['itemid']),
 				' ('.$item['prototypes'].')');
-			$prototriggers = array(new CLink(S_TRIGGERS, 'triggers.php?&parent_discoveryid='.$item['itemid']),
-				' ('.$item['triggers'].')');
 
 			$graphs_count = isset($graphs[$item['itemid']]['rowscount']) ? $graphs[$item['itemid']]['rowscount'] : 0;
 			$protographs = array(new CLink(S_GRAPHS, 'graph_prototypes.php?&parent_discoveryid='.$item['itemid']),
 				' ('.$graphs_count.')');
+
+			$triggers_count = isset($triggers[$item['itemid']]['rowscount']) ? $triggers[$item['itemid']]['rowscount'] : 0;
+			$prototriggers = array(new CLink(S_TRIGGERS, 'trigger_prototypes.php?&parent_discoveryid='.$item['itemid']),
+				' ('.$triggers_count.')');
 
 			$table->addRow(array(
 				new CCheckBox('group_itemid['.$item['itemid'].']',null,null,$item['itemid']),

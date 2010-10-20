@@ -2543,15 +2543,13 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 // Insert form for Trigger
 	function insert_trigger_form(){
-		$frmTrig = new CFormTable(S_TRIGGER,'triggers.php');
+		$frmTrig = new CFormTable(S_TRIGGER);
 		$frmTrig->setHelp('config_triggers.php');
+		$parent_discoveryid = get_request('parent_discoveryid');
+		$frmTrig->addVar('parent_discoveryid', $parent_discoveryid);
 
-//		if(isset($_REQUEST['hostid'])){
-//			$frmTrig->addVar('hostid',$_REQUEST['hostid']);
-//		}
-
-		$dep_el=array();
-		$dependencies = get_request('dependencies',array());
+		$dep_el = array();
+		$dependencies = get_request('dependencies', array());
 
 		$limited = null;
 
@@ -2589,7 +2587,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		}
 
 		$expression		= get_request('expression',	'');
-		$description		= get_request('description',	'');
+		$description	= get_request('description',	'');
 		$type 			= get_request('type',		0);
 		$priority		= get_request('priority',	0);
 		$status			= get_request('status',		0);
@@ -2597,7 +2595,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$url			= get_request('url',		'');
 
 		$expr_temp		= get_request('expr_temp',	'');
-		$input_method		= get_request('input_method',	IM_ESTABLISHED);
+		$input_method	= get_request('input_method',	IM_ESTABLISHED);
 
 		if((isset($_REQUEST['triggerid']) && !isset($_REQUEST['form_refresh']))  || isset($limited)){
 			$description	= $trigger['description'];
@@ -2669,10 +2667,10 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		}
 
 		$row = array($exprtxt,
-					 new CButton('insert',$input_method == IM_TREE ? S_EDIT : S_SELECT,
-								 "return PopUp('popup_trexpr.php?dstfrm=".$frmTrig->getName().
-								 "&dstfld1=${exprfname}&srctbl=expression".
-								 "&srcfld1=expression&expression=' + escape($exprparam),1000,700);"));
+			 new CButton('insert',$input_method == IM_TREE ? S_EDIT : S_SELECT,
+						 "return PopUp('popup_trexpr.php?dstfrm=".$frmTrig->getName().
+						 "&dstfld1=${exprfname}&srctbl=expression&parent_discoveryid=".$parent_discoveryid.
+						 "&srcfld1=expression&expression=' + escape($exprparam),1000,700);"));
 
 		if(isset($macrobtn)) array_push($row, $macrobtn);
 		if($input_method == IM_TREE){
@@ -2768,39 +2766,41 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 										  $btn_test));
 		}
 
+		if(!$parent_discoveryid){
 // dependencies
-		foreach($dependencies as $val){
-			array_push($dep_el,
-				array(
-					new CCheckBox('rem_dependence['.$val.']', 'no', null, strval($val)),
-					expand_trigger_description($val)
-				),
-				BR());
-			$frmTrig->addVar('dependencies[]',strval($val));
+			foreach($dependencies as $val){
+				array_push($dep_el,
+					array(
+						new CCheckBox('rem_dependence['.$val.']', 'no', null, strval($val)),
+						expand_trigger_description($val)
+					),
+					BR());
+				$frmTrig->addVar('dependencies[]',strval($val));
+			}
+
+			if(count($dep_el)==0)
+				array_push($dep_el,  S_NO_DEPENDENCES_DEFINED);
+			else
+				array_push($dep_el, new CButton('del_dependence',S_DELETE_SELECTED));
+			$frmTrig->addRow(S_THE_TRIGGER_DEPENDS_ON,$dep_el);
+		/* end dependencies */
+
+		/* new dependency */
+	//		$frmTrig->addVar('new_dependence','0');
+
+	//		$txtCondVal = new CTextBox('trigger','',75,'yes');
+
+			$btnSelect = new CButton('btn1',S_ADD,
+					"return PopUp('popup.php?srctbl=triggers".
+								'&srcfld1=triggerid'.
+								'&reference=deptrigger'.
+								'&multiselect=1'.
+							"',1000,700);",'T');
+
+
+			$frmTrig->addRow(S_NEW_DEPENDENCY, $btnSelect, 'new');
+	// end new dependency
 		}
-
-		if(count($dep_el)==0)
-			array_push($dep_el,  S_NO_DEPENDENCES_DEFINED);
-		else
-			array_push($dep_el, new CButton('del_dependence',S_DELETE_SELECTED));
-		$frmTrig->addRow(S_THE_TRIGGER_DEPENDS_ON,$dep_el);
-	/* end dependencies */
-
-	/* new dependency */
-//		$frmTrig->addVar('new_dependence','0');
-
-//		$txtCondVal = new CTextBox('trigger','',75,'yes');
-
-		$btnSelect = new CButton('btn1',S_ADD,
-				"return PopUp('popup.php?srctbl=triggers".
-							'&srcfld1=triggerid'.
-							'&reference=deptrigger'.
-							'&multiselect=1'.
-						"',1000,700);",'T');
-
-
-		$frmTrig->addRow(S_NEW_DEPENDENCY, $btnSelect, 'new');
-// end new dependency
 
 		$type_select = new CComboBox('type');
 		$type_select->additem(TRIGGER_MULT_EVENT_DISABLED,S_NORMAL,(($type == TRIGGER_MULT_EVENT_ENABLED)? 'no':'yes'));
@@ -2826,11 +2826,11 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			if( !$limited ){
 				$frmTrig->addItemToBottomRow(new CButtonDelete(S_DELETE_TRIGGER_Q,
 					url_param("form").url_param('groupid').url_param("hostid").
-					url_param("triggerid")));
+					url_param("triggerid").url_param("parent_discoveryid")));
 			}
 		}
 		$frmTrig->addItemToBottomRow(SPACE);
-		$frmTrig->addItemToBottomRow(new CButtonCancel(url_param('groupid').url_param("hostid")));
+		$frmTrig->addItemToBottomRow(new CButtonCancel(url_param('groupid').url_param("hostid").url_param("parent_discoveryid")));
 
 		$jsmenu = new CPUMenu(null,170);
 		$jsmenu->InsertJavaScript();
@@ -2884,7 +2884,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 			$options = array(
 				'graphids' => $_REQUEST['graphid'],
-				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
+				'filter' => array('flags' => null),
 				'output' => API_OUTPUT_EXTEND,
 			);
 			$graphs = CGraph::get($options);

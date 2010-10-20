@@ -161,6 +161,7 @@ $ZBX_MENU = array(
 						'host_discovery.php',
 						'disc_prototypes.php',
 						'graph_prototypes.php',
+						'trigger_prototypes.php',
 					)
 				),
 				array(

@@ -382,6 +382,7 @@ frontends/php/styles/ul.css -text
 frontends/php/templates.php -text
 frontends/php/tr_logform.php -text
 frontends/php/tr_testexpr.php -text
+frontends/php/trigger_prototypes.php -text
 frontends/php/usergrps.php -text
 frontends/php/warning.php -text
 include/dbcache.h -text

@@ -848,6 +848,7 @@ switch($itemType) {
 			'select_hosts' => API_OUTPUT_EXTEND,
 			'select_triggers' => API_OUTPUT_EXTEND,
 			'select_applications' => API_OUTPUT_EXTEND,
+			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
@@ -1038,7 +1039,14 @@ switch($itemType) {
 				$description[] = ':';
 			}
 			$item['description_expanded'] = item_description($item);
-			$description[] = new CLink($item['description_expanded'], '?form=update&itemid='.$item['itemid']);
+
+			if(!empty($item['discoveryRule'])){
+				$description[] = new CSpan($item['discoveryRule']['description'], 'discoveryName');
+				$description[] = ':'.$item['description_expanded'];
+			}
+			else{
+				$description[] = new CLink($item['description_expanded'], '?form=update&itemid='.$item['itemid']);
+			}
 
 			$status = new CCol(new CLink(item_status2str($item['status']), '?group_itemid='.$item['itemid'].'&go='.
 				($item['status']? 'activate':'disable'), item_status2style($item['status'])));
