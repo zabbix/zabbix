@@ -2083,8 +2083,23 @@ static int	DBlld_copy_trigger(zbx_uint64_t hostid, zbx_uint64_t triggerid, const
 	}
 	DBfree_result(result);
 
-	/* trigger creation */
-	if (SUCCEED != res)
+	comments_esc = DBdyn_escape_string(comments);
+	url_esc = DBdyn_escape_string(url);
+
+	if (SUCCEED == res)
+	{
+		DBexecute("update triggers"
+				" set description='%s',"
+					"priority=%d,"
+					"status=%d,"
+					"comments='%s',"
+					"url='%s',"
+					"type=%d"
+				" where triggerid=" ZBX_FS_UI64,
+				description_esc, (int)priority, (int)status,
+				comments_esc, url_esc, (int)type, h_triggerid);
+	}
+	else
 	{
 		char	*sql = NULL;
 		int	sql_alloc = 256, sql_offset = 0;
@@ -2100,9 +2115,6 @@ static int	DBlld_copy_trigger(zbx_uint64_t hostid, zbx_uint64_t triggerid, const
 		new_triggerid = DBget_maxid("triggers");
 		triggerdiscoveryid = DBget_maxid("trigger_discovery");
 		new_expression = strdup(expression);
-
-		comments_esc = DBdyn_escape_string(comments);
-		url_esc = DBdyn_escape_string(url);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 192 +
 				strlen(description_esc) +
@@ -2122,9 +2134,6 @@ static int	DBlld_copy_trigger(zbx_uint64_t hostid, zbx_uint64_t triggerid, const
 				" values"
 					" (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ");\n",
 				triggerdiscoveryid, new_triggerid, triggerid);
-
-		zbx_free(url_esc);
-		zbx_free(comments_esc);
 
 		/* Loop: functions */
 		result = DBselect(
@@ -2192,6 +2201,8 @@ static int	DBlld_copy_trigger(zbx_uint64_t hostid, zbx_uint64_t triggerid, const
 		zbx_free(sql);
 	}
 
+	zbx_free(url_esc);
+	zbx_free(comments_esc);
 	zbx_free(description_esc);
 
 	return res;
