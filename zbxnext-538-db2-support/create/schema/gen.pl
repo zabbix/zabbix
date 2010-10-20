@@ -119,6 +119,28 @@ ZBX_TABLE	tables[]={
 	"t_cksum_text"	=>	"nclob"  
 );
 
+%db2=(
+	"database"	=>	"db2",
+	"type"		=>	"sql",
+	"before"	=>	"",
+	"after"		=>	"",
+	"exec_cmd"	=>	";\n",
+	"t_bigint"	=>	"bigint",
+	"t_id"		=>	"bigint",
+	"t_integer"	=>	"integer",
+	"t_time"	=>	"integer",
+	"t_serial"	=>	"bigint",
+	"t_double"	=>	"decfloat(16)",
+	"t_varchar"	=>	"varchar",
+	"t_char"	=>	"varchar",
+	"t_image"	=>	"blob",
+	"t_history_log"	=>	"clob",
+	"t_history_text"=>	"clob",
+	"t_blob"	=>	"clob",
+	"t_item_param"	=>	"clob",
+	"t_cksum_text"	=>	"clob"
+);
+
 %postgresql=("t_bigint"	=>	"numeric(20)",
 	"database"	=>	"postgresql",
 	"before"	=>	"",
@@ -267,6 +289,13 @@ sub process_field
 			}
 		}
 
+		if($output{"database"} eq "db2"){
+			@text_fields = ('blob');
+			if(grep /$output{$type_short}/, @text_fields){ 
+				$default=""; 
+			}
+		}
+
 		# Special processing for Oracle "default 'ZZZ' not null" -> "default 'ZZZ'. NULL=='' in Oracle!"
 		if(($output{"database"} eq "oracle") && ((0==index($type_2,"nvarchar2")) || (0==index($type_2,"nclob"))))
 		{
@@ -334,7 +363,7 @@ sub process_index
 
 sub usage
 {
-	printf "Usage: $0 [c|mysql|oracle|php|postgresql|sqlite]\n";
+	printf "Usage: $0 [c|db2|mysql|oracle|php|postgresql|sqlite]\n";
 	printf "The script generates ZABBIX SQL schemas and C/PHP code for different database engines.\n";
 	exit;
 }
@@ -349,6 +378,7 @@ sub main
 	$format=$ARGV[0];
 	switch ($format) {
 		case "c"		{ %output=%c; }
+		case "db2"		{ %output=%db2; }
 		case "mysql"		{ %output=%mysql; }
 		case "oracle"		{ %output=%oracle; }
 		case "php"		{ %output=%php; }
