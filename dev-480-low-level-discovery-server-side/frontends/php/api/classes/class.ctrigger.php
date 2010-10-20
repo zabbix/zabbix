@@ -65,7 +65,7 @@ class CTrigger extends CZBXAPI{
 			'group' => array(),
 			'order' => array(),
 			'limit' => null,
-			);
+		);
 
 		$def_options = array(
 			'nodeids'				=> null,
@@ -75,6 +75,7 @@ class CTrigger extends CZBXAPI{
 			'triggerids'			=> null,
 			'itemids'				=> null,
 			'applicationids'		=> null,
+			'discoveryids'			=> null,
 			'functions'				=> null,
 			'inherited'				=> null,
 			'templated'				=> null,
@@ -113,6 +114,7 @@ class CTrigger extends CZBXAPI{
 			'select_items'			=> null,
 			'select_functions'		=> null,
 			'select_dependencies'	=> null,
+			'selectDiscoveryRule'	=> null,
 			'countOutput'			=> null,
 			'groupCount'			=> null,
 			'preservekeys'			=> null,
@@ -310,6 +312,24 @@ class CTrigger extends CZBXAPI{
 			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
 		}
 
+// discoveryids
+		if(!is_null($options['discoveryids'])){
+			zbx_value2array($options['discoveryids']);
+
+			if($options['output'] != API_OUTPUT_SHORTEN){
+				$sql_parts['select']['itemid'] = 'id.parent_itemid';
+			}
+			$sql_parts['from']['functions'] = 'functions f';
+			$sql_parts['from']['item_discovery'] = 'item_discovery id';
+			$sql_parts['where']['fid'] = 'f.itemid=id.itemid';
+			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
+			$sql_parts['where'][] = DBcondition('id.parent_itemid', $options['discoveryids']);
+
+			if(!is_null($options['groupCount'])){
+				$sql_parts['group']['id'] = 'id.parent_itemid';
+			}
+		}
+
 // functions
 		if(!is_null($options['functions'])){
 			zbx_value2array($options['functions']);
@@ -440,7 +460,13 @@ class CTrigger extends CZBXAPI{
 		}
 
 // --- FILTER ---
+		if(is_null($options['filter']))
+			$options['filter'] = array();
+
 		if(is_array($options['filter'])){
+			if(!array_key_exists('flags', $options['filter']))
+				$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
+
 			zbx_db_filter('triggers t', $options, $sql_parts);
 
 			if(isset($options['filter']['host']) && !is_null($options['filter']['host'])){
@@ -618,6 +644,9 @@ class CTrigger extends CZBXAPI{
 					}
 					if(!is_null($options['select_dependencies']) && !isset($result[$trigger['triggerid']]['dependencies'])){
 						$result[$trigger['triggerid']]['dependencies'] = array();
+					}
+					if(!is_null($options['selectDiscoveryRule']) && !isset($result[$trigger['triggerid']]['discoveryRule'])){
+						$result[$trigger['triggerid']]['discoveryRule'] = array();
 					}
 
 // groups
@@ -857,6 +886,7 @@ Copt::memoryPick();
 				'nodeids' => $nodeids,
 				'output' => $options['select_items'],
 				'triggerids' => $triggerids,
+				'filter' => array('flags' => null),
 				'webitems' => 1,
 				'nopermissions' => 1,
 				'preservekeys' => 1
@@ -867,6 +897,41 @@ Copt::memoryPick();
 				unset($item['triggers']);
 				foreach($itriggers as $num => $trigger){
 					$result[$trigger['triggerid']]['items'][] = $item;
+				}
+			}
+		}
+
+// Adding discoveryRule
+		if(!is_null($options['selectDiscoveryRule'])){
+			$ruleids = $rule_map = array();
+
+			$sql = 'SELECT id.parent_itemid, td.triggerid'.
+					' FROM trigger_discovery td, item_discovery id, functions f'.
+					' WHERE '.DBcondition('td.triggerid', $triggerids).
+						' AND td.parent_triggerid=f.triggerid'.
+						' AND f.itemid=id.itemid';
+			$db_rules = DBselect($sql);
+			while($rule = DBfetch($db_rules)){
+				$ruleids[$rule['parent_itemid']] = $rule['parent_itemid'];
+				$rule_map[$rule['triggerid']] = $rule['parent_itemid'];
+			}
+
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'itemids' => $ruleids,
+				'filter' => array('flags' => null),
+				'nopermissions' => 1,
+				'preservekeys' => 1,
+			);
+
+			if(is_array($options['selectDiscoveryRule']) || str_in_array($options['selectDiscoveryRule'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['selectDiscoveryRule'];
+				$discoveryRules = CItem::get($obj_params);
+
+				foreach($result as $triggerid => $trigger){
+					if(isset($discoveryRules[$rule_map[$triggerid]])){
+						$result[$triggerid]['discoveryRule'] = $discoveryRules[$rule_map[$triggerid]];
+					}
 				}
 			}
 		}
@@ -1213,6 +1278,7 @@ COpt::memoryPick();
 
 			$options = array(
 				'triggerids' => $triggerids,
+				'filter' => array('flags' => null),
 				'editable' => 1,
 				'extendoutput' => 1,
 				'preservekeys' => 1

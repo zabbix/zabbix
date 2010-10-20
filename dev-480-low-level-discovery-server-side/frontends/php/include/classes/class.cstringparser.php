@@ -891,8 +891,12 @@ function triggerExpressionValidateItemKey(&$parent, &$levelData, $index, &$expre
 
 	if(ZAPCAT_COMPATIBILITY)
 		$keyParams = str_replace(',,', '][', $keyParams);
-		
-	$itemFound = CItem::get(Array('filter' => Array('hostid' => $hostId, 'key_' => $keyName.$keyParams), 'output' => API_OUTPUT_EXTEND, 'webitems' => true));
+
+	$itemFound = CItem::get(array(
+		'filter' => array('hostid' => $hostId, 'key_' => $keyName.$keyParams, 'flags' => null), 
+		'output' => API_OUTPUT_EXTEND,
+		'webitems' => true
+	));
 	if(count($itemFound) > 0) {
 		$itemFound = array_shift($itemFound);
 		if(isset($itemFound['itemid']) && $itemFound['itemid'] > 0) $itemId = $itemFound['itemid'];

@@ -110,6 +110,7 @@ class CItem extends CZBXAPI{
 			'select_graphs'			=> null,
 			'select_applications'	=> null,
 			'select_prototypes'		=> null,
+			'selectDiscoveryRule'	=> null,
 			'countOutput'			=> null,
 			'groupCount'			=> null,
 			'preservekeys'			=> null,
@@ -513,6 +514,9 @@ class CItem extends CZBXAPI{
 					if(!is_null($options['select_prototypes']) && !isset($result[$item['itemid']]['prototypes'])){
 						$result[$item['itemid']]['prototypes'] = array();
 					}
+					if(!is_null($options['selectDiscoveryRule']) && !isset($result[$item['itemid']]['discoveryRule'])){
+						$result[$item['itemid']]['discoveryRule'] = array();
+					}
 
 // hostids
 					if(isset($item['hostid']) && is_null($options['select_hosts'])){
@@ -742,6 +746,39 @@ COpt::memoryPick();
 			}
 		}
 
+// Adding discoveryRule
+		if(!is_null($options['selectDiscoveryRule'])){
+			$ruleids = $rule_map = array();
+			$sql = 'SELECT id1.itemid, id2.parent_itemid'.
+					' FROM item_discovery id1, item_discovery id2'.
+					' WHERE '.DBcondition('id1.itemid', $itemids).
+						' AND id1.parent_itemid=id2.itemid';
+			$db_rules = DBselect($sql);
+			while($rule = DBfetch($db_rules)){
+				$ruleids[$rule['parent_itemid']] = $rule['parent_itemid'];
+				$rule_map[$rule['itemid']] = $rule['parent_itemid'];
+			}
+
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'itemids' => $ruleids,
+				'filter' => array('flags' => null),
+				'nopermissions' => 1,
+				'preservekeys' => 1,
+			);
+
+			if(is_array($options['selectDiscoveryRule']) || str_in_array($options['selectDiscoveryRule'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['selectDiscoveryRule'];
+				$discoveryRules = self::get($obj_params);
+
+				foreach($result as $itemid => $item){
+					if(isset($rule_map[$itemid]) && isset($discoveryRules[$rule_map[$itemid]])){
+						$result[$itemid]['discoveryRule'] = $discoveryRules[$rule_map[$itemid]];
+					}
+				}
+			}
+		}
+
 COpt::memoryPick();
 // removing keys (hash -> array)
 		if(is_null($options['preservekeys'])){
@@ -914,6 +951,7 @@ COpt::memoryPick();
 			$options = array(
 				'itemids' => $itemids,
 				'editable' => 1,
+				'filter' => array('flags' => null),
 				'preservekeys' => 1,
 				'output' => API_OUTPUT_EXTEND,
 			);

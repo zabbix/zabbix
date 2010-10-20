@@ -240,7 +240,7 @@ class CGraph extends CZBXAPI{
 		if(!is_null($options['discoveryids'])){
 			zbx_value2array($options['discoveryids']);
 			if($options['output'] != API_OUTPUT_SHORTEN){
-				$sql_parts['select']['itemid'] = 'gi.itemid';
+				$sql_parts['select']['itemid'] = 'id.parent_itemid';
 			}
 			$sql_parts['from']['graphs_items'] = 'graphs_items gi';
 			$sql_parts['from']['item_discovery'] = 'item_discovery id';

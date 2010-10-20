@@ -821,7 +821,7 @@ return $caption;
 	return true;
 	}
 
-	function add_trigger($expression, $description, $type, $priority, $status, $comments, $url, $deps=array(), $templateid=0){
+	function add_trigger($expression, $description, $type, $priority, $status, $comments, $url, $deps=array(), $templateid=0, $flags=0){
 		$expressionData = parseTriggerExpressions($expression, true);
 		if( isset($expressionData[$expression]['errors']) ) {
 			showExpressionErrors($expression, $expressionData[$expression]['errors']);
@@ -838,9 +838,9 @@ return $caption;
 		$triggerid=get_dbid('triggers','triggerid');
 
 		$result=DBexecute('INSERT INTO triggers '.
-			'  (triggerid,description,type,priority,status,comments,url,value,error,templateid) '.
+			'  (triggerid,description,type,priority,status,comments,url,value,error,templateid,flags) '.
 			" values ($triggerid,".zbx_dbstr($description).",$type,$priority,$status,".zbx_dbstr($comments).','.
-			zbx_dbstr($url).",2,'Trigger just added. No status update so far.',".zero2null($templateid).")");
+			zbx_dbstr($url).",2,'Trigger just added. No status update so far.',".zero2null($templateid).", ".$flags.")");
 
 		if(!$result){
 			return	$result;
@@ -943,10 +943,10 @@ return $caption;
 		$newtriggerid=get_dbid('triggers','triggerid');
 
 		$result = DBexecute('INSERT INTO triggers '.
-					' (triggerid,description,type,priority,status,comments,url,value,expression,templateid)'.
+					' (triggerid,description,type,priority,status,comments,url,value,expression,templateid,flags)'.
 					' VALUES ('.$newtriggerid.','.zbx_dbstr($trigger['description']).','.$trigger['type'].','.$trigger['priority'].','.
 					$trigger['status'].','.zbx_dbstr($trigger['comments']).','.
-					zbx_dbstr($trigger['url']).",2,'0',".($copy_mode ? 'NULL' : $triggerid).')');
+					zbx_dbstr($trigger['url']).",2,'0',".($copy_mode ? 'NULL' : $triggerid).','.$trigger['flags'].')');
 
 		if(!$result)
 			return $result;
@@ -2203,7 +2203,7 @@ return $caption;
 
 				foreach($map as $hostid => $templates){
 					$set_with_dep = false;
-					
+
 					foreach($templateids as $tplid){
 						if(isset($templates[$tplid])){
 							$set_with_dep = true;
