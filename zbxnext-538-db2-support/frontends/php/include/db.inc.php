@@ -290,7 +290,7 @@ if(!isset($DB)){
 // TODO			OCI_DEFAULT
 				break;
 			case 'IBM_DB2':
-				$result = true;
+				$result = db2_autocommit($DB['DB'], DB2_AUTOCOMMIT_OFF);
 				break;
 			case 'SQLITE3':
 				if(1 == $DB['TRANSACTIONS']){
@@ -303,7 +303,7 @@ if(!isset($DB)){
 	}
 
 
-	function DBend($result=null){
+	function DBend($result=true){
 		global $DB;
 //SDI('DBend(): '.$DB['TRANSACTIONS']);
 		if($DB['TRANSACTIONS'] != 1){
@@ -315,20 +315,13 @@ if(!isset($DB)){
 				info('POSSIBLE ERROR: Used incorrect logic in database processing, transaction not started!');
 			}
 
-		if(!is_null($result))
 			$DB['TRANSACTION_STATE'] = $result && $DB['TRANSACTION_STATE'];
 
 		return $DB['TRANSACTION_STATE'];
 		}
 
 		$DB['TRANSACTIONS'] = 0;
-
-		if(is_null($result)){
-			$DBresult = $DB['TRANSACTION_STATE'];
-		}
-		else{
-			$DBresult = $result && $DB['TRANSACTION_STATE'];
-		}
+		$DBresult = $result && $DB['TRANSACTION_STATE'];
 
 //SDI('Result: '.$result);
 
@@ -362,6 +355,7 @@ if(!isset($DB)){
 				break;
 			case 'IBM_DB2':
 				$result = db2_commit($DB['DB']);
+				if($result) db2_autocommit($DB['DB'], DB2_AUTOCOMMIT_ON);
 				break;
 			case 'SQLITE3':
 				$result = DBexecute('commit');
@@ -389,6 +383,7 @@ if(!isset($DB)){
 				break;
 			case 'IBM_DB2':
 				$result = db2_rollback($DB['DB']);
+				db2_autocommit($DB['DB'], DB2_AUTOCOMMIT_ON);
 				break;
 			case 'SQLITE3':
 				$result = DBexecute('rollback');
@@ -562,13 +557,11 @@ COpt::savesqlrequest(microtime(true)-$time_start,$query);
 				break;
 				case 'IBM_DB2':
 					$options = array();
-					if($DB['TRANSACTIONS']) $options['autocommit'] = DB2_AUTOCOMMIT_OFF;
-
 					if(!$result = db2_prepare($DB['DB'], $query)){
 						$e = @db2_stmt_errormsg($result);
 						error('SQL error ['.$query.'] in ['.$e.']');
 					}
-					else if(true !== @db2_execute($result,$options)){
+					else if(true !== @db2_execute($result)){
 						$e = @db2_stmt_errormsg($result);
 						error('SQL error ['.$query.'] in ['.$e.']');
 					}
