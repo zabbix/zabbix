@@ -487,7 +487,7 @@ function getLastEvents($options){
 		'skipDependent'	=> 1,
 		'select_hosts' => array('hostid', 'host'),
 		'output' => API_OUTPUT_EXTEND,
-		'expandDescription' => 1,
+//		'expandDescription' => 1,
 		'sortfield' => 'lastchange',
 		'sortorder' => ZBX_SORT_DOWN,
 		'limit' => $options['limit']
