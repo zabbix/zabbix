@@ -127,7 +127,8 @@ if(isset($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] == $E
 }
 
 header('Content-type: text/javascript; charset=UTF-8');
-header('Content-length: '.$jsLength);
+// breaks if "zlib.output_compression = On"
+//	header('Content-length: '.$jsLength);
 header('Cache-Control: public, must-revalidate');
 header('ETag: '.$ETag);
 
