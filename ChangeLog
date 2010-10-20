@@ -1,5 +1,6 @@
 Changes for 1.9
 
+ - [DEV-490] made graph legend optional (Aly)
  - [DEV-483] added templated screens (Aly)
  - [DEV-485] added multiple urls for map elements (Vedmak)
  - [ZBX-3045] fixed deleting mediatype (Vedmak)

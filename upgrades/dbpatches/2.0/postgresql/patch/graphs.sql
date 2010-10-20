@@ -1,10 +1,13 @@
-ALTER TABLE ONLY graphs ALTER graphid DROP DEFAULT,
-			ALTER templateid DROP DEFAULT,
-			ALTER templateid DROP NOT NULL,
-			ALTER ymin_itemid DROP DEFAULT,
-			ALTER ymin_itemid DROP NOT NULL,
-			ALTER ymax_itemid DROP DEFAULT,
-			ALTER ymax_itemid DROP NOT NULL;
+ALTER TABLE ONLY graphs 
+	ALTER graphid DROP DEFAULT,
+	ALTER templateid DROP DEFAULT,
+	ALTER templateid DROP NOT NULL,
+	ALTER ymin_itemid DROP DEFAULT,
+	ALTER ymin_itemid DROP NOT NULL,
+	ALTER ymax_itemid DROP DEFAULT,
+	ALTER ymax_itemid DROP NOT NULL,
+	ALTER show_legend SET DEFAULT 1;
+UPDATE graphs SET show_legend=1 WHERE graphtype=0 OR graphtype=1;
 UPDATE graphs SET templateid=NULL WHERE templateid=0;
 UPDATE graphs SET templateid=NULL WHERE NOT templateid IS NULL AND NOT templateid IN (SELECT graphid FROM graphs);
 UPDATE graphs SET ymin_itemid=NULL WHERE ymin_itemid=0 OR NOT ymin_itemid IN (SELECT itemid FROM items);
