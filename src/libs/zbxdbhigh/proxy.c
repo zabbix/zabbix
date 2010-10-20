@@ -2739,7 +2739,7 @@ static int	DBlld_update_graph(zbx_uint64_t hostid, zbx_uint64_t graphid,
 	name_esc = DBdyn_escape_string(name);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
-			"select gi.gitemid,0,i.key_,gi.drawtype,gi.sortorder,gi.color,"
+			"select gi.gitemid,i.itemid,i.key_,gi.drawtype,gi.sortorder,gi.color,"
 				"gi.yaxisside,gi.calc_fnc,gi.type,gi.periods_cnt,i.flags"
 			" from graphs_items gi,items i"
 			" where gi.itemid=i.itemid"
@@ -2998,22 +2998,22 @@ static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_item
 			substitute_discovery_macros(&name, &name_alloc, &jp_row);
 
 			DBlld_update_graph(hostid, graphid, name,
-				atoi(row[2]),			/* width */
-				atoi(row[3]),			/* height */
-				atof(row[4]),			/* yaxismin */
-				atof(row[5]),			/* yaxismax */
-				(unsigned char)atoi(row[6]),	/* show_work_period */
-				(unsigned char)atoi(row[7]),	/* show_triggers */
-				(unsigned char)atoi(row[8]),	/* graphtype */
-				(unsigned char)atoi(row[9]),	/* show_legend */
-				(unsigned char)atoi(row[10]),	/* show_3d */
-				atof(row[11]),			/* percent_left */
-				atof(row[12]),			/* percent_right */
-				(unsigned char)atoi(row[13]),	/* ymin_type */
-				(unsigned char)atoi(row[14]),	/* ymax_type */
-				ymin_itemid,
-				ymax_itemid,
-				&jp_row);
+					atoi(row[2]),			/* width */
+					atoi(row[3]),			/* height */
+					atof(row[4]),			/* yaxismin */
+					atof(row[5]),			/* yaxismax */
+					(unsigned char)atoi(row[6]),	/* show_work_period */
+					(unsigned char)atoi(row[7]),	/* show_triggers */
+					(unsigned char)atoi(row[8]),	/* graphtype */
+					(unsigned char)atoi(row[9]),	/* show_legend */
+					(unsigned char)atoi(row[10]),	/* show_3d */
+					atof(row[11]),			/* percent_left */
+					atof(row[12]),			/* percent_right */
+					(unsigned char)atoi(row[13]),	/* ymin_type */
+					(unsigned char)atoi(row[14]),	/* ymax_type */
+					ymin_itemid,
+					ymax_itemid,
+					&jp_row);
 		}
 	}
 	DBfree_result(result);
@@ -3210,7 +3210,6 @@ int	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value,
 
 	DBlld_update_triggers(hostid, discovery_itemid, &jp_data);
 	DBlld_update_graphs(hostid, discovery_itemid, &jp_data);
-
 
 	if (ITEM_STATUS_NOTSUPPORTED == status)
 	{
