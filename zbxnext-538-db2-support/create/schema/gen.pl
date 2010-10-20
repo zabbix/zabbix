@@ -134,11 +134,11 @@ ZBX_TABLE	tables[]={
 	"t_varchar"	=>	"varchar",
 	"t_char"	=>	"varchar",
 	"t_image"	=>	"blob",
-	"t_history_log"	=>	"clob",
-	"t_history_text"=>	"clob",
-	"t_blob"	=>	"clob",
-	"t_item_param"	=>	"clob",
-	"t_cksum_text"	=>	"clob"
+	"t_history_log"	=>	"varchar(2048)",
+	"t_history_text"=>	"varchar(2048)",
+	"t_blob"	=>	"varchar(2048)",
+	"t_item_param"	=>	"varchar(2048)",
+	"t_cksum_text"	=>	"varchar(2048)"
 );
 
 %postgresql=("t_bigint"	=>	"numeric(20)",
