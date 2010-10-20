@@ -464,7 +464,7 @@ FIELD		|templateid	|t_id		|	|NULL		|ZBX_SYNC		|1|graphs	|graphid
 FIELD		|show_work_period|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|show_triggers	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|graphtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|show_legend	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|show_legend	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|show_3d	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|percent_left	|t_double	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|percent_right	|t_double	|'0'	|NOT NULL	|ZBX_SYNC
