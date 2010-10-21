@@ -319,6 +319,7 @@ include_once('include/page_header.php');
 		$options = array(
 			'triggerids' => $_REQUEST['g_triggerid'],
 			'editable'=>1,
+			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),			
 			'select_hosts' => API_OUTPUT_EXTEND,
 			'output'=>API_OUTPUT_EXTEND,
 			'expandDescription' => 1

@@ -252,6 +252,7 @@ include_once('include/page_header.php');
 			' WHERE '.DBcondition('ia.applicationid',$db_appids).
 				' AND i.itemid=ia.itemid AND i.lastvalue IS NOT NULL'.
 				' AND (i.status='.ITEM_STATUS_ACTIVE. ' OR i.status='.ITEM_STATUS_NOTSUPPORTED.')'.
+				' AND i.flags='.ZBX_FLAG_DISCOVERY_NORMAL.
 			order_by('i.description,i.itemid,i.lastclock');
 //SDI($sql);
 	$db_items = DBselect($sql);
@@ -380,6 +381,7 @@ include_once('include/page_header.php');
 				' AND h.hostid=i.hostid '.
 				' AND h.status='.HOST_STATUS_MONITORED.
 				' AND i.status='.ITEM_STATUS_ACTIVE.
+				' AND i.flags='.ZBX_FLAG_DISCOVERY_NORMAL.
 				' AND '.DBcondition('h.hostid',$available_hosts).
 			' ORDER BY h.host';
 
@@ -401,6 +403,7 @@ include_once('include/page_header.php');
 				' AND h.hostid=i.hostid '.
 				' AND h.status='.HOST_STATUS_MONITORED.
 				' AND i.status='.ITEM_STATUS_ACTIVE.
+				' AND i.flags='.ZBX_FLAG_DISCOVERY_NORMAL.
 				' AND '.DBcondition('h.hostid',$db_hostids).
 			' ORDER BY i.description,i.itemid';
 	$db_items = DBselect($sql);

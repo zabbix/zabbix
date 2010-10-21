@@ -1703,6 +1703,11 @@ return $caption;
 			if(!$result) return  $result;
 		}
 
+		$sql = 'SELECT triggerid FROM trigger_discovery WHERE '.DBcondition('parent_triggerid', $triggerids);
+		$db_triggers = DBselect($sql);
+		while($trigger = DBfetch($db_triggers)){
+			$triggerids[] = $trigger['triggerid'];
+		}
 // get hosts before functions deletion !!!
 		$trig_hosts = array();
 		foreach($triggerids as $id => $triggerid){
