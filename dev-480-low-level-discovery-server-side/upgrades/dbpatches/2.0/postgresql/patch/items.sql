@@ -1,7 +1,5 @@
 ALTER TABLE ONLY items ALTER itemid DROP DEFAULT,
 		       ALTER hostid DROP DEFAULT,
-		       ALTER lastvalue TYPE text,
-		       ALTER prevvalue TYPE text,
 		       ALTER units TYPE varchar(255),
 		       ALTER templateid DROP DEFAULT,
 		       ALTER templateid DROP NOT NULL,

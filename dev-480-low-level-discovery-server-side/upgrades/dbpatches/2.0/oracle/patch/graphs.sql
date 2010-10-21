@@ -5,6 +5,8 @@ ALTER TABLE graphs MODIFY ymin_itemid DEFAULT NULL;
 ALTER TABLE graphs MODIFY ymin_itemid NULL;
 ALTER TABLE graphs MODIFY ymax_itemid DEFAULT NULL;
 ALTER TABLE graphs MODIFY ymax_itemid NULL;
+ALTER TABLE graphs MODIFY show_legend DEFAULT 1;
+UPDATE graphs SET show_legend=1 WHERE graphtype=0 OR graphtype=1;
 ALTER TABLE graphs ADD flags number(10) DEFAULT '0' NOT NULL;
 UPDATE graphs SET templateid=NULL WHERE templateid=0;
 UPDATE graphs SET templateid=NULL WHERE NOT templateid IS NULL AND NOT templateid IN (SELECT graphid FROM graphs);
