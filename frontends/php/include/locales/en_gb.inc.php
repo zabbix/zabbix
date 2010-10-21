@@ -2496,7 +2496,13 @@
 	'S_OTHER_SMALL'=>			'other',
 
 // class.cookie.js
-	'S_MAX_COOKIE_SIZE_REACHED' => 'We are sorry, the maximum possible number of elements to remember has been reached.',
+	'S_MAX_COOKIE_SIZE_REACHED'=>		'We are sorry, the maximum possible number of elements to remember has been reached.',
+
+	'S_LAST_PAGE'=>			'Last',
+	'S_FIRST_PAGE'=>		'First',
+	'S_PREVIOUS_PAGE'=>		'Previous',
+	'S_NEXT_PAGE'=>			'Next',
+	'S_PREVIOUS_EVENTS'=>		'Previous',
 
 );
 ?>
