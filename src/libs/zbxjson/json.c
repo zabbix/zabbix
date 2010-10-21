@@ -709,7 +709,7 @@ static const char	*zbx_json_decodevalue_dyn(const char *p, char **string, size_t
 	if (*string_alloc <= sz)
 	{
 		*string_alloc = sz + 1;
-		*string = zbx_malloc(*string, *string_alloc);
+		*string = zbx_realloc(*string, *string_alloc);
 	}
 
 	switch (jt)

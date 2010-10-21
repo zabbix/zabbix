@@ -2578,22 +2578,23 @@ out:
 	return ret;
 }
 
-void	substitute_discovery_macros(char **data, size_t *data_alloc, struct zbx_json_parse *jp_row)
+void	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row)
 {
 	const char	*__function_name = "substitute_discovery_macros";
 
 	char		*src, *dst, *replace_to = NULL, c;
-	size_t		l, r, sz_data, sz_macro, sz_value, replace_to_alloc = 0;
+	size_t		l, r, sz_data, sz_macro, sz_value,
+			replace_to_alloc = 0, data_alloc;
 	int		res;
 
 	assert(data);
 	assert(*data);
-	assert(data_alloc);
 	assert(jp_row);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __function_name, *data);
 
 	sz_data = strlen(*data);
+	data_alloc = sz_data + 1;
 
 	for (l = 0; l < sz_data; l++)
 	{
@@ -2621,10 +2622,10 @@ void	substitute_discovery_macros(char **data, size_t *data_alloc, struct zbx_jso
 
 			sz_data += sz_value - sz_macro;
 
-			while (*data_alloc <= sz_data)
+			while (data_alloc <= sz_data)
 			{
-				*data_alloc *= 2;
-				*data = realloc(*data, *data_alloc);
+				data_alloc *= 2;
+				*data = realloc(*data, data_alloc);
 			}
 
 			src = *data + l + sz_macro;
