@@ -1028,25 +1028,15 @@ FIELD		|dns		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|useip		|t_integer	|'1'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|ip		|t_varchar(39)	|'127.0.0.1'|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|port		|t_integer	|'10050'|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|available	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|error		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|errors_from	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|disable_until	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|useipmi	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|ipmi_ip	|t_varchar(64)	|'127.0.0.1'|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|ipmi_port	|t_integer	|'623'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|ipmi_authtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|ipmi_privilege	|t_integer	|'2'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|ipmi_username	|t_varchar(16)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|ipmi_password	|t_varchar(20)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|ipmi_available	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|ipmi_error	|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|ipmi_errors_from|t_integer	|'0'	|NOT NULL	|0
-FIELD		|ipmi_disable_until|t_integer	|'0'	|NOT NULL	|0
-FIELD		|snmp_available	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|snmp_error	|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|snmp_errors_from|t_integer	|'0'	|NOT NULL	|0
-FIELD		|snmp_disable_until|t_integer	|'0'	|NOT NULL	|0
+FIELD		|available	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|error		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|errors_from	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|disable_until	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|interfaceid
-INDEX		|2		|hostid
+INDEX		|2		|hostid, itemtype
 
