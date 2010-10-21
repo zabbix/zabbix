@@ -15,6 +15,7 @@ Changes for 1.9
 
 Changes for 1.8.4rc2
 
+ - [ZBX-2630] fixed ability to translate various strings in the frontend depending on their context (Richlv)
  - [ZBX-3091] fixed error when update proxy (Vedmak)
  - [ZBX-3042] fixed submitParent field error (KB)
  - [ZBX-1038] fixed last(), prev(), diff(), change(), and abschange() not working properly with long textual values (asaveljevs)
