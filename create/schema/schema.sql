@@ -523,37 +523,14 @@ TABLE|hosts|hostid|ZBX_SYNC
 FIELD		|hostid		|t_id		|	|NOT NULL	|0
 FIELD		|proxy_hostid	|t_id		|	|NULL		|ZBX_SYNC		|1|hosts	|hostid		|RESTRICT
 FIELD		|host		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|dns		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|useip		|t_integer	|'1'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|ip		|t_varchar(39)	|'127.0.0.1'|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|port		|t_integer	|'10050'|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|disable_until	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|error		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|available	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|errors_from	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|lastaccess	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|inbytes	|t_bigint	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|outbytes	|t_bigint	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|useipmi	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|ipmi_port	|t_integer	|'623'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|ipmi_authtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|ipmi_privilege	|t_integer	|'2'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|ipmi_username	|t_varchar(16)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|ipmi_password	|t_varchar(20)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|ipmi_disable_until|t_integer	|'0'	|NOT NULL	|0
-FIELD		|ipmi_available	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|snmp_disable_until|t_integer	|'0'	|NOT NULL	|0
-FIELD		|snmp_available	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|maintenanceid	|t_id		|	|NULL		|ZBX_SYNC		|2|maintenances	|		|RESTRICT
 FIELD		|maintenance_status|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|maintenance_type|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|maintenance_from|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|ipmi_ip	|t_varchar(64)	|'127.0.0.1'|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|ipmi_errors_from|t_integer	|'0'	|NOT NULL	|0
-FIELD		|snmp_errors_from|t_integer	|'0'	|NOT NULL	|0
-FIELD		|ipmi_error	|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|snmp_error	|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|host
 INDEX		|2		|status
 INDEX		|3		|proxy_hostid
@@ -716,6 +693,7 @@ FIELD		|publickey	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|privatekey	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|mtime		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|lastns		|t_nanosec	|	|NULL		|0
+FIELD		|interfaceid	|t_id	|	|NOT NULL	|ZBX_SYNC,ZBX_PROXY	|1|interface
 UNIQUE		|1		|hostid,key_
 INDEX		|3		|status
 INDEX		|4		|templateid
@@ -1040,3 +1018,34 @@ FIELD		|id		|t_serial	|	|NOT NULL	|0
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|host		|t_varchar(64)	|''	|NOT NULL	|0
 INDEX		|1		|clock
+
+TABLE|interface|interfaceid|ZBX_SYNC
+FIELD		|interfaceid	|t_id		|	|NOT NULL	|0
+FIELD		|hostid		|t_id		|	|NOT NULL	|0	|1	|hosts	|hostid		|RESTRICT
+FIELD		|itemtype		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|dns		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|useip		|t_integer	|'1'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|ip		|t_varchar(39)	|'127.0.0.1'|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|port		|t_integer	|'10050'|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|available	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|error		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|errors_from	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|disable_until	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|useipmi	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|ipmi_ip	|t_varchar(64)	|'127.0.0.1'|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|ipmi_port	|t_integer	|'623'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|ipmi_authtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|ipmi_privilege	|t_integer	|'2'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|ipmi_username	|t_varchar(16)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|ipmi_password	|t_varchar(20)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|ipmi_available	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|ipmi_error	|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|ipmi_errors_from|t_integer	|'0'	|NOT NULL	|0
+FIELD		|ipmi_disable_until|t_integer	|'0'	|NOT NULL	|0
+FIELD		|snmp_available	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|snmp_error	|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|snmp_errors_from|t_integer	|'0'	|NOT NULL	|0
+FIELD		|snmp_disable_until|t_integer	|'0'	|NOT NULL	|0
+INDEX		|1		|interfaceid
+INDEX		|2		|hostid
+
