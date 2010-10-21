@@ -69,9 +69,9 @@ function make_favorite_graphs(){
 			$item = $items[$sourceid];
 			$host = reset($item['hosts']);
 
-			$item['description'] = item_description($item);
+			$item['name'] = item_name($item);
 
-			$link = new CLink(get_node_name_by_elid($sourceid, null, ': ').$host['host'].':'.$item['description'],'history.php?action=showgraph&itemid='.$sourceid);
+			$link = new CLink(get_node_name_by_elid($sourceid, null, ': ').$host['host'].':'.$item['name'],'history.php?action=showgraph&itemid='.$sourceid);
 			$link->setTarget('blank');
 
 			$capt = new CSpan($link);
@@ -270,7 +270,7 @@ function make_system_status($filter){
 		'maintenance' => $filter['maintenance'],
 		'expandData' => 1,
 		'skipDependent' => 1,
-		'expandDescription' => 1,
+		'expandName' => 1,
 		'filter' => array(
 			'priority' => $filter['severity'],
 			'value' => TRIGGER_VALUE_TRUE
@@ -363,7 +363,7 @@ function make_system_status($filter){
 					$table_inf->addRow(array(
 						get_node_name_by_elid($trigger['triggerid']),
 						$trigger['host'],
-						new CCol($trigger['description'], get_severity_style($trigger['priority'])),
+						new CCol($trigger['name'], get_severity_style($trigger['priority'])),
 						zbx_date2age($event['clock']),
 						($config['event_ack_enable']) ? (new CCol($ack, 'center')) : NULL,
 						$actions
@@ -398,7 +398,7 @@ function make_system_status($filter){
 					$table_inf_unack->addRow(array(
 						get_node_name_by_elid($trigger['triggerid']),
 						$trigger['host'],
-						new CCol($trigger['description'], get_severity_style($trigger['priority'])),
+						new CCol($trigger['name'], get_severity_style($trigger['priority'])),
 						zbx_date2age($event['clock']),
 						($config['event_ack_enable']) ? (new CCol($ack, 'center')) : NULL,
 						$actions
@@ -999,8 +999,8 @@ function make_latest_issues($filter = array()){
 				}
 			}
 
-//			$description = expand_trigger_description($row['triggerid']);
-			$description = expand_trigger_description_by_data(zbx_array_merge($trigger, array('clock'=>$row_event['clock'], 'ns'=>$row_event['ns'])),ZBX_FLAG_EVENT);
+//			$name = expand_trigger_name($row['triggerid']);
+			$name = expand_trigger_name_by_data(zbx_array_merge($trigger, array('clock'=>$row_event['clock'], 'ns'=>$row_event['ns'])),ZBX_FLAG_EVENT);
 
 //actions
 			$actions = get_event_actions_stat_hints($row_event['eventid']);
@@ -1011,24 +1011,24 @@ function make_latest_issues($filter = array()){
 					);
 
 			if($trigger['url'])
-				$description = new CLink($description, $trigger['url'], null, null, true);
+				$name = new CLink($name, $trigger['url'], null, null, true);
 			else
-				$description = new CSpan($description,'pointer');
+				$name = new CSpan($name,'pointer');
 
-			$description = new CCol($description,get_severity_style($trigger['priority']));
-			$description->setHint(make_popup_eventlist($row_event['eventid'], $trigger['type'], $trigger['triggerid']), '', '', false);
+			$name = new CCol($name,get_severity_style($trigger['priority']));
+			$name->setHint(make_popup_eventlist($row_event['eventid'], $trigger['type'], $trigger['triggerid']), '', '', false);
 		
 			$table->addRow(array(
 				get_node_name_by_elid($trigger['triggerid']),
 				$host,
-				$description,
+				$name,
 				$clock,
 				zbx_date2age($row_event['clock']),
 				$ack,
 				$actions
 			));
 		}
-		unset($trigger,$description,$actions);
+		unset($trigger,$name,$actions);
 	}
 
 	$table->setFooter(new CCol(S_UPDATED.': '.zbx_date2str(S_BLOCKS_LATEST_ISSUES_TIME_FORMAT)));
@@ -1245,10 +1245,10 @@ function make_graph_submenu(){
 			$item = $items[$sourceid];
 			$host = reset($item['hosts']);
 
-			$item['description'] = item_description($item);
+			$item['name'] = item_name($item);
 
 			$favGraphs[] = array(
-							'name'	=>	$host['host'].':'.$item['description'],
+							'name'	=>	$host['host'].':'.$item['name'],
 							'favobj'=>	'itemid',
 							'favid'	=>	$sourceid,
 							'action'=>	'remove'

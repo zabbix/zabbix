@@ -119,7 +119,7 @@ class CChart extends CGraphDraw{
 
 		$item = get_item_by_itemid($itemid);
 		$this->items[$this->num] = $item;
-		$this->items[$this->num]['description'] = item_description($item);
+		$this->items[$this->num]['name'] = item_name($item);
 		$this->items[$this->num]['delay'] = getItemDelay($item['delay'], $item['delay_flex']);
 
 		if(strpos($item['units'], ',') !== false)
@@ -449,7 +449,7 @@ class CChart extends CGraphDraw{
 		$cnt = 0;
 
 		foreach($this->items as $inum => $item){
-			$sql = 'SELECT DISTINCT h.host, tr.description, tr.triggerid, tr.expression, tr.priority, tr.value '.
+			$sql = 'SELECT DISTINCT h.host, tr.name, tr.triggerid, tr.expression, tr.priority, tr.value '.
 					' FROM triggers tr,functions f,items i, hosts h '.
 					' WHERE tr.triggerid=f.triggerid '.
 						" AND f.function IN ('last','min','avg','max') ".
@@ -492,7 +492,7 @@ class CChart extends CGraphDraw{
 					'skipdraw' => ($val <= $minY || $val >= $maxY),
 					'y' => $this->sizeY - (($val-$minY) / ($maxY-$minY)) * $this->sizeY + $this->shiftY,
 					'color' => $color,
-					'description' => S_TRIGGER.': '.expand_trigger_description_by_data($trigger),
+					'name' => S_TRIGGER.': '.expand_trigger_name_by_data($trigger),
 					'constant' => '['.$arr[2].' '.$arr[3].$arr[4].']'
 					));
 				++$cnt;
@@ -1621,8 +1621,8 @@ class CChart extends CGraphDraw{
 
 			$data = &$this->data[$this->items[$i]['itemid']][$this->items[$i]['calc_type']];
 
-			if($this->itemsHost) $item_caption = $this->items[$i]['description'];
-			else $item_caption = $this->items[$i]['host'].': '.$this->items[$i]['description'];
+			if($this->itemsHost) $item_caption = $this->items[$i]['name'];
+			else $item_caption = $this->items[$i]['host'].': '.$this->items[$i]['name'];
 
 			if(isset($data) && isset($data['min'])){
 				if($this->items[$i]['axisside'] == GRAPH_YAXIS_SIDE_LEFT)
@@ -1639,7 +1639,7 @@ class CChart extends CGraphDraw{
 			}
 			else{
 				$legend->addCell($colNum,array('text' => $item_caption));
-//				$legend->addCell($colNum,array('text' => $this->items[$i]['host'].': '.$this->items[$i]['description']));
+//				$legend->addCell($colNum,array('text' => $this->items[$i]['host'].': '.$this->items[$i]['name']));
 				$legend->addCell($colNum,array('text' => '[ '. S_NO_DATA_SMALL . ' ]'));
 			}
 
@@ -1750,11 +1750,11 @@ class CChart extends CGraphDraw{
 				10,
 				$this->getColor('Black No Alpha'));
 
-//			$legend->addCell($colNum,array('text' => $trigger['description']));
+//			$legend->addCell($colNum,array('text' => $trigger['name']));
 //			$legend->addCell($colNum, array('text' => $trigger['constant']));
 
 			$legend->addRow(array(
-				array('text' => $trigger['description']),
+				array('text' => $trigger['name']),
 				array('text' => $trigger['constant'])
 				));
 			$colNum++;

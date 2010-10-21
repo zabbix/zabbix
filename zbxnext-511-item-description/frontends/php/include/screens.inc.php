@@ -255,7 +255,7 @@ require_once('include/js.inc.php');
 		$host = get_host_by_itemid($itemid);
 
 		$table = new CTableInfo();
-		$table->setHeader(array(S_TIMESTAMP,$host['host'].': '.item_description($item)));
+		$table->setHeader(array(S_TIMESTAMP,$host['host'].': '.item_name($item)));
 
 		$options = array(
 			'history' => $item['value_type'],
@@ -454,7 +454,7 @@ require_once('include/js.inc.php');
 				$item = reset($items);
 				$item['host'] = reset($item['hosts']);
 
-				$caption = item_description($item);
+				$caption = item_name($item);
 
 				$nodeName = get_node_name_by_elid($item['itemid']);
 				if(!zbx_empty($nodeName))
@@ -464,7 +464,7 @@ require_once('include/js.inc.php');
 			$form->addVar('resourceid',$id);
 
 			$textfield = new Ctextbox('caption',$caption,75,'yes');
-			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&real_hosts=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=simple_graph&srcfld1=itemid&srcfld2=description',800,450);");
+			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&real_hosts=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=simple_graph&srcfld1=itemid&srcfld2=name',800,450);");
 			$selectbtn->setAttribute('onmouseover',"javascript: this.style.cursor = 'pointer';");
 
 			$form->addRow(S_PARAMETER,array($textfield,SPACE,$selectbtn));
@@ -517,7 +517,7 @@ require_once('include/js.inc.php');
 				$item = reset($items);
 				$item['host'] = reset($item['hosts']);
 
-				$caption = item_description($item);
+				$caption = item_name($item);
 
 				$nodeName = get_node_name_by_elid($item['itemid']);
 				if(!zbx_empty($nodeName))
@@ -527,7 +527,7 @@ require_once('include/js.inc.php');
 			$form->addVar('resourceid',$id);
 
 			$textfield = new CTextbox('caption',$caption,75,'yes');
-			$selectbtn = new CButton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=plain_text&srcfld1=itemid&srcfld2=description',800,450);");
+			$selectbtn = new CButton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=plain_text&srcfld1=itemid&srcfld2=name',800,450);");
 			$selectbtn->setAttribute('onmouseover',"javascript: this.style.cursor = 'pointer';");
 
 			$form->addRow(S_PARAMETER,array($textfield,SPACE,$selectbtn));
@@ -706,7 +706,7 @@ require_once('include/js.inc.php');
 				$items = CItem::get($options);
 				$item = reset($items);
 
-				$caption = $item['description'];
+				$caption = $item['name'];
 			}
 
 			$form->addVar('resourceid',$resourceid);
@@ -720,7 +720,7 @@ require_once('include/js.inc.php');
 
 			if(TIME_TYPE_HOST == $style){
 				$textfield = new CTextbox('caption',$caption,75,'yes');
-				$selectbtn = new CButton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=items&srcfld1=itemid&srcfld2=description',800,450);");
+				$selectbtn = new CButton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=items&srcfld1=itemid&srcfld2=name',800,450);");
 				$selectbtn->setAttribute('onmouseover',"javascript: this.style.cursor = 'pointer';");
 	
 				$form->addRow(S_PARAMETER,array($textfield,SPACE,$selectbtn));
@@ -1486,7 +1486,7 @@ require_once('include/js.inc.php');
 							S_TIME,
 							is_show_all_nodes() ? S_NODE : null,
 							S_HOST,
-							S_DESCRIPTION,
+							S_NAME,
 							S_VALUE,
 							S_SEVERITY
 							));
@@ -1506,7 +1506,7 @@ require_once('include/js.inc.php');
 							get_node_name_by_elid($event['objectid']),
 							$host['host'],
 							new CLink(
-								$trigger['description'],
+								$trigger['name'],
 								'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid']
 								),
 							$value,

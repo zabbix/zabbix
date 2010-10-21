@@ -1214,7 +1214,7 @@ update_multiContainer: function(e){
 
 	var e_td_4 = document.createElement('td');
 	e_tr_3.appendChild(e_td_4);
-	e_td_4.appendChild(document.createTextNode(locale['S_DESCRIPTION']));
+	e_td_4.appendChild(document.createTextNode(locale['S_NAME']));
 
 
 	var count = 0;

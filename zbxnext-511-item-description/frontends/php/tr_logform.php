@@ -45,7 +45,7 @@ include_once('include/page_header.php');
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 
 	$fields=array(
-		'description'=>		array(T_ZBX_STR, O_OPT,  NULL,		NOT_EMPTY,	'isset({save_trigger})'),
+		'name'=>		array(T_ZBX_STR, O_OPT,  NULL,		NOT_EMPTY,	'isset({save_trigger})'),
 		'itemid'=>			array(T_ZBX_INT, O_OPT,	 P_SYS,		DB_ID,	'isset({save_trigger})'),
 		'sform'=>			array(T_ZBX_INT, O_OPT,  NULL,	  	IN('0,1'),	null),
 		'sitems'=>			array(T_ZBX_INT, O_OPT,  NULL, 		IN('0,1'),	null),
@@ -58,7 +58,7 @@ include_once('include/page_header.php');
 		'priority'=>		array(T_ZBX_INT, O_OPT,  NULL, 		IN('0,1,2,3,4,5'),	'isset({save_trigger})'),
 		'expressions'=>		array(T_ZBX_STR, O_OPT,	 NULL,		NOT_EMPTY,	'isset({save_trigger})'),
 		'expr_type'=>		array(T_ZBX_INT, O_OPT,  NULL, 		IN('0,1'),	null),
-		'comments'=>		array(T_ZBX_STR, O_OPT,  null,  	null, null),
+		'description'=>		array(T_ZBX_STR, O_OPT,  null,  	null, null),
 		'url'=>				array(T_ZBX_STR, O_OPT,  null,  	null, null),
 		'status'=>			array(T_ZBX_INT, O_OPT,  NULL, 		IN('0,1'),	null),
 		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	 NULL,		NULL,	NULL),
@@ -92,23 +92,23 @@ if(isset($_REQUEST['save_trigger'])){
 		if(isset($_REQUEST['triggerid'])){
 			$trigger_data = get_trigger_by_triggerid($_REQUEST['triggerid']);
 			if($trigger_data['templateid']){
-				$_REQUEST['description'] = $trigger_data['description'];
+				$_REQUEST['name'] = $trigger_data['name'];
 				$expression = explode_exp($trigger_data['expression'],0);
 			}
 
 			$trigger = array();
 			$trigger['triggerid'] = $_REQUEST['triggerid'];
 			$trigger['expression'] = $expression;
-			$trigger['description'] = $_REQUEST['description'];
+			$trigger['name'] = $_REQUEST['name'];
 			$trigger['type'] = $type;
 			$trigger['priority'] = $_REQUEST['priority'];
 			$trigger['status'] = $status;
-			$trigger['comments'] = $_REQUEST['comments'];
+			$trigger['description'] = $_REQUEST['description'];
 			$trigger['url'] = $_REQUEST['url'];
 
 			DBstart();
 			$result = CTrigger::update($trigger);
-//			update_trigger($_REQUEST['triggerid'],$expression,$_REQUEST["description"],$type,$_REQUEST["priority"],$status,$_REQUEST["comments"],$_REQUEST["url"],$deps, $trigger_data['templateid']);
+//			update_trigger($_REQUEST['triggerid'],$expression,$_REQUEST["name"],$type,$_REQUEST["priority"],$status,$_REQUEST["description"],$_REQUEST["url"],$deps, $trigger_data['templateid']);
 
 			$result &= CTrigger::deleteDependencies($trigger);
 			$result &= CTrigger::addDependencies($deps);
@@ -123,11 +123,11 @@ if(isset($_REQUEST['save_trigger'])){
 		else{
 			$trigger = array();
 			$trigger['expression'] = $expression;
-			$trigger['description'] = $_REQUEST['description'];
+			$trigger['name'] = $_REQUEST['name'];
 			$trigger['type'] = $type;
 			$trigger['priority'] = $_REQUEST['priority'];
 			$trigger['status'] = $status;
-			$trigger['comments'] = $_REQUEST['comments'];
+			$trigger['description'] = $_REQUEST['description'];
 			$trigger['url'] = $_REQUEST['url'];
 
 			DBstart();
@@ -148,7 +148,7 @@ if(isset($_REQUEST['save_trigger'])){
 				}
 			}
 
-//			$triggerid=add_trigger($expression,$_REQUEST["description"],$type,$_REQUEST["priority"],$status,$_REQUEST["comments"],$_REQUEST["url"],$deps);
+//			$triggerid=add_trigger($expression,$_REQUEST["name"],$type,$_REQUEST["priority"],$status,$_REQUEST["description"],$_REQUEST["url"],$deps);
 
 			$result &= CTrigger::addDependencies($deps);
 
@@ -162,7 +162,7 @@ if(isset($_REQUEST['save_trigger'])){
 		}
 
 		if($result){
-			add_audit($audit_action, AUDIT_RESOURCE_TRIGGER, S_TRIGGER." [".$triggerid."] [".expand_trigger_description($triggerid)."] ");
+			add_audit($audit_action, AUDIT_RESOURCE_TRIGGER, S_TRIGGER." [".$triggerid."] [".expand_trigger_name($triggerid)."] ");
 			unset($_REQUEST["sform"]);
 
 			zbx_add_post_js('closeform("items.php");');
@@ -193,7 +193,7 @@ if(isset($_REQUEST['sform'])){
 		$frmTRLog->addVar('form_refresh',get_request('form_refresh',1));
 
 		$sql = 'SELECT DISTINCT f.functionid, f.function, f.parameter, t.expression, '.
-								' t.description, t.priority, t.comments, t.url, t.status, t.type'.
+								' t.name, t.priority, t.description, t.url, t.status, t.type'.
 					' FROM functions f, triggers t, items i '.
 					' WHERE t.triggerid='.$_REQUEST['triggerid'].
 						' AND i.itemid=f.itemid '.
@@ -203,11 +203,11 @@ if(isset($_REQUEST['sform'])){
 
 		$res = DBselect($sql);
 		while($rows = DBfetch($res)){
-			$description = $rows['description'];
+			$name = $rows['name'];
 			$expression = $rows['expression'];
 			$type = $rows['type'];
 			$priority = $rows['priority'];
-			$comments = $rows['comments'];
+			$description = $rows['description'];
 			$url = $rows['url'];
 			$status = $rows['status'];
 
@@ -264,11 +264,11 @@ if(isset($_REQUEST['sform'])){
 		}
 	}
 	else{
-		$description = get_request('description','');
+		$name = get_request('name','');
 		$expressions = get_request('expressions',array());
 		$type = get_request('type',0);
 		$priority = get_request('priority',0);
-		$comments = get_request('comments','');
+		$description = get_request('description','');
 		$url = get_request('url','');
 		$status = get_request('status',0);
 	}
@@ -276,7 +276,7 @@ if(isset($_REQUEST['sform'])){
 	$keys = get_request('keys',array());
 
 //sdi('<pre>'.print_r($expressions, true).'</pre>');
-	$frmTRLog->addRow(S_DESCRIPTION,new CTextBox('description',$description,80));
+	$frmTRLog->addRow(S_NAME,new CTextBox('name',$name,80));
 
 	$item = '';
 	$db_items = DBselect('SELECT DISTINCT * FROM items WHERE itemid='.$itemid);
@@ -286,14 +286,14 @@ if(isset($_REQUEST['sform'])){
 			$item = $template_host['host'].':';
 		}
 
-		$item .= item_description($db_item,$db_item['key_']);
+		$item .= item_name($db_item,$db_item['key_']);
 	}
 
 	$ctb = new CTextBox('item',$item,80);
 	$ctb->setAttribute('id','item');
 	$ctb->setAttribute('disabled','disabled');
 
-	$script = "javascript: return PopUp('popup.php?dstfrm=".$frmTRLog->getName()."&dstfld1=itemid&dstfld2=item&srctbl=items&srcfld1=itemid&srcfld2=description',800,450);";
+	$script = "javascript: return PopUp('popup.php?dstfrm=".$frmTRLog->getName()."&dstfld1=itemid&dstfld2=item&srctbl=items&srcfld1=itemid&srcfld2=name',800,450);";
 	$cbtn = new CButton('select_item',S_SELECT,$script);
 
 	$frmTRLog->addRow(S_ITEM,array($ctb, $cbtn));
@@ -402,7 +402,7 @@ if(isset($_REQUEST['sform'])){
 
 	$frmTRLog->addRow(S_SEVERITY,$sev_select);
 
-	$frmTRLog->addRow(S_COMMENTS,new CTextArea('comments',$comments));
+	$frmTRLog->addRow(S_COMMENTS,new CTextArea('description',$description));
 
 	$frmTRLog->addRow(S_URL,new CTextBox('url',$url,80));
 

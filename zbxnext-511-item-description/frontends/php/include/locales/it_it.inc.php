@@ -186,7 +186,7 @@
 	'S_ITEMS_ACTIVATED'=>			'Parametro attivato',
 	'S_ITEMS_DISABLED'=>			'Parametri disabilitati!',
 	'S_KEY'=>			'Chiave',
-	'S_DESCRIPTION'=>			'Descrizione',
+	'S_NAME'=>			'Descrizione',
 	'S_UPDATE_INTERVAL'=>			'Aggiorna ogni (in sec)',
 	'S_HISTORY'=>			'Storico',
 	'S_TRENDS'=>			'Trends (in gg)',

@@ -393,10 +393,10 @@ options = array(
 			);
 			$options = zbx_array_merge($def_ptions, $options);
 			$triggers = Ctrigger::get($options);
-			order_result($triggers, 'description');
+			order_result($triggers, 'name');
 
 			foreach($triggers as $trigger){
-				$this->data['triggers'][$trigger['triggerid']] = $trigger['description'];
+				$this->data['triggers'][$trigger['triggerid']] = $trigger['name'];
 			}
 
 			if(is_null($triggerid)) $triggerid = $this->_profileIds['triggerid'];

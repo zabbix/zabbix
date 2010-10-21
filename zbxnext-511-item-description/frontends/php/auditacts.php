@@ -185,7 +185,7 @@ include_once('include/page_header.php');
 	foreach($alerts as $num => $row){
 		$mediatype = array_pop($row['mediatypes']);
 
-		if($mediatype['mediatypeid'] == 0) $mediatype = array('description' => '');
+		if($mediatype['mediatypeid'] == 0) $mediatype = array('name' => '');
 
 		if($row['status'] == ALERT_STATUS_SENT){
 			if ($row['alerttype'] == ALERT_TYPE_MESSAGE)
@@ -213,7 +213,7 @@ include_once('include/page_header.php');
 		$table->addRow(array(
 			get_node_name_by_elid($row['alertid']),
 			new CCol(zbx_date2str(S_AUDITACTS_DESCRIPTION_DATE_FORMAT,$row['clock']), 'top'),
-			new CCol($mediatype['description'], 'top'),
+			new CCol($mediatype['name'], 'top'),
 			new CCol($status, 'top'),
 			new CCol($retries, 'top'),
 			new CCol($row['sendto'], 'top'),

@@ -110,7 +110,7 @@ include_once('include/page_header.php');
 	$frmMedia->addVar('dstfrm',$_REQUEST['dstfrm']);
 
 	$cmbType = new CComboBox('mediatypeid',$mediatypeid);
-	$sql = 'SELECT mediatypeid,description '.
+	$sql = 'SELECT mediatypeid,name '.
 			' FROM media_type'.
 			' WHERE '.DBin_node('mediatypeid').
 			' ORDER BY type';
@@ -118,7 +118,7 @@ include_once('include/page_header.php');
 	while($type=DBfetch($types)){
 		$cmbType->addItem(
 				$type['mediatypeid'],
-				get_node_name_by_elid($type['mediatypeid'], null, ': ').$type['description']
+				get_node_name_by_elid($type['mediatypeid'], null, ': ').$type['name']
 				);
 	}
 	$frmMedia->addRow(S_TYPE,$cmbType);

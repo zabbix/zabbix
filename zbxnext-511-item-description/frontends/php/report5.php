@@ -84,7 +84,7 @@ include_once('include/page_header.php');
 
 	$triggers = array();
 	$triggerids = array();
-	$sql = 'SELECT h.host, MAX(h.hostid) as hostid, t.triggerid, t.description, t.expression, '.
+	$sql = 'SELECT h.host, MAX(h.hostid) as hostid, t.triggerid, t.name, t.expression, '.
 				' MAX(t.lastchange) as lastchange, t.priority, count(distinct e.eventid) as cnt_event '.
 			' FROM hosts h, triggers t, functions f, items i, events e'.
 			' WHERE h.hostid = i.hostid '.
@@ -95,8 +95,8 @@ include_once('include/page_header.php');
 				' and e.clock>'.(time()-$time_dif).
 				' and '.DBcondition('t.triggerid',$available_triggers).
 				' and '.DBin_node('t.triggerid').
-			' GROUP BY h.host,t.triggerid,t.description,t.expression,t.priority '.
-			' ORDER BY cnt_event desc, h.host, t.description, t.triggerid';
+			' GROUP BY h.host,t.triggerid,t.name,t.expression,t.priority '.
+			' ORDER BY cnt_event desc, h.host, t.name, t.triggerid';
 	$result=DBselect($sql, 100);
 	while($row=DBfetch($result)){
 		$row['items'] = array();
@@ -112,13 +112,13 @@ include_once('include/page_header.php');
 	while($row = DBfetch($result)){
 		$item['itemid'] = $row['itemid'];
 		$item['action'] = str_in_array($row['value_type'],array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64))?'showgraph':'showvalues';
-		$item['description'] = item_description($row);
+		$item['name'] = item_name($row);
 
 		$triggers[$row['triggerid']]['items'][$row['itemid']] = $item;
 	}
 
 	foreach($triggers as $triggerid => $row){
-		$description = expand_trigger_description_by_data($row);
+		$name = expand_trigger_name_by_data($row);
 
 		$menus = '';
 		$host_nodeid = id2nodeid($row['hostid']);
@@ -143,7 +143,7 @@ include_once('include/page_header.php');
 			$tr_conf_link = "['".S_CONFIGURATION_OF_TRIGGERS."',\"javascript: redirect('triggers.php?form=update&triggerid=".$row['triggerid']."&hostid=".$row['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
 
 
-		$tr_desc = new CSpan($description,'pointer');
+		$tr_desc = new CSpan($name,'pointer');
 		$tr_desc->addAction('onclick',"create_mon_trigger_menu(event, ".
 										" new Array({'triggerid': '".$row['triggerid']."', 'lastchange': '".$row['lastchange']."'},".$tr_conf_link."),".
 										zbx_jsvalue($row['items'], true).");");

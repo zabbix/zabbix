@@ -123,7 +123,7 @@ function condition_type2str($conditiontype){
 	$str_type[CONDITION_TYPE_HOST_TEMPLATE]		= S_HOST_TEMPLATE;
 	$str_type[CONDITION_TYPE_TRIGGER]		= S_TRIGGER;
 	$str_type[CONDITION_TYPE_HOST]			= S_HOST;
-	$str_type[CONDITION_TYPE_TRIGGER_NAME]		= S_TRIGGER_DESCRIPTION;
+	$str_type[CONDITION_TYPE_TRIGGER_NAME]		= S_TRIGGER_NAME;
 	$str_type[CONDITION_TYPE_TRIGGER_VALUE]		= S_TRIGGER_VALUE;
 	$str_type[CONDITION_TYPE_TRIGGER_SEVERITY]	= S_TRIGGER_SEVERITY;
 	$str_type[CONDITION_TYPE_TIME_PERIOD]		= S_TIME_PERIOD;
@@ -171,7 +171,7 @@ function condition_value2str($conditiontype, $value){
 		case CONDITION_TYPE_TRIGGER:
 			$trig = CTrigger::get(array(
 				'triggerids' => $value,
-				'expandTriggerDescriptions' => true,
+				'expandTriggerNames' => true,
 				'output' => API_OUTPUT_EXTEND,
 				'select_hosts' => API_OUTPUT_EXTEND,
 				'nodeids' => get_current_nodeid(true),
@@ -180,7 +180,7 @@ function condition_value2str($conditiontype, $value){
 			$host = reset($trig['hosts']);
 			$str_val = '';
 			if(id2nodeid($value) != get_current_nodeid()) $str_val = get_node_name_by_elid($value, true, ': ');
-			$str_val .= $host['host'].':'.$trig['description'];
+			$str_val .= $host['host'].':'.$trig['name'];
 			break;
 		case CONDITION_TYPE_HOST:
 		case CONDITION_TYPE_HOST_TEMPLATE:
@@ -815,7 +815,7 @@ function get_history_of_actions($limit,&$last_clock=null,$sql_cond=''){
 	$table->setHeader(array(
 			is_show_all_nodes() ? make_sorting_header(S_NODES,'a.alertid') : null,
 			make_sorting_header(S_TIME,'clock'),
-			make_sorting_header(S_TYPE,'description'),
+			make_sorting_header(S_TYPE,'name'),
 			make_sorting_header(S_STATUS,'status'),
 			make_sorting_header(S_RETRIES_LEFT,'retries'),
 			make_sorting_header(S_RECIPIENTS,'sendto'),
@@ -823,7 +823,7 @@ function get_history_of_actions($limit,&$last_clock=null,$sql_cond=''){
 			S_ERROR
 			));
 
-	$sql = 'SELECT a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,a.error '.
+	$sql = 'SELECT a.alertid,a.clock,mt.name,a.sendto,a.subject,a.message,a.status,a.retries,a.error '.
 			' FROM events e, alerts a '.
 				' LEFT JOIN media_type mt ON mt.mediatypeid=a.mediatypeid '.
 			' WHERE e.eventid = a.eventid '.
@@ -874,7 +874,7 @@ function get_history_of_actions($limit,&$last_clock=null,$sql_cond=''){
 		$table->addRow(array(
 			get_node_name_by_elid($row['alertid']),
 			new CCol($time, 'top'),
-			new CCol($row['description'], 'top'),
+			new CCol($row['name'], 'top'),
 			new CCol($status, 'top'),
 			new CCol($retries, 'top'),
 			new CCol($sendto, 'top'),
@@ -949,7 +949,7 @@ function get_action_msgs_for_event($eventid){
 		$table->addRow(array(
 			get_node_name_by_elid($row['alertid']),
 			new CCol($time, 'top'),
-			new CCol((!empty($mediatype['description']) ? $mediatype['description'] : ''), 'top'),
+			new CCol((!empty($mediatype['name']) ? $mediatype['name'] : ''), 'top'),
 			new CCol($status, 'top'),
 			new CCol($retries, 'top'),
 			new CCol($sendto, 'top'),
@@ -1043,7 +1043,7 @@ function get_actions_hint_by_eventid($eventid,$status=NULL){
 			S_STATUS
 			));
 /*
-	$sql = 'SELECT DISTINCT a.alertid,mt.description,a.sendto,a.status,u.alias,a.retries '.
+	$sql = 'SELECT DISTINCT a.alertid,mt.name,a.sendto,a.status,u.alias,a.retries '.
 			' FROM events e,users u,alerts a'.
 			' left join media_type mt on mt.mediatypeid=a.mediatypeid'.
 			' WHERE a.eventid='.$eventid.
@@ -1053,9 +1053,9 @@ function get_actions_hint_by_eventid($eventid,$status=NULL){
 				' AND '.DBcondition('e.objectid',$available_triggers).
 				' AND '.DBin_node('a.alertid').
 				' AND u.userid=a.userid '.
-			' ORDER BY mt.description';
+			' ORDER BY mt.name';
 //*/
-	$sql = 'SELECT DISTINCT a.alertid,mt.description,u.alias,a.subject,a.message,a.sendto,a.status,a.retries,a.alerttype '.
+	$sql = 'SELECT DISTINCT a.alertid,mt.name,u.alias,a.subject,a.message,a.sendto,a.status,a.retries,a.alerttype '.
 			' FROM events e,alerts a '.
 				' LEFT JOIN users u ON u.userid=a.userid '.
 				' LEFT JOIN media_type mt ON mt.mediatypeid=a.mediatypeid'.
@@ -1085,7 +1085,7 @@ function get_actions_hint_by_eventid($eventid,$status=NULL){
 
 		switch($row['alerttype']){
 			case ALERT_TYPE_MESSAGE:
-				$message = empty($row['description'])?'-':$row['description'];
+				$message = empty($row['name'])?'-':$row['name'];
 				break;
 			case ALERT_TYPE_COMMAND:
 				$message = array(bold(S_COMMAND.':'));

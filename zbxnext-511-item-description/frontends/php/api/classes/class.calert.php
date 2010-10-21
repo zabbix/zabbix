@@ -461,7 +461,7 @@ COpt::memoryPick();
  *
  * @param _array $alerts multidimensional array with alerts data
  * @param array $alerts[0,...]['expression']
- * @param array $alerts[0,...]['description']
+ * @param array $alerts[0,...]['name']
  * @param array $alerts[0,...]['type'] OPTIONAL
  * @param array $alerts[0,...]['priority'] OPTIONAL
  * @param array $alerts[0,...]['status'] OPTIONAL

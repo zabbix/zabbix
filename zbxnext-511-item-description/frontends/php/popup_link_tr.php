@@ -64,12 +64,12 @@ include_once('include/page_header.php');
 				);
 
 			$dbTriggers = CTrigger::get($options);
-			order_result($dbTriggers, 'description');
+			order_result($dbTriggers, 'name');
 
 			foreach($dbTriggers as $tnum => $trigger){
 				$host = reset($trigger['hosts']);
 
-				$triggers[$trigger['triggerid']] = $host['host'].':'.expand_trigger_description_by_data($trigger);
+				$triggers[$trigger['triggerid']] = $host['host'].':'.expand_trigger_name_by_data($trigger);
 			}
 		}
 
@@ -111,7 +111,7 @@ include_once('include/page_header.php');
 				);
 
 			$triggers = CTrigger::get($options);
-			order_result($triggers, 'description');
+			order_result($triggers, 'name');
 		}
 		$triggerids = zbx_objectValues($triggers, 'triggerid');
 		$frmCnct->addVar('linktriggers', $triggerids);
@@ -151,10 +151,10 @@ include_once('include/page_header.php');
 
 		foreach($triggers as $tnum => $trigger){
 			$dbTriggers = CTrigger::get($options);
-			order_result($dbTriggers, 'description');
+			order_result($dbTriggers, 'name');
 
 			$host = reset($trigger['hosts']);
-			$trList->addItem($trigger['triggerid'], $host['host'].':'.expand_trigger_description_by_data($trigger));
+			$trList->addItem($trigger['triggerid'], $host['host'].':'.expand_trigger_name_by_data($trigger));
 		}
 
 		$frmCnct->addRow(S_TRIGGERS, array($trList, BR(), $btnSelect, $btnRemove));

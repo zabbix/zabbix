@@ -256,10 +256,10 @@
 		$item_host = reset($item_data['hosts']);
 		$item_host = $item_host['host'];
 		
-		$description = $item_host.':'.item_description($item_data);
+		$name = $item_host.':'.item_name($item_data);
 	}
 	else{
-		$description = '';
+		$name = '';
 	}
 
 	$expr_type	= get_request("expr_type", 'last[=]');
@@ -363,10 +363,10 @@ if(form){
 	$form->addVar('itemid',$itemid);
 
 	$form->addRow(S_ITEM, array(
-		new CTextBox('description', $description, 50, 'yes'),
+		new CTextBox('name', $name, 50, 'yes'),
 		new CButton('select', S_SELECT, "return PopUp('popup.php?dstfrm=".$form->GetName().
-				"&dstfld1=itemid&dstfld2=description&".
-				"srctbl=items&srcfld1=itemid&srcfld2=description',0,0,'zbx_popup_item');")
+				"&dstfld1=itemid&dstfld2=name&".
+				"srctbl=items&srcfld1=itemid&srcfld2=name',0,0,'zbx_popup_item');")
 		));
 
 	$cmbFnc = new CComboBox('expr_type', $expr_type	, 'submit()');

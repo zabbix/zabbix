@@ -127,10 +127,10 @@ include_once('include/page_header.php');
 						foreach($link['linktriggers'] as $lnum => $linktrigger){
 							$hosts = get_hosts_by_triggerid($linktrigger['triggerid']);
 							if($host = DBfetch($hosts)){
-								$description = $host['host'].':'.expand_trigger_description($linktrigger['triggerid']);
+								$name = $host['host'].':'.expand_trigger_name($linktrigger['triggerid']);
 							}
 
-							$link['linktriggers'][$lnum]['desc_exp'] = $description;
+							$link['linktriggers'][$lnum]['desc_exp'] = $name;
 						}
 						order_result($link['linktriggers'], 'desc_exp');
 						$action .= 'ZBX_SYSMAPS['.$cmapid.'].map.add_link('.zbx_jsvalue($link).'); '."\n";

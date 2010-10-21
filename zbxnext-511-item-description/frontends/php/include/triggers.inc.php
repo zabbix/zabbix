@@ -506,20 +506,20 @@ return $caption;
 
 
 /*
- * Function: get_trigger_by_description
+ * Function: get_trigger_by_name
  *
  * Description:
- *	 retrieve triggerid by description
+ *	 retrieve triggerid by name
  *
  * Author:
  *	Aly
  *
  * Comments:
- *	  description - host-name:trigger-description. Example( "unix server:low free disk space")
+ *	  name - host-name:trigger-name. Example( "unix server:low free disk space")
  */
 
-	function get_trigger_by_description($desc){
-		list($host_name, $trigger_description) = explode(':',$desc,2);
+	function get_trigger_by_name($desc){
+		list($host_name, $trigger_name) = explode(':',$desc,2);
 
 		$sql = 'SELECT t.* '.
 				' FROM triggers t, items i, functions f, hosts h '.
@@ -527,7 +527,7 @@ return $caption;
 					' AND i.hostid=h.hostid '.
 					' AND f.itemid=i.itemid '.
 					' AND t.triggerid=f.triggerid '.
-					' AND t.description='.zbx_dbstr($trigger_description).
+					' AND t.name='.zbx_dbstr($trigger_name).
 				' ORDER BY t.triggerid DESC';
 		$trigger = DBfetch(DBselect($sql,1));
 	return $trigger;
@@ -821,7 +821,7 @@ return $caption;
 	return true;
 	}
 
-	function add_trigger($expression, $description, $type, $priority, $status, $comments, $url, $deps=array(), $templateid=0){
+	function add_trigger($expression, $name, $type, $priority, $status, $description, $url, $deps=array(), $templateid=0){
 		$expressionData = parseTriggerExpressions($expression, true);
 		if( isset($expressionData[$expression]['errors']) ) {
 			showExpressionErrors($expression, $expressionData[$expression]['errors']);
@@ -830,16 +830,16 @@ return $caption;
 		if( !validate_trigger_dependency($expression, $deps))
 			return false;
 
-		if(CTrigger::exists(array('description' => $description, 'expression' => $expression))){
-			error('Trigger '.$description.' already exists');
+		if(CTrigger::exists(array('name' => $name, 'expression' => $expression))){
+			error('Trigger '.$name.' already exists');
 			return false;
 		}
 
 		$triggerid=get_dbid('triggers','triggerid');
 
 		$result=DBexecute('INSERT INTO triggers '.
-			'  (triggerid,description,type,priority,status,comments,url,value,error,templateid) '.
-			" values ($triggerid,".zbx_dbstr($description).",$type,$priority,$status,".zbx_dbstr($comments).','.
+			'  (triggerid,name,type,priority,status,description,url,value,error,templateid) '.
+			" values ($triggerid,".zbx_dbstr($name).",$type,$priority,$status,".zbx_dbstr($description).','.
 			zbx_dbstr($url).",2,'Trigger just added. No status update so far.',".zero2null($templateid).")");
 
 		if(!$result){
@@ -858,7 +858,7 @@ return $caption;
 
 			foreach($deps as $id => $triggerid_up){
 				if(!$result2=add_trigger_dependency($triggerid, $triggerid_up)){
-					error(S_INCORRECT_DEPENDENCY.' ['.expand_trigger_description($triggerid_up).']');
+					error(S_INCORRECT_DEPENDENCY.' ['.expand_trigger_name($triggerid_up).']');
 				}
 
 				$result &= $result2;
@@ -869,7 +869,7 @@ return $caption;
 		$trig_host = DBfetch($trig_hosts);
 
 		if($result){
-			$msg = S_ADDED_TRIGGER.SPACE.'"'.$description.'"';
+			$msg = S_ADDED_TRIGGER.SPACE.'"'.$name.'"';
 			if($trig_host){
 				$msg .= SPACE.S_TO_HOST_SMALL.SPACE.'"'.$trig_host['host'].'"';
 			}
@@ -894,7 +894,7 @@ return $caption;
 		}
 
 		if($result)
-			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TRIGGER,	$triggerid,	$trig_host['host'].':'.$description, NULL,	NULL, NULL);
+			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TRIGGER,	$triggerid,	$trig_host['host'].':'.$name, NULL,	NULL, NULL);
 
 		return $triggerid;
 	}
@@ -920,7 +920,7 @@ return $caption;
 					' AND i2.key_=i1.key_ '.
 					' AND i2.hostid='.$hostid.
 					' AND t2.triggerid=f2.triggerid '.
-					' AND t2.description='.zbx_dbstr($trigger['description']).
+					' AND t2.name='.zbx_dbstr($trigger['name']).
 					' AND t2.templateid=0 ';
 
 		$host_triggers = DBSelect($sql);
@@ -930,11 +930,11 @@ return $caption;
 			return update_trigger(
 				$host_trigger['triggerid'],
 				NULL,	// expression
-				$trigger['description'],
+				$trigger['name'],
 				$trigger['type'],
 				$trigger['priority'],
 				NULL,	// status
-				$trigger['comments'],
+				$trigger['description'],
 				$trigger['url'],
 				array(),
 				$copy_mode ? 0 : $triggerid);
@@ -943,9 +943,9 @@ return $caption;
 		$newtriggerid=get_dbid('triggers','triggerid');
 
 		$result = DBexecute('INSERT INTO triggers '.
-					' (triggerid,description,type,priority,status,comments,url,value,expression,templateid)'.
-					' VALUES ('.$newtriggerid.','.zbx_dbstr($trigger['description']).','.$trigger['type'].','.$trigger['priority'].','.
-					$trigger['status'].','.zbx_dbstr($trigger['comments']).','.
+					' (triggerid,name,type,priority,status,description,url,value,expression,templateid)'.
+					' VALUES ('.$newtriggerid.','.zbx_dbstr($trigger['name']).','.$trigger['type'].','.$trigger['priority'].','.
+					$trigger['status'].','.zbx_dbstr($trigger['description']).','.
 					zbx_dbstr($trigger['url']).",2,'0',".($copy_mode ? 'NULL' : $triggerid).')');
 
 		if(!$result)
@@ -986,8 +986,8 @@ return $caption;
 			add_trigger_dependency($newtriggerid, $dep_id);
 		}
 
-		info(S_ADDED_TRIGGER.SPACE.'"'.$trigger['description'].'"'.SPACE.S_TO_HOST_SMALL.SPACE.'"'.$host['host'].'"');
-		add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TRIGGER, $newtriggerid, $host['host'].':'.$trigger['description'], NULL, NULL, NULL);
+		info(S_ADDED_TRIGGER.SPACE.'"'.$trigger['name'].'"'.SPACE.S_TO_HOST_SMALL.SPACE.'"'.$host['host'].'"');
+		add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TRIGGER, $newtriggerid, $host['host'].':'.$trigger['name'], NULL, NULL, NULL);
 // Copy triggers to the child hosts
 		$child_hosts = get_hosts_by_templateid($hostid);
 		while($child_host = DBfetch($child_hosts)){
@@ -1464,11 +1464,11 @@ return $caption;
 		return $expr;
 	}
 
-	function update_trigger_comments($triggerids,$comments){
+	function update_trigger_description($triggerids,$description){
 		zbx_value2array($triggerids);
 
 		return	DBexecute('UPDATE triggers '.
-						' SET comments='.zbx_dbstr($comments).
+						' SET description='.zbx_dbstr($description).
 						' WHERE '.DBcondition('triggerid',$triggerids));
 	}
 
@@ -1521,7 +1521,7 @@ return $caption;
 	}
 
 	/*
-	 * Function: expand_trigger_description_constants
+	 * Function: expand_trigger_name_constants
 	 *
 	 * Description:
 	 *	 substitute simple macros in data string with real values
@@ -1533,32 +1533,32 @@ return $caption;
 	 *		   replcae $1-9 macros
 	 *
 	 */
-	function expand_trigger_description_constants($description, $row){
+	function expand_trigger_name_constants($name, $row){
 		if($row && isset($row['expression'])){
 //			$numbers = extract_numbers(ereg_replace('(\{[0-9]+\})', 'function', $row['expression']));
 			$numbers = extract_numbers(preg_replace('/(\{[0-9]+\})/', 'function', $row['expression']));
 
-			$description = $row['description'];
+			$name = $row['name'];
 
 			for ( $i = 0; $i < 9; $i++ ){
-				$description = str_replace(
+				$name = str_replace(
 									'$'.($i+1),
 									isset($numbers[$i])?$numbers[$i]:'',
-									$description
+									$name
 								);
 			}
 		}
 
-		return $description;
+		return $name;
 	}
 
-	function expand_trigger_description_by_data($row, $flag = ZBX_FLAG_TRIGGER){
+	function expand_trigger_name_by_data($row, $flag = ZBX_FLAG_TRIGGER){
 		if($row){
-			$description = expand_trigger_description_constants($row['description'], $row);
+			$name = expand_trigger_name_constants($row['name'], $row);
 
 			for($i=0; $i<10; $i++){
 				$macro = '{HOSTNAME'.($i ? $i : '').'}';
-				if(zbx_strstr($description, $macro)) {
+				if(zbx_strstr($name, $macro)) {
 					$functionid = trigger_get_N_functionid($row['expression'], $i ? $i : 1);
 
 					if(isset($functionid)) {
@@ -1570,14 +1570,14 @@ return $caption;
 						$host = DBfetch(DBselect($sql));
 						if(is_null($host['host']))
 							$host['host'] = $macro;
-						$description = str_replace($macro, $host['host'], $description);
+						$name = str_replace($macro, $host['host'], $name);
 					}
 				}
 			}
 
 			for($i=0; $i<10; $i++){
 				$macro = '{ITEM.LASTVALUE'.($i ? $i : '').'}';
-				if(zbx_strstr($description, $macro)){
+				if(zbx_strstr($name, $macro)){
 					$functionid = trigger_get_N_functionid($row['expression'], $i ? $i : 1);
 
 					if(isset($functionid)){
@@ -1586,7 +1586,7 @@ return $caption;
 								' WHERE i.itemid=f.itemid '.
 									' AND f.functionid='.$functionid;
 						$row2=DBfetch(DBselect($sql));
-						$description = str_replace($macro, format_lastvalue($row2), $description);
+						$name = str_replace($macro, format_lastvalue($row2), $name);
 
 					}
 				}
@@ -1594,33 +1594,33 @@ return $caption;
 
 			for($i=0; $i<10; $i++){
 				$macro = '{ITEM.VALUE'.($i ? $i : '').'}';
-				if(zbx_strstr($description, $macro)){
+				if(zbx_strstr($name, $macro)){
 					$value=($flag==ZBX_FLAG_TRIGGER)?
 							trigger_get_func_value($row['expression'],ZBX_FLAG_TRIGGER,$i ? $i : 1, 1):
 							trigger_get_func_value($row['expression'],ZBX_FLAG_EVENT,$i ? $i : 1, $row['clock'], $row['ns']);
 
-					$description = str_replace($macro, $value, $description);
+					$name = str_replace($macro, $value, $name);
 				}
 
 			}
 
-			if($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $description, $arr)){
+			if($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $name, $arr)){
 				$macros = CUserMacro::getMacros($arr[1], array('triggerid' => $row['triggerid']));
 
 				$search = array_keys($macros);
 				$values = array_values($macros);
 
-				$description = str_replace($search, $values, $description);
+				$name = str_replace($search, $values, $name);
 		}
 		}
 		else{
-			$description = '*ERROR*';
+			$name = '*ERROR*';
 		}
-	return $description;
+	return $name;
 	}
 
-	function expand_trigger_description_simple($triggerid){
-		$sql = 'SELECT DISTINCT h.host,t.description,t.expression,t.triggerid '.
+	function expand_trigger_name_simple($triggerid){
+		$sql = 'SELECT DISTINCT h.host,t.name,t.expression,t.triggerid '.
 				' FROM triggers t, functions f, items i, hosts h '.
 				' WHERE f.triggerid=t.triggerid '.
 					' AND i.itemid=f.itemid '.
@@ -1628,13 +1628,13 @@ return $caption;
 					' AND t.triggerid='.$triggerid;
 		$trigger = DBfetch(DBselect($sql));
 
-	return expand_trigger_description_by_data($trigger);
+	return expand_trigger_name_by_data($trigger);
 	}
 
-	function expand_trigger_description($triggerid){
-		$description = expand_trigger_description_simple($triggerid);
-		$description = htmlspecialchars($description);
-	return $description;
+	function expand_trigger_name($triggerid){
+		$name = expand_trigger_name_simple($triggerid);
+		$name = htmlspecialchars($name);
+	return $name;
 	}
 
 	function update_trigger_value_to_unknown_by_hostid($hostids){
@@ -1750,7 +1750,7 @@ return $caption;
 
 // Get triggers INFO before delete them!
 		$triggers = array();
-		$trig_res = DBselect('SELECT triggerid, description FROM triggers WHERE '.DBcondition('triggerid',$triggerids));
+		$trig_res = DBselect('SELECT triggerid, name FROM triggers WHERE '.DBcondition('triggerid',$triggerids));
 		while($trig_rows = DBfetch($trig_res)){
 			$triggers[$trig_rows['triggerid']] = $trig_rows;
 		}
@@ -1759,7 +1759,7 @@ return $caption;
 		$result = DBexecute('DELETE FROM triggers WHERE '.DBcondition('triggerid',$triggerids));
 		if($result){
 			foreach($triggers as $triggerid => $trigger){
-				$msg = S_TRIGGER.SPACE.'"'.$trigger['description'].'"'.SPACE.S_DELETED_SMALL;
+				$msg = S_TRIGGER.SPACE.'"'.$trigger['name'].'"'.SPACE.S_DELETED_SMALL;
 				$trig_host = DBfetch($trig_hosts[$triggerid]);
 				if($trig_host){
 					$msg .= SPACE.S_FROM_HOST_SMALL.SPACE.'"'.$trig_host['host'].'"';
@@ -1777,7 +1777,7 @@ return $caption;
 	 * Comments: !!! Don't forget sync code with C !!!                            *
 	 *                                                                            *
 	 ******************************************************************************/
-	function update_trigger($triggerid,$expression=NULL,$description=NULL,$type=NULL,$priority=NULL,$status=NULL,$comments=NULL,$url=NULL,$deps=array(),$templateid=0){
+	function update_trigger($triggerid,$expression=NULL,$name=NULL,$type=NULL,$priority=NULL,$status=NULL,$description=NULL,$url=NULL,$deps=array(),$templateid=0){
 		$trigger	= get_trigger_by_triggerid($triggerid);
 		$trig_hosts	= get_hosts_by_triggerid($triggerid);
 		$trig_host	= DBfetch($trig_hosts);
@@ -1802,11 +1802,11 @@ return $caption;
 
 		if(!validate_trigger_dependency($expression, $deps)) return false;
 
-		if(is_null($description)){
-			$description = $trigger['description'];
+		if(is_null($name)){
+			$name = $trigger['name'];
 		}
 
-		if(CTrigger::exists(array('description' => $description, 'expression' => $expression))){
+		if(CTrigger::exists(array('name' => $name, 'expression' => $expression))){
 
 			reset($expressionData[$expression]['hosts']);
 			$hData =& $expressionData[$expression]['hosts'][key($expressionData[$expression]['hosts'])];
@@ -1814,7 +1814,7 @@ return $caption;
 			$host = zbx_substr($expression, $hData['openSymbolNum']+1, $hData['closeSymbolNum']-($hData['openSymbolNum']+1));
 
 			$options = array(
-				'filter' => array('description' => $description, 'host' => $host),
+				'filter' => array('name' => $name, 'host' => $host),
 				'output' => API_OUTPUT_EXTEND,
 				'editable' => 1,
 			);
@@ -1829,7 +1829,7 @@ return $caption;
 				}
 			}
 			if($trigger_exist && ($trigger_exist['triggerid'] != $trigger['triggerid'])){
-				error('Trigger [ '.$trigger['description'].' ] already exists');
+				error('Trigger [ '.$trigger['name'].' ] already exists');
 				return false;
 			}
 			else if(!$trigger_exist){
@@ -1861,11 +1861,11 @@ return $caption;
 					update_trigger(
 						$db_chd_trigger['triggerid'],
 						$newexpression,
-						$description,
+						$name,
 						$type,
 						$priority,
 						NULL,		// status
-						$comments,
+						$description,
 						$url,
 						replace_template_dependencies($deps, $chd_trig_host['hostid']),
 						$triggerid);
@@ -1883,11 +1883,11 @@ return $caption;
 
 		$update_values = array();
 		if(!is_null($expression)) $update_values['expression'] = $expression;
-		if(!is_null($description)) $update_values['description'] = $description;
+		if(!is_null($name)) $update_values['name'] = $name;
 		if(!is_null($type)) $update_values['type'] = $type;
 		if(!is_null($priority)) $update_values['priority'] = $priority;
 		if(!is_null($status)) $update_values['status'] = $status;
-		if(!is_null($comments)) $update_values['comments'] = $comments;
+		if(!is_null($description)) $update_values['description'] = $description;
 		if(!is_null($url)) $update_values['url'] = $url;
 		if(!is_null($templateid)) $update_values['templateid'] = $templateid;
 
@@ -1906,14 +1906,14 @@ return $caption;
 
 		foreach($deps as $id => $triggerid_up){
 			if(!$result2=add_trigger_dependency($triggerid, $triggerid_up)){
-				error(S_INCORRECT_DEPENDENCY.' ['.expand_trigger_description($triggerid_up).']');
+				error(S_INCORRECT_DEPENDENCY.' ['.expand_trigger_name($triggerid_up).']');
 			}
 			$result &= $result2;
 		}
 
 		if($result){
 			$trig_hosts	= get_hosts_by_triggerid($triggerid);
-			$msg = S_TRIGGER.SPACE.'"'.$trigger['description'].'"'.SPACE.S_UPDATED_SMALL;
+			$msg = S_TRIGGER.SPACE.'"'.$trigger['name'].'"'.SPACE.S_UPDATED_SMALL;
 			$trig_host = DBfetch($trig_hosts);
 			if($trig_host){
 				$msg .= SPACE.S_FOR_HOST_SMALL.SPACE.'"'.$trig_host['host'].'"';
@@ -1923,7 +1923,7 @@ return $caption;
 
 		if($result) {
 			$trigger_new = get_trigger_by_triggerid($triggerid);
-			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER,	$triggerid,	$trig_host['host'].':'.$trigger['description'], 'triggers', $trigger, $trigger_new);
+			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER,	$triggerid,	$trig_host['host'].':'.$trigger['name'], 'triggers', $trigger, $trigger_new);
 		}
 
 		$result = $result?$triggerid:$result;
@@ -2089,11 +2089,11 @@ return $caption;
 			while($chd_trigger_data = DBfetch($db_chd_triggers)){
 				update_trigger($chd_trigger_data['triggerid'],
 								NULL,	//expression
-								NULL,	//description
+								NULL,	//name
 								NULL,	//type
 								NULL,	//priority
 								NULL,	//status
-								NULL,	//comments
+								NULL,	//description
 								NULL,	//url
 					replace_template_dependencies(
 						get_trigger_dependencies_by_triggerid($trigger_data['triggerid']),
@@ -2351,7 +2351,7 @@ return $caption;
 
 			if($unlink_mode){
 				if(DBexecute('UPDATE triggers SET templateid=NULL WHERE triggerid='.$trigger['triggerid'])){
-						info('Trigger "'.$trigger['description'].'" unlinked');
+						info('Trigger "'.$trigger['name'].'" unlinked');
 				}
 			}
 			else{
@@ -2418,7 +2418,7 @@ return $caption;
 			'expandData' => 1,
 			'skipDependent' => 1,
 			'output' => API_OUTPUT_EXTEND,
-			'sortfield' => 'description'
+			'sortfield' => 'name'
 		);
 
 		$db_triggers = CTrigger::get($options);
@@ -2430,23 +2430,23 @@ return $caption;
 
 		foreach($db_triggers as $tnum => $row){
 			$row['host'] = get_node_name_by_elid($row['hostid'], null, ': ').$row['host'];
-			$row['description'] = expand_trigger_description_constants($row['description'], $row);
+			$row['name'] = expand_trigger_name_constants($row['name'], $row);
 
 			$hosts[zbx_strtolower($row['host'])] = $row['host'];
 
 			// A little tricky check for attempt to overwrite active trigger (value=1) with
 			// inactive or active trigger with lower priority.
-			if(!isset($triggers[$row['description']][$row['host']]) ||
+			if(!isset($triggers[$row['name']][$row['host']]) ||
 				(
-					(($triggers[$row['description']][$row['host']]['value'] == TRIGGER_VALUE_FALSE) && ($row['value'] == TRIGGER_VALUE_TRUE)) ||
+					(($triggers[$row['name']][$row['host']]['value'] == TRIGGER_VALUE_FALSE) && ($row['value'] == TRIGGER_VALUE_TRUE)) ||
 					(
-						(($triggers[$row['description']][$row['host']]['value'] == TRIGGER_VALUE_FALSE) || ($row['value'] == TRIGGER_VALUE_TRUE)) &&
-						($row['priority'] > $triggers[$row['description']][$row['host']]['priority'])
+						(($triggers[$row['name']][$row['host']]['value'] == TRIGGER_VALUE_FALSE) || ($row['value'] == TRIGGER_VALUE_TRUE)) &&
+						($row['priority'] > $triggers[$row['name']][$row['host']]['priority'])
 					)
 				)
 			)
 			{
-				$triggers[$row['description']][$row['host']] = array(
+				$triggers[$row['name']][$row['host']] = array(
 					'hostid'	=> $row['hostid'],
 					'triggerid'	=> $row['triggerid'],
 					'value'		=> $row['value'],
@@ -2556,32 +2556,32 @@ return $caption;
 
 			if(isset($ack_menu)) $tr_ov_menu[] = $ack_menu;
 
-			$sql = 'SELECT DISTINCT i.itemid, i.description, i.key_, i.value_type '.
+			$sql = 'SELECT DISTINCT i.itemid, i.name, i.key_, i.value_type '.
 					' FROM items i, functions f '.
 					' WHERE f.itemid=i.itemid '.
 						' AND f.triggerid='.$trhosts[$hostname]['triggerid'];
 			$db_items = DBselect($sql);
 			while($item_data = DBfetch($db_items)){
-				$description = item_description($item_data);
+				$name = item_name($item_data);
 				switch($item_data['value_type']){
 					case ITEM_VALUE_TYPE_UINT64:
 					case ITEM_VALUE_TYPE_FLOAT:
 						$action = 'showgraph';
-						$status_bar = S_SHOW_GRAPH_OF_ITEM.' \''.$description.'\'';
+						$status_bar = S_SHOW_GRAPH_OF_ITEM.' \''.$name.'\'';
 						break;
 					case ITEM_VALUE_TYPE_LOG:
 					case ITEM_VALUE_TYPE_STR:
 					case ITEM_VALUE_TYPE_TEXT:
 					default:
 						$action = 'showlatest';
-						$status_bar = S_SHOW_VALUES_OF_ITEM.' \''.$description.'\'';
+						$status_bar = S_SHOW_VALUES_OF_ITEM.' \''.$name.'\'';
 						break;
 				}
 
-				if(zbx_strlen($description) > 25) $description = zbx_substr($description,0,22).'...';
+				if(zbx_strlen($name) > 25) $name = zbx_substr($name,0,22).'...';
 
 				$item_menu[$action][] = array(
-					$description,
+					$name,
 					'history.php?action='.$action.'&itemid='.$item_data['itemid'].'&period=3600',
 					 array('tw'=>'', 'sb'=>$status_bar));
 			}
@@ -2617,7 +2617,7 @@ return $caption;
 			$sql_dep = 'SELECT * FROM trigger_depends WHERE triggerid_down='.$triggerid;
 			$dep_res = DBselect($sql_dep);
 			while($dep_row = DBfetch($dep_res)){
-				$dep_table->addRow(SPACE.'-'.SPACE.expand_trigger_description($dep_row['triggerid_up']));
+				$dep_table->addRow(SPACE.'-'.SPACE.expand_trigger_name($dep_row['triggerid_up']));
 				$dependency = true;
 			}
 
@@ -2639,7 +2639,7 @@ return $caption;
 			$sql_dep = 'SELECT * FROM trigger_depends WHERE triggerid_up='.$triggerid;
 			$dep_res = DBselect($sql_dep);
 			while($dep_row = DBfetch($dep_res)){
-				$dep_table->addRow(SPACE.'-'.SPACE.expand_trigger_description($dep_row['triggerid_down']));
+				$dep_table->addRow(SPACE.'-'.SPACE.expand_trigger_name($dep_row['triggerid_down']));
 				$dependency = true;
 			}
 

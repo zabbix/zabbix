@@ -1384,14 +1384,14 @@ return $result;
 			return false;
 		}
 
-		$sql = 'SELECT i.itemid,i.key_,i.description '.
+		$sql = 'SELECT i.itemid,i.key_,i.name '.
 				' FROM items_applications ia, items i '.
 				' WHERE i.type='.ITEM_TYPE_HTTPTEST.
 					' AND i.itemid=ia.itemid '.
 					' AND '.DBcondition('ia.applicationid',$applicationids);
 		$res = DBselect($sql);
 		if($info = DBfetch($res)){
-			info(S_APPLICATION.SPACE.'"'.$host['host'].':'.$app['name'].'"'.SPACE.S_USED_BY_ITEM_SMALL.SPACE.'"'.item_description($info).'"');
+			info(S_APPLICATION.SPACE.'"'.$host['host'].':'.$app['name'].'"'.SPACE.S_USED_BY_ITEM_SMALL.SPACE.'"'.item_name($info).'"');
 			return false;
 		}
 

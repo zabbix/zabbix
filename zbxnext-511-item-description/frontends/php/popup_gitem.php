@@ -144,10 +144,10 @@ include_once('include/page_header.php');
 
 		$frmGItem->addVar('dstfrm',$_REQUEST['dstfrm']);
 
-		$description = '';
+		$name = '';
 		if($itemid > 0){
-			$description = get_item_by_itemid($itemid);
-			$description = item_description($description);
+			$name = get_item_by_itemid($itemid);
+			$name = item_name($name);
 		}
 
 		$frmGItem->addVar('graphid',$graphid);
@@ -157,7 +157,7 @@ include_once('include/page_header.php');
 		$frmGItem->addVar('graphtype',$graphtype);
 		$frmGItem->addVar('only_hostid',$only_hostid);
 
-		$txtCondVal = new CTextBox('description',$description,50,'yes');
+		$txtCondVal = new CTextBox('name',$name,50,'yes');
 
 		$host_condition = '';
 		if(isset($only_hostid)){// graph for template must use only one host
@@ -169,8 +169,8 @@ include_once('include/page_header.php');
 
 		$btnSelect = new CButton('btn1',S_SELECT,
 				"return PopUp('popup.php?writeonly=1&dstfrm=".$frmGItem->GetName().
-				"&dstfld1=itemid&dstfld2=description&".
-				"srctbl=items&srcfld1=itemid&srcfld2=description".$host_condition."');",
+				"&dstfld1=itemid&dstfld2=name&".
+				"srctbl=items&srcfld1=itemid&srcfld2=name".$host_condition."');",
 				'T');
 
 		$frmGItem->addRow(S_PARAMETER ,array($txtCondVal,$btnSelect));

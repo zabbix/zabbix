@@ -57,14 +57,14 @@ include_once('include/page_footer.php');
 	$form->setHelp('install_source_web.php');
 	$form->addRow(
 		array(bold(S_NEW_INSTALLATION_BIG),BR(),BR(),
-			bold(S_DESCRIPTION),BR(),
+			bold(S_NAME),BR(),
 			'Not implemented yet!',
 			BR(),BR(),BR()
 			),
 		new CButton('install',S_NEW_INSTALLATION));
 	$form->addRow(
 		array(bold(S_UPDATE_BIG),BR(),BR(),
-			bold(S_DESCRIPTION),BR(),
+			bold(S_NAME),BR(),
 			'Not implemented yet!',
 			BR(),BR(),BR()
 			),

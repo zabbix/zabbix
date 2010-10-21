@@ -195,16 +195,16 @@ if(isset($_REQUEST['pservices'])){
 		$prefix	 = null;
 		$trigger = '-';
 
-		$description = S_ROOT_SMALL;
+		$name = S_ROOT_SMALL;
 
-		$description = new CLink($description,'#');
-		$description->setAction('javascript:
+		$name = new CLink($name,'#');
+		$name->setAction('javascript:
 				window.opener.document.forms[0].elements[\'parent_name\'].value = '.zbx_jsvalue(S_ROOT_SMALL).';
 				window.opener.document.forms[0].elements[\'parentname\'].value = '.zbx_jsvalue(S_ROOT_SMALL).';
 				window.opener.document.forms[0].elements[\'parentid\'].value = '.zbx_jsvalue(0).';
 				self.close(); return false;');
 
-		$table->addRow(array(array($prefix,$description),S_NONE,$trigger));
+		$table->addRow(array(array($prefix,$name),S_NONE,$trigger));
 //-----
 	if(isset($service)){
 		$childs = get_service_childs($service['serviceid'],1);
@@ -232,20 +232,20 @@ if(isset($_REQUEST['pservices'])){
 		$prefix	 = null;
 		$trigger = '-';
 
-		$description = $db_service_data['name'];
+		$name = $db_service_data['name'];
 
-		$description = new CSpan($description,'link');
-		$description->setAttribute('onclick', 'javascript:
+		$name = new CSpan($name,'link');
+		$name->setAttribute('onclick', 'javascript:
 						window.opener.document.forms[0].elements[\'parent_name\'].value = '.zbx_jsvalue($db_service_data['name']).';
 						window.opener.document.forms[0].elements[\'parentname\'].value = '.zbx_jsvalue($db_service_data['name']).';
 						window.opener.document.forms[0].elements[\'parentid\'].value = '.zbx_jsvalue($db_service_data['serviceid']).';
 						self.close(); return false;');
 
 		if(isset($db_service_data['triggerid'])){
-			$trigger = expand_trigger_description($db_service_data['triggerid']);
+			$trigger = expand_trigger_name($db_service_data['triggerid']);
 		}
 
-		$table->addRow(array(array($prefix,$description),algorithm2str($db_service_data['algorithm']),$trigger));
+		$table->addRow(array(array($prefix,$name),algorithm2str($db_service_data['algorithm']),$trigger));
 	}
 
 	$cb = new CButton('cancel',S_CANCEL);
@@ -302,16 +302,16 @@ if(isset($_REQUEST['cservices'])){
 		$prefix	 = null;
 		$trigger = '-';
 
-		$description = $db_service_data['name'];
+		$name = $db_service_data['name'];
 
 		if(isset($db_service_data['triggerid'])){
-			$trigger = expand_trigger_description($db_service_data['triggerid']);
+			$trigger = expand_trigger_name($db_service_data['triggerid']);
 		}
 
-		$description = new CLink($description,'#');
-		$description->setAction('window.opener.add_child_service('.zbx_jsvalue($db_service_data['name']).','.zbx_jsvalue($db_service_data['serviceid']).','.zbx_jsvalue($trigger).','.zbx_jsvalue($db_service_data['triggerid']).'); self.close(); return false;');
+		$name = new CLink($name,'#');
+		$name->setAction('window.opener.add_child_service('.zbx_jsvalue($db_service_data['name']).','.zbx_jsvalue($db_service_data['serviceid']).','.zbx_jsvalue($trigger).','.zbx_jsvalue($db_service_data['triggerid']).'); self.close(); return false;');
 
-		$table->addRow(array(array($prefix,$description),algorithm2str($db_service_data['algorithm']),$trigger));
+		$table->addRow(array(array($prefix,$name),algorithm2str($db_service_data['algorithm']),$trigger));
 	}
 
 	$cb = new CButton('cancel',S_CANCEL);
@@ -498,10 +498,10 @@ if(isset($_REQUEST['sform'])){
 		$prefix	 = null;
 		$trigger = '-';
 
-		$description = new CLink($child['name'],'services_form.php?sform=1&serviceid='.$child['serviceid']);
+		$name = new CLink($child['name'],'services_form.php?sform=1&serviceid='.$child['serviceid']);
 
 		if(isset($child['triggerid']) && !empty($child['triggerid'])){
-			$trigger = expand_trigger_description($child['triggerid']);
+			$trigger = expand_trigger_name($child['triggerid']);
 		}
 
 		$table->addRow(array(
@@ -510,7 +510,7 @@ if(isset($_REQUEST['sform'])){
 					new CVar('childs['.$child['serviceid'].'][serviceid]', $child['serviceid'])
 					),
 				array(
-					$description,
+					$name,
 					new CVar('childs['.$child['serviceid'].'][name]', $child['name'])
 					),
 				new CCheckBox(
@@ -722,7 +722,7 @@ if(isset($_REQUEST['sform'])){
 	$frmService->addRow(S_LINK_TO_TRIGGER_Q, new CCheckBox('linktrigger',$linktrigger,"javascript: display_element('trigger_name');",1));
 
 	if($triggerid > 0){
-		$trigger = expand_trigger_description($triggerid);
+		$trigger = expand_trigger_name($triggerid);
 	}
 	else{
 		$trigger = '';
@@ -732,7 +732,7 @@ if(isset($_REQUEST['sform'])){
 						new CCol(S_TRIGGER,'form_row_l'),
 						new CCol(array(
 									new CTextBox('trigger',$trigger,64,'yes'),
-									new CButton('btn1',S_SELECT,"return PopUp('popup.php?"."dstfrm=".$frmService->GetName()."&dstfld1=triggerid&dstfld2=trigger"."&srctbl=triggers&srcfld1=triggerid&srcfld2=description&real_hosts=1');",'T')
+									new CButton('btn1',S_SELECT,"return PopUp('popup.php?"."dstfrm=".$frmService->GetName()."&dstfld1=triggerid&dstfld2=trigger"."&srctbl=triggers&srcfld1=triggerid&srcfld2=name&real_hosts=1');",'T')
 								),'form_row_r')
 							));
 	$row->setAttribute('id','trigger_name');

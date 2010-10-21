@@ -59,7 +59,7 @@ class CItem extends CZBXAPI{
 		$user_type = $USER_DETAILS['type'];
 		$userid = $USER_DETAILS['userid'];
 
-		$sort_columns = array('itemid','description','key_','delay','history','trends','type','status'); // allowed columns for sorting
+		$sort_columns = array('itemid','name','key_','delay','history','trends','type','status'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
 
 		$sql_parts = array(
@@ -303,7 +303,7 @@ class CItem extends CZBXAPI{
 
 // pattern
 		if(!is_null($options['pattern'])){
-			$sql_parts['where']['description'] = ' UPPER(i.description) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
+			$sql_parts['where']['name'] = ' UPPER(i.name) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
 		}
 
 		if(isset($options['patternKey']))
@@ -332,9 +332,9 @@ class CItem extends CZBXAPI{
 				$sql_parts['where']['itemid'] = DBcondition('i.itemid', $options['filter']['itemid']);
 			}
 
-			if(isset($options['filter']['description'])){
-				zbx_value2array($options['filter']['description']);
-				$sql_parts['where']['description'] = DBcondition('i.description', $options['filter']['description'], false, true);
+			if(isset($options['filter']['name'])){
+				zbx_value2array($options['filter']['name']);
+				$sql_parts['where']['name'] = DBcondition('i.name', $options['filter']['name'], false, true);
 			}
 
 			if(isset($options['filter']['key_'])){

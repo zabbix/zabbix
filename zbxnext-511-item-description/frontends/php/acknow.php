@@ -106,7 +106,7 @@ include_once('include/page_header.php');
 		if($result){
 			$event_acknowledged = true;
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER, S_ACKNOWLEDGE_ADDED.
-				' ['.($bulk) ? ' BULK ACKNOWLEDGE ' : (expand_trigger_description_by_data($event_trigger)).']'.
+				' ['.($bulk) ? ' BULK ACKNOWLEDGE ' : (expand_trigger_name_by_data($event_trigger)).']'.
 				' ['.$_REQUEST['message'].']');
 		}
 
@@ -128,7 +128,7 @@ include_once('include/page_header.php');
 
 ?>
 <?php
-	$msg = $bulk ? ' BULK ACKNOWLEDGE ' : expand_trigger_description_by_data($event_trigger);
+	$msg = $bulk ? ' BULK ACKNOWLEDGE ' : expand_trigger_name_by_data($event_trigger);
 	show_table_header(array(S_ALARM_ACKNOWLEDGES_BIG.': ', $msg));
 	print(SBR);
 	

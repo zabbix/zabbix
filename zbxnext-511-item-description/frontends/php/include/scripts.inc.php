@@ -42,7 +42,7 @@ function execute_script($scriptid,$hostid){
 
 	if(!$socket = fsockopen($ZBX_SERVER, $ZBX_SERVER_PORT, $errorCode, $errorMsg, ZBX_SCRIPT_TIMEOUT)){
 		array_pop($ZBX_MESSAGES);
-		error(S_SCRIPT_ERROR_DESCRIPTION.': '.$errorMsg);
+		error(S_SCRIPT_ERROR_NAME.': '.$errorMsg);
 		show_messages(false, '', S_SCRIPT_ERROR);
 		return false;
 	}
@@ -62,7 +62,7 @@ function execute_script($scriptid,$hostid){
 	stream_set_timeout($socket, ZBX_SCRIPT_TIMEOUT);
 
 	if(fwrite($socket, $dataToSend, zbx_strlen($dataToSend)) === false) {
-		error(S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_SEND_ERROR);
+		error(S_SCRIPT_ERROR_NAME.': '.S_SCRIPT_SEND_ERROR);
 		show_messages(false, '', S_SCRIPT_ERROR);
 		return false;
 	}
@@ -75,7 +75,7 @@ function execute_script($scriptid,$hostid){
 		if(($out = fread($socket, $pbl)) !== false) {
 			$response .= $out;
 		}else{
-			error(S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_READ_ERROR);
+			error(S_SCRIPT_ERROR_NAME.': '.S_SCRIPT_READ_ERROR);
 			show_messages(false, '', S_SCRIPT_ERROR);
 			return false;
 		}
@@ -83,15 +83,15 @@ function execute_script($scriptid,$hostid){
 
 	if(!feof($socket)) {
 		if(time()-$now >= ZBX_SCRIPT_TIMEOUT) {
-			error(S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_TIMEOUT_ERROR);
+			error(S_SCRIPT_ERROR_NAME.': '.S_SCRIPT_TIMEOUT_ERROR);
 			show_messages(false, '', S_SCRIPT_ERROR);
 			return false;
 		}else if($i*$pbl >= ZBX_SCRIPT_BYTES_LIMIT) {
-			error(S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_BYTES_LIMIT_ERROR);
+			error(S_SCRIPT_ERROR_NAME.': '.S_SCRIPT_BYTES_LIMIT_ERROR);
 			show_messages(false, '', S_SCRIPT_ERROR);
 			return false;
 		}else {
-			error(S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_UNKNOWN_ERROR);
+			error(S_SCRIPT_ERROR_NAME.': '.S_SCRIPT_UNKNOWN_ERROR);
 			show_messages(false, '', S_SCRIPT_ERROR);
 			return false;
 		}
@@ -101,7 +101,7 @@ function execute_script($scriptid,$hostid){
 		$json = new CJSON();
 		$rcv = $json->decode($response, true);
 	}else{
-		error(S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_ERROR_EMPTY_RESPONSE);
+		error(S_SCRIPT_ERROR_NAME.': '.S_SCRIPT_ERROR_EMPTY_RESPONSE);
 		show_messages(false, '', S_SCRIPT_ERROR);
 		return false;
 	}

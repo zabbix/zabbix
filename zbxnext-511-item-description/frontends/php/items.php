@@ -76,7 +76,7 @@ switch($itemType) {
 		'copy_mode'=>			array(T_ZBX_INT, O_OPT,	 P_SYS,	IN('0'),	null),
 
 		'itemid'=>			array(T_ZBX_INT, O_NO,	 P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))'),
-		'description'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),
+		'name'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),
 		'key'=>				array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,		'isset({save})'),
 		'delay'=>			array(T_ZBX_INT, O_OPT,  null,  '(('.BETWEEN(1,86400).
 				'(!isset({delay_flex}) || !({delay_flex}) || is_array({delay_flex}) && !count({delay_flex}))) ||'.
@@ -120,7 +120,7 @@ switch($itemType) {
 		'params_script'=>	array(T_ZBX_STR, O_OPT, NULL, NULL, NULL),
 		'params_dbmonitor'=>	array(T_ZBX_STR, O_OPT, NULL, NULL, NULL),
 		'params_calculted'=>	array(T_ZBX_STR, O_OPT, NULL, NULL, NULL),
-		'description_details'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,'isset({save})'),
+		'description'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,'isset({save})'),
 
 		'snmp_community'=>	array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,		'isset({save})&&isset({type})&&'.IN(
 													ITEM_TYPE_SNMPV1.','.
@@ -179,7 +179,7 @@ switch($itemType) {
 		'filter_host'=>				array(T_ZBX_STR, O_OPT,  null,	null,		null),
 		'filter_hostid'=>			array(T_ZBX_INT, O_OPT,  null,	DB_ID,		null),
 		'filter_application'=>		array(T_ZBX_STR, O_OPT,  null,	null,		null),
-		'filter_description'=>		array(T_ZBX_STR, O_OPT,  null,	null,		null),
+		'filter_name'=>		array(T_ZBX_STR, O_OPT,  null,	null,		null),
 		'filter_type'=>				array(T_ZBX_INT, O_OPT,  null,
 				IN(array(-1,ITEM_TYPE_ZABBIX,ITEM_TYPE_SNMPV1,ITEM_TYPE_TRAPPER,ITEM_TYPE_SIMPLE,
 				ITEM_TYPE_SNMPV2C,ITEM_TYPE_INTERNAL,ITEM_TYPE_SNMPV3,ITEM_TYPE_ZABBIX_ACTIVE,
@@ -218,7 +218,7 @@ switch($itemType) {
 	);
 
 	check_fields($fields);
-	validate_sort_and_sortorder('description', ZBX_SORT_UP);
+	validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 	$_REQUEST['go'] = get_request('go', 'none');
 
@@ -269,7 +269,7 @@ switch($itemType) {
 		$_REQUEST['filter_group'] = get_request('filter_group');
 		$_REQUEST['filter_host'] = get_request('filter_host');
 		$_REQUEST['filter_application'] = get_request('filter_application');
-		$_REQUEST['filter_description'] = get_request('filter_description');
+		$_REQUEST['filter_name'] = get_request('filter_name');
 		$_REQUEST['filter_type'] = get_request('filter_type', -1);
 		$_REQUEST['filter_key'] = get_request('filter_key');
 		$_REQUEST['filter_snmp_community'] = get_request('filter_snmp_community');
@@ -289,7 +289,7 @@ switch($itemType) {
 		CProfile::update('web.items.filter_group', $_REQUEST['filter_group'], PROFILE_TYPE_STR);
 		CProfile::update('web.items.filter_host', $_REQUEST['filter_host'], PROFILE_TYPE_STR);
 		CProfile::update('web.items.filter_application', $_REQUEST['filter_application'], PROFILE_TYPE_STR);
-		CProfile::update('web.items.filter_description', $_REQUEST['filter_description'], PROFILE_TYPE_STR);
+		CProfile::update('web.items.filter_name', $_REQUEST['filter_name'], PROFILE_TYPE_STR);
 		CProfile::update('web.items.filter_type', $_REQUEST['filter_type'], PROFILE_TYPE_INT);
 		CProfile::update('web.items.filter_key', $_REQUEST['filter_key'], PROFILE_TYPE_STR);
 		CProfile::update('web.items.filter_snmp_community', $_REQUEST['filter_snmp_community'], PROFILE_TYPE_STR);
@@ -310,7 +310,7 @@ switch($itemType) {
 		$_REQUEST['filter_group'] = CProfile::get('web.items.filter_group');
 		$_REQUEST['filter_host'] = CProfile::get('web.items.filter_host');
 		$_REQUEST['filter_application'] = CProfile::get('web.items.filter_application');
-		$_REQUEST['filter_description'] = CProfile::get('web.items.filter_description');
+		$_REQUEST['filter_name'] = CProfile::get('web.items.filter_name');
 		$_REQUEST['filter_type'] = CProfile::get('web.items.filter_type', -1);
 		$_REQUEST['filter_key'] = CProfile::get('web.items.filter_key');
 		$_REQUEST['filter_snmp_community'] = CProfile::get('web.items.filter_snmp_community');
@@ -392,7 +392,7 @@ switch($itemType) {
 		$db_delay_flex = trim($db_delay_flex,';');
 
 		$item = array(
-				'description'	=> get_request('description'),
+				'name'	=> get_request('name'),
 				'key_'			=> get_request('key'),
 				'hostid'		=> get_request('form_hostid'),
 				'delay'			=> get_request('delay'),
@@ -424,8 +424,10 @@ switch($itemType) {
 				'params'			=> get_request('params'),
 				'ipmi_sensor'		=> get_request('ipmi_sensor'),
 			'data_type'		=> get_request('data_type'),
-			'description_details'		=> get_request('description_details')
+			'description'		=> get_request('description')
 		);
+
+		sdii($item);
 
 		if(isset($_REQUEST['itemid'])){
 			DBstart();
@@ -529,7 +531,7 @@ switch($itemType) {
 		$result = false;
 
 		$item = array(
-				'description'	=> null,
+				'name'	=> null,
 				'key_'			=> null,
 				'hostid'		=> null,
 				'delay'			=> get_request('delay'),
@@ -579,7 +581,7 @@ switch($itemType) {
 
 		if($_REQUEST['register']=='do'){
 			$item = array(
-					'description'	=> get_request('description'),
+					'name'	=> get_request('name'),
 					'key_'			=> get_request('key'),
 					'hostid'		=> get_request('hostid'),
 					'delay'			=> get_request('delay'),
@@ -763,7 +765,7 @@ switch($itemType) {
 
 		$group_itemid = $_REQUEST['group_itemid'];
 
-		$sql = 'SELECT h.host, i.itemid, i.description, i.key_, i.templateid, i.type'.
+		$sql = 'SELECT h.host, i.itemid, i.name, i.key_, i.templateid, i.type'.
 				' FROM items i, hosts h '.
 				' WHERE '.DBcondition('i.itemid',$group_itemid).
 					' AND h.hostid=i.hostid'.
@@ -772,12 +774,12 @@ switch($itemType) {
 		while($item = DBfetch($db_items)) {
 			if($item['templateid'] != ITEM_TYPE_ZABBIX) {
 				unset($group_itemid[$item['itemid']]);
-				error(S_ITEM.SPACE."'".$item['host'].':'.item_description($item)."'".SPACE.S_CANNOT_DELETE_ITEM.SPACE.'('.S_TEMPLATED_ITEM.')');
+				error(S_ITEM.SPACE."'".$item['host'].':'.item_name($item)."'".SPACE.S_CANNOT_DELETE_ITEM.SPACE.'('.S_TEMPLATED_ITEM.')');
 				continue;
 			}
 			else if($item['type'] == ITEM_TYPE_HTTPTEST) {
 				unset($group_itemid[$item['itemid']]);
-				error(S_ITEM.SPACE."'".$item['host'].':'.item_description($item)."'".SPACE.S_CANNOT_DELETE_ITEM.SPACE.'('.S_WEB_ITEM.')');
+				error(S_ITEM.SPACE."'".$item['host'].':'.item_name($item)."'".SPACE.S_CANNOT_DELETE_ITEM.SPACE.'('.S_WEB_ITEM.')');
 				continue;
 			}
 
@@ -841,7 +843,7 @@ switch($itemType) {
 // ----------------
 
 // Items Filter{
-		$sortfield = getPageSortField('description');
+		$sortfield = getPageSortField('name');
 		$sortorder = getPageSortOrder();
 		$options = array(
 			'filter' => array(),
@@ -868,8 +870,8 @@ switch($itemType) {
 		if(isset($_REQUEST['filter_application']) && !zbx_empty($_REQUEST['filter_application']))
 			$options['application'] = $_REQUEST['filter_application'];
 
-		if(isset($_REQUEST['filter_description']) && !zbx_empty($_REQUEST['filter_description']))
-			$options['pattern'] = $_REQUEST['filter_description'];
+		if(isset($_REQUEST['filter_name']) && !zbx_empty($_REQUEST['filter_name']))
+			$options['pattern'] = $_REQUEST['filter_name'];
 
 		if(isset($_REQUEST['filter_type']) && !zbx_empty($_REQUEST['filter_type']) && ($_REQUEST['filter_type'] != -1))
 			$options['filter']['type'] = $_REQUEST['filter_type'];
@@ -942,7 +944,7 @@ switch($itemType) {
 			new CCheckBox('all_items',null,"checkAll('".$form->GetName()."','all_items','group_itemid');"),
 			S_LOG,
 			$show_host?S_HOST:null,
-			make_sorting_header(S_DESCRIPTION,'description'),
+			make_sorting_header(S_NAME,'name'),
 			S_TRIGGERS,
 			make_sorting_header(S_KEY,'key_'),
 			make_sorting_header(S_INTERVAL,'delay'),
@@ -1033,14 +1035,14 @@ switch($itemType) {
 				$host = null;
 			}
 
-			$description = array();
+			$name = array();
 			if($item['templateid']){
 				$template_host = get_realhost_by_itemid($item['templateid']);
-				$description[] = new CLink($template_host['host'],'?hostid='.$template_host['hostid'], 'unknown');
-				$description[] = ':';
+				$name[] = new CLink($template_host['host'],'?hostid='.$template_host['hostid'], 'unknown');
+				$name[] = ':';
 			}
-			$item['description_expanded'] = item_description($item);
-			$description[] = new CLink($item['description_expanded'], '?form=update&itemid='.$item['itemid']);
+			$item['name_expanded'] = item_name($item);
+			$name[] = new CLink($item['name_expanded'], '?form=update&itemid='.$item['itemid']);
 
 			$status = new CCol(new CLink(item_status2str($item['status']), '?group_itemid='.$item['itemid'].'&go='.
 				($item['status']? 'activate':'disable'), item_status2style($item['status'])));
@@ -1078,17 +1080,17 @@ switch($itemType) {
 // TRIGGERS INFO
 			foreach($item['triggers'] as $tnum => $trigger){
 				$triggerid = $trigger['triggerid'];
-				$tr_description = array();
+				$tr_name = array();
 
 				if($trigger['templateid'] > 0){
 					$real_hosts = get_realhosts_by_triggerid($triggerid);
 					$real_host = DBfetch($real_hosts);
-					$tr_description[] = new CLink($real_host['host'], 'triggers.php?&hostid='.$real_host['hostid'], 'unknown');
-					$tr_description[] = ':';
+					$tr_name[] = new CLink($real_host['host'], 'triggers.php?&hostid='.$real_host['hostid'], 'unknown');
+					$tr_name[] = ':';
 				}
 
-				$trigger['description_expanded'] = expand_trigger_description($triggerid);
-				$tr_description[] = new CLink($trigger['description_expanded'], 'triggers.php?form=update&triggerid='.$triggerid);
+				$trigger['name_expanded'] = expand_trigger_name($triggerid);
+				$tr_name[] = new CLink($trigger['name_expanded'], 'triggers.php?form=update&triggerid='.$triggerid);
 
 				if($trigger['value'] != TRIGGER_VALUE_UNKNOWN) $trigger['error'] = '';
 
@@ -1111,7 +1113,7 @@ switch($itemType) {
 
 				$trigger_hint->addRow(array(
 					$priority,
-					$tr_description,
+					$tr_name,
 					explode_exp($trigger['expression'], 1),
 					$tstatus,
 				));
@@ -1140,7 +1142,7 @@ switch($itemType) {
 				$triggers=",Array('".S_EDIT_TRIGGER."',null,null,{'outer' : 'pum_o_submenu','inner' : ['pum_i_submenu']}\n";
 
 				foreach($item['triggers'] as $num => $trigger){
-					$triggers .= ',["'.$trigger['description_expanded'].'",'.
+					$triggers .= ',["'.$trigger['name_expanded'].'",'.
 										zbx_jsvalue("javascript: openWinCentered('tr_logform.php?sform=1&itemid=".$item['itemid'].
 																"&triggerid=".$trigger['triggerid'].
 																"&ltype=".$ltype."','TriggerLog',760,540,".
@@ -1157,7 +1159,7 @@ switch($itemType) {
 
 				$menuicon = new CIcon(S_MENU,'iconmenu_b',
 						'call_triggerlog_menu(event, '.zbx_jsvalue($item['itemid']).','.
-						zbx_jsvalue($item['description_expanded']).','.$ltype.$triggers.');');
+						zbx_jsvalue($item['name_expanded']).','.$ltype.$triggers.');');
 			}
 			else{
 				$menuicon = SPACE;
@@ -1167,7 +1169,7 @@ switch($itemType) {
 				new CCheckBox('group_itemid['.$item['itemid'].']',null,null,$item['itemid']),
 				$menuicon,
 				$host,
-				$description,
+				$name,
 				$trigger_info,
 				$item['key_'],
 				$item['delay'],

@@ -194,7 +194,7 @@ include_once('include/page_header.php');
 		S_RESOURCE,
 		S_ACTION,
 		S_ID,
-		S_DESCRIPTION,
+		S_NAME,
 		S_DETAILS
 	));
 

@@ -847,7 +847,7 @@
 					$selements[$snum]['elementName'] = $maps[$selement['elementid']]['name'];
 					break;
 				case SYSMAP_ELEMENT_TYPE_TRIGGER:
-					$selements[$snum]['elementName'] = expand_trigger_description_by_data($triggers[$selement['elementid']]);
+					$selements[$snum]['elementName'] = expand_trigger_name_by_data($triggers[$selement['elementid']]);
 					break;
 				case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
 					$selements[$snum]['elementName'] = $hostgroups[$selement['elementid']]['name'];
@@ -1407,7 +1407,7 @@
 			$i['ack'] = (bool) !($i['problem_unack']);
 
 			if($sysmap['expandproblem'] && ($i['problem'] == 1)){
-				$i['problem_title'] = expand_trigger_description_by_data($all_triggers[$last_problemid]);
+				$i['problem_title'] = expand_trigger_name_by_data($all_triggers[$last_problemid]);
 			}
 
 			if(($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) && ($i['maintenance'] == 1)){
@@ -1461,7 +1461,7 @@
 			}
 			if(!empty($elems['triggers'])){
 				foreach($elems['triggers'] as $elem){
-					$info[$elem['selementid']]['name'] = expand_trigger_description_by_data($all_triggers[$elem['elementid']]);
+					$info[$elem['selementid']]['name'] = expand_trigger_name_by_data($all_triggers[$elem['elementid']]);
 				}
 			}
 			if(!empty($elems['hosts'])){

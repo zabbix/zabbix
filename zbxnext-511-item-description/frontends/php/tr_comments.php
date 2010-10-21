@@ -34,7 +34,7 @@ include_once('include/page_header.php');
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'triggerid'=>	array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID, null),
-		'comments'=>	array(T_ZBX_STR, O_OPT,  null,	null, 'isset({save})'),
+		'description'=>	array(T_ZBX_STR, O_OPT,  null,	null, 'isset({save})'),
 
 		'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'cancel'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -62,13 +62,13 @@ include_once('include/page_header.php');
 
 
 	if(isset($_REQUEST['save'])){
-		$result = update_trigger_comments($_REQUEST['triggerid'], $_REQUEST['comments']);
-		show_messages($result, S_DESCRIPTION_UPDATED, S_CANNOT_UPDATE_DESCRIPTION);
+		$result = update_trigger_description($_REQUEST['triggerid'], $_REQUEST['description']);
+		show_messages($result, S_NAME_UPDATED, S_CANNOT_UPDATE_NAME);
 
 		if($result){
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER, S_TRIGGER . ' [' .
-					$_REQUEST['triggerid'] . '] [' . expand_trigger_description(
-				$_REQUEST['triggerid']) . '] ' . S_DESCRIPTION . ' [' . $_REQUEST['comments'] . ']');
+					$_REQUEST['triggerid'] . '] [' . expand_trigger_name(
+				$_REQUEST['triggerid']) . '] ' . S_NAME . ' [' . $_REQUEST['description'] . ']');
 		}
 	}
 	else if(isset($_REQUEST['cancel'])){
@@ -76,13 +76,13 @@ include_once('include/page_header.php');
 		exit();
 	}
 
-	show_table_header(S_TRIGGER.SPACE.S_DESCRIPTION);
+	show_table_header(S_TRIGGER.SPACE.S_NAME);
 
 	$host = reset($trigger['hosts']);
 
-	$frmComent = new CFormTable(S_DESCRIPTION." for ".$host['host']." : \"".expand_trigger_description_by_data($trigger).'"');
+	$frmComent = new CFormTable(S_NAME." for ".$host['host']." : \"".expand_trigger_name_by_data($trigger).'"');
 	$frmComent->addVar('triggerid', $_REQUEST['triggerid']);
-	$frmComent->addRow(S_DESCRIPTION, new CTextArea('comments',$trigger['comments'],100,25));
+	$frmComent->addRow(S_NAME, new CTextArea('description',$trigger['description'],100,25));
 	$frmComent->addItemToBottomRow(new CButton('save', S_SAVE));
 	$frmComent->addItemToBottomRow(new CButtonCancel('&triggerid='.$_REQUEST['triggerid']));
 

@@ -86,7 +86,7 @@ function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
 		}
 
 		$sql_cond=($_REQUEST['hostid'] > 0)?' AND h.hostid='.$_REQUEST['hostid']:' AND '.DBcondition('h.hostid',$available_hosts);
-		$sql = 'SELECT DISTINCT t.triggerid,t.description '.
+		$sql = 'SELECT DISTINCT t.triggerid,t.name '.
 			' FROM triggers t,hosts h,items i,functions f '.
 			' WHERE f.itemid=i.itemid '.
 				' AND h.hostid=i.hostid '.
@@ -96,13 +96,13 @@ function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
 				' AND '.DBin_node('t.triggerid').
 				' AND i.status='.ITEM_STATUS_ACTIVE.
 				$sql_cond.
-			' ORDER BY t.description';
+			' ORDER BY t.name';
 		$result=DBselect($sql);
 
 		while($row=DBfetch($result)){
 			$cmbTrigs->addItem(
 					$row['triggerid'],
-					get_node_name_by_elid($row['triggerid'], null, ': ').expand_trigger_description($row['triggerid'])
+					get_node_name_by_elid($row['triggerid'], null, ': ').expand_trigger_name($row['triggerid'])
 					);
 		}
 
@@ -320,12 +320,12 @@ function bar_report_form(){
 					url_param($gid,false,'gid').
 					'",550,400,"graph_item_form");');
 
-			$description = $host['host'].': '.item_description($item);
+			$name = $host['host'].': '.item_name($item);
 
 			$items_table->addRow(array(
 					new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
 					$caption,
-					$description,
+					$name,
 					graph_item_calc_fnc2str($gitem['calc_fnc'],0),
 					($gitem['axisside']==GRAPH_YAXIS_SIDE_LEFT)?S_LEFT:S_RIGHT,
 					$color,
@@ -464,12 +464,12 @@ function bar_report_form2(){
 					url_param($gid,false,'gid').
 					'",550,400,"graph_item_form");');
 
-			$description = $host['host'].': '.item_description($item);
+			$name = $host['host'].': '.item_name($item);
 
 			$items_table->addRow(array(
 					new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
 					$caption,
-					$description,
+					$name,
 					graph_item_calc_fnc2str($gitem['calc_fnc'],0)
 				));
 		}
@@ -701,19 +701,19 @@ function bar_report_form3(){
 
 // ITEMS
 	$itemid = 0;
-	$description = '';
+	$name = '';
 	if(count($items) && ($items[0]['itemid'] > 0)){
 		$itemid = $items[0]['itemid'];
-		$description = get_item_by_itemid($itemid);
-		$description = item_description($description);
+		$name = get_item_by_itemid($itemid);
+		$name = item_name($name);
 	}
 	$reportForm->addVar('items[0][itemid]',$itemid);
 
-	$txtCondVal = new CTextBox('items[0][description]',$description,50,'yes');
+	$txtCondVal = new CTextBox('items[0][name]',$name,50,'yes');
 	$btnSelect = new CButton('btn1',S_SELECT,
 			"return PopUp('popup.php?dstfrm=".$reportForm->GetName().
-			"&dstfld1=items[0][itemid]&dstfld2=items[0][description]&".
-			"srctbl=items&srcfld1=itemid&srcfld2=description&monitored_hosts=1');",
+			"&dstfld1=items[0][itemid]&dstfld2=items[0][name]&".
+			"srctbl=items&srcfld1=itemid&srcfld2=name&monitored_hosts=1');",
 			'T');
 
 	$reportForm->addRow(S_ITEM , array($txtCondVal,$btnSelect));

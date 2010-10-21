@@ -124,7 +124,7 @@ include_once('include/page_header.php');
 		}
 
 		$query = 'SELECT DISTINCT s.serviceid, sl.servicedownid, sl_p.serviceupid as serviceupid, s.triggerid, '.
-				' s.name as caption, s.algorithm, t.description, t.expression, s.sortorder, sl.linkid, s.showsla, s.goodsla, s.status '.
+				' s.name as caption, s.algorithm, t.name, t.expression, s.sortorder, sl.linkid, s.showsla, s.goodsla, s.status '.
 			' FROM services s '.
 				' LEFT JOIN triggers t ON s.triggerid = t.triggerid '.
 				' LEFT JOIN services_links sl ON  s.serviceid = sl.serviceupid and NOT(sl.soft=0) '.
@@ -157,12 +157,12 @@ include_once('include/page_header.php');
 			$row['caption'] = array(get_node_name_by_elid($row['serviceid'], null, ': '), $row['caption']);
 
 			if(empty($row['serviceupid'])) $row['serviceupid']='0';
-			if(empty($row['description'])) $row['description']=S_NONE;
+			if(empty($row['name'])) $row['name']=S_NONE;
 			$row['graph'] = new CLink(S_SHOW,'srv_status.php?serviceid='.$row['serviceid'].'&showgraph=1'.url_param('path'));
 
 			if(isset($row['triggerid']) && !empty($row['triggerid'])){
 
-				$url = new CLink(expand_trigger_description($row['triggerid']),'events.php?source='.EVENT_SOURCE_TRIGGERS.'&triggerid='.$row['triggerid']);
+				$url = new CLink(expand_trigger_name($row['triggerid']),'events.php?source='.EVENT_SOURCE_TRIGGERS.'&triggerid='.$row['triggerid']);
 				$row['caption'] = array($row['caption'],' [',$url,']');
 
 			}
@@ -179,14 +179,14 @@ include_once('include/page_header.php');
 									' AND t.triggerid=s.triggerid '.
 									' AND '.DBcondition('t.triggerid',$available_triggers).
 									' AND '.DBin_node('s.serviceid').
-								' ORDER BY s.status DESC, t.description');
+								' ORDER BY s.status DESC, t.name');
 
 				while($row2=DBfetch($result2)){
 					if(is_string($row['reason']) && ($row['reason'] == '-'))
 						$row['reason'] = new CList(null,'itservices');
 					if(does_service_depend_on_the_service($row['serviceid'],$row2['serviceid'])){
 						$row['reason']->addItem(new CLink(
-										expand_trigger_description($row2['triggerid']),
+										expand_trigger_name($row2['triggerid']),
 										'events.php?source='.EVENT_SOURCE_TRIGGERS.'&triggerid='.$row2['triggerid']));
 					}
 				}

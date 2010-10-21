@@ -59,10 +59,10 @@ include_once('include/page_header.php');
 	$form->addItem(SPACE.S_MEDIA_TYPE.SPACE);
 	$cmbMedia = new CComboBox('media_type', $media_type, 'submit();');
 	$cmbMedia->addItem(0,S_ALL_SMALL);
-        $db_medias = DBselect('select * from media_type where '.DBin_node('mediatypeid').' order by description');
+        $db_medias = DBselect('select * from media_type where '.DBin_node('mediatypeid').' order by name');
 
 	while($media_data = DBfetch($db_medias)){
-		$cmbMedia->addItem($media_data['mediatypeid'], $media_data['description']);
+		$cmbMedia->addItem($media_data['mediatypeid'], $media_data['name']);
 	}
 	$form->addItem($cmbMedia);
 
@@ -107,10 +107,10 @@ include_once('include/page_header.php');
 			' FROM media_type '.
 			' WHERE '.DBin_node('mediatypeid').
 				($media_type > 0 ? ' and mediatypeid='.$media_type : '' ).
-			' ORDER BY description';
+			' ORDER BY name';
 	$db_media_types = DBselect($sql);
 	while($media_type_data = DBfetch($db_media_types)){
-		$media_types[$media_type_data['mediatypeid']] = $media_type_data['description'];
+		$media_types[$media_type_data['mediatypeid']] = $media_type_data['name'];
 	}
 
 	switch($period){
@@ -172,7 +172,7 @@ include_once('include/page_header.php');
 			$all = 0;
 			$cnt_by_type = array();
 
-			foreach($media_types as $mediatypeid => $description){
+			foreach($media_types as $mediatypeid => $name){
 				$sql = 'SELECT count(*) as cnt '.
 						' FROM alerts a '.
 						' WHERE a.userid='.$userid.

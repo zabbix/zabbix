@@ -107,7 +107,7 @@
 	}
 
 	function	add_host_to_services($hostid, $serviceid){
-		$result = DBselect('SELECT distinct h.host,t.triggerid,t.description,t.expression '.
+		$result = DBselect('SELECT distinct h.host,t.triggerid,t.name,t.expression '.
 							' FROM triggers t,hosts h,items i,functions f '.
 							' WHERE h.hostid='.$hostid.
 								' AND h.hostid=i.hostid '.
@@ -117,7 +117,7 @@
 							);
 
 		while($row=DBfetch($result)){
-			$serviceid2 = add_service(expand_trigger_description_by_data($row),$row["triggerid"],"on",0,"off",99);
+			$serviceid2 = add_service(expand_trigger_name_by_data($row),$row["triggerid"],"on",0,"off",99);
 			add_service_link($serviceid2,$serviceid,0);
 		}
 		return	1;
@@ -534,7 +534,7 @@ if($serviceid == 1 || $serviceid == 2){
 	return $sla_time;
 	}
 
-	// function get_service_status_description($status){
+	// function get_service_status_name($status){
 		// $desc=new CSpan(S_OK_BIG,'green');
 		// if(TRIGGER_SEVERITY_DISASTER == $status){
 			// $desc=new CTag('div','yes',S_DISASTER,'disaster');
@@ -644,7 +644,7 @@ if($serviceid == 1 || $serviceid == 2){
 	//---------------------------- if not leaf -----------------------------
 		$rows['parentid'] = $parentid;
 		// if(($rows['serviceid']  > 0) && ($rows['caption'] != 'root')){
-			// $rows['status'] = get_service_status_description($rows["status"]);
+			// $rows['status'] = get_service_status_name($rows["status"]);
 		// }
 
 		if($soft == 0){

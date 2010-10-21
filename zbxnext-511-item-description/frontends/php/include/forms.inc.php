@@ -488,12 +488,12 @@
 		foreach($user_medias as $one_media) $media_type_ids[$one_media['mediatypeid']] = 1;
 
 		if(count($media_type_ids) > 0){
-			$sql = 'SELECT mt.mediatypeid, mt.description '.
+			$sql = 'SELECT mt.mediatypeid, mt.name '.
 				' FROM media_type mt '.
 				' WHERE mt.mediatypeid IN ('.implode(',',array_keys($media_type_ids)).')';
 			$db_media_types = DBselect($sql);
 			while($db_media_type = DBfetch($db_media_types)){
-				$media_types[$db_media_type['mediatypeid']] = $db_media_type['description'];
+				$media_types[$db_media_type['mediatypeid']] = $db_media_type['name'];
 			}
 		}
 
@@ -1152,7 +1152,7 @@
 		$filter_group			= $_REQUEST['filter_group'];
 		$filter_host			= $_REQUEST['filter_host'];
 		$filter_application		= $_REQUEST['filter_application'];
-		$filter_description		= $_REQUEST['filter_description'];
+		$filter_name		= $_REQUEST['filter_name'];
 		$filter_type			= $_REQUEST['filter_type'];
 		$filter_key			= $_REQUEST['filter_key'];
 		$filter_snmp_community		= $_REQUEST['filter_snmp_community'];
@@ -1219,8 +1219,8 @@
 					new CButton('btn_app', S_SELECT, 'return PopUp("popup.php?dstfrm='.$form->getName().
 						'&dstfld1=filter_application&srctbl=applications&srcfld1=name",400,300,"application");', 'A'))
 		));
-		$col_table1->addRow(array(array(bold(S_DESCRIPTION),SPACE.S_LIKE_SMALL.': '),
-			new CTextBox("filter_description", $filter_description, 30)));
+		$col_table1->addRow(array(array(bold(S_NAME),SPACE.S_LIKE_SMALL.': '),
+			new CTextBox("filter_name", $filter_name, 30)));
 		$col_table1->addRow(array(array(bold(S_KEY),SPACE.S_LIKE_SMALL.': '),
 			new CTextBox("filter_key", $filter_key, 30)));
 
@@ -1689,7 +1689,7 @@
 
 		$hostid = get_request('form_hostid', 0);
 
-		$description = get_request('description', '');
+		$name = get_request('name', '');
 		$key = get_request('key', '');
 		$host = get_request('host', null);
 		$delay = get_request('delay', 30);
@@ -1711,7 +1711,7 @@
 		$new_application = get_request('new_application', '');
 		$applications = get_request('applications', array());
 		$delay_flex = get_request('delay_flex', array());
-		$description_details = get_request('description_details');
+		$description = get_request('description');
 
 		$snmpv3_securityname = get_request('snmpv3_securityname', '');
 		$snmpv3_securitylevel = get_request('snmpv3_securitylevel', 0);
@@ -1779,7 +1779,7 @@
 		}
 
 		if((isset($_REQUEST['itemid']) && !isset($_REQUEST['form_refresh'])) || isset($limited)){
-			$description = $item_data['description'];
+			$name = $item_data['name'];
 			$key = $item_data['key_'];
 //			$host			= $item_data['host'];
 			$type = $item_data['type'];
@@ -1794,7 +1794,7 @@
 			$multiplier = $item_data['multiplier'];
 			$hostid = $item_data['hostid'];
 			$params = $item_data['params'];
-			$description_details = $item_data['description_details'];
+			$description = $item_data['description'];
 
 			$snmpv3_securityname = $item_data['snmpv3_securityname'];
 			$snmpv3_securitylevel = $item_data['snmpv3_securitylevel'];
@@ -1900,12 +1900,12 @@
 			$caption[] = S_ITEM.' "';
 			$caption = array_reverse($caption);
 			$caption[] = ': ';
-			$caption[] = $item_data['description'];
+			$caption[] = $item_data['name'];
 			$caption[] = '"';
 			$frmItem->setTitle($caption);
 		}
 		else
-			$frmItem->setTitle(S_ITEM." $host : $description");
+			$frmItem->setTitle(S_ITEM." $host : $name");
 
 		$frmItem->addVar('form_hostid', $hostid);
 		$frmItem->addRow(S_HOST, array(
@@ -1916,7 +1916,7 @@
 				'H')
 			));
 
-		$frmItem->addRow(S_NAME, new CTextBox('description',$description,40, $limited));
+		$frmItem->addRow(S_NAME, new CTextBox('name',$name,40, $limited));
 
 		if(isset($limited)){
 			$frmItem->addRow(S_TYPE,  new CTextBox('typename', item_type2str($type), 40, 'yes'));
@@ -2291,9 +2291,9 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TRAPPER, 'row_trapper_hosts');
 
 
-		$description_ta = new CTextArea('description_details', $description_details);
+		$description_ta = new CTextArea('description', $description);
 
-		$frmItem->addRow(S_DESCRIPTION, $description_ta);
+		$frmItem->addRow(S_NAME, $description_ta);
 
 		$new_app = new CTextBox('new_application', $new_application, 40);
 		$frmItem->addRow(S_NEW_APPLICATION, $new_app, 'new');
@@ -2374,7 +2374,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$frmItem->addVar('group_itemid',get_request('group_itemid',array()));
 		$frmItem->addVar('config',get_request('config',0));
 
-		$description	= get_request('description'	,'');
+		$name	= get_request('name'	,'');
 		$key		= get_request('key'		,'');
 		$host		= get_request('host',		null);
 		$delay		= get_request('delay'		,30);
@@ -2689,7 +2689,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			array_push($dep_el,
 				array(
 					new CCheckBox("rem_dependence[]", 'no', null, strval($val)),
-					expand_trigger_description($val)
+					expand_trigger_name($val)
 				),
 				BR());
 			$frmMTrig->addVar("dependencies[]",strval($val));
@@ -2781,7 +2781,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 			$caption[] = S_TRIGGER.' "';
 			$caption = array_reverse($caption);
-			$caption[] = htmlspecialchars($trigger['description']);
+			$caption[] = htmlspecialchars($trigger['name']);
 			$caption[] = '"';
 			$frmTrig->setTitle($caption);
 
@@ -2789,28 +2789,28 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		}
 
 		$expression		= get_request('expression',	'');
-		$description		= get_request('description',	'');
+		$name		= get_request('name',	'');
 		$type 			= get_request('type',		0);
 		$priority		= get_request('priority',	0);
 		$status			= get_request('status',		0);
-		$comments		= get_request('comments',	'');
+		$description		= get_request('description',	'');
 		$url			= get_request('url',		'');
 
 		$expr_temp		= get_request('expr_temp',	'');
 		$input_method		= get_request('input_method',	IM_ESTABLISHED);
 
 		if((isset($_REQUEST['triggerid']) && !isset($_REQUEST['form_refresh']))  || isset($limited)){
-			$description	= $trigger['description'];
+			$name	= $trigger['name'];
 			$expression	= explode_exp($trigger['expression'],0);
 
 			if(!isset($limited) || !isset($_REQUEST['form_refresh'])){
 				$type = $trigger['type'];
 				$priority	= $trigger['priority'];
 				$status		= $trigger['status'];
-				$comments	= $trigger['comments'];
+				$description	= $trigger['description'];
 				$url		= $trigger['url'];
 
-				$trigs=DBselect('SELECT t.triggerid,t.description,t.expression '.
+				$trigs=DBselect('SELECT t.triggerid,t.name,t.expression '.
 							' FROM triggers t,trigger_depends d '.
 							' WHERE t.triggerid=d.triggerid_up '.
 								' AND d.triggerid_down='.$_REQUEST['triggerid']);
@@ -2822,7 +2822,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			}
 		}
 
-		$frmTrig->addRow(S_NAME, new CTextBox('description',$description,90, $limited));
+		$frmTrig->addRow(S_NAME, new CTextBox('name',$name,90, $limited));
 
 		if($input_method == IM_TREE){
 			$alz = analyze_expression($expression);
@@ -2973,7 +2973,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			array_push($dep_el,
 				array(
 					new CCheckBox('rem_dependence['.$val.']', 'no', null, strval($val)),
-					expand_trigger_description($val)
+					expand_trigger_name($val)
 				),
 				BR());
 			$frmTrig->addVar('dependencies[]',strval($val));
@@ -3014,7 +3014,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		}
 		$frmTrig->addRow(S_SEVERITY,$cmbPrior);
 
-		$frmTrig->addRow(S_DESCRIPTION,new CTextArea("comments",$comments,90,7));
+		$frmTrig->addRow(S_NAME,new CTextArea("description",$description,90,7));
 		$frmTrig->addRow(S_URL,new CTextBox("url",$url,90));
 		$frmTrig->addRow(S_DISABLED,new CCheckBox("status",$status));
 
@@ -3243,8 +3243,8 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 					$do_down->onClick("return create_var('".$frmGraph->getName()."','move_down',".$gid.", true);");
 				}
 
-				$description = new CSpan($host['host'].': '.item_description($item),'link');
-				$description->onClick(
+				$name = new CSpan($host['host'].': '.item_name($item),'link');
+				$name->onClick(
 					'return PopUp("popup_gitem.php?list_name=items&dstfrm='.$frmGraph->getName().
 					url_param($only_hostid, false, 'only_hostid').
 					url_param($monitored_hosts, false, 'monitored_hosts').
@@ -3258,7 +3258,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 				if(($graphtype == GRAPH_TYPE_PIE) || ($graphtype == GRAPH_TYPE_EXPLODED)){
 					$items_table->addRow(array(
 							new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
-							$description,
+							$name,
 							graph_item_calc_fnc2str($gitem["calc_fnc"],$gitem["type"]),
 							graph_item_type2str($gitem['type'],$gitem["periods_cnt"]),
 							$color,
@@ -3269,7 +3269,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 					$items_table->addRow(array(
 							new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
 //							$gitem['sortorder'],
-							$description,
+							$name,
 							graph_item_calc_fnc2str($gitem["calc_fnc"],$gitem["type"]),
 							graph_item_type2str($gitem['type'],$gitem["periods_cnt"]),
 							($gitem['yaxisside']==GRAPH_YAXIS_SIDE_LEFT)?S_LEFT:S_RIGHT,
@@ -3334,7 +3334,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 				if($ymin_itemid > 0){
 					$min_host = get_host_by_itemid($ymin_itemid);
 					$min_item = get_item_by_itemid($ymin_itemid);
-					$ymin_name = $min_host['host'].':'.item_description($min_item);
+					$ymin_name = $min_host['host'].':'.item_name($min_item);
 				}
 
 				if(count($items)){
@@ -3347,7 +3347,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 														"&dstfld2=ymin_name".
 														"&srctbl=items".
 														"&srcfld1=itemid".
-														"&srcfld2=description',0,0,'zbx_popup_item');");
+														"&srcfld2=name',0,0,'zbx_popup_item');");
 				}
 				else{
 					$yaxis_min[] = SPACE.S_ADD_GRAPH_ITEMS;
@@ -3378,7 +3378,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 				if($ymax_itemid > 0){
 					$max_host = get_host_by_itemid($ymax_itemid);
 					$max_item = get_item_by_itemid($ymax_itemid);
-					$ymax_name = $max_host['host'].':'.item_description($max_item);
+					$ymax_name = $max_host['host'].':'.item_name($max_item);
 				}
 
 				if(count($items)){
@@ -3391,7 +3391,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 														"&dstfld2=ymax_name".
 														"&srctbl=items".
 														"&srcfld1=itemid".
-														"&srcfld2=description',0,0,'zbx_popup_item');");
+														"&srcfld2=name',0,0,'zbx_popup_item');");
 				}
 				else{
 					$yaxis_max[] = SPACE.S_ADD_GRAPH_ITEMS;
@@ -4572,9 +4572,9 @@ JAVASCRIPT;
 				$items_lbx = new CListBox('items', null, 8);
 				$items_lbx->setAttribute('disabled', 'disabled');
 
-				order_result($host_items, 'description');
+				order_result($host_items, 'name');
 				foreach($host_items as $hitem){
-					$items_lbx->addItem($hitem['itemid'], item_description($hitem));
+					$items_lbx->addItem($hitem['itemid'], item_name($hitem));
 				}
 				$host_tbl->addRow(array(S_ITEMS, $items_lbx));
 			}
@@ -4584,7 +4584,7 @@ JAVASCRIPT;
 				'inherited' => 0,
 				'hostids' => $_REQUEST['hostid'],
 				'output' => API_OUTPUT_EXTEND,
-				'expandDescription' => true,
+				'expandName' => true,
 			);
 			$host_triggers = CTrigger::get($options);
 
@@ -4592,9 +4592,9 @@ JAVASCRIPT;
 				$trig_lbx = new CListBox('triggers' ,null, 8);
 				$trig_lbx->setAttribute('disabled', 'disabled');
 
-				order_result($host_triggers, 'description');
+				order_result($host_triggers, 'name');
 				foreach($host_triggers as $htrigger){
-					$trig_lbx->addItem($htrigger['triggerid'], $htrigger['description']);
+					$trig_lbx->addItem($htrigger['triggerid'], $htrigger['name']);
 				}
 				$host_tbl->addRow(array(S_TRIGGERS, $trig_lbx));
 			}
@@ -5309,12 +5309,12 @@ JAVASCRIPT;
 		$header_host = array_pop($header_host);
 
 
-		$description = array();
+		$name = array();
 		if($header_host['proxy_hostid']){
 			$proxy = get_host_by_hostid($header_host['proxy_hostid']);
-			$description[] = $proxy['host'].':';
+			$name[] = $proxy['host'].':';
 		}
-		$description[] = $header_host['host'];
+		$name[] = $header_host['host'];
 
 		if(str_in_array('items', $elements)){
 			$items = array(new CLink(S_ITEMS, 'items.php?hostid='.$header_host['hostid']),
@@ -5342,7 +5342,7 @@ JAVASCRIPT;
 				(str_in_array('items', $elements) ? $items : null),
 				(str_in_array('triggers', $elements) ? $triggers : null),
 				(str_in_array('graphs', $elements) ? $graphs : null),
-				array(bold(S_TEMPLATE.': '), $description)
+				array(bold(S_TEMPLATE.': '), $name)
 			));
 		}
 		else{
@@ -5378,7 +5378,7 @@ JAVASCRIPT;
 				(str_in_array('items', $elements) ? $items : null),
 				(str_in_array('triggers', $elements) ? $triggers : null),
 				(str_in_array('graphs', $elements) ? $graphs : null),
-				array(bold(S_HOST.': '),$description),
+				array(bold(S_HOST.': '),$name),
 				array(bold(S_DNS.': '), $dns),
 				array(bold(S_IP.': '), $ip),
 				array(bold(S_PORT.': '), $port),

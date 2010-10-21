@@ -68,7 +68,7 @@ include_once('include/page_header.php');
 
 
 	$sql = 'SELECT DISTINCT s.serviceid, sl.servicedownid, sl_p.serviceupid as serviceupid, s.triggerid, '.
-		' s.name as caption, s.algorithm, t.description, t.expression, s.sortorder, sl.linkid, s.showsla, s.goodsla, s.status '.
+		' s.name as caption, s.algorithm, t.name, t.expression, s.sortorder, sl.linkid, s.showsla, s.goodsla, s.status '.
 	' FROM services s '.
 		' LEFT JOIN triggers t ON s.triggerid = t.triggerid '.
 		' LEFT JOIN services_links sl ON  s.serviceid = sl.serviceupid and NOT(sl.soft=0) '.
@@ -87,7 +87,7 @@ include_once('include/page_header.php');
 				'caption' => S_ROOT_SMALL,
 				'status' => SPACE,
 				'algorithm' => SPACE,
-				'description' => SPACE,
+				'name' => SPACE,
 				'soft' => 0,
 				'linkid'=>''
 				);
@@ -99,7 +99,7 @@ include_once('include/page_header.php');
 		$row['id'] = $row['serviceid'];
 
 		(empty($row['serviceupid']))?($row['serviceupid']='0'):('');
-		(empty($row['triggerid']))?($row['description']='None'):($row['description']=expand_trigger_description($row['triggerid']));
+		(empty($row['triggerid']))?($row['name']='None'):($row['name']=expand_trigger_name($row['triggerid']));
 
 
 			if(isset($services[$row['serviceid']])){

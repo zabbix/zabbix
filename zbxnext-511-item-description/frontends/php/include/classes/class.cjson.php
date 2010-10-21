@@ -927,22 +927,22 @@ class CJSON{
 
 	/**
 	 *
-	 * Reduce a string by removing leading and trailing comments and whitespace.
+	 * Reduce a string by removing leading and trailing description and whitespace.
 	 *
-	 * @param string $str string value to strip of comments and whitespace
+	 * @param string $str string value to strip of description and whitespace
 	 *
-	 * @return string string value stripped of comments and whitespace
+	 * @return string string value stripped of description and whitespace
 	 *
 	 */
 	protected function _reduce_string($str){
 		$str = preg_replace(array(
-			// eliminate single line comments in '// ...' form
+			// eliminate single line description in '// ...' form
 			'#^\s*//(.+)$#m',
 
-			// eliminate multi-line comments in '/* ... */' form, at start of string
+			// eliminate multi-line description in '/* ... */' form, at start of string
 			'#^\s*/\*(.+)\*/#Us',
 
-			// eliminate multi-line comments in '/* ... */' form, at end of string
+			// eliminate multi-line description in '/* ... */' form, at end of string
 			'#/\*(.+)\*/\s*$#Us'
 
 		), '', $str);

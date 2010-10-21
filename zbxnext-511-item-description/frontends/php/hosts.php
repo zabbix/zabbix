@@ -270,9 +270,9 @@ include_once('include/page_header.php');
 
 // we do custom fields for export
 		foreach($dependencies as $triggerid => $dep_data){
-			$dependencies[$triggerid]['trigger']['host_description'] = $triggers[$triggerid]['host'].':'.$triggers[$triggerid]['description'];
+			$dependencies[$triggerid]['trigger']['host_description'] = $triggers[$triggerid]['host'].':'.$triggers[$triggerid]['name'];
 			foreach($dep_data['depends_on'] as $dep_triggerid => $dep_trigger){
-				$dependencies[$triggerid]['depends_on'][$dep_triggerid]['host_description'] = $dep_trigger['host'].':'.$dep_trigger['description'];
+				$dependencies[$triggerid]['depends_on'][$dep_triggerid]['host_description'] = $dep_trigger['host'].':'.$dep_trigger['name'];
 			}
 		}
 
@@ -566,11 +566,11 @@ include_once('include/page_header.php');
 			}
 
 // Host items
-			$sql = 'SELECT DISTINCT i.itemid, i.description '.
+			$sql = 'SELECT DISTINCT i.itemid, i.name '.
 					' FROM items i '.
 					' WHERE i.hostid='.$clone_hostid.
 						' AND i.templateid IS NULL '.
-					' ORDER BY i.description';
+					' ORDER BY i.name';
 
 			$res = DBselect($sql);
 			while($db_item = DBfetch($res)){

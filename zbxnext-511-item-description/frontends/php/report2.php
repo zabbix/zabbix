@@ -162,7 +162,7 @@ include_once('include/page_header.php');
 		$rep2_wdgt->addHeader(array(
 			new CLink($trigger_data['host'],'?filter_groupid='.$_REQUEST['groupid'].'&filter_hostid='.$trigger_data['hostid']),
 			' : ',
-			expand_trigger_description_by_data($trigger_data)
+			expand_trigger_name_by_data($trigger_data)
 			),SPACE);
 
 		$table = new CTableInfo(null,'graph');
@@ -212,7 +212,7 @@ include_once('include/page_header.php');
 				$sql_where.= ' AND t.templateid='.$_REQUEST['tpl_triggerid'];
 		}
 
-		$sql = 'SELECT DISTINCT h.hostid,h.host,t.triggerid,t.expression,t.description,t.value '.
+		$sql = 'SELECT DISTINCT h.hostid,h.host,t.triggerid,t.expression,t.name,t.value '.
 			' FROM triggers t,hosts h,items i,functions f '.$sql_from.
 			' WHERE h.status='.HOST_STATUS_MONITORED.
 				' AND '.DBcondition('h.hostid',$available_hosts).
@@ -222,7 +222,7 @@ include_once('include/page_header.php');
 				' AND t.triggerid=f.triggerid '.
 				' AND t.status='.TRIGGER_STATUS_ENABLED.
 				$sql_where.
-			' ORDER BY h.host, t.description';
+			' ORDER BY h.host, t.name';
 		$result = DBselect($sql);
 
 		$table = new CTableInfo();
@@ -249,7 +249,7 @@ include_once('include/page_header.php');
 			$table->addRow(array(
 				get_node_name_by_elid($row['hostid']),
 				(($_REQUEST['hostid'] == 0) || (1 == $config)) ? $row['host'] : NULL,
-				new CLink(expand_trigger_description_by_data($row), 'events.php?triggerid='.$row['triggerid']),
+				new CLink(expand_trigger_name_by_data($row), 'events.php?triggerid='.$row['triggerid']),
 				$true,
 				$false,
 				$unknown,

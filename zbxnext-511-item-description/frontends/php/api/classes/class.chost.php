@@ -816,7 +816,7 @@ Copt::memoryPick();
 				$obj_params['output'] = $options['select_items'];
 				$items = CItem::get($obj_params);
 
-				if(!is_null($options['limitSelects'])) order_result($items, 'description');
+				if(!is_null($options['limitSelects'])) order_result($items, 'name');
 				foreach($items as $itemid => $item){
 					unset($items[$itemid]['hosts']);
 					foreach($item['hosts'] as $hnum => $host){
@@ -859,7 +859,7 @@ Copt::memoryPick();
 				$obj_params['output'] = $options['select_triggers'];
 				$triggers = CTrigger::get($obj_params);
 
-				if(!is_null($options['limitSelects'])) order_result($triggers, 'description');
+				if(!is_null($options['limitSelects'])) order_result($triggers, 'name');
 				foreach($triggers as $triggerid => $trigger){
 					unset($triggers[$triggerid]['hosts']);
 

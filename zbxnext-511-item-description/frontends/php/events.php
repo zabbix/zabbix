@@ -173,7 +173,7 @@
 		$filterForm->addVar('triggerid', get_request('triggerid', 0));
 
 		if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0)){
-			$trigger = expand_trigger_description($_REQUEST['triggerid']);
+			$trigger = expand_trigger_name($_REQUEST['triggerid']);
 		}
 		else{
 			$trigger = '';
@@ -183,7 +183,7 @@
 			new CCol(S_TRIGGER,'form_row_l'),
 			new CCol(array(
 				new CTextBox('trigger',$trigger,96,'yes'),
-				new CButton("btn1",S_SELECT,"return PopUp('popup.php?"."dstfrm=".$filterForm->GetName()."&dstfld1=triggerid&dstfld2=trigger"."&srctbl=triggers&srcfld1=triggerid&srcfld2=description&real_hosts=1');",'T')
+				new CButton("btn1",S_SELECT,"return PopUp('popup.php?"."dstfrm=".$filterForm->GetName()."&dstfld1=triggerid&dstfld2=trigger"."&srctbl=triggers&srcfld1=triggerid&srcfld2=name&real_hosts=1');",'T')
 			),'form_row_r')
 		));
 		$filterForm->addRow($row);
@@ -302,7 +302,7 @@
 			$table->setHeader(array(
 				S_TIME,
 				S_IP,
-				S_DESCRIPTION,
+				S_NAME,
 				S_STATUS
 			));
 
@@ -315,7 +315,7 @@
 						else{
 							$event_data['object_data']['ip'] = S_UNKNOWN;
 						}
-						$event_data['description'] = S_HOST;
+						$event_data['name'] = S_HOST;
 						break;
 					case EVENT_OBJECT_DSERVICE:
 						if(isset($dservices[$event_data['objectid']])){
@@ -327,7 +327,7 @@
 							$event_data['object_data']['port'] = S_UNKNOWN;
 						}
 
-						$event_data['description'] = S_SERVICE.': '.discovery_check_type2str($event_data['object_data']['type']).'; '.
+						$event_data['name'] = S_SERVICE.': '.discovery_check_type2str($event_data['object_data']['type']).'; '.
 							S_PORT.': '.$event_data['object_data']['port'];
 						break;
 					default:
@@ -338,7 +338,7 @@
 				$table->addRow(array(
 					zbx_date2str(S_EVENTS_DISCOVERY_TIME_FORMAT,$event_data['clock']),
 					$event_data['object_data']['ip'],
-					$event_data['description'],
+					$event_data['name'],
 					new CCol(discovery_value($event_data['value']), discovery_value_style($event_data['value']))
 				));
 			}
@@ -348,7 +348,7 @@
 				S_TIME,
 				is_show_all_nodes()?S_NODE:null,
 				($_REQUEST['hostid'] == 0)?S_HOST:null,
-				S_DESCRIPTION,
+				S_NAME,
 				S_STATUS,
 				S_SEVERITY,
 				S_DURATION,
@@ -422,7 +422,7 @@
 					$i = array();
 					$i['itemid'] = $item['itemid'];
 					$i['action'] = str_in_array($item['value_type'],array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64))? 'showgraph':'showvalues';
-					$i['description'] = item_description($item);
+					$i['name'] = item_name($item);
 					$items[] = $i;
 				}
 
@@ -439,8 +439,8 @@
 					}
 				}
 
-				$description = expand_trigger_description_by_data(zbx_array_merge($trigger, array('clock'=>$event['clock'], 'ns'=>$event['ns'])), ZBX_FLAG_EVENT);
-				$tr_desc = new CSpan($description,'pointer');
+				$name = expand_trigger_name_by_data(zbx_array_merge($trigger, array('clock'=>$event['clock'], 'ns'=>$event['ns'])), ZBX_FLAG_EVENT);
+				$tr_desc = new CSpan($name,'pointer');
 				$tr_desc->addAction('onclick',"create_mon_trigger_menu(event, ".
 										" new Array({'triggerid': '".$trigger['triggerid']."', 'lastchange': '".$event['clock']."'}),".
 										zbx_jsvalue($items, true).");");

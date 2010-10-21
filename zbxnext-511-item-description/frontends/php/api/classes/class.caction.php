@@ -485,7 +485,7 @@ COpt::memoryPick();
  *
  * @param _array $actions multidimensional array with actions data
  * @param array $actions[0,...]['expression']
- * @param array $actions[0,...]['description']
+ * @param array $actions[0,...]['name']
  * @param array $actions[0,...]['type'] OPTIONAL
  * @param array $actions[0,...]['priority'] OPTIONAL
  * @param array $actions[0,...]['status'] OPTIONAL
@@ -556,7 +556,7 @@ COpt::memoryPick();
  * @param _array $actions multidimensional array with actions data
  * @param array $actions[0,...]['actionid']
  * @param array $actions[0,...]['expression']
- * @param array $actions[0,...]['description']
+ * @param array $actions[0,...]['name']
  * @param array $actions[0,...]['type'] OPTIONAL
  * @param array $actions[0,...]['priority'] OPTIONAL
  * @param array $actions[0,...]['status'] OPTIONAL

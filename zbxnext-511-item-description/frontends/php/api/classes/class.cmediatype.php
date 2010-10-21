@@ -170,10 +170,10 @@ class CMediatype extends CZBXAPI{
 // pattern
 		if(!zbx_empty($options['pattern'])){
 			if($options['startPattern']){
-				$sql_parts['where']['description'] = ' UPPER(mt.description) LIKE '.zbx_dbstr(zbx_strtoupper($options['pattern']).'%');
+				$sql_parts['where']['name'] = ' UPPER(mt.name) LIKE '.zbx_dbstr(zbx_strtoupper($options['pattern']).'%');
 			}
 			else{
-				$sql_parts['where']['description'] = ' UPPER(mt.description) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
+				$sql_parts['where']['name'] = ' UPPER(mt.name) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
 			}
 		}
 
@@ -187,9 +187,9 @@ class CMediatype extends CZBXAPI{
 				$sql_parts['where']['mediatypeid'] = 'mt.mediatypeid='.$options['filter']['mediatypeid'];
 			}
 
-			if(isset($options['filter']['description']) && !is_null($options['filter']['description'])){
-				zbx_value2array($options['filter']['description']);
-				$sql_parts['where']['description'] = DBcondition('mt.description', $options['filter']['description'], false, true);
+			if(isset($options['filter']['name']) && !is_null($options['filter']['name'])){
+				zbx_value2array($options['filter']['name']);
+				$sql_parts['where']['name'] = DBcondition('mt.name', $options['filter']['name'], false, true);
 			}
 
 			if(isset($options['filter']['type']) && !is_null($options['filter']['type'])){
@@ -355,7 +355,7 @@ Copt::memoryPick();
 
 		$sql = 'SELECT mt.mediatypeid '.
 				' FROM media_type mt '.
-				' WHERE mt.description='.zbx_dbstr($mediatype_data['description']).
+				' WHERE mt.name='.zbx_dbstr($mediatype_data['name']).
 					' AND '.DBin_node('mt.mediatypeid', false);
 		$res = DBselect($sql);
 		while($mediatype = DBfetch($res)){
@@ -373,7 +373,7 @@ Copt::memoryPick();
  *
  * @param array $mediatypes
  * @param string $mediatypes['type']
- * @param string $mediatypes['description']
+ * @param string $mediatypes['name']
  * @param string $mediatypes['smtp_server']
  * @param string $mediatypes['smtp_helo']
  * @param string $mediatypes['smtp_email']
@@ -398,15 +398,15 @@ Copt::memoryPick();
 			foreach($mediatypes as $mnum => $mediatype){
 				$mediatype_db_fields = array(
 					'type' => null,
-					'description' => null,
+					'name' => null,
 				);
 				if(!check_db_fields($mediatype_db_fields, $mediatype)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_CMEDIATYPE_ERROR_WRONG_FIELD_FOR_MEDIATYPE);
 				}
 
-				$mediatype_exist = self::getObjects(array('description' => $mediatype['description']));
+				$mediatype_exist = self::getObjects(array('name' => $mediatype['name']));
 				if(!empty($mediatype_exist)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_MEDIATYPE_ALREADY_EXISTS . ' ' . $mediatype_exist[0]['description']);
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_MEDIATYPE_ALREADY_EXISTS . ' ' . $mediatype_exist[0]['name']);
 				}
 
 				$insert_mediatypes[$mnum] = $mediatype;
@@ -430,7 +430,7 @@ Copt::memoryPick();
  *
  * @param array $mediatypes
  * @param string $mediatypes['type']
- * @param string $mediatypes['description']
+ * @param string $mediatypes['name']
  * @param string $mediatypes['smtp_server']
  * @param string $mediatypes['smtp_helo']
  * @param string $mediatypes['smtp_email']
@@ -453,9 +453,9 @@ Copt::memoryPick();
 			self::BeginTransaction(__METHOD__);
 
 			foreach($mediatypes as $mnum => $mediatype){
-				if(isset($mediatype['description'])){
+				if(isset($mediatype['name'])){
 					$options = array(
-						'filter' => array('description' => $mediatype['description']),
+						'filter' => array('name' => $mediatype['name']),
 						'preservekeys' => 1,
 						'output' => API_OUTPUT_SHORTEN,
 					);
@@ -463,7 +463,7 @@ Copt::memoryPick();
 					$exist_mediatype = reset($exist_mediatypes);
 
 					if($exist_mediatype && ($exist_mediatype['mediatypeid'] != $mediatype['mediatypeid']))
-						self::exception(ZBX_API_ERROR_PARAMETERS, S_MEDIATYPE_ALREADY_EXISTS . ' ' . $mediatype['description']);
+						self::exception(ZBX_API_ERROR_PARAMETERS, S_MEDIATYPE_ALREADY_EXISTS . ' ' . $mediatype['name']);
 				}
 
 				$mediatype_db_fields = array(

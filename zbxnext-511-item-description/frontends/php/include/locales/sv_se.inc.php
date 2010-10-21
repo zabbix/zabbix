@@ -40,7 +40,7 @@
 	'S_TRIGGER_SEVERITY'=>			'Allvarlighetsgrad för utlösare',
 	'S_TRIGGER_VALUE'=>			'Värde för utlösare',
 	'S_TIME_PERIOD'=>			'Tidsperiod',
-	'S_TRIGGER_DESCRIPTION'=>			'Beskrivning av utlösare',
+	'S_TRIGGER_NAME'=>			'Beskrivning av utlösare',
 	'S_CONDITIONS'=>			'Villkor',
 	'S_CONDITION'=>			'Villkor',
 	'S_NO_CONDITIONS_DEFINED'=>			'Inga villkor har definierats',
@@ -287,7 +287,7 @@
 	'S_ITEMS_ACTIVATED'=>			'Objekt aktiverade',
 	'S_ITEMS_DISABLED'=>			'Objekt inaktiverade',
 	'S_KEY'=>			'Nyckel',
-	'S_DESCRIPTION'=>			'Beskrivning',
+	'S_NAME'=>			'Beskrivning',
 	'S_UPDATE_INTERVAL'=>			'Uppdateringsintervall',
 	'S_HISTORY'=>			'Historik',
 	'S_TRENDS'=>			'Trender',
@@ -608,7 +608,7 @@
 	'S_AUDIT'=>			'Granskning',
 	'S_LOGIN'=>			'Inloggning',
 	'S_LATEST_DATA'=>			'Senaste data',
-	'S_INCORRECT_DESCRIPTION'=>			'Felaktig beskrivning',
+	'S_INCORRECT_NAME'=>			'Felaktig beskrivning',
 
 	);
 ?>

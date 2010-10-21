@@ -56,7 +56,7 @@ class CTrigger extends CZBXAPI{
 		$user_type = $USER_DETAILS['type'];
 		$userid = $USER_DETAILS['userid'];
 
-		$sort_columns = array('triggerid', 'description', 'status', 'priority', 'lastchange'); // allowed columns for sorting
+		$sort_columns = array('triggerid', 'name', 'status', 'priority', 'lastchange'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
 
 
@@ -103,7 +103,7 @@ class CTrigger extends CZBXAPI{
 			'pattern'				=> '',
 // OutPut
 			'expandData'			=> null,
-			'expandDescription'		=> null,
+			'expandName'		=> null,
 			'output'				=> API_OUTPUT_REFER,
 			'extendoutput'			=> null,
 			'select_groups'			=> null,
@@ -434,7 +434,7 @@ class CTrigger extends CZBXAPI{
 
 // pattern
 		if(!zbx_empty($options['pattern'])){
-			$sql_parts['where']['description'] = ' UPPER(t.description) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
+			$sql_parts['where']['name'] = ' UPPER(t.name) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
 		}
 
 
@@ -442,10 +442,10 @@ class CTrigger extends CZBXAPI{
 		if(!is_null($options['filter'])){
 			zbx_value2array($options['filter']);
 
-			if(isset($options['filter']['description']) && !is_null($options['filter']['description'])){
-				zbx_value2array($options['filter']['description']);
+			if(isset($options['filter']['name']) && !is_null($options['filter']['name'])){
+				zbx_value2array($options['filter']['name']);
 
-				$sql_parts['where']['description'] = DBcondition('t.description',$options['filter']['description'], false, true);
+				$sql_parts['where']['name'] = DBcondition('t.name',$options['filter']['name'], false, true);
 			}
 
 			if(isset($options['filter']['host']) || isset($options['filter']['hostid'])){
@@ -875,16 +875,16 @@ Copt::memoryPick();
 			}
 		}
 
-// expandDescription
-		if(!is_null($options['expandDescription'])){
+// expandName
+		if(!is_null($options['expandName'])){
 // Function compare values {{{
 			foreach($result as $tnum => $trigger){
-				preg_match_all('/\$([1-9])/u', $trigger['description'], $numbers);
+				preg_match_all('/\$([1-9])/u', $trigger['name'], $numbers);
 				preg_match_all('~{[0-9]+}[+\-\*/<>=#]?[\(]*(?P<val>[+\-0-9]+)[\)]*~u', $trigger['expression'], $matches);
 
 				foreach($numbers[1] as $i){
 					$rep = isset($matches['val'][$i-1]) ? $matches['val'][$i-1] : '';
-					$result[$tnum]['description'] = str_replace('$'.($i), $rep, $result[$tnum]['description']);
+					$result[$tnum]['name'] = str_replace('$'.($i), $rep, $result[$tnum]['name']);
 				}
 			}
 // }}}
@@ -895,7 +895,7 @@ Copt::memoryPick();
 			$triggers_to_expand_items2 = array();
 			foreach($result as $tnum => $trigger){
 
-				preg_match_all('/{HOSTNAME([1-9]?)}/u', $trigger['description'], $hnums);
+				preg_match_all('/{HOSTNAME([1-9]?)}/u', $trigger['name'], $hnums);
 				if(!empty($hnums[1])){
 					preg_match_all('/{([0-9]+)}/u', $trigger['expression'], $funcs);
 					$funcs = $funcs[1];
@@ -910,7 +910,7 @@ Copt::memoryPick();
 					}
 				}
 
-				preg_match_all('/{ITEM.LASTVALUE([1-9]?)}/u', $trigger['description'], $inums);
+				preg_match_all('/{ITEM.LASTVALUE([1-9]?)}/u', $trigger['name'], $inums);
 				if(!empty($inums[1])){
 					preg_match_all('/{([0-9]+)}/u', $trigger['expression'], $funcs);
 					$funcs = $funcs[1];
@@ -925,7 +925,7 @@ Copt::memoryPick();
 					}
 				}
 
-				preg_match_all('/{ITEM.VALUE([1-9]?)}/u', $trigger['description'], $inums);
+				preg_match_all('/{ITEM.VALUE([1-9]?)}/u', $trigger['name'], $inums);
 				if(!empty($inums[1])){
 					preg_match_all('/{([0-9]+)}/u', $trigger['expression'], $funcs);
 					$funcs = $funcs[1];
@@ -954,37 +954,37 @@ Copt::memoryPick();
 
 						$fnum = $triggers_to_expand_hosts[$func['triggerid']][$func['functionid']];
 						if($fnum == 1)
-							$result[$func['triggerid']]['description'] = str_replace('{HOSTNAME}', $func['host'], $result[$func['triggerid']]['description']);
+							$result[$func['triggerid']]['name'] = str_replace('{HOSTNAME}', $func['host'], $result[$func['triggerid']]['name']);
 
-						$result[$func['triggerid']]['description'] = str_replace('{HOSTNAME'.$fnum.'}', $func['host'], $result[$func['triggerid']]['description']);
+						$result[$func['triggerid']]['name'] = str_replace('{HOSTNAME'.$fnum.'}', $func['host'], $result[$func['triggerid']]['name']);
 					}
 
 					if(isset($triggers_to_expand_items[$func['triggerid']][$func['functionid']])){
 						$fnum = $triggers_to_expand_items[$func['triggerid']][$func['functionid']];
 						if($fnum == 1)
-							$result[$func['triggerid']]['description'] = str_replace('{ITEM.LASTVALUE}', $func['lastvalue'], $result[$func['triggerid']]['description']);
+							$result[$func['triggerid']]['name'] = str_replace('{ITEM.LASTVALUE}', $func['lastvalue'], $result[$func['triggerid']]['name']);
 
-						$result[$func['triggerid']]['description'] = str_replace('{ITEM.LASTVALUE'.$fnum.'}', $func['lastvalue'], $result[$func['triggerid']]['description']);
+						$result[$func['triggerid']]['name'] = str_replace('{ITEM.LASTVALUE'.$fnum.'}', $func['lastvalue'], $result[$func['triggerid']]['name']);
 					}
 
 					if(isset($triggers_to_expand_items2[$func['triggerid']][$func['functionid']])){
 						$fnum = $triggers_to_expand_items2[$func['triggerid']][$func['functionid']];
 						if($fnum == 1)
-							$result[$func['triggerid']]['description'] = str_replace('{ITEM.VALUE}', $func['lastvalue'], $result[$func['triggerid']]['description']);
+							$result[$func['triggerid']]['name'] = str_replace('{ITEM.VALUE}', $func['lastvalue'], $result[$func['triggerid']]['name']);
 
-						$result[$func['triggerid']]['description'] = str_replace('{ITEM.VALUE'.$fnum.'}', $func['lastvalue'], $result[$func['triggerid']]['description']);
+						$result[$func['triggerid']]['name'] = str_replace('{ITEM.VALUE'.$fnum.'}', $func['lastvalue'], $result[$func['triggerid']]['name']);
 					}
 				}
 			}
 
 			foreach($result as $tnum => $trigger){
-				if($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $trigger['description'], $arr)){
+				if($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $trigger['name'], $arr)){
 					$macros = CUserMacro::getMacros($arr[1], array('triggerid' => $trigger['triggerid']));
 
 					$search = array_keys($macros);
 					$values = array_values($macros);
 
-					$result[$tnum]['description'] = str_replace($search, $values, $trigger['description']);
+					$result[$tnum]['name'] = str_replace($search, $values, $trigger['name']);
 				}
 			}
 		}
@@ -1005,7 +1005,7 @@ COpt::memoryPick();
  * @param array $triggers[0,...]['expression']
  * @param array $triggers[0,...]['host']
  * @param array $triggers[0,...]['hostid'] OPTIONAL
- * @param array $triggers[0,...]['description'] OPTIONAL
+ * @param array $triggers[0,...]['name'] OPTIONAL
  */
 	public static function getObjects($triggerData){
 		$options = array(
@@ -1033,7 +1033,7 @@ COpt::memoryPick();
 	}
 
 	public static function exists($object){
-		$keyFields = array(array('hostid', 'host'), 'description');
+		$keyFields = array(array('hostid', 'host'), 'name');
 
 		$result = false;
 
@@ -1081,7 +1081,7 @@ COpt::memoryPick();
 /**
  * Add triggers
  *
- * Trigger params: expression, description, type, priority, status, comments, url, templateid
+ * Trigger params: expression, name, type, priority, status, comments, url, templateid
  *
  * @param array $triggers
  * @return boolean
@@ -1095,7 +1095,7 @@ COpt::memoryPick();
 
 			foreach($triggers as $num => $trigger){
 				$trigger_db_fields = array(
-					'description'	=> null,
+					'name'	=> null,
 					'expression'	=> null,
 					'type'		=> 0,
 					'priority'	=> 0,
@@ -1111,7 +1111,7 @@ COpt::memoryPick();
 
 				$result = add_trigger(
 					$trigger['expression'],
-					$trigger['description'],
+					$trigger['name'],
 					$trigger['type'],
 					$trigger['priority'],
 					$trigger['status'],
@@ -1120,7 +1120,7 @@ COpt::memoryPick();
 					array(),
 					$trigger['templateid']
 				);
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Trigger ['.$trigger['description'].' ]: cannot create');
+				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Trigger ['.$trigger['name'].' ]: cannot create');
 
 				$triggerids[] = $result;
 			}
@@ -1140,7 +1140,7 @@ COpt::memoryPick();
 /**
  * Update triggers
  *
- * Trigger params: expression, description, type, priority, status, comments, url, templateid
+ * Trigger params: expression, name, type, priority, status, comments, url, templateid
  *
  * @param array $triggers
  * @return boolean
@@ -1177,7 +1177,7 @@ COpt::memoryPick();
 				$result = update_trigger(
 					$trigger['triggerid'],
 					$trigger['expression'],
-					$trigger['description'],
+					$trigger['name'],
 					$trigger['type'],
 					$trigger['priority'],
 					$trigger['status'],
@@ -1186,7 +1186,7 @@ COpt::memoryPick();
 					array(),
 					$trigger['templateid']
 				);
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Trigger ['.$trigger['description'].' ]: cannot update');
+				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Trigger ['.$trigger['name'].' ]: cannot update');
 			}
 
 			self::EndTransaction(true, __METHOD__);

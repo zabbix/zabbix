@@ -81,7 +81,7 @@ include_once('include/page_header.php');
 	imagefilledrectangle($im,0,0,$x,$y,$white);
 	imagerectangle($im,0,0,$x-1,$y-1,$black);
 
-	$str = expand_trigger_description_by_data($db_data);
+	$str = expand_trigger_name_by_data($db_data);
 
 	$str = S_CHART4_HEADER_TITLE_PART1.' '.$str.' '.S_CHART4_HEADER_TITLE_PART2.' '.zbx_date2str(S_CHART4_HEADER_DATE_FORMAT).' '.S_CHART4_HEADER_TITLE_PART3;
 	$x = imagesx($im)/2-imagefontwidth(4)*zbx_strlen($str)/2;

@@ -131,7 +131,7 @@ class zbxXML{
 		),
 		XML_TAG_DEPENDENCY => array(
 			'attributes' => array(
-				'host_trigger'		=> 'description'),
+				'host_trigger'		=> 'name'),
 			'elements' => array(
 				'depends'			=> ''
 			)
@@ -143,7 +143,7 @@ class zbxXML{
 				'value_type'		=> ''
 			),
 			'elements' => array(
-				'description'		=> '',
+				'name'		=> '',
 				'ipmi_sensor'		=> '',
 				'delay'				=> '',
 				'history'			=> '',
@@ -176,13 +176,13 @@ class zbxXML{
 		XML_TAG_TRIGGER => array(
 			'attributes' => array(),
 			'elements' => array(
-				'description'		=> '',
+				'name'		=> '',
 				'type'				=> '',
 				'expression'		=> '',
 				'url'				=> '',
 				'status'			=> '',
 				'priority'			=> '',
-				'comments'			=> ''
+				'description'			=> ''
 			)
 		),
 		XML_TAG_GRAPH => array(
@@ -686,7 +686,7 @@ class zbxXML{
 						case SYSMAP_ELEMENT_TYPE_TRIGGER:
 							$db_triggers = CTrigger::getObjects($selement['elementid']);
 							if(empty($db_triggers)){
-								$error = S_CANNOT_FIND_TRIGGER.' "'.$nodeCaption.$selement['elementid']['host'].':'.$selement['elementid']['description'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
+								$error = S_CANNOT_FIND_TRIGGER.' "'.$nodeCaption.$selement['elementid']['host'].':'.$selement['elementid']['name'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
 								throw new Exception($error);
 							}
 
@@ -723,7 +723,7 @@ class zbxXML{
 
 						$db_triggers = CTrigger::getObjects($linktrigger['triggerid']);
 						if(empty($db_triggers)){
-							$error = S_CANNOT_FIND_TRIGGER.' "'.$nodeCaption.$linktrigger['triggerid']['host'].':'.$linktrigger['triggerid']['description'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
+							$error = S_CANNOT_FIND_TRIGGER.' "'.$nodeCaption.$linktrigger['triggerid']['host'].':'.$linktrigger['triggerid']['name'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
 							throw new Exception($error);
 						}
 
@@ -1194,7 +1194,7 @@ class zbxXML{
 							if($current_trigger = CTrigger::exists($trigger_db)){
 								$ctriggers = CTrigger::get(array(
 									'filter' => array(
-										'description' => $trigger_db['description']
+										'name' => $trigger_db['name']
 									),
 									'hostids' => $current_host['hostid'],
 									'output' => API_OUTPUT_EXTEND,
@@ -1210,17 +1210,17 @@ class zbxXML{
 									}
 								}
 								if(!$current_trigger){
-									throw new APIException(1, 'No permission for Trigger ['.$trigger_db['description'].']');
+									throw new APIException(1, 'No permission for Trigger ['.$trigger_db['name'].']');
 								}
 							}
 
 
 							if(!$current_trigger && !isset($rules['trigger']['missed'])){
-								info('Trigger ['.$trigger_db['description'].'] skipped - user rule');
+								info('Trigger ['.$trigger_db['name'].'] skipped - user rule');
 								continue; // break if not update exist
 							}
 							if($current_trigger && !isset($rules['trigger']['exist'])){
-								info('Trigger ['.$trigger_db['description'].'] skipped - user rule');
+								info('Trigger ['.$trigger_db['name'].'] skipped - user rule');
 								continue; // break if not update exist
 							}
 
@@ -1404,21 +1404,21 @@ class zbxXML{
 					foreach($dependencies as $dependency){
 						$triggers_to_add_dep = array();
 
-						$trigger_description = $dependency->getAttribute('description');
-						$current_triggerid = get_trigger_by_description($trigger_description);
-// sdi('<b><u>Trigger Description: </u></b>'.$trigger_description.' | <b>Current_triggerid: </b>'. $current_triggerid['triggerid']);
+						$trigger_name = $dependency->getAttribute('name');
+						$current_triggerid = get_trigger_by_name($trigger_name);
+// sdi('<b><u>Trigger Name: </u></b>'.$trigger_name.' | <b>Current_triggerid: </b>'. $current_triggerid['triggerid']);
 
 						if($current_triggerid && isset($triggers_for_dependencies[$current_triggerid['triggerid']])){
 							$depends_on_list = $xpath->query('depends', $dependency);
 
 							foreach($depends_on_list as $depends_on){
-								$depends_triggerid = get_trigger_by_description($depends_on->nodeValue);;
-// sdi('<b>depends on description: </b>'.$depends_on->nodeValue.' | <b>depends_triggerid: </b>'. $depends_triggerid['triggerid']);
+								$depends_triggerid = get_trigger_by_name($depends_on->nodeValue);;
+// sdi('<b>depends on name: </b>'.$depends_on->nodeValue.' | <b>depends_triggerid: </b>'. $depends_triggerid['triggerid']);
 								if($depends_triggerid['triggerid']){
 									$triggers_to_add_dep[] = $depends_triggerid['triggerid'];
 								}
 							}
-							$r = update_trigger($current_triggerid['triggerid'],null,$current_triggerid['description'],null,null,null,null,null,$triggers_to_add_dep,null);
+							$r = update_trigger($current_triggerid['triggerid'],null,$current_triggerid['name'],null,null,null,null,null,$triggers_to_add_dep,null);
 							if($r === false){
 								throw new APIException();
 							}
@@ -1581,7 +1581,7 @@ class zbxXML{
 				$dependencies_node = $root->appendChild(new DOMElement(XML_TAG_DEPENDENCIES));
 				foreach($data['dependencies'] as $ddnum => $dep_data){
 					$dependeny_node = $dependencies_node->appendChild(new DOMElement(XML_TAG_DEPENDENCY));
-					$dependeny_node->setAttributeNode(new DOMAttr('description', $dep_data['trigger']['host_description']));
+					$dependeny_node->setAttributeNode(new DOMAttr('name', $dep_data['trigger']['host_description']));
 					foreach($dep_data['depends_on'] as $dtnum => $dep_trigger){
 						$n = $dependeny_node->appendChild(new DOMElement('depends'));
 						$n->appendChild(new DOMText($dep_trigger['host_description']));

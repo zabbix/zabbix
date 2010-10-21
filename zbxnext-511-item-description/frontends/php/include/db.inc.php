@@ -97,7 +97,7 @@ if(!isset($DB)){
 					}
 
 					$DB['DB']= ociplogon($DB['USER'], $DB['PASSWORD'], $connect);
-//					$DB['DB']= ociplogon($DB['USER'], $DB['PASSWORD'], '(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST='.$DB['SERVER'].')(PORT=1521))(CONNECT_DATA=(SERVICE_NAME='.$DB['DATABASE'].')))');
+//					$DB['DB']= ociplogon($DB['USER'], $DB['PASSWORD'], '(NAME=(ADDRESS=(PROTOCOL=TCP)(HOST='.$DB['SERVER'].')(PORT=1521))(CONNECT_DATA=(SERVICE_NAME='.$DB['DATABASE'].')))');
 					if(!$DB['DB']){
 						$error = 'Error connecting to database';
 						$result = false;

@@ -38,7 +38,7 @@ include_once('include/page_header.php');
 		'media_types'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 		'mediatypeid'=>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,'(isset({form})&&({form}=="update"))'),
 		'type'=>			array(T_ZBX_INT, O_OPT,	NULL,	IN(implode(',',array(MEDIA_TYPE_EMAIL,MEDIA_TYPE_EXEC,MEDIA_TYPE_SMS,MEDIA_TYPE_JABBER))),'(isset({save}))'),
-		'description'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'(isset({save}))'),
+		'name'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'(isset({save}))'),
 		'smtp_server'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.MEDIA_TYPE_EMAIL.')&&isset({save})'),
 		'smtp_helo'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.MEDIA_TYPE_EMAIL.')&&isset({save})'),
 		'smtp_email'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.MEDIA_TYPE_EMAIL.')&&isset({save})'),
@@ -57,7 +57,7 @@ include_once('include/page_header.php');
 	);
 
 	check_fields($fields);
-	validate_sort_and_sortorder('description',ZBX_SORT_UP);
+	validate_sort_and_sortorder('name',ZBX_SORT_UP);
 ?>
 <?php
 
@@ -67,7 +67,7 @@ include_once('include/page_header.php');
 	if(isset($_REQUEST['save'])){
 		$mediatype = array(
 			'type' => $_REQUEST['type'],
-			'description' => $_REQUEST['description'],
+			'name' => $_REQUEST['name'],
 			'smtp_server' => get_request('smtp_server'),
 			'smtp_helo' => get_request('smtp_helo'),
 			'smtp_email' => get_request('smtp_email'),
@@ -91,7 +91,7 @@ include_once('include/page_header.php');
 		}
 
 		if($result){
-			add_audit($action, AUDIT_RESOURCE_MEDIA_TYPE,'Media type ['.$_REQUEST['description'].']');
+			add_audit($action, AUDIT_RESOURCE_MEDIA_TYPE,'Media type ['.$_REQUEST['name'].']');
 			unset($_REQUEST['form']);
 		}
 	}
@@ -137,7 +137,7 @@ include_once('include/page_header.php');
 	if(isset($_REQUEST['form'])){
 
 		$type		= get_request('type',0);
-		$description	= get_request('description','');
+		$name	= get_request('name','');
 		$smtp_server	= get_request('smtp_server','localhost');
 		$smtp_helo	= get_request('smtp_helo','localhost');
 		$smtp_email	= get_request('smtp_email','zabbix@localhost');
@@ -157,7 +157,7 @@ include_once('include/page_header.php');
 
 			$mediatypeid	= $mediatype['mediatypeid'];
 			$type			= get_request('type',$mediatype['type']);
-			$description	= $mediatype['description'];
+			$name	= $mediatype['name'];
 			$smtp_server	= $mediatype['smtp_server'];
 
 			$smtp_helo	= $mediatype['smtp_helo'];
@@ -175,7 +175,7 @@ include_once('include/page_header.php');
 			$frmMeadia->addVar('mediatypeid',$_REQUEST['mediatypeid']);
 		}
 
-		$frmMeadia->addRow(S_DESCRIPTION,new CTextBox('description',$description,30));
+		$frmMeadia->addRow(S_NAME,new CTextBox('name',$name,30));
 		$cmbType = new CComboBox('type',$type,'submit()');
 		$cmbType->addItem(MEDIA_TYPE_EMAIL,S_EMAIL);
 		$cmbType->addItem(MEDIA_TYPE_JABBER,S_JABBER);
@@ -226,12 +226,12 @@ include_once('include/page_header.php');
 		$table->setHeader(array(
 			new CCheckBox('all_media_types',NULL,"checkAll('".$form->getName()."','all_media_types','media_types');"),
 			make_sorting_header(S_TYPE,'type'),
-			make_sorting_header(S_DESCRIPTION,'description'),
+			make_sorting_header(S_NAME,'name'),
 			S_DETAILS
 		));
 
 // Mediatype table
-		$sortfield = getPageSortField('description');
+		$sortfield = getPageSortField('name');
 		$sortorder = getPageSortOrder();
 
 		$options = array(
@@ -270,7 +270,7 @@ include_once('include/page_header.php');
 			$table->addRow(array(
 				new CCheckBox('media_types['.$mediatype['mediatypeid'].']',NULL,NULL,$mediatype['mediatypeid']),
 				media_type2str($mediatype['type']),
-				new CLink($mediatype['description'],'?form=update&mediatypeid='.$mediatype['mediatypeid']),
+				new CLink($mediatype['name'],'?form=update&mediatypeid='.$mediatype['mediatypeid']),
 				$details));
 		}
 

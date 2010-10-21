@@ -207,9 +207,9 @@ include_once('include/page_header.php');
 
 // we do custom fields for export
 		foreach($dependencies as $triggerid => $dep_data){
-			$dependencies[$triggerid]['trigger']['host_description'] = $triggers[$triggerid]['host'].':'.$triggers[$triggerid]['description'];
+			$dependencies[$triggerid]['trigger']['host_description'] = $triggers[$triggerid]['host'].':'.$triggers[$triggerid]['name'];
 			foreach($dep_data['depends_on'] as $dep_triggerid => $dep_trigger){
-				$dependencies[$triggerid]['depends_on'][$dep_triggerid]['host_description'] = $dep_trigger['host'].':'.$dep_trigger['description'];
+				$dependencies[$triggerid]['depends_on'][$dep_triggerid]['host_description'] = $dep_trigger['host'].':'.$dep_trigger['name'];
 			}
 		}
 
@@ -378,11 +378,11 @@ include_once('include/page_header.php');
 			}
 
 // Host items
-			$sql = 'SELECT DISTINCT i.itemid, i.description '.
+			$sql = 'SELECT DISTINCT i.itemid, i.name '.
 					' FROM items i '.
 					' WHERE i.hostid='.$clone_templateid.
 						' AND i.templateid=0 '.
-					' ORDER BY i.description';
+					' ORDER BY i.name';
 			$res = DBselect($sql);
 			while($db_item = DBfetch($res)){
 				$result &= (bool) copy_item_to_host($db_item['itemid'], $templateid, true);
@@ -661,8 +661,8 @@ include_once('include/page_header.php');
 				}
 				else{
 					foreach($template_items as $inum => $titem){
-						$item_description = item_description($titem);
-						$items_lbx->addItem($titem['itemid'], $item_description);
+						$item_name = item_name($titem);
+						$items_lbx->addItem($titem['itemid'], $item_name);
 					}
 				}
 				$template_tbl->addRow(array(S_ITEMS, $items_lbx));
@@ -680,8 +680,8 @@ include_once('include/page_header.php');
 				}
 				else{
 					foreach($template_triggers as $tnum => $ttrigger){
-						$trigger_description = expand_trigger_description($ttrigger['triggerid']);
-						$trig_lbx->addItem($ttrigger['triggerid'], $trigger_description);
+						$trigger_name = expand_trigger_name($ttrigger['triggerid']);
+						$trig_lbx->addItem($ttrigger['triggerid'], $trigger_name);
 					}
 				}
 				$template_tbl->addRow(array(S_TRIGGERS, $trig_lbx));

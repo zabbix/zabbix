@@ -40,7 +40,7 @@
 	'S_TRIGGER_SEVERITY'=>			'Trekker ernstheid',
 	'S_TRIGGER_VALUE'=>			'Trekker waarde',
 	'S_TIME_PERIOD'=>			'Tijd periode',
-	'S_TRIGGER_DESCRIPTION'=>			'Trekker omschrijving',
+	'S_TRIGGER_NAME'=>			'Trekker omschrijving',
 	'S_CONDITIONS'=>			'Condities',
 	'S_CONDITION'=>			'Condities',
 	'S_NO_CONDITIONS_DEFINED'=>			'Geen condities gedefineerd',
@@ -287,7 +287,7 @@
 	'S_ITEMS_ACTIVATED'=>			'Items geactiveerd',
 	'S_ITEMS_DISABLED'=>			'Items gedeactiveerd',
 	'S_KEY'=>			'Sleutel',
-	'S_DESCRIPTION'=>			'Omschrijving',
+	'S_NAME'=>			'Omschrijving',
 	'S_UPDATE_INTERVAL'=>			'Bijwerk interval',
 	'S_HISTORY'=>			'Geschiedenis',
 	'S_TRENDS'=>			'Trends',
@@ -608,7 +608,7 @@
 	'S_AUDIT'=>			'Controle',
 	'S_LOGIN'=>			'Login',
 	'S_LATEST_DATA'=>			'Laatste data',
-	'S_INCORRECT_DESCRIPTION'=>			'Incorrecte omschrijving',
+	'S_INCORRECT_NAME'=>			'Incorrecte omschrijving',
 
 	);
 ?>

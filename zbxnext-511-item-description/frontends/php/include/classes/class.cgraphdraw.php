@@ -253,7 +253,7 @@ class CGraphDraw{
 
 	public function drawHeader(){
 		if(!isset($this->header)){
-			$str=$this->items[0]['host'].': '.$this->items[0]['description'];
+			$str=$this->items[0]['host'].': '.$this->items[0]['name'];
 		}
 		else{
 			$str=$this->header;

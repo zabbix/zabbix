@@ -195,7 +195,7 @@
 	# Update Item definition for selected group
 
 	function update_item_in_group($groupid,$itemid,$item){
-/*		$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,$valuemapid,$delay_flex,$params,$ipmi_sensor,$applications)
+/*		$name,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,$valuemapid,$delay_flex,$params,$ipmi_sensor,$applications)
 //*/
 		$sql='SELECT i.itemid,i.hostid '.
 				' FROM hosts_groups hg,items i '.
@@ -240,7 +240,7 @@
 	# Add Item definition to selected group
 
 	function add_item_to_group($groupid,$item){
-/*	$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,$valuemapid,$delay_flex,$params,$ipmi_sensor,$applications)
+/*	$name,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,$valuemapid,$delay_flex,$params,$ipmi_sensor,$applications)
 //*/
 		$sql='SELECT hostid FROM hosts_groups WHERE groupid='.$groupid;
 		$result=DBSelect($sql);
@@ -258,14 +258,14 @@
 	 ******************************************************************************/
 	function add_item($item){
 /*
-		$item = array('description','key','hostid','delay','history','status','type',
+		$item = array('name','key','hostid','delay','history','status','type',
 		'snmp_community','snmp_oid','value_type','trapper_hosts','snmp_port','units','multiplier','delta',
 		'snmpv3_securityname','snmpv3_securitylevel','snmpv3_authpassphrase','snmpv3_privpassphrase',
 		'formula','trends','logtimefmt','valuemapid','delay_flex','params','ipmi_sensor','applications','templateid');
 //*/
 
 		$item_db_fields = array(
-				'description'		=> null,
+				'name'		=> null,
 				'key_'			=> null,
 				'hostid'		=> null,
 				'delay'			=> 60,
@@ -297,7 +297,7 @@
 				'privatekey'		=> '',
 				'params'		=> '',
 				'ipmi_sensor'		=> '',
-				'description_details'		=> '',
+				'description'		=> '',
 				'applications'		=> array(),
 				'templateid'		=> 0);
 
@@ -403,13 +403,13 @@
 		// first add mother item
 		$itemid=get_dbid('items','itemid');
 		$result=DBexecute('INSERT INTO items '.
-				' (itemid,description,key_,hostid,delay,history,status,type,'.
+				' (itemid,name,key_,hostid,delay,history,status,type,'.
 					'snmp_community,snmp_oid,value_type,data_type,trapper_hosts,'.
 					'snmp_port,units,multiplier,'.
 					'delta,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,'.
 					'snmpv3_privpassphrase,formula,trends,logtimefmt,valuemapid,'.
-					'delay_flex,params,ipmi_sensor,templateid,authtype,username,password,publickey,privatekey,description_details)'.
-			' VALUES ('.$itemid.','.zbx_dbstr($item['description']).','.zbx_dbstr($item['key_']).','.(!$item['hostid']? '0':$item['hostid']).','.
+					'delay_flex,params,ipmi_sensor,templateid,authtype,username,password,publickey,privatekey,description)'.
+			' VALUES ('.$itemid.','.zbx_dbstr($item['name']).','.zbx_dbstr($item['key_']).','.(!$item['hostid']? '0':$item['hostid']).','.
 				(!$item['delay']? '0':$item['delay']).','.
 				(!$item['history']? '0':$item['history']).','.
 				(!$item['status']? '0':$item['status']).','.
@@ -432,11 +432,11 @@
 				zbx_dbstr($item['password']).','.
 				zbx_dbstr($item['publickey']).','.
 				zbx_dbstr($item['privatekey']).','.
-				zbx_dbstr($item['description_details']).')'
+				zbx_dbstr($item['description']).')'
 		);
 
 		if ($result)
-			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_ITEM, $itemid, $host['host'].':'.$item['description'], NULL, NULL, NULL);
+			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_ITEM, $itemid, $host['host'].':'.$item['name'], NULL, NULL, NULL);
 		else
 			return $result;
 
@@ -493,7 +493,7 @@
 				if ($result){
 					$host=get_host_by_hostid($row['hostid']);
 					$item_new = get_item_by_itemid($row['itemid']);
-					add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, $row['itemid'], $host['host'].':'.$row['description'], 'items', $row, $item_new);
+					add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, $row['itemid'], $host['host'].':'.$row['name'], 'items', $row, $item_new);
 				}
 			}
 		}
@@ -520,7 +520,7 @@
 	 ******************************************************************************/
 	function update_item($itemid,$item){
 /*
-		$item = array('description','key','hostid','delay','history','status','type',
+		$item = array('name','key','hostid','delay','history','status','type',
 		'snmp_community','snmp_oid','value_type','trapper_hosts','snmp_port','units','multiplier','delta',
 		'snmpv3_securityname','snmpv3_securitylevel','snmpv3_authpassphrase','snmpv3_privpassphrase',
 		'formula','trends','logtimefmt','valuemapid','delay_flex','params','ipmi_sensor','applications','templateid');
@@ -637,7 +637,7 @@
 
 		$result=DBexecute(
 			'UPDATE items '.
-			' SET description='.zbx_dbstr($item['description']).','.
+			' SET name='.zbx_dbstr($item['name']).','.
 				'key_='.zbx_dbstr($item['key_']).','.
 				'hostid='.$item['hostid'].','.
 				'delay='.$item['delay'].','.
@@ -668,13 +668,13 @@
 				'username='.zbx_dbstr($item['username']).','.
 				'password='.zbx_dbstr($item['password']).','.
 				'publickey='.zbx_dbstr($item['publickey']).','.
-				'description_details='.zbx_dbstr($item['description_details']).','.
+				'description='.zbx_dbstr($item['description']).','.
 				'privatekey='.zbx_dbstr($item['privatekey']).
 			' WHERE itemid='.$itemid);
 
 		if ($result){
 			$item_new = get_item_by_itemid($itemid);
-			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, $itemid, $host['host'].':'.$item_old['description'], 'items', $item_old, $item_new);
+			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, $itemid, $host['host'].':'.$item_old['name'], 'items', $item_old, $item_new);
 		}
 
 		update_item_status($itemid, $item['status']);
@@ -702,7 +702,7 @@
 		$item_data = get_item_by_itemid_limited($itemid);
 
 		$restore_rules= array(
-					'description'		=> array(),
+					'name'		=> array(),
 					'key_'			=> array(),
 					'hostid'		=> array(),
 					'delay'			=> array('template' => 1),
@@ -734,7 +734,7 @@
 					'params'		=> array('template' => 1),
 					'delay_flex'		=> array('template' => 1),
 					'ipmi_sensor'		=> array(),
-					'description_details'	=> array('template' => 1)
+					'description'	=> array('template' => 1)
 		);
 
 		foreach($restore_rules as $var_name => $info){
@@ -919,11 +919,11 @@
 	}
 
 	function get_item_by_itemid_limited($itemid){
-		$sql = 'SELECT itemid,description,key_,hostid,delay,history,status,type,'.
+		$sql = 'SELECT itemid,name,key_,hostid,delay,history,status,type,'.
 					'snmp_community,snmp_oid,value_type,data_type,trapper_hosts,snmp_port,units,multiplier,delta,'.
 					'snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,'.
 					'formula,trends,logtimefmt,valuemapid,delay_flex,params,ipmi_sensor,templateid,'.
-					'authtype,username,password,publickey,privatekey,description_details '.
+					'authtype,username,password,publickey,privatekey,description '.
 			' FROM items '.
 			' WHERE itemid='.$itemid;
 		$row = DBfetch(DBselect($sql));
@@ -997,7 +997,7 @@
 
 // Get items INFO before delete them!
 		$items = array();
-		$item_res = DBselect('SELECT itemid, description, key_ FROM items WHERE '.DBcondition('itemid',$itemids));
+		$item_res = DBselect('SELECT itemid, name, key_ FROM items WHERE '.DBcondition('itemid',$itemids));
 		while($item_rows = DBfetch($item_res)){
 			$items[$item_rows['itemid']] = $item_rows;
 		}
@@ -1057,7 +1057,7 @@
 			$item_old = get_item_by_itemid($id);
 			$result = DBexecute('DELETE FROM items WHERE itemid='.$id);
 			if ($result)
-				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM, $id, $item_old['description'], 'items', NULL, NULL);
+				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM, $id, $item_old['name'], 'items', NULL, NULL);
 			else
 				break;
 		}
@@ -1142,8 +1142,8 @@
 		return $item['key_'];
 	}
 
-	function item_description($item){
-		$descr = $item['description'];
+	function item_name($item){
+		$descr = $item['name'];
 		$key = expand_item_key_by_data($item);
 
 		for($i=9;$i>0;$i--){
@@ -1190,7 +1190,7 @@
 
 // COpt::profiling_start('prepare_data');
 		$result = DBselect('SELECT DISTINCT h.hostid, h.host,i.itemid, i.key_, i.value_type, i.lastvalue, i.units, '.
-				' i.description, t.priority, i.valuemapid, t.value as tr_value, t.triggerid '.
+				' i.name, t.priority, i.valuemapid, t.value as tr_value, t.triggerid '.
 			' FROM hosts h, items i '.
 				' LEFT JOIN functions f on f.itemid=i.itemid '.
 				' LEFT JOIN triggers t on t.triggerid=f.triggerid and t.status='.TRIGGER_STATUS_ENABLED.
@@ -1198,14 +1198,14 @@
 				' AND h.status='.HOST_STATUS_MONITORED.
 				' AND h.hostid=i.hostid '.
 				' AND i.status='.ITEM_STATUS_ACTIVE.
-			' ORDER BY i.description,i.itemid');
+			' ORDER BY i.name,i.itemid');
 
 		unset($items);
 		unset($hosts);
 // get rid of warnings about $triggers undefined
 		$items = array();
 		while($row = DBfetch($result)){
-			$descr = item_description($row);
+			$descr = item_name($row);
 			$row['host'] = get_node_name_by_elid($row['hostid'], null, ': ').$row['host'];
 			$hosts[zbx_strtolower($row['host'])] = $row['host'];
 
@@ -1226,7 +1226,7 @@
 					'value_type'=> $row['value_type'],
 					'lastvalue'	=> $row['lastvalue'],
 					'units'		=> $row['units'],
-					'description'=> $row['description'],
+					'name'=> $row['name'],
 					'valuemapid' => $row['valuemapid'],
 					'severity'	=> $row['priority'],
 					'tr_value'	=> $row['tr_value'],

@@ -92,19 +92,19 @@ require_once('include/items.inc.php');
 
 		$monitored_items = array(
 			array(
-				'description'	=> 'Download speed for step \'$2\' of scenario \'$1\'',
+				'name'	=> 'Download speed for step \'$2\' of scenario \'$1\'',
 				'key_'		=> 'web.test.in['.$testname.','.$name.',bps]',
 				'type'		=> ITEM_VALUE_TYPE_FLOAT,
 				'units'		=> 'Bps',
 				'httpstepitemtype'=> HTTPSTEP_ITEM_TYPE_IN),
 			array(
-				'description'	=> 'Response time for step \'$2\' of scenario \'$1\'',
+				'name'	=> 'Response time for step \'$2\' of scenario \'$1\'',
 				'key_'		=> 'web.test.time['.$testname.','.$name.',resp]',
 				'type'		=> ITEM_VALUE_TYPE_FLOAT,
 				'units'		=> 's',
 				'httpstepitemtype'=> HTTPSTEP_ITEM_TYPE_TIME),
 			array(
-				'description'	=> 'Response code for step \'$2\' of scenario \'$1\'',
+				'name'	=> 'Response code for step \'$2\' of scenario \'$1\'',
 				'key_'		=> 'web.test.rspcode['.$testname.','.$name.']',
 				'type'		=> ITEM_VALUE_TYPE_UINT64,
 				'units'		=> '',
@@ -123,7 +123,7 @@ require_once('include/items.inc.php');
 			}
 
 			$item_args = array(
-				'description'		=> $item['description'],
+				'name'		=> $item['name'],
 				'key_'			=> $item['key_'],
 				'hostid'		=> $hostid,
 				'delay'			=> $delay,
@@ -299,13 +299,13 @@ require_once('include/items.inc.php');
 
 			$monitored_items = array(
 				array(
-					'description'	=> 'Download speed for scenario \'$1\'',
+					'name'	=> 'Download speed for scenario \'$1\'',
 					'key_'		=> 'web.test.in['.$name.',,bps]',
 					'type'		=> ITEM_VALUE_TYPE_FLOAT,
 					'units'		=> 'Bps',
 					'httptestitemtype'=> HTTPSTEP_ITEM_TYPE_IN),
 				array(
-					'description'	=> 'Failed step of scenario \'$1\'',
+					'name'	=> 'Failed step of scenario \'$1\'',
 					'key_'		=> 'web.test.fail['.$name.']',
 					'type'		=> ITEM_VALUE_TYPE_UINT64,
 					'units'		=> '',
@@ -324,7 +324,7 @@ require_once('include/items.inc.php');
 				}
 
 				$item_args = array(
-					'description'	=> $item['description'],
+					'name'	=> $item['name'],
 					'key_'			=> $item['key_'],
 					'hostid'		=> $hostid,
 					'delay'			=> $delay,

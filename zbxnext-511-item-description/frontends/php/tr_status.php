@@ -290,12 +290,12 @@ include_once('include/page_header.php');
 		$config['event_ack_enable'] ? S_ACKNOWLEDGED : NULL,
 		is_show_all_nodes() ? S_NODE : null,
 		S_HOST,
-		make_sorting_header(S_NAME, 'description'),
-		S_DESCRIPTION
+		make_sorting_header(S_NAME, 'name'),
+		S_NAME
 	));
 
 
-	$sortfield = getPageSortField('description');
+	$sortfield = getPageSortField('name');
 	$sortorder = getPageSortOrder();
 	$options = array(
 		'nodeids' => get_current_nodeid(),
@@ -422,7 +422,7 @@ include_once('include/page_header.php');
 
 	foreach($triggers as $tnum => $trigger){
 
-		$trigger['desc'] = $description = expand_trigger_description($trigger['triggerid']);
+		$trigger['desc'] = $name = expand_trigger_name($trigger['triggerid']);
 
 		$items = array();
 
@@ -434,25 +434,25 @@ include_once('include/page_header.php');
 
 		foreach($trigger['items'] as $inum => $item){
 
-			$item_description = item_description($item);
+			$item_name = item_name($item);
 
 			//if we have items from different hosts, we must prefix a host name
 			if ($used_host_count > 1) {
-				$item_description = $used_hosts[$item['hostid']].':'.$item_description;
+				$item_name = $used_hosts[$item['hostid']].':'.$item_name;
 			}
 
 			$items[$inum]['itemid'] = $item['itemid'];
 			$items[$inum]['action'] = str_in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64)) ? 'showgraph' : 'showvalues';
-			$items[$inum]['description'] = $item_description;
+			$items[$inum]['name'] = $item_name;
 		}
 		$trigger['items'] = $items;
 
 
 //----
 
-		$description = new CSpan($description, 'link_menu');
+		$name = new CSpan($name, 'link_menu');
 
-// trigger description js menu {{{
+// trigger name js menu {{{
 		$hosts = reset($trigger['hosts']);
 
 		$menu_trigger_conf = 'null';
@@ -467,21 +467,21 @@ include_once('include/page_header.php');
 				null, {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
 		}
 
-		$description->addAction('onclick',
+		$name->addAction('onclick',
 			"javascript: create_mon_trigger_menu(event, new Array({'triggerid': '".$trigger['triggerid'].
 				"', 'lastchange': '".$trigger['lastchange']."'}, ".$menu_trigger_conf.", ".$menu_trigger_url."),".
 			zbx_jsvalue($items, true).");"
 		);
 
 
-// }}} trigger description js menu
+// }}} trigger name js menu
 
 		if($_REQUEST['show_details']){
 			$font = new CTag('font', 'yes');
 			$font->setAttribute('color', '#000');
 			$font->setAttribute('size', '-2');
 			$font->addItem(explode_exp($trigger['expression'], 1, false, true));
-			$description = array($description, BR(), $font);
+			$name = array($name, BR(), $font);
 		}
 
 // DEPENDENCIES {{{
@@ -491,14 +491,14 @@ include_once('include/page_header.php');
 			$dep_table->addRow(bold(S_DEPENDS_ON.':'));
 
 			foreach($trigger['dependencies'] as $dep){
-				$dep_table->addRow(' - '.expand_trigger_description($dep['triggerid']));
+				$dep_table->addRow(' - '.expand_trigger_name($dep['triggerid']));
 			}
 
 			$img = new Cimg('images/general/down_icon.png', 'DEP_UP');
 			$img->setAttribute('style', 'vertical-align: middle; border: 0px;');
 			$img->setHint($dep_table);
 
-			$description = array($img, SPACE, $description);
+			$name = array($img, SPACE, $name);
 		}
 
 		$dependency = false;
@@ -509,7 +509,7 @@ include_once('include/page_header.php');
 		$sql_dep = 'SELECT * FROM trigger_depends WHERE triggerid_up='.$trigger['triggerid'];
 		$dep_res = DBselect($sql_dep);
 		while($dep_row = DBfetch($dep_res)){
-			$dep_table->addRow(SPACE.'-'.SPACE.expand_trigger_description($dep_row['triggerid_down']));
+			$dep_table->addRow(SPACE.'-'.SPACE.expand_trigger_name($dep_row['triggerid_down']));
 			$dependency = true;
 		}
 
@@ -518,12 +518,12 @@ include_once('include/page_header.php');
 			$img->setAttribute('style','vertical-align: middle; border: 0px;');
 			$img->setHint($dep_table);
 
-			$description = array($img,SPACE,$description);
+			$name = array($img,SPACE,$name);
 		}
 		unset($img, $dep_table, $dependency);
 // }}} DEPENDENCIES
 
-		$tr_desc = new CSpan($description);
+		$tr_desc = new CSpan($name);
 
 
 // host JS menu {{{
@@ -564,7 +564,7 @@ include_once('include/page_header.php');
 				$maintenances = CMaintenance::get($maintenanceOptions);
 				$maintenance = reset($maintenances);
 
-				$maint_hint = new CSpan($maintenance['name'].($maintenance['description']=='' ? '' : ': '.$maintenance['description']));
+				$maint_hint = new CSpan($maintenance['name'].($maintenance['name']=='' ? '' : ': '.$maintenance['name']));
 
 				$maint_span->setHint($maint_hint);
 			}
@@ -637,7 +637,7 @@ include_once('include/page_header.php');
 			get_node_name_by_elid($trigger['triggerid']),
 			$host,
 			$tr_desc,
-			new CLink(zbx_empty($trigger['comments']) ? S_ADD : S_SHOW, 'tr_comments.php?triggerid='.$trigger['triggerid'])
+			new CLink(zbx_empty($trigger['description']) ? S_ADD : S_SHOW, 'tr_comments.php?triggerid='.$trigger['triggerid'])
 		), 'even_row');
 
 

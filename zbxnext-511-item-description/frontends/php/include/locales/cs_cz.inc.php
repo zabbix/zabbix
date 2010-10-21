@@ -149,7 +149,7 @@
 	'S_INCORRECT_IP_RANGE'=>		'Neplatný rozsah IP.',
 
 //	auditacts.php
-	'S_AUDITACTS_DESCRIPTION_DATE_FORMAT'=>	'j. M Y G:i:s',
+	'S_AUDITACTS_NAME_DATE_FORMAT'=>	'j. M Y G:i:s',
 
 //	auditlogs.php
 	'S_AUDITLOGS_RECORD_DATE_FORMAT'=>	'j. M Y G:i:s',
@@ -312,7 +312,7 @@
 	'S_MAINTENANCE_SMALL'=>			'údržba',
 	'S_MAX_VALUE_SMALL'=>			'maximální hodnota',
 	'S_MIN_VALUE_SMALL'=>			'minimální hodnota',
-	'S_TRIGGER_DESCRIPTION'=>		'Popis spouštěče',
+	'S_TRIGGER_NAME'=>		'Popis spouštěče',
 	'S_HOST_NAME'=>				'Název hostitele',
 	'S_ACTION_CONDITIONS'=>			'Podmínky akce',
 	'S_OPERATION_CONDITION'=>		'podmínka operace',
@@ -1084,7 +1084,7 @@
 	'S_ITEMS_ACTIVATED'=>					'Položky byly povoleny',
 	'S_ITEMS_DISABLED'=>					'Položky byly zakázány',
 	'S_KEY'=>						'Klíč',
-	'S_DESCRIPTION'=>					'Popis',
+	'S_NAME'=>					'Popis',
 	'S_UPDATE_INTERVAL'=>					'Interval aktualizací',
 	'S_INTERVAL'=>						'Interval',
 	'S_HISTORY'=>						'Historie',
@@ -1154,7 +1154,7 @@
 	'S_SKIP_EXISTING_ITEMS'=>				'Přeskočit existující položky',
 	'S_UPDATE_EXISTING_NON_LINKED_ITEMS'=>			'aktualizovat existující nepřipojené položky',
 	'S_COPY'=>						'Kopírovat',
-	'S_SHOW_ITEMS_WITH_DESCRIPTION_LIKE'=>			'Zobrazit položky s popisem',
+	'S_SHOW_ITEMS_WITH_NAME_LIKE'=>			'Zobrazit položky s popisem',
 	'S_HISTORY_CLEARING_CAN_TAKE_A_LONG_TIME_CONTINUE_Q'=>	'Pročištění historie může chvíli trvat. Pokračovat?',
 	'S_MASS_UPDATE'=>					'Hromadná aktualizace',
 	'S_SEARCH'=>						'Hledat',
@@ -1898,7 +1898,7 @@
 	'S_DELETE_SELECTED_SCRIPTS_Q'=>		'Smazat vybrané skripty?',
 
 	'S_SCRIPT_ERROR'=>			'CHYBA SKRIPTU',
-	'S_SCRIPT_ERROR_DESCRIPTION'=>		'Popis chyby',
+	'S_SCRIPT_ERROR_NAME'=>		'Popis chyby',
 	'S_SCRIPT_SEND_ERROR'=>			'Nepodařilo se poslat příkaz, zkontrolujte spojení',
 	'S_SCRIPT_READ_ERROR'=>			'Nepodařilo se přečíst odpověď skriptu, zkontrolujte spojení',
 	'S_SCRIPT_TIMEOUT_ERROR'=>		'Vypršel čas definovaný konstantou ZBX_SCRIPT_TIMEOUT (v "include/defines.inc.php"). Můžete zkusit tuto hodnotu zzvětšit.',
@@ -2126,7 +2126,7 @@
 //	media.inc.php
 	'S_NO_MEDIA_WITH'=>			'Neexistuje médium s',
 	'S_NO_MEDIA_TYPE_WITH'=>		'Neexistuje typ média s',
-	'S_AN_ACTION_TYPE_WITH_DESCRIPTION'=>	'Typ akce s popisem',
+	'S_AN_ACTION_TYPE_WITH_NAME'=>	'Typ akce s popisem',
 
 //	hosts.inc.php
 	'S_CANNOT_EXIST_WITHOUT_GROUP'=>		'nemůže existovat bez skupiny',
@@ -2386,7 +2386,7 @@
 	'S_LATEST_DATA'=>			'Poslední hodnoty',
 
 //	Errors
-	'S_INCORRECT_DESCRIPTION'=>		'Neplatný popis',
+	'S_INCORRECT_NAME'=>		'Neplatný popis',
 	'S_CANT_FORMAT_TREE'=>			'Nelze naformátovat navigační strom',
 	'S_NO_PERMISSION'=>				'Nemáte oprávnění k provedení této operace',
 	'S_NO_PERMISSIONS_FOR_SCREEN'=>	'Nemáte oprávnění k obrazovce',

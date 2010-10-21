@@ -621,7 +621,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 						new CButton('btn1',S_SELECT,
 							"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
 							"&dstfld1=new_condition%5Bvalue%5D&dstfld2=trigger&srctbl=triggers".
-							"&srcfld1=triggerid&srcfld2=description');",
+							"&srcfld1=triggerid&srcfld2=name');",
 							'T'));
 					break;
 				case CONDITION_TYPE_TRIGGER_NAME:
@@ -1004,26 +1004,26 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 					$cmbMediaType->addItem(0, S_MINUS_ALL_MINUS);
 
 					if(OPERATION_OBJECT_USER == $new_operation['object']){
-						$sql = 'SELECT DISTINCT mt.mediatypeid,mt.description,m.userid ' .
+						$sql = 'SELECT DISTINCT mt.mediatypeid,mt.name,m.userid ' .
 								' FROM media_type mt, media m ' .
 								' WHERE ' . DBin_node('mt.mediatypeid') .
 								' AND m.mediatypeid=mt.mediatypeid ' .
 								' AND m.userid=' . $new_operation['objectid'] .
 								' AND m.active=' . ACTION_STATUS_ENABLED .
-								' ORDER BY mt.description';
+								' ORDER BY mt.name';
 						$db_mediatypes = DBselect($sql);
 						while($db_mediatype = DBfetch($db_mediatypes)){
-							$cmbMediaType->addItem($db_mediatype['mediatypeid'], $db_mediatype['description']);
+							$cmbMediaType->addItem($db_mediatype['mediatypeid'], $db_mediatype['name']);
 						}
 					}
 					else{
-						$sql = 'SELECT mt.mediatypeid, mt.description' .
+						$sql = 'SELECT mt.mediatypeid, mt.name' .
 								' FROM media_type mt ' .
 								' WHERE ' . DBin_node('mt.mediatypeid') .
-								' ORDER BY mt.description';
+								' ORDER BY mt.name';
 						$db_mediatypes = DBselect($sql);
 						while($db_mediatype = DBfetch($db_mediatypes)){
-							$cmbMediaType->addItem($db_mediatype['mediatypeid'], $db_mediatype['description']);
+							$cmbMediaType->addItem($db_mediatype['mediatypeid'], $db_mediatype['name']);
 						}
 					}
 					$tblNewOperation->addRow(array(S_SEND_ONLY_TO, $cmbMediaType));
@@ -1031,18 +1031,18 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 					if(OPERATION_OBJECT_USER == $new_operation['object']){
 						$media_table = new CTable(S_NO_MEDIA_DEFINED,'tablestripped');
 
-						$sql = 'SELECT mt.description,m.sendto,m.period,m.severity ' .
+						$sql = 'SELECT mt.name,m.sendto,m.period,m.severity ' .
 								' FROM media_type mt,media m ' .
 								' WHERE ' . DBin_node('mt.mediatypeid') .
 								' AND mt.mediatypeid=m.mediatypeid ' .
 								' AND m.userid=' . $new_operation['objectid'] .
 								($new_operation['mediatypeid'] ? ' AND m.mediatypeid=' . $new_operation['mediatypeid'] : '') .
 								' AND m.active=' . ACTION_STATUS_ENABLED .
-								' ORDER BY mt.description,m.sendto';
+								' ORDER BY mt.name,m.sendto';
 						$db_medias = DBselect($sql);
 						while($db_media = DBfetch($db_medias)) {
 							$media_table->addRow(array(
-								new CSpan($db_media['description'], 'nowrap'),
+								new CSpan($db_media['name'], 'nowrap'),
 								new CSpan($db_media['sendto'], 'nowrap'),
 								new CSpan($db_media['period'], 'nowrap'),
 								media_severity2str($db_media['severity'])

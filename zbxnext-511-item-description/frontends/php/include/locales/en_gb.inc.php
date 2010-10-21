@@ -320,7 +320,7 @@
 	'S_MAINTENANCE_SMALL'=>			'maintenance',
 	'S_MAX_VALUE_SMALL'=>			'max value',
 	'S_MIN_VALUE_SMALL'=>			'min value',
-	'S_TRIGGER_DESCRIPTION'=>		'Trigger description',
+	'S_TRIGGER_NAME'=>		'Trigger name',
 	'S_HOST_NAME'=>				'Host name',
 	'S_ACTION_CONDITIONS'=>			'Action conditions',
 	'S_OPERATION_CONDITION'=>		'Operation condition',
@@ -1097,7 +1097,8 @@
 	'S_ITEMS_ACTIVATED'=>					'Items activated',
 	'S_ITEMS_DISABLED'=>					'Items disabled',
 	'S_KEY'=>						'Key',
-	'S_DESCRIPTION'=>					'Description',
+	'S_NAME'=>					'Name',
+	'S_DESCRIPTION' =>			'Description',
 	'S_UPDATE_INTERVAL'=>					'Update interval',
 	'S_INTERVAL'=>						'Interval',
 	'S_HISTORY'=>						'History',
@@ -1167,7 +1168,7 @@
 	'S_SKIP_EXISTING_ITEMS'=>				'Skip existing items',
 	'S_UPDATE_EXISTING_NON_LINKED_ITEMS'=>			'update existing non linked items',
 	'S_COPY'=>						'Copy',
-	'S_SHOW_ITEMS_WITH_DESCRIPTION_LIKE'=>			'Show items with description like',
+	'S_SHOW_ITEMS_WITH_NAME_LIKE'=>			'Show items with name like',
 	'S_HISTORY_CLEARING_CAN_TAKE_A_LONG_TIME_CONTINUE_Q'=>	'History clearing can take a long time. Continue?',
 	'S_MASS_UPDATE'=>					'Mass update',
 	'S_SEARCH'=>						'Search',
@@ -1778,13 +1779,13 @@
 	'S_TRIGGER_LOG_FORM'=>	'Log trigger form',
 
 //	tr_comments.php
-	'S_TRIGGER_COMMENTS'=>			'Trigger comments',
+	'S_TRIGGER_COMMENTS'=>			'Trigger description',
 	'S_TRIGGER_COMMENTS_BIG'=>		'TRIGGER COMMENTS',
 	'S_COMMENT_UPDATED'=>			'Comment updated',
 	'S_CANNOT_UPDATE_COMMENT'=>		'Cannot update comment',
 	'S_ADD'=>						'Add',
-	'S_DESCRIPTION_UPDATED'=>						'Description updated',
-	'S_CANNOT_UPDATE_DESCRIPTION'=>						'Cannot update description',
+	'S_NAME_UPDATED'=>						'Name updated',
+	'S_CANNOT_UPDATE_NAME'=>						'Cannot update name',
 
 //	tr_status.php
 	'S_SOUND'=>							'Sound',
@@ -1938,7 +1939,7 @@
 	'S_DELETE_SELECTED_SCRIPTS_Q'=>		'Delete selected scripts?',
 
 	'S_SCRIPT_ERROR'=>			'SCRIPT ERROR',
-	'S_SCRIPT_ERROR_DESCRIPTION'=>		'Error Description',
+	'S_SCRIPT_ERROR_NAME'=>		'Error Description',
 	'S_SCRIPT_SEND_ERROR'=>			'Can\'t send command, check connection',
 	'S_SCRIPT_READ_ERROR'=>			'Can\'t read script response, check connection',
 	'S_SCRIPT_TIMEOUT_ERROR'=>		'Defined in "include/defines.inc.php" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value',
@@ -2186,7 +2187,7 @@
 //	media.inc.php
 	'S_NO_MEDIA_WITH'=>			'No media with',
 	'S_NO_MEDIA_TYPE_WITH'=>		'No media type with',
-	'S_AN_ACTION_TYPE_WITH_DESCRIPTION'=>	'An action type with description',
+	'S_AN_ACTION_TYPE_WITH_NAME'=>	'An action type with name',
 
 //	hosts.inc.php
 	'S_CANNOT_EXIST_WITHOUT_GROUP'=>		'can not exist without group',
@@ -2447,7 +2448,7 @@
 	'S_LATEST_DATA'=>			'Latest data',
 
 //	Errors
-	'S_INCORRECT_DESCRIPTION'=>		'Incorrect description',
+	'S_INCORRECT_NAME'=>		'Incorrect name',
 	'S_CANT_FORMAT_TREE'=>			'Can\'t format Tree',
 	'S_NO_PERMISSION'=>				'You do not have permission to perform this operation',
 	'S_NO_PERMISSIONS_FOR_SCREEN'=>	'No permissions for screen',
