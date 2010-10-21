@@ -131,6 +131,7 @@ switch($itemType) {
 	if(get_request('itemid', false)){
 		$options = array(
 			'itemids' => $_REQUEST['itemid'],
+			'filter' => array('flags' => ZBX_FLAG_DISCOVERY),
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => 1
 		);
@@ -368,6 +369,7 @@ switch($itemType) {
 			$options = array(
 				'hostids' => $hostid,
 				'itemids' => $_REQUEST['itemid'],
+				'filter' => array('flags' => ZBX_FLAG_DISCOVERY),
 				'output' => API_OUTPUT_EXTEND,
 				'editable' => 1,
 			);
@@ -726,7 +728,7 @@ switch($itemType) {
 			$description[] = new CLink($item['description_expanded'], '?form=update&itemid='.$item['itemid']);
 
 
-			$status = new CCol(new CLink(item_status2str($item['status']), '?group_itemid='.$item['itemid'].'&go='.
+			$status = new CCol(new CLink(item_status2str($item['status']), '?hostid='.$_REQUEST['hostid'].'&group_itemid='.$item['itemid'].'&go='.
 				($item['status']? 'activate':'disable'), item_status2style($item['status'])));
 
 

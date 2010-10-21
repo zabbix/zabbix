@@ -351,13 +351,11 @@ switch($itemType) {
 	$items_wdgt = new CWidget();
 
 
+	$form = null;
 	if(!isset($_REQUEST['form'])){
 		$form = new CForm(null, 'get');
 		$form->addVar('parent_discoveryid', $_REQUEST['parent_discoveryid']);
 		$form->addItem(new CButton('form', S_CREATE_RULE));
-	}
-	else{
-		$form = null;
 	}
 	$items_wdgt->addPageHeader(S_CONFIGURATION_OF_PROTOTYPES_BIG, $form);
 
@@ -370,7 +368,7 @@ switch($itemType) {
 		$numrows = new CDiv();
 		$numrows->setAttribute('name', 'numrows');
 
-		$items_wdgt->addHeader(S_PROTOTYPES_OF_BIG.SPACE.$discovery_rule['description'], SPACE);
+		$items_wdgt->addHeader(array(S_PROTOTYPES_OF_BIG.SPACE, new CSpan($discovery_rule['description'], 'discoveryName')));
 		$items_wdgt->addHeader($numrows, SPACE);
 
 		$items_wdgt->addItem(get_header_host_table($_REQUEST['hostid']));
