@@ -28,7 +28,23 @@
 
 #define ZBX_MAX_SQL_SIZE	262144	/* 256KB */
 
-#if defined(HAVE_MYSQL)
+#if defined(HAVE_IBM_DB2)
+
+#	include <sqlcli1.h>
+
+	typedef struct
+	{
+		// FIXME
+	}
+	zbx_ibm_db2_handle_t;
+
+	extern zbx_ibm_db2_handle_t	ibm_db2;
+
+#	define DB_ROW		FIXME
+#	define DB_RESULT	FIXME
+#	define DBfree_result	FIXME
+
+#elif defined(HAVE_MYSQL)
 
 #	include "mysql.h"
 #	include "errmsg.h"
@@ -67,9 +83,9 @@
 	}
 	ZBX_OCI_DB_RESULT;
 
-	void	OCI_DBfree_result(DB_RESULT result);
-	ub4	OCI_DBserver_status();
-	char	*zbx_oci_error(sword status);
+	void		OCI_DBfree_result(DB_RESULT result);
+	ub4		OCI_DBserver_status();
+	const char	*zbx_oci_error(sword status);
 
 #elif defined(HAVE_POSTGRESQL)
 
@@ -119,35 +135,28 @@
 
 	extern PHP_MUTEX	sqlite_access;
 
-#endif /* HAVE_SQLITE3 */
+#endif	/* HAVE_SQLITE3 */
 
 #ifdef HAVE_SQLITE3
 	/* We have to put double % here for sprintf */
-#	define ZBX_SQL_MOD(x,y) #x "%%" #y
+#	define ZBX_SQL_MOD(x, y) #x "%%" #y
 #else
-#	define ZBX_SQL_MOD(x,y) "mod(" #x "," #y ")"
+#	define ZBX_SQL_MOD(x, y) "mod(" #x "," #y ")"
 #endif
 
 int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbsocket, int port);
 void	zbx_db_init(char *host, char *user, char *password, char *dbname, char *dbsocket, int port);
-
 void    zbx_db_close();
 
-int	zbx_db_vexecute(const char *fmt, va_list args);
+int	zbx_db_begin();
+int	zbx_db_commit();
+int	zbx_db_rollback();
 
-#ifdef HAVE___VA_ARGS__
-#	define zbx_db_execute(fmt, ...)	__zbx_zbx_db_execute(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#else
-#	define zbx_db_execute __zbx_zbx_db_execute
-#endif /* HAVE___VA_ARGS__ */
-int	__zbx_zbx_db_execute(const char *fmt, ...);
-
+int		zbx_db_vexecute(const char *fmt, va_list args);
 DB_RESULT	zbx_db_vselect(const char *fmt, va_list args);
 DB_RESULT	zbx_db_select_n(const char *query, int n);
+
 DB_ROW		zbx_db_fetch(DB_RESULT result);
 int		zbx_db_is_null(const char *field);
-int		zbx_db_begin();
-int		zbx_db_commit();
-int		zbx_db_rollback();
 
 #endif
