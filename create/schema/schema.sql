@@ -1023,6 +1023,7 @@ TABLE|interface|interfaceid|ZBX_SYNC
 FIELD		|interfaceid	|t_id		|	|NOT NULL	|0
 FIELD		|hostid		|t_id		|	|NOT NULL	|0	|1	|hosts	|hostid		|RESTRICT
 FIELD		|itemtype		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|default		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|dns		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|useip		|t_integer	|'1'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|ip		|t_varchar(39)	|'127.0.0.1'|NOT NULL	|ZBX_SYNC,ZBX_PROXY
