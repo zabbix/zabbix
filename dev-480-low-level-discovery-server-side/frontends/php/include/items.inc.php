@@ -265,7 +265,8 @@
 				'params'		=> '',
 				'ipmi_sensor'		=> '',
 				'applications'		=> array(),
-				'templateid'		=> 0
+				'templateid'		=> 0,
+				'flags' => 0,
 		);
 
 		if(!check_db_fields($item_db_fields, $item)){
