@@ -329,7 +329,7 @@ include_once('include/page_header.php');
 			$table_map->addRow(S_PROBLEM_DISPLAY, $selectShowUnack);
 
 			$url_table = new Ctable();
-			$url_table->setHeader(array(S_NAME, S_URL_C, S_ELEMENT, SPACE));
+			$url_table->setHeader(array(S_NAME, S_URL, S_ELEMENT, SPACE));
 
 			if(empty($urls)){
 				$urls[] = array('name' => '', 'url' => '', 'elementtype' => 0);
