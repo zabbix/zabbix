@@ -1048,8 +1048,13 @@ switch($itemType) {
 				$description[] = new CLink($item['description_expanded'], '?form=update&itemid='.$item['itemid']);
 			}
 
-			$status = new CCol(new CLink(item_status2str($item['status']), '?group_itemid='.$item['itemid'].'&go='.
-				($item['status']? 'activate':'disable'), item_status2style($item['status'])));
+			if(empty($item['discoveryRule'])){
+				$status = new CCol(new CLink(item_status2str($item['status']), '?group_itemid='.$item['itemid'].'&go='.
+					($item['status']? 'activate':'disable'), item_status2style($item['status'])));
+			}
+			else{
+				$status = new CCol(new CSpan(item_status2str($item['status']), item_status2style($item['status'])));
+			}
 
 
 			if(zbx_empty($item['error'])){
@@ -1169,8 +1174,11 @@ switch($itemType) {
 				$menuicon = SPACE;
 			}
 
+			$cb = new CCheckBox('group_itemid['.$item['itemid'].']',null,null,$item['itemid']);
+			$cb->setEnabled(empty($item['discoveryRule']));
+
 			$table->addRow(array(
-				new CCheckBox('group_itemid['.$item['itemid'].']',null,null,$item['itemid']),
+				$cb,
 				$menuicon,
 				$host,
 				$description,

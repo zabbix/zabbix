@@ -104,12 +104,11 @@ include_once('include/page_header.php');
 	$_REQUEST['go'] = get_request('go','none');
 
 // PERMISSIONS
-	$parent_discoveryid = get_request('parent_discoveryid');
-	if($parent_discoveryid){
+	if(get_request('parent_discoveryid')){
 		$options = array(
 			'itemids' => $_REQUEST['parent_discoveryid'],
 			'output' => API_OUTPUT_EXTEND,
-			'filter' => array('flags' => null),
+			'filter' => array('flags' => ZBX_FLAG_DISCOVERY),
 			'editable' => 1
 		);
 		$discovery_rule = CItem::get($options);
@@ -117,15 +116,8 @@ include_once('include/page_header.php');
 		if(!$discovery_rule) access_deny();
 		$_REQUEST['hostid'] = $discovery_rule['hostid'];
 	}
-	else if(get_request('hostid', 0) > 0){
-		$options = array(
-			'hostids' => $_REQUEST['hostid'],
-			'extendoutput' => 1,
-			'templated_hosts' => 1,
-			'editable' => 1
-		);
-		$hosts = CHost::get($options);
-		if(empty($hosts)) access_deny();
+	else{
+		access_deny();
 	}
 ?>
 <?php
@@ -372,7 +364,7 @@ include_once('include/page_header.php');
 		$form->addItem(new CButton('form', S_CREATE_TRIGGER));
 	}
 
-	$triggers_wdgt->addPageHeader(S_CONFIGURATION_OF_TRIGGERS_BIG, $form);
+	$triggers_wdgt->addPageHeader(S_CONFIGURATION_OF_TRIGGERS_PROTOTYPES_BIG, $form);
 ?>
 <?php
 	if(($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['g_triggerid'])){
@@ -389,7 +381,8 @@ include_once('include/page_header.php');
 		$tr_link = new CLink($showdisabled?S_HIDE_DISABLED_TRIGGERS : S_SHOW_DISABLED_TRIGGERS,
 				'trigger_prototypes.php?showdisabled='.($showdisabled?0:1).'&parent_discoveryid='.$_REQUEST['parent_discoveryid']);
 
-		$triggers_wdgt->addHeader(S_TRIGGERS_BIG);
+
+		$triggers_wdgt->addHeader(array(S_TRIGGER_PROTOTYPES_OF_BIG.SPACE, new CSpan($discovery_rule['description'], 'discoveryName')));
 		$triggers_wdgt->addHeader($numrows, array('[ ',$tr_link,' ]'));
 
 		$triggers_wdgt->addItem(get_header_host_table($_REQUEST['hostid']));
@@ -483,7 +476,7 @@ include_once('include/page_header.php');
 			}
 
 
-			$status_link = 'trigger_prototypess.php?go='.(($trigger['status'] == TRIGGER_STATUS_DISABLED) ? 'activate' : 'disable').
+			$status_link = 'trigger_prototypes.php?go='.(($trigger['status'] == TRIGGER_STATUS_DISABLED) ? 'activate' : 'disable').
 				'&g_triggerid%5B%5D='.$triggerid;
 			if($trigger['status'] == TRIGGER_STATUS_DISABLED){
 				$status = new CLink(S_DISABLED, $status_link, 'disabled');

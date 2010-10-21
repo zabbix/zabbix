@@ -1491,11 +1491,22 @@
 		$frmItem->setAttribute('style','visibility: hidden;');
 		$frmItem->setHelp('web.items.item.php');
 
-		$parent_discoveryid = get_request('parent_discoveryid', false);
-		if($parent_discoveryid)
+		$parent_discoveryid = get_request('parent_discoveryid');
+		if($parent_discoveryid){
 			$frmItem->addVar('parent_discoveryid', $parent_discoveryid);
 
-		$hostid = get_request('form_hostid', 0);
+			$options = array(
+				'itemids' => $parent_discoveryid,
+				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
+				'output' => API_OUTPUT_EXTEND,
+				'editable' => true,
+			);
+			$discoveryRule = CItem::get($options);
+			$discoveryRule = reset($discoveryRule);
+			$hostid = $discoveryRule['hostid'];
+		}
+		else
+			$hostid = get_request('form_hostid', 0);
 
 		$description = get_request('description', '');
 		$key = get_request('key', '');
@@ -1703,7 +1714,8 @@
 				else break;
 			}while($itmid != 0);
 
-			$caption[] = S_ITEM.' "';
+			if($parent_discoveryid)
+			$caption[] = ($parent_discoveryid) ? S_PROTOTYPE.' "' : S_ITEM.' "';
 			$caption = array_reverse($caption);
 			$caption[] = ': ';
 			$caption[] = $item_data['description'];
@@ -2118,7 +2130,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 				array_push($frmRow,
 					SPACE,
 					new CButtonDelete(S_DELETE_SELECTED_ITEM_Q,
-						url_param('form').url_param('groupid').url_param('itemid'))
+						url_param('form').url_param('groupid').url_param('itemid').url_param('parent_discoveryid'))
 				);
 			}
 		}
