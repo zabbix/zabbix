@@ -1172,6 +1172,7 @@
 				' AND h.status='.HOST_STATUS_MONITORED.
 				' AND h.hostid=i.hostid '.
 				' AND i.status='.ITEM_STATUS_ACTIVE.
+				' AND i.flags='.ZBX_FLAG_DISCOVERY_NORMAL.
 			' ORDER BY i.description,i.itemid');
 
 		unset($items);

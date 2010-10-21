@@ -671,6 +671,13 @@
 			$result &= delete_graph($del_chd_graphs);
 		}
 
+
+		$sql = 'SELECT graphid FROM graph_discovery WHERE '.DBcondition('parent_graphid', $graphids);
+		$db_graphs = DBselect($sql);
+		while($graph = DBfetch($db_graphs)){
+			$graphids[] = $graph['graphid'];
+		}
+
 		DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid',$graphids).' AND resourcetype='.SCREEN_RESOURCE_GRAPH);
 
 // delete graph
