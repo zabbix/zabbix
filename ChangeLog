@@ -1,5 +1,6 @@
 Changes for 1.8.4rc2
 
+ - [ZBX-2630] fixed ability to translate various strings in the frontend depending on their context (Richlv)
  - [ZBX-3091] fixed error when update proxy (Vedmak)
  - [ZBX-3120] fixed error when create new map (Vedmak)
  - [ZBX-3042] fixed submitParent field error (KB)
