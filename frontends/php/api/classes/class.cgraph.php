@@ -1116,7 +1116,7 @@ COpt::memoryPick();
 // }}} EXCEPTION
 
 			$itemids += zbx_objectValues($graph['gitems'], 'itemid');
-			}
+		}
 
 
 		if(!empty($itemids)){
@@ -1156,6 +1156,20 @@ COpt::memoryPick();
 				}
 // }}} EXCEPTION: GRAPH EXISTS
 			}
+
+// PROTOTYPE {{{
+			if($graph['flags'] == ZBX_FLAG_DISCOVERY_CHILD){
+				$has_prototype = false;
+				foreach($graph['gitems'] as $gitem){
+					if($allowed_items[$gitem['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_CHILD){
+						$has_prototype = true;
+					}
+				}
+				if(!$has_prototype){
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph prototype must have at least one prototype');
+				}
+			}
+// }}} PROTOTYPE
 		}
 
 		return true;

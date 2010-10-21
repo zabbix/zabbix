@@ -835,6 +835,29 @@ return $caption;
 			return false;
 		}
 
+
+// kopaem nedo trigger parser shtob naiti dannie po itemam, TODO: peredelatj
+		if($flags != ZBX_FLAG_DISCOVERY_NORMAL){
+			$has_prototype = false;
+			foreach($expressionData as $data){
+				foreach($data['expressions'] as $expr){
+					foreach($expr['parts'] as $part){
+						if($part['levelType'] == 'key'){
+							if($part['levelDBData']['flags'] == ZBX_FLAG_DISCOVERY_CHILD){
+								$has_prototype = true;
+								break 3;
+							}
+						}
+					}
+				}
+			}
+			if(!$has_prototype){
+				error('Trigger prototype should have at least one prototype');
+				return false;
+			}
+		}
+// ---
+
 		$triggerid=get_dbid('triggers','triggerid');
 
 		$result=DBexecute('INSERT INTO triggers '.
@@ -937,7 +960,9 @@ return $caption;
 				$trigger['comments'],
 				$trigger['url'],
 				array(),
-				$copy_mode ? 0 : $triggerid);
+				($copy_mode ? 0 : $triggerid),
+				$trigger['flags']
+			);
 		}
 
 		$newtriggerid=get_dbid('triggers','triggerid');
@@ -1782,7 +1807,7 @@ return $caption;
 	 * Comments: !!! Don't forget sync code with C !!!                            *
 	 *                                                                            *
 	 ******************************************************************************/
-	function update_trigger($triggerid,$expression=NULL,$description=NULL,$type=NULL,$priority=NULL,$status=NULL,$comments=NULL,$url=NULL,$deps=array(),$templateid=0){
+	function update_trigger($triggerid,$expression=NULL,$description=NULL,$type=NULL,$priority=NULL,$status=NULL,$comments=NULL,$url=NULL,$deps=array(),$templateid=0, $flags=0){
 		$trigger	= get_trigger_by_triggerid($triggerid);
 		$trig_hosts	= get_hosts_by_triggerid($triggerid);
 		$trig_host	= DBfetch($trig_hosts);
@@ -1804,6 +1829,30 @@ return $caption;
 			showExpressionErrors($expression, $expressionData[$expression]['errors']);
 			return false;
 		}
+
+// kopaem nedo trigger parser shtob naiti dannie po itemam, TODO: peredelatj
+		if($flags != ZBX_FLAG_DISCOVERY_NORMAL){
+			$has_prototype = false;
+
+			foreach($expressionData as $data){
+				foreach($data['expressions'] as $expr){
+					foreach($expr['parts'] as $part){
+						if($part['levelType'] == 'key'){
+							if($part['levelDBData']['flags'] == ZBX_FLAG_DISCOVERY_CHILD){
+								$has_prototype = true;
+								break 3;
+							}
+						}
+					}
+				}
+			}
+			if(!$has_prototype){
+				error('Trigger prototype should have at least one prototype');
+				return false;
+			}
+		}
+// ---
+
 
 		if(!validate_trigger_dependency($expression, $deps)) return false;
 
@@ -1873,7 +1922,9 @@ return $caption;
 						$comments,
 						$url,
 						replace_template_dependencies($deps, $chd_trig_host['hostid']),
-						$triggerid);
+						$triggerid,
+						$flags
+					);
 				}
 			}
 		}
