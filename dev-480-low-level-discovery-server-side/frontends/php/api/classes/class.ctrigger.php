@@ -1164,7 +1164,8 @@ COpt::memoryPick();
 					'status'	=> TRIGGER_STATUS_DISABLED,
 					'comments'	=> '',
 					'url'		=> '',
-					'templateid'=> 0
+					'templateid'=> 0,
+					'flags' => 0,
 				);
 
 				if(!check_db_fields($trigger_db_fields, $trigger)){
@@ -1180,7 +1181,8 @@ COpt::memoryPick();
 					$trigger['comments'],
 					$trigger['url'],
 					array(),
-					$trigger['templateid']
+					$trigger['templateid'],
+					$trigger['flags']
 				);
 				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Trigger ['.$trigger['description'].' ]: cannot create');
 

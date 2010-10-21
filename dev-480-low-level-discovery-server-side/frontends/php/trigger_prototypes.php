@@ -172,7 +172,7 @@ include_once('include/page_header.php');
 			$result = update_trigger($_REQUEST['triggerid'],
 				$_REQUEST['expression'],$_REQUEST['description'],$type,
 				$_REQUEST['priority'],$status,$_REQUEST['comments'],$_REQUEST['url'],
-				$deps, $triggerData['templateid']);
+				$deps, $triggerData['templateid'], ZBX_FLAG_DISCOVERY_CHILD);
 			$result = DBend($result);
 
 			$triggerid = $_REQUEST['triggerid'];
@@ -319,7 +319,7 @@ include_once('include/page_header.php');
 		$options = array(
 			'triggerids' => $_REQUEST['g_triggerid'],
 			'editable'=>1,
-			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),			
+			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
 			'select_hosts' => API_OUTPUT_EXTEND,
 			'output'=>API_OUTPUT_EXTEND,
 			'expandDescription' => 1
