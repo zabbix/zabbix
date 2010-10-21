@@ -929,7 +929,7 @@ Copt::memoryPick();
 				$discoveryRules = CItem::get($obj_params);
 
 				foreach($result as $triggerid => $trigger){
-					if(isset($discoveryRules[$rule_map[$triggerid]])){
+					if(isset($rule_map[$triggerid]) && isset($discoveryRules[$rule_map[$triggerid]])){
 						$result[$triggerid]['discoveryRule'] = $discoveryRules[$rule_map[$triggerid]];
 					}
 				}

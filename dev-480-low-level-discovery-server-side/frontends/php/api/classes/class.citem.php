@@ -943,7 +943,7 @@ COpt::memoryPick();
 		if(empty($itemids)) return true;
 
 		$itemids = zbx_toArray($itemids);
-		$insert = array();
+		$insert = $discovery_items = $prototype_items = array();
 
 		try{
 			self::BeginTransaction(__METHOD__);
@@ -965,6 +965,13 @@ COpt::memoryPick();
 				}
 				if($del_items[$itemid]['type'] == ITEM_TYPE_HTTPTEST){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete web items');
+				}
+
+				if($del_items[$itemid]['flags'] == ZBX_FLAG_DISCOVERY){
+					$discovery_items[$itemid] = $itemid;
+				}
+				else if($del_items[$itemid]['flags'] == ZBX_FLAG_DISCOVERY_CHILD){
+					$prototype_items[$itemid] = $itemid;
 				}
 			}
 
@@ -1000,6 +1007,26 @@ COpt::memoryPick();
 				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete item');
 			}
 //--
+
+// discovery rules/prototypes
+			if(!empty($discovery_items)){
+				$sql = 'SELECT itemid FROM item_discovery WHERE '.DBcondition('parent_itemid', $discovery_items);
+				$db_prototypes = DBselect($sql);
+				while($prototype = DBfetch($db_prototypes)){
+					$prototype_items[$prototype['itemid']] = $prototype['itemid'];
+					$itemids[] = $prototype['itemid'];
+				}
+			}
+
+			if(!empty($prototype_items)){
+				$sql = 'SELECT itemid FROM item_discovery WHERE '.DBcondition('parent_itemid', $prototype_items);
+				$db_items = DBselect($sql);
+				while($item = DBfetch($db_items)){
+					$itemids[] = $item['itemid'];
+				}
+			}
+// ---
+
 
 			$itemids_condition = DBcondition('itemid', $itemids);
 

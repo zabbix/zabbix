@@ -617,14 +617,24 @@ include_once('include/page_header.php');
 				default: $priority = $trigger['priority'];
 			}
 
-			$status_link = 'triggers.php?go='.(($trigger['status'] == TRIGGER_STATUS_DISABLED) ? 'activate' : 'disable').
-				'&g_triggerid%5B%5D='.$triggerid;
+			if(empty($trigger['discoveryRule'])){
+				$status_link = 'triggers.php?go='.(($trigger['status'] == TRIGGER_STATUS_DISABLED) ? 'activate' : 'disable').
+					'&g_triggerid%5B%5D='.$triggerid;
 
-			if($trigger['status'] == TRIGGER_STATUS_DISABLED){
-				$status = new CLink(S_DISABLED, $status_link, 'disabled');
+				if($trigger['status'] == TRIGGER_STATUS_DISABLED){
+					$status = new CLink(S_DISABLED, $status_link, 'disabled');
+				}
+				else if($trigger['status'] == TRIGGER_STATUS_ENABLED){
+					$status = new CLink(S_ENABLED, $status_link, 'enabled');
+				}
 			}
-			else if($trigger['status'] == TRIGGER_STATUS_ENABLED){
-				$status = new CLink(S_ENABLED, $status_link, 'enabled');
+			else{
+				if($trigger['status'] == TRIGGER_STATUS_DISABLED){
+					$status = new CSpan(S_DISABLED, 'disabled');
+				}
+				else if($trigger['status'] == TRIGGER_STATUS_ENABLED){
+					$status = new CSpan(S_ENABLED, 'enabled');
+				}
 			}
 
 			$hosts = null;
@@ -636,8 +646,11 @@ include_once('include/page_header.php');
 				}
 			}
 
+			$cb = new CCheckBox('g_triggerid['.$triggerid.']', NULL, NULL, $triggerid);
+			$cb->setEnabled(empty($trigger['discoveryRule']));
+
 			$table->addRow(array(
-				new CCheckBox('g_triggerid['.$triggerid.']', NULL, NULL, $triggerid),
+				$cb,
 				$priority,
 				$status,
 				$hosts,

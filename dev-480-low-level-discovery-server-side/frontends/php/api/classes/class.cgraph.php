@@ -80,6 +80,7 @@ class CGraph extends CZBXAPI{
 			'select_hosts'			=> null,
 			'select_items'			=> null,
 			'select_graph_items'	=> null,
+			'selectDiscoveryRule'	=> null,
 			'extendoutput'			=> null,
 			'countOutput'			=> null,
 			'groupCount'			=> null,
@@ -419,6 +420,9 @@ class CGraph extends CZBXAPI{
 					if(!is_null($options['select_items']) && !isset($result[$graph['graphid']]['items'])){
 						$result[$graph['graphid']]['items'] = array();
 					}
+					if(!is_null($options['selectDiscoveryRule']) && !isset($result[$graph['graphid']]['discoveryRule'])){
+						$result[$graph['graphid']]['discoveryRule'] = array();
+					}
 
 // hostids
 					if(isset($graph['hostid']) && is_null($options['select_hosts'])){
@@ -545,6 +549,41 @@ COpt::memoryPick();
 				unset($item['graphs']);
 				foreach($igraphs as $num => $graph){
 					$result[$graph['graphid']]['items'][] = $item;
+				}
+			}
+		}
+
+// Adding discoveryRule
+		if(!is_null($options['selectDiscoveryRule'])){
+			$ruleids = $rule_map = array();
+
+			$sql = 'SELECT id.parent_itemid, gd.graphid'.
+					' FROM graph_discovery gd, item_discovery id,  graphs_items gi'.
+					' WHERE '.DBcondition('gd.graphid', $graphids).
+						' AND gd.parent_graphid=gi.graphid'.
+						' AND gi.itemid=id.itemid';
+			$db_rules = DBselect($sql);
+			while($rule = DBfetch($db_rules)){
+				$ruleids[$rule['parent_itemid']] = $rule['parent_itemid'];
+				$rule_map[$rule['graphid']] = $rule['parent_itemid'];
+			}
+
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'itemids' => $ruleids,
+				'filter' => array('flags' => null),
+				'nopermissions' => 1,
+				'preservekeys' => 1,
+			);
+
+			if(is_array($options['selectDiscoveryRule']) || str_in_array($options['selectDiscoveryRule'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['selectDiscoveryRule'];
+				$discoveryRules = CItem::get($obj_params);
+
+				foreach($result as $graphid => $graph){
+					if(isset($rule_map[$graphid]) && isset($discoveryRules[$rule_map[$graphid]])){
+						$result[$graphid]['discoveryRule'] = $discoveryRules[$rule_map[$graphid]];
+					}
 				}
 			}
 		}

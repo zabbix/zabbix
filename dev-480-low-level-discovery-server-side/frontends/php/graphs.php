@@ -137,7 +137,7 @@ include_once('include/page_header.php');
 				'nodeids'=>get_current_nodeid(true),
 				'itemids'=>$itemids,
 				'webitems'=>1,
-				'editable'=>1
+				'editable'=>1,
 			);
 			$db_items = CItem::get($options);
 			$db_items = zbx_toHash($db_items, 'itemid');
@@ -446,16 +446,9 @@ include_once('include/page_header.php');
 // Change graphtype from numbers to names, for correct sorting
 		if($sortfield == 'graphtype'){
 			foreach($graphs as $gnum => $graph){
-				switch($graph['graphtype']){
-					case GRAPH_TYPE_STACKED: $graphtype = S_STACKED; break;
-					case GRAPH_TYPE_PIE: $graphtype = S_PIE; break;
-					case GRAPH_TYPE_EXPLODED: $graphtype = S_EXPLODED; break;
-					default: $graphtype = S_NORMAL; break;
-				}
-				$graphs[$gnum]['graphtype'] = $graphtype;
+				$graphs[$gnum]['graphtype'] = graphType($graph['graphtype']);
 			}
 		}
-
 // sorting && paging
 		order_result($graphs, $sortfield, $sortorder);
 		$paging = getPagingLine($graphs);
@@ -466,21 +459,15 @@ include_once('include/page_header.php');
 			'graphids' => $graphids,
 			'output' => API_OUTPUT_EXTEND,
 			'select_hosts' => API_OUTPUT_EXTEND,
-			'select_templates' => API_OUTPUT_EXTEND
+			'select_templates' => API_OUTPUT_EXTEND,
+			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 		);
 		$graphs = CGraph::get($options);
 
 // Change graphtype from numbers to names, for correct sorting
 		foreach($graphs as $gnum => $graph){
-			switch($graph['graphtype']){
-				case GRAPH_TYPE_STACKED: $graphtype = S_STACKED; break;
-				case GRAPH_TYPE_PIE: $graphtype = S_PIE; break;
-				case GRAPH_TYPE_EXPLODED: $graphtype = S_EXPLODED; break;
-				default: $graphtype = S_NORMAL; break;
-			}
-			$graphs[$gnum]['graphtype'] = $graphtype;
+			$graphs[$gnum]['graphtype'] = graphType($graph['graphtype']);
 		}
-
 		order_result($graphs, $sortfield, $sortorder);
 
 		foreach($graphs as $gnum => $graph){
@@ -504,6 +491,11 @@ include_once('include/page_header.php');
 				$real_hosts = get_realhosts_by_graphid($graph['templateid']);
 				$real_host = DBfetch($real_hosts);
 				$name[] = new CLink($real_host['host'], 'graphs.php?'.'hostid='.$real_host['hostid'], 'unknown');
+				$name[] = ':'.$graph['name'];
+			}
+
+			if(!empty($graph['discoveryRule'])){
+				$name[] = new CSpan($graph['discoveryRule']['description'], 'discoveryName');
 				$name[] = ':'.$graph['name'];
 			}
 			else{
@@ -538,7 +530,7 @@ include_once('include/page_header.php');
 
 		zbx_add_post_js('chkbxRange.pageGoName = "group_graphid";');
 
-		$footer = get_table_header(new CCol(array($goBox, $goButton)));
+		$footer = get_table_header(array($goBox, $goButton));
 //----
 
 // PAGING FOOTER

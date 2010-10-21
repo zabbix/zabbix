@@ -86,8 +86,7 @@ include_once('include/page_header.php');
 	$_REQUEST['go'] = get_request('go', 'none');
 
 // PERMISSIONS
-	$parent_discoveryid = get_request('parent_discoveryid');
-	if($parent_discoveryid){
+	if(get_request('parent_discoveryid')){
 		$options = array(
 			'itemids' => $_REQUEST['parent_discoveryid'],
 			'output' => API_OUTPUT_EXTEND,
@@ -98,6 +97,9 @@ include_once('include/page_header.php');
 		$discovery_rule = reset($discovery_rule);
 		if(!$discovery_rule) access_deny();
 		$_REQUEST['hostid'] = $discovery_rule['hostid'];
+	}
+	else{
+		access_deny();
 	}
 
 ?>
@@ -266,7 +268,6 @@ include_once('include/page_header.php');
 		}
 	}
 //------ GO -------
-// TODO: delete generated graphs !!!
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_graphid'])){
 		$go_result = CGraph::delete($_REQUEST['group_graphid']);
 		show_messages($go_result, S_GRAPHS_DELETED, S_CANNOT_DELETE_GRAPHS);
@@ -284,7 +285,7 @@ include_once('include/page_header.php');
 	if(!isset($_REQUEST['form'])){
 		$form = new CForm(null, 'get');
 		$form->addItem(new CButton('form', S_CREATE_GRAPH));
-		$form->addVar('parent_discoveryid', $parent_discoveryid);
+		$form->addVar('parent_discoveryid', $_REQUEST['parent_discoveryid']);
 	}
 	else
 		$form = null;
@@ -322,7 +323,7 @@ include_once('include/page_header.php');
 		$numrows = new CDiv();
 		$numrows->setAttribute('name','numrows');
 
-		$graphs_wdgt->addHeader(S_GRAPHS_BIG);
+		$graphs_wdgt->addHeader(array(S_GRAPH_PROTOTYPES_OF_BIG.SPACE, new CSpan($discovery_rule['description'], 'discoveryName')));
 		$graphs_wdgt->addHeader($numrows);
 
 // Header Host
@@ -331,7 +332,7 @@ include_once('include/page_header.php');
 /* TABLE */
 		$form = new CForm();
 		$form->setName('graphs');
-		$form->addVar('parent_discoveryid', $parent_discoveryid);
+		$form->addVar('parent_discoveryid', $_REQUEST['parent_discoveryid']);
 
 		$table = new CTableInfo(S_NO_GRAPHS_DEFINED);
 		$table->setHeader(array(
@@ -376,7 +377,7 @@ include_once('include/page_header.php');
 				$name[] = ':'.$graph['name'];
 			}
 			else{
-				$name[] = new CLink($graph['name'], 'graph_prototypes.php?parent_discoveryid='.$parent_discoveryid.
+				$name[] = new CLink($graph['name'], 'graph_prototypes.php?parent_discoveryid='.$_REQUEST['parent_discoveryid'].
 						'&graphid='.$graphid.'&form=update');
 			}
 

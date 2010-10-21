@@ -177,6 +177,9 @@ switch($itemType) {
 		if(!$discovery_rule) access_deny();
 		$_REQUEST['hostid'] = $discovery_rule['hostid'];
 	}
+	else{
+		access_deny();
+	}
 ?>
 <?php
 /* AJAX */
@@ -355,7 +358,7 @@ switch($itemType) {
 	if(!isset($_REQUEST['form'])){
 		$form = new CForm(null, 'get');
 		$form->addVar('parent_discoveryid', $_REQUEST['parent_discoveryid']);
-		$form->addItem(new CButton('form', S_CREATE_RULE));
+		$form->addItem(new CButton('form', S_CREATE_PROTOTYPE));
 	}
 	$items_wdgt->addPageHeader(S_CONFIGURATION_OF_PROTOTYPES_BIG, $form);
 
@@ -418,8 +421,8 @@ switch($itemType) {
 			$item['description_expanded'] = item_description($item);
 			$description[] = new CLink($item['description_expanded'], '?form=update&itemid='.$item['itemid'].'&parent_discoveryid='.$_REQUEST['parent_discoveryid']);
 
-			$status = new CCol(new CLink(item_status2str($item['status']), '?group_itemid='.$item['itemid'].'&go='.
-				($item['status']? 'activate':'disable'), item_status2style($item['status'])));
+			$status = new CCol(new CLink(item_status2str($item['status']), '?group_itemid='.$item['itemid'].'&parent_discoveryid='.$_REQUEST['parent_discoveryid'].
+					'&go='.($item['status']? 'activate':'disable'), item_status2style($item['status'])));
 
 
 			if(zbx_empty($item['error'])){
