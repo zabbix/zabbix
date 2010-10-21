@@ -28,113 +28,110 @@
 
 #define ZBX_MAX_SQL_SIZE	262144	/* 256KB */
 
-#ifdef HAVE_MYSQL
+#if defined(HAVE_MYSQL)
+
 #	include "mysql.h"
 #	include "errmsg.h"
 #	include "mysqld_error.h"
-#	define	DB_HANDLE	MYSQL
-extern MYSQL	*conn;
-#endif /* HAVE_MYSQL */
 
-#ifdef HAVE_ORACLE
+	extern MYSQL	*conn;
+
+#	define DB_ROW		MYSQL_ROW
+#	define DB_RESULT	MYSQL_RES *
+#	define DBfree_result	mysql_free_result
+
+#elif defined(HAVE_ORACLE)
+
 #	include "oci.h"
-typedef struct zbx_oracle_db_handle_s {
-	OCIEnv *envhp;
-	OCIError *errhp;
-	OCISvcCtx *svchp;
-	OCIServer *srvhp;
-} zbx_oracle_db_handle_t;
 
-extern zbx_oracle_db_handle_t oracle;
-#endif /* HAVE_ORACLE */
-
-#ifdef HAVE_POSTGRESQL
-#	include <libpq-fe.h>
-extern PGconn	*conn;
-#endif /* HAVE_POSTGRESQL */
-
-#ifdef HAVE_SQLITE3
-#	include <sqlite3.h>
-extern sqlite3		*conn;
-#endif /* HAVE_SQLITE3 */
-
-#ifdef HAVE_SQLITE3
-/* We have to put double % here for sprintf */
-#	define ZBX_SQL_MOD(x,y) #x "%%" #y
-#else
-#	define ZBX_SQL_MOD(x,y) "mod(" #x "," #y ")"
-#endif
-
-#ifdef HAVE_SQLITE3
-
-	#include "mutexs.h"
-
-	#define DB_ROW		char **
-	#define	DB_RESULT	ZBX_SQ_DB_RESULT*
-	#define	DBfree_result	SQ_DBfree_result
-
-	typedef struct zbx_sq_db_result_s
+	typedef struct
 	{
-		int		curow;
-		char		**data;
-		int		nrow;
-		int		ncolumn;
+		OCIEnv		*envhp;
+		OCIError	*errhp;
+		OCISvcCtx	*svchp;
+		OCIServer	*srvhp;
+	}
+	zbx_oracle_db_handle_t;
+	
+	extern zbx_oracle_db_handle_t	oracle;
 
-		DB_ROW		values;
-	} ZBX_SQ_DB_RESULT;
+#	define DB_ROW		char **
+#	define DB_RESULT	ZBX_OCI_DB_RESULT *
+#	define DBfree_result	OCI_DBfree_result
 
-void	SQ_DBfree_result(DB_RESULT result);
+	typedef struct
+	{
+		OCIStmt	*stmthp;
+		int 	ncolumn;
+		DB_ROW	values;
+	}
+	ZBX_OCI_DB_RESULT;
 
-	extern PHP_MUTEX	sqlite_access;
+	void	OCI_DBfree_result(DB_RESULT result);
+	ub4	OCI_DBserver_status();
+	char	*zbx_oci_error(sword status);
 
-#endif
+#elif defined(HAVE_POSTGRESQL)
 
-#ifdef HAVE_MYSQL
-	#define	DB_RESULT	MYSQL_RES *
-	#define	DBfree_result	mysql_free_result
-	#define DB_ROW		MYSQL_ROW
-#endif
+#	include <libpq-fe.h>
 
-#ifdef HAVE_POSTGRESQL
-	#define DB_ROW		char **
-	#define	DB_RESULT	ZBX_PG_DB_RESULT*
-	#define	DBfree_result	PG_DBfree_result
+	extern PGconn	*conn;
 
-	typedef struct zbx_pg_db_result_s
+#	define DB_ROW		char **
+#	define DB_RESULT	ZBX_PG_DB_RESULT *
+#	define DBfree_result	PG_DBfree_result
+
+	typedef struct
 	{
 		PGresult	*pg_result;
 		int		row_num;
 		int		fld_num;
 		int		cursor;
 		DB_ROW		values;
-	} ZBX_PG_DB_RESULT;
+	}
+	ZBX_PG_DB_RESULT;
 
-void	PG_DBfree_result(DB_RESULT result);
+	void	PG_DBfree_result(DB_RESULT result);
 
-#endif
+#elif defined(HAVE_SQLITE3)
 
-#ifdef HAVE_ORACLE
-	#define	DB_RESULT ZBX_OCI_DB_RESULT*
-	#define	DBfree_result OCI_DBfree_result
-	#define DB_ROW		char **
+#	include <sqlite3.h>
 
-	typedef struct zbx_oci_db_result_s
+	extern sqlite3		*conn;
+
+#	define DB_ROW		char **
+#	define DB_RESULT	ZBX_SQ_DB_RESULT *
+#	define DBfree_result	SQ_DBfree_result
+
+	typedef struct
 	{
-		OCIStmt	*stmthp;
-		int 	ncolumn;
-		DB_ROW	values;
-	} ZBX_OCI_DB_RESULT;
+		int		curow;
+		char		**data;
+		int		nrow;
+		int		ncolumn;
+		DB_ROW		values;
+	}
+	ZBX_SQ_DB_RESULT;
 
-	void	OCI_DBfree_result(DB_RESULT result);
-	ub4	OCI_DBserver_status();
-	char*	zbx_oci_error(sword status);
+	void	SQ_DBfree_result(DB_RESULT result);
+
+#	include "mutexs.h"
+
+	extern PHP_MUTEX	sqlite_access;
+
+#endif /* HAVE_SQLITE3 */
+
+#ifdef HAVE_SQLITE3
+	/* We have to put double % here for sprintf */
+#	define ZBX_SQL_MOD(x,y) #x "%%" #y
+#else
+#	define ZBX_SQL_MOD(x,y) "mod(" #x "," #y ")"
 #endif
 
 int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbsocket, int port);
 void	zbx_db_init(char *host, char *user, char *password, char *dbname, char *dbsocket, int port);
 
-void    zbx_db_close(void);
-void    zbx_db_vacuum(void);
+void    zbx_db_close();
 
 int	zbx_db_vexecute(const char *fmt, va_list args);
 

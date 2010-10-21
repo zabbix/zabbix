@@ -551,7 +551,7 @@ COpt::savesqlrequest(microtime(true)-$time_start,$query);
 						error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 					}
 					else{
-						/* It should be here. The function must return boolen */
+						/* It should be here. The function must return boolean */
 						$result = true;
 					}
 				break;
@@ -566,7 +566,7 @@ COpt::savesqlrequest(microtime(true)-$time_start,$query);
 						error('SQL error ['.$query.'] in ['.$e.']');
 					}
 					else{
-						/* It should be here. The function must return boolen */
+						/* It should be here. The function must return boolean */
 						$result = true;
 					}
 				break;

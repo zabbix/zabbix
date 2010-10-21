@@ -44,9 +44,9 @@ static int	txn_init = 0;
 
 #ifdef	HAVE_ORACLE
 	zbx_oracle_db_handle_t	oracle;
-#endif /* HAVE_ORACLE */
+#endif
 
-void	zbx_db_close(void)
+void	zbx_db_close()
 {
 #ifdef	HAVE_MYSQL
 	mysql_close(conn);
@@ -59,29 +59,30 @@ void	zbx_db_close(void)
 #ifdef	HAVE_ORACLE
 	if (oracle.svchp)
 	{
-		(void) OCILogoff(oracle.svchp, oracle.errhp);
+		(void)OCILogoff(oracle.svchp, oracle.errhp);
 		oracle.svchp = NULL;
 	}
 
-	if (oracle.errhp) {
-		(void) OCIHandleFree(oracle.errhp, OCI_HTYPE_ERROR);
+	if (oracle.errhp)
+	{
+		(void)OCIHandleFree(oracle.errhp, OCI_HTYPE_ERROR);
 		oracle.errhp = NULL;
 	}
 
 	if (oracle.envhp) {
-		(void) OCIHandleFree((dvoid *) oracle.envhp, OCI_HTYPE_ENV);
+		(void)OCIHandleFree((dvoid *)oracle.envhp, OCI_HTYPE_ENV);
 		oracle.envhp = NULL;
 	}
 
-	if (oracle.srvhp) {
-		(void) OCIHandleFree(oracle.srvhp, OCI_HTYPE_SERVER);
+	if (oracle.srvhp)
+	{
+		(void)OCIHandleFree(oracle.srvhp, OCI_HTYPE_SERVER);
 		oracle.srvhp = NULL;
 	}
 #endif /* HAVE_ORACLE */
 #ifdef	HAVE_SQLITE3
 	sqlite3_close(conn);
 	conn = NULL;
-/*	php_sem_remove(&sqlite_access); */
 #endif
 }
 #if HAVE_ORACLE
@@ -400,7 +401,7 @@ static DB_RESULT	__zbx_zbx_db_select(const char *fmt, ...)
  * Comments: Do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_db_begin(void)
+int	zbx_db_begin()
 {
 	int	rc = ZBX_DB_OK;
 
@@ -446,7 +447,7 @@ int	zbx_db_begin(void)
  * Comments: Do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_db_commit(void)
+int	zbx_db_commit()
 {
 	int	rc = ZBX_DB_OK;
 
@@ -488,7 +489,7 @@ int	zbx_db_commit(void)
  * Comments: Do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_db_rollback(void)
+int	zbx_db_rollback()
 {
 	int	rc = ZBX_DB_OK;
 
