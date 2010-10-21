@@ -39,6 +39,7 @@ extern int	CONFIG_POLLER_FORKS;
 extern int	CONFIG_IPMIPOLLER_FORKS;
 extern int	CONFIG_PINGER_FORKS;
 extern int	CONFIG_REFRESH_UNSUPPORTED;
+extern int	CONFIG_NS_SUPPORT;
 extern int	CONFIG_UNAVAILABLE_DELAY;
 extern int	CONFIG_UNREACHABLE_PERIOD;
 extern int	CONFIG_UNREACHABLE_DELAY;
@@ -106,7 +107,7 @@ DC_ITEM
 	char		password_orig[ITEM_PASSWORD_LEN_MAX], *password;
 };
 
-void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, AGENT_RESULT *value, int now,
+void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, AGENT_RESULT *value, zbx_timespec_t *ts,
 		int timestamp, char *source, int severity, int logeventid, int lastlogsize, int mtime);
 int	DCsync_history(int sync_type);
 void	init_database_cache(unsigned char p);

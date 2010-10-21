@@ -194,6 +194,8 @@ static int	process_record_event(int sender_nodeid, int nodeid, const ZBX_TABLE *
 			event.value=atoi(buffer);
 		} else if (0 == strcmp(table->fields[f].name, "acknowledged")) {
 			event.acknowledged=atoi(buffer);
+		} else if (0 == strcmp(table->fields[f].name, "ns")) {
+			event.ns = atoi(buffer);
 		}
 	}
 

@@ -490,7 +490,7 @@ static int	trigger_dependent(zbx_uint64_t triggerid)
 }
 
 int	DBupdate_trigger_value(zbx_uint64_t triggerid, int trigger_type, int trigger_value,
-		const char *trigger_error, int new_value, int now, const char *reason)
+		const char *trigger_error, int new_value, zbx_timespec_t *ts, const char *reason)
 {
 	const char	*__function_name = "update_trigger_value";
 	int		ret = SUCCEED;
@@ -500,10 +500,10 @@ int	DBupdate_trigger_value(zbx_uint64_t triggerid, int trigger_type, int trigger
 
 	if (reason == NULL)
 		zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64 " old:%d new:%d now:%d",
-				__function_name, triggerid, trigger_value, new_value, now);
+				__function_name, triggerid, trigger_value, new_value, ts->sec);
 	else
 		zabbix_log(LOG_LEVEL_DEBUG,"In %s() triggerid:" ZBX_FS_UI64 " old:%d new:%d now:%d reason:'%s'",
-				__function_name, triggerid, trigger_value, new_value, now, reason);
+				__function_name, triggerid, trigger_value, new_value, ts->sec, reason);
 
 	switch (trigger_type)
 	{
@@ -532,7 +532,7 @@ int	DBupdate_trigger_value(zbx_uint64_t triggerid, int trigger_type, int trigger
 							"lastchange=%d,"
 							"error=''"
 						" where triggerid=" ZBX_FS_UI64,
-					new_value, now, triggerid);
+					new_value, ts->sec, triggerid);
 			}
 			else
 			{
@@ -542,7 +542,7 @@ int	DBupdate_trigger_value(zbx_uint64_t triggerid, int trigger_type, int trigger
 							"lastchange=%d,"
 							"error='%s'"
 						" where triggerid=" ZBX_FS_UI64,
-					new_value, now, reason_esc, triggerid);
+					new_value, ts->sec, reason_esc, triggerid);
 				zbx_free(reason_esc);
 			}
 
@@ -551,8 +551,9 @@ int	DBupdate_trigger_value(zbx_uint64_t triggerid, int trigger_type, int trigger
 			event.source = EVENT_SOURCE_TRIGGERS;
 			event.object = EVENT_OBJECT_TRIGGER;
 			event.objectid = triggerid;
-			event.clock = now;
+			event.clock = ts->sec;
 			event.value = new_value;
+			event.ns = ts->ns;
 
 			/* Processing event */
 			if (FAIL == (ret = process_event(&event)))
@@ -642,6 +643,7 @@ void	DBupdate_triggers_status_after_restart(void)
 	int		trigger_type, trigger_value, type, lastclock, delay,
 			nextcheck, min_nextcheck, now;
 	const char	*trigger_error;
+	zbx_timespec_t	ts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -703,8 +705,11 @@ void	DBupdate_triggers_status_after_restart(void)
 		if (-1 == min_nextcheck || min_nextcheck >= now)
 			continue;
 
+		ts.sec = min_nextcheck;
+		ts.ns = 0;
+
 		DBupdate_trigger_value(triggerid, trigger_type, trigger_value, trigger_error,
-				TRIGGER_VALUE_UNKNOWN, min_nextcheck, "Zabbix was restarted.");
+				TRIGGER_VALUE_UNKNOWN, &ts, "Zabbix was restarted.");
 	}
 	DBfree_result(result);
 

@@ -60,7 +60,7 @@ static int	poller_num;
  * Comments: can be done in process_data()                                    *
  *                                                                            *
  ******************************************************************************/
-static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double *value_dbl,	/*struct timeb *tp*/int now,
+static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double *value_dbl,	zbx_timespec_t *ts,
 		int ping_result, char *error)
 {
 	DC_ITEM		item;
@@ -75,8 +75,8 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 
 	if (ping_result == NOTSUPPORTED)
 	{
-		DCadd_nextcheck(item.itemid, now, error);	/* update error & status field in items table */
-		DCrequeue_reachable_item(item.itemid, ITEM_STATUS_NOTSUPPORTED, now);
+		DCadd_nextcheck(item.itemid, ts->sec, error);	/* update error & status field in items table */
+		DCrequeue_reachable_item(item.itemid, ITEM_STATUS_NOTSUPPORTED, ts->sec);
 	}
 	else
 	{
@@ -91,9 +91,9 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 			SET_DBL_RESULT(&value, *value_dbl);
 		}
 
-		dc_add_history(item.itemid, item.value_type, &value, now, 0, NULL, 0, 0, 0, 0);
+		dc_add_history(item.itemid, item.value_type, &value, ts, 0, NULL, 0, 0, 0, 0);
 
-		DCrequeue_reachable_item(item.itemid, ITEM_STATUS_ACTIVE, now);
+		DCrequeue_reachable_item(item.itemid, ITEM_STATUS_ACTIVE, ts->sec);
 
 		free_result(&value);
 	}
@@ -115,7 +115,7 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
  *                                                                            *
  ******************************************************************************/
 static void	process_values(icmpitem_t *items, int first_index, int last_index, ZBX_FPING_HOST *hosts,
-		int hosts_count, /*struct timeb *tp*/int now, int ping_result, char *error)
+		int hosts_count, zbx_timespec_t *ts, int ping_result, char *error)
 {
 	int 	i, h;
 	zbx_uint64_t	value_uint64;
@@ -145,7 +145,7 @@ static void	process_values(icmpitem_t *items, int first_index, int last_index, Z
 				switch (items[i].icmpping) {
 					case ICMPPING:
 						value_uint64 = hosts[h].rcv ? 1 : 0;
-						process_value(items[i].itemid, &value_uint64, NULL, /*tp*/now, ping_result, error);
+						process_value(items[i].itemid, &value_uint64, NULL, ts, ping_result, error);
 						break;
 					case ICMPPINGSEC:
 						switch (items[i].type) {
@@ -153,11 +153,11 @@ static void	process_values(icmpitem_t *items, int first_index, int last_index, Z
 							case ICMPPINGSEC_MAX : value_dbl = hosts[h].max; break;
 							case ICMPPINGSEC_AVG : value_dbl = hosts[h].avg; break;
 						}
-						process_value(items[i].itemid, NULL, &value_dbl, /*tp*/now, ping_result, error);
+						process_value(items[i].itemid, NULL, &value_dbl, ts, ping_result, error);
 						break;
 					case ICMPPINGLOSS:
 						value_dbl = 100 * (1 - (double)hosts[h].rcv / (double)items[i].count);
-						process_value(items[i].itemid, NULL, &value_dbl, /*tp*/now, ping_result, error);
+						process_value(items[i].itemid, NULL, &value_dbl, ts, ping_result, error);
 						break;
 				}
 			}
@@ -426,8 +426,7 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count)
 	static int		hosts_alloc = 4;
 	int			hosts_count = 0;
 
-	/*struct timeb	tp;*/
-	int	now;
+	zbx_timespec_t		ts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_pinger_hosts()");
 
@@ -443,13 +442,12 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count)
 		{
 			zbx_setproctitle("pinger [pinging hosts]");
 
-			/*ftime(&tp);*/
-			now = time( NULL );
+			zbx_timespec(&ts);
 			ping_result = do_ping(hosts, hosts_count,
 						items[i].count, items[i].interval, items[i].size, items[i].timeout,
 						error, sizeof(error));
 
-			process_values(items, first_index, i + 1, hosts, hosts_count, /*&tp*/now, ping_result, error);
+			process_values(items, first_index, i + 1, hosts, hosts_count, &ts, ping_result, error);
 
 			hosts_count = 0;
 			first_index = i + 1;

@@ -56,6 +56,7 @@ static int process_value(zbx_uint64_t itemid, AGENT_RESULT *value)
 	DB_RESULT	result;
 	DB_ROW		row;
 	unsigned char	value_type;
+	zbx_timespec_t	ts;
 
 	INIT_CHECK_MEMORY();
 
@@ -88,7 +89,9 @@ static int process_value(zbx_uint64_t itemid, AGENT_RESULT *value)
 
 	value_type = (unsigned char)atoi(row[1]);
 
-	dc_add_history(itemid, value_type, value, time(NULL), 0, NULL, 0, 0, 0, 0);
+	zbx_timespec(&ts);
+
+	dc_add_history(itemid, value_type, value, &ts, 0, NULL, 0, 0, 0, 0);
 
 	DBfree_result(result);
 

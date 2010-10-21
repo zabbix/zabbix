@@ -126,6 +126,7 @@ AC_SEARCH_LIBS(socket, socket)
 #Solaris SNMP requires this
 AC_SEARCH_LIBS(kstat_open, kstat)
 AC_SEARCH_LIBS(gethostbyname, nsl)
+AC_SEARCH_LIBS(clock_gettime, rt)
 #AC_SEARCH_LIBS(__res_query, resolv bind socket)
 #Solaris 8 requires this. It does not have symbol __res_query.
 #AC_SEARCH_LIBS(res_query, resolv bind socket)
@@ -280,6 +281,22 @@ if test -r /proc/net/dev; then
 else
 	AC_MSG_RESULT(no)
 fi
+
+dnl Check for function clock_gettime in time.h
+AC_MSG_CHECKING(for clock_gettime in time.h)
+AC_TRY_LINK([
+#ifdef HAVE_TIME_H
+#	include <time.h>
+#elif HAVE_SYS_TIME_H
+#	include <sys/time.h>
+#endif	/* HAVE_SYS_TIME_H */
+],
+[struct timespec tp;
+clock_gettime(CLOCK_REALTIME, &tp);
+],
+AC_DEFINE(HAVE_TIME_CLOCK_GETTIME,1,[Define to 1 if function 'clock_gettime' exist.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
 
 dnl Check for mem_unit in struct sysinfo
 AC_MSG_CHECKING(for mem_unit in struct sysinfo)
