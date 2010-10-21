@@ -128,7 +128,7 @@ class CProxy extends CZBXAPI{
 
 // extendoutput
 		if($options['output'] == API_OUTPUT_EXTEND){
-			$sql_parts['select']['hosts'] = 'h.hostid, h.host, h.status';
+			$sql_parts['select']['hosts'] = 'h.hostid, h.host, h.status, h.lastaccess';
 		}
 
 // countOutput

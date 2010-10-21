@@ -170,7 +170,7 @@ include_once('include/page_header.php');
 		$parent_discoveryid = get_request('parent_discoveryid', false);
 		if($parent_discoveryid){
 			$btnSelect = new CButton('btn1',S_SELECT,
-				"return PopUp('popup.php?writeonly=1&dstfrm=".$frmGItem->GetName().
+				"return PopUp('popup.php?writeonly=1&templated_hosts=1&dstfrm=".$frmGItem->GetName().
 						"&dstfld1=itemid&dstfld2=description&".
 						"srctbl=prototypes&srcfld1=itemid&srcfld2=description&parent_discoveryid=".$parent_discoveryid.
 						"', 800, 600);",

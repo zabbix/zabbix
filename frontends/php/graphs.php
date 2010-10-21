@@ -191,7 +191,7 @@ include_once('include/page_header.php');
 				'show_work_period' => get_request('showworkperiod',0),
 				'show_triggers' => get_request('showtriggers',0),
 				'graphtype' => $_REQUEST['graphtype'],
-				'show_legend' => get_request('legend', 0),
+				'show_legend' => get_request('legend', 1),
 				'show_3d' => get_request('graph3d', 0),
 				'percent_left' => $percent_left,
 				'percent_right' => $percent_right,
@@ -353,6 +353,7 @@ include_once('include/page_header.php');
 
 // Config
 	if(!isset($_REQUEST['form'])){
+		$form->cleanItems();
 		$form->addItem(new CButton('form', S_CREATE_GRAPH));
 	}
 
@@ -371,7 +372,8 @@ include_once('include/page_header.php');
 			$table->addRow(new CImg('chart7.php?period=3600'.url_param('name').
 					url_param('legend').url_param('graph3d').url_param('width').
 					url_param('height').url_param('graphtype').url_param('items')));
-		}else if($dataValid){
+		}
+		else if($dataValid){
 			$table->addRow(new CImg('chart3.php?period=3600'.url_param('name').url_param('width').url_param('height').
 				url_param('ymin_type').url_param('ymax_type').url_param('yaxismin').url_param('yaxismax').
 				url_param('ymin_itemid').url_param('ymax_itemid').
@@ -427,7 +429,7 @@ include_once('include/page_header.php');
 		if($pageFilter->hostsSelected){
 			$options = array(
 				'editable' => 1,
-				'extendoutput' => 1,
+				'output' => array('graphid', 'name', 'graphtype'),
 				'sortfield' => $sortfield,
 				'sortorder' => $sortorder,
 				'limit' => ($config['search_limit']+1)
@@ -439,6 +441,19 @@ include_once('include/page_header.php');
 				$options['groupids'] = $pageFilter->groupid;
 
 			$graphs = CGraph::get($options);
+		}
+
+// Change graphtype from numbers to names, for correct sorting
+		if($sortfield == 'graphtype'){
+			foreach($graphs as $gnum => $graph){
+				switch($graph['graphtype']){
+					case GRAPH_TYPE_STACKED: $graphtype = S_STACKED; break;
+					case GRAPH_TYPE_PIE: $graphtype = S_PIE; break;
+					case GRAPH_TYPE_EXPLODED: $graphtype = S_EXPLODED; break;
+					default: $graphtype = S_NORMAL; break;
+				}
+				$graphs[$gnum]['graphtype'] = $graphtype;
+			}
 		}
 
 // sorting && paging
@@ -455,21 +470,13 @@ include_once('include/page_header.php');
 		);
 		$graphs = CGraph::get($options);
 
-		// Change graphtype from numbers to names, for correct sorting
+// Change graphtype from numbers to names, for correct sorting
 		foreach($graphs as $gnum => $graph){
 			switch($graph['graphtype']){
-				case GRAPH_TYPE_STACKED:
-					$graphtype = S_STACKED;
-				break;
-				case GRAPH_TYPE_PIE:
-					$graphtype = S_PIE;
-				break;
-				case GRAPH_TYPE_EXPLODED:
-					$graphtype = S_EXPLODED;
-				break;
-				default:
-					$graphtype = S_NORMAL;
-				break;
+				case GRAPH_TYPE_STACKED: $graphtype = S_STACKED; break;
+				case GRAPH_TYPE_PIE: $graphtype = S_PIE; break;
+				case GRAPH_TYPE_EXPLODED: $graphtype = S_EXPLODED; break;
+				default: $graphtype = S_NORMAL; break;
 			}
 			$graphs[$gnum]['graphtype'] = $graphtype;
 		}

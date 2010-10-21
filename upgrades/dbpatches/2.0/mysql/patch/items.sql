@@ -1,7 +1,5 @@
 ALTER TABLE items MODIFY itemid bigint unsigned NOT NULL,
 		  MODIFY hostid bigint unsigned NOT NULL,
-		  MODIFY lastvalue text NULL,
-		  MODIFY prevvalue text NULL,
 		  MODIFY units varchar(255) DEFAULT '' NOT NULL,
 		  MODIFY templateid bigint unsigned NULL,
 		  MODIFY valuemapid bigint unsigned NULL,
