@@ -1158,7 +1158,7 @@ COpt::memoryPick();
 			}
 
 // PROTOTYPE {{{
-			if($graph['flags'] == ZBX_FLAG_DISCOVERY_CHILD){
+			if(isset($graph['flags']) && ($graph['flags'] == ZBX_FLAG_DISCOVERY_CHILD)){
 				$has_prototype = false;
 				foreach($graph['gitems'] as $gitem){
 					if($allowed_items[$gitem['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_CHILD){

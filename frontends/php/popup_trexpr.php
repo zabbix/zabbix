@@ -422,15 +422,19 @@ if(form){
 	$form->addVar('dstfld1', $dstfld1);
 	$form->addVar('itemid',$itemid);
 
-	$form->addRow(S_ITEM, array(
+	$row = array(
 		new CTextBox('description', $description, 50, 'yes'),
 		new CButton('select', S_SELECT, "return PopUp('popup.php?dstfrm=".$form->GetName().
 				"&dstfld1=itemid&dstfld2=description&submitParent=1&".
 				"srctbl=items&srcfld1=itemid&srcfld2=description',0,0,'zbx_popup_item');"),
-		new CButton('select', S_SELECT_PROTOTYPE, "return PopUp('popup.php?dstfrm=".$form->GetName().
+	);
+	if(get_request('parent_discoveryid')){
+		$row[] = new CButton('select', S_SELECT_PROTOTYPE, "return PopUp('popup.php?dstfrm=".$form->GetName().
 				"&dstfld1=itemid&dstfld2=description&submitParent=1".url_param('parent_discoveryid', true).
-				"&srctbl=prototypes&srcfld1=itemid&srcfld2=description',0,0,'zbx_popup_item');"),
-		));
+				"&srctbl=prototypes&srcfld1=itemid&srcfld2=description',0,0,'zbx_popup_item');");
+	}
+
+	$form->addRow(S_ITEM, $row);
 
 	$cmbFnc = new CComboBox('expr_type', $expr_type	, 'submit()');
 	$cmbFnc->addStyle('width: auto;');

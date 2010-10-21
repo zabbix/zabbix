@@ -2681,7 +2681,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$row = array($exprtxt,
 			 new CButton('insert',$input_method == IM_TREE ? S_EDIT : S_SELECT,
 						 "return PopUp('popup_trexpr.php?dstfrm=".$frmTrig->getName().
-						 "&dstfld1=${exprfname}&srctbl=expression&parent_discoveryid=".$parent_discoveryid.
+						 "&dstfld1=${exprfname}&srctbl=expression".url_param('parent_discoveryid').
 						 "&srcfld1=expression&expression=' + escape($exprparam),1000,700);"));
 
 		if(isset($macrobtn)) array_push($row, $macrobtn);
