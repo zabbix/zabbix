@@ -1755,7 +1755,6 @@
 	'S_DEPENDS_ON'=>			'Depends on',
 	'S_DEPENDENT'=>				'Dependent',
 	'S_URL'=>				'URL',
-	'S_URL_C'=>				'Url',
 	'S_INVALID_URL_PARAMS'=>		'Zabbix has received an incorrect request',
 	'S_CREATE_TRIGGER'=>			'Create Trigger',
 	'S_INSERT'=>				'Insert',
