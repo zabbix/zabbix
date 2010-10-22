@@ -217,6 +217,7 @@ switch($itemType) {
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("filter"=={favobj})')
 	);
 
+
 	check_fields($fields);
 	validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
@@ -426,8 +427,6 @@ switch($itemType) {
 			'data_type'		=> get_request('data_type'),
 			'description'		=> get_request('description')
 		);
-
-		sdii($item);
 
 		if(isset($_REQUEST['itemid'])){
 			DBstart();

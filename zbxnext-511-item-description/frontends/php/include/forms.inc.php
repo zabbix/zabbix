@@ -2293,7 +2293,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 		$description_ta = new CTextArea('description', $description);
 
-		$frmItem->addRow(S_NAME, $description_ta);
+		$frmItem->addRow(S_DESCRIPTION, $description_ta);
 
 		$new_app = new CTextBox('new_application', $new_application, 40);
 		$frmItem->addRow(S_NEW_APPLICATION, $new_app, 'new');
@@ -3014,7 +3014,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		}
 		$frmTrig->addRow(S_SEVERITY,$cmbPrior);
 
-		$frmTrig->addRow(S_NAME,new CTextArea("description",$description,90,7));
+		$frmTrig->addRow(S_DESCRIPTION,new CTextArea("description",$description,90,7));
 		$frmTrig->addRow(S_URL,new CTextBox("url",$url,90));
 		$frmTrig->addRow(S_DISABLED,new CCheckBox("status",$status));
 
