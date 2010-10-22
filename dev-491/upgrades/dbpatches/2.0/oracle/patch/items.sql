@@ -15,3 +15,6 @@ DELETE FROM items WHERE NOT hostid IN (SELECT hostid FROM hosts);
 ALTER TABLE items ADD CONSTRAINT c_items_1 FOREIGN KEY (hostid) REFERENCES hosts (hostid) ON DELETE CASCADE;
 ALTER TABLE items ADD CONSTRAINT c_items_2 FOREIGN KEY (templateid) REFERENCES items (itemid) ON DELETE CASCADE;
 ALTER TABLE items ADD CONSTRAINT c_items_3 FOREIGN KEY (valuemapid) REFERENCES valuemaps (valuemapid);
+ALTER TABLE items ADD CONSTRAINT c_items_4 FOREIGN KEY (interfaceid) REFERENCES interface (interfaceid);
+UPDATE items SET interfaceid=(SELECT interfaceid FROM interface WHERE hostid=items.hostid AND itemtype=0 AND main=1) WHERE type<>12;
+UPDATE items SET interfaceid=(SELECT interfaceid FROM interface WHERE hostid=items.hostid AND itemtype=12 AND main=1) WHERE type=12;
