@@ -48,6 +48,7 @@ const char	*help_message[] = {
 	"                                       Specify - in <hostname> to use hostname from configuration file or --host argument",
 	"  -T --with-timestamps                 Each line of file contains whitespace delimited: <hostname> <key> <timestamp> <value>",
 	"                                       This can be used with --input-file option",
+	"                                       Timestamp should be specified in Unix timestamp format",
 	"  -r --real-time                       Send metrics one by one as soon as they are received",
 	"                                       This can be used when reading from standard input",
 	"",
@@ -382,10 +383,10 @@ int main(int argc, char **argv)
 {
 	FILE	*in;
 
-	char	in_line[MAX_BUF_LEN],
+	char	in_line[MAX_BUFFER_LEN],
 		hostname[MAX_STRING_LEN],
 		key[MAX_STRING_LEN],
-		key_value[MAX_BUF_LEN],
+		key_value[MAX_BUFFER_LEN],
 		clock[32];
 
 	int	task = ZBX_TASK_START,

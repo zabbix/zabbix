@@ -1,5 +1,7 @@
 Changes for 1.9
 
+ - [ZBX-3097] fixed nanosecond related bug in messaging (KB)
+ - [DEV-490] made graph legend optional (Aly)
  - [DEV-483] added templated screens (Aly)
  - [DEV-485] added multiple urls for map elements (Vedmak)
  - [ZBX-3045] fixed deleting mediatype (Vedmak)
@@ -13,6 +15,13 @@ Changes for 1.9
 
 Changes for 1.8.4rc2
 
+ - [ZBX-2630] fixed ability to translate various strings in the frontend depending on their context (Richlv)
+ - [ZBX-3091] fixed error when update proxy (Vedmak)
+ - [ZBX-3042] fixed submitParent field error (KB)
+ - [ZBX-1038] fixed last(), prev(), diff(), change(), and abschange() not working properly with long textual values (asaveljevs)
+ - [ZBXNEXT-532] specify timestamp format in zabbix_sender manpage and help output; hint at required item configuration in zabbix_sender manpage (Richlv)
+ - [ZBX-3103] updated French translation; thanks to Alixen (Richlv)
+ - [ZBX-3095] fixed processing of 'Host template' condition in actions (Sasha)
  - [ZBX-2981] removed unnecessary queries in map permission checks (Vedmak)
  - [ZBX-3080] fixed javascript not cached by browsers (Vedmak)
  - [ZBX-2661] improved displaying discovery checks in configuration (Vedmak)

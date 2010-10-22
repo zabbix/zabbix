@@ -1298,7 +1298,7 @@ function getPagingLine(&$items, $autotrim=true){
 	$table = BR();
 	if($cnt_pages > 1){
 		if($startPage > 1){
-			$pagespan = new CSpan('<< '.S_FIRST, 'darklink');
+			$pagespan = new CSpan('<< '.S_FIRST_PAGE, 'darklink');
 			$pagespan->setAttribute('onclick', 'javascript: openPage(0);');
 
 			$pageline[] = $pagespan;
@@ -1306,7 +1306,7 @@ function getPagingLine(&$items, $autotrim=true){
 		}
 
 		if($crnt_page > 1){
-			$pagespan = new CSpan('< '.S_PREVIOUS, 'darklink');
+			$pagespan = new CSpan('< '.S_PREVIOUS_PAGE, 'darklink');
 			$pagespan->setAttribute('onclick', 'javascript: openPage('.(($crnt_page-2) * $rows_per_page).');');
 
 			$pageline[] = $pagespan;
@@ -1331,7 +1331,7 @@ function getPagingLine(&$items, $autotrim=true){
 		array_pop($pageline);
 
 		if($crnt_page <  $cnt_pages){
-			$pagespan = new CSpan(S_NEXT.' >', 'darklink');
+			$pagespan = new CSpan(S_NEXT_PAGE.' >', 'darklink');
 			$pagespan->setAttribute('onclick', 'javascript: openPage('.($crnt_page * $rows_per_page).');');
 
 			$pageline[] = ' | ';
@@ -1339,7 +1339,7 @@ function getPagingLine(&$items, $autotrim=true){
 		}
 
 		if($p < $cnt_pages){
-			$pagespan = new CSpan(S_LAST.' >>', 'darklink');
+			$pagespan = new CSpan(S_LAST_PAGE.' >>', 'darklink');
 			$pagespan->setAttribute('onclick', 'javascript: openPage('.(($cnt_pages-1) * $rows_per_page).');');
 
 			$pageline[] = '&nbsp;&nbsp;';

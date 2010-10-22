@@ -179,8 +179,9 @@ include_once('include/page_header.php');
 
 		'select'=>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,	null),
 
-		'submitParent'=>	array(T_ZBX_INT, O_OPT, null,   BETWEEN(0,15),	null),
+		'submitParent'=>	array(T_ZBX_INT, O_OPT, null,   IN('0,1'),	null),
 	);
+
 
 	$allowed_item_types = array(ITEM_TYPE_ZABBIX,ITEM_TYPE_ZABBIX_ACTIVE,ITEM_TYPE_SIMPLE,ITEM_TYPE_INTERNAL,ITEM_TYPE_AGGREGATE);
 
@@ -304,7 +305,9 @@ include_once('include/page_header.php');
 	}
 	else if($templated_hosts){
 		$options['hosts']['templated_hosts'] = true;
-		$options['groups']['templated_hosts'] = true;
+
+// TODO: inconsistancy in "templated_hosts" parameter for host and host group
+//		$options['groups']['templated_hosts'] = true;
 	}
 
 	if(!is_null($writeonly)){
@@ -816,6 +819,7 @@ include_once('include/page_header.php');
 			'output' => API_OUTPUT_EXTEND,
 			'select_hosts' => API_OUTPUT_EXTEND
 		);
+
 		if(!is_null($writeonly)) $options['editable'] = 1;
 		if(!is_null($templated)) $options['templated'] = $templated;
 		if(!is_null($value_types)) $options['filter']['value_type'] = $value_types;
