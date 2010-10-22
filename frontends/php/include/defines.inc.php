@@ -55,6 +55,7 @@
 	define('ZBX_FLAG_DISCOVERY_NORMAL', 0x0);
 	define('ZBX_FLAG_DISCOVERY', 0x1);
 	define('ZBX_FLAG_DISCOVERY_CHILD', 0x2);
+	define('ZBX_FLAG_DISCOVERY_CREATED', 0x4);
 
 	define('EXTACK_OPTION_ALL',		0);
 	define('EXTACK_OPTION_UNACK',	1);
