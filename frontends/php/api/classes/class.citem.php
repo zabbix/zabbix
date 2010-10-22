@@ -355,7 +355,7 @@ class CItem extends CZBXAPI{
 
 		if(is_array($options['filter'])){
 			if(!array_key_exists('flags', $options['filter']))
-    			$options['filter']['flags'] = 0;
+    			$options['filter']['flags'] = array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED);
 
 			zbx_db_filter('items i', $options, $sql_parts);
 
