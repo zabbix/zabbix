@@ -429,7 +429,10 @@ switch($itemType) {
 		$typeVisibility = array();
 		$delay_flex_el = array();
 
-		$types = array_keys(item_type2str());
+		$types = item_type2str();
+		unset($types[ITEM_TYPE_HTTPTEST]);
+
+		$type_keys = array_keys($types);
 
 		$i = 0;
 		foreach($delay_flex as $val){
@@ -444,7 +447,7 @@ switch($itemType) {
 				BR());
 			$frmItem->addVar('delay_flex['.$i.'][delay]', $val['delay']);
 			$frmItem->addVar('delay_flex['.$i.'][period]', $val['period']);
-			foreach($types as $it) {
+			foreach($type_keys as $it) {
 				if($it == ITEM_TYPE_TRAPPER || $it == ITEM_TYPE_ZABBIX_ACTIVE) continue;
 				zbx_subarray_push($typeVisibility, $it, 'delay_flex['.$i.'][delay]');
 				zbx_subarray_push($typeVisibility, $it, 'delay_flex['.$i.'][period]');
@@ -466,7 +469,7 @@ switch($itemType) {
 
 // Type
 		$cmbType = new CComboBox('type', $type);
-		$cmbType->addItems(item_type2str());
+		$cmbType->addItems($types);
 		$frmItem->addRow(S_TYPE, $cmbType);
 
 // SNMP OID
