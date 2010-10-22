@@ -1173,7 +1173,7 @@
 				' AND h.status='.HOST_STATUS_MONITORED.
 				' AND h.hostid=i.hostid '.
 				' AND i.status='.ITEM_STATUS_ACTIVE.
-				' AND i.flags='.ZBX_FLAG_DISCOVERY_NORMAL.
+				' AND '.DBcondition('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
 			' ORDER BY i.description,i.itemid');
 
 		unset($items);

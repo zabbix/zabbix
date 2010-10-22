@@ -465,7 +465,7 @@ class CTrigger extends CZBXAPI{
 
 		if(is_array($options['filter'])){
 			if(!array_key_exists('flags', $options['filter']))
-				$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
+				$options['filter']['flags'] = array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED);
 
 			zbx_db_filter('triggers t', $options, $sql_parts);
 

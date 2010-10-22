@@ -315,7 +315,7 @@ class CGraph extends CZBXAPI{
 
 		if(is_array($options['filter'])){
 			if(!array_key_exists('flags', $options['filter']))
-				$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
+				$options['filter']['flags'] = array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED);
 
 			zbx_db_filter('graphs g', $options, $sql_parts);
 
@@ -721,12 +721,14 @@ COpt::memoryPick();
 // GRAPHS PERMISSIONS {{{
 			$options = array(
 				'graphids' => zbx_objectValues($graphs, 'graphid'),
+				'filter' => array('flags' => null),
 				'editable' => 1,
 				'preservekeys' => 1,
 				'output' => API_OUTPUT_SHORTEN,
 				'select_graph_items'=> API_OUTPUT_EXTEND
 			);
 			$upd_graphs = self::get($options);
+
 			foreach($graphs as $gnum => $graph){
 				if(!isset($upd_graphs[$graph['graphid']])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
@@ -1128,10 +1130,10 @@ COpt::memoryPick();
 				'webitems' => 1,
 				'editable' => 1,
 				'output' => API_OUTPUT_EXTEND,
-				'preservekeys' => 1
+				'preservekeys' => 1,
 			);
-
 			$allowed_items = CItem::get($options);
+
 			foreach($itemids as $inum => $itemid){
 				if(!isset($allowed_items[$itemid])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
