@@ -188,7 +188,6 @@ INDEX		|4		|status,retries
 INDEX		|5		|mediatypeid
 INDEX		|6		|userid
 
-
 TABLE|history||0
 FIELD		|itemid		|t_id		|	|NOT NULL	|0			|-|items
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
@@ -466,7 +465,7 @@ FIELD		|templateid	|t_id		|	|NULL		|ZBX_SYNC		|1|graphs	|graphid
 FIELD		|show_work_period|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|show_triggers	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|graphtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|show_legend	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|show_legend	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|show_3d	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|percent_left	|t_double	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|percent_right	|t_double	|'0'	|NOT NULL	|ZBX_SYNC
@@ -687,9 +686,9 @@ FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|delay		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|history	|t_integer	|'90'	|NOT NULL	|ZBX_SYNC
 FIELD		|trends		|t_integer	|'365'	|NOT NULL	|ZBX_SYNC
-FIELD		|lastvalue	|t_history_text	|	|NULL		|0
+FIELD		|lastvalue	|t_varchar(255)	|	|NULL		|0
 FIELD		|lastclock	|t_time		|	|NULL		|0
-FIELD		|prevvalue	|t_history_text	|	|NULL		|0
+FIELD		|prevvalue	|t_varchar(255)	|	|NULL		|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|value_type	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|trapper_hosts	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY

@@ -353,7 +353,7 @@
 		$proxy_items = CItem::get($options);
 		foreach($proxy_items as $pitems){
 			if(!isset($proxies[$pitems['proxy_hostid']]['item_count'])) $proxies[$pitems['proxy_hostid']]['item_count'] = 0;
-			$proxies[$pitems['proxy_hostid']]['item_count'] += $pitems;
+			$proxies[$pitems['proxy_hostid']]['item_count'] += $pitems['rowscount'];
 		}
 // }}} CALCULATE ITEMS
 

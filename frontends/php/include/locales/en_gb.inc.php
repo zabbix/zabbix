@@ -1756,7 +1756,6 @@
 	'S_DEPENDS_ON'=>			'Depends on',
 	'S_DEPENDENT'=>				'Dependent',
 	'S_URL'=>				'URL',
-	'S_URL_C'=>				'Url',
 	'S_INVALID_URL_PARAMS'=>		'Zabbix has received an incorrect request',
 	'S_CREATE_TRIGGER'=>			'Create Trigger',
 	'S_INSERT'=>				'Insert',
@@ -2498,7 +2497,13 @@
 	'S_OTHER_SMALL'=>			'other',
 
 // class.cookie.js
-	'S_MAX_COOKIE_SIZE_REACHED' => 'We are sorry, the maximum possible number of elements to remember has been reached.',
+	'S_MAX_COOKIE_SIZE_REACHED'=>		'We are sorry, the maximum possible number of elements to remember has been reached.',
+
+	'S_LAST_PAGE'=>			'Last',
+	'S_FIRST_PAGE'=>		'First',
+	'S_PREVIOUS_PAGE'=>		'Previous',
+	'S_NEXT_PAGE'=>			'Next',
+	'S_PREVIOUS_EVENTS'=>		'Previous',
 
 );
 ?>

@@ -1222,7 +1222,7 @@ int	int_in_list(char *list, int value)
  *                                                                            *
  * Purpose: compares two double values                                        *
  *                                                                            *
- * Parameters: a,b - doubled to compare                                       *
+ * Parameters: a, b - doubles to compare                                      *
  *                                                                            *
  * Return value:  0 - the values are equal                                    *
  *                1 - otherwise                                               *
@@ -1234,11 +1234,7 @@ int	int_in_list(char *list, int value)
  ******************************************************************************/
 int	cmp_double(double a,double b)
 {
-	if(fabs(a-b)<0.000001)
-	{
-		return	0;
-	}
-	return	1;
+	return fabs(a - b) < 0.000001 ? 0 : 1;
 }
 
 /******************************************************************************
