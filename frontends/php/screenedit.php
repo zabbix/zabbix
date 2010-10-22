@@ -140,6 +140,15 @@ include_once('include/page_header.php');
 				unset($_REQUEST['form']);
 
 			show_messages(true, $msg_ok, $msg_err);
+
+			//getting updated screen, so we wont have to refresh the page to see changes
+			$screens = CScreen::get($options);
+			if(empty($screens)){
+				$screens = CTemplateScreen::get($options);
+				if(empty($screens)) access_deny();
+			}
+			$screen = reset($screens);
+
 		}
 		catch(Exception $e){
 			DBend(false);
