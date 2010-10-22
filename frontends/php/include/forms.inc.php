@@ -1497,7 +1497,7 @@
 
 			$options = array(
 				'itemids' => $parent_discoveryid,
-				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
+				'filter' => array('flags' => ZBX_FLAG_DISCOVERY),
 				'output' => API_OUTPUT_EXTEND,
 				'editable' => true,
 			);
@@ -2139,7 +2139,13 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			new CButtonCancel(url_param('groupid').url_param('parent_discoveryid'))
 		);
 
-		$frmItem->addSpanRow($frmRow,'form_row_last');
+		if($parent_discoveryid){
+			$frmItem->addItemToBottomRow($frmRow,'form_row_last');
+		}
+		else{
+			$frmItem->addSpanRow($frmRow,'form_row_last');
+		}
+
 
 		if(!$parent_discoveryid){
 // GROUP OPERATIONS
