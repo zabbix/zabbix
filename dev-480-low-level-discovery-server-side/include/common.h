@@ -184,8 +184,9 @@ typedef enum
 	ITEM_TYPE_CALCULATED
 } zbx_item_type_t;
 
-#define ZBX_FLAG_DISCOVERY		0x01	/* low-level discovery item */
-#define ZBX_FLAG_DISCOVERY_CHILD	0x02	/* low-level discovery template item */
+#define ZBX_FLAG_DISCOVERY		0x01	/* low-level discovery rule */
+#define ZBX_FLAG_DISCOVERY_CHILD	0x02	/* low-level discovery proto-item, proto-trigger or proto-graph */
+#define ZBX_FLAG_DISCOVERED_ITEM	0x04	/* low-level discovered item, trigger or graph */
 
 typedef enum
 {
