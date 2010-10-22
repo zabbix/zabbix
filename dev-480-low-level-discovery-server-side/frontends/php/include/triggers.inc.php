@@ -1340,9 +1340,13 @@ return $caption;
 							$style = 'enabled';
 						}
 
-
-						$link = new CLink($function_data['host'].':'.$function_data['key_'],
-							'items.php?form=update&itemid='.$function_data['itemid'], $style);
+						if($function_data['flags'] == ZBX_FLAG_DISCOVERY_CREATED){
+							$link = new CSpan($function_data['host'].':'.$function_data['key_'], $style);
+						}
+						else{
+							$link = new CLink($function_data['host'].':'.$function_data['key_'],
+								'items.php?form=update&itemid='.$function_data['itemid'], $style);
+						}
 
 						array_push($exp,array('{',$link,'.',bold($function_data['function'].'('),$function_data['parameter'],bold(')'),'}'));
 					}
