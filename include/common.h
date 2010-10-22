@@ -118,7 +118,7 @@
 
 #define	APPLICATION_NAME	"Zabbix Agent"
 #define	ZABBIX_REVDATE		"4 October 2010"
-#define	ZABBIX_VERSION		"1.8.4rc1"
+#define	ZABBIX_VERSION		"1.8.4rc2"
 #define	ZABBIX_REVISION		"{ZABBIX_REVISION}"
 
 #if defined(_WINDOWS)
