@@ -29,6 +29,6 @@ AC_DEFUN([AX_LIB_IBM_DB2],
         IBM_DB2_CPPFLAGS="-I$ibm_db2_include_dir"
         IBM_DB2_LDFLAGS="-L$ibm_db2_lib_dir"
         IBM_DB2_LIBS="-ldb2"
-	AC_DEFINE(HAVE_IBM_DB2, [1], [Define to 1 if IBM DB2 libraries are available])
+        AC_DEFINE(HAVE_IBM_DB2, [1], [Define to 1 if IBM DB2 libraries are available])
     fi
 ])

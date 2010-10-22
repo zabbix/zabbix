@@ -34,15 +34,31 @@
 
 	typedef struct
 	{
-		// FIXME
+		SQLHANDLE	henv;
+		SQLHANDLE	hdbc;
 	}
 	zbx_ibm_db2_handle_t;
 
 	extern zbx_ibm_db2_handle_t	ibm_db2;
 
-#	define DB_ROW		FIXME
-#	define DB_RESULT	FIXME
-#	define DBfree_result	FIXME
+#	define DB_ROW		char **
+#	define DB_RESULT	ZBX_IBM_DB2_RESULT *
+#	define DBfree_result	IBM_DB2free_result
+
+	typedef struct
+	{
+		SQLHANDLE	hstmt;
+		SQLSMALLINT	ncolumn;
+		DB_ROW		values;
+		DB_ROW		values_cli;
+		SQLINTEGER	*values_len;
+	}
+	ZBX_IBM_DB2_RESULT;
+
+	void	IBM_DB2free_result(DB_RESULT result);
+	int	IBM_DB2server_status();
+	int	zbx_ibm_db2_success(SQLRETURN ret);
+	void	zbx_ibm_db2_log_errors(SQLSMALLINT htype, SQLHANDLE hndl);
 
 #elif defined(HAVE_MYSQL)
 
@@ -77,9 +93,9 @@
 
 	typedef struct
 	{
-		OCIStmt	*stmthp;
-		int 	ncolumn;
-		DB_ROW	values;
+		OCIStmt		*stmthp;
+		int 		ncolumn;
+		DB_ROW		values;
 	}
 	ZBX_OCI_DB_RESULT;
 
