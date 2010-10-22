@@ -545,6 +545,8 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 
 #if defined(HAVE_IBM_DB2)
 	SQLHANDLE	hstmt = 0;
+	SQLRETURN	ret1;
+	SQLLEN		row1;
 	SQLLEN		rows = 0;
 #elif defined(HAVE_MYSQL)
 	int		status;
@@ -576,6 +578,17 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 		ret = ZBX_DB_DOWN;
 
 	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLRowCount(hstmt, &rows)))
+		ret = ZBX_DB_DOWN;
+
+	while (ZBX_DB_OK == ret && SUCCEED == zbx_ibm_db2_success(ret1 = SQLMoreResults(hstmt)))
+	{
+		if (SUCCEED != zbx_ibm_db2_success(SQLRowCount(hstmt, &row1)))
+			ret = ZBX_DB_DOWN;
+		else
+			rows += row1;
+	}
+
+	if (ZBX_DB_OK == ret && SQL_NO_DATA_FOUND != ret1)
 		ret = ZBX_DB_DOWN;
 
   	if (hstmt && SUCCEED != zbx_ibm_db2_success(SQLFreeHandle(SQL_HANDLE_STMT, hstmt)))
