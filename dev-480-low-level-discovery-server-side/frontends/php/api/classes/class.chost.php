@@ -757,7 +757,7 @@ Copt::memoryPick();
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'hostids' => $hostids,
-				'filter' => array('flags' => 0),
+				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
