@@ -534,7 +534,6 @@ FIELD		|maintenance_from|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|host
 INDEX		|2		|status
 INDEX		|3		|proxy_hostid
-INDEX		|4		|ip
 
 TABLE|globalmacro|globalmacroid|ZBX_SYNC
 FIELD		|globalmacroid	|t_id		|	|NOT NULL	|0
@@ -693,7 +692,7 @@ FIELD		|publickey	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|privatekey	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|mtime		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|lastns		|t_nanosec	|	|NULL		|0
-FIELD		|interfaceid	|t_id		|	|NOT NULL	|ZBX_SYNC,ZBX_PROXY	|4|interface
+FIELD		|interfaceid	|t_id		|	|NOT NULL	|ZBX_SYNC,ZBX_PROXY	|4|interface	|		|RESTRICT
 UNIQUE		|1		|hostid,key_
 INDEX		|3		|status
 INDEX		|4		|templateid
@@ -1021,9 +1020,9 @@ INDEX		|1		|clock
 
 TABLE|interface|interfaceid|ZBX_SYNC
 FIELD		|interfaceid	|t_id		|	|NOT NULL	|0
-FIELD		|hostid		|t_id		|	|NOT NULL	|0	|1	|hosts	|hostid		|RESTRICT
+FIELD		|hostid		|t_id		|	|NOT NULL	|0	|1	|hosts	
 FIELD		|itemtype		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|default		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|main		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|dns		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|useip		|t_integer	|'1'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|ip		|t_varchar(39)	|'127.0.0.1'|NOT NULL	|ZBX_SYNC,ZBX_PROXY
@@ -1038,4 +1037,3 @@ FIELD		|errors_from	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|disable_until	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|interfaceid
 INDEX		|2		|hostid, itemtype
-

@@ -830,6 +830,7 @@ upgrades/dbpatches/2.0/mysql/patch/httptest.sql -text
 upgrades/dbpatches/2.0/mysql/patch/httptestitem.sql -text
 upgrades/dbpatches/2.0/mysql/patch/ids.sql -text
 upgrades/dbpatches/2.0/mysql/patch/images.sql -text
+upgrades/dbpatches/2.0/mysql/patch/interface.sql -text
 upgrades/dbpatches/2.0/mysql/patch/items.sql -text
 upgrades/dbpatches/2.0/mysql/patch/items_applications.sql -text
 upgrades/dbpatches/2.0/mysql/patch/maintenances.sql -text
@@ -920,6 +921,7 @@ upgrades/dbpatches/2.0/oracle/patch/httptest.sql -text
 upgrades/dbpatches/2.0/oracle/patch/httptestitem.sql -text
 upgrades/dbpatches/2.0/oracle/patch/ids.sql -text
 upgrades/dbpatches/2.0/oracle/patch/images.sql -text
+upgrades/dbpatches/2.0/oracle/patch/interface.sql -text
 upgrades/dbpatches/2.0/oracle/patch/items.sql -text
 upgrades/dbpatches/2.0/oracle/patch/items_applications.sql -text
 upgrades/dbpatches/2.0/oracle/patch/maintenances.sql -text
@@ -1009,6 +1011,7 @@ upgrades/dbpatches/2.0/postgresql/patch/httptest.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/httptestitem.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/ids.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/images.sql -text
+upgrades/dbpatches/2.0/postgresql/patch/interface.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/items.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/items_applications.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/maintenances.sql -text
