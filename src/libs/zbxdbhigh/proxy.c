@@ -2085,10 +2085,12 @@ static int	DBlld_copy_trigger(zbx_uint64_t hostid, zbx_uint64_t triggerid, const
 					"status=%d,"
 					"comments='%s',"
 					"url='%s',"
-					"type=%d"
+					"type=%d,"
+					"flags=%d"
 				" where triggerid=" ZBX_FS_UI64,
 				description_esc, (int)priority, (int)status,
-				comments_esc, url_esc, (int)type, h_triggerid);
+				comments_esc, url_esc, (int)type,
+				ZBX_FLAG_DISCOVERED_ITEM, h_triggerid);
 	}
 	else
 	{
@@ -2112,12 +2114,12 @@ static int	DBlld_copy_trigger(zbx_uint64_t hostid, zbx_uint64_t triggerid, const
 				strlen(comments_esc) + strlen(url_esc),
 				"insert into triggers"
 					" (triggerid,description,priority,status,"
-						"comments,url,type,value)"
+						"comments,url,type,value,flags)"
 					" values (" ZBX_FS_UI64 ",'%s',%d,%d,"
-						"'%s','%s',%d,%d);\n",
+						"'%s','%s',%d,%d,%d);\n",
 					new_triggerid, description_esc, (int)priority,
 					(int)status, comments_esc, url_esc, (int)type,
-					TRIGGER_VALUE_UNKNOWN);
+					TRIGGER_VALUE_UNKNOWN, ZBX_FLAG_DISCOVERED_ITEM);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 152,
 				"insert into trigger_discovery"
@@ -2390,19 +2392,19 @@ static int	DBlld_update_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, co
 					"ipmi_sensor,snmp_community,snmp_oid,snmp_port,"
 					"snmpv3_securityname,snmpv3_securitylevel,"
 					"snmpv3_authpassphrase,snmpv3_privpassphrase,"
-					"authtype,username,password,publickey,privatekey)"
+					"authtype,username,password,publickey,privatekey,flags)"
 				" values"
 					" (" ZBX_FS_UI64 ",'%s','%s'," ZBX_FS_UI64 ",%d,%d,%d,"
 					"%d,'%s',%d,%d,%d,'%s','%s',%d,%d,'%s','%s',%s,'%s','%s',"
 					"'%s','%s',%d,'%s',%d,'%s','%s',%d,'%s','%s','%s',"
-					"'%s');\n",
+					"'%s',%d);\n",
 				itemid, description_esc, key_esc, hostid, (int)type, (int)value_type, (int)data_type,
 				delay, delay_flex_esc, history, trends, (int)status, trapper_hosts_esc, units_esc,
 				multiplier, delta, formula_esc, logtimefmt_esc, DBsql_id_ins(valuemapid), params_esc,
 				ipmi_sensor_esc, snmp_community_esc, snmp_oid_esc, (int)snmp_port,
-				snmpv3_securityname_esc, (int)snmpv3_securitylevel,
-				snmpv3_authpassphrase_esc, snmpv3_privpassphrase_esc,
-				(int)authtype, username_esc, password_esc, publickey_esc, privatekey_esc);
+				snmpv3_securityname_esc, (int)snmpv3_securitylevel, snmpv3_authpassphrase_esc,
+				snmpv3_privpassphrase_esc, (int)authtype, username_esc, password_esc, publickey_esc,
+				privatekey_esc, ZBX_FLAG_DISCOVERED_ITEM);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 140,
 				"insert into item_discovery"
@@ -2446,15 +2448,16 @@ static int	DBlld_update_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, co
 					"username='%s',"
 					"password='%s',"
 					"publickey='%s',"
-					"privatekey='%s'"
+					"privatekey='%s',"
+					"flags=%d"
 				" where itemid=" ZBX_FS_UI64 ";\n",
 				description_esc, key_esc, (int)type, (int)value_type, (int)data_type,
 				delay, delay_flex_esc, history, trends, trapper_hosts_esc, units_esc,
 				multiplier, delta, formula_esc, logtimefmt_esc, DBsql_id_ins(valuemapid), params_esc,
 				ipmi_sensor_esc, snmp_community_esc, snmp_oid_esc, (int)snmp_port,
-				snmpv3_securityname_esc, (int)snmpv3_securitylevel,
-				snmpv3_authpassphrase_esc, snmpv3_privpassphrase_esc,
-				(int)authtype, username_esc, password_esc, publickey_esc, privatekey_esc, itemid);
+				snmpv3_securityname_esc, (int)snmpv3_securitylevel, snmpv3_authpassphrase_esc,
+				snmpv3_privpassphrase_esc, (int)authtype, username_esc, password_esc, publickey_esc,
+				privatekey_esc, ZBX_FLAG_DISCOVERED_ITEM, itemid);
 
 		uint64_array_remove_both(appids, &appids_num, rmids, &rmids_num);
 
@@ -2827,14 +2830,15 @@ static int	DBlld_update_graph(zbx_uint64_t hostid, zbx_uint64_t graphid,
 					"ymin_type=%d,"
 					"ymax_type=%d,"
 					"ymin_itemid=%s,"
-					"ymax_itemid=%s"
+					"ymax_itemid=%s,"
+					"flags=%d"
 				" where graphid=" ZBX_FS_UI64 ";\n",
 				name_esc, width, height, yaxismin, yaxismax,
 				(int)show_work_period, (int)show_triggers,
 				(int)graphtype, (int)show_legend, (int)show_3d, 
 				percent_left, percent_right, (int)ymin_type, (int)ymax_type,
 				DBsql_id_ins(ymin_itemid), DBsql_id_ins(ymax_itemid),
-				new_graphid);
+				ZBX_FLAG_DISCOVERED_ITEM, new_graphid);
 
 		for (i = 0; i < gitems_num; i++)
 		{
@@ -2871,16 +2875,16 @@ static int	DBlld_update_graph(zbx_uint64_t hostid, zbx_uint64_t graphid,
 				"insert into graphs"
 					" (graphid,name,width,height,yaxismin,yaxismax,show_work_period,"
 					"show_triggers,graphtype,show_legend,show_3d,percent_left,"
-					"percent_right,ymin_type,ymax_type,ymin_itemid,ymax_itemid)"
+					"percent_right,ymin_type,ymax_type,ymin_itemid,ymax_itemid,flags)"
 				" values"
 					" (" ZBX_FS_UI64 ",'%s',%d,%d," ZBX_FS_DBL ","
 					ZBX_FS_DBL ",%d,%d,%d,%d,%d," ZBX_FS_DBL ","
-					ZBX_FS_DBL ",%d,%d,%s,%s);\n",
+					ZBX_FS_DBL ",%d,%d,%s,%s,%d);\n",
 				new_graphid, name_esc, width, height, yaxismin, yaxismax,
 				(int)show_work_period, (int)show_triggers,
 				(int)graphtype, (int)show_legend, (int)show_3d,
 				percent_left, percent_right, (int)ymin_type, (int)ymax_type,
-				DBsql_id_ins(ymin_itemid), DBsql_id_ins(ymax_itemid));
+				DBsql_id_ins(ymin_itemid), DBsql_id_ins(ymax_itemid), ZBX_FLAG_DISCOVERED_ITEM);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 144,
 				"insert into graph_discovery"
@@ -3086,7 +3090,6 @@ int	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value,
 	if (NOTSUPPORTED == res)
 		goto error;
 
-zabbix_log(LOG_LEVEL_DEBUG, "In %s() value:'%s'", __function_name, value);
 	if (SUCCEED != zbx_json_open(value, &jp))
 	{
 		zbx_snprintf(error, mex_error_len, "%s", "Value should be JSON object");
