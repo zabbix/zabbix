@@ -2548,7 +2548,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 		$frmMTrig->addItemToBottomRow(new CButton('mass_save',S_SAVE));
 		$frmMTrig->addItemToBottomRow(SPACE);
-		$frmMTrig->addItemToBottomRow(new CButtonCancel(url_param('groupid')));
+		$frmMTrig->addItemToBottomRow(new CButtonCancel(url_param('groupid').url_param('parent_discoveryid')));
 
 		$script = "function addPopupValues(list){
 						if(!isset('object', list)) return false;
