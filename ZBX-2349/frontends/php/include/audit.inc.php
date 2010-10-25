@@ -19,45 +19,39 @@
 **/
 ?>
 <?php
-	function audit_resource2str($resource_type=null){
-		$resources = array(
-			AUDIT_RESOURCE_USER => S_USER,
-			AUDIT_RESOURCE_ZABBIX_CONFIG => S_CONFIGURATION_OF_ZABBIX,
-			AUDIT_RESOURCE_MEDIA_TYPE => S_MEDIA_TYPE,
-			AUDIT_RESOURCE_HOST => S_HOST,
-			AUDIT_RESOURCE_ACTION => S_ACTION,
-			AUDIT_RESOURCE_GRAPH => S_GRAPH,
-			AUDIT_RESOURCE_GRAPH_ELEMENT => S_GRAPH_ELEMENT,
-			AUDIT_RESOURCE_USER_GROUP => S_USER_GROUP,
-			AUDIT_RESOURCE_APPLICATION => S_APPLICATION,
-			AUDIT_RESOURCE_TRIGGER => S_TRIGGER,
-			AUDIT_RESOURCE_HOST_GROUP => S_HOST_GROUP,
-			AUDIT_RESOURCE_ITEM => S_ITEM,
-			AUDIT_RESOURCE_IMAGE => S_IMAGE,
-			AUDIT_RESOURCE_VALUE_MAP => S_VALUE_MAP,
-			AUDIT_RESOURCE_IT_SERVICE => S_IT_SERVICE,
-			AUDIT_RESOURCE_MAP => S_MAP,
-			AUDIT_RESOURCE_SCREEN => S_SCREEN,
-			AUDIT_RESOURCE_NODE => S_NODE,
-			AUDIT_RESOURCE_SCENARIO => S_SCENARIO,
-			AUDIT_RESOURCE_DISCOVERY_RULE => S_DISCOVERY_RULE,
-			AUDIT_RESOURCE_SLIDESHOW => S_SLIDESHOW,
-			AUDIT_RESOURCE_PROXY => S_PROXY,
-			AUDIT_RESOURCE_REGEXP => S_REGULAR_EXPRESSION,
-			AUDIT_RESOURCE_MAINTENANCE => S_MAINTENANCE,
-			AUDIT_RESOURCE_SCRIPT => S_SCRIPT,
-			AUDIT_RESOURCE_MACRO => S_MACRO,
-			AUDIT_RESOURCE_TEMPLATE => S_TEMPLATE,
-		);
+	function audit_resource2str($resource_type){
+		$str_resource[AUDIT_RESOURCE_USER] 		= S_USER;
+		$str_resource[AUDIT_RESOURCE_ZABBIX_CONFIG] 	= S_CONFIGURATION_OF_ZABBIX;
+		$str_resource[AUDIT_RESOURCE_MEDIA_TYPE] 	= S_MEDIA_TYPE;
+		$str_resource[AUDIT_RESOURCE_HOST] 		= S_HOST;
+		$str_resource[AUDIT_RESOURCE_ACTION] 		= S_ACTION;
+		$str_resource[AUDIT_RESOURCE_GRAPH] 		= S_GRAPH;
+		$str_resource[AUDIT_RESOURCE_GRAPH_ELEMENT]	= S_GRAPH_ELEMENT;
+		$str_resource[AUDIT_RESOURCE_USER_GROUP] 	= S_USER_GROUP;
+		$str_resource[AUDIT_RESOURCE_APPLICATION] 	= S_APPLICATION;
+		$str_resource[AUDIT_RESOURCE_TRIGGER] 		= S_TRIGGER;
+		$str_resource[AUDIT_RESOURCE_HOST_GROUP]	= S_HOST_GROUP;
+		$str_resource[AUDIT_RESOURCE_ITEM]		= S_ITEM;
+		$str_resource[AUDIT_RESOURCE_IMAGE]		= S_IMAGE;
+		$str_resource[AUDIT_RESOURCE_VALUE_MAP]		= S_VALUE_MAP;
+		$str_resource[AUDIT_RESOURCE_IT_SERVICE]	= S_IT_SERVICE;
+		$str_resource[AUDIT_RESOURCE_MAP]		= S_MAP;
+		$str_resource[AUDIT_RESOURCE_SCREEN]		= S_SCREEN;
+		$str_resource[AUDIT_RESOURCE_NODE]		= S_NODE;
+		$str_resource[AUDIT_RESOURCE_SCENARIO]		= S_SCENARIO;
+		$str_resource[AUDIT_RESOURCE_DISCOVERY_RULE]	= S_DISCOVERY_RULE;
+		$str_resource[AUDIT_RESOURCE_SLIDESHOW]		= S_SLIDESHOW;
+		$str_resource[AUDIT_RESOURCE_PROXY]		= S_PROXY;
+		$str_resource[AUDIT_RESOURCE_REGEXP] = S_REGULAR_EXPRESSION;
+		$str_resource[AUDIT_RESOURCE_MAINTENANCE] = S_MAINTENANCE;
+		$str_resource[AUDIT_RESOURCE_SCRIPT] = S_SCRIPT;
+		$str_resource[AUDIT_RESOURCE_MACRO] = S_MACRO;
+		$str_resource[AUDIT_RESOURCE_TEMPLATE] = S_TEMPLATE;
 
-		if(is_null($resource_type)){
-			natsort($resources);
-			return $resources;
-		}
-		else if(isset($resources[$resource_type]))
-			return $resources[$resource_type];
-		else
-			return S_UNKNOWN_RESOURCE;
+		if(isset($str_resource[$resource_type]))
+			return $str_resource[$resource_type];
+
+	return S_UNKNOWN_RESOURCE;
 	}
 
 	function add_audit_if($condition,$action,$resourcetype,$details){

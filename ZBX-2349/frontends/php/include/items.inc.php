@@ -1150,7 +1150,10 @@
 
             $search = array_keys($macros);
             $values = array_values($macros);
-            $descr = zbx_str_replace($search, $values, $descr);
+			for($i=0; $i<count($search); $i++){
+				$descr = zbx_str_replace($search[$i], $values[$i], $descr);
+			}
+            
         }
 
 	
