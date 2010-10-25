@@ -479,6 +479,7 @@ TABLE|graph_discovery|graphdiscoveryid|ZBX_SYNC
 FIELD		|graphdiscoveryid|t_id		|	|NOT NULL	|0
 FIELD		|graphid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|graphs
 FIELD		|parent_graphid	|t_id		|	|NOT NULL	|ZBX_SYNC		|2|graphs	|graphid
+FIELD		|name		|t_varchar(128)	|''	|NOT NULL	|0
 UNIQUE		|1		|graphid,parent_graphid
 
 TABLE|graphs_items|gitemid|ZBX_SYNC
