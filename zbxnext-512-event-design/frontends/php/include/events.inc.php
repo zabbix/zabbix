@@ -236,50 +236,37 @@ function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
 
 	$table->setAttribute('style', 'width: 400px;');
 
-	$event_list = array();
-	$sql = 'SELECT * '.
-			' FROM events '.
-			' WHERE eventid<='.$eventid.
-				' AND object='.EVENT_OBJECT_TRIGGER.
-				' AND objectid='.$triggerid.
-			' ORDER BY eventid DESC';
-	$db_events = DBselect($sql, ZBX_WIDGET_ROWS);
-
-	$count = 0;
-	while($event = DBfetch($db_events)){
-		if(!empty($event_list) && ($event_list[$count]['value'] != $event['value'])) {
-			$count++;
-		}
-		else if(!empty($event_list) &&
-			($event_list[$count]['value'] == $event['value']) &&
-			($trigger_type == TRIGGER_MULT_EVENT_ENABLED) &&
-			($event['value'] == TRIGGER_VALUE_TRUE))
-		{
-			$count++;
-		}
-
-		$event_list[$count] = $event;
-	}
+	$options = array(
+		'output' => API_OUTPUT_EXTEND,
+		'triggerids' => $triggerid,
+		'eventid_till' => $eventid,
+		'filter' => array(
+			'object' => EVENT_OBJECT_TRIGGER
+		),
+		'nopermissions' => 1,
+		'sortfield' => 'clock',
+		'sortorder' => ZBX_SORT_DOWN,
+		'limit' => ZBX_WIDGET_ROWS
+	);
+	$db_events = CEvent::get($options);
 
 	$lclock = time();
-	foreach($event_list as $id => $event) {
+	foreach($db_events as $id => $event) {
 		$duration = zbx_date2age($lclock, $event['clock']);
 		$lclock = $event['clock'];
 
 		$value = new CCol(trigger_value2str($event['value']), get_trigger_value_style($event['value']));
 
 // ack +++
-		$ack = new CSpan(S_NO,'on');
-		if($event['acknowledged']) {
-			$ack=new CSpan(S_YES,'off');
-		}
+		$ack = getEventAckState($event);
+
 // ---
 		$table->addRow(array(
 			zbx_date2str(S_EVENTS_POPUP_EVENT_LIST_DATE_FORMAT,$event['clock']),
 			$value,
 			$duration,
 			zbx_date2age($event['clock']),
-			$config['event_ack_enable']? $ack : NULL //hide acknowledges if they are turned off
+			$ack
 		));
 	}
 

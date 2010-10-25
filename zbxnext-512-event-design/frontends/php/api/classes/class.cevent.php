@@ -389,7 +389,7 @@ class CEvent extends CZBXAPI{
 				' WHERE '.$sql_where.
 				$sql_order;
 		$db_res = DBselect($sql, $sql_limit);
- //SDI($sql);
+//SDI($sql);
 		while($event = DBfetch($db_res)){
 			if($options['countOutput']){
 				$result = $event['rowscount'];
