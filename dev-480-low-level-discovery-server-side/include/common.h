@@ -887,7 +887,6 @@ int	starts_with(const char *str, const char *prefix);
 int	cmp_key_id(const char *key_1, const char *key_2);
 
 int	get_nearestindex(void *p, size_t sz, int num, zbx_uint64_t id);
-void	zbx_sort_array(void *p, size_t sz, int num);
 int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t value, int alloc_step);
 void	uint64_array_merge(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t *value, int value_num, int alloc_step);
 int	uint64_array_exists(zbx_uint64_t *values, int num, zbx_uint64_t value);

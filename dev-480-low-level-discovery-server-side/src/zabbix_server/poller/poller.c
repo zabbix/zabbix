@@ -596,7 +596,7 @@ static int	get_values()
 		}
 
 		/* check for low-level discovery (lld) item */
-		if (res == SUCCEED && 0 != (items[i].flags & ZBX_FLAG_DISCOVERY))
+		if (res == SUCCEED && 0 != (ZBX_FLAG_DISCOVERY & items[i].flags))
 		{
 			if (NOTSUPPORTED == (res = DBlld_process_discovery_rule(items[i].itemid,
 					agent.text, error, sizeof(error))))
@@ -607,7 +607,7 @@ static int	get_values()
 
 		if (res == SUCCEED)
 		{
-			if (0 == (items[i].flags & ZBX_FLAG_DISCOVERY))
+			if (0 == (ZBX_FLAG_DISCOVERY & items[i].flags))
 				dc_add_history(items[i].itemid, items[i].value_type, &agent, &ts, 0, NULL, 0, 0, 0, 0);
 
 			DCrequeue_reachable_item(items[i].itemid, ITEM_STATUS_ACTIVE, ts.sec);

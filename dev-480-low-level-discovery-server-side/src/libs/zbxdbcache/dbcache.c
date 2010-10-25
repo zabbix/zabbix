@@ -836,7 +836,7 @@ static void	DCsync_trends()
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Alexei Vladishev, Aleksander Vladishev                             *
+ * Author: Alexei Vladishev, Alexander Vladishev                              *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -845,7 +845,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 {
 	const char	*__function_name = "DCmass_update_triggers";
 
-	typedef struct zbx_trigger_s
+	typedef struct
 	{
 		zbx_uint64_t	triggerid;
 		char		*exp;
@@ -854,7 +854,8 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 		unsigned char	type;
 		unsigned char	value;
 		unsigned char	flags;
-	} zbx_trigger_t;
+	}
+	zbx_trigger_t;
 
 	zbx_trigger_t	*tr = NULL, *tr_last = NULL;
 	int		tr_alloc, tr_num = 0;

@@ -1131,7 +1131,7 @@ void    DBescape_string(const char *src, char *dst, int len)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-char*	DBdyn_escape_string(const char *src)
+char	*DBdyn_escape_string(const char *src)
 {
 	int	len;
 	char	*dst = NULL;
@@ -1160,7 +1160,7 @@ char*	DBdyn_escape_string(const char *src)
  * Comments: sync changes with 'DBescape_string', 'DBget_escape_string_len'   *
  *                                                                            *
  ******************************************************************************/
-char*	DBdyn_escape_string_len(const char *src, int max_src_len)
+char	*DBdyn_escape_string_len(const char *src, int max_src_len)
 {
 	const char	*s;
 	char		*dst = NULL;

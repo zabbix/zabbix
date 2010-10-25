@@ -235,7 +235,7 @@ static void	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t proxy_hostid,
 		return;
 	}
 
-	if (0 != (flags & ZBX_FLAG_DISCOVERY_CHILD))
+	if (0 != (ZBX_FLAG_DISCOVERY_CHILD & flags))
 	{
 		*poller_type = ZBX_NO_POLLER;
 		return;
@@ -549,7 +549,7 @@ static void	DCsync_items(DB_RESULT result)
 		DCstrpool_replace(found, &item->key, row[6]);
 		item->flags = (unsigned char)atoi(row[26]);
 
-		if (item->flags & ZBX_FLAG_DISCOVERY)
+		if (0 != (ZBX_FLAG_DISCOVERY & item->flags))
 			item->value_type = ITEM_VALUE_TYPE_TEXT;
 		else
 			item->value_type = (unsigned char)atoi(row[5]);
@@ -1919,7 +1919,7 @@ int	DCconfig_get_items(zbx_uint64_t hostid, const char *key, DC_ITEM **items)
 		if (NULL == (dc_item = DCfind_item(dc_host->hostid, key)))
 			continue;
 
-		if (0 != (dc_item->flags & ZBX_FLAG_DISCOVERY_CHILD))
+		if (0 != (ZBX_FLAG_DISCOVERY_CHILD & dc_item->flags))
 			continue;
 
 		if (CONFIG_REFRESH_UNSUPPORTED == 0 &&

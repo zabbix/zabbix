@@ -22,6 +22,7 @@
 #include "log.h"
 #include "zlog.h"
 #include "sysinfo.h"
+#include "zbxalgo.h"
 #include "zbxserver.h"
 
 #include "proxy.h"
@@ -1365,7 +1366,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 					calc_timestamp(values[i].value, &values[i].timestamp, item.logtimefmt);
 
 				/* check for low-level discovery (lld) item */
-				if (0 != (item.flags & ZBX_FLAG_DISCOVERY))
+				if (0 != (ZBX_FLAG_DISCOVERY & item.flags))
 				{
 					if (NOTSUPPORTED == DBlld_process_discovery_rule(item.itemid,
 								agent.text, error, strlen(error)))
@@ -1808,15 +1809,14 @@ exit:
  *                                                                            *
  * Purpose: retrieve applications for specified item                          *
  *                                                                            *
- * Parameters:  hostid - host identificator from database                     *
- *              template_itemid - template item identificator from database   *
+ * Parameters:  itemid - item identificator from database                     *
  *              appids - result buffer                                        *
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	DBget_applications_by_itemid(zbx_uint64_t itemid,
@@ -1852,7 +1852,7 @@ static void	DBget_applications_by_itemid(zbx_uint64_t itemid,
  *                                                                            *
  * Return value: pointer to expanded expression                               *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1886,7 +1886,7 @@ static char	*DBlld_expand_trigger_expression(zbx_uint64_t triggerid, const char 
 	{
 		key = strdup(row[2]);
 
-		if (NULL != jp_row && (ZBX_FLAG_DISCOVERY_CHILD & (unsigned char)atoi(row[5])))
+		if (NULL != jp_row && 0 != (ZBX_FLAG_DISCOVERY_CHILD & (unsigned char)atoi(row[5])))
 			substitute_discovery_macros(&key, jp_row);
 
 		sz_h = strlen(row[1]);
@@ -1921,13 +1921,13 @@ static char	*DBlld_expand_trigger_expression(zbx_uint64_t triggerid, const char 
  * Purpose: compare two triggers                                              *
  *                                                                            *
  * Parameters: triggerid1  - [IN] first trigger identificator from database   *
- *             expression1 - [IN] fist trigger short expression               *
+ *             expression1 - [IN] first trigger short expression              *
  *             triggerid2  - [IN] second trigger identificator from database  *
  *             expression2 - [IN] second trigger short expression             *
  *                                                                            *
  * Return value: SUCCEED - if triggers coincide                               *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1966,7 +1966,7 @@ static int	DBlld_compare_triggers(zbx_uint64_t triggerid1, const char *expressio
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -2138,7 +2138,7 @@ static int	DBlld_copy_trigger(zbx_uint64_t hostid, zbx_uint64_t triggerid, const
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			if (ZBX_FLAG_DISCOVERY_CHILD & (unsigned char)atoi(row[5]))
+			if (0 != (ZBX_FLAG_DISCOVERY_CHILD & (unsigned char)atoi(row[5])))
 			{
 				if (FAIL == (res = DBlld_get_item(hostid, row[4], jp_row, &h_itemid)))
 					break;
@@ -2245,12 +2245,12 @@ static void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_it
 		ZBX_STR2UINT64(triggerid, row[0]);
 
 		p = NULL;
-/* {"net.if.discovery":[{"ifname":"eth0"},{"ifname":"lo"},...]}
+/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]}
  *                      ^
  */ 		while (NULL != (p = zbx_json_next(jp_data, p)))
 		{
-/* {"net.if.discovery":[{"ifname":"eth0"},{"ifname":"lo"},...]}
- *                      ^---------------^
+/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]}
+ *                      ^------------------^
  */			if (FAIL == zbx_json_brackets_open(p, &jp_row))
 				continue;
 
@@ -2347,7 +2347,7 @@ static int	DBlld_update_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, co
 			char		*key_esc;
 			zbx_uint64_t	id;
 
-			key_esc = DBdyn_escape_string(key_last ? key_last : key_orig);
+			key_esc = DBdyn_escape_string(NULL != key_last ? key_last : key_orig);
 
 			result = DBselect(
 					"select i.itemid,d.parent_itemid"
@@ -2608,12 +2608,12 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, 
 	}
 
 	p = NULL;
-/* {"net.if.discovery":[{"ifname":"eth0"},{"ifname":"lo"},...]}
+/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]}
  *                      ^
  */ 	while (NULL != (p = zbx_json_next(jp_data, p)))
 	{
-/* {"net.if.discovery":[{"ifname":"eth0"},{"ifname":"lo"},...]}
- *                      ^---------------^
+/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]}
+ *                      ^------------------^
  */		if (FAIL == zbx_json_brackets_open(p, &jp_row))
 			continue;
 
@@ -2673,7 +2673,7 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, 
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	DBlld_cmp_graphitems(ZBX_GRAPH_ITEMS *gitems1, int gitems1_num,
@@ -2754,7 +2754,7 @@ static int	DBlld_update_graph(zbx_uint64_t hostid, zbx_uint64_t graphid,
 
 	for (i = 0; i < gitems_num; i++)
 	{
-		if (ZBX_FLAG_DISCOVERY_CHILD & gitems[i].flags)
+		if (0 != (ZBX_FLAG_DISCOVERY_CHILD & gitems[i].flags))
 			if (FAIL == (res = DBlld_get_item(hostid, gitems[i].key, jp_row, &gitems[i].itemid)))
 				break;
 	}
@@ -2762,7 +2762,7 @@ static int	DBlld_update_graph(zbx_uint64_t hostid, zbx_uint64_t graphid,
 	if (FAIL == res)
 		goto out;
 
-	zbx_sort_array(gitems, sizeof(ZBX_GRAPH_ITEMS), gitems_num);
+	qsort(gitems, gitems_num, sizeof(ZBX_GRAPH_ITEMS), ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	result = DBselect(
 			"select distinct g.graphid"
@@ -2983,12 +2983,12 @@ static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_item
 		ZBX_DBROW2UINT64(ymax_itemid, row[16]);
 
 		p = NULL;
-/* {"net.if.discovery":[{"ifname":"eth0"},{"ifname":"lo"},...]}
+/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]}
  *                      ^
  */	 	while (NULL != (p = zbx_json_next(jp_data, p)))
 		{
-/* {"net.if.discovery":[{"ifname":"eth0"},{"ifname":"lo"},...]}
- *                      ^---------------^
+/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]}
+ *                      ^------------------^
  */			if (FAIL == zbx_json_brackets_open(p, &jp_row))
 				continue;
 
@@ -3039,7 +3039,7 @@ static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_item
  *                                                                            *
  ******************************************************************************/
 int	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value,
-		char *error, size_t mex_error_len)
+		char *error, size_t max_error_len)
 {
 	const char		*__function_name = "DBlld_process_discovery_rule";
 
@@ -3076,13 +3076,13 @@ int	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value,
 		snmp_community_esc = DBdyn_escape_string(row[4]);
 		snmp_port = (unsigned short)atoi(row[5]);
 		snmpv3_securityname_esc = DBdyn_escape_string(row[6]);
-		snmpv3_securitylevel = (unsigned short)atoi(row[7]);
+		snmpv3_securitylevel = (unsigned char)atoi(row[7]);
 		snmpv3_authpassphrase_esc = DBdyn_escape_string(row[8]);
 		snmpv3_privpassphrase_esc = DBdyn_escape_string(row[9]);
 	}
 	else
 	{
-		zbx_snprintf(error, mex_error_len, "Invalid discovery rule ID [" ZBX_FS_UI64 "]", discovery_itemid);
+		zbx_snprintf(error, max_error_len, "Invalid discovery rule ID [" ZBX_FS_UI64 "]", discovery_itemid);
 		res = NOTSUPPORTED;
 	}
 	DBfree_result(result);
@@ -3092,16 +3092,16 @@ int	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value,
 
 	if (SUCCEED != zbx_json_open(value, &jp))
 	{
-		zbx_snprintf(error, mex_error_len, "%s", "Value should be JSON object");
+		zbx_snprintf(error, max_error_len, "%s", "Value should be JSON object");
 		res = NOTSUPPORTED;
 		goto error;
 	}
 
-/* {"net.if.discovery":[{"ifname":"eth0"},{"ifname":"lo"},...]}
- *                     ^-------------------------------------^
+/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]}
+ *                     ^-------------------------------------------^
  */	if (SUCCEED != zbx_json_brackets_by_name(&jp, discovery_key, &jp_data))
 	{
-		zbx_snprintf(error, mex_error_len, "%s", "Wrong data in JSON object");
+		zbx_snprintf(error, max_error_len, "%s", "Wrong data in JSON object");
 		res = NOTSUPPORTED;
 		goto error;
 	}
