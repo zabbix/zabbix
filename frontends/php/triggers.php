@@ -564,7 +564,8 @@ include_once('include/page_header.php');
 			}
 
 			if(!empty($trigger['discoveryRule'])){
-				$description[] = new CSpan($trigger['discoveryRule']['description'], 'discoveryName');
+				$description[] = new CLink($trigger['discoveryRule']['description'], 'trigger_prototypes.php?parent_discoveryid='.
+					$trigger['discoveryRule']['itemid'],'discoveryName');
 				$description[] = ':'.$trigger['description'];
 			}
 			else{

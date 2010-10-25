@@ -358,9 +358,8 @@ include_once('include/page_header.php');
 		);
 		$graphs = CGraph::get($options);
 
-		// Change graphtype from numbers to names, for correct sorting
 		foreach($graphs as $gnum => $graph){
-			$graph['graphtype'] = graphType($graph['graphtype']);
+			$graphs[$gnum]['graphtype'] = graphType($graph['graphtype']);
 		}
 
 		order_result($graphs, $sortfield, $sortorder);

@@ -596,7 +596,7 @@ switch($itemType) {
 
 // Update interval (in sec)
 		$frmItem->addRow(S_UPDATE_INTERVAL_IN_SEC, new CNumericBox('delay',$delay,5), null, 'row_delay');
-		foreach($types as $it) {
+		foreach($type_keys as $it) {
 			if($it == ITEM_TYPE_TRAPPER) continue;
 			zbx_subarray_push($typeVisibility, $it, 'delay');
 			zbx_subarray_push($typeVisibility, $it, 'row_delay');
@@ -613,7 +613,7 @@ switch($itemType) {
 			new CButton('add_delay_flex', S_ADD)
 		), 'new', 'row_new_delay_flex');
 
-		foreach($types as $it) {
+		foreach($type_keys as $it) {
 			if($it == ITEM_TYPE_TRAPPER || $it == ITEM_TYPE_ZABBIX_ACTIVE) continue;
 			zbx_subarray_push($typeVisibility, $it, 'row_flex_intervals');
 			zbx_subarray_push($typeVisibility, $it, 'row_new_delay_flex');
@@ -631,18 +631,18 @@ switch($itemType) {
 		$frmItem->addRow(S_NEW_APPLICATION, new CTextBox('new_application', $new_application,40), 'new');
 
 
+		if(empty($applications)) $applications[] = 0;
 		$all_apps = CApplication::get(array(
 			'hostids' => $hostid,
 			'ediatble' => 1,
 			'output' => API_OUTPUT_EXTEND,
 		));
-		if(!empty($all_apps)){
-			$cmbApps = new CListBox('applications[]', $applications, 10);
-			foreach($all_apps as $app){
-				$cmbApps->addItem($app['applicationid'], $app['name']);
-			}
-			$frmItem->addRow(S_APPLICATIONS, $cmbApps);
+		$cmbApps = new CListBox('applications[]', $applications, 10);
+		$cmbApps->addItem(0,'-'.S_NONE.'-');
+		foreach($all_apps as $app){
+			$cmbApps->addItem($app['applicationid'], $app['name']);
 		}
+		$frmItem->addRow(S_APPLICATIONS, $cmbApps);
 
 
 		$frmRow = array(new CButton('save',S_SAVE));

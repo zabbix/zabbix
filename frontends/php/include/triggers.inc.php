@@ -1343,6 +1343,11 @@ return $caption;
 						if($function_data['flags'] == ZBX_FLAG_DISCOVERY_CREATED){
 							$link = new CSpan($function_data['host'].':'.$function_data['key_'], $style);
 						}
+						else if($function_data['flags'] == ZBX_FLAG_DISCOVERY_CHILD){
+							$link = new CLink($function_data['host'].':'.$function_data['key_'],
+								'disc_prototypes.php?form=update&itemid='.$function_data['itemid'].'&parent_discoveryid='.
+								$trigger['discoveryRuleid'], $style);
+						}
 						else{
 							$link = new CLink($function_data['host'].':'.$function_data['key_'],
 								'items.php?form=update&itemid='.$function_data['itemid'], $style);

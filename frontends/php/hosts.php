@@ -192,6 +192,7 @@ include_once('include/page_header.php');
 		$params = array(
 			'hostids' => $hostids,
 			'preservekeys' => 1,
+			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 			'output' => API_OUTPUT_EXTEND
 		);
 		$graphs = CGraph::get($params);
@@ -228,6 +229,7 @@ include_once('include/page_header.php');
 // SELECT ITEMS
 		$params = array(
 			'hostids' => $hostids,
+			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 			'preservekeys' => 1,
 			'output' => API_OUTPUT_EXTEND
 		);
@@ -235,7 +237,6 @@ include_once('include/page_header.php');
 
 // SELECT APPLICATIONS
 		$itemids = zbx_objectValues($items, 'itemid');
-//sdii($itemids);
 		$params = array(
 			'itemids' => $itemids,
 			'preservekeys' => 1,
@@ -248,6 +249,7 @@ include_once('include/page_header.php');
 		$params = array(
 			'hostids' => $hostids,
 			'output' => API_OUTPUT_EXTEND,
+			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 			'preservekeys' => 1,
 			'select_dependencies' => API_OUTPUT_EXTEND,
 			'expandData' => 1
