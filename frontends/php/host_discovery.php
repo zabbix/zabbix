@@ -42,7 +42,7 @@ switch($itemType) {
 }
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'hostid'=>			array(T_ZBX_INT, O_OPT,  null,	DB_ID,			'(!isset({form}) || (isset({form})&&!isset({itemid})))'),
+		'hostid'=>			array(T_ZBX_INT, O_OPT,  null,	DB_ID,			null),
 		'itemid'=>			array(T_ZBX_INT, O_NO,	 P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))'),
 
 		'description'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),
@@ -461,8 +461,8 @@ switch($itemType) {
 		array_push($delay_flex_el, count($delay_flex_el)==0 ? S_NO_FLEXIBLE_INTERVALS : new CButton('del_delay_flex',S_DELETE_SELECTED));
 
 
-// Description
-		$frmItem->addRow(S_DESCRIPTION, new CTextBox('description',$description,40, $limited));
+// Name
+		$frmItem->addRow(S_NAME, new CTextBox('description',$description,40, $limited));
 
 // Key
 		$frmItem->addRow(S_KEY, new CTextBox('key', $key, 40, $limited));
@@ -674,17 +674,20 @@ switch($itemType) {
 		$form->addVar('hostid', $_REQUEST['hostid']);
 		$form->setName('items');
 
+		$sortlink = new Curl();
+		$sortlink->setArgument('hostid', $_REQUEST['hostid']);
+		$sortlink = $sortlink->getUrl();
 		$table  = new CTableInfo();
 		$table->setHeader(array(
 			new CCheckBox('all_items',null,"checkAll('".$form->GetName()."','all_items','group_itemid');"),
-			make_sorting_header(S_DESCRIPTION,'description'),
+			make_sorting_header(S_NAME,'description', $sortlink),
 			S_PROTOTYPES,
 			S_TRIGGERS,
 			S_GRAPHS,
-			make_sorting_header(S_KEY,'key_'),
-			make_sorting_header(S_INTERVAL,'delay'),
-			make_sorting_header(S_TYPE,'type'),
-			make_sorting_header(S_STATUS,'status'),
+			make_sorting_header(S_KEY,'key_', $sortlink),
+			make_sorting_header(S_INTERVAL,'delay', $sortlink),
+			make_sorting_header(S_TYPE,'type', $sortlink),
+			make_sorting_header(S_STATUS,'status', $sortlink),
 			S_APPLICATIONS,
 			S_ERROR
 		));
@@ -745,6 +748,8 @@ switch($itemType) {
 
 			$applications = zbx_objectValues($item['applications'], 'name');
 			$applications = implode(', ', $applications);
+// ugly dash
+			if(empty($applications)) $applications = '-';
 
 			$prototypes = array(new CLink(S_PROTOTYPES, 'disc_prototypes.php?&parent_discoveryid='.$item['itemid']),
 				' ('.$item['prototypes'].')');
