@@ -835,29 +835,6 @@ return $caption;
 			return false;
 		}
 
-
-// kopaem nedo trigger parser shtob naiti dannie po itemam, TODO: peredelatj
-		if($flags != ZBX_FLAG_DISCOVERY_NORMAL){
-			$has_prototype = false;
-			foreach($expressionData as $data){
-				foreach($data['expressions'] as $expr){
-					foreach($expr['parts'] as $part){
-						if($part['levelType'] == 'key'){
-							if($part['levelDBData']['flags'] == ZBX_FLAG_DISCOVERY_CHILD){
-								$has_prototype = true;
-								break 3;
-							}
-						}
-					}
-				}
-			}
-			if(!$has_prototype){
-				error('Trigger prototype should have at least one prototype');
-				return false;
-			}
-		}
-// ---
-
 		$triggerid=get_dbid('triggers','triggerid');
 
 		$result=DBexecute('INSERT INTO triggers '.
@@ -887,6 +864,30 @@ return $caption;
 				$result &= $result2;
 			}
 		}
+
+// TODO: peredelatj!
+		if($flags != ZBX_FLAG_DISCOVERY_NORMAL){
+			$trig_info = CTrigger::get(array(
+				'triggerids' => $triggerid,
+				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
+				'output' => API_OUTPUT_REFER,
+				'select_items' => API_OUTPUT_EXTEND
+			));
+			$trig_info = reset($trig_info);
+			$has_prototype = false;
+
+			foreach($trig_info['items'] as $titem){
+				if($titem['flags'] == ZBX_FLAG_DISCOVERY_CHILD){
+					$has_prototype = true;
+					break;
+				}
+			}
+			if(!$has_prototype){
+				error('Trigger prototype should have at least one prototype');
+				$result = false;
+			}
+		}
+// ---
 
 		$trig_hosts = get_hosts_by_triggerid($triggerid);
 		$trig_host = DBfetch($trig_hosts);
@@ -1836,30 +1837,6 @@ return $caption;
 			return false;
 		}
 
-// kopaem nedo trigger parser shtob naiti dannie po itemam, TODO: peredelatj
-		if($flags != ZBX_FLAG_DISCOVERY_NORMAL){
-			$has_prototype = false;
-
-			foreach($expressionData as $data){
-				foreach($data['expressions'] as $expr){
-					foreach($expr['parts'] as $part){
-						if($part['levelType'] == 'key'){
-							if($part['levelDBData']['flags'] == ZBX_FLAG_DISCOVERY_CHILD){
-								$has_prototype = true;
-								break 3;
-							}
-						}
-					}
-				}
-			}
-			if(!$has_prototype){
-				error('Trigger prototype should have at least one prototype');
-				return false;
-			}
-		}
-// ---
-
-
 		if(!validate_trigger_dependency($expression, $deps)) return false;
 
 		if(is_null($description)){
@@ -1963,6 +1940,30 @@ return $caption;
 		}
 
 		DB::update('triggers', array('values' => $update_values, 'where' => array('triggerid='.$triggerid)));
+
+// TODO: peredelatj!
+		if($flags != ZBX_FLAG_DISCOVERY_NORMAL){
+			$trig_info = CTrigger::get(array(
+				'triggerids' => $triggerid,
+				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
+				'output' => API_OUTPUT_REFER,
+				'select_items' => API_OUTPUT_EXTEND
+			));
+			$trig_info = reset($trig_info);
+			$has_prototype = false;
+
+			foreach($trig_info['items'] as $titem){
+				if($titem['flags'] == ZBX_FLAG_DISCOVERY_CHILD){
+					$has_prototype = true;
+					break;
+				}
+			}
+			if(!$has_prototype){
+				error('Trigger prototype should have at least one prototype');
+				$result = false;
+			}
+		}
+// ---
 
 		delete_dependencies_by_triggerid($triggerid);
 
