@@ -381,14 +381,17 @@ switch($itemType) {
 		$form->setName('items');
 		$form->addVar('parent_discoveryid', $_REQUEST['parent_discoveryid']);
 
+		$sortlink = new Curl();
+		$sortlink->setArgument('parent_discoveryid', $_REQUEST['parent_discoveryid']);
+		$sortlink = $sortlink->getUrl();
 		$table = new CTableInfo();
 		$table->setHeader(array(
 			new CCheckBox('all_items',null,"checkAll('".$form->GetName()."','all_items','group_itemid');"),
-			make_sorting_header(S_DESCRIPTION,'description'),
-			make_sorting_header(S_KEY,'key_'),
-			make_sorting_header(S_INTERVAL,'delay'),
-			make_sorting_header(S_TYPE,'type'),
-			make_sorting_header(S_STATUS,'status'),
+			make_sorting_header(S_DESCRIPTION,'description', $sortlink),
+			make_sorting_header(S_KEY,'key_', $sortlink),
+			make_sorting_header(S_INTERVAL,'delay', $sortlink),
+			make_sorting_header(S_TYPE,'type', $sortlink),
+			make_sorting_header(S_STATUS,'status', $sortlink),
 			S_APPLICATIONS,
 			S_ERROR
 		));
@@ -436,6 +439,8 @@ switch($itemType) {
 
 			$applications = zbx_objectValues($item['applications'], 'name');
 			$applications = implode(', ', $applications);
+// ugly dash
+			if(empty($applications)) $applications = '-';
 
 			$table->addRow(array(
 				new CCheckBox('group_itemid['.$item['itemid'].']',null,null,$item['itemid']),

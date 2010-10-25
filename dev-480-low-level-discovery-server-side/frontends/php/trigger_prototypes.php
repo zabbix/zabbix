@@ -233,6 +233,7 @@ include_once('include/page_header.php');
 		$options = array(
 			'triggerids' => $_REQUEST['g_triggerid'],
 			'select_dependencies' => 1,
+			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => 1
 		);

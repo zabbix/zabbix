@@ -2482,11 +2482,16 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 		asort($dependencies);
 
-		$frmMTrig = new CFormTable(S_TRIGGERS_MASSUPDATE, 'triggers.php');
+		$frmMTrig = new CFormTable(S_TRIGGERS_MASSUPDATE);
 		$frmMTrig->addVar('massupdate',get_request('massupdate',1));
 		$frmMTrig->addVar('go',get_request('go','massupdate'));
 		$frmMTrig->setAttribute('id', 'massupdate');
 		$frmMTrig->setName('trig_form');
+
+		$parent_discoveryid = get_request('parent_discoveryid');
+		if($parent_discoveryid){
+			$frmMTrig->addVar('parent_discoveryid', $parent_discoveryid);
+		}
 
 		$triggers = $_REQUEST['g_triggerid'];
 		foreach($triggers as $id => $triggerid){
@@ -2501,42 +2506,44 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			$cmbPrior
 		);
 
+		if(!$parent_discoveryid){
 /* dependencies */
-		$dep_el = array();
-		foreach($dependencies as $val){
-			array_push($dep_el,
-				array(
-					new CCheckBox("rem_dependence[]", 'no', null, strval($val)),
-					expand_trigger_description($val)
-				),
-				BR());
-			$frmMTrig->addVar("dependencies[]",strval($val));
+			$dep_el = array();
+			foreach($dependencies as $val){
+				array_push($dep_el,
+					array(
+						new CCheckBox("rem_dependence[]", 'no', null, strval($val)),
+						expand_trigger_description($val)
+					),
+					BR());
+				$frmMTrig->addVar("dependencies[]",strval($val));
+			}
+
+			if(count($dep_el)==0)
+				$dep_el[] = S_NO_DEPENDENCES_DEFINED;
+			else
+				$dep_el[] = new CButton('del_dependence',S_DELETE_SELECTED);
+
+	//		$frmMTrig->addRow(S_THE_TRIGGER_DEPENDS_ON,$dep_el);
+	/* end dependencies */
+	/* new dependency */
+			//$frmMTrig->addVar('new_dependence','0');
+
+			$btnSelect = new CButton('btn1', S_ADD,
+					"return PopUp('popup.php?dstfrm=massupdate&dstact=add_dependence&reference=deptrigger".
+					"&dstfld1=new_dependence[]&srctbl=triggers&objname=triggers&srcfld1=triggerid&multiselect=1".
+					"',1000,700);",
+					'T');
+
+			array_push($dep_el, array(br(),$btnSelect));
+
+			$dep_div = new CDiv($dep_el);
+			$dep_div->setAttribute('id','dependency_box');
+
+			$frmMTrig->addRow(array(new CVisibilityBox('visible[dependencies]', isset($visible['dependencies']), 'dependency_box', S_ORIGINAL),S_TRIGGER_DEPENDENCIES),
+								$dep_div
+							);
 		}
-
-		if(count($dep_el)==0)
-			$dep_el[] = S_NO_DEPENDENCES_DEFINED;
-		else
-			$dep_el[] = new CButton('del_dependence',S_DELETE_SELECTED);
-
-//		$frmMTrig->addRow(S_THE_TRIGGER_DEPENDS_ON,$dep_el);
-/* end dependencies */
-/* new dependency */
-		//$frmMTrig->addVar('new_dependence','0');
-
-		$btnSelect = new CButton('btn1', S_ADD,
-				"return PopUp('popup.php?dstfrm=massupdate&dstact=add_dependence&reference=deptrigger".
-				"&dstfld1=new_dependence[]&srctbl=triggers&objname=triggers&srcfld1=triggerid&multiselect=1".
-				"',1000,700);",
-				'T');
-
-		array_push($dep_el, array(br(),$btnSelect));
-
-		$dep_div = new CDiv($dep_el);
-		$dep_div->setAttribute('id','dependency_box');
-
-		$frmMTrig->addRow(array(new CVisibilityBox('visible[dependencies]', isset($visible['dependencies']), 'dependency_box', S_ORIGINAL),S_TRIGGER_DEPENDENCIES),
-							$dep_div
-						);
 /* end new dependency */
 
 		$frmMTrig->addItemToBottomRow(new CButton('mass_save',S_SAVE));
