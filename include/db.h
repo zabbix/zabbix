@@ -582,9 +582,10 @@ zbx_uint64_t	DBget_nextid(const char *tablename, int num);
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-typedef struct {
-	/* The itemid should be on the first place for the correct sorting */
-	zbx_uint64_t	itemid, gitemid;
+typedef struct
+{
+	zbx_uint64_t	itemid; /* itemid should come first for correct sorting */
+	zbx_uint64_t	gitemid;
 	char		key[ITEM_KEY_LEN_MAX];
 	int		drawtype;
 	int		sortorder;
@@ -594,7 +595,8 @@ typedef struct {
 	int		type;
 	int		periods_cnt;
 	unsigned char	flags;
-} ZBX_GRAPH_ITEMS;
+}
+ZBX_GRAPH_ITEMS;
 
 int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *error);
 int	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid);

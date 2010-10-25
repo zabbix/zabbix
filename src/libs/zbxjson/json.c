@@ -568,7 +568,7 @@ static size_t	zbx_json_string_size(const char *p)
 					case 'r':
 					case 't': sz++; break;
 					default:
-						/* this should never happen */;
+						THIS_SHOULD_NEVER_HAPPEN;
 				}
 			}
 			else
@@ -616,14 +616,15 @@ static const char	*zbx_json_decodestring(const char *p, char *string, size_t len
 					case 't': *o++ = '\t'; break;
 					case 'u':
 						p += 2; /* "00" */
-						c = zbx_hex2num( *p++ ) << 4;
-						c += zbx_hex2num( *p );
+						c = zbx_hex2num(*p++) << 4;
+						c += zbx_hex2num(*p);
 						*o++ = (char)c;
 						break;
 					default:
-						/* this should never happen */;
+						THIS_SHOULD_NEVER_HAPPEN;
 				}
-			} else
+			}
+			else
 				*o++ = *p;
 		}
 		p++;
