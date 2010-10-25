@@ -143,11 +143,11 @@ int	process_event(DB_EVENT *event, int force_actions)
 
 		process_actions(event);
 
-		if (EVENT_OBJECT_TRIGGER == event->object)
-			DBupdate_services(event->objectid, TRIGGER_VALUE_TRUE == event->value ? event->trigger_priority : 0, event->clock);
-
 		free_trigger_info(event);
 	}
+
+	if (TRIGGER_VALUE_CHANGED_YES == event->value_changed && EVENT_OBJECT_TRIGGER == event->object)
+		DBupdate_services(event->objectid, TRIGGER_VALUE_TRUE == event->value ? event->trigger_priority : 0, event->clock);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 

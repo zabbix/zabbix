@@ -384,12 +384,14 @@ static int	trigger_dependent_rec(zbx_uint64_t triggerid, int level)
 		return ret;
 	}
 
-	result = DBselect("select t.triggerid,t.value"
-				" from trigger_depends d,triggers t"
-				" where d.triggerid_down=" ZBX_FS_UI64
-					" and d.triggerid_up=t.triggerid",
-					triggerid);
-	while (NULL != (row=DBfetch(result)))
+	result = DBselect(
+			"select t.triggerid,t.value"
+			" from trigger_depends d,triggers t"
+			" where d.triggerid_down=" ZBX_FS_UI64
+				" and d.triggerid_up=t.triggerid",
+			triggerid);
+
+	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(triggerid_tmp, row[0]);
 		value_tmp = atoi(row[1]);
