@@ -862,13 +862,12 @@ FIELD		|elementid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|elementtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|iconid_off	|t_id		|	|NULL		|ZBX_SYNC		|2|images	|imageid	|RESTRICT
 FIELD		|iconid_on	|t_id		|	|NULL		|ZBX_SYNC		|3|images	|imageid	|RESTRICT
-FIELD		|iconid_unknown	|t_id		|	|NULL		|ZBX_SYNC		|4|images	|imageid	|RESTRICT
 FIELD		|label		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|label_location	|t_integer	|	|NULL		|ZBX_SYNC
 FIELD		|x		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|y		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|iconid_disabled|t_id		|	|NULL		|ZBX_SYNC		|5|images	|imageid	|RESTRICT
-FIELD		|iconid_maintenance|t_id	|	|NULL		|ZBX_SYNC		|6|images	|imageid	|RESTRICT
+FIELD		|iconid_disabled|t_id		|	|NULL		|ZBX_SYNC		|4|images	|imageid	|RESTRICT
+FIELD		|iconid_maintenance|t_id	|	|NULL		|ZBX_SYNC		|5|images	|imageid	|RESTRICT
 
 TABLE|sysmap_element_url|sysmapelementurlid|ZBX_SYNC
 FIELD		|sysmapelementurlid|t_id	|	|NOT NULL	|0
