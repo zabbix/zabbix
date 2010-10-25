@@ -1,0 +1,2 @@
+ALTER TABLE history_uint ALTER COLUMN itemid SET WITH DEFAULT NULL;
+ALTER TABLE history_uint ADD ns integer SET WITH DEFAULT '0' NOT NULL;
