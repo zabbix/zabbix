@@ -57,13 +57,13 @@ static int		ZBX_HISTORY_SIZE = 0;
 int			ZBX_SYNC_MAX = 1000;	/* Must be less than ZBX_HISTORY_SIZE */
 static int		ZBX_ITEMIDS_SIZE = 0;
 
-#define ZBX_IDS_SIZE	10
+#define ZBX_IDS_SIZE	11
 #define ZBX_DC_ID	struct zbx_dc_id_type
 #define ZBX_DC_IDS	struct zbx_dc_ids_type
 
 ZBX_DC_ID
 {
-	char		table_name[16];
+	char		table_name[ZBX_TABLENAME_LEN_MAX];
 	zbx_uint64_t	lastid;
 	int		reserved;
 };
