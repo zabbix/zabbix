@@ -2,6 +2,7 @@ CREATE TABLE graph_discovery (
 	graphdiscoveryid         number(20)                                NOT NULL,
 	graphid                  number(20)                                NOT NULL,
 	parent_graphid           number(20)                                NOT NULL,
+	name                     nvarchar2(128)  DEFAULT ''                ,
 	PRIMARY KEY (graphdiscoveryid)
 );
 CREATE UNIQUE INDEX graph_discovery_1 on graph_discovery (graphid,parent_graphid);

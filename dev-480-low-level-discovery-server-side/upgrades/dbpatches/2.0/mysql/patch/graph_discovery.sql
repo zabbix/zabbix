@@ -2,6 +2,7 @@ CREATE TABLE graph_discovery (
 	graphdiscoveryid         bigint unsigned                           NOT NULL,
 	graphid                  bigint unsigned                           NOT NULL,
 	parent_graphid           bigint unsigned                           NOT NULL,
+	name                     varchar(128)    DEFAULT ''                NOT NULL,
 	PRIMARY KEY (graphdiscoveryid)
 ) ENGINE=InnoDB;
 CREATE UNIQUE INDEX graph_discovery_1 on graph_discovery (graphid,parent_graphid);
