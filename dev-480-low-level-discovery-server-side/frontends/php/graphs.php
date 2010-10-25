@@ -495,7 +495,8 @@ include_once('include/page_header.php');
 			}
 
 			if(!empty($graph['discoveryRule'])){
-				$name[] = new CSpan($graph['discoveryRule']['description'], 'discoveryName');
+				$name[] = new CLink($graph['discoveryRule']['description'], 'graph_prototypes.php?parent_discoveryid='.
+					$graph['discoveryRule']['itemid'],'discoveryName');
 				$name[] = ':'.$graph['name'];
 			}
 			else{

@@ -1041,7 +1041,8 @@ switch($itemType) {
 			$item['description_expanded'] = item_description($item);
 
 			if(!empty($item['discoveryRule'])){
-				$description[] = new CSpan($item['discoveryRule']['description'], 'discoveryName');
+				$description[] = new CLink($item['discoveryRule']['description'], 'disc_prototypes.php?parent_discoveryid='.
+					$item['discoveryRule']['itemid'], 'discoveryName');
 				$description[] = ':'.$item['description_expanded'];
 			}
 			else{

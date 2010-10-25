@@ -416,11 +416,15 @@ if(form){
 
 	echo SBR;
 
+	$parent_discoveryid = get_request('parent_discoveryid');
+
 	$form = new CFormTable(S_CONDITION);
 	$form->SetName('expression');
 	$form->addVar('dstfrm', $dstfrm);
 	$form->addVar('dstfld1', $dstfld1);
 	$form->addVar('itemid',$itemid);
+	if($parent_discoveryid)
+		$form->addVar('parent_discoveryid', $parent_discoveryid);
 
 	$row = array(
 		new CTextBox('description', $description, 50, 'yes'),
@@ -428,7 +432,7 @@ if(form){
 				"&dstfld1=itemid&dstfld2=description&submitParent=1&".
 				"srctbl=items&srcfld1=itemid&srcfld2=description',0,0,'zbx_popup_item');"),
 	);
-	if(get_request('parent_discoveryid')){
+	if($parent_discoveryid){
 		$row[] = new CButton('select', S_SELECT_PROTOTYPE, "return PopUp('popup.php?dstfrm=".$form->GetName().
 				"&dstfld1=itemid&dstfld2=description&submitParent=1".url_param('parent_discoveryid', true).
 				"&srctbl=prototypes&srcfld1=itemid&srcfld2=description',0,0,'zbx_popup_item');");

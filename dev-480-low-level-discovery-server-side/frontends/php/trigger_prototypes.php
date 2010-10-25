@@ -271,6 +271,7 @@ include_once('include/page_header.php');
 		$options = array(
 			'triggerids' => $_REQUEST['g_triggerid'],
 			'editable' => 1,
+			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
 			'output' => API_OUTPUT_EXTEND,
 			'select_hosts' => API_OUTPUT_EXTEND
 		);
@@ -442,6 +443,7 @@ include_once('include/page_header.php');
 			$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
 			$trigger['items'] = zbx_toHash($trigger['items'], 'itemid');
 			$trigger['functions'] = zbx_toHash($trigger['functions'], 'functionid');
+			$trigger['discoveryRuleid'] = $_REQUEST['parent_discoveryid'];
 
 			$description = array();
 			if($trigger['templateid'] > 0){
@@ -478,7 +480,7 @@ include_once('include/page_header.php');
 
 
 			$status_link = 'trigger_prototypes.php?go='.(($trigger['status'] == TRIGGER_STATUS_DISABLED) ? 'activate' : 'disable').
-				'&g_triggerid%5B%5D='.$triggerid;
+				'&g_triggerid%5B%5D='.$triggerid.'&parent_discoveryid='.$_REQUEST['parent_discoveryid'];
 			if($trigger['status'] == TRIGGER_STATUS_DISABLED){
 				$status = new CLink(S_DISABLED, $status_link, 'disabled');
 			}
