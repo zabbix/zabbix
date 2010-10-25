@@ -840,9 +840,9 @@ return $caption;
 		$triggerid=get_dbid('triggers','triggerid');
 
 		$result=DBexecute('INSERT INTO triggers '.
-			'  (triggerid,description,type,priority,status,comments,url,value,error,templateid) '.
+			'  (triggerid,description,type,priority,status,comments,url,value,value_flags,error,templateid) '.
 			" values ($triggerid,".zbx_dbstr($description).",$type,$priority,$status,".zbx_dbstr($comments).','.
-			zbx_dbstr($url).",2,'Trigger just added. No status update so far.',".zero2null($templateid).")");
+			zbx_dbstr($url).",".TRIGGER_VALUE_FALSE.",".TRIGGER_VALUE_FLAG_UNKNOWN.",'Trigger just added. No status update so far.',".zero2null($templateid).")");
 
 		if(!$result){
 			return	$result;

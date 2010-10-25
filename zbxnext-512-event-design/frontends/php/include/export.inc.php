@@ -704,7 +704,7 @@ class zbxXML{
 						break;
 					}
 
-					$icons = array('iconid_off','iconid_on','iconid_unknown','iconid_disabled','iconid_maintenance');
+					$icons = array('iconid_off','iconid_on','iconid_disabled','iconid_maintenance');
 					foreach($icons as $icon){
 						if(isset($selement[$icon])){
 							$image = getImageByIdent($selement[$icon]);

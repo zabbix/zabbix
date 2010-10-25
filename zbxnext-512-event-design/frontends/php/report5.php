@@ -93,6 +93,7 @@ include_once('include/page_header.php');
 				' and t.triggerid=e.objectid '.
 				' and e.object='.EVENT_OBJECT_TRIGGER.
 				' and e.clock>'.(time()-$time_dif).
+				' and e.value_changed='.TRIGGER_VALUE_CHANGED_YES.
 				' and '.DBcondition('t.triggerid',$available_triggers).
 				' and '.DBin_node('t.triggerid').
 			' GROUP BY h.host,t.triggerid,t.description,t.expression,t.priority '.
