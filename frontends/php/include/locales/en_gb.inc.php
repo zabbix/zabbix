@@ -1201,7 +1201,29 @@
 	'S_DELETE_HISTORY_SELECTED_ITEMS_Q'=>			'Delete history of selected items?',
 	'S_DELETE_SELECTED_ITEMS_Q'=>				'Delete selected items?',
 	'S_FORMULA'=>						'Formula',
+	'S_RULE'=>						'Rule',
 
+// host_discovery.php
+	'S_CONFIGURATION_OF_DISCOVERY_RULES_BIG' => 'CONFIGURATION OF DISCOVERY RULES',
+	'S_PROTOTYPES' => 'Prototypes',
+	
+// disc_prototypes.php
+	'S_CONFIGURATION_OF_ITEM_PROTOTYPES_BIG' => 'CONFIGURATION OF ITEM PROTOTYPES', 
+	'S_ITEM_PROTOTYPES_OF_BIG' => 'ITEM PROTOTYPES OF', 
+	'S_ADD_PROTOTYPE' => 'Add prototype', 
+	'S_SELECT_PROTOTYPE' => 'Select prototype', 
+	'S_CREATE_PROTOTYPE' => 'Create prototype', 
+	'S_ITEM_PROTOTYPE' => 'Item prototype', 
+	
+	'S_CONFIGURATION_OF_GRAPHS_PROTOTYPES_BIG' => 'CONFIGURATION OF GRAPH PROTOTYPES',
+	
+// trigger_prototypes.php
+	'S_CONFIGURATION_OF_TRIGGERS_PROTOTYPES_BIG' => 'CONFIGURATION OF TRIGGER PROTOTYPES',
+	'S_TRIGGER_PROTOTYPES_OF_BIG' => 'TRIGGER PROTOTYPES OF',
+
+// graph_prototypes.php
+	'S_GRAPH_PROTOTYPES_OF_BIG' => 'GRAPH PROTOTYPES OF',
+	
 //	events.php
 	'S_EVENT'=>				'Event',
 	'S_EVENT_DETAILS'=>			'Event details',

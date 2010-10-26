@@ -184,6 +184,10 @@ typedef enum
 	ITEM_TYPE_CALCULATED
 } zbx_item_type_t;
 
+#define ZBX_FLAG_DISCOVERY		0x01	/* low-level discovery rule */
+#define ZBX_FLAG_DISCOVERY_CHILD	0x02	/* low-level discovery proto-item, proto-trigger or proto-graph */
+#define ZBX_FLAG_DISCOVERED_ITEM	0x04	/* low-level discovered item, trigger or graph */
+
 typedef enum
 {
 	ITEM_AUTHTYPE_PASSWORD = 0,
@@ -887,6 +891,7 @@ int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t v
 void	uint64_array_merge(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t *value, int value_num, int alloc_step);
 int	uint64_array_exists(zbx_uint64_t *values, int num, zbx_uint64_t value);
 void	uint64_array_remove(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values, int rm_num);
+void	uint64_array_remove_both(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values, int *rm_num);
 
 #ifdef _WINDOWS
 LPTSTR	zbx_acp_to_unicode(LPCSTR acp_string);
