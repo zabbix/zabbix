@@ -1368,8 +1368,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 				/* check for low-level discovery (lld) item */
 				if (0 != (ZBX_FLAG_DISCOVERY & item.flags))
 				{
-					if (NOTSUPPORTED == DBlld_process_discovery_rule(item.itemid,
-								agent.text, error, strlen(error)))
+					if (NOTSUPPORTED == DBlld_process_discovery_rule(item.itemid, agent.text))
 					{
 						zabbix_log(LOG_LEVEL_WARNING, "Item [%s:%s] error: %s",
 								item.host.host, item.key_orig, error);
@@ -2660,47 +2659,6 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, 
 
 /******************************************************************************
  *                                                                            *
- * Function: DBlld_cmp_graphitems                                             *
- *                                                                            *
- * Purpose: Compare graph items from two graphs                               *
- *                                                                            *
- * Parameters: gitems1     - [IN] first graph items, sorted by itemid         *
- *             gitems1_num - [IN] number of first graph items                 *
- *             gitems2     - [IN] second graph items, sorted by itemid        *
- *             gitems2_num - [IN] number of second graph items                *
- *                                                                            *
- * Return value: SUCCEED if graph items coincide                              *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-static int	DBlld_cmp_graphitems(ZBX_GRAPH_ITEMS *gitems1, int gitems1_num,
-		ZBX_GRAPH_ITEMS *gitems2, int gitems2_num)
-{
-	const char	*__function_name = "DBlld_cmp_graphitems";
-	int		res = FAIL, i;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	if (gitems1_num != gitems2_num)
-		goto clean;
-
-	for (i = 0; i < gitems1_num; i++)
-		if (gitems1[i].itemid != gitems2[i].itemid)
-			goto clean;
-
-	res = SUCCEED;
-clean:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s",
-			__function_name, zbx_result_string(res));
-
-	return res;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: DBlld_update_graph                                               *
  *                                                                            *
  * Purpose: add or update graph                                               *
@@ -2722,28 +2680,111 @@ static int	DBlld_update_graph(zbx_uint64_t hostid, zbx_uint64_t graphid,
 		double percent_left, double percent_right,
 		unsigned char ymin_type, unsigned char ymax_type,
 		zbx_uint64_t ymin_itemid, zbx_uint64_t ymax_itemid,
-		struct zbx_json_parse *jp_row)
+		struct zbx_json_parse *jp_row, char **error)
 {
 	const char		*__function_name = "DBlld_update_graph";
 
-	char			*sql = NULL, *key = NULL, *name_esc, *color_esc;
-	int			sql_alloc = 1024, sql_offset = 0, i;
+	char			*sql = NULL, *key = NULL, *color_esc;
+	int			sql_alloc = 1024, sql_offset, i;
 	ZBX_GRAPH_ITEMS 	*gitems = NULL, *chd_gitems = NULL;
 	int			gitems_alloc = 0, gitems_num = 0,
 				chd_gitems_alloc = 0, chd_gitems_num = 0,
 				res = SUCCEED;
 	DB_RESULT		result;
 	DB_ROW			row;
-	zbx_uint64_t		new_graphid = 0, new_gitemid, graphdiscoveryid;
+	zbx_uint64_t		new_graphid = 0, graphdiscoveryid;
+	char			*graph_name, *graph_name_esc, *name_esc;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() jp_row:'%.*s'", __function_name,
 			jp_row->end - jp_row->start + 1, jp_row->start);
 
-	sql = zbx_malloc(sql, sql_alloc);
+	graph_name = strdup(name);
+	substitute_discovery_macros(&graph_name, jp_row);
+	graph_name_esc = DBdyn_escape_string(graph_name);
 	name_esc = DBdyn_escape_string(name);
 
+	result = DBselect(
+			"select distinct g.graphid"
+			" from graphs g,graph_discovery gd"
+			" where g.graphid=gd.graphid"
+				" and gd.parent_graphid=" ZBX_FS_UI64
+				" and g.name='%s'",
+			graphid, graph_name_esc);
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(new_graphid, row[0]);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() new_graphid:" ZBX_FS_UI64,
+				__function_name, new_graphid);
+	}
+	DBfree_result(result);
+
+	if (0 == new_graphid)
+	{
+		result = DBselect(
+				"select distinct g.graphid,gd.name,g.name"
+				" from graphs g,graph_discovery gd"
+				" where g.graphid=gd.graphid"
+					" and gd.parent_graphid=" ZBX_FS_UI64,
+				graphid);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			char	*old_graph_name;
+
+			old_graph_name = strdup(row[1]);
+			substitute_discovery_macros(&old_graph_name, jp_row);
+
+			if (0 == strcmp(old_graph_name, row[2]))
+				ZBX_STR2UINT64(new_graphid, row[0]);
+
+			zbx_free(old_graph_name);
+
+			if (0 != new_graphid)
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() new_graphid:" ZBX_FS_UI64,
+						__function_name, new_graphid);
+				break;
+			}
+		}
+		DBfree_result(result);
+	}
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	sql_offset = 0;
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
-			"select gi.gitemid,i.itemid,i.key_,gi.drawtype,gi.sortorder,gi.color,"
+			"select distinct g.graphid"
+			" from graphs g,graphs_items gi,items i"
+			" where g.graphid=gi.graphid"
+				" and gi.itemid=i.itemid"
+				" and i.hostid=" ZBX_FS_UI64
+				" and g.name='%s'",
+			hostid, graph_name_esc);
+
+	if (0 != new_graphid)
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 64,
+				" and g.graphid<>" ZBX_FS_UI64,
+				new_graphid);
+
+	result = DBselect("%s", sql);
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		if (0 != new_graphid)
+			DBdelete_graphs(&new_graphid, 1);
+
+		*error = zbx_strdcatf(*error, "Can't add graph [%s]: graph already exists\n", graph_name);
+		res = FAIL;
+	}
+	DBfree_result(result);
+
+	if (FAIL == res)
+		goto out;
+
+	sql_offset = 0;
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
+			"select 0,i.itemid,i.key_,gi.drawtype,gi.sortorder,gi.color,"
 				"gi.yaxisside,gi.calc_fnc,gi.type,gi.periods_cnt,i.flags"
 			" from graphs_items gi,items i"
 			" where gi.itemid=i.itemid"
@@ -2764,28 +2805,15 @@ static int	DBlld_update_graph(zbx_uint64_t hostid, zbx_uint64_t graphid,
 
 	qsort(gitems, gitems_num, sizeof(ZBX_GRAPH_ITEMS), ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	result = DBselect(
-			"select distinct g.graphid"
-			" from graphs g,graphs_items gi,items i"
-			" where g.graphid=gi.graphid"
-				" and gi.itemid=i.itemid"
-				" and i.hostid=" ZBX_FS_UI64
-				" and g.name='%s'"
-				" and not g.flags & %d",
-			hostid, name_esc, ZBX_FLAG_DISCOVERY_CHILD);
-
-	/* compare graphs */
-	if (NULL != (row = DBfetch(result)))
+	if (0 != new_graphid)
 	{
-		ZBX_STR2UINT64(new_graphid, row[0]);
+		size_t		sz;
+		ZBX_GRAPH_ITEMS	*gitem;
 
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
-				"select gi.gitemid,i.itemid,i.key_,"
-					"gi.drawtype,gi.sortorder,"
-					"gi.color,gi.yaxisside,"
-					"gi.calc_fnc,gi.type,"
-					"gi.periods_cnt,i.flags"
+				"select gi.gitemid,i.itemid,i.key_,gi.drawtype,gi.sortorder,gi.color,"
+					"gi.yaxisside,gi.calc_fnc,gi.type,gi.periods_cnt,i.flags"
 				" from graphs_items gi,items i"
 				" where gi.itemid=i.itemid"
 					" and gi.graphid=" ZBX_FS_UI64
@@ -2794,14 +2822,19 @@ static int	DBlld_update_graph(zbx_uint64_t hostid, zbx_uint64_t graphid,
 
 		DBget_graphitems(sql, &chd_gitems, &chd_gitems_alloc, &chd_gitems_num);
 
-		if (SUCCEED != DBlld_cmp_graphitems(gitems, gitems_num, chd_gitems, chd_gitems_num))
+		for (i = chd_gitems_num - 1; i >= 0; i--)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() Graph [%s] already exists on the host (items are not identical)",
-					__function_name, name);
-			res = FAIL;
+			if (NULL != (gitem = bsearch(&chd_gitems[i].itemid, gitems, gitems_num, sizeof(ZBX_GRAPH_ITEMS), ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+			{
+				gitem->gitemid = chd_gitems[i].gitemid;
+
+				chd_gitems_num--;
+
+				if (0 != (sz = (chd_gitems_num - i) * sizeof(ZBX_GRAPH_ITEMS)))
+					memmove(&chd_gitems[i], &chd_gitems[i + 1], sz);
+			}
 		}
 	}
-	DBfree_result(result);
 
 	if (FAIL == res)
 		goto out;
@@ -2833,17 +2866,54 @@ static int	DBlld_update_graph(zbx_uint64_t hostid, zbx_uint64_t graphid,
 					"ymax_itemid=%s,"
 					"flags=%d"
 				" where graphid=" ZBX_FS_UI64 ";\n",
-				name_esc, width, height, yaxismin, yaxismax,
+				graph_name_esc, width, height, yaxismin, yaxismax,
 				(int)show_work_period, (int)show_triggers,
 				(int)graphtype, (int)show_legend, (int)show_3d, 
 				percent_left, percent_right, (int)ymin_type, (int)ymax_type,
 				DBsql_id_ins(ymin_itemid), DBsql_id_ins(ymax_itemid),
 				ZBX_FLAG_DISCOVERED_ITEM, new_graphid);
 
-		for (i = 0; i < gitems_num; i++)
-		{
-			color_esc = DBdyn_escape_string(gitems[i].color);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128 + strlen(name_esc),
+				"update graph_discovery"
+				" set name='%s'"
+				" where graphid=" ZBX_FS_UI64
+					" and parent_graphid=" ZBX_FS_UI64 ";\n",
+				name_esc, new_graphid, graphid);
+	}
+	else
+	{
+		new_graphid = DBget_maxid("graphs");
+		graphdiscoveryid = DBget_maxid("graph_discovery");
 
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 1024,
+				"insert into graphs"
+					" (graphid,name,width,height,yaxismin,yaxismax,show_work_period,"
+					"show_triggers,graphtype,show_legend,show_3d,percent_left,"
+					"percent_right,ymin_type,ymax_type,ymin_itemid,ymax_itemid,flags)"
+				" values"
+					" (" ZBX_FS_UI64 ",'%s',%d,%d," ZBX_FS_DBL ","
+					ZBX_FS_DBL ",%d,%d,%d,%d,%d," ZBX_FS_DBL ","
+					ZBX_FS_DBL ",%d,%d,%s,%s,%d);\n",
+				new_graphid, graph_name_esc, width, height, yaxismin, yaxismax,
+				(int)show_work_period, (int)show_triggers,
+				(int)graphtype, (int)show_legend, (int)show_3d,
+				percent_left, percent_right, (int)ymin_type, (int)ymax_type,
+				DBsql_id_ins(ymin_itemid), DBsql_id_ins(ymax_itemid), ZBX_FLAG_DISCOVERED_ITEM);
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 160 + strlen(name_esc),
+				"insert into graph_discovery"
+					" (graphdiscoveryid,graphid,parent_graphid,name)"
+				" values"
+					" (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s');\n",
+				graphdiscoveryid, new_graphid, graphid, name_esc);
+	}
+
+	for (i = 0; i < gitems_num; i++)
+	{
+		color_esc = DBdyn_escape_string(gitems[i].color);
+
+		if (0 != gitems[i].gitemid)
+		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
 					"update graphs_items"
 					" set drawtype=%d,"
@@ -2861,43 +2931,11 @@ static int	DBlld_update_graph(zbx_uint64_t hostid, zbx_uint64_t graphid,
 					gitems[i].calc_fnc,
 					gitems[i].type,
 					gitems[i].periods_cnt,
-					chd_gitems[i].gitemid);
-
-			zbx_free(color_esc);
+					gitems[i].gitemid);
 		}
-	}
-	else
-	{
-		new_graphid = DBget_maxid("graphs");
-		graphdiscoveryid = DBget_maxid("graph_discovery");
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 1024,
-				"insert into graphs"
-					" (graphid,name,width,height,yaxismin,yaxismax,show_work_period,"
-					"show_triggers,graphtype,show_legend,show_3d,percent_left,"
-					"percent_right,ymin_type,ymax_type,ymin_itemid,ymax_itemid,flags)"
-				" values"
-					" (" ZBX_FS_UI64 ",'%s',%d,%d," ZBX_FS_DBL ","
-					ZBX_FS_DBL ",%d,%d,%d,%d,%d," ZBX_FS_DBL ","
-					ZBX_FS_DBL ",%d,%d,%s,%s,%d);\n",
-				new_graphid, name_esc, width, height, yaxismin, yaxismax,
-				(int)show_work_period, (int)show_triggers,
-				(int)graphtype, (int)show_legend, (int)show_3d,
-				percent_left, percent_right, (int)ymin_type, (int)ymax_type,
-				DBsql_id_ins(ymin_itemid), DBsql_id_ins(ymax_itemid), ZBX_FLAG_DISCOVERED_ITEM);
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 144,
-				"insert into graph_discovery"
-					" (graphdiscoveryid,graphid,parent_graphid)"
-				" values"
-					" (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ");\n",
-				graphdiscoveryid, new_graphid, graphid);
-
-		new_gitemid = DBget_maxid_num("graphs_items", gitems_num);
-
-		for (i = 0; i < gitems_num; i++)
+		else
 		{
-			color_esc = DBdyn_escape_string(gitems[i].color);
+			gitems[i].gitemid = DBget_maxid("graphs_items");
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
 					"insert into graphs_items"
@@ -2906,14 +2944,21 @@ static int	DBlld_update_graph(zbx_uint64_t hostid, zbx_uint64_t graphid,
 					" values"
 						" (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64
 						",%d,%d,'%s',%d,%d,%d,%d);\n",
-					new_gitemid, new_graphid, gitems[i].itemid,
+					gitems[i].gitemid, new_graphid, gitems[i].itemid,
 					gitems[i].drawtype, gitems[i].sortorder, color_esc,
 					gitems[i].yaxisside, gitems[i].calc_fnc, gitems[i].type,
 					gitems[i].periods_cnt);
-			new_gitemid++;
-
-			zbx_free(color_esc);
 		}
+
+		zbx_free(color_esc);
+	}
+
+	for (i = 0; i < chd_gitems_num; i++)
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
+				"delete from graphs_items"
+				" where gitemid=" ZBX_FS_UI64 ";\n",
+				chd_gitems[i].gitemid);
 	}
 
 #ifdef HAVE_ORACLE
@@ -2926,6 +2971,8 @@ out:
 	zbx_free(gitems);
 	zbx_free(chd_gitems);
 	zbx_free(name_esc);
+	zbx_free(graph_name_esc);
+	zbx_free(graph_name);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
 
@@ -2950,7 +2997,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_itemid,
-		struct zbx_json_parse *jp_data)
+		struct zbx_json_parse *jp_data, char **error)
 {
 	const char		*__function_name = "DBlld_update_graphs";
 
@@ -2959,7 +3006,6 @@ static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_item
 	struct zbx_json_parse	jp_row;
 	const char		*p;
 	zbx_uint64_t		graphid, ymin_itemid, ymax_itemid;
-	char			*name = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -2992,10 +3038,8 @@ static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_item
  */			if (FAIL == zbx_json_brackets_open(p, &jp_row))
 				continue;
 
-			name = strdup(row[1]);
-			substitute_discovery_macros(&name, &jp_row);
-
-			DBlld_update_graph(hostid, graphid, name,
+			DBlld_update_graph(hostid, graphid,
+					row[1],				/* name */
 					atoi(row[2]),			/* width */
 					atoi(row[3]),			/* height */
 					atof(row[4]),			/* yaxismin */
@@ -3011,9 +3055,8 @@ static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_item
 					(unsigned char)atoi(row[14]),	/* ymax_type */
 					ymin_itemid,
 					ymax_itemid,
-					&jp_row);
-
-			zbx_free(name);
+					&jp_row,
+					error);
 		}
 	}
 	DBfree_result(result);
@@ -3038,8 +3081,7 @@ static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_item
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value,
-		char *error, size_t max_error_len)
+int	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
 {
 	const char		*__function_name = "DBlld_process_discovery_rule";
 
@@ -3057,12 +3099,15 @@ int	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value,
 	unsigned short		snmp_port = 0;
 	unsigned char		status = 0, snmpv3_securitylevel = 0;
 	int			res = SUCCEED;
+	char			*error, *db_error = NULL, *error_esc;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __function_name, discovery_itemid);
 
+	error = strdup("");
+
 	result = DBselect(
 			"select hostid,key_,status,filter,snmp_community,snmp_port,snmpv3_securityname,"
-				"snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase"
+				"snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,error"
 			" from items"
 			" where itemid=" ZBX_FS_UI64,
 			discovery_itemid);
@@ -3079,10 +3124,11 @@ int	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value,
 		snmpv3_securitylevel = (unsigned char)atoi(row[7]);
 		snmpv3_authpassphrase_esc = DBdyn_escape_string(row[8]);
 		snmpv3_privpassphrase_esc = DBdyn_escape_string(row[9]);
+		db_error = strdup(row[10]);
 	}
 	else
 	{
-		zbx_snprintf(error, max_error_len, "Invalid discovery rule ID [" ZBX_FS_UI64 "]", discovery_itemid);
+		error = zbx_dsprintf(error, "Invalid discovery rule ID [" ZBX_FS_UI64 "]", discovery_itemid);
 		res = NOTSUPPORTED;
 	}
 	DBfree_result(result);
@@ -3092,7 +3138,7 @@ int	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value,
 
 	if (SUCCEED != zbx_json_open(value, &jp))
 	{
-		zbx_snprintf(error, max_error_len, "%s", "Value should be JSON object");
+		error = zbx_dsprintf(error, "Value should be JSON object");
 		res = NOTSUPPORTED;
 		goto error;
 	}
@@ -3101,7 +3147,7 @@ int	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value,
  *                     ^-------------------------------------------^
  */	if (SUCCEED != zbx_json_brackets_by_name(&jp, discovery_key, &jp_data))
 	{
-		zbx_snprintf(error, max_error_len, "%s", "Wrong data in JSON object");
+		error = zbx_dsprintf(error, "Wrong data in JSON object");
 		res = NOTSUPPORTED;
 		goto error;
 	}
@@ -3201,7 +3247,7 @@ int	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value,
 	DBfree_result(result);
 
 	DBlld_update_triggers(hostid, discovery_itemid, &jp_data);
-	DBlld_update_graphs(hostid, discovery_itemid, &jp_data);
+	DBlld_update_graphs(hostid, discovery_itemid, &jp_data, &error);
 
 	if (ITEM_STATUS_NOTSUPPORTED == status)
 	{
@@ -3213,10 +3259,22 @@ int	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value,
 		zabbix_syslog("%s", message);
 		zbx_free(message);
 
-		DBexecute("update items set status=%d,error='' where itemid=" ZBX_FS_UI64,
+		DBexecute("update items set status=%d where itemid=" ZBX_FS_UI64,
 				ITEM_STATUS_ACTIVE, discovery_itemid);
 	}
+
+	if (0 != strcmp(error, db_error))
+	{
+		error_esc = DBdyn_escape_string_len(error, ITEM_ERROR_LEN);
+
+		DBexecute("update items set error='%s' where itemid=" ZBX_FS_UI64,
+				error_esc, discovery_itemid);
+
+		zbx_free(error_esc);
+	}
 error:
+	zbx_free(error);
+	zbx_free(db_error);
 	zbx_free(snmpv3_privpassphrase_esc);
 	zbx_free(snmpv3_authpassphrase_esc);
 	zbx_free(snmpv3_securityname_esc);

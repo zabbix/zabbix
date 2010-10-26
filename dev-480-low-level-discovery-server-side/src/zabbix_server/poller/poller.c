@@ -598,8 +598,7 @@ static int	get_values()
 		/* check for low-level discovery (lld) item */
 		if (res == SUCCEED && 0 != (ZBX_FLAG_DISCOVERY & items[i].flags))
 		{
-			if (NOTSUPPORTED == (res = DBlld_process_discovery_rule(items[i].itemid,
-					agent.text, error, sizeof(error))))
+			if (NOTSUPPORTED == (res = DBlld_process_discovery_rule(items[i].itemid, agent.text)))
 			{
 				SET_MSG_RESULT(&agent, strdup(error));
 			}
