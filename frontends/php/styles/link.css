@@ -66,3 +66,8 @@ a.underline:link	{ text-decoration: underline; }
 a.underline:visited { text-decoration: underline; }
 a.underline:hover	{ text-decoration: underline; }
 a.underline:active  { text-decoration: underline; }
+
+a.discoveryName:link{ color: #999900; }
+a.discoveryName:visited{ color: #999900; }
+a.discoveryName:hover{ color: #999900; }
+a.discoveryName:active{ color: #999900; }

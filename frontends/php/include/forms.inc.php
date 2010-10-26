@@ -1486,116 +1486,99 @@
 
 // Insert form for Item information
 	function insert_item_form(){
-		global $USER_DETAILS;
 
-		$frmItem = new CFormTable(S_ITEM, 'items.php', 'post');
+		$frmItem = new CFormTable(S_ITEM);
 		$frmItem->setAttribute('style','visibility: hidden;');
 		$frmItem->setHelp('web.items.item.php');
 
-		$hostid			= get_request('form_hostid',		0);
+		$parent_discoveryid = get_request('parent_discoveryid');
+		if($parent_discoveryid){
+			$frmItem->addVar('parent_discoveryid', $parent_discoveryid);
 
-		$description		= get_request('description',		'');
-		$key			= get_request('key',			'');
-		$host			= get_request('host',			null);
-		$delay			= get_request('delay',			30);
-		$history		= get_request('history',		90);
-		$status			= get_request('status',			0);
-		$type			= get_request('type',			0);
-		$snmp_community		= get_request('snmp_community',		'public');
-		$snmp_oid		= get_request('snmp_oid',		'interfaces.ifTable.ifEntry.ifInOctets.1');
-		$snmp_port		= get_request('snmp_port',		161);
-		$value_type		= get_request('value_type',		ITEM_VALUE_TYPE_UINT64);
-		$data_type		= get_request('data_type',		ITEM_DATA_TYPE_DECIMAL);
-		$trapper_hosts		= get_request('trapper_hosts',		'');
-		$units			= get_request('units',			'');
-		$valuemapid		= get_request('valuemapid',		0);
-		$params			= get_request('params',			'');
-		$multiplier		= get_request('multiplier',		0);
-		$delta			= get_request('delta',			0);
-		$trends			= get_request('trends',			365);
-		$new_application	= get_request('new_application',	'');
-		$applications		= get_request('applications',		array());
-		$delay_flex		= get_request('delay_flex',		array());
+			$options = array(
+				'itemids' => $parent_discoveryid,
+				'filter' => array('flags' => ZBX_FLAG_DISCOVERY),
+				'output' => API_OUTPUT_EXTEND,
+				'editable' => true,
+			);
+			$discoveryRule = CItem::get($options);
+			$discoveryRule = reset($discoveryRule);
+			$hostid = $discoveryRule['hostid'];
+		}
+		else
+			$hostid = get_request('form_hostid', 0);
 
-		$snmpv3_securityname	= get_request('snmpv3_securityname',	'');
-		$snmpv3_securitylevel	= get_request('snmpv3_securitylevel',	0);
-		$snmpv3_authpassphrase	= get_request('snmpv3_authpassphrase',	'');
-		$snmpv3_privpassphrase	= get_request('snmpv3_privpassphrase',	'');
-		$ipmi_sensor		= get_request('ipmi_sensor',		'');
-		$authtype		= get_request('authtype',		0);
-		$username		= get_request('username',		'');
-		$password		= get_request('password',		'');
-		$publickey		= get_request('publickey',		'');
-		$privatekey		= get_request('privatekey',		'');
+		$description = get_request('description', '');
+		$key = get_request('key', '');
+		$host = get_request('host', null);
+		$delay = get_request('delay', 30);
+		$history = get_request('history', 90);
+		$status = get_request('status', 0);
+		$type = get_request('type', 0);
+		$snmp_community = get_request('snmp_community', 'public');
+		$snmp_oid = get_request('snmp_oid', 'interfaces.ifTable.ifEntry.ifInOctets.1');
+		$snmp_port = get_request('snmp_port', 161);
+		$value_type = get_request('value_type', ITEM_VALUE_TYPE_UINT64);
+		$data_type = get_request('data_type', ITEM_DATA_TYPE_DECIMAL);
+		$trapper_hosts = get_request('trapper_hosts', '');
+		$units = get_request('units', '');
+		$valuemapid = get_request('valuemapid', 0);
+		$params = get_request('params', '');
+		$multiplier = get_request('multiplier', 0);
+		$delta = get_request('delta', 0);
+		$trends = get_request('trends', 365);
+		$new_application = get_request('new_application', '');
+		$applications = get_request('applications', array());
+		$delay_flex = get_request('delay_flex', array());
 
-		$formula		= get_request('formula',		'1');
-		$logtimefmt		= get_request('logtimefmt',		'');
+		$snmpv3_securityname = get_request('snmpv3_securityname', '');
+		$snmpv3_securitylevel = get_request('snmpv3_securitylevel', 0);
+		$snmpv3_authpassphrase = get_request('snmpv3_authpassphrase', '');
+		$snmpv3_privpassphrase = get_request('snmpv3_privpassphrase', '');
+		$ipmi_sensor = get_request('ipmi_sensor', '');
+		$authtype = get_request('authtype', 0);
+		$username = get_request('username', '');
+		$password = get_request('password', '');
+		$publickey = get_request('publickey', '');
+		$privatekey = get_request('privatekey', '');
 
-		$add_groupid		= get_request('add_groupid', 		get_request('groupid', 0));
+		$formula = get_request('formula', '1');
+		$logtimefmt = get_request('logtimefmt', '');
 
-		$limited		= null;
+		$add_groupid = get_request('add_groupid', get_request('groupid', 0));
+
+		$limited = false;
 		$types = array(
-				ITEM_TYPE_ZABBIX,
-				ITEM_TYPE_ZABBIX_ACTIVE,
-				ITEM_TYPE_SIMPLE,
-				ITEM_TYPE_SNMPV1,
-				ITEM_TYPE_SNMPV2C,
-				ITEM_TYPE_SNMPV3,
-				ITEM_TYPE_INTERNAL,
-				ITEM_TYPE_TRAPPER,
-				ITEM_TYPE_AGGREGATE,
-				ITEM_TYPE_EXTERNAL,
-				ITEM_TYPE_DB_MONITOR,
-				ITEM_TYPE_IPMI,
-				ITEM_TYPE_SSH,
-				ITEM_TYPE_TELNET,
-				ITEM_TYPE_CALCULATED);
-
-/*		switch ($type) {
-		case ITEM_TYPE_DB_MONITOR:
-			if (zbx_empty($key) || $key == 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]' ||
-					$key == 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]')
-				$key = 'db.odbc.select[<unique short description>]';
-			if (zbx_empty($params))
-				$params = "DSN=<database source name>\nuser=<user name>\npassword=<password>\nsql=<query>";
-			break;
-		case ITEM_TYPE_SSH:
-			if (zbx_empty($key) || $key == 'db.odbc.select[<unique short description>]' ||
-					$key == 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]')
-				$key = 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]';
-			if (0 == strncmp($params, "DSN=<database source name>", 26))
-				$params = '';
-			break;
-		case ITEM_TYPE_TELNET:
-			if (zbx_empty($key) || $key == 'db.odbc.select[<unique short description>]' ||
-					$key == 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]')
-				$key = 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]';
-			if (0 == strncmp($params, "DSN=<database source name>", 26))
-				$params = '';
-			break;
-		default:
-			if ($key == 'db.odbc.select[<unique short description>]' ||
-					$key == 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]' ||
-					$key == 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]')
-				$key = '';
-			if (0 == strncmp($params, "DSN=<database source name>", 26))
-				$params = '';
-			break;
-		}*/
+			ITEM_TYPE_ZABBIX,
+			ITEM_TYPE_ZABBIX_ACTIVE,
+			ITEM_TYPE_SIMPLE,
+			ITEM_TYPE_SNMPV1,
+			ITEM_TYPE_SNMPV2C,
+			ITEM_TYPE_SNMPV3,
+			ITEM_TYPE_INTERNAL,
+			ITEM_TYPE_TRAPPER,
+			ITEM_TYPE_AGGREGATE,
+			ITEM_TYPE_EXTERNAL,
+			ITEM_TYPE_DB_MONITOR,
+			ITEM_TYPE_IPMI,
+			ITEM_TYPE_SSH,
+			ITEM_TYPE_TELNET,
+			ITEM_TYPE_CALCULATED
+		);
 
 		if(isset($_REQUEST['itemid'])){
 			$frmItem->addVar('itemid', $_REQUEST['itemid']);
 
 			$options = array(
 				'itemids' => $_REQUEST['itemid'],
-				'output' => API_OUTPUT_EXTEND
+				'filter' => array('flags' => null),
+				'output' => API_OUTPUT_EXTEND,
 			);
 			$item_data = CItem::get($options);
 			$item_data = reset($item_data);
 
 			$hostid	= ($hostid > 0) ? $hostid : $item_data['hostid'];
-			$limited = (($item_data['templateid'] == 0)  && ($item_data['type'] != ITEM_TYPE_HTTPTEST)) ? null : 'yes';
-			$item_data['snmp_port'] = $item_data['snmp_port'] == '0' ? 161 : $item_data['snmp_port'];
+			$limited = ($item_data['templateid'] != 0);
 		}
 
 		if(is_null($host)){
@@ -1608,11 +1591,12 @@
 				$host_info = CHost::get($options);
 				$host_info = reset($host_info);
 				$host = $host_info['host'];
-			} else
+			}
+			else
 				$host = S_NOT_SELECTED_SMALL;
 		}
 
-		if((isset($_REQUEST['itemid']) && !isset($_REQUEST['form_refresh'])) || isset($limited)){
+		if((isset($_REQUEST['itemid']) && !isset($_REQUEST['form_refresh'])) || $limited){
 			$description		= $item_data['description'];
 			$key			= $item_data['key_'];
 //			$host			= $item_data['host'];
@@ -1647,7 +1631,7 @@
 
 			$new_application	= get_request('new_application',	'');
 
-			if(!isset($limited) || !isset($_REQUEST['form_refresh'])){
+			if(!$limited || !isset($_REQUEST['form_refresh'])){
 				$delay		= $item_data['delay'];
 				$history	= $item_data['history'];
 				$status		= $item_data['status'];
@@ -1730,7 +1714,7 @@
 				else break;
 			}while($itmid != 0);
 
-			$caption[] = S_ITEM.' "';
+			$caption[] = ($parent_discoveryid) ? S_ITEM_PROTOTYPE.' "' : S_ITEM.' "';
 			$caption = array_reverse($caption);
 			$caption[] = ': ';
 			$caption[] = $item_data['description'];
@@ -1740,18 +1724,20 @@
 		else
 			$frmItem->setTitle(S_ITEM." $host : $description");
 
-		$frmItem->addVar('form_hostid', $hostid);
-		$frmItem->addRow(S_HOST,array(
-			new CTextBox('host',$host,32,true),
-			new CButton('btn_host', S_SELECT,
-				"return PopUp('popup.php?dstfrm=".$frmItem->getName().
-				"&dstfld1=host&dstfld2=form_hostid&srctbl=hosts_and_templates&srcfld1=host&srcfld2=hostid',450,450);",
-				'H')
-			));
+		if(!$parent_discoveryid){
+			$frmItem->addVar('form_hostid', $hostid);
+			$frmItem->addRow(S_HOST,array(
+				new CTextBox('host',$host,32,true),
+				new CButton('btn_host', S_SELECT,
+					"return PopUp('popup.php?dstfrm=".$frmItem->getName().
+					"&dstfld1=host&dstfld2=form_hostid&srctbl=hosts_and_templates&srcfld1=host&srcfld2=hostid',450,450);",
+					'H')
+				));
+		}
 
 		$frmItem->addRow(S_DESCRIPTION, new CTextBox('description',$description,40, $limited));
 
-		if(isset($limited)){
+		if($limited){
 			$frmItem->addRow(S_TYPE,  new CTextBox('typename', item_type2str($type), 40, 'yes'));
 			$frmItem->addVar('type', $type);
 		}
@@ -1825,7 +1811,7 @@
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_IPMI, 'ipmi_sensor');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_IPMI, 'row_ipmi_sensor');
 
-		if(isset($limited))
+		if($limited)
 			$btnSelect = null;
 		else
 			$btnSelect = new CButton('btn1',S_SELECT,
@@ -1931,15 +1917,8 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_CALCULATED, 'params_calculted');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_CALCULATED, 'row_params');
 
-/*
-ITEM_TYPE_DB_MONITOR $key = 'db.odbc.select[<unique short description>]'; $params = "DSN=<database source name>\nuser=<user name>\npassword=<password>\nsql=<query>";
-ITEM_TYPE_SSH $key = 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]'; $params = '';
-ITEM_TYPE_TELNET $key = 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]'; $params = '';
-ITEM_TYPE_CALCULATED $key = ''; $params = '';
-//*/
 
-
-		if(isset($limited)){
+		if($limited){
 			$frmItem->addVar('value_type', $value_type);
 			$cmbValType = new CTextBox('value_type_name', item_value_type2str($value_type), 40, 'yes');
 		}
@@ -1954,11 +1933,11 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 		$frmItem->addRow(S_TYPE_OF_INFORMATION,$cmbValType);
 
-		if(isset($limited)) {
+		if($limited){
 			$frmItem->addVar('data_type', $data_type);
 			$cmbDataType = new CTextBox('data_type_name', item_data_type2str($data_type), 20, 'yes');
 		}
-		else {
+		else{
 			$cmbDataType = new CComboBox('data_type', $data_type);
 			$cmbDataType->addItem(ITEM_DATA_TYPE_DECIMAL,		item_data_type2str(ITEM_DATA_TYPE_DECIMAL));
 			$cmbDataType->addItem(ITEM_DATA_TYPE_OCTAL,		item_data_type2str(ITEM_DATA_TYPE_OCTAL));
@@ -1980,7 +1959,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_units');
 
 		$mltpbox = Array();
-		if(isset($limited)){
+		if($limited){
 			$frmItem->addVar('multiplier', $multiplier);
 
 			$mcb = new CCheckBox('multiplier', $multiplier == 1 ? 'yes':'no');
@@ -2017,7 +1996,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$row = new CRow(array(new CCol(S_UPDATE_INTERVAL_IN_SEC,'form_row_l'), new CCol(new CNumericBox('delay',$delay,5),'form_row_r')));
 		$row->setAttribute('id', 'row_delay');
 		$frmItem->addRow($row);
-		foreach($types as $it) {
+		foreach($types as $it){
 			if($it == ITEM_TYPE_TRAPPER) continue;
 			zbx_subarray_push($typeVisibility, $it, 'delay');
 			zbx_subarray_push($typeVisibility, $it, 'row_delay');
@@ -2028,13 +2007,13 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$frmItem->addRow($row);
 
 		$row = new CRow(array(new CCol(S_NEW_FLEXIBLE_INTERVAL,'form_row_l'), new CCol(
-					array(
-						S_DELAY, SPACE,
-						new CNumericBox('new_delay_flex[delay]','50',5),
-						S_PERIOD, SPACE,
-						new CTextBox('new_delay_flex[period]','1-7,00:00-23:59',27), BR(),
-						new CButton('add_delay_flex',S_ADD)
-					),'form_row_r')), 'new');
+			array(
+				S_DELAY, SPACE,
+				new CNumericBox('new_delay_flex[delay]','50',5),
+				S_PERIOD, SPACE,
+				new CTextBox('new_delay_flex[period]','1-7,00:00-23:59',27), BR(),
+				new CButton('add_delay_flex',S_ADD)
+			),'form_row_r')), 'new');
 		$row->setAttribute('id', 'row_new_delay_flex');
 		$frmItem->addRow($row);
 
@@ -2085,7 +2064,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'delta');
 		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_delta');
 
-		if(isset($limited)){
+		if($limited){
 			$frmItem->addVar('valuemapid', $valuemapid);
 			$map_name = S_AS_IS;
 			if($map_data = DBfetch(DBselect('SELECT name FROM valuemaps WHERE valuemapid='.$valuemapid))){
@@ -2146,39 +2125,48 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 				SPACE,
 				new CButton('clone',S_CLONE));
 
-			if(!isset($limited)){
+			if(!$limited){
 				array_push($frmRow,
 					SPACE,
 					new CButtonDelete(S_DELETE_SELECTED_ITEM_Q,
-						url_param('form').url_param('groupid').url_param('itemid'))
+						url_param('form').url_param('groupid').url_param('itemid').url_param('parent_discoveryid'))
 				);
 			}
 		}
 		array_push($frmRow,
 			SPACE,
-			new CButtonCancel(url_param('groupid')));
+			new CButtonCancel(url_param('groupid').url_param('parent_discoveryid'))
+		);
 
-		$frmItem->addSpanRow($frmRow,'form_row_last');
+		if($parent_discoveryid){
+			$frmItem->addItemToBottomRow($frmRow,'form_row_last');
+		}
+		else{
+			$frmItem->addSpanRow($frmRow,'form_row_last');
+		}
 
+
+		if(!$parent_discoveryid){
 // GROUP OPERATIONS
-		$cmbGroups = new CComboBox('add_groupid',$add_groupid);
-		$groups = CHostGroup::get(array(
-			'editable' => 1,
-			'output' => API_OUTPUT_EXTEND,
-		));
-		order_result($groups, 'name');
-		foreach($groups as $group){
-			$cmbGroups->addItem($group['groupid'], get_node_name_by_elid($group['groupid'], null, ': ').$group['name']);
-		}
-		$frmItem->addRow(S_GROUP,$cmbGroups);
+			$cmbGroups = new CComboBox('add_groupid',$add_groupid);
+			$groups = CHostGroup::get(array(
+				'editable' => 1,
+				'output' => API_OUTPUT_EXTEND,
+			));
+			order_result($groups, 'name');
+			foreach($groups as $group){
+				$cmbGroups->addItem($group['groupid'], get_node_name_by_elid($group['groupid'], null, ': ').$group['name']);
+			}
+			$frmItem->addRow(S_GROUP,$cmbGroups);
 
-		$cmbAction = new CComboBox('action');
-		$cmbAction->addItem('add to group',S_ADD_TO_GROUP);
-		if(isset($_REQUEST['itemid'])){
-			$cmbAction->addItem('update in group',S_UPDATE_IN_GROUP);
-			$cmbAction->addItem('delete FROM group',S_DELETE_FROM_GROUP);
+			$cmbAction = new CComboBox('action');
+			$cmbAction->addItem('add to group',S_ADD_TO_GROUP);
+			if(isset($_REQUEST['itemid'])){
+				$cmbAction->addItem('update in group',S_UPDATE_IN_GROUP);
+				$cmbAction->addItem('delete FROM group',S_DELETE_FROM_GROUP);
+			}
+			$frmItem->addItemToBottomRow(array($cmbAction, SPACE, new CButton('register',S_DO)));
 		}
-		$frmItem->addItemToBottomRow(array($cmbAction, SPACE, new CButton('register',S_DO)));
 
 		$json = new CJSON();
 
@@ -2493,11 +2481,16 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 		asort($dependencies);
 
-		$frmMTrig = new CFormTable(S_TRIGGERS_MASSUPDATE, 'triggers.php');
+		$frmMTrig = new CFormTable(S_TRIGGERS_MASSUPDATE);
 		$frmMTrig->addVar('massupdate',get_request('massupdate',1));
 		$frmMTrig->addVar('go',get_request('go','massupdate'));
 		$frmMTrig->setAttribute('id', 'massupdate');
 		$frmMTrig->setName('trig_form');
+
+		$parent_discoveryid = get_request('parent_discoveryid');
+		if($parent_discoveryid){
+			$frmMTrig->addVar('parent_discoveryid', $parent_discoveryid);
+		}
 
 		$triggers = $_REQUEST['g_triggerid'];
 		foreach($triggers as $id => $triggerid){
@@ -2512,47 +2505,49 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			$cmbPrior
 		);
 
+		if(!$parent_discoveryid){
 /* dependencies */
-		$dep_el = array();
-		foreach($dependencies as $val){
-			array_push($dep_el,
-				array(
-					new CCheckBox("rem_dependence[]", 'no', null, strval($val)),
-					expand_trigger_description($val)
-				),
-				BR());
-			$frmMTrig->addVar("dependencies[]",strval($val));
+			$dep_el = array();
+			foreach($dependencies as $val){
+				array_push($dep_el,
+					array(
+						new CCheckBox("rem_dependence[]", 'no', null, strval($val)),
+						expand_trigger_description($val)
+					),
+					BR());
+				$frmMTrig->addVar("dependencies[]",strval($val));
+			}
+
+			if(count($dep_el)==0)
+				$dep_el[] = S_NO_DEPENDENCES_DEFINED;
+			else
+				$dep_el[] = new CButton('del_dependence',S_DELETE_SELECTED);
+
+	//		$frmMTrig->addRow(S_THE_TRIGGER_DEPENDS_ON,$dep_el);
+	/* end dependencies */
+	/* new dependency */
+			//$frmMTrig->addVar('new_dependence','0');
+
+			$btnSelect = new CButton('btn1', S_ADD,
+					"return PopUp('popup.php?dstfrm=massupdate&dstact=add_dependence&reference=deptrigger".
+					"&dstfld1=new_dependence[]&srctbl=triggers&objname=triggers&srcfld1=triggerid&multiselect=1".
+					"',1000,700);",
+					'T');
+
+			array_push($dep_el, array(br(),$btnSelect));
+
+			$dep_div = new CDiv($dep_el);
+			$dep_div->setAttribute('id','dependency_box');
+
+			$frmMTrig->addRow(array(new CVisibilityBox('visible[dependencies]', isset($visible['dependencies']), 'dependency_box', S_ORIGINAL),S_TRIGGER_DEPENDENCIES),
+								$dep_div
+							);
 		}
-
-		if(count($dep_el)==0)
-			$dep_el[] = S_NO_DEPENDENCES_DEFINED;
-		else
-			$dep_el[] = new CButton('del_dependence',S_DELETE_SELECTED);
-
-//		$frmMTrig->addRow(S_THE_TRIGGER_DEPENDS_ON,$dep_el);
-/* end dependencies */
-/* new dependency */
-		//$frmMTrig->addVar('new_dependence','0');
-
-		$btnSelect = new CButton('btn1', S_ADD,
-				"return PopUp('popup.php?dstfrm=massupdate&dstact=add_dependence&reference=deptrigger".
-				"&dstfld1=new_dependence[]&srctbl=triggers&objname=triggers&srcfld1=triggerid&multiselect=1".
-				"',1000,700);",
-				'T');
-
-		array_push($dep_el, array(br(),$btnSelect));
-
-		$dep_div = new CDiv($dep_el);
-		$dep_div->setAttribute('id','dependency_box');
-
-		$frmMTrig->addRow(array(new CVisibilityBox('visible[dependencies]', isset($visible['dependencies']), 'dependency_box', S_ORIGINAL),S_TRIGGER_DEPENDENCIES),
-							$dep_div
-						);
 /* end new dependency */
 
 		$frmMTrig->addItemToBottomRow(new CButton('mass_save',S_SAVE));
 		$frmMTrig->addItemToBottomRow(SPACE);
-		$frmMTrig->addItemToBottomRow(new CButtonCancel(url_param('groupid')));
+		$frmMTrig->addItemToBottomRow(new CButtonCancel(url_param('groupid').url_param('parent_discoveryid')));
 
 		$script = "function addPopupValues(list){
 						if(!isset('object', list)) return false;
@@ -2572,15 +2567,13 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 // Insert form for Trigger
 	function insert_trigger_form(){
-		$frmTrig = new CFormTable(S_TRIGGER,'triggers.php');
+		$frmTrig = new CFormTable(S_TRIGGER);
 		$frmTrig->setHelp('config_triggers.php');
+		$parent_discoveryid = get_request('parent_discoveryid');
+		$frmTrig->addVar('parent_discoveryid', $parent_discoveryid);
 
-//		if(isset($_REQUEST['hostid'])){
-//			$frmTrig->addVar('hostid',$_REQUEST['hostid']);
-//		}
-
-		$dep_el=array();
-		$dependencies = get_request('dependencies',array());
+		$dep_el = array();
+		$dependencies = get_request('dependencies', array());
 
 		$limited = null;
 
@@ -2618,7 +2611,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		}
 
 		$expression		= get_request('expression',	'');
-		$description		= get_request('description',	'');
+		$description	= get_request('description',	'');
 		$type 			= get_request('type',		0);
 		$priority		= get_request('priority',	0);
 		$status			= get_request('status',		0);
@@ -2626,7 +2619,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$url			= get_request('url',		'');
 
 		$expr_temp		= get_request('expr_temp',	'');
-		$input_method		= get_request('input_method',	IM_ESTABLISHED);
+		$input_method	= get_request('input_method',	IM_ESTABLISHED);
 
 		if((isset($_REQUEST['triggerid']) && !isset($_REQUEST['form_refresh']))  || isset($limited)){
 			$description	= $trigger['description'];
@@ -2698,10 +2691,10 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		}
 
 		$row = array($exprtxt,
-					 new CButton('insert',$input_method == IM_TREE ? S_EDIT : S_SELECT,
-								 "return PopUp('popup_trexpr.php?dstfrm=".$frmTrig->getName().
-								 "&dstfld1=${exprfname}&srctbl=expression".
-								 "&srcfld1=expression&expression=' + escape($exprparam),1000,700);"));
+			 new CButton('insert',$input_method == IM_TREE ? S_EDIT : S_SELECT,
+						 "return PopUp('popup_trexpr.php?dstfrm=".$frmTrig->getName().
+						 "&dstfld1=${exprfname}&srctbl=expression".url_param('parent_discoveryid').
+						 "&srcfld1=expression&expression=' + escape($exprparam),1000,700);"));
 
 		if(isset($macrobtn)) array_push($row, $macrobtn);
 		if($input_method == IM_TREE){
@@ -2797,39 +2790,41 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 										  $btn_test));
 		}
 
+		if(!$parent_discoveryid){
 // dependencies
-		foreach($dependencies as $val){
-			array_push($dep_el,
-				array(
-					new CCheckBox('rem_dependence['.$val.']', 'no', null, strval($val)),
-					expand_trigger_description($val)
-				),
-				BR());
-			$frmTrig->addVar('dependencies[]',strval($val));
+			foreach($dependencies as $val){
+				array_push($dep_el,
+					array(
+						new CCheckBox('rem_dependence['.$val.']', 'no', null, strval($val)),
+						expand_trigger_description($val)
+					),
+					BR());
+				$frmTrig->addVar('dependencies[]',strval($val));
+			}
+
+			if(count($dep_el)==0)
+				array_push($dep_el,  S_NO_DEPENDENCES_DEFINED);
+			else
+				array_push($dep_el, new CButton('del_dependence',S_DELETE_SELECTED));
+			$frmTrig->addRow(S_THE_TRIGGER_DEPENDS_ON,$dep_el);
+		/* end dependencies */
+
+		/* new dependency */
+	//		$frmTrig->addVar('new_dependence','0');
+
+	//		$txtCondVal = new CTextBox('trigger','',75,'yes');
+
+			$btnSelect = new CButton('btn1',S_ADD,
+					"return PopUp('popup.php?srctbl=triggers".
+								'&srcfld1=triggerid'.
+								'&reference=deptrigger'.
+								'&multiselect=1'.
+							"',1000,700);",'T');
+
+
+			$frmTrig->addRow(S_NEW_DEPENDENCY, $btnSelect, 'new');
+	// end new dependency
 		}
-
-		if(count($dep_el)==0)
-			array_push($dep_el,  S_NO_DEPENDENCES_DEFINED);
-		else
-			array_push($dep_el, new CButton('del_dependence',S_DELETE_SELECTED));
-		$frmTrig->addRow(S_THE_TRIGGER_DEPENDS_ON,$dep_el);
-	/* end dependencies */
-
-	/* new dependency */
-//		$frmTrig->addVar('new_dependence','0');
-
-//		$txtCondVal = new CTextBox('trigger','',75,'yes');
-
-		$btnSelect = new CButton('btn1',S_ADD,
-				"return PopUp('popup.php?srctbl=triggers".
-							'&srcfld1=triggerid'.
-							'&reference=deptrigger'.
-							'&multiselect=1'.
-						"',1000,700);",'T');
-
-
-		$frmTrig->addRow(S_NEW_DEPENDENCY, $btnSelect, 'new');
-// end new dependency
 
 		$type_select = new CComboBox('type');
 		$type_select->additem(TRIGGER_MULT_EVENT_DISABLED,S_NORMAL,(($type == TRIGGER_MULT_EVENT_ENABLED)? 'no':'yes'));
@@ -2855,11 +2850,11 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			if( !$limited ){
 				$frmTrig->addItemToBottomRow(new CButtonDelete(S_DELETE_TRIGGER_Q,
 					url_param("form").url_param('groupid').url_param("hostid").
-					url_param("triggerid")));
+					url_param("triggerid").url_param("parent_discoveryid")));
 			}
 		}
 		$frmTrig->addItemToBottomRow(SPACE);
-		$frmTrig->addItemToBottomRow(new CButtonCancel(url_param('groupid').url_param("hostid")));
+		$frmTrig->addItemToBottomRow(new CButtonCancel(url_param('groupid').url_param("hostid").url_param("parent_discoveryid")));
 
 		$jsmenu = new CPUMenu(null,170);
 		$jsmenu->InsertJavaScript();
@@ -2900,49 +2895,50 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 	}
 
 	function insert_graph_form(){
-		$frmGraph = new CFormTable(S_GRAPH, null, 'post');
+		$frmGraph = new CFormTable(S_GRAPH);
 		$frmGraph->setName('frm_graph');
-		//$frmGraph->setHelp("web.graphs.graph.php");
 
-		$items = get_request('items', array());
+		$parent_discoveryid = get_request('parent_discoveryid');
+		if($parent_discoveryid) $frmGraph->addVar('parent_discoveryid', $parent_discoveryid);
+
 
 		if(isset($_REQUEST['graphid'])){
 			$frmGraph->addVar('graphid', $_REQUEST['graphid']);
 
 			$options = array(
-						'graphids' => $_REQUEST['graphid'],
-						'output' => API_OUTPUT_EXTEND
-					);
+				'graphids' => $_REQUEST['graphid'],
+				'filter' => array('flags' => null),
+				'output' => API_OUTPUT_EXTEND,
+			);
 			$graphs = CGraph::get($options);
-			$row = reset($graphs);
+			$graph = reset($graphs);
 
-			$frmGraph->setTitle(S_GRAPH.' "'.$row['name'].'"');
+			$frmGraph->setTitle(S_GRAPH.' "'.$graph['name'].'"');
 		}
 
 		if(isset($_REQUEST['graphid']) && !isset($_REQUEST['form_refresh'])){
-			$name = $row['name'];
-			$width = $row['width'];
-			$height = $row['height'];
-			$ymin_type = $row['ymin_type'];
-			$ymax_type = $row['ymax_type'];
-			$yaxismin = $row['yaxismin'];
-			$yaxismax = $row['yaxismax'];
-			$ymin_itemid = $row['ymin_itemid'];
-			$ymax_itemid = $row['ymax_itemid'];
-			$showworkperiod = $row['show_work_period'];
-			$showtriggers = $row['show_triggers'];
-			$graphtype = $row['graphtype'];
-			$legend = $row['show_legend'];
-			$graph3d = $row['show_3d'];
-			$percent_left = $row['percent_left'];
-			$percent_right = $row['percent_right'];
+			$name = $graph['name'];
+			$width = $graph['width'];
+			$height = $graph['height'];
+			$ymin_type = $graph['ymin_type'];
+			$ymax_type = $graph['ymax_type'];
+			$yaxismin = $graph['yaxismin'];
+			$yaxismax = $graph['yaxismax'];
+			$ymin_itemid = $graph['ymin_itemid'];
+			$ymax_itemid = $graph['ymax_itemid'];
+			$showworkperiod = $graph['show_work_period'];
+			$showtriggers = $graph['show_triggers'];
+			$graphtype = $graph['graphtype'];
+			$legend = $graph['show_legend'];
+			$graph3d = $graph['show_3d'];
+			$percent_left = $graph['percent_left'];
+			$percent_right = $graph['percent_right'];
 
 			$options = array(
-						'graphids' => $_REQUEST['graphid'],
-						'sortfield' => 'sortorder',
-						'extendoutput' => 1
-					);
-
+				'graphids' => $_REQUEST['graphid'],
+				'sortfield' => 'sortorder',
+				'output' => API_OUTPUT_EXTEND,
+			);
 			$items = CGraphItem::get($options);
 		}
 		else{
@@ -2956,8 +2952,8 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			else{
 				$width = get_request('width', 900);
 				$height = get_request('height', 200);
-
 			}
+
 			$ymin_type = get_request('ymin_type', GRAPH_YAXIS_TYPE_CALCULATED);
 			$ymax_type = get_request('ymax_type', GRAPH_YAXIS_TYPE_CALCULATED);
 			$yaxismin = get_request('yaxismin', 0.00);
@@ -2974,6 +2970,8 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 			if(isset($visible['percent_left'])) $percent_left = get_request('percent_left', 0);
 			if(isset($visible['percent_right'])) $percent_right = get_request('percent_right', 0);
+
+			$items = get_request('items', array());
 		}
 
 
@@ -2984,27 +2982,27 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 
 /* reinit $_REQUEST */
-		$_REQUEST['items']		= $items;
-		$_REQUEST['name']		= $name;
-		$_REQUEST['width']		= $width;
-		$_REQUEST['height']		= $height;
+		$_REQUEST['items'] = $items;
+		$_REQUEST['name'] = $name;
+		$_REQUEST['width'] = $width;
+		$_REQUEST['height'] = $height;
 
-		$_REQUEST['ymin_type']		= $ymin_type;
-		$_REQUEST['ymax_type']		= $ymax_type;
+		$_REQUEST['ymin_type'] = $ymin_type;
+		$_REQUEST['ymax_type'] = $ymax_type;
 
-		$_REQUEST['yaxismin']		= $yaxismin;
-		$_REQUEST['yaxismax']		= $yaxismax;
+		$_REQUEST['yaxismin'] = $yaxismin;
+		$_REQUEST['yaxismax'] = $yaxismax;
 
-		$_REQUEST['ymin_itemid']	= $ymin_itemid;
-		$_REQUEST['ymax_itemid']	= $ymax_itemid;
+		$_REQUEST['ymin_itemid'] = $ymin_itemid;
+		$_REQUEST['ymax_itemid'] = $ymax_itemid;
 
-		$_REQUEST['showworkperiod']	= $showworkperiod;
-		$_REQUEST['showtriggers']	= $showtriggers;
-		$_REQUEST['graphtype']		= $graphtype;
-		$_REQUEST['legend']		= $legend;
-		$_REQUEST['graph3d']		= $graph3d;
-		$_REQUEST['percent_left']	= $percent_left;
-		$_REQUEST['percent_right']	= $percent_right;
+		$_REQUEST['showworkperiod'] = $showworkperiod;
+		$_REQUEST['showtriggers'] = $showtriggers;
+		$_REQUEST['graphtype'] = $graphtype;
+		$_REQUEST['legend'] = $legend;
+		$_REQUEST['graph3d'] = $graph3d;
+		$_REQUEST['percent_left'] = $percent_left;
+		$_REQUEST['percent_right'] = $percent_right;
 /********************/
 
 		if($graphtype != GRAPH_TYPE_NORMAL){
@@ -3038,18 +3036,11 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$frmGraph->addVar('ymax_itemid', $ymax_itemid);
 
 		$frmGraph->addRow(S_NAME, new CTextBox('name', $name, 32));
-
 		$frmGraph->addRow(S_WIDTH, new CNumericBox('width', $width, 5));
 		$frmGraph->addRow(S_HEIGHT, new CNumericBox('height', $height, 5));
 
 		$cmbGType = new CComboBox('graphtype', $graphtype, 'graphs.submit(this)');
-		$cmbGType->addItem(GRAPH_TYPE_NORMAL, S_NORMAL);
-		$cmbGType->addItem(GRAPH_TYPE_STACKED, S_STACKED);
-		$cmbGType->addItem(GRAPH_TYPE_PIE, S_PIE);
-		$cmbGType->addItem(GRAPH_TYPE_EXPLODED, S_EXPLODED);
-
-		zbx_add_post_js('graphs.graphtype = '.$graphtype.";\n");
-
+		$cmbGType->addItems(graphType());
 		$frmGraph->addRow(S_GRAPH_TYPE, $cmbGType);
 
 
@@ -3116,7 +3107,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 							graph_item_calc_fnc2str($gitem["calc_fnc"],$gitem["type"]),
 							graph_item_type2str($gitem['type'],$gitem["periods_cnt"]),
 							$color,
-							array( $do_up, SPACE."|".SPACE, $do_down )
+							array( $do_up, ((!is_null($do_up) && !is_null($do_down)) ? SPACE."|".SPACE : ''), $do_down )
 						));
 				}
 				else{
@@ -3147,10 +3138,10 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 
 			if($graphtype == GRAPH_TYPE_NORMAL){
-				$percent_left = sprintf('%2.2f',$percent_left);
-				$percent_right = sprintf('%2.2f',$percent_right);
+				$percent_left = sprintf('%2.2f', $percent_left);
+				$percent_right = sprintf('%2.2f', $percent_right);
 
-				$pr_left_input = new CTextBox('percent_left',$percent_left,'5');
+				$pr_left_input = new CTextBox('percent_left', $percent_left, '5');
 				$pr_left_chkbx = new CCheckBox('visible[percent_left]',1,"javascript: ShowHide('percent_left');",1);
 				if($percent_left == 0){
 					$pr_left_input->setAttribute('style','display: none;');
@@ -3164,9 +3155,8 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 					$pr_right_chkbx->setChecked(0);
 				}
 
-				$frmGraph->addRow(S_PERCENTILE_LINE.' ('.S_LEFT.')',array($pr_left_chkbx,$pr_left_input));
-
-				$frmGraph->addRow(S_PERCENTILE_LINE.' ('.S_RIGHT.')',array($pr_right_chkbx,$pr_right_input));
+				$frmGraph->addRow(S_PERCENTILE_LINE.' ('.S_LEFT.')',array($pr_left_chkbx, $pr_left_input));
+				$frmGraph->addRow(S_PERCENTILE_LINE.' ('.S_RIGHT.')',array($pr_right_chkbx, $pr_right_input));
 			}
 
 			$yaxis_min = array();
@@ -3194,17 +3184,17 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 				if(count($items)){
 					$yaxis_min[] = new CTextBox("ymin_name",$ymin_name,80,'yes');
 					$yaxis_min[] = new CButton('yaxis_min',S_SELECT,'javascript: '.
-													"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
-													url_param($only_hostid, false, 'only_hostid').
-													url_param($monitored_hosts, false, 'monitored_hosts').
-														"&dstfld1=ymin_itemid".
-														"&dstfld2=ymin_name".
-														"&srctbl=items".
-														"&srcfld1=itemid".
-														"&srcfld2=description',0,0,'zbx_popup_item');");
+						"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
+						url_param($only_hostid, false, 'only_hostid').
+						url_param($monitored_hosts, false, 'monitored_hosts').
+							"&dstfld1=ymin_itemid".
+							"&dstfld2=ymin_name".
+							"&srctbl=items".
+							"&srcfld1=itemid".
+							"&srcfld2=description',0,0,'zbx_popup_item');");
 				}
 				else{
-					$yaxis_min[] = SPACE.S_ADD_GRAPH_ITEMS;
+					$yaxis_min[] = S_ADD_GRAPH_ITEMS;
 				}
 			}
 			else{
@@ -3238,21 +3228,22 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 				if(count($items)){
 					$yaxis_max[] = new CTextBox("ymax_name",$ymax_name,80,'yes');
 					$yaxis_max[] = new CButton('yaxis_max',S_SELECT,'javascript: '.
-													"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
-													url_param($only_hostid, false, 'only_hostid').
-													url_param($monitored_hosts, false, 'monitored_hosts').
-														"&dstfld1=ymax_itemid".
-														"&dstfld2=ymax_name".
-														"&srctbl=items".
-														"&srcfld1=itemid".
-														"&srcfld2=description',0,0,'zbx_popup_item');");
+							"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
+							url_param($only_hostid, false, 'only_hostid').
+							url_param($monitored_hosts, false, 'monitored_hosts').
+							"&dstfld1=ymax_itemid".
+							"&dstfld2=ymax_name".
+							"&srctbl=items".
+							"&srcfld1=itemid".
+							"&srcfld2=description',0,0,'zbx_popup_item');"
+					);
 				}
 				else{
-					$yaxis_max[] = SPACE.S_ADD_GRAPH_ITEMS;
+					$yaxis_max[] = S_ADD_GRAPH_ITEMS;
 				}
 			}
 			else{
-				$frmGraph->addVar('yaxismax',$yaxismax);
+				$frmGraph->addVar('yaxismax', $yaxismax);
 			}
 
 			$frmGraph->addRow(S_YAXIS_MAX_VALUE, $yaxis_max);
@@ -3261,34 +3252,37 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			$frmGraph->addRow(S_3D_VIEW,new CCheckBox('graph3d',$graph3d,null,1));
 		}
 
-		$frmGraph->addRow(S_ITEMS,
-				array(
-					$items_table,
-					new CButton('add_item',S_ADD,
-						"return PopUp('popup_gitem.php?dstfrm=".$frmGraph->getName().
-						url_param($only_hostid, false, 'only_hostid').
-						url_param($monitored_hosts, false, 'monitored_hosts').
-						url_param($graphtype, false, 'graphtype').
-						"',550,400,'graph_item_form');"),
-					$dedlete_button
-				));
-		unset($items_table, $dedlete_button);
-
-		$preView = new CButton('preview',S_PREVIEW);
-		//$preView->setAttribute('style', 'float: left;');
-
-		$frmGraph->addItemToBottomRow($preView);
-		$frmGraph->addItemToBottomRow(SPACE);
-		$frmGraph->addItemToBottomRow(new CButton('save',S_SAVE));
-		if(isset($_REQUEST['graphid'])){
-			$frmGraph->addItemToBottomRow(SPACE);
-			$frmGraph->addItemToBottomRow(new CButton('clone',S_CLONE));
-			$frmGraph->addItemToBottomRow(SPACE);
-			$frmGraph->addItemToBottomRow(new CButtonDelete(S_DELETE_GRAPH_Q,url_param('graphid').
-				url_param('groupid').url_param('hostid')));
+		$addProtoBtn = null;
+		if($parent_discoveryid){
+			$addProtoBtn = new CButton('add_protoitem', S_ADD_PROTOTYPE,
+				"return PopUp('popup_gitem.php?dstfrm=".$frmGraph->getName().
+				url_param($graphtype, false, 'graphtype').
+				url_param('parent_discoveryid').
+				"',700,400,'graph_item_form');");
 		}
-		$frmGraph->addItemToBottomRow(SPACE);
-		$frmGraph->addItemToBottomRow(new CButtonCancel(url_param('groupid').url_param('hostid')));
+
+		$frmGraph->addRow(S_ITEMS, array(
+			$items_table,
+			new CButton('add_item',S_ADD,
+				"return PopUp('popup_gitem.php?dstfrm=".$frmGraph->getName().
+				url_param($only_hostid, false, 'only_hostid').
+				url_param($monitored_hosts, false, 'monitored_hosts').
+				url_param($graphtype, false, 'graphtype').
+				"',700,400,'graph_item_form');"),
+			$addProtoBtn,
+			$dedlete_button
+		));
+
+		$footer = array(
+			new CButton('preview', S_PREVIEW),
+			new CButton('save', S_SAVE),
+		);
+		if(isset($_REQUEST['graphid'])){
+			$footer[] = new CButton('clone', S_CLONE);
+			$footer[] = new CButtonDelete(S_DELETE_GRAPH_Q,url_param('graphid').url_param('parent_discoveryid'));
+		}
+		$footer[] = new CButtonCancel(url_param('parent_discoveryid'));
+		$frmGraph->addItemToBottomRow($footer);
 
 		$frmGraph->show();
 	}
@@ -4990,7 +4984,6 @@ JAVASCRIPT;
 
 		insert_js('
 			function addMacroRow(){
-				
 				if(typeof(addMacroRow.macro_count) == "undefined"){
 					addMacroRow.macro_count = '.count($macros).';
 				}
