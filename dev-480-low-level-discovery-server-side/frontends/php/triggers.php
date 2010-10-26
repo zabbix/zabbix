@@ -618,24 +618,14 @@ include_once('include/page_header.php');
 				default: $priority = $trigger['priority'];
 			}
 
-			if(empty($trigger['discoveryRule'])){
-				$status_link = 'triggers.php?go='.(($trigger['status'] == TRIGGER_STATUS_DISABLED) ? 'activate' : 'disable').
-					'&g_triggerid%5B%5D='.$triggerid;
+			$status_link = 'triggers.php?go='.(($trigger['status'] == TRIGGER_STATUS_DISABLED) ? 'activate' : 'disable').
+				'&g_triggerid%5B%5D='.$triggerid;
 
-				if($trigger['status'] == TRIGGER_STATUS_DISABLED){
-					$status = new CLink(S_DISABLED, $status_link, 'disabled');
-				}
-				else if($trigger['status'] == TRIGGER_STATUS_ENABLED){
-					$status = new CLink(S_ENABLED, $status_link, 'enabled');
-				}
+			if($trigger['status'] == TRIGGER_STATUS_DISABLED){
+				$status = new CLink(S_DISABLED, $status_link, 'disabled');
 			}
-			else{
-				if($trigger['status'] == TRIGGER_STATUS_DISABLED){
-					$status = new CSpan(S_DISABLED, 'disabled');
-				}
-				else if($trigger['status'] == TRIGGER_STATUS_ENABLED){
-					$status = new CSpan(S_ENABLED, 'enabled');
-				}
+			else if($trigger['status'] == TRIGGER_STATUS_ENABLED){
+				$status = new CLink(S_ENABLED, $status_link, 'enabled');
 			}
 
 			$hosts = null;
