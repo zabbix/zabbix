@@ -696,7 +696,7 @@ switch($itemType) {
 		$table->setHeader(array(
 			new CCheckBox('all_items',null,"checkAll('".$form->GetName()."','all_items','group_itemid');"),
 			make_sorting_header(S_NAME,'description', $sortlink),
-			S_PROTOTYPES,
+			S_ITEMS,
 			S_TRIGGERS,
 			S_GRAPHS,
 			make_sorting_header(S_KEY,'key_', $sortlink),
@@ -766,7 +766,7 @@ switch($itemType) {
 // ugly dash
 			if(empty($applications)) $applications = '-';
 
-			$prototypes = array(new CLink(S_PROTOTYPES, 'disc_prototypes.php?&parent_discoveryid='.$item['itemid']),
+			$prototypes = array(new CLink(S_ITEMS, 'disc_prototypes.php?&parent_discoveryid='.$item['itemid']),
 				' ('.$item['prototypes'].')');
 
 			$graphs_count = isset($graphs[$item['itemid']]['rowscount']) ? $graphs[$item['itemid']]['rowscount'] : 0;
