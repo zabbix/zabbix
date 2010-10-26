@@ -1580,6 +1580,7 @@
 	'S_NO_RESOURCES_DEFINED'=>		'No resources defined',
 	'S_SIMPLE_GRAPH'=>				'Simple graph',
 	'S_SIMPLE_GRAPHS'=>				'Simple graphs',
+	'S_HISTORY_AND_SIMPLE_GRAPHS'=> 'History and simple graphs',
 	'S_SIMPLE_GRAPH_BIG'=>			'SIMPLE GRAPH',
 	'S_GRAPH_NAME'=>				'Graph name',
 	'S_WIDTH'=>						'Width',
