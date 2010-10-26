@@ -284,6 +284,7 @@ include_once('include/page_header.php');
 
 	if(!isset($_REQUEST['form'])){
 		$form = new CForm(null, 'get');
+		$form->cleanItems();
 		$form->addItem(new CButton('form', S_CREATE_GRAPH));
 		$form->addVar('parent_discoveryid', $_REQUEST['parent_discoveryid']);
 	}
