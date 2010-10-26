@@ -838,7 +838,6 @@ COpt::memoryPick();
 	protected static function inherit($graph, $hostids=null){
 		$options = array(
 			'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
-			'filter' => array('flags' => null),
 			'output' => API_OUTPUT_SHORTEN,
 			'nopermissions' => 1,
 		);
@@ -891,16 +890,16 @@ COpt::memoryPick();
 
 // check if templated graph exists
 			$chd_graph = self::get(array(
-				'filter' => array('templateid' => $tmp_graph['graphid']),
+				'filter' => array('templateid' => $tmp_graph['graphid'], 'flags' => array(ZBX_FLAG_DISCOVERY_CHILD, ZBX_FLAG_DISCOVERY_NORMAL)),
 				'output' => API_OUTPUT_EXTEND,
-				'filter' => array('flags' => null),
 				'preservekeys' => 1,
 				'hostids' => $chd_host['hostid']
 			));
+
 			if($chd_graph = reset($chd_graph)){
 				if((zbx_strtolower($tmp_graph['name']) != zbx_strtolower($chd_graph['name']))
 				&& self::exists(array('name' => $tmp_graph['name'], 'hostids' => $chd_host['hostid'])))
-			{
+				{
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$tmp_graph['name'].' ]: already exists on [ '.$chd_host['host'].' ]');
 				}
 
@@ -1012,7 +1011,8 @@ COpt::memoryPick();
 				'hostids' => $data['templateids'],
 				'preservekeys' => 1,
 				'output' => API_OUTPUT_EXTEND,
-				'select_graph_items' => API_OUTPUT_EXTEND
+				'select_graph_items' => API_OUTPUT_EXTEND,
+				'filter' => array('flags' => null),
 			);
 			$graphs = self::get($options);
 

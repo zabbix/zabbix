@@ -816,13 +816,72 @@
 		}
 
 		$db_tmp_items = get_items_by_hostid($templateid);
+
+		$item_proto_map = $prototypeids = $disc_rule_map = array();
 		while($db_tmp_item = DBfetch($db_tmp_items)){
+
 			$db_tmp_item['hostid'] = $hostid;
 			$db_tmp_item['applications'] = get_same_applications_for_host(get_applications_by_itemid($db_tmp_item['itemid']),$hostid);
 			$db_tmp_item['templateid'] = $copy_mode?0:$db_tmp_item['itemid'];
 
 			add_item($db_tmp_item);
+
+			if($db_tmp_item['flags'] == ZBX_FLAG_DISCOVERY_CHILD){
+				$prototypeids[$db_tmp_item['itemid']] = $db_tmp_item['itemid'];
+			}
 		}
+
+		if(!empty($prototypeids)){
+			$prototypes = array();
+			$sql = 'SELECT itemid, parent_itemid FROM item_discovery WHERE'.DBcondition('itemid', $prototypeids);
+			$db_res = DBselect($sql);
+			while($pro = DBfetch($db_res)){
+				$prototypes[$pro['itemid']] = $pro['parent_itemid'];
+			}
+
+
+			$item_proto_map = CItem::get(array(
+				'hostids' => $hostid,
+				'filter' => array('templateid' => array_keys($prototypes), 'flags' => null),
+				'output' => API_OUTPUT_EXTEND,
+				'preservekeys' => true,
+			));
+			$sql = 'SELECT itemid, parent_itemid FROM item_discovery WHERE'.DBcondition('itemid', array_keys($item_proto_map));
+			$db_res = DBselect($sql);
+			while($pro = DBfetch($db_res)){
+				unset($item_proto_map[$pro['itemid']]);
+			}
+			$item_proto_map = zbx_toHash($item_proto_map, 'templateid');
+
+			$disc_rule_map = CItem::get(array(
+				'hostids' => $hostid,
+				'filter' => array('templateid' => array_unique($prototypes), 'flags' => null),
+				'output' => API_OUTPUT_EXTEND,
+				'preservekeys' => true,
+			));
+			$disc_rule_map = zbx_toHash($disc_rule_map, 'templateid');
+
+
+			$insert = array();
+			foreach($item_proto_map as $old_proto => $new_proto){
+				if(!empty($new_proto['discoveryRule'])) continue;
+				$old_rule = $prototypes[$old_proto];
+				$parent_itemid = $disc_rule_map[$old_rule]['itemid'];
+
+				$insert[] = array(
+					'itemid' => $new_proto['itemid'],
+					'parent_itemid' => $parent_itemid,
+				);
+			}
+
+			try{
+				DB::insert('item_discovery', $insert);
+			}
+			catch(Exception $e){
+				return false;
+			}
+		}
+
 	}
 
 // Activate Item

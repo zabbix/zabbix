@@ -942,10 +942,11 @@ return $caption;
 					' AND i2.hostid='.$hostid.
 					' AND t2.triggerid=f2.triggerid '.
 					' AND t2.description='.zbx_dbstr($trigger['description']).
-					' AND t2.templateid=0 ';
+					' AND t2.templateid IS NULL';
 
 		$host_triggers = DBSelect($sql);
 		while($host_trigger = DBfetch($host_triggers)){
+
 			if(cmp_triggers_exressions($trigger['expression'], $host_trigger['expression'])) continue;
 			// link not linked trigger with same expression
 			return update_trigger(

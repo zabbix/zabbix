@@ -1090,7 +1090,6 @@ switch($itemType) {
 				if($trigger['templateid'] > 0){
 					$real_hosts = get_realhosts_by_triggerid($triggerid);
 					$real_host = DBfetch($real_hosts);
-					if($trigger['flags'])
 					$tr_description[] = new CLink($real_host['host'], 'triggers.php?&hostid='.$real_host['hostid'], 'unknown');
 					$tr_description[] = ':';
 				}

@@ -4984,7 +4984,6 @@ JAVASCRIPT;
 
 		insert_js('
 			function addMacroRow(){
-				
 				if(typeof(addMacroRow.macro_count) == "undefined"){
 					addMacroRow.macro_count = '.count($macros).';
 				}

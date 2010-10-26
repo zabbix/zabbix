@@ -97,6 +97,7 @@ switch($itemType) {
 		'snmpv3_privpassphrase'=>array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.'))'),
 
 		'ipmi_sensor'=>		array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,	'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_IPMI.'))', S_IPMI_SENSOR),
+		'trapper_hosts'=>	array(T_ZBX_STR, O_OPT,  null,  null,			'isset({save})&&isset({type})&&({type}==2)'),
 
 		'new_application'=>	array(T_ZBX_STR, O_OPT, null,	null,	'isset({save})'),
 		'applications'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID, null),
@@ -348,6 +349,7 @@ switch($itemType) {
 		$new_application = get_request('new_application', '');
 		$applications = get_request('applications', array());
 		$delay_flex = get_request('delay_flex', array());
+		$trapper_hosts = get_request('trapper_hosts', '');
 
 		$snmpv3_securityname = get_request('snmpv3_securityname', '');
 		$snmpv3_securitylevel = get_request('snmpv3_securitylevel', 0);
@@ -394,6 +396,7 @@ switch($itemType) {
 			$snmpv3_privpassphrase = $item_data['snmpv3_privpassphrase'];
 
 			$ipmi_sensor = $item_data['ipmi_sensor'];
+			$trapper_hosts		= $item_data['trapper_hosts'];
 
 			$authtype = $item_data['authtype'];
 			$username = $item_data['username'];
@@ -468,8 +471,15 @@ switch($itemType) {
 		$frmItem->addRow(S_KEY, new CTextBox('key', $key, 40, $limited));
 
 // Type
-		$cmbType = new CComboBox('type', $type);
-		$cmbType->addItems($types);
+
+		if($limited){
+			$cmbType = new CTextBox('typename', item_type2str($type), 40, 'yes');
+			$frmItem->addVar('type', $type);
+		}
+		else{
+			$cmbType = new CComboBox('type', $type);
+			$cmbType->addItems($types);
+		}
 		$frmItem->addRow(S_TYPE, $cmbType);
 
 // SNMP OID
@@ -626,6 +636,11 @@ switch($itemType) {
 		$cmbStatus = new CComboBox('status', $status);
 		$cmbStatus->addItems(item_status2str());
 		$frmItem->addRow(S_STATUS, $cmbStatus);
+
+// allowed hosts
+		$frmItem->addRow(S_ALLOWED_HOSTS, new CTextBox('trapper_hosts',$trapper_hosts,40), null, 'row_trapper_hosts');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_TRAPPER, 'trapper_hosts');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_TRAPPER, 'row_trapper_hosts');
 
 // New application
 		$frmItem->addRow(S_NEW_APPLICATION, new CTextBox('new_application', $new_application,40), 'new');
