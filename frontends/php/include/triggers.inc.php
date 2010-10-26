@@ -910,10 +910,6 @@ return $caption;
 		}
 
 		if(!$result){
-			if($templateid == 0){
-// delete main trigger (and recursively childs)
-				delete_trigger($triggerid);
-			}
 			return $result;
 		}
 
@@ -1193,7 +1189,7 @@ return $caption;
 				}
 
 				$state='';
-				$sql = 'SELECT h.host,i.itemid,i.key_,f.function,f.triggerid,f.parameter,i.itemid,i.status'.
+				$sql = 'SELECT h.host,i.itemid,i.key_,i.flags,f.function,f.triggerid,f.parameter,i.itemid,i.status'.
 						' FROM items i,functions f,hosts h'.
 						' WHERE f.functionid='.$functionid.
 							' AND i.itemid=f.itemid '.
@@ -1226,11 +1222,18 @@ return $caption;
 						}
 
 
-						$link = new CLink(
-									$function_data['host'].':'.$function_data['key_'],
-									'items.php?form=update&itemid='.$function_data['itemid'].'&switch_node='.id2nodeid($function_data['itemid']),
-									$style
-								);
+						if($function_data['flags'] == ZBX_FLAG_DISCOVERY_CREATED){
+							$link = new CSpan($function_data['host'].':'.$function_data['key_'], $style);
+						}
+						else if($function_data['flags'] == ZBX_FLAG_DISCOVERY_CHILD){
+							$link = new CLink($function_data['host'].':'.$function_data['key_'],
+								'disc_prototypes.php?form=update&itemid='.$function_data['itemid'].'&parent_discoveryid='.
+								$trigger['discoveryRuleid'].'&switch_node='.id2nodeid($function_data['itemid']), $style);
+						}
+						else{
+							$link = new CLink($function_data['host'].':'.$function_data['key_'],
+								'items.php?form=update&itemid='.$function_data['itemid'].'&switch_node='.id2nodeid($function_data['itemid']), $style);
+						}
 
 						array_push($exp,array('{',$link,'.',bold($function_data['function'].'('),$function_data['parameter'],bold(')'),'}'));
 					}

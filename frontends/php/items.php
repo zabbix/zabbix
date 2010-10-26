@@ -1049,13 +1049,8 @@ switch($itemType) {
 				$description[] = new CLink($item['description_expanded'], '?form=update&itemid='.$item['itemid']);
 			}
 
-			if(empty($item['discoveryRule'])){
-				$status = new CCol(new CLink(item_status2str($item['status']), '?group_itemid='.$item['itemid'].'&go='.
-					($item['status']? 'activate':'disable'), item_status2style($item['status'])));
-			}
-			else{
-				$status = new CCol(new CSpan(item_status2str($item['status']), item_status2style($item['status'])));
-			}
+			$status = new CCol(new CLink(item_status2str($item['status']), '?group_itemid='.$item['itemid'].'&go='.
+				($item['status']? 'activate':'disable'), item_status2style($item['status'])));
 
 
 			if(zbx_empty($item['error'])){
@@ -1095,12 +1090,18 @@ switch($itemType) {
 				if($trigger['templateid'] > 0){
 					$real_hosts = get_realhosts_by_triggerid($triggerid);
 					$real_host = DBfetch($real_hosts);
+					if($trigger['flags'])
 					$tr_description[] = new CLink($real_host['host'], 'triggers.php?&hostid='.$real_host['hostid'], 'unknown');
 					$tr_description[] = ':';
 				}
 
 				$trigger['description_expanded'] = expand_trigger_description($triggerid);
-				$tr_description[] = new CLink($trigger['description_expanded'], 'triggers.php?form=update&triggerid='.$triggerid);
+				if($trigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED){
+					$tr_description[] = new CSpan($trigger['description_expanded']);
+				}
+				else{
+					$tr_description[] = new CLink($trigger['description_expanded'], 'triggers.php?form=update&triggerid='.$triggerid);
+				}
 
 				if($trigger['value'] != TRIGGER_VALUE_UNKNOWN) $trigger['error'] = '';
 
