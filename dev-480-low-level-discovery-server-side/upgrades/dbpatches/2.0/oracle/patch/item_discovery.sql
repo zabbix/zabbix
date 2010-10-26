@@ -2,6 +2,7 @@ CREATE TABLE item_discovery (
 	itemdiscoveryid          number(20)                                NOT NULL,
 	itemid                   number(20)                                NOT NULL,
 	parent_itemid            number(20)                                NOT NULL,
+	key_                     nvarchar2(255)  DEFAULT ''                ,
 	PRIMARY KEY (itemdiscoveryid)
 );
 CREATE UNIQUE INDEX item_discovery_1 on item_discovery (itemid,parent_itemid);

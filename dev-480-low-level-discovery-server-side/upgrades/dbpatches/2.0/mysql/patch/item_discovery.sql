@@ -2,6 +2,7 @@ CREATE TABLE item_discovery (
 	itemdiscoveryid          bigint unsigned                           NOT NULL,
 	itemid                   bigint unsigned                           NOT NULL,
 	parent_itemid            bigint unsigned                           NOT NULL,
+	key_                     varchar(255)    DEFAULT ''                NOT NULL,
 	PRIMARY KEY (itemdiscoveryid)
 ) ENGINE=InnoDB;
 CREATE UNIQUE INDEX item_discovery_1 on item_discovery (itemid,parent_itemid);
