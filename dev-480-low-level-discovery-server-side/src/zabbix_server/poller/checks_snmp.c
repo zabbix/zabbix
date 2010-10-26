@@ -23,12 +23,13 @@
 
 #ifdef HAVE_SNMP
 
-typedef struct zbx_snmp_index_s
+typedef struct
 {
 	char	*oid;
 	char	*value;
 	int	index;
-} zbx_snmp_index_t;
+}
+zbx_snmp_index_t;
 
 static zbx_snmp_index_t	*snmpidx = NULL;
 static int		snmpidx_count = 0, snmpidx_alloc = 16;
@@ -43,7 +44,7 @@ static int		snmpidx_count = 0, snmpidx_alloc = 16;
  *                                                                            *
  * Return value: index of new record                                          *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -559,9 +560,9 @@ static int	snmp_set_value(const char *snmp_oid, struct variable_list *vars, DC_I
  *                                                                            *
  * Function: snmp_walk                                                        *
  *                                                                            *
- * Purpose: retrive information for low-level discovery item                  *
+ * Purpose: retrieve information for low-level discovery item                 *
  *                                                                            *
- * Parameters: DB_ITEM *item - configuration of zabbix item                   *
+ * Parameters: DC_ITEM *item - configuration of zabbix item                   *
  *             char *OID     - OID of table with values of interest           *
  *                                                                            *
  * Return value:  NOTSUPPORTED - OID does not exist, any other critical error *
@@ -569,7 +570,7 @@ static int	snmp_set_value(const char *snmp_oid, struct variable_list *vars, DC_I
  *                SUCCEED - success, variable 'idx' contains index having     *
  *                          value 'value'                                     *
  *                                                                            *
- * Author:                                                                    *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -988,4 +989,5 @@ out:
 
 	return ret;
 }
+
 #endif
