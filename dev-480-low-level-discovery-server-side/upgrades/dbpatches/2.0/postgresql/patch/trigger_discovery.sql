@@ -2,6 +2,8 @@ CREATE TABLE trigger_discovery (
 	triggerdiscoveryid       bigint                                    NOT NULL,
 	triggerid                bigint                                    NOT NULL,
 	parent_triggerid         bigint                                    NOT NULL,
+	expression               varchar(255)    DEFAULT ''                NOT NULL,
+	name                     varchar(255)    DEFAULT ''                NOT NULL,
 	PRIMARY KEY (triggerdiscoveryid)
 ) with OIDS;
 CREATE UNIQUE INDEX trigger_discovery_1 on trigger_discovery (triggerid,parent_triggerid);
