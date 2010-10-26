@@ -460,7 +460,6 @@ static int	get_values()
 			*username = NULL, *publickey = NULL, *privatekey = NULL,
 			*password = NULL;
 	zbx_timespec_t	ts;
-	char		error[ITEM_ERROR_LEN_MAX];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -595,18 +594,12 @@ static int	get_values()
 				assert(0 == 1);
 		}
 
-		/* check for low-level discovery (lld) item */
-		if (res == SUCCEED && 0 != (ZBX_FLAG_DISCOVERY & items[i].flags))
-		{
-			if (NOTSUPPORTED == (res = DBlld_process_discovery_rule(items[i].itemid, agent.text)))
-			{
-				SET_MSG_RESULT(&agent, strdup(error));
-			}
-		}
-
 		if (res == SUCCEED)
 		{
-			if (0 == (ZBX_FLAG_DISCOVERY & items[i].flags))
+			/* check for low-level discovery (lld) item */
+			if (0 != (ZBX_FLAG_DISCOVERY & items[i].flags))
+				DBlld_process_discovery_rule(items[i].itemid, agent.text);
+			else
 				dc_add_history(items[i].itemid, items[i].value_type, &agent, &ts, 0, NULL, 0, 0, 0, 0);
 
 			DCrequeue_reachable_item(items[i].itemid, ITEM_STATUS_ACTIVE, ts.sec);

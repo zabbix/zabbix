@@ -1319,7 +1319,6 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 	AGENT_RESULT	agent;
 	DC_ITEM		item;
 	int		i;
-	char		error[ITEM_ERROR_LEN_MAX];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1367,14 +1366,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 
 				/* check for low-level discovery (lld) item */
 				if (0 != (ZBX_FLAG_DISCOVERY & item.flags))
-				{
-					if (NOTSUPPORTED == DBlld_process_discovery_rule(item.itemid, agent.text))
-					{
-						zabbix_log(LOG_LEVEL_WARNING, "Item [%s:%s] error: %s",
-								item.host.host, item.key_orig, error);
-						DCadd_nextcheck(item.itemid, (time_t)values[i].ts.sec, error);
-					}
-				}
+					DBlld_process_discovery_rule(item.itemid, agent.text);
 				else
 					dc_add_history(item.itemid, item.value_type, &agent, &values[i].ts,
 							values[i].timestamp, values[i].source, values[i].severity,
