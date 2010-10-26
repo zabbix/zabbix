@@ -734,6 +734,7 @@ TABLE|item_discovery|itemdiscoveryid|ZBX_SYNC
 FIELD		|itemdiscoveryid|t_id		|	|NOT NULL	|0
 FIELD		|itemid		|t_id		|	|NOT NULL	|ZBX_SYNC		|1|items
 FIELD		|parent_itemid	|t_id		|	|NOT NULL	|ZBX_SYNC		|2|items	|itemid
+FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|0
 UNIQUE		|1		|itemid,parent_itemid
 
 TABLE|items_applications|itemappid|ZBX_SYNC
