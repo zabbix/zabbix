@@ -1495,7 +1495,7 @@ int	is_int_prefix(const char *c)
  * Return value:  SUCCEED - the string is unsigned integer                    *
  *                FAIL - the string is not number or overflow                 *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1504,6 +1504,9 @@ int	is_uint64(const char *str, zbx_uint64_t *value)
 {
 	register zbx_uint64_t	max_uint64 = ~(zbx_uint64_t)__UINT64_C(0);
 	register zbx_uint64_t	value_uint64 = 0, c;
+
+	if ('\0' == *str)
+		return FAIL;
 
 	while ('\0' != *str)
 	{
