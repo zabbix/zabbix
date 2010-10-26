@@ -18,8 +18,8 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
+#include "zbxjson.h"
 
 int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
@@ -64,4 +64,34 @@ int     NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AG
         init_result(result);
 
 	return SYSINFO_RET_FAIL;
+}
+
+int	NET_IF_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	struct if_nameindex	*ni;
+	struct zbx_json		j;
+	int			i;
+
+	assert(result);
+
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+
+	zbx_json_addarray(&j, cmd);
+
+	for (ni = if_nameindex(), i = 0; 0 != ni[i].if_index; i++)
+	{
+		zbx_json_addobject(&j, NULL);
+		zbx_json_addstring(&j, "{#IFNAME}", ni[i].if_name, ZBX_JSON_TYPE_STRING);
+		zbx_json_close(&j);
+	}
+
+	if_freenameindex(ni);
+
+	zbx_json_close(&j);
+
+	SET_STR_RESULT(result, strdup(j.buffer));
+
+	zbx_json_free(&j);
+
+	return SYSINFO_RET_OK;
 }
