@@ -448,6 +448,7 @@ return $caption;
 			$options = array(
 				'triggerids' => zbx_objectValues($triggers, 'templateid'),
 				'select_hosts' => API_OUTPUT_EXTEND,
+				'filter' => array('flags' => null),
 				'output' => API_OUTPUT_EXTEND,
 				'nopermissions' => 1
 			);
