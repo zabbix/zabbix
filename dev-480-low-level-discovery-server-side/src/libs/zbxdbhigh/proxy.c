@@ -2746,14 +2746,6 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemi
 		zbx_free(units_esc);
 		zbx_free(trapper_hosts_esc);
 		zbx_free(delay_flex_esc);
-
-		if (SUCCEED == DBis_null(row[3]) || 0 != strcmp(row[2], row[3]))
-		{
-			DBexecute("update items"
-					" set lastvalue=key_"
-					" where itemid=" ZBX_FS_UI64,
-					itemid);
-		}
 	}
 	DBfree_result(result);
 
