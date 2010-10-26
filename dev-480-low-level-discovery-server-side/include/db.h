@@ -595,6 +595,7 @@ typedef struct
 	int		type;
 	int		periods_cnt;
 	unsigned char	flags;
+	unsigned char	del_flag;
 }
 ZBX_GRAPH_ITEMS;
 
@@ -640,6 +641,7 @@ void	DBdelete_sysmaps_hosts_by_hostid(zbx_uint64_t hostid);
 
 int	DBadd_graph_item_to_linked_hosts(int gitemid,int hostid);
 
+void	DBdelete_graphs(zbx_uint64_t *graphids, int graphids_num);
 int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_uint64_t templateid);
 int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_uint64_t templateid);
 int	DBdelete_host(zbx_uint64_t hostid);
