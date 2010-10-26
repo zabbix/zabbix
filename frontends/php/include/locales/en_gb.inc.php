@@ -2055,6 +2055,8 @@
 	'S_EXPRESSION_UNNECESSARY_SYMBOLS_DETECTED_ERROR'=>'Unnecessary symbols detected',
 	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_AFTER_ERROR'=>'Not allowed symbols detected after element',
 	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_BEFORE_ERROR'=>'Not allowed symbols detected before element',
+	'S_ARE_YOU_SURE_YOU_WANT_TO_DELETE'=>'Are you sure you want to delete',
+	'S_MACROS_ES'=>'macro(s)',
 
 //	popup_link_tr.php
 	'S_NEW_INDICATORS'=>			'New indicators',

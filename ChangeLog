@@ -1,5 +1,6 @@
 Changes for 1.8.4rc2
 
+ - [ZBX-1492] added confirmation dialog when deleting macros
  - [ZBX-3135] add an example for using standard input in zabbix_sender manpage (Richlv)
  - [ZBX-2616] bundled DejaVu font upgraded from 2.31 to 2.32 (Richlv)
  - [ZBX-2630] fixed ability to translate various strings in the frontend depending on their context (Richlv)
