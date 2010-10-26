@@ -2026,21 +2026,19 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			zbx_subarray_push($typeVisibility, $it, 'add_delay_flex');
 		}
 
-		if(!$parent_discoveryid){
-			$frmItem->addRow(S_KEEP_HISTORY_IN_DAYS, array(
-				new CNumericBox('history',$history,8),
-				(!isset($_REQUEST['itemid'])) ? null :
-					new CButtonQMessage('del_history',S_CLEAR_HISTORY,S_HISTORY_CLEARING_CAN_TAKE_A_LONG_TIME_CONTINUE_Q)
-				));
+		$frmItem->addRow(S_KEEP_HISTORY_IN_DAYS, array(
+			new CNumericBox('history',$history,8),
+			(!isset($_REQUEST['itemid'])) ? null :
+				new CButtonQMessage('del_history',S_CLEAR_HISTORY,S_HISTORY_CLEARING_CAN_TAKE_A_LONG_TIME_CONTINUE_Q)
+			));
 
-			$row = new CRow(array(new CCol(S_KEEP_TRENDS_IN_DAYS,'form_row_l'), new CCol(new CNumericBox('trends',$trends,8),'form_row_r')));
-			$row->setAttribute('id', 'row_trends');
-			$frmItem->addRow($row);
-			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'trends');
-			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'row_trends');
-			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'trends');
-			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_trends');
-		}
+		$row = new CRow(array(new CCol(S_KEEP_TRENDS_IN_DAYS,'form_row_l'), new CCol(new CNumericBox('trends',$trends,8),'form_row_r')));
+		$row->setAttribute('id', 'row_trends');
+		$frmItem->addRow($row);
+		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'trends');
+		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'row_trends');
+		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'trends');
+		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_trends');
 
 		$cmbStatus = new CComboBox('status',$status);
 		foreach(array(ITEM_STATUS_ACTIVE,ITEM_STATUS_DISABLED,ITEM_STATUS_NOTSUPPORTED) as $st)
