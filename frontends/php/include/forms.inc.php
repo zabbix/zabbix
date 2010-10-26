@@ -4990,6 +4990,7 @@ JAVASCRIPT;
 
 		insert_js('
 			function addMacroRow(){
+				
 				if(typeof(addMacroRow.macro_count) == "undefined"){
 					addMacroRow.macro_count = '.count($macros).';
 				}
@@ -5055,7 +5056,7 @@ JAVASCRIPT;
 		}
 
 
-		$script = '$$("#tbl_macros input:checked").each(function(obj){ $(obj.parentNode.parentNode).remove(); });';
+		$script = '$$("#tbl_macros input:checked").each(function(obj){ $(obj.parentNode.parentNode).remove(); if (typeof(deleted_macro_cnt) == \'undefined\') deleted_macro_cnt=1; else deleted_macro_cnt++; });';
 		$delete_btn = new CButton('macros_del', S_DELETE_SELECTED, $script);
 		$delete_btn->setType('button');
 
@@ -5072,7 +5073,7 @@ JAVASCRIPT;
 
 		$footer = null;
 		if($hostid === null){
-			$footer = array(new CButton('save', S_SAVE));
+			$footer = array(new CButton('save', S_SAVE, "if (deleted_macro_cnt > 0) return confirm('".S_ARE_YOU_SURE_YOU_WANT_TO_DELETE." '+deleted_macro_cnt+' ".S_MACROS_ES."?');"));
 		}
 
 		return new CFormElement(S_MACROS, $macros_tbl, $footer);
