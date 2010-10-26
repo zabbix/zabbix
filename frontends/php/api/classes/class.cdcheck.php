@@ -33,7 +33,6 @@ class CDCheck extends CZBXAPI{
 		$result = array();
 		$nodeCheck = false;
 		$user_type = $USER_DETAILS['type'];
-		$userid = $USER_DETAILS['userid'];
 
 		$sort_columns = array('dcheckid', 'druleid'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM); // allowed output options for [ select_* ] params
@@ -55,7 +54,9 @@ class CDCheck extends CZBXAPI{
 			'nopermissions'				=> null,
 // filter
 			'filter'					=> null,
-			'pattern'					=> null,
+			'search'					=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
 
 // OutPut
 			'output'					=> API_OUTPUT_REFER,
@@ -188,33 +189,15 @@ class CDCheck extends CZBXAPI{
 		}
 
 // filter
-		if(!is_null($options['filter'])){
-			zbx_value2array($options['filter']);
-
-			if(isset($options['filter']['dhostid']) && !is_null($options['filter']['dhostid'])){
-				$sql_parts['where']['dhostid'] = 'dc.dhostid='.$options['filter']['dhostid'];
-			}
-
-			if(isset($options['filter']['type']) && !is_null($options['filter']['type'])){
-				zbx_value2array($options['filter']['type']);
-				$sql_parts['where']['type'] = DBcondition('dc.type', $options['filter']['type']);
-			}
-
-			if(isset($options['filter']['key_']) && !is_null($options['filter']['key_'])){
-				zbx_value2array($options['filter']['key_']);
-				$sql_parts['where']['key_'] = DBcondition('dc.key_', $options['filter']['key_'], false, true);
-			}
-
-			if(isset($options['filter']['ports']) && !is_null($options['filter']['ports'])){
-				zbx_value2array($options['filter']['ports']);
-				$sql_parts['where']['ports'] = DBcondition('dc.ports', $options['filter']['ports'], false, true);
-			}
-
-			if(isset($options['filter']['snmp_community']) && !is_null($options['filter']['snmp_community'])){
-				zbx_value2array($options['filter']['snmp_community']);
-				$sql_parts['where']['snmp_community'] = DBcondition('dc.snmp_community', $options['filter']['snmp_community'], false, true);
-			}
+		if(is_array($options['filter'])){
+			zbx_db_filter('dchecks dc', $options, $sql_parts);
 		}
+
+// search
+		if(is_array($options['search'])){
+			zbx_db_search('dchecks dc', $options, $sql_parts);
+		}
+
 // order
 // restrict not allowed columns for sorting
 		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
@@ -234,8 +217,6 @@ class CDCheck extends CZBXAPI{
 		}
 //-------
 
-
-		$dserviceids = array();
 
 		$sql_parts['select'] = array_unique($sql_parts['select']);
 		$sql_parts['from'] = array_unique($sql_parts['from']);
@@ -286,10 +267,6 @@ class CDCheck extends CZBXAPI{
 						$result[$dcheck['dcheckid']]['dhosts'] = array();
 					}
 
-					if(!is_null($options['selectDChecks']) && !isset($result[$dcheck['dcheckid']]['dchecks'])){
-						$result[$dcheck['dcheckid']]['dchecks'] = array();
-					}
-
 					if(!is_null($options['selectHosts']) && !isset($result[$dcheck['dcheckid']]['hosts'])){
 						$result[$dcheck['dcheckid']]['hosts'] = array();
 					}
@@ -306,13 +283,6 @@ class CDCheck extends CZBXAPI{
 							$result[$dcheck['dcheckid']]['dhosts'] = array();
 
 						$result[$dcheck['dcheckid']]['dhosts'][] = array('dhostid' => $dcheck['dhostid']);
-					}
-// dcheckids
-					if(isset($dcheck['dcheckid']) && is_null($options['selectDChecks'])){
-						if(!isset($result[$dcheck['dcheckid']]['dchecks']))
-							$result[$dcheck['dcheckid']]['dchecks'] = array();
-
-						$result[$dcheck['dcheckid']]['dchecks'][] = array('dcheckid' => $dcheck['dcheckid']);
 					}
 
 					$result[$dcheck['dcheckid']] += $dcheck;
@@ -342,6 +312,7 @@ Copt::memoryPick();
 				if(!is_null($options['limitSelects'])) order_result($drules, 'name');
 				foreach($drules as $druleid => $drule){
 					unset($drules[$druleid]['dchecks']);
+					$count = array();
 					foreach($drule['dchecks'] as $dnum => $dcheck){
 						if(!is_null($options['limitSelects'])){
 							if(!isset($count[$dcheck['dcheckid']])) $count[$dcheck['dcheckid']] = 0;

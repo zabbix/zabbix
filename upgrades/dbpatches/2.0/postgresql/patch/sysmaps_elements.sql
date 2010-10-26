@@ -1,3 +1,16 @@
+CREATE TABLE sysmap_element_url (
+	sysmapelementurlid       bigint                                    NOT NULL,
+	selementid               bigint                                    NOT NULL,
+	name                     varchar(255)                              NOT NULL,
+	url                      varchar(255)    DEFAULT ''                NOT NULL,
+	PRIMARY KEY (sysmapelementurlid)
+) with OIDS;
+CREATE UNIQUE INDEX sysmap_element_url_1 on sysmap_element_url (selementid,name);
+ALTER TABLE ONLY sysmap_element_url ADD CONSTRAINT c_sysmap_element_url_1 FOREIGN KEY (selementid) REFERENCES sysmaps_elements (selementid) ON DELETE CASCADE;
+
+INSERT INTO sysmap_element_url (sysmapelementurlid,selementid,name,url)
+	SELECT selementid,selementid,url,url FROM sysmaps_elements WHERE url<>'';
+
 ALTER TABLE ONLY sysmaps_elements ALTER selementid DROP DEFAULT,
 				  ALTER sysmapid DROP DEFAULT,
 				  ALTER iconid_off DROP DEFAULT,
@@ -9,7 +22,8 @@ ALTER TABLE ONLY sysmaps_elements ALTER selementid DROP DEFAULT,
 				  ALTER iconid_disabled DROP DEFAULT,
 				  ALTER iconid_disabled DROP NOT NULL,
 				  ALTER iconid_maintenance DROP DEFAULT,
-				  ALTER iconid_maintenance DROP NOT NULL;
+				  ALTER iconid_maintenance DROP NOT NULL,
+				  DROP COLUMN url;
 DELETE FROM sysmaps_elements WHERE sysmapid NOT IN (SELECT sysmapid FROM sysmaps);
 UPDATE sysmaps_elements SET iconid_off=NULL WHERE iconid_off=0;
 UPDATE sysmaps_elements SET iconid_on=NULL WHERE iconid_on=0;

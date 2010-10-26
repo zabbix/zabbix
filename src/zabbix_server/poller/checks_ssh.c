@@ -82,7 +82,7 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 /*	const char	*fingerprint;*/
 	int		auth_pw = 0, rc, ret = NOTSUPPORTED,
 			exitcode, bytecount = 0;
-	char		*conn, buffer[MAX_BUF_LEN], buf[16], *userauthlist,
+	char		*conn, buffer[MAX_BUFFER_LEN], buf[16], *userauthlist,
 			*publickey = NULL, *privatekey = NULL;
 	size_t		sz;
 
@@ -241,8 +241,8 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 			if (0 < (rc = libssh2_channel_read(channel, buf, sizeof(buf))))
 			{
 				sz = (size_t)rc;
-				if (sz > MAX_BUF_LEN - (bytecount + 1))
-					sz = MAX_BUF_LEN - (bytecount + 1);
+				if (sz > MAX_BUFFER_LEN - (bytecount + 1))
+					sz = MAX_BUFFER_LEN - (bytecount + 1);
 				if (0 == sz)
 					continue;
 

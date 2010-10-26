@@ -220,7 +220,7 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 {
 	FILE *log_file = NULL;
 
-	char	message[MAX_BUF_LEN];
+	char	message[MAX_BUFFER_LEN];
 
 	struct	tm	*tm;
 	va_list		args;

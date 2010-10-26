@@ -165,10 +165,10 @@ include_once('include/page_header.php');
 		$deps = get_request('dependencies',array());
 
 		if(isset($_REQUEST['triggerid'])){
-			$trigger_data = get_trigger_by_triggerid($_REQUEST['triggerid']);
-			if($trigger_data['templateid']){
-				$_REQUEST['description'] = $trigger_data['description'];
-				$_REQUEST['expression'] = explode_exp($trigger_data['expression'],0);
+			$triggerData = get_trigger_by_triggerid($_REQUEST['triggerid']);
+			if($triggerData['templateid']){
+				$_REQUEST['description'] = $triggerData['description'];
+				$_REQUEST['expression'] = explode_exp($triggerData['expression'],0);
 			}
 
 			DBstart();
@@ -176,7 +176,7 @@ include_once('include/page_header.php');
 			$result = update_trigger($_REQUEST['triggerid'],
 				$_REQUEST['expression'],$_REQUEST['description'],$type,
 				$_REQUEST['priority'],$status,$_REQUEST['comments'],$_REQUEST['url'],
-				$deps, $trigger_data['templateid']);
+				$deps, $triggerData['templateid']);
 			$result = DBend($result);
 
 			$triggerid = $_REQUEST['triggerid'];
@@ -199,28 +199,27 @@ include_once('include/page_header.php');
 		$result = false;
 
 		$options = array(
-			'triggerids' => $_REQUEST['triggerid'],
-			'extendoutput'=>1, 
-			'editable'=>1, 
-			'select_hosts' => API_OUTPUT_EXTEND,
+			'triggerids'=> $_REQUEST['triggerid'],
+			'editable'=> 1,
+			'select_hosts'=> API_OUTPUT_EXTEND,
+			'output'=> API_OUTPUT_EXTEND,
 		);
 		$triggers = CTrigger::get($options);
-		
-		if($trigger_data = reset($triggers)){
-			$host = reset($trigger_data['hosts']);
+
+		if($triggerData = reset($triggers)){
+			$host = reset($triggerData['hosts']);
+
 			DBstart();
-			$result = CTrigger::delete($triggers);
+			$result = CTrigger::delete($triggerData['triggerid']);
 			$result = DBend($result);
 			if($result){
-				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $_REQUEST['triggerid'], $host['host'].':'.$trigger_data['description'], NULL, NULL, NULL);
+				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $_REQUEST['triggerid'], $host['host'].':'.$triggerData['description'], NULL, NULL, NULL);
 			}
 		}
 
 		show_messages($result, S_TRIGGER_DELETED, S_CANNOT_DELETE_TRIGGER);
 
 		if($result){
-			//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER,
-			//	S_TRIGGER.' ['.$_REQUEST['triggerid'].'] ['.expand_trigger_description_by_data($trigger_data).'] ');
 			unset($_REQUEST['form']);
 			unset($_REQUEST['triggerid']);
 		}
@@ -379,33 +378,32 @@ include_once('include/page_header.php');
 	}
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['g_triggerid'])){
 		DBstart();
-		
+
+		$triggerids = array();
 		$options = array(
-			'extendoutput'=>1, 
+			'triggerids' => $_REQUEST['g_triggerid'],
 			'editable'=>1, 
 			'select_hosts' => API_OUTPUT_EXTEND,
-			'triggerids' => $_REQUEST['g_triggerid'],
+			'output'=>API_OUTPUT_EXTEND,
+			'expandDescription' => 1
 		);
 		$triggers = CTrigger::get($options);
 
 		foreach($triggers as $tnum => $trigger){
-			$triggerid = $trigger['triggerid'];
-
-			$description = expand_trigger_description($triggerid);
 			if($trigger['templateid'] != 0){
 				unset($triggers[$tnum]);
-				error(S_CANNOT_DELETE_TRIGGER.' [ '.$description.' ] ('.S_TEMPLATED_TRIGGER.')');
+				error(S_CANNOT_DELETE_TRIGGER.' [ '.$trigger['description'].' ] ('.S_TEMPLATED_TRIGGER.')');
 				continue;
 			}
+
+			$triggerids[] = $trigger['triggerid'];
 			$host = reset($trigger['hosts']);
 
-			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $triggerid, $host['host'].':'.$description, NULL, NULL, NULL);
+			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $trigger['triggerid'], $host['host'].':'.$trigger['description'], NULL, NULL, NULL);
 		}
 
-		$go_result = !empty($triggers);
-		if($go_result){
-			$go_result = CTrigger::delete($triggers);
-		}
+		$go_result = !empty($triggerids);
+		if($go_result) $go_result = CTrigger::delete($triggerids);
 
 		$go_result = DBend($go_result);
 		show_messages($go_result, S_TRIGGERS_DELETED, S_CANNOT_DELETE_TRIGGERS);
@@ -483,7 +481,7 @@ include_once('include/page_header.php');
 
 // Header Host
 		if($_REQUEST['hostid'] > 0){
-			$tbl_header_host = get_header_host_table($_REQUEST['hostid'], array('items', 'applications', 'graphs'));
+			$tbl_header_host = get_header_host_table($_REQUEST['hostid'],'triggers');
 			$triggers_wdgt->addItem($tbl_header_host);
 		}
 

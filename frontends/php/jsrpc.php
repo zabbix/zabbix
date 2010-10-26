@@ -48,11 +48,11 @@ include_once('include/page_header.php');
 	$result = array();
 	switch($data['method']){
 		case 'host.get':
-			$pattern = $data['params']['pattern'];
+			$search = $data['params']['search'];
 
 			$options = array(
-				'startPattern' => 1,
-				'pattern' => $pattern,
+				'startSearch' => 1,
+				'search' => $search,
 				'output' => array('hostid', 'host'),
 				'sortfield' => 'host',
 				'limit' => 15
@@ -129,7 +129,7 @@ include_once('include/page_header.php');
 					'title' => $title.' '.get_node_name_by_elid($host['hostid'],null,':').'[url='.$url_tr_status.']'.$host['host'].'[/url]',
 					'body' => array(
 						S_DETAILS.': '.' [url='.$url_events.']'.$trigger['description'].'[/url]',
-						S_DATE.': [b][url='.$url_tr_events.']'.zbx_date2str(S_DATE_FORMAT_YMDHMS, $event['clock']).':'.$event['ns'].'[/url][/b]',
+						S_DATE.': [b][url='.$url_tr_events.']'.zbx_date2str(S_DATE_FORMAT_YMDHMS, $event['clock']).'[/url][/b]',
 //						S_AGE.': '.zbx_date2age($event['clock'], time()),
 //						S_SEVERITY.': '.get_severity_style($trigger['priority'])
 //						S_SOURCE.': '.$event['eventid'].' : '.$event['clock']

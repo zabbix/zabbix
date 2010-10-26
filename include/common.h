@@ -117,8 +117,8 @@
 #define OFF	0
 
 #define	APPLICATION_NAME	"Zabbix Agent"
-#define	ZABBIX_REVDATE		"7 December 2009"
-#define	ZABBIX_VERSION		"1.9"
+#define	ZABBIX_REVDATE		"26 October 2010"
+#define	ZABBIX_VERSION		"1.9.0"
 #define	ZABBIX_REVISION		"{ZABBIX_REVISION}"
 
 #if defined(_WINDOWS)
@@ -152,10 +152,7 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 const char	*zbx_result_string(int result);
 
 #define MAX_STRING_LEN	2048
-#define MAX_BUF_LEN	65536
-
-#define DB_TEXT_LEN	65535
-#define DB_TEXT_LEN_MAX	DB_TEXT_LEN+1
+#define MAX_BUFFER_LEN	65536
 
 #define ZBX_DM_DELIMITER	'\255'
 
@@ -617,33 +614,21 @@ typedef enum
 
 const char	*zbx_permission_string(int perm);
 
-/* Types of nodes */
-#define	ZBX_NODE_TYPE_REMOTE	0
-#define	ZBX_NODE_TYPE_LOCAL	1
-
 #define	ZBX_NODE_MASTER	0
 #define	ZBX_NODE_SLAVE	1
 const char	*zbx_nodetype_string(unsigned char nodetype);
 
-#define	POLLER_DELAY	5
+#define POLLER_DELAY		5
 #define DISCOVERER_DELAY	60
 
 #define	ZBX_NO_POLLER			255
 #define	ZBX_POLLER_TYPE_NORMAL		0
-#define	ZBX_POLLER_TYPE_IPMI		1
-#define	ZBX_POLLER_TYPE_PINGER		2
-#define	ZBX_POLLER_TYPE_COUNT		3	/* number of poller types */
+#define	ZBX_POLLER_TYPE_UNREACHABLE	1
+#define	ZBX_POLLER_TYPE_IPMI		2
+#define	ZBX_POLLER_TYPE_PINGER		3
+#define	ZBX_POLLER_TYPE_COUNT		4	/* number of poller types */
 
-#define	POLLER_TIMEOUT	5
-/* Do not perform more than this number of checks during unavailability period */
-/*#define SLEEP_ON_UNREACHABLE		60*/
-/*#define CHECKS_PER_UNAVAILABLE_PERIOD	4*/
-
-#define	AGENT_TIMEOUT	3
-
-#define	SENDER_TIMEOUT		60
-#define	ZABBIX_TRAPPER_TIMEOUT	300
-#define	SNMPTRAPPER_TIMEOUT	5
+#define	GET_SENDER_TIMEOUT	60
 
 #ifndef MAX
 #	define MAX(a, b) ((a) > (b) ? (a) : (b))

@@ -72,7 +72,7 @@ include_once('include/page_header.php');
 		'ipmi_ip'=>			array(T_ZBX_STR, O_OPT,	NULL, NULL,				NULL),
 		'ipmi_port'=>		array(T_ZBX_INT, O_OPT,	NULL, BETWEEN(0,65535),	NULL),
 		'ipmi_authtype'=>	array(T_ZBX_INT, O_OPT,	NULL, BETWEEN(-1,6),	NULL),
-		'ipmi_privilege'=>	array(T_ZBX_INT, O_OPT,	NULL, BETWEEN(1,5),		NULL),
+		'ipmi_privilege'=>	array(T_ZBX_INT, O_OPT,	NULL, BETWEEN(0,5),		NULL),
 		'ipmi_username'=>	array(T_ZBX_STR, O_OPT,	NULL, NULL,				NULL),
 		'ipmi_password'=>	array(T_ZBX_STR, O_OPT,	NULL, NULL,				NULL),
 
@@ -503,6 +503,11 @@ include_once('include/page_header.php');
 			}
 			$groups = zbx_toObject($groups, 'groupid');
 
+			$macros = get_request('macros', array());
+			foreach($macros as $mnum => $macro){
+				if(zbx_empty($macro['value'])) unset($macros[$mnum]);
+			}
+
 			$host = array(
 				'host' => $_REQUEST['host'],
 				'port' => $_REQUEST['port'],
@@ -520,7 +525,7 @@ include_once('include/page_header.php');
 				'ipmi_password' => $_REQUEST['ipmi_password'],
 				'groups' => $groups,
 				'templates' => $templates,
-				'macros' => get_request('macros', array()),
+				'macros' => $macros,
 				'extendedProfile' => (get_request('useprofile_ext', 'no') == 'yes') ? get_request('ext_host_profiles', array()) : array(),
 			);
 

@@ -42,7 +42,7 @@ class CGraph extends CZBXAPI{
 		$result = array();
 
 		$sort_columns = array('graphid','name'); // allowed columns for sorting
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM); // allowed output options for [ select_* ] params
 
 		$sql_parts = array(
 			'select' => array('graphs' => 'g.graphid'),
@@ -56,6 +56,7 @@ class CGraph extends CZBXAPI{
 		$def_options = array(
 			'nodeids' 				=> null,
 			'groupids' 				=> null,
+			'templateids'			=> null,
 			'hostids' 				=> null,
 			'graphids' 				=> null,
 			'itemids' 				=> null,
@@ -64,14 +65,18 @@ class CGraph extends CZBXAPI{
 			'inherited'				=> null,
 			'editable'				=> null,
 			'nopermissions'			=> null,
+
 // filter
-			'filter'				=> '',
-			'pattern'				=> '',
+			'filter'					=> null,
+			'search'					=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
+
 // output
 			'output'				=> API_OUTPUT_REFER,
-			'select_hosts'			=> null,
 			'select_groups'			=> null,
 			'select_templates'		=> null,
+			'select_hosts'			=> null,
 			'select_items'			=> null,
 			'select_graph_items'	=> null,
 			'extendoutput'			=> null,
@@ -107,6 +112,15 @@ class CGraph extends CZBXAPI{
 			}
 		}
 
+
+		if(is_array($options['output'])){
+			unset($sql_parts['select']['graphs']);
+			foreach($options['output'] as $key => $field){
+				$sql_parts['select'][$field] = ' g.'.$field;
+			}
+
+			$options['output'] = API_OUTPUT_CUSTOM;
+		}
 
 // editable + PERMISSION CHECK
 
@@ -166,6 +180,19 @@ class CGraph extends CZBXAPI{
 
 			if(!is_null($options['groupCount'])){
 				$sql_parts['group']['hg'] = 'hg.groupid';
+			}
+		}
+
+// templateids
+		if(!is_null($options['templateids'])){
+			zbx_value2array($options['templateids']);
+
+			if(!is_null($options['hostids'])){
+				zbx_value2array($options['hostids']);
+				$options['hostids'] = array_merge($options['hostids'], $options['templateids']);
+			}
+			else{
+				$options['hostids'] = $options['templateids'];
 			}
 		}
 
@@ -255,37 +282,46 @@ class CGraph extends CZBXAPI{
 			}
 		}
 
-// pattern
-		if(!zbx_empty($options['pattern'])){
-			$sql_parts['where']['name'] = ' UPPER(g.name) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
+// search
+		if(is_array($options['search'])){
+			zbx_db_search('graphs g', $options, $sql_parts);
 		}
 
 // filter
+		if(is_array($options['filter'])){
 
-// filter
-		if(!is_null($options['filter'])){
-			zbx_value2array($options['filter']);
+			if(isset($options['filter']['name'])){
+				zbx_value2array($options['filter']['name']);
+				$sql_parts['where']['name'] = DBcondition('g.name', $options['filter']['name'], false, true);
+			}
 
-			if(isset($options['filter']['name']))
-				$sql_parts['where']['name'] = 'g.name='.zbx_dbstr($options['filter']['name']);
+			if(isset($options['filter']['templateid'])){
+				zbx_value2array($options['filter']['templateid']);
+				$sql_parts['where']['templateid'] = DBcondition('g.templateid', $options['filter']['templateid']);
+			}
 
-			if(isset($options['filter']['templateid']))
-				$sql_parts['where']['templateid'] = 'g.templateid='.$options['filter']['templateid'];
+			if(isset($options['filter']['host'])){
+				zbx_value2array($options['filter']['host']);
 
-			if(isset($options['filter']['host']) || isset($options['filter']['hostid'])){
+				$sql_parts['from']['graphs_items'] = 'graphs_items gi';
+				$sql_parts['from']['items'] = 'items i';
+				$sql_parts['from']['hosts'] = 'hosts h';
+				$sql_parts['where']['gig'] = 'gi.graphid=g.graphid';
+				$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
+
+					$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
+				$sql_parts['where']['host'] = DBcondition('h.host', $options['filter']['host'], false, true);
+				}
+
+			if(isset($options['filter']['hostid'])){
+				zbx_value2array($options['filter']['hostid']);
+
 				$sql_parts['from']['graphs_items'] = 'graphs_items gi';
 				$sql_parts['from']['items'] = 'items i';
 				$sql_parts['where']['gig'] = 'gi.graphid=g.graphid';
 				$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
 
-				if(isset($options['filter']['host'])){
-					$sql_parts['from']['hosts'] = 'hosts h';
-					$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
-					$sql_parts['where']['host'] = 'h.host='.zbx_dbstr($options['filter']['host']);
-				}
-
-				if(isset($options['filter']['hostid']))
-					$sql_parts['where']['hostid'] = 'i.hostid='.$options['filter']['hostid'];
+				$sql_parts['where']['hostid'] = DBcondition('i.hostid', $options['filter']['hostid']);
 			}
 		}
 
@@ -334,6 +370,7 @@ class CGraph extends CZBXAPI{
 					$sql_where.
 				$sql_group.
 				$sql_order;
+//SDI($sql);
 		$db_res = DBselect($sql, $sql_limit);
 		while($graph = DBfetch($db_res)){
 			if(!is_null($options['countOutput'])){
@@ -343,12 +380,12 @@ class CGraph extends CZBXAPI{
 					$result = $graph['rowscount'];
 			}
 			else{
+				$graphids[$graph['graphid']] = $graph['graphid'];
+
 				if($options['output'] == API_OUTPUT_SHORTEN){
 					$result[$graph['graphid']] = array('graphid' => $graph['graphid']);
 				}
 				else{
-					$graphids[$graph['graphid']] = $graph['graphid'];
-
 					if(!isset($result[$graph['graphid']]))
 						$result[$graph['graphid']]= array();
 
@@ -388,7 +425,7 @@ class CGraph extends CZBXAPI{
 		}
 
 COpt::memoryPick();
-		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['countOutput'])){
+		if(!is_null($options['countOutput'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
@@ -403,6 +440,7 @@ COpt::memoryPick();
 				'preservekeys' => 1
 			);
 			$gitems = CGraphItem::get($obj_params);
+//SDI($gitems);
 			foreach($gitems as $gitemid => $gitem){
 				$ggraphs = $gitem['graphs'];
 				unset($gitem['graphs']);
@@ -561,7 +599,7 @@ COpt::memoryPick();
 		try{
 			self::BeginTransaction(__METHOD__);
 
-			self::checkInput($graphs);
+			self::checkInput($graphs, false);
 
 			foreach($graphs as $gnum => $graph){
 
@@ -572,15 +610,6 @@ COpt::memoryPick();
 					'templated_hosts' => 1,
 				);
 				$graph_hosts = CHost::get($options);
-
-// check - already exists
-				$filter = array(
-					'name' => $graph['name'],
-					'hostids' => zbx_objectValues($graph_hosts, 'hostid')
-				);
-				if(self::exists($filter)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph already exists [ '.$graph['name'].' ] on Host [ '.$graph_hosts[0]['host'].' ]');
-				}
 
 // check - items from one template
 				$templated_graph = false;
@@ -637,23 +666,27 @@ COpt::memoryPick();
 				'graphids' => zbx_objectValues($graphs, 'graphid'),
 				'editable' => 1,
 				'preservekeys' => 1,
-				'output' => API_OUTPUT_SHORTEN
+				'output' => API_OUTPUT_SHORTEN,
+				'select_graph_items'=> API_OUTPUT_EXTEND
 			);
 			$upd_graphs = self::get($options);
 			foreach($graphs as $gnum => $graph){
 				if(!isset($upd_graphs[$graph['graphid']])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 				}
+
+				if(!isset($graph['gitems']))
+					$graphs[$gnum]['gitems'] = $upd_graphs[$graph['graphid']]['gitems'];
 			}
+
 // }}} GRAPHS PERMISSIONS
 
-			self::checkInput($graphs);
+			self::checkInput($graphs, true);
 
 			foreach($graphs as $gnum => $graph){
 
 				unset($graph['templateid']);
 
-// EXCEPTION: GRAPH EXISTS {{{
 				$options = array(
 					'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
 					'output' => API_OUTPUT_EXTEND,
@@ -661,20 +694,6 @@ COpt::memoryPick();
 					'templated_hosts' => 1,
 				);
 				$graph_hosts = CHost::get($options);
-
-				$options = array(
-					'filter' => array('name' => $graph['name']),
-					'hostids' => zbx_objectValues($graph_hosts, 'hostid'),
-					'nopermissions' => 1
-				);
-				$graph_exists = self::get($options);
-				$graph_exists = reset($graph_exists);
-
-				if($graph_exists && ($graph_exists['graphid'] != $graph['graphid'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$graph['name'].' ]: already exists on [ '.$graph_hosts[0]['host'].' ]');
-				}
-// }}} EXCEPTION: GRAPH EXISTS
-
 
 // EXCEPTION: MESS TEMPLATED ITEMS {{{
 				$templated_graph = false;
@@ -693,11 +712,10 @@ COpt::memoryPick();
 				self::checkAxisItems($graph, $templated_graph);
 
 				self::updateReal($graph);
-
-				if($templated_graph){
-					self::inherit($graph);
+// inheritance
+				if($templated_graph) self::inherit($graph);
+				$graphids[] = $graph['graphid'];
 				}
-			}
 
 			self::EndTransaction(true, __METHOD__);
 			return array('graphids' => $graphids);
@@ -737,31 +755,22 @@ COpt::memoryPick();
 	}
 
 	protected static function updateReal($graph){
-		DB::update('graphs', array(
-			'values' => $graph,
-			'where' => array('graphid='.$graph['graphid']),
-		));
+		$data = array(array('values' => $graph, 'where'=> array('graphid='.$graph['graphid'])));
+		$result = DB::update('graphs', $data);
+		if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 
 
-		DBexecute('DELETE FROM graphs_items WHERE graphid='.$graph['graphid'])
-			or self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+		if(isset($graph['gitems'])){
+			if(!DBexecute('DELETE FROM graphs_items WHERE graphid='.$graph['graphid']))
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 
-		foreach($graph['gitems'] as $gitem){
-			$values = array(
-				'gitemid' => get_dbid('graphs_items', 'gitemid'),
-				'graphid' => $graph['graphid']
-			);
-			if(isset($gitem['itemid'])) $values['itemid'] = $gitem['itemid'];
-			if(isset($gitem['color'])) $values['color'] = zbx_dbstr($gitem['color']);
-			if(isset($gitem['drawtype'])) $values['drawtype'] = $gitem['drawtype'];
-			if(isset($gitem['sortorder'])) $values['sortorder'] = $gitem['sortorder'];
-			if(isset($gitem['yaxisside'])) $values['yaxisside'] = $gitem['yaxisside'];
-			if(isset($gitem['calc_fnc'])) $values['calc_fnc'] = $gitem['calc_fnc'];
-			if(isset($gitem['type'])) $values['type'] = $gitem['type'];
-			if(isset($gitem['periods_cnt'])) $values['periods_cnt'] = $gitem['periods_cnt'];
+			foreach($graph['gitems'] as $inum => $gitem){
+				$gitem['graphid'] = $graph['graphid'];
 
-			$sql = 'INSERT INTO graphs_items ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')';
-			DBexecute($sql) or self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+				$result = DB::insert('graphs_items', array($gitem));
+				if(!$result)
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+		}
 		}
 
 		return $graph['graphid'];
@@ -774,11 +783,13 @@ COpt::memoryPick();
 			'nopermissions' => 1,
 		);
 		$graph_templates = CTemplate::get($options);
-		if(!empty($graph_templates)){
-			$graph_template = reset($graph_templates);
 
+		if(empty($graph_templates)) return true;
+//-----
+
+		$graphTemplate = reset($graph_templates);
 			$options = array(
-				'templateids' => $graph_template['templateid'],
+			'templateids' => $graphTemplate['templateid'],
 				'output' => array('hostid', 'host'),
 				'preservekeys' => 1,
 				'hostids' => $hostids,
@@ -801,8 +812,8 @@ COpt::memoryPick();
 				$tmp_graph = $graph;
 				$tmp_graph['templateid'] = $graph['graphid'];
 
-				$tmp_graph['gitems'] = get_same_graphitems_for_host($tmp_graph['gitems'], $chd_host['hostid'])
-					or self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$tmp_graph['name'].' ]: cannot inherit. No required items on [ '.$chd_host['host'].' ]');
+			if(!$tmp_graph['gitems'] = get_same_graphitems_for_host($tmp_graph['gitems'], $chd_host['hostid']))
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$tmp_graph['name'].' ]: cannot inherit. No required items on [ '.$chd_host['host'].' ]');
 
 				if($tmp_graph['ymax_itemid'] > 0){
 					$ymax_itemid = get_same_graphitems_for_host(array(array('itemid' => $tmp_graph['ymax_itemid'])), $chd_host['hostid']);
@@ -826,7 +837,8 @@ COpt::memoryPick();
 				));
 				if($chd_graph = reset($chd_graph)){
 					if((zbx_strtolower($tmp_graph['name']) != zbx_strtolower($chd_graph['name']))
-						&& self::exists(array('name' => $tmp_graph['name'], 'hostids' => $chd_host['hostid']))){
+					&& self::exists(array('name' => $tmp_graph['name'], 'hostids' => $chd_host['hostid'])))
+				{
 						self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$tmp_graph['name'].' ]: already exists on [ '.$chd_host['host'].' ]');
 					}
 
@@ -882,7 +894,6 @@ COpt::memoryPick();
 				self::inherit($tmp_graph);
 			}
 		}
-	}
 
 /**
  * Inherit template graphs from template to host
@@ -1007,14 +1018,31 @@ COpt::memoryPick();
 		}
 	}
 
-	private static function checkInput($graphs){
+	private static function checkInput($graphs, $update=false){
+		$itemids = array();
 
 		foreach($graphs as $gnum => $graph){
+// EXCEPTION: GRAPH FIELDS {{{
+			$fields = array('name' => null);
+			if(!$update && !check_db_fields($fields, $graph)){
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for graph');
+			}
+// }}} EXCEPTION: GRAPH FIELDS
+
 // EXCEPTION: NO ITEMS {{{
 			if(!isset($graph['gitems']) || !is_array($graph['gitems']) || empty($graph['gitems'])){
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_MISSING_ITEMS_FOR_GRAPH.' [ '.$graph['name'].' ]');
 			}
 // }}} EXCEPTION: NO ITEMS
+
+// EXCEPTION: ITEMS FIELDS {{{
+			$fields = array('itemid' => null);
+			foreach($graph['gitems'] as $ginum => $gitem){
+				if(!check_db_fields($fields, $gitem)){
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for items');
+				}
+			}
+// }}} EXCEPTION: ITEMS FIELDS
 
 // EXCPETION: more than one sum type item for pie graph {{{
 			if(($graph['graphtype'] == GRAPH_TYPE_PIE) || ($graph['graphtype'] == GRAPH_TYPE_EXPLODED)){
@@ -1026,41 +1054,48 @@ COpt::memoryPick();
 			}
 // }}} EXCEPTION
 
-// EXCEPTION: GRAPH FIELDS {{{
-			$fields = array('name' => null);
-			if(!check_db_fields($fields, $graph)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for graph');
+			$itemids += zbx_objectValues($graph['gitems'], 'itemid');
 			}
-// }}} EXCEPTION: GRAPH FIELDS
 
 
-// EXCEPTION: ITEMS FIELDS {{{
-			$fields = array('itemid' => null);
-			foreach($graph['gitems'] as $ginum => $gitem){
-				if(!check_db_fields($fields, $gitem)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for items');
-				}
-			}
-// }}} EXCEPTION: ITEMS FIELDS
-
-
+		if(!empty($itemids)){
 // EXCEPTION: ITEMS PERMISSIONS {{{
 			$options = array(
 				'nodeids' => get_current_nodeid(true),
-				'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
+				'itemids' => array_unique($itemids),
 				'webitems' => 1,
 				'editable' => 1,
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1
 			);
+
 			$allowed_items = CItem::get($options);
-			foreach($graph['gitems'] as $gitem){
-				if(!isset($allowed_items[$gitem['itemid']])){
+			foreach($itemids as $inum => $itemid){
+				if(!isset($allowed_items[$itemid])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 				}
 			}
 // }}} EXCEPTION: ITEMS PERMISSIONS
 		}
+
+		foreach($graphs as $gnum => $graph){
+			if(!isset($graph['name'])) continue;
+
+			$options = array(
+				'nodeids' => get_current_nodeid(true),
+				'filter' => array('name' => $graph['name']),
+				'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
+				'nopermissions' => 1
+			);
+			$graphsExists = self::get($options);
+			foreach($graphsExists as $genum => $graphExists){
+				if(!$update || ($graphExists['graphid'] != $graph['graphid'])){
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph with name [ '.$graph['name'].' ] already exists');
+				}
+// }}} EXCEPTION: GRAPH EXISTS
+			}
+		}
+
 		return true;
 	}
 
@@ -1073,7 +1108,7 @@ COpt::memoryPick();
 		if(isset($graph['ymax_type']) && $graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE){
 			$axis_items[$graph['ymax_itemid']] = $graph['ymax_itemid'];
 		}
-		
+
 		if(!empty($axis_items)){
 			$cnt = count($axis_items);
 
@@ -1089,12 +1124,11 @@ COpt::memoryPick();
 
 			$cnt_exist = CItem::get($options);
 
-			if($cnt != $cnt_exist) 
+			if($cnt != $cnt_exist)
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect item for axis value item');
 		}
-		
+
 		return true;
 	}
-
 }
 ?>

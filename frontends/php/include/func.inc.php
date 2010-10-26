@@ -748,21 +748,6 @@ function zbx_strrpos($haystack, $needle){
 		return strrpos($haystack, $needle);
 	}
 }
-
-function zbx_str_replace($search, $replace, $subject){
-	if(defined('ZBX_MBSTRINGS_ENABLED')){
-		$offset = 0;
-		while(false !== ($pos = mb_strpos($subject, $search, $offset))){
-			$offset = $pos + mb_strlen($replace);
-			$subject = mb_substr($subject, 0, $pos) . $replace . mb_substr($subject, $pos + mb_strlen($search));
-		}
-	}
-	else{
-		$subject = str_replace($search, $replace, $subject);
-	}
-    return $subject;
-}
-
 // }}} STRING FUNCTIONS
 
 
@@ -886,8 +871,15 @@ function morder_result(&$array, $sortfields, $sortorder=ZBX_SORT_UP){
 }
 
 
-function order_result(&$data, $sortfield, $sortorder=ZBX_SORT_UP){
+function order_result(&$data, $sortfield=null, $sortorder=ZBX_SORT_UP){
 	if(empty($data)) return false;
+
+	if(is_null($sortfield)){
+		natcasesort($data);
+		if($sortorder != ZBX_SORT_UP)
+			$data = array_reverse($data, true);
+		return true;
+	}
 
 	$sort = array();
 	foreach($data as $key => $arr){
@@ -956,9 +948,9 @@ return $result;
 
 function uint_in_array($needle,$haystack){
 //TODO: REMOVE
-	if(!empty($haystack) && !is_numeric(key($haystack))){
+//	if(!empty($haystack) && !is_numeric(key($haystack))){
 //		info('uint_in_array: possible pasted associated array');
-	}
+//	}
 //----
 
 	foreach($haystack as $id => $value)
@@ -999,6 +991,17 @@ function zbx_value2array(&$values){
 			$tmp[$values] = $values;
 
 		$values = $tmp;
+	}
+}
+
+// creates chain of relation parent -> childs, for all chain levels
+function createParentToChildRelation(&$chain, $link, $parentField, $childField){
+	if(!isset($chain[$link[$parentField]]))
+		$chain[$link[$parentField]] = array();
+
+	$chain[$link[$parentField]][$link[$childField]] = $link[$childField];
+	if(isset($chain[$link[$childField]])){
+		$chain[$link[$parentField]] = zbx_array_merge($chain[$link[$parentField]], $chain[$link[$childField]]);
 	}
 }
 
@@ -1142,9 +1145,9 @@ function zbx_str2links($text){
 	return $result;
 }
 
-function zbx_subarray_push(&$mainArray, $sIndex, $element) {
+function zbx_subarray_push(&$mainArray, $sIndex, $element = null) {
 	if(!isset($mainArray[$sIndex])) $mainArray[$sIndex] = array();
-	$mainArray[$sIndex][] = $element;
+	$mainArray[$sIndex][] = is_null($element) ? $sIndex : $element;
 }
 /************* END ZBX MISC *************/
 
@@ -1290,7 +1293,7 @@ function getPagingLine(&$items, $autotrim=true){
 	$table = BR();
 	if($cnt_pages > 1){
 		if($startPage > 1){
-			$pagespan = new CSpan('<< '.S_FIRST, 'darklink');
+			$pagespan = new CSpan('<< '.S_FIRST_PAGE, 'darklink');
 			$pagespan->setAttribute('onclick', 'javascript: openPage(0);');
 
 			$pageline[] = $pagespan;
@@ -1298,7 +1301,7 @@ function getPagingLine(&$items, $autotrim=true){
 		}
 
 		if($crnt_page > 1){
-			$pagespan = new CSpan('< '.S_PREVIOUS, 'darklink');
+			$pagespan = new CSpan('< '.S_PREVIOUS_PAGE, 'darklink');
 			$pagespan->setAttribute('onclick', 'javascript: openPage('.(($crnt_page-2) * $rows_per_page).');');
 
 			$pageline[] = $pagespan;
@@ -1323,7 +1326,7 @@ function getPagingLine(&$items, $autotrim=true){
 		array_pop($pageline);
 
 		if($crnt_page <  $cnt_pages){
-			$pagespan = new CSpan(S_NEXT.' >', 'darklink');
+			$pagespan = new CSpan(S_NEXT_PAGE.' >', 'darklink');
 			$pagespan->setAttribute('onclick', 'javascript: openPage('.($crnt_page * $rows_per_page).');');
 
 			$pageline[] = ' | ';
@@ -1331,7 +1334,7 @@ function getPagingLine(&$items, $autotrim=true){
 		}
 
 		if($p < $cnt_pages){
-			$pagespan = new CSpan(S_LAST.' >>', 'darklink');
+			$pagespan = new CSpan(S_LAST_PAGE.' >>', 'darklink');
 			$pagespan->setAttribute('onclick', 'javascript: openPage('.(($cnt_pages-1) * $rows_per_page).');');
 
 			$pageline[] = '&nbsp;&nbsp;';
