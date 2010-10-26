@@ -1079,6 +1079,8 @@ COpt::memoryPick();
 		else if(isset($triggerData['nodeids']))
 			$options['nodeids'] = $triggerData['nodeids'];
 
+// expression is checked later
+		unset($options['filter']['expression']);
 		$result = self::get($options);
 		if(isset($triggerData['expression'])){
 			foreach($result as $tnum => $trigger){

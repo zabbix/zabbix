@@ -1,4 +1,4 @@
-ALTER TABLE ONLY graphs 
+ALTER TABLE ONLY graphs
 	ALTER graphid DROP DEFAULT,
 			ALTER templateid DROP DEFAULT,
 			ALTER templateid DROP NOT NULL,
