@@ -210,18 +210,6 @@ include_once('include/page_header.php');
 	$app_wdgt = new CWidget();
 
 	$frmForm = new CForm(null, 'get');
-
-// Config
-	$cmbConf = new CComboBox('config', 'applications.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
-		$cmbConf->addItem('templates.php',S_TEMPLATES);
-		$cmbConf->addItem('hosts.php',S_HOSTS);
-		$cmbConf->addItem('items.php',S_ITEMS);
-		$cmbConf->addItem('triggers.php',S_TRIGGERS);
-		$cmbConf->addItem('graphs.php',S_GRAPHS);
-		$cmbConf->addItem('applications.php',S_APPLICATIONS);
-	$frmForm->addVar('hostid',get_request('hostid', 0));
-	$frmForm->addItem($cmbConf);
-
 	if(!isset($_REQUEST['form'])){
 		$frmForm->addItem(SPACE);
 		$frmForm->addItem(new CButton('form', S_CREATE_APPLICATION));

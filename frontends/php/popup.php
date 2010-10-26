@@ -73,6 +73,10 @@
 			$page['title'] = 'S_ITEMS_BIG';
 			$min_user_type = USER_TYPE_ZABBIX_USER;
 			break;
+		case 'prototypes':
+			$page['title'] = 'S_PROTOTYPES_BIG';
+			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
+			break;
 		case 'help_items':
 			$page['title'] = 'S_STANDARD_ITEMS_BIG';
 			$min_user_type = USER_TYPE_ZABBIX_USER;
@@ -144,7 +148,7 @@ include_once('include/page_header.php');
 		invalid_url();
 	}
 
-	if(defined($page['title']))     $page['title'] = constant($page['title']);
+	if(defined($page['title'])) $page['title'] = constant($page['title']);
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -158,6 +162,7 @@ include_once('include/page_header.php');
 		'nodeid'=>		array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 		'groupid'=>		array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 		'hostid'=>		array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
+		'parent_discoveryid'=>		array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 		'screenid'=>			array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 		'templates'=>			array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	null),
 		'host_templates'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	null),
@@ -863,6 +868,86 @@ include_once('include/page_header.php');
 				item_value_type2str($row['value_type']),
 				new CSpan(item_status2str($row['status']),item_status2style($row['status']))
 				));
+		}
+
+		if($multiselect){
+			$button = new CButton('select', S_SELECT, "javascript: addSelectedValues('items', ".zbx_jsvalue($reference).");");
+			$button->setType('button');
+			$table->setFooter(new CCol($button, 'right'));
+		}
+
+		$form->addItem($table);
+		$form->show();
+	}
+	else if($srctbl == 'prototypes'){
+		$form = new CForm();
+		$form->setName('itemform');
+		$form->setAttribute('id', 'items');
+
+		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
+
+		insert_js_function('addSelectedValues');
+		insert_js_function('addValues');
+		insert_js_function('addValue');
+
+		if($multiselect)
+			$header = array(
+				array(new CCheckBox("all_items", NULL, "javascript: checkAll('".$form->getName()."', 'all_items','items');"), S_DESCRIPTION),
+				S_KEY,
+				S_TYPE,
+				S_TYPE_OF_INFORMATION,
+				S_STATUS
+			);
+		else
+			$header = array(
+				S_DESCRIPTION,
+				S_KEY,
+				S_TYPE,
+				S_TYPE_OF_INFORMATION,
+				S_STATUS
+			);
+
+		$table->setHeader($header);
+
+		$options = array(
+			'nodeids' => $nodeid,
+			'discoveryids' => get_request('parent_discoveryid'),
+			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
+			'output' => API_OUTPUT_EXTEND,
+		);
+
+		$items = CItem::get($options);
+		order_result($items, 'description');
+
+		foreach($items as $tnum => $row){
+			$description = new CSpan(item_description($row), 'link');
+
+			if($multiselect){
+				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", ".zbx_jsvalue($row[$srcfld1]).");";
+			}
+			else{
+				$values = array(
+					$dstfld1 => $row[$srcfld1],
+					$dstfld2 => $row[$srcfld2],
+				);
+
+//if we need to submit parent window
+				$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).','.zbx_jsvalue($values).', '.($submitParent?'true':'false').'); return false;';
+			}
+
+			$description->setAttribute('onclick', $js_action);
+
+			if($multiselect){
+				$description = new CCol(array(new CCheckBox('items['.zbx_jsValue($row[$srcfld1]).']', NULL, NULL, $row['itemid']), $description));
+			}
+
+			$table->addRow(array(
+				$description,
+				$row['key_'],
+				item_type2str($row['type']),
+				item_value_type2str($row['value_type']),
+				new CSpan(item_status2str($row['status']),item_status2style($row['status']))
+			));
 		}
 
 		if($multiselect){
