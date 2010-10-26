@@ -3164,7 +3164,7 @@ static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_item
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
+void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
 {
 	const char		*__function_name = "DBlld_process_discovery_rule";
 
@@ -3174,15 +3174,12 @@ int	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
 	struct zbx_json_parse	jp, jp_data;
 	char			*snmp_community_esc = NULL, *snmpv3_securityname_esc = NULL,
 				*snmpv3_authpassphrase_esc = NULL, *snmpv3_privpassphrase_esc = NULL,
-				*discovery_key = NULL, *filter = NULL, *error, *db_error = NULL,
+				*discovery_key = NULL, *filter = NULL, *error = NULL, *db_error = NULL,
 				*error_esc;
 	unsigned short		snmp_port = 0;
 	unsigned char		status = 0, snmpv3_securitylevel = 0;
-	int			res = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __function_name, discovery_itemid);
-
-	error = strdup("");
 
 	result = DBselect(
 			"select hostid,key_,status,filter,snmp_community,snmp_port,snmpv3_securityname,"
@@ -3206,19 +3203,17 @@ int	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
 		db_error = strdup(row[10]);
 	}
 	else
-	{
-		error = zbx_dsprintf(error, "Invalid discovery rule ID [" ZBX_FS_UI64 "]", discovery_itemid);
-		res = NOTSUPPORTED;
-	}
+		zabbix_log(LOG_LEVEL_WARNING, "Invalid discovery rule ID [" ZBX_FS_UI64 "]", discovery_itemid);
 	DBfree_result(result);
 
-	if (NOTSUPPORTED == res)
+	if (0 == hostid)
 		goto error;
+
+	error = strdup("");
 
 	if (SUCCEED != zbx_json_open(value, &jp))
 	{
 		error = zbx_dsprintf(error, "Value should be JSON object");
-		res = NOTSUPPORTED;
 		goto error;
 	}
 
@@ -3227,7 +3222,6 @@ int	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
  */	if (SUCCEED != zbx_json_brackets_by_name(&jp, discovery_key, &jp_data))
 	{
 		error = zbx_dsprintf(error, "Wrong data in JSON object");
-		res = NOTSUPPORTED;
 		goto error;
 	}
 
@@ -3251,8 +3245,8 @@ int	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
 		DBexecute("update items set status=%d where itemid=" ZBX_FS_UI64,
 				ITEM_STATUS_ACTIVE, discovery_itemid);
 	}
-
-	if (0 != strcmp(error, db_error))
+error:
+	if (NULL != error && 0 != strcmp(error, db_error))
 	{
 		error_esc = DBdyn_escape_string_len(error, ITEM_ERROR_LEN);
 
@@ -3261,7 +3255,7 @@ int	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
 
 		zbx_free(error_esc);
 	}
-error:
+
 	zbx_free(error);
 	zbx_free(db_error);
 	zbx_free(snmpv3_privpassphrase_esc);
@@ -3271,7 +3265,5 @@ error:
 	zbx_free(discovery_key);
 	zbx_free(filter);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
-
-	return res;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
