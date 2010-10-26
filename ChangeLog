@@ -1,6 +1,5 @@
 Changes for 1.9
 
- - [ZBX-3129] screen changes were shown on second reload; removed favourites button from templated screens (KB)
  - [ZBX-3097] fixed nanosecond related bug in messaging (KB)
  - [DEV-490] made graph legend optional (Aly)
  - [DEV-483] added templated screens (Aly)
