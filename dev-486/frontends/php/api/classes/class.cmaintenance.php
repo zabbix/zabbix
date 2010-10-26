@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -61,7 +61,8 @@ class CMaintenance extends CZBXAPI{
 			'where' => array(),
 			'group' => array(),
 			'order' => array(),
-			'limit' => null);
+			'limit' => null
+		);
 
 		$def_options = array(
 			'nodeids'				=> null,
@@ -70,8 +71,12 @@ class CMaintenance extends CZBXAPI{
 			'maintenanceids'		=> null,
 			'editable'				=> null,
 			'nopermissions'			=> null,
+
 // filter
-			'pattern'				=> '',
+			'filter'					=> null,
+			'search'					=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
 			'filter'				=> null,
 
 // OutPut
@@ -199,11 +204,6 @@ class CMaintenance extends CZBXAPI{
 			$sql_parts['where'][] = DBcondition('m.maintenanceid',$maintenanceids);
 		}
 
-
-
-
-
-
 // nodeids
 		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
@@ -242,28 +242,14 @@ class CMaintenance extends CZBXAPI{
 			}
 		}
 
-
-//filters
-		//adding filters if they are present
-		if(!is_null($options['filter'])){
-			zbx_value2array($options['filter']);
-			//maintenance name
-			if(isset($options['filter']['name']) && !is_null($options['filter']['name'])){
-				zbx_value2array($options['filter']['name']);
-				$sql_parts['where']['name'] = DBcondition('m.name', $options['filter']['name'], false, true);//false - NOT IN, true - is a string
-			}
-			//maintenance id
-			if(isset($options['filter']['maintenanceid']) && !is_null($options['filter']['maintenanceid'])){
-				zbx_value2array($options['filter']['maintenanceid']);
-				$sql_parts['where']['maintenanceid'] = DBcondition('m.maintenanceid', $options['filter']['maintenanceid']);
-			}
-
+// filter
+		if(is_array($options['filter'])){
+			zbx_db_filter('maintenances m', $options, $sql_parts);
 		}
 
-
-// pattern
-		if(!zbx_empty($options['pattern'])){
-			$sql_parts['where'][] = ' UPPER(m.name) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
+// search
+		if(is_array($options['search'])){
+			zbx_db_search('maintenances m', $options, $sql_parts);
 		}
 
 // order
@@ -403,6 +389,7 @@ Copt::memoryPick();
 			}
 		}
 
+Copt::memoryPick();
 // removing keys (hash -> array)
 		if(is_null($options['preservekeys'])){
 			$result = zbx_cleanHashes($result);
@@ -411,7 +398,7 @@ Copt::memoryPick();
 	return $result;
 	}
 
-	
+
 	/**
 	 * Determine, whether an object already exists
 	 *
@@ -487,7 +474,7 @@ Copt::memoryPick();
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				}
 			}
-
+//---
 
 			$tid = 0;
 			$insert = array();

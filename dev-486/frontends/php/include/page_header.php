@@ -62,6 +62,10 @@
 			header('Content-Type: text/plain; charset=UTF-8');
 			if(!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
 			break;
+		case PAGE_TYPE_TEXT:
+			header('Content-Type: text/plain; charset=UTF-8');
+			if(!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
+			break;
 		case PAGE_TYPE_TEXT_FILE:
 			header('Content-Type: text/plain; charset=UTF-8');
 			header('Content-Disposition: attachment; filename="'.$page['file'].'"');
@@ -123,6 +127,9 @@
 	<link rel="stylesheet" type="text/css" href="css.css" />
 <!--[if IE 6]>
 	<script type="text/javascript" src="js/ie6fix.js"></script>
+	<link rel="stylesheet" type="text/css" href="styles/ie.css" />
+<![endif]-->
+<!--[if IE 7]>
 	<link rel="stylesheet" type="text/css" href="styles/ie.css" />
 <![endif]-->
 

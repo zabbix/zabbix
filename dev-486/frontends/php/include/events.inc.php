@@ -70,7 +70,7 @@
 		);
 		$event_count = CEvent::get($options);
 
-	return $event_count['rowscount'];
+	return $event_count;
 	}
 
 /* function:
@@ -484,9 +484,10 @@ function getLastEvents($options){
 
 	$triggerOptions = array(
 		'filter' => array(),
+		'skipDependent'	=> 1,
 		'select_hosts' => array('hostid', 'host'),
 		'output' => API_OUTPUT_EXTEND,
-		'expandDescription' => 1,
+//		'expandDescription' => 1,
 		'sortfield' => 'lastchange',
 		'sortorder' => ZBX_SORT_DOWN,
 		'limit' => $options['limit']
@@ -532,6 +533,10 @@ function getLastEvents($options){
 
 		$sortClock[$enum] = $event['clock'];
 		$sortEvent[$enum] = $event['eventid'];
+
+		//expanding description for the state where event was
+		$merged_event = array_merge($event, $triggers[$event['objectid']]);
+		$events[$enum]['trigger']['description'] = expand_trigger_description_by_data($merged_event, ZBX_FLAG_EVENT);
 	}
 
 	array_multisort($sortClock, SORT_DESC, $sortEvent, SORT_DESC, $events);

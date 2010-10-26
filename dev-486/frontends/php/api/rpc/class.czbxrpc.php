@@ -26,25 +26,32 @@ class czbxrpc{
 	public static function call($method, $params, $sessionid=null){
 		global $USER_DETAILS;
 
-		$process = true;
-
 // List of methods without params
 		$notifications = array(
 			'apiinfo.version' => 1
 		);
+//-----
+
+// list of methods which does not require athentication
+		$without_auth = array(
+			'apiinfo.version' => 1
+		);
+//-----
 
 		if(is_null($params) && !isset($notifications[$method])){
 			self::$result = array('error' => ZBX_API_ERROR_PARAMETERS);
 			return self::$result;
 		}
-//-----
+
 		list($resource, $action) = explode('.', $method);
-
-		$without_auth = array('apiinfo.version'); // list of methods which does not require athentication
-
-		if(!str_in_array($method, $without_auth)){
+		if(!isset($without_auth[$method])){
 // Authentication {{{
-			if(empty($sessionid) && (($resource != 'user') || ($action != 'authenticate'))){
+
+// compatibility mode
+			if(($resource == 'user') && ($action == 'authenticate')) $action = 'login';
+//----------
+
+			if(empty($sessionid) && (($resource != 'user') || ($action != 'login'))){
 				self::$result = array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'Not authorized');
 				return self::$result;
 			}
@@ -69,6 +76,7 @@ class czbxrpc{
 			}
 // }}} Authentication
 		}
+		unset($params['nopermissions']);
 
 		if(!method_exists('czbxrpc', $resource)){
 			self::$result = array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => 'Resource ('.$resource.') does not exist');
@@ -81,9 +89,7 @@ class czbxrpc{
 			return self::$result;
 		}
 
-		unset($params['nopermissions']);
 		call_user_func(array('czbxrpc', $resource), $action, $params);
-
 		if(self::$result !== false){
 			self::$result = array('result' => self::$result);
 		}
@@ -394,6 +400,18 @@ class czbxrpc{
 		self::$result = $result;
 	}
 
+// TEMPLATESCREEN
+	private static function templateScreen($action, $params){
+
+		CTemplateScreen::$error = array();
+
+		switch($action){
+			default:
+			$result = call_user_func(array('CTemplateScreen', $action), $params);
+		}
+
+		self::$result = $result;
+	}
 
 // TRIGGER
 	private static function trigger($action, $params){

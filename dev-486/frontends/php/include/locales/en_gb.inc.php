@@ -1238,6 +1238,7 @@
 	'S_LINK'=>				'Link',
 	'S_LABEL'=>				'Label',
 	'S_GRID'=>				'Grid',
+	'S_GO_TO'=>				'Go to',
 	'S_X'=>					'X',
 	'S_ICON_PROBLEM'=>			'Icon (problem)',
 	'S_ICON_OK'=>				'Icon (OK)',
@@ -1579,6 +1580,7 @@
 	'S_NO_RESOURCES_DEFINED'=>		'No resources defined',
 	'S_SIMPLE_GRAPH'=>				'Simple graph',
 	'S_SIMPLE_GRAPHS'=>				'Simple graphs',
+	'S_HISTORY_AND_SIMPLE_GRAPHS'=> 'History and simple graphs',
 	'S_SIMPLE_GRAPH_BIG'=>			'SIMPLE GRAPH',
 	'S_GRAPH_NAME'=>				'Graph name',
 	'S_WIDTH'=>						'Width',
@@ -1608,6 +1610,7 @@
 	'S_CANNOT_FIND_GRAPH'=>			'Cannot find graph',
 	'S_CANNOT_FIND_ITEM'=>			'Cannot find item',
 	'S_USED_IN_EXPORTED_SCREEN_SMALL'=>'used in exported screen',
+	'S_TEMPLATED'=>'Templated',
 
 //	screenedit.php
 	'S_MAP'=>					'Map',
@@ -1648,6 +1651,7 @@
 //	screens.php
 	'S_CUSTOM_SCREENS'=>			'Custom screens',
 	'S_SCREENS_BIG'=>				'SCREENS',
+	'S_HOST_SCREENS'=>				'Host screens',
 
 	'S_SLIDESHOW_UPDATED'=>			'Slideshow updated',
 	'S_CANNOT_UPDATE_SLIDESHOW'=>		'Cannot_update slideshow',
@@ -2059,6 +2063,8 @@
 	'S_EXPRESSION_UNNECESSARY_SYMBOLS_DETECTED_ERROR'=>'Unnecessary symbols detected',
 	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_AFTER_ERROR'=>'Not allowed symbols detected after element',
 	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_BEFORE_ERROR'=>'Not allowed symbols detected before element',
+	'S_ARE_YOU_SURE_YOU_WANT_TO_DELETE'=>'Are you sure you want to delete',
+	'S_MACROS_ES'=>'macro(s)',
 
 //	popup_link_tr.php
 	'S_NEW_INDICATORS'=>			'New indicators',
@@ -2388,6 +2394,9 @@
 	'S_CUSER_ERROR_LDAP_MODULE_MISSING'=>			'Probably php-ldap module is missing',
 	'S_CUSER_ERROR_FAILED_LOGIN_ATTEMPTS'=>				'failed login attempts logged.',
 	'S_CUSER_ERROR_LAST_FAILED_ATTEMPTS'=>				'Last failed attempt was from',
+	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_CREATE_SCRIPTS'=>		'Only Super Admins can create Scripts',
+	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_UPDATE_SCRIPTS'=>		'Only Super Admins can update Scripts',
+	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_DELETE_SCRIPTS'=>		'Only Super Admins can delete Scripts',
 	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_CREATE_USERS'=>		'Only Super Admins can create Users',
 	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_UPDATE_USERS'=>		'Only Super Admins can update Users',
 	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_DELETE_USERS'=>		'Only Super Admins can delete Users',
@@ -2453,6 +2462,7 @@
 	'S_LATEST_DATA'=>			'Latest data',
 
 //	Errors
+	'S_DOES_NOT_EXIST_SMALL'=>		'does not exist',
 	'S_INCORRECT_DESCRIPTION'=>		'Incorrect description',
 	'S_CANT_FORMAT_TREE'=>			'Can\'t format Tree',
 	'S_NO_PERMISSION'=>				'You do not have permission to perform this operation',
@@ -2489,7 +2499,13 @@
 	'S_OTHER_SMALL'=>			'other',
 
 // class.cookie.js
-	'S_MAX_COOKIE_SIZE_REACHED' => 'We are sorry, the maximum possible number of elements to remember has been reached.',
+	'S_MAX_COOKIE_SIZE_REACHED'=>		'We are sorry, the maximum possible number of elements to remember has been reached.',
+
+	'S_LAST_PAGE'=>			'Last',
+	'S_FIRST_PAGE'=>		'First',
+	'S_PREVIOUS_PAGE'=>		'Previous',
+	'S_NEXT_PAGE'=>			'Next',
+	'S_PREVIOUS_EVENTS'=>		'Previous',
 
 );
 ?>

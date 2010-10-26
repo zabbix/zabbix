@@ -632,6 +632,24 @@ function display_element(name){
 	}
 }
 
+function cloneRow(elementid, count){
+	if(typeof(cloneRow.count) == 'undefined'){
+		cloneRow.count = count;
+	}
+	cloneRow.count++;
+
+	var tpl = new Template($(elementid).cloneNode(true).wrap('div').innerHTML);
+
+	var emptyEntry = tpl.evaluate({'id' : cloneRow.count});
+
+	var newEntry = $(elementid).insert({'before' : emptyEntry}).previousSibling;
+
+	$(newEntry).descendants().each(function(e){e.removeAttribute('disabled');});
+	newEntry.setAttribute('id', 'entry_'+cloneRow.count);
+	newEntry.style.display = '';
+}
+
+
 //------------------------------------------------------
 //					DASHBOARD JS MENU
 //------------------------------------------------------
@@ -671,7 +689,42 @@ function create_mon_trigger_menu(e, args, items){
 	if((args.length > 1) && !is_null(args[1])) tr_menu.push(args[1]);
 	if((args.length > 1) && !is_null(args[2])) tr_menu.push(args[2]);
 
-	tr_menu.push(['Simple graphs',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}]);
+	//getting info about types of items that we have
+	var has_char_items = false;
+	var has_int_items = false;
+
+	//checking every item
+	for(var itemid in items){
+		//if no info about type is given
+		if(!isset(itemid, items)) continue;
+		if(!isset('value_type', items[itemid])) continue;
+
+		//1, 2, 4 - charecter types
+		if (items[itemid].value_type == '1' || items[itemid].value_type == '2' || items[itemid].value_type == '4'){
+			has_char_items = true;
+		}
+		//0, 3 - numeric types
+		if (items[itemid].value_type == '0' || items[itemid].value_type == '3'){
+			has_int_items = true;
+		}
+	}
+
+	var history_section_caption = '';
+	//we have chars and numbers, or we have none (probably 'value_type' key was not set)
+	if (has_char_items == has_int_items) {
+		history_section_caption = locale['S_HISTORY_AND_SIMPLE_GRAPHS'];
+	}
+	//we have only charecter items, so 'history' should be shown
+	else if (has_char_items) {
+		history_section_caption = locale['S_HISTORY'];
+	}
+	//we have only numeric items, so 'simple graphs' should be shown
+	else {
+		history_section_caption = locale['S_SIMPLE_GRAPHS'];
+	}
+	
+
+	tr_menu.push([history_section_caption,null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}]);
 
 //	for(var i=0; i < items.length; i++){
 	for(var itemid in items){

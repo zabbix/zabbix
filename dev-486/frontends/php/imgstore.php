@@ -47,14 +47,15 @@ include_once('include/page_header.php');
 				' width: 50px; '.
 				' background-image: url("images/general/no_icon.png"); }'."\n";
 
-		$sql = 'SELECT i.* '.
-				' FROM images i '.
-				' WHERE i.imagetype=1 '.
-					' AND '.dbin_node('i.imageid', false);
-		$res = DBselect($sql);
-		while($image = DBfetch($res)){
+		$options = array(
+			'filter'=> array('imagetype'=> IMAGE_TYPE_ICON),
+			'output'=> API_OUTPUT_EXTEND,
+			'select_image'=> 1
+		);
+		$images = CImage::get($options);
+		foreach($images as $inum => $image){
 //SDI($image['image']);
-			$image['image'] = zbx_unescape_image($image['image']);
+			$image['image'] = zbx_unescape_image(base64_decode($image['image']));
 
 			$ico = imagecreatefromstring($image['image']);
 			$w = imagesx($ico);

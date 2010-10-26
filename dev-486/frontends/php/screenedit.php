@@ -27,7 +27,7 @@
 	$page['title'] = 'S_CONFIGURATION_OF_SCREENS';
 	$page['file'] = 'screenedit.php';
 	$page['hist_arg'] = array('screenid');
-	$page['scripts'] = array('effects.js','dragdrop.js','class.cscreen.js','class.calendar.js','gtlc.js');
+	$page['scripts'] = array('effects.js', 'dragdrop.js', 'class.cscreen.js', 'class.calendar.js', 'gtlc.js');
 
 include_once('include/page_header.php');
 
@@ -41,6 +41,7 @@ include_once('include/page_header.php');
 		'resourcetype'=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,16),	'isset({save})'),
 		'caption'=>		array(T_ZBX_STR, O_OPT,  null,  null,	null),
 		'resourceid'=>	array(T_ZBX_INT, O_OPT,  null,  DB_ID, 	'isset({save})'),
+		'templateid'=>	array(T_ZBX_INT, O_OPT,  null,  DB_ID, 	null),
 		'width'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	null),
 		'height'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	null),
 		'colspan'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,100),		null),
@@ -53,6 +54,8 @@ include_once('include/page_header.php');
 		'dynamic'=>		array(T_ZBX_INT, O_OPT,  null,  null,			null),
 		'x'=>			array(T_ZBX_INT, O_OPT,  null,  BETWEEN(1,100),		'isset({save})&&(isset({form})&&({form}!="update"))'),
 		'y'=>			array(T_ZBX_INT, O_OPT,  null,  BETWEEN(1,100),		'isset({save})&&(isset({form})&&({form}!="update"))'),
+		'screen_type'=>			array(T_ZBX_INT, O_OPT,  null,  null,		null),
+
 
 // STATUS OF TRIGGER
 		'tr_groupid'=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
@@ -73,27 +76,23 @@ include_once('include/page_header.php');
 	);
 
 	check_fields($fields);
-	$_REQUEST['dynmic'] = get_request('dynamic',SCREEN_SIMPLE_ITEM);
+	$_REQUEST['dynmic'] = get_request('dynamic', SCREEN_SIMPLE_ITEM);
 ?>
 <?php
-	$trigg_wdgt = new CWidget();
-	$trigg_wdgt->addPageHeader(S_CONFIGURATION_OF_SCREEN_BIG);
-	
-	//show_table_header(S_CONFIGURATION_OF_SCREEN_BIG);
-
 	$options = array(
 		'screenids' => $_REQUEST['screenid'],
 		'editable' => 1,
-		'output' => API_OUTPUT_EXTEND
+		'output' => API_OUTPUT_EXTEND,
+		'select_screenitems' => API_OUTPUT_EXTEND
 	);
 	$screens = CScreen::get($options);
-	if(empty($screens)) access_deny();
+	if(empty($screens)){
+		$screens = CTemplateScreen::get($options);
+		if(empty($screens)) access_deny();
+	}
 
 	$screen = reset($screens);
-	
-	$trigg_wdgt->addHeader($screen['name']);
-	$trigg_wdgt->addItem(BR());
-	
+
 	if(isset($_REQUEST['save'])){
 		if(!isset($_REQUEST['elements'])) $_REQUEST['elements'] = 0;
 
@@ -208,14 +207,14 @@ include_once('include/page_header.php');
 						' AND x='.$sw_pos[1].
 						' AND screenid='.$screen['screenid'];
 			$fitem = DBfetch(DBselect($sql));
-			
+
 			$sql = 'SELECT screenitemid, colspan, rowspan '.
 					' FROM screens_items '.
 					' WHERE y='.$sw_pos[2].
 						' AND x='.$sw_pos[3].
 						' AND screenid='.$screen['screenid'];
 			$sitem = DBfetch(DBselect($sql));
-			
+
 			if($fitem){
 				DBexecute('UPDATE screens_items '.
 							' SET y='.$sw_pos[2].',x='.$sw_pos[3].
@@ -225,7 +224,7 @@ include_once('include/page_header.php');
 								' AND x='.$sw_pos[1].
 								' AND screenid='.$screen['screenid'].
 								' AND screenitemid='.$fitem['screenitemid']);
-								
+
 			}
 
 			if($sitem){
@@ -242,14 +241,30 @@ include_once('include/page_header.php');
 		}
 	}
 
-	if($_REQUEST['screenid'] > 0){
-		$table = get_screen($_REQUEST['screenid'], 1);
-		$trigg_wdgt->addItem($table);
-		zbx_add_post_js('init_screen("'.$_REQUEST['screenid'].'","iframe","'.$_REQUEST['screenid'].'");');
-		zbx_add_post_js('timeControl.processObjects();');
-	}
+	$screen_wdgt = new CWidget();
+	$screen_wdgt->addPageHeader(S_CONFIGURATION_OF_SCREEN_BIG);
 
-	$trigg_wdgt->show();
+	$screen_wdgt->addHeader($screen['name']);
+	$screen_wdgt->addItem(BR());
+
+	if($screen['templateid'])
+		$screen_wdgt->addItem(get_header_host_table($screen['templateid']));
+
+	//getting updated screen, so we wont have to refresh the page to see changes
+	$screens = CScreen::get($options);
+	if(empty($screens)){
+		$screens = CTemplateScreen::get($options);
+		if(empty($screens)) access_deny();
+	}
+	$screen = reset($screens);
+
+
+	$table = get_screen($screen, 1);
+	$screen_wdgt->addItem($table);
+	zbx_add_post_js('init_screen("'.$_REQUEST['screenid'].'","iframe","'.$_REQUEST['screenid'].'");');
+	zbx_add_post_js('timeControl.processObjects();');
+
+	$screen_wdgt->show();
 ?>
 <?php
 

@@ -1,6 +1,6 @@
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,8 +20,9 @@
 var agt = navigator.userAgent.toLowerCase();
 var OP = (agt.indexOf("opera") != -1) && window.opera;
 var IE = (agt.indexOf("msie") != -1) && document.all && !OP;
+var IE9 = (agt.indexOf("msie 9.0") != -1) && document.all && !OP;
 var IE8 = (agt.indexOf("msie 8.0") != -1) && document.all && !OP;
-var IE7 = IE && !IE8 && document.all && !OP;
+var IE7 = (agt.indexOf("msie 7.0") != -1) && document.all && !OP;
 var IE6 = (agt.indexOf("msie 6.0") != -1) && document.all && !OP;
 var CR = (agt.indexOf("chrome") != -1);
 var SF = (agt.indexOf("safari") != -1) && !CR;
@@ -36,6 +37,7 @@ function checkBrowser(){
  if(IE6) alert('IE6');
  if(IE7) alert('IE7');
  if(IE8) alert('IE8');
+ if(IE9) alert('IE9');
  if(CR) alert('Chrome');
  if(SF) alert('Safari');
  if(WK) alert('Apple Webkit');
@@ -87,6 +89,11 @@ function is_array(obj) {
 }
 
 function SDI(msg){
+	if(GK || WK){
+		console.log(msg);
+		return true;
+	}
+
 	var div_help = document.getElementById('div_help');
 
 	if((typeof(div_help) == 'undefined') || empty(div_help)){
@@ -117,12 +124,14 @@ function SDI(msg){
 }
 
 function SDJ(obj, name){
-	var debug = '';
-//	debug = obj.toSource();
-//	SDI(debug);
-//return null;
+	if(GK || WK){
+		console.dir(obj);
+		return true;
+	}
 
-	name = name || 'none';
+	var debug = '';
+
+	var name = name || 'none';
 	for(var key in obj){
 		if(typeof(obj[key]) == name) continue;
 

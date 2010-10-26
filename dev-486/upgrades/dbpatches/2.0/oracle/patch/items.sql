@@ -1,7 +1,5 @@
 ALTER TABLE items MODIFY itemid DEFAULT NULL;
 ALTER TABLE items MODIFY hostid DEFAULT NULL;
-ALTER TABLE items MODIFY lastvalue nclob;
-ALTER TABLE items MODIFY prevvalue nclob;
 ALTER TABLE items MODIFY units nvarchar2(255);
 ALTER TABLE items MODIFY templateid DEFAULT NULL;
 ALTER TABLE items MODIFY templateid NULL;

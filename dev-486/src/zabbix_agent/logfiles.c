@@ -403,7 +403,7 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 	int		i = 0;
 	int		nbytes;
 	int		ret = FAIL;
-	char		buffer[MAX_BUF_LEN];
+	char		buffer[MAX_BUFFER_LEN];
 	char		*directory = NULL;
 	char		*format = NULL;
 	struct stat	file_buf;
@@ -680,7 +680,7 @@ int	process_log(char *filename, long *lastlogsize, char **value, const char *enc
 	int		f;
 	struct stat	buf;
 	int		nbytes, ret = FAIL;
-	char		buffer[MAX_BUF_LEN];
+	char		buffer[MAX_BUFFER_LEN];
 
 	assert(filename);
 	assert(lastlogsize);
