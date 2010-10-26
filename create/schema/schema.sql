@@ -937,6 +937,8 @@ TABLE|trigger_discovery|triggerdiscoveryid|ZBX_SYNC
 FIELD		|triggerdiscoveryid|t_id	|	|NOT NULL	|0
 FIELD		|triggerid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|triggers
 FIELD		|parent_triggerid|t_id		|	|NOT NULL	|ZBX_SYNC		|2|triggers	|triggerid
+FIELD		|expression	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
 UNIQUE		|1		|triggerid,parent_triggerid
 
 TABLE|trigger_depends|triggerdepid|ZBX_SYNC
