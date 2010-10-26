@@ -528,6 +528,10 @@ span.info{
 	font-size: 11px;
 }
 
+span.discoveryName{
+	color: #999900;
+}
+
 .biglink{
 	font-weight: bold;
 	font-size: 13px;

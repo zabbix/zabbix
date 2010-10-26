@@ -37,7 +37,8 @@ class CTextBox extends CTag{
 	}
 
 	public function setReadonly($value='yes'){
-		if((is_string($value) && ($value=='yes' || $value=='checked' || $value=='on') || $value=='1') || (is_int($value) && $value<>0))
+		if((is_string($value) && ($value=='yes' || $value=='checked' || $value=='on') || $value=='1')
+				|| (is_int($value) && $value<>0) || ($value === true))
 			return $this->attributes['readonly'] = 'readonly';
 
 		$this->removeAttribute('readonly');

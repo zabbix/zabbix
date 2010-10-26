@@ -23,6 +23,7 @@
 #include "common.h"
 #include "db.h"
 #include "dbcache.h"
+#include "zbxjson.h"
 
 #define MACRO_TYPE_TRIGGER_DESCRIPTION	0x0001
 #define MACRO_TYPE_MESSAGE_SUBJECT	0x0002
@@ -50,5 +51,6 @@ void	substitute_macros(DB_EVENT *event, DB_ACTION *action, DB_ESCALATION *escala
 int	evaluate_expression(int *result, char **expression, time_t now,
 		zbx_uint64_t trigggerid, int trigger_value, char *error, int maxerrlen);
 int	evaluate(double *value, char *exp, char *error, int maxerrlen);
+void	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row);
 
 #endif

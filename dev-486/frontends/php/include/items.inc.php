@@ -66,123 +66,90 @@
 		}
 	}
 
-/*
- * Function: item_type2str
- *
- * Description:
- *     Represent integer value of item type as string
- *
- * Author:
- *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
- *
- * Comments:
- *
- */
-	function item_type2str($type){
-		switch($type){
-			case ITEM_TYPE_ZABBIX:		$type = S_ZABBIX_AGENT;			break;
-			case ITEM_TYPE_SNMPV1:		$type = S_SNMPV1_AGENT;			break;
-			case ITEM_TYPE_TRAPPER:		$type = S_ZABBIX_TRAPPER;		break;
-			case ITEM_TYPE_SIMPLE:		$type = S_SIMPLE_CHECK;			break;
-			case ITEM_TYPE_SNMPV2C:		$type = S_SNMPV2_AGENT;			break;
-			case ITEM_TYPE_INTERNAL:	$type = S_ZABBIX_INTERNAL;		break;
-			case ITEM_TYPE_SNMPV3:		$type = S_SNMPV3_AGENT;			break;
-			case ITEM_TYPE_ZABBIX_ACTIVE:	$type = S_ZABBIX_AGENT_ACTIVE;		break;
-			case ITEM_TYPE_AGGREGATE:	$type = S_ZABBIX_AGGREGATE;		break;
-			case ITEM_TYPE_HTTPTEST:	$type = S_WEB_MONITORING;		break;
-			case ITEM_TYPE_EXTERNAL:	$type = S_EXTERNAL_CHECK;		break;
-			case ITEM_TYPE_DB_MONITOR:	$type = S_ZABBIX_DATABASE_MONITOR;	break;
-			case ITEM_TYPE_IPMI:		$type = S_IPMI_AGENT;			break;
-			case ITEM_TYPE_SSH:		$type = S_SSH_AGENT;			break;
-			case ITEM_TYPE_TELNET:		$type = S_TELNET_AGENT;			break;
-			case ITEM_TYPE_CALCULATED:	$type = S_CALCULATED;			break;
-			default:$type = S_UNKNOWN;			break;
+	function item_type2str($type=null){
+		$types = array(
+			ITEM_TYPE_ZABBIX => S_ZABBIX_AGENT,
+			ITEM_TYPE_SNMPV1 => S_SNMPV1_AGENT,
+			ITEM_TYPE_TRAPPER => S_ZABBIX_TRAPPER,
+			ITEM_TYPE_SIMPLE => S_SIMPLE_CHECK,
+			ITEM_TYPE_SNMPV2C => S_SNMPV2_AGENT,
+			ITEM_TYPE_INTERNAL => S_ZABBIX_INTERNAL,
+			ITEM_TYPE_SNMPV3 => S_SNMPV3_AGENT,
+			ITEM_TYPE_ZABBIX_ACTIVE => S_ZABBIX_AGENT_ACTIVE,
+			ITEM_TYPE_AGGREGATE => S_ZABBIX_AGGREGATE,
+			ITEM_TYPE_HTTPTEST => S_WEB_MONITORING,
+			ITEM_TYPE_EXTERNAL => S_EXTERNAL_CHECK,
+			ITEM_TYPE_DB_MONITOR => S_ZABBIX_DATABASE_MONITOR,
+			ITEM_TYPE_IPMI => S_IPMI_AGENT,
+			ITEM_TYPE_SSH => S_SSH_AGENT,
+			ITEM_TYPE_TELNET => S_TELNET_AGENT,
+			ITEM_TYPE_CALCULATED => S_CALCULATED,
+		);
+
+		if(is_null($type)){
+			natsort($types);
+			return $types;
 		}
-	return $type;
+		else if(isset($types[$type]))
+			return $types[$type];
+		else
+			return S_UNKNOWN;
 	}
 
-	/*
-	 * Function: item_value_type2str
-	 *
-	 * Description:
-	 *     Represent integer value of item value type as string
-	 *
-	 * Author:
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments:
-	 *
-	 */
-	function item_value_type2str($value_type){
-		switch($value_type){
-			case ITEM_VALUE_TYPE_UINT64:	$value_type = S_NUMERIC_UNSIGNED;		break;
-			case ITEM_VALUE_TYPE_FLOAT:	$value_type = S_NUMERIC_FLOAT;		break;
-			case ITEM_VALUE_TYPE_STR:	$value_type = S_CHARACTER;		break;
-			case ITEM_VALUE_TYPE_LOG:	$value_type = S_LOG;			break;
-			case ITEM_VALUE_TYPE_TEXT:	$value_type = S_TEXT;			break;
-			default:$value_type = S_UNKNOWN;			break;
+	function item_value_type2str($type=null){
+		$types = array(
+			ITEM_VALUE_TYPE_UINT64 => S_NUMERIC_UNSIGNED,
+			ITEM_VALUE_TYPE_FLOAT => S_NUMERIC_FLOAT,
+			ITEM_VALUE_TYPE_STR => S_CHARACTER,
+			ITEM_VALUE_TYPE_LOG => S_LOG,
+			ITEM_VALUE_TYPE_TEXT => S_TEXT,
+		);
+
+		if(is_null($type)){
+			natsort($types);
+			return $types;
 		}
-	return $value_type;
+		else if(isset($types[$type]))
+			return $types[$type];
+		else
+			return S_UNKNOWN;
 	}
 
-	/*
-	 * Function: item_data_type2str
-	 *
-	 * Description:
-	 *     Represent integer value of item data type as string
-	 *
-	 * Author:
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments:
-	 *
-	 */
-	function item_data_type2str($data_type){
-		switch($data_type){
-			case ITEM_DATA_TYPE_DECIMAL:		$data_type = S_DECIMAL;		break;
-			case ITEM_DATA_TYPE_OCTAL:		$data_type = S_OCTAL;		break;
-			case ITEM_DATA_TYPE_HEXADECIMAL:	$data_type = S_HEXADECIMAL;	break;
-			default:$data_type = S_UNKNOWN;		break;
+	function item_data_type2str($type=null){
+		$types = array(
+			ITEM_DATA_TYPE_DECIMAL => S_DECIMAL,
+			ITEM_DATA_TYPE_OCTAL => S_OCTAL,
+			ITEM_DATA_TYPE_HEXADECIMAL => S_HEXADECIMAL,
+		);
+
+		if(is_null($type)){
+			natsort($types);
+			return $types;
 		}
-	return $data_type;
+		else if(isset($types[$type]))
+			return $types[$type];
+		else
+			return S_UNKNOWN;
 	}
 
-	/*
-	 * Function: item_status2str
-	 *
-	 * Description:
-	 *     Represent integer value of item status as string
-	 *
-	 * Author:
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments:
-	 *
-	 */
-	function	item_status2str($status){
-		switch($status){
-			case ITEM_STATUS_ACTIVE:	$status = S_ACTIVE;		break;
-			case ITEM_STATUS_DISABLED:	$status = S_DISABLED;		break;
-			case ITEM_STATUS_NOTSUPPORTED:	$status = S_NOT_SUPPORTED;	break;
-			default:
-				$status = S_UNKNOWN;		break;
+	function item_status2str($type=null){
+		$types = array(
+			ITEM_STATUS_ACTIVE => S_ACTIVE,
+			ITEM_STATUS_DISABLED => S_DISABLED,
+			ITEM_STATUS_NOTSUPPORTED => S_NOT_SUPPORTED,
+		);
+
+		if(is_null($type)){
+			natsort($types);
+			return $types;
 		}
-	return $status;
+		else if(isset($types[$type]))
+			return $types[$type];
+		else
+			return S_UNKNOWN;
 	}
 
-	/*
-	 * Function: item_status2style
-	 *
-	 * Description:
-	 *     Represent integer value of item status as CSS style name
-	 *
-	 * Author:
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments:
-	 *
-	 */
-	function	item_status2style($status){
+	function item_status2style($status){
 		switch($status){
 			case ITEM_STATUS_ACTIVE:	$status = 'off';	break;
 			case ITEM_STATUS_DISABLED:	$status = 'on';		break;
@@ -298,14 +265,16 @@
 				'params'		=> '',
 				'ipmi_sensor'		=> '',
 				'applications'		=> array(),
-				'templateid'		=> 0);
+				'templateid'		=> 0,
+				'flags' => 0,
+		);
 
 		if(!check_db_fields($item_db_fields, $item)){
 			error(S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION.SPACE.'[add_item]');
 			return false;
 		}
 
-		$host=get_host_by_hostid($item['hostid']);
+		$host = get_host_by_hostid($item['hostid']);
 		if(!$host){
 			return false;
 		}
@@ -407,7 +376,7 @@
 					'snmp_port,units,multiplier,'.
 					'delta,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,'.
 					'snmpv3_privpassphrase,formula,trends,logtimefmt,valuemapid,'.
-					'delay_flex,params,ipmi_sensor,templateid,authtype,username,password,publickey,privatekey)'.
+					'delay_flex,params,ipmi_sensor,templateid,authtype,username,password,publickey,privatekey, flags)'.
 			' VALUES ('.$itemid.','.zbx_dbstr($item['description']).','.zbx_dbstr($item['key_']).','.(!$item['hostid']? '0':$item['hostid']).','.
 						(!$item['delay']? '0':$item['delay']).','.(!$item['history']? '0':$item['history']).','.(!$item['status']? '0':$item['status']).','.(!$item['type']? '0':$item['type']).','.
 						zbx_dbstr($item['snmp_community']).','.zbx_dbstr($item['snmp_oid']).','.(!$item['value_type']? '0':$item['value_type']).','.(!$item['data_type']? '0':$item['data_type']).','.
@@ -418,8 +387,21 @@
 						zbx_dbstr($item['delay_flex']).','.zbx_dbstr($item['params']).','.
 						zbx_dbstr($item['ipmi_sensor']).','.zero2null($item['templateid']).','.intval($item['authtype']).','.
 						zbx_dbstr($item['username']).','.zbx_dbstr($item['password']).','.
-						zbx_dbstr($item['publickey']).','.zbx_dbstr($item['privatekey']).')'
+						zbx_dbstr($item['publickey']).','.zbx_dbstr($item['privatekey']).','.$item['flags'].')'
 			);
+
+		if(isset($item['parent_itemid'])){
+			try{
+				$val = array(array(
+					'itemid' => $itemid,
+					'parent_itemid' => $item['parent_itemid'],
+				));
+				DB::insert('item_discovery', $val);
+			}
+			catch(APIException $e){
+				$result = false;
+			}
+		}
 
 		if ($result)
 			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_ITEM, $itemid, $host['host'].':'.$item['description'], NULL, NULL, NULL);
@@ -441,6 +423,16 @@
 			$item['hostid'] = $db_host['hostid'];
 			$item['applications'] = get_same_applications_for_host($item['applications'], $db_host['hostid']);
 			$item['templateid'] = $itemid;
+
+			if(isset($item['parent_itemid'])){
+				$sql = 'SELECT parent_itemid FROM item_discovery WHERE itemid='.$itemid;
+				$current_parentid = DBfetch(DBselect($sql));
+				$sql = 'SELECT itemid FROM items WHERE templateid='.
+						$current_parentid['parent_itemid'].' AND hostid='.$item['hostid'];
+				$new_parentid = DBfetch(DBselect($sql));
+
+				$item['parent_itemid'] = $new_parentid['itemid'];
+			}
 
 			$result = add_item($item);
 			if(!$result) break;
@@ -824,13 +816,72 @@
 		}
 
 		$db_tmp_items = get_items_by_hostid($templateid);
+
+		$item_proto_map = $prototypeids = $disc_rule_map = array();
 		while($db_tmp_item = DBfetch($db_tmp_items)){
+
 			$db_tmp_item['hostid'] = $hostid;
 			$db_tmp_item['applications'] = get_same_applications_for_host(get_applications_by_itemid($db_tmp_item['itemid']),$hostid);
 			$db_tmp_item['templateid'] = $copy_mode?0:$db_tmp_item['itemid'];
 
 			add_item($db_tmp_item);
+
+			if($db_tmp_item['flags'] == ZBX_FLAG_DISCOVERY_CHILD){
+				$prototypeids[$db_tmp_item['itemid']] = $db_tmp_item['itemid'];
+			}
 		}
+
+		if(!empty($prototypeids)){
+			$prototypes = array();
+			$sql = 'SELECT itemid, parent_itemid FROM item_discovery WHERE'.DBcondition('itemid', $prototypeids);
+			$db_res = DBselect($sql);
+			while($pro = DBfetch($db_res)){
+				$prototypes[$pro['itemid']] = $pro['parent_itemid'];
+			}
+
+
+			$item_proto_map = CItem::get(array(
+				'hostids' => $hostid,
+				'filter' => array('templateid' => array_keys($prototypes), 'flags' => null),
+				'output' => API_OUTPUT_EXTEND,
+				'preservekeys' => true,
+			));
+			$sql = 'SELECT itemid, parent_itemid FROM item_discovery WHERE'.DBcondition('itemid', array_keys($item_proto_map));
+			$db_res = DBselect($sql);
+			while($pro = DBfetch($db_res)){
+				unset($item_proto_map[$pro['itemid']]);
+			}
+			$item_proto_map = zbx_toHash($item_proto_map, 'templateid');
+
+			$disc_rule_map = CItem::get(array(
+				'hostids' => $hostid,
+				'filter' => array('templateid' => array_unique($prototypes), 'flags' => null),
+				'output' => API_OUTPUT_EXTEND,
+				'preservekeys' => true,
+			));
+			$disc_rule_map = zbx_toHash($disc_rule_map, 'templateid');
+
+
+			$insert = array();
+			foreach($item_proto_map as $old_proto => $new_proto){
+				if(!empty($new_proto['discoveryRule'])) continue;
+				$old_rule = $prototypes[$old_proto];
+				$parent_itemid = $disc_rule_map[$old_rule]['itemid'];
+
+				$insert[] = array(
+					'itemid' => $new_proto['itemid'],
+					'parent_itemid' => $parent_itemid,
+				);
+			}
+
+			try{
+				DB::insert('item_discovery', $insert);
+			}
+			catch(Exception $e){
+				return false;
+			}
+		}
+
 	}
 
 // Activate Item
@@ -906,7 +957,7 @@
 					'snmp_community,snmp_oid,value_type,data_type,trapper_hosts,snmp_port,units,multiplier,delta,'.
 					'snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,'.
 					'formula,trends,logtimefmt,valuemapid,delay_flex,params,ipmi_sensor,templateid,'.
-					'authtype,username,password,publickey,privatekey '.
+					'authtype,username,password,publickey,privatekey,flags '.
 			' FROM items '.
 			' WHERE itemid='.$itemid;
 		$row = DBfetch(DBselect($sql));
@@ -1181,6 +1232,7 @@
 				' AND h.status='.HOST_STATUS_MONITORED.
 				' AND h.hostid=i.hostid '.
 				' AND i.status='.ITEM_STATUS_ACTIVE.
+				' AND '.DBcondition('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
 			' ORDER BY i.description,i.itemid');
 
 		unset($items);
