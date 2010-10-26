@@ -2534,7 +2534,6 @@ static int	DBlld_update_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, co
 
 	zbx_free(rmids);
 	zbx_free(appids);
-	zbx_free(key_esc);
 
 #ifdef HAVE_ORACLE
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
@@ -2930,9 +2929,6 @@ static int	DBlld_update_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid,
 			}
 		}
 	}
-
-	if (FAIL == res)
-		goto out;
 
 	sql_offset = 0;
 #ifdef HAVE_ORACLE
