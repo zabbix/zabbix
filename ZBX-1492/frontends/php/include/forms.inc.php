@@ -5544,7 +5544,7 @@ JAVASCRIPT;
 
 		$footer = null;
 		if($hostid === null){
-			$footer = array(new CButton('save', S_SAVE, "if (deleted_macro_cnt > 0) return confirm('".S_ARE_YOU_SURE_YOU_WANT_TO_DELETE." '+deleted_macro_cnt+' ".S_MACROS_ES."');"));
+			$footer = array(new CButton('save', S_SAVE, "if (deleted_macro_cnt > 0) return confirm('".S_ARE_YOU_SURE_YOU_WANT_TO_DELETE." '+deleted_macro_cnt+' ".S_MACROS_ES."?');"));
 		}
 
 		return new CFormElement(S_MACROS, $macros_tbl, $footer);
