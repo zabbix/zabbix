@@ -354,7 +354,7 @@ switch($itemType) {
 		$form->addVar('parent_discoveryid', $_REQUEST['parent_discoveryid']);
 		$form->addItem(new CButton('form', S_CREATE_PROTOTYPE));
 	}
-	$items_wdgt->addPageHeader(S_CONFIGURATION_OF_PROTOTYPES_BIG, $form);
+	$items_wdgt->addPageHeader(S_CONFIGURATION_OF_ITEM_PROTOTYPES_BIG, $form);
 
 
 	if(isset($_REQUEST['form'])){
@@ -365,7 +365,7 @@ switch($itemType) {
 		$numrows = new CDiv();
 		$numrows->setAttribute('name', 'numrows');
 
-		$items_wdgt->addHeader(array(S_PROTOTYPES_OF_BIG.SPACE, new CSpan($discovery_rule['description'], 'discoveryName')));
+		$items_wdgt->addHeader(array(S_ITEM_PROTOTYPES_OF_BIG.SPACE, new CSpan($discovery_rule['description'], 'discoveryName')));
 		$items_wdgt->addHeader($numrows, SPACE);
 
 		$items_wdgt->addItem(get_header_host_table($_REQUEST['hostid']));
@@ -444,7 +444,7 @@ switch($itemType) {
 				$item['key_'],
 				$item['delay'],
 				$item['history'],
-				(in_array($item['value_type'], array(ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT)) ? '' : $item['trends']),				
+				(in_array($item['value_type'], array(ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT)) ? '' : $item['trends']),
 				item_type2str($item['type']),
 				$status,
 				new CCol($applications, 'wraptext'),

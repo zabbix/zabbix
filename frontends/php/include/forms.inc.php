@@ -1714,7 +1714,7 @@
 				else break;
 			}while($itmid != 0);
 
-			$caption[] = ($parent_discoveryid) ? S_PROTOTYPE.' "' : S_ITEM.' "';
+			$caption[] = ($parent_discoveryid) ? S_ITEM_PROTOTYPE.' "' : S_ITEM.' "';
 			$caption = array_reverse($caption);
 			$caption[] = ': ';
 			$caption[] = $item_data['description'];
