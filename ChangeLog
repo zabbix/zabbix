@@ -1,5 +1,6 @@
 Changes for 1.8.4rc2
 
+ - [ZBX-2861] fixed error when adding users to usergroups (KB)
  - [ZBX-1492] added confirmation dialog when deleting macros (KB)
  - [ZBX-3135] add an example for using standard input in zabbix_sender manpage (Richlv)
  - [ZBX-2616] bundled DejaVu font upgraded from 2.31 to 2.32 (Richlv)
