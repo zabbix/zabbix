@@ -37,6 +37,7 @@ create/data/images/UPS.png -text svneol=unset#unset
 create/data/images/UPS_small.png -text svneol=unset#unset
 create/data/images/Workstation.png -text svneol=unset#unset
 create/data/images/Workstation_small.png -text svneol=unset#unset
+create/data/images_db2.sql -text
 create/schema/gen_php.php -text
 frontends/php/api/.htaccess -text
 frontends/php/api/classes/class.apiexception.php -text
