@@ -75,7 +75,6 @@ include_once('include/page_header.php');
 				navigation_bar_calc('web.slides', $_REQUEST['elementid'],true);
 			}
 		}
-
 		if(str_in_array($_REQUEST['favobj'],array('screenid','slideshowid'))){
 			$result = false;
 			if('add' == $_REQUEST['action']){
@@ -112,7 +111,7 @@ include_once('include/page_header.php');
 						$screen = get_slideshow($elementid, $step);
 
 						$screens = CScreen::get(array(
-							'screenids' => $elementid
+							'screenids' => $screen['screenid']
 						));
 						if(empty($screens)){
 							print alert('No permissions');
@@ -123,8 +122,8 @@ include_once('include/page_header.php');
 								'output' => API_OUTPUT_EXTEND,
 								'select_screenitems' => API_OUTPUT_EXTEND
 							));
-							$screen = reset($screens);
-							$element = get_screen($screen,2,$effectiveperiod);
+							$cur_screen = reset($screens);
+							$element = get_screen($cur_screen,2,$effectiveperiod);
 
 							$refresh_multipl = CProfile::get('web.slides.rf_rate.hat_slides', 1, $elementid);
 
