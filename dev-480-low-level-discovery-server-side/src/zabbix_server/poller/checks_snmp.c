@@ -562,20 +562,21 @@ static int	snmp_set_value(const char *snmp_oid, struct variable_list *vars, DC_I
  *                                                                            *
  * Purpose: retrieve information for low-level discovery item                 *
  *                                                                            *
- * Parameters: DC_ITEM *item - configuration of zabbix item                   *
- *             char *OID     - OID of table with values of interest           *
+ * Parameters: ss    - [IN] SNMP session handle                               *
+ *             item  - [IN] configuration of Zabbix item                      *
+ *             OID   - [IN] OID of table with values of interest              *
+ *             value - [OUT] result structure                                 *
  *                                                                            *
  * Return value:  NOTSUPPORTED - OID does not exist, any other critical error *
  *                NETWORK_ERROR - recoverable network error                   *
- *                SUCCEED - success, variable 'idx' contains index having     *
- *                          value 'value'                                     *
+ *                SUCCEED - if function successfully completed                *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	snmp_walk(struct snmp_session *ss, DC_ITEM *item, char *OID, AGENT_RESULT *value)
+static int	snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID, AGENT_RESULT *value)
 {
 	const char		*__function_name = "snmp_walk";
 
