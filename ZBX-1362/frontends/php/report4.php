@@ -158,9 +158,7 @@ include_once('include/page_header.php');
 
 	}
 
-	$table->SetHeader($header,'vertical_header');
-
-
+	$table->setHeader($header,'vertical_header');
 	for($t = $from; $t <= $to; $t++){
 		if(($start = get_time($t)) > time())
 			break;
@@ -172,13 +170,13 @@ include_once('include/page_header.php');
 
 		//getting all alerts in this period of time
 		$options = array(
-			'output'=>API_OUTPUT_EXTEND,
+			'output'=> array('mediatypeid', 'userid'),
 			'time_from'=>$start,
 			'time_till'=>$end
 		);
 
 		//if we must get only specific media type, no need to select the other ones
-		if ($media_type!=0){
+		if ($media_type>0){
 			$options['mediatypeids'] = $media_type;
 		}
 
@@ -187,7 +185,6 @@ include_once('include/page_header.php');
 
 		//counting alert count for each user and media type
 		$summary = array();
-
 		foreach($users as $userid => $alias){
 			$summary[$userid] = array();
 			$summary[$userid]['total'] = 0;
@@ -195,15 +192,14 @@ include_once('include/page_header.php');
 		}
 		
 		foreach($alert_info as $ai){
-			if( isset($summary[$ai['userid']]) ){
-				$summary[$ai['userid']]['total']++;
-				if (isset($summary[$ai['userid']]['medias'][$ai['mediatypeid']])) {
-					$summary[$ai['userid']]['medias'][$ai['mediatypeid']]++;
-				}
-				else {
-					$summary[$ai['userid']]['medias'][$ai['mediatypeid']] = 1;
-				}
+			if( !isset($summary[$ai['userid']]) ) continue;
 
+			$summary[$ai['userid']]['total']++;
+			if (isset($summary[$ai['userid']]['medias'][$ai['mediatypeid']])) {
+				$summary[$ai['userid']]['medias'][$ai['mediatypeid']]++;
+			}
+			else {
+				$summary[$ai['userid']]['medias'][$ai['mediatypeid']] = 1;
 			}
 		}
 		
