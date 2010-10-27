@@ -474,8 +474,8 @@ class CChart extends CGraphDraw{
 				else if(strcasecmp($arr[4],'M') == 0)	$val *= 1048576; //1024*1024;
 				else if(strcasecmp($arr[4],'G') == 0)	$val *= 1073741824; //1024*1024*1024;
 
-				$minY = $this->m_minY[$this->items[0]['axisside']];
-				$maxY = $this->m_maxY[$this->items[0]['axisside']];
+				$minY = $this->m_minY[$this->items[$inum]['axisside']];
+				$maxY = $this->m_maxY[$this->items[$inum]['axisside']];
 
 //				if($val <= $minY || $val >= $maxY)	continue;
 //SDI($item['itemid']);
