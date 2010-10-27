@@ -16,6 +16,7 @@ Changes for 1.9.0
 
 Changes for 1.8.4rc2
 
+ - [ZBX-1346] update example agent daemon configuration file for Windows with parameters from Zabbix manual (Richlv)
  - [ZBX-2984] fixed incorrect trigger line in graphs. For line drawing was used axis from first item not trigger item (Vedmak)
  - [ZBX-3059] different titles for popup menu depending on data type (KB)
  - [ZBX-2861] fixed error when adding users to usergroups (KB)
