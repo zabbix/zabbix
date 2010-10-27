@@ -168,7 +168,7 @@ include_once('include/page_header.php');
 		}
 
 		$btnSelect = new CButton('btn1',S_SELECT,
-				"return PopUp('popup.php?writeonly=1&templated_hosts=1&dstfrm=".$frmGItem->GetName().
+				"return PopUp('popup.php?writeonly=1&dstfrm=".$frmGItem->GetName().
 				"&dstfld1=itemid&dstfld2=description&".
 				"srctbl=items&srcfld1=itemid&srcfld2=description".$host_condition."');",
 				'T');

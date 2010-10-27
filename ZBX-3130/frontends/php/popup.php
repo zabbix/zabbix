@@ -217,6 +217,7 @@ include_once('include/page_header.php');
 
 	$host_status = null;
 	$templated = null;
+
 	if($real_hosts){
 		$templated = 0;
 	}
@@ -821,8 +822,10 @@ include_once('include/page_header.php');
 		);
 
 		if(!is_null($writeonly)) $options['editable'] = 1;
-		if(!is_null($templated)) $options['templated'] = $templated;
+		if(!is_null($templated) && $templated == 1) $options['templated'] = $templated;
 		if(!is_null($value_types)) $options['filter']['value_type'] = $value_types;
+		//host can't have id=0. This option maked hosts dissapear from list
+		if ($options['hostids'] == 0) unset($options['hostids']);
 
 		$items = CItem::get($options);
 		order_result($items, 'description', ZBX_SORT_UP);
