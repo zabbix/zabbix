@@ -1039,9 +1039,9 @@ TABLE|interface|interfaceid|ZBX_SYNC
 FIELD		|interfaceid	|t_id		|	|NOT NULL	|0
 FIELD		|hostid		|t_id		|	|NOT NULL	|0	|1	|hosts	
 FIELD		|main		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|dns		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|useip		|t_integer	|'1'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|ip		|t_varchar(39)	|'127.0.0.1'|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|port		|t_integer	|'10050'|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|dns		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|port		|t_varchar(64)	|'10050'|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 INDEX		|1		|interfaceid
 INDEX		|2		|hostid
