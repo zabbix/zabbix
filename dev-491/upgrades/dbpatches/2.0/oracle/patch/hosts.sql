@@ -11,34 +11,32 @@ ALTER TABLE hosts ADD CONSTRAINT c_hosts_2 FOREIGN KEY (maintenanceid) REFERENCE
 CREATE TABLE interface (
 	interfaceid              number(20)                                NOT NULL,
 	hostid                   number(20)                                NOT NULL,
-	itemtype                 number(10)      DEFAULT '0'               NOT NULL,
 	main                     number(10)      DEFAULT '0'               NOT NULL,
 	dns                      nvarchar2(64)   DEFAULT ''                ,
 	useip                    number(10)      DEFAULT '1'               NOT NULL,
 	ip                       nvarchar2(39)   DEFAULT '127.0.0.1'       ,
 	port                     number(10)      DEFAULT '10050'           NOT NULL,
-	ipmi_authtype            number(10)      DEFAULT '0'               NOT NULL,
-	ipmi_privilege           number(10)      DEFAULT '2'               NOT NULL,
-	ipmi_username            nvarchar2(16)   DEFAULT ''                ,
-	ipmi_password            nvarchar2(20)   DEFAULT ''                ,
-	available                number(10)      DEFAULT '0'               NOT NULL,
-	error                    nvarchar2(128)  DEFAULT ''                ,
-	errors_from              number(10)      DEFAULT '0'               NOT NULL,
-	disable_until            number(10)      DEFAULT '0'               NOT NULL,
 	PRIMARY KEY (interfaceid));
 CREATE INDEX interface_1 on interface (interfaceid);
-CREATE INDEX interface_2 on interface (hostid, itemtype);
+CREATE INDEX interface_2 on interface (hostid);
 ALTER TABLE interface ADD CONSTRAINT c_interface_1 FOREIGN KEY (hostid) REFERENCES hosts (hostid) ON DELETE CASCADE;
 
  
-INSERT INTO interface (interfaceid,hostid,itemtype,main,ip,dns,port,useip,available,error,errors_from,disable_until)
-	SELECT (hostid - (round(hostid / 100000000000)*100000000000)) * 2 + (round(hostid / 100000000000)*100000000000),
-		hostid,0,1,ip,dns,port,useip,available,error,errors_from,disable_until 
+INSERT INTO interface (interfaceid,hostid,main,ip,dns,useip,port)
+	(SELECT (hostid - (round(hostid / 100000000000)*100000000000)) * 2 + (round(hostid / 100000000000)*100000000000),
+		hostid,1,ip,dns,useip,port
 	FROM hosts 
-	WHERE status IN (0,1);
+	WHERE status IN (0,1));
 
-INSERT INTO interface (interfaceid,hostid,itemtype,main,dns,useip,port,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,available,error,errors_from,disable_until)
-	SELECT (hostid - (round(hostid / 100000000000)*100000000000)) * 2 + (round(hostid / 100000000000)*100000000000) + 1,
-		hostid,12,1,ipmi_ip,0,ipmi_port,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,ipmi_available,ipmi_error,ipmi_errors_from,ipmi_disable_until 
+INSERT INTO interface (interfaceid,hostid,main,dns,useip,port)
+	(SELECT (hostid - (round(hostid / 100000000000)*100000000000)) * 2 + (round(hostid / 100000000000)*100000000000) + 1,
+		hostid,0,ipmi_ip,0,ipmi_port
 	FROM hosts 
-	WHERE status IN (0,1) AND useipmi=1;
+	WHERE status IN (0,1) AND useipmi=1);
+
+ALTER TABLE hosts DROP COLUMN ip;
+ALTER TABLE hosts DROP COLUMN dns;
+ALTER TABLE hosts DROP COLUMN port;
+ALTER TABLE hosts DROP COLUMN useip;
+ALTER TABLE hosts DROP COLUMN ipmi_ip;
+ALTER TABLE hosts DROP COLUMN ipmi_port;
