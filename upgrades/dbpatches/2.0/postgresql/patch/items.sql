@@ -17,5 +17,7 @@ ALTER TABLE ONLY items ADD CONSTRAINT c_items_1 FOREIGN KEY (hostid) REFERENCES 
 ALTER TABLE ONLY items ADD CONSTRAINT c_items_2 FOREIGN KEY (templateid) REFERENCES items (itemid) ON DELETE CASCADE;
 ALTER TABLE ONLY items ADD CONSTRAINT c_items_3 FOREIGN KEY (valuemapid) REFERENCES valuemaps (valuemapid);
 ALTER TABLE ONLY items ADD CONSTRAINT c_items_4 FOREIGN KEY (interfaceid) REFERENCES interface (interfaceid);
-UPDATE items SET interfaceid=(SELECT interfaceid FROM interface WHERE hostid=items.hostid AND itemtype=0 AND main=1) WHERE type<>12;
-UPDATE items SET interfaceid=(SELECT interfaceid FROM interface WHERE hostid=items.hostid AND itemtype=12 AND main=1) WHERE type=12;
+UPDATE items SET interfaceid=(SELECT interfaceid FROM interface WHERE hostid=items.hostid AND main=1);
+UPDATE items
+	SET port=(SELECT port FROM interface WHERE interface.hostid=items.hostid AND interface.main=1);
+	WHERE EXISTS(SELECT hostid FROM hosts WHERE hosts.hostid=items.hostid AND hosts.status IN (0,1));
