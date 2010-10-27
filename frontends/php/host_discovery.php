@@ -617,9 +617,8 @@ switch($itemType) {
 			list($item_filter_macro, $item_filter_value) = explode(':', $item_filter);
 			
 		$frmItem->addRow(S_FILTER, array(
-			S_MACRO, new CTextBox('item_filter_macro',$item_filter_macro,20),
-			SPACE, 
-			S_FILTER, new CTextBox('item_filter_value',$item_filter_value,20)
+			S_MACRO, SPACE, new CTextBox('item_filter_macro',$item_filter_macro,20),
+			S_REGEXP, SPACE, new CTextBox('item_filter_value',$item_filter_value,40)
 		), null);
 
 // Update interval (in sec)
