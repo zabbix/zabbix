@@ -267,6 +267,7 @@
 				'applications'		=> array(),
 				'templateid'		=> 0,
 				'flags' => 0,
+				'filter' => '',
 		);
 
 		if(!check_db_fields($item_db_fields, $item)){
@@ -376,7 +377,7 @@
 					'snmp_port,units,multiplier,'.
 					'delta,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,'.
 					'snmpv3_privpassphrase,formula,trends,logtimefmt,valuemapid,'.
-					'delay_flex,params,ipmi_sensor,templateid,authtype,username,password,publickey,privatekey, flags)'.
+					'delay_flex,params,ipmi_sensor,templateid,authtype,username,password,publickey,privatekey, flags, filter)'.
 			' VALUES ('.$itemid.','.zbx_dbstr($item['description']).','.zbx_dbstr($item['key_']).','.(!$item['hostid']? '0':$item['hostid']).','.
 						(!$item['delay']? '0':$item['delay']).','.(!$item['history']? '0':$item['history']).','.(!$item['status']? '0':$item['status']).','.(!$item['type']? '0':$item['type']).','.
 						zbx_dbstr($item['snmp_community']).','.zbx_dbstr($item['snmp_oid']).','.(!$item['value_type']? '0':$item['value_type']).','.(!$item['data_type']? '0':$item['data_type']).','.
@@ -387,7 +388,7 @@
 						zbx_dbstr($item['delay_flex']).','.zbx_dbstr($item['params']).','.
 						zbx_dbstr($item['ipmi_sensor']).','.zero2null($item['templateid']).','.intval($item['authtype']).','.
 						zbx_dbstr($item['username']).','.zbx_dbstr($item['password']).','.
-						zbx_dbstr($item['publickey']).','.zbx_dbstr($item['privatekey']).','.$item['flags'].')'
+						zbx_dbstr($item['publickey']).','.zbx_dbstr($item['privatekey']).','.$item['flags'].','.zbx_dbstr($item['filter']).')'
 			);
 
 		if(isset($item['parent_itemid'])){
@@ -646,7 +647,8 @@
 				'username='.zbx_dbstr($item['username']).','.
 				'password='.zbx_dbstr($item['password']).','.
 				'publickey='.zbx_dbstr($item['publickey']).','.
-				'privatekey='.zbx_dbstr($item['privatekey']).
+				'privatekey='.zbx_dbstr($item['privatekey']).','.
+				'filter='.zbx_dbstr($item['filter']).
 			' WHERE itemid='.$itemid);
 
 		if ($result){
@@ -710,6 +712,7 @@
 					'privatekey'		=> array('template' => 1),
 					'params'		=> array('template' => 1),
 					'delay_flex'		=> array('template' => 1),
+					'filter'		=> array(),
 					'ipmi_sensor'		=> array());
 
 		foreach($restore_rules as $var_name => $info){
@@ -957,7 +960,7 @@
 					'snmp_community,snmp_oid,value_type,data_type,trapper_hosts,snmp_port,units,multiplier,delta,'.
 					'snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,'.
 					'formula,trends,logtimefmt,valuemapid,delay_flex,params,ipmi_sensor,templateid,'.
-					'authtype,username,password,publickey,privatekey,flags '.
+					'authtype,username,password,publickey,privatekey,flags, filter '.
 			' FROM items '.
 			' WHERE itemid='.$itemid;
 		$row = DBfetch(DBselect($sql));

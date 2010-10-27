@@ -46,6 +46,8 @@ switch($itemType) {
 		'itemid'=>			array(T_ZBX_INT, O_NO,	 P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))'),
 
 		'description'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),
+		'item_filter_macro'=>		array(T_ZBX_STR, O_OPT,  null,	null,		'isset({save})'),
+		'item_filter_value'=>		array(T_ZBX_STR, O_OPT,  null,	null,		'isset({save})'),
 		'key'=>				array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,		'isset({save})'),
 		'delay'=>			array(T_ZBX_INT, O_OPT,  null,  '(('.BETWEEN(1,86400).
 				'(!isset({delay_flex}) || !({delay_flex}) || is_array({delay_flex}) && !count({delay_flex}))) ||'.
@@ -208,6 +210,10 @@ switch($itemType) {
 				$applications[$new_appid] = $new_appid;
 		}
 
+		$ifm =  get_request('item_filter_macro');
+		$ifv =  get_request('item_filter_value');
+		$filter = $ifm.':'.$ifv;
+		
 		$item = array(
 			'description' => get_request('description'),
 			'key_' => get_request('key'),
@@ -232,6 +238,7 @@ switch($itemType) {
 			'ipmi_sensor' => get_request('ipmi_sensor'),
 			'applications' => $applications,
 			'flags' => ZBX_FLAG_DISCOVERY,
+			'filter' => $filter,
 		);
 
 		if(isset($_REQUEST['itemid'])){
@@ -350,6 +357,7 @@ switch($itemType) {
 		$applications = get_request('applications', array());
 		$delay_flex = get_request('delay_flex', array());
 		$trapper_hosts = get_request('trapper_hosts', '');
+		$item_filter = get_request('filter', '');
 
 		$snmpv3_securityname = get_request('snmpv3_securityname', '');
 		$snmpv3_securitylevel = get_request('snmpv3_securitylevel', 0);
@@ -389,6 +397,7 @@ switch($itemType) {
 			$snmp_oid = $item_data['snmp_oid'];
 			$snmp_port = $item_data['snmp_port'];
 			$params = $item_data['params'];
+			$item_filter = $item_data['filter'];
 
 			$snmpv3_securityname = $item_data['snmpv3_securityname'];
 			$snmpv3_securitylevel = $item_data['snmpv3_securitylevel'];
@@ -602,7 +611,16 @@ switch($itemType) {
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_CALCULATED, 'row_params');
 
 // Filter
-		$frmItem->addRow(S_FILTER, new CTextArea('item_filter','',40, 3), null);
+
+		$item_filter_macro = $item_filter_value = '';
+		if(!empty($item_filter))
+			list($item_filter_macro, $item_filter_value) = explode(':', $item_filter);
+			
+		$frmItem->addRow(S_FILTER, array(
+			S_MACRO, new CTextBox('item_filter_macro',$item_filter_macro,20),
+			SPACE, 
+			S_FILTER, new CTextBox('item_filter_value',$item_filter_value,20)
+		), null);
 
 // Update interval (in sec)
 		$frmItem->addRow(S_UPDATE_INTERVAL_IN_SEC, new CNumericBox('delay',$delay,5), null, 'row_delay');
