@@ -2,7 +2,6 @@ CREATE TABLE trigger_discovery (
 	triggerdiscoveryid       number(20)                                NOT NULL,
 	triggerid                number(20)                                NOT NULL,
 	parent_triggerid         number(20)                                NOT NULL,
-	expression               nvarchar2(255)  DEFAULT ''                ,
 	name                     nvarchar2(255)  DEFAULT ''                ,
 	PRIMARY KEY (triggerdiscoveryid)
 );
