@@ -2789,9 +2789,8 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemi
 			" where i.itemid=d.itemid"
 				" and d.parent_itemid=di.itemid"
 				" and i.hostid=" ZBX_FS_UI64
-				" and i.flags & %d"
 				" and d.parent_itemid=" ZBX_FS_UI64,
-			hostid, ZBX_FLAG_DISCOVERY_CHILD, discovery_itemid);
+			hostid, discovery_itemid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
