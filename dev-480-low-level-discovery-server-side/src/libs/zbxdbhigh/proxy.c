@@ -2209,7 +2209,7 @@ static int	DBlld_update_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_trigger
 				comments_esc, url_esc, (int)type,
 				ZBX_FLAG_DISCOVERY_CREATED, new_triggerid);
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 192 + strlen(description_proto_esc),
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256 + strlen(description_proto_esc),
 				"update trigger_discovery"
 				" set name='%s'"
 				" where triggerid=" ZBX_FS_UI64
@@ -2240,7 +2240,7 @@ static int	DBlld_update_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_trigger
 					(int)status, comments_esc, url_esc, (int)type,
 					TRIGGER_VALUE_UNKNOWN, ZBX_FLAG_DISCOVERY_CREATED);
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 192 + strlen(description_proto_esc),
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256 + strlen(description_proto_esc),
 				"insert into trigger_discovery"
 					" (triggerdiscoveryid,triggerid,parent_triggerid,name)"
 				" values"
@@ -2572,7 +2572,7 @@ static int	DBlld_update_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, co
 				snmpv3_privpassphrase_esc, (int)authtype, username_esc, password_esc, publickey_esc,
 				privatekey_esc, ZBX_FLAG_DISCOVERY_CREATED);
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 140,
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256 + strlen(key_proto_esc),
 				"insert into item_discovery"
 					" (itemdiscoveryid,itemid,parent_itemid,key_)"
 				" values"
@@ -2625,7 +2625,7 @@ static int	DBlld_update_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, co
 				snmpv3_privpassphrase_esc, (int)authtype, username_esc, password_esc, publickey_esc,
 				privatekey_esc, ZBX_FLAG_DISCOVERY_CREATED, new_itemid);
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128 + strlen(key_proto_esc),
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256 + strlen(key_proto_esc),
 				"update item_discovery"
 				" set key_='%s'"
 				" where itemid=" ZBX_FS_UI64
@@ -3093,7 +3093,7 @@ static int	DBlld_update_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid,
 				DBsql_id_ins(ymin_itemid), DBsql_id_ins(ymax_itemid),
 				ZBX_FLAG_DISCOVERY_CREATED, new_graphid);
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128 + strlen(name_proto_esc),
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256 + strlen(name_proto_esc),
 				"update graph_discovery"
 				" set name='%s'"
 				" where graphid=" ZBX_FS_UI64
@@ -3120,7 +3120,7 @@ static int	DBlld_update_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid,
 				percent_left, percent_right, (int)ymin_type, (int)ymax_type,
 				DBsql_id_ins(ymin_itemid), DBsql_id_ins(ymax_itemid), ZBX_FLAG_DISCOVERY_CREATED);
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 160 + strlen(name_proto_esc),
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256 + strlen(name_proto_esc),
 				"insert into graph_discovery"
 					" (graphdiscoveryid,graphid,parent_graphid,name)"
 				" values"
