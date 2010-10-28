@@ -314,7 +314,7 @@ include_once('include/page_header.php');
 			DBstart();
 			foreach($_REQUEST['group_graphid'] as $gnum => $graph_id){
 				foreach($db_hosts as $hnum => $host){
-					$go_result &= (bool) copy_graph_to_host($graph_id, $host['hostid'], true);
+					$go_result &= (bool) copy_graph_to_host($graph_id, $host['hostid']);
 
 				}
 			}

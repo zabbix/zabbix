@@ -1627,26 +1627,26 @@ COpt::memoryPick();
 			$linkedTpls = self::get(array(
 				'nopermissions' => 1,
 				'output' => API_OUTPUT_SHORTEN,
-						'hostids' => $targetid
+				'hostids' => $targetid
 			));
 			$allids = array_merge($templateids, zbx_objectValues($linkedTpls, 'templateid'));
 
-			$sql = 'SELECT key_, count(*) as cnt '.
+			$sql = 'SELECT key_, count(itemid) as cnt '.
 				' FROM items '.
 				' WHERE '.DBcondition('hostid',$allids).
 				' GROUP BY key_ '.
-				' HAVING count(*) > 1';
+				' HAVING count(itemid) > 1';
 			$res = DBselect($sql);
 			if($db_cnt = DBfetch($res)){
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					S_TEMPLATE_WITH_ITEM_KEY.' ['.htmlspecialchars($db_cnt['key_']).'] '.S_ALREADY_LINKED_TO_HOST_SMALL);
 			}
 
-			$sql = 'SELECT name, count(*) as cnt '.
+			$sql = 'SELECT name, count(applicationid) as cnt '.
 				' FROM applications '.
 				' WHERE '.DBcondition('hostid',$allids).
 				' GROUP BY name '.
-				' HAVING count(*) > 1';
+				' HAVING count(applicationid) > 1';
 			$res = DBselect($sql);
 			if($db_cnt = DBfetch($res)){
 				self::exception(ZBX_API_ERROR_PARAMETERS,

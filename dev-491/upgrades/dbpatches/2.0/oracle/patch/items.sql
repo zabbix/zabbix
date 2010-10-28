@@ -8,6 +8,9 @@ ALTER TABLE items MODIFY valuemapid NULL;
 ALTER TABLE items ADD lastns number(10) NULL;
 ALTER TABLE items ADD flags number(10) DEFAULT '0' NOT NULL;
 ALTER TABLE items ADD filter nvarchar2(255) DEFAULT '';
+ALTER TABLE items ADD interfaceid number(20) DEFAULT NULL;
+ALTER TABLE items ADD port nvarchar2(64) DEFAULT '';
+
 UPDATE items SET templateid=NULL WHERE templateid=0;
 UPDATE items SET templateid=NULL WHERE NOT templateid IS NULL AND NOT templateid IN (SELECT itemid FROM items);
 UPDATE items SET valuemapid=NULL WHERE valuemapid=0;
@@ -18,7 +21,11 @@ ALTER TABLE items ADD CONSTRAINT c_items_1 FOREIGN KEY (hostid) REFERENCES hosts
 ALTER TABLE items ADD CONSTRAINT c_items_2 FOREIGN KEY (templateid) REFERENCES items (itemid) ON DELETE CASCADE;
 ALTER TABLE items ADD CONSTRAINT c_items_3 FOREIGN KEY (valuemapid) REFERENCES valuemaps (valuemapid);
 ALTER TABLE items ADD CONSTRAINT c_items_4 FOREIGN KEY (interfaceid) REFERENCES interface (interfaceid);
-UPDATE items SET interfaceid=(SELECT interfaceid FROM interface WHERE hostid=items.hostid AND main=1);
+UPDATE items SET port=snmp_port;
 UPDATE items
-	SET port=(SELECT port FROM interface WHERE interface.hostid=items.hostid AND interface.main=1);
+	SET interfaceid=(SELECT interfaceid FROM interface WHERE hostid=items.hostid AND main=1);
 	WHERE EXISTS(SELECT hostid FROM hosts WHERE hosts.hostid=items.hostid AND hosts.status IN (0,1));
+UPDATE items
+	SET port=(SELECT port FROM interface WHERE interface.interfaceid=items.interfaceid);
+	WHERE port='' AND interfaceid NOT NULL;
+ALTER TABLE items DROP COLUMN snmp_port;

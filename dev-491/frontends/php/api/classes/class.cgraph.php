@@ -789,25 +789,14 @@ COpt::memoryPick();
 	}
 
 	protected static function createReal($graph){
-		$graphid = DB::insert('graphs', array($graph));
-		$graphid = reset($graphid);
+		$graphids = DB::insert('graphs', array($graph));
+		$graphid = reset($graphids);
 
 		foreach($graph['gitems'] as $gitem){
-			$values = array(
-				'gitemid' => get_dbid('graphs_items', 'gitemid'),
-				'graphid' => $graphid,
-			);
-			if(isset($gitem['itemid'])) $values['itemid'] = $gitem['itemid'];
-			if(isset($gitem['color'])) $values['color'] = zbx_dbstr($gitem['color']);
-			if(isset($gitem['drawtype'])) $values['drawtype'] = $gitem['drawtype'];
-			if(isset($gitem['sortorder'])) $values['sortorder'] = $gitem['sortorder'];
-			if(isset($gitem['yaxisside'])) $values['yaxisside'] = $gitem['yaxisside'];
-			if(isset($gitem['calc_fnc'])) $values['calc_fnc'] = $gitem['calc_fnc'];
-			if(isset($gitem['type'])) $values['type'] = $gitem['type'];
-			if(isset($gitem['periods_cnt'])) $values['periods_cnt'] = $gitem['periods_cnt'];
-
-			$sql = 'INSERT INTO graphs_items ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')';
-			DBexecute($sql) or self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+			$gitem['graphid'] = $graphid;
+			
+			$gitemids = DB::insert('graphs_items', array($gitem));
+			if(!$gitemids) self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 		}
 
 		return $graphid;
@@ -829,7 +818,7 @@ COpt::memoryPick();
 				$result = DB::insert('graphs_items', array($gitem));
 				if(!$result)
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-		}
+			}
 		}
 
 		return $graph['graphid'];
