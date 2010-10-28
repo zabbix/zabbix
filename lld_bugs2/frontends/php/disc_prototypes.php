@@ -421,7 +421,7 @@ switch($itemType) {
 			}
 			$item['description_expanded'] = item_description($item);
 
-			$disc_link = '&parent_discoveryid='.$item['discoveryRule']['itemid'];
+			$disc_link = '&parent_discoveryid='.$_REQUEST['parent_discoveryid'];
 			$description[] = new CLink($item['description_expanded'], '?form=update&itemid='.$item['itemid'].$disc_link);
 
 			$status = new CCol(new CLink(item_status2str($item['status']), '?group_itemid='.$item['itemid'].$disc_link.
