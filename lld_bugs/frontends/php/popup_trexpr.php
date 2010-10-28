@@ -431,8 +431,8 @@ if(form){
 	$row = array(
 		new CTextBox('description', $description, 50, 'yes'),
 		new CButton('select', S_SELECT, "return PopUp('popup.php?dstfrm=".$form->GetName().
-				"&dstfld1=itemid&dstfld2=description&submitParent=1&".$normal_only.
-				"srctbl=items&srcfld1=itemid&srcfld2=description',0,0,'zbx_popup_item');"),
+				"&dstfld1=itemid&dstfld2=description&submitParent=1".$normal_only.
+				"&srctbl=items&srcfld1=itemid&srcfld2=description',0,0,'zbx_popup_item');"),
 	);
 	if($parent_discoveryid){
 		$row[] = new CButton('select', S_SELECT_PROTOTYPE, "return PopUp('popup.php?dstfrm=".$form->GetName().
