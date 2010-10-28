@@ -1142,6 +1142,7 @@ COpt::memoryPick();
 // }}} EXCEPTION: ITEMS PERMISSIONS
 		}
 
+
 		foreach($graphs as $gnum => $graph){
 			if(!isset($graph['name'])) continue;
 
@@ -1154,11 +1155,11 @@ COpt::memoryPick();
 			);
 			$graphsExists = self::get($options);
 			foreach($graphsExists as $genum => $graphExists){
-				if(!$update || ($graphExists['graphid'] == $graph['graphid'])){
+				if(($update && ($graphExists['graphid'] != $graph['graphid'])) || !$update){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph with name [ '.$graph['name'].' ] already exists');
 				}
-// }}} EXCEPTION: GRAPH EXISTS
 			}
+// }}} EXCEPTION: GRAPH EXISTS
 
 // PROTOTYPE {{{
 			if(isset($graph['flags']) && ($graph['flags'] == ZBX_FLAG_DISCOVERY_CHILD)){
