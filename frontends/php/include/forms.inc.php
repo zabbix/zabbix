@@ -2386,7 +2386,6 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 	function insert_copy_elements_to_forms($elements_array_name){
 
 		$copy_type = get_request('copy_type', 0);
-		$copy_mode = get_request('copy_mode', 0);
 		$filter_groupid = get_request('filter_groupid', 0);
 		$group_itemid = get_request($elements_array_name, array());
 		$copy_targetid = get_request('copy_targetid', array());
@@ -2457,12 +2456,6 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		}
 
 		$frmCopy->addRow(S_TARGET, $target_list);
-
-		$cmbCopyMode = new CComboBox('copy_mode',$copy_mode);
-		$cmbCopyMode->addItem(0, S_UPDATE_EXISTING_NON_LINKED_ITEMS);
-		$cmbCopyMode->addItem(1, S_SKIP_EXISTING_ITEMS);
-		$cmbCopyMode->setEnabled(false);
-		$frmCopy->addRow(S_MODE, $cmbCopyMode);
 
 		$frmCopy->addItemToBottomRow(new CButton("copy",S_COPY));
 		$frmCopy->addItemToBottomRow(array(SPACE,

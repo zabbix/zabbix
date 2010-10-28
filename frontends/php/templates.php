@@ -412,7 +412,7 @@ include_once('include/page_header.php');
 			);
 			$db_graphs = CGraph::get($options);
 			foreach($db_graphs as $gnum => $db_graph){
-				$result &= (bool) copy_graph_to_host($db_graph['graphid'], $templateid, true);
+				$result &= (bool) copy_graph_to_host($db_graph['graphid'], $templateid);
 			}
 		}
 // }

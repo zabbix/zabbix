@@ -597,7 +597,7 @@ include_once('include/page_header.php');
 			$graphs = CGraph::get($options);
 			foreach($graphs as $gnum => $graph){
 				if(count($graph['hosts']) > 1) continue;
-					if(!copy_graph_to_host($graph['graphid'], $hostid, true)) throw new Exception();
+					if(!copy_graph_to_host($graph['graphid'], $hostid)) throw new Exception();
 			}
 		}
 

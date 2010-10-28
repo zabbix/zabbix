@@ -110,13 +110,8 @@
 		copy_template_applications($hostid, $templateid, $copy_mode);
 		copy_template_items($hostid, $templateid, $copy_mode);
 		copy_template_triggers($hostid, $templateid, $copy_mode);
-		// razvilka $copy
-		if($copy_mode){
-			copy_template_graphs($hostid, $templateid, $copy_mode);
-		}
-		else{
-			$result = CGraph::syncTemplates(array('hostids' => $hostid, 'templateids' => $templateid));
-		}
+
+		$result = CGraph::syncTemplates(array('hostids' => $hostid, 'templateids' => $templateid));
 		return $result;
 	}
 
