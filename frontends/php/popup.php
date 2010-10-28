@@ -175,6 +175,7 @@ include_once('include/page_header.php');
 		'monitored_hosts'=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
 		'templated_hosts'=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
 		'real_hosts'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
+		'normal_only'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
 
 		'itemtype'=>		array(T_ZBX_INT, O_OPT, null,   null,		null),
 		'value_types'=>		array(T_ZBX_INT, O_OPT, null,   BETWEEN(0,15),	null),
@@ -217,6 +218,7 @@ include_once('include/page_header.php');
 
 // items
  	$value_types		= get_request('value_types', null);
+	$normal_only = get_request('normal_only');
 
 	$submitParent = get_request('submitParent', 0);
 
@@ -821,10 +823,12 @@ include_once('include/page_header.php');
 			'groupids' => $groupid,
 			'hostids' => $hostid,
 			'webitems' => 1,
+			'filter' => array(),
 			'output' => API_OUTPUT_EXTEND,
 			'select_hosts' => API_OUTPUT_EXTEND
 		);
 
+		if(!is_null($normal_only)) $options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
 		if(!is_null($writeonly)) $options['editable'] = 1;
 		if(!is_null($templated)) $options['templated'] = $templated;
 		if(!is_null($value_types)) $options['filter']['value_type'] = $value_types;

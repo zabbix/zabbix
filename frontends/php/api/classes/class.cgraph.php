@@ -624,7 +624,7 @@ COpt::memoryPick();
 
 	public static function exists($object){
 		$options = array(
-			'filter' => array(),
+			'filter' => array('flags' => null),
 			'output' => API_OUTPUT_SHORTEN,
 			'nopermissions' => 1,
 			'limit' => 1
@@ -1142,22 +1142,24 @@ COpt::memoryPick();
 // }}} EXCEPTION: ITEMS PERMISSIONS
 		}
 
+
 		foreach($graphs as $gnum => $graph){
 			if(!isset($graph['name'])) continue;
 
 			$options = array(
 				'nodeids' => get_current_nodeid(true),
-				'filter' => array('name' => $graph['name']),
+				'output' => API_OUTPUT_SHORTEN,
+				'filter' => array('name' => $graph['name'], 'flags' => null),
 				'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
 				'nopermissions' => 1
 			);
 			$graphsExists = self::get($options);
 			foreach($graphsExists as $genum => $graphExists){
-				if(!$update || ($graphExists['graphid'] != $graph['graphid'])){
+				if(($update && ($graphExists['graphid'] != $graph['graphid'])) || !$update){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph with name [ '.$graph['name'].' ] already exists');
 				}
-// }}} EXCEPTION: GRAPH EXISTS
 			}
+// }}} EXCEPTION: GRAPH EXISTS
 
 // PROTOTYPE {{{
 			if(isset($graph['flags']) && ($graph['flags'] == ZBX_FLAG_DISCOVERY_CHILD)){
