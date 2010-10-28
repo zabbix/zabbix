@@ -1206,6 +1206,18 @@
 	return get_host_by_itemid($itemid);
 	}
 
+// kostilek //
+	function get_realrule_by_itemid_and_hostid($itemid, $hostid){
+		$item = get_item_by_itemid($itemid);
+		if($hostid == $item['hostid'])
+			return $item['itemid'];
+
+		if($item['templateid'] <> 0)
+			return get_realrule_by_itemid_and_hostid($item['templateid'], $hostid);
+
+		return $item['itemid'];
+	}
+
 /*
  * Function: get_items_data_overview
  *

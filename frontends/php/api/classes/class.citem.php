@@ -749,10 +749,24 @@ COpt::memoryPick();
 // Adding discoveryRule
 		if(!is_null($options['selectDiscoveryRule'])){
 			$ruleids = $rule_map = array();
+
 			$sql = 'SELECT id1.itemid, id2.parent_itemid'.
-					' FROM item_discovery id1, item_discovery id2'.
+					' FROM item_discovery id1, item_discovery id2, items i'.
 					' WHERE '.DBcondition('id1.itemid', $itemids).
-						' AND id1.parent_itemid=id2.itemid';
+						' AND id1.parent_itemid=id2.itemid'.
+						' AND i.itemid=id1.itemid'.
+						' AND i.flags='.ZBX_FLAG_DISCOVERY_CREATED;
+			$db_rules = DBselect($sql);
+			while($rule = DBfetch($db_rules)){
+				$ruleids[$rule['parent_itemid']] = $rule['parent_itemid'];
+				$rule_map[$rule['itemid']] = $rule['parent_itemid'];
+			}
+
+			$sql = 'SELECT id.parent_itemid, id.itemid'.
+					' FROM item_discovery id, items i'.
+					' WHERE '.DBcondition('id.itemid', $itemids).
+						' AND i.itemid=id.itemid'.
+						' AND i.flags='.ZBX_FLAG_DISCOVERY_CHILD;
 			$db_rules = DBselect($sql);
 			while($rule = DBfetch($db_rules)){
 				$ruleids[$rule['parent_itemid']] = $rule['parent_itemid'];

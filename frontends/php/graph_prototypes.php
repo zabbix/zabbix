@@ -373,7 +373,8 @@ include_once('include/page_header.php');
 			if($graph['templateid'] != 0){
 				$real_hosts = get_realhosts_by_graphid($graph['templateid']);
 				$real_host = DBfetch($real_hosts);
-				$name[] = new CLink($real_host['host'], 'graphs.php?'.'hostid='.$real_host['hostid'], 'unknown');
+				$tpl_disc_ruleid = get_realrule_by_itemid_and_hostid($_REQUEST['parent_discoveryid'], $real_host['hostid']);
+				$name[] = new CLink($real_host['host'], 'graph_prototypes.php?parent_discoveryid='.$tpl_disc_ruleid, 'unknown');
 				$name[] = ':'.$graph['name'];
 			}
 			else{

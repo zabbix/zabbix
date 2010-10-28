@@ -414,13 +414,17 @@ switch($itemType) {
 			$description = array();
 			if($item['templateid']){
 				$template_host = get_realhost_by_itemid($item['templateid']);
-				$description[] = new CLink($template_host['host'],'?hostid='.$template_host['hostid'], 'unknown');
+
+				$tpl_disc_ruleid = get_realrule_by_itemid_and_hostid($_REQUEST['parent_discoveryid'], $template_host['hostid']);
+				$description[] = new CLink($template_host['host'],'?parent_discoveryid='.$tpl_disc_ruleid, 'unknown');
 				$description[] = ':';
 			}
 			$item['description_expanded'] = item_description($item);
-			$description[] = new CLink($item['description_expanded'], '?form=update&itemid='.$item['itemid'].'&parent_discoveryid='.$_REQUEST['parent_discoveryid']);
 
-			$status = new CCol(new CLink(item_status2str($item['status']), '?group_itemid='.$item['itemid'].'&parent_discoveryid='.$_REQUEST['parent_discoveryid'].
+			$disc_link = '&parent_discoveryid='.$item['discoveryRule']['itemid'];
+			$description[] = new CLink($item['description_expanded'], '?form=update&itemid='.$item['itemid'].$disc_link);
+
+			$status = new CCol(new CLink(item_status2str($item['status']), '?group_itemid='.$item['itemid'].$disc_link.
 					'&go='.($item['status']? 'activate':'disable'), item_status2style($item['status'])));
 
 
