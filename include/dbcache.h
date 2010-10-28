@@ -106,6 +106,7 @@ DC_ITEM
 	char		publickey_orig[ITEM_PUBLICKEY_LEN_MAX], *publickey;
 	char		privatekey_orig[ITEM_PRIVATEKEY_LEN_MAX], *privatekey;
 	char		password_orig[ITEM_PASSWORD_LEN_MAX], *password;
+	unsigned char	flags;
 };
 
 void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, AGENT_RESULT *value, zbx_timespec_t *ts,

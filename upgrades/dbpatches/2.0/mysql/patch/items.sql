@@ -4,6 +4,9 @@ ALTER TABLE items MODIFY itemid bigint unsigned NOT NULL,
 		  MODIFY templateid bigint unsigned NULL,
 		  MODIFY valuemapid bigint unsigned NULL,
 		  ADD lastns integer NULL,
+		  ADD flags integer DEFAULT '0' NOT NULL,
+		  ADD filter varchar(255) DEFAULT '' NOT NULL,
+		  ADD lastns integer NULL,
 		  ADD interfaceid bigint unsigned NULL;
 		  
 UPDATE items SET templateid=NULL WHERE templateid=0;

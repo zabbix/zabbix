@@ -6,6 +6,9 @@ ALTER TABLE ONLY items ALTER itemid DROP DEFAULT,
 		       ALTER valuemapid DROP DEFAULT,
 		       ALTER valuemapid DROP NOT NULL,
 		       ADD lastns integer NULL,
+		       ADD flags integer DEFAULT '0' NOT NULL,
+		       ADD filter varchar(255) DEFAULT '' NOT NULL,
+		       ADD lastns integer NULL,
 			   ADD interfaceid bigint NULL;
 UPDATE items SET templateid=NULL WHERE templateid=0;
 UPDATE items SET templateid=NULL WHERE NOT templateid IS NULL AND NOT templateid IN (SELECT itemid FROM items);

@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "sysinfo.h"
+#include "zbxjson.h"
 
 typedef struct net_stat_s {
 	zbx_uint64_t ibytes;
@@ -232,4 +233,58 @@ int	NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_
 		ret = SYSINFO_RET_FAIL;
 
 	return ret;
+}
+
+int	NET_IF_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+#if defined(HAVE_LIBPERFSTAT)
+	int			rc, i, ret = SYSINFO_RET_FAIL;
+	perfstat_id_t		ps_id;
+	perfstat_netinterface_t	*ps_netif = NULL;
+	struct zbx_json		j;
+
+	/* check how many perfstat_netinterface_t structures are available */
+	if (-1 == (rc = perfstat_netinterface(NULL, NULL, sizeof(perfstat_netinterface_t), 0)))
+		return ret;
+
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+
+	zbx_json_addarray(&j, cmd);
+
+	if (0 == rc)	/* No network interfaces found */
+	{
+		ret = SYSINFO_RET_OK;
+		goto end;
+	}
+
+	ps_netif = zbx_malloc(ps_netif, rc * sizeof(perfstat_netinterface_t));
+
+	/* set name to first interface */
+	strcpy(ps_id.name, FIRST_NETINTERFACE);	/* pseudo-name for the first network interface */
+
+	/* ask to get all the structures available in one call */
+	/* return code is number of structures returned */
+	if (-1 != (rc = perfstat_netinterface(&ps_id, ps_netif, sizeof(perfstat_netinterface_t), rc)))
+		ret = SYSINFO_RET_OK;
+
+	/* Collecting of the information for each of the interfaces */
+	for (i = 0; i < rc; i++)
+	{
+		zbx_json_addobject(&j, NULL);
+		zbx_json_addstring(&j, "{#IFNAME}", ps_netif[i].name, ZBX_JSON_TYPE_STRING);
+		zbx_json_close(&j);
+	}
+
+	zbx_free(ps_netif);
+end:
+	zbx_json_close(&j);
+
+	SET_STR_RESULT(result, strdup(j.buffer));
+
+	zbx_json_free(&j);
+
+	return ret;
+#else
+	return SYSINFO_RET_FAIL;
+#endif
 }

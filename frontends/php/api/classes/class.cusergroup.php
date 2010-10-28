@@ -363,8 +363,8 @@ class CUserGroup extends CZBXAPI{
 
 			foreach($usrgrps as $gnum => $usrgrp){
 				$mass_add = array();
-				if(isset($usrgrp['users'])){
-					$mass_add['userids'] = $usrgrp['users'];
+				if(isset($usrgrp['userids'])){
+					$mass_add['userids'] = $usrgrp['userids'];
 				}
 				if(isset($usrgrp['rights'])){
 					$mass_add['rights'] = $usrgrp['rights'];

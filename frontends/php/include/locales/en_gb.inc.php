@@ -1201,7 +1201,29 @@
 	'S_DELETE_HISTORY_SELECTED_ITEMS_Q'=>			'Delete history of selected items?',
 	'S_DELETE_SELECTED_ITEMS_Q'=>				'Delete selected items?',
 	'S_FORMULA'=>						'Formula',
+	'S_RULE'=>						'Rule',
 
+// host_discovery.php
+	'S_CONFIGURATION_OF_DISCOVERY_RULES_BIG' => 'CONFIGURATION OF DISCOVERY RULES',
+	'S_PROTOTYPES' => 'Prototypes',
+	
+// disc_prototypes.php
+	'S_CONFIGURATION_OF_ITEM_PROTOTYPES_BIG' => 'CONFIGURATION OF ITEM PROTOTYPES', 
+	'S_ITEM_PROTOTYPES_OF_BIG' => 'ITEM PROTOTYPES OF', 
+	'S_ADD_PROTOTYPE' => 'Add prototype', 
+	'S_SELECT_PROTOTYPE' => 'Select prototype', 
+	'S_CREATE_PROTOTYPE' => 'Create prototype', 
+	'S_ITEM_PROTOTYPE' => 'Item prototype', 
+	
+	'S_CONFIGURATION_OF_GRAPHS_PROTOTYPES_BIG' => 'CONFIGURATION OF GRAPH PROTOTYPES',
+	
+// trigger_prototypes.php
+	'S_CONFIGURATION_OF_TRIGGERS_PROTOTYPES_BIG' => 'CONFIGURATION OF TRIGGER PROTOTYPES',
+	'S_TRIGGER_PROTOTYPES_OF_BIG' => 'TRIGGER PROTOTYPES OF',
+
+// graph_prototypes.php
+	'S_GRAPH_PROTOTYPES_OF_BIG' => 'GRAPH PROTOTYPES OF',
+	
 //	events.php
 	'S_EVENT'=>				'Event',
 	'S_EVENT_DETAILS'=>			'Event details',
@@ -1580,6 +1602,7 @@
 	'S_NO_RESOURCES_DEFINED'=>		'No resources defined',
 	'S_SIMPLE_GRAPH'=>				'Simple graph',
 	'S_SIMPLE_GRAPHS'=>				'Simple graphs',
+	'S_HISTORY_AND_SIMPLE_GRAPHS'=> 'History and simple graphs',
 	'S_SIMPLE_GRAPH_BIG'=>			'SIMPLE GRAPH',
 	'S_GRAPH_NAME'=>				'Graph name',
 	'S_WIDTH'=>						'Width',
@@ -1755,7 +1778,6 @@
 	'S_DEPENDS_ON'=>			'Depends on',
 	'S_DEPENDENT'=>				'Dependent',
 	'S_URL'=>				'URL',
-	'S_URL_C'=>				'Url',
 	'S_INVALID_URL_PARAMS'=>		'Zabbix has received an incorrect request',
 	'S_CREATE_TRIGGER'=>			'Create Trigger',
 	'S_INSERT'=>				'Insert',
@@ -2063,6 +2085,8 @@
 	'S_EXPRESSION_UNNECESSARY_SYMBOLS_DETECTED_ERROR'=>'Unnecessary symbols detected',
 	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_AFTER_ERROR'=>'Not allowed symbols detected after element',
 	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_BEFORE_ERROR'=>'Not allowed symbols detected before element',
+	'S_ARE_YOU_SURE_YOU_WANT_TO_DELETE'=>'Are you sure you want to delete',
+	'S_MACROS_ES'=>'macro(s)',
 
 //	popup_link_tr.php
 	'S_NEW_INDICATORS'=>			'New indicators',
@@ -2497,7 +2521,13 @@
 	'S_OTHER_SMALL'=>			'other',
 
 // class.cookie.js
-	'S_MAX_COOKIE_SIZE_REACHED' => 'We are sorry, the maximum possible number of elements to remember has been reached.',
+	'S_MAX_COOKIE_SIZE_REACHED'=>		'We are sorry, the maximum possible number of elements to remember has been reached.',
+
+	'S_LAST_PAGE'=>			'Last',
+	'S_FIRST_PAGE'=>		'First',
+	'S_PREVIOUS_PAGE'=>		'Previous',
+	'S_NEXT_PAGE'=>			'Next',
+	'S_PREVIOUS_EVENTS'=>		'Previous',
 
 );
 ?>
