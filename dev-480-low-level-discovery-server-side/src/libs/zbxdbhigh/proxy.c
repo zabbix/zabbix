@@ -3344,7 +3344,9 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
 	DBfree_result(result);
 
 	if (0 == hostid)
-		goto error;
+		goto clean;
+
+	DBbegin();
 
 	error = strdup("");
 
@@ -3393,6 +3395,8 @@ error:
 		zbx_free(error_esc);
 	}
 
+	DBcommit();
+clean:
 	zbx_free(error);
 	zbx_free(db_error);
 	zbx_free(snmpv3_privpassphrase_esc);
