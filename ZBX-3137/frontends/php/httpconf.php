@@ -92,7 +92,6 @@ include_once('include/page_header.php');
 			'editable' => 1,
 		),
 		'hosts' => array(
-			'templated_hosts' => 1,
 			'editable' => 1,
 		),
 		'hostid' => get_request('hostid', null),
@@ -339,12 +338,29 @@ include_once('include/page_header.php');
 	$_REQUEST['steps'] = array_merge(get_request('steps',array())); /* reinitialize keys */
 
 
-	$form_button = null;
-	if(!isset($_REQUEST['form']) && ($_REQUEST['hostid'] > 0)){
+	if (!isset($_REQUEST['form'])){
+		//creating button "Create scenario"
 		$form_button = new CForm(null, 'get');
 		$form_button->addVar('hostid', $_REQUEST['hostid']);
-		$form_button->addItem(new CButton('form', S_CREATE_SCENARIO));
+		//if host is selected
+		if(!isset($_REQUEST['form']) && ($_REQUEST['hostid'] > 0)){
+			//allowing to press button
+			$create_scenario_button = new CButton('form', S_CREATE_SCENARIO);
+			$create_scenario_button->setEnabled('yes');
+		}
+		else{
+			//adding additional hint to button
+			$create_scenario_button = new CButton('form', S_CREATE_SCENARIO.' '.S_SELECT_HOST_FIRST);
+			//and disabling it
+			$create_scenario_button->setEnabled('no');
+		}
+		$form_button->addItem($create_scenario_button);
 	}
+	else {
+		$form_button = null;
+	}
+
+
 
 	$http_wdgt = new CWidget();
 	$http_wdgt->addPageHeader(S_CONFIGURATION_OF_WEB_MONITORING_BIG, $form_button);
