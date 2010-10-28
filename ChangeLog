@@ -20,6 +20,7 @@ Changes for 1.9.0
 
 Changes for 1.8.4rc2
 
+ - [ZBX-1362] optimized alert performance (KB)
  - [ZBX-2852] fixed map not updating in slideshow (Vedmak)
  - [ZBX-1346] update example agent daemon configuration file for Windows with parameters from Zabbix manual (Richlv)
  - [ZBX-2984] fixed incorrect trigger line in graphs. For line drawing was used axis from first item not trigger item (Vedmak)
