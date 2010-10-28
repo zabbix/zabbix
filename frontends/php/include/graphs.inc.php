@@ -777,7 +777,8 @@
 				}
 			}
 			else{
-				delete_graph($db_graph['graphid']);
+				DBexecute('UPDATE graphs SET templateid=NULL WHERE graphid='.$db_graph['graphid']);
+				CGraph::delete($db_graph['graphid']);
 			}
 		}
 	}

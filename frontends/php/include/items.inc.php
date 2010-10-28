@@ -767,7 +767,10 @@
 				}
 			}
 			else{
-				delete_item($db_item["itemid"]);
+				if(!in_array($db_item['flags'], array(ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_CHILD))){
+					DBexecute('UPDATE items SET templateid=NULL WHERE itemid='.$db_item["itemid"]);
+					CItem::delete($db_item["itemid"]);
+				}
 			}
 		}
 	}

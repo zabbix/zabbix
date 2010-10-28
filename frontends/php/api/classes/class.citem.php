@@ -1000,7 +1000,7 @@ COpt::memoryPick();
 				}
 			} while(!empty($parent_itemids));
 
-// delete graphs
+// delete graphs, leave if graph still have item
 			$del_graphs = array();
 			$sql = 'SELECT gi.graphid' .
 					' FROM graphs_items gi' .
@@ -1041,9 +1041,31 @@ COpt::memoryPick();
 			}
 // ---
 
+// delete graphs
+			$del_graphs = array();
+			$sql = 'SELECT gi.graphid' .
+					' FROM graphs_items gi' .
+					' WHERE ' . DBcondition('gi.itemid', $itemids);
+			$db_graphs = DBselect($sql);
+			while($db_graph = DBfetch($db_graphs)){
+				$del_graphs[$db_graph['graphid']] = $db_graph['graphid'];
+			}
+			if(!empty($del_graphs))
+				DB::delete('graphs', $del_graphs);
+//--
+
+
+			$triggers = CTrigger::get(array(
+				'itemids' => $itemids,
+				'output' => API_OUTPUT_SHORTEN,
+				'nopermissions' => true,
+				'preservekeys' => true,
+			));
+			if(!empty($triggers))
+				DB::delete('triggers', zbx_objectValues($triggers, 'triggerid'));
+
 
 			$itemids_condition = DBcondition('itemid', $itemids);
-
 			DB::delete('screens_items', array(
 				DBcondition('resourceid', $itemids),
 				DBcondition('resourcetype', array(SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT)),

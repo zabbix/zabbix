@@ -1283,14 +1283,27 @@ COpt::memoryPick();
 			$options = array(
 				'triggerids' => $triggerids,
 				'filter' => array('flags' => null),
+				'output' => API_OUTPUT_EXTEND,
 				'editable' => 1,
 				'extendoutput' => 1,
 				'preservekeys' => 1
 			);
 			$del_triggers = self::get($options);
 			foreach($triggerids as $gnum => $triggerid){
+				if($del_triggers[$triggerid]['flags'] = ZBX_FLAG_DISCOVERY_CHILD)
+					$trigger_prototypes[$triggerid] = $triggerid;
+
 				if(!isset($del_triggers[$triggerid])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+				}
+			}
+
+			if(!empty($trigger_prototypes)){
+				$sql = 'SELECT triggerid FROM trigger_discovery WHERE '.
+						DBcondition('parent_triggerid', $trigger_prototypes);
+				$db_triggers = DBselect($sql);
+				while($trigger = DBfetch($db_triggers)){
+					$triggerids[] = $trigger['triggerid'];
 				}
 			}
 
