@@ -816,11 +816,12 @@ void	DBupdate_services(zbx_uint64_t triggerid, int status, int clock)
 
 /******************************************************************************
  *                                                                            *
- * Function: DBdelete_services_by_triggerid                                   *
+ * Function: DBdelete_services_by_triggerids                                  *
  *                                                                            *
  * Purpose: delete triggers from service                                      *
  *                                                                            *
- * Parameters: triggerid - trigger identificator from database                *
+ * Parameters: triggerids     - [IN] trigger identificators from database     *
+ *             triggerids_num - [IN] number of triggers                       *
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
@@ -829,8 +830,14 @@ void	DBupdate_services(zbx_uint64_t triggerid, int status, int clock)
  * Comments: !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_services_by_triggerid(zbx_uint64_t triggerid)
+static void	DBdelete_services_by_triggerids(zbx_uint64_t *triggerids, int triggerids_num)
 {
+	char	*sql = NULL;
+	int	sql_alloc = 256, sql_offset = 0;
+
+	if (0 == triggerids_num)
+		return;
+
 /*	-- CASCADE DELETE
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -886,9 +893,17 @@ static void	DBdelete_services_by_triggerid(zbx_uint64_t triggerid)
 
 	zbx_free(sql);
 */
-	DBexecute("delete from services"
-			" where triggerid=" ZBX_FS_UI64,
-			triggerid);
+	sql = zbx_malloc(sql, sql_alloc);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 32,
+			"delete from services"
+			" where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
+			"triggerid", triggerids, triggerids_num);
+
+	DBexecute("%s", sql);
+
+	zbx_free(sql);
 
 	DBupdate_services_status_all();
 }
@@ -948,8 +963,14 @@ static void	DBdelete_sysmaps_element(zbx_uint64_t selementid)
  * Comments: !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_sysmaps_elements(int elementtype, zbx_uint64_t elementid)
+static void	DBdelete_sysmaps_elements(int elementtype, zbx_uint64_t *elementids, int elementids_num)
 {
+	char	*sql = NULL;
+	int	sql_alloc = 256, sql_offset = 0;
+
+	if (0 == elementids_num)
+		return;
+
 /*	-- CASCADE DELETE
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -970,10 +991,19 @@ static void	DBdelete_sysmaps_elements(int elementtype, zbx_uint64_t elementid)
 	}
 	DBfree_result(result);
 */
-	DBexecute("delete from sysmaps_elements"
+	sql = zbx_malloc(sql, sql_alloc);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 64,
+			"delete from sysmaps_elements"
 			" where elementtype=%d"
-				" and elementid=" ZBX_FS_UI64,
-			elementtype, elementid);
+				" and",
+			elementtype);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
+			"elementid", elementids, elementids_num);
+
+	DBexecute("%s", sql);
+
+	zbx_free(sql);
 }
 
 /******************************************************************************
@@ -1012,11 +1042,12 @@ static void DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid
 
 /******************************************************************************
  *                                                                            *
- * Function: DBdelete_trigger                                                 *
+ * Function: DBdelete_triggers                                                *
  *                                                                            *
  * Purpose: delete trigger from database                                      *
  *                                                                            *
- * Parameters: triggerid - trigger identificator from database                *
+ * Parameters: triggerids     - [IN] trigger identificators from database     *
+ *             triggerids_num - [IN] number of triggers                       *
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
@@ -1025,17 +1056,47 @@ static void DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid
  * Comments: !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_trigger(zbx_uint64_t triggerid)
+static void	DBdelete_triggers(zbx_uint64_t **triggerids, int *triggerids_alloc, int *triggerids_num)
 {
-	char	*sql = NULL;
-	int	sql_offset = 0, sql_alloc = 256;
+	char		*sql = NULL;
+	int		sql_alloc = 256, sql_offset, num, i;
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	triggerid;
 
-	DBdelete_services_by_triggerid(triggerid);
-	DBdelete_sysmaps_elements(SYSMAP_ELEMENT_TYPE_TRIGGER, triggerid);
-	DBdelete_action_conditions(CONDITION_TYPE_TRIGGER, triggerid);
+	if (0 == *triggerids_num)
+		return;
 
 	sql = zbx_malloc(sql, sql_alloc);
 
+	do /* add child triggers (auto-created) */
+	{
+		num = *triggerids_num;
+		sql_offset = 0;
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 64,
+				"select triggerid"
+				" from trigger_discovery"
+				" where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
+				"parent_triggerid", *triggerids, *triggerids_num);
+
+		result = DBselect("%s", sql);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			ZBX_STR2UINT64(triggerid, row[0]);
+			uint64_array_add(triggerids, triggerids_alloc, triggerids_num, triggerid, 64);
+		}
+		DBfree_result(result);
+	} while (num != *triggerids_num);
+
+	DBdelete_services_by_triggerids(*triggerids, *triggerids_num);
+	DBdelete_sysmaps_elements(SYSMAP_ELEMENT_TYPE_TRIGGER, *triggerids, *triggerids_num);
+
+	for (i = 0; i < *triggerids_num; i++)
+		DBdelete_action_conditions(CONDITION_TYPE_TRIGGER, (*triggerids)[i]);
+
+	sql_offset = 0;
 #ifdef HAVE_ORACLE
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
 #endif
@@ -1057,11 +1118,15 @@ static void	DBdelete_trigger(zbx_uint64_t triggerid)
 			triggerid);
 */
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 92,
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 64,
 			"delete from events"
-			" where object=%d"
-				" and objectid=" ZBX_FS_UI64 ";\n",
-			EVENT_OBJECT_TRIGGER, triggerid);
+			" where source=%d"
+				" and object=%d"
+				" and",
+			EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
+			"objectid", *triggerids, *triggerids_num);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
 
 /*	-- CASCADE DELETE
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 92,
@@ -1070,10 +1135,12 @@ static void	DBdelete_trigger(zbx_uint64_t triggerid)
 			triggerid);
 */
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 92,
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 32,
 			"delete from triggers"
-			" where triggerid=" ZBX_FS_UI64 ";\n",
-			triggerid);
+			" where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
+			"triggerid", *triggerids, *triggerids_num);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
 
 #ifdef HAVE_ORACLE
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
@@ -1106,7 +1173,7 @@ static void	DBdelete_triggers_by_itemids(zbx_uint64_t *itemids, int itemids_num)
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	*triggerids = NULL, triggerid;
-	int		triggerids_alloc = 0, triggerids_num = 0, i;
+	int		triggerids_alloc = 0, triggerids_num = 0;
 	char		*sql = NULL;
 	int		sql_offset = 0, sql_alloc = 512;
 
@@ -1134,29 +1201,7 @@ static void	DBdelete_triggers_by_itemids(zbx_uint64_t *itemids, int itemids_num)
 	}
 	DBfree_result(result);
 
-	if (0 != triggerids_num)
-	{
-		/* add all inherited triggers */
-		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 64,
-				"select triggerid"
-				" from trigger_discovery"
-				" where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-				"parent_triggerid", triggerids, triggerids_num);
-
-		result = DBselect("%s", sql);
-
-		while (NULL != (row = DBfetch(result)))
-		{
-			ZBX_STR2UINT64(triggerid, row[0]);
-			uint64_array_add(&triggerids, &triggerids_alloc, &triggerids_num, triggerid, 64);
-		}
-		DBfree_result(result);
-	}
-
-	for (i = 0; i < triggerids_num; i++)
-		DBdelete_trigger(triggerids[i]);
+	DBdelete_triggers(&triggerids, &triggerids_alloc, &triggerids_num);
 
 	zbx_free(triggerids);
 	zbx_free(sql);
@@ -1248,7 +1293,7 @@ static void	DBdelete_graphs(zbx_uint64_t **graphids, int *graphids_alloc, int *g
 {
 	const char	*__function_name = "DBdelete_graphs";
 	char		*sql = NULL;
-	int		sql_alloc = 256, sql_offset;
+	int		sql_alloc = 256, sql_offset, num;
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	graphid;
@@ -1261,23 +1306,26 @@ static void	DBdelete_graphs(zbx_uint64_t **graphids, int *graphids_alloc, int *g
 
 	sql = zbx_malloc(sql, sql_alloc);
 
-	/* add all inherited graphs */
-	sql_offset = 0;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 64,
-			"select graphid"
-			" from graph_discovery"
-			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-			"parent_graphid", *graphids, *graphids_num);
-
-	result = DBselect("%s", sql);
-
-	while (NULL != (row = DBfetch(result)))
+	do /* add child graphs (auto-created) */
 	{
-		ZBX_STR2UINT64(graphid, row[0]);
-		uint64_array_add(graphids, graphids_alloc, graphids_num, graphid, 64);
-	}
-	DBfree_result(result);
+		num = *graphids_num;
+		sql_offset = 0;
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 64,
+				"select graphid"
+				" from graph_discovery"
+				" where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
+				"parent_graphid", *graphids, *graphids_num);
+
+		result = DBselect("%s", sql);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			ZBX_STR2UINT64(graphid, row[0]);
+			uint64_array_add(graphids, graphids_alloc, graphids_num, graphid, 64);
+		}
+		DBfree_result(result);
+	} while (num != *graphids_num);
 
 	sql_offset = 0;
 #ifdef HAVE_ORACLE
@@ -1341,7 +1389,7 @@ static void	DBdelete_items(zbx_uint64_t **itemids, int *itemids_alloc, int *item
 {
 	const char	*__function_name = "DBdelete_items";
 	char		*sql = NULL;
-	int		sql_alloc = 256, sql_offset;
+	int		sql_alloc = 256, sql_offset, num;
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	itemid;
@@ -1354,23 +1402,26 @@ static void	DBdelete_items(zbx_uint64_t **itemids, int *itemids_alloc, int *item
 
 	sql = zbx_malloc(sql, sql_alloc);
 
-	/* add all inherited items */
-	sql_offset = 0;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 64,
-			"select itemid"
-			" from item_discovery"
-			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-			"parent_itemid", *itemids, *itemids_num);
-
-	result = DBselect("%s", sql);
-
-	while (NULL != (row = DBfetch(result)))
+	do /* add child items (auto-created and prototypes) */
 	{
-		ZBX_STR2UINT64(itemid, row[0]);
-		uint64_array_add(itemids, itemids_alloc, itemids_num, itemid, 64);
-	}
-	DBfree_result(result);
+		num = *itemids_num;
+		sql_offset = 0;
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 64,
+				"select itemid"
+				" from item_discovery"
+				" where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
+				"parent_itemid", *itemids, *itemids_num);
+
+		result = DBselect("%s", sql);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			ZBX_STR2UINT64(itemid, row[0]);
+			uint64_array_add(itemids, itemids_alloc, itemids_num, itemid, 64);
+		}
+		DBfree_result(result);
+	} while (num != *itemids_num);
 
 	DBdelete_triggers_by_itemids(*itemids, *itemids_num);
 	DBdelete_history_by_itemids(*itemids, *itemids_num);
@@ -1747,7 +1798,8 @@ static void	DBdelete_template_triggers(zbx_uint64_t hostid, zbx_uint64_t templat
 	const char	*__function_name = "DBdelete_template_triggers";
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	triggerid;
+	zbx_uint64_t	*triggerids = NULL, triggerid;
+	int		triggerids_alloc = 0, triggerids_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1763,9 +1815,13 @@ static void	DBdelete_template_triggers(zbx_uint64_t hostid, zbx_uint64_t templat
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(triggerid, row[0]);
-		DBdelete_trigger(triggerid);
+		uint64_array_add(&triggerids, &triggerids_alloc, &triggerids_num, triggerid, 64);
 	}
 	DBfree_result(result);
+
+	DBdelete_triggers(&triggerids, &triggerids_alloc, &triggerids_num);
+
+	zbx_free(triggerids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -2484,8 +2540,8 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 						"publickey='%s',"
 						"privatekey='%s',"
 						"templateid=" ZBX_FS_UI64 ","
-						"flags='%s',"
-						"filter=%d"
+						"flags=%d,"
+						"filter='%s'"
 					" where itemid=" ZBX_FS_UI64 ";\n",
 					description_esc,
 					row[3],		/* type */
@@ -3317,7 +3373,7 @@ int	DBdelete_host(zbx_uint64_t hostid)
 	}
 
 	/* delete host from maps */
-	DBdelete_sysmaps_elements(SYSMAP_ELEMENT_TYPE_HOST, hostid);
+	DBdelete_sysmaps_elements(SYSMAP_ELEMENT_TYPE_HOST, &hostid, 1);
 
 	/* delete action conditions */
 	DBdelete_action_conditions(CONDITION_TYPE_HOST, hostid);
