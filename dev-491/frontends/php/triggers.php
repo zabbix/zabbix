@@ -382,7 +382,7 @@ include_once('include/page_header.php');
 		$triggerids = array();
 		$options = array(
 			'triggerids' => $_REQUEST['g_triggerid'],
-			'editable'=>1, 
+			'editable'=>1,
 			'select_hosts' => API_OUTPUT_EXTEND,
 			'output'=>API_OUTPUT_EXTEND,
 			'expandDescription' => 1
@@ -534,6 +534,7 @@ include_once('include/page_header.php');
 			'select_items' => API_OUTPUT_EXTEND,
 			'select_functions' => API_OUTPUT_EXTEND,
 			'select_dependencies' => API_OUTPUT_EXTEND,
+			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 		);
 
 		$triggers = CTrigger::get($options);
@@ -562,7 +563,15 @@ include_once('include/page_header.php');
 				}
 			}
 
-			$description[] = new CLink($trigger['description'], 'triggers.php?form=update&triggerid='.$triggerid);
+			if(!empty($trigger['discoveryRule'])){
+				$description[] = new CLink($trigger['discoveryRule']['description'], 'trigger_prototypes.php?parent_discoveryid='.
+					$trigger['discoveryRule']['itemid'],'discoveryName');
+				$description[] = ':'.$trigger['description'];
+			}
+			else{
+				$description[] = new CLink($trigger['description'], 'triggers.php?form=update&triggerid='.$triggerid);
+			}
+
 
 //add dependencies {
 			$deps = $trigger['dependencies'];
@@ -628,8 +637,11 @@ include_once('include/page_header.php');
 				}
 			}
 
+			$cb = new CCheckBox('g_triggerid['.$triggerid.']', NULL, NULL, $triggerid);
+			$cb->setEnabled(empty($trigger['discoveryRule']));
+
 			$table->addRow(array(
-				new CCheckBox('g_triggerid['.$triggerid.']', NULL, NULL, $triggerid),
+				$cb,
 				$priority,
 				$status,
 				$hosts,

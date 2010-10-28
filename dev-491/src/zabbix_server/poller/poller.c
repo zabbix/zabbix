@@ -25,6 +25,7 @@
 #include "sysinfo.h"
 #include "daemon.h"
 #include "zbxserver.h"
+#include "proxy.h"
 
 #include "poller.h"
 
@@ -578,11 +579,28 @@ static int	get_values()
 		res = get_value(&items[i], &agent);
 		zbx_timespec(&ts);
 
+		switch (res)
+		{
+			case SUCCEED:
+			case NOTSUPPORTED:
+			case AGENT_ERROR:
+				activate_host(&items[i], &ts);
+				break;
+			case NETWORK_ERROR:
+				deactivate_host(&items[i], &ts, agent.msg);
+				break;
+			default:
+				zbx_error("Unknown response code returned.");
+				assert(0 == 1);
+		}
+
 		if (res == SUCCEED)
 		{
-			activate_host(&items[i], &ts);
-
-			dc_add_history(items[i].itemid, items[i].value_type, &agent, &ts, 0, NULL, 0, 0, 0, 0);
+			/* check for low-level discovery (lld) item */
+			if (0 != (ZBX_FLAG_DISCOVERY & items[i].flags))
+				DBlld_process_discovery_rule(items[i].itemid, agent.text);
+			else
+				dc_add_history(items[i].itemid, items[i].value_type, &agent, &ts, 0, NULL, 0, 0, 0, 0);
 
 			DCrequeue_reachable_item(items[i].itemid, ITEM_STATUS_ACTIVE, ts.sec);
 		}
@@ -596,15 +614,11 @@ static int	get_values()
 						items[i].host.host, items[i].key_orig);
 			}
 
-			activate_host(&items[i], &ts);
-
 			DCadd_nextcheck(items[i].itemid, ts.sec, agent.msg);	/* update error & status field in items table */
 			DCrequeue_reachable_item(items[i].itemid, ITEM_STATUS_NOTSUPPORTED, ts.sec);
 		}
 		else if (res == NETWORK_ERROR)
 		{
-			deactivate_host(&items[i], &ts, agent.msg);
-
 			switch (items[i].type) {
 			case ITEM_TYPE_ZABBIX:
 				uint64_array_add(&ids, &ids_alloc, &ids_num, items[i].host.hostid, 1);
@@ -622,11 +636,6 @@ static int	get_values()
 			}
 
 			DCrequeue_unreachable_item(items[i].itemid);
-		}
-		else
-		{
-			zbx_error("Unknown response code returned.");
-			assert(0 == 1);
 		}
 
 		free_result(&agent);

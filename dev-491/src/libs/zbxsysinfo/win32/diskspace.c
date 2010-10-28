@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "sysinfo.h"
+#include "zbxjson.h"
 
 int	VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
@@ -56,6 +57,57 @@ int	VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 				(double)(__int64)totalBytes.QuadPart)
 	else
 		return SYSINFO_RET_FAIL;
+
+	return SYSINFO_RET_OK;
+}
+
+int	VFS_FS_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	LPTSTR		buffer = NULL, p;
+	char		*utf8;
+	DWORD		dwSize;
+	size_t		sz;
+	struct zbx_json	j;
+
+	assert(result);
+
+	/* Make an initial call to GetLogicalDriveStrings to
+	   get the necessary size into the dwSize variable */
+	if (0 == (dwSize = GetLogicalDriveStrings(0, buffer)))
+		return SYSINFO_RET_FAIL;
+
+	buffer = (LPTSTR)zbx_malloc(buffer, (dwSize + 1) * sizeof(TCHAR));
+
+	/* Make a second call to GetLogicalDriveStrings to get
+	   the actual data we require */
+	if (0 == (dwSize = GetLogicalDriveStrings(dwSize, buffer)))
+	{
+		zbx_free(buffer);
+		return SYSINFO_RET_FAIL;
+	}
+
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+
+	zbx_json_addarray(&j, cmd);
+
+	for (p = buffer, sz = wcslen(p); sz > 0; p += sz + 1, sz = wcslen(p))
+	{
+		utf8 = zbx_unicode_to_utf8(p);
+
+		zbx_json_addobject(&j, NULL);
+		zbx_json_addstring(&j, "{#FSNAME}", utf8, ZBX_JSON_TYPE_STRING);
+		zbx_json_close(&j);
+
+		zbx_free(utf8);
+	}
+
+	zbx_free(buffer);
+
+	zbx_json_close(&j);
+
+	SET_STR_RESULT(result, strdup(j.buffer));
+
+	zbx_json_free(&j);
 
 	return SYSINFO_RET_OK;
 }

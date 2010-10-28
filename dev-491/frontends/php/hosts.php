@@ -192,6 +192,7 @@ include_once('include/page_header.php');
 		$params = array(
 			'hostids' => $hostids,
 			'preservekeys' => 1,
+			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 			'output' => API_OUTPUT_EXTEND
 		);
 		$graphs = CGraph::get($params);
@@ -228,6 +229,7 @@ include_once('include/page_header.php');
 // SELECT ITEMS
 		$params = array(
 			'hostids' => $hostids,
+			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 			'preservekeys' => 1,
 			'output' => API_OUTPUT_EXTEND
 		);
@@ -235,7 +237,6 @@ include_once('include/page_header.php');
 
 // SELECT APPLICATIONS
 		$itemids = zbx_objectValues($items, 'itemid');
-//sdii($itemids);
 		$params = array(
 			'itemids' => $itemids,
 			'preservekeys' => 1,
@@ -248,6 +249,7 @@ include_once('include/page_header.php');
 		$params = array(
 			'hostids' => $hostids,
 			'output' => API_OUTPUT_EXTEND,
+			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 			'preservekeys' => 1,
 			'select_dependencies' => API_OUTPUT_EXTEND,
 			'expandData' => 1
@@ -772,6 +774,7 @@ include_once('include/page_header.php');
 			S_ITEMS,
 			S_TRIGGERS,
 			S_GRAPHS,
+			S_DISCOVERY,
 			make_sorting_header(S_DNS, 'dns'),
 			make_sorting_header(S_IP, 'ip'),
 			S_PORT,
@@ -820,6 +823,7 @@ include_once('include/page_header.php');
 			'select_triggers' => API_OUTPUT_COUNT,
 			'select_graphs' => API_OUTPUT_COUNT,
 			'select_applications' => API_OUTPUT_COUNT,
+			'select_discoveries' => API_OUTPUT_COUNT,
 			'nopermissions' => 1,
 		);
 		$hosts = CHost::get($options);
@@ -851,6 +855,8 @@ include_once('include/page_header.php');
 				' ('.$host['triggers'].')');
 			$graphs = array(new CLink(S_GRAPHS, 'graphs.php?groupid='.$_REQUEST['groupid'].'&hostid='.$host['hostid']),
 				' ('.$host['graphs'].')');
+			$discoveries = array(new CLink(S_DISCOVERY, 'host_discovery.php?&hostid='.$host['hostid']),
+				' ('.$host['discoveries'].')');
 
 			$description = array();
 			if($host['proxy_hostid']){
@@ -975,6 +981,7 @@ include_once('include/page_header.php');
 				$items,
 				$triggers,
 				$graphs,
+				$discoveries,
 				$dns,
 				$ip,
 				empty($host['port']) ? '-' : $host['port'],

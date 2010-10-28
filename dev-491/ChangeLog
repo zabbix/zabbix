@@ -1,5 +1,6 @@
-Changes for 1.9
+Changes for 1.9.0
 
+ - [DEV-477] added support of low-level discovery of file systems, network interfaces and SNMP OID's (Sasha,Vedmak) 
  - [ZBX-3097] fixed nanosecond related bug in messaging (KB)
  - [DEV-490] made graph legend optional (Aly)
  - [DEV-483] added templated screens (Aly)
@@ -15,6 +16,14 @@ Changes for 1.9
 
 Changes for 1.8.4rc2
 
+ - [ZBX-1346] update example agent daemon configuration file for Windows with parameters from Zabbix manual (Richlv)
+ - [ZBX-2984] fixed incorrect trigger line in graphs. For line drawing was used axis from first item not trigger item (Vedmak)
+ - [ZBX-3059] different titles for popup menu depending on data type (KB)
+ - [ZBX-2861] fixed error when adding users to usergroups (KB)
+ - [ZBX-1492] added confirmation dialog when deleting macros (KB)
+ - [ZBX-3135] add an example for using standard input in zabbix_sender manpage (Richlv)
+ - [ZBX-2616] bundled DejaVu font upgraded from 2.31 to 2.32 (Richlv)
+ - [ZBX-2630] fixed ability to translate various strings in the frontend depending on their context (Richlv)
  - [ZBX-3091] fixed error when update proxy (Vedmak)
  - [ZBX-3042] fixed submitParent field error (KB)
  - [ZBX-1038] fixed last(), prev(), diff(), change(), and abschange() not working properly with long textual values (asaveljevs)

@@ -112,6 +112,7 @@ include_once('include/page_header.php');
 
 		$options = array(
 			'webitems' => 1,
+			'filter' => array('flags' => null),
 			'itemids' => zbx_objectValues($items, 'itemid'),
 			'nodeids' => get_current_nodeid(true),
 			'output' => API_OUTPUT_SHORTEN,

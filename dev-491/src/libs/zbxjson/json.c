@@ -536,6 +536,50 @@ const char	*zbx_json_next_value(struct zbx_json_parse *jp, const char *p, char *
 	return p;
 }
 
+static size_t	zbx_json_string_size(const char *p)
+{
+	int	state = 0; /* 0 - init; 1 - inside string */
+	size_t	sz = 0;
+
+	if ('"' != *p)
+		return (size_t)(-1);
+
+	while (*p != '\0')	/* this should never happen */
+	{
+		if (*p == '"')
+		{
+			if (state == 1)
+				return sz;
+			state = 1;
+		}
+		else if (state == 1)
+		{
+			if (*p == '\\')
+			{
+				switch (*++p)
+				{
+					case 'u': p += 2;
+					case '"':
+					case '\\':
+					case '/':
+					case 'b':
+					case 'f':
+					case 'n':
+					case 'r':
+					case 't': sz++; break;
+					default:
+						THIS_SHOULD_NEVER_HAPPEN;
+				}
+			}
+			else
+				sz++;
+		}
+		p++;
+	}
+
+	return (size_t)(-1);
+}
+
 static const char	*zbx_json_decodestring(const char *p, char *string, size_t len)
 {
 	int	state = 0; /* 0 - init; 1 - inside string */
@@ -545,54 +589,96 @@ static const char	*zbx_json_decodestring(const char *p, char *string, size_t len
 	if ('"' != *p)
 		return NULL;
 
-	while (*p != '\0') { /* this should never happen */
-		if (*p == '"') {
-			if (state == 1) {
+	while (*p != '\0')	/* this should never happen */
+	{
+		if (*p == '"')
+		{
+			if (state == 1)
+			{
 				*o = '\0';
 				return ++p;
 			}
 			state = 1;
-		} else if (state == 1 && (size_t)(o - string) < len - 1/*'\0'*/) {
-			if (*p == '\\') {
-				switch (*++p) {
-				case '"':
-				case '\\':
-				case '/': *o++ = *p; break;
-				case 'b': *o++ = '\b'; break;
-				case 'f': *o++ = '\f'; break;
-				case 'n': *o++ = '\n'; break;
-				case 'r': *o++ = '\r'; break;
-				case 't': *o++ = '\t'; break;
-				case 'u':
-					p += 2; /* "00" */
-					c = zbx_hex2num( *p++ ) << 4;
-					c += zbx_hex2num( *p );
-					*o++ = (char)c;
-					break;
-				default:
-					/* this should never happen */;
+		}
+		else if (state == 1 && (size_t)(o - string) < len - 1/*'\0'*/)
+		{
+			if (*p == '\\')
+			{
+				switch (*++p)
+				{
+					case '"':
+					case '\\':
+					case '/': *o++ = *p; break;
+					case 'b': *o++ = '\b'; break;
+					case 'f': *o++ = '\f'; break;
+					case 'n': *o++ = '\n'; break;
+					case 'r': *o++ = '\r'; break;
+					case 't': *o++ = '\t'; break;
+					case 'u':
+						p += 2; /* "00" */
+						c = zbx_hex2num(*p++) << 4;
+						c += zbx_hex2num(*p);
+						*o++ = (char)c;
+						break;
+					default:
+						THIS_SHOULD_NEVER_HAPPEN;
 				}
-			} else
+			}
+			else
 				*o++ = *p;
 		}
 		p++;
 	}
+
 	return NULL;
+}
+
+static size_t	zbx_json_int_size(const char *p)
+{
+	size_t	sz = 0;
+
+	while (*p != '\0')	/* this should never happen */
+	{
+		if ((*p < '0' || *p > '9') && *p != '-')
+			return sz;
+		else
+			sz++;
+		p++;
+	}
+
+	return (size_t)(-1);
 }
 
 static const char	*zbx_json_decodeint(const char *p, char *string, size_t len)
 {
 	char	*o = string;
 
-	while (*p != '\0') { /* this should never happen */
-		if ((*p < '0' || *p > '9') && *p != '-') {
+	while (*p != '\0')	/* this should never happen */
+	{
+		if ((*p < '0' || *p > '9') && *p != '-')
+		{
 			*o = '\0';
 			return p;
-		} else if ((size_t)(o - string) < len - 1/*'\0'*/)
+		}
+		else if ((size_t)(o - string) < len - 1/*'\0'*/)
 			*o++ = *p;
 		p++;
 	}
+
 	return NULL;
+}
+
+static size_t	zbx_json_value_size(const char *p, zbx_json_type_t jt)
+{
+	switch (jt)
+	{
+		case ZBX_JSON_TYPE_STRING:
+			return zbx_json_string_size(p);
+		case ZBX_JSON_TYPE_INT:
+			return zbx_json_int_size(p);
+		default:
+			return (size_t)(-1);
+	}
 }
 
 const char	*zbx_json_decodevalue(const char *p, char *string, size_t len)
@@ -608,6 +694,33 @@ const char	*zbx_json_decodevalue(const char *p, char *string, size_t len)
 		return zbx_json_decodeint(p, string, len);
 	default:
 		return NULL;
+	}
+}
+
+static const char	*zbx_json_decodevalue_dyn(const char *p, char **string, size_t *string_alloc)
+{
+	zbx_json_type_t	jt;
+	size_t		sz;
+
+	jt = zbx_json_type(p);
+
+	if ((size_t)(-1) == (sz = zbx_json_value_size(p, jt)))
+		return NULL;
+
+	if (*string_alloc <= sz)
+	{
+		*string_alloc = sz + 1;
+		*string = zbx_realloc(*string, *string_alloc);
+	}
+
+	switch (jt)
+	{
+		case ZBX_JSON_TYPE_STRING:
+			return zbx_json_decodestring(p, *string, *string_alloc);
+		case ZBX_JSON_TYPE_INT:
+			return zbx_json_decodeint(p, *string, *string_alloc);
+		default:
+			return NULL;
 	}
 }
 
@@ -673,11 +786,9 @@ const char	*zbx_json_pair_by_name(struct zbx_json_parse *jp, const char *name)
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value: pointer to value                                             *
- *        {"name":["a","b",...]}                                              *
- *                ^ - returned pointer                                        *
+ * Return value: SUCCEED - if value successfully parsed, FAIL - otherwise     *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -690,6 +801,34 @@ int	zbx_json_value_by_name(struct zbx_json_parse *jp, const char *name, char *st
 		return FAIL;
 
 	if (NULL == zbx_json_decodevalue(p, string, len))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_json_value_by_name_dyn                                       *
+ *                                                                            *
+ * Purpose: return value by pair name                                         *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: SUCCEED - if value successfully parsed, FAIL - otherwise     *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_json_value_by_name_dyn(struct zbx_json_parse *jp, const char *name, char **string, size_t *string_alloc)
+{
+	const char	*p = NULL;
+
+	if (NULL == (p = zbx_json_pair_by_name(jp, name)))
+		return FAIL;
+
+	if (NULL == zbx_json_decodevalue_dyn(p, string, string_alloc))
 		return FAIL;
 
 	return SUCCEED;
