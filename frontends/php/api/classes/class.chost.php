@@ -174,6 +174,7 @@ class CHost extends CZBXAPI{
 
 		if(is_array($options['output'])){
 			unset($sql_parts['select']['hosts']);
+			$sql_parts['select']['hostid'] = ' h.hostid';
 			foreach($options['output'] as $key => $field){
 				$sql_parts['select'][$field] = ' h.'.$field;
 			}
