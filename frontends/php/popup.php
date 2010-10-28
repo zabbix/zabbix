@@ -224,6 +224,7 @@ include_once('include/page_header.php');
 
 	$host_status = null;
 	$templated = null;
+
 	if($real_hosts){
 		$templated = 0;
 	}
@@ -308,13 +309,16 @@ include_once('include/page_header.php');
 		$options['hosts']['monitored_hosts'] = true;
 	}
 	else if($real_hosts){
-		$options['groups']['real_hosts'] = true;
+		$options['groups']['real_hosts'] = true;		
 	}
 	else if($templated_hosts){
 		$options['hosts']['templated_hosts'] = true;
 
 // TODO: inconsistancy in "templated_hosts" parameter for host and host group
 //		$options['groups']['templated_hosts'] = true;
+	}
+	else{
+		$options['hosts']['templated_hosts'] = true;
 	}
 
 	if(!is_null($writeonly)){
@@ -830,8 +834,10 @@ include_once('include/page_header.php');
 
 		if(!is_null($normal_only)) $options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
 		if(!is_null($writeonly)) $options['editable'] = 1;
-		if(!is_null($templated)) $options['templated'] = $templated;
+		if(!is_null($templated) && $templated == 1) $options['templated'] = $templated;
 		if(!is_null($value_types)) $options['filter']['value_type'] = $value_types;
+		//host can't have id=0. This option made hosts dissapear from list
+		if ($options['hostids'] == 0) unset($options['hostids']);
 
 		$items = CItem::get($options);
 		order_result($items, 'description', ZBX_SORT_UP);
