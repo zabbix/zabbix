@@ -2431,7 +2431,8 @@ return $caption;
 				}
 			}
 			else{
-				delete_trigger($trigger['triggerid']);
+				DBexecute('UPDATE triggers SET templateid=NULL WHERE triggerid='.$trigger['triggerid']);
+				CTrigger::delete($trigger['triggerid']);
 			}
 		}
 	return TRUE;

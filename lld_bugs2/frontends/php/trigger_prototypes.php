@@ -34,7 +34,7 @@ include_once('include/page_header.php');
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'parent_discoveryid'=>	array(T_ZBX_INT, O_MAND,	 NULL,	DB_ID,	NULL),
+		'parent_discoveryid'=>	array(T_ZBX_INT, O_MAND,	 P_SYS,	DB_ID,	NULL),
 
 		'triggerid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,'(isset({form})&&({form}=="update"))'),
 

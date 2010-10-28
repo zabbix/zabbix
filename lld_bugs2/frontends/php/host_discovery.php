@@ -42,7 +42,7 @@ switch($itemType) {
 }
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'hostid'=>			array(T_ZBX_INT, O_OPT,  null,	DB_ID,			null),
+		'hostid'=>			array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,			null),
 		'itemid'=>			array(T_ZBX_INT, O_NO,	 P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))'),
 
 		'description'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),
@@ -213,7 +213,7 @@ switch($itemType) {
 		$ifm =  get_request('item_filter_macro');
 		$ifv =  get_request('item_filter_value');
 		$filter = $ifm.':'.$ifv;
-		
+
 		$item = array(
 			'description' => get_request('description'),
 			'key_' => get_request('key'),
@@ -615,7 +615,7 @@ switch($itemType) {
 		$item_filter_macro = $item_filter_value = '';
 		if(!empty($item_filter))
 			list($item_filter_macro, $item_filter_value) = explode(':', $item_filter);
-			
+
 		$frmItem->addRow(S_FILTER, array(
 			S_MACRO, SPACE, new CTextBox('item_filter_macro',$item_filter_macro,20),
 			S_REGEXP, SPACE, new CTextBox('item_filter_value',$item_filter_value,40)
