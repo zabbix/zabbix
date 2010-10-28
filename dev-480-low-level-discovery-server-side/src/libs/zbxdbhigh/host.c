@@ -353,11 +353,12 @@ static int	validate_host(zbx_uint64_t hostid, zbx_uint64_t templateid,
 			chd_gitems_alloc = 0, chd_gitems_num = 0,
 			res = SUCCEED;
 	zbx_uint64_t	graphid;
+	unsigned char	t_flags, h_flags;
 
 	sql = zbx_malloc(sql, sql_alloc);
 
 	tresult = DBselect(
-			"select distinct g.graphid,g.name"
+			"select distinct g.graphid,g.name,g.flags"
 			" from graphs g,graphs_items gi,items i"
 			" where g.graphid=gi.graphid"
 				" and gi.itemid=i.itemid"
@@ -367,6 +368,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_uint64_t templateid,
 	while (SUCCEED == res && NULL != (trow = DBfetch(tresult)))
 	{
 		ZBX_STR2UINT64(graphid, trow[0]);
+		t_flags = (unsigned char)atoi(trow[2]);
 
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
@@ -384,7 +386,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_uint64_t templateid,
 		name_esc = DBdyn_escape_string(trow[1]);
 
 		hresult = DBselect(
-				"select distinct g.graphid"
+				"select distinct g.graphid,g.flags"
 				" from graphs g,graphs_items gi,items i"
 				" where g.graphid=gi.graphid"
 					" and gi.itemid=i.itemid"
@@ -399,6 +401,16 @@ static int	validate_host(zbx_uint64_t hostid, zbx_uint64_t templateid,
 		while (NULL != (hrow = DBfetch(hresult)))
 		{
 			ZBX_STR2UINT64(graphid, hrow[0]);
+			h_flags = (unsigned char)atoi(hrow[1]);
+
+			if (t_flags != h_flags)
+			{
+				res = FAIL;
+				zbx_snprintf(error, max_error_len,
+						"Graph prototype and real graph [%s] have the same name",
+						trow[1]);
+				break;
+			}
 
 			sql_offset = 0;
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
@@ -427,6 +439,27 @@ static int	validate_host(zbx_uint64_t hostid, zbx_uint64_t templateid,
 		DBfree_result(hresult);
 	}
 	DBfree_result(tresult);
+
+	if (SUCCEED == res)
+	{
+		tresult = DBselect(
+				"select i.key_"
+				" from items i,items t"
+				" where i.key_=t.key_"
+					" and i.flags<>t.flags"
+					" and i.hostid=" ZBX_FS_UI64
+					" and t.hostid=" ZBX_FS_UI64,
+				hostid, templateid);
+
+		if (NULL != (trow = DBfetch(tresult)))
+		{
+			res = FAIL;
+			zbx_snprintf(error, max_error_len,
+					"Item prototype and real item [%s] have the same key",
+					trow[0]);
+		}
+		DBfree_result(tresult);
+	}
 
 	zbx_free(sql);
 	zbx_free(gitems);
