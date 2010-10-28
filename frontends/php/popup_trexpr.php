@@ -426,10 +426,12 @@ if(form){
 	if($parent_discoveryid)
 		$form->addVar('parent_discoveryid', $parent_discoveryid);
 
+	$normal_only = ($parent_discoveryid) ? '&normal_only=1' : '';
+
 	$row = array(
 		new CTextBox('description', $description, 50, 'yes'),
 		new CButton('select', S_SELECT, "return PopUp('popup.php?dstfrm=".$form->GetName().
-				"&dstfld1=itemid&dstfld2=description&submitParent=1&".
+				"&dstfld1=itemid&dstfld2=description&submitParent=1&".$normal_only.
 				"srctbl=items&srcfld1=itemid&srcfld2=description',0,0,'zbx_popup_item');"),
 	);
 	if($parent_discoveryid){
