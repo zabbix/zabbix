@@ -2583,7 +2583,7 @@ static void	DCadd_history_log(zbx_uint64_t itemid, char *value_orig, zbx_timespe
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -2592,9 +2592,8 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char
 		AGENT_RESULT *value, zbx_timespec_t *ts, int timestamp, char *source,
 		int severity, int logeventid, int lastlogsize, int mtime)
 {
-
 	/* check for low-level discovery (lld) item */
-	if (0 != (zbx_process & ZBX_PROCESS_SERVER) && 0 != (ZBX_FLAG_DISCOVERY & flags))
+	if (0 != (ZBX_PROCESS_SERVER & zbx_process) && 0 != (ZBX_FLAG_DISCOVERY & flags))
 		DBlld_process_discovery_rule(itemid, value->text);
 
 	switch (value_type)
