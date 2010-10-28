@@ -3261,6 +3261,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 				"',700,400,'graph_item_form');");
 		}
 
+		$normal_only = $parent_discoveryid ? '&normal_only=1' : '';
 		$frmGraph->addRow(S_ITEMS, array(
 			$items_table,
 			new CButton('add_item',S_ADD,
@@ -3268,6 +3269,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 				url_param($only_hostid, false, 'only_hostid').
 				url_param($monitored_hosts, false, 'monitored_hosts').
 				url_param($graphtype, false, 'graphtype').
+				$normal_only.
 				"',700,400,'graph_item_form');"),
 			$addProtoBtn,
 			$dedlete_button

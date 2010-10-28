@@ -455,7 +455,9 @@ include_once('include/page_header.php');
 				else{
 					$real_hosts = $realHosts[$triggerid];
 					$real_host = reset($real_hosts);
-					$description[] = new CLink($real_host['host'], 'trigger_prototypes.php?', 'unknown');
+					$tpl_disc_ruleid = get_realrule_by_itemid_and_hostid($_REQUEST['parent_discoveryid'], $real_host['hostid']);
+
+					$description[] = new CLink($real_host['host'], 'trigger_prototypes.php?parent_discoveryid='.$tpl_disc_ruleid, 'unknown');
 					$description[] = ':';
 				}
 			}
