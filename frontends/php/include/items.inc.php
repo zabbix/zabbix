@@ -712,7 +712,7 @@
 					'privatekey'		=> array('template' => 1),
 					'params'		=> array('template' => 1),
 					'delay_flex'		=> array('template' => 1),
-					'filter'		=> array(),
+					'filter'		=> array('template' => 1),
 					'ipmi_sensor'		=> array());
 
 		foreach($restore_rules as $var_name => $info){
