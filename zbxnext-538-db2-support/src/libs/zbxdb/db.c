@@ -52,6 +52,20 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	txn_init = 1;
 
 #if defined(HAVE_IBM_DB2)
+	char	*connect = NULL;
+
+	connect = strdup("PROTOCOL=TCPIP;");
+	if (NULL != dbname && '\0' != *dbname)
+		connect = zbx_strdcatf(connect, "DATABASE=%s;", dbname);
+	if (NULL != host && '\0' != *host)
+		connect = zbx_strdcatf(connect, "HOSTNAME=%s;", host);
+	if (0 != port)
+		connect = zbx_strdcatf(connect, "PORT=%d;", port);
+	if (NULL != user && '\0' != *user)
+		connect = zbx_strdcatf(connect, "UID=%s;", user);
+	if (NULL != password && '\0' != *password)
+		connect = zbx_strdcatf(connect, "PWD=%s;", password);
+
 	memset(&ibm_db2, 0, sizeof(ibm_db2));
 
 	/* allocate an environment handle */
@@ -67,8 +81,8 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		ret = ZBX_DB_FAIL;
 
 	/* connect to the database */
-	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLConnect(ibm_db2.hdbc, (SQLCHAR *)dbname, SQL_NTS,
-								(SQLCHAR *)user, SQL_NTS, (SQLCHAR *)password, SQL_NTS)))
+	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLDriverConnect(ibm_db2.hdbc, NULL, connect, SQL_NTS,
+								NULL, 0, NULL, SQL_DRIVER_NOPROMPT)))
 		ret = ZBX_DB_FAIL;
 
 	/* set autocommit on */
@@ -89,6 +103,8 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 		zbx_db_close();
 	}
+
+	zbx_free(connect);
 #elif defined(HAVE_MYSQL)
 	conn = mysql_init(NULL);
 
@@ -144,7 +160,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	/* connection string format: [//]host[:port][/service name] */
 
-	if (host && *host)
+	if (NULL != host && '\0' != *host)
 	{
 		connect = zbx_strdcatf(connect, "//%s", host);
 
