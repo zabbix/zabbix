@@ -218,7 +218,6 @@ include_once('include/page_header.php');
 
 // items
  	$value_types		= get_request('value_types', null);
-	$normal_only = get_request('normal_only');
 
 	$submitParent = get_request('submitParent', 0);
 
@@ -269,6 +268,10 @@ include_once('include/page_header.php');
 
 	if($value_types)
 		$frmTitle->addVar('value_types', $value_types);
+
+	$normal_only = get_request('normal_only');
+	if($normal_only)
+		$frmTitle->addVar('normal_only', $normal_only);
 
 //adding param to a form, so that it would remain when page is refreshed
 	$frmTitle->addVar('dstfrm', $dstfrm);
