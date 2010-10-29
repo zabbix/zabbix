@@ -310,15 +310,13 @@ switch($itemType) {
 <?php
 	$items_wdgt = new CWidget();
 
-
+	$form = null;
 	if(!isset($_REQUEST['form'])){
 		$form = new CForm(null, 'get');
 		$form->addVar('hostid', $_REQUEST['hostid']);
 		$form->addItem(new CButton('form', S_CREATE_RULE));
 	}
-	else{
-		$form = null;
-	}
+
 	$items_wdgt->addPageHeader(S_CONFIGURATION_OF_DISCOVERY_RULES_BIG, $form);
 
 
@@ -665,8 +663,8 @@ switch($itemType) {
 		$numrows = new CDiv();
 		$numrows->setAttribute('name', 'numrows');
 
-		$items_wdgt->addHeader(S_DISCOVERY_RULES_BIG, SPACE);
-		$items_wdgt->addHeader($numrows, SPACE);
+		$items_wdgt->addHeader(S_DISCOVERY_RULES_BIG);
+		$items_wdgt->addHeader($numrows);
 
 		$items_wdgt->addItem(get_header_host_table($_REQUEST['hostid'], 'discoveries'));
 // ----------------
@@ -678,7 +676,7 @@ switch($itemType) {
 		$sortlink = new Curl();
 		$sortlink->setArgument('hostid', $_REQUEST['hostid']);
 		$sortlink = $sortlink->getUrl();
-		$table  = new CTableInfo();
+		$table = new CTableInfo();
 		$table->setHeader(array(
 			new CCheckBox('all_items',null,"checkAll('".$form->GetName()."','all_items','group_itemid');"),
 			make_sorting_header(S_NAME,'description', $sortlink),
@@ -698,29 +696,17 @@ switch($itemType) {
 			'hostids' => $_REQUEST['hostid'],
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => 1,
-			'filter' => array('flags' => ZBX_FLAG_DISCOVERY),
 			'select_prototypes' => API_OUTPUT_COUNT,
+			'select_graphs' => API_OUTPUT_COUNT,
+			'select_triggers' => API_OUTPUT_COUNT,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
 		);
-		$items = CItem::get($options);
+		$items = CDiscoveryRule::get($options);
 
 		order_result($items, $sortfield, $sortorder);
 		$paging = getPagingLine($items);
-
-		$options = array(
-			'discoveryids' => zbx_objectValues($items, 'itemid'),
-			'filter' => array('flags' => null),
-			'output' => API_OUTPUT_COUNT,
-			'groupCount' => true,
-			'countOutput' => true,
-		);
-		$graphs = CGraph::get($options);
-		$graphs = zbx_toHash($graphs, 'parent_itemid');
-
-		$triggers = CTrigger::get($options);
-		$triggers = zbx_toHash($triggers, 'parent_itemid');
 
 		foreach($items as $inum => $item){
 			$description = array();
@@ -750,11 +736,11 @@ switch($itemType) {
 
 			$graphs_count = isset($graphs[$item['itemid']]['rowscount']) ? $graphs[$item['itemid']]['rowscount'] : 0;
 			$protographs = array(new CLink(S_GRAPHS, 'graph_prototypes.php?&parent_discoveryid='.$item['itemid']),
-				' ('.$graphs_count.')');
+				' ('.$item['graphs'].')');
 
 			$triggers_count = isset($triggers[$item['itemid']]['rowscount']) ? $triggers[$item['itemid']]['rowscount'] : 0;
 			$prototriggers = array(new CLink(S_TRIGGERS, 'trigger_prototypes.php?&parent_discoveryid='.$item['itemid']),
-				' ('.$triggers_count.')');
+				' ('.$item['triggers'].')');
 
 			$table->addRow(array(
 				new CCheckBox('group_itemid['.$item['itemid'].']',null,null,$item['itemid']),

@@ -804,14 +804,13 @@ Copt::memoryPick();
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'hostids' => $hostids,
-				'filter' => array('flags' => ZBX_FLAG_DISCOVERY),
 				'nopermissions' => 1,
 				'preservekeys' => 1,
 			);
 
 			if(is_array($options['select_discoveries']) || str_in_array($options['select_discoveries'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['select_discoveries'];
-				$items = CItem::get($obj_params);
+				$items = CDiscoveryRule::get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($items, 'description');
 				foreach($items as $itemid => $item){
@@ -832,7 +831,7 @@ Copt::memoryPick();
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
-				$items = CItem::get($obj_params);
+				$items = CDiscoveryRule::get($obj_params);
 				$items = zbx_toHash($items, 'hostid');
 				foreach($result as $hostid => $host){
 					if(isset($items[$hostid]))

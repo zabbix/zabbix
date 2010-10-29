@@ -53,7 +53,8 @@ function __autoload($class_name){
 		'cuser' => 1,
 		'cusergroup' => 1,
 		'cusermacro' => 1,
-		'czbxapi' => 1
+		'czbxapi' => 1,
+		'cdiscoveryrule' => 1,
 	);
 
 	$rpc = array(

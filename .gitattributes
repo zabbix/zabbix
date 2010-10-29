@@ -46,6 +46,7 @@ frontends/php/api/classes/class.capiinfo.php -text
 frontends/php/api/classes/class.capplication.php -text
 frontends/php/api/classes/class.cdcheck.php -text
 frontends/php/api/classes/class.cdhost.php -text
+frontends/php/api/classes/class.cdiscoveryrule.php -text
 frontends/php/api/classes/class.cdrule.php -text
 frontends/php/api/classes/class.cdservice.php -text
 frontends/php/api/classes/class.cevent.php -text

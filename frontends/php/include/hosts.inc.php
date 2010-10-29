@@ -110,12 +110,14 @@ SDI('copy_template_elements');
 		$result = true;
 		copy_template_applications($hostid, $templateid, $copy_mode);
 
+		$result = CDiscoveryRule::syncTemplates(array('hostids' => $hostid, 'templateids' => $templateid));
 		$result = CItem::syncTemplates(array('hostids' => $hostid, 'templateids' => $templateid));
+
 //		copy_template_items($hostid, $templateid, $copy_mode);
 
 		copy_template_triggers($hostid, $templateid, $copy_mode);
 
-		
+
 		$result = CGraph::syncTemplates(array('hostids' => $hostid, 'templateids' => $templateid));
 		return $result;
 	}
