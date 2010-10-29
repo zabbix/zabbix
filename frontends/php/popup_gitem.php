@@ -39,6 +39,7 @@ include_once('include/page_header.php');
 		'dstfrm'=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,		null),
 
 		'parent_discoveryid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			null),
+		'normal_only'=>	array(T_ZBX_INT, O_OPT,	 null,	null,			null),
 		'graphid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			null),
 		'gid'=>			array(T_ZBX_INT, O_OPT,  P_SYS,	BETWEEN(0,65535),	null),
 		'graphtype'=>	array(T_ZBX_INT, O_OPT,	 null,	IN('0,1,2,3'),		'isset({save})'),
@@ -168,6 +169,7 @@ include_once('include/page_header.php');
 		}
 
 		$parent_discoveryid = get_request('parent_discoveryid', false);
+		$normal_only = get_request('normal_only') ? '&normal_only=1' : '';
 		if($parent_discoveryid){
 			$btnSelect = new CButton('btn1',S_SELECT,
 				"return PopUp('popup.php?writeonly=1&dstfrm=".$frmGItem->GetName().
@@ -180,8 +182,8 @@ include_once('include/page_header.php');
 		else{
 			$btnSelect = new CButton('btn1',S_SELECT,
 				"return PopUp('popup.php?writeonly=1&dstfrm=".$frmGItem->GetName().
-						"&dstfld1=itemid&dstfld2=description&".
-						"srctbl=items&srcfld1=itemid&srcfld2=description".$host_condition."', 800, 600);",
+						"&dstfld1=itemid&dstfld2=description".$normal_only.
+						"&srctbl=items&srcfld1=itemid&srcfld2=description".$host_condition."', 800, 600);",
 				'T'
 			);
 		}
