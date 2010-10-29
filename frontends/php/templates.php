@@ -383,12 +383,8 @@ include_once('include/page_header.php');
 // FULL_CLONE {
 
 		if(!zbx_empty($templateid) && $templateid && $clone_templateid && ($_REQUEST['form'] == 'full_clone')){
-// Host applications
-			$sql = 'SELECT * FROM applications WHERE hostid='.$clone_templateid.' AND templateid=0';
-			$res = DBselect($sql);
-			while($db_app = DBfetch($res)){
-				add_application($db_app['name'], $templateid, 0);
-			}
+
+			if(!copy_applications($clone_hostid, $hostid)) throw new Exception();
 
 // Host items
 			$sql = 'SELECT DISTINCT i.itemid, i.description '.
