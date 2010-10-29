@@ -437,8 +437,12 @@ int	zbx_db_begin()
 #if defined(HAVE_IBM_DB2)
 	if (SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_AUTOCOMMIT, (SQLPOINTER)SQL_AUTOCOMMIT_OFF, SQL_NTS)))
 		rc = ZBX_DB_DOWN;
+
 	if (ZBX_DB_OK != rc)
+	{
 		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc);
+		rc = (SQL_CD_TRUE == IBM_DB2server_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
+	}
 #elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL) || defined(HAVE_SQLITE3)
 	rc = zbx_db_execute("%s", "begin;");
 #elif defined(HAVE_SQLITE3)
@@ -487,8 +491,12 @@ int	zbx_db_commit()
 		rc = ZBX_DB_DOWN;
 	if (SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_AUTOCOMMIT, (SQLPOINTER)SQL_AUTOCOMMIT_ON, SQL_NTS)))
 		rc = ZBX_DB_DOWN;
+
 	if (ZBX_DB_OK != rc)
+	{
 		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc);
+		rc = (SQL_CD_TRUE == IBM_DB2server_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
+	}
 #elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL) || defined(HAVE_SQLITE3)
 	rc = zbx_db_execute("%s", "commit;");
 #elif defined(HAVE_ORACLE)
@@ -534,8 +542,12 @@ int	zbx_db_rollback()
 		rc = ZBX_DB_DOWN;
 	if (SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_AUTOCOMMIT, (SQLPOINTER)SQL_AUTOCOMMIT_ON, SQL_NTS)))
 		rc = ZBX_DB_DOWN;
+
 	if (ZBX_DB_OK != rc)
+	{
 		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc);
+		rc = (SQL_CD_TRUE == IBM_DB2server_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
+	}
 #elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL) || defined(HAVE_SQLITE3)
 	rc = zbx_db_execute("%s", "rollback;");
 #elif defined(HAVE_ORACLE)
@@ -607,18 +619,20 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	if (ZBX_DB_OK == ret && SQL_NO_DATA_FOUND != ret1)
 		ret = ZBX_DB_DOWN;
 
-  	if (hstmt && SUCCEED != zbx_ibm_db2_success(SQLFreeHandle(SQL_HANDLE_STMT, hstmt)))
-		ret = ZBX_DB_DOWN;
-
 	if (ZBX_DB_OK != ret)
 	{
 		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc);
 		zbx_ibm_db2_log_errors(SQL_HANDLE_STMT, hstmt);
+
+		ret = (SQL_CD_TRUE == IBM_DB2server_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
 	}
 	else if (rows >= 0)
 	{
 		ret = (int)rows;
 	}
+
+	if (hstmt)
+		SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
 #elif defined(HAVE_MYSQL)
 	if (NULL == conn)
 	{
@@ -834,6 +848,7 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 	if (0 == result->ncolumn)
 		goto error;
 
+	result->nalloc = 0;
 	result->values = zbx_malloc(result->values, sizeof(char *) * result->ncolumn);
 	result->values_cli = zbx_malloc(result->values_cli, sizeof(char *) * result->ncolumn);
 	result->values_len = zbx_malloc(result->values_len, sizeof(SQLINTEGER) * result->ncolumn);
@@ -849,6 +864,7 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 
 		/* allocate memory to bind a column */
 		result->values_cli[i] = zbx_malloc(NULL, result->values_len[i]);
+		result->nalloc++;
 
 		/* bind columns to program variables, converting all types to CHAR */
 		if (SUCCEED != zbx_ibm_db2_success(ret = SQLBindCol(result->hstmt, (SQLSMALLINT)(i + 1), SQL_C_CHAR,
@@ -856,8 +872,9 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 			goto error;
 	}
 error:
-	if (SUCCEED != zbx_ibm_db2_success(ret) && 0 != result->ncolumn)
+	if (SUCCEED != zbx_ibm_db2_success(ret) || 0 == result->ncolumn)
 	{
+		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc);
 		zbx_ibm_db2_log_errors(SQL_HANDLE_STMT, result->hstmt);
 
 		IBM_DB2free_result(result);
@@ -1210,7 +1227,7 @@ void	IBM_DB2free_result(DB_RESULT result)
 	{
 		int	i;
 
-		for (i = 0; i < result->ncolumn; i++)
+		for (i = 0; i < result->nalloc; i++)
 		{
 			zbx_free(result->values_cli[i]);
 		}

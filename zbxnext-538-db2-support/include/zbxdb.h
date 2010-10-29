@@ -48,6 +48,7 @@
 	typedef struct
 	{
 		SQLHANDLE	hstmt;
+		SQLSMALLINT	nalloc;
 		SQLSMALLINT	ncolumn;
 		DB_ROW		values;
 		DB_ROW		values_cli;
