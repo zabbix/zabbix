@@ -35,8 +35,8 @@ include_once('include/page_header.php');
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields = array(
-		'groupid'=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,	NULL),
-		'hostid'=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,	NULL),
+		'groupid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,	NULL),
+		'hostid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,	NULL),
 
 		'copy_type'	=>array(T_ZBX_INT, O_OPT,	 P_SYS,	IN('0,1'),'isset({copy})'),
 		'copy_mode'	=>array(T_ZBX_INT, O_OPT,	 P_SYS,	IN('0'),NULL),

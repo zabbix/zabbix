@@ -560,25 +560,22 @@ include_once('include/page_header.php');
 					$host['host'],
 					'hosts',
 					$host_old,
-					$host_new);
+					$host_new
+				);
 			}
 
 // FULL CLONE {{{
 			if($clone_hostid && ($_REQUEST['form'] == 'full_clone')){
-// Host applications
-			$sql = 'SELECT * FROM applications WHERE hostid='.$clone_hostid.' AND templateid=0';
-			$res = DBselect($sql);
-			while($db_app = DBfetch($res)){
-				add_application($db_app['name'], $hostid, 0);
-			}
+
+				if(!copy_applications($clone_hostid, $hostid)) throw new Exception();
 
 // Host items
 			$sql = 'SELECT DISTINCT i.itemid, i.description '.
 					' FROM items i '.
 					' WHERE i.hostid='.$clone_hostid.
 						' AND i.templateid IS NULL '.
+							' AND i.flags<>'.ZBX_FLAG_DISCOVERY_CREATED.
 					' ORDER BY i.description';
-
 			$res = DBselect($sql);
 			while($db_item = DBfetch($res)){
 					if(!copy_item_to_host($db_item['itemid'], $hostid, true)) throw new Exception();
@@ -592,6 +589,7 @@ include_once('include/page_header.php');
 				'inherited' => 0,
 				'hostids' => $clone_hostid,
 				'select_hosts' => API_OUTPUT_REFER,
+					'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY, ZBX_FLAG_DISCOVERY_CHILD, ZBX_FLAG_DISCOVERY_NORMAL)),
 				'output' => API_OUTPUT_EXTEND,
 			);
 			$graphs = CGraph::get($options);
@@ -600,8 +598,8 @@ include_once('include/page_header.php');
 					if(!copy_graph_to_host($graph['graphid'], $hostid)) throw new Exception();
 			}
 		}
-
 // }}} FULL CLONE
+
 
 //HOSTS PROFILE Section
 			CProfile::update('HOST_PORT', $_REQUEST['port'], PROFILE_TYPE_INT);
@@ -615,7 +613,9 @@ include_once('include/page_header.php');
 					$_REQUEST['devicetype'],$_REQUEST['name'],$_REQUEST['os'],
 					$_REQUEST['serialno'],$_REQUEST['tag'],$_REQUEST['macaddress'],
 					$_REQUEST['hardware'],$_REQUEST['software'],$_REQUEST['contact'],
-					$_REQUEST['location'],$_REQUEST['notes'])) throw new Exception();
+					$_REQUEST['location'],$_REQUEST['notes'])
+				)
+					throw new Exception();
 			}
 
 // }}} SAVE TRANSACTION
@@ -711,8 +711,6 @@ include_once('include/page_header.php');
 
 ?>
 <?php
-	// echo SBR;
-
 	if(($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['hosts'])){
 		$hosts_wdgt->addItem(insert_mass_update_host_form());
 	}
@@ -723,7 +721,6 @@ include_once('include/page_header.php');
 			$hosts_wdgt->addItem(insert_host_form());
 	}
 	else{
-
 		$frmForm = new CForm();
 		$frmForm->setMethod('get');
 
@@ -846,6 +843,7 @@ include_once('include/page_header.php');
 		$templates = CTemplate::get($options);
 		$templates = zbx_toHash($templates, 'templateid');
 //---------
+
 		foreach($hosts as $num => $host){
 			$applications = array(new CLink(S_APPLICATIONS, 'applications.php?groupid='.$_REQUEST['groupid'].'&hostid='.$host['hostid']),
 				' ('.$host['applications'].')');
