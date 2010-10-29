@@ -1048,10 +1048,22 @@ COpt::memoryPick();
 			);
 			$del_graphs = self::get($options);
 			foreach($graphids as $graphid){
+				if($del_graphs[$graphid]['flags'] = ZBX_FLAG_DISCOVERY_CHILD)
+					$graph_prototypes[$graphid] = $graphid;
+
 				if(!isset($del_graphs[$graphid]))
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				if($del_graphs[$graphid]['templateid'] != 0){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, 'Cannot delete templated graphs');
+				}
+			}
+
+			if(!empty($graph_prototypes)){
+				$sql = 'SELECT graphid FROM graph_discovery WHERE '.
+						DBcondition('parent_graphid', $graph_prototypes);
+				$db_graphs = DBselect($sql);
+				while($graph = DBfetch($db_graphs)){
+					$graphids[] = $graph['graphid'];
 				}
 			}
 

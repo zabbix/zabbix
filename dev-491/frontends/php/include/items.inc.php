@@ -767,7 +767,10 @@
 				}
 			}
 			else{
-				delete_item($db_item["itemid"]);
+				if(!in_array($db_item['flags'], array(ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_CHILD))){
+					DBexecute('UPDATE items SET templateid=NULL WHERE itemid='.$db_item["itemid"]);
+					CItem::delete($db_item["itemid"]);
+				}
 			}
 		}
 	}
@@ -793,6 +796,26 @@
 
 		$result = add_item($db_tmp_item);
 	return $result;
+	}
+
+	function copy_applications($srcid, $destid){
+		$options = array(
+			'hostids' => $srcid,
+			'output' => API_OUTPUT_EXTEND,
+			'inherited' => false,
+		);
+		$apps_to_clone = CApplication::get($options);
+		foreach($apps_to_clone as $num => $app){
+			$app['hostid'] = $destid;
+			unset($app['applicationid']);
+			$apps_to_clone[$num] = $app;
+		}
+
+		return CApplication::create($apps_to_clone);
+	}
+
+	function copy_items($srcid, $destid){
+		
 	}
 
 	/*
@@ -1205,6 +1228,18 @@
 			return get_realhost_by_itemid($item['templateid']);
 
 	return get_host_by_itemid($itemid);
+	}
+
+// kostilek //
+	function get_realrule_by_itemid_and_hostid($itemid, $hostid){
+		$item = get_item_by_itemid($itemid);
+		if($hostid == $item['hostid'])
+			return $item['itemid'];
+
+		if($item['templateid'] <> 0)
+			return get_realrule_by_itemid_and_hostid($item['templateid'], $hostid);
+
+		return $item['itemid'];
 	}
 
 /*

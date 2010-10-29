@@ -34,7 +34,7 @@ include_once('include/page_header.php');
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'parent_discoveryid'=>	array(T_ZBX_INT, O_MAND,	 NULL,	DB_ID,	NULL),
+		'parent_discoveryid'=>	array(T_ZBX_INT, O_MAND,	 P_SYS,	DB_ID,	NULL),
 
 		'triggerid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,'(isset({form})&&({form}=="update"))'),
 
@@ -455,7 +455,9 @@ include_once('include/page_header.php');
 				else{
 					$real_hosts = $realHosts[$triggerid];
 					$real_host = reset($real_hosts);
-					$description[] = new CLink($real_host['host'], 'trigger_prototypes.php?', 'unknown');
+					$tpl_disc_ruleid = get_realrule_by_itemid_and_hostid($_REQUEST['parent_discoveryid'], $real_host['hostid']);
+
+					$description[] = new CLink($real_host['host'], 'trigger_prototypes.php?parent_discoveryid='.$tpl_disc_ruleid, 'unknown');
 					$description[] = ':';
 				}
 			}
