@@ -42,7 +42,7 @@ switch($itemType) {
 }
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'hostid'=>			array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,			null),
+		'hostid'=>			array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,			'!isset({form})'),
 		'itemid'=>			array(T_ZBX_INT, O_NO,	 P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))'),
 
 		'description'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),
@@ -100,9 +100,6 @@ switch($itemType) {
 
 		'ipmi_sensor'=>		array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,	'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_IPMI.'))', S_IPMI_SENSOR),
 		'trapper_hosts'=>	array(T_ZBX_STR, O_OPT,  null,  null,			'isset({save})&&isset({type})&&({type}==2)'),
-
-		'new_application'=>	array(T_ZBX_STR, O_OPT, null,	null,	'isset({save})'),
-		'applications'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID, null),
 
 		'add_delay_flex'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'del_delay_flex'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -196,7 +193,6 @@ switch($itemType) {
 		$_REQUEST['form'] = 'clone';
 	}
 	else if(isset($_REQUEST['save'])){
-		$applications = get_request('applications', array());
 		$delay_flex = get_request('delay_flex', array());
 
 		$db_delay_flex = '';
@@ -204,11 +200,6 @@ switch($itemType) {
 			$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
 		}
 		$db_delay_flex = trim($db_delay_flex,';');
-
-		if(!zbx_empty($_REQUEST['new_application'])){
-			if($new_appid = add_application($_REQUEST['new_application'], $_REQUEST['hostid']))
-				$applications[$new_appid] = $new_appid;
-		}
 
 		$ifm =  get_request('item_filter_macro');
 		$ifv =  get_request('item_filter_value');
@@ -236,7 +227,7 @@ switch($itemType) {
 			'privatekey' => get_request('privatekey'),
 			'params' => get_request('params'),
 			'ipmi_sensor' => get_request('ipmi_sensor'),
-			'applications' => $applications,
+			'applications' => array(),
 			'flags' => ZBX_FLAG_DISCOVERY,
 			'filter' => $filter,
 		);
@@ -353,8 +344,6 @@ switch($itemType) {
 		$snmp_oid = get_request('snmp_oid', 'interfaces.ifTable.ifEntry.ifInOctets.1');
 		$snmp_port = get_request('snmp_port', 161);
 		$params = get_request('params', '');
-		$new_application = get_request('new_application', '');
-		$applications = get_request('applications', array());
 		$delay_flex = get_request('delay_flex', array());
 		$trapper_hosts = get_request('trapper_hosts', '');
 		$item_filter = get_request('filter', '');
@@ -416,7 +405,6 @@ switch($itemType) {
 			$formula = $item_data['formula'];
 			$logtimefmt = $item_data['logtimefmt'];
 
-			$new_application = get_request('new_application', '');
 
 			if(!isset($limited) || !isset($_REQUEST['form_refresh'])){
 				$delay		= $item_data['delay'];
@@ -432,8 +420,6 @@ switch($itemType) {
 						array_push($delay_flex, array('delay'=> $arr_of_delay[0], 'period'=> $arr_of_delay[1]));
 					}
 				}
-
-				$applications = array_unique(zbx_array_merge($applications, get_applications_by_itemid($_REQUEST['itemid'])));
 			}
 		}
 
@@ -658,23 +644,6 @@ switch($itemType) {
 		$frmItem->addRow(S_ALLOWED_HOSTS, new CTextBox('trapper_hosts',$trapper_hosts,40), null, 'row_trapper_hosts');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TRAPPER, 'trapper_hosts');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TRAPPER, 'row_trapper_hosts');
-
-// New application
-		$frmItem->addRow(S_NEW_APPLICATION, new CTextBox('new_application', $new_application,40), 'new');
-
-
-		if(empty($applications)) $applications[] = 0;
-		$all_apps = CApplication::get(array(
-			'hostids' => $hostid,
-			'ediatble' => 1,
-			'output' => API_OUTPUT_EXTEND,
-		));
-		$cmbApps = new CListBox('applications[]', $applications, 10);
-		$cmbApps->addItem(0,'-'.S_NONE.'-');
-		foreach($all_apps as $app){
-			$cmbApps->addItem($app['applicationid'], $app['name']);
-		}
-		$frmItem->addRow(S_APPLICATIONS, $cmbApps);
 
 
 		$frmRow = array(new CButton('save',S_SAVE));

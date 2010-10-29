@@ -798,6 +798,26 @@
 	return $result;
 	}
 
+	function copy_applications($srcid, $destid){
+		$options = array(
+			'hostids' => $srcid,
+			'output' => API_OUTPUT_EXTEND,
+			'inherited' => false,
+		);
+		$apps_to_clone = CApplication::get($options);
+		foreach($apps_to_clone as $num => $app){
+			$app['hostid'] = $destid;
+			unset($app['applicationid']);
+			$apps_to_clone[$num] = $app;
+		}
+
+		return CApplication::create($apps_to_clone);
+	}
+
+	function copy_items($srcid, $destid){
+		
+	}
+
 	/*
 	 * Function: copy_template_items
 	 *

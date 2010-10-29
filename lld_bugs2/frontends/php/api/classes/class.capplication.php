@@ -429,7 +429,7 @@ COpt::memoryPick();
 /**
  * Add Applications
  *
- * @param _array $applications
+ * @param array $applications
  * @param array $app_data['name']
  * @param array $app_data['hostid']
  * @return boolean

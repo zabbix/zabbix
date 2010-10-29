@@ -3864,28 +3864,23 @@ return $caption;
 	function copy_triggers($srcid, $destid){
 		try{
 			$options = array(
-				'hostids' => $srcid,
-				'output' => API_OUTPUT_EXTEND,
-				'templated_hosts' => 1
+				'hostids' => array($srcid, $destid),
+				'output' => array('hostid', 'host'),
+				'templated_hosts' => true,
+				'preservekeys' => true
 			);
-			$src = CHost::get($options);
-			if(empty($src)) throw new Exception();
-			$src = reset($src);
+			$hosts = CHost::get($options);
 
-
-			$options = array(
-				'hostids' => $destid,
-				'output' => API_OUTPUT_EXTEND,
-				'templated_hosts' => 1
-			);
-			$dest = CHost::get($options);
-			if(empty($dest)) throw new Exception();
-			$dest = reset($dest);
-
+			if(isset($hosts[$srcid], $hosts[$destid])){
+				$src = $hosts[$srcid];
+				$dest = $hosts[$destid];
+			}
+			else throw new Exception();
 
 			$options = array(
 				'hostids' => $srcid,
 				'output' => API_OUTPUT_EXTEND,
+				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY, ZBX_FLAG_DISCOVERY_CHILD, ZBX_FLAG_DISCOVERY_NORMAL)),
 				'inherited' => 0,
 				'select_dependencies' => API_OUTPUT_EXTEND
 			);
