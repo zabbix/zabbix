@@ -1121,7 +1121,8 @@ static void	DBdelete_triggers(zbx_uint64_t **triggerids, int *triggerids_alloc, 
 			uint64_array_add(triggerids, triggerids_alloc, triggerids_num, triggerid, 64);
 		}
 		DBfree_result(result);
-	} while (num != *triggerids_num);
+	}
+	while (num != *triggerids_num);
 
 	DBdelete_services_by_triggerids(*triggerids, *triggerids_num);
 	DBdelete_sysmaps_elements(SYSMAP_ELEMENT_TYPE_TRIGGER, *triggerids, *triggerids_num);
@@ -1358,7 +1359,8 @@ static void	DBdelete_graphs(zbx_uint64_t **graphids, int *graphids_alloc, int *g
 			uint64_array_add(graphids, graphids_alloc, graphids_num, graphid, 64);
 		}
 		DBfree_result(result);
-	} while (num != *graphids_num);
+	}
+	while (num != *graphids_num);
 
 	sql_offset = 0;
 #ifdef HAVE_ORACLE
@@ -1454,7 +1456,8 @@ static void	DBdelete_items(zbx_uint64_t **itemids, int *itemids_alloc, int *item
 			uint64_array_add(itemids, itemids_alloc, itemids_num, itemid, 64);
 		}
 		DBfree_result(result);
-	} while (num != *itemids_num);
+	}
+	while (num != *itemids_num);
 
 	DBdelete_triggers_by_itemids(*itemids, *itemids_num);
 	DBdelete_history_by_itemids(*itemids, *itemids_num);
