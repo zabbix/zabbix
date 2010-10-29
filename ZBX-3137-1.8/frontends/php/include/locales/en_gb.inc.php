@@ -212,6 +212,7 @@
 	'S_DISABLE_SELECTED_WEB_SCENARIOS_Q'=>		'Disable selected WEB scenarios?',
 	'S_DELETE_HISTORY_SELECTED_WEB_SCENARIOS_Q'=>	'Delete history of selected WEB scenarios?',
 	'S_DELETE_SELECTED_WEB_SCENARIOS_Q'=>		'Delete selected WEB scenarios?',
+	'S_SELECT_HOST_FIRST' => '(select host first)',
 
 //	exp_imp.php
 	'S_ELEMENT'=>				'Element',
