@@ -1,11 +1,13 @@
+Changes for 1.9.1
+
+ - [ZBX-3130] fixed bug when creating custom graph: host items now can be added (KB) 
+
 Changes for 1.9.0
 
  - [DEV-477] added support of low-level discovery of file systems, network interfaces and SNMP OID's (Sasha,Vedmak) 
- - [ZBX-3097] fixed nanosecond related bug in messaging (KB)
  - [DEV-490] made graph legend optional (Aly)
  - [DEV-483] added templated screens (Aly)
  - [DEV-485] added multiple urls for map elements (Vedmak)
- - [ZBX-3045] fixed deleting mediatype (Vedmak)
  - [DEV-471] field graph_theme.noneworktimecolor renamed to nonworktimecolor (Sasha)
  - [DEV-471] database integrity - added foreign keys (Sasha,Vedmak)
  - [ZBXNEXT-483] added vfs.file.contents[file,encoding] check (asaveljevs)
@@ -16,6 +18,8 @@ Changes for 1.9.0
 
 Changes for 1.8.4rc2
 
+ - [ZBX-1362] optimized alert performance (KB)
+ - [ZBX-2852] fixed map not updating in slideshow (Vedmak)
  - [ZBX-1346] update example agent daemon configuration file for Windows with parameters from Zabbix manual (Richlv)
  - [ZBX-2984] fixed incorrect trigger line in graphs. For line drawing was used axis from first item not trigger item (Vedmak)
  - [ZBX-3059] different titles for popup menu depending on data type (KB)
