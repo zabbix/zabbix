@@ -938,8 +938,12 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 		if test "x$have_db" != "xno"; then
 			AC_MSG_ERROR([You can configure for only one database.])
 		fi
-
-		have_db="IBM DB2"
+		
+		if test "x$found_ibm_db2" = "xyes"; then
+			have_db="IBM DB2"
+		else
+			AC_MSG_ERROR([IBM DB2 library not found])
+		fi
 	fi
 
 	dnl Checking for MySQL support
