@@ -689,7 +689,6 @@ switch($itemType) {
 			make_sorting_header(S_INTERVAL,'delay', $sortlink),
 			make_sorting_header(S_TYPE,'type', $sortlink),
 			make_sorting_header(S_STATUS,'status', $sortlink),
-			S_APPLICATIONS,
 			S_ERROR
 		));
 
@@ -700,7 +699,6 @@ switch($itemType) {
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => 1,
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY),
-			'select_applications' => API_OUTPUT_EXTEND,
 			'select_prototypes' => API_OUTPUT_COUNT,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
@@ -747,11 +745,6 @@ switch($itemType) {
 				$error->setHint($item['error'], '', 'on');
 			}
 
-			$applications = zbx_objectValues($item['applications'], 'name');
-			$applications = implode(', ', $applications);
-// ugly dash
-			if(empty($applications)) $applications = '-';
-
 			$prototypes = array(new CLink(S_ITEMS, 'disc_prototypes.php?&parent_discoveryid='.$item['itemid']),
 				' ('.$item['prototypes'].')');
 
@@ -773,7 +766,6 @@ switch($itemType) {
 				$item['delay'],
 				item_type2str($item['type']),
 				$status,
-				new CCol($applications, 'wraptext'),
 				$error
 			));
 		}
