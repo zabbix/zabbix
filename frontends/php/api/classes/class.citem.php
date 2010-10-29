@@ -1003,7 +1003,7 @@ COpt::memoryPick();
 				}
 // {{{ EXCEPTION: ITEM EXISTS
 				$itemsExists = self::get(array(
-					'output' => array('itemid','hostid','description',''),
+					'output' => array('itemid','hostid','description'),
 					'filter' => array(
 						'hostid' => $item['hostid'],
 						'key_' => $item['key_'],
@@ -1227,7 +1227,7 @@ COpt::memoryPick();
 						' SELECT gii.gitemid' .
 						' FROM graphs_items gii' .
 						' WHERE gii.graphid=gi.graphid' .
-						' AND ' . DBcondition('gii.itemid', $itemids, true, false) .
+							' AND ' . DBcondition('gii.itemid', $itemids, true, false) .
 					' )';
 			$db_graphs = DBselect($sql);
 			while($db_graph = DBfetch($db_graphs)){
