@@ -1,6 +1,6 @@
 Changes for 1.9.1
 
- - [ZBX-3130] fixed bug when creating custom graph: application from template can't be used anymore (KB) 
+ - [ZBX-3130] fixed bug when creating custom graph: host items now can be added (KB) 
 
 Changes for 1.9.0
 
