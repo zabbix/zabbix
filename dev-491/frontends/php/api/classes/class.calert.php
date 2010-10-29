@@ -54,7 +54,7 @@ class CAlert extends CZBXAPI{
 		$userid = $USER_DETAILS['userid'];
 
 		$sort_columns = array('alertid','clock','eventid','status'); // allowed columns for sorting
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM); // allowed output options for [ select_* ] params
 
 
 		$sql_parts = array(
@@ -112,6 +112,17 @@ class CAlert extends CZBXAPI{
 			if(!is_null($options['select_users'])){
 				$options['select_users'] = API_OUTPUT_EXTEND;
 			}
+		}
+
+
+		if(is_array($options['output'])){
+			unset($sql_parts['select']['alerts']);
+			$sql_parts['select']['alertid'] = ' a.alertid';
+			foreach($options['output'] as $key => $field){
+				$sql_parts['select'][$field] = ' a.'.$field;
+			}
+
+			$options['output'] = API_OUTPUT_CUSTOM;
 		}
 
 
