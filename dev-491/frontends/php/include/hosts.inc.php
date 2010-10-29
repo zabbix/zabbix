@@ -106,11 +106,16 @@
  *
  */
 	function copy_template_elements($hostid, $templateid = null, $copy_mode = false){
+SDI('copy_template_elements');
 		$result = true;
 		copy_template_applications($hostid, $templateid, $copy_mode);
-		copy_template_items($hostid, $templateid, $copy_mode);
+
+		$result = CItem::syncTemplates(array('hostids' => $hostid, 'templateids' => $templateid));
+//		copy_template_items($hostid, $templateid, $copy_mode);
+
 		copy_template_triggers($hostid, $templateid, $copy_mode);
 
+		
 		$result = CGraph::syncTemplates(array('hostids' => $hostid, 'templateids' => $templateid));
 		return $result;
 	}
@@ -468,6 +473,7 @@
 				' FROM hosts h, items i '.
 				' WHERE i.hostid=h.hostid '.
 					' AND '.DBcondition('i.itemid',$itemids);
+
 		$res=DBselect($sql);
 		while($row=DBfetch($res)){
 			$result = true;

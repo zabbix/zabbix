@@ -176,6 +176,7 @@ class CHost extends CZBXAPI{
 
 		if(is_array($options['output'])){
 			unset($sql_parts['select']['hosts']);
+			$sql_parts['select']['hostid'] = ' h.hostid';
 			foreach($options['output'] as $key => $field){
 				$sql_parts['select'][$field] = ' h.'.$field;
 			}
@@ -528,7 +529,7 @@ class CHost extends CZBXAPI{
 				' WHERE '.$sql_where.
 				$sql_group.
 				$sql_order;
- //SDI($sql);
+//SDI($sql);
 		$res = DBselect($sql, $sql_limit);
 		while($host = DBfetch($res)){
 			if(!is_null($options['countOutput'])){
@@ -602,7 +603,10 @@ class CHost extends CZBXAPI{
 						if(!isset($result[$host['hostid']]['templates']))
 							$result[$host['hostid']]['templates'] = array();
 
-						$result[$host['hostid']]['templates'][] = array('templateid' => $host['templateid']);
+						$result[$host['hostid']]['templates'][] = array(
+							'templateid' => $host['templateid'],
+							'hostid' => $host['templateid']
+						);
 						unset($host['templateid']);
 					}
 
