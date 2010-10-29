@@ -941,6 +941,7 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 		
 		if test "x$found_ibm_db2" = "xyes"; then
 			have_db="IBM DB2"
+			have_multirow_insert="yes"
 		else
 			AC_MSG_ERROR([IBM DB2 library not found])
 		fi
