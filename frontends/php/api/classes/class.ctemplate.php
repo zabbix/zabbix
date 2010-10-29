@@ -134,8 +134,14 @@ class CTemplate extends CZBXAPI{
 		}
 
 		if(is_array($options['output'])){
-			$sql_parts['select']['hosts'] = ' h.'.implode(',h.', $options['output']);
-			$options['output'] = API_OUTPUT_REFER;
+			unset($sql_parts['select']['templates']);
+			$sql_parts['select']['hostid'] = ' h.hostid';
+
+			foreach($options['output'] as $key => $field){
+				$sql_parts['select'][$field] = ' h.'.$field;
+			}
+
+			$options['output'] = API_OUTPUT_CUSTOM;
 		}
 // editable + PERMISSION CHECK
 
@@ -340,7 +346,7 @@ class CTemplate extends CZBXAPI{
 			zbx_db_search('hosts h', $options, $sql_parts);
 		}
 
-// extendoutput
+// output
 		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['templates'] = 'h.*';
 		}

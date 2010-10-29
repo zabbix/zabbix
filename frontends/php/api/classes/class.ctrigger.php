@@ -144,6 +144,7 @@ class CTrigger extends CZBXAPI{
 
 		if(is_array($options['output'])){
 			unset($sql_parts['select']['triggers']);
+			$sql_parts['select']['triggerid'] = ' t.triggerid';
 			foreach($options['output'] as $key => $field){
 				$sql_parts['select'][$field] = ' t.'.$field;
 			}

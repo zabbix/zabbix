@@ -1032,7 +1032,7 @@ else {
  */
 		public static function insert($table, $values, $getids=true){
 			if(empty($values)) return true;
-			$result_ids = array();
+			$resultIds = array();
 
 			if($getids)
 				$id = self::reserveIds($table, count($values));
@@ -1040,20 +1040,32 @@ else {
 			$table_schema = self::getSchema($table);
 
 			foreach($values as $key => $row){
-				foreach($row as $field => $v){
+				foreach($row as $field => &$value){
 					if(!isset($table_schema['fields'][$field])){
 						unset($row[$field]);
+						continue;
 					}
-					else if($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_CHAR){
-						$row[$field] = zbx_dbstr($v);
+
+					if(is_null($value)){
+						if($table_schema['fields'][$field]['null'])
+							$value = 'NULL';
+						else if(isset($table_schema['fields'][$field]['default']))
+							$value = $table_schema['fields'][$field]['default'];
+					}
+
+					if($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_CHAR){
+						if($value != 'NULL')
+							$value = zbx_dbstr($value);
 					}
 					else if(isset($table_schema['fields'][$field]['ref_table'])){
-						$row[$field] = zero2null($v);
+						if($table_schema['fields'][$field]['null'])
+							$value = zero2null($value);
 					}
 				}
+				unset($value);
 
 				if($getids){
-					$result_ids[$key] = $id;
+					$resultIds[$key] = $id;
 					$row[$table_schema['key']] = $id;
 					$id = bcadd($id, 1, 0);
 				}
@@ -1064,7 +1076,7 @@ else {
 				if(!DBexecute($sql)) self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
 			}
 
-			return $result_ids;
+			return $resultIds;
 		}
 
 /**
@@ -1088,15 +1100,25 @@ else {
 					if(!isset($table_schema['fields'][$field])){
 						continue;
 					}
-					else if($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_CHAR){
-						$value = zbx_dbstr($value);
+					if(is_null($value)){
+						if($table_schema['fields'][$field]['null'])
+							$value = 'NULL';
+						else if(isset($table_schema['fields'][$field]['default']))
+							$value = $table_schema['fields'][$field]['default'];
+					}
+
+					if($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_CHAR){
+						if($value != 'NULL')
+							$value = zbx_dbstr($value);
 					}
 					else if(isset($table_schema['fields'][$field]['ref_table'])){
-						$value = zero2null($value);
+						if($table_schema['fields'][$field]['null'])
+							$value = zero2null($value);
 					}
 
 					$sql_set .= $field.'='.$value.',';
 				}
+
 				$sql_set = rtrim($sql_set, ',');
 
 				if(!empty($sql_set)){

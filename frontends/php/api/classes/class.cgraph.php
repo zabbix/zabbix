@@ -878,14 +878,14 @@ COpt::memoryPick();
 			}
 
 // check if templated graph exists
-			$chd_graph = self::get(array(
+			$chd_graphs = self::get(array(
 				'filter' => array('templateid' => $tmp_graph['graphid'], 'flags' => array(ZBX_FLAG_DISCOVERY_CHILD, ZBX_FLAG_DISCOVERY_NORMAL)),
 				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1,
 				'hostids' => $chd_host['hostid']
 			));
 
-			if($chd_graph = reset($chd_graph)){
+			if($chd_graph = reset($chd_graphs)){
 				if((zbx_strtolower($tmp_graph['name']) != zbx_strtolower($chd_graph['name']))
 				&& self::exists(array('name' => $tmp_graph['name'], 'hostids' => $chd_host['hostid'])))
 				{

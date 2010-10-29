@@ -391,53 +391,50 @@ switch($itemType) {
 		$db_delay_flex = trim($db_delay_flex,';');
 
 		$item = array(
-				'description'	=> get_request('description'),
-				'key_'			=> get_request('key'),
-				'hostid'		=> get_request('form_hostid'),
-				'delay'			=> get_request('delay'),
-				'history'		=> get_request('history'),
-				'status'		=> get_request('status'),
-				'type'			=> get_request('type'),
-				'snmp_community'=> get_request('snmp_community'),
-				'snmp_oid'		=> get_request('snmp_oid'),
-				'value_type'	=> get_request('value_type'),
-				'trapper_hosts'	=> get_request('trapper_hosts'),
-				'snmp_port'		=> get_request('snmp_port'),
-				'units'			=> get_request('units'),
+			'description'	=> get_request('description'),
+			'key_'			=> get_request('key'),
+			'hostid'		=> get_request('form_hostid'),
+			'delay'			=> get_request('delay'),
+			'history'		=> get_request('history'),
+			'status'		=> get_request('status'),
+			'type'			=> get_request('type'),
+			'snmp_community'=> get_request('snmp_community'),
+			'snmp_oid'		=> get_request('snmp_oid'),
+			'value_type'	=> get_request('value_type'),
+			'trapper_hosts'	=> get_request('trapper_hosts'),
+			'snmp_port'		=> get_request('snmp_port'),
+			'units'			=> get_request('units'),
 			'multiplier'	=> get_request('multiplier', 0),
-				'delta'			=> get_request('delta'),
-				'snmpv3_securityname'	=> get_request('snmpv3_securityname'),
-				'snmpv3_securitylevel'	=> get_request('snmpv3_securitylevel'),
-				'snmpv3_authpassphrase'	=> get_request('snmpv3_authpassphrase'),
-				'snmpv3_privpassphrase'	=> get_request('snmpv3_privpassphrase'),
-				'formula'			=> get_request('formula'),
-				'trends'			=> get_request('trends'),
-				'logtimefmt'		=> get_request('logtimefmt'),
-				'valuemapid'		=> get_request('valuemapid'),
-				'delay_flex'		=> $db_delay_flex,
-				'authtype'		=> get_request('authtype'),
-				'username'		=> get_request('username'),
-				'password'		=> get_request('password'),
-				'publickey'		=> get_request('publickey'),
-				'privatekey'		=> get_request('privatekey'),
-				'params'			=> get_request('params'),
-				'ipmi_sensor'		=> get_request('ipmi_sensor'),
+			'delta'			=> get_request('delta'),
+			'snmpv3_securityname'	=> get_request('snmpv3_securityname'),
+			'snmpv3_securitylevel'	=> get_request('snmpv3_securitylevel'),
+			'snmpv3_authpassphrase'	=> get_request('snmpv3_authpassphrase'),
+			'snmpv3_privpassphrase'	=> get_request('snmpv3_privpassphrase'),
+			'formula'			=> get_request('formula'),
+			'trends'			=> get_request('trends'),
+			'logtimefmt'		=> get_request('logtimefmt'),
+			'valuemapid'		=> get_request('valuemapid'),
+			'delay_flex'		=> $db_delay_flex,
+			'authtype'		=> get_request('authtype'),
+			'username'		=> get_request('username'),
+			'password'		=> get_request('password'),
+			'publickey'		=> get_request('publickey'),
+			'privatekey'		=> get_request('privatekey'),
+			'params'			=> get_request('params'),
+			'ipmi_sensor'		=> get_request('ipmi_sensor'),
 			'data_type'		=> get_request('data_type')
 		);
 
 		if(isset($_REQUEST['itemid'])){
 			DBstart();
 
-			$new_appid = true;
-			$result = false;
-
 			if(!zbx_empty($_REQUEST['new_application'])){
-				if($new_appid = add_application($_REQUEST['new_application'],$_REQUEST['form_hostid']))
-					$applications[$new_appid] = $new_appid;
+				$applications[$new_appid] = add_application($_REQUEST['new_application'],$_REQUEST['form_hostid']);
 			}
 
 			if((count($applications) == 1) && in_array(0, $applications))
 				$applications = array();
+
 			$item['applications'] = $applications;
 
 			$db_item = get_item_by_itemid_limited($_REQUEST['itemid']);
@@ -447,12 +444,11 @@ switch($itemType) {
 // sdii($db_item['applications']);
 
 			foreach($item as $field => $value){
-				if($item[$field] == $db_item[$field]) $item[$field] = null;
+				if($item[$field] == $db_item[$field]) unset($item[$field]);
 			}
 
-			if($new_appid){
-				$result = smart_update_item($_REQUEST['itemid'],$item);
-			}
+			$item['itemid'] = $_REQUEST['itemid'];
+			$result = CItem::update($item);
 
 			$result = DBend($result);
 
@@ -474,7 +470,7 @@ switch($itemType) {
 			$item['applications'] = $applications;
 
 			if($new_appid){
-				$itemid = add_item($item);
+				$itemid = CItem::create(array($item));
 			}
 
 			$result = DBend($itemid);
@@ -1025,7 +1021,7 @@ switch($itemType) {
 		foreach($items as $inum => $item){
 
 			if($show_host){
-				$host = array_pop($item['hosts']);
+				$host = reset($item['hosts']);
 				$host = $host['host'];
 			}
 			else{
@@ -1035,6 +1031,7 @@ switch($itemType) {
 			$description = array();
 			if($item['templateid']){
 				$template_host = get_realhost_by_itemid($item['templateid']);
+
 				$description[] = new CLink($template_host['host'],'?hostid='.$template_host['hostid'], 'unknown');
 				$description[] = ':';
 			}
