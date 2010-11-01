@@ -55,6 +55,7 @@ frontends/php/api/classes/class.cgraphitem.php -text
 frontends/php/api/classes/class.chistory.php -text
 frontends/php/api/classes/class.chost.php -text
 frontends/php/api/classes/class.chostgroup.php -text
+frontends/php/api/classes/class.chostinterface.php -text
 frontends/php/api/classes/class.cimage.php -text
 frontends/php/api/classes/class.citem.php -text
 frontends/php/api/classes/class.cmaintenance.php -text

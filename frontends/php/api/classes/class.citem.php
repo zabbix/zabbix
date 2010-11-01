@@ -77,6 +77,7 @@ class CItem extends CZBXAPI{
 			'hostids'				=> null,
 			'proxyids'				=> null,
 			'itemids'				=> null,
+			'interfaceids'			=> null,
 			'graphids'				=> null,
 			'triggerids'			=> null,
 			'applicationids'		=> null,
@@ -181,21 +182,12 @@ class CItem extends CZBXAPI{
 // nodeids
 		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
-// groupids
-		if(!is_null($options['groupids'])){
-			zbx_value2array($options['groupids']);
 
-			if($options['output'] != API_OUTPUT_SHORTEN){
-				$sql_parts['select']['groupid'] = 'hg.groupid';
-			}
+// itemids
+		if(!is_null($options['itemids'])){
+			zbx_value2array($options['itemids']);
 
-			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
-			$sql_parts['where'][] = 'hg.hostid=i.hostid';
-
-			if(!is_null($options['groupCount'])){
-				$sql_parts['group']['hg'] = 'hg.groupid';
-			}
+			$sql_parts['where']['itemid'] = DBcondition('i.itemid', $options['itemids']);
 		}
 
 // templateids
@@ -226,6 +218,38 @@ class CItem extends CZBXAPI{
 			}
 		}
 
+// interfaceids
+		if(!is_null($options['interfaceids'])){
+			zbx_value2array($options['interfaceids']);
+
+			if($options['output'] != API_OUTPUT_EXTEND){
+				$sql_parts['select']['interfaceid'] = 'i.interfaceid';
+			}
+
+			$sql_parts['where']['interfaceid'] = DBcondition('i.interfaceid', $options['interfaceids']);
+
+			if(!is_null($options['groupCount'])){
+				$sql_parts['group']['i'] = 'i.interfaceid';
+			}
+		}
+
+// groupids
+		if(!is_null($options['groupids'])){
+			zbx_value2array($options['groupids']);
+
+			if($options['output'] != API_OUTPUT_SHORTEN){
+				$sql_parts['select']['groupid'] = 'hg.groupid';
+			}
+
+			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
+			$sql_parts['where'][] = 'hg.hostid=i.hostid';
+
+			if(!is_null($options['groupCount'])){
+				$sql_parts['group']['hg'] = 'hg.groupid';
+			}
+		}
+
 // proxyids
 		if(!is_null($options['proxyids'])){
 			zbx_value2array($options['proxyids']);
@@ -241,13 +265,6 @@ class CItem extends CZBXAPI{
 			if(!is_null($options['groupCount'])){
 				$sql_parts['group']['h'] = 'h.proxy_hostid';
 			}
-		}
-
-// itemids
-		if(!is_null($options['itemids'])){
-			zbx_value2array($options['itemids']);
-
-			$sql_parts['where']['itemid'] = DBcondition('i.itemid', $options['itemids']);
 		}
 
 // triggerids

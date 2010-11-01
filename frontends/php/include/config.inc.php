@@ -39,6 +39,7 @@ function __autoload($class_name){
 		'chistory' => 1,
 		'chost' => 1,
 		'chostgroup' => 1,
+		'chostinterface'=> 1,
 		'cimage' => 1,
 		'citem' => 1,
 		'cmaintenance' => 1,
