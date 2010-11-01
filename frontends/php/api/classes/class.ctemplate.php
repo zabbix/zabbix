@@ -1527,10 +1527,11 @@ COpt::memoryPick();
 		try{
 			self::BeginTransaction(__METHOD__);
 
-			$upd_templates = self::get(array(
-				'templateids' => $templateids,
+			$upd_templates = CHost::get(array(
+				'hostids' => $templateids,
 				'editable' => 1,
-				'preservekeys' => 1
+				'preservekeys' => 1,
+				'templated_hosts' => true,
 			));
 
 			foreach($templateids as $templateid){
@@ -1740,13 +1741,19 @@ COpt::memoryPick();
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot sync template');
+				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot sync discovery rules');
+
+				$result = CItemPrototype::syncTemplates(array(
+					'hostids' => $targetid,
+					'templateids' => $templateid
+				));
+				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot sync item prototypes');
 
 				$result = CItem::syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot sync template');
+				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot sync items');
 
 				copy_template_triggers($targetid, $templateid, false);
 
@@ -1754,7 +1761,7 @@ COpt::memoryPick();
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot sync template');
+				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot sync graphs');
 			}
 		}
 
@@ -1781,19 +1788,22 @@ COpt::memoryPick();
 		while($graph = DBfetch($db_graphs)){
 			$graphs[$graph['graphid']] = $graph['name'];
 		}
-		if($clear){
-			CGraph::delete(array_keys($graphs));
-		}
-		else{
-			DB::update('graphs', array(
-				'values' => array('templateid' => 0),
-				'where' => array(DBcondition('graphid', array_keys($graphs)))
-			));
+
+		if(!empty($graphs)){
+			if($clear){
+				CGraph::delete(array_keys($graphs), true);
+			}
+			else{
+				DB::update('graphs', array(
+					'values' => array('templateid' => 0),
+					'where' => array(DBcondition('graphid', array_keys($graphs)))
+				));
+			}
 		}
 
 // TODO: remove info from API
 		foreach($graphs as $graph){
-			info(S_GRAPH.' ['.$graph['name'].'] '.S_UNLINKED_SMALL);
+			info(S_GRAPH.' ['.$graph.'] '.S_UNLINKED_SMALL);
 		}
 // }}} GRAPHS
 
@@ -1817,19 +1827,21 @@ COpt::memoryPick();
 			$triggers[$trigger['triggerid']] = $trigger['description'];
 		}
 
-		if($clear){
-			CTrigger::delete(array_keys($triggers));
-		}
-		else{
-			DB::update('triggers', array(
-				'values' => array('templateid' => 0),
-				'where' => array(DBcondition('triggerid', array_keys($triggers)))
-			));
+		if(!empty($triggers)){
+			if($clear){
+				CTrigger::delete(array_keys($triggers), true);
+			}
+			else{
+				DB::update('triggers', array(
+					'values' => array('templateid' => 0),
+					'where' => array(DBcondition('triggerid', array_keys($triggers)))
+				));
+			}
 		}
 
 // TODO: remove info from API
 		foreach($triggers as $trigger){
-			info(S_TRIGGER.' ['.$trigger['name'].'] '.S_UNLINKED_SMALL);
+			info(S_TRIGGER.' ['.$trigger.'] '.S_UNLINKED_SMALL);
 		}
 // }}} TRIGGERS
 
@@ -1857,19 +1869,21 @@ COpt::memoryPick();
 			$items[$item['itemid']] = $item['key_'];
 		}
 
-		if($clear){
-			CItem::delete(array_keys($items));
-		}
-		else{
-			DB::update('items', array(
-				'values' => array('templateid' => 0),
-				'where' => array(DBcondition('itemid', array_keys($items)))
-			));
+		if(!empty($items)){
+			if($clear){
+				CItem::delete(array_keys($items), true);
+			}
+			else{
+				DB::update('items', array(
+					'values' => array('templateid' => 0),
+					'where' => array(DBcondition('itemid', array_keys($items)))
+				));
+			}
 		}
 
 // TODO: remove info from API
 		foreach($items as $item){
-			info(S_ITEM.' ['.$item['key_'].'] '.S_UNLINKED_SMALL);
+			info(S_ITEM.' ['.$item.'] '.S_UNLINKED_SMALL);
 		}
 // }}} ITEMS
 
@@ -1887,19 +1901,21 @@ COpt::memoryPick();
 			$applications[$application['applicationid']] = $application['name'];
 		}
 
-		if($clear){
-			CApplication::delete(array_keys($applications));
-		}
-		else{
-			DB::update('applications', array(
-				'values' => array('templateid' => 0),
-				'where' => array(DBcondition('applicationid', array_keys($applications)))
-			));
+		if(!empty($applications)){
+			if($clear){
+				CApplication::delete(array_keys($applications), true);
+			}
+			else{
+				DB::update('applications', array(
+					'values' => array('templateid' => 0),
+					'where' => array(DBcondition('applicationid', array_keys($applications)))
+				));
+			}
 		}
 
 // TODO: remove info from API
 		foreach($applications as $application){
-			info(S_APPLICATION.' ['.$application['name'].'] '.S_UNLINKED_SMALL);
+			info(S_APPLICATION.' ['.$application.'] '.S_UNLINKED_SMALL);
 		}
 // }}} APPLICATIONS
 

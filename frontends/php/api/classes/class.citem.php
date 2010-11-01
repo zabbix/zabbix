@@ -1184,39 +1184,35 @@ COpt::memoryPick();
  * @param array $itemids
  * @return
  */
-	public static function delete($itemids){
+	public static function delete($itemids, $nopermissions=false){
 		if(empty($itemids)) return true;
 
 		$itemids = zbx_toArray($itemids);
-		$insert = $discovery_items = $prototype_items = array();
+		$itemids = zbx_toHash($itemids);
 
 		try{
 			self::BeginTransaction(__METHOD__);
 
-			$options = array(
-				'itemids' => $itemids,
-				'editable' => 1,
-				'filter' => array('flags' => null),
-				'preservekeys' => 1,
-				'output' => API_OUTPUT_EXTEND,
-			);
-			$del_items = self::get($options);
-			foreach($itemids as $itemid){
-				if(!isset($del_items[$itemid])){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
-				}
-				if($del_items[$itemid]['templateid'] != 0){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete templated items');
-				}
-				if($del_items[$itemid]['type'] == ITEM_TYPE_HTTPTEST){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete web items');
-				}
-
-				if($del_items[$itemid]['flags'] == ZBX_FLAG_DISCOVERY){
-					$discovery_items[$itemid] = $itemid;
-				}
-				else if($del_items[$itemid]['flags'] == ZBX_FLAG_DISCOVERY_CHILD){
-					$prototype_items[$itemid] = $itemid;
+// TODO: remove $nopermissions hack
+			if(!$nopermissions){
+				$options = array(
+					'itemids' => $itemids,
+					'editable' => 1,
+					'preservekeys' => 1,
+					'webitems' => true,
+					'output' => API_OUTPUT_EXTEND,
+				);
+				$del_items = self::get($options);
+				foreach($itemids as $itemid){
+					if(!isset($del_items[$itemid])){
+						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
+					}
+					if($del_items[$itemid]['templateid'] != 0){
+						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete templated items');
+					}
+					if($del_items[$itemid]['type'] == ITEM_TYPE_HTTPTEST){
+						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete web items');
+					}
 				}
 			}
 
@@ -1227,7 +1223,7 @@ COpt::memoryPick();
 				$parent_itemids = array();
 				while($db_item = DBfetch($db_items)){
 					$parent_itemids[] = $db_item['itemid'];
-					$itemids[] = $db_item['itemid'];
+					$itemids[$db_item['itemid']] = $db_item['itemid'];
 				}
 			} while(!empty($parent_itemids));
 
@@ -1248,43 +1244,10 @@ COpt::memoryPick();
 			}
 
 			if(!empty($del_graphs)){
-				$result = CGraph::delete($del_graphs);
+				$result = CGraph::delete($del_graphs, true);
 				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete item');
 			}
 //--
-
-// discovery rules/prototypes
-			if(!empty($discovery_items)){
-				$sql = 'SELECT itemid FROM item_discovery WHERE '.DBcondition('parent_itemid', $discovery_items);
-				$db_prototypes = DBselect($sql);
-				while($prototype = DBfetch($db_prototypes)){
-					$prototype_items[$prototype['itemid']] = $prototype['itemid'];
-					$itemids[] = $prototype['itemid'];
-				}
-			}
-
-			if(!empty($prototype_items)){
-				$sql = 'SELECT itemid FROM item_discovery WHERE '.DBcondition('parent_itemid', $prototype_items);
-				$db_items = DBselect($sql);
-				while($item = DBfetch($db_items)){
-					$itemids[] = $item['itemid'];
-				}
-			}
-// ---
-
-// delete graphs
-			$del_graphs = array();
-			$sql = 'SELECT gi.graphid' .
-					' FROM graphs_items gi' .
-					' WHERE ' . DBcondition('gi.itemid', $itemids);
-			$db_graphs = DBselect($sql);
-			while($db_graph = DBfetch($db_graphs)){
-				$del_graphs[$db_graph['graphid']] = $db_graph['graphid'];
-			}
-			if(!empty($del_graphs))
-				DB::delete('graphs', $del_graphs);
-//--
-
 
 			$triggers = CTrigger::get(array(
 				'itemids' => $itemids,
@@ -1319,6 +1282,7 @@ COpt::memoryPick();
 				'history',
 			);
 
+			$insert = array();
 			foreach($itemids as $id => $itemid){
 				foreach($item_data_tables as $table){
 					$insert[] = array(

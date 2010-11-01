@@ -901,7 +901,7 @@ COpt::memoryPick();
 		if(empty($ruleids)) return true;
 
 		$ruleids = zbx_toArray($ruleids);
-		$insert = $prototypeids = array();
+		$ruleids = zbx_toHash($ruleids);
 
 		try{
 			self::BeginTransaction(__METHOD__);
@@ -918,7 +918,7 @@ COpt::memoryPick();
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
 				}
 				if($del_items[$ruleid]['templateid'] != 0){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete templated items');
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete templated rules');
 				}
 			}
 
@@ -928,57 +928,28 @@ COpt::memoryPick();
 				$db_items = DBselect('SELECT itemid FROM items WHERE ' . DBcondition('templateid', $parent_itemids));
 				$parent_itemids = array();
 				while($db_item = DBfetch($db_items)){
-					$parent_itemids[] = $db_item['itemid'];
-					$ruleids[] = $db_item['itemid'];
+					$parent_itemids[$db_item['itemid']] = $db_item['itemid'];
+					$ruleids[$db_item['itemid']] = $db_item['itemid'];
 				}
 			}while(!empty($parent_itemids));
 
-
-			$sql = 'SELECT itemid FROM item_discovery WHERE '.DBcondition('parent_itemid', $ruleids);
+			$prototypeids = array();
+			$sql = 'SELECT itemid'.
+			 		' FROM item_discovery id, items i'.
+			 		' WHERE i.templateid IS NULL'.
+			 			' AND '.DBcondition('parent_itemid', $ruleids);
 			$db_items = DBselect($sql);
 			while($item = DBfetch($db_items)){
-				$prototypeids[] = $item['itemid'];
+				$prototypeids[$item['itemid']] = $item['itemid'];
 			}
-// ---
-
-// delete graphs
-			$del_graphs = array();
-			$sql = 'SELECT gi.graphid' .
-					' FROM graphs_items gi' .
-					' WHERE ' . DBcondition('gi.itemid', $prototypeids);
-			$db_graphs = DBselect($sql);
-			while($db_graph = DBfetch($db_graphs)){
-				$del_graphs[$db_graph['graphid']] = $db_graph['graphid'];
-			}
-			if(!empty($del_graphs)){
-				DB::delete('graphs', $del_graphs);
-			}
-//--
-
-			$triggers = CTrigger::get(array(
-				'itemids' => $prototypeids,
-				'output' => API_OUTPUT_SHORTEN,
-				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
-				'nopermissions' => true,
-				'preservekeys' => true,
-			));
-			if(!empty($triggers))
-				DB::delete('triggers', zbx_objectValues($triggers, 'triggerid'));
+			if(!CItemPrototype::delete($prototypeids, true))
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete discovery rule');
 
 
-			$itemids_condition = DBcondition('itemid', $ruleids);
-			DB::delete('screens_items', array(
-				DBcondition('resourceid', $ruleids),
-				DBcondition('resourcetype', array(SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT)),
-			));
-			DB::delete('items', array($itemids_condition));
-			DB::delete('profiles', array(
-				'idx='.zbx_dbstr('web.favorite.graphids'),
-				'source='.zbx_dbstr('itemid'),
-				DBcondition('value_id', $ruleids)
-			));
+			DB::delete('items', array(DBcondition('itemid', $ruleids)));
 
 
+// HOUSEKEEPER {{{
 			$item_data_tables = array(
 				'trends',
 				'trends_uint',
@@ -989,6 +960,7 @@ COpt::memoryPick();
 				'history',
 			);
 
+			$insert = array();
 			foreach($ruleids as $id => $ruleid){
 				foreach($item_data_tables as $table){
 					$insert[] = array(
@@ -999,6 +971,7 @@ COpt::memoryPick();
 				}
 			}
 			DB::insert('housekeeper', $insert);
+// }}} HOUSEKEEPER
 
 			self::EndTransaction(true, __METHOD__);
 			return array('ruleids' => $ruleids);

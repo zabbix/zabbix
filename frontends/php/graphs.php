@@ -493,10 +493,9 @@ include_once('include/page_header.php');
 				$name[] = new CLink($real_host['host'], 'graphs.php?'.'hostid='.$real_host['hostid'], 'unknown');
 				$name[] = ':'.$graph['name'];
 			}
-
-			if(!empty($graph['discoveryRule'])){
+			else if(!empty($graph['discoveryRule'])){
 				$name[] = new CLink($graph['discoveryRule']['description'], 'graph_prototypes.php?parent_discoveryid='.
-					$graph['discoveryRule']['itemid'],'discoveryName');
+						$graph['discoveryRule']['itemid'],'discoveryName');
 				$name[] = ':'.$graph['name'];
 			}
 			else{
@@ -505,7 +504,8 @@ include_once('include/page_header.php');
 
 
 			$chkBox = new CCheckBox('group_graphid['.$graphid.']', NULL, NULL, $graphid);
-			if($graph['templateid'] > 0) $chkBox->setEnabled(false);
+			if(($graph['templateid'] > 0) || empty($item['discoveryRule']))
+				$chkBox->setEnabled(false);
 
 			$table->addRow(array(
 				$chkBox,

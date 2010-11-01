@@ -773,7 +773,7 @@ COpt::memoryPick();
 
 		foreach($graph['gitems'] as $gitem){
 			$gitem['graphid'] = $graphid;
-			
+
 			$gitemids = DB::insert('graphs_items', array($gitem));
 			if(!$gitemids) self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 		}
@@ -1011,29 +1011,31 @@ COpt::memoryPick();
  * @param array $graphs['graphids']
  * @return boolean
  */
-	public static function delete($graphids){
+	public static function delete($graphids, $nopermissions=false){
 		$graphids = zbx_toArray($graphids);
 		if(empty($graphids)) return true;
 
 		try{
 			self::BeginTransaction(__METHOD__);
 
-			$options = array(
-				'graphids' => $graphids,
-				'editable' => 1,
-				'filter' => array('flags' => null),
-				'output' => API_OUTPUT_EXTEND,
-				'preservekeys' => 1
-			);
-			$del_graphs = self::get($options);
-			foreach($graphids as $graphid){
-				if($del_graphs[$graphid]['flags'] = ZBX_FLAG_DISCOVERY_CHILD)
-					$graph_prototypes[$graphid] = $graphid;
-
-				if(!isset($del_graphs[$graphid]))
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				if($del_graphs[$graphid]['templateid'] != 0){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, 'Cannot delete templated graphs');
+// TODO: remove $nopermissions hack
+			if(!$nopermissions){
+				$options = array(
+					'graphids' => $graphids,
+					'editable' => 1,
+					'filter' => array('flags' => null),
+					'output' => API_OUTPUT_EXTEND,
+					'preservekeys' => 1
+				);
+				$del_graphs = self::get($options);
+				foreach($graphids as $graphid){
+					if($del_graphs[$graphid]['flags'] = ZBX_FLAG_DISCOVERY_CHILD)
+						$graph_prototypes[$graphid] = $graphid;
+					if(!isset($del_graphs[$graphid]))
+						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+					if($del_graphs[$graphid]['templateid'] != 0){
+						self::exception(ZBX_API_ERROR_PERMISSIONS, 'Cannot delete templated graphs');
+					}
 				}
 			}
 
