@@ -1377,7 +1377,7 @@ return $result;
 
 
 
-		//check if app is used by web scenarion
+		//check if app is used by web scenario
 		$sql = 'SELECT ht.name, ht.applicationid '.
 				' FROM httptest ht '.
 				' WHERE '.DBcondition('ht.applicationid',$applicationids).'
