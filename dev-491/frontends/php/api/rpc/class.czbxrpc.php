@@ -270,6 +270,19 @@ class czbxrpc{
 		self::$result = $result;
 	}
 
+// HostInterface
+	private static function hostinterface($action, $params){
+
+		CHostInterface::$error = array();
+
+		switch($action){
+			default:
+			$result = call_user_func(array('CHostInterface', $action), $params);
+		}
+
+		self::$result = $result;
+	}
+
 // HOST GROUP
 	private static function hostgroup($action, $params){
 
