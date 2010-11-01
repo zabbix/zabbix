@@ -694,7 +694,7 @@ include_once('include/page_header.php');
 					$chkBox,
 					is_show_all_nodes()?SPACE:NULL,
 					($_REQUEST['hostid']>0) ? null : $db_app['host'],
-					array(str_repeat(SPACE,4), $name),
+					$name,
 					$step_cout,
 					$httptest_data['delay'],
 					$status
