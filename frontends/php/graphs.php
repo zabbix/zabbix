@@ -105,7 +105,7 @@ include_once('include/page_header.php');
 	else if(get_request('hostid', 0) > 0){
 		$options = array(
 			'hostids' => $_REQUEST['hostid'],
-			'extendoutput' => 1,
+			'output' => API_OUTPUT_EXTEND,
 			'templated_hosts' => 1,
 			'editable' => 1
 		);

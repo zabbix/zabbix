@@ -321,7 +321,7 @@ include_once('include/page_header.php');
 		$options = array(
 			'sysmapids' => $_REQUEST['sysmapid'],
 			'editable' => 1,
-			'extendoutput' => 1,
+			'output' => API_OUTPUT_EXTEND,
 		);
 		$maps = CMap::get($options);
 

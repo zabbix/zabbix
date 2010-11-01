@@ -607,7 +607,10 @@
 		$frm_title = S_USER_GROUP;
 
 		if(isset($_REQUEST['usrgrpid'])){
-			$usrgrp		= CUserGroup::get(array('usrgrpids' => $_REQUEST['usrgrpid'],  'extendoutput' => 1));
+			$usrgrp	= CUserGroup::get(array(
+				'usrgrpids' => $_REQUEST['usrgrpid'],
+				'output' => API_OUTPUT_EXTEND
+			));
 			$usrgrp = reset($usrgrp);
 
 			$frm_title	= S_USER_GROUP.' "'.$usrgrp['name'].'"';
@@ -2406,7 +2409,10 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 		$target_list = array();
 
-		$groups = CHostGroup::get(array('extendoutput'=>1, 'order'=>'name'));
+		$groups = CHostGroup::get(array(
+			'output'=>API_OUTPUT_EXTEND,
+			'sortorder'=>'name'
+		));
 		order_result($groups, 'name');
 
 		if(0 == $copy_type){
@@ -2420,7 +2426,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			$frmCopy->addRow('Group', $cmbGroup);
 
 			$options = array(
-				'extendoutput'=>1,
+				'output'=>API_OUTPUT_EXTEND,
 				'groupids' => $filter_groupid,
 				'templated_hosts' => 1
 			);
@@ -4277,7 +4283,10 @@ JAVASCRIPT;
 
 		$grp_tb = new CTweenBox($frmHost, 'groups', $host_groups, 10);
 
-		$all_groups = CHostGroup::get(array('editable' => 1, 'extendoutput' => 1));
+		$all_groups = CHostGroup::get(array(
+			'editable' => 1,
+			'output' => API_OUTPUT_EXTEND
+		));
 		order_result($all_groups, 'name');
 		foreach($all_groups as $group){
 			$grp_tb->addItem($group['groupid'], $group['name']);
@@ -4307,7 +4316,8 @@ JAVASCRIPT;
 		$cmbProxy = new CComboBox('proxy_hostid', $proxy_hostid);
 
 		$cmbProxy->addItem(0, S_NO_PROXY);
-		$options = array('extendoutput' => 1);
+
+		$options = array('output' => API_OUTPUT_EXTEND);
 		$db_proxies = CProxy::get($options);
 		order_result($db_proxies, 'host');
 

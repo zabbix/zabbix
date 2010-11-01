@@ -76,7 +76,6 @@ class CTemplate extends CZBXAPI{
 
 // OutPut
 			'output'					=> API_OUTPUT_REFER,
-			'extendoutput'				=> null,
 			'select_groups'				=> null,
 			'select_hosts'				=> null,
 			'select_templates'			=> null,
@@ -87,7 +86,7 @@ class CTemplate extends CZBXAPI{
 			'select_graphs'				=> null,
 			'select_applications'		=> null,
 			'select_macros'				=> null,
-			'selectScreens'			=> null,
+			'selectScreens'				=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -99,39 +98,6 @@ class CTemplate extends CZBXAPI{
 		);
 
 		$options = zbx_array_merge($def_options, $options);
-
-
-		if(!is_null($options['extendoutput'])){
-			$options['output'] = API_OUTPUT_EXTEND;
-
-			if(!is_null($options['select_groups'])){
-				$options['select_groups'] = API_OUTPUT_EXTEND;
-			}
-			if(!is_null($options['select_templates'])){
-				$options['select_templates'] = API_OUTPUT_EXTEND;
-			}
-			if(!is_null($options['selectParentTemplates'])){
-				$options['selectParentTemplates'] = API_OUTPUT_EXTEND;
-			}
-			if(!is_null($options['select_hosts'])){
-				$options['select_hosts'] = API_OUTPUT_EXTEND;
-			}
-			if(!is_null($options['select_items'])){
-				$options['select_items'] = API_OUTPUT_EXTEND;
-			}
-			if(!is_null($options['select_triggers'])){
-				$options['select_triggers'] = API_OUTPUT_EXTEND;
-			}
-			if(!is_null($options['select_graphs'])){
-				$options['select_graphs'] = API_OUTPUT_EXTEND;
-			}
-			if(!is_null($options['select_applications'])){
-				$options['select_applications'] = API_OUTPUT_EXTEND;
-			}
-			if(!is_null($options['select_macros'])){
-				$options['select_macros'] = API_OUTPUT_EXTEND;
-			}
-		}
 
 		if(is_array($options['output'])){
 			unset($sql_parts['select']['templates']);

@@ -161,7 +161,7 @@ include_once('include/page_header.php');
 		}
 	}
 	else if(isset($_REQUEST['delete'])){
-		$group = CUserGroup::get(array('usrgrpids' => $_REQUEST['usrgrpid'], 'extendoutput' => 1));
+		$group = CUserGroup::get(array('usrgrpids' => $_REQUEST['usrgrpid'], 'output' => API_OUTPUT_EXTEND));
 		$group = reset($group);
 
 		$result = CUserGroup::delete($_REQUEST['usrgrpid']);

@@ -81,7 +81,6 @@ class CGraph extends CZBXAPI{
 			'select_items'			=> null,
 			'select_graph_items'	=> null,
 			'selectDiscoveryRule'	=> null,
-			'extendoutput'			=> null,
 			'countOutput'			=> null,
 			'groupCount'			=> null,
 			'preservekeys'			=> null,
@@ -93,26 +92,6 @@ class CGraph extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $options);
 
-
-		if(!is_null($options['extendoutput'])){
-			$options['output'] = API_OUTPUT_EXTEND;
-
-			if(!is_null($options['select_hosts'])){
-				$options['select_hosts'] = API_OUTPUT_EXTEND;
-			}
-			if(!is_null($options['select_groups'])){
-				$options['select_groups'] = API_OUTPUT_EXTEND;
-			}
-			if(!is_null($options['select_templates'])){
-				$options['select_templates'] = API_OUTPUT_EXTEND;
-			}
-			if(!is_null($options['select_items'])){
-				$options['select_items'] = API_OUTPUT_EXTEND;
-			}
-			if(!is_null($options['select_graph_items'])){
-				$options['select_graph_items'] = API_OUTPUT_EXTEND;
-			}
-		}
 
 		if(is_array($options['output'])){
 			unset($sql_parts['select']['graphs']);

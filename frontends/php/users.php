@@ -229,7 +229,7 @@ include_once('include/page_header.php');
 	}
 // Add USER to GROUP
 	else if(isset($_REQUEST['grpaction'])&&isset($_REQUEST['usrgrpid'])&&isset($_REQUEST['userid'])&&($_REQUEST['grpaction']==1)){
-		$user = CUser::get(array('userids'=>$_REQUEST['userid'],'extendoutput'=>1));
+		$user = CUser::get(array('userids'=>$_REQUEST['userid'],'output'=>API_OUTPUT_EXTEND));
 		$user = reset($user);
 
 		$group = CUserGroup::get(array('usrgrpids' => $_REQUEST['usrgrpid'],  'output' => API_OUTPUT_EXTEND));
@@ -252,7 +252,7 @@ include_once('include/page_header.php');
 	}
 // Remove USER from GROUP
 	else if(isset($_REQUEST['grpaction'])&&isset($_REQUEST['usrgrpid'])&&isset($_REQUEST['userid'])&&($_REQUEST['grpaction']==0)){
-		$user = CUser::get(array('userids'=>$_REQUEST['userid'],'extendoutput'=>1));
+		$user = CUser::get(array('userids'=>$_REQUEST['userid'],'output'=>API_OUTPUT_EXTEND));
 		$user = reset($user);
 
 		$group = CUserGroup::get(array('usrgrpids' => $_REQUEST['usrgrpid'],  'output' => API_OUTPUT_EXTEND));

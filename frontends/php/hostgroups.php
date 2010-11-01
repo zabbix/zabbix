@@ -277,7 +277,7 @@ include_once('include/page_header.php');
 			'not_proxy_host' => 1,
 			'sortfield' => 'name',
 			'editable' => 1,
-			'extendoutput' => 1);
+			'output' => API_OUTPUT_EXTEND);
 		$db_groups = CHostGroup::get($params);
 		$twb_groupid = get_request('twb_groupid', -1);
 		if($twb_groupid == -1){
@@ -314,16 +314,19 @@ include_once('include/page_header.php');
 				'templated_hosts' => 1,
 				'sortfield' => 'host',
 				'editable' => 1,
-				'extendoutput' => 1);
+				'output' => API_OUTPUT_EXTEND
+			);
 
-		} else {
+		}
+		else {
 			// get hosts from selected twb_groupid combo
 			$params = array(
 				'groupids' => $twb_groupid,
 				'templated_hosts' => 1,
 				'sortfield' => 'host',
 				'editable' => 1,
-				'extendoutput' => 1);
+				'output' => API_OUTPUT_EXTEND
+			);
 		}
 
 		$db_hosts = CHost::get($params);

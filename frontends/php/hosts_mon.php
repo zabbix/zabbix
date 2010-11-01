@@ -226,7 +226,10 @@ include_once('include/page_header.php');
 
 		$description = array();
 		if($host['proxy_hostid']){
-			$proxy = CProxy::get(array('proxyids' => $host['proxy_hostid'], 'extendoutput' => 1));
+			$proxy = CProxy::get(array(
+				'proxyids' => $host['proxy_hostid'],
+				'output' => API_OUTPUT_EXTEND
+			));
 			$proxy = reset($proxy);
 			$description[] = $proxy['host'] . ':';
 		}

@@ -95,6 +95,7 @@ class CHost extends CZBXAPI{
 			'hostids'					=> null,
 			'proxyids'					=> null,
 			'templateids'				=> null,
+			'interfaceids'				=> null,
 			'itemids'					=> null,
 			'triggerids'				=> null,
 			'maintenanceids'			=> null,
@@ -123,7 +124,6 @@ class CHost extends CZBXAPI{
 
 // OutPut
 			'output'					=> API_OUTPUT_REFER,
-			'extendoutput'				=> null,
 			'select_groups'				=> null,
 			'selectParentTemplates'		=> null,
 			'select_items'				=> null,
@@ -135,6 +135,7 @@ class CHost extends CZBXAPI{
 			'select_applications'		=> null,
 			'select_macros'				=> null,
 			'selectScreens'				=> null,
+			'selectInterfaces'			=> null,
 			'select_profile'			=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
@@ -147,32 +148,6 @@ class CHost extends CZBXAPI{
 		);
 
 		$options = zbx_array_merge($def_options, $options);
-
-		if(!is_null($options['extendoutput'])){
-			$options['output'] = API_OUTPUT_EXTEND;
-
-			if(!is_null($options['select_groups'])){
-				$options['select_groups'] = API_OUTPUT_EXTEND;
-			}
-			if(!is_null($options['selectParentTemplates'])){
-				$options['selectParentTemplates'] = API_OUTPUT_EXTEND;
-			}
-			if(!is_null($options['select_items'])){
-				$options['select_items'] = API_OUTPUT_EXTEND;
-			}
-			if(!is_null($options['select_triggers'])){
-				$options['select_triggers'] = API_OUTPUT_EXTEND;
-			}
-			if(!is_null($options['select_graphs'])){
-				$options['select_graphs'] = API_OUTPUT_EXTEND;
-			}
-			if(!is_null($options['select_applications'])){
-				$options['select_applications'] = API_OUTPUT_EXTEND;
-			}
-			if(!is_null($options['select_macros'])){
-				$options['select_macros'] = API_OUTPUT_EXTEND;
-			}
-		}
 
 		if(is_array($options['output'])){
 			unset($sql_parts['select']['hosts']);
@@ -273,6 +248,23 @@ class CHost extends CZBXAPI{
 			if(!$nodeCheck){
 				$nodeCheck = true;
 				$sql_parts['where'][] = DBin_node('ht.templateid', $nodeids);
+			}
+		}
+
+// interfaceids
+		if(!is_null($options['interfaceids'])){
+			zbx_value2array($options['interfaceids']);
+			if($options['output'] != API_OUTPUT_SHORTEN){
+				$sql_parts['select']['interfaceid'] = 'hi.interfaceid';
+			}
+
+			$sql_parts['from']['interfaces'] = 'interface hi';
+			$sql_parts['where'][] = DBcondition('hi.interfaceid', $options['interfaceids']);
+			$sql_parts['where']['hi'] = 'h.hostid=hi.hostid';
+
+			if(!$nodeCheck){
+				$nodeCheck = true;
+				$sql_parts['where'][] = DBin_node('hi.interfaceid', $nodeids);
 			}
 		}
 
@@ -585,9 +577,10 @@ class CHost extends CZBXAPI{
 					if(!is_null($options['selectScreens']) && !isset($result[$host['hostid']]['screens'])){
 						$result[$host['hostid']]['screens'] = array();
 					}
-//					if(!is_null($options['select_maintenances']) && !isset($result[$host['hostid']]['maintenances'])){
-//						$result[$host['hostid']]['maintenances'] = array();
-//					}
+
+					if(!is_null($options['selectInterfaces']) && !isset($result[$host['hostid']]['interfaces'])){
+						$result[$host['hostid']]['interfaces'] = array();
+					}
 
 // groupids
 					if(isset($host['groupid']) && is_null($options['select_groups'])){
@@ -617,6 +610,15 @@ class CHost extends CZBXAPI{
 
 						$result[$host['hostid']]['triggers'][] = array('triggerid' => $host['triggerid']);
 						unset($host['triggerid']);
+					}
+
+// interfaceids
+					if(isset($host['interfaceid']) && is_null($options['selectInterfaces'])){
+						if(!isset($result[$host['hostid']]['interfaces']))
+							$result[$host['hostid']]['interfaces'] = array();
+
+						$result[$host['hostid']]['interfaces'][] = array('interfaceid' => $host['interfaceid']);
+						unset($host['interfaceid']);
 					}
 
 // itemids
@@ -1232,7 +1234,6 @@ Copt::memoryPick();
 			self::checkInput($hosts, __FUNCTION__);
 
 			foreach($hosts as $num => $host){
-
 				$hostid = DB::insert('hosts', array($host));
 				$hostids[] = $hostid = reset($hostid);
 
@@ -1240,11 +1241,18 @@ Copt::memoryPick();
 
 				$options = array();
 				$options['hosts'] = $host;
-				$options['groups'] = $host['groups'];
+
+				if(isset($host['groups']) && !is_null($host['groups']))
+					$options['groups'] = $host['groups'];
+
 				if(isset($host['templates']) && !is_null($host['templates']))
 					$options['templates'] = $host['templates'];
+
 				if(isset($host['macros']) && !is_null($host['macros']))
 					$options['macros'] = $host['macros'];
+
+				if(isset($host['interfaces']) && !is_null($host['interfaces']))
+					$options['interfaces'] = $host['interfaces'];
 
 				$result = CHost::massAdd($options);
 				if(!$result){
@@ -1343,11 +1351,13 @@ Copt::memoryPick();
  * @param array $data['macros']
  * @return array
  */
-	public static function massAdd($data){
+	public static function massAdd(&$data){
 		$data['hosts'] = zbx_toArray($data['hosts']);
 
 		try{
 			self::BeginTransaction(__METHOD__);
+
+			self::checkInput($data, __FUNCTION__);
 
 			$options = array(
 				'hostids' => zbx_objectValues($data['hosts'], 'hostid'),
@@ -1362,30 +1372,48 @@ Copt::memoryPick();
 			}
 
 			if(isset($data['groups']) && !empty($data['groups'])){
+				$data['groups'] = zbx_toArray($data['groups']);
+
 				$options = array(
-					'groups' => zbx_toArray($data['groups']),
-					'hosts' => $data['hosts']
+					'hosts' => &$data['hosts'],
+					'groups' => &$data['groups']
 				);
 				$result = CHostGroup::massAdd($options);
 				if(!$result) self::exception();
 			}
 
 			if(isset($data['templates']) && !empty($data['templates'])){
+				$data['templates'] = zbx_toArray($data['templates']);
+
 				$options = array(
-					'hosts' => $data['hosts'],
-					'templates' => zbx_toArray($data['templates'])
+					'hosts' => &$data['hosts'],
+					'templates' => &$data['templates']
 				);
 				$result = CTemplate::massAdd($options);
 				if(!$result) self::exception();
 			}
 
 			if(isset($data['macros']) && !empty($data['macros'])){
+				$data['macros'] = zbx_toArray($data['macros']);
+
 				$options = array(
-					'hosts' => $data['hosts'],
-					'macros' => $data['macros']
+					'hosts' => &$data['hosts'],
+					'macros' => &$data['macros']
 				);
 
 				$result = CUserMacro::massAdd($options);
+				if(!$result) self::exception();
+			}
+
+			if(isset($data['interfaces']) && !empty($data['interfaces'])){
+				$data['interfaces'] = zbx_toArray($data['interfaces']);
+
+				$options = array(
+					'hosts' => &$data['hosts'],
+					'interfaces' => &$data['interfaces']
+				);
+
+				$result = CHostInterface::massAdd($options);
 				if(!$result) self::exception();
 			}
 

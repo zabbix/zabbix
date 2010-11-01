@@ -852,16 +852,16 @@
 		}
 
 
-		$hosts = CHost::get(array('hostids'=>$hostids, 'extendoutput'=>1, 'nopermissions'=>1, 'nodeids' => get_current_nodeid(true)));
+		$hosts = CHost::get(array('hostids'=>$hostids, 'output'=>API_OUTPUT_EXTEND, 'nopermissions'=>1, 'nodeids' => get_current_nodeid(true)));
 		$hosts = zbx_toHash($hosts, 'hostid');
 
-		$maps = CMap::get(array('mapids'=>$mapids, 'extendoutput'=>1, 'nopermissions'=>1, 'nodeids' => get_current_nodeid(true)));
+		$maps = CMap::get(array('mapids'=>$mapids, 'output'=>API_OUTPUT_EXTEND, 'nopermissions'=>1, 'nodeids' => get_current_nodeid(true)));
 		$maps = zbx_toHash($maps, 'sysmapid');
 
-		$triggers = CTrigger::get(array('triggerids'=>$triggerids, 'extendoutput'=>1, 'nopermissions'=>1, 'nodeids' => get_current_nodeid(true)));
+		$triggers = CTrigger::get(array('triggerids'=>$triggerids, 'output'=>API_OUTPUT_EXTEND, 'nopermissions'=>1, 'nodeids' => get_current_nodeid(true)));
 		$triggers = zbx_toHash($triggers, 'triggerid');
 
-		$hostgroups = CHostGroup::get(array('hostgroupids'=>$hostgroupids, 'extendoutput'=>1, 'nopermissions'=>1, 'nodeids' => get_current_nodeid(true)));
+		$hostgroups = CHostGroup::get(array('hostgroupids'=>$hostgroupids, 'output'=>API_OUTPUT_EXTEND, 'nopermissions'=>1, 'nodeids' => get_current_nodeid(true)));
 		$hostgroups = zbx_toHash($hostgroups, 'groupid');
 
 		foreach($selements as $snum => $selement){
@@ -1691,10 +1691,11 @@
 
 			if(!empty($linktriggers)){
 				$max_severity=0;
-				$options = array();
-				$options['nopermissions'] = 1;
-				$options['extendoutput'] = 1;
-				$options['triggerids'] = array();
+				$options = array(
+					'nopermissions' => 1,
+					'output' => API_OUTPUT_EXTEND,
+					'triggerids' => array()
+				);
 
 				$triggers = array();
 				foreach($linktriggers as $lt_num => $link_trigger){
@@ -1930,10 +1931,11 @@
 
 			if(!empty($linktriggers)){
 				$max_severity=0;
-				$options = array();
-				$options['nopermissions'] = 1;
-				$options['extendoutput'] = 1;
-				$options['triggerids'] = array();
+				$options = array(
+					'nopermissions' => 1,
+					'output' => API_OUTPUT_EXTEND,
+					'triggerids' => array()
+				);
 
 				$triggers = array();
 				foreach($linktriggers as $lt_num => $link_trigger){
