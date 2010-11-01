@@ -485,6 +485,7 @@ Copt::memoryPick();
 			}
 
 		}
+		unset($interface);
 
 		if($delete){
 			$items = CItem::get(array(
@@ -598,51 +599,24 @@ Copt::memoryPick();
 
 	public static function massAdd($data){
 		$interfaces = zbx_toArray($data['interfaces']);
-		$interfaceids = zbx_objectValues($interfaces, 'interfaceid');
+
+		$hosts = zbx_toArray($data['hosts']);
+		$hostids = zbx_objectValues($hosts, 'hostid');
 
 		try{
 			self::BeginTransaction(__METHOD__);
 
-			$options = array(
-				'interfaceids' => $interfaceids,
-				'editable' => 1,
-				'preservekeys' => 1
-			);
-			$upd_interfaces = self::get($options);
-			foreach($interfaces as $gnum => $interface){
-				if(!isset($upd_interfaces[$interface['interfaceid']])){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+			$insertData = array();
+			foreach($interfaces as $inum => $interface){
+				foreach($hosts as $hnum => $host){
+					$newInterface = $interface;
+					$newInterface['hostid'] = $host;
+
+					$insertData[] = $newInterface;
 				}
 			}
 
-			$hosts = isset($data['hosts']) ? zbx_toArray($data['hosts']) : null;
-			$hostids = is_null($hosts) ? array() : zbx_objectValues($hosts, 'hostid');
-
-			$templates = isset($data['templates']) ? zbx_toArray($data['templates']) : null;
-			$templateids = is_null($templates) ? array() : zbx_objectValues($templates, 'templateid');
-
-			$objectids = array_merge($hostids, $templateids);
-
-			$linked = array();
-			$sql = 'SELECT hostid, interfaceid '.
-				' FROM hosts_interfaces '.
-				' WHERE '.DBcondition('hostid', $objectids).
-					' AND '.DBcondition('interfaceid', $interfaceids);
-			$linked_db = DBselect($sql);
-			while($pair = DBfetch($linked_db)){
-				$linked[$pair['interfaceid']][$pair['hostid']] = 1;
-			}
-
-			foreach($interfaceids as $gnum => $interfaceid){
-				foreach($objectids as $hostid){
-					if(isset($linked[$interfaceid][$hostid])) continue;
-					$hostinterfaceid = get_dbid('hosts_interfaces', 'hostinterfaceid');
-					$result = DBexecute("INSERT INTO hosts_interfaces (hostinterfaceid, hostid, interfaceid) VALUES ($hostinterfaceid, $hostid, $interfaceid)");
-					if(!$result){
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-					}
-				}
-			}
+			self::create($insertData);
 
 			self::EndTransaction(true, __METHOD__);
 			return array('interfaceids' => $interfaceids);

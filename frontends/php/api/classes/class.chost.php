@@ -1155,12 +1155,16 @@ Copt::memoryPick();
 		}
 		else{
 			$hostDBfields = array('host'=>null);
+		}
+
+		if(!empty($groupids)){
 			$dbGroups = CHostGroup::get(array(
 				'output' => API_OUTPUT_EXTEND,
 				'groupids' => $groupids,
 				'editable' => 1,
 				'preservekeys' => 1
 			));
+
 		}
 
 		foreach($hosts as $inum => &$host){
@@ -1175,6 +1179,9 @@ Copt::memoryPick();
 			else{
 				if(!isset($host['groups']))
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'No groups for host [ '.$host['host'].' ]');
+
+				if(!isset($host['interfaces']))
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'No interfaces for host [ '.$host['host'].' ]');
 			}
 
 			if(isset($host['groups'])){
@@ -1188,19 +1195,36 @@ Copt::memoryPick();
 				}
 			}
 
+			if(isset($host['interfaces'])){
+				if(!is_array($host['interfaces']) || empty($host['interfaces']))
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'No interfaces for host [ '.$host['host'].' ]');
+			}
+
 			if(isset($host['host'])){
 				if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $host['host'])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect characters used for Hostname [ '.$host['host'].' ]');
 				}
-				if(self::exists(array('host' => $host['host']))){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
+
+				$hostsExists = self::get(array(
+					'filter' => array('host' => $host['host'])
+				));
+				foreach($hostsExists as $exnum => $hostExists){
+					if(!$update || ($hostExists['hostid'] != $host['hostid'])){
+						self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
+					}
 				}
-				if(CTemplate::exists(array('host' => $host['host']))){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
+
+				$templatesExists = CTemplate::get(array(
+					'filter' => array('host' => $host['host'])
+				));
+				foreach($templatesExists as $exnum => $templatesExists){
+					if(!$update || ($templatesExists['hostid'] != $host['hostid'])){
+						self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
+					}
 				}
 			}
-
 		}
+		unset($host);
 	}
 
 /**
@@ -1356,8 +1380,6 @@ Copt::memoryPick();
 
 		try{
 			self::BeginTransaction(__METHOD__);
-
-			self::checkInput($data, __FUNCTION__);
 
 			$options = array(
 				'hostids' => zbx_objectValues($data['hosts'], 'hostid'),
@@ -1584,7 +1606,8 @@ Copt::memoryPick();
 					}
 				}
 
-				$result = self::massAdd(array('hosts' => $hosts, 'templates' => $data['templates']));
+				$data = array('hosts' => $hosts, 'templates' => $data['templates']);
+				$result = self::massAdd($data);
 				if(!$result){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_CANNOT_LINK_TEMPLATE);
 				}
