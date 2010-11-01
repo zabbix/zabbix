@@ -332,6 +332,10 @@ sub process_field
 				$statements="${statements}SELECT proxy_history_seq.nextval INTO :new.id FROM dual;\n";
 				$statements="${statements}END;$output{'exec_cmd'}";
 			}
+			elsif($output{"database"} eq "db2")
+			{
+				$row="$row\tGENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1)";
+			}
 		}
 		print $row;
 	}
