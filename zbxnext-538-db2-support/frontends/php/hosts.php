@@ -72,7 +72,7 @@ include_once('include/page_header.php');
 		'ipmi_ip'=>			array(T_ZBX_STR, O_OPT,	NULL, NULL,				NULL),
 		'ipmi_port'=>		array(T_ZBX_INT, O_OPT,	NULL, BETWEEN(0,65535),	NULL),
 		'ipmi_authtype'=>	array(T_ZBX_INT, O_OPT,	NULL, BETWEEN(-1,6),	NULL),
-		'ipmi_privilege'=>	array(T_ZBX_INT, O_OPT,	NULL, BETWEEN(1,5),		NULL),
+		'ipmi_privilege'=>	array(T_ZBX_INT, O_OPT,	NULL, BETWEEN(0,5),		NULL),
 		'ipmi_username'=>	array(T_ZBX_STR, O_OPT,	NULL, NULL,				NULL),
 		'ipmi_password'=>	array(T_ZBX_STR, O_OPT,	NULL, NULL,				NULL),
 

@@ -1576,6 +1576,7 @@
 	'S_NO_RESOURCES_DEFINED'=>		'No resources defined',
 	'S_SIMPLE_GRAPH'=>				'Simple graph',
 	'S_SIMPLE_GRAPHS'=>				'Simple graphs',
+	'S_HISTORY_AND_SIMPLE_GRAPHS'=> 'History and simple graphs',
 	'S_SIMPLE_GRAPH_BIG'=>			'SIMPLE GRAPH',
 	'S_GRAPH_NAME'=>				'Graph name',
 	'S_WIDTH'=>						'Width',
@@ -2055,6 +2056,8 @@
 	'S_EXPRESSION_UNNECESSARY_SYMBOLS_DETECTED_ERROR'=>'Unnecessary symbols detected',
 	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_AFTER_ERROR'=>'Not allowed symbols detected after element',
 	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_BEFORE_ERROR'=>'Not allowed symbols detected before element',
+	'S_ARE_YOU_SURE_YOU_WANT_TO_DELETE'=>'Are you sure you want to delete',
+	'S_MACROS_ES'=>'macro(s)',
 
 //	popup_link_tr.php
 	'S_NEW_INDICATORS'=>			'New indicators',
@@ -2489,7 +2492,13 @@
 	'S_OTHER_SMALL'=>			'other',
 
 // class.cookie.js
-	'S_MAX_COOKIE_SIZE_REACHED' => 'We are sorry, the maximum possible number of elements to remember has been reached.',
+	'S_MAX_COOKIE_SIZE_REACHED'=>		'We are sorry, the maximum possible number of elements to remember has been reached.',
+
+	'S_LAST_PAGE'=>			'Last',
+	'S_FIRST_PAGE'=>		'First',
+	'S_PREVIOUS_PAGE'=>		'Previous',
+	'S_NEXT_PAGE'=>			'Next',
+	'S_PREVIOUS_EVENTS'=>		'Previous',
 
 );
 ?>

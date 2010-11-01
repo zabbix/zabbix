@@ -917,20 +917,17 @@ COpt::memoryPick();
 
 				$result = DBexecute('INSERT INTO sysmaps_elements ('.implode(',', array_keys($values)).')'.
 								' VALUES ('.implode(',', array_values($values)).')');
-
 				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Map add elements failed');
 			}
 
-			$result = self::EndTransaction($result, __METHOD__);
+			self::EndTransaction(true, __METHOD__);
 
 			return $selementids;
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
-
 			$errors = $e->getErrors();
 			$error = reset($errors);
-
 			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, $error);
 			return false;
 		}

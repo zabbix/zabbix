@@ -646,7 +646,7 @@ COpt::memoryPick();
 						$child_applications[] = $app;
 					}
 
-					$result = self::addItems(array('items' => $child, 'applications' => $child_applications));
+					$result = self::massAdd(array('items' => $child, 'applications' => $child_applications));
 					if(!$result){
 						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot add items');
 					}

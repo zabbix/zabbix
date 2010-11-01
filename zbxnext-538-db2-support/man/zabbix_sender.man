@@ -1,4 +1,4 @@
-.TH ZABBIX_SENDER 8 "16 October 2010"
+.TH ZABBIX_SENDER 8 "23 October 2010"
 .if n .ad l
 .SH NAME
 zabbix_sender \- Zabbix Sender utility.
@@ -38,13 +38,17 @@ Display this help and exit.
 .IP "-V, --version"
 Output version information and exit.
 .SH "EXAMPLES"
-.B zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -s """Monitored Host""" -k """mysql.queries""" -o """342.45"""
+.B zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -s """Monitored Host""" -k mysql.queries -o 342.45
 
 Send \fB342.45\fR as the value for \fBmysql.queries\fR key in \fBMonitored Host\fR host using Zabbix server defined in agent daemon configuration file.
 
 .B zabbix_sender -z 192.168.1.113 -i data_values.txt
 
 Send values from file \fBdata_values.txt\fR to server with IP \fB192.168.1.113\fR. Host names and keys are defined in the file.
+
+.B echo """- hw.serial.number 1287872261 SQ4321ASDF""" | zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -T -i -
+
+Send a timestamped value from the commandline to Zabbix server, specified in the agent daemon configuration file. Dash in the input data indicates that hostname also should be used from the same configuration file.
 
 .SH "SEE ALSO"
 .BR zabbix_agentd (8),
