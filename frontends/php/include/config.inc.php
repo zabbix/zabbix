@@ -31,6 +31,7 @@ function __autoload($class_name){
 		'capplication' => 1,
 		'cdcheck' => 1,
 		'cdhost' => 1,
+		'cdiscoveryrule' => 1,
 		'cdrule' => 1,
 		'cdservice' => 1,
 		'cevent' => 1,
@@ -55,7 +56,6 @@ function __autoload($class_name){
 		'cusergroup' => 1,
 		'cusermacro' => 1,
 		'czbxapi' => 1,
-		'cdiscoveryrule' => 1,
 	);
 
 	$rpc = array(

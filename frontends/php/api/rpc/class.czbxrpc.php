@@ -178,6 +178,19 @@ class czbxrpc{
 		self::$result = $result;
 	}
 
+// DiscoveryRule
+	private static function discoveryrule($action, $params){
+
+		CDiscoveryRule::$error = array();
+
+		switch($action){
+			default:
+			$result = call_user_func(array('CDiscoveryRule', $action), $params);
+		}
+
+		self::$result = $result;
+	}
+
 // DRule
 	private static function drule($action, $params){
 
