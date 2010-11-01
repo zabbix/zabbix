@@ -368,6 +368,10 @@ sub process_field
 				$sequences = "${sequences}SELECT ${table_name}_seq.nextval INTO :new.id FROM dual;${eol}\n";
 				$sequences = "${sequences}END;${eol}\n/${eol}\n";
 			}
+			elsif($output{"database"} eq "db2")
+			{
+				$row="$row\tGENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1)";
+			}
 		}
 
 		if ($relN ne "" and $relN ne "-")
