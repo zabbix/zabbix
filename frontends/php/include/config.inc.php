@@ -43,6 +43,7 @@ function __autoload($class_name){
 		'chostinterface'=> 1,
 		'cimage' => 1,
 		'citem' => 1,
+		'citemprototype' => 1,
 		'cmaintenance' => 1,
 		'cmap' => 1,
 		'cmediatype' => 1,

@@ -481,45 +481,6 @@
 	}
 
 /*
- * Function: delete_template_graphs
- *
- * Description:
- *     Delete template graph from specified host
- *
- * Author:
- *     Eugene Grigorjev
- *
- * Comments: !!! Don't forget sync code with C !!!
- *
- */
-	function delete_template_graphs($hostid, $templateids = null /* array format 'arr[id]=name' */, $unlink_mode = false){
-		zbx_value2array($templateids);
-
-		$db_graphs = get_graphs_by_hostid($hostid);
-		while($db_graph = DBfetch($db_graphs)){
-			if($db_graph['templateid'] == 0)
-				continue;
-
-			if(!is_null($templateids)){
-				$tmp_hhosts = get_hosts_by_graphid($db_graph['templateid']);
-				$tmp_host = DBfetch($tmp_hhosts);
-
-				if( !uint_in_array($tmp_host['hostid'], $templateids)) continue;
-			}
-
-			if($unlink_mode){
-				if(DBexecute('UPDATE graphs SET templateid=NULL WHERE graphid='.$db_graph['graphid'])){
-					info(S_GRAPH.SPACE.'"'.$db_graph['name'].'"'.SPACE.S_UNLINKED_SMALL);
-				}
-			}
-			else{
-				DBexecute('UPDATE graphs SET templateid=NULL WHERE graphid='.$db_graph['graphid']);
-				CGraph::delete($db_graph['graphid']);
-			}
-		}
-	}
-
-/*
  * Function: copy_graph_to_host
  *
  * Description:
@@ -537,7 +498,7 @@
 		));
 		$graph = reset($graphs);
 		$gitems = $graph['gitems'];
-		
+
 		$new_gitems = get_same_graphitems_for_host($gitems, $hostid);
 		if(empty($new_gitems)){
 			$host = get_host_by_hostid($hostid);

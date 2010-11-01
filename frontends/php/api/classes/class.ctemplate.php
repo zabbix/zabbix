@@ -1402,30 +1402,29 @@ COpt::memoryPick();
 			}
 // }}} UPDATE HOSTGROUPS LINKAGE
 
-
 			$data['templates_clear'] = isset($data['templates_clear']) ? zbx_toArray($data['templates_clear']) : array();
-			$cleared_templateids = array();
-			foreach($templateids as $templateid){
-				foreach($data['templates_clear'] as $tpl){
-					$result = unlink_template($templateid, $tpl['templateid'], false);
-					if(!$result){
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot unlink template [ ' . $tpl['templateid'] . ' ]');
-					}
-					$cleared_templateids[] = $tpl['templateid'];
-				}
-			}
+			$templateids_clear = zbx_objectValues($data['templates_clear'], 'templateid');
 
+			if(!empty($data['templates_clear'])){
+				$result = self::massRemove(array(
+					'templateids' => $templateids,
+					'templateids_clear' => $templateids_clear,
+				));
+			}
 
 // UPDATE TEMPLATE LINKAGE {{{
 // firstly need to unlink all things, to correctly check circulars
 
 			if(isset($data['hosts']) && !is_null($data['hosts'])){
-				$template_hosts = CHost::get(array('templateids' => $templateids, 'templated_hosts' => 1));
+				$template_hosts = CHost::get(array(
+					'templateids' => $templateids,
+					'templated_hosts' => 1
+				));
 				$template_hostids = zbx_objectValues($template_hosts, 'hostid');
 				$new_hostids = zbx_objectValues($data['hosts'], 'hostid');
 
 				$hosts_to_del = array_diff($template_hostids, $new_hostids);
-				$hostids_to_del = array_diff($hosts_to_del, $cleared_templateids);
+				$hostids_to_del = array_diff($hosts_to_del, $templateids_clear);
 
 				if(!empty($hostids_to_del)){
 					$result = self::massRemove(array(
@@ -1444,7 +1443,7 @@ COpt::memoryPick();
 				$new_templateids = zbx_objectValues($data['templates_link'], 'templateid');
 
 				$templates_to_del = array_diff($template_templateids, $new_templateids);
-				$templateids_to_del = array_diff($templates_to_del, $cleared_templateids);
+				$templateids_to_del = array_diff($templates_to_del, $templateids_clear);
 				if(!empty($templateids_to_del)){
 					$result = self::massRemove(array(
 						'templateids' => $templateids,
@@ -1583,24 +1582,19 @@ COpt::memoryPick();
 				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Can\'t unlink groups');
 			}
 
+			if(isset($data['templateids_clear'])){
+				$templateids_clear = zbx_toArray($data['templateids_clear']);
+				$result = CTemplate::unlink($templateids_clear, $data['templateids'], true);
+			}
+
 			if(isset($data['hostids'])){
 				$hostids = zbx_toArray($data['hostids']);
-				foreach($hostids as $hostid){
-					foreach($templateids as $templateid){
-						$result = unlink_template($hostid, $templateid, true);
-						if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Can\'t unlink hosts');
-					}
-				}
+				$result = CTemplate::unlink($templateids, $hostids);
 			}
 
 			if(isset($data['templateids_link'])){
 				$templateids_link = zbx_toArray($data['templateids_link']);
-				foreach($templateids_link as $templateid_link){
-					foreach($templateids as $templateid){
-						$result = unlink_template($templateid, $templateid_link, true);
-						if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Can\'t unlink templates');
-					}
-				}
+				$result = CTemplate::unlink($templateids_link, $templateids);
 			}
 
 			if(isset($data['macros'])){
@@ -1773,10 +1767,181 @@ COpt::memoryPick();
 						continue 2;
 					}
 				}
-				if(!sync_host_with_templates($targetid, $templateid))
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot sync template');
+
+				copy_template_applications($targetid, $templateid, false);
+
+				$result = CDiscoveryRule::syncTemplates(array(
+					'hostids' => $targetid,
+					'templateids' => $templateid
+				));
+				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot sync template');
+
+				$result = CItem::syncTemplates(array(
+					'hostids' => $targetid,
+					'templateids' => $templateid
+				));
+				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot sync template');
+
+				copy_template_triggers($targetid, $templateid, false);
+
+				$result = CGraph::syncTemplates(array(
+					'hostids' => $targetid,
+					'templateids' => $templateid
+				));
+				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot sync template');
 			}
 		}
+
+		return true;
+	}
+
+	private static function unlink($templateids, $targetids, $clear=false){
+
+// GRAPHS {{{
+		$sql = 'SELECT DISTINCT g.graphid, g.name'.
+				' FROM graphs g, graphs_items gi, items i'.
+				' WHERE '.DBCondition('i.hostid', $targetids).
+  				' AND gi.itemid=i.itemid'.
+				' AND g.graphid=gi.graphid'.
+				' AND EXISTS ('.
+					' SELECT ggi.graphid'.
+					' FROM graphs_items ggi, items ii'.
+					' WHERE ggi.graphid=g.templateid'.
+						' AND ii.itemid=ggi.itemid'.
+					  	' AND '.DBCondition('ii.hostid', $templateids).
+				')';
+		$db_graphs = DBSelect($sql);
+		$graphs = array();
+		while($graph = DBfetch($db_graphs)){
+			$graphs[$graph['graphid']] = $graph['name'];
+		}
+		if($clear){
+			CGraph::delete(array_keys($graphs));
+		}
+		else{
+			DB::update('graphs', array(
+				'values' => array('templateid' => 0),
+				'where' => array(DBcondition('graphid', array_keys($graphs)))
+			));
+		}
+
+// TODO: remove info from API
+		foreach($graphs as $graph){
+			info(S_GRAPH.' ['.$graph['name'].'] '.S_UNLINKED_SMALL);
+		}
+// }}} GRAPHS
+
+
+// TRIGGERS {{{
+		$sql = 'SELECT DISTINCT t.triggerid, t.description'.
+		' FROM triggers t, functions f, items i'.
+		' WHERE '.DBCondition('i.hostid', $targetids).
+			' AND f.itemid=i.itemid'.
+			' AND t.triggerid=f.triggerid'.
+			' AND EXISTS ('.
+				' SELECT ff.triggerid'.
+				' FROM functions ff, items ii'.
+				' WHERE ff.triggerid=t.templateid'.
+					' AND ii.itemid=ff.itemid'.
+					' AND '.DBCondition('ii.hostid', $templateids).
+		')';
+		$db_triggers = DBSelect($sql);
+		$triggers = array();
+		while($trigger = DBfetch($db_triggers)){
+			$triggers[$trigger['triggerid']] = $trigger['description'];
+		}
+
+		if($clear){
+			CTrigger::delete(array_keys($triggers));
+		}
+		else{
+			DB::update('triggers', array(
+				'values' => array('templateid' => 0),
+				'where' => array(DBcondition('triggerid', array_keys($triggers)))
+			));
+		}
+
+// TODO: remove info from API
+		foreach($triggers as $trigger){
+			info(S_TRIGGER.' ['.$trigger['name'].'] '.S_UNLINKED_SMALL);
+		}
+// }}} TRIGGERS
+
+
+// ITEMS {{{
+//		$sql = 'SELECT DISTINCT i.itemid, i.key_'.
+//		' FROM items i'.
+//		' WHERE '.DBCondition('i.hostid', $targetids).
+//			' AND EXISTS ('.
+//				' SELECT ii.itemid'.
+//				' FROM items ii'.
+//				' WHERE ii.itemid=i.templateid'.
+//					' AND '.DBCondition('ii.hostid', $templateids).
+//		')';
+
+		$sql = 'SELECT DISTINCT i1.itemid, i1.key_'.
+		' FROM items i1, items i2'.
+		' WHERE '.DBCondition('i1.hostid', $targetids).
+			' AND i2.itemid=i1.templateid'.
+			' AND '.DBCondition('i2.hostid', $templateids);
+
+		$db_items = DBSelect($sql);
+		$items = array();
+		while($item = DBfetch($db_items)){
+			$items[$item['itemid']] = $item['key_'];
+		}
+
+		if($clear){
+			CItem::delete(array_keys($items));
+		}
+		else{
+			DB::update('items', array(
+				'values' => array('templateid' => 0),
+				'where' => array(DBcondition('itemid', array_keys($items)))
+			));
+		}
+
+// TODO: remove info from API
+		foreach($items as $item){
+			info(S_ITEM.' ['.$item['key_'].'] '.S_UNLINKED_SMALL);
+		}
+// }}} ITEMS
+
+
+// APPLICATIONS {{{
+		$sql = 'SELECT DISTINCT a1.applicationid, a1.name'.
+		' FROM applications a1, applications a2'.
+		' WHERE '.DBCondition('a1.hostid', $targetids).
+			' AND a2.applicationid=a1.templateid'.
+			' AND '.DBCondition('a2.hostid', $templateids);
+
+		$db_applications = DBSelect($sql);
+		$applications = array();
+		while($application = DBfetch($db_applications)){
+			$applications[$application['applicationid']] = $application['name'];
+		}
+
+		if($clear){
+			CApplication::delete(array_keys($applications));
+		}
+		else{
+			DB::update('applications', array(
+				'values' => array('templateid' => 0),
+				'where' => array(DBcondition('applicationid', array_keys($applications)))
+			));
+		}
+
+// TODO: remove info from API
+		foreach($applications as $application){
+			info(S_APPLICATION.' ['.$application['name'].'] '.S_UNLINKED_SMALL);
+		}
+// }}} APPLICATIONS
+
+
+		DB::delete('hosts_templates', array(
+			DBCondition('templateid', $templateids),
+			DBCondition('hostid', $targetids)
+		));
 
 		return true;
 	}

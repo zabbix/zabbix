@@ -335,6 +335,19 @@ class czbxrpc{
 		self::$result = $result;
 	}
 
+// ITEM PROTOTYPE
+	private static function itemprototype($action, $params){
+
+		CItemprototype::$error = array();
+
+		switch($action){
+			default:
+			$result = call_user_func(array('CItemprototype', $action), $params);
+		}
+
+		self::$result = $result;
+	}
+
 // MAINTENANCE
 	private static function maintenance($action, $params){
 

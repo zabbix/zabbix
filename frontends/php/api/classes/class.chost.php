@@ -1230,7 +1230,7 @@ Copt::memoryPick();
 			self::BeginTransaction(__METHOD__);
 
 			self::checkInput($hosts, __FUNCTION__);
-			
+
 			foreach($hosts as $num => $host){
 
 				$hostid = DB::insert('hosts', array($host));
@@ -1524,15 +1524,13 @@ Copt::memoryPick();
 
 
 			$data['templates_clear'] = isset($data['templates_clear']) ? zbx_toArray($data['templates_clear']) : array();
-			$cleared_templateids = array();
-			foreach($hostids as $hostid){
-				foreach($data['templates_clear'] as $tpl){
-					$result = unlink_template($hostid, $tpl['templateid'], false);
-					if(!$result){
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot unlink template [ '.$tpl['templateid'].' ]');
-					}
-					$cleared_templateids[] = $tpl['templateid'];
-				}
+			$templateids_clear = zbx_objectValues($data['templates_clear'], 'templateid');
+
+			if(!empty($data['templates_clear'])){
+				$result = self::massRemove(array(
+					'hostids' => $hostids,
+					'templateids_clear' => $templateids_clear,
+				));
 			}
 
 
@@ -1549,7 +1547,7 @@ Copt::memoryPick();
 				$new_templateids = zbx_objectValues($data['templates'], 'templateid');
 
 				$templates_to_del = array_diff($host_templateids, $new_templateids);
-				$templates_to_del = array_diff($templates_to_del, $cleared_templateids);
+				$templates_to_del = array_diff($templates_to_del, $templateids_clear);
 
 				if(!empty($templates_to_del)){
 					$result = self::massRemove(array('hostids' => $hostids, 'templateids' => $templates_to_del));
@@ -1769,6 +1767,15 @@ Copt::memoryPick();
 				$options = array(
 					'hostids' => $hostids,
 					'templateids' => zbx_toArray($data['templateids'])
+				);
+				$result = CTemplate::massRemove($options);
+				if(!$result) self::exception();
+			}
+
+			if(isset($data['templateids_clear'])){
+				$options = array(
+					'templateids' => $hostids,
+					'templateids_clear' => zbx_toArray($data['templateids_clear'])
 				);
 				$result = CTemplate::massRemove($options);
 				if(!$result) self::exception();

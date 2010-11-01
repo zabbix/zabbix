@@ -131,11 +131,10 @@ switch($itemType) {
 	if(get_request('itemid', false)){
 		$options = array(
 			'itemids' => $_REQUEST['itemid'],
-			'filter' => array('flags' => ZBX_FLAG_DISCOVERY),
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => 1
 		);
-		$item = CItem::get($options);
+		$item = CDiscoveryRule::get($options);
 		$item = reset($item);
 		if(!$item) access_deny();
 		$_REQUEST['hostid'] = $item['hostid'];
@@ -180,7 +179,7 @@ switch($itemType) {
 	else if(isset($_REQUEST['delete'])&&isset($_REQUEST['itemid'])){
 		$result = false;
 		if($item = get_item_by_itemid($_REQUEST['itemid'])){
-			$result = CItem::delete($_REQUEST['itemid']);
+			$result = CDiscoveryRule::delete($_REQUEST['itemid']);
 		}
 
 		show_messages($result, S_ITEM_DELETED, S_CANNOT_DELETE_ITEM);
@@ -266,38 +265,7 @@ switch($itemType) {
 		show_messages($go_result, ($_REQUEST['go'] == 'activate') ? S_ITEMS_ACTIVATED : S_ITEMS_DISABLED, null);
 	}
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_itemid'])){
-		global $USER_DETAILS;
-
-		$go_result = true;
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_WRITE);
-
-		$group_itemid = $_REQUEST['group_itemid'];
-
-		$sql = 'SELECT h.host, i.itemid, i.description, i.key_, i.templateid, i.type'.
-				' FROM items i, hosts h '.
-				' WHERE '.DBcondition('i.itemid',$group_itemid).
-					' AND h.hostid=i.hostid'.
-					' AND '.DBcondition('h.hostid',$available_hosts);
-		$db_items = DBselect($sql);
-		while($item = DBfetch($db_items)) {
-			if($item['templateid'] != ITEM_TYPE_ZABBIX) {
-				unset($group_itemid[$item['itemid']]);
-				error(S_ITEM.SPACE."'".$item['host'].':'.item_description($item)."'".SPACE.S_CANNOT_DELETE_ITEM.SPACE.'('.S_TEMPLATED_ITEM.')');
-				continue;
-			}
-			else if($item['type'] == ITEM_TYPE_HTTPTEST) {
-				unset($group_itemid[$item['itemid']]);
-				error(S_ITEM.SPACE."'".$item['host'].':'.item_description($item)."'".SPACE.S_CANNOT_DELETE_ITEM.SPACE.'('.S_WEB_ITEM.')');
-				continue;
-			}
-
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM,S_ITEM.' ['.$item['key_'].'] ['.$item['itemid'].'] '.S_HOST.' ['.$item['host'].']');
-		}
-
-		$go_result &= !empty($group_itemid);
-		if($go_result) {
-			$go_result = CItem::delete($group_itemid);
-		}
+		$go_result = CDiscoveryRule::delete($_REQUEST['group_itemid']);
 		show_messages($go_result, S_ITEMS_DELETED, S_CANNOT_DELETE_ITEMS);
 	}
 

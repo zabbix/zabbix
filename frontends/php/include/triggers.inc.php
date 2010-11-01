@@ -2399,45 +2399,6 @@ return $caption;
 		return strcmp($expr1,$trig2['expression']);
 	}
 
-	/*
-	 * Function: delete_template_triggers
-	 *
-	 * Description:
-	 *	 Delete template triggers
-	 *
-	 * Author:
-	 *	 Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments: !!! Don't forget sync code with C !!!
-	 *
-	 */
-	function delete_template_triggers($hostid, $templateids = null, $unlink_mode = false){
-		zbx_value2array($templateids);
-
-		$triggers = get_triggers_by_hostid($hostid);
-		while($trigger = DBfetch($triggers)){
-			if($trigger['templateid']==0)	continue;
-
-			if($templateids != null){
-				$db_tmp_hosts = get_hosts_by_triggerid($trigger['templateid']);
-				$tmp_host = DBfetch($db_tmp_hosts);
-
-				if(!uint_in_array($tmp_host['hostid'], $templateids)) continue;
-			}
-
-			if($unlink_mode){
-				if(DBexecute('UPDATE triggers SET templateid=NULL WHERE triggerid='.$trigger['triggerid'])){
-						info('Trigger "'.$trigger['description'].'" unlinked');
-				}
-			}
-			else{
-				DBexecute('UPDATE triggers SET templateid=NULL WHERE triggerid='.$trigger['triggerid']);
-				CTrigger::delete($trigger['triggerid']);
-			}
-		}
-	return TRUE;
-	}
-
 /*
  * Function: copy_template_triggers
  *

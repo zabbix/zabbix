@@ -58,6 +58,7 @@ frontends/php/api/classes/class.chostgroup.php -text
 frontends/php/api/classes/class.chostinterface.php -text
 frontends/php/api/classes/class.cimage.php -text
 frontends/php/api/classes/class.citem.php -text
+frontends/php/api/classes/class.citemprototype.php -text
 frontends/php/api/classes/class.cmaintenance.php -text
 frontends/php/api/classes/class.cmap.php -text
 frontends/php/api/classes/class.cmediatype.php -text
