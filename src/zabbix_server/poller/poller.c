@@ -25,7 +25,6 @@
 #include "sysinfo.h"
 #include "daemon.h"
 #include "zbxserver.h"
-#include "proxy.h"
 
 #include "poller.h"
 
@@ -177,7 +176,7 @@ static void	update_key_status(zbx_uint64_t hostid, int host_status, zbx_timespec
 		init_result(&agent);
 		SET_UI64_RESULT(&agent, host_status);
 
-		dc_add_history(items[i].itemid, items[i].value_type, &agent, ts, 0, NULL, 0, 0, 0, 0);
+		dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &agent, ts, 0, NULL, 0, 0, 0, 0);
 
 		free_result(&agent);
 	}
@@ -596,11 +595,7 @@ static int	get_values()
 
 		if (res == SUCCEED)
 		{
-			/* check for low-level discovery (lld) item */
-			if (0 != (ZBX_FLAG_DISCOVERY & items[i].flags))
-				DBlld_process_discovery_rule(items[i].itemid, agent.text);
-			else
-				dc_add_history(items[i].itemid, items[i].value_type, &agent, &ts, 0, NULL, 0, 0, 0, 0);
+			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &agent, &ts, 0, NULL, 0, 0, 0, 0);
 
 			DCrequeue_reachable_item(items[i].itemid, ITEM_STATUS_ACTIVE, ts.sec);
 		}
