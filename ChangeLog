@@ -1,5 +1,6 @@
 Changes for 1.8.4rc2
 
+ - [ZBXNEXT-538] added support for IBM DB2 (Aly,asaveljevs,Sasha)
  - [ZBX-1362] optimized alert performance (KB)
  - [ZBX-2852] fixed map not updating in slideshow (Vedmak)
  - [ZBX-1346] update example agent daemon configuration file for Windows with parameters from Zabbix manual (Richlv)

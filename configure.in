@@ -932,6 +932,36 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 
 	have_multirow_insert="no"
 
+	dnl Checking for IBM DB2 support
+	AX_LIB_IBM_DB2()
+	if test "x$want_ibm_db2" = "xyes"; then
+		if test "x$have_db" != "xno"; then
+			AC_MSG_ERROR([You can configure for only one database.])
+		fi
+		
+		if test "x$found_ibm_db2" = "xyes"; then
+			have_db="IBM DB2"
+			have_multirow_insert="yes"
+		else
+			AC_MSG_ERROR([IBM DB2 library not found])
+		fi
+	fi
+
+	dnl Checking for MySQL support
+	AX_LIB_MYSQL()
+	if test "x$want_mysql" = "xyes"; then
+		if test "x$have_db" != "xno"; then
+			AC_MSG_ERROR([You can configure for only one database.])
+		fi
+
+		if test "x$found_mysql" = "xyes"; then
+			have_db="MySQL"
+			have_multirow_insert="yes"
+		else
+			AC_MSG_ERROR([MySQL library not found])
+		fi
+	fi
+
 	dnl Checking for Oracle support
 	AX_LIB_ORACLE_OCI([10.0])
 	if test "x$WANT_ORACLE_OCI" = "xyes"; then
@@ -953,6 +983,26 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 			AC_DEFINE(HAVE_ORACLE,1,[Define to 1 if Oracle should be enabled.])
 		else
 			AC_MSG_ERROR([Oracle OCI library not found])
+		fi
+	fi
+
+	dnl Checking for PostgreSQL support
+	AX_LIB_POSTGRESQL()
+	if test "x$want_postgresql" = "xyes"; then
+		if test "x$have_db" != "xno"; then
+			AC_MSG_ERROR([You can configure for only one database.])
+		fi
+
+		if test "x$found_postgresql" = "xyes"; then
+
+			have_db="PostgreSQL"
+
+			if test "$postgresql_version_number" -ge 8002000; then
+				have_multirow_insert="yes"
+			fi
+
+		else
+			AC_MSG_ERROR([PostgreSQL library not found])
 		fi
 	fi
 
@@ -984,45 +1034,10 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 		fi
 	fi
 
-	dnl Checking for MySQL support
-	AX_LIB_MYSQL()
-	if test "x$want_mysql" = "xyes"; then
-		if test "x$have_db" != "xno"; then
-			AC_MSG_ERROR([You can configure for only one database.])
-		fi
-
-		if test "x$found_mysql" = "xyes"; then
-			have_db="MySQL"
-			have_multirow_insert="yes"
-		else
-			AC_MSG_ERROR([MySQL library not found])
-		fi
-	fi
-
-	dnl Checking for PostgreSQL support
-	AX_LIB_POSTGRESQL()
-	if test "x$want_postgresql" = "xyes"; then
-		if test "x$have_db" != "xno"; then
-			AC_MSG_ERROR([You can configure for only one database.])
-		fi
-
-		if test "x$found_postgresql" = "xyes"; then
-
-			have_db="PostgreSQL"
-
-			if test "$postgresql_version_number" -ge 8002000; then
-				have_multirow_insert="yes"
-			fi
-
-		else
-			AC_MSG_ERROR([PostgreSQL library not found])
-		fi
-	fi
-
 	AC_MSG_CHECKING(for Zabbix server database selection)
 	if test "x$have_db" = "xno"; then
 		AC_MSG_RESULT(error)
-		AC_MSG_ERROR([No database selected for Zabbix server. Use --with-mysql or --with-oracle or --with-pgsql or --with-sqlite3.])
+		AC_MSG_ERROR([No database selected for Zabbix server. Use --with-ibm-db2 or --with-mysql or --with-oracle or --with-pgsql or --with-sqlite3.])
 	else
 		AC_MSG_RESULT(ok)
 	fi
@@ -1035,9 +1050,9 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 		AC_MSG_RESULT(no)
 	fi
 
-	DB_CPPFLAGS="$ORACLE_CPPFLAGS $SQLITE3_CPPFLAGS $MYSQL_CFLAGS $POSTGRESQL_CPPFLAGS"
-	DB_LDFLAGS="$ORACLE_LDFLAGS $SQLITE3_LDFLAGS $MYSQL_LDFLAGS $POSTGRESQL_LDFLAGS"
-	DB_LIBS="$ORACLE_LIBS $SQLITE3_LIBS $MYSQL_LIBS $POSTGRESQL_LIBS"
+	DB_CPPFLAGS="$IBM_DB2_CPPFLAGS $MYSQL_CFLAGS $ORACLE_CPPFLAGS $POSTGRESQL_CPPFLAGS $SQLITE3_CPPFLAGS"
+	DB_LDFLAGS="$IBM_DB2_LDFLAGS $MYSQL_LDFLAGS $ORACLE_LDFLAGS $POSTGRESQL_LDFLAGS $SQLITE3_LDFLAGS"
+	DB_LIBS="$IBM_DB2_LIBS $MYSQL_LIBS $ORACLE_LIBS $POSTGRESQL_LIBS $SQLITE3_LIBS"
 
 	AC_SUBST(DB_CPPFLAGS)
 	AC_SUBST(DB_LDFLAGS)

@@ -119,6 +119,28 @@ ZBX_TABLE	tables[]={
 	"t_cksum_text"	=>	"nclob"  
 );
 
+%db2=(
+	"database"	=>	"db2",
+	"type"		=>	"sql",
+	"before"	=>	"",
+	"after"		=>	"",
+	"exec_cmd"	=>	";\n",
+	"t_bigint"	=>	"bigint",
+	"t_id"		=>	"bigint",
+	"t_integer"	=>	"integer",
+	"t_time"	=>	"integer",
+	"t_serial"	=>	"bigint",
+	"t_double"	=>	"decfloat(16)",
+	"t_varchar"	=>	"varchar",
+	"t_char"	=>	"varchar",
+	"t_image"	=>	"blob",
+	"t_history_log"	=>	"varchar(2048)",
+	"t_history_text"=>	"varchar(2048)",
+	"t_blob"	=>	"varchar(2048)",
+	"t_item_param"	=>	"varchar(2048)",
+	"t_cksum_text"	=>	"varchar(2048)"
+);
+
 %postgresql=("t_bigint"	=>	"numeric(20)",
 	"database"	=>	"postgresql",
 	"before"	=>	"",
@@ -267,6 +289,13 @@ sub process_field
 			}
 		}
 
+		if($output{"database"} eq "db2"){
+			@text_fields = ('blob');
+			if(grep /$output{$type_short}/, @text_fields){ 
+				$default=""; 
+			}
+		}
+
 		# Special processing for Oracle "default 'ZZZ' not null" -> "default 'ZZZ'. NULL=='' in Oracle!"
 		if(($output{"database"} eq "oracle") && ((0==index($type_2,"nvarchar2")) || (0==index($type_2,"nclob"))))
 		{
@@ -303,6 +332,10 @@ sub process_field
 				$statements="${statements}SELECT proxy_history_seq.nextval INTO :new.id FROM dual;\n";
 				$statements="${statements}END;$output{'exec_cmd'}";
 			}
+			elsif($output{"database"} eq "db2")
+			{
+				$row="$row\tGENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1)";
+			}
 		}
 		print $row;
 	}
@@ -334,7 +367,7 @@ sub process_index
 
 sub usage
 {
-	printf "Usage: $0 [c|mysql|oracle|php|postgresql|sqlite]\n";
+	printf "Usage: $0 [c|db2|mysql|oracle|php|postgresql|sqlite]\n";
 	printf "The script generates ZABBIX SQL schemas and C/PHP code for different database engines.\n";
 	exit;
 }
@@ -349,6 +382,7 @@ sub main
 	$format=$ARGV[0];
 	switch ($format) {
 		case "c"		{ %output=%c; }
+		case "db2"		{ %output=%db2; }
 		case "mysql"		{ %output=%mysql; }
 		case "oracle"		{ %output=%oracle; }
 		case "php"		{ %output=%php; }
