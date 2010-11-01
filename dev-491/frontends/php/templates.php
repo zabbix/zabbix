@@ -575,7 +575,7 @@ include_once('include/page_header.php');
 // FORM ITEM : Groups tween box [  ] [  ]
 // get all Groups
 			$group_tb = new CTweenBox($frmHost, 'groups', $groups, 10);
-			$options = array('editable' => 1, 'extendoutput' => 1);
+			$options = array('editable' => 1, 'output' => API_OUTPUT_EXTEND);
 			$all_groups = CHostGroup::get($options);
 			order_result($all_groups, 'name');
 
@@ -589,7 +589,7 @@ include_once('include/page_header.php');
 			$template_tbl->addRow(array(S_NEW_GROUP, new CTextBox('newgroup', $newgroup)));
 
 // FORM ITEM : linked Hosts tween box [  ] [  ]
-			// $options = array('editable' => 1, 'extendoutput' => 1);
+			// $options = array('editable' => 1, 'output' => API_OUTPUT_EXTEND);
 			// $twb_groups = CHostGroup::get($options);
 			$twb_groupid = get_request('twb_groupid', 0);
 			if($twb_groupid == 0){
@@ -608,7 +608,8 @@ include_once('include/page_header.php');
 				'groupids' => $twb_groupid,
 				'templated_hosts' => 1,
 				'editable' => 1,
-				'extendoutput' => 1);
+				'output' => API_OUTPUT_EXTEND
+			);
 			$db_hosts = CHost::get($params);
 			order_result($db_hosts, 'host');
 
@@ -622,7 +623,8 @@ include_once('include/page_header.php');
 				'hostids' => $hosts_linked_to,
 				'templated_hosts' => 1,
 				'editable' => 1,
-				'extendoutput' => 1);
+				'output' => API_OUTPUT_EXTEND
+			);
 			$db_hosts = CHost::get($params);
 			order_result($db_hosts, 'host');
 			foreach($db_hosts as $hnum => $db_host){
@@ -681,7 +683,7 @@ include_once('include/page_header.php');
 				$trig_lbx = new CListBox('triggers', null, 8);
 				$trig_lbx->setAttribute('disabled', 'disabled');
 
-				$options = array('editable' => 1, 'hostids' => $templateid, 'extendoutput' => 1);
+				$options = array('editable' => 1, 'hostids' => $templateid, 'output' => API_OUTPUT_EXTEND);
 				$template_triggers = CTrigger::get($options);
 
 				if(empty($template_triggers)){
@@ -700,7 +702,7 @@ include_once('include/page_header.php');
 				$graphs_lbx = new CListBox('graphs', null, 8);
 				$graphs_lbx->setAttribute('disabled', 'disabled');
 
-				$options = array('editable' => 1, 'hostids' => $templateid, 'extendoutput' => 1);
+				$options = array('editable' => 1, 'hostids' => $templateid, 'output' => API_OUTPUT_EXTEND);
 				$template_graphs = CGraph::get($options);
 
 				if(empty($template_graphs)){

@@ -251,9 +251,13 @@ include_once('include/page_header.php');
 			if(!is_null($val = get_request('work_period')))
 				$msg[] = S_WORKING_TIME.' ['.$val.']';
 			if(!is_null($val = get_request('discovery_groupid'))){
-				$val = CHostGroup::get(array('groupids' => $val, 'editable' => 1, 'extendoutput' => 1));
-				if(!empty($val)){
+				$val = CHostGroup::get(array(
+					'groupids' => $val,
+					'editable' => 1,
+					'output' => API_OUTPUT_EXTEND
+				));
 
+				if(!empty($val)){
 					$val = array_pop($val);
 					$msg[] = S_GROUP_FOR_DISCOVERED_HOSTS.' ['.$val['name'].']';
 
@@ -775,7 +779,11 @@ include_once('include/page_header.php');
 			new CNumericBox('refresh_unsupported', $config['refresh_unsupported'], 5));
 
 		$cmbGrp = new CComboBox('discovery_groupid', $config['discovery_groupid']);
-		$groups = CHostGroup::get(array('sortfield'=>'name', 'editable' => 1, 'extendoutput' => 1));
+		$groups = CHostGroup::get(array(
+			'sortfield'=>'name',
+			'editable' => 1,
+			'output' => API_OUTPUT_EXTEND
+		));
 		foreach($groups as $gnum => $group){
 			$cmbGrp->addItem($group['groupid'], $group['name']);
 		}

@@ -83,7 +83,6 @@ class CHostGroup extends CZBXAPI{
 
 // output
 			'output'					=> API_OUTPUT_REFER,
-			'extendoutput'				=> null,
 			'select_hosts'				=> null,
 			'select_templates'			=> null,
 
@@ -98,16 +97,6 @@ class CHostGroup extends CZBXAPI{
 		);
 
 		$options = zbx_array_merge($def_options, $params);
-
-
-		if(!is_null($options['extendoutput'])){
-			$options['output'] = API_OUTPUT_EXTEND;
-
-			if(!is_null($options['select_hosts'])){
-				$options['select_hosts'] = API_OUTPUT_EXTEND;
-			}
-		}
-
 
 // editable + PERMISSION CHECK
 

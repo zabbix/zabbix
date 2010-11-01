@@ -38,31 +38,13 @@ class CInterfaceInterface extends CZBXAPI{
  *
  * @param _array $options
  * @param array $options['nodeids'] Node IDs
- * @param array $options['groupids'] InterfaceGroup IDs
  * @param array $options['hostids'] Interface IDs
- * @param boolean $options['monitored_hosts'] only monitored Interfaces
- * @param boolean $options['templated_hosts'] include templates in result
- * @param boolean $options['with_items'] only with items
- * @param boolean $options['with_monitored_items'] only with monitored items
- * @param boolean $options['with_historical_items'] only with historical items
- * @param boolean $options['with_triggers'] only with triggers
- * @param boolean $options['with_monitored_triggers'] only with monitored triggers
- * @param boolean $options['with_httptests'] only with http tests
- * @param boolean $options['with_monitored_httptests'] only with monitored http tests
- * @param boolean $options['with_graphs'] only with graphs
  * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
  * @param int $options['extendoutput'] return all fields for Interfaces
- * @param boolean $options['select_groups'] select InterfaceGroups
- * @param boolean $options['select_templates'] select Templates
- * @param boolean $options['select_items'] select Items
- * @param boolean $options['select_triggers'] select Triggers
- * @param boolean $options['select_graphs'] select Graphs
- * @param boolean $options['select_applications'] select Applications
- * @param boolean $options['select_macros'] select Macros
- * @param boolean $options['select_profile'] select Profile
+ * @param boolean $options['selectHosts'] select Interface hosts
+ * @param boolean $options['selectItems'] select Items
  * @param int $options['count'] count Interfaces, returned column name is rowscount
  * @param string $options['pattern'] search hosts by pattern in Interface name
- * @param string $options['extendPattern'] search hosts by pattern in Interface name, ip and DNS
  * @param int $options['limit'] limit selection
  * @param string $options['sortfield'] field to sort by
  * @param string $options['sortorder'] sort order
@@ -106,7 +88,7 @@ class CInterfaceInterface extends CZBXAPI{
 
 // OutPut
 			'output'					=> API_OUTPUT_REFER,
-			'selectInterfaces'				=> null,
+			'selectHosts'			=> null,
 			'selectItems'				=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
@@ -315,15 +297,15 @@ class CInterfaceInterface extends CZBXAPI{
 				else{
 					if(!isset($result[$interface['interfaceid']])) $result[$interface['interfaceid']] = array();
 
-					if(!is_null($options['select_hosts']) && !isset($result[$interface['hostid']]['hosts'])){
+					if(!is_null($options['selectHosts']) && !isset($result[$interface['hostid']]['hosts'])){
 						$result[$interface['interfaceid']]['hosts'] = array();
 					}
-					if(!is_null($options['select_items']) && !isset($result[$interface['hostid']]['items'])){
+					if(!is_null($options['selectItems']) && !isset($result[$interface['hostid']]['items'])){
 						$result[$interface['interfaceid']]['items'] = array();
 					}
 
 // itemids
-					if(isset($interface['itemid']) && is_null($options['select_items'])){
+					if(isset($interface['itemid']) && is_null($options['selectItems'])){
 						if(!isset($result[$interface['hostid']]['items']))
 							$result[$interface['hostid']]['items'] = array();
 
@@ -344,8 +326,51 @@ Copt::memoryPick();
 		}
 
 // Adding Objects
+// Adding Hosts
+		if(!is_null($options['selectHosts'])){
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'interfaceids' => $interfaceids,
+				'preservekeys' => 1
+			);
+
+			if(is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['selectHosts'];
+				$hosts = CHost::get($obj_params);
+
+				if(!is_null($options['limitSelects'])) order_result($hosts, 'host');
+				foreach($hosts as $hostid => $host){
+					unset($hosts[$hostid]['interfaces']);
+
+					foreach($host['interfaces'] as $tnum => $interface){
+						if(!is_null($options['limitSelects'])){
+							if(!isset($count[$interface['interfaceid']])) $count[$interface['interfaceid']] = 0;
+							$count[$interface['interfaceid']]++;
+
+							if($count[$interface['interfaceid']] > $options['limitSelects']) continue;
+						}
+
+						$result[$interface['interfaceid']]['hosts'][] = &$hosts[$hostid];
+					}
+				}
+			}
+			else if(API_OUTPUT_COUNT == $options['selectHosts']){
+				$obj_params['countOutput'] = 1;
+				$obj_params['groupCount'] = 1;
+
+				$hosts = CHost::get($obj_params);
+				$hosts = zbx_toHash($hosts, 'hostid');
+				foreach($result as $templateid => $template){
+					if(isset($hosts[$templateid]))
+						$result[$templateid]['hosts'] = $hosts[$templateid]['rowscount'];
+					else
+						$result[$templateid]['hosts'] = 0;
+				}
+			}
+		}
+
 // Adding Items
-		if(!is_null($options['select_items'])){
+		if(!is_null($options['selectItems'])){
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'interfaceids' => $interfaceids,
@@ -353,8 +378,8 @@ Copt::memoryPick();
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
-			if(is_array($options['select_items']) || str_in_array($options['select_items'], $subselects_allowed_outputs)){
-				$obj_params['output'] = $options['select_items'];
+			if(is_array($options['selectItems']) || str_in_array($options['selectItems'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['selectItems'];
 				$items = CItem::get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($items, 'description');
@@ -370,7 +395,7 @@ Copt::memoryPick();
 					$result[$item['interfaceid']]['items'][] = &$items[$itemid];
 				}
 			}
-			else if(API_OUTPUT_COUNT == $options['select_items']){
+			else if(API_OUTPUT_COUNT == $options['selectItems']){
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
@@ -464,7 +489,7 @@ Copt::memoryPick();
 		if($delete){
 			$items = CItem::get(array(
 				'output' => array('key_'),
-				'select_hosts' => array('host'),
+				'selectHosts' => array('host'),
 				'interfaceids' => zbx_objectValues($interfaces, 'interfaceid'),
 				'preservekeys' => 1,
 				'nopermissions' => 1
@@ -571,5 +596,236 @@ Copt::memoryPick();
 		}
 	}
 
+	public static function massAdd($data){
+		$interfaces = zbx_toArray($data['interfaces']);
+		$interfaceids = zbx_objectValues($interfaces, 'interfaceid');
+
+		try{
+			self::BeginTransaction(__METHOD__);
+
+			$options = array(
+				'interfaceids' => $interfaceids,
+				'editable' => 1,
+				'preservekeys' => 1
+			);
+			$upd_interfaces = self::get($options);
+			foreach($interfaces as $gnum => $interface){
+				if(!isset($upd_interfaces[$interface['interfaceid']])){
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				}
+			}
+
+			$hosts = isset($data['hosts']) ? zbx_toArray($data['hosts']) : null;
+			$hostids = is_null($hosts) ? array() : zbx_objectValues($hosts, 'hostid');
+
+			$templates = isset($data['templates']) ? zbx_toArray($data['templates']) : null;
+			$templateids = is_null($templates) ? array() : zbx_objectValues($templates, 'templateid');
+
+			$objectids = array_merge($hostids, $templateids);
+
+			$linked = array();
+			$sql = 'SELECT hostid, interfaceid '.
+				' FROM hosts_interfaces '.
+				' WHERE '.DBcondition('hostid', $objectids).
+					' AND '.DBcondition('interfaceid', $interfaceids);
+			$linked_db = DBselect($sql);
+			while($pair = DBfetch($linked_db)){
+				$linked[$pair['interfaceid']][$pair['hostid']] = 1;
+			}
+
+			foreach($interfaceids as $gnum => $interfaceid){
+				foreach($objectids as $hostid){
+					if(isset($linked[$interfaceid][$hostid])) continue;
+					$hostinterfaceid = get_dbid('hosts_interfaces', 'hostinterfaceid');
+					$result = DBexecute("INSERT INTO hosts_interfaces (hostinterfaceid, hostid, interfaceid) VALUES ($hostinterfaceid, $hostid, $interfaceid)");
+					if(!$result){
+						self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+					}
+				}
+			}
+
+			self::EndTransaction(true, __METHOD__);
+			return array('interfaceids' => $interfaceids);
+		}
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
+			return false;
+		}
+	}
+
+/**
+ * Remove Hosts from Hostinterfaces
+ *
+ * @param array $data
+ * @param array $data['interfaceids']
+ * @param array $data['hostids']
+ * @param array $data['templateids']
+ * @return boolean
+ */
+	public static function massRemove($data){
+		$interfaceids = zbx_toArray($data['interfaceids'], 'interfaceid');
+		try{
+			self::BeginTransaction(__METHOD__);
+
+			$options = array(
+				'interfaceids' => $interfaceids,
+				'editable' => 1,
+				'preservekeys' => 1,
+				'output' => API_OUTPUT_SHORTEN
+			);
+			$upd_interfaces = self::get($options);
+			foreach($interfaceids as $interfaceid){
+				if(!isset($upd_interfaces[$interfaceid])){
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				}
+			}
+
+			$hostids = isset($data['hostids']) ? zbx_toArray($data['hostids']) : array();
+			$templateids = isset($data['templateids']) ? zbx_toArray($data['templateids']) : array();
+
+			$objectids_to_unlink = array_merge($hostids, $templateids);
+			if(!empty($objectids_to_unlink)){
+				$unlinkable = getUnlinkableHosts($interfaceids, $objectids_to_unlink);
+				if(count($objectids_to_unlink) != count($unlinkable)){
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'One of the Objects is left without Hostinterface');
+				}
+
+				DB::delete('hosts_interfaces', array(
+					DBcondition('hostid', $objectids_to_unlink),
+					DBcondition('interfaceid', $interfaceids)
+				));
+			}
+
+			self::EndTransaction(true, __METHOD__);
+			return array('interfaceids' => $interfaceids);
+		}
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
+			return false;
+		}
+	}
+
+/**
+ * Update Hostinterfaces with new Hosts (rewrite)
+ *
+ * @param array $data
+ * @param array $data['interfaces']
+ * @param array $data['hosts']
+ * @param array $data['templates']
+ * @return boolean
+ */
+	public static function massUpdate($data){
+		$interfaces = zbx_toArray($data['interfaces']);
+		$hosts = isset($data['hosts']) ? zbx_toArray($data['hosts']) : null;
+		$templates = isset($data['templates']) ? zbx_toArray($data['templates']) : null;
+
+		$interfaceids = zbx_objectValues($interfaces, 'interfaceid');
+		$hostids = zbx_objectValues($hosts, 'hostid');
+		$templateids = zbx_objectValues($templates, 'templateid');
+
+		try{
+			self::BeginTransaction(__METHOD__);
+
+			$hosts_to_unlink = $hosts_to_link = array();
+			$options = array(
+				'interfaceids' => $interfaceids,
+				'preservekeys' => 1,
+			);
+			if(!is_null($hosts)){
+				$interfaces_hosts = CHost::get($options);
+				$hosts_to_unlink = array_diff(array_keys($interfaces_hosts), $hostids);
+				$hosts_to_link = array_diff($hostids, array_keys($interfaces_hosts));
+			}
+
+			$templates_to_unlink = $templates_to_link = array();
+			if(!is_null($templates)){
+				$interfaces_templates = CTemplate::get($options);
+				$templates_to_unlink = array_diff(array_keys($interfaces_templates), $templateids);
+				$templates_to_link = array_diff($templateids, array_keys($interfaces_templates));
+			}
+
+			$objectids_to_link = array_merge($hosts_to_link, $templates_to_link);
+			$objectids_to_unlink = array_merge($hosts_to_unlink, $templates_to_unlink);
+
+// PERMISSION {{{
+			$options = array(
+				'interfaceids' => $interfaceids,
+				'editable' => 1,
+				'preservekeys' => 1
+			);
+			$allowed_interfaces = self::get($options);
+			foreach($interfaces as $num => $interface){
+				if(!isset($allowed_interfaces[$interface['interfaceid']])){
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				}
+			}
+
+			if(!is_null($hosts)){
+				$hosts_to_check = array_merge($hosts_to_link, $hosts_to_unlink);
+				$options = array(
+					'hostids' => $hosts_to_check,
+					'editable' => 1,
+					'preservekeys' => 1
+				);
+				$allowed_hosts = CHost::get($options);
+				foreach($hosts_to_check as $num => $hostid){
+					if(!isset($allowed_hosts[$hostid])){
+						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+					}
+				}
+			}
+
+			if(!is_null($templates)){
+				$templates_to_check = array_merge($templates_to_link, $templates_to_unlink);
+				$options = array(
+					'templateids' => $templates_to_check,
+					'editable' => 1,
+					'preservekeys' => 1
+				);
+				$allowed_templates = CTemplate::get($options);
+				foreach($templates_to_check as $num => $templateid){
+					if(!isset($allowed_templates[$templateid])){
+						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+					}
+				}
+			}
+// }}} PERMISSION
+
+			$unlinkable = getUnlinkableHosts($interfaceids, $objectids_to_unlink);
+			if(count($objectids_to_unlink) != count($unlinkable)){
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'One of the Objects is left without Hostinterface');
+			}
+
+			$sql = 'DELETE FROM hosts_interfaces WHERE '.DBcondition('interfaceid', $interfaceids).' AND '.DBcondition('hostid', $objectids_to_unlink);
+			if(!DBexecute($sql))
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+
+			foreach($interfaceids as $gnum => $interfaceid){
+				foreach($objectids_to_link as $objectid){
+					$hostinterfaceid = get_dbid('hosts_interfaces', 'hostinterfaceid');
+					$result = DBexecute("INSERT INTO hosts_interfaces (hostinterfaceid, hostid, interfaceid) VALUES ($hostinterfaceid, $objectid, $interfaceid)");
+					if(!$result){
+						self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+					}
+				}
+			}
+
+			self::EndTransaction(true, __METHOD__);
+			return array('interfaceids' => $interfaceids);
+		}
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
+			return false;
+		}
+	}
 }
 ?>

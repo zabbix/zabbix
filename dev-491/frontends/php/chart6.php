@@ -50,11 +50,10 @@ include_once 'include/page_header.php';
 	}
 
 	$options = array(
-			'graphids' => $_REQUEST['graphid'],
-			'select_hosts' => 1,
-			'extendoutput' => 1
-		);
-
+		'graphids' => $_REQUEST['graphid'],
+		'select_hosts' => API_OUTPUT_EXTEND,
+		'output' => API_OUTPUT_EXTEND
+	);
 	$db_data = CGraph::get($options);
 	if(empty($db_data)) access_deny();
 	else $db_data = reset($db_data);

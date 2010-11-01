@@ -108,7 +108,6 @@ class CTrigger extends CZBXAPI{
 			'expandData'			=> null,
 			'expandDescription'		=> null,
 			'output'				=> API_OUTPUT_REFER,
-			'extendoutput'			=> null,
 			'select_groups'			=> null,
 			'select_hosts'			=> null,
 			'select_items'			=> null,
@@ -127,20 +126,6 @@ class CTrigger extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $options);
 
-
-		if(!is_null($options['extendoutput'])){
-			$options['output'] = API_OUTPUT_EXTEND;
-
-			if(!is_null($options['select_hosts'])){
-				$options['select_hosts'] = API_OUTPUT_EXTEND;
-			}
-			if(!is_null($options['select_items'])){
-				$options['select_items'] = API_OUTPUT_EXTEND;
-			}
-			if(!is_null($options['select_dependencies'])){
-				$options['select_dependencies'] = API_OUTPUT_EXTEND;
-			}
-		}
 
 		if(is_array($options['output'])){
 			unset($sql_parts['select']['triggers']);
