@@ -425,6 +425,7 @@ Copt::memoryPick();
 			$dbInterfaces = self::get(array(
 				'output' => API_OUTPUT_EXTEND,
 				'interfaceids' => zbx_objectValues($interfaces, 'interfaceid'),
+				'editable' => 1,
 				'preservekeys' => 1
 			));
 		}
@@ -432,6 +433,7 @@ Copt::memoryPick();
 			$interfaceDBfields = array('ip'=>null, 'dns'=>null, 'useip'=>null, 'hostid'=>null);
 			$dbHosts = CHost::get(array(
 				'hostids' => zbx_objectValues($interfaces, 'hostid'),
+				'editable' => 1,
 				'preservekeys' => 1
 			));
 		}
