@@ -23,66 +23,10 @@
  * @package API
  */
 
-class CValidators{
+class CItemprototype extends CZBXAPI{
 
-	public static function required($array, $key){
-		return isset($array[$key]);
-	}
-
-	public static function arrayof($array, $key, $rules){
-		if(!isset($array[$key])) return true;
-
-		foreach($rules as $field => $filters){
-			foreach($filters as $filter){
-				$validator = array_shift($filter);
-				call_user_func_array(array('CValidators', $validator), array($array, $field, $filter));
-
-			}
-		}
-	}
-
-	public static function hash($array, $key, $rules){
-		if(!isset($array[$key])) return true;
-
-		foreach($rules as $field => $filters){
-			foreach($filters as $filter){
-				$validator = array_shift($filter);
-				call_user_func_array(array('CValidators', $validator), array($array, $field, $filter));
-
-			}
-		}
-	}
-
-
-}
-
-
-class CDiscoveryRule extends CZBXAPI{
-
-	protected static function get_rules($method){
-		$rules = array();
-
-		$rules['create'] = array('arrayof',
-			'rules' => array(
-				'hostid' => array('required'),
-				'applications' => array(
-					array('arrayof',
-						'rules' => array(
-							'applicationid' => array('required'),
-							'name' => array('required'),
-						)
-					),
-				),
-				'key_' => array(
-					array('required'),
-					array('string', 'length' => 256),
-				),
-			),
-		);
-
-	}
 /**
- * Get DiscoveryRule data
+ * Get Itemprototype data
  */
 	public static function get($options=array()){
 		global $USER_DETAILS;
@@ -108,6 +52,7 @@ class CDiscoveryRule extends CZBXAPI{
 			'templateids'			=> null,
 			'hostids'				=> null,
 			'itemids'				=> null,
+			'discoveryids'			=> null,
 			'inherited'				=> null,
 			'templated'				=> null,
 			'monitored'				=> null,
@@ -125,7 +70,6 @@ class CDiscoveryRule extends CZBXAPI{
 			'select_hosts'			=> null,
 			'select_triggers'		=> null,
 			'select_graphs'			=> null,
-			'select_prototypes'		=> null,
 			'countOutput'			=> null,
 			'groupCount'			=> null,
 			'preservekeys'			=> null,
@@ -209,6 +153,23 @@ class CDiscoveryRule extends CZBXAPI{
 			zbx_value2array($options['itemids']);
 
 			$sql_parts['where']['itemid'] = DBcondition('i.itemid', $options['itemids']);
+		}
+
+// discoveryids
+		if(!is_null($options['discoveryids'])){
+			zbx_value2array($options['discoveryids']);
+
+			if($options['output'] != API_OUTPUT_SHORTEN){
+				$sql_parts['select']['discoveryid'] = 'id.parent_itemid';
+			}
+
+			$sql_parts['from']['item_discovery'] = 'item_discovery id';
+			$sql_parts['where'][] = DBcondition('id.parent_itemid', $options['discoveryids']);
+			$sql_parts['where']['idi'] = 'i.itemid=id.itemid';
+
+			if(!is_null($options['groupCount'])){
+				$sql_parts['group']['id'] = 'id.parent_itemid';
+			}
 		}
 
 // inherited
@@ -362,8 +323,32 @@ class CDiscoveryRule extends CZBXAPI{
 // hostids
 					if(isset($item['hostid']) && is_null($options['select_hosts'])){
 						if(!isset($result[$item['itemid']]['hosts'])) $result[$item['itemid']]['hosts'] = array();
-
 						$result[$item['itemid']]['hosts'][] = array('hostid' => $item['hostid']);
+					}
+
+// triggerids
+					if(isset($item['triggerid']) && is_null($options['select_triggers'])){
+						if(!isset($result[$item['itemid']]['triggers']))
+							$result[$item['itemid']]['triggers'] = array();
+
+						$result[$item['itemid']]['triggers'][] = array('triggerid' => $item['triggerid']);
+						unset($item['triggerid']);
+					}
+// graphids
+					if(isset($item['graphid']) && is_null($options['select_graphs'])){
+						if(!isset($result[$item['itemid']]['graphs']))
+							$result[$item['itemid']]['graphs'] = array();
+
+						$result[$item['itemid']]['graphs'][] = array('graphid' => $item['graphid']);
+						unset($item['graphid']);
+					}
+// applicationids
+					if(isset($item['applicationid']) && is_null($options['select_applications'])){
+						if(!isset($result[$item['itemid']]['applications']))
+							$result[$item['itemid']]['applications'] = array();
+
+						$result[$item['itemid']]['applications'][] = array('applicationid' => $item['applicationid']);
+						unset($item['applicationid']);
 					}
 
 					$result[$item['itemid']] += $item;

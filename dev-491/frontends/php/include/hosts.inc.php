@@ -28,72 +28,6 @@
 	}
 
 /*
- * Function: check_circle_host_link
- *
- * Description:
- *     Check for circular templates linkage
- *
- * Author:
- *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
- *
- * Comments:
- *
- *     NOTE: templates = array(id => name, id2 => name2, ...)
- *
- */
-	function check_circle_host_link($hostid, $templates){
-		if(count($templates) == 0)	return false;
-		if(isset($templates[$hostid]))	return true;
-		foreach($templates as $id => $name)
-			if(check_circle_host_link($hostid, get_templates_by_hostid($id)))
-				return true;
-
-		return false;
-	}
-
-/*
- * Function: unlink_template
- *
- * Description:
- *     Unlink elements from host by template
- *
- * Author:
- *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
- *
- * Comments: !!! Don't forget sync code with C !!!
- *
- */
-	function unlink_template($hostid, $templateids, $unlink_mode = true){
-		zbx_value2array($templateids);
-
-		$result = delete_template_elements($hostid, $templateids, $unlink_mode);
-		$result&= DBexecute('DELETE FROM hosts_templates WHERE hostid='.$hostid.' AND '.DBcondition('templateid',$templateids));
-	return $result;
-	}
-
-/*
- * Function: delete_template_elements
- *
- * Description:
- *     Delete all elements from host by template
- *
- * Author:
- *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
- *
- * Comments: !!! Don't forget sync code with C !!!
- *
- */
-	function delete_template_elements($hostid, $templateids = null, $unlink_mode = false){
-		zbx_value2array($templateids);
-
-		delete_template_graphs($hostid, $templateids, $unlink_mode);
-		delete_template_triggers($hostid, $templateids, $unlink_mode);
-		delete_template_items($hostid, $templateids, $unlink_mode);
-		delete_template_applications($hostid, $templateids, $unlink_mode);
-	return true;
-	}
-
-/*
  * Function: copy_template_elements
  *
  * Description:
@@ -123,24 +57,6 @@ SDI('copy_template_elements');
 	}
 
 /*
- * Function: sync_host_with_templates
- *
- * Description:
- *     Synchronize template elements with host
- *
- * Author:
- *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
- *
- * Comments: !!! Don't forget sync code with C !!!
- *
- */
-	function sync_host_with_templates($hostid, $templateid = null){
-		delete_template_elements($hostid, $templateid);
-		$res = copy_template_elements($hostid, $templateid);
-		return $res;
-	}
-
-/*
  * Function: delete_host
  *
  * Description:
@@ -156,11 +72,10 @@ SDI('copy_template_elements');
 		zbx_value2array($hostids);
 		if(empty($hostids)) return true;
 
-		$ret = false;
 // unlink child hosts
 		$db_childs = get_hosts_by_templateid($hostids);
 		while($db_child = DBfetch($db_childs)){
-			unlink_template($db_child['hostid'], $hostids, $unlink_mode);
+			$result = CTemplate::unlink($db_child['hostid'], $hostids, !$unlink_mode);
 		}
 
 // delete web tests

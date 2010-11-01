@@ -736,46 +736,6 @@
 	}
 
 	/*
-	 * Function: delete_template_items
-	 *
-	 * Description:
-	 *     Delete items from host by templateid
-	 *
-	 * Author:
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments: !!! Don't forget sync code with C !!!
-	 *
-	 */
-	function delete_template_items($hostid, $templateids = null, $unlink_mode = false){
-		zbx_value2array($templateids);
-
-		$db_items = get_items_by_hostid($hostid);
-		while($db_item = DBfetch($db_items)){
-			if($db_item["templateid"] == 0)
-				continue;
-
-			if( !is_null($templateids)){
-				$db_tmp_item = get_item_by_itemid($db_item["templateid"]);
-
-				if(!uint_in_array($db_tmp_item["hostid"], $templateids)) continue;
-			}
-
-			if($unlink_mode){
-				if(DBexecute('UPDATE items SET templateid=NULL WHERE itemid='.$db_item["itemid"])){
-					info("Item '".$db_item["key_"]."' unlinked");
-				}
-			}
-			else{
-				if(!in_array($db_item['flags'], array(ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_CHILD))){
-					DBexecute('UPDATE items SET templateid=NULL WHERE itemid='.$db_item["itemid"]);
-					CItem::delete($db_item["itemid"]);
-				}
-			}
-		}
-	}
-
-	/*
 	 * Function: copy_item_to_host
 	 *
 	 * Description:
@@ -815,7 +775,7 @@
 	}
 
 	function copy_items($srcid, $destid){
-		
+
 	}
 
 	/*
