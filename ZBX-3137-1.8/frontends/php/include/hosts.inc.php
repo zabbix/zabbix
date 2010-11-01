@@ -1375,15 +1375,27 @@ return $result;
 
 		if(!empty($tmp_appids)) delete_application($tmp_appids);			// recursion!!!
 
+
+
+		//check if app is used by web scenarion
 		$sql = 'SELECT ht.name, ht.applicationid '.
 				' FROM httptest ht '.
-				' WHERE '.DBcondition('ht.applicationid',$applicationids);
+				' WHERE '.DBcondition('ht.applicationid',$applicationids).'
+						OR ht.applicationid IN (SELECT applicationid
+												FROM applications
+												WHERE '.DBcondition('templateid',$applicationids).')';
 		$res = DBselect($sql);
+		//if it is, we can't delete it
 		if($info = DBfetch($res)){
-			info(S_APPLICATION.SPACE.'"'.$apps[$info['applicationid']]['host'].':'.$apps[$info['applicationid']]['name'].'"'.SPACE.S_USED_BY_SCENARIO_SMALL.SPACE.'"'.$info['name'].'"');
+			if (isset($apps[$info['applicationid']]['host'])){
+				info(S_APPLICATION.SPACE.'"'.$apps[$info['applicationid']]['host'].':'.$apps[$info['applicationid']]['name'].'"'.SPACE.S_USED_BY_SCENARIO_SMALL.SPACE.'"'.$info['name'].'"');
+			}
+			else {
+				info(S_YOU_CANT_DELETE_TEMPLATE_FOR_APP_USED_IN_SCENARIO);
+			}
 			return false;
 		}
-
+		
 		$sql = 'SELECT i.itemid,i.key_,i.description '.
 				' FROM items_applications ia, items i '.
 				' WHERE i.type='.ITEM_TYPE_HTTPTEST.
