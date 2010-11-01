@@ -2,7 +2,6 @@ CREATE TABLE trigger_discovery (
 	triggerdiscoveryid       bigint                                    NOT NULL,
 	triggerid                bigint                                    NOT NULL,
 	parent_triggerid         bigint                                    NOT NULL,
-	expression               varchar(255)    DEFAULT ''                NOT NULL,
 	name                     varchar(255)    DEFAULT ''                NOT NULL,
 	PRIMARY KEY (triggerdiscoveryid)
 ) with OIDS;
