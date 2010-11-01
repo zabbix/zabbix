@@ -41,7 +41,7 @@ class CItemprototype extends CZBXAPI{
 		$sql_parts = array(
 			'select' => array('items' => 'i.itemid'),
 			'from' => array('items' => 'items i'),
-			'where' => array('i.flags='.ZBX_FLAG_DISCOVERY),
+			'where' => array('i.flags='.ZBX_FLAG_DISCOVERY_CHILD),
 			'group' => array(),
 			'order' => array(),
 			'limit' => null);
@@ -342,13 +342,13 @@ class CItemprototype extends CZBXAPI{
 						$result[$item['itemid']]['graphs'][] = array('graphid' => $item['graphid']);
 						unset($item['graphid']);
 					}
-// applicationids
-					if(isset($item['applicationid']) && is_null($options['select_applications'])){
-						if(!isset($result[$item['itemid']]['applications']))
-							$result[$item['itemid']]['applications'] = array();
+// discoveryids
+					if(isset($item['discoveryids'])){
+						if(!isset($result[$item['itemid']]['discoveryRule']))
+							$result[$item['itemid']]['discovery'] = array();
 
-						$result[$item['itemid']]['applications'][] = array('applicationid' => $item['applicationid']);
-						unset($item['applicationid']);
+						$result[$item['itemid']]['discoveryRule'][] = array('ruleid' => $item['item_parentid']);
+						unset($item['item_parentid']);
 					}
 
 					$result[$item['itemid']] += $item;
@@ -736,7 +736,7 @@ COpt::memoryPick();
 		unset($item);
 	}
 /**
- * Add DIscoveryRule
+ * Add Itemprototype
  *
  * @param array $items
  * @return array|boolean
@@ -846,7 +846,7 @@ COpt::memoryPick();
 	}
 
 /**
- * Update DIscoveryRule
+ * Update Itemprototype
  *
  * @param array $items
  * @return boolean
@@ -877,56 +877,59 @@ COpt::memoryPick();
 	}
 
 /**
- * Delete DIscoveryRules
+ * Delete Itemprototypes
  *
  * @param array $ruleids
  * @return
  */
-	public static function delete($ruleids){
-		if(empty($ruleids)) return true;
+	public static function delete($prototypeids, $nopermissions=false){
+		if(empty($prototypeids)) return true;
 
-		$ruleids = zbx_toArray($ruleids);
-		$insert = $prototypeids = array();
-
+		$prototypeids = zbx_toArray($prototypeids);
+		$prototypeids = zbx_toHash($prototypeids);
 		try{
 			self::BeginTransaction(__METHOD__);
 
 			$options = array(
-				'itemids' => $ruleids,
+				'itemids' => $prototypeids,
 				'editable' => 1,
 				'preservekeys' => 1,
 				'output' => API_OUTPUT_EXTEND,
 			);
 			$del_items = self::get($options);
-			foreach($ruleids as $ruleid){
-				if(!isset($del_items[$ruleid])){
+			foreach($prototypeids as $prototypeid){
+// TODO: remove $nopermissions hack
+				if(!$nopermissions && !isset($del_items[$prototypeid])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
 				}
-				if($del_items[$ruleid]['templateid'] != 0){
+				if($del_items[$prototypeid]['templateid'] != 0){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete templated items');
 				}
 			}
 
 // first delete child items
-			$parent_itemids = $ruleids;
+			$parent_itemids = $prototypeids;
 			do{
 				$db_items = DBselect('SELECT itemid FROM items WHERE ' . DBcondition('templateid', $parent_itemids));
 				$parent_itemids = array();
 				while($db_item = DBfetch($db_items)){
-					$parent_itemids[] = $db_item['itemid'];
-					$ruleids[] = $db_item['itemid'];
+					$parent_itemids[$db_item['itemid']] = $db_item['itemid'];
+					$prototypeids[$db_item['itemid']] = $db_item['itemid'];
 				}
 			}while(!empty($parent_itemids));
 
 
-			$sql = 'SELECT itemid FROM item_discovery WHERE '.DBcondition('parent_itemid', $ruleids);
+			$created_items = array();
+			$sql = 'SELECT itemid FROM item_discovery WHERE '.DBcondition('parent_itemid', $prototypeids);
 			$db_items = DBselect($sql);
 			while($item = DBfetch($db_items)){
-				$prototypeids[] = $item['itemid'];
+				$created_items[$item['itemid']] = $item['itemid'];
 			}
-// ---
+			$result = CItem::delete($created_items, true);
+			if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete item prototype');
 
-// delete graphs
+
+// delete graph prototypes
 			$del_graphs = array();
 			$sql = 'SELECT gi.graphid' .
 					' FROM graphs_items gi' .
@@ -935,35 +938,25 @@ COpt::memoryPick();
 			while($db_graph = DBfetch($db_graphs)){
 				$del_graphs[$db_graph['graphid']] = $db_graph['graphid'];
 			}
-			if(!empty($del_graphs)){
+			if(!empty($del_graphs))
 				DB::delete('graphs', $del_graphs);
-			}
-//--
+// --
+
 
 			$triggers = CTrigger::get(array(
 				'itemids' => $prototypeids,
+				'filter' => array('flags' => null),
 				'output' => API_OUTPUT_SHORTEN,
-				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
 				'nopermissions' => true,
 				'preservekeys' => true,
 			));
 			if(!empty($triggers))
 				DB::delete('triggers', zbx_objectValues($triggers, 'triggerid'));
 
-
-			$itemids_condition = DBcondition('itemid', $ruleids);
-			DB::delete('screens_items', array(
-				DBcondition('resourceid', $ruleids),
-				DBcondition('resourcetype', array(SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT)),
-			));
-			DB::delete('items', array($itemids_condition));
-			DB::delete('profiles', array(
-				'idx='.zbx_dbstr('web.favorite.graphids'),
-				'source='.zbx_dbstr('itemid'),
-				DBcondition('value_id', $ruleids)
-			));
+			DB::delete('items', array(DBcondition('itemid', $prototypeids)));
 
 
+// HOUSEKEEPER {{{
 			$item_data_tables = array(
 				'trends',
 				'trends_uint',
@@ -974,19 +967,20 @@ COpt::memoryPick();
 				'history',
 			);
 
-			foreach($ruleids as $id => $ruleid){
+			foreach($prototypeids as $id => $prototypeid){
 				foreach($item_data_tables as $table){
 					$insert[] = array(
 						'tablename' => $table,
 						'field' => 'itemid',
-						'value' => $ruleid,
+						'value' => $prototypeid,
 					);
 				}
 			}
 			DB::insert('housekeeper', $insert);
+// }}} HOUSEKEEPER
 
 			self::EndTransaction(true, __METHOD__);
-			return array('ruleids' => $ruleids);
+			return array('ruleids' => $prototypeids);
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
@@ -1102,7 +1096,7 @@ COpt::memoryPick();
 				if(isset($item['key_']) && isset($exItemsKeys[$item['key_']])){
 					$exItem = $exItemsKeys[$item['key_']];
 
-					if($exItem['flags'] != ZBX_FLAG_DISCOVERY){
+					if($exItem['flags'] != ZBX_FLAG_DISCOVERY_CHILD){
 						self::exception(ZBX_API_ERROR_PARAMETERS, S_AN_ITEM_WITH_THE_KEY.SPACE.'['.$exItem['key_'].']'.SPACE.S_ALREADY_EXISTS_FOR_HOST_SMALL.SPACE.'['.$host['host'].'].'.SPACE.S_THE_KEY_MUST_BE_UNIQUE);
 					}
 					else if(($exItem['templateid'] > 0) && ($exItem['templateid'] != $item['hostid'])){

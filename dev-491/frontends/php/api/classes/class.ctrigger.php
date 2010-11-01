@@ -1260,27 +1260,30 @@ COpt::memoryPick();
  * @param array $triggerids array with trigger ids
  * @return deleted triggerids
  */
-	public static function delete($triggerids){
+	public static function delete($triggerids, $nopermissions=false){
 		$triggerids = zbx_toArray($triggerids);
 
 		try{
 			self::BeginTransaction(__METHOD__);
 
-			$options = array(
-				'triggerids' => $triggerids,
-				'filter' => array('flags' => null),
-				'output' => API_OUTPUT_EXTEND,
-				'editable' => 1,
-				'extendoutput' => 1,
-				'preservekeys' => 1
-			);
-			$del_triggers = self::get($options);
-			foreach($triggerids as $gnum => $triggerid){
-				if($del_triggers[$triggerid]['flags'] = ZBX_FLAG_DISCOVERY_CHILD)
-					$trigger_prototypes[$triggerid] = $triggerid;
+// TODO: remove $nopermissions hack
+			if(!$nopermissions){
+				$options = array(
+					'triggerids' => $triggerids,
+					'filter' => array('flags' => null),
+					'output' => API_OUTPUT_EXTEND,
+					'editable' => 1,
+					'extendoutput' => 1,
+					'preservekeys' => 1
+				);
+				$del_triggers = self::get($options);
+				foreach($triggerids as $gnum => $triggerid){
+					if($del_triggers[$triggerid]['flags'] = ZBX_FLAG_DISCOVERY_CHILD)
+						$trigger_prototypes[$triggerid] = $triggerid;
 
-				if(!isset($del_triggers[$triggerid])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+					if(!isset($del_triggers[$triggerid])){
+						self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+					}
 				}
 			}
 

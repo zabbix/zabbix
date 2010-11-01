@@ -30,7 +30,6 @@ private $css_class;
 private $pageHeaders;
 private $headers;
 private $flicker;
-private $items;
 
 	public function __construct($id=null,$body=null,$state=null){
 		if(is_null($id)){

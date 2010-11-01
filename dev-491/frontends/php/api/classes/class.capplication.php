@@ -522,25 +522,28 @@ COpt::memoryPick();
  * @param array $applications[0,...]['applicationid']
  * @return boolean
  */
-	public static function delete($applicationids){
+	public static function delete($applicationids, $nopermissions=false){
 		$applicationids = zbx_toArray($applicationids);
 		try{
 			self::BeginTransaction(__METHOD__);
 
-			$options = array(
-				'applicationids' => $applicationids,
-				'editable' => 1,
-				'output' => API_OUTPUT_EXTEND,
-				'preservekeys' => 1
-			);
-			$del_applications = self::get($options);
+// TODO: remove $nopermissions hack
+			if(!$nopermissions){
+				$options = array(
+					'applicationids' => $applicationids,
+					'editable' => 1,
+					'output' => API_OUTPUT_EXTEND,
+					'preservekeys' => 1
+				);
+				$del_applications = self::get($options);
 
-			foreach($applicationids as $applicationid){
-				if(!isset($del_applications[$applicationid])){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
-				}
-				if($del_applications[$applicationid]['templateid'] != 0){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, 'Cannot delete templated application');
+				foreach($applicationids as $applicationid){
+					if(!isset($del_applications[$applicationid])){
+						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
+					}
+					if($del_applications[$applicationid]['templateid'] != 0){
+						self::exception(ZBX_API_ERROR_PERMISSIONS, 'Cannot delete templated application');
+					}
 				}
 			}
 
