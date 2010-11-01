@@ -599,15 +599,19 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	zabbix_log(LOG_LEVEL_DEBUG, "Query [txnlev:%d] [%s]", txn_level, sql);
 
 #if defined(HAVE_IBM_DB2)
+	/* allocate a statement handle */
 	if (SUCCEED != zbx_ibm_db2_success(SQLAllocHandle(SQL_HANDLE_STMT, ibm_db2.hdbc, &hstmt)))
 		ret = ZBX_DB_DOWN;
 
-  	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLExecDirect(hstmt, (SQLCHAR *)sql, SQL_NTS)))
+	/* directly execute the statement; returns SQL_NO_DATA_FOUND when no rows were affected */
+  	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success_ext(SQLExecDirect(hstmt, (SQLCHAR *)sql, SQL_NTS)))
 		ret = ZBX_DB_DOWN;
 
+	/* get number of affected rows */
 	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLRowCount(hstmt, &rows)))
 		ret = ZBX_DB_DOWN;
 
+	/* process other SQL statements in the batch */
 	while (ZBX_DB_OK == ret && SUCCEED == zbx_ibm_db2_success(ret1 = SQLMoreResults(hstmt)))
 	{
 		if (SUCCEED != zbx_ibm_db2_success(SQLRowCount(hstmt, &row1)))
@@ -1317,6 +1321,11 @@ int	IBM_DB2server_status()
 int	zbx_ibm_db2_success(SQLRETURN ret)
 {
 	return (SQL_SUCCESS == ret || SQL_SUCCESS_WITH_INFO == ret ? SUCCEED : FAIL);
+}
+
+int	zbx_ibm_db2_success_ext(SQLRETURN ret)
+{
+	return (SQL_SUCCESS == ret || SQL_SUCCESS_WITH_INFO == ret || SQL_NO_DATA_FOUND == ret ? SUCCEED : FAIL);
 }
 
 void	zbx_ibm_db2_log_errors(SQLSMALLINT htype, SQLHANDLE hndl)
