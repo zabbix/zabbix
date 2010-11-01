@@ -883,6 +883,7 @@ COpt::memoryPick();
 			$dbItems = self::get(array(
 				'output' => API_OUTPUT_EXTEND,
 				'itemids' => zbx_objectValues($items, 'itemid'),
+				'editable' => 1,
 				'preservekeys' => 1
 			));
 		}
@@ -891,6 +892,7 @@ COpt::memoryPick();
 			$dbHosts = CHost::get(array(
 				'hostids' => zbx_objectValues($items, 'hostid'),
 				'templated_hosts' => 1,
+				'editable' => 1,
 				'preservekeys' => 1
 			));
 		}

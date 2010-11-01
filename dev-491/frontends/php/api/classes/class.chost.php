@@ -1131,6 +1131,76 @@ Copt::memoryPick();
 	return !empty($objs);
 	}
 
+	protected static function checkInput(&$hosts, $method){
+		$insert = ($method == 'insert');
+		$update = ($method == 'update');
+		$delete = ($method == 'delete');
+
+// permissions
+		$groupids = array();
+		foreach($hosts as $hnum => $host){
+			if(!isset($host['groups'])) continue;
+			$groupids = array_merge($groupids, zbx_objectValues($host['groups'], 'groupid'));
+		}
+
+		if($update || $delete){
+			$hostDBfields = array('hostid'=> null);
+			$dbHosts = self::get(array(
+				'hostids' => zbx_objectValues($hosts, 'hostid'),
+				'editable' => 1,
+				'preservekeys' => 1
+			));
+		}
+		else{
+			$hostDBfields = array('host'=>null);
+			$dbGroups = CHostGroup::get(array(
+				'output' => API_OUTPUT_EXTEND,
+				'groupids' => $groupids,
+				'editable' => 1,
+				'preservekeys' => 1
+			));
+		}
+
+		foreach($hosts as $inum => &$host){
+			if(!check_db_fields($hostDBfields, $host)){
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for host [ '.$host['host'].' ]');
+			}
+
+			if($update || $delete){
+				if(!isset($dbHosts[$host['hostid']]))
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+			}
+			else{
+				if(!isset($host['groups']))
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'No groups for host [ '.$host['host'].' ]');
+			}
+
+			if(isset($host['groups'])){
+				if(!is_array($host['groups']) || empty($host['groups']))
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'No groups for host [ '.$host['host'].' ]');
+
+				foreach($host['groups'] as $gnum => $group){
+					if(!isset($dbGroups[$group['groupid']])){
+						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
+					}
+				}
+			}
+
+			if(isset($host['host'])){
+				if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $host['host'])){
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect characters used for Hostname [ '.$host['host'].' ]');
+				}
+				if(self::exists(array('host' => $host['host']))){
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
+				}
+				if(CTemplate::exists(array('host' => $host['host']))){
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
+				}
+			}
+
+		}
+	}
+
 /**
  * Add Host
  *
@@ -1155,62 +1225,19 @@ Copt::memoryPick();
 	public static function create($hosts){
 		$hosts = zbx_toArray($hosts);
 		$hostids = array();
-		$groupids = array();
 
 		try{
 			self::BeginTransaction(__METHOD__);
-// CHECK IF HOSTS HAVE AT LEAST 1 GROUP {{{
-			foreach($hosts as $hnum => $host){
-				if(empty($host['groups'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'No groups for host [ '.$host['host'].' ]');
-				}
-				$hosts[$hnum]['groups'] = zbx_toArray($hosts[$hnum]['groups']);
 
-				foreach($hosts[$hnum]['groups'] as $gnum => $group){
-					$groupids[$group['groupid']] = $group['groupid'];
-				}
-			}
-// }}} CHECK IF HOSTS HAVE AT LEAST 1 GROUP
-
-
-// PERMISSIONS {{{
-			$upd_groups = CHostGroup::get(array(
-				'groupids' => $groupids,
-				'editable' => 1,
-				'preservekeys' => 1));
-			foreach($groupids as $gnum => $groupid){
-				if(!isset($upd_groups[$groupid])){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
-				}
-			}
-// }}} PERMISSIONS
-
-
+			self::checkInput($hosts, __FUNCTION__);
+			
 			foreach($hosts as $num => $host){
-				$host_db_fields = array(
-					'host' => null,
-				);
-				if(!check_db_fields($host_db_fields, $host)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for host [ '.$host['host'].' ]');
-				}
-
-				if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $host['host'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect characters used for Hostname [ '.$host['host'].' ]');
-				}
-
-				if(self::exists(array('host' => $host['host']))){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
-				}
-				if(CTemplate::exists(array('host' => $host['host']))){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
-				}
-
 
 				$hostid = DB::insert('hosts', array($host));
 				$hostids[] = $hostid = reset($hostid);
 
-
 				$host['hostid'] = $hostid;
+
 				$options = array();
 				$options['hosts'] = $host;
 				$options['groups'] = $host['groups'];
@@ -1284,17 +1311,8 @@ Copt::memoryPick();
 
 		try{
 			self::BeginTransaction(__METHOD__);
-			$options = array(
-				'hostids' => $hostids,
-				'editable' => 1,
-				'preservekeys' => 1
-			);
-			$upd_hosts = self::get($options);
-			foreach($hosts as $gnum => $host){
-				if(!isset($upd_hosts[$host['hostid']])){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, 'You do not have enough rights for operation');
-				}
-			}
+
+			self::checkInput($hosts, __FUNCTION__);
 
 			foreach($hosts as $num => $host){
 				$tmp = $host;
