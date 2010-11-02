@@ -161,7 +161,6 @@ SDI('copy_template_elements');
 
 		//since all apps were deleted by other functions earlier, we must unlink
 		// those, who were not because they were used in web scenarios
-		$app_templates = array();
 
 		$exceptional_applicationids = array();
 		$query = 'SELECT
