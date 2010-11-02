@@ -52,7 +52,7 @@ const char	*DBnode(const char *fieldid, const int nodeid)
 	return dbnode;
 }
 
-void	DBclose(void)
+void	DBclose()
 {
 	zbx_db_close();
 }
@@ -130,7 +130,7 @@ void	DBinit()
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	DBping(void)
+int	DBping()
 {
 	int ret;
 
@@ -155,7 +155,7 @@ int	DBping(void)
  * Comments: Do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-void	DBbegin(void)
+void	DBbegin()
 {
 	int	rc;
 
@@ -190,7 +190,7 @@ void	DBbegin(void)
  * Comments: Do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-void	DBcommit(void)
+void	DBcommit()
 {
 	int	rc;
 
@@ -225,7 +225,7 @@ void	DBcommit(void)
  * Comments: Do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-void	DBrollback(void)
+void	DBrollback()
 {
 	int	rc;
 
@@ -1019,6 +1019,7 @@ int	DBremove_escalation(zbx_uint64_t escalationid)
 	return SUCCEED;
 }
 
+
 /******************************************************************************
  *                                                                            *
  * Function: DBget_escape_string_len                                          *
@@ -1131,7 +1132,7 @@ void    DBescape_string(const char *src, char *dst, int len)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-char*	DBdyn_escape_string(const char *src)
+char	*DBdyn_escape_string(const char *src)
 {
 	int	len;
 	char	*dst = NULL;
@@ -1160,7 +1161,7 @@ char*	DBdyn_escape_string(const char *src)
  * Comments: sync changes with 'DBescape_string', 'DBget_escape_string_len'   *
  *                                                                            *
  ******************************************************************************/
-char*	DBdyn_escape_string_len(const char *src, int max_src_len)
+char	*DBdyn_escape_string_len(const char *src, int max_src_len)
 {
 	const char	*s;
 	char		*dst = NULL;
@@ -1447,7 +1448,9 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 			0 == strcmp(tablename, "dhosts") ||
 			0 == strcmp(tablename, "alerts") ||
 			0 == strcmp(tablename, "escalations") ||
-			0 == strcmp(tablename, "autoreg_host"))
+			0 == strcmp(tablename, "autoreg_host") ||
+			0 == strcmp(tablename, "graph_discovery") ||
+			0 == strcmp(tablename, "trigger_discovery"))
 		return DCget_nextid(tablename, num);
 
 	return DBget_nextid(tablename, num);
@@ -1858,7 +1861,7 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, int now)
 			DBnode_local("autoreg_hostid"));
 
 	if (NULL != (row = DBfetch(result)))
-		ZBX_STR2UINT64(autoreg_hostid, row[0])
+		ZBX_STR2UINT64(autoreg_hostid, row[0]);
 	else
 	{
 		autoreg_hostid = DBget_maxid("autoreg_host");

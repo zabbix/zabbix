@@ -209,7 +209,7 @@ function select_config($cache = true){
 		$config = $row;
 		return $row;
 	}
-	else if($page['title'] != "S_INSTALLATION"){
+	else if(isset($page['title']) && ($page['title'] != "S_INSTALLATION")){
 		error(S_UNABLE_TO_SELECT_CONFIGURATION);
 	}
 return $row;

@@ -18,6 +18,7 @@ build/win32/project/resource.res
 /configure
 create/Makefile
 create/Makefile.in
+create/schema/db2.sql
 create/schema/mysql.sql
 create/schema/oracle.sql
 create/schema/postgresql.sql

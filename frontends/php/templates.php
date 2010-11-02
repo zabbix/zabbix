@@ -383,12 +383,8 @@ include_once('include/page_header.php');
 // FULL_CLONE {
 
 		if(!zbx_empty($templateid) && $templateid && $clone_templateid && ($_REQUEST['form'] == 'full_clone')){
-// Host applications
-			$sql = 'SELECT * FROM applications WHERE hostid='.$clone_templateid.' AND templateid=0';
-			$res = DBselect($sql);
-			while($db_app = DBfetch($res)){
-				add_application($db_app['name'], $templateid, 0);
-			}
+
+			if(!copy_applications($clone_hostid, $hostid)) throw new Exception();
 
 // Host items
 			$sql = 'SELECT DISTINCT i.itemid, i.description '.
@@ -799,6 +795,7 @@ include_once('include/page_header.php');
 			S_TRIGGERS,
 			S_GRAPHS,
 			S_SCREENS,
+			S_DISCOVERY,
 			S_LINKED_TEMPLATES,
 			S_LINKED_TO
 		));
@@ -839,6 +836,7 @@ include_once('include/page_header.php');
 			'select_triggers' => API_OUTPUT_COUNT,
 			'select_graphs' => API_OUTPUT_COUNT,
 			'select_applications' => API_OUTPUT_COUNT,
+			'select_discoveries' => API_OUTPUT_COUNT,
 			'selectScreens' => API_OUTPUT_COUNT,
 			'nopermissions' => 1,
 		);
@@ -865,6 +863,8 @@ include_once('include/page_header.php');
 				' ('.$template['graphs'].')');
 			$screens = array(new CLink(S_SCREENS,'screenconf.php?templateid='.$template['templateid']),
 				' ('.$template['screens'].')');
+			$discoveries = array(new CLink(S_DISCOVERY, 'host_discovery.php?&hostid='.$template['hostid']),
+				' ('.$template['discoveries'].')');
 
 
 			$i = 0;
@@ -934,6 +934,7 @@ include_once('include/page_header.php');
 				$triggers,
 				$graphs,
 				$screens,
+				$discoveries,
 				(empty($linked_templates_output) ? '-' : new CCol($linked_templates_output,'wraptext')),
 				(empty($linked_to_output) ? '-' : new CCol($linked_to_output,'wraptext'))
 			));

@@ -24,7 +24,6 @@ class CFormTable extends CForm{
  private $align;
  private $help;
 
-
  protected $top_items = array();
  protected $center_items = array();
  protected $bottom_items = array();
@@ -117,7 +116,7 @@ class CFormTable extends CForm{
 		array_push($this->top_items, $value);
 	}
 
-	public function addRow($item1, $item2=NULL, $class=NULL){
+	public function addRow($item1, $item2=NULL, $class=NULL, $id=null){
 		if(is_object($item1) && zbx_strtolower(get_class($item1)) == 'crow'){
 		}
 		else if(is_object($item1) && zbx_strtolower(get_class($item1)) == 'ctable'){
@@ -127,7 +126,6 @@ class CFormTable extends CForm{
 			$item1 = new CRow($td);
 		}
 		else{
-			$tmp = $item1;
 			if(is_string($item1)){
 				$item1 = nbsp($item1);
 			}
@@ -135,13 +133,14 @@ class CFormTable extends CForm{
 			if(empty($item1)) $item1 = SPACE;
 			if(empty($item2)) $item2 = SPACE;
 
-			$item1 = new CRow(
-							array(
-								new CCol($item1,'form_row_l'),
-								new CCol($item2,'form_row_r')
-							),
-							$class);
+			$item1 = new CRow(array(
+				new CCol($item1, 'form_row_l'),
+				new CCol($item2, 'form_row_r')
+			), $class);
 		}
+
+		if(!is_null($id))
+			$item1->setAttribute('id', $id);
 
 		array_push($this->center_items, $item1);
 
@@ -149,17 +148,13 @@ class CFormTable extends CForm{
 	}
 
 	public function addSpanRow($value, $class=NULL){
-		if(is_string($value))
-			$item1=nbsp($value);
-
 		if(is_null($value)) $value = SPACE;
 		if(is_null($class)) $class = 'form_row_c';
 
 		$col = new CCol($value,$class);
-			$col->setColSpan(2);
+		$col->setColSpan(2);
 		array_push($this->center_items,new CRow($col));
 	}
-
 
 	public function addItemToBottomRow($value){
 		$this->bottom_items->addItem($value);

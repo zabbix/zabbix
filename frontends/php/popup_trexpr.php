@@ -253,6 +253,7 @@
 		"expression"=>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 
 		"itemid"=>	array(T_ZBX_INT, O_OPT,	null,	null,						'isset({insert})'),
+		"parent_discoveryid"=>	array(T_ZBX_INT, O_OPT,	null,	null,			null),
 		"expr_type"=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,					'isset({insert})'),
 		"param"=>	array(T_ZBX_STR, O_OPT,	null,	0,						'isset({insert})'),
 		"paramtype"=>	array(T_ZBX_INT, O_OPT, null,	IN(PARAM_TYPE_SECONDS.','.PARAM_TYPE_COUNTS),	'isset({insert})'),
@@ -304,6 +305,7 @@
 		$options = array(
 			'output' => API_OUTPUT_EXTEND,
 			'itemids' => $itemid,
+			'filter' => array('flags' => null),
 			'webitems' => 1,
 			'select_hosts' => API_OUTPUT_EXTEND
 		);
@@ -312,7 +314,7 @@
 
 		$item_host = reset($item_data['hosts']);
 		$item_host = $item_host['host'];
-		
+
 		$description = $item_host.':'.item_description($item_data);
 	}
 	else{
@@ -414,18 +416,31 @@ if(form){
 
 	echo SBR;
 
+	$parent_discoveryid = get_request('parent_discoveryid');
+
 	$form = new CFormTable(S_CONDITION);
 	$form->SetName('expression');
 	$form->addVar('dstfrm', $dstfrm);
 	$form->addVar('dstfld1', $dstfld1);
 	$form->addVar('itemid',$itemid);
+	if($parent_discoveryid)
+		$form->addVar('parent_discoveryid', $parent_discoveryid);
 
-	$form->addRow(S_ITEM, array(
+	$normal_only = ($parent_discoveryid) ? '&normal_only=1' : '';
+
+	$row = array(
 		new CTextBox('description', $description, 50, 'yes'),
 		new CButton('select', S_SELECT, "return PopUp('popup.php?dstfrm=".$form->GetName().
-				"&dstfld1=itemid&dstfld2=description&submitParent=1&".
-				"srctbl=items&srcfld1=itemid&srcfld2=description',0,0,'zbx_popup_item');")
-		));
+				"&dstfld1=itemid&dstfld2=description&submitParent=1".$normal_only.
+				"&srctbl=items&srcfld1=itemid&srcfld2=description',0,0,'zbx_popup_item');"),
+	);
+	if($parent_discoveryid){
+		$row[] = new CButton('select', S_SELECT_PROTOTYPE, "return PopUp('popup.php?dstfrm=".$form->GetName().
+				"&dstfld1=itemid&dstfld2=description&submitParent=1".url_param('parent_discoveryid', true).
+				"&srctbl=prototypes&srcfld1=itemid&srcfld2=description',0,0,'zbx_popup_item');");
+	}
+
+	$form->addRow(S_ITEM, $row);
 
 	$cmbFnc = new CComboBox('expr_type', $expr_type	, 'submit()');
 	$cmbFnc->addStyle('width: auto;');

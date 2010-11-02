@@ -176,7 +176,7 @@ static void	update_key_status(zbx_uint64_t hostid, int host_status, zbx_timespec
 		init_result(&agent);
 		SET_UI64_RESULT(&agent, host_status);
 
-		dc_add_history(items[i].itemid, items[i].value_type, &agent, ts, 0, NULL, 0, 0, 0, 0);
+		dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &agent, ts, 0, NULL, 0, 0, 0, 0);
 
 		free_result(&agent);
 	}
@@ -578,11 +578,24 @@ static int	get_values()
 		res = get_value(&items[i], &agent);
 		zbx_timespec(&ts);
 
+		switch (res)
+		{
+			case SUCCEED:
+			case NOTSUPPORTED:
+			case AGENT_ERROR:
+				activate_host(&items[i], &ts);
+				break;
+			case NETWORK_ERROR:
+				deactivate_host(&items[i], &ts, agent.msg);
+				break;
+			default:
+				zbx_error("Unknown response code returned.");
+				assert(0 == 1);
+		}
+
 		if (res == SUCCEED)
 		{
-			activate_host(&items[i], &ts);
-
-			dc_add_history(items[i].itemid, items[i].value_type, &agent, &ts, 0, NULL, 0, 0, 0, 0);
+			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &agent, &ts, 0, NULL, 0, 0, 0, 0);
 
 			DCrequeue_reachable_item(items[i].itemid, ITEM_STATUS_ACTIVE, ts.sec);
 		}
@@ -596,15 +609,11 @@ static int	get_values()
 						items[i].host.host, items[i].key_orig);
 			}
 
-			activate_host(&items[i], &ts);
-
 			DCadd_nextcheck(items[i].itemid, ts.sec, agent.msg);	/* update error & status field in items table */
 			DCrequeue_reachable_item(items[i].itemid, ITEM_STATUS_NOTSUPPORTED, ts.sec);
 		}
 		else if (res == NETWORK_ERROR)
 		{
-			deactivate_host(&items[i], &ts, agent.msg);
-
 			switch (items[i].type) {
 			case ITEM_TYPE_ZABBIX:
 				uint64_array_add(&ids, &ids_alloc, &ids_num, items[i].host.hostid, 1);
@@ -622,11 +631,6 @@ static int	get_values()
 			}
 
 			DCrequeue_unreachable_item(items[i].itemid);
-		}
-		else
-		{
-			zbx_error("Unknown response code returned.");
-			assert(0 == 1);
 		}
 
 		free_result(&agent);
