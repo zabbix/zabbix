@@ -838,7 +838,7 @@ include_once('include/page_header.php');
 			'select_triggers' => API_OUTPUT_COUNT,
 			'select_graphs' => API_OUTPUT_COUNT,
 			'select_applications' => API_OUTPUT_COUNT,
-			'select_discoveries' => API_OUTPUT_COUNT,
+			'selectDiscoveries' => API_OUTPUT_COUNT,
 			'selectScreens' => API_OUTPUT_COUNT,
 			'nopermissions' => 1,
 		);

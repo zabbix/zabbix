@@ -157,10 +157,6 @@ SDI('copy_template_elements');
 						' AND '.DBcondition('objectid',$hostids));
 
 
-// delete host profile
-		delete_host_profile($hostids);
-		delete_host_profile_ext($hostids);
-
 // delete host applications
 		DBexecute('DELETE FROM applications WHERE '.DBcondition('hostid',$hostids));
 
@@ -1563,35 +1559,6 @@ return $result;
 
 		$result=DBexecute($sql.$values);
 	return  $result;
-	}
-
-
-// Delete Host Profile
-	function delete_host_profile($hostids){
-		zbx_value2array($hostids);
-		$result=DBexecute('DELETE FROM hosts_profiles WHERE '.DBcondition('hostid',$hostids));
-
-	return $result;
-	}
-
-/*
- * Function: delete_host_profile_ext
- *
- * Description:
- *     Delete alternate host profile information.
- *
- * Author:
- *     John R Pritchard (john.r.pritchard@gmail.com)
- *
- * Comments:
- *     Extend original "delete_host_profile" function for new hosts_profiles_ext data.
- *
- */
-	function delete_host_profile_ext($hostids){
-		zbx_value2array($hostids);
-		$result=DBexecute('DELETE FROM hosts_profiles_ext WHERE '.DBcondition('hostid',$hostids));
-
-	return $result;
 	}
 
 	function getUnlinkableHosts($groupids=null,$hostids=null){

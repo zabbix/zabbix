@@ -636,7 +636,7 @@ include_once('include/page_header.php');
 	}
 // DELETE HOST
 	else if(isset($_REQUEST['delete']) && isset($_REQUEST['hostid'])){
-		$result = CHost::delete($_REQUEST['hostid']);
+		$result = CHost::delete(array('hostid' => $_REQUEST['hostid']));
 		show_messages($result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
 
 		if($result){
@@ -662,7 +662,7 @@ include_once('include/page_header.php');
 	else if($_REQUEST['go'] == 'delete'){
 		$hostids = get_request('hosts', array());
 
-		$go_result = CHost::delete($hostids);
+		$go_result = CHost::delete(zbx_toObject($hostids,'hostid'));
 		show_messages($go_result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
 	}
 // ACTIVATE/DISABLE HOSTS
@@ -820,7 +820,7 @@ include_once('include/page_header.php');
 			'select_triggers' => API_OUTPUT_COUNT,
 			'select_graphs' => API_OUTPUT_COUNT,
 			'select_applications' => API_OUTPUT_COUNT,
-			'select_discoveries' => API_OUTPUT_COUNT,
+			'selectDiscoveries' => API_OUTPUT_COUNT,
 			'nopermissions' => 1,
 		);
 		$hosts = CHost::get($options);
