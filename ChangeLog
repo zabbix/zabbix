@@ -1,10 +1,10 @@
 Changes for 1.9.1
 
- - [ZBX-3130] fixed bug when creating custom graph: host items now can be added (KB) 
+ - [ZBX-3130] fixed bug when creating custom graph: host items now can be added (KB)
 
 Changes for 1.9.0
 
- - [DEV-477] added support of low-level discovery of file systems, network interfaces and SNMP OID's (Sasha,Vedmak) 
+ - [DEV-477] added support of low-level discovery of file systems, network interfaces and SNMP OID's (Sasha,Vedmak)
  - [DEV-490] made graph legend optional (Aly)
  - [DEV-483] added templated screens (Aly)
  - [DEV-485] added multiple urls for map elements (Vedmak)
@@ -18,6 +18,8 @@ Changes for 1.9.0
 
 Changes for 1.8.4rc2
 
+ - [ZBX-3137] fixed errors related to deleting and application that is used in a web scenario (KB)
+ - [ZBXNEXT-538] added support for IBM DB2 (Aly,asaveljevs,Sasha)
  - [ZBX-1362] optimized alert performance (KB)
  - [ZBX-2852] fixed map not updating in slideshow (Vedmak)
  - [ZBX-1346] update example agent daemon configuration file for Windows with parameters from Zabbix manual (Richlv)
