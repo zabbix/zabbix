@@ -2187,6 +2187,7 @@
 	'S_CANNOT_ADD_NEW_APPLICATION'=>		'Cannot add new application',
 	'S_SCENARIO_WITH_NAME'=>			'Scenario with name',
 	'S_ADDED_SMALL'=>				'added',
+	'S_PRINTABLE_ONLY'=>'only printable characters',
 
 //	media.inc.php
 	'S_NO_MEDIA_WITH'=>			'No media with',

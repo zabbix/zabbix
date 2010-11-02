@@ -593,16 +593,22 @@ return $caption;
  */
 	function zbx_unquote_param($value){
 		$value = trim($value);
-		if( !empty($value) && '"' == $value[0] ){
+		if( !empty($value) && '"' == zbx_substr($value, 0, 1) ){
 /* open quotes and unescape chars */
-			$value = substr($value, 1, zbx_strlen($value)-2);
+			$value = zbx_substr($value, 1, zbx_strlen($value)-2);
 
 			$new_val = '';
 			for ( $i=0, $max=zbx_strlen($value); $i < $max; $i++){
-				if( $i+1 < $max && $value[$i] == '\\' && ($value[$i+1] == '\\' || $value[$i+1] == '"') )
-					$new_val .= $value[++$i];
+
+				$current_char = zbx_substr($value, $i, 1);
+				$next_char = zbx_substr($value, $i+1, 1);
+
+				if( $i+1 < $max && $current_char == '\\' && ($next_char == '\\' || $next_char == '"') ){
+					$new_val .= $next_char;
+					$i = $i + 1;
+				}
 				else
-					$new_val .= $value[$i];
+					$new_val .= $current_char;
 			}
 			$value = $new_val;
 		}
@@ -628,18 +634,23 @@ return $caption;
 
 		for( $param_s = $i = 0, $len = zbx_strlen($string); $i < $len; $i++){
 			$char = zbx_substr($string, $i, 1);
+			$prev_char = $i > 0 ? zbx_substr($string, $i-1, 1) : '';
 			switch ( $char ){
 				case '"':
-					$quoted = !$quoted;
+					if ($prev_char!='\\'){
+						$quoted = !$quoted;
+					}
 					break;
 				case ',':
 					if( !$quoted ){
-						$params[] = zbx_unquote_param(substr($string, $param_s, $i - $param_s));
+						$params[] = zbx_unquote_param(zbx_substr($string, $param_s, $i - $param_s));
 						$param_s = $i+1;
 					}
 					break;
 				case '\\':
-					if( $quoted && $i+1 < $len && ($string[$i+1] == '\\' || $string[$i+1] == '"'))
+					$next_symbol = zbx_substr($string, $i+1, 1);
+
+					if( $quoted && $i+1 < $len && ($next_symbol == '\\' || $next_symbol == '"'))
 						$i++;
 					break;
 			}
@@ -651,10 +662,11 @@ return $caption;
 		}
 
 		if($i > $param_s){
-			$params[] = zbx_unquote_param(substr($string, $param_s, $i - $param_s));
+			$params[] = str_replace('\\"', '"', zbx_unquote_param(zbx_substr($string, $param_s, $i - $param_s)));
 		}
 
 	return $params;
+	
 	}
 
 /*
