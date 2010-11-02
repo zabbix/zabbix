@@ -1708,7 +1708,7 @@ return $caption;
 		}
 
 		if(!empty($triggers)){
-			DBexecute('UPDATE triggers SET value_flags='.TRIGGER_VALUE_FLAG_UNKNOWN.' WHERE '.DBcondition('triggerid',$triggerids).' AND value_flags='.TRIGGER_VALUE_FLAG_NORMAL);
+			DBexecute('UPDATE triggers SET value_flags='.TRIGGER_VALUE_FLAG_UNKNOWN.' WHERE '.DBcondition('triggerid',$triggers).' AND value_flags='.TRIGGER_VALUE_FLAG_NORMAL);
 		}
 	return true;
 	}
