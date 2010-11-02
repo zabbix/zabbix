@@ -158,7 +158,36 @@ SDI('copy_template_elements');
 
 
 // delete host applications
-		DBexecute('DELETE FROM applications WHERE '.DBcondition('hostid',$hostids));
+
+		//since all apps were deleted by other functions earlier, we must unlink
+		// those, who were not because they were used in web scenarios
+		$app_templates = array();
+
+		$exceptional_applicationids = array();
+		$query = 'SELECT
+						httptest.applicationid,
+						httptest.name httptestname,
+						applications.name appname
+					FROM
+						httptest,
+						applications
+					WHERE
+						httptest.applicationid = applications.applicationid
+						AND applications.templateid IN (SELECT applicationid
+														FROM applications
+														WHERE '.DBcondition('hostid',$hostids).')';
+		$db_applications = DBselect($query);
+		while($ex_app = DBfetch($db_applications)){
+			$exceptional_applicationids[] = $ex_app['applicationid'];
+		}
+
+		//removing links from those apps that were not deleted
+		if (count($exceptional_applicationids) > 0)
+		{
+			$query = 'UPDATE applications SET templateid = 0 WHERE '.DBcondition('applicationid',$exceptional_applicationids);
+			DBexecute($query); 
+		}
+
 
 // delete host
 		foreach($hostids as $id) {	/* The section should be improved */
@@ -1289,15 +1318,27 @@ return $result;
 
 		if(!empty($tmp_appids)) delete_application($tmp_appids);			// recursion!!!
 
+
+
+		//check if app is used by web scenario
 		$sql = 'SELECT ht.name, ht.applicationid '.
 				' FROM httptest ht '.
-				' WHERE '.DBcondition('ht.applicationid',$applicationids);
+				' WHERE '.DBcondition('ht.applicationid',$applicationids).'
+						OR ht.applicationid IN (SELECT applicationid
+												FROM applications
+												WHERE '.DBcondition('templateid',$applicationids).')';
 		$res = DBselect($sql);
+		//if it is, we can't delete it
 		if($info = DBfetch($res)){
-			info(S_APPLICATION.SPACE.'"'.$apps[$info['applicationid']]['host'].':'.$apps[$info['applicationid']]['name'].'"'.SPACE.S_USED_BY_SCENARIO_SMALL.SPACE.'"'.$info['name'].'"');
+			if (isset($apps[$info['applicationid']]['host'])){
+				info(S_APPLICATION.SPACE.'"'.$apps[$info['applicationid']]['host'].':'.$apps[$info['applicationid']]['name'].'"'.SPACE.S_USED_BY_SCENARIO_SMALL.SPACE.'"'.$info['name'].'"'.SPACE.S_AND_CANT_BE_DELETED);
+			}
+			else {
+				info(S_YOU_CANT_DELETE_TEMPLATE_FOR_APP_USED_IN_SCENARIO);
+			}
 			return false;
 		}
-
+		
 		$sql = 'SELECT i.itemid,i.key_,i.description '.
 				' FROM items_applications ia, items i '.
 				' WHERE i.type='.ITEM_TYPE_HTTPTEST.

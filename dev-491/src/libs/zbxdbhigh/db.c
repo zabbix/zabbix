@@ -52,7 +52,7 @@ const char	*DBnode(const char *fieldid, const int nodeid)
 	return dbnode;
 }
 
-void	DBclose(void)
+void	DBclose()
 {
 	zbx_db_close();
 }
@@ -130,7 +130,7 @@ void	DBinit()
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	DBping(void)
+int	DBping()
 {
 	int ret;
 
@@ -155,7 +155,7 @@ int	DBping(void)
  * Comments: Do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-void	DBbegin(void)
+void	DBbegin()
 {
 	int	rc;
 
@@ -190,7 +190,7 @@ void	DBbegin(void)
  * Comments: Do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-void	DBcommit(void)
+void	DBcommit()
 {
 	int	rc;
 
@@ -225,7 +225,7 @@ void	DBcommit(void)
  * Comments: Do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-void	DBrollback(void)
+void	DBrollback()
 {
 	int	rc;
 
@@ -1018,6 +1018,7 @@ int	DBremove_escalation(zbx_uint64_t escalationid)
 
 	return SUCCEED;
 }
+
 
 /******************************************************************************
  *                                                                            *

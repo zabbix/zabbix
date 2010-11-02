@@ -22,9 +22,9 @@
 #include "zlog.h"
 #include "zbxodbc.h"
 
-static char zbx_last_odbc_strerror[255];
+static char	zbx_last_odbc_strerror[255];
 
-char* get_last_odbc_strerror(void)
+const char	*get_last_odbc_strerror()
 {
 	return zbx_last_odbc_strerror;
 }
@@ -252,7 +252,7 @@ ZBX_ODBC_ROW	odbc_DBfetch(ZBX_ODBC_RESULT pdbh)
 	SQLRETURN	retcode;
 	SQLSMALLINT     i;
 
-	if(pdbh == NULL)	return NULL;
+	if (pdbh == NULL)	return NULL;
 
 	clean_odbc_strerror();
 
@@ -261,13 +261,13 @@ ZBX_ODBC_ROW	odbc_DBfetch(ZBX_ODBC_RESULT pdbh)
 	retcode = SQLFetch(pdbh->hstmt);
 	if (retcode == SQL_ERROR) goto lbl_err_exit;
 
-	if (retcode != SQL_SUCCESS && retcode != SQL_SUCCESS_WITH_INFO )
+	if (retcode != SQL_SUCCESS && retcode != SQL_SUCCESS_WITH_INFO)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "odbc_DBfetch [end of rows received]");
 		return NULL;
 	}
 
-	for(i=0; i < pdbh->col_num; i++)
+	for (i = 0; i < pdbh->col_num; i++)
 	{
 		rtrim_spaces(pdbh->row_data[i]);
 		zabbix_log(LOG_LEVEL_DEBUG, "Fetched [%i col]: %s", i, pdbh->row_data[i]);
@@ -326,21 +326,21 @@ ZBX_ODBC_RESULT	odbc_DBselect(ZBX_ODBC_DBH *pdbh, const char *query)
 
 	pdbh->col_num  = col_num;
 
-	pdbh->row_data = zbx_malloc(pdbh->row_data, sizeof(char*) * col_num);
-	memset(pdbh->row_data, 0, sizeof(char*) * col_num);
+	pdbh->row_data = zbx_malloc(pdbh->row_data, sizeof(char *) * col_num);
+	memset(pdbh->row_data, 0, sizeof(char *) * col_num);
 
 	pdbh->data_len = zbx_malloc(pdbh->data_len, sizeof(SQLINTEGER) * col_num);
 	memset(pdbh->data_len, 0, sizeof(SQLINTEGER) * col_num);
 
-	for(i=0; i < col_num; i++)
+	for (i = 0; i < col_num; i++)
 	{
 		pdbh->row_data[i] = zbx_malloc(pdbh->row_data[i], MAX_STRING_LEN);
-		SQLBindCol(pdbh->hstmt, i+1, SQL_C_CHAR, pdbh->row_data[i], MAX_STRING_LEN, &pdbh->data_len[i]);
+		SQLBindCol(pdbh->hstmt, i + 1, SQL_C_CHAR, pdbh->row_data[i], MAX_STRING_LEN, &pdbh->data_len[i]);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "selected %i cols", col_num);
 
-	return (ZBX_ODBC_RESULT) pdbh;
+	return (ZBX_ODBC_RESULT)pdbh;
 
 lbl_err_exit:
 
