@@ -1,4 +1,8 @@
 ALTER TABLE history_sync ALTER COLUMN itemid SET WITH DEFAULT NULL;
+REORG TABLE history_sync;
 ALTER TABLE history_sync ALTER COLUMN nodeid SET WITH DEFAULT NULL;
-ALTER TABLE history_sync ALTER COLUMN nodeid SET integer;
-ALTER TABLE history_sync ADD ns integer SET WITH DEFAULT '0' NOT NULL;
+REORG TABLE history_sync;
+ALTER TABLE history_sync ALTER COLUMN nodeid SET DATA TYPE integer;
+REORG TABLE history_sync;
+ALTER TABLE history_sync ADD ns integer WITH DEFAULT '0' NOT NULL;
+REORG TABLE history_sync;
