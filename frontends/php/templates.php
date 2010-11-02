@@ -433,7 +433,7 @@ include_once('include/page_header.php');
 		//$host = get_host_by_hostid($_REQUEST['templateid']);
 
 		DBstart();
-		$result = delete_host($_REQUEST['templateid'], $unlink_mode);
+		$result = CTemplate::delete($_REQUEST['templateid']);
 		$result = DBend($result);
 
 		show_messages($result, S_TEMPLATE_DELETED, S_CANNOT_DELETE_TEMPLATE);
@@ -458,7 +458,7 @@ include_once('include/page_header.php');
 		$del_hosts = zbx_objectValues($del_hosts, 'templateid');
 
 
-		$go_result = delete_host($del_hosts, $unlink_mode);
+		$go_result = CTemplate::delete($del_hosts);
 		$go_result = DBend($go_result);
 
 		show_messages($go_result, S_TEMPLATE_DELETED, S_CANNOT_DELETE_TEMPLATE);
