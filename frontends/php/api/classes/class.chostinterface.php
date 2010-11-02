@@ -640,155 +640,20 @@ Copt::memoryPick();
  * @return boolean
  */
 	public static function massRemove($data){
-		$interfaceids = zbx_toArray($data['interfaceids'], 'interfaceid');
-		try{
-			self::BeginTransaction(__METHOD__);
-
-			$options = array(
-				'interfaceids' => $interfaceids,
-				'editable' => 1,
-				'preservekeys' => 1,
-				'output' => API_OUTPUT_SHORTEN
-			);
-			$upd_interfaces = self::get($options);
-			foreach($interfaceids as $interfaceid){
-				if(!isset($upd_interfaces[$interfaceid])){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				}
-			}
-
-			$hostids = isset($data['hostids']) ? zbx_toArray($data['hostids']) : array();
-			$templateids = isset($data['templateids']) ? zbx_toArray($data['templateids']) : array();
-
-			$objectids_to_unlink = array_merge($hostids, $templateids);
-			if(!empty($objectids_to_unlink)){
-				$unlinkable = getUnlinkableHosts($interfaceids, $objectids_to_unlink);
-				if(count($objectids_to_unlink) != count($unlinkable)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'One of the Objects is left without Hostinterface');
-				}
-
-				DB::delete('hosts_interfaces', array(
-					DBcondition('hostid', $objectids_to_unlink),
-					DBcondition('interfaceid', $interfaceids)
-				));
-			}
-
-			self::EndTransaction(true, __METHOD__);
-			return array('interfaceids' => $interfaceids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
-	}
-
-/**
- * Update Hostinterfaces with new Hosts (rewrite)
- *
- * @param array $data
- * @param array $data['interfaces']
- * @param array $data['hosts']
- * @param array $data['templates']
- * @return boolean
- */
-	public static function massUpdate($data){
 		$interfaces = zbx_toArray($data['interfaces']);
-		$hosts = isset($data['hosts']) ? zbx_toArray($data['hosts']) : null;
-		$templates = isset($data['templates']) ? zbx_toArray($data['templates']) : null;
-
 		$interfaceids = zbx_objectValues($interfaces, 'interfaceid');
-		$hostids = zbx_objectValues($hosts, 'hostid');
-		$templateids = zbx_objectValues($templates, 'templateid');
+
+		$hostids = zbx_toArray($data['hostids']);
 
 		try{
 			self::BeginTransaction(__METHOD__);
 
-			$hosts_to_unlink = $hosts_to_link = array();
-			$options = array(
-				'interfaceids' => $interfaceids,
-				'preservekeys' => 1,
-			);
-			if(!is_null($hosts)){
-				$interfaces_hosts = CHost::get($options);
-				$hosts_to_unlink = array_diff(array_keys($interfaces_hosts), $hostids);
-				$hosts_to_link = array_diff($hostids, array_keys($interfaces_hosts));
-			}
+			self::checkInput($interfaces, __FUNCTION__);
 
-			$templates_to_unlink = $templates_to_link = array();
-			if(!is_null($templates)){
-				$interfaces_templates = CTemplate::get($options);
-				$templates_to_unlink = array_diff(array_keys($interfaces_templates), $templateids);
-				$templates_to_link = array_diff($templateids, array_keys($interfaces_templates));
-			}
-
-			$objectids_to_link = array_merge($hosts_to_link, $templates_to_link);
-			$objectids_to_unlink = array_merge($hosts_to_unlink, $templates_to_unlink);
-
-// PERMISSION {{{
-			$options = array(
-				'interfaceids' => $interfaceids,
-				'editable' => 1,
-				'preservekeys' => 1
-			);
-			$allowed_interfaces = self::get($options);
-			foreach($interfaces as $num => $interface){
-				if(!isset($allowed_interfaces[$interface['interfaceid']])){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				}
-			}
-
-			if(!is_null($hosts)){
-				$hosts_to_check = array_merge($hosts_to_link, $hosts_to_unlink);
-				$options = array(
-					'hostids' => $hosts_to_check,
-					'editable' => 1,
-					'preservekeys' => 1
-				);
-				$allowed_hosts = CHost::get($options);
-				foreach($hosts_to_check as $num => $hostid){
-					if(!isset($allowed_hosts[$hostid])){
-						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-					}
-				}
-			}
-
-			if(!is_null($templates)){
-				$templates_to_check = array_merge($templates_to_link, $templates_to_unlink);
-				$options = array(
-					'templateids' => $templates_to_check,
-					'editable' => 1,
-					'preservekeys' => 1
-				);
-				$allowed_templates = CTemplate::get($options);
-				foreach($templates_to_check as $num => $templateid){
-					if(!isset($allowed_templates[$templateid])){
-						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-					}
-				}
-			}
-// }}} PERMISSION
-
-			$unlinkable = getUnlinkableHosts($interfaceids, $objectids_to_unlink);
-			if(count($objectids_to_unlink) != count($unlinkable)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'One of the Objects is left without Hostinterface');
-			}
-
-			$sql = 'DELETE FROM hosts_interfaces WHERE '.DBcondition('interfaceid', $interfaceids).' AND '.DBcondition('hostid', $objectids_to_unlink);
-			if(!DBexecute($sql))
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-
-			foreach($interfaceids as $gnum => $interfaceid){
-				foreach($objectids_to_link as $objectid){
-					$hostinterfaceid = get_dbid('hosts_interfaces', 'hostinterfaceid');
-					$result = DBexecute("INSERT INTO hosts_interfaces (hostinterfaceid, hostid, interfaceid) VALUES ($hostinterfaceid, $objectid, $interfaceid)");
-					if(!$result){
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-					}
-				}
-			}
+			DB::delete('interface', array(
+				DBcondition('hostid', $hostids),
+				DBcondition('interfaceid', $interfaceids)
+			));
 
 			self::EndTransaction(true, __METHOD__);
 			return array('interfaceids' => $interfaceids);

@@ -977,6 +977,9 @@ class CUserMacro extends CZBXAPI{
 
 			$objectids = array_merge($hostids, $templateids);
 
+// first we need to validate input data
+			self::validate($data['macros']);
+
 // Check on existing
 			$options = array(
 				'hostids' => $objectids,
@@ -985,23 +988,8 @@ class CUserMacro extends CZBXAPI{
 				'output' => API_OUTPUT_EXTEND
 			);
 			$db_macros = self::get($options);
-/*
-			foreach($db_macros as $dbnum => $db_macro){
-				if(!isset($existing_macros[$db_macro['macro']])) $existing_macros[$db_macro['macro']] = array();
-				$existing_macros[$db_macro['macro']][$db_macro['hostid']] = $db_macro;
-			}
-
-			foreach($data['macros'] as $hmnum => $updMacro){
-				foreach($objectids as $hnum => $objectid){
-					if(!isset($existing_macros[$updMacro['macro']][$objectid]))
-						self::exception(ZBX_API_ERROR_PERMISSIONS, S_MACRO.' [ '.$updMacro['macro'].' ] '.S_DOES_NOT_EXIST_SMALL);
-				}
-			}
-//*/
 //--
-
-// first we need to validate input data
-			self::validate($data['macros']);
+			
 			$updateMacros = zbx_toHash($data['macros'], 'macro');
 
 			$hostmacroids = array();
