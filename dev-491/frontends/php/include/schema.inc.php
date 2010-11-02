@@ -2070,7 +2070,7 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '0',
+				'default' => '1',
 			),
 			'show_3d' => array(
 				'null' => false,
@@ -2145,6 +2145,12 @@ return array(
 				'length' => 20,
 				'ref_table' => 'graphs',
 				'ref_field' => 'graphid',
+			),
+			'name' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 128,
+				'default' => '',
 			),
 		),
 	),
@@ -2380,30 +2386,6 @@ return array(
 				'length' => 64,
 				'default' => '',
 			),
-			'dns' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
-				'default' => '',
-			),
-			'useip' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '1',
-			),
-			'ip' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 39,
-				'default' => '127.0.0.1',
-			),
-			'port' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '10050',
-			),
 			'status' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
@@ -2457,12 +2439,6 @@ return array(
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0',
-			),
-			'ipmi_port' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '623',
 			),
 			'ipmi_authtype' => array(
 				'null' => false,
@@ -2536,12 +2512,6 @@ return array(
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0',
-			),
-			'ipmi_ip' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
-				'default' => '127.0.0.1',
 			),
 			'ipmi_errors_from' => array(
 				'null' => false,
@@ -3189,12 +3159,6 @@ return array(
 				'length' => 255,
 				'default' => '',
 			),
-			'snmp_port' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '161',
-			),
 			'hostid' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
@@ -3235,7 +3199,7 @@ return array(
 			'lastvalue' => array(
 				'null' => true,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'length' => 255,
 			),
 			'lastclock' => array(
 				'null' => true,
@@ -3245,7 +3209,7 @@ return array(
 			'prevvalue' => array(
 				'null' => true,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'length' => 255,
 			),
 			'status' => array(
 				'null' => false,
@@ -3427,6 +3391,19 @@ return array(
 				'length' => 255,
 				'default' => '',
 			),
+			'interfaceid' => array(
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'interface',
+				'ref_field' => '',
+			),
+			'port' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '',
+			),
 		),
 	),
 	'item_discovery' => array(
@@ -3450,6 +3427,12 @@ return array(
 				'length' => 20,
 				'ref_table' => 'items',
 				'ref_field' => 'itemid',
+			),
+			'key_' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
 			),
 		),
 	),
@@ -4413,6 +4396,12 @@ return array(
 				'ref_table' => 'triggers',
 				'ref_field' => 'triggerid',
 			),
+			'name' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			),
 		),
 	),
 	'trigger_depends' => array(
@@ -4969,6 +4958,53 @@ return array(
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
 				'default' => '',
+			),
+		),
+	),
+	'interface' => array(
+		'key' => 'interfaceid',
+		'fields' => array(
+			'interfaceid' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			),
+			'hostid' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'hosts',
+				'ref_field' => 'hostid',
+			),
+			'main' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			),
+			'useip' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
+			),
+			'ip' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 39,
+				'default' => '127.0.0.1',
+			),
+			'dns' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '',
+			),
+			'port' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '10050',
 			),
 		),
 	),

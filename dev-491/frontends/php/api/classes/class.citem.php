@@ -878,6 +878,7 @@ COpt::memoryPick();
 				'output' => API_OUTPUT_EXTEND,
 				'itemids' => zbx_objectValues($items, 'itemid'),
 				'editable' => 1,
+				'webitems' => true,
 				'preservekeys' => 1
 			));
 		}
@@ -909,10 +910,9 @@ COpt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 
 // TODO: remove webchecks
-				if(!isset($item['type']) || ($item['type'] != ITEM_TYPE_HTTPTEST))
-					$item['interfaceid'] = null;
-//--
-				if(!isset($item['interfaceid']))
+				if(isset($item['type']) && ($item['type'] == ITEM_TYPE_HTTPTEST))
+					unset($item['interfaceid']);
+				else if(!isset($item['interfaceid']))
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 			}
 			else if($delete){

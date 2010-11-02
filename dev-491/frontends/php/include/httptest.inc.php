@@ -159,9 +159,11 @@ require_once('include/items.inc.php');
 				$item_args['trends'] = $trends;
 				$item_args['valuemapid'] = 0;
 
-				if(!$itemid = CItem::create($item_args)){
+				if(!$itemids = CItem::create($item_args)){
 					return false;
 				}
+
+				$itemid = reset($itemids['itemids']);
 			}
 			else{
 				$itemid = $item_data['itemid'];
@@ -361,9 +363,10 @@ require_once('include/items.inc.php');
 					$item_args['trends'] = $trends;
 					$item_args['valuemapid'] = 0;
 
-					if(!$itemid = CItem::create($item_args)){
+					if(!$itemids = CItem::create($item_args)){
 						throw new Exception('Cannot add item');
 					}
+					$itemid = reset($itemids['itemids']);
 				}
 				else{
 					$itemid = $item_args['itemid'] = $item_data['itemid'];
