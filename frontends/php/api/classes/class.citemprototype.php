@@ -316,9 +316,6 @@ class CItemprototype extends CZBXAPI{
 					if(!is_null($options['select_graphs']) && !isset($result[$item['itemid']]['graphs'])){
 						$result[$item['itemid']]['graphs'] = array();
 					}
-					if(!is_null($options['select_prototypes']) && !isset($result[$item['itemid']]['prototypes'])){
-						$result[$item['itemid']]['prototypes'] = array();
-					}
 
 // hostids
 					if(isset($item['hostid']) && is_null($options['select_hosts'])){
@@ -344,10 +341,10 @@ class CItemprototype extends CZBXAPI{
 					}
 // discoveryids
 					if(isset($item['discoveryids'])){
-						if(!isset($result[$item['itemid']]['discoveryRule']))
+						if(!isset($result[$item['itemid']]['discovery']))
 							$result[$item['itemid']]['discovery'] = array();
 
-						$result[$item['itemid']]['discoveryRule'][] = array('ruleid' => $item['item_parentid']);
+						$result[$item['itemid']]['discovery'][] = array('ruleid' => $item['item_parentid']);
 						unset($item['item_parentid']);
 					}
 
@@ -481,52 +478,6 @@ COpt::memoryPick();
 						$result[$itemid]['graphs'] = $graphs[$itemid]['rowscount'];
 					else
 						$result[$itemid]['graphs'] = 0;
-				}
-			}
-		}
-
-// Adding prototypes
-		if(!is_null($options['select_prototypes'])){
-			$obj_params = array(
-				'nodeids' => $nodeids,
-				'discoveryids' => $itemids,
-				'filter' => array('flags' => null),
-				'nopermissions' => 1,
-				'preservekeys' => 1,
-			);
-
-			if(is_array($options['select_prototypes']) || str_in_array($options['select_prototypes'], $subselects_allowed_outputs)){
-				$obj_params['output'] = $options['select_prototypes'];
-				$prototypes = CItem::get($obj_params);
-
-				if(!is_null($options['limitSelects'])) order_result($prototypes, 'description');
-				foreach($prototypes as $itemid => $subrule){
-					unset($prototypes[$itemid]['discoveries']);
-					$count = array();
-					foreach($subrule['discoveries'] as $discovery){
-						if(!is_null($options['limitSelects'])){
-							if(!isset($count[$discovery['itemid']])) $count[$discovery['itemid']] = 0;
-							$count[$discovery['itemid']]++;
-
-							if($count[$discovery['itemid']] > $options['limitSelects']) continue;
-						}
-
-						$result[$discovery['itemid']]['prototypes'][] = &$prototypes[$itemid];
-					}
-				}
-			}
-			else if(API_OUTPUT_COUNT == $options['select_prototypes']){
-				$obj_params['countOutput'] = 1;
-				$obj_params['groupCount'] = 1;
-
-				$prototypes = CItem::get($obj_params);
-
-				$prototypes = zbx_toHash($prototypes, 'parent_itemid');
-				foreach($result as $itemid => $item){
-					if(isset($prototypes[$itemid]))
-						$result[$itemid]['prototypes'] = $prototypes[$itemid]['rowscount'];
-					else
-						$result[$itemid]['prototypes'] = 0;
 				}
 			}
 		}
@@ -769,21 +720,28 @@ COpt::memoryPick();
 	protected static function createReal(&$items){
 		$itemids = DB::insert('items', $items);
 
-		$itemApplications = array();
+		$itemApplications = $insert_item_discovery = array();
 		foreach($items as $key => $item){
 			$items[$key]['itemid'] = $itemids[$key];
 
-			if(!isset($item['applications'])) continue;
+			$insert_item_discovery[] = array(
+				'itemid' => $items[$key]['itemid'],
+				'parent_itemid' => $item['ruleid']
+			);
 
-			foreach($item['applications'] as $anum => $appid){
-				if($appid == 0) continue;
+			if(isset($item['applications'])){
+				foreach($item['applications'] as $anum => $appid){
+					if($appid == 0) continue;
 
-				$itemApplications[] = array(
-					'applicationid' => $appid,
-					'itemid' => $items[$key]['itemid']
-				);
+					$itemApplications[] = array(
+						'applicationid' => $appid,
+						'itemid' => $items[$key]['itemid']
+					);
+				}
 			}
 		}
+
+		DB::insert('item_discovery', $insert_item_discovery);
 
 		if(!empty($itemApplications)){
 			DB::insert('items_applications', $itemApplications);
@@ -798,7 +756,7 @@ COpt::memoryPick();
 		));
 		foreach($itemHosts as $item){
 			$host = reset($item['hosts']);
-			info(S_ADDED_NEW_ITEM.SPACE.$host['host'].':'.$item['key_']);
+			info(S_ITEM_PROTOTYPE.' ['.$host['host'].':'.$item['key_'].'] '.S_CREATED_SMALL);
 		}
 	}
 
@@ -840,9 +798,8 @@ COpt::memoryPick();
 		));
 		foreach($itemHosts as $item){
 			$host = reset($item['hosts']);
-			info(S_ITEM.SPACE."'".$host['host'].':'.$item['key_']."'".SPACE.S_UPDATED_SMALL);
+			info(S_ITEM_PROTOTYPE." [".$host['host'].':'.$item['key_']."] ".S_UPDATED_SMALL);
 		}
-
 	}
 
 /**
@@ -890,20 +847,22 @@ COpt::memoryPick();
 		try{
 			self::BeginTransaction(__METHOD__);
 
-			$options = array(
-				'itemids' => $prototypeids,
-				'editable' => 1,
-				'preservekeys' => 1,
-				'output' => API_OUTPUT_EXTEND,
-			);
-			$del_items = self::get($options);
-			foreach($prototypeids as $prototypeid){
+			if(!$nopermissions){
+				$options = array(
+					'itemids' => $prototypeids,
+					'editable' => 1,
+					'preservekeys' => 1,
+					'output' => API_OUTPUT_EXTEND,
+				);
+				$del_items = self::get($options);
+				foreach($prototypeids as $prototypeid){
 // TODO: remove $nopermissions hack
-				if(!$nopermissions && !isset($del_items[$prototypeid])){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
-				}
-				if($del_items[$prototypeid]['templateid'] != 0){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete templated items');
+					if(!isset($del_items[$prototypeid])){
+						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
+					}
+					if($del_items[$prototypeid]['templateid'] != 0){
+						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete templated items');
+					}
 				}
 			}
 
@@ -942,17 +901,6 @@ COpt::memoryPick();
 				DB::delete('graphs', $del_graphs);
 // --
 
-
-			$triggers = CTrigger::get(array(
-				'itemids' => $prototypeids,
-				'filter' => array('flags' => null),
-				'output' => API_OUTPUT_SHORTEN,
-				'nopermissions' => true,
-				'preservekeys' => true,
-			));
-			if(!empty($triggers))
-				DB::delete('triggers', zbx_objectValues($triggers, 'triggerid'));
-
 			DB::delete('items', array(DBcondition('itemid', $prototypeids)));
 
 
@@ -980,7 +928,7 @@ COpt::memoryPick();
 // }}} HOUSEKEEPER
 
 			self::EndTransaction(true, __METHOD__);
-			return array('ruleids' => $prototypeids);
+			return array('prototypeids' => $prototypeids);
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
@@ -1099,7 +1047,7 @@ COpt::memoryPick();
 					if($exItem['flags'] != ZBX_FLAG_DISCOVERY_CHILD){
 						self::exception(ZBX_API_ERROR_PARAMETERS, S_AN_ITEM_WITH_THE_KEY.SPACE.'['.$exItem['key_'].']'.SPACE.S_ALREADY_EXISTS_FOR_HOST_SMALL.SPACE.'['.$host['host'].'].'.SPACE.S_THE_KEY_MUST_BE_UNIQUE);
 					}
-					else if(($exItem['templateid'] > 0) && ($exItem['templateid'] != $item['hostid'])){
+					else if(($exItem['templateid'] > 0) && ($exItem['templateid'] != $item['itemid'])){
 						self::exception(ZBX_API_ERROR_PARAMETERS, S_AN_ITEM_WITH_THE_KEY.SPACE.'['.$exItem['key_'].']'.SPACE.S_ALREADY_EXISTS_FOR_HOST_SMALL.SPACE.'['.$host['host'].'].'.SPACE.S_THE_KEY_MUST_BE_UNIQUE);
 					}
 				}
@@ -1107,6 +1055,7 @@ COpt::memoryPick();
 // coping item
 				$newItem = $item;
 				$newItem['hostid'] = $host['hostid'];
+				$newItem['templateid'] = $item['itemid'];
 
 // setting item application
 				if(isset($item['applications'])){
@@ -1116,15 +1065,21 @@ COpt::memoryPick();
 
 				if($exItem){
 					$newItem['itemid'] = $exItem['itemid'];
-					unset($newItem['templateid']);
 					$updateItems[] = $newItem;
 				}
 				else{
-// setting item templateid to original item hostid
-					$newItem['templateid'] = $item['itemid'];
-					$insertItems[] = $newItem;
+					$insertItems[$item['itemid']] = $newItem;
 				}
 			}
+		}
+
+		$sql = 'SELECT i.itemid ruleid, id.itemid itemid'.
+				' FROM items i, item_discovery id'.
+				' WHERE i.templateid=id.parent_itemid'.
+					' AND '.DBcondition('id.itemid', array_keys($insertItems));
+		$db_result = DBselect($sql);
+		while($rule = DBfetch($db_result)){
+			$insertItems[$rule['itemid']]['ruleid'] = $rule['ruleid'];
 		}
 
 		self::createReal($insertItems);

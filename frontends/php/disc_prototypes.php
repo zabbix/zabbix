@@ -219,15 +219,16 @@ switch($itemType) {
 		$_REQUEST['form'] = 'clone';
 	}
 	else if(isset($_REQUEST['save'])){
-		$applications = get_request('applications', array());
 		$delay_flex = get_request('delay_flex', array());
-
 		$db_delay_flex = '';
 		foreach($delay_flex as $num => $val){
 			$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
 		}
 		$db_delay_flex = trim($db_delay_flex,';');
 
+		DBstart();
+
+		$applications = get_request('applications', array());
 		if(!zbx_empty($_REQUEST['new_application'])){
 			if($new_appid = add_application($_REQUEST['new_application'], $_REQUEST['hostid']))
 				$applications[$new_appid] = $new_appid;
@@ -266,26 +267,27 @@ switch($itemType) {
 			'data_type'		=> get_request('data_type'),
 			'applications' => $applications,
 			'flags' => ZBX_FLAG_DISCOVERY_CHILD,
-			'parent_itemid' => get_request('parent_discoveryid'),
+			'ruleid' => get_request('parent_discoveryid'),
 		);
 
 		if(isset($_REQUEST['itemid'])){
-			DBstart();
-
 			$db_item = get_item_by_itemid_limited($_REQUEST['itemid']);
 			$db_item['applications'] = get_applications_by_itemid($_REQUEST['itemid']);
 
-			$result = smart_update_item($_REQUEST['itemid'], $item);
-			$result = DBend($result);
+			foreach($item as $field => $value){
+				if($item[$field] == $db_item[$field]) unset($item[$field]);
+			}
+
+			$result = CItemPrototype::update($item);
 
 			show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 		}
 		else{
-			DBstart();
-			$result = add_item($item);
-			$result = DBend($result);
+			$result = CItemPrototype::create($item);
 			show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 		}
+
+		$result = DBend($result);
 
 		if($result){
 			unset($_REQUEST['itemid']);

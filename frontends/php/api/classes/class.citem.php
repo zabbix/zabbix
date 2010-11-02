@@ -1099,7 +1099,7 @@ COpt::memoryPick();
 		));
 		foreach($itemHosts as $item){
 			$host = reset($item['hosts']);
-			info(S_ADDED_NEW_ITEM.SPACE.$host['host'].':'.$item['key_']);
+			info(S_ITEM." [".$host['host'].':'.$item['key_']."] ".S_CREATED_SMALL);
 		}
 	}
 
@@ -1141,7 +1141,7 @@ COpt::memoryPick();
 		));
 		foreach($itemHosts as $item){
 			$host = reset($item['hosts']);
-			info(S_ITEM.SPACE."'".$host['host'].':'.$item['key_']."'".SPACE.S_UPDATED_SMALL);
+			info(S_ITEM." [".$host['host'].':'.$item['key_']."] ".S_UPDATED_SMALL);
 		}
 
 	}
@@ -1343,7 +1343,7 @@ COpt::memoryPick();
 				'hostids' => $data['templateids'],
 				'preservekeys' => 1,
 				'output' => API_OUTPUT_EXTEND,
-				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_CHILD, ZBX_FLAG_DISCOVERY_NORMAL)),
+				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 			);
 			$items = self::get($options);
 
@@ -1401,13 +1401,11 @@ COpt::memoryPick();
 			$exItemsTpl = zbx_toHash($exItems, 'templateid');
 
 			foreach($parentItems as $itemid => $item){
-				$update = false;
 				$exItem = null;
 
 // update by tempalteid
 				if(isset($exItemsTpl[$item['itemid']])){
 					$exItem = $exItemsTpl[$item['itemid']];
-					$update = true;
 				}
 
 // update by key
@@ -1417,15 +1415,15 @@ COpt::memoryPick();
 					if($exItem['flags'] != ZBX_FLAG_DISCOVERY_NORMAL){
 						self::exception(ZBX_API_ERROR_PARAMETERS, S_AN_ITEM_WITH_THE_KEY.SPACE.'['.$exItem['key_'].']'.SPACE.S_ALREADY_EXISTS_FOR_HOST_SMALL.SPACE.'['.$host['host'].'].'.SPACE.S_THE_KEY_MUST_BE_UNIQUE);
 					}
-					else if(($exItem['templateid'] > 0) && ($exItem['templateid'] != $item['hostid'])){
+					else if(($exItem['templateid'] > 0) && ($exItem['templateid'] != $item['itemid'])){
 						self::exception(ZBX_API_ERROR_PARAMETERS, S_AN_ITEM_WITH_THE_KEY.SPACE.'['.$exItem['key_'].']'.SPACE.S_ALREADY_EXISTS_FOR_HOST_SMALL.SPACE.'['.$host['host'].'].'.SPACE.S_THE_KEY_MUST_BE_UNIQUE);
 					}
-					$update = true;
 				}
 
 // coping item
 				$newItem = $item;
 				$newItem['hostid'] = $host['hostid'];
+				$newItem['templateid'] = $item['itemid'];
 
 // setting item application
 				if(isset($item['applications'])){
@@ -1433,14 +1431,11 @@ COpt::memoryPick();
 				}
 //--
 
-				if($update){
+				if($exItem){
 					$newItem['itemid'] = $exItem['itemid'];
-					unset($newItem['templateid']);
 					$updateItems[] = $newItem;
 				}
 				else{
-// setting item templateid to original item hostid
-					$newItem['templateid'] = $item['itemid'];
 					$insertItems[] = $newItem;
 				}
 			}

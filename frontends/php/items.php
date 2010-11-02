@@ -380,15 +380,24 @@ switch($itemType) {
 		$_REQUEST['form'] = 'clone';
 	}
 	else if(isset($_REQUEST['save']) && ($_REQUEST['form_hostid'] > 0)){
-		$applications = get_request('applications',array());
 		$delay_flex = get_request('delay_flex',array());
 		$db_delay_flex = '';
-
 		foreach($delay_flex as $num => $val){
 			$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
 		}
-
 		$db_delay_flex = trim($db_delay_flex,';');
+
+
+		$applications = get_request('applications',array());
+		$fapp = reset($applications);
+		if($fapp == 0) array_shift($applications);
+
+		DBstart();
+
+		if(!zbx_empty($_REQUEST['new_application'])){
+			if($new_appid = add_application($_REQUEST['new_application'], $_REQUEST['form_hostid']))
+				$applications[$new_appid] = $new_appid;
+		}
 
 		$item = array(
 			'description'	=> get_request('description'),
@@ -422,68 +431,32 @@ switch($itemType) {
 			'privatekey'		=> get_request('privatekey'),
 			'params'			=> get_request('params'),
 			'ipmi_sensor'		=> get_request('ipmi_sensor'),
-			'data_type'		=> get_request('data_type')
+			'data_type'		=> get_request('data_type'),
+			'applications' => $applications,
 		);
 
 		if(isset($_REQUEST['itemid'])){
-			DBstart();
-
-			if(!zbx_empty($_REQUEST['new_application'])){
-				$applications[$new_appid] = add_application($_REQUEST['new_application'],$_REQUEST['form_hostid']);
-			}
-
-			if((count($applications) == 1) && in_array(0, $applications))
-				$applications = array();
-
-			$item['applications'] = $applications;
-
 			$db_item = get_item_by_itemid_limited($_REQUEST['itemid']);
 			$db_item['applications'] = get_applications_by_itemid($_REQUEST['itemid']);
-
-// sdii($item['applications']);
-// sdii($db_item['applications']);
 
 			foreach($item as $field => $value){
 				if($item[$field] == $db_item[$field]) unset($item[$field]);
 			}
 
-			$item['itemid'] = $_REQUEST['itemid'];
 			$result = CItem::update($item);
-
-			$result = DBend($result);
-
-			$itemid = $_REQUEST['itemid'];
-/*			$action = AUDIT_ACTION_UPDATE;*/
 
 			show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 		}
 		else{
-			DBstart();
-
-			$new_appid = true;
-			$itemid = false;
-			if(!zbx_empty($_REQUEST['new_application'])){
-				if($new_appid = add_application($_REQUEST['new_application'],$_REQUEST['form_hostid']))
-					$applications[$new_appid] = $new_appid;
-			}
-
-			$item['applications'] = $applications;
-
-			if($new_appid){
-				$itemid = CItem::create(array($item));
-			}
-
-			$result = DBend($itemid);
-
-/*			$action = AUDIT_ACTION_ADD;*/
+			$result = CItem::create($item);
 			show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 		}
 
+		$result = DBend($result);
 		if($result){
 /*			$host = get_host_by_hostid($_REQUEST['hostid']);
 
 			add_audit($action, AUDIT_RESOURCE_ITEM, S_ITEM.' ['.$_REQUEST['key'].'] ['.$itemid.'] '.S_HOST.' ['.$host['host'].']');*/
-
 			unset($_REQUEST['itemid']);
 			unset($_REQUEST['form']);
 		}

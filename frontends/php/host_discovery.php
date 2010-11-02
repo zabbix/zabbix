@@ -234,18 +234,19 @@ switch($itemType) {
 		if(isset($_REQUEST['itemid'])){
 			DBstart();
 
+			$item['itemid'] = $_REQUEST['itemid'];
+
 			$db_item = get_item_by_itemid_limited($_REQUEST['itemid']);
-			$db_item['applications'] = get_applications_by_itemid($_REQUEST['itemid']);
+			foreach($item as $field => $value){
+				if($item[$field] == $db_item[$field]) unset($item[$field]);
+			}
 
-			$result = smart_update_item($_REQUEST['itemid'], $item);
+			$result = CItem::update($item);
 			$result = DBend($result);
-
 			show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 		}
 		else{
-			DBstart();
-			$result = add_item($item);
-			$result = DBend($result);
+			$result = CItem::create(array($item));
 			show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 		}
 
