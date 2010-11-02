@@ -813,7 +813,7 @@ COpt::memoryPick();
 		));
 		foreach($itemHosts as $item){
 			$host = reset($item['hosts']);
-			info(S_ADDED_NEW_ITEM.SPACE.$host['host'].':'.$item['key_']);
+			info(S_DISCOVERY_RULE.' ['.$host['host'].':'.$item['key_'].'] '.S_CREATED_SMALL);
 		}
 	}
 
@@ -855,7 +855,7 @@ COpt::memoryPick();
 		));
 		foreach($itemHosts as $item){
 			$host = reset($item['hosts']);
-			info(S_ITEM.SPACE."'".$host['host'].':'.$item['key_']."'".SPACE.S_UPDATED_SMALL);
+			info(S_DISCOVERY_RULE.' ['.$host['host'].':'.$item['key_'].'] '.S_UPDATED_SMALL);
 		}
 
 	}
@@ -897,7 +897,7 @@ COpt::memoryPick();
  * @param array $ruleids
  * @return
  */
-	public static function delete($ruleids){
+	public static function delete($ruleids, $nopermissions=false){
 		if(empty($ruleids)) return true;
 
 		$ruleids = zbx_toArray($ruleids);
@@ -906,19 +906,21 @@ COpt::memoryPick();
 		try{
 			self::BeginTransaction(__METHOD__);
 
-			$options = array(
-				'itemids' => $ruleids,
-				'editable' => 1,
-				'preservekeys' => 1,
-				'output' => API_OUTPUT_EXTEND,
-			);
-			$del_items = self::get($options);
-			foreach($ruleids as $ruleid){
-				if(!isset($del_items[$ruleid])){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
-				}
-				if($del_items[$ruleid]['templateid'] != 0){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete templated rules');
+			if(!$nopermissions){
+				$options = array(
+					'itemids' => $ruleids,
+					'editable' => 1,
+					'preservekeys' => 1,
+					'output' => API_OUTPUT_EXTEND,
+				);
+				$del_items = self::get($options);
+				foreach($ruleids as $ruleid){
+					if(!isset($del_items[$ruleid])){
+						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
+					}
+					if($del_items[$ruleid]['templateid'] != 0){
+						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete templated rules');
+					}
 				}
 			}
 
@@ -934,7 +936,7 @@ COpt::memoryPick();
 			}while(!empty($parent_itemids));
 
 			$prototypeids = array();
-			$sql = 'SELECT itemid'.
+			$sql = 'SELECT i.itemid'.
 			 		' FROM item_discovery id, items i'.
 			 		' WHERE i.templateid IS NULL'.
 			 			' AND '.DBcondition('parent_itemid', $ruleids);
@@ -1093,7 +1095,7 @@ COpt::memoryPick();
 					if($exItem['flags'] != ZBX_FLAG_DISCOVERY){
 						self::exception(ZBX_API_ERROR_PARAMETERS, S_AN_ITEM_WITH_THE_KEY.SPACE.'['.$exItem['key_'].']'.SPACE.S_ALREADY_EXISTS_FOR_HOST_SMALL.SPACE.'['.$host['host'].'].'.SPACE.S_THE_KEY_MUST_BE_UNIQUE);
 					}
-					else if(($exItem['templateid'] > 0) && ($exItem['templateid'] != $item['hostid'])){
+					else if(($exItem['templateid'] > 0) && ($exItem['templateid'] != $item['itemid'])){
 						self::exception(ZBX_API_ERROR_PARAMETERS, S_AN_ITEM_WITH_THE_KEY.SPACE.'['.$exItem['key_'].']'.SPACE.S_ALREADY_EXISTS_FOR_HOST_SMALL.SPACE.'['.$host['host'].'].'.SPACE.S_THE_KEY_MUST_BE_UNIQUE);
 					}
 				}
@@ -1101,6 +1103,7 @@ COpt::memoryPick();
 // coping item
 				$newItem = $item;
 				$newItem['hostid'] = $host['hostid'];
+				$newItem['templateid'] = $item['itemid'];
 
 // setting item application
 				if(isset($item['applications'])){
@@ -1110,12 +1113,9 @@ COpt::memoryPick();
 
 				if($exItem){
 					$newItem['itemid'] = $exItem['itemid'];
-					unset($newItem['templateid']);
 					$updateItems[] = $newItem;
 				}
 				else{
-// setting item templateid to original item hostid
-					$newItem['templateid'] = $item['itemid'];
 					$insertItems[] = $newItem;
 				}
 			}

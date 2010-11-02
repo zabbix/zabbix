@@ -2205,6 +2205,7 @@
 	'S_THE_KEY_MUST_BE_UNIQUE'=>			'The key must be unique.',
 	'S_ADDED_NEW_ITEM'=>				'Added new item',
 	'S_UPDATED_SMALL'=>				'updated',
+	'S_CREATED_SMALL'=>				'created',
 	'S_NO_ITEM_WITH'=>				'No item with',
 	'S_DELETED_SMALL'=>				'deleted',
 	'S_UNKNOWN_VALUE_TYPE'=>			'Unknown value type',
