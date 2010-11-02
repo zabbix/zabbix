@@ -177,11 +177,7 @@ switch($itemType) {
 		array_push($_REQUEST['delay_flex'],$_REQUEST['new_delay_flex']);
 	}
 	else if(isset($_REQUEST['delete'])&&isset($_REQUEST['itemid'])){
-		$result = false;
-		if($item = get_item_by_itemid($_REQUEST['itemid'])){
-			$result = CDiscoveryRule::delete($_REQUEST['itemid']);
-		}
-
+		$result = CDiscoveryRule::delete($_REQUEST['itemid']);
 		show_messages($result, S_ITEM_DELETED, S_CANNOT_DELETE_ITEM);
 
 		unset($_REQUEST['itemid']);
@@ -226,7 +222,6 @@ switch($itemType) {
 			'privatekey' => get_request('privatekey'),
 			'params' => get_request('params'),
 			'ipmi_sensor' => get_request('ipmi_sensor'),
-			'applications' => array(),
 			'flags' => ZBX_FLAG_DISCOVERY,
 			'filter' => $filter,
 		);
@@ -234,19 +229,19 @@ switch($itemType) {
 		if(isset($_REQUEST['itemid'])){
 			DBstart();
 
-			$item['itemid'] = $_REQUEST['itemid'];
-
 			$db_item = get_item_by_itemid_limited($_REQUEST['itemid']);
 			foreach($item as $field => $value){
 				if($item[$field] == $db_item[$field]) unset($item[$field]);
 			}
 
-			$result = CItem::update($item);
+			$item['itemid'] = $_REQUEST['itemid'];
+
+			$result = CDiscoveryRule::update($item);
 			$result = DBend($result);
 			show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 		}
 		else{
-			$result = CItem::create(array($item));
+			$result = CDiscoveryRule::create(array($item));
 			show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 		}
 

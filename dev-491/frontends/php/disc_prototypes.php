@@ -278,6 +278,8 @@ switch($itemType) {
 				if($item[$field] == $db_item[$field]) unset($item[$field]);
 			}
 
+			$item['itemid'] = $_REQUEST['itemid'];
+			
 			$result = CItemPrototype::update($item);
 
 			show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
