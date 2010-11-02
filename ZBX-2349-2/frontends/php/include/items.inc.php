@@ -1145,9 +1145,7 @@
 
             $search = array_keys($macros);
             $values = array_values($macros);
-            for($i=0; $i<count($search); $i++){
-				$descr = str_replace($search[$i], $values[$i], $descr);
-			}
+			$descr = str_replace($search, $values, $descr);
         }
 
 	return $descr;
