@@ -539,7 +539,7 @@ DB_ESCALATION
 #define DBnode_local(fieldid) DBnode(fieldid, CONFIG_NODEID)
 const char *DBnode(const char *fieldid, const int nodeid);
 
-int	DBping(void);
+int	DBping();
 
 void    DBconnect(int flag);
 void	DBinit();

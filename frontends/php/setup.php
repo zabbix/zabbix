@@ -39,7 +39,7 @@ if(!defined('PAGE_HEADER_LOADED'))
 		'distributed'=>		array(T_ZBX_STR, O_OPT,	null,	null,			null),
 		'trouble'=>		array(T_ZBX_STR, O_OPT,	null,	null,			null),
 
-		'type'=>		array(T_ZBX_STR, O_OPT,	null,	IN('"MYSQL","POSTGRESQL","ORACLE","SQLITE3"'),	null),
+		'type'=>		array(T_ZBX_STR, O_OPT,	null,	IN('"MYSQL","POSTGRESQL","ORACLE","IBM_DB2","SQLITE3"'),	null),
 		'server'=>		array(T_ZBX_STR, O_OPT,	null,	null,			null),
 		'port'=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,65535),	null),
 		'database'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		null),
@@ -83,23 +83,28 @@ if(!defined('PAGE_HEADER_LOADED'))
 
 	$ZBX_CONFIG['allowed_db'] = array();
 
-	/* MYSQL */
+// MYSQL
 	if(zbx_is_callable(array('mysql_pconnect', 'mysql_select_db', 'mysql_error', 'mysql_select_db','mysql_query', 'mysql_fetch_array', 'mysql_fetch_row', 'mysql_data_seek','mysql_insert_id')))
 	{
 		$ZBX_CONFIG['allowed_db']['MYSQL'] = 'MySQL';
 	}
 
-	/* POSTGRESQL */
+// POSTGRESQL
 	if(zbx_is_callable(array('pg_pconnect', 'pg_fetch_array', 'pg_fetch_row', 'pg_exec', 'pg_getlastoid'))){
 		$ZBX_CONFIG['allowed_db']['POSTGRESQL'] = 'PostgreSQL';
 	}
 
-	/* ORACLE */
+// ORACLE
 	if(zbx_is_callable(array('ocilogon', 'ocierror', 'ociparse', 'ociexecute', 'ocifetchinto'))){
 		$ZBX_CONFIG['allowed_db']['ORACLE'] = 'Oracle';
 	}
 
-	/* SQLITE3 */
+// IBM_DB2
+	if(zbx_is_callable(array('db2_connect', 'db2_set_option', 'db2_prepare', 'db2_execute', 'db2_fetch_assoc'))){
+		$ZBX_CONFIG['allowed_db']['IBM_DB2'] = 'IBM DB2';
+	}
+
+// SQLITE3
 	if(zbx_is_callable(array('sqlite3_open', 'sqlite3_close', 'sqlite3_query', 'sqlite3_error', 'sqlite3_fetch_array', 'sqlite3_query_close', 'sqlite3_exec'))){
 		$ZBX_CONFIG['allowed_db']['SQLITE3'] = 'SQLite3';
 	}
@@ -114,7 +119,8 @@ if(!defined('PAGE_HEADER_LOADED'))
 	$ZBX_SETUP_WIZARD = new CSetupWizard($ZBX_CONFIG);
 
 	zbx_set_post_cookie('ZBX_CONFIG', serialize($ZBX_CONFIG));
-
+?>
+<?php
 include_once('include/page_header.php');
 
 	global	$ZBX_CONFIGURATION_FILE;
