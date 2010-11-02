@@ -2233,12 +2233,13 @@ static int	DBlld_update_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_trigger
 				strlen(comments_esc) + strlen(url_esc),
 				"insert into triggers"
 					" (triggerid,description,priority,status,"
-						"comments,url,type,value,flags)"
+						"comments,url,type,value,value_flags,flags)"
 					" values (" ZBX_FS_UI64 ",'%s',%d,%d,"
-						"'%s','%s',%d,%d,%d);\n",
+						"'%s','%s',%d,%d,%d,%d);\n",
 					new_triggerid, description_esc, (int)priority,
 					(int)status, comments_esc, url_esc, (int)type,
-					TRIGGER_VALUE_UNKNOWN, ZBX_FLAG_DISCOVERY_CREATED);
+					TRIGGER_VALUE_FALSE, TRIGGER_VALUE_FLAG_UNKNOWN,
+					ZBX_FLAG_DISCOVERY_CREATED);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256 + strlen(description_proto_esc),
 				"insert into trigger_discovery"
