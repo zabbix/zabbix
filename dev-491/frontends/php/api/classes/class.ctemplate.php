@@ -81,7 +81,7 @@ class CTemplate extends CZBXAPI{
 			'select_templates'			=> null,
 			'selectParentTemplates'		=> null,
 			'select_items'				=> null,
-			'select_discoveries'		=> null,
+			'selectDiscoveries'		=> null,
 			'select_triggers'			=> null,
 			'select_graphs'				=> null,
 			'select_applications'		=> null,
@@ -408,7 +408,7 @@ class CTemplate extends CZBXAPI{
 					if(!is_null($options['select_items']) && !isset($result[$template['templateid']]['items'])){
 						$template['items'] = array();
 					}
-					if(!is_null($options['select_discoveries']) && !isset($result[$template['hostid']]['discoveries'])){
+					if(!is_null($options['selectDiscoveries']) && !isset($result[$template['hostid']]['discoveries'])){
 						$result[$template['hostid']]['discoveries'] = array();
 					}
 					if(!is_null($options['select_triggers']) && !isset($result[$template['templateid']]['triggers'])){
@@ -690,7 +690,7 @@ Copt::memoryPick();
 		}
 
 // Adding Discoveries
-		if(!is_null($options['select_discoveries'])){
+		if(!is_null($options['selectDiscoveries'])){
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'hostids' => $templateids,
@@ -699,8 +699,8 @@ Copt::memoryPick();
 				'preservekeys' => 1,
 			);
 
-			if(is_array($options['select_discoveries']) || str_in_array($options['select_discoveries'], $subselects_allowed_outputs)){
-				$obj_params['output'] = $options['select_discoveries'];
+			if(is_array($options['selectDiscoveries']) || str_in_array($options['selectDiscoveries'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['selectDiscoveries'];
 				$items = CItem::get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($items, 'description');
@@ -718,7 +718,7 @@ Copt::memoryPick();
 					}
 				}
 			}
-			else if(API_OUTPUT_COUNT == $options['select_discoveries']){
+			else if(API_OUTPUT_COUNT == $options['selectDiscoveries']){
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
