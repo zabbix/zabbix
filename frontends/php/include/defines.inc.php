@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-	define('ZABBIX_VERSION','1.9');
+	define('ZABBIX_VERSION','1.9.0');
 	define('ZABBIX_API_VERSION','1.2');
 /* USER DEFINES */
 
@@ -44,7 +44,7 @@
 	define('GRAPH_YAXIS_SIDE_DEFAULT',		0); // 0 - LEFT SIDE, 1 - RIGHT SIDE
 
 	define('ZBX_MAX_IMAGE_SIZE',			1024*1024);
- 
+
 	define('ZBX_UNITS_ROUNDOFF_THRESHOLD', 0.01);
 	define('ZBX_UNITS_ROUNDOFF_UPPER_LIMIT', 2);
 	define('ZBX_UNITS_ROUNDOFF_LOWER_LIMIT', 6);
@@ -52,12 +52,10 @@
 /* END OF USERS DEFINES */
 	define('ZAPCAT_COMPATIBILITY', false);
 
-	define('ZBX_MAP_HIGHLIGHT', 0x1);
-	define('ZBX_MAP_EXPANDPROBLEM', 0x2);
-	define('ZBX_MAP_MARKELEMENTS', 0x4);
-	define('ZBX_MAP_EXTACK_UNACK', 0x8);
-	define('ZBX_MAP_EXTACK_TOTAL', 0x10);
-	define('ZBX_MAP_EXTACK_SEPARATED', ZBX_MAP_EXTACK_UNACK | ZBX_MAP_EXTACK_TOTAL );
+	define('ZBX_FLAG_DISCOVERY_NORMAL', 0x0);
+	define('ZBX_FLAG_DISCOVERY', 0x1);
+	define('ZBX_FLAG_DISCOVERY_CHILD', 0x2);
+	define('ZBX_FLAG_DISCOVERY_CREATED', 0x4);
 
 	define('EXTACK_OPTION_ALL',		0);
 	define('EXTACK_OPTION_UNACK',	1);
@@ -370,10 +368,10 @@
 	define('MEDIA_TYPE_SMS',		2);
 	define('MEDIA_TYPE_JABBER',		3);
 	define('MEDIA_TYPE_EZ_TEXTING',	100);
-	
+
 	define('EZ_TEXTING_LIMIT_USA',		0);
 	define('EZ_TEXTING_LIMIT_CANADA',	1);
-	
+
 	define('ACTION_DEFAULT_SUBJ',		'{TRIGGER.NAME}: {TRIGGER.STATUS}');
 	define('ACTION_DEFAULT_MSG',		"{TRIGGER.NAME}: {TRIGGER.STATUS}\nLast value: {ITEM.LASTVALUE}\n\n{TRIGGER.URL}");
 
@@ -653,7 +651,7 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	define('REGEXP_EXCLUDE',1);
 
 // PREG
-	define('ZBX_PREG_PRINT', '^\x00-\x1F');
+	define('ZBX_PREG_PRINT', '^\x{00}-\x{1F}');
 
 	define('ZBX_PREG_SPACES', '(\s+){0,1}');
 	define('ZBX_PREG_MACRO_NAME', '([A-Z0-9\._]+)');

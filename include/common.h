@@ -117,8 +117,8 @@
 #define OFF	0
 
 #define	APPLICATION_NAME	"Zabbix Agent"
-#define	ZABBIX_REVDATE		"7 December 2009"
-#define	ZABBIX_VERSION		"1.9"
+#define	ZABBIX_REVDATE		"26 October 2010"
+#define	ZABBIX_VERSION		"1.9.0"
 #define	ZABBIX_REVISION		"{ZABBIX_REVISION}"
 
 #if defined(_WINDOWS)
@@ -183,6 +183,10 @@ typedef enum
 	ITEM_TYPE_TELNET,
 	ITEM_TYPE_CALCULATED
 } zbx_item_type_t;
+
+#define ZBX_FLAG_DISCOVERY		0x01	/* low-level discovery rule */
+#define ZBX_FLAG_DISCOVERY_CHILD	0x02	/* low-level discovery proto-item, proto-trigger or proto-graph */
+#define ZBX_FLAG_DISCOVERY_CREATED	0x04	/* auto-created item, trigger or graph */
 
 typedef enum
 {
@@ -895,6 +899,7 @@ int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t v
 void	uint64_array_merge(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t *value, int value_num, int alloc_step);
 int	uint64_array_exists(zbx_uint64_t *values, int num, zbx_uint64_t value);
 void	uint64_array_remove(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values, int rm_num);
+void	uint64_array_remove_both(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values, int *rm_num);
 
 #ifdef _WINDOWS
 LPTSTR	zbx_acp_to_unicode(LPCSTR acp_string);

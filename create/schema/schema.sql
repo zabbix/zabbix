@@ -473,7 +473,15 @@ FIELD		|ymin_type	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|ymax_type	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|ymin_itemid	|t_id		|	|NULL		|ZBX_SYNC		|2|items	|itemid		|RESTRICT
 FIELD		|ymax_itemid	|t_id		|	|NULL		|ZBX_SYNC		|3|items	|itemid		|RESTRICT
+FIELD		|flags		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|graphs_1	|name
+
+TABLE|graph_discovery|graphdiscoveryid|ZBX_SYNC
+FIELD		|graphdiscoveryid|t_id		|	|NOT NULL	|0
+FIELD		|graphid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|graphs
+FIELD		|parent_graphid	|t_id		|	|NOT NULL	|ZBX_SYNC		|2|graphs	|graphid
+FIELD		|name		|t_varchar(128)	|''	|NOT NULL	|0
+UNIQUE		|1		|graphid,parent_graphid
 
 TABLE|graphs_items|gitemid|ZBX_SYNC
 FIELD		|gitemid	|t_id		|	|NOT NULL	|0
@@ -717,9 +725,18 @@ FIELD		|publickey	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|privatekey	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|mtime		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|lastns		|t_nanosec	|	|NULL		|0
+FIELD		|flags		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|filter		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 UNIQUE		|1		|hostid,key_
 INDEX		|3		|status
 INDEX		|4		|templateid
+
+TABLE|item_discovery|itemdiscoveryid|ZBX_SYNC
+FIELD		|itemdiscoveryid|t_id		|	|NOT NULL	|0
+FIELD		|itemid		|t_id		|	|NOT NULL	|ZBX_SYNC		|1|items
+FIELD		|parent_itemid	|t_id		|	|NOT NULL	|ZBX_SYNC		|2|items	|itemid
+FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|0
+UNIQUE		|1		|itemid,parent_itemid
 
 TABLE|items_applications|itemappid|ZBX_SYNC
 FIELD		|itemappid	|t_id		|	|NOT NULL	|0
@@ -912,8 +929,16 @@ FIELD		|error		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|templateid	|t_id		|	|NULL		|ZBX_SYNC		|1|triggers	|triggerid
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|value_flags	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|flags		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|status
 INDEX		|2		|value
+
+TABLE|trigger_discovery|triggerdiscoveryid|ZBX_SYNC
+FIELD		|triggerdiscoveryid|t_id	|	|NOT NULL	|0
+FIELD		|triggerid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|triggers
+FIELD		|parent_triggerid|t_id		|	|NOT NULL	|ZBX_SYNC		|2|triggers	|triggerid
+FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
+UNIQUE		|1		|triggerid,parent_triggerid
 
 TABLE|trigger_depends|triggerdepid|ZBX_SYNC
 FIELD		|triggerdepid	|t_id		|	|NOT NULL	|0

@@ -28,98 +28,19 @@
 static int	txn_level = 0;
 static int	txn_init = 0;
 
-#ifdef	HAVE_SQLITE3
+#if defined(HAVE_IBM_DB2)
+	zbx_ibm_db2_handle_t	ibm_db2;
+#elif defined(HAVE_MYSQL)
+	MYSQL		*conn = NULL;
+#elif defined(HAVE_ORACLE)
+	zbx_oracle_db_handle_t	oracle;
+#elif defined(HAVE_POSTGRESQL)
+	PGconn		*conn = NULL;
+	static int	ZBX_PG_BYTEAOID = 0;
+#elif defined(HAVE_SQLITE3)
 	sqlite3		*conn = NULL;
 	PHP_MUTEX	sqlite_access;
 #endif
-
-#ifdef	HAVE_MYSQL
-	MYSQL		*conn = NULL;
-#endif
-
-#ifdef	HAVE_POSTGRESQL
-	PGconn		*conn = NULL;
-	static int	ZBX_PG_BYTEAOID = 0;
-#endif
-
-#ifdef	HAVE_ORACLE
-	zbx_oracle_db_handle_t	oracle;
-#endif /* HAVE_ORACLE */
-
-void	zbx_db_close(void)
-{
-#ifdef	HAVE_MYSQL
-	mysql_close(conn);
-	conn = NULL;
-#endif
-#ifdef	HAVE_POSTGRESQL
-	PQfinish(conn);
-	conn = NULL;
-#endif
-#ifdef	HAVE_ORACLE
-	if (oracle.svchp)
-	{
-		(void) OCILogoff(oracle.svchp, oracle.errhp);
-		oracle.svchp = NULL;
-	}
-
-	if (oracle.errhp) {
-		(void) OCIHandleFree(oracle.errhp, OCI_HTYPE_ERROR);
-		oracle.errhp = NULL;
-	}
-
-	if (oracle.envhp) {
-		(void) OCIHandleFree((dvoid *) oracle.envhp, OCI_HTYPE_ENV);
-		oracle.envhp = NULL;
-	}
-
-	if (oracle.srvhp) {
-		(void) OCIHandleFree(oracle.srvhp, OCI_HTYPE_SERVER);
-		oracle.srvhp = NULL;
-	}
-#endif /* HAVE_ORACLE */
-#ifdef	HAVE_SQLITE3
-	sqlite3_close(conn);
-	conn = NULL;
-/*	php_sem_remove(&sqlite_access); */
-#endif
-}
-#if HAVE_ORACLE
-char*	zbx_oci_error(sword status)
-{
-	/* NOTE: not thread safe, be careful */
-	static char errbuf[512];
-	sb4 errcode = 0;
-
-	errbuf[0] = '\0';
-	switch (status)
-	{
-		case OCI_SUCCESS_WITH_INFO:
-			(void) zbx_snprintf (errbuf, sizeof(errbuf), "%s", "OCI_SUCCESS_WITH_INFO");
-			break;
-		case OCI_NEED_DATA:
-			(void) zbx_snprintf (errbuf, sizeof(errbuf), "%s", "OCI_NEED_DATA");
-			break;
-		case OCI_NO_DATA:
-			(void) zbx_snprintf (errbuf, sizeof(errbuf), "%s", "OCI_NODATA");
-			break;
-		case OCI_ERROR:
-			(void) OCIErrorGet((dvoid *)oracle.errhp, (ub4) 1, (text *) NULL, &errcode,
-				(text *)errbuf, (ub4) sizeof(errbuf), OCI_HTYPE_ERROR);
-			break;
-		case OCI_INVALID_HANDLE:
-			(void) zbx_snprintf (errbuf, sizeof(errbuf), "%s", "OCI_INVALID_HANDLE");
-			break;
-		case OCI_STILL_EXECUTING:
-			(void) zbx_snprintf (errbuf, sizeof(errbuf), "%s", "OCI_STILL_EXECUTE");
-			break;
-		case OCI_CONTINUE:
-			(void) zbx_snprintf (errbuf, sizeof(errbuf), "%s", "OCI_CONTINUE");
-			break;
-	}
-	return errbuf;
-}
-#endif /* HAVE_ORACLE */
 
 /*
  * Connect to the database.
@@ -130,10 +51,61 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	txn_init = 1;
 
-#ifdef	HAVE_MYSQL
-	/* For MySQL >3.22.00 */
-	/*	if( ! mysql_connect( conn, NULL, dbuser, dbpassword ) )*/
+#if defined(HAVE_IBM_DB2)
+	char	*connect = NULL;
 
+	connect = strdup("PROTOCOL=TCPIP;");
+	if (NULL != dbname && '\0' != *dbname)
+		connect = zbx_strdcatf(connect, "DATABASE=%s;", dbname);
+	if (NULL != host && '\0' != *host)
+		connect = zbx_strdcatf(connect, "HOSTNAME=%s;", host);
+	if (0 != port)
+		connect = zbx_strdcatf(connect, "PORT=%d;", port);
+	if (NULL != user && '\0' != *user)
+		connect = zbx_strdcatf(connect, "UID=%s;", user);
+	if (NULL != password && '\0' != *password)
+		connect = zbx_strdcatf(connect, "PWD=%s;", password);
+
+	memset(&ibm_db2, 0, sizeof(ibm_db2));
+
+	/* allocate an environment handle */
+	if (SUCCEED != zbx_ibm_db2_success(SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &ibm_db2.henv)))
+		ret = ZBX_DB_FAIL;
+
+	/* set attribute to enable application to run as ODBC 3.0 application; recommended for pure IBM DB2 CLI, but not required */
+	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLSetEnvAttr(ibm_db2.henv, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0)))
+		ret = ZBX_DB_FAIL;
+
+	/* allocate a database connection handle */
+	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLAllocHandle(SQL_HANDLE_DBC, ibm_db2.henv, &ibm_db2.hdbc)))
+		ret = ZBX_DB_FAIL;
+
+	/* connect to the database */
+	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLDriverConnect(ibm_db2.hdbc, NULL, connect, SQL_NTS,
+								NULL, 0, NULL, SQL_DRIVER_NOPROMPT)))
+		ret = ZBX_DB_FAIL;
+
+	/* set autocommit on */
+  	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_AUTOCOMMIT,
+								(SQLPOINTER)SQL_AUTOCOMMIT_ON, SQL_NTS)))
+		ret = ZBX_DB_DOWN;
+
+	/* we do not generate vendor escape clause sequences */
+  	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_NOSCAN,
+								(SQLPOINTER)SQL_NOSCAN_ON, SQL_NTS)))
+		ret = ZBX_DB_DOWN;
+
+	/* output error information */
+	if (ZBX_DB_OK != ret)
+	{
+		zbx_ibm_db2_log_errors(SQL_HANDLE_ENV, ibm_db2.henv);
+		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc);
+
+		zbx_db_close();
+	}
+
+	zbx_free(connect);
+#elif defined(HAVE_MYSQL)
 	conn = mysql_init(NULL);
 
 	if (!mysql_real_connect(conn, host, user, password, dbname, port, dbsocket, CLIENT_MULTI_STATEMENTS))
@@ -175,50 +147,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 			break;
 		}
 	}
-#endif
-#ifdef	HAVE_POSTGRESQL
-	char		*cport = NULL;
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		sversion;
-
-	if( port )	cport = zbx_dsprintf(cport, "%i", port);
-
-	conn = PQsetdbLogin(host, cport, NULL, NULL, dbname, user, password );
-
-	zbx_free(cport);
-
-	/* check to see that the backend connection was successfully made */
-	if (PQstatus(conn) != CONNECTION_OK)
-	{
-		zabbix_errlog(ERR_Z3001, dbname, 0, PQerrorMessage(conn));
-		ret = ZBX_DB_DOWN;
-	}
-	else
-	{
-		result = DBselect("select oid from pg_type where typname = 'bytea'");
-		row = DBfetch(result);
-		if(row)
-		{
-			ZBX_PG_BYTEAOID = atoi(row[0]);
-		}
-		DBfree_result(result);
-	}
-
-#ifdef	HAVE_FUNCTION_PQSERVERVERSION
-	sversion = PQserverVersion(conn);
-	zabbix_log(LOG_LEVEL_DEBUG, "PostgreSQL Server version: %d", sversion);
-#else
-	sversion = 0;
-#endif	/* HAVE_FUNCTION_PQSERVERVERSION */
-
-	if (sversion >= 80100)
-	{
-		/* disable "nonstandard use of \' in a string literal" warning */
-		DBexecute("set escape_string_warning to off");
-	}
-#endif
-#ifdef	HAVE_ORACLE
+#elif defined(HAVE_ORACLE)
 	char	*connect = NULL;
 	sword	err = OCI_SUCCESS;
 
@@ -231,7 +160,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	/* connection string format: [//]host[:port][/service name] */
 
-	if (host && *host)
+	if (NULL != host && '\0' != *host)
 	{
 		connect = zbx_strdcatf(connect, "//%s", host);
 
@@ -293,8 +222,48 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	if (ZBX_DB_OK != ret)
 		zbx_db_close();
-#endif
-#ifdef	HAVE_SQLITE3
+#elif defined(HAVE_POSTGRESQL)
+	char		*cport = NULL;
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		sversion;
+
+	if (0 != port)
+		cport = zbx_dsprintf(cport, "%i", port);
+
+	conn = PQsetdbLogin(host, cport, NULL, NULL, dbname, user, password);
+
+	zbx_free(cport);
+
+	/* check to see that the backend connection was successfully made */
+	if (PQstatus(conn) != CONNECTION_OK)
+	{
+		zabbix_errlog(ERR_Z3001, dbname, 0, PQerrorMessage(conn));
+		ret = ZBX_DB_DOWN;
+	}
+	else
+	{
+		result = DBselect("select oid from pg_type where typname = 'bytea'");
+		if (NULL != (row = DBfetch(result)))
+		{
+			ZBX_PG_BYTEAOID = atoi(row[0]);
+		}
+		DBfree_result(result);
+	}
+
+#ifdef	HAVE_FUNCTION_PQSERVERVERSION
+	sversion = PQserverVersion(conn);
+	zabbix_log(LOG_LEVEL_DEBUG, "PostgreSQL Server version: %d", sversion);
+#else
+	sversion = 0;
+#endif	/* HAVE_FUNCTION_PQSERVERVERSION */
+
+	if (sversion >= 80100)
+	{
+		/* disable "nonstandard use of \' in a string literal" warning */
+		DBexecute("set escape_string_warning to off");
+	}
+#elif defined(HAVE_SQLITE3)
 #ifdef	HAVE_FUNCTION_SQLITE3_OPEN_V2
 	if (SQLITE_OK != (ret = sqlite3_open_v2(dbname, &conn, SQLITE_OPEN_READWRITE, NULL)))
 #else
@@ -310,7 +279,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		char	*p, *path;
 
 		/* Do not return SQLITE_BUSY immediately, wait for N ms */
-		sqlite3_busy_timeout(conn, 60*1000);
+		sqlite3_busy_timeout(conn, 60 * 1000);
 
 		path = strdup(dbname);
 		if (NULL != (p = strrchr(path, '/')))
@@ -324,7 +293,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 		zbx_free(path);
 	}
-#endif
+#endif	/* HAVE_SQLITE3 */
 	txn_init = 0;
 
 	return ret;
@@ -332,12 +301,10 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 void	zbx_db_init(char *host, char *user, char *password, char *dbname, char *dbsocket, int port)
 {
-#ifdef	HAVE_SQLITE3
+#if defined(HAVE_SQLITE3)
 	int		ret;
 	struct stat	buf;
-#endif
 
-#ifdef	HAVE_SQLITE3
 	if (0 != stat(dbname, &buf))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Cannot open database file \"%s\": %s", dbname, strerror(errno));
@@ -353,13 +320,67 @@ void	zbx_db_init(char *host, char *user, char *password, char *dbname, char *dbs
 		DBexecute("%s", db_schema);
 		DBclose();
 	}
+#endif	/* HAVE_SQLITE3 */
+}
+
+void	zbx_db_close()
+{
+#if defined(HAVE_IBM_DB2)
+	if (ibm_db2.hdbc)
+	{
+		SQLDisconnect(ibm_db2.hdbc);
+		SQLFreeHandle(SQL_HANDLE_DBC, ibm_db2.hdbc);
+	}
+
+	if (ibm_db2.henv)
+		SQLFreeHandle(SQL_HANDLE_ENV, ibm_db2.henv);
+
+	memset(&ibm_db2, 0, sizeof(ibm_db2));
+#elif defined(HAVE_MYSQL)
+	mysql_close(conn);
+	conn = NULL;
+#elif defined(HAVE_ORACLE)
+	if (oracle.svchp)
+	{
+		(void)OCILogoff(oracle.svchp, oracle.errhp);
+		oracle.svchp = NULL;
+	}
+
+	if (oracle.errhp)
+	{
+		(void)OCIHandleFree(oracle.errhp, OCI_HTYPE_ERROR);
+		oracle.errhp = NULL;
+	}
+
+	if (oracle.envhp)
+	{
+		(void)OCIHandleFree((dvoid *)oracle.envhp, OCI_HTYPE_ENV);
+		oracle.envhp = NULL;
+	}
+
+	if (oracle.srvhp)
+	{
+		(void)OCIHandleFree(oracle.srvhp, OCI_HTYPE_SERVER);
+		oracle.srvhp = NULL;
+	}
+#elif defined(HAVE_POSTGRESQL)
+	PQfinish(conn);
+	conn = NULL;
+#elif defined(HAVE_SQLITE3)
+	sqlite3_close(conn);
+	conn = NULL;
 #endif
 }
 
-int	__zbx_zbx_db_execute(const char *fmt, ...)
+#ifdef HAVE___VA_ARGS__
+#	define zbx_db_execute(fmt, ...)	__zbx_zbx_db_execute(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+#else
+#	define zbx_db_execute		__zbx_zbx_db_execute
+#endif
+static int	__zbx_zbx_db_execute(const char *fmt, ...)
 {
-	va_list args;
-	int ret;
+	va_list	args;
+	int	ret;
 
 	va_start(args, fmt);
 	ret = zbx_db_vexecute(fmt, args);
@@ -371,8 +392,8 @@ int	__zbx_zbx_db_execute(const char *fmt, ...)
 #ifdef HAVE___VA_ARGS__
 #	define zbx_db_select(fmt, ...)	__zbx_zbx_db_select(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
 #else
-#	define zbx_db_select __zbx_zbx_db_select
-#endif /* HAVE___VA_ARGS__ */
+#	define zbx_db_select		__zbx_zbx_db_select
+#endif
 static DB_RESULT	__zbx_zbx_db_select(const char *fmt, ...)
 {
 	va_list		args;
@@ -387,7 +408,7 @@ static DB_RESULT	__zbx_zbx_db_select(const char *fmt, ...)
 
 /******************************************************************************
  *                                                                            *
- * Function: DBbegin                                                          *
+ * Function: zbx_db_begin                                                     *
  *                                                                            *
  * Purpose: Start transaction                                                 *
  *                                                                            *
@@ -400,7 +421,7 @@ static DB_RESULT	__zbx_zbx_db_select(const char *fmt, ...)
  * Comments: Do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_db_begin(void)
+int	zbx_db_begin()
 {
 	int	rc = ZBX_DB_OK;
 
@@ -413,17 +434,25 @@ int	zbx_db_begin(void)
 
 	txn_level++;
 
-#ifdef	HAVE_SQLITE3
+#if defined(HAVE_IBM_DB2)
+	if (SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_AUTOCOMMIT, (SQLPOINTER)SQL_AUTOCOMMIT_OFF, SQL_NTS)))
+		rc = ZBX_DB_DOWN;
+
+	if (ZBX_DB_OK != rc)
+	{
+		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc);
+		rc = (SQL_CD_TRUE == IBM_DB2server_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
+	}
+#elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL) || defined(HAVE_SQLITE3)
+	rc = zbx_db_execute("%s", "begin;");
+#elif defined(HAVE_SQLITE3)
 	if (PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "ERROR: Unable to create lock"
 				" on SQLite database.");
 		assert(0);
 	}
-#endif	/* HAVE_SQLITE3 */
-#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL) || defined(HAVE_SQLITE3)
-	rc = zbx_db_execute("%s", "begin;");
-#endif	/* HAVE_MYSQL || HAVE_POSTGRESQL || HAVE_SQLITE3 */
+#endif
 
 	if (rc < ZBX_DB_OK)	/* ZBX_DB_FAIL | ZBX_DB_DOWN */
 		txn_level--;
@@ -433,7 +462,7 @@ int	zbx_db_begin(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: DBcommit                                                         *
+ * Function: zbx_db_commit                                                    *
  *                                                                            *
  * Purpose: Commit transaction                                                *
  *                                                                            *
@@ -446,7 +475,7 @@ int	zbx_db_begin(void)
  * Comments: Do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_db_commit(void)
+int	zbx_db_commit()
 {
 	int	rc = ZBX_DB_OK;
 
@@ -457,15 +486,24 @@ int	zbx_db_commit(void)
 		assert(0);
 	}
 
-#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL) || defined(HAVE_SQLITE3)
+#if defined(HAVE_IBM_DB2)
+	if (SUCCEED != zbx_ibm_db2_success(SQLEndTran(SQL_HANDLE_DBC, ibm_db2.hdbc, SQL_COMMIT)))
+		rc = ZBX_DB_DOWN;
+	if (SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_AUTOCOMMIT, (SQLPOINTER)SQL_AUTOCOMMIT_ON, SQL_NTS)))
+		rc = ZBX_DB_DOWN;
+
+	if (ZBX_DB_OK != rc)
+	{
+		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc);
+		rc = (SQL_CD_TRUE == IBM_DB2server_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
+	}
+#elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL) || defined(HAVE_SQLITE3)
 	rc = zbx_db_execute("%s", "commit;");
-#endif	/* HAVE_MYSQL || HAVE_POSTGRESQL || HAVE_SQLITE3 */
-#ifdef	HAVE_SQLITE3
+#elif defined(HAVE_ORACLE)
+	OCITransCommit(oracle.svchp, oracle.errhp, OCI_DEFAULT);
+#elif defined(HAVE_SQLITE3)
 	php_sem_release(&sqlite_access);
-#endif	/* HAVE_SQLITE3 */
-#ifdef	HAVE_ORACLE
-	(void)OCITransCommit(oracle.svchp, oracle.errhp, OCI_DEFAULT);
-#endif	/* HAVE_ORACLE */
+#endif
 
 	if (rc >= ZBX_DB_OK)	/* ZBX_DB_OK or number of changes */
 		txn_level--;
@@ -475,7 +513,7 @@ int	zbx_db_commit(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: DBrollback                                                       *
+ * Function: zbx_db_rollback                                                  *
  *                                                                            *
  * Purpose: Rollback transaction                                              *
  *                                                                            *
@@ -488,7 +526,7 @@ int	zbx_db_commit(void)
  * Comments: Do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_db_rollback(void)
+int	zbx_db_rollback()
 {
 	int	rc = ZBX_DB_OK;
 
@@ -499,15 +537,24 @@ int	zbx_db_rollback(void)
 		assert(0);
 	}
 
-#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL) || defined(HAVE_SQLITE3)
+#if defined(HAVE_IBM_DB2)
+	if (SUCCEED != zbx_ibm_db2_success(SQLEndTran(SQL_HANDLE_DBC, ibm_db2.hdbc, SQL_ROLLBACK)))
+		rc = ZBX_DB_DOWN;
+	if (SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_AUTOCOMMIT, (SQLPOINTER)SQL_AUTOCOMMIT_ON, SQL_NTS)))
+		rc = ZBX_DB_DOWN;
+
+	if (ZBX_DB_OK != rc)
+	{
+		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc);
+		rc = (SQL_CD_TRUE == IBM_DB2server_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
+	}
+#elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL) || defined(HAVE_SQLITE3)
 	rc = zbx_db_execute("%s", "rollback;");
-#endif	/* HAVE_MYSQL || HAVE_POSTGRESQL || HAVE_SQLITE3 */
-#ifdef	HAVE_SQLITE3
+#elif defined(HAVE_ORACLE)
+	OCITransRollback(oracle.svchp, oracle.errhp, OCI_DEFAULT);
+#elif defined(HAVE_SQLITE3)
 	php_sem_release(&sqlite_access);
-#endif	/* HAVE_SQLITE3 */
-#ifdef	HAVE_ORACLE
-	(void)OCITransRollback(oracle.svchp, oracle.errhp, OCI_DEFAULT);
-#endif	/* HAVE_ORACLE */
+#endif
 
 	if (rc >= ZBX_DB_OK)	/* ZBX_DB_OK or number of changes */
 		txn_level--;
@@ -524,16 +571,21 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	int	ret = ZBX_DB_OK;
 	double	sec = 0;
 
-#ifdef	HAVE_POSTGRESQL
+#if defined(HAVE_IBM_DB2)
+	SQLHANDLE	hstmt = 0;
+	SQLRETURN	ret1;
+	SQLLEN		row1;
+	SQLLEN		rows = 0;
+#elif defined(HAVE_MYSQL)
+	int		status;
+#elif defined(HAVE_ORACLE)
+	OCIStmt		*stmthp = NULL;
+#elif defined(HAVE_POSTGRESQL)
 	PGresult	*result;
 	char		*error = NULL;
-#endif
-#ifdef	HAVE_SQLITE3
-	int err;
-	char *error=0;
-#endif
-#ifdef	HAVE_MYSQL
-	int		status;
+#elif defined(HAVE_SQLITE3)
+	int		err;
+	char		*error = NULL;
 #endif
 
 	if (CONFIG_LOG_SLOW_QUERIES)
@@ -544,28 +596,69 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	if (0 == txn_init && 0 == txn_level)
 		zabbix_log(LOG_LEVEL_DEBUG, "Query without transaction detected");
 
-	zabbix_log( LOG_LEVEL_DEBUG, "Query [txnlev:%d] [%s]", txn_level, sql);
-#ifdef	HAVE_MYSQL
-	if(!conn)
+	zabbix_log(LOG_LEVEL_DEBUG, "Query [txnlev:%d] [%s]", txn_level, sql);
+
+#if defined(HAVE_IBM_DB2)
+	/* allocate a statement handle */
+	if (SUCCEED != zbx_ibm_db2_success(SQLAllocHandle(SQL_HANDLE_STMT, ibm_db2.hdbc, &hstmt)))
+		ret = ZBX_DB_DOWN;
+
+	/* directly execute the statement; returns SQL_NO_DATA_FOUND when no rows were affected */
+  	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success_ext(SQLExecDirect(hstmt, (SQLCHAR *)sql, SQL_NTS)))
+		ret = ZBX_DB_DOWN;
+
+	/* get number of affected rows */
+	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLRowCount(hstmt, &rows)))
+		ret = ZBX_DB_DOWN;
+
+	/* process other SQL statements in the batch */
+	while (ZBX_DB_OK == ret && SUCCEED == zbx_ibm_db2_success(ret1 = SQLMoreResults(hstmt)))
+	{
+		if (SUCCEED != zbx_ibm_db2_success(SQLRowCount(hstmt, &row1)))
+			ret = ZBX_DB_DOWN;
+		else
+			rows += row1;
+	}
+
+	if (ZBX_DB_OK == ret && SQL_NO_DATA_FOUND != ret1)
+		ret = ZBX_DB_DOWN;
+
+	if (ZBX_DB_OK != ret)
+	{
+		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc);
+		zbx_ibm_db2_log_errors(SQL_HANDLE_STMT, hstmt);
+
+		ret = (SQL_CD_TRUE == IBM_DB2server_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
+	}
+	else if (rows >= 0)
+	{
+		ret = (int)rows;
+	}
+
+	if (hstmt)
+		SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+#elif defined(HAVE_MYSQL)
+	if (NULL == conn)
 	{
 		zabbix_errlog(ERR_Z3003);
 		ret = ZBX_DB_FAIL;
 	}
 	else
 	{
-		if (0 != (status = mysql_query(conn,sql)))
+		if (0 != (status = mysql_query(conn, sql)))
 		{
 			zabbix_errlog(ERR_Z3005, mysql_errno(conn), mysql_error(conn), sql);
-			switch(mysql_errno(conn)) {
-				case	CR_CONN_HOST_ERROR:
-				case	CR_SERVER_GONE_ERROR:
-				case	CR_CONNECTION_ERROR:
-				case	CR_SERVER_LOST:
-				case	ER_SERVER_SHUTDOWN:
-				case	ER_ACCESS_DENIED_ERROR: /* wrong user or password */
-				case	ER_ILLEGAL_GRANT_FOR_TABLE: /* user without any privileges */
-				case	ER_TABLEACCESS_DENIED_ERROR:/* user without some privilege */
-				case	ER_UNKNOWN_ERROR:
+			switch (mysql_errno(conn))
+			{
+				case CR_CONN_HOST_ERROR:
+				case CR_SERVER_GONE_ERROR:
+				case CR_CONNECTION_ERROR:
+				case CR_SERVER_LOST:
+				case ER_SERVER_SHUTDOWN:
+				case ER_ACCESS_DENIED_ERROR: /* wrong user or password */
+				case ER_ILLEGAL_GRANT_FOR_TABLE: /* user without any privileges */
+				case ER_TABLEACCESS_DENIED_ERROR:/* user without some privilege */
+				case ER_UNKNOWN_ERROR:
 					ret = ZBX_DB_DOWN;
 					break;
 				default:
@@ -575,11 +668,10 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 		}
 		else
 		{
-			do {
+			do
+			{
 				if (mysql_field_count(conn) == 0)
 				{
-/*					zabbix_log(LOG_LEVEL_DEBUG, ZBX_FS_UI64 " rows affected",
-							(zbx_uint64_t)mysql_affected_rows(conn));*/
 					ret += (int)mysql_affected_rows(conn);
 				}
 				else  /* some error occurred */
@@ -591,39 +683,12 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 				/* more results? -1 = no, >0 = error, 0 = yes (keep looping) */
 				if ((status = mysql_next_result(conn)) > 0)
 					zabbix_errlog(ERR_Z3005, mysql_errno(conn), mysql_error(conn), sql);
-			} while (status == 0);
+			}
+			while (status == 0);
 		}
 	}
-#endif
-#ifdef	HAVE_POSTGRESQL
-	result = PQexec(conn,sql);
-
-	if( result==NULL)
-	{
-		zabbix_errlog(ERR_Z3005, 0, "Result is NULL", sql);
-		ret = ZBX_DB_FAIL;
-	}
-	if( PQresultStatus(result) != PGRES_COMMAND_OK)
-	{
-		error = zbx_dsprintf(error, "%s:%s",
-				PQresStatus(PQresultStatus(result)),
-				PQresultErrorMessage(result));
-		zabbix_errlog(ERR_Z3005, 0, error, sql);
-		zbx_free(error);
-
-		ret = (CONNECTION_OK == PQstatus(conn) ? ZBX_DB_FAIL : ZBX_DB_DOWN);
-	}
-
-	if(ret == ZBX_DB_OK)
-	{
-		ret = atoi(PQcmdTuples(result));
-	}
-	PQclear(result);
-#endif
-#ifdef	HAVE_ORACLE
+#elif defined(HAVE_ORACLE)
 	sword err = OCI_SUCCESS;
-
-	OCIStmt *stmthp = NULL;
 
 	err = OCIHandleAlloc( (dvoid *) oracle.envhp, (dvoid **) &stmthp,
 		OCI_HTYPE_STMT, (size_t) 0, (dvoid **) 0);
@@ -655,11 +720,34 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 
 	if (stmthp)
 	{
-		(void) OCIHandleFree((dvoid *) stmthp, OCI_HTYPE_STMT);
+		(void)OCIHandleFree((dvoid *)stmthp, OCI_HTYPE_STMT);
 		stmthp = NULL;
 	}
-#endif /* HAVE_ORACLE */
-#ifdef	HAVE_SQLITE3
+#elif defined(HAVE_POSTGRESQL)
+	result = PQexec(conn,sql);
+
+	if (NULL == result)
+	{
+		zabbix_errlog(ERR_Z3005, 0, "Result is NULL", sql);
+		ret = ZBX_DB_FAIL;
+	}
+	if (PGRES_COMMAND_OK != PQresultStatus(result))
+	{
+		error = zbx_dsprintf(error, "%s:%s",
+				PQresStatus(PQresultStatus(result)),
+				PQresultErrorMessage(result));
+		zabbix_errlog(ERR_Z3005, 0, error, sql);
+		zbx_free(error);
+
+		ret = (CONNECTION_OK == PQstatus(conn) ? ZBX_DB_FAIL : ZBX_DB_DOWN);
+	}
+
+	if (ZBX_DB_OK == ret)
+	{
+		ret = atoi(PQcmdTuples(result));
+	}
+	PQclear(result);
+#elif defined(HAVE_SQLITE3)
 	if (0 == txn_level)
 	{
 		if (PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
@@ -702,13 +790,13 @@ lbl_exec:
 	{
 		php_sem_release(&sqlite_access);
 	}
-#endif
+#endif	/* HAVE_SQLITE3 */
 
 	if (CONFIG_LOG_SLOW_QUERIES)
 	{
 		sec = zbx_time() - sec;
-		if(sec > (double)CONFIG_LOG_SLOW_QUERIES / 1000.0)
-			zabbix_log( LOG_LEVEL_WARNING, "Slow query: " ZBX_FS_DBL " sec, \"%s\"", sec, sql);
+		if (sec > (double)CONFIG_LOG_SLOW_QUERIES / 1000.0)
+			zabbix_log(LOG_LEVEL_WARNING, "Slow query: " ZBX_FS_DBL " sec, \"%s\"", sec, sql);
 	}
 
 	zbx_free(sql);
@@ -716,194 +804,26 @@ lbl_exec:
 	return ret;
 }
 
-
-int	zbx_db_is_null(const char *field)
-{
-	int ret = FAIL;
-
-	if(field == NULL)	ret = SUCCEED;
-#ifdef HAVE_ORACLE
-	else if(field[0] == 0)	ret = SUCCEED;
-#endif /* HAVE_ORACLE */
-	return ret;
-}
-
-#ifdef  HAVE_POSTGRESQL
-/* in db.h - #define DBfree_result   PG_DBfree_result */
-void	PG_DBfree_result(DB_RESULT result)
-{
-	if(!result) return;
-
-	/* free old data */
-	if(result->values)
-	{
-		result->fld_num = 0;
-		zbx_free(result->values);
-		result->values = NULL;
-	}
-
-	PQclear(result->pg_result);
-	zbx_free(result);
-}
-#endif
-#ifdef  HAVE_SQLITE3
-/* in db.h - #define DBfree_result   SQ_DBfree_result */
-void	SQ_DBfree_result(DB_RESULT result)
-{
-	if(!result) return;
-
-	if(result->data)
-	{
-		sqlite3_free_table(result->data);
-	}
-
-	zbx_free(result);
-}
-#endif
-#ifdef  HAVE_ORACLE
-/* in db.h - #define DBfree_result   OCI_DBfree_result */
-void	OCI_DBfree_result(DB_RESULT result)
-{
-	if(!result) return;
-
-	if (result->values) {
-		int i;
-		for (i = 0; i < result->ncolumn; i++) {
-			if (result->values[i]) {
-				zbx_free (result->values[i]);
-				result->values[i] = NULL;
-			}
-		}
-		zbx_free (result->values);
-		result->values = NULL;
-	}
-
-	if (result->stmthp)
-		(void) OCIHandleFree((dvoid *) result->stmthp, OCI_HTYPE_STMT);
-
-	zbx_free (result);
-}
-#endif
-
-#ifdef	HAVE_ORACLE
-/* server status: OCI_SERVER_NORMAL or OCI_SERVER_NOT_CONNECTED */
-ub4	OCI_DBserver_status()
-{
-	sword	err;
-	ub4	server_status = OCI_SERVER_NOT_CONNECTED; 
-
-	err = OCIAttrGet((void *)oracle.srvhp, OCI_HTYPE_SERVER, (void *)&server_status,
-			(ub4 *)0, OCI_ATTR_SERVER_STATUS, (OCIError *)oracle.errhp);
-	
-	if (OCI_SUCCESS != err)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "Could not determine Oracle server status, assuming not connected");
-	}
-
-	return server_status;
-}
-#endif
-
-DB_ROW	zbx_db_fetch(DB_RESULT result)
-{
-#ifdef	HAVE_MYSQL
-	if(!result)	return NULL;
-
-	return mysql_fetch_row(result);
-#endif
-#ifdef	HAVE_POSTGRESQL
-
-	int	i;
-
-	/* EOF */
-	if(!result)	return NULL;
-
-	/* free old data */
-	if(result->values)
-	{
-		zbx_free(result->values);
-		result->values = NULL;
-	}
-
-	/* EOF */
-	if(result->cursor == result->row_num) return NULL;
-
-	/* init result */
-	result->fld_num = PQnfields(result->pg_result);
-
-	if(result->fld_num > 0)
-	{
-		result->values = zbx_malloc(result->values, sizeof(char*) * result->fld_num);
-		for(i = 0; i < result->fld_num; i++)
-		{
-			if(PQgetisnull(result->pg_result, result->cursor, i))
-			{
-				result->values[i] = NULL;
-			}
-			else
-			{
-				result->values[i] = PQgetvalue(result->pg_result, result->cursor, i);
-				if(PQftype(result->pg_result,i) == ZBX_PG_BYTEAOID) /* binary data type BYTEAOID */
-					zbx_pg_unescape_bytea((u_char *)result->values[i]);
-			}
-		}
-	}
-
-	result->cursor++;
-
-	return result->values;
-#endif
-#ifdef	HAVE_ORACLE
-	sword err = OCI_SUCCESS;
-
-	/* EOF */
-	if(!result)	return NULL;
-
-	err = OCIStmtFetch(result->stmthp, oracle.errhp, 1, OCI_FETCH_NEXT, OCI_DEFAULT);
-	if (OCI_NO_DATA == err)	{
-		return NULL;
-	}
-
-	return result->values;
-
-#endif /* HAVE_ORACLE */
-#ifdef HAVE_SQLITE3
-
-	/* EOF */
-	if(!result)	return NULL;
-
-	/* EOF */
-	if(result->curow >= result->nrow) return NULL;
-
-	if(!result->data) return NULL;
-
-	result->curow++; /* NOTE: First row == header row */
-
-	return &(result->data[result->curow * result->ncolumn]);
-#endif
-
-	return NULL;
-}
-
 /*
  * Execute SQL statement. For select statements only.
  */
 DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 {
-	char	*sql = NULL;
-	DB_RESULT result = NULL;
-	double	sec = 0;
+	char		*sql = NULL;
+	DB_RESULT	result = NULL;
+	double		sec = 0;
 
-#ifdef	HAVE_ORACLE
-	sword err = OCI_SUCCESS;
-	ub4 counter;
-#endif /* HAVE_ORACLE */
-#ifdef	HAVE_SQLITE3
-	int ret = FAIL;
-	char *error = NULL;
-#endif
-#ifdef	HAVE_POSTGRESQL
-	char	*error = NULL;
+#if defined(HAVE_IBM_DB2)
+	int		i;
+	SQLRETURN	ret = SQL_SUCCESS;
+#elif defined(HAVE_ORACLE)
+	sword		err = OCI_SUCCESS;
+	ub4		counter;
+#elif defined(HAVE_POSTGRESQL)
+	char		*error = NULL;
+#elif defined(HAVE_SQLITE3)
+	int		ret = FAIL;
+	char		*error = NULL;
 #endif
 
 	if (CONFIG_LOG_SLOW_QUERIES)
@@ -911,29 +831,82 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 
 	sql = zbx_dvsprintf(sql, fmt, args);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "Query [txnlev:%d] [%s]", txn_level, sql);
+	zabbix_log(LOG_LEVEL_DEBUG, "Query [txnlev:%d] [%s]", txn_level, sql);
 
-#ifdef	HAVE_MYSQL
-	if(!conn)
+#if defined(HAVE_IBM_DB2)
+	result = zbx_malloc(result, sizeof(ZBX_IBM_DB2_RESULT));
+	memset(result, 0, sizeof(ZBX_IBM_DB2_RESULT));
+
+	/* allocate a statement handle */
+	if (SUCCEED != zbx_ibm_db2_success(ret = SQLAllocHandle(SQL_HANDLE_STMT, ibm_db2.hdbc, &result->hstmt)))
+		goto error;
+
+	/* directly execute the statement */
+	if (SUCCEED != zbx_ibm_db2_success(ret = SQLExecDirect(result->hstmt, (SQLCHAR *)sql, SQL_NTS)))
+		goto error;
+
+	/* identify the number of output columns */
+	if (SUCCEED != zbx_ibm_db2_success(ret = SQLNumResultCols(result->hstmt, &result->ncolumn)))
+		goto error;
+
+	if (0 == result->ncolumn)
+		goto error;
+
+	result->nalloc = 0;
+	result->values = zbx_malloc(result->values, sizeof(char *) * result->ncolumn);
+	result->values_cli = zbx_malloc(result->values_cli, sizeof(char *) * result->ncolumn);
+	result->values_len = zbx_malloc(result->values_len, sizeof(SQLINTEGER) * result->ncolumn);
+
+	for (i = 0; i < result->ncolumn; i++)
+	{
+		/* get the display size for a column */
+		if (SUCCEED != zbx_ibm_db2_success(ret = SQLColAttribute(result->hstmt, (SQLSMALLINT)(i + 1), SQL_DESC_DISPLAY_SIZE,
+												NULL, 0, NULL, &result->values_len[i])))
+			goto error;
+
+		result->values_len[i] += 1; /* '\0'; */
+
+		/* allocate memory to bind a column */
+		result->values_cli[i] = zbx_malloc(NULL, result->values_len[i]);
+		result->nalloc++;
+
+		/* bind columns to program variables, converting all types to CHAR */
+		if (SUCCEED != zbx_ibm_db2_success(ret = SQLBindCol(result->hstmt, (SQLSMALLINT)(i + 1), SQL_C_CHAR,
+								result->values_cli[i], result->values_len[i], &result->values_len[i])))
+			goto error;
+	}
+error:
+	if (SUCCEED != zbx_ibm_db2_success(ret) || 0 == result->ncolumn)
+	{
+		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc);
+		zbx_ibm_db2_log_errors(SQL_HANDLE_STMT, result->hstmt);
+
+		IBM_DB2free_result(result);
+
+		result = (SQL_CD_TRUE == IBM_DB2server_status() ? NULL : (DB_RESULT)ZBX_DB_DOWN);
+	}
+#elif defined(HAVE_MYSQL)
+	if (NULL == conn)
 	{
 		zabbix_errlog(ERR_Z3003);
 		result = NULL;
 	}
 	else
 	{
-		if(mysql_query(conn,sql) != 0)
+		if (0 != mysql_query(conn, sql))
 		{
 			zabbix_errlog(ERR_Z3005, mysql_errno(conn), mysql_error(conn), sql);
-			switch(mysql_errno(conn)) {
-				case 	CR_CONN_HOST_ERROR:
-				case	CR_SERVER_GONE_ERROR:
-				case	CR_CONNECTION_ERROR:
-				case	CR_SERVER_LOST:
-				case	ER_SERVER_SHUTDOWN:
-				case	ER_ACCESS_DENIED_ERROR: /* wrong user or password */
-				case	ER_ILLEGAL_GRANT_FOR_TABLE: /* user without any privileges */
-				case	ER_TABLEACCESS_DENIED_ERROR:/* user without some privilege */
-				case	ER_UNKNOWN_ERROR:
+			switch (mysql_errno(conn))
+			{
+				case CR_CONN_HOST_ERROR:
+				case CR_SERVER_GONE_ERROR:
+				case CR_CONNECTION_ERROR:
+				case CR_SERVER_LOST:
+				case ER_SERVER_SHUTDOWN:
+				case ER_ACCESS_DENIED_ERROR: /* wrong user or password */
+				case ER_ILLEGAL_GRANT_FOR_TABLE: /* user without any privileges */
+				case ER_TABLEACCESS_DENIED_ERROR:/* user without some privilege */
+				case ER_UNKNOWN_ERROR:
 					result = (DB_RESULT)ZBX_DB_DOWN;
 					break;
 				default:
@@ -942,12 +915,117 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 			}
 		}
 		else
-		{
 			result = mysql_store_result(conn);
-		}
 	}
-#endif
-#ifdef	HAVE_POSTGRESQL
+#elif defined(HAVE_ORACLE)
+	result = zbx_malloc(NULL, sizeof(ZBX_OCI_DB_RESULT));
+	memset(result, 0, sizeof(ZBX_OCI_DB_RESULT));
+
+	err = OCIHandleAlloc((dvoid *)oracle.envhp, (dvoid **)&result->stmthp,
+		OCI_HTYPE_STMT, (size_t)0, (dvoid **)0);
+
+	if (err == OCI_SUCCESS)
+	{
+		err = OCIStmtPrepare(result->stmthp, oracle.errhp, (text *)sql,
+			(ub4)strlen((char *)sql),
+			(ub4)OCI_NTV_SYNTAX, (ub4)OCI_DEFAULT);
+	}
+
+	if (err == OCI_SUCCESS)
+	{
+		err = OCIStmtExecute(oracle.svchp, result->stmthp, oracle.errhp, (ub4)0, (ub4)0,
+			(CONST OCISnapshot *)NULL, (OCISnapshot *)NULL, OCI_COMMIT_ON_SUCCESS);
+		/*
+		if (err == OCI_NO_DATA)
+		{
+			OCI_DBfree_result(result);
+			result = NULL;
+			err = OCI_SUCCESS;
+		}
+		*/
+	}
+
+	if (err == OCI_SUCCESS)
+	{
+		/* Get the number of columns in the query */
+		err = OCIAttrGet((void *)result->stmthp, OCI_HTYPE_STMT, (void *)&result->ncolumn,
+				  (ub4 *)0, OCI_ATTR_PARAM_COUNT, oracle.errhp);
+	}
+
+	if (err != OCI_SUCCESS)
+		goto error;
+
+	assert(result->ncolumn > 0);
+
+	result->values = zbx_malloc(NULL, result->ncolumn * sizeof(char *));
+	memset(result->values, 0, result->ncolumn * sizeof(char *));
+
+	for (counter = 1; OCI_SUCCESS == err && counter <= result->ncolumn; counter++)
+	{
+		OCIParam	*parmdp = NULL;
+		OCIDefine	*defnp = NULL;
+		ub4		char_semantics;
+		ub2		col_width;
+
+		/* Request a parameter descriptor in the select-list */
+		err = OCIParamGet((void *)result->stmthp, OCI_HTYPE_STMT, oracle.errhp,
+			(void **)&parmdp, (ub4)counter);
+
+		if (err == OCI_SUCCESS)
+		{
+			/* Retrieve the length semantics for the column */
+			char_semantics = 0;
+			err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM,
+				(void *)&char_semantics, (ub4 *)0, (ub4)OCI_ATTR_CHAR_USED,
+				(OCIError *)oracle.errhp);
+		}
+
+		if (err == OCI_SUCCESS)
+		{
+			col_width = 0;
+			if (char_semantics)
+			{
+				/* Retrieve the column width in characters */
+				err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM,
+					(void *)&col_width, (ub4 *)0, (ub4)OCI_ATTR_CHAR_SIZE,
+					(OCIError *)oracle.errhp);
+			}
+			else
+			{
+				/* Retrieve the column width in bytes */
+				err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM,
+					(void *)&col_width,(ub4 *)0, (ub4)OCI_ATTR_DATA_SIZE,
+					(OCIError *)oracle.errhp);
+			}
+		}
+		col_width++;
+
+		result->values[counter - 1] = zbx_malloc(NULL, col_width);
+		memset(result->values[counter - 1], 0, col_width);
+
+		if (err == OCI_SUCCESS)
+		{
+			/* represent any data as characters */
+			err = OCIDefineByPos(result->stmthp, &defnp, oracle.errhp, counter,
+				(dvoid *)result->values[counter - 1], col_width, SQLT_STR,
+				(dvoid *)0, (ub2 *)0, (ub2 *)0, OCI_DEFAULT);
+		}
+
+		/* free cell descriptor */
+		OCIDescriptorFree(parmdp, OCI_DTYPE_PARAM);
+		parmdp = NULL;
+	}
+
+error:
+	if (err != OCI_SUCCESS)
+	{
+		zabbix_errlog(ERR_Z3005, err, zbx_oci_error(err), sql);
+
+		OCI_DBfree_result(result);
+
+		result = (OCI_SERVER_NORMAL == OCI_DBserver_status() ? NULL : (DB_RESULT)ZBX_DB_DOWN);
+	}
+#elif defined(HAVE_POSTGRESQL)
 	result = zbx_malloc(NULL, sizeof(ZBX_PG_DB_RESULT));
 	result->pg_result = PQexec(conn, sql);
 	result->values = NULL;
@@ -971,107 +1049,7 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 	}
 	else	/* init rownum */
 		result->row_num = PQntuples(result->pg_result);
-#endif
-#ifdef	HAVE_ORACLE
-	result = zbx_malloc(NULL, sizeof(ZBX_OCI_DB_RESULT));
-	memset (result, 0, sizeof(ZBX_OCI_DB_RESULT));
-
-	err = OCIHandleAlloc( (dvoid *) oracle.envhp, (dvoid **) &result->stmthp,
-		OCI_HTYPE_STMT, (size_t) 0, (dvoid **) 0);
-
-	if (err == OCI_SUCCESS) {
-		err = OCIStmtPrepare(result->stmthp, oracle.errhp, (text *)sql,
-			(ub4) strlen((char *) sql),
-			(ub4) OCI_NTV_SYNTAX, (ub4) OCI_DEFAULT);
-	}
-
-	if (err == OCI_SUCCESS) {
-		err = OCIStmtExecute(oracle.svchp, result->stmthp, oracle.errhp, (ub4) 0, (ub4) 0,
-			(CONST OCISnapshot *) NULL, (OCISnapshot *) NULL, OCI_COMMIT_ON_SUCCESS);
-		/*
-		if (err == OCI_NO_DATA) {
-			OCI_DBfree_result (result);
-			result = NULL;
-			err = OCI_SUCCESS;
-		}
-		*/
-	}
-
-	if (err == OCI_SUCCESS) {
-		/* Get the number of columns in the query */
-		err = OCIAttrGet((void *)result->stmthp, OCI_HTYPE_STMT, (void *)&result->ncolumn,
-				  (ub4 *)0, OCI_ATTR_PARAM_COUNT, oracle.errhp);
-	}
-
-	if (err != OCI_SUCCESS)
-		goto error;
-
-	assert(result->ncolumn > 0);
-
-	result->values = zbx_malloc (NULL, result->ncolumn * sizeof (char *));
-	memset (result->values, 0, result->ncolumn * sizeof (char *));
-
-	for (counter = 1; (err == OCI_SUCCESS) && (counter <= result->ncolumn); counter++)
-	{
-		OCIParam *parmdp = NULL;
-		OCIDefine *defnp = NULL;
-		ub4 char_semantics;
-		ub2 col_width;
-
-		/* Request a parameter descriptor in the select-list */
-		err = OCIParamGet((void *)result->stmthp, OCI_HTYPE_STMT, oracle.errhp,
-			(void **)&parmdp, (ub4) counter);
-
-		if (err == OCI_SUCCESS) {
-			/* Retrieve the length semantics for the column */
-			char_semantics = 0;
-			err = OCIAttrGet((void*) parmdp, (ub4) OCI_DTYPE_PARAM,
-				(void*) &char_semantics,(ub4 *) 0, (ub4) OCI_ATTR_CHAR_USED,
-				(OCIError *) oracle.errhp  );
-		}
-
-		if (err == OCI_SUCCESS) {
-			col_width = 0;
-			if (char_semantics) {
-				/* Retrieve the column width in characters */
-				err = OCIAttrGet((void*) parmdp, (ub4) OCI_DTYPE_PARAM,
-					(void*) &col_width, (ub4 *) 0, (ub4) OCI_ATTR_CHAR_SIZE,
-					(OCIError *) oracle.errhp  );
-			}
-			else {
-				/* Retrieve the column width in bytes */
-				err = OCIAttrGet((void*) parmdp, (ub4) OCI_DTYPE_PARAM,
-					(void*) &col_width,(ub4 *) 0, (ub4) OCI_ATTR_DATA_SIZE,
-					(OCIError *) oracle.errhp  );
-			}
-		}
-		col_width++;
-
-		result->values[counter - 1] = zbx_malloc (NULL, col_width);
-		memset (result->values[counter - 1], 0, col_width);
-
-		if (err == OCI_SUCCESS) {
-			/* represent any data as characters */
-			err = OCIDefineByPos(result->stmthp, &defnp, oracle.errhp, counter,
-				(dvoid *) result->values[counter - 1], col_width, SQLT_STR,
-				(dvoid *) 0, (ub2 *)0, (ub2 *)0, OCI_DEFAULT);
-		}
-
-		/* free cell descriptor */
-		OCIDescriptorFree(parmdp, OCI_DTYPE_PARAM);
-		parmdp = NULL;
-	}
-
-error:
-	if (err != OCI_SUCCESS) {
-		zabbix_errlog(ERR_Z3005, err, zbx_oci_error(err), sql);
-
-		OCI_DBfree_result(result);
-
-		result = (OCI_SERVER_NORMAL == OCI_DBserver_status() ? NULL : (DB_RESULT)ZBX_DB_DOWN);
-	}
-#endif /* HAVE_ORACLE */
-#ifdef HAVE_SQLITE3
+#elif defined(HAVE_SQLITE3)
 	if (0 == txn_level)
 	{
 		if (PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
@@ -1112,13 +1090,13 @@ lbl_get_table:
 	{
 		php_sem_release(&sqlite_access);
 	}
-#endif
+#endif	/* HAVE_SQLITE3 */
 
 	if (CONFIG_LOG_SLOW_QUERIES)
 	{
 		sec = zbx_time() - sec;
-		if(sec > (double)CONFIG_LOG_SLOW_QUERIES / 1000.0)
-			zabbix_log( LOG_LEVEL_WARNING, "Slow query: " ZBX_FS_DBL " sec, \"%s\"", sec, sql);
+		if (sec > (double)CONFIG_LOG_SLOW_QUERIES / 1000.0)
+			zabbix_log(LOG_LEVEL_WARNING, "Slow query: " ZBX_FS_DBL " sec, \"%s\"", sec, sql);
 	}
 
 	zbx_free(sql);
@@ -1130,16 +1108,288 @@ lbl_get_table:
  */
 DB_RESULT	zbx_db_select_n(const char *query, int n)
 {
-#ifdef	HAVE_MYSQL
+#if defined(HAVE_IBM_DB2)
+	return zbx_db_select("%s fetch first %d rows only", query, n);
+#elif defined(HAVE_MYSQL)
 	return zbx_db_select("%s limit %d", query, n);
-#endif
-#ifdef	HAVE_POSTGRESQL
-	return zbx_db_select("%s limit %d", query, n);
-#endif
-#ifdef	HAVE_ORACLE
+#elif defined(HAVE_ORACLE)
 	return zbx_db_select("select * from (%s) where rownum<=%d", query, n);
-#endif /* HAVE_ORACLE */
-#ifdef	HAVE_SQLITE3
+#elif defined(HAVE_POSTGRESQL)
+	return zbx_db_select("%s limit %d", query, n);
+#elif defined(HAVE_SQLITE3)
 	return zbx_db_select("%s limit %d", query, n);
 #endif
 }
+
+DB_ROW	zbx_db_fetch(DB_RESULT result)
+{
+#if defined(HAVE_IBM_DB2)
+	int	i;
+
+	if (NULL == result)
+		return NULL;
+
+	if (SUCCEED != zbx_ibm_db2_success(SQLFetch(result->hstmt))) /* e.g., SQL_NO_DATA_FOUND */
+		return NULL;
+
+	for (i = 0; i < result->ncolumn; i++)
+	{
+		result->values[i] = (SQL_NULL_DATA == result->values_len[i] ? NULL : result->values_cli[i]);
+	}
+
+	return result->values;
+#elif defined(HAVE_MYSQL)
+	if (NULL == result)
+		return NULL;
+
+	return mysql_fetch_row(result);
+#elif defined(HAVE_ORACLE)
+	if (NULL == result)
+		return NULL;
+
+	if (OCI_NO_DATA == OCIStmtFetch(result->stmthp, oracle.errhp, 1, OCI_FETCH_NEXT, OCI_DEFAULT))
+		return NULL;
+
+	return result->values;
+#elif defined(HAVE_POSTGRESQL)
+	/* EOF */
+	if (NULL == result)
+		return NULL;
+
+	/* free old data */
+	if (NULL != result->values)
+		zbx_free(result->values);
+
+	/* EOF */
+	if (result->cursor == result->row_num)
+		return NULL;
+
+	/* init result */
+	result->fld_num = PQnfields(result->pg_result);
+
+	if (result->fld_num > 0)
+	{
+		int	i;
+		
+		result->values = zbx_malloc(result->values, sizeof(char *) * result->fld_num);
+
+		for (i = 0; i < result->fld_num; i++)
+		{
+			if (PQgetisnull(result->pg_result, result->cursor, i))
+			{
+				result->values[i] = NULL;
+			}
+			else
+			{
+				result->values[i] = PQgetvalue(result->pg_result, result->cursor, i);
+				if (PQftype(result->pg_result, i) == ZBX_PG_BYTEAOID) /* binary data type BYTEAOID */
+					zbx_pg_unescape_bytea((u_char *)result->values[i]);
+			}
+		}
+	}
+
+	result->cursor++;
+
+	return result->values;
+#elif defined(HAVE_SQLITE3)
+	/* EOF */
+	if (NULL == result)
+		return NULL;
+
+	/* EOF */
+	if (result->curow >= result->nrow)
+		return NULL;
+
+	if (NULL == result->data)
+		return NULL;
+
+	result->curow++; /* NOTE: first row == header row */
+
+	return &(result->data[result->curow * result->ncolumn]);
+#endif
+}
+
+int	zbx_db_is_null(const char *field)
+{
+	int	ret = FAIL;
+
+	if (NULL == field)		ret = SUCCEED;
+#if defined(HAVE_ORACLE)
+	else if ('\0' == field[0])	ret = SUCCEED;
+#endif
+	return ret;
+}
+
+#if defined(HAVE_IBM_DB2)
+/* in zbxdb.h - #define DBfree_result   IBM_DB2free_result */
+void	IBM_DB2free_result(DB_RESULT result)
+{
+	if (NULL == result)
+		return;
+
+	if (NULL != result->values_cli)
+	{
+		int	i;
+
+		for (i = 0; i < result->nalloc; i++)
+		{
+			zbx_free(result->values_cli[i]);
+		}
+
+		zbx_free(result->values);
+		zbx_free(result->values_cli);
+		zbx_free(result->values_len);
+	}
+
+	if (result->hstmt)
+		SQLFreeHandle(SQL_HANDLE_STMT, result->hstmt);
+
+	zbx_free(result);
+}
+#elif defined(HAVE_ORACLE)
+/* in zbxdb.h - #define DBfree_result   OCI_DBfree_result */
+void	OCI_DBfree_result(DB_RESULT result)
+{
+	if (NULL == result)
+		return;
+
+	if (NULL != result->values)
+	{
+		int	i;
+
+		for (i = 0; i < result->ncolumn; i++)
+		{
+			zbx_free(result->values[i]);
+		}
+
+		zbx_free(result->values);
+	}
+
+	if (result->stmthp)
+		OCIHandleFree((dvoid *)result->stmthp, OCI_HTYPE_STMT);
+
+	zbx_free(result);
+}
+#elif defined(HAVE_POSTGRESQL)
+/* in zbxdb.h - #define DBfree_result   PG_DBfree_result */
+void	PG_DBfree_result(DB_RESULT result)
+{
+	if (NULL == result)
+		return;
+
+	if (NULL != result->values)
+	{
+		result->fld_num = 0;
+		zbx_free(result->values);
+		result->values = NULL;
+	}
+
+	PQclear(result->pg_result);
+	zbx_free(result);
+}
+#elif defined(HAVE_SQLITE3)
+/* in zbxdb.h - #define DBfree_result   SQ_DBfree_result */
+void	SQ_DBfree_result(DB_RESULT result)
+{
+	if (NULL == result)
+		return;
+
+	if (NULL != result->data)
+	{
+		sqlite3_free_table(result->data);
+	}
+
+	zbx_free(result);
+}
+#endif	/* HAVE_SQLITE3 */
+
+#if defined(HAVE_IBM_DB2)
+/* server status: SQL_CD_TRUE or SQL_CD_FALSE */
+int	IBM_DB2server_status()
+{
+	int	server_status = SQL_CD_TRUE;
+
+	if (SUCCEED != zbx_ibm_db2_success(SQLGetConnectAttr(ibm_db2.hdbc, SQL_ATTR_CONNECTION_DEAD,
+								&server_status, SQL_IS_POINTER, NULL)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Could not determine IBM DB2 server status, assuming not connected");
+	}
+
+	return (SQL_CD_FALSE == server_status ? SQL_CD_TRUE : SQL_CD_FALSE);
+}
+
+int	zbx_ibm_db2_success(SQLRETURN ret)
+{
+	return (SQL_SUCCESS == ret || SQL_SUCCESS_WITH_INFO == ret ? SUCCEED : FAIL);
+}
+
+int	zbx_ibm_db2_success_ext(SQLRETURN ret)
+{
+	return (SQL_SUCCESS == ret || SQL_SUCCESS_WITH_INFO == ret || SQL_NO_DATA_FOUND == ret ? SUCCEED : FAIL);
+}
+
+void	zbx_ibm_db2_log_errors(SQLSMALLINT htype, SQLHANDLE hndl)
+{
+	SQLCHAR		message[SQL_MAX_MESSAGE_LENGTH + 1];
+	SQLCHAR		sqlstate[SQL_SQLSTATE_SIZE + 1];
+	SQLINTEGER	sqlcode;
+	SQLSMALLINT	length, i = 1;
+
+	while (SQL_SUCCESS == SQLGetDiagRec(htype, hndl, i++, sqlstate, &sqlcode, message, SQL_MAX_MESSAGE_LENGTH + 1, &length))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "IBM DB2 ERROR: [%d] %s [%s]", (int)sqlcode, sqlstate, message);
+	}
+}
+#elif defined(HAVE_ORACLE)
+/* server status: OCI_SERVER_NORMAL or OCI_SERVER_NOT_CONNECTED */
+ub4	OCI_DBserver_status()
+{
+	sword	err;
+	ub4	server_status = OCI_SERVER_NOT_CONNECTED; 
+
+	err = OCIAttrGet((void *)oracle.srvhp, OCI_HTYPE_SERVER, (void *)&server_status,
+			(ub4 *)0, OCI_ATTR_SERVER_STATUS, (OCIError *)oracle.errhp);
+	
+	if (OCI_SUCCESS != err)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Could not determine Oracle server status, assuming not connected");
+	}
+
+	return server_status;
+}
+
+const char	*zbx_oci_error(sword status)
+{
+	static char	errbuf[512];
+	sb4		errcode = 0;
+
+	errbuf[0] = '\0';
+	switch (status)
+	{
+		case OCI_SUCCESS_WITH_INFO:
+			zbx_snprintf(errbuf, sizeof(errbuf), "%s", "OCI_SUCCESS_WITH_INFO");
+			break;
+		case OCI_NEED_DATA:
+			zbx_snprintf(errbuf, sizeof(errbuf), "%s", "OCI_NEED_DATA");
+			break;
+		case OCI_NO_DATA:
+			zbx_snprintf(errbuf, sizeof(errbuf), "%s", "OCI_NODATA");
+			break;
+		case OCI_ERROR:
+			OCIErrorGet((dvoid *)oracle.errhp, (ub4)1, (text *)NULL, &errcode,
+				(text *)errbuf, (ub4)sizeof(errbuf), OCI_HTYPE_ERROR);
+			break;
+		case OCI_INVALID_HANDLE:
+			zbx_snprintf(errbuf, sizeof(errbuf), "%s", "OCI_INVALID_HANDLE");
+			break;
+		case OCI_STILL_EXECUTING:
+			zbx_snprintf(errbuf, sizeof(errbuf), "%s", "OCI_STILL_EXECUTING");
+			break;
+		case OCI_CONTINUE:
+			zbx_snprintf(errbuf, sizeof(errbuf), "%s", "OCI_CONTINUE");
+			break;
+	}
+
+	return errbuf;
+}
+#endif	/* HAVE_ORACLE */

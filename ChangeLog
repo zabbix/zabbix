@@ -1,10 +1,13 @@
-Changes for 1.9
+Changes for 1.9.1
 
- - [ZBX-3097] fixed nanosecond related bug in messaging (KB)
+ - [ZBX-3130] fixed bug when creating custom graph: host items now can be added (KB)
+
+Changes for 1.9.0
+
+ - [DEV-477] added support of low-level discovery of file systems, network interfaces and SNMP OID's (Sasha,Vedmak)
  - [DEV-490] made graph legend optional (Aly)
  - [DEV-483] added templated screens (Aly)
  - [DEV-485] added multiple urls for map elements (Vedmak)
- - [ZBX-3045] fixed deleting mediatype (Vedmak)
  - [DEV-471] field graph_theme.noneworktimecolor renamed to nonworktimecolor (Sasha)
  - [DEV-471] database integrity - added foreign keys (Sasha,Vedmak)
  - [ZBXNEXT-483] added vfs.file.contents[file,encoding] check (asaveljevs)
@@ -15,6 +18,18 @@ Changes for 1.9
 
 Changes for 1.8.4rc2
 
+ - [ZBX-2349] Unicode support for macros and web scenario steps (KB)
+ - [ZBX-3137] fixed errors related to deleting and application that is used in a web scenario (KB)
+ - [ZBXNEXT-538] added support for IBM DB2 (Aly,asaveljevs,Sasha)
+ - [ZBX-1362] optimized alert performance (KB)
+ - [ZBX-2852] fixed map not updating in slideshow (Vedmak)
+ - [ZBX-1346] update example agent daemon configuration file for Windows with parameters from Zabbix manual (Richlv)
+ - [ZBX-2984] fixed incorrect trigger line in graphs. For line drawing was used axis from first item not trigger item (Vedmak)
+ - [ZBX-3059] different titles for popup menu depending on data type (KB)
+ - [ZBX-2861] fixed error when adding users to usergroups (KB)
+ - [ZBX-1492] added confirmation dialog when deleting macros (KB)
+ - [ZBX-3135] add an example for using standard input in zabbix_sender manpage (Richlv)
+ - [ZBX-2616] bundled DejaVu font upgraded from 2.31 to 2.32 (Richlv)
  - [ZBX-2630] fixed ability to translate various strings in the frontend depending on their context (Richlv)
  - [ZBX-3091] fixed error when update proxy (Vedmak)
  - [ZBX-3042] fixed submitParent field error (KB)

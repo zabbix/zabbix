@@ -35,6 +35,10 @@ class CObject{
 	return $res;
 	}
 
+	public function __toString(){
+		return $this->toString();
+	}
+
 	public function show($destroy=true){
 		echo $this->toString($destroy);
 	}

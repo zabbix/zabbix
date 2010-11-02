@@ -841,13 +841,14 @@ switch($itemType) {
 		$sortfield = getPageSortField('description');
 		$sortorder = getPageSortOrder();
 		$options = array(
-			'filter' => array(),
+			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 			'search' => array(),
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => 1,
 			'select_hosts' => API_OUTPUT_EXTEND,
 			'select_triggers' => API_OUTPUT_EXTEND,
 			'select_applications' => API_OUTPUT_EXTEND,
+			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
@@ -1038,7 +1039,15 @@ switch($itemType) {
 				$description[] = ':';
 			}
 			$item['description_expanded'] = item_description($item);
-			$description[] = new CLink($item['description_expanded'], '?form=update&itemid='.$item['itemid']);
+
+			if(!empty($item['discoveryRule'])){
+				$description[] = new CLink($item['discoveryRule']['description'], 'disc_prototypes.php?parent_discoveryid='.
+					$item['discoveryRule']['itemid'], 'discoveryName');
+				$description[] = ':'.$item['description_expanded'];
+			}
+			else{
+				$description[] = new CLink($item['description_expanded'], '?form=update&itemid='.$item['itemid']);
+			}
 
 			$status = new CCol(new CLink(item_status2str($item['status']), '?group_itemid='.$item['itemid'].'&go='.
 				($item['status']? 'activate':'disable'), item_status2style($item['status'])));
@@ -1086,7 +1095,12 @@ switch($itemType) {
 				}
 
 				$trigger['description_expanded'] = expand_trigger_description($triggerid);
-				$tr_description[] = new CLink($trigger['description_expanded'], 'triggers.php?form=update&triggerid='.$triggerid);
+				if($trigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED){
+					$tr_description[] = new CSpan($trigger['description_expanded']);
+				}
+				else{
+					$tr_description[] = new CLink($trigger['description_expanded'], 'triggers.php?form=update&triggerid='.$triggerid);
+				}
 
 				if($trigger['value_flags'] == TRIGGER_VALUE_FLAG_UNKNOWN) $trigger['error'] = '';
 
@@ -1161,8 +1175,11 @@ switch($itemType) {
 				$menuicon = SPACE;
 			}
 
+			$cb = new CCheckBox('group_itemid['.$item['itemid'].']',null,null,$item['itemid']);
+			$cb->setEnabled(empty($item['discoveryRule']));
+
 			$table->addRow(array(
-				new CCheckBox('group_itemid['.$item['itemid'].']',null,null,$item['itemid']),
+				$cb,
 				$menuicon,
 				$host,
 				$description,

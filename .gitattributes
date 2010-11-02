@@ -37,6 +37,7 @@ create/data/images/UPS.png -text svneol=unset#unset
 create/data/images/UPS_small.png -text svneol=unset#unset
 create/data/images/Workstation.png -text svneol=unset#unset
 create/data/images/Workstation_small.png -text svneol=unset#unset
+create/data/images_db2.sql -text
 create/schema/gen_php.php -text
 frontends/php/api/.htaccess -text
 frontends/php/api/classes/class.apiexception.php -text
@@ -91,7 +92,10 @@ frontends/php/conf/maintenance.inc.php -text
 frontends/php/conf/zabbix.conf.php.example -text
 frontends/php/dashboard.php -text
 frontends/php/dashconf.php -text
+frontends/php/disc_prototypes.php -text
 frontends/php/fonts/DejaVuSans.ttf -text
+frontends/php/graph_prototypes.php -text
+frontends/php/host_discovery.php -text
 frontends/php/host_screen.php -text
 frontends/php/hostgroups.php -text
 frontends/php/hosts_mon.php -text
@@ -380,6 +384,7 @@ frontends/php/styles/ul.css -text
 frontends/php/templates.php -text
 frontends/php/tr_logform.php -text
 frontends/php/tr_testexpr.php -text
+frontends/php/trigger_prototypes.php -text
 frontends/php/usergrps.php -text
 frontends/php/warning.php -text
 include/dbcache.h -text
@@ -395,6 +400,7 @@ include/zbxjson.h -text
 include/zbxmacros.h -text
 include/zbxmedia.h -text
 include/zbxodbc.h -text
+m4/ax_lib_ibm_db2.m4 -text
 m4/ax_lib_oracle_oci.m4 -text
 m4/iconv.m4 -text
 m4/libiodbc.m4 -text
@@ -814,6 +820,7 @@ upgrades/dbpatches/2.0/mysql/patch/events.sql -text
 upgrades/dbpatches/2.0/mysql/patch/expressions.sql -text
 upgrades/dbpatches/2.0/mysql/patch/functions.sql -text
 upgrades/dbpatches/2.0/mysql/patch/globalmacro.sql -text
+upgrades/dbpatches/2.0/mysql/patch/graph_discovery.sql -text
 upgrades/dbpatches/2.0/mysql/patch/graph_theme.sql -text
 upgrades/dbpatches/2.0/mysql/patch/graphs.sql -text
 upgrades/dbpatches/2.0/mysql/patch/graphs_items.sql -text
@@ -831,6 +838,7 @@ upgrades/dbpatches/2.0/mysql/patch/httptest.sql -text
 upgrades/dbpatches/2.0/mysql/patch/httptestitem.sql -text
 upgrades/dbpatches/2.0/mysql/patch/ids.sql -text
 upgrades/dbpatches/2.0/mysql/patch/images.sql -text
+upgrades/dbpatches/2.0/mysql/patch/item_discovery.sql -text
 upgrades/dbpatches/2.0/mysql/patch/items.sql -text
 upgrades/dbpatches/2.0/mysql/patch/items_applications.sql -text
 upgrades/dbpatches/2.0/mysql/patch/maintenances.sql -text
@@ -868,6 +876,7 @@ upgrades/dbpatches/2.0/mysql/patch/sysmaps_link_triggers.sql -text
 upgrades/dbpatches/2.0/mysql/patch/sysmaps_links.sql -text
 upgrades/dbpatches/2.0/mysql/patch/timeperiods.sql -text
 upgrades/dbpatches/2.0/mysql/patch/trigger_depends.sql -text
+upgrades/dbpatches/2.0/mysql/patch/trigger_discovery.sql -text
 upgrades/dbpatches/2.0/mysql/patch/triggers.sql -text
 upgrades/dbpatches/2.0/mysql/patch/user_history.sql -text
 upgrades/dbpatches/2.0/mysql/patch/users.sql -text
@@ -904,6 +913,7 @@ upgrades/dbpatches/2.0/oracle/patch/events.sql -text
 upgrades/dbpatches/2.0/oracle/patch/expressions.sql -text
 upgrades/dbpatches/2.0/oracle/patch/functions.sql -text
 upgrades/dbpatches/2.0/oracle/patch/globalmacro.sql -text
+upgrades/dbpatches/2.0/oracle/patch/graph_discovery.sql -text
 upgrades/dbpatches/2.0/oracle/patch/graph_theme.sql -text
 upgrades/dbpatches/2.0/oracle/patch/graphs.sql -text
 upgrades/dbpatches/2.0/oracle/patch/graphs_items.sql -text
@@ -921,6 +931,7 @@ upgrades/dbpatches/2.0/oracle/patch/httptest.sql -text
 upgrades/dbpatches/2.0/oracle/patch/httptestitem.sql -text
 upgrades/dbpatches/2.0/oracle/patch/ids.sql -text
 upgrades/dbpatches/2.0/oracle/patch/images.sql -text
+upgrades/dbpatches/2.0/oracle/patch/item_discovery.sql -text
 upgrades/dbpatches/2.0/oracle/patch/items.sql -text
 upgrades/dbpatches/2.0/oracle/patch/items_applications.sql -text
 upgrades/dbpatches/2.0/oracle/patch/maintenances.sql -text
@@ -958,6 +969,7 @@ upgrades/dbpatches/2.0/oracle/patch/sysmaps_link_triggers.sql -text
 upgrades/dbpatches/2.0/oracle/patch/sysmaps_links.sql -text
 upgrades/dbpatches/2.0/oracle/patch/timeperiods.sql -text
 upgrades/dbpatches/2.0/oracle/patch/trigger_depends.sql -text
+upgrades/dbpatches/2.0/oracle/patch/trigger_discovery.sql -text
 upgrades/dbpatches/2.0/oracle/patch/triggers.sql -text
 upgrades/dbpatches/2.0/oracle/patch/user_history.sql -text
 upgrades/dbpatches/2.0/oracle/patch/users.sql -text
@@ -993,6 +1005,7 @@ upgrades/dbpatches/2.0/postgresql/patch/events.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/expressions.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/functions.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/globalmacro.sql -text
+upgrades/dbpatches/2.0/postgresql/patch/graph_discovery.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/graph_theme.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/graphs.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/graphs_items.sql -text
@@ -1010,6 +1023,7 @@ upgrades/dbpatches/2.0/postgresql/patch/httptest.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/httptestitem.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/ids.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/images.sql -text
+upgrades/dbpatches/2.0/postgresql/patch/item_discovery.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/items.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/items_applications.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/maintenances.sql -text
@@ -1047,6 +1061,7 @@ upgrades/dbpatches/2.0/postgresql/patch/sysmaps_link_triggers.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/sysmaps_links.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/timeperiods.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/trigger_depends.sql -text
+upgrades/dbpatches/2.0/postgresql/patch/trigger_discovery.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/triggers.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/user_history.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/users.sql -text

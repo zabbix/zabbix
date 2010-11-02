@@ -299,8 +299,9 @@
 			'graphs' => 'graphs',
 			'applications' => 'applications',
 			'screens' => 'screens',
+			'discoveries' => 'discoveries'
 		);
-		
+
 		if(!is_null($current))
 			unset($elements[$current]);
 
@@ -314,6 +315,7 @@
 		if(isset($elements['graphs'])) $header_host_opt['select_graphs'] = API_OUTPUT_COUNT;
 		if(isset($elements['applications'])) $header_host_opt['select_applications'] = API_OUTPUT_COUNT;
 		if(isset($elements['screens'])) $header_host_opt['selectScreens'] = API_OUTPUT_COUNT;
+		if(isset($elements['discoveries'])) $header_host_opt['select_discoveries'] = API_OUTPUT_COUNT;
 
 		$header_host = CHost::get($header_host_opt);
 		$header_host = array_pop($header_host);
@@ -345,6 +347,10 @@
 
 		if(isset($elements['applications'])){
 			$list->addItem(array(new CLink(S_APPLICATIONS, 'applications.php?hostid='.$header_host['hostid']),' ('.$header_host['applications'].')'));
+		}
+
+		if(isset($elements['discoveries'])){
+			$list->addItem(array(new CLink(S_DISCOVERY, 'host_discovery.php?hostid='.$header_host['hostid']),' ('.$header_host['discoveries'].')'));
 		}
 
 

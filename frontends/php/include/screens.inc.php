@@ -1218,7 +1218,7 @@ require_once('include/js.inc.php');
 				}
 				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_MAP) ){
 
-					$image_map = new CImg("map.php?noedit=1&sysmapid=$resourceid"."&width=$width&height=$height");
+					$image_map = new CImg("map.php?noedit=1&sysmapid=$resourceid"."&width=$width&height=$height&curtime=".time());
 
 					if($editmode == 0){
 						$options = array(

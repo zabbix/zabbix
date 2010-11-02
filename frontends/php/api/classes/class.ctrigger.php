@@ -65,7 +65,7 @@ class CTrigger extends CZBXAPI{
 			'group' => array(),
 			'order' => array(),
 			'limit' => null,
-			);
+		);
 
 		$def_options = array(
 			'nodeids'				=> null,
@@ -75,6 +75,7 @@ class CTrigger extends CZBXAPI{
 			'triggerids'			=> null,
 			'itemids'				=> null,
 			'applicationids'		=> null,
+			'discoveryids'			=> null,
 			'functions'				=> null,
 			'inherited'				=> null,
 			'templated'				=> null,
@@ -113,6 +114,7 @@ class CTrigger extends CZBXAPI{
 			'select_items'			=> null,
 			'select_functions'		=> null,
 			'select_dependencies'	=> null,
+			'selectDiscoveryRule'	=> null,
 			'countOutput'			=> null,
 			'groupCount'			=> null,
 			'preservekeys'			=> null,
@@ -287,6 +289,10 @@ class CTrigger extends CZBXAPI{
 			$sql_parts['from']['functions'] = 'functions f';
 			$sql_parts['where']['itemid'] = DBcondition('f.itemid', $options['itemids']);
 			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
+
+			if(!is_null($options['groupCount'])){
+				$sql_parts['group']['f'] = 'f.itemid';
+			}
 		}
 
 // applicationids
@@ -304,6 +310,24 @@ class CTrigger extends CZBXAPI{
 			$sql_parts['where']['ia'] = 'i.hostid=a.hostid';
 			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
 			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
+		}
+
+// discoveryids
+		if(!is_null($options['discoveryids'])){
+			zbx_value2array($options['discoveryids']);
+
+			if($options['output'] != API_OUTPUT_SHORTEN){
+				$sql_parts['select']['itemid'] = 'id.parent_itemid';
+			}
+			$sql_parts['from']['functions'] = 'functions f';
+			$sql_parts['from']['item_discovery'] = 'item_discovery id';
+			$sql_parts['where']['fid'] = 'f.itemid=id.itemid';
+			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
+			$sql_parts['where'][] = DBcondition('id.parent_itemid', $options['discoveryids']);
+
+			if(!is_null($options['groupCount'])){
+				$sql_parts['group']['id'] = 'id.parent_itemid';
+			}
 		}
 
 // functions
@@ -438,7 +462,13 @@ class CTrigger extends CZBXAPI{
 		}
 
 // --- FILTER ---
+		if(is_null($options['filter']))
+			$options['filter'] = array();
+
 		if(is_array($options['filter'])){
+			if(!array_key_exists('flags', $options['filter']))
+				$options['filter']['flags'] = array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED);
+
 			zbx_db_filter('triggers t', $options, $sql_parts);
 
 			if(isset($options['filter']['host']) && !is_null($options['filter']['host'])){
@@ -456,12 +486,12 @@ class CTrigger extends CZBXAPI{
 
 			if(isset($options['filter']['hostid']) && !is_null($options['filter']['hostid'])){
 				zbx_value2array($options['filter']['hostid']);
-				
+
 				$sql_parts['from']['functions'] = 'functions f';
 				$sql_parts['from']['items'] = 'items i';
 				$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
 				$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
-				
+
 				$sql_parts['where']['hostid'] = DBcondition('i.hostid', $options['filter']['hostid']);
 			}
 		}
@@ -616,6 +646,9 @@ class CTrigger extends CZBXAPI{
 					}
 					if(!is_null($options['select_dependencies']) && !isset($result[$trigger['triggerid']]['dependencies'])){
 						$result[$trigger['triggerid']]['dependencies'] = array();
+					}
+					if(!is_null($options['selectDiscoveryRule']) && !isset($result[$trigger['triggerid']]['discoveryRule'])){
+						$result[$trigger['triggerid']]['discoveryRule'] = array();
 					}
 
 // groups
@@ -856,6 +889,7 @@ Copt::memoryPick();
 				'nodeids' => $nodeids,
 				'output' => $options['select_items'],
 				'triggerids' => $triggerids,
+				'filter' => array('flags' => null),
 				'webitems' => 1,
 				'nopermissions' => 1,
 				'preservekeys' => 1
@@ -866,6 +900,41 @@ Copt::memoryPick();
 				unset($item['triggers']);
 				foreach($itriggers as $num => $trigger){
 					$result[$trigger['triggerid']]['items'][] = $item;
+				}
+			}
+		}
+
+// Adding discoveryRule
+		if(!is_null($options['selectDiscoveryRule'])){
+			$ruleids = $rule_map = array();
+
+			$sql = 'SELECT id.parent_itemid, td.triggerid'.
+					' FROM trigger_discovery td, item_discovery id, functions f'.
+					' WHERE '.DBcondition('td.triggerid', $triggerids).
+						' AND td.parent_triggerid=f.triggerid'.
+						' AND f.itemid=id.itemid';
+			$db_rules = DBselect($sql);
+			while($rule = DBfetch($db_rules)){
+				$ruleids[$rule['parent_itemid']] = $rule['parent_itemid'];
+				$rule_map[$rule['triggerid']] = $rule['parent_itemid'];
+			}
+
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'itemids' => $ruleids,
+				'filter' => array('flags' => null),
+				'nopermissions' => 1,
+				'preservekeys' => 1,
+			);
+
+			if(is_array($options['selectDiscoveryRule']) || str_in_array($options['selectDiscoveryRule'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['selectDiscoveryRule'];
+				$discoveryRules = CItem::get($obj_params);
+
+				foreach($result as $triggerid => $trigger){
+					if(isset($rule_map[$triggerid]) && isset($discoveryRules[$rule_map[$triggerid]])){
+						$result[$triggerid]['discoveryRule'] = $discoveryRules[$rule_map[$triggerid]];
+					}
 				}
 			}
 		}
@@ -1100,7 +1169,8 @@ COpt::memoryPick();
 					'status'	=> TRIGGER_STATUS_DISABLED,
 					'comments'	=> '',
 					'url'		=> '',
-					'templateid'=> 0
+					'templateid'=> 0,
+					'flags' => 0,
 				);
 
 				if(!check_db_fields($trigger_db_fields, $trigger)){
@@ -1116,7 +1186,8 @@ COpt::memoryPick();
 					$trigger['comments'],
 					$trigger['url'],
 					array(),
-					$trigger['templateid']
+					$trigger['templateid'],
+					$trigger['flags']
 				);
 				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Trigger ['.$trigger['description'].' ]: cannot create');
 
@@ -1214,14 +1285,28 @@ COpt::memoryPick();
 
 			$options = array(
 				'triggerids' => $triggerids,
+				'filter' => array('flags' => null),
+				'output' => API_OUTPUT_EXTEND,
 				'editable' => 1,
 				'extendoutput' => 1,
 				'preservekeys' => 1
 			);
 			$del_triggers = self::get($options);
 			foreach($triggerids as $gnum => $triggerid){
+				if($del_triggers[$triggerid]['flags'] = ZBX_FLAG_DISCOVERY_CHILD)
+					$trigger_prototypes[$triggerid] = $triggerid;
+
 				if(!isset($del_triggers[$triggerid])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+				}
+			}
+
+			if(!empty($trigger_prototypes)){
+				$sql = 'SELECT triggerid FROM trigger_discovery WHERE '.
+						DBcondition('parent_triggerid', $trigger_prototypes);
+				$db_triggers = DBselect($sql);
+				while($trigger = DBfetch($db_triggers)){
+					$triggerids[] = $trigger['triggerid'];
 				}
 			}
 

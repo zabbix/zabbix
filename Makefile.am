@@ -27,8 +27,9 @@ dist-hook:
 	rm -f $(top_distdir)/frontends/php/conf/zabbix.conf.php
 
 dbschema:
+	create/schema/gen.pl db2 > create/schema/db2.sql
 	create/schema/gen.pl mysql > create/schema/mysql.sql
+	create/schema/gen.pl oracle > create/schema/oracle.sql
 	create/schema/gen.pl postgresql > create/schema/postgresql.sql
 	create/schema/gen.pl sqlite > create/schema/sqlite.sql
-	create/schema/gen.pl oracle > create/schema/oracle.sql
 	create/schema/gen.pl c > src/libs/zbxdbhigh/dbschema.c

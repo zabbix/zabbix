@@ -157,7 +157,6 @@ hideObj: function(data) {
 	this.disableObj($(data.id), true);
 	$(data.id).style.display = 'none';
 
-	var objValue = this.objValue($(data.id));
 	var elmValue = null;
 
 	if(isset('value', data)){
