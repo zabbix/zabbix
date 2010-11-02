@@ -1877,7 +1877,7 @@ Copt::memoryPick();
 
 		$hosts = zbx_toArray($hosts);
 		$hostids = zbx_objectValues($hosts, 'hostid');
-		
+
 		try{
 			self::BeginTransaction(__METHOD__);
 
@@ -1890,7 +1890,7 @@ Copt::memoryPick();
 				'preservekeys' => 1
 			));
 
-			CItem::delete($del_items, true);
+			CItem::delete($delItems, true);
 
 			$hostidCondition = DBcondition('hostid',$hostids);
 

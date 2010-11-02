@@ -185,7 +185,7 @@ SDI('copy_template_elements');
 		if (count($exceptional_applicationids) > 0)
 		{
 			$query = 'UPDATE applications SET templateid = 0 WHERE '.DBcondition('applicationid',$exceptional_applicationids);
-			DBexecute($query); 
+			DBexecute($query);
 		}
 
 
@@ -1095,54 +1095,6 @@ return $result;
 		CProfile::update($host_var, $_REQUEST['hostid'], PROFILE_TYPE_ID);
 	}
 
-/*
- * Function: validate_group
- *
- * Description:
- *     Check available groups by user permisions
- *
- * Author:
- *     Artem "Aly" Suharev
- *
- * Comments:
- *
- */
- 	function validate_group(&$PAGE_GROUPS, &$PAGE_HOSTS, $reset_host=true){
-		global $page;
-
-		$config = select_config();
-
-		$dd_first_entry = $config['dropdown_first_entry'];
-
-		$group_var = 'web.latest.groupid';
-		$host_var = 'web.latest.hostid';
-
-		$_REQUEST['groupid']    = get_request('groupid', CProfile::get($group_var, -1));
-
-		if($_REQUEST['groupid'] < 0){
-			$PAGE_GROUPS['selected'] = $_REQUEST['groupid'] = 0;
-			$PAGE_HOSTS['selected'] = $_REQUEST['hostid'] = 0;
-		}
-
-		if(!isset($_REQUEST['hostid']) || $reset_host){
-			$PAGE_HOSTS['selected'] = $_REQUEST['hostid'] = 0;
-		}
-
-		if(($PAGE_GROUPS['selected'] == 0) && ($dd_first_entry == ZBX_DROPDOWN_FIRST_NONE)){
-			$PAGE_GROUPS['groupids'] = array();
-		}
-
-		$PAGE_GROUPS['selected'] = $_REQUEST['groupid'];
-
-		if($PAGE_GROUPS['original'] > -1)
-			CProfile::update('web.'.$page['menu'].'.groupid', $_REQUEST['groupid'], PROFILE_TYPE_ID);
-
-		if($PAGE_HOSTS['original'] > -1)
-			CProfile::update('web.'.$page['menu'].'.hostid', $_REQUEST['hostid'], PROFILE_TYPE_ID);
-
-		CProfile::update($group_var, $_REQUEST['groupid'], PROFILE_TYPE_ID);
-		CProfile::update($host_var, $_REQUEST['hostid'], PROFILE_TYPE_ID);
-	}
 
 /* APPLICATIONS */
 
@@ -1338,7 +1290,7 @@ return $result;
 			}
 			return false;
 		}
-		
+
 		$sql = 'SELECT i.itemid,i.key_,i.description '.
 				' FROM items_applications ia, items i '.
 				' WHERE i.type='.ITEM_TYPE_HTTPTEST.
@@ -1401,52 +1353,6 @@ return $result;
 
 	function get_applications_by_hostid($hostid){
 		return DBselect('select * from applications where hostid='.$hostid);
-	}
-
-	/*
-	 * Function: delete_template_applications
-	 *
-	 * Description:
-	 *     Delete applications from host by templates
-	 *
-	 * Author:
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments: !!! Don't forget sync code with C !!!
-	 *
-	 *           $templateid can be numeric or numeric array
-	 *
-	 */
-	function delete_template_applications($hostid, $templateids = null, $unlink_mode = false){
-		zbx_value2array($templateids);
-
-		$db_apps = get_applications_by_hostid($hostid);
-		while($db_app = DBfetch($db_apps)){
-			if($db_app["templateid"] == 0)
-				continue;
-
-			if(!is_null($templateids)){
-
-				unset($skip);
-				if($tmp_app_data = get_application_by_applicationid($db_app["templateid"])){
-					if(!uint_in_array($tmp_app_data["hostid"], $templateids)){
-						$skip = true;
-						break;
-					}
-				}
-				if(isset($skip)) continue;
-
-			}
-
-			if($unlink_mode){
-				if(DBexecute("update applications set templateid=NULL where applicationid=".$db_app["applicationid"])){
-					info(S_APPLICATION.SPACE."'".$db_app["name"]."'".SPACE.S_UNLINKED_SMALL);
-				}
-			}
-			else{
-				delete_application($db_app["applicationid"]);
-			}
-		}
 	}
 
 	/*
@@ -1532,74 +1438,6 @@ return $result;
 		}
 
 	return $result;
-	}
-
-// Add Host Profile
-
-	function add_host_profile($hostid,$devicetype,$name,$os,$serialno,$tag,$macaddress,$hardware,$software,$contact,$location,$notes){
-
-		$result=DBselect('SELECT * FROM hosts_profiles WHERE hostid='.$hostid);
-		if(DBfetch($result)){
-			error(S_HOST_PROFILE.SPACE.S_ALREADY_EXISTS);
-			return 0;
-		}
-
-		$result=DBexecute('INSERT INTO hosts_profiles '.
-			' (hostid,devicetype,name,os,serialno,tag,macaddress,hardware,software,contact,location,notes) '.
-			' VALUES ('.$hostid.','.zbx_dbstr($devicetype).','.zbx_dbstr($name).','.
-			zbx_dbstr($os).','.zbx_dbstr($serialno).','.zbx_dbstr($tag).','.zbx_dbstr($macaddress).
-			','.zbx_dbstr($hardware).','.zbx_dbstr($software).','.zbx_dbstr($contact).','.
-			zbx_dbstr($location).','.zbx_dbstr($notes).')');
-
-	return	$result;
-	}
-
-/*
- * Function: add_host_profile_ext
- *
- * Description:
- *  Add alternate host profile information.
- *
- * Author:
- *	John R Pritchard (john.r.pritchard@gmail.com)
- * 	modified by Aly
- * Comments:
- *  Extend original "add_host_profile" function for new hosts_profiles_ext data.
- *
- */
-	function add_host_profile_ext($hostid,$ext_host_profiles=array()){
-
-		$ext_profiles_fields = array('device_alias','device_type','device_chassis','device_os','device_os_short',
-			'device_hw_arch','device_serial','device_model','device_tag','device_vendor','device_contract',
-			'device_who','device_status','device_app_01','device_app_02','device_app_03','device_app_04',
-			'device_app_05','device_url_1','device_url_2','device_url_3','device_networks','device_notes',
-			'device_hardware','device_software','ip_subnet_mask','ip_router','ip_macaddress','oob_ip',
-			'oob_subnet_mask','oob_router','date_hw_buy','date_hw_install','date_hw_expiry','date_hw_decomm','site_street_1',
-			'site_street_2','site_street_3','site_city','site_state','site_country','site_zip','site_rack','site_notes',
-			'poc_1_name','poc_1_email','poc_1_phone_1','poc_1_phone_2','poc_1_cell','poc_1_screen','poc_1_notes','poc_2_name',
-			'poc_2_email','poc_2_phone_1','poc_2_phone_2','poc_2_cell','poc_2_screen','poc_2_notes');
-
-		$result=DBselect('SELECT * FROM hosts_profiles_ext WHERE hostid='.$hostid);
-		if(DBfetch($result)){
-			error(S_HOST_PROFILE.SPACE.S_ALREADY_EXISTS);
-			return false;
-		}
-
-		$sql = 'INSERT INTO hosts_profiles_ext (hostid,';
-		$values = ' VALUES ('.$hostid.',';
-
-		foreach($ext_host_profiles as $field => $value){
-			if(str_in_array($field,$ext_profiles_fields)){
-				$sql.=$field.',';
-				$values.=zbx_dbstr($value).',';
-			}
-		}
-
-		$sql = rtrim($sql,',').')';
-		$values = rtrim($values,',').')';
-
-		$result=DBexecute($sql.$values);
-	return  $result;
 	}
 
 	function getUnlinkableHosts($groupids=null,$hostids=null){

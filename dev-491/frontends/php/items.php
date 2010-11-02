@@ -496,43 +496,45 @@ switch($itemType) {
 		$result = false;
 
 		$item = array(
-				'description'	=> null,
-				'key_'			=> null,
-				'hostid'		=> null,
-				'delay'			=> get_request('delay'),
-				'history'		=> get_request('history'),
-				'status'		=> get_request('status'),
-				'type'			=> get_request('type'),
-				'snmp_community'	=> get_request('snmp_community'),
-				'snmp_oid'		=> get_request('snmp_oid'),
-				'value_type'	=> get_request('value_type'),
-				'trapper_hosts'	=> get_request('trapper_hosts'),
-				'snmp_port'		=> get_request('snmp_port'),
-				'units'			=> get_request('units'),
-				'multiplier'	=> get_request('multiplier'),
-				'delta'			=> get_request('delta'),
-				'snmpv3_securityname'	=> get_request('snmpv3_securityname'),
-				'snmpv3_securitylevel'	=> get_request('snmpv3_securitylevel'),
-				'snmpv3_authpassphrase'	=> get_request('snmpv3_authpassphrase'),
-				'snmpv3_privpassphrase'	=> get_request('snmpv3_privpassphrase'),
-				'formula'			=> get_request('formula'),
-				'trends'			=> get_request('trends'),
-				'logtimefmt'		=> get_request('logtimefmt'),
-				'valuemapid'		=> get_request('valuemapid'),
-				'delay_flex'		=> $db_delay_flex,
-				'authtype'		=> get_request('authtype'),
-				'username'		=> get_request('username'),
-				'password'		=> get_request('password'),
-				'publickey'		=> get_request('publickey'),
-				'privatekey'		=> get_request('privatekey'),
-				'params'			=> null,
-				'ipmi_sensor'		=> get_request('ipmi_sensor'),
-				'applications'		=> get_request('applications',null),
-				'data_type'		=> get_request('data_type'));
+			'description'	=> null,
+			'key_'			=> null,
+			'hostid'		=> null,
+			'delay'			=> get_request('delay'),
+			'history'		=> get_request('history'),
+			'status'		=> get_request('status'),
+			'type'			=> get_request('type'),
+			'snmp_community'	=> get_request('snmp_community'),
+			'snmp_oid'		=> get_request('snmp_oid'),
+			'value_type'	=> get_request('value_type'),
+			'trapper_hosts'	=> get_request('trapper_hosts'),
+			'snmp_port'		=> get_request('snmp_port'),
+			'units'			=> get_request('units'),
+			'multiplier'	=> get_request('multiplier'),
+			'delta'			=> get_request('delta'),
+			'snmpv3_securityname'	=> get_request('snmpv3_securityname'),
+			'snmpv3_securitylevel'	=> get_request('snmpv3_securitylevel'),
+			'snmpv3_authpassphrase'	=> get_request('snmpv3_authpassphrase'),
+			'snmpv3_privpassphrase'	=> get_request('snmpv3_privpassphrase'),
+			'formula'			=> get_request('formula'),
+			'trends'			=> get_request('trends'),
+			'logtimefmt'		=> get_request('logtimefmt'),
+			'valuemapid'		=> get_request('valuemapid'),
+			'delay_flex'		=> $db_delay_flex,
+			'authtype'		=> get_request('authtype'),
+			'username'		=> get_request('username'),
+			'password'		=> get_request('password'),
+			'publickey'		=> get_request('publickey'),
+			'privatekey'		=> get_request('privatekey'),
+			'params'			=> null,
+			'ipmi_sensor'		=> get_request('ipmi_sensor'),
+			'applications'		=> get_request('applications',null),
+			'data_type'		=> get_request('data_type')
+		);
 
 		DBstart();
 		foreach($group_itemid as $id){
-			$result |= smart_update_item($id,$item);
+			$item['itemid'] = $id;
+			$result |= CItem::update($item);
 		}
 		$result = DBend($result);
 
