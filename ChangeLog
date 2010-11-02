@@ -18,6 +18,7 @@ Changes for 1.9.0
 
 Changes for 1.8.4rc2
 
+ - [ZBX-2349] Unicode support for macros and web scenario steps (KB)
  - [ZBX-3137] fixed errors related to deleting and application that is used in a web scenario (KB)
  - [ZBXNEXT-538] added support for IBM DB2 (Aly,asaveljevs,Sasha)
  - [ZBX-1362] optimized alert performance (KB)
