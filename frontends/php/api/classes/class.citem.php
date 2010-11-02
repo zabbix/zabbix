@@ -873,6 +873,7 @@ COpt::memoryPick();
 // permissions
 		if($update || $delete){
 			$item_db_fields = array('itemid'=> null);
+// TODO: forbid creating web items
 			$dbItems = self::get(array(
 				'output' => API_OUTPUT_EXTEND,
 				'itemids' => zbx_objectValues($items, 'itemid'),
@@ -907,6 +908,10 @@ COpt::memoryPick();
 				if(!isset($dbHosts[$item['hostid']]))
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 
+// TODO: remove webchecks
+				if(!isset($item['type']) || ($item['type'] != ITEM_TYPE_HTTPTEST))
+					$item['interfaceid'] = null;
+//--
 				if(!isset($item['interfaceid']))
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 			}
@@ -914,10 +919,10 @@ COpt::memoryPick();
 				if(!isset($dbItems[$item['itemid']]))
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 
-				if($dbItems[$itemid]['templateid'] != 0){
+				if($dbItems[$item['itemid']]['templateid'] != 0){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete templated items');
 				}
-				if($dbItems[$itemid]['type'] == ITEM_TYPE_HTTPTEST){
+				if($dbItems[$item['itemid']]['type'] == ITEM_TYPE_HTTPTEST){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete web items');
 				}
 
@@ -1079,7 +1084,6 @@ COpt::memoryPick();
  */
 	public static function create($items){
 		$items = zbx_toArray($items);
-		$itemids = array();
 
 		try{
 			self::BeginTransaction(__METHOD__);
@@ -1166,7 +1170,7 @@ COpt::memoryPick();
 
 		if(!empty($itemids)){
 			DB::delete('items_applications', array( DBcondition('itemid', $itemids)));
-			$itemApplicationids = DB::insert('items_applications', $itemApplications);
+			DB::insert('items_applications', $itemApplications);
 		}
 
 // TODO: REMOVE info
@@ -1191,7 +1195,6 @@ COpt::memoryPick();
  */
 	public static function update($items){
 		$items = zbx_toArray($items);
-		$itemids = zbx_objectValues($items, 'itemid');
 
 		try{
 			self::BeginTransaction(__METHOD__);

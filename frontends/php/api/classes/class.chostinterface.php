@@ -26,7 +26,7 @@
 /**
  * Class containing methods for operations with Interfaces
  */
-class CInterfaceInterface extends CZBXAPI{
+class CHostInterface extends CZBXAPI{
 /**
  * Get Interface Interface data
  *
@@ -339,6 +339,8 @@ Copt::memoryPick();
 				$hosts = CHost::get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($hosts, 'host');
+
+				$count = array();
 				foreach($hosts as $hostid => $host){
 					unset($hosts[$hostid]['interfaces']);
 
@@ -384,6 +386,7 @@ Copt::memoryPick();
 
 				if(!is_null($options['limitSelects'])) order_result($items, 'description');
 
+				$count = array();
 				foreach($items as $itemid => $item){
 					if(!is_null($options['limitSelects'])){
 						if(!isset($count[$item['interfaceid']])) $count[$item['interfaceid']] = 0;
@@ -552,7 +555,7 @@ Copt::memoryPick();
 			$result = DB::update('interface', $data);
 
 			self::EndTransaction($result, __METHOD__);
-			return array('interfaceids' => zbx_obejctValues($interfaces, 'interfaceid'));
+			return array('interfaceids' => zbx_objectValues($interfaces, 'interfaceid'));
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
@@ -601,7 +604,6 @@ Copt::memoryPick();
 		$interfaces = zbx_toArray($data['interfaces']);
 
 		$hosts = zbx_toArray($data['hosts']);
-		$hostids = zbx_objectValues($hosts, 'hostid');
 
 		try{
 			self::BeginTransaction(__METHOD__);
@@ -616,7 +618,7 @@ Copt::memoryPick();
 				}
 			}
 
-			self::create($insertData);
+			$interfaceids = self::create($insertData);
 
 			self::EndTransaction(true, __METHOD__);
 			return array('interfaceids' => $interfaceids);

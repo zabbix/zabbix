@@ -690,7 +690,7 @@ switch($itemType) {
 			DBstart();
 			foreach($_REQUEST['group_itemid'] as $item_id)
 				foreach($hosts_ids as $host_id){
-					$go_result |= copy_item_to_host($item_id, $host_id, true);
+					$go_result |= copy_item_to_host($item_id, $host_id);
 				}
 
 			$go_result = DBend($go_result);

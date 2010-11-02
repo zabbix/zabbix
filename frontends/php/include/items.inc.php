@@ -213,7 +213,7 @@
 		$result=DBSelect($sql);
 		while($row=DBfetch($result)){
 			$item['hostid'] = $row['hostid'];
-			add_item($item);
+			CItem::create($item);
 		}
 	return true;
 	}
@@ -747,15 +747,16 @@
 	 * Comments:
 	 *
 	 */
-	function copy_item_to_host($itemid, $hostid, $copy_mode = false){
+	function copy_item_to_host($itemid, $hostid){
 		$db_tmp_item = get_item_by_itemid_limited($itemid);
 
 		$db_tmp_item['hostid'] = $hostid;
 		$db_tmp_item['applications'] = get_same_applications_for_host(get_applications_by_itemid($db_tmp_item['itemid']),$hostid);
-		$db_tmp_item['templateid'] = $copy_mode?0:$db_tmp_item['itemid'];
+		$db_tmp_item['templateid'] = 0;
 
-		$result = add_item($db_tmp_item);
-	return $result;
+		$result = CItem::create($db_tmp_item);
+
+		return $result;
 	}
 
 	function copy_applications($srcid, $destid){

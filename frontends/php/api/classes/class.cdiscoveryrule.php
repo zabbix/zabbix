@@ -620,7 +620,7 @@ COpt::memoryPick();
 				if(!isset($dbItems[$item['itemid']]))
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 
-				if($dbItems[$itemid]['templateid'] != 0){
+				if($dbItems[$item['itemid']]['templateid'] != 0){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete templated items');
 				}
 
@@ -922,7 +922,7 @@ COpt::memoryPick();
 			self::BeginTransaction(__METHOD__);
 
 			if(!$nopermissions){
-				self::checkInput($items, __FUNCTION__);				
+				self::checkInput($items, __FUNCTION__);
 			}
 
 // first delete child items
