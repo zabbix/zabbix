@@ -19,16 +19,25 @@
 **/
 ?>
 <?php
-/*
- * Function: graph_item_type2str
- *
- * Description:
- *     Represent integer value of graph item type into the string
- *
- * Author:
- *     Eugene Grigorjev
- *
- */
+
+	function graphType($type=null){
+		$types = array(
+			GRAPH_TYPE_STACKED => S_STACKED,
+			GRAPH_TYPE_PIE => S_PIE,
+			GRAPH_TYPE_EXPLODED => S_EXPLODED,
+			GRAPH_TYPE_NORMAL => S_NORMAL,
+		);
+
+		if(is_null($type)){
+			order_result($types);
+			return $types;
+		}
+		else if(isset($types[$type]))
+			return $types[$type];
+		else
+			return S_UNKNOWN;
+	}
+
 	function graph_item_type2str($type,$count=null){
 		switch($type){
 			case GRAPH_ITEM_SUM:
@@ -45,16 +54,6 @@
 	return $type;
 	}
 
-/*
- * Function: graph_item_drawtypes
- *
- * Description:
- *     Return available drawing types for graph item
- *
- * Author:
- *     Eugene Grigorjev
- *
- */
 	function graph_item_drawtypes(){
 		return array(
 				GRAPH_ITEM_DRAWTYPE_LINE,
@@ -672,6 +671,13 @@
 			$result &= delete_graph($del_chd_graphs);
 		}
 
+
+		$sql = 'SELECT graphid FROM graph_discovery WHERE '.DBcondition('parent_graphid', $graphids);
+		$db_graphs = DBselect($sql);
+		while($graph = DBfetch($db_graphs)){
+			$graphids[] = $graph['graphid'];
+		}
+
 		DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid',$graphids).' AND resourcetype='.SCREEN_RESOURCE_GRAPH);
 
 // delete graph
@@ -771,7 +777,8 @@
 				}
 			}
 			else{
-				delete_graph($db_graph['graphid']);
+				DBexecute('UPDATE graphs SET templateid=NULL WHERE graphid='.$db_graph['graphid']);
+				CGraph::delete($db_graph['graphid']);
 			}
 		}
 	}

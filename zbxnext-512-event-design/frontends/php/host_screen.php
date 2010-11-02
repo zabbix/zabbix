@@ -175,14 +175,17 @@
 		$effectiveperiod = navigation_bar_calc('web.screens', $screen['screenid'], true);
 
 // PAGE HEADER {{{
+		//KB: Removing favourites icon from screens (ZBX-3129)
+		/*
 		$icon = get_icon('favourite', array(
 			'fav' => 'web.favorite.screenids',
 			'elname' => 'screenid',
 			'elid' => $screen['screenid'],
 		));
+		 */
 		$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
 
-		$screens_wdgt->addPageHeader(S_SCREENS_BIG, array($formHeader, SPACE, $icon, $fs_icon));
+		$screens_wdgt->addPageHeader(S_SCREENS_BIG, array($formHeader, SPACE, /*$icon,*/ $fs_icon));
 // }}} PAGE HEADER
 
 

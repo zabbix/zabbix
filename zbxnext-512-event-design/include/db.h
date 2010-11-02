@@ -538,7 +538,7 @@ DB_ESCALATION
 #define DBnode_local(fieldid) DBnode(fieldid, CONFIG_NODEID)
 const char *DBnode(const char *fieldid, const int nodeid);
 
-int	DBping(void);
+int	DBping();
 
 void    DBconnect(int flag);
 void	DBinit();
@@ -571,6 +571,31 @@ const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname);
 #define DBget_maxid(table)	DBget_maxid_num(table, 1)
 zbx_uint64_t	DBget_maxid_num(const char *tablename, int num);
 zbx_uint64_t	DBget_nextid(const char *tablename, int num);
+
+/******************************************************************************
+ *                                                                            *
+ * Type: ZBX_GRAPH_ITEMS                                                      *
+ *                                                                            *
+ * Purpose: represent graph item data                                         *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ ******************************************************************************/
+typedef struct
+{
+	zbx_uint64_t	itemid; /* itemid should come first for correct sorting */
+	zbx_uint64_t	gitemid;
+	char		key[ITEM_KEY_LEN_MAX];
+	int		drawtype;
+	int		sortorder;
+	char		color[GRAPH_ITEM_COLOR_LEN_MAX];
+	int		yaxisside;
+	int		calc_fnc;
+	int		type;
+	int		periods_cnt;
+	unsigned char	flags;
+}
+ZBX_GRAPH_ITEMS;
 
 int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *error);
 int	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid);
@@ -617,6 +642,7 @@ int	DBadd_graph_item_to_linked_hosts(int gitemid,int hostid);
 int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_uint64_t templateid);
 int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_uint64_t templateid);
 int	DBdelete_host(zbx_uint64_t hostid);
+void	DBget_graphitems(const char *sql, ZBX_GRAPH_ITEMS **gitems, int *gitems_alloc, int *gitems_num);
 void	DBupdate_services(zbx_uint64_t triggerid, int status, int clock);
 
 /* History related functions */

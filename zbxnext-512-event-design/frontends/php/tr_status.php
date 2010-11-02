@@ -421,7 +421,7 @@ include_once('include/page_header.php');
 
 
 	foreach($triggers as $tnum => $trigger){
-		
+
 		$trigger['desc'] = $description = expand_trigger_description($trigger['triggerid']);
 
 		$items = array();
@@ -431,9 +431,8 @@ include_once('include/page_header.php');
 			$used_hosts[$th['hostid']] = $th['host'];
 		}
 		$used_host_count = count($used_hosts);
-
+		
 		foreach($trigger['items'] as $inum => $item){
-
 			$item_description = item_description($item);
 
 			//if we have items from different hosts, we must prefix a host name
@@ -442,6 +441,7 @@ include_once('include/page_header.php');
 			}
 
 			$items[$inum]['itemid'] = $item['itemid'];
+			$items[$inum]['value_type'] = $item['value_type']; //ZBX-3059: So it would be possible to show different caption for history for chars and numbers (KB)
 			$items[$inum]['action'] = str_in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64)) ? 'showgraph' : 'showvalues';
 			$items[$inum]['description'] = $item_description;
 		}
@@ -456,7 +456,7 @@ include_once('include/page_header.php');
 		$hosts = reset($trigger['hosts']);
 
 		$menu_trigger_conf = 'null';
-		if($admin_links){
+		if($admin_links && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL){
 			$menu_trigger_conf = "['".S_CONFIGURATION_OF_TRIGGERS."',\"javascript:
 				redirect('triggers.php?form=update&triggerid=".$trigger['triggerid'].'&switch_node='.id2nodeid($trigger['triggerid'])."')\",
 				null, {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
@@ -473,7 +473,7 @@ include_once('include/page_header.php');
 			zbx_jsvalue($items, true).");"
 		);
 
-		
+
 // }}} trigger description js menu
 
 		if($_REQUEST['show_details']){
@@ -548,8 +548,8 @@ include_once('include/page_header.php');
 
 			$menus = rtrim($menus,',');
 			$menus = 'show_popup_menu(event,['.$menus.'],180);';
-			
-			
+
+
 
 			$maint_span = null;
 			if($trigger_host['maintenance_status']){
@@ -581,7 +581,7 @@ include_once('include/page_header.php');
 		$host->addStyle('white-space: normal;');
 // }}} host JS menu
 
-		
+
 		$status = new CSpan(trigger_value2str($trigger['value']), get_trigger_value_style($trigger['value']));
 		if((time() - $trigger['lastchange']) < TRIGGER_BLINK_PERIOD){
 			$status->setAttribute('name', 'blink');

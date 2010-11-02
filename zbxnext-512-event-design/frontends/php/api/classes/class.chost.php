@@ -127,6 +127,7 @@ class CHost extends CZBXAPI{
 			'select_groups'				=> null,
 			'selectParentTemplates'		=> null,
 			'select_items'				=> null,
+			'select_discoveries'		=> null,
 			'select_triggers'			=> null,
 			'select_graphs'				=> null,
 			'select_dhosts'				=> null,
@@ -175,6 +176,7 @@ class CHost extends CZBXAPI{
 
 		if(is_array($options['output'])){
 			unset($sql_parts['select']['hosts']);
+			$sql_parts['select']['hostid'] = ' h.hostid';
 			foreach($options['output'] as $key => $field){
 				$sql_parts['select'][$field] = ' h.'.$field;
 			}
@@ -548,39 +550,34 @@ class CHost extends CZBXAPI{
 					if(!is_null($options['select_groups']) && !isset($result[$host['hostid']]['groups'])){
 						$result[$host['hostid']]['groups'] = array();
 					}
-
 					if(!is_null($options['selectParentTemplates']) && !isset($result[$host['hostid']]['parentTemplates'])){
 						$result[$host['hostid']]['parentTemplates'] = array();
 					}
-
 					if(!is_null($options['select_items']) && !isset($result[$host['hostid']]['items'])){
 						$result[$host['hostid']]['items'] = array();
+					}
+					if(!is_null($options['select_discoveries']) && !isset($result[$host['hostid']]['discoveries'])){
+						$result[$host['hostid']]['discoveries'] = array();
 					}
 					if(!is_null($options['select_profile']) && !isset($result[$host['hostid']]['profile'])){
 						$result[$host['hostid']]['profile'] = array();
 						$result[$host['hostid']]['profile_ext'] = array();
 					}
-
 					if(!is_null($options['select_triggers']) && !isset($result[$host['hostid']]['triggers'])){
 						$result[$host['hostid']]['triggers'] = array();
 					}
-
 					if(!is_null($options['select_graphs']) && !isset($result[$host['hostid']]['graphs'])){
 						$result[$host['hostid']]['graphs'] = array();
 					}
-
 					if(!is_null($options['select_dhosts']) && !isset($result[$host['hostid']]['dhosts'])){
 						$result[$host['hostid']]['dhosts'] = array();
 					}
-
 					if(!is_null($options['select_dservices']) && !isset($result[$host['hostid']]['dservices'])){
 						$result[$host['hostid']]['dservices'] = array();
 					}
-
 					if(!is_null($options['select_applications']) && !isset($result[$host['hostid']]['applications'])){
 						$result[$host['hostid']]['applications'] = array();
 					}
-
 					if(!is_null($options['select_macros']) && !isset($result[$host['hostid']]['macros'])){
 						$result[$host['hostid']]['macros'] = array();
 					}
@@ -762,6 +759,7 @@ Copt::memoryPick();
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'hostids' => $hostids,
+				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
@@ -787,7 +785,7 @@ Copt::memoryPick();
 			else if(API_OUTPUT_COUNT == $options['select_items']){
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
-				
+
 				$items = CItem::get($obj_params);
 				$items = zbx_toHash($items, 'hostid');
 				foreach($result as $hostid => $host){
@@ -795,6 +793,50 @@ Copt::memoryPick();
 						$result[$hostid]['items'] = $items[$hostid]['rowscount'];
 					else
 						$result[$hostid]['items'] = 0;
+				}
+			}
+		}
+
+// Adding Discoveries
+		if(!is_null($options['select_discoveries'])){
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'hostids' => $hostids,
+				'filter' => array('flags' => ZBX_FLAG_DISCOVERY),
+				'nopermissions' => 1,
+				'preservekeys' => 1,
+			);
+
+			if(is_array($options['select_discoveries']) || str_in_array($options['select_discoveries'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['select_discoveries'];
+				$items = CItem::get($obj_params);
+
+				if(!is_null($options['limitSelects'])) order_result($items, 'description');
+				foreach($items as $itemid => $item){
+					unset($items[$itemid]['hosts']);
+					foreach($item['hosts'] as $hnum => $host){
+						if(!is_null($options['limitSelects'])){
+							if(!isset($count[$host['hostid']])) $count[$host['hostid']] = 0;
+							$count[$host['hostid']]++;
+
+							if($count[$host['hostid']] > $options['limitSelects']) continue;
+						}
+
+						$result[$host['hostid']]['discoveries'][] = &$items[$itemid];
+					}
+				}
+			}
+			else if(API_OUTPUT_COUNT == $options['select_discoveries']){
+				$obj_params['countOutput'] = 1;
+				$obj_params['groupCount'] = 1;
+
+				$items = CItem::get($obj_params);
+				$items = zbx_toHash($items, 'hostid');
+				foreach($result as $hostid => $host){
+					if(isset($items[$hostid]))
+						$result[$hostid]['discoveries'] = $items[$hostid]['rowscount'];
+					else
+						$result[$hostid]['discoveries'] = 0;
 				}
 			}
 		}
@@ -1511,7 +1553,7 @@ Copt::memoryPick();
 			}
 // }}} UPDATE TEMPLATE LINKAGE
 
-			
+
 // UPDATE MACROS {{{
 			if(isset($data['macros']) && !is_null($data['macros'])){
 				$macrosToAdd = zbx_toHash($data['macros'], 'macro');

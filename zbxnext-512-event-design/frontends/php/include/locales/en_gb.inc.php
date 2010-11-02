@@ -212,6 +212,7 @@
 	'S_DISABLE_SELECTED_WEB_SCENARIOS_Q'=>		'Disable selected WEB scenarios?',
 	'S_DELETE_HISTORY_SELECTED_WEB_SCENARIOS_Q'=>	'Delete history of selected WEB scenarios?',
 	'S_DELETE_SELECTED_WEB_SCENARIOS_Q'=>		'Delete selected WEB scenarios?',
+	'S_SELECT_HOST_FIRST' => '(select host first)',
 
 //	exp_imp.php
 	'S_ELEMENT'=>				'Element',
@@ -1202,7 +1203,31 @@
 	'S_DELETE_HISTORY_SELECTED_ITEMS_Q'=>			'Delete history of selected items?',
 	'S_DELETE_SELECTED_ITEMS_Q'=>				'Delete selected items?',
 	'S_FORMULA'=>						'Formula',
+	'S_RULE'=>						'Rule',
 
+// host_discovery.php
+	'S_CONFIGURATION_OF_DISCOVERY_RULES_BIG' => 'CONFIGURATION OF DISCOVERY RULES',
+	'S_PROTOTYPES' => 'Prototypes',
+	'S_REGEXP' => 'Regexp',
+	'S_DISCOVERY_RULES' => 'Discovery rules',
+	
+// disc_prototypes.php
+	'S_CONFIGURATION_OF_ITEM_PROTOTYPES_BIG' => 'CONFIGURATION OF ITEM PROTOTYPES', 
+	'S_ITEM_PROTOTYPES_OF_BIG' => 'ITEM PROTOTYPES OF', 
+	'S_ADD_PROTOTYPE' => 'Add prototype', 
+	'S_SELECT_PROTOTYPE' => 'Select prototype', 
+	'S_CREATE_PROTOTYPE' => 'Create prototype', 
+	'S_ITEM_PROTOTYPE' => 'Item prototype', 
+	
+	'S_CONFIGURATION_OF_GRAPHS_PROTOTYPES_BIG' => 'CONFIGURATION OF GRAPH PROTOTYPES',
+	
+// trigger_prototypes.php
+	'S_CONFIGURATION_OF_TRIGGERS_PROTOTYPES_BIG' => 'CONFIGURATION OF TRIGGER PROTOTYPES',
+	'S_TRIGGER_PROTOTYPES_OF_BIG' => 'TRIGGER PROTOTYPES OF',
+
+// graph_prototypes.php
+	'S_GRAPH_PROTOTYPES_OF_BIG' => 'GRAPH PROTOTYPES OF',
+	
 //	events.php
 	'S_EVENT'=>				'Event',
 	'S_EVENT_DETAILS'=>			'Event details',
@@ -1581,6 +1606,7 @@
 	'S_NO_RESOURCES_DEFINED'=>		'No resources defined',
 	'S_SIMPLE_GRAPH'=>				'Simple graph',
 	'S_SIMPLE_GRAPHS'=>				'Simple graphs',
+	'S_HISTORY_AND_SIMPLE_GRAPHS'=> 'History and simple graphs',
 	'S_SIMPLE_GRAPH_BIG'=>			'SIMPLE GRAPH',
 	'S_GRAPH_NAME'=>				'Graph name',
 	'S_WIDTH'=>						'Width',
@@ -2063,6 +2089,8 @@
 	'S_EXPRESSION_UNNECESSARY_SYMBOLS_DETECTED_ERROR'=>'Unnecessary symbols detected',
 	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_AFTER_ERROR'=>'Not allowed symbols detected after element',
 	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_BEFORE_ERROR'=>'Not allowed symbols detected before element',
+	'S_ARE_YOU_SURE_YOU_WANT_TO_DELETE'=>'Are you sure you want to delete',
+	'S_MACROS_ES'=>'macro(s)',
 
 //	popup_link_tr.php
 	'S_NEW_INDICATORS'=>			'New indicators',
@@ -2191,6 +2219,7 @@
 	'S_CANNOT_ADD_NEW_APPLICATION'=>		'Cannot add new application',
 	'S_SCENARIO_WITH_NAME'=>			'Scenario with name',
 	'S_ADDED_SMALL'=>				'added',
+	'S_PRINTABLE_ONLY'=>'only printable characters',
 
 //	media.inc.php
 	'S_NO_MEDIA_WITH'=>			'No media with',
@@ -2223,7 +2252,8 @@
 	'S_ALREADY_LINKED_TO_HOST_SMALL'=>		'already linked to host',
 	'S_HOST_HAS_BEEN_DELETED_MSG_PART1'=>		'Host',
 	'S_HOST_HAS_BEEN_DELETED_MSG_PART2'=>		'has been deleted from the system',
-
+	'S_YOU_CANT_DELETE_TEMPLATE_FOR_APP_USED_IN_SCENARIO'=>'You can\'t delete template for an application that is used in a web scenario',
+	'S_AND_CANT_BE_DELETED' => 'and can\'t be deleted',
 //	validate.inc.php
 	'S_CRITICAL_ERROR'=>				'Critical error',
 	'S_FIELD'=>					'Field',

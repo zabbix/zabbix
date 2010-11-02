@@ -22,7 +22,7 @@ ALTER TABLE ONLY sysmaps_elements ALTER selementid DROP DEFAULT,
 				  ALTER iconid_disabled DROP NOT NULL,
 				  ALTER iconid_maintenance DROP DEFAULT,
 				  ALTER iconid_maintenance DROP NOT NULL,
-				  DROP COLUMN url; 
+				  DROP COLUMN url;
 DELETE FROM sysmaps_elements WHERE sysmapid NOT IN (SELECT sysmapid FROM sysmaps);
 UPDATE sysmaps_elements SET iconid_off=NULL WHERE iconid_off=0;
 UPDATE sysmaps_elements SET iconid_on=NULL WHERE iconid_on=0;

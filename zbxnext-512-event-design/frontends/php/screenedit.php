@@ -250,6 +250,15 @@ include_once('include/page_header.php');
 	if($screen['templateid'])
 		$screen_wdgt->addItem(get_header_host_table($screen['templateid']));
 
+	//getting updated screen, so we wont have to refresh the page to see changes
+	$screens = CScreen::get($options);
+	if(empty($screens)){
+		$screens = CTemplateScreen::get($options);
+		if(empty($screens)) access_deny();
+	}
+	$screen = reset($screens);
+
+
 	$table = get_screen($screen, 1);
 	$screen_wdgt->addItem($table);
 	zbx_add_post_js('init_screen("'.$_REQUEST['screenid'].'","iframe","'.$_REQUEST['screenid'].'");');

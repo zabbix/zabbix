@@ -26,7 +26,7 @@
 #   NOTE: These options described above do not take yes|no values. If 'yes'
 #   value is passed, then WARNING message will be displayed, 'no' value, as
 #   well as the --without-oracle-* variations will cause the macro to not 
-#   check enything.
+#   check anything.
 #
 #   This macro calls:
 #
@@ -49,7 +49,7 @@
 #
 # ADAPTATION
 #
-#   Macro adapted for ZABBIX usague by Eugene Grigorjev
+#   Macro adapted for ZABBIX usage by Eugene Grigorjev
 #
 
 AC_DEFUN([AX_LIB_ORACLE_OCI],
