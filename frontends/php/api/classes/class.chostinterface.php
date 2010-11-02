@@ -440,7 +440,7 @@ Copt::memoryPick();
 	}
 
 	protected static function checkInput($interfaces, $method){
-		$insert = ($method == 'insert');
+		$create = ($method == 'create');
 		$update = ($method == 'update');
 		$delete = ($method == 'delete');
 

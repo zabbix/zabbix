@@ -856,9 +856,22 @@ COpt::memoryPick();
 	}
 
 
-	public static function checkInput(&$items, $update=false){
+	public static function checkInput(&$items, $method){
+		$create = ($method == 'create');
+		$update = ($method == 'update');
+		$delete = ($method == 'delete');
+
+// interfaces
+		$interfaceids = zbx_objectValues($items, 'interfaceid');
+		$interfaces = CHostInterface::get(array(
+			'output' => array('interfaceid', 'hostid'),
+			'interfaceids' => $interfaceids,
+			'nopermissions' => 1,
+			'preservekeys' => 1
+		));
+
 // permissions
-		if($update){
+		if($update || $delete){
 			$item_db_fields = array('itemid'=> null);
 			$dbItems = self::get(array(
 				'output' => API_OUTPUT_EXTEND,
@@ -890,7 +903,27 @@ COpt::memoryPick();
 			unset($item['prevorgvalue']);
 			unset($item['lastns']);
 
-			if($update){
+			if($create){
+				if(!isset($dbHosts[$item['hostid']]))
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+
+				if(!isset($item['interfaceid']))
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+			}
+			else if($delete){
+				if(!isset($dbItems[$item['itemid']]))
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+
+				if($dbItems[$itemid]['templateid'] != 0){
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete templated items');
+				}
+				if($dbItems[$itemid]['type'] == ITEM_TYPE_HTTPTEST){
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete web items');
+				}
+
+				continue;
+			}
+			else{
 				if(!isset($dbItems[$item['itemid']]))
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 
@@ -939,12 +972,11 @@ COpt::memoryPick();
 					$item['hostid'] = $dbItems[$item['itemid']]['hostid'];
 				}
 			}
-			else{
-				if(!isset($dbHosts[$item['hostid']]))
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 
-				if(!isset($item['interfaceid']))
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+			if(isset($item['interfaceid'])){
+				$interface = $interfaces[$item['interfaceid']];
+				if($interface['hostid'] != $item['hostid'])
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Item uses Host interface from non parent host');
 			}
 
 			if(isset($item['port'])){
@@ -1018,6 +1050,7 @@ COpt::memoryPick();
 						self::exception(ZBX_API_ERROR_PARAMETERS, S_VALUE_TYPE_MUST_FLOAT_FOR_AGGREGATE_ITEMS);
 					}
 				}
+
 // {{{ EXCEPTION: ITEM EXISTS
 				$itemsExists = self::get(array(
 					'output' => array('itemid','hostid','description'),
@@ -1051,7 +1084,7 @@ COpt::memoryPick();
 		try{
 			self::BeginTransaction(__METHOD__);
 
-			self::checkInput($items);
+			self::checkInput($items, __FUNCTION__);
 
 			self::createReal($items);
 
@@ -1163,7 +1196,7 @@ COpt::memoryPick();
 		try{
 			self::BeginTransaction(__METHOD__);
 
-			self::checkInput($items, true);
+			self::checkInput($items, __FUNCTION__);
 
 			self::updateReal($items);
 
@@ -1199,25 +1232,8 @@ COpt::memoryPick();
 
 // TODO: remove $nopermissions hack
 			if(!$nopermissions){
-				$options = array(
-					'itemids' => $itemids,
-					'editable' => 1,
-					'preservekeys' => 1,
-					'webitems' => true,
-					'output' => API_OUTPUT_EXTEND,
-				);
-				$del_items = self::get($options);
-				foreach($itemids as $itemid){
-					if(!isset($del_items[$itemid])){
-						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
-					}
-					if($del_items[$itemid]['templateid'] != 0){
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete templated items');
-					}
-					if($del_items[$itemid]['type'] == ITEM_TYPE_HTTPTEST){
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete web items');
-					}
-				}
+				$items = zbx_toObject($itemids, 'itemid');
+				self::checkInput($items, __FUNCTION__);
 			}
 
 // first delete child items
