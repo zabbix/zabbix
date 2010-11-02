@@ -716,8 +716,8 @@ FIELD		|publickey	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|privatekey	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|mtime		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|lastns		|t_nanosec	|	|NULL		|0
-FIELD		|flags		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|filter		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|flags		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|filter		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|interfaceid	|t_id		|	|NULL	|ZBX_SYNC,ZBX_PROXY	|4|interface	|		|RESTRICT
 FIELD		|port	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 UNIQUE		|1		|hostid,key_
@@ -931,7 +931,6 @@ TABLE|trigger_discovery|triggerdiscoveryid|ZBX_SYNC
 FIELD		|triggerdiscoveryid|t_id	|	|NOT NULL	|0
 FIELD		|triggerid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|triggers
 FIELD		|parent_triggerid|t_id		|	|NOT NULL	|ZBX_SYNC		|2|triggers	|triggerid
-FIELD		|expression	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
 UNIQUE		|1		|triggerid,parent_triggerid
 
