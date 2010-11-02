@@ -103,6 +103,29 @@ if(!isset($DB)){
 						$result = false;
 					}
 					break;
+				case 'IBM_DB2':
+					$connect = '';
+					$connect .= 'DATABASE='.$DB['DATABASE'].';';
+					$connect .= 'HOSTNAME='.$DB['SERVER'].';';
+					$connect .= 'PORT='.$DB['PORT'].';';
+					$connect .= 'PROTOCOL=TCPIP;';
+					$connect .= 'UID='.$DB['USER'].';';
+					$connect .= 'PWD='.$DB['PASSWORD'].';';
+
+					$DB['DB']= db2_connect($connect, $DB['USER'], $DB['PASSWORD']);
+					if(!$DB['DB']){
+						$error = 'Error connecting to database';
+						$result = false;
+					}
+					else{
+						//DBexecute('set current schema='.$DB['USER'].';');
+						$options = array(
+							'db2_attr_case' => DB2_CASE_LOWER,
+						);
+						db2_set_option($DB['DB'], $options, 1);
+					}
+
+					break;
 				case 'SQLITE3':
 					$DB['TRANSACTIONS'] = 0;
 					if(!function_exists('init_db_access')){
@@ -187,6 +210,9 @@ if(!isset($DB)){
 				case 'ORACLE':
 					$result = ocilogoff($DB['DB']);
 					break;
+				case 'IBM_DB2':
+					$result = db2_close($DB['DB']);
+					break;
 				case 'SQLITE3':
 					$result = true;
 					sqlite3_close($DB['DB']);
@@ -263,6 +289,9 @@ if(!isset($DB)){
 				$result = true;
 // TODO			OCI_DEFAULT
 				break;
+			case 'IBM_DB2':
+				$result = db2_autocommit($DB['DB'], DB2_AUTOCOMMIT_OFF);
+				break;
 			case 'SQLITE3':
 				if(1 == $DB['TRANSACTIONS']){
 					lock_db_access();
@@ -274,7 +303,7 @@ if(!isset($DB)){
 	}
 
 
-	function DBend($result=null){
+	function DBend($result=true){
 		global $DB;
 //SDI('DBend(): '.$DB['TRANSACTIONS']);
 		if($DB['TRANSACTIONS'] != 1){
@@ -286,20 +315,13 @@ if(!isset($DB)){
 				info('POSSIBLE ERROR: Used incorrect logic in database processing, transaction not started!');
 			}
 
-		if(!is_null($result))
 			$DB['TRANSACTION_STATE'] = $result && $DB['TRANSACTION_STATE'];
 
 		return $DB['TRANSACTION_STATE'];
 		}
 
 		$DB['TRANSACTIONS'] = 0;
-
-		if(is_null($result)){
-			$DBresult = $DB['TRANSACTION_STATE'];
-		}
-		else{
-			$DBresult = $result && $DB['TRANSACTION_STATE'];
-		}
+		$DBresult = $result && $DB['TRANSACTION_STATE'];
 
 //SDI('Result: '.$result);
 
@@ -330,7 +352,10 @@ if(!isset($DB)){
 				break;
 			case 'ORACLE':
 				$result = ocicommit($DB['DB']);
-
+				break;
+			case 'IBM_DB2':
+				$result = db2_commit($DB['DB']);
+				if($result) db2_autocommit($DB['DB'], DB2_AUTOCOMMIT_ON);
 				break;
 			case 'SQLITE3':
 				$result = DBexecute('commit');
@@ -355,6 +380,10 @@ if(!isset($DB)){
 				break;
 			case 'ORACLE':
 				$result = ocirollback($DB['DB']);
+				break;
+			case 'IBM_DB2':
+				$result = db2_rollback($DB['DB']);
+				db2_autocommit($DB['DB'], DB2_AUTOCOMMIT_ON);
 				break;
 			case 'SQLITE3':
 				$result = DBexecute('rollback');
@@ -425,8 +454,26 @@ if(!isset($DB)){
 						$e=ocierror($result);
 						error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 					}
+				break;
+				case 'IBM_DB2':
+					if(zbx_numeric($limit)){
+						$till = $offset + $limit;
+						$query = 'SELECT * FROM ('.$query.') WHERE rownum BETWEEN '.intval($offset).' AND '.intval($till);
+					}
 
-					break;
+					$options = array();
+					if($DB['TRANSACTIONS']) $options['autocommit'] = DB2_AUTOCOMMIT_OFF;
+
+					if(!$result = db2_prepare($DB['DB'], $query)){
+						$e = @db2_stmt_errormsg($result);
+						error('SQL error ['.$query.'] in ['.$e.']');
+					}
+					else if(true !== @db2_execute($result, $options)){
+						$e = @db2_stmt_errormsg($result);
+						error('SQL error ['.$query.'] in ['.$e.']');
+					}
+
+				break;
 				case 'SQLITE3':
 					if(!$DB['TRANSACTIONS']){
 						lock_db_access();
@@ -459,7 +506,7 @@ if(!isset($DB)){
 					if(!$DB['TRANSACTIONS']){
 						unlock_db_access();
 					}
-					break;
+				break;
 			}
 
 			if($DB['TRANSACTIONS'] && !$result){
@@ -486,13 +533,13 @@ COpt::savesqlrequest(microtime(true)-$time_start,$query);
 					if(!$result){
 						error('Error in query ['.$query.'] ['.mysql_error().']');
 					}
-					break;
+				break;
 				case 'POSTGRESQL':
 					$result = (bool) pg_query($DB['DB'],$query);
 					if(!$result){
 						error('Error in query ['.$query.'] ['.pg_last_error().']');
 					}
-					break;
+				break;
 				case 'ORACLE':
 					$result=OCIParse($DB['DB'],$query);
 					if(!$result){
@@ -504,11 +551,25 @@ COpt::savesqlrequest(microtime(true)-$time_start,$query);
 						error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 					}
 					else{
-						/* It should be here. The function must return boolen */
+						/* It should be here. The function must return boolean */
 						$result = true;
 					}
-
-					break;
+				break;
+				case 'IBM_DB2':
+					$options = array();
+					if(!$result = db2_prepare($DB['DB'], $query)){
+						$e = @db2_stmt_errormsg($result);
+						error('SQL error ['.$query.'] in ['.$e.']');
+					}
+					else if(true !== @db2_execute($result)){
+						$e = @db2_stmt_errormsg($result);
+						error('SQL error ['.$query.'] in ['.$e.']');
+					}
+					else{
+						/* It should be here. The function must return boolean */
+						$result = true;
+					}
+				break;
 				case 'SQLITE3':
 					if(!$DB['TRANSACTIONS']){
 						lock_db_access();
@@ -567,6 +628,12 @@ COpt::savesqlrequest(microtime(true)-$time_start,$query);
 					}
 				}
 				break;
+			case 'IBM_DB2':
+				$result = db2_fetch_assoc($cursor);
+				if(!$result){
+					db2_free_result($cursor);
+				}
+				break;
 			case 'SQLITE3':
 				if($cursor){
 					$result = array_shift($cursor);
@@ -595,21 +662,7 @@ COpt::savesqlrequest(microtime(true)-$time_start,$query);
 	}
 
 // string value prepearing
-if(isset($DB['TYPE']) && $DB['TYPE'] == 'ORACLE') {
-	function zbx_dbstr($var){
-		if(is_array($var)){
-			foreach($var as $vnum => $value) $var[$vnum] = "'".preg_replace('/\'/','\'\'',$value)."'";
-			return $var;
-		}
-
-	return "'".preg_replace('/\'/','\'\'',$var)."'";
-	}
-
-	function zbx_dbcast_2bigint($field){
-		return ' CAST('.$field.' AS NUMBER(20)) ';
-	}
-}
-else if(isset($DB['TYPE']) && $DB['TYPE'] == "MYSQL") {
+if(isset($DB['TYPE']) && $DB['TYPE'] == "MYSQL") {
 	function zbx_dbstr($var){
 		if(is_array($var)){
 			foreach($var as $vnum => $value) $var[$vnum] = "'".mysql_real_escape_string($value)."'";
@@ -631,6 +684,34 @@ else if(isset($DB['TYPE']) && $DB['TYPE'] == "POSTGRESQL") {
 		}
 
 	return "'".pg_escape_string($var)."'";
+	}
+
+	function zbx_dbcast_2bigint($field){
+		return ' CAST('.$field.' AS BIGINT) ';
+	}
+}
+else if(isset($DB['TYPE']) && $DB['TYPE'] == 'ORACLE') {
+	function zbx_dbstr($var){
+		if(is_array($var)){
+			foreach($var as $vnum => $value) $var[$vnum] = "'".preg_replace('/\'/','\'\'',$value)."'";
+			return $var;
+		}
+
+	return "'".preg_replace('/\'/','\'\'',$var)."'";
+	}
+
+	function zbx_dbcast_2bigint($field){
+		return ' CAST('.$field.' AS NUMBER(20)) ';
+	}
+}
+else if(isset($DB['TYPE']) && $DB['TYPE'] == 'IBM_DB2') {
+	function zbx_dbstr($var){
+		if(is_array($var)){
+			foreach($var as $vnum => $value) $var[$vnum] = "'".db2_escape_string($value)."'";
+			return $var;
+		}
+
+	return "'".db2_escape_string($var)."'";
 	}
 
 	function zbx_dbcast_2bigint($field){
@@ -758,6 +839,7 @@ else {
 			$min=bcadd(bcmul($nodeid,'100000000000000'),bcmul($ZBX_LOCALNODEID,'100000000000'), 0);
 			$max=bcadd(bcadd(bcmul($nodeid,'100000000000000'),bcmul($ZBX_LOCALNODEID,'100000000000')),'99999999999', 0);
 			$row = DBfetch(DBselect('SELECT nextid FROM ids WHERE nodeid='.$nodeid .' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field)));
+
 			if(!$row){
 				$row = DBfetch(DBselect('SELECT max('.$field.') AS id FROM '.$table.' WHERE '.$field.'>='.$min.' AND '.$field.'<='.$max));
 				if(!$row || ($row['id'] == 0)){
