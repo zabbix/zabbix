@@ -598,6 +598,7 @@ include_once('include/page_header.php');
 						if(!copy_graph_to_host($graph['graphid'], $hostid, true)) throw new Exception();
 				}
 			}
+
 // }}} FULL CLONE
 
 
@@ -620,9 +621,9 @@ include_once('include/page_header.php');
 
 // }}} SAVE TRANSACTION
 
-			DBend(true);
+			$result = DBend(true);
 
-			show_messages(true, $msg_ok, $msg_fail);
+			show_messages($result, $msg_ok, $msg_fail);
 
 			unset($_REQUEST['form']);
 			unset($_REQUEST['hostid']);

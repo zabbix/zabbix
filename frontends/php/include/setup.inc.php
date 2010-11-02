@@ -271,44 +271,6 @@
 				$table,
 				);
 		}
-		/*
-		function stage4()
-		{
-			global $_SERVER;
-
-			if($this->getConfig('distributed', null))
-			{
-				$table = new CTable();
-				$table->setAlign('center');
-				$table->addRow(array(
-					'Node name',
-					new CTextBox('nodename', $this->getConfig('nodename',    $_SERVER["SERVER_NAME"]), 40)
-					));
-				$table->addRow(array(
-					'Node ID',
-					new CNumericBox('nodeid', $this->getConfig('nodeid',      0), 10)
-					));
-
-			}
-			else
-			{
-				$table = null;
-			}
-
-			return new CTag('div', 'yes', array(
-				'The goal in the distributed monitoring environment is a service checks from a "central" server '.
-				'onto one or more "distributed" servers. Most small to medium sized systems '.
-				'will not have a real need for setting up such an environment.',BR,BR,
-				'Please check the "Use distributed monitoring" to enabling this functionality',BR,BR,
-				 new CTag('div', 'yes', array(
-				 	new CCheckBox('distributed', $this->getConfig('distributed', null), 'submit();'),
-					'Use distributed monitoring'),
-					'center'),
-				BR,BR,
-				$table
-				), 'text');
-		}
-		*/
 
 		function stage5(){
 			$allowed_db = $this->getConfig('allowed_db', array());
@@ -363,18 +325,6 @@
 									new CSpan(S_OK,'ok') :
 									new CSpan(S_FAIL,'fail')
 										));
-
-			/*
-			$table->addRow(array('Table creation:',  $this->getConfig('ZBX_TABLES_CREATED', false) ?
-									new CSpan(S_OK,'ok') :
-									new CSpan(S_FAIL,'fail')
-										));
-
-			$table->addRow(array('Data loading:',  $this->getConfig('ZBX_DATA_LOADED', false) ?
-									new CSpan(S_OK,'ok') :
-									new CSpan(S_FAIL,'fail')
-										));
-			*/
 
 			return array(
 				$table, BR(),
@@ -456,94 +406,7 @@
 		return $result;
 		}
 
-		/*
-		function CreateTables()
-		{
-			global $ZBX_CONFIGURATION_FILE;
-
-			$error = null;
-			if(file_exists($ZBX_CONFIGURATION_FILE))
-			{
-				include $ZBX_CONFIGURATION_FILE;
-
-				switch($DB['TYPE'])
-				{
-					case 'MYSQL':		$ZBX_SCHEMA_FILE = 'mysql.sql';		break;
-					case 'POSTGRESQL':	$ZBX_SCHEMA_FILE = 'postgresql.sql';	break;
-					case 'ORACLE':		$ZBX_SCHEMA_FILE = 'oracle.sql';	break;
-				}
-
-				if(isset($ZBX_SCHEMA_FILE))
-				{
-					$ZBX_SCHEMA_FILE = 'create/'.$ZBX_SCHEMA_FILE;
-					if(DBconnect($error))
-					{
-						DBloadfile($ZBX_SCHEMA_FILE, $error);
-					}
-				}
-				else
-				{
-					$error = 'Table creation. Incorrect configuration file ['.$ZBX_CONFIGURATION_FILE.']';
-				}
-				DBclose();
-			}
-			else
-			{
-				$error = 'Table creation. Missing configuration file['.$ZBX_CONFIGURATION_FILE.']';
-			}
-			if(isset($error))
-			{
-				error($error);
-			}
-
-			return !isset($error);
-		}
-		*/
-
-		/*
-		function LoadData()
-		{
-			global $ZBX_CONFIGURATION_FILE;
-
-			$error = null;
-			if(file_exists($ZBX_CONFIGURATION_FILE))
-			{
-				include $ZBX_CONFIGURATION_FILE;
-
-				$ZBX_DATA_FILE = 'create/data.sql';
-				if(DBconnect($error))
-				{
-					if(DBloadfile($ZBX_DATA_FILE, $error))
-					{
-						if($this->getConfig('distributed', null))
-						{
-							if(!DBexecute('insert into nodes (nodeid, name, nodetype) values('.
-								$this->getConfig('nodeid', 0).','.
-								zbx_dbstr($this->getConfig('nodename', 'local')).','.
-								'1)'))
-							{
-								$error = '';
-							}
-						}
-					}
-				}
-				DBclose();
-			}
-			else
-			{
-				$error = 'Table creation. Missing configuration file['.$ZBX_CONFIGURATION_FILE.']';
-			}
-			if(isset($error))
-			{
-				error($error);
-			}
-
-			return !isset($error);
-		}
-		*/
-
-		function CheckConfigurationFile()
-		{
+		function CheckConfigurationFile(){
 			global $DB,$ZBX_SERVER,$ZBX_SERVER_PORT;
 
 			if(!empty($DB)){
@@ -656,58 +519,17 @@
 			if($this->getStep() == 4){
 				$this->setConfig('ZBX_SERVER',		get_request('zbx_server',	$this->getConfig('ZBX_SERVER',		'localhost')));
 				$this->setConfig('ZBX_SERVER_PORT',	get_request('zbx_server_port',	$this->getConfig('ZBX_SERVER_PORT',	'10051')));
-				if(isset($_REQUEST['next'][$this->getStep()]))		$this->DoNext();
+				if(isset($_REQUEST['next'][$this->getStep()])) $this->DoNext();
 			}
-
-			/*
-			if($this->getStep() == 4)
-			{
-				if(!isset($_REQUEST['next'][3]) && !isset($_REQUEST['back'][5]))
-				{
-					$this->setConfig('distributed',
-						get_request('distributed',	null));
-				}
-
-				if($this->getConfig('distributed',	null))
-				{
-					$this->setConfig('nodename',
-						get_request('nodename',
-						$this->getConfig('nodename',	$_SERVER["SERVER_NAME"])));
-					$this->setConfig('nodeid',
-						get_request('nodeid',
-						$this->getConfig('nodeid',	0)));
-				}
-				else
-				{
-					$this->setConfig('nodename', null);
-					$this->setConfig('nodeid', null);
-				}
-			}
-			*/
 
 			if($this->getStep() == 5 && isset($_REQUEST['next'][$this->getStep()])){
 				$this->DoNext();
 			}
 
 			if($this->getStep() == 6){
-				$this->setConfig('ZBX_CONFIG_FILE_CORRECT', $this->CheckConfigurationFile());
+				// $this->setConfig('ZBX_CONFIG_FILE_CORRECT', $this->CheckConfigurationFile());
 
-				/*
-				if($this->getConfig('ZBX_CONFIG_FILE_CORRECT', false) && !$this->getConfig('ZBX_TABLES_CREATED', false))
-				{
-					$this->setConfig('ZBX_TABLES_CREATED', $this->CreateTables());
-				}
-
-				if($this->getConfig('ZBX_TABLES_CREATED', false) && !$this->getConfig('ZBX_DATA_LOADED', false))
-				{
-					$this->setConfig('ZBX_DATA_LOADED', $this->LoadData());
-				}
-				*/
-
-				if(/*!$this->getConfig('ZBX_TABLES_CREATED', false) ||
-					!$this->getConfig('ZBX_DATA_LOADED', false) || */
-					!$this->getConfig('ZBX_CONFIG_FILE_CORRECT', false))
-				{
+				if(!$this->getConfig('ZBX_CONFIG_FILE_CORRECT', false)){
 					$this->DISABLE_NEXT_BUTTON = true;
 				}
 
@@ -726,8 +548,7 @@
 			}
 		}
 
-		function getNewConfigurationFileContent()
-		{
+		function getNewConfigurationFileContent(){
 			return
 '<?php
 /*
