@@ -575,9 +575,13 @@ COpt::memoryPick();
 		return !empty($objs);
 	}
 
-	public static function checkInput(&$items, $update=false){
+	public static function checkInput(&$items, $method){
+		$create = ($method == 'create');
+		$update = ($method == 'update');
+		$delete = ($method == 'delete');
+
 // permissions
-		if($update){
+		if($update || $delete){
 			$item_db_fields = array('itemid'=> null);
 			$dbItems = self::get(array(
 				'output' => API_OUTPUT_EXTEND,
@@ -608,7 +612,21 @@ COpt::memoryPick();
 			unset($item['prevorgvalue']);
 			unset($item['lastns']);
 
-			if($update){
+			if($create){
+				if(!isset($dbHosts[$item['hostid']]))
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+			}
+			else if($delete){
+				if(!isset($dbItems[$item['itemid']]))
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+
+				if($dbItems[$itemid]['templateid'] != 0){
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete templated items');
+				}
+
+				continue;
+			}
+			else{
 				if(!isset($dbItems[$item['itemid']]))
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 
@@ -647,6 +665,7 @@ COpt::memoryPick();
 					'ipmi_sensor'		=> array()
 				);
 
+
 				foreach($restoreRules as $var_name => $info){
 					if(!isset($info['template']) && (0 != $dbItems[$item['itemid']]['templateid'])){
 						unset($item[$var_name]);
@@ -656,10 +675,6 @@ COpt::memoryPick();
 				if(!isset($items[$inum]['hostid'])){
 					$item['hostid'] = $dbItems[$item['itemid']]['hostid'];
 				}
-			}
-			else{
-				if(!isset($dbHosts[$item['hostid']]))
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 			}
 
 			if(isset($item['port'])){
@@ -762,7 +777,7 @@ COpt::memoryPick();
 		try{
 			self::BeginTransaction(__METHOD__);
 
-			self::checkInput($items);
+			self::checkInput($items, __FUNCTION__);
 
 			self::createReal($items);
 
@@ -872,7 +887,7 @@ COpt::memoryPick();
 		try{
 			self::BeginTransaction(__METHOD__);
 
-			self::checkInput($items, true);
+			self::checkInput($items, __FUNCTION__);
 
 			self::updateReal($items);
 
@@ -907,21 +922,7 @@ COpt::memoryPick();
 			self::BeginTransaction(__METHOD__);
 
 			if(!$nopermissions){
-				$options = array(
-					'itemids' => $ruleids,
-					'editable' => 1,
-					'preservekeys' => 1,
-					'output' => API_OUTPUT_EXTEND,
-				);
-				$del_items = self::get($options);
-				foreach($ruleids as $ruleid){
-					if(!isset($del_items[$ruleid])){
-						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
-					}
-					if($del_items[$ruleid]['templateid'] != 0){
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete templated rules');
-					}
-				}
+				self::checkInput($items, __FUNCTION__);				
 			}
 
 // first delete child items
