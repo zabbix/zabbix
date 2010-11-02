@@ -1844,6 +1844,15 @@ Copt::memoryPick();
 				if(!$result) self::exception();
 			}
 
+			if(isset($data['interfaces'])){
+				$options = array(
+					'hostids' => $hostids,
+					'interfaces' => zbx_toArray($data['interfaces'])
+				);
+				$result = CHostInterface::massRemove($options);
+				if(!$result) self::exception();
+			}
+
 			self::EndTransaction(true, __METHOD__);
 			return array('hostids' => $hostids);
 		}
