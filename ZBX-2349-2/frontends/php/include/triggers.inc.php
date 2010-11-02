@@ -593,7 +593,7 @@ return $caption;
  */
 	function zbx_unquote_param($value){
 		$value = trim($value);
-		if( !empty($value) && '"' == $value[0] ){
+		if( !empty($value) && '"' == zbx_substr($value, 1, 1) ){
 /* open quotes and unescape chars */
 			$value = zbx_substr($value, 1, zbx_strlen($value)-2);
 
@@ -634,9 +634,12 @@ return $caption;
 
 		for( $param_s = $i = 0, $len = zbx_strlen($string); $i < $len; $i++){
 			$char = zbx_substr($string, $i, 1);
+			$prev_char = $i > 0 ? zbx_substr($string, $i-1, 1) : '';
 			switch ( $char ){
 				case '"':
-					$quoted = !$quoted;
+					if ($prev_char!='\\'){
+						$quoted = !$quoted;
+					}
 					break;
 				case ',':
 					if( !$quoted ){
@@ -659,10 +662,11 @@ return $caption;
 		}
 
 		if($i > $param_s){
-			$params[] = zbx_unquote_param(zbx_substr($string, $param_s, $i - $param_s));
+			$params[] = str_replace('\\"', '"', zbx_unquote_param(zbx_substr($string, $param_s, $i - $param_s)));
 		}
 
 	return $params;
+	
 	}
 
 /*
