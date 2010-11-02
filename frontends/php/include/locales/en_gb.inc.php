@@ -212,6 +212,7 @@
 	'S_DISABLE_SELECTED_WEB_SCENARIOS_Q'=>		'Disable selected WEB scenarios?',
 	'S_DELETE_HISTORY_SELECTED_WEB_SCENARIOS_Q'=>	'Delete history of selected WEB scenarios?',
 	'S_DELETE_SELECTED_WEB_SCENARIOS_Q'=>		'Delete selected WEB scenarios?',
+	'S_SELECT_HOST_FIRST' => '(select host first)',
 
 //	exp_imp.php
 	'S_ELEMENT'=>				'Element',
@@ -2218,7 +2219,8 @@
 	'S_ALREADY_LINKED_TO_HOST_SMALL'=>		'already linked to host',
 	'S_HOST_HAS_BEEN_DELETED_MSG_PART1'=>		'Host',
 	'S_HOST_HAS_BEEN_DELETED_MSG_PART2'=>		'has been deleted from the system',
-
+	'S_YOU_CANT_DELETE_TEMPLATE_FOR_APP_USED_IN_SCENARIO'=>'You can\'t delete template for an application that is used in a web scenario',
+	'S_AND_CANT_BE_DELETED' => 'and can\'t be deleted',
 //	validate.inc.php
 	'S_CRITICAL_ERROR'=>				'Critical error',
 	'S_FIELD'=>					'Field',
