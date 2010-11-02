@@ -870,6 +870,7 @@ COpt::memoryPick();
 		else{
 			$item_db_fields = array('description'=>null, 'key_'=>null, 'hostid'=>null);
 			$dbHosts = CHost::get(array(
+				'output' => array('hostid', 'host', 'status'),
 				'hostids' => zbx_objectValues($items, 'hostid'),
 				'templated_hosts' => 1,
 				'editable' => 1,
@@ -941,6 +942,9 @@ COpt::memoryPick();
 			else{
 				if(!isset($dbHosts[$item['hostid']]))
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+
+				if(!isset($item['interfaceid']))
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 			}
 
 			if(isset($item['port'])){
@@ -981,22 +985,22 @@ COpt::memoryPick();
 					}
 
 					if($item['type'] == ITEM_TYPE_AGGREGATE){
-						/* grpfunc['group','key','itemfunc','numeric param'] */
+// grpfunc['group','key','itemfunc','numeric param']
 						if(preg_match('/^((.)*)(\[\"((.)*)\"\,\"((.)*)\"\,\"((.)*)\"\,\"([0-9]+)\"\])$/i', $item['key_'], $arr)){
 							$g=$arr[1];
 							if(!str_in_array($g,array("grpmax","grpmin","grpsum","grpavg"))){
 								self::exception(ZBX_API_ERROR_PARAMETERS, S_GROUP_FUNCTION.SPACE."[$g]".SPACE.S_IS_NOT_ONE_OF.SPACE."[grpmax, grpmin, grpsum, grpavg]");
 							}
-							// Group
+// Group
 							$g=$arr[4];
-							// Key
+// Key
 							$g=$arr[6];
-							// Item function
+// Item function
 							$g=$arr[8];
 							if(!str_in_array($g, array('last', 'min', 'max', 'avg', 'sum','count'))){
 								self::exception(ZBX_API_ERROR_PARAMETERS, S_ITEM_FUNCTION.SPACE.'['.$g.']'.SPACE.S_IS_NOT_ONE_OF.SPACE.'[last, min, max, avg, sum, count]');
 							}
-							// Parameter
+// Parameter
 							$g=$arr[10];
 						}
 						else{
