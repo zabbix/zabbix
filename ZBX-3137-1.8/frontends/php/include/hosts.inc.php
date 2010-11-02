@@ -1417,7 +1417,7 @@ return $result;
 		//if it is, we can't delete it
 		if($info = DBfetch($res)){
 			if (isset($apps[$info['applicationid']]['host'])){
-				info(S_APPLICATION.SPACE.'"'.$apps[$info['applicationid']]['host'].':'.$apps[$info['applicationid']]['name'].'"'.SPACE.S_USED_BY_SCENARIO_SMALL.SPACE.'"'.$info['name'].'"'.SPACE.AND_CANT_BE_DELETED);
+				info(S_APPLICATION.SPACE.'"'.$apps[$info['applicationid']]['host'].':'.$apps[$info['applicationid']]['name'].'"'.SPACE.S_USED_BY_SCENARIO_SMALL.SPACE.'"'.$info['name'].'"'.SPACE.S_AND_CANT_BE_DELETED);
 			}
 			else {
 				info(S_YOU_CANT_DELETE_TEMPLATE_FOR_APP_USED_IN_SCENARIO);

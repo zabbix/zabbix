@@ -488,7 +488,7 @@ include_once('include/page_header.php');
 		$form->addRow(S_VARIABLES, new CTextArea('macros', $macros, 84, 5));
 
 		$tblSteps = new CTableInfo();
-		$tblSteps->setHeader(array(S_NAME,S_TIMEOUT,S_URL,S_REQUIRED,S_STATUS,S_SORT));
+		$tblSteps->setHeader(array('',S_NAME,S_TIMEOUT,S_URL,S_REQUIRED,S_STATUS,S_SORT));
 		if(count($steps) > 0){
 			$first = min(array_keys($steps));
 			$last = max(array_keys($steps));
@@ -532,7 +532,8 @@ include_once('include/page_header.php');
 			}
 
 			$tblSteps->addRow(array(
-				array(new CCheckBox('sel_step[]',null,null,$stepid), $name),
+				(new CCheckBox('sel_step[]',null,null,$stepid)),
+				$name,
 				$s['timeout'].SPACE.S_SEC_SMALL,
 				$url,
 				$s['required'],
