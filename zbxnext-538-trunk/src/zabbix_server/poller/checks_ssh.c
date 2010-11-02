@@ -314,7 +314,6 @@ int	get_value_ssh(DC_ITEM *item, AGENT_RESULT *result)
 {
 	char	cmd[MAX_STRING_LEN], params[MAX_STRING_LEN], dns[HOST_DNS_LEN_MAX],
 		port[8], encoding[32];
-	int	port_int;
 
 	if (0 == parse_command(item->key, cmd, sizeof(cmd), params, sizeof(params)))
 		return NOTSUPPORTED;
@@ -342,11 +341,8 @@ int	get_value_ssh(DC_ITEM *item, AGENT_RESULT *result)
 
 	if ('\0' != *port)
 	{
-		port_int = atoi(port);
-		if (port_int < 1 || port_int > 65535)
+		if (FAIL == is_ushort(port, &item->host.port))
 			return NOTSUPPORTED;
-
-		item->host.port = (unsigned short)port_int;
 	}
 	else
 		item->host.port = ZBX_DEFAULT_SSH_PORT;

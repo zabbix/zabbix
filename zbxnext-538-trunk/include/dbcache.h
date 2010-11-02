@@ -106,10 +106,12 @@ DC_ITEM
 	char		publickey_orig[ITEM_PUBLICKEY_LEN_MAX], *publickey;
 	char		privatekey_orig[ITEM_PRIVATEKEY_LEN_MAX], *privatekey;
 	char		password_orig[ITEM_PASSWORD_LEN_MAX], *password;
+	unsigned char	flags;
 };
 
-void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, AGENT_RESULT *value, zbx_timespec_t *ts,
-		int timestamp, char *source, int severity, int logeventid, int lastlogsize, int mtime);
+void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char flags,
+		AGENT_RESULT *value, zbx_timespec_t *ts, int timestamp, char *source,
+		int severity, int logeventid, int lastlogsize, int mtime);
 int	DCsync_history(int sync_type);
 void	init_database_cache(unsigned char p);
 void	free_database_cache(void);

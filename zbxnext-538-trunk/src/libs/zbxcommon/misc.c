@@ -1495,7 +1495,7 @@ int	is_int_prefix(const char *c)
  * Return value:  SUCCEED - the string is unsigned integer                    *
  *                FAIL - the string is not number or overflow                 *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1504,6 +1504,9 @@ int	is_uint64(const char *str, zbx_uint64_t *value)
 {
 	register zbx_uint64_t	max_uint64 = ~(zbx_uint64_t)__UINT64_C(0);
 	register zbx_uint64_t	value_uint64 = 0, c;
+
+	if ('\0' == *str)
+		return FAIL;
 
 	while ('\0' != *str)
 	{
@@ -1918,6 +1921,38 @@ void	uint64_array_remove(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values
 
 		memmove(&values[index], &values[index + 1], sizeof(zbx_uint64_t) * ((*num) - index - 1));
 		(*num)--;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: uint64_array_remove_both                                         *
+ *                                                                            *
+ * Purpose: remove equal values from both arrays                              *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	uint64_array_remove_both(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values, int *rm_num)
+{
+	int	rindex, index;
+
+	for (rindex = 0; rindex < *rm_num; rindex++)
+	{
+		index = get_nearestindex(values, sizeof(zbx_uint64_t), *num, rm_values[rindex]);
+		if (index == *num || values[index] != rm_values[rindex])
+			continue;
+
+		memmove(&values[index], &values[index + 1], sizeof(zbx_uint64_t) * ((*num) - index - 1));
+		(*num)--;
+		memmove(&rm_values[rindex], &rm_values[rindex + 1], sizeof(zbx_uint64_t) * ((*rm_num) - rindex - 1));
+		(*rm_num)--; rindex--;
 	}
 }
 

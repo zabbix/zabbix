@@ -27,6 +27,7 @@
 #include "ipc.h"
 #include "mutexs.h"
 #include "zbxserver.h"
+#include "proxy.h"
 
 #include "memalloc.h"
 #include "zbxalgo.h"
@@ -57,13 +58,13 @@ static int		ZBX_HISTORY_SIZE = 0;
 int			ZBX_SYNC_MAX = 1000;	/* Must be less than ZBX_HISTORY_SIZE */
 static int		ZBX_ITEMIDS_SIZE = 0;
 
-#define ZBX_IDS_SIZE	8
+#define ZBX_IDS_SIZE	10
 #define ZBX_DC_ID	struct zbx_dc_id_type
 #define ZBX_DC_IDS	struct zbx_dc_ids_type
 
 ZBX_DC_ID
 {
-	char		table_name[16];
+	char		table_name[ZBX_TABLENAME_LEN_MAX];
 	zbx_uint64_t	lastid;
 	int		reserved;
 };
@@ -836,7 +837,7 @@ static void	DCsync_trends()
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Alexei Vladishev, Aleksander Vladishev                             *
+ * Author: Alexei Vladishev, Alexander Vladishev                              *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -845,7 +846,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 {
 	const char	*__function_name = "DCmass_update_triggers";
 
-	typedef struct zbx_trigger_s
+	typedef struct
 	{
 		zbx_uint64_t	triggerid;
 		char		*exp;
@@ -853,7 +854,9 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 		zbx_timespec_t	ts;
 		unsigned char	type;
 		unsigned char	value;
-	} zbx_trigger_t;
+		unsigned char	flags;
+	}
+	zbx_trigger_t;
 
 	zbx_trigger_t	*tr = NULL, *tr_last = NULL;
 	int		tr_alloc, tr_num = 0;
@@ -864,11 +867,12 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 	DB_ROW		row;
 	int		sql_offset = 0, i;
 	zbx_uint64_t	itemid, triggerid;
+	unsigned char	flags;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 1024,
-			"select distinct t.triggerid,t.type,t.value,t.error,t.expression,f.itemid"
+			"select distinct t.triggerid,t.type,t.value,t.error,t.expression,f.itemid,i.flags"
 			" from triggers t,functions f,items i"
 			" where i.status not in (%d)"
 				" and i.itemid=f.itemid"
@@ -924,6 +928,15 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 			tr_last->exp = strdup(row[4]);
 			tr_last->ts.sec = 0;
 			tr_last->ts.ns = 0;
+			tr_last->flags = 0x00;
+		}
+
+		flags = (unsigned char)atoi(row[6]);
+
+		if (0 != (ZBX_FLAG_DISCOVERY_CHILD & flags))
+		{
+			tr_last->flags = flags;
+			continue;
 		}
 
 		ZBX_STR2UINT64(itemid, row[5]);
@@ -947,6 +960,10 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 
 	for (i = 0; i < tr_num; i++)
 	{
+		/* skip triggers with expression with discovery child items */
+		if (0 != (ZBX_FLAG_DISCOVERY_CHILD & tr_last->flags))
+			continue;
+
 		if (0 == tr[i].ts.sec)
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
@@ -2566,14 +2583,22 @@ static void	DCadd_history_log(zbx_uint64_t itemid, char *value_orig, zbx_timespe
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, AGENT_RESULT *value, zbx_timespec_t *ts,
-		int timestamp, char *source, int severity, int logeventid, int lastlogsize, int mtime)
+void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char flags,
+		AGENT_RESULT *value, zbx_timespec_t *ts, int timestamp, char *source,
+		int severity, int logeventid, int lastlogsize, int mtime)
 {
+	/* check for low-level discovery (lld) item */
+	if (0 != (ZBX_PROCESS_SERVER & zbx_process) && 0 != (ZBX_FLAG_DISCOVERY & flags))
+	{
+		DBlld_process_discovery_rule(itemid, value->text);
+		return;
+	}
+
 	switch (value_type)
 	{
 		case ITEM_VALUE_TYPE_FLOAT:

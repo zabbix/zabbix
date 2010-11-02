@@ -1390,6 +1390,7 @@
 	'S_NO_RESOURCES_DEFINED'=>			'Aucune ressource définie',
 	'S_SIMPLE_GRAPH'=>			'Graphique simple',
 	'S_SIMPLE_GRAPHS'=>			'Graphiques simples',
+	'S_HISTORY_AND_SIMPLE_GRAPHS'=>			'Historique et graphiques simples',
 	'S_SIMPLE_GRAPH_BIG'=>			'GRAPHIQUE SIMPLE',
 	'S_GRAPH_NAME'=>			'Nom du graphique',
 	'S_WIDTH'=>			'Largeur',
@@ -1812,6 +1813,8 @@
 	'S_EXPRESSION_UNNECESSARY_SYMBOLS_DETECTED_ERROR'=>			'Symboles inutiles détectés',
 	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_AFTER_ERROR'=>			'Symboles interdits détectés après l\'élément',
 	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_BEFORE_ERROR'=>			'Symboles interdits détectés avant l\'élément',
+	'S_ARE_YOU_SURE_YOU_WANT_TO_DELETE'=>			'Etes-vous sur de vouloir supprimer',
+	'S_MACROS_ES'=>			'macro(s)',
 	'S_NEW_INDICATORS'=>			'Nouveaux indicateurs',
 	'S_EDIT_CONNECTOR'=>			'Modifier le connecteur',
 	'S_INCLUDE_S'=>			'Inclure',
@@ -2140,7 +2143,7 @@
 	'S_LOGOUT'=>			'Déconnexion',
 	'S_PRINT'=>			'Imprimer',
 	'S_LATEST_DATA'=>			'Dernières données',
-	'S_DOES_NOT_EXISTS_SMALL'=>			'n\'existe pas',
+	'S_DOES_NOT_EXIST_SMALL'=>			'n\'existe pas',
 	'S_INCORRECT_DESCRIPTION'=>			'Description incorrecte',
 	'S_CANT_FORMAT_TREE'=>			'Production arbre de tri impossible',
 	'S_NO_PERMISSION'=>			'Vous n\'avez pas la permission d\'effectuer cette opération',
@@ -2168,6 +2171,11 @@
 	'S_CANNOT_CREATE_NEW_ELEMENT'=>			'Impossible de créer un nouvel élément',
 	'S_OTHER_SMALL'=>			'autre',
 	'S_MAX_COOKIE_SIZE_REACHED'=>			'Nous sommes désolés, le nombre maximeum d\'éléments à mémoriser a été atteint.',
+	'S_LAST_PAGE'=>			'Dernière',
+	'S_FIRST_PAGE'=>			'Première',
+	'S_PREVIOUS_PAGE'=>			'Précédente',
+	'S_NEXT_PAGE'=>			'Suivante',
+	'S_PREVIOUS_EVENTS'=>			'Précédents',
 
 	);
 ?>

@@ -122,6 +122,7 @@ const char	*zbx_json_next_value(struct zbx_json_parse *jp, const char *p, char *
 const char	*zbx_json_pair_next(struct zbx_json_parse *jp, const char *p, char *name, size_t len);
 const char	*zbx_json_pair_by_name(struct zbx_json_parse *jp, const char *name);
 int		zbx_json_value_by_name(struct zbx_json_parse *jp, const char *name, char *string, size_t len);
+int		zbx_json_value_by_name_dyn(struct zbx_json_parse *jp, const char *name, char **string, size_t *string_alloc);
 int		zbx_json_brackets_open(const char *p, struct zbx_json_parse *jp);
 int		zbx_json_brackets_by_name(struct zbx_json_parse *jp, const char *name, struct zbx_json_parse *out);
 int		zbx_json_object_is_empty(struct zbx_json_parse *jp);

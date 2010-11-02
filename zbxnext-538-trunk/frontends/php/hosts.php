@@ -192,6 +192,7 @@ include_once('include/page_header.php');
 		$params = array(
 			'hostids' => $hostids,
 			'preservekeys' => 1,
+			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 			'output' => API_OUTPUT_EXTEND
 		);
 		$graphs = CGraph::get($params);
@@ -228,6 +229,7 @@ include_once('include/page_header.php');
 // SELECT ITEMS
 		$params = array(
 			'hostids' => $hostids,
+			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 			'preservekeys' => 1,
 			'output' => API_OUTPUT_EXTEND
 		);
@@ -235,7 +237,6 @@ include_once('include/page_header.php');
 
 // SELECT APPLICATIONS
 		$itemids = zbx_objectValues($items, 'itemid');
-//sdii($itemids);
 		$params = array(
 			'itemids' => $itemids,
 			'preservekeys' => 1,
@@ -248,6 +249,7 @@ include_once('include/page_header.php');
 		$params = array(
 			'hostids' => $hostids,
 			'output' => API_OUTPUT_EXTEND,
+			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 			'preservekeys' => 1,
 			'select_dependencies' => API_OUTPUT_EXTEND,
 			'expandData' => 1
@@ -558,48 +560,47 @@ include_once('include/page_header.php');
 					$host['host'],
 					'hosts',
 					$host_old,
-					$host_new);
+					$host_new
+				);
 			}
 
 // FULL CLONE {{{
 			if($clone_hostid && ($_REQUEST['form'] == 'full_clone')){
-// Host applications
-			$sql = 'SELECT * FROM applications WHERE hostid='.$clone_hostid.' AND templateid=0';
-			$res = DBselect($sql);
-			while($db_app = DBfetch($res)){
-				add_application($db_app['name'], $hostid, 0);
-			}
+
+				if(!copy_applications($clone_hostid, $hostid)) throw new Exception();
 
 // Host items
-			$sql = 'SELECT DISTINCT i.itemid, i.description '.
-					' FROM items i '.
-					' WHERE i.hostid='.$clone_hostid.
-						' AND i.templateid IS NULL '.
-					' ORDER BY i.description';
-
-			$res = DBselect($sql);
-			while($db_item = DBfetch($res)){
+				$sql = 'SELECT DISTINCT i.itemid, i.description '.
+						' FROM items i '.
+						' WHERE i.hostid='.$clone_hostid.
+							' AND i.templateid IS NULL '.
+							' AND i.flags<>'.ZBX_FLAG_DISCOVERY_CREATED.
+						' ORDER BY i.description';
+				$res = DBselect($sql);
+				while($db_item = DBfetch($res)){
 					if(!copy_item_to_host($db_item['itemid'], $hostid, true)) throw new Exception();
-			}
+				}
 
 // Host triggers
 				if(!copy_triggers($clone_hostid, $hostid)) throw new Exception();
 
 // Host graphs
-			$options = array(
-				'inherited' => 0,
-				'hostids' => $clone_hostid,
-				'select_hosts' => API_OUTPUT_REFER,
-				'output' => API_OUTPUT_EXTEND,
-			);
-			$graphs = CGraph::get($options);
-			foreach($graphs as $gnum => $graph){
-				if(count($graph['hosts']) > 1) continue;
-					if(!copy_graph_to_host($graph['graphid'], $hostid, true)) throw new Exception();
+				$options = array(
+					'inherited' => 0,
+					'hostids' => $clone_hostid,
+					'select_hosts' => API_OUTPUT_REFER,
+					'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY, ZBX_FLAG_DISCOVERY_CHILD, ZBX_FLAG_DISCOVERY_NORMAL)),
+					'output' => API_OUTPUT_EXTEND,
+				);
+				$graphs = CGraph::get($options);
+				foreach($graphs as $gnum => $graph){
+					if(count($graph['hosts']) > 1) continue;
+						if(!copy_graph_to_host($graph['graphid'], $hostid, true)) throw new Exception();
+				}
 			}
-		}
 
 // }}} FULL CLONE
+
 
 //HOSTS PROFILE Section
 			CProfile::update('HOST_PORT', $_REQUEST['port'], PROFILE_TYPE_INT);
@@ -613,14 +614,16 @@ include_once('include/page_header.php');
 					$_REQUEST['devicetype'],$_REQUEST['name'],$_REQUEST['os'],
 					$_REQUEST['serialno'],$_REQUEST['tag'],$_REQUEST['macaddress'],
 					$_REQUEST['hardware'],$_REQUEST['software'],$_REQUEST['contact'],
-					$_REQUEST['location'],$_REQUEST['notes'])) throw new Exception();
+					$_REQUEST['location'],$_REQUEST['notes'])
+				)
+					throw new Exception();
 			}
 
 // }}} SAVE TRANSACTION
 
-			DBend(true);
+			$result = DBend(true);
 
-			show_messages(true, $msg_ok, $msg_fail);
+			show_messages($result, $msg_ok, $msg_fail);
 
 			unset($_REQUEST['form']);
 			unset($_REQUEST['hostid']);
@@ -709,8 +712,6 @@ include_once('include/page_header.php');
 
 ?>
 <?php
-	// echo SBR;
-
 	if(($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['hosts'])){
 		$hosts_wdgt->addItem(insert_mass_update_host_form());
 	}
@@ -721,7 +722,6 @@ include_once('include/page_header.php');
 			$hosts_wdgt->addItem(insert_host_form());
 	}
 	else{
-
 		$frmForm = new CForm();
 		$frmForm->setMethod('get');
 
@@ -772,6 +772,7 @@ include_once('include/page_header.php');
 			S_ITEMS,
 			S_TRIGGERS,
 			S_GRAPHS,
+			S_DISCOVERY,
 			make_sorting_header(S_DNS, 'dns'),
 			make_sorting_header(S_IP, 'ip'),
 			S_PORT,
@@ -820,6 +821,7 @@ include_once('include/page_header.php');
 			'select_triggers' => API_OUTPUT_COUNT,
 			'select_graphs' => API_OUTPUT_COUNT,
 			'select_applications' => API_OUTPUT_COUNT,
+			'select_discoveries' => API_OUTPUT_COUNT,
 			'nopermissions' => 1,
 		);
 		$hosts = CHost::get($options);
@@ -842,6 +844,7 @@ include_once('include/page_header.php');
 		$templates = CTemplate::get($options);
 		$templates = zbx_toHash($templates, 'templateid');
 //---------
+
 		foreach($hosts as $num => $host){
 			$applications = array(new CLink(S_APPLICATIONS, 'applications.php?groupid='.$_REQUEST['groupid'].'&hostid='.$host['hostid']),
 				' ('.$host['applications'].')');
@@ -851,6 +854,8 @@ include_once('include/page_header.php');
 				' ('.$host['triggers'].')');
 			$graphs = array(new CLink(S_GRAPHS, 'graphs.php?groupid='.$_REQUEST['groupid'].'&hostid='.$host['hostid']),
 				' ('.$host['graphs'].')');
+			$discoveries = array(new CLink(S_DISCOVERY, 'host_discovery.php?&hostid='.$host['hostid']),
+				' ('.$host['discoveries'].')');
 
 			$description = array();
 			if($host['proxy_hostid']){
@@ -975,6 +980,7 @@ include_once('include/page_header.php');
 				$items,
 				$triggers,
 				$graphs,
+				$discoveries,
 				$dns,
 				$ip,
 				empty($host['port']) ? '-' : $host['port'],
