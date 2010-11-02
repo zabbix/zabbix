@@ -65,7 +65,7 @@ require_once('include/items.inc.php');
 		}
 
 //		if(!eregi('^([0-9a-zA-Z\_\.[.-.]\$ ]+)$', $name)){
-		if(!preg_match('/^([0-9a-z_\.\-\$\s]+)$/i', $name)){
+		if(!preg_match('/'.ZBX_PREG_PARAMS.'/i', $name)){
 			error(S_SCENARIO_STEP_NAME_SHOULD_CONTAIN.SPACE."'0-9a-zA-Z_ .$'-".SPACE.S_CHARACTERS_ONLY_SMALL);
 			return false;
 		}
