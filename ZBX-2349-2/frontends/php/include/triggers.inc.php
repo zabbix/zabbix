@@ -593,7 +593,7 @@ return $caption;
  */
 	function zbx_unquote_param($value){
 		$value = trim($value);
-		if( !empty($value) && '"' == zbx_substr($value, 1, 1) ){
+		if( !empty($value) && '"' == zbx_substr($value, 0, 1) ){
 /* open quotes and unescape chars */
 			$value = zbx_substr($value, 1, zbx_strlen($value)-2);
 
