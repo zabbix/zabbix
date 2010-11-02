@@ -603,7 +603,7 @@ include_once('include/page_header.php');
 						' ORDER BY i.description';
 				$res = DBselect($sql);
 				while($db_item = DBfetch($res)){
-						if(!copy_item_to_host($db_item['itemid'], $hostid, true)) throw new Exception();
+					if(!copy_item_to_host($db_item['itemid'], $hostid)) throw new Exception();
 				}
 
 // Host triggers

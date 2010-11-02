@@ -165,7 +165,7 @@ require_once('include/items.inc.php');
 			}
 			else{
 				$itemid = $item_data['itemid'];
-				
+
 				$item_args['itemid'] = $item_data['itemid'];
 				$item_args['history'] = $item_data['history'];
 				$item_args['status'] = $item_data['status'];
@@ -361,12 +361,12 @@ require_once('include/items.inc.php');
 					$item_args['trends'] = $trends;
 					$item_args['valuemapid'] = 0;
 
-					if(!$itemid = add_item($item_args)){
+					if(!$itemid = CItem::create($item_args)){
 						throw new Exception('Cannot add item');
 					}
 				}
 				else{
-					$itemid = $item_data['itemid'];
+					$itemid = $item_args['itemid'] = $item_data['itemid'];
 
 					$item_args['history'] = $item_data['history'];
 					$item_args['status'] = $item_data['status'];
@@ -374,7 +374,8 @@ require_once('include/items.inc.php');
 					$item_args['trends'] = $item_data['trends'];
 					$item_args['valuemapid'] = $item_data['valuemapid'];
 
-					if(!update_item($itemid, $item_args)){
+
+					if(!CItem::update($item_args)){
 						throw new Exception('Cannot update item');
 					}
 				}

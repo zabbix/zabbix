@@ -394,7 +394,7 @@ include_once('include/page_header.php');
 					' ORDER BY i.description';
 			$res = DBselect($sql);
 			while($db_item = DBfetch($res)){
-				$result &= (bool) copy_item_to_host($db_item['itemid'], $templateid, true);
+				$result &= (bool) copy_item_to_host($db_item['itemid'], $templateid);
 			}
 
 // Host triggers
