@@ -925,6 +925,7 @@ COpt::memoryPick();
 			}
 
 // first delete child items
+
 			$parent_itemids = $ruleids;
 			do{
 				$db_items = DBselect('SELECT itemid FROM items WHERE ' . DBcondition('templateid', $parent_itemids));
@@ -939,6 +940,7 @@ COpt::memoryPick();
 			$sql = 'SELECT i.itemid'.
 			 		' FROM item_discovery id, items i'.
 			 		' WHERE i.templateid IS NULL'.
+			 			' AND i.itemid=id.itemid'.
 			 			' AND '.DBcondition('parent_itemid', $ruleids);
 			$db_items = DBselect($sql);
 			while($item = DBfetch($db_items)){
@@ -946,7 +948,6 @@ COpt::memoryPick();
 			}
 			if(!CItemPrototype::delete($prototypeids, true))
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete discovery rule');
-
 
 			DB::delete('items', array(DBcondition('itemid', $ruleids)));
 
