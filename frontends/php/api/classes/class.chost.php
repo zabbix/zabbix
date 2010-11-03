@@ -54,7 +54,7 @@ class CHost extends CZBXAPI{
  * @param int $options['extendoutput'] return all fields for Hosts
  * @param boolean $options['select_groups'] select HostGroups
  * @param boolean $options['select_templates'] select Templates
- * @param boolean $options['select_items'] select Items
+ * @param boolean $options['selectItems'] select Items
  * @param boolean $options['select_triggers'] select Triggers
  * @param boolean $options['select_graphs'] select Graphs
  * @param boolean $options['select_applications'] select Applications
@@ -126,7 +126,7 @@ class CHost extends CZBXAPI{
 			'output'					=> API_OUTPUT_REFER,
 			'select_groups'				=> null,
 			'selectParentTemplates'		=> null,
-			'select_items'				=> null,
+			'selectItems'				=> null,
 			'selectDiscoveries'		=> null,
 			'select_triggers'			=> null,
 			'select_graphs'				=> null,
@@ -545,7 +545,7 @@ class CHost extends CZBXAPI{
 					if(!is_null($options['selectParentTemplates']) && !isset($result[$host['hostid']]['parentTemplates'])){
 						$result[$host['hostid']]['parentTemplates'] = array();
 					}
-					if(!is_null($options['select_items']) && !isset($result[$host['hostid']]['items'])){
+					if(!is_null($options['selectItems']) && !isset($result[$host['hostid']]['items'])){
 						$result[$host['hostid']]['items'] = array();
 					}
 					if(!is_null($options['selectDiscoveries']) && !isset($result[$host['hostid']]['discoveries'])){
@@ -622,7 +622,7 @@ class CHost extends CZBXAPI{
 					}
 
 // itemids
-					if(isset($host['itemid']) && is_null($options['select_items'])){
+					if(isset($host['itemid']) && is_null($options['selectItems'])){
 						if(!isset($result[$host['hostid']]['items']))
 							$result[$host['hostid']]['items'] = array();
 
@@ -728,6 +728,7 @@ Copt::memoryPick();
 				$templates = CTemplate::get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($templates, 'host');
+				$count = array();
 				foreach($templates as $templateid => $template){
 					unset($templates[$templateid]['hosts']);
 					$count = array();
@@ -758,8 +759,50 @@ Copt::memoryPick();
 			}
 		}
 
+// Adding HostInterfaces
+		if(!is_null($options['selectInterfaces'])){
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'hostids' => $hostids,
+				'nopermissions' => 1,
+				'preservekeys' => 1
+			);
+			if(is_array($options['selectInterfaces']) || str_in_array($options['selectInterfaces'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['selectInterfaces'];
+				$interfaces = CHostInterface::get($obj_params);
+
+				if(!is_null($options['limitSelects'])) 
+					order_result($interfaces, 'interfaceid', ZBX_SORT_UP);
+
+				$count = array();
+				foreach($interfaces as $interfaceid => $interface){
+					if(!is_null($options['limitSelects'])){
+						if(!isset($count[$interface['hostid']])) $count[$interface['hostid']] = 0;
+						$count[$interface['hostid']]++;
+
+						if($count[$interface['hostid']] > $options['limitSelects']) continue;
+					}
+
+					$result[$interface['hostid']]['interfaces'][] = &$interfaces[$interfaceid];
+				}
+			}
+			else if(API_OUTPUT_COUNT == $options['selectInterfaces']){
+				$obj_params['countOutput'] = 1;
+				$obj_params['groupCount'] = 1;
+
+				$interfaces = CHostInterface::get($obj_params);
+				$interfaces = zbx_toHash($interfaces, 'hostid');
+				foreach($result as $hostid => $host){
+					if(isset($interfaces[$hostid]))
+						$result[$hostid]['interfaces'] = $interfaces[$hostid]['rowscount'];
+					else
+						$result[$hostid]['interfaces'] = 0;
+				}
+			}
+		}
+
 // Adding Items
-		if(!is_null($options['select_items'])){
+		if(!is_null($options['selectItems'])){
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'hostids' => $hostids,
@@ -767,26 +810,25 @@ Copt::memoryPick();
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
-			if(is_array($options['select_items']) || str_in_array($options['select_items'], $subselects_allowed_outputs)){
-				$obj_params['output'] = $options['select_items'];
+
+			if(is_array($options['selectItems']) || str_in_array($options['selectItems'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['selectItems'];
 				$items = CItem::get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($items, 'description');
+				$count = array();
 				foreach($items as $itemid => $item){
-					unset($items[$itemid]['hosts']);
-					foreach($item['hosts'] as $hnum => $host){
-						if(!is_null($options['limitSelects'])){
-							if(!isset($count[$host['hostid']])) $count[$host['hostid']] = 0;
-							$count[$host['hostid']]++;
+					if(!is_null($options['limitSelects'])){
+						if(!isset($count[$item['hostid']])) $count[$item['hostid']] = 0;
+						$count[$item['hostid']]++;
 
-							if($count[$host['hostid']] > $options['limitSelects']) continue;
-						}
-
-						$result[$host['hostid']]['items'][] = &$items[$itemid];
+						if($count[$item['hostid']] > $options['limitSelects']) continue;
 					}
+
+					$result[$item['hostid']]['items'][] = &$items[$itemid];
 				}
 			}
-			else if(API_OUTPUT_COUNT == $options['select_items']){
+			else if(API_OUTPUT_COUNT == $options['selectItems']){
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
@@ -815,6 +857,8 @@ Copt::memoryPick();
 				$items = CDiscoveryRule::get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($items, 'description');
+
+				$count = array();
 				foreach($items as $itemid => $item){
 					unset($items[$itemid]['hosts']);
 					foreach($item['hosts'] as $hnum => $host){
@@ -858,6 +902,8 @@ Copt::memoryPick();
 				$triggers = CTrigger::get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($triggers, 'description');
+
+				$count = array();
 				foreach($triggers as $triggerid => $trigger){
 					unset($triggers[$triggerid]['hosts']);
 
@@ -902,6 +948,8 @@ Copt::memoryPick();
 				$graphs = CGraph::get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($graphs, 'name');
+
+				$count = array();
 				foreach($graphs as $graphid => $graph){
 					unset($graphs[$graphid]['hosts']);
 
@@ -946,6 +994,8 @@ Copt::memoryPick();
 				$dhosts = CDHost::get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($dhosts, 'dhostid');
+
+				$count = array();
 				foreach($dhosts as $dhostid => $dhost){
 					unset($dhosts[$dhostid]['hosts']);
 
@@ -990,6 +1040,8 @@ Copt::memoryPick();
 				$applications = CApplication::get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($applications, 'name');
+
+				$count = array();
 				foreach($applications as $applicationid => $application){
 					unset($applications[$applicationid]['hosts']);
 

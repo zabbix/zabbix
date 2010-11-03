@@ -88,7 +88,7 @@ class CHostInterface extends CZBXAPI{
 
 // OutPut
 			'output'					=> API_OUTPUT_REFER,
-			'selectHosts'			=> null,
+			'selectHosts'				=> null,
 			'selectItems'				=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
@@ -203,12 +203,12 @@ class CHostInterface extends CZBXAPI{
 // should last, after all ****IDS checks
 		if(!$nodeCheck){
 			$nodeCheck = true;
-			$sql_parts['where'][] = DBin_node('h.hostid', $nodeids);
+			$sql_parts['where'][] = DBin_node('hi.interfaceid', $nodeids);
 		}
 
 // output
 		if($options['output'] == API_OUTPUT_EXTEND){
-			$sql_parts['select']['hosts'] = 'hi.*';
+			$sql_parts['select']['interface'] = 'hi.*';
 		}
 
 // countOutput

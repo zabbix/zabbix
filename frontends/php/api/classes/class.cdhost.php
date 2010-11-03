@@ -54,7 +54,7 @@ class CDHost extends CZBXAPI{
  * @param int $options['extendoutput'] return all fields for Hosts
  * @param boolean $options['select_groups'] select HostGroups
  * @param boolean $options['select_templates'] select Templates
- * @param boolean $options['select_items'] select Items
+ * @param boolean $options['selectItems'] select Items
  * @param boolean $options['select_triggers'] select Triggers
  * @param boolean $options['select_graphs'] select Graphs
  * @param boolean $options['select_applications'] select Applications

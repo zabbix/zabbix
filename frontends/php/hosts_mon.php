@@ -202,7 +202,7 @@ include_once('include/page_header.php');
 		'hostids' => zbx_objectValues($hosts, 'hostid'),
 		'output' => API_OUTPUT_EXTEND,
 		'selectParentTemplates' => array('hostid', 'host'),
-		'select_items' => API_OUTPUT_COUNT,
+		'selectItems' => API_OUTPUT_COUNT,
 		'select_triggers' => API_OUTPUT_COUNT,
 		'select_graphs' => API_OUTPUT_COUNT,
 		'select_applications' => API_OUTPUT_COUNT,

@@ -78,7 +78,7 @@ class CGraph extends CZBXAPI{
 			'select_groups'			=> null,
 			'select_templates'		=> null,
 			'select_hosts'			=> null,
-			'select_items'			=> null,
+			'selectItems'			=> null,
 			'select_graph_items'	=> null,
 			'selectDiscoveryRule'	=> null,
 			'countOutput'			=> null,
@@ -396,7 +396,7 @@ class CGraph extends CZBXAPI{
 					if(!is_null($options['select_templates']) && !isset($result[$graph['graphid']]['templates'])){
 						$result[$graph['graphid']]['templates'] = array();
 					}
-					if(!is_null($options['select_items']) && !isset($result[$graph['graphid']]['items'])){
+					if(!is_null($options['selectItems']) && !isset($result[$graph['graphid']]['items'])){
 						$result[$graph['graphid']]['items'] = array();
 					}
 					if(!is_null($options['selectDiscoveryRule']) && !isset($result[$graph['graphid']]['discoveryRule'])){
@@ -412,7 +412,7 @@ class CGraph extends CZBXAPI{
 						unset($graph['hostid']);
 					}
 // itemids
-					if(isset($graph['itemid']) && is_null($options['select_items'])){
+					if(isset($graph['itemid']) && is_null($options['selectItems'])){
 						if(!isset($result[$graph['graphid']]['items']))
 							$result[$graph['graphid']]['items'] = array();
 
@@ -514,10 +514,10 @@ COpt::memoryPick();
 		}
 
 // Adding Items
-		if(!is_null($options['select_items']) && str_in_array($options['select_items'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectItems']) && str_in_array($options['selectItems'], $subselects_allowed_outputs)){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'output' => $options['select_items'],
+				'output' => $options['selectItems'],
 				'graphids' => $graphids,
 				'nopermissions' => 1,
 				'preservekeys' => 1
@@ -829,7 +829,7 @@ COpt::memoryPick();
 			'graphids' => $graph['graphid'],
 			'nopermissions' => 1,
 			'filter' => array('flags' => null),
-			'select_items' => API_OUTPUT_EXTEND,
+			'selectItems' => API_OUTPUT_EXTEND,
 			'select_graph_items' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND
 		);

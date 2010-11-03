@@ -267,7 +267,7 @@
 				'output' => API_OUTPUT_EXTEND,
 				'select_hosts' => API_OUTPUT_EXTEND,
 				'select_triggers' => API_OUTPUT_EXTEND,
-				'select_items' => API_OUTPUT_EXTEND,
+				'selectItems' => API_OUTPUT_EXTEND,
 			);
 			$dsc_events = CEvent::get($options);
 			order_result($dsc_events, 'eventid', ZBX_SORT_DOWN);
@@ -407,7 +407,7 @@
 				'triggerids' => zbx_objectValues($events, 'objectid'),
 				'select_hosts' => API_OUTPUT_EXTEND,
 				'select_triggers' => API_OUTPUT_EXTEND,
-				'select_items' => API_OUTPUT_EXTEND,
+				'selectItems' => API_OUTPUT_EXTEND,
 				'output' => API_OUTPUT_EXTEND
 			);
 			$triggers = CTrigger::get($triggersOptions);

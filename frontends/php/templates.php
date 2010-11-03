@@ -834,7 +834,7 @@ include_once('include/page_header.php');
 			'select_hosts' => array('hostid','host','status'),
 			'select_templates' => array('hostid','host','status'),
 			'selectParentTemplates' => array('hostid','host','status'),
-			'select_items' => API_OUTPUT_COUNT,
+			'selectItems' => API_OUTPUT_COUNT,
 			'select_triggers' => API_OUTPUT_COUNT,
 			'select_graphs' => API_OUTPUT_COUNT,
 			'select_applications' => API_OUTPUT_COUNT,

@@ -516,13 +516,6 @@ class CItem extends CZBXAPI{
 						$result[$item['itemid']]['discoveryRule'] = array();
 					}
 
-// hostids
-					if(isset($item['hostid']) && is_null($options['select_hosts'])){
-						if(!isset($result[$item['itemid']]['hosts'])) $result[$item['itemid']]['hosts'] = array();
-
-						$result[$item['itemid']]['hosts'][] = array('hostid' => $item['hostid']);
-//						unset($item['hostid']);
-					}
 // triggerids
 					if(isset($item['triggerid']) && is_null($options['select_triggers'])){
 						if(!isset($result[$item['itemid']]['triggers']))
@@ -1390,9 +1383,10 @@ COpt::memoryPick();
 		$items = zbx_toHash($items, 'itemid');
 
 		$chdHosts = CHost::get(array(
+			'output' => array('hostid', 'host'),
+			'selectInterfaces' => API_OUTPUT_REFER,
 			'templateids' => zbx_objectValues($items, 'hostid'),
 			'hostids' => $hostids,
-			'output' => array('hostid', 'host'),
 			'preservekeys' => 1,
 			'nopermissions' => 1,
 			'templated_hosts' => 1
@@ -1402,6 +1396,7 @@ COpt::memoryPick();
 		$insertItems = array();
 		$updateItems = array();
 		foreach($chdHosts as $hostid => $host){
+			$interface = reset($host['interfaces']);
 			$templateids = zbx_toHash($host['templates'], 'templateid');
 
 // skip items not from parent templates of current host
@@ -1456,9 +1451,11 @@ COpt::memoryPick();
 
 				if($exItem){
 					$newItem['itemid'] = $exItem['itemid'];
+					unset($newItem['interfaceid']);
 					$updateItems[] = $newItem;
 				}
 				else{
+					$newItem['interfaceid'] = $interface['interfaceid'];
 					$insertItems[] = $newItem;
 				}
 			}
