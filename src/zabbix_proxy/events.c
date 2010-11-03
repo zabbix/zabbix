@@ -17,9 +17,6 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#include "common.h"
-#include "log.h"
-
 #include "events.h"
 
 /******************************************************************************
@@ -34,29 +31,10 @@
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments: Cannot use action->userid as it may also be groupid              *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	process_event(DB_EVENT *event, int force_actions)
 {
-/*	zabbix_log(LOG_LEVEL_DEBUG,"In [proxy]process_event(eventid:" ZBX_FS_UI64 ",object:%d,objectid:" ZBX_FS_UI64 ")",
-			event->eventid,
-			event->object,
-			event->objectid);
-
-	if (event->eventid == 0)
-		event->eventid = DBget_maxid("events", "eventid");
-
-	DBexecute("insert into events(eventid,source,object,objectid,clock,value)"
-			" values(" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 ",%d,%d)",
-			event->eventid,
-			event->source,
-			event->object,
-			event->objectid,
-			event->clock,
-			event->value);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of [proxy]process_event()");
-*/
 	return SUCCEED;
 }

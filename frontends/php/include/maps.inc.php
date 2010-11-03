@@ -460,9 +460,6 @@
 			case SYSMAP_ELEMENT_ICON_ON:
 				$info['iconid'] = $selement['iconid_on'];
 				break;
-			case SYSMAP_ELEMENT_ICON_UNKNOWN:
-				$info['iconid'] = $selement['iconid_unknown'];
-				break;
 			case SYSMAP_ELEMENT_ICON_MAINTENANCE:
 				$info['iconid'] = $selement['iconid_maintenance'];
 				break;
@@ -513,9 +510,6 @@
 					break;
 				case SYSMAP_ELEMENT_ICON_ON:
 					$info['iconid'] = $selement['iconid_on'];
-					break;
-				case SYSMAP_ELEMENT_ICON_UNKNOWN:
-					$info['iconid'] = $selement['iconid_unknown'];
 					break;
 				case SYSMAP_ELEMENT_ICON_MAINTENANCE:
 					$info['iconid'] = $selement['iconid_maintenance'];
@@ -905,16 +899,6 @@
 				'color' => ($i['priority'] > 3) ? $colors['Red'] : $colors['Dark Red']
 			);
 		}
-		else if($i['unknown']){
-			$info['iconid'] = $selement['iconid_unknown'];
-			$info['icon_type'] = SYSMAP_ELEMENT_ICON_UNKNOWN;
-			$info['info'] = array(
-				'unknown' => array(
-					'msg' => S_UNKNOWN_BIG,
-					'color' => $colors['Gray'],
-				)
-			);
-		}
 		else if($i['trigger_disabled']){
 			$info['iconid'] = $selement['iconid_disabled'];
 			$info['icon_type'] = SYSMAP_ELEMENT_ICON_DISABLED;
@@ -981,16 +965,6 @@
 					'color' => $colors['Gray']
 				);
 			}
-			$has_problem = true;
-		}
-		else if($i['unknown']){
-			$info['iconid'] = $selement['iconid_unknown'];
-			$info['icon_type'] = SYSMAP_ELEMENT_ICON_UNKNOWN;
-
-			$info['info']['unknown'] = array(
-				'msg' => $i['unknown'] . ' ' . S_UNKNOWN,
-				'color' => $colors['Gray']
-			);
 			$has_problem = true;
 		}
 
@@ -1065,15 +1039,6 @@
 					'color' => $colors['Gray']
 				);
 			}
-			$has_problem = true;
-		}
-		else if($i['unknown']){
-			$info['iconid'] = $selement['iconid_unknown'];
-			$info['icon_type'] = SYSMAP_ELEMENT_ICON_UNKNOWN;
-			$info['info']['unknown'] = array(
-				'msg' => $i['unknown'] . ' ' . S_UNKNOWN,
-				'color' => $colors['Gray']
-			);
 			$has_problem = true;
 		}
 
@@ -1154,16 +1119,6 @@
 					'color' => $colors['Gray']
 				);
 			}
-			$has_problem = true;
-		}
-		else if($i['unknown']){
-			$info['iconid'] = $selement['iconid_unknown'];
-			$info['icon_type'] = SYSMAP_ELEMENT_ICON_UNKNOWN;
-
-			$info['info']['unknown'] = array(
-				'msg' => $i['unknown'] . ' ' . S_UNKNOWN,
-				'color' => $colors['Gray']
-			);
 			$has_problem = true;
 		}
 
@@ -1332,6 +1287,9 @@
 			$options = array(
 				'nodeids' => get_current_nodeid(true),
 				'triggerids' => array_keys($triggers_map),
+				'filter' => array(
+					'value_flags' => null
+				),
 				'output' => API_OUTPUT_EXTEND,
 				'nopermissions' => 1
 			);
@@ -1350,7 +1308,10 @@
 			$options = array(
 				'nodeids' => get_current_nodeid(true),
 				'triggerids' => array_keys($triggers_map_submaps),
-				'filter' => array('value' => array(TRIGGER_VALUE_UNKNOWN, TRIGGER_VALUE_TRUE)),
+				'filter' => array(
+//					'value' => TRIGGER_VALUE_TRUE,
+					'value_flags' => null
+				),
 				'skipDependent' => 1,
 				'output' => API_OUTPUT_EXTEND,
 				'nopermissions' => 1,
@@ -1371,7 +1332,10 @@
 				'hostids' => $monitored_hostids,
 				'output' => API_OUTPUT_EXTEND,
 				'nopermissions' => 1,
-				'filter' => array('value' => array(TRIGGER_VALUE_UNKNOWN, TRIGGER_VALUE_TRUE)),
+				'filter' => array(
+//					'value' => TRIGGER_VALUE_TRUE,
+					'value_flags' => null,
+				),
 				'nodeids' => get_current_nodeid(true),
 				'active' => true,
 				'skipDependent' => 1,
@@ -1396,7 +1360,10 @@
 			'nodeids' => get_current_nodeid(true),
 			'nopermissions' => 1,
 			'active' => 1,
-			'filter' => array('value' => TRIGGER_VALUE_TRUE),
+			'filter' => array(
+				'value' => TRIGGER_VALUE_TRUE,
+				'value_flags' => null
+			),
 		);
 		$unack_triggerids = CTrigger::get($options);
 		$unack_triggerids = zbx_toHash($unack_triggerids, 'triggerid');
@@ -1439,9 +1406,6 @@
 						$last_problemid = $triggerid;
 						if($i['priority'] < $trigger['priority'])
 							$i['priority'] = $trigger['priority'];
-					}
-					else if($trigger['value'] == TRIGGER_VALUE_UNKNOWN){
-						$i['unknown']++;
 					}
 
 					if(isset($unack_triggerids[$triggerid]))
@@ -1760,8 +1724,6 @@
 					}
 				}
 
-				if($el_info['icon_type'] == SYSMAP_ELEMENT_ICON_UNKNOWN) $hl_color = hex2rgb('CCCCCC');
-
 				if($el_info['icon_type'] == SYSMAP_ELEMENT_ICON_MAINTENANCE) $st_color = hex2rgb('FF9933');
 				if($el_info['icon_type'] == SYSMAP_ELEMENT_ICON_DISABLED) $st_color = hex2rgb('EEEEEE');
 
@@ -1868,7 +1830,6 @@
 			$st_color = null;
 			if(!isset($_REQUEST['noselements']) && (($map['highlight']%2) == SYSMAP_HIGHLIGHT_ON)){
 				if($el_info['icon_type'] == SYSMAP_ELEMENT_ICON_ON) $hl_color = true;
-				if($el_info['icon_type'] == SYSMAP_ELEMENT_ICON_UNKNOWN) $hl_color = true;
 
 				if($el_info['icon_type'] == SYSMAP_ELEMENT_ICON_MAINTENANCE) $st_color = true;
 				if($el_info['icon_type'] == SYSMAP_ELEMENT_ICON_DISABLED) $st_color = true;
@@ -2051,7 +2012,6 @@
 			$st_color = null;
 			if(!isset($_REQUEST['noselements']) && (($map['highlight']%2) == SYSMAP_HIGHLIGHT_ON)){
 				if($el_info['icon_type'] == SYSMAP_ELEMENT_ICON_ON) $hl_color = true;
-				if($el_info['icon_type'] == SYSMAP_ELEMENT_ICON_UNKNOWN) $hl_color = true;
 
 				if($el_info['icon_type'] == SYSMAP_ELEMENT_ICON_MAINTENANCE) $st_color = true;
 				if($el_info['icon_type'] == SYSMAP_ELEMENT_ICON_DISABLED) $st_color = true;
@@ -2077,6 +2037,7 @@
 			}
 			else if($map['label_type'] == MAP_LABEL_TYPE_NAME){
 				$label[] = array('msg' => $el_info['name']);
+				$label = array_merge($label, $status_lines[$selementid]);
 			}
 			else{
 				$label = array_merge($label_lines[$selementid], $status_lines[$selementid]);

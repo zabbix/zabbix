@@ -121,8 +121,8 @@ class CScript extends CZBXAPI{
 			$sql_parts['where'][] = 'hg.groupid=r.id';
 			$sql_parts['where'][] = 'r.groupid=ug.usrgrpid';
 			$sql_parts['where'][] = 'ug.userid='.$userid;
-			$sql_parts['where'][] = '(hg.groupid=s.groupid OR s.groupid=0)';
-			$sql_parts['where'][] = '(ug.usrgrpid=s.usrgrpid OR s.usrgrpid=0)';
+			$sql_parts['where'][] = '(hg.groupid=s.groupid OR s.groupid IS NULL)';
+			$sql_parts['where'][] = '(ug.usrgrpid=s.usrgrpid OR s.usrgrpid IS NULL)';
 		}
 
 // nodeids
@@ -138,7 +138,7 @@ class CScript extends CZBXAPI{
 				$sql_parts['select']['scripts'] = 's.scriptid, s.groupid';
 			}
 
-			$sql_parts['where'][] = DBcondition('s.groupid', $options['groupids']);
+			$sql_parts['where'][] = '('.DBcondition('s.groupid', $options['groupids']).' OR s.groupid IS NULL)';
 		}
 
 // hostids
@@ -152,7 +152,7 @@ class CScript extends CZBXAPI{
 			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sql_parts['where'][] = '(('.DBcondition('hg.hostid', $options['hostids']).' AND hg.groupid=s.groupid)'.
 									' OR '.
-									'(s.groupid=0))';
+									'(s.groupid IS NULL))';
 		}
 
 // scriptids
@@ -225,6 +225,7 @@ class CScript extends CZBXAPI{
 				' WHERE '.DBin_node('s.scriptid', $nodeids).
 					$sql_where.
 				$sql_order;
+//SDI($sql);
 		$res = DBselect($sql, $sql_limit);
 		while($script = DBfetch($res)){
 			if($options['countOutput']){
@@ -643,6 +644,8 @@ class CScript extends CZBXAPI{
 			$scripts_by_host[$hostid] = array();
 		}
 //-----
+
+
 		$options = array(
 			'hostids' => $hostids,
 			'output' => API_OUTPUT_EXTEND,
@@ -652,8 +655,8 @@ class CScript extends CZBXAPI{
 
 		$obj_params = array(
 			'groupids' => zbx_objectValues($groups, 'groupid'),
-         'sortfield' => 'name',
 			'output' => API_OUTPUT_EXTEND,
+			'sortfield' => 'name',
 			'preservekeys' => 1
 		);
 		$scripts  = CScript::get($obj_params);

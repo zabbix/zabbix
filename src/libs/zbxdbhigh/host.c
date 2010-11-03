@@ -2053,12 +2053,12 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t host
 				strlen(comments_esc) + strlen(url_esc),
 				"insert into triggers"
 					" (triggerid,description,priority,status,"
-						"comments,url,type,value,templateid,flags)"
+						"comments,url,type,value,value_flags,templateid,flags)"
 					" values (" ZBX_FS_UI64 ",'%s',%d,%d,"
-						"'%s','%s',%d,%d," ZBX_FS_UI64 ",%d);\n",
+						"'%s','%s',%d,%d,%d," ZBX_FS_UI64 ",%d);\n",
 					*new_triggerid, description_esc, (int)priority,
 					(int)status, comments_esc, url_esc, (int)type,
-					TRIGGER_VALUE_UNKNOWN, triggerid, (int)flags);
+					TRIGGER_VALUE_FALSE, TRIGGER_VALUE_FLAG_UNKNOWN, triggerid, (int)flags);
 
 		zbx_free(url_esc);
 		zbx_free(comments_esc);

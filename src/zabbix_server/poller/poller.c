@@ -276,14 +276,14 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_timespec_
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	triggerid;
-	int		trigger_type, trigger_value;
+	int		trigger_type, trigger_value, trigger_flags;
 	const char	*trigger_error;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64,
 			__function_name, hostid);
 
 	result = DBselect(
-			"select distinct t.triggerid,t.type,t.value,t.error"
+			"select distinct t.triggerid,t.type,t.value,t.value_flags,t.error"
 			" from hosts h,items i,functions f,triggers t"
 			" where h.hostid=i.hostid"
 				" and i.itemid=f.itemid"
@@ -304,10 +304,11 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_timespec_
 		ZBX_STR2UINT64(triggerid, row[0]);
 		trigger_type = atoi(row[1]);
 		trigger_value = atoi(row[2]);
-		trigger_error = row[3];
+		trigger_flags = atoi(row[3]);
+		trigger_error = row[4];
 
-		DBupdate_trigger_value(triggerid, trigger_type, trigger_value,
-				trigger_error, TRIGGER_VALUE_UNKNOWN, ts, reason);
+		DBupdate_trigger_value(triggerid, trigger_type, trigger_value, trigger_flags,
+				trigger_error, trigger_value, TRIGGER_VALUE_FLAG_UNKNOWN, ts, reason);
 	}
 	DBfree_result(result);
 

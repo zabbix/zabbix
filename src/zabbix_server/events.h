@@ -17,11 +17,9 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-
 #ifndef ZABBIX_EVENTS_H
 #define ZABBIX_EVENTS_H
 
-#include "common.h"
 #include "db.h"
 
 int	process_event(DB_EVENT *event, int force_actions);
