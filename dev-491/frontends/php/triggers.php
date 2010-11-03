@@ -531,7 +531,7 @@ include_once('include/page_header.php');
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 			'output' => API_OUTPUT_EXTEND,
 			'select_hosts' => API_OUTPUT_EXTEND,
-			'select_items' => API_OUTPUT_EXTEND,
+			'selectItems' => API_OUTPUT_EXTEND,
 			'select_functions' => API_OUTPUT_EXTEND,
 			'select_dependencies' => API_OUTPUT_EXTEND,
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,

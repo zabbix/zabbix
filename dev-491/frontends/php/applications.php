@@ -333,7 +333,7 @@ include_once('include/page_header.php');
 			$options = array(
 				'applicationids' => zbx_objectValues($applications, 'applicationid'),
 				'output' => API_OUTPUT_EXTEND,
-				'select_items' => API_OUTPUT_REFER,
+				'selectItems' => API_OUTPUT_REFER,
 				'expandData' => 1,
 			);
 			$applications = CApplication::get($options);

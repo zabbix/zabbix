@@ -421,7 +421,7 @@ include_once('include/page_header.php');
 			'output' => API_OUTPUT_EXTEND,
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
 			'select_hosts' => API_OUTPUT_EXTEND,
-			'select_items' => API_OUTPUT_EXTEND,
+			'selectItems' => API_OUTPUT_EXTEND,
 			'select_functions' => API_OUTPUT_EXTEND,
 		);
 		$triggers = CTrigger::get($options);

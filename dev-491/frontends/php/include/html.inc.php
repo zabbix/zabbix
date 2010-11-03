@@ -310,7 +310,7 @@
 			'output' => API_OUTPUT_EXTEND,
 			'templated_hosts' => 1,
 		);
-		if(isset($elements['items'])) $header_host_opt['select_items'] = API_OUTPUT_COUNT;
+		if(isset($elements['items'])) $header_host_opt['selectItems'] = API_OUTPUT_COUNT;
 		if(isset($elements['triggers'])) $header_host_opt['select_triggers'] = API_OUTPUT_COUNT;
 		if(isset($elements['graphs'])) $header_host_opt['select_graphs'] = API_OUTPUT_COUNT;
 		if(isset($elements['applications'])) $header_host_opt['select_applications'] = API_OUTPUT_COUNT;

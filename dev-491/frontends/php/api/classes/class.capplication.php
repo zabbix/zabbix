@@ -85,10 +85,9 @@ class CApplication extends CZBXAPI{
 
 // OutPut
 			'output'				=> API_OUTPUT_REFER,
-			'extendoutput'			=> null,
 			'expandData'			=> null,
 			'select_hosts'			=> null,
-			'select_items'			=> null,
+			'selectItems'			=> null,
 			'countOutput'			=> null,
 			'groupCount'			=> null,
 			'preservekeys'			=> null,
@@ -99,16 +98,6 @@ class CApplication extends CZBXAPI{
 		);
 
 		$options = zbx_array_merge($def_options, $options);
-
-
-		if(!is_null($options['extendoutput'])){
-			$options['output'] = API_OUTPUT_EXTEND;
-
-			if(!is_null($options['select_items'])){
-				$options['select_items'] = API_OUTPUT_EXTEND;
-			}
-		}
-
 
 // editable + PERMISSION CHECK
 
@@ -328,7 +317,7 @@ class CApplication extends CZBXAPI{
 						$result[$application['applicationid']]['hosts'] = array();
 					}
 
-					if(!is_null($options['select_items']) && !isset($result[$application['applicationid']]['items'])){
+					if(!is_null($options['selectItems']) && !isset($result[$application['applicationid']]['items'])){
 						$result[$application['applicationid']]['items'] = array();
 					}
 
@@ -342,7 +331,7 @@ class CApplication extends CZBXAPI{
 					}
 
 // itemids
-					if(isset($application['itemid']) && is_null($options['select_items'])){
+					if(isset($application['itemid']) && is_null($options['selectItems'])){
 						if(!isset($result[$application['applicationid']]['items']))
 							$result[$application['applicationid']]['items'] = array();
 
@@ -382,9 +371,9 @@ COpt::memoryPick();
 
 // Adding Objects
 // Adding items
-		if(!is_null($options['select_items']) && str_in_array($options['select_items'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectItems']) && str_in_array($options['selectItems'], $subselects_allowed_outputs)){
 			$obj_params = array(
-				'output' => $options['select_items'],
+				'output' => $options['selectItems'],
 				'applicationids' => $applicationids,
 				'nopermissions' => 1,
 				'preservekeys' => 1

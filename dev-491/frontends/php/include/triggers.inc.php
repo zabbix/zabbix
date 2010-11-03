@@ -884,7 +884,7 @@ return $caption;
 				'triggerids' => $triggerid,
 				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
 				'output' => API_OUTPUT_REFER,
-				'select_items' => API_OUTPUT_EXTEND
+				'selectItems' => API_OUTPUT_EXTEND
 			));
 			$trig_info = reset($trig_info);
 			$has_prototype = false;
@@ -1964,7 +1964,7 @@ return $caption;
 				'triggerids' => $triggerid,
 				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
 				'output' => API_OUTPUT_REFER,
-				'select_items' => API_OUTPUT_EXTEND
+				'selectItems' => API_OUTPUT_EXTEND
 			));
 			$trig_info = reset($trig_info);
 			$has_prototype = false;

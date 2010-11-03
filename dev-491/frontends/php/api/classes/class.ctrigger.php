@@ -110,7 +110,7 @@ class CTrigger extends CZBXAPI{
 			'output'				=> API_OUTPUT_REFER,
 			'select_groups'			=> null,
 			'select_hosts'			=> null,
-			'select_items'			=> null,
+			'selectItems'			=> null,
 			'select_functions'		=> null,
 			'select_dependencies'	=> null,
 			'selectDiscoveryRule'	=> null,
@@ -622,7 +622,7 @@ class CTrigger extends CZBXAPI{
 					if(!is_null($options['select_hosts']) && !isset($result[$trigger['triggerid']]['hosts'])){
 						$result[$trigger['triggerid']]['hosts'] = array();
 					}
-					if(!is_null($options['select_items']) && !isset($result[$trigger['triggerid']]['items'])){
+					if(!is_null($options['selectItems']) && !isset($result[$trigger['triggerid']]['items'])){
 						$result[$trigger['triggerid']]['items'] = array();
 					}
 					if(!is_null($options['select_functions']) && !isset($result[$trigger['triggerid']]['functions'])){
@@ -652,7 +652,7 @@ class CTrigger extends CZBXAPI{
 						if(is_null($options['expandData'])) unset($trigger['hostid']);
 					}
 // itemids
-					if(isset($trigger['itemid']) && is_null($options['select_items'])){
+					if(isset($trigger['itemid']) && is_null($options['selectItems'])){
 						if(!isset($result[$trigger['triggerid']]['items']))
 							$result[$trigger['triggerid']]['items'] = array();
 
@@ -867,10 +867,10 @@ Copt::memoryPick();
 		}
 
 // Adding Items
-		if(!is_null($options['select_items']) && str_in_array($options['select_items'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectItems']) && str_in_array($options['selectItems'], $subselects_allowed_outputs)){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'output' => $options['select_items'],
+				'output' => $options['selectItems'],
 				'triggerids' => $triggerids,
 				'filter' => array('flags' => null),
 				'webitems' => 1,

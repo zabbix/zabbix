@@ -93,7 +93,7 @@ class CEvent extends CZBXAPI{
 			'output'				=> API_OUTPUT_REFER,
 			'extendoutput'			=> null,
 			'select_hosts'			=> null,
-			'select_items'			=> null,
+			'selectItems'			=> null,
 			'select_triggers'		=> null,
 			'countOutput'			=> null,
 			'preservekeys'			=> null,
@@ -115,8 +115,8 @@ class CEvent extends CZBXAPI{
 			if(!is_null($options['select_triggers'])){
 				$options['select_triggers'] = API_OUTPUT_EXTEND;
 			}
-			if(!is_null($options['select_items'])){
-				$options['select_items'] = API_OUTPUT_EXTEND;
+			if(!is_null($options['selectItems'])){
+				$options['selectItems'] = API_OUTPUT_EXTEND;
 			}
 		}
 
@@ -314,7 +314,7 @@ class CEvent extends CZBXAPI{
 		}
 
 // select_********
-		if(($options['output'] != API_OUTPUT_EXTEND) && (!is_null($options['select_hosts']) || !is_null($options['select_triggers']) || !is_null($options['select_items'])))
+		if(($options['output'] != API_OUTPUT_EXTEND) && (!is_null($options['select_hosts']) || !is_null($options['select_triggers']) || !is_null($options['selectItems'])))
 		{
 			$sql_parts['select']['events'][] = 'e.object';
 			$sql_parts['select']['events'][] = 'e.objectid';
@@ -373,7 +373,7 @@ class CEvent extends CZBXAPI{
 						$result[$event['eventid']]['triggers'] = array();
 					}
 
-					if(!is_null($options['select_items']) && !isset($result[$event['eventid']]['items'])){
+					if(!is_null($options['selectItems']) && !isset($result[$event['eventid']]['items'])){
 						$result[$event['eventid']]['items'] = array();
 					}
 
@@ -394,7 +394,7 @@ class CEvent extends CZBXAPI{
 					}
 
 // itemids
-					if(isset($event['itemid']) && is_null($options['select_items'])){
+					if(isset($event['itemid']) && is_null($options['selectItems'])){
 						if(!isset($result[$event['eventid']]['items'])) $result[$event['eventid']]['items'] = array();
 
 						$result[$event['eventid']]['items'][] = array('itemid' => $event['itemid']);
@@ -468,10 +468,10 @@ Copt::memoryPick();
 		}
 
 // Adding items
-		if(!is_null($options['select_items']) && str_in_array($options['select_items'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectItems']) && str_in_array($options['selectItems'], $subselects_allowed_outputs)){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'output' => $options['select_items'],
+				'output' => $options['selectItems'],
 				'triggerids' => $triggerids,
 				'webitems' => 1,
 				'nopermissions' => 1,

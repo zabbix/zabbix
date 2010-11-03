@@ -80,8 +80,8 @@ class CTemplate extends CZBXAPI{
 			'select_hosts'				=> null,
 			'select_templates'			=> null,
 			'selectParentTemplates'		=> null,
-			'select_items'				=> null,
-			'selectDiscoveries'		=> null,
+			'selectItems'				=> null,
+			'selectDiscoveries'			=> null,
 			'select_triggers'			=> null,
 			'select_graphs'				=> null,
 			'select_applications'		=> null,
@@ -405,7 +405,7 @@ class CTemplate extends CZBXAPI{
 					if(!is_null($options['selectParentTemplates']) && !isset($result[$template['templateid']]['parentTemplates'])){
 						$template['parentTemplates'] = array();
 					}
-					if(!is_null($options['select_items']) && !isset($result[$template['templateid']]['items'])){
+					if(!is_null($options['selectItems']) && !isset($result[$template['templateid']]['items'])){
 						$template['items'] = array();
 					}
 					if(!is_null($options['selectDiscoveries']) && !isset($result[$template['hostid']]['discoveries'])){
@@ -454,7 +454,7 @@ class CTemplate extends CZBXAPI{
 					}
 
 // itemids
-					if(isset($template['itemid']) && is_null($options['select_items'])){
+					if(isset($template['itemid']) && is_null($options['selectItems'])){
 						if(!isset($result[$template['templateid']]['items']))
 							$result[$template['templateid']]['items'] = array();
 
@@ -645,7 +645,7 @@ Copt::memoryPick();
 		}
 
 // Adding Items
-		if(!is_null($options['select_items'])){
+		if(!is_null($options['selectItems'])){
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'hostids' => $templateids,
@@ -654,27 +654,25 @@ Copt::memoryPick();
 				'preservekeys' => 1
 			);
 
-			if(is_array($options['select_items']) || str_in_array($options['select_items'], $subselects_allowed_outputs)){
-				$obj_params['output'] = $options['select_items'];
+			if(is_array($options['selectItems']) || str_in_array($options['selectItems'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['selectItems'];
 				$items = CItem::get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($items, 'description');
+
+				$count = array();
 				foreach($items as $itemid => $item){
-					unset($items[$itemid]['hosts']);
+					if(!is_null($options['limitSelects'])){
+						if(!isset($count[$item['hostid']])) $count[$item['hostid']] = 0;
+						$count[$item['hostid']]++;
 
-					foreach($item['hosts'] as $hnum => $host){
-						if(!is_null($options['limitSelects'])){
-							if(!isset($count[$host['hostid']])) $count[$host['hostid']] = 0;
-							$count[$host['hostid']]++;
-
-							if($count[$host['hostid']] > $options['limitSelects']) continue;
-						}
-
-						$result[$host['hostid']]['items'][] = &$items[$itemid];
+						if($count[$item['hostid']] > $options['limitSelects']) continue;
 					}
+
+					$result[$item['hostid']]['items'][] = &$items[$itemid];
 				}
 			}
-			else if(API_OUTPUT_COUNT == $options['select_items']){
+			else if(API_OUTPUT_COUNT == $options['selectItems']){
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 

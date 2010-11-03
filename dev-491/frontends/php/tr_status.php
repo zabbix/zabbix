@@ -350,7 +350,7 @@ include_once('include/page_header.php');
 		'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 		'output' => API_OUTPUT_EXTEND,
 		'select_hosts' => array('hostid', 'host', 'maintenance_status', 'maintenance_type', 'maintenanceid'),
-		'select_items' => API_OUTPUT_EXTEND,
+		'selectItems' => API_OUTPUT_EXTEND,
 		'select_dependencies' => API_OUTPUT_EXTEND
 	);
 	$triggers = CTrigger::get($options);
