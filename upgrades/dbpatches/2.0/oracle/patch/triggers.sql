@@ -13,7 +13,7 @@ ALTER TABLE events ADD value_changed number(10) DEFAULT '0' NOT NULL;
 CREATE TABLE tmp_events_eventid (eventid number(20) PRIMARY KEY,prev_value number(10),value number(10));
 CREATE INDEX tmp_events_index on events (source, object, objectid, clock, eventid, value);
 
-CREATE OR REPLACE FUNCTION get_prev_value(eventid IN NUMBER, triggerid IN NUMBER, clock IN NUMBER,value IN NUMBER)
+CREATE OR REPLACE FUNCTION get_prev_value(eventid IN NUMBER, triggerid IN NUMBER, clock IN NUMBER)
 RETURN NUMBER IS
 prev_value NUMBER(10);
 BEGIN
@@ -45,7 +45,7 @@ END;
 -- Those that have a PROBLEM event (or no event) before them.
 
 INSERT INTO tmp_events_eventid (eventid, prev_value, value)
-	SELECT eventid,get_prev_value(eventid, objectid, clock, value) AS prev_value, value
+	SELECT eventid,get_prev_value(eventid, objectid, clock) AS prev_value, value
 	FROM events
 	WHERE source=0					-- EVENT_SOURCE_TRIGGERS
 		AND object=0				-- EVENT_OBJECT_TRIGGER
@@ -56,7 +56,7 @@ INSERT INTO tmp_events_eventid (eventid, prev_value, value)
 -- (1) Those that have an OK event (or no event) before them.
 
 INSERT INTO tmp_events_eventid (eventid, prev_value, value)
-	SELECT e.eventid,get_prev_value(e.eventid, e.objectid, e.clock, e.value) AS prev_value, e.value
+	SELECT e.eventid,get_prev_value(e.eventid, e.objectid, e.clock) AS prev_value, e.value
 	FROM events e,triggers t
 	WHERE e.source=0				-- EVENT_SOURCE_TRIGGERS
 		AND e.object=0				-- EVENT_OBJECT_TRIGGER
