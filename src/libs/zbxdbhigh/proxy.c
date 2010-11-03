@@ -2073,7 +2073,7 @@ static int	DBlld_update_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_trigger
 	zbx_uint64_t	new_triggerid = 0, h_itemid, h_triggerid, functionid, triggerdiscoveryid;
 	char		search[23], replace[23], *description,
 			*description_esc, *comments_esc, *url_esc,
-			*description_proto_esc;
+			*description_proto_esc, *error_esc;
 	int		update_expression = 1, res = SUCCEED;
 	char		*sql = NULL;
 	int		sql_alloc = 1024, sql_offset = 0;
@@ -2229,16 +2229,19 @@ static int	DBlld_update_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_trigger
 		new_triggerid = DBget_maxid("triggers");
 		triggerdiscoveryid = DBget_maxid("trigger_discovery");
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 192 + strlen(description_esc) +
-				strlen(comments_esc) + strlen(url_esc),
+		error_esc = DBdyn_escape_string("Trigger just added. No status update so far.");
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256 + strlen(description_esc) +
+				strlen(comments_esc) + strlen(url_esc) + strlen(error_esc),
 				"insert into triggers"
 					" (triggerid,description,priority,status,"
-						"comments,url,type,value,flags)"
+						"comments,url,type,value,value_flags,flags,error)"
 					" values (" ZBX_FS_UI64 ",'%s',%d,%d,"
-						"'%s','%s',%d,%d,%d);\n",
+						"'%s','%s',%d,%d,%d,%d,'%s');\n",
 					new_triggerid, description_esc, (int)priority,
 					(int)status, comments_esc, url_esc, (int)type,
-					TRIGGER_VALUE_UNKNOWN, ZBX_FLAG_DISCOVERY_CREATED);
+					TRIGGER_VALUE_FALSE, TRIGGER_VALUE_FLAG_UNKNOWN,
+					ZBX_FLAG_DISCOVERY_CREATED, error_esc);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256 + strlen(description_proto_esc),
 				"insert into trigger_discovery"
@@ -2246,6 +2249,8 @@ static int	DBlld_update_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_trigger
 				" values"
 					" (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s');\n",
 				triggerdiscoveryid, new_triggerid, parent_triggerid, description_proto_esc);
+
+		zbx_free(error_esc);
 	}
 
 	if (1 == update_expression)

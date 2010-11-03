@@ -284,6 +284,7 @@ include_once('include/page_header.php');
 		$config['event_ack_enable'] ? $header_cb : null,
 		make_sorting_header(S_SEVERITY, 'priority'),
 		S_STATUS,
+		S_INFO,
 		make_sorting_header(S_LAST_CHANGE, 'lastchange'),
 		S_AGE,
 		$show_event_col ? S_DURATION : NULL,
@@ -393,6 +394,7 @@ include_once('include/page_header.php');
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 			'nopermissions' => 1,
 			'output' => API_OUTPUT_EXTEND,
+			'select_acknowledges' => API_OUTPUT_COUNT,
 			'time_from' => time() - ($config['event_expire']*86400),
 			'time_till' => time(),
 			'sortfield' => 'eventid',
@@ -567,24 +569,17 @@ include_once('include/page_header.php');
 				$maint_span->setHint($maint_hint);
 			}
 
-
-
-
 			$hosts_span = new CSpan($trigger_host['host'], 'link_menu');
 			$hosts_span->setAttribute('onclick','javascript: '.$menus);
 			$hosts_list[] = $hosts_span;
 			$hosts_list[] = $maint_span;
 			$hosts_list[] = ', ';
-
-
 		}
 
 		array_pop($hosts_list);
 		$host = new CCol($hosts_list);
 		$host->addStyle('white-space: normal;');
 // }}} host JS menu
-
-
 
 
 		$status = new CSpan(trigger_value2str($trigger['value']), get_trigger_value_style($trigger['value']));
@@ -622,12 +617,22 @@ include_once('include/page_header.php');
 		$severity_col = new CCol(get_severity_description($trigger['priority']), get_severity_style($trigger['priority'], $trigger['value']));
 		if($show_event_col) $severity_col->setColSpan(2);
 
+		
+// Unknown triggers
+		$unknown = new CDiv(SPACE,'iconok');
+		if($trigger['value_flags'] == TRIGGER_VALUE_FLAG_UNKNOWN){
+			$unknown = new CDiv(SPACE,'iconunknown');
+			$unknown->setHint($trigger['error'], '', 'on');
+		}
+//----
+
 		$table->addRow(array(
 			$open_close,
 			$config['event_ack_enable'] ?
 				($show_event_col ? null : new CCheckBox('triggers['.$trigger['triggerid'].']', 'no', null, $trigger['triggerid'])) : null,
 			$severity_col,
 			$status,
+			$unknown,
 			$lastchange,
 			zbx_date2age($trigger['lastchange']),
 			$show_event_col ? SPACE : NULL,
@@ -645,23 +650,10 @@ include_once('include/page_header.php');
 			foreach($trigger['events'] as $enum => $row_event){
 				$i++;
 
-				$status = new CSpan(trigger_value2str($row_event['value']), get_trigger_value_style($row_event['value']));
+				$status = new CCol(new CSpan(trigger_value2str($row_event['value']), get_trigger_value_style($row_event['value'])));
+				$status->setColSpan(2);
 
-				if($config['event_ack_enable']){
-					if($row_event['value'] == TRIGGER_VALUE_TRUE){
-						if($row_event['acknowledged'] == 1){
-							$acks_cnt = DBfetch(DBselect('SELECT COUNT(*) as cnt FROM acknowledges WHERE eventid='.$row_event['eventid']));
-							$ack = array(new CSpan(S_YES, 'off'),SPACE.'('.$acks_cnt['cnt'].SPACE,
-								new CLink(S_SHOW,'acknow.php?eventid='.$row_event['eventid']),')');
-						}
-						else{
-							$ack = new CLink(S_NOT_ACKNOWLEDGED, 'acknow.php?eventid='.$row_event['eventid'], 'on');
-						}
-					}
-					else{
-						$ack = SPACE;
-					}
-				}
+				$ack = getEventAckState($row_event);
 
 				if(($row_event['acknowledged'] == 0) && ($row_event['value'] == TRIGGER_VALUE_TRUE)){
 					$ack_cb = new CCheckBox('events['.$row_event['eventid'].']', 'no', NULL, $row_event['eventid']);

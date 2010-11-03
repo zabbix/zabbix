@@ -412,7 +412,8 @@ class CTrigger extends CZBXAPI{
 				' SELECT e.eventid'.
 				' FROM events e'.
 				' WHERE e.objectid=t.triggerid'.
-					' AND e.object=0'.
+					' AND e.object='.EVENT_OBJECT_TRIGGER.
+					' AND e.value_changed='.TRIGGER_VALUE_CHANGED_YES.
 					' AND e.value='.TRIGGER_VALUE_TRUE.
 					' AND e.acknowledged=0)';
 		}
@@ -422,7 +423,8 @@ class CTrigger extends CZBXAPI{
 				' SELECT e.eventid'.
 				' FROM events e'.
 				' WHERE e.objectid=t.triggerid'.
-					' AND e.object=0'.
+					' AND e.object='.EVENT_OBJECT_TRIGGER.
+					' AND e.value_changed='.TRIGGER_VALUE_CHANGED_YES.
 					' AND e.value='.TRIGGER_VALUE_TRUE.
 					' AND e.acknowledged=0)';
 		}
@@ -738,6 +740,7 @@ Copt::memoryPick();
 					' WHERE e.object='.EVENT_OBJECT_TRIGGER.
 						' AND '.DBcondition('e.objectid', $triggerids).
 						' AND '.DBcondition('e.value', array(TRIGGER_VALUE_TRUE)).
+						' AND e.value_changed='.TRIGGER_VALUE_CHANGED_YES.
 					' GROUP BY e.objectid';
 			$events_db = DBselect($sql);
 			while($event = DBfetch($events_db)){

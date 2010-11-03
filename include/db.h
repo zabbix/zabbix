@@ -107,7 +107,6 @@ typedef enum {
 #define DB_HTTPTESTITEM	struct zbx_httptestitem_type
 #define DB_ESCALATION	struct zbx_escalation_type
 
-/* Trigger related defines */
 #define TRIGGER_DESCRIPTION_LEN		1020
 #define TRIGGER_DESCRIPTION_LEN_MAX	TRIGGER_DESCRIPTION_LEN+1
 #define TRIGGER_EXPRESSION_LEN		255
@@ -301,14 +300,13 @@ DB_EVENT
 	zbx_uint64_t	objectid;
 	int		clock;
 	int		value;
+	int		value_changed;
 	int		acknowledged;
-	int		skip_actions;
 	char		trigger_description[TRIGGER_DESCRIPTION_LEN_MAX];
 	int		trigger_priority;
 	char		*trigger_url;
 	char		*trigger_comments;
 	int		trigger_type;
-	zbx_uint64_t	ack_eventid;
 	int		ns;
 };
 
@@ -414,6 +412,7 @@ DB_TRIGGER
 	char	*comments;
 	int	status;
 	int	value;
+	int	value_flags;
 	int	priority;
 	int	type;
 	char	error[TRIGGER_ERROR_LEN_MAX];
@@ -602,10 +601,10 @@ int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *e
 int	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid);
 int	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid);
 int	DBremove_escalation(zbx_uint64_t escalationid);
-void	DBupdate_triggers_status_after_restart(void);
+void	DBupdate_triggers_status_after_restart();
 int	DBget_prev_trigger_value(zbx_uint64_t triggerid);
-int     DBupdate_trigger_value(zbx_uint64_t triggerid, int type, int value,
-		const char *trigger_error, int new_value, zbx_timespec_t *ts, const char *reason);
+int	DBupdate_trigger_value(zbx_uint64_t triggerid, int trigger_type, int trigger_value, int trigger_flags,
+		const char *trigger_error, int new_value, int new_flags, const zbx_timespec_t *ts, const char *reason);
 
 int	DBget_row_count(const char *table_name);
 int	DBget_items_unsupported_count();

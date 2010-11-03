@@ -258,7 +258,6 @@
 
 	define('SYSMAP_ELEMENT_ICON_ON',			0);
 	define('SYSMAP_ELEMENT_ICON_OFF',			1);
-	define('SYSMAP_ELEMENT_ICON_UNKNOWN',		2);
 	define('SYSMAP_ELEMENT_ICON_MAINTENANCE',	3);
 	define('SYSMAP_ELEMENT_ICON_DISABLED',		4);
 
@@ -340,7 +339,13 @@
 
 	define('TRIGGER_VALUE_FALSE',		0);
 	define('TRIGGER_VALUE_TRUE',		1);
-	define('TRIGGER_VALUE_UNKNOWN',		2);
+	define('TRIGGER_VALUE_UNKNOWN',		2); // only in "events" table
+
+	define('TRIGGER_VALUE_FLAG_NORMAL',	0);
+	define('TRIGGER_VALUE_FLAG_UNKNOWN',1);
+
+	define('TRIGGER_VALUE_CHANGED_NO',	0);
+	define('TRIGGER_VALUE_CHANGED_YES',	1);
 
 	define('TRIGGER_SEVERITY_NOT_CLASSIFIED',	0);
 	define('TRIGGER_SEVERITY_INFORMATION',		1);
@@ -441,7 +446,7 @@
 
 /* view style [OVERVIEW]*/
 	define('STYLE_LEFT',	0);
-	define('STYLE_TOP',	1);
+	define('STYLE_TOP',		1);
 
 /* time module tipe */
 	define('TIME_TYPE_LOCAL',	0);

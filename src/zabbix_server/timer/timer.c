@@ -54,7 +54,7 @@ static void	process_time_functions()
 	DB_ROW		row;
 	char		*exp, error[MAX_STRING_LEN];
 	zbx_uint64_t	triggerid;
-	int		trigger_type, trigger_value, exp_value;
+	int		trigger_type, trigger_value, trigger_flags, exp_value;
 	const char	*trigger_error;
 	zbx_timespec_t	ts;
 
@@ -63,7 +63,7 @@ static void	process_time_functions()
 	zbx_setproctitle("timer [updating triggers]");
 
 	result = DBselect(
-			"select distinct t.triggerid,t.type,t.value,t.error,t.expression"
+			"select distinct t.triggerid,t.type,t.value,t.value_flags,t.error,t.expression"
 			" from triggers t,functions f,items i,hosts h"
 			" where t.status=%d"
 				" and t.triggerid=f.triggerid"
@@ -87,8 +87,9 @@ static void	process_time_functions()
 		ZBX_STR2UINT64(triggerid, row[0]);
 		trigger_type = atoi(row[1]);
 		trigger_value = atoi(row[2]);
-		trigger_error = row[3];
-		exp = strdup(row[4]);
+		trigger_flags = atoi(row[3]);
+		trigger_error = row[4];
+		exp = strdup(row[5]);
 
 		zbx_timespec(&ts);
 
@@ -97,12 +98,12 @@ static void	process_time_functions()
 			zabbix_log(LOG_LEVEL_WARNING, "Expression [%s] cannot be evaluated: %s", exp, error);
 			zabbix_syslog("Expression [%s] cannot be evaluated: %s", exp, error);
 
-			DBupdate_trigger_value(triggerid, trigger_type, trigger_value,
-					trigger_error, TRIGGER_VALUE_UNKNOWN, &ts, error);
+			DBupdate_trigger_value(triggerid, trigger_type, trigger_value, trigger_flags,
+					trigger_error, trigger_value, TRIGGER_VALUE_FLAG_UNKNOWN, &ts, error);
 		}
 		else
-			DBupdate_trigger_value(triggerid, trigger_type, trigger_value,
-					trigger_error, exp_value, &ts, NULL);
+			DBupdate_trigger_value(triggerid, trigger_type, trigger_value, trigger_flags,
+					trigger_error, exp_value, TRIGGER_VALUE_FLAG_NORMAL, &ts, NULL);
 
 		zbx_free(exp);
 	}
@@ -445,7 +446,9 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maint
 		event.object = EVENT_OBJECT_TRIGGER;
 		event.objectid = triggerid;
 		event.clock = maintenance_to;
+		event.ns = 0;
 		event.value = value_after;
+		event.value_changed = TRIGGER_VALUE_CHANGED_NO;
 
 		process_event(&event, 1);
 	}

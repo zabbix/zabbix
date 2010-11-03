@@ -292,6 +292,7 @@ FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|value		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|acknowledged	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|ns		|t_nanosec	|'0'	|NOT NULL	|0
+FIELD		|value_changed	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|object,objectid,eventid
 INDEX		|2		|clock
 
@@ -878,13 +879,12 @@ FIELD		|elementid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|elementtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|iconid_off	|t_id		|	|NULL		|ZBX_SYNC		|2|images	|imageid	|RESTRICT
 FIELD		|iconid_on	|t_id		|	|NULL		|ZBX_SYNC		|3|images	|imageid	|RESTRICT
-FIELD		|iconid_unknown	|t_id		|	|NULL		|ZBX_SYNC		|4|images	|imageid	|RESTRICT
 FIELD		|label		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|label_location	|t_integer	|	|NULL		|ZBX_SYNC
 FIELD		|x		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|y		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|iconid_disabled|t_id		|	|NULL		|ZBX_SYNC		|5|images	|imageid	|RESTRICT
-FIELD		|iconid_maintenance|t_id	|	|NULL		|ZBX_SYNC		|6|images	|imageid	|RESTRICT
+FIELD		|iconid_disabled|t_id		|	|NULL		|ZBX_SYNC		|4|images	|imageid	|RESTRICT
+FIELD		|iconid_maintenance|t_id	|	|NULL		|ZBX_SYNC		|5|images	|imageid	|RESTRICT
 
 TABLE|sysmap_element_url|sysmapelementurlid|ZBX_SYNC
 FIELD		|sysmapelementurlid|t_id	|	|NOT NULL	|0
@@ -924,11 +924,11 @@ FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|value		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|priority	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|lastchange	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|dep_level	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|comments	|t_blob		|''	|NOT NULL	|ZBX_SYNC
 FIELD		|error		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|templateid	|t_id		|	|NULL		|ZBX_SYNC		|1|triggers	|triggerid
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|value_flags	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|flags		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|status
 INDEX		|2		|value
