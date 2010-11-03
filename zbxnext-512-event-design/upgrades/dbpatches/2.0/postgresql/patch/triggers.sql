@@ -96,7 +96,7 @@ DROP TABLE tmp_events_eventid;
 ALTER TABLE ONLY triggers ALTER triggerid DROP DEFAULT,
 			  ALTER templateid DROP DEFAULT,
 			  ALTER templateid DROP NOT NULL,
-			  DROP dep_level,
+			  DROP COLUMN dep_level,
 			  ADD value_flags integer DEFAULT '0' NOT NULL,
 			  ADD flags integer DEFAULT '0' NOT NULL;
 UPDATE triggers SET templateid=NULL WHERE templateid=0;

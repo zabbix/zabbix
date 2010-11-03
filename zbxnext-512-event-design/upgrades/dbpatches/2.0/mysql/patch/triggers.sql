@@ -95,7 +95,7 @@ DROP TABLE tmp_events_eventid;
 
 ALTER TABLE triggers MODIFY triggerid bigint unsigned NOT NULL,
 		     MODIFY templateid bigint unsigned NULL,
-		     DROP dep_level,
+		     DROP COLUMN dep_level,
 		     ADD value_flags integer DEFAULT '0' NOT NULL,
 		     ADD flags integer DEFAULT '0' NOT NULL;
 UPDATE triggers SET templateid=NULL WHERE templateid=0;
