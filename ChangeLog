@@ -1,5 +1,6 @@
 Changes for 1.9.1
 
+ - [ZBXNEXT-512] redesign of unknown events (Aly,asaveljevs,Sasha)
  - [ZBX-3130] fixed bug when creating custom graph: host items now can be added (KB)
 
 Changes for 1.9.0

@@ -60,7 +60,7 @@ class CEvent extends CZBXAPI{
 		$user_type = $USER_DETAILS['type'];
 		$userid = $USER_DETAILS['userid'];
 
-		$sort_columns = array('eventid', 'clock'); // allowed columns for sorting
+		$sort_columns = array('eventid', 'object', 'clock'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
 
 		$sql_parts = array(
@@ -68,6 +68,7 @@ class CEvent extends CZBXAPI{
 			'from' => array('events' => 'events e'),
 			'where' => array(),
 			'order' => array(),
+			'group' => array(),
 			'limit' => null
 		);
 
@@ -83,19 +84,28 @@ class CEvent extends CZBXAPI{
 			'acknowledged'			=> null,
 			'nopermissions'			=> null,
 // filter
-			'hide_unknown'			=> null,
+			'showUnknown'			=> null,
 			'value'					=> null,
 			'time_from'				=> null,
 			'time_till'				=> null,
 			'eventid_from'			=> null,
 			'eventid_till'			=> null,
+// filter
+			'filter'					=> null,
+			'search'					=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
+
 // OutPut
 			'output'				=> API_OUTPUT_REFER,
 			'extendoutput'			=> null,
 			'select_hosts'			=> null,
 			'select_items'			=> null,
 			'select_triggers'		=> null,
+			'select_alerts'			=> null,
+			'select_acknowledges'	=> null,
 			'countOutput'			=> null,
+			'groupCount'			=> null,
 			'preservekeys'			=> null,
 
 			'sortfield'				=> '',
@@ -119,7 +129,6 @@ class CEvent extends CZBXAPI{
 				$options['select_items'] = API_OUTPUT_EXTEND;
 			}
 		}
-
 
 // editable + PERMISSION CHECK
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
@@ -250,9 +259,10 @@ class CEvent extends CZBXAPI{
 		if(!is_null($options['acknowledged'])){
 			$sql_parts['where'][] = 'e.acknowledged='.($options['acknowledged']?1:0);
 		}
-// hide_unknown
-		if(!is_null($options['hide_unknown'])){
-			$sql_parts['where'][] = 'e.value<>'.TRIGGER_VALUE_UNKNOWN;
+// showUnknown
+		if(!is_null($options['showUnknown'])){
+			if(is_null($options['filter'])) $options['filter'] = array();
+			$options['filter']['value_changed'] = null;
 		}
 // time_from
 		if(!is_null($options['time_from'])){
@@ -276,6 +286,22 @@ class CEvent extends CZBXAPI{
 
 			$sql_parts['where'][] = DBcondition('e.value', $options['value']);
 		}
+
+// search
+		if(is_array($options['search'])){
+			zbx_db_search('events e', $options, $sql_parts);
+		}
+
+// filter
+		if(is_null($options['filter'])) $options['filter'] = array();
+
+		if(is_array($options['filter'])){
+			if(!array_key_exists('value_changed', $options['filter']))
+				$options['filter']['value_changed'] = TRIGGER_VALUE_CHANGED_YES;
+
+			zbx_db_filter('events e', $options, $sql_parts);
+		}
+
 // output
 		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['events'] = array('e.*');
@@ -293,18 +319,34 @@ class CEvent extends CZBXAPI{
 // restrict not allowed columns for sorting
 		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
 		if(!zbx_empty($options['sortfield'])){
-
 			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN)?ZBX_SORT_DOWN:ZBX_SORT_UP;
 
-			$sql_parts['order'][] = 'e.'.$options['sortfield'].' '.$sortorder;
+			if($options['sortfield'] == 'clock'){
+				$sql_parts['order'][] = 'e.clock '.$sortorder;
+				$sql_parts['order'][] = 'e.ns '.$sortorder;
 
-			if(!is_null($options['triggerids']) && ($options['sortfield'] == 'clock')){
-				$sql_parts['where']['o'] = '(e.object-0)='.EVENT_OBJECT_TRIGGER;
+				if(!str_in_array('e.*', $sql_parts['select']['events'])){
+					$sql_parts['select']['events'][] = 'e.clock';
+					$sql_parts['select']['events'][] = 'e.ns';
+				}
+
+				if(!is_null($options['triggerids'])){
+					$sql_parts['where']['o'] = '(e.object-0)='.EVENT_OBJECT_TRIGGER;
+				}
 			}
 
-			$eventFields = $sql_parts['select']['events'];
-			if(!str_in_array('e.'.$options['sortfield'], $eventFields) && !str_in_array('e.*', $eventFields)){
-				$sql_parts['select']['events'][] = 'e.'.$options['sortfield'];
+			if($options['sortfield'] == 'object'){
+				$sql_parts['order'][] = 'e.object '.$sortorder;
+				$sql_parts['order'][] = 'e.objectid '.$sortorder;
+				$sql_parts['order'][] = 'e.clock '.$sortorder;
+				$sql_parts['order'][] = 'e.ns '.$sortorder;
+
+				if(!str_in_array('e.*', $sql_parts['select']['events'])){
+					$sql_parts['select']['events'][] = 'e.object';
+					$sql_parts['select']['events'][] = 'e.objectid';
+					$sql_parts['select']['events'][] = 'e.clock';
+					$sql_parts['select']['events'][] = 'e.ns';
+				}
 			}
 		}
 
@@ -347,7 +389,7 @@ class CEvent extends CZBXAPI{
 				' WHERE '.$sql_where.
 				$sql_order;
 		$db_res = DBselect($sql, $sql_limit);
- //SDI($sql);
+//SDI($sql);
 		while($event = DBfetch($db_res)){
 			if($options['countOutput']){
 				$result = $event['rowscount'];
@@ -375,6 +417,14 @@ class CEvent extends CZBXAPI{
 
 					if(!is_null($options['select_items']) && !isset($result[$event['eventid']]['items'])){
 						$result[$event['eventid']]['items'] = array();
+					}
+
+					if(!is_null($options['select_alerts']) && !isset($result[$event['eventid']]['alerts'])){
+						$result[$event['eventid']]['alerts'] = array();
+					}
+
+					if(!is_null($options['select_acknowledges']) && !isset($result[$event['eventid']]['acknowledges'])){
+						$result[$event['eventid']]['acknowledges'] = array();
 					}
 
 // hostids
@@ -500,6 +550,48 @@ Copt::memoryPick();
 			}
 		}
 
+// Adding alerts
+		if(!is_null($options['select_alerts']) && str_in_array($options['select_alerts'], $subselects_allowed_outputs)){
+			$obj_params = array(
+				'output' => $options['select_alerts'],
+				'select_mediatypes' => API_OUTPUT_EXTEND,
+				'nodeids' => $nodeids,
+				'eventids' => $eventids,
+				'nopermissions' => 1,
+				'preservekeys' => 1,
+				'sortfield' => 'clock',
+				'sortorder' => ZBX_SORT_DOWN
+			);
+			$dbAlerts = CAlert::get($obj_params);
+			foreach($dbAlerts as $anum => $alert){
+				$result[$alert['eventid']]['alerts'][] = $alert;
+			}
+		}
+
+// adding acknowledges
+		if(!is_null($options['select_acknowledges'])){
+			if(is_array($options['select_acknowledges']) || str_in_array($options['select_acknowledges'], $subselects_allowed_outputs)){
+				$sql = 'SELECT a.*, u.alias '.
+					' FROM acknowledges a '.
+						' LEFT JOIN users u ON u.userid=a.userid '.
+					' WHERE '.DBcondition('a.eventid', $eventids).
+					' ORDER BY a.clock DESC';
+				$res = DBselect($sql);
+				while($ack = DBfetch($res)){
+					$result[$ack['eventid']]['acknowledges'][] = $ack;
+				}
+			}
+			else if(API_OUTPUT_COUNT == $options['select_acknowledges']){
+				$sql = 'SELECT COUNT(a.acknowledgeid) as rowscount, a.eventid '.
+					' FROM acknowledges a '.
+					' WHERE '.DBcondition('a.eventid', $eventids).
+					' GROUP BY a.eventid';
+				$res = DBselect($sql);
+				while($ack = DBfetch($res)){
+					$result[$ack['eventid']]['acknowledges'] = $ack['rowscount'];
+				}
+			}
+		}
 
 // removing keys (hash -> array)
 

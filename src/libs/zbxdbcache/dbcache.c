@@ -854,6 +854,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 		zbx_timespec_t	ts;
 		unsigned char	type;
 		unsigned char	value;
+		unsigned char	value_flags;
 		unsigned char	flags;
 	}
 	zbx_trigger_t;
@@ -872,7 +873,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 1024,
-			"select distinct t.triggerid,t.type,t.value,t.error,t.expression,f.itemid,i.flags"
+			"select distinct t.triggerid,t.type,t.value,t.value_flags,t.error,t.expression,f.itemid,i.flags"
 			" from triggers t,functions f,items i"
 			" where i.status not in (%d)"
 				" and i.itemid=f.itemid"
@@ -924,14 +925,15 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 			tr_last->triggerid = triggerid;
 			tr_last->type = (unsigned char)atoi(row[1]);
 			tr_last->value = (unsigned char)atoi(row[2]);
-			tr_last->error = strdup(row[3]);
-			tr_last->exp = strdup(row[4]);
+			tr_last->value_flags = (unsigned char)atoi(row[3]);
+			tr_last->error = strdup(row[4]);
+			tr_last->exp = strdup(row[5]);
 			tr_last->ts.sec = 0;
 			tr_last->ts.ns = 0;
 			tr_last->flags = 0x00;
 		}
 
-		flags = (unsigned char)atoi(row[6]);
+		flags = (unsigned char)atoi(row[7]);
 
 		if (0 != (ZBX_FLAG_DISCOVERY_CHILD & flags))
 		{
@@ -939,7 +941,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 			continue;
 		}
 
-		ZBX_STR2UINT64(itemid, row[5]);
+		ZBX_STR2UINT64(itemid, row[6]);
 
 		for (i = 0; i < history_num; i++)
 		{
@@ -978,12 +980,12 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 			zabbix_syslog("Expression [%s] cannot be evaluated: %s",
 					tr[i].exp, error);
 
-			DBupdate_trigger_value(tr[i].triggerid, tr[i].type, tr[i].value,
-					tr[i].error, TRIGGER_VALUE_UNKNOWN, &tr[i].ts, error);
+			DBupdate_trigger_value(tr[i].triggerid, tr[i].type, tr[i].value, tr[i].value_flags,
+					tr[i].error, tr[i].value, TRIGGER_VALUE_FLAG_UNKNOWN, &tr[i].ts, error);
 		}
 		else
-			DBupdate_trigger_value(tr[i].triggerid, tr[i].type, tr[i].value,
-					tr[i].error, exp_value, &tr[i].ts, NULL);
+			DBupdate_trigger_value(tr[i].triggerid, tr[i].type, tr[i].value, tr[i].value_flags,
+					tr[i].error, exp_value, TRIGGER_VALUE_FLAG_NORMAL, &tr[i].ts, NULL);
 
 		zbx_free(tr[i].error);
 		zbx_free(tr[i].exp);
