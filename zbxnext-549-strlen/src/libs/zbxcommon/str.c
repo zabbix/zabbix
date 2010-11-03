@@ -2662,6 +2662,19 @@ bad:
 	return NULL;
 }
 
+int	zbx_strlen_utf8(const char *text)
+{
+	int	n = 0;
+
+	while ('\0' != *text)
+	{
+		if (0x80 != (0xc0 & *text++))
+			n++;
+	}
+
+	return n;
+}
+
 void	win2unix_eol(char *text)
 {
 	size_t	i, sz;
