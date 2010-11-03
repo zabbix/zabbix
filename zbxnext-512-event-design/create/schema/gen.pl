@@ -124,6 +124,28 @@ const ZBX_TABLE	tables[]={
 	"t_cksum_text"	=>	"nclob"  
 );
 
+%db2=("t_bigint"	=>	"bigint",
+	"database"	=>	"db2",
+	"before"	=>	"",
+	"after"		=>	"",
+	"type"		=>	"sql",
+	"t_bigint"	=>	"bigint",
+	"t_id"		=>	"bigint",
+	"t_integer"	=>	"integer",
+	"t_serial"	=>	"bigint",
+	"t_double"	=>	"decfloat(16)",
+	"t_varchar"	=>	"varchar",
+	"t_char"	=>	"varchar",
+	"t_image"	=>	"blob",
+	"t_history_log"	=>	"varchar(2048)",
+	"t_history_text"=>	"varchar(2048)",
+	"t_time"	=>	"integer",
+	"t_nanosec"	=>	"integer",
+	"t_blob"	=>	"varchar(2048)",
+	"t_item_param"	=>	"varchar(2048)",
+	"t_cksum_text"	=>	"varchar(2048)"
+);
+
 %postgresql=("t_bigint"	=>	"numeric(20)",
 	"database"	=>	"postgresql",
 	"before"	=>	"",
@@ -286,7 +308,12 @@ sub process_field
 
 		if ($default ne "")
 		{
-			$default = "DEFAULT $default";
+			if ($output{"database"} eq "db2"){
+				$default = "WITH DEFAULT $default";
+			}
+			else{
+				$default = "DEFAULT $default";
+			}
 		}
 		
 		if ($output{"database"} eq "mysql")
@@ -295,6 +322,13 @@ sub process_field
 
 			if (grep /$output{$type_short}/, @text_fields)
 			{
+				$default="";
+			}
+		}
+
+		if($output{"database"} eq "db2"){
+			@text_fields = ('blob');
+			if(grep /$output{$type_short}/, @text_fields){
 				$default="";
 			}
 		}
@@ -333,6 +367,10 @@ sub process_field
 				$sequences = "${sequences}BEGIN${eol}\n";
 				$sequences = "${sequences}SELECT ${table_name}_seq.nextval INTO :new.id FROM dual;${eol}\n";
 				$sequences = "${sequences}END;${eol}\n/${eol}\n";
+			}
+			elsif($output{"database"} eq "db2")
+			{
+				$row="$row\tGENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1)";
 			}
 		}
 
@@ -418,7 +456,7 @@ sub process_index
 
 sub usage
 {
-	printf "Usage: $0 [c|mysql|oracle|postgresql|sqlite]\n";
+	printf "Usage: $0 [c|db2|mysql|oracle|postgresql|sqlite]\n";
 	printf "The script generates Zabbix SQL schemas and C code for different database engines.\n";
 	exit;
 }
@@ -489,6 +527,7 @@ sub main
 	switch ($format)
 	{
 		case "c"		{ %output = %c; }
+		case "db2"		{ %output = %db2; }
 		case "mysql"		{ %output = %mysql; }
 		case "oracle"		{ %output = %oracle; }
 		case "postgresql"	{ %output = %postgresql; }
@@ -519,6 +558,10 @@ sub main
 		print $fkeys_drop_prefix.$fkeys_drop.$fkeys_suffix;
 		print "#elif HAVE_ORACLE\nconst char *const db_schema= \"\\\n";
 		%output = %oracle;
+		process();
+		print $fkeys_drop_prefix.$fkeys_drop.$fkeys_suffix;
+		print "#elif HAVE_DB2\nconst char *const db_schema= \"\\\n";
+		%output = %db2;
 		process();
 		print $fkeys_drop_prefix.$fkeys_drop.$fkeys_suffix;
 		print "#elif HAVE_POSTGRESQL\nconst char *const db_schema= \"\\\n";
