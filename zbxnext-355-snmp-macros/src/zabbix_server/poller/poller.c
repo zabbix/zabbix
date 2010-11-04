@@ -457,7 +457,9 @@ static int	get_values()
 			i, now, num, res;
 	static char	*key = NULL, *ipmi_ip = NULL, *params = NULL,
 			*username = NULL, *publickey = NULL, *privatekey = NULL,
-			*password = NULL;
+			*password = NULL, *snmp_community = NULL, *snmp_oid = NULL,
+			*snmpv3_securityname = NULL, *snmpv3_authpassphrase = NULL,
+			*snmpv3_privpassphrase = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -475,66 +477,105 @@ static int	get_values()
 		items[i].key = key;
 
 		switch (items[i].type) {
-		case ITEM_TYPE_IPMI:
-			zbx_free(ipmi_ip);
-			ipmi_ip = strdup(items[i].host.ipmi_ip_orig);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
-					&ipmi_ip, MACRO_TYPE_HOST_IPMI_IP, NULL, 0);
-			items[i].host.ipmi_ip = ipmi_ip;
-			break;
-		case ITEM_TYPE_DB_MONITOR:
-			items[i].params = items[i].params_orig;
-			break;
-		case ITEM_TYPE_SSH:
-			zbx_free(username);
-			zbx_free(publickey);
-			zbx_free(privatekey);
-			zbx_free(password);
-			zbx_free(params);
+			case ITEM_TYPE_SNMPv3:
+				zbx_free(snmpv3_securityname);
+				zbx_free(snmpv3_authpassphrase);
+				zbx_free(snmpv3_privpassphrase);
 
-			username = strdup(items[i].username_orig);
-			publickey = strdup(items[i].publickey_orig);
-			privatekey = strdup(items[i].privatekey_orig);
-			password = strdup(items[i].password_orig);
-			params = strdup(items[i].params_orig);
+				snmpv3_securityname = strdup(items[i].snmpv3_securityname_orig);
+				snmpv3_authpassphrase = strdup(items[i].snmpv3_authpassphrase_orig);
+				snmpv3_privpassphrase = strdup(items[i].snmpv3_privpassphrase_orig);
 
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
-					&username, MACRO_TYPE_ITEM_USERNAME, NULL, 0);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
-					&publickey, MACRO_TYPE_ITEM_PUBLICKEY, NULL, 0);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
-					&privatekey, MACRO_TYPE_ITEM_PRIVATEKEY, NULL, 0);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
-					&password, MACRO_TYPE_ITEM_PASSWORD, NULL, 0);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
-					&params, MACRO_TYPE_ITEM_SCRIPT, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
+						&snmpv3_securityname, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
+						&snmpv3_authpassphrase, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
+						&snmpv3_privpassphrase, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 
-			items[i].username = username;
-			items[i].publickey = publickey;
-			items[i].privatekey = privatekey;
-			items[i].password = password;
-			items[i].params = params;
-			break;
-		case ITEM_TYPE_TELNET:
-			zbx_free(username);
-			zbx_free(password);
-			zbx_free(params);
+				items[i].snmpv3_securityname = snmpv3_securityname;
+				items[i].snmpv3_authpassphrase = snmpv3_authpassphrase;
+				items[i].snmpv3_privpassphrase = snmpv3_privpassphrase;
+			case ITEM_TYPE_SNMPv1:
+			case ITEM_TYPE_SNMPv2c:
+				zbx_free(snmp_community);
+				zbx_free(snmp_oid);
 
-			username = strdup(items[i].username_orig);
-			password = strdup(items[i].password_orig);
-			params = strdup(items[i].params_orig);
+				snmp_community = strdup(items[i].snmp_community_orig);
+				snmp_oid = strdup(items[i].snmp_oid_orig);
 
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
-					&username, MACRO_TYPE_ITEM_USERNAME, NULL, 0);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
-					&password, MACRO_TYPE_ITEM_PASSWORD, NULL, 0);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
-					&params, MACRO_TYPE_ITEM_SCRIPT, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
+						&snmp_community, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
+						&snmp_oid, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 
-			items[i].username = username;
-			items[i].password = password;
-			items[i].params = params;
-			break;
+				items[i].snmp_community = snmp_community;
+				items[i].snmp_oid = snmp_oid;
+				break;
+			case ITEM_TYPE_IPMI:
+				zbx_free(ipmi_ip);
+				ipmi_ip = strdup(items[i].host.ipmi_ip_orig);
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
+						&ipmi_ip, MACRO_TYPE_HOST_IPMI_IP, NULL, 0);
+				items[i].host.ipmi_ip = ipmi_ip;
+				break;
+			case ITEM_TYPE_DB_MONITOR:
+				zbx_free(params);
+				params = strdup(items[i].params_orig);
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
+						&params, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+				items[i].params = params;
+				break;
+			case ITEM_TYPE_SSH:
+				zbx_free(username);
+				zbx_free(publickey);
+				zbx_free(privatekey);
+				zbx_free(password);
+				zbx_free(params);
+
+				username = strdup(items[i].username_orig);
+				publickey = strdup(items[i].publickey_orig);
+				privatekey = strdup(items[i].privatekey_orig);
+				password = strdup(items[i].password_orig);
+				params = strdup(items[i].params_orig);
+
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
+						&username, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
+						&publickey, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
+						&privatekey, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
+						&password, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
+						&params, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+
+				items[i].username = username;
+				items[i].publickey = publickey;
+				items[i].privatekey = privatekey;
+				items[i].password = password;
+				items[i].params = params;
+				break;
+			case ITEM_TYPE_TELNET:
+				zbx_free(username);
+				zbx_free(password);
+				zbx_free(params);
+
+				username = strdup(items[i].username_orig);
+				password = strdup(items[i].password_orig);
+				params = strdup(items[i].params_orig);
+
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
+						&username, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
+						&password, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
+						&params, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+
+				items[i].username = username;
+				items[i].password = password;
+				items[i].params = params;
+				break;
 		}
 
 		/* Skip unreachable hosts but do not break the loop. */
