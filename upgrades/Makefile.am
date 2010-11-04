@@ -12,6 +12,7 @@ dist-hook:
 	mkdir $(distdir)/dbpatches/1.8/mysql
 	mkdir $(distdir)/dbpatches/1.8/oracle
 	mkdir $(distdir)/dbpatches/1.8/postgresql
+	mkdir $(distdir)/dbpatches/2.0/ibm_db2
 	mkdir $(distdir)/dbpatches/2.0/mysql
 	mkdir $(distdir)/dbpatches/2.0/oracle
 	mkdir $(distdir)/dbpatches/2.0/postgresql
@@ -22,9 +23,11 @@ dist-hook:
 	cat $(srcdir)/dbpatches/1.8/oracle/patch/* >$(distdir)/dbpatches/1.8/oracle/patch.sql
 	cat $(srcdir)/dbpatches/1.8/postgresql/patch/* >$(distdir)/dbpatches/1.8/postgresql/patch.sql
 	cp $(srcdir)/dbpatches/1.8/mysql/upgrade $(distdir)/dbpatches/1.8/mysql/
+	cat $(srcdir)/dbpatches/2.0/ibm_db2/patch/* >$(distdir)/dbpatches/2.0/ibm_db2/patch.sql
 	cat $(srcdir)/dbpatches/2.0/mysql/patch/* >$(distdir)/dbpatches/2.0/mysql/patch.sql
 	cat $(srcdir)/dbpatches/2.0/oracle/patch/* >$(distdir)/dbpatches/2.0/oracle/patch.sql
 	cat $(srcdir)/dbpatches/2.0/postgresql/patch/* >$(distdir)/dbpatches/2.0/postgresql/patch.sql
+	cat $(srcdir)/dbpatches/2.0/ibm_db2/optional/* >$(distdir)/dbpatches/2.0/ibm_db2/optional.sql
 	cat $(srcdir)/dbpatches/2.0/mysql/optional/* >$(distdir)/dbpatches/2.0/mysql/optional.sql
 	cat $(srcdir)/dbpatches/2.0/oracle/optional/* >$(distdir)/dbpatches/2.0/oracle/optional.sql
 	cat $(srcdir)/dbpatches/2.0/postgresql/optional/* >$(distdir)/dbpatches/2.0/postgresql/optional.sql
