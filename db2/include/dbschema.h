@@ -56,6 +56,8 @@ ZBX_TABLE
 #endif
 
 extern ZBX_TABLE	tables[];
+#if defined(HAVE_SQLITE3)
 extern const char	*db_schema;
+#endif /* HAVE_SQLITE3 */
 
 #endif
