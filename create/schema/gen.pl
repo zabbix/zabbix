@@ -119,8 +119,8 @@ ZBX_TABLE	tables[]={
 	"t_cksum_text"	=>	"nclob"  
 );
 
-%db2=(
-	"database"	=>	"db2",
+%ibm_db2=(
+	"database"	=>	"ibm_db2",
 	"type"		=>	"sql",
 	"before"	=>	"",
 	"after"		=>	"",
@@ -289,7 +289,7 @@ sub process_field
 			}
 		}
 
-		if($output{"database"} eq "db2"){
+		if($output{"database"} eq "ibm_db2"){
 			@text_fields = ('blob');
 			if(grep /$output{$type_short}/, @text_fields){ 
 				$default=""; 
@@ -332,7 +332,7 @@ sub process_field
 				$statements="${statements}SELECT proxy_history_seq.nextval INTO :new.id FROM dual;\n";
 				$statements="${statements}END;$output{'exec_cmd'}";
 			}
-			elsif($output{"database"} eq "db2")
+			elsif($output{"database"} eq "ibm_db2")
 			{
 				$row="$row\tGENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1)";
 			}
@@ -367,7 +367,7 @@ sub process_index
 
 sub usage
 {
-	printf "Usage: $0 [c|db2|mysql|oracle|php|postgresql|sqlite]\n";
+	printf "Usage: $0 [c|ibm_db2|mysql|oracle|php|postgresql|sqlite]\n";
 	printf "The script generates ZABBIX SQL schemas and C/PHP code for different database engines.\n";
 	exit;
 }
@@ -382,7 +382,7 @@ sub main
 	$format=$ARGV[0];
 	switch ($format) {
 		case "c"		{ %output=%c; }
-		case "db2"		{ %output=%db2; }
+		case "ibm_db2"		{ %output=%ibm_db2; }
 		case "mysql"		{ %output=%mysql; }
 		case "oracle"		{ %output=%oracle; }
 		case "php"		{ %output=%php; }
