@@ -17,10 +17,13 @@ Changes for 1.9.0
  - [DEV-449] added system.localtime[local] check (Sasha)
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
-Changes for 1.8.4rc2
+Changes for 1.8.4rc3
 
  - [ZBX-2349] Unicode support for macros and web scenario steps (KB)
  - [ZBX-3137] fixed errors related to deleting and application that is used in a web scenario (KB)
+
+Changes for 1.8.4rc2
+
  - [ZBXNEXT-538] added support for IBM DB2 (Aly,asaveljevs,Sasha)
  - [ZBX-1362] optimized alert performance (KB)
  - [ZBX-2852] fixed map not updating in slideshow (Vedmak)
