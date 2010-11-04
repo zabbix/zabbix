@@ -1405,6 +1405,28 @@ return $result;
 		if(!empty($tmp_appids)) delete_application($tmp_appids);			// recursion!!!
 
 
+		$applicationids_with_parents = $applicationids;
+		foreach($applicationids as $app_id)
+		{
+			$app_template_id = $app_id;
+			while($app_template_id != 0)
+			{
+				$sql = 'SELECT applicationid
+						FROM applications
+						WHERE templateid = '.$app_template_id.'';
+				$db_app = DBselect($sql);
+				if($app = DBfetch($db_app)){
+					$app_template_id = $app['applicationid'];
+					if (!in_array($app_template_id, $applicationids_with_parents)){
+						$applicationids_with_parents[] = $app_template_id;
+					}
+				}
+				else{
+					$app_template_id = 0;
+				}
+
+			}
+		}
 
 		//check if app is used by web scenario
 		$sql = 'SELECT ht.name, ht.applicationid '.
@@ -1412,7 +1434,7 @@ return $result;
 				' WHERE '.DBcondition('ht.applicationid',$applicationids).'
 						OR ht.applicationid IN (SELECT applicationid
 												FROM applications
-												WHERE '.DBcondition('templateid',$applicationids).')';
+												WHERE '.DBcondition('templateid',$applicationids_with_parents).')';
 		$res = DBselect($sql);
 		//if it is, we can't delete it
 		if($info = DBfetch($res)){
