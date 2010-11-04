@@ -1,5 +1,6 @@
 Changes for 1.9.1
 
+ - [ZBXNEXT-538] include ibm_db2 upgrade patches in distribution package (Sasha)
  - [ZBXNEXT-512] redesign of unknown events (Aly,asaveljevs,Sasha)
  - [ZBX-3130] fixed bug when creating custom graph: host items now can be added (KB)
 
@@ -19,6 +20,7 @@ Changes for 1.9.0
 
 Changes for 1.8.4rc3
 
+ - [ZBXNEXT-538] include ibm_db2.sql and images_ibm_db2.sql files in distribution package (Sasha)
  - [ZBX-3107] fixed graph bugs: problem with large values, problem with uptime format (KB)
  - [ZBX-2349] unicode support for macros and web scenario steps (KB)
  - [ZBX-3137] fixed errors related to deleting and application that is used in a web scenario (KB)

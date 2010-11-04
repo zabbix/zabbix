@@ -124,8 +124,8 @@ const ZBX_TABLE	tables[]={
 	"t_cksum_text"	=>	"nclob"  
 );
 
-%db2=("t_bigint"	=>	"bigint",
-	"database"	=>	"db2",
+%ibm_db2=("t_bigint"	=>	"bigint",
+	"database"	=>	"ibm_db2",
 	"before"	=>	"",
 	"after"		=>	"",
 	"type"		=>	"sql",
@@ -308,7 +308,7 @@ sub process_field
 
 		if ($default ne "")
 		{
-			if ($output{"database"} eq "db2"){
+			if ($output{"database"} eq "ibm_db2"){
 				$default = "WITH DEFAULT $default";
 			}
 			else{
@@ -326,7 +326,7 @@ sub process_field
 			}
 		}
 
-		if($output{"database"} eq "db2"){
+		if($output{"database"} eq "ibm_db2"){
 			@text_fields = ('blob');
 			if(grep /$output{$type_short}/, @text_fields){
 				$default="";
@@ -368,7 +368,7 @@ sub process_field
 				$sequences = "${sequences}SELECT ${table_name}_seq.nextval INTO :new.id FROM dual;${eol}\n";
 				$sequences = "${sequences}END;${eol}\n/${eol}\n";
 			}
-			elsif($output{"database"} eq "db2")
+			elsif($output{"database"} eq "ibm_db2")
 			{
 				$row="$row\tGENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1)";
 			}
@@ -456,7 +456,7 @@ sub process_index
 
 sub usage
 {
-	printf "Usage: $0 [c|db2|mysql|oracle|postgresql|sqlite]\n";
+	printf "Usage: $0 [c|ibm_db2|mysql|oracle|postgresql|sqlite]\n";
 	printf "The script generates Zabbix SQL schemas and C code for different database engines.\n";
 	exit;
 }
@@ -527,7 +527,7 @@ sub main
 	switch ($format)
 	{
 		case "c"		{ %output = %c; }
-		case "db2"		{ %output = %db2; }
+		case "ibm_db2"		{ %output = %ibm_db2; }
 		case "mysql"		{ %output = %mysql; }
 		case "oracle"		{ %output = %oracle; }
 		case "postgresql"	{ %output = %postgresql; }
@@ -560,8 +560,8 @@ sub main
 		%output = %oracle;
 		process();
 		print $fkeys_drop_prefix.$fkeys_drop.$fkeys_suffix;
-		print "#elif HAVE_DB2\nconst char *const db_schema= \"\\\n";
-		%output = %db2;
+		print "#elif HAVE_IBM_DB2\nconst char *const db_schema= \"\\\n";
+		%output = %ibm_db2;
 		process();
 		print $fkeys_drop_prefix.$fkeys_drop.$fkeys_suffix;
 		print "#elif HAVE_POSTGRESQL\nconst char *const db_schema= \"\\\n";
