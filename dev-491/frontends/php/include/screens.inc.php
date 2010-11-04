@@ -1031,7 +1031,10 @@ require_once('include/js.inc.php');
 						$host = reset($hosts);
 
 						$def_items = array();
-						$di_res = get_graphitems_by_graphid($resourceid);
+						$di_res =  DBselect('SELECT * '.
+								' FROM graphs_items '.
+								' WHERE graphid='.$resourceid.
+								' ORDER BY itemid,drawtype,sortorder,color,yaxisside');
 						while($gitem = DBfetch($di_res)) $def_items[] = $gitem;
 
 						$new_items = get_same_graphitems_for_host($def_items, $_REQUEST['hostid'], false);

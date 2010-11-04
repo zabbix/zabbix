@@ -487,7 +487,7 @@
 		}
 
 		if(!empty($del_graphs)){
-			$result = delete_graph($del_graphs);
+			$result = CGraph::delete($del_graphs);
 			if(!$result)	return	$result;
 		}
 

@@ -243,6 +243,20 @@ class czbxrpc{
 		self::$result = $result;
 	}
 
+// GRAPH
+	private static function graphprototype($action, $params){
+
+		CGraphPrototype::$error = array();
+
+		switch($action){
+			default:
+			$result = call_user_func(array('CGraphPrototype', $action), $params);
+		}
+
+		self::$result = $result;
+	}
+
+
 // GRAPHITEM
 	private static function graphitem($action, $params){
 
