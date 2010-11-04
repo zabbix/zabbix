@@ -31,7 +31,6 @@ include_once('include/page_header.php');
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-/* ARRAYS */
 		'hosts'=>				array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID, 	NULL),
 		'groups'=>				array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID, 	NULL),
 		'hostids'=>				array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID, 	NULL),
@@ -52,7 +51,7 @@ include_once('include/page_header.php');
 		'form_refresh'=>		array(T_ZBX_STR, O_OPT, NULL,			NULL,	NULL)
 	);
 	check_fields($fields);
-	validate_sort_and_sortorder('name',ZBX_SORT_UP);
+	validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 	$_REQUEST['go'] = get_request('go','none');
 
@@ -60,11 +59,6 @@ include_once('include/page_header.php');
 	if(get_request('groupid', 0) > 0){
 		$groupids = available_groups($_REQUEST['groupid'], 1);
 		if(empty($groupids)) access_deny();
-	}
-
-	if(get_request('hostid', 0) > 0){
-		$hostids = available_hosts($_REQUEST['hostid'], 1);
-		if(empty($hostids)) access_deny();
 	}
 ?>
 <?php
@@ -77,15 +71,29 @@ include_once('include/page_header.php');
 
 		$objects = get_request('hosts', array());
 
-		$hosts = CHost::get(array('hostids' => $objects, 'output' => API_OUTPUT_SHORTEN));
-		$templates = CTemplate::get(array('templateids' => $objects, 'output' => API_OUTPUT_SHORTEN));
+		$hosts = CHost::get(array(
+			'hostids' => $objects,
+			'output' => API_OUTPUT_SHORTEN
+		));
+
+		$templates = CTemplate::get(array(
+			'templateids' => $objects,
+			'output' => API_OUTPUT_SHORTEN
+		));
 
 		if(isset($_REQUEST['groupid'])){
 			DBstart();
-			$old_group = CHostGroup::get(array('groupids' => $_REQUEST['groupid'],	'output' => API_OUTPUT_EXTEND));
+			$old_group = CHostGroup::get(array(
+				'groupids' => $_REQUEST['groupid'],
+				'output' => API_OUTPUT_EXTEND
+			));
 			$old_group = reset($old_group);
-		
-			$result = CHostGroup::update(array('groupid' => $_REQUEST['groupid'], 'name' => $_REQUEST['gname']));
+
+			$result = CHostGroup::update(array(
+				'groupid' => $_REQUEST['groupid'],
+				'name' => $_REQUEST['gname']
+			));
+
 			if($result){
 				$options = array(
 					'groupids' => $result['groupids'],
@@ -148,10 +156,7 @@ include_once('include/page_header.php');
 		unset($_REQUEST['save']);
 	}
 	else if(isset($_REQUEST['delete']) && isset($_REQUEST['groupid'])){
-		$result = false;
-		DBstart();
-		$result = delete_host_group($_REQUEST['groupid']);
-		$result = DBend($result);
+		$result = CHostGroup::delete($_REQUEST['groupid']);
 
 		unset($_REQUEST['form']);
 		show_messages($result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
@@ -159,31 +164,8 @@ include_once('include/page_header.php');
 	}
 // --------- GO  ----------
 	else if($_REQUEST['go'] == 'delete'){
-/* group operations */
-			$go_result = true;
-
 			$groups = get_request('groups', array());
-
-			DBstart();
-			$sql = 'SELECT g.groupid, g.name '.
-					' FROM groups g '.
-					' WHERE '.DBin_node('g.groupid').
-						' AND '.DBcondition('g.groupid', $groups);
-			$db_groups = DBselect($sql);
-			while($db_group=DBfetch($db_groups)){
-				if(!isset($groups[$db_group['groupid']])) continue;
-
-/*				if(!$group = get_hostgroup_by_groupid($db_group['groupid'])) continue;*/
-				$go_result &= delete_host_group($db_group['groupid']);
-
-/*
-				if($result){
-					add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST_GROUP,
-					S_HOST_GROUP.' ['.$group['name'].' ] ['.$group['groupid'].']');
-				}
-//*/
-			}
-			$go_result = DBend($go_result);
+			$go_result = CHostGroup::delete($groups);
 			show_messages($go_result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
 		}
 	else if(str_in_array($_REQUEST['go'], array('activate', 'disable'))){
@@ -192,7 +174,11 @@ include_once('include/page_header.php');
 		$groups = get_request('groups', array());
 		if(!empty($groups)){
 			DBstart();
-			$hosts = CHost::get(array('groupids' => $groups, 'editable' => 1, 'output' => API_OUTPUT_EXTEND));
+			$hosts = CHost::get(array(
+				'groupids' => $groups,
+				'editable' => 1,
+				'output' => API_OUTPUT_EXTEND
+			));
 
 			if(empty($hosts)){
 				$go_result = true;
@@ -235,8 +221,6 @@ include_once('include/page_header.php');
 	$groups_wdgt->addPageHeader(S_CONFIGURATION_OF_GROUPS, $frmForm);
 
 	if(isset($_REQUEST['form'])){
-		global $USER_DETAILS;
-
 		$groupid = get_request('groupid', 0);
 		$hosts = get_request('hosts', array());
 
@@ -261,8 +245,6 @@ include_once('include/page_header.php');
 			}
 		}
 
-		
-
 		$frmHostG = new CFormTable($frm_title, 'hostgroups.php');
 		$frmHostG->setName('hg_form');
 
@@ -284,10 +266,7 @@ include_once('include/page_header.php');
 			$gr = reset($db_groups);
 			$twb_groupid = $gr['groupid'];
 		}
-		
-		
 
-		
 		//creating <select> with list of host groups
 		$cmbGroups = new CComboBox('twb_groupid', $twb_groupid, 'submit()');
 
@@ -301,9 +280,6 @@ include_once('include/page_header.php');
 		foreach($db_groups as $row){
 			$cmbGroups->addItem($row['groupid'], $row['name']);
 		}
-
-
-
 
 		$cmbHosts = new CTweenBox($frmHostG, 'hosts', $hosts, 25);
 
@@ -364,20 +340,14 @@ include_once('include/page_header.php');
 
 		$frmHostG->addRow(S_HOSTS, $cmbHosts->Get(S_HOSTS.SPACE.S_IN,array(S_OTHER.SPACE.S_HOSTS.SPACE.'|'.SPACE.S_GROUP.SPACE, $cmbGroups)));
 
-		$frmHostG->addItemToBottomRow(new CButton('save',S_SAVE));
+		$frmHostG->addItemToBottomRow(new CButton('save', S_SAVE));
 		if($groupid > 0){
-			$frmHostG->addItemToBottomRow(SPACE);
-			$frmHostG->addItemToBottomRow(new CButton('clone',S_CLONE));
-			$frmHostG->addItemToBottomRow(SPACE);
-
 			$dltButton = new CButtonDelete(S_DELETE_SELECTED_GROUP, url_param('form').url_param('groupid'));
 			$dlt_groups = getDeletableHostGroups($_REQUEST['groupid']);
-
 			if(empty($dlt_groups)) $dltButton->setAttribute('disabled', 'disabled');
 
-			$frmHostG->addItemToBottomRow($dltButton);
+			$frmHostG->addItemToBottomRow(array(new CButton('clone',S_CLONE), $dltButton));
 		}
-		$frmHostG->addItemToBottomRow(SPACE);
 		$frmHostG->addItemToBottomRow(new CButtonCancel());
 		$groups_wdgt->addItem($frmHostG);
 	}

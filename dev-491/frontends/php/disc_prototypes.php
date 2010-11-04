@@ -229,9 +229,18 @@ switch($itemType) {
 		DBstart();
 
 		$applications = get_request('applications', array());
+		$fapp = reset($applications);
+		if($fapp == 0) array_shift($applications);
+
 		if(!zbx_empty($_REQUEST['new_application'])){
-			if($new_appid = add_application($_REQUEST['new_application'], $_REQUEST['hostid']))
+			$new_appid = CApplication::create(array(
+				'name' => $_REQUEST['new_application'],
+				'hostid' => $_REQUEST['hostid']
+			));
+			if($new_appid){
+				$new_appid = reset($new_appid['applicationids']);
 				$applications[$new_appid] = $new_appid;
+			}
 		}
 
 		$item = array(
@@ -279,7 +288,7 @@ switch($itemType) {
 			}
 
 			$item['itemid'] = $_REQUEST['itemid'];
-			
+
 			$result = CItemPrototype::update($item);
 
 			show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);

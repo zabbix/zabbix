@@ -20,13 +20,9 @@
 ?>
 <?php
 /**
- * File containing CApplication class for API.
  * @package API
  */
-/**
- * Class containing methods for operations with Applications
- *
- */
+
 class CApplication extends CZBXAPI{
 /**
  * Get Applications data
@@ -415,32 +411,106 @@ COpt::memoryPick();
 	return !empty($objs);
 	}
 
+	public static function checkInput(&$applications, $method){
+		$create = ($method == 'create');
+		$update = ($method == 'update');
+		$delete = ($method == 'delete');
+
+// permissions
+		if($update || $delete){
+			$item_db_fields = array('applicationid' => null);
+			$dbApplications = self::get(array(
+				'output' => API_OUTPUT_EXTEND,
+				'applicationids' => zbx_objectValues($applications, 'applicationid'),
+				'editable' => 1,
+				'preservekeys' => 1
+			));
+		}
+		else{
+			$item_db_fields = array('name' => null, 'hostid' => null);
+			$dbHosts = CHost::get(array(
+				'output' => array('hostid', 'host', 'status'),
+				'hostids' => zbx_objectValues($applications, 'hostid'),
+				'templated_hosts' => 1,
+				'editable' => 1,
+				'preservekeys' => 1
+			));
+		}
+
+		foreach($applications as &$application){
+			if(!check_db_fields($item_db_fields, $application)){
+				self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION);
+			}
+
+			unset($application['templateid']);
+
+// check permissions by hostid
+			if($create){
+				if(!isset($dbHosts[$application['hostid']]))
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+			}
+
+// check permissions by applicationid
+			if($delete || $update){
+				if(!isset($dbApplications[$application['applicationid']]))
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+			}
+
+// check on operating with templated applications
+			if($delete || $update){
+				if($dbApplications[$application['applicationid']]['templateid'] != 0){
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot interact templated applications');
+				}
+			}
+
+			if($update){
+				if(!isset($application['hostid'])){
+					$application['hostid'] = $dbApplications[$application['applicationid']]['hostid'];
+				}
+			}
+
+// check existance
+			if($update || $create){
+				$applicationsExists = self::get(array(
+					'output' => API_OUTPUT_EXTEND,
+					'filter' => array(
+						'hostid' => $application['hostid'],
+						'name' => $application['name'],
+					),
+					'nopermissions' => 1
+				));
+				foreach($applicationsExists as $applicationExists){
+					if(!$update || ($applicationExists['applicationid'] != $application['applicationid'])){
+						self::exception(ZBX_API_ERROR_PARAMETERS, S_APPLICATION.' ['.$application['name'].'] '.S_ALREADY_EXISTS_SMALL);
+					}
+				}
+			}
+		}
+		unset($application);
+	}
+
 /**
  * Add Applications
  *
  * @param array $applications
  * @param array $app_data['name']
  * @param array $app_data['hostid']
- * @return boolean
+ * @return array
  */
 	public static function create($applications){
 		$applications = zbx_toArray($applications);
-		$applicationids = array();
 
 		try{
 			self::BeginTransaction(__METHOD__);
 
-			foreach($applications as $anum => $application){
-				$result = add_application($application['name'], $application['hostid']);
+			self::checkInput($applications, __FUNCTION__);
 
-				if(!$result)
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_CANNOT_CREATE_APPLICATION);
-				$applicationids[] = $result;
-			}
+			self::createReal($applications);
+
+			self::inherit($applications);
 
 			self::EndTransaction(true, __METHOD__);
-
-			return array('applicationids' => $applicationids);
+			return array('applicationids' => zbx_objectValues($applications, 'applicationid'));
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
@@ -454,46 +524,25 @@ COpt::memoryPick();
 /**
  * Update Applications
  *
- * @param _array $applications
+ * @param array $applications
  * @param array $app_data['name']
  * @param array $app_data['hostid']
- * @return boolean
+ * @return array
  */
 	public static function update($applications){
 		$applications = zbx_toArray($applications);
-		$applicationids = zbx_objectValues($applications, 'applicationid');
 
 		try{
 			self::BeginTransaction(__METHOD__);
 
-			$options = array(
-				'applicationids' => $applicationids,
-				'editable' => 1,
-				'output' => API_OUTPUT_EXTEND,
-				'preservekeys' => 1
-			);
-			$upd_applications = self::get($options);
-			foreach($applications as $anum => $application){
-				if(!isset($upd_applications[$application['applicationid']])){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
-				}
-			}
+			self::checkInput($applications, __FUNCTION__);
 
-			foreach($applications as $anum => $application){
-				$application_db_fields = $upd_applications[$application['applicationid']];
+			self::updateReal($applications);
 
-				if(!check_db_fields($application_db_fields, $application)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_FIELDS_FOR_APPLICATIONS);
-				}
-
-				$result = update_application($application['applicationid'], $application['name'], $application['hostid']);
-				if(!$result)
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_CANNOT_UPDATE_APPLICATION);
-			}
+			self::inherit($applications);
 
 			self::EndTransaction(true, __METHOD__);
-
-			return array('applicationids' => $applicationids);
+			return array('applicationids' => zbx_objectValues($applications, 'applicationids'));
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
@@ -504,12 +553,51 @@ COpt::memoryPick();
 		}
 	}
 
+	protected static function createReal(&$applications){
+		$applicationids = DB::insert('items', $applications);
+
+		foreach($applications as $anum => $application){
+			$applications[$anum]['applicationid'] = $applicationids[$anum];
+		}
+
+// TODO: REMOVE info
+		$applications_created = self::get(array(
+			'applicationids' => $applicationids,
+			'output' => API_OUTPUT_EXTEND,
+			'nopermissions' => 1
+		));
+		foreach($applications_created as $application_created){
+			info(S_APPLICATION.' ['.$application_created['name'].'] '.S_CREATED_SMALL);
+		}
+	}
+
+	protected static function updateReal($applications){
+		$update = array();
+		foreach($applications as $application){
+			$update[] = array(
+				'values' => $application,
+				'where'=> array('applicationid='.$application['applicationid'])
+			);
+		}
+		DB::update('applications', $update);
+
+
+// TODO: REMOVE info
+		$applications_upd = self::get(array(
+			'applicationids' => zbx_objectValues($applications, 'applicationid'),
+			'output' => API_OUTPUT_EXTEND,
+			'nopermissions' => 1,
+		));
+		foreach($applications_upd as $application_upd){
+			info(S_APPLICATION.' ['.$application_upd['name'].'] '.S_UPDATED_SMALL);
+		}
+	}
+
 /**
  * Delete Applications
  *
- * @param _array $applications
- * @param array $applications[0,...]['applicationid']
- * @return boolean
+ * @param array $applicationids
+ * @return array
  */
 	public static function delete($applicationids, $nopermissions=false){
 		$applicationids = zbx_toArray($applicationids);
@@ -536,9 +624,35 @@ COpt::memoryPick();
 				}
 			}
 
-			$result = delete_application($applicationids);
-			if(!$result)
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_CANNOT_DELETE_APPLICATION);
+
+			$parent_applicationids = $applicationids;
+			do{
+				$db_applications = DBselect('SELECT applicationid FROM applications WHERE ' . DBcondition('templateid', $parent_applicationids));
+				$parent_applicationids = array();
+				while($db_application = DBfetch($db_applications)){
+					$parent_applicationids[] = $db_application['applicationid'];
+					$applicationids[$db_application['applicationid']] = $db_application['applicationid'];
+				}
+			} while(!empty($parent_applicationids));
+
+
+//check if app is used by web scenario
+			$sql = 'SELECT ht.name, ht.applicationid '.
+					' FROM httptest ht '.
+					' WHERE '.DBcondition('ht.applicationid',$applicationids);
+			$res = DBselect($sql);
+			if($info = DBfetch($res)){
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+						S_APPLICATION.' ['.$del_applications[$info['applicationid']]['name'].'] '.
+						S_USED_BY_SCENARIO_SMALL.' ['.$info['name'].'] '.S_AND_CANT_BE_DELETED);
+			}
+
+			DB::delete('applications', array(DBcondition('applicationid', $applicationids)));
+
+// TODO: remove info from API
+			foreach($del_applications as $del_application){
+				info(S_APPLICATION.' ['.$del_application['name'].'] '.S_DELETED_SMALL);
+			}
 
 			self::EndTransaction(true, __METHOD__);
 			return array('applicationids' => $applicationids);
@@ -657,20 +771,135 @@ COpt::memoryPick();
 		}
 	}
 
-	private function inherit($application, $hostids=null){
+	protected static function inherit($applications, $hostids=null){
+		if(empty($applications)) return $applications;
 
+		$applications = zbx_toHash($applications, 'applicationid');
+
+		$chdHosts = CHost::get(array(
+			'output' => array('hostid', 'host'),
+			'templateids' => zbx_objectValues($applications, 'hostid'),
+			'hostids' => $hostids,
+			'preservekeys' => 1,
+			'nopermissions' => 1,
+			'templated_hosts' => 1
+		));
+		if(empty($chdHosts)) return true;
+
+		$insertApplications = array();
+		$updateApplications = array();
+		foreach($chdHosts as $hostid => $host){
+			$templateids = zbx_toHash($host['templates'], 'templateid');
+
+// skip applications not from parent templates of current host
+			$parentApplications = array();
+			foreach($applications as $applicationid => $application){
+				if(isset($templateids[$application['hostid']]))
+					$parentApplications[$applicationid] = $application;
+			}
+
+// check existing items to decide insert or update
+			$exApplications = self::get(array(
+				'output' => array('applicationid', 'name', 'templateid'),
+				'hostids' => $hostid,
+				'preservekeys' => 1,
+				'nopermissions' => 1
+			));
+			$exApplicationsNames = zbx_toHash($exApplications, 'name');
+			$exApplicationsTpl = zbx_toHash($exApplications, 'templateid');
+
+			foreach($parentApplications as $applicationid => $application){
+				$exApplication = null;
+
+// update by tempalteid
+				if(isset($exApplicationsTpl[$applicationid])){
+					$exApplication = $exApplicationsTpl[$applicationid];
+				}
+
+// update by name
+				if(isset($application['name']) && isset($exApplicationsNames[$application['name']])){
+					$exApplication = $exApplicationsNames[$application['name']];
+					if(($exApplication['templateid'] > 0) && ($exApplication['templateid'] != $application['applicationid'])){
+						self::exception(ZBX_API_ERROR_PARAMETERS, S_APPLICATION.' ['.$exApplication['name'].'] '.S_ALREADY_EXISTS_FOR_HOST_SMALL.' ['.$host['host'].']');
+					}
+				}
+
+				$newApplication = $application;
+				$newApplication['hostid'] = $host['hostid'];
+				$newApplication['templateid'] = $application['applicationid'];
+
+
+				if($exApplication){
+					$newApplication['applicationid'] = $exApplication['applicationid'];
+					$updateApplications[] = $newApplication;
+				}
+				else{
+					$insertApplications[] = $newApplication;
+				}
+			}
+		}
+
+		self::createReal($insertApplications);
+		self::updateReal($updateApplications);
+
+		$inheritedApplications = array_merge($insertApplications, $updateApplications);
+
+		self::inherit($inheritedApplications);
+
+		return true;
 	}
 
-	private function create_real(){
+	public static function syncTemplates($data){
+		try{
+			self::BeginTransaction(__METHOD__);
 
-	}
+			$data['templateids'] = zbx_toArray($data['templateids']);
+			$data['hostids'] = zbx_toArray($data['hostids']);
 
-	private function update_real(){
+			$options = array(
+				'hostids' => $data['hostids'],
+				'editable' => 1,
+				'preservekeys' => 1,
+				'templated_hosts' => 1,
+				'output' => API_OUTPUT_SHORTEN
+			);
+			$allowedHosts = CHost::get($options);
+			foreach($data['hostids'] as $hostid){
+				if(!isset($allowedHosts[$hostid])){
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				}
+			}
+			$options = array(
+				'templateids' => $data['templateids'],
+				'preservekeys' => 1,
+				'output' => API_OUTPUT_SHORTEN
+			);
+			$allowedTemplates = CTemplate::get($options);
+			foreach($data['templateids'] as $templateid){
+				if(!isset($allowedTemplates[$templateid])){
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				}
+			}
 
-	}
+			$options = array(
+				'hostids' => $data['templateids'],
+				'preservekeys' => 1,
+				'output' => API_OUTPUT_EXTEND,
+			);
+			$applications = self::get($options);
 
-	public function syncTemplates(){
+			self::inherit($applications, $data['hostids']);
 
+			self::EndTransaction(true, __METHOD__);
+			return true;
+		}
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
+			return false;
+		}
 	}
 }
 
