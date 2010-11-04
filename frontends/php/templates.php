@@ -425,15 +425,18 @@ include_once('include/page_header.php');
 	}
 // delete, delete_and_clear
 	else if((isset($_REQUEST['delete']) || isset($_REQUEST['delete_and_clear'])) && isset($_REQUEST['templateid'])){
-		$unlink_mode = false;
-		if(isset($_REQUEST['delete'])){
-			$unlink_mode =  true;
-		}
-
-		//$host = get_host_by_hostid($_REQUEST['templateid']);
-
 		DBstart();
-		$result = CTemplate::delete($_REQUEST['templateid']);
+
+		$go_result = true;
+		if(isset($_REQUEST['delete'])){
+			$result = CTemplate::massUpdate(array(
+				'templateids' => $_REQUEST['templateid'],
+				'hosts' => array()
+			));
+		}
+		if($result)
+			$result = CTemplate::delete($_REQUEST['templateid']);
+
 		$result = DBend($result);
 
 		show_messages($result, S_TEMPLATE_DELETED, S_CANNOT_DELETE_TEMPLATE);
@@ -446,19 +449,20 @@ include_once('include/page_header.php');
 	}
 // ---------- GO ---------
 	else if(str_in_array($_REQUEST['go'], array('delete', 'delete_and_clear')) && isset($_REQUEST['templates'])){
-		$unlink_mode = false;
-		if($_REQUEST['go'] == 'delete'){
-			$unlink_mode = true;
-		}
 
-		DBstart();
-		$go_result = true;
 		$templates = get_request('templates', array());
-		$del_hosts = CTemplate::get(array('templateids' => $templates, 'editable' => 1));
-		$del_hosts = zbx_objectValues($del_hosts, 'templateid');
+		DBstart();
 
+		$go_result = true;
+		if(isset($_REQUEST['delete'])){
+			$go_result = CTemplate::massUpdate(array(
+				'templateids' => $templates,
+				'hosts' => array()
+			));
+		}
+		if($go_result)
+			$go_result = CTemplate::delete($templates);
 
-		$go_result = CTemplate::delete($del_hosts);
 		$go_result = DBend($go_result);
 
 		show_messages($go_result, S_TEMPLATE_DELETED, S_CANNOT_DELETE_TEMPLATE);

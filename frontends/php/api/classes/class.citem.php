@@ -1061,7 +1061,7 @@ COpt::memoryPick();
 				));
 				foreach($itemsExists as $inum => $itemExists){
 					if(!$update || ($itemExists['itemid'] != $item['itemid'])){
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Host with item [ '.$item['description'].':'.$item['key_'].' ] already exists');
+						self::exception(ZBX_API_ERROR_PARAMETERS, S_ITEM.' ['.$item['description'].':'.$item['key_'].'] '.S_ALREADY_EXISTS_SMALL);
 					}
 				}
 // }}} EXCEPTION: ITEM EXISTS

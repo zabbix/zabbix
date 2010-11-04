@@ -1047,12 +1047,12 @@ COpt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$template['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
 
-				$templateid = get_dbid('hosts', 'hostid');
-				$templateids[] = $templateid;
+				$templateid = DB::insert('hosts', array(
+					'host' => $template['host'],
+					'status' => HOST_STATUS_TEMPLATE,
+				));
+				$templateids[] = $templateid = reset($templateid);
 
-				$sql = 'INSERT INTO hosts (hostid, host, status) VALUES ('.$templateid.','.zbx_dbstr($template['host']).','.HOST_STATUS_TEMPLATE.')';
-				if(!DBexecute($sql))
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBError');
 
 				$template['templateid'] = $templateid;
 				$options = array();
@@ -1140,38 +1140,134 @@ COpt::memoryPick();
  * @param array $templateids['templateids']
  * @return boolean
  */
-	public static function delete($templates){
-		$templates = zbx_toArray($templates);
-		$templateids = array();
+	public static function delete($templateids){
+		if(empty($templateids)) return true;
 
-		$options = array(
-			'templateids' => zbx_objectValues($templates, 'templateid'),
-			'editable' => 1,
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => 1
-		);
-		$del_templates = self::get($options);
-		foreach($templates as $gnum => $template){
-			if(!isset($del_templates[$template['templateid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				return false;
+		$templateids = zbx_toArray($templateids);
+
+		try{
+			self::BeginTransaction(__METHOD__);
+
+			$options = array(
+				'templateids' => $templateids,
+				'editable' => 1,
+				'output' => API_OUTPUT_SHORTEN,
+				'preservekeys' => 1
+			);
+			$del_templates = self::get($options);
+			foreach($templateids as $templateid){
+				if(!isset($del_templates[$templateid])){
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				}
 			}
-			$templateids[] = $template['templateid'];
-		}
 
-		if(!empty($templateids)){
-			$result = delete_host($templateids, false);
-		}
-		else{
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ templateids ]');
-			$result = false;
-		}
+			CTemplate::unlink($templateids, null, true);
 
-		if($result){
+			$delItems = CItem::get(array(
+				'templateids' => $templateids,
+				'nopermissions' => 1,
+				'preservekeys' => 1
+			));
+			CItem::delete($delItems, true);
+
+
+	// delete screen items
+			DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid',$templateids)).' AND resourcetype='.SCREEN_RESOURCE_HOST_TRIGGERS;
+
+	// delete host from maps
+			delete_sysmaps_elements_with_hostid($templateids);
+
+	// disable actions
+			$actionids = array();
+
+	// conditions
+			$sql = 'SELECT DISTINCT actionid '.
+					' FROM conditions '.
+					' WHERE conditiontype='.CONDITION_TYPE_HOST.
+						' AND '.DBcondition('value',$templateids, false, true);
+			$db_actions = DBselect($sql);
+			while($db_action = DBfetch($db_actions)){
+				$actionids[$db_action['actionid']] = $db_action['actionid'];
+			}
+
+			DBexecute('UPDATE actions '.
+						' SET status='.ACTION_STATUS_DISABLED.
+						' WHERE '.DBcondition('actionid',$actionids));
+	// operations
+			$sql = 'SELECT DISTINCT o.actionid '.
+					' FROM operations o '.
+					' WHERE o.operationtype IN ('.OPERATION_TYPE_GROUP_ADD.','.OPERATION_TYPE_GROUP_REMOVE.') '.
+						' AND '.DBcondition('o.objectid',$templateids);
+			$db_actions = DBselect($sql);
+			while($db_action = DBfetch($db_actions)){
+				$actionids[$db_action['actionid']] = $db_action['actionid'];
+			}
+
+			if(!empty($actionids)){
+				DBexecute('UPDATE actions '.
+						' SET status='.ACTION_STATUS_DISABLED.
+						' WHERE '.DBcondition('actionid',$actionids));
+			}
+
+
+	// delete action conditions
+			DBexecute('DELETE FROM conditions '.
+						' WHERE conditiontype='.CONDITION_TYPE_HOST.
+							' AND '.DBcondition('value',$templateids, false, true));	// FIXED[POSIBLE value type violation]!!!
+
+
+	// delete action operations
+			DBexecute('DELETE FROM operations '.
+						' WHERE operationtype IN ('.OPERATION_TYPE_TEMPLATE_ADD.','.OPERATION_TYPE_TEMPLATE_REMOVE.') '.
+							' AND '.DBcondition('objectid',$templateids));
+
+
+// delete host applications
+			//since all apps were deleted by other functions earlier, we must unlink
+			// those, who were not because they were used in web scenarios
+
+			$exceptional_applicationids = array();
+			$query = 'SELECT
+							httptest.applicationid,
+							httptest.name httptestname,
+							applications.name appname
+						FROM
+							httptest,
+							applications
+						WHERE
+							httptest.applicationid = applications.applicationid
+							AND applications.templateid IN (SELECT applicationid
+															FROM applications
+															WHERE '.DBcondition('hostid',$templateids).')';
+			$db_applications = DBselect($query);
+			while($ex_app = DBfetch($db_applications)){
+				$exceptional_applicationids[] = $ex_app['applicationid'];
+			}
+
+//removing links from those apps that were not deleted
+			if(count($exceptional_applicationids) > 0){
+				$query = 'UPDATE applications SET templateid = 0 WHERE '.DBcondition('applicationid',$exceptional_applicationids);
+				DBexecute($query);
+			}
+
+
+			$templateidCondition = DBcondition('hostid', $templateids);
+			DB::delete('hosts', array($templateidCondition));
+
+// TODO: remove info from API
+			foreach($del_templates as $template) {
+				info(S_HOST_HAS_BEEN_DELETED_MSG_PART1.SPACE.$template['host'].SPACE.S_HOST_HAS_BEEN_DELETED_MSG_PART2);
+				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $template['hostid'], $template['host'], 'hosts', NULL, NULL);
+			}
+
+			self::EndTransaction(true, __METHOD__);
 			return array('templateids' => $templateids);
 		}
-		else{
-			self::setError(__METHOD__);
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
 		}
 	}
@@ -1733,7 +1829,10 @@ COpt::memoryPick();
 					}
 				}
 
-				copy_template_applications($targetid, $templateid, false);
+				$result = CApplication::syncTemplates(array(
+					'hostids' => $targetid,
+					'templateids' => $templateid
+				));
 
 				$result = CDiscoveryRule::syncTemplates(array(
 					'hostids' => $targetid,
@@ -1766,21 +1865,27 @@ COpt::memoryPick();
 		return true;
 	}
 
-	private static function unlink($templateids, $targetids, $clear=false){
+	private static function unlink($templateids, $targetids=null, $clear=false){
 
 /* GRAPHS {{{ */
-		$sql = 'SELECT DISTINCT g.graphid, g.name'.
-				' FROM graphs g, graphs_items gi, items i'.
-				' WHERE '.DBCondition('i.hostid', $targetids).
+
+		$sql_from = 'graphs g';
+		$sql_where = ' EXISTS ('.
+				' SELECT ggi.graphid'.
+				' FROM graphs_items ggi, items ii'.
+				' WHERE ggi.graphid=g.templateid'.
+					' AND ii.itemid=ggi.itemid'.
+					' AND '.DBCondition('ii.hostid', $templateids).')';
+
+		if(!is_null($targetids)){
+			$sql_from = 'graphs g, graphs_items gi, items i';
+			$sql_where .= ' AND '.DBCondition('i.hostid', $targetids).
   				' AND gi.itemid=i.itemid'.
-				' AND g.graphid=gi.graphid'.
-				' AND EXISTS ('.
-					' SELECT ggi.graphid'.
-					' FROM graphs_items ggi, items ii'.
-					' WHERE ggi.graphid=g.templateid'.
-						' AND ii.itemid=ggi.itemid'.
-					  	' AND '.DBCondition('ii.hostid', $templateids).
-				')';
+				' AND g.graphid=gi.graphid';
+		}
+		$sql = 'SELECT DISTINCT g.graphid, g.name'.
+				' FROM '.$sql_from.
+				' WHERE '.$sql_where;
 		$db_graphs = DBSelect($sql);
 		$graphs = array();
 		while($graph = DBfetch($db_graphs)){
@@ -1808,18 +1913,23 @@ COpt::memoryPick();
 
 
 /* TRIGGERS {{{ */
-		$sql = 'SELECT DISTINCT t.triggerid, t.description'.
-		' FROM triggers t, functions f, items i'.
-		' WHERE '.DBCondition('i.hostid', $targetids).
-			' AND f.itemid=i.itemid'.
-			' AND t.triggerid=f.triggerid'.
-			' AND EXISTS ('.
+		$sql_from = 'triggers t';
+		$sql_where = ' EXISTS ('.
 				' SELECT ff.triggerid'.
 				' FROM functions ff, items ii'.
 				' WHERE ff.triggerid=t.templateid'.
 					' AND ii.itemid=ff.itemid'.
-					' AND '.DBCondition('ii.hostid', $templateids).
-		')';
+					' AND '.DBCondition('ii.hostid', $templateids).')';
+
+		if(!is_null($targetids)){
+			$sql_from = 'triggers t, functions f, items i';
+			$sql_where .= ' AND '.DBCondition('i.hostid', $targetids).
+  				' AND f.itemid=i.itemid'.
+				' AND t.triggerid=f.triggerid';
+		}
+		$sql = 'SELECT DISTINCT t.triggerid, t.description'.
+				' FROM '.$sql_from.
+				' WHERE '.$sql_where;
 		$db_triggers = DBSelect($sql);
 		$triggers = array();
 		while($trigger = DBfetch($db_triggers)){
@@ -1847,13 +1957,17 @@ COpt::memoryPick();
 
 
 /* ITEMS && DISCOVERYRULES && ITEMPROTOTYPES {{{ */
-		$sql = 'SELECT DISTINCT i1.itemid, i1.key_, i1.flags'.
-		' FROM items i1, items i2'.
-		' WHERE '.DBCondition('i1.hostid', $targetids).
-			' AND i2.itemid=i1.templateid'.
+		$sql_from = 'items i1, items i2';
+		$sql_where = ' i2.itemid=i1.templateid'.
 			' AND '.DBCondition('i2.hostid', $templateids).
 			' AND '.DBCondition('i1.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY, ZBX_FLAG_DISCOVERY_CHILD));
 
+		if(!is_null($targetids)){
+			$sql_where .= ' AND '.DBCondition('i1.hostid', $targetids);
+		}
+		$sql = 'SELECT DISTINCT i1.itemid, i1.key_, i1.flags'.
+				' FROM '.$sql_from.
+				' WHERE '.$sql_where;
 		$db_items = DBSelect($sql);
 		$items = array(
 			ZBX_FLAG_DISCOVERY_NORMAL => array(),
@@ -1921,11 +2035,15 @@ COpt::memoryPick();
 
 
 /* APPLICATIONS {{{ */
-		$sql = 'SELECT DISTINCT a1.applicationid, a1.name'.
-		' FROM applications a1, applications a2'.
-		' WHERE '.DBCondition('a1.hostid', $targetids).
-			' AND a2.applicationid=a1.templateid'.
+		$sql_from = 'applications a1, applications a2';
+		$sql_where = ' a2.applicationid=a1.templateid'.
 			' AND '.DBCondition('a2.hostid', $templateids);
+		if(!is_null($targetids)){
+			$sql_where .= ' AND '.DBCondition('a1.hostid', $targetids);
+		}
+		$sql = 'SELECT DISTINCT a1.applicationid, a1.name'.
+				' FROM '.$sql_from.
+				' WHERE '.$sql_where;
 
 		$db_applications = DBSelect($sql);
 		$applications = array();

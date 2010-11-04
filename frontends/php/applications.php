@@ -88,15 +88,22 @@ include_once('include/page_header.php');
 /****** APPLICATIONS **********/
 	if(isset($_REQUEST['save'])){
 		DBstart();
+		$application = array(
+			'name' => $_REQUEST['appname'],
+			'hostid' => $_REQUEST['apphostid']
+		);
 		if(isset($_REQUEST['applicationid'])){
-			$applicationid = update_application($_REQUEST['applicationid'],$_REQUEST['appname'], $_REQUEST['apphostid']);
+			$application['applicationid'] = $_REQUEST['applicationid'];
+			$applicationid = CApplication::update($application);
+			$applicationid = reset($applicationid['applicationids']);
+
 			$action		= AUDIT_ACTION_UPDATE;
 			$msg_ok		= S_APPLICATION_UPDATED;
 			$msg_fail	= S_CANNOT_UPDATE_APPLICATION;
-
 		}
-		else {
-			$applicationid = add_application($_REQUEST['appname'], $_REQUEST['apphostid']);
+		else{
+			$applicationid = CApplication::create($application);
+			$applicationid = reset($applicationid['applicationids']);
 			$action		= AUDIT_ACTION_ADD;
 			$msg_ok		= S_APPLICATION_ADDED;
 			$msg_fail	= S_CANNOT_ADD_APPLICATION;
