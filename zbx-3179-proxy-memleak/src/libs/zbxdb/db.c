@@ -443,7 +443,7 @@ int	zbx_db_begin()
 		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc);
 		rc = (SQL_CD_TRUE == IBM_DB2server_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
 	}
-#elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL) || defined(HAVE_SQLITE3)
+#elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 	rc = zbx_db_execute("%s", "begin;");
 #elif defined(HAVE_SQLITE3)
 	if (PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
@@ -452,6 +452,7 @@ int	zbx_db_begin()
 				" on SQLite database.");
 		assert(0);
 	}
+	rc = zbx_db_execute("%s", "begin;");
 #endif
 
 	if (rc < ZBX_DB_OK)	/* ZBX_DB_FAIL | ZBX_DB_DOWN */
@@ -497,11 +498,12 @@ int	zbx_db_commit()
 		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc);
 		rc = (SQL_CD_TRUE == IBM_DB2server_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
 	}
-#elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL) || defined(HAVE_SQLITE3)
+#elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 	rc = zbx_db_execute("%s", "commit;");
 #elif defined(HAVE_ORACLE)
 	OCITransCommit(oracle.svchp, oracle.errhp, OCI_DEFAULT);
 #elif defined(HAVE_SQLITE3)
+	rc = zbx_db_execute("%s", "commit;");
 	php_sem_release(&sqlite_access);
 #endif
 
@@ -548,11 +550,12 @@ int	zbx_db_rollback()
 		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc);
 		rc = (SQL_CD_TRUE == IBM_DB2server_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
 	}
-#elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL) || defined(HAVE_SQLITE3)
+#elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 	rc = zbx_db_execute("%s", "rollback;");
 #elif defined(HAVE_ORACLE)
 	OCITransRollback(oracle.svchp, oracle.errhp, OCI_DEFAULT);
 #elif defined(HAVE_SQLITE3)
+	rc = zbx_db_execute("%s", "rollback;");
 	php_sem_release(&sqlite_access);
 #endif
 
