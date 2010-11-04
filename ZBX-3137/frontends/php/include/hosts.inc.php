@@ -1404,37 +1404,25 @@ return $result;
 
 		if(!empty($tmp_appids)) delete_application($tmp_appids);			// recursion!!!
 
-
-		$applicationids_with_parents = $applicationids;
-		foreach($applicationids as $app_id)
-		{
-			$app_template_id = $app_id;
-			while($app_template_id != 0)
-			{
-				$sql = 'SELECT applicationid
-						FROM applications
-						WHERE templateid = '.$app_template_id.'';
-				$db_app = DBselect($sql);
-				if($app = DBfetch($db_app)){
-					$app_template_id = $app['applicationid'];
-					if (!in_array($app_template_id, $applicationids_with_parents)){
-						$applicationids_with_parents[] = $app_template_id;
-					}
-				}
-				else{
-					$app_template_id = 0;
-				}
-
+		//getting the list of all parent apps
+		$parents_that_should_not_be_deleted = $applicationids;
+		$parent_applicationids = $applicationids;
+		do{
+			$db_applications = DBselect('SELECT applicationid FROM applications WHERE ' . DBcondition('templateid', $parent_applicationids));
+			$parent_applicationids = array();
+			while($db_application = DBfetch($db_applications)){
+				 $parent_applicationids[] = $db_application['applicationid'];
+				 $parents_that_should_not_be_deleted[$db_application['applicationid']] = $db_application['applicationid'];
 			}
-		}
-
+	   } while(!empty($parent_applicationids));
+   
 		//check if app is used by web scenario
 		$sql = 'SELECT ht.name, ht.applicationid '.
 				' FROM httptest ht '.
 				' WHERE '.DBcondition('ht.applicationid',$applicationids).'
 						OR ht.applicationid IN (SELECT applicationid
 												FROM applications
-												WHERE '.DBcondition('templateid',$applicationids_with_parents).')';
+												WHERE '.DBcondition('templateid',$parents_that_should_not_be_deleted).')';
 		$res = DBselect($sql);
 		//if it is, we can't delete it
 		if($info = DBfetch($res)){
