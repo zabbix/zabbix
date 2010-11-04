@@ -26,9 +26,9 @@
 /**
  * Class containing methods for operations with graphs
  */
-class CGraph extends CZBXAPI{
+class CGraphPrototype extends CZBXAPI{
 /**
-* Get graph data
+* Get GraphPrototype data
 *
 * @param array $options
 * @return array
@@ -47,7 +47,7 @@ class CGraph extends CZBXAPI{
 		$sql_parts = array(
 			'select' => array('graphs' => 'g.graphid'),
 			'from' => array('graphs' => 'graphs g'),
-			'where' => array(),
+			'where' => array('g.flags='.ZBX_FLAG_DISCOVERY_CHILD),
 			'group' => array(),
 			'order' => array(),
 			'limit' => null,
@@ -623,7 +623,7 @@ COpt::memoryPick();
 	}
 
 /**
- * Create new graphs
+ * Create new GraphPrototypes
  *
  * @param array $graphs
  * @return boolean
@@ -685,7 +685,7 @@ COpt::memoryPick();
 	}
 
 /**
- * Update existing graphs
+ * Update existing GraphPrototype
  *
  * @param array $graphs
  * @return boolean
@@ -820,6 +820,7 @@ COpt::memoryPick();
 		$options = array(
 			'graphids' => $graph['graphid'],
 			'nopermissions' => 1,
+			'filter' => array('flags' => null),
 			'selectItems' => API_OUTPUT_EXTEND,
 			'select_graph_items' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND
@@ -857,7 +858,7 @@ COpt::memoryPick();
 
 			if($chd_graph = reset($chd_graphs)){
 				if((zbx_strtolower($tmp_graph['name']) != zbx_strtolower($chd_graph['name']))
-						&& self::exists(array('name' => $tmp_graph['name'], 'hostids' => $chd_host['hostid'])))
+				&& self::exists(array('name' => $tmp_graph['name'], 'hostids' => $chd_host['hostid'])))
 				{
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$tmp_graph['name'].' ]: already exists on [ '.$chd_host['host'].' ]');
 				}
@@ -975,6 +976,7 @@ COpt::memoryPick();
 				'preservekeys' => 1,
 				'output' => API_OUTPUT_EXTEND,
 				'select_graph_items' => API_OUTPUT_EXTEND,
+				'filter' => array('flags' => null),
 			);
 			$graphs = self::get($options);
 
@@ -999,7 +1001,7 @@ COpt::memoryPick();
 	}
 
 /**
- * Delete graphs
+ * Delete GraphPrototype
  *
  * @param array $graphs
  * @param array $graphs['graphids']
@@ -1038,9 +1040,20 @@ COpt::memoryPick();
 				$parent_graphids = array();
 				while($db_graph = DBfetch($db_graphs)){
 					$parent_graphids[] = $db_graph['graphid'];
-					$itemids[$db_graph['graphid']] = $db_graph['graphid'];
+					$graphids[$db_graph['graphid']] = $db_graph['graphid'];
 				}
 			} while(!empty($parent_graphids));
+
+
+			$created_graphs = array();
+			$sql = 'SELECT itemid FROM graph_discovery WHERE '.DBcondition('parent_graphid', $graphids);
+			$db_graphs = DBselect($sql);
+			while($graph = DBfetch($db_graphs)){
+				$created_graphs[$graph['graphid']] = $graph['graphid'];
+			}
+			$result = CGraph::delete($created_graphs, true);
+			if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete graph prototype');
+
 
 			DB::delete('screens_items', array(
 				DBcondition('resourceid', $graphids),
@@ -1146,13 +1159,25 @@ COpt::memoryPick();
 				'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
 				'nopermissions' => 1
 			);
-			$graphsExists = self::get($options);
+			$graphsExists = CGraph::get($options);
 			foreach($graphsExists as $genum => $graphExists){
 				if(($update && ($graphExists['graphid'] != $graph['graphid'])) || !$update){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph with name [ '.$graph['name'].' ] already exists');
 				}
 			}
 // }}} EXCEPTION: GRAPH EXISTS
+
+// PROTOTYPE {{{
+			$has_prototype = false;
+			foreach($graph['gitems'] as $gitem){
+				if($allowed_items[$gitem['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_CHILD){
+					$has_prototype = true;
+				}
+			}
+			if(!$has_prototype){
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph prototype must have at least one prototype');
+			}
+// }}} PROTOTYPE
 		}
 
 		return true;

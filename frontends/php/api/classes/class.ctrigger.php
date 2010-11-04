@@ -23,10 +23,7 @@
  * File containing CTrigger class for API.
  * @package API
  */
-/**
- * Class containing methods for operations with Triggers
- *
- */
+
 class CTrigger extends CZBXAPI{
 
 /**
@@ -1192,8 +1189,6 @@ COpt::memoryPick();
 /**
  * Update triggers
  *
- * Trigger params: expression, description, type, priority, status, comments, url, templateid
- *
  * @param array $triggers
  * @return boolean
  */
@@ -1267,16 +1262,18 @@ COpt::memoryPick();
 			self::BeginTransaction(__METHOD__);
 
 // TODO: remove $nopermissions hack
+
+			$options = array(
+				'triggerids' => $triggerids,
+				'filter' => array('flags' => null),
+				'output' => API_OUTPUT_EXTEND,
+				'editable' => 1,
+				'extendoutput' => 1,
+				'preservekeys' => 1
+			);
+			$del_triggers = self::get($options);
+			
 			if(!$nopermissions){
-				$options = array(
-					'triggerids' => $triggerids,
-					'filter' => array('flags' => null),
-					'output' => API_OUTPUT_EXTEND,
-					'editable' => 1,
-					'extendoutput' => 1,
-					'preservekeys' => 1
-				);
-				$del_triggers = self::get($options);
 				foreach($triggerids as $gnum => $triggerid){
 					if($del_triggers[$triggerid]['flags'] = ZBX_FLAG_DISCOVERY_CHILD)
 						$trigger_prototypes[$triggerid] = $triggerid;
@@ -1320,7 +1317,7 @@ COpt::memoryPick();
 /**
  * Add dependency for trigger
  *
- * @param _array $triggersData
+ * @param array $triggersData
  * @param array $triggers_data['triggerid]
  * @param array $triggers_data['dependsOnTriggerid']
  * @return boolean
@@ -1354,7 +1351,7 @@ COpt::memoryPick();
 /**
  * Delete trigger dependencis
  *
- * @param _array $triggersData multidimensional array with trigger objects
+ * @param array $triggersData
  * @param array $triggers[0,...]['triggerid']
  * @return boolean
  */

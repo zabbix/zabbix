@@ -1854,6 +1854,12 @@ COpt::memoryPick();
 
 				copy_template_triggers($targetid, $templateid, false);
 
+				$result = CGraphPrototype::syncTemplates(array(
+					'hostids' => $targetid,
+					'templateids' => $templateid
+				));
+				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot sync graph prptotypes');
+
 				$result = CGraph::syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid

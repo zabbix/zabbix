@@ -65,16 +65,6 @@
 			);
 	}
 
-/*
- * Function: graph_item_drawtype2str
- *
- * Description:
- *     Represent integer value of graph item drawing type into the string
- *
- * Author:
- *     Eugene Grigorjev
- *
- */
 	function graph_item_drawtype2str($drawtype,$type=null){
 		if($type == GRAPH_ITEM_AGGREGATED) return '-';
 
@@ -89,16 +79,7 @@
 		}
 	return $drawtype;
 	}
-/*
- * Function: graph_item_calc_fnc2str
- *
- * Description:
- *     Represent integer value of calculation function into the string
- *
- * Author:
- *     Eugene Grigorjev
- *
- */
+
 	function graph_item_calc_fnc2str($calc_fnc, $type=null){
 		if($type == GRAPH_ITEM_AGGREGATED) return '-';
 
@@ -189,13 +170,6 @@
 							' WHERE h.hostid=i.hostid '.
 								' AND gi.itemid=i.itemid '.
 								' AND gi.graphid='.$graphid);
-	}
-
-	function get_graphitems_by_graphid($graphid){
-		return DBselect('SELECT * '.
-					' FROM graphs_items '.
-					' WHERE graphid='.$graphid.
-					' ORDER BY itemid,drawtype,sortorder,color,yaxisside');
 	}
 
 /*
@@ -317,11 +291,6 @@
 		return	false;
 	}
 
-	function get_graphs_by_templateid($templateids){
-		zbx_value2array($templateids);
-	return DBselect('SELECT * FROM graphs WHERE '.DBcondition('templateid',$templateids));
-	}
-
 /*
  * Function: get_same_graphitems_for_host
  *
@@ -366,120 +335,6 @@
 		return $result;
 	}
 
-
-/*
- * Function: delete_graph
- *
- * Description:
- *     Delete graph with templates
- *
- * Author:
- *     Eugene Grigorjev
- *
- * Comments: !!! Don't forget sync code with C !!!
- *
- */
-	function delete_graph($graphids){
-		zbx_value2array($graphids);
-
-		$result = true;
-
-		$graphs = array();
-		$host_list = array();
-		foreach($graphids as $id => $graphid){
-			$graphs[$graphid] = get_graph_by_graphid($graphid);
-
-			$host_list[$graphid] = array();
-			$db_hosts = get_hosts_by_graphid($graphid);
-			while($db_host = DBfetch($db_hosts)){
-				if(!isset($host_list[$graphid][$db_host['host']]))
-					$host_list[$graphid][$db_host['host']] = true;
-			}
-		}
-
-// first remove child graphs
-		$del_chd_graphs = array();
-		$chd_graphs = get_graphs_by_templateid($graphids);
-		while($chd_graph = DBfetch($chd_graphs)){ /* recursion */
-			$del_chd_graphs[$chd_graph['graphid']] = $chd_graph['graphid'];
-		}
-		if(!empty($del_chd_graphs)){
-			$result &= delete_graph($del_chd_graphs);
-		}
-
-
-		$sql = 'SELECT graphid FROM graph_discovery WHERE '.DBcondition('parent_graphid', $graphids);
-		$db_graphs = DBselect($sql);
-		while($graph = DBfetch($db_graphs)){
-			$graphids[] = $graph['graphid'];
-		}
-
-		DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid',$graphids).' AND resourcetype='.SCREEN_RESOURCE_GRAPH);
-
-// delete graph
-		DBexecute('DELETE FROM graphs_items WHERE '.DBcondition('graphid',$graphids));
-		DBexecute("DELETE FROM profiles WHERE idx='web.favorite.graphids' AND source='graphid' AND ".DBcondition('value_id',$graphids));
-
-		$result = DBexecute('DELETE FROM graphs WHERE '.DBcondition('graphid',$graphids));
-		if($result){
-			foreach($graphs as $graphid => $graph){
-				if(isset($host_list[$graphid]))
-					info(S_GRAPH_DELETED_FROM_HOSTS_PART1.SPACE.$graph['name'].SPACE.S_GRAPH_DELETED_FROM_HOSTS_PART2.SPACE.(count($host_list[$graphid]) > 1 ? 's' : '').SPACE.S_GRAPH_DELETED_FROM_HOSTS_PART3.':'.SPACE.'"'.implode('","', array_keys($host_list[$graphid])).'"');
-			}
-		}
-
-	return $result;
-	}
-
-/*
- * Function: cmp_graphitems
- *
- * Description:
- *     Compare two graph items
- *
- * Author:
- *     Eugene Grigorjev
- *
- * Comments: !!! Don't forget sync code with C !!!
- *
- */
-	function cmp_graphitems(&$gitem1, &$gitem2){
-		if($gitem1['drawtype']	!= $gitem2['drawtype'])		return 1;
-		if($gitem1['sortorder']	!= $gitem2['sortorder'])	return 2;
-		if($gitem1['color']	!= $gitem2['color'])		return 3;
-		if($gitem1['yaxisside']	!= $gitem2['yaxisside'])	return 4;
-
-		$item1 = get_item_by_itemid($gitem1['itemid']);
-		$item2 = get_item_by_itemid($gitem2['itemid']);
-
-		if($item1['key_'] != $item2['key_'])			return 5;
-
-		return 0;
-	}
-
-/*
- * Function: add_item_to_graph
- *
- * Description:
- *     Add item to graph
- *
- * Author:
- *     Eugene Grigorjev
- *
- * Comments: !!! Don't forget sync code with C !!!
- *
- */
-	function add_item_to_graph($graphid,$itemid,$color,$drawtype,$sortorder,$yaxisside,$calc_fnc,$type,$periods_cnt){
-		$gitemid = get_dbid('graphs_items','gitemid');
-
-		$result = DBexecute('insert into graphs_items'.
-			' (gitemid,graphid,itemid,color,drawtype,sortorder,yaxisside,calc_fnc,type,periods_cnt)'.
-			' values ('.$gitemid.','.$graphid.','.$itemid.','.zbx_dbstr($color).','.$drawtype.','.
-			$sortorder.','.$yaxisside.','.$calc_fnc.','.$type.','.$periods_cnt.')');
-
-		return ( $result ? $gitemid : $result );
-	}
-
 /*
  * Function: copy_graph_to_host
  *
@@ -502,7 +357,7 @@
 		$new_gitems = get_same_graphitems_for_host($gitems, $hostid);
 		if(empty($new_gitems)){
 			$host = get_host_by_hostid($hostid);
-			info(S_SKIPPED_COPYING_OF_GRAPH.SPACE.'"'.$db_graph["name"].'"'.SPACE.S_TO_HOST_SMALL.SPACE.'"'.$host['host'].'"');
+			info(S_SKIPPED_COPYING_OF_GRAPH.SPACE.'"'.$graph["name"].'"'.SPACE.S_TO_HOST_SMALL.SPACE.'"'.$host['host'].'"');
 			return false;
 		}
 

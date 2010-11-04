@@ -36,6 +36,7 @@ function __autoload($class_name){
 		'cdservice' => 1,
 		'cevent' => 1,
 		'cgraph' => 1,
+		'cgraphprototype' => 1,
 		'cgraphitem' => 1,
 		'chistory' => 1,
 		'chost' => 1,

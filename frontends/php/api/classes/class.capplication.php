@@ -605,15 +605,15 @@ COpt::memoryPick();
 			self::BeginTransaction(__METHOD__);
 
 // TODO: remove $nopermissions hack
-			if(!$nopermissions){
-				$options = array(
-					'applicationids' => $applicationids,
-					'editable' => 1,
-					'output' => API_OUTPUT_EXTEND,
-					'preservekeys' => 1
-				);
-				$del_applications = self::get($options);
+			$options = array(
+				'applicationids' => $applicationids,
+				'editable' => 1,
+				'output' => API_OUTPUT_EXTEND,
+				'preservekeys' => 1
+			);
+			$del_applications = self::get($options);
 
+			if(!$nopermissions){
 				foreach($applicationids as $applicationid){
 					if(!isset($del_applications[$applicationid])){
 						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);

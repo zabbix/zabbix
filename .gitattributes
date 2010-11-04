@@ -53,6 +53,7 @@ frontends/php/api/classes/class.cdservice.php -text
 frontends/php/api/classes/class.cevent.php -text
 frontends/php/api/classes/class.cgraph.php -text
 frontends/php/api/classes/class.cgraphitem.php -text
+frontends/php/api/classes/class.cgraphprototype.php -text
 frontends/php/api/classes/class.chistory.php -text
 frontends/php/api/classes/class.chost.php -text
 frontends/php/api/classes/class.chostgroup.php -text
