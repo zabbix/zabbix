@@ -117,12 +117,24 @@ include_once('include/page_header.php');
 	else $options['druleids'] = zbx_objectValues($drules,'druleid');
 
 	$dservices = CDService::get($options);
+	$gMacros = CUserMacro::get(array(
+		'output' => API_OUTPUT_EXTEND,
+		'globalmacro' => 1
+	));
+	$gMacros = zbx_toHash($gMacros, 'macro');
 
 	$services = array();
 	foreach($dservices as $dsnum => $dservice){
+		$key_ = $dservice['key_'];
+		if(!zbx_empty($key_)){
+			if(isset($gMacros[$key_])) $key_ = $gMacros[$key_]['value'];
+			$key_ = ': '.$key_;
+		}
+
 		$service_name = discovery_check_type2str($dservice['type']).
 				discovery_port2str($dservice['type'], $dservice['port']).
-				(zbx_empty($dservice['key_']) ? '' : ':'.$dservice['key_']);
+				$key_;
+
 		$services[$service_name] = 1;
 	}
 	ksort($services);
@@ -219,9 +231,15 @@ include_once('include/page_header.php');
 					$time = 'lastdown';
 				}
 
+				$key_ = $dservice['key_'];
+				if(!zbx_empty($key_)){
+					if(isset($gMacros[$key_])) $key_ = $gMacros[$key_]['value'];
+					$key_ = ': '.$key_;
+				}
+
 				$service_name = discovery_check_type2str($dservice['type']).
 						discovery_port2str($dservice['type'], $dservice['port']).
-						(empty($dservice['key_']) ? '' : ':'.$dservice['key_']);
+						$key_;
 
 				$discovery_info[$dservice['ip']]['services'][$service_name] = array('class' => $class, 'time' => $dservice[$time]);
 			}
