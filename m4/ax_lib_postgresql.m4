@@ -49,8 +49,8 @@ AC_DEFUN([AX_LIB_POSTGRESQL],
 [
     PG_CONFIG="no"
 
-    AC_ARG_WITH([pgsql],
-        AC_HELP_STRING([--with-pgsql@<:@=ARG@:>@],
+    AC_ARG_WITH([postgresql],
+        AC_HELP_STRING([--with-postgresql@<:@=ARG@:>@],
             [use PostgreSQL library @<:@default=no@:>@, optionally specify path to pg_config]
         ),
         [
