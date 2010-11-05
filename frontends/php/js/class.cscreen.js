@@ -68,32 +68,27 @@ initialize: function(screenid, obj_id, id){
 		var divs = document.getElementsByClassName("draggable", trs[i]);
 		for (var j = 0; j < divs.length; ++j){
 			addListener(divs[j], 'mousedown', this.deactivate_drag.bindAsEventListener(this), false);
-			new Draggable(divs[j], {//revert: 'failure',
-//									handle:'handle'+c,
-				revert: true,
-//				function(){
-//					if(IE){
-//						Event.stopObserving(document.body, "drag", wedge, false);
-//						Event.stopObserving(document.body, "selectstart", wedge, false);
-//					}
-//				},
-				onStart: function(){
+
+			jQuery(divs[j]).draggable({
+				revert: 'invalid',
+				start: function(){
 					if(IE){
 						Event.observe(document.body, "drag", wedge, false);
 						Event.observe(document.body, "selectstart", wedge, false);
 					}
 				},
-				onEnd: this.activate_drag.bind(this)
+				stop: this.activate_drag.bind(this)
 			});
 		}
 	}
 
-	var divs = document.getElementsByClassName("draggable", this.screen_obj);
+	var divs = $$(this.screen_obj).select(".draggable");
 	for (var j = 0; j < divs.length; ++j){
-		Droppables.add(divs[j], {accept:'draggable',
-									hoverclass:'hoverclass123',
-									onDrop: this.on_drop.bind(this)
-								});
+		jQuery(divs[j]).droppable({
+			accept:'draggable',
+			hoverClass:'hoverclass123',
+			drop: this.on_drop.bind(this)
+		})
 	}
 },
 
