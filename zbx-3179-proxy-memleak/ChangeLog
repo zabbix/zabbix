@@ -1,6 +1,7 @@
 Changes for 1.8.4rc3
 
  - [ZBX-3179] fixed memory leaks and 100% CPU usage for proxy with SQLite3 (asaveljevs)
+ - [ZBXNEXT-538] include ibm_db2.sql and images_ibm_db2.sql files in distribution package (Sasha)
  - [ZBX-3107] fixed graph bugs: problem with large values, problem with uptime format (KB)
  - [ZBX-2349] unicode support for macros and web scenario steps (KB)
  - [ZBX-3137] fixed errors related to deleting an application that is used in a web scenario (KB)
