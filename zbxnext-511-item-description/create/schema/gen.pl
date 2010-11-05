@@ -55,7 +55,8 @@ local $uniq;
 	"t_history_text"=>	"text",
 	"t_blob"	=>	"blob",
 	"t_item_param"	=>	"text",
-	"t_cksum_text"	=>	"text"
+	"t_cksum_text"	=>	"text",
+	"t_text"	=>	"text"
 );
 
 %c=(	"type"		=>	"code",
@@ -75,7 +76,8 @@ local $uniq;
 	"t_history_text"=>	"ZBX_TYPE_TEXT",
 	"t_blob"	=>	"ZBX_TYPE_BLOB",
 	"t_item_param"	=>	"ZBX_TYPE_TEXT",
-	"t_cksum_text"	=>	"ZBX_TYPE_TEXT"  
+	"t_cksum_text"	=>	"ZBX_TYPE_TEXT",
+	"t_text"	=>	"ZBX_TYPE_TEXT"
 );
 
 $c{"before"}="/* 
@@ -121,7 +123,8 @@ const ZBX_TABLE	tables[]={
 	"t_history_text"=>	"nclob",
 	"t_blob"	=>	"nvarchar2(2048)",
 	"t_item_param"	=>	"nvarchar2(2048)",
-	"t_cksum_text"	=>	"nclob"  
+	"t_cksum_text"	=>	"nclob",
+	"t_text"	=>	"text"
 );
 
 %postgresql=("t_bigint"	=>	"numeric(20)",
@@ -143,7 +146,8 @@ const ZBX_TABLE	tables[]={
 	"t_nanosec"	=>	"integer",
 	"t_blob"	=>	"text",
 	"t_item_param"	=>	"text",
-	"t_cksum_text"	=>	"text"  
+	"t_cksum_text"	=>	"text",
+	"t_text"	=>	"text"
 );
 
 %sqlite=("t_bigint"	=>	"bigint",
@@ -164,7 +168,8 @@ const ZBX_TABLE	tables[]={
 	"t_history_text"=>	"text",
 	"t_blob"	=>	"blob",
 	"t_item_param"	=>	"text",
-	"t_cksum_text"	=>	"text"  
+	"t_cksum_text"	=>	"text",
+	"t_text"	=>	"text"
 );
 
 sub newstate
