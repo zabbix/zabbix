@@ -124,7 +124,7 @@ const ZBX_TABLE	tables[]={
 	"t_blob"	=>	"nvarchar2(2048)",
 	"t_item_param"	=>	"nvarchar2(2048)",
 	"t_cksum_text"	=>	"nclob",
-	"t_text"	=>	"text"
+	"t_text"	=>	"nclob"
 );
 
 %postgresql=("t_bigint"	=>	"numeric(20)",
