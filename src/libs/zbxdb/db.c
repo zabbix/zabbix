@@ -372,6 +372,7 @@ void	zbx_db_close()
 #endif
 }
 
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL) || defined(HAVE_SQLITE3)
 #ifdef HAVE___VA_ARGS__
 #	define zbx_db_execute(fmt, ...)	__zbx_zbx_db_execute(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
 #else
@@ -388,6 +389,7 @@ static int	__zbx_zbx_db_execute(const char *fmt, ...)
 
 	return ret;
 }
+#endif /* HAVE_MYSQL || HAVE_POSTGRESQL || HAVE_SQLITE3 */
 
 #ifdef HAVE___VA_ARGS__
 #	define zbx_db_select(fmt, ...)	__zbx_zbx_db_select(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
