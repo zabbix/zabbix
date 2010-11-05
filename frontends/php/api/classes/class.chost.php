@@ -1944,10 +1944,8 @@ Copt::memoryPick();
 
 			CItem::delete($delItems, true);
 
-			$hostidCondition = DBcondition('hostid',$hostids);
-
 // delete host interfaces
-			DB::delete('interface', array($hostidCondition));
+			DB::delete('interface', array('hostid'=>$hostids));
 
 // delete web tests
 			$del_httptests = array();
@@ -1962,21 +1960,21 @@ Copt::memoryPick();
 
 // delete screen items
 			DB::delete('screens_items', array(
-					DBcondition('resourceid',$hostids),
-					'resourcetype='.SCREEN_RESOURCE_HOST_TRIGGERS
+					'resourceid'=>$hostids,
+					'resourcetype'=>SCREEN_RESOURCE_HOST_TRIGGERS
 				));
 
 // delete host from maps
 			delete_sysmaps_elements_with_hostid($hostids);
 
 // delete host from maintenances
-			DB::delete('maintenances_hosts', array($hostidCondition));
+			DB::delete('maintenances_hosts', array('hostid'=>$hostids));
 
 // delete host from group
-			DB::delete('hosts_groups', array($hostidCondition));
+			DB::delete('hosts_groups', array('hostid'=>$hostids));
 
 // delete host from template linkages
-			DB::delete('hosts_templates', array($hostidCondition));
+			DB::delete('hosts_templates', array('hostid'=>$hostids));
 
 // disable actions
 			$actionids = array();
@@ -2013,25 +2011,25 @@ Copt::memoryPick();
 
 // delete action conditions
 			DB::delete('conditions', array(
-				'conditiontype='.CONDITION_TYPE_HOST,
-				DBcondition('value',$hostids, false, true)
+				'conditiontype'=>CONDITION_TYPE_HOST,
+				'value'=>$hostids
 			));
 
 // delete action operations
 			DB::delete('operations', array(
-				DBcondition('operationtype', array(OPERATION_TYPE_TEMPLATE_ADD, OPERATION_TYPE_TEMPLATE_REMOVE)),
-				DBcondition('objectid',$hostids)
+				'operationtype'=>array(OPERATION_TYPE_TEMPLATE_ADD, OPERATION_TYPE_TEMPLATE_REMOVE),
+				'objectid'=>$hostids
 			));
 
 // delete host profile
-			DB::delete('hosts_profiles', array($hostidCondition));
-			DB::delete('hosts_profiles_ext', array($hostidCondition));
+			DB::delete('hosts_profiles', array('hostid'=>$hostids));
+			DB::delete('hosts_profiles_ext', array('hostid'=>$hostids));
 
 // delete host applications
-			DB::delete('applications', array($hostidCondition));
+			DB::delete('applications', array('hostid'=>$hostids));
 
 // delete host
-			DB::delete('hosts', array($hostidCondition));
+			DB::delete('hosts', array('hostid'=>$hostids));
 
 // TODO: remove info from API
 			foreach($hosts as $hnum => $host) {

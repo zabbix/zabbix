@@ -1162,7 +1162,7 @@ COpt::memoryPick();
 		}
 
 		if(!empty($itemids)){
-			DB::delete('items_applications', array( DBcondition('itemid', $itemids)));
+			DB::delete('items_applications', array( 'itemid'=>$itemids));
 			DB::insert('items_applications', $itemApplications);
 		}
 
@@ -1272,19 +1272,19 @@ COpt::memoryPick();
 				'preservekeys' => true,
 			));
 			if(!empty($triggers))
-				DB::delete('triggers', zbx_objectValues($triggers, 'triggerid'));
+				DB::delete('triggers', array('triggerid'=>zbx_objectValues($triggers, 'triggerid')));
 
 
-			$itemids_condition = DBcondition('itemid', $itemids);
+			$itemids_condition = array('itemid'=>$itemids);
 			DB::delete('screens_items', array(
-				DBcondition('resourceid', $itemids),
-				DBcondition('resourcetype', array(SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT)),
+				'resourceid'=>$itemids,
+				'resourcetype'=>array(SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT),
 			));
-			DB::delete('items', array($itemids_condition));
+			DB::delete('items', $itemids_condition);
 			DB::delete('profiles', array(
-				'idx='.zbx_dbstr('web.favorite.graphids'),
-				'source='.zbx_dbstr('itemid'),
-				DBcondition('value_id', $itemids)
+				'idx'=>'web.favorite.graphids',
+				'source'=>'itemid',
+				'value_id'=>$itemids
 			));
 
 

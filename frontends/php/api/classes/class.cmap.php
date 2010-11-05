@@ -715,7 +715,7 @@ COpt::memoryPick();
 			DB::update('sysmaps', $update);
 
 			if(!empty($urlidsToDelete))
-				DB::delete('sysmap_url', DBcondition('sysmapurlid', $urlidsToDelete));
+				DB::delete('sysmap_url', array('sysmapurlid'=>$urlidsToDelete));
 
 			DB::update('sysmap_url', $urlsToUpdate);
 			DB::insert('sysmap_url', $urlsToAdd);
@@ -760,11 +760,11 @@ COpt::memoryPick();
 
 // delete maps from selements of other maps
 			DB::delete('sysmaps_elements', array(
-				DBcondition('elementid', $sysmapids),
-				'elementtype='.SYSMAP_ELEMENT_TYPE_MAP
+				'elementid'=>$sysmapids,
+				'elementtype'=>SYSMAP_ELEMENT_TYPE_MAP
 			));
 //----
-			DB::delete('sysmaps', array(DBcondition('sysmapid', $sysmapids)));
+			DB::delete('sysmaps', array('sysmapid'=>$sysmapids));
 
 			self::EndTransaction(true, __METHOD__);
 			return array('sysmapids' => $sysmapids);
@@ -1007,7 +1007,7 @@ COpt::memoryPick();
 			DB::update('sysmaps_elements', $update);
 
 			if(!empty($urlidsToDelete))
-				DB::delete('sysmap_element_url', DBcondition('sysmapelementurlid', $urlidsToDelete));
+				DB::delete('sysmap_element_url', array('sysmapelementurlid'=>$urlidsToDelete));
 			DB::update('sysmap_element_url', $urlsToUpdate);
 			DB::insert('sysmap_element_url', $urlsToAdd);
 

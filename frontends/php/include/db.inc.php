@@ -1214,7 +1214,63 @@ else {
 			return true;
 		}
 
-		public static function delete($table, $where){
+
+/**
+ * Delete data from DB
+ *
+ * Example:
+ * DB::delete('applications', array('applicationid'=>array(1, 8, 6)));
+ * DELETE FROM applications WHERE applicationid IN (1, 8, 6)
+ *
+ * DB::delete('applications', array('applicationid'=>array(1), 'templateid'=array(10)));
+ * DELETE FROM applications WHERE applicationid IN (1) AND templateid IN (10)
+ *
+ * @param string $table
+ * @param array $where pair of fieldname => fieldvalues
+ * @return bool
+ */
+		public static function delete($table, $wheres, $use_or=false){
+			if(empty($wheres) || !is_array($wheres)) {
+				return true;
+			}
+
+			$table_schema = self::getSchema($table);
+
+			sdii($wheres);
+			sdii($table_schema);
+
+			$sql_wheres = array();
+
+			//for every field
+			foreach($wheres as $field=>$values) {
+				//if this field does not exist, just skip it
+				if (!isset($table_schema['fields'][$field])) {
+					continue;
+				}
+				$values = zbx_toArray($values);
+				$is_string = $table_schema['fields'][$field]['type'] == self::FIELD_TYPE_CHAR;
+				$sql_wheres[] = DBcondition($field, $values, false, $is_string);//false = not NOT IN
+			}
+			sdii($sql_wheres);
+			//we will not delete everything from a table just like this
+			if (count($sql_wheres) == 0) {
+				return false;
+			}
+
+			$logical_operator = $use_or ? 'OR' : 'AND';
+			//this string will be used in sql statement
+			$sql_where_imploded = implode(' '.$logical_operator.' ', $sql_wheres);
+
+			$sql = 'DELETE FROM '.$table.' WHERE '.$sql_where_imploded;
+			sdii($sql);
+			if(!DBexecute($sql)) {
+				self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
+			}
+			return true;
+		}
+		
+
+		public static function old_delete($table, $where){
 			$where = zbx_toArray($where);
 
 			$sql = 'DELETE FROM '.$table.' WHERE '.implode(' AND ', $where);

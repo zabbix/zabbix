@@ -754,8 +754,8 @@ COpt::memoryPick();
 				SCREEN_RESOURCE_DATA_OVERVIEW
 			);
 			DB::delete('screens_items', array(
-				DBcondition('resourceid', $groupids),
-				DBcondition('resourcetype', $resources)
+				'resourceid'=>$groupids,
+				'resourcetype'=>$resources
 			));
 
 // delete sysmap element
@@ -795,18 +795,18 @@ COpt::memoryPick();
 
 // delete action conditions
 			DB::delete('conditions', array(
-				'conditiontype='.CONDITION_TYPE_HOST_GROUP,
-				DBcondition('value', $groupids, false, true)
+				'conditiontype'=>CONDITION_TYPE_HOST_GROUP,
+				'value'=>$groupids
 			));
 
 // delete action operations
 			DB::delete('operations', array(
-				'operationtype IN ('.OPERATION_TYPE_GROUP_ADD.','.OPERATION_TYPE_GROUP_REMOVE.')',
-				DBcondition('objectid', $groupids)
+				'operationtype'=>array(OPERATION_TYPE_GROUP_ADD, OPERATION_TYPE_GROUP_REMOVE),
+				'objectid'=>$groupids
 			));
 
 			DB::delete('groups', array(
-				DBcondition('groupid', $groupids)
+				'groupid'=>$groupids
 			));
 
 
@@ -935,8 +935,8 @@ COpt::memoryPick();
 				}
 
 				DB::delete('hosts_groups', array(
-					DBcondition('hostid', $objectids_to_unlink),
-					DBcondition('groupid', $groupids)
+					'hostid'=>$objectids_to_unlink,
+					'groupid'=>$groupids
 				));
 			}
 
