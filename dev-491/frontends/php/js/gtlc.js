@@ -612,6 +612,9 @@ position:{
 
 px2sec:			null,		// seconds in pixel
 
+//debug_status:	2,				// debug status: 0 - off, 1 - on, 2 - SDI;
+//debug_info:		'',				// debug string
+
 // status
 scrollmsover: 0,			// if mouse over scrollbar then = 1, out = 0
 barmsdown: 0,				// if mousedown on bar = 1, else = 0
@@ -647,10 +650,10 @@ try{
 
 // AFTER px2sec is set.	important!
 		this.position.bar = getDimensions(this.bar);
-		
+
 		this.setBarPosition();
 		this.setGhostByBar();
-		
+
 		this.setTabInfo();
 //-------------------------------
 
@@ -672,6 +675,7 @@ try{
 onBarChange: function(){	
 	this.changed = 1;
 //	SDI(this.timeline+' : '+this.scrollbarMaxW+' : '+this.barW+' : '+this.barX);
+
 	this.onchange(this.scrollbarid, this.timeline.timelineid, true);
 },
 
@@ -893,22 +897,26 @@ setBarPosition: function(rightSide, periodWidth, setTimeLine){
 	
 	this.position.bar.left = right - width;
 	this.position.bar.width = width;
-	this.position.bar.right = right;	
+	this.position.bar.right = right;
 },
 
-setGhostByBar: function(){
+setGhostByBar: function(ui){
 	this.debug('setGhostByBar');
-	
-	var dims = getDimensions(this.dom.bar);
+//--
+	if(arguments.length > 0)
+		var dims = {'left': ui.position.left, 'width': jQuery(ui.helper.context).width()};
+	else
+		var dims = getDimensions(this.dom.bar);
 	
 // ghost
 	this.dom.ghost.style.left = dims.left + 'px';
 	this.dom.ghost.style.width = dims.width + 'px';
-	
+
+
 // arrows
 	this.dom.left_arr.style.left = (dims.left-4) + 'px';
 	this.dom.right_arr.style.left = (dims.left+dims.width-3) + 'px';
-	
+
 	this.position.ghost = getDimensions(this.dom.ghost);
 },
 
@@ -919,8 +927,8 @@ setBarByGhost: function(){
 // bar
 // set time
 	this.setBarPosition(dimensions.right, dimensions.width, false);
-//	this.setGhostByBar();
 
+//	this.setGhostByBar();
 //	this.setTabInfo();
 	
 	this.onBarChange();
@@ -1018,58 +1026,35 @@ setCalendarRight: function(time){
 //----------------------------------------------------------------
 
 // <BAR>
-getBarDimensions: function(x,y,draggable){
-	this.debug('getBarDimensions');
-	if(this.disabled){
-		var dims = getDimensions(draggable.element);
-		return[dims.left,y];
-	}
-//---
-
-	function constrain(n, lower, upper) {
-		if (n > upper) return upper;
-		else if (n < lower) return lower;
-		else return n;
-	}
-	
-	var element_dimensions = draggable.element.getDimensions();
-	var parent_dimensions = this.dom.overlevel.getDimensions();
-
-	return[
-		constrain(x, 0, parent_dimensions.width - element_dimensions.width),
-		constrain(y, 0, parent_dimensions.hight - element_dimensions.hight),
-	];
-},
-
-barDragStart: function(dragable,e){
+barDragStart: function(e, ui){
 	this.debug('barDragStart');
 	if(this.disabled) return false;
 //---
 },
 
-barDragChange: function(dragable,e){
+barDragChange: function(e,ui){
 	this.debug('barDragChange');
 	if(this.disabled){
-		dragable.endDrag(e);
+		ui.helper[0].stop(e);
 		return false;
 	}
 //---
 
-	var element = dragable.element;
+	var element = ui.helper.context;
 	this.position.bar = getDimensions(element);
 
-	this.setGhostByBar();
+	this.setGhostByBar(ui);
 
 	this.updateTimeLine(this.position.bar);
 	this.setTabInfo();
 },
 
-barDragEnd: function(dragable,e){
+barDragEnd: function(e, ui){
 	this.debug('barDragEnd');
 	if(this.disabled) return false;
 //---
 
-	var element = dragable.element;
+	var element = ui.helper.context;
 	this.position.bar = getDimensions(element);
 	
 	this.ghostBox.endResize();
@@ -1081,64 +1066,51 @@ makeBarDragable: function(element){
 	this.debug('makeBarDragable');
 //---
 
-	new Draggable(element,{
-				ghosting: false,
-				snap: this.getBarDimensions.bind(this),
-				constraint: 'horizontal',
-				onStart: this.barDragStart.bind(this),
-				change: this.barDragChange.bind(this),
-				onEnd: this.barDragEnd.bind(this)
-				});
+	var pD = {
+		'left': jQuery(this.dom.overlevel).offset().left,
+		'width': jQuery(this.dom.overlevel).width(),
+		'offset': jQuery(element).width()
+	}
+
+
+//TODO:  write proper function
+	jQuery(element).draggable({
+		containment: 'parent',//[pD.left, 0, pD.width+pD.left-pD.offset, 0],
+		axis: 'x',
+		start: this.barDragStart.bind(this),
+		drag: this.barDragChange.bind(this),
+		stop: this.barDragEnd.bind(this)
+	});
 
 },
 // </BAR>
 
 
 // <LEFT ARR>
-get_dragable_left_arr_dimensions: function(x,y,draggable){
-	this.debug('get_dragable_left_arr_dimensions');
-	if(this.disabled){
-		var dims = getDimensions(draggable.element);
-		return[dims.left,y];
-	}
-//-----
-
-	function constrain(n, lower, upper) {
-		if (n > upper) return upper;
-		else if (n < lower) return lower;
-		else return n;
-	}
-	
-	var element_dimensions = draggable.element.getDimensions();
-	var parent_dimensions = this.dom.overlevel.getDimensions();
-	
-	return[
-		constrain(x, -4, parent_dimensions.width - element_dimensions.width + 3),
-		constrain(y, 0, parent_dimensions.hight - element_dimensions.hight),
-	];
-},
-
 make_left_arr_dragable: function(element){
 	this.debug('make_left_arr_dragable');
 //---
+	var pD = {
+		'left': jQuery(this.dom.overlevel).offset().left,
+		'width': jQuery(this.dom.overlevel).width()
+	}
 
-	new Draggable(element,{
-				ghosting: false,
-				snap: this.get_dragable_left_arr_dimensions.bind(this),
-				constraint: 'horizontal',
-				onStart: this.leftArrowDragStart.bind(this),
-				change: this.leftArrowDragChange.bind(this),
-				onEnd: this.leftArrowDragEnd.bind(this)
-				});
+//TODO:  write proper function
+	jQuery(element).draggable({
+		containment: [pD.left-4, 0, pD.width+pD.left-4, 0],
+		axis: 'x',
+		start: this.leftArrowDragStart.bind(this),
+		drag: this.leftArrowDragChange.bind(this),
+		stop: this.leftArrowDragEnd.bind(this)
+	});
 
 },
 
-leftArrowDragStart: function(dragable, e){
+leftArrowDragStart: function(e, ui){
 	this.debug('leftArrowDragStart');
 	if(this.disabled) return false;
 //---
-
-	var element = dragable.element;
+	var element = ui.helper.context;
 	this.position.leftArr = getDimensions(element);
 
 	this.ghostBox.userstartime = this.timeline.usertime();
@@ -1147,32 +1119,29 @@ leftArrowDragStart: function(dragable, e){
 	
 },
 
-leftArrowDragChange: function(dragable, e){
+leftArrowDragChange: function(e, ui){
 	this.debug('leftArrowDragChange');
 	if(this.disabled){
-		dragable.endDrag(e);
+		ui.helper.context.stop(e);
 		return false;
 	}
 //---
 
-	var element = dragable.element;
-	var leftArrPos = getDimensions(element);
-
-	this.ghostBox.resizeBox(leftArrPos.right - this.position.leftArr.right);
+	this.ghostBox.resizeBox(ui.position.left - ui.originalPosition.left);
 	this.position.ghost = getDimensions(this.dom.ghost);
 
 	this.updateTimeLine(this.position.ghost);
 	this.setTabInfo();	
 },
 
-leftArrowDragEnd: function(dragable, e){
+leftArrowDragEnd: function(e, ui){
 	this.debug('leftArrowDragEnd');
 	if(this.disabled) return false;
 //---
 
-	var element = dragable.element;
+	var element = ui.helper.context;
 	this.position.leftArr = getDimensions(element);
-	
+
 	this.ghostBox.endResize();
 
 	this.setBarByGhost();
@@ -1180,80 +1149,57 @@ leftArrowDragEnd: function(dragable, e){
 // </LEFT ARR>
 
 // <RIGHT ARR>
-get_dragable_right_arr_dimensions: function(x,y,draggable){
-	this.debug('get_dragable_right_arr_dimensions');
-	if(this.disabled){
-		var dims = getDimensions(draggable.element);
-		return[dims.left,y];
-	}
-//-----
-
-	function constrain(n, lower, upper) {
-		if (n > upper) return upper;
-		else if (n < lower) return lower;
-		else return n;
-	}
-	
-	var element_dimensions = draggable.element.getDimensions();
-	var parent_dimensions = this.dom.overlevel.getDimensions();
-	
-	return[
-		constrain(x, -3, parent_dimensions.width - element_dimensions.width+4),
-		constrain(y, 0, parent_dimensions.hight - element_dimensions.hight),
-	];
-},
-
 make_right_arr_dragable: function(element){
 	this.debug('make_right_arr_dragable');
 //---
+	var pD = {
+		'left': jQuery(this.dom.overlevel).offset().left,
+		'width': jQuery(this.dom.overlevel).width()
+	}
 
-	new Draggable(element,{
-				ghosting: false,
-				snap: this.get_dragable_right_arr_dimensions.bind(this),
-				constraint: 'horizontal',
-				onStart: this.rightArrowDragStart.bind(this),
-				change: this.rightArrowDragChange.bind(this),
-				onEnd: this.rightArrowDragEnd.bind(this)
-				});
-
+//TODO:  write proper function
+	jQuery(element).draggable({
+		containment: [pD.left-4, 0, pD.width+pD.left-4, 0],
+		axis: 'x',
+		start: this.rightArrowDragStart.bind(this),
+		drag: this.rightArrowDragChange.bind(this),
+		stop: this.rightArrowDragEnd.bind(this)
+	});
 },
 
-rightArrowDragStart: function(dragable, e){
+rightArrowDragStart: function(e, ui){
 	this.debug('rightArrowDragStart');
 	if(this.disabled) return false;
 //---
 
-	var element = dragable.element;
+	var element = ui.helper.context;
 	this.position.rightArr = getDimensions(element);
 
 	this.ghostBox.userstartime = this.timeline.usertime() - this.timeline.period();
 	this.ghostBox.startResize(1);
 },
 
-rightArrowDragChange: function(dragable, e){
+rightArrowDragChange: function(e, ui){
 	this.debug('rightArrowDragChange');
 	if(this.disabled){
-		dragable.endDrag(e);
+		ui.helper.context.stop(e);
 		return false;
 	}
 //---
 
-	var element = dragable.element;
-	var rightArrPos = getDimensions(element);
-	
-	this.ghostBox.resizeBox(rightArrPos.right - this.position.rightArr.right);
+	this.ghostBox.resizeBox(ui.position.left - ui.originalPosition.left);
 	this.position.ghost = getDimensions(this.dom.ghost);
 
 	this.updateTimeLine(this.position.ghost);
 	this.setTabInfo();
 },
 
-rightArrowDragEnd: function(dragable, e){
+rightArrowDragEnd: function(e, ui){
 	this.debug('rightArrowDragEnd');
 	if(this.disabled) return false;
 //---
 
-	var element = dragable.element;
+	var element = ui.helper.context;
 	this.position.rightArr = getDimensions(element);
 	
 	this.ghostBox.endResize();

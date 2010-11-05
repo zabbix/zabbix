@@ -16,16 +16,13 @@ $availableJScripts = array(
 	'common.js' => '',
 	'menu.js' => '',
 	'prototype.js' => '',
-	'builder.js' => 'scriptaculous/',
-	'controls.js' => 'scriptaculous/',
-	'dragdrop.js' => 'scriptaculous/',
-	'effects.js' => 'scriptaculous/',
-	'slider.js' => 'scriptaculous/',
-	'sound.js' => 'scriptaculous/',
+	'jquery.min.js' => 'jquery/',
+	'jquery-ui.min.js' => 'jquery/',
 	'gtlc.js' => '',
 	'functions.js' => '',
 	'main.js' => '',
 	'dom.js' => '',
+
 // classes
 	'class.bbcode.js' => '',
 	'class.calendar.js' => '',
@@ -82,10 +79,9 @@ $tranStrings = array(
 if(empty($_GET['files'])){
 	$files = array(
 		'prototype.js',
-		'effects.js',
-		'dragdrop.js',
+		'jquery.min.js',
+		'jquery-ui.min.js',
 		'common.js',
-		'dom.js',
 		'class.cdebug.js',
 		'class.cdate.js',
 		'class.cookie.js',
