@@ -61,6 +61,18 @@
 				'M' => $metrics		/* metrcis */
 			     )
 	);
+	
+	$param1_sec_count_no_seconds = array(
+		array(
+			'C' => S_LAST_OF.' (T)',	/* caption */
+			'T' => T_ZBX_INT,	/* type */
+			'M' => PARAM_TYPE_COUNTS,		/* metrcis */
+			 ),
+		array(
+			'C' => S_TIME_SHIFT.' ',	/* caption */
+			'T' => T_ZBX_INT,	/* type */
+		));
+			
 	$param1_sec = array(
 			array(
 				'C' => S_LAST_OF.' (T)',	/* caption */
@@ -179,6 +191,12 @@
 			'description'	=> 'Find string T last value. N {OP} X, where X is 1 - if found, 0 - otherwise',
 			'operators'     => $limited_operators,
 			'params'	=> $param1_str,
+			'allowed_types' => $allowed_types_str
+			),
+		'strlen'		=> array(
+			'description'	=> 'Find if string T length {OP} N',
+			'operators'     => $operators,
+			'params'	=> $param1_sec_count_no_seconds,
 			'allowed_types' => $allowed_types_str
 			),
 		'sum'		=> array(
@@ -336,9 +354,19 @@
 	$expr_type = $function.'['.$operator.']';
 
 
-	$param		= get_request('param',	0);
-	$paramtype	= get_request('paramtype',	PARAM_TYPE_SECONDS);
-	$value		= get_request('value',		0);
+	$param		= get_request('param', 0);
+	$paramtype	= get_request('paramtype');
+
+	if(is_null($paramtype) && isset($functions[$function]['params']['M'])){
+		$paramtype = is_array($functions[$function]['params']['M'])  
+				? reset($functions[$function]['params']['M'])
+				: $functions[$function]['params']['M'];
+	}
+	else if(is_null($paramtype)){
+		$paramtype = PARAM_TYPE_SECONDS;
+	}
+		
+	$value		= get_request('value', 0);
 
 	if(!is_array($param)){
 		if(isset($functions[$function]['params'])){
@@ -392,7 +420,8 @@ function InsertText(obj, value){
 			$paramtype == PARAM_TYPE_COUNTS ? '#' : '',
 			rtrim(implode(',', $param),','),
 			$operator,
-			$value);
+			$value
+		);
 ?>
 
 <script language="JavaScript" type="text/javascript">
@@ -447,7 +476,7 @@ if(form){
 	foreach($functions as  $id => $f){
 		foreach($f['operators'] as $op => $txt_op){
 			//if user has selected an item, we are filtering out the triggers that can't work with it
-			if (!isset($itemValueType) || isset($f['allowed_types'][$itemValueType])) {
+			if(!isset($itemValueType) || isset($f['allowed_types'][$itemValueType])){
 				$cmbFnc->addItem($id.'['.$op.']', str_replace('{OP}', $txt_op, $f['description']));
 			}
 		}
@@ -459,14 +488,24 @@ if(form){
 			$pv = (isset($param[$pid])) ? $param[$pid] : null;
 
 			if($pf['T'] == T_ZBX_INT){
-				if( 0 == $pid ||  1 == $pid ){
-					if( isset($pf['M']) && is_array($pf['M'])){
-						$cmbParamType = new CComboBox('paramtype', $paramtype);
-						foreach( $pf['M'] as $mid => $caption ){
-							$cmbParamType->addItem($mid, $caption);
+				if(0 == $pid){
+					if(isset($pf['M'])){
+						if(is_array($pf['M'])){
+							$cmbParamType = new CComboBox('paramtype', $paramtype);
+							foreach( $pf['M'] as $mid => $caption ){
+								$cmbParamType->addItem($mid, $caption);
+							}
+						}
+						else if($pf['M'] == PARAM_TYPE_SECONDS){
+							$form->addVar('paramtype', PARAM_TYPE_SECONDS);
+							$cmbParamType = S_SECONDS;
+						}
+						else if($pf['M'] == PARAM_TYPE_COUNTS){
+							$form->addVar('paramtype', PARAM_TYPE_COUNTS);
+							$cmbParamType = S_COUNT;
 						}
 					}
-					else {
+					else{
 						$form->addVar('paramtype', PARAM_TYPE_SECONDS);
 						$cmbParamType = S_SECONDS;
 					}
