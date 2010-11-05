@@ -265,18 +265,18 @@
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"dstfrm"=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	null),
-		"dstfld1"=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	null),
+		'dstfrm'=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	null),
+		'dstfld1'=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	null),
 
-		"expression"=>	array(T_ZBX_STR, O_OPT, null,	null,		null),
+		'expression'=>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 
-		"itemid"=>	array(T_ZBX_INT, O_OPT,	null,	null,						'isset({insert})'),
-		"expr_type"=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,					'isset({insert})'),
-		"param"=>	array(T_ZBX_STR, O_OPT,	null,	0,						'isset({insert})'),
-		"paramtype"=>	array(T_ZBX_INT, O_OPT, null,	IN(PARAM_TYPE_SECONDS.','.PARAM_TYPE_COUNTS),	'isset({insert})'),
-		"value"=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,					'isset({insert})'),
+		'itemid'=>	array(T_ZBX_INT, O_OPT,	null,	null,						'isset({insert})'),
+		'expr_type'=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,					'isset({insert})'),
+		'param'=>	array(T_ZBX_STR, O_OPT,	null,	0,						'isset({insert})'),
+		'paramtype'=>	array(T_ZBX_INT, O_OPT, null,	IN(PARAM_TYPE_SECONDS.','.PARAM_TYPE_COUNTS),	'isset({insert})'),
+		'value'=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,					'isset({insert})'),
 
-		"insert"=>	array(T_ZBX_STR,	O_OPT,	P_SYS|P_ACT,	null,	null)
+		'insert'=>	array(T_ZBX_STR,	O_OPT,	P_SYS|P_ACT,	null,	null)
 	);
 
 	check_fields($fields);
@@ -314,8 +314,8 @@
 	}
 	unset($expr_res);
 
-	$dstfrm		= get_request("dstfrm",		0);	// destination form
-	$dstfld1	= get_request("dstfld1",	'');	// destination field
+	$dstfrm		= get_request('dstfrm',		0);	// destination form
+	$dstfld1	= get_request('dstfld1',	'');	// destination field
 	$itemid		= get_request('itemid', 0);
 
 	if($itemid){
@@ -337,7 +337,7 @@
 		$description = '';
 	}
 
-	$expr_type	= get_request("expr_type", 'last[=]');
+	$expr_type	= get_request('expr_type', 'last[=]');
 	if(preg_match('/^([a-z]{1,})\[(['.implode('',array_keys($operators)).'])\]$/i',$expr_type,$expr_res)){
 		$function = $expr_res[1];
 		$operator = $expr_res[2];
@@ -510,6 +510,9 @@ if(form){
 						$cmbParamType = S_SECONDS;
 					}
 				}
+				else if(1 == $pid){
+					$cmbParamType = S_SECONDS;
+				}
 				else{
 					$cmbParamType = null;
 				}
@@ -518,7 +521,7 @@ if(form){
 				$form->addRow($pf['C'].' ', array(
 					new CNumericBox('param['.$pid.']', $pv, 10),
 					$cmbParamType
-					));
+				));
 			}
 			else{
 				$form->addRow($pf['C'], new CTextBox('param['.$pid.']', $pv, 30));
