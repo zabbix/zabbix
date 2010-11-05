@@ -31,5 +31,5 @@ dbschema:
 	create/schema/gen.pl mysql > create/schema/mysql.sql
 	create/schema/gen.pl oracle > create/schema/oracle.sql
 	create/schema/gen.pl postgresql > create/schema/postgresql.sql
-	create/schema/gen.pl sqlite > create/schema/sqlite.sql
+	create/schema/gen.pl sqlite3 > create/schema/sqlite3.sql
 	create/schema/gen.pl c > src/libs/zbxdbhigh/dbschema.c

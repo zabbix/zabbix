@@ -1,5 +1,6 @@
 Changes for 1.9.1
 
+ - [DEV-471] fixed sql scripts names consistency (Sasha)
  - [ZBXNEXT-538] include ibm_db2 upgrade patches in distribution package (Sasha)
  - [ZBXNEXT-512] redesign of unknown events (Aly,asaveljevs,Sasha)
  - [ZBX-3130] fixed bug when creating custom graph: host items now can be added (KB)
