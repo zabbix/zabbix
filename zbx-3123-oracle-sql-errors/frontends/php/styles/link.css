@@ -1,0 +1,68 @@
+/* CSS Document */
+a {font-family:Verdana, Arial, Helvetica, sans-serif; font-size:8pt; text-decoration: underline;}
+a:link 		{	color:#3C3089;  }
+a:visited 	{	color:#3C3089;  }
+a:hover 	{	color:#6C80B9;  }
+a:active 	{	color:#3C3089;  }
+
+a.highlight 		{	font-size:10px; font-weight: bold; }
+a.highlight:link 	{ 	color: #ffffff; text-decoration: none; }
+a.highlight:visited {	color: #ffffff; text-decoration: none; }
+a.highlight:hover	{	color: #ffcc00; }
+
+a.enabled:link		{	color:#00AA00;	}
+a.enabled:visited 	{	color:#00AA00;	}
+a.enabled:hover 	{	color:#44CC44;	}
+a.enabled:active 	{	color:#00AA00;	}
+
+a.disabled:link		{	color:#AA0000;	}
+a.disabled:visited 	{	color:#AA0000;	}
+a.disabled:hover 	{	color:#CC4444;	}
+a.disabled:active 	{	color:#AA0000;	}
+
+a.orange:link		{	color:#EE7000;	}
+a.orange:visited 	{	color:#EE7000;	}
+a.orange:hover 		{	color:#FF9444;	}
+a.orange:active 	{	color:#EE7000;	}
+
+a.unknown:link		{	color:#777777;	}
+a.unknown:visited 	{	color:#777777;	}
+a.unknown:hover 	{	color:#999999;	}
+a.unknown:active 	{	color:#777777;	}
+
+a.off:link		{	color:#00AA00;	}
+a.off:visited 	{	color:#00AA00;	}
+a.off:hover 	{	color:#44CC44;	}
+a.off:active 	{	color:#00AA00;	}
+
+a.on:link		{	color:#AA0000;	}
+a.on:visited 	{	color:#AA0000;	}
+a.on:hover 		{	color:#CC7777;	}
+a.on:active 	{	color:#AA0000;	}
+
+a.small_font:link	{	color: #000000;	text-decoration: none; }
+a.small_font:visited{	color: #000000;	text-decoration: none; }
+a.small_font:hover	{	color: #000000;	text-decoration: underline; }
+a.small_font:active	{	color: #000000;	text-decoration: underline; }
+
+a.footer	{	color:#CCCCCC; }
+
+a.header_sort:link		{	color:#222; text-decoration: none;  }
+a.header_sort:visited 	{	color:#222; text-decoration: none;  }
+a.header_sort:hover 	{	color:#222; text-decoration: underline; }
+a.header_sort:active 	{	color:#222; text-decoration: underline; }
+
+a.history:link		{	color:#448; font-size:10px; text-decoration: none;  }
+a.history:visited 	{	color:#448; font-size:10px; text-decoration: none;  }
+a.history:hover 	{	color:#448; font-size:10px; text-decoration: underline; }
+a.history:active 	{	color:#448; font-size:10px; text-decoration: underline; }
+
+a.image:link		{	text-decoration: none; }
+a.image:visited 	{	text-decoration: none; }
+a.image:hover 		{	text-decoration: none; }
+a.image:active 		{	text-decoration: none; }
+
+a.underline:link	{ text-decoration: underline; }
+a.underline:visited { text-decoration: underline; }
+a.underline:hover	{ text-decoration: underline; }
+a.underline:active  { text-decoration: underline; }
