@@ -22,7 +22,7 @@ create/schema/ibm_db2.sql
 create/schema/mysql.sql
 create/schema/oracle.sql
 create/schema/postgresql.sql
-create/schema/sqlite.sql
+create/schema/sqlite3.sql
 /cscope.*
 /depcomp
 frontends/php/conf/zabbix.conf.php
