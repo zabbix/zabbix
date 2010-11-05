@@ -135,7 +135,8 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 	init_result(&result);
 	*value = '\0';
 
-	switch (dcheck->type) {
+	switch (dcheck->type)
+	{
 		case SVC_SSH:	service = "ssh"; break;
 		case SVC_LDAP:	service = "ldap"; break;
 		case SVC_SMTP:	service = "smtp"; break;
@@ -156,10 +157,12 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 			break;
 	}
 
-	if (ret == SUCCEED) {
+	if (ret == SUCCEED)
+	{
 		alarm(10);
 
-		switch(dcheck->type) {
+		switch(dcheck->type)
+		{
 			/* Simple checks */
 			case SVC_SSH:
 			case SVC_LDAP:

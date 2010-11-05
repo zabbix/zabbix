@@ -22,12 +22,13 @@
 
 #ifdef HAVE_SNMP
 
-typedef struct zbx_snmp_index_s
+typedef struct
 {
 	char	*oid;
 	char	*value;
 	int	index;
-} zbx_snmp_index_t;
+}
+zbx_snmp_index_t;
 
 static zbx_snmp_index_t	*snmpidx = NULL;
 static int		snmpidx_count = 0, snmpidx_alloc = 16;

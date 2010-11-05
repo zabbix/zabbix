@@ -476,7 +476,8 @@ static int	get_values()
 				&key, MACRO_TYPE_ITEM_KEY, NULL, 0);
 		items[i].key = key;
 
-		switch (items[i].type) {
+		switch (items[i].type)
+		{
 			case ITEM_TYPE_SNMPv3:
 				zbx_free(snmpv3_securityname);
 				zbx_free(snmpv3_authpassphrase);
@@ -579,38 +580,39 @@ static int	get_values()
 		}
 
 		/* Skip unreachable hosts but do not break the loop. */
-		switch (items[i].type) {
-		case ITEM_TYPE_ZABBIX:
-			if (SUCCEED == uint64_array_exists(ids, ids_num, items[i].host.hostid))
-			{
-				DCrequeue_unreachable_item(items[i].itemid);
-				zabbix_log(LOG_LEVEL_DEBUG, "Zabbix Host " ZBX_FS_UI64 " is unreachable. Skipping [%s]",
-						items[i].host.hostid, items[i].key_orig);
-				continue;
-			}
-			break;
-		case ITEM_TYPE_SNMPv1:
-		case ITEM_TYPE_SNMPv2c:
-		case ITEM_TYPE_SNMPv3:
-			if (SUCCEED == uint64_array_exists(snmpids, snmpids_num, items[i].host.hostid))
-			{
-				DCrequeue_unreachable_item(items[i].itemid);
-				zabbix_log(LOG_LEVEL_DEBUG, "SNMP Host " ZBX_FS_UI64 " is unreachable. Skipping [%s]",
-						items[i].host.hostid, items[i].key_orig);
-				continue;
-			}
-			break;
-		case ITEM_TYPE_IPMI:
-			if (SUCCEED == uint64_array_exists(ipmiids, ipmiids_num, items[i].host.hostid))
-			{
-				DCrequeue_unreachable_item(items[i].itemid);
-				zabbix_log(LOG_LEVEL_DEBUG, "IPMI Host " ZBX_FS_UI64 " is unreachable. Skipping [%s]",
-						items[i].host.hostid, items[i].key_orig);
-				continue;
-			}
-			break;
-		default:
-			/* nothing to do */;
+		switch (items[i].type)
+		{
+			case ITEM_TYPE_ZABBIX:
+				if (SUCCEED == uint64_array_exists(ids, ids_num, items[i].host.hostid))
+				{
+					DCrequeue_unreachable_item(items[i].itemid);
+					zabbix_log(LOG_LEVEL_DEBUG, "Zabbix Host " ZBX_FS_UI64 " is unreachable. Skipping [%s]",
+							items[i].host.hostid, items[i].key_orig);
+					continue;
+				}
+				break;
+			case ITEM_TYPE_SNMPv1:
+			case ITEM_TYPE_SNMPv2c:
+			case ITEM_TYPE_SNMPv3:
+				if (SUCCEED == uint64_array_exists(snmpids, snmpids_num, items[i].host.hostid))
+				{
+					DCrequeue_unreachable_item(items[i].itemid);
+					zabbix_log(LOG_LEVEL_DEBUG, "SNMP Host " ZBX_FS_UI64 " is unreachable. Skipping [%s]",
+							items[i].host.hostid, items[i].key_orig);
+					continue;
+				}
+				break;
+			case ITEM_TYPE_IPMI:
+				if (SUCCEED == uint64_array_exists(ipmiids, ipmiids_num, items[i].host.hostid))
+				{
+					DCrequeue_unreachable_item(items[i].itemid);
+					zabbix_log(LOG_LEVEL_DEBUG, "IPMI Host " ZBX_FS_UI64 " is unreachable. Skipping [%s]",
+							items[i].host.hostid, items[i].key_orig);
+					continue;
+				}
+				break;
+			default:
+				/* nothing to do */;
 		}
 
 		init_result(&agent);
@@ -645,20 +647,21 @@ static int	get_values()
 		{
 			deactivate_host(&items[i], now, agent.msg);
 
-			switch (items[i].type) {
-			case ITEM_TYPE_ZABBIX:
-				uint64_array_add(&ids, &ids_alloc, &ids_num, items[i].host.hostid, 1);
-				break;
-			case ITEM_TYPE_SNMPv1:
-			case ITEM_TYPE_SNMPv2c:
-			case ITEM_TYPE_SNMPv3:
-				uint64_array_add(&snmpids, &snmpids_alloc, &snmpids_num, items[i].host.hostid, 1);
-				break;
-			case ITEM_TYPE_IPMI:
-				uint64_array_add(&ipmiids, &ipmiids_alloc, &ipmiids_num, items[i].host.hostid, 1);
-				break;
-			default:
-				/* nothing to do */;
+			switch (items[i].type)
+			{
+				case ITEM_TYPE_ZABBIX:
+					uint64_array_add(&ids, &ids_alloc, &ids_num, items[i].host.hostid, 1);
+					break;
+				case ITEM_TYPE_SNMPv1:
+				case ITEM_TYPE_SNMPv2c:
+				case ITEM_TYPE_SNMPv3:
+					uint64_array_add(&snmpids, &snmpids_alloc, &snmpids_num, items[i].host.hostid, 1);
+					break;
+				case ITEM_TYPE_IPMI:
+					uint64_array_add(&ipmiids, &ipmiids_alloc, &ipmiids_num, items[i].host.hostid, 1);
+					break;
+				default:
+					/* nothing to do */;
 			}
 
 			DCrequeue_unreachable_item(items[i].itemid);
