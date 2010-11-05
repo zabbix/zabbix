@@ -2088,11 +2088,15 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, 
 					zbxmacros_get_value(macros, &dc_item->host.hostid, 1, m, &replace_to);
 			}
 		}
-		else if (macro_type & (MACRO_TYPE_ITEM_USERNAME | MACRO_TYPE_ITEM_PUBLICKEY |
-				MACRO_TYPE_ITEM_PRIVATEKEY | MACRO_TYPE_ITEM_PASSWORD | MACRO_TYPE_ITEM_SCRIPT))
+		else if (macro_type & MACRO_TYPE_ITEM_FIELD)
 		{
 			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
-				zbxmacros_get_value(macros, &dc_item->host.hostid, 1, m, &replace_to);
+			{
+				if (NULL == dc_item)
+					zbxmacros_get_value(macros, NULL, 0, m, &replace_to);
+				else
+					zbxmacros_get_value(macros, &dc_item->host.hostid, 1, m, &replace_to);
+			}
 		}
 		else if (macro_type & MACRO_TYPE_ITEM_EXPRESSION)
 		{
