@@ -90,13 +90,13 @@ DC_ITEM
 	unsigned char	status;
 	char		trapper_hosts[ITEM_TRAPPER_HOSTS_LEN_MAX];
 	char		logtimefmt[ITEM_LOGTIMEFMT_LEN_MAX];
-	char		snmp_community[ITEM_SNMP_COMMUNITY_LEN_MAX];
-	char		snmp_oid[ITEM_SNMP_OID_LEN_MAX];
+	char		snmp_community_orig[ITEM_SNMP_COMMUNITY_LEN_MAX], *snmp_community;
+	char		snmp_oid_orig[ITEM_SNMP_OID_LEN_MAX], *snmp_oid;
 	unsigned short	snmp_port;
-	char		snmpv3_securityname[ITEM_SNMPV3_SECURITYNAME_LEN_MAX];
+	char		snmpv3_securityname_orig[ITEM_SNMPV3_SECURITYNAME_LEN_MAX], *snmpv3_securityname;
 	unsigned char	snmpv3_securitylevel;
-	char		snmpv3_authpassphrase[ITEM_SNMPV3_AUTHPASSPHRASE_LEN_MAX];
-	char		snmpv3_privpassphrase[ITEM_SNMPV3_PRIVPASSPHRASE_LEN_MAX];
+	char		snmpv3_authpassphrase_orig[ITEM_SNMPV3_AUTHPASSPHRASE_LEN_MAX], *snmpv3_authpassphrase;
+	char		snmpv3_privpassphrase_orig[ITEM_SNMPV3_PRIVPASSPHRASE_LEN_MAX], *snmpv3_privpassphrase;
 	char		ipmi_sensor[ITEM_IPMI_SENSOR_LEN_MAX];
 	char		params_orig[ITEM_PARAMS_LEN_MAX], *params;
 	char		delay_flex[ITEM_DELAY_FLEX_LEN_MAX];
