@@ -1073,7 +1073,7 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 	AC_MSG_CHECKING(for Zabbix server database selection)
 	if test "x$have_db" = "xno"; then
 		AC_MSG_RESULT(error)
-		AC_MSG_ERROR([No database selected for Zabbix server. Use --with-ibm-db2 or --with-mysql or --with-oracle or --with-pgsql or --with-sqlite3.])
+		AC_MSG_ERROR([No database selected for Zabbix server. Use --with-ibm-db2 or --with-mysql or --with-oracle or --with-postgresql or --with-sqlite3.])
 	else
 		AC_MSG_RESULT(ok)
 	fi
