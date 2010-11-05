@@ -785,7 +785,7 @@ COpt::memoryPick();
 		}
 
 		if(!empty($itemids)){
-			DB::delete('items_applications', array( DBcondition('itemid', $itemids)));
+			DB::delete('items_applications', array('itemid'=>$itemids));
 			DB::insert('items_applications', $itemApplications);
 		}
 
@@ -898,10 +898,10 @@ COpt::memoryPick();
 				$del_graphs[$db_graph['graphid']] = $db_graph['graphid'];
 			}
 			if(!empty($del_graphs))
-				DB::delete('graphs', $del_graphs);
+				DB::delete('graphs', array('graphid'=>$del_graphs));
 // --
 
-			DB::delete('items', array(DBcondition('itemid', $prototypeids)));
+			DB::delete('items', array('itemid'=>$prototypeids));
 
 
 // HOUSEKEEPER {{{

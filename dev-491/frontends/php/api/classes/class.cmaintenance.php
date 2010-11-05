@@ -649,8 +649,8 @@ Copt::memoryPick();
 				$timeperiodids[] = $timeperiod['timeperiodid'];
 			}
 
-			DB::delete('timeperiods', DBcondition('timeperiodid', $timeperiodids));
-			DB::delete('maintenances_windows', DBcondition('maintenanceid', $maintenanceids));
+			DB::delete('timeperiods', array('timeperiodid'=>$timeperiodids));
+			DB::delete('maintenances_windows', array('maintenanceid'=>$maintenanceids));
 
 
 			$tid = 0;
@@ -690,8 +690,8 @@ Copt::memoryPick();
 			DB::insert('maintenances_windows', $insert_windows);
 
 
-			DB::delete('maintenances_hosts', DBcondition('maintenanceid', $maintenanceids));
-			DB::delete('maintenances_groups', DBcondition('maintenanceid', $maintenanceids));
+			DB::delete('maintenances_hosts', array('maintenanceid'=>$maintenanceids));
+			DB::delete('maintenances_groups', array('maintenanceid'=>$maintenanceids));
 
 			$insert_hosts = array();
 			$insert_groups = array();
@@ -767,8 +767,8 @@ Copt::memoryPick();
 				$timeperiodids[] = $timeperiod['timeperiodid'];
 			}
 
-			$mid_cond = DBcondition('maintenanceid', $maintenanceids);
-			DB::delete('timeperiods', DBcondition('timeperiodid', $timeperiodids));
+			$mid_cond = array('maintenanceid'=>$maintenanceids);
+			DB::delete('timeperiods', array('timeperiodid'=>$timeperiodids));
 			DB::delete('maintenances_windows', $mid_cond);
 			DB::delete('maintenances_hosts', $mid_cond);
 			DB::delete('maintenances_groups', $mid_cond);

@@ -899,7 +899,7 @@ class CUserMacro extends CZBXAPI{
 			$db_macros = self::get($options);
 			$hostmacroids = array_keys($db_macros);
 
-			DB::delete('hostmacro', array(DBcondition('hostmacroid', $hostmacroids)));
+			DB::delete('hostmacro', array('hostmacroid'=>$hostmacroids));
 
 			self::EndTransaction(true, __METHOD__);
 			return array('hostmacroids' => $hostmacroids);

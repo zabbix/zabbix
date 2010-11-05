@@ -783,7 +783,7 @@ COpt::memoryPick();
 		DB::update('graphs', $data);
 
 		if(isset($graph['gitems'])){
-			DB::delete('graphs_items', array('graphid='.$graph['graphid']));
+			DB::delete('graphs_items', array('graphid'=>$graph['graphid']));
 
 			foreach($graph['gitems'] as $inum => $gitem){
 				$gitem['graphid'] = $graph['graphid'];
@@ -1043,18 +1043,18 @@ COpt::memoryPick();
 			} while(!empty($parent_graphids));
 
 			DB::delete('screens_items', array(
-				DBcondition('resourceid', $graphids),
-				'resourcetype='.SCREEN_RESOURCE_GRAPH
+				'resourceid'=>$graphids,
+				'resourcetype'=>SCREEN_RESOURCE_GRAPH
 			));
 
 			DB::delete('profiles', array(
-				'idx='.zbx_dbstr('web.favorite.graphids'),
-				'source='.zbx_dbstr('graphid'),
-				DBcondition('value_id' ,$graphids)
+				'idx'=>'web.favorite.graphids',
+				'source'=>'graphid',
+				'value_id'=>$graphids
 			));
 
 			DB::delete('graphs', array(
-				DBcondition('graphid', $graphids)
+				'graphid'=> $graphids
 			));
 
 			foreach($del_graphs as $graphid => $graph){

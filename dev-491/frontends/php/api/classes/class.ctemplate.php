@@ -1251,7 +1251,7 @@ COpt::memoryPick();
 			}
 
 
-			$templateidCondition = DBcondition('hostid', $templateids);
+			$templateidCondition = array('hostid'=>$templateids);
 			DB::delete('hosts', array($templateidCondition));
 
 // TODO: remove info from API
@@ -2078,8 +2078,8 @@ COpt::memoryPick();
 
 
 		DB::delete('hosts_templates', array(
-			DBCondition('templateid', $templateids),
-			DBCondition('hostid', $targetids)
+			'templateid'=>$templateids,
+			'hostid'=>$targetids
 		));
 
 		return true;

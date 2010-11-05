@@ -586,7 +586,7 @@ Copt::memoryPick();
 
 			self::checkInput($interfaces,__FUNCTION__);
 
-			DB::delete('interface', array(DBcondition('interfaceid', $interfaceids)));
+			DB::delete('interface', array('interfaceid'=>$interfaceids));
 
 			self::EndTransaction(true, __METHOD__);
 			return array('interfaceids' => $interfaceids);
@@ -653,8 +653,8 @@ Copt::memoryPick();
 			self::checkInput($interfaces, __FUNCTION__);
 
 			DB::delete('interface', array(
-				DBcondition('hostid', $hostids),
-				DBcondition('interfaceid', $interfaceids)
+				'hostid'=>$hostids,
+				'interfaceid'=>$interfaceids
 			));
 
 			self::EndTransaction(true, __METHOD__);

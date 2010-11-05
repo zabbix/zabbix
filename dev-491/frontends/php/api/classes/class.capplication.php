@@ -647,7 +647,7 @@ COpt::memoryPick();
 						S_USED_BY_SCENARIO_SMALL.' ['.$info['name'].'] '.S_AND_CANT_BE_DELETED);
 			}
 
-			DB::delete('applications', array(DBcondition('applicationid', $applicationids)));
+			DB::delete('applications', array('applicationid'=>$applicationids));
 
 // TODO: remove info from API
 			foreach($del_applications as $del_application){
