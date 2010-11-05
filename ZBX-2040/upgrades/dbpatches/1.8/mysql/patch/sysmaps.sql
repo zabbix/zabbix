@@ -1,1 +1,0 @@
-ALTER TABLE sysmaps ADD highlight INTEGER DEFAULT '1' NOT NULL;
