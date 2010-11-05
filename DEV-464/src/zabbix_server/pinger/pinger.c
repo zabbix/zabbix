@@ -360,7 +360,7 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 	for (i = 0; i < num; i++)
 	{
 		items[i].key = strdup(items[i].key_orig);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
+		substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
 				&items[i].key, MACRO_TYPE_ITEM_KEY, NULL, 0);
 
 		conn = items[i].host.useip == 1 ? items[i].host.ip : items[i].host.dns;
