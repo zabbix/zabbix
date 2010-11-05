@@ -48,7 +48,8 @@
 		'tr_groupid'=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 		'tr_hostid'=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 
-		'elementid'=>	array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,NULL),
+		'elementid'=>	array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,null),
+		'screenname'=>	array(T_ZBX_STR, O_OPT,	P_SYS,	null,null),
 		'step'=>		array(T_ZBX_INT, O_OPT,  P_SYS,		BETWEEN(0,65535),NULL),
 
 		'period'=>		array(T_ZBX_INT, O_OPT,  P_SYS, 	null,NULL),
@@ -136,9 +137,23 @@
 		'nodeids' => get_current_nodeid(),
 		'extendoutput' => 1
 	));
-	$screens = zbx_toHash($screens, 'screenid');
+
+	//wherether we shpold use screen name to fetch a screen (id this is false, elementid is used)
+	$use_screen_name = isset($_REQUEST['screenname']);
+
+	//if screen name is provided it takes priority over elementid
+	if ($use_screen_name) {
+		$screens = zbx_toHash($screens, 'name');
+		$elementIdentifier = $_REQUEST['screenname'];
+	}
+	else {
+		$screens = zbx_toHash($screens, 'screenid');
+		$elementIdentifier = $elementid;
+	}
+
 	order_result($screens, 'name');
 
+	//no screens defined at all
 	if(empty($screens)){
 		$screens_wdgt->addPageHeader(S_SCREENS_BIG, $formHeader);
 		$screens_wdgt->addItem(BR());
@@ -146,20 +161,26 @@
 		$screens_wdgt->show();
 	}
 	else{
-		if(!isset($screens[$elementid])){
-			$screen = reset($screens);
-			$elementid = $screen['screenid'];
+		//if screen is not found
+		if(!isset($screens[$elementIdentifier])){
+			$screen = reset($screens); //getting the fist one
+			$elementid = $screen['screenid']; //it's id will be used even if we are working with screen name
+			$elementIdentifier = $elementid;
+			$use_screen_name = false;
+		}
+		else {
+			$screen = $screens[$elementIdentifier];
 		}
 
-		$effectiveperiod = navigation_bar_calc('web.screens', $elementid, true);
+		$effectiveperiod = navigation_bar_calc('web.screens', $screen['screenid'], true);
 
-		$element_name = $screens[$elementid]['name'];
+		$element_name = $screen['name'];
 
 // PAGE HEADER {{{
 		$icon = get_icon('favourite', array(
 			'fav' => 'web.favorite.screenids',
 			'elname' => 'screenid',
-			'elid' => $elementid,
+			'elid' => $screen['screenid'],
 		));
 		$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
 		
@@ -172,23 +193,23 @@
 		$form = new CForm(null, 'get');
 		$form->addVar('fullscreen', $_REQUEST['fullscreen']);
 
-		$cmbElements = new CComboBox('elementid', $elementid, 'submit()');
-		foreach($screens as $snum => $screen){
+		$cmbElements = new CComboBox('elementid', $screen['screenid'], 'submit()');
+		foreach($screens as $snum => $scr){
 			/**
 			 * Adding htmlspecialchars function to output of the screen name, so
 			 * that it would be available to use symbols like ">" in screen names
 			 * @see ZBX-2844
 			 * @author Konstantin Buravcov
 			 */
-			$displayed_screen_name = htmlspecialchars(get_node_name_by_elid($screen['screenid'], null, ': ').$screen['name']);
-			$cmbElements->addItem($screen['screenid'], $displayed_screen_name);
+			$displayed_screen_name = htmlspecialchars(get_node_name_by_elid($scr['screenid'], null, ': ').$scr['name']);
+			$cmbElements->addItem($scr['screenid'], $displayed_screen_name);
 		}
 		$form->addItem(array(S_SCREENS.SPACE, $cmbElements));
 
 		$screens_wdgt->addHeader($element_name, $form);
 // }}} HEADER
 
-		if((2 != $_REQUEST['fullscreen']) && check_dynamic_items($elementid, 0)){
+		if((2 != $_REQUEST['fullscreen']) && check_dynamic_items($screen['screenid'], 0)){
 			if(!isset($_REQUEST['hostid'])){
 				$_REQUEST['groupid'] = $_REQUEST['hostid'] = 0;
 			}
@@ -218,7 +239,7 @@
 			$form->addItem(array(SPACE.S_HOST.SPACE, $cmbHosts));
 		}
 
-		$element = get_screen($elementid, 0, $effectiveperiod);
+		$element = get_screen($screen['screenid'], 0, $effectiveperiod);
 
 		if(2 != $_REQUEST['fullscreen']){
 			$timeline = array(
@@ -232,7 +253,7 @@
 
 			$dom_graph_id = 'screen_scroll';
 			$objData = array(
-				'id' => $elementid,
+				'id' => $screen['screenid'],
 				'domid' => $dom_graph_id,
 				'loadSBox' => 0,
 				'loadImage' => 0,
