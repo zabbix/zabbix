@@ -168,8 +168,8 @@ const ZBX_TABLE	tables[]={
 	"t_cksum_text"	=>	"text"  
 );
 
-%sqlite=("t_bigint"	=>	"bigint",
-	"database"	=>	"sqlite",
+%sqlite3=("t_bigint"	=>	"bigint",
+	"database"	=>	"sqlite3",
 	"before"	=>	"",
 	"after"		=>	"",
 	"type"		=>	"sql",
@@ -346,7 +346,7 @@ sub process_field
 
 		if ($type eq "t_serial")
 		{
-			if ($output{"database"} eq "sqlite")
+			if ($output{"database"} eq "sqlite3")
 			{
 				$row = sprintf("%-*s PRIMARY KEY AUTOINCREMENT", $szcol4, $row);
 				$pkey="";
@@ -401,7 +401,7 @@ sub process_field
 
 			$cname = "c_${table_name}_${relN}";
 
-			if ($output{"database"} eq "sqlite")
+			if ($output{"database"} eq "sqlite3")
 			{
 				$references = " REFERENCES ${fk_table} (${fk_field})${fk_flags}";
 			}
@@ -456,7 +456,7 @@ sub process_index
 
 sub usage
 {
-	printf "Usage: $0 [c|ibm_db2|mysql|oracle|postgresql|sqlite]\n";
+	printf "Usage: $0 [c|ibm_db2|mysql|oracle|postgresql|sqlite3]\n";
 	printf "The script generates Zabbix SQL schemas and C code for different database engines.\n";
 	exit;
 }
@@ -531,7 +531,7 @@ sub main
 		case "mysql"		{ %output = %mysql; }
 		case "oracle"		{ %output = %oracle; }
 		case "postgresql"	{ %output = %postgresql; }
-		case "sqlite"		{ %output = %sqlite; }
+		case "sqlite3"		{ %output = %sqlite3; }
 		else			{ usage(); }
 	}
 
@@ -569,7 +569,7 @@ sub main
 		process();
 		print $fkeys_drop_prefix.$fkeys_drop.$fkeys_suffix;
 		print "#elif HAVE_SQLITE3\nconst char *const db_schema= \"\\\n";
-		%output = %sqlite;
+		%output = %sqlite3;
 		process();
 		print $fkeys_drop_prefix.$fkeys_drop.$fkeys_suffix;
 		print "#endif\t/* HAVE_SQLITE3 */\n";

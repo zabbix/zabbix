@@ -5,11 +5,11 @@ EXTRA_DIST = \
 	schema/mysql.sql \
 	schema/oracle.sql \
 	schema/postgresql.sql \
-	schema/sqlite.sql \
+	schema/sqlite3.sql \
 	data/images/*.png \
 	data/data.sql \
 	data/images_ibm_db2.sql \
 	data/images_mysql.sql \
 	data/images_oracle.sql \
-	data/images_pgsql.sql \
+	data/images_postgresql.sql \
 	data/images_sqlite3.sql
