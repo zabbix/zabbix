@@ -1534,13 +1534,13 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 	case ITEM_TYPE_SNMPv3:
 		if (NULL != (snmpitem = zbx_hashset_search(&config->snmpitems, &src_item->itemid)))
 		{
-			strscpy(dst_item->snmp_community, snmpitem->snmp_community);
-			strscpy(dst_item->snmp_oid, snmpitem->snmp_oid);
+			strscpy(dst_item->snmp_community_orig, snmpitem->snmp_community);
+			strscpy(dst_item->snmp_oid_orig, snmpitem->snmp_oid);
 			dst_item->snmp_port = snmpitem->snmp_port;
-			strscpy(dst_item->snmpv3_securityname, snmpitem->snmpv3_securityname);
+			strscpy(dst_item->snmpv3_securityname_orig, snmpitem->snmpv3_securityname);
 			dst_item->snmpv3_securitylevel = snmpitem->snmpv3_securitylevel;
-			strscpy(dst_item->snmpv3_authpassphrase, snmpitem->snmpv3_authpassphrase);
-			strscpy(dst_item->snmpv3_privpassphrase, snmpitem->snmpv3_privpassphrase);
+			strscpy(dst_item->snmpv3_authpassphrase_orig, snmpitem->snmpv3_authpassphrase);
+			strscpy(dst_item->snmpv3_privpassphrase_orig, snmpitem->snmpv3_privpassphrase);
 		}
 		break;
 	case ITEM_TYPE_TRAPPER:
