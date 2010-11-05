@@ -682,6 +682,11 @@ static int	get_values()
 	zbx_free(publickey);
 	zbx_free(privatekey);
 	zbx_free(password);
+	zbx_free(snmp_community);
+	zbx_free(snmp_oid);
+	zbx_free(snmpv3_securityname);
+	zbx_free(snmpv3_authpassphrase);
+	zbx_free(snmpv3_privpassphrase);
 
 	zbx_free(ids);
 	zbx_free(snmpids);
