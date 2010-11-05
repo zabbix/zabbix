@@ -426,26 +426,7 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 	}
 //Special processing of uptime
 	if($units=='uptime'){
-		$ret='';
-		$days=floor($value/(24*3600));
-		if($days>0){
-			$value=$value-$days*(24*3600);
-		}
-		$hours=floor($value/(3600));
-		if($hours>0){
-			$value=$value-$hours*3600;
-		}
-		$min=floor($value/(60));
-		if($min>0){
-			$value=$value-$min*(60);
-		}
-		if($days==0){
-			$ret = sprintf('%02d:%02d:%02d', $hours, $min, $value);
-		}
-		else{
-			$ret = sprintf('%d '.S_DAYS_SMALL.', %02d:%02d:%02d', $days, $hours, $min, $value);
-		}
-		return $ret;
+		return zbx_date2age(time() - $value);
 	}
 // Special processing for seconds
 	if($units=='s'){
