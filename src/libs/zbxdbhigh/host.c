@@ -543,7 +543,7 @@ static void	DBclear_parents_from_trigger()
 	result = DBselect("select s.serviceid"
 				" from services s,services_links sl"
 				" where s.serviceid=sl.serviceupid"
-				" and s.triggerid is not null"
+					" and s.triggerid is not null"
 				" group by s.serviceid");
 
 	while (NULL != (row = DBfetch(result)))
@@ -769,9 +769,10 @@ static void	DBupdate_services_status_all(void)
 
 	clock = time(NULL);
 
-	result = DBselect("select s.serviceid,s.algorithm,s.triggerid"
-			" from services s"
-			" where s.serviceid not in (select distinct serviceupid from services_links)");
+	result = DBselect(
+			"select serviceid,algorithm,triggerid"
+			" from services"
+			" where serviceid not in (select distinct serviceupid from services_links)");
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -783,18 +784,20 @@ static void	DBupdate_services_status_all(void)
 
 		status = DBget_service_status(serviceid, atoi(row[1]), triggerid);
 
-		DBexecute("update services set status=%d where serviceid=" ZBX_FS_UI64,
-			status,
-			serviceid);
+		DBexecute("update services"
+				" set status=%d"
+				" where serviceid=" ZBX_FS_UI64,
+				status, serviceid);
 
 		DBadd_service_alarm(serviceid, status, clock);
 	}
 	DBfree_result(result);
 
-	result = DBselect("select max(sl.servicedownid),sl.serviceupid"
-			" from services_links sl"
-			" where sl.servicedownid not in (select distinct serviceupid from services_links)"
-			" group by sl.serviceupid");
+	result = DBselect(
+			"select max(servicedownid),serviceupid"
+			" from services_links"
+			" where servicedownid not in (select distinct serviceupid from services_links)"
+			" group by serviceupid");
 
 	while (NULL != (row = DBfetch(result)))
 	{
