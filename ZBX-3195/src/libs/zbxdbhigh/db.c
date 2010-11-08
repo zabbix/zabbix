@@ -2070,10 +2070,17 @@ void	DBproxy_register_host(const char *host)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void DBexecute_overflowed_sql(char **sql, int *sql_allocated, int *sql_offset)
+void	DBexecute_overflowed_sql(char **sql, int *sql_allocated, int *sql_offset)
 {
 	if (*sql_offset > ZBX_MAX_SQL_SIZE)
 	{
+#ifdef HAVE_MULTIROW_INSERT
+		if ((*sql)[*sql_offset - 1] == ',')
+		{
+			(*sql_offset)--;
+			zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 3, ";\n");
+		}
+#endif
 #ifdef HAVE_ORACLE
 		zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 8, "end;\n");
 #endif
