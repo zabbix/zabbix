@@ -197,7 +197,7 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 
 	zbx_json_addstring(j, NULL, table->recid, ZBX_JSON_TYPE_STRING);
 
-	for (f = 0; table->fields[f].name != 0; f ++)
+	for (f = 0; table->fields[f].name != 0; f++)
 	{
 		if ((table->fields[f].flags & ZBX_PROXY) == 0)
 			continue;
@@ -328,11 +328,13 @@ void	get_proxy_monitored_hostids(zbx_uint64_t proxy_hostid, zbx_uint64_t **hosti
  ******************************************************************************/
 void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 {
-	struct proxytable_t {
+	struct proxytable_t
+	{
 		const char	*table;
 	};
 
-	static const struct proxytable_t pt[]={
+	static const struct proxytable_t pt[] =
+	{
 		{"globalmacro"},
 		{"hosts"},
 		{"hosts_templates"},
@@ -370,7 +372,7 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 		if (0 == strcmp(pt[i].table, "hosts"))
 		{
 			zbx_snprintf_alloc(&condition, &condition_alloc, &condition_offset, 256,
-					" where");
+					" where%s", 0 == hostids_num ? " 0=1" : "");
 			DBadd_condition_alloc(&condition, &condition_alloc, &condition_offset,
 					"t.hostid", hostids, hostids_num);
 		}
@@ -420,7 +422,7 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 		else if (0 == strcmp(pt[i].table, "hostmacro"))
 		{
 			zbx_snprintf_alloc(&condition, &condition_alloc, &condition_offset, 256,
-					" where");
+					" where%s", 0 == hostids_num ? " 0=1" : "");
 			DBadd_condition_alloc(&condition, &condition_alloc, &condition_offset,
 					"t.hostid", hostids, hostids_num);
 		}
