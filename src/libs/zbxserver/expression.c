@@ -1852,7 +1852,6 @@ static const char	*ex_suffix[EX_SUFFIX_NUM] = {"}", "1}", "2}", "3}", "4}", "5}"
  * Purpose: substitute simple macros in data string with real values          *
  *                                                                            *
  * Parameters: trigger - trigger structure                                    *
- *             action - action structure (NULL if unknown)                    *
  *             escalation - escalation structure. used for recovery           *
  *                          messages in {ESC.HISTORY} macro.                  *
  *                          (NULL for other cases)                            *
@@ -1866,10 +1865,12 @@ static const char	*ex_suffix[EX_SUFFIX_NUM] = {"}", "1}", "2}", "3}", "4}", "5}"
  *           {TRIGGER.NAME}, {TRIGGER.KEY}, {TRIGGER.SEVERITY}                *
  *                                                                            *
  ******************************************************************************/
-int	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, DC_HOST *dc_host,
+int	substitute_simple_macros(DB_EVENT *event, DB_ITEM *item, DC_HOST *dc_host,
 		DC_ITEM *dc_item, DB_ESCALATION *escalation,
 		char **data, int macro_type, char *error, int maxerrlen)
 {
+	const char	*__function_name = "substitute_simple_macros";
+
 	char		*p, *bl, *br, c, *str_out = NULL, *replace_to = NULL, sql[64];
 	const char	*suffix, *m;
 	int		i, n, N_functionid, ret, res = SUCCEED;
@@ -1880,12 +1881,11 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, 
 
 	if (NULL == data || NULL == *data || '\0' == **data)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "In substitute_simple_macros(data:NULL)");
+		zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:NULL", __function_name);
 		return res;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_simple_macros (data:'%s')",
-			*data);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __function_name, *data);
 
 	if (macro_type & MACRO_TYPE_TRIGGER_DESCRIPTION)
 		expand_trigger_description_constants(data, event->objectid);
@@ -1936,7 +1936,7 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, 
 				if (0 == strcmp(m, MVAR_TRIGGER_NAME))
 				{
 					replace_to = zbx_dsprintf(replace_to, "%s", event->trigger_description);
-					substitute_simple_macros(event, action, item, dc_host, dc_item, escalation, &replace_to,
+					substitute_simple_macros(event, item, dc_host, dc_item, escalation, &replace_to,
 							MACRO_TYPE_TRIGGER_DESCRIPTION, error, maxerrlen);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_COMMENT))
@@ -2241,8 +2241,8 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, 
 
 		if (FAIL == ret)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "No %s in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
-					bl, event->objectid);
+			zabbix_log(LOG_LEVEL_DEBUG, "No %s in %s(). Triggerid [" ZBX_FS_UI64 "]",
+					bl, __function_name, event->objectid);
 			replace_to = zbx_dsprintf(replace_to, "%s", STR_UNKNOWN_VARIABLE);
 		}
 
@@ -2268,8 +2268,7 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, 
 
 	*data = str_out;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End substitute_simple_macros (result:'%s')",
-			*data);
+	zabbix_log(LOG_LEVEL_DEBUG, "End %s() data:'%s'", __function_name, *data);
 
 	return res;
 }
@@ -2281,7 +2280,6 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, 
  * Purpose: substitute macros in data string with real values                 *
  *                                                                            *
  * Parameters: trigger - trigger structure                                    *
- *             action - action structure                                      *
  *             escalation - escalation structure. used for recovery           *
  *                          messages in {ESC.HISTORY} macro.                  *
  *                          (NULL for other cases)                            *
@@ -2294,8 +2292,10 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, 
  * Comments: example: "{127.0.0.1:system[procload].last(0)}" to "1.34"        *
  *                                                                            *
  ******************************************************************************/
-void	substitute_macros(DB_EVENT *event, DB_ACTION *action, DB_ESCALATION *escalation, char **data)
+void	substitute_macros(DB_EVENT *event, DB_ESCALATION *escalation, char **data)
 {
+	const char	*__function_name = "substitute_macros";
+
 	char
 		*str_out = NULL,
 		*replace_to = NULL,
@@ -2312,19 +2312,18 @@ void	substitute_macros(DB_EVENT *event, DB_ACTION *action, DB_ESCALATION *escala
 
 	if (NULL == data || NULL == *data || '\0' == **data)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "In substitute_macros(data:NULL)");
+		zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:NULL", __function_name);
 		return;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_macros(data:\"%s\")",
-			*data);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __function_name, *data);
 
-	substitute_simple_macros(event, NULL, NULL, NULL, NULL, escalation, data, MACRO_TYPE_MESSAGE, NULL, 0);
+	substitute_simple_macros(event, NULL, NULL, NULL, escalation, data, MACRO_TYPE_MESSAGE, NULL, 0);
 
 	pl = *data;
-	while((pr = strchr(pl, '{')))
+	while (NULL != (pr = strchr(pl, '{')))
 	{
-		if((pme = strchr(pr, '}')) == NULL)
+		if (NULL == (pme = strchr(pr, '}')))
 			break;
 
 		pme[0] = '\0';
@@ -2388,8 +2387,7 @@ void	substitute_macros(DB_EVENT *event, DB_ACTION *action, DB_ESCALATION *escala
 
 	*data = str_out;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End substitute_macros(result:%s)",
-		*data);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() data:'%s'", __function_name, *data);
 }
 
 /******************************************************************************
@@ -2550,7 +2548,7 @@ int	evaluate_expression(int *result, char **expression, time_t now,
 	event.objectid = triggerid;
 	event.value = trigger_value;
 
-	if (SUCCEED == substitute_simple_macros(&event, NULL, NULL, NULL, NULL, NULL, expression, MACRO_TYPE_TRIGGER_EXPRESSION,
+	if (SUCCEED == substitute_simple_macros(&event, NULL, NULL, NULL, NULL, expression, MACRO_TYPE_TRIGGER_EXPRESSION,
 			error, maxerrlen))
 	{
 		/* Evaluate expression */

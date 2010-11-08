@@ -474,7 +474,7 @@ static int	get_values()
 	{
 		zbx_free(key);
 		key = strdup(items[i].key_orig);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
+		substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
 				&key, MACRO_TYPE_ITEM_KEY, NULL, 0);
 		items[i].key = key;
 
@@ -489,11 +489,11 @@ static int	get_values()
 				snmpv3_authpassphrase = strdup(items[i].snmpv3_authpassphrase_orig);
 				snmpv3_privpassphrase = strdup(items[i].snmpv3_privpassphrase_orig);
 
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
+				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
 						&snmpv3_securityname, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
+				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
 						&snmpv3_authpassphrase, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
+				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
 						&snmpv3_privpassphrase, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 
 				items[i].snmpv3_securityname = snmpv3_securityname;
@@ -507,9 +507,9 @@ static int	get_values()
 				snmp_community = strdup(items[i].snmp_community_orig);
 				snmp_oid = strdup(items[i].snmp_oid_orig);
 
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
+				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
 						&snmp_community, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
+				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
 						&snmp_oid, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 
 				items[i].snmp_community = snmp_community;
@@ -518,14 +518,14 @@ static int	get_values()
 			case ITEM_TYPE_IPMI:
 				zbx_free(ipmi_ip);
 				ipmi_ip = strdup(items[i].host.ipmi_ip_orig);
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
+				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
 						&ipmi_ip, MACRO_TYPE_HOST_IPMI_IP, NULL, 0);
 				items[i].host.ipmi_ip = ipmi_ip;
 				break;
 			case ITEM_TYPE_DB_MONITOR:
 				zbx_free(params);
 				params = strdup(items[i].params_orig);
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
+				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
 						&params, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 				items[i].params = params;
 				break;
@@ -542,15 +542,15 @@ static int	get_values()
 				password = strdup(items[i].password_orig);
 				params = strdup(items[i].params_orig);
 
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
+				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
 						&username, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
+				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
 						&publickey, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
+				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
 						&privatekey, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
+				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
 						&password, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
+				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
 						&params, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 
 				items[i].username = username;
@@ -568,11 +568,11 @@ static int	get_values()
 				password = strdup(items[i].password_orig);
 				params = strdup(items[i].params_orig);
 
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
+				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
 						&username, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
+				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
 						&password, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
+				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
 						&params, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 
 				items[i].username = username;
