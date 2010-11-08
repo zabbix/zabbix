@@ -4146,6 +4146,7 @@ $triggerExpressionRules['keyFunctionName'] = Array(
 		'prev',
 		'regexp',
 		'str',
+		'strlen',
 		'sum',
 		'time'),
 	'indexItem' => true,
