@@ -138,7 +138,7 @@
 		'extendoutput' => 1
 	));
 
-	//wherether we should use screen name to fetch a screen (id this is false, elementid is used)
+	//whether we should use screen name to fetch a screen (if this is false, elementid is used)
 	$use_screen_name = isset($_REQUEST['screenname']);
 
 	//if screen name is provided it takes priority over elementid
