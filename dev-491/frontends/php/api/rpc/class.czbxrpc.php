@@ -518,5 +518,18 @@ class czbxrpc{
 
 		self::$result = $result;
 	}
+
+// WEBCHECK
+	private static function webcheck($action, $params){
+
+		CWebCheck::$error = array();
+
+		switch($action){
+			default:
+			$result = call_user_func(array('CWebCheck', $action), $params);
+		}
+
+		self::$result = $result;
+	}
 }
 ?>

@@ -554,7 +554,7 @@ COpt::memoryPick();
 	}
 
 	protected static function createReal(&$applications){
-		$applicationids = DB::insert('items', $applications);
+		$applicationids = DB::insert('applications', $applications);
 
 		foreach($applications as $anum => $application){
 			$applications[$anum]['applicationid'] = $applicationids[$anum];

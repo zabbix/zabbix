@@ -1253,26 +1253,26 @@ COpt::memoryPick();
  * Delete triggers
  *
  * @param array $triggerids array with trigger ids
- * @return deleted triggerids
+ * @return array
  */
 	public static function delete($triggerids, $nopermissions=false){
+		if(empty($triggerids)) return true;
 		$triggerids = zbx_toArray($triggerids);
 
 		try{
 			self::BeginTransaction(__METHOD__);
 
-// TODO: remove $nopermissions hack
-
 			$options = array(
 				'triggerids' => $triggerids,
-				'filter' => array('flags' => null),
 				'output' => API_OUTPUT_EXTEND,
 				'editable' => 1,
+				'select_hosts' => API_OUTPUT_EXTEND,
 				'extendoutput' => 1,
 				'preservekeys' => 1
 			);
 			$del_triggers = self::get($options);
-			
+
+// TODO: remove $nopermissions hack
 			if(!$nopermissions){
 				foreach($triggerids as $gnum => $triggerid){
 					if($del_triggers[$triggerid]['flags'] = ZBX_FLAG_DISCOVERY_CHILD)
@@ -1293,13 +1293,57 @@ COpt::memoryPick();
 				}
 			}
 
-			if(!empty($triggerids)){
-				$result = delete_trigger($triggerids);
-				if(!$result)
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete trigger');
+// first delete child triggers
+			$parent_triggerids = $triggerids;
+			do{
+				$db_items = DBselect('SELECT triggerid FROM triggers WHERE ' . DBcondition('templateid', $parent_triggerids));
+				$parent_triggerids = array();
+				while($db_trigger = DBfetch($db_items)){
+					$parent_triggerids[] = $db_trigger['triggerid'];
+					$triggerids[$db_trigger['triggerid']] = $db_trigger['triggerid'];
+				}
+			} while(!empty($parent_triggerids));
+
+
+			DB::delete('events', array(
+				DBcondition('objectid', $triggerids),
+				'object='.EVENT_OBJECT_TRIGGER
+			));
+
+			DB::delete('sysmaps_elements', array(
+				DBcondition('elementid', $triggerids),
+				'elementtype='.SYSMAP_ELEMENT_TYPE_TRIGGER
+			));
+
+// disable actions
+			$actionids = array();
+			$sql = 'SELECT DISTINCT actionid '.
+					' FROM conditions '.
+					' WHERE conditiontype='.CONDITION_TYPE_TRIGGER.
+						' AND '.DBcondition('value', $triggerids, false, true);   // FIXED[POSIBLE value type violation]!!!
+			$db_actions = DBselect($sql);
+			while($db_action = DBfetch($db_actions)){
+				$actionids[$db_action['actionid']] = $db_action['actionid'];
 			}
-			else{
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ triggerids ]');
+
+			DBexecute('UPDATE actions '.
+					' SET status='.ACTION_STATUS_DISABLED.
+					' WHERE '.DBcondition('actionid', $actionids));
+
+// delete action conditions
+			DB::delete('conditions', array(
+				'conditiontype='.CONDITION_TYPE_TRIGGER,
+				DBcondition('value', $triggerids, false, true),
+			));
+
+			DB::delete('triggers', array(DBcondition('triggerid', $triggerids)));
+
+			update_services_status_all();
+
+// TODO: REMOVE info
+			foreach($del_triggers as $triggerid => $trigger){
+				info(S_TRIGGER.' ['.$trigger['description'].'] '.S_DELETED_SMALL.'from hosts ['.
+						implode(', ',zbx_objectValues($trigger['hosts'], 'host')).']');
 			}
 
 			self::EndTransaction(true, __METHOD__);
