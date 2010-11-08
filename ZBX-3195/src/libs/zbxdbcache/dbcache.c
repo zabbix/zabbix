@@ -75,11 +75,13 @@ ZBX_DC_IDS
 
 ZBX_DC_IDS		*ids = NULL;
 
-typedef union {
+typedef union
+{
 	double		value_float;
 	zbx_uint64_t	value_uint64;
 	char		*value_str;
-} history_value_t;
+}
+history_value_t;
 
 #define ZBX_DC_HISTORY	struct zbx_dc_history_type
 #define ZBX_DC_TREND	struct zbx_dc_trend_type
@@ -384,7 +386,10 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 			}
 
 			if (i == trends_to)
-				continue;	/* this should never happen */
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
 
 			trend->disable_from = clock;
 
