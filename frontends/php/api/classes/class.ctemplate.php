@@ -77,7 +77,7 @@ class CTemplate extends CZBXAPI{
 // OutPut
 			'output'					=> API_OUTPUT_REFER,
 			'select_groups'				=> null,
-			'select_hosts'				=> null,
+			'selectHosts'				=> null,
 			'select_templates'			=> null,
 			'selectParentTemplates'		=> null,
 			'selectItems'				=> null,
@@ -399,7 +399,7 @@ class CTemplate extends CZBXAPI{
 					if(!is_null($options['select_templates']) && !isset($result[$template['templateid']]['templates'])){
 						$template['templates'] = array();
 					}
-					if(!is_null($options['select_hosts']) && !isset($result[$template['templateid']]['hosts'])){
+					if(!is_null($options['selectHosts']) && !isset($result[$template['templateid']]['hosts'])){
 						$template['hosts'] = array();
 					}
 					if(!is_null($options['selectParentTemplates']) && !isset($result[$template['templateid']]['parentTemplates'])){
@@ -437,7 +437,7 @@ class CTemplate extends CZBXAPI{
 					}
 
 // hostids
-					if(isset($template['linked_hostid']) && is_null($options['select_hosts'])){
+					if(isset($template['linked_hostid']) && is_null($options['selectHosts'])){
 						if(!isset($result[$template['templateid']]['hosts']))
 							$result[$template['templateid']]['hosts'] = array();
 
@@ -559,15 +559,15 @@ Copt::memoryPick();
 		}
 
 // Adding Hosts
-		if(!is_null($options['select_hosts'])){
+		if(!is_null($options['selectHosts'])){
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'templateids' => $templateids,
 				'preservekeys' => 1
 			);
 
-			if(is_array($options['select_hosts']) || str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
-				$obj_params['output'] = $options['select_hosts'];
+			if(is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['selectHosts'];
 				$hosts = CHost::get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($hosts, 'host');
@@ -586,7 +586,7 @@ Copt::memoryPick();
 					}
 				}
 			}
-			else if(API_OUTPUT_COUNT == $options['select_hosts']){
+			else if(API_OUTPUT_COUNT == $options['selectHosts']){
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 

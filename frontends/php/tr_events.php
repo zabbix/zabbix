@@ -72,7 +72,7 @@
 	$options = array(
 		'triggerids' => $_REQUEST['triggerid'],
 		'output' => API_OUTPUT_EXTEND,
-		'select_hosts' => API_OUTPUT_EXTEND
+		'selectHosts' => API_OUTPUT_EXTEND
 	);
 	$trigger = CTrigger::get($options);
 	if(!$trigger){

@@ -307,7 +307,7 @@
 			'itemids' => $itemid,
 			'filter' => array('flags' => null),
 			'webitems' => 1,
-			'select_hosts' => API_OUTPUT_EXTEND
+			'selectHosts' => API_OUTPUT_EXTEND
 		);
 		$item_data = CItem::get($options);
 		$item_data = reset($item_data);

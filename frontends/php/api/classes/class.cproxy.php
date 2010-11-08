@@ -82,7 +82,7 @@ class CProxy extends CZBXAPI{
 			'countOutput'				=> null,
 			'preservekeys'				=> null,
 
-			'select_hosts'				=> null,
+			'selectHosts'				=> null,
 
 			'sortfield'					=> '',
 			'sortorder'					=> '',
@@ -197,7 +197,7 @@ class CProxy extends CZBXAPI{
 				else{
 					if(!isset($result[$proxy['proxyid']])) $result[$proxy['proxyid']]= array();
 
-					if(!is_null($options['select_hosts']) && !isset($result[$proxy['proxyid']]['hosts'])){
+					if(!is_null($options['selectHosts']) && !isset($result[$proxy['proxyid']]['hosts'])){
 						$result[$proxy['proxyid']]['hosts'] = array();
 					}
 
@@ -213,12 +213,12 @@ class CProxy extends CZBXAPI{
 
 // Adding Objects
 
-// select_hosts
+// selectHosts
 		if(!empty($proxyids)){
-			if(!is_null($options['select_hosts']) && str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
+			if(!is_null($options['selectHosts']) && str_in_array($options['selectHosts'], $subselects_allowed_outputs)){
 				$obj_params = array(
 					'nodeids' => $nodeids,
-					'output' => $options['select_hosts'],
+					'output' => $options['selectHosts'],
 					'proxyids' => $proxyids,
 					'preservekeys' => 1
 				);

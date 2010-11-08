@@ -45,7 +45,7 @@ function make_favorite_graphs(){
 
 	$options = array(
 			'graphids' => $graphids,
-			'select_hosts' => API_OUTPUT_EXTEND,
+			'selectHosts' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND,
 		);
 	$graphs = CGraph::get($options);
@@ -53,7 +53,7 @@ function make_favorite_graphs(){
 
 	$options = array(
 			'itemids' => $itemids,
-			'select_hosts' => API_OUTPUT_EXTEND,
+			'selectHosts' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND,
 			'webitems' => 1,
 		);
@@ -504,7 +504,7 @@ function make_hoststat_summary($filter){
 			'monitored' => 1,
 			'maintenance' => $filter['maintenance'],
 			'withLastEventUnacknowledged' => 1,
-			'select_hosts' => API_OUTPUT_REFER,
+			'selectHosts' => API_OUTPUT_REFER,
 			'filter' => array(
 				'priority' => $filter['severity'],
 				'value' => TRIGGER_VALUE_TRUE
@@ -861,7 +861,7 @@ function make_latest_issues($filter = array()){
 			'value' => TRIGGER_VALUE_TRUE
 		),
 		'select_groups' => API_OUTPUT_EXTEND,
-		'select_hosts' => API_OUTPUT_EXTEND,
+		'selectHosts' => API_OUTPUT_EXTEND,
 		'output' => API_OUTPUT_EXTEND,
 		'sortfield' => 'lastchange',
 		'sortorder' => ZBX_SORT_DOWN,
@@ -1217,7 +1217,7 @@ function make_graph_submenu(){
 
 	$options = array(
 			'graphids' => $graphids,
-			'select_hosts' => array('hostid', 'host'),
+			'selectHosts' => array('hostid', 'host'),
 			'output' => API_OUTPUT_EXTEND
 		);
 	$graphs = CGraph::get($options);
@@ -1225,7 +1225,7 @@ function make_graph_submenu(){
 
 	$options = array(
 			'itemids' => $itemids,
-			'select_hosts' => array('hostid', 'host'),
+			'selectHosts' => array('hostid', 'host'),
 			'output' => API_OUTPUT_EXTEND,
 			'webitems' => 1,
 		);

@@ -162,7 +162,7 @@ options = array(
 		$graphs = CGraph::get(array(
 			'graphids' => $options['graphid'],
 			'output' => API_OUTPUT_EXTEND,
-			'select_hosts' => API_OUTPUT_REFER,
+			'selectHosts' => API_OUTPUT_REFER,
 			'select_templates' => API_OUTPUT_REFER,
 			'select_groups' => API_OUTPUT_REFER,
 		));
@@ -225,7 +225,7 @@ options = array(
 		$triggers = CTrigger::get(array(
 			'triggerids' => $options['triggerid'],
 			'output' => API_OUTPUT_EXTEND,
-			'select_hosts' => API_OUTPUT_REFER,
+			'selectHosts' => API_OUTPUT_REFER,
 			'select_templates' => API_OUTPUT_REFER,
 			'select_groups' => API_OUTPUT_REFER,
 		));

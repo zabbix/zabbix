@@ -59,7 +59,7 @@ include_once('include/page_header.php');
 					'nodeids' => get_current_nodeid(true),
 					'triggerids'=> $_REQUEST['linktriggers'],
 					'editable'=> 1,
-					'select_hosts' => array('hostid', 'host'),
+					'selectHosts' => array('hostid', 'host'),
 					'output' => API_OUTPUT_EXTEND
 				);
 
@@ -106,7 +106,7 @@ include_once('include/page_header.php');
 					'nodeids' => get_current_nodeid(true),
 					'triggerids'=> $_REQUEST['linktriggers'],
 					'editable'=> 1,
-					'select_hosts' => array('hostid', 'host'),
+					'selectHosts' => array('hostid', 'host'),
 					'output' => API_OUTPUT_EXTEND
 				);
 

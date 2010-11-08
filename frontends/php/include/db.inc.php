@@ -1236,9 +1236,6 @@ else {
 
 			$table_schema = self::getSchema($table);
 
-			sdii($wheres);
-			sdii($table_schema);
-
 			$sql_wheres = array();
 
 			//for every field

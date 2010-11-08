@@ -83,7 +83,7 @@ class CHostGroup extends CZBXAPI{
 
 // output
 			'output'					=> API_OUTPUT_REFER,
-			'select_hosts'				=> null,
+			'selectHosts'				=> null,
 			'select_templates'			=> null,
 
 			'countOutput'				=> null,
@@ -395,12 +395,12 @@ class CHostGroup extends CZBXAPI{
 						$result[$group['groupid']]['templates'] = array();
 					}
 
-					if(!is_null($options['select_hosts']) && !isset($result[$group['groupid']]['hosts'])){
+					if(!is_null($options['selectHosts']) && !isset($result[$group['groupid']]['hosts'])){
 						$result[$group['groupid']]['hosts'] = array();
 					}
 
 // hostids
-					if(isset($group['hostid']) && is_null($options['select_hosts'])){
+					if(isset($group['hostid']) && is_null($options['selectHosts'])){
 						if(!isset($result[$group['groupid']]['hosts']))
 							$result[$group['groupid']]['hosts'] = array();
 
@@ -447,15 +447,15 @@ COpt::memoryPick();
 		}
 
 // Adding hosts
-		if(!is_null($options['select_hosts'])){
+		if(!is_null($options['selectHosts'])){
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'groupids' => $groupids,
 				'preservekeys' => 1
 			);
 
-			if(is_array($options['select_hosts']) || str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
-				$obj_params['output'] = $options['select_hosts'];
+			if(is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['selectHosts'];
 				$hosts = CHost::get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($hosts, 'host');
@@ -476,7 +476,7 @@ COpt::memoryPick();
 					}
 				}
 			}
-			else if(API_OUTPUT_COUNT == $options['select_hosts']){
+			else if(API_OUTPUT_COUNT == $options['selectHosts']){
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 

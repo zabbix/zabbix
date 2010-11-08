@@ -198,7 +198,7 @@ include_once('include/page_header.php');
 			'triggerids'=> $_REQUEST['triggerid'],
 			'filter' => array('flags' => null),
 			'editable'=> 1,
-			'select_hosts'=> API_OUTPUT_EXTEND,
+			'selectHosts'=> API_OUTPUT_EXTEND,
 			'output'=> API_OUTPUT_EXTEND,
 		);
 		$triggers = CTrigger::get($options);
@@ -274,7 +274,7 @@ include_once('include/page_header.php');
 			'editable' => 1,
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
 			'output' => API_OUTPUT_EXTEND,
-			'select_hosts' => API_OUTPUT_EXTEND
+			'selectHosts' => API_OUTPUT_EXTEND
 		);
 
 		$triggers = CTrigger::get($options);
@@ -322,7 +322,7 @@ include_once('include/page_header.php');
 			'triggerids' => $_REQUEST['g_triggerid'],
 			'editable'=>1,
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
-			'select_hosts' => API_OUTPUT_EXTEND,
+			'selectHosts' => API_OUTPUT_EXTEND,
 			'output'=>API_OUTPUT_EXTEND,
 			'expandDescription' => 1
 		);
@@ -420,7 +420,7 @@ include_once('include/page_header.php');
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 			'output' => API_OUTPUT_EXTEND,
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
-			'select_hosts' => API_OUTPUT_EXTEND,
+			'selectHosts' => API_OUTPUT_EXTEND,
 			'selectItems' => API_OUTPUT_EXTEND,
 			'select_functions' => API_OUTPUT_EXTEND,
 		);

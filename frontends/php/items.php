@@ -823,7 +823,7 @@ switch($itemType) {
 			'search' => array(),
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => 1,
-			'select_hosts' => API_OUTPUT_EXTEND,
+			'selectHosts' => API_OUTPUT_EXTEND,
 			'select_triggers' => API_OUTPUT_EXTEND,
 			'select_applications' => API_OUTPUT_EXTEND,
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,

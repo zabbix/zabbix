@@ -614,7 +614,7 @@ include_once('include/page_header.php');
 				$options = array(
 					'inherited' => 0,
 					'hostids' => $clone_hostid,
-					'select_hosts' => API_OUTPUT_REFER,
+					'selectHosts' => API_OUTPUT_REFER,
 						'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY, ZBX_FLAG_DISCOVERY_CHILD, ZBX_FLAG_DISCOVERY_NORMAL)),
 					'output' => API_OUTPUT_EXTEND,
 				);

@@ -388,7 +388,7 @@ include_once('include/page_header.php');
 // COUNT hosts, templates
 		$options = array(
 			'groupids' => zbx_objectValues($groups, 'groupid'),
-			'select_hosts' => API_OUTPUT_COUNT,
+			'selectHosts' => API_OUTPUT_COUNT,
 			'select_templates' => API_OUTPUT_COUNT,
 			'nopermissions' => 1
 		);
@@ -399,7 +399,7 @@ include_once('include/page_header.php');
 // Data
 		$options = array(
 			'groupids' => zbx_objectValues($groups, 'groupid'),
-			'select_hosts' => array('hostid','host','status'),
+			'selectHosts' => array('hostid','host','status'),
 			'select_templates' => array('hostid','host','status'),
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => 1,

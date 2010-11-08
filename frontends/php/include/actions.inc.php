@@ -170,7 +170,7 @@ function condition_value2str($conditiontype, $value){
 				'triggerids' => $value,
 				'expandTriggerDescriptions' => true,
 				'output' => API_OUTPUT_EXTEND,
-				'select_hosts' => API_OUTPUT_EXTEND,
+				'selectHosts' => API_OUTPUT_EXTEND,
 				'nodeids' => get_current_nodeid(true),
 			));
 			$trig = reset($trig);

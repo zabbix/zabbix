@@ -723,7 +723,7 @@ include_once('include/page_header.php');
 			'nodeids' => $nodeid,
 			'hostids' => $hostid,
 			'output' => API_OUTPUT_EXTEND,
-			'select_hosts' => API_OUTPUT_EXTEND,
+			'selectHosts' => API_OUTPUT_EXTEND,
 			'select_dependencies' => API_OUTPUT_EXTEND,
 			'expandDescription' => 1,
 		);
@@ -832,7 +832,7 @@ include_once('include/page_header.php');
 			'webitems' => 1,
 			'filter' => array(),
 			'output' => API_OUTPUT_EXTEND,
-			'select_hosts' => API_OUTPUT_EXTEND
+			'selectHosts' => API_OUTPUT_EXTEND
 		);
 
 		if(!is_null($normal_only)) $options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
@@ -1049,7 +1049,7 @@ include_once('include/page_header.php');
 			'hostids' => $hostid,
 			'output' => API_OUTPUT_EXTEND,
 			'nodeids' => $nodeid,
-			'select_hosts' => API_OUTPUT_EXTEND
+			'selectHosts' => API_OUTPUT_EXTEND
 		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 		if(!is_null($templated)) $options['templated'] = $templated;
@@ -1150,7 +1150,7 @@ include_once('include/page_header.php');
 			'nodeids' => $nodeid,
 			'hostids' => $hostid,
 			'output' => API_OUTPUT_EXTEND,
-			'select_hosts' => API_OUTPUT_EXTEND,
+			'selectHosts' => API_OUTPUT_EXTEND,
 			'webitems' => 1,
 			'templated' => 0,
 			'filter' => array(
@@ -1294,7 +1294,7 @@ include_once('include/page_header.php');
 				'nodeids' => $nodeid,
 				'hostids'=> $hostid,
 				'output' => API_OUTPUT_EXTEND,
-				'select_hosts' => API_OUTPUT_EXTEND,
+				'selectHosts' => API_OUTPUT_EXTEND,
 				'templated' => 0,
 				'filter' => array(
 					'status' => ITEM_STATUS_ACTIVE

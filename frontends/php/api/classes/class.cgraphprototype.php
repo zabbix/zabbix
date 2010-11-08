@@ -77,7 +77,7 @@ class CGraphPrototype extends CZBXAPI{
 			'output'				=> API_OUTPUT_REFER,
 			'select_groups'			=> null,
 			'select_templates'		=> null,
-			'select_hosts'			=> null,
+			'selectHosts'			=> null,
 			'selectItems'			=> null,
 			'select_graph_items'	=> null,
 			'selectDiscoveryRule'	=> null,
@@ -387,7 +387,7 @@ class CGraphPrototype extends CZBXAPI{
 					if(!isset($result[$graph['graphid']]))
 						$result[$graph['graphid']]= array();
 
-					if(!is_null($options['select_hosts']) && !isset($result[$graph['graphid']]['hosts'])){
+					if(!is_null($options['selectHosts']) && !isset($result[$graph['graphid']]['hosts'])){
 						$result[$graph['graphid']]['hosts'] = array();
 					}
 					if(!is_null($options['select_graph_items']) && !isset($result[$graph['graphid']]['gitems'])){
@@ -404,7 +404,7 @@ class CGraphPrototype extends CZBXAPI{
 					}
 
 // hostids
-					if(isset($graph['hostid']) && is_null($options['select_hosts'])){
+					if(isset($graph['hostid']) && is_null($options['selectHosts'])){
 						if(!isset($result[$graph['graphid']]['hosts']))
 							$result[$graph['graphid']]['hosts'] = array();
 
@@ -474,11 +474,11 @@ COpt::memoryPick();
 		}
 
 // Adding Hosts
-		if(!is_null($options['select_hosts'])){
-			if(is_array($options['select_hosts']) || str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectHosts'])){
+			if(is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselects_allowed_outputs)){
 				$obj_params = array(
 					'nodeids' => $nodeids,
-					'output' => $options['select_hosts'],
+					'output' => $options['selectHosts'],
 					'graphids' => $graphids,
 					'nopermissions' => 1,
 					'preservekeys' => 1
@@ -1019,7 +1019,7 @@ COpt::memoryPick();
 				'graphids' => $graphids,
 				'editable' => 1,
 				'output' => API_OUTPUT_EXTEND,
-				'select_hosts' => API_OUTPUT_EXTEND,
+				'selectHosts' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1
 			);
 			$del_graphs = self::get($options);
