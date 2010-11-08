@@ -136,7 +136,7 @@ int	send_history_last_id(zbx_sock_t *sock, const char *data)
 
 	return res;
 error:
-	zabbix_log( LOG_LEVEL_ERR, "NODE %d: Received invalid record from node %d for node %d [%s]",
+	zabbix_log(LOG_LEVEL_ERR, "NODE %d: Received invalid record from node %d for node %d [%s]",
 		CONFIG_NODEID,
 		sender_nodeid,
 		nodeid,
@@ -181,7 +181,9 @@ static int	process_record_event(int sender_nodeid, int nodeid, const ZBX_TABLE *
 	memset(&event, 0, sizeof(event));
 
 	r = record;
-	for (f = 0; table->fields[f].name != 0; f++) {
+
+	for (f = 0; table->fields[f].name != 0; f++)
+	{
 		if (NULL == r)
 			goto error;
 
@@ -196,11 +198,11 @@ static int	process_record_event(int sender_nodeid, int nodeid, const ZBX_TABLE *
 		} else if (0 == strcmp(table->fields[f].name, "objectid")) {
 			ZBX_STR2UINT64(event.objectid, buffer);
 		} else if (0 == strcmp(table->fields[f].name, "clock")) {
-			event.clock=atoi(buffer);
+			event.clock = atoi(buffer);
 		} else if (0 == strcmp(table->fields[f].name, "value")) {
-			event.value=atoi(buffer);
+			event.value = atoi(buffer);
 		} else if (0 == strcmp(table->fields[f].name, "acknowledged")) {
-			event.acknowledged=atoi(buffer);
+			event.acknowledged = atoi(buffer);
 		} else if (0 == strcmp(table->fields[f].name, "ns")) {
 			event.ns = atoi(buffer);
 		}
@@ -208,7 +210,7 @@ static int	process_record_event(int sender_nodeid, int nodeid, const ZBX_TABLE *
 
 	return process_event(&event, 0);
 error:
-	zabbix_log( LOG_LEVEL_ERR, "NODE %d: Received invalid record from node %d for node %d [%s]",
+	zabbix_log(LOG_LEVEL_ERR, "NODE %d: Received invalid record from node %d for node %d [%s]",
 		CONFIG_NODEID,
 		sender_nodeid,
 		nodeid,
@@ -227,7 +229,8 @@ static void	begin_history_sql(char **sql, int *sql_allocated, int *sql_offset, c
 	if (0 != (table->flags & ZBX_HISTORY_SYNC))
 		zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 8, "nodeid,");
 
-	for (f = 0; table->fields[f].name != 0; f++) {
+	for (f = 0; table->fields[f].name != 0; f++)
+	{
 		if (0 != (table->flags & ZBX_HISTORY_SYNC) && 0 == (table->fields[f].flags & ZBX_HISTORY_SYNC))
 			continue;
 
@@ -358,7 +361,7 @@ static int	process_record(char **sql, int *sql_allocated, int *sql_offset, int s
 
 	return res;
 error:
-	zabbix_log( LOG_LEVEL_ERR, "NODE %d: Received invalid record from node %d for node %d [%s]",
+	zabbix_log(LOG_LEVEL_ERR, "NODE %d: Received invalid record from node %d for node %d [%s]",
 		CONFIG_NODEID,
 		sender_nodeid,
 		nodeid,
@@ -405,7 +408,8 @@ static int	process_items(char **sql, int *sql_allocated, int *sql_offset, int se
 
 	zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 40, "update items set prevvalue=lastvalue");
 
-	for (r = record, f = 0; table->fields[f].name != 0; f++) {
+	for (r = record, f = 0; table->fields[f].name != 0; f++)
+	{
 		if (0 != (table->flags & ZBX_HISTORY_SYNC) && 0 == (table->fields[f].flags & ZBX_HISTORY_SYNC))
 			continue;
 
@@ -459,7 +463,7 @@ static int	process_items(char **sql, int *sql_allocated, int *sql_offset, int se
 	if (value_type == ZBX_TYPE_FLOAT)
 		DBadd_trend(itemid, value_double, clock);
 	else if (value_type == ZBX_TYPE_UINT)
-		DBadd_trend_uint(itemid, value_double, clock);
+		DBadd_trend_uint(itemid, value_uint64, clock);
 
 	zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 40, " where itemid=" ZBX_FS_UI64 ";\n",
 			itemid);
@@ -478,7 +482,7 @@ static int	process_items(char **sql, int *sql_allocated, int *sql_offset, int se
 
 	return res;
 error:
-	zabbix_log( LOG_LEVEL_ERR, "NODE %d: Received invalid record from node %d for node %d [%s]",
+	zabbix_log(LOG_LEVEL_ERR, "NODE %d: Received invalid record from node %d for node %d [%s]",
 		CONFIG_NODEID,
 		sender_nodeid,
 		nodeid,
@@ -534,11 +538,13 @@ int	node_history(char *data, size_t datalen)
 
 	DBbegin();
 
-	for (r = data; *r != '\0' && res == SUCCEED;) {
+	for (r = data; *r != '\0' && res == SUCCEED;)
+	{
 		if (NULL != (newline = strchr(r, '\n')))
 			*newline = '\0';
 
-		if (1 == firstline) {
+		if (1 == firstline)
+		{
 			zbx_get_next_field(&r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER); /* constant 'History' */
 			zbx_get_next_field(&r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER); /* sender_nodeid */
 			sender_nodeid=atoi(buffer);
@@ -565,9 +571,11 @@ int	node_history(char *data, size_t datalen)
 			if (NULL != table && 0 == (table->flags & (ZBX_HISTORY | ZBX_HISTORY_SYNC)))
 				table = NULL;
 
-			if (NULL != table && 0 != (table->flags & ZBX_HISTORY_SYNC)) {
+			if (NULL != table && 0 != (table->flags & ZBX_HISTORY_SYNC))
+			{
 				table_sync = table;
-				if (NULL != (pos = strstr(buffer, "_sync"))) {
+				if (NULL != (pos = strstr(buffer, "_sync")))
+				{
 					*pos = '\0';
 					table = DBget_table(buffer);
 				}
@@ -579,13 +587,15 @@ int	node_history(char *data, size_t datalen)
 			if (NULL != table && 0 == strncmp(table->table, "history", 7))
 				history = 1;
 
-			if (NULL == table) {
+			if (NULL == table)
+			{
 				zabbix_log(LOG_LEVEL_ERR, "NODE %d: Invalid received data: unknown tablename \"%s\"",
 					CONFIG_NODEID,
 					buffer);
 				res = FAIL;
 			}
-			if (NULL != newline) {
+			if (NULL != newline)
+			{
 				zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Received %s from node %d for node %d datalen %d",
 					CONFIG_NODEID,
 					buffer,
@@ -597,10 +607,15 @@ int	node_history(char *data, size_t datalen)
 			sql1_offset = 0;
 			sql2_offset = 0;
 			sql3_offset = 0;
-		} else if (NULL != table) {
-			if (events) {
+		}
+		else if (NULL != table)
+		{
+			if (events)
+			{
 				res = process_record_event(sender_nodeid, nodeid, table, r);
-			} else {
+			}
+			else
+			{
 				res = process_record(&sql1, &sql1_allocated, &sql1_offset, sender_nodeid, nodeid, table, r, newline ? 0 : 1);
 				if (SUCCEED == res && 0 != history)
 					res = process_items(&sql2, &sql2_allocated, &sql2_offset, sender_nodeid, nodeid, table, r, newline ? 0 : 1);
@@ -609,13 +624,16 @@ int	node_history(char *data, size_t datalen)
 			}
 		}
 
-		if (newline != NULL) {
+		if (newline != NULL)
+		{
 			*newline = '\n';
 			r = newline + 1;
-		} else
+		}
+		else
 			break;
 	}
-	if (res == SUCCEED)
+
+	if (SUCCEED == res)
 		DBcommit();
 	else
 		DBrollback();
