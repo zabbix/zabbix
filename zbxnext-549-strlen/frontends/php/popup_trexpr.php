@@ -62,17 +62,6 @@
 			     )
 	);
 	
-	$param1_sec_count_no_seconds = array(
-		array(
-			'C' => S_LAST_OF.' (T)',	/* caption */
-			'T' => T_ZBX_INT,	/* type */
-			'M' => PARAM_TYPE_COUNTS,		/* metrcis */
-			 ),
-		array(
-			'C' => S_TIME_SHIFT.' ',	/* caption */
-			'T' => T_ZBX_INT,	/* type */
-		));
-			
 	$param1_sec = array(
 			array(
 				'C' => S_LAST_OF.' (T)',	/* caption */
@@ -168,6 +157,7 @@
 		'last'	=> array(
 			'description'	=> 'Last value {OP} N',
 			'operators'	=> $operators,
+			'params'	=> $param1_sec_count,
 			'allowed_types' => $allowed_types_any
 			),
 		'max'		=> array(
@@ -196,7 +186,7 @@
 		'strlen'		=> array(
 			'description'	=> 'Find if string T length {OP} N',
 			'operators'     => $operators,
-			'params'	=> $param1_sec_count_no_seconds,
+			'params'	=> $param1_sec_count,
 			'allowed_types' => $allowed_types_str
 			),
 		'sum'		=> array(
@@ -327,6 +317,7 @@
 		);
 		$item_data = CItem::get($options);
 		$item_data = reset($item_data);
+		$item_key = $item_data['key_'];
 
 		$item_host = reset($item_data['hosts']);
 		$item_host = $item_host['host'];
@@ -334,7 +325,7 @@
 		$description = $item_host.':'.item_description($item_data);
 	}
 	else{
-		$description = '';
+		$item_key = $item_host = $description = '';
 	}
 
 	$expr_type	= get_request('expr_type', 'last[=]');
@@ -415,7 +406,7 @@ function InsertText(obj, value){
 	if(isset($_REQUEST['insert'])){
 		$expression = sprintf('{%s:%s.%s(%s%s)}%s%s',
 			$item_host,
-			$item_data['key_'],
+			$item_key,
 			$function,
 			$paramtype == PARAM_TYPE_COUNTS ? '#' : '',
 			rtrim(implode(',', $param),','),
