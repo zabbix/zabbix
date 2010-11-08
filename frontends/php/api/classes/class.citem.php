@@ -935,7 +935,7 @@ COpt::memoryPick();
 					'type'			=> array(),
 					'snmp_community'	=> array('template' => 1),
 					'snmp_oid'		=> array(),
-					'snmp_port'		=> array('template' => 1),
+					'port'		=> array('template' => 1),
 					'snmpv3_securityname'	=> array('template' => 1),
 					'snmpv3_securitylevel'	=> array('template' => 1),
 					'snmpv3_authpassphrase'	=> array('template' => 1),
@@ -983,8 +983,7 @@ COpt::memoryPick();
 				else if(preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/u', $item['port'])){
 				}
 				else{
-// TODO: rename SNMP_PORT to PORT
-					error(S_INVALID_SNMP_PORT);
+					error(S_INVALID_PORT);
 					return FALSE;
 				}
 			}

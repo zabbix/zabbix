@@ -89,7 +89,7 @@ switch($itemType) {
 													ITEM_TYPE_SNMPV1.','.
 													ITEM_TYPE_SNMPV2C.','.
 													ITEM_TYPE_SNMPV3,'type')),
-		'snmp_port'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	'isset({save})&&isset({type})&&'.IN(
+		'port'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	'isset({save})&&isset({type})&&'.IN(
 													ITEM_TYPE_SNMPV1.','.
 													ITEM_TYPE_SNMPV2C.','.
 													ITEM_TYPE_SNMPV3,'type')),
@@ -209,7 +209,7 @@ switch($itemType) {
 			'type' => get_request('type'),
 			'snmp_community' => get_request('snmp_community'),
 			'snmp_oid' => get_request('snmp_oid'),
-			'snmp_port' => get_request('snmp_port'),
+			'port' => get_request('port'),
 			'snmpv3_securityname' => get_request('snmpv3_securityname'),
 			'snmpv3_securitylevel' => get_request('snmpv3_securitylevel'),
 			'snmpv3_authpassphrase' => get_request('snmpv3_authpassphrase'),
@@ -304,7 +304,7 @@ switch($itemType) {
 		$type = get_request('type', 0);
 		$snmp_community = get_request('snmp_community', 'public');
 		$snmp_oid = get_request('snmp_oid', 'interfaces.ifTable.ifEntry.ifInOctets.1');
-		$snmp_port = get_request('snmp_port', 161);
+		$port = get_request('port', 161);
 		$params = get_request('params', '');
 		$delay_flex = get_request('delay_flex', array());
 		$trapper_hosts = get_request('trapper_hosts', '');
@@ -346,7 +346,7 @@ switch($itemType) {
 			$type = $item_data['type'];
 			$snmp_community = $item_data['snmp_community'];
 			$snmp_oid = $item_data['snmp_oid'];
-			$snmp_port = $item_data['snmp_port'];
+			$port = $item_data['port'];
 			$params = $item_data['params'];
 			$item_filter = $item_data['filter'];
 
@@ -481,13 +481,13 @@ switch($itemType) {
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'row_snmpv3_privpassphrase');
 
 // SNMP port
-		$frmItem->addRow(S_SNMP_PORT, new CNumericBox('snmp_port',$snmp_port,5), null, 'row_snmp_port');
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV1, 'snmp_port');
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV2C, 'snmp_port');
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'snmp_port');
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV1, 'row_snmp_port');
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV2C, 'row_snmp_port');
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'row_snmp_port');
+		$frmItem->addRow(S_PORT, new CNumericBox('port',$port,5), null, 'row_port');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV1, 'port');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV2C, 'port');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'port');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV1, 'row_port');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV2C, 'row_port');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'row_port');
 
 // IPMI sensor
 		$frmItem->addRow(S_IPMI_SENSOR, new CTextBox('ipmi_sensor', $ipmi_sensor, 64, $limited), null, 'row_ipmi_sensor');

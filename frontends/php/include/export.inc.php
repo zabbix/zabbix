@@ -166,7 +166,7 @@ class zbxXML{
 				'trapper_hosts'		=> '',
 				'snmp_community'	=> '',
 				'snmp_oid'			=> '',
-				'snmp_port'			=> '',
+				'port'			=> '',
 				'snmpv3_securityname'	=> '',
 				'snmpv3_securitylevel'	=> '',
 				'snmpv3_authpassphrase'	=> '',

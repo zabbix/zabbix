@@ -156,6 +156,7 @@ class CHostInterface extends CZBXAPI{
 // hostids
 		if(!is_null($options['hostids'])){
 			zbx_value2array($options['hostids']);
+			$sql_parts['select']['hostid'] = 'hi.hostid';
 			$sql_parts['where']['hostid'] = DBcondition('hi.hostid', $options['hostids']);
 
 			if(!$nodeCheck){

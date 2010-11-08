@@ -640,7 +640,7 @@ COpt::memoryPick();
 					'type'			=> array(),
 					'snmp_community'	=> array('template' => 1),
 					'snmp_oid'		=> array(),
-					'snmp_port'		=> array('template' => 1),
+					'port'		=> array('template' => 1),
 					'snmpv3_securityname'	=> array('template' => 1),
 					'snmpv3_securitylevel'	=> array('template' => 1),
 					'snmpv3_authpassphrase'	=> array('template' => 1),
@@ -681,8 +681,7 @@ COpt::memoryPick();
 				if(zbx_ctype_digit($item['port']) && ($item['port']>0) && ($item['port']<65535)){}
 				else if(preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/u', $item['port'])){}
 				else{
-// TODO: rename SNMP_PORT to PORT
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_INVALID_SNMP_PORT);
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_INVALID_PORT);
 				}
 			}
 

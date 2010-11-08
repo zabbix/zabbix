@@ -102,7 +102,7 @@ switch($itemType) {
 													ITEM_TYPE_SNMPV1.','.
 													ITEM_TYPE_SNMPV2C.','.
 													ITEM_TYPE_SNMPV3,'type')),
-		'snmp_port'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	'isset({save})&&isset({type})&&'.IN(
+		'port'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	'isset({save})&&isset({type})&&'.IN(
 													ITEM_TYPE_SNMPV1.','.
 													ITEM_TYPE_SNMPV2C.','.
 													ITEM_TYPE_SNMPV3,'type')),
@@ -254,7 +254,7 @@ switch($itemType) {
 			'snmp_oid'		=> get_request('snmp_oid'),
 			'value_type'	=> get_request('value_type'),
 			'trapper_hosts'	=> get_request('trapper_hosts'),
-			'snmp_port'		=> get_request('snmp_port'),
+			'port'		=> get_request('port'),
 			'units'			=> get_request('units'),
 			'multiplier'	=> get_request('multiplier', 0),
 			'delta'			=> get_request('delta'),

@@ -365,14 +365,6 @@
 			$tbl_header_host->addItem($list);
 		}
 		else{
-			$dns = empty($header_host['dns']) ? '-' : $header_host['dns'];
-			$ip = empty($header_host['ip']) ? '-' : $header_host['ip'];
-			$port = empty($header_host['port']) ? '-' : $header_host['port'];
-			if(1 == $header_host['useip'])
-				$ip = bold($ip);
-			else
-				$dns = bold($dns);
-
 			switch($header_host['status']){
 				case HOST_STATUS_MONITORED:
 					$status = new CSpan(S_MONITORED, 'off');
@@ -392,9 +384,6 @@
 				$available = new CSpan(S_UNKNOWN, 'unknown');
 
 			$list->addItem(array(bold(S_HOST.': '), $description));
-			$list->addItem(array(bold(S_DNS.': '), $dns));
-			$list->addItem(array(bold(S_IP.': '), $ip));
-			$list->addItem(array(bold(S_PORT.': '), $port));
 			$list->addItem(array(bold(S_STATUS.': '), $status));
 			$list->addItem(array(bold(S_AVAILABILITY.': '), $available));
 
