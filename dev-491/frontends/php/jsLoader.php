@@ -40,7 +40,8 @@ $availableJScripts = array(
 	'class.pmaster.js' => '',
 	'class.cviewswitcher.js' => '',
 // templates
-	'sysmap.tpl.js' => 'templates/'
+	'sysmap.tpl.js' => 'templates/',
+	'hosts.tpl.js' => 'templates/'
 );
 
 $tranStrings = array(
@@ -51,7 +52,8 @@ $tranStrings = array(
 		'S_EDIT_SERVICE', 'S_DELETE_SERVICE', 'S_DELETE_SELECTED_SERVICES_Q', 'S_CREATE_LOG_TRIGGER', 'S_DELETE',
 		'S_DELETE_KEYWORD_Q', 'S_DELETE_EXPRESSION_Q', 'S_SIMPLE_GRAPHS', 'S_HISTORY', 'S_HISTORY_AND_SIMPLE_GRAPHS'
 	),
-	'main.js' => array('S_CLOSE', 'S_NO_ELEMENTS_SELECTED'),
+	'main.js' => array('S_CLOSE', 'S_NO_ELEMENTS_SELECTED',
+	),
 	'class.calendar.js' => array('S_JANUARY', 'S_FEBRUARY', 'S_MARCH', 'S_APRIL', 'S_MAY', 'S_JUNE',
 		'S_JULY', 'S_AUGUST', 'S_SEPTEMBER', 'S_OCTOBER', 'S_NOVEMBER', 'S_DECEMBER', 'S_MONDAY_SHORT_BIG',
 		'S_TUESDAY_SHORT_BIG', 'S_WEDNESDAY_SHORT_BIG', 'S_THURSDAY_SHORT_BIG', 'S_FRIDAY_SHORT_BIG',
@@ -73,6 +75,8 @@ $tranStrings = array(
 	'class.cmessages.js' => array('S_MUTE','S_UNMUTE','S_MESSAGES','S_CLEAR','S_SNOOZE','S_MOVE'
 	),
 	'class.cookie.js' => array('S_MAX_COOKIE_SIZE_REACHED'
+	),
+	'hosts.tpl.js' => array('S_INTERFACES', 'S_REMOVE', 'S_DNS_NAME', 'S_IP_ADDRESS'
 	)
 );
 

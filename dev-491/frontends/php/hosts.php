@@ -39,6 +39,7 @@ else{
 	$page['title'] = 'S_HOSTS';
 	$page['file'] = 'hosts.php';
 	$page['hist_arg'] = array('groupid');
+	$page['scripts'] = array('hosts.tpl.js');
 }
 
 include_once('include/page_header.php');
@@ -57,20 +58,15 @@ include_once('include/page_header.php');
 		'hostid'=>			array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,			'isset({form})&&({form}=="update")'),
 		'host'=>			array(T_ZBX_STR, O_OPT,	null,   NOT_EMPTY,		'isset({save})'),
 		'proxy_hostid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,			'isset({save})'),
-		'dns'=>				array(T_ZBX_STR, O_OPT,	null,	null,			'isset({save})'),
-		'useip'=>			array(T_ZBX_STR, O_OPT, null,	IN('0,1'),		'isset({save})'),
-		'ip'=>				array(T_ZBX_IP,  O_OPT, null,	null,			'isset({save})'),
-		'port'=>			array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,65535),	'isset({save})'),
 		'status'=>			array(T_ZBX_INT, O_OPT,	null,	IN('0,1,3'),		'isset({save})'),
 
-		'newgroup'=>		array(T_ZBX_STR, O_OPT, null,   null,	null),
+		'newgroup'=>		array(T_ZBX_STR, O_OPT, null,   null,		null),
+		'interfaces'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})'),
 		'templates'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	null),
 		'templates_rem'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   null,	null),
 		'clear_templates'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,	null),
 
 		'useipmi'=>			array(T_ZBX_STR, O_OPT,	NULL, NULL,				NULL),
-		'ipmi_ip'=>			array(T_ZBX_STR, O_OPT,	NULL, NULL,				NULL),
-		'ipmi_port'=>		array(T_ZBX_INT, O_OPT,	NULL, BETWEEN(0,65535),	NULL),
 		'ipmi_authtype'=>	array(T_ZBX_INT, O_OPT,	NULL, BETWEEN(-1,6),	NULL),
 		'ipmi_privilege'=>	array(T_ZBX_INT, O_OPT,	NULL, BETWEEN(0,5),		NULL),
 		'ipmi_username'=>	array(T_ZBX_STR, O_OPT,	NULL, NULL,				NULL),
@@ -465,12 +461,14 @@ include_once('include/page_header.php');
 	}
 // SAVE HOST
 	else if(isset($_REQUEST['save'])){
+		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
+			access_deny();
+		
 		try{
+			$interfaces = get_request('interfaces', array());
 			$templates = get_request('templates', array());
 			$templates_clear = get_request('clear_templates', array());
 			$groups = get_request('groups', array());
-
-			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY))) access_deny();
 
 			if(isset($_REQUEST['hostid'])){
 				$create_new = false;
@@ -492,6 +490,14 @@ include_once('include/page_header.php');
 			$templates = array_keys($templates);
 			$templates = zbx_toObject($templates, 'templateid');
 			$templates_clear = zbx_toObject($templates_clear, 'templateid');
+
+			foreach($interfaces as $inum => $interface){
+				if($interface['new'] == 'create')
+					unset($interfaces[$inum]['interfaceid']);
+
+				unset($interfaces[$inum]['new']);
+			}
+
 
 // START SAVE TRANSACTION {{{
 			DBstart();
@@ -529,21 +535,16 @@ include_once('include/page_header.php');
 
 			$host = array(
 				'host' => $_REQUEST['host'],
-				'port' => $_REQUEST['port'],
 				'status' => $_REQUEST['status'],
-				'useip' => $_REQUEST['useip'],
-				'dns' => $_REQUEST['dns'],
-				'ip' => $_REQUEST['ip'],
 				'proxy_hostid' => get_request('proxy_hostid', 0),
 				'useipmi' => isset($_REQUEST['useipmi']) ? 1 : 0,
-				'ipmi_ip' => $_REQUEST['ipmi_ip'],
-				'ipmi_port' => $_REQUEST['ipmi_port'],
 				'ipmi_authtype' => $_REQUEST['ipmi_authtype'],
 				'ipmi_privilege' => $_REQUEST['ipmi_privilege'],
 				'ipmi_username' => $_REQUEST['ipmi_username'],
 				'ipmi_password' => $_REQUEST['ipmi_password'],
 				'groups' => $groups,
 				'templates' => $templates,
+				'interfaces' => $interfaces,
 				'macros' => $macros,
 				'profile' => $profile,
 				'extendedProfile' => (get_request('useprofile_ext', 'no') == 'yes') ? get_request('ext_host_profiles', array()) : array(),
@@ -625,7 +626,6 @@ include_once('include/page_header.php');
 			}
 // }}} FULL CLONE
 
-			CProfile::update('HOST_PORT', $_REQUEST['port'], PROFILE_TYPE_INT);
 // }}} SAVE TRANSACTION
 
 			$result = DBend(true);
@@ -824,12 +824,12 @@ include_once('include/page_header.php');
 			'hostids' => zbx_objectValues($hosts, 'hostid'),
 			'output' => API_OUTPUT_EXTEND,
 			'selectParentTemplates' => array('hostid','host'),
+			'selectInterfaces' => API_OUTPUT_EXTEND,
 			'selectItems' => API_OUTPUT_COUNT,
+			'selectDiscoveries' => API_OUTPUT_COUNT,
 			'select_triggers' => API_OUTPUT_COUNT,
 			'select_graphs' => API_OUTPUT_COUNT,
-			'select_applications' => API_OUTPUT_COUNT,
-			'selectDiscoveries' => API_OUTPUT_COUNT,
-			'nopermissions' => 1,
+			'select_applications' => API_OUTPUT_COUNT
 		);
 		$hosts = CHost::get($options);
 
@@ -846,13 +846,15 @@ include_once('include/page_header.php');
 
 		$options = array(
 			'templateids' => $templateids,
-			'selectParentTemplates' => array('hostid', 'host')
+			'selectParentTemplates' => array('hostid', 'host'),
 		);
 		$templates = CTemplate::get($options);
 		$templates = zbx_toHash($templates, 'templateid');
 //---------
 
 		foreach($hosts as $num => $host){
+			$interface = reset($host['interfaces']);
+
 			$applications = array(new CLink(S_APPLICATIONS, 'applications.php?groupid='.$_REQUEST['groupid'].'&hostid='.$host['hostid']),
 				' ('.$host['applications'].')');
 			$items = array(new CLink(S_ITEMS, 'items.php?filter_set=1&hostid='.$host['hostid']),
@@ -876,9 +878,10 @@ include_once('include/page_header.php');
 
 			$description[] = new CLink($host['host'], 'hosts.php?form=update&hostid='.$host['hostid'].url_param('groupid'));
 
-			$dns = empty($host['dns']) ? '-' : $host['dns'];
-			$ip = empty($host['ip']) ? '-' : $host['ip'];
-			$use = (1 == $host['useip']) ? 'ip' : 'dns';
+			$dns = empty($interface['dns']) ? '-' : $interface['dns'];
+			$ip = empty($interface['ip']) ? '-' : $interface['ip'];
+			$port = empty($interface['port']) ? '-' : $interface['port'];
+			$use = (1 == $interface['useip']) ? 'ip' : 'dns';
 			$$use = bold($$use);
 
 			$status_script = null;
@@ -993,7 +996,7 @@ include_once('include/page_header.php');
 				$discoveries,
 				$dns,
 				$ip,
-				empty($host['port']) ? '-' : $host['port'],
+				$port,
 				new CCol($hostTemplates, 'wraptext'),
 				$status,
 				$av_table

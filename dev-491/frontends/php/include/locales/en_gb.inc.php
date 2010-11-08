@@ -848,6 +848,8 @@
 	'S_DELETE_SELECTED_GROUPS'=>		'Delete selected groups',
 
 //	hosts.php
+	'S_INTERFACES' =>				'Interfaces',
+	'S_HOST_INTERFACES' =>			'Host interfaces',
 	'S_IMPORT_TEMPLATE'=>			'Import Template',
 	'S_IMPORT_HOST'=>				'Import Host',
 	'S_MACROS'=>					'Macros',
