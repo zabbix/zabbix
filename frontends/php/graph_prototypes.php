@@ -90,10 +90,9 @@ include_once('include/page_header.php');
 		$options = array(
 			'itemids' => $_REQUEST['parent_discoveryid'],
 			'output' => API_OUTPUT_EXTEND,
-			'filter' => array('flags' => null),
 			'editable' => 1
 		);
-		$discovery_rule = CItem::get($options);
+		$discovery_rule = CDiscoveryRule::get($options);
 		$discovery_rule = reset($discovery_rule);
 		if(!$discovery_rule) access_deny();
 		$_REQUEST['hostid'] = $discovery_rule['hostid'];
@@ -193,14 +192,14 @@ include_once('include/page_header.php');
 			if(isset($_REQUEST['graphid'])){
 				$graph['graphid'] = $_REQUEST['graphid'];
 
-				$result = CGraph::update($graph);
+				$result = CGraphPrototype::update($graph);
 
 				if($result){
 					add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_GRAPH,'Graph ID ['.$_REQUEST['graphid'].'] Graph ['.$_REQUEST['name'].']');
 				}
 			}
 			else{
-				$result = CGraph::create($graph);
+				$result = CGraphPrototype::create($graph);
 
 				if($result){
 					add_audit(AUDIT_ACTION_ADD, AUDIT_RESOURCE_GRAPH, 'Graph ['.$_REQUEST['name'].']');
@@ -218,7 +217,7 @@ include_once('include/page_header.php');
 		}
 	}
 	else if(isset($_REQUEST['delete']) && isset($_REQUEST['graphid'])){
-		$result = CGraph::delete($_REQUEST['graphid']);
+		$result = CGraphPrototype::delete($_REQUEST['graphid']);
 		if($result){
 			unset($_REQUEST['form']);
 		}
@@ -269,7 +268,7 @@ include_once('include/page_header.php');
 	}
 //------ GO -------
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_graphid'])){
-		$go_result = CGraph::delete($_REQUEST['group_graphid']);
+		$go_result = CGraphPrototype::delete($_REQUEST['group_graphid']);
 		show_messages($go_result, S_GRAPHS_DELETED, S_CANNOT_DELETE_GRAPHS);
 	}
 
@@ -352,12 +351,11 @@ include_once('include/page_header.php');
 			'discoveryids' => $_REQUEST['parent_discoveryid'],
 			'editable' => 1,
 			'output' => API_OUTPUT_EXTEND,
-			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
 //			'sortfield' => $sortfield,
 //			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
 		);
-		$graphs = CGraph::get($options);
+		$graphs = CGraphPrototype::get($options);
 
 		foreach($graphs as $gnum => $graph){
 			$graphs[$gnum]['graphtype'] = graphType($graph['graphtype']);

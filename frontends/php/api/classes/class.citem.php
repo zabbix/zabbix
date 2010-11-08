@@ -1101,7 +1101,6 @@ COpt::memoryPick();
 
 	protected static function createReal(&$items){
 		$itemids = DB::insert('items', $items);
-		if(!$itemids) self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 
 		$itemApplications = array();
 		foreach($items as $key => $item){

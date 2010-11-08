@@ -57,6 +57,7 @@ function __autoload($class_name){
 		'cuser' => 1,
 		'cusergroup' => 1,
 		'cusermacro' => 1,
+		'cwebcheck' => 1,
 		'czbxapi' => 1,
 	);
 

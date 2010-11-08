@@ -73,6 +73,7 @@ frontends/php/api/classes/class.ctrigger.php -text
 frontends/php/api/classes/class.cuser.php -text
 frontends/php/api/classes/class.cusergroup.php -text
 frontends/php/api/classes/class.cusermacro.php -text
+frontends/php/api/classes/class.cwebcheck.php -text
 frontends/php/api/classes/class.czbxapi.php -text
 frontends/php/api/rpc/class.cjsonrpc.php -text
 frontends/php/api/rpc/class.czbxrpc.php -text

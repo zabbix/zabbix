@@ -60,7 +60,9 @@ include_once('include/page_header.php');
 
 
 	if(isset($_REQUEST['save'])){
-		$result = update_trigger_comments($_REQUEST['triggerid'],$_REQUEST['comments']);
+		$result = DBexecute('UPDATE triggers '.
+						' SET comments='.zbx_dbstr($_REQUEST['comments']).
+						' WHERE triggerid='.$_REQUEST['triggerid']);
 		show_messages($result, S_COMMENT_UPDATED, S_CANNOT_UPDATE_COMMENT);
 
 		if($result){

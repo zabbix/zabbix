@@ -1028,6 +1028,7 @@ else {
 		const SCHEMA_FILE = 'schema.inc.php';
 		const DBEXECUTE_ERROR = 1;
 		const RESERVEIDS_ERROR = 2;
+		const SCHEMA_ERROR = 3;
 
 		const FIELD_TYPE_INT = 'int';
 		const FIELD_TYPE_CHAR = 'char';
@@ -1102,7 +1103,8 @@ else {
 				return self::$schema;
 			else if(isset(self::$schema[$table]))
 				return self::$schema[$table];
-			else return false;
+			else
+				self::exception(self::SCHEMA_ERROR, 'Table '. $table .' does not exist.');
 		}
 
 /**
@@ -1230,7 +1232,7 @@ else {
  * @return bool
  */
 		public static function delete($table, $wheres, $use_or=false){
-			if(empty($wheres) || !is_array($wheres)) {
+			if(empty($wheres) || !is_array($wheres)){
 				return true;
 			}
 
@@ -1239,9 +1241,9 @@ else {
 			$sql_wheres = array();
 
 //for every field
-			foreach($wheres as $field=>$values) {
+			foreach($wheres as $field => $values){
 //if this field does not exist, just skip it
-				if (!isset($table_schema['fields'][$field])) {
+				if (!isset($table_schema['fields'][$field])){
 					continue;
 				}
 				$values = zbx_toArray($values);
@@ -1252,22 +1254,18 @@ else {
 			}
 
 //we will not delete everything from a table just like this
-			if (count($sql_wheres) == 0) {
+			if(count($sql_wheres) == 0){
 				return false;
 			}
 
-			$logical_operator = $use_or ? 'OR' : 'AND';
-//this string will be used in sql statement
-			$sql_where_imploded = implode(' '.$logical_operator.' ', $sql_wheres);
-
-			$sql = 'DELETE FROM '.$table.' WHERE '.$sql_where_imploded;
-
+			$sql = 'DELETE FROM '.$table.' WHERE '.implode(($use_or ? ' OR ' : ' AND '), $sql_wheres);
+			
 			if(!DBexecute($sql)) {
 				self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
 			}
 			return true;
 		}
-		
+
 
 		public static function old_delete($table, $where){
 			$where = zbx_toArray($where);

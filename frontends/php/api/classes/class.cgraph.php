@@ -1057,6 +1057,7 @@ COpt::memoryPick();
 				'graphid'=> $graphids
 			));
 
+// TODO: REMOVE info
 			foreach($del_graphs as $graphid => $graph){
 				info(S_GRAPH.' ['.$graph['name'].'] '.S_DELETED_SMALL.'from hosts ['.
 						implode(', ',zbx_objectValues($graph['hosts'], 'host')).']');

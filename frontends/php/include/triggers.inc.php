@@ -484,18 +484,6 @@ return $caption;
 		return DBselect('select * from functions where triggerid='.$triggerid);
 	}
 
-/*
- * Function: get_triggers_by_hostid
- *
- * Description:
- *	 retrieve selection of triggers by hostid
- *
- * Author:
- *	Aly
- *
- * Comments:
- *
- */
 	function get_triggers_by_hostid($hostid){
 		$db_triggers = DBselect('SELECT DISTINCT t.* '.
 								' FROM triggers t, functions f, items i '.
@@ -667,7 +655,7 @@ return $caption;
 		}
 
 	return $params;
-	
+
 	}
 
 /*
@@ -1513,14 +1501,6 @@ return $caption;
 		return $expr;
 	}
 
-	function update_trigger_comments($triggerids,$comments){
-		zbx_value2array($triggerids);
-
-		return	DBexecute('UPDATE triggers '.
-						' SET comments='.zbx_dbstr($comments).
-						' WHERE '.DBcondition('triggerid',$triggerids));
-	}
-
 // Update Trigger status
 	function update_trigger_status($triggerids,$status){
 		zbx_value2array($triggerids);
@@ -1728,100 +1708,6 @@ return $caption;
 		$eventids = CEvent::create($events);
 
 	return $eventids;
-	}
-
-/******************************************************************************
- *																			*
- * Purpose: Delete Trigger definition										 *
- *																			*
- * Comments: !!! Don't forget sync code with C !!!							*
- *																			*
- ******************************************************************************/
-	function delete_trigger($triggerids){
-		zbx_value2array($triggerids);
-
-// first delete child triggers
-		$del_chd_triggers = array();
-		$db_triggers= get_triggers_by_templateid($triggerids);
-		while($db_trigger = DBfetch($db_triggers)){// recursion
-			$del_chd_triggers[$db_trigger['triggerid']] = $db_trigger['triggerid'];
-		}
-
-		if(!empty($del_chd_triggers)){
-			$result = delete_trigger($del_chd_triggers);
-			if(!$result) return  $result;
-		}
-
-		$sql = 'SELECT triggerid FROM trigger_discovery WHERE '.DBcondition('parent_triggerid', $triggerids);
-		$db_triggers = DBselect($sql);
-		while($trigger = DBfetch($db_triggers)){
-			$triggerids[] = $trigger['triggerid'];
-		}
-// get hosts before functions deletion !!!
-		$trig_hosts = array();
-		foreach($triggerids as $id => $triggerid){
-			$trig_hosts[$triggerid] = get_hosts_by_triggerid($triggerid);
-		}
-
-		$result = delete_dependencies_by_triggerid($triggerids);
-		if(!$result)	return	$result;
-
-		DBexecute('DELETE FROM trigger_depends WHERE '.DBcondition('triggerid_up',$triggerids));
-
-		$result = delete_function_by_triggerid($triggerids);
-		if(!$result)	return	$result;
-
-		$result = delete_events_by_triggerid($triggerids);
-		if(!$result)	return	$result;
-
-		$result = delete_services_by_triggerid($triggerids);
-		if(!$result)	return	$result;
-
-		$result = delete_sysmaps_elements_with_triggerid($triggerids);
-		if(!$result)	return	$result;
-
-		DBexecute('DELETE FROM sysmaps_link_triggers WHERE '.DBcondition('triggerid',$triggerids));
-
-// disable actions
-		$actionids = array();
-		$sql = 'SELECT DISTINCT actionid '.
-				' FROM conditions '.
-				' WHERE conditiontype='.CONDITION_TYPE_TRIGGER.
-					' AND '.DBcondition('value',$triggerids,false,true);   // FIXED[POSIBLE value type violation]!!!
-		$db_actions = DBselect($sql);
-		while($db_action = DBfetch($db_actions)){
-			$actionids[$db_action['actionid']] = $db_action['actionid'];
-		}
-
-		DBexecute('UPDATE actions '.
-					' SET status='.ACTION_STATUS_DISABLED.
-					' WHERE '.DBcondition('actionid',$actionids));
-
-// delete action conditions
-		DBexecute('DELETE FROM conditions '.
-					' WHERE conditiontype='.CONDITION_TYPE_TRIGGER.
-						' AND '.DBcondition('value',$triggerids,false,true)); // FIXED[POSIBLE value type violation]!!!
-
-// Get triggers INFO before delete them!
-		$triggers = array();
-		$trig_res = DBselect('SELECT triggerid, description FROM triggers WHERE '.DBcondition('triggerid',$triggerids));
-		while($trig_rows = DBfetch($trig_res)){
-			$triggers[$trig_rows['triggerid']] = $trig_rows;
-		}
-// --
-
-		$result = DBexecute('DELETE FROM triggers WHERE '.DBcondition('triggerid',$triggerids));
-		if($result){
-			foreach($triggers as $triggerid => $trigger){
-				$msg = S_TRIGGER.SPACE.'"'.$trigger['description'].'"'.SPACE.S_DELETED_SMALL;
-				$trig_host = DBfetch($trig_hosts[$triggerid]);
-				if($trig_host){
-					$msg .= SPACE.S_FROM_HOST_SMALL.SPACE.'"'.$trig_host['host'].'"';
-				}
-				info($msg);
-			}
-		}
-	return $result;
 	}
 
 // Update Trigger definition
@@ -2310,11 +2196,6 @@ return $caption;
 	return	DBexecute('DELETE FROM functions WHERE '.DBcondition('triggerid',$triggerids));
 	}
 
-	function delete_events_by_triggerid($triggerids){
-		zbx_value2array($triggerids);
-	return	DBexecute('DELETE FROM events WHERE '.DBcondition('objectid',$triggerids).' AND object='.EVENT_OBJECT_TRIGGER);
-	}
-
 /******************************************************************************
  *																			*
  * Comments: !!! Don't forget sync code with C !!!							*
@@ -2329,27 +2210,10 @@ return $caption;
 			$del_triggers[$row['triggerid']] = $row['triggerid'];
 		}
 		if(!empty($del_triggers)){
-			if(!delete_trigger($del_triggers)) return FALSE;
+			if(!CTrigger::delete($del_triggers)) return FALSE;
 		}
 
 	return TRUE;
-	}
-
-/******************************************************************************
- *																			*
- * Purpose: Delete Service definitions by triggerid						   *
- *																			*
- * Comments: !!! Don't forget sync code with C !!!							*
- *																			*
- ******************************************************************************/
-	function delete_services_by_triggerid($triggerids){
-		zbx_value2array($triggerids);
-
-		$result = DBselect('SELECT serviceid FROM services WHERE '.DBcondition('triggerid',$triggerids));
-		while($row = DBfetch($result)){
-			delete_service($row['serviceid']);
-		}
-	return	TRUE;
 	}
 
 /*
@@ -2368,47 +2232,6 @@ return $caption;
 		$expr1 = preg_replace('/{[0-9]+}/', 'func', $expr1);
 		$expr2 = preg_replace('/{[0-9]+}/', 'func', $expr2);
 		return strcmp($expr1, $expr2);
-	}
-
-	/*
-	 * Function: cmp_triggers
-	 *
-	 * Description:
-	 *	 compare triggers by expression
-	 *
-	 * Author:
-	 *	 Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments: !!! Don't forget sync code with C !!!
-	 *
-	 */
-	function cmp_triggers($triggerid1, $triggerid2){
-// compare EXPRESSION !!!
-		$trig1 = get_trigger_by_triggerid($triggerid1);
-		$trig2 = get_trigger_by_triggerid($triggerid2);
-
-		$trig_fnc1 = get_functions_by_triggerid($triggerid1);
-
-		$expr1 = $trig1['expression'];
-		while($fnc1 = DBfetch($trig_fnc1)){
-			$trig_fnc2 = get_functions_by_triggerid($triggerid2);
-			while($fnc2 = DBfetch($trig_fnc2)){
-				if(strcmp($fnc1['function'],$fnc2['function']))	continue;
-				if($fnc1['parameter'] != $fnc2['parameter'])	continue;
-
-				$item1 = get_item_by_itemid($fnc1['itemid']);
-				$item2 = get_item_by_itemid($fnc2['itemid']);
-
-				if(strcmp($item1['key_'],$item2['key_']))	continue;
-
-				$expr1 = str_replace(
-					'{'.$fnc1['functionid'].'}',
-					'{'.$fnc2['functionid'].'}',
-					$expr1);
-				break;
-			}
-		}
-		return strcmp($expr1,$trig2['expression']);
 	}
 
 /*
@@ -2888,22 +2711,6 @@ return $caption;
 	return $ret;
 	}
 
-/*
- * Function: trigger_depenent
- *
- * Description:
- *	 check iftrigger depends on other triggers having status TRUE
- *
- * Author:
- *	 Alexei Vladishev
- *
- * Comments:
- *
- */
-	function trigger_dependent($triggerid){
-		$level = 0;
-		return trigger_dependent_rec($triggerid, $level);
-	}
 
 /*
  * Function: trigger_get_N_functionid

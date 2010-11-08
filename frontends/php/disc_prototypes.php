@@ -165,10 +165,9 @@ switch($itemType) {
 		$options = array(
 			'itemids' => $_REQUEST['parent_discoveryid'],
 			'output' => API_OUTPUT_EXTEND,
-			'filter' => array('flags' => null),
 			'editable' => 1
 		);
-		$discovery_rule = CItem::get($options);
+		$discovery_rule = CDiscoveryRule::get($options);
 		$discovery_rule = reset($discovery_rule);
 		if(!$discovery_rule) access_deny();
 		$_REQUEST['hostid'] = $discovery_rule['hostid'];
@@ -203,12 +202,8 @@ switch($itemType) {
 		$_REQUEST['delay_flex'] = get_request('delay_flex', array());
 		array_push($_REQUEST['delay_flex'],$_REQUEST['new_delay_flex']);
 	}
-	else if(isset($_REQUEST['delete'])&&isset($_REQUEST['itemid'])){
-		$result = false;
-		if($item = get_item_by_itemid($_REQUEST['itemid'])){
-			$result = CItem::delete($_REQUEST['itemid']);
-		}
-
+	else if(isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])){
+		$result = CItemPrototype::delete($_REQUEST['itemid']);
 		show_messages($result, S_ITEM_DELETED, S_CANNOT_DELETE_ITEM);
 
 		unset($_REQUEST['itemid']);
@@ -316,38 +311,7 @@ switch($itemType) {
 		show_messages($go_result, ($_REQUEST['go'] == 'activate') ? S_ITEMS_ACTIVATED : S_ITEMS_DISABLED, null);
 	}
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_itemid'])){
-		global $USER_DETAILS;
-
-		$go_result = true;
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_WRITE);
-
-		$group_itemid = $_REQUEST['group_itemid'];
-
-		$sql = 'SELECT h.host, i.itemid, i.description, i.key_, i.templateid, i.type'.
-				' FROM items i, hosts h '.
-				' WHERE '.DBcondition('i.itemid',$group_itemid).
-					' AND h.hostid=i.hostid'.
-					' AND '.DBcondition('h.hostid',$available_hosts);
-		$db_items = DBselect($sql);
-		while($item = DBfetch($db_items)) {
-			if($item['templateid'] != ITEM_TYPE_ZABBIX) {
-				unset($group_itemid[$item['itemid']]);
-				error(S_ITEM.SPACE."'".$item['host'].':'.item_description($item)."'".SPACE.S_CANNOT_DELETE_ITEM.SPACE.'('.S_TEMPLATED_ITEM.')');
-				continue;
-			}
-			else if($item['type'] == ITEM_TYPE_HTTPTEST) {
-				unset($group_itemid[$item['itemid']]);
-				error(S_ITEM.SPACE."'".$item['host'].':'.item_description($item)."'".SPACE.S_CANNOT_DELETE_ITEM.SPACE.'('.S_WEB_ITEM.')');
-				continue;
-			}
-
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM,S_ITEM.' ['.$item['key_'].'] ['.$item['itemid'].'] '.S_HOST.' ['.$item['host'].']');
-		}
-
-		$go_result &= !empty($group_itemid);
-		if($go_result) {
-			$go_result = CItem::delete($group_itemid);
-		}
+		$go_result = CItemPrototype::delete($group_itemid);
 		show_messages($go_result, S_ITEMS_DELETED, S_CANNOT_DELETE_ITEMS);
 	}
 
@@ -411,14 +375,13 @@ switch($itemType) {
 		$options = array(
 			'discoveryids' => $_REQUEST['parent_discoveryid'],
 			'output' => API_OUTPUT_EXTEND,
-			'filter' => array('flags' => null),
 			'editable' => 1,
 			'select_applications' => API_OUTPUT_EXTEND,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
 		);
-		$items = CItem::get($options);
+		$items = CItemPrototype::get($options);
 
 		order_result($items, $sortfield, $sortorder);
 		$paging = getPagingLine($items);

@@ -102,6 +102,7 @@ class CHost extends CZBXAPI{
 			'graphids'					=> null,
 			'dhostids'					=> null,
 			'dserviceids'				=> null,
+			'webcheckids'				=> null,
 			'monitored_hosts'			=> null,
 			'templated_hosts'			=> null,
 			'proxy_hosts'				=> null,
@@ -301,6 +302,25 @@ class CHost extends CZBXAPI{
 			if(!$nodeCheck){
 				$nodeCheck = true;
 				$sql_parts['where'][] = DBin_node('f.triggerid', $nodeids);
+			}
+		}
+
+// webcheckids
+		if(!is_null($options['webcheckids'])){
+			zbx_value2array($options['webcheckids']);
+			if($options['output'] != API_OUTPUT_SHORTEN){
+				$sql_parts['select']['webcheckid'] = 'ht.httptestid';
+			}
+
+			$sql_parts['from']['applications'] = 'applications a';
+			$sql_parts['from']['httptest'] = 'httptest ht';
+			$sql_parts['where'][] = DBcondition('ht.httptestid', $options['webcheckids']);
+			$sql_parts['where']['aht'] = 'a.applicationid=ht.applicationid';
+			$sql_parts['where']['ah'] = 'a.hostid=h.hostid';
+
+			if(!$nodeCheck){
+				$nodeCheck = true;
+				$sql_parts['where'][] = DBin_node('ht.httptestid', $nodeids);
 			}
 		}
 
@@ -639,6 +659,15 @@ class CHost extends CZBXAPI{
 						unset($host['graphid']);
 					}
 
+// webcheckids
+					if(isset($host['httptestid'])){
+						if(!isset($result[$host['hostid']]['webchecks']))
+							$result[$host['hostid']]['webchecks'] = array();
+
+						$result[$host['hostid']]['webchecks'][] = array('webcheckid' => $host['httptestid']);
+						unset($host['httptestid']);
+					}
+
 // dhostids
 					if(isset($host['dhostid']) && is_null($options['select_dhosts'])){
 						if(!isset($result[$host['hostid']]['dhosts']))
@@ -771,7 +800,7 @@ Copt::memoryPick();
 				$obj_params['output'] = $options['selectInterfaces'];
 				$interfaces = CHostInterface::get($obj_params);
 
-				if(!is_null($options['limitSelects'])) 
+				if(!is_null($options['limitSelects']))
 					order_result($interfaces, 'interfaceid', ZBX_SORT_UP);
 
 				$count = array();
@@ -2008,7 +2037,7 @@ Copt::memoryPick();
 				$del_httptests[$db_httptest['httptestid']] = $db_httptest['httptestid'];
 			}
 			if(!empty($del_httptests)){
-				delete_httptest($del_httptests);
+				CWebCheck::delete($del_httptests);
 			}
 
 
@@ -2016,7 +2045,7 @@ Copt::memoryPick();
 			DB::delete('screens_items', array(
 					'resourceid'=>$hostids,
 					'resourcetype'=>SCREEN_RESOURCE_HOST_TRIGGERS
-				));
+			));
 
 // delete host from maps
 			delete_sysmaps_elements_with_hostid($hostids);
