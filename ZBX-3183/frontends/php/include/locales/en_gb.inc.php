@@ -1647,6 +1647,7 @@
 	'S_CUSTOM_SCREENS'=>			'Custom screens',
 	'S_SCREENS_BIG'=>				'SCREENS',
 
+
 	'S_SLIDESHOW_UPDATED'=>			'Slideshow updated',
 	'S_CANNOT_UPDATE_SLIDESHOW'=>		'Cannot_update slideshow',
 	'S_SLIDESHOW_ADDED'=>			'Slideshow added',
@@ -1654,6 +1655,10 @@
 	'S_SLIDESHOW_DELETED'=>			'Slideshow deleted',
 	'S_CANNOT_DELETE_SLIDESHOW'=>		'Cannot delete slideshow',
 	'S_DELETE_SLIDESHOW_Q'=>		'Delete slideshow?',
+
+	'S_SCREEN_WITH_NAME'=> 'Screen with name',
+	'S_SCREEN_WITH_ID'=> 'Screen with id',
+	'DOES_NOT_EXIST' => 'does not exist.',
 
 // slides.php
 	'S_CUSTOM_SLIDES' =>			'Custom slides',

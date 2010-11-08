@@ -138,7 +138,7 @@
 		'extendoutput' => 1
 	));
 
-	//wherether we shpold use screen name to fetch a screen (id this is false, elementid is used)
+	//wherether we should use screen name to fetch a screen (id this is false, elementid is used)
 	$use_screen_name = isset($_REQUEST['screenname']);
 
 	//if screen name is provided it takes priority over elementid
@@ -160,17 +160,19 @@
 		$screens_wdgt->addItem(new CTableInfo(S_NO_SCREENS_DEFINED));
 		$screens_wdgt->show();
 	}
+	//if screen we are searching for does not exist
+	elseif(!isset($screens[$elementIdentifier])){
+		$error_msg = $use_screen_name
+					 ? S_SCREEN_WITH_NAME.SPACE.'"'.$elementIdentifier.'"'.SPACE.S_DOES_NOT_EXIST
+					 : S_SCREEN_WITH_ID.SPACE.'"'.$elementIdentifier.'"'.SPACE.S_DOES_NOT_EXIST;
+		$screens_wdgt->addPageHeader(S_SCREENS_BIG, $formHeader);
+		$screens_wdgt->addItem(BR());
+		$screens_wdgt->addItem(new CTableInfo($error_msg));
+		$screens_wdgt->show();
+	}
+	//screen exists, showing it
 	else{
-		//if screen is not found
-		if(!isset($screens[$elementIdentifier])){
-			$screen = reset($screens); //getting the fist one
-			$elementid = $screen['screenid']; //it's id will be used even if we are working with screen name
-			$elementIdentifier = $elementid;
-			$use_screen_name = false;
-		}
-		else {
-			$screen = $screens[$elementIdentifier];
-		}
+		$screen = $screens[$elementIdentifier];
 
 		$effectiveperiod = navigation_bar_calc('web.screens', $screen['screenid'], true);
 
