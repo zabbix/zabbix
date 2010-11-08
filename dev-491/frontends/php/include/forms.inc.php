@@ -2201,7 +2201,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 	}
 
 	function insert_mass_update_item_form($elements_array_name){
-		global $USER_DETAILS;
+		$itemids = get_request('group_itemid',array());
 
 		$frmItem = new CFormTable(S_ITEM,null,'post');
 		$frmItem->setHelp('web.items.item.php');
@@ -2209,12 +2209,13 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 		$frmItem->addVar('massupdate',1);
 
-		$frmItem->addVar('group_itemid',get_request('group_itemid',array()));
+		$frmItem->addVar('group_itemid', $itemids);
 		$frmItem->addVar('config',get_request('config',0));
 
 		$description	= get_request('description'	,'');
 		$key		= get_request('key'		,'');
 		$host		= get_request('host',		null);
+		$interfaceid	= get_request('interfaceid',		null);
 		$delay		= get_request('delay'		,30);
 		$history	= get_request('history'		,90);
 		$status		= get_request('status'		,0);
@@ -2259,10 +2260,9 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			$frmItem->addVar("delay_flex[".$i."][delay]", $val['delay']);
 			$frmItem->addVar("delay_flex[".$i."][period]", $val['period']);
 			$i++;
-			if($i >= 7) break; /* limit count of  intervals
-					    * 7 intervals by 30 symbols = 210 characters
-					    * db storage field is 256
-					    */
+			if($i >= 7) break;
+// limit count of  intervals 7 intervals by 30 symbols = 210 characters
+// db storage field is 256
 		}
 
 		if(count($delay_flex_el)==0)
@@ -2271,6 +2271,25 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			array_push($delay_flex_el, new CButton('del_delay_flex',S_DELETE_SELECTED));
 
 		if(count($applications)==0)  array_push($applications,0);
+
+		$dbHosts = CHost::get(array(
+			'itemids' => $itemids,
+			'selectInterfaces' => API_OUTPUT_EXTEND
+		));
+
+		if(count($dbHosts) == 1){
+			$dbHost = reset($dbHosts);
+
+			$sbIntereaces = new CComboBox('interfaceid');
+			foreach($dbHost['interfaces'] as $ifnum => $interface){
+				$caption = $interface['useip'] ? $interface['ip'] : $interface['dns'];
+				$caption.= ' : '.$interface['port'];
+
+				$sbIntereaces->addItem($interface['interfaceid'], $caption);
+			}
+			$frmItem->addRow(array( new CVisibilityBox('interface_visible', get_request('interface_visible'), 'interfaceid', S_ORIGINAL),
+				S_HOST_INTERFACE), $sbIntereaces);
+		}
 
 		$cmbType = new CComboBox('type',$type);
 		foreach(array(ITEM_TYPE_ZABBIX,ITEM_TYPE_ZABBIX_ACTIVE,ITEM_TYPE_SIMPLE,ITEM_TYPE_SNMPV1,
@@ -3674,8 +3693,6 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 // HOSTS
 	function insert_mass_update_host_form(){//$elements_array_name){
-		global $USER_DETAILS;
-
 		$visible = get_request('visible', array());
 
 		$groups = get_request('groups', array());
@@ -4094,8 +4111,6 @@ JAVASCRIPT;
 
 // Host form
 	function insert_host_form(){
-		global $USER_DETAILS;
-
 		$host_groups = get_request('groups', array());
 		if(isset($_REQUEST['groupid']) && ($_REQUEST['groupid']>0) && empty($host_groups)){
 			array_push($host_groups, $_REQUEST['groupid']);

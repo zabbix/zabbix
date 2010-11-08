@@ -68,6 +68,7 @@ class CItemprototype extends CZBXAPI{
 // OutPut
 			'output'				=> API_OUTPUT_REFER,
 			'selectHosts'			=> null,
+			'select_applications'	=> null,
 			'select_triggers'		=> null,
 			'select_graphs'			=> null,
 			'countOutput'			=> null,
@@ -310,6 +311,9 @@ class CItemprototype extends CZBXAPI{
 					if(!is_null($options['selectHosts']) && !isset($result[$item['itemid']]['hosts'])){
 						$result[$item['itemid']]['hosts'] = array();
 					}
+					if(!is_null($options['select_applications']) && !isset($result[$item['itemid']]['applications'])){
+						$result[$item['itemid']]['applications'] = array();
+					}
 					if(!is_null($options['select_triggers']) && !isset($result[$item['itemid']]['triggers'])){
 						$result[$item['itemid']]['triggers'] = array();
 					}
@@ -437,6 +441,24 @@ COpt::memoryPick();
 			}
 		}
 
+// Adding applications
+		if(!is_null($options['select_applications']) && str_in_array($options['select_applications'], $subselects_allowed_outputs)){
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'output' => $options['select_applications'],
+				'itemids' => $itemids,
+				'preservekeys' => 1
+			);
+			$applications = CApplication::get($obj_params);
+			foreach($applications as $applicationid => $application){
+				$aitems = $application['items'];
+				unset($application['items']);
+				foreach($aitems as $inum => $item){
+					$result[$item['itemid']]['applications'][] = $application;
+				}
+			}
+		}
+		
 // Adding graphs
 		if(!is_null($options['select_graphs'])){
 			$obj_params = array(
