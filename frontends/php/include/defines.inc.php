@@ -210,6 +210,9 @@
 	define('CONDITION_OPERATOR_LESS_EQUAL',	6);
 	define('CONDITION_OPERATOR_NOT_IN',		7);
 
+	define('HOST_USE_DNS',		0);
+	define('HOST_USE_IP',		1);
+
 	define('HOST_STATUS_MONITORED',		0);
 	define('HOST_STATUS_NOT_MONITORED',	1);
 //	define('HOST_STATUS_UNREACHABLE',	2);

@@ -75,6 +75,7 @@ class CHostInterface extends CZBXAPI{
 			'nodeids'					=> null,
 			'groupids'					=> null,
 			'hostids'					=> null,
+			'interfaceids'				=> null,
 			'itemids'					=> null,
 			'triggerids'				=> null,
 			'editable'					=> null,
@@ -475,18 +476,22 @@ Copt::memoryPick();
 				if(!isset($dbInterfaces[$interface['interfaceid']]))
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 
-				if(isset($interface['hostid']))
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION);
+				$dbInterface = $dbInterfaces[$interface['interfaceid']];
+				if(isset($interface['hostid']) && (bccomp($dbInterface['hostid'], $interface['hostid']) !=0))
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Can not switch host for interface');
 			}
 			else{
 				if(!isset($dbHosts[$interface['hostid']]))
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 			}
 
-			if(isset($interface['dns']) && !preg_match('/^'.ZBX_PREG_DNS_FORMAT.'$/i', $interface['dns'])){
+			if(isset($interface['dns']) && !empty($interface['dns']) && !preg_match('/^'.ZBX_PREG_DNS_FORMAT.'$/i', $interface['dns'])){
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect characters used for DNS [ '.$interface['dns'].' ]');
 			}
 
+			if(isset($interface['ip']) && !empty($interface['ip']) && !validate_ip($interface['ip'], $arr)){
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect interface IP [ '.$interface['ip'].' ] provided');
+			}
 		}
 		unset($interface);
 
@@ -545,7 +550,7 @@ Copt::memoryPick();
 
 		try{
 			self::BeginTransaction(__METHOD__);
-
+			
 			self::checkInput($interfaces, __FUNCTION__);
 
 			$data = array();
@@ -602,7 +607,6 @@ Copt::memoryPick();
 
 	public static function massAdd($data){
 		$interfaces = zbx_toArray($data['interfaces']);
-
 		$hosts = zbx_toArray($data['hosts']);
 
 		try{
@@ -652,10 +656,14 @@ Copt::memoryPick();
 
 			self::checkInput($interfaces, __FUNCTION__);
 
-			DB::delete('interface', array(
-				'hostid'=>$hostids,
-				'interfaceid'=>$interfaceids
-			));
+			foreach($interfaces as $inum => $interface){
+				DB::delete('interface', array(
+					'hostid'=>$hostids,
+					'ip'=>$interface['ip'],
+					'dns'=>$interface['dns'],
+					'port'=>$interface['port']
+				));
+			}
 
 			self::EndTransaction(true, __METHOD__);
 			return array('interfaceids' => $interfaceids);

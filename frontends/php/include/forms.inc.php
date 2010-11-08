@@ -4086,16 +4086,10 @@ JAVASCRIPT;
 		$newgroup	= get_request('newgroup','');
 
 		$host 		= get_request('host',	'');
-		$port 		= get_request('port',	CProfile::get('HOST_PORT',10050));
 		$status		= get_request('status',	HOST_STATUS_MONITORED);
-		$useip		= get_request('useip',	1);
-		$dns		= get_request('dns',	'');
-		$ip		= get_request('ip',	'0.0.0.0');
 		$proxy_hostid	= get_request('proxy_hostid','');
 
 		$useipmi	= get_request('useipmi','no');
-		$ipmi_ip	= get_request('ipmi_ip','');
-		$ipmi_port	= get_request('ipmi_port',623);
 		$ipmi_authtype	= get_request('ipmi_authtype',-1);
 		$ipmi_privilege	= get_request('ipmi_privilege',2);
 		$ipmi_username	= get_request('ipmi_username','');
@@ -4121,53 +4115,54 @@ JAVASCRIPT;
 		$ext_host_profiles	= get_request('ext_host_profiles',array());
 // END:   HOSTS PROFILE EXTENDED Section
 
-		$templates		= get_request('templates',array());
-		$clear_templates	= get_request('clear_templates',array());
+		$interfaces = get_request('interfaces',array());
+		$templates = get_request('templates',array());
+		$clear_templates = get_request('clear_templates',array());
 
 		$frm_title = S_HOST;
 		if($_REQUEST['hostid']>0){
-			$db_host = get_host_by_hostid($_REQUEST['hostid']);
-			$frm_title	.= SPACE.' ['.$db_host['host'].']';
+			$dbHosts = CHost::get(array(
+				'hostids' => $_REQUEST['hostid'], 
+				'selectParentTemplates' => API_OUTPUT_EXTEND,
+				'selectInterfaces' => API_OUTPUT_EXTEND,
+				'select_profile' => API_OUTPUT_EXTEND,
+				'output' => API_OUTPUT_EXTEND
+			));
+			$dbHost = reset($dbHosts);
 
-			$original_templates = get_templates_by_hostid($_REQUEST['hostid']);
+			$frm_title	.= SPACE.' ['.$dbHost['host'].']';
+			$original_templates = $dbHost['parentTemplates'];
 		}
 		else{
 			$original_templates = array();
 		}
 
 		if(($_REQUEST['hostid']>0) && !isset($_REQUEST['form_refresh'])){
-			$proxy_hostid		= $db_host['proxy_hostid'];
-			$host			= $db_host['host'];
-			$port			= $db_host['port'];
-			$status			= $db_host['status'];
-			$useip			= $db_host['useip'];
-			$useipmi		= $db_host['useipmi'] ? 'yes' : 'no';
-			$ip			= $db_host['ip'];
-			$dns			= $db_host['dns'];
-			$ipmi_ip		= $db_host['ipmi_ip'];
+			$proxy_hostid	= $dbHost['proxy_hostid'];
+			$host			= $dbHost['host'];
+			$status			= $dbHost['status'];
+			
+			$useipmi		= $dbHost['useipmi'] ? 'yes' : 'no';
+			$ipmi_authtype		= $dbHost['ipmi_authtype'];
+			$ipmi_privilege		= $dbHost['ipmi_privilege'];
+			$ipmi_username		= $dbHost['ipmi_username'];
+			$ipmi_password		= $dbHost['ipmi_password'];
 
-			$ipmi_port		= $db_host['ipmi_port'];
-			$ipmi_authtype		= $db_host['ipmi_authtype'];
-			$ipmi_privilege		= $db_host['ipmi_privilege'];
-			$ipmi_username		= $db_host['ipmi_username'];
-			$ipmi_password		= $db_host['ipmi_password'];
-
+			$interfaces = $dbHost['interfaces'];
 // add groups
 			$options = array('hostids' => $_REQUEST['hostid']);
 			$host_groups = CHostGroup::get($options);
 			$host_groups = zbx_objectValues($host_groups, 'groupid');
 
 // read profile
-			$db_profiles = DBselect('SELECT * FROM hosts_profiles WHERE hostid='.$_REQUEST['hostid']);
-
 			$useprofile = 'no';
-			$db_profile = DBfetch($db_profiles);
-			if($db_profile){
+			$db_profile = $dbHost['profile'];
+			if(!empty($db_profile)){
 				$useprofile = 'yes';
 
 				$devicetype	= $db_profile['devicetype'];
 				$name		= $db_profile['name'];
-				$os		= $db_profile['os'];
+				$os			= $db_profile['os'];
 				$serialno	= $db_profile['serialno'];
 				$tag		= $db_profile['tag'];
 				$macaddress	= $db_profile['macaddress'];
@@ -4179,18 +4174,14 @@ JAVASCRIPT;
 			}
 
 // BEGIN: HOSTS PROFILE EXTENDED Section
-			$useprofile_ext = 'no';
-
-			$db_profiles_alt = DBselect('SELECT * FROM hosts_profiles_ext WHERE hostid='.$_REQUEST['hostid']);
-			if($ext_host_profiles = DBfetch($db_profiles_alt)){
-				$useprofile_ext = 'yes';
-			}
-			else{
-				$ext_host_profiles = array();
-			}
+			$ext_host_profiles = $dbHost['profile_ext'];
+			$useprofile_ext = empty($ext_host_profiles) ? 'no' : 'yes';
 // END:   HOSTS PROFILE EXTENDED Section
 
-			$templates = $original_templates;
+			$templates = array();
+			foreach($original_templates as $tnum => $tpl){
+				$templates[$tpl['templateid']] = $tpl['host'];
+			}
 		}
 
 		$ext_profiles_fields = array(
@@ -4296,21 +4287,9 @@ JAVASCRIPT;
 
 		$host_tbl->addRow(array(S_NEW_GROUP, new CTextBox('newgroup',$newgroup)));
 
-// onchange does not work on some browsers: MacOS, KDE browser
-		$host_tbl->addRow(array(S_DNS_NAME,new CTextBox('dns',$dns,'40')));
-		if(defined('ZBX_HAVE_IPV6')){
-			$host_tbl->addRow(array(S_IP_ADDRESS,new CTextBox('ip',$ip,'39')));
-		}
-		else{
-			$host_tbl->addRow(array(S_IP_ADDRESS,new CTextBox('ip',$ip,'15')));
-		}
-
-		$cmbConnectBy = new CComboBox('useip', $useip);
-		$cmbConnectBy->addItem(0, S_DNS_NAME);
-		$cmbConnectBy->addItem(1, S_IP_ADDRESS);
-		$host_tbl->addRow(array(S_CONNECT_TO,$cmbConnectBy));
-
-		$host_tbl->addRow(array(S_AGENT_PORT,new CNumericBox('port',$port,5)));
+// interfaces
+		$ifTab = get_interfaces_tab($interfaces);
+		$host_tbl->addRow(array(S_INTERFACES, $ifTab));
 
 //Proxy
 		$cmbProxy = new CComboBox('proxy_hostid', $proxy_hostid);
@@ -4336,9 +4315,6 @@ JAVASCRIPT;
 		$host_tbl->addRow(array(S_USEIPMI, new CCheckBox('useipmi', $useipmi, 'submit()')));
 
 		if($useipmi == 'yes'){
-			$host_tbl->addRow(array(S_IPMI_IP_ADDRESS, new CTextBox('ipmi_ip', $ipmi_ip, defined('ZBX_HAVE_IPV6') ? 39 : 15)));
-			$host_tbl->addRow(array(S_IPMI_PORT, new CNumericBox('ipmi_port', $ipmi_port, 5)));
-
 			$cmbIPMIAuthtype = new CComboBox('ipmi_authtype', $ipmi_authtype);
 			$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_DEFAULT,	S_AUTHTYPE_DEFAULT);
 			$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_NONE,		S_AUTHTYPE_NONE);
@@ -4361,8 +4337,6 @@ JAVASCRIPT;
 			$host_tbl->addRow(array(S_IPMI_PASSWORD, new CTextBox('ipmi_password', $ipmi_password, 20)));
 		}
 		else{
-			$frmHost->addVar('ipmi_ip', $ipmi_ip);
-			$frmHost->addVar('ipmi_port', $ipmi_port);
 			$frmHost->addVar('ipmi_authtype', $ipmi_authtype);
 			$frmHost->addVar('ipmi_privilege', $ipmi_privilege);
 			$frmHost->addVar('ipmi_username', $ipmi_username);
@@ -4476,15 +4450,17 @@ JAVASCRIPT;
 
 // TEMPLATES{
 		$template_tbl = new CTableInfo(S_NO_TEMPLATES_LINKED, 'tablestripped');
+		$template_tbl->setCellPadding(0);
+		$template_tbl->setCellSpacing(0);
 		$template_tbl->setOddRowClass('form_odd_row');
 		$template_tbl->setEvenRowClass('form_even_row');
 
 		foreach($templates as $id => $temp_name){
 			$frmHost->addVar('templates['.$id.']', $temp_name);
-			$template_tbl->addRow(new CCol(array(
+			$template_tbl->addRow(array(
 				new CCheckBox('templates_rem['.$id.']', 'no', null, $id),
-				$temp_name))
-			);
+				$temp_name
+			));
 		}
 
 		$footer = new CCol(array(
@@ -4498,7 +4474,7 @@ JAVASCRIPT;
 			SPACE,
 			new CButton('unlink_and_clear', S_UNLINK_AND_CLEAR)
 		));
-		//$footer->setColSpan(2);
+		$footer->setColSpan(2);
 
 		$template_tbl->setFooter($footer);
 
@@ -4982,6 +4958,62 @@ JAVASCRIPT;
 		$tblExpFooter->setFooter($td);
 // end of condition list preparation
 	return $tblExpFooter;
+	}
+
+
+	function get_interfaces_tab($interfaces){
+		if(empty($interfaces)){
+			$interfaces = array(array(
+				'ip' => '127.0.0.1',
+				'dns' => '',
+				'port' => 10050,
+				'useip' => 1
+			));
+		}
+
+		$ifTab = new CTable();
+		$ifTab->addRow(array(S_IP_ADDRESS,S_DNS_NAME,S_PORT,S_CONNECT_TO));
+		$ifTab->setAttribute('id', 'hostInterfaces');
+
+		$jsData = '';
+		foreach($interfaces as $inum => $interface){
+			$jsData.= 'addInterfaceRow('.zbx_jsvalue($interface).');';
+		}
+
+		zbx_add_post_js($jsData);
+		insert_js('
+			function addInterfaceRow(interface){
+				var tpl = new Template(ZBX_TPL.hostInterface);
+
+				if(!isset("new", interface)) interface.new = "update";
+
+				if(!isset("interfaceid", interface)){
+					interface.interfaceid = $("hostInterfaces").select("tr[id^=hostInterface]").length;
+					interface.new = "create";
+				}
+
+
+				$("hostIterfacesFooter").insert({"before" : tpl.evaluate(interface)});
+
+				if(isset("useip", interface)){
+					var useipSelect = $("hostInterfaces").select("select[id^=interfaces_"+interface.interfaceid+"_useip]");
+					if(!empty(useipSelect)) useipSelect[0].selectedIndex = interface.useip;
+				}
+			}
+		');
+
+		$addButton = new CSpan(S_ADD, 'link_menu');
+		$addButton->setAttribute('onclick', 'javascript: addInterfaceRow({})');
+
+		$col = new CCol(array($addButton));
+		$col->setAttribute('colspan', 5);
+
+		$buttonRow = new CRow($col);
+		$buttonRow->setAttribute('id', 'hostIterfacesFooter');
+
+		$ifTab->addRow($buttonRow);
+
+		return $ifTab;
 	}
 
 	function get_macros_widget($hostid = null){
