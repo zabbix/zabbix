@@ -279,7 +279,8 @@ switch($itemType) {
 			$db_item['applications'] = get_applications_by_itemid($_REQUEST['itemid']);
 
 			foreach($item as $field => $value){
-				if($item[$field] == $db_item[$field]) unset($item[$field]);
+				if(isset($db_item[$field]) && ($item[$field] == $db_item[$field]))
+					unset($item[$field]);
 			}
 
 			$item['itemid'] = $_REQUEST['itemid'];
@@ -411,7 +412,6 @@ switch($itemType) {
 				$error = new CDiv(SPACE, 'iconerror');
 				$error->setHint($item['error'], '', 'on');
 			}
-
 
 			$applications = zbx_objectValues($item['applications'], 'name');
 			$applications = implode(', ', $applications);
