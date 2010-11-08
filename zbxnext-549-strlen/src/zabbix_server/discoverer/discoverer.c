@@ -24,6 +24,7 @@
 #include "sysinfo.h"
 #include "zbxicmpping.h"
 #include "discovery.h"
+#include "zbxserver.h"
 
 #include "daemon.h"
 #include "discoverer.h"
@@ -119,7 +120,7 @@ static void proxy_update_host(DB_DRULE *drule, char *ip, int status, int now)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
+static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 {
 	const char	*__function_name = "discover_service";
 	int		ret = SUCCEED;
@@ -134,7 +135,8 @@ static int discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 	init_result(&result);
 	*value = '\0';
 
-	switch (dcheck->type) {
+	switch (dcheck->type)
+	{
 		case SVC_SSH:	service = "ssh"; break;
 		case SVC_LDAP:	service = "ldap"; break;
 		case SVC_SMTP:	service = "smtp"; break;
@@ -155,10 +157,12 @@ static int discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 			break;
 	}
 
-	if (ret == SUCCEED) {
+	if (ret == SUCCEED)
+	{
 		alarm(10);
 
-		switch(dcheck->type) {
+		switch(dcheck->type)
+		{
 			/* Simple checks */
 			case SVC_SSH:
 			case SVC_LDAP:
@@ -198,11 +202,19 @@ static int discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 
 				item.value_type	= ITEM_VALUE_TYPE_STR;
 
-				switch (dcheck->type) {
-				case SVC_SNMPv1:	item.type = ITEM_TYPE_SNMPv1; break;
-				case SVC_SNMPv2c:	item.type = ITEM_TYPE_SNMPv2c; break;
-				case SVC_SNMPv3:	item.type = ITEM_TYPE_SNMPv3; break;
-				default:		item.type = ITEM_TYPE_ZABBIX; break;
+				switch (dcheck->type)
+				{
+					case SVC_SNMPv1:
+						item.type = ITEM_TYPE_SNMPv1;
+						break;
+					case SVC_SNMPv2c:
+						item.type = ITEM_TYPE_SNMPv2c;
+						break;
+					case SVC_SNMPv3:
+						item.type = ITEM_TYPE_SNMPv3;
+						break;
+					default:
+						item.type = ITEM_TYPE_ZABBIX;
 				}
 
 				if (dcheck->type == SVC_AGENT)
@@ -220,17 +232,29 @@ static int discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 				else
 #ifdef HAVE_SNMP
 				{
-					zbx_strlcpy(item.snmp_oid, dcheck->key_, sizeof(item.snmp_oid));
-					zbx_strlcpy(item.snmp_community, dcheck->snmp_community,
-							sizeof(item.snmp_community));
-					zbx_strlcpy(item.snmpv3_securityname, dcheck->snmpv3_securityname,
-							sizeof(item.snmpv3_securityname));
-					item.snmpv3_securitylevel	= dcheck->snmpv3_securitylevel;
-					zbx_strlcpy(item.snmpv3_authpassphrase, dcheck->snmpv3_authpassphrase,
-							sizeof(item.snmpv3_authpassphrase));
-					zbx_strlcpy(item.snmpv3_privpassphrase, dcheck->snmpv3_privpassphrase,
-							sizeof(item.snmpv3_privpassphrase));
-					item.snmp_port			= port;
+					item.snmp_port = port;
+					item.snmp_community = strdup(dcheck->snmp_community);
+					item.snmp_oid = strdup(dcheck->key_);
+
+					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL,
+							&item.snmp_community, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL,
+							&item.snmp_oid, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+
+					if (ITEM_TYPE_SNMPv3 == item.type)
+					{
+						item.snmpv3_securityname = strdup(dcheck->snmpv3_securityname);
+						item.snmpv3_securitylevel = dcheck->snmpv3_securitylevel;
+						item.snmpv3_authpassphrase = strdup(dcheck->snmpv3_authpassphrase);
+						item.snmpv3_privpassphrase = strdup(dcheck->snmpv3_privpassphrase);
+
+						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL,
+								&item.snmpv3_securityname, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL,
+								&item.snmpv3_authpassphrase, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL,
+								&item.snmpv3_privpassphrase, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+					}
 
 					if(SUCCEED == get_value_snmp(&item, &result))
 					{
@@ -241,6 +265,16 @@ static int discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 					}
 					else
 						ret = FAIL;
+
+					zbx_free(item.snmp_community);
+					zbx_free(item.snmp_oid);
+
+					if (ITEM_TYPE_SNMPv3 == item.type)
+					{
+						zbx_free(item.snmpv3_securityname);
+						zbx_free(item.snmpv3_authpassphrase);
+						zbx_free(item.snmpv3_privpassphrase);
+					}
 				}
 #else
 					ret = FAIL;

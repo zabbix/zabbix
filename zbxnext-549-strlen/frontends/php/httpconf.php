@@ -92,7 +92,6 @@ include_once('include/page_header.php');
 			'editable' => 1,
 		),
 		'hosts' => array(
-			'templated_hosts' => 1,
 			'editable' => 1,
 		),
 		'hostid' => get_request('hostid', null),
@@ -339,12 +338,29 @@ include_once('include/page_header.php');
 	$_REQUEST['steps'] = array_merge(get_request('steps',array())); /* reinitialize keys */
 
 
-	$form_button = null;
-	if(!isset($_REQUEST['form']) && ($_REQUEST['hostid'] > 0)){
+	if (!isset($_REQUEST['form'])){
+		//creating button "Create scenario"
 		$form_button = new CForm(null, 'get');
 		$form_button->addVar('hostid', $_REQUEST['hostid']);
-		$form_button->addItem(new CButton('form', S_CREATE_SCENARIO));
+		//if host is selected
+		if(!isset($_REQUEST['form']) && ($_REQUEST['hostid'] > 0)){
+			//allowing to press button
+			$create_scenario_button = new CButton('form', S_CREATE_SCENARIO);
+			$create_scenario_button->setEnabled('yes');
+		}
+		else{
+			//adding additional hint to button
+			$create_scenario_button = new CButton('form', S_CREATE_SCENARIO.' '.S_SELECT_HOST_FIRST);
+			//and disabling it
+			$create_scenario_button->setEnabled('no');
+		}
+		$form_button->addItem($create_scenario_button);
 	}
+	else {
+		$form_button = null;
+	}
+
+	
 
 	$http_wdgt = new CWidget();
 	$http_wdgt->addPageHeader(S_CONFIGURATION_OF_WEB_MONITORING_BIG, $form_button);
@@ -472,7 +488,7 @@ include_once('include/page_header.php');
 		$form->addRow(S_VARIABLES, new CTextArea('macros', $macros, 84, 5));
 
 		$tblSteps = new CTableInfo();
-		$tblSteps->setHeader(array(S_NAME,S_TIMEOUT,S_URL,S_REQUIRED,S_STATUS,S_SORT));
+		$tblSteps->setHeader(array('',S_NAME,S_TIMEOUT,S_URL,S_REQUIRED,S_STATUS,S_SORT));
 		if(count($steps) > 0){
 			$first = min(array_keys($steps));
 			$last = max(array_keys($steps));
@@ -516,7 +532,8 @@ include_once('include/page_header.php');
 			}
 
 			$tblSteps->addRow(array(
-				array(new CCheckBox('sel_step[]',null,null,$stepid), $name),
+				(new CCheckBox('sel_step[]',null,null,$stepid)),
+				$name,
 				$s['timeout'].SPACE.S_SEC_SMALL,
 				$url,
 				$s['required'],
@@ -678,7 +695,7 @@ include_once('include/page_header.php');
 					$chkBox,
 					is_show_all_nodes()?SPACE:NULL,
 					($_REQUEST['hostid']>0) ? null : $db_app['host'],
-					array(str_repeat(SPACE,4), $name),
+					$name,
 					$step_cout,
 					$httptest_data['delay'],
 					$status

@@ -109,7 +109,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, char **res
 		return ret;
 	}
 
-	substitute_simple_macros(NULL, NULL, NULL, &host, NULL, NULL,
+	substitute_simple_macros(NULL, NULL, &host, NULL, NULL,
 			&command, MACRO_TYPE_SCRIPT, NULL, 0);
 
 	zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Executing command: '%s'",

@@ -1,3 +1,17 @@
+Changes for 1.8.4rc3
+
+ - [ZBXNEXT-549] added trigger function strlen() (asaveljevs,Vedmak)
+ - [ZBX-3156] fixed integer trends for child node on master; thanks to Łukasz Reszka (asaveljevs)
+ - [ZBX-3040] guest users now can't edit trigger comments (KB)
+ - [ZBX-3123] fixed Oracle SQL errors in processing of IT services (Sasha)
+ - [ZBXNEXT-205,ZBXNEXT-355] added support of user macros in community, OID, security name and passphrases fields of SNMP items (Sasha,Aly)
+ - [ZBXNEXT-357] added support of user macros in parameters field of database item; thanks to Kirill Fateev (Sasha) 
+ - [ZBX-3179] fixed memory leaks and 100% CPU usage for proxy with SQLite3 (asaveljevs)
+ - [ZBXNEXT-538] include ibm_db2.sql and images_ibm_db2.sql files in distribution package (Sasha)
+ - [ZBX-3107] fixed graph bugs: problem with large values, problem with uptime format (KB)
+ - [ZBX-2349] unicode support for macros and web scenario steps (KB)
+ - [ZBX-3137] fixed errors related to deleting an application that is used in a web scenario (KB)
+
 Changes for 1.8.4rc2
 
  - [ZBXNEXT-538] added support for IBM DB2 (Aly,asaveljevs,Sasha)

@@ -529,24 +529,27 @@ static void	DBclear_parents_from_trigger(zbx_uint64_t serviceid)
 
 	if (0 != serviceid)
 	{
-		DBexecute("UPDATE services as s "
-				" SET s.triggerid = null "
-				" WHERE s.serviceid = " ZBX_FS_UI64, serviceid);
+		DBexecute("update services"
+				" set triggerid=null"
+				" where serviceid=" ZBX_FS_UI64,
+				serviceid);
 	}
 	else
 	{
-		result = DBselect("SELECT s.serviceid "
-					" FROM services as s, services_links as sl "
-					" WHERE s.serviceid = sl.serviceupid "
-					" AND NOT(s.triggerid IS NULL) "
-					" GROUP BY s.serviceid");
+		result = DBselect("select s.serviceid"
+					" from services s,services_links sl"
+					" where s.serviceid = sl.serviceupid"
+						" and s.triggerid is not null"
+					" group by s.serviceid");
+
 		while (NULL != (row = DBfetch(result)))
 		{
 			ZBX_STR2UINT64(serviceid, row[0]);
 
-			DBexecute("UPDATE services as s "
-					" SET s.triggerid = null "
-					" WHERE s.serviceid = " ZBX_FS_UI64, serviceid);
+			DBexecute("update services"
+					" set triggerid=null"
+					" where serviceid=" ZBX_FS_UI64,
+					serviceid);
 		}
 		DBfree_result(result);
 	}
@@ -715,9 +718,10 @@ static void	DBupdate_services_status_all(void)
 
 	clock = time(NULL);
 
-	result = DBselect("SELECT s.serviceid,s.algorithm,s.triggerid "
-			" FROM services AS s "
-			" WHERE s.serviceid NOT IN (SELECT DISTINCT sl.serviceupid FROM services_links AS sl)");
+	result = DBselect(
+			"select serviceid,algorithm,triggerid"
+			" from services"
+			" where serviceid not in (select distinct serviceupid from services_links)");
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -729,18 +733,20 @@ static void	DBupdate_services_status_all(void)
 
 		status = DBget_service_status(serviceid, atoi(row[1]), triggerid);
 
-		DBexecute("UPDATE services SET status=%d WHERE serviceid=" ZBX_FS_UI64,
-			status,
-			serviceid);
+		DBexecute("update services"
+				" set status=%d"
+				" where serviceid=" ZBX_FS_UI64,
+				status, serviceid);
 
 		DBadd_service_alarm(serviceid, status, clock);
 	}
 	DBfree_result(result);
 
-	result = DBselect("SELECT MAX(sl.servicedownid) as serviceid, sl.serviceupid "
-			" FROM services_links AS sl "
-			" WHERE sl.servicedownid NOT IN (select distinct sl.serviceupid from services_links as sl) "
-			" GROUP BY sl.serviceupid");
+	result = DBselect(
+			"select max(servicedownid),serviceupid"
+			" from services_links"
+			" where servicedownid not in (select distinct serviceupid from services_links)"
+			" group by serviceupid");
 
 	while (NULL != (row = DBfetch(result)))
 	{
