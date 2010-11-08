@@ -201,7 +201,7 @@ include_once('include/page_header.php');
 		$options = array(
 			'triggerids'=> $_REQUEST['triggerid'],
 			'editable'=> 1,
-			'select_hosts'=> API_OUTPUT_EXTEND,
+			'selectHosts'=> API_OUTPUT_EXTEND,
 			'output'=> API_OUTPUT_EXTEND,
 		);
 		$triggers = CTrigger::get($options);
@@ -293,7 +293,7 @@ include_once('include/page_header.php');
 			'triggerids' => $_REQUEST['g_triggerid'],
 			'editable' => 1,
 			'output' => API_OUTPUT_EXTEND,
-			'select_hosts' => API_OUTPUT_EXTEND
+			'selectHosts' => API_OUTPUT_EXTEND
 		);
 
 		$triggers = CTrigger::get($options);
@@ -383,7 +383,7 @@ include_once('include/page_header.php');
 		$options = array(
 			'triggerids' => $_REQUEST['g_triggerid'],
 			'editable'=>1,
-			'select_hosts' => API_OUTPUT_EXTEND,
+			'selectHosts' => API_OUTPUT_EXTEND,
 			'output'=>API_OUTPUT_EXTEND,
 			'expandDescription' => 1
 		);
@@ -530,7 +530,7 @@ include_once('include/page_header.php');
 		$options = array(
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 			'output' => API_OUTPUT_EXTEND,
-			'select_hosts' => API_OUTPUT_EXTEND,
+			'selectHosts' => API_OUTPUT_EXTEND,
 			'selectItems' => API_OUTPUT_EXTEND,
 			'select_functions' => API_OUTPUT_EXTEND,
 			'select_dependencies' => API_OUTPUT_EXTEND,

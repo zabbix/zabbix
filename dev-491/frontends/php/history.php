@@ -143,7 +143,7 @@ include_once('include/page_header.php');
 		'nodeids' => get_current_nodeid(),
 		'itemids' => $_REQUEST['itemid'],
 		'webitems' => 1,
-		'select_hosts' => array('hostid','host'),
+		'selectHosts' => array('hostid','host'),
 		'output' => API_OUTPUT_EXTEND
 	);
 

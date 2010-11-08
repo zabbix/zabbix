@@ -92,7 +92,7 @@ class CEvent extends CZBXAPI{
 // OutPut
 			'output'				=> API_OUTPUT_REFER,
 			'extendoutput'			=> null,
-			'select_hosts'			=> null,
+			'selectHosts'			=> null,
 			'selectItems'			=> null,
 			'select_triggers'		=> null,
 			'countOutput'			=> null,
@@ -109,8 +109,8 @@ class CEvent extends CZBXAPI{
 		if(!is_null($options['extendoutput'])){
 			$options['output'] = API_OUTPUT_EXTEND;
 
-			if(!is_null($options['select_hosts'])){
-				$options['select_hosts'] = API_OUTPUT_EXTEND;
+			if(!is_null($options['selectHosts'])){
+				$options['selectHosts'] = API_OUTPUT_EXTEND;
 			}
 			if(!is_null($options['select_triggers'])){
 				$options['select_triggers'] = API_OUTPUT_EXTEND;
@@ -314,7 +314,7 @@ class CEvent extends CZBXAPI{
 		}
 
 // select_********
-		if(($options['output'] != API_OUTPUT_EXTEND) && (!is_null($options['select_hosts']) || !is_null($options['select_triggers']) || !is_null($options['selectItems'])))
+		if(($options['output'] != API_OUTPUT_EXTEND) && (!is_null($options['selectHosts']) || !is_null($options['select_triggers']) || !is_null($options['selectItems'])))
 		{
 			$sql_parts['select']['events'][] = 'e.object';
 			$sql_parts['select']['events'][] = 'e.objectid';
@@ -365,7 +365,7 @@ class CEvent extends CZBXAPI{
 
 					if(!isset($result[$event['eventid']])) $result[$event['eventid']]= array();
 
-					if(!is_null($options['select_hosts']) && !isset($result[$event['eventid']]['hosts'])){
+					if(!is_null($options['selectHosts']) && !isset($result[$event['eventid']]['hosts'])){
 						$result[$event['eventid']]['hosts'] = array();
 					}
 
@@ -378,7 +378,7 @@ class CEvent extends CZBXAPI{
 					}
 
 // hostids
-					if(isset($event['hostid']) && is_null($options['select_hosts'])){
+					if(isset($event['hostid']) && is_null($options['selectHosts'])){
 						if(!isset($result[$event['eventid']]['hosts'])) $result[$event['eventid']]['hosts'] = array();
 
 						$result[$event['eventid']]['hosts'][] = array('hostid' => $event['hostid']);
@@ -415,10 +415,10 @@ Copt::memoryPick();
 
 // Adding Objects
 // Adding hosts
-		if(!is_null($options['select_hosts']) && str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectHosts']) && str_in_array($options['selectHosts'], $subselects_allowed_outputs)){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'output' => $options['select_hosts'],
+				'output' => $options['selectHosts'],
 				'triggerids' => $triggerids,
 				'nopermissions' => 1,
 				'preservekeys' => 1

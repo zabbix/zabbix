@@ -465,7 +465,7 @@ require_once('include/js.inc.php');
 // User-defined graph
 			$options = array(
 				'graphids' => $resourceid,
-				'select_hosts' => array('hostid', 'host'),
+				'selectHosts' => array('hostid', 'host'),
 				'output' => API_OUTPUT_EXTEND
 			);
 			$graphs = CGraph::get($options);
@@ -511,7 +511,7 @@ require_once('include/js.inc.php');
 // Simple graph
 			$options = array(
 				'itemids' => $resourceid,
-				'select_hosts' => array('hostid', 'host'),
+				'selectHosts' => array('hostid', 'host'),
 				'output' => API_OUTPUT_EXTEND
 			);
 			$items = CItem::get($options);
@@ -583,7 +583,7 @@ require_once('include/js.inc.php');
 // Plain text
 			$options = array(
 				'itemids' => $resourceid,
-				'select_hosts' => array('hostid', 'host'),
+				'selectHosts' => array('hostid', 'host'),
 				'output' => API_OUTPUT_EXTEND
 			);
 			$items = CItem::get($options);
@@ -1460,7 +1460,7 @@ require_once('include/js.inc.php');
 					 case TIME_TYPE_HOST:
 						$options = array(
 							'itemids' => $resourceid,
-							'select_hosts' => API_OUTPUT_EXTEND,
+							'selectHosts' => API_OUTPUT_EXTEND,
 							'output' => API_OUTPUT_EXTEND
 						);
 

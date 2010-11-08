@@ -265,7 +265,7 @@
 				'source' => EVENT_SOURCE_DISCOVERY,
 				'eventids' => zbx_objectValues($dsc_events,'eventid'),
 				'output' => API_OUTPUT_EXTEND,
-				'select_hosts' => API_OUTPUT_EXTEND,
+				'selectHosts' => API_OUTPUT_EXTEND,
 				'select_triggers' => API_OUTPUT_EXTEND,
 				'selectItems' => API_OUTPUT_EXTEND,
 			);
@@ -405,7 +405,7 @@
 
 			$triggersOptions = array(
 				'triggerids' => zbx_objectValues($events, 'objectid'),
-				'select_hosts' => API_OUTPUT_EXTEND,
+				'selectHosts' => API_OUTPUT_EXTEND,
 				'select_triggers' => API_OUTPUT_EXTEND,
 				'selectItems' => API_OUTPUT_EXTEND,
 				'output' => API_OUTPUT_EXTEND

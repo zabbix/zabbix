@@ -458,7 +458,7 @@ include_once('include/page_header.php');
 		$options = array(
 			'graphids' => $graphids,
 			'output' => API_OUTPUT_EXTEND,
-			'select_hosts' => API_OUTPUT_EXTEND,
+			'selectHosts' => API_OUTPUT_EXTEND,
 			'select_templates' => API_OUTPUT_EXTEND,
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 		);

@@ -67,7 +67,7 @@ class CItemprototype extends CZBXAPI{
 
 // OutPut
 			'output'				=> API_OUTPUT_REFER,
-			'select_hosts'			=> null,
+			'selectHosts'			=> null,
 			'select_triggers'		=> null,
 			'select_graphs'			=> null,
 			'countOutput'			=> null,
@@ -307,7 +307,7 @@ class CItemprototype extends CZBXAPI{
 					if(!isset($result[$item['itemid']]))
 						$result[$item['itemid']]= array();
 
-					if(!is_null($options['select_hosts']) && !isset($result[$item['itemid']]['hosts'])){
+					if(!is_null($options['selectHosts']) && !isset($result[$item['itemid']]['hosts'])){
 						$result[$item['itemid']]['hosts'] = array();
 					}
 					if(!is_null($options['select_triggers']) && !isset($result[$item['itemid']]['triggers'])){
@@ -318,7 +318,7 @@ class CItemprototype extends CZBXAPI{
 					}
 
 // hostids
-					if(isset($item['hostid']) && is_null($options['select_hosts'])){
+					if(isset($item['hostid']) && is_null($options['selectHosts'])){
 						if(!isset($result[$item['itemid']]['hosts'])) $result[$item['itemid']]['hosts'] = array();
 						$result[$item['itemid']]['hosts'][] = array('hostid' => $item['hostid']);
 					}
@@ -361,13 +361,13 @@ COpt::memoryPick();
 
 // Adding Objects
 // Adding hosts
-		if(!is_null($options['select_hosts'])){
-			if(is_array($options['select_hosts']) || str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectHosts'])){
+			if(is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselects_allowed_outputs)){
 				$obj_params = array(
 					'nodeids' => $nodeids,
 					'itemids' => $itemids,
 					'templated_hosts' => 1,
-					'output' => $options['select_hosts'],
+					'output' => $options['selectHosts'],
 					'nopermissions' => 1,
 					'preservekeys' => 1
 				);
@@ -751,7 +751,7 @@ COpt::memoryPick();
 		$itemHosts = self::get(array(
 			'itemids' => $itemids,
 			'output' => array('key_'),
-			'select_hosts' => array('host'),
+			'selectHosts' => array('host'),
 			'nopermissions' => 1
 		));
 		foreach($itemHosts as $item){
@@ -793,7 +793,7 @@ COpt::memoryPick();
 		$itemHosts = self::get(array(
 			'itemids' => $itemids,
 			'output' => array('key_'),
-			'select_hosts' => array('host'),
+			'selectHosts' => array('host'),
 			'nopermissions' => 1,
 		));
 		foreach($itemHosts as $item){

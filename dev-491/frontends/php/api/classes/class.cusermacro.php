@@ -101,7 +101,7 @@ class CUserMacro extends CZBXAPI{
 			'output'					=> API_OUTPUT_REFER,
 			'extendoutput'				=> null,
 			'select_groups'				=> null,
-			'select_hosts'				=> null,
+			'selectHosts'				=> null,
 			'select_templates'			=> null,
 			'countOutput'				=> null,
 			'preservekeys'				=> null,
@@ -120,8 +120,8 @@ class CUserMacro extends CZBXAPI{
 			if(!is_null($options['select_groups'])){
 				$options['select_groups'] = API_OUTPUT_EXTEND;
 			}
-			if(!is_null($options['select_hosts'])){
-				$options['select_hosts'] = API_OUTPUT_EXTEND;
+			if(!is_null($options['selectHosts'])){
+				$options['selectHosts'] = API_OUTPUT_EXTEND;
 			}
 			if(!is_null($options['select_templates'])){
 				$options['select_templates'] = API_OUTPUT_EXTEND;
@@ -170,7 +170,7 @@ class CUserMacro extends CZBXAPI{
 
 			$options['select_groups'] = null;
 			$options['select_templates'] = null;
-			$options['select_hosts'] = null;
+			$options['selectHosts'] = null;
 		}
 
 // globalmacroids
@@ -362,7 +362,7 @@ class CUserMacro extends CZBXAPI{
 							$result[$macro['hostmacroid']]['templates'] = array();
 						}
 // Hosts
-						if($options['select_hosts'] && !isset($result[$macro['hostmacroid']]['hosts'])){
+						if($options['selectHosts'] && !isset($result[$macro['hostmacroid']]['hosts'])){
 							$result[$macro['hostmacroid']]['hosts'] = array();
 						}
 
@@ -446,9 +446,9 @@ class CUserMacro extends CZBXAPI{
 		}
 
 // Adding Hosts
-		if(!is_null($options['select_hosts']) && str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectHosts']) && str_in_array($options['selectHosts'], $subselects_allowed_outputs)){
 			$obj_params = array(
-				'output' => $options['select_hosts'],
+				'output' => $options['selectHosts'],
 				'hostids' => $hostids,
 				'preservekeys' => 1
 			);

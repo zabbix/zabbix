@@ -83,7 +83,7 @@ class CMaintenance extends CZBXAPI{
 			'output'				=> API_OUTPUT_REFER,
 			'extendoutput'			=> null,
 			'select_groups'			=> null,
-			'select_hosts'			=> null,
+			'selectHosts'			=> null,
 			'countOutput'			=> null,
 			'groupCount'			=> null,
 			'preservekeys'			=> null,
@@ -101,8 +101,8 @@ class CMaintenance extends CZBXAPI{
 			if(!is_null($options['select_groups'])){
 				$options['select_groups'] = API_OUTPUT_EXTEND;
 			}
-			if(!is_null($options['select_hosts'])){
-				$options['select_hosts'] = API_OUTPUT_EXTEND;
+			if(!is_null($options['selectHosts'])){
+				$options['selectHosts'] = API_OUTPUT_EXTEND;
 			}
 		}
 // editable + PERMISSION CHECK
@@ -214,7 +214,7 @@ class CMaintenance extends CZBXAPI{
 
 // hostids
 		if(!is_null($options['hostids'])){
-			$options['select_hosts'] = 1;
+			$options['selectHosts'] = 1;
 		}
 
 // maintenanceids
@@ -317,7 +317,7 @@ class CMaintenance extends CZBXAPI{
 					if(!is_null($options['select_groups']) && !isset($result[$maintenance['maintenanceid']]['groups'])){
 						$result[$maintenance['maintenanceid']]['groups'] = array();
 					}
-					if(!is_null($options['select_hosts']) && !isset($result[$maintenance['maintenanceid']]['hosts'])){
+					if(!is_null($options['selectHosts']) && !isset($result[$maintenance['maintenanceid']]['hosts'])){
 						$result[$maintenance['maintenanceid']]['hosts'] = array();
 					}
 // groupids
@@ -330,7 +330,7 @@ class CMaintenance extends CZBXAPI{
 					}
 
 // hostids
-					if(isset($maintenance['hostid']) && is_null($options['select_hosts'])){
+					if(isset($maintenance['hostid']) && is_null($options['selectHosts'])){
 						if(!isset($result[$maintenance['maintenanceid']]['hosts']))
 							$result[$maintenance['maintenanceid']]['hosts'] = array();
 
@@ -370,13 +370,13 @@ Copt::memoryPick();
 		}
 
 
-// select_hosts
-		if(is_array($options['select_hosts']) || str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
+// selectHosts
+		if(is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselects_allowed_outputs)){
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'maintenanceids' => $maintenanceids,
 				'preservekeys' => 1,
-				'output' => $options['select_hosts'],
+				'output' => $options['selectHosts'],
 			);
 			$hosts = CHost::get($obj_params);
 

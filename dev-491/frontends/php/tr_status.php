@@ -349,7 +349,7 @@ include_once('include/page_header.php');
 		'nodeids' => get_current_nodeid(),
 		'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 		'output' => API_OUTPUT_EXTEND,
-		'select_hosts' => array('hostid', 'host', 'maintenance_status', 'maintenance_type', 'maintenanceid'),
+		'selectHosts' => array('hostid', 'host', 'maintenance_status', 'maintenance_type', 'maintenanceid'),
 		'selectItems' => API_OUTPUT_EXTEND,
 		'select_dependencies' => API_OUTPUT_EXTEND
 	);

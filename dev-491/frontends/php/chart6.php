@@ -51,7 +51,7 @@ include_once 'include/page_header.php';
 
 	$options = array(
 		'graphids' => $_REQUEST['graphid'],
-		'select_hosts' => API_OUTPUT_EXTEND,
+		'selectHosts' => API_OUTPUT_EXTEND,
 		'output' => API_OUTPUT_EXTEND
 	);
 	$db_data = CGraph::get($options);

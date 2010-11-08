@@ -82,7 +82,7 @@ class CApplication extends CZBXAPI{
 // OutPut
 			'output'				=> API_OUTPUT_REFER,
 			'expandData'			=> null,
-			'select_hosts'			=> null,
+			'selectHosts'			=> null,
 			'selectItems'			=> null,
 			'countOutput'			=> null,
 			'groupCount'			=> null,
@@ -309,7 +309,7 @@ class CApplication extends CZBXAPI{
 						$result[$application['applicationid']]= array();
 
 
-					if(!is_null($options['select_hosts']) && !isset($result[$application['applicationid']]['hosts'])){
+					if(!is_null($options['selectHosts']) && !isset($result[$application['applicationid']]['hosts'])){
 						$result[$application['applicationid']]['hosts'] = array();
 					}
 
@@ -318,7 +318,7 @@ class CApplication extends CZBXAPI{
 					}
 
 // hostids
-					if(isset($application['hostid']) && is_null($options['select_hosts'])){
+					if(isset($application['hostid']) && is_null($options['selectHosts'])){
 						if(!isset($result[$application['applicationid']]['hosts']))
 							$result[$application['applicationid']]['hosts'] = array();
 
@@ -348,9 +348,9 @@ COpt::memoryPick();
 
 // Adding Objects
 // Adding Hosts
-		if(!is_null($options['select_hosts']) && str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectHosts']) && str_in_array($options['selectHosts'], $subselects_allowed_outputs)){
 			$obj_params = array(
-				'output' => $options['select_hosts'],
+				'output' => $options['selectHosts'],
 				'applicationids' => $applicationids,
 				'nopermissions' => 1,
 				'preservekeys' => 1

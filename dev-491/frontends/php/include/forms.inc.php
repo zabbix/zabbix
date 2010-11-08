@@ -4390,7 +4390,7 @@ JAVASCRIPT;
 				'inherited' => 0,
 				'hostids' => $_REQUEST['hostid'],
 				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CHILD)),
-				'select_hosts' => API_OUTPUT_REFER,
+				'selectHosts' => API_OUTPUT_REFER,
 				'output' => API_OUTPUT_EXTEND,
 			);
 			$host_graphs = CGraph::get($options);
