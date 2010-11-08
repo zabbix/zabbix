@@ -1,5 +1,6 @@
 Changes for 1.9.1
 
+ - [ZBX-3190] fixed sql errors when processing proxy configuration (asaveljevs,Sasha)
  - [DEV-471] fixed sql scripts names consistency (Sasha)
  - [ZBXNEXT-538] include ibm_db2 upgrade patches in distribution package (Sasha)
  - [ZBXNEXT-512] redesign of unknown events (Aly,asaveljevs,Sasha)
@@ -21,6 +22,7 @@ Changes for 1.9.0
 
 Changes for 1.8.4rc3
 
+ - [ZBX-3040] guest users now can't edit trigger comments (KB)
  - [ZBX-3123] fixed Oracle SQL errors in processing of IT services (Sasha)
  - [ZBXNEXT-205,ZBXNEXT-355] added support of user macros in community, OID, security name and passphrases fields of SNMP items (Sasha,Aly)
  - [ZBXNEXT-357] added support of user macros in parameters field of database item; thanks to Kirill Fateev (Sasha) 
