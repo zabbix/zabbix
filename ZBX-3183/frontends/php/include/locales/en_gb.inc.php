@@ -1658,7 +1658,7 @@
 
 	'S_SCREEN_WITH_NAME'=> 'Screen with name',
 	'S_SCREEN_WITH_ID'=> 'Screen with id',
-	'DOES_NOT_EXIST' => 'does not exist.',
+	'S_DOES_NOT_EXIST' => 'does not exist.',
 
 // slides.php
 	'S_CUSTOM_SLIDES' =>			'Custom slides',
