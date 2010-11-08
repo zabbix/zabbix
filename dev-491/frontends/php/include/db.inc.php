@@ -1238,28 +1238,30 @@ else {
 
 			$sql_wheres = array();
 
-			//for every field
+//for every field
 			foreach($wheres as $field=>$values) {
-				//if this field does not exist, just skip it
+//if this field does not exist, just skip it
 				if (!isset($table_schema['fields'][$field])) {
 					continue;
 				}
 				$values = zbx_toArray($values);
-				$is_string = $table_schema['fields'][$field]['type'] == self::FIELD_TYPE_CHAR;
-				$sql_wheres[] = DBcondition($field, $values, false, $is_string);//false = not NOT IN
+				$is_string = ($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_CHAR);
+
+//false = not NOT IN
+				$sql_wheres[] = DBcondition($field, $values, false, $is_string);
 			}
-			sdii($sql_wheres);
-			//we will not delete everything from a table just like this
+
+//we will not delete everything from a table just like this
 			if (count($sql_wheres) == 0) {
 				return false;
 			}
 
 			$logical_operator = $use_or ? 'OR' : 'AND';
-			//this string will be used in sql statement
+//this string will be used in sql statement
 			$sql_where_imploded = implode(' '.$logical_operator.' ', $sql_wheres);
 
 			$sql = 'DELETE FROM '.$table.' WHERE '.$sql_where_imploded;
-			sdii($sql);
+
 			if(!DBexecute($sql)) {
 				self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
 			}

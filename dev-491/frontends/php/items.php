@@ -67,6 +67,7 @@ switch($itemType) {
 		'groupid'=>			array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			null),
 		'hostid'=>			array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,			null),
 		'form_hostid'=>			array(T_ZBX_INT, O_OPT,  null,	DB_ID.NOT_ZERO,		'isset({save})', S_HOST),
+		'interfaceid'=>			array(T_ZBX_INT, O_OPT,  null,	DB_ID,				null, S_INTERFACE),
 
 
 		'add_groupid'=>		array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			'(isset({register})&&({register}=="go"))'),
@@ -128,7 +129,7 @@ switch($itemType) {
 													ITEM_TYPE_SNMPV1.','.
 													ITEM_TYPE_SNMPV2C.','.
 													ITEM_TYPE_SNMPV3,'type')),
-		'snmp_port'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	'isset({save})&&isset({type})&&'.IN(
+		'port'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	'isset({save})&&isset({type})&&'.IN(
 													ITEM_TYPE_SNMPV1.','.
 													ITEM_TYPE_SNMPV2C.','.
 													ITEM_TYPE_SNMPV3,'type')),
@@ -188,7 +189,7 @@ switch($itemType) {
 		'filter_snmp_community'=>array(T_ZBX_STR, O_OPT,  null,  null,	null),
 		'filter_snmpv3_securityname'=>array(T_ZBX_STR, O_OPT,  null,  null,  null),
 		'filter_snmp_oid'=>			array(T_ZBX_STR, O_OPT,  null,  null,	null),
-		'filter_snmp_port'=>		array(T_ZBX_INT, O_OPT,  P_UNSET_EMPTY,  BETWEEN(0,65535),	null),
+		'filter_port'=>				array(T_ZBX_INT, O_OPT,  P_UNSET_EMPTY,  BETWEEN(0,65535),	null),
 		'filter_value_type'=>		array(T_ZBX_INT, O_OPT,  null,  IN('-1,0,1,2,3,4'),null),
 		'filter_data_type'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(-1,ITEM_DATA_TYPE_HEXADECIMAL),null),
 		'filter_delay'=>			array(T_ZBX_INT, O_OPT,  P_UNSET_EMPTY,  BETWEEN(0,86400),null),
@@ -274,7 +275,7 @@ switch($itemType) {
 		$_REQUEST['filter_snmp_community'] = get_request('filter_snmp_community');
 		$_REQUEST['filter_snmpv3_securityname'] = get_request('filter_snmpv3_securityname');
 		$_REQUEST['filter_snmp_oid'] = get_request('filter_snmp_oid');
-		$_REQUEST['filter_snmp_port'] = get_request('filter_snmp_port');
+		$_REQUEST['filter_port'] = get_request('filter_port');
 		$_REQUEST['filter_value_type'] = get_request('filter_value_type', -1);
 		$_REQUEST['filter_data_type'] = get_request('filter_data_type', -1);
 		$_REQUEST['filter_delay'] = get_request('filter_delay');
@@ -294,7 +295,7 @@ switch($itemType) {
 		CProfile::update('web.items.filter_snmp_community', $_REQUEST['filter_snmp_community'], PROFILE_TYPE_STR);
 		CProfile::update('web.items.filter_snmpv3_securityname', $_REQUEST['filter_snmpv3_securityname'], PROFILE_TYPE_STR);
 		CProfile::update('web.items.filter_snmp_oid', $_REQUEST['filter_snmp_oid'], PROFILE_TYPE_STR);
-		CProfile::update('web.items.filter_snmp_port', $_REQUEST['filter_snmp_port'], PROFILE_TYPE_STR);
+		CProfile::update('web.items.filter_port', $_REQUEST['filter_port'], PROFILE_TYPE_STR);
 		CProfile::update('web.items.filter_value_type', $_REQUEST['filter_value_type'], PROFILE_TYPE_INT);
 		CProfile::update('web.items.filter_data_type', $_REQUEST['filter_data_type'], PROFILE_TYPE_INT);
 		CProfile::update('web.items.filter_delay', $_REQUEST['filter_delay'], PROFILE_TYPE_STR);
@@ -315,7 +316,7 @@ switch($itemType) {
 		$_REQUEST['filter_snmp_community'] = CProfile::get('web.items.filter_snmp_community');
 		$_REQUEST['filter_snmpv3_securityname'] = CProfile::get('web.items.filter_snmpv3_securityname');
 		$_REQUEST['filter_snmp_oid'] = CProfile::get('web.items.filter_snmp_oid');
-		$_REQUEST['filter_snmp_port'] = CProfile::get('web.items.filter_snmp_port');
+		$_REQUEST['filter_port'] = CProfile::get('web.items.filter_port');
 		$_REQUEST['filter_value_type'] = CProfile::get('web.items.filter_value_type', -1);
 		$_REQUEST['filter_data_type'] = CProfile::get('web.items.filter_data_type', -1);
 		$_REQUEST['filter_delay'] = CProfile::get('web.items.filter_delay');
@@ -409,6 +410,7 @@ switch($itemType) {
 			'description'	=> get_request('description'),
 			'key_'			=> get_request('key'),
 			'hostid'		=> get_request('form_hostid'),
+			'interfaceid'	=> get_request('interfaceid', 0),
 			'delay'			=> get_request('delay'),
 			'history'		=> get_request('history'),
 			'status'		=> get_request('status'),
@@ -417,7 +419,7 @@ switch($itemType) {
 			'snmp_oid'		=> get_request('snmp_oid'),
 			'value_type'	=> get_request('value_type'),
 			'trapper_hosts'	=> get_request('trapper_hosts'),
-			'snmp_port'		=> get_request('snmp_port'),
+			'port'		=> get_request('port'),
 			'units'			=> get_request('units'),
 			'multiplier'	=> get_request('multiplier', 0),
 			'delta'			=> get_request('delta'),
@@ -513,7 +515,7 @@ switch($itemType) {
 			'snmp_oid'		=> get_request('snmp_oid'),
 			'value_type'	=> get_request('value_type'),
 			'trapper_hosts'	=> get_request('trapper_hosts'),
-			'snmp_port'		=> get_request('snmp_port'),
+			'port'		=> get_request('port'),
 			'units'			=> get_request('units'),
 			'multiplier'	=> get_request('multiplier'),
 			'delta'			=> get_request('delta'),
@@ -561,11 +563,11 @@ switch($itemType) {
 					'history'		=> get_request('history'),
 					'status'		=> get_request('status'),
 					'type'			=> get_request('type'),
-				'snmp_community'	=> get_request('snmp_community'),
+					'snmp_community'	=> get_request('snmp_community'),
 					'snmp_oid'		=> get_request('snmp_oid'),
 					'value_type'	=> get_request('value_type'),
 					'trapper_hosts'	=> get_request('trapper_hosts'),
-					'snmp_port'		=> get_request('snmp_port'),
+					'port'		=> get_request('port'),
 					'units'			=> get_request('units'),
 					'multiplier'	=> get_request('multiplier'),
 					'delta'			=> get_request('delta'),
@@ -863,8 +865,8 @@ switch($itemType) {
 		if(isset($_REQUEST['filter_snmp_oid']) && !zbx_empty($_REQUEST['filter_snmp_oid']))
 			$options['filter']['snmp_oid'] = $_REQUEST['filter_snmp_oid'];
 
-		if(isset($_REQUEST['filter_snmp_port']) && !zbx_empty($_REQUEST['filter_snmp_port']))
-			$options['filter']['snmp_port'] = $_REQUEST['filter_snmp_port'];
+		if(isset($_REQUEST['filter_port']) && !zbx_empty($_REQUEST['filter_port']))
+			$options['filter']['port'] = $_REQUEST['filter_port'];
 
 		if(isset($_REQUEST['filter_value_type']) && !zbx_empty($_REQUEST['filter_value_type']) && $_REQUEST['filter_value_type'] != -1)
 			$options['filter']['value_type'] = $_REQUEST['filter_value_type'];

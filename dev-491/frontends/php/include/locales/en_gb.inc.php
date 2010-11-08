@@ -849,7 +849,9 @@
 
 //	hosts.php
 	'S_INTERFACES' =>				'Interfaces',
+	'S_INTERFACE' =>				'Interface',
 	'S_HOST_INTERFACES' =>			'Host interfaces',
+	'S_HOST_INTERFACE' =>			'Host interface',
 	'S_IMPORT_TEMPLATE'=>			'Import Template',
 	'S_IMPORT_HOST'=>				'Import Host',
 	'S_MACROS'=>					'Macros',
@@ -1158,7 +1160,6 @@
 	'S_ITEM'=>						'Item',
 	'S_SNMP_COMMUNITY'=>					'SNMP community',
 	'S_SNMP_OID'=>						'SNMP OID',
-	'S_SNMP_PORT'=>						'SNMP port',
 	'S_ALLOWED_HOSTS'=>					'Allowed hosts',
 	'S_SNMPV3_SECURITY_NAME'=>				'SNMPv3 security name',
 	'S_SNMPV3_SECURITY_LEVEL'=>				'SNMPv3 security level',
@@ -2195,7 +2196,7 @@
 	'S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION'=>	'Incorrect arguments passed to function',
 	'S_INCORRECT_KEY_FORMAT'=>			'Incorrect key format',
 	'S_ITEM_WILL_NOT_BE_REFRESHED_PLEASE_ENTER_A_CORRECT_UPDATE_INTERVAL'=>	'Item will not be refreshed. Please enter a correct update interval.',
-	'S_INVALID_SNMP_PORT'=>				'Invalid SNMP port',
+	'S_INVALID_PORT'=>				'Invalid port',
 	'S_TYPE_INFORMATION_BUST_LOG_FOR_LOG_KEY'=>	'Type of information must be Log for log key',
 	'S_VALUE_TYPE_MUST_FLOAT_FOR_AGGREGATE_ITEMS'=>	'Value type must be Float for aggregate items',
 	'S_GROUP_FUNCTION'=>				'Group function',

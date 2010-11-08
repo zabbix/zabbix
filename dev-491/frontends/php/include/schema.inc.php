@@ -1884,7 +1884,7 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 128,
-				'default' => 'default.css',
+				'default' => 'css_ob.css',
 			),
 			'authentication_type' => array(
 				'null' => false,

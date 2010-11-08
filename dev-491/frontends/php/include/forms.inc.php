@@ -966,7 +966,7 @@
 		$filter_snmp_community		= $_REQUEST['filter_snmp_community'];
 		$filter_snmpv3_securityname	= $_REQUEST['filter_snmpv3_securityname'];
 		$filter_snmp_oid		= $_REQUEST['filter_snmp_oid'];
-		$filter_snmp_port		= $_REQUEST['filter_snmp_port'];
+		$filter_port			= $_REQUEST['filter_port'];
 		$filter_value_type		= $_REQUEST['filter_value_type'];
 		$filter_data_type		= $_REQUEST['filter_data_type'];
 		$filter_delay			= $_REQUEST['filter_delay'];
@@ -1078,7 +1078,7 @@
 				$snmp_types = array(
 					'filter_snmp_community_label', 'filter_snmp_community',
 					'filter_snmp_oid_label', 'filter_snmp_oid',
-					'filter_snmp_port_label', 'filter_snmp_port'
+					'filter_port_label', 'filter_port'
 				);
 
 				foreach($snmp_types as $vItem){
@@ -1090,7 +1090,7 @@
 				foreach(array(
 					'filter_snmpv3_securityname_label', 'filter_snmpv3_securityname',
 					'filter_snmp_oid_label', 'filter_snmp_oid',
-					'filter_snmp_port_label', 'filter_snmp_port'
+					'filter_port_label', 'filter_port'
 				) as $vItem)
 				zbx_subarray_push($fTypeVisibility, $it, $vItem);
 				unset($vItem);
@@ -1133,10 +1133,10 @@
 
 		$col_table2->addRow(array(array($label241, SPACE), array($field241, SPACE)));
 	//fifth row
-		$label251 = new CSpan(array(bold(S_SNMP_PORT), SPACE.S_LIKE_SMALL.': '));
-		$label251->setAttribute('id', 'filter_snmp_port_label');
+		$label251 = new CSpan(array(bold(S_PORT), SPACE.S_LIKE_SMALL.': '));
+		$label251->setAttribute('id', 'filter_port_label');
 
-		$field251 = new CNumericBox('filter_snmp_port', $filter_snmp_port, 5 ,null, true);
+		$field251 = new CNumericBox('filter_port', $filter_port, 5 ,null, true);
 		$field251->setEnabled('no');
 
 		$col_table2->addRow(array(array($label251, SPACE), array($field251, SPACE)));
@@ -1511,6 +1511,7 @@
 		else
 			$hostid = get_request('form_hostid', 0);
 
+		$interfaceid	= get_request('interfaceid', 0);
 		$description = get_request('description', '');
 		$key = get_request('key', '');
 		$host = get_request('host', null);
@@ -1520,7 +1521,7 @@
 		$type = get_request('type', 0);
 		$snmp_community = get_request('snmp_community', 'public');
 		$snmp_oid = get_request('snmp_oid', 'interfaces.ifTable.ifEntry.ifInOctets.1');
-		$snmp_port = get_request('snmp_port', 161);
+		$port = get_request('port', 161);
 		$value_type = get_request('value_type', ITEM_VALUE_TYPE_UINT64);
 		$data_type = get_request('data_type', ITEM_DATA_TYPE_DECIMAL);
 		$trapper_hosts = get_request('trapper_hosts', '');
@@ -1602,11 +1603,12 @@
 		if((isset($_REQUEST['itemid']) && !isset($_REQUEST['form_refresh'])) || $limited){
 			$description		= $item_data['description'];
 			$key			= $item_data['key_'];
+			$interfaceid	= $item_data['interfaceid'];
 //			$host			= $item_data['host'];
 			$type			= $item_data['type'];
 			$snmp_community		= $item_data['snmp_community'];
 			$snmp_oid		= $item_data['snmp_oid'];
-			$snmp_port		= $item_data['snmp_port'];
+			$port		= $item_data['port'];
 			$value_type		= $item_data['value_type'];
 			$data_type		= $item_data['data_type'];
 			$trapper_hosts		= $item_data['trapper_hosts'];
@@ -1736,6 +1738,22 @@
 					"&dstfld1=host&dstfld2=form_hostid&srctbl=hosts_and_templates&srcfld1=host&srcfld2=hostid',450,450);",
 					'H')
 				));
+
+
+			$interfaces = CHostInterface::get(array(
+				'hostids' => $hostid,
+				'output' => API_OUTPUT_EXTEND
+			));
+			if(!empty($interfaces)){
+				$sbIntereaces = new CComboBox('interfaceid', $interfaceid);
+				foreach($interfaces as $ifnum => $interface){
+					$caption = $interface['useip'] ? $interface['ip'] : $interface['dns'];
+					$caption.= ' : '.$interface['port'];
+
+					$sbIntereaces->addItem($interface['interfaceid'], $caption);
+				}
+				$frmItem->addRow(S_HOST_INTERFACE,$sbIntereaces);
+			}
 		}
 
 		$frmItem->addRow(S_DESCRIPTION, new CTextBox('description',$description,40, $limited));
@@ -1797,15 +1815,15 @@
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'snmpv3_privpassphrase');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'row_snmpv3_privpassphrase');
 
-		$row = new CRow(array(new CCol(S_SNMP_PORT,'form_row_l'), new CCol(new CNumericBox('snmp_port',$snmp_port,5), 'form_row_r')));
-		$row->setAttribute('id', 'row_snmp_port');
+		$row = new CRow(array(new CCol(S_PORT,'form_row_l'), new CCol(new CNumericBox('port',$port,5), 'form_row_r')));
+		$row->setAttribute('id', 'row_port');
 		$frmItem->addRow($row);
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV1, 'snmp_port');
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV2C, 'snmp_port');
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'snmp_port');
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV1, 'row_snmp_port');
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV2C, 'row_snmp_port');
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'row_snmp_port');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV1, 'port');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV2C, 'port');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'port');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV1, 'row_port');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV2C, 'row_port');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'row_port');
 
 
 		$row = new CRow(array(new CCol(S_IPMI_SENSOR,'form_row_l'), new CCol(new CTextBox('ipmi_sensor', $ipmi_sensor, 64, $limited),'form_row_r')));
@@ -2203,7 +2221,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$type		= get_request('type'		,0);
 		$snmp_community	= get_request('snmp_community'	,'public');
 		$snmp_oid	= get_request('snmp_oid'	,'interfaces.ifTable.ifEntry.ifInOctets.1');
-		$snmp_port	= get_request('snmp_port'	,161);
+		$port	= get_request('port'	,161);
 		$value_type	= get_request('value_type'	,ITEM_VALUE_TYPE_UINT64);
 		$data_type	= get_request('data_type'	,ITEM_DATA_TYPE_DECIMAL);
 		$trapper_hosts	= get_request('trapper_hosts'	,'');
@@ -2282,8 +2300,8 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$frmItem->addRow(array( new CVisibilityBox('privpassphras_visible', get_request('privpassphras_visible'), 'snmpv3_privpassphrase',
 			S_ORIGINAL), S_SNMPV3_PRIV_PASSPHRASE), new CTextBox('snmpv3_privpassphrase',$snmpv3_privpassphrase,64));
 
-		$frmItem->addRow(array( new CVisibilityBox('port_visible', get_request('port_visible'), 'snmp_port', S_ORIGINAL), S_SNMP_PORT),
-			new CNumericBox('snmp_port',$snmp_port,5));
+		$frmItem->addRow(array( new CVisibilityBox('port_visible', get_request('port_visible'), 'port', S_ORIGINAL), S_PORT),
+			new CNumericBox('port',$port,5));
 
 		$cmbValType = new CComboBox('value_type',$value_type);
 		$cmbValType->addItem(ITEM_VALUE_TYPE_UINT64,	S_NUMERIC_UNSIGNED);		$cmbValType->addItem(ITEM_VALUE_TYPE_FLOAT,	S_NUMERIC_FLOAT);		$cmbValType->addItem(ITEM_VALUE_TYPE_STR, 	S_CHARACTER);		$cmbValType->addItem(ITEM_VALUE_TYPE_LOG, 	S_LOG);		$cmbValType->addItem(ITEM_VALUE_TYPE_TEXT,	S_TEXT);		$frmItem->addRow(array( new CVisibilityBox('value_type_visible', get_request('value_type_visible'), 'value_type', S_ORIGINAL),			S_TYPE_OF_INFORMATION), $cmbValType);
