@@ -162,15 +162,32 @@ class CMaintenance extends CZBXAPI{
 									' AND rr.groupid=gg.usrgrpid  '.
 									' AND gg.userid='.$userid.
 									' AND rr.permission<'.$permission.')';
+			$sql =
+			'SELECT DISTINCT mm.maintenanceid '.
+			' FROM maintenances mm, maintenances_groups mmg, rights r, users_groups ug '.
+			' WHERE '.
+				' r.groupid = ug.usrgrpid '.
+				' AND ug.userid = '.$userid.
+				' AND r.permission >= '.$permission.' '.
+				' AND mm.maintenanceid = mmg.maintenanceid '.
+				' AND NOT EXISTS ( '.
+					' SELECT rr.id '.
+					' FROM rights rr, users_groups gg, maintenances_groups mmg2 '.
+					' WHERE rr.id = mmg2.groupid '.
+					' AND rr.groupid = gg.usrgrpid '.
+					' AND gg.userid = '.$userid.
+					' AND rr.permission < '.$permission.' '.
+					' AND mm.maintenanceid = mmg2.maintenanceid '.
+				')';
+
 			if(!is_null($options['groupids'])){
 				zbx_value2array($options['groupids']);
 				$sql.=' AND '.DBcondition('mmg.groupid', $options['groupids']);
 			}
-
 			$res = DBselect($sql);
 			while($miantenace = DBfetch($res)){
 				$maintenanceids[] = $miantenace['maintenanceid'];
-			}
+			} 
 
 			$sql = ' SELECT mm.maintenanceid '.
 					' FROM maintenances mm, maintenances_hosts mmh, rights r,users_groups ug, hosts_groups hg '.
@@ -187,6 +204,26 @@ class CMaintenance extends CZBXAPI{
 									' AND rr.groupid=gg.usrgrpid  '.
 									' AND gg.userid='.$userid.
 									' AND rr.permission<'.$permission.')';
+			$sql =
+				'SELECT mm.maintenanceid '.
+				' FROM maintenances mm, maintenances_hosts mmh, rights r, users_groups ug, hosts_groups hg'.
+				' WHERE r.groupid = ug.usrgrpid'.
+				' AND ug.userid = '.$userid.
+				' AND r.permission >= '.$permission.
+				' AND mm.maintenanceid = mmh.maintenanceid'.
+				' AND hg.hostid = mmh.hostid'.
+				' AND r.id = hg.groupid'.
+				' AND NOT EXISTS ('.
+					' SELECT rr.id'.
+					' FROM rights rr, users_groups gg, maintenances_hosts mmh2, hosts_groups hg2'.
+					' WHERE rr.groupid = gg.usrgrpid'.
+					' AND mm.maintenanceid = mmh2.maintenanceid'.
+					' AND hg2.hostid = mmh2.hostid'.
+					' AND rr.id=hg2.groupid'.
+					' AND gg.userid = '.$userid.
+					' AND rr.permission < '.$permission.
+				' )';
+
 			if(!is_null($options['groupids'])){
 				zbx_value2array($options['groupids']);
 				$sql.=' AND '.DBcondition('hg.groupid', $options['groupids']);
