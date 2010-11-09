@@ -170,7 +170,7 @@
 
 		//if elementid is used to fetch an element, saving it in profile
 		if(2 != $_REQUEST['fullscreen'] && !$use_screen_name) {
-			CProfile::update('web.screens.elementid',$screen['id'] , PROFILE_TYPE_ID);
+			CProfile::update('web.screens.elementid',$screen['screenid'] , PROFILE_TYPE_ID);
 		}
 
 		$effectiveperiod = navigation_bar_calc('web.screens', $screen['screenid'], true);
