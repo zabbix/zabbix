@@ -1656,9 +1656,8 @@
 	'S_CANNOT_DELETE_SLIDESHOW'=>		'Cannot delete slideshow',
 	'S_DELETE_SLIDESHOW_Q'=>		'Delete slideshow?',
 
-	'S_SCREEN_WITH_NAME'=> 'Screen with name',
-	'S_SCREEN_WITH_ID'=> 'Screen with id',
-	'S_DOES_NOT_EXIST' => 'does not exist.',
+	'S_ERROR_SCREEN_WITH_NAME_DOES_NOT_EXIST'=> 'Screen with name "%s" does not exist',
+	'S_ERROR_SCREEN_WITH_ID_DOES_NOT_EXIST'=> 'Screen with id "%d" does not exist',
 
 // slides.php
 	'S_CUSTOM_SLIDES' =>			'Custom slides',

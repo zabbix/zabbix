@@ -116,10 +116,6 @@
 <?php
 	$elementid = $_REQUEST['elementid'] = get_request('elementid', CProfile::get('web.screens.elementid', null));
 
-	if(2 != $_REQUEST['fullscreen'])
-		CProfile::update('web.screens.elementid',$_REQUEST['elementid'], PROFILE_TYPE_ID);
-
-
 	$screens_wdgt = new CWidget();
 
 	$scroll_div = new CDiv();
@@ -163,16 +159,19 @@
 	//if screen we are searching for does not exist
 	elseif(!isset($screens[$elementIdentifier])){
 		$error_msg = $use_screen_name
-					 ? S_SCREEN_WITH_NAME.SPACE.'"'.$elementIdentifier.'"'.SPACE.S_DOES_NOT_EXIST
-					 : S_SCREEN_WITH_ID.SPACE.'"'.$elementIdentifier.'"'.SPACE.S_DOES_NOT_EXIST;
-		$screens_wdgt->addPageHeader(S_SCREENS_BIG, $formHeader);
-		$screens_wdgt->addItem(BR());
-		$screens_wdgt->addItem(new CTableInfo($error_msg));
-		$screens_wdgt->show();
+					 ? sprintf(S_ERROR_SCREEN_WITH_NAME_DOES_NOT_EXIST, $elementIdentifier)
+					 : sprintf(S_ERROR_SCREEN_WITH_ID_DOES_NOT_EXIST, $elementIdentifier);
+	
+		show_error_message($error_msg);
 	}
 	//screen exists, showing it
 	else{
 		$screen = $screens[$elementIdentifier];
+
+		//if elementid is used to fetch an element, saving it in profile
+		if(2 != $_REQUEST['fullscreen'] && !$use_screen_name) {
+			CProfile::update('web.screens.elementid',$screen['id'] , PROFILE_TYPE_ID);
+		}
 
 		$effectiveperiod = navigation_bar_calc('web.screens', $screen['screenid'], true);
 
