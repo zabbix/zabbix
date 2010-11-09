@@ -1479,6 +1479,19 @@ return $caption;
 	function update_trigger_comments($triggerids,$comments){
 		zbx_value2array($triggerids);
 
+		$triggers = CTrigger::get(array(
+			'editable' => 1,
+			'trigegrids' => $triggerids,
+			'output' => API_OUTPUT_SHORTEN,
+		));
+		$triggers = zbx_toHash($triggers, 'triggerid');
+		foreach($triggerids as $triggerid){
+			if(!isset($triggers[$triggerid])){
+				return false;
+			}
+		}
+
+
 		return	DBexecute('UPDATE triggers '.
 						' SET comments='.zbx_dbstr($comments).
 						' WHERE '.DBcondition('triggerid',$triggerids));
@@ -4133,6 +4146,7 @@ $triggerExpressionRules['keyFunctionName'] = Array(
 		'prev',
 		'regexp',
 		'str',
+		'strlen',
 		'sum',
 		'time'),
 	'indexItem' => true,
