@@ -1,5 +1,6 @@
 Changes for 1.8.4rc3
 
+ - [ZBX-3195] fixed slow sync of trends data while server shutdown (Sasha)
  - [ZBXNEXT-549] added trigger function strlen() (asaveljevs,Vedmak)
  - [ZBX-3156] fixed integer trends for child node on master; thanks to Łukasz Reszka (asaveljevs)
  - [ZBX-3040] guest users now can't edit trigger comments (KB)

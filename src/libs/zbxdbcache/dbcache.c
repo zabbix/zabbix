@@ -75,11 +75,13 @@ ZBX_DC_IDS
 
 ZBX_DC_IDS		*ids = NULL;
 
-typedef union {
+typedef union
+{
 	double		value_float;
 	zbx_uint64_t	value_uint64;
 	char		*value_str;
-} history_value_t;
+}
+history_value_t;
 
 #define ZBX_DC_HISTORY	struct zbx_dc_history_type
 #define ZBX_DC_TREND	struct zbx_dc_trend_type
@@ -309,12 +311,9 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 	history_value_t	value_min, value_avg, value_max;
 	unsigned char	value_type;
 	zbx_uint64_t	*ids = NULL, itemid;
-	int		ids_alloc, ids_num = 0;
+	int		ids_alloc = ZBX_SYNC_MAX, ids_num = 0, trends_to = *trends_num;
 	ZBX_DC_TREND	*trend = NULL;
 	const char	*table_name;
-#ifdef HAVE_MULTIROW_INSERT
-	int		tmp_offset;
-#endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trends_num:%d",
 			__function_name, *trends_num);
@@ -330,7 +329,6 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 		assert(0 == 1);
 	}
 
-	ids_alloc = *trends_num;
 	ids = zbx_malloc(ids, ids_alloc * sizeof(zbx_uint64_t));
 
 	for (i = 0; i < *trends_num; i++)
@@ -344,6 +342,12 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 			continue;
 
 		uint64_array_add(&ids, &ids_alloc, &ids_num, trend->itemid, 64);
+
+		if (ZBX_SYNC_MAX == ids_num)
+		{
+			trends_to = i + 1;
+			break;
+		}
 	}
 
 	if (0 != ids_num)
@@ -372,7 +376,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 		{
 			itemid = ids[--ids_num];
 
-			for (i = 0; i < *trends_num; i++)
+			for (i = 0; i < trends_to; i++)
 			{
 				trend = &trends[i];
 
@@ -381,8 +385,11 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 					break;
 			}
 
-			if (i == *trends_num)
-				continue;	/* this should never happen */
+			if (i == trends_to)
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
 
 			trend->disable_from = clock;
 
@@ -402,7 +409,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 
 	ids_num = 0;
 
-	for (i = 0; i < *trends_num; i++)
+	for (i = 0; i < trends_to; i++)
 	{
 		trend = &trends[i];
 
@@ -438,7 +445,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 		{
 			ZBX_STR2UINT64(itemid, row[0]);
 
-			for (i = 0; i < *trends_num; i++)
+			for (i = 0; i < trends_to; i++)
 			{
 				trend = &trends[i];
 
@@ -447,8 +454,11 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 					break;
 			}
 
-			if (i == *trends_num)
-				continue;	/* this should never happen */
+			if (i == trends_to)
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
 
 			num = atoi(row[1]);
 
@@ -502,6 +512,8 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 			}
 
 			trend->itemid = 0;
+
+			DBexecute_overflowed_sql(&sql, &sql_allocated, &sql_offset);
 		}
 		DBfree_result(result);
 
@@ -516,18 +528,10 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 	zbx_free(ids);
 
 	sql_offset = 0;
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "begin\n");
-#endif
 
 	if (value_type == ITEM_VALUE_TYPE_FLOAT)
 	{
-#ifdef HAVE_MULTIROW_INSERT
-		tmp_offset = sql_offset;
-		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 96,
-				"insert into trends (itemid,clock,num,value_min,value_avg,value_max) values ");
-#endif
-		for (i = 0; i < *trends_num; i++)
+		for (i = 0; i < trends_to; i++)
 		{
 			trend = &trends[i];
 
@@ -536,6 +540,17 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 
 			if (clock != trend->clock || value_type != trend->value_type)
 				continue;
+
+			if (0 == sql_offset)
+			{
+#ifdef HAVE_ORACLE
+				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 7, "begin\n");
+#endif
+#ifdef HAVE_MULTIROW_INSERT
+				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 96,
+						"insert into trends (itemid,clock,num,value_min,value_avg,value_max) values ");
+#endif
+			}
 
 #ifdef HAVE_MULTIROW_INSERT
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
@@ -558,25 +573,13 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 					trend->value_max.value_float);
 #endif
 			trend->itemid = 0;
+
+			DBexecute_overflowed_sql(&sql, &sql_allocated, &sql_offset);
 		}
-#ifdef HAVE_MULTIROW_INSERT
-		if (sql[sql_offset - 1] == ',')
-		{
-			sql_offset--;
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 4, ";\n");
-		}
-		else
-			sql_offset = tmp_offset;
-#endif
 	}
 	else
 	{
-#ifdef HAVE_MULTIROW_INSERT
-		tmp_offset = sql_offset;
-		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 96,
-				"insert into trends_uint (itemid,clock,num,value_min,value_avg,value_max) values ");
-#endif
-		for (i = 0; i < *trends_num; i++)
+		for (i = 0; i < trends_to; i++)
 		{
 			trend = &trends[i];
 
@@ -585,6 +588,17 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 
 			if (clock != trend->clock || value_type != trend->value_type)
 				continue;
+
+			if (0 == sql_offset)
+			{
+#ifdef HAVE_ORACLE
+				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 7, "begin\n");
+#endif
+#ifdef HAVE_MULTIROW_INSERT
+				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 96,
+						"insert into trends_uint (itemid,clock,num,value_min,value_avg,value_max) values ");
+#endif
+			}
 
 #ifdef HAVE_MULTIROW_INSERT
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
@@ -607,24 +621,22 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 					trend->value_max.value_uint64);
 #endif
 			trend->itemid = 0;
+
+			DBexecute_overflowed_sql(&sql, &sql_allocated, &sql_offset);
 		}
-#ifdef HAVE_MULTIROW_INSERT
-		if (sql[sql_offset - 1] == ',')
-		{
-			sql_offset--;
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 4, ";\n");
-		}
-		else
-			sql_offset = tmp_offset;
-#endif
 	}
 
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "end;\n");
+	if (0 != sql_offset)
+	{
+#ifdef HAVE_MULTIROW_INSERT
+		sql_offset--;
+		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 3, ";\n");
 #endif
-
-	if (sql_offset > 16) /* In ORACLE always present begin..end; */
+#ifdef HAVE_ORACLE
+		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 6, "end;\n");
+#endif
 		DBexecute("%s", sql);
+	}
 
 	/* clean trends */
 	for (i = 0, num = 0; i < *trends_num; i++)
