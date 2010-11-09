@@ -149,19 +149,6 @@ class CMaintenance extends CZBXAPI{
 		else{
 			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
 
-			$sql = ' SELECT mm.maintenanceid '.
-					' FROM maintenances mm, maintenances_groups mmg, rights r,users_groups ug '.
-					' WHERE r.groupid=ug.usrgrpid  '.
-						' AND ug.userid='.$userid.
-						' AND r.permission>='.$permission.
-						' AND mm.maintenanceid=mmg.maintenanceid  '.
-						' AND NOT EXISTS( '.
-								' SELECT rr.id '.
-								' FROM rights rr, users_groups gg  '.
-								' WHERE rr.id=mmg.groupid  '.
-									' AND rr.groupid=gg.usrgrpid  '.
-									' AND gg.userid='.$userid.
-									' AND rr.permission<'.$permission.')';
 			$sql =
 			'SELECT DISTINCT mm.maintenanceid '.
 			' FROM maintenances mm, maintenances_groups mmg, rights r, users_groups ug '.
@@ -189,21 +176,6 @@ class CMaintenance extends CZBXAPI{
 				$maintenanceids[] = $miantenace['maintenanceid'];
 			} 
 
-			$sql = ' SELECT mm.maintenanceid '.
-					' FROM maintenances mm, maintenances_hosts mmh, rights r,users_groups ug, hosts_groups hg '.
-					' WHERE r.groupid=ug.usrgrpid  '.
-						' AND ug.userid='.$userid.
-						' AND r.permission>='.$permission.
-						' AND mm.maintenanceid=mmh.maintenanceid  '.
-						' AND hg.hostid=mmh.hostid '.
-						' AND r.id=hg.groupid  '.
-						' AND NOT EXISTS( '.
-								' SELECT rr.id '.
-								 ' FROM rights rr, users_groups gg  '.
-								 ' WHERE rr.id=hg.groupid  '.
-									' AND rr.groupid=gg.usrgrpid  '.
-									' AND gg.userid='.$userid.
-									' AND rr.permission<'.$permission.')';
 			$sql =
 				'SELECT mm.maintenanceid '.
 				' FROM maintenances mm, maintenances_hosts mmh, rights r, users_groups ug, hosts_groups hg'.
