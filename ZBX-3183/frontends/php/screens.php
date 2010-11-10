@@ -114,7 +114,19 @@
 	}
 ?>
 <?php
-	$elementid = $_REQUEST['elementid'] = get_request('elementid', CProfile::get('web.screens.elementid', null));
+
+	//getiing element id from GET paramters
+	$elementid = $_REQUEST['elementid'] = get_request('elementid', false);
+	//if none is provided
+	if ($elementid === false) {
+		//get element id saved in profile from the last visit
+		$elementid = CProfile::get('web.screens.elementid', null);
+		//this flag will be used in case this element does not exist
+		$id_has_been_fetched_from_profile = true;
+	}
+	else {
+		$id_has_been_fetched_from_profile = false;
+	}
 
 	$screens_wdgt = new CWidget();
 
@@ -157,16 +169,23 @@
 		$screens_wdgt->show();
 	}
 	//if screen we are searching for does not exist
-	elseif(!isset($screens[$elementIdentifier])){
+	elseif(!isset($screens[$elementIdentifier]) && !$id_has_been_fetched_from_profile){
 		$error_msg = $use_screen_name
 					 ? sprintf(S_ERROR_SCREEN_WITH_NAME_DOES_NOT_EXIST, $elementIdentifier)
 					 : sprintf(S_ERROR_SCREEN_WITH_ID_DOES_NOT_EXIST, $elementIdentifier);
-	
+
 		show_error_message($error_msg);
 	}
 	//screen exists, showing it
 	else{
-		$screen = $screens[$elementIdentifier];
+		if (!isset($screens[$elementIdentifier])) {
+			//this means id was fetched from profile and this screen does not exist
+			//in this case we need to show the first one
+			$screen = reset($screens);
+		}
+		else {
+			$screen = $screens[$elementIdentifier];
+		}
 
 		//if elementid is used to fetch an element, saving it in profile
 		if(2 != $_REQUEST['fullscreen'] && !$use_screen_name) {
