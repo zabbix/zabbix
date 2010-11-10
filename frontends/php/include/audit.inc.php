@@ -71,6 +71,8 @@
 		global $USER_DETAILS;
 
 		if(!isset($USER_DETAILS['userid']))	check_authorisation();
+		if($USER_DETAILS['userid'] == 0) return true;
+
 
 		$auditid = get_dbid('auditlog','auditid');
 
