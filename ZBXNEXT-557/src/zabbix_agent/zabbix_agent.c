@@ -18,8 +18,6 @@
 **/
 
 #include "common.h"
-#include "zabbix_agent.h"
-
 #include "comms.h"
 #include "cfg.h"
 #include "log.h"
