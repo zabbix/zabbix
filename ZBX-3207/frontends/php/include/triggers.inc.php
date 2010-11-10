@@ -1333,6 +1333,10 @@ return $caption;
 									'items.php?form=update&itemid='.$function_data['itemid'],
 									$style
 								);
+								
+						if($function_data['type'] == ITEM_TYPE_HTTPTEST){
+							$link = new CSpan($function_data['host'].':'.$function_data['key_'], $style);
+						}
 
 						array_push($exp,array('{',$link,'.',bold($function_data['function'].'('),$function_data['parameter'],bold(')'),'}'));
 					}
