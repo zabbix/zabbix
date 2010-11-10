@@ -40,8 +40,13 @@
 #define	ZBX_TYPE_UINT		5
 #define	ZBX_TYPE_ID		6
 
-#define ZBX_FIELD struct zbx_field_type
-ZBX_FIELD
+#define ZBX_MAX_FIELDS		64
+#define ZBX_TABLENAME_LEN	64
+#define ZBX_TABLENAME_LEN_MAX	ZBX_TABLENAME_LEN + 1
+#define ZBX_FIELDNAME_LEN	64
+#define ZBX_FIELDNAME_LEN_MAX	ZBX_FIELDNAME_LEN + 1
+
+typedef struct
 {
 	const char    	*name;
 	unsigned char	type;
@@ -49,23 +54,18 @@ ZBX_FIELD
 	const char	*fk_table;
 	const char	*fk_field;
 	unsigned char	fk_flags;
-};
+}
+ZBX_FIELD;
 
-#define ZBX_MAX_FIELDS		64
-#define ZBX_TABLENAME_LEN	64
-#define ZBX_TABLENAME_LEN_MAX	ZBX_TABLENAME_LEN + 1
-#define ZBX_FIELDNAME_LEN	64
-#define ZBX_FIELDNAME_LEN_MAX	ZBX_FIELDNAME_LEN + 1
-
-#define ZBX_TABLE struct zbx_table_type
-ZBX_TABLE
+typedef struct
 {
 	const char    	*table;
 	const char	*recid;
 	unsigned char	flags;
 	ZBX_FIELD	fields[ZBX_MAX_FIELDS];
 	const char	*uniq;
-};
+}
+ZBX_TABLE;
 
 extern const ZBX_TABLE	tables[];
 extern const char	*const db_schema;

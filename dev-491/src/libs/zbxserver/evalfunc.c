@@ -64,7 +64,7 @@ static int	get_function_parameter_uint(DB_ITEM *item, const char *parameters, in
 	if (0 != get_param(parameters, Nparam, parameter, FUNCTION_PARAMETER_LEN_MAX))
 		goto clean;
 
-	if (SUCCEED == substitute_simple_macros(NULL, NULL, item, NULL, NULL, NULL, &parameter, MACRO_TYPE_FUNCTION_PARAMETER, NULL, 0))
+	if (SUCCEED == substitute_simple_macros(NULL, item, NULL, NULL, NULL, &parameter, MACRO_TYPE_FUNCTION_PARAMETER, NULL, 0))
 	{
 		if ('#' == *parameter)
 		{
@@ -108,7 +108,7 @@ static int	get_function_parameter_str(DB_ITEM *item, const char *parameters, int
 		goto clean;
 	}
 
-	res = substitute_simple_macros(NULL, NULL, item, NULL, NULL, NULL, value, MACRO_TYPE_FUNCTION_PARAMETER, NULL, 0);
+	res = substitute_simple_macros(NULL, item, NULL, NULL, NULL, value, MACRO_TYPE_FUNCTION_PARAMETER, NULL, 0);
 
 	if (res == SUCCEED)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() value:'%s'", __function_name, *value);
@@ -819,7 +819,7 @@ static int	evaluate_AVG(char *value, DB_ITEM *item, const char *function, const 
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1383,7 +1383,7 @@ static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, con
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
- * Comments: To be used by functions abchange(), change(), and diff().        *
+ * Comments: To be used by functions abschange(), change(), and diff().       *
  *                                                                            *
  ******************************************************************************/
 static int	compare_last_and_prev(const DB_ITEM *item, time_t now)
@@ -1617,7 +1617,7 @@ clean:
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1761,6 +1761,47 @@ static int	evaluate_STR(char *value, DB_ITEM *item, const char *function, const 
 clean:
 	zbx_free(arg1);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+
+	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_STRLEN                                                  *
+ *                                                                            *
+ * Purpose: evaluate function 'strlen' for the item                           *
+ *                                                                            *
+ * Parameters: value - buffer of size MAX_BUFFER_LEN                          *
+ *             item - item (performance metric)                               *
+ *             parameters - Nth last value and time shift (optional)          *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ * Author: Aleksandrs Saveljevs                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	evaluate_STRLEN(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
+{
+	const char	*__function_name = "evaluate_STRLEN";
+	int		res = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (item->value_type != ITEM_VALUE_TYPE_STR && item->value_type != ITEM_VALUE_TYPE_TEXT &&
+			item->value_type != ITEM_VALUE_TYPE_LOG)
+		goto clean;
+
+	if (SUCCEED == evaluate_LAST(value, item, "last", parameters, now))
+	{
+		zbx_snprintf(value, MAX_BUFFER_LEN, "%d", zbx_strlen_utf8(value));
+		res = SUCCEED;
+	}
+
+clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
 
 	return res;
@@ -1933,6 +1974,10 @@ int	evaluate_function(char *value, DB_ITEM *item, const char *function, const ch
 	else if (0 == strcmp(function, "str") || 0 == strcmp(function, "regexp") || 0 == strcmp(function, "iregexp"))
 	{
 		ret = evaluate_STR(value, item, function, parameter, now);
+	}
+	else if (0 == strcmp(function, "strlen"))
+	{
+		ret = evaluate_STRLEN(value, item, function, parameter, now);
 	}
 	else if (0 == strcmp(function, "now"))
 	{

@@ -1551,8 +1551,8 @@ require_once('include/js.inc.php');
 						'limit' => $elements
 					);
 
-					$hide_unknown = CProfile::get('web.events.filter.hide_unknown',0);
-					if($hide_unknown){
+					$showUnknown = CProfile::get('web.events.filter.showUnknown',0);
+					if($showUnknown){
 						$options['value'] = array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE);
 					}
 
@@ -1574,7 +1574,7 @@ require_once('include/js.inc.php');
 						$value = new CCol(trigger_value2str($event['value']), get_trigger_value_style($event['value']));
 
 //						$row = zbx_array_merge($triggers[$row['triggerid']],$row);
-//						if((1 == $hide_unknown) && (!event_initial_time($row,$hide_unknown))) continue;
+//						if((1 == $showUnknown) && (!event_initial_time($row,$showUnknown))) continue;
 
 						$item->addRow(array(
 							zbx_date2str(S_EVENTS_TRIGGERS_EVENTS_HISTORY_LIST_DATE_FORMAT,$event['clock']),

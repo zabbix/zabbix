@@ -33,20 +33,16 @@
 #define MACRO_TYPE_ITEM_KEY		0x0010
 #define MACRO_TYPE_HOST_IPMI_IP		0x0020
 #define MACRO_TYPE_FUNCTION_PARAMETER	0x0040
-#define MACRO_TYPE_ITEM_USERNAME	0x0080
-#define MACRO_TYPE_ITEM_PUBLICKEY	0x0100
-#define MACRO_TYPE_ITEM_PRIVATEKEY	0x0200
-#define MACRO_TYPE_ITEM_PASSWORD	0x0400
-#define MACRO_TYPE_ITEM_SCRIPT		0x0800
-#define MACRO_TYPE_SCRIPT		0x1000
-#define MACRO_TYPE_ITEM_EXPRESSION	0x2000
+#define MACRO_TYPE_ITEM_FIELD		0x0080
+#define MACRO_TYPE_SCRIPT		0x0100
+#define MACRO_TYPE_ITEM_EXPRESSION	0x0200
 
 int	evaluate_function(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now);
 
-int	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, DC_HOST *host,
+int	substitute_simple_macros(DB_EVENT *event, DB_ITEM *item, DC_HOST *host,
 		DC_ITEM *dc_item, DB_ESCALATION *escalation, char **data, int macro_type,
 		char *error, int maxerrlen);
-void	substitute_macros(DB_EVENT *event, DB_ACTION *action, DB_ESCALATION *escalation, char **data);
+void	substitute_macros(DB_EVENT *event, DB_ESCALATION *escalation, char **data);
 
 int	evaluate_expression(int *result, char **expression, time_t now,
 		zbx_uint64_t trigggerid, int trigger_value, char *error, int maxerrlen);

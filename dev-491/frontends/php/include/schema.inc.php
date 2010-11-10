@@ -1262,6 +1262,12 @@ return array(
 				'length' => 10,
 				'default' => '0',
 			),
+			'value_changed' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			),
 		),
 	),
 	'trends' => array(
@@ -4335,12 +4341,6 @@ return array(
 				'length' => 10,
 				'default' => '0',
 			),
-			'dep_level' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			),
 			'comments' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
@@ -4361,6 +4361,12 @@ return array(
 				'ref_field' => 'triggerid',
 			),
 			'type' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			),
+			'value_flags' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,

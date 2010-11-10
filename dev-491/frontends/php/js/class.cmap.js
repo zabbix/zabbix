@@ -66,7 +66,6 @@ mselement: {
 	elementName:		'',			// element name
 	iconid_off:			0,			// ALWAYS must be a STRING (js doesn't support uint64)
 	iconid_on:			0,			// ALWAYS must be a STRING (js doesn't support uint64)
-	iconid_unknown:		0,			// ALWAYS must be a STRING (js doesn't support uint64)
 	iconid_maintenance:	0,		// ALWAYS must be a STRING (js doesn't support uint64)
 	iconid_disabled:	0,			// ALWAYS must be a STRING (js doesn't support uint64)
 	label:				locale['S_NEW_ELEMENT'],	// Element label
@@ -1888,62 +1887,6 @@ this.selementForm.iconid_on = e_select_6;
 		e_select_6.appendChild(e_option_7);
 	}
 
-
-// ICON UNKNOWN
-	var e_tr_4 = document.createElement('tr');
-this.selementForm.typeDOM.iconid_unknown = e_tr_4;
-
-	e_tr_4.className = "even_row";
-	e_tbody_3.appendChild(e_tr_4);
-
-
-	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_l";
-
-	var e_input_6 = document.createElement('input');
-this.selementForm.massEdit.chkboxIconid_unknown = e_input_6;
-	e_input_6.setAttribute('type', 'checkbox');
-	e_input_6.setAttribute('name', "chkboxIconid_unknown");
-	e_input_6.setAttribute('id', "chkboxIconid_unknown");
-	e_input_6.className = 'checkbox';
-	e_td_5.appendChild(e_input_6);
-
-	e_td_5.appendChild(document.createTextNode(' '));
-	e_td_5.appendChild(document.createTextNode(locale['S_ICON_UNKNOWN']));
-	e_tr_4.appendChild(e_td_5);
-
-
-	var e_td_5 = document.createElement('td');
-	e_td_5.className = "form_row_r";
-	e_tr_4.appendChild(e_td_5);
-
-
-	var e_select_6 = document.createElement('select');
-this.selementForm.iconid_unknown = e_select_6;
-
-	e_select_6.className = "biginput";
-	e_select_6.setAttribute('name',"iconid_unknown");
-	e_select_6.setAttribute('id',"iconid_unknown");
-	e_td_5.appendChild(e_select_6);
-
-
-	var e_option_7 = document.createElement('option');
-	e_option_7.setAttribute('value', '0');
-	e_option_7.appendChild(document.createTextNode(locale['S_DEFAULT']));
-	e_select_6.appendChild(e_option_7);
-
-
-	var icons = zbxSelementIcons['icons'];
-	for(var iconid in icons){
-		if(empty(icons[iconid])) continue;
-
-		var e_option_7 = document.createElement('option');
-		e_option_7.setAttribute('value', iconid);
-		e_option_7.appendChild(document.createTextNode(icons[iconid]));
-		e_select_6.appendChild(e_option_7);
-	}
-
-
 // ICON MAINTENANCE
 	var e_tr_4 = document.createElement('tr');
 this.selementForm.typeDOM.iconid_maintenance = e_tr_4;
@@ -2232,16 +2175,6 @@ form_selement_update: function(e, selementid){
 			}
 		}
 
-// Icon UNKNOWN
-		advanced_icons = advanced_icons || (selement.iconid_unknown != 0);
-		for(var i=0; i<this.selementForm.iconid_unknown.options.length; i++){
-			if(!isset(i, this.selementForm.iconid_unknown.options)) continue;
-
-			if(this.selementForm.iconid_unknown.options[i].value === selement.iconid_unknown){
-				this.selementForm.iconid_unknown.options[i].selected = true;
-			}
-		}
-
 // Icon MAINTENANCE
 		advanced_icons = advanced_icons || (selement.iconid_maintenance != 0);
 		for(var i=0; i<this.selementForm.iconid_maintenance.options.length; i++){
@@ -2303,9 +2236,6 @@ form_selement_update: function(e, selementid){
 // Icon PROBLEM
 		this.selementForm.iconid_on.selectedIndex = 0;
 
-// Icon UNKNOWN
-		this.selementForm.iconid_unknown.selectedIndex = 0;
-
 // Icon MAINTENANCE
 		this.selementForm.iconid_maintenance.selectedIndex = 0;
 
@@ -2326,13 +2256,11 @@ form_selement_updateByIcons: function(e){
 
 	if(advanced){
 		this.selementForm.typeDOM.iconid_on.style.display = display_style;
-		this.selementForm.typeDOM.iconid_unknown.style.display = display_style;
 		this.selementForm.typeDOM.iconid_maintenance.style.display = display_style;
 		this.selementForm.typeDOM.iconid_disabled.style.display = display_style;
 	}
 	else{
 		this.selementForm.typeDOM.iconid_on.style.display = 'none';
-		this.selementForm.typeDOM.iconid_unknown.style.display = 'none';
 		this.selementForm.typeDOM.iconid_maintenance.style.display = 'none';
 		this.selementForm.typeDOM.iconid_disabled.style.display = 'none';
 	}
@@ -2351,7 +2279,6 @@ form_selement_updateByType: function(e, multi){
 		this.selementForm.massEdit.chkboxLabelLocation.style.display = 'inline';
 		this.selementForm.massEdit.chkboxIconid_off.style.display = 'inline';
 		this.selementForm.massEdit.chkboxIconid_on.style.display = 'inline';
-		this.selementForm.massEdit.chkboxIconid_unknown.style.display = 'inline';
 		this.selementForm.massEdit.chkboxIconid_maintenance.style.display = 'inline';
 		this.selementForm.massEdit.chkboxIconid_disabled.style.display = 'inline';
 
@@ -2362,7 +2289,6 @@ form_selement_updateByType: function(e, multi){
 
 		this.selementForm.typeDOM.advanced_icons.style.display = display_style;
 		this.selementForm.typeDOM.iconid_on.style.display = display_style;
-		this.selementForm.typeDOM.iconid_unknown.style.display = display_style;
 		this.selementForm.typeDOM.iconid_maintenance.style.display = display_style;
 		this.selementForm.typeDOM.iconid_disabled.style.display = display_style;
 
@@ -2381,7 +2307,6 @@ form_selement_updateByType: function(e, multi){
 		this.selementForm.massEdit.chkboxLabelLocation.style.display = 'none';
 		this.selementForm.massEdit.chkboxIconid_off.style.display = 'none';
 		this.selementForm.massEdit.chkboxIconid_on.style.display = 'none';
-		this.selementForm.massEdit.chkboxIconid_unknown.style.display = 'none';
 		this.selementForm.massEdit.chkboxIconid_maintenance.style.display = 'none';
 		this.selementForm.massEdit.chkboxIconid_disabled.style.display = 'none';
 
@@ -2389,7 +2314,6 @@ form_selement_updateByType: function(e, multi){
 		this.selementForm.massEdit.chkboxLabelLocation.checked = false;
 		this.selementForm.massEdit.chkboxIconid_off.checked = false;
 		this.selementForm.massEdit.chkboxIconid_on.checked = false;
-		this.selementForm.massEdit.chkboxIconid_unknown.checked = false;
 		this.selementForm.massEdit.chkboxIconid_maintenance.checked = false;
 		this.selementForm.massEdit.chkboxIconid_disabled.checked = false;
 
@@ -2427,7 +2351,6 @@ form_selement_updateByType: function(e, multi){
 
 			this.selementForm.typeDOM.advanced_icons.style.display = display_style;
 			this.selementForm.typeDOM.iconid_on.style.display = display_style;
-			this.selementForm.typeDOM.iconid_unknown.style.display = display_style;
 			this.selementForm.typeDOM.iconid_maintenance.style.display = display_style;
 			this.selementForm.typeDOM.iconid_disabled.style.display = display_style;
 		break;
@@ -2443,7 +2366,6 @@ form_selement_updateByType: function(e, multi){
 
 			this.selementForm.typeDOM.advanced_icons.style.display = display_style;
 			this.selementForm.typeDOM.iconid_on.style.display = display_style;
-			this.selementForm.typeDOM.iconid_unknown.style.display = 'none';
 			this.selementForm.typeDOM.iconid_maintenance.style.display = 'none';
 			this.selementForm.typeDOM.iconid_disabled.style.display = 'none';
 		break;
@@ -2459,7 +2381,6 @@ form_selement_updateByType: function(e, multi){
 
 			this.selementForm.typeDOM.advanced_icons.style.display = display_style;
 			this.selementForm.typeDOM.iconid_on.style.display = display_style;
-			this.selementForm.typeDOM.iconid_unknown.style.display = display_style;
 			this.selementForm.typeDOM.iconid_maintenance.style.display = display_style;
 			this.selementForm.typeDOM.iconid_disabled.style.display = display_style;
 		break;
@@ -2475,7 +2396,6 @@ form_selement_updateByType: function(e, multi){
 
 			this.selementForm.typeDOM.advanced_icons.style.display = display_style;
 			this.selementForm.typeDOM.iconid_on.style.display = display_style;
-			this.selementForm.typeDOM.iconid_unknown.style.display = display_style;
 			this.selementForm.typeDOM.iconid_maintenance.style.display = 'none';
 			this.selementForm.typeDOM.iconid_disabled.style.display = 'none';
 
@@ -2552,9 +2472,6 @@ form_selement_save: function(e){
 // Icon PROBLEM
 		params.iconid_on = this.selementForm.iconid_on.options[this.selementForm.iconid_on.selectedIndex].value;
 
-// Icon UNKNOWN
-		params.iconid_unknown = this.selementForm.iconid_unknown.options[this.selementForm.iconid_unknown.selectedIndex].value;
-
 // Icon MAINTENANCE
 		params.iconid_maintenance = this.selementForm.iconid_maintenance.options[this.selementForm.iconid_maintenance.selectedIndex].value;
 
@@ -2564,7 +2481,6 @@ form_selement_save: function(e){
 // Advanced icons
 		if(!this.selementForm.advanced_icons.checked){
 			params.iconid_on = 0;
-			params.iconid_unknown = 0;
 			params.iconid_maintenance = 0;
 			params.iconid_disabled = 0;
 		}
@@ -2627,10 +2543,6 @@ form_selement_save: function(e){
 // Icon PROBLEM
 		if(this.selementForm.massEdit.chkboxIconid_on.checked)
 			params.iconid_on = this.selementForm.iconid_on.options[this.selementForm.iconid_on.selectedIndex].value;
-
-// Icon UNKNOWN
-		if(this.selementForm.massEdit.chkboxIconid_unknown.checked)
-			params.iconid_unknown = this.selementForm.iconid_unknown.options[this.selementForm.iconid_unknown.selectedIndex].value;
 
 // Icon MAINTENANCE
 		if(this.selementForm.massEdit.chkboxIconid_maintenance.checked)
@@ -3532,7 +3444,6 @@ data: {
 	elementName:		'',			// element name
 	iconid_off:			0,			// ALWAYS must be a STRING (js doesn't support uint64)
 	iconid_on:			0,			// ALWAYS must be a STRING (js doesn't support uint64)
-	iconid_unknown:		0,			// ALWAYS must be a STRING (js doesn't support uint64)
 	iconid_maintenance:	0,		// ALWAYS must be a STRING (js doesn't support uint64)
 	iconid_disabled:	0,			// ALWAYS must be a STRING (js doesn't support uint64)
 	label:				locale['S_NEW_ELEMENT'],	// Element label

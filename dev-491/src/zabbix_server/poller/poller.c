@@ -276,14 +276,14 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_timespec_
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	triggerid;
-	int		trigger_type, trigger_value;
+	int		trigger_type, trigger_value, trigger_flags;
 	const char	*trigger_error;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64,
 			__function_name, hostid);
 
 	result = DBselect(
-			"select distinct t.triggerid,t.type,t.value,t.error"
+			"select distinct t.triggerid,t.type,t.value,t.value_flags,t.error"
 			" from hosts h,items i,functions f,triggers t"
 			" where h.hostid=i.hostid"
 				" and i.itemid=f.itemid"
@@ -304,10 +304,11 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_timespec_
 		ZBX_STR2UINT64(triggerid, row[0]);
 		trigger_type = atoi(row[1]);
 		trigger_value = atoi(row[2]);
-		trigger_error = row[3];
+		trigger_flags = atoi(row[3]);
+		trigger_error = row[4];
 
-		DBupdate_trigger_value(triggerid, trigger_type, trigger_value,
-				trigger_error, TRIGGER_VALUE_UNKNOWN, ts, reason);
+		DBupdate_trigger_value(triggerid, trigger_type, trigger_value, trigger_flags,
+				trigger_error, trigger_value, TRIGGER_VALUE_FLAG_UNKNOWN, ts, reason);
 	}
 	DBfree_result(result);
 
@@ -457,7 +458,9 @@ static int	get_values()
 			i, num, res;
 	static char	*key = NULL, *ipmi_ip = NULL, *params = NULL,
 			*username = NULL, *publickey = NULL, *privatekey = NULL,
-			*password = NULL;
+			*password = NULL, *snmp_community = NULL, *snmp_oid = NULL,
+			*snmpv3_securityname = NULL, *snmpv3_authpassphrase = NULL,
+			*snmpv3_privpassphrase = NULL;
 	zbx_timespec_t	ts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -471,106 +474,147 @@ static int	get_values()
 	{
 		zbx_free(key);
 		key = strdup(items[i].key_orig);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
+		substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
 				&key, MACRO_TYPE_ITEM_KEY, NULL, 0);
 		items[i].key = key;
 
-		switch (items[i].type) {
-		case ITEM_TYPE_IPMI:
-			zbx_free(ipmi_ip);
-			ipmi_ip = strdup(items[i].host.ipmi_ip_orig);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
-					&ipmi_ip, MACRO_TYPE_HOST_IPMI_IP, NULL, 0);
-			items[i].host.ipmi_ip = ipmi_ip;
-			break;
-		case ITEM_TYPE_DB_MONITOR:
-			items[i].params = items[i].params_orig;
-			break;
-		case ITEM_TYPE_SSH:
-			zbx_free(username);
-			zbx_free(publickey);
-			zbx_free(privatekey);
-			zbx_free(password);
-			zbx_free(params);
+		switch (items[i].type)
+		{
+			case ITEM_TYPE_SNMPv3:
+				zbx_free(snmpv3_securityname);
+				zbx_free(snmpv3_authpassphrase);
+				zbx_free(snmpv3_privpassphrase);
 
-			username = strdup(items[i].username_orig);
-			publickey = strdup(items[i].publickey_orig);
-			privatekey = strdup(items[i].privatekey_orig);
-			password = strdup(items[i].password_orig);
-			params = strdup(items[i].params_orig);
+				snmpv3_securityname = strdup(items[i].snmpv3_securityname_orig);
+				snmpv3_authpassphrase = strdup(items[i].snmpv3_authpassphrase_orig);
+				snmpv3_privpassphrase = strdup(items[i].snmpv3_privpassphrase_orig);
 
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
-					&username, MACRO_TYPE_ITEM_USERNAME, NULL, 0);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
-					&publickey, MACRO_TYPE_ITEM_PUBLICKEY, NULL, 0);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
-					&privatekey, MACRO_TYPE_ITEM_PRIVATEKEY, NULL, 0);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
-					&password, MACRO_TYPE_ITEM_PASSWORD, NULL, 0);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
-					&params, MACRO_TYPE_ITEM_SCRIPT, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+						&snmpv3_securityname, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+						&snmpv3_authpassphrase, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+						&snmpv3_privpassphrase, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 
-			items[i].username = username;
-			items[i].publickey = publickey;
-			items[i].privatekey = privatekey;
-			items[i].password = password;
-			items[i].params = params;
-			break;
-		case ITEM_TYPE_TELNET:
-			zbx_free(username);
-			zbx_free(password);
-			zbx_free(params);
+				items[i].snmpv3_securityname = snmpv3_securityname;
+				items[i].snmpv3_authpassphrase = snmpv3_authpassphrase;
+				items[i].snmpv3_privpassphrase = snmpv3_privpassphrase;
+			case ITEM_TYPE_SNMPv1:
+			case ITEM_TYPE_SNMPv2c:
+				zbx_free(snmp_community);
+				zbx_free(snmp_oid);
 
-			username = strdup(items[i].username_orig);
-			password = strdup(items[i].password_orig);
-			params = strdup(items[i].params_orig);
+				snmp_community = strdup(items[i].snmp_community_orig);
+				snmp_oid = strdup(items[i].snmp_oid_orig);
 
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
-					&username, MACRO_TYPE_ITEM_USERNAME, NULL, 0);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
-					&password, MACRO_TYPE_ITEM_PASSWORD, NULL, 0);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
-					&params, MACRO_TYPE_ITEM_SCRIPT, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+						&snmp_community, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+						&snmp_oid, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 
-			items[i].username = username;
-			items[i].password = password;
-			items[i].params = params;
-			break;
+				items[i].snmp_community = snmp_community;
+				items[i].snmp_oid = snmp_oid;
+				break;
+			case ITEM_TYPE_IPMI:
+				zbx_free(ipmi_ip);
+				ipmi_ip = strdup(items[i].host.ipmi_ip_orig);
+				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+						&ipmi_ip, MACRO_TYPE_HOST_IPMI_IP, NULL, 0);
+				items[i].host.ipmi_ip = ipmi_ip;
+				break;
+			case ITEM_TYPE_DB_MONITOR:
+				zbx_free(params);
+				params = strdup(items[i].params_orig);
+				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+						&params, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+				items[i].params = params;
+				break;
+			case ITEM_TYPE_SSH:
+				zbx_free(username);
+				zbx_free(publickey);
+				zbx_free(privatekey);
+				zbx_free(password);
+				zbx_free(params);
+
+				username = strdup(items[i].username_orig);
+				publickey = strdup(items[i].publickey_orig);
+				privatekey = strdup(items[i].privatekey_orig);
+				password = strdup(items[i].password_orig);
+				params = strdup(items[i].params_orig);
+
+				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+						&username, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+						&publickey, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+						&privatekey, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+						&password, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+						&params, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+
+				items[i].username = username;
+				items[i].publickey = publickey;
+				items[i].privatekey = privatekey;
+				items[i].password = password;
+				items[i].params = params;
+				break;
+			case ITEM_TYPE_TELNET:
+				zbx_free(username);
+				zbx_free(password);
+				zbx_free(params);
+
+				username = strdup(items[i].username_orig);
+				password = strdup(items[i].password_orig);
+				params = strdup(items[i].params_orig);
+
+				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+						&username, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+						&password, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+						&params, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+
+				items[i].username = username;
+				items[i].password = password;
+				items[i].params = params;
+				break;
 		}
 
 		/* Skip unreachable hosts but do not break the loop. */
-		switch (items[i].type) {
-		case ITEM_TYPE_ZABBIX:
-			if (SUCCEED == uint64_array_exists(ids, ids_num, items[i].host.hostid))
-			{
-				DCrequeue_unreachable_item(items[i].itemid);
-				zabbix_log(LOG_LEVEL_DEBUG, "Zabbix Host " ZBX_FS_UI64 " is unreachable. Skipping [%s]",
-						items[i].host.hostid, items[i].key_orig);
-				continue;
-			}
-			break;
-		case ITEM_TYPE_SNMPv1:
-		case ITEM_TYPE_SNMPv2c:
-		case ITEM_TYPE_SNMPv3:
-			if (SUCCEED == uint64_array_exists(snmpids, snmpids_num, items[i].host.hostid))
-			{
-				DCrequeue_unreachable_item(items[i].itemid);
-				zabbix_log(LOG_LEVEL_DEBUG, "SNMP Host " ZBX_FS_UI64 " is unreachable. Skipping [%s]",
-						items[i].host.hostid, items[i].key_orig);
-				continue;
-			}
-			break;
-		case ITEM_TYPE_IPMI:
-			if (SUCCEED == uint64_array_exists(ipmiids, ipmiids_num, items[i].host.hostid))
-			{
-				DCrequeue_unreachable_item(items[i].itemid);
-				zabbix_log(LOG_LEVEL_DEBUG, "IPMI Host " ZBX_FS_UI64 " is unreachable. Skipping [%s]",
-						items[i].host.hostid, items[i].key_orig);
-				continue;
-			}
-			break;
-		default:
-			/* nothing to do */;
+		switch (items[i].type)
+		{
+			case ITEM_TYPE_ZABBIX:
+				if (SUCCEED == uint64_array_exists(ids, ids_num, items[i].host.hostid))
+				{
+					DCrequeue_unreachable_item(items[i].itemid);
+					zabbix_log(LOG_LEVEL_DEBUG, "Zabbix Host " ZBX_FS_UI64 " is unreachable. Skipping [%s]",
+							items[i].host.hostid, items[i].key_orig);
+					continue;
+				}
+				break;
+			case ITEM_TYPE_SNMPv1:
+			case ITEM_TYPE_SNMPv2c:
+			case ITEM_TYPE_SNMPv3:
+				if (SUCCEED == uint64_array_exists(snmpids, snmpids_num, items[i].host.hostid))
+				{
+					DCrequeue_unreachable_item(items[i].itemid);
+					zabbix_log(LOG_LEVEL_DEBUG, "SNMP Host " ZBX_FS_UI64 " is unreachable. Skipping [%s]",
+							items[i].host.hostid, items[i].key_orig);
+					continue;
+				}
+				break;
+			case ITEM_TYPE_IPMI:
+				if (SUCCEED == uint64_array_exists(ipmiids, ipmiids_num, items[i].host.hostid))
+				{
+					DCrequeue_unreachable_item(items[i].itemid);
+					zabbix_log(LOG_LEVEL_DEBUG, "IPMI Host " ZBX_FS_UI64 " is unreachable. Skipping [%s]",
+							items[i].host.hostid, items[i].key_orig);
+					continue;
+				}
+				break;
+			default:
+				/* nothing to do */;
 		}
 
 		init_result(&agent);
@@ -614,20 +658,21 @@ static int	get_values()
 		}
 		else if (res == NETWORK_ERROR)
 		{
-			switch (items[i].type) {
-			case ITEM_TYPE_ZABBIX:
-				uint64_array_add(&ids, &ids_alloc, &ids_num, items[i].host.hostid, 1);
-				break;
-			case ITEM_TYPE_SNMPv1:
-			case ITEM_TYPE_SNMPv2c:
-			case ITEM_TYPE_SNMPv3:
-				uint64_array_add(&snmpids, &snmpids_alloc, &snmpids_num, items[i].host.hostid, 1);
-				break;
-			case ITEM_TYPE_IPMI:
-				uint64_array_add(&ipmiids, &ipmiids_alloc, &ipmiids_num, items[i].host.hostid, 1);
-				break;
-			default:
-				/* nothing to do */;
+			switch (items[i].type)
+			{
+				case ITEM_TYPE_ZABBIX:
+					uint64_array_add(&ids, &ids_alloc, &ids_num, items[i].host.hostid, 1);
+					break;
+				case ITEM_TYPE_SNMPv1:
+				case ITEM_TYPE_SNMPv2c:
+				case ITEM_TYPE_SNMPv3:
+					uint64_array_add(&snmpids, &snmpids_alloc, &snmpids_num, items[i].host.hostid, 1);
+					break;
+				case ITEM_TYPE_IPMI:
+					uint64_array_add(&ipmiids, &ipmiids_alloc, &ipmiids_num, items[i].host.hostid, 1);
+					break;
+				default:
+					/* nothing to do */;
 			}
 
 			DCrequeue_unreachable_item(items[i].itemid);
@@ -643,6 +688,11 @@ static int	get_values()
 	zbx_free(publickey);
 	zbx_free(privatekey);
 	zbx_free(password);
+	zbx_free(snmp_community);
+	zbx_free(snmp_oid);
+	zbx_free(snmpv3_securityname);
+	zbx_free(snmpv3_authpassphrase);
+	zbx_free(snmpv3_privpassphrase);
 
 	zbx_free(ids);
 	zbx_free(snmpids);
