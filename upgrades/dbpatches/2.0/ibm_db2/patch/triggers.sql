@@ -4,13 +4,14 @@
 
 DROP INDEX events_2;
 CREATE INDEX events_2 on events (clock);
-ALTER TABLE ONLY events ALTER eventid DROP DEFAULT,
-			ADD ns integer DEFAULT '0' NOT NULL,
-			ADD value_changed integer DEFAULT '0' NOT NULL;
+ALTER TABLE events ALTER COLUMN eventid SET WITH DEFAULT NULL;
+ALTER TABLE events ADD ns integer DEFAULT '0' NOT NULL;
+ALTER TABLE events ADD value_changed integer DEFAULT '0' NOT NULL;
+REORG TABLE events;
 
 -- Begin event redesign patch
 
-CREATE TEMPORARY TABLE tmp_events_eventid (eventid bigint PRIMARY KEY,prev_value integer,value integer);
+CREATE TABLE tmp_events_eventid (eventid bigint NOT NULL PRIMARY KEY,prev_value integer,value integer);
 CREATE INDEX tmp_events_index on events (source, object, objectid, clock, eventid, value);
 
 -- Which OK events should have value_changed flag set?
@@ -24,23 +25,22 @@ INSERT INTO tmp_events_eventid (eventid,prev_value,value)
 					AND e2.object=e1.object
 					AND e2.objectid=e1.objectid
 					AND (e2.clock<e1.clock OR (e2.clock=e1.clock AND e2.eventid<e1.eventid))
-					AND e2.value<2					-- TRIGGER_VALUE_UNKNOWN
+					AND e2.value IN (0,1)	-- TRIGGER_VALUE_FALSE (OK), TRIGGER_VALUE_TRUE (PROBLEM)
 				ORDER BY e2.source DESC,
 						e2.object DESC,
 						e2.objectid DESC,
 						e2.clock DESC,
 						e2.eventid DESC,
 						e2.value DESC
-				LIMIT 1),e1.value
+				FETCH FIRST 1 ROWS ONLY),e1.value
 		FROM events e1
-		WHERE e1.source=0							-- EVENT_SOURCE_TRIGGERS
-			AND e1.object=0 						-- EVENT_OBJECT_TRIGGER
-			AND e1.value=0							-- TRIGGER_VALUE_FALSE (OK)
+		WHERE e1.source=0				-- EVENT_SOURCE_TRIGGERS
+			AND e1.object=0 			-- EVENT_OBJECT_TRIGGER
+			AND e1.value=0				-- TRIGGER_VALUE_FALSE (OK)
 );
 
 -- Which PROBLEM events should have value_changed flag set?
 -- (1) Those that have an OK event (or no event) before them.
--- (2) Those that came from a "MULTIPLE PROBLEM" trigger.
 
 INSERT INTO tmp_events_eventid (eventid,prev_value,value)
 (
@@ -50,31 +50,33 @@ INSERT INTO tmp_events_eventid (eventid,prev_value,value)
 					AND e2.object=e1.object
 					AND e2.objectid=e1.objectid
 					AND (e2.clock<e1.clock OR (e2.clock=e1.clock AND e2.eventid<e1.eventid))
-					AND e2.value<2					-- TRIGGER_VALUE_UNKNOWN
+					AND e2.value IN (0,1)	-- TRIGGER_VALUE_FALSE (OK), TRIGGER_VALUE_TRUE (PROBLEM)
 				ORDER BY e2.source DESC,
 						e2.object DESC,
 						e2.objectid DESC,
 						e2.clock DESC,
 						e2.eventid DESC,
 						e2.value DESC
-				LIMIT 1),e1.value
+				FETCH FIRST 1 ROWS ONLY),e1.value
 		FROM events e1,triggers t
-		WHERE e1.source=0							-- EVENT_SOURCE_TRIGGERS
-			AND e1.object=0 						-- EVENT_OBJECT_TRIGGER
+		WHERE e1.source=0				-- EVENT_SOURCE_TRIGGERS
+			AND e1.object=0 			-- EVENT_OBJECT_TRIGGER
 			AND e1.objectid=t.triggerid
-			AND e1.value=1							-- TRIGGER_VALUE_TRUE
-			AND t.type=0							-- TRIGGER_TYPE_NORMAL
+			AND e1.value=1				-- TRIGGER_VALUE_TRUE
+			AND t.type=0				-- TRIGGER_TYPE_NORMAL
 );
+
+-- (2) Those that came from a "MULTIPLE PROBLEM" trigger.
 
 INSERT INTO tmp_events_eventid (eventid,value)
 (
 	SELECT e1.eventid,e1.value
 		FROM events e1,triggers t
-		WHERE e1.source=0							-- EVENT_SOURCE_TRIGGERS
-			AND e1.object=0 						-- EVENT_OBJECT_TRIGGER
+		WHERE e1.source=0				-- EVENT_SOURCE_TRIGGERS
+			AND e1.object=0 			-- EVENT_OBJECT_TRIGGER
 			AND e1.objectid=t.triggerid
-			AND e1.value=1							-- TRIGGER_VALUE_TRUE (PROBLEM)
-			AND t.type=1							-- TRIGGER_TYPE_MULTIPLE_TRUE
+			AND e1.value=1				-- TRIGGER_VALUE_TRUE (PROBLEM)
+			AND t.type=1				-- TRIGGER_TYPE_MULTIPLE_TRUE
 );
 
 DELETE FROM tmp_events_eventid WHERE prev_value = value;
@@ -93,29 +95,31 @@ DROP TABLE tmp_events_eventid;
 ---- Patching table `triggers`
 ----
 
-ALTER TABLE ONLY triggers ALTER triggerid DROP DEFAULT,
-			  ALTER templateid DROP DEFAULT,
-			  ALTER templateid DROP NOT NULL,
-			  DROP COLUMN dep_level,
-			  ADD value_flags integer DEFAULT '0' NOT NULL,
-			  ADD flags integer DEFAULT '0' NOT NULL;
+ALTER TABLE triggers ALTER COLUMN triggerid SET WITH DEFAULT NULL;
+ALTER TABLE triggers ALTER COLUMN templateid SET WITH DEFAULT NULL;
+ALTER TABLE triggers ALTER COLUMN templateid DROP NOT NULL;
+ALTER TABLE triggers DROP COLUMN dep_level;
+ALTER TABLE triggers ADD value_flags integer WITH DEFAULT '0' NOT NULL;
+ALTER TABLE triggers ADD flags integer WITH DEFAULT '0' NOT NULL;
+REORG TABLE triggers;
 UPDATE triggers SET templateid=NULL WHERE templateid=0;
 UPDATE triggers SET templateid=NULL WHERE NOT templateid IS NULL AND NOT templateid IN (SELECT triggerid FROM triggers);
-ALTER TABLE ONLY triggers ADD CONSTRAINT c_triggers_1 FOREIGN KEY (templateid) REFERENCES triggers (triggerid) ON DELETE CASCADE;
+ALTER TABLE triggers ADD CONSTRAINT c_triggers_1 FOREIGN KEY (templateid) REFERENCES triggers (triggerid) ON DELETE CASCADE;
+REORG TABLE triggers;
 
 -- Begin event redesign patch
 
-CREATE TEMPORARY TABLE tmp_triggers (triggerid bigint PRIMARY KEY, eventid bigint);
+CREATE TABLE tmp_triggers (triggerid bigint NOT NULL PRIMARY KEY, eventid bigint);
 
 INSERT INTO tmp_triggers (triggerid, eventid)
 (
 	SELECT t.triggerid, MAX(e.eventid)
 		FROM triggers t, events e
-		WHERE t.value=2				-- TRIGGER_VALUE_UNKNOWN
-			AND e.source=0			-- EVENT_SOURCE_TRIGGERS	
-			AND e.object=0			-- EVENT_OBJECT_TRIGGER
+		WHERE t.value=2			-- TRIGGER_VALUE_UNKNOWN
+			AND e.source=0		-- EVENT_SOURCE_TRIGGERS	
+			AND e.object=0		-- EVENT_OBJECT_TRIGGER
 			AND e.objectid=t.triggerid
-			AND e.value<>2			-- TRIGGER_VALUE_UNKNOWN
+			AND e.value IN (0,1)	-- TRIGGER_VALUE_FALSE (OK), TRIGGER_VALUE_TRUE (PROBLEM)
 		GROUP BY t.triggerid
 );
 
@@ -132,9 +136,10 @@ UPDATE triggers
 	);
 
 UPDATE triggers
-	SET value=0,					-- TRIGGER_VALUE_FALSE
+	SET value=0,				-- TRIGGER_VALUE_FALSE (OK)
 		value_flags=1
-	WHERE value=2;					-- TRIGGER_VALUE_UNKNOWN
+	WHERE value NOT IN (0,1)		-- TRIGGER_VALUE_FALSE (OK), TRIGGER_VALUE_TRUE (PROBLEM)
+;
 
 DROP TABLE tmp_triggers;
 

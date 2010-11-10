@@ -53,10 +53,13 @@ include_once('include/page_header.php');
 	$options = array(
 		'nodeids' => get_current_nodeid(true),
 		'triggerids' => $_REQUEST['triggerid'],
-		'output' => API_OUTPUT_SHORTEN,
+		'output' => API_OUTPUT_EXTEND,
+		'expandDescription' => true,
 	);
-	$db_data = CTrigger::get($options);
-	if(empty($db_data)) access_deny();
+	$trigger = CTrigger::get($options);
+	$trigger = reset($trigger);
+	
+	if(!$trigger) access_deny();
 
 
 	if(isset($_REQUEST['save'])){
@@ -65,9 +68,11 @@ include_once('include/page_header.php');
 						' WHERE triggerid='.$_REQUEST['triggerid']);
 		show_messages($result, S_COMMENT_UPDATED, S_CANNOT_UPDATE_COMMENT);
 
+		$trigger['comments'] = $_REQUEST['comments'];
+		
 		if($result){
 			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_TRIGGER,
-				S_TRIGGER.' ['.$_REQUEST['triggerid'].'] ['.expand_trigger_description($_REQUEST['triggerid']).'] '.
+				S_TRIGGER.' ['.$_REQUEST['triggerid'].'] ['.$trigger['description'].'] '.
 				S_COMMENTS.' ['.$_REQUEST['comments'].']');
 		}
 	}
@@ -77,8 +82,27 @@ include_once('include/page_header.php');
 	}
 
 	show_table_header(S_TRIGGER_COMMENTS_BIG);
-	insert_trigger_comment_form($_REQUEST["triggerid"]);
+	
+	//if user has no permissions to edit comments, no "save" button for him
+	$triggerEditable = CTrigger::get(array(
+		'editable' => 1,
+		'trigegrids' => $_REQUEST['triggerid'],
+		'output' => API_OUTPUT_SHORTEN,
+	));
+	$triggerEditable = !empty($triggerEditable);
+	
+	$frmComent = new CFormTable(S_COMMENTS.' for "'.$trigger['description'].'"');
+	$frmComent->addVar('triggerid', $_REQUEST['triggerid']);
+	$frmComent->addRow(S_COMMENTS, new CTextArea('comments', $trigger['comments'], 100, 25, !$triggerEditable));
+	
+	if($triggerEditable){
+		$frmComent->addItemToBottomRow(new CButton("save",S_SAVE));
+	}
 
+	$frmComent->addItemToBottomRow(new CButtonCancel('&triggerid='.$_REQUEST['triggerid']));
+
+	$frmComent->show();
+	
 ?>
 <?php
 

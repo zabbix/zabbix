@@ -1084,7 +1084,7 @@ switch($itemType) {
 					$tr_description[] = new CLink($trigger['description_expanded'], 'triggers.php?form=update&triggerid='.$triggerid);
 				}
 
-				if($trigger['value'] != TRIGGER_VALUE_UNKNOWN) $trigger['error'] = '';
+				if($trigger['value_flags'] == TRIGGER_VALUE_FLAG_UNKNOWN) $trigger['error'] = '';
 
 				switch($trigger['priority']){
 					case 0: $priority = S_NOT_CLASSIFIED; break;

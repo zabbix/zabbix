@@ -331,6 +331,7 @@ return $caption;
 	function get_trigger_value_style($value){
 		$str_val[TRIGGER_VALUE_FALSE]	= 'off';
 		$str_val[TRIGGER_VALUE_TRUE]	= 'on';
+// keep it for events
 		$str_val[TRIGGER_VALUE_UNKNOWN]	= 'unknown';
 
 		if(isset($str_val[$value]))
@@ -342,6 +343,7 @@ return $caption;
 	function trigger_value2str($value){
 		$str_val[TRIGGER_VALUE_FALSE]	= S_OK_BIG;
 		$str_val[TRIGGER_VALUE_TRUE]	= S_PROBLEM_BIG;
+// keep it for events
 		$str_val[TRIGGER_VALUE_UNKNOWN]	= S_UNKNOWN_BIG;
 
 		if(isset($str_val[$value]))
@@ -839,9 +841,9 @@ return $caption;
 		$triggerid=get_dbid('triggers','triggerid');
 
 		$result=DBexecute('INSERT INTO triggers '.
-			'  (triggerid,description,type,priority,status,comments,url,value,error,templateid,flags) '.
+			'  (triggerid,description,type,priority,status,comments,url,value,value_flags,error,templateid,flags) '.
 			" values ($triggerid,".zbx_dbstr($description).",$type,$priority,$status,".zbx_dbstr($comments).','.
-			zbx_dbstr($url).",2,'Trigger just added. No status update so far.',".zero2null($templateid).", ".$flags.")");
+			zbx_dbstr($url).",".TRIGGER_VALUE_FALSE.",".TRIGGER_VALUE_FLAG_UNKNOWN.",'Trigger just added. No status update so far.',".zero2null($templateid).",".$flags.")");
 
 		if(!$result){
 			return	$result;
@@ -1501,6 +1503,27 @@ return $caption;
 		return $expr;
 	}
 
+	function update_trigger_comments($triggerids,$comments){
+		zbx_value2array($triggerids);
+
+		$triggers = CTrigger::get(array(
+			'editable' => 1,
+			'trigegrids' => $triggerids,
+			'output' => API_OUTPUT_SHORTEN,
+		));
+		$triggers = zbx_toHash($triggers, 'triggerid');
+		foreach($triggerids as $triggerid){
+			if(!isset($triggers[$triggerid])){
+				return false;
+			}
+		}
+
+
+		return	DBexecute('UPDATE triggers '.
+						' SET comments='.zbx_dbstr($comments).
+						' WHERE '.DBcondition('triggerid',$triggerids));
+	}
+
 // Update Trigger status
 	function update_trigger_status($triggerids,$status){
 		zbx_value2array($triggerids);
@@ -1520,7 +1543,7 @@ return $caption;
 
 		if($status != TRIGGER_STATUS_ENABLED){
 			addEvent($triggerids, TRIGGER_VALUE_UNKNOWN);
-			DBexecute('UPDATE triggers SET lastchange='.time().', value='.TRIGGER_VALUE_UNKNOWN.' WHERE '.DBcondition('triggerid',$triggerids).' AND value<>'.TRIGGER_VALUE_UNKNOWN);
+			DBexecute('UPDATE triggers SET value_flags='.TRIGGER_VALUE_FLAG_UNKNOWN.' WHERE '.DBcondition('triggerid',$triggerids).' AND value_flags='.TRIGGER_VALUE_FLAG_NORMAL);
 		}
 
 	return true;
@@ -1686,7 +1709,7 @@ return $caption;
 		}
 
 		if(!empty($triggers)){
-			DBexecute('UPDATE triggers SET value='.TRIGGER_VALUE_UNKNOWN.', lastchange='.$now.' WHERE '.DBcondition('triggerid',$triggers));
+			DBexecute('UPDATE triggers SET value_flags='.TRIGGER_VALUE_FLAG_UNKNOWN.' WHERE '.DBcondition('triggerid',$triggers).' AND value_flags='.TRIGGER_VALUE_FLAG_NORMAL);
 		}
 	return true;
 	}
@@ -1726,6 +1749,7 @@ return $caption;
 
 		$expressionData = parseTriggerExpressions($expression, true);
 
+		$error = null;
 		if(is_null($expression)){
 			/* Restore expression */
 			$expression = explode_exp($trigger['expression'],0);
@@ -1733,6 +1757,7 @@ return $caption;
 		}
 		else if(!isset($expressionData[$expression]['errors']) && $expression != explode_exp($trigger['expression'],0)){
 			$event_to_unknown = true;
+			$error = 'Trigger expression updated. No status update so far.';
 		}
 
 		if( isset($expressionData[$expression]['errors']) ) {
@@ -1832,13 +1857,13 @@ return $caption;
 		if(!is_null($comments)) $update_values['comments'] = $comments;
 		if(!is_null($url)) $update_values['url'] = $url;
 		if(!is_null($templateid)) $update_values['templateid'] = $templateid;
+		if(!is_null($error)) $update_values['error'] = $error;
 
 		if($event_to_unknown || (!is_null($status) && ($status != TRIGGER_STATUS_ENABLED))){
-			if($trigger['value'] != TRIGGER_VALUE_UNKNOWN){
+			if($trigger['value_flags'] == TRIGGER_VALUE_FLAG_NORMAL){
 				addEvent($triggerid, TRIGGER_VALUE_UNKNOWN);
 
-				$update_values['value'] = TRIGGER_VALUE_UNKNOWN;
-				$update_values['lastchange'] = time();
+				$update_values['value_flags'] = TRIGGER_VALUE_FLAG_UNKNOWN;
 			}
 		}
 
@@ -2804,19 +2829,21 @@ return $caption;
 	}
 
 // author: Aly
-	function make_trigger_details($triggerid,&$trigger_data){
+	function make_trigger_details($trigger){
 		$table = new CTableInfo();
 
 		if(is_show_all_nodes()){
-			$table->addRow(array(S_NODE, get_node_name_by_elid($triggerid)));
+			$table->addRow(array(S_NODE, get_node_name_by_elid($trigger['triggerid'])));
 		}
 
-		$table->addRow(array(S_HOST, $trigger_data['host']));
-		$table->addRow(array(S_TRIGGER, $trigger_data['exp_desc']));
-		$table->addRow(array(S_SEVERITY, new CCol(get_severity_description($trigger_data['priority']), get_severity_style($trigger_data['priority']))));
-		$table->addRow(array(S_EXPRESSION, $trigger_data['exp_expr']));
-		$table->addRow(array(S_EVENT_GENERATION, S_NORMAL.((TRIGGER_MULT_EVENT_ENABLED==$trigger_data['type'])?SPACE.'+'.SPACE.S_MULTIPLE_PROBLEM_EVENTS:'')));
-		$table->addRow(array(S_DISABLED, ((TRIGGER_STATUS_ENABLED==$trigger_data['status'])?new CCol(S_NO,'off'):new CCol(S_YES,'on')) ));
+		$expression = explode_exp($trigger['expression'], 1, false, true);
+
+		$table->addRow(array(S_HOST, $trigger['host']));
+		$table->addRow(array(S_TRIGGER, $trigger['description']));
+		$table->addRow(array(S_SEVERITY, new CCol(get_severity_description($trigger['priority']), get_severity_style($trigger['priority']))));
+		$table->addRow(array(S_EXPRESSION, $expression));
+		$table->addRow(array(S_EVENT_GENERATION, S_NORMAL.((TRIGGER_MULT_EVENT_ENABLED==$trigger['type'])?SPACE.'+'.SPACE.S_MULTIPLE_PROBLEM_EVENTS:'')));
+		$table->addRow(array(S_DISABLED, ((TRIGGER_STATUS_ENABLED==$trigger['status'])?new CCol(S_NO,'off'):new CCol(S_YES,'on')) ));
 
 	return $table;
 	}
@@ -3953,6 +3980,7 @@ $triggerExpressionRules['keyFunctionName'] = Array(
 		'prev',
 		'regexp',
 		'str',
+		'strlen',
 		'sum',
 		'time'),
 	'indexItem' => true,

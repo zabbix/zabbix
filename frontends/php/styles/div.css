@@ -252,6 +252,14 @@ div.iconok{
 	background-repeat:no-repeat;
 }
 
+div.iconunknown{
+	height: 14px;
+	width: 14px;
+	background-image: url('../images/general/unknown_icon.png');
+	background-repeat:no-repeat;
+	cursor: pointer;
+}
+
 /* <status icons> */
 div.iconzbxunknown{
 	height: 14px;

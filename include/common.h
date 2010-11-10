@@ -530,7 +530,15 @@ typedef enum
 /* Trigger values */
 #define TRIGGER_VALUE_FALSE	0
 #define TRIGGER_VALUE_TRUE	1
-#define TRIGGER_VALUE_UNKNOWN	2
+#define TRIGGER_VALUE_UNKNOWN	2 /* only in "events" table */
+
+/* Trigger value flags */
+#define TRIGGER_VALUE_FLAG_NORMAL	0
+#define TRIGGER_VALUE_FLAG_UNKNOWN	1
+
+/* Trigger value change flags */
+#define TRIGGER_VALUE_CHANGED_NO	0
+#define TRIGGER_VALUE_CHANGED_YES	1
 
 /* Trigger severity */
 typedef enum
@@ -906,6 +914,7 @@ void	zbx_strupper(char *str);
 char	*convert_to_utf8(char *in, size_t in_size, const char *encoding);
 #endif	/* HAVE_ICONV */
 char	*zbx_replace_utf8(const char *text, char replacement);
+int	zbx_strlen_utf8(const char *text);
 
 void	win2unix_eol(char *text);
 int	str2uint(const char *str);

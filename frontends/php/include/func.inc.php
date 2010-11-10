@@ -426,26 +426,7 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 	}
 //Special processing of uptime
 	if($units=='uptime'){
-		$ret='';
-		$days=floor($value/(24*3600));
-		if($days>0){
-			$value=$value-$days*(24*3600);
-		}
-		$hours=floor($value/(3600));
-		if($hours>0){
-			$value=$value-$hours*3600;
-		}
-		$min=floor($value/(60));
-		if($min>0){
-			$value=$value-$min*(60);
-		}
-		if($days==0){
-			$ret = sprintf('%02d:%02d:%02d', $hours, $min, $value);
-		}
-		else{
-			$ret = sprintf('%d '.S_DAYS_SMALL.', %02d:%02d:%02d', $days, $hours, $min, $value);
-		}
-		return $ret;
+		return zbx_date2age(time() - $value);
 	}
 // Special processing for seconds
 	if($units=='s'){
@@ -823,10 +804,10 @@ function zbx_rksort(&$array, $flags=NULL){
 
 
 // used only in morder_result
-function sortSub($array, $sortorder){
+function sortSub($data, $sortorder){
 	$result = array();
 
-	$keys = array_keys($array);
+	$keys = array_keys($data);
 	natcasesort($keys);
 
 
@@ -834,28 +815,28 @@ function sortSub($array, $sortorder){
 		$keys = array_reverse($keys);
 
 	foreach($keys as $key){
-		$tst = reset($array[$key]);
+		$tst = reset($data[$key]);
 		if(isset($tst[0]) && !is_array($tst[0])){
-			$array[$key] = sortSub($array[$key], $sortorder);
+			$data[$key] = sortSub($data[$key], $sortorder);
 		}
 
-		foreach($array[$key] as $id){
+		foreach($data[$key] as $id){
 			$result[] = $id;
 		}
 	}
 	return $result;
 }
 
-function morder_result(&$array, $sortfields, $sortorder=ZBX_SORT_UP){
+function morder_result(&$data, $sortfields, $sortorder=ZBX_SORT_UP){
 	$tmp = array();
 	$result = array();
 
-	foreach($array as $key => $el){
+	foreach($data as $key => $value){
 		unset($pointer);
 		$pointer =& $tmp;
 		foreach($sortfields as $f){
-			if(!isset($pointer[$el[$f]])) $pointer[$el[$f]] = array();
-			$pointer =& $pointer[$el[$f]];
+			if(!isset($pointer[$value[$f]])) $pointer[$value[$f]] = array();
+			$pointer =& $pointer[$value[$f]];
 		}
 		$pointer[] = $key;
 	}
@@ -863,16 +844,21 @@ function morder_result(&$array, $sortfields, $sortorder=ZBX_SORT_UP){
 	$order = sortSub($tmp, $sortorder);
 
 	foreach($order as $key){
-		$result[$key] = $array[$key];
+		$result[$key] = $data[$key];
 	}
 
-	$array = $result;
+	$data = $result;
 	return true;
 }
 
 
 function order_result(&$data, $sortfield=null, $sortorder=ZBX_SORT_UP){
 	if(empty($data)) return false;
+
+	if(is_array($sortfield)){
+		morder_result($data, $sortfield, $sortorder);
+		return true;
+	}
 
 	if(is_null($sortfield)){
 		natcasesort($data);
