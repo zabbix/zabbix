@@ -23,15 +23,15 @@ ALTER TABLE ONLY sysmaps_elements ALTER selementid DROP DEFAULT,
 				  ALTER iconid_maintenance DROP DEFAULT,
 				  ALTER iconid_maintenance DROP NOT NULL,
 				  DROP COLUMN url;
-DELETE FROM sysmaps_elements WHERE sysmapid NOT IN (SELECT sysmapid FROM sysmaps);
+DELETE FROM sysmaps_elements WHERE NOT EXISTS (SELECT 1 FROM sysmaps WHERE sysmaps.sysmapid=sysmaps_elements.sysmapid);
 UPDATE sysmaps_elements SET iconid_off=NULL WHERE iconid_off=0;
 UPDATE sysmaps_elements SET iconid_on=NULL WHERE iconid_on=0;
 UPDATE sysmaps_elements SET iconid_disabled=NULL WHERE iconid_disabled=0;
 UPDATE sysmaps_elements SET iconid_maintenance=NULL WHERE iconid_maintenance=0;
-UPDATE sysmaps_elements SET iconid_off=NULL WHERE NOT iconid_off IS NULL AND NOT iconid_off IN (SELECT imageid FROM images WHERE imagetype=1);
-UPDATE sysmaps_elements SET iconid_on=NULL WHERE NOT iconid_on IS NULL AND NOT iconid_on IN (SELECT imageid FROM images WHERE imagetype=1);
-UPDATE sysmaps_elements SET iconid_disabled=NULL WHERE NOT iconid_disabled IS NULL AND NOT iconid_disabled IN (SELECT imageid FROM images WHERE imagetype=1);
-UPDATE sysmaps_elements SET iconid_maintenance=NULL WHERE NOT iconid_maintenance IS NULL AND NOT iconid_maintenance IN (SELECT imageid FROM images WHERE imagetype=1);
+UPDATE sysmaps_elements SET iconid_off=NULL WHERE iconid_off IS NOT NULL AND NOT EXISTS (SELECT imageid FROM images WHERE images.imagetype=1 and images.imageid=sysmaps_elements.iconid_off );
+UPDATE sysmaps_elements SET iconid_on=NULL WHERE iconid_on IS NOT NULL AND NOT EXISTS (SELECT imageid FROM images WHERE images.imagetype=1 and images.imageid=sysmaps_elements.iconid_on);
+UPDATE sysmaps_elements SET iconid_disabled=NULL WHERE iconid_disabled IS NOT NULL AND NOT EXISTS (SELECT imageid FROM images WHERE images.imagetype=1 and images.imageid=sysmaps_elements.iconid_disabled);
+UPDATE sysmaps_elements SET iconid_maintenance=NULL WHERE iconid_maintenance IS NOT NULL AND NOT EXISTS (SELECT imageid FROM images WHERE images.imagetype=1 and images.imageid=sysmaps_elements.iconid_maintenance);
 ALTER TABLE ONLY sysmaps_elements ADD CONSTRAINT c_sysmaps_elements_1 FOREIGN KEY (sysmapid) REFERENCES sysmaps (sysmapid) ON DELETE CASCADE;
 ALTER TABLE ONLY sysmaps_elements ADD CONSTRAINT c_sysmaps_elements_2 FOREIGN KEY (iconid_off) REFERENCES images (imageid);
 ALTER TABLE ONLY sysmaps_elements ADD CONSTRAINT c_sysmaps_elements_3 FOREIGN KEY (iconid_on) REFERENCES images (imageid);
