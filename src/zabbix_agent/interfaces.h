@@ -20,7 +20,6 @@
 #ifndef ZABBIX_INTERFACES_H
 #define ZABBIX_INTERFACES_H
 
-
 #define	MAX_INTERFACE	(16)
 
 typedef struct s_single_interface_data
