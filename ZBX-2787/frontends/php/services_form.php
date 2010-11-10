@@ -728,7 +728,7 @@ if(isset($_REQUEST['sform'])){
 	$frmService->addRow(S_NEW_SERVICE_TIME, array(
 			$cmbTimeType, BR(),
 			$time_param,
-			new CButton('add_service_time',S_ADD_SMALL,'javascript: document.forms[0].action += \'?sform=1\'; submit();')
+			new CButton('add_service_time',S_ADD_SMALL,'javascript: document.forms[0].action += \'?sform=1\';')
 		));
 //trigger
 	$frmService->addRow(S_LINK_TO_TRIGGER_Q, new CCheckBox('linktrigger',$linktrigger,"javascript: display_element('trigger_name');",1));
