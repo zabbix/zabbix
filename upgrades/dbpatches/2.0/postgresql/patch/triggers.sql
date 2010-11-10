@@ -100,7 +100,7 @@ ALTER TABLE ONLY triggers ALTER triggerid DROP DEFAULT,
 			  ADD value_flags integer DEFAULT '0' NOT NULL,
 			  ADD flags integer DEFAULT '0' NOT NULL;
 UPDATE triggers SET templateid=NULL WHERE templateid=0;
-UPDATE triggers t1 SET templateid=NULL WHERE templateid IS NOT NULL AND NOT EXISTS (SELECT 1 FROM triggers t2 WHERE t2.triggerid=t1.templateid);
+UPDATE triggers SET templateid=NULL WHERE templateid IS NOT NULL AND NOT EXISTS (SELECT 1 FROM triggers t WHERE t.triggerid=triggers.templateid);
 ALTER TABLE ONLY triggers ADD CONSTRAINT c_triggers_1 FOREIGN KEY (templateid) REFERENCES triggers (triggerid) ON DELETE CASCADE;
 
 -- Begin event redesign patch
