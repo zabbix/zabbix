@@ -179,6 +179,9 @@ static void parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 			break;
 		case 'V':
 			version();
+#ifdef _AIX
+			tl_version();
+#endif /* _AIX */
 			exit(-1);
 			break;
 		case 'p':
