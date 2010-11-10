@@ -20,7 +20,7 @@ sbin_PROGRAMS = \
 	zabbix_agentd
 
 zabbix_agent_SOURCES = \
-	zabbix_agent.c zabbix_agent.h \
+	zabbix_agent.c \
 	stats.c stats.h \
 	cpustat.c cpustat.h \
 	diskdevices.c diskdevices.h \

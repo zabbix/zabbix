@@ -22,6 +22,7 @@ Changes for 1.9.0
 
 Changes for 1.8.4rc3
 
+ - [ZBXNEXT-557] added TL compatibility information when executed AIX agent with --version flag (Sasha)
  - [ZBX-3195] fixed slow sync of trends data while server shutdown (Sasha)
  - [ZBXNEXT-549] added trigger function strlen() (asaveljevs,Vedmak)
  - [ZBX-3156] fixed integer trends for child node on master; thanks to Łukasz Reszka (asaveljevs)
