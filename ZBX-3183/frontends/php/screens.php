@@ -168,7 +168,7 @@
 		$screens_wdgt->addItem(new CTableInfo(S_NO_SCREENS_DEFINED));
 		$screens_wdgt->show();
 	}
-	//if screen we are searching for does not exist
+	//if screen we are searching for does not exist and was not fetched from profile
 	elseif(!isset($screens[$elementIdentifier]) && !$id_has_been_fetched_from_profile){
 		$error_msg = $use_screen_name
 					 ? sprintf(S_ERROR_SCREEN_WITH_NAME_DOES_NOT_EXIST, $elementIdentifier)
@@ -176,7 +176,6 @@
 
 		show_error_message($error_msg);
 	}
-	//screen exists, showing it
 	else{
 		if (!isset($screens[$elementIdentifier])) {
 			//this means id was fetched from profile and this screen does not exist
