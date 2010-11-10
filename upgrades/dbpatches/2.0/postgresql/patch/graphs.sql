@@ -10,9 +10,9 @@ ALTER TABLE ONLY graphs
 			ADD flags integer DEFAULT '0' NOT NULL;
 UPDATE graphs SET show_legend=1 WHERE graphtype=0 OR graphtype=1;
 UPDATE graphs SET templateid=NULL WHERE templateid=0;
-UPDATE graphs SET templateid=NULL WHERE NOT templateid IS NULL AND NOT templateid IN (SELECT graphid FROM graphs);
-UPDATE graphs SET ymin_itemid=NULL WHERE ymin_itemid=0 OR NOT ymin_itemid IN (SELECT itemid FROM items);
-UPDATE graphs SET ymax_itemid=NULL WHERE ymax_itemid=0 OR NOT ymax_itemid IN (SELECT itemid FROM items);
+UPDATE graphs g1 SET templateid=NULL WHERE g1.templateid IS NOT NULL AND NOT EXISTS (SELECT 1 FROM graphs g2 WHERE g2.graphid=g1.templateid);
+UPDATE graphs SET ymin_itemid=NULL WHERE ymin_itemid=0 OR NOT EXISTS (SELECT itemid FROM items WHERE items.itemid=graphs.ymin_itemid);
+UPDATE graphs SET ymax_itemid=NULL WHERE ymax_itemid=0 OR NOT EXISTS (SELECT itemid FROM items WHERE items.itemid=graphs.ymax_itemid);
 UPDATE graphs SET ymin_type=0 WHERE ymin_type=2 AND ymin_itemid=NULL;
 UPDATE graphs SET ymax_type=0 WHERE ymax_type=2 AND ymax_itemid=NULL;
 ALTER TABLE ONLY graphs ADD CONSTRAINT c_graphs_1 FOREIGN KEY (templateid) REFERENCES graphs (graphid) ON DELETE CASCADE;
