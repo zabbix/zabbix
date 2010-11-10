@@ -277,7 +277,8 @@ function getEventAckState($event){
 	$config = select_config();
 
 	if(!$config['event_ack_enable']) return null;
-	if(($event['value'] != TRIGGER_VALUE_TRUE) || ($event['value_changed'] == TRIGGER_VALUE_CHANGED_NO)){
+//	if(($event['value'] != TRIGGER_VALUE_TRUE) || ($event['value_changed'] == TRIGGER_VALUE_CHANGED_NO)){
+	if($event['value_changed'] == TRIGGER_VALUE_CHANGED_NO){
 		return SPACE;
 	}
 

@@ -240,6 +240,23 @@
 			$current[] = BR();
 		}
 
+		if(function_exists('db2_connect') &&
+			function_exists('db2_set_option') &&
+			function_exists('db2_commit') &&
+			function_exists('db2_rollback') &&
+			function_exists('db2_autocommit') &&
+			function_exists('db2_prepare') &&
+			function_exists('db2_execute') &&
+			function_exists('db2_stmt_errormsg') &&
+			function_exists('db2_fetch_assoc') &&
+			function_exists('db2_free_result') &&
+			function_exists('db2_escape_string') &&
+			function_exists('db2_close')){
+
+			$current[] = 'IBM DB2';
+			$current[] = BR();
+		}
+
 		if(function_exists('sqlite3_open') &&
 			function_exists('sqlite3_close') &&
 			function_exists('sqlite3_query') &&

@@ -290,18 +290,20 @@ function make_system_status($filter){
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => 1,
 			'limit' => 1,
-			'sortfield' => 'eventid',
+			'sortfield' => 'clock',
 			'sortorder' => ZBX_SORT_DOWN
 		);
-		$event = CEvent::get($options);
-		if(empty($event)){
+		$events = CEvent::get($options);
+		if(empty($events)){
 			$trigger['event'] = array(
+				'value_changed' => 0,
+				'value' => $trigger['value'],
 				'acknowledged' => 1,
 				'clock' => $trigger['lastchange'],
 			);
 		}
 		else{
-			$trigger['event'] = reset($event);
+			$trigger['event'] = reset($events);
 		}
 
 		foreach($trigger['groups'] as $group){
@@ -355,7 +357,7 @@ function make_system_status($filter){
 					else $actions = S_NO_DATA_SMALL;
 
 // Unknown triggers
-					$unknown = new CDiv(SPACE,'iconok');
+					$unknown = SPACE;
 					if($trigger['value_flags'] == TRIGGER_VALUE_FLAG_UNKNOWN){
 						$unknown = new CDiv(SPACE,'iconunknown');
 						$unknown->setHint($trigger['error'], '', 'on');
@@ -395,7 +397,7 @@ function make_system_status($filter){
 					else $actions = S_NO_DATA_SMALL;
 
 // Unknown triggers
-					$unknown = new CDiv(SPACE,'iconok');
+					$unknown = SPACE;
 					if($trigger['value_flags'] == TRIGGER_VALUE_FLAG_UNKNOWN){
 						$unknown = new CDiv(SPACE,'iconunknown');
 						$unknown->setHint($trigger['error'], '', 'on');
@@ -986,7 +988,7 @@ function make_latest_issues($filter = array()){
 // }}} Maintenance
 
 // Unknown triggers
-		$unknown = new CDiv(SPACE,'iconok');
+		$unknown = SPACE;
 		if($trigger['value_flags'] == TRIGGER_VALUE_FLAG_UNKNOWN){
 			$unknown = new CDiv(SPACE,'iconunknown');
 			$unknown->setHint($trigger['error'], '', 'on');
