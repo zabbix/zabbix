@@ -171,6 +171,8 @@
 		$filterForm->setAttribute('id', 'zbx_filter');
 	
 		$filterForm->addVar('triggerid', get_request('triggerid', 0));
+		$filterForm->addVar('stime', get_request('stime'));
+		$filterForm->addVar('period', get_request('period'));
 
 		if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0)){
 			$trigger = expand_trigger_description($_REQUEST['triggerid']);
