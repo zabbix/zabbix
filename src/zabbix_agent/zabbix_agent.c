@@ -18,8 +18,6 @@
 **/
 
 #include "common.h"
-#include "zabbix_agent.h"
-
 #include "comms.h"
 #include "cfg.h"
 #include "log.h"
@@ -122,6 +120,9 @@ int	main(int argc, char **argv)
 				break;
 			case 'V':
 				version();
+#ifdef _AIX
+				tl_version();
+#endif /* _AIX */
 				exit(-1);
 				break;
 			case 'p':
