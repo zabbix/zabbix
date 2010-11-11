@@ -577,8 +577,11 @@ div.formElement_body{
 }
 
 div.objectlist{
-	border-color: #AA5500;
+	border-color: #CC5500;
 	background-color: #2F2F2F;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
 }
 
 div.objectlist ul li{

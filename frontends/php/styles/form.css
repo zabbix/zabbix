@@ -73,7 +73,9 @@ form.thin .biginput{
 }
 
 
-div.formlist {}
+div.formlist {
+	font-size: 1.1em;
+}
 
 div.formlist ul{
 	list-style-type: none;
