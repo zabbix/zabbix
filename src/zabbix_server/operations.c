@@ -17,20 +17,6 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <netinet/in.h>
-#include <netdb.h>
-
-#include <signal.h>
-
-#include <string.h>
-
-#include <time.h>
-
 #include "common.h"
 #include "comms.h"
 #include "db.h"
@@ -59,8 +45,7 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-
-static void run_remote_command(char* host_name, char* command)
+static void	run_remote_command(char *host_name, char *command)
 {
 	int		ret = 9;
 	AGENT_RESULT	agent_result;
@@ -177,7 +162,7 @@ static void run_remote_command(char* host_name, char* command)
 #define CMD_ALIAS 0
 #define CMD_REM_COMMAND 1
 
-static int get_next_command(char** command_list, char** alias, int* is_group, char** command)
+static int	get_next_command(char **command_list, char **alias, int *is_group, char **command)
 {
 	int state = CMD_ALIAS;
 	int len = 0;
@@ -245,7 +230,7 @@ static int get_next_command(char** command_list, char** alias, int* is_group, ch
 
 /******************************************************************************
  *                                                                            *
- * Function: run_commands                                                     *
+ * Function: op_run_commands                                                  *
  *                                                                            *
  * Purpose: run remote commandlist for specific action                        *
  *                                                                            *
@@ -297,9 +282,9 @@ void	op_run_commands(char *cmd_list)
 
 /******************************************************************************
  *                                                                            *
- * Function: select hostid of discovered host                                 *
+ * Function: select_discovered_host                                           *
  *                                                                            *
- * Purpose: select discovered host                                            *
+ * Purpose: select hostid of discovered host                                  *
  *                                                                            *
  * Parameters: dhostid - discovered host id                                   *
  *                                                                            *
@@ -465,9 +450,9 @@ static void	add_discovered_host_group(zbx_uint64_t hostid, zbx_uint64_t groupid)
 
 /******************************************************************************
  *                                                                            *
- * Function: add host if not added already                                    *
+ * Function: add_discovered_host                                              *
  *                                                                            *
- * Purpose: add discovered host                                               *
+ * Purpose: add discovered host if it was not added already                   *
  *                                                                            *
  * Parameters: dhostid - discovered host id                                   *
  *                                                                            *

@@ -24,7 +24,6 @@
 
 #include "active.h"
 
-
 /******************************************************************************
  *                                                                            *
  * Function: get_hostid_by_host                                               *
@@ -36,7 +35,7 @@
  * Return value:  SUCCEED - host is found                                     *
  *                FAIL - an error occurred or host not found                  *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -79,7 +78,7 @@ static int	get_hostid_by_host(const char *host, const char *ip, unsigned short p
 	{
 		zbx_snprintf(error, MAX_STRING_LEN, "host [%s] not found", host);
 
-		/* remove ::ffff: prefix from IPv4-mapped IPV6 addresses */
+		/* remove ::ffff: prefix from IPv4-mapped IPv6 addresses */
 		if (0 == strncmp("::ffff:", ip, 7) && SUCCEED == is_ip4(ip + 7))
 			ip += 7;
 

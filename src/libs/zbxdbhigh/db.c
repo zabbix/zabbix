@@ -17,16 +17,6 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#include <stdlib.h>
-#include <stdio.h>
-
-/* for setproctitle() */
-#include <sys/types.h>
-#include <unistd.h>
-
-#include <string.h>
-#include <strings.h>
-
 #include "zbxdb.h"
 #include "db.h"
 #include "log.h"
@@ -1881,7 +1871,7 @@ zbx_uint64_t	DBmultiply_value_uint64(DB_ITEM *item, zbx_uint64_t value)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1942,13 +1932,13 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
  *                                                                            *
  * Function: DBproxy_register_host                                            *
  *                                                                            *
- * Purpose: registrate unknown host                                           *
+ * Purpose: register unknown host                                             *
  *                                                                            *
  * Parameters: host - host name                                               *
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
