@@ -659,8 +659,8 @@ char	*zbx_user_string(zbx_uint64_t userid);
 double	DBmultiply_value_float(DB_ITEM *item, double value);
 zbx_uint64_t	DBmultiply_value_uint64(DB_ITEM *item, zbx_uint64_t value);
 
-void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, int now);
-void	DBproxy_register_host(const char *host);
+void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, unsigned short port, int now);
+void	DBproxy_register_host(const char *host, const char *ip, unsigned short port);
 void	DBexecute_overflowed_sql(char **sql, int *sql_allocated, int *sql_offset);
 char	*DBget_unique_hostname_by_sample(char *host_name_sample);
 

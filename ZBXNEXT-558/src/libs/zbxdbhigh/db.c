@@ -1886,9 +1886,9 @@ zbx_uint64_t	DBmultiply_value_uint64(DB_ITEM *item, zbx_uint64_t value)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, int now)
+void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, unsigned short port, int now)
 {
-	char		*host_esc;
+	char		*host_esc, *ip_esc;
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_EVENT	event;
@@ -1910,11 +1910,17 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, int now)
 		ZBX_STR2UINT64(autoreg_hostid, row[0]);
 	else
 	{
+		ip_esc = DBdyn_escape_string_len(ip, HOST_IP_LEN);
+
 		autoreg_hostid = DBget_maxid("autoreg_host");
-		DBexecute("insert into autoreg_host (autoreg_hostid,proxy_hostid,host) values (" ZBX_FS_UI64 ",%s,'%s')",
-				autoreg_hostid,
-				DBsql_id_ins(proxy_hostid),
-				host_esc);
+		DBexecute("insert into autoreg_host"
+				" (autoreg_hostid,proxy_hostid,host,listen_ip,listen_port)"
+				" values"
+				" (" ZBX_FS_UI64 ",%s,'%s','%s',%d)",
+				autoreg_hostid, DBsql_id_ins(proxy_hostid),
+				host_esc, ip_esc, (int)port);
+
+		zbx_free(ip_esc);
 	}
 	DBfree_result(result);
 
@@ -1929,7 +1935,7 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, int now)
 	event.value	= TRIGGER_VALUE_TRUE;
 
 	/* Processing event */
-	process_event(&event, 0);
+	process_event(&event, 1);
 }
 
 /******************************************************************************
@@ -1947,16 +1953,20 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, int now)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	DBproxy_register_host(const char *host)
+void	DBproxy_register_host(const char *host, const char *ip, unsigned short port)
 {
-	char	*host_esc;
+	char	*host_esc, *ip_esc;
 
 	host_esc = DBdyn_escape_string_len(host, HOST_HOST_LEN);
+	ip_esc = DBdyn_escape_string_len(ip, HOST_IP_LEN);
 
-	DBexecute("insert into proxy_autoreg_host (clock,host) values (%d,'%s')",
-			(int)time(NULL),
-			host_esc);
+	DBexecute("insert into proxy_autoreg_host"
+			" (clock,host,listen_ip,listen_port)"
+			" values"
+			" (%d,'%s','%s',%d)",
+			(int)time(NULL), host_esc, ip_esc, (int)port);
 
+	zbx_free(ip_esc);
 	zbx_free(host_esc);
 }
 

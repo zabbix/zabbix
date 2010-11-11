@@ -338,8 +338,12 @@ static zbx_uint64_t	select_discovered_host(DB_EVENT *event)
 				event->objectid);
 		break;
 	case EVENT_OBJECT_ZABBIX_ACTIVE:
-		result = DBselect("select h.hostid from hosts h,autoreg_host a"
-				" where a.proxy_hostid=h.proxy_hostid and a.host=h.host and a.autoreg_hostid=" ZBX_FS_UI64,
+		result = DBselect(
+				"select h.hostid"
+				" from hosts h,autoreg_host a"
+				" where a.proxy_hostid=h.proxy_hostid"
+					" and a.host=h.host"
+					" and a.autoreg_hostid=" ZBX_FS_UI64,
 				event->objectid);
 		break;
 	default:
@@ -530,7 +534,9 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 				event->objectid);
 		break;
 	case EVENT_OBJECT_ZABBIX_ACTIVE:
-		result = DBselect("select proxy_hostid,host from autoreg_host"
+		result = DBselect(
+				"select proxy_hostid,host,listen_ip,listen_port"
+				" from autoreg_host"
 				" where autoreg_hostid=" ZBX_FS_UI64,
 				event->objectid);
 		break;
@@ -545,6 +551,7 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 		if (EVENT_OBJECT_ZABBIX_ACTIVE == event->object)
 		{
 			host_esc = DBdyn_escape_string_len(row[1], HOST_HOST_LEN);
+			ip_esc = DBdyn_escape_string_len(row[2], HOST_IP_LEN);
 
 			result2 = DBselect(
 					"select hostid,proxy_hostid"
@@ -558,12 +565,11 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 			{
 				hostid = DBget_maxid("hosts");
 
-				DBexecute("insert into hosts (hostid,proxy_hostid,host,useip,dns)"
-						" values (" ZBX_FS_UI64 ",%s,'%s',0,'%s')",
+				DBexecute("insert into hosts (hostid,proxy_hostid,host,useip,dns,ip,port)"
+						" values (" ZBX_FS_UI64 ",%s,'%s',1,'%s','%s',%s)",
 						hostid,
 						DBsql_id_ins(proxy_hostid),
-						host_esc,
-						host_esc);
+						host_esc, host_esc, ip_esc, row[3]);
 			}
 			else
 			{
@@ -581,6 +587,7 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 			}
 			DBfree_result(result2);
 
+			zbx_free(ip_esc);
 			zbx_free(host_esc);
 		}
 		else /* EVENT_OBJECT_DHOST, EVENT_OBJECT_DSERVICE */

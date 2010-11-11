@@ -41,7 +41,8 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	get_hostid_by_host(const char *host, zbx_uint64_t *hostid, char *error, unsigned char zbx_process)
+static int	get_hostid_by_host(const char *host, const char *ip, unsigned short port,
+		zbx_uint64_t *hostid, char *error, unsigned char zbx_process)
 {
 	char		*host_esc;
 	DB_RESULT	result;
@@ -78,15 +79,19 @@ static int	get_hostid_by_host(const char *host, zbx_uint64_t *hostid, char *erro
 	{
 		zbx_snprintf(error, MAX_STRING_LEN, "host [%s] not found", host);
 
+		/* remove ::ffff: prefix from IPv4-mapped IPV6 addresses */
+		if (0 == strncmp("::ffff:", ip, 7) && SUCCEED == is_ip4(ip + 7))
+			ip += 7;
+
 		DBbegin();
 
 		if (0 != (zbx_process & ZBX_PROCESS_SERVER))
 		{
-			DBregister_host(0, host, (int)time(NULL));
+			DBregister_host(0, host, ip, port, (int)time(NULL));
 		}
 		else if (0 != (zbx_process & ZBX_PROCESS_PROXY))
 		{
-			DBproxy_register_host(host);
+			DBproxy_register_host(host, ip, port);
 		}
 
 		DBcommit();
@@ -127,7 +132,7 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request, unsigned char zb
 	int		buffer_offset = 0;
 	int		res = FAIL;
 	zbx_uint64_t	hostid;
-	char		error[MAX_STRING_LEN];
+	char		error[MAX_STRING_LEN], ip[HOST_IP_LEN_MAX];
 	DC_ITEM		dc_item;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In send_list_of_active_checks()");
@@ -145,7 +150,9 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request, unsigned char zb
 		goto out;
 	}
 
-	if (FAIL == get_hostid_by_host(host, &hostid, error, zbx_process))
+	strscpy(ip, get_ip_by_socket(sock));
+
+	if (FAIL == get_hostid_by_host(host, ip, 10050, &hostid, error, zbx_process))
 		goto out;
 
 	buffer = zbx_malloc(buffer, buffer_alloc);
@@ -250,7 +257,8 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp,
 {
 	char		host[HOST_HOST_LEN_MAX], *name_esc, params[MAX_STRING_LEN],
 			pattern[MAX_STRING_LEN], tmp[32],
-			key_severity[MAX_STRING_LEN], key_logeventid[MAX_STRING_LEN];
+			key_severity[MAX_STRING_LEN], key_logeventid[MAX_STRING_LEN],
+			ip[HOST_IP_LEN_MAX];
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_ITEM		item;
@@ -259,6 +267,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp,
 	zbx_uint64_t	hostid;
 	char		error[MAX_STRING_LEN];
 	DC_ITEM		dc_item;
+	unsigned short	port;
 
 	char		**regexp = NULL;
 	int		regexp_alloc = 0;
@@ -276,7 +285,16 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp,
 		goto error;
 	}
 
-	if (FAIL == get_hostid_by_host(host, &hostid, error, zbx_process))
+	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_IP, ip, sizeof(ip)))
+		strscpy(ip, get_ip_by_socket(sock));
+
+	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_PORT, tmp, sizeof(tmp)))
+		*tmp = '\0';
+
+	if (FAIL == is_ushort(tmp, &port))
+		port = 10050;
+
+	if (FAIL == get_hostid_by_host(host, ip, port, &hostid, error, zbx_process))
 		goto error;
 
 	sql = zbx_malloc(sql, sql_alloc);
