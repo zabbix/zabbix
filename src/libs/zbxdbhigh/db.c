@@ -1885,6 +1885,7 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 	zbx_uint64_t	autoreg_hostid;
 
 	host_esc = DBdyn_escape_string_len(host, HOST_HOST_LEN);
+	ip_esc = DBdyn_escape_string_len(ip, HOST_IP_LEN);
 
 	result = DBselect(
 			"select autoreg_hostid"
@@ -1897,11 +1898,16 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 			DBnode_local("autoreg_hostid"));
 
 	if (NULL != (row = DBfetch(result)))
+	{
 		ZBX_STR2UINT64(autoreg_hostid, row[0]);
+
+		DBexecute("update autoreg_host"
+				" set listen_ip='%s',listen_port=%d"
+				" where autoreg_hostid=" ZBX_FS_UI64,
+				ip_esc, (int)port, autoreg_hostid);
+	}
 	else
 	{
-		ip_esc = DBdyn_escape_string_len(ip, HOST_IP_LEN);
-
 		autoreg_hostid = DBget_maxid("autoreg_host");
 		DBexecute("insert into autoreg_host"
 				" (autoreg_hostid,proxy_hostid,host,listen_ip,listen_port)"
@@ -1909,11 +1915,10 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 				" (" ZBX_FS_UI64 ",%s,'%s','%s',%d)",
 				autoreg_hostid, DBsql_id_ins(proxy_hostid),
 				host_esc, ip_esc, (int)port);
-
-		zbx_free(ip_esc);
 	}
 	DBfree_result(result);
 
+	zbx_free(ip_esc);
 	zbx_free(host_esc);
 
 	/* Preparing auto registration event for processing */
