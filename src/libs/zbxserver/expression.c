@@ -1274,8 +1274,11 @@ static int	DBget_item_lastvalue_by_triggerid(zbx_uint64_t triggerid, char **last
 	if (FAIL == trigger_get_N_functionid(expression, N_functionid, &functionid))
 		return FAIL;
 
-	result = DBselect("select i.itemid,i.value_type,i.valuemapid,i.units,i.lastvalue from items i,functions f"
-			" where i.itemid=f.itemid and f.functionid=" ZBX_FS_UI64,
+	result = DBselect(
+			"select i.itemid,i.value_type,i.valuemapid,i.units,i.lastvalue"
+			" from items i,functions f"
+			" where i.itemid=f.itemid"
+				" and f.functionid=" ZBX_FS_UI64,
 			functionid);
 
 	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[4]))
@@ -1310,10 +1313,10 @@ static int	DBget_item_lastvalue_by_triggerid(zbx_uint64_t triggerid, char **last
 			default:
 				zbx_strlcpy(tmp, row[4], sizeof(tmp));
 
-				if (SUCCEED != replace_value_by_map(tmp, sizeof(tmp), valuemapid))
-					add_value_suffix(tmp, sizeof(tmp), row[3], value_type);
 				if (ITEM_VALUE_TYPE_FLOAT == value_type)
 					del_zeroes(tmp);
+				if (SUCCEED != replace_value_by_map(tmp, sizeof(tmp), valuemapid))
+					add_value_suffix(tmp, sizeof(tmp), row[3], value_type);
 
 				*lastvalue = zbx_dsprintf(*lastvalue, "%s", tmp);
 				break;
@@ -1349,7 +1352,7 @@ static int	DBget_item_value_by_triggerid(zbx_uint64_t triggerid, char **value, i
 	DB_RESULT	h_result;
 	DB_ROW		h_row;
 	char		expression[TRIGGER_EXPRESSION_LEN_MAX];
-	zbx_uint64_t	functionid;
+	zbx_uint64_t	functionid, valuemapid;
 	int		value_type, ret = FAIL;
 	char		tmp[MAX_STRING_LEN];
 
@@ -1359,13 +1362,17 @@ static int	DBget_item_value_by_triggerid(zbx_uint64_t triggerid, char **value, i
 	if (FAIL == trigger_get_N_functionid(expression, N_functionid, &functionid))
 		return FAIL;
 
-	result = DBselect("select i.itemid,i.value_type from items i,functions f"
-			" where i.itemid=f.itemid and f.functionid=" ZBX_FS_UI64,
+	result = DBselect(
+			"select i.itemid,i.value_type,i.valuemapid,i.units,i.lastvalue"
+			" from items i,functions f"
+			" where i.itemid=f.itemid"
+				" and f.functionid=" ZBX_FS_UI64,
 			functionid);
 
 	if (NULL != (row = DBfetch(result)))
 	{
 		value_type = atoi(row[1]);
+		ZBX_STR2UINT64(valuemapid, row[2]);
 
 		zbx_snprintf(tmp, sizeof(tmp), "select value from %s where itemid=%s and clock<=%d order by itemid,clock desc",
 				get_table_by_value_type(value_type), row[0], clock);
@@ -1373,9 +1380,30 @@ static int	DBget_item_value_by_triggerid(zbx_uint64_t triggerid, char **value, i
 		h_result = DBselectN(tmp, 1);
 		if (NULL != (h_row = DBfetch(h_result)))
 		{
-			if (ITEM_VALUE_TYPE_FLOAT == value_type)
-				del_zeroes(h_row[0]);
-			*value = zbx_dsprintf(*value, "%s", h_row[0]);
+			switch (value_type)
+			{
+				case ITEM_VALUE_TYPE_LOG:
+				case ITEM_VALUE_TYPE_TEXT:
+					*value = zbx_dsprintf(*value, "%s", h_row[0]);
+					break;
+				case ITEM_VALUE_TYPE_STR:
+					zbx_strlcpy(tmp, h_row[0], sizeof(tmp));
+
+					replace_value_by_map(tmp, sizeof(tmp), valuemapid);
+
+					*value = zbx_dsprintf(*value, "%s", tmp);
+					break;
+				default:
+					zbx_strlcpy(tmp, h_row[0], sizeof(tmp));
+
+					if (ITEM_VALUE_TYPE_FLOAT == value_type)
+						del_zeroes(tmp);
+					if (SUCCEED != replace_value_by_map(tmp, sizeof(tmp), valuemapid))
+						add_value_suffix(tmp, sizeof(tmp), row[3], value_type);
+
+					*value = zbx_dsprintf(*value, "%s", tmp);
+					break;
+			}
 			ret = SUCCEED;
 		}
 		DBfree_result(h_result);
