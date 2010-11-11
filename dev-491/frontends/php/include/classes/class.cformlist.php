@@ -24,13 +24,13 @@ class CFormList extends CDiv{
 	protected $editable = true;
 	protected $formInputs = array('ctextbox','cnumericbox','ctextarea','ccombobox','ccheckbox','cpassbox','cipbox');
 
-	public function __construct($id, $class='formlist', $editable=true){
+	public function __construct($id, $class='', $editable=true){
 		$this->editable = $editable;
 		$this->formList = new CList();
 
 		parent::__construct();
 		$this->setAttribute('id', $id);
-		$this->setAttribute('class', $class);
+		$this->setAttribute('class', 'formlist '.$class);
 	}
 
 	public function addRow($term, $description){

@@ -50,35 +50,35 @@
  *
  * http://docs.jquery.com/UI/Theming/API
  *
- * To view and modify this theme, visit http://jqueryui.com/themeroller/?ffDefault=verdana,%20arial,%20helvetica,%20sans-serif;&fwDefault=bold&fsDefault=1.0em&cornerRadius=3px&bgColorHeader=2f2f2f&bgTextureHeader=04_highlight_hard.png&bgImgOpacityHeader=25&borderColorHeader=333333&fcHeader=ffffff&iconColorHeader=ffffff&bgColorContent=0f0f0f&bgTextureContent=01_flat.png&bgImgOpacityContent=25&borderColorContent=666666&fcContent=ffffff&iconColorContent=cccccc&bgColorDefault=1f1f1f&bgTextureDefault=02_glass.png&bgImgOpacityDefault=30&borderColorDefault=666666&fcDefault=eeeeee&iconColorDefault=cccccc&bgColorHover=1f1f1f&bgTextureHover=02_glass.png&bgImgOpacityHover=30&borderColorHover=ff5500&fcHover=ff5500&iconColorHover=ff5500&bgColorActive=ff5500&bgTextureActive=02_glass.png&bgImgOpacityActive=40&borderColorActive=2f2f2f&fcActive=2f2f2f&iconColorActive=2f2f2f&bgColorHighlight=cccccc&bgTextureHighlight=04_highlight_hard.png&bgImgOpacityHighlight=80&borderColorHighlight=ff5500&fcHighlight=ff5500&iconColorHighlight=4b8e0b&bgColorError=ffc73d&bgTextureError=02_glass.png&bgImgOpacityError=40&borderColorError=ffb73d&fcError=111111&iconColorError=a83300&bgColorOverlay=5c5c5c&bgTextureOverlay=07_diagonals_small.png&bgImgOpacityOverlay=50&opacityOverlay=80&bgColorShadow=cccccc&bgTextureShadow=01_flat.png&bgImgOpacityShadow=30&opacityShadow=60&thicknessShadow=3px&offsetTopShadow=-3px&offsetLeftShadow=-3px&cornerRadiusShadow=4px
+ * To view and modify this theme, visit http://jqueryui.com/themeroller/?ffDefault=Verdana,%20Arial,%20sans-serif&fwDefault=bold&fsDefault=1.0em&cornerRadius=3px&bgColorHeader=333333&bgTextureHeader=03_highlight_soft.png&bgImgOpacityHeader=25&borderColorHeader=333333&fcHeader=ffffff&iconColorHeader=ffffff&bgColorContent=1f1f1f&bgTextureContent=01_flat.png&bgImgOpacityContent=25&borderColorContent=ff5500&fcContent=dfdfdf&iconColorContent=dfdfdf&bgColorDefault=555555&bgTextureDefault=02_glass.png&bgImgOpacityDefault=20&borderColorDefault=2f2f2f&fcDefault=eeeeee&iconColorDefault=cccccc&bgColorHover=f0a000&bgTextureHover=02_glass.png&bgImgOpacityHover=50&borderColorHover=2f2f2f&fcHover=2f2f2f&iconColorHover=2f2f2f&bgColorActive=ff5500&bgTextureActive=02_glass.png&bgImgOpacityActive=50&borderColorActive=2f2f2f&fcActive=2f2f2f&iconColorActive=2f2f2f&bgColorHighlight=eeeeee&bgTextureHighlight=03_highlight_soft.png&bgImgOpacityHighlight=80&borderColorHighlight=cccccc&fcHighlight=2e7db2&iconColorHighlight=4b8e0b&bgColorError=ff7722&bgTextureError=01_flat.png&bgImgOpacityError=50&borderColorError=a83300&fcError=111111&iconColorError=a83300&bgColorOverlay=5c5c5c&bgTextureOverlay=07_diagonals_small.png&bgImgOpacityOverlay=50&opacityOverlay=80&bgColorShadow=cccccc&bgTextureShadow=01_flat.png&bgImgOpacityShadow=30&opacityShadow=60&thicknessShadow=3px&offsetTopShadow=-3px&offsetLeftShadow=-3px&cornerRadiusShadow=4px
  */
 
 
 /* Component containers
 ----------------------------------*/
-.darkorange .ui-widget { font-family: verdana, arial, helvetica, sans-serif;; font-size: 1.0em; }
+.darkorange .ui-widget { font-family: Verdana, Arial, sans-serif; font-size: 1.0em; }
 .darkorange .ui-widget .ui-widget { font-size: 1em; }
-.darkorange .ui-widget input, .darkorange .ui-widget select, .darkorange .ui-widget textarea, .darkorange .ui-widget button { font-family: verdana, arial, helvetica, sans-serif;; font-size: 1em; }
-.darkorange .ui-widget-content { border: 1px solid #666666; background: #0f0f0f url(images/ui-bg_flat_25_0f0f0f_40x100.png) 50% 50% repeat-x; color: #ffffff; }
-.darkorange .ui-widget-content a { color: #ffffff; }
-.darkorange .ui-widget-header { border: 1px solid #333333; background: #2f2f2f url(images/ui-bg_highlight-hard_25_2f2f2f_1x100.png) 50% 50% repeat-x; color: #ffffff; font-weight: bold; }
+.darkorange .ui-widget input, .darkorange .ui-widget select, .darkorange .ui-widget textarea, .darkorange .ui-widget button { font-family: Verdana, Arial, sans-serif; font-size: 1em; }
+.darkorange .ui-widget-content { border: 1px solid #CC5500; background: #1f1f1f url(images/ui-bg_flat_25_1f1f1f_40x100.png) 50% 50% repeat-x; color: #dfdfdf; }
+.darkorange .ui-widget-content a { color: #dfdfdf; }
+.darkorange .ui-widget-header { border: 1px solid #333333; background: #333333 url(images/ui-bg_highlight-soft_25_333333_1x100.png) 50% 50% repeat-x; color: #ffffff; font-weight: bold; }
 .darkorange .ui-widget-header a { color: #ffffff; }
 
 /* Interaction states
 ----------------------------------*/
-.darkorange .ui-state-default, .darkorange .ui-widget-content .ui-state-default, .darkorange .ui-widget-header .ui-state-default { border: 1px solid #666666; background: #1f1f1f url(images/ui-bg_glass_30_1f1f1f_1x400.png) 50% 50% repeat-x; font-weight: bold; color: #eeeeee; }
+.darkorange .ui-state-default, .darkorange .ui-widget-content .ui-state-default, .darkorange .ui-widget-header .ui-state-default { border: 1px solid #2f2f2f; background: #555555 url(images/ui-bg_glass_20_555555_1x400.png) 50% 50% repeat-x; font-weight: bold; color: #eeeeee; }
 .darkorange .ui-state-default a, .darkorange .ui-state-default a:link, .darkorange .ui-state-default a:visited { color: #eeeeee; text-decoration: none; }
-.darkorange .ui-state-hover, .darkorange .ui-widget-content .ui-state-hover, .darkorange .ui-widget-header .ui-state-hover, .darkorange .ui-state-focus, .darkorange .ui-widget-content .ui-state-focus, .darkorange .ui-widget-header .ui-state-focus { border: 1px solid #ff5500; background: #1f1f1f url(images/ui-bg_glass_30_1f1f1f_1x400.png) 50% 50% repeat-x; font-weight: bold; color: #ff5500; }
-.darkorange .ui-state-hover a, .darkorange .ui-state-hover a:hover { color: #ff5500; text-decoration: none; }
-.darkorange .ui-state-active, .darkorange .ui-widget-content .ui-state-active, .darkorange .ui-widget-header .ui-state-active { border: 1px solid #2f2f2f; background: #ff5500 url(images/ui-bg_glass_40_ff5500_1x400.png) 50% 50% repeat-x; font-weight: bold; color: #2f2f2f; }
+.darkorange .ui-state-hover, .darkorange .ui-widget-content .ui-state-hover, .darkorange .ui-widget-header .ui-state-hover, .darkorange .ui-state-focus, .darkorange .ui-widget-content .ui-state-focus, .darkorange .ui-widget-header .ui-state-focus { border: 1px solid #2f2f2f; background: #f0a000 url(images/ui-bg_glass_50_f0a000_1x400.png) 50% 50% repeat-x; font-weight: bold; color: #2f2f2f; }
+.darkorange .ui-state-hover a, .darkorange .ui-state-hover a:hover { color: #2f2f2f; text-decoration: none; }
+.darkorange .ui-state-active, .darkorange .ui-widget-content .ui-state-active, .darkorange .ui-widget-header .ui-state-active { border: 1px solid #2f2f2f; background: #ff5500 url(images/ui-bg_glass_50_ff5500_1x400.png) 50% 50% repeat-x; font-weight: bold; color: #2f2f2f; }
 .darkorange .ui-state-active a, .darkorange .ui-state-active a:link, .darkorange .ui-state-active a:visited { color: #2f2f2f; text-decoration: none; }
 .darkorange .ui-widget :active { outline: none; }
 
 /* Interaction Cues
 ----------------------------------*/
-.darkorange .ui-state-highlight, .darkorange .ui-widget-content .ui-state-highlight, .darkorange .ui-widget-header .ui-state-highlight  {border: 1px solid #ff5500; background: #cccccc url(images/ui-bg_highlight-hard_80_cccccc_1x100.png) 50% top repeat-x; color: #ff5500; }
-.darkorange .ui-state-highlight a, .darkorange .ui-widget-content .ui-state-highlight a,.ui-widget-header .ui-state-highlight a { color: #ff5500; }
-.darkorange .ui-state-error, .darkorange .ui-widget-content .ui-state-error, .darkorange .ui-widget-header .ui-state-error {border: 1px solid #ffb73d; background: #ffc73d url(images/ui-bg_glass_40_ffc73d_1x400.png) 50% 50% repeat-x; color: #111111; }
+.darkorange .ui-state-highlight, .darkorange .ui-widget-content .ui-state-highlight, .darkorange .ui-widget-header .ui-state-highlight  {border: 1px solid #cccccc; background: #eeeeee url(images/ui-bg_highlight-soft_80_eeeeee_1x100.png) 50% top repeat-x; color: #2e7db2; }
+.darkorange .ui-state-highlight a, .darkorange .ui-widget-content .ui-state-highlight a,.ui-widget-header .ui-state-highlight a { color: #2e7db2; }
+.darkorange .ui-state-error, .darkorange .ui-widget-content .ui-state-error, .darkorange .ui-widget-header .ui-state-error {border: 1px solid #a83300; background: #ff7722 url(images/ui-bg_flat_50_ff7722_40x100.png) 50% 50% repeat-x; color: #111111; }
 .darkorange .ui-state-error a, .darkorange .ui-widget-content .ui-state-error a, .darkorange .ui-widget-header .ui-state-error a { color: #111111; }
 .darkorange .ui-state-error-text, .darkorange .ui-widget-content .ui-state-error-text, .darkorange .ui-widget-header .ui-state-error-text { color: #111111; }
 .darkorange .ui-priority-primary, .darkorange .ui-widget-content .ui-priority-primary, .darkorange .ui-widget-header .ui-priority-primary { font-weight: bold; }
@@ -89,11 +89,11 @@
 ----------------------------------*/
 
 /* states and images */
-.darkorange .ui-icon { width: 16px; height: 16px; background-image: url(images/ui-icons_cccccc_256x240.png); }
-.darkorange .ui-widget-content .ui-icon {background-image: url(images/ui-icons_cccccc_256x240.png); }
+.darkorange .ui-icon { width: 16px; height: 16px; background-image: url(images/ui-icons_dfdfdf_256x240.png); }
+.darkorange .ui-widget-content .ui-icon {background-image: url(images/ui-icons_dfdfdf_256x240.png); }
 .darkorange .ui-widget-header .ui-icon {background-image: url(images/ui-icons_ffffff_256x240.png); }
 .darkorange .ui-state-default .ui-icon { background-image: url(images/ui-icons_cccccc_256x240.png); }
-.darkorange .ui-state-hover .ui-icon, .darkorange .ui-state-focus .ui-icon {background-image: url(images/ui-icons_ff5500_256x240.png); }
+.darkorange .ui-state-hover .ui-icon, .darkorange .ui-state-focus .ui-icon {background-image: url(images/ui-icons_2f2f2f_256x240.png); }
 .darkorange .ui-state-active .ui-icon {background-image: url(images/ui-icons_2f2f2f_256x240.png); }
 .darkorange .ui-state-highlight .ui-icon {background-image: url(images/ui-icons_4b8e0b_256x240.png); }
 .darkorange .ui-state-error .ui-icon, .darkorange .ui-state-error-text .ui-icon {background-image: url(images/ui-icons_a83300_256x240.png); }
