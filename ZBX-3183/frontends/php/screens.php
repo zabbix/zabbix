@@ -115,10 +115,13 @@
 ?>
 <?php
 
+	//whether we should use screen name to fetch a screen (if this is false, elementid is used)
+	$use_screen_name = isset($_REQUEST['screenname']);
+
 	//getiing element id from GET paramters
 	$elementid = $_REQUEST['elementid'] = get_request('elementid', false);
 	//if none is provided
-	if ($elementid === false) {
+	if ($elementid === false && !$use_screen_name) {
 		//get element id saved in profile from the last visit
 		$elementid = CProfile::get('web.screens.elementid', null);
 		//this flag will be used in case this element does not exist
@@ -146,8 +149,7 @@
 		'extendoutput' => 1
 	));
 
-	//whether we should use screen name to fetch a screen (if this is false, elementid is used)
-	$use_screen_name = isset($_REQUEST['screenname']);
+	
 
 	//if screen name is provided it takes priority over elementid
 	if ($use_screen_name) {
