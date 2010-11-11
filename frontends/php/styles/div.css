@@ -371,7 +371,7 @@ div.icon_sortdown{
 
 /********** <OBJECT LIST> ************/
 div.objectlist{
-	margin: 5px 5px 5px 5px;
+	margin: 5px 0px 5px 0px;
 	border: 1px solid #6C80B9;
 	background-color: #FFFFFF;
 }
@@ -550,4 +550,9 @@ span.discoveryName{
 .biglink:hover{
 	color:#6C80B9;
 	text-decoration: underline;
+}
+
+
+div.widget{
+	margin: 0px 4px 0px 4px;
 }

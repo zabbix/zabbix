@@ -1,5 +1,6 @@
 /* CSS Document */
 /* Black and Blue Theme by Aly*/
+@import "darkblue/jquery-ui-1.8.6.custom.css";
 
 @media print {
 	body{
