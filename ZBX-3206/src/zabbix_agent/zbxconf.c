@@ -187,3 +187,26 @@ void    load_user_parameters(int optional)
 	else
 		parse_opt_cfg_file(CONFIG_FILE, cfg);
 }
+
+#ifdef _AIX
+void	tl_version()
+{
+#ifdef _AIXVERSION_610
+#	define ZBX_AIX_TL	"6100 and above"
+#elif _AIXVERSION_530
+#	ifdef HAVE_AIXOSLEVEL_530006
+#		define ZBX_AIX_TL	"5300-06 and above"
+#	else
+#		define ZBX_AIX_TL	"5300-00,01,02,03,04,05"
+#	endif
+#elif _AIXVERSION_520
+#	define ZBX_AIX_TL	"5200"
+#elif _AIXVERSION_510
+#	define ZBX_AIX_TL	"5100"
+#endif
+#ifdef ZBX_AIX_TL
+	printf("Supported technology levels: %s\n", ZBX_AIX_TL);
+#endif /* ZBX_AIX_TL */
+#undef ZBX_AIX_TL
+}
+#endif /* _AIX */

@@ -65,7 +65,6 @@ void	collect_stats_interfaces(ZBX_INTERFACES_DATA *pinterfaces)
 #include <pwd.h>
 
 #include "sysinfo.h"
-#include "zabbix_agent.h"
 
 #include "log.h"
 #include "cfg.h"
