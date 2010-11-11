@@ -360,6 +360,22 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
 
+	if (NULL != CONFIG_LISTEN_IP)
+	{
+		char	*p;
+
+		if (NULL != (p = strchr(CONFIG_LISTEN_IP, ',')))
+			*p = '\0';
+
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_IP, CONFIG_LISTEN_IP, ZBX_JSON_TYPE_STRING);
+
+		if (NULL != p)
+			*p = ',';
+	}
+
+	if (10050 != CONFIG_LISTEN_PORT)
+		zbx_json_adduint64(&json, ZBX_PROTO_TAG_PORT, CONFIG_LISTEN_PORT);
+
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, CONFIG_TIMEOUT)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", json.buffer);
