@@ -71,3 +71,31 @@ form.thin .biginput{
 	font-size: 11px;
 	height: 14px;
 }
+
+
+div.formlist {}
+
+div.formlist ul{
+	list-style-type: none;
+	margin: 0px;
+	padding: 0px;
+	width: 100%;
+}
+
+div.formlist ul li{
+	padding: 2px;
+	width: 100%;
+	vertical-align: middle;
+}
+
+div.formlist ul li div.dt{
+	width: 20%;
+	float: left;
+	text-align: right;
+	white-space: nowrap;
+}
+
+div.formlist ul li div.dd{
+	width: 77%;
+	margin-left: 21%;
+}

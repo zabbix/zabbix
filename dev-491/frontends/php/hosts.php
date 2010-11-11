@@ -703,7 +703,6 @@ include_once('include/page_header.php');
 	}
 
 	$hosts_wdgt = new CWidget();
-	$hosts_wdgt->addPageHeader(S_CONFIGURATION_OF_HOSTS, $frmForm);
 
 	$options = array(
 		'groups' => array(
@@ -725,20 +724,25 @@ include_once('include/page_header.php');
 	else if(isset($_REQUEST['form'])){
 		if($_REQUEST['form'] == S_IMPORT_HOST)
 			$hosts_wdgt->addItem(import_host_form());
-		else
-			$hosts_wdgt->addItem(insert_host_form());
+		else{
+			$hosts_wdgt->addItem(get_header_host_table($_REQUEST['hostid'], 'host'));
+
+
+			$hostForm = new CGetForm();
+			$hosts_wdgt->addItem($hostForm->render('host.edit'));
+		}
 	}
 	else{
-		$frmForm = new CForm();
-		$frmForm->setMethod('get');
+		$frmGroup = new CForm();
+		$frmGroup->setMethod('get');
 
-		$frmForm->addItem(array(S_GROUP.SPACE, $pageFilter->getGroupsCB()));
+		$frmGroup->addItem(array(S_GROUP.SPACE, $pageFilter->getGroupsCB()));
 
 		$numrows = new CDiv();
 		$numrows->setAttribute('name', 'numrows');
 
-		$hosts_wdgt->addHeader(S_HOSTS_BIG, $frmForm);
-		$hosts_wdgt->addHeader($numrows);
+		$hosts_wdgt->addHeader(S_CONFIGURATION_OF_HOSTS, $frmGroup);
+		$hosts_wdgt->addHeader($numrows, $frmForm);
 
 // HOSTS FILTER {{{
 		$filter_table = new CTable('', 'filter_config');

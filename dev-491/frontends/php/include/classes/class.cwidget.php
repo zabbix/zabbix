@@ -84,22 +84,15 @@ private $flicker;
 	}
 
 	public function get(){
-//		$widget = new CTable();
-//		$widget->setAttribute('width','100%');
-//		$widget->setCellPadding(0);
-//		$widget->setCellSpacing(0);
-
 		$widget = array();
 
 		if(!empty($this->pageHeaders)){
 			$header_tab = $this->createPageHeader();
-//			$widget->addRow(new CCol($header_tab));
 			$widget[] = $header_tab;
 		}
 
 		if(!empty($this->headers)){
 			$header_tab = $this->createHeader();
-//			$widget->addRow($header_tab);
 			$widget[] = $header_tab;
 		}
 
@@ -139,17 +132,15 @@ private $flicker;
 
 			$flicker_tab->addRow($div);
 
-//			$widget->addRow($flicker_tab);
 			$widget[] = $flicker_tab;
 		}
 
 		$div = new CDiv($this->body);
 		$div->setAttribute('id',$this->domid);
-//		$div->setAttribute('style','width: 1180px; overflow: auto;');
+		$div->setAttribute('class','widget');
 
 		if(!$this->state) $div->setAttribute('style','display: none;');
 
-//		$widget->addRow($div);
 		$widget[] = $div;
 
 	return $widget;

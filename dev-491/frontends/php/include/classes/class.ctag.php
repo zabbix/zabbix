@@ -76,10 +76,6 @@ class CTag extends CObject{
 	public function bodyToString(){
 		$res = $this->tag_body_start;
 	return $res.parent::toString(false);
-
-		/*foreach($this->items as $item)
-			$res .= $item;
-		return $res;*/
 	}
 
 	public function endToString(){
@@ -185,6 +181,12 @@ class CTag extends CObject{
 	public function error($value){
 		error('class('.get_class($this).') - '.$value);
 		return 1;
+	}
+
+	public function getForm($action=NULL, $method='post', $enctype=NULL){
+		$form = new CForm($action, $method, $enctype);
+		$form->addItem($this);
+	return $form;
 	}
 }
 ?>

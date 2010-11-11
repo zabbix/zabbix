@@ -16,8 +16,8 @@ $availableJScripts = array(
 	'common.js' => '',
 	'menu.js' => '',
 	'prototype.js' => '',
-	'jquery.min.js' => 'jquery/',
-	'jquery-ui.min.js' => 'jquery/',
+	'jquery.js' => 'jquery/',
+	'jquery-ui.js' => 'jquery/',
 	'gtlc.js' => '',
 	'functions.js' => '',
 	'main.js' => '',
@@ -83,8 +83,8 @@ $tranStrings = array(
 if(empty($_GET['files'])){
 	$files = array(
 		'prototype.js',
-		'jquery.min.js',
-		'jquery-ui.min.js',
+		'jquery.js',
+		'jquery-ui.js',
 		'common.js',
 		'class.cdebug.js',
 		'class.cdate.js',

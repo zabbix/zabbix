@@ -143,6 +143,12 @@
 			print('<link rel="stylesheet" type="text/css" href="styles/'.$css.'" />'."\n");
 			print('<!--[if IE 6]><link rel="stylesheet" type="text/css" href="styles/ie_'.$css.'" /><![endif]-->'."\n");
 		}
+
+		switch($css){
+			case "css_od.css": $bodyCSS = 'darkorange'; break;
+			case "css_bb.css": $bodyCSS = 'darkblue'; break;
+			default: $bodyCSS = 'originalblue'; break;
+		}
 	}
 
 	if($page['file'] == 'sysmap.php')
@@ -161,7 +167,7 @@
 	}
 ?>
 </head>
-<body onload="zbxCallPostScripts();">
+	<body onload="zbxCallPostScripts();" class="<?php print($bodyCSS); ?>" >
 <?php
 	}
 
