@@ -179,8 +179,10 @@ int	NET_TCP_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 
 static char	*decode_type(int q_type)
 {
-	static char buf[16];
-	switch (q_type) {
+	static char	buf[16];
+
+	switch (q_type)
+	{
 		case T_A:	return "A";	/* "address"; */
 		case T_NS:	return "NS";	/* "name server"; */
 		case T_MD:	return "MD";	/* "mail forwarder"; */
@@ -408,9 +410,11 @@ int	CHECK_DNS_QUERY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		GETLONG(q_ttl, msg_ptr);
 		GETSHORT(q_len, msg_ptr);
 
-		switch (q_type) {
+		switch (q_type)
+		{
 			case T_A:
-				switch (q_class) {
+				switch (q_class)
+				{
 					case C_IN:
 					case C_HS:
 						bcopy(msg_ptr, &inaddr, INADDRSZ);
