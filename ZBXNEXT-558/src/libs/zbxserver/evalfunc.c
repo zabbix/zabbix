@@ -2447,11 +2447,24 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 
 	DBget_item_from_db(&item, row);
 
-	res = evaluate_function(value, &item, function, parameter, time(NULL));
-
-	if (SUCCEED != replace_value_by_map(value, MAX_BUFFER_LEN, item.valuemapid))
+	if (SUCCEED == (res = evaluate_function(value, &item, function, parameter, time(NULL))))
 	{
-		add_value_suffix(value, MAX_BUFFER_LEN, item.units, item.value_type);
+		if (0 == strcmp(function, "last") || 0 == strcmp(function, "prev"))
+		{
+			switch (item.value_type)
+			{
+				case ITEM_VALUE_TYPE_FLOAT:
+				case ITEM_VALUE_TYPE_UINT64:
+					if (SUCCEED != replace_value_by_map(value, MAX_BUFFER_LEN, item.valuemapid))
+						add_value_suffix(value, MAX_BUFFER_LEN, item.units, item.value_type);
+					break;
+				case ITEM_VALUE_TYPE_STR:
+					replace_value_by_map(value, MAX_BUFFER_LEN, item.valuemapid);
+					break;
+				default:
+					;
+			}
+		}
 	}
 
 	DBfree_result(result); /* Cannot call DBfree_result until evaluate_FUNC. */
