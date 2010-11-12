@@ -852,6 +852,7 @@ upgrades/dbpatches/2.0/ibm_db2/patch/opconditions.sql -text
 upgrades/dbpatches/2.0/ibm_db2/patch/operations.sql -text
 upgrades/dbpatches/2.0/ibm_db2/patch/opmediatypes.sql -text
 upgrades/dbpatches/2.0/ibm_db2/patch/profiles.sql -text
+upgrades/dbpatches/2.0/ibm_db2/patch/proxy_autoreg_host.sql -text
 upgrades/dbpatches/2.0/ibm_db2/patch/proxy_dhistory.sql -text
 upgrades/dbpatches/2.0/ibm_db2/patch/proxy_history.sql -text
 upgrades/dbpatches/2.0/ibm_db2/patch/regexps.sql -text
@@ -943,6 +944,7 @@ upgrades/dbpatches/2.0/mysql/patch/opconditions.sql -text
 upgrades/dbpatches/2.0/mysql/patch/operations.sql -text
 upgrades/dbpatches/2.0/mysql/patch/opmediatypes.sql -text
 upgrades/dbpatches/2.0/mysql/patch/profiles.sql -text
+upgrades/dbpatches/2.0/mysql/patch/proxy_autoreg_host.sql -text
 upgrades/dbpatches/2.0/mysql/patch/proxy_dhistory.sql -text
 upgrades/dbpatches/2.0/mysql/patch/proxy_history.sql -text
 upgrades/dbpatches/2.0/mysql/patch/regexps.sql -text
@@ -1036,6 +1038,7 @@ upgrades/dbpatches/2.0/oracle/patch/opconditions.sql -text
 upgrades/dbpatches/2.0/oracle/patch/operations.sql -text
 upgrades/dbpatches/2.0/oracle/patch/opmediatypes.sql -text
 upgrades/dbpatches/2.0/oracle/patch/profiles.sql -text
+upgrades/dbpatches/2.0/oracle/patch/proxy_autoreg_host.sql -text
 upgrades/dbpatches/2.0/oracle/patch/proxy_dhistory.sql -text
 upgrades/dbpatches/2.0/oracle/patch/proxy_history.sql -text
 upgrades/dbpatches/2.0/oracle/patch/regexps.sql -text
@@ -1128,6 +1131,7 @@ upgrades/dbpatches/2.0/postgresql/patch/opconditions.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/operations.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/opmediatypes.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/profiles.sql -text
+upgrades/dbpatches/2.0/postgresql/patch/proxy_autoreg_host.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/proxy_dhistory.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/proxy_history.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/regexps.sql -text
