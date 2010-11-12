@@ -1363,7 +1363,7 @@ static int	DBget_item_value_by_triggerid(zbx_uint64_t triggerid, char **value, i
 		return FAIL;
 
 	result = DBselect(
-			"select i.itemid,i.value_type,i.valuemapid,i.units,i.lastvalue"
+			"select i.itemid,i.value_type,i.valuemapid,i.units"
 			" from items i,functions f"
 			" where i.itemid=f.itemid"
 				" and f.functionid=" ZBX_FS_UI64,

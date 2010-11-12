@@ -2450,7 +2450,7 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 
 	if (SUCCEED == (res = evaluate_function(value, &item, function, parameter, time(NULL))))
 	{
-		if (0 == strcmp(function, "last"))
+		if (0 == strcmp(function, "last") || 0 == strcmp(function, "prev"))
 		{
 			switch (item.value_type)
 			{
