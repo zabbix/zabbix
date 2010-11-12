@@ -178,8 +178,9 @@ include_once('include/page_header.php');
 
 		'select'=>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,	null),
 
-		'submitParent'=>	array(T_ZBX_INT, O_OPT, null,   BETWEEN(0,15),	null),
+		'submitParent'=>	array(T_ZBX_INT, O_OPT, null,   IN('0,1'),	null),
 	);
+
 
 	$allowed_item_types = array(ITEM_TYPE_ZABBIX,ITEM_TYPE_ZABBIX_ACTIVE,ITEM_TYPE_SIMPLE,ITEM_TYPE_INTERNAL,ITEM_TYPE_AGGREGATE);
 
@@ -211,7 +212,7 @@ include_once('include/page_header.php');
 // items
  	$value_types		= get_request('value_types', null);
 
-	$submitParent = get_request('submitParent', false);
+	$submitParent = get_request('submitParent', 0);
 
 	$host_status = null;
 	$templated = null;
@@ -411,7 +412,7 @@ include_once('include/page_header.php');
 		$options = array(
 			'nodeids' => $nodeid,
 			'groupids'=>$groupid,
-			'extendoutput' => 1,
+			'output' => API_OUTPUT_EXTEND,
 			'sortfield'=>'host'
 		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
@@ -495,7 +496,7 @@ include_once('include/page_header.php');
 		$options = array(
 			'nodeids' => $nodeid,
 			'groupids' => $groupid,
-			'extendoutput' => 1,
+			'output' => API_OUTPUT_EXTEND,
 			'sortfield' => 'host'
 		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
@@ -536,7 +537,7 @@ include_once('include/page_header.php');
 
 		$options = array(
 				'nodeids' => $nodeid,
-				'extendoutput' => 1
+				'output' => API_OUTPUT_EXTEND
 			);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 
@@ -565,7 +566,7 @@ include_once('include/page_header.php');
 		$options = array(
 			'nodeids' => $nodeid,
 			'groupids' => $groupid,
-			'extendoutput' => 1,
+			'output' => API_OUTPUT_EXTEND,
 			'sortfield' => 'host'
 			);
 		if(!is_null($writeonly)) $options['editable'] = 1;
@@ -590,7 +591,7 @@ include_once('include/page_header.php');
 		$options = array(
 			'nodeids' => $nodeid,
 			'groupids' => $groupid,
-			'extendoutput' => 1,
+			'output' => API_OUTPUT_EXTEND,
 			'sortfield'=>'host'
 		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
@@ -619,7 +620,7 @@ include_once('include/page_header.php');
 
 		$options = array(
 				'nodeids' => $nodeid,
-				'extendoutput' => 1
+				'output' => API_OUTPUT_EXTEND
 			);
 
 		$usergroups = CUserGroup::get($options);
@@ -643,7 +644,7 @@ include_once('include/page_header.php');
 
 		$options = array(
 				'nodeids' => $nodeid,
-				'extendoutput' => 1
+				'output' => API_OUTPUT_EXTEND
 			);
 
 		$users = CUser::get($options);
@@ -1127,7 +1128,7 @@ include_once('include/page_header.php');
 
 		$options = array(
 			'nodeids' => $nodeid,
-			'extendoutput' => 1
+			'output' => API_OUTPUT_EXTEND
 		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 
@@ -1392,7 +1393,7 @@ include_once('include/page_header.php');
 		$options = array(
 				'nodeids' => $nodeid,
 				'monitored_hosts' => 1,
-				'extendoutput' => 1
+				'output' => API_OUTPUT_EXTEND
 			);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 
@@ -1422,7 +1423,7 @@ include_once('include/page_header.php');
 
 		$options = array(
 				'nodeids' => $nodeid,
-				'extendoutput' => 1
+				'output' => API_OUTPUT_EXTEND
 			);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 

@@ -11,7 +11,7 @@ if(isset($_GET['lang']) && ($_GET['lang'] != 'en_gb') && preg_match('/^[a-z]{2}_
 // }}} get language translations
 
 
-// available scriptas 'scriptFileName' => 'path relative to js/'
+// available scripts 'scriptFileName' => 'path relative to js/'
 $availableJScripts = array(
 	'common.js' => '',
 	'menu.js' => '',
@@ -49,7 +49,7 @@ $tranStrings = array(
 	),
 	'functions.js' => array('DO_YOU_REPLACE_CONDITIONAL_EXPRESSION_Q', 'S_INSERT_MACRO', 'S_ADD_SERVICE',
 		'S_EDIT_SERVICE', 'S_DELETE_SERVICE', 'S_DELETE_SELECTED_SERVICES_Q', 'S_CREATE_LOG_TRIGGER', 'S_DELETE',
-		'S_DELETE_KEYWORD_Q', 'S_DELETE_EXPRESSION_Q',
+		'S_DELETE_KEYWORD_Q', 'S_DELETE_EXPRESSION_Q','S_SIMPLE_GRAPHS', 'S_HISTORY', 'S_HISTORY_AND_SIMPLE_GRAPHS'
 	),
 	'main.js' => array('S_CLOSE', 'S_NO_ELEMENTS_SELECTED'),
 	'class.calendar.js' => array('S_JANUARY', 'S_FEBRUARY', 'S_MARCH', 'S_APRIL', 'S_MAY', 'S_JUNE',
@@ -99,9 +99,19 @@ foreach($files as $file){
 }
 
 
+$jsLength = strlen($js);
+$ETag = md5($jsLength);
+if(isset($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] == $ETag){
+	header('HTTP/1.1 304 Not Modified');
+	header('ETag: '.$ETag);
+	exit();
+}
+
 header('Content-type: text/javascript; charset=UTF-8');
+// breaks if "zlib.output_compression = On"
+//	header('Content-length: '.$jsLength);
+header('Cache-Control: public, must-revalidate');
+header('ETag: '.$ETag);
 
 echo $js;
-
-return;
 ?>

@@ -212,6 +212,7 @@
 	'S_DISABLE_SELECTED_WEB_SCENARIOS_Q'=>		'Disable selected WEB scenarios?',
 	'S_DELETE_HISTORY_SELECTED_WEB_SCENARIOS_Q'=>	'Delete history of selected WEB scenarios?',
 	'S_DELETE_SELECTED_WEB_SCENARIOS_Q'=>		'Delete selected WEB scenarios?',
+	'S_SELECT_HOST_FIRST' => '(select host first)',
 
 //	exp_imp.php
 	'S_ELEMENT'=>				'Element',
@@ -1208,18 +1209,18 @@
 	'S_NO_EVENTS_FOUND'=>			'No events found',
 	'S_EVENTS_SINCE'=>			'Events since',
 	'S_EVENTS_DATE_FORMAT'=>		'd M Y H:i:s',
-	'S_EVENTS_DISCOVERY_TIME_FORMAT'=>	'Y.M.d H:i:s',
-	'S_EVENTS_ACTION_TIME_FORMAT'=>		'Y.M.d H:i:s',
+	'S_EVENTS_DISCOVERY_TIME_FORMAT'=>	'd M Y H:i:s',
+	'S_EVENTS_ACTION_TIME_FORMAT'=>		'd M Y H:i:s',
 	'S_UP_BIG'=>		'UP',
 	'S_DOWN_BIG'=>		'DOWN',
 	'S_DISCOVERED_BIG'=>		'DISCOVERED',
 	'S_LOST_BIG'=>		'LOST',
 
 //	events.inc.php
-	'S_EVENTS_EVENT_DETAILS_DATE_FORMAT'=>			'Y.M.d H:i:s',
-	'S_EVENTS_SMALL_EVENT_LIST_DATE_FORMAT'=>		'Y.M.d H:i:s',
+	'S_EVENTS_EVENT_DETAILS_DATE_FORMAT'=>			'd M Y H:i:s',
+	'S_EVENTS_SMALL_EVENT_LIST_DATE_FORMAT'=>		'd M Y H:i:s',
 	'S_EVENTS_POPUP_EVENT_LIST_DATE_FORMAT'=>		'd M Y H:i:s',
-	'S_EVENTS_TRIGGERS_EVENTS_HISTORY_LIST_DATE_FORMAT'=>	'Y.M.d H:i:s',
+	'S_EVENTS_TRIGGERS_EVENTS_HISTORY_LIST_DATE_FORMAT'=>	'd M Y H:i:s',
 
 //	latest.php
 	'S_LAST_CHECK'=>			'Last check',
@@ -1494,6 +1495,8 @@
 	'S_SERVICES_DOWNTIME_DATE_FORMAT'=>		'l H:i',
 	'S_SERVICES_ONETIME_DOWNTIME_DATE_FORMAT'=>	'd M Y H:i',
 	'S_ADD_SMALL'=>								'add',
+	'S_ERROR_ADDING_SERVICE_TIME'=>'Error adding service time',
+	'S_IS_A_WRONG_TIME_FORMAT'=>'is a wrong time format. Should be from 00:00 to 23:59.',
 
 //	locales.php
 	'S_DO_NOT_ADD'=>			'Do not add',
@@ -1576,6 +1579,7 @@
 	'S_NO_RESOURCES_DEFINED'=>		'No resources defined',
 	'S_SIMPLE_GRAPH'=>				'Simple graph',
 	'S_SIMPLE_GRAPHS'=>				'Simple graphs',
+	'S_HISTORY_AND_SIMPLE_GRAPHS'=> 'History and simple graphs',
 	'S_SIMPLE_GRAPH_BIG'=>			'SIMPLE GRAPH',
 	'S_GRAPH_NAME'=>				'Graph name',
 	'S_WIDTH'=>						'Width',
@@ -2055,6 +2059,8 @@
 	'S_EXPRESSION_UNNECESSARY_SYMBOLS_DETECTED_ERROR'=>'Unnecessary symbols detected',
 	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_AFTER_ERROR'=>'Not allowed symbols detected after element',
 	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_BEFORE_ERROR'=>'Not allowed symbols detected before element',
+	'S_ARE_YOU_SURE_YOU_WANT_TO_DELETE'=>'Are you sure you want to delete',
+	'S_MACROS_ES'=>'macro(s)',
 
 //	popup_link_tr.php
 	'S_NEW_INDICATORS'=>			'New indicators',
@@ -2183,6 +2189,7 @@
 	'S_CANNOT_ADD_NEW_APPLICATION'=>		'Cannot add new application',
 	'S_SCENARIO_WITH_NAME'=>			'Scenario with name',
 	'S_ADDED_SMALL'=>				'added',
+	'S_PRINTABLE_ONLY'=>'only printable characters',
 
 //	media.inc.php
 	'S_NO_MEDIA_WITH'=>			'No media with',
@@ -2215,7 +2222,8 @@
 	'S_ALREADY_LINKED_TO_HOST_SMALL'=>		'already linked to host',
 	'S_HOST_HAS_BEEN_DELETED_MSG_PART1'=>		'Host',
 	'S_HOST_HAS_BEEN_DELETED_MSG_PART2'=>		'has been deleted from the system',
-
+	'S_YOU_CANT_DELETE_TEMPLATE_FOR_APP_USED_IN_SCENARIO'=>'You can\'t delete template for an application that is used in a web scenario',
+	'S_AND_CANT_BE_DELETED' => 'and can\'t be deleted',
 //	validate.inc.php
 	'S_CRITICAL_ERROR'=>				'Critical error',
 	'S_FIELD'=>					'Field',
@@ -2385,6 +2393,9 @@
 	'S_CUSER_ERROR_LDAP_MODULE_MISSING'=>			'Probably php-ldap module is missing',
 	'S_CUSER_ERROR_FAILED_LOGIN_ATTEMPTS'=>				'failed login attempts logged.',
 	'S_CUSER_ERROR_LAST_FAILED_ATTEMPTS'=>				'Last failed attempt was from',
+	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_CREATE_SCRIPTS'=>		'Only Super Admins can create Scripts',
+	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_UPDATE_SCRIPTS'=>		'Only Super Admins can update Scripts',
+	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_DELETE_SCRIPTS'=>		'Only Super Admins can delete Scripts',
 	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_CREATE_USERS'=>		'Only Super Admins can create Users',
 	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_UPDATE_USERS'=>		'Only Super Admins can update Users',
 	'S_CUSER_ERROR_ONLY_SUPER_ADMIN_CAN_DELETE_USERS'=>		'Only Super Admins can delete Users',
@@ -2450,6 +2461,7 @@
 	'S_LATEST_DATA'=>			'Latest data',
 
 //	Errors
+	'S_DOES_NOT_EXIST_SMALL'=>		'does not exist',
 	'S_INCORRECT_DESCRIPTION'=>		'Incorrect description',
 	'S_CANT_FORMAT_TREE'=>			'Can\'t format Tree',
 	'S_NO_PERMISSION'=>				'You do not have permission to perform this operation',
@@ -2486,7 +2498,13 @@
 	'S_OTHER_SMALL'=>			'other',
 
 // class.cookie.js
-	'S_MAX_COOKIE_SIZE_REACHED' => 'We are sorry, the maximum possible number of elements to remember has been reached.',
+	'S_MAX_COOKIE_SIZE_REACHED'=>		'We are sorry, the maximum possible number of elements to remember has been reached.',
+
+	'S_LAST_PAGE'=>			'Last',
+	'S_FIRST_PAGE'=>		'First',
+	'S_PREVIOUS_PAGE'=>		'Previous',
+	'S_NEXT_PAGE'=>			'Next',
+	'S_PREVIOUS_EVENTS'=>		'Previous',
 
 );
 ?>

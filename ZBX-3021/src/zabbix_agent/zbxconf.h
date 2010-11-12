@@ -36,4 +36,8 @@ extern int	CONFIG_MAX_LINES_PER_SECOND;
 void    load_config();
 void    load_user_parameters(int optional);
 
+#ifdef _AIX
+void	tl_version();
+#endif /* _AIX */
+
 #endif /* ZABBIX_ZBXCONF_H */

@@ -1069,11 +1069,11 @@
 	function get_n_param($key, $num){
 		$param="";
 
-		$num--;
-//SDI(ZBX_KEY_PARAM_ID);
-//		if(ereg('^'.ZBX_EREG_ITEM_KEY_FORMAT.'$', $key, $arr)){
+        $num--;
 		if(preg_match('/^'.ZBX_PREG_ITEM_KEY_FORMAT.'$/', $key, $arr)){
-			if(!isset($arr[ZBX_KEY_PARAM_ID]))  $arr[ZBX_KEY_PARAM_ID] = false;
+			if(!isset($arr[ZBX_KEY_PARAM_ID])){
+				$arr[ZBX_KEY_PARAM_ID] = false;
+			}
 
 			$params = zbx_get_params($arr[ZBX_KEY_PARAM_ID]);
 
@@ -1082,7 +1082,7 @@
 			}
 		}
 
-	return $param;
+		return $param;
 	}
 
 	function expand_item_key_by_data($item){
@@ -1129,17 +1129,24 @@
 		$descr = $item['description'];
 		$key = expand_item_key_by_data($item);
 
-		for($i=9;$i>0;$i--){
-			$descr=str_replace("$$i",get_n_param($key,$i),$descr);
-		}
+		/**
+		 * Regular string functions used below are changed to zbx_*
+		 * wrappers to allow users to name steps in non-ascii chars.
+		 * Also $str[$i] calls were replased by zbx_substr($str, $i, 1)
+		 * @see ZBX-2349
+		 * @author Konstantin Buravcov
+		 */
+        for($i=9;$i>0;$i--){
+            $descr = str_replace("$$i",get_n_param($key,$i),$descr);
+        }
 
-		if($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $descr, $arr)){
-			$macros = CuserMacro::getMacros($arr[1], array('itemid' => $item['itemid']));
-			
-			$search = array_keys($macros);
-			$values = array_values($macros);
+        if($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $descr, $arr)){
+            $macros = CuserMacro::getMacros($arr[1], array('itemid' => $item['itemid']));
+
+            $search = array_keys($macros);
+            $values = array_values($macros);
 			$descr = str_replace($search, $values, $descr);
-		}
+        }
 
 	return $descr;
 	}

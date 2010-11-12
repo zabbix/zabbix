@@ -28,7 +28,7 @@ return messagesListId;
 // Puppet master Class
 // Author: Aly
 var CMessageList = Class.create(CDebug,{
-messageListId:			0,				// PMasters reference id
+messageListId:			0,				// reference id
 
 updateFrequency:		60,				// seconds
 timeoutFrequency:		10,				// seconds
@@ -295,7 +295,7 @@ closeAllMessages: function(e){
 
 	new RPC.Call(rpcRequest);
 
-	Effect.SlideUp(this.dom.container, {duration: (this.effectTimeout / 1000)});
+	Effect.BlindUp(this.dom.container, {duration: (this.effectTimeout / 1000)});
 
 	for(var messageid in this.messageList){
 		if(empty(this.messageList[messageid])) continue;

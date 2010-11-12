@@ -1,6 +1,7 @@
+<?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,8 +17,14 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
+?>
+<?php
+class CLabel extends CTag{
+	public function __construct($label, $for=null, $id=null){
+		parent::__construct('label', 'yes', $label);
 
-#ifndef ZABBIX_MONAGENT_H
-#define ZABBIX_MONAGENT_H
-
-#endif
+		if(!is_null($id)) $this->setAttribute('id', $id);
+		if(!is_null($for)) $this->setAttribute('for', $for);
+	}
+}
+?>

@@ -316,7 +316,7 @@ static int	telnet_login(int socket_fd, const char *username,
 		const char *password, AGENT_RESULT *result)
 {
 	const char	*__function_name = "telnet_login";
-	char		buf[MAX_BUF_LEN], c;
+	char		buf[MAX_BUFFER_LEN], c;
 	size_t		sz, offset;
 	int		rc, ret = FAIL;
 
@@ -391,7 +391,7 @@ static int	telnet_execute(int socket_fd, const char *command,
 		AGENT_RESULT *result, const char *encoding)
 {
 	const char	*__function_name = "telnet_execute";
-	char		buf[MAX_BUF_LEN];
+	char		buf[MAX_BUFFER_LEN];
 	size_t		sz, offset;
 	int		rc, ret = FAIL;
 	char		*command_lf = NULL, *command_crlf = NULL;
@@ -454,7 +454,7 @@ static int	telnet_execute(int socket_fd, const char *command,
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() stripped command output:'%.*s'",
 			__function_name, offset, buf);
 
-	if (MAX_BUF_LEN == offset)
+	if (MAX_BUFFER_LEN == offset)
 		offset--;
 	buf[offset] = '\0';
 
@@ -546,13 +546,13 @@ int	get_value_telnet(DC_ITEM *item, AGENT_RESULT *result)
 	if ('\0' != *port)
 	{
 		port_int = atoi(port);
-		if (port_int < 1 || port_int > 65536)
+		if (port_int < 1 || port_int > 65535)
 			return NOTSUPPORTED;
 
 		item->host.port = (unsigned short)port_int;
 	}
 	else
-		item->host.port = 23;
+		item->host.port = ZBX_DEFAULT_TELNET_PORT;
 
 	return telnet_run(item, result, encoding);
 }

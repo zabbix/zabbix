@@ -218,7 +218,7 @@ static int	process_proxy()
 			{
 				if (SUCCEED == (ret = send_data_to_proxy(&host, &s, j.buffer)))
 					ret = zbx_recv_response(&s, NULL, 0, 0);
-							
+
 				disconnect_proxy(&s);
 			}
 
@@ -245,11 +245,19 @@ retry_history:
 					ZBX_PROTO_VALUE_HISTORY_DATA, &answer)))
 			{
 				if (SUCCEED == zbx_json_open(answer, &jp))
+				{
 					process_hist_data(NULL, &jp, host.hostid, NULL, 0);
 
-				if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
-					if (ZBX_MAX_HRECORDS <= zbx_json_count(&jp_data))
-						goto retry_history;
+					if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
+					{
+						if (ZBX_MAX_HRECORDS <= zbx_json_count(&jp_data))
+						{
+							zbx_free(answer);
+							goto retry_history;
+						}
+					}
+				}
+				zbx_free(answer);
 			}
 			else
 				goto network_error;
@@ -258,11 +266,19 @@ retry_dhistory:
 					ZBX_PROTO_VALUE_DISCOVERY_DATA, &answer)))
 			{
 				if (SUCCEED == zbx_json_open(answer, &jp))
+				{
 					process_dhis_data(&jp);
 
-				if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
-					if (ZBX_MAX_HRECORDS <= zbx_json_count(&jp_data))
-						goto retry_dhistory;
+					if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
+					{
+						if (ZBX_MAX_HRECORDS <= zbx_json_count(&jp_data))
+						{
+							zbx_free(answer);
+							goto retry_dhistory;
+						}
+					}
+				}
+				zbx_free(answer);
 			}
 			else
 				goto network_error;
@@ -271,11 +287,19 @@ retry_autoreg_host:
 					ZBX_PROTO_VALUE_AUTO_REGISTRATION_DATA, &answer)))
 			{
 				if (SUCCEED == zbx_json_open(answer, &jp))
+				{
 					process_areg_data(&jp, host.hostid);
 
-				if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
-					if (ZBX_MAX_HRECORDS <= zbx_json_count(&jp_data))
-						goto retry_autoreg_host;
+					if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
+					{
+						if (ZBX_MAX_HRECORDS <= zbx_json_count(&jp_data))
+						{
+							zbx_free(answer);
+							goto retry_autoreg_host;
+						}
+					}
+				}
+				zbx_free(answer);
 			}
 			else
 				goto network_error;

@@ -27,7 +27,7 @@ typedef struct function_s {
 	char		*key;
 	char		*func;
 	char		*params;
-	char		value[MAX_STRING_LEN];
+	char		*value;
 	unsigned char	found;
 } function_t;
 
@@ -49,6 +49,7 @@ static void	zbx_free_expression(expression_t *exp)
 		zbx_free(f->key);
 		zbx_free(f->func);
 		zbx_free(f->params);
+		zbx_free(f->value);
 	}
 	zbx_free(exp->exp);
 	zbx_free(exp->functions);
@@ -57,7 +58,7 @@ static void	zbx_free_expression(expression_t *exp)
 /*
  * reallocate string buffer if offset >= alloc
  */
-extern void	calcitem_exp_addchr(char **buffer, int *alloc, int *offset, int step, char c)
+static void	calcitem_exp_addchr(char **buffer, int *alloc, int *offset, int step, char c)
 {
 	if (*alloc == *offset)
 	{
@@ -84,7 +85,7 @@ static int	calcitem_add_function(expression_t *exp, char *func, char *params)
 	f->key = NULL;
 	f->func = func;
 	f->params = params;
-	f->value[0] = '\0';
+	f->value = NULL;
 	f->found = 0;
 
 	return f->functionid;
@@ -133,7 +134,7 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp,
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() expression:'%s'", __function_name, exp->exp);
 
-	if (FAIL == (ret = substitute_simple_macros(NULL, NULL, NULL, NULL, dc_item, NULL,
+	if (FAIL == (ret = substitute_simple_macros(NULL, NULL, NULL, dc_item, NULL,
 				&exp->exp, MACRO_TYPE_ITEM_EXPRESSION, error, max_error_len)))
 	{
 		zbx_free_expression(exp);
@@ -250,15 +251,18 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp,
 				continue;
 
 			f->found = 1;
+			f->value = zbx_malloc(f->value, MAX_BUFFER_LEN);
 
 			if (SUCCEED != evaluate_function(f->value, &item, f->func, f->params, now))
 			{
-				zbx_snprintf(error, max_error_len, "Can not evaluate function [%s(%s)]",
+				zbx_snprintf(error, max_error_len, "Cannot evaluate function [%s(%s)]",
 						f->func, f->params);
 
 				ret = NOTSUPPORTED;
 				break;
 			}
+			else
+				f->value = zbx_realloc(f->value, strlen(f->value) + 1);
 		}
 
 		if (SUCCEED != ret)
@@ -276,7 +280,7 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp,
 		if (0 == f->found)
 		{
 			zbx_snprintf(error, max_error_len,
-				"Can not evaluate function [%s(%s)]"
+				"Cannot evaluate function [%s(%s)]"
 					": item [%s:%s] not found",
 					f->func, f->params, f->host, f->key);
 			ret = NOTSUPPORTED;

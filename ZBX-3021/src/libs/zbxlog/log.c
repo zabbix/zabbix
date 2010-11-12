@@ -192,7 +192,6 @@ void zabbix_set_log_level(int level)
 
 void zabbix_errlog(zbx_err_codes_t err, ...)
 {
-#define ERR_STRING_LEN	256
 	const char	*msg;
 	char		*s = NULL;
 	va_list		ap;
@@ -220,7 +219,7 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 {
 	FILE *log_file = NULL;
 
-	char	message[MAX_BUF_LEN];
+	char	message[MAX_BUFFER_LEN];
 
 	struct	tm	*tm;
 	va_list		args;

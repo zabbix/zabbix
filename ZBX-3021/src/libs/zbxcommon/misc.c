@@ -1158,7 +1158,7 @@ int	int_in_list(char *list, int value)
  *                                                                            *
  * Purpose: compares two double values                                        *
  *                                                                            *
- * Parameters: a,b - doubled to compare                                       *
+ * Parameters: a, b - doubles to compare                                      *
  *                                                                            *
  * Return value:  0 - the values are equal                                    *
  *                1 - otherwise                                               *
@@ -1170,11 +1170,7 @@ int	int_in_list(char *list, int value)
  ******************************************************************************/
 int	cmp_double(double a,double b)
 {
-	if(fabs(a-b)<0.000001)
-	{
-		return	0;
-	}
-	return	1;
+	return fabs(a - b) < 0.000001 ? 0 : 1;
 }
 
 /******************************************************************************
@@ -1462,6 +1458,51 @@ int	is_uint64(const char *str, zbx_uint64_t *value)
 
 	if (NULL != value)
 		*value = value_uint64;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: is_ushort                                                        *
+ *                                                                            *
+ * Purpose: check if the string is 16bit unsigned integer                     *
+ *                                                                            *
+ * Parameters: str - string to check                                          *
+ *                                                                            *
+ * Return value:  SUCCEED - the string is unsigned integer                    *
+ *                FAIL - the string is not number or overflow                 *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	is_ushort(const char *str, unsigned short *value)
+{
+	register unsigned short	max_ushort = 0xFFFF;
+	register unsigned short	value_ushort = 0, c;
+
+	if ('\0' == *str)
+		return FAIL;
+
+	while ('\0' != *str)
+	{
+		if (*str >= '0' && *str <= '9')
+		{
+			c = (unsigned short)(unsigned char)(*str - '0');
+			if ((max_ushort - c) / 10 >= value_ushort)
+				value_ushort = value_ushort * 10 + c;
+			else
+				return FAIL;	/* overflow */
+			str++;
+		}
+		else
+			return FAIL;	/* not a digit */
+	}
+
+	if (NULL != value)
+		*value = value_ushort;
 
 	return SUCCEED;
 }

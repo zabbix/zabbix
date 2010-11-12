@@ -52,7 +52,7 @@ const char	*DBnode(const char *fieldid, const int nodeid)
 	return dbnode;
 }
 
-void	DBclose(void)
+void	DBclose()
 {
 	zbx_db_close();
 }
@@ -130,7 +130,7 @@ void	DBinit()
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	DBping(void)
+int	DBping()
 {
 	int ret;
 
@@ -155,7 +155,7 @@ int	DBping(void)
  * Comments: Do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-void	DBbegin(void)
+void	DBbegin()
 {
 	int	rc;
 
@@ -190,7 +190,7 @@ void	DBbegin(void)
  * Comments: Do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-void	DBcommit(void)
+void	DBcommit()
 {
 	int	rc;
 
@@ -225,7 +225,7 @@ void	DBcommit(void)
  * Comments: Do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-void	DBrollback(void)
+void	DBrollback()
 {
 	int	rc;
 
@@ -285,7 +285,6 @@ int	DBis_null(char *field)
 
 DB_ROW	DBfetch(DB_RESULT result)
 {
-
 	return zbx_db_fetch(result);
 }
 
@@ -1146,7 +1145,7 @@ int	DBremove_escalation(zbx_uint64_t escalationid)
 	return SUCCEED;
 }
 
-void	DBvacuum(void)
+void	DBvacuum()
 {
 #ifdef	HAVE_POSTGRESQL
 	char	*table_for_housekeeping[] = {"services", "services_links", "graphs_items", "graphs", "sysmaps_links",
@@ -1310,7 +1309,7 @@ char*	DBdyn_escape_string(const char *src)
  * Comments: sync changes with 'DBescape_string', 'DBget_escape_string_len'   *
  *                                                                            *
  ******************************************************************************/
-char*	DBdyn_escape_string_len(const char *src, int max_src_len)
+char	*DBdyn_escape_string_len(const char *src, int max_src_len)
 {
 	const char	*s;
 	char		*dst = NULL;
@@ -1562,7 +1561,7 @@ void	DBget_item_from_db(DB_ITEM *item, DB_ROW row)
 	item->mtime			= atoi(row[26]);
 
 	key = zbx_dsprintf(key, "%s", item->key_orig);
-	substitute_simple_macros(NULL, NULL, item, NULL, NULL, NULL, &key, MACRO_TYPE_ITEM_KEY, NULL, 0);
+	substitute_simple_macros(NULL, item, NULL, NULL, NULL, &key, MACRO_TYPE_ITEM_KEY, NULL, 0);
 	item->key = key;
 }
 
@@ -1608,9 +1607,9 @@ zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 	const char	*__function_name = "DBget_nextid";
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	ret1,ret2;
+	zbx_uint64_t	ret1, ret2;
 	zbx_uint64_t	min, max;
-	int		found  = FAIL, dbres, nodeid;
+	int		found = FAIL, dbres, nodeid;
 	const ZBX_TABLE	*table;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tablename:'%s'",
@@ -1619,21 +1618,26 @@ zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 	table = DBget_table(tablename);
 	nodeid = CONFIG_NODEID >= 0 ? CONFIG_NODEID : 0;
 
-	if (table->flags & ZBX_SYNC) {
+	if (table->flags & ZBX_SYNC)
+	{
 		min = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)nodeid+(zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)nodeid;
 		max = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)nodeid+(zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)nodeid+(zbx_uint64_t)__UINT64_C(99999999999);
-	} else {
+	}
+	else
+	{
 		min = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)nodeid;
 		max = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)nodeid+(zbx_uint64_t)__UINT64_C(99999999999999);
 	}
 
-	do {
+	do
+	{
 		result = DBselect("select nextid from ids where nodeid=%d and table_name='%s' and field_name='%s'",
 			nodeid,
 			table->table,
 			table->recid);
 
-		if(NULL == (row = DBfetch(result))) {
+		if (NULL == (row = DBfetch(result)))
+		{
 			DBfree_result(result);
 
 			result = DBselect("select max(%s) from %s where %s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
@@ -1643,17 +1647,18 @@ zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 					min,
 					max);
 
-			if(NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]) || !*row[0])
+			if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
 				ret1 = min;
-			else {
+			else
+			{
 				ZBX_STR2UINT64(ret1, row[0]);
-				if(ret1 >= max) {
+				if (ret1 >= max)
+				{
 					zabbix_log(LOG_LEVEL_CRIT, "DBget_maxid: Maximum number of id's was exceeded"
 							" [table:%s, field:%s, id:" ZBX_FS_UI64 "]",
 							table->table,
 							table->recid,
 							ret1);
-
 					exit(FAIL);
 				}
 			}
@@ -1666,20 +1671,25 @@ zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 					table->recid,
 					ret1);
 
-			if (dbres < ZBX_DB_OK) {
-				/* reshenie problemi nevidimosti novoj zapisi, sozdannoj v parallel'noj tranzakcii */
+			if (dbres < ZBX_DB_OK)
+			{
+				/* solving the problem of an invisible record created in a parallel transaction */
 				DBexecute("update ids set nextid=nextid+1 where nodeid=%d and table_name='%s'"
 						" and field_name='%s'",
 						nodeid,
 						table->table,
 						table->recid);
 			}
+
 			continue;
-		} else {
+		}
+		else
+		{
 			ZBX_STR2UINT64(ret1, row[0]);
 			DBfree_result(result);
 
-			if((ret1 < min) || (ret1 >= max)) {
+			if (ret1 < min || ret1 >= max)
+			{
 				DBexecute("delete from ids where nodeid=%d and table_name='%s' and field_name='%s'",
 					nodeid,
 					table->table,
@@ -1697,12 +1707,15 @@ zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 				nodeid,
 				table->table,
 				table->recid);
-			row = DBfetch(result);
-			if (!row || DBis_null(row[0])==SUCCEED) {
-				/* Should never be here */
+
+			if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
 				DBfree_result(result);
 				continue;
-			} else {
+			}
+			else
+			{
 				ZBX_STR2UINT64(ret2, row[0]);
 				DBfree_result(result);
 				if (ret1 + num == ret2)
@@ -1710,7 +1723,7 @@ zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 			}
 		}
 	}
-	while(FAIL == found);
+	while (FAIL == found);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() \"%s\".\"%s\":" ZBX_FS_UI64,
 			__function_name,
@@ -2057,10 +2070,17 @@ void	DBproxy_register_host(const char *host)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void DBexecute_overflowed_sql(char **sql, int *sql_allocated, int *sql_offset)
+void	DBexecute_overflowed_sql(char **sql, int *sql_allocated, int *sql_offset)
 {
 	if (*sql_offset > ZBX_MAX_SQL_SIZE)
 	{
+#ifdef HAVE_MULTIROW_INSERT
+		if ((*sql)[*sql_offset - 1] == ',')
+		{
+			(*sql_offset)--;
+			zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 3, ";\n");
+		}
+#endif
 #ifdef HAVE_ORACLE
 		zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 8, "end;\n");
 #endif

@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-define('ZBX_PAGE_NO_AUTHORIZATION', 1);
+define('ZBX_RPC_REQUEST', 1);
 require_once('include/config.inc.php');
 
 $allowed_content = array(

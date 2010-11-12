@@ -48,11 +48,11 @@ include_once('include/page_header.php');
 	$result = array();
 	switch($data['method']){
 		case 'host.get':
-			$pattern = $data['params']['pattern'];
+			$search = $data['params']['search'];
 
 			$options = array(
-				'startPattern' => 1,
-				'pattern' => $pattern,
+				'startSearch' => 1,
+				'search' => $search,
 				'output' => array('hostid', 'host'),
 				'sortfield' => 'host',
 				'limit' => 15

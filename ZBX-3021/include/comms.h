@@ -99,6 +99,7 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 
 #define	ZBX_DEFAULT_FTP_PORT	21
 #define	ZBX_DEFAULT_SSH_PORT	22
+#define	ZBX_DEFAULT_TELNET_PORT	23
 #define	ZBX_DEFAULT_SMTP_PORT	25
 #define	ZBX_DEFAULT_HTTP_PORT	80
 #define	ZBX_DEFAULT_POP_PORT	110

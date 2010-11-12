@@ -109,35 +109,50 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 	}
 	else if (condition->conditiontype == CONDITION_TYPE_HOST_TEMPLATE)
 	{
-		ZBX_STR2UINT64(condition_value, condition->value);
+		zbx_uint64_t	hostid, triggerid;
 
-		result = DBselect(
-				"select distinct ht.templateid"
-				" from hosts_templates ht,items i,functions f,triggers t"
-				" where ht.hostid=i.hostid"
-					" and i.itemid=f.itemid"
-					" and f.triggerid=t.triggerid"
-					" and t.triggerid=" ZBX_FS_UI64
-					" and ht.templateid=" ZBX_FS_UI64,
-				event->objectid,
-				condition_value);
+		ZBX_STR2UINT64(condition_value, condition->value);
 
 		switch (condition->operator)
 		{
 		case CONDITION_OPERATOR_EQUAL:
-			if (NULL != DBfetch(result))
-				ret = SUCCEED;
-			break;
 		case CONDITION_OPERATOR_NOT_EQUAL:
-			if (NULL == DBfetch(result))
-				ret = SUCCEED;
+			triggerid = event->objectid;
+
+			do
+			{
+				result = DBselect(
+						"select distinct i.hostid,t.templateid"
+						" from items i,functions f,triggers t"
+						" where i.itemid=f.itemid"
+							" and f.triggerid=t.templateid"
+							" and t.triggerid=" ZBX_FS_UI64,
+						triggerid);
+
+				if (NULL != (row = DBfetch(result)))
+				{
+					ZBX_STR2UINT64(hostid, row[0]);
+					ZBX_STR2UINT64(triggerid, row[1]);
+
+					if (hostid == condition_value)
+					{
+						ret = SUCCEED;
+						break;
+					}
+				}
+				else
+					triggerid = 0;
+				DBfree_result(result);
+			} while (SUCCEED != ret && 0 != triggerid);
+
+			if (CONDITION_OPERATOR_NOT_EQUAL == condition->operator)
+				ret = (SUCCEED == ret) ? FAIL : SUCCEED;
 			break;
 		default:
 			zabbix_log(LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
 					condition->operator,
 					condition->conditionid);
 		}
-		DBfree_result(result);
 	}
 	else if (condition->conditiontype == CONDITION_TYPE_HOST)
 	{
@@ -216,7 +231,7 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 	{
 		tmp_str = zbx_dsprintf(tmp_str, "%s", event->trigger_description);
 
-		substitute_simple_macros(event, NULL, NULL, NULL, NULL, NULL, &tmp_str, MACRO_TYPE_TRIGGER_DESCRIPTION, NULL, 0);
+		substitute_simple_macros(event, NULL, NULL, NULL, NULL, &tmp_str, MACRO_TYPE_TRIGGER_DESCRIPTION, NULL, 0);
 
 		switch (condition->operator)
 		{

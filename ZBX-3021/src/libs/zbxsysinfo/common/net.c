@@ -41,7 +41,7 @@ int	tcp_expect(const char *host, unsigned short port, const char *request,
 
 	*value_int = 0;
 
-	if (SUCCEED == (net = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, 3/*alarm!!!*/)))
+	if (SUCCEED == (net = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, 0)))
 	{
 		if (NULL != request)
 		{
@@ -68,8 +68,9 @@ int	tcp_expect(const char *host, unsigned short port, const char *request,
 		{
 			*value_int = 1;
 		}
+
+		zbx_tcp_close(&s);
 	}
-	zbx_tcp_close(&s);
 
 	if (FAIL == net)
 		zabbix_log(LOG_LEVEL_DEBUG, "TCP expect network error: %s", zbx_tcp_strerror());
@@ -80,101 +81,39 @@ int	tcp_expect(const char *host, unsigned short port, const char *request,
 	return SYSINFO_RET_OK;
 }
 
-int	TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_TCP_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef HAVE_PROC
-	FILE	*f = NULL;
-	char	c[MAX_STRING_LEN];
-	char	porthex[MAX_STRING_LEN];
-	char	pattern[MAX_STRING_LEN];
-	int	ret = SYSINFO_RET_FAIL;
+	unsigned short	port;
+	int		value_int, ret;
+	char		ip[64], port_str[8];
 
 	assert(result);
 
 	init_result(result);
 
-	if(num_param(param) > 1)
-	{
+	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
-	}
 
-	if(get_param(param, 1, porthex, MAX_STRING_LEN) != 0)
-	{
-		return SYSINFO_RET_FAIL;
-	}
+	if (0 != get_param(param, 1, ip, sizeof(ip)))
+		*ip = '\0';
 
-	strscpy(pattern,porthex);
-	zbx_strlcat(pattern," 00000000:0000 0A", MAX_STRING_LEN);
-
-	if(NULL == (f = fopen("/proc/net/tcp","r")))
-	{
-		return	SYSINFO_RET_FAIL;
-	}
-
-	while (NULL != fgets(c,MAX_STRING_LEN,f))
-	{
-		if(NULL != strstr(c,pattern))
-		{
-			SET_UI64_RESULT(result, 1);
-			ret = SYSINFO_RET_OK;
-			break;
-		}
-	}
-	zbx_fclose(f);
-
-	SET_UI64_RESULT(result, 0);
-
-	return ret;
-#else
-	return	SYSINFO_RET_FAIL;
-#endif
-}
-
-int	CHECK_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	short	port=0;
-	int	value_int;
-	int	ret;
-	char	ip[MAX_STRING_LEN];
-	char	port_str[MAX_STRING_LEN];
-
-	assert(result);
-
-	init_result(result);
-
-	if(num_param(param) > 2)
-	{
-		return SYSINFO_RET_FAIL;
-	}
-
-	if(get_param(param, 1, ip, MAX_STRING_LEN) != 0)
-	{
-		ip[0] = '\0';
-	}
-
-	if(ip[0] == '\0')
-	{
+	if ('\0' == *ip)
 		strscpy(ip, "127.0.0.1");
-	}
 
-	if(get_param(param, 2, port_str, MAX_STRING_LEN) != 0)
-	{
-		port_str[0] = '\0';
-	}
+	if (0 != get_param(param, 2, port_str, sizeof(port_str)))
+		*port_str = '\0';
 
-	if(port_str[0] == '\0')
-	{
+	if (SUCCEED != is_ushort(port_str, &port))
 		return SYSINFO_RET_FAIL;
-	}
 
-	port=atoi(port_str);
+	alarm(CONFIG_TIMEOUT);
 
-	ret = tcp_expect(ip,port,NULL,NULL,NULL,&value_int);
-
-	if(ret == SYSINFO_RET_OK)
+	if (SYSINFO_RET_OK == (ret = tcp_expect(ip, port, NULL, NULL, NULL, &value_int)))
 	{
 		SET_UI64_RESULT(result, value_int);
 	}
+
+	alarm(0);
 
 	return ret;
 }
@@ -240,8 +179,10 @@ int	CHECK_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 
 static char	*decode_type(int q_type)
 {
-	static char buf[16];
-	switch (q_type) {
+	static char	buf[16];
+
+	switch (q_type)
+	{
 		case T_A:	return "A";	/* "address"; */
 		case T_NS:	return "NS";	/* "name server"; */
 		case T_MD:	return "MD";	/* "mail forwarder"; */
@@ -469,9 +410,11 @@ int	CHECK_DNS_QUERY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		GETLONG(q_ttl, msg_ptr);
 		GETSHORT(q_len, msg_ptr);
 
-		switch (q_type) {
+		switch (q_type)
+		{
 			case T_A:
-				switch (q_class) {
+				switch (q_class)
+				{
 					case C_IN:
 					case C_HS:
 						bcopy(msg_ptr, &inaddr, INADDRSZ);

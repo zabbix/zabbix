@@ -17,18 +17,8 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-
-#ifndef ZABBIX_DBSYNC_H
-#define ZABBIX_DBSYNC_H
-
-#define ZBX_FIELD struct zbx_field_type
-ZBX_FIELD
-{
-	char    *name;
-	int	type;
-	int	flags;
-	char	*rel;
-};
+#ifndef ZABBIX_DBSCHEMA_H
+#define ZABBIX_DBSCHEMA_H
 
 #define ZBX_MAX_FIELDS		64
 #define ZBX_TABLENAME_LEN	64
@@ -36,26 +26,27 @@ ZBX_FIELD
 #define ZBX_FIELDNAME_LEN	64
 #define ZBX_FIELDNAME_LEN_MAX	ZBX_FIELDNAME_LEN + 1
 
-#define ZBX_TABLE struct zbx_table_type
-ZBX_TABLE
+typedef struct
+{
+	char    *name;
+	int	type;
+	int	flags;
+	char	*rel;
+}
+ZBX_FIELD;
+
+typedef struct
 {
 	char    	*table;
 	char		*recid;
 	int		flags;
 	ZBX_FIELD	fields[ZBX_MAX_FIELDS];
-};
-
-#ifdef HAVE_ORACLE
-#	define ZBX_DBTYPE_INT64 "number(20)"
-#elif HAVE_POSTGRESQL
-#	define ZBX_DBTYPE_INT64 "bigint"
-#elif HAVE_MYSQL
-#	define ZBX_DBTYPE_INT64 "bigint unsigned"
-#elif HAVE_SQLITE3
-#	define ZBX_DBTYPE_INT64 "bigint"
-#endif
+}
+ZBX_TABLE;
 
 extern ZBX_TABLE	tables[];
+#if defined(HAVE_SQLITE3)
 extern const char	*db_schema;
+#endif /* HAVE_SQLITE3 */
 
 #endif
