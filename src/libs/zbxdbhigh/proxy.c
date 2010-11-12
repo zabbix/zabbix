@@ -85,6 +85,8 @@ static ZBX_HISTORY_TABLE areg = {
 		{
 		{"p.clock",	ZBX_PROTO_TAG_CLOCK,		ZBX_JSON_TYPE_INT,	NULL},
 		{"p.host",	ZBX_PROTO_TAG_HOST,		ZBX_JSON_TYPE_STRING,	NULL},
+		{"p.listen_ip",	ZBX_PROTO_TAG_IP,		ZBX_JSON_TYPE_STRING,	""},
+		{"p.listen_port",ZBX_PROTO_TAG_PORT,		ZBX_JSON_TYPE_STRING,	"0"},
 		{NULL}
 		}
 };
@@ -1101,8 +1103,8 @@ static void	proxy_set_lastid(const ZBX_HISTORY_TABLE *ht, const zbx_uint64_t las
 			ht->lastfieldname);
 
 	if (NULL == (row = DBfetch(result)))
-		DBexecute("insert into ids (table_name,field_name,nextid)"
-				"values ('%s','%s'," ZBX_FS_UI64 ")",
+		DBexecute("insert into ids (nodeid,table_name,field_name,nextid)"
+				"values (0,'%s','%s'," ZBX_FS_UI64 ")",
 				ht->table,
 				ht->lastfieldname,
 				lastid);
@@ -1742,7 +1744,8 @@ void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)
 	int			ret;
 	const char		*p = NULL;
 	time_t			now, hosttime, itemtime;
-	char			host[HOST_HOST_LEN_MAX];
+	char			host[HOST_HOST_LEN_MAX], ip[HOST_IP_LEN_MAX];
+	unsigned short		port;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1768,8 +1771,17 @@ void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_HOST, host, sizeof(host)))
 			goto json_parse_error;
 
+		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_IP, ip, sizeof(ip)))
+			*ip = '\0';
+
+		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_PORT, tmp, sizeof(tmp)))
+			*tmp = '\0';
+
+		if (FAIL == is_ushort(tmp, &port))
+			port = 10050;
+
 		DBbegin();
-		DBregister_host(proxy_hostid, host, itemtime);
+		DBregister_host(proxy_hostid, host, ip, port, itemtime);
 		DBcommit();
 
 		continue;
