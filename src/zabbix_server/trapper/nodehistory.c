@@ -555,7 +555,7 @@ int	node_history(char *data, size_t datalen)
 			if (FAIL == is_direct_slave_node(sender_nodeid))
 			{
 				zabbix_log(LOG_LEVEL_ERR, "NODE %d: Received data from node %d"
-							"that is not a direct slave node",
+							" that is not a direct slave node",
 						CONFIG_NODEID, sender_nodeid);
 				res = FAIL;
 			}
