@@ -2187,38 +2187,31 @@ return $caption;
 		if(!empty($deps)){
 			$templates = array();
 			$templateids = array();
-			$trigger_from_host = false;
+			$templated_trigger = false;
 			$db_triggerhosts = get_hosts_by_expression($expression);
 
 			while($triggerhost = DBfetch($db_triggerhosts)){
-				if($triggerhost['status'] == HOST_STATUS_TEMPLATE){ //is template
+				if($triggerhost['status'] == HOST_STATUS_TEMPLATE){
 					$templates[$triggerhost['hostid']] = $triggerhost;
 					$templateids[$triggerhost['hostid']] = $triggerhost['hostid'];
-				}
-				else{
-					//atleast one item from expressions comes from hosts
-					$trigger_from_host = true;
+					$templated_trigger = true;
 				}
 			}
 
 			$dep_templateids = array();
-			$dep_from_host = false;
 			$db_dephosts = get_hosts_by_triggerid($deps);
 			while($dephost = DBfetch($db_dephosts)) {
-				if($dephost['status'] == HOST_STATUS_TEMPLATE){ //is template
+				if($templated_dep = ($dephost['status'] == HOST_STATUS_TEMPLATE)){
 					$templates[$dephost['hostid']] = $dephost;
 					$dep_templateids[$dephost['hostid']] = $dephost['hostid'];
 				}
-				else{
-					//atleast one item from dependencies comes from hosts
-					$dep_from_host = true;
+				
+				//we have a host trigger added to template trigger or otherwise
+				if($templated_trigger != $templated_dep){
+					return false;
 				}
 			}
 
-			//we have a host trigger added to template trigger or otherwise
-			if ($dep_from_host != $trigger_from_host){
-				return false; //this can not happen
-			}
 
 			$tdiff = array_diff($dep_templateids, $templateids);
 			if(!empty($templateids) && !empty($dep_templateids) && !empty($tdiff)){
