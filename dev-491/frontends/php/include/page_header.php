@@ -127,13 +127,12 @@
 	<link rel="stylesheet" type="text/css" href="css.css" />
 <!--[if IE 6]>
 	<script type="text/javascript" src="js/ie6fix.js"></script>
+<![endif]-->
+<!--[if lte IE 7]>
 	<link rel="stylesheet" type="text/css" href="styles/ie.css" />
 <![endif]-->
-<!--[if IE 7]>
-	<link rel="stylesheet" type="text/css" href="styles/ie.css" />
-<![endif]-->
-
 <?php
+	$bodyCSS = 'originalblue';
 	if(isset($DB['DB']) && !is_null($DB['DB'])){
 		$config = select_config();
 

@@ -446,6 +446,7 @@
 
 // MACROS WIDGET {
 // macros
+
 	if(empty($macros)){
 		$macros = array(array(
 			'macro' => '',
@@ -456,9 +457,11 @@
 	$macroTab = new CTable();
 	$macroTab->addRow(array(S_MACRO, SPACE, S_VALUE));
 	$macroTab->setAttribute('id', 'userMacros');
-//SDII($macros);
+
 	$jsInsert = '';
 	foreach($macros as $inum => $macro){
+		if(!empty($jsInsert) && zbx_empty($macro['macro']) && zbx_empty($macro['value'])) continue;
+		
 		$jsInsert.= 'addMacroRow('.zbx_jsvalue($macro).');';
 	}
 	zbx_add_post_js($jsInsert);

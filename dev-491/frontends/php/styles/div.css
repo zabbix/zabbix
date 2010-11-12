@@ -1,4 +1,7 @@
 /* CSS Document */
+div#tabs{
+	min-width: 980px;
+}
 
 div.disaster{
 	background-color: #FF0000;

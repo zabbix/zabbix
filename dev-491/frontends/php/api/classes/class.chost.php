@@ -1437,7 +1437,11 @@ Copt::memoryPick();
 					$interfaces = $host['interfaces'];
 					unset($host['interfaces']);
 				}
-				$result = self::massUpdate(array('hosts' => $host));
+
+				$data = $host;
+				$data['hosts'] = $host;
+
+				$result = self::massUpdate($data);
 
 // INTERFACES
 				if(!is_null($interfaces)){
@@ -1500,7 +1504,7 @@ Copt::memoryPick();
  * @param array $data['macros']
  * @return array
  */
-	public static function massAdd(&$data){
+	public static function massAdd($data){
 		$data['hosts'] = zbx_toArray($data['hosts']);
 
 		try{
@@ -1665,7 +1669,6 @@ Copt::memoryPick();
 
 // }}} UPDATE HOSTS PROPERTIES
 
-
 // UPDATE HOSTGROUPS LINKAGE {{{
 			if(isset($data['groups']) && !is_null($data['groups'])){
 				$data['groups'] = zbx_toArray($data['groups']);
@@ -1731,8 +1734,7 @@ Copt::memoryPick();
 					}
 				}
 
-				$data = array('hosts' => $hosts, 'templates' => $data['templates']);
-				$result = self::massAdd($data);
+				$result = self::massAdd(array('hosts' => $hosts, 'templates' => $data['templates']));
 				if(!$result){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_CANNOT_LINK_TEMPLATE);
 				}
@@ -1796,6 +1798,8 @@ Copt::memoryPick();
 				}
 
 				if(!empty($macrosToAdd)){
+					$macrosToAdd = array_values($macrosToAdd);
+
 					$result = self::massAdd(array('hosts' => $hosts, 'macros' => $macrosToAdd));
 					if(!$result){
 						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot add macro');
