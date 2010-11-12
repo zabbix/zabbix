@@ -85,7 +85,7 @@ class CTemplate extends CZBXAPI{
 			'select_triggers'			=> null,
 			'select_graphs'				=> null,
 			'select_applications'		=> null,
-			'select_macros'				=> null,
+			'selectMacros'				=> null,
 			'selectScreens'				=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
@@ -420,7 +420,7 @@ class CTemplate extends CZBXAPI{
 					if(!is_null($options['select_applications']) && !isset($result[$template['templateid']]['applications'])){
 						$template['applications'] = array();
 					}
-					if(!is_null($options['select_macros']) && !isset($result[$template['templateid']]['macros'])){
+					if(!is_null($options['selectMacros']) && !isset($result[$template['templateid']]['macros'])){
 						$template['macros'] = array();
 					}
 					if(!is_null($options['selectScreens']) && !isset($result[$template['templateid']]['screens'])){
@@ -904,10 +904,10 @@ Copt::memoryPick();
 		}
 
 // Adding macros
-		if(!is_null($options['select_macros']) && str_in_array($options['select_macros'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectMacros']) && str_in_array($options['selectMacros'], $subselects_allowed_outputs)){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'output' => $options['select_macros'],
+				'output' => $options['selectMacros'],
 				'hostids' => $templateids,
 				'preservekeys' => 1
 			);

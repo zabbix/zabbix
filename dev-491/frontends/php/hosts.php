@@ -39,7 +39,6 @@ else{
 	$page['title'] = 'S_HOSTS';
 	$page['file'] = 'hosts.php';
 	$page['hist_arg'] = array('groupid');
-	$page['scripts'] = array('hosts.tpl.js');
 }
 
 include_once('include/page_header.php');
@@ -698,6 +697,8 @@ include_once('include/page_header.php');
 
 	$frmForm = new CForm();
 	if(!isset($_REQUEST['form'])){
+// removes form_refresh variable
+		$frmForm->cleanItems();
 		$frmForm->addItem(new CButton('form',S_CREATE_HOST));
 		$frmForm->addItem(new CButton('form', S_IMPORT_HOST));
 	}
@@ -727,7 +728,6 @@ include_once('include/page_header.php');
 		else{
 			$hosts_wdgt->addItem(get_header_host_table($_REQUEST['hostid'], 'host'));
 
-
 			$hostForm = new CGetForm();
 			$hosts_wdgt->addItem($hostForm->render('host.edit'));
 		}
@@ -741,8 +741,8 @@ include_once('include/page_header.php');
 		$numrows = new CDiv();
 		$numrows->setAttribute('name', 'numrows');
 
-		$hosts_wdgt->addHeader(S_CONFIGURATION_OF_HOSTS, $frmGroup);
-		$hosts_wdgt->addHeader($numrows, $frmForm);
+		$hosts_wdgt->addHeader(S_CONFIGURATION_OF_HOSTS, $frmForm);
+		$hosts_wdgt->addHeader($numrows, $frmGroup);
 
 // HOSTS FILTER {{{
 		$filter_table = new CTable('', 'filter_config');

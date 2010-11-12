@@ -40,10 +40,9 @@
 			}
 
 			ob_start();
-
 			$this->form = include('./include/forms/'.$file.'.php');
 			$this->scripts = ob_get_clean();
-			
+
 			print($this->scripts);
 			return $this->form;
 		}
@@ -4499,62 +4498,6 @@ JAVASCRIPT;
 	return $tblExpFooter;
 	}
 
-
-	function get_interfaces_tab($interfaces){
-		if(empty($interfaces)){
-			$interfaces = array(array(
-				'ip' => '127.0.0.1',
-				'dns' => '',
-				'port' => 10050,
-				'useip' => 1
-			));
-		}
-
-		$ifTab = new CTable();
-		$ifTab->addRow(array(S_IP_ADDRESS,S_DNS_NAME,S_PORT,S_CONNECT_TO));
-		$ifTab->setAttribute('id', 'hostInterfaces');
-
-		$jsData = '';
-		foreach($interfaces as $inum => $interface){
-			$jsData.= 'addInterfaceRow('.zbx_jsvalue($interface).');';
-		}
-
-		zbx_add_post_js($jsData);
-		insert_js('
-			function addInterfaceRow(interface){
-				var tpl = new Template(ZBX_TPL.hostInterface);
-
-				if(!isset("new", interface)) interface.new = "update";
-
-				if(!isset("interfaceid", interface)){
-					interface.interfaceid = $("hostInterfaces").select("tr[id^=hostInterface]").length;
-					interface.new = "create";
-				}
-
-
-				$("hostIterfacesFooter").insert({"before" : tpl.evaluate(interface)});
-
-				if(isset("useip", interface)){
-					var useipSelect = $("hostInterfaces").select("select[id^=interfaces_"+interface.interfaceid+"_useip]");
-					if(!empty(useipSelect)) useipSelect[0].selectedIndex = interface.useip;
-				}
-			}
-		');
-
-		$addButton = new CSpan(S_ADD, 'link_menu');
-		$addButton->setAttribute('onclick', 'javascript: addInterfaceRow({})');
-
-		$col = new CCol(array($addButton));
-		$col->setAttribute('colspan', 5);
-
-		$buttonRow = new CRow($col);
-		$buttonRow->setAttribute('id', 'hostIterfacesFooter');
-
-		$ifTab->addRow($buttonRow);
-
-		return $ifTab;
-	}
-
 	function get_macros_widget($hostid = null){
 
 		if(isset($_REQUEST['form_refresh'])){
@@ -4672,5 +4615,4 @@ JAVASCRIPT;
 		//return new CFormElement(S_MACROS, $macros_tbl, $footer);
 		return $macros_tbl;
 	}
-
 ?>

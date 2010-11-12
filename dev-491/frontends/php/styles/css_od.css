@@ -621,12 +621,22 @@ span.biglink:hover{
 }
 
 
-span.link_menu{
+input.link_menu{
 	color: #FF5500;
 	border-bottom-color: #FF5500;
 }
 
-span.link_menu:hover{
+input.link_menu:hover{
+	color: #FF8800;
+	border-bottom-color: #FF8800;
+}
+
+.link_menu{
+	color: #FF5500;
+	border-bottom-color: #FF5500;
+}
+
+.link_menu:hover{
 	color: #FF8800;
 	border-bottom-color: #FF8800;
 }

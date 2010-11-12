@@ -851,6 +851,7 @@
 //	hosts.php
 	'S_INTERFACES' =>				'Interfaces',
 	'S_INTERFACE' =>				'Interface',
+	'S_NEW_HOST' =>					'New host',
 	'S_HOST_INTERFACES' =>			'Host interfaces',
 	'S_HOST_INTERFACE' =>			'Host interface',
 	'S_IMPORT_TEMPLATE'=>			'Import Template',
