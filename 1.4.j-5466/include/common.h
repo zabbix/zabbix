@@ -641,7 +641,7 @@ char*	comms_create_request(
 	);
 
 int	comms_parse_response(char *xml,char *host,char *key, char *data, char *lastlogsize, char *timestamp,
-	       char *source, char *severity, int maxlen);
+	       char *source, char *severity);
 
 int 	parse_command(const char *command, char *cmd, int cmd_max_len, char *param, int param_max_len);
 

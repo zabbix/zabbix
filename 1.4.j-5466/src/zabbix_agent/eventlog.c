@@ -88,7 +88,7 @@ static long	zbx_close_eventlog(HANDLE eventlog_handle)
 }
 
 /* get Nth error from event log. 1 is the first. */
-static long    zbx_get_eventlog_message(
+static int	zbx_get_eventlog_message(
 	const char	*source,
 	HANDLE		eventlog_handle,
 	long		which,
@@ -97,9 +97,10 @@ static long    zbx_get_eventlog_message(
 	unsigned short	*out_severity,
 	unsigned long	*out_timestamp)
 {
+	const char	*__function_name = "zbx_get_eventlog_message";
+	int		buffer_size = 512;
 	EVENTLOGRECORD	*pELR = NULL;
-	BYTE		bBuffer[1024];			/* hold the event log record raw data */
-	DWORD		dwRead, dwNeeded;
+	DWORD		dwRead, dwNeeded, dwErr;
 	char		stat_buf[MAX_PATH];
 	char		MsgDll[MAX_PATH];		/* the name of the message DLL */
 	HKEY		hk = NULL;
@@ -111,41 +112,40 @@ static long    zbx_get_eventlog_message(
 	long		i;
 	LPTSTR		msgBuf = NULL;			/* hold text of the error message that we */
 	long		err = 0;
+	int		ret = FAIL;
 
-	assert(out_source);
-	assert(out_message);
-	assert(out_severity);
-	assert(out_timestamp);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() which:%ld", __function_name, which);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In zbx_get_eventlog_message() [source:%s] [which:%ld]",
-		source,
-		which);
-
-	*out_source		= NULL;
+	*out_source	= NULL;
 	*out_message	= NULL;
 	*out_severity	= 0;
 	*out_timestamp	= 0;
 
-	if (!eventlog_handle)        return(0);
+	if (!eventlog_handle)
+		return(0);
 
-	if(!ReadEventLog(eventlog_handle,               /* event-log handle */
-		EVENTLOG_SEEK_READ |                    /* read forward */
-		EVENTLOG_FORWARDS_READ,                 /* sequential read */
-		which,                                  /* which record to read 1 is first */
-		bBuffer,                                /* address of buffer */
-		sizeof(bBuffer),                        /* size of buffer */
-		&dwRead,                                /* count of bytes read */
-		&dwNeeded))                             /* bytes in next record */
+	pELR = (EVENTLOGRECORD *)zbx_malloc((void *)pELR, buffer_size);
+retry:
+	if (0 == ReadEventLog(eventlog_handle, EVENTLOG_SEEK_READ | EVENTLOG_FORWARDS_READ, which,
+			pELR, buffer_size, &dwRead, &dwNeeded))
 	{
-		return GetLastError();
+		dwErr = GetLastError();
+		if (dwErr == ERROR_INSUFFICIENT_BUFFER)
+		{
+			buffer_size = dwNeeded;
+			pELR = (EVENTLOGRECORD *)zbx_realloc((void *)pELR, buffer_size);
+			goto retry;
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): %s", __function_name, strerror_from_system(dwErr));
+			goto out;
+		}
 	}
 
-	pELR = (EVENTLOGRECORD*)bBuffer;                    /* point to data */
-
-	*out_severity	= pELR->EventType;                  /* return event type */
-	*out_timestamp	= pELR->TimeGenerated;				/* return timestamp */
-
-	*out_source = strdup((char*)pELR + sizeof(EVENTLOGRECORD));	/* copy source name */
+	*out_severity	= pELR->EventType;		/* return event type */
+	*out_timestamp	= pELR->TimeGenerated;		/* return timestamp */
+	*out_source = strdup((char *)(pELR + 1));	/* copy source name */
 
 	err = FAIL;
 
@@ -245,7 +245,13 @@ static long    zbx_get_eventlog_message(
 		}
 	}
 
-	return 0;
+	ret = SUCCEED;
+out:
+	zbx_free(pELR);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, ret);
+
+	return ret;
 } 
 #endif /* _WINDOWS */
 
@@ -292,14 +298,8 @@ int process_eventlog(
 		
 		for (i = FirstID; i < LastID; i++)
 		{
-			if( 0 == zbx_get_eventlog_message(
-				source,
-				eventlog_handle,
-				i,
-				out_source,
-				out_message,
-				out_severity,
-				out_timestamp) )
+			if (SUCCEED == zbx_get_eventlog_message(source, eventlog_handle, i, out_source, out_message,
+					out_severity, out_timestamp))
 			{
 				switch(*out_severity)
 				{
