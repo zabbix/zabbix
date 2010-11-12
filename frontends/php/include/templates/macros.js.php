@@ -1,8 +1,8 @@
 <script type="text/x-jquery-tmpl" id="userMacroRow">
 <tr id="userMacroRow_#{macroid}">
 	<td>
-		<input type="hidden" name="macros[#{interfaceid}][new]" value="#{newValue}">
-		<input type="hidden" name="macros[#{interfaceid}][macroid]" value="#{macroid}">
+		<input type="hidden" name="macros[#{macroid}][new]" value="#{newValue}">
+		<input type="hidden" name="macros[#{macroid}][macroid]" value="#{macroid}">
 		<input class="biginput" name="macros[#{macroid}][macro]" type="text" size="30" value="#{macro}" placeholder="{$MACRO}">
 	</td>
 	<td><span style="vertical-align:top;">⇒</span></td>
@@ -21,8 +21,8 @@ function addMacroRow(userMacro){
 
 	if(!isset("newValue", userMacro)) userMacro.newValue = "update";
 
-	if(!isset("interfaceid", userMacro)){
-		userMacro.interfaceid = $("userMacros").select("tr[id^=userMacroRow]").length;
+	if(!isset("macroid", userMacro)){
+		userMacro.macroid = $("userMacros").select("tr[id^=userMacroRow]").length;
 		userMacro.newValue = "create";
 	}
 

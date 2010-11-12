@@ -464,6 +464,7 @@ include_once('include/page_header.php');
 			access_deny();
 		
 		try{
+			$macros = get_request('macros', array());
 			$interfaces = get_request('interfaces', array());
 			$templates = get_request('templates', array());
 			$templates_clear = get_request('clear_templates', array());
@@ -497,6 +498,13 @@ include_once('include/page_header.php');
 				unset($interfaces[$inum]['new']);
 			}
 
+			foreach($macros as $mnum => $macro){
+				if($macro['new'] == 'create')
+					unset($macros[$mnum]['macroid']);
+
+				unset($macros[$mnum]['new']);
+			}
+
 
 // START SAVE TRANSACTION {{{
 			DBstart();
@@ -510,7 +518,6 @@ include_once('include/page_header.php');
 			}
 			$groups = zbx_toObject($groups, 'groupid');
 
-			$macros = get_request('macros', array());
 			foreach($macros as $mnum => $macro){
 				if(zbx_empty($macro['value'])) unset($macros[$mnum]);
 			}
