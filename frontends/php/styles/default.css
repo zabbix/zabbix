@@ -34,6 +34,9 @@ body{
 	min-width: 1024px;
 }
 
+label{
+	cursor: pointer;
+}
 /**************** MEDIA *****************/
 @media print {
 	div.printless{

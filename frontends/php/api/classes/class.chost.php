@@ -58,7 +58,7 @@ class CHost extends CZBXAPI{
  * @param boolean $options['select_triggers'] select Triggers
  * @param boolean $options['select_graphs'] select Graphs
  * @param boolean $options['select_applications'] select Applications
- * @param boolean $options['select_macros'] select Macros
+ * @param boolean $options['selectMacros'] select Macros
  * @param boolean $options['select_profile'] select Profile
  * @param int $options['count'] count Hosts, returned column name is rowscount
  * @param string $options['pattern'] search hosts by pattern in Host name
@@ -134,7 +134,7 @@ class CHost extends CZBXAPI{
 			'select_dhosts'				=> null,
 			'select_dservices'			=> null,
 			'select_applications'		=> null,
-			'select_macros'				=> null,
+			'selectMacros'				=> null,
 			'selectScreens'				=> null,
 			'selectInterfaces'			=> null,
 			'select_profile'			=> null,
@@ -590,7 +590,7 @@ class CHost extends CZBXAPI{
 					if(!is_null($options['select_applications']) && !isset($result[$host['hostid']]['applications'])){
 						$result[$host['hostid']]['applications'] = array();
 					}
-					if(!is_null($options['select_macros']) && !isset($result[$host['hostid']]['macros'])){
+					if(!is_null($options['selectMacros']) && !isset($result[$host['hostid']]['macros'])){
 						$result[$host['hostid']]['macros'] = array();
 					}
 
@@ -1104,10 +1104,10 @@ Copt::memoryPick();
 		}
 
 // Adding macros
-		if(!is_null($options['select_macros']) && str_in_array($options['select_macros'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectMacros']) && str_in_array($options['selectMacros'], $subselects_allowed_outputs)){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'output' => $options['select_macros'],
+				'output' => $options['selectMacros'],
 				'hostids' => $hostids,
 				'preservekeys' => 1
 			);

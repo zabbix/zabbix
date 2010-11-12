@@ -25,20 +25,34 @@
  * @author Aly
  */
 class CTabView extends CDiv{
-	protected $id = null;
+	protected $id = 'tabs';
 	protected $tabs = null;
 	protected $headers = null;
 
-	public function __construct($id='tabs'){
-		$this->id = $id;
+	protected $selectedTab = null;
+	protected $rememberTab = false;
+
+	public function __construct($data){
+		if(isset($data['id'])) $this->id = $data['id'];
+		if(isset($data['remember'])) $this->setRemember($data['remember']);
+		if(isset($data['selected'])) $this->setSelected($data['selected']);
 
 		$this->headers = new CList();
 		$this->tabs = array();
 
 		parent::__construct();
 		$this->setAttribute('id',$this->id);
+		$this->setAttribute('class','hidden');
 	}
 
+	public function setRemember($remember){
+		$this->rememberTab = $remember;
+	}
+
+	public function setSelected($selected){
+		$this->selectedTab = $selected;
+	}
+	
 	public function addTab($id, $header, $body){
 		$this->headers->addItem(new CLink($header, '#'.$id, null, null, false));
 		
@@ -50,7 +64,13 @@ class CTabView extends CDiv{
 		$this->addItem($this->headers);
 		$this->addItem($this->tabs);
 
-		zbx_add_post_js('jQuery(function() { jQuery( "#'.$this->id.'" ).tabs(); });');
+		$options = array();
+		if(!is_null($this->selectedTab)) 
+			$options['selected'] = $this->selectedTab;
+		if(!is_null($this->rememberTab) && ($this->rememberTab > 0))
+			$options['cookie'] = array('expires' => $this->rememberTab);
+
+		zbx_add_post_js('jQuery(function() { jQuery( "#'.$this->id.'" ).tabs('.zbx_jsvalue($options, true).').show(); });');
 		return parent::toString($destroy);
 	}
 }

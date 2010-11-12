@@ -33,18 +33,20 @@ class CFormList extends CDiv{
 		$this->setAttribute('class', 'formlist '.$class);
 	}
 
-	public function addRow($term, $description){
-		$left = new CDiv(null, 'dt');
-
-		$label = new CTag('label', 'yes', $term);
+	public function addRow($term, $description=null){
+		$label = $term;
 		if(is_object($description)){
 			$inputClass = zbx_strtolower(get_class($description));
 			if(in_array($inputClass, $this->formInputs)){
+				$label = new CTag('label', 'yes', $term);
 				$label->setAttribute('for', $description->getAttribute('id'));
 			}
 		}
 
-		$this->formList->addItem(array($left->addItem($label), new CDiv($description, 'dd')));
+		if(!is_null($description))
+			$this->formList->addItem(array(new CDiv($label, 'dt'), new CDiv($description, 'dd')));
+		else
+			$this->formList->addItem(new CDiv($label, 'dd'));
 	}
 
 	public function toString($destroy=true){

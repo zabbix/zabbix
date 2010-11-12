@@ -19,8 +19,14 @@
 **/
 ?>
 <?php
-
-$divTabs = new CTabView();
+// include JS + templates
+	include('include/templates/hosts.js.php');
+	include('include/templates/macros.js.php');
+?>
+<?php
+	$divTabs = new CTabView(array('remember'=>1));
+	if(!isset($_REQUEST['form_refresh']))
+		$divTabs->setSelected(0);
 
 	$host_groups = get_request('groups', array());
 	if(isset($_REQUEST['groupid']) && ($_REQUEST['groupid']>0) && empty($host_groups)){
@@ -59,6 +65,7 @@ $divTabs = new CTabView();
 	$ext_host_profiles	= get_request('ext_host_profiles',array());
 // END:   HOSTS PROFILE EXTENDED Section
 
+	$macros = get_request('macros',array());
 	$interfaces = get_request('interfaces',array());
 	$templates = get_request('templates',array());
 	$clear_templates = get_request('clear_templates',array());
@@ -69,6 +76,7 @@ $divTabs = new CTabView();
 			'hostids' => $_REQUEST['hostid'],
 			'selectParentTemplates' => API_OUTPUT_EXTEND,
 			'selectInterfaces' => API_OUTPUT_EXTEND,
+			'selectMacros' => API_OUTPUT_EXTEND,
 			'select_profile' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND
 		));
@@ -82,6 +90,8 @@ $divTabs = new CTabView();
 	}
 
 	if(($_REQUEST['hostid']>0) && !isset($_REQUEST['form_refresh'])){
+		
+
 		$proxy_hostid	= $dbHost['proxy_hostid'];
 		$host			= $dbHost['host'];
 		$status			= $dbHost['status'];
@@ -92,7 +102,9 @@ $divTabs = new CTabView();
 		$ipmi_username		= $dbHost['ipmi_username'];
 		$ipmi_password		= $dbHost['ipmi_password'];
 
+		$macros = $dbHost['macros'];
 		$interfaces = $dbHost['interfaces'];
+
 // add groups
 		$options = array('hostids' => $_REQUEST['hostid']);
 		$host_groups = CHostGroup::get($options);
@@ -229,7 +241,36 @@ $divTabs = new CTabView();
 	$hostList->addRow(S_NEW_GROUP, new CTextBox('newgroup',$newgroup));
 
 // interfaces
-	$ifTab = get_interfaces_tab($interfaces);
+	if(empty($interfaces)){
+		$interfaces = array(array(
+			'ip' => '127.0.0.1',
+			'dns' => '',
+			'port' => 10050,
+			'useip' => 1
+		));
+	}
+
+	$ifTab = new CTable();
+	$ifTab->addRow(array(S_IP_ADDRESS,S_DNS_NAME,S_PORT,S_CONNECT_TO));
+	$ifTab->setAttribute('id', 'hostInterfaces');
+
+	$jsInsert = '';
+	foreach($interfaces as $inum => $interface){
+		$jsInsert.= 'addInterfaceRow('.zbx_jsvalue($interface).');';
+	}
+	zbx_add_post_js($jsInsert);
+
+	$addButton = new CButton('add', S_ADD, 'javascript: addInterfaceRow({});',false);
+	$addButton->setAttribute('class', 'link_menu');
+
+	$col = new CCol(array($addButton));
+	$col->setAttribute('colspan', 5);
+
+	$buttonRow = new CRow($col);
+	$buttonRow->setAttribute('id', 'hostIterfacesFooter');
+
+	$ifTab->addRow($buttonRow);
+	
 	$hostList->addRow(S_INTERFACES, $ifTab);
 
 //Proxy
@@ -375,63 +416,88 @@ $divTabs = new CTabView();
 // } HOST WIDGET
 
 // TEMPLATES{
-	$template_tbl = new CTableInfo(S_NO_TEMPLATES_LINKED, 'tablestripped');
-	$template_tbl->setCellPadding(0);
-	$template_tbl->setCellSpacing(0);
-	$template_tbl->setOddRowClass('form_odd_row');
-	$template_tbl->setEvenRowClass('form_even_row');
+
+	$tmplList = new CFormList('tmpllist');
 
 	foreach($templates as $id => $temp_name){
 		$frmHost->addVar('templates['.$id.']', $temp_name);
-		$template_tbl->addRow(array(
-			new CCheckBox('templates_rem['.$id.']', 'no', null, $id),
-			$temp_name
-		));
+		$tmplList->addRow($temp_name, new CCheckBox('templates_rem['.$id.']', 'no', null, $id));
 	}
 
-	$footer = new CCol(array(
-		new CButton('add_template', S_ADD,
-			"return PopUp('popup.php?dstfrm=".$frmHost->getName().
+	$tmplAdd = new CButton('add', S_ADD, "return PopUp('popup.php?dstfrm=".$frmHost->getName().
 			"&dstfld1=new_template&srctbl=templates&srcfld1=hostid&srcfld2=host".
 			url_param($templates,false,'existed_templates')."',450,450)",
-			'T'),
-		SPACE,
-		new CButton('unlink', S_UNLINK),
-		SPACE,
-		new CButton('unlink_and_clear', S_UNLINK_AND_CLEAR)
-	));
-	$footer->setColSpan(2);
+			'T');
+	$tmplAdd->setAttribute('class', 'link_menu');
 
-	$template_tbl->setFooter($footer);
+	$tmplUnlink = new CButton('unlink', S_UNLINK);
+	$tmplUnlink->setAttribute('class', 'link_menu');
 
-	$divTabs->addTab('templateTab', S_TEMPLATES, $template_tbl);
+	$tmplUnlinkClear = new CButton('unlink_and_clear', S_UNLINK_AND_CLEAR);
+	$tmplUnlinkClear->setAttribute('class', 'link_menu');
+
+	$footer = new CDiv(array($tmplAdd,$tmplUnlink,$tmplUnlinkClear));
+
+	$tmplList->addRow($footer);
+
+	$divTabs->addTab('templateTab', S_TEMPLATES, $tmplList);
 // } TEMPLATES
 
 
 // MACROS WIDGET {
-	$divTabs->addTab('macroTab', S_MACROS, get_macros_widget($_REQUEST['hostid']));
+// macros
+	if(empty($macros)){
+		$macros = array(array(
+			'macro' => '',
+			'value' => ''
+		));
+	}
+
+	$macroTab = new CTable();
+	$macroTab->addRow(array(S_MACRO, SPACE, S_VALUE));
+	$macroTab->setAttribute('id', 'userMacros');
+//SDII($macros);
+	$jsInsert = '';
+	foreach($macros as $inum => $macro){
+		$jsInsert.= 'addMacroRow('.zbx_jsvalue($macro).');';
+	}
+	zbx_add_post_js($jsInsert);
+
+	$addButton = new CButton('add', S_ADD, 'javascript: addMacroRow({});',false);
+	$addButton->setAttribute('class', 'link_menu');
+
+	$col = new CCol(array($addButton));
+	$col->setAttribute('colspan', 4);
+
+	$buttonRow = new CRow($col);
+	$buttonRow->setAttribute('id', 'userMacroFooter');
+
+	$macroTab->addRow($buttonRow);
+
+	$macrolist = new CFormList('macrolist');
+	$macrolist->addRow($macroTab);
+
+	$divTabs->addTab('macroTab', S_MACROS, $macrolist);
 // } MACROS WIDGET
 
 
 // PROFILE WIDGET {
-	$profile_tbl = new CTable('', 'tablestripped');
-	$profile_tbl->setOddRowClass('form_odd_row');
-	$profile_tbl->setEvenRowClass('form_even_row');
+	$profileList = new CFormList('profilelist');
 
-	$profile_tbl->addRow(array(S_USE_PROFILE,new CCheckBox('useprofile',$useprofile,'submit()')));
+	$profileList->addRow(S_USE_PROFILE,new CCheckBox('useprofile',$useprofile,'submit()'));
 
 	if($useprofile == 'yes'){
-		$profile_tbl->addRow(array(S_DEVICE_TYPE,new CTextBox('devicetype',$devicetype,61)));
-		$profile_tbl->addRow(array(S_NAME,new CTextBox('name',$name,61)));
-		$profile_tbl->addRow(array(S_OS,new CTextBox('os',$os,61)));
-		$profile_tbl->addRow(array(S_SERIALNO,new CTextBox('serialno',$serialno,61)));
-		$profile_tbl->addRow(array(S_TAG,new CTextBox('tag',$tag,61)));
-		$profile_tbl->addRow(array(S_MACADDRESS,new CTextBox('macaddress',$macaddress,61)));
-		$profile_tbl->addRow(array(S_HARDWARE,new CTextArea('hardware',$hardware,60,4)));
-		$profile_tbl->addRow(array(S_SOFTWARE,new CTextArea('software',$software,60,4)));
-		$profile_tbl->addRow(array(S_CONTACT,new CTextArea('contact',$contact,60,4)));
-		$profile_tbl->addRow(array(S_LOCATION,new CTextArea('location',$location,60,4)));
-		$profile_tbl->addRow(array(S_NOTES,new CTextArea('notes',$notes,60,4)));
+		$profileList->addRow(S_DEVICE_TYPE,new CTextBox('devicetype',$devicetype,61));
+		$profileList->addRow(S_NAME,new CTextBox('name',$name,61));
+		$profileList->addRow(S_OS,new CTextBox('os',$os,61));
+		$profileList->addRow(S_SERIALNO,new CTextBox('serialno',$serialno,61));
+		$profileList->addRow(S_TAG,new CTextBox('tag',$tag,61));
+		$profileList->addRow(S_MACADDRESS,new CTextBox('macaddress',$macaddress,61));
+		$profileList->addRow(S_HARDWARE,new CTextArea('hardware',$hardware,60,4));
+		$profileList->addRow(S_SOFTWARE,new CTextArea('software',$software,60,4));
+		$profileList->addRow(S_CONTACT,new CTextArea('contact',$contact,60,4));
+		$profileList->addRow(S_LOCATION,new CTextArea('location',$location,60,4));
+		$profileList->addRow(S_NOTES,new CTextArea('notes',$notes,60,4));
 	}
 	else{
 		$frmHost->addVar('devicetype', $devicetype);
@@ -447,25 +513,23 @@ $divTabs = new CTabView();
 		$frmHost->addVar('notes',$notes);
 	}
 
-	$divTabs->addTab('profileTab', S_HOST_PROFILE, $profile_tbl);
+	$divTabs->addTab('profileTab', S_HOST_PROFILE, $profileList);
 // } PROFILE WIDGET
 
 // EXT PROFILE WIDGET {
-	$ext_profile_tbl = new CTable('', 'tablestripped');
-	$ext_profile_tbl->setOddRowClass('form_odd_row');
-	$ext_profile_tbl->setEvenRowClass('form_even_row');
-	$ext_profile_tbl->addRow(array(S_USE_EXTENDED_PROFILE,new CCheckBox('useprofile_ext',$useprofile_ext,'submit()','yes')));
+	$profileexlist =  new CFormList('profileexlist');
+	$profileexlist->addRow(S_USE_EXTENDED_PROFILE,new CCheckBox('useprofile_ext',$useprofile_ext,'submit()','yes'));
 
 	foreach($ext_profiles_fields as $prof_field => $caption){
 		if($useprofile_ext == 'yes'){
-			$ext_profile_tbl->addRow(array($caption,new CTextBox('ext_host_profiles['.$prof_field.']',$ext_host_profiles[$prof_field],40)));
+			$profileexlist->addRow($caption,new CTextBox('ext_host_profiles['.$prof_field.']',$ext_host_profiles[$prof_field],80));
 		}
 		else{
 			$frmHost->addVar('ext_host_profiles['.$prof_field.']',	$ext_host_profiles[$prof_field]);
 		}
 	}
 
-	$divTabs->addTab('profileExTab', S_EXTENDED_HOST_PROFILE, $ext_profile_tbl);
+	$divTabs->addTab('profileExTab', S_EXTENDED_HOST_PROFILE, $profileexlist);
 // } EXT PROFILE WIDGET
 
 $frmHost->addItem($divTabs);
@@ -479,8 +543,7 @@ $frmHost->addItem($divTabs);
 	}
 	array_push($host_footer, SPACE, new CButtonCancel(url_param('groupid')));
 
-	$frmHost->addItem(new CDiv($host_footer));
-//
+	$frmHost->addItem(new CDiv($host_footer, 'center'));
 
 return $frmHost;
 ?>

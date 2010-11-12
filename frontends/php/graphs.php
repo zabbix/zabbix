@@ -353,6 +353,7 @@ include_once('include/page_header.php');
 
 // Config
 	if(!isset($_REQUEST['form'])){
+// removes form_refresh variable
 		$form->cleanItems();
 		$form->addItem(new CButton('form', S_CREATE_GRAPH));
 	}

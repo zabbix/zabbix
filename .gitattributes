@@ -326,6 +326,8 @@ frontends/php/include/requirements.inc.php -text
 frontends/php/include/schema.inc.php -text
 frontends/php/include/scripts.inc.php -text
 frontends/php/include/sounds.inc.php -text
+frontends/php/include/templates/hosts.js.php -text
+frontends/php/include/templates/macros.js.php -text
 frontends/php/include/valuemap.inc.php -text
 frontends/php/include/xmlschemas/screens.rng -text
 frontends/php/js/class.bbcode.js -text
@@ -352,7 +354,6 @@ frontends/php/js/jquery/jquery.js -text
 frontends/php/js/main.js -text
 frontends/php/js/menu.js -text
 frontends/php/js/prototype.js -text
-frontends/php/js/templates/hosts.tpl.js -text
 frontends/php/js/templates/sysmap.tpl.js -text
 frontends/php/jsLoader.php -text
 frontends/php/jsrpc.php -text
