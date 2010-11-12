@@ -23,6 +23,7 @@ Changes for 1.9.0
 
 Changes for 1.8.4rc3
 
+ - [ZBX-2639] added net.if.total and net.if.list items in the help_items table (Sasha)
  - [ZBX-1600] added support of value mapping for {ITEM.VALUE} macro in notifications (Sasha)
  - [ZBX-3065] fixed undefined variables in maps.php when logged as guest and no maps defined (Vedmak)
  - [ZBX-3206] fixed timeout for simple checks (removed hardcoded timeout 3 sec) (Sasha)
