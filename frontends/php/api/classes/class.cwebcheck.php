@@ -396,31 +396,34 @@ COpt::memoryPick();
 				DB::update('httptest', $update);
 
 
-				$checkitems_update = array();
+				$checkitems_update = $update_fields = array();
 				$sql = 'SELECT i.itemid, hi.type'.
 					' FROM items i, httptestitem hi '.
 					' WHERE hi.httptestid='.$webcheck['webcheckid'].
 						' AND hi.itemid=i.itemid';
 				$db_checkitems = DBselect($sql);
 				while($checkitem = DBfetch($db_checkitems)){
-					$update_this = false;
 					$itemids[] = $checkitem['itemid'];
 
 					if(isset($webcheck['name'])){
 						switch($checkitem['type']){
 							case HTTPSTEP_ITEM_TYPE_IN:
-								$checkitem['key_'] = 'web.test.in['.$webcheck['name'].',,bps]';
+								$update_fields['key_'] = 'web.test.in['.$webcheck['name'].',,bps]';
 								break;
 							case HTTPSTEP_ITEM_TYPE_LASTSTEP:
-								$checkitem['key_'] = 'web.test.fail['.$webcheck['name'].']';
+								$update_fields['key_'] = 'web.test.fail['.$webcheck['name'].']';
 								break;
 						}
-						$update_this = true;
 					}
 
-					if($update_this){
+					if(isset($webcheck['status'])){
+						$update_fields['status'] = $webcheck['status'];
+					}
+
+
+					if(!empty($update_fields)){
 						$checkitems_update[] = array(
-							'values' => array('key_' => $checkitem['key_']),
+							'values' => $update_fields,
 							'where' => array('itemid='.$checkitem['itemid'])
 						);
 					}
@@ -575,7 +578,7 @@ COpt::memoryPick();
 			$item['trapper_hosts'] = 'localhost';
 			$item['history'] = self::$history;
 			$item['trends'] = self::$trends;
-			$item['status'] = ITEM_STATUS_ACTIVE;
+			$item['status'] = $webcheck['status'];
 			$item['applications'] = array($webcheck['applicationid']);
 		}
 		unset($item);
@@ -672,7 +675,7 @@ COpt::memoryPick();
 				$item['data_type'] = ITEM_DATA_TYPE_DECIMAL;
 				$item['history'] = self::$history;
 				$item['trends'] = self::$trends;
-				$item['status'] = ITEM_STATUS_ACTIVE;
+				$item['status'] = $webcheck['status'];
 				$item['applications'] = array($webcheck['applicationid']);
 			}
 			unset($item);
@@ -680,6 +683,7 @@ COpt::memoryPick();
 
 			$step_itemids = DB::insert('items', $stepitems);
 
+			$itemApplications = array();
 			foreach($step_itemids as $itemid){
 				$itemApplications[] = array(
 					'applicationid' => $webcheck['applicationid'],
@@ -696,7 +700,6 @@ COpt::memoryPick();
 					'itemid' => $step_itemids[$inum],
 					'type' => $item['httpstepitemtype'],
 				);
-
 			}
 			DB::insert('httpstepitem', $webstepitems);
 
@@ -725,35 +728,36 @@ COpt::memoryPick();
 
 
 // update item keys
-			$stepitems_update = array();
+			$stepitems_update = $update_fields = array();
 			$sql = 'SELECT i.itemid, hi.type'.
 				' FROM items i, httpstepitem hi '.
 				' WHERE hi.httpstepid='.$webstep['webstepid'].
 					' AND hi.itemid=i.itemid';
 			$db_stepitems = DBselect($sql);
 			while($stepitem = DBfetch($db_stepitems)){
-				$update_this = false;
 				$itemids[] = $stepitem['itemid'];
 
 				if(isset($webcheck['name']) || $webstep['name']){
-
 					switch($stepitem['type']){
 						case HTTPSTEP_ITEM_TYPE_IN:
-							$stepitem['key_'] = 'web.test.in['.$webcheck['name'].','.$webstep['name'].',bps]';
+							$update_fields['key_'] = 'web.test.in['.$webcheck['name'].','.$webstep['name'].',bps]';
 							break;
 						case HTTPSTEP_ITEM_TYPE_TIME:
-							$stepitem['key_'] = 'web.test.time['.$webcheck['name'].','.$webstep['name'].',resp]';
+							$update_fields['key_'] = 'web.test.time['.$webcheck['name'].','.$webstep['name'].',resp]';
 							break;
 						case HTTPSTEP_ITEM_TYPE_RSPCODE:
-							$stepitem['key_'] = 'web.test.rspcode['.$webcheck['name'].','.$webstep['name'].']';
+							$update_fields['key_'] = 'web.test.rspcode['.$webcheck['name'].','.$webstep['name'].']';
 							break;
 					}
-					$update_this = true;
 				}
 
-				if($update_this){
+				if(isset($webcheck['status'])){
+					$update_fields['status'] = $webcheck['status'];
+				}
+
+				if(!empty($update_fields)){
 					$stepitems_update[] = array(
-						'values' => array('key_' => $stepitem['key_']),
+						'values' => $update_fields,
 						'where' => array('itemid='.$stepitem['itemid'])
 					);
 				}

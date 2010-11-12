@@ -2149,7 +2149,6 @@ return $caption;
 		while(($trig = DBfetch($res)) && $result){
 			$result &= check_dependency_by_triggerid($triggerid,$trig['triggerid_up'],$level);		// RECURSION!!!
 		}
-
 	return $result;
 	}
 
@@ -2271,20 +2270,20 @@ return $caption;
  * Comments: !!! Don't forget sync code with C !!!
  *
  */
-	function copy_template_triggers($hostid, $templateid = null, $copy_mode = false){
+	function copy_template_triggers($hostid, $templateid = null){
 		if(null == $templateid){
 			$templateid = array_keys(get_templates_by_hostid($hostid));
 		}
 
 		if(is_array($templateid)){
 			foreach($templateid as $id)
-				copy_template_triggers($hostid, $id, $copy_mode); // attention recursion
+				copy_template_triggers($hostid, $id); // attention recursion
 			return;
 		}
 
 		$triggers = get_triggers_by_hostid($templateid);
 		while($trigger = DBfetch($triggers)){
-			copy_trigger_to_host($trigger['triggerid'], $hostid, $copy_mode);
+			copy_trigger_to_host($trigger['triggerid'], $hostid, false);
 		}
 
 		update_template_dependencies_for_host($hostid);

@@ -1852,7 +1852,7 @@ COpt::memoryPick();
 				));
 				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot sync items');
 
-				copy_template_triggers($targetid, $templateid, false);
+				copy_template_triggers($targetid, $templateid);
 
 				$result = CGraphPrototype::syncTemplates(array(
 					'hostids' => $targetid,
