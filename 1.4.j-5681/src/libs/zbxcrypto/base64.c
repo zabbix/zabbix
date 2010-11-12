@@ -199,16 +199,17 @@ void str_base64_encode(const char *p_str, char *p_b64str, int in_size)
  *		   p_str (out)		- the encoded str to return
  *		   p_out_size (out)	- the size (len) of the str decoded
  *
- * Returns	:  
+ * Returns	:  length of p_str
  *
  * Comments	:
  *
  *----------------------------------------------------------------------*/
-void str_base64_decode(const char *p_b64str, char *p_str, int *p_out_size)
+int	str_base64_decode(const char *p_b64str, char *p_str, int p_str_size)
 {
 	int i;
 	int j = 0;
 	int	in_size;
+	int	p_out_size = 0;
 	char from1='A',from2='A',from3='A',from4='A';
 	unsigned char to1=0,to2=0,to3=0,to4=0;
 	char	str_clean[MAX_B64_SIZE];/* str_clean is the string 
@@ -217,11 +218,9 @@ void str_base64_decode(const char *p_b64str, char *p_str, int *p_out_size)
 					*/
 	assert(p_b64str);
 	assert(p_str);
-	assert(p_out_size);
 
 	in_size = (int)strlen(p_b64str);
 	memset(str_clean, 0, sizeof(str_clean));
-	*p_out_size = 0;
 	
 	/* Clean-up input string */
 	for ( i=0; i < in_size; i++ )
@@ -237,7 +236,7 @@ void str_base64_decode(const char *p_b64str, char *p_str, int *p_out_size)
 	
 	if ( 0 == in_size )
 	{
-		return;
+		return p_out_size;
 	}
 
 	for ( i=0; i < in_size ;i+=4)
@@ -264,18 +263,21 @@ void str_base64_decode(const char *p_b64str, char *p_str, int *p_out_size)
 		to4 = char_base64_decode(from4);
 
 		*(p_str++) = ( (to1<<2)|(to2>>4) );
-		(*p_out_size)++;
+		if (++p_out_size == p_str_size)
+			break;
 		if (from3 != '=')
 		{
 			*(p_str++) = ( ((to2&0xf)<<4)|(to3>>2) );
-			(*p_out_size)++;
+			if (++p_out_size == p_str_size)
+				break;
 		}
 		if (from4 != '=')
 		{
 			*(p_str++) =  ( ((to3&0x3)<<6)|to4 );
-			(*p_out_size)++;
+			if (++p_out_size == p_str_size)
+				break;
 		}
 	}
 	
-	return;
+	return p_out_size;
 }
