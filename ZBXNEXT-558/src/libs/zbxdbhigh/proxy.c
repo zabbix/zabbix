@@ -1103,8 +1103,8 @@ static void	proxy_set_lastid(const ZBX_HISTORY_TABLE *ht, const zbx_uint64_t las
 			ht->lastfieldname);
 
 	if (NULL == (row = DBfetch(result)))
-		DBexecute("insert into ids (table_name,field_name,nextid)"
-				"values ('%s','%s'," ZBX_FS_UI64 ")",
+		DBexecute("insert into ids (nodeid,table_name,field_name,nextid)"
+				"values (0,'%s','%s'," ZBX_FS_UI64 ")",
 				ht->table,
 				ht->lastfieldname,
 				lastid);
