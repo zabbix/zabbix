@@ -1225,8 +1225,9 @@ COpt::memoryPick();
 			self::BeginTransaction(__METHOD__);
 
 // TODO: remove $nopermissions hack
+			$items = zbx_toObject($itemids, 'itemid');
+
 			if(!$nopermissions){
-				$items = zbx_toObject($itemids, 'itemid');
 				self::checkInput($items, __FUNCTION__);
 			}
 

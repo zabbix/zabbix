@@ -164,6 +164,18 @@ include_once('include/page_header.php');
 
 		$deps = get_request('dependencies',array());
 
+		$trigger = array(
+			'expression' => $_REQUEST['expression'],
+			'description' => $_REQUEST['description'],
+			'type' => $_REQUEST['type'],
+			'priority' => $_REQUEST['priority'],
+			'status' => isset($_REQUEST['status'])?TRIGGER_STATUS_DISABLED:TRIGGER_STATUS_ENABLED,
+			'comments' => $_REQUEST['comments'],
+			'url' => $_REQUEST['url'],
+			'dependencies' => get_request('dependencies',array()),
+			'url' => $_REQUEST['url'],
+		);
+
 		if(isset($_REQUEST['triggerid'])){
 			$triggerData = get_trigger_by_triggerid($_REQUEST['triggerid']);
 			if($triggerData['templateid']){
@@ -184,13 +196,9 @@ include_once('include/page_header.php');
 			show_messages($result, S_TRIGGER_UPDATED, S_CANNOT_UPDATE_TRIGGER);
 		}
 		else{
-			DBstart();
-			$triggerid = add_trigger($_REQUEST['expression'],$_REQUEST['description'],$type,
-				$_REQUEST['priority'],$status,$_REQUEST['comments'],$_REQUEST['url'],
-				$deps);
-			$result = DBend($triggerid);
+			$result = CTrigger::create($trigger);
+
 			show_messages($result, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
-			if($result) $_REQUEST['triggerid'] = $triggerid;
 		}
 		if($result)
 			unset($_REQUEST['form']);
