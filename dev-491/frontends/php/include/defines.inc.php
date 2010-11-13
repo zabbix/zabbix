@@ -210,9 +210,6 @@
 	define('CONDITION_OPERATOR_LESS_EQUAL',	6);
 	define('CONDITION_OPERATOR_NOT_IN',		7);
 
-	define('HOST_USE_DNS',		0);
-	define('HOST_USE_IP',		1);
-
 	define('HOST_STATUS_MONITORED',		0);
 	define('HOST_STATUS_NOT_MONITORED',	1);
 //	define('HOST_STATUS_UNREACHABLE',	2);
@@ -223,6 +220,13 @@
 
 	define('HOST_MAINTENANCE_STATUS_OFF',	0);
 	define('HOST_MAINTENANCE_STATUS_ON',	1);
+
+	define('INTERFACE_USE_DNS',		0);
+	define('INTERFACE_USE_IP',		1);
+
+	define('INTEFACE_TYPE_AGENT',		0);
+	define('INTEFACE_TYPE_SNMP',		6);
+	define('INTEFACE_TYPE_IPMI',		12);
 
 	define('MAINTENANCE_STATUS_ACTIVE',		0);
 	define('MAINTENANCE_STATUS_APPROACH',	1);
