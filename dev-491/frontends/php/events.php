@@ -191,16 +191,16 @@
 		$filterForm->addRow($row);
 
 		$filterForm->addVar('showUnknown',$_REQUEST['showUnknown']);
-		$unkcbx = new CCheckBox('hide_unk',$_REQUEST['showUnknown'],null,'1');
-		$unkcbx->setAction('javascript: create_var("'.$filterForm->GetName().'", "showUnknown", (this.checked?1:0), 0); ');
+		$unkcbx = new CCheckBox('hide_unk',
+			$_REQUEST['showUnknown'],
+			'javascript: create_var("'.$filterForm->GetName().'", "showUnknown", (this.checked?1:0), 0); ',
+			'1');
 
 		$filterForm->addRow(S_SHOW_UNKNOWN_EVENTS,$unkcbx);
 
-		$reset = new CButton('filter_rst',S_RESET);
-		$reset->setType('button');
-		$reset->setAction('javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
+		$reset = new CButton('filter_rst',S_RESET,'javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
 
-		$filterForm->addItemToBottomRow(new CButton('filter_set',S_FILTER));
+		$filterForm->addItemToBottomRow(new CSubmit('filter_set',S_FILTER));
 		$filterForm->addItemToBottomRow($reset);
 	}
 

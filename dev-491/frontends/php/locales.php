@@ -187,10 +187,10 @@ if(isset($_REQUEST['next'])){
 		$value = '';
 	}
 
-	$frmLcls->addItemToBottomRow(new CButton('prev','<< '.S_PREVIOUS));
+	$frmLcls->addItemToBottomRow(new CSubmit('prev','<< '.S_PREVIOUS));
 	$frmLcls->addItemToBottomRow(SPACE);
 
-	$frmLcls->addItemToBottomRow(new CButton('download',S_DOWNLOAD));
+	$frmLcls->addItemToBottomRow(new CSubmit('download',S_DOWNLOAD));
 	$frmLcls->show();
 }
 else{
@@ -220,7 +220,7 @@ else{
 
 	$frmLcls->addRow(S_NEW_ENTRIES, $cmbFill);
 
-	$frmLcls->addItemToBottomRow(new CButton('next',S_NEXT.' >>'));
+	$frmLcls->addItemToBottomRow(new CSubmit('next',S_NEXT.' >>'));
 	$frmLcls->show();
 }
 

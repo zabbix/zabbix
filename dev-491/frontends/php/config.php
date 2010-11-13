@@ -608,13 +608,13 @@ include_once('include/page_header.php');
 	if(!isset($_REQUEST['form'])){
 		switch($_REQUEST['config']){
 			case 3:
-				$form->addItem(new CButton('form',S_CREATE_IMAGE));
+				$form->addItem(new CSubmit('form',S_CREATE_IMAGE));
 				break;
 			case 6:
-				$form->addItem(new CButton('form',S_CREATE_VALUE_MAP));
+				$form->addItem(new CSubmit('form',S_CREATE_VALUE_MAP));
 				break;
 			case 10:
-				$form->addItem(new CButton('form',S_NEW_REGULAR_EXPRESSION));
+				$form->addItem(new CSubmit('form',S_NEW_REGULAR_EXPRESSION));
 				break;
 		}
 	}
@@ -641,7 +641,7 @@ include_once('include/page_header.php');
 		$frmHouseKeep->addRow(S_DO_NOT_KEEP_EVENTS_OLDER_THAN,
 			new CNumericBox("event_history", $config["event_history"], 5));
 
-		$frmHouseKeep->addItemToBottomRow(new CButton("save", S_SAVE));
+		$frmHouseKeep->addItemToBottomRow(new CSubmit("save", S_SAVE));
 
 		$cnf_wdgt->addItem($frmHouseKeep);
 	}
@@ -691,7 +691,7 @@ include_once('include/page_header.php');
 					new CImg('imgstore.php?iconid='.$imageid,'no image',null),'image.php?imageid='.$row['imageid']));
 			}
 
-			$frmImages->addItemToBottomRow(new CButton('save',S_SAVE));
+			$frmImages->addItemToBottomRow(new CSubmit('save',S_SAVE));
 			if(isset($_REQUEST['imageid'])){
 				$frmImages->addItemToBottomRow(SPACE);
 				$frmImages->addItemToBottomRow(new CButtonDelete(S_DELETE_SELECTED_IMAGE,
@@ -802,7 +802,7 @@ include_once('include/page_header.php');
 					);
 		$frmOther->addRow(S_USER_GROUP_FOR_DATABASE_DOWN_MESSAGE, $cmbUsrGrp);
 
-		$frmOther->addItemToBottomRow(new CButton('save', S_SAVE));
+		$frmOther->addItemToBottomRow(new CSubmit('save', S_SAVE));
 
 		$cnf_wdgt->addItem($frmOther);
 	}
@@ -857,13 +857,13 @@ include_once('include/page_header.php');
 				$i++;
 			}
 
-			$saveButton = new CButton('save', S_SAVE);
+			$saveButton = new CSubmit('save', S_SAVE);
 
 			if(count($valuemap_el)==0) {
 				array_push($valuemap_el, S_NO_MAPPING_DEFINED);
 				$saveButton->setAttribute('disabled', 'true');
 			} else {
-				array_push($valuemap_el, new CButton('del_map',S_DELETE_SELECTED));
+				array_push($valuemap_el, new CSubmit('del_map',S_DELETE_SELECTED));
 			}
 
 			$frmValmap->addRow(S_MAPPING, $valuemap_el);
@@ -872,7 +872,7 @@ include_once('include/page_header.php');
 				new CSpan(RARR,"rarr"),
 				new CTextBox("add_newvalue","",10),
 				SPACE,
-				new CButton("add_map",S_ADD)
+				new CSubmit("add_map",S_ADD)
 				),'new');
 
 			$frmValmap->addItemToBottomRow($saveButton);
@@ -947,7 +947,7 @@ include_once('include/page_header.php');
 		$frmHouseKeep->addRow(S_WORKING_TIME,
 			new CTextBox("work_period",$config["work_period"], 35));
 
-		$frmHouseKeep->addItemToBottomRow(new CButton("save", S_SAVE));
+		$frmHouseKeep->addItemToBottomRow(new CSubmit("save", S_SAVE));
 
 		$cnf_wdgt->addItem($frmHouseKeep);
 	}
@@ -988,7 +988,7 @@ include_once('include/page_header.php');
 			new CTextBox('event_expire',$config['event_expire'],5));
 		$frmGUI->addRow(S_MAX_COUNT_OF_EVENTS,
 			new CTextBox('event_show_max',$config['event_show_max'],5));
-		$frmGUI->addItemToBottomRow(new CButton("save",S_SAVE));
+		$frmGUI->addItemToBottomRow(new CSubmit("save",S_SAVE));
 
 		$cnf_wdgt->addItem($frmGUI);
 	}

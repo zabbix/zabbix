@@ -216,7 +216,7 @@ include_once('include/page_header.php');
 	$form->addItem($cmbAction);
 
 	if($_REQUEST['action'] != 'showgraph')
-		$form->addItem(array(SPACE, new CButton('plaintext',S_AS_PLAIN_TEXT)));
+		$form->addItem(array(SPACE, new CSubmit('plaintext',S_AS_PLAIN_TEXT)));
 
 	array_unshift($header['right'], $form, SPACE);
 //--
@@ -283,7 +283,7 @@ include_once('include/page_header.php');
 
 			$filterForm->addRow(S_SELECTED, $tmp);
 
-			$filterForm->addItemToBottomRow(new CButton('select',S_FILTER));
+			$filterForm->addItemToBottomRow(new CSubmit('select',S_FILTER));
 		}
 // ------
 

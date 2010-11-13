@@ -339,7 +339,7 @@ include_once('include/page_header.php');
 	$cmbConf = new CComboBox('config', 'users.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
 		$cmbConf->addItem('usergrps.php', S_USER_GROUPS);
 		$cmbConf->addItem('users.php', S_USERS);
-	$frmForm->addItem(array($cmbConf, new CButton('form', S_CREATE_USER)));
+	$frmForm->addItem(array($cmbConf, new CSubmit('form', S_CREATE_USER)));
 
 	$user_wdgt = new CWidget();
 	$user_wdgt->addPageHeader(S_CONFIGURATION_OF_USERS_AND_USER_GROUPS, $frmForm);
@@ -504,7 +504,7 @@ include_once('include/page_header.php');
 
 
 // goButton name is necessary!!!
-		$goButton = new CButton('goButton', S_GO);
+		$goButton = new CSubmit('goButton', S_GO);
 		$goButton->setAttribute('id','goButton');
 
 		zbx_add_post_js('chkbxRange.pageGoName = "group_userid";');

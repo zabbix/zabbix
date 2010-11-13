@@ -330,7 +330,7 @@ switch($itemType) {
 	if(!isset($_REQUEST['form'])){
 		$form = new CForm(null, 'get');
 		$form->addVar('parent_discoveryid', $_REQUEST['parent_discoveryid']);
-		$form->addItem(new CButton('form', S_CREATE_PROTOTYPE));
+		$form->addItem(new CSubmit('form', S_CREATE_PROTOTYPE));
 	}
 	$items_wdgt->addPageHeader(S_CONFIGURATION_OF_ITEM_PROTOTYPES_BIG, $form);
 
@@ -447,7 +447,7 @@ switch($itemType) {
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
-		$goButton = new CButton('goButton',S_GO);
+		$goButton = new CSubmit('goButton',S_GO);
 		$goButton->setAttribute('id','goButton');
 
 		zbx_add_post_js('chkbxRange.pageGoName = "group_itemid";');

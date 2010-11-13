@@ -278,7 +278,7 @@ switch($itemType) {
 	if(!isset($_REQUEST['form'])){
 		$form = new CForm(null, 'get');
 		$form->addVar('hostid', $_REQUEST['hostid']);
-		$form->addItem(new CButton('form', S_CREATE_RULE));
+		$form->addItem(new CSubmit('form', S_CREATE_RULE));
 	}
 
 	$items_wdgt->addPageHeader(S_CONFIGURATION_OF_DISCOVERY_RULES_BIG, $form);
@@ -418,7 +418,7 @@ switch($itemType) {
 			if($i >= 7) break;
 		}
 
-		array_push($delay_flex_el, count($delay_flex_el)==0 ? S_NO_FLEXIBLE_INTERVALS : new CButton('del_delay_flex',S_DELETE_SELECTED));
+		array_push($delay_flex_el, count($delay_flex_el)==0 ? S_NO_FLEXIBLE_INTERVALS : new CSubmit('del_delay_flex',S_DELETE_SELECTED));
 
 
 // Name
@@ -585,7 +585,7 @@ switch($itemType) {
 			S_DELAY, SPACE,	new CNumericBox('new_delay_flex[delay]', '50', 5),
 			S_PERIOD, SPACE, new CTextBox('new_delay_flex[period]', '1-7,00:00-23:59', 27),
 			BR(),
-			new CButton('add_delay_flex', S_ADD)
+			new CSubmit('add_delay_flex', S_ADD)
 		), 'new', 'row_new_delay_flex');
 
 		foreach($type_keys as $it) {
@@ -608,9 +608,9 @@ switch($itemType) {
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TRAPPER, 'row_trapper_hosts');
 
 
-		$frmRow = array(new CButton('save',S_SAVE));
+		$frmRow = array(new CSubmit('save',S_SAVE));
 		if(isset($_REQUEST['itemid'])){
-			$frmRow[] = new CButton('clone',S_CLONE);
+			$frmRow[] = new CSubmit('clone',S_CLONE);
 			$frmRow[] = new CButtonDelete(S_DELETE_SELECTED_ITEM_Q,	url_param('form').url_param('groupid').url_param('itemid'));
 		}
 		$frmRow[] = new CButtonCancel(url_param('groupid').url_param('hostid'));
@@ -735,7 +735,7 @@ switch($itemType) {
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
-		$goButton = new CButton('goButton',S_GO);
+		$goButton = new CSubmit('goButton',S_GO);
 		$goButton->setAttribute('id','goButton');
 
 		zbx_add_post_js('chkbxRange.pageGoName = "group_itemid";');

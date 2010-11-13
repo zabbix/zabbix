@@ -173,11 +173,9 @@ function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
 	$filterForm->addRow(S_PERIOD, $filtertimetab);
 
 //*/
-	$filterForm->addItemToBottomRow(new CButton('filter_set',S_FILTER));
+	$filterForm->addItemToBottomRow(new CSubmit('filter_set',S_FILTER));
 
-	$reset = new CButton("filter_rst",S_RESET);
-	$reset->setType('button');
-	$reset->setAction('javascript: var url = new Curl(location.href); url.setArgument("filter_rst",1); location.href = url.getUrl();');
+	$reset = new CButton("filter_rst", S_RESET, 'javascript: var url = new Curl(location.href); url.setArgument("filter_rst",1); location.href = url.getUrl();');
 
 	$filterForm->addItemToBottomRow($reset);
 
@@ -331,7 +329,7 @@ function bar_report_form(){
 					$color,
 				));
 		}
-		$delete_button = new CButton('delete_item', S_DELETE_SELECTED);
+		$delete_button = new CSubmit('delete_item', S_DELETE_SELECTED);
 	}
 	else{
 		$items_table = $delete_button = null;
@@ -347,7 +345,7 @@ function bar_report_form(){
 				));
 	unset($items_table, $delete_button);
 
-	$reportForm->addItemToBottomRow(new CButton('report_show',S_SHOW));
+	$reportForm->addItemToBottomRow(new CSubmit('report_show',S_SHOW));
 
 	$reset = new CButton('reset',S_RESET);
 	$reset->setType('reset');
@@ -428,7 +426,7 @@ function bar_report_form2(){
 					$color,
 				));
 		}
-		$delete_button = new CButton('delete_period', S_DELETE_SELECTED);
+		$delete_button = new CSubmit('delete_period', S_DELETE_SELECTED);
 	}
 	else{
 		$periods_table = $delete_button = null;
@@ -473,7 +471,7 @@ function bar_report_form2(){
 					graph_item_calc_fnc2str($gitem['calc_fnc'],0)
 				));
 		}
-		$delete_button = new CButton('delete_item', S_DELETE_SELECTED);
+		$delete_button = new CSubmit('delete_item', S_DELETE_SELECTED);
 	}
 	else{
 		$items_table = $delete_button = null;
@@ -491,7 +489,7 @@ function bar_report_form2(){
 //--------------
 
 
-	$reportForm->addItemToBottomRow(new CButton('report_show',S_SHOW));
+	$reportForm->addItemToBottomRow(new CSubmit('report_show',S_SHOW));
 
 	$reset = new CButton('reset',S_RESET);
 	$reset->setType('reset');
@@ -734,7 +732,7 @@ function bar_report_form3(){
 //--------------
 
 
-	$reportForm->addItemToBottomRow(new CButton('report_show',S_SHOW));
+	$reportForm->addItemToBottomRow(new CSubmit('report_show',S_SHOW));
 
 	$reset = new CButton('reset',S_RESET);
 	$reset->setType('reset');

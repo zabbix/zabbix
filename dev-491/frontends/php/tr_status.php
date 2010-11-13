@@ -247,8 +247,8 @@ include_once('include/page_header.php');
 
 	$filterForm->addRow(S_FILTER_BY_NAME, new CTextBox('txt_select', $_REQUEST['txt_select'], 40));
 
-	$filterForm->addItemToBottomRow(new CButton('filter_set', S_FILTER));
-	$filterForm->addItemToBottomRow(new CButton('filter_rst', S_RESET));
+	$filterForm->addItemToBottomRow(new CSubmit('filter_set', S_FILTER));
+	$filterForm->addItemToBottomRow(new CSubmit('filter_rst', S_RESET));
 
 	$trigg_wdgt->addFlicker($filterForm, CProfile::get('web.tr_status.filter.state', 0));
 /*************** FILTER END ******************/
@@ -698,7 +698,7 @@ include_once('include/page_header.php');
 		$goBox->addItem('bulkacknowledge', S_BULK_ACKNOWLEDGE);
 
 // goButton name is necessary!!!
-		$goButton = new CButton('goButton', S_GO.' (0)');
+		$goButton = new CSubmit('goButton', S_GO.' (0)');
 		$goButton->setAttribute('id', 'goButton');
 
 		$show_event_col ? zbx_add_post_js('chkbxRange.pageGoName = "events";') : zbx_add_post_js('chkbxRange.pageGoName = "triggers";');

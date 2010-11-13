@@ -38,8 +38,7 @@ class CFormList extends CDiv{
 		if(is_object($description)){
 			$inputClass = zbx_strtolower(get_class($description));
 			if(in_array($inputClass, $this->formInputs)){
-				$label = new CTag('label', 'yes', $term);
-				$label->setAttribute('for', $description->getAttribute('id'));
+				$label = new CLabel($term, $description->getAttribute('id'));
 			}
 		}
 

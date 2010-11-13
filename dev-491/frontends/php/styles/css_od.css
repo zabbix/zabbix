@@ -620,33 +620,33 @@ span.biglink:hover{
 	color: #FF8800;
 }
 
-
-input.link_menu{
-	color: #FF5500;
-	border-bottom-color: #FF5500;
-}
-
-input.link_menu:hover{
-	color: #FF8800;
-	border-bottom-color: #FF8800;
-}
-
-.link_menu{
-	color: #FF5500;
-	border-bottom-color: #FF5500;
-}
-
-.link_menu:hover{
-	color: #FF8800;
-	border-bottom-color: #FF8800;
-}
-
 div.suggest{
 	border: 1px #FF5500 solid;
 }
 
 /*////////////////	FORMS	////////////////////*/
-.button{
+.input, .input[disabled]:hover{
+	border: 1px solid #DFDFDF;
+	background-color: #2F2F2F;
+	color: #DFDFDF;
+}
+
+.input:focus { border-color: #FF5500; color: #FF5500;}
+.input:hover { border-color: #FF5500; color: #FF5500;}
+
+.input[readonly], .input[readonly]:hover{
+/* NOTE: Ignored by IE */
+	border-color: #DFDFDF;
+	background-color: #777777;
+	color: #DFDFDF;
+}
+
+.select{
+	cursor: pointer;
+	margin: 1px 4px 1px 2px;
+}
+
+.button{ 
 	border-color: #FF5500;
 	background: #2f2f2f;
 	color: #FF5500;
@@ -662,46 +662,12 @@ div.suggest{
 	box-shadow: 0 0 6px #FF5500;
 }
 
-.biginput[readonly], .biginput[readonly]:hover{
-/* NOTE: Ignored by IE */
-	border-color: #DFDFDF;
-	background-color: #777777;
-	color: #DFDFDF;
-}
-
-
-.select{
-	border: 1px solid #DFDFDF;
-	background: #2F2F2F;
-	color: white;
-	cursor: pointer;
-	margin: 1px 4px 1px 2px;
-}
-
-.select:hover{
-	border-color: #FF5500;
-	background-color: #2F2F2F;
+.link_menu{
 	color: #FF5500;
+	border-bottom-color: #FF5500;
 }
 
-.select:focus{
-	border-color: #FF5500;
-	background-color: #2F2F2F;
-	color: #FF5500;
-}
-
-.biginput, .biginput[disabled]:hover{
-	border: 1px solid #DFDFDF;
-	background-color: #2F2F2F;
-	color: #DFDFDF;
-}
-
-.biginput:focus	{
-	border-color: #FF5500;
-	color: #FF5500;
-}
-
-.biginput:hover	{
-	border-color: #FF5500;
-	color: #FF5500;
+.link_menu:hover{
+	color: #FF8800;
+	border-bottom-color: #FF8800;
 }

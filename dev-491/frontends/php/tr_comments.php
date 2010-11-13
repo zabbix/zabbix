@@ -96,7 +96,7 @@ include_once('include/page_header.php');
 	$frmComent->addRow(S_COMMENTS, new CTextArea('comments', $trigger['comments'], 100, 25, !$triggerEditable));
 	
 	if($triggerEditable){
-		$frmComent->addItemToBottomRow(new CButton("save",S_SAVE));
+		$frmComent->addItemToBottomRow(new CSubmit("save",S_SAVE));
 	}
 
 	$frmComent->addItemToBottomRow(new CButtonCancel('&triggerid='.$_REQUEST['triggerid']));

@@ -146,7 +146,7 @@ include_once('include/page_header.php');
 	$cmbStat->addItem(1,S_DISABLED);
 	$frmMedia->addRow(S_STATUS,$cmbStat);
 
-	$frmMedia->addItemToBottomRow(new CButton('add', ($media > -1)?S_SAVE:S_ADD));
+	$frmMedia->addItemToBottomRow(new CSubmit('add', ($media > -1)?S_SAVE:S_ADD));
 	$frmMedia->addItemToBottomRow(SPACE);
 	$frmMedia->addItemToBottomRow(new CButtonCancel(null, 'close_window();'));
 	$frmMedia->Show();

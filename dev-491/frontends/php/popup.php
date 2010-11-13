@@ -416,7 +416,7 @@ include_once('include/page_header.php');
 			$epmtyScript.= get_window_opener($dstfrm, $dstfld2, $value2);
 			$epmtyScript.= ' close_window(); return false;';
 
-			$frmTitle->addItem(array(SPACE,new CButton('empty',S_EMPTY, $epmtyScript)));
+			$frmTitle->addItem(array(SPACE,new CSubmit('empty',S_EMPTY, $epmtyScript)));
 		}
 	}
 
@@ -532,7 +532,7 @@ include_once('include/page_header.php');
 			));
 		}
 
-		$table->setFooter(new CButton('select',S_SELECT));
+		$table->setFooter(new CSubmit('select',S_SELECT));
 		$form = new CForm();
 		$form->addVar('existed_templates',$existed_templates);
 
@@ -786,7 +786,6 @@ include_once('include/page_header.php');
 
 		if($multiselect){
 			$button = new CButton('select', S_SELECT, "javascript: addSelectedValues('triggers', ".zbx_jsvalue($reference).");");
-			$button->setType('button');
 			$table->setFooter(new CCol($button, 'right'));
 		}
 
@@ -885,7 +884,6 @@ include_once('include/page_header.php');
 
 		if($multiselect){
 			$button = new CButton('select', S_SELECT, "javascript: addSelectedValues('items', ".zbx_jsvalue($reference).");");
-			$button->setType('button');
 			$table->setFooter(new CCol($button, 'right'));
 		}
 
@@ -965,7 +963,6 @@ include_once('include/page_header.php');
 
 		if($multiselect){
 			$button = new CButton('select', S_SELECT, "javascript: addSelectedValues('items', ".zbx_jsvalue($reference).");");
-			$button->setType('button');
 			$table->setFooter(new CCol($button, 'right'));
 		}
 
@@ -1109,7 +1106,6 @@ include_once('include/page_header.php');
 
 		if($multiselect){
 			$button = new CButton('select', S_SELECT, "javascript: addSelectedValues('graphs', ".zbx_jsvalue($reference).");");
-			$button->setType('button');
 			$table->setFooter(new CCol($button, 'right'));
 		}
 
@@ -1202,7 +1198,6 @@ include_once('include/page_header.php');
 
 		if($multiselect){
 			$button = new CButton('select', S_SELECT, "javascript: addSelectedValues('items', ".zbx_jsvalue($reference).");");
-			$button->setType('button');
 			$table->setFooter(new CCol($button, 'right'));
 		}
 
@@ -1272,7 +1267,6 @@ include_once('include/page_header.php');
 
 		if($multiselect){
 			$button = new CButton('select', S_SELECT, "javascript: addSelectedValues('sysmaps', ".zbx_jsvalue($reference).");");
-			$button->setType('button');
 			$table->setFooter(new CCol($button, 'right'));
 		}
 
@@ -1384,7 +1378,6 @@ include_once('include/page_header.php');
 
 		if($multiselect){
 			$button = new CButton('select', S_SELECT, "javascript: addSelectedValues('slides', ".zbx_jsvalue($reference).");");
-			$button->setType('button');
 			$table->setFooter(new CCol($button, 'right'));
 		}
 
@@ -1449,7 +1442,6 @@ include_once('include/page_header.php');
 
 		if($multiselect){
 			$button = new CButton('select', S_SELECT, "javascript: addSelectedValues('screens', ".zbx_jsvalue($reference).");");
-			$button->setType('button');
 			$table->setFooter(new CCol($button, 'right'));
 		}
 

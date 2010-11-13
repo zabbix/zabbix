@@ -132,9 +132,9 @@
 
 		$form->addRow(S_SLIDES, array(
 			$tblSteps,
-			!isset($new_step) ? new CButton('add_step_bttn',S_ADD,
+			!isset($new_step) ? new CSubmit('add_step_bttn',S_ADD,
 				"return create_var('".$form->getName()."','add_step',1, true);") : null,
-			(count($steps) > 0) ? new CButton('del_sel_step',S_DELETE_SELECTED) : null
+			(count($steps) > 0) ? new CSubmit('del_sel_step',S_DELETE_SELECTED) : null
 			));
 
 		if(isset($new_step)){
@@ -157,17 +157,17 @@
 						'&dstfld1=screen_name&srcfld1=name'.
 						'&dstfld2=new_step%5Bscreenid%5D&srcfld2=screenid");'),
 					BR(),
-					new CButton('add_step', isset($new_step['sid']) ? S_SAVE : S_ADD),
-					new CButton('cancel_step', S_CANCEL)
+					new CSubmit('add_step', isset($new_step['sid']) ? S_SAVE : S_ADD),
+					new CSubmit('cancel_step', S_CANCEL)
 
 				),
 				isset($new_step['sid']) ? 'edit' : 'new');
 		}
 
-		$form->addItemToBottomRow(new CButton("save",S_SAVE));
+		$form->addItemToBottomRow(new CSubmit("save",S_SAVE));
 		if(isset($_REQUEST['slideshowid'])){
 			$form->addItemToBottomRow(SPACE);
-			$form->addItemToBottomRow(new CButton('clone',S_CLONE));
+			$form->addItemToBottomRow(new CSubmit('clone',S_CLONE));
 			$form->addItemToBottomRow(SPACE);
 			$form->addItemToBottomRow(new CButtonDelete(S_DELETE_SLIDESHOW_Q,
 				url_param('form').url_param('slideshowid').url_param('config')));
@@ -202,7 +202,7 @@
 		$form->addRow(S_REQUIRED, new CTextBox('required', $required, 80));
 		$form->addRow(S_STATUS_CODES, new CTextBox('status_codes', $status_codes, 80));
 
-		$form->addItemToBottomRow(new CButton("save", isset($stepid) ? S_SAVE : S_ADD));
+		$form->addItemToBottomRow(new CSubmit("save", isset($stepid) ? S_SAVE : S_ADD));
 
 		$form->addItemToBottomRow(new CButtonCancel(null,'close_window();'));
 
@@ -351,7 +351,7 @@
 					$frmUser->addVar('change_password', $change_password);
 			}
 			else{
-				$passwd_but = new CButton('change_password', S_CHANGE_PASSWORD);
+				$passwd_but = new CSubmit('change_password', S_CHANGE_PASSWORD);
 				if($alias == ZBX_GUEST_USER){
 					$passwd_but->setAttribute('disabled','disabled');
 				}
@@ -394,7 +394,7 @@
 						'return PopUp("popup_usrgrp.php?dstfrm='.$frmUser->getName().
 						'&list_name=user_groups_to_del[]&var_name=user_groups",450, 450);'),
 					SPACE,
-					(count($user_groups) > 0)?new CButton('del_user_group',S_DELETE_SELECTED):null
+					(count($user_groups) > 0)?new CSubmit('del_user_group',S_DELETE_SELECTED):null
 				));
 		}
 
@@ -493,7 +493,7 @@
 				array($media_table,
 					new CButton('add_media',S_ADD,'javascript: return PopUp("popup_media.php?dstfrm='.$frmUser->getName().'",550,400);'),
 					SPACE,
-					(count($user_medias) > 0) ? new CButton('del_user_media',S_DELETE_SELECTED) : null
+					(count($user_medias) > 0) ? new CSubmit('del_user_media',S_DELETE_SELECTED) : null
 				));
 		}
 
@@ -583,8 +583,8 @@
 				new CCheckBox('messages[triggers.recovery]', $messages['triggers.recovery'], null, 1),
 				S_RECOVERY,
 				$soundList,
-				new CButton('start', S_PLAY, "javascript: testUserSound('messages[sounds.recovery]');", false),
-				new CButton('stop', S_STOP, 'javascript: AudioList.stopAll();', false)
+				new CButton('start', S_PLAY, "javascript: testUserSound('messages[sounds.recovery]');"),
+				new CButton('stop', S_STOP, 'javascript: AudioList.stopAll();')
 			);
 
 			$triggers->addRow($resolved);
@@ -597,8 +597,8 @@
 					new CCheckBox('messages[triggers.severities]['.$severity.']', isset($messages['triggers.severities'][$severity]), null, 1),
 					getSeverityCaption($severity),
 					$soundList,
-					new CButton('start', S_PLAY, "javascript: testUserSound('messages[sounds.".$severity."]');", false),
-					new CButton('stop', S_STOP, 'javascript: AudioList.stopAll();', false)
+					new CButton('start', S_PLAY, "javascript: testUserSound('messages[sounds.".$severity."]');"),
+					new CButton('stop', S_STOP, 'javascript: AudioList.stopAll();')
 				));
 
 
@@ -612,7 +612,7 @@
 			zbx_add_post_js("var userMessageSwitcher = new CViewSwitcher('messages[enabled]', ['click', 'change'], ".zbx_jsvalue($msgVisibility, true).");");
  		}
 
-		$frmUser->addItemToBottomRow(new CButton('save',S_SAVE));
+		$frmUser->addItemToBottomRow(new CSubmit('save',S_SAVE));
 		if(isset($userid) && ($profile == 0)){
 			$frmUser->addItemToBottomRow(SPACE);
 			$delete_b = new CButtonDelete(S_DELETE_SELECTED_USER_Q,url_param("form").url_param("config").url_param("userid"));
@@ -757,10 +757,10 @@
 			array(
 				$lstUsers,
 				BR(),
-				new CButton('add_user',S_ADD,
+				new CSubmit('add_user',S_ADD,
 					"return PopUp('popup_users.php?dstfrm=".$frmUserG->getName().
 					"&list_name=group_users_to_del[]&var_name=group_users',600,300);"),
-				(count($group_users) > 0) ? new CButton('del_group_user',S_DELETE_SELECTED) : null
+				(count($group_users) > 0) ? new CSubmit('del_group_user',S_DELETE_SELECTED) : null
 			));
 */
 /////////////////
@@ -821,15 +821,15 @@
 			array(new CButton('add_read_write',S_ADD,
 					"return PopUp('popup_right.php?dstfrm=".$frmUserG->getName().
 					"&permission=".PERM_READ_WRITE."',450,450);"),
-				new CButton('del_read_write',S_DELETE_SELECTED)),
+				new CSubmit('del_read_write',S_DELETE_SELECTED)),
 			array(	new CButton('add_read_only',S_ADD,
 					"return PopUp('popup_right.php?dstfrm=".$frmUserG->getName().
 					"&permission=".PERM_READ_ONLY."',450,450);"),
-				new CButton('del_read_only',S_DELETE_SELECTED)),
+				new CSubmit('del_read_only',S_DELETE_SELECTED)),
 			array(new CButton('add_deny',S_ADD,
 					"return PopUp('popup_right.php?dstfrm=".$frmUserG->getName().
 					"&permission=".PERM_DENY."',450,450);"),
-				new CButton('del_deny',S_DELETE_SELECTED))
+				new CSubmit('del_deny',S_DELETE_SELECTED))
 			));
 
 		$frmUserG->addRow(S_RIGHTS,$table_Rights);
@@ -848,7 +848,7 @@
 			$frmUserG->addSpanRow(get_rights_of_elements_table($group_rights));
 		}
 
-		$frmUserG->addItemToBottomRow(new CButton('save',S_SAVE));
+		$frmUserG->addItemToBottomRow(new CSubmit('save',S_SAVE));
 		if(isset($_REQUEST['usrgrpid'])){
 			$frmUserG->addItemToBottomRow(SPACE);
 			$frmUserG->addItemToBottomRow(new CButtonDelete('Delete selected group?',
@@ -1717,7 +1717,7 @@
 			}
 		//}
 
-		array_push($delay_flex_el, count($delay_flex_el)==0 ? S_NO_FLEXIBLE_INTERVALS : new CButton('del_delay_flex',S_DELETE_SELECTED));
+		array_push($delay_flex_el, count($delay_flex_el)==0 ? S_NO_FLEXIBLE_INTERVALS : new CSubmit('del_delay_flex',S_DELETE_SELECTED));
 
 		if(count($applications)==0) array_push($applications, 0);
 
@@ -2059,7 +2059,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 				new CNumericBox('new_delay_flex[delay]','50',5),
 				S_PERIOD, SPACE,
 				new CTextBox('new_delay_flex[period]','1-7,00:00-23:59',27), BR(),
-				new CButton('add_delay_flex',S_ADD)
+				new CSubmit('add_delay_flex',S_ADD)
 			),'form_row_r')), 'new');
 		$row->setAttribute('id', 'row_new_delay_flex');
 		$frmItem->addRow($row);
@@ -2166,11 +2166,11 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		}
 		$frmItem->addRow(S_APPLICATIONS,$cmbApps);
 
-		$frmRow = array(new CButton('save',S_SAVE));
+		$frmRow = array(new CSubmit('save',S_SAVE));
 		if(isset($_REQUEST['itemid'])){
 			array_push($frmRow,
 				SPACE,
-				new CButton('clone',S_CLONE));
+				new CSubmit('clone',S_CLONE));
 
 			if(!$limited){
 				array_push($frmRow,
@@ -2212,7 +2212,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 				$cmbAction->addItem('update in group',S_UPDATE_IN_GROUP);
 				$cmbAction->addItem('delete FROM group',S_DELETE_FROM_GROUP);
 			}
-			$frmItem->addItemToBottomRow(array($cmbAction, SPACE, new CButton('register',S_DO)));
+			$frmItem->addItemToBottomRow(array($cmbAction, SPACE, new CSubmit('register',S_DO)));
 		}
 
 		$json = new CJSON();
@@ -2294,7 +2294,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		if(count($delay_flex_el)==0)
 			array_push($delay_flex_el, S_NO_FLEXIBLE_INTERVALS);
 		else
-			array_push($delay_flex_el, new CButton('del_delay_flex',S_DELETE_SELECTED));
+			array_push($delay_flex_el, new CSubmit('del_delay_flex',S_DELETE_SELECTED));
 
 		if(count($applications)==0)  array_push($applications,0);
 
@@ -2382,7 +2382,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 										new CNumericBox("new_delay_flex[delay]","50",5),
 										S_PERIOD, SPACE,
 										new CTextBox("new_delay_flex[period]","1-7,00:00-23:59",27), BR(),
-										new CButton("add_delay_flex",S_ADD)
+										new CSubmit("add_delay_flex",S_ADD)
 									));
 		$new_delay_flex_el->setAttribute('id', 'new_delay_flex_el');
 
@@ -2443,7 +2443,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$frmItem->addRow(array( new CVisibilityBox('applications_visible', get_request('applications_visible'), 'applications[]',
 			S_ORIGINAL), S_APPLICATIONS),$cmbApps);
 
-		$frmItem->addItemToBottomRow(array(new CButton("update",S_UPDATE),
+		$frmItem->addItemToBottomRow(array(new CSubmit("update",S_UPDATE),
 			SPACE, new CButtonCancel(url_param('groupid').url_param("hostid").url_param("config"))));
 
 	return $frmItem;
@@ -2526,7 +2526,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 		$frmCopy->addRow(S_TARGET, $target_list);
 
-		$frmCopy->addItemToBottomRow(new CButton("copy",S_COPY));
+		$frmCopy->addItemToBottomRow(new CSubmit("copy",S_COPY));
 		$frmCopy->addItemToBottomRow(array(SPACE,
 			new CButtonCancel(url_param('groupid').url_param("hostid").url_param("config"))));
 
@@ -2583,7 +2583,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			if(count($dep_el)==0)
 				$dep_el[] = S_NO_DEPENDENCES_DEFINED;
 			else
-				$dep_el[] = new CButton('del_dependence',S_DELETE_SELECTED);
+				$dep_el[] = new CSubmit('del_dependence',S_DELETE_SELECTED);
 
 	//		$frmMTrig->addRow(S_THE_TRIGGER_DEPENDS_ON,$dep_el);
 	/* end dependencies */
@@ -2607,7 +2607,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		}
 /* end new dependency */
 
-		$frmMTrig->addItemToBottomRow(new CButton('mass_save',S_SAVE));
+		$frmMTrig->addItemToBottomRow(new CSubmit('mass_save',S_SAVE));
 		$frmMTrig->addItemToBottomRow(SPACE);
 		$frmMTrig->addItemToBottomRow(new CButtonCancel(url_param('groupid').url_param('parent_discoveryid')));
 
@@ -2736,7 +2736,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 				$frmTrig->addVar('expression', $expression);
 				$exprfname = 'expr_temp';
 				$exprtxt = new CTextBox($exprfname, $expr_temp, 65, 'yes');
-				$macrobtn = new CButton('insert_macro', S_INSERT_MACRO, 'return call_ins_macro_menu(event);');
+				$macrobtn = new CSubmit('insert_macro', S_INSERT_MACRO, 'return call_ins_macro_menu(event);');
 				$exprparam = "this.form.elements['$exprfname'].value";
 			}
 			else{
@@ -2762,12 +2762,12 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		if($input_method == IM_TREE){
 			array_push($row, BR());
 			if(empty($outline)){
-				array_push($row, new CButton('add_expression', S_ADD, ""));
+				array_push($row, new CSubmit('add_expression', S_ADD, ""));
 			}
 			else{
-				array_push($row, new CButton('and_expression', S_AND_BIG, ""));
-				array_push($row, new CButton('or_expression', S_OR_BIG, ""));
-				array_push($row, new CButton('replace_expression', S_REPLACE, ""));
+				array_push($row, new CSubmit('and_expression', S_AND_BIG, ""));
+				array_push($row, new CSubmit('or_expression', S_OR_BIG, ""));
+				array_push($row, new CSubmit('replace_expression', S_REPLACE, ""));
 			}
 		}
 		$frmTrig->addVar('input_method', $input_method);
@@ -2867,7 +2867,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			if(count($dep_el)==0)
 				array_push($dep_el,  S_NO_DEPENDENCES_DEFINED);
 			else
-				array_push($dep_el, new CButton('del_dependence',S_DELETE_SELECTED));
+				array_push($dep_el, new CSubmit('del_dependence',S_DELETE_SELECTED));
 			$frmTrig->addRow(S_THE_TRIGGER_DEPENDS_ON,$dep_el);
 		/* end dependencies */
 
@@ -2904,10 +2904,10 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$frmTrig->addRow(S_URL,new CTextBox("url",$url,90));
 		$frmTrig->addRow(S_DISABLED,new CCheckBox("status",$status));
 
-		$frmTrig->addItemToBottomRow(new CButton("save",S_SAVE));
+		$frmTrig->addItemToBottomRow(new CSubmit("save",S_SAVE));
 		if(isset($_REQUEST["triggerid"])){
 			$frmTrig->addItemToBottomRow(SPACE);
-			$frmTrig->addItemToBottomRow(new CButton("clone",S_CLONE));
+			$frmTrig->addItemToBottomRow(new CSubmit("clone",S_CLONE));
 			$frmTrig->addItemToBottomRow(SPACE);
 			if( !$limited ){
 				$frmTrig->addItemToBottomRow(new CButtonDelete(S_DELETE_TRIGGER_Q,
@@ -3167,7 +3167,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 						));
 				}
 			}
-			$dedlete_button = new CButton('delete_item', S_DELETE_SELECTED);
+			$dedlete_button = new CSubmit('delete_item', S_DELETE_SELECTED);
 		}
 		else{
 			$items_table = $dedlete_button = null;
@@ -3319,11 +3319,11 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		));
 
 		$footer = array(
-			new CButton('preview', S_PREVIEW),
-			new CButton('save', S_SAVE),
+			new CSubmit('preview', S_PREVIEW),
+			new CSubmit('save', S_SAVE),
 		);
 		if(isset($_REQUEST['graphid'])){
-			$footer[] = new CButton('clone', S_CLONE);
+			$footer[] = new CSubmit('clone', S_CLONE);
 			$footer[] = new CButtonDelete(S_DELETE_GRAPH_Q,url_param('graphid').url_param('parent_discoveryid'));
 		}
 		$footer[] = new CButtonCancel(url_param('parent_discoveryid'));
@@ -3658,9 +3658,9 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 //			$tblPeriod->addRow(array(S_AT.SPACE.'('.S_HOUR.':'.S_MINUTE.')', $tabTime));
 
 		$td = new CCol(array(
-			new CButton('add_timeperiod', $new ? S_SAVE : S_ADD),
+			new CSubmit('add_timeperiod', $new ? S_SAVE : S_ADD),
 			SPACE,
-			new CButton('cancel_new_timeperiod',S_CANCEL)
+			new CSubmit('cancel_new_timeperiod',S_CANCEL)
 			));
 
 		$td->setAttribute('colspan','3');
@@ -3694,7 +3694,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 		$form->addRow(S_RULES, $table);
 
-		$form->addItemToBottomRow(new CButton('import', S_IMPORT));
+		$form->addItemToBottomRow(new CSubmit('import', S_IMPORT));
 		return $form;
 	}
 
@@ -3918,7 +3918,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			new CButton('add_template', S_ADD, "return PopUp('popup.php?dstfrm=".$frmHost->getName().
 				"&dstfld1=new_template&srctbl=templates&srcfld1=hostid&srcfld2=host".
 				url_param($templates,false,'existed_templates')."',450,450)"),
-			new CButton('unlink', S_REMOVE)
+			new CSubmit('unlink', S_REMOVE)
 		));
 
 		$vbox = new CVisibilityBox('visible[template_table]', isset($visible['template_table']), 'template_table', S_ORIGINAL);
@@ -3952,7 +3952,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			new CButton('add_template', S_ADD, "return PopUp('popup.php?dstfrm=".$frmHost->getName().
 				"&dstfld1=new_template&srctbl=templates&srcfld1=hostid&srcfld2=host".
 				url_param($templates,false,'existed_templates')."',450,450)"),
-			new CButton('unlink', S_REMOVE)
+			new CSubmit('unlink', S_REMOVE)
 		));
 
 		$vbox = new CVisibilityBox('visible[template_table_r]', isset($visible['template_table_r']), 'template_table_r', S_ORIGINAL);
@@ -4075,7 +4075,7 @@ JAVASCRIPT;
 		}
 // END:   HOSTS PROFILE EXTENDED Section
 
-		$frmHost->addItemToBottomRow(new CButton('masssave',S_SAVE));
+		$frmHost->addItemToBottomRow(new CSubmit('masssave',S_SAVE));
 		$frmHost->addItemToBottomRow(SPACE);
 		$frmHost->addItemToBottomRow(new CButtonCancel(url_param('config').url_param('groupid')));
 
@@ -4111,7 +4111,7 @@ JAVASCRIPT;
 
 		$form->addRow(S_RULES, $table);
 
-		$form->addItemToBottomRow(new CButton('import', S_IMPORT));
+		$form->addItemToBottomRow(new CSubmit('import', S_IMPORT));
 
 	return $form;
 	}
@@ -4214,7 +4214,7 @@ JAVASCRIPT;
 
 		$form->addRow(S_RULES, $table);
 
-		$form->addItemToBottomRow(new CButton('import', S_IMPORT));
+		$form->addItemToBottomRow(new CSubmit('import', S_IMPORT));
 		return $form;
 	}
 
@@ -4347,16 +4347,16 @@ JAVASCRIPT;
 
 		$tblFoot = new CTableInfo(null);
 
-		$td = new CCol(array(new CButton('save',S_SAVE)));
+		$td = new CCol(array(new CSubmit('save',S_SAVE)));
 		$td->setColSpan(2);
 		$td->addStyle('text-align: right;');
 
 		$td->addItem(SPACE);
-		$td->addItem(new CButton('test',S_TEST));
+		$td->addItem(new CSubmit('test',S_TEST));
 
 		if(isset($_REQUEST['regexpid'])){
 			$td->addItem(SPACE);
-			$td->addItem(new CButton('clone',S_CLONE));
+			$td->addItem(new CSubmit('clone',S_CLONE));
 
 			$td->addItem(SPACE);
 			$td->addItem(new CButtonDelete(S_DELETE_REGULAR_EXPRESSION_Q,url_param('form').url_param('config').url_param('regexpid')));
@@ -4410,7 +4410,7 @@ JAVASCRIPT;
 				$expression['expression'],
 				$exp_result,
 				$expression['case_sensitive']?S_YES:S_NO,
-				new CButton('edit_expressionid['.$id.']',S_EDIT)
+				new CSubmit('edit_expressionid['.$id.']',S_EDIT)
 				));
 
 
@@ -4422,8 +4422,8 @@ JAVASCRIPT;
 
 		$buttons = array();
 		if(!isset($_REQUEST['new_expression'])){
-			$buttons[] = new CButton('new_expression',S_NEW);
-			$buttons[] = new CButton('delete_expression',S_DELETE);
+			$buttons[] = new CSubmit('new_expression',S_NEW);
+			$buttons[] = new CSubmit('delete_expression',S_DELETE);
 		}
 
 		$td = new CCol($buttons);
@@ -4486,8 +4486,8 @@ JAVASCRIPT;
 
 		$oper_buttons = array();
 
-		$oper_buttons[] = new CButton('add_expression',isset($new_expression['id'])?S_SAVE:S_ADD);
-		$oper_buttons[] = new CButton('cancel_new_expression',S_CANCEL);
+		$oper_buttons[] = new CSubmit('add_expression',isset($new_expression['id'])?S_SAVE:S_ADD);
+		$oper_buttons[] = new CSubmit('cancel_new_expression',S_CANCEL);
 
 		$td = new CCol($oper_buttons);
 		$td->setAttribute('colspan',2);
@@ -4547,7 +4547,7 @@ JAVASCRIPT;
 				var text1 = document.createElement("input");
 				text1.setAttribute("type", "text");
 				text1.setAttribute("name", "macros["+addMacroRow.macro_count+"][macro]");
-				text1.className = "biginput";
+				text1.className = "input";
 				text1.setAttribute("size",30);
 				text1.setAttribute("placeholder","{$MACRO}");
 				td2.appendChild(text1);
@@ -4568,7 +4568,7 @@ JAVASCRIPT;
 				text2.setAttribute("type", "text");
 				text2.setAttribute("placeholder","<'.S_VALUE.'>");
 				text2.setAttribute("name","macros["+addMacroRow.macro_count+"][value]");
-				text2.className = "biginput";
+				text2.className = "input";
 				text2.setAttribute("size",40);
 				td4.appendChild(text2);
 
@@ -4592,10 +4592,7 @@ JAVASCRIPT;
 
 		$script = '$$("#tbl_macros input:checked").each(function(obj){ $(obj.parentNode.parentNode).remove(); if (typeof(deleted_macro_cnt) == \'undefined\') deleted_macro_cnt=1; else deleted_macro_cnt++; });';
 		$delete_btn = new CButton('macros_del', S_DELETE_SELECTED, $script);
-		$delete_btn->setType('button');
-
 		$add_button = new CButton('macro_add', S_ADD, 'javascript: addMacroRow()');
-		$add_button->setType('button');
 
 		$buttonRow = new CRow();
 		$buttonRow->setAttribute('id', 'row_new_macro');
@@ -4607,8 +4604,8 @@ JAVASCRIPT;
 
 		$footer = null;
 		if($hostid === null){
-//			$footer = array(new CButton('save', S_SAVE, "if (deleted_macro_cnt > 0) return confirm('".S_ARE_YOU_SURE_YOU_WANT_TO_DELETE." '+deleted_macro_cnt+' ".S_MACROS_ES."?');"));
-			$footer = new CRow(new CButton('save', S_SAVE, "if (deleted_macro_cnt > 0) return confirm('".S_ARE_YOU_SURE_YOU_WANT_TO_DELETE." '+deleted_macro_cnt+' ".S_MACROS_ES."?');"));
+//			$footer = array(new CSubmit('save', S_SAVE, "if (deleted_macro_cnt > 0) return confirm('".S_ARE_YOU_SURE_YOU_WANT_TO_DELETE." '+deleted_macro_cnt+' ".S_MACROS_ES."?');"));
+			$footer = new CRow(new CSubmit('save', S_SAVE, "if (deleted_macro_cnt > 0) return confirm('".S_ARE_YOU_SURE_YOU_WANT_TO_DELETE." '+deleted_macro_cnt+' ".S_MACROS_ES."?');"));
 			$macros_tbl->setFooter($footer);
 		}
 

@@ -191,8 +191,8 @@ include_once('include/page_header.php');
 
 
 	$frmMsg->addRow(S_MESSAGE, new CTextArea('message', '', 80, 6));
-	$frmMsg->addItemToBottomRow(new CButton('saveandreturn', $btn_txt2));
-	$bulk ? '' : $frmMsg->addItemToBottomRow(new CButton('save', $btn_txt));
+	$frmMsg->addItemToBottomRow(new CSubmit('saveandreturn', $btn_txt2));
+	$bulk ? '' : $frmMsg->addItemToBottomRow(new CSubmit('save', $btn_txt));
 	$frmMsg->addItemToBottomRow(new CButtonCancel());
 
 	$frmMsg->show(false);

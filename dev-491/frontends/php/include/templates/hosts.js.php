@@ -4,16 +4,16 @@
 <td>
 	<input type="hidden" name="interfaces[#{interfaceid}][new]" value="#{newValue}">
 	<input type="hidden" name="interfaces[#{interfaceid}][interfaceid]" value="#{interfaceid}">
-	<input class="biginput" name="interfaces[#{interfaceid}][ip]" type="text" size="39" value="#{ip}">
+	<input class="input" name="interfaces[#{interfaceid}][ip]" type="text" size="39" value="#{ip}">
 </td>
 <td>
-	<input class="biginput" name="interfaces[#{interfaceid}][dns]" type="text" size="30" value="#{dns}">
+	<input class="input" name="interfaces[#{interfaceid}][dns]" type="text" size="30" value="#{dns}">
 </td>
 <td>
-	<input class="biginput" name="interfaces[#{interfaceid}][port]" type="text" size="5" value="#{port}" maxlength="5" onkeypress=" var c = (window.event) ? event.keyCode : event.which; if(event.ctrlKey || c &lt;= 31 || (c &gt;= 48 &amp;&amp; c &lt;= 57) || (c &gt;= 37 &amp;&amp; c &lt;= 40) || c==46 || c==35 || c==36) return true; else return false; " onchange=" if(isNaN(parseInt(this.value,10))) this.value = 0;  else this.value = parseInt(this.value,10);">
+	<input class="input" name="interfaces[#{interfaceid}][port]" type="text" size="5" value="#{port}" maxlength="5" onkeypress=" var c = (window.event) ? event.keyCode : event.which; if(event.ctrlKey || c &lt;= 31 || (c &gt;= 48 &amp;&amp; c &lt;= 57) || (c &gt;= 37 &amp;&amp; c &lt;= 40) || c==46 || c==35 || c==36) return true; else return false; " onchange=" if(isNaN(parseInt(this.value,10))) this.value = 0;  else this.value = parseInt(this.value,10);">
 </td>
 <td>
-	<select name="interfaces[#{interfaceid}][useip]" id="hostInterfaceRow_#{interfaceid}_useip" class="select">
+	<select name="interfaces[#{interfaceid}][useip]" id="hostInterfaceRow_#{interfaceid}_useip" class="input select">
 		<option value="0"><?php print(S_DNS_NAME);?></option>
 		<option value="1"><?php print(S_IP_ADDRESS);?></option>
 	</select>

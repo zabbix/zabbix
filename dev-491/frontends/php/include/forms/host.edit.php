@@ -238,7 +238,10 @@
 	}
 
 	$hostList->addRow(S_GROUPS,$grp_tb->get(S_IN_GROUPS, S_OTHER_GROUPS));
-	$hostList->addRow(S_NEW_GROUP, new CTextBox('newgroup',$newgroup));
+	$hostList->addRow(array(
+			new CLabel(S_NEW_GROUP, 'newgroup'), BR(),
+			new CTextBox('newgroup',$newgroup)
+		));
 
 // interfaces
 	if(empty($interfaces)){
@@ -260,7 +263,7 @@
 	}
 	zbx_add_post_js($jsInsert);
 
-	$addButton = new CButton('add', S_ADD, 'javascript: addInterfaceRow({});',false);
+	$addButton = new CButton('add', S_ADD, 'javascript: addInterfaceRow({});');
 	$addButton->setAttribute('class', 'link_menu');
 
 	$col = new CCol(array($addButton));
@@ -398,10 +401,10 @@
 			'T');
 	$tmplAdd->setAttribute('class', 'link_menu');
 
-	$tmplUnlink = new CButton('unlink', S_UNLINK);
+	$tmplUnlink = new CSubmit('unlink', S_UNLINK);
 	$tmplUnlink->setAttribute('class', 'link_menu');
 
-	$tmplUnlinkClear = new CButton('unlink_and_clear', S_UNLINK_AND_CLEAR);
+	$tmplUnlinkClear = new CSubmit('unlink_and_clear', S_UNLINK_AND_CLEAR);
 	$tmplUnlinkClear->setAttribute('class', 'link_menu');
 
 	$footer = new CDiv(array($tmplAdd,$tmplUnlink,$tmplUnlinkClear));
@@ -471,7 +474,7 @@
 	}
 	zbx_add_post_js($jsInsert);
 
-	$addButton = new CButton('add', S_ADD, 'javascript: addMacroRow({});',false);
+	$addButton = new CButton('add', S_ADD, 'javascript: addMacroRow({});');
 	$addButton->setAttribute('class', 'link_menu');
 
 	$col = new CCol(array($addButton));
@@ -544,9 +547,9 @@ $frmHost->addItem($divTabs);
 
 // Footer
 	$host_footer = array();
-	$host_footer[] = new CButton('save', S_SAVE);
+	$host_footer[] = new CSubmit('save', S_SAVE);
 	if(($_REQUEST['hostid']>0) && ($_REQUEST['form'] != 'full_clone')){
-		array_push($host_footer, SPACE, new CButton('clone', S_CLONE), SPACE, new CButton('full_clone', S_FULL_CLONE), SPACE,
+		array_push($host_footer, SPACE, new CSubmit('clone', S_CLONE), SPACE, new CSubmit('full_clone', S_FULL_CLONE), SPACE,
 			new CButtonDelete(S_DELETE_SELECTED_HOST_Q, url_param('form').url_param('hostid').url_param('groupid')));
 	}
 	array_push($host_footer, SPACE, new CButtonCancel(url_param('groupid')));

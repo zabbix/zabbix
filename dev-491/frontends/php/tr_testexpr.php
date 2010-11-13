@@ -175,14 +175,12 @@ include_once('include/page_header.php');
 	$frm_test->addRow(S_RESULT, $res_table);
 
 // action buttons
-	$btn_test = new CButton('test_expression', S_TEST);
+	$btn_test = new CSubmit('test_expression', S_TEST);
 	if(!$allowedTesting) $btn_test->setAttribute('disabled', 'disabled');
 	$frm_test->addItemToBottomRow($btn_test);
 	$frm_test->addItemToBottomRow(SPACE);
 
-	$btn_close = new CButton('close', S_CLOSE);
-	$btn_close->setType('button');
-	$btn_close->setAction('javascript: self.close();');
+	$btn_close = new CButton('close', S_CLOSE,'javascript: self.close();');
 	$frm_test->addItemToBottomRow($btn_close);
 
 	$frm_test->show();

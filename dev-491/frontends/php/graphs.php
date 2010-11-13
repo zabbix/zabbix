@@ -355,7 +355,7 @@ include_once('include/page_header.php');
 	if(!isset($_REQUEST['form'])){
 // removes form_refresh variable
 		$form->cleanItems();
-		$form->addItem(new CButton('form', S_CREATE_GRAPH));
+		$form->addItem(new CSubmit('form', S_CREATE_GRAPH));
 	}
 
 	show_table_header(S_CONFIGURATION_OF_GRAPHS_BIG,$form);
@@ -527,7 +527,7 @@ include_once('include/page_header.php');
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
-		$goButton = new CButton('goButton',S_GO);
+		$goButton = new CSubmit('goButton',S_GO);
 		$goButton->setAttribute('id','goButton');
 
 		zbx_add_post_js('chkbxRange.pageGoName = "group_graphid";');

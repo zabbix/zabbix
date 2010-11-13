@@ -542,7 +542,7 @@ if(form){
 
 	$form->addRow('N', new CTextBox('value', $value, 10));
 
-	$form->addItemToBottomRow(new CButton('insert',S_INSERT));
+	$form->addItemToBottomRow(new CSubmit('insert',S_INSERT));
 	$form->show();
 
 

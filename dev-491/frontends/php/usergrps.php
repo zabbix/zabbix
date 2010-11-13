@@ -340,7 +340,7 @@ include_once('include/page_header.php');
 		$cmbConf->addItem('usergrps.php',S_USER_GROUPS);
 		$cmbConf->addItem('users.php',S_USERS);
 
-	$frmForm->addItem(array($cmbConf,SPACE,new CButton('form', S_CREATE_GROUP)));
+	$frmForm->addItem(array($cmbConf,SPACE,new CSubmit('form', S_CREATE_GROUP)));
 
 	$usrgroup_wdgt = new CWidget();
 	$usrgroup_wdgt->addPageHeader(S_CONFIGURATION_OF_USERS_AND_USER_GROUPS, $frmForm);
@@ -492,7 +492,7 @@ include_once('include/page_header.php');
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
-		$goButton = new CButton('goButton',S_GO);
+		$goButton = new CSubmit('goButton',S_GO);
 		$goButton->setAttribute('id','goButton');
 
 		zbx_add_post_js('chkbxRange.pageGoName = "group_groupid";');
