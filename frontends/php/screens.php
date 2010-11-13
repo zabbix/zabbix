@@ -48,7 +48,8 @@
 		'tr_groupid'=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 		'tr_hostid'=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 
-		'elementid'=>	array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,NULL),
+		'elementid'=>	array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,null),
+		'screenname'=>	array(T_ZBX_STR, O_OPT,	P_SYS,	null,null),
 		'step'=>		array(T_ZBX_INT, O_OPT,  P_SYS,		BETWEEN(0,65535),NULL),
 
 		'period'=>		array(T_ZBX_INT, O_OPT,  P_SYS, 	null,NULL),
@@ -113,11 +114,22 @@
 	}
 ?>
 <?php
-	$elementid = $_REQUEST['elementid'] = get_request('elementid', CProfile::get('web.screens.elementid', null));
 
-	if(2 != $_REQUEST['fullscreen'])
-		CProfile::update('web.screens.elementid',$_REQUEST['elementid'], PROFILE_TYPE_ID);
+	//whether we should use screen name to fetch a screen (if this is false, elementid is used)
+	$use_screen_name = isset($_REQUEST['screenname']);
 
+	//getiing element id from GET paramters
+	$elementid = $_REQUEST['elementid'] = get_request('elementid', false);
+	//if none is provided
+	if ($elementid === false && !$use_screen_name) {
+		//get element id saved in profile from the last visit
+		$elementid = CProfile::get('web.screens.elementid', null);
+		//this flag will be used in case this element does not exist
+		$id_has_been_fetched_from_profile = true;
+	}
+	else {
+		$id_has_been_fetched_from_profile = false;
+	}
 
 	$screens_wdgt = new CWidget();
 
@@ -136,30 +148,60 @@
 		'nodeids' => get_current_nodeid(),
 		'extendoutput' => 1
 	));
-	$screens = zbx_toHash($screens, 'screenid');
+
+	
+
+	//if screen name is provided it takes priority over elementid
+	if ($use_screen_name) {
+		$screens = zbx_toHash($screens, 'name');
+		$elementIdentifier = $_REQUEST['screenname'];
+	}
+	else {
+		$screens = zbx_toHash($screens, 'screenid');
+		$elementIdentifier = $elementid;
+	}
+
 	order_result($screens, 'name');
 
+	//no screens defined at all
 	if(empty($screens)){
 		$screens_wdgt->addPageHeader(S_SCREENS_BIG, $formHeader);
 		$screens_wdgt->addItem(BR());
 		$screens_wdgt->addItem(new CTableInfo(S_NO_SCREENS_DEFINED));
 		$screens_wdgt->show();
 	}
+	//if screen we are searching for does not exist and was not fetched from profile
+	elseif(!isset($screens[$elementIdentifier]) && !$id_has_been_fetched_from_profile){
+		$error_msg = $use_screen_name
+					 ? sprintf(S_ERROR_SCREEN_WITH_NAME_DOES_NOT_EXIST, $elementIdentifier)
+					 : sprintf(S_ERROR_SCREEN_WITH_ID_DOES_NOT_EXIST, $elementIdentifier);
+
+		show_error_message($error_msg);
+	}
 	else{
-		if(!isset($screens[$elementid])){
+		if (!isset($screens[$elementIdentifier])) {
+			//this means id was fetched from profile and this screen does not exist
+			//in this case we need to show the first one
 			$screen = reset($screens);
-			$elementid = $screen['screenid'];
+		}
+		else {
+			$screen = $screens[$elementIdentifier];
 		}
 
-		$effectiveperiod = navigation_bar_calc('web.screens', $elementid, true);
+		//if elementid is used to fetch an element, saving it in profile
+		if(2 != $_REQUEST['fullscreen'] && !$use_screen_name) {
+			CProfile::update('web.screens.elementid',$screen['screenid'] , PROFILE_TYPE_ID);
+		}
 
-		$element_name = $screens[$elementid]['name'];
+		$effectiveperiod = navigation_bar_calc('web.screens', $screen['screenid'], true);
+
+		$element_name = $screen['name'];
 
 // PAGE HEADER {{{
 		$icon = get_icon('favourite', array(
 			'fav' => 'web.favorite.screenids',
 			'elname' => 'screenid',
-			'elid' => $elementid,
+			'elid' => $screen['screenid'],
 		));
 		$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
 		
@@ -172,23 +214,23 @@
 		$form = new CForm(null, 'get');
 		$form->addVar('fullscreen', $_REQUEST['fullscreen']);
 
-		$cmbElements = new CComboBox('elementid', $elementid, 'submit()');
-		foreach($screens as $snum => $screen){
+		$cmbElements = new CComboBox('elementid', $screen['screenid'], 'submit()');
+		foreach($screens as $snum => $scr){
 			/**
 			 * Adding htmlspecialchars function to output of the screen name, so
 			 * that it would be available to use symbols like ">" in screen names
 			 * @see ZBX-2844
 			 * @author Konstantin Buravcov
 			 */
-			$displayed_screen_name = htmlspecialchars(get_node_name_by_elid($screen['screenid'], null, ': ').$screen['name']);
-			$cmbElements->addItem($screen['screenid'], $displayed_screen_name);
+			$displayed_screen_name = htmlspecialchars(get_node_name_by_elid($scr['screenid'], null, ': ').$scr['name']);
+			$cmbElements->addItem($scr['screenid'], $displayed_screen_name);
 		}
 		$form->addItem(array(S_SCREENS.SPACE, $cmbElements));
 
 		$screens_wdgt->addHeader($element_name, $form);
 // }}} HEADER
 
-		if((2 != $_REQUEST['fullscreen']) && check_dynamic_items($elementid, 0)){
+		if((2 != $_REQUEST['fullscreen']) && check_dynamic_items($screen['screenid'], 0)){
 			if(!isset($_REQUEST['hostid'])){
 				$_REQUEST['groupid'] = $_REQUEST['hostid'] = 0;
 			}
@@ -218,7 +260,7 @@
 			$form->addItem(array(SPACE.S_HOST.SPACE, $cmbHosts));
 		}
 
-		$element = get_screen($elementid, 0, $effectiveperiod);
+		$element = get_screen($screen['screenid'], 0, $effectiveperiod);
 
 		if(2 != $_REQUEST['fullscreen']){
 			$timeline = array(
@@ -232,7 +274,7 @@
 
 			$dom_graph_id = 'screen_scroll';
 			$objData = array(
-				'id' => $elementid,
+				'id' => $screen['screenid'],
 				'domid' => $dom_graph_id,
 				'loadSBox' => 0,
 				'loadImage' => 0,
