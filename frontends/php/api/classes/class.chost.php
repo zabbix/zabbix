@@ -259,7 +259,7 @@ class CHost extends CZBXAPI{
 				$sql_parts['select']['interfaceid'] = 'hi.interfaceid';
 			}
 
-			$sql_parts['from']['interfaces'] = 'interface hi';
+			$sql_parts['from']['interface'] = 'interface hi';
 			$sql_parts['where'][] = DBcondition('hi.interfaceid', $options['interfaceids']);
 			$sql_parts['where']['hi'] = 'h.hostid=hi.hostid';
 
@@ -478,7 +478,7 @@ class CHost extends CZBXAPI{
 			$options['sortfield'] = '';
 			$sql_parts['select'] = array('count(DISTINCT h.hostid) as rowscount');
 
-//groupCount
+// groupCount
 			if(!is_null($options['groupCount'])){
 				foreach($sql_parts['group'] as $key => $fields){
 					$sql_parts['select'][$key] = $fields;
@@ -489,11 +489,21 @@ class CHost extends CZBXAPI{
 // search
 		if(is_array($options['search'])){
 			zbx_db_search('hosts h', $options, $sql_parts);
+
+			if(zbx_db_search('interface hi', $options, $sql_parts)){
+				$sql_parts['from']['interface'] = 'interface hi';
+				$sql_parts['where']['hi'] = 'h.hostid=hi.hostid';
+			}
 		}
 
 // filter
 		if(is_array($options['filter'])){
 			zbx_db_filter('hosts h', $options, $sql_parts);
+
+			if(zbx_db_filter('interface hi', $options, $sql_parts)){
+				$sql_parts['from']['interface'] = 'interface hi';
+				$sql_parts['where']['hi'] = 'h.hostid=hi.hostid';
+			}
 		}
 
 // order
@@ -541,7 +551,7 @@ class CHost extends CZBXAPI{
 				' WHERE '.$sql_where.
 				$sql_group.
 				$sql_order;
-//SDI($sql);
+///SDI($sql);
 		$res = DBselect($sql, $sql_limit);
 		while($host = DBfetch($res)){
 			if(!is_null($options['countOutput'])){

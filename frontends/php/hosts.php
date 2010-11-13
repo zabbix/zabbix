@@ -791,9 +791,7 @@ include_once('include/page_header.php');
 			S_TRIGGERS,
 			S_GRAPHS,
 			S_DISCOVERY,
-			make_sorting_header(S_DNS, 'dns'),
-			make_sorting_header(S_IP, 'ip'),
-			S_PORT,
+			S_INTERFACE,
 			S_TEMPLATES,
 			make_sorting_header(S_STATUS, 'status'),
 			S_AVAILABILITY
@@ -889,11 +887,8 @@ include_once('include/page_header.php');
 
 			$description[] = new CLink($host['host'], 'hosts.php?form=update&hostid='.$host['hostid'].url_param('groupid'));
 
-			$dns = empty($interface['dns']) ? '-' : $interface['dns'];
-			$ip = empty($interface['ip']) ? '-' : $interface['ip'];
-			$port = empty($interface['port']) ? '-' : $interface['port'];
-			$use = (1 == $interface['useip']) ? 'ip' : 'dns';
-			$$use = bold($$use);
+			$hostIF = ($interface['useip'] == INTERFACE_USE_IP) ? $interface['ip'] : $interface['dns'];
+			$hostIF .= empty($interface['port']) ? '' : ': '.$interface['port'];
 
 			$status_script = null;
 			switch($host['status']){
@@ -1005,9 +1000,7 @@ include_once('include/page_header.php');
 				$triggers,
 				$graphs,
 				$discoveries,
-				$dns,
-				$ip,
-				$port,
+				$hostIF,
 				new CCol($hostTemplates, 'wraptext'),
 				$status,
 				$av_table

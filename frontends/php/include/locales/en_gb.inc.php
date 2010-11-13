@@ -933,6 +933,7 @@
 	'S_IP_ADDRESS'=>				'IP address',
 	'S_LINK_ADDITIONAL_TEMPLATES'=>			'Link additional templates',
 	'S_RELINK_TEMPLATES'=>			'Replace linked templates',
+	'S_IPMI'=>						'IPMI',
 	'S_USEIPMI'=>					'Use IPMI',
 	'S_IPMI_IP_ADDRESS'=>				'IPMI IP address',
 	'S_IPMI_PORT'=>					'IPMI port',

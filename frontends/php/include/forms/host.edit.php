@@ -294,37 +294,6 @@
 
 	$hostList->addRow(S_STATUS,$cmbStatus);
 
-	$hostList->addRow(S_USEIPMI, new CCheckBox('useipmi', $useipmi, 'submit()'));
-
-	if($useipmi == 'yes'){
-		$cmbIPMIAuthtype = new CComboBox('ipmi_authtype', $ipmi_authtype);
-		$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_DEFAULT,	S_AUTHTYPE_DEFAULT);
-		$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_NONE,		S_AUTHTYPE_NONE);
-		$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_MD2,		S_AUTHTYPE_MD2);
-		$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_MD5,		S_AUTHTYPE_MD5);
-		$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_STRAIGHT,	S_AUTHTYPE_STRAIGHT);
-		$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_OEM,		S_AUTHTYPE_OEM);
-		$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_RMCP_PLUS,	S_AUTHTYPE_RMCP_PLUS);
-		$hostList->addRow(S_IPMI_AUTHTYPE, $cmbIPMIAuthtype);
-
-		$cmbIPMIPrivilege = new CComboBox('ipmi_privilege', $ipmi_privilege);
-		$cmbIPMIPrivilege->addItem(IPMI_PRIVILEGE_CALLBACK,	S_PRIVILEGE_CALLBACK);
-		$cmbIPMIPrivilege->addItem(IPMI_PRIVILEGE_USER,		S_PRIVILEGE_USER);
-		$cmbIPMIPrivilege->addItem(IPMI_PRIVILEGE_OPERATOR,	S_PRIVILEGE_OPERATOR);
-		$cmbIPMIPrivilege->addItem(IPMI_PRIVILEGE_ADMIN,	S_PRIVILEGE_ADMIN);
-		$cmbIPMIPrivilege->addItem(IPMI_PRIVILEGE_OEM,		S_PRIVILEGE_OEM);
-
-		$hostList->addRow(S_IPMI_PRIVILEGE, $cmbIPMIPrivilege);
-		$hostList->addRow(S_IPMI_USERNAME, new CTextBox('ipmi_username', $ipmi_username, 16));
-		$hostList->addRow(S_IPMI_PASSWORD, new CTextBox('ipmi_password', $ipmi_password, 20));
-	}
-	else{
-		$frmHost->addVar('ipmi_authtype', $ipmi_authtype);
-		$frmHost->addVar('ipmi_privilege', $ipmi_privilege);
-		$frmHost->addVar('ipmi_username', $ipmi_username);
-		$frmHost->addVar('ipmi_password', $ipmi_password);
-	}
-
 	if($_REQUEST['form'] == 'full_clone'){
 // Host items
 		$host_items = CItem::get(array(
@@ -416,7 +385,6 @@
 // } HOST WIDGET
 
 // TEMPLATES{
-
 	$tmplList = new CFormList('tmpllist');
 
 	foreach($templates as $id => $temp_name){
@@ -442,6 +410,43 @@
 
 	$divTabs->addTab('templateTab', S_TEMPLATES, $tmplList);
 // } TEMPLATES
+
+// IPMI TAB {
+	$ipmiList = new CFormList('ipmilist');
+	$ipmiList->addRow(S_USEIPMI, new CCheckBox('useipmi', $useipmi, 'submit()'));
+
+	if($useipmi == 'yes'){
+		$cmbIPMIAuthtype = new CComboBox('ipmi_authtype', $ipmi_authtype);
+		$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_DEFAULT,	S_AUTHTYPE_DEFAULT);
+		$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_NONE,		S_AUTHTYPE_NONE);
+		$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_MD2,		S_AUTHTYPE_MD2);
+		$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_MD5,		S_AUTHTYPE_MD5);
+		$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_STRAIGHT,	S_AUTHTYPE_STRAIGHT);
+		$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_OEM,		S_AUTHTYPE_OEM);
+		$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_RMCP_PLUS,	S_AUTHTYPE_RMCP_PLUS);
+		$ipmiList->addRow(S_IPMI_AUTHTYPE, $cmbIPMIAuthtype);
+
+		$cmbIPMIPrivilege = new CComboBox('ipmi_privilege', $ipmi_privilege);
+		$cmbIPMIPrivilege->addItem(IPMI_PRIVILEGE_CALLBACK,	S_PRIVILEGE_CALLBACK);
+		$cmbIPMIPrivilege->addItem(IPMI_PRIVILEGE_USER,		S_PRIVILEGE_USER);
+		$cmbIPMIPrivilege->addItem(IPMI_PRIVILEGE_OPERATOR,	S_PRIVILEGE_OPERATOR);
+		$cmbIPMIPrivilege->addItem(IPMI_PRIVILEGE_ADMIN,	S_PRIVILEGE_ADMIN);
+		$cmbIPMIPrivilege->addItem(IPMI_PRIVILEGE_OEM,		S_PRIVILEGE_OEM);
+
+		$ipmiList->addRow(S_IPMI_PRIVILEGE, $cmbIPMIPrivilege);
+		$ipmiList->addRow(S_IPMI_USERNAME, new CTextBox('ipmi_username', $ipmi_username, 16));
+		$ipmiList->addRow(S_IPMI_PASSWORD, new CTextBox('ipmi_password', $ipmi_password, 20));
+	}
+	else{
+		$frmHost->addVar('ipmi_authtype', $ipmi_authtype);
+		$frmHost->addVar('ipmi_privilege', $ipmi_privilege);
+		$frmHost->addVar('ipmi_username', $ipmi_username);
+		$frmHost->addVar('ipmi_password', $ipmi_password);
+	}
+
+	$divTabs->addTab('ipmiTab', S_IPMI, $ipmiList);
+
+// } IPMI TAB
 
 
 // MACROS WIDGET {

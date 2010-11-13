@@ -928,7 +928,16 @@ else {
 				zbx_dbstr($start.zbx_strtoupper($pattern).'%');
 		}
 
-		if(!empty($search)) $sql_parts['where']['search'] = '( '.implode(' OR ', $search).' )';
+		if(!empty($search)){
+			if(isset($sql_parts['where']['search'])){
+				$search[] = $sql_parts['where']['search'];
+			}
+
+			$sql_parts['where']['search'] = '( '.implode(' OR ', $search).' )';
+			return true;
+		}
+
+	return false;
 	}
 
 
@@ -957,7 +966,15 @@ else {
 			}
 		}
 
-		if(!empty($filter)) $sql_parts['where']['filter'] = '( '.implode(' AND ', $filter).' )';
+		if(!empty($filter)){
+			if(isset($sql_parts['where']['filter'])){
+				$filter[] = $sql_parts['where']['filter'];
+			}
+			$sql_parts['where']['filter'] = '( '.implode(' AND ', $filter).' )';
+			return true;
+		}
+
+	return false;
 	}
 
 
