@@ -57,7 +57,7 @@ class CButtonQMessage extends CButton{
 
 	public function setAction($value=null){
 		if(!is_null($value))
-			return parent::setAction($value);
+			return parent::setAttribute('onclick', $value);
 
 		global $page;
 
@@ -73,7 +73,7 @@ class CButtonQMessage extends CButton{
 			$action = 'true';
 		}
 
-		return parent::setAction('if('.$confirmation.') return '.$action.'; else return false;');
+		return parent::setAttribute('onclick', 'if('.$confirmation.') return '.$action.'; else return false;');
 	}
 }
 ?>

@@ -197,8 +197,7 @@ if(isset($_REQUEST['pservices'])){
 
 		$description = S_ROOT_SMALL;
 
-		$description = new CLink($description,'#');
-		$description->setAction('javascript:
+		$description = new CLink($description,'#',null,'javascript:
 				window.opener.document.forms[0].elements[\'parent_name\'].value = '.zbx_jsvalue(S_ROOT_SMALL).';
 				window.opener.document.forms[0].elements[\'parentname\'].value = '.zbx_jsvalue(S_ROOT_SMALL).';
 				window.opener.document.forms[0].elements[\'parentid\'].value = '.zbx_jsvalue(0).';
@@ -248,9 +247,7 @@ if(isset($_REQUEST['pservices'])){
 		$table->addRow(array(array($prefix,$description),algorithm2str($db_service_data['algorithm']),$trigger));
 	}
 
-	$cb = new CButton('cancel',S_CANCEL);
-	$cb->setType('button');
-	$cb->setAction('javascript: self.close();');
+	$cb = new CButton('cancel',S_CANCEL,'javascript: self.close();');
 
 	$td = new CCol($cb);
 	$td->setAttribute('style','text-align:right;');
@@ -308,15 +305,12 @@ if(isset($_REQUEST['cservices'])){
 			$trigger = expand_trigger_description($db_service_data['triggerid']);
 		}
 
-		$description = new CLink($description,'#');
-		$description->setAction('window.opener.add_child_service('.zbx_jsvalue($db_service_data['name']).','.zbx_jsvalue($db_service_data['serviceid']).','.zbx_jsvalue($trigger).','.zbx_jsvalue($db_service_data['triggerid']).'); self.close(); return false;');
+		$description = new CLink($description,'#',null,'window.opener.add_child_service('.zbx_jsvalue($db_service_data['name']).','.zbx_jsvalue($db_service_data['serviceid']).','.zbx_jsvalue($trigger).','.zbx_jsvalue($db_service_data['triggerid']).'); self.close(); return false;');
 
 		$table->addRow(array(array($prefix,$description),algorithm2str($db_service_data['algorithm']),$trigger));
 	}
 
-	$cb = new CButton('cancel',S_CANCEL);
-	$cb->setType('button');
-	$cb->setAction('javascript: self.close();');
+	$cb = new CButton('cancel',S_CANCEL,'javascript: self.close();');
 
 	$td = new CCol($cb);
 	$td->setAttribute('style','text-align:right;');
@@ -471,9 +465,7 @@ if(isset($_REQUEST['sform'])){
 	$frmService->addVar('parentname',$parentname);
 	$frmService->addVar('parentid',$parentid);
 
-	$cb = new CButton('select_parent',S_CHANGE);
-	$cb->setType('button');
-	$cb->setAction("javascript: openWinCentered('services_form.php?pservices=1".url_param('serviceid')."','ZBX_Services_List',740,420,'scrollbars=1, toolbar=0, menubar=0, resizable=1, dialog=0');");
+	$cb = new CButton('select_parent',S_CHANGE,"javascript: openWinCentered('services_form.php?pservices=1".url_param('serviceid')."','ZBX_Services_List',740,420,'scrollbars=1, toolbar=0, menubar=0, resizable=1, dialog=0');");
 
 	$frmService->addRow(S_PARENT_SERVICE,array($ctb,$cb));
 //----------
@@ -525,13 +517,9 @@ if(isset($_REQUEST['sform'])){
 				));
 	}
 
-	$cb = new CButton('add_child_service',S_ADD);
-	$cb->setType('button');
-	$cb->setAction("javascript: openWinCentered('services_form.php?cservices=1".url_param('serviceid')."','ZBX_Services_List',640,520,'scrollbars=1, toolbar=0, menubar=0, resizable=0');");
+	$cb = new CButton('add_child_service',S_ADD,"javascript: openWinCentered('services_form.php?cservices=1".url_param('serviceid')."','ZBX_Services_List',640,520,'scrollbars=1, toolbar=0, menubar=0, resizable=0');");
 
-	$cb2 = new CButton('del_child_service',S_REMOVE);
-	$cb2->setType('button');
-	$cb2->setAction("javascript: remove_childs('".$frmService->GetName()."','childs_to_del','tr');");
+	$cb2 = new CButton('del_child_service',S_REMOVE,"javascript: remove_childs('".$frmService->GetName()."','childs_to_del','tr');");
 
 	$frmService->addRow(S_DEPENDS_ON,array($table,BR(),$cb,$cb2));
 //----------
@@ -601,7 +589,7 @@ if(isset($_REQUEST['sform'])){
 	if(count($stime_el)==0)
 		array_push($stime_el, S_NO_TIMES_DEFINED);
 	else
-		array_push($stime_el, new CButton('del_service_times',S_DELETE_SELECTED));
+		array_push($stime_el, new CSubmit('del_service_times',S_DELETE_SELECTED));
 
 	$frmService->addRow(S_SERVICE_TIMES, $stime_el);
 
@@ -716,7 +704,7 @@ if(isset($_REQUEST['sform'])){
 	$frmService->addRow(S_NEW_SERVICE_TIME, array(
 			$cmbTimeType, BR(),
 			$time_param,
-			new CButton('add_service_time',S_ADD_SMALL,'javascript: document.forms[0].action += \'?sform=1\'; submit();')
+			new CSubmit('add_service_time',S_ADD_SMALL,'javascript: document.forms[0].action += \'?sform=1\'; submit();')
 		));
 //trigger
 	$frmService->addRow(S_LINK_TO_TRIGGER_Q, new CCheckBox('linktrigger',$linktrigger,"javascript: display_element('trigger_name');",1));
@@ -747,7 +735,7 @@ if(isset($_REQUEST['sform'])){
 	$frmService->addRow(S_SORT_ORDER_0_999, new CTextBox('sortorder',$sortorder,3));
 //---------
 
-	$frmService->addItemToBottomRow(new CButton('save_service',S_SAVE,'javascript: document.forms[0].action += \'?saction=1\';'));
+	$frmService->addItemToBottomRow(new CSubmit('save_service',S_SAVE,'javascript: document.forms[0].action += \'?saction=1\';'));
 	if(isset($service['serviceid'])){
 		$frmService->addItemToBottomRow(SPACE);
 		$frmService->addItemToBottomRow(new CButtonDelete(
@@ -757,9 +745,7 @@ if(isset($_REQUEST['sform'])){
 	}
 	$frmService->addItemToBottomRow(SPACE);
 
-	$cb = new CButton('cancel',S_CANCEL);
-	$cb->setType('button');
-	$cb->setAction('javascript: self.close();');
+	$cb = new CButton('cancel',S_CANCEL,'javascript: self.close();');
 
 	$frmService->addItemToBottomRow($cb);
 	$frmService->show();

@@ -151,11 +151,9 @@ include_once('include/page_header.php');
 	$filterForm->addRow(S_RESOURCE, $cmbResource);
 
 
-	$reset = new CButton('filter_rst',S_RESET);
-	$reset->setType('button');
-	$reset->setAction('javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
+	$reset = new CButton('filter_rst',S_RESET,'javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
 
-	$filterForm->addItemToBottomRow(new CButton('filter_set',S_FILTER));
+	$filterForm->addItemToBottomRow(new CSubmit('filter_set',S_FILTER));
 	$filterForm->addItemToBottomRow($reset);
 
 	$audit_wdgt->addFlicker($filterForm, CProfile::get('web.auditlogs.filter.state',1));

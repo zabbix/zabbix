@@ -477,8 +477,8 @@ include_once('include/page_header.php');
 <?php
 	$frmForm = new CForm();
 	if(!isset($_REQUEST['form'])){
-		$frmForm->addItem(new CButton('form', S_CREATE_TEMPLATE));
-		$frmForm->addItem(new CButton('form', S_IMPORT_TEMPLATE));
+		$frmForm->addItem(new CSubmit('form', S_CREATE_TEMPLATE));
+		$frmForm->addItem(new CSubmit('form', S_IMPORT_TEMPLATE));
 	}
 
 	$template_wdgt = new CWidget();
@@ -645,14 +645,14 @@ include_once('include/page_header.php');
 				$frmHost->addVar('templates['.$tid.']', $tname);
 				$tpl_table->addRow(array(
 					$tname,
-					new CButton('unlink['.$tid.']', S_UNLINK),
-					isset($original_templates[$tid]) ? new CButton('unlink_and_clear['.$tid.']', S_UNLINK_AND_CLEAR) : SPACE
+					new CSubmit('unlink['.$tid.']', S_UNLINK),
+					isset($original_templates[$tid]) ? new CSubmit('unlink_and_clear['.$tid.']', S_UNLINK_AND_CLEAR) : SPACE
 				));
 			}
 
 			$template_tbl->addRow(array(S_LINK_WITH_TEMPLATE, array(
 				$tpl_table,
-				new CButton('add_template', S_ADD,
+				new CSubmit('add_template', S_ADD,
 					'return PopUp("popup.php?dstfrm='.$frmHost->GetName().
 					'&dstfld1=new_template&srctbl=templates&srcfld1=hostid&srcfld2=host&excludeids['.$templateid.']='.$templateid.
 					url_param($templates,false,"existed_templates").'",450,450)', 'T')
@@ -722,12 +722,12 @@ include_once('include/page_header.php');
 // FULL CLONE }
 
 			$host_footer = array();
-			$host_footer[] = new CButton('save', S_SAVE);
+			$host_footer[] = new CSubmit('save', S_SAVE);
 			if(($templateid > 0) && ($_REQUEST['form'] != 'full_clone')){
 				$host_footer[] = SPACE;
-				$host_footer[] = new CButton('clone', S_CLONE);
+				$host_footer[] = new CSubmit('clone', S_CLONE);
 				$host_footer[] = SPACE;
-				$host_footer[] = new CButton('full_clone', S_FULL_CLONE);
+				$host_footer[] = new CSubmit('full_clone', S_FULL_CLONE);
 				$host_footer[] = SPACE;
 				$host_footer[] = new CButtonDelete(S_DELETE_TEMPLATE_Q, url_param('form').url_param('templateid').url_param('groupid'));
 				$host_footer[] = SPACE;
@@ -959,7 +959,7 @@ include_once('include/page_header.php');
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
-		$goButton = new CButton('goButton',S_GO);
+		$goButton = new CSubmit('goButton',S_GO);
 		$goButton->setAttribute('id','goButton');
 
 		zbx_add_post_js('chkbxRange.pageGoName = "templates";');

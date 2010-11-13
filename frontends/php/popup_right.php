@@ -107,7 +107,6 @@ check_fields($fields);
 	insert_js('var grouplist = '.zbx_jsvalue($grouplist).';');
 
 	$button = new CButton('select', S_SELECT, 'add_groups("'.$dstfrm.'")');
-	$button->setType('button');
 	$table->setFooter(new CCol($button,'right'));
 
 	$form->addItem($table);

@@ -188,5 +188,9 @@ class CTag extends CObject{
 		$form->addItem($this);
 	return $form;
 	}
+
+	public function setTitle($value='title'){
+		$this->setAttribute('title', $value);
+	}
 }
 ?>

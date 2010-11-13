@@ -277,7 +277,6 @@ COpt::compare_files_with_menu($ZBX_MENU);
 					" \$('div_node_tree').setStyle({top: pos.top+'px'});".
 					" if(IE6) showPopupDiv('div_node_tree','select_iframe');";		// IE6
 				$button_show_tree = new CButton('show_node_tree', S_SELECT_NODES, $jscript); //sdelatj konstatntu!
-				$button_show_tree->setType('button');
 				$button_show_tree->setAttribute('id', 'button_show_tree');
 
 // +++ Create node tree +++
@@ -309,7 +308,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 				$div_node_tree = new CDiv();
 				$div_node_tree->addItem($node_tree->getHTML());
 
-				$div_node_tree->addItem(new CButton('select_nodes', S_SELECT, "javascript: ".
+				$div_node_tree->addItem(new CSubmit('select_nodes', S_SELECT, "javascript: ".
 																				" if(IE6) hidePopupDiv('select_iframe');".	//IE6 fix
 																				" \$('div_node_tree').setStyle({display:'none'});"));
 

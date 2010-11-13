@@ -3,11 +3,11 @@
 	<td>
 		<input type="hidden" name="macros[#{macroid}][new]" value="#{newValue}">
 		<input type="hidden" name="macros[#{macroid}][macroid]" value="#{macroid}">
-		<input class="biginput" name="macros[#{macroid}][macro]" type="text" size="30" value="#{macro}" placeholder="{$MACRO}">
+		<input class="input" name="macros[#{macroid}][macro]" type="text" size="30" value="#{macro}" placeholder="{$MACRO}">
 	</td>
 	<td><span style="vertical-align:top;">⇒</span></td>
 	<td>
-		<input class="biginput" name="macros[#{macroid}][value]" type="text" size="40" value="#{value}" placeholder="&lt;Value&gt;">
+		<input class="input" name="macros[#{macroid}][value]" type="text" size="40" value="#{value}" placeholder="&lt;Value&gt;">
 	</td>
 	<td>
 		<input type="button" class="link_menu" name="remove" value="<?php print(S_REMOVE);?>" onclick="$('userMacroRow_#{macroid}').remove();" />

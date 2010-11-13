@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,19 +19,10 @@
 **/
 ?>
 <?php
-class CVarTag extends CTag{
-/* public */
-	public function __construct($name='',$value='0'){
-		parent::__construct('input','no');
-		$this->attributes['type'] = 'hidden';
-		$this->attributes['name'] = $name;
-		$this->attributes['id'] = $name;
-
-		$this->setValue($value);
-	}
-
-	public function setValue($value){
-		$this->attributes['value'] = htmlspecialchars($value);
+class CSubmit extends CButton{
+	public function __construct($name='submit', $caption='', $action=NULL){
+		parent::__construct($name, $caption, $action);
+		$this->setAttribute('type', 'submit');
 	}
 }
 ?>

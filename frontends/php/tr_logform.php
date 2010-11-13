@@ -302,7 +302,7 @@ if(isset($_REQUEST['sform'])){
 	$ctb->setAttribute('disabled','disabled');
 
 	$script = "javascript: return PopUp('popup.php?dstfrm=".$frmTRLog->getName()."&dstfld1=itemid&dstfld2=item&srctbl=items&srcfld1=itemid&srcfld2=description',800,450);";
-	$cbtn = new CButton('select_item',S_SELECT,$script);
+	$cbtn = new CSubmit('select_item',S_SELECT,$script);
 
 	$frmTRLog->addRow(S_ITEM,array($ctb, $cbtn));
 	$frmTRLog->addVar('itemid',$itemid);
@@ -318,18 +318,10 @@ if(isset($_REQUEST['sform'])){
 	$ctb->setAttribute('id','logexpr');
 
 	$cb = new CButton('add_exp',S_ADD,'javascript: add_logexpr();');
-	$cb->setType('button');
-	$cb->setAttribute('id','add_exp');
-
 	$cbAdd = new CButton('add_key_and',S_AND_BIG,'javascript: add_keyword_and();');
-	$cbAdd->setType('button');
-	$cbAdd->setAttribute('id','add_key_and');
 	$cbOr = new CButton('add_key_or',S_OR_BIG,'javascript: add_keyword_or();');
-	$cbOr->setType('button');
-	$cbOr->setAttribute('id','add_key_or');
-
 	$cbIregexp = new CCheckBox('iregexp', 'no', null,1);
-	$cbIregexp->setAttribute('id','iregexp');
+
 
 	$frmTRLog->addRow(S_EXPRESSION,array($ctb,BR(),$cbIregexp,'iregexp',SPACE,$cbAdd,SPACE,$cbOr,SPACE,$exp_select,SPACE, $cb));
 
@@ -416,11 +408,10 @@ if(isset($_REQUEST['sform'])){
 
 	$frmTRLog->addRow(S_DISABLED,new CCheckBox('status', (($status == TRIGGER_STATUS_DISABLED)?'yes':'no'), null,1));
 
-	$frmTRLog->addItemToBottomRow(new CButton('save_trigger',S_SAVE,'javascript: document.forms[0].action += \'?saction=1\';'));
+	$frmTRLog->addItemToBottomRow(new CSubmit('save_trigger',S_SAVE,'javascript: document.forms[0].action += \'?saction=1\';'));
 	$frmTRLog->addItemToBottomRow(SPACE);
 
 	$cb = new CButton('cancel',S_CANCEL, 'javascript: self.close();');
-	$cb->setType('button');
 
 	$frmTRLog->addItemToBottomRow($cb);
 	if($bExprResult){

@@ -326,7 +326,7 @@ include_once('include/page_header.php');
 	$frmForm = new CForm(null, 'get');
 
 	if(!isset($_REQUEST['form'])){
-		$frmForm->addItem(new CButton('form',S_CREATE_MAINTENANCE_PERIOD));
+		$frmForm->addItem(new CSubmit('form',S_CREATE_MAINTENANCE_PERIOD));
 	}
 
 	$maintenance_wdgt = new CWidget();
@@ -413,9 +413,9 @@ include_once('include/page_header.php');
 		$tblMntc->addRow(array(S_DESCRIPTION, new CTextArea('description', $description,66,5)));
 
 
-		$footer = array(new CButton('save', S_SAVE));
+		$footer = array(new CSubmit('save', S_SAVE));
 		if(isset($_REQUEST['maintenanceid'])){
-			$footer[] = new CButton('clone',S_CLONE);
+			$footer[] = new CSubmit('clone',S_CLONE);
 			$footer[] = new CButtonDelete(S_DELETE_MAINTENANCE_PERIOD_Q, url_param('form').url_param('maintenanceid'));
 		}
 		$footer[] = new CButtonCancel();
@@ -457,7 +457,7 @@ include_once('include/page_header.php');
 				timeperiod_type2str($timeperiod['timeperiod_type']),
 				new CCol(shedule2str($timeperiod), 'wraptext'),
 				zbx_date2age(0,$timeperiod['period']),
-				new CButton('edit_timeperiodid['.$id.']', S_EDIT)
+				new CSubmit('edit_timeperiodid['.$id.']', S_EDIT)
 			));
 
 			$tblPeriod->addItem(new Cvar('timeperiods['.$id.'][timeperiod_type]', $timeperiod['timeperiod_type']));
@@ -472,10 +472,10 @@ include_once('include/page_header.php');
 
 		$footer = array();
 		if(!isset($_REQUEST['new_timeperiod'])){
-			$footer[] = new CButton('new_timeperiod', S_NEW);
+			$footer[] = new CSubmit('new_timeperiod', S_NEW);
 		}
 		if($tblPeriod->ItemsCount() > 0 ){
-			$footer[] = new CButton('del_timeperiod', S_DELETE_SELECTED);
+			$footer[] = new CSubmit('del_timeperiod', S_DELETE_SELECTED);
 		}
 
 		$left_tab->addRow(new CFormElement(S_MAINTENANCE, $tblPeriod, $footer));
@@ -693,7 +693,7 @@ include_once('include/page_header.php');
 		$goBox->addItem($goOption);
 
 		// goButton name is necessary!!!
-		$goButton = new CButton('goButton',S_GO.' (0)');
+		$goButton = new CSubmit('goButton',S_GO.' (0)');
 		$goButton->setAttribute('id','goButton');
 
 		zbx_add_post_js('chkbxRange.pageGoName = "maintenanceids";');

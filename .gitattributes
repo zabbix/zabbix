@@ -273,7 +273,7 @@ frontends/php/include/classes/class.cicon.php -text
 frontends/php/include/classes/class.ciframe.php -text
 frontends/php/include/classes/class.cimagetexttable.php -text
 frontends/php/include/classes/class.cimg.php -text
-frontends/php/include/classes/class.cipbox.php -text
+frontends/php/include/classes/class.cinput.php -text
 frontends/php/include/classes/class.cjson.php -text
 frontends/php/include/classes/class.cjsscript.php -text
 frontends/php/include/classes/class.clabel.php -text
@@ -293,6 +293,7 @@ frontends/php/include/classes/class.crow.php -text
 frontends/php/include/classes/class.cserverinfo.php -text
 frontends/php/include/classes/class.cspan.php -text
 frontends/php/include/classes/class.cstringparser.php -text
+frontends/php/include/classes/class.csubmit.php -text
 frontends/php/include/classes/class.ctable.php -text
 frontends/php/include/classes/class.ctableinfo.php -text
 frontends/php/include/classes/class.ctabview.php -text
@@ -304,7 +305,6 @@ frontends/php/include/classes/class.ctriggersinfo.php -text
 frontends/php/include/classes/class.ctweenbox.php -text
 frontends/php/include/classes/class.curl.php -text
 frontends/php/include/classes/class.cvar.php -text
-frontends/php/include/classes/class.cvartag.php -text
 frontends/php/include/classes/class.cvisibilitybox.php -text
 frontends/php/include/classes/class.cwidget.php -text
 frontends/php/include/debug.inc.php -text

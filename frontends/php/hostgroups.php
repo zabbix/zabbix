@@ -214,7 +214,7 @@ include_once('include/page_header.php');
 	}
 	else{
 		$frmForm = new CForm();
-		$frmForm->addItem(new CButton('form', S_CREATE_GROUP));
+		$frmForm->addItem(new CSubmit('form', S_CREATE_GROUP));
 	}
 
 	$groups_wdgt = new CWidget();
@@ -340,13 +340,13 @@ include_once('include/page_header.php');
 
 		$frmHostG->addRow(S_HOSTS, $cmbHosts->Get(S_HOSTS.SPACE.S_IN,array(S_OTHER.SPACE.S_HOSTS.SPACE.'|'.SPACE.S_GROUP.SPACE, $cmbGroups)));
 
-		$frmHostG->addItemToBottomRow(new CButton('save', S_SAVE));
+		$frmHostG->addItemToBottomRow(new CSubmit('save', S_SAVE));
 		if($groupid > 0){
 			$dltButton = new CButtonDelete(S_DELETE_SELECTED_GROUP, url_param('form').url_param('groupid'));
 			$dlt_groups = getDeletableHostGroups($_REQUEST['groupid']);
 			if(empty($dlt_groups)) $dltButton->setAttribute('disabled', 'disabled');
 
-			$frmHostG->addItemToBottomRow(array(new CButton('clone',S_CLONE), $dltButton));
+			$frmHostG->addItemToBottomRow(array(new CSubmit('clone',S_CLONE), $dltButton));
 		}
 		$frmHostG->addItemToBottomRow(new CButtonCancel());
 		$groups_wdgt->addItem($frmHostG);
@@ -489,7 +489,7 @@ include_once('include/page_header.php');
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
-		$goButton = new CButton('goButton',S_GO);
+		$goButton = new CSubmit('goButton',S_GO);
 		$goButton->setAttribute('id','goButton');
 
 		zbx_add_post_js('chkbxRange.pageGoName = "groups";');

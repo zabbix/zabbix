@@ -180,7 +180,7 @@
 			}
 		}
 		else if(is_object($obj)){
-			$formObjects = array('cform','ccheckbox','cselect','cbutton','cbuttonqmessage','cbuttondelete','cbuttoncancel');
+			$formObjects = array('cform','ccheckbox','cselect','cbutton','csubmit','cbuttonqmessage','cbuttondelete','cbuttoncancel');
 			if(is_object($obj) && str_in_array(zbx_strtolower(get_class($obj)), $formObjects)){
 				$obj=SPACE;
 			}

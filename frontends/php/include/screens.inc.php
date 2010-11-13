@@ -545,7 +545,7 @@ require_once('include/js.inc.php');
 				$selectbtn = new CButton('select', S_SELECT,
 					"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName().
 							"&real_hosts=1&dstfld1=resourceid&dstfld2=caption&srctbl=simple_graph&srcfld1=itemid".
-							"&srcfld2=description',800,450);");
+							"&srcflCButtond2=description',800,450);");
 			}
 
 			$form->addRow(S_PARAMETER, array($textfield, SPACE, $selectbtn));
@@ -574,7 +574,7 @@ require_once('include/js.inc.php');
 			$form->addVar('resourceid',$id);
 			$textfield = new Ctextbox('caption',$caption,60,'yes');
 
-			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name',400,450);");
+			$selectbtn = new CButton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name',400,450);");
 
 			$form->addRow(S_PARAMETER,array($textfield,SPACE,$selectbtn));
 
@@ -738,7 +738,7 @@ require_once('include/js.inc.php');
 			$form->addVar('resourceid',$id);
 
 			$textfield = new Ctextbox('caption',$caption,60,'yes');
-			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=screens2&srcfld1=screenid&srcfld2=name&screenid=".$_REQUEST['screenid']."',800,450);");
+			$selectbtn = new CButton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=screens2&srcfld1=screenid&srcfld2=name&screenid=".$_REQUEST['screenid']."',800,450);");
 
 			$form->addRow(S_PARAMETER,array($textfield,SPACE,$selectbtn));
 		}
@@ -875,7 +875,7 @@ require_once('include/js.inc.php');
 			$form->addRow(S_DYNAMIC_ITEM,	new CCheckBox('dynamic',$dynamic,null,1));
 		}
 
-		$form->addItemToBottomRow(new CButton('save', S_SAVE));
+		$form->addItemToBottomRow(new CSubmit('save', S_SAVE));
 		if(isset($_REQUEST['screenitemid'])){
 			$form->addItemToBottomRow(array(SPACE, new CButtonDelete(null,
 				url_param('form').url_param('screenid').url_param('screenitemid'))));

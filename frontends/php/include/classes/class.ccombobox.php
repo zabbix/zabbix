@@ -26,18 +26,14 @@ class CComboBox extends CTag{
 		parent::__construct('select', 'yes');
 		$this->tag_end = '';
 
-		$this->attributes['id'] = $name;
-		$this->attributes['name'] = $name;
+		$this->setAttribute('id', $name);
+		$this->setAttribute('name', $name);
 
-		$this->attributes['class'] = 'select';
-		$this->attributes['size'] = 1;
+		$this->setAttribute('class', 'input select');
+		$this->setAttribute('size', 1);
 
 		$this->value = $value;
-		$this->setAction($action);
-	}
-
-	public function setAction($value='submit()', $event='onchange'){
-		$this->setAttribute($event,$value);
+		$this->setAttribute('onchange',$action);
 	}
 
 	public function setValue($value=NULL){

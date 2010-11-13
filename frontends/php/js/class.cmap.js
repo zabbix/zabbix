@@ -1569,7 +1569,7 @@ this.selementForm.massEdit.elementtype = e_tr_4;
 this.selementForm.elementtype = e_select_6;
 
 	e_select_6.setAttribute('size',"1");
-	e_select_6.className = "biginput";
+	e_select_6.className = "input";
 	e_select_6.setAttribute('name',"elementtype");
 	e_select_6.setAttribute('id',"elementtype");
 	e_td_5.appendChild(e_select_6);
@@ -1639,7 +1639,7 @@ this.selementForm.label = e_textarea_6;
 	e_textarea_6.setAttribute('cols',"56");
 	e_textarea_6.setAttribute('rows',"4");
 	e_textarea_6.setAttribute('name',"label");
-	e_textarea_6.className = "biginput";
+	e_textarea_6.className = "input";
 	e_td_5.appendChild(e_textarea_6);
 
 // LABEL LOCATION
@@ -1675,7 +1675,7 @@ this.selementForm.massEdit.chkboxLabelLocation = e_input_6
 this.selementForm.label_location = e_select_6;
 
 	e_select_6.setAttribute('size',"1");
-	e_select_6.className = "biginput";
+	e_select_6.className = "input";
 	e_select_6.setAttribute('name',"label_location");
 	e_select_6.setAttribute('id',"label_location");
 	e_td_5.appendChild(e_select_6);
@@ -1740,7 +1740,7 @@ this.selementForm.elementName = e_input_6;
 	e_input_6.setAttribute('size',"56");
 	e_input_6.setAttribute('id',"elementName");
 	e_input_6.setAttribute('name',"elementName");
-	e_input_6.className = "biginput";
+	e_input_6.className = "input";
 	e_td_5.appendChild(e_input_6);
 
 	e_td_5.appendChild(document.createTextNode('  '));
@@ -1786,7 +1786,7 @@ this.selementForm.massEdit.chkboxIconid_off = e_input_6
 	var e_select_6 = document.createElement('select');
 this.selementForm.iconid_off = e_select_6;
 
-	e_select_6.className = "biginput";
+	e_select_6.className = "input";
 	e_select_6.setAttribute('name',"iconid_off");
 	e_select_6.setAttribute('id',"iconid_off");
 	e_td_5.appendChild(e_select_6);
@@ -1865,7 +1865,7 @@ this.selementForm.massEdit.chkboxIconid_on = e_input_6;
 	var e_select_6 = document.createElement('select');
 this.selementForm.iconid_on = e_select_6;
 
-	e_select_6.className = "biginput";
+	e_select_6.className = "input";
 	e_select_6.setAttribute('name',"iconid_on");
 	e_select_6.setAttribute('id',"iconid_on");
 	e_td_5.appendChild(e_select_6);
@@ -1919,7 +1919,7 @@ this.selementForm.massEdit.chkboxIconid_maintenance = e_input_6;
 	var e_select_6 = document.createElement('select');
 this.selementForm.iconid_maintenance = e_select_6;
 
-	e_select_6.className = "biginput";
+	e_select_6.className = "input";
 	e_select_6.setAttribute('name',"iconid_maintenance");
 	e_select_6.setAttribute('id',"iconid_maintenance");
 	e_td_5.appendChild(e_select_6);
@@ -1974,7 +1974,7 @@ this.selementForm.massEdit.chkboxIconid_disabled = e_input_6;
 	var e_select_6 = document.createElement('select');
 this.selementForm.iconid_disabled = e_select_6;
 
-	e_select_6.className = "biginput";
+	e_select_6.className = "input";
 	e_select_6.setAttribute('name',"iconid_disabled");
 	e_select_6.setAttribute('id',"iconid_disabled");
 	e_td_5.appendChild(e_select_6);
@@ -2024,7 +2024,7 @@ this.selementForm.x = e_input_6;
 	e_input_6.setAttribute('size',"5");
 	e_input_6.setAttribute('id',"x");
 	e_input_6.setAttribute('name',"x");
-	e_input_6.className = "biginput";
+	e_input_6.className = "input";
 	e_td_5.appendChild(e_input_6);
 
 // Y
@@ -2055,7 +2055,7 @@ this.selementForm.y = e_input_6;
 	e_input_6.setAttribute('size',"5");
 	e_input_6.setAttribute('id',"y");
 	e_input_6.setAttribute('name',"y");
-	e_input_6.className = "biginput";
+	e_input_6.className = "input";
 	e_td_5.appendChild(e_input_6);
 
 
@@ -2696,7 +2696,7 @@ this.linkForm.linklabel = e_textarea_6;
 	e_textarea_6.setAttribute('rows',"4");
 	e_textarea_6.setAttribute('name',"linklabel");
 	e_textarea_6.setAttribute('id',"linklabel");
-	e_textarea_6.className = "biginput";
+	e_textarea_6.className = "input";
 	e_td_5.appendChild(e_textarea_6);
 
 
@@ -2720,7 +2720,7 @@ this.linkForm.linklabel = e_textarea_6;
 	var e_select_6 = document.createElement('select');
 this.linkForm.selementid1 = e_select_6;
 	e_select_6.setAttribute('size',"1");
-	e_select_6.className = "biginput";
+	e_select_6.className = "input";
 	e_select_6.setAttribute('name',"selementid1");
 	e_select_6.setAttribute('id',"selementid1");
 	e_td_5.appendChild(e_select_6);
@@ -2747,7 +2747,7 @@ this.linkForm.selementid1 = e_select_6;
 	var e_select_6 = document.createElement('select');
 this.linkForm.selementid2 = e_select_6;
 	e_select_6.setAttribute('size',"1");
-	e_select_6.className = "biginput";
+	e_select_6.className = "input";
 	e_select_6.setAttribute('name',"selementid2");
 	e_select_6.setAttribute('id',"selementid2");
 	e_td_5.appendChild(e_select_6);
@@ -2792,7 +2792,7 @@ this.linkForm.linkIndicatorsTable = e_td_5;
 this.linkForm.drawtype = e_select_6;
 
 	e_select_6.setAttribute('size',"1");
-	e_select_6.className = "biginput";
+	e_select_6.className = "input";
 	e_select_6.setAttribute('name',"drawtype");
 	e_select_6.setAttribute('id',"drawtype");
 	e_td_5.appendChild(e_select_6);
@@ -2846,7 +2846,7 @@ this.linkForm.color = e_input_6;
 	e_input_6.setAttribute('size',"7");
 	e_input_6.setAttribute('id',"color");
 	e_input_6.setAttribute('name',"color");
-	e_input_6.className = "biginput";
+	e_input_6.className = "input";
 	e_td_5.appendChild(e_input_6);
 
 
@@ -3170,7 +3170,7 @@ form_link_addLinktrigger: function(linktrigger){
 
 	e_select_10.setAttribute('id',"link_triggers["+triggerid+"][drawtype]");
 	e_select_10.setAttribute('name', 'link_triggers['+triggerid+'][drawtype]');
-	e_select_10.className = 'biginput';
+	e_select_10.className = 'input';
 
 // items
 	var e_option_11 = document.createElement('option');
@@ -3207,7 +3207,7 @@ form_link_addLinktrigger: function(linktrigger){
 	e_input_22.setAttribute('size',"7");
 	e_input_22.setAttribute('id',"link_triggers["+triggerid+"][color]");
 	e_input_22.setAttribute('name',"link_triggers["+triggerid+"][color]");
-	e_input_22.className = "biginput";
+	e_input_22.className = "input";
 	e_td_9.appendChild(e_input_22);
 
 	var e_div_10 = document.createElement('div');

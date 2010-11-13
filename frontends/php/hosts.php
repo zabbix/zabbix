@@ -706,8 +706,8 @@ include_once('include/page_header.php');
 	if(!isset($_REQUEST['form'])){
 // removes form_refresh variable
 		$frmForm->cleanItems();
-		$frmForm->addItem(new CButton('form',S_CREATE_HOST));
-		$frmForm->addItem(new CButton('form', S_IMPORT_HOST));
+		$frmForm->addItem(new CSubmit('form',S_CREATE_HOST));
+		$frmForm->addItem(new CSubmit('form', S_IMPORT_HOST));
 	}
 
 	$hosts_wdgt = new CWidget();
@@ -1025,7 +1025,7 @@ include_once('include/page_header.php');
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
-		$goButton = new CButton('goButton', S_GO);
+		$goButton = new CSubmit('goButton', S_GO);
 		$goButton->setAttribute('id', 'goButton');
 
 		zbx_add_post_js('chkbxRange.pageGoName = "hosts";');

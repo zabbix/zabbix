@@ -172,7 +172,7 @@
 		$cmbConf->addItem('proxies.php',S_PROXIES);
 	$frmForm->addItem($cmbConf);
 	if(!isset($_REQUEST['form'])){
-		$frmForm->addItem(new CButton('form',S_CREATE_PROXY));
+		$frmForm->addItem(new CSubmit('form',S_CREATE_PROXY));
 	}
 	$proxies_wdgt->addPageHeader(S_CONFIGURATION_OF_PROXIES, $frmForm);
 
@@ -272,10 +272,10 @@
 		}
 		$frmHostG->addRow(S_HOSTS,$cmbHosts->Get(S_PROXY.SPACE.S_HOSTS,S_OTHER.SPACE.S_HOSTS));
 
-		$frmHostG->addItemToBottomRow(new CButton('save',S_SAVE));
+		$frmHostG->addItemToBottomRow(new CSubmit('save',S_SAVE));
 		if($_REQUEST['hostid']>0){
 			$frmHostG->addItemToBottomRow(array(
-				SPACE, new CButton('clone',S_CLONE), 
+				SPACE, new CSubmit('clone',S_CLONE), 
 				SPACE, new CButtonDelete(S_DELETE_SELECTED_PROXY_Q, url_param('form').url_param('hostid')),
 				SPACE
 			));
@@ -396,7 +396,7 @@
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
-		$goButton = new CButton('goButton', S_GO.' (0)');
+		$goButton = new CSubmit('goButton', S_GO.' (0)');
 		$goButton->setAttribute('id', 'goButton');
 
 		zbx_add_post_js('chkbxRange.pageGoName = "hosts";');

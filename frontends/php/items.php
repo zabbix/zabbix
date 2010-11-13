@@ -784,7 +784,7 @@ switch($itemType) {
 		$form->addVar('form_hostid', $hostid);
 
 // Config
-	$form->addItem(array(SPACE, new CButton('form', S_CREATE_ITEM)));
+	$form->addItem(array(SPACE, new CSubmit('form', S_CREATE_ITEM)));
 
 	$items_wdgt->addPageHeader(S_CONFIGURATION_OF_ITEMS_BIG, $form);
 //	show_table_header(S_CONFIGURATION_OF_ITEMS_BIG, $form);
@@ -1204,7 +1204,7 @@ switch($itemType) {
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
-		$goButton = new CButton('goButton',S_GO);
+		$goButton = new CSubmit('goButton',S_GO);
 		$goButton->setAttribute('id','goButton');
 
 		zbx_add_post_js('chkbxRange.pageGoName = "group_itemid";');

@@ -372,12 +372,12 @@ sdi($result);
 		//if host is selected
 		if(!isset($_REQUEST['form']) && ($_REQUEST['hostid'] > 0)){
 			//allowing to press button
-			$create_scenario_button = new CButton('form', S_CREATE_SCENARIO);
+			$create_scenario_button = new CSubmit('form', S_CREATE_SCENARIO);
 			$create_scenario_button->setEnabled('yes');
 		}
 		else{
 			//adding additional hint to button
-			$create_scenario_button = new CButton('form', S_CREATE_SCENARIO.' '.S_SELECT_HOST_FIRST);
+			$create_scenario_button = new CSubmit('form', S_CREATE_SCENARIO.' '.S_SELECT_HOST_FIRST);
 			//and disabling it
 			$create_scenario_button->setEnabled('no');
 		}
@@ -574,13 +574,13 @@ sdi($result);
 			(count($steps) > 0) ? array ($tblSteps, BR()) : null ,
 			new CButton('add_step',S_ADD,
 				'return PopUp("popup_httpstep.php?dstfrm='.$form->getName().'");'),
-			(count($steps) > 0) ? new CButton('del_sel_step',S_DELETE_SELECTED) : null
+			(count($steps) > 0) ? new CSubmit('del_sel_step',S_DELETE_SELECTED) : null
 			));
 
-		$form->addItemToBottomRow(new CButton("save",S_SAVE));
+		$form->addItemToBottomRow(new CSubmit("save",S_SAVE));
 		if(isset($_REQUEST["httptestid"])){
 			$form->addItemToBottomRow(SPACE);
-			$form->addItemToBottomRow(new CButton("clone",S_CLONE));
+			$form->addItemToBottomRow(new CSubmit("clone",S_CLONE));
 			$form->addItemToBottomRow(SPACE);
 			$form->addItemToBottomRow(new CButtonDelete(S_DELETE_SCENARIO_Q,
 				url_param("form").url_param("httptestid").url_param('hostid')));
@@ -783,7 +783,7 @@ sdi($result);
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
-		$goButton = new CButton('goButton',S_GO.' (0)');
+		$goButton = new CSubmit('goButton',S_GO.' (0)');
 		$goButton->setAttribute('id','goButton');
 
 		zbx_add_post_js('chkbxRange.pageGoName = "group_httptestid";');

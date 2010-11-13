@@ -219,7 +219,7 @@ include_once('include/page_header.php');
 	$frmForm = new CForm(null, 'get');
 	if(!isset($_REQUEST['form'])){
 		$frmForm->addItem(SPACE);
-		$frmForm->addItem(new CButton('form', S_CREATE_APPLICATION));
+		$frmForm->addItem(new CSubmit('form', S_CREATE_APPLICATION));
 	}
 
 	$app_wdgt->addPageheader(S_CONFIGURATION_OF_APPLICATIONS, $frmForm);
@@ -273,7 +273,7 @@ include_once('include/page_header.php');
 				));
 		}
 
-		$frmApp->addItemToBottomRow(new CButton('save',S_SAVE));
+		$frmApp->addItemToBottomRow(new CSubmit('save',S_SAVE));
 		if(isset($_REQUEST['applicationid'])){
 			$frmApp->addItemToBottomRow(SPACE);
 			$frmApp->addItemToBottomRow(new CButtonDelete(S_DELETE_APPLICATION,
@@ -385,7 +385,7 @@ include_once('include/page_header.php');
 			$goBox->addItem($goOption);
 
 			// goButton name is necessary!!!
-			$goButton = new CButton('goButton',S_GO.' (0)');
+			$goButton = new CSubmit('goButton',S_GO.' (0)');
 			$goButton->setAttribute('id','goButton');
 
 			zbx_add_post_js('chkbxRange.pageGoName = "applications";');

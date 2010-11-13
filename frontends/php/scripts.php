@@ -218,7 +218,7 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 
 		$frmScr->addRow(S_REQUIRED_HOST.SPACE.S_PERMISSIONS_SMALL,$select_acc);
 
-		$frmScr->addItemToBottomRow(new CButton('save',S_SAVE,"javascript: document.getElementById('scripts').action+='?action=1'; "));
+		$frmScr->addItemToBottomRow(new CSubmit('save',S_SAVE,"javascript: document.getElementById('scripts').action+='?action=1'; "));
 		$frmScr->addItemToBottomRow(SPACE);
 
 		if(isset($_REQUEST['scriptid'])) {
@@ -313,7 +313,7 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
-		$goButton = new CButton('goButton',S_GO);
+		$goButton = new CSubmit('goButton',S_GO);
 		$goButton->setAttribute('id','goButton');
 
 		zbx_add_post_js('chkbxRange.pageGoName = "scripts";');
