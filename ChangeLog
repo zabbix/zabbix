@@ -23,6 +23,7 @@ Changes for 1.9.0
 
 Changes for 1.8.4rc3
 
+ - [ZBX-3183] fixed maintenenace permisson issue (KB)
  - [ZBX-3183] added screenname GET parameter support to screens.php (KB)
  - [ZBX-2639] added net.if.total and net.if.list items in the help_items table (Sasha)
  - [ZBX-1600] added support of value mapping for {ITEM.VALUE} macro in notifications (Sasha)
