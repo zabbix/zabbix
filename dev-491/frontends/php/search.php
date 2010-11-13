@@ -104,6 +104,7 @@ include_once('include/page_header.php');
 		),
 		'limit' => $rows_per_page,
 		'select_groups' => API_OUTPUT_EXTEND,
+		'selectInterfaces' => API_OUTPUT_EXTEND,
 		'selectItems' => API_OUTPUT_COUNT,
 		'select_triggers' => API_OUTPUT_COUNT,
 		'select_graphs' => API_OUTPUT_COUNT,
@@ -157,6 +158,11 @@ include_once('include/page_header.php');
 
 	foreach($hosts as $hnum => $host){
 		$hostid = $host['hostid'];
+
+		$interface = reset($host['interfaces']);
+		$host['ip'] = $interface['ip'];
+		$host['dns'] = $interface['dns'];
+		$host['port'] = $interface['port'];
 
 		switch($host['status']){
 			case HOST_STATUS_NOT_MONITORED:
