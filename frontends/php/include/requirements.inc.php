@@ -461,6 +461,23 @@
 			
 	}
 
+
+	function check_php_gettext() {
+		$current = function_exists('_');
+
+		$req = $current ? 1 : 0;
+
+		return array(
+			'name' => S_PHP_GETTEXT,
+			'current' => $req ? S_YES_SMALL : S_NO_SMALL,
+			'required' => null,
+			'recommended' => null,
+			'result' => $req,
+			'error' => S_REQUIRED_GETTEXT_MODULE.'['.S_CONFIGURE_PHP_WITH_SMALL.SPACE.'--enable-gettext]'
+			);
+
+	}
+
 	function check_php_requirements(){
 		$result = array();
 
@@ -477,10 +494,11 @@
 		$result[] = check_php_sockets();
 		$result[] = check_php_session();
 		$result[] = check_php_gd();
+		$result[] = check_php_gettext();
 		$result[] = check_php_gd_png();
 		$result[] = check_php_xml();
 		$result[] = check_php_ctype();
-
+		
 		return $result;
 	}
 

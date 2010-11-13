@@ -373,13 +373,30 @@
 		}
 
 
-
+		//prepaitring the list of possible interface languages
 		$cmbLang = new CComboBox('lang',$lang);
+		$languages_unable_set = 0;
 		foreach($ZBX_LOCALES as $loc_id => $loc_name){
-			$cmbLang->addItem($loc_id,$loc_name);
+			//checking if this locale exists in the system. The only way of doing it is to try and set one
+			if(setlocale(LC_ALL, zbx_locale_variants($loc_id))){
+				$locale_exists = 'yes';
+				$languages_unable_set++;
+			}
+			else {
+				$locale_exists = 'no';
+			}
+			$selected = $loc_id == $USER_DETAILS['lang'] ? true : null;
+			$cmbLang->addItem($loc_id, $loc_name, $selected, $locale_exists);
+
 		}
+		//restoring original locale
+		setlocale(LC_ALL, zbx_locale_variants($USER_DETAILS['lang']));
 
 		$frmUser->addRow(S_LANGUAGE, $cmbLang);
+		//if some languages can't be set, showing a warning about that
+		if ($languages_unable_set > 0) {
+			$frmUser->addRow('', _('*you are not able to choose some of the languages, because locales for them are not installed on the web server.'));
+		}
 
 		$cmbTheme = new CComboBox('theme',$theme);
 			$cmbTheme->addItem(ZBX_DEFAULT_CSS,S_SYSTEM_DEFAULT);

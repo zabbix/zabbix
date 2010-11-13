@@ -1,0 +1,2341 @@
+"Project-Id-Version: Zabbix 1.9\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-11-10 16:17+0300\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Konstantin <konstantin.buravcov@zabbix.com>\n"
+"Language-Team: Zabbix <info@zabbix.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#:
+msgid "d M Y H:i:s"
+msgstr "d M H:i:s"
+
+#:
+msgid "d M Y"
+msgstr "d M Y"
+
+#:
+msgid "UTF-8"
+msgstr "UTF-8"
+
+#:
+msgid "Create rule"
+msgstr "Creër Regel"
+
+#:
+msgid "Acknowledges"
+msgstr "Herkenningen"
+
+#:
+msgid "Acknowledge"
+msgstr "Herkenning"
+
+#:
+msgid "Acknowledge alarm by"
+msgstr "Bevesting Herkenning"
+
+#:
+msgid "Add comment by"
+msgstr "Voeg opmerking toe"
+
+#:
+msgid "ALARM ACKNOWLEDGES"
+msgstr "ALARM HERKENNINGEN"
+
+#:
+msgid "Configuration of actions"
+msgstr "Configuratie van acties"
+
+#:
+msgid "CONFIGURATION OF ACTIONS"
+msgstr "CONFIGURATIE VAN ACTIES"
+
+#:
+msgid "Send message"
+msgstr "Verzend bericht"
+
+#:
+msgid "Remote command"
+msgstr "Remote commando"
+
+#:
+msgid "Filter"
+msgstr "Filter"
+
+#:
+msgid "Trigger severity"
+msgstr "Trekker ernstheid"
+
+#:
+msgid "Trigger value"
+msgstr "Trekker waarde"
+
+#:
+msgid "Time period"
+msgstr "Tijd periode"
+
+#:
+msgid "Trigger description"
+msgstr "Trekker omschrijving"
+
+#:
+msgid "Conditions"
+msgstr "Condities"
+
+#:
+msgid "Condition"
+msgstr "Condities"
+
+#:
+msgid "No conditions defined"
+msgstr "Geen condities gedefineerd"
+
+#:
+msgid "Actions deleted"
+msgstr "Acties verwijderd"
+
+#:
+msgid "Cannot delete actions"
+msgstr "Kan acties niet verwijderen"
+
+#:
+msgid "Actions"
+msgstr "Acties"
+
+#:
+msgid "ACTIONS"
+msgstr "ACTIES"
+
+#:
+msgid "Action added"
+msgstr "Actie toegevoegd"
+
+#:
+msgid "Cannot add action"
+msgstr "kan actie niet toevoegen"
+
+#:
+msgid "Action updated"
+msgstr "Actie bijgewerkt"
+
+#:
+msgid "Cannot update action"
+msgstr "Kan actie niet bijwerken"
+
+#:
+msgid "Action deleted"
+msgstr "Actie verwijderd"
+
+#:
+msgid "Cannot delete action"
+msgstr "Kan actie niet verwijderen"
+
+#:
+msgid "Send message to"
+msgstr "Verzend bericht aan"
+
+#:
+msgid "Delay"
+msgstr "Vertraging"
+
+#:
+msgid "Subject"
+msgstr "Onderwerp"
+
+#:
+msgid "Message"
+msgstr "Bericht"
+
+#:
+msgid "On"
+msgstr "AAN"
+
+#:
+msgid "Off"
+msgstr "UIT"
+
+#:
+msgid "No actions defined"
+msgstr "Geen acties gedefineerd"
+
+#:
+msgid "Single user"
+msgstr "Enkele gebruiker"
+
+#:
+msgid "User group"
+msgstr "Gebruikers groep"
+
+#:
+msgid "Group"
+msgstr "Groep"
+
+#:
+msgid "User"
+msgstr "Gebruiker"
+
+#:
+msgid "Not classified"
+msgstr "Niet geclassificeerd"
+
+#:
+msgid "Information"
+msgstr "Informatie"
+
+#:
+msgid "Warning"
+msgstr "Waarschuwing"
+
+#:
+msgid "Average"
+msgstr "Gemiddelde"
+
+#:
+msgid "High"
+msgstr "Hoog"
+
+#:
+msgid "Disaster"
+msgstr "Catastrofe"
+
+#:
+msgid "Create Action"
+msgstr "Maak een actie"
+
+#:
+msgid "Show all"
+msgstr "Toon alles"
+
+#:
+msgid "Time"
+msgstr "Tijd"
+
+#:
+msgid "Status"
+msgstr "Status"
+
+#:
+msgid "Duration"
+msgstr "Duur"
+
+#:
+msgid "TRUE"
+msgstr "WAAR"
+
+#:
+msgid "FALSE"
+msgstr "ONWAAR"
+
+#:
+msgid "UNKNOWN"
+msgstr "ONBEKEND"
+
+#:
+msgid "Type"
+msgstr "Type"
+
+#:
+msgid "Recipient(s)"
+msgstr "Ontvanger(s)"
+
+#:
+msgid "Error"
+msgstr "Fout"
+
+#:
+msgid "sent"
+msgstr "Verzonden"
+
+#:
+msgid "not sent"
+msgstr "Niet verzonden"
+
+#:
+msgid "No actions found"
+msgstr "Geen acties gedefineerd"
+
+#:
+msgid "Custom graphs"
+msgstr "Speciale grafieken"
+
+#:
+msgid "GRAPHS"
+msgstr "GRAFIEKEN"
+
+#:
+msgid "Select graph to display"
+msgstr "Selecteer een grafiek om weer te geven"
+
+#:
+msgid "Period"
+msgstr "Periode"
+
+#:
+msgid "Select graph..."
+msgstr "Selecteer een grafiek..."
+
+#:
+msgid "Cannot update value map"
+msgstr "Kan map waarde niet bijwerken"
+
+#:
+msgid "Value map added"
+msgstr "Waarde aan map toegevoegd"
+
+#:
+msgid "Cannot add value map"
+msgstr "Kan niet map waarde bijwerken"
+
+#:
+msgid "Value map deleted"
+msgstr "Map waarde verwijderd"
+
+#:
+msgid "Cannot delete value map"
+msgstr "Kan niet map waarde verwijderen"
+
+#:
+msgid "Value map updated"
+msgstr "Map waarde bijgewerkt"
+
+#:
+msgid "VALUE MAPPING"
+msgstr "WAARDE AFBEELDING"
+
+#:
+msgid "Value mapping"
+msgstr "Waarde afbeeldingen"
+
+#:
+msgid "Value map"
+msgstr "Waarde afbeelding"
+
+#:
+msgid "Mapping"
+msgstr "Afbeelding"
+
+#:
+msgid "New mapping"
+msgstr "Nieuwe afbeelding"
+
+#:
+msgid "No mapping defined"
+msgstr "Geen afbeelding gedefineerd"
+
+#:
+msgid "Create value map"
+msgstr "Maak waarde afbeelding"
+
+#:
+msgid "Configuration of Zabbix"
+msgstr "Configuratie van ZABBIX"
+
+#:
+msgid "CONFIGURATION OF ZABBIX"
+msgstr "CONFIGURATIE VAN ZABBIX"
+
+#:
+msgid "Configuration updated"
+msgstr "Configuratie bijgewerkt"
+
+#:
+msgid "Configuration was not updated"
+msgstr "Configuratie was niet bijgewerkt"
+
+#:
+msgid "Added new media type"
+msgstr "Nieuw media type toegevoegd"
+
+#:
+msgid "New media type was not added"
+msgstr "Nieuw media type was niet toegevoegd"
+
+#:
+msgid "Media type updated"
+msgstr "Media type bijgewerkt"
+
+#:
+msgid "Media type was not updated"
+msgstr "Media type was niet bijgewerkt"
+
+#:
+msgid "Media type deleted"
+msgstr "Media type verwijderd"
+
+#:
+msgid "Media type was not deleted"
+msgstr "Media type was niet verwijderd"
+
+#:
+msgid "Configuration"
+msgstr "Configuratie"
+
+#:
+msgid "Do not keep actions older than (in days)"
+msgstr "Bewaar geen acties ouder dan (in dagen)"
+
+#:
+msgid "Do not keep events older than (in days)"
+msgstr "Bewaar geen gebeurtenissen ouder dan (in dagen)"
+
+#:
+msgid "No media types defined"
+msgstr "Geen media types gedefineerd"
+
+#:
+msgid "SMTP server"
+msgstr "SMTP Server"
+
+#:
+msgid "SMTP helo"
+msgstr "SMTP Groet"
+
+#:
+msgid "SMTP email"
+msgstr "SMTP Email"
+
+#:
+msgid "Script name"
+msgstr "Script naam"
+
+#:
+msgid "Delete selected media?"
+msgstr "Verwijder geselecteerde media?"
+
+#:
+msgid "Delete selected image?"
+msgstr "Verwijder geselecteerde afbeelding?"
+
+#:
+msgid "Housekeeper"
+msgstr "Huishoudster"
+
+#:
+msgid "Media types"
+msgstr "Media types"
+
+#:
+msgid "Escalation rules"
+msgstr "Escalatie regels"
+
+#:
+msgid "Escalation"
+msgstr "Escalatie"
+
+#:
+msgid "Escalation rule"
+msgstr "Escalatie regel"
+
+#:
+msgid "Default"
+msgstr "Standaard"
+
+#:
+msgid "Images"
+msgstr "Afbeeldingen"
+
+#:
+msgid "Image"
+msgstr "Afbeelding"
+
+#:
+msgid "IMAGES"
+msgstr "AFBEELDINGEN"
+
+#:
+msgid "Icon"
+msgstr "Icoon"
+
+#:
+msgid "No images defined"
+msgstr "Geen afbeelding gedefineerd"
+
+#:
+msgid "Background"
+msgstr "Achtergrond"
+
+#:
+msgid "Upload"
+msgstr "Upload"
+
+#:
+msgid "Image added"
+msgstr "Afbeelding toegevoegd"
+
+#:
+msgid "Cannot add image"
+msgstr "Kan afbeelding niet toevoegen"
+
+#:
+msgid "Image deleted"
+msgstr "Afbeelding verwijderd"
+
+#:
+msgid "Cannot delete image"
+msgstr "Kan niet afbeelding verwijderen"
+
+#:
+msgid "Image updated"
+msgstr "Afbeelding bijgewerkt"
+
+#:
+msgid "Cannot update image"
+msgstr "Kan niet afbeelding bijwerken"
+
+#:
+msgid "Other"
+msgstr "Anders"
+
+#:
+msgid "Other parameters"
+msgstr "Andere parameters"
+
+#:
+msgid "Refresh unsupported items (in sec)"
+msgstr "Vernieuw niet ondersteunde items (in sec)"
+
+#:
+msgid "Create Media Type"
+msgstr "Creër Media Type"
+
+#:
+msgid "Create Image"
+msgstr "Creër Afbeelding"
+
+#:
+msgid "Working time"
+msgstr "Werk tijd"
+
+#:
+msgid "Expression"
+msgstr "Expressie"
+
+#:
+msgid "No permissions !"
+msgstr "Geen toegang !"
+
+#:
+msgid "LATEST DATA"
+msgstr "LAATSTE DATA"
+
+#:
+msgid "all"
+msgstr "alle"
+
+#:
+msgid "- all -"
+msgstr "- alle -"
+
+#:
+msgid "- other -"
+msgstr "- andere -"
+
+#:
+msgid "Graph"
+msgstr "Grafiek"
+
+#:
+msgid "Connected as"
+msgstr "Verbonden als"
+
+#:
+msgid "Item added"
+msgstr "Item toegevoegd"
+
+#:
+msgid "Item updated"
+msgstr "Item bijgewerkt"
+
+#:
+msgid "Parameter"
+msgstr "Parameter"
+
+#:
+msgid "Colour"
+msgstr "Kleur"
+
+#:
+msgid "Up"
+msgstr "Omhoog"
+
+#:
+msgid "Down"
+msgstr "Omlaag"
+
+#:
+msgid "New item for the graph"
+msgstr "Nieuw item voor de grafiek"
+
+#:
+msgid "Sort order (0->100)"
+msgstr "Sorteer orde (0->100)"
+
+#:
+msgid "Y axis side"
+msgstr "Y lijn zijde"
+
+#:
+msgid "Left"
+msgstr "Links"
+
+#:
+msgid "Function"
+msgstr "Functie"
+
+#:
+msgid "min"
+msgstr "min"
+
+#:
+msgid "avg"
+msgstr "gmd"
+
+#:
+msgid "max"
+msgstr "max"
+
+#:
+msgid "Draw style"
+msgstr "Afbeelding stijl"
+
+#:
+msgid "Simple"
+msgstr "Simpel"
+
+#:
+msgid "Aggregated"
+msgstr "Aggregatie"
+
+#:
+msgid "Aggregated periods count"
+msgstr "Aggregatie periode telling"
+
+#:
+msgid "Configuration of graphs"
+msgstr "Configuratie van grafieken"
+
+#:
+msgid "CONFIGURATION OF GRAPHS"
+msgstr "CONFIGURATIE VAN GRAFIEKEN"
+
+#:
+msgid "Graph added"
+msgstr "Grafiek toegevoegd"
+
+#:
+msgid "Graph updated"
+msgstr "Grafiek bijgewerkt"
+
+#:
+msgid "Cannot update graph"
+msgstr "Kan grafiek niet bijwerken"
+
+#:
+msgid "Graph deleted"
+msgstr "Grafiek verwijderd"
+
+#:
+msgid "Cannot delete graph"
+msgstr "Kan grafiek niet verwijderen"
+
+#:
+msgid "Cannot add graph"
+msgstr "Kan grefiek niet toevoegen"
+
+#:
+msgid "Id"
+msgstr "Id"
+
+#:
+msgid "No graphs defined"
+msgstr "Geen grafieken gedefineerd"
+
+#:
+msgid "Delete graph?"
+msgstr "Verwijder grafiek?"
+
+#:
+msgid "Y axis MIN value"
+msgstr "Y lijn MIN waarde"
+
+#:
+msgid "Y axis MAX value"
+msgstr "Y lijn MAX waarde"
+
+#:
+msgid "Calculated"
+msgstr "Gecalculeerd"
+
+#:
+msgid "Fixed"
+msgstr "Statisch"
+
+#:
+msgid "Create Graph"
+msgstr "Creër Grafiek"
+
+#:
+msgid "Show working time"
+msgstr "Toon werk tijden"
+
+#:
+msgid "Show triggers"
+msgstr "Toon Trekkers"
+
+#:
+msgid "Last hour graph"
+msgstr "Laatste uur grafiek"
+
+#:
+msgid "500 latest values"
+msgstr "500 laatste waardes"
+
+#:
+msgid "Timestamp"
+msgstr "Tijdsstempel"
+
+#:
+msgid "Local"
+msgstr "Lokaal"
+
+#:
+msgid "Source"
+msgstr "Bron"
+
+#:
+msgid "Show selected"
+msgstr "Toon geselecteerde"
+
+#:
+msgid "Hide selected"
+msgstr "Verberg geselecteerde"
+
+#:
+msgid "Mark selected"
+msgstr "Markeer geselecteerde"
+
+#:
+msgid "Mark others"
+msgstr "Markeer andere"
+
+#:
+msgid "as Red"
+msgstr "als Rood"
+
+#:
+msgid "as Green"
+msgstr "als Groen"
+
+#:
+msgid "as Blue"
+msgstr "als Blauw"
+
+#:
+msgid "Application"
+msgstr "Applicatie"
+
+#:
+msgid "Applications"
+msgstr "Applicaties"
+
+#:
+msgid "APPLICATIONS"
+msgstr "APPLICATIES"
+
+#:
+msgid "Create application"
+msgstr "Creër applicatie"
+
+#:
+msgid "Application updated"
+msgstr "Applicatie bijgewerkt"
+
+#:
+msgid "Cannot update application"
+msgstr "Kan applicatie niet bijwerken"
+
+#:
+msgid "Application added"
+msgstr "Applicatie toegevoegd"
+
+#:
+msgid "Cannot add application"
+msgstr "Kan applicatie niet toevoegen"
+
+#:
+msgid "Application deleted"
+msgstr "Applicatie verwijderd"
+
+#:
+msgid "Cannot delete application"
+msgstr "Kan applicatie niet verwijderen"
+
+#:
+msgid "Hosts"
+msgstr "Gastheren"
+
+#:
+msgid "Items"
+msgstr "Items"
+
+#:
+msgid "ITEMS"
+msgstr "ITEMS"
+
+#:
+msgid "Triggers"
+msgstr "Trekkers"
+
+#:
+msgid "Graphs"
+msgstr "Grafieken"
+
+#:
+msgid "Host added"
+msgstr "Gastheer toegevoegd"
+
+#:
+msgid "Cannot add host"
+msgstr "kan gastheer niet toevoegen"
+
+#:
+msgid "Host updated"
+msgstr "Gastheer bijgewerkt"
+
+#:
+msgid "Cannot update host"
+msgstr "kan gastheer niet bijwerken"
+
+#:
+msgid "Host status updated"
+msgstr "Gastheer status bijgewerkt"
+
+#:
+msgid "Cannot update host status"
+msgstr "Kan gastheer status niet bijwerken"
+
+#:
+msgid "Host deleted"
+msgstr "Gastheer verwijderd"
+
+#:
+msgid "Cannot delete host"
+msgstr "Kan gastheer niet verwijderen"
+
+#:
+msgid "HOST GROUPS"
+msgstr "GASTHEER GROEPEN"
+
+#:
+msgid "No host groups defined"
+msgstr "Geen gastheer groepen gedefineerd"
+
+#:
+msgid "No hosts defined"
+msgstr "Geen gastheren gedefineerd"
+
+#:
+msgid "HOSTS"
+msgstr "GASTHEREN"
+
+#:
+msgid "Host"
+msgstr "Gastheer"
+
+#:
+msgid "IP"
+msgstr "IP"
+
+#:
+msgid "Port"
+msgstr "Poort"
+
+#:
+msgid "Monitored"
+msgstr "Gemonitord"
+
+#:
+msgid "Not monitored"
+msgstr "Niet gemonitord"
+
+#:
+msgid "Template"
+msgstr "Sjabloon"
+
+#:
+msgid "Deleted"
+msgstr "Verwijderd"
+
+#:
+msgid "Unknown"
+msgstr "Onbekend"
+
+#:
+msgid "Groups"
+msgstr "Groepen"
+
+#:
+msgid "New group"
+msgstr "Nieuwe groep"
+
+#:
+msgid "IP address"
+msgstr "IP adres"
+
+#:
+msgid "Use profile"
+msgstr "Gebruik Profiel"
+
+#:
+msgid "Delete selected host?"
+msgstr "Verwijder geselecteerde gastheer?"
+
+#:
+msgid "Group name"
+msgstr "Groep naam"
+
+#:
+msgid "Host group"
+msgstr "Gastheer groep"
+
+#:
+msgid "Host groups"
+msgstr "Gastheer groepen"
+
+#:
+msgid "Update"
+msgstr "Bijwerken"
+
+#:
+msgid "Availability"
+msgstr "Beschikbaarheid"
+
+#:
+msgid "Available"
+msgstr "Beschikbaar"
+
+#:
+msgid "Not available"
+msgstr "Niet beschikbaar"
+
+#:
+msgid "Delete selected hosts?"
+msgstr "Verwijder geselecteerde gastheren?"
+
+#:
+msgid "Link with template"
+msgstr "Verbind met Sjabloon"
+
+#:
+msgid "Host profile"
+msgstr "Gastheer profiel"
+
+#:
+msgid "Device type"
+msgstr "Apparaat type"
+
+#:
+msgid "OS"
+msgstr "Besturingssysteem"
+
+#:
+msgid "SerialNo"
+msgstr "Serienummer"
+
+#:
+msgid "Tag"
+msgstr "Etiket"
+
+#:
+msgid "Hardware"
+msgstr "Hardware"
+
+#:
+msgid "Software"
+msgstr "Software"
+
+#:
+msgid "Contact"
+msgstr "Contact"
+
+#:
+msgid "Location"
+msgstr "Locatie"
+
+#:
+msgid "Notes"
+msgstr "Opmerkingen"
+
+#:
+msgid "MAC Address"
+msgstr "MAC Adres"
+
+#:
+msgid "Add to group"
+msgstr "Toevoegen aan groep"
+
+#:
+msgid "Delete from group"
+msgstr "Verwijder in groep"
+
+#:
+msgid "Update in group"
+msgstr "Bijwerken in groep"
+
+#:
+msgid "Create Host"
+msgstr "Creër Gastheer"
+
+#:
+msgid "Create Template"
+msgstr "Creër Sjabloon"
+
+#:
+msgid "Template linkage"
+msgstr "Sjabloon verbindingen"
+
+#:
+msgid "Templates"
+msgstr "Sjablonen"
+
+#:
+msgid "TEMPLATES"
+msgstr "SJABLONEN"
+
+#:
+msgid "No items defined"
+msgstr "Geen items gedefineerd"
+
+#:
+msgid "History cleared"
+msgstr "Geschiedenis opgeschoond"
+
+#:
+msgid "Cannot clear history"
+msgstr "Kan geschiedenis niet opschonen"
+
+#:
+msgid "Configuration of items"
+msgstr "Configuratie van items"
+
+#:
+msgid "CONFIGURATION OF ITEMS"
+msgstr "CONFIGURATIE VAN ITEMS"
+
+#:
+msgid "Cannot update item"
+msgstr "Kan item niet bijwerken"
+
+#:
+msgid "Status updated"
+msgstr "Status bijgewerkt"
+
+#:
+msgid "Cannot update status"
+msgstr "kan status niet bijwerken"
+
+#:
+msgid "Cannot add item"
+msgstr "Kan item niet toevoegen"
+
+#:
+msgid "Item deleted"
+msgstr "Item verwijderd"
+
+#:
+msgid "Cannot delete item"
+msgstr "Kan item niet verwijderen"
+
+#:
+msgid "Items deleted"
+msgstr "Items verwijderd"
+
+#:
+msgid "Cannot delete items"
+msgstr "Kan items niet verwijderen"
+
+#:
+msgid "Items activated"
+msgstr "Items geactiveerd"
+
+#:
+msgid "Items disabled"
+msgstr "Items gedeactiveerd"
+
+#:
+msgid "Key"
+msgstr "Sleutel"
+
+#:
+msgid "Description"
+msgstr "Omschrijving"
+
+#:
+msgid "Update interval"
+msgstr "Bijwerk interval"
+
+#:
+msgid "History"
+msgstr "Geschiedenis"
+
+#:
+msgid "Trends"
+msgstr "Trends"
+
+#:
+msgid "Zabbix agent"
+msgstr "ZABBIX agent"
+
+#:
+msgid "Zabbix agent (active)"
+msgstr "ZABBIX agent (actief)"
+
+#:
+msgid "SNMPv1 agent"
+msgstr "SNMPv1 agent"
+
+#:
+msgid "Zabbix trapper"
+msgstr "ZABBIX trapper"
+
+#:
+msgid "Simple check"
+msgstr "Simple check"
+
+#:
+msgid "SNMPv2 agent"
+msgstr "SNMPv2 agent"
+
+#:
+msgid "SNMPv3 agent"
+msgstr "SNMPv3 agent"
+
+#:
+msgid "Zabbix internal"
+msgstr "ZABBIX intern"
+
+#:
+msgid "Zabbix aggregate"
+msgstr "ZABBIX gezamenlijk"
+
+#:
+msgid "Active"
+msgstr "Actief"
+
+#:
+msgid "Not supported"
+msgstr "Niet ondersteund"
+
+#:
+msgid "Email"
+msgstr "Email"
+
+#:
+msgid "SMS"
+msgstr "SMS"
+
+#:
+msgid "Script"
+msgstr "Script"
+
+#:
+msgid "GSM modem"
+msgstr "GSM modem"
+
+#:
+msgid "Units"
+msgstr "Eenheden"
+
+#:
+msgid "Update interval (in sec)"
+msgstr "Bijwerk interval (in sec)"
+
+#:
+msgid "Keep history (in days)"
+msgstr "Bewaar geschiedenis (in dagen)"
+
+#:
+msgid "Keep trends (in days)"
+msgstr "Bewaar trends (in dagen)"
+
+#:
+msgid "Type of information"
+msgstr "Type informatie"
+
+#:
+msgid "Store value"
+msgstr "Bewaar waarde"
+
+#:
+msgid "Show value"
+msgstr "Toon waarde"
+
+#:
+msgid "Numeric (unsigned)"
+msgstr "Numeriek (integer 64bit)"
+
+#:
+msgid "Numeric (float)"
+msgstr "Numeriek (zwevend)"
+
+#:
+msgid "Character"
+msgstr "Karakter"
+
+#:
+msgid "Log"
+msgstr "Log"
+
+#:
+msgid "Text"
+msgstr "Tekst"
+
+#:
+msgid "As is"
+msgstr "Als is"
+
+#:
+msgid "Delta (speed per second)"
+msgstr "Delta (snelheid per seconden)"
+
+#:
+msgid "Delta (simple change)"
+msgstr "Delta (simpele verandering)"
+
+#:
+msgid "Item"
+msgstr "Item"
+
+#:
+msgid "SNMP community"
+msgstr "SNMP gemeenschap"
+
+#:
+msgid "SNMP OID"
+msgstr "SNMP OID"
+
+#:
+msgid "SNMP port"
+msgstr "SNMP poort"
+
+#:
+msgid "Allowed hosts"
+msgstr "Toegestane gastheren"
+
+#:
+msgid "SNMPv3 security name"
+msgstr "SNMPv3 Beveiligings naam"
+
+#:
+msgid "SNMPv3 security level"
+msgstr "SNMPv3 Beveiligings nivo"
+
+#:
+msgid "SNMPv3 auth passphrase"
+msgstr "SNMPv3 auth inhaalfase"
+
+#:
+msgid "SNMPv3 priv passphrase"
+msgstr "SNMPv3 rechten inhaalfase"
+
+#:
+msgid "Custom multiplier"
+msgstr "Aangepaste vermenigvuldiging"
+
+#:
+msgid "Select host..."
+msgstr "Selecteer gastheer..."
+
+#:
+msgid "Log time format"
+msgstr "Log tijd formaat"
+
+#:
+msgid "Create Item"
+msgstr "Creër Item"
+
+#:
+msgid "Latest events"
+msgstr "Laatste gebeurtenissen"
+
+#:
+msgid "HISTORY OF EVENTS"
+msgstr "GESCHIEDENIS VAN GEBEURTENISSEN"
+
+#:
+msgid "No events found"
+msgstr "Geen gebeurtenissen gevonden"
+
+#:
+msgid "Last check"
+msgstr "Laatste controle"
+
+#:
+msgid "Last value"
+msgstr "Laatste waardes"
+
+#:
+msgid "Link"
+msgstr "Link"
+
+#:
+msgid "Label"
+msgstr "Label"
+
+#:
+msgid "X"
+msgstr "X"
+
+#:
+msgid "Link status indicator"
+msgstr "Link status indicator"
+
+#:
+msgid "Configuration of network maps"
+msgstr "CONFIGURATIE VAN NETWERK MAPPEN"
+
+#:
+msgid "MAPS"
+msgstr "MAPPEN"
+
+#:
+msgid "No maps defined"
+msgstr "Geen mappen No maps gedefineerd"
+
+#:
+msgid "Create Map"
+msgstr "Creër Map"
+
+#:
+msgid "Icon label location"
+msgstr "Icoon label locatie"
+
+#:
+msgid "Bottom"
+msgstr "onder"
+
+#:
+msgid "Top"
+msgstr "boven"
+
+#:
+msgid "OK"
+msgstr "OK"
+
+#:
+msgid "http://www.zabbix.com"
+msgstr "http://www.zabbix.com"
+
+#:
+msgid "Network maps"
+msgstr "Netwerk mappen"
+
+#:
+msgid "NETWORK MAPS"
+msgstr "NETWERK MAPPEN"
+
+#:
+msgid "Background image"
+msgstr "Achtergrond afbeelding"
+
+#:
+msgid "Icon label type"
+msgstr "Icoon label type"
+
+#:
+msgid "Label location"
+msgstr "Label locatie"
+
+#:
+msgid "Element name"
+msgstr "Element naam"
+
+#:
+msgid "Status only"
+msgstr "Status alleen"
+
+#:
+msgid "Nothing"
+msgstr "Niets"
+
+#:
+msgid "Media"
+msgstr "Media"
+
+#:
+msgid "Send to"
+msgstr "Verzend aan"
+
+#:
+msgid "When active"
+msgstr "Wanneer actief"
+
+#:
+msgid "No media defined"
+msgstr "Geen media gedefineerd"
+
+#:
+msgid "New media"
+msgstr "Nieuw media"
+
+#:
+msgid "Use if severity"
+msgstr "Gebruiks als ernstheid"
+
+#:
+msgid "Save"
+msgstr "Bewaar"
+
+#:
+msgid "Cancel"
+msgstr "Annuleer"
+
+#:
+msgid "Overview"
+msgstr "Overzicht"
+
+#:
+msgid "OVERVIEW"
+msgstr "OVERZICHT"
+
+#:
+msgid "Data"
+msgstr "Data"
+
+#:
+msgid "QUEUE"
+msgstr "WACHTRIJ"
+
+#:
+msgid "QUEUE OF ITEMS TO BE UPDATED"
+msgstr "WACHTRIJ VAN ITEMS OM BIJGEWERKT TE WORDEN"
+
+#:
+msgid "Next check"
+msgstr "Volgende controle"
+
+#:
+msgid "The queue is empty"
+msgstr "De wachtrij is leeg"
+
+#:
+msgid "Total"
+msgstr "Totaal"
+
+#:
+msgid "Count"
+msgstr "Telling"
+
+#:
+msgid "5 seconds"
+msgstr "5 seconden"
+
+#:
+msgid "10 seconds"
+msgstr "10 seconden"
+
+#:
+msgid "30 seconds"
+msgstr "30 seconden"
+
+#:
+msgid "1 minute"
+msgstr "1 minuut"
+
+#:
+msgid "5 minutes"
+msgstr "5 minuten"
+
+#:
+msgid "Status of Zabbix"
+msgstr "Status van ZABBIX"
+
+#:
+msgid "STATUS OF ZABBIX"
+msgstr "STATUS van ZABBIX"
+
+#:
+msgid "Value"
+msgstr "Waarde"
+
+#:
+msgid "Zabbix server is running"
+msgstr "Zabbix Server Actief"
+
+#:
+msgid "Values stored"
+msgstr "Waardes Opgeslagen"
+
+#:
+msgid "Trends stored"
+msgstr "Trends Opgeslagen"
+
+#:
+msgid "Number of triggers (enabled/disabled)[problem/unknown/ok]"
+msgstr "Aantal Trekkers (geactiveerd/gedeactiveerd)[problemen/onbekend/ok]"
+
+#:
+msgid "Triggers (e/d)[p/u/o]"
+msgstr "Trekkers (e/d)[p/o/ok]"
+
+#:
+msgid "Number of items (monitored/disabled/not supported)"
+msgstr "Aantal Items (gemonitord/gedeactiveerd/niet ondersteund)"
+
+#:
+msgid "Items (m/d/n)"
+msgstr "Items (m/d/n)"
+
+#:
+msgid "Number of users (online)"
+msgstr "Aantal Gebruikers (online)"
+
+#:
+msgid "Users (online)"
+msgstr "Gebruikers (online)"
+
+#:
+msgid "Number of hosts (monitored/not monitored/templates)"
+msgstr "Aantal Gastheren (gemonitord/niet gemonitord/sjablonen)"
+
+#:
+msgid "Hosts (m/n/t)"
+msgstr "Gastheren (m/n/t)"
+
+#:
+msgid "Yes"
+msgstr "Ja"
+
+#:
+msgid "No"
+msgstr "Nee"
+
+#:
+msgid "running"
+msgstr "Lopende"
+
+#:
+msgid "not running"
+msgstr "Niet lopende"
+
+#:
+msgid "Availability report"
+msgstr "Beschikbaarheids report"
+
+#:
+msgid "AVAILABILITY REPORT"
+msgstr "BESCHIKBAARHEIDS REPORT"
+
+#:
+msgid "Show"
+msgstr "Toon"
+
+#:
+msgid "IT SERVICES AVAILABILITY REPORT"
+msgstr "IT DIENSTEN BESCHIKBAARHEIDS REPORT"
+
+#:
+msgid "From"
+msgstr "Van"
+
+#:
+msgid "Till"
+msgstr "Tot"
+
+#:
+msgid "Ok"
+msgstr "Ok"
+
+#:
+msgid "Problems"
+msgstr "Problemen"
+
+#:
+msgid "Percentage"
+msgstr "Percentage"
+
+#:
+msgid "SLA"
+msgstr "SLA"
+
+#:
+msgid "Day"
+msgstr "Dag"
+
+#:
+msgid "Month"
+msgstr "Maand"
+
+#:
+msgid "Year"
+msgstr "Jaar"
+
+#:
+msgid "Daily"
+msgstr "Dagelijks"
+
+#:
+msgid "Weekly"
+msgstr "Wekelijks"
+
+#:
+msgid "Monthly"
+msgstr "Maandelijks"
+
+#:
+msgid "Yearly"
+msgstr "Jaarlijks"
+
+#:
+msgid "Notifications"
+msgstr "Notificaties"
+
+#:
+msgid "NOTIFICATIONS"
+msgstr "NOTIFICATIES"
+
+#:
+msgid "Notification report"
+msgstr "Notificaties report"
+
+#:
+msgid "Most busy triggers top 100"
+msgstr "Meest actieve trekkers top 100"
+
+#:
+msgid "MOST BUSY TRIGGERS TOP 100"
+msgstr "MEEST ACTIVE TREKKERS TOP 100"
+
+#:
+msgid "Number of status changes"
+msgstr "Aantal keren veranderd"
+
+#:
+msgid "Week"
+msgstr "Week"
+
+#:
+msgid "Last"
+msgstr "Laatst"
+
+#:
+msgid "Screens"
+msgstr "Schermen"
+
+#:
+msgid "Screen"
+msgstr "Scherm"
+
+#:
+msgid "CONFIGURATION OF SCREENS"
+msgstr "CONFIGURATIE VAN SCHERMEN"
+
+#:
+msgid "Configuration of screens"
+msgstr "Configuratie van schermen"
+
+#:
+msgid "Screen added"
+msgstr "Scherm toegevoegd"
+
+#:
+msgid "Cannot add screen"
+msgstr "Kan scherm niet toevoegen"
+
+#:
+msgid "Screen updated"
+msgstr "Scherm bijgewerkt"
+
+#:
+msgid "Cannot update screen"
+msgstr "Kan scherm niet bijwerken"
+
+#:
+msgid "Screen deleted"
+msgstr "Scherm verwijderd"
+
+#:
+msgid "Cannot deleted screen"
+msgstr "Kan scherm niet verwijderen"
+
+#:
+msgid "Columns"
+msgstr "Kolomen"
+
+#:
+msgid "Rows"
+msgstr "Rijen"
+
+#:
+msgid "No screens defined"
+msgstr "Geen schermen gedefineerd"
+
+#:
+msgid "Delete screen?"
+msgstr "Verwijder scherm?"
+
+#:
+msgid "CONFIGURATION OF SCREEN"
+msgstr "CONFIGURATIE VAN SCHERMEN"
+
+#:
+msgid "Screen cell configuration"
+msgstr "Scherm cel configuratie"
+
+#:
+msgid "Resource"
+msgstr "Bron"
+
+#:
+msgid "Simple graph"
+msgstr "Simpel grafiek"
+
+#:
+msgid "Graph name"
+msgstr "Grafiek naam"
+
+#:
+msgid "Width"
+msgstr "Breedte"
+
+#:
+msgid "Height"
+msgstr "Hoogte"
+
+#:
+msgid "Create Screen"
+msgstr "Creër Scherm"
+
+#:
+msgid "Edit"
+msgstr "Bijwerken"
+
+#:
+msgid "Dimension (cols x rows)"
+msgstr "Dimensies (kolomen x rijen)"
+
+#:
+msgid "Map"
+msgstr "Map"
+
+#:
+msgid "As plain text"
+msgstr "Als platte teskst"
+
+#:
+msgid "Plain text"
+msgstr "Platte tekst"
+
+#:
+msgid "Column span"
+msgstr "Kolom breedte"
+
+#:
+msgid "Row span"
+msgstr "Rij breedte"
+
+#:
+msgid "Show lines"
+msgstr "Toon lijnen"
+
+#:
+msgid "Hosts info"
+msgstr "Gastheren info"
+
+#:
+msgid "Triggers info"
+msgstr "Trekkers info"
+
+#:
+msgid "Server info"
+msgstr "Server info"
+
+#:
+msgid "Clock"
+msgstr "Klok"
+
+#:
+msgid "Triggers overview"
+msgstr "Trekkers overzicht"
+
+#:
+msgid "Data overview"
+msgstr "Data overzicht"
+
+#:
+msgid "History of actions"
+msgstr "Geschiedenis van acties"
+
+#:
+msgid "History of events"
+msgstr "Geschiedenis van gebeurtenissen"
+
+#:
+msgid "Time type"
+msgstr "Tijd type"
+
+#:
+msgid "Server time"
+msgstr "Server time"
+
+#:
+msgid "Local time"
+msgstr "Lokale tijd"
+
+#:
+msgid "Style"
+msgstr "Stijle"
+
+#:
+msgid "Vertical"
+msgstr "Verticaal"
+
+#:
+msgid "Horizontal"
+msgstr "Horizontaal"
+
+#:
+msgid "Horizontal align"
+msgstr "Horizontale uitlijning"
+
+#:
+msgid "Centre"
+msgstr "Midden"
+
+#:
+msgid "Right"
+msgstr "Recht"
+
+#:
+msgid "Vertical align"
+msgstr "Verticale uitlijning"
+
+#:
+msgid "Middle"
+msgstr "midden"
+
+#:
+msgid "Custom screens"
+msgstr "Specifieke Schermen"
+
+#:
+msgid "SCREENS 45645645"
+msgstr "SCHERMEN"
+
+#:
+msgid "IT services"
+msgstr "IT Diensten"
+
+#:
+msgid "Service updated"
+msgstr "Dienst bijgewerkt"
+
+#:
+msgid "Cannot update service"
+msgstr "Kan dienst niet bijwerken"
+
+#:
+msgid "Service added"
+msgstr "Dienst toegevoegd"
+
+#:
+msgid "Cannot add service"
+msgstr "kan dienst niet toevoegen"
+
+#:
+msgid "Service deleted"
+msgstr "Dienst verwijderd"
+
+#:
+msgid "Cannot delete service"
+msgstr "kan dienst niet verwijderen"
+
+#:
+msgid "Status calculation"
+msgstr "Status calculatie"
+
+#:
+msgid "Status calculation algorithm"
+msgstr "Status calculatie algoritme"
+
+#:
+msgid "None"
+msgstr "Geen"
+
+#:
+msgid "Soft"
+msgstr "Soft"
+
+#:
+msgid "Do not calculate"
+msgstr "Bereken niet"
+
+#:
+msgid "Acceptable SLA (in %)"
+msgstr "Accepteerbare SLA (in %)"
+
+#:
+msgid "Link to trigger?"
+msgstr "Link naar Trekker?"
+
+#:
+msgid "Sort order (0->999)"
+msgstr "Sorteer orde (0->999)"
+
+#:
+msgid "Trigger"
+msgstr "Trekker"
+
+#:
+msgid "Server"
+msgstr "Server"
+
+#:
+msgid "Delete"
+msgstr "Verwijder"
+
+#:
+msgid "IT SERVICES"
+msgstr "IT DIENSTEN"
+
+#:
+msgid "Service"
+msgstr "Diensten"
+
+#:
+msgid "Reason"
+msgstr "Reden"
+
+#:
+msgid "No triggers defined"
+msgstr "Geen Trekkers gedefineerd"
+
+#:
+msgid "Configuration of triggers"
+msgstr "Configuratie van Trekkers"
+
+#:
+msgid "CONFIGURATION OF TRIGGERS"
+msgstr "CONFIGURATIE VAN TREKKERS"
+
+#:
+msgid "Triggers deleted"
+msgstr "Trekkers verwijderd"
+
+#:
+msgid "Cannot delete triggers"
+msgstr "Kan trekkers niet verwijderen"
+
+#:
+msgid "Trigger deleted"
+msgstr "Trekker verwijderd"
+
+#:
+msgid "Cannot delete trigger"
+msgstr "Kan trekker niet verwijderen"
+
+#:
+msgid "Trigger added"
+msgstr "Trekker toegevoegd"
+
+#:
+msgid "Cannot add trigger"
+msgstr "Kan trekker niet toevoegen"
+
+#:
+msgid "Severity"
+msgstr "Ernstheid"
+
+#:
+msgid "Disabled"
+msgstr "Gedeactiveerd"
+
+#:
+msgid "Enabled"
+msgstr "Geactiveerd"
+
+#:
+msgid "Change"
+msgstr "Aanpassen"
+
+#:
+msgid "Trigger updated"
+msgstr "Trekker bijgewerkt"
+
+#:
+msgid "Cannot update trigger"
+msgstr "Kan trekker niet bijwerken"
+
+#:
+msgid "Depends on"
+msgstr "Afhankelijk van"
+
+#:
+msgid "URL"
+msgstr "URL"
+
+#:
+msgid "Create Trigger"
+msgstr "Creër trekker"
+
+#:
+msgid "Trigger comments"
+msgstr "Trekker opmerkingen"
+
+#:
+msgid "TRIGGER COMMENTS"
+msgstr "TREKKER OPMERKINGEN"
+
+#:
+msgid "Comment updated"
+msgstr "Opmerkingen bijgewerkt"
+
+#:
+msgid "Cannot update comment"
+msgstr "Kan opmerkingen niet bijwerken"
+
+#:
+msgid "Add"
+msgstr "Toevoegen"
+
+#:
+msgid "Status of triggers"
+msgstr "Status van trekkers"
+
+#:
+msgid "STATUS OF TRIGGERS"
+msgstr "STATUS VAN TREKKERS"
+
+#:
+msgid "Show details"
+msgstr "Toon details"
+
+#:
+msgid "TRIGGERS"
+msgstr "Trekkers"
+
+#:
+msgid "Last change"
+msgstr "Laatste verandering"
+
+#:
+msgid "Comments"
+msgstr "Opmerkingen"
+
+#:
+msgid "Acknowledged"
+msgstr "Herkenning"
+
+#:
+msgid "Ack"
+msgstr "Hng"
+
+#:
+msgid "Select"
+msgstr "Selecteer"
+
+#:
+msgid "Users"
+msgstr "Gebruikers"
+
+#:
+msgid "User added"
+msgstr "Gebruikers toegevoegd"
+
+#:
+msgid "Cannot add user"
+msgstr "Kan gebruiker niet toevoegen"
+
+#:
+msgid "Cannot add user. Both passwords must be equal."
+msgstr "Kan gebruiker niet toevoegen. Beide wachtwoorden moeten hetzelfde zijn."
+
+#:
+msgid "User deleted"
+msgstr "Gebruiker verwijderd"
+
+#:
+msgid "Cannot delete user"
+msgstr "Kan gebruikers niet verwijderen"
+
+#:
+msgid "User updated"
+msgstr "Gebruiker bijgewerkt"
+
+#:
+msgid "Cannot update user"
+msgstr "Kan gebruiker niet bijwerken"
+
+#:
+msgid "Cannot update user. Both passwords must be equal."
+msgstr "Kan gebruiker niet bijwerken. Beide wachtwoorden moeten hetzelfde zijn."
+
+#:
+msgid "Group added"
+msgstr "Groep toegevoegd"
+
+#:
+msgid "Cannot add group"
+msgstr "Kan groep niet toevoegen"
+
+#:
+msgid "Group updated"
+msgstr "Groep bijgewerkt"
+
+#:
+msgid "Cannot update group"
+msgstr "Kan groep niet bijwerken"
+
+#:
+msgid "Group deleted"
+msgstr "Groep verwijderd"
+
+#:
+msgid "Cannot delete group"
+msgstr "Kan groep niet verwijderen"
+
+#:
+msgid "CONFIGURATION OF USERS AND USER GROUPS"
+msgstr "CONFIGURATIE VAN GEBRUIKERS AND GROEPEN"
+
+#:
+msgid "USER GROUPS"
+msgstr "GEBRUIKERS GROEPEN"
+
+#:
+msgid "USERS"
+msgstr "GEBRUIKERS"
+
+#:
+msgid "User groups"
+msgstr "Gebruikers groepen"
+
+#:
+msgid "Members"
+msgstr "Leden"
+
+#:
+msgid "No user groups defined"
+msgstr "Geen gebruiker groepen gedefineerd"
+
+#:
+msgid "Alias"
+msgstr "Alias"
+
+#:
+msgid "Name"
+msgstr "Naam"
+
+#:
+msgid "Surname"
+msgstr "Achternaam"
+
+#:
+msgid "Is online?"
+msgstr "Is verbonden?"
+
+#:
+msgid "No users defined"
+msgstr "Geen gebruikers gedefineerd"
+
+#:
+msgid "Read only"
+msgstr "Alleen lezen"
+
+#:
+msgid "Read-write"
+msgstr "Lees-schrijf"
+
+#:
+msgid "Hide"
+msgstr "Verberg"
+
+#:
+msgid "Password"
+msgstr "Wachtwoord"
+
+#:
+msgid "Password (once again)"
+msgstr "Wachtwoord (normaals)"
+
+#:
+msgid "URL (after login)"
+msgstr "URL (na de login)"
+
+#:
+msgid "Refresh (in seconds)"
+msgstr "Verversing (in seconden)"
+
+#:
+msgid "Create User"
+msgstr "Creër Gebruiker"
+
+#:
+msgid "Create Group"
+msgstr "Creër Groep"
+
+#:
+msgid "Audit"
+msgstr "Controle"
+
+#:
+msgid "Action"
+msgstr "Actie"
+
+#:
+msgid "Details"
+msgstr "Details"
+
+#:
+msgid "Unknown action"
+msgstr "Onbekende actie"
+
+#:
+msgid "Added"
+msgstr "Toegevoegd"
+
+#:
+msgid "Updated"
+msgstr "Bijgewerkt"
+
+#:
+msgid "Media type"
+msgstr "Media type"
+
+#:
+msgid "Graph element"
+msgstr "Grafiek element"
+
+#:
+msgid "Unknown resource"
+msgstr "Onbekende bron"
+
+#:
+msgid "USER PROFILE"
+msgstr "GEBRUIKERS PROFIEL"
+
+#:
+msgid "User profile"
+msgstr "Gebruikers profiel"
+
+#:
+msgid "Language"
+msgstr "Taal"
+
+#:
+msgid "English (GB)"
+msgstr "English (GB)"
+
+#:
+msgid "French (FR)"
+msgstr "French (FR)"
+
+#:
+msgid "German (DE)"
+msgstr "German (DE)"
+
+#:
+msgid "Italian (IT)"
+msgstr "Italian (IT)"
+
+#:
+msgid "Latvian (LV)"
+msgstr "Latvian (LV)"
+
+#:
+msgid "Russian (RU)"
+msgstr "Russian (RU)"
+
+#:
+msgid "Spanish (SP)"
+msgstr "Spanish (SP)"
+
+#:
+msgid "Japanese (JP)"
+msgstr "Japanese (JP)"
+
+#:
+msgid "Chinese (CN)"
+msgstr "Chinese (CN)"
+
+#:
+msgid "Dutch (NL)"
+msgstr "Dutch (NL)"
+
+#:
+msgid "ZABBIX"
+msgstr "ZABBIX"
+
+#:
+msgid "Host profiles"
+msgstr "Gastheren profielen"
+
+#:
+msgid "HOST PROFILES"
+msgstr "GASTHEER PROFIELEN"
+
+#:
+msgid "Empty"
+msgstr "Leeg"
+
+#:
+msgid "STANDARD ITEMS"
+msgstr "STANDAARD ITEMS"
+
+#:
+msgid "No items"
+msgstr "Geen items"
+
+#:
+msgid "Y"
+msgstr "Y"
+
+#:
+msgid "Help"
+msgstr "Help"
+
+#:
+msgid "Profile"
+msgstr "Profiel"
+
+#:
+msgid "Monitoring"
+msgstr "Monitoring"
+
+#:
+msgid "Inventory"
+msgstr "Inventaris"
+
+#:
+msgid "Queue"
+msgstr "Wachtrij"
+
+#:
+msgid "Events"
+msgstr "Gebeurtenissen"
+
+#:
+msgid "Maps"
+msgstr "Mappen"
+
+#:
+msgid "Reports"
+msgstr "Reporten"
+
+#:
+msgid "General"
+msgstr "Algemeen"
+
+#:
+msgid "Login"
+msgstr "Login"
+
+#:
+msgid "Latest data"
+msgstr "Laatste data"
+
+#:
+msgid "Incorrect description"
+msgstr "Incorrecte omschrijving"

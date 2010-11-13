@@ -1,0 +1,6065 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: Konstantin <konstantin.buravcov@zabbix.com>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "d M Y H:i:s"
+msgstr "d M H:i:s"
+
+msgid "d M Y"
+msgstr "d M Y"
+
+msgid "d.M"
+msgstr "d.M"
+
+msgid "UTF-8"
+msgstr "UTF-8"
+
+msgid "y"
+msgstr "г"
+
+msgid "m"
+msgstr "м"
+
+msgid "w"
+msgstr "н"
+
+msgid "d"
+msgstr "д"
+
+msgid "h"
+msgstr "ч"
+
+msgid "s"
+msgstr "с"
+
+msgid "ms"
+msgstr "мс"
+
+msgid "Sun"
+msgstr "Вс"
+
+msgid "Mon"
+msgstr "Пн"
+
+msgid "Tue"
+msgstr "Вт"
+
+msgid "Wed"
+msgstr "Ср"
+
+msgid "Thu"
+msgstr "Чт"
+
+msgid "Fri"
+msgstr "Пт"
+
+msgid "Sat"
+msgstr "Сб"
+
+msgid "Sunday"
+msgstr "Воскресенье"
+
+msgid "Monday"
+msgstr "Понедельник"
+
+msgid "Tuesday"
+msgstr "Вторник"
+
+msgid "Wednesday"
+msgstr "Среда"
+
+msgid "Thursday"
+msgstr "Четверг"
+
+msgid "Friday"
+msgstr "Пятница"
+
+msgid "Saturday"
+msgstr "Суббота"
+
+msgid "Jan"
+msgstr "Янв"
+
+msgid "Feb"
+msgstr "Фев"
+
+msgid "Mar"
+msgstr "Мар"
+
+msgid "Apr"
+msgstr "Апр"
+
+msgid "May"
+msgstr "Май"
+
+msgid "Jun"
+msgstr "Июн"
+
+msgid "Jul"
+msgstr "Июл"
+
+msgid "Aug"
+msgstr "Авг"
+
+msgid "Sep"
+msgstr "Сен"
+
+msgid "Oct"
+msgstr "Окт"
+
+msgid "Nov"
+msgstr "Ноя"
+
+msgid "Dec"
+msgstr "Дек"
+
+msgid "January"
+msgstr "Январь"
+
+msgid "February"
+msgstr "Февраль"
+
+msgid "March"
+msgstr "Март"
+
+msgid "April"
+msgstr "Апрель"
+
+msgid "June"
+msgstr "Июнь"
+
+msgid "July"
+msgstr "Июль"
+
+msgid "August"
+msgstr "Август"
+
+msgid "September"
+msgstr "Сентябрь"
+
+msgid "October"
+msgstr "Октябрь"
+
+msgid "November"
+msgstr "Ноябрь"
+
+msgid "December"
+msgstr "Декабрь"
+
+msgid "Activate selected"
+msgstr "Активировать выбранное"
+
+msgid "Disable selected"
+msgstr "Деактивировать выбранное"
+
+msgid "Activate selected hosts"
+msgstr "Активировать выбранные узлы сети"
+
+msgid "Disable selected hosts"
+msgstr "Деактивировать выбранные узлы сети"
+
+msgid "Delete selected"
+msgstr "Удалить"
+
+msgid "Copy selected to ..."
+msgstr "Копировать в..."
+
+msgid "Host IP"
+msgstr "IP хоста"
+
+msgid "Service type"
+msgstr "Тип сервиса"
+
+msgid "Service port"
+msgstr "Порт сервиса"
+
+msgid "Discovery status"
+msgstr "Состояние обнаружения"
+
+msgid "Received value"
+msgstr "Полученное значение"
+
+msgid "Uptime/Downtime"
+msgstr "Доступен/Недоступен"
+
+msgid "Discovery rule"
+msgstr "Правило обнаружения"
+
+msgid "Discovery"
+msgstr "Обнаружение"
+
+msgid "DISCOVERY"
+msgstr "ОБНАРУЖЕНИЕ"
+
+msgid "Configuration of discovery"
+msgstr "Настройки обнаружения"
+
+msgid "CONFIGURATION OF DISCOVERY"
+msgstr "НАСТРОЙКИ ОБНАРУЖЕНИЯ"
+
+msgid "No discovery rules defined"
+msgstr "Правила обнаружения не заданы"
+
+msgid "IP range"
+msgstr "Диапазон IP адресов"
+
+msgid "Checks"
+msgstr "Проверки"
+
+msgid "Create rule"
+msgstr "Создать правило"
+
+msgid "Delete rule?"
+msgstr "Удалить правило?"
+
+msgid "Discovery by proxy"
+msgstr "Обнаружение через прокси"
+
+msgid "(no proxy)"
+msgstr "(без прокси)"
+
+msgid "Device uniqueness criteria"
+msgstr "Критерий уникальности устройства"
+
+msgid "Event source"
+msgstr "Событие"
+
+msgid "New check"
+msgstr "Новая проверка"
+
+msgid "SSH"
+msgstr "SSH"
+
+msgid "LDAP"
+msgstr "LDAP"
+
+msgid "SMTP"
+msgstr "SMTP"
+
+msgid "FTP"
+msgstr "FTP"
+
+msgid "HTTP"
+msgstr "HTTP"
+
+msgid "POP"
+msgstr "POP"
+
+msgid "NNTP"
+msgstr "NNTP"
+
+msgid "IMAP"
+msgstr "IMAP"
+
+msgid "TCP"
+msgstr "TCP"
+
+msgid "ICMP Ping"
+msgstr "ICMP Ping"
+
+msgid "ports"
+msgstr "порты"
+
+msgid "Discovery rules deleted"
+msgstr "Правила обнаружения удалены"
+
+msgid "Discovery rule deleted"
+msgstr "Правило обнаружения удалено"
+
+msgid "Cannot delete discovery rule"
+msgstr "Не удалось удалить правило обнаружения"
+
+msgid "Discovery rules updated"
+msgstr "Правила обнаружения обновлены"
+
+msgid "Discovery rule updated"
+msgstr "Правило обнаружения обновлено"
+
+msgid "Cannot update discovery rule"
+msgstr "Не удалось обновить правило обнаружения"
+
+msgid "Discovery rule added"
+msgstr "Добавлено новое правило обнаружения"
+
+msgid "Cannot add discovery rule"
+msgstr "Не удалось добавить правило обнаружения"
+
+msgid "STATUS OF DISCOVERY"
+msgstr "СОСТОЯНИЕ ОБНАРУЖЕНИЯ"
+
+msgid "Status of discovery"
+msgstr "Состояние обнаружения"
+
+msgid "Enable selected discovery rules?"
+msgstr "Включить выбранные правила обнаружения?"
+
+msgid "Disable selected discovery rules?"
+msgstr "Отключить выбранные правила обнаружения?"
+
+msgid "Delete selected discovery rules?"
+msgstr "Удалить выбранные правила обнаружения?"
+
+msgid "Discovered"
+msgstr "Обнаружен"
+
+msgid "Lost"
+msgstr "Потерян"
+
+msgid "Uptime"
+msgstr "Доступен"
+
+msgid "Downtime"
+msgstr "Недоступен"
+
+msgid "Discovered device"
+msgstr "Обнаруженное устройство"
+
+msgid "Monitored host"
+msgstr "Наблюдаемый узел сети"
+
+msgid "Incorrect IP range."
+msgstr "Некорректный диапазон IP адресов."
+
+msgid "Details of scenario"
+msgstr "Детали сценария"
+
+msgid "DETAILS OF SCENARIO"
+msgstr "ДЕТАЛИ СЦЕНАРИЯ"
+
+msgid "Speed"
+msgstr "Скорость"
+
+msgid "Response code"
+msgstr "Код ответа"
+
+msgid "TOTAL"
+msgstr "ВСЕГО"
+
+msgid "Response time"
+msgstr "Время ответа"
+
+msgid "In progress"
+msgstr "В работе"
+
+msgid "of"
+msgstr "из"
+
+msgid "to"
+msgstr "до"
+
+msgid "In check"
+msgstr "Проверяется"
+
+msgid "Idle till"
+msgstr "Простой до"
+
+msgid "Failed on"
+msgstr "Ошибочный в"
+
+msgid "Failed"
+msgstr "Ошибочный"
+
+msgid "Status of Web monitoring"
+msgstr "Состояние Веб-мониторинга"
+
+msgid "STATUS OF WEB MONITORING"
+msgstr "СОСТОЯНИЕ ВЕБ-МОНИТОРИНГА"
+
+msgid "State"
+msgstr "Состояние"
+
+msgid "Sort"
+msgstr "Сортировать"
+
+msgid "Status codes"
+msgstr "Коды состояний"
+
+msgid "Web"
+msgstr "Веб"
+
+msgid "Configuration of Web monitoring"
+msgstr "Настройки Веб-мониторинга"
+
+msgid "CONFIGURATION OF WEB MONITORING"
+msgstr "НАСТРОЙКИ ВЕБ-МОНИТОРИНГА"
+
+msgid "Scenario"
+msgstr "Сценарий"
+
+msgid "Scenarios"
+msgstr "Сценарии"
+
+msgid "SCENARIOS"
+msgstr "СЦЕНАРИИ"
+
+msgid "Create scenario"
+msgstr "Создать сценарий"
+
+msgid "Hide disabled scenarios"
+msgstr "Скрыть отключенные сценарии"
+
+msgid "Show disabled scenarios"
+msgstr "Показать отключенные сценарии"
+
+msgid "Number of steps"
+msgstr "Количество шагов"
+
+msgid "Scenario deleted"
+msgstr "Сценарий удален"
+
+msgid "Scenario activated"
+msgstr "Сценарий активирован"
+
+msgid "Scenario disabled"
+msgstr "Сценарий отключен"
+
+msgid "Delete scenario?"
+msgstr "Удалить сценарий?"
+
+msgid "Scenario updated"
+msgstr "Сценарий обновлен"
+
+msgid "Cannot update scenario"
+msgstr "Не удалось обновить сценарий"
+
+msgid "Scenario added"
+msgstr "Сценарий добавлен"
+
+msgid "Cannot add scenario"
+msgstr "Не удалось добавить сценарий"
+
+msgid "Cannot delete scenario"
+msgstr "Не удалось обновить сценарий"
+
+msgid "Agent"
+msgstr "Агент"
+
+msgid "Variables"
+msgstr "Переменные"
+
+msgid "Step"
+msgstr "Шаг"
+
+msgid "Steps"
+msgstr "Шаги"
+
+msgid "Timeout"
+msgstr "Время ожидания"
+
+msgid "Post"
+msgstr "Post"
+
+msgid "Required"
+msgstr "Требуется"
+
+msgid "Step of scenario"
+msgstr "Шаг сценария"
+
+msgid "Basic authentication"
+msgstr "Простая аутентификация"
+
+msgid "Enable selected WEB scenarios?"
+msgstr "Включить выбранные Веб сценарии?"
+
+msgid "Disable selected WEB scenarios?"
+msgstr "Отключить выбранные Веб сценарии?"
+
+msgid "Delete history of selected WEB scenarios?"
+msgstr "Удалить историю у выбранных Веб сценариев?"
+
+msgid "Delete selected WEB scenarios?"
+msgstr "Удалить выбранные Веб сценарии?"
+
+msgid "Element"
+msgstr "Элемент"
+
+msgid "Elements"
+msgstr "Элементы"
+
+msgid "Only host info"
+msgstr "Информация только о узле сети"
+
+msgid "Export/Import"
+msgstr "Экспорт/Импорт"
+
+msgid "Import file"
+msgstr "Импортировать файл"
+
+msgid "Import"
+msgstr "Импорт"
+
+msgid "IMPORT"
+msgstr "ИМПОРТ"
+
+msgid "Export"
+msgstr "Экспорт"
+
+msgid "Export selected"
+msgstr "Экспортировать выбранное"
+
+msgid "EXPORT"
+msgstr "ЭКСПОРТ"
+
+msgid "Preview"
+msgstr "Предпросмотр"
+
+msgid "Back"
+msgstr "Назад"
+
+msgid "BACK"
+msgstr "НАЗАД"
+
+msgid "No data for export"
+msgstr "Нет данных для экспорта"
+
+msgid "no data"
+msgstr "нет данных"
+
+msgid "Rules"
+msgstr "Правила"
+
+msgid "Existing"
+msgstr "Существующий"
+
+msgid "Missing"
+msgstr "Пропущенный"
+
+msgid "Refresh"
+msgstr "Обновить"
+
+msgid "Refresh time in seconds"
+msgstr "Время обновления в секундах"
+
+msgid "Refresh time multiplier"
+msgstr "Множитель времени обновления"
+
+msgid "Imported"
+msgstr "Импортировано"
+
+msgid "successfully"
+msgstr "успешно"
+
+msgid "failed"
+msgstr "ошибочно"
+
+msgid "d.m.y"
+msgstr "d.m.y"
+
+msgid "H.i"
+msgstr "H.i"
+
+msgid "Previous"
+msgstr "Назад"
+
+msgid "Next"
+msgstr "Далее"
+
+msgid "Retry"
+msgstr "Повтор"
+
+msgid "Finish"
+msgstr "Финиш"
+
+msgid "Fail"
+msgstr "Ошибка"
+
+msgid "UPDATE"
+msgstr "ОБНОВЛЕНИЕ"
+
+msgid "Installation"
+msgstr "Инсталляция"
+
+msgid "New installation"
+msgstr "Новая инсталляция"
+
+msgid "NEW INSTALLATION"
+msgstr "НОВАЯ ИНСТАЛЛЯЦИЯ"
+
+msgid "Installation/Update"
+msgstr "Инсталляция/Обновление"
+
+msgid "Zabbix is temporarily unavailable"
+msgstr "ZABBIX временно недоступен"
+
+msgid "Multibyte String module required to run FrontEnd"
+msgstr "Требуется модуль Multibyte String для запуска интерфейса"
+
+msgid "Y.M.d H:i:s"
+msgstr "d M Y H:i:s"
+
+msgid "Empty input parameter"
+msgstr "Пустой параметр ввода"
+
+msgid "Time zone"
+msgstr "Часовой пояс"
+
+msgid "Do not keep history older than (in days)"
+msgstr "Не хранить историю более чем (в днях)"
+
+msgid "Do not keep trends older than (in days)"
+msgstr "Не хранить тенденции более чем (в днях)"
+
+msgid "Master node"
+msgstr "Мастер нода"
+
+msgid "Child"
+msgstr "Подчиненный"
+
+msgid "Master"
+msgstr "Мастер"
+
+msgid "Node updated"
+msgstr "Нода обновлена"
+
+msgid "Cannot update node"
+msgstr "Не удалось обновить ноду"
+
+msgid "Node added"
+msgstr "Нода добавлена"
+
+msgid "Cannot add node"
+msgstr "Не удалось добавить ноду"
+
+msgid "Node deleted"
+msgstr "Нода удалена"
+
+msgid "Cannot delete node"
+msgstr "Не удалось удалить ноду"
+
+msgid "Current node"
+msgstr "Текущая нода"
+
+msgid "Select Nodes"
+msgstr "Выбрать ноды"
+
+msgid "No events to acknowledge"
+msgstr "Нет событий для подтверждения"
+
+msgid "Acknowledges"
+msgstr "Подтверждения"
+
+msgid "Acknowledge"
+msgstr "Подтвердить"
+
+msgid "Return"
+msgstr "Вернуться"
+
+msgid "Acknowledge alarm by"
+msgstr "Подтвердить тревогу от имени"
+
+msgid "Add comment by"
+msgstr "Добавить комментарий как"
+
+msgid "ALARM ACKNOWLEDGES"
+msgstr "ПОДТВЕРЖДЕНИЯ ОПОВЕЩЕНИЙ"
+
+msgid "Acknowledge added"
+msgstr "Подтверждение добавлено"
+
+msgid "Cannot acknowledge event"
+msgstr "Не удалось подтвердить событие"
+
+msgid "----[BULK ACKNOWLEDGE]----"
+msgstr "----[ВВЕДЕНО КАК МАССОВОЕ ПОДТВЕРЖДЕНИЕ]----"
+
+msgid "Bulk acknowledge"
+msgstr "Массовое подтверждение"
+
+msgid "Immediately"
+msgstr "Незамедлительно"
+
+msgid "Infinity"
+msgstr "Бесконечность"
+
+msgid "Recovery message"
+msgstr "Сообщение о восстановлении"
+
+msgid "Configuration of actions"
+msgstr "Настройка действий"
+
+msgid "CONFIGURATION OF ACTIONS"
+msgstr "НАСТРОЙКА ДЕЙСТВИЙ"
+
+msgid "Operation type"
+msgstr "Тип операции"
+
+msgid "Send message"
+msgstr "Отправить сообщение"
+
+msgid "Remote command"
+msgstr "Удаленная команда"
+
+msgid "Remote commands"
+msgstr "Удаленные команды"
+
+msgid "Filter"
+msgstr "Фильтр"
+
+msgid "Trigger severity"
+msgstr "Важность триггера"
+
+msgid "Trigger value"
+msgstr "Значение триггера"
+
+msgid "Time period"
+msgstr "Период времени"
+
+msgid "Maintenance status"
+msgstr "Состояние обслуживания"
+
+msgid "maintenance"
+msgstr "обслуживание"
+
+msgid "max value"
+msgstr "макс значение"
+
+msgid "min value"
+msgstr "мин значение"
+
+msgid "Trigger description"
+msgstr "Описание триггера"
+
+msgid "Host name"
+msgstr "Имя узла сети"
+
+msgid "Action conditions"
+msgstr "Условия действия"
+
+msgid "Operation condition"
+msgstr "Условие операции"
+
+msgid "Conditions"
+msgstr "Условия"
+
+msgid "Condition"
+msgstr "Условие"
+
+msgid "New condition"
+msgstr "Новое условие"
+
+msgid "Action operations"
+msgstr "Операции действия"
+
+msgid "Operations"
+msgstr "Операции"
+
+msgid "Edit operation"
+msgstr "Изменить операцию"
+
+msgid "No conditions defined"
+msgstr "Условия не заданы"
+
+msgid "Actions deleted"
+msgstr "Действия удалены"
+
+msgid "Cannot delete actions"
+msgstr "Невозможно удалить действия"
+
+msgid "No operations defined"
+msgstr "Операции не заданы"
+
+msgid "New"
+msgstr "Новый"
+
+msgid "Add host"
+msgstr "Добавить узел сети"
+
+msgid "Remove host"
+msgstr "Удалить узел сети"
+
+msgid "Enable host"
+msgstr "Включить узел сети"
+
+msgid "Disable host"
+msgstr "Выключить узел сети"
+
+msgid "Link to template"
+msgstr "Соединить с шаблоном"
+
+msgid "Unlink from template"
+msgstr "Отсоединить от шаблона"
+
+msgid "Host template"
+msgstr "Шаблон узла сети"
+
+msgid "Event acknowledged"
+msgstr "Подтверждение события"
+
+msgid "Send only to"
+msgstr "Отправлять только"
+
+msgid "User medias"
+msgstr "Медиа пользователя"
+
+msgid "Discovery check"
+msgstr "Проверка обнаружения"
+
+msgid "Discovered object"
+msgstr "Обнаруженный объект"
+
+msgid "Device"
+msgstr "Устройство"
+
+msgid "Auto registration"
+msgstr "Авторегистрация"
+
+msgid "Incorrect trigger"
+msgstr "Некорректный триггер"
+
+msgid "Incorrect host"
+msgstr "Некорректный узел сети"
+
+msgid "Incorrect period"
+msgstr "Некорректный период"
+
+msgid "Incorrect IP"
+msgstr "Некорректный IP"
+
+msgid "Incorrect discovery check"
+msgstr "Некорректная проверка обнаружения"
+
+msgid "Incorrect port"
+msgstr "Некорректный порт"
+
+msgid "Incorrect discovery status"
+msgstr "Некорректное состояние обнаружения"
+
+msgid "Incorrect condition type"
+msgstr "Некорректный тип условия"
+
+msgid "Incorrect operation type"
+msgstr "Некорректный тип операции"
+
+msgid "Incorrect user"
+msgstr "Некорректный пользователь"
+
+msgid "Incorrect steps"
+msgstr "Некорректные шаги"
+
+msgid "selected actions?"
+msgstr "выбранные действия?"
+
+msgid "Actions"
+msgstr "Действия"
+
+msgid "Logs"
+msgstr "Журналы"
+
+msgid "LOGS"
+msgstr "ЖУРНАЛЫ"
+
+msgid "ACTIONS"
+msgstr "ДЕЙСТВИЯ"
+
+msgid "Message actions"
+msgstr "Сообщение действий"
+
+msgid "Command actions"
+msgstr "Команды действий"
+
+msgid "Action added"
+msgstr "Действие добавлено"
+
+msgid "Cannot add action"
+msgstr "Не удалось добавить действие"
+
+msgid "Action updated"
+msgstr "Действие обновлено"
+
+msgid "Cannot update action"
+msgstr "Не удалось обновить действие"
+
+msgid "Action deleted"
+msgstr "Действие удалено"
+
+msgid "Cannot delete action"
+msgstr "Не удалось удалить действие"
+
+msgid "Send message to"
+msgstr "Отправить сообщение"
+
+msgid "Run remote commands"
+msgstr "Выполнить удаленную команду"
+
+msgid "Delay"
+msgstr "Задержка"
+
+msgid "Subject"
+msgstr "Тема"
+
+msgid "Recovery subject"
+msgstr "Тема восстановления"
+
+msgid "Default message"
+msgstr "Сообщение по умолчанию"
+
+msgid "Default subject"
+msgstr "Тема по умолчанию"
+
+msgid "Message"
+msgstr "Сообщение"
+
+msgid "ON"
+msgstr "ВКЛ"
+
+msgid "OFF"
+msgstr "ВЫКЛ"
+
+msgid "On"
+msgstr "ВКЛ"
+
+msgid "Off"
+msgstr "ВЫКЛ"
+
+msgid "No actions defined"
+msgstr "Действия не заданы"
+
+msgid "Single user"
+msgstr "Одному пользователю"
+
+msgid "User group"
+msgstr "Группе пользователей"
+
+msgid "Group"
+msgstr "Группа"
+
+msgid "User"
+msgstr "Пользователь"
+
+msgid "Not classified"
+msgstr "Не классифицировано"
+
+msgid "Information"
+msgstr "Информация"
+
+msgid "Warning"
+msgstr "Предупреждение"
+
+msgid "Average"
+msgstr "Средняя"
+
+msgid "High"
+msgstr "Высокая"
+
+msgid "Disaster"
+msgstr "Чрезвычайная"
+
+msgid "AND / OR"
+msgstr "И / ИЛИ"
+
+msgid "AND"
+msgstr "И"
+
+msgid "and"
+msgstr "и"
+
+msgid "&"
+msgstr "&"
+
+msgid "OR"
+msgstr "ИЛИ"
+
+msgid "or"
+msgstr "или"
+
+msgid "Type of calculation"
+msgstr "Тип калькуляции"
+
+msgid "Create Action"
+msgstr "Создать действие"
+
+msgid "Delete selected action?"
+msgstr "Удалить выбранное действие"
+
+msgid "like"
+msgstr "содержит"
+
+msgid "not like"
+msgstr "не содержит"
+
+msgid "in"
+msgstr "в"
+
+msgid "not in"
+msgstr "не в"
+
+msgid "Retries left"
+msgstr "Попыток"
+
+msgid "Actions since"
+msgstr "Действия с"
+
+msgid "Show all"
+msgstr "Показать все"
+
+msgid "Time"
+msgstr "Время"
+
+msgid "Status"
+msgstr "Состояние"
+
+msgid "Duration"
+msgstr "Длительность"
+
+msgid "TRUE"
+msgstr "ИСТИНА"
+
+msgid "FALSE"
+msgstr "ЛОЖЬ"
+
+msgid "UNKNOWN"
+msgstr "НЕИЗВЕСТНО"
+
+msgid "Type"
+msgstr "Тип"
+
+msgid "Recipient(s)"
+msgstr "Получатель(-и)"
+
+msgid "Recipient"
+msgstr "Получатель"
+
+msgid "Error"
+msgstr "Ошибка"
+
+msgid "sent"
+msgstr "отправлено"
+
+msgid "executed"
+msgstr "выполнено"
+
+msgid "not sent"
+msgstr "не отправлено"
+
+msgid "No actions found"
+msgstr "Действия не найдены"
+
+msgid "Incorrect command"
+msgstr "Некорректная команда"
+
+msgid "Unknown group name"
+msgstr "Неизвестное имя группы"
+
+msgid "Unknown host name"
+msgstr "Неизвестное имя узла сети"
+
+msgid "in command"
+msgstr "в команде"
+
+msgid "Line"
+msgstr "Линия"
+
+msgid "Filled region"
+msgstr "Заполнение"
+
+msgid "Bold line"
+msgstr "Жирная линия"
+
+msgid "Dot"
+msgstr "Точечная линия"
+
+msgid "Dashed line"
+msgstr "Пунктирная линия"
+
+msgid "Gradient line"
+msgstr "Градиентная линия"
+
+msgid "Custom graphs"
+msgstr "Пользовательские графики"
+
+msgid "GRAPHS"
+msgstr "ГРАФИКИ"
+
+msgid "Select graph to display"
+msgstr "Выберите график для отображения"
+
+msgid "Period"
+msgstr "Период"
+
+msgid "Select graph..."
+msgstr "Выберите график..."
+
+msgid "Fullscreen"
+msgstr "Во весь экран"
+
+msgid "View"
+msgstr "Вид"
+
+msgid "H:i"
+msgstr "H:i"
+
+msgid "D"
+msgstr "D"
+
+msgid "d.m"
+msgstr "d.m"
+
+msgid "d.m H:i"
+msgstr "d.m H:i"
+
+msgid "d.m.Y H:i"
+msgstr "d.m.Y H:i"
+
+msgid "GUI"
+msgstr "Веб-интерфейс"
+
+msgid "Dropdown first entry"
+msgstr "Первая запись в списке"
+
+msgid "remember selected"
+msgstr "запоминать выбранное"
+
+msgid "Max count of elements to show inside table cell"
+msgstr "Макс. количество элементов в таблице"
+
+msgid "Search/Filter elements limit"
+msgstr "Лимит элементов в поиске/фильтре"
+
+msgid "Themes"
+msgstr "Темы"
+
+msgid "System default"
+msgstr "Системная по умолчанию"
+
+msgid "Black & Blue"
+msgstr "Черный & Синий"
+
+msgid "Original blue"
+msgstr "Оригинальная синяя"
+
+msgid "Dark orange"
+msgstr "Темно-оранжевая"
+
+msgid "Default theme"
+msgstr "Тема по умолчанию"
+
+msgid "Event acknowledges"
+msgstr "Подтверждение событий"
+
+msgid "Days"
+msgstr "Дни"
+
+msgid "Show events not older"
+msgstr "Показывать события не старше"
+
+msgid "Show events max"
+msgstr "Показать события макс"
+
+msgid "Max count of events per trigger to show"
+msgstr "Макс количество отображаемых событий у триггера"
+
+msgid "Cannot update value map"
+msgstr "Не удалось обновить преобразование значения"
+
+msgid "Value map added"
+msgstr "Преобразование значения добавлено"
+
+msgid "Cannot add value map"
+msgstr "Не удалось добавить преобразование значения"
+
+msgid "Value map deleted"
+msgstr "Преобразование значение удалено"
+
+msgid "Cannot delete value map"
+msgstr "Не удалось удалить преобразование значения"
+
+msgid "Value map updated"
+msgstr "Преобразование значения обновлено"
+
+msgid "VALUE MAPPING"
+msgstr "ПРЕОБРАЗОВАНИЕ ЗНАЧЕНИЙ"
+
+msgid "Value mapping"
+msgstr "Преобразование значений"
+
+msgid "Value map"
+msgstr "Преобразование значения"
+
+msgid "Mapping"
+msgstr "Преобразование"
+
+msgid "New mapping"
+msgstr "Новое преобразование"
+
+msgid "No mapping defined"
+msgstr "Преобразования не заданы"
+
+msgid "Create value map"
+msgstr "Создать преобразование значения"
+
+msgid "Configuration of Zabbix"
+msgstr "Настройка Zabbix"
+
+msgid "CONFIGURATION OF ZABBIX"
+msgstr "НАСТРОЙКА ZABBIX"
+
+msgid "Configuration updated"
+msgstr "Настройки обновлены"
+
+msgid "Configuration was not updated"
+msgstr "Настройки не обновлены"
+
+msgid "Added new media type"
+msgstr "Добавлен новый способ оповещений"
+
+msgid "New media type was not added"
+msgstr "Новый способ оповещений не добавлен"
+
+msgid "Media type updated"
+msgstr "Способ оповещений обновлен"
+
+msgid "Media type was not updated"
+msgstr "Способ оповещений не обновлен"
+
+msgid "Media type deleted"
+msgstr "Способ оповещений удален"
+
+msgid "Media type was not deleted"
+msgstr "Способ оповещений не удален"
+
+msgid "Configuration"
+msgstr "Настройка"
+
+msgid "Administration"
+msgstr "Администрирование"
+
+msgid "Do not keep actions older than (in days)"
+msgstr "Не хранить действия старше, чем (дней)"
+
+msgid "Do not keep events older than (in days)"
+msgstr "Не хранить события старше, чем (дней)"
+
+msgid "No media types defined"
+msgstr "Способы оповещений не заданы"
+
+msgid "SMTP server"
+msgstr "SMTP сервер"
+
+msgid "SMTP helo"
+msgstr "SMTP приветствие"
+
+msgid "SMTP email"
+msgstr "SMTP адрес электронной почты"
+
+msgid "Script name"
+msgstr "Название скрипта"
+
+msgid "Delete selected media?"
+msgstr "Удалить выбранный способ оповещений?"
+
+msgid "Delete selected image?"
+msgstr "Удалить выбранное изображение?"
+
+msgid "Housekeeper"
+msgstr "Очистка истории"
+
+msgid "Media types"
+msgstr "Способы оповещений"
+
+msgid "Escalation rules"
+msgstr "Правила эскалации"
+
+msgid "Enable escalations"
+msgstr "Включить эскалации"
+
+msgid "Escalation"
+msgstr "Эскалация"
+
+msgid "Escalation rule"
+msgstr "Правило эскалации"
+
+msgid "Default"
+msgstr "По умолчанию"
+
+msgid "Images"
+msgstr "Изображения"
+
+msgid "Image"
+msgstr "Изображение"
+
+msgid "IMAGES"
+msgstr "ИЗОБРАЖЕНИЕ"
+
+msgid "Icon"
+msgstr "Иконка"
+
+msgid "No images defined"
+msgstr "Изображения не заданы"
+
+msgid "Background"
+msgstr "Фоновое изображение"
+
+msgid "Upload"
+msgstr "Загрузить"
+
+msgid "Image added"
+msgstr "Изображение добавлено"
+
+msgid "Cannot add image"
+msgstr "Не удалось добавить изображение"
+
+msgid "Image deleted"
+msgstr "Изображение удалено"
+
+msgid "Cannot delete image"
+msgstr "Не удалось удалить изображение"
+
+msgid "Image updated"
+msgstr "Изображение обновлено"
+
+msgid "Cannot update image"
+msgstr "Не удалось обновить изображение"
+
+msgid "Other"
+msgstr "Прочее"
+
+msgid "Other parameters"
+msgstr "Прочие параметры"
+
+msgid "Refresh unsupported items (in sec)"
+msgstr "Обновлять неподдерживаемые элементы данных (секунды)"
+
+msgid "Create Media Type"
+msgstr "Создать способ оповещений"
+
+msgid "Create Image"
+msgstr "Создать изображение"
+
+msgid "Working time"
+msgstr "Рабочее время"
+
+msgid "User group for database down message"
+msgstr "Сообщение для группы пользователей при недоступности базы данных"
+
+msgid "Incorrect group"
+msgstr "Некорректная группа"
+
+msgid "Nothing to do"
+msgstr "Ничего не сделано"
+
+msgid "Incorrect work period"
+msgstr "Неверный режим работы"
+
+msgid "Regular expressions"
+msgstr "Регулярные выражения"
+
+msgid "Regular expression"
+msgstr "Регулярное выражение"
+
+msgid "Expressions"
+msgstr "Выражения"
+
+msgid "Expression"
+msgstr "Выражение"
+
+msgid "Expected result"
+msgstr "Ожидаемый результат"
+
+msgid "Character string included"
+msgstr "Строка символов включена"
+
+msgid "Any character string included"
+msgstr "Любая строка символов включена"
+
+msgid "Character string not included"
+msgstr "Строка символов не включена"
+
+msgid "Result is TRUE"
+msgstr "Результат TRUE"
+
+msgid "Result is FALSE"
+msgstr "Результат FALSE"
+
+msgid "Expression type"
+msgstr "Тип выражения"
+
+msgid "New expression"
+msgstr "Новое выражение"
+
+msgid "Case sensitive"
+msgstr "Регистрозависимое"
+
+msgid "Test"
+msgstr "Тест"
+
+msgid "Delimiter"
+msgstr "Разделитель"
+
+msgid "Test string"
+msgstr "Тестовая строка"
+
+msgid "Incorrect expression"
+msgstr "Некорректное выражение"
+
+msgid "New regular expression"
+msgstr "Новое регулярное выражение"
+
+msgid "Regular expression added"
+msgstr "Регулярное выражение добавлено"
+
+msgid "Cannot add regular expression"
+msgstr "Не удалось добавить регулярное выражение"
+
+msgid "Regular expression updated"
+msgstr "Регулярное выражение обновлено"
+
+msgid "Cannot update regular expression"
+msgstr "Не удалось обновить регулярное выражение"
+
+msgid "Regular expression deleted"
+msgstr "Регулярное выражение удалено"
+
+msgid "Cannot delete regular expression"
+msgstr "Не удалось удалить регулярное выражение"
+
+msgid "Delete regular expression?"
+msgstr "Удалить регулярное выражение?"
+
+msgid "Delete selected regular expressions?"
+msgstr "Удалить выбранные регулярные выражения?"
+
+msgid "Group for discovered hosts"
+msgstr "Группа для обнаруженных узлов сети"
+
+msgid "Value maps are used to create a mapping between numeric values and string representations"
+msgstr "Карты значений используются для создания преобразования между цифровыми значениями и строковыми представлениями"
+
+msgid "Delete selected value mapping?"
+msgstr "Удалить выбранное значение преобразования?"
+
+msgid "Delete selected media types?"
+msgstr "Удалить выбранные способы оповещений?"
+
+msgid "Your setup is not configured for distributed monitoring"
+msgstr "Ваша установка не настроена под распределенный мониторинг"
+
+msgid "CONFIGURATION OF NODES"
+msgstr "КОНФИГУРАЦИЯ НОД"
+
+msgid "DM"
+msgstr "DM"
+
+msgid "Node"
+msgstr "Нода"
+
+msgid "Nodes"
+msgstr "Нода"
+
+msgid "NODES"
+msgstr "НОДЫ"
+
+msgid "New node"
+msgstr "Новая нода"
+
+msgid "No nodes defined"
+msgstr "Ноды не заданы"
+
+msgid "All nodes"
+msgstr "Все ноды"
+
+msgid "Delete selected node?"
+msgstr "Удалить выбранную ноду?"
+
+msgid "Enable hosts monitored by selected proxies?"
+msgstr "Активировать узлы сети наблюдаемые выбранными прокси?"
+
+msgid "Disable hosts monitored by selected proxies?"
+msgstr "Деактивировать узлы сети наблюдаемые выбранными прокси?"
+
+msgid "Delete selected proxies?"
+msgstr "Удалить выбранные прокси?"
+
+msgid "CONFIGURATION OF PROXIES"
+msgstr "КОНФИГУРАЦИЯ ПРОКСИ"
+
+msgid "Delete selected proxy?"
+msgstr "Удалить выбранный прокси?"
+
+msgid "Host count"
+msgstr "Количество узлов сети"
+
+msgid "Item count"
+msgstr "Количество элементов данных"
+
+msgid "Required performance (vps)"
+msgstr "Требуемое быстродействие (знч/сек)"
+
+msgid "Proxy mode"
+msgstr "Режим прокси"
+
+msgid "Passive"
+msgstr "Пассивный"
+
+msgid "Active"
+msgstr "Активный"
+
+msgid "Authentication"
+msgstr "Аутентификация"
+
+msgid "Authentication to Zabbix"
+msgstr "Аутентификация Zabbix"
+
+msgid "Base DN"
+msgstr "Базовый DN"
+
+msgid "Bind DN"
+msgstr "Привязанный DN"
+
+msgid "Bind Password"
+msgstr "Привязанный пароль"
+
+msgid "Search attribute"
+msgstr "Аттрибут поиска"
+
+msgid "was not"
+msgstr "не был"
+
+msgid "successful"
+msgstr "успешно"
+
+msgid "must be valid"
+msgstr "должен быть верным"
+
+msgid "LDAP Authentication"
+msgstr "LDAP аутентификация"
+
+msgid "HTTP Authentication"
+msgstr "HTTP аутентификация"
+
+msgid "Zabbix Internal authentication"
+msgstr "Внутренняя аутентификация Zabbix"
+
+msgid "Default authentication"
+msgstr "Аутентификация по умолчанию"
+
+msgid "Switching HTTP authentication will reset all current sessions! Continue?"
+msgstr "Переключение на HTTP аутентификацию сбросит все такущие сессии! Продолжить?"
+
+msgid "Switching LDAP authentication will reset all current sessions! Continue?"
+msgstr "Переключение на LDAP аутентификацию сбросит все такущие сессии! Продолжить?"
+
+msgid "No permissions !"
+msgstr "Нет прав !"
+
+msgid "LATEST DATA"
+msgstr "ПОСЛЕДНИЕ ДАННЫЕ"
+
+msgid "All"
+msgstr "Все"
+
+msgid "all"
+msgstr "все"
+
+msgid "- all -"
+msgstr "- все -"
+
+msgid "- other -"
+msgstr "- прочее -"
+
+msgid "not selected"
+msgstr "нет выбранного"
+
+msgid "Graph"
+msgstr "График"
+
+msgid "Zabbix"
+msgstr "Zabbix"
+
+msgid "Copyright 2001-2010 by"
+msgstr "Все права защищены 2001-2010"
+
+msgid "Connected as"
+msgstr "Подключен под"
+
+msgid "Not connected"
+msgstr "Не подключен"
+
+msgid "SIA Zabbix"
+msgstr "SIA Zabbix"
+
+msgid "Graphs copied"
+msgstr "Графики скопированы"
+
+msgid "Cannot copy graphs"
+msgstr "Не удалось скопировать графики"
+
+msgid "Item added"
+msgstr "Элемент добавлен"
+
+msgid "Item updated"
+msgstr "Элемент обновлен"
+
+msgid "Items updated"
+msgstr "Элементы обновлены"
+
+msgid "Item does not exist"
+msgstr "Элемент не существует"
+
+msgid "Sort by"
+msgstr "Сортировать по"
+
+msgid "Parameter"
+msgstr "Параметр"
+
+msgid "Colour"
+msgstr "Цвет"
+
+msgid "Up"
+msgstr "Up"
+
+msgid "Down"
+msgstr "Down"
+
+msgid "New item for the graph"
+msgstr "Новый элемент данных для графика"
+
+msgid "Update item for the graph"
+msgstr "Обновление элемента данных для графика"
+
+msgid "Sort order (0->100)"
+msgstr "Порядок сортировки (0->100)"
+
+msgid "Y axis side"
+msgstr "Расположение оси Y"
+
+msgid "Axis side"
+msgstr "Расположение оси X"
+
+msgid "Left"
+msgstr "По левой стороне"
+
+msgid "Function"
+msgstr "Функция"
+
+msgid "min"
+msgstr "мин"
+
+msgid "avg"
+msgstr "срд"
+
+msgid "max"
+msgstr "макс"
+
+msgid "last"
+msgstr "посл"
+
+msgid "Draw style"
+msgstr "Способ отрисовки"
+
+msgid "Simple"
+msgstr "Простой"
+
+msgid "Graph type"
+msgstr "Тип графика"
+
+msgid "Stacked"
+msgstr "Стэкируемый"
+
+msgid "Normal"
+msgstr "Нормальный"
+
+msgid "Pie"
+msgstr "Круговой"
+
+msgid "Exploded"
+msgstr "Расширенный круговой"
+
+msgid "Aggregated"
+msgstr "Агрегированный"
+
+msgid "Aggregated periods count"
+msgstr "Количество аггрегированных периодов"
+
+msgid "add graph items first"
+msgstr "добавьте элементы данных к графику"
+
+msgid "Title"
+msgstr "Заголовок"
+
+msgid "Percentile line"
+msgstr "Процентная линия"
+
+msgid "Configuration of graphs"
+msgstr "Настройка графиков"
+
+msgid "CONFIGURATION OF GRAPHS"
+msgstr "НАСТРОЙКА ГРАФИКОВ"
+
+msgid "Graph added"
+msgstr "График добавлен"
+
+msgid "Graph updated"
+msgstr "График обновлен"
+
+msgid "Cannot update graph"
+msgstr "Не удалось обновить график"
+
+msgid "Graph deleted"
+msgstr "График удален"
+
+msgid "Cannot delete graph"
+msgstr "Не удалось удалить график"
+
+msgid "Graphs deleted"
+msgstr "График удален"
+
+msgid "Cannot delete graphs"
+msgstr "Не удалось удалить график"
+
+msgid "Cannot add graph"
+msgstr "Не удалось добавить график"
+
+msgid "Cannot add more than one item with type \"Graph sum\""
+msgstr "Невозможно добавить больше одного элемента данных с типом \"Суммарный график\""
+
+msgid "Id"
+msgstr "Id"
+
+msgid "No graphs defined"
+msgstr "Графики не заданы"
+
+msgid "No graph defined"
+msgstr "График не задан"
+
+msgid "Delete graph?"
+msgstr "Удалить график?"
+
+msgid "Y axis MIN value"
+msgstr "МИН значение оси Y"
+
+msgid "Y axis MAX value"
+msgstr "МАКС значение оси Y"
+
+msgid "Calculated"
+msgstr "Подсчитываемое"
+
+msgid "Fixed"
+msgstr "Фиксированное"
+
+msgid "Create Graph"
+msgstr "Создать график"
+
+msgid "Show working time"
+msgstr "Показывать рабочее время"
+
+msgid "Show triggers"
+msgstr "Показывать триггеры"
+
+msgid "3D view"
+msgstr "3D вид"
+
+msgid "Legend"
+msgstr "Легенда"
+
+msgid "Show legend"
+msgstr "Показать легенду"
+
+msgid "Graph sum"
+msgstr "Сумма графика"
+
+msgid "Graph item"
+msgstr "Элемент графика"
+
+msgid "Items required for graph"
+msgstr "Требуемые элементы для графика"
+
+msgid "Templated graph"
+msgstr "Шаблонный график"
+
+msgid "No target selected"
+msgstr "Цели не выбраны"
+
+msgid "Delete selected graphs?"
+msgstr "Удалить выбранные графики"
+
+msgid "seconds"
+msgstr "секунд"
+
+msgid "sec"
+msgstr "сек"
+
+msgid "Select rows with value like"
+msgstr "Отображать элементы с описанием"
+
+msgid "Last hour graph"
+msgstr "График за последний час"
+
+msgid "Last week graph"
+msgstr "График за последнюю неделю"
+
+msgid "Last month graph"
+msgstr "График за последний месяц"
+
+msgid "500 latest values"
+msgstr "500 последних значений"
+
+msgid "Timestamp"
+msgstr "Отметка времени"
+
+msgid "Local"
+msgstr "Локальный"
+
+msgid "Source"
+msgstr "Источник"
+
+msgid "Event ID"
+msgstr "ID события"
+
+msgid "log files"
+msgstr "Скрыть неизвестное"
+
+msgid "Remove selected"
+msgstr "Удалить выбранные"
+
+msgid "Items list"
+msgstr "Список элементов данных"
+
+msgid "Show selected"
+msgstr "Показать выбранное"
+
+msgid "Hide selected"
+msgstr "Не показывать выбранное"
+
+msgid "Mark selected"
+msgstr "Пометить выбранное"
+
+msgid "Mark others"
+msgstr "Пометить невыбранное"
+
+msgid "as Red"
+msgstr "красным"
+
+msgid "as Green"
+msgstr "зеленым"
+
+msgid "as Blue"
+msgstr "синим"
+
+msgid "Failure Audit"
+msgstr "Ошибочный аудит"
+
+msgid "Success Audit"
+msgstr "Успешный аудит"
+
+msgid "[Y.M.d H:i:s]"
+msgstr "[Y.M.d H:i:s]"
+
+msgid "Y-m-d H:i:s"
+msgstr "Y-m-d H:i:s"
+
+msgid "Maintenance"
+msgstr "Обслуживание"
+
+msgid "Maintenance added"
+msgstr "Обслуживание добавлено"
+
+msgid "Maintenance updated"
+msgstr "Обслуживание обновлено"
+
+msgid "Maintenance deleted"
+msgstr "Обслуживание удалено"
+
+msgid "Delete selected maintenance periods?"
+msgstr "Удалить выбранные периоды обслуживания?"
+
+msgid "At least one host or group should be selected"
+msgstr "Должен быть выбран по крайней мере один узел сети или группа узлов сети"
+
+msgid "In maintenance"
+msgstr "В обслуживании"
+
+msgid "Hosts in maintenance"
+msgstr "Узлы сети в обслуживании"
+
+msgid "Groups in maintenance"
+msgstr "Группы в обслуживании"
+
+msgid "Cannot add maintenance"
+msgstr "Не удалось добавить обслуживание"
+
+msgid "Cannot update maintenance"
+msgstr "Не удалось обновить обслуживание"
+
+msgid "Cannot delete maintenance"
+msgstr "Не удалось удалить обслуживание"
+
+msgid "Maintenance period length"
+msgstr "Длительность периода обслуживания"
+
+msgid "Maintenance periods"
+msgstr "Периоды обслуживания"
+
+msgid "MAINTENANCE PERIODS"
+msgstr "ПЕРИОДЫ ОБСЛУЖИВАНИЯ"
+
+msgid "New maintenance period"
+msgstr "Новый период обслуживания"
+
+msgid "Edit maintenance period"
+msgstr "Изменить период обслуживания"
+
+msgid "Create maintenance period"
+msgstr "Создать период обслуживания"
+
+msgid "Maintenance type"
+msgstr "Тип обслуживания"
+
+msgid "Expired"
+msgstr "Завершен"
+
+msgid "Approach"
+msgstr "Близится"
+
+msgid "With data collection"
+msgstr "Нормальная обработка"
+
+msgid "No data collection"
+msgstr "Обработка без данных"
+
+msgid "Normal maintenance"
+msgstr "Нормальное обслуживание"
+
+msgid "No data maintenance"
+msgstr "Обслуживание без обработки данных"
+
+msgid "Delete maintenance period?"
+msgstr "Удалить период обслуживания"
+
+msgid "Active since"
+msgstr "Активен с"
+
+msgid "Active till"
+msgstr "Активен до"
+
+msgid "Period type"
+msgstr "Тип периода"
+
+msgid "Schedule"
+msgstr "Запланировать"
+
+msgid "Next run"
+msgstr "Следующее выполнение"
+
+msgid "Date"
+msgstr "Дата"
+
+msgid "One time only"
+msgstr "Единовременно"
+
+msgid "Day of week"
+msgstr "День в неделю"
+
+msgid "Day of month"
+msgstr "День в месяц"
+
+msgid "Every day(s)"
+msgstr "Каждый день(и)"
+
+msgid "Every week(s)"
+msgstr "Каждую неделю(и)"
+
+msgid "First"
+msgstr "Первый"
+
+msgid "Second"
+msgstr "Секунда"
+
+msgid "Third"
+msgstr "Третий"
+
+msgid "Fourth"
+msgstr "Четвертый"
+
+msgid "At"
+msgstr "В"
+
+msgid "Incorrect maintenance period"
+msgstr "Некорректный период обслуживания"
+
+msgid "Incorrect maintenance date"
+msgstr "Некорректная дата обслуживания"
+
+msgid "Incorrect maintenance day period"
+msgstr "Некорректный день периода обслуживания"
+
+msgid "Incorrect maintenance week period"
+msgstr "Некорректная неделя периода обслуживания"
+
+msgid "Incorrect maintenance month period"
+msgstr "Некорректный месяц периода обслуживания"
+
+msgid "Incorrect maintenance days of week"
+msgstr "Некорректный день недели обслуживания"
+
+msgid "CONFIGURATION OF HOST GROUPS"
+msgstr "КОНФИГУРАЦИЯ ГРУПП УЗЛОВ СЕТИ"
+
+msgid "Delete selected group?"
+msgstr "Удалить выбранную группу?"
+
+msgid "Enable selected Host Groups?"
+msgstr "Активировать выбранные группы узлов сети?"
+
+msgid "Disable selected Host Groups?"
+msgstr "Деактивировать выбранные группы узлов сети?"
+
+msgid "Delete selected Host Groups?"
+msgstr "Удалить выбранные группы узлов сети?"
+
+msgid "Delete selected groups"
+msgstr "Удалить выбранные группы"
+
+msgid "Import Template"
+msgstr "Импорт шаблона"
+
+msgid "Import Host"
+msgstr "Импорт узла сети"
+
+msgid "Macros"
+msgstr "Макросы"
+
+msgid "Macro"
+msgstr "Макрос"
+
+msgid "Wrong macro"
+msgstr "Ошибочный макрос"
+
+msgid "Macro name is too long, should not exceed 64 chars."
+msgstr "Имя макроса слишком длинное, оно не должно превышать 64 символа"
+
+msgid "Macro value is too long, should not exceed 255 chars."
+msgstr "Значение макроса слишком длинное, оно не должно превышать 255 символов"
+
+msgid "Macro already exists"
+msgstr "Макрос уже существует"
+
+msgid "New macro"
+msgstr "Новый макрос"
+
+msgid "Empty macro value"
+msgstr "Пустое значение макроса"
+
+msgid "No macros defined"
+msgstr "Нет заданных макросов"
+
+msgid "Macro added"
+msgstr "Макрос добавлен"
+
+msgid "Macros updated"
+msgstr "Макросы обновлены"
+
+msgid "Cannot update macros"
+msgstr "Не удалось обновить макросы"
+
+msgid "Macros deleted"
+msgstr "Макрос удален"
+
+msgid "Cannot add macro"
+msgstr "Не удалось добавить макрос"
+
+msgid "Cannot delete macros"
+msgstr "Не удалось удалить макросы"
+
+msgid "Hosts list"
+msgstr "Список узлов сети"
+
+msgid "Other groups"
+msgstr "Другие группы"
+
+msgid "In groups"
+msgstr "В группах"
+
+msgid "In"
+msgstr "В"
+
+msgid "Application"
+msgstr "Группа элементов данных"
+
+msgid "Applications"
+msgstr "Группы элементов данных"
+
+msgid "APPLICATIONS"
+msgstr "ГРУППЫ ЭЛЕМЕНТОВ ДАННЫХ"
+
+msgid "Create application"
+msgstr "Создать группу элементов данных"
+
+msgid "Application updated"
+msgstr "Группа элементов данных обновлена"
+
+msgid "Cannot update application"
+msgstr "Не удалось обновить группу элементов данных"
+
+msgid "Application added"
+msgstr "Группа элементов данных добавлена"
+
+msgid "Cannot add application"
+msgstr "Не удалось добавить группу элементов данных"
+
+msgid "Application deleted"
+msgstr "Группа элементов данных удалена"
+
+msgid "Cannot delete application"
+msgstr "Невозможно удалить группу элементов данных"
+
+msgid "No applications defined"
+msgstr "Группы элементов данных не заданы"
+
+msgid "No templates linked"
+msgstr "Без связанных шаблонов"
+
+msgid "Hosts"
+msgstr "Узлы сети"
+
+msgid "Items"
+msgstr "Элементы данных"
+
+msgid "ITEMS"
+msgstr "ЭЛЕМЕНТЫ ДАННЫХ"
+
+msgid "Triggers"
+msgstr "Триггеры"
+
+msgid "Graphs"
+msgstr "Графики"
+
+msgid "Host added"
+msgstr "Узел сети добавлен"
+
+msgid "Cannot add host"
+msgstr "Не удалось добавить узел сети"
+
+msgid "Items copied"
+msgstr "Элементы скопированы"
+
+msgid "Cannot copy items"
+msgstr "Не удалось скопировать элементы"
+
+msgid "Host updated"
+msgstr "Узел сети обновлен"
+
+msgid "Cannot update host"
+msgstr "Не удалось обновить узел сети"
+
+msgid "Cannot update"
+msgstr "Не удалось обновить"
+
+msgid "Host status updated"
+msgstr "Состояние узла сети обновлено"
+
+msgid "Cannot update host status"
+msgstr "Не удалось обновить статус узла сети"
+
+msgid "Host deleted"
+msgstr "Узел сети удален"
+
+msgid "Cannot delete host"
+msgstr "Не удалось удалить узел сети"
+
+msgid "CONFIGURATION OF HOSTS"
+msgstr "КОНФИГУРАЦИЯ УЗЛОВ СЕТИ"
+
+msgid "CONFIGURATION OF TEMPLATES"
+msgstr "КОНФИГУРАЦИЯ ШАБЛОНОВ"
+
+msgid "CONFIGURATION OF APPLICATIONS"
+msgstr "КОНФИГУРАЦИЯ ГРУПП ЭЛЕМЕНТОВ"
+
+msgid "CONFIGURATION OF MAINTENANCE PERIODS"
+msgstr "КОНФИГУРАЦИЯ ПЕРИОДОВ ОБСЛУЖИВАНИЯ"
+
+msgid "HOST GROUPS"
+msgstr "ГРУППЫ УЗЛОВ СЕТИ"
+
+msgid "No host groups defined"
+msgstr "Группы узлов сети не заданы"
+
+msgid "No hosts defined"
+msgstr "Узлы сети не заданы"
+
+msgid "No templates defined"
+msgstr "Шаблоны не заданы"
+
+msgid "No proxies defined"
+msgstr "Прокси не заданы"
+
+msgid "HOSTS"
+msgstr "УЗЛЫ СЕТИ"
+
+msgid "Host"
+msgstr "Узел сети"
+
+msgid "Connect to"
+msgstr "Подключаться по"
+
+msgid "DNS"
+msgstr "DNS"
+
+msgid "IP"
+msgstr "IP"
+
+msgid "Port"
+msgstr "Порт"
+
+msgid "Zabbix agent port"
+msgstr "Порт Zabbix агента"
+
+msgid "Monitored"
+msgstr "Наблюдается"
+
+msgid "Not monitored"
+msgstr "Не наблюдается"
+
+msgid "Template"
+msgstr "Шаблон"
+
+msgid "Deleted"
+msgstr "Удален"
+
+msgid "Unknown"
+msgstr "Неизвестно"
+
+msgid "Groups"
+msgstr "Группы"
+
+msgid " - all groups - "
+msgstr "- все группы -"
+
+msgid "All groups"
+msgstr "Все группы"
+
+msgid "No groups defined"
+msgstr "Группы не заданы"
+
+msgid "New group"
+msgstr "Новая группа"
+
+msgid "DNS name"
+msgstr "DNS имя"
+
+msgid "IP address"
+msgstr "IP адрес"
+
+msgid "Link additional templates"
+msgstr "Присоединить дополнительные шаблоны"
+
+msgid "Replace linked templates"
+msgstr "Заменить соединенные шаблоны"
+
+msgid "Use IPMI"
+msgstr "Использовать IPMI"
+
+msgid "IPMI IP address"
+msgstr "IP адрес IPMI"
+
+msgid "IPMI port"
+msgstr "Порт IPMI"
+
+msgid "IPMI authentication algorithm"
+msgstr "Алгоритм авторизации IPMI"
+
+msgid "None"
+msgstr "Пусто"
+
+msgid "MD2"
+msgstr "MD2"
+
+msgid "MD5"
+msgstr "MD5"
+
+msgid "Straight"
+msgstr "Straight"
+
+msgid "OEM"
+msgstr "OEM"
+
+msgid "RMCP+"
+msgstr "RMCP+"
+
+msgid "IPMI privilege level"
+msgstr "Уровень привилегии IPMI"
+
+msgid "Callback"
+msgstr "Обратный вызов"
+
+msgid "Operator"
+msgstr "Оператор"
+
+msgid "Admin"
+msgstr "Администратор"
+
+msgid "IPMI username"
+msgstr "Имя пользователя IPMI"
+
+msgid "IPMI password"
+msgstr "Пароль IPMI"
+
+msgid "Use profile"
+msgstr "Использовать профиль"
+
+msgid "Delete selected host?"
+msgstr "Удалить выбранный узел сети?"
+
+msgid "Delete selected with linked elements"
+msgstr "Удалить выбранное с соединенными элементами"
+
+msgid "Group name"
+msgstr "Название группы"
+
+msgid "Host group"
+msgstr "Группа узлов сети"
+
+msgid "Host groups"
+msgstr "Группы узлов сети"
+
+msgid "Update"
+msgstr "Обновить"
+
+msgid "Availability"
+msgstr "Доступность"
+
+msgid "Available"
+msgstr "Доступен"
+
+msgid "Not available"
+msgstr "Недоступен"
+
+msgid "Proxies"
+msgstr "Прокси"
+
+msgid "PROXIES"
+msgstr "ПРОКСИ"
+
+msgid "Proxy"
+msgstr "Прокси"
+
+msgid "Create Proxy"
+msgstr "Создать прокси"
+
+msgid "Proxy name"
+msgstr "Имя прокси"
+
+msgid "Last seen (age)"
+msgstr "Последний замеченный (возраст)"
+
+msgid "Host macro"
+msgstr "Макрос узла сети"
+
+msgid "doesn't exist"
+msgstr "не существует"
+
+msgid "Enable selected hosts?"
+msgstr "Активировать выбранные узлы сети?"
+
+msgid "Disable selected hosts?"
+msgstr "Деактивировать выбранные узлы сети?"
+
+msgid "Delete selected hosts?"
+msgstr "Удалить выбранные узлы сети?"
+
+msgid "Updated status of host"
+msgstr "Состояние узла сети обновлено"
+
+msgid "Clear when unlinking"
+msgstr "Очистить при отсоединении"
+
+msgid "Templates list"
+msgstr "Список шаблонов"
+
+msgid "New template added"
+msgstr "Новый шаблон добавлен"
+
+msgid "Cannot add template"
+msgstr "Не удалось добавить шаблон"
+
+msgid "Template updated"
+msgstr "Шаблон обновлен"
+
+msgid "Cannot update template"
+msgstr "Не удалось обновить шаблон"
+
+msgid "Linked templates"
+msgstr "Соединенные шаблоны"
+
+msgid "Linked to"
+msgstr "Соединен с"
+
+msgid "Template deleted"
+msgstr "Шаблон удален"
+
+msgid "Cannot delete template"
+msgstr "Не удалось удалить шаблон"
+
+msgid "Link with template"
+msgstr "Соединить с шаблоном"
+
+msgid "Delete and clear"
+msgstr "Удалить И отчистить"
+
+msgid "Delete selected templates?"
+msgstr "Удалить выбранные шаблоны?"
+
+msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
+msgstr "Внимание: это действие удалит выбранные шаблоны и очистит все соединенные с ними узлы сети"
+
+msgid "Host profile"
+msgstr "Профиль узла сети"
+
+msgid "Device type"
+msgstr "Тип устройства"
+
+msgid "OS"
+msgstr "ОС"
+
+msgid "SerialNo"
+msgstr "Серийный номер"
+
+msgid "Tag"
+msgstr "Тэг"
+
+msgid "Hardware"
+msgstr "Аппаратные средства"
+
+msgid "Software"
+msgstr "Программное обеспечение"
+
+msgid "Contact"
+msgstr "Контактная информация"
+
+msgid "Location"
+msgstr "Местоположение"
+
+msgid "Notes"
+msgstr "Примечания"
+
+msgid "MAC Address"
+msgstr "MAC адрес"
+
+msgid "Add to group"
+msgstr "Добавить в группу"
+
+msgid "Delete from group"
+msgstr "Удалить из группы"
+
+msgid "Update in group"
+msgstr "Обновить в группе"
+
+msgid "Create Host"
+msgstr "Создать узел сети"
+
+msgid "Create Template"
+msgstr "Создать шаблон"
+
+msgid "Template linkage"
+msgstr "Связи с шаблонами"
+
+msgid "Templates"
+msgstr "Шаблоны"
+
+msgid "TEMPLATES"
+msgstr "ШАБЛОНЫ"
+
+msgid "Unlink"
+msgstr "Отсоединить"
+
+msgid "Cannot unlink template"
+msgstr "Не удалось отсоединить шаблон"
+
+msgid "Cannot link template"
+msgstr "Не удалось соединить шаблон"
+
+msgid "Unlink and clear"
+msgstr "Отсоединить и очистить"
+
+msgid "Monitored by proxy"
+msgstr "Мониторится через прокси"
+
+msgid "Use extended profile"
+msgstr "Использовать расширенный профиль"
+
+msgid "Alias"
+msgstr "Алиас устройства"
+
+msgid "Device Chassis"
+msgstr "Шасси устройства"
+
+msgid "OS (Full Details)"
+msgstr "ОС (Полное описание)"
+
+msgid "OS (Short)"
+msgstr "ОС (Короткое описание)"
+
+msgid "HW Architecture"
+msgstr "HW архитектура"
+
+msgid "Serial Number"
+msgstr "Серийный номер"
+
+msgid "Model Number"
+msgstr "Модель"
+
+msgid "Asset Tag"
+msgstr "Признак активности"
+
+msgid "Device Vendor"
+msgstr "Производитель"
+
+msgid "Device Contract Number"
+msgstr "Номер производителя"
+
+msgid "Installer Name"
+msgstr "Имя установщика"
+
+msgid "Device Deployment Status"
+msgstr "Состояние развертывания устройства"
+
+msgid "Software Application #1"
+msgstr "Приложение #1"
+
+msgid "Software Application #2"
+msgstr "Приложение #2"
+
+msgid "Software Application #3"
+msgstr "Приложение #3"
+
+msgid "Software Application #4"
+msgstr "Приложение #4"
+
+msgid "Software Application #5"
+msgstr "Приложение #5"
+
+msgid "URL #1"
+msgstr "URL #1"
+
+msgid "URL #2"
+msgstr "URL #2"
+
+msgid "URL #3"
+msgstr "URL #3"
+
+msgid "Device Port Connections"
+msgstr "Подключения к портам устройства"
+
+msgid "Device Notes"
+msgstr "Комментарии к устройству"
+
+msgid "Device Hardware"
+msgstr "Аппаратные средства устройства"
+
+msgid "Device Software"
+msgstr "Прикладные средства устройства"
+
+msgid "Host Subnet Mask"
+msgstr "Маска подсети хоста"
+
+msgid "Host Router"
+msgstr "Роутер хоста"
+
+msgid "Host MAC Address"
+msgstr "MAC адрес хоста"
+
+msgid "OOB IP Address"
+msgstr "OOB IP адрес"
+
+msgid "OOB Subnet Mask"
+msgstr "OOB маска подсети"
+
+msgid "OOB Router"
+msgstr "OOB роутер"
+
+msgid "Date HW Purchased"
+msgstr "Дата покупки HW"
+
+msgid "Date HW Installed"
+msgstr "Дата установки HW"
+
+msgid "Date HW Maintenance Expires"
+msgstr "Дата прохождения обслуживания HW"
+
+msgid "Date HW Decommissioned"
+msgstr "Дата списания HW"
+
+msgid "Site Address 1"
+msgstr "Адрес 1"
+
+msgid "Site Address 2"
+msgstr "Адрес 2"
+
+msgid "Site Address 3"
+msgstr "Адрес 3"
+
+msgid "Site City"
+msgstr "Город"
+
+msgid "Site State / Province"
+msgstr "Область / Участок"
+
+msgid "Site Country"
+msgstr "Страна"
+
+msgid "Site Zip / Postal"
+msgstr "Почтовый индекс"
+
+msgid "Site Rack Location"
+msgstr "Местоположение стойки"
+
+msgid "Site Notes"
+msgstr "Примечания"
+
+msgid "Primary POC Name"
+msgstr "Первичное имя POC"
+
+msgid "Primary POC Email"
+msgstr "Первичный email POC"
+
+msgid "Primary POC Phone 1"
+msgstr "Первичный POC телефон 1"
+
+msgid "Primary POC Phone 2"
+msgstr "Первичный POC телефон 2"
+
+msgid "Primary POC Cell"
+msgstr "Первичный POC сотовый"
+
+msgid "Primary POC Screen Name"
+msgstr "Первичное POC имя экрана"
+
+msgid "Primary POC Comments"
+msgstr "Первичные POC комментарии"
+
+msgid "Secondary POC Name"
+msgstr "Вторичное POC имя"
+
+msgid "Secondary POC Email"
+msgstr "Вторичный email POC"
+
+msgid "Secondary POC Phone 1"
+msgstr "Вторичный POC телефон 1"
+
+msgid "Secondary POC Phone 2"
+msgstr "Вторичный POC телефон 2"
+
+msgid "Secondary POC Cell"
+msgstr "Вторичный POC сотовый"
+
+msgid "Secondary POC Screen Name"
+msgstr "Вторичное POC имя экрана"
+
+msgid "Secondary POC Comments"
+msgstr "Вторичные POC комментарии"
+
+msgid "Templated items"
+msgstr "Элементы данных из шаблона"
+
+msgid "Not Templated items"
+msgstr "Без элементов данных из шаблона"
+
+msgid "With triggers"
+msgstr "С триггерами"
+
+msgid "Without triggers"
+msgstr "Без триггерами"
+
+msgid "Types"
+msgstr "Типы"
+
+msgid "No items defined"
+msgstr "Элементы данных не заданы"
+
+msgid "No item defined"
+msgstr "Элемент данных не задан"
+
+msgid "History cleared"
+msgstr "История очищена"
+
+msgid "Clear history for selected"
+msgstr "Очистить журнал"
+
+msgid "Clear history"
+msgstr "Очистить журнал"
+
+msgid "Cannot clear history"
+msgstr "Невозможно очистить историю"
+
+msgid "Configuration of items"
+msgstr "Настройка элементов данных"
+
+msgid "CONFIGURATION OF ITEMS"
+msgstr "НАСТРОЙКА ЭЛЕМЕНТОВ ДАННЫХ"
+
+msgid "Cannot update item"
+msgstr "Не удалось обновить элемент данных"
+
+msgid "Status updated"
+msgstr "Состояни обновлено"
+
+msgid "Cannot update status"
+msgstr "Не удалось обновить состояние"
+
+msgid "Cannot add item"
+msgstr "Не удалось добавить элемент данных"
+
+msgid "Item deleted"
+msgstr "Элемент данных удален"
+
+msgid "Cannot delete item"
+msgstr "Не удалось удалить элемент данных"
+
+msgid "Items deleted"
+msgstr "Элементы данных удалены"
+
+msgid "Cannot delete items"
+msgstr "Не удалось удалить элементы данных"
+
+msgid "Items activated"
+msgstr "Элементы данных активированы"
+
+msgid "Items disabled"
+msgstr "Элементы данных деактивированы"
+
+msgid "Key"
+msgstr "Ключ"
+
+msgid "Description"
+msgstr "Описание"
+
+msgid "Update interval"
+msgstr "Интервал обновления"
+
+msgid "Interval"
+msgstr "Интервал"
+
+msgid "History"
+msgstr "История"
+
+msgid "Trends"
+msgstr "Динамика изменений"
+
+msgid "Zabbix agent"
+msgstr "Zabbix агент"
+
+msgid "Zabbix agent (active)"
+msgstr "Zabbix агент (активный)"
+
+msgid "SNMPv1 agent"
+msgstr "SNMPv1 агент"
+
+msgid "Zabbix trapper"
+msgstr "Zabbix траппер"
+
+msgid "Simple check"
+msgstr "Простая проверка"
+
+msgid "SNMPv2 agent"
+msgstr "SNMPv2 агент"
+
+msgid "SNMPv3 agent"
+msgstr "SNMPv3 агент"
+
+msgid "Zabbix internal"
+msgstr "Внутренний Zabbix"
+
+msgid "Database monitor"
+msgstr "Монитор баз данных"
+
+msgid "IPMI agent"
+msgstr "IPMI агент"
+
+msgid "SSH agent"
+msgstr "SSH агент"
+
+msgid "TELNET agent"
+msgstr "TELNET агент"
+
+msgid "Zabbix aggregate"
+msgstr "Аггрегативный Zabbix"
+
+msgid "External check"
+msgstr "Внешняя проверка"
+
+msgid "Web monitoring"
+msgstr "Веб-мониторинг"
+
+msgid "WEB CHECKS"
+msgstr "ВЕБ ПРОВЕРКИ"
+
+msgid "Not supported"
+msgstr "Не поддерживается"
+
+msgid "Email"
+msgstr "Email"
+
+msgid "Jabber"
+msgstr "Jabber"
+
+msgid "Jabber identifier"
+msgstr "Идентификатор Jabber"
+
+msgid "SMS"
+msgstr "SMS"
+
+msgid "Script"
+msgstr "Сценарий"
+
+msgid "GSM modem"
+msgstr "GSM модем"
+
+msgid "Units"
+msgstr "Единица измерения"
+
+msgid "Update interval (in sec)"
+msgstr "Интервал обновления (секунды)"
+
+msgid "Keep history (in days)"
+msgstr "Хранить историю (дни)"
+
+msgid "Keep trends (in days)"
+msgstr "Хранить динамику изменений (дни)"
+
+msgid "Type of information"
+msgstr "Тип информации"
+
+msgid "Data type"
+msgstr "Тип данных"
+
+msgid "Decimal"
+msgstr "Десятичный"
+
+msgid "Octal"
+msgstr "Восьмеричный"
+
+msgid "Hexadecimal"
+msgstr "Шестнадцатеричный"
+
+msgid "Store value"
+msgstr "Хранить значение"
+
+msgid "Show value"
+msgstr "Показывать значение"
+
+msgid "Numeric (integer 64bit)"
+msgstr "Числовой (целое 64бит)"
+
+msgid "Numeric (unsigned)"
+msgstr "Числовой (целое положительное)"
+
+msgid "Numeric (float)"
+msgstr "Числовой (с плавающей точкой)"
+
+msgid "Character"
+msgstr "Символ"
+
+msgid "Log"
+msgstr "Журнал (лог)"
+
+msgid "Text"
+msgstr "Текст"
+
+msgid "As is"
+msgstr "Как есть"
+
+msgid "Delta (speed per second)"
+msgstr "Дельта (скорость в секунду)"
+
+msgid "Delta (simple change)"
+msgstr "Дельта (простое изменение)"
+
+msgid "Item"
+msgstr "Элемент данных"
+
+msgid "SNMP community"
+msgstr "SNMP community"
+
+msgid "SNMP OID"
+msgstr "SNMP OID"
+
+msgid "SNMP port"
+msgstr "SNMP порт"
+
+msgid "Allowed hosts"
+msgstr "Разрешенные узлы сети"
+
+msgid "SNMPv3 security name"
+msgstr "SNMPv3 security name"
+
+msgid "SNMPv3 security level"
+msgstr "SNMPv3 security level"
+
+msgid "SNMPv3 auth passphrase"
+msgstr "SNMPv3 auth passphrase"
+
+msgid "SNMPv3 priv passphrase"
+msgstr "SNMPv3 priv passphrase"
+
+msgid "Custom multiplier"
+msgstr "Пользовательский множитель"
+
+msgid "Use custom multiplier"
+msgstr "Пользовательский множитель"
+
+msgid "Select host..."
+msgstr "Выберите узел сети..."
+
+msgid "Log time format"
+msgstr "Формат времени в журнале (логе)"
+
+msgid "Create Item"
+msgstr "Создать элемент данных"
+
+msgid "elements copy to ..."
+msgstr "копировать элементы в ..."
+
+msgid "Mode"
+msgstr "Режим"
+
+msgid "Target"
+msgstr "Цель"
+
+msgid "Target type"
+msgstr "Тип цели"
+
+msgid "Skip existing items"
+msgstr "Пропустить существующие элементы данных"
+
+msgid "update existing non linked items"
+msgstr "обновить существующие не соединенные элементы данных"
+
+msgid "Copy"
+msgstr "Копировать"
+
+msgid "Show items with description like"
+msgstr "Показать элементы данных с содержанием описания"
+
+msgid "History clearing can take a long time. Continue?"
+msgstr "Очистка журнала может занять продолжительное время. Продолжить?"
+
+msgid "Mass update"
+msgstr "Массовое обновление"
+
+msgid "Search"
+msgstr "Поиск"
+
+msgid "Original"
+msgstr "Оригинальное"
+
+msgid "New flexible interval"
+msgstr "Новый переменный интервал"
+
+msgid "Flexible intervals (sec)"
+msgstr "Переменные интервалы (сек)"
+
+msgid "No flexible intervals"
+msgstr "Без переменных интервалов"
+
+msgid "Additional parameters"
+msgstr "Дополнительные параметры"
+
+msgid "New application"
+msgstr "Новая группа элементов данных"
+
+msgid "IPMI sensor"
+msgstr "Сенсор IPMI"
+
+msgid "Templated item"
+msgstr "Шаблонный элемент"
+
+msgid "Web item"
+msgstr "Веб элемент"
+
+msgid "Executed script"
+msgstr "Выполняемый скрипт"
+
+msgid "User name"
+msgstr "Имя пользователя"
+
+msgid "Public key file"
+msgstr "Файл публичного ключа"
+
+msgid "Private key file"
+msgstr "Файл приватного ключа"
+
+msgid "Public key"
+msgstr "Публичный ключ"
+
+msgid "Authentication method"
+msgstr "Метод аутентификации"
+
+msgid "Passphrase"
+msgstr "Ключевое слово"
+
+msgid "Edit Trigger"
+msgstr "Изменить триггер"
+
+msgid "Enable selected items?"
+msgstr "Включить выбранные элементы данных?"
+
+msgid "Disable selected items?"
+msgstr "Отключить выбранные элементы данных?"
+
+msgid "Mass update selected items?"
+msgstr "Обновить массово выбранные элементы данных?"
+
+msgid "Copy selected items?"
+msgstr "Скопировать выбранные элементы данных?"
+
+msgid "Delete history of selected items?"
+msgstr "Удалить историю выбранных элементов данных?"
+
+msgid "Delete selected items?"
+msgstr "Удалить выбранные элементы данных?"
+
+msgid "Formula"
+msgstr "Формула"
+
+msgid "Event"
+msgstr "Событие"
+
+msgid "Event details"
+msgstr "Подробности события"
+
+msgid "List"
+msgstr "Список"
+
+msgid "Latest events"
+msgstr "Последние события"
+
+msgid "HISTORY OF EVENTS"
+msgstr "ИСТОРИЯ СОБЫТИЙ"
+
+msgid "No events found"
+msgstr "События не найдены"
+
+msgid "Events since"
+msgstr "События с"
+
+msgid "UP"
+msgstr "ДОСТУПЕН"
+
+msgid "DOWN"
+msgstr "НЕДОСТУПЕН"
+
+msgid "DISCOVERED"
+msgstr "ОБНАРУЖЕН"
+
+msgid "LOST"
+msgstr "ПОТЕРЯН"
+
+msgid "Last check"
+msgstr "Последняя проверка"
+
+msgid "Last value"
+msgstr "Последнее значение"
+
+msgid "Hidden"
+msgstr "Скрыть"
+
+msgid "Shown"
+msgstr "Показать"
+
+msgid "Align icons"
+msgstr "Привязать иконки"
+
+msgid "Upper level maps"
+msgstr "Карты верхнего уровня"
+
+msgid "Links"
+msgstr "Связи"
+
+msgid "Link"
+msgstr "Связь"
+
+msgid "Label"
+msgstr "Подпись"
+
+msgid "Grid"
+msgstr "Сетка"
+
+msgid "X"
+msgstr "X"
+
+msgid "Icon (problem)"
+msgstr "Иконка (проблема)"
+
+msgid "Icon (OK)"
+msgstr "Иконка (ok)"
+
+msgid "Icon (unknown)"
+msgstr "Иконка (неизвестно)"
+
+msgid "Icon (maintenance)"
+msgstr "Иконка (обслуживание)"
+
+msgid "Icon (disabled)"
+msgstr "Иконка (отключен)"
+
+msgid "Link status indicator"
+msgstr "Индикатор состояния связи"
+
+msgid "Configuration of network maps"
+msgstr "НАСТРОЙКА КАРТ СЕТЕЙ"
+
+msgid "CONFIGURATION OF NETWORK MAPS"
+msgstr "НАСТРОЙКА КАРТ СЕТЕЙ"
+
+msgid "Map is saved! Return?"
+msgstr "Карта сети сохранена! Завершить редактирование?"
+
+msgid "Map save operation failed."
+msgstr "Ошибка при операции сохранения карты."
+
+msgid "Get Img: Element data not found!"
+msgstr "Получение Img: Данные по элементу не найдены!"
+
+msgid "Add element"
+msgstr "Добавить элемент"
+
+msgid "Coordinate X"
+msgstr "Координата X"
+
+msgid "Coordinate Y"
+msgstr "Координата Y"
+
+msgid "Connectors"
+msgstr "СВЯЗИ"
+
+msgid "UNAVAILABLE"
+msgstr "НЕДОСТУПЕН"
+
+msgid "MAINTENANCE"
+msgstr "В ОБСЛУЖИВАНИИ"
+
+msgid "Image is used in Zabbix map"
+msgstr "Фоновое изображение используется на карте сети ZABBIX"
+
+msgid "Edit map element"
+msgstr "Изменить элемент карты"
+
+msgid "Icon (default)"
+msgstr "Иконка (по умолчанию)"
+
+msgid "Apply"
+msgstr "Применить"
+
+msgid "Map elements"
+msgstr "Элементы карты"
+
+msgid "Network map deleted"
+msgstr "Карта сети удалена"
+
+msgid "Cannot delete network map"
+msgstr "Не удалось удалить карту сети"
+
+msgid "MAPS"
+msgstr "КАРТЫ СЕТИ"
+
+msgid "No maps defined"
+msgstr "Карты сети не заданы"
+
+msgid "Create Map"
+msgstr "Создать карту сети"
+
+msgid "Import Map"
+msgstr "Импорт карты"
+
+msgid "Icon label location"
+msgstr "Расположение подписи иконки"
+
+msgid "Icon highlighting"
+msgstr "Подсветка иконки"
+
+msgid "Link indicators"
+msgstr "Индикаторы связи"
+
+msgid "Type (OK)"
+msgstr "Тип (ОК)"
+
+msgid "Colour (OK)"
+msgstr "Цвет (ОК)"
+
+msgid "Use advanced icons"
+msgstr "Использовать расширенные иконки"
+
+msgid "Delete selected maps?"
+msgstr "Удалить выбранные карты?"
+
+msgid "Network map added"
+msgstr "Карта сети добавлена"
+
+msgid "Cannot add network map"
+msgstr "Не удалось добавить карту сети"
+
+msgid "Network map updated"
+msgstr "Карта сети обновлена"
+
+msgid "Cannot update network map"
+msgstr "Не удалось обновить карту сети"
+
+msgid "Expand single problem"
+msgstr "Развертывание одиночной проблемы"
+
+msgid "Mark elements on triggers status change"
+msgstr "Маркировать элементы с измененившимся состоянием триггеров"
+
+msgid "Get selected elements FAILED."
+msgstr "Не удалось получить элементы."
+
+msgid "Two elements should be selected"
+msgstr "Должны быть выбраны два элемента"
+
+msgid "Delete selected elements?"
+msgstr "Удалить выбранные элементы?"
+
+msgid "Please select two elements"
+msgstr "Пожалуйста, выберите два элемента"
+
+msgid "Delete Links between selected elements?"
+msgstr "Удалить соединители между выбранными элементами?"
+
+msgid "No links"
+msgstr "Без связей"
+
+msgid "Wrong type of arguments passed to function"
+msgstr "Ошибочный тип переданных в функцию аргументов"
+
+msgid "New element"
+msgstr "Новый элемент"
+
+msgid "Set trigger"
+msgstr "Задать триггер"
+
+msgid "Bottom"
+msgstr "По нижнему краю"
+
+msgid "Top"
+msgstr "По верхнему краю"
+
+msgid "Link status indicators"
+msgstr "Индикаторы состояния соединителя"
+
+msgid "Remove element"
+msgstr "Удалить элемент"
+
+msgid "Add link"
+msgstr "Добавить соединитель"
+
+msgid "Remove link"
+msgstr "Удалить соединитель"
+
+msgid "Cannot find image"
+msgstr "Не удалось найти рисунок"
+
+msgid "Cannot find background image"
+msgstr "Не удалось найти фоновый рисунок"
+
+msgid "Cannot find trigger"
+msgstr "Не удалось найти триггер"
+
+msgid "Cannot find host"
+msgstr "Не удалось найти узел сети"
+
+msgid "Cannot find hostgroup"
+msgstr "Не удалось найти группу узлов сети"
+
+msgid "Cannot find map"
+msgstr "Не удалось найти карту"
+
+msgid "Cannot find screen"
+msgstr "Не удалось найти комплексный экран"
+
+msgid "used in exported map"
+msgstr "используемый в экспортированной карте"
+
+msgid "No icon for map element"
+msgstr "Нет иконки для элемента карты"
+
+msgid "Export does not contain Zabbix maps"
+msgstr "Экспорт не содержит карты Zabbix"
+
+msgid "Export does not contain Zabbix screens"
+msgstr "Экспорт не содержит комплексные экраны Zabbix"
+
+msgid "OK"
+msgstr "OK"
+
+msgid "PROBLEM"
+msgstr "ПРОБЛЕМА"
+
+msgid "http://www.zabbix.com"
+msgstr "http://www.zabbix.com"
+
+msgid "Unacknowledged"
+msgstr "Неподтверждено"
+
+msgid "Event acknowledging disabled"
+msgstr "Подтверждение событий отключено"
+
+msgid "Network maps"
+msgstr "Карты сетей"
+
+msgid "NETWORK MAPS"
+msgstr "Карты сетей"
+
+msgid "Background image"
+msgstr "Фоновое изображение"
+
+msgid "Icon label type"
+msgstr "Тип подписи иконки"
+
+msgid "Label location"
+msgstr "Расположение подписи"
+
+msgid "Element name"
+msgstr "Название элемента"
+
+msgid "Status only"
+msgstr "Только состояние"
+
+msgid "Nothing"
+msgstr "Ничего"
+
+msgid "m.d.Y H:i:s"
+msgstr "m.d.Y H:i:s"
+
+msgid "CONFIGURATION OF MEDIA TYPES"
+msgstr "НАСТРОЙКИ СПОСОБОВ ОПОВЕЩЕНИЙ"
+
+msgid "MEDIA TYPES"
+msgstr "ТИПЫ СПОСОБОВ ОПОВЕЩЕНИЙ"
+
+msgid "Media"
+msgstr "Способ оповещений"
+
+msgid "Send to"
+msgstr "Отправлять"
+
+msgid "When active"
+msgstr "Когда активно"
+
+msgid "No media defined"
+msgstr "Способы оповещений не заданы"
+
+msgid "New media"
+msgstr "Новый способ оповещений"
+
+msgid "Use if severity"
+msgstr "Использовать, если важность"
+
+msgid "Save"
+msgstr "Сохранить"
+
+msgid "Cancel"
+msgstr "Отменить"
+
+msgid "Dashboard"
+msgstr "Dashboard"
+
+msgid "PERSONAL DASHBOARD"
+msgstr "ПЕРСОНАЛЬНЫЙ DASHBOARD"
+
+msgid "Age"
+msgstr "Возраст"
+
+msgid "Issue"
+msgstr "Проблема"
+
+msgid "System status"
+msgstr "Состояние системы"
+
+msgid "Host status"
+msgstr "Состояние узлов сети"
+
+msgid "Without problems"
+msgstr "Без проблем"
+
+msgid "With problems"
+msgstr "С проблемами"
+
+msgid "Last 20 issues"
+msgstr "Последние 20 проблем"
+
+msgid "Favourite"
+msgstr "Избранное"
+
+msgid "Favourites"
+msgstr "Избранные"
+
+msgid "Every"
+msgstr "Каждые"
+
+msgid "Menu"
+msgstr "Меню"
+
+msgid "Reset"
+msgstr "Сбросить"
+
+msgid "Maximize"
+msgstr "Развернуть"
+
+msgid "Minimize"
+msgstr "Свернуть"
+
+msgid "Loading..."
+msgstr "Загрузка..."
+
+msgid "Dashboard configuration"
+msgstr "Настройка Dashboard"
+
+msgid "DASHBOARD CONFIGURATION"
+msgstr "НАСТРОЙКА DASHBOARD"
+
+msgid "Configure"
+msgstr "Настройка"
+
+msgid "Selected"
+msgstr "Выбрать"
+
+msgid "Show hosts in maintenance"
+msgstr "Отображать узлы сети в обслуживании"
+
+msgid "Triggers with severity"
+msgstr "Триггеры с важностью"
+
+msgid "Dashboard filter"
+msgstr "Фильтр Dashboard"
+
+msgid "Favourite graphs"
+msgstr "Избранные графики"
+
+msgid "Favourite maps"
+msgstr "Избранные карты"
+
+msgid "Favourite screens"
+msgstr "Избранные комплексные экраны"
+
+msgid "Unacknowledged only"
+msgstr "Только неподтвержденные"
+
+msgid "Separated"
+msgstr "Неподтвержденные отдельно"
+
+msgid "Problem display"
+msgstr "Отображение проблем"
+
+msgid "Overview"
+msgstr "Обзор"
+
+msgid "Overview by proxy"
+msgstr "Обзор по прокси"
+
+msgid "OVERVIEW"
+msgstr "ОБЗОР"
+
+msgid "Hosts location"
+msgstr "Расположение узлов сети"
+
+msgid "Data"
+msgstr "Данные"
+
+msgid "Show graph of item"
+msgstr "Показать график элемента"
+
+msgid "Show values of item"
+msgstr "Показать значения элемента"
+
+msgid "Values"
+msgstr "Значения"
+
+msgid "5 min"
+msgstr "5 мин"
+
+msgid "15 min"
+msgstr "15 мин"
+
+msgid "QUEUE"
+msgstr "ОЧЕРЕДЬ"
+
+msgid "QUEUE OF ITEMS TO BE UPDATED"
+msgstr "ОЧЕРЕДЬ ОЖИДАЮЩИХ ОБНОВЛЕНИЯ ЭЛЕМЕНТОВ ДАННЫХ"
+
+msgid "Next check"
+msgstr "Следующая проверка"
+
+msgid "The queue is empty"
+msgstr "Очередь пуста"
+
+msgid "Total"
+msgstr "Всего"
+
+msgid "Count"
+msgstr "Количество"
+
+msgid "5 seconds"
+msgstr "5 секунд"
+
+msgid "10 seconds"
+msgstr "10 секунд"
+
+msgid "30 seconds"
+msgstr "30 секунд"
+
+msgid "1 minute"
+msgstr "1 минута"
+
+msgid "5 minutes"
+msgstr "5 минут"
+
+msgid "More than 10 minutes"
+msgstr "Более 10 минут"
+
+msgid "Truncated"
+msgstr "Укорочено"
+
+msgid "Delayed by"
+msgstr "Отложить"
+
+msgid "REPORT"
+msgstr "ОТЧЕТ"
+
+msgid "Status of Zabbix"
+msgstr "Состояние Zabbix"
+
+msgid "STATUS OF ZABBIX"
+msgstr "СОСТОЯНИЕ ZABBIX"
+
+msgid "Value"
+msgstr "Значение"
+
+msgid "Zabbix server is running"
+msgstr "Zabbix сервер запущен"
+
+msgid "Values stored"
+msgstr "Количество записей значений"
+
+msgid "Trends stored"
+msgstr "Количество записей тенденций"
+
+msgid "Number of triggers (enabled/disabled)[problem/unknown/ok]"
+msgstr "Количество триггеров (активированных/деактивированных)[проблема/неизвестно/ок]"
+
+msgid "Triggers (e/d)[p/u/o]"
+msgstr "Триггеры (а/д)[п/н/о]"
+
+msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
+msgstr "Считать только триггеры у включенных хостов и зависящих от включенных элементов"
+
+msgid "Number of items (monitored/disabled/not supported)"
+msgstr "Количество элементов данных (активных/неактивных/не поддерживается)"
+
+msgid "Items (m/d/n)"
+msgstr "Элементы данных (а/н/нп)"
+
+msgid "Only items assigned to enabled hosts are counted"
+msgstr "Считать только элементы у включенных хостов"
+
+msgid "Number of users (online)"
+msgstr "Количество пользователей"
+
+msgid "Users (online)"
+msgstr "Пользователи (подключены в данный момент)"
+
+msgid "Number of hosts (monitored/not monitored/templates)"
+msgstr "Количество узлов сети (контролируется/не контролируется/шаблоны)"
+
+msgid "Hosts (m/n/t)"
+msgstr "Узлы сети (к/н/ш)"
+
+msgid "Required server performance, new values per second"
+msgstr "Требуемое быстродействие сервера, новые значения в секунду"
+
+msgid "Yes"
+msgstr "Да"
+
+msgid "No"
+msgstr "Нет"
+
+msgid "running"
+msgstr "запущен"
+
+msgid "not running"
+msgstr "не запущен"
+
+msgid "Availability report"
+msgstr "Отчет о доступности"
+
+msgid "AVAILABILITY REPORT"
+msgstr "ОТЧЕТ О ДОСТУПНОСТИ"
+
+msgid "Show"
+msgstr "Показать"
+
+msgid "By host"
+msgstr "По узлу сети"
+
+msgid "By trigger template"
+msgstr "По шаблону триггера"
+
+msgid "(year"
+msgstr "(год"
+
+msgid ")"
+msgstr ")"
+
+msgid "Y"
+msgstr "Y"
+
+msgid "Y.m.d H:i"
+msgstr "Y.m.d H:i"
+
+msgid "Y.m.d"
+msgstr "Y.m.d"
+
+msgid "IT services availability report"
+msgstr "Отчет доступности IT услуг"
+
+msgid "IT SERVICES AVAILABILITY REPORT"
+msgstr "ОТЧЕТ ДОСТУПНОСТИ IT УСЛУГ"
+
+msgid "From"
+msgstr "От"
+
+msgid "from"
+msgstr "от"
+
+msgid "Till"
+msgstr "До"
+
+msgid "To"
+msgstr "К"
+
+msgid "Ok"
+msgstr "Ok"
+
+msgid "Resolved"
+msgstr "Решена"
+
+msgid "Problem"
+msgstr "Проблема"
+
+msgid "Problems"
+msgstr "Проблемы"
+
+msgid "Percentage"
+msgstr "Процент"
+
+msgid "SLA"
+msgstr "SLA"
+
+msgid "Hour"
+msgstr "Час"
+
+msgid "Hours"
+msgstr "Часы"
+
+msgid "Minute"
+msgstr "Минута"
+
+msgid "Minutes"
+msgstr "Минут"
+
+msgid "Day"
+msgstr "День"
+
+msgid "Month"
+msgstr "Месяц"
+
+msgid "Year"
+msgstr "Год"
+
+msgid "year"
+msgstr "год"
+
+msgid "Hourly"
+msgstr "Ежечасно"
+
+msgid "Daily"
+msgstr "Ежедневно"
+
+msgid "Weekly"
+msgstr "Еженедельно"
+
+msgid "Monthly"
+msgstr "Ежемесячно"
+
+msgid "Yearly"
+msgstr "Ежегодно"
+
+msgid "M Y"
+msgstr "M Y"
+
+msgid "d M Y H:i"
+msgstr "d M Y H:i"
+
+msgid "l H:i"
+msgstr "l H:i"
+
+msgid "add"
+msgstr "добавить"
+
+msgid "Do not add"
+msgstr "Не добавлять"
+
+msgid "Leave empty"
+msgstr "Не заполнять значения"
+
+msgid "Fill with default value"
+msgstr "Заполнить значением по умолчанию"
+
+msgid "Create"
+msgstr "Создать"
+
+msgid "new"
+msgstr "новый"
+
+msgid "Locales"
+msgstr "Локализации"
+
+msgid "locale"
+msgstr "локализация"
+
+msgid "Download"
+msgstr "Загрузить"
+
+msgid "Take for default locale"
+msgstr "Взять за язык по умолчанию"
+
+msgid "Locale to extend"
+msgstr "Расширяемый язык"
+
+msgid "New entries"
+msgstr "Новые записи"
+
+msgid "Notifications"
+msgstr "Уведомления"
+
+msgid "NOTIFICATIONS"
+msgstr "УВЕДОМЛЕНИЯ"
+
+msgid "Notification report"
+msgstr "Отчет об уведомлениях"
+
+msgid "Most busy triggers top 100"
+msgstr "100 наиболее активных триггеров"
+
+msgid "MOST BUSY TRIGGERS TOP 100"
+msgstr "100 НАИБОЛЕЕ АКТИВНЫХ ТРИГГЕРОВ"
+
+msgid "Number of status changes"
+msgstr "Количество изменений состояния"
+
+msgid "Week"
+msgstr "Неделя"
+
+msgid "Last"
+msgstr "Последний"
+
+msgid "Bar reports"
+msgstr "Гистограммные отчеты"
+
+msgid "Distribution of values for multiple periods"
+msgstr "Распределение значений для нескольких периодов"
+
+msgid "Distribution of values for multiple items"
+msgstr "Распределение значений для нескольких элементов"
+
+msgid "Compare values for multiple periods"
+msgstr "Сравнение значений для нескольких периодов"
+
+msgid "Selected hosts"
+msgstr "Выбранные узлы сети"
+
+msgid "Selected groups"
+msgstr "Выбранные группы"
+
+msgid "Scale"
+msgstr "Период"
+
+msgid "Average by"
+msgstr "Среднее по"
+
+msgid "Palette"
+msgstr "Палитра"
+
+msgid "Darken"
+msgstr "Темнее"
+
+msgid "Brighten"
+msgstr "Светлее"
+
+msgid "Screens"
+msgstr "Комплексные экраны"
+
+msgid "Screen"
+msgstr "Комплексный экран"
+
+msgid "CONFIGURATION OF SCREENS"
+msgstr "НАСТРОЙКА КОМПЛЕКСНЫХ ЭКРАНОВ"
+
+msgid "Configuration of screens"
+msgstr "Настройка комплексных экранов"
+
+msgid "Screen added"
+msgstr "Комплексный экран добавлен"
+
+msgid "Cannot add screen"
+msgstr "Не удалось добавить комплексный экран"
+
+msgid "Screen updated"
+msgstr "Комплексный экран обновлен"
+
+msgid "Cannot update screen"
+msgstr "Не удалось обновить комплексный экран"
+
+msgid "Screen deleted"
+msgstr "Комплексный экран удален"
+
+msgid "Cannot deleted screen"
+msgstr "Не удалось удалить комплексный экран"
+
+msgid "Columns"
+msgstr "Столбцов"
+
+msgid "Rows"
+msgstr "Строк"
+
+msgid "No screens defined"
+msgstr "Комплексные экраны на заданы"
+
+msgid "Delete screen?"
+msgstr "Удалить комплексный экран?"
+
+msgid "CONFIGURATION OF SCREEN"
+msgstr "НАСТРОЙКА КОМПЛЕКСНОГО ЭКРАНА"
+
+msgid "Screen cell configuration"
+msgstr "Настройка элемента комплексного экрана"
+
+msgid "Resource"
+msgstr "Ресурс"
+
+msgid "User rights"
+msgstr "Права пользователя"
+
+msgid "No resources defined"
+msgstr "Ресурсы не заданы"
+
+msgid "Simple graph"
+msgstr "Простой график"
+
+msgid "Simple graphs"
+msgstr "Простые графики"
+
+msgid "SIMPLE GRAPH"
+msgstr "ПРОСТОЙ ГРАФИК"
+
+msgid "Graph name"
+msgstr "Название графика"
+
+msgid "Width"
+msgstr "Ширина"
+
+msgid "Height"
+msgstr "Высота"
+
+msgid "Create Screen"
+msgstr "Создать комплексный экран"
+
+msgid "Create Slide Show"
+msgstr "Создать слайд-шоу"
+
+msgid "Edit"
+msgstr "Изменить"
+
+msgid "Dynamic item"
+msgstr "Динамический элемент"
+
+msgid "Dimension (cols x rows)"
+msgstr "Размер (столбцов x строк)"
+
+msgid "Delete selected slideshows?"
+msgstr "Удалить выбранные слайд-шоу?"
+
+msgid "Slideshow must contain slides"
+msgstr "Слайд-шоу должно содержать слайды"
+
+msgid "Slide shows"
+msgstr "Слайд-шоу"
+
+msgid "Slide show"
+msgstr "Слайд-шоу"
+
+msgid "CONFIGURATION OF SLIDE SHOWS"
+msgstr "НАСТРОЙКИ СЛАЙД-ШОУ"
+
+msgid "Configuration of slideshows"
+msgstr "Настройки слайд-шоу"
+
+msgid "SLIDE SHOWS"
+msgstr "СЛАЙД-ШОУ"
+
+msgid "No slide shows defined"
+msgstr "Слайд-шоу не заданы"
+
+msgid "Count of slides"
+msgstr "Количество слайдов"
+
+msgid "No slides defined"
+msgstr "Слайды не заданы"
+
+msgid "Slides"
+msgstr "Слайды"
+
+msgid "New slide"
+msgstr "Новый слайд"
+
+msgid "Show text as HTML"
+msgstr "Показать текст в виде HTML"
+
+msgid "Import screen"
+msgstr "Импорт комплексного экрана"
+
+msgid "Cannot find graph"
+msgstr "Не удалось найти график"
+
+msgid "Cannot find item"
+msgstr "Не удалось найти элемент данных"
+
+msgid "used in exported screen"
+msgstr "используемый в экспортированном комплексном экране"
+
+msgid "Map"
+msgstr "Карта сети"
+
+msgid "As plain text"
+msgstr "Как простой текст"
+
+msgid "Plain text"
+msgstr "Текст"
+
+msgid "PLAINT TEXT"
+msgstr "ТЕКСТ"
+
+msgid "Column span"
+msgstr "Объединить столбцы"
+
+msgid "Row span"
+msgstr "Объединить строки"
+
+msgid "Show lines"
+msgstr "Отображать строк"
+
+msgid "Hosts info"
+msgstr "Информация об узлах сети"
+
+msgid "Triggers info"
+msgstr "Информация о триггерах"
+
+msgid "Server info"
+msgstr "Информация о сервере"
+
+msgid "Clock"
+msgstr "Часы"
+
+msgid "Triggers overview"
+msgstr "Обзор триггеров"
+
+msgid "Data overview"
+msgstr "Обзор данных"
+
+msgid "History of actions"
+msgstr "История действий"
+
+msgid "History of events"
+msgstr "История событий"
+
+msgid "Time type"
+msgstr "Тип времени"
+
+msgid "Server time"
+msgstr "Серверное время"
+
+msgid "Local time"
+msgstr "Местное время"
+
+msgid "Style"
+msgstr "Способ"
+
+msgid "Vertical"
+msgstr "Вертикальный"
+
+msgid "Horizontal"
+msgstr "Горизонтальный"
+
+msgid "Horizontal align"
+msgstr "Выравнивание по горизонтали"
+
+msgid "Centre"
+msgstr "По центру"
+
+msgid "Right"
+msgstr "По правой стороне"
+
+msgid "Vertical align"
+msgstr "Выравнивание по вертикали"
+
+msgid "Middle"
+msgstr "По середине"
+
+msgid "Impossible to remove last row and column"
+msgstr "Не удалось удалить последнюю строку или колонку"
+
+msgid "Screen should contain at least one row and column"
+msgstr "Комплексный отчет должен содержать по крайней мере одну строку и колонку"
+
+msgid "Custom screens"
+msgstr "Пользовательские комплексные экраны"
+
+msgid "SCREENS 45645645"
+msgstr "КОМПЛЕКСНЫЕ ЭКРАНЫ"
+
+msgid "Slideshow updated"
+msgstr "Слайд-шоу обновлено"
+
+msgid "Cannot_update slideshow"
+msgstr "Не удалось обновить слайд-шоу"
+
+msgid "Slideshow added"
+msgstr "Слайд-шоу добавлено"
+
+msgid "Cannot add slideshow"
+msgstr "Не удалось добавить слайд-шоу"
+
+msgid "Slideshow deleted"
+msgstr "Слайд-шоу удалено"
+
+msgid "Cannot delete slideshow"
+msgstr "Не удалось удалить слайд-шоу"
+
+msgid "Delete slideshow?"
+msgstr "Удалить слайд-шоу?"
+
+msgid "Custom slides"
+msgstr "Пользовательские слайды"
+
+msgid "Average problem"
+msgstr "Средняя проблема"
+
+msgid "Serious problem"
+msgstr "Серьезная проблема"
+
+msgid "Minor problem"
+msgstr "Незначительная проблема"
+
+msgid "root"
+msgstr "root"
+
+msgid "IT service"
+msgstr "Услуга IT"
+
+msgid "IT services"
+msgstr "Услуги IT"
+
+msgid "Configuration of IT services"
+msgstr "Настройки IT услуг"
+
+msgid "Service updated"
+msgstr "Услуга обновлена"
+
+msgid "No IT service defined"
+msgstr "Услуги IT не заданы"
+
+msgid "Cannot update service"
+msgstr "Невозможно обновить услугу"
+
+msgid "Service added"
+msgstr "Услуга добавлена"
+
+msgid "Cannot add service"
+msgstr "Невозможно добавить услугу"
+
+msgid "Service deleted"
+msgstr "Услуга удалена"
+
+msgid "Cannot delete service"
+msgstr "Невозможно удалить услугу"
+
+msgid "Parent service"
+msgstr "Родительская услуга"
+
+msgid "Status calculation"
+msgstr "Подсчет состояния"
+
+msgid "Status calculation algorithm"
+msgstr "Алгоритм подсчета статуса"
+
+msgid "Problem, if at least one child has a problem"
+msgstr "Проблема, если хотя бы у одного из подчиненных имеется проблема"
+
+msgid "Problem, if all children have problems"
+msgstr "Проблема, если все подчиненные имеют проблемы"
+
+msgid "Soft"
+msgstr "Нежесткая"
+
+msgid "Do not calculate"
+msgstr "Без подсчета"
+
+msgid "Calculate SLA"
+msgstr "Подсчитывать SLA"
+
+msgid "Acceptable SLA (in %)"
+msgstr "Допустимый SLA (проценты)"
+
+msgid "Link to trigger?"
+msgstr "Связать с триггером?"
+
+msgid "Sort order (0->999)"
+msgstr "Порядок сортировки (0->999)"
+
+msgid "Trigger"
+msgstr "Триггер"
+
+msgid "Server"
+msgstr "Сервер"
+
+msgid "Delete"
+msgstr "Удалить"
+
+msgid "Clone"
+msgstr "Клонировать"
+
+msgid "Full clone"
+msgstr "Полное клонирование"
+
+msgid "One-time downtime"
+msgstr "Однократная недоступность"
+
+msgid "No times defined"
+msgstr "Интервалы времени не заданы"
+
+msgid "Service times"
+msgstr "Интервалы времени услуги"
+
+msgid "New service time"
+msgstr "Новый интервал времени услуги"
+
+msgid "Note"
+msgstr "Заметка"
+
+msgid "Remove"
+msgstr "Удалить"
+
+msgid "IT SERVICES"
+msgstr "УСЛУГИ IT"
+
+msgid "Service"
+msgstr "Услуга"
+
+msgid "Services"
+msgstr "Услуги"
+
+msgid "Reason"
+msgstr "Причина"
+
+msgid "Today"
+msgstr "Сегодня"
+
+msgid "This week"
+msgstr "Эта неделя"
+
+msgid "This year"
+msgstr "Этот год"
+
+msgid "This month"
+msgstr "Этот месяц"
+
+msgid "Last 24 hours"
+msgstr "Последние 24 часа"
+
+msgid "Last 7 days"
+msgstr "Последние 7 дней"
+
+msgid "Last 30 days"
+msgstr "Последние 30 дней"
+
+msgid "Last 365 days"
+msgstr "Последние 365 дней"
+
+msgid "Cannot format Tree. Check logic structure in service links"
+msgstr "Не удалось сформировать дерево. Проверьте логическую структуру в связях сервиса"
+
+msgid "Show triggers with unacknowledged events"
+msgstr "Показывать триггеры с неподтвержденными событиями"
+
+msgid "No trigger"
+msgstr "Триггеров нет"
+
+msgid "No triggers defined"
+msgstr "Триггеры не заданы"
+
+msgid "No trigger defined"
+msgstr "Триггер не задан"
+
+msgid "Configuration of triggers"
+msgstr "Настройка триггеров"
+
+msgid "CONFIGURATION OF TRIGGERS"
+msgstr "НАСТРОЙКА ТРИГГЕРОВ"
+
+msgid "Triggers deleted"
+msgstr "Триггеры удалены"
+
+msgid "Cannot delete triggers"
+msgstr "Не удалось удалить триггеры"
+
+msgid "Trigger deleted"
+msgstr "Триггер удален"
+
+msgid "Cannot delete trigger"
+msgstr "Не удалось удалить триггер"
+
+msgid "Trigger added"
+msgstr "Триггер добавлен"
+
+msgid "Cannot add trigger"
+msgstr "Не удалось добавить триггер"
+
+msgid "Severity"
+msgstr "Важность"
+
+msgid "Min severity"
+msgstr "Минимальная важность"
+
+msgid "Disabled"
+msgstr "Деактивирован"
+
+msgid "DISABLED"
+msgstr "ОТКЛЮЧЕН"
+
+msgid "Enabled"
+msgstr "Активирован"
+
+msgid "Disable"
+msgstr "Отключить"
+
+msgid "Enable"
+msgstr "Активировать"
+
+msgid "Enable selected"
+msgstr "Активировать выбранное"
+
+msgid "Change"
+msgstr "Изменить"
+
+msgid "Trigger updated"
+msgstr "Триггер обновлен"
+
+msgid "Cannot update trigger"
+msgstr "Не удалось обновить триггер"
+
+msgid "Depends on"
+msgstr "Зависит от"
+
+msgid "Dependent"
+msgstr "Зависимость"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Zabbix has received an incorrect request"
+msgstr "Zabbix получил некорректный запрос"
+
+msgid "Create Trigger"
+msgstr "Создать триггер"
+
+msgid "Insert"
+msgstr "Вставить"
+
+msgid "Seconds"
+msgstr "Секунд"
+
+msgid "Last of"
+msgstr "Последний из"
+
+msgid "Multiple PROBLEM events"
+msgstr "Множественные события ПРОБЛЕМА"
+
+msgid "Show disabled triggers"
+msgstr "Показывать деактивированные триггеры"
+
+msgid "Hide disabled triggers"
+msgstr "Не отображать деактивированные триггеры"
+
+msgid "The trigger depends on"
+msgstr "Триггер зависит от"
+
+msgid "No dependencies defined"
+msgstr "Зависимости не заданы"
+
+msgid "New dependency"
+msgstr "Новая зависимость"
+
+msgid "Event generation"
+msgstr "Генерация события"
+
+msgid "Triggers massupdate"
+msgstr "Массовое обновление"
+
+msgid "Trigger dependencies"
+msgstr "Зависимости триггера"
+
+msgid "Incorrect dependency"
+msgstr "Неверная зависимость"
+
+msgid "Toggle input method"
+msgstr "Переключить метод ввода"
+
+msgid "Insert macro"
+msgstr "Вставить макрос"
+
+msgid "Replace"
+msgstr "Заменить"
+
+msgid "Templated trigger"
+msgstr "Шаблонный триггер"
+
+msgid "Enable selected triggers?"
+msgstr "Включить выбранные триггеры?"
+
+msgid "Disable selected triggers?"
+msgstr "Отключить выбранные триггеры?"
+
+msgid "Mass update selected triggers?"
+msgstr "Обновить массово выбранные триггеры?"
+
+msgid "Copy selected triggers?"
+msgstr "Скопировать выбранные триггеры?"
+
+msgid "Delete selected triggers?"
+msgstr "Удалить выбранные триггеры?"
+
+msgid "Trigger comments"
+msgstr "Комментарии к триггеру"
+
+msgid "TRIGGER COMMENTS"
+msgstr "КОММЕНТАРИИ К ТРИГГЕРУ"
+
+msgid "Comment updated"
+msgstr "Комментарий обновлен"
+
+msgid "Cannot update comment"
+msgstr "Не удалось обновить комментарий"
+
+msgid "Add"
+msgstr "Добавить"
+
+msgid "Sound"
+msgstr "Звук"
+
+msgid "Status of triggers"
+msgstr "Состояние триггеров"
+
+msgid "STATUS OF TRIGGERS"
+msgstr "Состояние ТРИГГЕРОВ"
+
+msgid "Status of hostgroup triggers"
+msgstr "Состояние триггеров группы узлов сети"
+
+msgid "Status of host triggers"
+msgstr "Состояние триггеров узла сети"
+
+msgid "Hide all"
+msgstr "Скрыть все"
+
+msgid "Show only problems"
+msgstr "Показывать только проблемы"
+
+msgid "Show unacknowledged"
+msgstr "Показывать только неподтвержденные"
+
+msgid "Show problem-unacknowledged"
+msgstr "Показывать только неподтвержденные проблемы"
+
+msgid "Not acknowledged"
+msgstr "Не подтверждено"
+
+msgid "Show last"
+msgstr "Показывать последние"
+
+msgid "Show details"
+msgstr "Показывать подробности"
+
+msgid "Filter by name"
+msgstr "Фильтр по имени"
+
+msgid "TRIGGERS"
+msgstr "ТРИГГЕРЫ"
+
+msgid "Last change"
+msgstr "Последнее изменение"
+
+msgid "Comments"
+msgstr "Комментарии"
+
+msgid "Acknowledged"
+msgstr "Подтверждено"
+
+msgid "Ack"
+msgstr "Подтверждено"
+
+msgid "Not Ack"
+msgstr "Не подтверждено"
+
+msgid "Never"
+msgstr "Никогда"
+
+msgid "Found"
+msgstr "Найдено"
+
+msgid "Acknowledge status"
+msgstr "Состояние подтверждения"
+
+msgid "Any"
+msgstr "Любое"
+
+msgid "With unacknowledged events"
+msgstr "С неподтвержденными событиями"
+
+msgid "With last event unacknowledged"
+msgstr "С последним неподтвержденным событием"
+
+msgid "Triggers status"
+msgstr "Состояние триггера"
+
+msgid "Age less than"
+msgstr "Возраст менее"
+
+msgid "Select"
+msgstr "Выбрать"
+
+msgid "Zabbix User"
+msgstr "Zabbix Пользователь"
+
+msgid "Zabbix Admin"
+msgstr "Zabbix Администратор"
+
+msgid "Zabbix Super Admin"
+msgstr "Zabbix Супер-Администратор"
+
+msgid "User type"
+msgstr "Тип пользователя"
+
+msgid "Users"
+msgstr "Пользователи"
+
+msgid "User added"
+msgstr "Пользователь добавлен"
+
+msgid "Cannot add user"
+msgstr "Не удалось добавить пользователя"
+
+msgid "Cannot add user. Both passwords must be equal."
+msgstr "Невозможно добавить пользователя. Оба пароля должны совпадать."
+
+msgid "User deleted"
+msgstr "Пользователь удален"
+
+msgid "Cannot delete user"
+msgstr "Не удалось удалить пользователя"
+
+msgid "Password should not be empty"
+msgstr "Пароль не может быть пустым"
+
+msgid "For guest, password must be empty"
+msgstr "Пароль для Гостя должен быть пустым"
+
+msgid "User updated"
+msgstr "Данные пользователя обновлены"
+
+msgid "Cannot update user"
+msgstr "Не удалось обновить данные пользователя"
+
+msgid "Cannot update user. Both passwords must be equal."
+msgstr "Невозможно обновить данные пользователя. Оба пароля должны совпадать."
+
+msgid "Group added"
+msgstr "Группа добавлена"
+
+msgid "Cannot add group"
+msgstr "Не удалось добавить группу"
+
+msgid "Group updated"
+msgstr "Группа обновлена"
+
+msgid "Cannot update group"
+msgstr "Не удалось обновить группу"
+
+msgid "Group deleted"
+msgstr "Группа удалена"
+
+msgid "Cannot delete group"
+msgstr "Не удалось удалить группу"
+
+msgid "Proxy added"
+msgstr "Прокси добавлен"
+
+msgid "Cannot add proxy"
+msgstr "Не удалось добавить прокси"
+
+msgid "Proxy updated"
+msgstr "Прокси обновлен"
+
+msgid "Cannot update proxy"
+msgstr "Не удалось обновить прокси"
+
+msgid "Proxy deleted"
+msgstr "Прокси удален"
+
+msgid "Cannot delete proxy"
+msgstr "Не удалось удалить прокси"
+
+msgid "Users status updated"
+msgstr "Состояние пользователя обновлено"
+
+msgid "Cannot update users status"
+msgstr "Не удалось обновить состояние пользователя"
+
+msgid "Users unblocked"
+msgstr "Разблокированные пользователи"
+
+msgid "Cannot unblock users"
+msgstr "Не удалось разблокировать пользователей"
+
+msgid "GUI access updated"
+msgstr "Доступ к GUI обновлен"
+
+msgid "Cannot update GUI access"
+msgstr "Не удалось обновить доступ к GUI"
+
+msgid "API access updated"
+msgstr "Доступ к API обновлен"
+
+msgid "Cannot update API access"
+msgstr "Не удалось обновить доступ к GUI"
+
+msgid "Debug mode updated"
+msgstr "Режим отладки обновлен"
+
+msgid "Cannot update debug mode"
+msgstr "Не удалось обновить режим отладки"
+
+msgid "User cannot disable himself"
+msgstr "Пользователь не может отключить себя"
+
+msgid "User cannot change status of himself"
+msgstr "Пользователь не может изменить статус для себя"
+
+msgid "User cannot change GUI access for himself"
+msgstr "Пользователь не может изменить доступ к GUI для себя"
+
+msgid "User cannot delete himself"
+msgstr "Пользователь не может удалить себя"
+
+msgid "CONFIGURATION OF USERS AND USER GROUPS"
+msgstr "НАСТРОЙКА ПОЛЬЗОВАТЕЛЕЙ И ГРУПП ПОЛЬЗОВАТЕЛЕЙ"
+
+msgid "USER GROUPS"
+msgstr "ГРУППЫ ПОЛЬЗОВАТЕЛЕЙ"
+
+msgid "USERS"
+msgstr "ПОЛЬЗОВАТЕЛИ"
+
+msgid "User groups"
+msgstr "Группы пользователей"
+
+msgid "Members"
+msgstr "Члены группы"
+
+msgid "No user groups defined"
+msgstr "Группы пользователей не заданы"
+
+msgid "Name"
+msgstr "Имя"
+
+msgid "Surname"
+msgstr "Фамилия"
+
+msgid "Is online?"
+msgstr "В системе?"
+
+msgid "No users defined"
+msgstr "Пользователи не заданы"
+
+msgid "Rights"
+msgstr "Права"
+
+msgid "GUI access"
+msgstr "Доступ к GUI"
+
+msgid "API access"
+msgstr "Доступ к API"
+
+msgid "Debug"
+msgstr "Отладка"
+
+msgid "Debug mode"
+msgstr "Режим отладки"
+
+msgid "Users status"
+msgstr "Состояние пользователей"
+
+msgid "No rights defined"
+msgstr "Права не заданы"
+
+msgid "Read only"
+msgstr "Только чтение"
+
+msgid "Read-write"
+msgstr "Чтение-запись"
+
+msgid "Deny"
+msgstr "Запрещено"
+
+msgid "Hide"
+msgstr "Скрыть"
+
+msgid "Password"
+msgstr "Пароль"
+
+msgid "Change password"
+msgstr "Изменить пароль"
+
+msgid "Password (once again)"
+msgstr "Пароль (подтверждение)"
+
+msgid "URL (after login)"
+msgstr "URL (после входа в систему)"
+
+msgid "Auto-login"
+msgstr "Авто-вход (1 месяц)"
+
+msgid "Auto-logout (min 90 seconds)"
+msgstr "Авто-выход (0-откючено)"
+
+msgid "Refresh (in seconds)"
+msgstr "Обновлять экран (секунды)"
+
+msgid "Create User"
+msgstr "Создать пользователя"
+
+msgid "Create Group"
+msgstr "Создать группу"
+
+msgid "No accessible resources"
+msgstr "Нет доступных ресурсов"
+
+msgid "Add to"
+msgstr "Добавить в"
+
+msgid "Remove from"
+msgstr "Удалить из"
+
+msgid "Internal"
+msgstr "Внутренняя"
+
+msgid "Rows per page"
+msgstr "Строк на странице"
+
+msgid "Enable API"
+msgstr "Включить API"
+
+msgid "Disable API"
+msgstr "Отключить API"
+
+msgid "Enable DEBUG"
+msgstr "Включить ОТЛАДКУ"
+
+msgid "Disable DEBUG"
+msgstr "Отключить ОТЛАДКУ"
+
+msgid "Blocked"
+msgstr "Заблокирован"
+
+msgid "Unblock selected"
+msgstr "Разблокировать выбранных"
+
+msgid "Unblock selected users?"
+msgstr "Разблокировать выбранных пользователей?"
+
+msgid "Delete selected users?"
+msgstr "Удалить выбранных пользователей"
+
+msgid "Enable selected groups?"
+msgstr "Включить выбранные группы?"
+
+msgid "Disable selected groups?"
+msgstr "Отключить выбранные группы?"
+
+msgid "Enable API access in selected groups?"
+msgstr "Включить доступ к API выбранным группам?"
+
+msgid "Disable API access in selected groups?"
+msgstr "Отключить доступ к API для выбранных групп?"
+
+msgid "Enable debug mode in selected groups?"
+msgstr "Включить режим отладки для выбранных групп?"
+
+msgid "Disable debug mode in selected groups?"
+msgstr "Отключить режим отладки у выбранных групп?"
+
+msgid "Delete selected groups?"
+msgstr "Удалить выбранные группы"
+
+msgid "CONFIGURATION OF SCRIPTS"
+msgstr "КОНФИГУРАЦИЯ СКРИПТОВ"
+
+msgid "Scripts"
+msgstr "Скрипты"
+
+msgid "SCRIPTS"
+msgstr "СКРИПТЫ"
+
+msgid "Command"
+msgstr "Команда"
+
+msgid "permissions"
+msgstr "права доступа"
+
+msgid "Required host"
+msgstr "Требуемые для узла"
+
+msgid "Read"
+msgstr "Чтение"
+
+msgid "Write"
+msgstr "Запись"
+
+msgid "No scripts defined"
+msgstr "Скрипты не заданы"
+
+msgid "Host access"
+msgstr "Доступ к узлу сети"
+
+msgid "Delete script?"
+msgstr "Удалить скрипт?"
+
+msgid "Create script"
+msgstr "Создать скрипт"
+
+msgid "Script added"
+msgstr "Скрипт добавлен"
+
+msgid "Cannot add script"
+msgstr "Не удалось добавить скрипт"
+
+msgid "Script updated"
+msgstr "Скрипт обновлен"
+
+msgid "Cannot update script"
+msgstr "Не удалось обновить скрипт"
+
+msgid "Script deleted"
+msgstr "Скрипт удален"
+
+msgid "Cannot delete script"
+msgstr "Не удалось удалить скрипт"
+
+msgid "Tools"
+msgstr "Инструменты"
+
+msgid "Result"
+msgstr "Результат"
+
+msgid "Close"
+msgstr "Закрыть"
+
+msgid "Cannot connect to Zabbix server"
+msgstr "Не удается подключиться к серверу Zabbix"
+
+msgid "Delete selected scripts?"
+msgstr "Удалить выбранные скрипты?"
+
+msgid "SCRIPT ERROR"
+msgstr "ОШИБКА В СКРИПТЕ"
+
+msgid "Error Description"
+msgstr "Описание скрипта"
+
+msgid "Can't send command, check connection"
+msgstr "Не удалось отправить команду, проверьте подключение"
+
+msgid "Can't read script response, check connection"
+msgstr "Не удалось прочитать ответ скрипта, проверьте подключение"
+
+msgid "Defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value"
+msgstr "Установленная в \"include/defines.inc.php\" константа ZBX_SCRIPT_TIMEOUT времени ожидания истекла. Вы можете попытаться увеличить это значение"
+
+msgid "Defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value"
+msgstr "Установленная в \"include/defines.inc.php\" константа ZBX_SCRIPT_BYTES_LIMIT лимита байт истекла. Вы можете попытаться увеличить это значение"
+
+msgid "Unknown error happened reading script answer, please report to the developers"
+msgstr "Произошла неизвестная ошибка при чтении ответа скрипта, пожалуйста, сообщите об этом разработчикам"
+
+msgid "Empty response received"
+msgstr "Получен пустой ответ"
+
+msgid "Audit"
+msgstr "Аудит"
+
+msgid "AUDIT LOGS"
+msgstr "ЖУРНАЛ АУДИТА"
+
+msgid "AUDIT ACTIONS"
+msgstr "ДЕЙСТВИЯ АУДИТА"
+
+msgid "Action"
+msgstr "Действие"
+
+msgid "Details"
+msgstr "Детали"
+
+msgid "Unknown action"
+msgstr "Неизвестное действие"
+
+msgid "Added"
+msgstr "Добавлено"
+
+msgid "Updated"
+msgstr "Обновлено"
+
+msgid "Media type"
+msgstr "Тип способа оповещений"
+
+msgid "Graph element"
+msgstr "Элемент графика"
+
+msgid "Unknown resource"
+msgstr "Неизвестный ресурс"
+
+msgid "already exists"
+msgstr "уже существует"
+
+msgid "Zabbix config"
+msgstr "Настройки Zabbix"
+
+msgid "Clear"
+msgstr "Очистить"
+
+msgid "Once"
+msgstr "Один раз"
+
+msgid "Move"
+msgstr "Переместить"
+
+msgid "Unmute"
+msgstr "Выключить звук"
+
+msgid "Mute"
+msgstr "Включить звук"
+
+msgid "Snooze"
+msgstr "Заснуть"
+
+msgid "Messages"
+msgstr "Сообщения"
+
+msgid "Problem on"
+msgstr "Проблема с"
+
+msgid "Recovery"
+msgstr "Восстановление"
+
+msgid "GUI Messaging"
+msgstr "Сообщения в веб-интерфейсе"
+
+msgid "Play sound"
+msgstr "Воспроизводить звуковой сигнал"
+
+msgid "Message timeout"
+msgstr "Таймаут сообщения"
+
+msgid "Play"
+msgstr "Воспроизвести"
+
+msgid "Pause"
+msgstr "Пауза"
+
+msgid "Stop"
+msgstr "Остановить"
+
+msgid "Loop"
+msgstr "Зациклить"
+
+msgid "USER PROFILE"
+msgstr "ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ"
+
+msgid "User profile"
+msgstr "Профиль пользователя"
+
+msgid "Language"
+msgstr "Язык"
+
+msgid "Theme"
+msgstr "Тема"
+
+msgid "English (GB)"
+msgstr "English (GB)"
+
+msgid "French (FR)"
+msgstr "French (FR)"
+
+msgid "German (DE)"
+msgstr "German (DE)"
+
+msgid "Italian (IT)"
+msgstr "Italian (IT)"
+
+msgid "Korean (KO)"
+msgstr "Korean (KO)"
+
+msgid "Latvian (LV)"
+msgstr "Latvian (LV)"
+
+msgid "Russian (RU)"
+msgstr "Russian (RU)"
+
+msgid "Portuguese (PT)"
+msgstr "Portuguese (PT)"
+
+msgid "Spanish (SP)"
+msgstr "Spanish (SP)"
+
+msgid "Swedish (SE)"
+msgstr "Swedish (SE)"
+
+msgid "Japanese (JP)"
+msgstr "Japanese (JP)"
+
+msgid "Chinese (CN)"
+msgstr "Chinese (CN)"
+
+msgid "Dutch (NL)"
+msgstr "Dutch (NL)"
+
+msgid "Hungarian (HU)"
+msgstr "Hungary (HU)"
+
+msgid "Polish (PL)"
+msgstr "Polish (PL)"
+
+msgid "Ukrainian (UA)"
+msgstr "Ukrainian (UA)"
+
+msgid "Czech (CZ)"
+msgstr "Czech (CZ)"
+
+msgid "ZABBIX"
+msgstr "ZABBIX"
+
+msgid "Welcome to Zabbix! You are connected as"
+msgstr "Добро пожаловать в Zabbix! Вы подключены как"
+
+msgid "Login name"
+msgstr "Имя пользователя"
+
+msgid "Host profiles"
+msgstr "Профиль узлов сети"
+
+msgid "HOST PROFILES"
+msgstr "ПРОФИЛИ УЗЛОВ СЕТИ"
+
+msgid "Extended host profile"
+msgstr "Расширенный профиль узла сети"
+
+msgid "Extended profile"
+msgstr "Расширенный профиль"
+
+msgid "Extended"
+msgstr "Расширенный"
+
+msgid "Edit hosts"
+msgstr "Изменить узлы сети"
+
+msgid "SEARCH"
+msgstr "ПОИСК"
+
+msgid "Go"
+msgstr "Выполнить"
+
+msgid "found"
+msgstr "найденных"
+
+msgid "Displaying"
+msgstr "Отображено"
+
+msgid "Search pattern is empty"
+msgstr "Пустой шаблон поиска"
+
+msgid "Caption"
+msgstr "Заголовок"
+
+msgid "Empty"
+msgstr "Пусто"
+
+msgid "STANDARD ITEMS"
+msgstr "СТАНДАРТНЫЕ ЭЛЕМЕНТЫ"
+
+msgid "No items"
+msgstr "Элементы не заданы"
+
+msgid "DISCOVERY RULES"
+msgstr "ПРАВИЛА ОБНАРУЖЕНИЯ"
+
+msgid "DISCOVERY CHECKS"
+msgstr "ПРОВЕРКИ ОБНАРУЖЕНИЯ"
+
+msgid "Hosts and templates"
+msgstr "Узлы сети и шаблоны"
+
+msgid "You can not switch hosts for current selection"
+msgstr "Вы не можете переключиться между узлами сети в текущем выборе"
+
+msgid "H:i:s"
+msgstr "H:i:s"
+
+msgid "No errors found"
+msgstr "Ошибки не найдены"
+
+msgid "Expression Syntax Error"
+msgstr "Синтаксическая ошибка в выражении"
+
+msgid "Unexpected end of element"
+msgstr "Неожиданный конец элемента"
+
+msgid "Check expression part starting from '"
+msgstr "Проверьте часть выражения начиная с '"
+
+msgid "'"
+msgstr "'"
+
+msgid "Not allowed symbols or sequence of symbols in expression element detected"
+msgstr "В выражении элемента найдены неразрешенные символы или последовательность символов"
+
+msgid "Not allowed value detected in element"
+msgstr "В элементе найдено неразрешенное значение"
+
+msgid "Unnecessary symbols detected"
+msgstr "Обнаружены ненужные символы"
+
+msgid "Not allowed symbols detected after element"
+msgstr "Найдены неразрешенные символы после элемента"
+
+msgid "Not allowed symbols detected before element"
+msgstr "Найдены неразрешенные символы до элемента"
+
+msgid "New indicators"
+msgstr "Новые индикаторы"
+
+msgid "Edit connector"
+msgstr "Изменить соединитель"
+
+msgid "Include"
+msgstr "Включено"
+
+msgid "Exclude"
+msgstr "Исключено"
+
+msgid "Keyword"
+msgstr "Ключевое слово"
+
+msgid "Position"
+msgstr "Позиция"
+
+msgid "Delete expression?"
+msgstr "Удалить выражение?"
+
+msgid "Delete keyword?"
+msgstr "Удалить ключевое слово?"
+
+msgid "Test data"
+msgstr "Тестовые данные"
+
+msgid "Expression Variable Elements"
+msgstr "Переменные элементов выражения"
+
+msgid "Unknown variable type, testing not available"
+msgstr "Неизвестный тип переменной, тестирование недоступно"
+
+msgid "Unknown host, no such host present in system"
+msgstr "Неизвестный узел сети, такого узла сети нет в системе"
+
+msgid "Unknown host item, no such item in selected host"
+msgstr "Неизвестный элемент данных узла сети, такого элемента данных нет у выбранного узла сети"
+
+msgid "Given expression is not a macro"
+msgstr "Заданное выражение это не макрос"
+
+msgid "Result type"
+msgstr "Тип результата"
+
+msgid "Combined result"
+msgstr "Комбинированный результат"
+
+msgid "Delete this application?"
+msgstr "Удалить эту группу элементов данных?"
+
+msgid "Activate selected applications?"
+msgstr "Активировать выбранные группы элементов данных?"
+
+msgid "Disable selected applications?"
+msgstr "Отключить выбранные группы элементов данных?"
+
+msgid "Delete selected applications?"
+msgstr "Удалить выбранные группы элементов данных?"
+
+msgid "Incorrect time period"
+msgstr "Некорректный период времени"
+
+msgid "No elements selected!"
+msgstr "Нет выбранных элементов!"
+
+msgid "refreshed every"
+msgstr "обновление каждые"
+
+msgid "Page received incorrect data"
+msgstr "Страница отправила некорректные данные"
+
+msgid "Timezone for PHP is not set. Please set \"date.timezone\" option in php.ini."
+msgstr "Часовой пояс для PHP не установлен. Пожалуйста, установите опцию \"date.timezone\" в php.ini"
+
+msgid "Stats for"
+msgstr "Статистика для"
+
+msgid "Total time"
+msgstr "Всего времени"
+
+msgid "Memory limit"
+msgstr "Лимит памяти"
+
+msgid "Memory usage"
+msgstr "Использование памяти"
+
+msgid "Memory leak"
+msgstr "Утечка памяти"
+
+msgid "SQL selects count"
+msgstr "Количество SQL selects"
+
+msgid "SQL executes count"
+msgstr "Количество SQL executes"
+
+msgid "SQL requests count"
+msgstr "Количество SQL запросов"
+
+msgid "Total time spent on SQL"
+msgstr "Всего времени затрачено на SQL"
+
+msgid "End of"
+msgstr "Конец"
+
+msgid "MEMORY LIMIT REACHED! Profiling was stopped to save memory for script processing."
+msgstr "ДОСТИГНУТ ПРЕДЕЛ ПАМЯТИ! Профилирование остановлено для сохранения памяти выполняемому скрипту"
+
+msgid "Wrong type"
+msgstr "Ошибочный тип"
+
+msgid "Incorrect type of asort_by_key"
+msgstr "Некорректный тип asort_by_key"
+
+msgid "days"
+msgstr "дней"
+
+msgid "B"
+msgstr "B"
+
+msgid "n"
+msgstr "n"
+
+msgid "Nano"
+msgstr "Нано"
+
+msgid "µ"
+msgstr "µ"
+
+msgid "Micro"
+msgstr "Микро"
+
+msgid "Milli"
+msgstr "Милли"
+
+msgid "K"
+msgstr "K"
+
+msgid "Kilo"
+msgstr "Кило"
+
+msgid "M"
+msgstr "M"
+
+msgid "Mega"
+msgstr "Мега"
+
+msgid "G"
+msgstr "G"
+
+msgid "Giga"
+msgstr "Гига"
+
+msgid "T"
+msgstr "T"
+
+msgid "Tera"
+msgstr "Тера"
+
+msgid "P"
+msgstr "P"
+
+msgid "Peta"
+msgstr "Пета"
+
+msgid "E"
+msgstr "E"
+
+msgid "Exa"
+msgstr "Экза"
+
+msgid "Z"
+msgstr "Z"
+
+msgid "Zetta"
+msgstr "Зетта"
+
+msgid "Yotta"
+msgstr "Йотта"
+
+msgid "Y.m.d H:i:s"
+msgstr "Y.m.d H:i:s"
+
+msgid "Delete selected user?"
+msgstr "Удалить выбранного пользователя"
+
+msgid "Subfilter"
+msgstr "Подфильтр"
+
+msgid "affects only filtered data!"
+msgstr "влияет только на отфильтрованные данные!"
+
+msgid "show value mappings"
+msgstr "преобразования значений"
+
+msgid "Delete selected item?"
+msgstr "Удалить выбранный элемент данных?"
+
+msgid "Do"
+msgstr "Сделать"
+
+msgid "Incorrect list of items."
+msgstr "Некорректный список элементов данных."
+
+msgid "Delete trigger?"
+msgstr "Удалить триггер?"
+
+msgid "Profile for this host is missing"
+msgstr "Для этого узла сети профиль не найден"
+
+msgid "No image"
+msgstr "Нет рисунка"
+
+msgid "Delete system map?"
+msgstr "Удалить системную карту?"
+
+msgid "Incorrect arguments passed to function"
+msgstr "В функцию переданы некорректные аргументы"
+
+msgid "Incorrect key format"
+msgstr "Некорректный формат ключа"
+
+msgid "Item will not be refreshed. Please enter a correct update interval."
+msgstr "Элемент данных не обновлен. Пожалуйста, введите корректный интервал обновления."
+
+msgid "Invalid SNMP port"
+msgstr "Ошибочный порт SNMP"
+
+msgid "Type of information must be Log for log key"
+msgstr "Тип информации должен быть установлен в Журнал (лог) для ключа журнала"
+
+msgid "Value type must be Float for aggregate items"
+msgstr "Тип значения должен быть установлен в Числовое (с плавающей точкой) для аггрегативных элементов данных"
+
+msgid "Group function"
+msgstr "Групповая функция"
+
+msgid "is not one of"
+msgstr "не один из"
+
+msgid "Item function"
+msgstr "Функция элемента данных"
+
+msgid "Key does not match"
+msgstr "Ключ не совпадает"
+
+msgid "An item with the Key"
+msgstr "Элемент данных с ключем"
+
+msgid "already exists for host"
+msgstr "уже существует для узла сети"
+
+msgid "The key must be unique."
+msgstr "Ключ должен быть уникальным."
+
+msgid "Added new item"
+msgstr "Новый элемент данных добавлен"
+
+msgid "updated"
+msgstr "обновлен"
+
+msgid "No item with"
+msgstr "Нет элемента данных с"
+
+msgid "deleted"
+msgstr "удален"
+
+msgid "Unknown value type"
+msgstr "Неизвестный тип значения"
+
+msgid "Check the key, please. Default example was passed"
+msgstr "Пожалуйста, проверьте ключ. Пример по умолчанию отображен"
+
+msgid "Scenario step number cannot be less than 1"
+msgstr "Номер шага сценария не может быть менее чем 1"
+
+msgid "Scenario step name should contain"
+msgstr "Имя шага сценария должно содержать"
+
+msgid "characters only"
+msgstr "только символы"
+
+msgid "Only characters are allowed"
+msgstr "Разрешены только символы"
+
+msgid "Cannot add new application"
+msgstr "Не удалось добавить новую группу элементов данных"
+
+msgid "Scenario with name"
+msgstr "Сценарий с именем"
+
+msgid "added"
+msgstr "добавлен"
+
+msgid "No media with"
+msgstr "Нет способа оповещений с"
+
+msgid "No media type with"
+msgstr "Нет типа способа оповещений с"
+
+msgid "An action type with description"
+msgstr "Тип действия с описанием"
+
+msgid "can not exist without group"
+msgstr "не может существовать без группы"
+
+msgid "Added host group"
+msgstr "Группа узлов сети добавлена"
+
+msgid "Updated host group"
+msgstr "Группа узлов сети обновлена"
+
+msgid "Incorrect characters used for Hostname"
+msgstr "В имени узла сети использованы некорректные символы"
+
+msgid "Incorrect characters used for DNS"
+msgstr "В DNS использованы некорректные символы"
+
+msgid "Circular link can not be created"
+msgstr "Круговая ссылка не может быть создана"
+
+msgid "must be linked to at least one host group"
+msgstr "должен присоединяться по крайней мере к одной группе узлов сети"
+
+msgid "Added new host"
+msgstr "Новый узел сети добавлен"
+
+msgid "is internal and can not be deleted"
+msgstr "внутренний и не может быть удален"
+
+msgid "can not be deleted, due to inner hosts can not be unlinked"
+msgstr "не удалось удалить, из-за не отсоединенных внутренних узлов сети"
+
+msgid "No host groups with"
+msgstr "Нет групп узлов сети с"
+
+msgid "incorrect parameters for"
+msgstr "некорректные параметры для"
+
+msgid "No host with"
+msgstr "Нет узла сети с"
+
+msgid "already exists in linked hosts"
+msgstr "уже существует с присоединенными узлами сети"
+
+msgid "Added new application"
+msgstr "Новая группа элементов данных добавлена"
+
+msgid "Updated application"
+msgstr "Группа элементов данных обновлена"
+
+msgid "used by item"
+msgstr "используется элементом данных"
+
+msgid "used by scenario"
+msgstr "используется сценарием"
+
+msgid "No application with"
+msgstr "Нет группы элементов данных с"
+
+msgid "unlinked"
+msgstr "отсоединен"
+
+msgid "Template with item key"
+msgstr "Шаблон с ключем элемента данных"
+
+msgid "Template with application"
+msgstr "Шаблон с группой элементов данных"
+
+msgid "already linked to host"
+msgstr "уже соединен с узлом сети"
+
+msgid "has been deleted from the system"
+msgstr "был удален из системы"
+
+msgid "Critical error"
+msgstr "Критическая ошибка"
+
+msgid "Field"
+msgstr "Поле"
+
+msgid "is not IP range"
+msgstr "не диапазон IP адресов"
+
+msgid "is not PORT range"
+msgstr "не диапазон портов"
+
+msgid "is not integer range"
+msgstr "не целочисленный диапазон"
+
+msgid "is not integer"
+msgstr "не целое число"
+
+msgid "is not double"
+msgstr "не дробное число"
+
+msgid "is not string"
+msgstr "не строка"
+
+msgid "contains Multibyte chars"
+msgstr "содержит Мультибайтовые символы"
+
+msgid "multibyte chars are restricted"
+msgstr "ограничение мультибайтовых символов"
+
+msgid "is not a colour"
+msgstr "не цвет"
+
+msgid "is mandatory"
+msgstr "обязательный"
+
+msgid "must be missing"
+msgstr "должен быть пропущен"
+
+msgid "Operation cannot be performed due to unauthorized request"
+msgstr "Операция не может быть выполнена из-за неавторизованного запроса"
+
+msgid "Incorrect value for"
+msgstr "Некорректное значение для"
+
+msgid "No trigger with"
+msgstr "Нет триггера с"
+
+msgid "Incorrect usage of quotes"
+msgstr "Некорректное использование ковычек"
+
+msgid "Expression cannot be empty"
+msgstr "Выражение не может быть пустым"
+
+msgid "No such host"
+msgstr "Такого узла сети не существует"
+
+msgid "Too many hosts"
+msgstr "Слишком много узлов сети"
+
+msgid "No such monitored parameter"
+msgstr "Такого наблюдаемого параметра не существует"
+
+msgid "for host"
+msgstr "для узла сети"
+
+msgid "Unknown function"
+msgstr "Неизвестная функция"
+
+msgid "Incorrect value type"
+msgstr "Некорректный Тип информации"
+
+msgid "for function"
+msgstr "для функции"
+
+msgid "of key"
+msgstr "с ключем"
+
+msgid "available only for items with value types"
+msgstr "доступна только для элементов данных с Типом информации"
+
+msgid "Missing mandatory parameter for function"
+msgstr "Пропущен обязательный параметр для функции"
+
+msgid "is not a float or macro for function"
+msgstr "не дробное число или макрос для функции"
+
+msgid "is not a float or counter or macro for function"
+msgstr "не дробное число, счетчик или макрос для функции"
+
+msgid "An item key must be used in trigger expression"
+msgstr "В выражении триггера должен быть использован ключ элемента данных"
+
+msgid "Incorrect trigger expression"
+msgstr "Некорректное выражение триггера"
+
+msgid "You can not use template hosts in mixed expressions."
+msgstr "Вы не можете использовать шаблонные узлы сети в смешанных выражениях"
+
+msgid "Added trigger"
+msgstr "Триггер добавлен"
+
+msgid "to host"
+msgstr "к узлу сети"
+
+msgid "Missing key"
+msgstr "Пропущенный ключ"
+
+msgid "Incorrect function is used"
+msgstr "Использована некорректная функция"
+
+msgid "Unknown macro"
+msgstr "Неизвестный макрос"
+
+msgid "from host"
+msgstr "для узла сети"
+
+msgid "Trigger in template"
+msgstr "Триггер в шаблоне"
+
+msgid "has dependency with trigger in template"
+msgstr "имеет зависимость с триггером в шаблоне"
+
+msgid "is not the highest level template"
+msgstr "не является высшим уровнем шаблона"
+
+msgid "No function with"
+msgstr "Нет функции с"
+
+msgid "Specify the conditional expression for the target."
+msgstr "Укажите условие выражения для цели."
+
+msgid "0 or 1"
+msgstr "0 или 1"
+
+msgid "At least one item must be present in the trigger expression."
+msgstr "В выражении триггера должен присуствовать хотя бы один элемент данных."
+
+msgid "Host does not exist."
+msgstr "Узел сети не существует."
+
+msgid "Host key does not exist."
+msgstr "Ключ узла сети не существует."
+
+msgid "Function '"
+msgstr "Функция '"
+
+msgid "' does not accept parameters."
+msgstr "' не поддерживает параметры."
+
+msgid "Transaction has not been closed. Aborting.."
+msgstr "Транзакция не была закрыта. Отмена..."
+
+msgid "No system map with"
+msgstr "Нет системной карты с"
+
+msgid "No sysmap element with"
+msgstr "Нет элемента системной карты с"
+
+msgid "template"
+msgstr "шаблон"
+
+msgid "No rows in screen"
+msgstr "В комплексном экране нет ячеек"
+
+msgid "Delete it?"
+msgstr "Удалить?"
+
+msgid "This screen-row is not empty"
+msgstr "Эта ячейка комплексного экрана не пустая"
+
+msgid "This screen-column is not empty"
+msgstr "Эта колонка комплексного экрана не пустая"
+
+msgid "[H:i:s]"
+msgstr "[H:i:s]"
+
+msgid "No graph item with"
+msgstr "Нет элемента графика с"
+
+msgid "Missing items for graph"
+msgstr "Пропущенные элементы для графика"
+
+msgid "with template host can not contain items from other hosts."
+msgstr "шаблонный узел сети не может содержать элементы данных с других узлов сети"
+
+msgid "Can not use multiple host items for template graph"
+msgstr "Невозможно использовать множественные элементы данных узла сети для шаблонного графика"
+
+msgid "You must use items only from host"
+msgstr "Вы должны использовать элементы данных только узла сети"
+
+msgid "for template graph"
+msgstr "для шаблонного графика"
+
+msgid "updated for hosts"
+msgstr "обновлено для узлов сети"
+
+msgid "Skipped copying of graph"
+msgstr "Пропущено копирование графика"
+
+msgid "Graph \""
+msgstr "График \""
+
+msgid "\" deleted from host"
+msgstr "\" удален из узла сети"
+
+msgid "Unable to select configuration"
+msgstr "Не удается выбрать конфигурацию"
+
+msgid "on"
+msgstr "в"
+
+msgid "every"
+msgstr "каждый"
+
+msgid "day"
+msgstr "день"
+
+msgid "of every"
+msgstr "каждую"
+
+msgid "weeks"
+msgstr "недели"
+
+msgid "week"
+msgstr "неделю"
+
+msgid "Service cannot be parent and child at the same time."
+msgstr "Сервис не может быть родительским и дочерним в одно время"
+
+msgid "Cannot link hardlinked service."
+msgstr "Не удается связать жесткой ссылкой сервис."
+
+msgid "Cannot link service to itself."
+msgstr "Не удается связать сервис с самим собой."
+
+msgid "No service with"
+msgstr "Нет сервиса с"
+
+msgid "No service linkage with"
+msgstr "Нет ссылки сервиса с"
+
+msgid "Unknown calculation algorithm of service status"
+msgstr "Неизвестный алгоритм подсчета состояния сервиса"
+
+msgid "Incorrect user data in"
+msgstr "Некорректные пользовательские данные в"
+
+msgid "Could not save image!"
+msgstr "Не удалось сохранить рисунок!"
+
+msgid "Execute SQL error"
+msgstr "Ошибка при выполнении SQL"
+
+msgid "Parse SQL error"
+msgstr "Ошибки при разборе SQL"
+
+msgid "Image size must be less than 1MB"
+msgstr "Размер рисунка должен быть меньше 1МБ"
+
+msgid "Select image to download"
+msgstr "Выберите рисунок для загрузки"
+
+msgid "Incorrect Image"
+msgstr "Некорректный рисунок"
+
+msgid "Incorrect characters used for Node name"
+msgstr "Использованы недопустимые символы в имени Ноды"
+
+msgid "Master node already exists"
+msgstr "Мастер нода уже существует"
+
+msgid "Incorrect node type"
+msgstr "Некорректный тип ноды"
+
+msgid "Node with same ID already exists"
+msgstr "Нода с таким ID уже существует"
+
+msgid "Unable to remove local node"
+msgstr "Невозможно удалить локальную ноду"
+
+msgid "Please be aware that database still contains data related to the deleted Node"
+msgstr "Помните, что база данных по-прежнему содержит данные связанные с удаленной Нодой"
+
+msgid "PHP version"
+msgstr "Версия PHP"
+
+msgid "Minimal version of PHP is"
+msgstr "Минимальная версия PHP"
+
+msgid "PHP memory limit"
+msgstr "Лимит памяти PHP"
+
+msgid "is a minimal PHP memory limitation"
+msgstr "минимальный лимит памяти для PHP"
+
+msgid "PHP post max size"
+msgstr "Макс размер PHP post"
+
+msgid "is minimum size of PHP post"
+msgstr "минимальный размер PHP post"
+
+msgid "PHP max execution time"
+msgstr "Макс время выполнения PHP"
+
+msgid "PHP max input time"
+msgstr "Макс время PHP input"
+
+msgid "is a minimal limitation on execution time of PHP scripts"
+msgstr "минимальное время выполнения PHP скриптов"
+
+msgid "is a minimal limitation on input parse time for PHP scripts"
+msgstr "минимальное время на разбор входящих данных для PHP скриптов"
+
+msgid "PHP timezone"
+msgstr "Часовой пояс PHP"
+
+msgid "no"
+msgstr "нет"
+
+msgid "yes"
+msgstr "да"
+
+msgid "Timezone for PHP is not set"
+msgstr "Часовой пояс для PHP не установлен"
+
+msgid "Please set"
+msgstr "Пожалуйста установите"
+
+msgid "option in"
+msgstr "опцию в"
+
+msgid "PHP databases support"
+msgstr "Поддержка баз данных PHP"
+
+msgid "Requires any database support [MySQL or PostgreSQL or Oracle or SQLite3]"
+msgstr "Требуется поддержка любой базы данных [MySQL или PostgreSQL или Oracle или SQLite3]"
+
+msgid "Requires bcmath module"
+msgstr "Требуется модуль bcmath"
+
+msgid "configure PHP with"
+msgstr "настройте PHP с"
+
+msgid "Requires mb string module"
+msgstr "Требуется модуль mb string"
+
+msgid "PHP Sockets"
+msgstr "Сокеты PHP"
+
+msgid "Required Sockets module"
+msgstr "Требуется модуль сокетов"
+
+msgid "The GD extension is not loaded."
+msgstr "Раширение GD не загружено."
+
+msgid "GD PNG Support"
+msgstr "Поддержка GD PNG"
+
+msgid "Requires images generation support"
+msgstr "Требуется поддержка генерирования рисунков"
+
+msgid "libxml module"
+msgstr "Модуль libxml"
+
+msgid "php-xml module is not installed"
+msgstr "модуль php-xml не установлен"
+
+msgid "ctype module"
+msgstr "Модуль ctype"
+
+msgid "Requires ctype module"
+msgstr "Требуется модуль ctype"
+
+msgid "PHP upload max filesize"
+msgstr "Макс размер загружаемого файла для PHP"
+
+msgid "is minimum for PHP upload filesize"
+msgstr "минимальный размер загружаемого файла для PHP"
+
+msgid "PHP Session"
+msgstr "PHP Session"
+
+msgid "Required Session module"
+msgstr "Требуется модуль сессий"
+
+msgid "Account is blocked for"
+msgstr "Аккаунт заблокирован на"
+
+msgid "Login name or password is incorrect"
+msgstr "Имя пользователя или пароль неверные"
+
+msgid "Session terminated, please re-login!"
+msgstr "Сессия завершена, пожалуйста, перезайдите в систему!"
+
+msgid "Table users is empty. Possible database corruption."
+msgstr "Таблица пользователей пустая. Возможно повреждена база данных."
+
+msgid "Probably php-ldap module is missing"
+msgstr "Вероятно не хватает модуля php-ldap"
+
+msgid "failed login attempts logged."
+msgstr "неудачных попыток входа в систему зафиксировано."
+
+msgid "Last failed attempt was from"
+msgstr "Последняя неудачная попытка с"
+
+msgid "Only Super Admins can create Users"
+msgstr "Только Супер-Администраторы могут создавать пользователей"
+
+msgid "Only Super Admins can update Users"
+msgstr "Только Супер-Администраторы могут обновлять пользователей"
+
+msgid "Only Super Admins can delete Users"
+msgstr "Только Супер-Администраторы могут удалять пользователей"
+
+msgid "Only Zabbix Admins can add user Medias"
+msgstr "Только Администраторы Zabbix могут добавлять способы оповещений к пользователю"
+
+msgid "Only Zabbix Admins can remove user Medias"
+msgstr "Только Администраторы Zabbix могут удалять способы оповещений у пользователя"
+
+msgid "Only Zabbix Admins can change user Medias"
+msgstr "Только Администраторы Zabbix могут изменять способы оповещений у пользователя"
+
+msgid "Can't delete user medias"
+msgstr "Не удалось удалить способы оповещений у пользователя"
+
+msgid "Can't update user medias"
+msgstr "Не удалось обновить способы оповещений у пользователя"
+
+msgid "Can't insert user medias"
+msgstr "Не удалось добавить способы оповещений у пользователя"
+
+msgid "Wrong fields for user"
+msgstr "Ошибочные поля для пользователя"
+
+msgid "User ["
+msgstr "Пользователь ["
+
+msgid "] already exists"
+msgstr "] уже существует"
+
+msgid "Cannot rename guest user"
+msgstr "Невозможно переименовать гостевого пользователя"
+
+msgid "User cannot restrict access to GUI for himself. Group \""
+msgstr "Пользователь не может себе ограничить доступ к GUI. Группа \""
+
+msgid "\""
+msgstr "\""
+
+msgid "User cannot disable himself. Group \""
+msgstr "Пользователь не может отключить себя. Группа \""
+
+msgid "Wrong period ["
+msgstr "Ошибочный период ["
+
+msgid "]"
+msgstr "]"
+
+msgid "Internal Zabbix error"
+msgstr "Внутренняя ошибка zabbix"
+
+msgid "Wrong fields for media type"
+msgstr "Ошибочные поля для способа оповещений"
+
+msgid "Can't delete media types"
+msgstr "Не удалось удалить способы оповещений"
+
+msgid "Can't update media types"
+msgstr "Не удалось обновить способы оповещений"
+
+msgid "Can't insert media types"
+msgstr "Не удалось добавитьспособы оповещений"
+
+msgid "Mediatype already exists:"
+msgstr "Способ оповещений уже существует:"
+
+msgid "Mediatypes used by action:"
+msgstr "Способы оповещений используются в действии:"
+
+msgid "Only Super Admins can create media types"
+msgstr "Только Супер-Администраторы могут создавать способы оповещений"
+
+msgid "Only Super Admins can update media types"
+msgstr "Только Супер-Администраторы могут обновлять способы оповещений"
+
+msgid "Only Super Admins can delete media types"
+msgstr "Только Супер-Администраторы могут удалять способы оповещений"
+
+msgid "You cannot view this URL as a"
+msgstr "Вы не можете просмотреть этот URL как"
+
+msgid "You must login to view this page."
+msgstr "Вы должны войти в систему для просмотра этой страницы."
+
+msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
+msgstr "Если вы считаете это сообщение ошибкой, пожалуйста, свяжитесь с вашими администраторами для получения прав доступа."
+
+msgid "You are not logged in."
+msgstr "Вы не вошли в систему."
+
+msgid "ERROR"
+msgstr "ОШИБКА"
+
+msgid "[Wrong value for month:"
+msgstr "[Неправильное значение месяца:"
+
+msgid "[Wrong value for day of week:"
+msgstr "[Неправильное значение дня недели:"
+
+msgid "Help"
+msgstr "Помощь"
+
+msgid "Profile"
+msgstr "Профиль"
+
+msgid "Get support"
+msgstr "Поддержка"
+
+msgid "Monitoring"
+msgstr "Мониторинг"
+
+msgid "Inventory"
+msgstr "Инвентаризация"
+
+msgid "Queue"
+msgstr "Очередь"
+
+msgid "Events"
+msgstr "События"
+
+msgid "EVENTS"
+msgstr "СОБЫТИЯ"
+
+msgid "Maps"
+msgstr "Карты сети"
+
+msgid "Report"
+msgstr "Отчет"
+
+msgid "Reports"
+msgstr "Отчеты"
+
+msgid "General"
+msgstr "Общие"
+
+msgid "Login"
+msgstr "Вход в систему"
+
+msgid "Logout"
+msgstr "Выход из системы"
+
+msgid "Print"
+msgstr "Печать"
+
+msgid "Latest data"
+msgstr "Последние данные"
+
+msgid "Incorrect description"
+msgstr "Некорретное описание"
+
+msgid "Can't format Tree"
+msgstr "Не удается построить дерево"
+
+msgid "You do not have permission to perform this operation"
+msgstr "У вас нет полномочий для выполнения этой операции"
+
+msgid "No permissions for screen"
+msgstr "Нет прав доступа к комплексному экрану"
+
+msgid "No permissions for map"
+msgstr "Нет прав доступа к карте"
+
+msgid "XML file contains errors"
+msgstr "XML файл содержит ошибки"
+
+msgid "W"
+msgstr "Ср"
+
+msgid "F"
+msgstr "Пт"
+
+msgid "S"
+msgstr "Сб"
+
+msgid "Zoom"
+msgstr "Масштаб"
+
+msgid "fixed"
+msgstr "фикс"
+
+msgid "dynamic"
+msgstr "динам"
+
+msgid "now"
+msgstr "сейчас"
+
+msgid "Create Log Trigger"
+msgstr "Создать триггер для журнала"
+
+msgid "Do you replace the conditional expression?"
+msgstr "Вы хотите заменить условие выражения?"
+
+msgid "Add Service"
+msgstr "Добавить сервис"
+
+msgid "Edit Service"
+msgstr "Изменить сервис"
+
+msgid "Delete Service"
+msgstr "Удалить сервис"
+
+msgid "Delete selected services?"
+msgstr "Удалить выбранные сервисы?"
+
+msgid "Can not find objects with name"
+msgstr "Не удалось найти объекты с именем"
+
+msgid "Can not create new element"
+msgstr "Не удалось создать новый элемент"
+
+msgid "other"
+msgstr "другое"
+
+msgid "We are sorry, the maximum possible number of elements to remember has been reached."
+msgstr "Приносим свои извинения, достигнуто максимально возможное количество элементов."
+
