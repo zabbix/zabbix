@@ -1,0 +1,2161 @@
+"Project-Id-Version: Zabbix 1.9\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-11-10 16:17+0300\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Konstantin <konstantin.buravcov@zabbix.com>\n"
+"Language-Team: Zabbix <info@zabbix.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#:
+msgid "d M Y H:i:s"
+msgstr "d M H:i:s"
+
+#:
+msgid "d M Y"
+msgstr "d M Y"
+
+#:
+msgid "UTF-8"
+msgstr "UTF-8"
+
+#:
+msgid "y"
+msgstr "g"
+
+#:
+msgid "m"
+msgstr "mēn."
+
+#:
+msgid "w"
+msgstr "ned."
+
+#:
+msgid "d"
+msgstr "d"
+
+#:
+msgid "h"
+msgstr "st."
+
+#:
+msgid "s"
+msgstr "s"
+
+#:
+msgid "ms"
+msgstr "ms"
+
+#:
+msgid "Sunday"
+msgstr "Svētdiena"
+
+#:
+msgid "Monday"
+msgstr "Pirmdiena"
+
+#:
+msgid "Tuesday"
+msgstr "Otrdiena"
+
+#:
+msgid "Wednesday"
+msgstr "Trešdiena"
+
+#:
+msgid "Thursday"
+msgstr "Cetrutdiena"
+
+#:
+msgid "Friday"
+msgstr "Piektdiena"
+
+#:
+msgid "Saturday"
+msgstr "Sestdiena"
+
+#:
+msgid "May"
+msgstr "Mai"
+
+#:
+msgid "January"
+msgstr "Janvāris"
+
+#:
+msgid "February"
+msgstr "Februāris"
+
+#:
+msgid "March"
+msgstr "Marts"
+
+#:
+msgid "April"
+msgstr "Aprīlis"
+
+#:
+msgid "June"
+msgstr "Jūnijs"
+
+#:
+msgid "July"
+msgstr "Jūlijs"
+
+#:
+msgid "August"
+msgstr "Augusts"
+
+#:
+msgid "September"
+msgstr "Septembris"
+
+#:
+msgid "October"
+msgstr "Oktobris"
+
+#:
+msgid "November"
+msgstr "Novembris"
+
+#:
+msgid "December"
+msgstr "Decembris"
+
+#:
+msgid "Delete selected"
+msgstr "Dzēst iezīmētos"
+
+#:
+msgid "Copy selected to ..."
+msgstr "Kopēt iezīmētos uz..."
+
+#:
+msgid "IP range"
+msgstr "IP apgabals"
+
+#:
+msgid "Speed"
+msgstr "Ātrums"
+
+#:
+msgid "Response time"
+msgstr "Atbildes laiks"
+
+#:
+msgid "Number of steps"
+msgstr "Soļu skaits"
+
+#:
+msgid "Agent"
+msgstr "Aģents"
+
+#:
+msgid "Variables"
+msgstr "Mainīgie"
+
+#:
+msgid "Step"
+msgstr "Solis"
+
+#:
+msgid "Steps"
+msgstr "Soļi"
+
+#:
+msgid "Element"
+msgstr "Elements"
+
+#:
+msgid "Elements"
+msgstr "Elementi"
+
+#:
+msgid "Existing"
+msgstr "Esošs"
+
+#:
+msgid "Missing"
+msgstr "Trūkstošs"
+
+#:
+msgid "Refresh"
+msgstr "Atjaunot"
+
+#:
+msgid "Previous"
+msgstr "Iepriekšējais"
+
+#:
+msgid "Next"
+msgstr "Nākamais"
+
+#:
+msgid "Zabbix is temporarily unavailable"
+msgstr "Zabbix šobrīd nav pieejams"
+
+#:
+msgid "Time zone"
+msgstr "Laika zona"
+
+#:
+msgid "Do not keep history older than (in days)"
+msgstr "Neuzglabāt vēsturi ilgāk kā (dienās)"
+
+#:
+msgid "Acknowledge added"
+msgstr "Apstiprinājums pievienots"
+
+#:
+msgid "Cannot acknowledge event"
+msgstr "Notikumu nav iespējams apstiprināt"
+
+#:
+msgid "Immediately"
+msgstr "Nekavējoties"
+
+#:
+msgid "Send message"
+msgstr "Sūtīt ziņojumu"
+
+#:
+msgid "Remote command"
+msgstr "Attālināta komanda"
+
+#:
+msgid "Remote commands"
+msgstr "Attālinātas komandas"
+
+#:
+msgid "Filter"
+msgstr "Filtrs"
+
+#:
+msgid "Time period"
+msgstr "Laika periods"
+
+#:
+msgid "Conditions"
+msgstr "Nosacījumi"
+
+#:
+msgid "Condition"
+msgstr "Nosacījums"
+
+#:
+msgid "New condition"
+msgstr "Izveidot jaunu nosacījumu"
+
+#:
+msgid "No conditions defined"
+msgstr "Nav nosacījumu"
+
+#:
+msgid "Event acknowledged"
+msgstr "Notikums apstiprināts"
+
+#:
+msgid "Send only to"
+msgstr "Sūtīt tikai"
+
+#:
+msgid "Device"
+msgstr "Iekārta"
+
+#:
+msgid "Delay"
+msgstr "Aizture"
+
+#:
+msgid "Subject"
+msgstr "Tēma"
+
+#:
+msgid "Default message"
+msgstr "Noklusētais ziņojums"
+
+#:
+msgid "Default subject"
+msgstr "Noklusētā tēma"
+
+#:
+msgid "Message"
+msgstr "Ziņojums"
+
+#:
+msgid "User group"
+msgstr "Lietotāju grupa"
+
+#:
+msgid "Group"
+msgstr "Grupa"
+
+#:
+msgid "User"
+msgstr "Lietotājs"
+
+#:
+msgid "Information"
+msgstr "Informācija"
+
+#:
+msgid "Warning"
+msgstr "Brīdinājums"
+
+#:
+msgid "Average"
+msgstr "Vidējs"
+
+#:
+msgid "High"
+msgstr "Augsts"
+
+#:
+msgid "Disaster"
+msgstr "Katastrofa"
+
+#:
+msgid "AND / OR"
+msgstr "UN / VAI"
+
+#:
+msgid "AND"
+msgstr "UN"
+
+#:
+msgid "and"
+msgstr "un"
+
+#:
+msgid "OR"
+msgstr "vai"
+
+#:
+msgid "Type of calculation"
+msgstr "Aprēķina tips"
+
+#:
+msgid "Retries left"
+msgstr "Palikuši mēģinājumi"
+
+#:
+msgid "Show all"
+msgstr "Attēlot visu"
+
+#:
+msgid "Time"
+msgstr "Laiks"
+
+#:
+msgid "Status"
+msgstr "Statuss"
+
+#:
+msgid "Duration"
+msgstr "Ilgums"
+
+#:
+msgid "Type"
+msgstr "Tips"
+
+#:
+msgid "Recipient(s)"
+msgstr "Saņemējs/i"
+
+#:
+msgid "Recipient"
+msgstr "Saņēmējs"
+
+#:
+msgid "Error"
+msgstr "Kļūda"
+
+#:
+msgid "sent"
+msgstr "nosūtīts"
+
+#:
+msgid "executed"
+msgstr "izpildīts"
+
+#:
+msgid "not sent"
+msgstr "netika nosūtīts"
+
+#:
+msgid "Line"
+msgstr "Līnija"
+
+#:
+msgid "Filled region"
+msgstr "Aizpildīts reģions"
+
+#:
+msgid "Bold line"
+msgstr "Paresnināta līnija"
+
+#:
+msgid "Dot"
+msgstr "Punkti"
+
+#:
+msgid "Dashed line"
+msgstr "Pārtraukta līnija"
+
+#:
+msgid "Select graph..."
+msgstr "Izvēlēties grafiku..."
+
+#:
+msgid "remember selected"
+msgstr "atcerēties izvēlēto"
+
+#:
+msgid "Max count of elements to show inside table cell"
+msgstr "Maksimālais elementu skaits, ko rādīt tabulas šūnā"
+
+#:
+msgid "Search/Filter elements limit"
+msgstr "Meklēšanas/filtra rezultātu limits"
+
+#:
+msgid "Event acknowledges"
+msgstr "Notikumu apstiprināšana"
+
+#:
+msgid "Days"
+msgstr "Dienas"
+
+#:
+msgid "Show events not older"
+msgstr "Rādīt notikumus, kas jaunāki par"
+
+#:
+msgid "Show events max"
+msgstr "Maksimālais attēlojamo notikumu skaits"
+
+#:
+msgid "Configuration of Zabbix"
+msgstr "Zabbix konfigurācija"
+
+#:
+msgid "CONFIGURATION OF ZABBIX"
+msgstr "ZABBIX KONFIGURĀCIJA"
+
+#:
+msgid "Configuration updated"
+msgstr "Konfigurācija saglabāta"
+
+#:
+msgid "Configuration was not updated"
+msgstr "Konfigurācija netika saglabāta"
+
+#:
+msgid "Configuration"
+msgstr "Konfigurācija"
+
+#:
+msgid "Administration"
+msgstr "Administrācija"
+
+#:
+msgid "Do not keep events older than (in days)"
+msgstr "Neuzglabāt notikumus, kas vecāki par (dienās)"
+
+#:
+msgid "SMTP server"
+msgstr "SMTP serveris"
+
+#:
+msgid "Script name"
+msgstr "Skripta nosaukums"
+
+#:
+msgid "Default"
+msgstr "Noklusētais"
+
+#:
+msgid "Images"
+msgstr "Attēli"
+
+#:
+msgid "Image"
+msgstr "Attēls"
+
+#:
+msgid "IMAGES"
+msgstr "ATTĒLI"
+
+#:
+msgid "Background"
+msgstr "Fons"
+
+#:
+msgid "Image added"
+msgstr "Attēls pievienots"
+
+#:
+msgid "Cannot add image"
+msgstr "Attēlu nav iespējams pievienot"
+
+#:
+msgid "Image deleted"
+msgstr "Attēls izdzēsts"
+
+#:
+msgid "Cannot delete image"
+msgstr "Attēlu nav iespējams izdzēst"
+
+#:
+msgid "Image updated"
+msgstr "Attēls atjaunots"
+
+#:
+msgid "Cannot update image"
+msgstr "Attēlu nav iespējams atjaunot"
+
+#:
+msgid "Other"
+msgstr "Cits"
+
+#:
+msgid "Other parameters"
+msgstr "Citi parametri"
+
+#:
+msgid "Create Image"
+msgstr "Izveidot attēlu"
+
+#:
+msgid "Working time"
+msgstr "Darba laiks"
+
+#:
+msgid "Regular expressions"
+msgstr "Regulārās izteiksmes"
+
+#:
+msgid "Regular expression"
+msgstr "Regulārā izteiksme"
+
+#:
+msgid "Expressions"
+msgstr "Izteiksmes"
+
+#:
+msgid "Expression"
+msgstr "Izteiksme"
+
+#:
+msgid "Expression type"
+msgstr "Izteiksmes tips"
+
+#:
+msgid "New expression"
+msgstr "Jauna izteiksme"
+
+#:
+msgid "Delimiter"
+msgstr "Atdalītājs"
+
+#:
+msgid "Required performance (vps)"
+msgstr "Nepieciešamā veikstpēja (vs)"
+
+#:
+msgid "Authentication"
+msgstr "Autentifikācija"
+
+#:
+msgid "was not"
+msgstr "netika"
+
+#:
+msgid "successful"
+msgstr "veiksmīgs"
+
+#:
+msgid "Copyright 2001-2010 by"
+msgstr "Autortīesības 2001-2010"
+
+#:
+msgid "Connected as"
+msgstr "Pievienojies kā"
+
+#:
+msgid "SIA Zabbix"
+msgstr "SIA Zabbix"
+
+#:
+msgid "Sort by"
+msgstr "Kārtot pēc"
+
+#:
+msgid "Parameter"
+msgstr "Parametrs"
+
+#:
+msgid "Colour"
+msgstr "Krāsa"
+
+#:
+msgid "Up"
+msgstr "Augšup"
+
+#:
+msgid "Down"
+msgstr "Lejup"
+
+#:
+msgid "Function"
+msgstr "Funkcija"
+
+#:
+msgid "Day of week"
+msgstr "Nedēļas diena"
+
+#:
+msgid "Day of month"
+msgstr "Mēneša diena"
+
+#:
+msgid "Monitored"
+msgstr "Uzraudzīts"
+
+#:
+msgid "Not monitored"
+msgstr "Netiek uzraudzīts"
+
+#:
+msgid "Groups"
+msgstr "Grupas"
+
+#:
+msgid " - all groups - "
+msgstr "- visas grupas -"
+
+#:
+msgid "All groups"
+msgstr "Visas grupas"
+
+#:
+msgid "New group"
+msgstr "Jauna grupa"
+
+#:
+msgid "IP address"
+msgstr "IP addrese"
+
+#:
+msgid "IPMI IP address"
+msgstr "IPMI IP adrese"
+
+#:
+msgid "IPMI port"
+msgstr "IPMI ports"
+
+#:
+msgid "IPMI authentication algorithm"
+msgstr "IPMI autentifikācijas algoritms"
+
+#:
+msgid "Group name"
+msgstr "Grupas vārds"
+
+#:
+msgid "Availability"
+msgstr "Pieejamība"
+
+#:
+msgid "Available"
+msgstr "Pieejams"
+
+#:
+msgid "Not available"
+msgstr "Nav pieejams"
+
+#:
+msgid "Device type"
+msgstr "Iekārtas tips"
+
+#:
+msgid "Hardware"
+msgstr "Aparatūra"
+
+#:
+msgid "Software"
+msgstr "Programmatūra"
+
+#:
+msgid "Contact"
+msgstr "Kontaktinformācija"
+
+#:
+msgid "Location"
+msgstr "Atrašanās vieta"
+
+#:
+msgid "Notes"
+msgstr "Piezīmes"
+
+#:
+msgid "Add to group"
+msgstr "Pievienot grupai"
+
+#:
+msgid "Delete from group"
+msgstr "Dzēst no grupas"
+
+#:
+msgid "Description"
+msgstr "Apraksts"
+
+#:
+msgid "History"
+msgstr "Vēsture"
+
+#:
+msgid "Zabbix agent"
+msgstr "Zabbix aģents"
+
+#:
+msgid "Zabbix agent (active)"
+msgstr "Zabbix aģents (aktīvs)"
+
+#:
+msgid "SNMPv1 agent"
+msgstr "SNMPv1 aģents"
+
+#:
+msgid "Simple check"
+msgstr "Vienkārša pārbaude"
+
+#:
+msgid "SNMPv2 agent"
+msgstr "SNMPv2 aģents"
+
+#:
+msgid "SNMPv3 agent"
+msgstr "SNMPv3 aģents"
+
+#:
+msgid "IPMI agent"
+msgstr "IPMI aģents"
+
+#:
+msgid "SSH agent"
+msgstr "SSH aģents"
+
+#:
+msgid "TELNET agent"
+msgstr "TELNET aģents"
+
+#:
+msgid "External check"
+msgstr "Ārēja pārbaude"
+
+#:
+msgid "Active"
+msgstr "Aktīvs"
+
+#:
+msgid "Not supported"
+msgstr "Netiek atbalstīts"
+
+#:
+msgid "Email"
+msgstr "E-pasts"
+
+#:
+msgid "Jabber"
+msgstr "Jabber"
+
+#:
+msgid "Jabber identifier"
+msgstr "Jabber identifikators"
+
+#:
+msgid "SMS"
+msgstr "SMS"
+
+#:
+msgid "Script"
+msgstr "Skripts"
+
+#:
+msgid "GSM modem"
+msgstr "GSM modems"
+
+#:
+msgid "Units"
+msgstr "Vienības"
+
+#:
+msgid "Type of information"
+msgstr "Informācijas tips"
+
+#:
+msgid "Data type"
+msgstr "Datu tips"
+
+#:
+msgid "Decimal"
+msgstr "Decimāls"
+
+#:
+msgid "Octal"
+msgstr "Oktāls"
+
+#:
+msgid "Hexadecimal"
+msgstr "Heksadecimāls"
+
+#:
+msgid "Text"
+msgstr "Teksts"
+
+#:
+msgid "SNMP OID"
+msgstr "SNMP OID"
+
+#:
+msgid "SNMP port"
+msgstr "SNMP ports"
+
+#:
+msgid "Copy"
+msgstr "Kopēt"
+
+#:
+msgid "Search"
+msgstr "Meklēt"
+
+#:
+msgid "Additional parameters"
+msgstr "Papildus parametri"
+
+#:
+msgid "IPMI sensor"
+msgstr "IPMI sensors"
+
+#:
+msgid "User name"
+msgstr "Lietotāja vārds"
+
+#:
+msgid "Public key file"
+msgstr "Publiskās atslēgas fails"
+
+#:
+msgid "Private key file"
+msgstr "Privātās atslēgas fails"
+
+#:
+msgid "Public key"
+msgstr "Publiskā atslēga"
+
+#:
+msgid "Authentication method"
+msgstr "Autentifikācijas metode"
+
+#:
+msgid "Passphrase"
+msgstr "Parole"
+
+#:
+msgid "Formula"
+msgstr "Formula"
+
+#:
+msgid "Event"
+msgstr "Notikums"
+
+#:
+msgid "Event details"
+msgstr "Notikuma detaļas"
+
+#:
+msgid "Latest events"
+msgstr "Pēdējie notikumi"
+
+#:
+msgid "HISTORY OF EVENTS"
+msgstr "NOTIKUMU VĒSTURE"
+
+#:
+msgid "No events found"
+msgstr "Notikumi nabv atrasti"
+
+#:
+msgid "Events since"
+msgstr "Notikumi kopš"
+
+#:
+msgid "Last check"
+msgstr "Pēdējā pārbaude"
+
+#:
+msgid "Last value"
+msgstr "Pēdējā vērtība"
+
+#:
+msgid "Hidden"
+msgstr "Slēpts"
+
+#:
+msgid "Shown"
+msgstr "Parādīts"
+
+#:
+msgid "Grid"
+msgstr "Režģis"
+
+#:
+msgid "X"
+msgstr "X"
+
+#:
+msgid "Configuration of network maps"
+msgstr "Tīkla karšu konfigurācija"
+
+#:
+msgid "Map is saved! Return?"
+msgstr "Karte saglabāta. Atgriezties?"
+
+#:
+msgid "Map save operation failed."
+msgstr "Kartes saglabāšana nav bijusi veiksmīga."
+
+#:
+msgid "Add element"
+msgstr "Pievienot elementu"
+
+#:
+msgid "Coordinate X"
+msgstr "X koordināta"
+
+#:
+msgid "Coordinate Y"
+msgstr "Y koordināta"
+
+#:
+msgid "Edit map element"
+msgstr "Rediģēt kartes elementu"
+
+#:
+msgid "Map elements"
+msgstr "Kartes elementi"
+
+#:
+msgid "Network map deleted"
+msgstr "Tīkla karte izdzēsta"
+
+#:
+msgid "Cannot delete network map"
+msgstr "Tīkla karti nav iespējams izdzēst"
+
+#:
+msgid "MAPS"
+msgstr "KATRES"
+
+#:
+msgid "Create Map"
+msgstr "Izveidot karti"
+
+#:
+msgid "Delete selected maps?"
+msgstr "Dzēst iezīmētās kartes?"
+
+#:
+msgid "Network map added"
+msgstr "Tīkla karte pievienota"
+
+#:
+msgid "Cannot add network map"
+msgstr "Nav iespējams pievienot tīkla karti"
+
+#:
+msgid "Two elements should be selected"
+msgstr "Jāiezīmē divi elementi"
+
+#:
+msgid "Delete selected elements?"
+msgstr "Dzēst iezīmētos elementus?"
+
+#:
+msgid "http://www.zabbix.com"
+msgstr "http://www.zabbix.com"
+
+#:
+msgid "Network maps"
+msgstr "Tīkla kartes"
+
+#:
+msgid "NETWORK MAPS"
+msgstr "TĪKLA KARTES"
+
+#:
+msgid "Background image"
+msgstr "Fona attēls"
+
+#:
+msgid "Save"
+msgstr "Saglabāt"
+
+#:
+msgid "Cancel"
+msgstr "Atcelt"
+
+#:
+msgid "Age"
+msgstr "Vecums"
+
+#:
+msgid "of"
+msgstr "no"
+
+#:
+msgid "Overview"
+msgstr "Pārskats"
+
+#:
+msgid "OVERVIEW"
+msgstr "PĀRSKATS"
+
+#:
+msgid "Values"
+msgstr "Vērtības"
+
+#:
+msgid "Next check"
+msgstr "Nākamā pārbaude"
+
+#:
+msgid "Count"
+msgstr "Skaits"
+
+#:
+msgid "5 seconds"
+msgstr "5 sekundes"
+
+#:
+msgid "10 seconds"
+msgstr "10 sekundes"
+
+#:
+msgid "30 seconds"
+msgstr "30 sekundes"
+
+#:
+msgid "1 minute"
+msgstr "1 minūte"
+
+#:
+msgid "5 minutes"
+msgstr "5 minūtes"
+
+#:
+msgid "More than 10 minutes"
+msgstr "Vairāk nekā 10 minūtes"
+
+#:
+msgid "Status of Zabbix"
+msgstr "Zabbix statuss"
+
+#:
+msgid "STATUS OF ZABBIX"
+msgstr "ZABBIX STATUSS"
+
+#:
+msgid "Value"
+msgstr "Vērtība"
+
+#:
+msgid "Zabbix server is running"
+msgstr "Zabbix serveris darbojas"
+
+#:
+msgid "Number of users (online)"
+msgstr "Lietotāju skaits"
+
+#:
+msgid "Users (online)"
+msgstr "Lietotāji (pieslēgušies)"
+
+#:
+msgid "Yes"
+msgstr "Jā"
+
+#:
+msgid "No"
+msgstr "Nē"
+
+#:
+msgid "From"
+msgstr "No"
+
+#:
+msgid "Till"
+msgstr "Līdz"
+
+#:
+msgid "Problems"
+msgstr "Problēmas"
+
+#:
+msgid "Hour"
+msgstr "Stunda"
+
+#:
+msgid "Hours"
+msgstr "Stundas"
+
+#:
+msgid "Minute"
+msgstr "Minūte"
+
+#:
+msgid "Minutes"
+msgstr "Minūtes"
+
+#:
+msgid "Day"
+msgstr "Diena"
+
+#:
+msgid "Month"
+msgstr "Mēnesis"
+
+#:
+msgid "Year"
+msgstr "Gads"
+
+#:
+msgid "add"
+msgstr "pievienot"
+
+#:
+msgid "Do not add"
+msgstr "Nepievienot"
+
+#:
+msgid "Leave empty"
+msgstr "Atstāt tukšu"
+
+#:
+msgid "Fill with default value"
+msgstr "Izmantot noklusēto vērtību"
+
+#:
+msgid "Create"
+msgstr "Izveidot"
+
+#:
+msgid "Week"
+msgstr "Nedēļa"
+
+#:
+msgid "Columns"
+msgstr "Stabiņi"
+
+#:
+msgid "Rows"
+msgstr "Rindas"
+
+#:
+msgid "Width"
+msgstr "Platums"
+
+#:
+msgid "Height"
+msgstr "Augstums"
+
+#:
+msgid "Show text as HTML"
+msgstr "Rādīt tekstu kā HTML"
+
+#:
+msgid "Map"
+msgstr "Karte"
+
+#:
+msgid "Style"
+msgstr "Stils"
+
+#:
+msgid "Vertical"
+msgstr "Vertikāli"
+
+#:
+msgid "Horizontal"
+msgstr "Horizontāli"
+
+#:
+msgid "Centre"
+msgstr "Centrēt"
+
+#:
+msgid "Right"
+msgstr "Pa labi"
+
+#:
+msgid "Middle"
+msgstr "Pa vidu"
+
+#:
+msgid "Custom screens"
+msgstr "Custom screens"
+
+#:
+msgid "Delete"
+msgstr "Dzēst"
+
+#:
+msgid "Today"
+msgstr "Šodiena"
+
+#:
+msgid "This week"
+msgstr "Šī nedēļa"
+
+#:
+msgid "This year"
+msgstr "Šis gads"
+
+#:
+msgid "This month"
+msgstr "Šis mēnesis"
+
+#:
+msgid "Last 24 hours"
+msgstr "Pēdējās 24 stundas"
+
+#:
+msgid "Last 7 days"
+msgstr "Pēdējās 7 dienas"
+
+#:
+msgid "Last 30 days"
+msgstr "Pēdējās 30 dienas"
+
+#:
+msgid "Last 365 days"
+msgstr "Pēdējās 365 dienas"
+
+#:
+msgid "Toggle input method"
+msgstr "Pārslēgt ievada metodi"
+
+#:
+msgid "Add"
+msgstr "Pievienot"
+
+#:
+msgid "Last change"
+msgstr "Pēdējā izmaiņa"
+
+#:
+msgid "Comments"
+msgstr "Komentāri"
+
+#:
+msgid "Zabbix User"
+msgstr "Zabbix lietotājs"
+
+#:
+msgid "Zabbix Admin"
+msgstr "Zabbix administrators"
+
+#:
+msgid "Zabbix Super Admin"
+msgstr "Zabbix superadministrators"
+
+#:
+msgid "User type"
+msgstr "Lietotāja tips"
+
+#:
+msgid "Users"
+msgstr "Lietotāji"
+
+#:
+msgid "User added"
+msgstr "Lietotājs pievienots"
+
+#:
+msgid "Cannot add user"
+msgstr "Lietotāju nav iespējams pievienot"
+
+#:
+msgid "Cannot add user. Both passwords must be equal."
+msgstr "Lietotāju nav iespējams pievienot. Abām parolēm jāsakrīt."
+
+#:
+msgid "User deleted"
+msgstr "Lietotājs izdzēsts"
+
+#:
+msgid "Cannot delete user"
+msgstr "Lietotāju nav iespējams izdzēst"
+
+#:
+msgid "Password should not be empty"
+msgstr "Parole nedrīkst būt tukša"
+
+#:
+msgid "Group added"
+msgstr "Grupa pievienota"
+
+#:
+msgid "Cannot add group"
+msgstr "Grupu nav iespējams pievienot"
+
+#:
+msgid "Group deleted"
+msgstr "Grupa izdzēsta"
+
+#:
+msgid "Cannot delete group"
+msgstr "Grupu nav iespējams pievienot"
+
+#:
+msgid "Users unblocked"
+msgstr "Lietotāji atbloķēti"
+
+#:
+msgid "Cannot unblock users"
+msgstr "Lietotājus nav iespējams atbloķēt"
+
+#:
+msgid "USER GROUPS"
+msgstr "LIETOTĀJU GRUPAS"
+
+#:
+msgid "USERS"
+msgstr "LIETOTĀJI"
+
+#:
+msgid "User groups"
+msgstr "Lietotāju grupas"
+
+#:
+msgid "Name"
+msgstr "Vārds"
+
+#:
+msgid "Surname"
+msgstr "Uzvārds"
+
+#:
+msgid "API access"
+msgstr "API pieeja"
+
+#:
+msgid "Users status"
+msgstr "Lietotāja statuss"
+
+#:
+msgid "Hide"
+msgstr "Slēpt"
+
+#:
+msgid "Password"
+msgstr "Parole"
+
+#:
+msgid "Change password"
+msgstr "Mainīt paroli"
+
+#:
+msgid "Password (once again)"
+msgstr "Parole (vēlreiz)"
+
+#:
+msgid "Create User"
+msgstr "Izveidot lietotāju"
+
+#:
+msgid "Create Group"
+msgstr "Izveidot grupu"
+
+#:
+msgid "Rows per page"
+msgstr "Ieriaksti lapā"
+
+#:
+msgid "Blocked"
+msgstr "Bloķēts"
+
+#:
+msgid "Unblock selected"
+msgstr "Atbloķēt iezīmētos"
+
+#:
+msgid "Unblock selected users?"
+msgstr "Vai atbloķēt iezīmētos lietotājus?"
+
+#:
+msgid "Delete selected users?"
+msgstr "Vai dzēst iezīmētos lietotājus?"
+
+#:
+msgid "Delete selected groups?"
+msgstr "Vai dzēst iezīmētās grupas?"
+
+#:
+msgid "Delete script?"
+msgstr "Vai dzēst skriptu?"
+
+#:
+msgid "Create script"
+msgstr "Izveidot skriptu"
+
+#:
+msgid "Script added"
+msgstr "Skripts pievienots"
+
+#:
+msgid "Cannot add script"
+msgstr "Skriptu nav iespējams pievienot"
+
+#:
+msgid "Script updated"
+msgstr "Skripts modificēts"
+
+#:
+msgid "Cannot update script"
+msgstr "Nevar modificēt skriptu"
+
+#:
+msgid "Script deleted"
+msgstr "Skripts izdzēsts"
+
+#:
+msgid "Cannot delete script"
+msgstr "Skriptu nav iespējams izdzēst"
+
+#:
+msgid "Tools"
+msgstr "Rīki"
+
+#:
+msgid "Result"
+msgstr "Rezultāts"
+
+#:
+msgid "Close"
+msgstr "Aizvērt"
+
+#:
+msgid "Cannot connect to Zabbix server"
+msgstr "Nevar pieslēgties Zabbix serverim"
+
+#:
+msgid "Delete selected scripts?"
+msgstr "Vai dzēst iezīmētos skriptus?"
+
+#:
+msgid "SCRIPT ERROR"
+msgstr "SKRIPTA KĻŪDA"
+
+#:
+msgid "Error Description"
+msgstr "Kļūdas apraksts"
+
+#:
+msgid "Can't send command, check connection"
+msgstr "Nav iespējams nosūtīt komandu, pārbaudiet savienojumu"
+
+#:
+msgid "Can't read script response, check connection"
+msgstr "Nav iespējams saņemt skripta rezultātus, pārbaudiet savienojumu"
+
+#:
+msgid "Unknown error happened reading script answer, please report to the developers"
+msgstr "Nezināma kļūda saņemot skripta rezultātus, lūdzu ziņojiet izstrādātājiem"
+
+#:
+msgid "Empty response received"
+msgstr "Saņemta tukša atbilde"
+
+#:
+msgid "Details"
+msgstr "Detaļas"
+
+#:
+msgid "Added"
+msgstr "Pievienots"
+
+#:
+msgid "Updated"
+msgstr "Saglabāts"
+
+#:
+msgid "Graph element"
+msgstr "Grafika elements"
+
+#:
+msgid "Unknown resource"
+msgstr "Nezināms resurss"
+
+#:
+msgid "already exists"
+msgstr "jau eksistē"
+
+#:
+msgid "Once"
+msgstr "Vienreiz"
+
+#:
+msgid "Move"
+msgstr "Pārvietot"
+
+#:
+msgid "Messages"
+msgstr "Ziņojumi"
+
+#:
+msgid "GUI Messaging"
+msgstr "Grafiskās saskarnes ziņojumi"
+
+#:
+msgid "Play sound"
+msgstr "Atskaņot skaņu"
+
+#:
+msgid "Play"
+msgstr "Atskaņot"
+
+#:
+msgid "Pause"
+msgstr "Pauze"
+
+#:
+msgid "Stop"
+msgstr "Stop"
+
+#:
+msgid "Loop"
+msgstr "Atkārtot"
+
+#:
+msgid "USER PROFILE"
+msgstr "LIETOTĀJA PROFILA"
+
+#:
+msgid "User profile"
+msgstr "Lietotāja profils"
+
+#:
+msgid "Language"
+msgstr "Valoda"
+
+#:
+msgid "English (GB)"
+msgstr "Angļu (GB)"
+
+#:
+msgid "French (FR)"
+msgstr "Franču (FR)"
+
+#:
+msgid "German (DE)"
+msgstr "Vācu (DE)"
+
+#:
+msgid "Italian (IT)"
+msgstr "Itāļu (IT)"
+
+#:
+msgid "Korean (KO)"
+msgstr "Korejiešu (KO)"
+
+#:
+msgid "Latvian (LV)"
+msgstr "Latviešu (LV)"
+
+#:
+msgid "Russian (RU)"
+msgstr "Krievu (RU)"
+
+#:
+msgid "Portuguese (PT)"
+msgstr "Protugāļu (PT)"
+
+#:
+msgid "Spanish (SP)"
+msgstr "Spāņu (SP)"
+
+#:
+msgid "Swedish (SE)"
+msgstr "Zviedru (SE)"
+
+#:
+msgid "Japanese (JP)"
+msgstr "Japāņu (JP)"
+
+#:
+msgid "Chinese (CN)"
+msgstr "Ķīniešu (CN)"
+
+#:
+msgid "Dutch (NL)"
+msgstr "Holandiešu (NL)"
+
+#:
+msgid "Hungarian (HU)"
+msgstr "Ungāru (HU)"
+
+#:
+msgid "Polish (PL)"
+msgstr "Poļu (PL)"
+
+#:
+msgid "Ukrainian (UA)"
+msgstr "Ukraiņu (UA)"
+
+#:
+msgid "Czech (CZ)"
+msgstr "Čehu (CZ)"
+
+#:
+msgid "ZABBIX"
+msgstr "ZABBIX"
+
+#:
+msgid "Welcome to Zabbix! You are connected as"
+msgstr "Laipni lūgti Zabbix! Jūs esat pieslēdzies kā"
+
+#:
+msgid "Extended"
+msgstr "Paplašināts"
+
+#:
+msgid "SEARCH"
+msgstr "MEKLĒT"
+
+#:
+msgid "found"
+msgstr "atrastiem"
+
+#:
+msgid "Displaying"
+msgstr "Attēlo"
+
+#:
+msgid "Empty"
+msgstr "Tukšs"
+
+#:
+msgid "No errors found"
+msgstr "Kļūdu nav"
+
+#:
+msgid "Expression Syntax Error"
+msgstr "Sintakses kļūda izteiksmē"
+
+#:
+msgid "Check expression part starting from '"
+msgstr "Pārbaudiet izteiksmi, sākot ar '"
+
+#:
+msgid "Not allowed symbols or sequence of symbols in expression element detected"
+msgstr "Izteiksmē atrasti neatļauti simboli vai to secība"
+
+#:
+msgid "Edit connector"
+msgstr "Rediģēt savienotāju"
+
+#:
+msgid "Include"
+msgstr "Iekļaut"
+
+#:
+msgid "Exclude"
+msgstr "Neikļaut"
+
+#:
+msgid "Keyword"
+msgstr "Atslēgas vārds"
+
+#:
+msgid "Delete expression?"
+msgstr "Dzēst izteiksmi?"
+
+#:
+msgid "Delete keyword?"
+msgstr "Dzēst atslēgas vārdu?"
+
+#:
+msgid "Test data"
+msgstr "Pārbaudāmie dati"
+
+#:
+msgid "Unknown variable type, testing not available"
+msgstr "Nezināms mainīgā tips, pārbaude nav pieejama"
+
+#:
+msgid "Result type"
+msgstr "Rezultāta tips"
+
+#:
+msgid "Combined result"
+msgstr "Gala rezultāts"
+
+#:
+msgid "Incorrect time period"
+msgstr "Nepareizs laika periods"
+
+#:
+msgid "No elements selected!"
+msgstr "Elementi netika iezīmēti"
+
+#:
+msgid "refreshed every"
+msgstr "atjaunots katras"
+
+#:
+msgid "Page received incorrect data"
+msgstr "Lapa saņēma nepareizu informāciju"
+
+#:
+msgid "Timezone for PHP is not set. Please set \"date.timezone\" option in php.ini."
+msgstr "PHP laika zona nav uzstādīta. Lūdzu, norādiet \"date.timezone\" failā \"php.ini\"."
+
+#:
+msgid "Total time"
+msgstr "Kopējais laiks"
+
+#:
+msgid "Memory limit"
+msgstr "Atmiņas ierobežojums"
+
+#:
+msgid "Memory usage"
+msgstr "Izmantotā atmiņa"
+
+#:
+msgid "Total time spent on SQL"
+msgstr "Kopā SQL pieprasījumos pavadītais laiks"
+
+#:
+msgid "Wrong type"
+msgstr "Nepareizs tips"
+
+#:
+msgid "days"
+msgstr "dienas"
+
+#:
+msgid "Exa"
+msgstr "Eksa"
+
+#:
+msgid "Yotta"
+msgstr "Jota"
+
+#:
+msgid "Delete selected user?"
+msgstr "Izdzēst izvēlēto lietotāju?"
+
+#:
+msgid "Subfilter"
+msgstr "Apakšfiltrs"
+
+#:
+msgid "affects only filtered data!"
+msgstr "ietekmē tikai atlasīto informāciju!"
+
+#:
+msgid "No image"
+msgstr "Nav attēla"
+
+#:
+msgid "Incorrect key format"
+msgstr "Nepareizs atslēgas formāts"
+
+#:
+msgid "Invalid SNMP port"
+msgstr "Nepareizs SNMP ports"
+
+#:
+msgid "Type of information must be Log for log key"
+msgstr "Atslēgas \"log\" tipam jābūt \"Log\""
+
+#:
+msgid "is not one of"
+msgstr "nav viens no"
+
+#:
+msgid "Key does not match"
+msgstr "Atslēga nesakrīt"
+
+#:
+msgid "deleted"
+msgstr "izdzēsts"
+
+#:
+msgid "added"
+msgstr "pievienots"
+
+#:
+msgid "Incorrect characters used for DNS"
+msgstr "DNS vārdā lietoti neatļauti simboli"
+
+#:
+msgid "Critical error"
+msgstr "Kritiska kļūda"
+
+#:
+msgid "Field"
+msgstr "Lauks"
+
+#:
+msgid "is not integer"
+msgstr "nav vesels skaitlis"
+
+#:
+msgid "is not a colour"
+msgstr "nav krāsa"
+
+#:
+msgid "is mandatory"
+msgstr "ir obligāts"
+
+#:
+msgid "Incorrect value for"
+msgstr "Nepareiza vērtība"
+
+#:
+msgid "Incorrect usage of quotes"
+msgstr "Nepareizs pēdiņu pielietojums"
+
+#:
+msgid "Expression cannot be empty"
+msgstr "Izteiksme nedrīkst būt tukša"
+
+#:
+msgid "No such monitored parameter"
+msgstr "Nav tāda uzraugāmā parametra"
+
+#:
+msgid "Unknown function"
+msgstr "Nezināma funkcija"
+
+#:
+msgid "for function"
+msgstr "funkcijai"
+
+#:
+msgid "Missing mandatory parameter for function"
+msgstr "Trūks obligāts funkcijas parametrs"
+
+#:
+msgid "Missing key"
+msgstr "Trūkst atslēga"
+
+#:
+msgid "Incorrect function is used"
+msgstr "Tiek izmantota nepareiza funkcija"
+
+#:
+msgid "No function with"
+msgstr "Nav funkcijas ar"
+
+#:
+msgid "0 or 1"
+msgstr "0 vai 1"
+
+#:
+msgid "Function '"
+msgstr "Funkcija '"
+
+#:
+msgid "' does not accept parameters."
+msgstr "' nepieņem parametrus"
+
+#:
+msgid "Delete it?"
+msgstr "Izdzēst?"
+
+#:
+msgid "Skipped copying of graph"
+msgstr "Grafika kopēšana izlaista"
+
+#:
+msgid "Graph \""
+msgstr "Grafiks \""
+
+#:
+msgid "every"
+msgstr "katru"
+
+#:
+msgid "day"
+msgstr "diena"
+
+#:
+msgid "weeks"
+msgstr "nedēļas"
+
+#:
+msgid "week"
+msgstr "nedēļa"
+
+#:
+msgid "Could not save image!"
+msgstr "Nevar saglabāt attēlu"
+
+#:
+msgid "Image size must be less than 1MB"
+msgstr "Attēlam jābūt mazākam par 1MB"
+
+#:
+msgid "Select image to download"
+msgstr "Izvēlieties attelu lejuplādēšanai"
+
+#:
+msgid "Incorrect Image"
+msgstr "Nepareizs attēls"
+
+#:
+msgid "PHP version"
+msgstr "PHP versija"
+
+#:
+msgid "Minimal version of PHP is"
+msgstr "Minimālā PHP versija ir"
+
+#:
+msgid "PHP memory limit"
+msgstr "PHP atmiņas ierobežojums"
+
+#:
+msgid "is a minimal PHP memory limitation"
+msgstr "ir minimālais PHP atmiņas ierobežojums"
+
+#:
+msgid "PHP max execution time"
+msgstr "PHP maksimālais izpildes laiks"
+
+#:
+msgid "PHP timezone"
+msgstr "PHP laika zona"
+
+#:
+msgid "no"
+msgstr "nē"
+
+#:
+msgid "yes"
+msgstr "jā"
+
+#:
+msgid "Timezone for PHP is not set"
+msgstr "PHP laika zona nav norādīta"
+
+#:
+msgid "Please set"
+msgstr "Lūdzu, norādiet"
+
+#:
+msgid "option in"
+msgstr "parametru"
+
+#:
+msgid "PHP databases support"
+msgstr "PHP datubāzu atbalsts"
+
+#:
+msgid "The GD extension is not loaded."
+msgstr "GD paplašinājums nav pieejams."
+
+#:
+msgid "GD PNG Support"
+msgstr "GD PNG atbalsts"
+
+#:
+msgid "seconds"
+msgstr "sekundes"
+
+#:
+msgid "Table users is empty. Possible database corruption."
+msgstr "Tabula \"users\" ir tukša. Iespējams datubāzes bojājums."
+
+#:
+msgid "Probably php-ldap module is missing"
+msgstr "Iespējams, trūkst \"php-ldap\" modulis"
+
+#:
+msgid "failed login attempts logged."
+msgstr "reģistrēti kļūdaini pieslēgšanās mēģinājumi."
+
+#:
+msgid "Last failed attempt was from"
+msgstr "Pēdējais kļūdainais mēģinājums bija no"
+
+#:
+msgid "Only Super Admins can create Users"
+msgstr "Tikai superadministratori var izveidot lietotājus"
+
+#:
+msgid "Only Super Admins can delete Users"
+msgstr "Tikai superadministratori var dzēst lietotājus"
+
+#:
+msgid "User ["
+msgstr "Lietotājs ["
+
+#:
+msgid "] already exists"
+msgstr "] jau eksistē"
+
+#:
+msgid "Cannot rename guest user"
+msgstr "Lietotāju \"guest\" nav iespējams pārdēvēt"
+
+#:
+msgid "Wrong period ["
+msgstr "Nepareizs periods ["
+
+#:
+msgid "You must login to view this page."
+msgstr "Jums jāpieslēdzas, lai aplūkotu šo lapu."
+
+#:
+msgid "You are not logged in."
+msgstr "Jūs neesat pieslēdzies."
+
+#:
+msgid "[Wrong value for month:"
+msgstr "[Nepareizs mēnesis:"
+
+#:
+msgid "[Wrong value for day of week:"
+msgstr "[Nepareiza nedēļas diena:"
+
+#:
+msgid "Help"
+msgstr "Palīdzība"
+
+#:
+msgid "Profile"
+msgstr "Profils"
+
+#:
+msgid "Get support"
+msgstr "Atbalsts"
+
+#:
+msgid "Monitoring"
+msgstr "Uzraudzība"
+
+#:
+msgid "Queue"
+msgstr "Rinda"
+
+#:
+msgid "Events"
+msgstr "Notikumi"
+
+#:
+msgid "EVENTS"
+msgstr "NOTIKUMI"
+
+#:
+msgid "Maps"
+msgstr "Kartes"
+
+#:
+msgid "Report"
+msgstr "Atskaite"
+
+#:
+msgid "Reports"
+msgstr "Atskautes"
+
+#:
+msgid "Login"
+msgstr "Pieslēgties"
+
+#:
+msgid "Logout"
+msgstr "Atslēgties"
+
+#:
+msgid "Print"
+msgstr "Drukāt"
+
+#:
+msgid "Latest data"
+msgstr "Jaunākā informācija"
+
+#:
+msgid "Incorrect description"
+msgstr "Nepareizs apraksts"
+
+#:
+msgid "You do not have permission to perform this operation"
+msgstr "Jums nav tiesību veikt šo darbību"
+
+#:
+msgid "No permissions for map"
+msgstr "Nav tiesību aplūkot karti"
+
+#:
+msgid "XML file contains errors"
+msgstr "XML fails satur kļūdas"
+
+#:
+msgid "M"
+msgstr "P"
+
+#:
+msgid "T"
+msgstr "O"
+
+#:
+msgid "W"
+msgstr "T"
+
+#:
+msgid "F"
+msgstr "P"
+
+#:
+msgid "S"
+msgstr "S"
+
+#:
+msgid "fixed"
+msgstr "fiksēts"
+
+#:
+msgid "dynamic"
+msgstr "dinamisks"
+
+#:
+msgid "Add Service"
+msgstr "Pievienot servisu"
+
+#:
+msgid "Edit Service"
+msgstr "Rediģēt servisu"
+
+#:
+msgid "Delete Service"
+msgstr "Dzēst servisu"
+
+#:
+msgid "Delete selected services?"
+msgstr "Dzēst izvēlēto servisu?"
+
+#:
+msgid "Can not create new element"
+msgstr "Nav iespējams izveidot jaunu elementu"
+
+#:
+msgid "other"
+msgstr "cits"

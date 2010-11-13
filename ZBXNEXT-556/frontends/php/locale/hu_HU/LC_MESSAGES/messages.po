@@ -1,0 +1,7181 @@
+"Project-Id-Version: Zabbix 1.9\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-11-10 16:17+0300\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Konstantin <konstantin.buravcov@zabbix.com>\n"
+"Language-Team: Zabbix <info@zabbix.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#:
+msgid "d M Y H:i:s"
+msgstr "Y M d H:i:s"
+
+#:
+msgid "d M Y"
+msgstr "Y M d"
+
+#:
+msgid "UTF-8"
+msgstr "UTF-8"
+
+#:
+msgid "y"
+msgstr "É"
+
+#:
+msgid "m"
+msgstr "H"
+
+#:
+msgid "w"
+msgstr "h"
+
+#:
+msgid "d"
+msgstr "n"
+
+#:
+msgid "h"
+msgstr "ó"
+
+#:
+msgid "s"
+msgstr "mp"
+
+#:
+msgid "ms"
+msgstr "szmp"
+
+#:
+msgid "Activate selected"
+msgstr "Kiválasztott aktiválása"
+
+#:
+msgid "Disable selected"
+msgstr "Kiválasztott tiltása"
+
+#:
+msgid "Activate selected hosts"
+msgstr "Kiválasztott hoszt aktiválása"
+
+#:
+msgid "Disable selected hosts"
+msgstr "Kiválasztott hoszt tiltálása"
+
+#:
+msgid "Delete selected"
+msgstr "Kiválasztott törlése"
+
+#:
+msgid "Copy selected to ..."
+msgstr "Kiválasztott másolása ..."
+
+#:
+msgid "Host IP"
+msgstr "Hoszt IP"
+
+#:
+msgid "Service type"
+msgstr "Szerviz típus"
+
+#:
+msgid "Service port"
+msgstr "Szerviz port"
+
+#:
+msgid "Discovery status"
+msgstr "Felderítés állapota"
+
+#:
+msgid "Received value"
+msgstr "Fogadott érték"
+
+#:
+msgid "Uptime/Downtime"
+msgstr "Üzemidő/Kiesés"
+
+#:
+msgid "Discovery rule"
+msgstr "Felderítési szabály"
+
+#:
+msgid "Discovery"
+msgstr "Felderítés"
+
+#:
+msgid "DISCOVERY"
+msgstr "FELDERÍTÉS"
+
+#:
+msgid "Configuration of discovery"
+msgstr "A felderítés konfigurációja"
+
+#:
+msgid "CONFIGURATION OF DISCOVERY"
+msgstr "A FELDERÍTÉS KONFIGURÁCIÓJA"
+
+#:
+msgid "No discovery rules defined"
+msgstr "Nincs felderítési szabály definiálva"
+
+#:
+msgid "IP range"
+msgstr "IP tartomány"
+
+#:
+msgid "Checks"
+msgstr "Ellenőrzések"
+
+#:
+msgid "Create rule"
+msgstr "Szabály létrehozása"
+
+#:
+msgid "Delete rule?"
+msgstr "Szabály törlése?"
+
+#:
+msgid "Discovery by proxy"
+msgstr "Felderítés proxy-n keresztül"
+
+#:
+msgid "(no proxy)"
+msgstr "(nincs proxy)"
+
+#:
+msgid "Device uniqueness criteria"
+msgstr "Egyedi eszköz szabály"
+
+#:
+msgid "Event source"
+msgstr "Esemény forrása"
+
+#:
+msgid "New check"
+msgstr "Új vizsgálat"
+
+#:
+msgid "SSH"
+msgstr "SSH"
+
+#:
+msgid "LDAP"
+msgstr "LDAP"
+
+#:
+msgid "SMTP"
+msgstr "SMTP"
+
+#:
+msgid "FTP"
+msgstr "FTP"
+
+#:
+msgid "HTTP"
+msgstr "HTTP"
+
+#:
+msgid "POP"
+msgstr "POP"
+
+#:
+msgid "NNTP"
+msgstr "NNTP"
+
+#:
+msgid "IMAP"
+msgstr "IMAP"
+
+#:
+msgid "TCP"
+msgstr "TCP"
+
+#:
+msgid "ICMP Ping"
+msgstr "ICMP Ping"
+
+#:
+msgid "ports"
+msgstr "portok"
+
+#:
+msgid "Discovery rules deleted"
+msgstr "Felderítési szabályok törölve"
+
+#:
+msgid "Discovery rule deleted"
+msgstr "Felderítési szabály törölve"
+
+#:
+msgid "Cannot delete discovery rule"
+msgstr "Nem lehet törölni a felderítési szabályt"
+
+#:
+msgid "Discovery rules updated"
+msgstr "Felderítési szabályok frissítve"
+
+#:
+msgid "Discovery rule updated"
+msgstr "Felderítési szabály frissítve"
+
+#:
+msgid "Cannot update discovery rule"
+msgstr "Nem lehet módosítani a felderítési szabályt"
+
+#:
+msgid "Discovery rule added"
+msgstr "Felderítési szabály rögzitve"
+
+#:
+msgid "Cannot add discovery rule"
+msgstr "Nem lehet hozzáadni felderítési szabályt"
+
+#:
+msgid "STATUS OF DISCOVERY"
+msgstr "FELDERÍTÉS ÁLLAPOTA"
+
+#:
+msgid "Status of discovery"
+msgstr "Felderítés állapota"
+
+#:
+msgid "Enable selected discovery rules?"
+msgstr "Engedélyezi a kijelölt felderítési szabályokat?"
+
+#:
+msgid "Disable selected discovery rules?"
+msgstr "Letiltja a kijelölt felderítési szabályokat?"
+
+#:
+msgid "Delete selected discovery rules?"
+msgstr "Törli a kijelölt felderítési szabályokat?"
+
+#:
+msgid "Discovered"
+msgstr "Felderítve"
+
+#:
+msgid "Lost"
+msgstr "Elveszett"
+
+#:
+msgid "Uptime"
+msgstr "Üzemidő"
+
+#:
+msgid "Downtime"
+msgstr "Kiesés"
+
+#:
+msgid "Discovered device"
+msgstr "Felderített eszköz"
+
+#:
+msgid "Monitored host"
+msgstr "Monitorozitt hoszt"
+
+#:
+msgid "Incorrect IP range."
+msgstr "Helytelen IP tartomány."
+
+#:
+msgid "Details of scenario"
+msgstr "Scenario részletei"
+
+#:
+msgid "DETAILS OF SCENARIO"
+msgstr "SCENARIO RÉSZLETEI"
+
+#:
+msgid "Speed"
+msgstr "Sebesség"
+
+#:
+msgid "Response code"
+msgstr "Válaszkód"
+
+#:
+msgid "TOTAL"
+msgstr "ÖSSZESEN"
+
+#:
+msgid "Response time"
+msgstr "Válaszidő"
+
+#:
+msgid "In progress"
+msgstr "Folyamatban"
+
+#:
+msgid "to"
+msgstr "-nak/-nek"
+
+#:
+msgid "In check"
+msgstr "Ellenőrzés alatt"
+
+#:
+msgid "Idle till"
+msgstr "Tétlen valameddig"
+
+#:
+msgid "Failed on"
+msgstr "Failed on"
+
+#:
+msgid "Failed"
+msgstr "Hiba"
+
+#:
+msgid "Status of Web monitoring"
+msgstr "Web felügyelet állapota"
+
+#:
+msgid "STATUS OF WEB MONITORING"
+msgstr "WEB FELÜGYELET ÁLLAPOTA"
+
+#:
+msgid "State"
+msgstr "Állapot"
+
+#:
+msgid "Sort"
+msgstr "Rendez"
+
+#:
+msgid "Status codes"
+msgstr "Státusz kódok"
+
+#:
+msgid "Web"
+msgstr "Web"
+
+#:
+msgid "Configuration of Web monitoring"
+msgstr "Web felügyelet beállításai"
+
+#:
+msgid "CONFIGURATION OF WEB MONITORING"
+msgstr "WEB FELÜGYELET BEÁLLÍTÁSAI"
+
+#:
+msgid "Scenario"
+msgstr "Scenario"
+
+#:
+msgid "Scenarios"
+msgstr "Scenario-k"
+
+#:
+msgid "SCENARIOS"
+msgstr "SCENARIO-k"
+
+#:
+msgid "Create scenario"
+msgstr "Scenario létrehozása"
+
+#:
+msgid "Hide disabled scenarios"
+msgstr "Letiltott scenario-k letiltása"
+
+#:
+msgid "Show disabled scenarios"
+msgstr "Letiltott scenario-k megjelenítése"
+
+#:
+msgid "Number of steps"
+msgstr "Folyamat lépéseinek száma"
+
+#:
+msgid "Scenario deleted"
+msgstr "Scenario törölve"
+
+#:
+msgid "Scenario activated"
+msgstr "Scenario engedélyezve"
+
+#:
+msgid "Scenario disabled"
+msgstr "Scenario letiltva"
+
+#:
+msgid "Delete scenario?"
+msgstr "Scenario törlése?"
+
+#:
+msgid "Scenario updated"
+msgstr "Scenario frissítve"
+
+#:
+msgid "Cannot update scenario"
+msgstr "Nem lehet frissíteni a scenario-t"
+
+#:
+msgid "Scenario added"
+msgstr "Scenario létrehozva"
+
+#:
+msgid "Cannot add scenario"
+msgstr "Nem lehet hozzáadni a scenario-t"
+
+#:
+msgid "Cannot delete scenario"
+msgstr "Nem lehet törölni a scenario-t"
+
+#:
+msgid "Agent"
+msgstr "Ügynök"
+
+#:
+msgid "Variables"
+msgstr "Változók"
+
+#:
+msgid "Step"
+msgstr "Lépés"
+
+#:
+msgid "Steps"
+msgstr "Lépések száma"
+
+#:
+msgid "Timeout"
+msgstr "Időtúllépés"
+
+#:
+msgid "Post"
+msgstr "Küldés"
+
+#:
+msgid "Required"
+msgstr "Szükséges"
+
+#:
+msgid "Step of scenario"
+msgstr "Scenario lépése"
+
+#:
+msgid "Basic authentication"
+msgstr "Alap authentikáció"
+
+#:
+msgid "Enable selected WEB scenarios?"
+msgstr "Kijelölt WEB scenario-k engedélyezése?"
+
+#:
+msgid "Disable selected WEB scenarios?"
+msgstr "Kijelölt WEB scenario-k tiltása?"
+
+#:
+msgid "Delete history of selected WEB scenarios?"
+msgstr "Kijelölt WEB scenario előzményeinek törlése?"
+
+#:
+msgid "Delete selected WEB scenarios?"
+msgstr "Kijelölt WEB scenario-k törlése?"
+
+#:
+msgid "Element"
+msgstr "Elem"
+
+#:
+msgid "Elements"
+msgstr "Elemek"
+
+#:
+msgid "Only host info"
+msgstr "Csak hoszt információ"
+
+#:
+msgid "Export/Import"
+msgstr "Export/Import"
+
+#:
+msgid "Import file"
+msgstr "Import fájl"
+
+#:
+msgid "Import"
+msgstr "Import"
+
+#:
+msgid "IMPORT"
+msgstr "IMPORT"
+
+#:
+msgid "Export"
+msgstr "Export"
+
+#:
+msgid "Export selected"
+msgstr "Kijelölt(ek) exportálása"
+
+#:
+msgid "EXPORT"
+msgstr "EXPORT"
+
+#:
+msgid "Preview"
+msgstr "Előnézet"
+
+#:
+msgid "Back"
+msgstr "Vissza"
+
+#:
+msgid "BACK"
+msgstr "VISSZA"
+
+#:
+msgid "No data for export"
+msgstr "Nincs exportálandó adat"
+
+#:
+msgid "no data"
+msgstr "nincs adat"
+
+#:
+msgid "Rules"
+msgstr "Szabályok"
+
+#:
+msgid "Existing"
+msgstr "Meglévő"
+
+#:
+msgid "Missing"
+msgstr "Hiányzó"
+
+#:
+msgid "Refresh"
+msgstr "Frissítés"
+
+#:
+msgid "Imported"
+msgstr "Importált"
+
+#:
+msgid "successfully"
+msgstr "sikeresen"
+
+#:
+msgid "failed"
+msgstr "hiba"
+
+#:
+msgid "Previous"
+msgstr "Előző"
+
+#:
+msgid "Next"
+msgstr "Következő"
+
+#:
+msgid "Retry"
+msgstr "Újra"
+
+#:
+msgid "Finish"
+msgstr "Vége"
+
+#:
+msgid "Fail"
+msgstr "Hiba"
+
+#:
+msgid "UPDATE"
+msgstr "UPDATE"
+
+#:
+msgid "Installation"
+msgstr "Telepítés"
+
+#:
+msgid "New installation"
+msgstr "Új telepítés"
+
+#:
+msgid "NEW INSTALLATION"
+msgstr "ÚJ TELEPÍTÉS"
+
+#:
+msgid "Installation/Update"
+msgstr "Telepítés/Frissítés"
+
+#:
+msgid "Zabbix is temporarily unavailable"
+msgstr "Zabbix átmenetileg nem elérhető"
+
+#:
+msgid "Multibyte String module required to run FrontEnd"
+msgstr "A felület futtatásához Multibyte String modul szükséges"
+
+#:
+msgid "Empty input parameter"
+msgstr "Üres bemeneti paraméter"
+
+#:
+msgid "Time zone"
+msgstr "Időzóna"
+
+#:
+msgid "Do not keep history older than (in days)"
+msgstr "Ennél régebbi adatok törlése (napokban)"
+
+#:
+msgid "Do not keep trends older than (in days)"
+msgstr "Ennél régebbi trend adatok törlése (napokban)"
+
+#:
+msgid "Master node"
+msgstr "Vezérlő csomópont"
+
+#:
+msgid "Child"
+msgstr "Vezérelt csomópont"
+
+#:
+msgid "Master"
+msgstr "Vezérlő"
+
+#:
+msgid "Node updated"
+msgstr "Csomópont frissítve"
+
+#:
+msgid "Cannot update node"
+msgstr "A csomópontot nem lehet frissíteni"
+
+#:
+msgid "Node added"
+msgstr "Csomópont hozzáadva"
+
+#:
+msgid "Cannot add node"
+msgstr "Csomópontot nem lehet hozzáadni"
+
+#:
+msgid "Node deleted"
+msgstr "Csomópont törölve"
+
+#:
+msgid "Cannot delete node"
+msgstr "Csomópontot nem lehet törölni"
+
+#:
+msgid "Current node"
+msgstr "Kiválasztott csomópont"
+
+#:
+msgid "Select Nodes"
+msgstr "Csomópont kiválasztása"
+
+#:
+msgid "No events to acknowledge"
+msgstr "Nincsenek visszaigazolandó események"
+
+#:
+msgid "Acknowledges"
+msgstr "Visszaigazolások"
+
+#:
+msgid "Acknowledge"
+msgstr "Visszaigazolás"
+
+#:
+msgid "Return"
+msgstr "Visszatérés"
+
+#:
+msgid "Acknowledge alarm by"
+msgstr "Riasztás visszaigazolta"
+
+#:
+msgid "Add comment by"
+msgstr "Megjegyzés hozzáfűzése"
+
+#:
+msgid "ALARM ACKNOWLEDGES"
+msgstr "RIASZTÁSOK VISSZAIGAZOLÁSAI"
+
+#:
+msgid "Acknowledge added"
+msgstr "Visszaigazolás hozzáadva"
+
+#:
+msgid "Cannot acknowledge event"
+msgstr "Nem lehet visszaigazolni az eseményt"
+
+#:
+msgid "----[BULK ACKNOWLEDGE]----"
+msgstr "----[CSOPORTOS VISSZAIGAZOLÁS]----"
+
+#:
+msgid "Bulk acknowledge"
+msgstr "Csoportos visszaigazolás"
+
+#:
+msgid "Immediately"
+msgstr "Azonnal"
+
+#:
+msgid "Infinity"
+msgstr "Végtelen"
+
+#:
+msgid "Recovery message"
+msgstr "Üzenet a helyreállásról"
+
+#:
+msgid "Configuration of actions"
+msgstr "Eljárások beállítása"
+
+#:
+msgid "CONFIGURATION OF ACTIONS"
+msgstr "ELJÁRÁSOK BEÁLLÍTÁSA"
+
+#:
+msgid "Operation type"
+msgstr "Működés típusa"
+
+#:
+msgid "Send message"
+msgstr "Üzenetküldés"
+
+#:
+msgid "Remote command"
+msgstr "Távoli parancs"
+
+#:
+msgid "Remote commands"
+msgstr "Távoli parancsok"
+
+#:
+msgid "Filter"
+msgstr "Szűrő"
+
+#:
+msgid "Trigger severity"
+msgstr "Trigger súlyosság"
+
+#:
+msgid "Trigger value"
+msgstr "Trigger érték"
+
+#:
+msgid "Time period"
+msgstr "Idő periódus"
+
+#:
+msgid "Maintenance status"
+msgstr "Karbantartás állapota"
+
+#:
+msgid "maintenance"
+msgstr "karbantartás"
+
+#:
+msgid "max value"
+msgstr "legnagyobb érték"
+
+#:
+msgid "min value"
+msgstr "legkisebb érték"
+
+#:
+msgid "Trigger description"
+msgstr "Trigger leírás"
+
+#:
+msgid "Host name"
+msgstr "Hoszt név"
+
+#:
+msgid "Action conditions"
+msgstr "Eljárás kondíciók"
+
+#:
+msgid "Operation condition"
+msgstr "Működési kondíciók"
+
+#:
+msgid "Conditions"
+msgstr "Feltételek"
+
+#:
+msgid "Condition"
+msgstr "Feltétel"
+
+#:
+msgid "New condition"
+msgstr "Új feltétel"
+
+#:
+msgid "Action operations"
+msgstr "Eljárás műveletei"
+
+#:
+msgid "Operations"
+msgstr "Műveletek"
+
+#:
+msgid "Edit operation"
+msgstr "Művelet szerkesztése"
+
+#:
+msgid "No conditions defined"
+msgstr "Nincsenek feltételek meghatározva"
+
+#:
+msgid "Actions deleted"
+msgstr "Eljárások törölve"
+
+#:
+msgid "Cannot delete actions"
+msgstr "Az eljárás(ok) nem törölhető(ek)"
+
+#:
+msgid "No operations defined"
+msgstr "Nincs(enek) művelet(ek) meghatározva"
+
+#:
+msgid "New"
+msgstr "Új"
+
+#:
+msgid "Add host"
+msgstr "Új hoszt"
+
+#:
+msgid "Remove host"
+msgstr "Hoszt eltávolítása"
+
+#:
+msgid "Enable host"
+msgstr "Hoszt engedélyezése"
+
+#:
+msgid "Disable host"
+msgstr "Hoszt tiltása"
+
+#:
+msgid "Link to template"
+msgstr "Hozzáadás a sablonhoz"
+
+#:
+msgid "Unlink from template"
+msgstr "Eltávolítás a sablonból"
+
+#:
+msgid "Host template"
+msgstr "Hoszt sablon"
+
+#:
+msgid "Event acknowledged"
+msgstr "Esemény visszaigazolva"
+
+#:
+msgid "Send only to"
+msgstr "Küldés csak ide"
+
+#:
+msgid "User medias"
+msgstr "Felhasználó eszköztípusai"
+
+#:
+msgid "Discovery check"
+msgstr "Felderítés"
+
+#:
+msgid "Discovered object"
+msgstr "Felderített objektum"
+
+#:
+msgid "Device"
+msgstr "Eszköz"
+
+#:
+msgid "Auto registration"
+msgstr "Automatikus regisztráció"
+
+#:
+msgid "Incorrect trigger"
+msgstr "Hibás trigger"
+
+#:
+msgid "Incorrect host"
+msgstr "Hibás hoszt"
+
+#:
+msgid "Incorrect period"
+msgstr "Hibás időintervallum"
+
+#:
+msgid "Incorrect IP"
+msgstr "Hibás IP"
+
+#:
+msgid "Incorrect discovery check"
+msgstr "Hibás felderítés"
+
+#:
+msgid "Incorrect port"
+msgstr "Hibás port"
+
+#:
+msgid "Incorrect discovery status"
+msgstr "Hibás felderítés státusz"
+
+#:
+msgid "Incorrect condition type"
+msgstr "Hibás kondíció típus"
+
+#:
+msgid "Incorrect operation type"
+msgstr "Hibás működés típus"
+
+#:
+msgid "Incorrect user"
+msgstr "Hibás felhasználó"
+
+#:
+msgid "Incorrect steps"
+msgstr "Hibás lépések"
+
+#:
+msgid "selected actions?"
+msgstr "kiválasztott eljárások?"
+
+#:
+msgid "Actions"
+msgstr "Eljárások"
+
+#:
+msgid "Logs"
+msgstr "Naplók"
+
+#:
+msgid "ACTIONS"
+msgstr "ELJÁRÁSOK"
+
+#:
+msgid "Message actions"
+msgstr "Üzenet eljárások"
+
+#:
+msgid "Command actions"
+msgstr "Parancs eljárások"
+
+#:
+msgid "Action added"
+msgstr "Eljárás hozzáadva"
+
+#:
+msgid "Cannot add action"
+msgstr "Az eljárást nem lehet felvenni"
+
+#:
+msgid "Action updated"
+msgstr "Eljárás frissítve"
+
+#:
+msgid "Cannot update action"
+msgstr "Az eljárást nem lehet frissíteni"
+
+#:
+msgid "Action deleted"
+msgstr "Eljárás törölve"
+
+#:
+msgid "Cannot delete action"
+msgstr "Az eljárást nem lehet törölni"
+
+#:
+msgid "Send message to"
+msgstr "Üzenet küldése"
+
+#:
+msgid "Run remote commands"
+msgstr "Távoli parancs futtatása"
+
+#:
+msgid "Delay"
+msgstr "Késleltetés"
+
+#:
+msgid "Subject"
+msgstr "Tárgy"
+
+#:
+msgid "Recovery subject"
+msgstr "Visszaállás tárgya"
+
+#:
+msgid "Default message"
+msgstr "Alapértelmezett üzenet"
+
+#:
+msgid "Default subject"
+msgstr "Alapértelmezett tárgy"
+
+#:
+msgid "Message"
+msgstr "Üzenet"
+
+#:
+msgid "On"
+msgstr "BEKAPCSOL"
+
+#:
+msgid "Off"
+msgstr "KIKAPCSOL"
+
+#:
+msgid "No actions defined"
+msgstr "Nincs eljárás definiálva"
+
+#:
+msgid "Single user"
+msgstr "Felhasználó"
+
+#:
+msgid "User group"
+msgstr "Felhasználói csoport"
+
+#:
+msgid "Group"
+msgstr "Csoport"
+
+#:
+msgid "User"
+msgstr "Felhasználó"
+
+#:
+msgid "Not classified"
+msgstr "Nincs osztályozva"
+
+#:
+msgid "Information"
+msgstr "Információ"
+
+#:
+msgid "Warning"
+msgstr "Figyelmezetés"
+
+#:
+msgid "Average"
+msgstr "Átlagos"
+
+#:
+msgid "High"
+msgstr "Magas"
+
+#:
+msgid "Disaster"
+msgstr "Katasztrofális"
+
+#:
+msgid "AND / OR"
+msgstr "ÉS / VAGY"
+
+#:
+msgid "AND"
+msgstr "ÉS"
+
+#:
+msgid "and"
+msgstr "és"
+
+#:
+msgid "&"
+msgstr "&"
+
+#:
+msgid "OR"
+msgstr "VAGY"
+
+#:
+msgid "or"
+msgstr "vagy"
+
+#:
+msgid "Type of calculation"
+msgstr "Számítás tipusa"
+
+#:
+msgid "Create Action"
+msgstr "Eljárás létrehozása"
+
+#:
+msgid "Delete selected action?"
+msgstr "Törli a kiválasztott eljárást?"
+
+#:
+msgid "like"
+msgstr "mint"
+
+#:
+msgid "not like"
+msgstr "nem mint"
+
+#:
+msgid "in"
+msgstr "ban / ben"
+
+#:
+msgid "not in"
+msgstr "nem ban / ben"
+
+#:
+msgid "Retries left"
+msgstr "Hátralévő próbálkozások száma"
+
+#:
+msgid "Actions since"
+msgstr "Végrehajtott eljárások"
+
+#:
+msgid "Show all"
+msgstr "Mutasd mindet"
+
+#:
+msgid "Time"
+msgstr "Idő"
+
+#:
+msgid "Status"
+msgstr "Státusz"
+
+#:
+msgid "Duration"
+msgstr "Időtartam"
+
+#:
+msgid "TRUE"
+msgstr "IGAZ"
+
+#:
+msgid "FALSE"
+msgstr "HAMIS"
+
+#:
+msgid "UNKNOWN"
+msgstr "ISMERETLEN"
+
+#:
+msgid "Type"
+msgstr "Típus"
+
+#:
+msgid "Recipient(s)"
+msgstr "Címzett(ek)"
+
+#:
+msgid "Recipient"
+msgstr "Címzett"
+
+#:
+msgid "Error"
+msgstr "Hiba"
+
+#:
+msgid "sent"
+msgstr "küldve"
+
+#:
+msgid "executed"
+msgstr "végrehajtva"
+
+#:
+msgid "not sent"
+msgstr "nincs elküldve"
+
+#:
+msgid "No actions found"
+msgstr "Eljárások nem találhatóak"
+
+#:
+msgid "Incorrect command"
+msgstr "Hibás parancs"
+
+#:
+msgid "Unknown group name"
+msgstr "Ismeretlen felhasználói csoport név"
+
+#:
+msgid "Unknown host name"
+msgstr "Ismeretlen hoszt név"
+
+#:
+msgid "in command"
+msgstr "parancsban"
+
+#:
+msgid "Line"
+msgstr "Vonal"
+
+#:
+msgid "Filled region"
+msgstr "Kitöltés"
+
+#:
+msgid "Bold line"
+msgstr "Vastag vonal"
+
+#:
+msgid "Dot"
+msgstr "Pontozott vonal"
+
+#:
+msgid "Dashed line"
+msgstr "Szaggatott vonal"
+
+#:
+msgid "Gradient line"
+msgstr "Meredek vonal"
+
+#:
+msgid "Custom graphs"
+msgstr "Egyéni grafikonok"
+
+#:
+msgid "GRAPHS"
+msgstr "Grafikonok"
+
+#:
+msgid "Select graph to display"
+msgstr "Grafikon kiválasztása"
+
+#:
+msgid "Period"
+msgstr "Időszak"
+
+#:
+msgid "Select graph..."
+msgstr "Grafikon kiválasztása..."
+
+#:
+msgid "Fullscreen"
+msgstr "Teljes képernyő"
+
+#:
+msgid "View"
+msgstr "Nézet"
+
+#:
+msgid "GUI"
+msgstr "GUI"
+
+#:
+msgid "Dropdown first entry"
+msgstr "Első érték kiválasztása"
+
+#:
+msgid "remember selected"
+msgstr "választás megjegyzése"
+
+#:
+msgid "Max count of elements to show inside table cell"
+msgstr "A táblázat mezőiben maximálisan megjelenő elemek száma"
+
+#:
+msgid "Search/Filter elements limit"
+msgstr "Keresési/Szűrési limit"
+
+#:
+msgid "Themes"
+msgstr "Témák"
+
+#:
+msgid "System default"
+msgstr "Alapértelmezett"
+
+#:
+msgid "Black & Blue"
+msgstr "Fekete & kék"
+
+#:
+msgid "Original blue"
+msgstr "Eredeti kék"
+
+#:
+msgid "Default theme"
+msgstr "Alapértelmezett téma"
+
+#:
+msgid "Event acknowledges"
+msgstr "Események visszaigazolásai"
+
+#:
+msgid "Days"
+msgstr "Napok"
+
+#:
+msgid "Show events not older"
+msgstr "Ne mutassa az ennél régebbi elemeket"
+
+#:
+msgid "Show events max"
+msgstr "Maximum ennyi elemet mutasson"
+
+#:
+msgid "Max count of events per trigger to show"
+msgstr "Triggerenkénti maximálisan megjelenített eseményszám"
+
+#:
+msgid "Cannot update value map"
+msgstr "Nem lehet frissíteni az érték-hozzárendelést"
+
+#:
+msgid "Value map added"
+msgstr "Az érték-hozzárendelés hozzáadva"
+
+#:
+msgid "Cannot add value map"
+msgstr "Az érték-hozzárendelést nem lehet végrehajtani"
+
+#:
+msgid "Value map deleted"
+msgstr "Érték-hozzárendelés törölve"
+
+#:
+msgid "Cannot delete value map"
+msgstr "Az érték-hozzárendelést nem lehet törölni"
+
+#:
+msgid "Value map updated"
+msgstr "Érték-hozzárendelés frissítve"
+
+#:
+msgid "VALUE MAPPING"
+msgstr "ÉRTÉK-HOZZÁRENDELÉS"
+
+#:
+msgid "Value mapping"
+msgstr "Érték-hozzárendelés"
+
+#:
+msgid "Value map"
+msgstr "Érték-hozzárendelési lista"
+
+#:
+msgid "Mapping"
+msgstr "Hozzárendelés"
+
+#:
+msgid "New mapping"
+msgstr "Új hozzárendelés"
+
+#:
+msgid "No mapping defined"
+msgstr "Nincs hozzárendelés definiálva"
+
+#:
+msgid "Create value map"
+msgstr "Érték-hozzárendelés létrehozása"
+
+#:
+msgid "Configuration of Zabbix"
+msgstr "ZABBIX konfigurálása"
+
+#:
+msgid "CONFIGURATION OF ZABBIX"
+msgstr "ZABBIX KONFIGURÁLÁSA"
+
+#:
+msgid "Configuration updated"
+msgstr "Konfiguráció frissítése"
+
+#:
+msgid "Configuration was not updated"
+msgstr "A konfiguráció nem lett frissítve"
+
+#:
+msgid "Added new media type"
+msgstr "Új eszköztípus hozzáadva"
+
+#:
+msgid "New media type was not added"
+msgstr "Új eszköztípus hozzáadás nem sikerült"
+
+#:
+msgid "Media type updated"
+msgstr "Eszköztípus frissítve"
+
+#:
+msgid "Media type was not updated"
+msgstr "Eszköztípus frissítése nem sikerült"
+
+#:
+msgid "Media type deleted"
+msgstr "Eszköztípus törölve"
+
+#:
+msgid "Media type was not deleted"
+msgstr "Eszköztípus törlése nem sikerült"
+
+#:
+msgid "Configuration"
+msgstr "Konfiguráció"
+
+#:
+msgid "Administration"
+msgstr "Adminisztráció"
+
+#:
+msgid "Do not keep actions older than (in days)"
+msgstr "Ennél régebbi eljárások törlése (napokban)"
+
+#:
+msgid "Do not keep events older than (in days)"
+msgstr "Ennél régebbi események törlése (napokban)"
+
+#:
+msgid "No media types defined"
+msgstr "Nincs eszköztípus beállítva"
+
+#:
+msgid "SMTP server"
+msgstr "SMTP szerver"
+
+#:
+msgid "SMTP helo"
+msgstr "SMTP helo"
+
+#:
+msgid "SMTP email"
+msgstr "SMTP email"
+
+#:
+msgid "Script name"
+msgstr "Script név"
+
+#:
+msgid "Delete selected media?"
+msgstr "Kijelölt eszköztípus törlése?"
+
+#:
+msgid "Delete selected image?"
+msgstr "Kijelölt kép törlése?"
+
+#:
+msgid "Housekeeper"
+msgstr "Adat-karbantartó"
+
+#:
+msgid "Media types"
+msgstr "Eszköztípusok"
+
+#:
+msgid "Escalation rules"
+msgstr "Eszkalációs szabályok"
+
+#:
+msgid "Enable escalations"
+msgstr "Eszkaláció engedélyezése"
+
+#:
+msgid "Escalation"
+msgstr "Eszkaláció"
+
+#:
+msgid "Escalation rule"
+msgstr "Eszkalációs szabály"
+
+#:
+msgid "Default"
+msgstr "Alapértelmezett"
+
+#:
+msgid "Images"
+msgstr "Képek"
+
+#:
+msgid "Image"
+msgstr "Kép"
+
+#:
+msgid "IMAGES"
+msgstr "KÉPEK"
+
+#:
+msgid "Icon"
+msgstr "Ikon"
+
+#:
+msgid "No images defined"
+msgstr "Nincs kép definiálva"
+
+#:
+msgid "Background"
+msgstr "Háttér"
+
+#:
+msgid "Upload"
+msgstr "Feltöltés"
+
+#:
+msgid "Image added"
+msgstr "Kép hozzáadva"
+
+#:
+msgid "Cannot add image"
+msgstr "Nem sikerült a képet hozzáadni"
+
+#:
+msgid "Image deleted"
+msgstr "Kép törölve"
+
+#:
+msgid "Cannot delete image"
+msgstr "Nem sikerült a képet törölni"
+
+#:
+msgid "Image updated"
+msgstr "Kép frissítve"
+
+#:
+msgid "Cannot update image"
+msgstr "Nem sikerült a képet frissíteni"
+
+#:
+msgid "Other"
+msgstr "Egyéb"
+
+#:
+msgid "Other parameters"
+msgstr "Egyéb paraméterek"
+
+#:
+msgid "Refresh unsupported items (in sec)"
+msgstr "Nem támogatott adatok frissítési gyakorisága (másodpercben)"
+
+#:
+msgid "Create Media Type"
+msgstr "Eszköztípus hozzáadása"
+
+#:
+msgid "Create Image"
+msgstr "Kép hozzáadása"
+
+#:
+msgid "Working time"
+msgstr "Munkaidő"
+
+#:
+msgid "User group for database down message"
+msgstr "Adatbázishiba esetén értesítendő felhasználói csoport"
+
+#:
+msgid "Incorrect group"
+msgstr "Érvénytelen csoport"
+
+#:
+msgid "Nothing to do"
+msgstr "Nincs feladat"
+
+#:
+msgid "Incorrect work period"
+msgstr "Szabálytalan munkaidő paraméter"
+
+#:
+msgid "Regular expressions"
+msgstr "Reguláris kifejezések"
+
+#:
+msgid "Regular expression"
+msgstr "Reguláris kifejezés"
+
+#:
+msgid "Expressions"
+msgstr "Kifejezések"
+
+#:
+msgid "Expression"
+msgstr "Kifejezés"
+
+#:
+msgid "Expected result"
+msgstr "Elvárt érték"
+
+#:
+msgid "Character string included"
+msgstr "Tartalmazza a következő szót"
+
+#:
+msgid "Any character string included"
+msgstr "Bármely szót tartalmaz"
+
+#:
+msgid "Character string not included"
+msgstr "Nem tartalmazza a következő szót"
+
+#:
+msgid "Result is TRUE"
+msgstr "Az eredmény IGAZ"
+
+#:
+msgid "Result is FALSE"
+msgstr "Az eredmény HAMIS"
+
+#:
+msgid "Expression type"
+msgstr "Kifejezés típusa"
+
+#:
+msgid "New expression"
+msgstr "Új kifejezés"
+
+#:
+msgid "Case sensitive"
+msgstr "Kis/nagybetű érzékeny"
+
+#:
+msgid "Test"
+msgstr "Teszt"
+
+#:
+msgid "Delimiter"
+msgstr "Elválasztó"
+
+#:
+msgid "Test string"
+msgstr "Teszt szöveg"
+
+#:
+msgid "Incorrect expression"
+msgstr "Hibás kifejezés"
+
+#:
+msgid "New regular expression"
+msgstr "Új reguláris kifejezés"
+
+#:
+msgid "Regular expression added"
+msgstr "Reguláris kifejezés hozzáadva"
+
+#:
+msgid "Cannot add regular expression"
+msgstr "Reguláris kifejezés hozzáadása nem sikerült"
+
+#:
+msgid "Regular expression updated"
+msgstr "Reguláris kifejezés frissítve"
+
+#:
+msgid "Cannot update regular expression"
+msgstr "Reguláris kifejezés frissítése nem sikerült"
+
+#:
+msgid "Regular expression deleted"
+msgstr "Reguláris kifejezés törölve"
+
+#:
+msgid "Cannot delete regular expression"
+msgstr "Reguláris kifejezés törlése nem sikerült"
+
+#:
+msgid "Delete regular expression?"
+msgstr "Töröljem a reguláris kifejezést?"
+
+#:
+msgid "Delete selected regular expressions?"
+msgstr "Töröljem a kiválasztott reguláris kifejezéseket?"
+
+#:
+msgid "Group for discovered hosts"
+msgstr "Csoport a felderített hosztoknak"
+
+#:
+msgid "Value maps are used to create a mapping between numeric values and string representations"
+msgstr "Az érték-hozzárendelések a számadatok és a hozzájuk tartozó szöveges értékek összerendelésére valók"
+
+#:
+msgid "Delete selected value mapping?"
+msgstr "Töröljem a kiválasztott érték-hozzárendelést?"
+
+#:
+msgid "Your setup is not configured for distributed monitoring"
+msgstr "A rendszer jelenlegi konfigurációja nem támogatja az \"Elosztott Mód\"-ot"
+
+#:
+msgid "CONFIGURATION OF NODES"
+msgstr "CSOMÓPONTOK KONFIGURÁLÁSA"
+
+#:
+msgid "DM"
+msgstr "EM (Elosztott Mód)"
+
+#:
+msgid "Node"
+msgstr "Csomópont"
+
+#:
+msgid "Nodes"
+msgstr "Csomópontok"
+
+#:
+msgid "NODES"
+msgstr "CSOMÓPONT"
+
+#:
+msgid "New node"
+msgstr "Új csomópont"
+
+#:
+msgid "No nodes defined"
+msgstr "Nincs csomópont definiálva"
+
+#:
+msgid "All nodes"
+msgstr "Minden csomópont"
+
+#:
+msgid "Delete selected node?"
+msgstr "Töröljem a kiválasztott csomópontot?"
+
+#:
+msgid "Enable hosts monitored by selected proxies?"
+msgstr "Engedélyezi a hosztokat a kiválasztott proxykon?"
+
+#:
+msgid "Disable hosts monitored by selected proxies?"
+msgstr "Letiltja a hosztokat a kiválasztott proxykon?"
+
+#:
+msgid "Delete selected proxies?"
+msgstr "Törli a kiválasztott proxykat?"
+
+#:
+msgid "CONFIGURATION OF PROXIES"
+msgstr "PROXY KONFIGURÁCIÓ"
+
+#:
+msgid "Delete selected proxy?"
+msgstr "Kiválasztott proxyk törlése?"
+
+#:
+msgid "Authentication"
+msgstr "Authentikáció"
+
+#:
+msgid "Authentication to Zabbix"
+msgstr "Zabbix authentikáció"
+
+#:
+msgid "Base DN"
+msgstr "Base DN"
+
+#:
+msgid "Bind DN"
+msgstr "Bind DN"
+
+#:
+msgid "Bind Password"
+msgstr "Bind Jelszó"
+
+#:
+msgid "Search attribute"
+msgstr "Keresési tulajdonság"
+
+#:
+msgid "was not"
+msgstr "nem volt"
+
+#:
+msgid "successful"
+msgstr "sikeres"
+
+#:
+msgid "must be valid"
+msgstr "igaznak kell lennie"
+
+#:
+msgid "LDAP Authentication"
+msgstr "LDAP authentikáció"
+
+#:
+msgid "HTTP Authentication"
+msgstr "HTTP authentikáció"
+
+#:
+msgid "Zabbix Internal authentication"
+msgstr "Zabbix belső authentikáció"
+
+#:
+msgid "Default authentication"
+msgstr "Alapértelmezett authentikáció"
+
+#:
+msgid "Switching HTTP authentication will reset all current sessions! Continue?"
+msgstr "A HTTP authentikáció érvényesítése az aktív kapcsolatok megszakításával jár! Folytatja?"
+
+#:
+msgid "Switching LDAP authentication will reset all current sessions! Continue?"
+msgstr "Az LDAP authentikáció érvényesítése az aktív kapcsolatok megszakításával jár! Folytatja?"
+
+#:
+msgid "No permissions !"
+msgstr "Jogosultsági hiba!"
+
+#:
+msgid "LATEST DATA"
+msgstr "AKTUÁLIS ADATOK"
+
+#:
+msgid "All"
+msgstr "Mind"
+
+#:
+msgid "all"
+msgstr "mind"
+
+#:
+msgid "- all -"
+msgstr "- mind -"
+
+#:
+msgid "- other -"
+msgstr "- egyéb -"
+
+#:
+msgid "not selected"
+msgstr "nincs kiválasztva"
+
+#:
+msgid "Graph"
+msgstr "Grafikon"
+
+#:
+msgid "Zabbix"
+msgstr "Zabbix"
+
+#:
+msgid "Copyright 2001-2010 by"
+msgstr "Szerzői jog 2001-2010"
+
+#:
+msgid "Connected as"
+msgstr "Csatlakozva mint"
+
+#:
+msgid "Not connected"
+msgstr "Nincs csatlakozva"
+
+#:
+msgid "SIA Zabbix"
+msgstr "Zabbix SIA"
+
+#:
+msgid "Graphs copied"
+msgstr "Grafikonok másolva"
+
+#:
+msgid "Cannot copy graphs"
+msgstr "Nem lehet másolni a grafikonokat"
+
+#:
+msgid "Item added"
+msgstr "Adatsor hozzáadva"
+
+#:
+msgid "Item updated"
+msgstr "Adatsor frissítve"
+
+#:
+msgid "Items updated"
+msgstr "Adatsorok hozzáadva"
+
+#:
+msgid "Item does not exist"
+msgstr "Adatsor nem létezik"
+
+#:
+msgid "Sort by"
+msgstr "Rendezés"
+
+#:
+msgid "Parameter"
+msgstr "Paraméter"
+
+#:
+msgid "Colour"
+msgstr "Szín"
+
+#:
+msgid "Up"
+msgstr "Fut"
+
+#:
+msgid "Down"
+msgstr "Áll"
+
+#:
+msgid "New item for the graph"
+msgstr "Új adatsor a grafikonhoz"
+
+#:
+msgid "Update item for the graph"
+msgstr "Adatsor frissítése a grafikonhoz"
+
+#:
+msgid "Sort order (0->100)"
+msgstr "Sorrend (0->100)"
+
+#:
+msgid "Y axis side"
+msgstr "Y tengely elhelyezkedése"
+
+#:
+msgid "Axis side"
+msgstr "Tengely elhelyezkedése"
+
+#:
+msgid "Left"
+msgstr "Balra"
+
+#:
+msgid "Function"
+msgstr "Funkció"
+
+#:
+msgid "min"
+msgstr "min"
+
+#:
+msgid "avg"
+msgstr "átl"
+
+#:
+msgid "max"
+msgstr "max"
+
+#:
+msgid "last"
+msgstr "utolsó"
+
+#:
+msgid "Draw style"
+msgstr "Rajz stílusa"
+
+#:
+msgid "Simple"
+msgstr "Egyszerű"
+
+#:
+msgid "Graph type"
+msgstr "Grafikon típusa"
+
+#:
+msgid "Stacked"
+msgstr "Rögzített"
+
+#:
+msgid "Normal"
+msgstr "Normál"
+
+#:
+msgid "Pie"
+msgstr "Kör"
+
+#:
+msgid "Exploded"
+msgstr "Bontott kör"
+
+#:
+msgid "Aggregated"
+msgstr "Összegzett"
+
+#:
+msgid "Aggregated periods count"
+msgstr "Összegzett időszakok száma"
+
+#:
+msgid "add graph items first"
+msgstr "Adjon először adatsort a grafikonhoz."
+
+#:
+msgid "Title"
+msgstr "Cím"
+
+#:
+msgid "Percentile line"
+msgstr "Százalék vonal"
+
+#:
+msgid "Configuration of graphs"
+msgstr "Grafikon konfiguráció"
+
+#:
+msgid "CONFIGURATION OF GRAPHS"
+msgstr "GRAFIKON KONFIGURÁCIÓ"
+
+#:
+msgid "Graph added"
+msgstr "Grafikon hozzáadva"
+
+#:
+msgid "Graph updated"
+msgstr "Grafikon frissítve"
+
+#:
+msgid "Cannot update graph"
+msgstr "A grafikon frissítése nem sikerült"
+
+#:
+msgid "Graph deleted"
+msgstr "Grafikon törölve"
+
+#:
+msgid "Cannot delete graph"
+msgstr "A grafikon törlése nem sikerült"
+
+#:
+msgid "Graphs deleted"
+msgstr "Grafikonok törölve"
+
+#:
+msgid "Cannot delete graphs"
+msgstr "A grafikonok törlése nem sikerült"
+
+#:
+msgid "Cannot add graph"
+msgstr "Grafikon hozzáadása nem sikerült"
+
+#:
+msgid "Cannot add more than one item with type \"Graph sum\""
+msgstr "Nem lehet egynél több \"Összesített grafikon\" -t hozzáadni"
+
+#:
+msgid "Id"
+msgstr "Azonosító"
+
+#:
+msgid "No graphs defined"
+msgstr "Nincsenek grafikonok definiálva"
+
+#:
+msgid "No graph defined"
+msgstr "Nincs grafikon definiálva"
+
+#:
+msgid "Delete graph?"
+msgstr "Grafikon törlése?"
+
+#:
+msgid "Y axis MIN value"
+msgstr "Y tengely MIN érték"
+
+#:
+msgid "Y axis MAX value"
+msgstr "Y tengely MAX érték"
+
+#:
+msgid "Calculated"
+msgstr "Kalkulált"
+
+#:
+msgid "Fixed"
+msgstr "Fix"
+
+#:
+msgid "Create Graph"
+msgstr "Grafikon létrehozása"
+
+#:
+msgid "Show working time"
+msgstr "Munkaidő megjelenítése"
+
+#:
+msgid "Show triggers"
+msgstr "Triggerek megjelenítése"
+
+#:
+msgid "3D view"
+msgstr "3D nézet"
+
+#:
+msgid "Legend"
+msgstr "Jelmagyarázat"
+
+#:
+msgid "Graph sum"
+msgstr "Összesített grafikon"
+
+#:
+msgid "Graph item"
+msgstr "Grafikon adatsor"
+
+#:
+msgid "Items required for graph"
+msgstr "Grafikonhoz szükséges adatsorok"
+
+#:
+msgid "Templated graph"
+msgstr "Grafikon sablonból"
+
+#:
+msgid "No target selected"
+msgstr "Nincs cél kiválasztva"
+
+#:
+msgid "Delete selected graphs?"
+msgstr "Törli a kiválasztott grafikonokat?"
+
+#:
+msgid "seconds"
+msgstr "másodpercek"
+
+#:
+msgid "sec"
+msgstr "mp"
+
+#:
+msgid "Select rows with value like"
+msgstr "A következő értéket tartalmazó sorok kiválasztása"
+
+#:
+msgid "Last hour graph"
+msgstr "Utolsó óra grafikonja"
+
+#:
+msgid "Last week graph"
+msgstr "Utolsó hét grafikonja"
+
+#:
+msgid "Last month graph"
+msgstr "Utolsó hónap grafikonja"
+
+#:
+msgid "500 latest values"
+msgstr "500 legfrissebb érték"
+
+#:
+msgid "Timestamp"
+msgstr "Időpecsét"
+
+#:
+msgid "Local"
+msgstr "Helyi"
+
+#:
+msgid "Source"
+msgstr "Forrás"
+
+#:
+msgid "Event ID"
+msgstr "Esemény azonosító"
+
+#:
+msgid "log files"
+msgstr "naplófájlok"
+
+#:
+msgid "Remove selected"
+msgstr "Kijelöltek eltávolítása"
+
+#:
+msgid "Show selected"
+msgstr "Választottak megjelenítése"
+
+#:
+msgid "Hide selected"
+msgstr "Választottak elrejtése"
+
+#:
+msgid "Mark selected"
+msgstr "Válaszott megjelölése"
+
+#:
+msgid "Mark others"
+msgstr "Inverz megjelölése"
+
+#:
+msgid "as Red"
+msgstr "Piros"
+
+#:
+msgid "as Green"
+msgstr "Zöld"
+
+#:
+msgid "as Blue"
+msgstr "Kék"
+
+#:
+msgid "Failure Audit"
+msgstr "Sikertelen Események"
+
+#:
+msgid "Success Audit"
+msgstr "Sikeres Események"
+
+#:
+msgid "Maintenance"
+msgstr "Karbantartás"
+
+#:
+msgid "Maintenance added"
+msgstr "Karbantartás hozzáadva"
+
+#:
+msgid "Maintenance updated"
+msgstr "Karbantartás frissítve"
+
+#:
+msgid "Maintenance deleted"
+msgstr "Karbantartás törölve"
+
+#:
+msgid "Delete selected maintenance periods?"
+msgstr "Kijelölt karbantartási időszak törlése?"
+
+#:
+msgid "Hosts in maintenance"
+msgstr "Karbantartott hosztok"
+
+#:
+msgid "Groups in maintenance"
+msgstr "Karbantartott csoportok"
+
+#:
+msgid "Cannot add maintenance"
+msgstr "Karbantartás hozzáadása sikertelen"
+
+#:
+msgid "Cannot update maintenance"
+msgstr "Karbantartás frissítése sikertelen"
+
+#:
+msgid "Cannot delete maintenance"
+msgstr "Karbantartás törlése sikertelen"
+
+#:
+msgid "Maintenance period length"
+msgstr "Karbantartási időszak hossza"
+
+#:
+msgid "Maintenance periods"
+msgstr "Karbantartási időszakok"
+
+#:
+msgid "MAINTENANCE PERIODS"
+msgstr "KARBANTARTÁSI IDŐSZAKOK"
+
+#:
+msgid "New maintenance period"
+msgstr "Új karbantartási időszak"
+
+#:
+msgid "Edit maintenance period"
+msgstr "Karbantartási időszak szerkesztése"
+
+#:
+msgid "Create maintenance period"
+msgstr "Karbantartási időszak létrehozása"
+
+#:
+msgid "Maintenance type"
+msgstr "Karbantartás típusa"
+
+#:
+msgid "Expired"
+msgstr "Lejárt"
+
+#:
+msgid "With data collection"
+msgstr "Adatgyűjtéssel"
+
+#:
+msgid "No data collection"
+msgstr "Adatgyűjtés nélkül"
+
+#:
+msgid "Normal maintenance"
+msgstr "Normál karbantartás"
+
+#:
+msgid "No data maintenance"
+msgstr "Adatkarbantartás nélkül"
+
+#:
+msgid "Delete maintenance period?"
+msgstr "Törli a karbantartási időszakot?"
+
+#:
+msgid "Active since"
+msgstr "Aktív ettől"
+
+#:
+msgid "Active till"
+msgstr "Eddig aktív"
+
+#:
+msgid "Period type"
+msgstr "Időszak típusa"
+
+#:
+msgid "Schedule"
+msgstr "Időzítés"
+
+#:
+msgid "Next run"
+msgstr "Következő futás"
+
+#:
+msgid "Date"
+msgstr "Dátum"
+
+#:
+msgid "One time only"
+msgstr "Egy alkalommal"
+
+#:
+msgid "Day of week"
+msgstr "Hét napja"
+
+#:
+msgid "Day of month"
+msgstr "Hónap napja"
+
+#:
+msgid "Every day(s)"
+msgstr "Minden nap"
+
+#:
+msgid "Every week(s)"
+msgstr "Minden héten"
+
+#:
+msgid "First"
+msgstr "Első"
+
+#:
+msgid "Second"
+msgstr "Második"
+
+#:
+msgid "Third"
+msgstr "Harmadik"
+
+#:
+msgid "Fourth"
+msgstr "Negyedik"
+
+#:
+msgid "January"
+msgstr "Január"
+
+#:
+msgid "February"
+msgstr "Február"
+
+#:
+msgid "March"
+msgstr "Március"
+
+#:
+msgid "April"
+msgstr "Április"
+
+#:
+msgid "May"
+msgstr "Május"
+
+#:
+msgid "June"
+msgstr "Június"
+
+#:
+msgid "July"
+msgstr "Július"
+
+#:
+msgid "August"
+msgstr "Augusztus"
+
+#:
+msgid "September"
+msgstr "Szeptember"
+
+#:
+msgid "October"
+msgstr "Október"
+
+#:
+msgid "November"
+msgstr "November"
+
+#:
+msgid "December"
+msgstr "December"
+
+#:
+msgid "Incorrect maintenance period"
+msgstr "Hibás karbantartási időszak"
+
+#:
+msgid "Incorrect maintenance date"
+msgstr "Hibás karbantartási dátum"
+
+#:
+msgid "Incorrect maintenance day period"
+msgstr "Hibás karbantartási nap"
+
+#:
+msgid "Incorrect maintenance week period"
+msgstr "Hibás karbantartási hét"
+
+#:
+msgid "Incorrect maintenance month period"
+msgstr "Hibás karbantartási hónap"
+
+#:
+msgid "Incorrect maintenance days of week"
+msgstr "Hibás karbantartás, \"hét napjai\""
+
+#:
+msgid "CONFIGURATION OF HOST GROUPS"
+msgstr "HOSZT CSOPORTOK KONFIGURÁCIÓJA"
+
+#:
+msgid "Delete selected group?"
+msgstr "Törli a kiválasztott csoportokat?"
+
+#:
+msgid "Enable selected Host Groups?"
+msgstr "Engedélyezi a kiválasztott hoszt csoportokat?"
+
+#:
+msgid "Disable selected Host Groups?"
+msgstr "Letiltja a kiválasztott hoszt csoportokat?"
+
+#:
+msgid "Delete selected Host Groups?"
+msgstr "Törli a kiválasztott hoszt csoportokat?"
+
+#:
+msgid "Delete selected groups"
+msgstr "Kiválasztott csoportok törlése"
+
+#:
+msgid "Macros"
+msgstr "Makrók"
+
+#:
+msgid "Wrong macro"
+msgstr "Hibás makró"
+
+#:
+msgid "Macro name is too long, should not exceed 64 chars."
+msgstr "A makró neve túl hosszú, maximum 64 karakter lehet."
+
+#:
+msgid "Macro value is too long, should not exceed 255 chars."
+msgstr "A makró értéke túl hosszú, maximum 255 karakter lehet."
+
+#:
+msgid "Macro already exists"
+msgstr "A makró már létezik"
+
+#:
+msgid "New macro"
+msgstr "Új makró"
+
+#:
+msgid "Empty macro value"
+msgstr "Üres makró"
+
+#:
+msgid "No macros defined"
+msgstr "Nincsenek makrók definiálva"
+
+#:
+msgid "Macro added"
+msgstr "Makró felvéve"
+
+#:
+msgid "Macros deleted"
+msgstr "Makrók törölve"
+
+#:
+msgid "Cannot add macro"
+msgstr "Makró hozzáadása sikertelen"
+
+#:
+msgid "Cannot delete macros"
+msgstr "Makró törlése sikertelen"
+
+#:
+msgid "Hosts list"
+msgstr "Hosztok listája"
+
+#:
+msgid "In"
+msgstr "-ban/-ben"
+
+#:
+msgid "Application"
+msgstr "Alkalmazás"
+
+#:
+msgid "Applications"
+msgstr "Alkalmazások"
+
+#:
+msgid "APPLICATIONS"
+msgstr "ALKALMAZÁSOK"
+
+#:
+msgid "Create application"
+msgstr "Alkalmazás"
+
+#:
+msgid "Application updated"
+msgstr "Alkalmazás frissítve"
+
+#:
+msgid "Cannot update application"
+msgstr "Alkalmazás frissítése sikertelen"
+
+#:
+msgid "Application added"
+msgstr "Alkalmazás felvéve"
+
+#:
+msgid "Cannot add application"
+msgstr "Alkalmazás felvétele sikertelen"
+
+#:
+msgid "Application deleted"
+msgstr "Alkalmazás törölve"
+
+#:
+msgid "Cannot delete application"
+msgstr "Alkalmazás törlése sikertelen"
+
+#:
+msgid "No applications defined"
+msgstr "Nincs alkalmazás definiálva"
+
+#:
+msgid "No templates linked"
+msgstr "Nincs csatolt minta"
+
+#:
+msgid "Hosts"
+msgstr "Hosztok"
+
+#:
+msgid "Items"
+msgstr "Elemek"
+
+#:
+msgid "ITEMS"
+msgstr "ELEMEK"
+
+#:
+msgid "Triggers"
+msgstr "Trigger-ek"
+
+#:
+msgid "Graphs"
+msgstr "Grafikonok"
+
+#:
+msgid "Host added"
+msgstr "Hoszt felvéve"
+
+#:
+msgid "Cannot add host"
+msgstr "Hoszt felvétele sikertelen"
+
+#:
+msgid "Items copied"
+msgstr "Elemek másolva"
+
+#:
+msgid "Cannot copy items"
+msgstr "Elemek másolása sikertelen"
+
+#:
+msgid "Host updated"
+msgstr "Hoszt frissítve"
+
+#:
+msgid "Cannot update host"
+msgstr "Hoszt frissítése sikertelen"
+
+#:
+msgid "Cannot update"
+msgstr "Frissítés sikertelen"
+
+#:
+msgid "Host status updated"
+msgstr "Hoszt státusz frissítve"
+
+#:
+msgid "Cannot update host status"
+msgstr "Hoszt státusz frissítése sikertelen"
+
+#:
+msgid "Host deleted"
+msgstr "Hoszt törölve"
+
+#:
+msgid "Cannot delete host"
+msgstr "Hoszt törlése sikertelen"
+
+#:
+msgid "CONFIGURATION OF HOSTS"
+msgstr "HOSZTOK KONFIGURÁCIÓJA"
+
+#:
+msgid "CONFIGURATION OF TEMPLATES"
+msgstr "MINTÁK KONFIGURÁCIÓJA"
+
+#:
+msgid "CONFIGURATION OF APPLICATIONS"
+msgstr "ALKALMAZÁSOK KONFIURÁCIÓJA"
+
+#:
+msgid "CONFIGURATION OF MAINTENANCE PERIODS"
+msgstr "KARBANTARTÁSI IDŐSZAKOK KONFIGURÁCIÓJA"
+
+#:
+msgid "HOST GROUPS"
+msgstr "HOSZT CSOPORTOK"
+
+#:
+msgid "No host groups defined"
+msgstr "Nincsenek hoszt csoportok definiálva"
+
+#:
+msgid "No hosts defined"
+msgstr "Nincs hoszt definiálva"
+
+#:
+msgid "No templates defined"
+msgstr "Nincs minta definiálva"
+
+#:
+msgid "No proxies defined"
+msgstr "Nincs proxy definiálva"
+
+#:
+msgid "HOSTS"
+msgstr "HOSZTOK"
+
+#:
+msgid "Host"
+msgstr "Hoszt"
+
+#:
+msgid "Connect to"
+msgstr "Kapcsolódva"
+
+#:
+msgid "DNS"
+msgstr "DNS"
+
+#:
+msgid "IP"
+msgstr "IP"
+
+#:
+msgid "Port"
+msgstr "Port"
+
+#:
+msgid "Zabbix agent port"
+msgstr "Zabbix agent port"
+
+#:
+msgid "Monitored"
+msgstr "Felügyelt"
+
+#:
+msgid "Not monitored"
+msgstr "Nem felügyelt"
+
+#:
+msgid "Template"
+msgstr "Minta"
+
+#:
+msgid "Deleted"
+msgstr "Törölve"
+
+#:
+msgid "Unknown"
+msgstr "Ismeretlen"
+
+#:
+msgid "Groups"
+msgstr "Csoportok"
+
+#:
+msgid " - all groups - "
+msgstr "- minden csoport -"
+
+#:
+msgid "All groups"
+msgstr "Minden csoport"
+
+#:
+msgid "No groups defined"
+msgstr "Nincsenek csoportok definiálva"
+
+#:
+msgid "New group"
+msgstr "Új csoport"
+
+#:
+msgid "DNS name"
+msgstr "DNS név"
+
+#:
+msgid "IP address"
+msgstr "IP cím"
+
+#:
+msgid "Link additional templates"
+msgstr "További minták csatolása"
+
+#:
+msgid "Replace linked templates"
+msgstr "Csatolt minták cseréje"
+
+#:
+msgid "Use IPMI"
+msgstr "IPMI használata"
+
+#:
+msgid "IPMI IP address"
+msgstr "IPMI IP cím"
+
+#:
+msgid "IPMI port"
+msgstr "IPMI port"
+
+#:
+msgid "IPMI authentication algorithm"
+msgstr "IPMI autentikációs algoritmus"
+
+#:
+msgid "None"
+msgstr "Nincs"
+
+#:
+msgid "MD2"
+msgstr "MD2"
+
+#:
+msgid "MD5"
+msgstr "MD5"
+
+#:
+msgid "Straight"
+msgstr "Straight"
+
+#:
+msgid "OEM"
+msgstr "OEM"
+
+#:
+msgid "RMCP+"
+msgstr "RMCP+"
+
+#:
+msgid "IPMI privilege level"
+msgstr "IPMI jogosultsági szint"
+
+#:
+msgid "Callback"
+msgstr "Visszahívás"
+
+#:
+msgid "Operator"
+msgstr "Operátor"
+
+#:
+msgid "Admin"
+msgstr "Rendszergazda"
+
+#:
+msgid "IPMI username"
+msgstr "IPMI felhasználónév"
+
+#:
+msgid "IPMI password"
+msgstr "IPMI jelszó"
+
+#:
+msgid "Use profile"
+msgstr "Profil használata"
+
+#:
+msgid "Delete selected host?"
+msgstr "Törli a kiválasztott hosztokat?"
+
+#:
+msgid "Delete selected with linked elements"
+msgstr "Törli a kijelölteket a csatolt elemekkel együtt?"
+
+#:
+msgid "Group name"
+msgstr "Csoport név"
+
+#:
+msgid "Host group"
+msgstr "Hoszt csoport"
+
+#:
+msgid "Host groups"
+msgstr "Hoszt csoportok"
+
+#:
+msgid "Update"
+msgstr "Frissítés"
+
+#:
+msgid "Availability"
+msgstr "Elérhetőség"
+
+#:
+msgid "Available"
+msgstr "Elérhető"
+
+#:
+msgid "Not available"
+msgstr "Nem elérhető"
+
+#:
+msgid "Proxies"
+msgstr "Proxik"
+
+#:
+msgid "PROXIES"
+msgstr "PROXIK"
+
+#:
+msgid "Proxy"
+msgstr "Proxy"
+
+#:
+msgid "Create Proxy"
+msgstr "Proxy létrehozása"
+
+#:
+msgid "Proxy name"
+msgstr "Proxy neve"
+
+#:
+msgid "Last seen (age)"
+msgstr "Utolsó kapcsolat időpontja"
+
+#:
+msgid "Host macro"
+msgstr "Hoszt makró"
+
+#:
+msgid "doesn't exist"
+msgstr "nem létezik"
+
+#:
+msgid "Enable selected hosts?"
+msgstr "Engedélyezi a kijelölt hosztokat?"
+
+#:
+msgid "Disable selected hosts?"
+msgstr "Letiltja a kijelölt hosztokat?"
+
+#:
+msgid "Delete selected hosts?"
+msgstr "Törli a kijelölt hosztokat?"
+
+#:
+msgid "Updated status of host"
+msgstr "Hoszt frissített státusza"
+
+#:
+msgid "Templates list"
+msgstr "Minták listája"
+
+#:
+msgid "New template added"
+msgstr "Új minta létrehozva"
+
+#:
+msgid "Cannot add template"
+msgstr "A mintát nem lehet létrehozni"
+
+#:
+msgid "Template updated"
+msgstr "Minta frissítve"
+
+#:
+msgid "Cannot update template"
+msgstr "Minta frissítése sikertelen"
+
+#:
+msgid "Linked templates"
+msgstr "Csatolt minták"
+
+#:
+msgid "Linked to"
+msgstr "Csatolva"
+
+#:
+msgid "Template deleted"
+msgstr "Minta törölve"
+
+#:
+msgid "Cannot delete template"
+msgstr "Minta nem törölhető"
+
+#:
+msgid "Link with template"
+msgstr "Minta kapcsolása"
+
+#:
+msgid "Delete and clear"
+msgstr "Törlés ÉS kiürítés"
+
+#:
+msgid "Delete selected templates?"
+msgstr "Törli a kijelölt mintákat?"
+
+#:
+msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
+msgstr "Figyelmeztetés: Ez a művelet törli a kijelölt mintákat és eltávolítja az érintett elemeket az összes csatolt hosztról"
+
+#:
+msgid "Host profile"
+msgstr "Hoszt profil"
+
+#:
+msgid "Device type"
+msgstr "Eszköz típusa"
+
+#:
+msgid "OS"
+msgstr "Operációs Rendszer"
+
+#:
+msgid "SerialNo"
+msgstr "Sorozatszám"
+
+#:
+msgid "Tag"
+msgstr "Cimke"
+
+#:
+msgid "Hardware"
+msgstr "Hardver"
+
+#:
+msgid "Software"
+msgstr "Szoftver"
+
+#:
+msgid "Contact"
+msgstr "Kapcsolat"
+
+#:
+msgid "Location"
+msgstr "Elhelyezkedés"
+
+#:
+msgid "Notes"
+msgstr "Jegyzetek"
+
+#:
+msgid "MAC Address"
+msgstr "MAC cím"
+
+#:
+msgid "Add to group"
+msgstr "Hozzáadás csoporthoz"
+
+#:
+msgid "Delete from group"
+msgstr "Törlés csoportból"
+
+#:
+msgid "Update in group"
+msgstr "Frissítés a csoportban"
+
+#:
+msgid "Create Host"
+msgstr "Hoszt létrehozása"
+
+#:
+msgid "Create Template"
+msgstr "Minta létrehozása"
+
+#:
+msgid "Template linkage"
+msgstr "Minta csatolások"
+
+#:
+msgid "Templates"
+msgstr "Minták"
+
+#:
+msgid "TEMPLATES"
+msgstr "MINTÁK"
+
+#:
+msgid "Unlink"
+msgstr "Leválasztás"
+
+#:
+msgid "Cannot unlink template"
+msgstr "Minta leválasztása"
+
+#:
+msgid "Cannot link template"
+msgstr "Minta csatolása sikertelen"
+
+#:
+msgid "Unlink and clear"
+msgstr "Leválasztás és kiürítés"
+
+#:
+msgid "Monitored by proxy"
+msgstr "Proxin keresztül monitorozva"
+
+#:
+msgid "Use extended profile"
+msgstr "Kiterjesztett profil használata"
+
+#:
+msgid "Alias"
+msgstr "Másodlagos név"
+
+#:
+msgid "Device Chassis"
+msgstr "Eszköz váztípus (chassis)"
+
+#:
+msgid "OS (Full Details)"
+msgstr "Oprendszer (részletes leírás)"
+
+#:
+msgid "OS (Short)"
+msgstr "Oprendszer (rövid leírás)"
+
+#:
+msgid "HW Architecture"
+msgstr "Hardver architechtura"
+
+#:
+msgid "Serial Number"
+msgstr "Sorozatszám"
+
+#:
+msgid "Model Number"
+msgstr "Modell azonosító"
+
+#:
+msgid "Asset Tag"
+msgstr "Leltári azonosító"
+
+#:
+msgid "Device Vendor"
+msgstr "Eszköz gyártója"
+
+#:
+msgid "Device Contract Number"
+msgstr "Eszköz szerződés száma"
+
+#:
+msgid "Installer Name"
+msgstr "Telepítette"
+
+#:
+msgid "Device Deployment Status"
+msgstr "Eszköztelepítés státusza"
+
+#:
+msgid "Software Application #1"
+msgstr "Szoftver alkalmazás #1"
+
+#:
+msgid "Software Application #2"
+msgstr "Szoftver alkalmazás #2"
+
+#:
+msgid "Software Application #3"
+msgstr "Szoftver alkalmazás #3"
+
+#:
+msgid "Software Application #4"
+msgstr "Szoftver alkalmazás #4"
+
+#:
+msgid "Software Application #5"
+msgstr "Szoftver alkalmazás #5"
+
+#:
+msgid "URL #1"
+msgstr "URL #1"
+
+#:
+msgid "URL #2"
+msgstr "URL #2"
+
+#:
+msgid "URL #3"
+msgstr "URL #3"
+
+#:
+msgid "Device Port Connections"
+msgstr "Port kapcsolatok"
+
+#:
+msgid "Device Notes"
+msgstr "Feljegyzések"
+
+#:
+msgid "Device Hardware"
+msgstr "Hardver"
+
+#:
+msgid "Device Software"
+msgstr "Szoftver"
+
+#:
+msgid "Host Subnet Mask"
+msgstr "Hoszt szubnet maszk"
+
+#:
+msgid "Host Router"
+msgstr "Hoszt router"
+
+#:
+msgid "Host MAC Address"
+msgstr "Hoszt MAC cím"
+
+#:
+msgid "OOB IP Address"
+msgstr "OOB IP cím"
+
+#:
+msgid "OOB Subnet Mask"
+msgstr "OOB szubnet maszk"
+
+#:
+msgid "OOB Router"
+msgstr "OOB router"
+
+#:
+msgid "Date HW Purchased"
+msgstr "Hardver vásárlásának időpontja"
+
+#:
+msgid "Date HW Installed"
+msgstr "Hardver telepítésének időpontj"
+
+#:
+msgid "Date HW Maintenance Expires"
+msgstr "Hardver garancia/karbantatrás lejárata"
+
+#:
+msgid "Date HW Decommissioned"
+msgstr "Hardver tervezett cseréjének időpontja"
+
+#:
+msgid "Site Address 1"
+msgstr "Cím 1"
+
+#:
+msgid "Site Address 2"
+msgstr "Cím 2"
+
+#:
+msgid "Site Address 3"
+msgstr "Cím 3"
+
+#:
+msgid "Site City"
+msgstr "Város"
+
+#:
+msgid "Site State / Province"
+msgstr "Állam / Megye"
+
+#:
+msgid "Site Country"
+msgstr "Ország"
+
+#:
+msgid "Site Zip / Postal"
+msgstr "Irányítószám"
+
+#:
+msgid "Site Rack Location"
+msgstr "Rack szekrény elhelyezkedése"
+
+#:
+msgid "Site Notes"
+msgstr "Megjegyzések"
+
+#:
+msgid "Primary POC Name"
+msgstr "Elsődleges kapcsolattartó neve"
+
+#:
+msgid "Primary POC Email"
+msgstr "Elsődleges kapcsolattartó e-mai címe"
+
+#:
+msgid "Primary POC Phone 1"
+msgstr "Elsődleges kapcsolattartó 1. telefonszám"
+
+#:
+msgid "Primary POC Phone 2"
+msgstr "Elsődleges kapcsolattartó 2. telefonszám"
+
+#:
+msgid "Primary POC Cell"
+msgstr "Elsődleges kapcsolattartó mobiltelefonszám"
+
+#:
+msgid "Primary POC Screen Name"
+msgstr "Elsődleges kapcsolattartó felhasználóneve"
+
+#:
+msgid "Primary POC Comments"
+msgstr "Elsődleges kapcsolattartó megjegyzések"
+
+#:
+msgid "Secondary POC Name"
+msgstr "Másodlagos kapcsolattartó neve"
+
+#:
+msgid "Secondary POC Email"
+msgstr "Másodlagos kapcsolattartó e-mai címe"
+
+#:
+msgid "Secondary POC Phone 1"
+msgstr "Másodlagos kapcsolattartó 1. telefonszám"
+
+#:
+msgid "Secondary POC Phone 2"
+msgstr "Másodlagos kapcsolattartó 2. telefonszám"
+
+#:
+msgid "Secondary POC Cell"
+msgstr "Másodlagos kapcsolattartó mobiltelefonszám"
+
+#:
+msgid "Secondary POC Screen Name"
+msgstr "Másodlagos kapcsolattartó felhasználóneve"
+
+#:
+msgid "Secondary POC Comments"
+msgstr "Másodlagos kapcsolattartó megjegyzések"
+
+#:
+msgid "Templated items"
+msgstr "Elemek mintából"
+
+#:
+msgid "Not Templated items"
+msgstr "Elemek minta nélkül"
+
+#:
+msgid "With triggers"
+msgstr "Triggerekkel"
+
+#:
+msgid "Without triggers"
+msgstr "Triggerek nélkül"
+
+#:
+msgid "Types"
+msgstr "Típusok"
+
+#:
+msgid "No items defined"
+msgstr "Nincsenek elemek definiálva"
+
+#:
+msgid "No item defined"
+msgstr "Nincsen elem definiálva"
+
+#:
+msgid "History cleared"
+msgstr "Előzmények törölve"
+
+#:
+msgid "Clear history for selected"
+msgstr "Kijelölt elem előzményeinek törlése"
+
+#:
+msgid "Clear history"
+msgstr "Előzmények törlése"
+
+#:
+msgid "Cannot clear history"
+msgstr "Előzmények törlése sikertelen"
+
+#:
+msgid "Configuration of items"
+msgstr "Elemek konfigurálása"
+
+#:
+msgid "CONFIGURATION OF ITEMS"
+msgstr "ELEMEK KONFIGURÁLÁSA"
+
+#:
+msgid "Cannot update item"
+msgstr "Elem frissítése sikertelen"
+
+#:
+msgid "Status updated"
+msgstr "Státusz frissítve"
+
+#:
+msgid "Cannot update status"
+msgstr "Státusz frissítése sikertelen"
+
+#:
+msgid "Cannot add item"
+msgstr "Elem felvétele sikertelen"
+
+#:
+msgid "Item deleted"
+msgstr "Elem törölve"
+
+#:
+msgid "Cannot delete item"
+msgstr "Elem törlése sikertelen"
+
+#:
+msgid "Items deleted"
+msgstr "Elemek törölve"
+
+#:
+msgid "Cannot delete items"
+msgstr "Cannot delete items"
+
+#:
+msgid "Items activated"
+msgstr "Elemek aktiválva"
+
+#:
+msgid "Items disabled"
+msgstr "Elemek tiltva"
+
+#:
+msgid "Key"
+msgstr "Kulcs"
+
+#:
+msgid "Description"
+msgstr "Leírás"
+
+#:
+msgid "Update interval"
+msgstr "Frissítési gyakoriság"
+
+#:
+msgid "Interval"
+msgstr "Intervallum"
+
+#:
+msgid "History"
+msgstr "Előzmények"
+
+#:
+msgid "Trends"
+msgstr "Trendek"
+
+#:
+msgid "Zabbix agent"
+msgstr "ZABBIX agent"
+
+#:
+msgid "Zabbix agent (active)"
+msgstr "ZABBIX agent (aktív)"
+
+#:
+msgid "SNMPv1 agent"
+msgstr "SNMPv1 agent"
+
+#:
+msgid "Zabbix trapper"
+msgstr "ZABBIX trapper"
+
+#:
+msgid "Simple check"
+msgstr "Egyszerű ellenőrzés"
+
+#:
+msgid "SNMPv2 agent"
+msgstr "SNMPv2 agent"
+
+#:
+msgid "SNMPv3 agent"
+msgstr "SNMPv3 agent"
+
+#:
+msgid "Zabbix internal"
+msgstr "ZABBIX belső"
+
+#:
+msgid "Database monitor"
+msgstr "Adatbázis monitor"
+
+#:
+msgid "IPMI agent"
+msgstr "IPMI agent"
+
+#:
+msgid "SSH agent"
+msgstr "SSH agent"
+
+#:
+msgid "TELNET agent"
+msgstr "TELNET agent"
+
+#:
+msgid "Zabbix aggregate"
+msgstr "ZABBIX összeg"
+
+#:
+msgid "External check"
+msgstr "Külső ellenőrzés"
+
+#:
+msgid "Web monitoring"
+msgstr "Web felügyelet"
+
+#:
+msgid "WEB CHECKS"
+msgstr "WEB ELLENŐRZÉSEK"
+
+#:
+msgid "Active"
+msgstr "Aktív"
+
+#:
+msgid "Not supported"
+msgstr "Nem támogatott"
+
+#:
+msgid "Email"
+msgstr "Email"
+
+#:
+msgid "Jabber"
+msgstr "Jabber"
+
+#:
+msgid "Jabber identifier"
+msgstr "Jabber Azonosító"
+
+#:
+msgid "SMS"
+msgstr "SMS"
+
+#:
+msgid "Script"
+msgstr "Script"
+
+#:
+msgid "GSM modem"
+msgstr "GSM modem"
+
+#:
+msgid "Units"
+msgstr "Egységek"
+
+#:
+msgid "Update interval (in sec)"
+msgstr "Frissítési gyakoriság (másodpercekben)"
+
+#:
+msgid "Keep history (in days)"
+msgstr "Előzmények megőrzése (napokban)"
+
+#:
+msgid "Keep trends (in days)"
+msgstr "Trendek megőrzése (napokban)"
+
+#:
+msgid "Type of information"
+msgstr "Információ típusa"
+
+#:
+msgid "Data type"
+msgstr "Adat típus"
+
+#:
+msgid "Decimal"
+msgstr "Decimális"
+
+#:
+msgid "Octal"
+msgstr "Oktális"
+
+#:
+msgid "Hexadecimal"
+msgstr "Hexadecimális"
+
+#:
+msgid "Store value"
+msgstr "Érték tárolása"
+
+#:
+msgid "Show value"
+msgstr "Érték megjelenítése"
+
+#:
+msgid "Numeric (integer 64bit)"
+msgstr "Numerikus (64 bites egész szám)"
+
+#:
+msgid "Numeric (unsigned)"
+msgstr "Numerikus (pozitív egész)"
+
+#:
+msgid "Numeric (float)"
+msgstr "Numerikus (lebegőpontos)"
+
+#:
+msgid "Character"
+msgstr "Betű"
+
+#:
+msgid "Log"
+msgstr "Napló"
+
+#:
+msgid "Text"
+msgstr "Szöveg"
+
+#:
+msgid "As is"
+msgstr "Ahogy van"
+
+#:
+msgid "Delta (speed per second)"
+msgstr "Változás (másodpercenként)"
+
+#:
+msgid "Delta (simple change)"
+msgstr "Változás (egyszeri változás)"
+
+#:
+msgid "Item"
+msgstr "Elem"
+
+#:
+msgid "SNMP community"
+msgstr "SNMP jelszó (community)"
+
+#:
+msgid "SNMP OID"
+msgstr "SNMP OID"
+
+#:
+msgid "SNMP port"
+msgstr "SNMP port"
+
+#:
+msgid "Allowed hosts"
+msgstr "Engedélyezett hosztok"
+
+#:
+msgid "SNMPv3 security name"
+msgstr "SNMPv3 biztonsági név"
+
+#:
+msgid "SNMPv3 security level"
+msgstr "SNMPv3 biztonsági szint"
+
+#:
+msgid "SNMPv3 auth passphrase"
+msgstr "SNMPv3 autentikációs \"passphrase\""
+
+#:
+msgid "SNMPv3 priv passphrase"
+msgstr "SNMPv3 privát \"passphrase\""
+
+#:
+msgid "Custom multiplier"
+msgstr "Egyedi szorzó"
+
+#:
+msgid "Select host..."
+msgstr "Hoszt kiválasztása..."
+
+#:
+msgid "Log time format"
+msgstr "Napló időformátuma"
+
+#:
+msgid "Create Item"
+msgstr "Elem létrehozása"
+
+#:
+msgid "elements copy to ..."
+msgstr "elemek másolása..."
+
+#:
+msgid "Mode"
+msgstr "Mód"
+
+#:
+msgid "Target"
+msgstr "Cél"
+
+#:
+msgid "Target type"
+msgstr "Cél típusa"
+
+#:
+msgid "Skip existing items"
+msgstr "Meglévők kihagyása"
+
+#:
+msgid "update existing non linked items"
+msgstr "létező nem csatolt elemek frissítése"
+
+#:
+msgid "Copy"
+msgstr "Másolás"
+
+#:
+msgid "Show items with description like"
+msgstr "Mutasd azokat melyek leírásában szerepel a(z)..."
+
+#:
+msgid "History clearing can take a long time. Continue?"
+msgstr "Az előzmények törlése hosszabb időt vehet igénybe. Folytatja?"
+
+#:
+msgid "Mass update"
+msgstr "Tömeges frissítés"
+
+#:
+msgid "Search"
+msgstr "Keresés"
+
+#:
+msgid "Original"
+msgstr "Eredeti"
+
+#:
+msgid "New flexible interval"
+msgstr "Új, változó intervallum"
+
+#:
+msgid "Flexible intervals (sec)"
+msgstr "Változó intervallumok (mp)"
+
+#:
+msgid "No flexible intervals"
+msgstr "Nincsenek változó intervallumok"
+
+#:
+msgid "Additional parameters"
+msgstr "További paraméterek"
+
+#:
+msgid "New application"
+msgstr "Új alkalmazás"
+
+#:
+msgid "IPMI sensor"
+msgstr "IPMI szenzor"
+
+#:
+msgid "Templated item"
+msgstr "Minta alapú elem"
+
+#:
+msgid "Web item"
+msgstr "Web elem"
+
+#:
+msgid "Executed script"
+msgstr "Végrehajtott szkript"
+
+#:
+msgid "User name"
+msgstr "Felhasználónév"
+
+#:
+msgid "Public key file"
+msgstr "Publikus kulcsfájl"
+
+#:
+msgid "Private key file"
+msgstr "Privát kulcsfájl"
+
+#:
+msgid "Public key"
+msgstr "Publikus kulcs"
+
+#:
+msgid "Authentication method"
+msgstr "Autentikációs mód"
+
+#:
+msgid "Passphrase"
+msgstr "\"Passphrase\""
+
+#:
+msgid "Edit Trigger"
+msgstr "Trigger szerkesztése"
+
+#:
+msgid "Enable selected items?"
+msgstr "Kijelölt elemek engedélyezése?"
+
+#:
+msgid "Disable selected items?"
+msgstr "Kijelölt elemek tiltása?"
+
+#:
+msgid "Mass update selected items?"
+msgstr "Kijelölt elemek tömeges frissítése?"
+
+#:
+msgid "Copy selected items?"
+msgstr "Kijelölt elemek másolása?"
+
+#:
+msgid "Delete history of selected items?"
+msgstr "Kijelölt elemek előzményeinek törlése?"
+
+#:
+msgid "Delete selected items?"
+msgstr "Kijelölt elemek törlése?"
+
+#:
+msgid "Event"
+msgstr "Esemény"
+
+#:
+msgid "Event details"
+msgstr "Esemény részletei"
+
+#:
+msgid "List"
+msgstr "Lista"
+
+#:
+msgid "Latest events"
+msgstr "Legfrissebb események"
+
+#:
+msgid "HISTORY OF EVENTS"
+msgstr "ESEMÉNYEK ELŐZMÉNYEI"
+
+#:
+msgid "No events found"
+msgstr "Nem találtunk ilyen eseményeket"
+
+#:
+msgid "Events since"
+msgstr "Események ettől az időponttól"
+
+#:
+msgid "Last check"
+msgstr "Utolsó ellenőrzés"
+
+#:
+msgid "Last value"
+msgstr "Utolsó érték"
+
+#:
+msgid "Upper level maps"
+msgstr "Felsőbb szintű térképek"
+
+#:
+msgid "Links"
+msgstr "Kapcsolatok"
+
+#:
+msgid "Link"
+msgstr "Kapcsolat"
+
+#:
+msgid "Label"
+msgstr "Cimke"
+
+#:
+msgid "X"
+msgstr "X"
+
+#:
+msgid "Icon (problem)"
+msgstr "Ikon (hiba)"
+
+#:
+msgid "Icon (OK)"
+msgstr "Ikon (OK)"
+
+#:
+msgid "Icon (unknown)"
+msgstr "Ikon (ismeretlen)"
+
+#:
+msgid "Icon (maintenance)"
+msgstr "Ikon (karbantartás)"
+
+#:
+msgid "Icon (disabled)"
+msgstr "Ikon (letiltva)"
+
+#:
+msgid "Link status indicator"
+msgstr "Kapcsolat státuszjelző"
+
+#:
+msgid "Configuration of network maps"
+msgstr "Hálózati térképek konfigurációa"
+
+#:
+msgid "CONFIGURATION OF NETWORK MAPS"
+msgstr "HÁLÓZATI TÉRKÉPEK KONFGURÁCIÓJA"
+
+#:
+msgid "Map is saved! Return?"
+msgstr "Térkép mentése sikeres! Visszatér?"
+
+#:
+msgid "Map save operation failed."
+msgstr "Térkép mentése sikertelen."
+
+#:
+msgid "Get Img: Element data not found!"
+msgstr "Kép lekérése: Nem található adat az elemhez!"
+
+#:
+msgid "Add element"
+msgstr "Elem hozzáadása"
+
+#:
+msgid "Coordinate X"
+msgstr "X koordináta"
+
+#:
+msgid "Coordinate Y"
+msgstr "Y koordináta"
+
+#:
+msgid "Connectors"
+msgstr "Kapcsolatok"
+
+#:
+msgid "UNAVAILABLE"
+msgstr "NEM ELÉRHETŐ"
+
+#:
+msgid "MAINTENANCE"
+msgstr "KARBANTARTÁS"
+
+#:
+msgid "Edit map element"
+msgstr "Térkép elem szerkesztése"
+
+#:
+msgid "Icon (default)"
+msgstr "Ikon (alapértelmezett)"
+
+#:
+msgid "Apply"
+msgstr "Alkalmaz"
+
+#:
+msgid "Map elements"
+msgstr "Térkép elemek"
+
+#:
+msgid "Network map deleted"
+msgstr "Hálózati térkép törölve"
+
+#:
+msgid "Cannot delete network map"
+msgstr "Hálózati térkép törlése sikertelen"
+
+#:
+msgid "MAPS"
+msgstr "TÉRKÉPEK"
+
+#:
+msgid "No maps defined"
+msgstr "Nincsenek térképek definiálva"
+
+#:
+msgid "Create Map"
+msgstr "Térkép létrehozása"
+
+#:
+msgid "Import Map"
+msgstr "Térkép importálása"
+
+#:
+msgid "Icon label location"
+msgstr "Ikon cimkéjének elhelyezkedése"
+
+#:
+msgid "Icon highlighting"
+msgstr "Ikon kiemelés"
+
+#:
+msgid "Link indicators"
+msgstr "Kapcsolatjelzők"
+
+#:
+msgid "Type (OK)"
+msgstr "Típus (OK)"
+
+#:
+msgid "Colour (OK)"
+msgstr "Szín (OK)"
+
+#:
+msgid "Use advanced icons"
+msgstr "Fejlett ikonok használata"
+
+#:
+msgid "Delete selected maps?"
+msgstr "Törli a kjelölt térképeket?"
+
+#:
+msgid "Network map added"
+msgstr "Hálózati térkép létrehozva"
+
+#:
+msgid "Cannot add network map"
+msgstr "Hálózati térkép létrehozása sikertelen"
+
+#:
+msgid "Network map updated"
+msgstr "Hálózati térkép frissítve"
+
+#:
+msgid "Cannot update network map"
+msgstr "Hálózati térkép frissítése sikertelen"
+
+#:
+msgid "Expand single problem"
+msgstr "Egyes hibák kifejtése"
+
+#:
+msgid "Bottom"
+msgstr "Alul"
+
+#:
+msgid "Top"
+msgstr "Felül"
+
+#:
+msgid "Link status indicators"
+msgstr "Kapcsolat állapotjelzők"
+
+#:
+msgid "Remove element"
+msgstr "Elem eltávolítása"
+
+#:
+msgid "Add link"
+msgstr "Kapcsolat felvétele"
+
+#:
+msgid "Remove link"
+msgstr "Kapcsolat eltávolítása"
+
+#:
+msgid "Cannot find image"
+msgstr "Kép nem található"
+
+#:
+msgid "Cannot find background image"
+msgstr "Háttérkép nem található"
+
+#:
+msgid "Cannot find trigger"
+msgstr "Trigger nem található"
+
+#:
+msgid "Cannot find host"
+msgstr "Hoszt nem található"
+
+#:
+msgid "Cannot find hostgroup"
+msgstr "Hosztcsoport nem található"
+
+#:
+msgid "Cannot find map"
+msgstr "Térkép nem található"
+
+#:
+msgid "Cannot find screen"
+msgstr "Képernyő nem található"
+
+#:
+msgid "used in exported map"
+msgstr "használva az importált térképen"
+
+#:
+msgid "No icon for map element"
+msgstr "Nincs ikon a térkép elemhez"
+
+#:
+msgid "Export does not contain Zabbix maps"
+msgstr "Az export nem tartalmaz Zabbix térképeket"
+
+#:
+msgid "Export does not contain Zabbix screens"
+msgstr "Az export nem tartalmaz Zabbix képernyőket"
+
+#:
+msgid "OK"
+msgstr "OK"
+
+#:
+msgid "PROBLEM"
+msgstr "HIBA"
+
+#:
+msgid "http://www.zabbix.com"
+msgstr "http://www.zabbix.com"
+
+#:
+msgid "Network maps"
+msgstr "Hálózati térképek"
+
+#:
+msgid "NETWORK MAPS"
+msgstr "HÁLÓZATI TÉRKÉPEK"
+
+#:
+msgid "Background image"
+msgstr "Háttérkép"
+
+#:
+msgid "Icon label type"
+msgstr "Ikon cimke típusa"
+
+#:
+msgid "Label location"
+msgstr "Cimke elhelyezkedése"
+
+#:
+msgid "Element name"
+msgstr "Elem név"
+
+#:
+msgid "Status only"
+msgstr "Csak státusz"
+
+#:
+msgid "Nothing"
+msgstr "Semmi"
+
+#:
+msgid "CONFIGURATION OF MEDIA TYPES"
+msgstr "ESZKÖZTÍPUSOK BEÁLLÍTÁSAI"
+
+#:
+msgid "MEDIA TYPES"
+msgstr "ESZKÖZTÍPUSOK"
+
+#:
+msgid "Media"
+msgstr "Eszköztípus"
+
+#:
+msgid "Send to"
+msgstr "Küldés"
+
+#:
+msgid "When active"
+msgstr "Amikor aktív"
+
+#:
+msgid "No media defined"
+msgstr "Nincs eszköztípus definiálva"
+
+#:
+msgid "New media"
+msgstr "Új eszköztípus"
+
+#:
+msgid "Use if severity"
+msgstr "Használat, ha a súlyosság"
+
+#:
+msgid "Save"
+msgstr "Mentés"
+
+#:
+msgid "Cancel"
+msgstr "Mégse"
+
+#:
+msgid "Dashboard"
+msgstr "Dashboard"
+
+#:
+msgid "PERSONAL DASHBOARD"
+msgstr "SZEMÉLYES DASHBOARD"
+
+#:
+msgid "Age"
+msgstr "Kor"
+
+#:
+msgid "Issue"
+msgstr "Eredmény"
+
+#:
+msgid "System status"
+msgstr "Rendszer státusz"
+
+#:
+msgid "Host status"
+msgstr "Hoszt státusz"
+
+#:
+msgid "Without problems"
+msgstr "Hibásak"
+
+#:
+msgid "With problems"
+msgstr "Hiba nélkül"
+
+#:
+msgid "Last 20 issues"
+msgstr "Utolsó 20 eredmény"
+
+#:
+msgid "Favourite"
+msgstr "Kedvenc"
+
+#:
+msgid "Favourites"
+msgstr "Kedvencek"
+
+#:
+msgid "Every"
+msgstr "Minden"
+
+#:
+msgid "Menu"
+msgstr "Menü"
+
+#:
+msgid "Reset"
+msgstr "Visszaállítás"
+
+#:
+msgid "Maximize"
+msgstr "Maximalizál"
+
+#:
+msgid "Minimize"
+msgstr "Minimalizál"
+
+#:
+msgid "Loading..."
+msgstr "Betöltés..."
+
+#:
+msgid "Dashboard configuration"
+msgstr "Dashboard konfiguráció"
+
+#:
+msgid "DASHBOARD CONFIGURATION"
+msgstr "DASHBOARD KONFIGURÁCIÓ"
+
+#:
+msgid "Configure"
+msgstr "Konfigurálás"
+
+#:
+msgid "Selected"
+msgstr "Kijelölt"
+
+#:
+msgid "Show hosts in maintenance"
+msgstr "Karbantartás alatti hosztok megjelenítése"
+
+#:
+msgid "Triggers with severity"
+msgstr "Triggerek a következő súlyossággal"
+
+#:
+msgid "Dashboard filter"
+msgstr "Dashboard szűrő"
+
+#:
+msgid "Overview"
+msgstr "Áttekintés"
+
+#:
+msgid "Overview by proxy"
+msgstr "Áttekintés proxinként"
+
+#:
+msgid "OVERVIEW"
+msgstr "ÁTTEKINTÉS"
+
+#:
+msgid "Hosts location"
+msgstr "Hosztok elhelyezkedése"
+
+#:
+msgid "Data"
+msgstr "Adat"
+
+#:
+msgid "Show graph of item"
+msgstr "Elemhez tartozó grafikon megjelenítése"
+
+#:
+msgid "Show values of item"
+msgstr "Elemhez tartozó értékek megjelenítése"
+
+#:
+msgid "Values"
+msgstr "Értékek"
+
+#:
+msgid "5 min"
+msgstr "5 perc"
+
+#:
+msgid "15 min"
+msgstr "15 perc"
+
+#:
+msgid "QUEUE"
+msgstr "FELDOLGOZÁSI SOR"
+
+#:
+msgid "QUEUE OF ITEMS TO BE UPDATED"
+msgstr "FRISSÍTENDŐ ELEMEK A FELDOLGOZÁSI SORBAN"
+
+#:
+msgid "Next check"
+msgstr "Következő ellenőrzés"
+
+#:
+msgid "The queue is empty"
+msgstr "A feldolgozási sor üres"
+
+#:
+msgid "Total"
+msgstr "Összes"
+
+#:
+msgid "Count"
+msgstr "Számol"
+
+#:
+msgid "5 seconds"
+msgstr "5 másodperc"
+
+#:
+msgid "10 seconds"
+msgstr "10 másodperc"
+
+#:
+msgid "30 seconds"
+msgstr "30 másodperc"
+
+#:
+msgid "1 minute"
+msgstr "1 perc"
+
+#:
+msgid "5 minutes"
+msgstr "5 perc"
+
+#:
+msgid "More than 10 minutes"
+msgstr "Több, mint 10 perc"
+
+#:
+msgid "Truncated"
+msgstr "Csonkolt"
+
+#:
+msgid "Delayed by"
+msgstr "Késleltetve"
+
+#:
+msgid "REPORT"
+msgstr "RIPORT"
+
+#:
+msgid "Status of Zabbix"
+msgstr "ZABBIX állapot"
+
+#:
+msgid "STATUS OF ZABBIX"
+msgstr "ZABBIX ÁLLAPOT"
+
+#:
+msgid "Value"
+msgstr "Érték"
+
+#:
+msgid "Zabbix server is running"
+msgstr "A Zabbix szerver fut"
+
+#:
+msgid "Values stored"
+msgstr "Értékek tárolva"
+
+#:
+msgid "Trends stored"
+msgstr "Trendek tárolva"
+
+#:
+msgid "Number of triggers (enabled/disabled)[problem/unknown/ok]"
+msgstr "Triggerek száma (engedélyezett/letiltott)[hiba/ismeretlen/ok]"
+
+#:
+msgid "Triggers (e/d)[p/u/o]"
+msgstr "Triggerek (e/l)[h/i/o]"
+
+#:
+msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
+msgstr "Csak az engedélyezett hosztokhoz rendelt, engedélyezett elemekhez tartozó triggerekből számítva"
+
+#:
+msgid "Number of items (monitored/disabled/not supported)"
+msgstr "Elemek száma (monitorozott/letiltott/nem támogatott)"
+
+#:
+msgid "Items (m/d/n)"
+msgstr "Elemek (m/l/n)"
+
+#:
+msgid "Only items assigned to enabled hosts are counted"
+msgstr "Csak az engedélyezett hosztokhoz rendelt elemekből számítva"
+
+#:
+msgid "Number of users (online)"
+msgstr "Felhasználók száma (bejelentkezve)"
+
+#:
+msgid "Users (online)"
+msgstr "Felhasználók (bejelentkezve)"
+
+#:
+msgid "Number of hosts (monitored/not monitored/templates)"
+msgstr "Hosztok száma (monitorozott/nem monitorozott/minták)"
+
+#:
+msgid "Hosts (m/n/t)"
+msgstr "Hosztok (m/n/mi)"
+
+#:
+msgid "Required server performance, new values per second"
+msgstr "Szükséges szerver teljesítmény (másodpercenkénti mérések száma))"
+
+#:
+msgid "Yes"
+msgstr "Igen"
+
+#:
+msgid "No"
+msgstr "Nem"
+
+#:
+msgid "running"
+msgstr "fut"
+
+#:
+msgid "not running"
+msgstr "nem fut"
+
+#:
+msgid "Availability report"
+msgstr "Rendelkezésre-állás jelentések"
+
+#:
+msgid "AVAILABILITY REPORT"
+msgstr "RENDELKEZÉSRE-ÁLLÁS JELENTÉSEK"
+
+#:
+msgid "Show"
+msgstr "Megjelenít"
+
+#:
+msgid "By host"
+msgstr "Hosztonként"
+
+#:
+msgid "By trigger template"
+msgstr "Trigger mintánként"
+
+#:
+msgid "IT services availability report"
+msgstr "IT szolgáltatások rendelkezésre-állási riportjai"
+
+#:
+msgid "IT SERVICES AVAILABILITY REPORT"
+msgstr "IT SZOLGÁLTATÁSOK RENDELKEZÉSRE-ÁLLÁSI RIPORTJAI"
+
+#:
+msgid "From"
+msgstr "-tól"
+
+#:
+msgid "from"
+msgstr "-tól"
+
+#:
+msgid "Till"
+msgstr "-ig"
+
+#:
+msgid "Ok"
+msgstr "Ok"
+
+#:
+msgid "Problem"
+msgstr "Hiba"
+
+#:
+msgid "Problems"
+msgstr "Hibák"
+
+#:
+msgid "Percentage"
+msgstr "Százalék"
+
+#:
+msgid "SLA"
+msgstr "SLA"
+
+#:
+msgid "Hour"
+msgstr "Óra"
+
+#:
+msgid "Hours"
+msgstr "Órák"
+
+#:
+msgid "Minute"
+msgstr "Perc"
+
+#:
+msgid "Minutes"
+msgstr "Percek"
+
+#:
+msgid "Day"
+msgstr "Nap"
+
+#:
+msgid "Month"
+msgstr "Hónap"
+
+#:
+msgid "Year"
+msgstr "Év"
+
+#:
+msgid "year"
+msgstr "év"
+
+#:
+msgid "Hourly"
+msgstr "Óránként"
+
+#:
+msgid "Daily"
+msgstr "Napi"
+
+#:
+msgid "Weekly"
+msgstr "Heti"
+
+#:
+msgid "Monthly"
+msgstr "Havi"
+
+#:
+msgid "Yearly"
+msgstr "Évi"
+
+#:
+msgid "Do not add"
+msgstr "Ne adja hozzá"
+
+#:
+msgid "Leave empty"
+msgstr "Hagyja üresen"
+
+#:
+msgid "Fill with default value"
+msgstr "Kitöltés alapértelmezett értékkel"
+
+#:
+msgid "Create"
+msgstr "Létrehoz"
+
+#:
+msgid "new"
+msgstr "új"
+
+#:
+msgid "Locales"
+msgstr "Nyelvi környezet"
+
+#:
+msgid "locale"
+msgstr "nyelvi környezet"
+
+#:
+msgid "Download"
+msgstr "Letöltés"
+
+#:
+msgid "Take for default locale"
+msgstr "Alapértelmezett nyelvi környezet"
+
+#:
+msgid "Locale to extend"
+msgstr "Módosítandó nyelvi környezet"
+
+#:
+msgid "New entries"
+msgstr "Új bejegyzések"
+
+#:
+msgid "Notifications"
+msgstr "Értesítések"
+
+#:
+msgid "NOTIFICATIONS"
+msgstr "ÉRTESÍTÉSEK"
+
+#:
+msgid "Notification report"
+msgstr "Értesítési riportok"
+
+#:
+msgid "Most busy triggers top 100"
+msgstr "Leggyakoribb trigger-ek (top 100)"
+
+#:
+msgid "MOST BUSY TRIGGERS TOP 100"
+msgstr "LEGGYAKORIBB TRIGGER-EK (TOP 100)"
+
+#:
+msgid "Number of status changes"
+msgstr "Állapotváltozások száma"
+
+#:
+msgid "Week"
+msgstr "Hét"
+
+#:
+msgid "Last"
+msgstr "Utolsó"
+
+#:
+msgid "Bar reports"
+msgstr "Egyedi riportok"
+
+#:
+msgid "Distribution of values for multiple periods"
+msgstr "Több időszak értékeinek eloszlása"
+
+#:
+msgid "Distribution of values for multiple items"
+msgstr "Több elem értékeinek eloszlása"
+
+#:
+msgid "Compare values for multiple periods"
+msgstr "Több időszak értékeinek összehasonlítása"
+
+#:
+msgid "Selected hosts"
+msgstr "Kijelölt hosztok"
+
+#:
+msgid "Selected groups"
+msgstr "Kijelölt csoportok"
+
+#:
+msgid "Scale"
+msgstr "Skála"
+
+#:
+msgid "Average by"
+msgstr "Átlag"
+
+#:
+msgid "Palette"
+msgstr "Paletta"
+
+#:
+msgid "Darken"
+msgstr "Sötétebb"
+
+#:
+msgid "Brighten"
+msgstr "Világosabb"
+
+#:
+msgid "Screens"
+msgstr "Képernyők"
+
+#:
+msgid "Screen"
+msgstr "Képernyő"
+
+#:
+msgid "CONFIGURATION OF SCREENS"
+msgstr "KÉPERNYŐK KONFIGURÁCIÓJA"
+
+#:
+msgid "Configuration of screens"
+msgstr "Képernyők konfigurációja"
+
+#:
+msgid "Screen added"
+msgstr "Képernyő létrehozva"
+
+#:
+msgid "Cannot add screen"
+msgstr "Képernyő létrehozása sikertelen"
+
+#:
+msgid "Screen updated"
+msgstr "Képernyő frissítve"
+
+#:
+msgid "Cannot update screen"
+msgstr "Képernyő frissítése sikertelen"
+
+#:
+msgid "Screen deleted"
+msgstr "Képernyő törölve"
+
+#:
+msgid "Cannot deleted screen"
+msgstr "Képernyő törlése sikertelen"
+
+#:
+msgid "Columns"
+msgstr "Oszlopok"
+
+#:
+msgid "Rows"
+msgstr "Sorok"
+
+#:
+msgid "No screens defined"
+msgstr "Nincsenek képernyők definiálva"
+
+#:
+msgid "Delete screen?"
+msgstr "Képernyő törlése?"
+
+#:
+msgid "CONFIGURATION OF SCREEN"
+msgstr "KÉPERNYŐK KONFIGURÁLÁSA"
+
+#:
+msgid "Screen cell configuration"
+msgstr "Képernyő cella konfigurálása"
+
+#:
+msgid "Resource"
+msgstr "Forrás"
+
+#:
+msgid "User rights"
+msgstr "Felhasználói jogok"
+
+#:
+msgid "No resources defined"
+msgstr "Nincsenek erőforrások definiálva"
+
+#:
+msgid "Simple graph"
+msgstr "Egyszerű grafikon"
+
+#:
+msgid "Simple graphs"
+msgstr "Egyszerű grafikonok"
+
+#:
+msgid "SIMPLE GRAPH"
+msgstr "EGYSZERŰ GRAFIKON"
+
+#:
+msgid "Graph name"
+msgstr "Grafikon név"
+
+#:
+msgid "Width"
+msgstr "Szélesség"
+
+#:
+msgid "Height"
+msgstr "Magasság"
+
+#:
+msgid "Create Screen"
+msgstr "Képernyő létrehozása"
+
+#:
+msgid "Edit"
+msgstr "Szerkesztés"
+
+#:
+msgid "Dynamic item"
+msgstr "Dinamikus elem"
+
+#:
+msgid "Dimension (cols x rows)"
+msgstr "Méret (sorok és oszlopok)"
+
+#:
+msgid "Delete selected slideshows?"
+msgstr "Törli a kijelölt bemutatót?"
+
+#:
+msgid "Slide shows"
+msgstr "Bemutatók"
+
+#:
+msgid "Slide show"
+msgstr "Bemutató"
+
+#:
+msgid "CONFIGURATION OF SLIDE SHOWS"
+msgstr "BEMUTATÓK KONFIGURÁCIÓJA"
+
+#:
+msgid "SLIDE SHOWS"
+msgstr "BEMUTATÓK"
+
+#:
+msgid "No slide shows defined"
+msgstr "Nincsenek bemutatók létrehozva"
+
+#:
+msgid "Count of slides"
+msgstr "Bemutatók száma"
+
+#:
+msgid "No slides defined"
+msgstr "Nincsenek bemutatók létrehozva"
+
+#:
+msgid "Slides"
+msgstr "Bemutatók"
+
+#:
+msgid "New slide"
+msgstr "Új bemutató"
+
+#:
+msgid "Show text as HTML"
+msgstr "Szöveg megjelenítése HTML-ként"
+
+#:
+msgid "Import screen"
+msgstr "Képernyő importálása"
+
+#:
+msgid "Cannot find graph"
+msgstr "Grafikon nem található"
+
+#:
+msgid "Cannot find item"
+msgstr "Elem nem található"
+
+#:
+msgid "used in exported screen"
+msgstr "használva az exportált képernyőn"
+
+#:
+msgid "Map"
+msgstr "Térkép"
+
+#:
+msgid "As plain text"
+msgstr "Szövegként"
+
+#:
+msgid "Plain text"
+msgstr "Szöveg"
+
+#:
+msgid "PLAINT TEXT"
+msgstr "SZÖVEG"
+
+#:
+msgid "Column span"
+msgstr "Oszlopok száma"
+
+#:
+msgid "Row span"
+msgstr "Sorok száma"
+
+#:
+msgid "Show lines"
+msgstr "Vonalak megjelenítése"
+
+#:
+msgid "Hosts info"
+msgstr "Hoszt info"
+
+#:
+msgid "Triggers info"
+msgstr "Trigger info"
+
+#:
+msgid "Server info"
+msgstr "Szerver info"
+
+#:
+msgid "Clock"
+msgstr "Óra"
+
+#:
+msgid "Triggers overview"
+msgstr "Trigger áttekintés"
+
+#:
+msgid "Data overview"
+msgstr "Adat áttekintés"
+
+#:
+msgid "History of actions"
+msgstr "Eljárások előzményei"
+
+#:
+msgid "History of events"
+msgstr "Események előzményei"
+
+#:
+msgid "Time type"
+msgstr "Idő típusa"
+
+#:
+msgid "Server time"
+msgstr "Szerver idő"
+
+#:
+msgid "Local time"
+msgstr "Helyi idő"
+
+#:
+msgid "Style"
+msgstr "Stílus"
+
+#:
+msgid "Vertical"
+msgstr "Függőleges"
+
+#:
+msgid "Horizontal"
+msgstr "Vízszintes"
+
+#:
+msgid "Horizontal align"
+msgstr "Vízszintes igazítás"
+
+#:
+msgid "Centre"
+msgstr "Középre"
+
+#:
+msgid "Right"
+msgstr "Jobbra"
+
+#:
+msgid "Vertical align"
+msgstr "Függőleges igazítás"
+
+#:
+msgid "Middle"
+msgstr "Középre"
+
+#:
+msgid "Impossible to remove last row and column"
+msgstr "Az utolsó sort és oszlopot nem lehet eltávolítani"
+
+#:
+msgid "Screen should contain at least one row and column"
+msgstr "A képernyőnek legalább egy sort és egy oszlopot tartalmaznia kell"
+
+#:
+msgid "Custom screens"
+msgstr "Egyedi képernyők"
+
+#:
+msgid "SCREENS 45645645"
+msgstr "KÉPERNYŐK"
+
+#:
+msgid "Slideshow updated"
+msgstr "Bemutató frissítve"
+
+#:
+msgid "Cannot_update slideshow"
+msgstr "Bemutató frissítése sikertelen"
+
+#:
+msgid "Slideshow added"
+msgstr "Bemutató létehozva"
+
+#:
+msgid "Cannot add slideshow"
+msgstr "Bemutató létrehozása sikertelen"
+
+#:
+msgid "Slideshow deleted"
+msgstr "Bemutató törölve"
+
+#:
+msgid "Cannot delete slideshow"
+msgstr "Bemutató törlése sikertelen"
+
+#:
+msgid "Delete slideshow?"
+msgstr "Törli a bemutatót?"
+
+#:
+msgid "Average problem"
+msgstr "Átlagos hiba"
+
+#:
+msgid "Serious problem"
+msgstr "Komoly hiba"
+
+#:
+msgid "Minor problem"
+msgstr "Kisebb hiba"
+
+#:
+msgid "root"
+msgstr "root"
+
+#:
+msgid "IT service"
+msgstr "IT szolgáltatás"
+
+#:
+msgid "IT services"
+msgstr "IT szolgáltatások"
+
+#:
+msgid "Configuration of IT services"
+msgstr "IT szolgáltatások konfigurációja"
+
+#:
+msgid "Service updated"
+msgstr "Szolgáltatás frissítve"
+
+#:
+msgid "No IT service defined"
+msgstr "Nincsenek IT szolgáltatások definiálva"
+
+#:
+msgid "Cannot update service"
+msgstr "Szolgáltatások frissítése sikertelen"
+
+#:
+msgid "Service added"
+msgstr "Szolgáltatás létrehozva"
+
+#:
+msgid "Cannot add service"
+msgstr "Szolgáltatás létrehozása sikertelen"
+
+#:
+msgid "Service deleted"
+msgstr "Szolgáltatás törölve"
+
+#:
+msgid "Cannot delete service"
+msgstr "Szolgáltatás törlése sikertelen"
+
+#:
+msgid "Parent service"
+msgstr "Szülő szolgáltatás"
+
+#:
+msgid "Status calculation"
+msgstr "Státusz számítás"
+
+#:
+msgid "Status calculation algorithm"
+msgstr "Státusz-számítási algoritmus"
+
+#:
+msgid "Problem, if at least one child has a problem"
+msgstr "Számítás, ha legalább egy alárendelt elem állapota hibás"
+
+#:
+msgid "Problem, if all children have problems"
+msgstr "Számítás, ha minden alárendelt elem állapota hibás"
+
+#:
+msgid "Soft"
+msgstr "Lágy"
+
+#:
+msgid "Do not calculate"
+msgstr "Ne számoljon"
+
+#:
+msgid "Calculate SLA"
+msgstr "SLA számítás"
+
+#:
+msgid "Acceptable SLA (in %)"
+msgstr "Elfogadott SLA (%-ban)"
+
+#:
+msgid "Link to trigger?"
+msgstr "Csatolás triggerhez?"
+
+#:
+msgid "Sort order (0->999)"
+msgstr "Sorba rendezés (0->999)"
+
+#:
+msgid "Trigger"
+msgstr "Trigger"
+
+#:
+msgid "Server"
+msgstr "Szerver"
+
+#:
+msgid "Delete"
+msgstr "Törlés"
+
+#:
+msgid "Clone"
+msgstr "Klón"
+
+#:
+msgid "Full clone"
+msgstr "Teljes klón"
+
+#:
+msgid "One-time downtime"
+msgstr "Egyszeri kiesés"
+
+#:
+msgid "No times defined"
+msgstr "Nincsenek időszakok definiálva"
+
+#:
+msgid "Service times"
+msgstr "Szolgáltatási időszakok"
+
+#:
+msgid "New service time"
+msgstr "Új szolgáltatási időszak felvétele"
+
+#:
+msgid "Note"
+msgstr "Jegyzet"
+
+#:
+msgid "Remove"
+msgstr "Eltávolítás"
+
+#:
+msgid "Sunday"
+msgstr "Vasárnap"
+
+#:
+msgid "Monday"
+msgstr "Hétfő"
+
+#:
+msgid "Tuesday"
+msgstr "Kedd"
+
+#:
+msgid "Wednesday"
+msgstr "Szerda"
+
+#:
+msgid "Thursday"
+msgstr "Csütörtök"
+
+#:
+msgid "Friday"
+msgstr "Péntek"
+
+#:
+msgid "Saturday"
+msgstr "Szombat"
+
+#:
+msgid "IT SERVICES"
+msgstr "IT SZOLGÁLTATÁSOK"
+
+#:
+msgid "Service"
+msgstr "Szolgáltatás"
+
+#:
+msgid "Services"
+msgstr "Szolgáltatások"
+
+#:
+msgid "Reason"
+msgstr "Ok"
+
+#:
+msgid "Today"
+msgstr "Ma"
+
+#:
+msgid "This week"
+msgstr "Ezen a héten"
+
+#:
+msgid "This year"
+msgstr "Ebben az évben"
+
+#:
+msgid "This month"
+msgstr "Ebben a hónapban"
+
+#:
+msgid "Last 24 hours"
+msgstr "Utolsó 24 óra"
+
+#:
+msgid "Last 7 days"
+msgstr "Utolsó 7 nap"
+
+#:
+msgid "Last 30 days"
+msgstr "Utolsó 30 nap"
+
+#:
+msgid "Last 365 days"
+msgstr "Utolsó 365 nap"
+
+#:
+msgid "Cannot format Tree. Check logic structure in service links"
+msgstr "A fa nem formázható. Ellenőrizze a logikai struktúrát a szervizek kapcsolódásainál."
+
+#:
+msgid "Show triggers with unacknowledged events"
+msgstr "Nyugtázatlan események megjelenítése"
+
+#:
+msgid "No trigger"
+msgstr "Nincs trigger"
+
+#:
+msgid "No triggers defined"
+msgstr "Nincsenek triggerek definiálva"
+
+#:
+msgid "No trigger defined"
+msgstr "Nincs trigger definiálva"
+
+#:
+msgid "Configuration of triggers"
+msgstr "Triggerek konfigurációja"
+
+#:
+msgid "CONFIGURATION OF TRIGGERS"
+msgstr "TRIGGEREK KONFIGURÁCIÓJA"
+
+#:
+msgid "Triggers deleted"
+msgstr "Triggerek törölve"
+
+#:
+msgid "Cannot delete triggers"
+msgstr "Triggerek törlése sikertelen"
+
+#:
+msgid "Trigger deleted"
+msgstr "Trigger törölve"
+
+#:
+msgid "Cannot delete trigger"
+msgstr "Trigger törlése sikertelen"
+
+#:
+msgid "Trigger added"
+msgstr "Trigger létrehozva"
+
+#:
+msgid "Cannot add trigger"
+msgstr "Triggerek létrehozása sikertelen"
+
+#:
+msgid "Severity"
+msgstr "Súlyosság"
+
+#:
+msgid "Min severity"
+msgstr "Minimum súlyosság"
+
+#:
+msgid "Disabled"
+msgstr "Letiltva"
+
+#:
+msgid "DISABLED"
+msgstr "LETILTVA"
+
+#:
+msgid "Enabled"
+msgstr "Engedélyezve"
+
+#:
+msgid "Disable"
+msgstr "Letiltás"
+
+#:
+msgid "Enable"
+msgstr "Engedélyezés"
+
+#:
+msgid "Enable selected"
+msgstr "Kijelölt engedélyezése"
+
+#:
+msgid "Change"
+msgstr "Módosítás"
+
+#:
+msgid "Trigger updated"
+msgstr "Trigger frissítve"
+
+#:
+msgid "Cannot update trigger"
+msgstr "A triggert nem lehet frissíteni"
+
+#:
+msgid "Depends on"
+msgstr "Függőség"
+
+#:
+msgid "Dependent"
+msgstr "Függő"
+
+#:
+msgid "URL"
+msgstr "URL"
+
+#:
+msgid "Zabbix has received an incorrect request"
+msgstr "A Zabbix hibás kérést fogadott"
+
+#:
+msgid "Create Trigger"
+msgstr "Trigger létrehozása"
+
+#:
+msgid "Insert"
+msgstr "Beszúrás"
+
+#:
+msgid "Seconds"
+msgstr "Másodpercek"
+
+#:
+msgid "Last of"
+msgstr "Utolsó"
+
+#:
+msgid "Show disabled triggers"
+msgstr "Letiltott triggerek megjelenítése"
+
+#:
+msgid "Hide disabled triggers"
+msgstr "Letiltott triggereket elrejtése"
+
+#:
+msgid "The trigger depends on"
+msgstr "Trigger függősége"
+
+#:
+msgid "No dependencies defined"
+msgstr "Nincsenek függőségek definiálva"
+
+#:
+msgid "New dependency"
+msgstr "Új függőség"
+
+#:
+msgid "Event generation"
+msgstr "Esemény generálás"
+
+#:
+msgid "Triggers massupdate"
+msgstr "Triggerek tömeges frissítése"
+
+#:
+msgid "Trigger dependencies"
+msgstr "Triggerek függőségei"
+
+#:
+msgid "Incorrect dependency"
+msgstr "Hibás függőség"
+
+#:
+msgid "Toggle input method"
+msgstr "Beviteli mód megjelenítése"
+
+#:
+msgid "Insert macro"
+msgstr "Makró beszúrása"
+
+#:
+msgid "Replace"
+msgstr "Csere"
+
+#:
+msgid "Templated trigger"
+msgstr "Trigger mintából"
+
+#:
+msgid "Enable selected triggers?"
+msgstr "Engedélyezi a kijelölt triggereket?"
+
+#:
+msgid "Disable selected triggers?"
+msgstr "Letiltja a kijelölt triggereket?"
+
+#:
+msgid "Mass update selected triggers?"
+msgstr "Kijelölt triggerek tömeges frissítése?"
+
+#:
+msgid "Copy selected triggers?"
+msgstr "Másolja a kijelölt triggereket?"
+
+#:
+msgid "Delete selected triggers?"
+msgstr "Törli a kijelölt triggereket?"
+
+#:
+msgid "Trigger comments"
+msgstr "Trigger megjegyzései"
+
+#:
+msgid "TRIGGER COMMENTS"
+msgstr "TRIGGER MEGJEGYZÉSEI"
+
+#:
+msgid "Comment updated"
+msgstr "Megjegyzés frissítve"
+
+#:
+msgid "Cannot update comment"
+msgstr "Megyjegyzés frissítése sikertelen"
+
+#:
+msgid "Add"
+msgstr "Hozzáadás"
+
+#:
+msgid "Sound"
+msgstr "Hang"
+
+#:
+msgid "Status of triggers"
+msgstr "Triggerek állapota"
+
+#:
+msgid "STATUS OF TRIGGERS"
+msgstr "TRIGGEREK ÁLLAPOTA"
+
+#:
+msgid "Status of hostgroup triggers"
+msgstr "Hosztcsoport triggereinek állapota"
+
+#:
+msgid "Status of host triggers"
+msgstr "Hoszt triggereinek állapota"
+
+#:
+msgid "Hide all"
+msgstr "Összes elrejtése"
+
+#:
+msgid "Show only problems"
+msgstr "Csak a hibásak megjelenítése"
+
+#:
+msgid "Show unacknowledged"
+msgstr "Nyugtázatlan események megjelenítése"
+
+#:
+msgid "Show problem-unacknowledged"
+msgstr "Nyugtázatlan, hibás események megjelenítése"
+
+#:
+msgid "Not acknowledged"
+msgstr "Nyugtázatlan"
+
+#:
+msgid "Show last"
+msgstr "Utolsó megjelenítése"
+
+#:
+msgid "Show details"
+msgstr "Részletek megjelenítése"
+
+#:
+msgid "TRIGGERS"
+msgstr "TRIGGEREK"
+
+#:
+msgid "Last change"
+msgstr "Aktuális változás"
+
+#:
+msgid "Comments"
+msgstr "Megjegyzés"
+
+#:
+msgid "Acknowledged"
+msgstr "Nyugtázva"
+
+#:
+msgid "Ack"
+msgstr "Nyugtázom"
+
+#:
+msgid "Not Ack"
+msgstr "Nincs nyugtázva"
+
+#:
+msgid "Never"
+msgstr "Soha"
+
+#:
+msgid "Found"
+msgstr "Talált"
+
+#:
+msgid "Select"
+msgstr "Kiválaszt"
+
+#:
+msgid "Zabbix User"
+msgstr "Zabbix felhasználó"
+
+#:
+msgid "Zabbix Admin"
+msgstr "Zabbix Admin"
+
+#:
+msgid "Zabbix Super Admin"
+msgstr "Zabbix Szuper Admin"
+
+#:
+msgid "User type"
+msgstr "Felhasználó típus"
+
+#:
+msgid "Users"
+msgstr "Felhasználók"
+
+#:
+msgid "User added"
+msgstr "Új felhasználó felvéve"
+
+#:
+msgid "Cannot add user"
+msgstr "Felhasználó létrehozása sikertelen"
+
+#:
+msgid "Cannot add user. Both passwords must be equal."
+msgstr "Felhasználó létrehozása sikertelen. A beírt jelszavak nem azonosak."
+
+#:
+msgid "User deleted"
+msgstr "Felhasználó törölve"
+
+#:
+msgid "Cannot delete user"
+msgstr "Felhasználó törlése sikertelen"
+
+#:
+msgid "Password should not be empty"
+msgstr "A jelszó nem lehet üres"
+
+#:
+msgid "For guest, password must be empty"
+msgstr "A vendég felhasználó (guest) jelszavának üresnek kell lennie"
+
+#:
+msgid "User updated"
+msgstr "Felhasználó frissítve"
+
+#:
+msgid "Cannot update user"
+msgstr "Felhasználó frissítése sikertelen"
+
+#:
+msgid "Cannot update user. Both passwords must be equal."
+msgstr "Felhasználó frissítése sikertelen. A beírt jelszavak nem azonosak."
+
+#:
+msgid "Group added"
+msgstr "Csoport létrehozva"
+
+#:
+msgid "Cannot add group"
+msgstr "Csoport létrehozása sikertelen"
+
+#:
+msgid "Group updated"
+msgstr "Csoport frissítve"
+
+#:
+msgid "Cannot update group"
+msgstr "Csoport frissítése sikertelen"
+
+#:
+msgid "Group deleted"
+msgstr "Csoport törölve"
+
+#:
+msgid "Cannot delete group"
+msgstr "Csoport törlése sikertelen"
+
+#:
+msgid "Proxy added"
+msgstr "Proxy létrehozva"
+
+#:
+msgid "Cannot add proxy"
+msgstr "Proxy létrehozása sikertelen"
+
+#:
+msgid "Proxy updated"
+msgstr "Proxy frissítve"
+
+#:
+msgid "Cannot update proxy"
+msgstr "Proxy frissítése sikertelen"
+
+#:
+msgid "Proxy deleted"
+msgstr "Proxy törölve"
+
+#:
+msgid "Cannot delete proxy"
+msgstr "Proxy törlése sikertelen"
+
+#:
+msgid "Users status updated"
+msgstr "Felhasználói-státusz frissítve"
+
+#:
+msgid "Cannot update users status"
+msgstr "Felhasználói-státusz frissítése sikertelen"
+
+#:
+msgid "Users unblocked"
+msgstr "Felhasználói-zárolás megszüntetve"
+
+#:
+msgid "Cannot unblock users"
+msgstr "Felhasználói-státusz engedélyezése sikertelen"
+
+#:
+msgid "GUI access updated"
+msgstr "GUI elérés frissítve"
+
+#:
+msgid "Cannot update GUI access"
+msgstr "GUI elérés frissítése sikertelen"
+
+#:
+msgid "API access updated"
+msgstr "API elérés frissítve"
+
+#:
+msgid "Cannot update API access"
+msgstr "API elérés frissítése sikertelen"
+
+#:
+msgid "Debug mode updated"
+msgstr "Hibakereső mód frissítve"
+
+#:
+msgid "Cannot update debug mode"
+msgstr "Hibakereső mód frissítése sikertelen"
+
+#:
+msgid "User cannot disable himself"
+msgstr "A felhasználó nem tilthatja saját hozzáférését"
+
+#:
+msgid "User cannot change status of himself"
+msgstr "A felhasználó nem módosíthatja saját státuszát"
+
+#:
+msgid "User cannot change GUI access for himself"
+msgstr "A felhasználó nem módosíthatja saját GUI hozzáférését"
+
+#:
+msgid "User cannot delete himself"
+msgstr "A felhasználó nem törölheti saját hozzáférését"
+
+#:
+msgid "CONFIGURATION OF USERS AND USER GROUPS"
+msgstr "FELHASZNÁLÓK ÉS CSOPORTOK KONFIGURÁCIÓJA"
+
+#:
+msgid "USER GROUPS"
+msgstr "FELHASZNÁLÓI CSOPORTOK"
+
+#:
+msgid "USERS"
+msgstr "FELHASZNÁLÓK"
+
+#:
+msgid "User groups"
+msgstr "Felhasználói csoportok"
+
+#:
+msgid "Members"
+msgstr "Tagok"
+
+#:
+msgid "No user groups defined"
+msgstr "Nincs felhasználói csoport definiálva"
+
+#:
+msgid "Name"
+msgstr "Név"
+
+#:
+msgid "Surname"
+msgstr "Vezetéknév"
+
+#:
+msgid "Is online?"
+msgstr "Bejelentkezve?"
+
+#:
+msgid "No users defined"
+msgstr "Nincsenek felhasználók definiálva"
+
+#:
+msgid "Rights"
+msgstr "Jogok"
+
+#:
+msgid "GUI access"
+msgstr "GUI hozzáférés"
+
+#:
+msgid "API access"
+msgstr "API hozzáférés"
+
+#:
+msgid "Debug"
+msgstr "Hibakeresés"
+
+#:
+msgid "Debug mode"
+msgstr "Hibakereső mód"
+
+#:
+msgid "Users status"
+msgstr "Felhasználók státusza"
+
+#:
+msgid "No rights defined"
+msgstr "Nincsenek jogosultságok"
+
+#:
+msgid "Read only"
+msgstr "Csak olvasható"
+
+#:
+msgid "Read-write"
+msgstr "Írható-olvasható"
+
+#:
+msgid "Deny"
+msgstr "Hozzáférés megtagadva"
+
+#:
+msgid "Hide"
+msgstr "Elrejtés"
+
+#:
+msgid "Password"
+msgstr "Jelszó"
+
+#:
+msgid "Change password"
+msgstr "Jelszó módosítása"
+
+#:
+msgid "Password (once again)"
+msgstr "Jelszó (ismétlés)"
+
+#:
+msgid "URL (after login)"
+msgstr "URL (belépés után)"
+
+#:
+msgid "Auto-login"
+msgstr "Automatikus bejelentkezés"
+
+#:
+msgid "Auto-logout (min 90 seconds)"
+msgstr "Automatikus kijelentkezés (minimum 90 mp)"
+
+#:
+msgid "Refresh (in seconds)"
+msgstr "Frissités (másodpercben)"
+
+#:
+msgid "Create User"
+msgstr "Új felhasználó"
+
+#:
+msgid "Create Group"
+msgstr "Új csoport"
+
+#:
+msgid "No accessible resources"
+msgstr "Nincsenek hozzáférhető erőforrások"
+
+#:
+msgid "Add to"
+msgstr "Hozzáadás"
+
+#:
+msgid "Remove from"
+msgstr "Eltávolítás"
+
+#:
+msgid "Internal"
+msgstr "Belső"
+
+#:
+msgid "Rows per page"
+msgstr "Sorok oldalanként"
+
+#:
+msgid "Enable API"
+msgstr "API engedélyezése"
+
+#:
+msgid "Disable API"
+msgstr "API letiltása"
+
+#:
+msgid "Enable DEBUG"
+msgstr "HIBAKERESŐ MÓD engedélyezése"
+
+#:
+msgid "Disable DEBUG"
+msgstr "HIBAKERESŐ MÓD tiltása"
+
+#:
+msgid "Blocked"
+msgstr "Zárolva"
+
+#:
+msgid "Unblock selected"
+msgstr "Zárolás feloldása"
+
+#:
+msgid "Unblock selected users?"
+msgstr "Engedélyezi a kijelölt zárolt felhasználókat?"
+
+#:
+msgid "Delete selected users?"
+msgstr "Törli a kiválasztott felhasználókat?"
+
+#:
+msgid "Enable selected groups?"
+msgstr "Engedélyezi a kiválasztott felhasználókat?"
+
+#:
+msgid "Disable selected groups?"
+msgstr "Tiltja a kiválasztott felhasználókat?"
+
+#:
+msgid "Enable API access in selected groups?"
+msgstr "Engedélyezi az API elérést a kiválasztott csoportok számára?"
+
+#:
+msgid "Disable API access in selected groups?"
+msgstr "Letiltja az API elérést a kiválasztott csoportok számára?"
+
+#:
+msgid "Enable debug mode in selected groups?"
+msgstr "Engedélyezi a hibakereső módot a kiválasztott csoportok számára?"
+
+#:
+msgid "Disable debug mode in selected groups?"
+msgstr "Letiltja a hibakereső módot a kiválasztott csoportok számára?"
+
+#:
+msgid "Delete selected groups?"
+msgstr "Törli a kiválasztott csoportokat?"
+
+#:
+msgid "CONFIGURATION OF SCRIPTS"
+msgstr "SCRIPTEK KONFIGURÁCIÓJA"
+
+#:
+msgid "Scripts"
+msgstr "Scriptek"
+
+#:
+msgid "SCRIPTS"
+msgstr "SCRIPTEK"
+
+#:
+msgid "Command"
+msgstr "Parancs"
+
+#:
+msgid "permissions"
+msgstr "jogosultságok"
+
+#:
+msgid "Required host"
+msgstr "Szükséges hoszt"
+
+#:
+msgid "Read"
+msgstr "Olvasás"
+
+#:
+msgid "Write"
+msgstr "Írás"
+
+#:
+msgid "No scripts defined"
+msgstr "Nincsenek scriptek definiálva"
+
+#:
+msgid "Host access"
+msgstr "Hoszt elérés"
+
+#:
+msgid "Delete script?"
+msgstr "Script törlése?"
+
+#:
+msgid "Create script"
+msgstr "Script létrehozása"
+
+#:
+msgid "Script added"
+msgstr "Script felvéve"
+
+#:
+msgid "Cannot add script"
+msgstr "Script felvétele sikertelen"
+
+#:
+msgid "Script updated"
+msgstr "Script frissítve"
+
+#:
+msgid "Cannot update script"
+msgstr "Script frissítése sikertelen"
+
+#:
+msgid "Script deleted"
+msgstr "Script törölve"
+
+#:
+msgid "Cannot delete script"
+msgstr "Script törlése sikertelen"
+
+#:
+msgid "Tools"
+msgstr "Eszközök"
+
+#:
+msgid "Result"
+msgstr "Eredmény"
+
+#:
+msgid "Close"
+msgstr "Bezár"
+
+#:
+msgid "Cannot connect to Zabbix server"
+msgstr "Nem sikerült csatlakozni a Zabbix szerverhez"
+
+#:
+msgid "Delete selected scripts?"
+msgstr "Törli a kiválasztott szkripteket?"
+
+#:
+msgid "SCRIPT ERROR"
+msgstr "SCRIPT HIBA"
+
+#:
+msgid "Error Description"
+msgstr "Hibaleírás"
+
+#:
+msgid "Can't send command, check connection"
+msgstr "Nem sikerült elküldeni a parancsot, kérem ellenőrizze a kapcsolatot"
+
+#:
+msgid "Can't read script response, check connection"
+msgstr "Nem érkezett meg a válasz a script részére, kérem ellenőrizze a kapcsolatot"
+
+#:
+msgid "Defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value"
+msgstr "Az \"include/defines.inc.php\" - ban meghatározott \"ZBX_SCRIPT_TIMEOUT\" időtúllépés elérve. Növelje a megadott konfigurációs értéket."
+
+#:
+msgid "Defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value"
+msgstr "Az \"include/defines.inc.php\" - ban meghatározott \"ZBX_SCRIPT_BYTES_LIMIT\" limit elérve. Növelje a megadott konfigurációs értéket."
+
+#:
+msgid "Unknown error happened reading script answer, please report to the developers"
+msgstr "Ismeretlen hiba történt a script végrehajtása közben, kérem értesítse a fejlesztőket"
+
+#:
+msgid "Empty response received"
+msgstr "Üres válasz"
+
+#:
+msgid "Audit"
+msgstr "Audit"
+
+#:
+msgid "AUDIT LOGS"
+msgstr "AUDIT LOGOK"
+
+#:
+msgid "AUDIT ACTIONS"
+msgstr "ESEMÉNY AUDIT"
+
+#:
+msgid "Action"
+msgstr "Eljárás"
+
+#:
+msgid "Details"
+msgstr "Részletek"
+
+#:
+msgid "Unknown action"
+msgstr "Ismeretlen eljárás"
+
+#:
+msgid "Added"
+msgstr "Felvéve"
+
+#:
+msgid "Updated"
+msgstr "Frissítve"
+
+#:
+msgid "Media type"
+msgstr "Eszköztípus"
+
+#:
+msgid "Graph element"
+msgstr "Grafikon elem"
+
+#:
+msgid "Unknown resource"
+msgstr "Ismeretlen forrás"
+
+#:
+msgid "already exists"
+msgstr "már létezik"
+
+#:
+msgid "Zabbix config"
+msgstr "Zabbix konfig"
+
+#:
+msgid "USER PROFILE"
+msgstr "FELHASZNÁLÓI PROFIL"
+
+#:
+msgid "User profile"
+msgstr "Felhasználói profil"
+
+#:
+msgid "Language"
+msgstr "Nyelv"
+
+#:
+msgid "Theme"
+msgstr "Téma"
+
+#:
+msgid "English (GB)"
+msgstr "Angol (GB)"
+
+#:
+msgid "French (FR)"
+msgstr "Francia (FR)"
+
+#:
+msgid "German (DE)"
+msgstr "Német (DE)"
+
+#:
+msgid "Italian (IT)"
+msgstr "Olasz (IT)"
+
+#:
+msgid "Korean (KO)"
+msgstr "Koreai (KO)"
+
+#:
+msgid "Latvian (LV)"
+msgstr "Litván (LV)"
+
+#:
+msgid "Russian (RU)"
+msgstr "Orosz (RU)"
+
+#:
+msgid "Portuguese (PT)"
+msgstr "Portugál (PT)"
+
+#:
+msgid "Spanish (SP)"
+msgstr "Spanyol (SP)"
+
+#:
+msgid "Swedish (SE)"
+msgstr "Svéd (SE)"
+
+#:
+msgid "Japanese (JP)"
+msgstr "Japán (JP)"
+
+#:
+msgid "Chinese (CN)"
+msgstr "Kínai (CN)"
+
+#:
+msgid "Dutch (NL)"
+msgstr "Holland (NL)"
+
+#:
+msgid "Hungarian (HU)"
+msgstr "Magyar (HU)"
+
+#:
+msgid "Polish (PL)"
+msgstr "Lengyel (PL)"
+
+#:
+msgid "Ukrainian (UA)"
+msgstr "Ukrán (UK)"
+
+#:
+msgid "ZABBIX"
+msgstr "ZABBIX"
+
+#:
+msgid "Welcome to Zabbix! You are connected as"
+msgstr "Üdvözöljük a Zabbixban! Felhasználónév:"
+
+#:
+msgid "Login name"
+msgstr "Felhasználónév"
+
+#:
+msgid "Host profiles"
+msgstr "Hoszt profilok"
+
+#:
+msgid "HOST PROFILES"
+msgstr "HOSZT PROFILOK"
+
+#:
+msgid "Extended host profile"
+msgstr "Kiterjesztett hoszt profil"
+
+#:
+msgid "Extended"
+msgstr "Kiterjesztett"
+
+#:
+msgid "SEARCH"
+msgstr "KERESÉS"
+
+#:
+msgid "Go"
+msgstr "Mehet"
+
+#:
+msgid "found"
+msgstr "talált"
+
+#:
+msgid "Displaying"
+msgstr "Megjelenít"
+
+#:
+msgid "Search pattern is empty"
+msgstr "A keresési feltétel üres"
+
+#:
+msgid "Caption"
+msgstr "Felirat"
+
+#:
+msgid "Empty"
+msgstr "Üres"
+
+#:
+msgid "STANDARD ITEMS"
+msgstr "STANDARD ELEMEK"
+
+#:
+msgid "No items"
+msgstr "Nincsenek elemek"
+
+#:
+msgid "DISCOVERY RULES"
+msgstr "FELDERÍTÉSI SZABÁLYOK"
+
+#:
+msgid "DISCOVERY CHECKS"
+msgstr "FELDERÍTÉSI ELJÁRÁSOK"
+
+#:
+msgid "Hosts and templates"
+msgstr "Hosztok és minták"
+
+#:
+msgid "Edit connector"
+msgstr "Kapcsolat szerkesztése"
+
+#:
+msgid "Include"
+msgstr "Beleértve"
+
+#:
+msgid "Exclude"
+msgstr "Kivéve"
+
+#:
+msgid "Keyword"
+msgstr "Kulcsszó"
+
+#:
+msgid "Position"
+msgstr "Pozíció"
+
+#:
+msgid "Delete expression?"
+msgstr "Törli a kifejezést?"
+
+#:
+msgid "Delete keyword?"
+msgstr "Törli a kulcsszót?"
+
+#:
+msgid "Test data"
+msgstr "Teszt adat"
+
+#:
+msgid "Result type"
+msgstr "Eredmény típusa"
+
+#:
+msgid "Combined result"
+msgstr "Kombinált eredmény"
+
+#:
+msgid "Delete this application?"
+msgstr "Törli az alkalmazást?"
+
+#:
+msgid "Activate selected applications?"
+msgstr "Engedélyezi a kiválasztott alkalmazásokat?"
+
+#:
+msgid "Disable selected applications?"
+msgstr "Letiltja a kiválasztott alkalmazásokat?"
+
+#:
+msgid "Delete selected applications?"
+msgstr "Törli a kiválasztott alkalmazásokat?"
+
+#:
+msgid "Incorrect time period"
+msgstr "Hibás időintervallum"
+
+#:
+msgid "No elements selected!"
+msgstr "Nincsenek kiválasztott elemek!"
+
+#:
+msgid "refreshed every"
+msgstr "frissítés minden"
+
+#:
+msgid "Page received incorrect data"
+msgstr "Az oldal hibás adatokat fogadott"
+
+#:
+msgid "Timezone for PHP is not set. Please set \"date.timezone\" option in php.ini."
+msgstr "Nincs beállítva időzóna. Az időzónát a php.ini fájl date.timezone változójában adhatja meg."
+
+#:
+msgid "Stats for"
+msgstr "Statisztika"
+
+#:
+msgid "Total time"
+msgstr "Összesen"
+
+#:
+msgid "Memory limit"
+msgstr "Memória limit"
+
+#:
+msgid "Memory usage"
+msgstr "Memóriahasználat"
+
+#:
+msgid "Memory leak"
+msgstr "Memóriaszivárgás"
+
+#:
+msgid "SQL selects count"
+msgstr "SLQ select-ek száma"
+
+#:
+msgid "SQL executes count"
+msgstr "SQL végrehajtások száma"
+
+#:
+msgid "SQL requests count"
+msgstr "SQL kérések száma"
+
+#:
+msgid "Total time spent on SQL"
+msgstr "Összes eltöltött SQL idő"
+
+#:
+msgid "End of"
+msgstr "Vége"
+
+#:
+msgid "MEMORY LIMIT REACHED! Profiling was stopped to save memory for script processing."
+msgstr "MEMÓRIA KORLÁT ELÉRVE! A szkript végrehajtása leállítva."
+
+#:
+msgid "Wrong type"
+msgstr "Hibás típus"
+
+#:
+msgid "Incorrect type of asort_by_key"
+msgstr "Hibás \"asort_by_key\" típus"
+
+#:
+msgid "days"
+msgstr "napok"
+
+#:
+msgid "B"
+msgstr "B"
+
+#:
+msgid "K"
+msgstr "K"
+
+#:
+msgid "Kilo"
+msgstr "Kilo"
+
+#:
+msgid "M"
+msgstr "M"
+
+#:
+msgid "Mega"
+msgstr "Mega"
+
+#:
+msgid "G"
+msgstr "G"
+
+#:
+msgid "Giga"
+msgstr "Giga"
+
+#:
+msgid "T"
+msgstr "T"
+
+#:
+msgid "Tera"
+msgstr "Tera"
+
+#:
+msgid "P"
+msgstr "P"
+
+#:
+msgid "Peta"
+msgstr "Peta"
+
+#:
+msgid "E"
+msgstr "E"
+
+#:
+msgid "Exa"
+msgstr "Exa"
+
+#:
+msgid "Z"
+msgstr "Z"
+
+#:
+msgid "Zetta"
+msgstr "Zeta"
+
+#:
+msgid "Y"
+msgstr "Y"
+
+#:
+msgid "Yotta"
+msgstr "Yotta"
+
+#:
+msgid "Delete selected user?"
+msgstr "Törli a kiválasztott felhasználót?"
+
+#:
+msgid "Subfilter"
+msgstr "Alszűrő"
+
+#:
+msgid "affects only filtered data!"
+msgstr "csak a szűrt adatot érinti"
+
+#:
+msgid "Delete selected item?"
+msgstr "Törli a kiválasztott elemet?"
+
+#:
+msgid "Incorrect list of items."
+msgstr "Hibás elemlista."
+
+#:
+msgid "Delete trigger?"
+msgstr "Törli a kiválasztott triggert?"
+
+#:
+msgid "Profile for this host is missing"
+msgstr "A hoszthoz nem tartozik profil"
+
+#:
+msgid "No image"
+msgstr "Nincs kép"
+
+#:
+msgid "Delete system map?"
+msgstr "Törli a rendszer térképet?"
+
+#:
+msgid "Incorrect arguments passed to function"
+msgstr "A funkció argumentuma hibás"
+
+#:
+msgid "Incorrect key format"
+msgstr "Hibás kulcsformátum"
+
+#:
+msgid "Item will not be refreshed. Please enter a correct update interval."
+msgstr "Az elem nem lesz frissítve. Kérem javítsa a frissítési intervallumot."
+
+#:
+msgid "Invalid SNMP port"
+msgstr "Hibás SNMP port"
+
+#:
+msgid "Type of information must be Log for log key"
+msgstr "Az információ típusát állítsa \"Log\"-ra"
+
+#:
+msgid "Value type must be Float for aggregate items"
+msgstr "Aggregált elemeknél az érték típusát \"Lebegőpontos\" - ra kell állítani"
+
+#:
+msgid "Group function"
+msgstr "Csoportfunkció"
+
+#:
+msgid "is not one of"
+msgstr "nem egy"
+
+#:
+msgid "Item function"
+msgstr "Elem funkció"
+
+#:
+msgid "Key does not match"
+msgstr "A kulcs nem egyezik"
+
+#:
+msgid "An item with the Key"
+msgstr "Elem ezzel a kulccsal"
+
+#:
+msgid "already exists for host"
+msgstr "már létezik a hoszton"
+
+#:
+msgid "The key must be unique."
+msgstr "A kulcsnak egyedinek kell lennie."
+
+#:
+msgid "Added new item"
+msgstr "Új elem létrehozva"
+
+#:
+msgid "updated"
+msgstr "frissítve"
+
+#:
+msgid "No item with"
+msgstr "Nincs elem"
+
+#:
+msgid "deleted"
+msgstr "törölve"
+
+#:
+msgid "Unknown value type"
+msgstr "Ismeretlen érték típus"
+
+#:
+msgid "Scenario step number cannot be less than 1"
+msgstr "A scenario lépésszám nem lehet 1-nél kevesebb"
+
+#:
+msgid "Scenario step name should contain"
+msgstr "A scenario lépésszám megnevezésének tartalmaznia kell"
+
+#:
+msgid "characters only"
+msgstr "betűket"
+
+#:
+msgid "Only characters are allowed"
+msgstr "Csak betűk elfogadottak"
+
+#:
+msgid "Cannot add new application"
+msgstr "Új alkalmazás létrehozása sikertelen"
+
+#:
+msgid "Scenario with name"
+msgstr "Scenario"
+
+#:
+msgid "added"
+msgstr "hozzáadva"
+
+#:
+msgid "No media with"
+msgstr "Nincs eszköztípus"
+
+#:
+msgid "No media type with"
+msgstr "Nincs ilyen eszköztípus"
+
+#:
+msgid "An action type with description"
+msgstr "Ilyen eljárás"
+
+#:
+msgid "can not exist without group"
+msgstr "nem létezhet csoport nélkül"
+
+#:
+msgid "Added host group"
+msgstr "Hoszt csoport létrehozva"
+
+#:
+msgid "Updated host group"
+msgstr "Hoszt csoport frissítve"
+
+#:
+msgid "Incorrect characters used for Hostname"
+msgstr "Hibás karakterek a Hosztnévben"
+
+#:
+msgid "Incorrect characters used for DNS"
+msgstr "Hibás karakterek a DNS névben"
+
+#:
+msgid "Circular link can not be created"
+msgstr "Körkörös hivatkozás nem hozható létre"
+
+#:
+msgid "must be linked to at least one host group"
+msgstr "legalább egy hoszt csoporthoz kapcsolódnia kell"
+
+#:
+msgid "Added new host"
+msgstr "Új hoszt lérehozva"
+
+#:
+msgid "is internal and can not be deleted"
+msgstr "belső és nem törölhető"
+
+#:
+msgid "can not be deleted, due to inner hosts can not be unlinked"
+msgstr "nem törölhető, mert a belső hosztokat nem lehet leválasztani"
+
+#:
+msgid "No host groups with"
+msgstr "Nincsenek ilyen hosztcsoportok"
+
+#:
+msgid "incorrect parameters for"
+msgstr "hibás paraméterek"
+
+#:
+msgid "No host with"
+msgstr "Nincs ilyen hoszt"
+
+#:
+msgid "already exists in linked hosts"
+msgstr "már létezik a csatolt hosztokon"
+
+#:
+msgid "Added new application"
+msgstr "Új alkalmazás létrehozva"
+
+#:
+msgid "Updated application"
+msgstr "Alkalmazás frissítve"
+
+#:
+msgid "used by item"
+msgstr "a következő elem által használva"
+
+#:
+msgid "used by scenario"
+msgstr "a következő scenario által használva"
+
+#:
+msgid "No application with"
+msgstr "Nincs ilyen alkalmazás"
+
+#:
+msgid "unlinked"
+msgstr "leválasztva"
+
+#:
+msgid "Template with item key"
+msgstr "Minta a következő elem kulccsal"
+
+#:
+msgid "Template with application"
+msgstr "Minta a következő alkalmazással"
+
+#:
+msgid "already linked to host"
+msgstr "már csatolva van a hoszthoz"
+
+#:
+msgid "Critical error"
+msgstr "Kritikus hiba"
+
+#:
+msgid "Field"
+msgstr "Mező"
+
+#:
+msgid "is not IP range"
+msgstr "nincs az IP tartományban"
+
+#:
+msgid "is not PORT range"
+msgstr "nincs a PORT tartományban"
+
+#:
+msgid "is not integer range"
+msgstr "nincs az egész szám tartományban"
+
+#:
+msgid "is not integer"
+msgstr "nem egész szám típusú"
+
+#:
+msgid "is not double"
+msgstr "nem dupla"
+
+#:
+msgid "is not string"
+msgstr "nem szöveg"
+
+#:
+msgid "contains Multibyte chars"
+msgstr "Multibyte karaktereket tartalmaz"
+
+#:
+msgid "multibyte chars are restricted"
+msgstr "Multibyte karakterek használata korlátozott"
+
+#:
+msgid "is not a colour"
+msgstr "nem szín"
+
+#:
+msgid "is mandatory"
+msgstr "kötelező"
+
+#:
+msgid "must be missing"
+msgstr "hiányoznia kell"
+
+#:
+msgid "Operation cannot be performed due to unauthorized request"
+msgstr "A művelet jogosultság hiányában nem hajtható végre"
+
+#:
+msgid "Incorrect value for"
+msgstr "Hibás érték"
+
+#:
+msgid "No trigger with"
+msgstr "Nincs ilyen trigger"
+
+#:
+msgid "Incorrect usage of quotes"
+msgstr "Az idézőjelek használata nem megfelelő"
+
+#:
+msgid "Expression cannot be empty"
+msgstr "A kifejezés nem lehet üres"
+
+#:
+msgid "No such host"
+msgstr "Nincs ilyen hoszt"
+
+#:
+msgid "Too many hosts"
+msgstr "Túl sok hoszt"
+
+#:
+msgid "No such monitored parameter"
+msgstr "Nincs ilyen monitorozott paraméter"
+
+#:
+msgid "for host"
+msgstr "a hoszon"
+
+#:
+msgid "Unknown function"
+msgstr "Ismeretlen funkció"
+
+#:
+msgid "Incorrect value type"
+msgstr "Hibás értéktípus"
+
+#:
+msgid "for function"
+msgstr "a funkciónál"
+
+#:
+msgid "of key"
+msgstr "a kulcs"
+
+#:
+msgid "available only for items with value types"
+msgstr "csak olyan elemekhez melyek érték típusa"
+
+#:
+msgid "Missing mandatory parameter for function"
+msgstr "Hiányzó kötelező paraméter a funkcióhoz"
+
+#:
+msgid "is not a float or macro for function"
+msgstr "nem lebegőpontos vagy makró funkció"
+
+#:
+msgid "is not a float or counter or macro for function"
+msgstr "nem lebegőpontos, számláló vagy makró funkció"
+
+#:
+msgid "An item key must be used in trigger expression"
+msgstr "A trigger kifejezésben egy elem kulcsot kell használni"
+
+#:
+msgid "Incorrect trigger expression"
+msgstr "Hibás trigger kifejezés"
+
+#:
+msgid "You can not use template hosts in mixed expressions."
+msgstr "Minta hosztok nem használhatóak vegyes kifejezéseknél"
+
+#:
+msgid "Added trigger"
+msgstr "Trigger létrehozva"
+
+#:
+msgid "to host"
+msgstr "a hoszthoz"
+
+#:
+msgid "Missing key"
+msgstr "Hiányzó kulcs"
+
+#:
+msgid "Incorrect function is used"
+msgstr "Hibás funkció"
+
+#:
+msgid "Unknown macro"
+msgstr "Ismeretlen makró"
+
+#:
+msgid "from host"
+msgstr "a hoszttól"
+
+#:
+msgid "Trigger in template"
+msgstr "Trigger a mintánál"
+
+#:
+msgid "has dependency with trigger in template"
+msgstr "függőségben van a triggerrel a mintában"
+
+#:
+msgid "is not the highest level template"
+msgstr "nem a legmagasabb szintű minta"
+
+#:
+msgid "No function with"
+msgstr "Nincs ilyen funkció"
+
+#:
+msgid "Specify the conditional expression for the target."
+msgstr "Határozon meg egy kifejezést a célhoz."
+
+#:
+msgid "0 or 1"
+msgstr "0 vagy 1"
+
+#:
+msgid "Transaction has not been closed. Aborting.."
+msgstr "A tranzakció lezárva. Megszakítás..."
+
+#:
+msgid "No system map with"
+msgstr "Nincs ilyen rendszer térkép"
+
+#:
+msgid "No sysmap element with"
+msgstr "Nincs rendszertérkép"
+
+#:
+msgid "template"
+msgstr "minta"
+
+#:
+msgid "No rows in screen"
+msgstr "Nincsenek sorok a képernyőhöz"
+
+#:
+msgid "Delete it?"
+msgstr "Törlés?"
+
+#:
+msgid "This screen-row is not empty"
+msgstr "Ez a képernyő-sor nem üres"
+
+#:
+msgid "This screen-column is not empty"
+msgstr "Ez a képernyő-oszlop nem üres"
+
+#:
+msgid "No graph item with"
+msgstr "Nincs ilyen grafikon elem"
+
+#:
+msgid "Missing items for graph"
+msgstr "Hiányó elemek a grafikonhoz"
+
+#:
+msgid "with template host can not contain items from other hosts."
+msgstr "minta hosztok nem tartalmazhaznak elemeket más hosztokhoz."
+
+#:
+msgid "Can not use multiple host items for template graph"
+msgstr "Többszörös hoszt elemek nem használhatóak a minta grafikonhoz"
+
+#:
+msgid "You must use items only from host"
+msgstr "Csak hoszthoz rendelt elemek használhatóak"
+
+#:
+msgid "for template graph"
+msgstr "minta grafikonhoz"
+
+#:
+msgid "updated for hosts"
+msgstr "frissítve a hosztokon"
+
+#:
+msgid "Skipped copying of graph"
+msgstr "Grafikon másolása kihagyva"
+
+#:
+msgid "Unable to select configuration"
+msgstr "A konfiguráció kiválaszhatása sikertelen"
+
+#:
+msgid "every"
+msgstr "minden"
+
+#:
+msgid "day"
+msgstr "nap"
+
+#:
+msgid "of every"
+msgstr "minden"
+
+#:
+msgid "weeks"
+msgstr "hét"
+
+#:
+msgid "week"
+msgstr "hét"
+
+#:
+msgid "Service cannot be parent and child at the same time."
+msgstr "Egy szolgáltatás nem lehet egyszerre szülő és alárendelt."
+
+#:
+msgid "Cannot link hardlinked service."
+msgstr "Rögzített szolgáltatás nem csatolható."
+
+#:
+msgid "Cannot link service to itself."
+msgstr "Szolgáltatás nem csatolható saját magához."
+
+#:
+msgid "No service with"
+msgstr "Nincs ilyen szolgáltatás"
+
+#:
+msgid "No service linkage with"
+msgstr "Nincs szolgáltatás-csatolás"
+
+#:
+msgid "Unknown calculation algorithm of service status"
+msgstr "Ismeretlen szolgáltatási státusz számítási algoritmus"
+
+#:
+msgid "Incorrect user data in"
+msgstr "Hibás felhasználói adat"
+
+#:
+msgid "Could not save image!"
+msgstr "Kép mentése sikertelen!"
+
+#:
+msgid "Execute SQL error"
+msgstr "SQL hiba végrehajtása"
+
+#:
+msgid "Parse SQL error"
+msgstr "SQL hiba felolvasása"
+
+#:
+msgid "Image size must be less than 1MB"
+msgstr "A kép mérete nem lehet 1 MB-nál nagyobb"
+
+#:
+msgid "Select image to download"
+msgstr "Letöltendő kép kiválasztása"
+
+#:
+msgid "Incorrect Image"
+msgstr "Hibás kép"
+
+#:
+msgid "Incorrect characters used for Node name"
+msgstr "Hibás karakterek a csomópont nevében"
+
+#:
+msgid "Master node already exists"
+msgstr "A vezérlő csomópont már létezik"
+
+#:
+msgid "Incorrect node type"
+msgstr "Hibás csomópont típus"
+
+#:
+msgid "Node with same ID already exists"
+msgstr "A megadott csomópont azonosító már létezik"
+
+#:
+msgid "Unable to remove local node"
+msgstr "A helyi csomópontot nem lehet eltávolítani"
+
+#:
+msgid "Please be aware that database still contains data related to the deleted Node"
+msgstr "Figyelem! Az adatbázisból a törölt csomópont adatai nem törlődnek!"
+
+#:
+msgid "PHP version"
+msgstr "PHP verzió"
+
+#:
+msgid "Minimal version of PHP is"
+msgstr "Minimális PHP verzió"
+
+#:
+msgid "PHP memory limit"
+msgstr "PHP memória limit"
+
+#:
+msgid "is a minimal PHP memory limitation"
+msgstr "a minimális PHP limit"
+
+#:
+msgid "PHP post max size"
+msgstr "PHP küldés maximális mérete"
+
+#:
+msgid "is minimum size of PHP post"
+msgstr "a minimális PHP küldési méret"
+
+#:
+msgid "PHP max execution time"
+msgstr "PHP maximális végrehajtási idő"
+
+#:
+msgid "PHP max input time"
+msgstr "PHP maximális beviteli idő"
+
+#:
+msgid "is a minimal limitation on execution time of PHP scripts"
+msgstr "a minimális limit a PHP szkriptek végrehajtásánál (execution time)"
+
+#:
+msgid "is a minimal limitation on input parse time for PHP scripts"
+msgstr "a minimális limit a PHP szkriptek adatbevitel-felolvasásánál (input parse time)"
+
+#:
+msgid "PHP timezone"
+msgstr "PHP időzóna"
+
+#:
+msgid "no"
+msgstr "nem"
+
+#:
+msgid "yes"
+msgstr "igen"
+
+#:
+msgid "Timezone for PHP is not set"
+msgstr "Noincs időzóna meghatározva a PHP-ban"
+
+#:
+msgid "Please set"
+msgstr "Kérem állítsa be"
+
+#:
+msgid "option in"
+msgstr "opció"
+
+#:
+msgid "PHP databases support"
+msgstr "PHP adatbázis támogatás"
+
+#:
+msgid "Requires any database support [MySQL or PostgreSQL or Oracle or SQLite3]"
+msgstr "Valamilyen adatbázis támogatás szükséges [MySQL vagy PostgreSQL vagy Oracle vagy SQLite3]"
+
+#:
+msgid "Requires bcmath module"
+msgstr "\"bcmath\" modul szükséges"
+
+#:
+msgid "configure PHP with"
+msgstr "PHP konfigurálása"
+
+#:
+msgid "Requires mb string module"
+msgstr "\"mb string\" modul szükséges"
+
+#:
+msgid "PHP Sockets"
+msgstr "PHP socketek"
+
+#:
+msgid "Required Sockets module"
+msgstr "\"Sockets\" modul szükséges"
+
+#:
+msgid "The GD extension is not loaded."
+msgstr "A GD kiterjesztés nincs betöltve"
+
+#:
+msgid "GD PNG Support"
+msgstr "GD PNG támogatás"
+
+#:
+msgid "Requires images generation support"
+msgstr "Kép generálási mód támogatás szükséges"
+
+#:
+msgid "libxml module"
+msgstr "libxml modul"
+
+#:
+msgid "php-xml module is not installed"
+msgstr "php-xml modul nincs telepítve"
+
+#:
+msgid "ctype module"
+msgstr "ctype modul"
+
+#:
+msgid "Requires ctype module"
+msgstr "Ctype modul szükséges"
+
+#:
+msgid "PHP upload max filesize"
+msgstr "a legnagyobb feltölthető PHP fájlméret"
+
+#:
+msgid "is minimum for PHP upload filesize"
+msgstr "a legkisebb feltölthető PHP fájlméret"
+
+#:
+msgid "Help"
+msgstr "Segítség"
+
+#:
+msgid "Profile"
+msgstr "Profil"
+
+#:
+msgid "Get support"
+msgstr "Támogatás"
+
+#:
+msgid "Monitoring"
+msgstr "Felügyelet"
+
+#:
+msgid "Inventory"
+msgstr "Leltár"
+
+#:
+msgid "Queue"
+msgstr "Feldolgozási sor"
+
+#:
+msgid "Events"
+msgstr "Események"
+
+#:
+msgid "EVENTS"
+msgstr "ESEMÉNYEK"
+
+#:
+msgid "Maps"
+msgstr "Térképek"
+
+#:
+msgid "Report"
+msgstr "Jelentés"
+
+#:
+msgid "Reports"
+msgstr "Jelentések"
+
+#:
+msgid "General"
+msgstr "Általános"
+
+#:
+msgid "Login"
+msgstr "Belépés"
+
+#:
+msgid "Logout"
+msgstr "Kilépés"
+
+#:
+msgid "Print"
+msgstr "Nyomtatás"
+
+#:
+msgid "Latest data"
+msgstr "Legfrissebb adat"
+
+#:
+msgid "Incorrect description"
+msgstr "Hibás leírás"
+
+#:
+msgid "Can't format Tree"
+msgstr "A fa formázása sikertelen"
+
+#:
+msgid "You do not have permission to perform this operation"
+msgstr "Önnek nincs jogosultsága a kért művelet végrehajtásához"
+
+#:
+msgid "No permissions for screen"
+msgstr "Nincs jogosultsága a képernyő megjelenítéséhez"
+
+#:
+msgid "No permissions for map"
+msgstr "Nincs jogosultsága a térkép megjelenítéséhez"
+
+#:
+msgid "XML file contains errors"
+msgstr "Az XML fájl hibákat tartalmaz"

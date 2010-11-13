@@ -1,0 +1,7973 @@
+"Project-Id-Version: Zabbix 1.9\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-11-10 16:17+0300\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Konstantin <konstantin.buravcov@zabbix.com>\n"
+"Language-Team: Zabbix <info@zabbix.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#:
+msgid "d M Y H:i:s"
+msgstr "j. M Y G:i:s"
+
+#:
+msgid "d M Y"
+msgstr "j. M Y"
+
+#:
+msgid "d.M"
+msgstr "j. M"
+
+#:
+msgid "UTF-8"
+msgstr "UTF-8"
+
+#:
+msgid "y"
+msgstr "r"
+
+#:
+msgid "m"
+msgstr "M"
+
+#:
+msgid "w"
+msgstr "t"
+
+#:
+msgid "d"
+msgstr "d"
+
+#:
+msgid "h"
+msgstr "h"
+
+#:
+msgid "s"
+msgstr "s"
+
+#:
+msgid "ms"
+msgstr "ms"
+
+#:
+msgid "Sun"
+msgstr "ne"
+
+#:
+msgid "Mon"
+msgstr "po"
+
+#:
+msgid "Tue"
+msgstr "út"
+
+#:
+msgid "Wed"
+msgstr "st"
+
+#:
+msgid "Thu"
+msgstr "čt"
+
+#:
+msgid "Fri"
+msgstr "pá"
+
+#:
+msgid "Sat"
+msgstr "so"
+
+#:
+msgid "Sunday"
+msgstr "neděle"
+
+#:
+msgid "Monday"
+msgstr "pondělí"
+
+#:
+msgid "Tuesday"
+msgstr "úterý"
+
+#:
+msgid "Wednesday"
+msgstr "středa"
+
+#:
+msgid "Thursday"
+msgstr "čtvrtek"
+
+#:
+msgid "Friday"
+msgstr "pátek"
+
+#:
+msgid "Saturday"
+msgstr "sobota"
+
+#:
+msgid "Jan"
+msgstr "led"
+
+#:
+msgid "Feb"
+msgstr "ún"
+
+#:
+msgid "Mar"
+msgstr "bře"
+
+#:
+msgid "Apr"
+msgstr "dub"
+
+#:
+msgid "May"
+msgstr "kvě"
+
+#:
+msgid "Jun"
+msgstr "čer"
+
+#:
+msgid "Jul"
+msgstr "čvc"
+
+#:
+msgid "Aug"
+msgstr "srp"
+
+#:
+msgid "Sep"
+msgstr "zář"
+
+#:
+msgid "Oct"
+msgstr "říj"
+
+#:
+msgid "Nov"
+msgstr "lis"
+
+#:
+msgid "Dec"
+msgstr "pro"
+
+#:
+msgid "January"
+msgstr "leden"
+
+#:
+msgid "February"
+msgstr "únor"
+
+#:
+msgid "March"
+msgstr "březen"
+
+#:
+msgid "April"
+msgstr "duben"
+
+#:
+msgid "June"
+msgstr "červen"
+
+#:
+msgid "July"
+msgstr "červenec"
+
+#:
+msgid "August"
+msgstr "srpen"
+
+#:
+msgid "September"
+msgstr "září"
+
+#:
+msgid "October"
+msgstr "říjen"
+
+#:
+msgid "November"
+msgstr "listopad"
+
+#:
+msgid "December"
+msgstr "prosinec"
+
+#:
+msgid "Activate selected"
+msgstr "Povolit vybrané"
+
+#:
+msgid "Disable selected"
+msgstr "Zakázat vybrané"
+
+#:
+msgid "Activate selected hosts"
+msgstr "Povolit vybrané hostitele"
+
+#:
+msgid "Disable selected hosts"
+msgstr "Zakázat vybrané hostitele"
+
+#:
+msgid "Delete selected"
+msgstr "Smazat vybrané"
+
+#:
+msgid "Copy selected to ..."
+msgstr "Kopírovat vybrané do ..."
+
+#:
+msgid "Host IP"
+msgstr "IP hostitele"
+
+#:
+msgid "Service type"
+msgstr "Typ služby"
+
+#:
+msgid "Service port"
+msgstr "Port služby"
+
+#:
+msgid "Discovery status"
+msgstr "Stav průzkumu"
+
+#:
+msgid "Received value"
+msgstr "Přijatá hodnota"
+
+#:
+msgid "Uptime/Downtime"
+msgstr "Uptime/Downtime"
+
+#:
+msgid "Discovery rule"
+msgstr "Pravidlo pro průzkum"
+
+#:
+msgid "Discovery"
+msgstr "Průzkum"
+
+#:
+msgid "DISCOVERY"
+msgstr "PRŮZKUM"
+
+#:
+msgid "Configuration of discovery"
+msgstr "Nastavení průzkumu"
+
+#:
+msgid "CONFIGURATION OF DISCOVERY"
+msgstr "NASTAVENÍ PRŮZKUMU"
+
+#:
+msgid "No discovery rules defined"
+msgstr "Není definováno žádné pravidlo pro průzkum"
+
+#:
+msgid "IP range"
+msgstr "Rozsah IP"
+
+#:
+msgid "Checks"
+msgstr "Kontroly"
+
+#:
+msgid "Create rule"
+msgstr "Vytvořit pravidlo"
+
+#:
+msgid "Delete rule?"
+msgstr "Smazat pravidlo?"
+
+#:
+msgid "Discovery by proxy"
+msgstr "Průzkum podle proxy"
+
+#:
+msgid "(no proxy)"
+msgstr "(bez proxy)"
+
+#:
+msgid "Device uniqueness criteria"
+msgstr "Jedinečný identifikátor zařízení"
+
+#:
+msgid "Event source"
+msgstr "Zdroj události"
+
+#:
+msgid "New check"
+msgstr "Nová kontrola"
+
+#:
+msgid "SSH"
+msgstr "SSH"
+
+#:
+msgid "LDAP"
+msgstr "LDAP"
+
+#:
+msgid "SMTP"
+msgstr "SMTP"
+
+#:
+msgid "FTP"
+msgstr "FTP"
+
+#:
+msgid "HTTP"
+msgstr "HTTP"
+
+#:
+msgid "POP"
+msgstr "POP"
+
+#:
+msgid "NNTP"
+msgstr "NNTP"
+
+#:
+msgid "IMAP"
+msgstr "IMAP"
+
+#:
+msgid "TCP"
+msgstr "TCP"
+
+#:
+msgid "ICMP Ping"
+msgstr "ICMP Ping"
+
+#:
+msgid "ports"
+msgstr "porty"
+
+#:
+msgid "Discovery rules deleted"
+msgstr "Pravidla pro průzkum byla smazána"
+
+#:
+msgid "Discovery rule deleted"
+msgstr "Pravidlo pro průzkum bylo smazáno"
+
+#:
+msgid "Cannot delete discovery rule"
+msgstr "Nelze smazat pravidlo pro průzkum"
+
+#:
+msgid "Discovery rules updated"
+msgstr "Pravidla pro průzkum byla aktualizována"
+
+#:
+msgid "Discovery rule updated"
+msgstr "Pravidlo pro průzkum bylo aktualizováno"
+
+#:
+msgid "Cannot update discovery rule"
+msgstr "Nelze aktualizovat pravidlo pro průzkum"
+
+#:
+msgid "Discovery rule added"
+msgstr "Pravidlo pro průzkum bylo přidáno"
+
+#:
+msgid "Cannot add discovery rule"
+msgstr "Nelze přidat pravidlo pro průzkum"
+
+#:
+msgid "STATUS OF DISCOVERY"
+msgstr "STAV PRŮZKUMU"
+
+#:
+msgid "Status of discovery"
+msgstr "Stav průzkumu"
+
+#:
+msgid "Enable selected discovery rules?"
+msgstr "Povolit vybrané průzkumy?"
+
+#:
+msgid "Disable selected discovery rules?"
+msgstr "Zakázat vybrané průzkumy?"
+
+#:
+msgid "Delete selected discovery rules?"
+msgstr "Smazat vybrané průzkumy?"
+
+#:
+msgid "Discovered"
+msgstr "Nalezené"
+
+#:
+msgid "Lost"
+msgstr "Ztracené"
+
+#:
+msgid "Uptime"
+msgstr "Uptime"
+
+#:
+msgid "Downtime"
+msgstr "Downtime"
+
+#:
+msgid "Discovered device"
+msgstr "Nalezené zařízení"
+
+#:
+msgid "Monitored host"
+msgstr "Sledovaný hostitel"
+
+#:
+msgid "Incorrect IP range."
+msgstr "Neplatný rozsah IP."
+
+#:
+msgid "Details of scenario"
+msgstr "Detaily scénáře"
+
+#:
+msgid "DETAILS OF SCENARIO"
+msgstr "DETAILY SCÉNÁŘE"
+
+#:
+msgid "Speed"
+msgstr "Rychlost"
+
+#:
+msgid "Response code"
+msgstr "Kód odpovědi"
+
+#:
+msgid "TOTAL"
+msgstr "CELKEM"
+
+#:
+msgid "Response time"
+msgstr "Odezva"
+
+#:
+msgid "In progress"
+msgstr "Probíhá"
+
+#:
+msgid "of"
+msgstr "z"
+
+#:
+msgid "to"
+msgstr "do"
+
+#:
+msgid "In check"
+msgstr "Probíhá kontrola"
+
+#:
+msgid "Idle till"
+msgstr "Neaktivní do"
+
+#:
+msgid "Failed on"
+msgstr "Selhalo na"
+
+#:
+msgid "Failed"
+msgstr "Selhalo"
+
+#:
+msgid "Status of Web monitoring"
+msgstr "Stav sledování webů"
+
+#:
+msgid "STATUS OF WEB MONITORING"
+msgstr "STAV SLEDOVÁNÍ WEBŮ"
+
+#:
+msgid "State"
+msgstr "Stav"
+
+#:
+msgid "Sort"
+msgstr "Řadit"
+
+#:
+msgid "Status codes"
+msgstr "Návratové hodnoty"
+
+#:
+msgid "Web"
+msgstr "Web"
+
+#:
+msgid "Configuration of Web monitoring"
+msgstr "Nastavení sledování webů"
+
+#:
+msgid "CONFIGURATION OF WEB MONITORING"
+msgstr "NASTAVENÍ SLEDOVÁNÍ WEBŮ"
+
+#:
+msgid "Scenario"
+msgstr "Scénář"
+
+#:
+msgid "Scenarios"
+msgstr "Scénáře"
+
+#:
+msgid "SCENARIOS"
+msgstr "SCÉNÁŘ"
+
+#:
+msgid "Create scenario"
+msgstr "Vytvořit scénář"
+
+#:
+msgid "Hide disabled scenarios"
+msgstr "Skrýt zakázané scénáře"
+
+#:
+msgid "Show disabled scenarios"
+msgstr "Zobrazit zakázané scénáře"
+
+#:
+msgid "Number of steps"
+msgstr "Počet kroků"
+
+#:
+msgid "Scenario deleted"
+msgstr "Scénář byl smazán"
+
+#:
+msgid "Scenario activated"
+msgstr "Scénář byl povolen"
+
+#:
+msgid "Scenario disabled"
+msgstr "Scénář byl zakázán"
+
+#:
+msgid "Delete scenario?"
+msgstr "Smazat scénář?"
+
+#:
+msgid "Scenario updated"
+msgstr "Scénář byl aktualizován"
+
+#:
+msgid "Cannot update scenario"
+msgstr "Nelze upravit scénář"
+
+#:
+msgid "Scenario added"
+msgstr "Scénář byl přidán"
+
+#:
+msgid "Cannot add scenario"
+msgstr "Nelze přidat scénář"
+
+#:
+msgid "Cannot delete scenario"
+msgstr "Nelze smazat scénář"
+
+#:
+msgid "Agent"
+msgstr "Agent"
+
+#:
+msgid "Variables"
+msgstr "Proměnné"
+
+#:
+msgid "Step"
+msgstr "Krok"
+
+#:
+msgid "Steps"
+msgstr "Kroky"
+
+#:
+msgid "Timeout"
+msgstr "Časový limit"
+
+#:
+msgid "Post"
+msgstr "POST"
+
+#:
+msgid "Required"
+msgstr "Vyžadováno"
+
+#:
+msgid "Step of scenario"
+msgstr "Krok scénáře"
+
+#:
+msgid "Basic authentication"
+msgstr "Basic authentication"
+
+#:
+msgid "Enable selected WEB scenarios?"
+msgstr "Povolit vybrané webové scénáře?"
+
+#:
+msgid "Disable selected WEB scenarios?"
+msgstr "Zakázat vybrané webové scénáře?"
+
+#:
+msgid "Delete history of selected WEB scenarios?"
+msgstr "Smazat historii vybraných webových scénářů?"
+
+#:
+msgid "Delete selected WEB scenarios?"
+msgstr "Smazat vybrané scénáře?"
+
+#:
+msgid "Element"
+msgstr "Prvek"
+
+#:
+msgid "Elements"
+msgstr "Prvky"
+
+#:
+msgid "Only host info"
+msgstr "Pouze informace o hostiteli"
+
+#:
+msgid "Export/Import"
+msgstr "Export/Import"
+
+#:
+msgid "Import file"
+msgstr "Importovat soubor"
+
+#:
+msgid "Import"
+msgstr "Import"
+
+#:
+msgid "IMPORT"
+msgstr "IMPORT"
+
+#:
+msgid "Export"
+msgstr "Export"
+
+#:
+msgid "Export selected"
+msgstr "Exportovat vybrané"
+
+#:
+msgid "EXPORT"
+msgstr "EXPORT"
+
+#:
+msgid "Preview"
+msgstr "Náhled"
+
+#:
+msgid "Back"
+msgstr "Zpět"
+
+#:
+msgid "BACK"
+msgstr "ZPĚT"
+
+#:
+msgid "No data for export"
+msgstr "Nejsou žádná data pro export"
+
+#:
+msgid "no data"
+msgstr "žádná data"
+
+#:
+msgid "Rules"
+msgstr "Pravidla"
+
+#:
+msgid "Existing"
+msgstr "Existující"
+
+#:
+msgid "Missing"
+msgstr "Chybějící"
+
+#:
+msgid "Refresh"
+msgstr "Aktualizovat"
+
+#:
+msgid "Refresh time in seconds"
+msgstr "Automatická aktualizace v sekundách"
+
+#:
+msgid "Refresh time multiplier"
+msgstr "Multiplikátor času aktualizace"
+
+#:
+msgid "Imported"
+msgstr "Importováno"
+
+#:
+msgid "successfully"
+msgstr "úspěšně"
+
+#:
+msgid "failed"
+msgstr "selhal"
+
+#:
+msgid "d.m.y"
+msgstr "d.m.y"
+
+#:
+msgid "H.i"
+msgstr "H.i"
+
+#:
+msgid "Previous"
+msgstr "Předchozí"
+
+#:
+msgid "Next"
+msgstr "Další"
+
+#:
+msgid "Retry"
+msgstr "Znovu zkusit"
+
+#:
+msgid "Finish"
+msgstr "Dokončit"
+
+#:
+msgid "Fail"
+msgstr "Selhalo"
+
+#:
+msgid "UPDATE"
+msgstr "AKTUALIZOVAT"
+
+#:
+msgid "Installation"
+msgstr "Instalace"
+
+#:
+msgid "New installation"
+msgstr "Nová instalace"
+
+#:
+msgid "NEW INSTALLATION"
+msgstr "NOVÁ INSTALACE"
+
+#:
+msgid "Installation/Update"
+msgstr "Instalace/Aktualizace"
+
+#:
+msgid "Zabbix is temporarily unavailable"
+msgstr "ZABBIX je dočasně nedostupný"
+
+#:
+msgid "Multibyte String module required to run FrontEnd"
+msgstr "Modul pro podporu vícebajtového kódování je nutný k běhu frontendu"
+
+#:
+msgid "Y.M.d H:i:s"
+msgstr "j. M Y G:i:s"
+
+#:
+msgid "Empty input parameter"
+msgstr "Prázdný vstupní parametr"
+
+#:
+msgid "Time zone"
+msgstr "Časové pásmo"
+
+#:
+msgid "Do not keep history older than (in days)"
+msgstr "Smazat historii starší než x dní"
+
+#:
+msgid "Do not keep trends older than (in days)"
+msgstr "Smazat trendy starší než x dní"
+
+#:
+msgid "Master node"
+msgstr "Hlavní uzel"
+
+#:
+msgid "Child"
+msgstr "Vzdálený"
+
+#:
+msgid "Master"
+msgstr "Hlavní"
+
+#:
+msgid "Node updated"
+msgstr "Uzel byl aktualizován"
+
+#:
+msgid "Cannot update node"
+msgstr "Nelze upravit uzel"
+
+#:
+msgid "Node added"
+msgstr "Uzel byl přidán"
+
+#:
+msgid "Cannot add node"
+msgstr "Nelze přidat uzel"
+
+#:
+msgid "Node deleted"
+msgstr "Uzel byl smazán"
+
+#:
+msgid "Cannot delete node"
+msgstr "Nelze smazat uzel"
+
+#:
+msgid "Current node"
+msgstr "Současný uzel"
+
+#:
+msgid "Select Nodes"
+msgstr "Vybrat uzly"
+
+#:
+msgid "No events to acknowledge"
+msgstr "Nejsou žádné události k potvrzení"
+
+#:
+msgid "Acknowledges"
+msgstr "Potvrzení"
+
+#:
+msgid "Acknowledge"
+msgstr "Potvrdit"
+
+#:
+msgid "Return"
+msgstr "Zpět"
+
+#:
+msgid "Acknowledge alarm by"
+msgstr "Potvrdit alarm -"
+
+#:
+msgid "Add comment by"
+msgstr "Přidat komentář -"
+
+#:
+msgid "ALARM ACKNOWLEDGES"
+msgstr "POTVRZENÍ ALARMŮ"
+
+#:
+msgid "Acknowledge added"
+msgstr "Potvrzení bylo přidáno"
+
+#:
+msgid "Cannot acknowledge event"
+msgstr "Nelze potvrdit událost"
+
+#:
+msgid "----[BULK ACKNOWLEDGE]----"
+msgstr "----[HROMADNÉ POTVRZENÍ]----"
+
+#:
+msgid "Bulk acknowledge"
+msgstr "Hromadné potvrzení"
+
+#:
+msgid "Immediately"
+msgstr "Ihned"
+
+#:
+msgid "Infinity"
+msgstr "Nekonečno"
+
+#:
+msgid "Recovery message"
+msgstr "Zpráva při obnovení"
+
+#:
+msgid "Configuration of actions"
+msgstr "Nastavení akcí"
+
+#:
+msgid "CONFIGURATION OF ACTIONS"
+msgstr "NASTAVENÍ AKCÍ"
+
+#:
+msgid "Operation type"
+msgstr "Typ operace"
+
+#:
+msgid "Send message"
+msgstr "Poslat zprávu"
+
+#:
+msgid "Remote command"
+msgstr "Vzdálený příkaz"
+
+#:
+msgid "Remote commands"
+msgstr "Vzdálené příkazy"
+
+#:
+msgid "Filter"
+msgstr "Filtr"
+
+#:
+msgid "Trigger severity"
+msgstr "Závažnost spouštěče"
+
+#:
+msgid "Trigger value"
+msgstr "Hodnota spouštěče"
+
+#:
+msgid "Time period"
+msgstr "Časové období"
+
+#:
+msgid "Maintenance status"
+msgstr "Stav údržby"
+
+#:
+msgid "maintenance"
+msgstr "údržba"
+
+#:
+msgid "max value"
+msgstr "maximální hodnota"
+
+#:
+msgid "min value"
+msgstr "minimální hodnota"
+
+#:
+msgid "Trigger description"
+msgstr "Popis spouštěče"
+
+#:
+msgid "Host name"
+msgstr "Název hostitele"
+
+#:
+msgid "Action conditions"
+msgstr "Podmínky akce"
+
+#:
+msgid "Operation condition"
+msgstr "podmínka operace"
+
+#:
+msgid "Conditions"
+msgstr "Podmínky"
+
+#:
+msgid "Condition"
+msgstr "Podmínka"
+
+#:
+msgid "New condition"
+msgstr "Nová podmínka"
+
+#:
+msgid "Action operations"
+msgstr "Operace akce"
+
+#:
+msgid "Operations"
+msgstr "Operace"
+
+#:
+msgid "Edit operation"
+msgstr "Upravit operaci"
+
+#:
+msgid "No conditions defined"
+msgstr "Nejsou definovány žádné podmínky"
+
+#:
+msgid "Actions deleted"
+msgstr "Akce byly smazány"
+
+#:
+msgid "Cannot delete actions"
+msgstr "Nelze smazat akce"
+
+#:
+msgid "No operations defined"
+msgstr "Nejsou definovány žádné operace"
+
+#:
+msgid "New"
+msgstr "Nová"
+
+#:
+msgid "Add host"
+msgstr "Přidat hostitele"
+
+#:
+msgid "Remove host"
+msgstr "Smazat hostitele"
+
+#:
+msgid "Enable host"
+msgstr "Povolit hostitele"
+
+#:
+msgid "Disable host"
+msgstr "Zakázat hostitele"
+
+#:
+msgid "Link to template"
+msgstr "Připojit šablonu"
+
+#:
+msgid "Unlink from template"
+msgstr "Odpojit od šablony"
+
+#:
+msgid "Host template"
+msgstr "Šablona hostitele"
+
+#:
+msgid "Event acknowledged"
+msgstr "Událost potvrzena"
+
+#:
+msgid "Send only to"
+msgstr "Poslat pouze na"
+
+#:
+msgid "User medias"
+msgstr "Média uživatelů"
+
+#:
+msgid "Discovery check"
+msgstr "Kontrola průzkumu"
+
+#:
+msgid "Discovered object"
+msgstr "Nalezený objekt"
+
+#:
+msgid "Device"
+msgstr "Zařízení"
+
+#:
+msgid "Auto registration"
+msgstr "Auto registrace"
+
+#:
+msgid "Incorrect trigger"
+msgstr "Neplatný spouštěč"
+
+#:
+msgid "Incorrect host"
+msgstr "Neplatný hostitel"
+
+#:
+msgid "Incorrect period"
+msgstr "Neplatné období"
+
+#:
+msgid "Incorrect IP"
+msgstr "Neplatná IP adresa"
+
+#:
+msgid "Incorrect discovery check"
+msgstr "Neplatná kontrola průzkumu"
+
+#:
+msgid "Incorrect port"
+msgstr "Neplatný port"
+
+#:
+msgid "Incorrect discovery status"
+msgstr "Neplatný stav průzkumu"
+
+#:
+msgid "Incorrect condition type"
+msgstr "Neplatný typ podmínky"
+
+#:
+msgid "Incorrect operation type"
+msgstr "Neplatný typ operace"
+
+#:
+msgid "Incorrect user"
+msgstr "Neplatný uživatel"
+
+#:
+msgid "Incorrect steps"
+msgstr "Neplatné kroky"
+
+#:
+msgid "selected actions?"
+msgstr "vybrané akce?"
+
+#:
+msgid "Actions"
+msgstr "Akce"
+
+#:
+msgid "Logs"
+msgstr "Logovací soubory"
+
+#:
+msgid "LOGS"
+msgstr "LOGOVACÍ SOUBORY"
+
+#:
+msgid "ACTIONS"
+msgstr "AKCE"
+
+#:
+msgid "Message actions"
+msgstr "Akce zpráv"
+
+#:
+msgid "Command actions"
+msgstr "Akce příkazů"
+
+#:
+msgid "Action added"
+msgstr "Akce byla přidána"
+
+#:
+msgid "Cannot add action"
+msgstr "Nelze přidat akci"
+
+#:
+msgid "Action updated"
+msgstr "Akce byla aktualizována"
+
+#:
+msgid "Cannot update action"
+msgstr "Nelze upravit akci"
+
+#:
+msgid "Action deleted"
+msgstr "Akce byla smazána"
+
+#:
+msgid "Cannot delete action"
+msgstr "Nelze smazat akci"
+
+#:
+msgid "Send message to"
+msgstr "Poslat zprávu komu:"
+
+#:
+msgid "Run remote commands"
+msgstr "Spustit vzdálené příkazy"
+
+#:
+msgid "Delay"
+msgstr "Prodleva"
+
+#:
+msgid "Subject"
+msgstr "Předmět"
+
+#:
+msgid "Recovery subject"
+msgstr "Předmět zprávy při obnovení"
+
+#:
+msgid "Default message"
+msgstr "Výchozí zpráva"
+
+#:
+msgid "Default subject"
+msgstr "Výchozí předmět"
+
+#:
+msgid "Message"
+msgstr "Zpráva"
+
+#:
+msgid "ON"
+msgstr "ON"
+
+#:
+msgid "OFF"
+msgstr "OFF"
+
+#:
+msgid "On"
+msgstr "On"
+
+#:
+msgid "Off"
+msgstr "Off"
+
+#:
+msgid "No actions defined"
+msgstr "Nejsou definovány žádné akce"
+
+#:
+msgid "Single user"
+msgstr "Jeden uživatel"
+
+#:
+msgid "User group"
+msgstr "Skupina uživatelů"
+
+#:
+msgid "Group"
+msgstr "Skupina"
+
+#:
+msgid "User"
+msgstr "Uživatel"
+
+#:
+msgid "Not classified"
+msgstr "Neurčeno"
+
+#:
+msgid "Information"
+msgstr "Informační"
+
+#:
+msgid "Warning"
+msgstr "Upozornění"
+
+#:
+msgid "Average"
+msgstr "Střední"
+
+#:
+msgid "High"
+msgstr "Závažný"
+
+#:
+msgid "Disaster"
+msgstr "Kritický"
+
+#:
+msgid "AND / OR"
+msgstr "A / NEBO"
+
+#:
+msgid "AND"
+msgstr "A"
+
+#:
+msgid "and"
+msgstr "a"
+
+#:
+msgid "&"
+msgstr "&"
+
+#:
+msgid "OR"
+msgstr "NEBO"
+
+#:
+msgid "or"
+msgstr "nebo"
+
+#:
+msgid "Type of calculation"
+msgstr "Způsob vyhodnocení"
+
+#:
+msgid "Create Action"
+msgstr "Vytvořit akci"
+
+#:
+msgid "Delete selected action?"
+msgstr "Smazat vybranou akci?"
+
+#:
+msgid "like"
+msgstr "jako"
+
+#:
+msgid "not like"
+msgstr "ne jako"
+
+#:
+msgid "in"
+msgstr "mezi"
+
+#:
+msgid "not in"
+msgstr "mimo"
+
+#:
+msgid "Retries left"
+msgstr "Zbývá pokusů"
+
+#:
+msgid "Actions since"
+msgstr "Akce od"
+
+#:
+msgid "Show all"
+msgstr "Zobrazit vše"
+
+#:
+msgid "Time"
+msgstr "Čas"
+
+#:
+msgid "Status"
+msgstr "Stav"
+
+#:
+msgid "Duration"
+msgstr "Trvání"
+
+#:
+msgid "TRUE"
+msgstr "PRAVDA"
+
+#:
+msgid "FALSE"
+msgstr "NEPRAVDA"
+
+#:
+msgid "UNKNOWN"
+msgstr "NEZNÁMÝ"
+
+#:
+msgid "Type"
+msgstr "Typ"
+
+#:
+msgid "Recipient(s)"
+msgstr "Příjemci"
+
+#:
+msgid "Recipient"
+msgstr "Příjemce"
+
+#:
+msgid "Error"
+msgstr "Chyba"
+
+#:
+msgid "sent"
+msgstr "posláno"
+
+#:
+msgid "executed"
+msgstr "vykonáno"
+
+#:
+msgid "not sent"
+msgstr "neposláno"
+
+#:
+msgid "No actions found"
+msgstr "Nenalezeny žádné akce"
+
+#:
+msgid "Incorrect command"
+msgstr "Neplatný příkaz"
+
+#:
+msgid "Unknown group name"
+msgstr "Neznámý název skupiny"
+
+#:
+msgid "Unknown host name"
+msgstr "Neznámý název hostitele"
+
+#:
+msgid "in command"
+msgstr "v příkazu"
+
+#:
+msgid "Line"
+msgstr "Čára"
+
+#:
+msgid "Filled region"
+msgstr "Oblast"
+
+#:
+msgid "Bold line"
+msgstr "Tučná čára"
+
+#:
+msgid "Dot"
+msgstr "Tečka"
+
+#:
+msgid "Dashed line"
+msgstr "Čárkovaná čára"
+
+#:
+msgid "Gradient line"
+msgstr "Přechod"
+
+#:
+msgid "Custom graphs"
+msgstr "Vlastní grafy"
+
+#:
+msgid "GRAPHS"
+msgstr "GRAFY"
+
+#:
+msgid "Select graph to display"
+msgstr "Vybrat graf k zobrazení"
+
+#:
+msgid "Period"
+msgstr "Období"
+
+#:
+msgid "Select graph..."
+msgstr "Vybrat graf..."
+
+#:
+msgid "Fullscreen"
+msgstr "Celá obrazovka"
+
+#:
+msgid "View"
+msgstr "pohled"
+
+#:
+msgid "H:i"
+msgstr "G:i"
+
+#:
+msgid "D"
+msgstr "D"
+
+#:
+msgid "d.m"
+msgstr "j.n."
+
+#:
+msgid "d.m H:i"
+msgstr "j.n. G:i"
+
+#:
+msgid "d.m.Y H:i"
+msgstr "j.n.Y G:i"
+
+#:
+msgid "GUI"
+msgstr "Grafické rozhraní"
+
+#:
+msgid "Dropdown first entry"
+msgstr "První položka v rozbalovacích seznamech"
+
+#:
+msgid "remember selected"
+msgstr "pamatovat vybranou"
+
+#:
+msgid "Max count of elements to show inside table cell"
+msgstr "Největší zobrazovaný počet položek v tabulce"
+
+#:
+msgid "Search/Filter elements limit"
+msgstr "Omezení počtu položek pro vyhledávání/filtr"
+
+#:
+msgid "Themes"
+msgstr "Témata"
+
+#:
+msgid "System default"
+msgstr "Výchozí nastavení"
+
+#:
+msgid "Black & Blue"
+msgstr "Černá & Modrá"
+
+#:
+msgid "Original blue"
+msgstr "Původní modrá"
+
+#:
+msgid "Default theme"
+msgstr "Výchozí téma"
+
+#:
+msgid "Event acknowledges"
+msgstr "Potvrzování událostí"
+
+#:
+msgid "Days"
+msgstr "dní"
+
+#:
+msgid "Show events not older"
+msgstr "Nejstarší zobrazované události"
+
+#:
+msgid "Show events max"
+msgstr "Největší počet zobrazovaných událostí"
+
+#:
+msgid "Max count of events per trigger to show"
+msgstr "Největší zobrazovaný počet událostí spouštěče"
+
+#:
+msgid "Cannot update value map"
+msgstr "Nelze aktualizovat mapu hodnot"
+
+#:
+msgid "Value map added"
+msgstr "Mapa hodnot byla přidána"
+
+#:
+msgid "Cannot add value map"
+msgstr "Nelze přidat mapu hodnot"
+
+#:
+msgid "Value map deleted"
+msgstr "Mapa hodnot byla smazána"
+
+#:
+msgid "Cannot delete value map"
+msgstr "Nelze smazat mapu hodnot"
+
+#:
+msgid "Value map updated"
+msgstr "Mapa hodnot byla aktualizována"
+
+#:
+msgid "VALUE MAPPING"
+msgstr "MAPOVÁNÍ HODNOT"
+
+#:
+msgid "Value mapping"
+msgstr "Mapování hodnot"
+
+#:
+msgid "Value map"
+msgstr "Mapa hodnot"
+
+#:
+msgid "Mapping"
+msgstr "Mapování"
+
+#:
+msgid "New mapping"
+msgstr "Nové mapování"
+
+#:
+msgid "No mapping defined"
+msgstr "Není definováno žádné mapování"
+
+#:
+msgid "Create value map"
+msgstr "Vytvořit mapu hodnot"
+
+#:
+msgid "Configuration of Zabbix"
+msgstr "Nastavení ZABBIXe"
+
+#:
+msgid "CONFIGURATION OF ZABBIX"
+msgstr "NASTAVENÍ ZABBIXE"
+
+#:
+msgid "Configuration updated"
+msgstr "Nastavení bylo aktualizováno"
+
+#:
+msgid "Configuration was not updated"
+msgstr "Nastavení nebylo aktualizováno"
+
+#:
+msgid "Added new media type"
+msgstr "Přidán nový typ média"
+
+#:
+msgid "New media type was not added"
+msgstr "Nový typ média nebyl přidán"
+
+#:
+msgid "Media type updated"
+msgstr "Typ média byl aktualizován"
+
+#:
+msgid "Media type was not updated"
+msgstr "Typ média nebyl aktualizován"
+
+#:
+msgid "Media type deleted"
+msgstr "Typ média byl smazán"
+
+#:
+msgid "Media type was not deleted"
+msgstr "Typ média nebyl smazán"
+
+#:
+msgid "Configuration"
+msgstr "Nastavení"
+
+#:
+msgid "Administration"
+msgstr "Administrace"
+
+#:
+msgid "Do not keep actions older than (in days)"
+msgstr "Smazat akce starší než x dní"
+
+#:
+msgid "Do not keep events older than (in days)"
+msgstr "Smazat události starší než x dní"
+
+#:
+msgid "No media types defined"
+msgstr "Nejsou definovány žádné typy médií"
+
+#:
+msgid "SMTP server"
+msgstr "SMTP server"
+
+#:
+msgid "SMTP helo"
+msgstr "SMTP HELO"
+
+#:
+msgid "SMTP email"
+msgstr "SMTP e-mail"
+
+#:
+msgid "Script name"
+msgstr "Název skriptu"
+
+#:
+msgid "Delete selected media?"
+msgstr "Smazat vybraná média?"
+
+#:
+msgid "Delete selected image?"
+msgstr "Smazat vybraný obrázek?"
+
+#:
+msgid "Housekeeper"
+msgstr "Údržba databáze"
+
+#:
+msgid "Media types"
+msgstr "Typy médií"
+
+#:
+msgid "Escalation rules"
+msgstr "Pravidla eskalace"
+
+#:
+msgid "Enable escalations"
+msgstr "Povolit eskalace"
+
+#:
+msgid "Escalation"
+msgstr "Eskalace"
+
+#:
+msgid "Escalation rule"
+msgstr "Pravidlo eskalace"
+
+#:
+msgid "Default"
+msgstr "Výchozí"
+
+#:
+msgid "Images"
+msgstr "Obrázky"
+
+#:
+msgid "Image"
+msgstr "Obrázek"
+
+#:
+msgid "IMAGES"
+msgstr "OBRÁZKY"
+
+#:
+msgid "Icon"
+msgstr "Ikona"
+
+#:
+msgid "No images defined"
+msgstr "Nejsou definovány žádné obrázky"
+
+#:
+msgid "Background"
+msgstr "Pozadí"
+
+#:
+msgid "Upload"
+msgstr "Upload"
+
+#:
+msgid "Image added"
+msgstr "Obrázek byl přidán"
+
+#:
+msgid "Cannot add image"
+msgstr "Nelze přidat obrázek"
+
+#:
+msgid "Image deleted"
+msgstr "Obrázek byl smazán"
+
+#:
+msgid "Cannot delete image"
+msgstr "Nelze smazat obrázek"
+
+#:
+msgid "Image updated"
+msgstr "Obrázek byl aktualizován"
+
+#:
+msgid "Cannot update image"
+msgstr "Nelze upravit obrázek"
+
+#:
+msgid "Other"
+msgstr "Další"
+
+#:
+msgid "Other parameters"
+msgstr "Další parametry"
+
+#:
+msgid "Refresh unsupported items (in sec)"
+msgstr "Aktualizovat nepodporované položky každých (sekund)"
+
+#:
+msgid "Create Media Type"
+msgstr "Vytvořit typ média"
+
+#:
+msgid "Create Image"
+msgstr "Vytvořit obrázek"
+
+#:
+msgid "Working time"
+msgstr "Pracovní doba"
+
+#:
+msgid "User group for database down message"
+msgstr "Skupina uživatelů pro zprávy o nefunkční databázi"
+
+#:
+msgid "Incorrect group"
+msgstr "Neplatná skupina"
+
+#:
+msgid "Nothing to do"
+msgstr "Není co dělat"
+
+#:
+msgid "Incorrect work period"
+msgstr "Neplatná pracovní doba"
+
+#:
+msgid "Regular expressions"
+msgstr "Regulární výrazy"
+
+#:
+msgid "Regular expression"
+msgstr "Regulární výraz"
+
+#:
+msgid "Expressions"
+msgstr "Výrazy"
+
+#:
+msgid "Expression"
+msgstr "Výraz"
+
+#:
+msgid "Expected result"
+msgstr "Očekávaný výsledek"
+
+#:
+msgid "Character string included"
+msgstr "Obsahuje řetězec"
+
+#:
+msgid "Any character string included"
+msgstr "Obsahuje alespoň jeden z řetězců"
+
+#:
+msgid "Character string not included"
+msgstr "Neobsahuje řetězec"
+
+#:
+msgid "Result is TRUE"
+msgstr "Výsledek je PRAVDA"
+
+#:
+msgid "Result is FALSE"
+msgstr "Výsledek je NEPRAVDA"
+
+#:
+msgid "Expression type"
+msgstr "Typ výrazu"
+
+#:
+msgid "New expression"
+msgstr "Nový výraz"
+
+#:
+msgid "Case sensitive"
+msgstr "Rozlišovat velikost"
+
+#:
+msgid "Test"
+msgstr "Test"
+
+#:
+msgid "Delimiter"
+msgstr "Oddělovač"
+
+#:
+msgid "Test string"
+msgstr "Testovací řetězec"
+
+#:
+msgid "Incorrect expression"
+msgstr "Neplatný výraz"
+
+#:
+msgid "New regular expression"
+msgstr "Nový regulární výraz"
+
+#:
+msgid "Regular expression added"
+msgstr "Regulární výraz byl přidán"
+
+#:
+msgid "Cannot add regular expression"
+msgstr "Nelze přidat regulární výraz"
+
+#:
+msgid "Regular expression updated"
+msgstr "Regulární výraz byl aktualizován"
+
+#:
+msgid "Cannot update regular expression"
+msgstr "Nelze upravit regulární výraz"
+
+#:
+msgid "Regular expression deleted"
+msgstr "Regulární výraz byl smazán"
+
+#:
+msgid "Cannot delete regular expression"
+msgstr "Nelze smazat regulární výraz"
+
+#:
+msgid "Delete regular expression?"
+msgstr "Smazat regulární výraz?"
+
+#:
+msgid "Delete selected regular expressions?"
+msgstr "Smazat vybrané regulární výrazy?"
+
+#:
+msgid "Group for discovered hosts"
+msgstr "Skupina pro nalezené hostitele"
+
+#:
+msgid "Value maps are used to create a mapping between numeric values and string representations"
+msgstr "Mapy hodnot se používají k převedení číselných hodnot na text"
+
+#:
+msgid "Delete selected value mapping?"
+msgstr "Smazat vybranou mapu hodnot?"
+
+#:
+msgid "Delete selected media types?"
+msgstr "Smazat vybrané typy médií?"
+
+#:
+msgid "Your setup is not configured for distributed monitoring"
+msgstr "Váš systém není nastavený pro distribuovaný monitoring"
+
+#:
+msgid "CONFIGURATION OF NODES"
+msgstr "NASTAVENÍ UZLŮ"
+
+#:
+msgid "DM"
+msgstr "DM"
+
+#:
+msgid "Node"
+msgstr "Uzel"
+
+#:
+msgid "Nodes"
+msgstr "Uzly"
+
+#:
+msgid "NODES"
+msgstr "UZLY"
+
+#:
+msgid "New node"
+msgstr "Nový uzel"
+
+#:
+msgid "No nodes defined"
+msgstr "Nejsou definovány žádné uzly"
+
+#:
+msgid "All nodes"
+msgstr "Všechny uzly"
+
+#:
+msgid "Delete selected node?"
+msgstr "Smazat vybraný uzel?"
+
+#:
+msgid "Enable hosts monitored by selected proxies?"
+msgstr "Povolit hostitele sledované přes vybrané proxy?"
+
+#:
+msgid "Disable hosts monitored by selected proxies?"
+msgstr "Zakázat hostitele sledované přes vybrané proxy?"
+
+#:
+msgid "Delete selected proxies?"
+msgstr "Smazat vybrané proxy?"
+
+#:
+msgid "CONFIGURATION OF PROXIES"
+msgstr "NASTAVENÍ PROXY"
+
+#:
+msgid "Delete selected proxy?"
+msgstr "Smazat vybrané proxy?"
+
+#:
+msgid "Host count"
+msgstr "Počet hostitelů"
+
+#:
+msgid "Item count"
+msgstr "Počet položek"
+
+#:
+msgid "Required performance (vps)"
+msgstr "Požadovaný výkon (hodnoty/sekundu)"
+
+#:
+msgid "Proxy mode"
+msgstr "Mód proxy"
+
+#:
+msgid "Passive"
+msgstr "Pasivní"
+
+#:
+msgid "Active"
+msgstr "Aktivní"
+
+#:
+msgid "Authentication"
+msgstr "Autentizace"
+
+#:
+msgid "Authentication to Zabbix"
+msgstr "Autentizace pro ZABBIX"
+
+#:
+msgid "Base DN"
+msgstr "Base DN"
+
+#:
+msgid "Bind DN"
+msgstr "Bind DN"
+
+#:
+msgid "Bind Password"
+msgstr "Bind Password"
+
+#:
+msgid "Search attribute"
+msgstr "Hledaný atribut"
+
+#:
+msgid "was not"
+msgstr "nebylo"
+
+#:
+msgid "successful"
+msgstr "úspěšné"
+
+#:
+msgid "must be valid"
+msgstr "musí být platný"
+
+#:
+msgid "LDAP Authentication"
+msgstr "LDAP Autentizace"
+
+#:
+msgid "HTTP Authentication"
+msgstr "HTTP Autentizace"
+
+#:
+msgid "Zabbix Internal authentication"
+msgstr "Interní autentizace ZABBIXe"
+
+#:
+msgid "Default authentication"
+msgstr "Výchozí autentizace"
+
+#:
+msgid "Switching HTTP authentication will reset all current sessions! Continue?"
+msgstr "Změna v HTTP autentizaci vymaže všechny současné relace! Pokračovat?"
+
+#:
+msgid "Switching LDAP authentication will reset all current sessions! Continue?"
+msgstr "Změna v LDAP autentizaci vymaže všechny současné relace! Pokračovat?"
+
+#:
+msgid "No permissions !"
+msgstr "Nemáte oprávnění!"
+
+#:
+msgid "LATEST DATA"
+msgstr "POSLEDNÍ HODNOTY"
+
+#:
+msgid "All"
+msgstr "vše"
+
+#:
+msgid "all"
+msgstr "vše"
+
+#:
+msgid "- all -"
+msgstr "- vše -"
+
+#:
+msgid "- other -"
+msgstr "- ostatní -"
+
+#:
+msgid "not selected"
+msgstr "nevybráno"
+
+#:
+msgid "Graph"
+msgstr "Graf"
+
+#:
+msgid "Zabbix"
+msgstr "Zabbix"
+
+#:
+msgid "Copyright 2001-2010 by"
+msgstr "Copyright 2001-2010 "
+
+#:
+msgid "Connected as"
+msgstr "Přihlášený uživatel:"
+
+#:
+msgid "Not connected"
+msgstr "Nepřihlášený"
+
+#:
+msgid "SIA Zabbix"
+msgstr "SIA Zabbix"
+
+#:
+msgid "Graphs copied"
+msgstr "Grafy byly zkopírovány"
+
+#:
+msgid "Cannot copy graphs"
+msgstr "Nelze zkopírovat grafy"
+
+#:
+msgid "Item added"
+msgstr "Položka byla přidána"
+
+#:
+msgid "Item updated"
+msgstr "Položka byla aktualizována"
+
+#:
+msgid "Items updated"
+msgstr "Položky byly aktualizovány"
+
+#:
+msgid "Item does not exist"
+msgstr "Položka neexistuje"
+
+#:
+msgid "Sort by"
+msgstr "Řadit podle"
+
+#:
+msgid "Parameter"
+msgstr "Parametr"
+
+#:
+msgid "Colour"
+msgstr "Barva"
+
+#:
+msgid "Up"
+msgstr "Nahoru"
+
+#:
+msgid "Down"
+msgstr "Dolů"
+
+#:
+msgid "New item for the graph"
+msgstr "Nová položka grafu"
+
+#:
+msgid "Update item for the graph"
+msgstr "Aktualizovat položku grafu"
+
+#:
+msgid "Sort order (0->100)"
+msgstr "Řazení (0->100)"
+
+#:
+msgid "Y axis side"
+msgstr "Strana osy Y"
+
+#:
+msgid "Axis side"
+msgstr "Strana osy"
+
+#:
+msgid "Left"
+msgstr "vlevo"
+
+#:
+msgid "Function"
+msgstr "Funkce"
+
+#:
+msgid "min"
+msgstr "min"
+
+#:
+msgid "avg"
+msgstr "průměr"
+
+#:
+msgid "max"
+msgstr "max"
+
+#:
+msgid "last"
+msgstr "poslední"
+
+#:
+msgid "Draw style"
+msgstr "Styl vykreslení"
+
+#:
+msgid "Simple"
+msgstr "Jednoduchý"
+
+#:
+msgid "Graph type"
+msgstr "Typ grafu"
+
+#:
+msgid "Stacked"
+msgstr "Skládaný"
+
+#:
+msgid "Normal"
+msgstr "Normální"
+
+#:
+msgid "Pie"
+msgstr "Koláčový"
+
+#:
+msgid "Exploded"
+msgstr "Rozdělený koláčový"
+
+#:
+msgid "Aggregated"
+msgstr "Skládaný"
+
+#:
+msgid "Aggregated periods count"
+msgstr "Počet složených období"
+
+#:
+msgid "add graph items first"
+msgstr "přidat nejdříve položky grafu"
+
+#:
+msgid "Title"
+msgstr "Titulek"
+
+#:
+msgid "Percentile line"
+msgstr "Percentil"
+
+#:
+msgid "Configuration of graphs"
+msgstr "Nastavení grafů"
+
+#:
+msgid "CONFIGURATION OF GRAPHS"
+msgstr "NASTAVENÍ GRAFŮ"
+
+#:
+msgid "Graph added"
+msgstr "Graf byl přidán"
+
+#:
+msgid "Graph updated"
+msgstr "Graf byl aktualizován"
+
+#:
+msgid "Cannot update graph"
+msgstr "Nelze upravit graf"
+
+#:
+msgid "Graph deleted"
+msgstr "Graf byl smazán"
+
+#:
+msgid "Cannot delete graph"
+msgstr "Nelze smazat graf"
+
+#:
+msgid "Graphs deleted"
+msgstr "Grafy byly smazány"
+
+#:
+msgid "Cannot delete graphs"
+msgstr "Nelze smazat grafy"
+
+#:
+msgid "Cannot add graph"
+msgstr "Nelze přidat graf"
+
+#:
+msgid "Cannot add more than one item with type \"Graph sum\""
+msgstr "Nelze přidat další položku typu \"souhrn grafu\""
+
+#:
+msgid "Id"
+msgstr "Id"
+
+#:
+msgid "No graphs defined"
+msgstr "Nejsou definovány žádné grafy"
+
+#:
+msgid "No graph defined"
+msgstr "Není definován žádný graf"
+
+#:
+msgid "Delete graph?"
+msgstr "Smazat graf?"
+
+#:
+msgid "Y axis MIN value"
+msgstr "Minimální hodnota na ose Y"
+
+#:
+msgid "Y axis MAX value"
+msgstr "Maximální hodnota na ose Y"
+
+#:
+msgid "Calculated"
+msgstr "Vypočítaná"
+
+#:
+msgid "Fixed"
+msgstr "Pevná"
+
+#:
+msgid "Create Graph"
+msgstr "Vytvořit graf"
+
+#:
+msgid "Show working time"
+msgstr "Zobrazit praconí dobu"
+
+#:
+msgid "Show triggers"
+msgstr "Zobrazit spouštěče"
+
+#:
+msgid "3D view"
+msgstr "3D pohled"
+
+#:
+msgid "Legend"
+msgstr "Legenda"
+
+#:
+msgid "Show legend"
+msgstr "Zobrazit legendu"
+
+#:
+msgid "Graph sum"
+msgstr "Souhrn grafu"
+
+#:
+msgid "Graph item"
+msgstr "Položka grafu"
+
+#:
+msgid "Items required for graph"
+msgstr "Graf musí obsahovat alespoň jednu položku"
+
+#:
+msgid "Templated graph"
+msgstr "Graf ze šablony"
+
+#:
+msgid "No target selected"
+msgstr "Není vybrán cíl"
+
+#:
+msgid "Delete selected graphs?"
+msgstr "Smazat vybrané grafy?"
+
+#:
+msgid "seconds"
+msgstr "sekund"
+
+#:
+msgid "sec"
+msgstr "sec"
+
+#:
+msgid "Select rows with value like"
+msgstr "Vybrat řádky s hodnotou jako"
+
+#:
+msgid "Last hour graph"
+msgstr "Graf za poslední hodinu"
+
+#:
+msgid "Last week graph"
+msgstr "Graf za minulý týden"
+
+#:
+msgid "Last month graph"
+msgstr "Graf za poslední měsíc"
+
+#:
+msgid "500 latest values"
+msgstr "500 posledních hodnot"
+
+#:
+msgid "Timestamp"
+msgstr "Časové razítko"
+
+#:
+msgid "Local"
+msgstr "Místní"
+
+#:
+msgid "Source"
+msgstr "Zdroj"
+
+#:
+msgid "Event ID"
+msgstr "ID události"
+
+#:
+msgid "log files"
+msgstr "logovací soubory"
+
+#:
+msgid "Remove selected"
+msgstr "Odstranit vybrané"
+
+#:
+msgid "Items list"
+msgstr "Seznam položek"
+
+#:
+msgid "Show selected"
+msgstr "Zobrazit vybrané"
+
+#:
+msgid "Hide selected"
+msgstr "Skrýt vybrané"
+
+#:
+msgid "Mark selected"
+msgstr "Označit vybrané"
+
+#:
+msgid "Mark others"
+msgstr "Označit ostatní"
+
+#:
+msgid "as Red"
+msgstr "červeně"
+
+#:
+msgid "as Green"
+msgstr "zeleně"
+
+#:
+msgid "as Blue"
+msgstr "modře"
+
+#:
+msgid "Failure Audit"
+msgstr "Neúspěšný audit"
+
+#:
+msgid "Success Audit"
+msgstr "Úspěšný audit"
+
+#:
+msgid "[Y.M.d H:i:s]"
+msgstr "[j. M Y G:i:s]"
+
+#:
+msgid "Y-m-d H:i:s"
+msgstr "Y-m-d H:i:s"
+
+#:
+msgid "Maintenance"
+msgstr "Servisní okna"
+
+#:
+msgid "Maintenance added"
+msgstr "Servisní okno bylo přidáno"
+
+#:
+msgid "Maintenance updated"
+msgstr "Servisní okno bylo aktualizováno"
+
+#:
+msgid "Maintenance deleted"
+msgstr "Servisní okno bylo smazáno"
+
+#:
+msgid "Delete selected maintenance periods?"
+msgstr "Smazat vybraná servisní okna?"
+
+#:
+msgid "In maintenance"
+msgstr "Probíhá údržba"
+
+#:
+msgid "Hosts in maintenance"
+msgstr "Hostitelé v servisním okně"
+
+#:
+msgid "Groups in maintenance"
+msgstr "Skupiny v servisním okně"
+
+#:
+msgid "Cannot add maintenance"
+msgstr "Nelze přidat servisní okno"
+
+#:
+msgid "Cannot update maintenance"
+msgstr "Nelze upravit servisní okno"
+
+#:
+msgid "Cannot delete maintenance"
+msgstr "Nelze smazat servisní okno"
+
+#:
+msgid "Maintenance period length"
+msgstr "Délka servisního okna"
+
+#:
+msgid "Maintenance periods"
+msgstr "Servisní okna"
+
+#:
+msgid "MAINTENANCE PERIODS"
+msgstr "SERVISNÍ OKNA"
+
+#:
+msgid "New maintenance period"
+msgstr "Nové servisní okno"
+
+#:
+msgid "Edit maintenance period"
+msgstr "Upravit servisní okno"
+
+#:
+msgid "Create maintenance period"
+msgstr "Vytvořit servisní okno"
+
+#:
+msgid "Maintenance type"
+msgstr "Typ servisního okna"
+
+#:
+msgid "Expired"
+msgstr "Vypršelo"
+
+#:
+msgid "Approach"
+msgstr "Blíží se"
+
+#:
+msgid "With data collection"
+msgstr "se sběrem dat"
+
+#:
+msgid "No data collection"
+msgstr "bez sběru dat"
+
+#:
+msgid "Normal maintenance"
+msgstr "Normální servisní okno"
+
+#:
+msgid "No data maintenance"
+msgstr "Servisní okno bez sběru dat"
+
+#:
+msgid "Delete maintenance period?"
+msgstr "Smazat servisní okno?"
+
+#:
+msgid "Active since"
+msgstr "Aktivní od"
+
+#:
+msgid "Active till"
+msgstr "Aktivní do"
+
+#:
+msgid "Period type"
+msgstr "Opakování"
+
+#:
+msgid "Schedule"
+msgstr "Termín"
+
+#:
+msgid "Next run"
+msgstr "Next run"
+
+#:
+msgid "Date"
+msgstr "Datum"
+
+#:
+msgid "One time only"
+msgstr "pouze jednou"
+
+#:
+msgid "Day of week"
+msgstr "Den v týdnu"
+
+#:
+msgid "Day of month"
+msgstr "Den v měsíci"
+
+#:
+msgid "Every day(s)"
+msgstr "Perioda dní"
+
+#:
+msgid "Every week(s)"
+msgstr "Perioda týdnů"
+
+#:
+msgid "First"
+msgstr "první"
+
+#:
+msgid "Second"
+msgstr "druhý"
+
+#:
+msgid "Third"
+msgstr "třetí"
+
+#:
+msgid "Fourth"
+msgstr "čtvrtý"
+
+#:
+msgid "At"
+msgstr "V"
+
+#:
+msgid "Incorrect maintenance period"
+msgstr "Neplatná doba trvání servisu"
+
+#:
+msgid "Incorrect maintenance date"
+msgstr "Neplatné datum servisu"
+
+#:
+msgid "Incorrect maintenance day period"
+msgstr "Neplatná perioda dní servisu"
+
+#:
+msgid "Incorrect maintenance week period"
+msgstr "Neplatná perioda týdnů servisu"
+
+#:
+msgid "Incorrect maintenance month period"
+msgstr "Neplatná perioda měsíců servisu"
+
+#:
+msgid "Incorrect maintenance days of week"
+msgstr "Neplatný den v týdnu servisu"
+
+#:
+msgid "CONFIGURATION OF HOST GROUPS"
+msgstr "NASTAVENÍ SKUPIN HOSTITELŮ"
+
+#:
+msgid "Delete selected group?"
+msgstr "Smazat vybranou skupinu?"
+
+#:
+msgid "Enable selected Host Groups?"
+msgstr "Povolit vybrané skupiny hostitelů?"
+
+#:
+msgid "Disable selected Host Groups?"
+msgstr "Zakázat vybrané skupiny hostitelů?"
+
+#:
+msgid "Delete selected Host Groups?"
+msgstr "Smazat vybranou skupinu hostitelů?"
+
+#:
+msgid "Delete selected groups"
+msgstr "Smazat vybrané skupiny"
+
+#:
+msgid "Import Template"
+msgstr "Importovat šablonu"
+
+#:
+msgid "Import Host"
+msgstr "Importovat hostitele"
+
+#:
+msgid "Macros"
+msgstr "Makra"
+
+#:
+msgid "Macro"
+msgstr "Makro"
+
+#:
+msgid "Wrong macro"
+msgstr "Neplatné makro"
+
+#:
+msgid "Macro name is too long, should not exceed 64 chars."
+msgstr "Název makra je příliš dlouhý, mesmí přesáhnout 64 znaků."
+
+#:
+msgid "Macro value is too long, should not exceed 255 chars."
+msgstr "Hodnota makra je příliš dlouhá, nesmí přesáhnout 255 znaků."
+
+#:
+msgid "Macro already exists"
+msgstr "Makro již existuje"
+
+#:
+msgid "New macro"
+msgstr "Nové makro"
+
+#:
+msgid "Empty macro value"
+msgstr "Prázdná hodnota makra"
+
+#:
+msgid "No macros defined"
+msgstr "Nejsou definována žádná makra"
+
+#:
+msgid "Macro added"
+msgstr "Makro bylo přidáno"
+
+#:
+msgid "Macros updated"
+msgstr "Makra byla aktualizována"
+
+#:
+msgid "Cannot update macros"
+msgstr "Nelze upravit makra"
+
+#:
+msgid "Macros deleted"
+msgstr "Makro bylo smazáno"
+
+#:
+msgid "Cannot add macro"
+msgstr "Nelze přidat makro"
+
+#:
+msgid "Cannot delete macros"
+msgstr "Nelze smazat makra"
+
+#:
+msgid "Hosts list"
+msgstr "Seznam hostitelů"
+
+#:
+msgid "Other groups"
+msgstr "Další skupiny"
+
+#:
+msgid "In groups"
+msgstr "Ve skupinách"
+
+#:
+msgid "In"
+msgstr "V"
+
+#:
+msgid "Application"
+msgstr "Aplikace"
+
+#:
+msgid "Applications"
+msgstr "Aplikace"
+
+#:
+msgid "APPLICATIONS"
+msgstr "APLIKACE"
+
+#:
+msgid "Create application"
+msgstr "Vytvořit aplikaci"
+
+#:
+msgid "Application updated"
+msgstr "Aplikace byla aktualizována"
+
+#:
+msgid "Cannot update application"
+msgstr "Nelze upravit aplikaci"
+
+#:
+msgid "Application added"
+msgstr "Aplikace byla přidána"
+
+#:
+msgid "Cannot add application"
+msgstr "Nelze přidat aplikaci"
+
+#:
+msgid "Application deleted"
+msgstr "Aplikace byla smazána"
+
+#:
+msgid "Cannot delete application"
+msgstr "Nelze smazat aplikaci"
+
+#:
+msgid "No applications defined"
+msgstr "Nejsou definovány žádné aplikace"
+
+#:
+msgid "No templates linked"
+msgstr "Nejsou připojeny žádné šablony"
+
+#:
+msgid "Hosts"
+msgstr "Hostitelé"
+
+#:
+msgid "Items"
+msgstr "Položky"
+
+#:
+msgid "ITEMS"
+msgstr "POLOŽKY"
+
+#:
+msgid "Triggers"
+msgstr "Spouštěče"
+
+#:
+msgid "Graphs"
+msgstr "Grafy"
+
+#:
+msgid "Host added"
+msgstr "Hostitel byl přidán"
+
+#:
+msgid "Cannot add host"
+msgstr "Nelze přidat hostitele"
+
+#:
+msgid "Items copied"
+msgstr "Položky byly zkopírovány"
+
+#:
+msgid "Cannot copy items"
+msgstr "Nelze zkopírovat položky"
+
+#:
+msgid "Host updated"
+msgstr "Hostitel byl aktualizován"
+
+#:
+msgid "Cannot update host"
+msgstr "Nelze upravit hostitele"
+
+#:
+msgid "Cannot update"
+msgstr "Nelze upravit"
+
+#:
+msgid "Host status updated"
+msgstr "Stav hostitele byl aktualizován"
+
+#:
+msgid "Cannot update host status"
+msgstr "Nelze upravit stav hostitele"
+
+#:
+msgid "Host deleted"
+msgstr "Hostitel byl smazán"
+
+#:
+msgid "Cannot delete host"
+msgstr "Nelze smazat hostitele"
+
+#:
+msgid "CONFIGURATION OF HOSTS"
+msgstr "NASTAVENÍ HOSTITELŮ"
+
+#:
+msgid "CONFIGURATION OF TEMPLATES"
+msgstr "NASTAVENÍ ŠABLON"
+
+#:
+msgid "CONFIGURATION OF APPLICATIONS"
+msgstr "NASTAVENÍ APLIKACÍ"
+
+#:
+msgid "CONFIGURATION OF MAINTENANCE PERIODS"
+msgstr "NASTAVENÍ SERVISNÍCH OKEN"
+
+#:
+msgid "HOST GROUPS"
+msgstr "SKUPINY HOSTITELE"
+
+#:
+msgid "No host groups defined"
+msgstr "Nejsou definovány žádné skupiny hostitelů"
+
+#:
+msgid "No hosts defined"
+msgstr "Nejsou definovaní žádní hostitelé"
+
+#:
+msgid "No templates defined"
+msgstr "Nejsou definovány žádné šablony"
+
+#:
+msgid "No proxies defined"
+msgstr "Nejsou definovány žádné proxy"
+
+#:
+msgid "HOSTS"
+msgstr "HOSTITELÉ"
+
+#:
+msgid "Host"
+msgstr "Hostitel"
+
+#:
+msgid "Connect to"
+msgstr "Připojit k"
+
+#:
+msgid "DNS"
+msgstr "DNS"
+
+#:
+msgid "IP"
+msgstr "IP"
+
+#:
+msgid "Port"
+msgstr "Port"
+
+#:
+msgid "Zabbix agent port"
+msgstr "Zabbix agent port"
+
+#:
+msgid "Monitored"
+msgstr "Sledován"
+
+#:
+msgid "Not monitored"
+msgstr "Nesledován"
+
+#:
+msgid "Template"
+msgstr "Šablona"
+
+#:
+msgid "Deleted"
+msgstr "Deleted"
+
+#:
+msgid "Unknown"
+msgstr "Neznámý"
+
+#:
+msgid "Groups"
+msgstr "Skupiny"
+
+#:
+msgid " - all groups - "
+msgstr " - všechny skupiny - "
+
+#:
+msgid "All groups"
+msgstr "Všechny skupiny"
+
+#:
+msgid "No groups defined"
+msgstr "Nejsou definovány žádné skupiny"
+
+#:
+msgid "New group"
+msgstr "Nová skupina"
+
+#:
+msgid "DNS name"
+msgstr "Jméno DNS"
+
+#:
+msgid "IP address"
+msgstr "IP adresa"
+
+#:
+msgid "Link additional templates"
+msgstr "Připojit další šablony"
+
+#:
+msgid "Replace linked templates"
+msgstr "Nahradit propojené šablony"
+
+#:
+msgid "Use IPMI"
+msgstr "Použít IPMI"
+
+#:
+msgid "IPMI IP address"
+msgstr "IPMI IP adresa"
+
+#:
+msgid "IPMI port"
+msgstr "IPMI port"
+
+#:
+msgid "IPMI authentication algorithm"
+msgstr "IPMI autentizační algoritmus"
+
+#:
+msgid "None"
+msgstr "Žádná"
+
+#:
+msgid "MD2"
+msgstr "MD2"
+
+#:
+msgid "MD5"
+msgstr "MD5"
+
+#:
+msgid "Straight"
+msgstr "Straight"
+
+#:
+msgid "OEM"
+msgstr "OEM"
+
+#:
+msgid "RMCP+"
+msgstr "RMCP+"
+
+#:
+msgid "IPMI privilege level"
+msgstr "IPMI úroveň oprávnění"
+
+#:
+msgid "Callback"
+msgstr "callback"
+
+#:
+msgid "Operator"
+msgstr "operator"
+
+#:
+msgid "Admin"
+msgstr "admin"
+
+#:
+msgid "IPMI username"
+msgstr "IPMI uživatelské jméno"
+
+#:
+msgid "IPMI password"
+msgstr "IPMI heslo"
+
+#:
+msgid "Use profile"
+msgstr "Použít profil"
+
+#:
+msgid "Delete selected host?"
+msgstr "Smazat vybraného hostitele?"
+
+#:
+msgid "Delete selected with linked elements"
+msgstr "Smazat vybrané včetně připojených položek"
+
+#:
+msgid "Group name"
+msgstr "Název skupiny"
+
+#:
+msgid "Host group"
+msgstr "Skupina hostitele"
+
+#:
+msgid "Host groups"
+msgstr "Skupina hostitelů"
+
+#:
+msgid "Update"
+msgstr "Aktualizovat"
+
+#:
+msgid "Availability"
+msgstr "Dostupnost"
+
+#:
+msgid "Available"
+msgstr "Dostupný"
+
+#:
+msgid "Not available"
+msgstr "Nedostupný"
+
+#:
+msgid "Proxies"
+msgstr "Proxy"
+
+#:
+msgid "PROXIES"
+msgstr "PROXY"
+
+#:
+msgid "Proxy"
+msgstr "Proxy"
+
+#:
+msgid "Create Proxy"
+msgstr "Vytvořit proxy"
+
+#:
+msgid "Proxy name"
+msgstr "Název proxy"
+
+#:
+msgid "Last seen (age)"
+msgstr "Poslední kontakt (stáří)"
+
+#:
+msgid "Host macro"
+msgstr "Hostitelovo makro"
+
+#:
+msgid "doesn't exist"
+msgstr "neexistuje"
+
+#:
+msgid "Enable selected hosts?"
+msgstr "Povolit vybrané hostitele?"
+
+#:
+msgid "Disable selected hosts?"
+msgstr "Zakázat vybrané hostitele?"
+
+#:
+msgid "Delete selected hosts?"
+msgstr "Smazat vybrané hostitele?"
+
+#:
+msgid "Updated status of host"
+msgstr "Aktualizován stav hostitele"
+
+#:
+msgid "Clear when unlinking"
+msgstr "Pročistit při odpojování"
+
+#:
+msgid "Templates list"
+msgstr "Seznam šablon"
+
+#:
+msgid "New template added"
+msgstr "Šablona byla přidána"
+
+#:
+msgid "Cannot add template"
+msgstr "Nelze přidat šablonu"
+
+#:
+msgid "Template updated"
+msgstr "Šablona byla aktualizována"
+
+#:
+msgid "Cannot update template"
+msgstr "Nelze upravit šablonu"
+
+#:
+msgid "Linked templates"
+msgstr "Připojené šablony"
+
+#:
+msgid "Linked to"
+msgstr "Připojené k"
+
+#:
+msgid "Template deleted"
+msgstr "Šablona byla smazána"
+
+#:
+msgid "Cannot delete template"
+msgstr "Nelze smazat šablonu"
+
+#:
+msgid "Link with template"
+msgstr "Připojit šablonu"
+
+#:
+msgid "Delete and clear"
+msgstr "Smazat a pročistit"
+
+#:
+msgid "Delete selected templates?"
+msgstr "Smazat vybrané šablony?"
+
+#:
+msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
+msgstr "Upozornění: tímto smažete vybrané šablony a pročistíte všechny připojené hostitele"
+
+#:
+msgid "Host profile"
+msgstr "Profil hostitele"
+
+#:
+msgid "Device type"
+msgstr "Typ zařízení"
+
+#:
+msgid "OS"
+msgstr "OS"
+
+#:
+msgid "SerialNo"
+msgstr "Sériové číslo"
+
+#:
+msgid "Tag"
+msgstr "Označení"
+
+#:
+msgid "Hardware"
+msgstr "Hardware"
+
+#:
+msgid "Software"
+msgstr "Software"
+
+#:
+msgid "Contact"
+msgstr "Kontakt"
+
+#:
+msgid "Location"
+msgstr "Lokalita"
+
+#:
+msgid "Notes"
+msgstr "Poznámky"
+
+#:
+msgid "MAC Address"
+msgstr "MAC adresa"
+
+#:
+msgid "Add to group"
+msgstr "Přidat do skupiny"
+
+#:
+msgid "Delete from group"
+msgstr "Smazat ze skupiny"
+
+#:
+msgid "Update in group"
+msgstr "Aktualizovat ve skupině"
+
+#:
+msgid "Create Host"
+msgstr "Vytvořit hostitele"
+
+#:
+msgid "Create Template"
+msgstr "Vytvořit šablonu"
+
+#:
+msgid "Template linkage"
+msgstr "Propojení šablon"
+
+#:
+msgid "Templates"
+msgstr "Šablony"
+
+#:
+msgid "TEMPLATES"
+msgstr "ŠABLONY"
+
+#:
+msgid "Unlink"
+msgstr "Odpojit"
+
+#:
+msgid "Cannot unlink template"
+msgstr "Nelze odpojit šablonu"
+
+#:
+msgid "Cannot link template"
+msgstr "Nelze připojit šablonu"
+
+#:
+msgid "Unlink and clear"
+msgstr "Odpojit a pročistit"
+
+#:
+msgid "Monitored by proxy"
+msgstr "Sledován přes proxy"
+
+#:
+msgid "Use extended profile"
+msgstr "Použít rozšířený profil"
+
+#:
+msgid "Alias"
+msgstr "Alias"
+
+#:
+msgid "Device Chassis"
+msgstr "Typ skříně"
+
+#:
+msgid "OS (Full Details)"
+msgstr "OS (podrobně)"
+
+#:
+msgid "OS (Short)"
+msgstr "OS (krátce)"
+
+#:
+msgid "HW Architecture"
+msgstr "HW Architektura"
+
+#:
+msgid "Serial Number"
+msgstr "Sériové číslo"
+
+#:
+msgid "Model Number"
+msgstr "Model zařízení"
+
+#:
+msgid "Asset Tag"
+msgstr "Označení majetku"
+
+#:
+msgid "Device Vendor"
+msgstr "Dodavatel zařízení"
+
+#:
+msgid "Device Contract Number"
+msgstr "Číslo smlouvy"
+
+#:
+msgid "Installer Name"
+msgstr "Jméno technika"
+
+#:
+msgid "Device Deployment Status"
+msgstr "Stav uvedení do provozu"
+
+#:
+msgid "Software Application #1"
+msgstr "Software 1"
+
+#:
+msgid "Software Application #2"
+msgstr "Software 2"
+
+#:
+msgid "Software Application #3"
+msgstr "Software 3"
+
+#:
+msgid "Software Application #4"
+msgstr "Software 4"
+
+#:
+msgid "Software Application #5"
+msgstr "Software 5"
+
+#:
+msgid "URL #1"
+msgstr "URL 1"
+
+#:
+msgid "URL #2"
+msgstr "URL 2"
+
+#:
+msgid "URL #3"
+msgstr "URL 3"
+
+#:
+msgid "Device Port Connections"
+msgstr "Síťová připojení"
+
+#:
+msgid "Device Notes"
+msgstr "Poznámky k zařízení"
+
+#:
+msgid "Device Hardware"
+msgstr "Hardware zařízení"
+
+#:
+msgid "Device Software"
+msgstr "Software zařízení"
+
+#:
+msgid "Host Subnet Mask"
+msgstr "Síťová maska hostitele"
+
+#:
+msgid "Host Router"
+msgstr "Router hostitele"
+
+#:
+msgid "Host MAC Address"
+msgstr "MAC adresa hostitele"
+
+#:
+msgid "OOB IP Address"
+msgstr "Dálkový přístup - IP adresa"
+
+#:
+msgid "OOB Subnet Mask"
+msgstr "Dálkový přístup - maska sítě"
+
+#:
+msgid "OOB Router"
+msgstr "Dálkový přístup - router"
+
+#:
+msgid "Date HW Purchased"
+msgstr "Datum zakoupení"
+
+#:
+msgid "Date HW Installed"
+msgstr "Datum instalace"
+
+#:
+msgid "Date HW Maintenance Expires"
+msgstr "Datum ukončení záruční doby"
+
+#:
+msgid "Date HW Decommissioned"
+msgstr "Datum vyřazení z provozu"
+
+#:
+msgid "Site Address 1"
+msgstr "Umístění - adresa 1"
+
+#:
+msgid "Site Address 2"
+msgstr "Umístění - adresa 2"
+
+#:
+msgid "Site Address 3"
+msgstr "Umístění - adresa 3"
+
+#:
+msgid "Site City"
+msgstr "Umístění - město"
+
+#:
+msgid "Site State / Province"
+msgstr "Umístění - stát / okres"
+
+#:
+msgid "Site Country"
+msgstr "Umístění - země"
+
+#:
+msgid "Site Zip / Postal"
+msgstr "Umístění - PSČ"
+
+#:
+msgid "Site Rack Location"
+msgstr "Umístění - označení rozvaděče"
+
+#:
+msgid "Site Notes"
+msgstr "Umístění - poznámky"
+
+#:
+msgid "Primary POC Name"
+msgstr "1. kontakt - jméno"
+
+#:
+msgid "Primary POC Email"
+msgstr "1. kontakt - e-mail"
+
+#:
+msgid "Primary POC Phone 1"
+msgstr "1. kontakt - telefon 1"
+
+#:
+msgid "Primary POC Phone 2"
+msgstr "1. kontakt - telefon 2"
+
+#:
+msgid "Primary POC Cell"
+msgstr "1. kontakt - mobil"
+
+#:
+msgid "Primary POC Screen Name"
+msgstr "1. kontakt - přezdívka"
+
+#:
+msgid "Primary POC Comments"
+msgstr "1. kontakt - poznámky"
+
+#:
+msgid "Secondary POC Name"
+msgstr "2. kontakt - jméno"
+
+#:
+msgid "Secondary POC Email"
+msgstr "2. kontakt - e-mail"
+
+#:
+msgid "Secondary POC Phone 1"
+msgstr "2. kontakt - telefon 1"
+
+#:
+msgid "Secondary POC Phone 2"
+msgstr "2. kontakt - telefon 2"
+
+#:
+msgid "Secondary POC Cell"
+msgstr "2. kontakt - mobil"
+
+#:
+msgid "Secondary POC Screen Name"
+msgstr "2. kontakt - přezdívka"
+
+#:
+msgid "Secondary POC Comments"
+msgstr "2. kontakt - poznámky"
+
+#:
+msgid "Templated items"
+msgstr "Položky ze šablony"
+
+#:
+msgid "Not Templated items"
+msgstr "Položky bez šablony"
+
+#:
+msgid "With triggers"
+msgstr "Se spouštěči"
+
+#:
+msgid "Without triggers"
+msgstr "Bez spouštěčů"
+
+#:
+msgid "Types"
+msgstr "Typy"
+
+#:
+msgid "No items defined"
+msgstr "Nejsou definovány žádné položky"
+
+#:
+msgid "No item defined"
+msgstr "Není definována žádná položka"
+
+#:
+msgid "History cleared"
+msgstr "Historie byla pročištěna"
+
+#:
+msgid "Clear history for selected"
+msgstr "Pročistit historii vybraných"
+
+#:
+msgid "Clear history"
+msgstr "Pročistit historii"
+
+#:
+msgid "Cannot clear history"
+msgstr "Nelze pročistit historii"
+
+#:
+msgid "Configuration of items"
+msgstr "Nastavení položek"
+
+#:
+msgid "CONFIGURATION OF ITEMS"
+msgstr "NASTAVENÍ POLOŽEK"
+
+#:
+msgid "Cannot update item"
+msgstr "Nelze upravit položku"
+
+#:
+msgid "Status updated"
+msgstr "Stav byl aktualizován"
+
+#:
+msgid "Cannot update status"
+msgstr "Nelze upravit stav"
+
+#:
+msgid "Cannot add item"
+msgstr "Nelze přidat položku"
+
+#:
+msgid "Item deleted"
+msgstr "Položka byla smazána"
+
+#:
+msgid "Cannot delete item"
+msgstr "Nelze smazat položku"
+
+#:
+msgid "Items deleted"
+msgstr "Položky byly smazány"
+
+#:
+msgid "Cannot delete items"
+msgstr "Nelze smazat položky"
+
+#:
+msgid "Items activated"
+msgstr "Položky byly povoleny"
+
+#:
+msgid "Items disabled"
+msgstr "Položky byly zakázány"
+
+#:
+msgid "Key"
+msgstr "Klíč"
+
+#:
+msgid "Description"
+msgstr "Popis"
+
+#:
+msgid "Update interval"
+msgstr "Interval aktualizací"
+
+#:
+msgid "Interval"
+msgstr "Interval"
+
+#:
+msgid "History"
+msgstr "Historie"
+
+#:
+msgid "Trends"
+msgstr "Trendy"
+
+#:
+msgid "Zabbix agent"
+msgstr "ZABBIX agent"
+
+#:
+msgid "Zabbix agent (active)"
+msgstr "ZABBIX agent (aktivní)"
+
+#:
+msgid "SNMPv1 agent"
+msgstr "SNMPv1 agent"
+
+#:
+msgid "Zabbix trapper"
+msgstr "Zabbix zachytávač"
+
+#:
+msgid "Simple check"
+msgstr "Jednoduchá kontrola"
+
+#:
+msgid "SNMPv2 agent"
+msgstr "SNMPv2 agent"
+
+#:
+msgid "SNMPv3 agent"
+msgstr "SNMPv3 agent"
+
+#:
+msgid "Zabbix internal"
+msgstr "Zabbix vnitřní proměnné"
+
+#:
+msgid "Database monitor"
+msgstr "Monitor databáze"
+
+#:
+msgid "IPMI agent"
+msgstr "IPMI agent"
+
+#:
+msgid "SSH agent"
+msgstr "SSH agent"
+
+#:
+msgid "TELNET agent"
+msgstr "TELNET agent"
+
+#:
+msgid "Zabbix aggregate"
+msgstr "Zabbix souhrny"
+
+#:
+msgid "External check"
+msgstr "Vnější kontrola"
+
+#:
+msgid "Web monitoring"
+msgstr "Sledování webů"
+
+#:
+msgid "WEB CHECKS"
+msgstr "SLEDOVÁNÍ WEBŮ"
+
+#:
+msgid "Not supported"
+msgstr "Nepodporováno"
+
+#:
+msgid "Email"
+msgstr "E-mail"
+
+#:
+msgid "Jabber"
+msgstr "Jabber"
+
+#:
+msgid "Jabber identifier"
+msgstr "Jabber účet"
+
+#:
+msgid "SMS"
+msgstr "SMS"
+
+#:
+msgid "Script"
+msgstr "Skript"
+
+#:
+msgid "GSM modem"
+msgstr "GSM modem"
+
+#:
+msgid "Units"
+msgstr "Jednotky"
+
+#:
+msgid "Update interval (in sec)"
+msgstr "Interval aktualizace [s]"
+
+#:
+msgid "Keep history (in days)"
+msgstr "Ponechat historii [dny]"
+
+#:
+msgid "Keep trends (in days)"
+msgstr "Ponechat trendy [dny]"
+
+#:
+msgid "Type of information"
+msgstr "Typ informace"
+
+#:
+msgid "Data type"
+msgstr "Datový typ"
+
+#:
+msgid "Decimal"
+msgstr "Desítkový"
+
+#:
+msgid "Octal"
+msgstr "Osmičkový"
+
+#:
+msgid "Hexadecimal"
+msgstr "Šestnáctkový"
+
+#:
+msgid "Store value"
+msgstr "Uložit hodnotu"
+
+#:
+msgid "Show value"
+msgstr "Ukázat hodnotu"
+
+#:
+msgid "Numeric (integer 64bit)"
+msgstr "Číslo (integer 64bit)"
+
+#:
+msgid "Numeric (unsigned)"
+msgstr "Číslo (unsigned)"
+
+#:
+msgid "Numeric (float)"
+msgstr "Číslo (float)"
+
+#:
+msgid "Character"
+msgstr "Znak"
+
+#:
+msgid "Log"
+msgstr "Log"
+
+#:
+msgid "Text"
+msgstr "Text"
+
+#:
+msgid "As is"
+msgstr "Ponechat stejné"
+
+#:
+msgid "Delta (speed per second)"
+msgstr "Rozdíl (rychlost za sekundu)"
+
+#:
+msgid "Delta (simple change)"
+msgstr "Rozdíl (změna)"
+
+#:
+msgid "Item"
+msgstr "Položka"
+
+#:
+msgid "SNMP community"
+msgstr "SNMP community"
+
+#:
+msgid "SNMP OID"
+msgstr "SNMP OID"
+
+#:
+msgid "SNMP port"
+msgstr "SNMP port"
+
+#:
+msgid "Allowed hosts"
+msgstr "Povolení hostitelé"
+
+#:
+msgid "SNMPv3 security name"
+msgstr "SNMPv3 security name"
+
+#:
+msgid "SNMPv3 security level"
+msgstr "SNMPv3 úroveň zabezpečení"
+
+#:
+msgid "SNMPv3 auth passphrase"
+msgstr "SNMPv3 auth passphrase"
+
+#:
+msgid "SNMPv3 priv passphrase"
+msgstr "SNMPv3 priv passphrase"
+
+#:
+msgid "Custom multiplier"
+msgstr "Vlastní multiplikátor"
+
+#:
+msgid "Use custom multiplier"
+msgstr "Použít vlastní multiplikátor"
+
+#:
+msgid "Select host..."
+msgstr "Vybrat hostitele ..."
+
+#:
+msgid "Log time format"
+msgstr "Formát času pro logování"
+
+#:
+msgid "Create Item"
+msgstr "Vytvořit položku"
+
+#:
+msgid "elements copy to ..."
+msgstr "prvků kopírovat do ..."
+
+#:
+msgid "Mode"
+msgstr "Mód"
+
+#:
+msgid "Target"
+msgstr "Cíl"
+
+#:
+msgid "Target type"
+msgstr "Typ cíle"
+
+#:
+msgid "Skip existing items"
+msgstr "Přeskočit existující položky"
+
+#:
+msgid "update existing non linked items"
+msgstr "aktualizovat existující nepřipojené položky"
+
+#:
+msgid "Copy"
+msgstr "Kopírovat"
+
+#:
+msgid "Show items with description like"
+msgstr "Zobrazit položky s popisem"
+
+#:
+msgid "History clearing can take a long time. Continue?"
+msgstr "Pročištění historie může chvíli trvat. Pokračovat?"
+
+#:
+msgid "Mass update"
+msgstr "Hromadná aktualizace"
+
+#:
+msgid "Search"
+msgstr "Hledat"
+
+#:
+msgid "Original"
+msgstr "Původní"
+
+#:
+msgid "New flexible interval"
+msgstr "Nový proměnný interval"
+
+#:
+msgid "Flexible intervals (sec)"
+msgstr "Proměnné intervaly [s]"
+
+#:
+msgid "No flexible intervals"
+msgstr "Žádné proměnné intervaly"
+
+#:
+msgid "Additional parameters"
+msgstr "Další parametry"
+
+#:
+msgid "New application"
+msgstr "Nová aplikace"
+
+#:
+msgid "IPMI sensor"
+msgstr "IPMI senzor"
+
+#:
+msgid "Templated item"
+msgstr "Položka ze šablony"
+
+#:
+msgid "Web item"
+msgstr "položka webu"
+
+#:
+msgid "Executed script"
+msgstr "Vykonaný skript"
+
+#:
+msgid "User name"
+msgstr "Uživatelské jméno"
+
+#:
+msgid "Public key file"
+msgstr "Soubor s veřejným klíčem"
+
+#:
+msgid "Private key file"
+msgstr "Soubor se soukromým klíčem"
+
+#:
+msgid "Public key"
+msgstr "Veřejný klíč"
+
+#:
+msgid "Authentication method"
+msgstr "Autentizační metoda"
+
+#:
+msgid "Passphrase"
+msgstr "Heslo"
+
+#:
+msgid "Edit Trigger"
+msgstr "Upravit spouštěč"
+
+#:
+msgid "Enable selected items?"
+msgstr "Povolit vybrané položky?"
+
+#:
+msgid "Disable selected items?"
+msgstr "Zakázat vybrané položky?"
+
+#:
+msgid "Mass update selected items?"
+msgstr "Hromadně aktualizovat vybrané položky?"
+
+#:
+msgid "Copy selected items?"
+msgstr "Zkopírovat vybrané položky?"
+
+#:
+msgid "Delete history of selected items?"
+msgstr "Smazat historii vybraných položek?"
+
+#:
+msgid "Delete selected items?"
+msgstr "Smazat vybrané položky?"
+
+#:
+msgid "Formula"
+msgstr "Vzorec"
+
+#:
+msgid "Event"
+msgstr "Událost"
+
+#:
+msgid "Event details"
+msgstr "Detaily události"
+
+#:
+msgid "List"
+msgstr "Seznam"
+
+#:
+msgid "Latest events"
+msgstr "Poslední události"
+
+#:
+msgid "HISTORY OF EVENTS"
+msgstr "HISTORIE UDÁLOSTÍ"
+
+#:
+msgid "No events found"
+msgstr "Nenalezeny žádné události"
+
+#:
+msgid "Events since"
+msgstr "Události od"
+
+#:
+msgid "Last check"
+msgstr "Poslední kontrola"
+
+#:
+msgid "Last value"
+msgstr "Poslední hodnota"
+
+#:
+msgid "Hidden"
+msgstr "skryta"
+
+#:
+msgid "Shown"
+msgstr "zobrazena"
+
+#:
+msgid "Align icons"
+msgstr "zarovnat ikony"
+
+#:
+msgid "Upper level maps"
+msgstr "Upper level maps"
+
+#:
+msgid "Links"
+msgstr "Odkazy"
+
+#:
+msgid "Link"
+msgstr "Spojnice"
+
+#:
+msgid "Label"
+msgstr "Popisek"
+
+#:
+msgid "Grid"
+msgstr "Mřížka"
+
+#:
+msgid "X"
+msgstr "X"
+
+#:
+msgid "Icon (problem)"
+msgstr "Ikona (problém)"
+
+#:
+msgid "Icon (OK)"
+msgstr "Ikona (OK)"
+
+#:
+msgid "Icon (unknown)"
+msgstr "Ikona (neznámý)"
+
+#:
+msgid "Icon (maintenance)"
+msgstr "Ikona (údržba)"
+
+#:
+msgid "Icon (disabled)"
+msgstr "Ikona (zakázáno)"
+
+#:
+msgid "Link status indicator"
+msgstr "Ukazatel stavu spojnice"
+
+#:
+msgid "Configuration of network maps"
+msgstr "Nastavení síťových map"
+
+#:
+msgid "CONFIGURATION OF NETWORK MAPS"
+msgstr "NASTAVENÍ SÍŤOVÝCH MAP"
+
+#:
+msgid "Map is saved! Return?"
+msgstr "Mapa je uložená! Zpět na seznam?"
+
+#:
+msgid "Map save operation failed."
+msgstr "Ukládání mapy selhalo."
+
+#:
+msgid "Get Img: Element data not found!"
+msgstr "Get Img: data prvku nebyla nalezena!"
+
+#:
+msgid "Add element"
+msgstr "Přidat prvek"
+
+#:
+msgid "Coordinate X"
+msgstr "Souřadnice X"
+
+#:
+msgid "Coordinate Y"
+msgstr "Souřadnice Y"
+
+#:
+msgid "Connectors"
+msgstr "Spojnice"
+
+#:
+msgid "UNAVAILABLE"
+msgstr "NEDOSTUPNÝ"
+
+#:
+msgid "MAINTENANCE"
+msgstr "ÚDRŽBA"
+
+#:
+msgid "Edit map element"
+msgstr "Upravit prvek mapy"
+
+#:
+msgid "Icon (default)"
+msgstr "Ikona (výchozí)"
+
+#:
+msgid "Apply"
+msgstr "Použít"
+
+#:
+msgid "Map elements"
+msgstr "Prvky mapy"
+
+#:
+msgid "Network map deleted"
+msgstr "Síťová mapa byla smazána"
+
+#:
+msgid "Cannot delete network map"
+msgstr "Nelze smazat síťovou mapu"
+
+#:
+msgid "MAPS"
+msgstr "MAPY"
+
+#:
+msgid "No maps defined"
+msgstr "Nejsou definovány žádné mapy"
+
+#:
+msgid "Create Map"
+msgstr "Vytvořit mapu"
+
+#:
+msgid "Import Map"
+msgstr "Importovat mapu"
+
+#:
+msgid "Icon label location"
+msgstr "Umístění popisku ikony"
+
+#:
+msgid "Icon highlighting"
+msgstr "Zvýrazňování ikon"
+
+#:
+msgid "Link indicators"
+msgstr "Ukazatel stavu spojnice"
+
+#:
+msgid "Type (OK)"
+msgstr "Typ (OK)"
+
+#:
+msgid "Colour (OK)"
+msgstr "Barva (OK)"
+
+#:
+msgid "Use advanced icons"
+msgstr "Použít více ikon"
+
+#:
+msgid "Delete selected maps?"
+msgstr "Smazat vybrané mapy?"
+
+#:
+msgid "Network map added"
+msgstr "Síťová mapa byla přidána"
+
+#:
+msgid "Cannot add network map"
+msgstr "Nelze přidat síťovou mapu"
+
+#:
+msgid "Network map updated"
+msgstr "Síťová mapa byla aktualizována"
+
+#:
+msgid "Cannot update network map"
+msgstr "Nelze upravit síťovou mapu"
+
+#:
+msgid "Expand single problem"
+msgstr "Rozvést jeden problém"
+
+#:
+msgid "Mark elements on triggers status change"
+msgstr "Mark elements on triggers status change"
+
+#:
+msgid "Get selected elements FAILED."
+msgstr "Get selected elements FAILED."
+
+#:
+msgid "Two elements should be selected"
+msgstr "Musí být vybrané dva prvky"
+
+#:
+msgid "Delete selected elements?"
+msgstr "Smazat vybrané prvky?"
+
+#:
+msgid "Please select two elements"
+msgstr "Vyberte, prosím, dva prvky"
+
+#:
+msgid "Delete Links between selected elements?"
+msgstr "Smazat spojnice mezi vybranými prvky?"
+
+#:
+msgid "No links"
+msgstr "Nejsou definovány žádné spojnice"
+
+#:
+msgid "Wrong type of arguments passed to function"
+msgstr "Funkci byly předané nesprávné typy argumentů"
+
+#:
+msgid "New element"
+msgstr "Nový prvek"
+
+#:
+msgid "Set trigger"
+msgstr "Set trigger"
+
+#:
+msgid "Bottom"
+msgstr "dole"
+
+#:
+msgid "Top"
+msgstr "nahoře"
+
+#:
+msgid "Link status indicators"
+msgstr "Ukazatelé stavu spojnice"
+
+#:
+msgid "Remove element"
+msgstr "Odstranit prvek"
+
+#:
+msgid "Add link"
+msgstr "Přidat odkaz"
+
+#:
+msgid "Remove link"
+msgstr "Odstranit spojnici"
+
+#:
+msgid "Cannot find image"
+msgstr "Nelze najít obrázek"
+
+#:
+msgid "Cannot find background image"
+msgstr "Nelze najít obrázek na pozadí"
+
+#:
+msgid "Cannot find trigger"
+msgstr "Nelze najít spouštěč"
+
+#:
+msgid "Cannot find host"
+msgstr "Nelze najít hostitele"
+
+#:
+msgid "Cannot find hostgroup"
+msgstr "Nelze najít skupinu hostitelů"
+
+#:
+msgid "Cannot find map"
+msgstr "Nelze najít mapu"
+
+#:
+msgid "Cannot find screen"
+msgstr "Nelze najít obrazovku"
+
+#:
+msgid "used in exported map"
+msgstr " - použito v exportované mapě"
+
+#:
+msgid "No icon for map element"
+msgstr "Prvek mapy nemá žádnou ikonu"
+
+#:
+msgid "Export does not contain Zabbix maps"
+msgstr "Export neobsahuje mapy Zabbixu"
+
+#:
+msgid "Export does not contain Zabbix screens"
+msgstr "Export neobsahuje obrazovky Zabbixu"
+
+#:
+msgid "OK"
+msgstr "OK"
+
+#:
+msgid "PROBLEM"
+msgstr "PROBLÉM"
+
+#:
+msgid "http://www.zabbix.com"
+msgstr "http://www.zabbix.com"
+
+#:
+msgid "Unacknowledged"
+msgstr "Nepotvrzené"
+
+#:
+msgid "Event acknowledging disabled"
+msgstr "Potvrzování událostí zakázáno"
+
+#:
+msgid "Network maps"
+msgstr "Síťové mapy"
+
+#:
+msgid "NETWORK MAPS"
+msgstr "SÍŤOVÉ MAPY"
+
+#:
+msgid "Background image"
+msgstr "Obrázek na pozadí"
+
+#:
+msgid "Icon label type"
+msgstr "Typ popisku ikony"
+
+#:
+msgid "Label location"
+msgstr "Umístění popisku"
+
+#:
+msgid "Element name"
+msgstr "Název prvku"
+
+#:
+msgid "Status only"
+msgstr "Pouze stav"
+
+#:
+msgid "Nothing"
+msgstr "Nic"
+
+#:
+msgid "m.d.Y H:i:s"
+msgstr "j.n.Y G:i:s"
+
+#:
+msgid "CONFIGURATION OF MEDIA TYPES"
+msgstr "NASTAVENÍ TYPŮ MÉDIÍ"
+
+#:
+msgid "MEDIA TYPES"
+msgstr "TYPY MÉDIÍ"
+
+#:
+msgid "Media"
+msgstr "Média"
+
+#:
+msgid "Send to"
+msgstr "Poslat na"
+
+#:
+msgid "When active"
+msgstr "Kdy je aktivní"
+
+#:
+msgid "No media defined"
+msgstr "Nejsou definována žádná média"
+
+#:
+msgid "New media"
+msgstr "Nové médium"
+
+#:
+msgid "Use if severity"
+msgstr "Použít pro závažnost"
+
+#:
+msgid "Save"
+msgstr "Uložit"
+
+#:
+msgid "Cancel"
+msgstr "Zrušit"
+
+#:
+msgid "Dashboard"
+msgstr "Řídící panel"
+
+#:
+msgid "PERSONAL DASHBOARD"
+msgstr "ŘÍDÍCÍ PANEL"
+
+#:
+msgid "Age"
+msgstr "Stáří"
+
+#:
+msgid "Issue"
+msgstr "Problém"
+
+#:
+msgid "System status"
+msgstr "Stav systému"
+
+#:
+msgid "Host status"
+msgstr "Stav hostitele"
+
+#:
+msgid "Without problems"
+msgstr "Bez problémů"
+
+#:
+msgid "With problems"
+msgstr "S problémy"
+
+#:
+msgid "Last 20 issues"
+msgstr "Posledních 20 problémů"
+
+#:
+msgid "Favourite"
+msgstr "Oblíbené"
+
+#:
+msgid "Favourites"
+msgstr "Oblíbené"
+
+#:
+msgid "Every"
+msgstr "Každých"
+
+#:
+msgid "Menu"
+msgstr "Menu"
+
+#:
+msgid "Reset"
+msgstr "Reset"
+
+#:
+msgid "Maximize"
+msgstr "Maximalizovat"
+
+#:
+msgid "Minimize"
+msgstr "Minimalizovat"
+
+#:
+msgid "Loading..."
+msgstr "Nahrávám..."
+
+#:
+msgid "Dashboard configuration"
+msgstr "Nastavení řídícího panelu"
+
+#:
+msgid "DASHBOARD CONFIGURATION"
+msgstr "NASTAVENÍ ŘÍDÍCÍHO PANELU"
+
+#:
+msgid "Configure"
+msgstr "Nastavit"
+
+#:
+msgid "Selected"
+msgstr "vybrané"
+
+#:
+msgid "Show hosts in maintenance"
+msgstr "Zobrazit hostitele v servisním okně"
+
+#:
+msgid "Triggers with severity"
+msgstr "Spouštěče se závažností"
+
+#:
+msgid "Dashboard filter"
+msgstr "Filtr řídících panelů"
+
+#:
+msgid "Favourite graphs"
+msgstr "Oblíbené grafy"
+
+#:
+msgid "Favourite maps"
+msgstr "Oblíbené mapy"
+
+#:
+msgid "Favourite screens"
+msgstr "Oblíbené obrazovky"
+
+#:
+msgid "Unacknowledged only"
+msgstr "pouze nepotvrzené"
+
+#:
+msgid "Separated"
+msgstr "Separated"
+
+#:
+msgid "Problem display"
+msgstr "Zobrazit problémy"
+
+#:
+msgid "Overview"
+msgstr "Přehled"
+
+#:
+msgid "Overview by proxy"
+msgstr "Přehled podle proxy"
+
+#:
+msgid "OVERVIEW"
+msgstr "PŘEHLED"
+
+#:
+msgid "Hosts location"
+msgstr "Umístění hostitelů"
+
+#:
+msgid "Data"
+msgstr "Data"
+
+#:
+msgid "Show graph of item"
+msgstr "Zobrazit graf položky"
+
+#:
+msgid "Show values of item"
+msgstr "Zobrazit hodnoty položky"
+
+#:
+msgid "Values"
+msgstr "Hodnoty"
+
+#:
+msgid "5 min"
+msgstr "5 min"
+
+#:
+msgid "15 min"
+msgstr "15 min"
+
+#:
+msgid "QUEUE"
+msgstr "FRONTA"
+
+#:
+msgid "QUEUE OF ITEMS TO BE UPDATED"
+msgstr "FRONTA POLOŽEK K AKTUALIZACI"
+
+#:
+msgid "Next check"
+msgstr "Příští kontrola"
+
+#:
+msgid "The queue is empty"
+msgstr "Fronta je prázdná"
+
+#:
+msgid "Total"
+msgstr "Celkem"
+
+#:
+msgid "Count"
+msgstr "Počet"
+
+#:
+msgid "5 seconds"
+msgstr "5 sekund"
+
+#:
+msgid "10 seconds"
+msgstr "10 sekund"
+
+#:
+msgid "30 seconds"
+msgstr "30 sekund"
+
+#:
+msgid "1 minute"
+msgstr "1 minuta"
+
+#:
+msgid "5 minutes"
+msgstr "5 minut"
+
+#:
+msgid "More than 10 minutes"
+msgstr "Více jak 10 minut"
+
+#:
+msgid "Truncated"
+msgstr "zkráceno"
+
+#:
+msgid "Delayed by"
+msgstr "Zpožděno o"
+
+#:
+msgid "REPORT"
+msgstr "PROTOKOL"
+
+#:
+msgid "Status of Zabbix"
+msgstr "Stav ZABBIXe"
+
+#:
+msgid "STATUS OF ZABBIX"
+msgstr "STAV ZABBIXE"
+
+#:
+msgid "Value"
+msgstr "Hodnota"
+
+#:
+msgid "Zabbix server is running"
+msgstr "ZABBIX server běží"
+
+#:
+msgid "Values stored"
+msgstr "Hodnoty uloženy"
+
+#:
+msgid "Trends stored"
+msgstr "Trends stored"
+
+#:
+msgid "Number of triggers (enabled/disabled)[problem/unknown/ok]"
+msgstr "Počet spouštěčů (povolených/zakázaných)[spuštěných/neznámých/nespuštěných]"
+
+#:
+msgid "Triggers (e/d)[p/u/o]"
+msgstr "Spouštěče (pov/zak)[A/?/N]"
+
+#:
+msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
+msgstr "Počítány jsou pouze spouštěče přiřazené k povoleným hostitelům a závisející na povolených položkách"
+
+#:
+msgid "Number of items (monitored/disabled/not supported)"
+msgstr "Počet položek (sledovaných/nesledovaných/nepodporovaných)"
+
+#:
+msgid "Items (m/d/n)"
+msgstr "Položky (sl/nesl/nep)[šab]"
+
+#:
+msgid "Only items assigned to enabled hosts are counted"
+msgstr "Počítány jsou pouze položky přiřazené k povoleným hostitelům"
+
+#:
+msgid "Number of users (online)"
+msgstr "Počet uživatelů (přihlášených)"
+
+#:
+msgid "Users (online)"
+msgstr "Uživatelé (online)"
+
+#:
+msgid "Number of hosts (monitored/not monitored/templates)"
+msgstr "Počet hostitelů (sledovaných/nesledovaných/vzorů)"
+
+#:
+msgid "Hosts (m/n/t)"
+msgstr "Hostitelé (sl/nesl/šab/zak)"
+
+#:
+msgid "Required server performance, new values per second"
+msgstr "Požadovaný výkon serveru - nové hodnoty za sekundu"
+
+#:
+msgid "Yes"
+msgstr "Ano"
+
+#:
+msgid "No"
+msgstr "Ne"
+
+#:
+msgid "running"
+msgstr "běží"
+
+#:
+msgid "not running"
+msgstr "neběží"
+
+#:
+msgid "Availability report"
+msgstr "Protokol dostupnosti"
+
+#:
+msgid "AVAILABILITY REPORT"
+msgstr "PROTOKOL DOSTUPNOSTI"
+
+#:
+msgid "Show"
+msgstr "Zobrazit"
+
+#:
+msgid "By host"
+msgstr "Podle hostitele"
+
+#:
+msgid "By trigger template"
+msgstr "Podle šablony spouštěče"
+
+#:
+msgid "(year"
+msgstr "(rok"
+
+#:
+msgid ")"
+msgstr ")"
+
+#:
+msgid "Y"
+msgstr "Y"
+
+#:
+msgid "Y.m.d H:i"
+msgstr "j. n. Y G:i"
+
+#:
+msgid "Y.m.d"
+msgstr "j. n. Y"
+
+#:
+msgid "IT services availability report"
+msgstr "Protokol dostupnosti IT služeb"
+
+#:
+msgid "IT SERVICES AVAILABILITY REPORT"
+msgstr "PROTOKOL DOSTUPNOSTI IT SLUŽEB"
+
+#:
+msgid "From"
+msgstr "Od"
+
+#:
+msgid "from"
+msgstr "od"
+
+#:
+msgid "Till"
+msgstr "Do"
+
+#:
+msgid "To"
+msgstr "Do"
+
+#:
+msgid "Ok"
+msgstr "Ok"
+
+#:
+msgid "Problem"
+msgstr "Problém"
+
+#:
+msgid "Problems"
+msgstr "Problémy"
+
+#:
+msgid "Percentage"
+msgstr "Procenta"
+
+#:
+msgid "SLA"
+msgstr "SLA"
+
+#:
+msgid "Hour"
+msgstr "Hodina"
+
+#:
+msgid "Hours"
+msgstr "hodin"
+
+#:
+msgid "Minute"
+msgstr "Minuta"
+
+#:
+msgid "Minutes"
+msgstr "minut"
+
+#:
+msgid "Day"
+msgstr "Den"
+
+#:
+msgid "Month"
+msgstr "Měsíc"
+
+#:
+msgid "Year"
+msgstr "Rok"
+
+#:
+msgid "year"
+msgstr "rok"
+
+#:
+msgid "Hourly"
+msgstr "hodinově"
+
+#:
+msgid "Daily"
+msgstr "denně"
+
+#:
+msgid "Weekly"
+msgstr "týdně"
+
+#:
+msgid "Monthly"
+msgstr "měsíčně"
+
+#:
+msgid "Yearly"
+msgstr "ročně"
+
+#:
+msgid "M Y"
+msgstr "F Y"
+
+#:
+msgid "d M Y H:i"
+msgstr "j. M Y G:i"
+
+#:
+msgid "l H:i"
+msgstr "l G:i"
+
+#:
+msgid "add"
+msgstr "přidat"
+
+#:
+msgid "Do not add"
+msgstr "Nepřidávat"
+
+#:
+msgid "Leave empty"
+msgstr "Ponechat prázdné"
+
+#:
+msgid "Fill with default value"
+msgstr "Vyplnit výchozími hodnotami"
+
+#:
+msgid "Create"
+msgstr "Vytvořit"
+
+#:
+msgid "new"
+msgstr "nový"
+
+#:
+msgid "Locales"
+msgstr "Lokalizace"
+
+#:
+msgid "locale"
+msgstr "lokalizaci"
+
+#:
+msgid "Download"
+msgstr "Download"
+
+#:
+msgid "Take for default locale"
+msgstr "Výchozí lokalizace"
+
+#:
+msgid "Locale to extend"
+msgstr "Rozšířit lokalizaci"
+
+#:
+msgid "New entries"
+msgstr "Nové údaje"
+
+#:
+msgid "Notifications"
+msgstr "Zprávy"
+
+#:
+msgid "NOTIFICATIONS"
+msgstr "ZPRÁVY"
+
+#:
+msgid "Notification report"
+msgstr "Protokol zpráv"
+
+#:
+msgid "Most busy triggers top 100"
+msgstr "Nejaktivnější spouštěče TOP 100"
+
+#:
+msgid "MOST BUSY TRIGGERS TOP 100"
+msgstr "NEJAKTIVNĚJŠÍ SPOUŠTĚČE TOP 100"
+
+#:
+msgid "Number of status changes"
+msgstr "Počet změn stavu"
+
+#:
+msgid "Week"
+msgstr "Týden"
+
+#:
+msgid "Last"
+msgstr "poslední"
+
+#:
+msgid "Bar reports"
+msgstr "Sloupcové grafy"
+
+#:
+msgid "Distribution of values for multiple periods"
+msgstr "Rozložení hodnot pro časové období"
+
+#:
+msgid "Distribution of values for multiple items"
+msgstr "Rozložení hodnot pro více časových období"
+
+#:
+msgid "Compare values for multiple periods"
+msgstr "Porovnání hodnot pro časové období"
+
+#:
+msgid "Selected hosts"
+msgstr "Vybraní hostitelé"
+
+#:
+msgid "Selected groups"
+msgstr "Vybrané skupiny"
+
+#:
+msgid "Scale"
+msgstr "Měřítko"
+
+#:
+msgid "Average by"
+msgstr "Průměry"
+
+#:
+msgid "Palette"
+msgstr "Barevná paleta"
+
+#:
+msgid "Darken"
+msgstr "Tmavší"
+
+#:
+msgid "Brighten"
+msgstr "Světlejší"
+
+#:
+msgid "Screens"
+msgstr "Obrazovky"
+
+#:
+msgid "Screen"
+msgstr "Obrazovka"
+
+#:
+msgid "CONFIGURATION OF SCREENS"
+msgstr "NASTAVENÍ OBRAZOVEK"
+
+#:
+msgid "Configuration of screens"
+msgstr "Nastavení obrazovek"
+
+#:
+msgid "Screen added"
+msgstr "Obrazovka byla přidána"
+
+#:
+msgid "Cannot add screen"
+msgstr "Nelze přidat obrazovku"
+
+#:
+msgid "Screen updated"
+msgstr "Obrazovka byla aktualizována"
+
+#:
+msgid "Cannot update screen"
+msgstr "Nelze upravit obrazovku"
+
+#:
+msgid "Screen deleted"
+msgstr "Obrazovka byla smazána"
+
+#:
+msgid "Cannot deleted screen"
+msgstr "Nelze smazat obrazovku"
+
+#:
+msgid "Columns"
+msgstr "Sloupce"
+
+#:
+msgid "Rows"
+msgstr "Řádky"
+
+#:
+msgid "No screens defined"
+msgstr "Nejsou definovány žádné obrazovky"
+
+#:
+msgid "Delete screen?"
+msgstr "Smazat obrazovku?"
+
+#:
+msgid "CONFIGURATION OF SCREEN"
+msgstr "NASTAVENÍ OBRAZOVKY"
+
+#:
+msgid "Screen cell configuration"
+msgstr "Nastavení buňky obrazovky"
+
+#:
+msgid "Resource"
+msgstr "Zdroj"
+
+#:
+msgid "User rights"
+msgstr "Oprávnění uživatelů"
+
+#:
+msgid "No resources defined"
+msgstr "Nejsou definovány žádné zdroje"
+
+#:
+msgid "Simple graph"
+msgstr "Jednoduchý graf"
+
+#:
+msgid "Simple graphs"
+msgstr "Jednoduché grafy"
+
+#:
+msgid "SIMPLE GRAPH"
+msgstr "JEDNODUCHÝ GRAF"
+
+#:
+msgid "Graph name"
+msgstr "Název grafu"
+
+#:
+msgid "Width"
+msgstr "Šířka"
+
+#:
+msgid "Height"
+msgstr "Výška"
+
+#:
+msgid "Create Screen"
+msgstr "Vytvořit obrazovku"
+
+#:
+msgid "Create Slide Show"
+msgstr "Vytvořit prezentaci"
+
+#:
+msgid "Edit"
+msgstr "Upravit"
+
+#:
+msgid "Dynamic item"
+msgstr "Dynamická položka"
+
+#:
+msgid "Dimension (cols x rows)"
+msgstr "Rozměr (soupce x řádky)"
+
+#:
+msgid "Delete selected slideshows?"
+msgstr "Smazat vybrané prezentace?"
+
+#:
+msgid "Slide shows"
+msgstr "Prezentace"
+
+#:
+msgid "Slide show"
+msgstr "Prezentace"
+
+#:
+msgid "CONFIGURATION OF SLIDE SHOWS"
+msgstr "NASTAVENÍ PREZENTACÍ"
+
+#:
+msgid "SLIDE SHOWS"
+msgstr "PREZENTACE"
+
+#:
+msgid "No slide shows defined"
+msgstr "Nejsou definovány žádné prezentace"
+
+#:
+msgid "Count of slides"
+msgstr "Počet slajdů"
+
+#:
+msgid "No slides defined"
+msgstr "Nejsou definovány žádné slajdy"
+
+#:
+msgid "Slides"
+msgstr "Slajdy"
+
+#:
+msgid "New slide"
+msgstr "Nový slajd"
+
+#:
+msgid "Show text as HTML"
+msgstr "Zobrazit text jako HTML"
+
+#:
+msgid "Import screen"
+msgstr "Importovat obrazovku"
+
+#:
+msgid "Cannot find graph"
+msgstr "Nelze najít graf"
+
+#:
+msgid "Cannot find item"
+msgstr "Nelze najít položku"
+
+#:
+msgid "used in exported screen"
+msgstr "- použito v exportované obrazovce"
+
+#:
+msgid "Map"
+msgstr "Mapa"
+
+#:
+msgid "As plain text"
+msgstr "Jako prostý text"
+
+#:
+msgid "Plain text"
+msgstr "Prostý text"
+
+#:
+msgid "PLAINT TEXT"
+msgstr "PROSTÝ TEXT"
+
+#:
+msgid "Column span"
+msgstr "Rozsah sloupců"
+
+#:
+msgid "Row span"
+msgstr "Rozsah řádků"
+
+#:
+msgid "Show lines"
+msgstr "Zobrazit řádků"
+
+#:
+msgid "Hosts info"
+msgstr "Informace o hostiteli"
+
+#:
+msgid "Triggers info"
+msgstr "Informace o spouštěčích"
+
+#:
+msgid "Server info"
+msgstr "Server info"
+
+#:
+msgid "Clock"
+msgstr "Hodiny"
+
+#:
+msgid "Triggers overview"
+msgstr "Přehled spouštěčů"
+
+#:
+msgid "Data overview"
+msgstr "Přehled dat"
+
+#:
+msgid "History of actions"
+msgstr "Historie akcí"
+
+#:
+msgid "History of events"
+msgstr "Historie událostí"
+
+#:
+msgid "Time type"
+msgstr "Druh času"
+
+#:
+msgid "Server time"
+msgstr "Čas na serveru"
+
+#:
+msgid "Local time"
+msgstr "Místní čas"
+
+#:
+msgid "Style"
+msgstr "Styl"
+
+#:
+msgid "Vertical"
+msgstr "Svislý"
+
+#:
+msgid "Horizontal"
+msgstr "Vodorovný"
+
+#:
+msgid "Horizontal align"
+msgstr "Vodorovné zarovnání"
+
+#:
+msgid "Centre"
+msgstr "Střed"
+
+#:
+msgid "Right"
+msgstr "vpravo"
+
+#:
+msgid "Vertical align"
+msgstr "Svislé zarovnání"
+
+#:
+msgid "Middle"
+msgstr "Střed"
+
+#:
+msgid "Impossible to remove last row and column"
+msgstr "Nelze odebrat poslední řádek a sloupec"
+
+#:
+msgid "Screen should contain at least one row and column"
+msgstr "Obrazovka musí obsahovat alespoň jeden řádek a jeden sloupec"
+
+#:
+msgid "Custom screens"
+msgstr "Vlastní obrazovky"
+
+#:
+msgid "SCREENS 45645645"
+msgstr "OBRAZOVKY"
+
+#:
+msgid "Slideshow updated"
+msgstr "Prezentace byla aktualizována"
+
+#:
+msgid "Cannot_update slideshow"
+msgstr "Nelze upravit prezentaci"
+
+#:
+msgid "Slideshow added"
+msgstr "Prezentace byla přidána"
+
+#:
+msgid "Cannot add slideshow"
+msgstr "Nelze přidat prezentaci"
+
+#:
+msgid "Slideshow deleted"
+msgstr "Prezentace byla smazána"
+
+#:
+msgid "Cannot delete slideshow"
+msgstr "Nelze smazat prezentaci"
+
+#:
+msgid "Delete slideshow?"
+msgstr "Smazat prezentaci?"
+
+#:
+msgid "Custom slides"
+msgstr "Vlastní prezentace"
+
+#:
+msgid "Average problem"
+msgstr "Střední problém"
+
+#:
+msgid "Serious problem"
+msgstr "Vážný problém"
+
+#:
+msgid "Minor problem"
+msgstr "Menší problém"
+
+#:
+msgid "root"
+msgstr "kořen"
+
+#:
+msgid "IT service"
+msgstr "Služba IT"
+
+#:
+msgid "IT services"
+msgstr "Služby IT"
+
+#:
+msgid "Configuration of IT services"
+msgstr "Nastavení IT služeb"
+
+#:
+msgid "Service updated"
+msgstr "Služba byla aktualizována"
+
+#:
+msgid "No IT service defined"
+msgstr "Nejsou definovány žádné IT služby"
+
+#:
+msgid "Cannot update service"
+msgstr "Nelze upravit službu"
+
+#:
+msgid "Service added"
+msgstr "Služba byla přidána"
+
+#:
+msgid "Cannot add service"
+msgstr "Nelze přidat službu"
+
+#:
+msgid "Service deleted"
+msgstr "Služba byla smazána"
+
+#:
+msgid "Cannot delete service"
+msgstr "Nelze smazat službu"
+
+#:
+msgid "Parent service"
+msgstr "Nadřazená služba"
+
+#:
+msgid "Status calculation"
+msgstr "Výpočet stavu"
+
+#:
+msgid "Status calculation algorithm"
+msgstr "Algoritmus výpočtu stavu"
+
+#:
+msgid "Problem, if at least one child has a problem"
+msgstr "problém, když alespoň jeden podřazený má problém"
+
+#:
+msgid "Problem, if all children have problems"
+msgstr "problém, když všechny podřazené mají problém"
+
+#:
+msgid "Soft"
+msgstr "Soft"
+
+#:
+msgid "Do not calculate"
+msgstr "nevypočítávat"
+
+#:
+msgid "Calculate SLA"
+msgstr "Vypočítat SLA"
+
+#:
+msgid "Acceptable SLA (in %)"
+msgstr "Přípustná SLA [%]"
+
+#:
+msgid "Link to trigger?"
+msgstr "Připojit spouštěč?"
+
+#:
+msgid "Sort order (0->999)"
+msgstr "Řazení (0->999)"
+
+#:
+msgid "Trigger"
+msgstr "Spouštěč"
+
+#:
+msgid "Server"
+msgstr "Server"
+
+#:
+msgid "Delete"
+msgstr "Smazat"
+
+#:
+msgid "Clone"
+msgstr "Vytvořit kopii"
+
+#:
+msgid "Full clone"
+msgstr "Vytvořit úplnou kopii"
+
+#:
+msgid "One-time downtime"
+msgstr "Jednorázový downtime"
+
+#:
+msgid "No times defined"
+msgstr "Nejsou definovány žádné časy"
+
+#:
+msgid "Service times"
+msgstr "Servisní časy"
+
+#:
+msgid "New service time"
+msgstr "Nový servisní čas"
+
+#:
+msgid "Note"
+msgstr "Poznámka"
+
+#:
+msgid "Remove"
+msgstr "Odstranit"
+
+#:
+msgid "IT SERVICES"
+msgstr "SLUŽBY IT"
+
+#:
+msgid "Service"
+msgstr "Služba"
+
+#:
+msgid "Services"
+msgstr "Služby"
+
+#:
+msgid "Reason"
+msgstr "Důvod"
+
+#:
+msgid "Today"
+msgstr "Dnes"
+
+#:
+msgid "This week"
+msgstr "Tento týden"
+
+#:
+msgid "This year"
+msgstr "Tento rok"
+
+#:
+msgid "This month"
+msgstr "Tento měsíc"
+
+#:
+msgid "Last 24 hours"
+msgstr "Posledních 24 hodin"
+
+#:
+msgid "Last 7 days"
+msgstr "Posledních 7 dní"
+
+#:
+msgid "Last 30 days"
+msgstr "Posledních 30 dní"
+
+#:
+msgid "Last 365 days"
+msgstr "Posledních 365 dní"
+
+#:
+msgid "Cannot format Tree. Check logic structure in service links"
+msgstr "Nelze naformátovat navigační strom. Zkontrolujte logiku propojení služeb"
+
+#:
+msgid "Show triggers with unacknowledged events"
+msgstr "Zobrazit spouštěče s nepotvrzenými událostmi"
+
+#:
+msgid "No trigger"
+msgstr "Není spouštěč"
+
+#:
+msgid "No triggers defined"
+msgstr "Nejsou definovány žádné spouštěče"
+
+#:
+msgid "No trigger defined"
+msgstr "Není definován žádný spouštěč"
+
+#:
+msgid "Configuration of triggers"
+msgstr "Nastavení spouštěčů"
+
+#:
+msgid "CONFIGURATION OF TRIGGERS"
+msgstr "NASTAVENÍ SPOUŠTĚČŮ"
+
+#:
+msgid "Triggers deleted"
+msgstr "Spouštěče byly smazány"
+
+#:
+msgid "Cannot delete triggers"
+msgstr "Nelze smazat spouštěče"
+
+#:
+msgid "Trigger deleted"
+msgstr "Spouštěč byl smazán"
+
+#:
+msgid "Cannot delete trigger"
+msgstr "Nelze smazat spouštěč"
+
+#:
+msgid "Trigger added"
+msgstr "Spouštěč byl přidán"
+
+#:
+msgid "Cannot add trigger"
+msgstr "Nelze přidat spouštěč"
+
+#:
+msgid "Severity"
+msgstr "Závažnost"
+
+#:
+msgid "Min severity"
+msgstr "Závažnost minimálně"
+
+#:
+msgid "Disabled"
+msgstr "Zakázáno"
+
+#:
+msgid "DISABLED"
+msgstr "ZAKÁZÁNO"
+
+#:
+msgid "Enabled"
+msgstr "Povoleno"
+
+#:
+msgid "Disable"
+msgstr "Zakázat"
+
+#:
+msgid "Enable"
+msgstr "Povolit"
+
+#:
+msgid "Enable selected"
+msgstr "Povolit vybrané"
+
+#:
+msgid "Change"
+msgstr "Změna"
+
+#:
+msgid "Trigger updated"
+msgstr "Spouštěč byl aktualizován"
+
+#:
+msgid "Cannot update trigger"
+msgstr "Nelze upravit spouštěč"
+
+#:
+msgid "Depends on"
+msgstr "Závisí na:"
+
+#:
+msgid "Dependent"
+msgstr "Závisející"
+
+#:
+msgid "URL"
+msgstr "URL"
+
+#:
+msgid "Zabbix has received an incorrect request"
+msgstr "Zabbix přijal neplatný požadavek"
+
+#:
+msgid "Create Trigger"
+msgstr "Vytvořit spouštěč"
+
+#:
+msgid "Insert"
+msgstr "Vložit"
+
+#:
+msgid "Seconds"
+msgstr "sekund"
+
+#:
+msgid "Last of"
+msgstr "Posledních"
+
+#:
+msgid "Multiple PROBLEM events"
+msgstr "opakování události"
+
+#:
+msgid "Show disabled triggers"
+msgstr "Zobrazit zakázané spouštěče"
+
+#:
+msgid "Hide disabled triggers"
+msgstr "Skrýt zakázané spouštěče"
+
+#:
+msgid "The trigger depends on"
+msgstr "Spouštěč závisí na"
+
+#:
+msgid "No dependencies defined"
+msgstr "Nejsou definovány žádné závislosti"
+
+#:
+msgid "New dependency"
+msgstr "Nová závislost"
+
+#:
+msgid "Event generation"
+msgstr "Generování události"
+
+#:
+msgid "Triggers massupdate"
+msgstr "Hromadná aktualizace spouštěčů"
+
+#:
+msgid "Trigger dependencies"
+msgstr "Závislosti spouštěče"
+
+#:
+msgid "Incorrect dependency"
+msgstr "Neplatná závislost"
+
+#:
+msgid "Toggle input method"
+msgstr "změnit způsob zadávání"
+
+#:
+msgid "Insert macro"
+msgstr "Vložit makro"
+
+#:
+msgid "Replace"
+msgstr "Nahradit"
+
+#:
+msgid "Templated trigger"
+msgstr "Spouštěč ze šablony"
+
+#:
+msgid "Enable selected triggers?"
+msgstr "Povolit vybrané spouštěče?"
+
+#:
+msgid "Disable selected triggers?"
+msgstr "Zakázat vybrané spouštěče?"
+
+#:
+msgid "Mass update selected triggers?"
+msgstr "Hromadně aktualizovat vybrané spouštěče?"
+
+#:
+msgid "Copy selected triggers?"
+msgstr "Zkopírovat vybrané spouštěče?"
+
+#:
+msgid "Delete selected triggers?"
+msgstr "Smazat vybrané spouštěče?"
+
+#:
+msgid "Trigger comments"
+msgstr "Komentáře ke spouštěči"
+
+#:
+msgid "TRIGGER COMMENTS"
+msgstr "KOMENTÁŘE KE SPOUŠTĚČI"
+
+#:
+msgid "Comment updated"
+msgstr "Komentář byl aktualizován"
+
+#:
+msgid "Cannot update comment"
+msgstr "Nelze upravit komentář"
+
+#:
+msgid "Add"
+msgstr "Přidat"
+
+#:
+msgid "Sound"
+msgstr "Zvuk"
+
+#:
+msgid "Status of triggers"
+msgstr "Stav spouštěčů"
+
+#:
+msgid "STATUS OF TRIGGERS"
+msgstr "STAV SPOUŠTĚČŮ"
+
+#:
+msgid "Status of hostgroup triggers"
+msgstr "Stav spouštěčů skupiny"
+
+#:
+msgid "Status of host triggers"
+msgstr "Stav spouštěčů hostitele"
+
+#:
+msgid "Hide all"
+msgstr "Skrýt vše"
+
+#:
+msgid "Show only problems"
+msgstr "Zobrazit pouze problémy"
+
+#:
+msgid "Show unacknowledged"
+msgstr "Zobrazit nepotvrzené"
+
+#:
+msgid "Show problem-unacknowledged"
+msgstr "Show problem-unacknowledged"
+
+#:
+msgid "Not acknowledged"
+msgstr "Nepotvrzeno"
+
+#:
+msgid "Show last"
+msgstr "Zobrazit poslední"
+
+#:
+msgid "Show details"
+msgstr "Zobrazit detaily"
+
+#:
+msgid "Filter by name"
+msgstr "Filtrovat podle jména"
+
+#:
+msgid "TRIGGERS"
+msgstr "SPOUŠTĚČE"
+
+#:
+msgid "Last change"
+msgstr "Poslední změna"
+
+#:
+msgid "Comments"
+msgstr "Komentáře"
+
+#:
+msgid "Acknowledged"
+msgstr "Potvrzený"
+
+#:
+msgid "Ack"
+msgstr "Potvrzeno"
+
+#:
+msgid "Not Ack"
+msgstr "Nepotvrzeno"
+
+#:
+msgid "Never"
+msgstr "Nikdy"
+
+#:
+msgid "Found"
+msgstr "Nalezeno"
+
+#:
+msgid "Acknowledge status"
+msgstr "Stav potvrzení"
+
+#:
+msgid "Any"
+msgstr "Jakýkoliv"
+
+#:
+msgid "With unacknowledged events"
+msgstr "S nepotvrzenými událostmi"
+
+#:
+msgid "With last event unacknowledged"
+msgstr "S poslední událostí nepotvrzenou"
+
+#:
+msgid "Triggers status"
+msgstr "Stav spouštěče"
+
+#:
+msgid "Age less than"
+msgstr "Stáří méně než"
+
+#:
+msgid "Select"
+msgstr "Vybrat"
+
+#:
+msgid "Zabbix User"
+msgstr "Zabbix uživatel"
+
+#:
+msgid "Zabbix Admin"
+msgstr "ZABBIX Admin"
+
+#:
+msgid "Zabbix Super Admin"
+msgstr "ZABBIX Super Admin"
+
+#:
+msgid "User type"
+msgstr "Typ uživatele"
+
+#:
+msgid "Users"
+msgstr "Uživatelé"
+
+#:
+msgid "User added"
+msgstr "Uživatel byl přidán"
+
+#:
+msgid "Cannot add user"
+msgstr "Nelze přidat uživatele"
+
+#:
+msgid "Cannot add user. Both passwords must be equal."
+msgstr "Nelze přidat uživatele. Obě hesla musí být stejná."
+
+#:
+msgid "User deleted"
+msgstr "Uživatel byl smazán"
+
+#:
+msgid "Cannot delete user"
+msgstr "Nelze smazat uživatele"
+
+#:
+msgid "Password should not be empty"
+msgstr "Heslo nemůže být prázdné"
+
+#:
+msgid "For guest, password must be empty"
+msgstr "Heslo účtu guest musí být prázdné"
+
+#:
+msgid "User updated"
+msgstr "Uživatel byl aktualizován"
+
+#:
+msgid "Cannot update user"
+msgstr "Nelze upravit uživatele"
+
+#:
+msgid "Cannot update user. Both passwords must be equal."
+msgstr "Nelze upravit uživatele. Obě hesla musí být stejná."
+
+#:
+msgid "Group added"
+msgstr "Skupina byla přidána"
+
+#:
+msgid "Cannot add group"
+msgstr "Nelze přidat skupinu"
+
+#:
+msgid "Group updated"
+msgstr "Skupina byla aktualizována"
+
+#:
+msgid "Cannot update group"
+msgstr "Nelze upravit skupinu"
+
+#:
+msgid "Group deleted"
+msgstr "Skupina byla smazána"
+
+#:
+msgid "Cannot delete group"
+msgstr "Nelze smazat skupinu"
+
+#:
+msgid "Proxy added"
+msgstr "Proxy byla přidána"
+
+#:
+msgid "Cannot add proxy"
+msgstr "Nelze přidat proxy"
+
+#:
+msgid "Proxy updated"
+msgstr "Proxy byla aktualizována"
+
+#:
+msgid "Cannot update proxy"
+msgstr "Nelze upravit proxy"
+
+#:
+msgid "Proxy deleted"
+msgstr "Proxy byla smazána"
+
+#:
+msgid "Cannot delete proxy"
+msgstr "Nelze smazat proxy"
+
+#:
+msgid "Users status updated"
+msgstr "Stav uživatelů byl aktualizován"
+
+#:
+msgid "Cannot update users status"
+msgstr "Nelze aktualizovat stav uživatele"
+
+#:
+msgid "Users unblocked"
+msgstr "Uživatelé odblokováni"
+
+#:
+msgid "Cannot unblock users"
+msgstr "Nelze odblokovat uživatele"
+
+#:
+msgid "GUI access updated"
+msgstr "Přístup ke grafickému rozhraní byl aktualizován"
+
+#:
+msgid "Cannot update GUI access"
+msgstr "Nelze upravit přístup ke grafickému rozhraní"
+
+#:
+msgid "API access updated"
+msgstr "Přístup k API byl aktualizován"
+
+#:
+msgid "Cannot update API access"
+msgstr "Nelze upravit přístup k API"
+
+#:
+msgid "Debug mode updated"
+msgstr "Ladící mód byl aktualizován"
+
+#:
+msgid "Cannot update debug mode"
+msgstr "Nelze upravit ladící mód"
+
+#:
+msgid "User cannot disable himself"
+msgstr "Uživatel nemůže zakázat sám sebe"
+
+#:
+msgid "User cannot change status of himself"
+msgstr "Uživatel nemůže měnit svůj stav"
+
+#:
+msgid "User cannot change GUI access for himself"
+msgstr "Uživatel nemůže upravit přístup ke grafickému rozhraní sám sobě"
+
+#:
+msgid "User cannot delete himself"
+msgstr "Uživatel nemůže smazat sám sebe"
+
+#:
+msgid "CONFIGURATION OF USERS AND USER GROUPS"
+msgstr "NASTAVENÍ UŽIVATELŮ A SKUPIN UŽIVATELŮ"
+
+#:
+msgid "USER GROUPS"
+msgstr "SKUPINY UŽIVATELŮ"
+
+#:
+msgid "USERS"
+msgstr "UŽIVATELÉ"
+
+#:
+msgid "User groups"
+msgstr "Skupiny uživatelů"
+
+#:
+msgid "Members"
+msgstr "Členové"
+
+#:
+msgid "No user groups defined"
+msgstr "Nejsou definovány žádné skupiny uživatelů"
+
+#:
+msgid "Name"
+msgstr "Jméno"
+
+#:
+msgid "Surname"
+msgstr "Příjmení"
+
+#:
+msgid "Is online?"
+msgstr "Je přihlášený?"
+
+#:
+msgid "No users defined"
+msgstr "Nejsou definovaní žádní uživatelé"
+
+#:
+msgid "Rights"
+msgstr "Oprávnění"
+
+#:
+msgid "GUI access"
+msgstr "Přístup ke grafickému rozhraní"
+
+#:
+msgid "API access"
+msgstr "Přístup k API"
+
+#:
+msgid "Debug"
+msgstr "Ladící výstup"
+
+#:
+msgid "Debug mode"
+msgstr "Ladící mód"
+
+#:
+msgid "Users status"
+msgstr "Stav uživatele"
+
+#:
+msgid "No rights defined"
+msgstr "Nejdou definována žádná oprávnění"
+
+#:
+msgid "Read only"
+msgstr "Pouze čtení"
+
+#:
+msgid "Read-write"
+msgstr "Čtení a zápis"
+
+#:
+msgid "Deny"
+msgstr "Zakázat"
+
+#:
+msgid "Hide"
+msgstr "Skrýt"
+
+#:
+msgid "Password"
+msgstr "Heslo"
+
+#:
+msgid "Change password"
+msgstr "Změnit heslo"
+
+#:
+msgid "Password (once again)"
+msgstr "Heslo (ověření)"
+
+#:
+msgid "URL (after login)"
+msgstr "URL po přihlášení"
+
+#:
+msgid "Auto-login"
+msgstr "Automatické přihlášení"
+
+#:
+msgid "Auto-logout (min 90 seconds)"
+msgstr "Automatické odhlášení (min 90 sekund)"
+
+#:
+msgid "Refresh (in seconds)"
+msgstr "Automatická aktualizace (sekund)"
+
+#:
+msgid "Create User"
+msgstr "Vytvořit uživatele"
+
+#:
+msgid "Create Group"
+msgstr "Vytvořit skupinu"
+
+#:
+msgid "No accessible resources"
+msgstr "Nejsou přístupné žádné zdroje"
+
+#:
+msgid "Add to"
+msgstr "Přidat do"
+
+#:
+msgid "Remove from"
+msgstr "Odebrat z"
+
+#:
+msgid "Internal"
+msgstr "Interní"
+
+#:
+msgid "Rows per page"
+msgstr "Počet řádků na stránku"
+
+#:
+msgid "Enable API"
+msgstr "Povolit přístup k API"
+
+#:
+msgid "Disable API"
+msgstr "Zakázat přístup k API"
+
+#:
+msgid "Enable DEBUG"
+msgstr "Povolit ladící mód"
+
+#:
+msgid "Disable DEBUG"
+msgstr "Zakázat ladící mód"
+
+#:
+msgid "Blocked"
+msgstr "Blokovaný"
+
+#:
+msgid "Unblock selected"
+msgstr "Odblokovat vybrané"
+
+#:
+msgid "Unblock selected users?"
+msgstr "Odblokovat vybrané uživatele?"
+
+#:
+msgid "Delete selected users?"
+msgstr "Smazat vybrané uživatele?"
+
+#:
+msgid "Enable selected groups?"
+msgstr "Povolit vybrané skupiny?"
+
+#:
+msgid "Disable selected groups?"
+msgstr "Zakázat vybrané skupiny?"
+
+#:
+msgid "Enable API access in selected groups?"
+msgstr "Povolit přístup k API pro vybrané skupiny?"
+
+#:
+msgid "Disable API access in selected groups?"
+msgstr "Zakázat přístup k API pro vybrané skupiny?"
+
+#:
+msgid "Enable debug mode in selected groups?"
+msgstr "Povolit ladící mód pro vybrané skupiny?"
+
+#:
+msgid "Disable debug mode in selected groups?"
+msgstr "Zakázat ladící mód pro vybrané skupiny?"
+
+#:
+msgid "Delete selected groups?"
+msgstr "Smazat vybrané skupiny?"
+
+#:
+msgid "CONFIGURATION OF SCRIPTS"
+msgstr "NASTAVENÍ SKRIPTŮ"
+
+#:
+msgid "Scripts"
+msgstr "Skripty"
+
+#:
+msgid "SCRIPTS"
+msgstr "SKRIPTY"
+
+#:
+msgid "Command"
+msgstr "Příkaz"
+
+#:
+msgid "permissions"
+msgstr "oprávnění"
+
+#:
+msgid "Required host"
+msgstr "Požadované hostitelské"
+
+#:
+msgid "Read"
+msgstr "Čtení"
+
+#:
+msgid "Write"
+msgstr "Zápis"
+
+#:
+msgid "No scripts defined"
+msgstr "Nejsou definovány žádné skripty"
+
+#:
+msgid "Host access"
+msgstr "Přístup hostitele"
+
+#:
+msgid "Delete script?"
+msgstr "Smazat skript?"
+
+#:
+msgid "Create script"
+msgstr "Vytvořit skript"
+
+#:
+msgid "Script added"
+msgstr "Skript byl přidán"
+
+#:
+msgid "Cannot add script"
+msgstr "Nelze přidat skript"
+
+#:
+msgid "Script updated"
+msgstr "Skript byl aktualizován"
+
+#:
+msgid "Cannot update script"
+msgstr "Nelze upravit skript"
+
+#:
+msgid "Script deleted"
+msgstr "Skript byl smazán"
+
+#:
+msgid "Cannot delete script"
+msgstr "Nelze smazat skript"
+
+#:
+msgid "Tools"
+msgstr "Nástroje"
+
+#:
+msgid "Result"
+msgstr "Výsledek"
+
+#:
+msgid "Close"
+msgstr "Zavřít"
+
+#:
+msgid "Cannot connect to Zabbix server"
+msgstr "Nelze se připojit k ZABBIX serveru"
+
+#:
+msgid "Delete selected scripts?"
+msgstr "Smazat vybrané skripty?"
+
+#:
+msgid "SCRIPT ERROR"
+msgstr "CHYBA SKRIPTU"
+
+#:
+msgid "Error Description"
+msgstr "Popis chyby"
+
+#:
+msgid "Can't send command, check connection"
+msgstr "Nepodařilo se poslat příkaz, zkontrolujte spojení"
+
+#:
+msgid "Can't read script response, check connection"
+msgstr "Nepodařilo se přečíst odpověď skriptu, zkontrolujte spojení"
+
+#:
+msgid "Defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value"
+msgstr "Vypršel čas definovaný konstantou ZBX_SCRIPT_TIMEOUT (v \"include/defines.inc.php\"). Můžete zkusit tuto hodnotu zzvětšit."
+
+#:
+msgid "Defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value"
+msgstr "Byl dosažen limit čtení definovaný konstantou ZBX_SCRIPT_BYTES_LIMIT (v \"include/defines.inc.php\"). Můžete zkusit tuto hodnotu zvětšit."
+
+#:
+msgid "Unknown error happened reading script answer, please report to the developers"
+msgstr "Došlo k neznámé chybě při čtení odpovědi skriptu. Prosím, reportujte tuto chybu vývojářům."
+
+#:
+msgid "Empty response received"
+msgstr "Byla přijata prázdná odpověď"
+
+#:
+msgid "Audit"
+msgstr "Audit"
+
+#:
+msgid "AUDIT LOGS"
+msgstr "ZÁZNAMY AUDITU"
+
+#:
+msgid "AUDIT ACTIONS"
+msgstr "AKCE AUDITU"
+
+#:
+msgid "Action"
+msgstr "Akce"
+
+#:
+msgid "Details"
+msgstr "Detaily"
+
+#:
+msgid "Unknown action"
+msgstr "Neznámá akce"
+
+#:
+msgid "Added"
+msgstr "Přidáno"
+
+#:
+msgid "Updated"
+msgstr "Aktualizováno"
+
+#:
+msgid "Media type"
+msgstr "Typ média"
+
+#:
+msgid "Graph element"
+msgstr "Prvek grafu"
+
+#:
+msgid "Unknown resource"
+msgstr "Neznámý zdroj"
+
+#:
+msgid "already exists"
+msgstr "již existuje"
+
+#:
+msgid "Zabbix config"
+msgstr "Nastavení Zabbix"
+
+#:
+msgid "USER PROFILE"
+msgstr "PROFIL UŽIVATELE"
+
+#:
+msgid "User profile"
+msgstr "Profil uživatele"
+
+#:
+msgid "Language"
+msgstr "Jazyk"
+
+#:
+msgid "Theme"
+msgstr "Téma"
+
+#:
+msgid "English (GB)"
+msgstr "Anglicky (GB)"
+
+#:
+msgid "French (FR)"
+msgstr "Francouzsky (FR)"
+
+#:
+msgid "German (DE)"
+msgstr "Německy (DE)"
+
+#:
+msgid "Italian (IT)"
+msgstr "Italsky (IT)"
+
+#:
+msgid "Korean (KO)"
+msgstr "Korejsky (KO)"
+
+#:
+msgid "Latvian (LV)"
+msgstr "Litevsky (LV)"
+
+#:
+msgid "Russian (RU)"
+msgstr "Rusky (RU)"
+
+#:
+msgid "Portuguese (PT)"
+msgstr "Portugalsky (PT)"
+
+#:
+msgid "Spanish (SP)"
+msgstr "Španělsky (SP)"
+
+#:
+msgid "Swedish (SE)"
+msgstr "Švédsky (SE)"
+
+#:
+msgid "Japanese (JP)"
+msgstr "Japonsky (JP)"
+
+#:
+msgid "Chinese (CN)"
+msgstr "Čínsky (CN)"
+
+#:
+msgid "Dutch (NL)"
+msgstr "Nizozemsky (NL)"
+
+#:
+msgid "Hungarian (HU)"
+msgstr "Maďarsky (HU)"
+
+#:
+msgid "Polish (PL)"
+msgstr "Polsky (PL)"
+
+#:
+msgid "Ukrainian (UA)"
+msgstr "Ukrajinsky (UA)"
+
+#:
+msgid "Czech (CZ)"
+msgstr "Česky (CZ)"
+
+#:
+msgid "ZABBIX"
+msgstr "ZABBIX"
+
+#:
+msgid "Welcome to Zabbix! You are connected as"
+msgstr "Vítejte v Zabbixu! Jste přihlášen(a) jako"
+
+#:
+msgid "Login name"
+msgstr "Přihlašovací jméno"
+
+#:
+msgid "Host profiles"
+msgstr "Profily hostitelů"
+
+#:
+msgid "HOST PROFILES"
+msgstr "PROFILY HOSTITELŮ"
+
+#:
+msgid "Extended host profile"
+msgstr "Rozšířený profil hostitele"
+
+#:
+msgid "Extended"
+msgstr "Rozšířený"
+
+#:
+msgid "Edit hosts"
+msgstr "Upravit hostitele"
+
+#:
+msgid "SEARCH"
+msgstr "HLEDAT"
+
+#:
+msgid "Go"
+msgstr "Proveď"
+
+#:
+msgid "found"
+msgstr "nalezených"
+
+#:
+msgid "Displaying"
+msgstr "Zobrazuji"
+
+#:
+msgid "Search pattern is empty"
+msgstr "Vyhledávací vzor je prázdný"
+
+#:
+msgid "Caption"
+msgstr "Popisek"
+
+#:
+msgid "Empty"
+msgstr "Prázdný"
+
+#:
+msgid "STANDARD ITEMS"
+msgstr "STANDARDNÍ POLOŽKY"
+
+#:
+msgid "No items"
+msgstr "Žádné položky"
+
+#:
+msgid "DISCOVERY RULES"
+msgstr "PRAVIDLA PRO PRŮZKUM"
+
+#:
+msgid "DISCOVERY CHECKS"
+msgstr "KONTROLY PRŮZKUMU"
+
+#:
+msgid "Hosts and templates"
+msgstr "Hostitelé a šablony"
+
+#:
+msgid "You can not switch hosts for current selection"
+msgstr "You can not switch hosts for current selection"
+
+#:
+msgid "H:i:s"
+msgstr "G:i:s"
+
+#:
+msgid "No errors found"
+msgstr "Nenalezeny žádné chyby"
+
+#:
+msgid "Expression Syntax Error"
+msgstr "Chyba syntaxe výrazu"
+
+#:
+msgid "Unexpected end of element"
+msgstr "Neočekávaný konec elementu"
+
+#:
+msgid "Check expression part starting from '"
+msgstr "Zkontrolujte část výrazu od '"
+
+#:
+msgid "'"
+msgstr "'"
+
+#:
+msgid "Not allowed symbols or sequence of symbols in expression element detected"
+msgstr "Ve výrazu byly zjištěny nepovolené znaky nebo posloupnost znaků"
+
+#:
+msgid "Not allowed value detected in element"
+msgstr "V elementu byla zjištěna nepovolená hodnota"
+
+#:
+msgid "Unnecessary symbols detected"
+msgstr "Byly zjištěny nadbytečné znaky"
+
+#:
+msgid "Not allowed symbols detected after element"
+msgstr "Za elementem byly zjištěny nepovolené znaky"
+
+#:
+msgid "Not allowed symbols detected before element"
+msgstr "Před elementem byly zjištěny nepovolené znaky"
+
+#:
+msgid "New indicators"
+msgstr "Nový ukazatel"
+
+#:
+msgid "Edit connector"
+msgstr "Upravit spojnici"
+
+#:
+msgid "Include"
+msgstr "Včetně"
+
+#:
+msgid "Exclude"
+msgstr "Vyjma"
+
+#:
+msgid "Keyword"
+msgstr "Klíčové slovo"
+
+#:
+msgid "Position"
+msgstr "Pozice"
+
+#:
+msgid "Delete expression?"
+msgstr "Smazat výraz?"
+
+#:
+msgid "Delete keyword?"
+msgstr "Smazat klíčové slovo?"
+
+#:
+msgid "Test data"
+msgstr "Testovací data"
+
+#:
+msgid "Expression Variable Elements"
+msgstr "Proměnné výrazu"
+
+#:
+msgid "Unknown variable type, testing not available"
+msgstr "Neznámý typ proměnné, testování není dostupné"
+
+#:
+msgid "Unknown host, no such host present in system"
+msgstr "Zadaný hostitel v systému neexistuje"
+
+#:
+msgid "Unknown host item, no such item in selected host"
+msgstr "Zadaná položka ve vybraném hostiteli neexistuje"
+
+#:
+msgid "Given expression is not a macro"
+msgstr "Zadaný výraz není makro"
+
+#:
+msgid "Result type"
+msgstr "Typ výsledku"
+
+#:
+msgid "Combined result"
+msgstr "Kombinovaný výsledek"
+
+#:
+msgid "Delete this application?"
+msgstr "Smazat tuto aplikaci?"
+
+#:
+msgid "Activate selected applications?"
+msgstr "Povolit vybrané aplikace?"
+
+#:
+msgid "Disable selected applications?"
+msgstr "Zakázat vybrané aplikace?"
+
+#:
+msgid "Delete selected applications?"
+msgstr "Smazat vybrané aplikace?"
+
+#:
+msgid "Incorrect time period"
+msgstr "Neplatné časové období"
+
+#:
+msgid "No elements selected!"
+msgstr "Nejsou vybrané žádné položky!"
+
+#:
+msgid "refreshed every"
+msgstr "aktualizováno každých"
+
+#:
+msgid "Page received incorrect data"
+msgstr "Byla přijata neplatná data"
+
+#:
+msgid "Timezone for PHP is not set. Please set \"date.timezone\" option in php.ini."
+msgstr "Časová zóna pro PHP není nastavena. Nastavte, prosím, volbu \"date.timezone\" v php.ini."
+
+#:
+msgid "Stats for"
+msgstr "Statistika pro"
+
+#:
+msgid "Total time"
+msgstr "Celkový čas"
+
+#:
+msgid "Memory limit"
+msgstr "Omezení paměti"
+
+#:
+msgid "Memory usage"
+msgstr "Využití paměti"
+
+#:
+msgid "Memory leak"
+msgstr "Únik paměti"
+
+#:
+msgid "SQL selects count"
+msgstr "Počet SQL select"
+
+#:
+msgid "SQL executes count"
+msgstr "Počet SQL execute"
+
+#:
+msgid "SQL requests count"
+msgstr "Počet SQL požadavků"
+
+#:
+msgid "Total time spent on SQL"
+msgstr "Celkový čas pro SQL"
+
+#:
+msgid "End of"
+msgstr "Konec"
+
+#:
+msgid "MEMORY LIMIT REACHED! Profiling was stopped to save memory for script processing."
+msgstr "OMEZENÍ PAMĚTI DOSAŽENO! Profilování bylo zastaveno, aby se ušetřila paměť pro zpracování skriptů."
+
+#:
+msgid "Wrong type"
+msgstr "Neplatný typ"
+
+#:
+msgid "Incorrect type of asort_by_key"
+msgstr "Neplatný typ asort_by_key"
+
+#:
+msgid "days"
+msgstr "dní"
+
+#:
+msgid "B"
+msgstr "B"
+
+#:
+msgid "n"
+msgstr "n"
+
+#:
+msgid "Nano"
+msgstr "nano"
+
+#:
+msgid "µ"
+msgstr "µ"
+
+#:
+msgid "Micro"
+msgstr "mikro"
+
+#:
+msgid "Milli"
+msgstr "mili"
+
+#:
+msgid "K"
+msgstr "k"
+
+#:
+msgid "Kilo"
+msgstr "kilo"
+
+#:
+msgid "M"
+msgstr "M"
+
+#:
+msgid "Mega"
+msgstr "mega"
+
+#:
+msgid "G"
+msgstr "G"
+
+#:
+msgid "Giga"
+msgstr "giga"
+
+#:
+msgid "T"
+msgstr "T"
+
+#:
+msgid "Tera"
+msgstr "tera"
+
+#:
+msgid "P"
+msgstr "P"
+
+#:
+msgid "Peta"
+msgstr "peta"
+
+#:
+msgid "E"
+msgstr "E"
+
+#:
+msgid "Exa"
+msgstr "exa"
+
+#:
+msgid "Z"
+msgstr "Z"
+
+#:
+msgid "Zetta"
+msgstr "zetta"
+
+#:
+msgid "Yotta"
+msgstr "yotta"
+
+#:
+msgid "Y.m.d H:i:s"
+msgstr "Y.m.d H:i:s"
+
+#:
+msgid "Delete selected user?"
+msgstr "Smazat vybraného uživatele?"
+
+#:
+msgid "Subfilter"
+msgstr "Rozšiřující filtr"
+
+#:
+msgid "affects only filtered data!"
+msgstr "ovlivní pouze filtrovaná data!"
+
+#:
+msgid "show value mappings"
+msgstr "zobrazit mapování hodnot"
+
+#:
+msgid "Delete selected item?"
+msgstr "Smazat vybranou položku?"
+
+#:
+msgid "Do"
+msgstr "Do"
+
+#:
+msgid "Incorrect list of items."
+msgstr "Neplatný seznam položek."
+
+#:
+msgid "Delete trigger?"
+msgstr "Smazat spouštěč?"
+
+#:
+msgid "Profile for this host is missing"
+msgstr "Chybí profil pro tohoto hostitele"
+
+#:
+msgid "No image"
+msgstr "žádný obrázek"
+
+#:
+msgid "Delete system map?"
+msgstr "Smazat systémovou mapu?"
+
+#:
+msgid "Incorrect arguments passed to function"
+msgstr "Funkci byly předány neplatné argumenty"
+
+#:
+msgid "Incorrect key format"
+msgstr "Neplatný formát klíče"
+
+#:
+msgid "Item will not be refreshed. Please enter a correct update interval."
+msgstr "Položka nebude akutalizována. Zadejte, prosím, správný interval aktualizací."
+
+#:
+msgid "Invalid SNMP port"
+msgstr "Neplatný SNMP port"
+
+#:
+msgid "Type of information must be Log for log key"
+msgstr "Type of information must be Log for log key"
+
+#:
+msgid "Value type must be Float for aggregate items"
+msgstr "Pro skládané položky musí být typ hodnoty float"
+
+#:
+msgid "Group function"
+msgstr "Seskupující funkce"
+
+#:
+msgid "is not one of"
+msgstr "není jedna z"
+
+#:
+msgid "Item function"
+msgstr "Funkce položky"
+
+#:
+msgid "Key does not match"
+msgstr "Klíč nesouhlasí"
+
+#:
+msgid "An item with the Key"
+msgstr "Položka s klíčem"
+
+#:
+msgid "already exists for host"
+msgstr "již pro hostitele existuje"
+
+#:
+msgid "The key must be unique."
+msgstr "Klíč musí být unikátní."
+
+#:
+msgid "Added new item"
+msgstr "Přidána nová položka"
+
+#:
+msgid "updated"
+msgstr "aktualizovaný"
+
+#:
+msgid "No item with"
+msgstr "Neexistuje položka s"
+
+#:
+msgid "deleted"
+msgstr "smazaný"
+
+#:
+msgid "Unknown value type"
+msgstr "Neznámý typ hodnoty"
+
+#:
+msgid "Check the key, please. Default example was passed"
+msgstr "Check the key, please. Default example was passed"
+
+#:
+msgid "Scenario step number cannot be less than 1"
+msgstr "Číslo kroku scénáře nesmí být menší než 1"
+
+#:
+msgid "Scenario step name should contain"
+msgstr "Krok scénáře může obsahovat"
+
+#:
+msgid "characters only"
+msgstr "znaky pouze"
+
+#:
+msgid "Only characters are allowed"
+msgstr "Povoleny jsou pouze tisknutelné znaky"
+
+#:
+msgid "Cannot add new application"
+msgstr "Nelze přidat novou aplikaci"
+
+#:
+msgid "Scenario with name"
+msgstr "Scénář se jménem"
+
+#:
+msgid "added"
+msgstr "přidáno"
+
+#:
+msgid "No media with"
+msgstr "Neexistuje médium s"
+
+#:
+msgid "No media type with"
+msgstr "Neexistuje typ média s"
+
+#:
+msgid "An action type with description"
+msgstr "Typ akce s popisem"
+
+#:
+msgid "can not exist without group"
+msgstr "nemůže existovat bez skupiny"
+
+#:
+msgid "Added host group"
+msgstr "Přidána skupina hostitelů"
+
+#:
+msgid "Updated host group"
+msgstr "Aktualizována skupina hostitelů"
+
+#:
+msgid "Incorrect characters used for Hostname"
+msgstr "Pro název hostitele jsou použity neplatné znaky"
+
+#:
+msgid "Incorrect characters used for DNS"
+msgstr "Pro DNS jsou použity neplatné znaky"
+
+#:
+msgid "Circular link can not be created"
+msgstr "Nelze připojit do smyčky"
+
+#:
+msgid "must be linked to at least one host group"
+msgstr "musí být připojen alespoň do jedné skupiny hostitelů"
+
+#:
+msgid "Added new host"
+msgstr "Přidán nový hostitel"
+
+#:
+msgid "is internal and can not be deleted"
+msgstr "je interní a nemůže být smazána"
+
+#:
+msgid "can not be deleted, due to inner hosts can not be unlinked"
+msgstr "nemůže být smazána, protože hostitelé v ní nemohou být odpojeni"
+
+#:
+msgid "No host groups with"
+msgstr "Neexistuje skupina hostitelů s"
+
+#:
+msgid "incorrect parameters for"
+msgstr "neplatné parametry pro"
+
+#:
+msgid "No host with"
+msgstr "Neexistuje hostitel s"
+
+#:
+msgid "already exists in linked hosts"
+msgstr "již pro propojené hostitele existuje"
+
+#:
+msgid "Added new application"
+msgstr "Přidána nová aplikace"
+
+#:
+msgid "Updated application"
+msgstr "Aktualizována aplikace"
+
+#:
+msgid "used by item"
+msgstr "použita položkou"
+
+#:
+msgid "used by scenario"
+msgstr "použita scénářem"
+
+#:
+msgid "No application with"
+msgstr "Neexistuje aplikace s"
+
+#:
+msgid "unlinked"
+msgstr "odpojený"
+
+#:
+msgid "Template with item key"
+msgstr "Šablona s klíčem položky"
+
+#:
+msgid "Template with application"
+msgstr "Šablona s aplikací"
+
+#:
+msgid "already linked to host"
+msgstr "je již propojená s hostitelem"
+
+#:
+msgid "has been deleted from the system"
+msgstr "byl smazán ze systému"
+
+#:
+msgid "Critical error"
+msgstr "Kritická chyba"
+
+#:
+msgid "Field"
+msgstr "Pole"
+
+#:
+msgid "is not IP range"
+msgstr "není rozsah IP"
+
+#:
+msgid "is not PORT range"
+msgstr "není z rozsahu čísel portů"
+
+#:
+msgid "is not integer range"
+msgstr "není z rozsahu čísel typu integer"
+
+#:
+msgid "is not integer"
+msgstr "není typu integer"
+
+#:
+msgid "is not double"
+msgstr "není typu double"
+
+#:
+msgid "is not string"
+msgstr "není řetězec"
+
+#:
+msgid "contains Multibyte chars"
+msgstr "obsahuje vícebajtové znaky"
+
+#:
+msgid "multibyte chars are restricted"
+msgstr "vícebajtové znaky jsou zakázané"
+
+#:
+msgid "is not a colour"
+msgstr "není barva"
+
+#:
+msgid "is mandatory"
+msgstr "je povinné"
+
+#:
+msgid "must be missing"
+msgstr "nesmí být zadáno"
+
+#:
+msgid "Operation cannot be performed due to unauthorized request"
+msgstr "Neoprávněný požadavek. Operace nemůže být provedena."
+
+#:
+msgid "Incorrect value for"
+msgstr "Neplatná hodnota pro"
+
+#:
+msgid "No trigger with"
+msgstr "Neexistuje spouštěč s"
+
+#:
+msgid "Incorrect usage of quotes"
+msgstr "Neplatné použití uvozovek"
+
+#:
+msgid "Expression cannot be empty"
+msgstr "Výraz nemůže být prázdný"
+
+#:
+msgid "No such host"
+msgstr "Zadaný hostitel neexistuje"
+
+#:
+msgid "Too many hosts"
+msgstr "Příliš mnoho hostitelů"
+
+#:
+msgid "No such monitored parameter"
+msgstr "Neexistuje sledovaný parametr"
+
+#:
+msgid "for host"
+msgstr "pro hostitele"
+
+#:
+msgid "Unknown function"
+msgstr "Neznámá funkce"
+
+#:
+msgid "Incorrect value type"
+msgstr "Neplatný typ hodnoty"
+
+#:
+msgid "for function"
+msgstr "pro funkci"
+
+#:
+msgid "of key"
+msgstr "klíče"
+
+#:
+msgid "available only for items with value types"
+msgstr "je dostupná pouze pro položky s hodnotami typu"
+
+#:
+msgid "Missing mandatory parameter for function"
+msgstr "Chybí povinný parametr funkce"
+
+#:
+msgid "is not a float or macro for function"
+msgstr "není float nebo makro pro funkci"
+
+#:
+msgid "is not a float or counter or macro for function"
+msgstr "není float, makro nebo čítač pro funkci"
+
+#:
+msgid "An item key must be used in trigger expression"
+msgstr "Ve výrazu spouštěče musí být použitý klíč položky"
+
+#:
+msgid "Incorrect trigger expression"
+msgstr "Neplatný výraz spouštěče"
+
+#:
+msgid "You can not use template hosts in mixed expressions."
+msgstr "Nelze použít hostitele ze šablon ve smíšených výrazech."
+
+#:
+msgid "Added trigger"
+msgstr "Přidán spouštěč"
+
+#:
+msgid "to host"
+msgstr "k hostiteli"
+
+#:
+msgid "Missing key"
+msgstr "Chybí klíč"
+
+#:
+msgid "Incorrect function is used"
+msgstr "Není použita platná funkce"
+
+#:
+msgid "Unknown macro"
+msgstr "Neznámé makro"
+
+#:
+msgid "from host"
+msgstr "od hostitele"
+
+#:
+msgid "Trigger in template"
+msgstr "Spouštěč v šabloně"
+
+#:
+msgid "has dependency with trigger in template"
+msgstr "má závislosti na spouštěči v šabloně"
+
+#:
+msgid "is not the highest level template"
+msgstr "není šablona na nejvyšší úrovni"
+
+#:
+msgid "No function with"
+msgstr "Neexistuje funkce s"
+
+#:
+msgid "Specify the conditional expression for the target."
+msgstr "Určete podmínku pro cíl."
+
+#:
+msgid "0 or 1"
+msgstr "0 nebo 1"
+
+#:
+msgid "At least one item must be present in the trigger expression."
+msgstr "Výraz spouštěče musí obsahovat alespoň jednu položku."
+
+#:
+msgid "Host does not exist."
+msgstr "Hostitel neexistuje."
+
+#:
+msgid "Host key does not exist."
+msgstr "Klíč hostitele neexistuje."
+
+#:
+msgid "Function '"
+msgstr "Funkce '"
+
+#:
+msgid "' does not accept parameters."
+msgstr "' nepřijímá žádné argumenty."
+
+#:
+msgid "Transaction has not been closed. Aborting.."
+msgstr "Transakce nebyla uzavřena. Ruším..."
+
+#:
+msgid "No system map with"
+msgstr "Není definována mapa s"
+
+#:
+msgid "No sysmap element with"
+msgstr "Není definován prvek mapy s"
+
+#:
+msgid "template"
+msgstr "šablona"
+
+#:
+msgid "No rows in screen"
+msgstr "Neexistují žádné řádky pro obrazovku"
+
+#:
+msgid "Delete it?"
+msgstr "Smazat?"
+
+#:
+msgid "This screen-row is not empty"
+msgstr "Tento řádek obrazovky není prázdný"
+
+#:
+msgid "This screen-column is not empty"
+msgstr "Tento sloupec obrazovky není prázdný"
+
+#:
+msgid "[H:i:s]"
+msgstr "[G:i:s]"
+
+#:
+msgid "No graph item with"
+msgstr "Neexistuje položka grafu s"
+
+#:
+msgid "Missing items for graph"
+msgstr "Chybí položky grafu"
+
+#:
+msgid "with template host can not contain items from other hosts."
+msgstr "s hostitelem ze šablony nemůže obsahovat položky ostatních hostitelů."
+
+#:
+msgid "Can not use multiple host items for template graph"
+msgstr "Nelze použít položky více hostitelů pro šablonu grafu"
+
+#:
+msgid "You must use items only from host"
+msgstr "Můžete použít položky pouze z hostitele"
+
+#:
+msgid "for template graph"
+msgstr "pro šablonu grafu"
+
+#:
+msgid "updated for hosts"
+msgstr "aktualizován pro hostitele"
+
+#:
+msgid "Skipped copying of graph"
+msgstr "Kopírování grafu přeskočeno"
+
+#:
+msgid "Graph \""
+msgstr "Graf \""
+
+#:
+msgid "\" deleted from host"
+msgstr "\" byl smazaný z hostitelů"
+
+#:
+msgid "Unable to select configuration"
+msgstr "Nepodařilo se načíst nastavení"
+
+#:
+msgid "on"
+msgstr "v"
+
+#:
+msgid "every"
+msgstr "každé"
+
+#:
+msgid "day"
+msgstr "den"
+
+#:
+msgid "of every"
+msgstr "každého"
+
+#:
+msgid "weeks"
+msgstr "týdny"
+
+#:
+msgid "week"
+msgstr "týden"
+
+#:
+msgid "Service cannot be parent and child at the same time."
+msgstr "Služba nemůže být nadřazená i podřazená zároveň."
+
+#:
+msgid "Cannot link hardlinked service."
+msgstr "Cannot link hardlinked service."
+
+#:
+msgid "Cannot link service to itself."
+msgstr "Nelze propojit službu se sebou samým"
+
+#:
+msgid "No service with"
+msgstr "Neexistuje služba s"
+
+#:
+msgid "No service linkage with"
+msgstr "Neexistuje propojení služby s"
+
+#:
+msgid "Unknown calculation algorithm of service status"
+msgstr "Neznámý algoritmus výpočtu stavu služby"
+
+#:
+msgid "Incorrect user data in"
+msgstr "Neplatná uživatelská data v"
+
+#:
+msgid "Could not save image!"
+msgstr "Nepodařilo se uložit obrázek!"
+
+#:
+msgid "Execute SQL error"
+msgstr "Chyba spuštění SQL"
+
+#:
+msgid "Parse SQL error"
+msgstr "Chyba zpracování SQL"
+
+#:
+msgid "Image size must be less than 1MB"
+msgstr "Obrázek musí mít velikost menší než 1MB"
+
+#:
+msgid "Select image to download"
+msgstr "Vyberte obrázek ke stažení"
+
+#:
+msgid "Incorrect Image"
+msgstr "Neplatný obrázek"
+
+#:
+msgid "Incorrect characters used for Node name"
+msgstr "Pro název uzlu jsou použity neplatné znaky"
+
+#:
+msgid "Master node already exists"
+msgstr "Hlavní uzel již existuje"
+
+#:
+msgid "Incorrect node type"
+msgstr "Neplatný typ uzlu"
+
+#:
+msgid "Node with same ID already exists"
+msgstr "Uzel se stejným ID již existuje"
+
+#:
+msgid "Unable to remove local node"
+msgstr "Nelze odebrat místní uzel"
+
+#:
+msgid "Please be aware that database still contains data related to the deleted Node"
+msgstr "Uvědomte si, prosím, že databáze stále obsahuje data vztažená ke smazanému uzlu"
+
+#:
+msgid "PHP version"
+msgstr "PHP - verze"
+
+#:
+msgid "Minimal version of PHP is"
+msgstr "Nejnižší verze PHP je"
+
+#:
+msgid "PHP memory limit"
+msgstr "PHP - omezení paměti"
+
+#:
+msgid "is a minimal PHP memory limitation"
+msgstr "je nejnižší hodnota omezení paměti PHP"
+
+#:
+msgid "PHP post max size"
+msgstr "PHP - omezení velikosti formulářových dat"
+
+#:
+msgid "is minimum size of PHP post"
+msgstr "je nejnižší hodnota omezení velikosti formulářových dat"
+
+#:
+msgid "PHP max execution time"
+msgstr "PHP - maximální doba běhu skriptu"
+
+#:
+msgid "PHP max input time"
+msgstr "PHP - maximální doba zpracování vstupních dat"
+
+#:
+msgid "is a minimal limitation on execution time of PHP scripts"
+msgstr "je nejnižší hodnota omezení doby běhu PHP skriptů"
+
+#:
+msgid "is a minimal limitation on input parse time for PHP scripts"
+msgstr "je nejnižší hodnota omezení doby zpracování vstupních dat pro PHP skripty"
+
+#:
+msgid "PHP timezone"
+msgstr "PHP - časová zóna"
+
+#:
+msgid "no"
+msgstr "ne"
+
+#:
+msgid "yes"
+msgstr "ano"
+
+#:
+msgid "Timezone for PHP is not set"
+msgstr "Časová zóna v PHP není nastavena."
+
+#:
+msgid "Please set"
+msgstr "Prosím, nastavte"
+
+#:
+msgid "option in"
+msgstr "volbu v"
+
+#:
+msgid "PHP databases support"
+msgstr "PHP - podpora databází"
+
+#:
+msgid "Requires any database support [MySQL or PostgreSQL or Oracle or SQLite3]"
+msgstr "Vyžaduje podporu pro databáze [MySQL, PostgreSQL, Oracle nebo SQLite3]"
+
+#:
+msgid "Requires bcmath module"
+msgstr "Vyžaduje modul bcmath"
+
+#:
+msgid "configure PHP with"
+msgstr "zkonfigurujte PHP s"
+
+#:
+msgid "Requires mb string module"
+msgstr "Vyžaduje modul mbstring"
+
+#:
+msgid "PHP Sockets"
+msgstr "PHP - podpora soketů"
+
+#:
+msgid "Required Sockets module"
+msgstr "Vyžaduje modul sockets"
+
+#:
+msgid "The GD extension is not loaded."
+msgstr "Rozšíření GD není načteno."
+
+#:
+msgid "GD PNG Support"
+msgstr "PHP - podpora GD PNG"
+
+#:
+msgid "Requires images generation support"
+msgstr "Vyžaduje podporu generování obrázků"
+
+#:
+msgid "libxml module"
+msgstr "PHP - libxml modul"
+
+#:
+msgid "php-xml module is not installed"
+msgstr "php-xml modul není nainstalovaný"
+
+#:
+msgid "ctype module"
+msgstr "modul ctype"
+
+#:
+msgid "Requires ctype module"
+msgstr "Vyžaduje modul ctype"
+
+#:
+msgid "PHP upload max filesize"
+msgstr "PHP - maximální velikost nahrávaného souboru"
+
+#:
+msgid "is minimum for PHP upload filesize"
+msgstr "je nejnižší hodnota pro maximální velikost nahrávaného souboru"
+
+#:
+msgid "PHP Session"
+msgstr "PHP - modul session"
+
+#:
+msgid "Required Session module"
+msgstr "Vyžaduje modul session"
+
+#:
+msgid "Account is blocked for"
+msgstr "Účet je blokovaný na"
+
+#:
+msgid "Login name or password is incorrect"
+msgstr "Neplatné přihlašovací jméno nebo heslo"
+
+#:
+msgid "Session terminated, please re-login!"
+msgstr "Relace byla ukončena! Přihlašte se, prosím, znovu."
+
+#:
+msgid "Table users is empty. Possible database corruption."
+msgstr "Tabulka uživatelů je prázdná. Databáze je pravděpodobně poškozená."
+
+#:
+msgid "Probably php-ldap module is missing"
+msgstr "Modul php-ldap pravděpodobně chybí"
+
+#:
+msgid "failed login attempts logged."
+msgstr "neúspěšné pokusy o přihlášení zaznamenány."
+
+#:
+msgid "Last failed attempt was from"
+msgstr "Poslední neúspěšný pokus o přihlášení byl z"
+
+#:
+msgid "Only Super Admins can create Users"
+msgstr "Pouze Super Admini můžou vytvářet uživatele"
+
+#:
+msgid "Only Super Admins can update Users"
+msgstr "Pouze Super Admini můžou aktualizovat uživatele"
+
+#:
+msgid "Only Super Admins can delete Users"
+msgstr "Pouze Super Admini můžou mazat uživatele"
+
+#:
+msgid "Only Zabbix Admins can add user Medias"
+msgstr "Pouze Zabbix Admini můžou přidávat média uživatelům"
+
+#:
+msgid "Only Zabbix Admins can remove user Medias"
+msgstr "Pouze Zabbix Admini můžou mazat média uživatelům"
+
+#:
+msgid "Only Zabbix Admins can change user Medias"
+msgstr "Pouze Zabbix Admini můžou měnit média uživatelům"
+
+#:
+msgid "Can't delete user medias"
+msgstr "Nelze smazat media uživatele"
+
+#:
+msgid "Can't update user medias"
+msgstr "Nelze aktualizovat média uživatele"
+
+#:
+msgid "Can't insert user medias"
+msgstr "Nelze přidat média uživatele"
+
+#:
+msgid "Wrong fields for user"
+msgstr "Nesprávně zadaná pole pro uživatele"
+
+#:
+msgid "User ["
+msgstr "Uživatel ["
+
+#:
+msgid "] already exists"
+msgstr "] již existuje"
+
+#:
+msgid "Cannot rename guest user"
+msgstr "Nelze přejmenovat uživatele guest"
+
+#:
+msgid "User cannot restrict access to GUI for himself. Group \""
+msgstr "Uživatel nemůže omezit přístup ke grafickému rozhraní sám sobě. Skupina \""
+
+#:
+msgid "\""
+msgstr "\" omezuje oprávnění"
+
+#:
+msgid "User cannot disable himself. Group \""
+msgstr "Uživatel nemůže zakázat sám sebe. Skupina \""
+
+#:
+msgid "Wrong period ["
+msgstr "Neplatné odbobí aktivity média ["
+
+#:
+msgid "]"
+msgstr "]"
+
+#:
+msgid "Internal Zabbix error"
+msgstr "Vnitřní chyba Zabbixu"
+
+#:
+msgid "Wrong fields for media type"
+msgstr "Nesprávně zadaná pole pro typ média"
+
+#:
+msgid "Can't delete media types"
+msgstr "Nelze smazat typy médií"
+
+#:
+msgid "Can't update media types"
+msgstr "Nelze aktualizovat typy médií"
+
+#:
+msgid "Can't insert media types"
+msgstr "Nelze přidat typy médií"
+
+#:
+msgid "Mediatype already exists:"
+msgstr "Typ média již existuje:"
+
+#:
+msgid "Mediatypes used by action:"
+msgstr "Typ média je použitý v akci:"
+
+#:
+msgid "Only Super Admins can create media types"
+msgstr "Pouze Super Admini můžou vytvářet typy médií"
+
+#:
+msgid "Only Super Admins can update media types"
+msgstr "Pouze Super Admini můžou aktualizovat typy médií"
+
+#:
+msgid "Only Super Admins can delete media types"
+msgstr "Pouze Super Admini můžou mazat typy médií"
+
+#:
+msgid "You cannot view this URL as a"
+msgstr "Tuto stránku nemůžete prohlížet jako"
+
+#:
+msgid "You must login to view this page."
+msgstr "Pro zobrazení této stránky musíte být přihlášen(a)."
+
+#:
+msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
+msgstr "Pokud si myslíte, že tato zpráva je špatně, prosím kontaktuje vašeho administrátora pro přidělení potřebných oprávnění."
+
+#:
+msgid "You are not logged in."
+msgstr "Nejste přihlášen(a)."
+
+#:
+msgid "ERROR"
+msgstr "CHYBA"
+
+#:
+msgid "[Wrong value for month:"
+msgstr "[Neplatná hodnota pro měsíc:"
+
+#:
+msgid "[Wrong value for day of week:"
+msgstr "[Neplatná hodnota pro den v týdnu:"
+
+#:
+msgid "Help"
+msgstr "Nápověda"
+
+#:
+msgid "Profile"
+msgstr "Profil"
+
+#:
+msgid "Get support"
+msgstr "Podpora"
+
+#:
+msgid "Monitoring"
+msgstr "Sledování"
+
+#:
+msgid "Inventory"
+msgstr "Inventář"
+
+#:
+msgid "Queue"
+msgstr "Fronta"
+
+#:
+msgid "Events"
+msgstr "Události"
+
+#:
+msgid "EVENTS"
+msgstr "UDÁLOSTI"
+
+#:
+msgid "Maps"
+msgstr "Mapy"
+
+#:
+msgid "Report"
+msgstr "Protokol"
+
+#:
+msgid "Reports"
+msgstr "Protokoly"
+
+#:
+msgid "General"
+msgstr "Obecné"
+
+#:
+msgid "Login"
+msgstr "Přihlásit"
+
+#:
+msgid "Logout"
+msgstr "Odhlásit"
+
+#:
+msgid "Print"
+msgstr "Tisk"
+
+#:
+msgid "Latest data"
+msgstr "Poslední hodnoty"
+
+#:
+msgid "Incorrect description"
+msgstr "Neplatný popis"
+
+#:
+msgid "Can't format Tree"
+msgstr "Nelze naformátovat navigační strom"
+
+#:
+msgid "You do not have permission to perform this operation"
+msgstr "Nemáte oprávnění k provedení této operace"
+
+#:
+msgid "No permissions for screen"
+msgstr "Nemáte oprávnění k obrazovce"
+
+#:
+msgid "No permissions for map"
+msgstr "Nemáte oprávnění k mapě"
+
+#:
+msgid "XML file contains errors"
+msgstr "XML soubor obsahuje chyby"
+
+#:
+msgid "W"
+msgstr "st"
+
+#:
+msgid "F"
+msgstr "pá"
+
+#:
+msgid "S"
+msgstr "so"
+
+#:
+msgid "Zoom"
+msgstr "Zvětšení"
+
+#:
+msgid "fixed"
+msgstr "pevný"
+
+#:
+msgid "dynamic"
+msgstr "dynamický"
+
+#:
+msgid "now"
+msgstr "nyní"
+
+#:
+msgid "Create Log Trigger"
+msgstr "Create Log Trigger"
+
+#:
+msgid "Do you replace the conditional expression?"
+msgstr "Do you replace the conditional expression?"
+
+#:
+msgid "Add Service"
+msgstr "Přidat službu"
+
+#:
+msgid "Edit Service"
+msgstr "Upravit službu"
+
+#:
+msgid "Delete Service"
+msgstr "Smazat službu"
+
+#:
+msgid "Delete selected services?"
+msgstr "Smazat vybrané služby?"
+
+#:
+msgid "Can not find objects with name"
+msgstr "Nelze najít žádné objekty se jménem"
+
+#:
+msgid "Can not create new element"
+msgstr "Nelze vytvořit nový element"
+
+#:
+msgid "other"
+msgstr "other"
+
+#:
+msgid "We are sorry, the maximum possible number of elements to remember has been reached."
+msgstr "We are sorry, the maximum possible number of elements to remember has been reached."

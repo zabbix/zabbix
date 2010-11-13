@@ -64,6 +64,9 @@ class CComboBox extends CTag{
 					$selected = 'yes';
 				}
 			}
+			else{
+				$selected = 'yes';
+			}
 
 			parent::addItem(new CComboItem($value, $caption, $selected, $enabled));
 		}

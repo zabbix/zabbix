@@ -1,0 +1,1581 @@
+"Project-Id-Version: Zabbix 1.9\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-11-10 16:17+0300\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Konstantin <konstantin.buravcov@zabbix.com>\n"
+"Language-Team: Zabbix <info@zabbix.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#:
+msgid "d M Y H:i:s"
+msgstr "d M H:i:s"
+
+#:
+msgid "d M Y"
+msgstr "d M Y"
+
+#:
+msgid "UTF-8"
+msgstr "UTF-8"
+
+#:
+msgid "Actions"
+msgstr "Azioni"
+
+#:
+msgid "Action added"
+msgstr "Azione aggiunta!"
+
+#:
+msgid "Cannot add action"
+msgstr "Non riesco ad aggiungere l'azione"
+
+#:
+msgid "Action updated"
+msgstr "Ho aggiornato l'azione"
+
+#:
+msgid "Cannot update action"
+msgstr "Non posso aggiornare l'azione"
+
+#:
+msgid "Action deleted"
+msgstr "Azione rimossa!"
+
+#:
+msgid "Cannot delete action"
+msgstr "Non posso cancellare l'azione"
+
+#:
+msgid "Send message to"
+msgstr "Manda il messaggio a:"
+
+#:
+msgid "Delay"
+msgstr "Con ritardo (in sec)"
+
+#:
+msgid "Subject"
+msgstr "Oggetto"
+
+#:
+msgid "Message"
+msgstr "Messaggio"
+
+#:
+msgid "On"
+msgstr "ON"
+
+#:
+msgid "Off"
+msgstr "OFF"
+
+#:
+msgid "No actions defined"
+msgstr "Nessuna azione definita"
+
+#:
+msgid "Single user"
+msgstr "Utente singolo"
+
+#:
+msgid "User group"
+msgstr "Gruppo di utenti"
+
+#:
+msgid "Group"
+msgstr "Gruppo"
+
+#:
+msgid "User"
+msgstr "Utente"
+
+#:
+msgid "Not classified"
+msgstr "Non classificato"
+
+#:
+msgid "Information"
+msgstr "Solo informativo"
+
+#:
+msgid "Warning"
+msgstr "Avvertimento"
+
+#:
+msgid "Average"
+msgstr "Allarme medio"
+
+#:
+msgid "High"
+msgstr "Grave allarme"
+
+#:
+msgid "Disaster"
+msgstr "Disastro!"
+
+#:
+msgid "Show all"
+msgstr "Mostra tutti"
+
+#:
+msgid "Time"
+msgstr "Data e ora"
+
+#:
+msgid "Status"
+msgstr "Stato"
+
+#:
+msgid "Duration"
+msgstr "Durata"
+
+#:
+msgid "TRUE"
+msgstr "VERO"
+
+#:
+msgid "FALSE"
+msgstr "FALSO"
+
+#:
+msgid "UNKNOWN"
+msgstr "NON RILEVABILE"
+
+#:
+msgid "Type"
+msgstr "Tipo"
+
+#:
+msgid "Recipient(s)"
+msgstr "Destinatari"
+
+#:
+msgid "Error"
+msgstr "Errore"
+
+#:
+msgid "sent"
+msgstr "spedito"
+
+#:
+msgid "not sent"
+msgstr "non spedito"
+
+#:
+msgid "Custom graphs"
+msgstr "Grafici"
+
+#:
+msgid "GRAPHS"
+msgstr "GRAFICI"
+
+#:
+msgid "Select graph to display"
+msgstr "Seleziona il grafico"
+
+#:
+msgid "Period"
+msgstr "Periodo"
+
+#:
+msgid "Select graph..."
+msgstr "Seleziona..."
+
+#:
+msgid "Configuration of Zabbix"
+msgstr "Configurazione di ZABBIX"
+
+#:
+msgid "CONFIGURATION OF ZABBIX"
+msgstr "CONFIGURAZIONE DI ZABBIX"
+
+#:
+msgid "Configuration updated"
+msgstr "Configurazione aggiornata"
+
+#:
+msgid "Configuration was not updated"
+msgstr "La configuration non è stata aggiornat"
+
+#:
+msgid "Added new media type"
+msgstr "Nuovo mezzo aggiunto"
+
+#:
+msgid "New media type was not added"
+msgstr "Il nuovo mezzo non è stato aggiunto"
+
+#:
+msgid "Media type updated"
+msgstr "Mezzo aggiornato!"
+
+#:
+msgid "Media type was not updated"
+msgstr "Il mezzo non è stato aggiornato"
+
+#:
+msgid "Media type deleted"
+msgstr "Il mezzo è stato rimosso"
+
+#:
+msgid "Media type was not deleted"
+msgstr "Il mezzo non è stato rimosso"
+
+#:
+msgid "Configuration"
+msgstr "Configurazione"
+
+#:
+msgid "Do not keep actions older than (in days)"
+msgstr "Non mantenere le azioni più vecchie di (in giorni)"
+
+#:
+msgid "Do not keep events older than (in days)"
+msgstr "Non mantenere gli eventi più vecchi di (in giorni)"
+
+#:
+msgid "No media types defined"
+msgstr "Nessun mezzo definito"
+
+#:
+msgid "SMTP server"
+msgstr "SMTP server"
+
+#:
+msgid "SMTP helo"
+msgstr "SMTP helo"
+
+#:
+msgid "SMTP email"
+msgstr "SMTP email"
+
+#:
+msgid "Script name"
+msgstr "Nome script"
+
+#:
+msgid "Delete selected media?"
+msgstr "Cancellare il mezzo selezionato?"
+
+#:
+msgid "Delete selected image?"
+msgstr "Cancellare l'immagine selezionata?"
+
+#:
+msgid "Housekeeper"
+msgstr "Pulizia database"
+
+#:
+msgid "Media types"
+msgstr "Tipi di mezzo"
+
+#:
+msgid "Escalation rules"
+msgstr "Regole di escalation"
+
+#:
+msgid "Escalation"
+msgstr "Escalation"
+
+#:
+msgid "Escalation rule"
+msgstr "Regola di escalation"
+
+#:
+msgid "Default"
+msgstr "Default"
+
+#:
+msgid "Images"
+msgstr "Immagini"
+
+#:
+msgid "Image"
+msgstr "Immagine"
+
+#:
+msgid "IMAGES"
+msgstr "IMMAGINI"
+
+#:
+msgid "Icon"
+msgstr "Icona"
+
+#:
+msgid "No images defined"
+msgstr "Nessuna immagine definita"
+
+#:
+msgid "Background"
+msgstr "Sfondo"
+
+#:
+msgid "Upload"
+msgstr "Carica"
+
+#:
+msgid "Image added"
+msgstr "Immagine aggiunta"
+
+#:
+msgid "Cannot add image"
+msgstr "Non posso aggiongere l'immagine"
+
+#:
+msgid "Image deleted"
+msgstr "Immagine rimossa"
+
+#:
+msgid "Cannot delete image"
+msgstr "Non posso rimuovere l'immagine"
+
+#:
+msgid "Image updated"
+msgstr "Image updated"
+
+#:
+msgid "Cannot update image"
+msgstr "Cannot update image"
+
+#:
+msgid "Expression"
+msgstr "Formula di calcolo"
+
+#:
+msgid "No permissions !"
+msgstr "Accesso negato!"
+
+#:
+msgid "all"
+msgstr "tutti"
+
+#:
+msgid "Graph"
+msgstr "Graph"
+
+#:
+msgid "Copyright 2001-2010 by"
+msgstr "Copyright 2001-2006 by"
+
+#:
+msgid "Connected as"
+msgstr "Connesso come utente:"
+
+#:
+msgid "SIA Zabbix"
+msgstr "SIA Zabbix"
+
+#:
+msgid "Item added"
+msgstr "Elemento agguinto!"
+
+#:
+msgid "Item updated"
+msgstr "Elemento aggiornato!"
+
+#:
+msgid "Parameter"
+msgstr "Parametro"
+
+#:
+msgid "Colour"
+msgstr "Colore"
+
+#:
+msgid "Up"
+msgstr "S"
+
+#:
+msgid "Down"
+msgstr "Gi"
+
+#:
+msgid "New item for the graph"
+msgstr "Aggiungi il seguente elemento"
+
+#:
+msgid "Sort order (0->100)"
+msgstr "Posizione (0->100)"
+
+#:
+msgid "Configuration of graphs"
+msgstr "Configurazione grafici"
+
+#:
+msgid "CONFIGURATION OF GRAPHS"
+msgstr "CONFIGURAZIONE GRAFICI"
+
+#:
+msgid "Graph added"
+msgstr "Grafico aggiunto!"
+
+#:
+msgid "Graph updated"
+msgstr "Grafico aggiornato!"
+
+#:
+msgid "Cannot update graph"
+msgstr "Non posso aggiornare il grafico"
+
+#:
+msgid "Graph deleted"
+msgstr "Grafico rimosso!"
+
+#:
+msgid "Cannot delete graph"
+msgstr "Non posso rimuovere il grafico"
+
+#:
+msgid "Cannot add graph"
+msgstr "Non posso aggiungere il grafico"
+
+#:
+msgid "Id"
+msgstr "Id"
+
+#:
+msgid "No graphs defined"
+msgstr "Nessun grafico definito"
+
+#:
+msgid "Delete graph?"
+msgstr "Rimuovere il grafico?"
+
+#:
+msgid "Y axis MIN value"
+msgstr "Y minimo"
+
+#:
+msgid "Y axis MAX value"
+msgstr "Y massimo"
+
+#:
+msgid "Calculated"
+msgstr "Automatico"
+
+#:
+msgid "Fixed"
+msgstr "Fisso"
+
+#:
+msgid "Last hour graph"
+msgstr "Grafico dell'ultima ora"
+
+#:
+msgid "Timestamp"
+msgstr "Data e ora"
+
+#:
+msgid "Hosts"
+msgstr "Dispositivi"
+
+#:
+msgid "Items"
+msgstr "Parametri"
+
+#:
+msgid "Triggers"
+msgstr "Inneschi"
+
+#:
+msgid "Graphs"
+msgstr "Grafici"
+
+#:
+msgid "Host added"
+msgstr "Dispositivo aggiunto!"
+
+#:
+msgid "Cannot add host"
+msgstr "Non posso aggiungere il dispositivo"
+
+#:
+msgid "Host updated"
+msgstr "Dispositivo aggiornato!"
+
+#:
+msgid "Cannot update host"
+msgstr "Non posso aggiornare il dispositivo"
+
+#:
+msgid "Host status updated"
+msgstr "Stato del dispositivo aggiornato!"
+
+#:
+msgid "Cannot update host status"
+msgstr "Non posso aggiornare lo stato del dispositivo"
+
+#:
+msgid "Host deleted"
+msgstr "Dispositivo rimosso!"
+
+#:
+msgid "Cannot delete host"
+msgstr "Non posso rimuovere il dispositivo"
+
+#:
+msgid "HOST GROUPS"
+msgstr "GRUPPI DI DISPOSITIVI"
+
+#:
+msgid "No host groups defined"
+msgstr "Nessun gruppo di dispositivi definito"
+
+#:
+msgid "No hosts defined"
+msgstr "Nessun dispositivo definito"
+
+#:
+msgid "HOSTS"
+msgstr "DISPOSITIVI"
+
+#:
+msgid "Host"
+msgstr "Dispositivo"
+
+#:
+msgid "IP"
+msgstr "IP"
+
+#:
+msgid "Port"
+msgstr "Porta"
+
+#:
+msgid "Monitored"
+msgstr "Abilitato"
+
+#:
+msgid "Not monitored"
+msgstr "Disabilitato"
+
+#:
+msgid "Template"
+msgstr "Modello"
+
+#:
+msgid "Deleted"
+msgstr "Rimosso"
+
+#:
+msgid "Unknown"
+msgstr "Non rilevabile"
+
+#:
+msgid "Groups"
+msgstr "Gruppi"
+
+#:
+msgid "New group"
+msgstr "Nuovo gruppo"
+
+#:
+msgid "IP address"
+msgstr "Indirizzo IP"
+
+#:
+msgid "Delete selected host?"
+msgstr "Rimuovi il dispositivo selezionato?"
+
+#:
+msgid "Group name"
+msgstr "Nome del gruppo"
+
+#:
+msgid "Host group"
+msgstr "Gruppo del dispositivo"
+
+#:
+msgid "Host groups"
+msgstr "Gruppi del dispositivo"
+
+#:
+msgid "Update"
+msgstr "Aggiorna"
+
+#:
+msgid "Availability"
+msgstr "Disponibilit"
+
+#:
+msgid "Available"
+msgstr "Disponibile"
+
+#:
+msgid "Not available"
+msgstr "Errore!"
+
+#:
+msgid "Templates"
+msgstr "Modelli"
+
+#:
+msgid "Configuration of items"
+msgstr "Configurazione parametri"
+
+#:
+msgid "CONFIGURATION OF ITEMS"
+msgstr "CONFIGURAZIONE PARAMETRI"
+
+#:
+msgid "Cannot update item"
+msgstr "Non posso aggiornare il parametro"
+
+#:
+msgid "Status updated"
+msgstr "Stato aggiornato!"
+
+#:
+msgid "Cannot update status"
+msgstr "Non posso aggiornare lo stato!"
+
+#:
+msgid "Cannot add item"
+msgstr "Non posso aggiungere il parametro"
+
+#:
+msgid "Item deleted"
+msgstr "Parametro rimosso!"
+
+#:
+msgid "Cannot delete item"
+msgstr "Non posso rimuovere il parametro"
+
+#:
+msgid "Items deleted"
+msgstr "Parametri rimossi!"
+
+#:
+msgid "Cannot delete items"
+msgstr "Non posso rimuovere i parametri"
+
+#:
+msgid "Items activated"
+msgstr "Parametro attivato"
+
+#:
+msgid "Items disabled"
+msgstr "Parametri disabilitati!"
+
+#:
+msgid "Key"
+msgstr "Chiave"
+
+#:
+msgid "Description"
+msgstr "Descrizione"
+
+#:
+msgid "Update interval"
+msgstr "Aggiorna ogni (in sec)"
+
+#:
+msgid "History"
+msgstr "Storico"
+
+#:
+msgid "Trends"
+msgstr "Trends (in gg)"
+
+#:
+msgid "Zabbix agent"
+msgstr "Modulo ZABBIX (PASSIVO)"
+
+#:
+msgid "Zabbix agent (active)"
+msgstr "Modulo ZABBIX (ATTIVO)"
+
+#:
+msgid "SNMPv1 agent"
+msgstr "Modulo SNMPv1"
+
+#:
+msgid "Zabbix trapper"
+msgstr "Trapper ZABBIX"
+
+#:
+msgid "Simple check"
+msgstr "Controlli base"
+
+#:
+msgid "SNMPv2 agent"
+msgstr "Modulo SNMPv2"
+
+#:
+msgid "SNMPv3 agent"
+msgstr "Modulo SNMPv3"
+
+#:
+msgid "Zabbix internal"
+msgstr "ZABBIX interno"
+
+#:
+msgid "Active"
+msgstr "Attivo"
+
+#:
+msgid "Not supported"
+msgstr "Non supportato"
+
+#:
+msgid "Email"
+msgstr "Email"
+
+#:
+msgid "Script"
+msgstr "Script"
+
+#:
+msgid "Units"
+msgstr "Unit"
+
+#:
+msgid "Update interval (in sec)"
+msgstr "Intervallo di aggiornameto (in sec)"
+
+#:
+msgid "Keep history (in days)"
+msgstr "Storico da mantenere (in gg)"
+
+#:
+msgid "Keep trends (in days)"
+msgstr "Trend da mantenere (in gg)"
+
+#:
+msgid "Type of information"
+msgstr "Tipo di dato"
+
+#:
+msgid "Store value"
+msgstr "Memorizza il valore"
+
+#:
+msgid "Numeric (unsigned)"
+msgstr "Numerico (integer 64bit)"
+
+#:
+msgid "Numeric (float)"
+msgstr "Numerico (float)"
+
+#:
+msgid "Character"
+msgstr "Alfabetico"
+
+#:
+msgid "Log"
+msgstr "Log"
+
+#:
+msgid "As is"
+msgstr "Così com'è"
+
+#:
+msgid "Delta (speed per second)"
+msgstr "Come velocità (delta nell'intervallo di tempo)"
+
+#:
+msgid "Delta (simple change)"
+msgstr "Come differenza semplice tra i due ultimi valori"
+
+#:
+msgid "Item"
+msgstr "Parametro"
+
+#:
+msgid "SNMP community"
+msgstr "SNMP community"
+
+#:
+msgid "SNMP OID"
+msgstr "SNMP OID"
+
+#:
+msgid "SNMP port"
+msgstr "SNMP port"
+
+#:
+msgid "Allowed hosts"
+msgstr "Dispositivi concessi"
+
+#:
+msgid "SNMPv3 security name"
+msgstr "SNMPv3 security name"
+
+#:
+msgid "SNMPv3 security level"
+msgstr "SNMPv3 security level"
+
+#:
+msgid "SNMPv3 auth passphrase"
+msgstr "SNMPv3 auth passphrase"
+
+#:
+msgid "SNMPv3 priv passphrase"
+msgstr "SNMPv3 priv passphrase"
+
+#:
+msgid "Custom multiplier"
+msgstr "Moltiplicatore variabile"
+
+#:
+msgid "Select host..."
+msgstr "Seleziona dispositivo..."
+
+#:
+msgid "Latest events"
+msgstr "Ultimi eventi"
+
+#:
+msgid "HISTORY OF EVENTS"
+msgstr "STORICO EVENTI"
+
+#:
+msgid "Last check"
+msgstr "Ultimo aggiornamento"
+
+#:
+msgid "Last value"
+msgstr "Ultimo dato"
+
+#:
+msgid "Label"
+msgstr "Etichetta"
+
+#:
+msgid "X"
+msgstr "X"
+
+#:
+msgid "Link status indicator"
+msgstr "Indicatore dello stato del collegamento"
+
+#:
+msgid "OK"
+msgstr "OK"
+
+#:
+msgid "http://www.zabbix.com"
+msgstr "http://www.zabbix.com"
+
+#:
+msgid "Network maps"
+msgstr "Mappe di rete"
+
+#:
+msgid "NETWORK MAPS"
+msgstr "MAPPE DI RETE"
+
+#:
+msgid "Background image"
+msgstr "Immagine di sfondo"
+
+#:
+msgid "Icon label type"
+msgstr "Tipo etichetta dell'icona"
+
+#:
+msgid "Status only"
+msgstr "Solo lo stato"
+
+#:
+msgid "Nothing"
+msgstr "Niente"
+
+#:
+msgid "Media"
+msgstr "Mezzi"
+
+#:
+msgid "Send to"
+msgstr "Spedisci a"
+
+#:
+msgid "When active"
+msgstr "Quando è attivo"
+
+#:
+msgid "No media defined"
+msgstr "Nessun mezzo definito"
+
+#:
+msgid "New media"
+msgstr "Nuovo mezzo"
+
+#:
+msgid "Use if severity"
+msgstr "Usa se la severità è"
+
+#:
+msgid "Overview"
+msgstr "Panoramica"
+
+#:
+msgid "OVERVIEW"
+msgstr "PANORAMICA"
+
+#:
+msgid "Data"
+msgstr "Dati"
+
+#:
+msgid "QUEUE"
+msgstr "CODA"
+
+#:
+msgid "QUEUE OF ITEMS TO BE UPDATED"
+msgstr "CODA DEI PARAMETRI DA AGGIORNARE"
+
+#:
+msgid "Next check"
+msgstr "Prossimo controllo"
+
+#:
+msgid "The queue is empty"
+msgstr "La coda è vuota"
+
+#:
+msgid "Total"
+msgstr "Totale"
+
+#:
+msgid "Count"
+msgstr "Quanti?"
+
+#:
+msgid "5 seconds"
+msgstr "5 secondi"
+
+#:
+msgid "10 seconds"
+msgstr "10 secondi"
+
+#:
+msgid "30 seconds"
+msgstr "30 secondi"
+
+#:
+msgid "1 minute"
+msgstr "1 minuto"
+
+#:
+msgid "5 minutes"
+msgstr "5 minuti"
+
+#:
+msgid "Status of Zabbix"
+msgstr "Stato del server"
+
+#:
+msgid "STATUS OF ZABBIX"
+msgstr "STATO DEL SERVER"
+
+#:
+msgid "Value"
+msgstr "Valore"
+
+#:
+msgid "Zabbix server is running"
+msgstr "Il server è attivo?"
+
+#:
+msgid "Number of users (online)"
+msgstr "Numero di utenti"
+
+#:
+msgid "Yes"
+msgstr "S"
+
+#:
+msgid "No"
+msgstr "No"
+
+#:
+msgid "Availability report"
+msgstr "Rapporto di stato"
+
+#:
+msgid "AVAILABILITY REPORT"
+msgstr "RAPPORTO DI STATO"
+
+#:
+msgid "Show"
+msgstr "Mostra..."
+
+#:
+msgid "IT SERVICES AVAILABILITY REPORT"
+msgstr "RAPPORTO SERVIZI IT"
+
+#:
+msgid "From"
+msgstr "Da"
+
+#:
+msgid "Till"
+msgstr "Fino a"
+
+#:
+msgid "Ok"
+msgstr "Ok"
+
+#:
+msgid "Problems"
+msgstr "Qualche problema"
+
+#:
+msgid "Percentage"
+msgstr "Percentuale"
+
+#:
+msgid "SLA"
+msgstr "SLA"
+
+#:
+msgid "Day"
+msgstr "Giorno"
+
+#:
+msgid "Month"
+msgstr "Mese"
+
+#:
+msgid "Year"
+msgstr "Anno"
+
+#:
+msgid "Daily"
+msgstr "Quotidianamente"
+
+#:
+msgid "Weekly"
+msgstr "Settimanalmente"
+
+#:
+msgid "Monthly"
+msgstr "Mensilmente"
+
+#:
+msgid "Yearly"
+msgstr "Annuariamente"
+
+#:
+msgid "Screens"
+msgstr "Schermate"
+
+#:
+msgid "Screen"
+msgstr "Nuova schermata"
+
+#:
+msgid "CONFIGURATION OF SCREENS"
+msgstr "CONFIGURAZIONE DELLE SCHERMATE"
+
+#:
+msgid "Screen added"
+msgstr "Schermata aggiunta!"
+
+#:
+msgid "Cannot add screen"
+msgstr "Non posso aggiungere la schermata"
+
+#:
+msgid "Screen updated"
+msgstr "Schermata aggiornata!"
+
+#:
+msgid "Cannot update screen"
+msgstr "Non posso aggiornare la schermata"
+
+#:
+msgid "Screen deleted"
+msgstr "Schermata rimossa!"
+
+#:
+msgid "Cannot deleted screen"
+msgstr "Non posso rimuovere la schermata"
+
+#:
+msgid "Columns"
+msgstr "Colonne"
+
+#:
+msgid "Rows"
+msgstr "Righe"
+
+#:
+msgid "No screens defined"
+msgstr "Nessuna schermata definita"
+
+#:
+msgid "Delete screen?"
+msgstr "Rimuovo la schermata?"
+
+#:
+msgid "CONFIGURATION OF SCREEN"
+msgstr "CONFIGURAZIONE DELLA SCHERMATA"
+
+#:
+msgid "Screen cell configuration"
+msgstr "Configurazione della cella"
+
+#:
+msgid "Resource"
+msgstr "Risorsa"
+
+#:
+msgid "Simple graph"
+msgstr "Grafico semplice"
+
+#:
+msgid "Graph name"
+msgstr "Nome del grafico"
+
+#:
+msgid "Width"
+msgstr "Larghezza pixels"
+
+#:
+msgid "Height"
+msgstr "Altezza pixels"
+
+#:
+msgid "Map"
+msgstr "Mappa"
+
+#:
+msgid "Plain text"
+msgstr "In formato testo"
+
+#:
+msgid "Column span"
+msgstr "Espandi su X colonne"
+
+#:
+msgid "Row span"
+msgstr "Espandi su X righe"
+
+#:
+msgid "Right"
+msgstr "Diritto"
+
+#:
+msgid "Custom screens"
+msgstr "Schermate definite"
+
+#:
+msgid "SCREENS 45645645"
+msgstr "SCHERMATE DEFINITE"
+
+#:
+msgid "IT services"
+msgstr "Servizi IT"
+
+#:
+msgid "Service updated"
+msgstr "Servizio aggiornato!"
+
+#:
+msgid "Cannot update service"
+msgstr "Non posso aggiornare il servizio"
+
+#:
+msgid "Service added"
+msgstr "Servizio aggiunto!"
+
+#:
+msgid "Cannot add service"
+msgstr "Non posso aggiungere il servizio"
+
+#:
+msgid "Service deleted"
+msgstr "Servizio rimosso!"
+
+#:
+msgid "Cannot delete service"
+msgstr "Non posso rimuovere il servizio"
+
+#:
+msgid "Status calculation"
+msgstr "Calcolo dello stato"
+
+#:
+msgid "Status calculation algorithm"
+msgstr "Algoritmo di calcolo dello stato"
+
+#:
+msgid "None"
+msgstr "Assente"
+
+#:
+msgid "Soft"
+msgstr "Soft"
+
+#:
+msgid "Do not calculate"
+msgstr "Nessun calcolo"
+
+#:
+msgid "Acceptable SLA (in %)"
+msgstr "Percentuale accettabile di SLA"
+
+#:
+msgid "Link to trigger?"
+msgstr "Collegato all'innesco?"
+
+#:
+msgid "Sort order (0->999)"
+msgstr "Priorità (0->999)"
+
+#:
+msgid "Trigger"
+msgstr "Specifica l'innesco collegato"
+
+#:
+msgid "Server"
+msgstr "Dispositivo"
+
+#:
+msgid "Delete"
+msgstr "Rimuovi"
+
+#:
+msgid "IT SERVICES"
+msgstr "SERVIZI IT"
+
+#:
+msgid "Service"
+msgstr "Servizio"
+
+#:
+msgid "Reason"
+msgstr "Causa"
+
+#:
+msgid "Configuration of triggers"
+msgstr "Configurazione inneschi"
+
+#:
+msgid "CONFIGURATION OF TRIGGERS"
+msgstr "CONFIGURAZIONE INNESCHI"
+
+#:
+msgid "Triggers deleted"
+msgstr "Inneschi rimossi!"
+
+#:
+msgid "Cannot delete triggers"
+msgstr "Non posso rimuovere gli innesschi"
+
+#:
+msgid "Trigger deleted"
+msgstr "Innesco rimosso!"
+
+#:
+msgid "Cannot delete trigger"
+msgstr "Non posso rimuovere l'innesco"
+
+#:
+msgid "Trigger added"
+msgstr "Innesco aggiunto!"
+
+#:
+msgid "Cannot add trigger"
+msgstr "Non posso aggiungere l'innesco"
+
+#:
+msgid "Severity"
+msgstr "Livello"
+
+#:
+msgid "Disabled"
+msgstr "Disabilitato"
+
+#:
+msgid "Enabled"
+msgstr "Abilitato"
+
+#:
+msgid "Change"
+msgstr "Differenza"
+
+#:
+msgid "Trigger updated"
+msgstr "Innesco aggiornato!"
+
+#:
+msgid "Cannot update trigger"
+msgstr "Non posso aggiornare l'innesco"
+
+#:
+msgid "Depends on"
+msgstr "Dipende da"
+
+#:
+msgid "Trigger comments"
+msgstr "Note sull'innesco"
+
+#:
+msgid "TRIGGER COMMENTS"
+msgstr "NOTE SULL'INNESCO"
+
+#:
+msgid "Comment updated"
+msgstr "Commento aggiornato!"
+
+#:
+msgid "Cannot update comment"
+msgstr "Non posso aggiornare il commento"
+
+#:
+msgid "Add"
+msgstr "Aggiungi"
+
+#:
+msgid "Status of triggers"
+msgstr "Stato degli inneschi"
+
+#:
+msgid "STATUS OF TRIGGERS"
+msgstr "STATO DEGLI INNESCHI"
+
+#:
+msgid "Show details"
+msgstr "Mostra i dettagli"
+
+#:
+msgid "TRIGGERS"
+msgstr "INNESCHI"
+
+#:
+msgid "Last change"
+msgstr "Ultimo innesco il"
+
+#:
+msgid "Comments"
+msgstr "Commenti"
+
+#:
+msgid "Select"
+msgstr "Mostra barra di selezione"
+
+#:
+msgid "Users"
+msgstr "Utenti"
+
+#:
+msgid "User added"
+msgstr "Utente aggiunto"
+
+#:
+msgid "Cannot add user"
+msgstr "Non posso aggiungere l'utente"
+
+#:
+msgid "Cannot add user. Both passwords must be equal."
+msgstr "Attenzione! Le due password devono essere uguali."
+
+#:
+msgid "User deleted"
+msgstr "Utente rimosso"
+
+#:
+msgid "Cannot delete user"
+msgstr "Non posso rimuovere l'utente"
+
+#:
+msgid "User updated"
+msgstr "Aggiornamento eseguito"
+
+#:
+msgid "Cannot update user"
+msgstr "Non posso eseguire l'aggiornamento"
+
+#:
+msgid "Cannot update user. Both passwords must be equal."
+msgstr "Attenzione! Le due password devono essere uguali."
+
+#:
+msgid "Group added"
+msgstr "Gruppo aggiunto"
+
+#:
+msgid "Cannot add group"
+msgstr "Non posso aggiungere il gruppo"
+
+#:
+msgid "Group updated"
+msgstr "Gruppo aggiornato"
+
+#:
+msgid "Cannot update group"
+msgstr "Non posso aggiornare il gruppo"
+
+#:
+msgid "Group deleted"
+msgstr "Gruppo rimosso"
+
+#:
+msgid "Cannot delete group"
+msgstr "Non posso rimuovere il gruppo"
+
+#:
+msgid "CONFIGURATION OF USERS AND USER GROUPS"
+msgstr "CONFIGURAZIONE UTENTI E GRUPPI"
+
+#:
+msgid "USER GROUPS"
+msgstr "GRUPPI"
+
+#:
+msgid "USERS"
+msgstr "UTENTI"
+
+#:
+msgid "User groups"
+msgstr "Gruppi utenti"
+
+#:
+msgid "Members"
+msgstr "Membri"
+
+#:
+msgid "No user groups defined"
+msgstr "Nessun gruppo utenti definito"
+
+#:
+msgid "Alias"
+msgstr "Alias"
+
+#:
+msgid "Name"
+msgstr "Nome"
+
+#:
+msgid "Surname"
+msgstr "Cognome"
+
+#:
+msgid "Is online?"
+msgstr "E' collegato?"
+
+#:
+msgid "No users defined"
+msgstr "Nessun utente definito"
+
+#:
+msgid "Read only"
+msgstr "Sola lettura"
+
+#:
+msgid "Read-write"
+msgstr "Lettura-scrittura"
+
+#:
+msgid "Hide"
+msgstr "Nascondi"
+
+#:
+msgid "Password"
+msgstr "Password"
+
+#:
+msgid "Password (once again)"
+msgstr "Password (ripeti)"
+
+#:
+msgid "URL (after login)"
+msgstr "URL (dopo il login)"
+
+#:
+msgid "Refresh (in seconds)"
+msgstr "Refresh (in seconds)"
+
+#:
+msgid "Action"
+msgstr "Action"
+
+#:
+msgid "Details"
+msgstr "Details"
+
+#:
+msgid "Unknown action"
+msgstr "Unknown action"
+
+#:
+msgid "Added"
+msgstr "Added"
+
+#:
+msgid "Updated"
+msgstr "Updated"
+
+#:
+msgid "Media type"
+msgstr "Media type"
+
+#:
+msgid "Graph element"
+msgstr "Graph element"
+
+#:
+msgid "USER PROFILE"
+msgstr "PROFILO UTENTE"
+
+#:
+msgid "User profile"
+msgstr "Profilo utente"
+
+#:
+msgid "Language"
+msgstr "Lingua"
+
+#:
+msgid "English (GB)"
+msgstr "Inglese (GB)"
+
+#:
+msgid "French (FR)"
+msgstr "Francese (FR)"
+
+#:
+msgid "German (DE)"
+msgstr "Tedesco (DE)"
+
+#:
+msgid "Italian (IT)"
+msgstr "Italiano (IT)"
+
+#:
+msgid "Latvian (LV)"
+msgstr "Lituano (LV)"
+
+#:
+msgid "Russian (RU)"
+msgstr "Russo (RU)"
+
+#:
+msgid "ZABBIX"
+msgstr "ZABBIX"
+
+#:
+msgid "Empty"
+msgstr "Vuoto"
+
+#:
+msgid "Y"
+msgstr "Y"
+
+#:
+msgid "Help"
+msgstr "Aiuto"
+
+#:
+msgid "Profile"
+msgstr "Profilo"
+
+#:
+msgid "Latest data"
+msgstr "ULTIMI VALORI"

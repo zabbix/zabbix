@@ -1,0 +1,3529 @@
+"Project-Id-Version: Zabbix 1.9\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-11-10 16:17+0300\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Konstantin <konstantin.buravcov@zabbix.com>\n"
+"Language-Team: Zabbix <info@zabbix.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#:
+msgid "d M Y H:i:s"
+msgstr "d M H:i:s"
+
+#:
+msgid "d M Y"
+msgstr "d M Y"
+
+#:
+msgid "UTF-8"
+msgstr "UTF-8"
+
+#:
+msgid "Activate selected"
+msgstr "선택 항목 활성화"
+
+#:
+msgid "Disable selected"
+msgstr "선택 항목 비활성화"
+
+#:
+msgid "Delete selected"
+msgstr "선택 항목 삭제"
+
+#:
+msgid "Copy selected to ..."
+msgstr "선택 항목 복사..."
+
+#:
+msgid "Host IP"
+msgstr "호스트 IP 주소"
+
+#:
+msgid "Service type"
+msgstr "서비스 종류"
+
+#:
+msgid "Service port"
+msgstr "서비스 포트"
+
+#:
+msgid "Discovery status"
+msgstr "디스커버리 상태"
+
+#:
+msgid "Received value"
+msgstr "수신 값"
+
+#:
+msgid "Uptime/Downtime"
+msgstr "업타임/다운타임"
+
+#:
+msgid "Discovery rule"
+msgstr "디스커버리 규칙"
+
+#:
+msgid "Discovery"
+msgstr "디스커버리"
+
+#:
+msgid "DISCOVERY"
+msgstr "디스커버리"
+
+#:
+msgid "Configuration of discovery"
+msgstr "디스커버리 설정"
+
+#:
+msgid "CONFIGURATION OF DISCOVERY"
+msgstr "디스커버리 설정"
+
+#:
+msgid "No discovery rules defined"
+msgstr "디스커버리 규칙이 정의되어 있지 않습니다"
+
+#:
+msgid "IP range"
+msgstr "IP 주소 범위"
+
+#:
+msgid "Checks"
+msgstr "검사 항목"
+
+#:
+msgid "Create rule"
+msgstr "규칙 작성"
+
+#:
+msgid "Delete rule?"
+msgstr "규칙을 삭제하시겠습니까?"
+
+#:
+msgid "Event source"
+msgstr "이벤트 소스"
+
+#:
+msgid "New check"
+msgstr "새 검사 항목"
+
+#:
+msgid "SSH"
+msgstr "SSH"
+
+#:
+msgid "LDAP"
+msgstr "LDAP"
+
+#:
+msgid "SMTP"
+msgstr "SMTP"
+
+#:
+msgid "FTP"
+msgstr "FTP"
+
+#:
+msgid "HTTP"
+msgstr "HTTP"
+
+#:
+msgid "POP"
+msgstr "POP"
+
+#:
+msgid "NNTP"
+msgstr "NNTP"
+
+#:
+msgid "IMAP"
+msgstr "IMAP"
+
+#:
+msgid "TCP"
+msgstr "TCP"
+
+#:
+msgid "ports"
+msgstr "포트"
+
+#:
+msgid "Discovery rules deleted"
+msgstr "디스커버리 규칙을 삭제하였습니다"
+
+#:
+msgid "Discovery rule deleted"
+msgstr "디스커버리 규칙을 삭제하였습니다"
+
+#:
+msgid "Cannot delete discovery rule"
+msgstr "디스커버리 규칙을 삭제할 수 없습니다"
+
+#:
+msgid "Discovery rules updated"
+msgstr "디스커버리 규칙을 갱신하였습니다"
+
+#:
+msgid "Discovery rule updated"
+msgstr "디스커버리 규칙을 갱신하였습니다"
+
+#:
+msgid "Cannot update discovery rule"
+msgstr "디스커버리 규칙을 갱신할 수 없습니다"
+
+#:
+msgid "Discovery rule added"
+msgstr "디스커버리 규칙을 추가하였습니다"
+
+#:
+msgid "Cannot add discovery rule"
+msgstr "디스커버리 규칙을 추가할 수 없습니다"
+
+#:
+msgid "STATUS OF DISCOVERY"
+msgstr "디스커버리 상태"
+
+#:
+msgid "Status of discovery"
+msgstr "디스커버리 상태"
+
+#:
+msgid "Details of scenario"
+msgstr "시나리오 이름"
+
+#:
+msgid "DETAILS OF SCENARIO"
+msgstr "시나리오 이름"
+
+#:
+msgid "Speed"
+msgstr "속도"
+
+#:
+msgid "Response code"
+msgstr "응답 코드"
+
+#:
+msgid "TOTAL"
+msgstr "합계"
+
+#:
+msgid "Response time"
+msgstr "응답 시간"
+
+#:
+msgid "In progress"
+msgstr "진행 중"
+
+#:
+msgid "of"
+msgstr "of"
+
+#:
+msgid "In check"
+msgstr "검사 중"
+
+#:
+msgid "Idle till"
+msgstr "유휴 한계"
+
+#:
+msgid "Failed on"
+msgstr "Failed on"
+
+#:
+msgid "Status of Web monitoring"
+msgstr "웹 감시 상태"
+
+#:
+msgid "STATUS OF WEB MONITORING"
+msgstr "웹 감시 상태"
+
+#:
+msgid "State"
+msgstr "상태"
+
+#:
+msgid "Status codes"
+msgstr "상태 코드"
+
+#:
+msgid "Web"
+msgstr "웹"
+
+#:
+msgid "Configuration of Web monitoring"
+msgstr "웹 감시 설정"
+
+#:
+msgid "CONFIGURATION OF WEB MONITORING"
+msgstr "웹 감시 설정"
+
+#:
+msgid "Scenario"
+msgstr "시나리오"
+
+#:
+msgid "Scenarios"
+msgstr "시나리오"
+
+#:
+msgid "SCENARIOS"
+msgstr "시나리오"
+
+#:
+msgid "Create scenario"
+msgstr "시나리오 작성"
+
+#:
+msgid "Hide disabled scenarios"
+msgstr "비활성 시나리오 감추기"
+
+#:
+msgid "Show disabled scenarios"
+msgstr "비활성 시나리오 보이기"
+
+#:
+msgid "Number of steps"
+msgstr "스텝 수"
+
+#:
+msgid "Scenario deleted"
+msgstr "시나리오를 삭제하였습니다"
+
+#:
+msgid "Scenario activated"
+msgstr "시나리오를 활성화하였습니다"
+
+#:
+msgid "Scenario disabled"
+msgstr "시나리오를 비활성화하였습니다"
+
+#:
+msgid "Delete scenario?"
+msgstr "시나리오를 삭제하시겠습니까?"
+
+#:
+msgid "Scenario updated"
+msgstr "시나리오를 갱신하였습니다"
+
+#:
+msgid "Cannot update scenario"
+msgstr "시나리오를 갱신할 수 없습니다"
+
+#:
+msgid "Scenario added"
+msgstr "시나리오를 추가하였습니다"
+
+#:
+msgid "Cannot add scenario"
+msgstr "시나리오를 추가할 수 없습니다"
+
+#:
+msgid "Cannot delete scenario"
+msgstr "시나리오를 삭제할 수 없습니다"
+
+#:
+msgid "Agent"
+msgstr "에이전트"
+
+#:
+msgid "Variables"
+msgstr "변수"
+
+#:
+msgid "Step"
+msgstr "스텝"
+
+#:
+msgid "Steps"
+msgstr "스텝"
+
+#:
+msgid "Timeout"
+msgstr "타임아웃"
+
+#:
+msgid "Post"
+msgstr "POST"
+
+#:
+msgid "Required"
+msgstr "요구 문자열"
+
+#:
+msgid "Step of scenario"
+msgstr "시나리오 스텝"
+
+#:
+msgid "Element"
+msgstr "항목"
+
+#:
+msgid "Elements"
+msgstr "항목"
+
+#:
+msgid "Only host info"
+msgstr "호스트 정보만"
+
+#:
+msgid "Export/Import"
+msgstr "내보내기/가져오기"
+
+#:
+msgid "Import file"
+msgstr "파일 가져오기"
+
+#:
+msgid "Import"
+msgstr "가져오기"
+
+#:
+msgid "IMPORT"
+msgstr "가져오기"
+
+#:
+msgid "Export"
+msgstr "내보내기"
+
+#:
+msgid "EXPORT"
+msgstr "내보내기"
+
+#:
+msgid "Preview"
+msgstr "미리보기"
+
+#:
+msgid "Back"
+msgstr "뒤로"
+
+#:
+msgid "No data for export"
+msgstr "내보낼 데이터가 없습니다"
+
+#:
+msgid "Rules"
+msgstr "규칙"
+
+#:
+msgid "Existing"
+msgstr "존재하는 경우"
+
+#:
+msgid "Missing"
+msgstr "존재하지 않는 경우"
+
+#:
+msgid "Refresh"
+msgstr "갱신"
+
+#:
+msgid "Previous"
+msgstr "이전"
+
+#:
+msgid "Next"
+msgstr "다음"
+
+#:
+msgid "Retry"
+msgstr "재실행"
+
+#:
+msgid "Finish"
+msgstr "종료"
+
+#:
+msgid "Fail"
+msgstr "실패"
+
+#:
+msgid "UPDATE"
+msgstr "갱신"
+
+#:
+msgid "Installation"
+msgstr "설치"
+
+#:
+msgid "New installation"
+msgstr "새로 설치"
+
+#:
+msgid "NEW INSTALLATION"
+msgstr "새로 설치"
+
+#:
+msgid "Installation/Update"
+msgstr "설치/갱신"
+
+#:
+msgid "Time zone"
+msgstr "시간대"
+
+#:
+msgid "Do not keep history older than (in days)"
+msgstr "이력 보존 기간(일)"
+
+#:
+msgid "Do not keep trends older than (in days)"
+msgstr "트렌드 보존 기간(일)"
+
+#:
+msgid "Master node"
+msgstr "마스터 노드"
+
+#:
+msgid "Child"
+msgstr "리모트"
+
+#:
+msgid "Master"
+msgstr "마스터"
+
+#:
+msgid "Node updated"
+msgstr "노드를 갱신하였습니다"
+
+#:
+msgid "Cannot update node"
+msgstr "노드를 갱신할 수 없습니다"
+
+#:
+msgid "Node added"
+msgstr "노드를 추가하였습니다"
+
+#:
+msgid "Cannot add node"
+msgstr "노드를 추가할 수 없습니다"
+
+#:
+msgid "Node deleted"
+msgstr "노드를 삭제하였습니다"
+
+#:
+msgid "Cannot delete node"
+msgstr "노드를 삭제할 수 없습니다"
+
+#:
+msgid "Current node"
+msgstr "현재 노드"
+
+#:
+msgid "Acknowledges"
+msgstr "인지"
+
+#:
+msgid "Acknowledge"
+msgstr "인지"
+
+#:
+msgid "Return"
+msgstr "뒤로"
+
+#:
+msgid "Acknowledge alarm by"
+msgstr "인지 사용자:"
+
+#:
+msgid "Add comment by"
+msgstr "주석 추가"
+
+#:
+msgid "ALARM ACKNOWLEDGES"
+msgstr "알람 확인"
+
+#:
+msgid "Acknowledge added"
+msgstr "인지를 추가하였습니다"
+
+#:
+msgid "Configuration of actions"
+msgstr "액션 설정"
+
+#:
+msgid "CONFIGURATION OF ACTIONS"
+msgstr "액션 설정"
+
+#:
+msgid "Operation type"
+msgstr "오퍼레이션 종류"
+
+#:
+msgid "Send message"
+msgstr "메시지 송신"
+
+#:
+msgid "Remote command"
+msgstr "원격 명령"
+
+#:
+msgid "Remote commands"
+msgstr "원격 명령"
+
+#:
+msgid "Filter"
+msgstr "필터"
+
+#:
+msgid "Trigger severity"
+msgstr "트리거 심각도"
+
+#:
+msgid "Trigger value"
+msgstr "트리거 값"
+
+#:
+msgid "Time period"
+msgstr "기간"
+
+#:
+msgid "Trigger description"
+msgstr "트리거 이름"
+
+#:
+msgid "Conditions"
+msgstr "조건"
+
+#:
+msgid "Condition"
+msgstr "조건"
+
+#:
+msgid "New condition"
+msgstr "새 조건"
+
+#:
+msgid "Operations"
+msgstr "오퍼레이션"
+
+#:
+msgid "Edit operation"
+msgstr "오퍼레이션 편집"
+
+#:
+msgid "No conditions defined"
+msgstr "조건이 정의되어 있지 않습니다"
+
+#:
+msgid "Actions deleted"
+msgstr "액션을 삭제하였습니다"
+
+#:
+msgid "Cannot delete actions"
+msgstr "액션을 삭제할 수 없습니다"
+
+#:
+msgid "No operations defined"
+msgstr "오퍼레이션이 정의되어 있지 않습니다"
+
+#:
+msgid "New"
+msgstr "새로 만들기"
+
+#:
+msgid "Add host"
+msgstr "호스트 추가"
+
+#:
+msgid "Remove host"
+msgstr "호스트 삭제"
+
+#:
+msgid "Link to template"
+msgstr "템플릿과의 링크 작성"
+
+#:
+msgid "Unlink from template"
+msgstr "템플릿과의 링크 삭제"
+
+#:
+msgid "Incorrect trigger"
+msgstr "부적설한 트리거"
+
+#:
+msgid "Incorrect host"
+msgstr "부적절한 호스트"
+
+#:
+msgid "Incorrect period"
+msgstr "부적절한 기간"
+
+#:
+msgid "Incorrect IP"
+msgstr "부적절한 IP 주소"
+
+#:
+msgid "Incorrect discovery check"
+msgstr "부적절한 디스커버리 검사"
+
+#:
+msgid "Incorrect port"
+msgstr "부적절한 포트"
+
+#:
+msgid "Incorrect discovery status"
+msgstr "부적절한 디스커버리 상태"
+
+#:
+msgid "Incorrect condition type"
+msgstr "부적절한 조건"
+
+#:
+msgid "Incorrect operation type"
+msgstr "부적절한 오퍼레이션"
+
+#:
+msgid "Incorrect user"
+msgstr "부적절한 사용자"
+
+#:
+msgid "Actions"
+msgstr "액션"
+
+#:
+msgid "ACTIONS"
+msgstr "액션"
+
+#:
+msgid "Action added"
+msgstr "액션을 추가하였습니다"
+
+#:
+msgid "Cannot add action"
+msgstr "액션을 추가할 수 없습니다"
+
+#:
+msgid "Action updated"
+msgstr "액션을 갱신하였습니다"
+
+#:
+msgid "Cannot update action"
+msgstr "액션을 갱신할 수 없습니다"
+
+#:
+msgid "Action deleted"
+msgstr "액션을 삭제하였습니다"
+
+#:
+msgid "Cannot delete action"
+msgstr "액션을 삭제할 수 없습니다"
+
+#:
+msgid "Send message to"
+msgstr "메시지 송신처"
+
+#:
+msgid "Run remote commands"
+msgstr "원격 명령 실행"
+
+#:
+msgid "Delay"
+msgstr "갱신 간격"
+
+#:
+msgid "Subject"
+msgstr "제목"
+
+#:
+msgid "Message"
+msgstr "메시지"
+
+#:
+msgid "On"
+msgstr "ON"
+
+#:
+msgid "Off"
+msgstr "OFF"
+
+#:
+msgid "No actions defined"
+msgstr "액션이 정의되어 있지 않습니다"
+
+#:
+msgid "Single user"
+msgstr "단일 사용자"
+
+#:
+msgid "User group"
+msgstr "사용자 그룹"
+
+#:
+msgid "Group"
+msgstr "그룹"
+
+#:
+msgid "User"
+msgstr "사용자"
+
+#:
+msgid "Not classified"
+msgstr "미분류"
+
+#:
+msgid "Information"
+msgstr "정보"
+
+#:
+msgid "Warning"
+msgstr "경고"
+
+#:
+msgid "Average"
+msgstr "가벼운 장애"
+
+#:
+msgid "High"
+msgstr "중증 장애"
+
+#:
+msgid "Disaster"
+msgstr "심각한 장애"
+
+#:
+msgid "AND / OR"
+msgstr "AND / OR"
+
+#:
+msgid "AND"
+msgstr "AND"
+
+#:
+msgid "and"
+msgstr "and"
+
+#:
+msgid "&"
+msgstr "&"
+
+#:
+msgid "OR"
+msgstr "OR"
+
+#:
+msgid "or"
+msgstr "or"
+
+#:
+msgid "Type of calculation"
+msgstr "계산 종류"
+
+#:
+msgid "Create Action"
+msgstr "액션 작성"
+
+#:
+msgid "Delete selected action?"
+msgstr "선택한 액션을 삭제하시겠습니까?"
+
+#:
+msgid "like"
+msgstr "포함"
+
+#:
+msgid "not like"
+msgstr "포함 안함"
+
+#:
+msgid "in"
+msgstr "범위 내"
+
+#:
+msgid "not in"
+msgstr "범위 밖"
+
+#:
+msgid "Retries left"
+msgstr "남은 재시도 횟수"
+
+#:
+msgid "Show all"
+msgstr "모두 보이기"
+
+#:
+msgid "Time"
+msgstr "시각"
+
+#:
+msgid "Status"
+msgstr "상태"
+
+#:
+msgid "Duration"
+msgstr "기간"
+
+#:
+msgid "TRUE"
+msgstr "장애"
+
+#:
+msgid "FALSE"
+msgstr "정상"
+
+#:
+msgid "UNKNOWN"
+msgstr "알 수 없음"
+
+#:
+msgid "Type"
+msgstr "종류"
+
+#:
+msgid "Recipient(s)"
+msgstr "수신처"
+
+#:
+msgid "Error"
+msgstr "에러"
+
+#:
+msgid "sent"
+msgstr "송신 완료"
+
+#:
+msgid "not sent"
+msgstr "미송신"
+
+#:
+msgid "No actions found"
+msgstr "액션을 찾을 수 없습니다"
+
+#:
+msgid "Line"
+msgstr "선"
+
+#:
+msgid "Filled region"
+msgstr "면"
+
+#:
+msgid "Bold line"
+msgstr "굵은 선"
+
+#:
+msgid "Dot"
+msgstr "점선"
+
+#:
+msgid "Dashed line"
+msgstr "파선"
+
+#:
+msgid "Custom graphs"
+msgstr "커스텀 그래프"
+
+#:
+msgid "GRAPHS"
+msgstr "그래프"
+
+#:
+msgid "Select graph to display"
+msgstr "표시할 그래프를 선택하십시오"
+
+#:
+msgid "Period"
+msgstr "기간"
+
+#:
+msgid "Select graph..."
+msgstr "그래프 선택..."
+
+#:
+msgid "Cannot update value map"
+msgstr "값 매핑을 갱신할 수 없습니다"
+
+#:
+msgid "Value map added"
+msgstr "값 매핑을 추가하였습니다"
+
+#:
+msgid "Cannot add value map"
+msgstr "값 매핑을 추가할 수 없습니다"
+
+#:
+msgid "Value map deleted"
+msgstr "값 매핑을 삭제하였습니다"
+
+#:
+msgid "Cannot delete value map"
+msgstr "값 매핑을 삭제할 수 없습니다"
+
+#:
+msgid "Value map updated"
+msgstr "값 매핑을 갱신하였습니다"
+
+#:
+msgid "VALUE MAPPING"
+msgstr "값 매핑"
+
+#:
+msgid "Value mapping"
+msgstr "값 매핑"
+
+#:
+msgid "Value map"
+msgstr "값 매핑"
+
+#:
+msgid "Mapping"
+msgstr "매핑"
+
+#:
+msgid "New mapping"
+msgstr "새 매핑"
+
+#:
+msgid "No mapping defined"
+msgstr "매핑이 정의되어 있지 않습니다"
+
+#:
+msgid "Create value map"
+msgstr "값 매핑 작성"
+
+#:
+msgid "Configuration of Zabbix"
+msgstr "ZABBIX 설정"
+
+#:
+msgid "CONFIGURATION OF ZABBIX"
+msgstr "ZABBIX 설정"
+
+#:
+msgid "Configuration updated"
+msgstr "설정을 갱신하였습니다"
+
+#:
+msgid "Configuration was not updated"
+msgstr "설정을 갱신할 수 없습니다"
+
+#:
+msgid "Added new media type"
+msgstr "연락 방법을 추가하였습니다"
+
+#:
+msgid "New media type was not added"
+msgstr "연락 방법을 추가할 수 없습니다"
+
+#:
+msgid "Media type updated"
+msgstr "연락 방법을 갱신하였습니다"
+
+#:
+msgid "Media type was not updated"
+msgstr "연락 방법을 갱신할 수 없습니다"
+
+#:
+msgid "Media type deleted"
+msgstr "연락 방법을 삭제하였습니다"
+
+#:
+msgid "Media type was not deleted"
+msgstr "연락 방법을 삭제할 수 없습니다"
+
+#:
+msgid "Configuration"
+msgstr "설정"
+
+#:
+msgid "Administration"
+msgstr "관리"
+
+#:
+msgid "Do not keep actions older than (in days)"
+msgstr "액션 보존 기간(일)"
+
+#:
+msgid "Do not keep events older than (in days)"
+msgstr "이벤트 보존 기간(일)"
+
+#:
+msgid "No media types defined"
+msgstr "연락 방법이 정의되어 있지 않습니다"
+
+#:
+msgid "SMTP server"
+msgstr "SMTP 서버"
+
+#:
+msgid "SMTP helo"
+msgstr "SMTP helo"
+
+#:
+msgid "SMTP email"
+msgstr "발송자 전자우편 주소"
+
+#:
+msgid "Script name"
+msgstr "스크립트 이름"
+
+#:
+msgid "Delete selected media?"
+msgstr "선택한 연락 방법을 삭제하시겠습니까?"
+
+#:
+msgid "Delete selected image?"
+msgstr "선택한 이미지를 삭제하시겠습니까?"
+
+#:
+msgid "Housekeeper"
+msgstr "데이터 보존 기간"
+
+#:
+msgid "Media types"
+msgstr "연락 방법"
+
+#:
+msgid "Escalation rules"
+msgstr "에스컬레이션 규칙"
+
+#:
+msgid "Escalation"
+msgstr "에스컬레이션"
+
+#:
+msgid "Escalation rule"
+msgstr "에스컬레이션 규칙"
+
+#:
+msgid "Default"
+msgstr "Default"
+
+#:
+msgid "Images"
+msgstr "이미지"
+
+#:
+msgid "Image"
+msgstr "이미지"
+
+#:
+msgid "IMAGES"
+msgstr "이미지"
+
+#:
+msgid "Icon"
+msgstr "아이콘"
+
+#:
+msgid "No images defined"
+msgstr "이미지가 정의되어 있지 않습니다"
+
+#:
+msgid "Background"
+msgstr "배경"
+
+#:
+msgid "Upload"
+msgstr "업로드"
+
+#:
+msgid "Image added"
+msgstr "이미지를 추가하였습니다"
+
+#:
+msgid "Cannot add image"
+msgstr "이미지를 추가할 수 없습니다"
+
+#:
+msgid "Image deleted"
+msgstr "이미지를 삭제하였습니다"
+
+#:
+msgid "Cannot delete image"
+msgstr "이미지를 삭제할 수 없습니다"
+
+#:
+msgid "Image updated"
+msgstr "이미지를 갱신하였습니다"
+
+#:
+msgid "Cannot update image"
+msgstr "이미지를 갱신할 수 없습니다"
+
+#:
+msgid "Other"
+msgstr "기타"
+
+#:
+msgid "Other parameters"
+msgstr "기타 파라미터"
+
+#:
+msgid "Refresh unsupported items (in sec)"
+msgstr "취득불가 아이템 갱신 간격(초)"
+
+#:
+msgid "Create Media Type"
+msgstr "연락 방법 작성"
+
+#:
+msgid "Create Image"
+msgstr "이미지 작성"
+
+#:
+msgid "Working time"
+msgstr "Working time"
+
+#:
+msgid "User group for database down message"
+msgstr "데이터베이스 정지 메시지 송신 대상 사용자 그룹"
+
+#:
+msgid "Incorrect group"
+msgstr "부적절한 그룹"
+
+#:
+msgid "Nothing to do"
+msgstr "실행할 것이 없습니다"
+
+#:
+msgid "Incorrect work period"
+msgstr "부적절한 Working time"
+
+#:
+msgid "Expression"
+msgstr "조건식"
+
+#:
+msgid "Node"
+msgstr "노드"
+
+#:
+msgid "Nodes"
+msgstr "노드"
+
+#:
+msgid "NODES"
+msgstr "노드"
+
+#:
+msgid "New node"
+msgstr "새 노드"
+
+#:
+msgid "No nodes defined"
+msgstr "노드가 정의되어 있지 않습니다"
+
+#:
+msgid "No permissions !"
+msgstr "권한이 없습니다!"
+
+#:
+msgid "LATEST DATA"
+msgstr "최근 데이터"
+
+#:
+msgid "all"
+msgstr "전체"
+
+#:
+msgid "- all -"
+msgstr "- all -"
+
+#:
+msgid "- other -"
+msgstr "- 기타 -"
+
+#:
+msgid "Graph"
+msgstr "그래프"
+
+#:
+msgid "Connected as"
+msgstr "다음 사용자로 로그인 중"
+
+#:
+msgid "SIA Zabbix"
+msgstr "SIA Zabbix"
+
+#:
+msgid "Item added"
+msgstr "아이템을 추가하였습니다"
+
+#:
+msgid "Item updated"
+msgstr "아이템을 갱신하였습니다"
+
+#:
+msgid "Items updated"
+msgstr "아이템을 갱신하였습니다"
+
+#:
+msgid "Parameter"
+msgstr "파라미터"
+
+#:
+msgid "Colour"
+msgstr "색"
+
+#:
+msgid "Up"
+msgstr "UP"
+
+#:
+msgid "Down"
+msgstr "DOWN"
+
+#:
+msgid "New item for the graph"
+msgstr "그래프에 추가할 아이템"
+
+#:
+msgid "Sort order (0->100)"
+msgstr "정렬 순서(0->100)"
+
+#:
+msgid "Y axis side"
+msgstr "Y축"
+
+#:
+msgid "Left"
+msgstr "왼쪽"
+
+#:
+msgid "Function"
+msgstr "기능"
+
+#:
+msgid "min"
+msgstr "최소"
+
+#:
+msgid "avg"
+msgstr "평균"
+
+#:
+msgid "max"
+msgstr "최대"
+
+#:
+msgid "Draw style"
+msgstr "종류"
+
+#:
+msgid "Simple"
+msgstr "표준"
+
+#:
+msgid "Graph type"
+msgstr "그래프 종류"
+
+#:
+msgid "Stacked"
+msgstr "누적 그래프"
+
+#:
+msgid "Normal"
+msgstr "꺾은선 그래프"
+
+#:
+msgid "Aggregated"
+msgstr "누계"
+
+#:
+msgid "Aggregated periods count"
+msgstr "누계 주기 횟수"
+
+#:
+msgid "Configuration of graphs"
+msgstr "그래프 설정"
+
+#:
+msgid "CONFIGURATION OF GRAPHS"
+msgstr "그래프 설정"
+
+#:
+msgid "Graph added"
+msgstr "그래프를 추가하였습니다"
+
+#:
+msgid "Graph updated"
+msgstr "그래프를 갱신하였습니다"
+
+#:
+msgid "Cannot update graph"
+msgstr "그래프를 갱신할 수 없습니다"
+
+#:
+msgid "Graph deleted"
+msgstr "그래프를 삭제하였습니다"
+
+#:
+msgid "Cannot delete graph"
+msgstr "그래프를 삭제할 수 없습니다"
+
+#:
+msgid "Cannot add graph"
+msgstr "그래프를 추가할 수 없습니다"
+
+#:
+msgid "Id"
+msgstr "ID"
+
+#:
+msgid "No graphs defined"
+msgstr "그래프가 정의되어 있지 않습니다"
+
+#:
+msgid "No graph defined"
+msgstr "그래프가 정의되어 있지 않습니다"
+
+#:
+msgid "Delete graph?"
+msgstr "그래프를 삭제하시겠습니까?"
+
+#:
+msgid "Y axis MIN value"
+msgstr "Y축 최솟값"
+
+#:
+msgid "Y axis MAX value"
+msgstr "Y축 최댓값"
+
+#:
+msgid "Calculated"
+msgstr "자동 계산"
+
+#:
+msgid "Fixed"
+msgstr "고정"
+
+#:
+msgid "Create Graph"
+msgstr "그래프 작성"
+
+#:
+msgid "Show working time"
+msgstr "Woring time 표시"
+
+#:
+msgid "Show triggers"
+msgstr "트리거 표시"
+
+#:
+msgid "Graph item"
+msgstr "그래프 아이템"
+
+#:
+msgid "Items required for graph"
+msgstr "그래프에 필요한 아이템"
+
+#:
+msgid "sec"
+msgstr "초"
+
+#:
+msgid "Last hour graph"
+msgstr "최근 1시간의 그래프"
+
+#:
+msgid "Last week graph"
+msgstr "최근 1주일의 그래프"
+
+#:
+msgid "Last month graph"
+msgstr "최근 1개월의 그래프"
+
+#:
+msgid "500 latest values"
+msgstr "최근 500개의 값"
+
+#:
+msgid "Timestamp"
+msgstr "타임 스탬프"
+
+#:
+msgid "Local"
+msgstr "로컬"
+
+#:
+msgid "Source"
+msgstr "소스"
+
+#:
+msgid "Show selected"
+msgstr "선택 항목 보이기"
+
+#:
+msgid "Hide selected"
+msgstr "선택 항목 감추기"
+
+#:
+msgid "Mark selected"
+msgstr "선택 항목 색 지정"
+
+#:
+msgid "Mark others"
+msgstr "선택 이외 항목 색 지정"
+
+#:
+msgid "as Red"
+msgstr "빨강"
+
+#:
+msgid "as Green"
+msgstr "녹색"
+
+#:
+msgid "as Blue"
+msgstr "파랑"
+
+#:
+msgid "Application"
+msgstr "애플리케이션"
+
+#:
+msgid "Applications"
+msgstr "애플리케이션"
+
+#:
+msgid "APPLICATIONS"
+msgstr "애플리케이션"
+
+#:
+msgid "Create application"
+msgstr "애플리케이션 작성"
+
+#:
+msgid "Application updated"
+msgstr "애플리케이션을 갱신하였습니다"
+
+#:
+msgid "Cannot update application"
+msgstr "애플리케이션을 갱신할 수 없습니다"
+
+#:
+msgid "Application added"
+msgstr "애플리케이션을 추가하였습니다"
+
+#:
+msgid "Cannot add application"
+msgstr "애플리케이션을 추가할 수 없습니다"
+
+#:
+msgid "Application deleted"
+msgstr "애플리케이션을 삭제하였습니다"
+
+#:
+msgid "Cannot delete application"
+msgstr "애플리케이션을 삭제할 수 없습니다"
+
+#:
+msgid "No applications defined"
+msgstr "애플리케이션이 정의되어 있지 않습니다"
+
+#:
+msgid "Hosts"
+msgstr "호스트"
+
+#:
+msgid "Items"
+msgstr "아이템"
+
+#:
+msgid "ITEMS"
+msgstr "아이템"
+
+#:
+msgid "Triggers"
+msgstr "트리거"
+
+#:
+msgid "Graphs"
+msgstr "그래프"
+
+#:
+msgid "Host added"
+msgstr "호스트를 추가하였습니다"
+
+#:
+msgid "Cannot add host"
+msgstr "호스트를 추가할 수 없습니다"
+
+#:
+msgid "Host updated"
+msgstr "호스트를 갱신하였습니다"
+
+#:
+msgid "Cannot update host"
+msgstr "호스트를 갱신할 수 없습니다"
+
+#:
+msgid "Host status updated"
+msgstr "호스트 상태를 갱신하였습니다"
+
+#:
+msgid "Cannot update host status"
+msgstr "호스트 상태를 갱신할 수 없습니다"
+
+#:
+msgid "Host deleted"
+msgstr "호스트를 삭제하였습니다"
+
+#:
+msgid "Cannot delete host"
+msgstr "호스트를 삭제할 수 없습니다"
+
+#:
+msgid "HOST GROUPS"
+msgstr "호스트 그룹"
+
+#:
+msgid "No host groups defined"
+msgstr "호스트 그룹이 정의되어 있지 않습니다"
+
+#:
+msgid "No hosts defined"
+msgstr "호스트가 정의되어 있지 않습니다"
+
+#:
+msgid "No templates defined"
+msgstr "템플릿이 정의되어 있지 않습니다"
+
+#:
+msgid "HOSTS"
+msgstr "호스트"
+
+#:
+msgid "Host"
+msgstr "호스트"
+
+#:
+msgid "Connect to"
+msgstr "접속 방법"
+
+#:
+msgid "DNS"
+msgstr "DNS"
+
+#:
+msgid "IP"
+msgstr "IP 주소"
+
+#:
+msgid "Port"
+msgstr "포트"
+
+#:
+msgid "Monitored"
+msgstr "감시 중"
+
+#:
+msgid "Not monitored"
+msgstr "미감시"
+
+#:
+msgid "Template"
+msgstr "템플릿"
+
+#:
+msgid "Deleted"
+msgstr "삭제"
+
+#:
+msgid "Unknown"
+msgstr "알 수 없음"
+
+#:
+msgid "Groups"
+msgstr "그룹"
+
+#:
+msgid "No groups defined"
+msgstr "그룹이 정의되어 있지 않습니다"
+
+#:
+msgid "New group"
+msgstr "새 그룹"
+
+#:
+msgid "DNS name"
+msgstr "DNS 이름"
+
+#:
+msgid "IP address"
+msgstr "IP 주소"
+
+#:
+msgid "Use profile"
+msgstr "프로파일 사용"
+
+#:
+msgid "Delete selected host?"
+msgstr "선택한 호스트를 삭제하시겠습니까?"
+
+#:
+msgid "Delete selected with linked elements"
+msgstr "선택 항목 및 연결된 구성요소 삭제"
+
+#:
+msgid "Group name"
+msgstr "그룹 이름"
+
+#:
+msgid "Host group"
+msgstr "호스트 그룹"
+
+#:
+msgid "Host groups"
+msgstr "호스트 그룹"
+
+#:
+msgid "Update"
+msgstr "갱신"
+
+#:
+msgid "Availability"
+msgstr "상태"
+
+#:
+msgid "Available"
+msgstr "감시 중"
+
+#:
+msgid "Not available"
+msgstr "미감시"
+
+#:
+msgid "Delete selected hosts?"
+msgstr "선택한 호스트를 삭제하시겠습니까?"
+
+#:
+msgid "Link with template"
+msgstr "템플릿 링크"
+
+#:
+msgid "Host profile"
+msgstr "호스트 프로파일"
+
+#:
+msgid "Device type"
+msgstr "장치 종류"
+
+#:
+msgid "OS"
+msgstr "OS"
+
+#:
+msgid "SerialNo"
+msgstr "일련번호"
+
+#:
+msgid "Tag"
+msgstr "태그"
+
+#:
+msgid "Hardware"
+msgstr "하드웨어"
+
+#:
+msgid "Software"
+msgstr "소프트웨어"
+
+#:
+msgid "Contact"
+msgstr "연락처"
+
+#:
+msgid "Location"
+msgstr "장소"
+
+#:
+msgid "Notes"
+msgstr "비고"
+
+#:
+msgid "MAC Address"
+msgstr "MAC 주소"
+
+#:
+msgid "Add to group"
+msgstr "그룹에 추가"
+
+#:
+msgid "Delete from group"
+msgstr "그룹에서 삭제"
+
+#:
+msgid "Update in group"
+msgstr "그룹 갱신"
+
+#:
+msgid "Create Host"
+msgstr "호스트 작성"
+
+#:
+msgid "Create Template"
+msgstr "템플릿 작성"
+
+#:
+msgid "Template linkage"
+msgstr "템플릿 링크"
+
+#:
+msgid "Templates"
+msgstr "템플릿"
+
+#:
+msgid "TEMPLATES"
+msgstr "템플릿"
+
+#:
+msgid "Unlink"
+msgstr "링크 삭제"
+
+#:
+msgid "Unlink and clear"
+msgstr "링크와 보존 데이터 삭제"
+
+#:
+msgid "No items defined"
+msgstr "아이템이 정의되어 있지 않습니다"
+
+#:
+msgid "No item defined"
+msgstr "아이템이 정의되어 있지 않습니다"
+
+#:
+msgid "History cleared"
+msgstr "이력이 삭제되었습니다"
+
+#:
+msgid "Clear history for selected"
+msgstr "선택 아이템 이력 삭제"
+
+#:
+msgid "Clear history"
+msgstr "이력 삭제"
+
+#:
+msgid "Cannot clear history"
+msgstr "이력을 삭제할 수 없습니다"
+
+#:
+msgid "Configuration of items"
+msgstr "아이템 설정"
+
+#:
+msgid "CONFIGURATION OF ITEMS"
+msgstr "아이템 설정"
+
+#:
+msgid "Cannot update item"
+msgstr "아이템을 갱신할 수 없습니다"
+
+#:
+msgid "Status updated"
+msgstr "상태를 갱신하였습니다"
+
+#:
+msgid "Cannot update status"
+msgstr "상태를 갱신할 수 없습니다"
+
+#:
+msgid "Cannot add item"
+msgstr "아이템을 추가할 수 없습니다"
+
+#:
+msgid "Item deleted"
+msgstr "아이템을 삭제하였습니다"
+
+#:
+msgid "Cannot delete item"
+msgstr "아이템을 삭제할 수 없습니다"
+
+#:
+msgid "Items deleted"
+msgstr "아이템을 삭제하였습니다"
+
+#:
+msgid "Cannot delete items"
+msgstr "아이템을 삭제할 수 없습니다"
+
+#:
+msgid "Items activated"
+msgstr "아이템을 활성화하였습니다"
+
+#:
+msgid "Items disabled"
+msgstr "아이템을 비활성화하였습니다"
+
+#:
+msgid "Key"
+msgstr "키"
+
+#:
+msgid "Description"
+msgstr "이름"
+
+#:
+msgid "Update interval"
+msgstr "갱신 간격"
+
+#:
+msgid "History"
+msgstr "이력"
+
+#:
+msgid "Trends"
+msgstr "트렌드"
+
+#:
+msgid "Zabbix agent"
+msgstr "ZABBIX 에이전트"
+
+#:
+msgid "Zabbix agent (active)"
+msgstr "ZABBIX 에이전트(활성)"
+
+#:
+msgid "SNMPv1 agent"
+msgstr "SNMPv1 에이전트"
+
+#:
+msgid "Zabbix trapper"
+msgstr "ZABBIX trapper"
+
+#:
+msgid "Simple check"
+msgstr "간단 검사"
+
+#:
+msgid "SNMPv2 agent"
+msgstr "SNMPv2 에이전트"
+
+#:
+msgid "SNMPv3 agent"
+msgstr "SNMPv3 에이전트"
+
+#:
+msgid "Zabbix internal"
+msgstr "ZABBIX 내장"
+
+#:
+msgid "Zabbix aggregate"
+msgstr "ZABBIX 집합"
+
+#:
+msgid "External check"
+msgstr "외부 검사"
+
+#:
+msgid "Web monitoring"
+msgstr "웹 감시"
+
+#:
+msgid "Active"
+msgstr "활성"
+
+#:
+msgid "Not supported"
+msgstr "취득 불가"
+
+#:
+msgid "Email"
+msgstr "전자우편"
+
+#:
+msgid "Jabber"
+msgstr "Jabber"
+
+#:
+msgid "Jabber identifier"
+msgstr "JabberID"
+
+#:
+msgid "SMS"
+msgstr "SMS"
+
+#:
+msgid "Script"
+msgstr "스크립트"
+
+#:
+msgid "GSM modem"
+msgstr "GSM 모뎀"
+
+#:
+msgid "Units"
+msgstr "단위"
+
+#:
+msgid "Update interval (in sec)"
+msgstr "갱신 간격(초)"
+
+#:
+msgid "Keep history (in days)"
+msgstr "이력 보존 기간(일)"
+
+#:
+msgid "Keep trends (in days)"
+msgstr "경향 보존 기간(일)"
+
+#:
+msgid "Type of information"
+msgstr "데이터형"
+
+#:
+msgid "Store value"
+msgstr "보존 시 계산"
+
+#:
+msgid "Show value"
+msgstr "값 매핑 사용"
+
+#:
+msgid "Numeric (unsigned)"
+msgstr "숫자(integer 64bit)"
+
+#:
+msgid "Numeric (float)"
+msgstr "숫자(float)"
+
+#:
+msgid "Character"
+msgstr "문자"
+
+#:
+msgid "Log"
+msgstr "로그"
+
+#:
+msgid "Text"
+msgstr "텍스트"
+
+#:
+msgid "As is"
+msgstr "하지 않음"
+
+#:
+msgid "Delta (speed per second)"
+msgstr "델타(변경 값/초)"
+
+#:
+msgid "Delta (simple change)"
+msgstr "델타"
+
+#:
+msgid "Item"
+msgstr "아이템"
+
+#:
+msgid "SNMP community"
+msgstr "SNMP community"
+
+#:
+msgid "SNMP OID"
+msgstr "SNMP OID"
+
+#:
+msgid "SNMP port"
+msgstr "SNMP 포트"
+
+#:
+msgid "Allowed hosts"
+msgstr "허가된 호스트"
+
+#:
+msgid "SNMPv3 security name"
+msgstr "SNMPv3 security name"
+
+#:
+msgid "SNMPv3 security level"
+msgstr "SNMPv3 security level"
+
+#:
+msgid "SNMPv3 auth passphrase"
+msgstr "SNMPv3 auth passphrase"
+
+#:
+msgid "SNMPv3 priv passphrase"
+msgstr "SNMPv3 priv passphrase"
+
+#:
+msgid "Custom multiplier"
+msgstr "승수"
+
+#:
+msgid "Select host..."
+msgstr "호스트 선택..."
+
+#:
+msgid "Log time format"
+msgstr "로그 시간 형식"
+
+#:
+msgid "Create Item"
+msgstr "아이템 작성"
+
+#:
+msgid "elements copy to ..."
+msgstr "아이템 복사 대상..."
+
+#:
+msgid "Mode"
+msgstr "모드"
+
+#:
+msgid "Target"
+msgstr "대상"
+
+#:
+msgid "Target type"
+msgstr "대상 종류"
+
+#:
+msgid "Skip existing items"
+msgstr "기존 아이템을 건너뜀"
+
+#:
+msgid "update existing non linked items"
+msgstr "기존 미 연결 아이템을 갱신"
+
+#:
+msgid "Copy"
+msgstr "복사"
+
+#:
+msgid "Show items with description like"
+msgstr "이름에 다음 문자열을 포함한 아이템만 보이기"
+
+#:
+msgid "History clearing can take a long time. Continue?"
+msgstr "이력 삭제에 시간이 걸릴 수도 있습니다. 계속하시겠습니까?"
+
+#:
+msgid "Mass update"
+msgstr "일괄갱신"
+
+#:
+msgid "Search"
+msgstr "찾기"
+
+#:
+msgid "Original"
+msgstr "변경 안함"
+
+#:
+msgid "New flexible interval"
+msgstr "새로운 유동적인 갱신 간격"
+
+#:
+msgid "Flexible intervals (sec)"
+msgstr "유동적인 갱신 간격(초)"
+
+#:
+msgid "No flexible intervals"
+msgstr "유동적인 갱신 간격이 정의되어 있지 않습니다"
+
+#:
+msgid "Latest events"
+msgstr "최근 이벤트"
+
+#:
+msgid "HISTORY OF EVENTS"
+msgstr "이벤트 이력"
+
+#:
+msgid "No events found"
+msgstr "이벤트를 찾을 수 없습니다"
+
+#:
+msgid "Last check"
+msgstr "최근 검사"
+
+#:
+msgid "Last value"
+msgstr "최근 값"
+
+#:
+msgid "Link"
+msgstr "연결"
+
+#:
+msgid "Label"
+msgstr "라벨"
+
+#:
+msgid "X"
+msgstr "X"
+
+#:
+msgid "Icon (unknown)"
+msgstr "아이콘(알 수 없음)"
+
+#:
+msgid "Link status indicator"
+msgstr "연결 상태 표시기"
+
+#:
+msgid "Configuration of network maps"
+msgstr "네트워크 맵 설정"
+
+#:
+msgid "CONFIGURATION OF NETWORK MAPS"
+msgstr "네트워크 맵 설정"
+
+#:
+msgid "Add element"
+msgstr "표시 구성요소 추가"
+
+#:
+msgid "Coordinate X"
+msgstr "X좌표"
+
+#:
+msgid "Coordinate Y"
+msgstr "Y좌표"
+
+#:
+msgid "Connectors"
+msgstr "연결"
+
+#:
+msgid "MAPS"
+msgstr "맵"
+
+#:
+msgid "No maps defined"
+msgstr "맵이 정의되어 있지 않습니다"
+
+#:
+msgid "Create Map"
+msgstr "맵 작성"
+
+#:
+msgid "Icon label location"
+msgstr "아이콘 라벨 위치"
+
+#:
+msgid "Bottom"
+msgstr "아래쪽"
+
+#:
+msgid "Top"
+msgstr "위쪽"
+
+#:
+msgid "OK"
+msgstr "정상"
+
+#:
+msgid "http://www.zabbix.com"
+msgstr "http://www.zabbix.com"
+
+#:
+msgid "Network maps"
+msgstr "네트워크 맵"
+
+#:
+msgid "NETWORK MAPS"
+msgstr "네트워크 맵"
+
+#:
+msgid "Background image"
+msgstr "배경 이미지"
+
+#:
+msgid "Icon label type"
+msgstr "아이콘 라벨 종류"
+
+#:
+msgid "Label location"
+msgstr "라벨 위치"
+
+#:
+msgid "Element name"
+msgstr "구성요소 이름"
+
+#:
+msgid "Status only"
+msgstr "상태만"
+
+#:
+msgid "Nothing"
+msgstr "없음"
+
+#:
+msgid "CONFIGURATION OF MEDIA TYPES"
+msgstr "연락 방법 설정"
+
+#:
+msgid "Media"
+msgstr "연락 방법"
+
+#:
+msgid "Send to"
+msgstr "수신처"
+
+#:
+msgid "When active"
+msgstr "연락 허용 시간대"
+
+#:
+msgid "No media defined"
+msgstr "연락 방법이 정의되어 있지 않습니다"
+
+#:
+msgid "New media"
+msgstr "새 연락 방법"
+
+#:
+msgid "Use if severity"
+msgstr "심각도 선택"
+
+#:
+msgid "Save"
+msgstr "저장"
+
+#:
+msgid "Cancel"
+msgstr "취소"
+
+#:
+msgid "Overview"
+msgstr "개요"
+
+#:
+msgid "OVERVIEW"
+msgstr "개요"
+
+#:
+msgid "Data"
+msgstr "데이터"
+
+#:
+msgid "Show graph of item"
+msgstr "아이템의 그래프 표시"
+
+#:
+msgid "Show values of item"
+msgstr "아이템의 값 표시"
+
+#:
+msgid "Values"
+msgstr "값"
+
+#:
+msgid "5 min"
+msgstr "5분"
+
+#:
+msgid "15 min"
+msgstr "15분"
+
+#:
+msgid "QUEUE"
+msgstr "큐"
+
+#:
+msgid "QUEUE OF ITEMS TO BE UPDATED"
+msgstr "갱신 아이템 큐"
+
+#:
+msgid "Next check"
+msgstr "다음 검사"
+
+#:
+msgid "The queue is empty"
+msgstr "큐가 비어 있습니다"
+
+#:
+msgid "Total"
+msgstr "합계"
+
+#:
+msgid "Count"
+msgstr "회"
+
+#:
+msgid "5 seconds"
+msgstr "5초"
+
+#:
+msgid "10 seconds"
+msgstr "10초"
+
+#:
+msgid "30 seconds"
+msgstr "30초"
+
+#:
+msgid "1 minute"
+msgstr "1분"
+
+#:
+msgid "5 minutes"
+msgstr "5분"
+
+#:
+msgid "Status of Zabbix"
+msgstr "ZABBIX 서버 상태"
+
+#:
+msgid "STATUS OF ZABBIX"
+msgstr "ZABBIX 서버 상태"
+
+#:
+msgid "Value"
+msgstr "값"
+
+#:
+msgid "Zabbix server is running"
+msgstr "ZABBIX 서버 가동 중"
+
+#:
+msgid "Values stored"
+msgstr "Values stored"
+
+#:
+msgid "Trends stored"
+msgstr "Trends stored"
+
+#:
+msgid "Number of triggers (enabled/disabled)[problem/unknown/ok]"
+msgstr "트리거 수(활성/비활성)[장애/알 수 없음/ok]"
+
+#:
+msgid "Triggers (e/d)[p/u/o]"
+msgstr "트리거 수(활성/비활성)[장애/알 수 없음/ok]"
+
+#:
+msgid "Number of items (monitored/disabled/not supported)"
+msgstr "아이템 수(감시/미감시/취득불가)"
+
+#:
+msgid "Items (m/d/n)"
+msgstr "아이템 수(감시/미감시/취득불가)"
+
+#:
+msgid "Number of users (online)"
+msgstr "사용자 수 (온라인)"
+
+#:
+msgid "Users (online)"
+msgstr "사용자 (온라인)"
+
+#:
+msgid "Number of hosts (monitored/not monitored/templates)"
+msgstr "호스트 수 (감시/미감시/템플릿)"
+
+#:
+msgid "Hosts (m/n/t)"
+msgstr "호스트 수 (감시/미감시/템플릿)"
+
+#:
+msgid "Yes"
+msgstr "예"
+
+#:
+msgid "No"
+msgstr "아니오"
+
+#:
+msgid "running"
+msgstr "가동 중"
+
+#:
+msgid "not running"
+msgstr "정지 중"
+
+#:
+msgid "Availability report"
+msgstr "가동 보고서"
+
+#:
+msgid "AVAILABILITY REPORT"
+msgstr "가동 보고서"
+
+#:
+msgid "Show"
+msgstr "표시"
+
+#:
+msgid "IT services availability report"
+msgstr "IT 서비스 가동 보고서"
+
+#:
+msgid "IT SERVICES AVAILABILITY REPORT"
+msgstr "IT 서비스 가동 보고서"
+
+#:
+msgid "From"
+msgstr "개시"
+
+#:
+msgid "from"
+msgstr "개시"
+
+#:
+msgid "Till"
+msgstr "종료"
+
+#:
+msgid "Ok"
+msgstr "OK"
+
+#:
+msgid "Problems"
+msgstr "장애"
+
+#:
+msgid "Percentage"
+msgstr "퍼센트"
+
+#:
+msgid "SLA"
+msgstr "SLA"
+
+#:
+msgid "Day"
+msgstr "일"
+
+#:
+msgid "Month"
+msgstr "월"
+
+#:
+msgid "Year"
+msgstr "년"
+
+#:
+msgid "Daily"
+msgstr "일간"
+
+#:
+msgid "Weekly"
+msgstr "주간"
+
+#:
+msgid "Monthly"
+msgstr "월간"
+
+#:
+msgid "Yearly"
+msgstr "연간"
+
+#:
+msgid "Notifications"
+msgstr "통지"
+
+#:
+msgid "NOTIFICATIONS"
+msgstr "통지"
+
+#:
+msgid "Notification report"
+msgstr "통지 보고서"
+
+#:
+msgid "Most busy triggers top 100"
+msgstr "실행 트리거 최상위 100항목"
+
+#:
+msgid "MOST BUSY TRIGGERS TOP 100"
+msgstr "실행 트리거 최상위 100항목"
+
+#:
+msgid "Number of status changes"
+msgstr "상태 변경 횟수"
+
+#:
+msgid "Week"
+msgstr "주"
+
+#:
+msgid "Last"
+msgstr "최근"
+
+#:
+msgid "Screens"
+msgstr "스크린"
+
+#:
+msgid "Screen"
+msgstr "스크린"
+
+#:
+msgid "CONFIGURATION OF SCREENS"
+msgstr "스크린 설정"
+
+#:
+msgid "Configuration of screens"
+msgstr "스크린 설정"
+
+#:
+msgid "Screen added"
+msgstr "스크린을 추가하였습니다"
+
+#:
+msgid "Cannot add screen"
+msgstr "스크린을 추가할 수 없습니다"
+
+#:
+msgid "Screen updated"
+msgstr "스크린을 갱신하였습니다"
+
+#:
+msgid "Cannot update screen"
+msgstr "스크린을 갱신할 수 없습니다"
+
+#:
+msgid "Screen deleted"
+msgstr "스크린을 삭제하였습니다"
+
+#:
+msgid "Cannot deleted screen"
+msgstr "스크린을 삭제할 수 없습니다"
+
+#:
+msgid "Columns"
+msgstr "열"
+
+#:
+msgid "Rows"
+msgstr "행"
+
+#:
+msgid "No screens defined"
+msgstr "스크린이 정의되어 있지 않습니다"
+
+#:
+msgid "Delete screen?"
+msgstr "스크린을 삭제하시겠습니까?"
+
+#:
+msgid "CONFIGURATION OF SCREEN"
+msgstr "스크린 설정"
+
+#:
+msgid "Screen cell configuration"
+msgstr "스크린 셀 설정"
+
+#:
+msgid "Resource"
+msgstr "리소스"
+
+#:
+msgid "User rights"
+msgstr "사용자 권한"
+
+#:
+msgid "No resources defined"
+msgstr "리소스가 정의되어 있지 않습니다"
+
+#:
+msgid "Simple graph"
+msgstr "단순 그래프"
+
+#:
+msgid "Graph name"
+msgstr "그래프 이름"
+
+#:
+msgid "Width"
+msgstr "너비"
+
+#:
+msgid "Height"
+msgstr "높이"
+
+#:
+msgid "Create Screen"
+msgstr "스크린 작성"
+
+#:
+msgid "Edit"
+msgstr "편집"
+
+#:
+msgid "Dimension (cols x rows)"
+msgstr "크기(열x행)"
+
+#:
+msgid "Slide shows"
+msgstr "슬라이드쇼"
+
+#:
+msgid "Slide show"
+msgstr "슬라이드쇼"
+
+#:
+msgid "CONFIGURATION OF SLIDE SHOWS"
+msgstr "슬라이드쇼 설정"
+
+#:
+msgid "SLIDE SHOWS"
+msgstr "슬라이드쇼"
+
+#:
+msgid "No slide shows defined"
+msgstr "슬라이드쇼가 정의되어 있지 않습니다"
+
+#:
+msgid "Count of slides"
+msgstr "슬라이드 수"
+
+#:
+msgid "No slides defined"
+msgstr "슬라이드가 정의되어 있지 않습니다"
+
+#:
+msgid "Slides"
+msgstr "슬라이드"
+
+#:
+msgid "New slide"
+msgstr "새 슬라이드"
+
+#:
+msgid "Map"
+msgstr "맵"
+
+#:
+msgid "As plain text"
+msgstr "일반 텍스트로 보기"
+
+#:
+msgid "Plain text"
+msgstr "일반 텍스트"
+
+#:
+msgid "Column span"
+msgstr "열 합치기"
+
+#:
+msgid "Row span"
+msgstr "행 합치기"
+
+#:
+msgid "Show lines"
+msgstr "표시할 행 수"
+
+#:
+msgid "Hosts info"
+msgstr "호스트 정보"
+
+#:
+msgid "Triggers info"
+msgstr "트리거 정보"
+
+#:
+msgid "Server info"
+msgstr "서버 정보"
+
+#:
+msgid "Clock"
+msgstr "시각"
+
+#:
+msgid "Triggers overview"
+msgstr "트리거 개요"
+
+#:
+msgid "Data overview"
+msgstr "데이터 개요"
+
+#:
+msgid "History of actions"
+msgstr "액션 이력"
+
+#:
+msgid "History of events"
+msgstr "이벤트 이력"
+
+#:
+msgid "Time type"
+msgstr "사용할 시간"
+
+#:
+msgid "Server time"
+msgstr "서버 시간"
+
+#:
+msgid "Local time"
+msgstr "로컬 시간"
+
+#:
+msgid "Style"
+msgstr "표시 형식"
+
+#:
+msgid "Vertical"
+msgstr "세로"
+
+#:
+msgid "Horizontal"
+msgstr "가로"
+
+#:
+msgid "Horizontal align"
+msgstr "가로 위치"
+
+#:
+msgid "Centre"
+msgstr "가운데"
+
+#:
+msgid "Right"
+msgstr "오른쪽"
+
+#:
+msgid "Vertical align"
+msgstr "세로 위치"
+
+#:
+msgid "Middle"
+msgstr "가운데"
+
+#:
+msgid "Custom screens"
+msgstr "커스텀 스크린"
+
+#:
+msgid "SCREENS 45645645"
+msgstr "스크린"
+
+#:
+msgid "Slideshow updated"
+msgstr "슬라이드쇼를 갱신하였습니다"
+
+#:
+msgid "Cannot_update slideshow"
+msgstr "슬라이드쇼를 갱신할 수 없습니다"
+
+#:
+msgid "Slideshow added"
+msgstr "슬라이드쇼를 추가하였습니다"
+
+#:
+msgid "Cannot add slideshow"
+msgstr "슬라이드쇼를 추가할 수 없습니다"
+
+#:
+msgid "Slideshow deleted"
+msgstr "슬라이드쇼를 삭제하였습니다"
+
+#:
+msgid "Cannot delete slideshow"
+msgstr "슬라이드쇼를 삭제할 수 없습니다"
+
+#:
+msgid "Delete slideshow?"
+msgstr "슬라이드쇼를 삭제하시겠습니까?"
+
+#:
+msgid "root"
+msgstr "root"
+
+#:
+msgid "IT service"
+msgstr "IT 서비스"
+
+#:
+msgid "IT services"
+msgstr "IT 서비스"
+
+#:
+msgid "Service updated"
+msgstr "서비스를 갱신하였습니다"
+
+#:
+msgid "No IT service defined"
+msgstr "IT 서비스가 정의되어 있지 않습니다"
+
+#:
+msgid "Cannot update service"
+msgstr "서비스를 갱신할 수 없습니다"
+
+#:
+msgid "Service added"
+msgstr "서비스를 추가하였습니다"
+
+#:
+msgid "Cannot add service"
+msgstr "서비스를 추가할 수 없습니다"
+
+#:
+msgid "Service deleted"
+msgstr "서비스를 삭제하였습니다"
+
+#:
+msgid "Cannot delete service"
+msgstr "서비스를 삭제할 수 없습니다"
+
+#:
+msgid "Status calculation"
+msgstr "상태 계산"
+
+#:
+msgid "Status calculation algorithm"
+msgstr "상태 계산 알고리즘"
+
+#:
+msgid "None"
+msgstr "없음"
+
+#:
+msgid "Soft"
+msgstr "Soft"
+
+#:
+msgid "Do not calculate"
+msgstr "계산 안함"
+
+#:
+msgid "Acceptable SLA (in %)"
+msgstr "SLA 허용 값(%)"
+
+#:
+msgid "Link to trigger?"
+msgstr "트리거와 연결"
+
+#:
+msgid "Sort order (0->999)"
+msgstr "정렬 순서(0->999)"
+
+#:
+msgid "Trigger"
+msgstr "트리거"
+
+#:
+msgid "Server"
+msgstr "서버"
+
+#:
+msgid "Delete"
+msgstr "삭제"
+
+#:
+msgid "Clone"
+msgstr "복제"
+
+#:
+msgid "Uptime"
+msgstr "가동 시간"
+
+#:
+msgid "Downtime"
+msgstr "정지 시간"
+
+#:
+msgid "One-time downtime"
+msgstr "일시적인 정지 시간"
+
+#:
+msgid "No times defined"
+msgstr "시간이 정의되어 있지 않습니다"
+
+#:
+msgid "Service times"
+msgstr "서비스 시간"
+
+#:
+msgid "New service time"
+msgstr "새 서비스 시간"
+
+#:
+msgid "Note"
+msgstr "설명"
+
+#:
+msgid "Remove"
+msgstr "삭제"
+
+#:
+msgid "Sunday"
+msgstr "일"
+
+#:
+msgid "Monday"
+msgstr "월"
+
+#:
+msgid "Tuesday"
+msgstr "화"
+
+#:
+msgid "Wednesday"
+msgstr "수"
+
+#:
+msgid "Thursday"
+msgstr "목"
+
+#:
+msgid "Friday"
+msgstr "금"
+
+#:
+msgid "Saturday"
+msgstr "토"
+
+#:
+msgid "IT SERVICES"
+msgstr "IT 서비스"
+
+#:
+msgid "Service"
+msgstr "서비스"
+
+#:
+msgid "Services"
+msgstr "서비스"
+
+#:
+msgid "Reason"
+msgstr "이유"
+
+#:
+msgid "No trigger"
+msgstr "트리거가 없습니다"
+
+#:
+msgid "No triggers defined"
+msgstr "트리거가 정의되어 있지 않습니다"
+
+#:
+msgid "No trigger defined"
+msgstr "트리거가 정의되어 있지 않습니다"
+
+#:
+msgid "Configuration of triggers"
+msgstr "트리거 설정"
+
+#:
+msgid "CONFIGURATION OF TRIGGERS"
+msgstr "트리거 설정"
+
+#:
+msgid "Triggers deleted"
+msgstr "트리거를 삭제하였습니다"
+
+#:
+msgid "Cannot delete triggers"
+msgstr "트리거를 삭제할 수 없습니다"
+
+#:
+msgid "Trigger deleted"
+msgstr "트리거를 삭제하였습니다"
+
+#:
+msgid "Cannot delete trigger"
+msgstr "트리거를 삭제할 수 없습니다"
+
+#:
+msgid "Trigger added"
+msgstr "트리거를 추가하였습니다"
+
+#:
+msgid "Cannot add trigger"
+msgstr "트리거를 추가할 수 없습니다"
+
+#:
+msgid "Severity"
+msgstr "심각도"
+
+#:
+msgid "Disabled"
+msgstr "비활성"
+
+#:
+msgid "Enabled"
+msgstr "활성"
+
+#:
+msgid "Enable selected"
+msgstr "선택 항목 활성화"
+
+#:
+msgid "Change"
+msgstr "변경"
+
+#:
+msgid "Trigger updated"
+msgstr "트리거를 갱신하였습니다"
+
+#:
+msgid "Cannot update trigger"
+msgstr "트리거를 갱신할 수 없습니다"
+
+#:
+msgid "Depends on"
+msgstr "의존 대상"
+
+#:
+msgid "URL"
+msgstr "URL"
+
+#:
+msgid "Create Trigger"
+msgstr "트리거 작성"
+
+#:
+msgid "Insert"
+msgstr "삽입"
+
+#:
+msgid "Seconds"
+msgstr "초"
+
+#:
+msgid "Last of"
+msgstr "최근"
+
+#:
+msgid "Show disabled triggers"
+msgstr "비활성 트리거 보이기"
+
+#:
+msgid "Hide disabled triggers"
+msgstr "비활성 트리거 감추기"
+
+#:
+msgid "The trigger depends on"
+msgstr "다음 트리거에 의존"
+
+#:
+msgid "No dependencies defined"
+msgstr "의존 트리거가 없습니다"
+
+#:
+msgid "New dependency"
+msgstr "의존 관계 작성"
+
+#:
+msgid "Trigger comments"
+msgstr "트리거 주석"
+
+#:
+msgid "TRIGGER COMMENTS"
+msgstr "트리거 주석"
+
+#:
+msgid "Comment updated"
+msgstr "주석을 갱신하였습니다"
+
+#:
+msgid "Cannot update comment"
+msgstr "주석을 갱신할 수 없습니다"
+
+#:
+msgid "Add"
+msgstr "추가"
+
+#:
+msgid "Status of triggers"
+msgstr "트리거 상태"
+
+#:
+msgid "STATUS OF TRIGGERS"
+msgstr "트리거 상태"
+
+#:
+msgid "Show details"
+msgstr "상세 보이기"
+
+#:
+msgid "TRIGGERS"
+msgstr "트리거"
+
+#:
+msgid "Last change"
+msgstr "최근 갱신"
+
+#:
+msgid "Comments"
+msgstr "주석"
+
+#:
+msgid "Acknowledged"
+msgstr "인지 완료"
+
+#:
+msgid "Ack"
+msgstr "인지"
+
+#:
+msgid "Never"
+msgstr "Never"
+
+#:
+msgid "Select"
+msgstr "선택"
+
+#:
+msgid "Zabbix User"
+msgstr "ZABBIX 사용자"
+
+#:
+msgid "Zabbix Admin"
+msgstr "ZABBIX 관리자"
+
+#:
+msgid "Zabbix Super Admin"
+msgstr "ZABBIX 최고 관리자"
+
+#:
+msgid "User type"
+msgstr "사용자 종류"
+
+#:
+msgid "Users"
+msgstr "사용자"
+
+#:
+msgid "User added"
+msgstr "사용자를 추가하였습니다"
+
+#:
+msgid "Cannot add user"
+msgstr "사용자를 추가할 수 없습니다"
+
+#:
+msgid "Cannot add user. Both passwords must be equal."
+msgstr "사용자를 추가할 수 없습니다. 암호가 일치하지 않습니다."
+
+#:
+msgid "User deleted"
+msgstr "사용자를 삭제하였습니다"
+
+#:
+msgid "Cannot delete user"
+msgstr "사용자를 삭제할 수 없습니다"
+
+#:
+msgid "User updated"
+msgstr "사용자를 갱신하였습니다"
+
+#:
+msgid "Cannot update user"
+msgstr "사용자를 갱신할 수 없습니다"
+
+#:
+msgid "Cannot update user. Both passwords must be equal."
+msgstr "사용자를 갱신할 수 없습니다. 암호가 일치하지 않습니다."
+
+#:
+msgid "Group added"
+msgstr "그룹을 추가하였습니다"
+
+#:
+msgid "Cannot add group"
+msgstr "그룹을 추가할 수 없습니다"
+
+#:
+msgid "Group updated"
+msgstr "그룹을 갱신하였습니다"
+
+#:
+msgid "Cannot update group"
+msgstr "그룹을 갱신할 수 없습니다"
+
+#:
+msgid "Group deleted"
+msgstr "그룹을 삭제하였습니다"
+
+#:
+msgid "Cannot delete group"
+msgstr "그룹을 삭제할 수 없습니다"
+
+#:
+msgid "CONFIGURATION OF USERS AND USER GROUPS"
+msgstr "사용자 및 사용자 그룹 설정"
+
+#:
+msgid "USER GROUPS"
+msgstr "사용자 그룹"
+
+#:
+msgid "USERS"
+msgstr "사용자"
+
+#:
+msgid "User groups"
+msgstr "사용자 그룹"
+
+#:
+msgid "Members"
+msgstr "구성원"
+
+#:
+msgid "No user groups defined"
+msgstr "사용자 그룹이 정의되어 있지 않습니다"
+
+#:
+msgid "Alias"
+msgstr "로그인 이름"
+
+#:
+msgid "Name"
+msgstr "이름"
+
+#:
+msgid "Surname"
+msgstr "성"
+
+#:
+msgid "Is online?"
+msgstr "로그인 상태"
+
+#:
+msgid "No users defined"
+msgstr "사용자가 정의되어 있지 않습니다"
+
+#:
+msgid "Rights"
+msgstr "권한"
+
+#:
+msgid "No rights defined"
+msgstr "권한이 정의되어 있지 않습니다"
+
+#:
+msgid "Read only"
+msgstr "읽기 전용"
+
+#:
+msgid "Read-write"
+msgstr "쓰기 가능"
+
+#:
+msgid "Deny"
+msgstr "거부"
+
+#:
+msgid "Hide"
+msgstr "감추기"
+
+#:
+msgid "Password"
+msgstr "암호"
+
+#:
+msgid "Change password"
+msgstr "암호변경"
+
+#:
+msgid "Password (once again)"
+msgstr "암호 확인"
+
+#:
+msgid "URL (after login)"
+msgstr "로그인 후 URL"
+
+#:
+msgid "Refresh (in seconds)"
+msgstr "새로 고침(초)"
+
+#:
+msgid "Create User"
+msgstr "사용자 작성"
+
+#:
+msgid "Create Group"
+msgstr "그룹 작성"
+
+#:
+msgid "No accessible resources"
+msgstr "사용할 수 있는 리소스가 없습니다"
+
+#:
+msgid "Delete selected users?"
+msgstr "선택한 사용자를 삭제하시겠습니까?"
+
+#:
+msgid "Audit"
+msgstr "감사"
+
+#:
+msgid "Action"
+msgstr "액션"
+
+#:
+msgid "Details"
+msgstr "자세히"
+
+#:
+msgid "Unknown action"
+msgstr "알 수 없는 액션"
+
+#:
+msgid "Added"
+msgstr "추가"
+
+#:
+msgid "Updated"
+msgstr "갱신"
+
+#:
+msgid "Media type"
+msgstr "연락 방법"
+
+#:
+msgid "Graph element"
+msgstr "그래프 구성요소"
+
+#:
+msgid "Unknown resource"
+msgstr "알 수 없는 리소스"
+
+#:
+msgid "USER PROFILE"
+msgstr "사용자 프로파일"
+
+#:
+msgid "User profile"
+msgstr "사용자 프로파일"
+
+#:
+msgid "Language"
+msgstr "언어"
+
+#:
+msgid "English (GB)"
+msgstr "영어 (GB)"
+
+#:
+msgid "French (FR)"
+msgstr "프랑스어 (FR)"
+
+#:
+msgid "German (DE)"
+msgstr "독일어 (DE)"
+
+#:
+msgid "Italian (IT)"
+msgstr "이탈리아어 (IT)"
+
+#:
+msgid "Latvian (LV)"
+msgstr "라트비아어 (LV)"
+
+#:
+msgid "Russian (RU)"
+msgstr "러시아어 (RU)"
+
+#:
+msgid "Portuguese (PT)"
+msgstr "포르투갈어 (PT)"
+
+#:
+msgid "Spanish (SP)"
+msgstr "스페인어 (SP)"
+
+#:
+msgid "Swedish (SE)"
+msgstr "스웨덴어 (SE)"
+
+#:
+msgid "Japanese (JP)"
+msgstr "일본어 (JP)"
+
+#:
+msgid "Chinese (CN)"
+msgstr "중국어 (CN)"
+
+#:
+msgid "Dutch (NL)"
+msgstr "네덜란드어 (NL)"
+
+#:
+msgid "Hungarian (HU)"
+msgstr "헝가리어 (HU)"
+
+#:
+msgid "ZABBIX"
+msgstr "ZABBIX"
+
+#:
+msgid "Host profiles"
+msgstr "호스트 프로파일"
+
+#:
+msgid "HOST PROFILES"
+msgstr "호스트 프로파일"
+
+#:
+msgid "Empty"
+msgstr "닫기"
+
+#:
+msgid "STANDARD ITEMS"
+msgstr "표준 아이템"
+
+#:
+msgid "No items"
+msgstr "아이템 없음"
+
+#:
+msgid "Y"
+msgstr "Y"
+
+#:
+msgid "Help"
+msgstr "도움말"
+
+#:
+msgid "Profile"
+msgstr "프로파일"
+
+#:
+msgid "Get support"
+msgstr "서포트"
+
+#:
+msgid "Monitoring"
+msgstr "모니터링"
+
+#:
+msgid "Inventory"
+msgstr "목록"
+
+#:
+msgid "Queue"
+msgstr "큐"
+
+#:
+msgid "Events"
+msgstr "이벤트"
+
+#:
+msgid "EVENTS"
+msgstr "이벤트"
+
+#:
+msgid "Maps"
+msgstr "맵"
+
+#:
+msgid "Reports"
+msgstr "보고서"
+
+#:
+msgid "General"
+msgstr "일반"
+
+#:
+msgid "Login"
+msgstr "로그인"
+
+#:
+msgid "Logout"
+msgstr "로그아웃"
+
+#:
+msgid "Latest data"
+msgstr "최근 데이터"
+
+#:
+msgid "Incorrect description"
+msgstr "이름이 적절하지 않습니다"
+
+#:
+msgid "Can't format Tree"
+msgstr "트리를 표시할 수 없습니다"
