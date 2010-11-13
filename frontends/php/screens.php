@@ -48,7 +48,8 @@
 		'tr_groupid'=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 		'tr_hostid'=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 
-		'elementid'=>	array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,NULL),
+		'elementid'=>	array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,null),
+		'screenname'=>	array(T_ZBX_STR, O_OPT,	P_SYS,	null,null),
 		'step'=>		array(T_ZBX_INT, O_OPT,  P_SYS,		BETWEEN(0,65535),NULL),
 
 		'period'=>		array(T_ZBX_INT, O_OPT,  P_SYS, 	null,NULL),
@@ -113,11 +114,22 @@
 	}
 ?>
 <?php
-	$elementid = get_request('elementid', CProfile::get('web.screens.elementid', null));
 
-	if(2 != $_REQUEST['fullscreen'])
-		CProfile::update('web.screens.elementid',$elementid, PROFILE_TYPE_ID);
+	//whether we should use screen name to fetch a screen (if this is false, elementid is used)
+	$use_screen_name = isset($_REQUEST['screenname']);
 
+	//getiing element id from GET paramters
+	$elementid = $_REQUEST['elementid'] = get_request('elementid', false);
+	//if none is provided
+	if ($elementid === false && !$use_screen_name) {
+		//get element id saved in profile from the last visit
+		$elementid = CProfile::get('web.screens.elementid', null);
+		//this flag will be used in case this element does not exist
+		$id_has_been_fetched_from_profile = true;
+	}
+	else {
+		$id_has_been_fetched_from_profile = false;
+	}
 
 	$screens_wdgt = new CWidget();
 
@@ -134,28 +146,56 @@
 
 	$screens = CScreen::get(array(
 		'nodeids' => get_current_nodeid(),
-		'output' => API_OUTPUT_EXTEND
+		'extendoutput' => 1
 	));
 
-	$screens = zbx_toHash($screens, 'screenid');
+
+
+	//if screen name is provided it takes priority over elementid
+	if ($use_screen_name) {
+		$screens = zbx_toHash($screens, 'name');
+		$elementIdentifier = $_REQUEST['screenname'];
+	}
+	else {
+		$screens = zbx_toHash($screens, 'screenid');
+		$elementIdentifier = $elementid;
+	}
+
 	order_result($screens, 'name');
 
+	//no screens defined at all
 	if(empty($screens)){
 		$screens_wdgt->addPageHeader(S_SCREENS_BIG, $formHeader);
 		$screens_wdgt->addItem(BR());
 		$screens_wdgt->addItem(new CTableInfo(S_NO_SCREENS_DEFINED));
 		$screens_wdgt->show();
 	}
+	//if screen we are searching for does not exist and was not fetched from profile
+	elseif(!isset($screens[$elementIdentifier]) && !$id_has_been_fetched_from_profile){
+		$error_msg = $use_screen_name
+					 ? sprintf(S_ERROR_SCREEN_WITH_NAME_DOES_NOT_EXIST, $elementIdentifier)
+					 : sprintf(S_ERROR_SCREEN_WITH_ID_DOES_NOT_EXIST, $elementIdentifier);
+
+		show_error_message($error_msg);
+	}
 	else{
-		$screen = (!isset($screens[$elementid]))?reset($screens):$screens[$elementid];
-		$tmpScreens = CScreen::get(array(
-			'screenids' => $screen['screenid'],
-			'output' => API_OUTPUT_EXTEND,
-			'select_screenitems' => API_OUTPUT_EXTEND
-		));
-		$screen = reset($tmpScreens);
+		if (!isset($screens[$elementIdentifier])) {
+			//this means id was fetched from profile and this screen does not exist
+			//in this case we need to show the first one
+			$screen = reset($screens);
+		}
+		else {
+			$screen = $screens[$elementIdentifier];
+		}
+
+		//if elementid is used to fetch an element, saving it in profile
+		if(2 != $_REQUEST['fullscreen'] && !$use_screen_name) {
+			CProfile::update('web.screens.elementid',$screen['screenid'] , PROFILE_TYPE_ID);
+		}
 
 		$effectiveperiod = navigation_bar_calc('web.screens', $screen['screenid'], true);
+
+		$element_name = $screen['name'];
 
 // PAGE HEADER {{{
 		$icon = get_icon('favourite', array(
@@ -164,7 +204,7 @@
 			'elid' => $screen['screenid'],
 		));
 		$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
-		
+
 		$screens_wdgt->addPageHeader(S_SCREENS_BIG, array($formHeader, SPACE, $icon, $fs_icon));
 		$screens_wdgt->addItem(BR());
 // }}} PAGE HEADER
@@ -175,46 +215,52 @@
 		$form->addVar('fullscreen', $_REQUEST['fullscreen']);
 
 		$cmbElements = new CComboBox('elementid', $screen['screenid'], 'submit()');
-		foreach($screens as $snum => $cbScreen){
-			$displayed_screen_name = get_node_name_by_elid($cbScreen['screenid'], null, ': ').$cbScreen['name'];
-			$cmbElements->addItem($cbScreen['screenid'], $displayed_screen_name);
+		foreach($screens as $snum => $scr){
+			/**
+			 * Adding htmlspecialchars function to output of the screen name, so
+			 * that it would be available to use symbols like ">" in screen names
+			 * @see ZBX-2844
+			 * @author Konstantin Buravcov
+			 */
+			$displayed_screen_name = htmlspecialchars(get_node_name_by_elid($scr['screenid'], null, ': ').$scr['name']);
+			$cmbElements->addItem($scr['screenid'], $displayed_screen_name);
 		}
 		$form->addItem(array(S_SCREENS.SPACE, $cmbElements));
 
-		$screens_wdgt->addHeader($screen['name'], $form);
+		$screens_wdgt->addHeader($element_name, $form);
 // }}} HEADER
 
 		if((2 != $_REQUEST['fullscreen']) && check_dynamic_items($screen['screenid'], 0)){
-			$options = array(
-				'groups' => array(
-					'monitored_hosts' => 1,
-					'with_monitored_items' => 1,
-				),
-				'hosts' => array(
-					'monitored_hosts' => 1,
-					'with_monitored_items' => 1,
-				),
-				'hostid' => get_request('hostid', null),
-				'groupid' => get_request('groupid', null),
-			);
+			if(!isset($_REQUEST['hostid'])){
+				$_REQUEST['groupid'] = $_REQUEST['hostid'] = 0;
+			}
 
-			$pageFilter = new CPageFilter($options);
-			$_REQUEST['groupid'] = $pageFilter->groupid;
-			$_REQUEST['hostid'] = $pageFilter->hostid;
+			$options = array('allow_all_hosts', 'monitored_hosts', 'with_items');
+			if(!$ZBX_WITH_ALL_NODES) array_push($options, 'only_current_node');
 
-			$form->addItem(array(S_GROUP.SPACE, $pageFilter->getGroupsCB(true)));
+			$params = array();
+			foreach($options as $option) $params[$option] = 1;
+			$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
+			$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
+//SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
+			validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
+
+			$cmbGroups = new CComboBox('groupid', $PAGE_GROUPS['selected'], 'javascript: submit();');
+			foreach($PAGE_GROUPS['groups'] as $groupid => $name){
+				$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid, null, ': ').$name);
+			}
+			$form->addItem(array(SPACE.S_GROUP.SPACE, $cmbGroups));
 
 
-			$cb_hosts = $pageFilter->hosts;
-			$cb_hosts['0'] = S_DEFAULT;
-			$cmbHosts = new CComboBox('hostid', $_REQUEST['hostid'], 'javascript: submit();');
-			foreach($cb_hosts as $hostid => $name){
+			$PAGE_HOSTS['hosts']['0'] = S_DEFAULT;
+			$cmbHosts = new CComboBox('hostid', $PAGE_HOSTS['selected'], 'javascript: submit();');
+			foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
 				$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid, null, ': ').$name);
 			}
 			$form->addItem(array(SPACE.S_HOST.SPACE, $cmbHosts));
 		}
 
-		$element = get_screen($screen, 0, $effectiveperiod);
+		$element = get_screen($screen['screenid'], 0, $effectiveperiod);
 
 		if(2 != $_REQUEST['fullscreen']){
 			$timeline = array(
@@ -249,9 +295,7 @@
 		$jsmenu->InsertJavaScript();
 		echo SBR;
 	}
-?>
-<?php
+
 
 include_once('include/page_footer.php');
-
 ?>
