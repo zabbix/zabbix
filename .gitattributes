@@ -380,8 +380,8 @@ frontends/php/locale/ru_RU/LC_MESSAGES/messages.mo -text
 frontends/php/locale/ru_RU/LC_MESSAGES/messages.po -text
 frontends/php/locale/sv_SE/LC_MESSAGES/messages.mo -text
 frontends/php/locale/sv_SE/LC_MESSAGES/messages.po -text
-frontends/php/locale/ua_UA/LC_MESSAGES/messages.mo -text
-frontends/php/locale/ua_UA/LC_MESSAGES/messages.po -text
+frontends/php/locale/uk_UA/LC_MESSAGES/messages.mo -text
+frontends/php/locale/uk_UA/LC_MESSAGES/messages.po -text
 frontends/php/locale/zh_CN/LC_MESSAGES/messages.mo -text
 frontends/php/locale/zh_CN/LC_MESSAGES/messages.po -text
 frontends/php/maintenance.php -text
