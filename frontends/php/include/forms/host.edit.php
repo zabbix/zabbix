@@ -291,7 +291,7 @@
 
 	$ifTab->addRow($buttonRow);
 
-	$hostList->addRow(S_INTERFACES, $ifTab);
+	$hostList->addRow(S_INTERFACES, new CDiv($ifTab, 'border_dotted objectlist'));
 
 //Proxy
 	$cmbProxy = new CComboBox('proxy_hostid', $proxy_hostid);
@@ -412,21 +412,18 @@
 		$tmplList->addRow($temp_name, new CCheckBox('templates_rem['.$id.']', 'no', null, $id));
 	}
 
+	$tmplFooter = new CDiv();
 	$tmplAdd = new CButton('add', S_ADD, "return PopUp('popup.php?dstfrm=".$frmHost->getName().
 			"&dstfld1=new_template&srctbl=templates&srcfld1=hostid&srcfld2=host".
 			url_param($templates,false,'existed_templates')."',450,450)",
-			'T');
-	$tmplAdd->setAttribute('class', 'link_menu');
+			'link_menu');
 
-	$tmplUnlink = new CSubmit('unlink', S_UNLINK);
-	$tmplUnlink->setAttribute('class', 'link_menu');
+	$tmplUnlink = new CSubmit('unlink', S_UNLINK, null, 'link_menu');
+	$tmplUnlinkClear = new CSubmit('unlink_and_clear', S_UNLINK_AND_CLEAR, null, 'link_menu');
 
-	$tmplUnlinkClear = new CSubmit('unlink_and_clear', S_UNLINK_AND_CLEAR);
-	$tmplUnlinkClear->setAttribute('class', 'link_menu');
+	$tmplFooter->addItem(array($tmplAdd,SPACE,SPACE,$tmplUnlink,SPACE,SPACE,$tmplUnlinkClear));
 
-	$footer = new CDiv(array($tmplAdd,$tmplUnlink,$tmplUnlinkClear));
-
-	$tmplList->addRow($footer);
+	$tmplList->addRow($tmplFooter);
 
 	$divTabs->addTab('templateTab', S_TEMPLATES, $tmplList);
 // } TEMPLATES
