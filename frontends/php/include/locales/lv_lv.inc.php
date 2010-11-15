@@ -419,7 +419,7 @@
 	'S_LATVIAN_LV'=>			'Latviešu (LV)',
 	'S_RUSSIAN_RU'=>			'Krievu (RU)',
 	'S_PORTUGUESE_PT'=>			'Protugāļu (PT)',
-	'S_SPANISH_SP'=>			'Spāņu (SP)',
+	'S_SPANISH_ES'=>			'Spāņu (ES)',
 	'S_SWEDISH_SE'=>			'Zviedru (SE)',
 	'S_JAPANESE_JP'=>			'Japāņu (JP)',
 	'S_CHINESE_CN'=>			'Ķīniešu (CN)',

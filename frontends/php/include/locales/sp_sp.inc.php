@@ -861,7 +861,7 @@
 	'S_ITALIAN_IT'=>			'Italiano (IT)',
 	'S_LATVIAN_LV'=>			'Letón (LV)',
 	'S_RUSSIAN_RU'=>			'Ruso (RU)',
-	'S_SPANISH_SP'=>			'Español (SP)',
+	'S_SPANISH_ES'=>			'Español (ES)',
 	'S_SWEDISH_SE'=>			'Sueco (SE)',
 	'S_JAPANESE_JP'=>			'Japonés (JP)',
 	'S_CHINESE_CN'=>			'Chino (CN)',

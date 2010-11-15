@@ -360,6 +360,8 @@ frontends/php/locale/de_DE/LC_MESSAGES/messages.mo -text
 frontends/php/locale/de_DE/LC_MESSAGES/messages.po -text
 frontends/php/locale/en_GB/LC_MESSAGES/messages.mo -text
 frontends/php/locale/en_GB/LC_MESSAGES/messages.po -text
+frontends/php/locale/es_ES/LC_MESSAGES/messages.mo -text
+frontends/php/locale/es_ES/LC_MESSAGES/messages.po -text
 frontends/php/locale/fr_FR/LC_MESSAGES/messages.mo -text
 frontends/php/locale/fr_FR/LC_MESSAGES/messages.po -text
 frontends/php/locale/hu_HU/LC_MESSAGES/messages.mo -text
@@ -378,8 +380,6 @@ frontends/php/locale/pt_BR/LC_MESSAGES/messages.mo -text
 frontends/php/locale/pt_BR/LC_MESSAGES/messages.po -text
 frontends/php/locale/ru_RU/LC_MESSAGES/messages.mo -text
 frontends/php/locale/ru_RU/LC_MESSAGES/messages.po -text
-frontends/php/locale/sp_SP/LC_MESSAGES/messages.mo -text
-frontends/php/locale/sp_SP/LC_MESSAGES/messages.po -text
 frontends/php/locale/sv_SE/LC_MESSAGES/messages.mo -text
 frontends/php/locale/sv_SE/LC_MESSAGES/messages.po -text
 frontends/php/locale/ua_UA/LC_MESSAGES/messages.mo -text

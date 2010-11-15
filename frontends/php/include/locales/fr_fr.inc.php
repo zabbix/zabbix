@@ -1763,7 +1763,7 @@
 	'S_LATVIAN_LV'=>			'Letton (LV)',
 	'S_RUSSIAN_RU'=>			'Russe (RU)',
 	'S_PORTUGUESE_PT'=>			'Portuguais (PT)',
-	'S_SPANISH_SP'=>			'Espagnol (SP)',
+	'S_SPANISH_ES'=>			'Espagnol (ES)',
 	'S_SWEDISH_SE'=>			'Suédois (SE)',
 	'S_JAPANESE_JP'=>			'Japonais (JP)',
 	'S_CHINESE_CN'=>			'Chinois (CN)',

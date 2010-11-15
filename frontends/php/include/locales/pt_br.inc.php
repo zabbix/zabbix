@@ -1731,7 +1731,7 @@
 	'S_LATVIAN_LV'=>			'Lituâno (LV)',
 	'S_RUSSIAN_RU'=>			'Russo (RU)',
 	'S_PORTUGUESE_PT'=>			'Português Brasileiro (PT_BR)',
-	'S_SPANISH_SP'=>			'Espanhol (SP)',
+	'S_SPANISH_ES'=>			'Espanhol (ES)',
 	'S_SWEDISH_SE'=>			'Sueco (SE)',
 	'S_JAPANESE_JP'=>			'Japonês (JP)',
 	'S_CHINESE_CN'=>			'Chinês (CN)',

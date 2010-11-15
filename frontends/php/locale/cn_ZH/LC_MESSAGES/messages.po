@@ -6085,8 +6085,8 @@ msgid "Portuguese (PT)"
 msgstr "波兰语 (PT)"
 
 #:
-msgid "Spanish (SP)"
-msgstr "西班牙语 (SP)"
+msgid "Spanish (ES)"
+msgstr "西班牙语 (ES)"
 
 #:
 msgid "Swedish (SE)"

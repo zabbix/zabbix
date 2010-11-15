@@ -6469,8 +6469,8 @@ msgid "Portuguese (PT)"
 msgstr "Portugalsky (PT)"
 
 #:
-msgid "Spanish (SP)"
-msgstr "Španělsky (SP)"
+msgid "Spanish (ES)"
+msgstr "Španělsky (ES)"
 
 #:
 msgid "Swedish (SE)"

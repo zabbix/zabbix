@@ -1557,7 +1557,7 @@
 	'S_LATVIAN_LV'=>			'拉脱维亚语(LV)',
 	'S_RUSSIAN_RU'=>			'俄语 (RU)',
 	'S_PORTUGUESE_PT'=>			'波兰语 (PT)',
-	'S_SPANISH_SP'=>			'西班牙语 (SP)',
+	'S_SPANISH_ES'=>			'西班牙语 (ES)',
 	'S_SWEDISH_SE'=>			'Swedish (SE)',
 	'S_JAPANESE_JP'=>			'日语 (JP)',
 	'S_CHINESE_CN'=>			'中文 (CN)',

@@ -3345,8 +3345,8 @@ msgid "Russian (RU)"
 msgstr "Ruso (RU)"
 
 #:
-msgid "Spanish (SP)"
-msgstr "Español (SP)"
+msgid "Spanish (ES)"
+msgstr "Español (ES)"
 
 #:
 msgid "Swedish (SE)"
