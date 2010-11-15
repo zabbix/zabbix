@@ -663,11 +663,20 @@ div.suggest{
 }
 
 .link_menu{
+	border: 0px;
+	background: none;
+
 	color: #FF5500;
-	border-bottom-color: #FF5500;
+	border-bottom: 1px dotted #FF5500;
 }
 
 .link_menu:hover{
 	color: #FF8800;
 	border-bottom-color: #FF8800;
+}
+
+.link_menu[disabled], .link_menu[disabled]:hover{
+	color: #DFDFDF;
+	border: 0px;
+	cursor: default;
 }

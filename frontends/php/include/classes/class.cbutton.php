@@ -20,9 +20,11 @@
 ?>
 <?php
 class CButton extends CInput{
-	public function __construct($name='button', $caption='', $action=NULL){
-		parent::__construct('button', $name, $caption);
+	public function __construct($name='button', $caption='', $action=NULL, $class=null){
+		parent::__construct('button', $name, $caption, $class);
 		$this->addAction('onclick', $action);
+
+		return $this;
 	}
 
 	public function setAccessKey($value='B'){

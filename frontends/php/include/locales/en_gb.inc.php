@@ -849,11 +849,14 @@
 	'S_DELETE_SELECTED_GROUPS'=>		'Delete selected groups',
 
 //	hosts.php
+	'S_SNMP' =>						'SNMP',
+	'S_MAIN' =>						'Main',
 	'S_INTERFACES' =>				'Interfaces',
 	'S_INTERFACE' =>				'Interface',
 	'S_NEW_HOST' =>					'New host',
 	'S_HOST_INTERFACES' =>			'Host interfaces',
 	'S_HOST_INTERFACE' =>			'Host interface',
+	'S_INTERFACE_IS_USED' =>		'Interface used in item',
 	'S_IMPORT_TEMPLATE'=>			'Import Template',
 	'S_IMPORT_HOST'=>				'Import Host',
 	'S_MACROS'=>					'Macros',

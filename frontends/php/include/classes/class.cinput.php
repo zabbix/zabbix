@@ -21,7 +21,7 @@
 <?php
 class CInput extends CTag{
 	protected $jQuery;
-	public function __construct($type='text',$name='textbox',$value='',$readonly='no'){
+	public function __construct($type='text',$name='textbox',$value='',$class=null){
 		parent::__construct('input','no');
 
 		$this->jQuery = false;
@@ -33,14 +33,17 @@ class CInput extends CTag{
 
 		$this->setAttribute('value',$value);
 
-		$this->setReadonly($readonly);
+		if(!is_null($class)) 
+			$this->setAttribute('class', 'input '.$class);
+		else
+			$this->setAttribute('class', 'input '.$type);
+
+	return $this;
 	}
 
 	public function setType($type){
 		$this->setAttribute('type', $type);
-
-		if(!$this->jQuery)
-			$this->setAttribute('class', 'input '.$type);
+		return $this;
 	}
 
 	public function setReadonly($value='yes'){
@@ -48,7 +51,7 @@ class CInput extends CTag{
 			(is_string($value) && ($value=='yes' || $value=='checked' || $value=='on') || $value=='1') ||
 			(is_int($value) && $value<>0) || ($value === true)
 		){
-			$this->setAttributes('readonly', 'readonly');
+			$this->setAttribute('readonly', 'readonly');
 			return $this;
 		}
 
@@ -71,8 +74,16 @@ class CInput extends CTag{
 	}
 
 
-	public function useJQuery($state){
-		$this->jQuery = (bool) $state;
+	public function useJQueryStyle(){
+		$this->jQuery = true;
+		$this->setAttribute('class', 'jqueryinput');
+
+		if(!defined('ZBX_JQUERY_INPUT')){
+			define('ZBX_JQUERY_INPUT', true);
+			zbx_add_post_js('jQuery("input[class=jqueryinput]").button();');
+		}
+
+		return $this;
 	}
 }
 ?>

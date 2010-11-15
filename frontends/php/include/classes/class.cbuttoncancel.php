@@ -20,12 +20,12 @@
 ?>
 <?php
 class CButtonCancel extends CButton{
-	public function __construct($vars=NULL,$action=NULL){
-		parent::__construct('cancel',S_CANCEL);
+	public function __construct($vars=NULL, $action=NULL, $class=null){
+		parent::__construct('cancel',S_CANCEL, $action, $class);
 
-		$this->setVars($vars);
-		if(!is_null($action)) $this->setAttribute('onclick', $action);
+		if(is_null($action)) $this->setVars($vars);
 	}
+
 	public function setVars($value=NULL){
 		global $page;
 

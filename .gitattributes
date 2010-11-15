@@ -241,6 +241,7 @@ frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
 frontends/php/imgstore.php -text
 frontends/php/include/blocks.inc.php -text
+frontends/php/include/classes/class.caccordion.php -text
 frontends/php/include/classes/class.carea.php -text
 frontends/php/include/classes/class.careamap.php -text
 frontends/php/include/classes/class.cbar.php -text
@@ -289,6 +290,7 @@ frontends/php/include/classes/class.cparam.php -text
 frontends/php/include/classes/class.cpassbox.php -text
 frontends/php/include/classes/class.cpie.php -text
 frontends/php/include/classes/class.cpumenu.php -text
+frontends/php/include/classes/class.cradiobutton.php -text
 frontends/php/include/classes/class.crow.php -text
 frontends/php/include/classes/class.cserverinfo.php -text
 frontends/php/include/classes/class.cspan.php -text
@@ -389,20 +391,19 @@ frontends/php/styles/darkblue/images/ui-icons_a83300_256x240.png -text
 frontends/php/styles/darkblue/images/ui-icons_cccccc_256x240.png -text
 frontends/php/styles/darkblue/images/ui-icons_ffffff_256x240.png -text
 frontends/php/styles/darkblue/jquery-ui-1.8.6.custom.css -text
-frontends/php/styles/darkorange/images/ui-bg_diagonals-small_50_5c5c5c_40x40.png -text
-frontends/php/styles/darkorange/images/ui-bg_flat_25_1f1f1f_40x100.png -text
+frontends/php/styles/darkorange/images/ui-bg_flat_25_2f2f2f_40x100.png -text
 frontends/php/styles/darkorange/images/ui-bg_flat_30_cccccc_40x100.png -text
-frontends/php/styles/darkorange/images/ui-bg_flat_50_ff7722_40x100.png -text
-frontends/php/styles/darkorange/images/ui-bg_glass_20_555555_1x400.png -text
-frontends/php/styles/darkorange/images/ui-bg_glass_50_f0a000_1x400.png -text
-frontends/php/styles/darkorange/images/ui-bg_glass_50_ff5500_1x400.png -text
-frontends/php/styles/darkorange/images/ui-bg_highlight-soft_25_333333_1x100.png -text
+frontends/php/styles/darkorange/images/ui-bg_flat_50_5c5c5c_40x100.png -text
+frontends/php/styles/darkorange/images/ui-bg_glass_20_2f2f2f_1x400.png -text
+frontends/php/styles/darkorange/images/ui-bg_glass_40_ff5500_1x400.png -text
+frontends/php/styles/darkorange/images/ui-bg_glass_40_ff9900_1x400.png -text
+frontends/php/styles/darkorange/images/ui-bg_glass_40_ffc73d_1x400.png -text
+frontends/php/styles/darkorange/images/ui-bg_highlight-hard_30_3f3f3f_1x100.png -text
 frontends/php/styles/darkorange/images/ui-bg_highlight-soft_80_eeeeee_1x100.png -text
-frontends/php/styles/darkorange/images/ui-icons_2f2f2f_256x240.png -text
-frontends/php/styles/darkorange/images/ui-icons_4b8e0b_256x240.png -text
+frontends/php/styles/darkorange/images/ui-icons_000000_256x240.png -text
 frontends/php/styles/darkorange/images/ui-icons_a83300_256x240.png -text
-frontends/php/styles/darkorange/images/ui-icons_cccccc_256x240.png -text
 frontends/php/styles/darkorange/images/ui-icons_dfdfdf_256x240.png -text
+frontends/php/styles/darkorange/images/ui-icons_ff5500_256x240.png -text
 frontends/php/styles/darkorange/images/ui-icons_ffffff_256x240.png -text
 frontends/php/styles/darkorange/jquery-ui-1.8.6.custom.css -text
 frontends/php/styles/default.css -text

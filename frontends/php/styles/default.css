@@ -83,28 +83,18 @@ img.top		{	vertical-align:text-top;			}
 img.bottom	{	vertical-align:text-bottom;			}
 img.borderless	{	border-width: 0px; vertical-align: bottom;	}
 
-.center{
-	width: 100%;
-	text-align: center;
-}
+.center{ width: 100%; text-align: center; }
+.left{ text-align: left; }
 
-.vert{
-	width:1px;
-	/*writing-mode: tb-rl;*/
-}
+.right{ text-align: right; }
 
-.rarr{
-	font-size: 16px;
-}
+.vert{ width:1px;}
 
-.bold {
-	font-weight: bold;
-}
+.rarr{ font-size: 16px; }
 
-.nowrap {
-	white-space: nowrap;
-	word-spacing:	0px;
-}
+.bold { font-weight: bold; }
+
+.nowrap { white-space: nowrap; word-spacing: 0px; }
 
 .delimiter{
 	font-weight:bold;

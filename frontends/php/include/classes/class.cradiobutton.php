@@ -19,9 +19,31 @@
 **/
 ?>
 <?php
-class CButtonDelete extends CButtonQMessage{
-	public function __construct($msg=NULL, $vars=NULL, $class=null){
-		parent::__construct('delete',S_DELETE,$msg,$vars,$class);
+class CRadioButton extends CDiv{
+	protected $count;
+	protected $name;
+	protected $value;
+
+	public function __construct($name='radio', $value='yes'){
+		parent::__construct();
+
+		$this->count = 0;
+	}
+
+
+	public function addItem($name, $value){
+		$this->count++;
+
+		$radio = CInput('radio', $this->name, $value);
+		$radio->setAttribute('id', $this->name.$this->count);
+
+		if(strcmp($value,$this->value) == 0){
+			$radio->setAttribute('checked', 'checked');
+		}
+
+		$label = CLabel($name, $this->name.$this->count);
+
+		parrent::addItem(array($radio, $label));
 	}
 }
 ?>

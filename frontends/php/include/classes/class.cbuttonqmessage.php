@@ -24,12 +24,12 @@ class CButtonQMessage extends CButton{
  public $msg;
  public $name;
 
-	public function __construct($name, $caption, $msg=NULL, $vars=NULL){
+	public function __construct($name, $caption, $msg=NULL, $vars=NULL, $class){
 		$this->vars = null;
 		$this->msg = null;
 		$this->name = $name;
 
-		parent::__construct($name,$caption);
+		parent::__construct($name,$caption,null,$class);
 
 		$this->setMessage($msg);
 		$this->setVars($vars);

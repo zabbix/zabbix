@@ -81,7 +81,7 @@
  *
  * author: Aly
  */
-function get_next_event($currentEvent, $eventList = null){
+function get_next_event($currentEvent, $eventList = null, $showUnknown=false){
 	if(!is_null($eventList)){
 		$nextEvent = reset($eventList);
 		foreach($eventList as $enum => $event){
@@ -108,7 +108,7 @@ function get_next_event($currentEvent, $eventList = null){
 		' WHERE e.objectid='.$currentEvent['objectid'].
 			' AND e.eventid > '.$currentEvent['eventid'].
 			' AND e.object='.EVENT_OBJECT_TRIGGER.
-			' AND e.value_changed='.TRIGGER_VALUE_CHANGED_YES.
+			($showUnknown ? '' : ' AND e.value_changed='.TRIGGER_VALUE_CHANGED_YES).
 		' ORDER BY e.object, e.objectid, e.eventid';
 
 	return DBfetch(DBselect($sql,1));
@@ -123,7 +123,7 @@ function make_event_details($event, $trigger){
 
 	$duration = zbx_date2age($event['clock']);
 
-	if($next_event = get_next_event($event)){
+	if($next_event = get_next_event($event, null, true)){
 		$duration = zbx_date2age($event['clock'],$next_event['clock']);
 	}
 
@@ -188,7 +188,7 @@ function make_small_eventlist($startEvent){
 		$duration = zbx_date2age($lclock, $event['clock']);
 		$clock = $event['clock'];
 
-		if($startEvent['eventid'] == $event['eventid'] && ($nextevent = get_next_event($event))) {
+		if($startEvent['eventid'] == $event['eventid'] && ($nextevent = get_next_event($event,null,true))) {
 			$duration = zbx_date2age($nextevent['clock'], $clock);
 		}
 		else if($startEvent['eventid'] == $event['eventid']) {
