@@ -551,7 +551,7 @@ Copt::memoryPick();
 
 		try{
 			self::BeginTransaction(__METHOD__);
-			
+
 			self::checkInput($interfaces, __FUNCTION__);
 
 			$data = array();
@@ -617,7 +617,7 @@ Copt::memoryPick();
 			foreach($interfaces as $inum => $interface){
 				foreach($hosts as $hnum => $host){
 					$newInterface = $interface;
-					$newInterface['hostid'] = $host;
+					$newInterface['hostid'] = $host['hostid'];
 
 					$insertData[] = $newInterface;
 				}
