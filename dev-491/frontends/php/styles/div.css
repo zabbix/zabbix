@@ -142,6 +142,36 @@ div.hoverclass123{
 }
 /***************************/
 
+div.formlist {
+
+}
+
+div.formlist ul{
+	list-style-type: none;
+	margin: 0px;
+	padding: 0px;
+	width: 100%;
+}
+
+div.formlist ul li{
+	padding: 2px;
+	width: 100%;
+	height: 100%;
+	vertical-align: middle;
+}
+
+div.formlist ul li div.dt{
+	width: 20%;
+	float: left;
+	text-align: right;
+	white-space: nowrap;
+}
+
+div.formlist ul li div.dd{
+	width: 77%;
+	padding-left: 21%;
+}
+
 /********* DIV IMG *********/
 div.zabbix_logo{
 	height: 31px;
@@ -374,13 +404,14 @@ div.icon_sortdown{
 
 /********** <OBJECT LIST> ************/
 div.objectlist{
+	padding: 3px;
 	margin: 5px 0px 5px 0px;
 	border: 1px solid #6C80B9;
 	background-color: #FFFFFF;
 }
 
 div.objectlist ul{
-	padding: 3px 0px 3px 0px;
+	padding: 0px;
 	list-style: none;
 	margin: 0px;
 }

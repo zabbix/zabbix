@@ -75,23 +75,38 @@
 		$dbHosts = CHost::get(array(
 			'hostids' => $_REQUEST['hostid'],
 			'selectParentTemplates' => API_OUTPUT_EXTEND,
-			'selectInterfaces' => API_OUTPUT_EXTEND,
 			'selectMacros' => API_OUTPUT_EXTEND,
 			'select_profile' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND
 		));
 		$dbHost = reset($dbHosts);
 
+		$dbHost['interfaces'] = CHostInterface::get(array(
+			'hostids' => $dbHost['hostid'],
+			'output' => API_OUTPUT_EXTEND,
+			'selectItems' => API_OUTPUT_COUNT,
+			'preserveKeys' => true
+		));
+
 		$frm_title	.= SPACE.' ['.$dbHost['host'].']';
 		$original_templates = $dbHost['parentTemplates'];
+
+		if(!empty($interfaces)){
+			foreach($interfaces as $hinum => $interface){
+				$interfaces[$hinum]['items'] = 0;
+				
+				if($interface['new'] == 'create') continue;
+				if(!isset($dbHost['interfaces'][$interface['interfaceid']])) continue;
+
+				$interfaces[$hinum]['items'] = $dbHost['interfaces'][$interface['interfaceid']]['items'];
+			}
+		}
 	}
 	else{
 		$original_templates = array();
 	}
 
 	if(($_REQUEST['hostid']>0) && !isset($_REQUEST['form_refresh'])){
-		
-
 		$proxy_hostid	= $dbHost['proxy_hostid'];
 		$host			= $dbHost['host'];
 		$status			= $dbHost['status'];
@@ -249,17 +264,19 @@
 			'ip' => '127.0.0.1',
 			'dns' => '',
 			'port' => 10050,
-			'useip' => 1
+			'useip' => 1,
+			'itemtype' => 0,
+			'items' => 0
 		));
 	}
 
 	$ifTab = new CTable();
-	$ifTab->addRow(array(S_IP_ADDRESS,S_DNS_NAME,S_PORT,S_CONNECT_TO));
+	$ifTab->addRow(array(SPACE, S_IP_ADDRESS,S_DNS_NAME,S_CONNECT_TO,S_PORT,S_TYPE));
 	$ifTab->setAttribute('id', 'hostInterfaces');
 
 	$jsInsert = '';
 	foreach($interfaces as $inum => $interface){
-		$jsInsert.= 'addInterfaceRow('.zbx_jsvalue($interface).');';
+		$jsInsert.= 'setTimeout(function(){addInterfaceRow('.zbx_jsvalue($interface).');}, 1);';
 	}
 	zbx_add_post_js($jsInsert);
 
@@ -273,7 +290,7 @@
 	$buttonRow->setAttribute('id', 'hostIterfacesFooter');
 
 	$ifTab->addRow($buttonRow);
-	
+
 	$hostList->addRow(S_INTERFACES, $ifTab);
 
 //Proxy
@@ -543,18 +560,20 @@
 	$divTabs->addTab('profileExTab', S_EXTENDED_HOST_PROFILE, $profileexlist);
 // } EXT PROFILE WIDGET
 
-$frmHost->addItem($divTabs);
+	$frmHost->addItem($divTabs);
 
 // Footer
-	$host_footer = array();
-	$host_footer[] = new CSubmit('save', S_SAVE);
+	$host_footer = new CDiv();
+	$host_footer->addItem(new CSubmit('save', S_SAVE));
 	if(($_REQUEST['hostid']>0) && ($_REQUEST['form'] != 'full_clone')){
-		array_push($host_footer, SPACE, new CSubmit('clone', S_CLONE), SPACE, new CSubmit('full_clone', S_FULL_CLONE), SPACE,
-			new CButtonDelete(S_DELETE_SELECTED_HOST_Q, url_param('form').url_param('hostid').url_param('groupid')));
+		$host_footer->addItem(new CSubmit('clone', S_CLONE));
+		$host_footer->addItem(new CSubmit('full_clone', S_FULL_CLONE));
+		$host_footer->addItem(new CButtonDelete(S_DELETE_SELECTED_HOST_Q, url_param('form').url_param('hostid').url_param('groupid')));
 	}
-	array_push($host_footer, SPACE, new CButtonCancel(url_param('groupid')));
+	$host_footer->addItem(new CButtonCancel(url_param('groupid')));
+	$host_footer->useJQueryStyle();
+	$frmHost->addItem(new CDiv($host_footer, 'objectlist right'));
 
-	$frmHost->addItem(new CDiv($host_footer, 'center'));
 
 return $frmHost;
 ?>

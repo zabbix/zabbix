@@ -486,12 +486,22 @@ Copt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 			}
 
-			if(isset($interface['dns']) && !empty($interface['dns']) && !preg_match('/^'.ZBX_PREG_DNS_FORMAT.'$/i', $interface['dns'])){
+			if(isset($interface['dns']) && !zbx_empty($interface['dns']) && !preg_match('/^'.ZBX_PREG_DNS_FORMAT.'$/i', $interface['dns'])){
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect characters used for DNS [ '.$interface['dns'].' ]');
 			}
 
-			if(isset($interface['ip']) && !empty($interface['ip']) && !validate_ip($interface['ip'], $arr)){
+			if(isset($interface['ip']) && !zbx_empty($interface['ip']) && !validate_ip($interface['ip'], $arr)){
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect interface IP [ '.$interface['ip'].' ] provided');
+			}
+
+			if($create){
+				if(zbx_empty($interface['ip']) && zbx_empty($interface['dns'])){
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'IP and DNS can not be empty for host interface');
+				}
+
+				if(zbx_empty($interface['port'])){
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'PORT can not be empty for host interface');
+				}
 			}
 		}
 		unset($interface);

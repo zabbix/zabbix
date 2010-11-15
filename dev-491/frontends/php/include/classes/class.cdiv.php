@@ -30,6 +30,19 @@ class CDiv extends CTag{
 		$this->tag_end = '';
 		$this->tag_body_start = '';
 		$this->tag_body_end = '';
+
+		return $this;
+	}
+
+	public function useJQueryStyle(){
+		$this->setAttribute('class', 'jqueryinputset');
+
+		if(!defined('ZBX_JQUERY_INPUTSET')){
+			define('ZBX_JQUERY_INPUTSET', true);
+			zbx_add_post_js('jQuery("div[class=jqueryinputset]").buttonset();');
+		}
+
+		return $this;
 	}
 }
 ?>

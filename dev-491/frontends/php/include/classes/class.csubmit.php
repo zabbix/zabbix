@@ -20,9 +20,11 @@
 ?>
 <?php
 class CSubmit extends CButton{
-	public function __construct($name='submit', $caption='', $action=NULL){
-		parent::__construct($name, $caption, $action);
+	public function __construct($name='submit', $caption='', $action=NULL, $class=null){
+		parent::__construct($name, $caption, $action, $class);
 		$this->setAttribute('type', 'submit');
+
+		return $this;
 	}
 }
 ?>

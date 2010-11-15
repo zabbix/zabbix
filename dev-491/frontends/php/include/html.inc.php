@@ -368,7 +368,7 @@
 		}
 
 
-		$tbl_header_host = new CDiv();
+		$tbl_header_host = new CDiv(null, 'objectlist');
 		if($header_host['status'] == HOST_STATUS_TEMPLATE){
 			if(isset($elements['screens'])){
 				$list->addItem(array(new CLink(S_SCREENS, 'screenconf.php?templateid='.$header_host['hostid']), ' ('.$header_host['screens'].')'));
@@ -403,7 +403,6 @@
 
 			$tbl_header_host->addItem($list);
 		}
-		$tbl_header_host->setClass('objectlist');
 
 		return $tbl_header_host;
 	}
