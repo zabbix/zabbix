@@ -121,6 +121,15 @@ function zbx_locale_variants($language)
 		'.eucCN',
 		'.Big5HKSCS',
 		'.Big5',
+		'.armscii8',
+		'.cp1251',
+		'.eucjp',
+		'.euckr',
+		'.euctw',
+		'.gb18030',
+		'.gbk',
+		'.koi8r',
+		'.tcvn',
 	);
 
 	$result = array();
