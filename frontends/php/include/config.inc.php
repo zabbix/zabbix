@@ -205,12 +205,12 @@ function __autoload($class_name){
 	if(!defined('ZBX_PAGE_NO_AUTHORIZATION') && !defined('ZBX_RPC_REQUEST')){
 		check_authorisation();
 
-		//if(file_exists('include/locales/'.$USER_DETAILS['lang'].'.inc.php')){
-		//	include_once('include/locales/'.$USER_DETAILS['lang'].'.inc.php');
-		//	process_locales();
-		//}
-
-		
+		//to see the wizard even if gettext support is off
+		if (!function_exists('_')){
+			function _($string){
+				return $string;
+			}
+		}
 
 		//initializing gettext translations depending on language selected by user
 		$locales = zbx_locale_variants($USER_DETAILS['lang']);
