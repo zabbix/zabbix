@@ -1181,7 +1181,7 @@ return $caption;
 				}
 
 				$state='';
-				$sql = 'SELECT h.host,i.itemid,i.key_,f.function,f.triggerid,f.parameter,i.itemid,i.status'.
+				$sql = 'SELECT h.host,i.itemid,i.key_,f.function,f.triggerid,f.parameter,i.itemid,i.status, i.type'.
 						' FROM items i,functions f,hosts h'.
 						' WHERE f.functionid='.$functionid.
 							' AND i.itemid=f.itemid '.
@@ -1219,6 +1219,10 @@ return $caption;
 									'items.php?form=update&itemid='.$function_data['itemid'].'&switch_node='.id2nodeid($function_data['itemid']),
 									$style
 								);
+
+						if($function_data['type'] == ITEM_TYPE_HTTPTEST){
+							$link = new CSpan($function_data['host'].':'.$function_data['key_'], $style);
+						}
 
 						array_push($exp,array('{',$link,'.',bold($function_data['function'].'('),$function_data['parameter'],bold(')'),'}'));
 					}
@@ -1335,6 +1339,10 @@ return $caption;
 									'items.php?form=update&itemid='.$function_data['itemid'],
 									$style
 								);
+								
+						if($function_data['type'] == ITEM_TYPE_HTTPTEST){
+							$link = new CSpan($function_data['host'].':'.$function_data['key_'], $style);
+						}
 
 						array_push($exp,array('{',$link,'.',bold($function_data['function'].'('),$function_data['parameter'],bold(')'),'}'));
 					}
