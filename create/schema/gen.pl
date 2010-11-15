@@ -294,7 +294,7 @@ sub process_field
 			}
 			elsif ($fk_flags eq "RESTRICT")
 			{
-				$fk_flags = " ";
+				$fk_flags = "0";
 			}
 		}
 		else
@@ -393,7 +393,7 @@ sub process_field
 			
 			if ($fk_flags eq "")
 			{
-				$fk_flags = "ON DELETE CASCADE";
+				$fk_flags = " ON DELETE CASCADE";
 			}
 			elsif ($fk_flags eq "RESTRICT")
 			{
@@ -419,7 +419,7 @@ sub process_field
 			{
 				$references = "";
 				
-				$fkeys = "${fkeys}${fk_bol}ALTER TABLE${only} ${table_name} ADD CONSTRAINT ${cname} FOREIGN KEY (${name}) REFERENCES ${fk_table} (${fk_field}) ${fk_flags}${fk_eol}\n";
+				$fkeys = "${fkeys}${fk_bol}ALTER TABLE${only} ${table_name} ADD CONSTRAINT ${cname} FOREIGN KEY (${name}) REFERENCES ${fk_table} (${fk_field})${fk_flags}${fk_eol}\n";
 
 				if ($output{"database"} eq "mysql")
 				{
