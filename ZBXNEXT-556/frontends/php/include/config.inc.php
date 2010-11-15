@@ -224,6 +224,8 @@ function __autoload($class_name){
 		bindtextdomain("messages", "locale");
 		bind_textdomain_codeset("messages", 'UTF-8');
 		textdomain("messages");
+		// Numeric Locale to default
+		setLocale(LC_NUMERIC, array('en','en_US','en_US.UTF-8','English_United States.1252'));
 
 
 		include_once('include/locales/en_gb.inc.php');

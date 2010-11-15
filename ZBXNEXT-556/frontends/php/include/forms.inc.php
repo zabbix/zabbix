@@ -387,6 +387,8 @@
 		}
 		//restoring original locale
 		setlocale(LC_ALL, zbx_locale_variants($USER_DETAILS['lang']));
+		// Numeric Locale to default
+		setLocale(LC_NUMERIC, array('en','en_US','en_US.UTF-8','English_United States.1252'));
 
 		$frmUser->addRow(S_LANGUAGE, $cmbLang);
 		//if some languages can't be set, showing a warning about that
