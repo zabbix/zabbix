@@ -95,7 +95,8 @@ function zbx_locale_variants($language)
 	$postfixes = array(
 		'',
 		'.utf8',
-		'.iso885915'
+		'.iso885915',
+		'.UTF-8'
 	);
 
 	$result = array();

@@ -384,7 +384,6 @@ frontends/php/locale/ua_UA/LC_MESSAGES/messages.mo -text
 frontends/php/locale/ua_UA/LC_MESSAGES/messages.po -text
 frontends/php/locale/zh_CN/LC_MESSAGES/messages.mo -text
 frontends/php/locale/zh_CN/LC_MESSAGES/messages.po -text
-frontends/php/locales.php -text
 frontends/php/maintenance.php -text
 frontends/php/popup_bitem.php -text
 frontends/php/popup_link_tr.php -text
