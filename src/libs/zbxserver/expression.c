@@ -1489,7 +1489,7 @@ static int	DBget_item_value_by_triggerid(zbx_uint64_t triggerid, char **value, i
 	{
 		ZBX_STR2UINT64(itemid, row[0]);
 		value_type = atoi(row[1]);
-		ZBX_STR2UINT64(valuemapid, row[2]);
+		ZBX_DBROW2UINT64(valuemapid, row[2]);
 
 		if (SUCCEED == (ret = DBget_history_value(itemid, value, get_table_by_value_type(value_type), "value", clock, ns)))
 		{
