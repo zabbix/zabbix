@@ -463,7 +463,7 @@
 
 
 	function check_php_gettext() {
-		$current = function_exists('_');
+		$current = function_exists('gettext');
 
 		$req = $current ? 1 : 0;
 
