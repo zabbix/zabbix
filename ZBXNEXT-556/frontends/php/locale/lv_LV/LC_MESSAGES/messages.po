@@ -1585,8 +1585,8 @@ msgid "Portuguese (PT)"
 msgstr "Protugāļu (PT)"
 
 #:
-msgid "Spanish (SP)"
-msgstr "Spāņu (SP)"
+msgid "Spanish (ES)"
+msgstr "Spāņu (ES)"
 
 #:
 msgid "Swedish (SE)"

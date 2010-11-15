@@ -1156,7 +1156,7 @@
 	'S_LATVIAN_LV'=>				'Łotewski (LV)',
 	'S_RUSSIAN_RU'=>				'Rosyjski (RU)',
 	'S_PORTUGUESE_PT'=>				'Portugalski (PT)',
-	'S_SPANISH_SP'=>				'Hiszpański (SP)',
+	'S_SPANISH_ES'=>				'Hiszpański (ES)',
 	'S_SWEDISH_SE'=>				'Szwedzki (SE)',
 	'S_JAPANESE_JP'=>				'Japoński (JP)',
 	'S_CHINESE_CN'=>				'Chiński (CN)',

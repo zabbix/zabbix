@@ -1000,7 +1000,7 @@
 	'S_LATVIAN_LV'=>			'라트비아어 (LV)',
 	'S_RUSSIAN_RU'=>			'러시아어 (RU)',
 	'S_PORTUGUESE_PT'=>			'포르투갈어 (PT)',
-	'S_SPANISH_SP'=>			'스페인어 (SP)',
+	'S_SPANISH_ES'=>			'스페인어 (ES)',
 	'S_SWEDISH_SE'=>			'스웨덴어 (SE)',
 	'S_JAPANESE_JP'=>			'일본어 (JP)',
 	'S_CHINESE_CN'=>			'중국어 (CN)',

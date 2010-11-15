@@ -6589,8 +6589,8 @@ msgid "Portuguese (PT)"
 msgstr "Португальська (PT)"
 
 #:
-msgid "Spanish (SP)"
-msgstr "Іспанська (SP)"
+msgid "Spanish (ES)"
+msgstr "Іспанська (ES)"
 
 #:
 msgid "Swedish (SE)"

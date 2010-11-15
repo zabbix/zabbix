@@ -2026,7 +2026,7 @@
 	'S_LATVIAN_LV'=>			_('Latvian (LV)'),
 	'S_RUSSIAN_RU'=>			_('Russian (RU)'),
 	'S_PORTUGUESE_PT'=>			_('Portuguese (PT)'),
-	'S_SPANISH_SP'=>			_('Spanish (SP)'),
+	'S_SPANISH_ES'=>			_('Spanish (ES)'),
 	'S_SWEDISH_SE'=>			_('Swedish (SE)'),
 	'S_JAPANESE_JP'=>			_('Japanese (JP)'),
 	'S_CHINESE_CN'=>			_('Chinese (CN)'),

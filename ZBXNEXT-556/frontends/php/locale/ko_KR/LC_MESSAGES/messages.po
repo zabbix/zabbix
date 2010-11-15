@@ -3413,8 +3413,8 @@ msgid "Portuguese (PT)"
 msgstr "포르투갈어 (PT)"
 
 #:
-msgid "Spanish (SP)"
-msgstr "스페인어 (SP)"
+msgid "Spanish (ES)"
+msgstr "스페인어 (ES)"
 
 #:
 msgid "Swedish (SE)"

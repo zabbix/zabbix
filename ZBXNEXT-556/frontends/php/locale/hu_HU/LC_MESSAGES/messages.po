@@ -6073,8 +6073,8 @@ msgid "Portuguese (PT)"
 msgstr "Portugál (PT)"
 
 #:
-msgid "Spanish (SP)"
-msgstr "Spanyol (SP)"
+msgid "Spanish (ES)"
+msgstr "Spanyol (ES)"
 
 #:
 msgid "Swedish (SE)"

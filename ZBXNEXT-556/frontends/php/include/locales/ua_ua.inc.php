@@ -1740,7 +1740,7 @@
 	'S_LATVIAN_LV'=>			'Латвійська (LV)',
 	'S_RUSSIAN_RU'=>			'Російська (RU)',
 	'S_PORTUGUESE_PT'=>			'Португальська (PT)',
-	'S_SPANISH_SP'=>			'Іспанська (SP)',
+	'S_SPANISH_ES'=>			'Іспанська (ES)',
 	'S_SWEDISH_SE'=>			'Шведська (SE)',
 	'S_JAPANESE_JP'=>			'Японська (JP)',
 	'S_CHINESE_CN'=>			'Китайська (CN)',

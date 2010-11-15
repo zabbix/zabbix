@@ -587,7 +587,7 @@
 	'S_ITALIAN_IT'=>			'Italienska (IT)',
 	'S_LATVIAN_LV'=>			'Lettiska (LV)',
 	'S_RUSSIAN_RU'=>			'Ryska (RU)',
-	'S_SPANISH_SP'=>			'Spanska (SP)',
+	'S_SPANISH_ES'=>			'Spanska (ES)',
 	'S_JAPANESE_JP'=>			'Japanska (JP)',
 	'S_CHINESE_CN'=>			'Kinesiska (CN)',
 	'S_ZABBIX_BIG'=>			'ZABBIX',
