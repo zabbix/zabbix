@@ -24,6 +24,8 @@
  * In case gettext functions do not exist, just replacing them with our own,
  * so user can see atleast english translation
  */
+
+
 if (!function_exists('_')){
 	function _($string){
 		return $string;

@@ -463,7 +463,7 @@
 
 
 	function check_php_gettext() {
-		$current = function_exists('gettext');
+		$current = function_exists('bindtextdomain');
 
 		$req = $current ? 1 : 0;
 
