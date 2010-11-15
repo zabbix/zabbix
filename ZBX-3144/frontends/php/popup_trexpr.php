@@ -275,6 +275,7 @@
 		$res = preg_match('/^'.ZBX_PREG_SIMPLE_EXPRESSION_FORMAT.'(['.implode('',array_keys($operators)).'])'.'(['.ZBX_PREG_PRINT.']{1,})/',
 						$_REQUEST['expression'],
 						$expr_res);
+
 		if($res){
 			$sql = 'SELECT i.itemid '.
 					' FROM items i, hosts h '.
@@ -298,7 +299,7 @@
 			$_REQUEST['expr_type'] = $expr_res[ZBX_SIMPLE_EXPRESSION_FUNCTION_NAME_ID].'['.$operator.']';
 
 
-			$_REQUEST['value'] = $expr_res[count($expr_res) - 1];
+			$_REQUEST['value'] = $expr_res[ZBX_SIMPLE_EXPRESSION_FUNCTION_PARAM_ID];
 
 		}
 	}
