@@ -73,6 +73,7 @@ function __autoload($class_name){
 ?>
 <?php
 
+	require_once('include/gettextwrapper.inc.php');
 	require_once('include/defines.inc.php');
 	require_once('include/func.inc.php');
 	require_once('include/html.inc.php');
@@ -204,13 +205,6 @@ function __autoload($class_name){
 
 	if(!defined('ZBX_PAGE_NO_AUTHORIZATION') && !defined('ZBX_RPC_REQUEST')){
 		check_authorisation();
-
-		//to see the wizard even if gettext support is off
-		if (!function_exists('_')){
-			function _($string){
-				return $string;
-			}
-		}
 
 		//initializing gettext translations depending on language selected by user
 		$locales = zbx_locale_variants($USER_DETAILS['lang']);

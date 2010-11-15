@@ -302,6 +302,7 @@ frontends/php/include/classes/class.cvisibilitybox.php -text
 frontends/php/include/classes/class.cwidget.php -text
 frontends/php/include/debug.inc.php -text
 frontends/php/include/func.inc.php -text
+frontends/php/include/gettextwrapper.inc.php -text
 frontends/php/include/ident.inc.php -text
 frontends/php/include/js.inc.php -text
 frontends/php/include/locales/cs_cz.inc.php -text
