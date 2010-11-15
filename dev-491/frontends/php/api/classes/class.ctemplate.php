@@ -1047,10 +1047,7 @@ COpt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$template['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
 
-				$templateid = DB::insert('hosts', array(
-					'host' => $template['host'],
-					'status' => HOST_STATUS_TEMPLATE,
-				));
+				$templateid = DB::insert('hosts', array(array('host' => $template['host'],'status' => HOST_STATUS_TEMPLATE,)));
 				$templateids[] = $templateid = reset($templateid);
 
 

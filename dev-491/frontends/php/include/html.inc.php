@@ -341,7 +341,7 @@
 		}
 		$description[] = $header_host['host'];
 
-		$list = new CList();
+		$list = new CList(null, 'objectlist');
 		if($header_host['status'] == HOST_STATUS_TEMPLATE)
 			$list->addItem(new CLink(bold(S_TEMPLATE_LIST), 'templates.php?templateid='.$header_host['hostid'].url_param('groupid')));
 		else

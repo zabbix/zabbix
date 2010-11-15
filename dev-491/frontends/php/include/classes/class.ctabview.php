@@ -42,7 +42,7 @@ class CTabView extends CDiv{
 
 		parent::__construct();
 		$this->setAttribute('id',$this->id);
-		$this->setAttribute('class','hidden');
+		$this->setAttribute('class','min-width hidden');
 	}
 
 	public function setRemember($remember){

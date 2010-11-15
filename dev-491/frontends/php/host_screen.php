@@ -204,7 +204,7 @@
 		}
 
 // Host Screen List
-		$screenList = new CList();
+		$screenList = new CList(null, 'objectlist');
 		foreach($screens as $snum => $cbScreen){
 			$displayed_screen_name = get_node_name_by_elid($cbScreen['screenid'], null, ': ').$cbScreen['name'];
 

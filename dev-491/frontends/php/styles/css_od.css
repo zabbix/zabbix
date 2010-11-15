@@ -576,16 +576,18 @@ div.formElement_body{
 	background-color: #1A1A1A;
 }
 
+
 div.objectlist{
 	border-color: #CC5500;
 	background-color: #2F2F2F;
-	-moz-border-radius: 3px;
-	-webkit-border-radius: 3px;
-	border-radius: 3px;
 }
 
-div.objectlist ul li{
+ul.objectlist li{
 	color: #DADADA;
+}
+
+div.border_dotted{
+	border: 1px dotted #CC5500;
 }
 
 .formElementTable tr td{

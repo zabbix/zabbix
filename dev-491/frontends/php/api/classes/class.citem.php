@@ -1383,7 +1383,7 @@ COpt::memoryPick();
 
 		$chdHosts = CHost::get(array(
 			'output' => array('hostid', 'host'),
-			'selectInterfaces' => API_OUTPUT_REFER,
+			'selectInterfaces' => API_OUTPUT_EXTEND,
 			'templateids' => zbx_objectValues($items, 'hostid'),
 			'hostids' => $hostids,
 			'preservekeys' => 1,
@@ -1395,7 +1395,13 @@ COpt::memoryPick();
 		$insertItems = array();
 		$updateItems = array();
 		foreach($chdHosts as $hostid => $host){
-			$interface = reset($host['interfaces']);
+			$interfaces = array();
+			foreach($host['interfaces'] as $hinum => $interface){
+				if($interface['main'] == 1){
+					$interfaces[$interface['itemtype']] = $interface;
+				}
+			}
+			
 			$templateids = zbx_toHash($host['templates'], 'templateid');
 
 // skip items not from parent templates of current host
@@ -1454,7 +1460,23 @@ COpt::memoryPick();
 					$updateItems[] = $newItem;
 				}
 				else{
-					$newItem['interfaceid'] = $interface['interfaceid'];
+					switch($newItem['type']){
+						case 1: $itemtype = 6; break;
+						case 4: $itemtype = 6; break;
+						case 6: $itemtype = 6; break;
+						case 12: $itemtype = 12; break;
+						case 0:
+						default: $itemtype = 0;
+					}
+SDII($interfaces);
+					if(isset($interfaces[$itemtype])){
+						$newItem['interfaceid'] = $interfaces[$itemtype]['interfaceid'];
+					}
+					else{
+						$defHI = reset($host['interfaces']);
+						$newItem['interfaceid'] = $defHI['interfaceid'];
+					}
+						
 					$insertItems[] = $newItem;
 				}
 			}
