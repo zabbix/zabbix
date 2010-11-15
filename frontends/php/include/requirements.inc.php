@@ -493,8 +493,8 @@
 		$result[] = check_php_mbstring();
 		$result[] = check_php_sockets();
 		$result[] = check_php_session();
-		$result[] = check_php_gd();
 		$result[] = check_php_gettext();
+		$result[] = check_php_gd();
 		$result[] = check_php_gd_png();
 		$result[] = check_php_xml();
 		$result[] = check_php_ctype();

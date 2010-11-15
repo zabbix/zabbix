@@ -768,7 +768,7 @@
 	'S_MAINTENANCE_ADDED'=>			_('Maintenance added'),
 	'S_MAINTENANCE_UPDATED'=>		_('Maintenance updated'),
 	'S_MAINTENANCE_DELETED'=>		_('Maintenance deleted'),
-	'S_DELETE_SELECTED_MAINTENANCE_PERIODS_Q'=>'Delete selected maintenance periods?',
+	'S_DELETE_SELECTED_MAINTENANCE_PERIODS_Q'=>_('Delete selected maintenance periods?'),
 	'S_GROUP_OR_HOST_NEEDED' => _('At least one host or group should be selected'),
 
 	'S_IN_MAINTENANCE'=>			_('In maintenance'),
@@ -985,7 +985,7 @@
 	'S_LINK_WITH_TEMPLATE'=>		_('Link with template'),
 	'S_DELETE_AND_CLEAR'=>			_('Delete and clear'),
 	'S_DELETE_SELECTED_TEMPLATES_Q'=>	_('Delete selected templates?'),
-	'S_WARNING_THIS_DELETE_TEMPLATES_AND_CLEAR'=>'Delete and clear selected templates? (Warning: all linked hosts will be cleared!)',
+	'S_WARNING_THIS_DELETE_TEMPLATES_AND_CLEAR'=>_('Delete and clear selected templates? (Warning: all linked hosts will be cleared!)'),
 	'S_DELETE_TEMPLATE_Q' => _('Delete template?'),
 	'S_DELETE_AND_CLEAR_TEMPLATE_Q' => _('Delete and clear template? (Warning: all linked hosts will be cleared!)'),
 
@@ -1317,7 +1317,7 @@
 	'S_PLEASE_SELECT_TWO_ELEMENTS'=>		_('Please select two elements'),
 	'S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q'=>	_('Delete Links between selected elements?'),
 	'S_NO_LINKS'=>					_('No links'),
-	'S_WRONG_TYPE_OF_ARGUMENTS_PASSED_TO_FUNCTION'=>'Wrong type of arguments passed to function',
+	'S_WRONG_TYPE_OF_ARGUMENTS_PASSED_TO_FUNCTION'=>_('Wrong type of arguments passed to function'),
 	'S_NEW_ELEMENT'=>				_('New element'),
 	'S_SET_TRIGGER'=>				_('Set trigger'),
 
@@ -1336,7 +1336,7 @@
 	'S_CANNOT_FIND_HOSTGROUP'=>		_('Cannot find hostgroup'),
 	'S_CANNOT_FIND_MAP'=>			_('Cannot find map'),
 	'S_CANNOT_FIND_SCREEN'=>		_('Cannot find screen'),
-	'S_USED_IN_EXPORTED_MAP_SMALL'=>'used in exported map',
+	'S_USED_IN_EXPORTED_MAP_SMALL'=>_('used in exported map'),
 	'S_NO_ICON_FOR_MAP_ELEMENT'=>	_('No icon for map element'),
 	'S_EXPORT_HAVE_NO_MAPS'=>		_('Export does not contain Zabbix maps'),
 	'S_EXPORT_HAVE_NO_SCREENS'=>	_('Export does not contain Zabbix screens'),
@@ -1635,8 +1635,8 @@
 
 	'S_CANNOT_FIND_GRAPH'=>			_('Cannot find graph'),
 	'S_CANNOT_FIND_ITEM'=>			_('Cannot find item'),
-	'S_USED_IN_EXPORTED_SCREEN_SMALL'=>'used in exported screen',
-	'S_TEMPLATED'=>'Templated',
+	'S_USED_IN_EXPORTED_SCREEN_SMALL'=>_('used in exported screen'),
+	'S_TEMPLATED'=>_('Templated'),
 
 //	screenedit.php
 	'S_MAP'=>					_('Map'),
@@ -2082,16 +2082,16 @@
 	'S_EXPRESSION_PART_ERROR'=>			_('Error'),
 	'S_EXPRESSION_PART_NO_ERROR'=>			_('No errors found'),
 	'S_EXPRESSION_SYNTAX_ERROR'=> 			_('Expression Syntax Error'),
-	'S_EXPRESSION_UNEXPECTED_END_OF_ELEMENT_ERROR'=>'Unexpected end of element',
+	'S_EXPRESSION_UNEXPECTED_END_OF_ELEMENT_ERROR'=>_('Unexpected end of element'),
 	'S_CHECK_EXPRESSION_PART_STARTING_FROM_PART1'=>	_('Check expression part starting from \''),
 	'S_CHECK_EXPRESSION_PART_STARTING_FROM_PART2'=>	_('\''),
-	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_OR_SEQUENCE_ERROR'=>'Not allowed symbols or sequence of symbols in expression element detected',
-	'S_EXPRESSION_NOT_ALLOWED_VALUE_IN_ELEMENT_ERROR'=>'Not allowed value detected in element',
-	'S_EXPRESSION_UNNECESSARY_SYMBOLS_DETECTED_ERROR'=>'Unnecessary symbols detected',
-	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_AFTER_ERROR'=>'Not allowed symbols detected after element',
-	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_BEFORE_ERROR'=>'Not allowed symbols detected before element',
-	'S_ARE_YOU_SURE_YOU_WANT_TO_DELETE'=>'Are you sure you want to delete',
-	'S_MACROS_ES'=>'macro(s)',
+	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_OR_SEQUENCE_ERROR'=>_('Not allowed symbols or sequence of symbols in expression element detected'),
+	'S_EXPRESSION_NOT_ALLOWED_VALUE_IN_ELEMENT_ERROR'=>_('Not allowed value detected in element'),
+	'S_EXPRESSION_UNNECESSARY_SYMBOLS_DETECTED_ERROR'=>_('Unnecessary symbols detected'),
+	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_AFTER_ERROR'=>_('Not allowed symbols detected after element'),
+	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_BEFORE_ERROR'=>_('Not allowed symbols detected before element'),
+	'S_ARE_YOU_SURE_YOU_WANT_TO_DELETE'=>_('Are you sure you want to delete'),
+	'S_MACROS_ES'=>_('macro(s)'),
 
 //	popup_link_tr.php
 	'S_NEW_INDICATORS'=>			_('New indicators'),
@@ -2134,7 +2134,7 @@
 // page_header.php
 	'S_REFRESHED_EVERY_SMALL'=>		_('refreshed every'),
 	'S_PAGE_RECEIVED_INCORRECT_DATA'=>	_('Page received incorrect data'),
-	'S_TIMEZONE_FOR_PHP_IS_NOT_SET_PLEASE_SET'=>'Timezone for PHP is not set. Please set "date.timezone" option in php.ini.',
+	'S_TIMEZONE_FOR_PHP_IS_NOT_SET_PLEASE_SET'=>_('Timezone for PHP is not set. Please set "date.timezone" option in php.ini.'),
 
 //	copt.inc.php
 	'S_STATS_FOR'=>			_('Stats for'),
@@ -2220,7 +2220,7 @@
 	'S_CANNOT_ADD_NEW_APPLICATION'=>		_('Cannot add new application'),
 	'S_SCENARIO_WITH_NAME'=>			_('Scenario with name'),
 	'S_ADDED_SMALL'=>				_('added'),
-	'S_PRINTABLE_ONLY'=>'only printable characters',
+	'S_PRINTABLE_ONLY'=>_('only printable characters'),
 
 //	media.inc.php
 	'S_NO_MEDIA_WITH'=>			_('No media with'),
@@ -2237,7 +2237,7 @@
 	'S_MUST_LINKED_LEAST_ONE_HOST_GROUP_SMALL'=>	_('must be linked to at least one host group'),
 	'S_ADDED_NEW_HOST'=>				_('Added new host'),
 	'S_INTERNAL_AND_CANNOT_DELETED_SMALL'=>		_('is internal and can not be deleted'),
-	'S_CANNOT_DELETED_INNER_HOSTS_CANNOT_UNLINKED_SMALL'=>'can not be deleted, due to inner hosts can not be unlinked',
+	'S_CANNOT_DELETED_INNER_HOSTS_CANNOT_UNLINKED_SMALL'=>_('can not be deleted, due to inner hosts can not be unlinked'),
 	'S_NO_HOST_GROUPS_WITH'=>			_('No host groups with'),
 	'S_INCORRECT_PARAMETERS_FOR_SMALL'=>			_('incorrect parameters for'),
 	'S_NO_HOST_WITH'=>				_('No host with'),
@@ -2253,7 +2253,7 @@
 	'S_ALREADY_LINKED_TO_HOST_SMALL'=>		_('already linked to host'),
 	'S_HOST_HAS_BEEN_DELETED_MSG_PART1'=>		_('Host'),
 	'S_HOST_HAS_BEEN_DELETED_MSG_PART2'=>		_('has been deleted from the system'),
-	'S_YOU_CANT_DELETE_TEMPLATE_FOR_APP_USED_IN_SCENARIO'=>'You can\'t delete template for an application that is used in a web scenario',
+	'S_YOU_CANT_DELETE_TEMPLATE_FOR_APP_USED_IN_SCENARIO'=>_('You can\'t delete template for an application that is used in a web scenario'),
 	'S_AND_CANT_BE_DELETED' => _('and can\'t be deleted'),
 //	validate.inc.php
 	'S_CRITICAL_ERROR'=>				_('Critical error'),
@@ -2329,7 +2329,7 @@
 //	graphs.inc.php
 	'S_NO_GRAPH_WITH'=>					_('No graph item with'),
 	'S_MISSING_ITEMS_FOR_GRAPH'=>				_('Missing items for graph'),
-	'S_GRAPH_TEMPLATE_HOST_CANNOT_OTHER_ITEMS_HOSTS_SMALL'=>'with template host can not contain items from other hosts.',
+	'S_GRAPH_TEMPLATE_HOST_CANNOT_OTHER_ITEMS_HOSTS_SMALL'=>_('with template host can not contain items from other hosts.'),
 	'S_CANNOT_USE_MULTIPLE_HOST_ITEMS_TEMPLATE_GRAPH'=>	_('Can not use multiple host items for template graph'),
 	'S_MUST_USE_ITEMS_ONLY_FROM_HOST'=>			_('You must use items only from host'),
 	'S_FOR_TEMPLATE_GRAPH_SMALL'=>				_('for template graph'),
@@ -2458,9 +2458,9 @@
 	'S_CMEDIATYPE_ERROR_CANT_INSERT_MEDIATYPES'=>		_('Can\'t insert media types'),
 	'S_MEDIATYPE_ALREADY_EXISTS'=>				_('Mediatype already exists:'),
 	'S_MEDIATYPE_USED_BY_ACTIONS'=>	_('Mediatypes used by action:'),
-	'S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_CREATE_MEDIATYPES'=>'Only Super Admins can create media types',
-	'S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_UPDATE_MEDIATYPES'=>'Only Super Admins can update media types',
-	'S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_DELETE_MEDIATYPES'=>'Only Super Admins can delete media types',
+	'S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_CREATE_MEDIATYPES'=>_('Only Super Admins can create media types'),
+	'S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_UPDATE_MEDIATYPES'=>_('Only Super Admins can update media types'),
+	'S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_DELETE_MEDIATYPES'=>_('Only Super Admins can delete media types'),
 
 //	config.inc.php
 	'S_CONFIG_NOT_LOGGED_IN_ACCESS_DENIED'=>		_('You cannot view this URL as a'),
