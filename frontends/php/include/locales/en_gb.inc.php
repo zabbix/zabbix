@@ -1373,7 +1373,7 @@
 
 //	Menu
 
-//	dashbord.php
+//	dashboard.php
 	'S_DASHBOARD'=>				_('Dashboard'),
 	'S_DASHBOARD_BIG'=>			_('PERSONAL DASHBOARD'),
 	'S_AGE'=>				_('Age'),

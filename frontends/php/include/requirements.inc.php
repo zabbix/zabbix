@@ -461,7 +461,6 @@
 			
 	}
 
-
 	function check_php_gettext() {
 		$current = function_exists('bindtextdomain');
 
@@ -473,7 +472,7 @@
 			'required' => null,
 			'recommended' => null,
 			'result' => $req,
-			'error' => S_REQUIRED_GETTEXT_MODULE.'['.S_CONFIGURE_PHP_WITH_SMALL.SPACE.'--enable-gettext]'
+			'error' => S_REQUIRED_GETTEXT_MODULE.SPACE.'['.S_CONFIGURE_PHP_WITH_SMALL.SPACE.'--enable-gettext]'
 			);
 
 	}
