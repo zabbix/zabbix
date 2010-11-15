@@ -1207,7 +1207,7 @@ return $caption;
 				}
 
 				$state='';
-				$sql = 'SELECT h.host,i.itemid,i.key_,i.flags,f.function,f.triggerid,f.parameter,i.itemid,i.status'.
+				$sql = 'SELECT h.host,i.itemid,i.key_,f.function,f.triggerid,f.parameter,i.itemid,i.status, i.type, i.flags'.
 						' FROM items i,functions f,hosts h'.
 						' WHERE f.functionid='.$functionid.
 							' AND i.itemid=f.itemid '.
@@ -1240,7 +1240,7 @@ return $caption;
 						}
 
 
-						if($function_data['flags'] == ZBX_FLAG_DISCOVERY_CREATED){
+						if($function_data['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $function_data['type'] == ITEM_TYPE_HTTPTEST){
 							$link = new CSpan($function_data['host'].':'.$function_data['key_'], $style);
 						}
 						else if($function_data['flags'] == ZBX_FLAG_DISCOVERY_CHILD){
@@ -1362,7 +1362,7 @@ return $caption;
 							$style = 'enabled';
 						}
 
-						if($function_data['flags'] == ZBX_FLAG_DISCOVERY_CREATED){
+						if($function_data['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $function_data['type'] == ITEM_TYPE_HTTPTEST){
 							$link = new CSpan($function_data['host'].':'.$function_data['key_'], $style);
 						}
 						else if($function_data['flags'] == ZBX_FLAG_DISCOVERY_CHILD){
@@ -1374,6 +1374,7 @@ return $caption;
 							$link = new CLink($function_data['host'].':'.$function_data['key_'],
 								'items.php?form=update&itemid='.$function_data['itemid'], $style);
 						}
+
 
 						array_push($exp,array('{',$link,'.',bold($function_data['function'].'('),$function_data['parameter'],bold(')'),'}'));
 					}
