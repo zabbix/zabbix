@@ -352,8 +352,6 @@ frontends/php/js/scriptaculous/sound.js -text
 frontends/php/js/templates/sysmap.tpl.js -text
 frontends/php/jsLoader.php -text
 frontends/php/jsrpc.php -text
-frontends/php/locale/cn_ZH/LC_MESSAGES/messages.mo -text
-frontends/php/locale/cn_ZH/LC_MESSAGES/messages.po -text
 frontends/php/locale/cs_CZ/LC_MESSAGES/messages.mo -text
 frontends/php/locale/cs_CZ/LC_MESSAGES/messages.po -text
 frontends/php/locale/de_DE/LC_MESSAGES/messages.mo -text
@@ -384,6 +382,8 @@ frontends/php/locale/sv_SE/LC_MESSAGES/messages.mo -text
 frontends/php/locale/sv_SE/LC_MESSAGES/messages.po -text
 frontends/php/locale/ua_UA/LC_MESSAGES/messages.mo -text
 frontends/php/locale/ua_UA/LC_MESSAGES/messages.po -text
+frontends/php/locale/zh_CN/LC_MESSAGES/messages.mo -text
+frontends/php/locale/zh_CN/LC_MESSAGES/messages.po -text
 frontends/php/locales.php -text
 frontends/php/maintenance.php -text
 frontends/php/popup_bitem.php -text

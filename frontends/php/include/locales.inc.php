@@ -64,7 +64,7 @@ function set_zbx_locales(){
 	global $ZBX_LOCALES;
 	$ZBX_LOCALES = array(
 		'en_GB'=>  S_ENGLISH_GB,
-		'cn_ZH'=>  S_CHINESE_CN,
+		'zh_CN'=>  S_CHINESE_CN,
 		'cs_CZ'=>  S_CZECH_CZ,
 		'nl_NL'=>  S_DUTCH_NL,
 		'fr_FR'=>  S_FRENCH_FR,
