@@ -1152,7 +1152,7 @@
 	'S_FRENCH_FR'=>					'Francuski (FR)',
 	'S_GERMAN_DE'=>					'Niemiecki (DE)',
 	'S_ITALIAN_IT'=>				'Włoski (IT)',
-	'S_KOREAN_KO'=>					'Koreański (KO)',
+	'S_KOREAN_KR'=>					'Koreański (KO)',
 	'S_LATVIAN_LV'=>				'Łotewski (LV)',
 	'S_RUSSIAN_RU'=>				'Rosyjski (RU)',
 	'S_PORTUGUESE_PT'=>				'Portugalski (PT)',

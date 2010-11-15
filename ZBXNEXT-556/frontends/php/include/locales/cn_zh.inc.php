@@ -1553,7 +1553,7 @@
 	'S_FRENCH_FR'=>			'法语 (FR)',
 	'S_GERMAN_DE'=>			'德语 (DE)',
 	'S_ITALIAN_IT'=>			'意大利语 (IT)',
-	'S_KOREAN_KO'=>			'韩语 (KO)',
+	'S_KOREAN_KR'=>			'韩语 (KO)',
 	'S_LATVIAN_LV'=>			'拉脱维亚语(LV)',
 	'S_RUSSIAN_RU'=>			'俄语 (RU)',
 	'S_PORTUGUESE_PT'=>			'波兰语 (PT)',

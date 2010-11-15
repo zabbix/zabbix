@@ -1736,7 +1736,7 @@
 	'S_FRENCH_FR'=>			'Французька (FR)',
 	'S_GERMAN_DE'=>			'Німецька (DE)',
 	'S_ITALIAN_IT'=>			'Італійська (IT)',
-	'S_KOREAN_KO'=>			'Корейська (KO)',
+	'S_KOREAN_KR'=>			'Корейська (KO)',
 	'S_LATVIAN_LV'=>			'Латвійська (LV)',
 	'S_RUSSIAN_RU'=>			'Російська (RU)',
 	'S_PORTUGUESE_PT'=>			'Португальська (PT)',

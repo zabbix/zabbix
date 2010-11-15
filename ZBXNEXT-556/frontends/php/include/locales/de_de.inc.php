@@ -1607,7 +1607,7 @@
 	'S_FRENCH_FR'=>			'Französisch (FR)',
 	'S_GERMAN_DE'=>			'Deutsch (DE)',
 	'S_ITALIAN_IT'=>			'Italienisch (IT)',
-	'S_KOREAN_KO'=>			'Koreanisch (KO)',
+	'S_KOREAN_KR'=>			'Koreanisch (KO)',
 	'S_LATVIAN_LV'=>			'Lättisch (LV)',
 	'S_RUSSIAN_RU'=>			'Russisch (RU)',
 	'S_PORTUGUESE_PT'=>			'Portugiesisch (PT)',

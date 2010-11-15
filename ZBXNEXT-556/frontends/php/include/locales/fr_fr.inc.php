@@ -1759,7 +1759,7 @@
 	'S_FRENCH_FR'=>			'Français (FR)',
 	'S_GERMAN_DE'=>			'Allemand (DE)',
 	'S_ITALIAN_IT'=>			'Italien (IT)',
-	'S_KOREAN_KO'=>			'Koréen (KO)',
+	'S_KOREAN_KR'=>			'Koréen (KO)',
 	'S_LATVIAN_LV'=>			'Letton (LV)',
 	'S_RUSSIAN_RU'=>			'Russe (RU)',
 	'S_PORTUGUESE_PT'=>			'Portuguais (PT)',

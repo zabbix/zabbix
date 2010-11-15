@@ -1732,7 +1732,7 @@
 	'S_FRENCH_FR'=>			'French (FR)',
 	'S_GERMAN_DE'=>			'German (DE)',
 	'S_ITALIAN_IT'=>			'Italian (IT)',
-	'S_KOREAN_KO'=>			'Korean (KO)',
+	'S_KOREAN_KR'=>			'Korean (KO)',
 	'S_LATVIAN_LV'=>			'Latvian (LV)',
 	'S_RUSSIAN_RU'=>			'Russian (RU)',
 	'S_PORTUGUESE_PT'=>			'Portuguese (PT)',
