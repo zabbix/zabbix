@@ -446,7 +446,7 @@
 
 // Duration
 
-				if($nextEvent = get_next_event($event, $events))
+				if($nextEvent = get_next_event($event, $events, $_REQUEST['showUnknown']))
 					$event['duration'] = zbx_date2age($event['clock'], $nextEvent['clock']);
 				else
 					$event['duration'] = zbx_date2age($event['clock']);
