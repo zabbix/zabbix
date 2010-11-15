@@ -1550,7 +1550,7 @@
 	'S_FRENCH_FR'=>			'Francia (FR)',
 	'S_GERMAN_DE'=>			'Német (DE)',
 	'S_ITALIAN_IT'=>			'Olasz (IT)',
-	'S_KOREAN_KO'=>			'Koreai (KO)',
+	'S_KOREAN_KR'=>			'Koreai (KO)',
 	'S_LATVIAN_LV'=>			'Litván (LV)',
 	'S_RUSSIAN_RU'=>			'Orosz (RU)',
 	'S_PORTUGUESE_PT'=>			'Portugál (PT)',

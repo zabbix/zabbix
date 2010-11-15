@@ -2022,7 +2022,7 @@
 	'S_FRENCH_FR'=>				_('French (FR)'),
 	'S_GERMAN_DE'=>				_('German (DE)'),
 	'S_ITALIAN_IT'=>			_('Italian (IT)'),
-	'S_KOREAN_KO'=>				_('Korean (KO)'),
+	'S_KOREAN_KR'=>				_('Korean (KO)'),
 	'S_LATVIAN_LV'=>			_('Latvian (LV)'),
 	'S_RUSSIAN_RU'=>			_('Russian (RU)'),
 	'S_PORTUGUESE_PT'=>			_('Portuguese (PT)'),

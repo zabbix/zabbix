@@ -71,7 +71,7 @@ function set_zbx_locales(){
 		'de_DE'=>  S_GERMAN_DE,
 		'hu_HU'=>  S_HUNGARIAN_HU,
 		'it_IT'=>  S_ITALIAN_IT,
-		'ko_KO'=>  S_KOREAN_KO,
+		'ko_KR'=>  S_KOREAN_KR,
 		'ja_JP'=>  S_JAPANESE_JP,
 		'lv_LV'=>  S_LATVIAN_LV,
 		'pl_PL'=>  S_POLISH_PL,

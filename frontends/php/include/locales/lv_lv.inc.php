@@ -415,7 +415,7 @@
 	'S_FRENCH_FR'=>			'Franču (FR)',
 	'S_GERMAN_DE'=>			'Vācu (DE)',
 	'S_ITALIAN_IT'=>			'Itāļu (IT)',
-	'S_KOREAN_KO'=>			'Korejiešu (KO)',
+	'S_KOREAN_KR'=>			'Korejiešu (KO)',
 	'S_LATVIAN_LV'=>			'Latviešu (LV)',
 	'S_RUSSIAN_RU'=>			'Krievu (RU)',
 	'S_PORTUGUESE_PT'=>			'Protugāļu (PT)',
