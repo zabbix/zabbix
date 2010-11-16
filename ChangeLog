@@ -1,5 +1,6 @@
 Changes for 1.8.4rc3
 
+ - [ZBX-3144] removed parsiing of exisiting expression in trigger expression popup (Vedmak)
  - [ZBX-3207] fixed possibility to click on web items in trigger expressions (Vedmak)
  - [ZBX-3021] fixed possibility to create dependency between host and template triggers (Vedmak)
  - [ZBX-3205] fixed incorrect event duration count (Aly)
