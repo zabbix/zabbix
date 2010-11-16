@@ -1279,6 +1279,8 @@ Copt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'No interfaces for host [ '.$host['host'].' ]');
 			}
 
+			if($delete) continue;
+
 			if(isset($host['groups'])){
 				if(!is_array($host['groups']) || empty($host['groups']))
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'No groups for host [ '.$host['host'].' ]');
@@ -2040,7 +2042,8 @@ Copt::memoryPick();
 				'preservekeys' => 1
 			));
 
-			CItem::delete($delItems, true);
+			$delItemIds = zbx_objectValues($delItems, 'itemid');
+			CItem::delete($delItemIds, true);
 
 // delete host interfaces
 			DB::delete('interface', array('hostid'=>$hostids));
