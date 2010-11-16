@@ -33,7 +33,7 @@ void	delete_reol(char *c);
 #define MACRO_TYPE_TRIGGER_DESCRIPTION	1
 #define MACRO_TYPE_MESSAGE_SUBJECT	2
 #define MACRO_TYPE_MESSAGE_BODY		4
-#define MACRO_TYPE_TRIGGER_EXPRESSION	5
+#define MACRO_TYPE_TRIGGER_EXPRESSION	8
 
 void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char **data, int macro_type);
 	

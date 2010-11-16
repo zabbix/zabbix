@@ -1,5 +1,6 @@
 Changes for 1.0.0
 
+ - [NTP-239] fixed execution of the not required sql query 'select expression from triggers where triggerid=0' (Sasha)
  - [NTP-286] fixed processing of long values on server side (Sasha)
  - [NTP-286] fixed processing of event log records more than 1KB (Sasha)
  - [NTP-269] fixed error when save trigger with '-' in item key (Vedmak)
