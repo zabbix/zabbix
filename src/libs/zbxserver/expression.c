@@ -24,8 +24,6 @@
 #include "log.h"
 #include "zlog.h"
 
-static DB_MACROS	*macros = NULL;
-
 /******************************************************************************
  *                                                                            *
  * Function: trigger_get_N_functionid                                         *
@@ -838,7 +836,7 @@ static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
 		{
 			c = *++n;
 			*n = '\0';
-			zbxmacros_get_value(macros, &hostid, 1, m - 1, &replace_to);
+			DCget_user_macro(&hostid, 1, m - 1, &replace_to);
 
 			if (NULL != replace_to)
 			{
@@ -1876,9 +1874,6 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ITEM *item, DC_HOST *dc_host,
 	int		i, n, N_functionid, ret, res = SUCCEED;
 	size_t		len;
 
-	if (NULL == macros)
-		zbxmacros_init(&macros);
-
 	if (NULL == data || NULL == *data || '\0' == **data)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:NULL", __function_name);
@@ -2155,7 +2150,7 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ITEM *item, DC_HOST *dc_host,
 					ret = DBget_item_value_by_triggerid(event->objectid, &replace_to, N_functionid,
 							event->clock, event->ns);
 				else if (0 == strncmp(m, "{$", 2))	/* user defined macros */
-					zbxmacros_get_value_by_triggerid(macros, event->objectid, m, &replace_to);
+					zbxmacros_get_value_by_triggerid(event->objectid, m, &replace_to);
 			}
 		}
 		else if (macro_type & MACRO_TYPE_TRIGGER_EXPRESSION)
@@ -2166,7 +2161,7 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ITEM *item, DC_HOST *dc_host,
 					replace_to = zbx_dsprintf(replace_to, "%d", event->value);
 				else if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				{
-					zbxmacros_get_value_by_triggerid(macros, event->objectid, m, &replace_to);
+					zbxmacros_get_value_by_triggerid(event->objectid, m, &replace_to);
 					if (NULL != replace_to && FAIL == (res = is_double_prefix(replace_to)) && NULL != error)
 						zbx_snprintf(error, maxerrlen, "Macro '%s' value is not numeric", m);
 				}
@@ -2185,7 +2180,7 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ITEM *item, DC_HOST *dc_host,
 				else if (0 == strcmp(m, MVAR_HOST_CONN))
 					replace_to = zbx_dsprintf(replace_to, "%s", item->useip ? item->host_ip : item->host_dns);
 				else if (0 == strncmp(m, "{$", 2))	/* user defined macros */
-					zbxmacros_get_value(macros, &item->hostid, 1, m, &replace_to);
+					DCget_user_macro(&item->hostid, 1, m, &replace_to);
 			}
 			else if (NULL != dc_item)
 			{
@@ -2199,7 +2194,7 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ITEM *item, DC_HOST *dc_host,
 					replace_to = zbx_dsprintf(replace_to, "%s",
 							dc_item->host.useip ? dc_item->host.ip : dc_item->host.dns);
 				else if (0 == strncmp(m, "{$", 2))	/* user defined macros */
-					zbxmacros_get_value(macros, &dc_item->host.hostid, 1, m, &replace_to);
+					DCget_user_macro(&dc_item->host.hostid, 1, m, &replace_to);
 			}
 		}
 		else if (macro_type & MACRO_TYPE_ITEM_FIELD)
@@ -2207,16 +2202,16 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ITEM *item, DC_HOST *dc_host,
 			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 			{
 				if (NULL == dc_item)
-					zbxmacros_get_value(macros, NULL, 0, m, &replace_to);
+					DCget_user_macro(NULL, 0, m, &replace_to);
 				else
-					zbxmacros_get_value(macros, &dc_item->host.hostid, 1, m, &replace_to);
+					DCget_user_macro(&dc_item->host.hostid, 1, m, &replace_to);
 			}
 		}
 		else if (macro_type & MACRO_TYPE_ITEM_EXPRESSION)
 		{
 			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 			{
-				zbxmacros_get_value(macros, &dc_item->host.hostid, 1, m, &replace_to);
+				DCget_user_macro(&dc_item->host.hostid, 1, m, &replace_to);
 				if (NULL != replace_to && FAIL == (res = is_double_prefix(replace_to)) && NULL != error)
 					zbx_snprintf(error, maxerrlen, "Macro '%s' value is not numeric", m);
 			}
@@ -2224,7 +2219,7 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ITEM *item, DC_HOST *dc_host,
 		else if (macro_type & MACRO_TYPE_FUNCTION_PARAMETER)
 		{
 			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
-				zbxmacros_get_value(macros, &item->hostid, 1, m, &replace_to);
+				DCget_user_macro(&item->hostid, 1, m, &replace_to);
 		}
 		else if (macro_type & MACRO_TYPE_SCRIPT)
 		{
