@@ -4,10 +4,7 @@
 <td>
 	<input type="hidden" name="interfaces[#{interfaceid}][new]" value="#{newValue}" />
 	<input type="hidden" name="interfaces[#{interfaceid}][interfaceid]" value="#{interfaceid}" />
-	<input class="input" name="interfaces_main" type="radio" size="30" value="#{interfaceid}" />
-</td>
-<td>
-	<input class="input" name="interfaces[#{interfaceid}][ip]" type="text" size="30" value="#{ip}" />
+	<input class="input" name="interfaces[#{interfaceid}][ip]" type="text" size="24" value="#{ip}" />
 </td>
 <td>
 	<input class="input" name="interfaces[#{interfaceid}][dns]" type="text" size="30" value="#{dns}" />
@@ -22,7 +19,7 @@
 	</div>
 </td>
 <td>
-	<input class="input" name="interfaces[#{interfaceid}][port]" type="text" size="5" value="#{port}" />
+	<input class="input" name="interfaces[#{interfaceid}][port]" type="text" size="10" value="#{port}" />
 </td>
 <td>
 	<div class="jqueryinputset">

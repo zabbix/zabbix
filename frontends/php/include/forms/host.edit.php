@@ -271,7 +271,7 @@
 	}
 
 	$ifTab = new CTable();
-	$ifTab->addRow(array(SPACE, S_IP_ADDRESS,S_DNS_NAME,S_CONNECT_TO,S_PORT,S_TYPE));
+	$ifTab->addRow(array(S_IP_ADDRESS,S_DNS_NAME,S_CONNECT_TO,S_PORT,S_TYPE));
 	$ifTab->setAttribute('id', 'hostInterfaces');
 
 	$jsInsert = '';
