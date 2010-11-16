@@ -467,6 +467,7 @@ int MAIN_ZABBIX_ENTRY(void)
 	init_configuration_cache();
 
 	DBconnect(ZBX_DB_CONNECT_EXIT);
+	DBcheck_auto_increment();
 	DCsync_configuration();
 	DBclose();
 

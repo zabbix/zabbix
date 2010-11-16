@@ -2160,3 +2160,60 @@ char	*DBget_unique_hostname_by_sample(char *host_name_sample)
 
 	return host_name_temp;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBcheck_auto_increment                                           *
+ *                                                                            *
+ * Purpose: On starting proxy, check if auto_increment attribute is correct   *
+ *          and fix it.                                                       *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: SUCCEED - no problem, FAIL - some problem occurred           *
+ *                                                                            *
+ * Author: Takanori Suzuki                                                    *
+ *                                                                            *
+ * Comments: When restarting MySQL, InnoDB engine does not keep               *
+ *           auto_increment data and resets the counter to 1 if               *
+ *           the table has no data. So, this check is needed.                 *
+ *                                                                            *
+ ******************************************************************************/
+int	DBcheck_auto_increment()
+{
+#ifdef HAVE_MYSQL
+	const char	*__function_name = "DBcheck_auto_increment";
+
+	DB_RESULT	check_result;
+	DB_RESULT	ids_result;
+	DB_ROW		check_row;
+	DB_ROW		ids_row;
+	zbx_uint64_t	nextid;
+	int		i;
+	const char	*check_list[] = {"proxy_history", "proxy_dhistory"};
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	for (i = 0; i < sizeof(check_list) / sizeof(const char *); i++)
+	{
+		check_result = DBselect("select count(*) from %s", check_list[i]);
+		if (NULL != (check_row = DBfetch(check_result)))
+		{
+			if (0 == strcmp("0", check_row[0]))
+			{
+				ids_result = DBselect("select nextid from ids where table_name='%s'", check_list[i]);
+				if (NULL != (ids_row = DBfetch(ids_result)))
+				{
+					ZBX_STR2UINT64(nextid, ids_row[0]);
+					DBexecute("alter table %s auto_increment=" ZBX_FS_UI64, check_list[i], nextid + 1);
+				}
+				DBfree_result(ids_result);
+			}
+		}
+		DBfree_result(check_result);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+#endif
+	return SUCCEED;
+}
