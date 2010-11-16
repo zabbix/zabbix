@@ -311,6 +311,7 @@ frontends/php/include/classes/class.cvisibilitybox.php -text
 frontends/php/include/classes/class.cwidget.php -text
 frontends/php/include/debug.inc.php -text
 frontends/php/include/forms/host.edit.php -text
+frontends/php/include/forms/template.edit.php -text
 frontends/php/include/func.inc.php -text
 frontends/php/include/ident.inc.php -text
 frontends/php/include/js.inc.php -text

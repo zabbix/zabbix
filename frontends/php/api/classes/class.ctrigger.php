@@ -1496,8 +1496,10 @@ COpt::memoryPick();
 
 // TODO: REMOVE info
 			foreach($del_triggers as $triggerid => $trigger){
-				info(S_TRIGGER.' ['.$trigger['description'].'] '.S_DELETED_SMALL.'from hosts ['.
-						implode(', ',zbx_objectValues($trigger['hosts'], 'host')).']');
+				if(isset($trigger['hosts']))
+					info(S_TRIGGER.' ['.$trigger['description'].'] '.S_DELETED_SMALL.'from hosts ['.implode(', ', zbx_objectValues($trigger['hosts'], 'host')).']');
+				else
+					info(S_TRIGGER.' ['.$trigger['description'].'] '.S_DELETED_SMALL.'from hosts ['.implode(', ', zbx_objectValues($trigger['templates'], 'host')).']');
 			}
 
 			self::EndTransaction(true, __METHOD__);
