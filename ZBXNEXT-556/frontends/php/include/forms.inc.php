@@ -391,11 +391,16 @@
 		setLocale(LC_NUMERIC, array('en','en_US','en_US.UTF-8','English_United States.1252'));
 
 		//if some languages can't be set, showing a warning about that
-		$lang_hint = $languages_unable_set > 0 ? _('you are not able to choose some of the languages, because locales for them are not installed on the web server.') : '';
-
+		$lang_hint = $languages_unable_set > 0 ? _('You are not able to choose some of the languages, because locales for them are not installed on the web server.') : '';
+		
 		$lang_tbl = new CTable();
-		$lang_tbl->addItem($cmbLang);
-		$lang_tbl->addItem(new CSpan($lang_hint, 'red'));
+		$c1 = new CCol($cmbLang);
+		$c1->addStyle('padding-left: 0;');
+		$langHintSpan = new Cspan($lang_hint, 'red');
+		$c2 = new CCol($langHintSpan);
+		$c2->addStyle('white-space: normal;');
+
+		$lang_tbl->addRow(array($c1, $c2));
 
 		$frmUser->addRow(S_LANGUAGE, $lang_tbl);
 
