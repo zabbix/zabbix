@@ -1397,9 +1397,8 @@ COpt::memoryPick();
 		foreach($chdHosts as $hostid => $host){
 			$interfaces = array();
 			foreach($host['interfaces'] as $hinum => $interface){
-				if($interface['main'] == 1){
+				if($interface['main'] == 1)
 					$interfaces[$interface['itemtype']] = $interface;
-				}
 			}
 
 			$templateids = zbx_toHash($host['templates'], 'templateid');
@@ -1455,7 +1454,7 @@ COpt::memoryPick();
 					if(!is_null($exItem)){
 // on update
 						if(!isset($interfaces[$itemtype])){
-							self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot find host interface on host ['.$host['host'].'] for item key ['.$exItem['key'].']');
+							self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot find host interface on host ['.$host['host'].'] for item key ['.$exItem['key_'].']');
 						}
 
 // item type changes does not reflect on used interface [do not update interface]
@@ -1464,7 +1463,7 @@ COpt::memoryPick();
 					}
 					else if(!isset($interfaces[$itemtype])){
 // on create
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot find host interface on host ['.$host['host'].'] for item key ['.$item['key'].']');
+						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot find host interface on host ['.$host['host'].'] for item key ['.$item['key_'].']');
 					}
 				}
 // -----
