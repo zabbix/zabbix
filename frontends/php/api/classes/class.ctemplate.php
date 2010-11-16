@@ -76,7 +76,7 @@ class CTemplate extends CZBXAPI{
 
 // OutPut
 			'output'					=> API_OUTPUT_REFER,
-			'select_groups'				=> null,
+			'selectGroups'				=> null,
 			'selectHosts'				=> null,
 			'select_templates'			=> null,
 			'selectParentTemplates'		=> null,
@@ -393,7 +393,7 @@ class CTemplate extends CZBXAPI{
 				else{
 					if(!isset($result[$template['templateid']])) $result[$template['templateid']]= array();
 
-					if(!is_null($options['select_groups']) && !isset($result[$template['templateid']]['groups'])){
+					if(!is_null($options['selectGroups']) && !isset($result[$template['templateid']]['groups'])){
 						$template['groups'] = array();
 					}
 					if(!is_null($options['select_templates']) && !isset($result[$template['templateid']]['templates'])){
@@ -428,7 +428,7 @@ class CTemplate extends CZBXAPI{
 					}
 
 // groupids
-					if(isset($template['groupid']) && is_null($options['select_groups'])){
+					if(isset($template['groupid']) && is_null($options['selectGroups'])){
 						if(!isset($result[$template['templateid']]['groups']))
 							$result[$template['templateid']]['groups'] = array();
 
@@ -485,7 +485,6 @@ class CTemplate extends CZBXAPI{
 
 		}
 
-
 Copt::memoryPick();
 		if(!is_null($options['countOutput'])){
 
@@ -495,10 +494,10 @@ Copt::memoryPick();
 
 // Adding Objects
 // Adding Groups
-		if(!is_null($options['select_groups']) && str_in_array($options['select_groups'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectGroups']) && str_in_array($options['selectGroups'], $subselects_allowed_outputs)){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'output' => $options['select_groups'],
+				'output' => $options['selectGroups'],
 				'hostids' => $templateids,
 				'preservekeys' => 1
 			);
@@ -1097,6 +1096,7 @@ COpt::memoryPick();
 				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1
 			));
+
 			foreach($templates as $tnum => $template){
 				if(!isset($upd_templates[$template['templateid']])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -1562,7 +1562,6 @@ COpt::memoryPick();
 					}
 				}
 //----
-
 				if(!empty($macrosToDelete)){
 					$result = self::massRemove(array(
 						'templateids' => $templateids,
@@ -1581,6 +1580,8 @@ COpt::memoryPick();
 				}
 
 				if(!empty($macrosToAdd)){
+					$macrosToAdd = array_values($macrosToAdd);
+
 					$result = self::massAdd(array('templates' => $templates, 'macros' => $macrosToAdd));
 					if(!$result){
 						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot add macro');

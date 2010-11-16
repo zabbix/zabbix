@@ -492,6 +492,11 @@ include_once('include/page_header.php');
 			$templates_clear = zbx_toObject($templates_clear, 'templateid');
 
 			foreach($interfaces as $inum => $interface){
+				if(zbx_empty($interface['ip']) && zbx_empty($interface['dns'])){
+					unset($interface[$inum]);
+					continue;
+				}
+
 				if($interface['new'] == 'create')
 					unset($interfaces[$inum]['interfaceid']);
 
@@ -499,9 +504,12 @@ include_once('include/page_header.php');
 			}
 
 			foreach($macros as $mnum => $macro){
-				if($macro['new'] == 'create')
-					unset($macros[$mnum]['macroid']);
-
+				if(zbx_empty($macro['value'])){
+					unset($macros[$mnum]);
+					continue;
+				}
+				
+				if($macro['new'] == 'create') unset($macros[$mnum]['macroid']);
 				unset($macros[$mnum]['new']);
 			}
 
@@ -517,10 +525,6 @@ include_once('include/page_header.php');
 				else throw new Exception();
 			}
 			$groups = zbx_toObject($groups, 'groupid');
-
-			foreach($macros as $mnum => $macro){
-				if(zbx_empty($macro['value'])) unset($macros[$mnum]);
-			}
 
 			$profile = array();
 			if(get_request('useprofile', 'no') == 'yes'){
@@ -706,8 +710,11 @@ include_once('include/page_header.php');
 	if(!isset($_REQUEST['form'])){
 // removes form_refresh variable
 		$frmForm->cleanItems();
-		$frmForm->addItem(new CSubmit('form',S_CREATE_HOST));
-		$frmForm->addItem(new CSubmit('form', S_IMPORT_HOST));
+		$bttnList = new CList(null, 'objectlist');
+		$bttnList->addItem(new CSubmit('form',S_CREATE_HOST, null, 'link_menu'));
+		$bttnList->addItem(new CSubmit('form', S_IMPORT_HOST, null, 'link_menu'));
+
+		$frmForm->addItem($bttnList);
 	}
 
 	$hosts_wdgt = new CWidget();
@@ -748,8 +755,8 @@ include_once('include/page_header.php');
 		$numrows = new CDiv();
 		$numrows->setAttribute('name', 'numrows');
 
-		$hosts_wdgt->addHeader(S_CONFIGURATION_OF_HOSTS, $frmForm);
-		$hosts_wdgt->addHeader($numrows, $frmGroup);
+		$hosts_wdgt->addHeader(S_CONFIGURATION_OF_HOSTS, $frmGroup);
+		$hosts_wdgt->addHeader($numrows, $frmForm);
 
 // HOSTS FILTER {{{
 		$filter_table = new CTable('', 'filter_config');

@@ -105,7 +105,7 @@ class CTrigger extends CZBXAPI{
 			'expandData'			=> null,
 			'expandDescription'		=> null,
 			'output'				=> API_OUTPUT_REFER,
-			'select_groups'			=> null,
+			'selectGroups'			=> null,
 			'selectHosts'			=> null,
 			'selectItems'			=> null,
 			'select_functions'		=> null,
@@ -635,7 +635,7 @@ class CTrigger extends CZBXAPI{
 					}
 
 // groups
-					if(isset($trigger['groupid']) && is_null($options['select_groups'])){
+					if(isset($trigger['groupid']) && is_null($options['selectGroups'])){
 						if(!isset($result[$trigger['triggerid']]['groups'])) $result[$trigger['triggerid']]['groups'] = array();
 
 						$result[$trigger['triggerid']]['groups'][] = array('groupid' => $trigger['groupid']);
@@ -782,10 +782,10 @@ Copt::memoryPick();
 		}
 
 // Adding groups
-		if(!is_null($options['select_groups']) && str_in_array($options['select_groups'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectGroups']) && str_in_array($options['selectGroups'], $subselects_allowed_outputs)){
 			$obj_params = array(
 					'nodeids' => $nodeids,
-					'output' => $options['select_groups'],
+					'output' => $options['selectGroups'],
 					'triggerids' => $triggerids,
 					'preservekeys' => 1
 				);

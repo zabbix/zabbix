@@ -75,7 +75,7 @@ class CGraph extends CZBXAPI{
 
 // output
 			'output'				=> API_OUTPUT_REFER,
-			'select_groups'			=> null,
+			'selectGroups'			=> null,
 			'select_templates'		=> null,
 			'selectHosts'			=> null,
 			'selectItems'			=> null,
@@ -452,11 +452,11 @@ COpt::memoryPick();
 		}
 
 // Adding Hostgroups
-		if(!is_null($options['select_groups'])){
-			if(is_array($options['select_groups']) || str_in_array($options['select_groups'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectGroups'])){
+			if(is_array($options['selectGroups']) || str_in_array($options['selectGroups'], $subselects_allowed_outputs)){
 				$obj_params = array(
 					'nodeids' => $nodeids,
-					'output' => $options['select_groups'],
+					'output' => $options['selectGroups'],
 					'graphids' => $graphids,
 					'nopermissions' => 1,
 					'preservekeys' => 1

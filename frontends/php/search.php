@@ -103,7 +103,7 @@ include_once('include/page_header.php');
 			'ip' => $search
 		),
 		'limit' => $rows_per_page,
-		'select_groups' => API_OUTPUT_EXTEND,
+		'selectGroups' => API_OUTPUT_EXTEND,
 		'selectInterfaces' => API_OUTPUT_EXTEND,
 		'selectItems' => API_OUTPUT_COUNT,
 		'select_triggers' => API_OUTPUT_COUNT,
@@ -313,7 +313,7 @@ include_once('include/page_header.php');
 			'nodeids'=> get_current_nodeid(true),
 			'search' => array('host' => $search),
 			'output' => API_OUTPUT_EXTEND,
-			'select_groups' => API_OUTPUT_REFER,
+			'selectGroups' => API_OUTPUT_REFER,
 			'sortfield' => 'host',
 			'selectItems' => API_OUTPUT_COUNT,
 			'select_triggers' => API_OUTPUT_COUNT,

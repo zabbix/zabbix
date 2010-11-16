@@ -80,7 +80,7 @@ class CScript extends CZBXAPI{
 // OutPut
 			'extendoutput'			=> null,
 			'output'				=> API_OUTPUT_REFER,
-			'select_groups'			=> null,
+			'selectGroups'			=> null,
 			'selectHosts'			=> null,
 			'countOutput'			=> null,
 			'preservekeys'			=> null,
@@ -96,8 +96,8 @@ class CScript extends CZBXAPI{
 		if(!is_null($options['extendoutput'])){
 			$options['output'] = API_OUTPUT_EXTEND;
 
-			if(!is_null($options['select_groups'])){
-				$options['select_groups'] = API_OUTPUT_EXTEND;
+			if(!is_null($options['selectGroups'])){
+				$options['selectGroups'] = API_OUTPUT_EXTEND;
 			}
 			if(!is_null($options['selectHosts'])){
 				$options['selectHosts'] = API_OUTPUT_EXTEND;
@@ -241,7 +241,7 @@ class CScript extends CZBXAPI{
 					if(!isset($result[$script['scriptid']]))
 						$result[$script['scriptid']] = array();
 
-					if(!is_null($options['select_groups']) && !isset($result[$script['scriptid']]['groups'])){
+					if(!is_null($options['selectGroups']) && !isset($result[$script['scriptid']]['groups'])){
 						$result[$script['scriptid']]['groups'] = array();
 					}
 
@@ -250,7 +250,7 @@ class CScript extends CZBXAPI{
 					}
 
 // groupids
-					if(isset($script['groupid']) && is_null($options['select_groups'])){
+					if(isset($script['groupid']) && is_null($options['selectGroups'])){
 						if(!isset($result[$script['scriptid']]['groups']))
 							$result[$script['scriptid']]['groups'] = array();
 
@@ -278,10 +278,10 @@ class CScript extends CZBXAPI{
 
 // Adding Objects
 // Adding groups
-		if(!is_null($options['select_groups']) && str_in_array($options['select_groups'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectGroups']) && str_in_array($options['selectGroups'], $subselects_allowed_outputs)){
 			foreach($result as $scriptid => $script){
 				$obj_params = array(
-					'output' => $options['select_groups'],
+					'output' => $options['selectGroups'],
 				);
 
 				if($script['host_access'] == PERM_READ_WRITE){

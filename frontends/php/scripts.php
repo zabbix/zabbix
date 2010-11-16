@@ -259,7 +259,7 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 		$options = array(
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => 1,
-			'select_groups' => API_OUTPUT_EXTEND
+			'selectGroups' => API_OUTPUT_EXTEND
 		);
 		$scripts = CScript::get($options);
 

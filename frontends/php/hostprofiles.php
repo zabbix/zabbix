@@ -89,7 +89,7 @@
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'select_profile' => API_OUTPUT_EXTEND,
-			'select_groups' => API_OUTPUT_EXTEND,
+			'selectGroups' => API_OUTPUT_EXTEND,
 			'limit' => ($config['search_limit']+1)
 		);
 		if($pageFilter->groupsSelected){

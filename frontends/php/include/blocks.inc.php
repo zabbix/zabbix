@@ -870,7 +870,7 @@ function make_latest_issues($filter = array()){
 			'priority' => $filter['severity'],
 			'value' => TRIGGER_VALUE_TRUE,
 		),
-		'select_groups' => API_OUTPUT_EXTEND,
+		'selectGroups' => API_OUTPUT_EXTEND,
 		'selectHosts' => array('hostid', 'host', 'maintenance_status', 'maintenanceid'),
 		'output' => API_OUTPUT_EXTEND,
 		'sortfield' => 'lastchange',

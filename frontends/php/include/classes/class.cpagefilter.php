@@ -164,7 +164,7 @@ options = array(
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => API_OUTPUT_REFER,
 			'select_templates' => API_OUTPUT_REFER,
-			'select_groups' => API_OUTPUT_REFER,
+			'selectGroups' => API_OUTPUT_REFER,
 		));
 
 		if($graph = reset($graphs)){
@@ -205,7 +205,7 @@ options = array(
 			'hostids' => $options['hostid'],
 			'templated_hosts' => 1,
 			'output' => array('hostid', 'host'),
-			'select_groups' => API_OUTPUT_REFER,
+			'selectGroups' => API_OUTPUT_REFER,
 		));
 
 		if($host = reset($hosts)){
@@ -227,7 +227,7 @@ options = array(
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => API_OUTPUT_REFER,
 			'select_templates' => API_OUTPUT_REFER,
-			'select_groups' => API_OUTPUT_REFER,
+			'selectGroups' => API_OUTPUT_REFER,
 		));
 
 		if($trigger = reset($triggers)){

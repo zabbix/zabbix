@@ -100,7 +100,7 @@ class CUserMacro extends CZBXAPI{
 // OutPut
 			'output'					=> API_OUTPUT_REFER,
 			'extendoutput'				=> null,
-			'select_groups'				=> null,
+			'selectGroups'				=> null,
 			'selectHosts'				=> null,
 			'select_templates'			=> null,
 			'countOutput'				=> null,
@@ -117,8 +117,8 @@ class CUserMacro extends CZBXAPI{
 		if(!is_null($options['extendoutput'])){
 			$options['output'] = API_OUTPUT_EXTEND;
 
-			if(!is_null($options['select_groups'])){
-				$options['select_groups'] = API_OUTPUT_EXTEND;
+			if(!is_null($options['selectGroups'])){
+				$options['selectGroups'] = API_OUTPUT_EXTEND;
 			}
 			if(!is_null($options['selectHosts'])){
 				$options['selectHosts'] = API_OUTPUT_EXTEND;
@@ -168,7 +168,7 @@ class CUserMacro extends CZBXAPI{
 			$options['hostids'] = null;
 			$options['itemids'] = null;
 
-			$options['select_groups'] = null;
+			$options['selectGroups'] = null;
 			$options['select_templates'] = null;
 			$options['selectHosts'] = null;
 		}
@@ -210,9 +210,9 @@ class CUserMacro extends CZBXAPI{
 				$sql_parts['select']['templateid'] = 'ht.templateid';
 			}
 
-			$sql_parts['from']['macros_templates'] = 'macros_templates ht';
+			$sql_parts['from']['macros_templates'] = 'hosts_templates ht';
 			$sql_parts['where'][] = DBcondition('ht.templateid', $options['templateids']);
-			$sql_parts['where']['hht'] = 'hm.hostid=ht.macroid';
+			$sql_parts['where']['hht'] = 'hm.hostid=ht.hostid';
 		}
 
 
@@ -291,7 +291,7 @@ class CUserMacro extends CZBXAPI{
 			$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.'
 					FROM '.$sql_from.'
 					WHERE '.DBin_node('gm.globalmacroid', $nodeids).
-					$sql_where.
+						$sql_where.
 					$sql_order;
 			$res = DBselect($sql, $sql_limit);
 			while($macro = DBfetch($res)){
@@ -334,7 +334,7 @@ class CUserMacro extends CZBXAPI{
 			$sql = 'SELECT '.$sql_select.'
 					FROM '.$sql_from.'
 					WHERE '.DBin_node('hm.hostmacroid', $nodeids).
-					$sql_where.
+						$sql_where.
 					$sql_order;
 //SDI($sql);
 			$res = DBselect($sql, $sql_limit);
@@ -354,7 +354,7 @@ class CUserMacro extends CZBXAPI{
 						if(!isset($result[$macro['hostmacroid']])) $result[$macro['hostmacroid']]= array();
 
 // Groups
-						if($options['select_groups'] && !isset($result[$macro['hostmacroid']]['groups'])){
+						if($options['selectGroups'] && !isset($result[$macro['hostmacroid']]['groups'])){
 							$result[$macro['hostmacroid']]['groups'] = array();
 						}
 // Templates
@@ -404,9 +404,9 @@ class CUserMacro extends CZBXAPI{
 
 // Adding Objects
 // Adding Groups
-		if(!is_null($options['select_groups']) && str_in_array($options['select_groups'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectGroups']) && str_in_array($options['selectGroups'], $subselects_allowed_outputs)){
 			$obj_params = array(
-				'output' => $options['select_groups'],
+				'output' => $options['selectGroups'],
 				'hostids' => $hostids,
 				'preservekeys' => 1
 			);

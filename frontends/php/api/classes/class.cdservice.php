@@ -52,7 +52,7 @@ class CDService extends CZBXAPI{
  * @param boolean $options['with_graphs'] only with graphs
  * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
  * @param int $options['extendoutput'] return all fields for Services
- * @param boolean $options['select_groups'] select ServiceGroups
+ * @param boolean $options['selectGroups'] select ServiceGroups
  * @param boolean $options['select_templates'] select Templates
  * @param boolean $options['selectItems'] select Items
  * @param boolean $options['select_triggers'] select Triggers
