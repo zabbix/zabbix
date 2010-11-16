@@ -60,7 +60,7 @@ AC_DEFUN([LIBCURL_CHECK_CONFIG],
 
   AC_ARG_WITH(libcurl,
      [If you want to use cURL library:
-AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=yes@:>@, optionally specify path to curl-config])],
+AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=no@:>@, optionally specify path to curl-config])],
         [
         if test "$withval" = "no"; then
             want_curl="no"
@@ -71,7 +71,7 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=yes@:>
             _libcurl_config=$withval
         fi
         ],
-        [want_curl=ifelse([$1],,[try],[$1])])
+        [want_curl=ifelse([$1],,[no],[$1])])
 
   if test "$want_curl" != "no" ; then
 

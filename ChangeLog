@@ -1,5 +1,6 @@
 Changes for 1.8.4rc3
 
+ - [ZBX-3218] server and proxy are no longer built with libcurl by default (asaveljevs)
  - [ZBX-3145] fixed user macros resolving (Vedmak)
  - [ZBX-3215] fixed filtering by group in trigger selection popup (Vedmak)
  - [ZBX-3144] removed parsing of existing expression in trigger expression popup (Vedmak)
