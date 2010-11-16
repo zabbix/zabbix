@@ -1203,7 +1203,7 @@ else {
 						continue;
 					}
 
-					// TODO: decide  if we allow to pass null to NOT NULL field using default instead
+// TODO: decide  if we allow to pass null to NOT NULL field using default instead
 					if(is_null($value)){
 						if($table_schema['fields'][$field]['null'])
 							$value = 'NULL';

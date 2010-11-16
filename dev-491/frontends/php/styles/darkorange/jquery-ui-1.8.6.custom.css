@@ -50,7 +50,7 @@
  *
  * http://docs.jquery.com/UI/Theming/API
  *
- * To view and modify this theme, visit http://jqueryui.com/themeroller/?ffDefault=Verdana,%20Arial,%20sans-serif&fwDefault=bold&fsDefault=1.0em&cornerRadius=3px&bgColorHeader=3f3f3f&bgTextureHeader=04_highlight_hard.png&bgImgOpacityHeader=30&borderColorHeader=ff5500&fcHeader=ff5500&iconColorHeader=ff5500&bgColorContent=2f2f2f&bgTextureContent=01_flat.png&bgImgOpacityContent=25&borderColorContent=ff5500&fcContent=dfdfdf&iconColorContent=dfdfdf&bgColorDefault=2f2f2f&bgTextureDefault=02_glass.png&bgImgOpacityDefault=20&borderColorDefault=ff5500&fcDefault=ff5500&iconColorDefault=ff5500&bgColorHover=ff9900&bgTextureHover=02_glass.png&bgImgOpacityHover=40&borderColorHover=ff7700&fcHover=ffffff&iconColorHover=ffffff&bgColorActive=ff5500&bgTextureActive=02_glass.png&bgImgOpacityActive=40&borderColorActive=ff5500&fcActive=000000&iconColorActive=000000&bgColorHighlight=eeeeee&bgTextureHighlight=03_highlight_soft.png&bgImgOpacityHighlight=80&borderColorHighlight=ff5500&fcHighlight=ff5500&iconColorHighlight=ff5500&bgColorError=ffc73d&bgTextureError=02_glass.png&bgImgOpacityError=40&borderColorError=ffb73d&fcError=111111&iconColorError=a83300&bgColorOverlay=5c5c5c&bgTextureOverlay=01_flat.png&bgImgOpacityOverlay=50&opacityOverlay=80&bgColorShadow=cccccc&bgTextureShadow=01_flat.png&bgImgOpacityShadow=30&opacityShadow=60&thicknessShadow=3px&offsetTopShadow=-3px&offsetLeftShadow=-3px&cornerRadiusShadow=4px
+ * To view and modify this theme, visit http://jqueryui.com/themeroller/?ffDefault=Verdana,%20Arial,%20sans-serif&fwDefault=bold&fsDefault=1.0em&cornerRadius=3px&bgColorHeader=4f4f4f&bgTextureHeader=04_highlight_hard.png&bgImgOpacityHeader=30&borderColorHeader=ff5500&fcHeader=dfdfdf&iconColorHeader=dfdfdf&bgColorContent=1f1f1f&bgTextureContent=01_flat.png&bgImgOpacityContent=25&borderColorContent=ff5500&fcContent=dfdfdf&iconColorContent=dfdfdf&bgColorDefault=2f2f2f&bgTextureDefault=02_glass.png&bgImgOpacityDefault=40&borderColorDefault=dfdfdf&fcDefault=dfdfdf&iconColorDefault=dfdfdf&bgColorHover=2f2f2f&bgTextureHover=02_glass.png&bgImgOpacityHover=40&borderColorHover=ff5500&fcHover=ff5500&iconColorHover=ff5500&bgColorActive=ff5500&bgTextureActive=02_glass.png&bgImgOpacityActive=40&borderColorActive=ff5500&fcActive=000000&iconColorActive=000000&bgColorHighlight=eeeeee&bgTextureHighlight=03_highlight_soft.png&bgImgOpacityHighlight=80&borderColorHighlight=ff5500&fcHighlight=ff5500&iconColorHighlight=ff5500&bgColorError=ffc73d&bgTextureError=02_glass.png&bgImgOpacityError=40&borderColorError=ffb73d&fcError=111111&iconColorError=a83300&bgColorOverlay=5c5c5c&bgTextureOverlay=01_flat.png&bgImgOpacityOverlay=50&opacityOverlay=80&bgColorShadow=cccccc&bgTextureShadow=01_flat.png&bgImgOpacityShadow=30&opacityShadow=60&thicknessShadow=3px&offsetTopShadow=-3px&offsetLeftShadow=-3px&cornerRadiusShadow=4px
  */
 
 
@@ -59,17 +59,17 @@
 .darkorange .ui-widget { font-family: Verdana, Arial, sans-serif; font-size: 1.0em; }
 .darkorange .ui-widget .ui-widget { font-size: 1em; }
 .darkorange .ui-widget input, .darkorange .ui-widget select, .darkorange .ui-widget textarea, .darkorange .ui-widget button { font-family: Verdana, Arial, sans-serif; font-size: 1em; }
-.darkorange .ui-widget-content { border: 1px solid #ff5500; background: #2f2f2f url(images/ui-bg_flat_25_2f2f2f_40x100.png) 50% 50% repeat-x; color: #dfdfdf; }
+.darkorange .ui-widget-content { border: 1px solid #ff5500; background: #1f1f1f url(images/ui-bg_flat_25_1f1f1f_40x100.png) 50% 50% repeat-x; color: #dfdfdf; }
 .darkorange .ui-widget-content a { color: #dfdfdf; }
-.darkorange .ui-widget-header { border: 1px solid #ff5500; background: #3f3f3f url(images/ui-bg_highlight-hard_30_3f3f3f_1x100.png) 50% 50% repeat-x; color: #ff5500; font-weight: bold; }
-.darkorange .ui-widget-header a { color: #ff5500; }
+.darkorange .ui-widget-header { border: 1px solid #ff5500; background: #4f4f4f url(images/ui-bg_highlight-hard_30_4f4f4f_1x100.png) 50% 50% repeat-x; color: #dfdfdf; font-weight: bold; }
+.darkorange .ui-widget-header a { color: #dfdfdf; }
 
 /* Interaction states
 ----------------------------------*/
-.darkorange .ui-state-default, .darkorange .ui-widget-content .ui-state-default, .darkorange .ui-widget-header .ui-state-default { border: 1px solid #ff5500; background: #2f2f2f url(images/ui-bg_glass_20_2f2f2f_1x400.png) 50% 50% repeat-x; font-weight: bold; color: #ff5500; }
-.darkorange .ui-state-default a, .darkorange .ui-state-default a:link, .darkorange .ui-state-default a:visited { color: #ff5500; text-decoration: none; }
-.darkorange .ui-state-hover, .darkorange .ui-widget-content .ui-state-hover, .darkorange .ui-widget-header .ui-state-hover, .darkorange .ui-state-focus, .darkorange .ui-widget-content .ui-state-focus, .darkorange .ui-widget-header .ui-state-focus { border: 1px solid #ff7700; background: #ff9900 url(images/ui-bg_glass_40_ff9900_1x400.png) 50% 50% repeat-x; font-weight: bold; color: #ffffff; }
-.darkorange .ui-state-hover a, .darkorange .ui-state-hover a:hover { color: #ffffff; text-decoration: none; }
+.darkorange .ui-state-default, .darkorange .ui-widget-content .ui-state-default, .darkorange .ui-widget-header .ui-state-default { border: 1px solid #dfdfdf; background: #2f2f2f url(images/ui-bg_glass_40_2f2f2f_1x400.png) 50% 50% repeat-x; font-weight: bold; color: #dfdfdf; }
+.darkorange .ui-state-default a, .darkorange .ui-state-default a:link, .darkorange .ui-state-default a:visited { color: #dfdfdf; text-decoration: none; }
+.darkorange .ui-state-hover, .darkorange .ui-widget-content .ui-state-hover, .darkorange .ui-widget-header .ui-state-hover, .darkorange .ui-state-focus, .darkorange .ui-widget-content .ui-state-focus, .darkorange .ui-widget-header .ui-state-focus { border: 1px solid #ff5500; background: #2f2f2f url(images/ui-bg_glass_40_2f2f2f_1x400.png) 50% 50% repeat-x; font-weight: bold; color: #ff5500; }
+.darkorange .ui-state-hover a, .darkorange .ui-state-hover a:hover { color: #ff5500; text-decoration: none; }
 .darkorange .ui-state-active, .darkorange .ui-widget-content .ui-state-active, .darkorange .ui-widget-header .ui-state-active { border: 1px solid #ff5500; background: #ff5500 url(images/ui-bg_glass_40_ff5500_1x400.png) 50% 50% repeat-x; font-weight: bold; color: #000000; }
 .darkorange .ui-state-active a, .darkorange .ui-state-active a:link, .darkorange .ui-state-active a:visited { color: #000000; text-decoration: none; }
 .darkorange .ui-widget :active { outline: none; }
@@ -91,9 +91,9 @@
 /* states and images */
 .darkorange .ui-icon { width: 16px; height: 16px; background-image: url(images/ui-icons_dfdfdf_256x240.png); }
 .darkorange .ui-widget-content .ui-icon {background-image: url(images/ui-icons_dfdfdf_256x240.png); }
-.darkorange .ui-widget-header .ui-icon {background-image: url(images/ui-icons_ff5500_256x240.png); }
-.darkorange .ui-state-default .ui-icon { background-image: url(images/ui-icons_ff5500_256x240.png); }
-.darkorange .ui-state-hover .ui-icon, .darkorange .ui-state-focus .ui-icon {background-image: url(images/ui-icons_ffffff_256x240.png); }
+.darkorange .ui-widget-header .ui-icon {background-image: url(images/ui-icons_dfdfdf_256x240.png); }
+.darkorange .ui-state-default .ui-icon { background-image: url(images/ui-icons_dfdfdf_256x240.png); }
+.darkorange .ui-state-hover .ui-icon, .darkorange .ui-state-focus .ui-icon {background-image: url(images/ui-icons_ff5500_256x240.png); }
 .darkorange .ui-state-active .ui-icon {background-image: url(images/ui-icons_000000_256x240.png); }
 .darkorange .ui-state-highlight .ui-icon {background-image: url(images/ui-icons_ff5500_256x240.png); }
 .darkorange .ui-state-error .ui-icon, .darkorange .ui-state-error-text .ui-icon {background-image: url(images/ui-icons_a83300_256x240.png); }
@@ -408,7 +408,7 @@ button.ui-button-icon-only { width: 2.4em; } /* button elements seem to need a l
 button.ui-button-icons-only { width: 3.7em; } 
 
 /*button text element */
-.darkorange .ui-button .ui-button-text { display: block; line-height: 0.8;  }
+.darkorange .ui-button .ui-button-text { display: block; line-height: 0.9;  }
 .darkorange .ui-button-text-only .ui-button-text { padding: .4em 1em; }
 .darkorange .ui-button-icon-only .ui-button-text, .darkorange .ui-button-icons-only .ui-button-text { padding: .4em; text-indent: -9999999px; }
 .darkorange .ui-button-text-icon-primary .ui-button-text, .darkorange .ui-button-text-icons .ui-button-text { padding: .4em 1em .4em 2.1em; }

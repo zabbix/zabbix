@@ -221,6 +221,9 @@
 	define('HOST_MAINTENANCE_STATUS_OFF',	0);
 	define('HOST_MAINTENANCE_STATUS_ON',	1);
 
+	define('INTERFACE_SECONDARY',	0);
+	define('INTERFACE_PRIMARY',		1);
+
 	define('INTERFACE_USE_DNS',		0);
 	define('INTERFACE_USE_IP',		1);
 

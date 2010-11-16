@@ -465,7 +465,7 @@ Copt::memoryPick();
 	return !empty($objs);
 	}
 
-	protected static function checkInput($interfaces, $method){
+	protected static function checkInput(&$interfaces, $method){
 		$create = ($method == 'create');
 		$update = ($method == 'update');
 		$delete = ($method == 'delete');
@@ -501,6 +501,8 @@ Copt::memoryPick();
 				$dbInterface = $dbInterfaces[$interface['interfaceid']];
 				if(isset($interface['hostid']) && (bccomp($dbInterface['hostid'], $interface['hostid']) !=0))
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Can not switch host for interface');
+
+				$interface['hostid'] = $dbInterface['hostid'];
 			}
 			else{
 				if(!isset($dbHosts[$interface['hostid']]))
@@ -543,6 +545,48 @@ Copt::memoryPick();
 		}
 	}
 
+	protected static function setMainInterfaces($interfaces){
+		$interfaces = zbx_toHash($interfaces, 'hostid');
+		$hostids = array_keys($interfaces);
+
+		$updateData = array();
+		foreach($hostids as $hnum => $hostid){
+			$interfaces = self::get(array(
+				'output' => API_OUTPUT_EXTEND,
+				'hostids' => $hostid,
+				'nopermissions' => 1,
+				'preservekeys' => 1,
+				'sortfield' => 'interfaceid',
+				'sortorder' => ZBX_SORT_UP,
+			));
+
+			$interfaceMain = array();
+			foreach($interfaces as $interfaceid => $interface){
+				if(!isset($interfaceMain[$interface['itemtype']])){
+					$interfaceMain[$interface['itemtype']] = $interface;
+
+					if($interface['main'] != INTERFACE_PRIMARY){
+						$updateData[] = array(
+							'values' => array('main' => INTERFACE_PRIMARY),
+							'where'=> array('interfaceid='.$interface['interfaceid'])
+						);
+					}
+					continue;
+				}
+
+				if($interface['main'] == INTERFACE_PRIMARY){
+					$updateData[] = array(
+						'values' => array('main' => INTERFACE_SECONDARY),
+						'where'=> array('interfaceid='.$interface['interfaceid'])
+					);
+				}
+			}
+		}
+
+		if(!empty($updateData))
+			DB::update('interface', $updateData);
+	}
+
 /**
  * Add Interface
  *
@@ -558,6 +602,9 @@ Copt::memoryPick();
 			self::checkInput($interfaces, __FUNCTION__);
 
 			$interfaceids = DB::insert('interface', $interfaces);
+
+// auto seting main interfaces
+			self::setMainInterfaces($interfaces);
 
 			self::EndTransaction(true, __METHOD__);
 			return array('interfaceids' => $interfaceids);
@@ -590,6 +637,9 @@ Copt::memoryPick();
 				$data[] = array('values' => $interface, 'where'=> array('interfaceid='.$interface['interfaceid']));
 			}
 			$result = DB::update('interface', $data);
+
+// auto seting main interfaces
+			self::setMainInterfaces($interfaces);
 
 			self::EndTransaction($result, __METHOD__);
 			return array('interfaceids' => zbx_objectValues($interfaces, 'interfaceid'));
@@ -624,6 +674,9 @@ Copt::memoryPick();
 			self::checkInput($interfaces,__FUNCTION__);
 
 			DB::delete('interface', array('interfaceid'=>$interfaceids));
+
+// auto seting main interfaces
+			self::setMainInterfaces($interfaces);
 
 			self::EndTransaction(true, __METHOD__);
 			return array('interfaceids' => $interfaceids);
