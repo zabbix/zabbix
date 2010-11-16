@@ -390,11 +390,14 @@
 		// Numeric Locale to default
 		setLocale(LC_NUMERIC, array('en','en_US','en_US.UTF-8','English_United States.1252'));
 
-		$frmUser->addRow(S_LANGUAGE, $cmbLang);
 		//if some languages can't be set, showing a warning about that
-		if ($languages_unable_set > 0) {
-			$frmUser->addRow('', _('*you are not able to choose some of the languages, because locales for them are not installed on the web server.'));
-		}
+		$lang_hint = $languages_unable_set > 0 ? _('you are not able to choose some of the languages, because locales for them are not installed on the web server.') : '';
+
+		$lang_tbl = new CTable();
+		$lang_tbl->addItem($cmbLang);
+		$lang_tbl->addItem(new CSpan($lang_hint, 'red'));
+
+		$frmUser->addRow(S_LANGUAGE, $lang_tbl);
 
 		$cmbTheme = new CComboBox('theme',$theme);
 			$cmbTheme->addItem(ZBX_DEFAULT_CSS,S_SYSTEM_DEFAULT);
