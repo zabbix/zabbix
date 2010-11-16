@@ -1212,7 +1212,7 @@ lbl_exit:
 	char		*value_esc;
 	zbx_uint64_t	id;
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In add_history_str()");
+	zabbix_log(LOG_LEVEL_DEBUG,"In add_history_text()");
 
 	value_esc = DBdyn_escape_string(value);
 
