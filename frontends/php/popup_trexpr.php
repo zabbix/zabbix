@@ -95,11 +95,6 @@
 		)
 	);
 
-	/**
-	 * 'allowed_types' item allows to filter out triggers that can't be used
-	 * by selected item
-	 * @see http://www.zabbix.com/documentation/1.8/manual/config/triggers
-	 */
 	$allowed_types_any = array(
 		ITEM_VALUE_TYPE_FLOAT => 1,
 		ITEM_VALUE_TYPE_STR => 1,
@@ -272,43 +267,27 @@
 
 	check_fields($fields);
 
-	if(isset($_REQUEST['expression'])){
-		$res = preg_match('/^'.ZBX_PREG_SIMPLE_EXPRESSION_FORMAT.'(['.implode('',array_keys($operators)).'])'.'(['.ZBX_PREG_PRINT.']{1,})/',
-						$_REQUEST['expression'],
-						$expr_res);
-		if($res){
-			$sql = 'SELECT i.itemid '.
-					' FROM items i, hosts h '.
-					' WHERE i.hostid=h.hostid '.
-						' AND h.host='.zbx_dbstr($expr_res[ZBX_SIMPLE_EXPRESSION_HOST_ID]).
-						' AND i.key_='.zbx_dbstr($expr_res[ZBX_SIMPLE_EXPRESSION_KEY_ID]);
+	$expr_type	= get_request('expr_type', 'last[=]');
+	if(preg_match('/^([a-z]+)\[(['.implode('',array_keys($operators)).'])\]$/i', $expr_type, $expr_res)){
+		$function = $expr_res[1];
+		$operator = $expr_res[2];
 
-			$itemid = DBfetch(DBselect($sql));
-
-			$_REQUEST['itemid'] = $itemid['itemid'];
-
-			$_REQUEST['paramtype'] = PARAM_TYPE_SECONDS;
-			$_REQUEST['param'] = $expr_res[ZBX_SIMPLE_EXPRESSION_FUNCTION_PARAM_ID];
-			if($_REQUEST['param'][0] == '#'){
-				$_REQUEST['paramtype'] = PARAM_TYPE_COUNTS;
-				$_REQUEST['param'] = ltrim($_REQUEST['param'],'#');
-			}
-
-			$operator = $expr_res[count($expr_res) - 2];
-
-			$_REQUEST['expr_type'] = $expr_res[ZBX_SIMPLE_EXPRESSION_FUNCTION_NAME_ID].'['.$operator.']';
-
-
-			$_REQUEST['value'] = $expr_res[count($expr_res) - 1];
-
-		}
+		if(!isset($functions[$function])) unset($function);
 	}
-	unset($expr_res);
+	
+	
+	$dstfrm = get_request('dstfrm', 0);
+	$dstfld1 = get_request('dstfld1', '');
+	$itemid = get_request('itemid', 0);
+	$value = get_request('value', 0);
+	$param = get_request('param', 0);
+	$paramtype = get_request('paramtype');
+	
+	if(!isset($function)) $function = 'last';
+	if(!isset($functions[$function]['operators'][$operator])) $operator = '=';
 
-	$dstfrm		= get_request('dstfrm',		0);	// destination form
-	$dstfld1	= get_request('dstfld1',	'');	// destination field
-	$itemid		= get_request('itemid', 0);
-
+	$expr_type = $function.'['.$operator.']';
+	
 	if($itemid){
 		$options = array(
 			'output' => API_OUTPUT_EXTEND,
@@ -330,25 +309,7 @@
 		$item_key = $item_host = $description = '';
 	}
 
-	$expr_type	= get_request('expr_type', 'last[=]');
-	if(preg_match('/^([a-z]{1,})\[(['.implode('',array_keys($operators)).'])\]$/i',$expr_type,$expr_res)){
-		$function = $expr_res[1];
-		$operator = $expr_res[2];
 
-		if(!str_in_array($function, array_keys($functions))) unset($function);
-	}
-	unset($expr_res);
-
-	if(!isset($function)) $function = 'last';
-
-	if(!str_in_array($operator, array_keys($functions[$function]['operators']))) unset($operator);
-	if(!isset($operator)) $operator = '=';
-
-	$expr_type = $function.'['.$operator.']';
-
-
-	$param		= get_request('param',	0);
-	$paramtype	= get_request('paramtype');
 
 	if(is_null($paramtype) && isset($functions[$function]['params']['M'])){
 		$paramtype = is_array($functions[$function]['params']['M'])  
@@ -359,7 +320,6 @@
 		$paramtype = PARAM_TYPE_SECONDS;
 	}
 		
-	$value		= get_request('value',		0);
 
 	if(!is_array($param)){
 		if(isset($functions[$function]['params'])){
