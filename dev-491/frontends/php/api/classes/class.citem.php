@@ -970,7 +970,7 @@ COpt::memoryPick();
 					$item['hostid'] = $dbItems[$item['itemid']]['hostid'];
 				}
 			}
-SDII($item);
+
 			if(isset($item['interfaceid'])){
 				$interface = $interfaces[$item['interfaceid']];
 				if($interface['hostid'] != $item['hostid'])
