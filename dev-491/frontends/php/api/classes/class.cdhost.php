@@ -52,7 +52,7 @@ class CDHost extends CZBXAPI{
  * @param boolean $options['with_graphs'] only with graphs
  * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
  * @param int $options['extendoutput'] return all fields for Hosts
- * @param boolean $options['select_groups'] select HostGroups
+ * @param boolean $options['selectGroups'] select HostGroups
  * @param boolean $options['select_templates'] select Templates
  * @param boolean $options['selectItems'] select Items
  * @param boolean $options['select_triggers'] select Triggers
@@ -483,7 +483,7 @@ Copt::memoryPick();
 			}
 		}
 
-// TODO :select_groups
+// TODO :selectGroups
 		if(!is_null($options['selectGroups']) && str_in_array($options['selectGroups'], $subselects_allowed_outputs)){
 			$obj_params = array(
 					'nodeids' => $nodeids,

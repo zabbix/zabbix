@@ -52,7 +52,7 @@ class CHost extends CZBXAPI{
  * @param boolean $options['with_graphs'] only with graphs
  * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
  * @param int $options['extendoutput'] return all fields for Hosts
- * @param boolean $options['select_groups'] select HostGroups
+ * @param boolean $options['selectGroups'] select HostGroups
  * @param boolean $options['select_templates'] select Templates
  * @param boolean $options['selectItems'] select Items
  * @param boolean $options['select_triggers'] select Triggers
@@ -125,7 +125,7 @@ class CHost extends CZBXAPI{
 
 // OutPut
 			'output'					=> API_OUTPUT_REFER,
-			'select_groups'				=> null,
+			'selectGroups'				=> null,
 			'selectParentTemplates'		=> null,
 			'selectItems'				=> null,
 			'selectDiscoveries'		=> null,
@@ -569,7 +569,7 @@ class CHost extends CZBXAPI{
 				else{
 					if(!isset($result[$host['hostid']])) $result[$host['hostid']] = array();
 
-					if(!is_null($options['select_groups']) && !isset($result[$host['hostid']]['groups'])){
+					if(!is_null($options['selectGroups']) && !isset($result[$host['hostid']]['groups'])){
 						$result[$host['hostid']]['groups'] = array();
 					}
 					if(!is_null($options['selectParentTemplates']) && !isset($result[$host['hostid']]['parentTemplates'])){
@@ -613,7 +613,7 @@ class CHost extends CZBXAPI{
 					}
 
 // groupids
-					if(isset($host['groupid']) && is_null($options['select_groups'])){
+					if(isset($host['groupid']) && is_null($options['selectGroups'])){
 						if(!isset($result[$host['hostid']]['groups']))
 							$result[$host['hostid']]['groups'] = array();
 
@@ -719,10 +719,10 @@ Copt::memoryPick();
 
 // Adding Objects
 // Adding Groups
-		if(!is_null($options['select_groups']) && str_in_array($options['select_groups'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectGroups']) && str_in_array($options['selectGroups'], $subselects_allowed_outputs)){
 			$obj_params = array(
 					'nodeids' => $nodeids,
-					'output' => $options['select_groups'],
+					'output' => $options['selectGroups'],
 					'hostids' => $hostids,
 					'preservekeys' => 1
 				);

@@ -74,6 +74,7 @@
 	if($_REQUEST['hostid']>0){
 		$dbHosts = CHost::get(array(
 			'hostids' => $_REQUEST['hostid'],
+			'selectGroups' => API_OUTPUT_EXTEND,
 			'selectParentTemplates' => API_OUTPUT_EXTEND,
 			'selectMacros' => API_OUTPUT_EXTEND,
 			'select_profile' => API_OUTPUT_EXTEND,
@@ -121,8 +122,7 @@
 		$interfaces = $dbHost['interfaces'];
 
 // add groups
-		$options = array('hostids' => $_REQUEST['hostid']);
-		$host_groups = CHostGroup::get($options);
+		$host_groups = $dbHosts['groups'];
 		$host_groups = zbx_objectValues($host_groups, 'groupid');
 
 // read profile

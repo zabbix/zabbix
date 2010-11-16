@@ -82,7 +82,7 @@ class CMaintenance extends CZBXAPI{
 // OutPut
 			'output'				=> API_OUTPUT_REFER,
 			'extendoutput'			=> null,
-			'select_groups'			=> null,
+			'selectGroups'			=> null,
 			'selectHosts'			=> null,
 			'countOutput'			=> null,
 			'groupCount'			=> null,
@@ -98,8 +98,8 @@ class CMaintenance extends CZBXAPI{
 		if(!is_null($options['extendoutput'])){
 			$options['output'] = API_OUTPUT_EXTEND;
 
-			if(!is_null($options['select_groups'])){
-				$options['select_groups'] = API_OUTPUT_EXTEND;
+			if(!is_null($options['selectGroups'])){
+				$options['selectGroups'] = API_OUTPUT_EXTEND;
 			}
 			if(!is_null($options['selectHosts'])){
 				$options['selectHosts'] = API_OUTPUT_EXTEND;
@@ -209,7 +209,7 @@ class CMaintenance extends CZBXAPI{
 
 // groupids
 		if(!is_null($options['groupids'])){
-			$options['select_groups'] = 1;
+			$options['selectGroups'] = 1;
 		}
 
 // hostids
@@ -314,14 +314,14 @@ class CMaintenance extends CZBXAPI{
 					if(!isset($result[$maintenance['maintenanceid']]))
 						$result[$maintenance['maintenanceid']]= array();
 
-					if(!is_null($options['select_groups']) && !isset($result[$maintenance['maintenanceid']]['groups'])){
+					if(!is_null($options['selectGroups']) && !isset($result[$maintenance['maintenanceid']]['groups'])){
 						$result[$maintenance['maintenanceid']]['groups'] = array();
 					}
 					if(!is_null($options['selectHosts']) && !isset($result[$maintenance['maintenanceid']]['hosts'])){
 						$result[$maintenance['maintenanceid']]['hosts'] = array();
 					}
 // groupids
-					if(isset($maintenance['groupid']) && is_null($options['select_groups'])){
+					if(isset($maintenance['groupid']) && is_null($options['selectGroups'])){
 						if(!isset($result[$maintenance['maintenanceid']]['groups']))
 							$result[$maintenance['maintenanceid']]['groups'] = array();
 
@@ -350,13 +350,13 @@ Copt::memoryPick();
 			return $result;
 		}
 
-// select_groups
-		if(is_array($options['select_groups']) || str_in_array($options['select_groups'], $subselects_allowed_outputs)){
+// selectGroups
+		if(is_array($options['selectGroups']) || str_in_array($options['selectGroups'], $subselects_allowed_outputs)){
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'maintenanceids' => $maintenanceids,
 				'preservekeys' => 1,
-				'output' => $options['select_groups'],
+				'output' => $options['selectGroups'],
 			);
 			$groups = CHostGroup::get($obj_params);
 
