@@ -226,6 +226,27 @@ class CHostInterface extends CZBXAPI{
 			}
 		}
 
+// interface itemtype includes several item types
+		foreach(array('search', 'filter') as $key){
+			if(is_array($options[$key]) && isset($options[$key]['itemtype'])){
+				zbx_value2array($options[$key]['itemtype']);
+
+				$itemtypes = array();
+				foreach($options[$key]['itemtype'] as $itnum => $itemtype){
+					switch($itemtype){
+						case ITEM_TYPE_SNMPV1: $itemtypes[ITEM_TYPE_SNMPV3] = ITEM_TYPE_SNMPV3; break;
+						case ITEM_TYPE_SNMPV2: $itemtypes[ITEM_TYPE_SNMPV3] = ITEM_TYPE_SNMPV3; break;
+						case ITEM_TYPE_SNMPV3: $itemtypes[ITEM_TYPE_SNMPV3] = ITEM_TYPE_SNMPV3; break;
+						case ITEM_TYPE_IPMI: $itemtypes[ITEM_TYPE_IPMI] = ITEM_TYPE_IPMI; break;
+						case ITEM_TYPE_ZABBIX:
+						default: $itemtypes[ITEM_TYPE_ZABBIX] = ITEM_TYPE_ZABBIX; break;
+					}
+				}
+
+				$options[$key]['itemtype'] = $itemtypes;
+			}
+		}
+
 // search
 		if(is_array($options['search'])){
 			zbx_db_search('interface hi', $options, $sql_parts);

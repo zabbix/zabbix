@@ -176,6 +176,20 @@
 	return true;
 	}
 
+	function getInterfaceTypeByItem($item){
+		if(!isset($item['type'])) return null;
+
+		switch($item['type']){
+			case ITEM_TYPE_SNMPV1: $itemtype = ITEM_TYPE_SNMPV3; break;
+			case ITEM_TYPE_SNMPV2: $itemtype = ITEM_TYPE_SNMPV3; break;
+			case ITEM_TYPE_SNMPV3: $itemtype = ITEM_TYPE_SNMPV3; break;
+			case ITEM_TYPE_IPMI: $itemtype = ITEM_TYPE_IPMI; break;
+			case ITEM_TYPE_ZABBIX:
+			default: $itemtype = ITEM_TYPE_ZABBIX;
+		}
+	return $itemtype;
+	}
+
 // Delete Item definition from selected group
 	function delete_item_from_group($groupid,$itemid){
 		if(!isset($itemid)){
@@ -274,9 +288,36 @@
 	 */
 	function copy_item_to_host($itemid, $hostid){
 		$db_tmp_item = get_item_by_itemid_limited($itemid);
+		$applications = get_same_applications_for_host(get_applications_by_itemid($db_tmp_item['itemid']),$hostid);
+
+		$hosts = CHost::get(array(
+			'output' => array('hostid', 'host', 'status'),
+			'selectInterfaces' => API_OUTPUT_EXTEND,
+			'hostids' => $hostid,
+			'preservekeys' => 1,
+			'nopermissions' => 1,
+			'templated_hosts' => 1
+		));
+		if(empty($hosts)) return false;
+		$host = reset($hosts);
+
+		unset($db_tmp_item['interfaceid']);
+		if($host['status'] != HOST_STATUS_TEMPLATE){
+			$itemtype = getInterfaceTypeByItem($item);
+			foreach($host['interfaces'] as $hinum => $interface){
+				if(($interface['itemtype'] == $itemtype) && ($interface['main'] == 1)){
+					$db_tmp_item['interfaceid'] = $interface['interfaceid'];
+				}
+			}
+
+			if(!isset($db_tmp_item['interfaceid'])){
+				error('Cannot find needed host interface on ['.$host['host'].']');
+				return false;		
+			}
+		}
 
 		$db_tmp_item['hostid'] = $hostid;
-		$db_tmp_item['applications'] = get_same_applications_for_host(get_applications_by_itemid($db_tmp_item['itemid']),$hostid);
+		$db_tmp_item['applications'] = $applications;
 		$db_tmp_item['templateid'] = 0;
 
 		$result = CItem::create($db_tmp_item);
