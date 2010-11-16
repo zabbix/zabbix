@@ -2186,29 +2186,29 @@ int	DBcheck_auto_increment()
 
 	DB_RESULT	check_result;
 	DB_RESULT	ids_result;
-	DB_ROW		check_row;
 	DB_ROW		ids_row;
 	zbx_uint64_t	nextid;
 	int		i;
+	char		sql[64];
 	const char	*check_list[] = {"proxy_history", "proxy_dhistory"};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	for (i = 0; i < sizeof(check_list) / sizeof(const char *); i++)
 	{
-		check_result = DBselect("select count(*) from %s", check_list[i]);
-		if (NULL != (check_row = DBfetch(check_result)))
+		zbx_snprintf(sql, sizeof(sql), "select 1 from %s", check_list[i]);
+		check_result = DBselectN(sql, 1);
+
+		if (NULL == DBfetch(check_result))
 		{
-			if (0 == strcmp("0", check_row[0]))
+			ids_result = DBselect("select nextid from ids where table_name='%s'", check_list[i]);
+
+			if (NULL != (ids_row = DBfetch(ids_result)))
 			{
-				ids_result = DBselect("select nextid from ids where table_name='%s'", check_list[i]);
-				if (NULL != (ids_row = DBfetch(ids_result)))
-				{
-					ZBX_STR2UINT64(nextid, ids_row[0]);
-					DBexecute("alter table %s auto_increment=" ZBX_FS_UI64, check_list[i], nextid + 1);
-				}
-				DBfree_result(ids_result);
+				ZBX_STR2UINT64(nextid, ids_row[0]);
+				DBexecute("alter table %s auto_increment=" ZBX_FS_UI64, check_list[i], nextid + 1);
 			}
+			DBfree_result(ids_result);
 		}
 		DBfree_result(check_result);
 	}
