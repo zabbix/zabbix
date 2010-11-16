@@ -174,4 +174,6 @@ int	DCconfig_get_proxypoller_hosts(DC_HOST *hosts, int max_hosts);
 int	DCconfig_get_proxy_nextcheck();
 void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck);
 
+void	DCget_user_macro(zbx_uint64_t *hostids, int host_num, const char *macro, char **replace_to);
+
 #endif
