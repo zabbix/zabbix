@@ -1052,12 +1052,16 @@ TABLE|autoreg_host|autoreg_hostid|ZBX_SYNC
 FIELD		|autoreg_hostid	|t_id		|	|NOT NULL	|0
 FIELD		|proxy_hostid	|t_id		|	|NULL		|ZBX_SYNC		|1|hosts		|hostid
 FIELD		|host		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|listen_ip	|t_varchar(39)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|listen_port	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 UNIQUE		|1		|proxy_hostid,host
 
 TABLE|proxy_autoreg_host|id|0
 FIELD		|id		|t_serial	|	|NOT NULL	|0
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|host		|t_varchar(64)	|''	|NOT NULL	|0
+FIELD		|listen_ip	|t_varchar(39)	|''	|NOT NULL	|0
+FIELD		|listen_port	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|clock
 
 TABLE|interface|interfaceid|ZBX_SYNC

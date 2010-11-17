@@ -17,20 +17,6 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <netinet/in.h>
-#include <netdb.h>
-
-#include <signal.h>
-
-#include <string.h>
-
-#include <time.h>
-
 #include "common.h"
 #include "comms.h"
 #include "db.h"
@@ -59,8 +45,7 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-
-static void run_remote_command(char* host_name, char* command)
+static void	run_remote_command(char *host_name, char *command)
 {
 	int		ret = 9;
 	AGENT_RESULT	agent_result;
@@ -177,7 +162,7 @@ static void run_remote_command(char* host_name, char* command)
 #define CMD_ALIAS 0
 #define CMD_REM_COMMAND 1
 
-static int get_next_command(char** command_list, char** alias, int* is_group, char** command)
+static int	get_next_command(char **command_list, char **alias, int *is_group, char **command)
 {
 	int state = CMD_ALIAS;
 	int len = 0;
@@ -245,7 +230,7 @@ static int get_next_command(char** command_list, char** alias, int* is_group, ch
 
 /******************************************************************************
  *                                                                            *
- * Function: run_commands                                                     *
+ * Function: op_run_commands                                                  *
  *                                                                            *
  * Purpose: run remote commandlist for specific action                        *
  *                                                                            *
@@ -297,9 +282,9 @@ void	op_run_commands(char *cmd_list)
 
 /******************************************************************************
  *                                                                            *
- * Function: select hostid of discovered host                                 *
+ * Function: select_discovered_host                                           *
  *                                                                            *
- * Purpose: select discovered host                                            *
+ * Purpose: select hostid of discovered host                                  *
  *                                                                            *
  * Parameters: dhostid - discovered host id                                   *
  *                                                                            *
@@ -338,8 +323,12 @@ static zbx_uint64_t	select_discovered_host(DB_EVENT *event)
 				event->objectid);
 		break;
 	case EVENT_OBJECT_ZABBIX_ACTIVE:
-		result = DBselect("select h.hostid from hosts h,autoreg_host a"
-				" where a.proxy_hostid=h.proxy_hostid and a.host=h.host and a.autoreg_hostid=" ZBX_FS_UI64,
+		result = DBselect(
+				"select h.hostid"
+				" from hosts h,autoreg_host a"
+				" where a.proxy_hostid=h.proxy_hostid"
+					" and a.host=h.host"
+					" and a.autoreg_hostid=" ZBX_FS_UI64,
 				event->objectid);
 		break;
 	default:
@@ -461,9 +450,9 @@ static void	add_discovered_host_group(zbx_uint64_t hostid, zbx_uint64_t groupid)
 
 /******************************************************************************
  *                                                                            *
- * Function: add host if not added already                                    *
+ * Function: add_discovered_host                                              *
  *                                                                            *
- * Purpose: add discovered host                                               *
+ * Purpose: add discovered host if it was not added already                   *
  *                                                                            *
  * Parameters: dhostid - discovered host id                                   *
  *                                                                            *
@@ -530,7 +519,9 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 				event->objectid);
 		break;
 	case EVENT_OBJECT_ZABBIX_ACTIVE:
-		result = DBselect("select proxy_hostid,host from autoreg_host"
+		result = DBselect(
+				"select proxy_hostid,host,listen_ip,listen_port"
+				" from autoreg_host"
 				" where autoreg_hostid=" ZBX_FS_UI64,
 				event->objectid);
 		break;
@@ -545,6 +536,7 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 		if (EVENT_OBJECT_ZABBIX_ACTIVE == event->object)
 		{
 			host_esc = DBdyn_escape_string_len(row[1], HOST_HOST_LEN);
+			ip_esc = DBdyn_escape_string_len(row[2], HOST_IP_LEN);
 
 			result2 = DBselect(
 					"select hostid,proxy_hostid"
@@ -558,12 +550,11 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 			{
 				hostid = DBget_maxid("hosts");
 
-				DBexecute("insert into hosts (hostid,proxy_hostid,host,useip,dns)"
-						" values (" ZBX_FS_UI64 ",%s,'%s',0,'%s')",
+				DBexecute("insert into hosts (hostid,proxy_hostid,host,useip,dns,ip,port)"
+						" values (" ZBX_FS_UI64 ",%s,'%s',1,'%s','%s',%s)",
 						hostid,
 						DBsql_id_ins(proxy_hostid),
-						host_esc,
-						host_esc);
+						host_esc, host_esc, ip_esc, row[3]);
 			}
 			else
 			{
@@ -581,6 +572,7 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 			}
 			DBfree_result(result2);
 
+			zbx_free(ip_esc);
 			zbx_free(host_esc);
 		}
 		else /* EVENT_OBJECT_DHOST, EVENT_OBJECT_DSERVICE */

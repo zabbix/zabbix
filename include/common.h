@@ -118,7 +118,7 @@
 
 #define	APPLICATION_NAME	"Zabbix Agent"
 #define	ZABBIX_REVDATE		"26 October 2010"
-#define	ZABBIX_VERSION		"1.9.0"
+#define	ZABBIX_VERSION		"1.9.1"
 #define	ZABBIX_REVISION		"{ZABBIX_REVISION}"
 
 #if defined(_WINDOWS)
@@ -784,8 +784,9 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 #define SEC_PER_MIN 60
 #define SEC_PER_HOUR 3600
 #define SEC_PER_DAY 86400
-#define SEC_PER_WEEK (7*SEC_PER_DAY)
-#define SEC_PER_YEAR (365*SEC_PER_DAY)
+#define SEC_PER_WEEK (7 * SEC_PER_DAY)
+#define SEC_PER_MONTH (30 * SEC_PER_DAY)
+#define SEC_PER_YEAR (365 * SEC_PER_DAY)
 #define ZBX_JAN_1970_IN_SEC   2208988800.0        /* 1970 - 1900 in seconds */
 double	zbx_time();
 void	zbx_timespec(zbx_timespec_t *ts);

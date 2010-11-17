@@ -1532,6 +1532,8 @@
 	'S_SERVICES_DOWNTIME_DATE_FORMAT'=>		'l H:i',
 	'S_SERVICES_ONETIME_DOWNTIME_DATE_FORMAT'=>	'd M Y H:i',
 	'S_ADD_SMALL'=>								'add',
+	'S_ERROR_ADDING_SERVICE_TIME'=>'Error adding service time',
+	'S_IS_A_WRONG_TIME_FORMAT'=>'is a wrong time format. Should be from 00:00 to 23:59.',
 
 //	locales.php
 	'S_DO_NOT_ADD'=>			'Do not add',
@@ -1687,6 +1689,7 @@
 	'S_SCREENS_BIG'=>				'SCREENS',
 	'S_HOST_SCREENS'=>				'Host screens',
 
+
 	'S_SLIDESHOW_UPDATED'=>			'Slideshow updated',
 	'S_CANNOT_UPDATE_SLIDESHOW'=>		'Cannot_update slideshow',
 	'S_SLIDESHOW_ADDED'=>			'Slideshow added',
@@ -1694,6 +1697,9 @@
 	'S_SLIDESHOW_DELETED'=>			'Slideshow deleted',
 	'S_CANNOT_DELETE_SLIDESHOW'=>		'Cannot delete slideshow',
 	'S_DELETE_SLIDESHOW_Q'=>		'Delete slideshow?',
+
+	'S_ERROR_SCREEN_WITH_NAME_DOES_NOT_EXIST'=> 'Screen with name "%s" does not exist',
+	'S_ERROR_SCREEN_WITH_ID_DOES_NOT_EXIST'=> 'Screen with id "%d" does not exist',
 
 // slides.php
 	'S_CUSTOM_SLIDES' =>			'Custom slides',
@@ -2316,7 +2322,8 @@
 	'S_EXPRESSION_HOST_KEY_DOES_NOT_ERROR'=>		'Host key does not exist.',
 	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART1'=>	'Function \'',
 	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART2'=>	'\' does not accept parameters.',
-
+    'S_WRONG_DEPENDENCY_ERROR'=>	'Error adding dependencies. Following dependencies are not allowed: 1) from a host trigger to a template trigger; 2) from a template trigger to a host trigger; 3) between template triggers, where templates have links to other templates.',
+		
 //	page_footer.php
 	'S_TRANSACTION_HAVE_NOT_BEEN_CLOSED_ABORTING'=>	'Transaction has not been closed. Aborting..',
 

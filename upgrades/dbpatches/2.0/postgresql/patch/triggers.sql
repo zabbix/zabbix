@@ -83,7 +83,7 @@ DELETE FROM tmp_events_eventid WHERE prev_value = value;
 
 DROP INDEX tmp_events_index;
 
-UPDATE events SET value_changed=1 WHERE eventid IN (SELECT eventid FROM tmp_events_eventid);
+UPDATE events SET value_changed=1 WHERE EXISTS (SELECT 1 FROM tmp_events_eventid WHERE tmp_events_eventid.eventid=events.eventid);
 
 DROP TABLE tmp_events_eventid;
 
@@ -100,7 +100,7 @@ ALTER TABLE ONLY triggers ALTER triggerid DROP DEFAULT,
 			  ADD value_flags integer DEFAULT '0' NOT NULL,
 			  ADD flags integer DEFAULT '0' NOT NULL;
 UPDATE triggers SET templateid=NULL WHERE templateid=0;
-UPDATE triggers SET templateid=NULL WHERE NOT templateid IS NULL AND NOT templateid IN (SELECT triggerid FROM triggers);
+UPDATE triggers SET templateid=NULL WHERE templateid IS NOT NULL AND NOT EXISTS (SELECT 1 FROM triggers t WHERE t.triggerid=triggers.templateid);
 ALTER TABLE ONLY triggers ADD CONSTRAINT c_triggers_1 FOREIGN KEY (templateid) REFERENCES triggers (triggerid) ON DELETE CASCADE;
 
 -- Begin event redesign patch

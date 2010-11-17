@@ -18,9 +18,7 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
-#include "zabbix_agent.h"
 
 #include "cfg.h"
 #include "log.h"
@@ -42,7 +40,6 @@
 #elif defined(ZABBIX_DAEMON) /* ZABBIX_SERVICE */
 #	include "daemon.h"
 #endif /* ZABBIX_DAEMON */
-
 
 const char	*progname = NULL;
 
@@ -179,6 +176,9 @@ static void parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 			break;
 		case 'V':
 			version();
+#ifdef _AIX
+			tl_version();
+#endif /* _AIX */
 			exit(-1);
 			break;
 		case 'p':

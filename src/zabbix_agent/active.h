@@ -28,6 +28,8 @@ extern int	CONFIG_REFRESH_ACTIVE_CHECKS;
 extern int	CONFIG_BUFFER_SEND;
 extern int	CONFIG_BUFFER_SIZE;
 extern int	CONFIG_MAX_LINES_PER_SECOND;
+extern char	*CONFIG_LISTEN_IP;
+extern int	CONFIG_LISTEN_PORT;
 
 /*#define MAX_LINES_PER_SECOND	100*/	/*obsolete, configuration parameter must be used*/
 

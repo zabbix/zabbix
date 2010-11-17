@@ -830,9 +830,11 @@ return $caption;
 			showExpressionErrors($expression, $expressionData[$expression]['errors']);
 			return false;
 		}
-		if( !validate_trigger_dependency($expression, $deps))
+		if( !validate_trigger_dependency($expression, $deps)){
+			error(S_WRONG_DEPENDENCY_ERROR);
 			return false;
-
+		}
+		
 		if(CTrigger::exists(array('description' => $description, 'expression' => $expression))){
 			error('Trigger '.$description.' already exists');
 			return false;
@@ -1193,7 +1195,7 @@ return $caption;
 				}
 
 				$state='';
-				$sql = 'SELECT h.host,i.itemid,i.key_,i.flags,f.function,f.triggerid,f.parameter,i.itemid,i.status'.
+				$sql = 'SELECT h.host,i.itemid,i.key_,f.function,f.triggerid,f.parameter,i.itemid,i.status, i.type, i.flags'.
 						' FROM items i,functions f,hosts h'.
 						' WHERE f.functionid='.$functionid.
 							' AND i.itemid=f.itemid '.
@@ -1226,7 +1228,7 @@ return $caption;
 						}
 
 
-						if($function_data['flags'] == ZBX_FLAG_DISCOVERY_CREATED){
+						if($function_data['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $function_data['type'] == ITEM_TYPE_HTTPTEST){
 							$link = new CSpan($function_data['host'].':'.$function_data['key_'], $style);
 						}
 						else if($function_data['flags'] == ZBX_FLAG_DISCOVERY_CHILD){
@@ -1348,7 +1350,7 @@ return $caption;
 							$style = 'enabled';
 						}
 
-						if($function_data['flags'] == ZBX_FLAG_DISCOVERY_CREATED){
+						if($function_data['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $function_data['type'] == ITEM_TYPE_HTTPTEST){
 							$link = new CSpan($function_data['host'].':'.$function_data['key_'], $style);
 						}
 						else if($function_data['flags'] == ZBX_FLAG_DISCOVERY_CHILD){
@@ -1360,6 +1362,7 @@ return $caption;
 							$link = new CLink($function_data['host'].':'.$function_data['key_'],
 								'items.php?form=update&itemid='.$function_data['itemid'], $style);
 						}
+
 
 						array_push($exp,array('{',$link,'.',bold($function_data['function'].'('),$function_data['parameter'],bold(')'),'}'));
 					}
@@ -1765,7 +1768,10 @@ return $caption;
 			return false;
 		}
 
-		if(!validate_trigger_dependency($expression, $deps)) return false;
+		if(!validate_trigger_dependency($expression, $deps)) {
+			error(S_WRONG_DEPENDENCY_ERROR);
+			return false;
+		}
 
 		if(is_null($description)){
 			$description = $trigger['description'];
@@ -2156,25 +2162,35 @@ return $caption;
 	function validate_trigger_dependency($expression, $deps) {
 		$result = true;
 
+		//if we have atleast one dependency
 		if(!empty($deps)){
 			$templates = array();
 			$templateids = array();
+			$templated_trigger = false;
 			$db_triggerhosts = get_hosts_by_expression($expression);
+
 			while($triggerhost = DBfetch($db_triggerhosts)){
-				if($triggerhost['status'] == HOST_STATUS_TEMPLATE){ //template
+				if($triggerhost['status'] == HOST_STATUS_TEMPLATE){
 					$templates[$triggerhost['hostid']] = $triggerhost;
 					$templateids[$triggerhost['hostid']] = $triggerhost['hostid'];
+					$templated_trigger = true;
 				}
 			}
 
 			$dep_templateids = array();
 			$db_dephosts = get_hosts_by_triggerid($deps);
 			while($dephost = DBfetch($db_dephosts)) {
-				if($dephost['status'] == HOST_STATUS_TEMPLATE){ //template
+				if($templated_dep = ($dephost['status'] == HOST_STATUS_TEMPLATE)){
 					$templates[$dephost['hostid']] = $dephost;
 					$dep_templateids[$dephost['hostid']] = $dephost['hostid'];
 				}
+				
+				//we have a host trigger added to template trigger or otherwise
+				if($templated_trigger != $templated_dep){
+					return false;
+				}
 			}
+
 
 			$tdiff = array_diff($dep_templateids, $templateids);
 			if(!empty($templateids) && !empty($dep_templateids) && !empty($tdiff)){
