@@ -2586,7 +2586,7 @@ return $caption;
 						if($event){
 							$ack_menu = array(
 											S_ACKNOWLEDGE,
-											'acknow.php?eventid='.$event['eventid'],
+											'acknow.php?eventid='.$event['eventid'].'&backurl=overview.php',
 											array('tw'=>'_blank')
 										);
 

@@ -433,10 +433,10 @@
 
 				if($config['event_ack_enable']){
 					if($event['acknowledged'] == 1){
-						$ack = new CLink(S_YES,'acknow.php?eventid='.$event['eventid']);
+						$ack = new CLink(S_YES,'acknow.php?eventid='.$event['eventid'].'&backurl='.$page['file']);
 					}
 					else{
-						$ack = new CLink(S_NO,'acknow.php?eventid='.$event['eventid'],'on');
+						$ack = new CLink(S_NO,'acknow.php?eventid='.$event['eventid'].'&backurl='.$page['file'],'on');
 					}
 				}
 

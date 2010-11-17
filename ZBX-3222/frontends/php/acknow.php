@@ -41,6 +41,8 @@ include_once('include/page_header.php');
 		'triggers' =>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	null),
 		'events'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	null),
 		'message'=>			array(T_ZBX_STR, O_OPT,	NULL,	$bulk ? NULL : NOT_EMPTY,	'isset({save})||isset({saveandreturn})'),
+		'backurl'=>			array(T_ZBX_STR, O_OPT,	NULL,	NULL,	null),
+		
 // Actions
 		'go'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
 // form
@@ -64,6 +66,7 @@ include_once('include/page_header.php');
 	}
 
 	$bulk = !isset($_REQUEST['eventid']);
+	$_REQUEST['backurl'] = get_request('backurl', 'tr_status.php');
 ?>
 <?php
 	if(!$bulk){
@@ -112,15 +115,7 @@ include_once('include/page_header.php');
 		}
 
 		if(isset($_REQUEST['saveandreturn'])){
-			$last_page = $USER_DETAILS['last_page'];
-
-			if(!$last_page){
-				$url = new CUrl('tr_status.php?hostid='.CProfile::get('web.tr_status.hostid', 0));
-			}
-			else{
-				$url = new CUrl($last_page['url']);
-			}
-
+			$url = new CUrl($_REQUEST['backurl']);			
 			jsRedirect($url->getUrl());
 			exit();
 		}
@@ -174,6 +169,8 @@ include_once('include/page_header.php');
 
 
 	$frmMsg = new CFormTable($title.' "'.$USER_DETAILS['alias'].'"');
+
+	$frmMsg->addVar('backurl', $_REQUEST['backurl']);
 
 	if(isset($_REQUEST['eventid'])){
 		$frmMsg->addVar('eventid', $_REQUEST['eventid']);
