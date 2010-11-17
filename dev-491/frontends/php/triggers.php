@@ -158,12 +158,6 @@ include_once('include/page_header.php');
 		if(!check_right_on_trigger_by_expression(PERM_READ_WRITE, $_REQUEST['expression']))
 			access_deny();
 
-		$status = isset($_REQUEST['status'])?TRIGGER_STATUS_DISABLED:TRIGGER_STATUS_ENABLED;
-
-		$type = $_REQUEST['type'];
-
-		$deps = get_request('dependencies',array());
-
 		$trigger = array(
 			'expression' => $_REQUEST['expression'],
 			'description' => $_REQUEST['description'],
@@ -177,21 +171,8 @@ include_once('include/page_header.php');
 		);
 
 		if(isset($_REQUEST['triggerid'])){
-			$triggerData = get_trigger_by_triggerid($_REQUEST['triggerid']);
-			if($triggerData['templateid']){
-				$_REQUEST['description'] = $triggerData['description'];
-				$_REQUEST['expression'] = explode_exp($triggerData['expression'],0);
-			}
-
-			DBstart();
-
-			$result = update_trigger($_REQUEST['triggerid'],
-				$_REQUEST['expression'],$_REQUEST['description'],$type,
-				$_REQUEST['priority'],$status,$_REQUEST['comments'],$_REQUEST['url'],
-				$deps, $triggerData['templateid']);
-			$result = DBend($result);
-
-			$triggerid = $_REQUEST['triggerid'];
+			$trigger['triggerid'] = $_REQUEST['triggerid'];
+			$result = CTrigger::update($trigger);
 
 			show_messages($result, S_TRIGGER_UPDATED, S_CANNOT_UPDATE_TRIGGER);
 		}
@@ -207,10 +188,10 @@ include_once('include/page_header.php');
 		$result = false;
 
 		$options = array(
-			'triggerids'=> $_REQUEST['triggerid'],
-			'editable'=> 1,
-			'selectHosts'=> API_OUTPUT_EXTEND,
-			'output'=> API_OUTPUT_EXTEND,
+			'triggerids' => $_REQUEST['triggerid'],
+			'editable' => 1,
+			'selectHosts' => API_OUTPUT_EXTEND,
+			'output' => API_OUTPUT_EXTEND,
 		);
 		$triggers = CTrigger::get($options);
 

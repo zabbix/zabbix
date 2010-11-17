@@ -231,7 +231,7 @@ include_once('include/page_header.php');
 					'name' => $_REQUEST['application'],
 					'hostid' => $_REQUEST['hostid']
 				));
-sdi($result);
+
 				if(!$result){
 					throw new Exception(S_CANNOT_ADD_NEW_APPLICATION.' [ '.$application.' ]');
 				}

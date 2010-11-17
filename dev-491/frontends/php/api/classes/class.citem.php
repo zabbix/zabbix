@@ -898,6 +898,9 @@ COpt::memoryPick();
 			unset($item['prevorgvalue']);
 			unset($item['lastns']);
 
+			if($dbHosts[$item['hostid']]['status'] == HOST_STATUS_TEMPLATE)
+				unset($item['interfaceid']);
+
 			if($create){
 				if(!isset($dbHosts[$item['hostid']]))
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);

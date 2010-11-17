@@ -181,7 +181,7 @@
 
 		switch($item['type']){
 			case ITEM_TYPE_SNMPV1: $itemtype = ITEM_TYPE_SNMPV3; break;
-			case ITEM_TYPE_SNMPV2: $itemtype = ITEM_TYPE_SNMPV3; break;
+			case ITEM_TYPE_SNMPV2C: $itemtype = ITEM_TYPE_SNMPV2C; break;
 			case ITEM_TYPE_SNMPV3: $itemtype = ITEM_TYPE_SNMPV3; break;
 			case ITEM_TYPE_IPMI: $itemtype = ITEM_TYPE_IPMI; break;
 			case ITEM_TYPE_ZABBIX:
@@ -312,7 +312,7 @@
 
 			if(!isset($db_tmp_item['interfaceid'])){
 				error('Cannot find needed host interface on ['.$host['host'].']');
-				return false;		
+				return false;
 			}
 		}
 
