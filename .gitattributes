@@ -309,7 +309,7 @@ frontends/php/include/locales/hu_hu.inc.php -text
 frontends/php/include/locales/ko_kr.inc.php -text
 frontends/php/include/locales/pl_pl.inc.php -text
 frontends/php/include/locales/pt_br.inc.php -text
-frontends/php/include/locales/ua_ua.inc.php -text
+frontends/php/include/locales/uk_ua.inc.php -text
 frontends/php/include/maintenances.inc.php -text
 frontends/php/include/menu.inc.php -text
 frontends/php/include/regexp.inc.php -text
