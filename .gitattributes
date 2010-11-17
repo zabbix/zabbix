@@ -354,6 +354,7 @@ frontends/php/js/templates/sysmap.tpl.js -text
 frontends/php/jsLoader.php -text
 frontends/php/jsrpc.php -text
 frontends/php/locale/POTFILES.in -text
+frontends/php/locale/README -text
 frontends/php/locale/add_new_language.sh -text
 frontends/php/locale/cs/LC_MESSAGES/frontend.po -text
 frontends/php/locale/de/LC_MESSAGES/frontend.po -text
