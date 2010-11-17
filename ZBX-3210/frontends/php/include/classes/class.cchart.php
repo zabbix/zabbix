@@ -788,11 +788,30 @@ class CChart extends CGraphDraw{
 				$interval = $int;
 			}
 		}
+
+
+		$columnInterval = ($this->gridPixelsVert*($this->m_maxY[$other_side] - $this->m_minY[$other_side]))/$this->sizeY;
+		$max = $this->m_maxY[$other_side];
+
+		$dist = bcmul(5, bcpow(10, 18));
+
+		$interval_other_side = 0;
+		foreach($intervals as $num => $int){
+			$t = abs($int - $columnInterval);
+
+			if($t<$dist){
+				$dist = $t;
+				$interval_other_side = $int;
+			}
+		}
 //------
 
 // correctin MIN & MAX
 		$this->m_minY[$side] = bcmul(floor(bcdiv($this->m_minY[$side], $interval)), $interval);
 		$this->m_maxY[$side] = bcmul(ceil(bcdiv($this->m_maxY[$side], $interval)), $interval);
+
+		$this->m_minY[$other_side] = bcmul(floor(bcdiv($this->m_minY[$other_side], $interval_other_side)), $interval_other_side);
+		$this->m_maxY[$other_side] = bcmul(ceil(bcdiv($this->m_maxY[$other_side], $interval_other_side)), $interval_other_side);
 //--------------------
 
 		$this->gridLinesCount[$side] = ceil(($this->m_maxY[$side] - $this->m_minY[$side]) / $interval);
@@ -838,8 +857,10 @@ class CChart extends CGraphDraw{
 //--------------------
 			}
 
+
 			$this->gridLinesCount[$other_side] = $this->gridLinesCount[$side];
-			$this->m_maxY[$other_side] = $this->m_minY[$other_side] + bcmul($interval,$this->gridLinesCount[$other_side]);
+
+			$this->m_maxY[$other_side] = $this->m_minY[$other_side] + bcmul($interval, $this->gridLinesCount[$other_side]);
 
 			$this->gridStep[$other_side] = $interval;
 		}
