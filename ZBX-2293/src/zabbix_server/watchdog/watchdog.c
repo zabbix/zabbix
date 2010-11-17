@@ -104,9 +104,7 @@ static void	init_config()
 	result = DBselect("select mt.mediatypeid,mt.type,mt.description,"
 				"mt.smtp_server,mt.smtp_helo,mt.smtp_email,"
 				"mt.exec_path,mt.gsm_modem,"
-				"mt.username,mt.passwd,"
-				"m.mediaid,m.userid,m.mediatypeid,"
-				"m.sendto,m.severity,m.period"
+				"mt.username,mt.passwd,m.sendto"
 				" from media m,users_groups u,config c,media_type mt"
 				" where m.userid=u.userid"
 					" and u.usrgrpid=c.alert_usrgrpid"
@@ -133,7 +131,7 @@ static void	init_config()
 		recipients[num].mediatype.username = strdup(row[8]);
 		recipients[num].mediatype.passwd = strdup(row[9]);
 
-		recipients[num].alert.sendto = strdup(row[13]);
+		recipients[num].alert.sendto = strdup(row[10]);
 		recipients[num].alert.subject = strdup("Zabbix database is down.");
 		recipients[num].alert.message = strdup("Zabbix database is down.");
 
@@ -162,7 +160,7 @@ static void	init_config()
  ******************************************************************************/
 static void	ping_database()
 {
-	const char	*__function = "ping_database";
+	const char	*__function_name = "ping_database";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
