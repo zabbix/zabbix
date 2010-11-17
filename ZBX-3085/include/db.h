@@ -633,5 +633,4 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, int now);
 void	DBproxy_register_host(const char *host);
 void	DBexecute_overflowed_sql(char **sql, int *sql_allocated, int *sql_offset);
 char	*DBget_unique_hostname_by_sample(char *host_name_sample);
-
 #endif
