@@ -22,5 +22,5 @@ for i in */LC_MESSAGES/frontend.po; do
 	echo -ne "$i\t"
 	# setting output file to /dev/null so that unneeded messages.mo file
 	# is not created
-	msgfmt --statistics -o /dev/null $i
+	msgfmt -c --statistics -o /dev/null $i
 done
