@@ -353,6 +353,7 @@ frontends/php/js/scriptaculous/sound.js -text
 frontends/php/js/templates/sysmap.tpl.js -text
 frontends/php/jsLoader.php -text
 frontends/php/jsrpc.php -text
+frontends/php/locale/POTFILES.in -text
 frontends/php/locale/cs/LC_MESSAGES/frontend.po -text
 frontends/php/locale/de/LC_MESSAGES/frontend.po -text
 frontends/php/locale/es/LC_MESSAGES/frontend.po -text
@@ -368,6 +369,7 @@ frontends/php/locale/pt_BR/LC_MESSAGES/frontend.po -text
 frontends/php/locale/ru/LC_MESSAGES/frontend.po -text
 frontends/php/locale/sv/LC_MESSAGES/frontend.po -text
 frontends/php/locale/uk/LC_MESSAGES/frontend.po -text
+frontends/php/locale/update_po.sh -text
 frontends/php/locale/zh_CN/LC_MESSAGES/frontend.po -text
 frontends/php/maintenance.php -text
 frontends/php/popup_bitem.php -text

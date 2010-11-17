@@ -31,6 +31,7 @@ frontends/php/images/general/*.db
 frontends/php/images/general/bar/*.db
 frontends/php/images/general/bttn/*.db
 frontends/php/images/general/tree/*.db
+frontends/php/locale/frontend.pot
 include/config.h
 include/config.h.in
 include/stamp-h1
