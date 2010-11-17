@@ -222,9 +222,9 @@ function __autoload($class_name){
 			if (!$locale_found && $USER_DETAILS['lang'] != 'en_gb'){
 				error('Locale for language "'.$USER_DETAILS['lang'].'" is not found on the web server. Tried to set: '.implode(', ', $locales).'. Unable to translate zabbix interface.');
 			}
-			bindtextdomain("messages", "locale");
-			bind_textdomain_codeset("messages", 'UTF-8');
-			textdomain("messages");
+			bindtextdomain("frontend", "locale");
+			bind_textdomain_codeset("frontend", 'UTF-8');
+			textdomain("frontend");
 		}
 		else {
 			error('Your PHP has no gettext support. Zabbix translations are not available.');
