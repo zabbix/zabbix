@@ -2205,13 +2205,8 @@ static void	add_value_suffix_normal(char *value, int max_len, const char *units)
 		value_double /= base * base * base * base;
 	}
 
-	if (0 != cmp_double((int)(value_double + 0.5), value_double))
-	{
-		zbx_snprintf(tmp, sizeof(tmp), ZBX_FS_DBL_EXT(2), value_double);
-		del_zeroes(tmp);
-	}
-	else
-		zbx_snprintf(tmp, sizeof(tmp), ZBX_FS_DBL_EXT(0), value_double);
+	zbx_snprintf(tmp, sizeof(tmp), ZBX_FS_DBL, value_double);
+	del_zeroes(tmp);
 
 	zbx_snprintf(value, max_len, "%s%s %s%s",
 			minus, tmp, kmgt, units);
@@ -2402,7 +2397,7 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 
 	if (SUCCEED == (res = evaluate_function(value, &item, function, parameter, time(NULL))))
 	{
-		if (0 == strcmp(function, "last") || 0 == strcmp(function, "prev"))
+		if (SUCCEED == str_in_list("last,prev", function, ','))
 		{
 			switch (item.value_type)
 			{
@@ -2413,6 +2408,18 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 					break;
 				case ITEM_VALUE_TYPE_STR:
 					replace_value_by_map(value, MAX_BUFFER_LEN, item.valuemapid);
+					break;
+				default:
+					;
+			}
+		}
+		else if (SUCCEED == str_in_list("abschange,avg,change,delta,max,min,sum", function, ','))
+		{
+			switch (item.value_type)
+			{
+				case ITEM_VALUE_TYPE_FLOAT:
+				case ITEM_VALUE_TYPE_UINT64:
+					add_value_suffix(value, MAX_BUFFER_LEN, item.units, item.value_type);
 					break;
 				default:
 					;
