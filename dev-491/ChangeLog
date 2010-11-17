@@ -1,5 +1,6 @@
 Changes for 1.9.1
 
+ - [ZBXNEXT-558] added support of monitoring auto-registered hosts with passive checks (Sasha)
  - [ZBX-3190] fixed sql errors when processing proxy configuration (asaveljevs,Sasha)
  - [DEV-471] fixed sql scripts names consistency (Sasha)
  - [ZBXNEXT-538] include ibm_db2 upgrade patches in distribution package (Sasha)
@@ -22,6 +23,25 @@ Changes for 1.9.0
 
 Changes for 1.8.4rc3
 
+ - [ZBX-3184] fixed 1000 vs. 1024 multipliers for bits, bytes, and other units in notification macros (asaveljevs)
+ - [ZBX-3184] fixed negative values with unit suffixes in notification macros (asaveljevs)
+ - [ZBX-3211] updated Ukrainian translation; renamed locale to uk_ua; thanks to zalex_ua (Richlv)
+ - [ZBX-3085] fixed possible stop to send data from proxy after shutdown of MySQL server; thanks to Takanori Suzuki (Sasha)
+ - [ZBX-3218] server and proxy are no longer built with libcurl by default (asaveljevs)
+ - [ZBX-3145] fixed user macros resolving (Vedmak)
+ - [ZBX-3215] fixed filtering by group in trigger selection popup (Vedmak)
+ - [ZBX-3144] removed parsing of existing expression in trigger expression popup (Vedmak)
+ - [ZBX-3207] fixed possibility to click on web items in trigger expressions (Vedmak)
+ - [ZBX-3205] fixed incorrect event duration count (Aly)
+ - [ZBX-3021] fixed possibility to create dependency between host and template triggers (Vedmak)
+ - [ZBX-3183] fixed maintenance permission issue (KB)
+ - [ZBX-3183] added screenname GET parameter support to screens.php (KB)
+ - [ZBX-2639] added net.if.total and net.if.list items in the help_items table (Sasha)
+ - [ZBX-1600] added support of value mapping for {ITEM.VALUE} macro in notifications (Sasha)
+ - [ZBX-3065] fixed undefined variables in maps.php when logged as guest and no maps defined (Vedmak)
+ - [ZBX-3206] fixed timeout for simple checks (removed hardcoded timeout 3 sec) (Sasha)
+ - [ZBX-2787] it is no longer possible add invalid time for IT services, like 1:111 or 23:67 or 4:66 and so on (KB)
+ - [ZBXNEXT-557] added TL compatibility information when executed AIX agent with --version flag (Sasha)
  - [ZBX-3195] fixed slow sync of trends data while server shutdown (Sasha)
  - [ZBXNEXT-549] added trigger function strlen() (asaveljevs,Vedmak)
  - [ZBX-3156] fixed integer trends for child node on master; thanks to Łukasz Reszka (asaveljevs)

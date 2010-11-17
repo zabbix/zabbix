@@ -1020,6 +1020,8 @@ class CUserMacro extends CZBXAPI{
 // TODO: should be private
 	public static function getMacros($macros, $options){
 		zbx_value2array($macros);
+		$macros = array_unique($macros);
+		
 		$result = array();
 
 		$obj_options = array(
@@ -1028,32 +1030,27 @@ class CUserMacro extends CZBXAPI{
 			'nopermissions' => 1,
 			'preservekeys' => 1,
 			'output' => API_OUTPUT_SHORTEN,
+			'templated_hosts' => true,
 		);
 		$hosts = CHost::get($obj_options);
-
+		$hostids = array_keys($hosts);	
+		
 		do{
 			$obj_options = array(
-				'hostids' => array_keys($hosts),
+				'hostids' => $hostids,
 				'macros' => $macros,
 				'output' => API_OUTPUT_EXTEND,
 				'nopermissions' => 1,
 				'preservekeys' => 1,
-
 			);
-			$hmacros = self::get($obj_options);
-
-			$host_macros = array();
-			foreach($hmacros as $hmacroid => $hmacro){
-				$h = reset($hmacro['hosts']);
-				$host_macros[$h['hostid']] = $hmacro;
-			}
-			ksort($host_macros);
+			$host_macros = self::get($obj_options);
+			order_result($host_macros, 'hostid');
 
 			foreach($macros as $mnum => $macro){
-				foreach($host_macros as $hostid => $hmacro){
+				foreach($host_macros as $hmnum => $hmacro){
 					if($macro == $hmacro['macro']){
 						$result[$macro] = $hmacro['value'];
-						unset($host_macros[$hostid], $macros[$mnum]);
+						unset($host_macros[$hmnum], $macros[$mnum]);
 						break;
 					}
 				}
@@ -1061,14 +1058,15 @@ class CUserMacro extends CZBXAPI{
 
 			if(!empty($macros)){
 				$obj_options = array(
-					'hostids' => array_keys($hosts),
+					'hostids' => $hostids,
 					'nopermissions' => 1,
 					'preservekeys' => 1,
 					'output' => API_OUTPUT_SHORTEN,
 				);
 				$hosts = CTemplate::get($obj_options);
+				$hostids = array_keys($hosts);
 			}
-		}while(!empty($macros) && !empty($hosts));
+		}while(!empty($macros) && !empty($hostids));
 
 
 		if(!empty($macros)){

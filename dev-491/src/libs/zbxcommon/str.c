@@ -1993,43 +1993,41 @@ int	zbx_get_next_field(const char **line, char **output, int *olen, char separat
  *                                                                            *
  * Function: str_in_list                                                      *
  *                                                                            *
- * Purpose: check if string matches a list of delimited strings               *
+ * Purpose: check if string is contained in a list of delimited strings       *
  *                                                                            *
  * Parameters: list     - strings a,b,ccc,ddd                                 *
  *             value    - value                                               *
  *             delimiter- delimiter                                           *
  *                                                                            *
- * Return value: FAIL - out of period, SUCCEED - within the period            *
+ * Return value: SUCCEED - string is in the list, FAIL - otherwise            *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	str_in_list(const char *list, const char *value, const char delimiter)
 {
-	const char	*start, *end;
-	size_t		sz, vsz;
+	const char	*end;
+	int		len, ret = FAIL;
 
-	vsz = strlen(value);
+	len = strlen(value);
 
-	for (start = list; *start != '\0'; )
+	while (SUCCEED != ret)
 	{
-		if (NULL != (end = strchr(start, delimiter)))
-			sz = end - start;
+		if (NULL != (end = strchr(list, delimiter)))
+		{
+			ret = (len == end - list && 0 == strncmp(list, value, len) ? SUCCEED : FAIL);
+			list = end + 1;
+		}
 		else
-			sz = strlen(start);
-
-		if (vsz == sz && 0 == strncmp(start, value, sz))
-			return SUCCEED;
-
-		if (end != NULL)
-			start = end + 1;
-		else
+		{
+			ret = (0 == strcmp(list, value) ? SUCCEED : FAIL);
 			break;
+		}
 	}
 
-	return FAIL;
+	return ret;
 }
 
 /******************************************************************************

@@ -41,11 +41,11 @@ ALTER TABLE ONLY items ALTER itemid DROP DEFAULT,
 		       ADD flags integer DEFAULT '0' NOT NULL,
 		       ADD filter varchar(255) DEFAULT '' NOT NULL;
 UPDATE items SET templateid=NULL WHERE templateid=0;
-UPDATE items SET templateid=NULL WHERE NOT templateid IS NULL AND NOT templateid IN (SELECT itemid FROM items);
+UPDATE items SET templateid=NULL WHERE templateid IS NOT NULL AND NOT EXISTS (SELECT 1 FROM items i WHERE i.itemid=items.templateid);
 UPDATE items SET valuemapid=NULL WHERE valuemapid=0;
-UPDATE items SET valuemapid=NULL WHERE NOT valuemapid IS NULL AND NOT valuemapid IN (SELECT valuemapid from valuemaps);
+UPDATE items SET valuemapid=NULL WHERE valuemapid IS NOT NULL AND NOT EXISTS (SELECT 1 FROM valuemaps WHERE valuemaps.valuemapid=items.valuemapid);
 UPDATE items SET units='Bps' WHERE type=9 AND units='bps';
-DELETE FROM items WHERE NOT hostid IN (SELECT hostid FROM hosts);
+DELETE FROM items WHERE NOT EXISTS (SELECT 1 FROM hosts WHERE hosts.hostid=items.hostid);
 ALTER TABLE ONLY items ADD CONSTRAINT c_items_1 FOREIGN KEY (hostid) REFERENCES hosts (hostid) ON DELETE CASCADE;
 ALTER TABLE ONLY items ADD CONSTRAINT c_items_2 FOREIGN KEY (templateid) REFERENCES items (itemid) ON DELETE CASCADE;
 ALTER TABLE ONLY items ADD CONSTRAINT c_items_3 FOREIGN KEY (valuemapid) REFERENCES valuemaps (valuemapid);

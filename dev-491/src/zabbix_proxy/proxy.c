@@ -441,18 +441,17 @@ int MAIN_ZABBIX_ENTRY(void)
 #       define IPV6_FEATURE_STATUS " NO"
 #endif
 
-	zabbix_log( LOG_LEVEL_WARNING, "Starting Zabbix Proxy. Zabbix %s (revision %s).",
+	zabbix_log(LOG_LEVEL_WARNING, "Starting Zabbix Proxy. Zabbix %s (revision %s).",
 			ZABBIX_VERSION,
 			ZABBIX_REVISION);
 
-	zabbix_log( LOG_LEVEL_WARNING, "**** Enabled features ****");
-	zabbix_log( LOG_LEVEL_WARNING, "SNMP monitoring:       " SNMP_FEATURE_STATUS	);
-	zabbix_log( LOG_LEVEL_WARNING, "IPMI monitoring:       " IPMI_FEATURE_STATUS	);
-	zabbix_log( LOG_LEVEL_WARNING, "WEB monitoring:        " LIBCURL_FEATURE_STATUS	);
-	zabbix_log( LOG_LEVEL_WARNING, "ODBC:                  " ODBC_FEATURE_STATUS	);
-	zabbix_log( LOG_LEVEL_WARNING, "SSH2 support:          " SSH2_FEATURE_STATUS	);
-	zabbix_log( LOG_LEVEL_WARNING, "IPv6 support:          " IPV6_FEATURE_STATUS	);
-	zabbix_log( LOG_LEVEL_WARNING, "**************************");
+	zabbix_log(LOG_LEVEL_WARNING, "**** Enabled features ****");
+	zabbix_log(LOG_LEVEL_WARNING, "SNMP monitoring:       " SNMP_FEATURE_STATUS);
+	zabbix_log(LOG_LEVEL_WARNING, "IPMI monitoring:       " IPMI_FEATURE_STATUS);
+	zabbix_log(LOG_LEVEL_WARNING, "ODBC:                  " ODBC_FEATURE_STATUS);
+	zabbix_log(LOG_LEVEL_WARNING, "SSH2 support:          " SSH2_FEATURE_STATUS);
+	zabbix_log(LOG_LEVEL_WARNING, "IPv6 support:          " IPV6_FEATURE_STATUS);
+	zabbix_log(LOG_LEVEL_WARNING, "**************************");
 
 #ifdef  HAVE_SQLITE3
 	if(ZBX_MUTEX_ERROR == php_sem_get(&sqlite_access, CONFIG_DBNAME))
