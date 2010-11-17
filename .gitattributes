@@ -361,6 +361,7 @@ frontends/php/locale/hu/LC_MESSAGES/frontend.po -text
 frontends/php/locale/it/LC_MESSAGES/frontend.po -text
 frontends/php/locale/ko/LC_MESSAGES/frontend.po -text
 frontends/php/locale/lv/LC_MESSAGES/frontend.po -text
+frontends/php/locale/make_mo.sh -text
 frontends/php/locale/nl/LC_MESSAGES/frontend.po -text
 frontends/php/locale/pl/LC_MESSAGES/frontend.po -text
 frontends/php/locale/pt_BR/LC_MESSAGES/frontend.po -text
