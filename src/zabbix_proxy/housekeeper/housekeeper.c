@@ -39,24 +39,27 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int delete_history(const char *table, const char *fieldname, int now)
+static int	delete_history(const char *table, const char *fieldname, int now)
 {
+	const char	*__function_name = "delete_history";
 	DB_RESULT       result;
 	DB_ROW          row;
 	int             minclock, records = 0;
-	zbx_uint64_t	lastid;
+	zbx_uint64_t	lastid, maxid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In delete_history() [table:%s] [now:%d]",
-			table,
-			now);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s' now:%d",
+			__function_name, table, now);
 
 	DBbegin();
 
-	result = DBselect("select nextid from ids where table_name='%s' and field_name='%s'",
-			table,
-			fieldname);
+	result = DBselect(
+			"select nextid"
+			" from ids"
+			" where table_name='%s'"
+				" and field_name='%s'",
+			table, fieldname);
 
-	if (NULL == (row = DBfetch(result)) || DBis_null(row[0]) == SUCCEED)
+	if (NULL == (row = DBfetch(result)))
 		goto rollback;
 
 	ZBX_STR2UINT64(lastid, row[0]);
@@ -65,14 +68,27 @@ static int delete_history(const char *table, const char *fieldname, int now)
 	result = DBselect("select min(clock) from %s",
 			table);
 
-	if (NULL == (row = DBfetch(result)) || DBis_null(row[0]) == SUCCEED)
+	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
 		goto rollback;
 
 	minclock = atoi(row[0]);
 	DBfree_result(result);
 
-	records = DBexecute("delete from %s where clock<%d or (id<" ZBX_FS_UI64 " and clock<%d)",
-			table,
+	result = DBselect("select max(id) from %s",
+			table);
+
+	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
+		goto rollback;
+
+	ZBX_STR2UINT64(maxid, row[0]);
+	DBfree_result(result);
+
+	records = DBexecute(
+			"delete from %s"
+			" where id<" ZBX_FS_UI64
+				" and (clock<%d"
+					" or (id<=" ZBX_FS_UI64 " and clock<%d))",
+			table, maxid,
 			now - CONFIG_PROXY_OFFLINE_BUFFER * 3600,
 			lastid,
 			MIN(now - CONFIG_PROXY_LOCAL_BUFFER * 3600, minclock + 4 * CONFIG_HOUSEKEEPING_FREQUENCY * 3600));
