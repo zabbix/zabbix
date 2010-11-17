@@ -2205,8 +2205,13 @@ static void	add_value_suffix_normal(char *value, int max_len, const char *units)
 		value_double /= base * base * base * base;
 	}
 
-	zbx_snprintf(tmp, sizeof(tmp), ZBX_FS_DBL, value_double);
-	del_zeroes(tmp);
+	if (0 != cmp_double((int)(value_double + 0.5), value_double))
+	{
+		zbx_snprintf(tmp, sizeof(tmp), ZBX_FS_DBL_EXT(2), value_double);
+		del_zeroes(tmp);
+	}
+	else
+		zbx_snprintf(tmp, sizeof(tmp), ZBX_FS_DBL_EXT(0), value_double);
 
 	zbx_snprintf(value, max_len, "%s%s %s%s",
 			minus, tmp, kmgt, units);
