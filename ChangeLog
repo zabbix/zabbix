@@ -1,5 +1,6 @@
 Changes for 1.8.4rc3
 
+ - [ZBX-3169] updated French translation; thanks to Alixen (Alexei)
  - [ZBX-3218] server and proxy are no longer built with libcurl by default (asaveljevs)
  - [ZBX-3145] fixed user macros resolving (Vedmak)
  - [ZBX-3215] fixed filtering by group in trigger selection popup (Vedmak)
