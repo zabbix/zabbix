@@ -1,6 +1,11 @@
 Changes for 1.8.4rc3
 
  - [ZBX-3027] fixed possible stop to send data from proxy after shutdown of MySQL server (Sasha)
+ - [ZBX-3169] updated French translation; thanks to Alixen (Alexei)
+ - [ZBX-3218] server and proxy are no longer built with libcurl by default (asaveljevs)
+ - [ZBX-3145] fixed user macros resolving (Vedmak)
+ - [ZBX-3215] fixed filtering by group in trigger selection popup (Vedmak)
+ - [ZBX-3144] removed parsing of existing expression in trigger expression popup (Vedmak)
  - [ZBX-3207] fixed possibility to click on web items in trigger expressions (Vedmak)
  - [ZBX-3021] fixed possibility to create dependency between host and template triggers (Vedmak)
  - [ZBX-3205] fixed incorrect event duration count (Aly)
