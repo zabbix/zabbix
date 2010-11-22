@@ -751,7 +751,7 @@ class CChart extends CGraphDraw{
 			if($this->ymin_type == GRAPH_YAXIS_TYPE_FIXED){
 				$this->m_minY[$side] = $this->yaxismin;
 
-				if(($this->ymax_type == GRAPH_YAXIS_TYPE_CALCULATED) && ($this->m_maxY[$side] < $this->m_minY[$side])){
+				if(($this->ymax_type == GRAPH_YAXIS_TYPE_CALCULATED) && bccomp($this->m_maxY[$side], $this->m_minY[$side]) == -1){
 					$this->m_maxY[$side] = bcmul($this->m_minY[$side], 1.2);
 				}
 			}
@@ -791,7 +791,6 @@ class CChart extends CGraphDraw{
 
 
 		$columnInterval = ($this->gridPixelsVert*($this->m_maxY[$other_side] - $this->m_minY[$other_side]))/$this->sizeY;
-		$max = $this->m_maxY[$other_side];
 
 		$dist = bcmul(5, bcpow(10, 18));
 
@@ -829,7 +828,7 @@ class CChart extends CGraphDraw{
 			$interval = 1;
 
 			foreach($intervals as $num => $int){
-				if($dist < bcmul($this->gridLinesCount[$side],$int)){
+				if(bccomp($dist, bcmul($this->gridLinesCount[$side],$int)) == -1){
 					$interval = $int;
 					break;
 				}
@@ -841,11 +840,11 @@ class CChart extends CGraphDraw{
 //--------------------
 
 // if we lowered min more than highed max - need additional recalculating
-			if(($tmp_maxY[$other_side] > $this->m_maxY[$other_side]) || ($tmp_minY[$other_side] < $this->m_minY[$other_side])){
+			if(bccomp($tmp_maxY[$other_side], $this->m_maxY[$other_side])==1 || bccomp($tmp_minY[$other_side], $this->m_minY[$other_side])==-1){
 				$dist = bcsub($this->m_maxY[$other_side],$this->m_minY[$other_side]);
 				$interval = 0;
 				foreach($intervals as $num => $int){
-					if($dist < bcmul($this->gridLinesCount[$side],$int)){
+					if(mccomp($dist, bcmul($this->gridLinesCount[$side],$int))==-1){
 						$interval = $int;
 						break;
 					}
