@@ -120,10 +120,7 @@
 
 		$macros = $dbHost['macros'];
 		$interfaces = $dbHost['interfaces'];
-
-// add groups
-		$host_groups = $dbHosts['groups'];
-		$host_groups = zbx_objectValues($host_groups, 'groupid');
+		$host_groups = zbx_objectValues($dbHost['groups'], 'groupid');
 
 // read profile
 		$useprofile = 'no';

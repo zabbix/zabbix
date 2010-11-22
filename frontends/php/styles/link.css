@@ -5,7 +5,7 @@ a:visited 	{	color:#3C3089;  }
 a:hover 	{	color:#6C80B9;  }
 a:active 	{	color:#3C3089;  }
 
-a.highlight 		{	font-size:10px; font-weight: bold; }
+a.highlight 		{	font-weight: bold; }
 a.highlight:link 	{ 	color: #ffffff; text-decoration: none; }
 a.highlight:visited {	color: #ffffff; text-decoration: none; }
 a.highlight:hover	{	color: #ffcc00; }
@@ -52,10 +52,10 @@ a.header_sort:visited 	{	color:#222; text-decoration: none;  }
 a.header_sort:hover 	{	color:#222; text-decoration: underline; }
 a.header_sort:active 	{	color:#222; text-decoration: underline; }
 
-a.history:link		{	color:#448; font-size:10px; text-decoration: none;  }
-a.history:visited 	{	color:#448; font-size:10px; text-decoration: none;  }
-a.history:hover 	{	color:#448; font-size:10px; text-decoration: underline; }
-a.history:active 	{	color:#448; font-size:10px; text-decoration: underline; }
+a.history:link		{	color:#448; text-decoration: none;  }
+a.history:visited 	{	color:#448; text-decoration: none;  }
+a.history:hover 	{	color:#448; text-decoration: underline; }
+a.history:active 	{	color:#448; text-decoration: underline; }
 
 a.image:link		{	text-decoration: none; }
 a.image:visited 	{	text-decoration: none; }
@@ -67,7 +67,7 @@ a.underline:visited { text-decoration: underline; }
 a.underline:hover	{ text-decoration: underline; }
 a.underline:active  { text-decoration: underline; }
 
-a.discoveryName:link{ color: #999900; }
-a.discoveryName:visited{ color: #999900; }
-a.discoveryName:hover{ color: #999900; }
-a.discoveryName:active{ color: #999900; }
+a.discoveryName:link { color: #999900; }
+a.discoveryName:visited { color: #999900; }
+a.discoveryName:hover { color: #999900; }
+a.discoveryName:active { color: #999900; }

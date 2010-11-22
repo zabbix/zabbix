@@ -152,8 +152,6 @@ img.borderless	{	border-width: 0px; vertical-align: bottom;	}
 	position: absolute;
 	background-color: white;
 	padding: 2px;
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 10px;
 	line-height:15px;
 	border: 1px solid black;
 }
@@ -165,8 +163,6 @@ img.borderless	{	border-width: 0px; vertical-align: bottom;	}
 
 #color_picker a {
 	text-decoration: none;
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 10px;
 	padding: 0px;
 	margin: 0px;
 }
