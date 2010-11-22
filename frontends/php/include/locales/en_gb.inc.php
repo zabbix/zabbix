@@ -2259,6 +2259,7 @@
 	'S_HOST_HAS_BEEN_DELETED_MSG_PART1'=>		'Host',
 	'S_HOST_HAS_BEEN_DELETED_MSG_PART2'=>		'has been deleted from the system',
 	'S_YOU_CANT_DELETE_TEMPLATE_FOR_APP_USED_IN_SCENARIO'=>'You can\'t delete template for an application that is used in a web scenario',
+	'S_USED_IN_WEB_SCENARIO' => 'used in web scenario',
 	'S_AND_CANT_BE_DELETED' => 'and can\'t be deleted',
 //	validate.inc.php
 	'S_CRITICAL_ERROR'=>				'Critical error',
