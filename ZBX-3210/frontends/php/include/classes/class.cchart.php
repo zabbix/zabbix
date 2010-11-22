@@ -932,7 +932,7 @@ class CChart extends CGraphDraw{
 		foreach($intervals as $num => $int){
 			$t = abs($int['sub']-$raw_time_interval);
 
-			if($t<$dist){
+			if(bccomp($t,$dist)==-1){
 				$dist = $t;
 				$sub_interval = $int['sub'];
 
