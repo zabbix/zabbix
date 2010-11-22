@@ -407,7 +407,7 @@
 		}
 
 		function CheckConfigurationFile(){
-			global $DB,$ZBX_SERVER,$ZBX_SERVER_PORT;
+			global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT;
 
 			if(!empty($DB)){
 				$old_DB				= true;
@@ -439,12 +439,12 @@
 					isset($ZBX_SERVER) &&
 					isset($ZBX_SERVER_PORT) &&
 					isset($IMAGE_FORMAT_DEFAULT) &&
-					$DB['TYPE']		== $this->getConfig('DB_TYPE',		null) &&
-					$DB['SERVER']		== $this->getConfig('DB_SERVER',	null) &&
-					$DB['PORT']		== $this->getConfig('DB_PORT',		null) &&
-					$DB['DATABASE']		== $this->getConfig('DB_DATABASE',	null) &&
-					$DB['USER']		== $this->getConfig('DB_USER',		null) &&
-					$DB['PASSWORD']		== $this->getConfig('DB_PASSWORD',	null)
+					$DB['TYPE'] == $this->getConfig('DB_TYPE',		null) &&
+					$DB['SERVER'] == $this->getConfig('DB_SERVER',	null) &&
+					$DB['PORT'] == $this->getConfig('DB_PORT',		null) &&
+					$DB['DATABASE'] == $this->getConfig('DB_DATABASE',	null) &&
+					$DB['USER'] == $this->getConfig('DB_USER',		null) &&
+					$DB['PASSWORD'] == $this->getConfig('DB_PASSWORD',	null)
 					)
 				{
 					if(!DBconnect($error_msg)){
@@ -452,12 +452,12 @@
 					}
 				}
 				else{
-					$error_msg = 'Incorrect configuration file['.$ZBX_CONFIGURATION_FILE.']';
+					$error_msg = 'Incorrect configuration file ['.$ZBX_CONFIGURATION_FILE.']';
 				}
 				DBclose();
 			}
 			else{
-				$error = 'Missing configuration file['.$ZBX_CONFIGURATION_FILE.']';
+				$error = 'Missing configuration file ['.$ZBX_CONFIGURATION_FILE.']';
 			}
 
 			if(isset($error_msg)){
