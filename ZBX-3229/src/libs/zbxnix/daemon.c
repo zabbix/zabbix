@@ -103,6 +103,16 @@ static void	parent_signal_handler(int sig, siginfo_t *siginfo, void *context)
 		{
 			if (0 == exiting)
 			{
+				int		i, found = 0;
+				extern int	threads_num;
+				extern pid_t	*threads;
+				
+				for (i = 1; i < threads_num && !found; i++)
+					found = (threads[i] == CHECKED_FIELD(siginfo, si_pid));
+
+				if (!found)	/* we should not worry too much about non-Zabbix child */
+					return;	/* processes, like watchdog alert scripts, terminating */
+
 				zabbix_log(LOG_LEVEL_CRIT, "One child process died (PID:%d,exitcode/signal:%d). Exiting ...",
 						CHECKED_FIELD(siginfo, si_pid),
 						CHECKED_FIELD(siginfo, si_status));
@@ -151,7 +161,7 @@ int	daemon_start(int allow_root)
 			zbx_error("Cannot run as root !");
 			exit(FAIL);
 		}
-		if(setgid(pwd->pw_gid) ==-1)
+		if(setgid(pwd->pw_gid) == -1)
 		{
 			zbx_error("Cannot setgid to %s [%s].",
 				user,

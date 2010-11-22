@@ -160,8 +160,6 @@ include_once('include/page_header.php');
 
 		$status = isset($_REQUEST['status'])?TRIGGER_STATUS_DISABLED:TRIGGER_STATUS_ENABLED;
 
-		$type = $_REQUEST['type'];
-
 		$deps = get_request('dependencies',array());
 
 		if(isset($_REQUEST['triggerid'])){
@@ -171,11 +169,28 @@ include_once('include/page_header.php');
 				$_REQUEST['expression'] = explode_exp($triggerData['expression'],0);
 			}
 
+			$current_deps = get_trigger_dependencies_by_triggerid($_REQUEST['triggerid']);
+			sort($deps);
+			sort($current_deps);
+			if($deps == $current_deps){
+				$deps = null;
+			}
+
+			$type = get_request('type');
+			$priority = get_request('priority');
+			$comments = get_request('comments');
+			$url = get_request('url');
+			if($triggerData['type'] == $_REQUEST['type']) $type = null;
+			if($triggerData['priority'] == $_REQUEST['priority']) $priority = null;
+			if($triggerData['comments'] == $_REQUEST['comments']) $comments = null;
+			if($triggerData['url'] == $_REQUEST['url']) $url = null;
+			if($triggerData['status'] == $status) $status = null;
+
 			DBstart();
 
 			$result = update_trigger($_REQUEST['triggerid'],
 				$_REQUEST['expression'],$_REQUEST['description'],$type,
-				$_REQUEST['priority'],$status,$_REQUEST['comments'],$_REQUEST['url'],
+				$priority,$status,$comments,$url,
 				$deps, $triggerData['templateid']);
 			$result = DBend($result);
 
@@ -185,7 +200,7 @@ include_once('include/page_header.php');
 		}
 		else{
 			DBstart();
-			$triggerid = add_trigger($_REQUEST['expression'],$_REQUEST['description'],$type,
+			$triggerid = add_trigger($_REQUEST['expression'],$_REQUEST['description'],$_REQUEST['type'],
 				$_REQUEST['priority'],$status,$_REQUEST['comments'],$_REQUEST['url'],
 				$deps);
 			$result = DBend($triggerid);
@@ -205,7 +220,7 @@ include_once('include/page_header.php');
 			'output'=> API_OUTPUT_EXTEND,
 		);
 		$triggers = CTrigger::get($options);
-		
+
 		if($triggerData = reset($triggers)){
 			$host = reset($triggerData['hosts']);
 
@@ -382,7 +397,7 @@ include_once('include/page_header.php');
 		$triggerids = array();
 		$options = array(
 			'triggerids' => $_REQUEST['g_triggerid'],
-			'editable'=>1, 
+			'editable'=>1,
 			'select_hosts' => API_OUTPUT_EXTEND,
 			'output'=>API_OUTPUT_EXTEND,
 			'expandDescription' => 1
