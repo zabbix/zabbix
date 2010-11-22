@@ -23,6 +23,7 @@ Changes for 1.9.0
 
 Changes for 1.8.4rc3
 
+ - [ZBX-3229] improved output of configure script (Richlv,asaveljevs)
  - [ZBX-3222] fixed Zabbix returns to incorrect page from acknowledge form (Vedmak)
  - [ZBX-2577] fixed template trigger update affects downstream triggers (Vedmak)
  - [ZBX-3221] fixed host deletion through API (Aly)
