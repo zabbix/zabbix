@@ -1915,7 +1915,7 @@ return $caption;
 						$description,
 						$type,
 						$priority,
-						NULL,		// status
+						$status,
 						$comments,
 						$url,
 						(is_null($deps) ? null : replace_template_dependencies($deps, $chd_trig_host['hostid'])),

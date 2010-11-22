@@ -184,6 +184,7 @@ include_once('include/page_header.php');
 			if($triggerData['priority'] == $_REQUEST['priority']) $priority = null;
 			if($triggerData['comments'] == $_REQUEST['comments']) $comments = null;
 			if($triggerData['url'] == $_REQUEST['url']) $url = null;
+			if($triggerData['status'] == $status) $status = null;
 
 			DBstart();
 
