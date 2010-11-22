@@ -36,8 +36,8 @@ class CChart extends CGraphDraw{
 		$this->yaxisright=0;
 		$this->yaxisleft=0;
 
-		$this->skipLeftScale = 0;		// in case if left axis should be drawn but dosn't contain any data
-		$this->skipRightScale = 0;		// in case if right axis should be drawn but dosn't contain any data
+		$this->skipLeftScale = 0;		// in case if left axis should be drawn but doesn't contain any data
+		$this->skipRightScale = 0;		// in case if right axis should be drawn but doesn't contain any data
 
 		$this->ymin_itemid = 0;
 		$this->ymax_itemid = 0;
@@ -806,7 +806,7 @@ class CChart extends CGraphDraw{
 		}
 //------
 
-// correctin MIN & MAX
+// correcting MIN & MAX
 		$this->m_minY[$side] = bcmul(floor(bcdiv($this->m_minY[$side], $interval)), $interval);
 		$this->m_maxY[$side] = bcmul(ceil(bcdiv($this->m_maxY[$side], $interval)), $interval);
 
@@ -816,7 +816,7 @@ class CChart extends CGraphDraw{
 
 		$this->gridLinesCount[$side] = ceil(($this->m_maxY[$side] - $this->m_minY[$side]) / $interval);
 
-// we add 1 interval so max Y woun't be at most top
+// we add 1 interval so max Y wouldn't be at the top
 		if(bccomp($this->m_maxY[$side], $tmp_maxY[$side], 2) == 0){
 			$this->gridLinesCount[$side]++;
 		}
