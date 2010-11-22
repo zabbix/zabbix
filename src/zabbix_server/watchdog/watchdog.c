@@ -30,13 +30,12 @@
 #include "zlog.h"
 #include "watchdog.h"
 
-#define ZBX_RECIPIENT struct zbx_recipient_t
-
-ZBX_RECIPIENT
+typedef struct
 {
 	DB_ALERT	alert;
 	DB_MEDIATYPE	mediatype;
-};
+}
+ZBX_RECIPIENT;
 
 #define	ZBX_MAX_RECIPIENTS	32
 
@@ -62,16 +61,16 @@ static int	lastsent = 0;
  ******************************************************************************/
 static void	send_alerts()
 {
-	int	i,now;
+	int	i, now;
 	char	error[MAX_STRING_LEN];
 
 	now = time(NULL);
 
-	if (now > lastsent + 900)
+	if (now > lastsent + 15 * SEC_PER_MIN)
 	{
 		for (i = 0; i < num; i++)
 		{
-			execute_action(&recipients[i].alert,&recipients[i].mediatype, error, sizeof(error));
+			execute_action(&recipients[i].alert, &recipients[i].mediatype, error, sizeof(error));
 		}
 
 		lastsent = now;
@@ -95,10 +94,12 @@ static void	send_alerts()
  ******************************************************************************/
 static void	init_config()
 {
+	const char	*__function_name = "init_config";
+
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In init_config()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	result = DBselect(
 			"select mt.mediatypeid,mt.type,mt.description,mt.smtp_server,"
@@ -138,6 +139,8 @@ static void	init_config()
 	}
 
 	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -157,23 +160,26 @@ static void	init_config()
  ******************************************************************************/
 static void	ping_database()
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "In ping_database()");
+	const char	*__function_name = "ping_database";
 
-	/* This is test SQL query, it does nothing */
-	if (DBping() == FAIL)
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (FAIL == DBping()) /* check whether a connection to the database can be made */
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Watchdog: Database is down");
 		send_alerts();
 	}
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "Watchdog: Database is up");
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
  *                                                                            *
  * Function: main_watchdog_loop                                               *
  *                                                                            *
- * Purpose: periodically checks availability of database and alerts admin if  *
+ * Purpose: periodically checks availability of database and alerts admins if *
  *          down                                                              *
  *                                                                            *
  * Parameters:                                                                *
