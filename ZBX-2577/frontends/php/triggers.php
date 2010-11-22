@@ -160,8 +160,6 @@ include_once('include/page_header.php');
 
 		$status = isset($_REQUEST['status'])?TRIGGER_STATUS_DISABLED:TRIGGER_STATUS_ENABLED;
 
-		$type = $_REQUEST['type'];
-
 		$deps = get_request('dependencies',array());
 
 		if(isset($_REQUEST['triggerid'])){
@@ -178,16 +176,20 @@ include_once('include/page_header.php');
 				$deps = null;
 			}
 
-			if($triggerData['type'] == $_REQUEST['type']) $_REQUEST['type'] = null;
-			if($triggerData['priority'] == $_REQUEST['priority']) $_REQUEST['priority'] = null;
-			if($triggerData['comments'] == $_REQUEST['comments']) $_REQUEST['comments'] = null;
-			if($triggerData['url'] == $_REQUEST['url']) $_REQUEST['url'] = null;
+			$type = get_request('type');
+			$priority = get_request('priority');
+			$comments = get_request('comments');
+			$url = get_request('url');
+			if($triggerData['type'] == $_REQUEST['type']) $type = null;
+			if($triggerData['priority'] == $_REQUEST['priority']) $priority = null;
+			if($triggerData['comments'] == $_REQUEST['comments']) $comments = null;
+			if($triggerData['url'] == $_REQUEST['url']) $url = null;
 
 			DBstart();
 
 			$result = update_trigger($_REQUEST['triggerid'],
 				$_REQUEST['expression'],$_REQUEST['description'],$type,
-				$_REQUEST['priority'],$status,$_REQUEST['comments'],$_REQUEST['url'],
+				$priority,$status,$comments,$url,
 				$deps, $triggerData['templateid']);
 			$result = DBend($result);
 
@@ -197,7 +199,7 @@ include_once('include/page_header.php');
 		}
 		else{
 			DBstart();
-			$triggerid = add_trigger($_REQUEST['expression'],$_REQUEST['description'],$type,
+			$triggerid = add_trigger($_REQUEST['expression'],$_REQUEST['description'],$_REQUEST['type'],
 				$_REQUEST['priority'],$status,$_REQUEST['comments'],$_REQUEST['url'],
 				$deps);
 			$result = DBend($triggerid);
