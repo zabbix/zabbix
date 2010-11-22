@@ -23,6 +23,7 @@ Changes for 1.9.0
 
 Changes for 1.8.4rc3
 
+ - [ZBX-3220] fixed error when delete host on postgresql db (Vedmak)
  - [ZBX-2293] fixed server terminating when sending "database down" alerts using scripts (asaveljevs,Sasha)
  - [ZBX-3184] fixed 1000 vs. 1024 multipliers for bits, bytes, and other units in notification macros (asaveljevs)
  - [ZBX-3184] fixed negative values with unit suffixes in notification macros (asaveljevs)
