@@ -1346,7 +1346,6 @@ return $result;
 	}
 
 	function delete_application($applicationids){
-		zbx_value2array($applicationids);
 		$applicationids = zbx_toHash($applicationids);
 
 		$apps = array();
@@ -1370,16 +1369,19 @@ return $result;
 			$tmp_appids[$db_app['applicationid']] = $db_app['applicationid'];
 		}
 
-		if(!empty($tmp_appids)) delete_application($tmp_appids);			// recursion!!!
+		if(!empty($tmp_appids)){
+// recursion!!!
+			if(!delete_application($tmp_appids)) return false; 
+		}
    
    
 		$unlink_apps = array();
 		//check if app is used by web scenario
 		$sql = 'SELECT ht.name, ht.applicationid '.
 				' FROM httptest ht '.
-				' WHERE '.DBcondition('ht.applicationid',$applicationids);
+				' WHERE '.DBcondition('ht.applicationid', $applicationids);
 		$res = DBselect($sql);
-		if($info = DBfetch($res)){
+		while($info = DBfetch($res)){
 			if($apps[$info['applicationid']]['templateid'] > 0){
 				$unlink_apps[$info['applicationid']] = $info['applicationid'];
 				unset($applicationids[$info['applicationid']]);
@@ -1390,11 +1392,11 @@ return $result;
 			}			
 		}
 		
-		$sql = 'SELECT i.itemid,i.key_,i.description '.
+		$sql = 'SELECT i.itemid, i.key_, i.description, ia.applicationid '.
 				' FROM items_applications ia, items i '.
 				' WHERE i.type='.ITEM_TYPE_HTTPTEST.
 					' AND i.itemid=ia.itemid '.
-					' AND '.DBcondition('ia.applicationid',$applicationids);
+					' AND '.DBcondition('ia.applicationid', $applicationids);
 		$res = DBselect($sql);
 		if($info = DBfetch($res)){
 			error(S_APPLICATION.' ['.$apps[$info['applicationid']]['host'].':'.$apps[$info['applicationid']]['name'].'] '.S_USED_BY_ITEM_SMALL.' ['.item_description($info).']');
@@ -1402,8 +1404,8 @@ return $result;
 		}
 
 		$result = DBexecute('UPDATE applications SET templateid=0 WHERE '.DBcondition('applicationid', $unlink_apps));
-		$result = DBexecute('DELETE FROM items_applications WHERE '.DBcondition('applicationid',$applicationids));
-		$result = DBexecute('DELETE FROM applications WHERE '.DBcondition('applicationid',$applicationids));
+		$result &= DBexecute('DELETE FROM items_applications WHERE '.DBcondition('applicationid', $applicationids));
+		$result &= DBexecute('DELETE FROM applications WHERE '.DBcondition('applicationid', $applicationids));
 
 		if($result){
 			foreach($apps as $appid => $app){
