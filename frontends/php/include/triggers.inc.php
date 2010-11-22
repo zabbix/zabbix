@@ -666,7 +666,7 @@ return $caption;
 		}
 
 	return $params;
-	
+
 	}
 
 /*
@@ -843,7 +843,7 @@ return $caption;
 			error(S_WRONG_DEPENDENCY_ERROR);
 			return false;
 		}
-		
+
 		if(CTrigger::exists(array('description' => $description, 'expression' => $expression))){
 			error('Trigger '.$description.' already exists');
 			return false;
@@ -1339,7 +1339,7 @@ return $caption;
 									'items.php?form=update&itemid='.$function_data['itemid'],
 									$style
 								);
-								
+
 						if($function_data['type'] == ITEM_TYPE_HTTPTEST){
 							$link = new CSpan($function_data['host'].':'.$function_data['key_'], $style);
 						}
@@ -1847,7 +1847,8 @@ return $caption;
 			return false;
 		}
 
-		if(!validate_trigger_dependency($expression, $deps)) {
+
+		if(!is_null($deps) && !validate_trigger_dependency($expression, $deps)) {
 			error(S_WRONG_DEPENDENCY_ERROR);
 			return false;
 		}
@@ -1914,11 +1915,12 @@ return $caption;
 						$description,
 						$type,
 						$priority,
-						NULL,		// status
+						$status,
 						$comments,
 						$url,
-						replace_template_dependencies($deps, $chd_trig_host['hostid']),
-						$triggerid);
+						(is_null($deps) ? null : replace_template_dependencies($deps, $chd_trig_host['hostid'])),
+						$triggerid
+					);
 				}
 			}
 		}
@@ -1952,13 +1954,15 @@ return $caption;
 
 		DB::update('triggers', array('values' => $update_values, 'where' => array('triggerid='.$triggerid)));
 
-		delete_dependencies_by_triggerid($triggerid);
+		if(!is_null($deps)){
+			delete_dependencies_by_triggerid($triggerid);
 
-		foreach($deps as $id => $triggerid_up){
-			if(!$result2=add_trigger_dependency($triggerid, $triggerid_up)){
-				error(S_INCORRECT_DEPENDENCY.' ['.expand_trigger_description($triggerid_up).']');
+			foreach($deps as $id => $triggerid_up){
+				if(!$result2=add_trigger_dependency($triggerid, $triggerid_up)){
+					error(S_INCORRECT_DEPENDENCY.' ['.expand_trigger_description($triggerid_up).']');
+				}
+				$result &= $result2;
 			}
-			$result &= $result2;
 		}
 
 		if($result){
@@ -2238,7 +2242,7 @@ return $caption;
 					$templates[$dephost['hostid']] = $dephost;
 					$dep_templateids[$dephost['hostid']] = $dephost['hostid'];
 				}
-				
+
 				//we have a host trigger added to template trigger or otherwise
 				if($templated_trigger != $templated_dep){
 					return false;
@@ -2263,7 +2267,7 @@ return $caption;
 
 				foreach($map as $hostid => $templates){
 					$set_with_dep = false;
-					
+
 					foreach($templateids as $tplid){
 						if(isset($templates[$tplid])){
 							$set_with_dep = true;
