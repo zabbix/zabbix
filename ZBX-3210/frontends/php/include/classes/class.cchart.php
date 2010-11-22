@@ -797,7 +797,7 @@ class CChart extends CGraphDraw{
 		foreach($intervals as $num => $int){
 			$t = abs($int - $columnInterval);
 
-			if($t<$dist){
+			if(bccomp($t,$dist)==-1){
 				$dist = $t;
 				$interval_other_side = $int;
 			}
