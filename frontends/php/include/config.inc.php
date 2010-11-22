@@ -107,6 +107,7 @@ function __autoload($class_name){
 	require_once('include/valuemap.inc.php');
 
 	require_once('include/users.inc.php');
+	require_once('include/ident.inc.php');
 // GLOBALS
 	global $USER_DETAILS, $USER_RIGHTS, $page;
 

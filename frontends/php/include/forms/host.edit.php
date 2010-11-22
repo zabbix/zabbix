@@ -222,10 +222,10 @@
 	$clear_templates = array_diff($clear_templates,array_keys($templates));
 	natcasesort($templates);
 
-	$frmHost = new CForm('hosts.php', 'post');
+	$frmHost = new CForm('hosts.php');
 	$frmHost->setName('web.hosts.host.php.');
-//		$frmHost->setHelp('web.hosts.host.php');
 	$frmHost->addVar('form', get_request('form', 1));
+
 	$from_rfr = get_request('form_refresh',0);
 	$frmHost->addVar('form_refresh', $from_rfr+1);
 	$frmHost->addVar('clear_templates', $clear_templates);

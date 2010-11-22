@@ -3,13 +3,12 @@
 form {margin: 0}
 
 form.thin .input{
-	font-size: 11px;
 	height: 14px;
 }
 
 .input, .input[disabled]:hover{
 	font-size: 10px;
-	font-family: verdana, arial, helvetica, sans-serif;
+	font-family: Verdana, arial, helvetica, sans-serif;
 
 	border: 1px solid gray;
 	background-color: white;

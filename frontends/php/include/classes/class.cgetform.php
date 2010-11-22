@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,35 +19,30 @@
 **/
 ?>
 <?php
-class CRadioButton extends CDiv{
-	protected $count;
-	protected $name;
-	protected $value;
+class CGetForm{
+	private $data;
+	private $form;
+	private $scripts;
 
-	public function __construct($name='radio', $value='yes'){
-		$this->count = 0;
-		$this->name = $name;
-		$this->value = $value;
-
-		parent::__construct();
+	public function __construct(){
 	}
 
+	public function assign($data){
+		$this->data = $data;
+	}
 
-	public function addValue($name, $value, $checked=null){
-		$this->count++;
-
-		$id = $name.'_'.$this->count;
-
-		$radio = new CInput('radio', $this->name, $value);
-		$radio->setAttribute('id', $id);
-
-		if((strcmp($value,$this->value) == 0) || !is_null($checked) || $checked){
-			$radio->setAttribute('checked', 'checked');
+	public function render($file){
+		if(!preg_match("/[a-z\.]+/", $file)){
+			error('Invalid form name given ['.$file.']');
+			return false;
 		}
 
-		$label = new CLabel($name, $id);
+		ob_start();
+		$this->form = include('./include/forms/'.$file.'.php');
+		$this->scripts = ob_get_clean();
 
-		parent::addItem(array($radio, $label));
+		print($this->scripts);
+		return $this->form;
 	}
 }
 ?>

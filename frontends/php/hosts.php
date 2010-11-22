@@ -20,9 +20,7 @@
 ?>
 <?php
 require_once('include/config.inc.php');
-require_once('include/maintenances.inc.php');
 require_once('include/forms.inc.php');
-require_once('include/ident.inc.php');
 
 if(isset($_REQUEST['go']) && ($_REQUEST['go'] == 'export') && isset($_REQUEST['hosts'])){
 	$EXPORT_DATA = true;

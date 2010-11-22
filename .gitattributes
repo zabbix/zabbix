@@ -266,6 +266,7 @@ frontends/php/include/classes/class.cform.php -text
 frontends/php/include/classes/class.cformelement.php -text
 frontends/php/include/classes/class.cformlist.php -text
 frontends/php/include/classes/class.cformtable.php -text
+frontends/php/include/classes/class.cgetform.php -text
 frontends/php/include/classes/class.cgraphdraw.php -text
 frontends/php/include/classes/class.chelp.php -text
 frontends/php/include/classes/class.chostsinfo.php -text
@@ -311,6 +312,7 @@ frontends/php/include/classes/class.cvisibilitybox.php -text
 frontends/php/include/classes/class.cwidget.php -text
 frontends/php/include/debug.inc.php -text
 frontends/php/include/forms/host.edit.php -text
+frontends/php/include/forms/proxy.edit.php -text
 frontends/php/include/forms/template.edit.php -text
 frontends/php/include/func.inc.php -text
 frontends/php/include/ident.inc.php -text
