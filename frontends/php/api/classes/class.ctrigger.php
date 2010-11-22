@@ -1216,25 +1216,23 @@ COpt::memoryPick();
  */
 	public static function update($triggers){
 		$triggers = zbx_toArray($triggers);
-		$triggerids = array();
+		$triggerids = zbx_objectValues($triggers, 'triggerid');
 
 		try{
 			self::BeginTransaction(__METHOD__);
 
 			$options = array(
-				'triggerids' => zbx_objectValues($triggers, 'triggerid'),
+				'triggerids' => $triggerids,
 				'editable' => 1,
 				'output' => API_OUTPUT_EXTEND,
-				'preservekeys' => 1
+				'preservekeys' => 1,
 			);
 			$upd_triggers = self::get($options);
 			foreach($triggers as $gnum => $trigger){
 				if(!isset($upd_triggers[$trigger['triggerid']])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 				}
-				$triggerids[] = $trigger['triggerid'];
 			}
-
 
 			foreach($triggers as $tnum => $trigger){
 
@@ -1242,6 +1240,12 @@ COpt::memoryPick();
 				if(!check_db_fields($trigger_db_fields, $trigger)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for trigger');
 				}
+
+				if($trigger_db_fields['type'] == $trigger['type']) $trigger['type'] = null;
+				if($trigger_db_fields['priority'] == $trigger['priority']) $trigger['priority'] = null;
+				if($trigger_db_fields['comments'] == $trigger['comments']) $trigger['comments'] = null;
+				if($trigger_db_fields['url'] == $trigger['url']) $trigger['url'] = null;
+
 
 				$result = update_trigger(
 					$trigger['triggerid'],
