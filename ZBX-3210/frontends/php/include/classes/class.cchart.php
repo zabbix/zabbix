@@ -858,7 +858,7 @@ class CChart extends CGraphDraw{
 
 			$this->gridLinesCount[$other_side] = $this->gridLinesCount[$side];
 
-			$this->m_maxY[$other_side] = $this->m_minY[$other_side] + bcmul($interval, $this->gridLinesCount[$other_side]);
+			$this->m_maxY[$other_side] = bcadd($this->m_minY[$other_side], bcmul($interval, $this->gridLinesCount[$other_side]));
 
 			$this->gridStep[$other_side] = $interval;
 		}
