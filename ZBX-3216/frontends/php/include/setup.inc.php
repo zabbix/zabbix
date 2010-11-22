@@ -385,7 +385,7 @@
 			DBclose();
 
 			if($DB['TYPE'] == 'SQLITE3' && !zbx_is_callable(array('sem_get','sem_acquire','sem_release','sem_remove'))){
-				error('SQLite3 required IPC functions');
+				error('SQLite3 requires IPC functions');
 				$result &= false;
 			}
 
