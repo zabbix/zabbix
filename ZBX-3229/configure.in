@@ -922,6 +922,7 @@ have_jabber="no"
 have_snmp="no"
 have_ipmi="no"
 have_ipv6="no"
+have_ssh2="no"
 
 if test "$ipv6" = "yes"; then
 	AC_DEFINE(HAVE_IPV6,1,[Define to 1 if IPv6 should be enabled.])
