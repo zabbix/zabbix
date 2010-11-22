@@ -487,6 +487,14 @@ Copt::memoryPick();
 				'editable' => 1,
 				'preservekeys' => 1
 			));
+
+			$dbProxies = CProxy::get(array(
+				'proxyids' => zbx_objectValues($interfaces, 'hostid'),
+				'editable' => 1,
+				'preservekeys' => 1
+			));
+
+			$dbHosts = zbx_array_merge($dbHosts, $dbProxies);
 		}
 
 		foreach($interfaces as $inum => &$interface){

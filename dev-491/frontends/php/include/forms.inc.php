@@ -19,35 +19,6 @@
 **/
 ?>
 <?php
-	require_once('include/users.inc.php');
-
-	class CGetForm{
-		private $data;
-		private $form;
-		private $scripts;
-
-		public function __construct(){
-		}
-
-		public function assign($data){
-			$this->data = $data;
-		}
-
-		public function render($file){
-			if(!preg_match("/[a-z\.]+/", $file)){
-				error('Invalid form name given ['.$file.']');
-				return false;
-			}
-
-			ob_start();
-			$this->form = include('./include/forms/'.$file.'.php');
-			$this->scripts = ob_get_clean();
-
-			print($this->scripts);
-			return $this->form;
-		}
-	}
-
 	function insert_slideshow_form(){
 		$form = new CFormTable(S_SLIDESHOW, null, 'post');
 		$form->setHelp('config_advanced.php');

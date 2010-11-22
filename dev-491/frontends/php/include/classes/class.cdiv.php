@@ -39,7 +39,7 @@ class CDiv extends CTag{
 
 		if(!defined('ZBX_JQUERY_INPUTSET')){
 			define('ZBX_JQUERY_INPUTSET', true);
-			zbx_add_post_js('jQuery("div[class=jqueryinputset]").buttonset();');
+			zbx_add_post_js('setTimeout(function(){jQuery("div[class=jqueryinputset]").buttonset();}, 10);');
 		}
 
 		return $this;

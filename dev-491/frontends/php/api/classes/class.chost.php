@@ -76,7 +76,7 @@ class CHost extends CZBXAPI{
 		$user_type = $USER_DETAILS['type'];
 		$userid = $USER_DETAILS['userid'];
 
-		$sort_columns = array('hostid', 'host', 'status', 'dns', 'ip'); // allowed columns for sorting
+		$sort_columns = array('hostid', 'host', 'status'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM); // allowed output options for [ select_* ] params
 
 
@@ -1269,7 +1269,7 @@ Copt::memoryPick();
 				if(!isset($dbHosts[$host['hostid']]))
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 
-				$host['host'] = $dbHosts[$host['hostid']]['host'];
+				if($delete) $proxy['host'] = $dbProxies[$proxy['proxyid']]['host'];
 			}
 			else{
 				if(!isset($host['groups']))
@@ -1299,7 +1299,7 @@ Copt::memoryPick();
 
 			if(isset($host['host'])){
 				if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $host['host'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect characters used for Hostname [ '.$host['host'].' ]');
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect characters used for Host name [ '.$host['host'].' ]');
 				}
 
 				$hostsExists = self::get(array(

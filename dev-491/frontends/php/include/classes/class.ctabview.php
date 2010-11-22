@@ -32,7 +32,7 @@ class CTabView extends CDiv{
 	protected $selectedTab = null;
 	protected $rememberTab = false;
 
-	public function __construct($data){
+	public function __construct($data = array()){
 		if(isset($data['id'])) $this->id = $data['id'];
 		if(isset($data['remember'])) $this->setRemember($data['remember']);
 		if(isset($data['selected'])) $this->setSelected($data['selected']);

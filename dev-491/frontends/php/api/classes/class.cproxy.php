@@ -77,12 +77,13 @@ class CProxy extends CZBXAPI{
 			'excludeSearch'				=> null,
 
 // OutPut
-			'extendoutput'				=> null,
 			'output'					=> API_OUTPUT_REFER,
 			'countOutput'				=> null,
 			'preservekeys'				=> null,
 
 			'selectHosts'				=> null,
+			'selectInterfaces'			=> null,
+			'limitSelects'				=> null,
 
 			'sortfield'					=> '',
 			'sortorder'					=> '',
@@ -91,9 +92,16 @@ class CProxy extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $options);
 
+		if(is_array($options['output'])){
+			unset($sql_parts['select']['hosts']);
+			$sql_parts['select']['hostid'] = ' h.hostid';
+			foreach($options['output'] as $key => $field){
+				if($field == 'proxyid') continue;
+				
+				$sql_parts['select'][$field] = ' h.'.$field;
+			}
 
-		if(!is_null($options['extendoutput'])){
-			$options['output'] = API_OUTPUT_EXTEND;
+			$options['output'] = API_OUTPUT_CUSTOM;
 		}
 
 
@@ -102,6 +110,7 @@ class CProxy extends CZBXAPI{
 		}
 		else{
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
+
 			if($permission == PERM_READ_WRITE)
 				return array();
 		}
@@ -201,12 +210,16 @@ class CProxy extends CZBXAPI{
 						$result[$proxy['proxyid']]['hosts'] = array();
 					}
 
+					if(!is_null($options['selectInterfaces']) && !isset($result[$proxy['proxyid']]['interfaces'])){
+						$result[$proxy['proxyid']]['interfaces'] = array();
+					}
+
 					$result[$proxy['proxyid']] += $proxy;
 				}
 			}
 		}
 
-		if(!is_null($options['countOutput'])){
+		if(!is_null($options['countOutput']) || empty($proxyids)){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
@@ -214,18 +227,61 @@ class CProxy extends CZBXAPI{
 // Adding Objects
 
 // selectHosts
-		if(!empty($proxyids)){
-			if(!is_null($options['selectHosts']) && str_in_array($options['selectHosts'], $subselects_allowed_outputs)){
-				$obj_params = array(
-					'nodeids' => $nodeids,
-					'output' => $options['selectHosts'],
-					'proxyids' => $proxyids,
-					'preservekeys' => 1
-				);
+		if(!is_null($options['selectHosts'])){
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'proxyids' => $proxyids,
+				'preservekeys' => 1
+			);
+			if(is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['selectHosts'];
+
 				$hosts = CHost::get($obj_params);
 
 				foreach($hosts as $host){
 					$result[$host['proxy_hostid']]['hosts'][] = $host;
+				}
+			}
+		}
+
+// Adding HostInterfaces
+		if(!is_null($options['selectInterfaces'])){
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'hostids' => $proxyids,
+				'nopermissions' => 1,
+				'preservekeys' => 1
+			);
+			if(is_array($options['selectInterfaces']) || str_in_array($options['selectInterfaces'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['selectInterfaces'];
+				$interfaces = CHostInterface::get($obj_params);
+
+				if(!is_null($options['limitSelects']))
+					order_result($interfaces, 'interfaceid', ZBX_SORT_UP);
+
+				$count = array();
+				foreach($interfaces as $interfaceid => $interface){
+					if(!is_null($options['limitSelects'])){
+						if(!isset($count[$interface['hostid']])) $count[$interface['hostid']] = 0;
+						$count[$interface['hostid']]++;
+
+						if($count[$interface['hostid']] > $options['limitSelects']) continue;
+					}
+
+					$result[$interface['hostid']]['interfaces'][] = &$interfaces[$interfaceid];
+				}
+			}
+			else if(API_OUTPUT_COUNT == $options['selectInterfaces']){
+				$obj_params['countOutput'] = 1;
+				$obj_params['groupCount'] = 1;
+
+				$interfaces = CHostInterface::get($obj_params);
+				$interfaces = zbx_toHash($interfaces, 'hostid');
+				foreach($result as $proxyid => $proxy){
+					if(isset($interfaces[$proxyid]))
+						$result[$proxyid]['interfaces'] = $interfaces[$proxyid]['rowscount'];
+					else
+						$result[$proxyid]['interfaces'] = 0;
 				}
 			}
 		}
@@ -238,5 +294,256 @@ class CProxy extends CZBXAPI{
 	return $result;
 	}
 
+	protected static function checkInput(&$proxies, $method){
+		global $USER_DETAILS;
+
+		$create = ($method == 'create');
+		$update = ($method == 'update');
+		$delete = ($method == 'delete');
+
+		foreach($proxies as $inum => &$proxy){
+			if(isset($proxy['proxyid'])) $proxy['hostid'] = $proxy['proxyid'];
+			if(isset($proxy['hostid'])) $proxy['proxyid'] = $proxy['hostid'];
+		}
+		unset($proxy);
+
+// permissions
+		if($update || $delete){
+			$proxyDBfields = array('proxyid'=> null);
+			$dbProxies = self::get(array(
+				'output' => array('proxyid', 'hostid', 'host'),
+				'proxyids' => zbx_objectValues($proxies, 'proxyid'),
+				'editable' => 1,
+				'preservekeys' => 1
+			));
+		}
+		else{
+			$proxyDBfields = array('host'=>null);
+		}
+
+
+		foreach($proxies as $inum => &$proxy){
+			if(!check_db_fields($proxyDBfields, $proxy)){
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for proxy [ '.$proxy['host'].' ]');
+			}
+
+			if($update || $delete){
+				if(!isset($dbProxies[$proxy['proxyid']]))
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+
+				if($delete) $proxy['host'] = $dbProxies[$proxy['proxyid']]['host'];
+			}
+			else{
+				if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type'])
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+
+				if(!isset($proxy['interfaces']))
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'No interfaces for proxy [ '.$proxy['host'].' ]');
+			}
+
+			if($delete) continue;
+
+			if(isset($proxy['interfaces'])){
+				if(!is_array($proxy['interfaces']) || empty($proxy['interfaces']))
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'No interfaces for proxy [ '.$proxy['host'].' ]');
+			}
+
+			if(isset($proxy['host'])){
+				if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $proxy['host'])){
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect characters used for Proxy name [ '.$proxy['host'].' ]');
+				}
+
+				$proxiesExists = self::get(array(
+					'filter' => array('host' => $proxy['host'])
+				));
+				foreach($proxiesExists as $exnum => $proxyExists){
+					if(!$update || ($proxyExists['proxyid'] != $proxy['proxyid'])){
+						self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$proxy['host'].' ] '.S_ALREADY_EXISTS_SMALL);
+					}
+				}
+			}
+		}
+		unset($proxy);
+	}
+
+
+	public static function create($proxies){
+		$proxies = zbx_toArray($proxies);
+		$proxyids = array();
+
+		try{
+			self::BeginTransaction(__METHOD__);
+
+			self::checkInput($proxies, __FUNCTION__);
+
+			$proxyids = DB::insert('hosts', $proxies);
+
+			$hostUpdate = array();
+			foreach($proxies as $pnum => $proxy){
+				if(!isset($proxy['hosts'])) continue;
+
+				$hostids = zbx_objectValues($proxy['hosts'], 'hostid');
+				$hostUpdate[] = array(
+					'values' => array('proxy_hostid' => $proxyids[$pnum]),
+					'where' => array(DBCondition('hostid', $hostids))
+				);
+// INTERFACES
+				foreach($proxy['interfaces'] as $ifnum => &$interface){
+					$interface['hostid'] = $proxyids[$pnum];
+				}
+				unset($interface);
+
+				$result = CHostInterface::create($proxy['interfaces']);
+				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Proxy interface creation failed');
+			}
+
+			DB::update('hosts', $hostUpdate);
+
+			self::EndTransaction(true, __METHOD__);
+			return array('proxyids' => $proxyids);
+		}
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
+			return false;
+		}
+	}
+
+
+	public static function update($proxies){
+		$proxies = zbx_toArray($proxies);
+		$proxyids = array();
+
+		try{
+			self::BeginTransaction(__METHOD__);
+
+			self::checkInput($proxies, __FUNCTION__);
+
+			$proxyUpdate = array();
+			$hostUpdate = array();
+			foreach($proxies as $pnum => $proxy){
+				$proxyids[] = $proxy['proxyid'];
+
+				$proxyUpdate[] = array(
+					'values' => $proxy,
+					'where' => array('hostid='.$proxy['proxyid'])
+				);
+
+				if(!isset($proxy['hosts'])) continue;
+
+				$hostUpdate[] = array(
+					'values' => array('proxy_hostid' => 0),
+					'where' => array('proxy_hostid='.$proxy['proxyid'])
+				);
+
+				$hostids = zbx_objectValues($proxy['hosts'], 'hostid');
+				$hostUpdate[] = array(
+					'values' => array('proxy_hostid' => $proxy['proxyid']),
+					'where' => array(DBCondition('hostid', $hostids))
+				);
+
+// INTERFACES
+				if(isset($proxy['interfaces']) && is_array($proxy['interfaces'])){
+					$result = CHostInterface::update($proxy['interfaces']);
+					if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Proxy interface update failed');
+				}
+			}
+
+			DB::update('hosts', $proxyUpdate);
+			DB::update('hosts', $hostUpdate);
+
+			self::EndTransaction(true, __METHOD__);
+			return array('proxyids' => $proxyids);
+		}
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
+			return false;
+		}
+	}
+	
+/**
+ * Delete Proxy
+ *
+ * @param array $proxies
+ * @param array $proxies[0, ...]['hostid'] Host ID to delete
+ * @return array|boolean
+ */
+	public static function delete($proxies){
+		if(empty($proxies)) return true;
+
+		$proxies = zbx_toArray($proxies);
+		$proxyids = zbx_objectValues($proxies, 'proxyid');
+
+		try{
+			self::BeginTransaction(__METHOD__);
+
+			self::checkInput($proxies, __FUNCTION__);
+
+// disable actions
+			$actionids = array();
+
+// conditions
+			
+			$sql = 'SELECT DISTINCT actionid '.
+					' FROM conditions '.
+					' WHERE conditiontype='.CONDITION_TYPE_PROXY.
+						' AND '.DBcondition('value',$proxyids, false, true);		// FIXED[POSIBLE value type violation]!!!
+			$db_actions = DBselect($sql);
+			while($db_action = DBfetch($db_actions)){
+				$actionids[$db_action['actionid']] = $db_action['actionid'];
+			}
+
+			if(!empty($actionids)){
+				$update = array();
+				$update[] = array(
+					'values' => array('status' => ACTION_STATUS_DISABLED),
+					'where' => array(DBcondition('actionid',$actionids))
+				);
+				DB::update('actions', $update);
+			}
+
+// delete action conditions
+			DB::delete('conditions', array(
+				'conditiontype'=>CONDITION_TYPE_PROXY,
+				'value'=>$proxyids
+			));
+
+// interfaces
+			DB::delete('interface', array('hostid'=>$proxyids));
+
+// Proxies
+			$update = array();
+			$update[] = array(
+				'values' => array('proxy_hostid' => 0),
+				'where' => array(DBcondition('proxy_hostid',$proxyids))
+			);
+			DB::update('hosts', $update);
+
+
+// delete host
+			DB::delete('hosts', array('hostid'=>$proxyids));
+
+// TODO: remove info from API
+			foreach($proxies as $hnum => $proxy) {
+				info(S_HOST_HAS_BEEN_DELETED_MSG_PART1.SPACE.$proxy['host'].SPACE.S_HOST_HAS_BEEN_DELETED_MSG_PART2);
+				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_PROXY,'['.$proxy['host'].' ] ['.$proxy['hostid'].']');
+			}
+
+			self::EndTransaction(true, __METHOD__);
+			return array('proxyids' => $proxyids);
+		}
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
+			return false;
+		}
+	}
 }
 ?>
