@@ -1006,7 +1006,6 @@ table.msgok{
 
 table.msgok tr td{
 	color:#333;
-	font-size:1.1em;
 	text-align:center;
 }
 
@@ -1019,6 +1018,7 @@ table.msgok tr td.clr{
 
 table.msgok tr td.msg_main{
 	height: 26px;
+	font-size: 1.1em;
 }
 
 table.msgok tr td.msg{
@@ -1032,19 +1032,18 @@ table.msgerr{
 
 table.msgerr tr td{
 	color:#333;
-	font-size:1.1em;
 	text-align:center;
 }
 
 table.msgerr tr td.clr{
 	width: 60px;
 	background-color:#CC4444;
-	font-size:10px;
 	font-weight: bold;
 }
 
 table.msgerr tr td.msg_main{
 	height: 26px;
+	font-size: 1.1em;
 }
 
 table.msgerr tr td.msg{
