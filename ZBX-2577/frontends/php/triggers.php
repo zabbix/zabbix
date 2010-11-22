@@ -171,6 +171,18 @@ include_once('include/page_header.php');
 				$_REQUEST['expression'] = explode_exp($triggerData['expression'],0);
 			}
 
+			$current_deps = get_trigger_dependencies_by_triggerid($_REQUEST['triggerid']);
+			sort($deps);
+			sort($current_deps);
+			if($deps == $current_deps){
+				$deps = null;
+			}
+
+			if($triggerData['type'] == $_REQUEST['type']) $_REQUEST['type'] = null;
+			if($triggerData['priority'] == $_REQUEST['priority']) $_REQUEST['priority'] = null;
+			if($triggerData['comments'] == $_REQUEST['comments']) $_REQUEST['comments'] = null;
+			if($triggerData['url'] == $_REQUEST['url']) $_REQUEST['url'] = null;
+
 			DBstart();
 
 			$result = update_trigger($_REQUEST['triggerid'],
@@ -205,7 +217,7 @@ include_once('include/page_header.php');
 			'output'=> API_OUTPUT_EXTEND,
 		);
 		$triggers = CTrigger::get($options);
-		
+
 		if($triggerData = reset($triggers)){
 			$host = reset($triggerData['hosts']);
 
@@ -382,7 +394,7 @@ include_once('include/page_header.php');
 		$triggerids = array();
 		$options = array(
 			'triggerids' => $_REQUEST['g_triggerid'],
-			'editable'=>1, 
+			'editable'=>1,
 			'select_hosts' => API_OUTPUT_EXTEND,
 			'output'=>API_OUTPUT_EXTEND,
 			'expandDescription' => 1
