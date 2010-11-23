@@ -1808,7 +1808,8 @@ int	zbx_pg_escape_bytea(const u_char *input, int ilen, char **output, int *olen)
 	o = *output;
 	i = input;
 
-	while(i - input < ilen) {
+	while(i - input < ilen)
+	{
 		if(*i == '\0' || *i <= 0x1f || *i >= 0x7f)
 		{
 			*o++ = '\\';
@@ -1865,7 +1866,8 @@ int	zbx_pg_unescape_bytea(u_char *io)
 
 	assert(io);
 
-	while(*i != '\0') {
+	while(*i != '\0')
+	{
 		switch(*i)
 		{
 			case '\\':
@@ -1893,46 +1895,6 @@ int	zbx_pg_unescape_bytea(u_char *io)
 	return o - io;
 }
 #endif
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_get_field                                                    *
- *                                                                            *
- * Purpose: return Nth field of character separated string                    *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-int	zbx_get_field(const char *line, char *result, int num, char separator)
-{
-	int delim=0;
-	int ptr=0;
-	int i;
-
-	int ret = FAIL;
-
-	for(i=0;line[i]!=0;i++)
-	{
-		if(line[i]==separator)
-		{
-			delim++;
-			continue;
-		}
-		if(delim==num)
-		{
-			result[ptr++]=line[i];
-			result[ptr]=0;
-			ret = SUCCEED;
-		}
-	}
-	return ret;
-}
 
 /******************************************************************************
  *                                                                            *
@@ -2373,14 +2335,16 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service)
 #ifdef _WINDOWS
 static int	get_codepage(const char *encoding, unsigned int *codepage)
 {
-	typedef struct codepage_s {
+	typedef struct
+	{
 		unsigned int	codepage;
-		char		*name;
-	} codepage_t;
+		const char	*name;
+	}
+	codepage_t;
 
 	int		i;
 	char		buf[16];
-	codepage_t	cp[] = {{0, "ANSI"}, {037, "IBM037"}, {437, "IBM437"}, {500, "IBM500"}, {708, "ASMO-708"},
+	codepage_t	cp[] = {{0, "ANSI"}, {37, "IBM037"}, {437, "IBM437"}, {500, "IBM500"}, {708, "ASMO-708"},
 			{709, NULL}, {710, NULL}, {720, "DOS-720"}, {737, "IBM737"}, {775, "IBM775"}, {850, "IBM850"},
 			{852, "IBM852"}, {855, "IBM855"}, {857, "IBM857"}, {858, "IBM00858"}, {860, "IBM860"},
 			{861, "IBM861"}, {862, "DOS-862"}, {863, "IBM863"}, {864, "IBM864"}, {865, "IBM865"},

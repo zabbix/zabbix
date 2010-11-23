@@ -763,7 +763,6 @@ void	zbx_hex2octal(const char *input, char **output, int *olen);
 int	zbx_pg_escape_bytea(const u_char *input, int ilen, char **output, int *olen);
 int	zbx_pg_unescape_bytea(u_char *io);
 #endif
-int	zbx_get_field(const char *line, char *result, int num, char separator);
 int	zbx_get_next_field(const char **line, char **output, int *olen, char separator);
 int	str_in_list(const char *list, const char *value, const char delimiter);
 
