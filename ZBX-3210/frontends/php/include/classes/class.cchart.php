@@ -788,12 +788,8 @@ class CChart extends CGraphDraw{
 				$t = bcsub($int,$columnInterval);
 			}
 
-<<<<<<< .mine
 			if(bccomp($t, $dist)==-1){
 
-=======
-			if(bccomp($t,$dist)==-1){
->>>>>>> .r15643
 				$dist = $t;
 				$interval = $int;
 			}
@@ -949,7 +945,7 @@ class CChart extends CGraphDraw{
 		foreach($intervals as $num => $int){
 			$t = abs($int['sub']-$raw_time_interval);
 
-			if(bccomp($t,$dist)==-1){
+			if($t<$dist){
 				$dist = $t;
 				$sub_interval = $int['sub'];
 
