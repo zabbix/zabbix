@@ -68,7 +68,7 @@ class CGraphDraw{
 
 		$this->graphtheme = array(
 			'description' => 'default',
-			'frontendtheme' => 'default.css',
+			'frontendtheme' => 'css_ob.css',
 			'textcolor' => '202020',
 			'highlightcolor' => 'aa4444',
 			'backgroundcolor' => 'f0f0f0',

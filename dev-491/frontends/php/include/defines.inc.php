@@ -717,7 +717,7 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 
 	define('ZBX_USER_ONLINE_TIME', 600);		// 10min
 	define('ZBX_GUEST_USER','guest');
-	define('ZBX_DEFAULT_CSS','default.css');
+	define('ZBX_DEFAULT_CSS','css_ob.css');
 
 	define('ZBX_FAVORITES_ALL', -1);
 
