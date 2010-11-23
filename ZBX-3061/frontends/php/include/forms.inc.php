@@ -2697,7 +2697,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		}
 
 		$row = array($exprtxt,
-					 new CButton('insert',$input_method == IM_TREE ? S_EDIT : S_SELECT,
+					 new CButton('insert',$input_method == IM_TREE ? S_EDIT : S_ADD,
 								 "return PopUp('popup_trexpr.php?dstfrm=".$frmTrig->getName().
 								 "&dstfld1=${exprfname}&srctbl=expression".
 								 "&srcfld1=expression&expression=' + escape($exprparam),1000,700);"));
@@ -2877,25 +2877,6 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		insert_js($script);
 
 	return $frmTrig;
-	}
-
-	function insert_trigger_comment_form($triggerid){
-
-		$trigger = DBfetch(DBselect('SELECT t.*, h.* '.
-			' FROM triggers t, functions f, items i, hosts h '.
-			' WHERE t.triggerid='.$triggerid.
-				' AND f.triggerid=t.triggerid '.
-				' AND f.itemid=i.itemid '.
-				' AND i.hostid=h.hostid '));
-
-		$frmComent = new CFormTable(S_COMMENTS." for ".$trigger['host']." : \"".expand_trigger_description_by_data($trigger).'"');
-		$frmComent->setHelp("web.tr_comments.comments.php");
-		$frmComent->addVar("triggerid",$triggerid);
-		$frmComent->addRow(S_COMMENTS,new CTextArea("comments",$trigger["comments"],100,25));
-		$frmComent->addItemToBottomRow(new CButton("save",S_SAVE));
-		$frmComent->addItemToBottomRow(new CButtonCancel('&triggerid='.$triggerid));
-
-		$frmComent->show();
 	}
 
 	function insert_graph_form(){
@@ -5245,6 +5226,7 @@ JAVASCRIPT;
 
 		insert_js('
 			function addMacroRow(){
+				
 				if(typeof(addMacroRow.macro_count) == "undefined"){
 					addMacroRow.macro_count = '.count($macros).';
 				}
@@ -5310,7 +5292,7 @@ JAVASCRIPT;
 		}
 
 
-		$script = '$$("#tbl_macros input:checked").each(function(obj){ $(obj.parentNode.parentNode).remove(); });';
+		$script = '$$("#tbl_macros input:checked").each(function(obj){ $(obj.parentNode.parentNode).remove(); if (typeof(deleted_macro_cnt) == \'undefined\') deleted_macro_cnt=1; else deleted_macro_cnt++; });';
 		$delete_btn = new CButton('macros_del', S_DELETE_SELECTED, $script);
 		$delete_btn->setType('button');
 
@@ -5327,7 +5309,7 @@ JAVASCRIPT;
 
 		$footer = null;
 		if($hostid === null){
-			$footer = array(new CButton('save', S_SAVE));
+			$footer = array(new CButton('save', S_SAVE, "if (deleted_macro_cnt > 0) return confirm('".S_ARE_YOU_SURE_YOU_WANT_TO_DELETE." '+deleted_macro_cnt+' ".S_MACROS_ES."?');"));
 		}
 
 		return new CFormElement(S_MACROS, $macros_tbl, $footer);

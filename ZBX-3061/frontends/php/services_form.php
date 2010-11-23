@@ -341,6 +341,7 @@ if(isset($_REQUEST['sform'])){
 
 		$new_service_time['type'] = $_REQUEST['new_service_time']['type'];
 
+		//sdii($_REQUEST['new_service_time']);
 		if($_REQUEST['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME){
 			$new_service_time['from'] = $_REQUEST['new_service_time']['from'];
 			$new_service_time['to'] = $_REQUEST['new_service_time']['to'];
@@ -351,13 +352,24 @@ if(isset($_REQUEST['sform'])){
 			$new_service_time['to'] = strtotime($_REQUEST['new_service_time']['to_week'].' '.$_REQUEST['new_service_time']['to']);
 			$new_service_time['note'] = $_REQUEST['new_service_time']['note'];
 		}
-
+		//sdi($new_service_time);
 		while($new_service_time['to'] && ($new_service_time['to'] <= $new_service_time['from']))
 			$new_service_time['to'] += 7*24*3600;
 
+		//validating service times that were entered
+		if ($new_service_time['to'] == false){
+			//time 'to' has a wrong format
+			error(S_ERROR_ADDING_SERVICE_TIME.' '.$_REQUEST['new_service_time']['to'].' '.S_IS_A_WRONG_TIME_FORMAT);
+		}
+		elseif($new_service_time['from'] == false) {
+			//time 'from' has a wrong format
+			error(S_ERROR_ADDING_SERVICE_TIME.' '.$_REQUEST['new_service_time']['from'].' '.S_IS_A_WRONG_TIME_FORMAT);
+		}
+		elseif(!str_in_array($_REQUEST['service_times'], $new_service_time)){
+			//if this time is not already there, adding it for insertation
+			array_push($_REQUEST['service_times'],$new_service_time);		
+		}
 
-		if($new_service_time['to'] && !str_in_array($_REQUEST['service_times'], $new_service_time))
-			array_push($_REQUEST['service_times'],$new_service_time);
 	}
 	else if(isset($_REQUEST['del_service_times']) && isset($_REQUEST['rem_service_times'])){
 		$_REQUEST['service_times'] = get_request('service_times',array());
@@ -716,7 +728,7 @@ if(isset($_REQUEST['sform'])){
 	$frmService->addRow(S_NEW_SERVICE_TIME, array(
 			$cmbTimeType, BR(),
 			$time_param,
-			new CButton('add_service_time',S_ADD_SMALL,'javascript: document.forms[0].action += \'?sform=1\'; submit();')
+			new CButton('add_service_time',S_ADD_SMALL,'javascript: document.forms[0].action += \'?sform=1\';')
 		));
 //trigger
 	$frmService->addRow(S_LINK_TO_TRIGGER_Q, new CCheckBox('linktrigger',$linktrigger,"javascript: display_element('trigger_name');",1));

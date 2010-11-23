@@ -117,8 +117,8 @@
 #define OFF	0
 
 #define	APPLICATION_NAME	"Zabbix Agent"
-#define	ZABBIX_REVDATE		"4 October 2010"
-#define	ZABBIX_VERSION		"1.8.4rc1"
+#define	ZABBIX_REVDATE		"1 November 2010"
+#define	ZABBIX_VERSION		"1.8.4rc2"
 #define	ZABBIX_REVISION		"{ZABBIX_REVISION}"
 
 #if defined(_WINDOWS)
@@ -765,7 +765,7 @@ int	zbx_pg_unescape_bytea(u_char *io);
 #endif
 int	zbx_get_field(const char *line, char *result, int num, char separator);
 int	zbx_get_next_field(const char **line, char **output, int *olen, char separator);
-int	str_in_list(char *list, const char *value, const char delimiter);
+int	str_in_list(const char *list, const char *value, const char delimiter);
 
 #ifdef HAVE___VA_ARGS__
 #	define zbx_setproctitle(fmt, ...) __zbx_zbx_setproctitle(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
@@ -777,8 +777,9 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 #define SEC_PER_MIN 60
 #define SEC_PER_HOUR 3600
 #define SEC_PER_DAY 86400
-#define SEC_PER_WEEK (7*SEC_PER_DAY)
-#define SEC_PER_YEAR (365*SEC_PER_DAY)
+#define SEC_PER_WEEK (7 * SEC_PER_DAY)
+#define SEC_PER_MONTH (30 * SEC_PER_DAY)
+#define SEC_PER_YEAR (365 * SEC_PER_DAY)
 #define ZBX_JAN_1970_IN_SEC   2208988800.0        /* 1970 - 1900 in seconds */
 double	zbx_time();
 double	zbx_current_time();
@@ -905,6 +906,7 @@ void	zbx_strupper(char *str);
 char	*convert_to_utf8(char *in, size_t in_size, const char *encoding);
 #endif	/* HAVE_ICONV */
 char	*zbx_replace_utf8(const char *text, char replacement);
+int	zbx_strlen_utf8(const char *text);
 
 void	win2unix_eol(char *text);
 int	str2uint(const char *str);

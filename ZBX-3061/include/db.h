@@ -531,13 +531,13 @@ DB_ESCALATION
 #define DBnode_local(fieldid) DBnode(fieldid, CONFIG_NODEID)
 const char *DBnode(const char *fieldid, const int nodeid);
 
-int	DBping(void);
+int	DBping();
 
 void    DBconnect(int flag);
 void	DBinit();
 
-void    DBclose(void);
-void    DBvacuum(void);
+void    DBclose();
+void    DBvacuum();
 
 #ifdef HAVE___VA_ARGS__
 #	define DBexecute(fmt, ...) __zbx_DBexecute(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)

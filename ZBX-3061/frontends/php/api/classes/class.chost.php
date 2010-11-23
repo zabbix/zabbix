@@ -174,6 +174,7 @@ class CHost extends CZBXAPI{
 
 		if(is_array($options['output'])){
 			unset($sql_parts['select']['hosts']);
+			$sql_parts['select']['hostid'] = ' h.hostid';
 			foreach($options['output'] as $key => $field){
 				$sql_parts['select'][$field] = ' h.'.$field;
 			}
@@ -1751,8 +1752,9 @@ Copt::memoryPick();
  * @param array $hosts[0, ...]['hostid'] Host ID to delete
  * @return array|boolean
  */
-	public static function delete($hostids){
-		$hostids = zbx_toArray($hostids);
+	public static function delete($hosts){
+		$hosts = zbx_toArray($hosts);
+		$hostids = zbx_objectValues($hosts, 'hostid');
 		if(empty($hostids)) return true;
 
 		try{

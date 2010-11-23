@@ -414,6 +414,8 @@ insert into help_items values(0,'kernel.maxproc','Maximum number of processes su
 insert into help_items values(0,'net.if.collisions[if]','Out-of-window collision. Collisions count.');
 insert into help_items values(0,'net.if.in[if &lt;,mode&gt;]','Network interface input statistic. Integer value. If mode is missing bytes is used.');
 insert into help_items values(0,'net.if.out[if &lt;,mode&gt;]','Network interface output statistic. Integer value. If mode is missing bytes is used.');
+insert into help_items values(0,'net.if.total[if &lt;,mode&gt;]','Sum of network interface incoming and outgoing statistics. Integer value. Mode - one of bytes (default), packets, errors or dropped');
+insert into help_items values(0,'net.if.list','List of network interfaces. Text value.');
 insert into help_items values(0,'net.tcp.dns[ip, zone]','Checks if DNS service is up. 0 - DNS is down, 1 - DNS is up.');
 insert into help_items values(0,'net.tcp.dns.query[ip, zone, type]','Performs a query for the record type specified by the parameter type');
 insert into help_items values(0,'net.tcp.listen[port]','Checks if this port is in LISTEN state. 0 - it is not, 1 - it is in LISTEN state.');
@@ -464,6 +466,8 @@ insert into help_items values(7,'kernel.maxproc','Maximum number of processes su
 insert into help_items values(7,'net.if.collisions[if]','Out-of-window collision. Collisions count.');
 insert into help_items values(7,'net.if.in[if &lt;,mode&gt;]','Network interface input statistic. Integer value. If mode is missing bytes is used.');
 insert into help_items values(7,'net.if.out[if &lt;,mode&gt;]','Network interface output statistic. Integer value. If mode is missing bytes is used.');
+insert into help_items values(7,'net.if.total[if &lt;,mode&gt;]','Sum of network interface incoming and outgoing statistics. Integer value. Mode - one of bytes (default), packets, errors or dropped');
+insert into help_items values(7,'net.if.list','List of network interfaces. Text value.');
 insert into help_items values(7,'net.tcp.dns[ip, zone]','Checks if DNS service is up. 0 - DNS is down, 1 - DNS is up.');
 insert into help_items values(7,'net.tcp.dns.query[ip, zone, type]','Performs a query for the record type specified by the parameter type');
 insert into help_items values(7,'net.tcp.listen[port]','Checks if this port is in LISTEN state. 0 - it is not, 1 - it is in LISTEN state.');

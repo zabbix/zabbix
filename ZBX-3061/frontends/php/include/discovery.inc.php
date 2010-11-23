@@ -102,10 +102,11 @@ require_once('include/perm.inc.php');
 	}
 
 	function discovery_port2str($type_int, $port){
-//		$port_def = svc_default_port($type_int);
-//
-//		if ($port != $port_def)
+		$port_def = svc_default_port($type_int);
+
+		if($port != $port_def){
 			return ' ('.$port.')';
+		}
 
 	return '';
 	}

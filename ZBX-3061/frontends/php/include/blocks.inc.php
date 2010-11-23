@@ -848,6 +848,8 @@ return $table;
 
 // author Aly
 function make_latest_issues($filter = array()){
+	global $page;
+	
 	$config = select_config();
 
 	$limit = isset($filter['limit']) ? $filter['limit'] : 20;
@@ -991,11 +993,11 @@ function make_latest_issues($filter = array()){
 					$ack_info = make_acktab_by_eventid($row_event['eventid']);
 					$ack_info->setAttribute('style','width: auto;');
 
-					$ack=new CLink(S_YES,'acknow.php?eventid='.$row_event['eventid'],'off');
+					$ack=new CLink(S_YES,'acknow.php?eventid='.$row_event['eventid'].'&backurl='.$page['file'],'off');
 					$ack->setHint($ack_info, '', '', false);
 				}
 				else{
-					$ack= new CLink(S_NO,'acknow.php?eventid='.$row_event['eventid'],'on');
+					$ack= new CLink(S_NO,'acknow.php?eventid='.$row_event['eventid'].'&backurl='.$page['file'],'on');
 				}
 			}
 

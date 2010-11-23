@@ -593,16 +593,22 @@ return $caption;
  */
 	function zbx_unquote_param($value){
 		$value = trim($value);
-		if( !empty($value) && '"' == $value[0] ){
+		if( !empty($value) && '"' == zbx_substr($value, 0, 1) ){
 /* open quotes and unescape chars */
-			$value = substr($value, 1, zbx_strlen($value)-2);
+			$value = zbx_substr($value, 1, zbx_strlen($value)-2);
 
 			$new_val = '';
 			for ( $i=0, $max=zbx_strlen($value); $i < $max; $i++){
-				if( $i+1 < $max && $value[$i] == '\\' && ($value[$i+1] == '\\' || $value[$i+1] == '"') )
-					$new_val .= $value[++$i];
+
+				$current_char = zbx_substr($value, $i, 1);
+				$next_char = zbx_substr($value, $i+1, 1);
+
+				if( $i+1 < $max && $current_char == '\\' && ($next_char == '\\' || $next_char == '"') ){
+					$new_val .= $next_char;
+					$i = $i + 1;
+				}
 				else
-					$new_val .= $value[$i];
+					$new_val .= $current_char;
 			}
 			$value = $new_val;
 		}
@@ -628,18 +634,23 @@ return $caption;
 
 		for( $param_s = $i = 0, $len = zbx_strlen($string); $i < $len; $i++){
 			$char = zbx_substr($string, $i, 1);
+			$prev_char = $i > 0 ? zbx_substr($string, $i-1, 1) : '';
 			switch ( $char ){
 				case '"':
-					$quoted = !$quoted;
+					if ($prev_char!='\\'){
+						$quoted = !$quoted;
+					}
 					break;
 				case ',':
 					if( !$quoted ){
-						$params[] = zbx_unquote_param(substr($string, $param_s, $i - $param_s));
+						$params[] = zbx_unquote_param(zbx_substr($string, $param_s, $i - $param_s));
 						$param_s = $i+1;
 					}
 					break;
 				case '\\':
-					if( $quoted && $i+1 < $len && ($string[$i+1] == '\\' || $string[$i+1] == '"'))
+					$next_symbol = zbx_substr($string, $i+1, 1);
+
+					if( $quoted && $i+1 < $len && ($next_symbol == '\\' || $next_symbol == '"'))
 						$i++;
 					break;
 			}
@@ -651,10 +662,11 @@ return $caption;
 		}
 
 		if($i > $param_s){
-			$params[] = zbx_unquote_param(substr($string, $param_s, $i - $param_s));
+			$params[] = str_replace('\\"', '"', zbx_unquote_param(zbx_substr($string, $param_s, $i - $param_s)));
 		}
 
 	return $params;
+
 	}
 
 /*
@@ -827,8 +839,10 @@ return $caption;
 			showExpressionErrors($expression, $expressionData[$expression]['errors']);
 			return false;
 		}
-		if( !validate_trigger_dependency($expression, $deps))
+		if( !validate_trigger_dependency($expression, $deps)){
+			error(S_WRONG_DEPENDENCY_ERROR);
 			return false;
+		}
 
 		if(CTrigger::exists(array('description' => $description, 'expression' => $expression))){
 			error('Trigger '.$description.' already exists');
@@ -1167,7 +1181,7 @@ return $caption;
 				}
 
 				$state='';
-				$sql = 'SELECT h.host,i.itemid,i.key_,f.function,f.triggerid,f.parameter,i.itemid,i.status'.
+				$sql = 'SELECT h.host,i.itemid,i.key_,f.function,f.triggerid,f.parameter,i.itemid,i.status, i.type'.
 						' FROM items i,functions f,hosts h'.
 						' WHERE f.functionid='.$functionid.
 							' AND i.itemid=f.itemid '.
@@ -1205,6 +1219,10 @@ return $caption;
 									'items.php?form=update&itemid='.$function_data['itemid'].'&switch_node='.id2nodeid($function_data['itemid']),
 									$style
 								);
+
+						if($function_data['type'] == ITEM_TYPE_HTTPTEST){
+							$link = new CSpan($function_data['host'].':'.$function_data['key_'], $style);
+						}
 
 						array_push($exp,array('{',$link,'.',bold($function_data['function'].'('),$function_data['parameter'],bold(')'),'}'));
 					}
@@ -1321,6 +1339,10 @@ return $caption;
 									'items.php?form=update&itemid='.$function_data['itemid'],
 									$style
 								);
+
+						if($function_data['type'] == ITEM_TYPE_HTTPTEST){
+							$link = new CSpan($function_data['host'].':'.$function_data['key_'], $style);
+						}
 
 						array_push($exp,array('{',$link,'.',bold($function_data['function'].'('),$function_data['parameter'],bold(')'),'}'));
 					}
@@ -1466,6 +1488,19 @@ return $caption;
 
 	function update_trigger_comments($triggerids,$comments){
 		zbx_value2array($triggerids);
+
+		$triggers = CTrigger::get(array(
+			'editable' => 1,
+			'trigegrids' => $triggerids,
+			'output' => API_OUTPUT_SHORTEN,
+		));
+		$triggers = zbx_toHash($triggers, 'triggerid');
+		foreach($triggerids as $triggerid){
+			if(!isset($triggers[$triggerid])){
+				return false;
+			}
+		}
+
 
 		return	DBexecute('UPDATE triggers '.
 						' SET comments='.zbx_dbstr($comments).
@@ -1812,7 +1847,11 @@ return $caption;
 			return false;
 		}
 
-		if(!validate_trigger_dependency($expression, $deps)) return false;
+
+		if(!is_null($deps) && !validate_trigger_dependency($expression, $deps)) {
+			error(S_WRONG_DEPENDENCY_ERROR);
+			return false;
+		}
 
 		if(is_null($description)){
 			$description = $trigger['description'];
@@ -1876,11 +1915,12 @@ return $caption;
 						$description,
 						$type,
 						$priority,
-						NULL,		// status
+						$status,
 						$comments,
 						$url,
-						replace_template_dependencies($deps, $chd_trig_host['hostid']),
-						$triggerid);
+						(is_null($deps) ? null : replace_template_dependencies($deps, $chd_trig_host['hostid'])),
+						$triggerid
+					);
 				}
 			}
 		}
@@ -1914,13 +1954,15 @@ return $caption;
 
 		DB::update('triggers', array('values' => $update_values, 'where' => array('triggerid='.$triggerid)));
 
-		delete_dependencies_by_triggerid($triggerid);
+		if(!is_null($deps)){
+			delete_dependencies_by_triggerid($triggerid);
 
-		foreach($deps as $id => $triggerid_up){
-			if(!$result2=add_trigger_dependency($triggerid, $triggerid_up)){
-				error(S_INCORRECT_DEPENDENCY.' ['.expand_trigger_description($triggerid_up).']');
+			foreach($deps as $id => $triggerid_up){
+				if(!$result2=add_trigger_dependency($triggerid, $triggerid_up)){
+					error(S_INCORRECT_DEPENDENCY.' ['.expand_trigger_description($triggerid_up).']');
+				}
+				$result &= $result2;
 			}
-			$result &= $result2;
 		}
 
 		if($result){
@@ -2178,25 +2220,35 @@ return $caption;
 	function validate_trigger_dependency($expression, $deps) {
 		$result = true;
 
+		//if we have atleast one dependency
 		if(!empty($deps)){
 			$templates = array();
 			$templateids = array();
+			$templated_trigger = false;
 			$db_triggerhosts = get_hosts_by_expression($expression);
+
 			while($triggerhost = DBfetch($db_triggerhosts)){
-				if($triggerhost['status'] == HOST_STATUS_TEMPLATE){ //template
+				if($triggerhost['status'] == HOST_STATUS_TEMPLATE){
 					$templates[$triggerhost['hostid']] = $triggerhost;
 					$templateids[$triggerhost['hostid']] = $triggerhost['hostid'];
+					$templated_trigger = true;
 				}
 			}
 
 			$dep_templateids = array();
 			$db_dephosts = get_hosts_by_triggerid($deps);
 			while($dephost = DBfetch($db_dephosts)) {
-				if($dephost['status'] == HOST_STATUS_TEMPLATE){ //template
+				if($templated_dep = ($dephost['status'] == HOST_STATUS_TEMPLATE)){
 					$templates[$dephost['hostid']] = $dephost;
 					$dep_templateids[$dephost['hostid']] = $dephost['hostid'];
 				}
+
+				//we have a host trigger added to template trigger or otherwise
+				if($templated_trigger != $templated_dep){
+					return false;
+				}
 			}
+
 
 			$tdiff = array_diff($dep_templateids, $templateids);
 			if(!empty($templateids) && !empty($dep_templateids) && !empty($tdiff)){
@@ -2215,7 +2267,7 @@ return $caption;
 
 				foreach($map as $hostid => $templates){
 					$set_with_dep = false;
-					
+
 					foreach($templateids as $tplid){
 						if(isset($templates[$tplid])){
 							$set_with_dep = true;
@@ -2538,7 +2590,7 @@ return $caption;
 						if($event){
 							$ack_menu = array(
 											S_ACKNOWLEDGE,
-											'acknow.php?eventid='.$event['eventid'],
+											'acknow.php?eventid='.$event['eventid'].'&backurl=overview.php',
 											array('tw'=>'_blank')
 										);
 
@@ -4121,6 +4173,7 @@ $triggerExpressionRules['keyFunctionName'] = Array(
 		'prev',
 		'regexp',
 		'str',
+		'strlen',
 		'sum',
 		'time'),
 	'indexItem' => true,

@@ -261,6 +261,7 @@ include_once('include/page_header.php');
 
 	$m_form = new CForm('acknow.php');
 	$m_form->setName('tr_status');
+	$m_form->addVar('backurl', $page['file']);
 
 	$admin_links = (($USER_DETAILS['type'] == USER_TYPE_ZABBIX_ADMIN) || ($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN));
 	$show_event_col = ($config['event_ack_enable'] && ($_REQUEST['show_events'] != EVENTS_OPTION_NOEVENT));
@@ -429,9 +430,8 @@ include_once('include/page_header.php');
 			$used_hosts[$th['hostid']] = $th['host'];
 		}
 		$used_host_count = count($used_hosts);
-
+		
 		foreach($trigger['items'] as $inum => $item){
-
 			$item_description = item_description($item);
 
 			//if we have items from different hosts, we must prefix a host name
@@ -440,6 +440,7 @@ include_once('include/page_header.php');
 			}
 
 			$items[$inum]['itemid'] = $item['itemid'];
+			$items[$inum]['value_type'] = $item['value_type']; //ZBX-3059: So it would be possible to show different caption for history for chars and numbers (KB)
 			$items[$inum]['action'] = str_in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64)) ? 'showgraph' : 'showvalues';
 			$items[$inum]['description'] = $item_description;
 		}
@@ -586,7 +587,6 @@ include_once('include/page_header.php');
 
 		
 
-
 		$status = new CSpan(trigger_value2str($trigger['value']), get_trigger_value_style($trigger['value']));
 		if((time() - $trigger['lastchange']) < TRIGGER_BLINK_PERIOD){
 			$status->setAttribute('name', 'blink');
@@ -596,7 +596,7 @@ include_once('include/page_header.php');
 
 		if($config['event_ack_enable']){
 			if($trigger['event_count']){
-				$to_ack = new CCol(array(new CLink(S_ACKNOWLEDGE, 'acknow.php?triggers[]='.$trigger['triggerid'], 'on'), ' ('.$trigger['event_count'].')'));
+				$to_ack = new CCol(array(new CLink(S_ACKNOWLEDGE, 'acknow.php?triggers[]='.$trigger['triggerid'].'&backurl='.$page['file'], 'on'), ' ('.$trigger['event_count'].')'));
 			}
 			else{
 				$to_ack = new CCol(S_ACKNOWLEDGED, 'off');
@@ -652,10 +652,10 @@ include_once('include/page_header.php');
 						if($row_event['acknowledged'] == 1){
 							$acks_cnt = DBfetch(DBselect('SELECT COUNT(*) as cnt FROM acknowledges WHERE eventid='.$row_event['eventid']));
 							$ack = array(new CSpan(S_YES, 'off'),SPACE.'('.$acks_cnt['cnt'].SPACE,
-								new CLink(S_SHOW,'acknow.php?eventid='.$row_event['eventid']),')');
+								new CLink(S_SHOW,'acknow.php?eventid='.$row_event['eventid'].'&backurl='.$page['file']),')');
 						}
 						else{
-							$ack = new CLink(S_NOT_ACKNOWLEDGED, 'acknow.php?eventid='.$row_event['eventid'], 'on');
+							$ack = new CLink(S_NOT_ACKNOWLEDGED, 'acknow.php?eventid='.$row_event['eventid'].'&backurl='.$page['file'], 'on');
 						}
 					}
 					else{

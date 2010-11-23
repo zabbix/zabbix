@@ -564,40 +564,40 @@ include_once('include/page_header.php');
 // FULL CLONE {{{
 			if($clone_hostid && ($_REQUEST['form'] == 'full_clone')){
 // Host applications
-			$sql = 'SELECT * FROM applications WHERE hostid='.$clone_hostid.' AND templateid=0';
-			$res = DBselect($sql);
-			while($db_app = DBfetch($res)){
-				add_application($db_app['name'], $hostid, 0);
-			}
+				$sql = 'SELECT * FROM applications WHERE hostid='.$clone_hostid.' AND templateid=0';
+				$res = DBselect($sql);
+				while($db_app = DBfetch($res)){
+					add_application($db_app['name'], $hostid, 0);
+				}
 
 // Host items
-			$sql = 'SELECT DISTINCT i.itemid, i.description '.
-					' FROM items i '.
-					' WHERE i.hostid='.$clone_hostid.
-						' AND i.templateid=0 '.
-					' ORDER BY i.description';
+				$sql = 'SELECT DISTINCT i.itemid, i.description '.
+						' FROM items i '.
+						' WHERE i.hostid='.$clone_hostid.
+							' AND i.templateid=0 '.
+						' ORDER BY i.description';
 
-			$res = DBselect($sql);
-			while($db_item = DBfetch($res)){
-					if(!copy_item_to_host($db_item['itemid'], $hostid, true)) throw new Exception();
-			}
+				$res = DBselect($sql);
+				while($db_item = DBfetch($res)){
+						if(!copy_item_to_host($db_item['itemid'], $hostid, true)) throw new Exception();
+				}
 
 // Host triggers
 				if(!copy_triggers($clone_hostid, $hostid)) throw new Exception();
 
 // Host graphs
-			$options = array(
-				'inherited' => 0,
-				'hostids' => $clone_hostid,
-				'select_hosts' => API_OUTPUT_REFER,
-				'output' => API_OUTPUT_EXTEND,
-			);
-			$graphs = CGraph::get($options);
-			foreach($graphs as $gnum => $graph){
-				if(count($graph['hosts']) > 1) continue;
-					if(!copy_graph_to_host($graph['graphid'], $hostid, true)) throw new Exception();
+				$options = array(
+					'inherited' => 0,
+					'hostids' => $clone_hostid,
+					'select_hosts' => API_OUTPUT_REFER,
+					'output' => API_OUTPUT_EXTEND,
+				);
+				$graphs = CGraph::get($options);
+				foreach($graphs as $gnum => $graph){
+					if(count($graph['hosts']) > 1) continue;
+						if(!copy_graph_to_host($graph['graphid'], $hostid, true)) throw new Exception();
+				}
 			}
-		}
 
 // }}} FULL CLONE
 
@@ -618,9 +618,9 @@ include_once('include/page_header.php');
 
 // }}} SAVE TRANSACTION
 
-			DBend(true);
+			$result = DBend(true);
 
-			show_messages(true, $msg_ok, $msg_fail);
+			show_messages($result, $msg_ok, $msg_fail);
 
 			unset($_REQUEST['form']);
 			unset($_REQUEST['hostid']);
@@ -634,7 +634,7 @@ include_once('include/page_header.php');
 	}
 // DELETE HOST
 	else if(isset($_REQUEST['delete']) && isset($_REQUEST['hostid'])){
-		$result = CHost::delete($_REQUEST['hostid']);
+		$result = CHost::delete(array('hostid' => $_REQUEST['hostid']));
 		show_messages($result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
 
 		if($result){
@@ -659,8 +659,9 @@ include_once('include/page_header.php');
 // DELETE HOST
 	else if($_REQUEST['go'] == 'delete'){
 		$hostids = get_request('hosts', array());
+		$hosts = zbx_toObject($hostids, 'hostid');
 
-		$go_result = CHost::delete($hostids);
+		$go_result = CHost::delete($hosts);
 		show_messages($go_result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
 	}
 // ACTIVATE/DISABLE HOSTS

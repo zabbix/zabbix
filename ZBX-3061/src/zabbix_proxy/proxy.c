@@ -86,6 +86,7 @@ static char	shortopts[] = "c:n:hV";
 
 /* end of COMMAND LINE OPTIONS */
 
+int	threads_num = 0;
 pid_t	*threads = NULL;
 
 static unsigned char	zbx_process = ZBX_PROCESS_PROXY_ACTIVE;
@@ -440,18 +441,17 @@ int MAIN_ZABBIX_ENTRY(void)
 #       define IPV6_FEATURE_STATUS " NO"
 #endif
 
-	zabbix_log( LOG_LEVEL_WARNING, "Starting Zabbix Proxy. Zabbix %s (revision %s).",
+	zabbix_log(LOG_LEVEL_WARNING, "Starting Zabbix Proxy. Zabbix %s (revision %s).",
 			ZABBIX_VERSION,
 			ZABBIX_REVISION);
 
-	zabbix_log( LOG_LEVEL_WARNING, "**** Enabled features ****");
-	zabbix_log( LOG_LEVEL_WARNING, "SNMP monitoring:       " SNMP_FEATURE_STATUS	);
-	zabbix_log( LOG_LEVEL_WARNING, "IPMI monitoring:       " IPMI_FEATURE_STATUS	);
-	zabbix_log( LOG_LEVEL_WARNING, "WEB monitoring:        " LIBCURL_FEATURE_STATUS	);
-	zabbix_log( LOG_LEVEL_WARNING, "ODBC:                  " ODBC_FEATURE_STATUS	);
-	zabbix_log( LOG_LEVEL_WARNING, "SSH2 support:          " SSH2_FEATURE_STATUS	);
-	zabbix_log( LOG_LEVEL_WARNING, "IPv6 support:          " IPV6_FEATURE_STATUS	);
-	zabbix_log( LOG_LEVEL_WARNING, "**************************");
+	zabbix_log(LOG_LEVEL_WARNING, "**** Enabled features ****");
+	zabbix_log(LOG_LEVEL_WARNING, "SNMP monitoring:       " SNMP_FEATURE_STATUS);
+	zabbix_log(LOG_LEVEL_WARNING, "IPMI monitoring:       " IPMI_FEATURE_STATUS);
+	zabbix_log(LOG_LEVEL_WARNING, "ODBC:                  " ODBC_FEATURE_STATUS);
+	zabbix_log(LOG_LEVEL_WARNING, "SSH2 support:          " SSH2_FEATURE_STATUS);
+	zabbix_log(LOG_LEVEL_WARNING, "IPv6 support:          " IPV6_FEATURE_STATUS);
+	zabbix_log(LOG_LEVEL_WARNING, "**************************");
 
 #ifdef  HAVE_SQLITE3
 	if(ZBX_MUTEX_ERROR == php_sem_get(&sqlite_access, CONFIG_DBNAME))
@@ -470,10 +470,11 @@ int MAIN_ZABBIX_ENTRY(void)
 	DCsync_configuration();
 	DBclose();
 
-	threads = calloc(1 + CONFIG_CONFSYNCER_FORKS + CONFIG_DATASENDER_FORKS + CONFIG_POLLER_FORKS
+	threads_num = 1 + CONFIG_CONFSYNCER_FORKS + CONFIG_DATASENDER_FORKS + CONFIG_POLLER_FORKS
 			+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS
 			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS
-			+ CONFIG_DBSYNCER_FORKS + CONFIG_IPMIPOLLER_FORKS, sizeof(pid_t));
+			+ CONFIG_DBSYNCER_FORKS + CONFIG_IPMIPOLLER_FORKS;
+	threads = calloc(threads_num, sizeof(pid_t));
 
 	if (CONFIG_TRAPPER_FORKS > 0)
 	{

@@ -244,14 +244,22 @@
 		delete_host_profile($hostids);
 		delete_host_profile_ext($hostids);
 
-// delete host applications
-		DBexecute('DELETE FROM applications WHERE '.DBcondition('hostid',$hostids));
+		$query = 'SELECT a.applicationid'.
+				' FROM applications a'.
+				' WHERE	'.DBcondition('a.hostid', $hostids);
+		$db_applications = DBselect($query);
+		while($app = DBfetch($db_applications)){
+			$applicationids[] = $app['applicationid'];
+		}
+		$result = delete_application($applicationids);
+		if(!$result) return false;
+		
 
 // delete host
-		foreach($hostids as $id) {	/* The section should be improved */
+		foreach($hostids as $id){	/* The section should be improved */
 			$host_old = get_host_by_hostid($id);
 			$result = DBexecute('DELETE FROM hosts WHERE hostid='.$id);
-			if ($result) {
+			if($result){
 				if($host_old['status'] == HOST_STATUS_TEMPLATE){
 					info(S_TEMPLATE.SPACE.$host_old['host'].SPACE.S_HOST_HAS_BEEN_DELETED_MSG_PART2);
 					add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TEMPLATE, $id, $host_old['host'], 'hosts', NULL, NULL);
@@ -1337,23 +1345,11 @@ return $result;
 		return db_save_application($name,$hostid,$applicationid,$templateid);
 	}
 
-/*
- * Function: delete_application
- *
- * Description:
- *     Delete application with all linkages
- *
- * Author:
- *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
- *
- * Comments: !!! Don't forget sync code with C !!!
- *
- */
 	function delete_application($applicationids){
-		zbx_value2array($applicationids);
+		$applicationids = zbx_toHash($applicationids);
 
 		$apps = array();
-		$sql = 'SELECT a.applicationid, h.host, a.name '.
+		$sql = 'SELECT a.applicationid, h.host, a.name, a.templateid '.
 				' FROM applications a, hosts h '.
 				' WHERE '.DBcondition('a.applicationid',$applicationids).
 					' AND h.hostid=a.hostid';
@@ -1373,38 +1369,56 @@ return $result;
 			$tmp_appids[$db_app['applicationid']] = $db_app['applicationid'];
 		}
 
-		if(!empty($tmp_appids)) delete_application($tmp_appids);			// recursion!!!
-
+		if(!empty($tmp_appids)){
+// recursion!!!
+			if(!delete_application($tmp_appids)) return false; 
+		}
+   
+   
+		$unlink_apps = array();
+		//check if app is used by web scenario
 		$sql = 'SELECT ht.name, ht.applicationid '.
 				' FROM httptest ht '.
-				' WHERE '.DBcondition('ht.applicationid',$applicationids);
+				' WHERE '.DBcondition('ht.applicationid', $applicationids);
 		$res = DBselect($sql);
-		if($info = DBfetch($res)){
-			info(S_APPLICATION.SPACE.'"'.$apps[$info['applicationid']]['host'].':'.$apps[$info['applicationid']]['name'].'"'.SPACE.S_USED_BY_SCENARIO_SMALL.SPACE.'"'.$info['name'].'"');
-			return false;
+		while($info = DBfetch($res)){
+			if($apps[$info['applicationid']]['templateid'] > 0){
+				$unlink_apps[$info['applicationid']] = $info['applicationid'];
+				unset($applicationids[$info['applicationid']]);
+			}
+			else{
+				error(S_APPLICATION.' ['.$apps[$info['applicationid']]['host'].':'.$apps[$info['applicationid']]['name'].'] '.S_USED_IN_WEB_SCENARIO);
+				return false;
+			}			
 		}
-
-		$sql = 'SELECT i.itemid,i.key_,i.description '.
+		
+		$sql = 'SELECT i.itemid, i.key_, i.description, ia.applicationid '.
 				' FROM items_applications ia, items i '.
 				' WHERE i.type='.ITEM_TYPE_HTTPTEST.
 					' AND i.itemid=ia.itemid '.
-					' AND '.DBcondition('ia.applicationid',$applicationids);
+					' AND '.DBcondition('ia.applicationid', $applicationids);
 		$res = DBselect($sql);
 		if($info = DBfetch($res)){
-			info(S_APPLICATION.SPACE.'"'.$host['host'].':'.$app['name'].'"'.SPACE.S_USED_BY_ITEM_SMALL.SPACE.'"'.item_description($info).'"');
+			error(S_APPLICATION.' ['.$apps[$info['applicationid']]['host'].':'.$apps[$info['applicationid']]['name'].'] '.S_USED_BY_ITEM_SMALL.' ['.item_description($info).']');
 			return false;
 		}
 
-		$result = DBexecute('DELETE FROM items_applications WHERE '.DBcondition('applicationid',$applicationids));
-		$result = DBexecute('DELETE FROM applications WHERE '.DBcondition('applicationid',$applicationids));
+		$result = DBexecute('UPDATE applications SET templateid=0 WHERE '.DBcondition('applicationid', $unlink_apps));
+		$result &= DBexecute('DELETE FROM items_applications WHERE '.DBcondition('applicationid', $applicationids));
+		$result &= DBexecute('DELETE FROM applications WHERE '.DBcondition('applicationid', $applicationids));
 
 		if($result){
 			foreach($apps as $appid => $app){
-				info(S_APPLICATION.SPACE.'"'.$app['host'].':'.$app['name'].'"'.SPACE.S_DELETED_SMALL);
+				if(isset($unlink_apps[$appid])){
+					info(S_APPLICATION.' ['.$app['host'].':'.$app['name'].'] '.S_USED_IN_WEB_SCENARIO.' ('.S_UNLINKED_SMALL.')');
+				}
+				else{
+					info(S_APPLICATION.' ['.$app['host'].':'.$app['name'].'] '.S_DELETED_SMALL);
+				}
 			}
 		}
 
-	return (bool) $result;
+		return $result;
 	}
 
 	function get_application_by_applicationid($applicationid,$no_error_message=0){

@@ -158,8 +158,7 @@ include_once('include/page_header.php');
 
 	}
 
-	$table->SetHeader($header,'vertical_header');
-
+	$table->setHeader($header,'vertical_header');
 	for($t = $from; $t <= $to; $t++){
 		if(($start = get_time($t)) > time())
 			break;
@@ -168,26 +167,46 @@ include_once('include/page_header.php');
 			$end = time();
 
 		$table_row = array(format_time($start),format_time2($end));
-		foreach($users as $userid => $alias){
-			$all = 0;
-			$cnt_by_type = array();
 
-			foreach($media_types as $mediatypeid => $description){
-				$sql = 'SELECT count(*) as cnt '.
-						' FROM alerts a '.
-						' WHERE a.userid='.$userid.
-							' AND a.mediatypeid='.$mediatypeid.
-							' AND a.clock>'.$start.
-							' AND a.clock<'.$end;
-				$cnt_data = DBfetch(DBselect($sql));
-				if(!$cnt_data)	$cnt_data = 0;
-				else		$cnt_data = $cnt_data['cnt'];
+		//getting all alerts in this period of time
+		$options = array(
+			'output'=> array('mediatypeid', 'userid'),
+			'time_from'=>$start,
+			'time_till'=>$end
+		);
 
-				array_push($cnt_by_type, $cnt_data);
-				$all += $cnt_data;
-			}
-			array_push($table_row,array($all, ($media_type == 0 ? SPACE.'('.implode('/',$cnt_by_type).')' : '' )));
+		//if we must get only specific media type, no need to select the other ones
+		if ($media_type>0){
+			$options['mediatypeids'] = $media_type;
 		}
+
+		//getting data throung API
+		$alert_info = CAlert::get($options);
+
+		//counting alert count for each user and media type
+		$summary = array();
+		foreach($users as $userid => $alias){
+			$summary[$userid] = array();
+			$summary[$userid]['total'] = 0;
+			$summary[$userid]['medias'] = array('1'=>0, '2'=>0, '3'=>0, '4'=>0);
+		}
+		
+		foreach($alert_info as $ai){
+			if( !isset($summary[$ai['userid']]) ) continue;
+
+			$summary[$ai['userid']]['total']++;
+			if (isset($summary[$ai['userid']]['medias'][$ai['mediatypeid']])) {
+				$summary[$ai['userid']]['medias'][$ai['mediatypeid']]++;
+			}
+			else {
+				$summary[$ai['userid']]['medias'][$ai['mediatypeid']] = 1;
+			}
+		}
+		
+		foreach($summary as $s){
+			array_push($table_row, array($s['total'], ($media_type == 0 ? SPACE.'('.implode('/',$s['medias']).')' : '' )));
+		}
+
 		$table->addRow($table_row);
 	}
 	$table->show();

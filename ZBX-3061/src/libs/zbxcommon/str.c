@@ -1992,37 +1992,40 @@ int	zbx_get_next_field(const char **line, char **output, int *olen, char separat
  *                                                                            *
  * Function: str_in_list                                                      *
  *                                                                            *
- * Purpose: check if string matches a list of delimited strings               *
+ * Purpose: check if string is contained in a list of delimited strings       *
  *                                                                            *
  * Parameters: list     - strings a,b,ccc,ddd                                 *
  *             value    - value                                               *
  *             delimiter- delimiter                                           *
  *                                                                            *
- * Return value: FAIL - out of period, SUCCEED - within the period            *
+ * Return value: SUCCEED - string is in the list, FAIL - otherwise            *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	str_in_list(char *list, const char *value, const char delimiter)
+int	str_in_list(const char *list, const char *value, const char delimiter)
 {
-	char	*start, *end;
-	int	ret = FAIL;
+	const char	*end;
+	int		len, ret = FAIL;
 
-	for (start = list; *start != '\0' && ret == FAIL;) {
-		if (NULL != (end = strchr(start, delimiter)))
-			*end = '\0';
+	len = strlen(value);
 
-		if (0 == strcmp(start, value))
-			ret = SUCCEED;
-
-		if (end != NULL) {
-			*end = delimiter;
-			start = end + 1;
-		} else
+	while (SUCCEED != ret)
+	{
+		if (NULL != (end = strchr(list, delimiter)))
+		{
+			ret = (len == end - list && 0 == strncmp(list, value, len) ? SUCCEED : FAIL);
+			list = end + 1;
+		}
+		else
+		{
+			ret = (0 == strcmp(list, value) ? SUCCEED : FAIL);
 			break;
+		}
 	}
+
 	return ret;
 }
 
@@ -2660,6 +2663,19 @@ char	*zbx_replace_utf8(const char *text, char replacement)
 bad:
 	zbx_free(out);
 	return NULL;
+}
+
+int	zbx_strlen_utf8(const char *text)
+{
+	int	n = 0;
+
+	while ('\0' != *text)
+	{
+		if (0x80 != (0xc0 & *text++))
+			n++;
+	}
+
+	return n;
 }
 
 void	win2unix_eol(char *text)

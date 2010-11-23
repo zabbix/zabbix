@@ -421,6 +421,7 @@
 				foreach($trigger['items'] as $inum => $item){
 					$i = array();
 					$i['itemid'] = $item['itemid'];
+					$i['value_type'] = $item['value_type']; //ZBX-3059: So it would be possible to show different caption for history for chars and numbers (KB)
 					$i['action'] = str_in_array($item['value_type'],array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64))? 'showgraph':'showvalues';
 					$i['description'] = item_description($item);
 					$items[] = $i;
@@ -432,10 +433,10 @@
 
 				if($config['event_ack_enable']){
 					if($event['acknowledged'] == 1){
-						$ack = new CLink(S_YES,'acknow.php?eventid='.$event['eventid']);
+						$ack = new CLink(S_YES,'acknow.php?eventid='.$event['eventid'].'&backurl='.$page['file']);
 					}
 					else{
-						$ack = new CLink(S_NO,'acknow.php?eventid='.$event['eventid'],'on');
+						$ack = new CLink(S_NO,'acknow.php?eventid='.$event['eventid'].'&backurl='.$page['file'],'on');
 					}
 				}
 
@@ -447,7 +448,7 @@
 
 // Duration
 				$tr_event = $event + $trigger;
-				if($next_event = get_next_event($tr_event, $events))
+				if($next_event = get_next_event($tr_event, $events, $_REQUEST['hide_unknown']))
 					$event['duration'] = zbx_date2age($tr_event['clock'], $next_event['clock']);
 				else
 					$event['duration'] = zbx_date2age($tr_event['clock']);

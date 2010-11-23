@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-	define('ZABBIX_VERSION','1.8.4rc1');
+	define('ZABBIX_VERSION','1.8.4rc2');
 	define('ZABBIX_API_VERSION','1.3');
 /* USER DEFINES */
 
@@ -637,7 +637,7 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	define('REGEXP_EXCLUDE',1);
 
 // PREG
-	define('ZBX_PREG_PRINT', '^\x00-\x1F');
+	define('ZBX_PREG_PRINT', '^\x{00}-\x{1F}');
 
 	define('ZBX_PREG_SPACES', '(\s+){0,1}');
 	define('ZBX_PREG_MACRO_NAME', '([A-Z0-9\._]+)');

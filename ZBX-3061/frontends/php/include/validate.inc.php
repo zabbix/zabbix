@@ -70,7 +70,7 @@
 
 	function KEY_PARAM($var=NULL){
 //		return 'ereg(\'^([0-9a-zA-Z\_\.[.'.ZBX_EREG_MINUS_SYMB.'.]\$ ]+)$\',{'.$var.'})&&';
-		return 'preg_match("/^([0-9a-zA-Z_\.\-\$ ]+)$/",{'.$var.'})&&';
+		return 'preg_match("/'.ZBX_PREG_PARAMS.'/",{'.$var.'})&&';
 	}
 
 	function validate_float($str){

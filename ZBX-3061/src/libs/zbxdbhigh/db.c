@@ -52,7 +52,7 @@ const char	*DBnode(const char *fieldid, const int nodeid)
 	return dbnode;
 }
 
-void	DBclose(void)
+void	DBclose()
 {
 	zbx_db_close();
 }
@@ -130,7 +130,7 @@ void	DBinit()
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	DBping(void)
+int	DBping()
 {
 	int ret;
 
@@ -155,7 +155,7 @@ int	DBping(void)
  * Comments: Do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-void	DBbegin(void)
+void	DBbegin()
 {
 	int	rc;
 
@@ -190,7 +190,7 @@ void	DBbegin(void)
  * Comments: Do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-void	DBcommit(void)
+void	DBcommit()
 {
 	int	rc;
 
@@ -225,7 +225,7 @@ void	DBcommit(void)
  * Comments: Do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-void	DBrollback(void)
+void	DBrollback()
 {
 	int	rc;
 
@@ -1145,7 +1145,7 @@ int	DBremove_escalation(zbx_uint64_t escalationid)
 	return SUCCEED;
 }
 
-void	DBvacuum(void)
+void	DBvacuum()
 {
 #ifdef	HAVE_POSTGRESQL
 	char	*table_for_housekeeping[] = {"services", "services_links", "graphs_items", "graphs", "sysmaps_links",
@@ -1309,7 +1309,7 @@ char*	DBdyn_escape_string(const char *src)
  * Comments: sync changes with 'DBescape_string', 'DBget_escape_string_len'   *
  *                                                                            *
  ******************************************************************************/
-char*	DBdyn_escape_string_len(const char *src, int max_src_len)
+char	*DBdyn_escape_string_len(const char *src, int max_src_len)
 {
 	const char	*s;
 	char		*dst = NULL;
@@ -1561,7 +1561,7 @@ void	DBget_item_from_db(DB_ITEM *item, DB_ROW row)
 	item->mtime			= atoi(row[26]);
 
 	key = zbx_dsprintf(key, "%s", item->key_orig);
-	substitute_simple_macros(NULL, NULL, item, NULL, NULL, NULL, &key, MACRO_TYPE_ITEM_KEY, NULL, 0);
+	substitute_simple_macros(NULL, item, NULL, NULL, NULL, &key, MACRO_TYPE_ITEM_KEY, NULL, 0);
 	item->key = key;
 }
 
@@ -2070,10 +2070,17 @@ void	DBproxy_register_host(const char *host)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void DBexecute_overflowed_sql(char **sql, int *sql_allocated, int *sql_offset)
+void	DBexecute_overflowed_sql(char **sql, int *sql_allocated, int *sql_offset)
 {
 	if (*sql_offset > ZBX_MAX_SQL_SIZE)
 	{
+#ifdef HAVE_MULTIROW_INSERT
+		if ((*sql)[*sql_offset - 1] == ',')
+		{
+			(*sql_offset)--;
+			zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 3, ";\n");
+		}
+#endif
 #ifdef HAVE_ORACLE
 		zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 8, "end;\n");
 #endif

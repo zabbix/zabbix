@@ -875,7 +875,6 @@ FIELD		|label_location	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|highlight	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|name
 
-
 TABLE|triggers|triggerid|ZBX_SYNC
 FIELD		|triggerid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|expression	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC

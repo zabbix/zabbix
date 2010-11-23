@@ -474,8 +474,8 @@ class CChart extends CGraphDraw{
 				else if(strcasecmp($arr[4],'M') == 0)	$val *= 1048576; //1024*1024;
 				else if(strcasecmp($arr[4],'G') == 0)	$val *= 1073741824; //1024*1024*1024;
 
-				$minY = $this->m_minY[$this->items[0]['axisside']];
-				$maxY = $this->m_maxY[$this->items[0]['axisside']];
+				$minY = $this->m_minY[$this->items[$inum]['axisside']];
+				$maxY = $this->m_maxY[$this->items[$inum]['axisside']];
 
 //				if($val <= $minY || $val >= $maxY)	continue;
 //SDI($item['itemid']);
@@ -1328,10 +1328,11 @@ class CChart extends CGraphDraw{
 // division by zero
 			$hstr_count = ($hstr_count == 0)?1:$hstr_count;
 
-			$val = $i * $step + $minY;
+			//using bc library, incase of large numbers
+			$val = bcadd(bcmul($i,$step),$minY);
 			if(bccomp(bcadd($val, bcdiv($step,2)), $maxY) == 1) continue;
-
 			$str = convert_units($val, $units, ITEM_CONVERT_NO_UNITS);
+
 			$dims = imageTextSize(8, 0, $str);
 
 			imageText($this->im,
@@ -1415,7 +1416,8 @@ class CChart extends CGraphDraw{
 		for($i=0;$i<=$hstr_count;$i++){
 			if($hstr_count == 0) continue;
 
-			$val = $i * $step + $minY;
+			//using bc module in case of large numbers
+			$val = bcadd(bcmul($i,$step),$minY);
 			if(bccomp(bcadd($val, bcdiv($step,2)), $maxY) == 1) continue;
 
 			$str = convert_units($val, $units, ITEM_CONVERT_NO_UNITS);

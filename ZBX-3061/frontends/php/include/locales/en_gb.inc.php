@@ -212,6 +212,7 @@
 	'S_DISABLE_SELECTED_WEB_SCENARIOS_Q'=>		'Disable selected WEB scenarios?',
 	'S_DELETE_HISTORY_SELECTED_WEB_SCENARIOS_Q'=>	'Delete history of selected WEB scenarios?',
 	'S_DELETE_SELECTED_WEB_SCENARIOS_Q'=>		'Delete selected WEB scenarios?',
+	'S_SELECT_HOST_FIRST' => '(select host first)',
 
 //	exp_imp.php
 	'S_ELEMENT'=>				'Element',
@@ -1494,6 +1495,8 @@
 	'S_SERVICES_DOWNTIME_DATE_FORMAT'=>		'l H:i',
 	'S_SERVICES_ONETIME_DOWNTIME_DATE_FORMAT'=>	'd M Y H:i',
 	'S_ADD_SMALL'=>								'add',
+	'S_ERROR_ADDING_SERVICE_TIME'=>'Error adding service time',
+	'S_IS_A_WRONG_TIME_FORMAT'=>'is a wrong time format. Should be from 00:00 to 23:59.',
 
 //	locales.php
 	'S_DO_NOT_ADD'=>			'Do not add',
@@ -1576,6 +1579,7 @@
 	'S_NO_RESOURCES_DEFINED'=>		'No resources defined',
 	'S_SIMPLE_GRAPH'=>				'Simple graph',
 	'S_SIMPLE_GRAPHS'=>				'Simple graphs',
+	'S_HISTORY_AND_SIMPLE_GRAPHS'=> 'History and simple graphs',
 	'S_SIMPLE_GRAPH_BIG'=>			'SIMPLE GRAPH',
 	'S_GRAPH_NAME'=>				'Graph name',
 	'S_WIDTH'=>						'Width',
@@ -1645,6 +1649,7 @@
 	'S_CUSTOM_SCREENS'=>			'Custom screens',
 	'S_SCREENS_BIG'=>				'SCREENS',
 
+
 	'S_SLIDESHOW_UPDATED'=>			'Slideshow updated',
 	'S_CANNOT_UPDATE_SLIDESHOW'=>		'Cannot_update slideshow',
 	'S_SLIDESHOW_ADDED'=>			'Slideshow added',
@@ -1652,6 +1657,9 @@
 	'S_SLIDESHOW_DELETED'=>			'Slideshow deleted',
 	'S_CANNOT_DELETE_SLIDESHOW'=>		'Cannot delete slideshow',
 	'S_DELETE_SLIDESHOW_Q'=>		'Delete slideshow?',
+
+	'S_ERROR_SCREEN_WITH_NAME_DOES_NOT_EXIST'=> 'Screen with name "%s" does not exist',
+	'S_ERROR_SCREEN_WITH_ID_DOES_NOT_EXIST'=> 'Screen with id "%d" does not exist',
 
 // slides.php
 	'S_CUSTOM_SLIDES' =>			'Custom slides',
@@ -2055,6 +2063,8 @@
 	'S_EXPRESSION_UNNECESSARY_SYMBOLS_DETECTED_ERROR'=>'Unnecessary symbols detected',
 	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_AFTER_ERROR'=>'Not allowed symbols detected after element',
 	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_BEFORE_ERROR'=>'Not allowed symbols detected before element',
+	'S_ARE_YOU_SURE_YOU_WANT_TO_DELETE'=>'Are you sure you want to delete',
+	'S_MACROS_ES'=>'macro(s)',
 
 //	popup_link_tr.php
 	'S_NEW_INDICATORS'=>			'New indicators',
@@ -2183,6 +2193,7 @@
 	'S_CANNOT_ADD_NEW_APPLICATION'=>		'Cannot add new application',
 	'S_SCENARIO_WITH_NAME'=>			'Scenario with name',
 	'S_ADDED_SMALL'=>				'added',
+	'S_PRINTABLE_ONLY'=>'only printable characters',
 
 //	media.inc.php
 	'S_NO_MEDIA_WITH'=>			'No media with',
@@ -2215,7 +2226,9 @@
 	'S_ALREADY_LINKED_TO_HOST_SMALL'=>		'already linked to host',
 	'S_HOST_HAS_BEEN_DELETED_MSG_PART1'=>		'Host',
 	'S_HOST_HAS_BEEN_DELETED_MSG_PART2'=>		'has been deleted from the system',
-
+	'S_YOU_CANT_DELETE_TEMPLATE_FOR_APP_USED_IN_SCENARIO'=>'You can\'t delete template for an application that is used in a web scenario',
+	'S_USED_IN_WEB_SCENARIO' => 'used in web scenario',
+	'S_AND_CANT_BE_DELETED' => 'and can\'t be deleted',
 //	validate.inc.php
 	'S_CRITICAL_ERROR'=>				'Critical error',
 	'S_FIELD'=>					'Field',
@@ -2269,7 +2282,8 @@
 	'S_EXPRESSION_HOST_KEY_DOES_NOT_ERROR'=>		'Host key does not exist.',
 	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART1'=>	'Function \'',
 	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART2'=>	'\' does not accept parameters.',
-
+    'S_WRONG_DEPENDENCY_ERROR'=>	'Error adding dependencies. Following dependencies are not allowed: 1) from a host trigger to a template trigger; 2) from a template trigger to a host trigger; 3) between template triggers, where templates have links to other templates.',
+		
 //	page_footer.php
 	'S_TRANSACTION_HAVE_NOT_BEEN_CLOSED_ABORTING'=>	'Transaction has not been closed. Aborting..',
 
@@ -2489,7 +2503,13 @@
 	'S_OTHER_SMALL'=>			'other',
 
 // class.cookie.js
-	'S_MAX_COOKIE_SIZE_REACHED' => 'We are sorry, the maximum possible number of elements to remember has been reached.',
+	'S_MAX_COOKIE_SIZE_REACHED'=>		'We are sorry, the maximum possible number of elements to remember has been reached.',
+
+	'S_LAST_PAGE'=>			'Last',
+	'S_FIRST_PAGE'=>		'First',
+	'S_PREVIOUS_PAGE'=>		'Previous',
+	'S_NEXT_PAGE'=>			'Next',
+	'S_PREVIOUS_EVENTS'=>		'Previous',
 
 );
 ?>

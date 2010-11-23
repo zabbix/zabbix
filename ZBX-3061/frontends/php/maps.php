@@ -98,6 +98,7 @@ include_once('include/page_header.php');
 		'select_selements' => 1
 	);
 
+	$icon = $fs_icon = null;
 	$maps = CMap::get($options);
 	$maps = zbx_toHash($maps, 'sysmapid');
 	if(!empty($maps)){

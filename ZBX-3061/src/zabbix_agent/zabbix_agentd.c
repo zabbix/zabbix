@@ -18,9 +18,7 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
-#include "zabbix_agent.h"
 
 #include "cfg.h"
 #include "log.h"
@@ -42,7 +40,6 @@
 #elif defined(ZABBIX_DAEMON) /* ZABBIX_SERVICE */
 #	include "daemon.h"
 #endif /* ZABBIX_DAEMON */
-
 
 const char	*progname = NULL;
 
@@ -159,16 +156,18 @@ static char	shortopts[] =
 
 static char	*TEST_METRIC = NULL;
 
-static ZBX_THREAD_HANDLE	*threads = NULL;
+int			threads_num = 0;
+ZBX_THREAD_HANDLE	*threads = NULL;
 
-static void parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
+static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 {
-	char	ch	= '\0';
+	char	ch = '\0';
 
 	t->task = ZBX_TASK_START;
 
 	/* Parse the command-line. */
 	while ((ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)) != (char)EOF)
+	{
 		switch (ch) {
 		case 'c':
 			CONFIG_FILE = strdup(zbx_optarg);
@@ -179,6 +178,9 @@ static void parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 			break;
 		case 'V':
 			version();
+#ifdef _AIX
+			tl_version();
+#endif /* _AIX */
 			exit(-1);
 			break;
 		case 'p':
@@ -213,6 +215,7 @@ static void parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 			t->task = ZBX_TASK_SHOW_USAGE;
 			break;
 		}
+	}
 
 	if(CONFIG_FILE == NULL)
 	{
@@ -263,7 +266,8 @@ int MAIN_ZABBIX_ENTRY(void)
 	}
 
 	/* Allocate memory for a collector, all listeners and an active check. */
-	threads = calloc(1 + CONFIG_ZABBIX_FORKS + ((0 == CONFIG_DISABLE_ACTIVE) ? 1 : 0), sizeof(ZBX_THREAD_HANDLE));
+	threads_num = 1 + CONFIG_ZABBIX_FORKS + (0 == CONFIG_DISABLE_ACTIVE ? 1 : 0);
+	threads = calloc(threads_num, sizeof(ZBX_THREAD_HANDLE));
 
 	/* Start the collector thread. */
 	threads[i=0] = zbx_thread_start(collector_thread, NULL);
