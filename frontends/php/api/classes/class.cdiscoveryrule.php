@@ -23,64 +23,8 @@
  * @package API
  */
 
-class CValidators{
-
-	public static function required($array, $key){
-		return isset($array[$key]);
-	}
-
-	public static function arrayof($array, $key, $rules){
-		if(!isset($array[$key])) return true;
-
-		foreach($rules as $field => $filters){
-			foreach($filters as $filter){
-				$validator = array_shift($filter);
-				call_user_func_array(array('CValidators', $validator), array($array, $field, $filter));
-
-			}
-		}
-	}
-
-	public static function hash($array, $key, $rules){
-		if(!isset($array[$key])) return true;
-
-		foreach($rules as $field => $filters){
-			foreach($filters as $filter){
-				$validator = array_shift($filter);
-				call_user_func_array(array('CValidators', $validator), array($array, $field, $filter));
-
-			}
-		}
-	}
-
-
-}
-
-
 class CDiscoveryRule extends CZBXAPI{
 
-	protected static function get_rules($method){
-		$rules = array();
-
-		$rules['create'] = array('arrayof',
-			'rules' => array(
-				'hostid' => array('required'),
-				'applications' => array(
-					array('arrayof',
-						'rules' => array(
-							'applicationid' => array('required'),
-							'name' => array('required'),
-						)
-					),
-				),
-				'key_' => array(
-					array('required'),
-					array('string', 'length' => 256),
-				),
-			),
-		);
-
-	}
 /**
  * Get DiscoveryRule data
  */
