@@ -258,7 +258,7 @@
 			$autologout	= get_request('autologout',90);
 
 			$lang		= get_request('lang','en_gb');
-			$theme		= get_request('theme','css_ob.css');
+			$theme		= get_request('theme','default.css');
 			$refresh	= get_request('refresh',30);
 			$rows_per_page	= get_request('rows_per_page',50);
 
