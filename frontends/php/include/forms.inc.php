@@ -1812,7 +1812,7 @@
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'snmpv3_privpassphrase');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'row_snmpv3_privpassphrase');
 
-		$row = new CRow(array(new CCol(S_PORT,'form_row_l'), new CCol(new CNumericBox('port',$port,5), 'form_row_r')));
+		$row = new CRow(array(new CCol(S_PORT,'form_row_l'), new CCol(new CTextBox('port',$port,15), 'form_row_r')));
 		$row->setAttribute('id', 'row_port');
 		$frmItem->addRow($row);
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV1, 'port');
@@ -2317,7 +2317,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			S_ORIGINAL), S_SNMPV3_PRIV_PASSPHRASE), new CTextBox('snmpv3_privpassphrase',$snmpv3_privpassphrase,64));
 
 		$frmItem->addRow(array( new CVisibilityBox('port_visible', get_request('port_visible'), 'port', S_ORIGINAL), S_PORT),
-			new CNumericBox('port',$port,5));
+			new CTextBox('port',$port,15));
 
 		$cmbValType = new CComboBox('value_type',$value_type);
 		$cmbValType->addItem(ITEM_VALUE_TYPE_UINT64,	S_NUMERIC_UNSIGNED);		$cmbValType->addItem(ITEM_VALUE_TYPE_FLOAT,	S_NUMERIC_FLOAT);		$cmbValType->addItem(ITEM_VALUE_TYPE_STR, 	S_CHARACTER);		$cmbValType->addItem(ITEM_VALUE_TYPE_LOG, 	S_LOG);		$cmbValType->addItem(ITEM_VALUE_TYPE_TEXT,	S_TEXT);		$frmItem->addRow(array( new CVisibilityBox('value_type_visible', get_request('value_type_visible'), 'value_type', S_ORIGINAL),			S_TYPE_OF_INFORMATION), $cmbValType);

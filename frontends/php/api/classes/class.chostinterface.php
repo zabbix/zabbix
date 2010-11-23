@@ -481,7 +481,7 @@ Copt::memoryPick();
 			));
 		}
 		else{
-			$interfaceDBfields = array('ip'=>null, 'dns'=>null, 'useip'=>null, 'hostid'=>null);
+			$interfaceDBfields = array('hostid'=>null,'itemtype'=>null,'ip'=>null,'dns'=>null,'useip'=>null);
 			$dbHosts = CHost::get(array(
 				'hostids' => zbx_objectValues($interfaces, 'hostid'),
 				'editable' => 1,
@@ -518,11 +518,11 @@ Copt::memoryPick();
 			}
 
 			if(isset($interface['dns']) && !zbx_empty($interface['dns']) && !preg_match('/^'.ZBX_PREG_DNS_FORMAT.'$/i', $interface['dns'])){
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect characters used for DNS [ '.$interface['dns'].' ]');
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect characters used for DNS "'.$interface['dns'].'"');
 			}
 
 			if(isset($interface['ip']) && !zbx_empty($interface['ip']) && !validate_ip($interface['ip'], $arr)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect interface IP [ '.$interface['ip'].' ] provided');
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect interface IP "'.$interface['ip'].'" provided');
 			}
 
 			if($create){
@@ -530,8 +530,18 @@ Copt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'IP and DNS can not be empty for host interface');
 				}
 
-				if(zbx_empty($interface['port'])){
+				if(isset($interface['port']) && zbx_empty($interface['port'])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'PORT can not be empty for host interface');
+				}
+			}
+
+			if(isset($interface['port'])){
+				if(zbx_ctype_digit($interface['port'])){
+					if($interface['port'] > 65535 || $interface['port'] < 0)
+						self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect interface PORT "'.$interface['port'].'" provided');
+				}
+				else if(!preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $interface['port'])){
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect interface PORT "'.$interface['port'].'". '.S_WRONG_MACRO);
 				}
 			}
 		}
