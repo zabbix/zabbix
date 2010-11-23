@@ -4506,7 +4506,7 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 128,
-				'default' => 'default.css',
+				'default' => 'css_ob.css',
 			),
 			'attempt_failed' => array(
 				'null' => false,

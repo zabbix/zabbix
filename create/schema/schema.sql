@@ -953,7 +953,7 @@ FIELD		|autologout	|t_integer	|'900'	|NOT NULL	|ZBX_SYNC
 FIELD		|lang		|t_varchar(5)	|'en_gb'|NOT NULL	|ZBX_SYNC
 FIELD		|refresh	|t_integer	|'30'	|NOT NULL	|ZBX_SYNC
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|theme		|t_varchar(128)	|'default.css'|NOT NULL	|ZBX_SYNC
+FIELD		|theme		|t_varchar(128)	|'css_ob.css'|NOT NULL	|ZBX_SYNC
 FIELD		|attempt_failed	|t_integer	|0	|NOT NULL	|ZBX_SYNC
 FIELD		|attempt_ip	|t_varchar(39)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|attempt_clock	|t_integer	|0	|NOT NULL	|ZBX_SYNC
