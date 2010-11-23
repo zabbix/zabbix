@@ -774,28 +774,45 @@ class CChart extends CGraphDraw{
 //------
 
 // CALC interval
-		$columnInterval = ($this->gridPixelsVert*($this->m_maxY[$side] - $this->m_minY[$side]))/$this->sizeY;
+		$columnInterval = bcdiv(bcmul($this->gridPixelsVert,(bcsub($this->m_maxY[$side],$this->m_minY[$side]))),$this->sizeY);
 
 		$dist = bcmul(5, bcpow(10, 18));
 
 		$interval = 0;
 		foreach($intervals as $num => $int){
-			$t = abs($int - $columnInterval);
+			//we must get a positive number
+			if (bccomp($int,$columnInterval) == -1) {
+				$t = bcsub($columnInterval, $int);
+			}
+			else {
+				$t = bcsub($int,$columnInterval);
+			}
 
+<<<<<<< .mine
+			if(bccomp($t, $dist)==-1){
+
+=======
 			if(bccomp($t,$dist)==-1){
+>>>>>>> .r15643
 				$dist = $t;
 				$interval = $int;
 			}
 		}
 
 
-		$columnInterval = ($this->gridPixelsVert*($this->m_maxY[$other_side] - $this->m_minY[$other_side]))/$this->sizeY;
+		$columnInterval = bcdiv(bcmul($this->gridPixelsVert, bcsub($this->m_maxY[$other_side],$this->m_minY[$other_side])),$this->sizeY);
 
 		$dist = bcmul(5, bcpow(10, 18));
 
 		$interval_other_side = 0;
 		foreach($intervals as $num => $int){
-			$t = abs($int - $columnInterval);
+			//we must get a positive number
+			if (bccomp($int,$columnInterval) == -1) {
+				$t = bcsub($columnInterval, $int);
+			}
+			else {
+				$t = bcsub($int,$columnInterval);
+			}
 
 			if(bccomp($t,$dist)==-1){
 				$dist = $t;
@@ -823,7 +840,7 @@ class CChart extends CGraphDraw{
 		$this->gridStep[$side] = $interval;
 
 		if(isset($this->axis_valuetype[$other_side])){
-			$dist = ($this->m_maxY[$other_side] - $this->m_minY[$other_side]);
+			$dist = bcsub($this->m_maxY[$other_side], $this->m_minY[$other_side]);
 			$interval = 1;
 
 			foreach($intervals as $num => $int){
