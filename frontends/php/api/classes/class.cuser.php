@@ -420,7 +420,7 @@ Copt::memoryPick();
 					'autologin' => 0,
 					'autologout' => 900,
 					'lang' => 'en_gb',
-					'theme' => 'css_ob.css',
+					'theme' => 'default.css',
 					'refresh' => 30,
 					'rows_per_page' => 50,
 					'type' => USER_TYPE_ZABBIX_USER,
