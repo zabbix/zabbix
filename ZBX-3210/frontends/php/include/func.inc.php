@@ -1406,4 +1406,58 @@ function make_refresh_menu($pmid,$dollid,$cur_interval,$params=null,&$menu,&$sub
 }
 
 /************* END REFRESH *************/
+
+
+
+/************* MATH *************/
+
+function bcceil($number) {
+    if (strpos($number, '.') !== false) {
+		//3.000000 is the same as 3
+		if (preg_match("/\.[0]+$/i", $number)) {
+			return bcround($number, 0);
+		}
+
+        if ($number[0] != '-') {
+            return bcadd($number, 1, 0);
+        }
+
+        return bcsub($number, 0, 0);
+    }
+
+    return $number;
+}
+
+function bcfloor($number)
+{
+    if (strpos($number, '.') !== false) {
+		//3.000000 is the same as 3
+		if (preg_match("/\.[0]+$/i", $number)) {
+			return bcround($number, 0);
+		}
+
+        if ($number[0] != '-') {
+            return bcadd($number, 0, 0);
+        }
+
+        return bcsub($number, 1, 0);
+    }
+
+    return $number;
+}
+
+function bcround($number, $precision = 0)
+{
+    if (strpos($number, '.') !== false) {
+        if ($number[0] != '-') {
+            return bcadd($number, '0.' . str_repeat('0', $precision) . '5', $precision);
+        }
+
+        return bcsub($number, '0.' . str_repeat('0', $precision) . '5', $precision);
+    }
+
+    return $number;
+}
+
+/************* END MATH *************/
 ?>
