@@ -1075,6 +1075,4 @@ FIELD		|dns		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|port		|t_varchar(64)	|'10050'|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 INDEX		|1		|interfaceid
 INDEX		|2		|hostid,itemtype
-INDEX		|3		|ip
-INDEX		|4		|dns
-INDEX		|5		|port
+INDEX		|3		|ip,dns

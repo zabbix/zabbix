@@ -109,7 +109,7 @@ include_once('include/page_header.php');
 		'select_triggers' => API_OUTPUT_COUNT,
 		'select_graphs' => API_OUTPUT_COUNT,
 		'select_applications' => API_OUTPUT_COUNT,
-		'output' => API_OUTPUT_EXTEND,
+		'output' => array('host','status'),
 	);
 	$db_hosts = CHost::get($params);
 
@@ -312,7 +312,7 @@ include_once('include/page_header.php');
 		$params = array(
 			'nodeids'=> get_current_nodeid(true),
 			'search' => array('host' => $search),
-			'output' => API_OUTPUT_EXTEND,
+			'output' => array('host'),
 			'selectGroups' => API_OUTPUT_REFER,
 			'sortfield' => 'host',
 			'selectItems' => API_OUTPUT_COUNT,
@@ -415,6 +415,9 @@ include_once('include/page_header.php');
 
 	$search_wdgt->show();
 
+?>
+<?php
 
 include_once('include/page_footer.php');
+
 ?>

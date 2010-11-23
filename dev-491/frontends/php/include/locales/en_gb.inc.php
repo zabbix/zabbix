@@ -854,6 +854,7 @@
 	'S_INTERFACES' =>				'Interfaces',
 	'S_INTERFACE' =>				'Interface',
 	'S_NEW_HOST' =>					'New host',
+	'S_NEW_TEMPLATE' =>				'New template',
 	'S_HOST_INTERFACES' =>			'Host interfaces',
 	'S_HOST_INTERFACE' =>			'Host interface',
 	'S_INTERFACE_IS_USED' =>		'Interface used in item',

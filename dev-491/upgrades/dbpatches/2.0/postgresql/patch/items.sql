@@ -21,15 +21,29 @@ ALTER TABLE ONLY items ADD CONSTRAINT c_items_1 FOREIGN KEY (hostid) REFERENCES 
 ALTER TABLE ONLY items ADD CONSTRAINT c_items_2 FOREIGN KEY (templateid) REFERENCES items (itemid) ON DELETE CASCADE;
 ALTER TABLE ONLY items ADD CONSTRAINT c_items_3 FOREIGN KEY (valuemapid) REFERENCES valuemaps (valuemapid);
 ALTER TABLE ONLY items ADD CONSTRAINT c_items_4 FOREIGN KEY (interfaceid) REFERENCES interface (interfaceid);
+
 UPDATE items SET port=snmp_port;
-UPDATE items
-	SET interfaceid=(SELECT interfaceid FROM interface WHERE hostid=items.hostid AND main=1)
-	WHERE EXISTS(SELECT hostid FROM hosts WHERE hosts.hostid=items.hostid AND hosts.status IN (0,1));
+ALTER TABLE items DROP COLUMN snmp_port;
+
+-- host interface for non IPMI and non templated items
+UPDATE items 
+	SET interfaceid=(SELECT interfaceid FROM interface WHERE hostid=items.hostid AND main=1 AND itemtype=0)
+	WHERE EXISTS(SELECT hostid FROM hosts WHERE hosts.hostid=items.hostid AND hosts.status IN (0,1))
+		AND type<>12;
+
+-- host interface for IPMI and non templated items
+UPDATE items 
+	SET interfaceid=(SELECT interfaceid FROM interface WHERE hostid=items.hostid AND main=1 AND itemtype=12)
+	WHERE EXISTS(SELECT hostid FROM hosts WHERE hosts.hostid=items.hostid AND hosts.status IN (0,1))
+		AND type=12;
+
+-- keep port for SNMP items
 UPDATE items
 	SET port=(SELECT port FROM interface WHERE interface.interfaceid=items.interfaceid)
-	WHERE port='' AND interfaceid IS NOT NULL;
+	WHERE port='' 
+		AND interfaceid IS NOT NULL
+		AND type IN (1,4,6);
 
-ALTER TABLE items DROP COLUMN snmp_port;
 ALTER TABLE ONLY items ALTER itemid DROP DEFAULT,
 		       ALTER hostid DROP DEFAULT,
 		       ALTER units TYPE varchar(255),

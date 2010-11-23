@@ -12,6 +12,7 @@ CREATE TABLE interface (
 	interfaceid              bigint                                    NOT NULL,
 	hostid                   bigint                                    NOT NULL,
 	main                     integer         DEFAULT '0'               NOT NULL,
+	itemtype                 integer         DEFAULT '0'               NOT NULL,
 	dns                      varchar(64)     DEFAULT ''                NOT NULL,
 	useip                    integer         DEFAULT '1'               NOT NULL,
 	ip                       varchar(39)     DEFAULT '127.0.0.1'       NOT NULL,
@@ -19,18 +20,19 @@ CREATE TABLE interface (
 	PRIMARY KEY (interfaceid)
 ) with OIDS;
 CREATE INDEX interface_1 on interface (interfaceid);
-CREATE INDEX interface_2 on interface (hostid);
+CREATE INDEX interface_2 on interface (hostid,itemtype);
+CREATE INDEX interface_3 on interface (ip,dns);
 ALTER TABLE ONLY interface ADD CONSTRAINT c_interface_1 FOREIGN KEY (hostid) REFERENCES hosts(hostid) ON DELETE CASCADE;
  
-INSERT INTO interface (interfaceid,hostid,main,ip,dns,useip,port)
+INSERT INTO interface (interfaceid,hostid,main,itemtype,ip,dns,useip,port)
 	(SELECT (hostid - ((hostid / 100000000000)*100000000000)) * 2 + ((hostid / 100000000000)*100000000000),
-		hostid,1,ip,dns,useip,port
+		hostid,1,0,ip,dns,useip,port
 	FROM hosts 
 	WHERE status IN (0,1));
 
-INSERT INTO interface (interfaceid,hostid,main,dns,useip,port)
+INSERT INTO interface (interfaceid,hostid,main,itemtype,ip,useip,port)
 	(SELECT (hostid - ((hostid / 100000000000)*100000000000)) * 2 + ((hostid / 100000000000)*100000000000) + 1,
-		hostid,0,ipmi_ip,0,ipmi_port
+		hostid,1,12,ipmi_ip,0,ipmi_port
 	FROM hosts 
 	WHERE status IN (0,1) AND useipmi=1);
 
