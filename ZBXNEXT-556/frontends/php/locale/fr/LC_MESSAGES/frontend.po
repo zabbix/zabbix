@@ -639,6 +639,10 @@ msgid "Delete selected WEB scenarios?"
 msgstr "Supprimer les scénarios WEB sélectionnés ?"
 
 #:
+msgid "(select host first)"
+msgstr "(sélectionner l'hôte en premier)"
+
+#:
 msgid "Element"
 msgstr "Elément"
 
@@ -6667,10 +6671,6 @@ msgid "Italian (IT)"
 msgstr "Italien (IT)"
 
 #:
-msgid "Korean (KO)"
-msgstr "Koréen (KO)"
-
-#:
 msgid "Latvian (LV)"
 msgstr "Letton (LV)"
 
@@ -6681,10 +6681,6 @@ msgstr "Russe (RU)"
 #:
 msgid "Portuguese (PT)"
 msgstr "Portuguais (PT)"
-
-#:
-msgid "Spanish (ES)"
-msgstr "Espagnol (ES)"
 
 #:
 msgid "Swedish (SE)"
@@ -7367,6 +7363,14 @@ msgid "has been deleted from the system"
 msgstr "a été supprimé du système"
 
 #:
+msgid "You can't delete template for an application that is used in a web scenario"
+msgstr "Vous ne pouvez pas supprimer une application utilisée sans un scénario Web"
+
+#:
+msgid "and can't be deleted"
+msgstr "et ne peut pas être supprimée"
+
+#:
 msgid "Critical error"
 msgstr "Erreur critique"
 
@@ -8005,6 +8009,10 @@ msgstr "Erreur Zabbix interne"
 #:
 msgid "Wrong fields for media type"
 msgstr "Champs incorrects pour ce type de media"
+
+#:
+msgid "Password required for mediatype"
+msgstr "Mot de passe obligatoire pour ce type de media"
 
 #:
 msgid "Can't delete media types"
