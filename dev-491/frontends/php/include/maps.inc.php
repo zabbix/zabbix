@@ -361,7 +361,7 @@
 			else if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP){
 				$links_menus.= "['".S_STATUS_OF_TRIGGERS."',\"javascript: redirect('events.php?source=0&groupid=".$db_element['elementid']."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 			}
- 
+
 			if(!empty($links_menus)){
 				$menus .= "['".S_GO_TO."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
 				$menus .= $links_menus;
@@ -2005,6 +2005,21 @@
 		$labelFontHeight = $allLabelsSize['height'];
 		$labelFontBaseline = $allLabelsSize['baseline'];
 
+		if($map['label_type'] == MAP_LABEL_TYPE_IP){
+			foreach($selements as $selementid => $selement){
+				if($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST)
+					$elementsHostids[] = $selement['elementid'];
+			}
+
+			$mapHosts = CHost::get(array(
+				'hostids' => $elementsHostids,
+				'output' => API_OUTPUT_SHORTEN,
+				'selectInterfaces' => API_OUTPUT_EXTEND,
+			));
+			$mapHosts = zbx_toHash($mapHosts, 'hostid');
+		}
+
+
 		foreach($selements as $selementid => $selement){
 			if(empty($selement)) continue;
 
@@ -2030,8 +2045,9 @@
 
 			$label = array();
 			if(($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) && ($map['label_type'] == MAP_LABEL_TYPE_IP)){
-				$host = get_host_by_hostid($selement['elementid']);
-				$label[] = array('msg' => $host['ip']);
+				$interface = reset($mapHosts[$selement['elementid']]['interfaces']);
+
+				$label[] = array('msg' => $interface['ip']);
 				$label = array_merge($label, $status_lines[$selementid]);
 			}
 			else if($map['label_type'] == MAP_LABEL_TYPE_STATUS){
