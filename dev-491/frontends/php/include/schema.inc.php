@@ -4112,13 +4112,6 @@ return array(
 				'ref_table' => 'images',
 				'ref_field' => 'imageid',
 			),
-			'iconid_unknown' => array(
-				'null' => true,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'images',
-				'ref_field' => 'imageid',
-			),
 			'label' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
@@ -4943,6 +4936,18 @@ return array(
 				'length' => 64,
 				'default' => '',
 			),
+			'listen_ip' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 39,
+				'default' => '',
+			),
+			'listen_port' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			),
 		),
 	),
 	'proxy_autoreg_host' => array(
@@ -4964,6 +4969,18 @@ return array(
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
 				'default' => '',
+			),
+			'listen_ip' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 39,
+				'default' => '',
+			),
+			'listen_port' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
 			),
 		),
 	),
@@ -4988,7 +5005,7 @@ return array(
 				'length' => 10,
 				'default' => '0',
 			),
-			'itemtype' => array(
+			'type' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,

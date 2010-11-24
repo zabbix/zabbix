@@ -1401,7 +1401,7 @@ COpt::memoryPick();
 			$interfaces = array();
 			foreach($host['interfaces'] as $hinum => $interface){
 				if($interface['main'] == 1)
-					$interfaces[$interface['itemtype']] = $interface;
+					$interfaces[$interface['type']] = $interface;
 			}
 
 			$templateids = zbx_toHash($host['templates'], 'templateid');
@@ -1446,25 +1446,25 @@ COpt::memoryPick();
 				}
 
 // checking interfaces
-				$itemtype = null;
+				$type = null;
 				if($host['status'] == HOST_STATUS_TEMPLATE){
 					unset($item['interfaceid']);
 				}
 				else if(isset($item['type'])){
 // if we creating new item or if we updating item type
-					$itemtype = getInterfaceTypeByItem($item);
+					$type = getInterfaceTypeByItem($item);
 
 					if(!is_null($exItem)){
 // on update
-						if(!isset($interfaces[$itemtype])){
+						if(!isset($interfaces[$type])){
 							self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot find host interface on host ['.$host['host'].'] for item key ['.$exItem['key_'].']');
 						}
 
 // item type changes does not reflect on used interface [do not update interface]
-						$exItemType = getInterfaceTypeByItem($exItem);
-						if($exItemType == $itemtype) $itemtype = null;
+						$exType = getInterfaceTypeByItem($exItem);
+						if($exType == $type) $type = null;
 					}
-					else if(!isset($interfaces[$itemtype])){
+					else if(!isset($interfaces[$type])){
 // on create
 						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot find host interface on host ['.$host['host'].'] for item key ['.$item['key_'].']');
 					}
@@ -1477,10 +1477,10 @@ COpt::memoryPick();
 				$newItem['hostid'] = $host['hostid'];
 				$newItem['templateid'] = $item['itemid'];
 
-				if(is_null($itemtype))
+				if(is_null($type))
 					unset($newItem['interfaceid']);
 				else
-					$newItem['interfaceid'] = $interfaces[$itemtype]['interfaceid'];
+					$newItem['interfaceid'] = $interfaces[$type]['interfaceid'];
 
 // setting item application
 				if(isset($item['applications'])){

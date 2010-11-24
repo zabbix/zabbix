@@ -226,27 +226,6 @@ class CHostInterface extends CZBXAPI{
 			}
 		}
 
-// interface itemtype includes several item types
-		foreach(array('search', 'filter') as $key){
-			if(is_array($options[$key]) && isset($options[$key]['itemtype'])){
-				zbx_value2array($options[$key]['itemtype']);
-
-				$itemtypes = array();
-				foreach($options[$key]['itemtype'] as $itnum => $itemtype){
-					switch($itemtype){
-						case ITEM_TYPE_SNMPV1: $itemtypes[ITEM_TYPE_SNMPV3] = ITEM_TYPE_SNMPV3; break;
-						case ITEM_TYPE_SNMPV2: $itemtypes[ITEM_TYPE_SNMPV3] = ITEM_TYPE_SNMPV3; break;
-						case ITEM_TYPE_SNMPV3: $itemtypes[ITEM_TYPE_SNMPV3] = ITEM_TYPE_SNMPV3; break;
-						case ITEM_TYPE_IPMI: $itemtypes[ITEM_TYPE_IPMI] = ITEM_TYPE_IPMI; break;
-						case ITEM_TYPE_ZABBIX:
-						default: $itemtypes[ITEM_TYPE_ZABBIX] = ITEM_TYPE_ZABBIX; break;
-					}
-				}
-
-				$options[$key]['itemtype'] = $itemtypes;
-			}
-		}
-
 // search
 		if(is_array($options['search'])){
 			zbx_db_search('interface hi', $options, $sql_parts);
@@ -481,20 +460,20 @@ Copt::memoryPick();
 			));
 		}
 		else{
-			$interfaceDBfields = array('hostid'=>null,'itemtype'=>null,'ip'=>null,'dns'=>null,'useip'=>null);
+			$interfaceDBfields = array('hostid'=>null,'ip'=>null,'dns'=>null,'useip'=>null);
 			$dbHosts = CHost::get(array(
+				'output' => array('host', 'status'),
 				'hostids' => zbx_objectValues($interfaces, 'hostid'),
 				'editable' => 1,
 				'preservekeys' => 1
 			));
 
 			$dbProxies = CProxy::get(array(
+				'output' => array('host', 'status'),
 				'proxyids' => zbx_objectValues($interfaces, 'hostid'),
 				'editable' => 1,
 				'preservekeys' => 1
 			));
-
-			$dbHosts = zbx_array_merge($dbHosts, $dbProxies);
 		}
 
 		foreach($interfaces as $inum => &$interface){
@@ -513,8 +492,13 @@ Copt::memoryPick();
 				$interface['hostid'] = $dbInterface['hostid'];
 			}
 			else{
-				if(!isset($dbHosts[$interface['hostid']]))
+				if(!isset($dbHosts[$interface['hostid']]) && !isset($dbProxies[$interface['hostid']]))
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+
+				if(isset($dbProxies[$interface['hostid']]))
+					$interface['type'] = INTERFACE_TYPE_UNKNOWN;
+				else if(!isset($interface['type']))
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION);
 			}
 
 			if(isset($interface['dns']) && !zbx_empty($interface['dns']) && !preg_match('/^'.ZBX_PREG_DNS_FORMAT.'$/i', $interface['dns'])){
@@ -580,8 +564,8 @@ Copt::memoryPick();
 
 			$interfaceMain = array();
 			foreach($interfaces as $interfaceid => $interface){
-				if(!isset($interfaceMain[$interface['itemtype']])){
-					$interfaceMain[$interface['itemtype']] = $interface;
+				if(!isset($interfaceMain[$interface['type']])){
+					$interfaceMain[$interface['type']] = $interface;
 
 					if($interface['main'] != INTERFACE_PRIMARY){
 						$updateData[] = array(

@@ -227,9 +227,10 @@
 	define('INTERFACE_USE_DNS',		0);
 	define('INTERFACE_USE_IP',		1);
 
-	define('INTEFACE_TYPE_AGENT',		0);
-	define('INTEFACE_TYPE_SNMP',		6);
-	define('INTEFACE_TYPE_IPMI',		12);
+	define('INTERFACE_TYPE_UNKNOWN',	0);
+	define('INTERFACE_TYPE_AGENT',		1);
+	define('INTERFACE_TYPE_SNMP',		2);
+	define('INTERFACE_TYPE_IPMI',		3);
 
 	define('MAINTENANCE_STATUS_ACTIVE',		0);
 	define('MAINTENANCE_STATUS_APPROACH',	1);

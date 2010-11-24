@@ -34,7 +34,7 @@
 		'hostid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,		'isset({form})&&({form}=="update")'),
 		'host'=>	array(T_ZBX_STR, O_OPT,	NULL,   NOT_EMPTY,	'isset({save})'),
 		'status'=>	array(T_ZBX_INT, O_OPT,	NULL,   BETWEEN(HOST_STATUS_PROXY_ACTIVE,HOST_STATUS_PROXY_PASSIVE), 'isset({save})'),
-		'interfaces'=>	array(T_ZBX_STR, O_OPT, NULL,	NOT_EMPTY,	'isset({save})'),
+		'interfaces'=>	array(T_ZBX_STR, O_OPT, NULL,	NOT_EMPTY,	'isset({save})&&({status}=='.HOST_STATUS_PROXY_PASSIVE.')'),
 		'hosts'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 
 // Actions
