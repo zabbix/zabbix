@@ -1031,6 +1031,8 @@ int	parse_key(char **exp, char **key)
 				case 0:
 					if (',' == *s)
 						;
+					else if (']' == *s && '[' == s[1] && 0 == array)	/* Zapcat */
+						s++;
 					else if ('"' == *s)
 						state = 1;
 					else if ('[' == *s)
@@ -1068,6 +1070,12 @@ int	parse_key(char **exp, char **key)
 						while (' ' == s[1])
 							s++;
 
+						if (0 == array && ']' == s[1] && '[' == s[2])	/* Zapcat */
+						{
+							state = 0;
+							break;
+						}
+
 						if (0 == array && ']' == s[1])
 						{
 							s++;
@@ -1087,7 +1095,12 @@ int	parse_key(char **exp, char **key)
 					break;
 				/* Unquoted */
 				case 2:
-					if (',' == *s || (']' == *s && 0 != array))
+					if (0 == array && ']' == *s && '[' == s[1])	/* Zapcat */
+					{
+						s--;
+						state = 0;
+					}
+					else if (',' == *s || (']' == *s && 0 != array))
 					{
 						s--;
 						state = 0;
