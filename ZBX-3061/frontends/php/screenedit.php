@@ -19,15 +19,16 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/screens.inc.php');
-	require_once('include/forms.inc.php');
-	require_once('include/blocks.inc.php');
 
-	$page['title'] = 'S_CONFIGURATION_OF_SCREENS';
-	$page['file'] = 'screenedit.php';
-	$page['hist_arg'] = array('screenid');
-	$page['scripts'] = array('effects.js','dragdrop.js','class.cscreen.js','class.calendar.js','gtlc.js');
+require_once('include/config.inc.php');
+require_once('include/screens.inc.php');
+require_once('include/forms.inc.php');
+require_once('include/blocks.inc.php');
+
+$page['title'] = 'S_CONFIGURATION_OF_SCREENS';
+$page['file'] = 'screenedit.php';
+$page['hist_arg'] = array('screenid');
+$page['scripts'] = array('effects.js','dragdrop.js','class.cscreen.js','class.calendar.js','gtlc.js');
 
 include_once('include/page_header.php');
 
@@ -107,12 +108,6 @@ include_once('include/page_header.php');
 			else{
 				$msg_ok = S_ITEM_ADDED;
 				$msg_err = S_CANNOT_ADD_ITEM;
-			}
-
-			$resources = array(SCREEN_RESOURCE_GRAPH, SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT, SCREEN_RESOURCE_MAP,
-				SCREEN_RESOURCE_SCREEN, SCREEN_RESOURCE_TRIGGERS_OVERVIEW, SCREEN_RESOURCE_DATA_OVERVIEW);
-			if(str_in_array($_REQUEST['resourcetype'], $resources) && ($_REQUEST['resourceid'] == 0)){
-				throw new Exception('Incorrect resource');
 			}
 
 			if(isset($_REQUEST['screenitemid'])){
