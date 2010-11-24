@@ -262,7 +262,7 @@
 			'dns' => '',
 			'port' => 10050,
 			'useip' => 1,
-			'itemtype' => 0,
+			'type' => 1,
 			'items' => 0
 		));
 	}

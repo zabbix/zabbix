@@ -180,14 +180,14 @@
 		if(!isset($item['type'])) return null;
 
 		switch($item['type']){
-			case ITEM_TYPE_SNMPV1: $itemtype = ITEM_TYPE_SNMPV3; break;
-			case ITEM_TYPE_SNMPV2C: $itemtype = ITEM_TYPE_SNMPV2C; break;
-			case ITEM_TYPE_SNMPV3: $itemtype = ITEM_TYPE_SNMPV3; break;
-			case ITEM_TYPE_IPMI: $itemtype = ITEM_TYPE_IPMI; break;
+			case ITEM_TYPE_SNMPV1: $type = INTERFACE_TYPE_SNMP; break;
+			case ITEM_TYPE_SNMPV2C: $type = INTERFACE_TYPE_SNMP; break;
+			case ITEM_TYPE_SNMPV3: $type = INTERFACE_TYPE_SNMP; break;
+			case ITEM_TYPE_IPMI: $type = INTERFACE_TYPE_IPMI; break;
 			case ITEM_TYPE_ZABBIX:
-			default: $itemtype = ITEM_TYPE_ZABBIX;
+			default: $type = INTERFACE_TYPE_AGENT;
 		}
-	return $itemtype;
+	return $type;
 	}
 
 // Delete Item definition from selected group
@@ -303,9 +303,9 @@
 
 		unset($db_tmp_item['interfaceid']);
 		if($host['status'] != HOST_STATUS_TEMPLATE){
-			$itemtype = getInterfaceTypeByItem($item);
+			$type = getInterfaceTypeByItem($item);
 			foreach($host['interfaces'] as $hinum => $interface){
-				if(($interface['itemtype'] == $itemtype) && ($interface['main'] == 1)){
+				if(($interface['type'] == $type) && ($interface['main'] == 1)){
 					$db_tmp_item['interfaceid'] = $interface['interfaceid'];
 				}
 			}

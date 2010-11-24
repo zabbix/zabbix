@@ -32,13 +32,13 @@ ALTER TABLE items DROP COLUMN snmp_port;
 REORG TABLE items;
 -- host interface for non IPMI and non templated items
 UPDATE items 
-	SET interfaceid=(SELECT interfaceid FROM interface WHERE hostid=items.hostid AND main=1 AND itemtype=0)
+	SET interfaceid=(SELECT interfaceid FROM interface WHERE hostid=items.hostid AND main=1 AND type=1)
 	WHERE EXISTS(SELECT hostid FROM hosts WHERE hosts.hostid=items.hostid AND hosts.status IN (0,1))
 		AND type<>12;
 
 -- host interface for IPMI and non templated items
 UPDATE items 
-	SET interfaceid=(SELECT interfaceid FROM interface WHERE hostid=items.hostid AND main=1 AND itemtype=12)
+	SET interfaceid=(SELECT interfaceid FROM interface WHERE hostid=items.hostid AND main=1 AND type=3)
 	WHERE EXISTS(SELECT hostid FROM hosts WHERE hosts.hostid=items.hostid AND hosts.status IN (0,1))
 		AND type=12;
 

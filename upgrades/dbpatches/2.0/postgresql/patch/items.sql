@@ -7,9 +7,9 @@ ALTER TABLE ONLY items ALTER itemid DROP DEFAULT,
 		       ALTER valuemapid DROP NOT NULL,
 		       ADD lastns integer NULL,
 		       ADD flags integer DEFAULT '0' NOT NULL,
-		       ADD filter varchar(255) DEFAULT '' NOT NULL,
-			   ADD interfaceid bigint NULL,
-			   ADD port varchar(64) DEFAULT '' NOT NULL;
+			ADD filter varchar(255) DEFAULT '' NOT NULL,
+			ADD interfaceid bigint NULL,
+			ADD port varchar(64) DEFAULT '' NOT NULL;
 
 UPDATE items SET templateid=NULL WHERE templateid=0;
 UPDATE items SET templateid=NULL WHERE NOT templateid IS NULL AND NOT templateid IN (SELECT itemid FROM items);
@@ -27,13 +27,13 @@ ALTER TABLE items DROP COLUMN snmp_port;
 
 -- host interface for non IPMI and non templated items
 UPDATE items 
-	SET interfaceid=(SELECT interfaceid FROM interface WHERE hostid=items.hostid AND main=1 AND itemtype=0)
+	SET interfaceid=(SELECT interfaceid FROM interface WHERE hostid=items.hostid AND main=1 AND type=1)
 	WHERE EXISTS(SELECT hostid FROM hosts WHERE hosts.hostid=items.hostid AND hosts.status IN (0,1))
 		AND type<>12;
 
 -- host interface for IPMI and non templated items
 UPDATE items 
-	SET interfaceid=(SELECT interfaceid FROM interface WHERE hostid=items.hostid AND main=1 AND itemtype=12)
+	SET interfaceid=(SELECT interfaceid FROM interface WHERE hostid=items.hostid AND main=1 AND type=3)
 	WHERE EXISTS(SELECT hostid FROM hosts WHERE hosts.hostid=items.hostid AND hosts.status IN (0,1))
 		AND type=12;
 

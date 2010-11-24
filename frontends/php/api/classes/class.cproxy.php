@@ -311,7 +311,7 @@ class CProxy extends CZBXAPI{
 		if($update || $delete){
 			$proxyDBfields = array('proxyid'=> null);
 			$dbProxies = self::get(array(
-				'output' => array('proxyid', 'hostid', 'host'),
+				'output' => array('proxyid', 'hostid', 'host', 'status'),
 				'proxyids' => zbx_objectValues($proxies, 'proxyid'),
 				'editable' => 1,
 				'preservekeys' => 1
@@ -337,7 +337,7 @@ class CProxy extends CZBXAPI{
 				if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type'])
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 
-				if(!isset($proxy['interfaces']))
+				if(($proxy['status'] == HOST_STATUS_PROXY_PASSIVE) && !isset($proxy['interfaces']))
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'No interfaces for proxy [ '.$proxy['host'].' ]');
 			}
 
@@ -387,6 +387,9 @@ class CProxy extends CZBXAPI{
 					'values' => array('proxy_hostid' => $proxyids[$pnum]),
 					'where' => array(DBCondition('hostid', $hostids))
 				);
+
+				if($proxy['status'] == HOST_STATUS_PROXY_ACTIVE) continue;
+
 // INTERFACES
 				foreach($proxy['interfaces'] as $ifnum => &$interface){
 					$interface['hostid'] = $proxyids[$pnum];
