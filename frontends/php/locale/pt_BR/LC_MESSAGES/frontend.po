@@ -1,0 +1,8063 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Zabbix 1.9\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-11-22 16:17+0300\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Konstantin <konstantin.buravcov@zabbix.com>\n"
+"Language-Team: Zabbix <info@zabbix.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#:
+msgid "d M Y H:i:s"
+msgstr "d M Y H:i:s"
+
+#:
+msgid "d M Y"
+msgstr "d M Y"
+
+#:
+msgid "d.M"
+msgstr "d/M"
+
+#:
+msgid "UTF-8"
+msgstr "UTF-8"
+
+#:
+msgid "y"
+msgstr "A"
+
+#:
+msgid "m"
+msgstr "M"
+
+#:
+msgid "w"
+msgstr "S"
+
+#:
+msgid "d"
+msgstr "D"
+
+#:
+msgid "h"
+msgstr "h"
+
+#:
+msgid "s"
+msgstr "s"
+
+#:
+msgid "ms"
+msgstr "ms"
+
+#:
+msgid "Sun"
+msgstr "Dom"
+
+#:
+msgid "Mon"
+msgstr "Seg"
+
+#:
+msgid "Tue"
+msgstr "Qui"
+
+#:
+msgid "Wed"
+msgstr "Qua"
+
+#:
+msgid "Thu"
+msgstr "Ter"
+
+#:
+msgid "Fri"
+msgstr "Sex"
+
+#:
+msgid "Sat"
+msgstr "Sab"
+
+#:
+msgid "Sunday"
+msgstr "Domingo"
+
+#:
+msgid "Monday"
+msgstr "Segunda-feira"
+
+#:
+msgid "Tuesday"
+msgstr "Quinta-feira"
+
+#:
+msgid "Wednesday"
+msgstr "Quarta-feira"
+
+#:
+msgid "Thursday"
+msgstr "Terça-feira"
+
+#:
+msgid "Friday"
+msgstr "Sexta-feira"
+
+#:
+msgid "Saturday"
+msgstr "Sábado"
+
+#:
+msgid "Jan"
+msgstr "Jan"
+
+#:
+msgid "Feb"
+msgstr "Fev"
+
+#:
+msgid "Mar"
+msgstr "Mar"
+
+#:
+msgid "Apr"
+msgstr "Abr"
+
+#:
+msgid "May"
+msgstr "Mai"
+
+#:
+msgid "Jun"
+msgstr "Jun"
+
+#:
+msgid "Jul"
+msgstr "Jul"
+
+#:
+msgid "Aug"
+msgstr "Ago"
+
+#:
+msgid "Sep"
+msgstr "Set"
+
+#:
+msgid "Oct"
+msgstr "Out"
+
+#:
+msgid "Nov"
+msgstr "Nov"
+
+#:
+msgid "Dec"
+msgstr "Dez"
+
+#:
+msgid "January"
+msgstr "Janeiro"
+
+#:
+msgid "February"
+msgstr "Fevereiro"
+
+#:
+msgid "March"
+msgstr "Março"
+
+#:
+msgid "April"
+msgstr "Abril"
+
+#:
+msgid "June"
+msgstr "Junho"
+
+#:
+msgid "July"
+msgstr "Julho"
+
+#:
+msgid "August"
+msgstr "Agosto"
+
+#:
+msgid "September"
+msgstr "Setembro"
+
+#:
+msgid "October"
+msgstr "Outubro"
+
+#:
+msgid "November"
+msgstr "Novembro"
+
+#:
+msgid "December"
+msgstr "Dezembro"
+
+#:
+msgid "Activate selected"
+msgstr "Ativar selecionado(s)"
+
+#:
+msgid "Disable selected"
+msgstr "Desativar selecionado(s)"
+
+#:
+msgid "Activate selected hosts"
+msgstr "Ativar hosts selecionados"
+
+#:
+msgid "Disable selected hosts"
+msgstr "Desativar hosts selecionados"
+
+#:
+msgid "Delete selected"
+msgstr "Remover selecionado(s)"
+
+#:
+msgid "Copy selected to ..."
+msgstr "Copiar selecionado(s) para..."
+
+#:
+msgid "Host IP"
+msgstr "IP do Host"
+
+#:
+msgid "Service type"
+msgstr "Tipo do Serviço"
+
+#:
+msgid "Service port"
+msgstr "Porta"
+
+#:
+msgid "Discovery status"
+msgstr "Status autobusca"
+
+#:
+msgid "Received value"
+msgstr "Valor recebido"
+
+#:
+msgid "Uptime/Downtime"
+msgstr "Uptime/Downtime"
+
+#:
+msgid "Discovery rule"
+msgstr "Regra de autobusca"
+
+#:
+msgid "Discovery"
+msgstr "Autobusca"
+
+#:
+msgid "DISCOVERY"
+msgstr "AUTOBUSCA"
+
+#:
+msgid "Configuration of discovery"
+msgstr "Configuração da autobusca"
+
+#:
+msgid "CONFIGURATION OF DISCOVERY"
+msgstr "CONFIGURAÇÃO DA AUTOBUSCA"
+
+#:
+msgid "No discovery rules defined"
+msgstr "Não há regras definidas"
+
+#:
+msgid "IP range"
+msgstr "Intervalo de IPs"
+
+#:
+msgid "Checks"
+msgstr "Checagens"
+
+#:
+msgid "Create rule"
+msgstr "Criar Regra"
+
+#:
+msgid "Delete rule?"
+msgstr "Remover regra?"
+
+#:
+msgid "Discovery by proxy"
+msgstr "Descoberta por proxy"
+
+#:
+msgid "(no proxy)"
+msgstr "(sem proxy)"
+
+#:
+msgid "Device uniqueness criteria"
+msgstr "Critério único do dispositivo"
+
+#:
+msgid "Event source"
+msgstr "Origem do evento"
+
+#:
+msgid "New check"
+msgstr "Nova checagem"
+
+#:
+msgid "SSH"
+msgstr "SSH"
+
+#:
+msgid "LDAP"
+msgstr "LDAP"
+
+#:
+msgid "SMTP"
+msgstr "SMTP"
+
+#:
+msgid "FTP"
+msgstr "FTP"
+
+#:
+msgid "HTTP"
+msgstr "HTTP"
+
+#:
+msgid "POP"
+msgstr "POP"
+
+#:
+msgid "NNTP"
+msgstr "NNTP"
+
+#:
+msgid "IMAP"
+msgstr "IMAP"
+
+#:
+msgid "TCP"
+msgstr "TCP"
+
+#:
+msgid "ICMP Ping"
+msgstr "ICMP Ping"
+
+#:
+msgid "ports"
+msgstr "portas"
+
+#:
+msgid "Discovery rules deleted"
+msgstr "Regras de autobusca removidas"
+
+#:
+msgid "Discovery rule deleted"
+msgstr "Regra de autobusca removida"
+
+#:
+msgid "Cannot delete discovery rule"
+msgstr "Regra de autobusca não pode ser removida"
+
+#:
+msgid "Discovery rules updated"
+msgstr "Regras de autobusca atualizadas"
+
+#:
+msgid "Discovery rule updated"
+msgstr "Regra de autobusca atualizada"
+
+#:
+msgid "Cannot update discovery rule"
+msgstr "Regra de autobusca não foi atualizada"
+
+#:
+msgid "Discovery rule added"
+msgstr "Regra de autobusca adicionada"
+
+#:
+msgid "Cannot add discovery rule"
+msgstr "Regra de autobusca não pode ser adicionada"
+
+#:
+msgid "STATUS OF DISCOVERY"
+msgstr "STATUS DA AUTOBUSCA"
+
+#:
+msgid "Status of discovery"
+msgstr "Status da autobusca"
+
+#:
+msgid "Enable selected discovery rules?"
+msgstr "Ativar regras de descoberta selecionadas?"
+
+#:
+msgid "Disable selected discovery rules?"
+msgstr "Desativar regras de descoberta selecionadas?"
+
+#:
+msgid "Delete selected discovery rules?"
+msgstr "Remover regras de descoberta selecionadas?"
+
+#:
+msgid "Discovered"
+msgstr "Descoberto"
+
+#:
+msgid "Lost"
+msgstr "Perdido"
+
+#:
+msgid "Uptime"
+msgstr "Uptime"
+
+#:
+msgid "Downtime"
+msgstr "Downtime"
+
+#:
+msgid "Discovered device"
+msgstr "Dispositivo descoberto"
+
+#:
+msgid "Monitored host"
+msgstr "Host monitorado"
+
+#:
+msgid "Incorrect IP range."
+msgstr "Range IP incorreto."
+
+#:
+msgid "Details of scenario"
+msgstr "Detalhes do cenário"
+
+#:
+msgid "DETAILS OF SCENARIO"
+msgstr "DETALHES DO CENÁRIO"
+
+#:
+msgid "Speed"
+msgstr "Velocidade"
+
+#:
+msgid "Response code"
+msgstr "Código retornado"
+
+#:
+msgid "TOTAL"
+msgstr "TOTAL"
+
+#:
+msgid "Response time"
+msgstr "Tempo de resposta"
+
+#:
+msgid "In progress"
+msgstr "Em andamento"
+
+#:
+msgid "of"
+msgstr "de"
+
+#:
+msgid "to"
+msgstr "a"
+
+#:
+msgid "In check"
+msgstr "Checando"
+
+#:
+msgid "Idle till"
+msgstr "Ocioso até"
+
+#:
+msgid "Failed on"
+msgstr "Falhou em"
+
+#:
+msgid "Failed"
+msgstr "Falhou"
+
+#:
+msgid "Status of Web monitoring"
+msgstr "Status da monitoração Web"
+
+#:
+msgid "STATUS OF WEB MONITORING"
+msgstr "STATUS DA MONITORAÇÃO WEB"
+
+#:
+msgid "State"
+msgstr "Status"
+
+#:
+msgid "Sort"
+msgstr "Ordenar"
+
+#:
+msgid "Status codes"
+msgstr "Códigos de status"
+
+#:
+msgid "Web"
+msgstr "Web"
+
+#:
+msgid "Configuration of Web monitoring"
+msgstr "Configuração do monitoramento Web"
+
+#:
+msgid "CONFIGURATION OF WEB MONITORING"
+msgstr "CONFIGURAÇÃO DO MONITORAMENTO WEB"
+
+#:
+msgid "Scenario"
+msgstr "Cenário"
+
+#:
+msgid "Scenarios"
+msgstr "Cenários"
+
+#:
+msgid "SCENARIOS"
+msgstr "CENÁRIOS"
+
+#:
+msgid "Create scenario"
+msgstr "Criar cenário"
+
+#:
+msgid "Hide disabled scenarios"
+msgstr "Esconder cenários inativos"
+
+#:
+msgid "Show disabled scenarios"
+msgstr "Mostrar cenários inativos"
+
+#:
+msgid "Number of steps"
+msgstr "Número de passos"
+
+#:
+msgid "Scenario deleted"
+msgstr "Cenário removido"
+
+#:
+msgid "Scenario activated"
+msgstr "Cenário ativado"
+
+#:
+msgid "Scenario disabled"
+msgstr "Cenário desabilitado"
+
+#:
+msgid "Delete scenario?"
+msgstr "Remover cenário?"
+
+#:
+msgid "Scenario updated"
+msgstr "Cenário atualizado"
+
+#:
+msgid "Cannot update scenario"
+msgstr "Cenário não foi atualizado"
+
+#:
+msgid "Scenario added"
+msgstr "Cenário adicionado"
+
+#:
+msgid "Cannot add scenario"
+msgstr "Cenário não foi incluído"
+
+#:
+msgid "Cannot delete scenario"
+msgstr "Cenário não foi removido"
+
+#:
+msgid "Agent"
+msgstr "Agente"
+
+#:
+msgid "Variables"
+msgstr "Variáveis"
+
+#:
+msgid "Step"
+msgstr "Passo"
+
+#:
+msgid "Steps"
+msgstr "Passos"
+
+#:
+msgid "Timeout"
+msgstr "Timeout"
+
+#:
+msgid "Post"
+msgstr "Post"
+
+#:
+msgid "Required"
+msgstr "Requerido"
+
+#:
+msgid "Step of scenario"
+msgstr "Passo do cenário"
+
+#:
+msgid "Basic authentication"
+msgstr "Autenticação básica"
+
+#:
+msgid "Enable selected WEB scenarios?"
+msgstr "Ativar cenário WEB selecionado?"
+
+#:
+msgid "Disable selected WEB scenarios?"
+msgstr "Desativar cenários WEB selecionados?"
+
+#:
+msgid "Delete history of selected WEB scenarios?"
+msgstr "Remover histórico de cenários WEB selecionados?"
+
+#:
+msgid "Delete selected WEB scenarios?"
+msgstr "Remover cenários WEB selecionados?"
+
+#:
+msgid "Element"
+msgstr "Elemento"
+
+#:
+msgid "Elements"
+msgstr "Elementos"
+
+#:
+msgid "Only host info"
+msgstr "Somente informação de host"
+
+#:
+msgid "Export/Import"
+msgstr "Exportar/Importar"
+
+#:
+msgid "Import file"
+msgstr "Importar arquivo"
+
+#:
+msgid "Import"
+msgstr "Importar"
+
+#:
+msgid "IMPORT"
+msgstr "IMPORTAR"
+
+#:
+msgid "Export"
+msgstr "Exportar"
+
+#:
+msgid "Export selected"
+msgstr "Exportar selecionado(s)"
+
+#:
+msgid "EXPORT"
+msgstr "EXPORTAR"
+
+#:
+msgid "Preview"
+msgstr "Visualizar"
+
+#:
+msgid "Back"
+msgstr "Atrás"
+
+#:
+msgid "BACK"
+msgstr "BACK"
+
+#:
+msgid "No data for export"
+msgstr "Não há dados para exportar"
+
+#:
+msgid "no data"
+msgstr "Não há dados"
+
+#:
+msgid "Rules"
+msgstr "Regras"
+
+#:
+msgid "Existing"
+msgstr "Existente"
+
+#:
+msgid "Missing"
+msgstr "Esperado"
+
+#:
+msgid "Refresh"
+msgstr "Atualizar"
+
+#:
+msgid "Refresh time in seconds"
+msgstr "Tempo de refresh em segundos"
+
+#:
+msgid "Refresh time multiplier"
+msgstr "Multiplicador de tempo de Refresh"
+
+#:
+msgid "Imported"
+msgstr "Importado"
+
+#:
+msgid "successfully"
+msgstr "com sucesso"
+
+#:
+msgid "failed"
+msgstr "falhou"
+
+#:
+msgid "d.m.y"
+msgstr "d.m.a"
+
+#:
+msgid "H.i"
+msgstr "H.i"
+
+#:
+msgid "Previous"
+msgstr "Anterior"
+
+#:
+msgid "Next"
+msgstr "Próximo"
+
+#:
+msgid "Retry"
+msgstr "Tentar"
+
+#:
+msgid "Finish"
+msgstr "Fim"
+
+#:
+msgid "Fail"
+msgstr "Falhou"
+
+#:
+msgid "UPDATE"
+msgstr "ATUALIZAR"
+
+#:
+msgid "Installation"
+msgstr "Instalação"
+
+#:
+msgid "New installation"
+msgstr "Nova instalação"
+
+#:
+msgid "NEW INSTALLATION"
+msgstr "NOVA INSTALAÇÃO"
+
+#:
+msgid "Installation/Update"
+msgstr "Instalação/Atualização"
+
+#:
+msgid "Zabbix is temporarily unavailable"
+msgstr "Zabbix está temporariamente indisponível"
+
+#:
+msgid "Multibyte String module required to run FrontEnd"
+msgstr "Módulo \"Multibyte String\" é requirido para a execução da GUI"
+
+#:
+msgid "Y.M.d H:i:s"
+msgstr "d/M/A H:i:s"
+
+#:
+msgid "Empty input parameter"
+msgstr "Parâmetro de entrada vazio"
+
+#:
+msgid "Time zone"
+msgstr "Fuso horário"
+
+#:
+msgid "Do not keep history older than (in days)"
+msgstr "Não manter no histórico mais do que (dias)"
+
+#:
+msgid "Do not keep trends older than (in days)"
+msgstr "Não arquivar trends mais do que (dias)"
+
+#:
+msgid "Master node"
+msgstr "Nó mestre"
+
+#:
+msgid "Child"
+msgstr "Remoto"
+
+#:
+msgid "Master"
+msgstr "Mestre"
+
+#:
+msgid "Node updated"
+msgstr "Nó atualizado"
+
+#:
+msgid "Cannot update node"
+msgstr "Nó não foi atualizado"
+
+#:
+msgid "Node added"
+msgstr "Nó adicionado"
+
+#:
+msgid "Cannot add node"
+msgstr "Nó não foi adicionado"
+
+#:
+msgid "Node deleted"
+msgstr "Nó removido"
+
+#:
+msgid "Cannot delete node"
+msgstr "Não foi possível deletar nó"
+
+#:
+msgid "Current node"
+msgstr "Nó atual"
+
+#:
+msgid "Select Nodes"
+msgstr "Selecionar nós"
+
+#:
+msgid "No events to acknowledge"
+msgstr "Não há eventos para vistar"
+
+#:
+msgid "Acknowledges"
+msgstr "Vistos"
+
+#:
+msgid "Acknowledge"
+msgstr "Vistar"
+
+#:
+msgid "Return"
+msgstr "Retornar"
+
+#:
+msgid "Acknowledge alarm by"
+msgstr "Alarme visto por"
+
+#:
+msgid "Add comment by"
+msgstr "Comentário incluído por"
+
+#:
+msgid "ALARM ACKNOWLEDGES"
+msgstr "VISTOS DADOS EM ALARMES"
+
+#:
+msgid "Acknowledge added"
+msgstr "Visto incluído"
+
+#:
+msgid "Cannot acknowledge event"
+msgstr "Não foi possível vistar evento"
+
+#:
+msgid "----[BULK ACKNOWLEDGE]----"
+msgstr "----[VISTO EM MASSA]----"
+
+#:
+msgid "Bulk acknowledge"
+msgstr "Visto em massa"
+
+#:
+msgid "Immediately"
+msgstr "Imediatamente"
+
+#:
+msgid "Infinity"
+msgstr "Infinito"
+
+#:
+msgid "Recovery message"
+msgstr "Mensagem da recuperação"
+
+#:
+msgid "Configuration of actions"
+msgstr "Configuração de ações"
+
+#:
+msgid "CONFIGURATION OF ACTIONS"
+msgstr "CONFIGURAÇÃO DE AÇÕES"
+
+#:
+msgid "Operation type"
+msgstr "Tipo da operação"
+
+#:
+msgid "Send message"
+msgstr "Enviar mensagem"
+
+#:
+msgid "Remote command"
+msgstr "Comando remoto"
+
+#:
+msgid "Remote commands"
+msgstr "Comandos remotos"
+
+#:
+msgid "Filter"
+msgstr "Filtrar"
+
+#:
+msgid "Trigger severity"
+msgstr "Severidade da trigger"
+
+#:
+msgid "Trigger value"
+msgstr "Valor da trigger"
+
+#:
+msgid "Time period"
+msgstr "Intervalo"
+
+#:
+msgid "Maintenance status"
+msgstr "Status de manutenção"
+
+#:
+msgid "maintenance"
+msgstr "manutenção"
+
+#:
+msgid "max value"
+msgstr "valor máx"
+
+#:
+msgid "min value"
+msgstr "valor mín"
+
+#:
+msgid "Trigger description"
+msgstr "Descrição do trigger"
+
+#:
+msgid "Host name"
+msgstr "Nome do Host"
+
+#:
+msgid "Action conditions"
+msgstr "Condições da ação"
+
+#:
+msgid "Operation condition"
+msgstr "Condição da operação"
+
+#:
+msgid "Conditions"
+msgstr "Condições"
+
+#:
+msgid "Condition"
+msgstr "Condição"
+
+#:
+msgid "New condition"
+msgstr "Nova condição"
+
+#:
+msgid "Action operations"
+msgstr "Operações da Ação"
+
+#:
+msgid "Operations"
+msgstr "Ações"
+
+#:
+msgid "Edit operation"
+msgstr "Editar ação"
+
+#:
+msgid "No conditions defined"
+msgstr "Nenhuma condição definida"
+
+#:
+msgid "Actions deleted"
+msgstr "Ações removidas"
+
+#:
+msgid "Cannot delete actions"
+msgstr "Ações não podem ser removidas"
+
+#:
+msgid "No operations defined"
+msgstr "Nenhuma ação definida"
+
+#:
+msgid "New"
+msgstr "Nova"
+
+#:
+msgid "Add host"
+msgstr "Adicionar servidor"
+
+#:
+msgid "Remove host"
+msgstr "Remover servidor"
+
+#:
+msgid "Enable host"
+msgstr "Ativar host"
+
+#:
+msgid "Disable host"
+msgstr "Desativar host"
+
+#:
+msgid "Link to template"
+msgstr "Associar à template"
+
+#:
+msgid "Unlink from template"
+msgstr "Desassociar da template"
+
+#:
+msgid "Host template"
+msgstr "Template do host"
+
+#:
+msgid "Event acknowledged"
+msgstr "Evento vistado"
+
+#:
+msgid "Send only to"
+msgstr "Enviar apenas para"
+
+#:
+msgid "User medias"
+msgstr "Mídias do usuário"
+
+#:
+msgid "Discovery check"
+msgstr "Discovery check"
+
+#:
+msgid "Discovered object"
+msgstr "Objeto descoberto"
+
+#:
+msgid "Device"
+msgstr "Dispositivo"
+
+#:
+msgid "Auto registration"
+msgstr "Autorregistro"
+
+#:
+msgid "Incorrect trigger"
+msgstr "Trigger incorreta"
+
+#:
+msgid "Incorrect host"
+msgstr "Servidor incorreto"
+
+#:
+msgid "Incorrect period"
+msgstr "Período incorreto"
+
+#:
+msgid "Incorrect IP"
+msgstr "IP incorreto"
+
+#:
+msgid "Incorrect discovery check"
+msgstr "Checagem de autobusca incorreta"
+
+#:
+msgid "Incorrect port"
+msgstr "Porta incorreta"
+
+#:
+msgid "Incorrect discovery status"
+msgstr "Status de autobusca incorreto"
+
+#:
+msgid "Incorrect condition type"
+msgstr "Tipo de condição incorreta"
+
+#:
+msgid "Incorrect operation type"
+msgstr "Tipo de operação incorreta"
+
+#:
+msgid "Incorrect user"
+msgstr "Usuário incorreto"
+
+#:
+msgid "Incorrect steps"
+msgstr "Passos incorretos"
+
+#:
+msgid "selected actions?"
+msgstr "ações selecionadas?"
+
+#:
+msgid "Actions"
+msgstr "Ações"
+
+#:
+msgid "Logs"
+msgstr "Logs"
+
+#:
+msgid "LOGS"
+msgstr "LOGS"
+
+#:
+msgid "ACTIONS"
+msgstr "AÇÕES"
+
+#:
+msgid "Message actions"
+msgstr "Ações de mensagem"
+
+#:
+msgid "Command actions"
+msgstr "Ações de comando"
+
+#:
+msgid "Action added"
+msgstr "Ação incluída"
+
+#:
+msgid "Cannot add action"
+msgstr "Ação não foi adicionada"
+
+#:
+msgid "Action updated"
+msgstr "Ação atualizada"
+
+#:
+msgid "Cannot update action"
+msgstr "Ação não foi atualizada"
+
+#:
+msgid "Action deleted"
+msgstr "Ação removida"
+
+#:
+msgid "Cannot delete action"
+msgstr "Ação não foi removida"
+
+#:
+msgid "Send message to"
+msgstr "Enviar mensagem para"
+
+#:
+msgid "Run remote commands"
+msgstr "Executar comandos remotos"
+
+#:
+msgid "Delay"
+msgstr "Espera"
+
+#:
+msgid "Subject"
+msgstr "Assunto"
+
+#:
+msgid "Recovery subject"
+msgstr "Assunto da recuperação"
+
+#:
+msgid "Default message"
+msgstr "Mensagem padrão"
+
+#:
+msgid "Default subject"
+msgstr "Assunto padrão"
+
+#:
+msgid "Message"
+msgstr "Mensagem"
+
+#:
+msgid "ON"
+msgstr "ON"
+
+#:
+msgid "OFF"
+msgstr "OFF"
+
+#:
+msgid "On"
+msgstr "ATIVO"
+
+#:
+msgid "Off"
+msgstr "INATIVO"
+
+#:
+msgid "No actions defined"
+msgstr "Nenhuma ação definida"
+
+#:
+msgid "Single user"
+msgstr "Usuário"
+
+#:
+msgid "User group"
+msgstr "Grupo de usuários"
+
+#:
+msgid "Group"
+msgstr "Grupo"
+
+#:
+msgid "User"
+msgstr "Usuário"
+
+#:
+msgid "Not classified"
+msgstr "Não classificada"
+
+#:
+msgid "Information"
+msgstr "Informação"
+
+#:
+msgid "Warning"
+msgstr "Advertência (Warning)"
+
+#:
+msgid "Average"
+msgstr "Médio (Average)"
+
+#:
+msgid "High"
+msgstr "Alto (High)"
+
+#:
+msgid "Disaster"
+msgstr "Desastre"
+
+#:
+msgid "AND / OR"
+msgstr "E/OU"
+
+#:
+msgid "AND"
+msgstr "E"
+
+#:
+msgid "and"
+msgstr "e"
+
+#:
+msgid "&"
+msgstr "&"
+
+#:
+msgid "OR"
+msgstr "OU"
+
+#:
+msgid "or"
+msgstr "ou"
+
+#:
+msgid "Type of calculation"
+msgstr "Tipo do cálculo"
+
+#:
+msgid "Create Action"
+msgstr "Criar ação"
+
+#:
+msgid "Delete selected action?"
+msgstr "Remover ação selecionada?"
+
+#:
+msgid "like"
+msgstr "como"
+
+#:
+msgid "not like"
+msgstr "diferente"
+
+#:
+msgid "in"
+msgstr "em"
+
+#:
+msgid "not in"
+msgstr "não em"
+
+#:
+msgid "Retries left"
+msgstr "Tentativas restantes"
+
+#:
+msgid "Actions since"
+msgstr "Ações desde"
+
+#:
+msgid "Show all"
+msgstr "Mostrar todos"
+
+#:
+msgid "Time"
+msgstr "Data"
+
+#:
+msgid "Status"
+msgstr "Status"
+
+#:
+msgid "Duration"
+msgstr "Duração"
+
+#:
+msgid "TRUE"
+msgstr "VERDADEIRO"
+
+#:
+msgid "FALSE"
+msgstr "FALSO"
+
+#:
+msgid "UNKNOWN"
+msgstr "DESCONHECIDO"
+
+#:
+msgid "Type"
+msgstr "Tipo"
+
+#:
+msgid "Recipient(s)"
+msgstr "Destinatário(s)"
+
+#:
+msgid "Recipient"
+msgstr "Destinatário"
+
+#:
+msgid "Error"
+msgstr "Erro"
+
+#:
+msgid "sent"
+msgstr "enviado"
+
+#:
+msgid "executed"
+msgstr "executado"
+
+#:
+msgid "not sent"
+msgstr "não enviado"
+
+#:
+msgid "No actions found"
+msgstr "Nenhuma ação encontrada"
+
+#:
+msgid "Incorrect command"
+msgstr "Comando incorreto"
+
+#:
+msgid "Unknown group name"
+msgstr "Grupo desconhecido"
+
+#:
+msgid "Unknown host name"
+msgstr "Nome de host desconhecido"
+
+#:
+msgid "in command"
+msgstr "no comando"
+
+#:
+msgid "Line"
+msgstr "Linha"
+
+#:
+msgid "Filled region"
+msgstr "Região preenchida"
+
+#:
+msgid "Bold line"
+msgstr "Linha grossa"
+
+#:
+msgid "Dot"
+msgstr "Pontilhado"
+
+#:
+msgid "Dashed line"
+msgstr "Linha tracejada"
+
+#:
+msgid "Gradient line"
+msgstr "Área gradiente"
+
+#:
+msgid "Custom graphs"
+msgstr "Gráficos personalizados"
+
+#:
+msgid "GRAPHS"
+msgstr "GRÁFICOS"
+
+#:
+msgid "Select graph to display"
+msgstr "Selecione gráfico"
+
+#:
+msgid "Period"
+msgstr "Período"
+
+#:
+msgid "Select graph..."
+msgstr "Selecione gráfico..."
+
+#:
+msgid "Fullscreen"
+msgstr "Tela cheia"
+
+#:
+msgid "View"
+msgstr "Visão"
+
+#:
+msgid "H:i"
+msgstr "H:i"
+
+#:
+msgid "D"
+msgstr "D"
+
+#:
+msgid "d.m"
+msgstr "d/m"
+
+#:
+msgid "d.m H:i"
+msgstr "d/m H:i"
+
+#:
+msgid "d.m.Y H:i"
+msgstr "d/m/A H:i"
+
+#:
+msgid "GUI"
+msgstr "GUI"
+
+#:
+msgid "Dropdown first entry"
+msgstr "Primeiro ítem dropdown"
+
+#:
+msgid "remember selected"
+msgstr "lembrar selecionado"
+
+#:
+msgid "Max count of elements to show inside table cell"
+msgstr "Número máximo de elementos mostrados dentro de uma célula de tabela"
+
+#:
+msgid "Search/Filter elements limit"
+msgstr "Limite de Busca/Filtragem de elementos"
+
+#:
+msgid "Themes"
+msgstr "Temas"
+
+#:
+msgid "System default"
+msgstr "Padrão do sistema"
+
+#:
+msgid "Black & Blue"
+msgstr "Preto & Azul"
+
+#:
+msgid "Original blue"
+msgstr "Azul Original"
+
+#:
+msgid "Dark orange"
+msgstr "Laranja Escuro"
+
+#:
+msgid "Default theme"
+msgstr "Tema padrão"
+
+#:
+msgid "Event acknowledges"
+msgstr "Vistos de eventos"
+
+#:
+msgid "Days"
+msgstr "Dias"
+
+#:
+msgid "Show events not older"
+msgstr "Mostrar eventos não anteriores a"
+
+#:
+msgid "Show events max"
+msgstr "Máx eventos a exibir"
+
+#:
+msgid "Max count of events per trigger to show"
+msgstr "Máximo de eventos por trigger a exibir"
+
+#:
+msgid "Cannot update value map"
+msgstr "Mapeamento não foi atualizado"
+
+#:
+msgid "Value map added"
+msgstr "Mapeamento de valor incluído"
+
+#:
+msgid "Cannot add value map"
+msgstr "Mapeamento de valor não foi incluído"
+
+#:
+msgid "Value map deleted"
+msgstr "Mapeamento de valor removido"
+
+#:
+msgid "Cannot delete value map"
+msgstr "Mapeamento não foi removido"
+
+#:
+msgid "Value map updated"
+msgstr "Mapeamento atualizado"
+
+#:
+msgid "VALUE MAPPING"
+msgstr "MAPEAMENTO DE VALOR"
+
+#:
+msgid "Value mapping"
+msgstr "Mapeamento de valor"
+
+#:
+msgid "Value map"
+msgstr "Valores"
+
+#:
+msgid "Mapping"
+msgstr "Mapeamento"
+
+#:
+msgid "New mapping"
+msgstr "Novo mapeamento"
+
+#:
+msgid "No mapping defined"
+msgstr "Nenhum mapeamento definido"
+
+#:
+msgid "Create value map"
+msgstr "Criar mapeamento de valor"
+
+#:
+msgid "Configuration of Zabbix"
+msgstr "Configuração do Zabbix"
+
+#:
+msgid "CONFIGURATION OF ZABBIX"
+msgstr "CONFIGURAÇÃO DO ZABBIX"
+
+#:
+msgid "Configuration updated"
+msgstr "Configuração atualizada"
+
+#:
+msgid "Configuration was not updated"
+msgstr "Configuração não foi atualizada"
+
+#:
+msgid "Added new media type"
+msgstr "Adicionar novo tipo de mídia"
+
+#:
+msgid "New media type was not added"
+msgstr "Nova mídia não foi adicionada"
+
+#:
+msgid "Media type updated"
+msgstr "Mídia atualizada"
+
+#:
+msgid "Media type was not updated"
+msgstr "Mídia não foi atualizada"
+
+#:
+msgid "Media type deleted"
+msgstr "Mídia removida"
+
+#:
+msgid "Media type was not deleted"
+msgstr "Mídia não foi removida"
+
+#:
+msgid "Configuration"
+msgstr "Configuração"
+
+#:
+msgid "Administration"
+msgstr "Administração"
+
+#:
+msgid "Do not keep actions older than (in days)"
+msgstr "Remover ações anteriores a (em dias)"
+
+#:
+msgid "Do not keep events older than (in days)"
+msgstr "Remover eventos anteriores a (em dias)"
+
+#:
+msgid "No media types defined"
+msgstr "Nenhum tipo de mídia definido"
+
+#:
+msgid "SMTP server"
+msgstr "Servidor SMTP"
+
+#:
+msgid "SMTP helo"
+msgstr "SMTP helo"
+
+#:
+msgid "SMTP email"
+msgstr "SMTP email"
+
+#:
+msgid "Script name"
+msgstr "Nome script"
+
+#:
+msgid "Delete selected media?"
+msgstr "Remover mídia selecionada?"
+
+#:
+msgid "Delete selected image?"
+msgstr "Remover imagem selecionada?"
+
+#:
+msgid "Housekeeper"
+msgstr "Limpeza"
+
+#:
+msgid "Media types"
+msgstr "Tipos de mídias"
+
+#:
+msgid "Escalation rules"
+msgstr "Regras de escalonamento"
+
+#:
+msgid "Enable escalations"
+msgstr "Ativar escalonamentos"
+
+#:
+msgid "Escalation"
+msgstr "Escalonamento"
+
+#:
+msgid "Escalation rule"
+msgstr "Regra de escalonamento"
+
+#:
+msgid "Default"
+msgstr "Padrão"
+
+#:
+msgid "Images"
+msgstr "Imagens"
+
+#:
+msgid "Image"
+msgstr "Imagem"
+
+#:
+msgid "IMAGES"
+msgstr "IMAGENS"
+
+#:
+msgid "Icon"
+msgstr "Ícone"
+
+#:
+msgid "No images defined"
+msgstr "Não há imagens definidas"
+
+#:
+msgid "Background"
+msgstr "Fundo"
+
+#:
+msgid "Upload"
+msgstr "Enviar"
+
+#:
+msgid "Image added"
+msgstr "Imagem incluída"
+
+#:
+msgid "Cannot add image"
+msgstr "Imagem não foi incluída"
+
+#:
+msgid "Image deleted"
+msgstr "Imagem removida"
+
+#:
+msgid "Cannot delete image"
+msgstr "Imagem não foi removida"
+
+#:
+msgid "Image updated"
+msgstr "Imagem atualizada"
+
+#:
+msgid "Cannot update image"
+msgstr "Imagem não foi atualizada"
+
+#:
+msgid "Other"
+msgstr "Outros"
+
+#:
+msgid "Other parameters"
+msgstr "Outros parâmetros"
+
+#:
+msgid "Refresh unsupported items (in sec)"
+msgstr "Atualizar itens não suportados (em segundos)"
+
+#:
+msgid "Create Media Type"
+msgstr "Criar Mídia"
+
+#:
+msgid "Create Image"
+msgstr "Criar Imagem"
+
+#:
+msgid "Working time"
+msgstr "Horário comercial"
+
+#:
+msgid "User group for database down message"
+msgstr "Grupo de usuários que receberá a mensagem de BD indisponível"
+
+#:
+msgid "Incorrect group"
+msgstr "Grupo incorreto"
+
+#:
+msgid "Nothing to do"
+msgstr "Nada a ser feito"
+
+#:
+msgid "Incorrect work period"
+msgstr "Período de trabalho incorreto"
+
+#:
+msgid "Regular expressions"
+msgstr "Expressões Regulares"
+
+#:
+msgid "Regular expression"
+msgstr "Expressão regular"
+
+#:
+msgid "Expressions"
+msgstr "Expressões"
+
+#:
+msgid "Expression"
+msgstr "Expressão"
+
+#:
+msgid "Expected result"
+msgstr "Resultado experado"
+
+#:
+msgid "Character string included"
+msgstr "Sequência de caracteres incluídos"
+
+#:
+msgid "Any character string included"
+msgstr "Qualquer sequência de caracteres incluídos"
+
+#:
+msgid "Character string not included"
+msgstr "Sequência de caracteres não incluídos"
+
+#:
+msgid "Result is TRUE"
+msgstr "Resultado é VERDADEIRO"
+
+#:
+msgid "Result is FALSE"
+msgstr "Resultado é FALSO"
+
+#:
+msgid "Expression type"
+msgstr "Tipo de expressão"
+
+#:
+msgid "New expression"
+msgstr "Nova expressão"
+
+#:
+msgid "Case sensitive"
+msgstr "Distinguir Maiúsc/Minúsc"
+
+#:
+msgid "Test"
+msgstr "Testar"
+
+#:
+msgid "Delimiter"
+msgstr "Delimitador"
+
+#:
+msgid "Test string"
+msgstr "Sequência de texto para teste"
+
+#:
+msgid "Incorrect expression"
+msgstr "Expressão incorreta"
+
+#:
+msgid "New regular expression"
+msgstr "Nova expressão regular"
+
+#:
+msgid "Regular expression added"
+msgstr "Expressão regular adicionada"
+
+#:
+msgid "Cannot add regular expression"
+msgstr "Não foi possível atualizar expressão regular"
+
+#:
+msgid "Regular expression updated"
+msgstr "Expressão regular atualizada"
+
+#:
+msgid "Cannot update regular expression"
+msgstr "Não foi possível atualizar expressão regular"
+
+#:
+msgid "Regular expression deleted"
+msgstr "Expressão regular deletada"
+
+#:
+msgid "Cannot delete regular expression"
+msgstr "Não foi possível deletar expressão regular"
+
+#:
+msgid "Delete regular expression?"
+msgstr "Remover expressão regular?"
+
+#:
+msgid "Delete selected regular expressions?"
+msgstr "Remover expressões regulares selecionadas?"
+
+#:
+msgid "Group for discovered hosts"
+msgstr "Grupo para hosts descobertos"
+
+#:
+msgid "Value maps are used to create a mapping between numeric values and string representations"
+msgstr "Mapas de valor são usados para criar um mapeamento entre valores numéricos e representações de string"
+
+#:
+msgid "Delete selected value mapping?"
+msgstr "Remover mapeamento de valor selecionado?"
+
+#:
+msgid "Delete selected media types?"
+msgstr "Remover tipos de mídia selecionados?"
+
+#:
+msgid "Your setup is not configured for distributed monitoring"
+msgstr "Seu sistema não está configurado para monitoramento distribuído"
+
+#:
+msgid "CONFIGURATION OF NODES"
+msgstr "CONFIGURAÇÃO DE NODOS"
+
+#:
+msgid "DM"
+msgstr "MD"
+
+#:
+msgid "Node"
+msgstr "Nodo"
+
+#:
+msgid "Nodes"
+msgstr "Nodo"
+
+#:
+msgid "NODES"
+msgstr "NODO"
+
+#:
+msgid "New node"
+msgstr "Novo nodo"
+
+#:
+msgid "No nodes defined"
+msgstr "Não há nodos definidos"
+
+#:
+msgid "All nodes"
+msgstr "Todos os nodos"
+
+#:
+msgid "Delete selected node?"
+msgstr "Remover nodo selecionado?"
+
+#:
+msgid "Enable hosts monitored by selected proxies?"
+msgstr "Habilitar hosts monitorados pelos proxy(ies) selecionado(s)?"
+
+#:
+msgid "Disable hosts monitored by selected proxies?"
+msgstr "Desabilitar hosts monitorados pelos proxy(ies) selecionado(s)?"
+
+#:
+msgid "Delete selected proxies?"
+msgstr "Remover proxy(ies) selecionado(s)?"
+
+#:
+msgid "CONFIGURATION OF PROXIES"
+msgstr "CONFIGURAÇÃO DE PROXIES"
+
+#:
+msgid "Delete selected proxy?"
+msgstr "Remover proxy(ies) selecionado(s)?"
+
+#:
+msgid "Host count"
+msgstr "Contagem de Hosts"
+
+#:
+msgid "Item count"
+msgstr "Contagem de Itens"
+
+#:
+msgid "Required performance (vps)"
+msgstr "Performance requerida (vps)"
+
+#:
+msgid "Proxy mode"
+msgstr "Modo do Proxy"
+
+#:
+msgid "Passive"
+msgstr "Passivo"
+
+#:
+msgid "Active"
+msgstr "Ativo"
+
+#:
+msgid "Authentication"
+msgstr "Autenticação"
+
+#:
+msgid "Authentication to Zabbix"
+msgstr "Autenticação para Zabbix"
+
+#:
+msgid "Base DN"
+msgstr "Base DN"
+
+#:
+msgid "Bind DN"
+msgstr "Bind DN"
+
+#:
+msgid "Bind Password"
+msgstr "Bind Password"
+
+#:
+msgid "Search attribute"
+msgstr "Atributo de Pesquisa"
+
+#:
+msgid "was not"
+msgstr "não foi"
+
+#:
+msgid "successful"
+msgstr "sucedido"
+
+#:
+msgid "must be valid"
+msgstr "deve ser válido"
+
+#:
+msgid "LDAP Authentication"
+msgstr "Autenticação LDAP"
+
+#:
+msgid "HTTP Authentication"
+msgstr "Autenticação HTTP"
+
+#:
+msgid "Zabbix Internal authentication"
+msgstr "Autenticação interna do Zabbix"
+
+#:
+msgid "Default authentication"
+msgstr "Autenticação Padrão"
+
+#:
+msgid "Switching HTTP authentication will reset all current sessions! Continue?"
+msgstr "Alterar para autenticação HTTP irá provocar o reinício das atuais sessões! Continuar?"
+
+#:
+msgid "Switching LDAP authentication will reset all current sessions! Continue?"
+msgstr "Alterar para autenticação LDAP irá provocar o reinício das atuais sessões! Continuar?"
+
+#:
+msgid "No permissions !"
+msgstr "Não tem permissão!"
+
+#:
+msgid "LATEST DATA"
+msgstr "DADOS RECENTES"
+
+#:
+msgid "All"
+msgstr "Todos"
+
+#:
+msgid "all"
+msgstr "Todos"
+
+#:
+msgid "- all -"
+msgstr "- todos -"
+
+#:
+msgid "- other -"
+msgstr "- outro -"
+
+#:
+msgid "not selected"
+msgstr "Não selecionado"
+
+#:
+msgid "Graph"
+msgstr "Gráfico"
+
+#:
+msgid "Zabbix"
+msgstr "Zabbix"
+
+#:
+msgid "Copyright 2001-2010 by"
+msgstr "Copyright 2001-2010 por"
+
+#:
+msgid "Connected as"
+msgstr "Conectado como"
+
+#:
+msgid "Not connected"
+msgstr "Não conectado"
+
+#:
+msgid "SIA Zabbix"
+msgstr "SIA Zabbix"
+
+#:
+msgid "Graphs copied"
+msgstr "Gráficos copiados"
+
+#:
+msgid "Cannot copy graphs"
+msgstr "Não foi possível copiar gráficos"
+
+#:
+msgid "Item added"
+msgstr "Item incluído"
+
+#:
+msgid "Item updated"
+msgstr "Item atualizada"
+
+#:
+msgid "Items updated"
+msgstr "Itens atualizados"
+
+#:
+msgid "Item does not exist"
+msgstr "Item não existe"
+
+#:
+msgid "Sort by"
+msgstr "Ordenar por"
+
+#:
+msgid "Parameter"
+msgstr "Parâmetro"
+
+#:
+msgid "Colour"
+msgstr "Cor"
+
+#:
+msgid "Up"
+msgstr "Acima"
+
+#:
+msgid "Down"
+msgstr "Abaixo"
+
+#:
+msgid "New item for the graph"
+msgstr "Novo item de gráfico"
+
+#:
+msgid "Update item for the graph"
+msgstr "Atualizar ítem do gráfico"
+
+#:
+msgid "Sort order (0->100)"
+msgstr "Posição (0->100)"
+
+#:
+msgid "Y axis side"
+msgstr "Eixo Y"
+
+#:
+msgid "Axis side"
+msgstr "Lado do Eixo"
+
+#:
+msgid "Left"
+msgstr "Esquerda"
+
+#:
+msgid "Function"
+msgstr "Função"
+
+#:
+msgid "min"
+msgstr "mín"
+
+#:
+msgid "avg"
+msgstr "méd"
+
+#:
+msgid "max"
+msgstr "máx"
+
+#:
+msgid "last"
+msgstr "último"
+
+#:
+msgid "Draw style"
+msgstr "Estilo"
+
+#:
+msgid "Simple"
+msgstr "Simples"
+
+#:
+msgid "Graph type"
+msgstr "Tipo do gráfico"
+
+#:
+msgid "Stacked"
+msgstr "Pilha"
+
+#:
+msgid "Normal"
+msgstr "Normal"
+
+#:
+msgid "Pie"
+msgstr "Torta"
+
+#:
+msgid "Exploded"
+msgstr "Explodido"
+
+#:
+msgid "Aggregated"
+msgstr "Agregada"
+
+#:
+msgid "Aggregated periods count"
+msgstr "Intervalo de tempo (agregado)"
+
+#:
+msgid "add graph items first"
+msgstr "adicione primeiro itens no gráfico"
+
+#:
+msgid "Title"
+msgstr "Título"
+
+#:
+msgid "Percentile line"
+msgstr "Linha Percentil"
+
+#:
+msgid "Configuration of graphs"
+msgstr "Configuração de gráficos"
+
+#:
+msgid "CONFIGURATION OF GRAPHS"
+msgstr "CONFIGURAÇÃO DE GRÁFICOS"
+
+#:
+msgid "Graph added"
+msgstr "Gráfico incluído"
+
+#:
+msgid "Graph updated"
+msgstr "Gráfico atualizado"
+
+#:
+msgid "Cannot update graph"
+msgstr "Gráfico não foi atualizado"
+
+#:
+msgid "Graph deleted"
+msgstr "Gráfico removido"
+
+#:
+msgid "Cannot delete graph"
+msgstr "Gráfico não foi removido"
+
+#:
+msgid "Graphs deleted"
+msgstr "Gráficos deletados"
+
+#:
+msgid "Cannot delete graphs"
+msgstr "Não foi possível deletar gráficos"
+
+#:
+msgid "Cannot add graph"
+msgstr "Gráfico não foi adicionado"
+
+#:
+msgid "Cannot add more than one item with type \"Graph sum\""
+msgstr "Não é possível adicionar outro item do tipo \"Graph sum\""
+
+#:
+msgid "Id"
+msgstr "Id"
+
+#:
+msgid "No graphs defined"
+msgstr "Não há gráficos definidos"
+
+#:
+msgid "No graph defined"
+msgstr "Não há gráfico definido"
+
+#:
+msgid "Delete graph?"
+msgstr "Remover gráfico?"
+
+#:
+msgid "Y axis MIN value"
+msgstr "Valor MÍNIMO no eixo Y"
+
+#:
+msgid "Y axis MAX value"
+msgstr "Valor MÁXIMO no eixo Y"
+
+#:
+msgid "Calculated"
+msgstr "Calculado"
+
+#:
+msgid "Fixed"
+msgstr "Fixo"
+
+#:
+msgid "Create Graph"
+msgstr "Criar Gráfico"
+
+#:
+msgid "Show working time"
+msgstr "Mostrar horário comercial"
+
+#:
+msgid "Show triggers"
+msgstr "Mostrar triggers"
+
+#:
+msgid "3D view"
+msgstr "Visão 3D"
+
+#:
+msgid "Legend"
+msgstr "Legenda"
+
+#:
+msgid "Show legend"
+msgstr "Mostrar legenda"
+
+#:
+msgid "Graph sum"
+msgstr "Somatória do gráfico"
+
+#:
+msgid "Graph item"
+msgstr "Item do gráfico"
+
+#:
+msgid "Items required for graph"
+msgstr "Itens obrigatórios para gráficos"
+
+#:
+msgid "Templated graph"
+msgstr "Template de gráfico"
+
+#:
+msgid "No target selected"
+msgstr "Nenhum alvo selecionado"
+
+#:
+msgid "Delete selected graphs?"
+msgstr "Remover gráficos selecionados?"
+
+#:
+msgid "seconds"
+msgstr "segundos"
+
+#:
+msgid "sec"
+msgstr "seg"
+
+#:
+msgid "Select rows with value like"
+msgstr "Selecionar registros com valores como"
+
+#:
+msgid "Last hour graph"
+msgstr "Gráfico última hora"
+
+#:
+msgid "Last week graph"
+msgstr "Gráfico última semana"
+
+#:
+msgid "Last month graph"
+msgstr "Gráfico último mês"
+
+#:
+msgid "500 latest values"
+msgstr "Últimos 500 valores"
+
+#:
+msgid "Timestamp"
+msgstr "Hora"
+
+#:
+msgid "Local"
+msgstr "Local"
+
+#:
+msgid "Source"
+msgstr "Origem"
+
+#:
+msgid "Event ID"
+msgstr "Evento ID"
+
+#:
+msgid "log files"
+msgstr "arquivos de log"
+
+#:
+msgid "Remove selected"
+msgstr "Remover selecionado"
+
+#:
+msgid "Items list"
+msgstr "Lista de Itens"
+
+#:
+msgid "Show selected"
+msgstr "Mostrar selecionados"
+
+#:
+msgid "Hide selected"
+msgstr "Esconder selecionados"
+
+#:
+msgid "Mark selected"
+msgstr "Marcar selecionados"
+
+#:
+msgid "Mark others"
+msgstr "Marcar outros"
+
+#:
+msgid "as Red"
+msgstr "em Vermelho"
+
+#:
+msgid "as Green"
+msgstr "em Verde"
+
+#:
+msgid "as Blue"
+msgstr "em Azul"
+
+#:
+msgid "Failure Audit"
+msgstr "Falha de Auditoria"
+
+#:
+msgid "Success Audit"
+msgstr "Sucesso na Auditoria"
+
+#:
+msgid "[Y.M.d H:i:s]"
+msgstr "[d/M/Y H:i:s]"
+
+#:
+msgid "Y-m-d H:i:s"
+msgstr "d/M/Y H:i:s"
+
+#:
+msgid "Maintenance"
+msgstr "Manutenção"
+
+#:
+msgid "Maintenance added"
+msgstr "Manutenção adicionada"
+
+#:
+msgid "Maintenance updated"
+msgstr "Manutenção atualizada"
+
+#:
+msgid "Maintenance deleted"
+msgstr "Manutenção deletada"
+
+#:
+msgid "Delete selected maintenance periods?"
+msgstr "Remover períodos de manutenção selecionados?"
+
+#:
+msgid "At least one host or group should be selected"
+msgstr "Pelo menos um host ou grupo deve ser selecionado"
+
+#:
+msgid "In maintenance"
+msgstr "Em manutenção"
+
+#:
+msgid "Hosts in maintenance"
+msgstr "Hosts em manutenção"
+
+#:
+msgid "Groups in maintenance"
+msgstr "Grupos em manutenção"
+
+#:
+msgid "Cannot add maintenance"
+msgstr "Não foi possível adicionar período de manutenção"
+
+#:
+msgid "Cannot update maintenance"
+msgstr "Não foi possível atualizar período de manutenção"
+
+#:
+msgid "Cannot delete maintenance"
+msgstr "Não foi possível deletar período de manutenção"
+
+#:
+msgid "Maintenance period length"
+msgstr "Duração do período de manutenção"
+
+#:
+msgid "Maintenance periods"
+msgstr "Períodos de manutenção"
+
+#:
+msgid "MAINTENANCE PERIODS"
+msgstr "PERÍODOS DE MANUTENÇÃO"
+
+#:
+msgid "New maintenance period"
+msgstr "Novo período de manutenção"
+
+#:
+msgid "Edit maintenance period"
+msgstr "Editar período de manutenção"
+
+#:
+msgid "Create maintenance period"
+msgstr "Criar período de manutenção"
+
+#:
+msgid "Maintenance type"
+msgstr "Tipo de manutenção"
+
+#:
+msgid "Expired"
+msgstr "Expirado"
+
+#:
+msgid "Approach"
+msgstr "Abordagem"
+
+#:
+msgid "With data collection"
+msgstr "Com coleta de dados"
+
+#:
+msgid "No data collection"
+msgstr "Sem coleta de dados"
+
+#:
+msgid "Normal maintenance"
+msgstr "Manutenção normal"
+
+#:
+msgid "No data maintenance"
+msgstr "Sem manutenção de dados"
+
+#:
+msgid "Delete maintenance period?"
+msgstr "Remover período de manutenção?"
+
+#:
+msgid "Active since"
+msgstr "Ativo desde"
+
+#:
+msgid "Active till"
+msgstr "Ativo até"
+
+#:
+msgid "Period type"
+msgstr "Tipo de período"
+
+#:
+msgid "Schedule"
+msgstr "Agendamento"
+
+#:
+msgid "Next run"
+msgstr "Próxima execução"
+
+#:
+msgid "Date"
+msgstr "Data"
+
+#:
+msgid "One time only"
+msgstr "Apenas uma vez"
+
+#:
+msgid "Day of week"
+msgstr "Dia da semana"
+
+#:
+msgid "Day of month"
+msgstr "Dia do mês"
+
+#:
+msgid "Every day(s)"
+msgstr "Todos os dias"
+
+#:
+msgid "Every week(s)"
+msgstr "Todas as semanas"
+
+#:
+msgid "First"
+msgstr "Primeiro"
+
+#:
+msgid "Second"
+msgstr "Segundo"
+
+#:
+msgid "Third"
+msgstr "Terceiro"
+
+#:
+msgid "Fourth"
+msgstr "Quarto"
+
+#:
+msgid "At"
+msgstr "Em"
+
+#:
+msgid "Incorrect maintenance period"
+msgstr "Período de manutenção incorreto"
+
+#:
+msgid "Incorrect maintenance date"
+msgstr "Data de manutenção incorreta"
+
+#:
+msgid "Incorrect maintenance day period"
+msgstr "Dias de manutenção incorretos"
+
+#:
+msgid "Incorrect maintenance week period"
+msgstr "Semana de manutenção incorreta"
+
+#:
+msgid "Incorrect maintenance month period"
+msgstr "Mês de manutenção incoreto"
+
+#:
+msgid "Incorrect maintenance days of week"
+msgstr "Dias da semana de manutenção incorretos"
+
+#:
+msgid "CONFIGURATION OF HOST GROUPS"
+msgstr "CONFIGURAÇÃO DE GRUPOS DE HOSTS"
+
+#:
+msgid "Delete selected group?"
+msgstr "Remover grupo selecionado?"
+
+#:
+msgid "Enable selected Host Groups?"
+msgstr "Ativar grupos de host selecionados?"
+
+#:
+msgid "Disable selected Host Groups?"
+msgstr "Desativar grupos de host selecionados?"
+
+#:
+msgid "Delete selected Host Groups?"
+msgstr "Remover grupos de host selecionados?"
+
+#:
+msgid "Delete selected groups"
+msgstr "Remover grupos selecionados"
+
+#:
+msgid "Import Template"
+msgstr "Importar Template"
+
+#:
+msgid "Import Host"
+msgstr "Importar Host"
+
+#:
+msgid "Macros"
+msgstr "Macros"
+
+#:
+msgid "Macro"
+msgstr "Macro"
+
+#:
+msgid "Wrong macro"
+msgstr "Macro incorreta"
+
+#:
+msgid "Macro name is too long, should not exceed 64 chars."
+msgstr "Nome da macro não deve exceder 64 caracteres."
+
+#:
+msgid "Macro value is too long, should not exceed 255 chars."
+msgstr "Valor da macro não deve exceder 255 caracteres."
+
+#:
+msgid "Macro already exists"
+msgstr "Macro já existe"
+
+#:
+msgid "New macro"
+msgstr "Nova macro"
+
+#:
+msgid "Empty macro value"
+msgstr "Valor da macro vazio"
+
+#:
+msgid "No macros defined"
+msgstr "Não há macros definidas"
+
+#:
+msgid "Macro added"
+msgstr "Macro adicionada"
+
+#:
+msgid "Macros updated"
+msgstr "Macros atualizadas"
+
+#:
+msgid "Cannot update macros"
+msgstr "Macros não foram atualizadas"
+
+#:
+msgid "Macros deleted"
+msgstr "Macros deletadas"
+
+#:
+msgid "Cannot add macro"
+msgstr "Não foi possível adicionar macro"
+
+#:
+msgid "Cannot delete macros"
+msgstr "Não foi possível deletar macros"
+
+#:
+msgid "Hosts list"
+msgstr "Lista de hosts"
+
+#:
+msgid "Other groups"
+msgstr "Outros grupos"
+
+#:
+msgid "In groups"
+msgstr "Nos grupos"
+
+#:
+msgid "In"
+msgstr "Em"
+
+#:
+msgid "Application"
+msgstr "Aplicação"
+
+#:
+msgid "Applications"
+msgstr "Aplicações"
+
+#:
+msgid "APPLICATIONS"
+msgstr "APLICAÇÃO"
+
+#:
+msgid "Create application"
+msgstr "Criar aplicação"
+
+#:
+msgid "Application updated"
+msgstr "Aplicação atualizada"
+
+#:
+msgid "Cannot update application"
+msgstr "Aplicação não foi atualizada"
+
+#:
+msgid "Application added"
+msgstr "Aplicação incluída"
+
+#:
+msgid "Cannot add application"
+msgstr "Aplicação não foi incluída"
+
+#:
+msgid "Application deleted"
+msgstr "Aplicação removida"
+
+#:
+msgid "Cannot delete application"
+msgstr "Aplicação não foi removida"
+
+#:
+msgid "No applications defined"
+msgstr "Nenhuma aplicação definida"
+
+#:
+msgid "No templates linked"
+msgstr "Não há templates associados"
+
+#:
+msgid "Hosts"
+msgstr "Hosts"
+
+#:
+msgid "Items"
+msgstr "Itens"
+
+#:
+msgid "ITEMS"
+msgstr "ITENS"
+
+#:
+msgid "Triggers"
+msgstr "Triggers"
+
+#:
+msgid "Graphs"
+msgstr "Gráficos"
+
+#:
+msgid "Host added"
+msgstr "Host incluído"
+
+#:
+msgid "Cannot add host"
+msgstr "Host não foi incluído"
+
+#:
+msgid "Items copied"
+msgstr "Itens copiados"
+
+#:
+msgid "Cannot copy items"
+msgstr "Não foi possível copiar itens"
+
+#:
+msgid "Host updated"
+msgstr "Host atualizado"
+
+#:
+msgid "Cannot update host"
+msgstr "Host não foi atualizado"
+
+#:
+msgid "Cannot update"
+msgstr "Não foi possível atualizar"
+
+#:
+msgid "Host status updated"
+msgstr "Status do host atualizado"
+
+#:
+msgid "Cannot update host status"
+msgstr "Status do host não foi atualizado"
+
+#:
+msgid "Host deleted"
+msgstr "Host removido"
+
+#:
+msgid "Cannot delete host"
+msgstr "Host não foi removido"
+
+#:
+msgid "CONFIGURATION OF HOSTS"
+msgstr "CONFIGURAÇÃO DE HOSTS"
+
+#:
+msgid "CONFIGURATION OF TEMPLATES"
+msgstr "CONFIGURAÇÃO DE TEMPLATES"
+
+#:
+msgid "CONFIGURATION OF APPLICATIONS"
+msgstr "CONFIGURAÇÃO DE APLICAÇÕS"
+
+#:
+msgid "CONFIGURATION OF MAINTENANCE PERIODS"
+msgstr "CONFIGURAÇÃO DE PERÍODOS DE MANUTENÇÃO"
+
+#:
+msgid "HOST GROUPS"
+msgstr "GRUPOS DE HOSTS"
+
+#:
+msgid "No host groups defined"
+msgstr "Nenhum grupo definido"
+
+#:
+msgid "No hosts defined"
+msgstr "Nenhum host definido"
+
+#:
+msgid "No templates defined"
+msgstr "Não há templates definidos"
+
+#:
+msgid "No proxies defined"
+msgstr "Não há proxies definidos"
+
+#:
+msgid "HOSTS"
+msgstr "HOSTS"
+
+#:
+msgid "Host"
+msgstr "Host"
+
+#:
+msgid "Connect to"
+msgstr "Connectado a"
+
+#:
+msgid "DNS"
+msgstr "DNS"
+
+#:
+msgid "IP"
+msgstr "IP"
+
+#:
+msgid "Port"
+msgstr "Porta"
+
+#:
+msgid "Zabbix agent port"
+msgstr "Porta do agente Zabbix"
+
+#:
+msgid "Monitored"
+msgstr "Monitorado"
+
+#:
+msgid "Not monitored"
+msgstr "Não monitorado"
+
+#:
+msgid "Template"
+msgstr "Template"
+
+#:
+msgid "Deleted"
+msgstr "Removido"
+
+#:
+msgid "Unknown"
+msgstr "Desconhecido"
+
+#:
+msgid "Groups"
+msgstr "Grupos"
+
+#:
+msgid " - all groups - "
+msgstr "- todos os grupos -"
+
+#:
+msgid "All groups"
+msgstr "Todos os grupos"
+
+#:
+msgid "No groups defined"
+msgstr "Nenhum grupo definido"
+
+#:
+msgid "New group"
+msgstr "Novo grupo"
+
+#:
+msgid "DNS name"
+msgstr "Nome DNS"
+
+#:
+msgid "IP address"
+msgstr "Endereço IP"
+
+#:
+msgid "Link additional templates"
+msgstr "Associar templates adicionais"
+
+#:
+msgid "Replace linked templates"
+msgstr "Substituir templates linkados"
+
+#:
+msgid "Use IPMI"
+msgstr "Usar IPMI"
+
+#:
+msgid "IPMI IP address"
+msgstr "Endereço IP IPMI"
+
+#:
+msgid "IPMI port"
+msgstr "Porta IPMI"
+
+#:
+msgid "IPMI authentication algorithm"
+msgstr "Algoritmo de Autenticação IPMI"
+
+#:
+msgid "None"
+msgstr "Nenhum"
+
+#:
+msgid "MD2"
+msgstr "MD2"
+
+#:
+msgid "MD5"
+msgstr "MD5"
+
+#:
+msgid "Straight"
+msgstr "Straight"
+
+#:
+msgid "OEM"
+msgstr "OEM"
+
+#:
+msgid "RMCP+"
+msgstr "RMCP+"
+
+#:
+msgid "IPMI privilege level"
+msgstr "Nível de Privilégio IPMI"
+
+#:
+msgid "Callback"
+msgstr "Callback"
+
+#:
+msgid "Operator"
+msgstr "Operador"
+
+#:
+msgid "Admin"
+msgstr "Admin"
+
+#:
+msgid "IPMI username"
+msgstr "Usuário IPMI"
+
+#:
+msgid "IPMI password"
+msgstr "Senha IPMI"
+
+#:
+msgid "Use profile"
+msgstr "Usar inventário"
+
+#:
+msgid "Delete selected host?"
+msgstr "Remover host selecionado?"
+
+#:
+msgid "Delete selected with linked elements"
+msgstr "Remover selecionado e elementos associados"
+
+#:
+msgid "Group name"
+msgstr "Nome do Grupo"
+
+#:
+msgid "Host group"
+msgstr "Grupo de Hosts"
+
+#:
+msgid "Host groups"
+msgstr "Grupos de Hosts"
+
+#:
+msgid "Update"
+msgstr "Atualiza"
+
+#:
+msgid "Availability"
+msgstr "Disponibilidade"
+
+#:
+msgid "Available"
+msgstr "Disponível"
+
+#:
+msgid "Not available"
+msgstr "Indisponível"
+
+#:
+msgid "Proxies"
+msgstr "Proxies"
+
+#:
+msgid "PROXIES"
+msgstr "PROXIES"
+
+#:
+msgid "Proxy"
+msgstr "Proxy"
+
+#:
+msgid "Create Proxy"
+msgstr "Criar Proxy"
+
+#:
+msgid "Proxy name"
+msgstr "Nome do proxy"
+
+#:
+msgid "Last seen (age)"
+msgstr "Última vez visto (idade)"
+
+#:
+msgid "Host macro"
+msgstr "Macro de Host"
+
+#:
+msgid "doesn't exist"
+msgstr "não existe"
+
+#:
+msgid "Enable selected hosts?"
+msgstr "Ativar hosts selecionados?"
+
+#:
+msgid "Disable selected hosts?"
+msgstr "Desativar hosts selecionados?"
+
+#:
+msgid "Delete selected hosts?"
+msgstr "Remover hosts selecionados?"
+
+#:
+msgid "Updated status of host"
+msgstr "Atualizar status do host"
+
+#:
+msgid "Clear when unlinking"
+msgstr "Limpar ao desassociar"
+
+#:
+msgid "Templates list"
+msgstr "Lista de templates"
+
+#:
+msgid "New template added"
+msgstr "Novo template adicionado"
+
+#:
+msgid "Cannot add template"
+msgstr "Não foi possível adicionar template"
+
+#:
+msgid "Template updated"
+msgstr "Template atualizado"
+
+#:
+msgid "Cannot update template"
+msgstr "Não foi possível atualizar template"
+
+#:
+msgid "Linked templates"
+msgstr "Associado aos templates"
+
+#:
+msgid "Linked to"
+msgstr "Associado a"
+
+#:
+msgid "Template deleted"
+msgstr "Template deletado"
+
+#:
+msgid "Cannot delete template"
+msgstr "Não foi possível deletar template"
+
+#:
+msgid "Link with template"
+msgstr "Associar a Template"
+
+#:
+msgid "Delete and clear"
+msgstr "Remover E limpar"
+
+#:
+msgid "Delete selected templates?"
+msgstr "Remover templates selecionados?"
+
+#:
+msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
+msgstr "Aviso: templates selecionados serão deletados e dados de hosts associados serão limpados"
+
+#:
+msgid "Host profile"
+msgstr "Inventário do host"
+
+#:
+msgid "Device type"
+msgstr "Tipo do host"
+
+#:
+msgid "OS"
+msgstr "S.O."
+
+#:
+msgid "SerialNo"
+msgstr "Número de série"
+
+#:
+msgid "Tag"
+msgstr "Plaqueta"
+
+#:
+msgid "Hardware"
+msgstr "Hardware"
+
+#:
+msgid "Software"
+msgstr "Software"
+
+#:
+msgid "Contact"
+msgstr "Contato"
+
+#:
+msgid "Location"
+msgstr "Local"
+
+#:
+msgid "Notes"
+msgstr "Notas"
+
+#:
+msgid "MAC Address"
+msgstr "Endereço MAC"
+
+#:
+msgid "Add to group"
+msgstr "Adicionar ao grupo"
+
+#:
+msgid "Delete from group"
+msgstr "Remover do grupo"
+
+#:
+msgid "Update in group"
+msgstr "Atualizar no grupo"
+
+#:
+msgid "Create Host"
+msgstr "Criar Host"
+
+#:
+msgid "Create Template"
+msgstr "Criar Template"
+
+#:
+msgid "Template linkage"
+msgstr "Associação a templates"
+
+#:
+msgid "Templates"
+msgstr "Templates"
+
+#:
+msgid "TEMPLATES"
+msgstr "TEMPLATES"
+
+#:
+msgid "Unlink"
+msgstr "Desassociar"
+
+#:
+msgid "Cannot unlink template"
+msgstr "Falha na desassociação do template"
+
+#:
+msgid "Cannot link template"
+msgstr "Falha na associação do template"
+
+#:
+msgid "Unlink and clear"
+msgstr "Desassociar e limpar"
+
+#:
+msgid "Monitored by proxy"
+msgstr "Monitorado por proxy"
+
+#:
+msgid "Use extended profile"
+msgstr "Usar perfil extendido"
+
+#:
+msgid "Alias"
+msgstr "Alias"
+
+#:
+msgid "Device Chassis"
+msgstr "Número do Chassis"
+
+#:
+msgid "OS (Full Details)"
+msgstr "S.O. (Detalhes)"
+
+#:
+msgid "OS (Short)"
+msgstr "S.O. (Resumo)"
+
+#:
+msgid "HW Architecture"
+msgstr "Arquitetura de HW"
+
+#:
+msgid "Serial Number"
+msgstr "Número de Série"
+
+#:
+msgid "Model Number"
+msgstr "Modelo"
+
+#:
+msgid "Asset Tag"
+msgstr "Placa de Patrimônio"
+
+#:
+msgid "Device Vendor"
+msgstr "Vendedor"
+
+#:
+msgid "Device Contract Number"
+msgstr "Contrato Número"
+
+#:
+msgid "Installer Name"
+msgstr "Nome do Instalador"
+
+#:
+msgid "Device Deployment Status"
+msgstr "Status de Entrega"
+
+#:
+msgid "Software Application #1"
+msgstr "Aplicativo #1"
+
+#:
+msgid "Software Application #2"
+msgstr "Aplicativo #2"
+
+#:
+msgid "Software Application #3"
+msgstr "Aplicativo #3"
+
+#:
+msgid "Software Application #4"
+msgstr "Aplicativo #4"
+
+#:
+msgid "Software Application #5"
+msgstr "Aplicativo #5"
+
+#:
+msgid "URL #1"
+msgstr "URL #1"
+
+#:
+msgid "URL #2"
+msgstr "URL #2"
+
+#:
+msgid "URL #3"
+msgstr "URL #3"
+
+#:
+msgid "Device Port Connections"
+msgstr "Porta de Conexão Upstream"
+
+#:
+msgid "Device Notes"
+msgstr "Notas"
+
+#:
+msgid "Device Hardware"
+msgstr "Hardware"
+
+#:
+msgid "Device Software"
+msgstr "Software"
+
+#:
+msgid "Host Subnet Mask"
+msgstr "Máscara de rede"
+
+#:
+msgid "Host Router"
+msgstr "Rota Default"
+
+#:
+msgid "Host MAC Address"
+msgstr "Endereço MAC"
+
+#:
+msgid "OOB IP Address"
+msgstr "Endereço IP do OOB"
+
+#:
+msgid "OOB Subnet Mask"
+msgstr "Máscara de rede do OOB"
+
+#:
+msgid "OOB Router"
+msgstr "Roteador OOB"
+
+#:
+msgid "Date HW Purchased"
+msgstr "Data da Compra"
+
+#:
+msgid "Date HW Installed"
+msgstr "Data da Instalação"
+
+#:
+msgid "Date HW Maintenance Expires"
+msgstr "Data do Fim de Suporte"
+
+#:
+msgid "Date HW Decommissioned"
+msgstr "Data do Desligamento"
+
+#:
+msgid "Site Address 1"
+msgstr "Endereço de instalação 1"
+
+#:
+msgid "Site Address 2"
+msgstr "Endereço de instalação 2"
+
+#:
+msgid "Site Address 3"
+msgstr "Endereço de instalação 3"
+
+#:
+msgid "Site City"
+msgstr "Cidade de instalação"
+
+#:
+msgid "Site State / Province"
+msgstr "Estado/Provincia de instalação"
+
+#:
+msgid "Site Country"
+msgstr "País de instalação"
+
+#:
+msgid "Site Zip / Postal"
+msgstr "CEP/Código Postal de instalação"
+
+#:
+msgid "Site Rack Location"
+msgstr "Localização do Rack de instalação"
+
+#:
+msgid "Site Notes"
+msgstr "Notas de instalação"
+
+#:
+msgid "Primary POC Name"
+msgstr "Nome Primário do POC"
+
+#:
+msgid "Primary POC Email"
+msgstr "Email Primário do POC"
+
+#:
+msgid "Primary POC Phone 1"
+msgstr "Fone Primário do POC 1"
+
+#:
+msgid "Primary POC Phone 2"
+msgstr "Fone Primário do POC 2"
+
+#:
+msgid "Primary POC Cell"
+msgstr "Celular Primário do POC"
+
+#:
+msgid "Primary POC Screen Name"
+msgstr "Nome de tela Primário do POC"
+
+#:
+msgid "Primary POC Comments"
+msgstr "Comentário Primário do POC"
+
+#:
+msgid "Secondary POC Name"
+msgstr "Nome Secundário do POC"
+
+#:
+msgid "Secondary POC Email"
+msgstr "Email Secundário do POC"
+
+#:
+msgid "Secondary POC Phone 1"
+msgstr "Fone Secundário do POC 1"
+
+#:
+msgid "Secondary POC Phone 2"
+msgstr "Fone Secundário do POC 2"
+
+#:
+msgid "Secondary POC Cell"
+msgstr "Celular Secundário do POC"
+
+#:
+msgid "Secondary POC Screen Name"
+msgstr "Nome de tela Secundário do POC"
+
+#:
+msgid "Secondary POC Comments"
+msgstr "Comentário Secundário do POC"
+
+#:
+msgid "Templated items"
+msgstr "Itens no template"
+
+#:
+msgid "Not Templated items"
+msgstr "Itens fora do emplate"
+
+#:
+msgid "With triggers"
+msgstr "Com triggers"
+
+#:
+msgid "Without triggers"
+msgstr "Sem triggers"
+
+#:
+msgid "Types"
+msgstr "Tipos"
+
+#:
+msgid "No items defined"
+msgstr "Nenhum item definido"
+
+#:
+msgid "No item defined"
+msgstr "Nenhum item  definido"
+
+#:
+msgid "History cleared"
+msgstr "Histórico zerado"
+
+#:
+msgid "Clear history for selected"
+msgstr "Limpar histórico dos itens selecionados"
+
+#:
+msgid "Clear history"
+msgstr "Limpar histórico"
+
+#:
+msgid "Cannot clear history"
+msgstr "Histórico não foi limpado"
+
+#:
+msgid "Configuration of items"
+msgstr "Configuração de itens"
+
+#:
+msgid "CONFIGURATION OF ITEMS"
+msgstr "CONFIGURAÇÃO DE ITENS"
+
+#:
+msgid "Cannot update item"
+msgstr "Item não foi atualizado"
+
+#:
+msgid "Status updated"
+msgstr "Status atualizado"
+
+#:
+msgid "Cannot update status"
+msgstr "Status não foi atualizado"
+
+#:
+msgid "Cannot add item"
+msgstr "Item não foi adicionado"
+
+#:
+msgid "Item deleted"
+msgstr "Item removido"
+
+#:
+msgid "Cannot delete item"
+msgstr "Item não foi removido"
+
+#:
+msgid "Items deleted"
+msgstr "Item(ns) removido(s)"
+
+#:
+msgid "Cannot delete items"
+msgstr "Itens não foram removidos"
+
+#:
+msgid "Items activated"
+msgstr "Item(ns) ativado(s)"
+
+#:
+msgid "Items disabled"
+msgstr "Item(ns) desativado(s)"
+
+#:
+msgid "Key"
+msgstr "Chave"
+
+#:
+msgid "Description"
+msgstr "Descrição"
+
+#:
+msgid "Update interval"
+msgstr "Intervalo de atualização"
+
+#:
+msgid "Interval"
+msgstr "Intervalo"
+
+#:
+msgid "History"
+msgstr "Histórico"
+
+#:
+msgid "Trends"
+msgstr "Estatísticas"
+
+#:
+msgid "Zabbix agent"
+msgstr "Agente Zabbix"
+
+#:
+msgid "Zabbix agent (active)"
+msgstr "Agente Zabbix (ativo)"
+
+#:
+msgid "SNMPv1 agent"
+msgstr "Agente SNMPv1"
+
+#:
+msgid "Zabbix trapper"
+msgstr "Zabbix trapper"
+
+#:
+msgid "Simple check"
+msgstr "Monitoração simples"
+
+#:
+msgid "SNMPv2 agent"
+msgstr "Agente SNMPv2"
+
+#:
+msgid "SNMPv3 agent"
+msgstr "Agente SNMPv3"
+
+#:
+msgid "Zabbix internal"
+msgstr "Zabbix interno"
+
+#:
+msgid "Database monitor"
+msgstr "Monitor de Banco de Dados"
+
+#:
+msgid "IPMI agent"
+msgstr "Agente IPMI"
+
+#:
+msgid "SSH agent"
+msgstr "Agente SSH"
+
+#:
+msgid "TELNET agent"
+msgstr "Agente TELNET"
+
+#:
+msgid "Zabbix aggregate"
+msgstr "Zabbix agregado"
+
+#:
+msgid "External check"
+msgstr "Monitoramento externo"
+
+#:
+msgid "Web monitoring"
+msgstr "Monitoramento Web"
+
+#:
+msgid "WEB CHECKS"
+msgstr "VERIFICAÇÕES WEB"
+
+#:
+msgid "Not supported"
+msgstr "Não suportado"
+
+#:
+msgid "Email"
+msgstr "E-mail"
+
+#:
+msgid "Jabber"
+msgstr "Jabber"
+
+#:
+msgid "Jabber identifier"
+msgstr "Identificador Jabber"
+
+#:
+msgid "SMS"
+msgstr "SMS"
+
+#:
+msgid "Script"
+msgstr "Script"
+
+#:
+msgid "GSM modem"
+msgstr "Modem GSM"
+
+#:
+msgid "Units"
+msgstr "Unidades"
+
+#:
+msgid "Update interval (in sec)"
+msgstr "Intervalo atualização (em seg)"
+
+#:
+msgid "Keep history (in days)"
+msgstr "Manter histórico (em dias)"
+
+#:
+msgid "Keep trends (in days)"
+msgstr "Manter estatísticas (em dias)"
+
+#:
+msgid "Type of information"
+msgstr "Tipo de informação"
+
+#:
+msgid "Data type"
+msgstr "Tipo de dados"
+
+#:
+msgid "Decimal"
+msgstr "Decimal"
+
+#:
+msgid "Octal"
+msgstr "Octal"
+
+#:
+msgid "Hexadecimal"
+msgstr "Hexadecimal"
+
+#:
+msgid "Store value"
+msgstr "Armazenar valor"
+
+#:
+msgid "Show value"
+msgstr "Mostrar valor"
+
+#:
+msgid "Numeric (integer 64bit)"
+msgstr "Numérico (inteiro 64bits)"
+
+#:
+msgid "Numeric (unsigned)"
+msgstr "Numérico (inteiro sem sinal)"
+
+#:
+msgid "Numeric (float)"
+msgstr "Numérico (fracionário)"
+
+#:
+msgid "Character"
+msgstr "Carácter"
+
+#:
+msgid "Log"
+msgstr "Log"
+
+#:
+msgid "Text"
+msgstr "Texto"
+
+#:
+msgid "As is"
+msgstr "Sem alterar"
+
+#:
+msgid "Delta (speed per second)"
+msgstr "Delta (alterações/seg)"
+
+#:
+msgid "Delta (simple change)"
+msgstr "Delta (alterações simples)"
+
+#:
+msgid "Item"
+msgstr "Item"
+
+#:
+msgid "SNMP community"
+msgstr "Comunidade SNMP"
+
+#:
+msgid "SNMP OID"
+msgstr "SNMP OID"
+
+#:
+msgid "SNMP port"
+msgstr "Porta SNMP"
+
+#:
+msgid "Allowed hosts"
+msgstr "Hosts permitidos"
+
+#:
+msgid "SNMPv3 security name"
+msgstr "SNMPv3 nome de segurança"
+
+#:
+msgid "SNMPv3 security level"
+msgstr "SNMPv3 nível de segurança"
+
+#:
+msgid "SNMPv3 auth passphrase"
+msgstr "SNMPv3 senha de autenticação"
+
+#:
+msgid "SNMPv3 priv passphrase"
+msgstr "SNMPv3 senha privada"
+
+#:
+msgid "Custom multiplier"
+msgstr "Multiplicador"
+
+#:
+msgid "Use custom multiplier"
+msgstr "Use custom multiplier"
+
+#:
+msgid "Select host..."
+msgstr "Selecione host..."
+
+#:
+msgid "Log time format"
+msgstr "Formato de data no log"
+
+#:
+msgid "Create Item"
+msgstr "Criar item"
+
+#:
+msgid "elements copy to ..."
+msgstr "copiar elementos para..."
+
+#:
+msgid "Mode"
+msgstr "Modo"
+
+#:
+msgid "Target"
+msgstr "Destino"
+
+#:
+msgid "Target type"
+msgstr "Tipo do destino"
+
+#:
+msgid "Skip existing items"
+msgstr "Ignorar itens existentes"
+
+#:
+msgid "update existing non linked items"
+msgstr "atualizar itens não associados"
+
+#:
+msgid "Copy"
+msgstr "Copiar"
+
+#:
+msgid "Show items with description like"
+msgstr "Mostrar itens com a descrição"
+
+#:
+msgid "History clearing can take a long time. Continue?"
+msgstr "Zerar o histórico pode levar um tempo bem longo. Continuar?"
+
+#:
+msgid "Mass update"
+msgstr "Atualização em massa"
+
+#:
+msgid "Search"
+msgstr "Pesquisar"
+
+#:
+msgid "Original"
+msgstr "Original"
+
+#:
+msgid "New flexible interval"
+msgstr "Novo intervalo flexível"
+
+#:
+msgid "Flexible intervals (sec)"
+msgstr "Intervalos flexíveis (seg)"
+
+#:
+msgid "No flexible intervals"
+msgstr "Não há intervalos flexíveis definidos"
+
+#:
+msgid "Additional parameters"
+msgstr "Parâmetros adicionais"
+
+#:
+msgid "New application"
+msgstr "Nova aplicação"
+
+#:
+msgid "IPMI sensor"
+msgstr "Sensor IPMI"
+
+#:
+msgid "Templated item"
+msgstr "Item em Template"
+
+#:
+msgid "Web item"
+msgstr "Item Web"
+
+#:
+msgid "Executed script"
+msgstr "Script executado"
+
+#:
+msgid "User name"
+msgstr "Nome do usuário"
+
+#:
+msgid "Public key file"
+msgstr "Arquivo de chave pública"
+
+#:
+msgid "Private key file"
+msgstr "Arquivo de chave privada"
+
+#:
+msgid "Public key"
+msgstr "Chave pública"
+
+#:
+msgid "Authentication method"
+msgstr "Método de autenticação"
+
+#:
+msgid "Passphrase"
+msgstr "Senha"
+
+#:
+msgid "Edit Trigger"
+msgstr "Editar Trigger"
+
+#:
+msgid "Enable selected items?"
+msgstr "Ativar item(ns) selecionado(s)?"
+
+#:
+msgid "Disable selected items?"
+msgstr "Desativar item(ns) selecionado(s)?"
+
+#:
+msgid "Mass update selected items?"
+msgstr "Atualizar em massa o(s) item(ns) selecionado(s)?"
+
+#:
+msgid "Copy selected items?"
+msgstr "Copiar item(ns) selecionado(s)?"
+
+#:
+msgid "Delete history of selected items?"
+msgstr "Remover histórico do(s) item(ns) selecionado(s)?"
+
+#:
+msgid "Delete selected items?"
+msgstr "Remover item(ns) selecionado(s)?"
+
+#:
+msgid "Formula"
+msgstr "Fórmula"
+
+#:
+msgid "Event"
+msgstr "Evento"
+
+#:
+msgid "Event details"
+msgstr "Detalhes do evento"
+
+#:
+msgid "List"
+msgstr "Lista"
+
+#:
+msgid "Latest events"
+msgstr "Últimos eventos"
+
+#:
+msgid "HISTORY OF EVENTS"
+msgstr "HISTÓRICO DE EVENTOS"
+
+#:
+msgid "No events found"
+msgstr "Nenhum evento encontrado"
+
+#:
+msgid "Events since"
+msgstr "Eventos desde"
+
+#:
+msgid "Last check"
+msgstr "Última checagem"
+
+#:
+msgid "Last value"
+msgstr "Último valor"
+
+#:
+msgid "Hidden"
+msgstr "Escondido"
+
+#:
+msgid "Shown"
+msgstr "Mostrar"
+
+#:
+msgid "Align icons"
+msgstr "Alinhar icones"
+
+#:
+msgid "Upper level maps"
+msgstr "Mapas de nível superior"
+
+#:
+msgid "Links"
+msgstr "Links"
+
+#:
+msgid "Link"
+msgstr "Link"
+
+#:
+msgid "Label"
+msgstr "Texto"
+
+#:
+msgid "Grid"
+msgstr "Grade"
+
+#:
+msgid "X"
+msgstr "X"
+
+#:
+msgid "Icon (problem)"
+msgstr "Ícone (problema)"
+
+#:
+msgid "Icon (OK)"
+msgstr "Ícone (ok)"
+
+#:
+msgid "Icon (unknown)"
+msgstr "Ícone (desconhecido)"
+
+#:
+msgid "Icon (maintenance)"
+msgstr "Ícone (manutenção)"
+
+#:
+msgid "Icon (disabled)"
+msgstr "Ícone (desabilitado)"
+
+#:
+msgid "Link status indicator"
+msgstr "Indicador do estado do link"
+
+#:
+msgid "Configuration of network maps"
+msgstr "Configuração de mapas de rede"
+
+#:
+msgid "CONFIGURATION OF NETWORK MAPS"
+msgstr "CONFIGURAÇÃO DE MAPAS DE REDE"
+
+#:
+msgid "Map is saved! Return?"
+msgstr "Mapa salvo! Retornar?"
+
+#:
+msgid "Map save operation failed."
+msgstr "Erro ao salvar mapa."
+
+#:
+msgid "Get Img: Element data not found!"
+msgstr "Get Img: Dados do elemento não encontrados!"
+
+#:
+msgid "Add element"
+msgstr "Adicionar elemento"
+
+#:
+msgid "Coordinate X"
+msgstr "Coordenada X"
+
+#:
+msgid "Coordinate Y"
+msgstr "Coordenada Y"
+
+#:
+msgid "Connectors"
+msgstr "Conectores"
+
+#:
+msgid "UNAVAILABLE"
+msgstr "INDISPONÍVEL"
+
+#:
+msgid "MAINTENANCE"
+msgstr "MANUTENÇÃO"
+
+#:
+msgid "Image is used in Zabbix map"
+msgstr "Imagem usada em mapa do ZABBIX"
+
+#:
+msgid "Edit map element"
+msgstr "Editar elemento"
+
+#:
+msgid "Icon (default)"
+msgstr "Ícone (padrão)"
+
+#:
+msgid "Apply"
+msgstr "Aplicar"
+
+#:
+msgid "Map elements"
+msgstr "Elementos de Mapa"
+
+#:
+msgid "Network map deleted"
+msgstr "Mapa de rede deletado"
+
+#:
+msgid "Cannot delete network map"
+msgstr "Não foi possível deletar mapa de rede"
+
+#:
+msgid "MAPS"
+msgstr "MAPAS"
+
+#:
+msgid "No maps defined"
+msgstr "Nenhum mapa definido"
+
+#:
+msgid "Create Map"
+msgstr "Criar mapa"
+
+#:
+msgid "Import Map"
+msgstr "Importar Mapa"
+
+#:
+msgid "Icon label location"
+msgstr "Localização do texto do ícone"
+
+#:
+msgid "Icon highlighting"
+msgstr "Destaque de ícone"
+
+#:
+msgid "Link indicators"
+msgstr "Indicadores de link"
+
+#:
+msgid "Type (OK)"
+msgstr "Tipo (OK)"
+
+#:
+msgid "Colour (OK)"
+msgstr "Cor (OK)"
+
+#:
+msgid "Use advanced icons"
+msgstr "Usar ícones avançados"
+
+#:
+msgid "Delete selected maps?"
+msgstr "Remover mapas selecionados?"
+
+#:
+msgid "Network map added"
+msgstr "Mapa de rede adicionado"
+
+#:
+msgid "Cannot add network map"
+msgstr "Não é possível adicionar mapa de rede"
+
+#:
+msgid "Network map updated"
+msgstr "Mapa de rede atualizado"
+
+#:
+msgid "Cannot update network map"
+msgstr "Não é possível atualizar mapa de rede"
+
+#:
+msgid "Expand single problem"
+msgstr "Expandir problemas singulares"
+
+#:
+msgid "Mark elements on triggers status change"
+msgstr "Marcar elementos nas mudanças de status das triggers"
+
+#:
+msgid "Get selected elements FAILED."
+msgstr "Recupera selements FALHOS."
+
+#:
+msgid "Two elements should be selected"
+msgstr "Dois elementos devem estar selecionados"
+
+#:
+msgid "Delete selected elements?"
+msgstr "Remover elementos selecionados?"
+
+#:
+msgid "Please select two elements"
+msgstr "Favor selecionar dois elementos"
+
+#:
+msgid "Delete Links between selected elements?"
+msgstr "Remover Links entre elementos selecionados?"
+
+#:
+msgid "No links"
+msgstr "Sem conexões"
+
+#:
+msgid "Wrong type of arguments passed to function"
+msgstr "Tipo incorreto de argumentos passados para a função"
+
+#:
+msgid "New element"
+msgstr "Novo elemento"
+
+#:
+msgid "Set trigger"
+msgstr "Definir trigger"
+
+#:
+msgid "Bottom"
+msgstr "Abaixo"
+
+#:
+msgid "Top"
+msgstr "Acima"
+
+#:
+msgid "Link status indicators"
+msgstr "Indicadores de status de link"
+
+#:
+msgid "Remove element"
+msgstr "Remover elemento"
+
+#:
+msgid "Add link"
+msgstr "Adicionar link"
+
+#:
+msgid "Remove link"
+msgstr "Remover link"
+
+#:
+msgid "Cannot find image"
+msgstr "Imagem não existe"
+
+#:
+msgid "Cannot find background image"
+msgstr "Imagem de fundo não existe"
+
+#:
+msgid "Cannot find trigger"
+msgstr "Trigger não existe"
+
+#:
+msgid "Cannot find host"
+msgstr "Host não existe"
+
+#:
+msgid "Cannot find hostgroup"
+msgstr "Grupo de host não existe"
+
+#:
+msgid "Cannot find map"
+msgstr "Mapa não existe"
+
+#:
+msgid "Cannot find screen"
+msgstr "Tela não existe"
+
+#:
+msgid "used in exported map"
+msgstr "usado no mapa exportado"
+
+#:
+msgid "No icon for map element"
+msgstr "Elemento de mapa sem ícone"
+
+#:
+msgid "Export does not contain Zabbix maps"
+msgstr "Exportação não contém mapas do Zabbix"
+
+#:
+msgid "Export does not contain Zabbix screens"
+msgstr "Exportação não contém telas do Zabbix"
+
+#:
+msgid "OK"
+msgstr "OK"
+
+#:
+msgid "PROBLEM"
+msgstr "PROBLEMA"
+
+#:
+msgid "http://www.zabbix.com"
+msgstr "http://www.zabbix.com"
+
+#:
+msgid "Unacknowledged"
+msgstr "Não vistado"
+
+#:
+msgid "Event acknowledging disabled"
+msgstr "Visto de eventos desabilitado"
+
+#:
+msgid "Network maps"
+msgstr "Mapas de rede"
+
+#:
+msgid "NETWORK MAPS"
+msgstr "MAPAS DE REDE"
+
+#:
+msgid "Background image"
+msgstr "Imagem de fundo"
+
+#:
+msgid "Icon label type"
+msgstr "Tipo do texto do ícone"
+
+#:
+msgid "Label location"
+msgstr "Localização do texto"
+
+#:
+msgid "Element name"
+msgstr "Nome do elemento"
+
+#:
+msgid "Status only"
+msgstr "Somente status"
+
+#:
+msgid "Nothing"
+msgstr "Nada"
+
+#:
+msgid "m.d.Y H:i:s"
+msgstr "d/m/Y H:i:s"
+
+#:
+msgid "CONFIGURATION OF MEDIA TYPES"
+msgstr "CONFIGURAÇÃO DE TIPOS DE MÍDIA"
+
+#:
+msgid "MEDIA TYPES"
+msgstr "TIPOS DE MÍDIA"
+
+#:
+msgid "Media"
+msgstr "Mídia"
+
+#:
+msgid "Send to"
+msgstr "Enviar para"
+
+#:
+msgid "When active"
+msgstr "Quando ativo"
+
+#:
+msgid "No media defined"
+msgstr "Não há mídia definida"
+
+#:
+msgid "New media"
+msgstr "Nova mídia"
+
+#:
+msgid "Use if severity"
+msgstr "Usar se risco"
+
+#:
+msgid "Save"
+msgstr "Salvar"
+
+#:
+msgid "Cancel"
+msgstr "Cancelar"
+
+#:
+msgid "Dashboard"
+msgstr "Dashboard"
+
+#:
+msgid "PERSONAL DASHBOARD"
+msgstr "DASHBOARD PESSOAL"
+
+#:
+msgid "Age"
+msgstr "Idade"
+
+#:
+msgid "Issue"
+msgstr "Assunto"
+
+#:
+msgid "System status"
+msgstr "Status do sistema"
+
+#:
+msgid "Host status"
+msgstr "Status do Host"
+
+#:
+msgid "Without problems"
+msgstr "Sem problemas"
+
+#:
+msgid "With problems"
+msgstr "Com problemas"
+
+#:
+msgid "Last 20 issues"
+msgstr "Últimos 20 eventos"
+
+#:
+msgid "Favourite"
+msgstr "Favorito"
+
+#:
+msgid "Favourites"
+msgstr "Favoritos"
+
+#:
+msgid "Every"
+msgstr "Cada"
+
+#:
+msgid "Menu"
+msgstr "Menu"
+
+#:
+msgid "Reset"
+msgstr "Limpar"
+
+#:
+msgid "Maximize"
+msgstr "Maximizar"
+
+#:
+msgid "Minimize"
+msgstr "Minimizar"
+
+#:
+msgid "Loading..."
+msgstr "Carregando..."
+
+#:
+msgid "Dashboard configuration"
+msgstr "Configuração do Dashboard"
+
+#:
+msgid "DASHBOARD CONFIGURATION"
+msgstr "CONFIGURAÇÃO DO DASHBOARD"
+
+#:
+msgid "Configure"
+msgstr "Configurar"
+
+#:
+msgid "Selected"
+msgstr "Selecionado"
+
+#:
+msgid "Show hosts in maintenance"
+msgstr "Mostrar hosts em manutenção"
+
+#:
+msgid "Triggers with severity"
+msgstr "Triggers com severidade"
+
+#:
+msgid "Dashboard filter"
+msgstr "Filtro de Dashboard"
+
+#:
+msgid "Favourite graphs"
+msgstr "Gráficos Favoritos"
+
+#:
+msgid "Favourite maps"
+msgstr "Mapas Favoritos"
+
+#:
+msgid "Favourite screens"
+msgstr "Telas Favoritas"
+
+#:
+msgid "Unacknowledged only"
+msgstr "Não vistados apenas"
+
+#:
+msgid "Separated"
+msgstr "Separados"
+
+#:
+msgid "Problem display"
+msgstr "Exibição de problemas"
+
+#:
+msgid "Overview"
+msgstr "Visão geral"
+
+#:
+msgid "Overview by proxy"
+msgstr "Visão geral por proxy"
+
+#:
+msgid "OVERVIEW"
+msgstr "VISÃO GERAL"
+
+#:
+msgid "Hosts location"
+msgstr "Localização dos Hosts"
+
+#:
+msgid "Data"
+msgstr "Dados"
+
+#:
+msgid "Show graph of item"
+msgstr "Mostrar gráfico do ítem"
+
+#:
+msgid "Show values of item"
+msgstr "Mostrar valores do ítem"
+
+#:
+msgid "Values"
+msgstr "Valores"
+
+#:
+msgid "5 min"
+msgstr "5 min"
+
+#:
+msgid "15 min"
+msgstr "15 min"
+
+#:
+msgid "QUEUE"
+msgstr "FILA"
+
+#:
+msgid "QUEUE OF ITEMS TO BE UPDATED"
+msgstr "FILA DE ITENS A SER ATUALIZADA"
+
+#:
+msgid "Next check"
+msgstr "Próxima checagem"
+
+#:
+msgid "The queue is empty"
+msgstr "A fila está vazia"
+
+#:
+msgid "Total"
+msgstr "Total"
+
+#:
+msgid "Count"
+msgstr "Contador"
+
+#:
+msgid "5 seconds"
+msgstr "5 segundos"
+
+#:
+msgid "10 seconds"
+msgstr "10 segundos"
+
+#:
+msgid "30 seconds"
+msgstr "30 segundos"
+
+#:
+msgid "1 minute"
+msgstr "1 minutos"
+
+#:
+msgid "5 minutes"
+msgstr "5 minutos"
+
+#:
+msgid "More than 10 minutes"
+msgstr "Mais de 10 minutos"
+
+#:
+msgid "Truncated"
+msgstr "Truncado"
+
+#:
+msgid "Delayed by"
+msgstr "Atrasado por"
+
+#:
+msgid "REPORT"
+msgstr "RELATÓRIO"
+
+#:
+msgid "Status of Zabbix"
+msgstr "Status do Zabbix"
+
+#:
+msgid "STATUS OF ZABBIX"
+msgstr "STATUS DO ZABBIX"
+
+#:
+msgid "Value"
+msgstr "Valor"
+
+#:
+msgid "Zabbix server is running"
+msgstr "Zabbix está rodando"
+
+#:
+msgid "Values stored"
+msgstr "Valores armazenados"
+
+#:
+msgid "Trends stored"
+msgstr "Estatísticas armazenadas"
+
+#:
+msgid "Number of triggers (enabled/disabled)[problem/unknown/ok]"
+msgstr "Número de triggers (ativas/desativadas)[verdadeiro/desconhecido/falso]"
+
+#:
+msgid "Triggers (e/d)[p/u/o]"
+msgstr "Triggers (a/d)[v/d/f]"
+
+#:
+msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
+msgstr "Somente triggers de hosts habilitados e dependentes de itens habilitados são contadas"
+
+#:
+msgid "Number of items (monitored/disabled/not supported)"
+msgstr "Número de itens (monitorados/desativados/não suportado)[trapper]"
+
+#:
+msgid "Items (m/d/n)"
+msgstr "Itens (m/d/n)[t]"
+
+#:
+msgid "Only items assigned to enabled hosts are counted"
+msgstr "Somente itens de hosts habilitados são contados"
+
+#:
+msgid "Number of users (online)"
+msgstr "Número de usuários (online)"
+
+#:
+msgid "Users (online)"
+msgstr "Usuários (online)"
+
+#:
+msgid "Number of hosts (monitored/not monitored/templates)"
+msgstr "Número de hosts (monitorados/não monitorados/templates/removidos)"
+
+#:
+msgid "Hosts (m/n/t)"
+msgstr "Hosts (m/n/t/d)"
+
+#:
+msgid "Required server performance, new values per second"
+msgstr "Desempenho requerido do servidor, novos valores por segundo (vps)"
+
+#:
+msgid "Yes"
+msgstr "Sim"
+
+#:
+msgid "No"
+msgstr "Não"
+
+#:
+msgid "running"
+msgstr "rodando"
+
+#:
+msgid "not running"
+msgstr "parado"
+
+#:
+msgid "Availability report"
+msgstr "Relatório de disponibilidade"
+
+#:
+msgid "AVAILABILITY REPORT"
+msgstr "RELATÓRIO DE DISPONIBILIDADE"
+
+#:
+msgid "Show"
+msgstr "Mostrar"
+
+#:
+msgid "By host"
+msgstr "Por host"
+
+#:
+msgid "By trigger template"
+msgstr "Por trigger template"
+
+#:
+msgid "(year"
+msgstr "(ano"
+
+#:
+msgid ")"
+msgstr ")"
+
+#:
+msgid "Y"
+msgstr "A"
+
+#:
+msgid "Y.m.d H:i"
+msgstr "d/m/Y H:i"
+
+#:
+msgid "Y.m.d"
+msgstr "d/m/Y"
+
+#:
+msgid "IT services availability report"
+msgstr "Relatório de disponibilidade dos serviços de TI"
+
+#:
+msgid "IT SERVICES AVAILABILITY REPORT"
+msgstr "RELATÓRIO DE DISPONIBILIDADE DOS SERVIÇOS DE TI"
+
+#:
+msgid "From"
+msgstr "De"
+
+#:
+msgid "from"
+msgstr "de"
+
+#:
+msgid "Till"
+msgstr "Até"
+
+#:
+msgid "To"
+msgstr "Para"
+
+#:
+msgid "Ok"
+msgstr "ok"
+
+#:
+msgid "Resolved"
+msgstr "Resolvido"
+
+#:
+msgid "Problem"
+msgstr "Problema"
+
+#:
+msgid "Problems"
+msgstr "Problemas"
+
+#:
+msgid "Percentage"
+msgstr "Porcentagem"
+
+#:
+msgid "SLA"
+msgstr "SLA"
+
+#:
+msgid "Hour"
+msgstr "Hora"
+
+#:
+msgid "Hours"
+msgstr "Horas"
+
+#:
+msgid "Minute"
+msgstr "Minuto"
+
+#:
+msgid "Minutes"
+msgstr "Minutos"
+
+#:
+msgid "Day"
+msgstr "Dia"
+
+#:
+msgid "Month"
+msgstr "Mês"
+
+#:
+msgid "Year"
+msgstr "Ano"
+
+#:
+msgid "year"
+msgstr "ano"
+
+#:
+msgid "Hourly"
+msgstr "Por hora"
+
+#:
+msgid "Daily"
+msgstr "Diário"
+
+#:
+msgid "Weekly"
+msgstr "Semanal"
+
+#:
+msgid "Monthly"
+msgstr "Mensal"
+
+#:
+msgid "Yearly"
+msgstr "Anual"
+
+#:
+msgid "M Y"
+msgstr "M Y"
+
+#:
+msgid "d M Y H:i"
+msgstr "d M Y H:i"
+
+#:
+msgid "l H:i"
+msgstr "l H:i"
+
+#:
+msgid "add"
+msgstr "incluir"
+
+#:
+msgid "Do not add"
+msgstr "Não adicionar"
+
+#:
+msgid "Leave empty"
+msgstr "Deixar vazio"
+
+#:
+msgid "Fill with default value"
+msgstr "Preencher com valor padrão"
+
+#:
+msgid "Create"
+msgstr "Criar"
+
+#:
+msgid "new"
+msgstr "Novo"
+
+#:
+msgid "Locales"
+msgstr "Idiomas"
+
+#:
+msgid "locale"
+msgstr "idiomas"
+
+#:
+msgid "Download"
+msgstr "Download"
+
+#:
+msgid "Take for default locale"
+msgstr "Usar como idioma padrão"
+
+#:
+msgid "Locale to extend"
+msgstr "Idioma a expandir"
+
+#:
+msgid "New entries"
+msgstr "Novas entradas"
+
+#:
+msgid "Notifications"
+msgstr "Notificações"
+
+#:
+msgid "NOTIFICATIONS"
+msgstr "NOTIFICAÇÕES"
+
+#:
+msgid "Notification report"
+msgstr "Relatório de notificações"
+
+#:
+msgid "Most busy triggers top 100"
+msgstr "Triggers mais ativados - top 100"
+
+#:
+msgid "MOST BUSY TRIGGERS TOP 100"
+msgstr "TRIGGERS MAIS ATIVADOS - TOP 100"
+
+#:
+msgid "Number of status changes"
+msgstr "Alterações no status"
+
+#:
+msgid "Week"
+msgstr "Semana"
+
+#:
+msgid "Last"
+msgstr "Última"
+
+#:
+msgid "Bar reports"
+msgstr "Relatórios de barra"
+
+#:
+msgid "Distribution of values for multiple periods"
+msgstr "Distribuição de valores por múltiplos períodos"
+
+#:
+msgid "Distribution of values for multiple items"
+msgstr "Distribuição de valores por múltiplos itens"
+
+#:
+msgid "Compare values for multiple periods"
+msgstr "Comparar valores por múltiplos períodos"
+
+#:
+msgid "Selected hosts"
+msgstr "Hosts selecionados"
+
+#:
+msgid "Selected groups"
+msgstr "Grupos selecionados"
+
+#:
+msgid "Scale"
+msgstr "Escala"
+
+#:
+msgid "Average by"
+msgstr "Média por"
+
+#:
+msgid "Palette"
+msgstr "Paleta"
+
+#:
+msgid "Darken"
+msgstr "Escurecer"
+
+#:
+msgid "Brighten"
+msgstr "Clarear"
+
+#:
+msgid "Screens"
+msgstr "Telas"
+
+#:
+msgid "Screen"
+msgstr "Tela"
+
+#:
+msgid "CONFIGURATION OF SCREENS"
+msgstr "CONFIGURAÇÃO DE TELAS"
+
+#:
+msgid "Configuration of screens"
+msgstr "Configuração de telas"
+
+#:
+msgid "Screen added"
+msgstr "Tela incluída"
+
+#:
+msgid "Cannot add screen"
+msgstr "Tela não foi incluída"
+
+#:
+msgid "Screen updated"
+msgstr "Tela atualizada"
+
+#:
+msgid "Cannot update screen"
+msgstr "Tela não foi atualizada"
+
+#:
+msgid "Screen deleted"
+msgstr "Tela removida"
+
+#:
+msgid "Cannot deleted screen"
+msgstr "Tela não foi removida"
+
+#:
+msgid "Columns"
+msgstr "Colunas"
+
+#:
+msgid "Rows"
+msgstr "Linhas"
+
+#:
+msgid "No screens defined"
+msgstr "Nenhuma tela definida"
+
+#:
+msgid "Delete screen?"
+msgstr "Remover tela?"
+
+#:
+msgid "CONFIGURATION OF SCREEN"
+msgstr "CONFIGURAÇÃO DE TELA"
+
+#:
+msgid "Screen cell configuration"
+msgstr "Tela de configuração para celular"
+
+#:
+msgid "Resource"
+msgstr "Recurso"
+
+#:
+msgid "User rights"
+msgstr "Direitos do usuário"
+
+#:
+msgid "No resources defined"
+msgstr "Nenhum recurso definido"
+
+#:
+msgid "Simple graph"
+msgstr "Gráfico simples"
+
+#:
+msgid "Simple graphs"
+msgstr "Gráficos simples"
+
+#:
+msgid "SIMPLE GRAPH"
+msgstr "GRÁFICO SIMPLES"
+
+#:
+msgid "Graph name"
+msgstr "Nome do Gráfico"
+
+#:
+msgid "Width"
+msgstr "Largura"
+
+#:
+msgid "Height"
+msgstr "Altura"
+
+#:
+msgid "Create Screen"
+msgstr "Criar Tela"
+
+#:
+msgid "Create Slide Show"
+msgstr "Criar Slide Show"
+
+#:
+msgid "Edit"
+msgstr "Editar"
+
+#:
+msgid "Dynamic item"
+msgstr "Ítem dinâmico"
+
+#:
+msgid "Dimension (cols x rows)"
+msgstr "Dimensão (cols x linhas)"
+
+#:
+msgid "Delete selected slideshows?"
+msgstr "Remover slideshows selecionados?"
+
+#:
+msgid "Slide shows"
+msgstr "Slideshows"
+
+#:
+msgid "Slide show"
+msgstr "Criar Slideshow"
+
+#:
+msgid "CONFIGURATION OF SLIDE SHOWS"
+msgstr "CONFIGURAÇÃO DE SLIDESHOWS"
+
+#:
+msgid "Configuration of slideshows"
+msgstr "Configuration of slideshows"
+
+#:
+msgid "SLIDE SHOWS"
+msgstr "SLIDESHOWS"
+
+#:
+msgid "No slide shows defined"
+msgstr "Nenhum slideshow definido"
+
+#:
+msgid "Count of slides"
+msgstr "Número de slides"
+
+#:
+msgid "No slides defined"
+msgstr "Não há slides definidos"
+
+#:
+msgid "Slides"
+msgstr "Slides"
+
+#:
+msgid "New slide"
+msgstr "Novo slide"
+
+#:
+msgid "Show text as HTML"
+msgstr "Mostrar texto como HTML"
+
+#:
+msgid "Import screen"
+msgstr "Importar tela"
+
+#:
+msgid "Cannot find graph"
+msgstr "Gráfico não encontrado"
+
+#:
+msgid "Cannot find item"
+msgstr "Item não encontrado"
+
+#:
+msgid "used in exported screen"
+msgstr "utilizado na tela exportada"
+
+#:
+msgid "Map"
+msgstr "Mapa"
+
+#:
+msgid "As plain text"
+msgstr "Como texto puro"
+
+#:
+msgid "Plain text"
+msgstr "Texto puro"
+
+#:
+msgid "PLAINT TEXT"
+msgstr "TEXTO PLANO"
+
+#:
+msgid "Column span"
+msgstr "Sobrepor coluna"
+
+#:
+msgid "Row span"
+msgstr "Sobrepor linha"
+
+#:
+msgid "Show lines"
+msgstr "Mostrar linhas"
+
+#:
+msgid "Hosts info"
+msgstr "Info hosts"
+
+#:
+msgid "Triggers info"
+msgstr "Info triggers"
+
+#:
+msgid "Server info"
+msgstr "Info servidor"
+
+#:
+msgid "Clock"
+msgstr "Relógio"
+
+#:
+msgid "Triggers overview"
+msgstr "Visão geral triggers"
+
+#:
+msgid "Data overview"
+msgstr "Visão geral dados"
+
+#:
+msgid "History of actions"
+msgstr "Histórico de ações"
+
+#:
+msgid "History of events"
+msgstr "Histórico de eventos"
+
+#:
+msgid "Time type"
+msgstr "Tipo de horário"
+
+#:
+msgid "Server time"
+msgstr "Hora do servidor"
+
+#:
+msgid "Local time"
+msgstr "Hora local"
+
+#:
+msgid "Style"
+msgstr "Estilo"
+
+#:
+msgid "Vertical"
+msgstr "Vertical"
+
+#:
+msgid "Horizontal"
+msgstr "Horizontal"
+
+#:
+msgid "Horizontal align"
+msgstr "Alinhamento horizontal"
+
+#:
+msgid "Centre"
+msgstr "Centro"
+
+#:
+msgid "Right"
+msgstr "Direita"
+
+#:
+msgid "Vertical align"
+msgstr "Alinhamento vertical"
+
+#:
+msgid "Middle"
+msgstr "Centro"
+
+#:
+msgid "Impossible to remove last row and column"
+msgstr "Impossível remover última linha e coluna"
+
+#:
+msgid "Screen should contain at least one row and column"
+msgstr "Tela deve conter pelo menos uma linha e uma coluna"
+
+#:
+msgid "Custom screens"
+msgstr "Telas personalizadas"
+
+#:
+msgid "SCREENS 45645645"
+msgstr "TELAS"
+
+#:
+msgid "Slideshow updated"
+msgstr "Slideshow atualizado"
+
+#:
+msgid "Cannot_update slideshow"
+msgstr "Slideshow não foi atualizado"
+
+#:
+msgid "Slideshow added"
+msgstr "Slideshow incluído"
+
+#:
+msgid "Cannot add slideshow"
+msgstr "Slideshow não foi incluído"
+
+#:
+msgid "Slideshow deleted"
+msgstr "Slideshow removido"
+
+#:
+msgid "Cannot delete slideshow"
+msgstr "Slideshow não foi removido"
+
+#:
+msgid "Delete slideshow?"
+msgstr "Remover slideshow?"
+
+#:
+msgid "Custom slides"
+msgstr "Slides customizados"
+
+#:
+msgid "Average problem"
+msgstr "Problema médio"
+
+#:
+msgid "Serious problem"
+msgstr "Problema grave"
+
+#:
+msgid "Minor problem"
+msgstr "Problema pequeno"
+
+#:
+msgid "root"
+msgstr "raiz"
+
+#:
+msgid "IT service"
+msgstr "Serviço de TI"
+
+#:
+msgid "IT services"
+msgstr "Serviços de TI"
+
+#:
+msgid "Configuration of IT services"
+msgstr "Configuração de serviços TI"
+
+#:
+msgid "Service updated"
+msgstr "Serviços atualizados"
+
+#:
+msgid "No IT service defined"
+msgstr "Não há serviços de TI definidos"
+
+#:
+msgid "Cannot update service"
+msgstr "Serviços não foram atualizados"
+
+#:
+msgid "Service added"
+msgstr "Serviço incluído"
+
+#:
+msgid "Cannot add service"
+msgstr "Serviço não foi incluído"
+
+#:
+msgid "Service deleted"
+msgstr "Serviço removido"
+
+#:
+msgid "Cannot delete service"
+msgstr "Serviço não foi removido"
+
+#:
+msgid "Parent service"
+msgstr "Serviço pai"
+
+#:
+msgid "Status calculation"
+msgstr "Cálculo do status"
+
+#:
+msgid "Status calculation algorithm"
+msgstr "Algoritmo de cálculo do status"
+
+#:
+msgid "Problem, if at least one child has a problem"
+msgstr "Problema, se pelo menos um filho tem problema"
+
+#:
+msgid "Problem, if all children have problems"
+msgstr "Problema, se todos os filhos tem problemas"
+
+#:
+msgid "Soft"
+msgstr "Soft"
+
+#:
+msgid "Do not calculate"
+msgstr "Não calcular"
+
+#:
+msgid "Calculate SLA"
+msgstr "Calcular SLA"
+
+#:
+msgid "Acceptable SLA (in %)"
+msgstr "SLA  aceitável (em %)"
+
+#:
+msgid "Link to trigger?"
+msgstr "Associar a trigger?"
+
+#:
+msgid "Sort order (0->999)"
+msgstr "Posicionar em (0->999)"
+
+#:
+msgid "Trigger"
+msgstr "Trigger"
+
+#:
+msgid "Server"
+msgstr "Servidor"
+
+#:
+msgid "Delete"
+msgstr "Remover"
+
+#:
+msgid "Clone"
+msgstr "Clonar"
+
+#:
+msgid "Full clone"
+msgstr "Clone Total"
+
+#:
+msgid "One-time downtime"
+msgstr "Downtime único"
+
+#:
+msgid "No times defined"
+msgstr "Não há horários de downtime definido"
+
+#:
+msgid "Service times"
+msgstr "Horário de serviço"
+
+#:
+msgid "New service time"
+msgstr "Novo horário de serviço"
+
+#:
+msgid "Note"
+msgstr "Nota"
+
+#:
+msgid "Remove"
+msgstr "Remover"
+
+#:
+msgid "IT SERVICES"
+msgstr "SERVIÇOS DE TI"
+
+#:
+msgid "Service"
+msgstr "Serviços"
+
+#:
+msgid "Services"
+msgstr "Serviços"
+
+#:
+msgid "Reason"
+msgstr "Razão"
+
+#:
+msgid "Today"
+msgstr "Hoje"
+
+#:
+msgid "This week"
+msgstr "Esta semana"
+
+#:
+msgid "This year"
+msgstr "Este ano"
+
+#:
+msgid "This month"
+msgstr "Este mês"
+
+#:
+msgid "Last 24 hours"
+msgstr "Últimas 24h"
+
+#:
+msgid "Last 7 days"
+msgstr "Últimos 7d"
+
+#:
+msgid "Last 30 days"
+msgstr "Últimos 30d"
+
+#:
+msgid "Last 365 days"
+msgstr "Últimos 365d"
+
+#:
+msgid "Cannot format Tree. Check logic structure in service links"
+msgstr "Não consegue formatar a árvore. Verifique a estrutura lógica nos links de serviço"
+
+#:
+msgid "Show triggers with unacknowledged events"
+msgstr "Mostrar triggers com eventos não vistados"
+
+#:
+msgid "No trigger"
+msgstr "Sem trigger"
+
+#:
+msgid "No triggers defined"
+msgstr "Nenhuma trigger definida"
+
+#:
+msgid "No trigger defined"
+msgstr "Nenhuma trigger definida"
+
+#:
+msgid "Configuration of triggers"
+msgstr "Configuração das triggers"
+
+#:
+msgid "CONFIGURATION OF TRIGGERS"
+msgstr "CONFIGURAÇÃO DAS TRIGGERS"
+
+#:
+msgid "Triggers deleted"
+msgstr "Triggers removidas"
+
+#:
+msgid "Cannot delete triggers"
+msgstr "Triggers não foram removidas"
+
+#:
+msgid "Trigger deleted"
+msgstr "Trigger removida"
+
+#:
+msgid "Cannot delete trigger"
+msgstr "Trigger não foi removida"
+
+#:
+msgid "Trigger added"
+msgstr "Trigger adicionada"
+
+#:
+msgid "Cannot add trigger"
+msgstr "Tigger não foi adicionada"
+
+#:
+msgid "Severity"
+msgstr "Risco"
+
+#:
+msgid "Min severity"
+msgstr "Severidade mínima"
+
+#:
+msgid "Disabled"
+msgstr "Inativo"
+
+#:
+msgid "DISABLED"
+msgstr "INATIVO"
+
+#:
+msgid "Enabled"
+msgstr "Ativo"
+
+#:
+msgid "Disable"
+msgstr "Desativar"
+
+#:
+msgid "Enable"
+msgstr "Ativar"
+
+#:
+msgid "Enable selected"
+msgstr "Ativar selecionadas"
+
+#:
+msgid "Change"
+msgstr "Alterar"
+
+#:
+msgid "Trigger updated"
+msgstr "Trigger atualizada"
+
+#:
+msgid "Cannot update trigger"
+msgstr "Trigger não foi atualizada"
+
+#:
+msgid "Depends on"
+msgstr "Depende de"
+
+#:
+msgid "Dependent"
+msgstr "Dependente"
+
+#:
+msgid "URL"
+msgstr "URL"
+
+#:
+msgid "Zabbix has received an incorrect request"
+msgstr "Zabbix recebeu uma requisição incorreta"
+
+#:
+msgid "Create Trigger"
+msgstr "Criar trigger"
+
+#:
+msgid "Insert"
+msgstr "Inserir"
+
+#:
+msgid "Seconds"
+msgstr "Segundos"
+
+#:
+msgid "Last of"
+msgstr "Última de"
+
+#:
+msgid "Multiple PROBLEM events"
+msgstr "Multiplos eventos de PROBLEMA"
+
+#:
+msgid "Show disabled triggers"
+msgstr "Mostrar triggers inativas"
+
+#:
+msgid "Hide disabled triggers"
+msgstr "Esconder triggers inativas"
+
+#:
+msgid "The trigger depends on"
+msgstr "A trigger depende de"
+
+#:
+msgid "No dependencies defined"
+msgstr "Não há dependências definidas"
+
+#:
+msgid "New dependency"
+msgstr "Nova dependência"
+
+#:
+msgid "Event generation"
+msgstr "Geração de Evento"
+
+#:
+msgid "Triggers massupdate"
+msgstr "Atualização em grupo de triggers"
+
+#:
+msgid "Trigger dependencies"
+msgstr "Trigger dependencies"
+
+#:
+msgid "Incorrect dependency"
+msgstr "Dependência incorreta"
+
+#:
+msgid "Toggle input method"
+msgstr "Alterar método de entrada"
+
+#:
+msgid "Insert macro"
+msgstr "Inserir macro"
+
+#:
+msgid "Replace"
+msgstr "Substituir"
+
+#:
+msgid "Templated trigger"
+msgstr "Trigger de Template"
+
+#:
+msgid "Enable selected triggers?"
+msgstr "Ativar triggers selecionadas?"
+
+#:
+msgid "Disable selected triggers?"
+msgstr "Desativar triggers selecionadas?"
+
+#:
+msgid "Mass update selected triggers?"
+msgstr "Atualizar em massa trigger(s) selecionada(s)?"
+
+#:
+msgid "Copy selected triggers?"
+msgstr "Copiar triggers selecionadas?"
+
+#:
+msgid "Delete selected triggers?"
+msgstr "Remover triggers selecionadas?"
+
+#:
+msgid "Trigger comments"
+msgstr "Comentários"
+
+#:
+msgid "TRIGGER COMMENTS"
+msgstr "COMENTÁRIOS"
+
+#:
+msgid "Comment updated"
+msgstr "Comentário atualizado"
+
+#:
+msgid "Cannot update comment"
+msgstr "Comentário não foi alterado"
+
+#:
+msgid "Add"
+msgstr "Adicionar"
+
+#:
+msgid "Sound"
+msgstr "Som"
+
+#:
+msgid "Status of triggers"
+msgstr "Status dos triggers"
+
+#:
+msgid "STATUS OF TRIGGERS"
+msgstr "STATUS DoS TRIGGERS"
+
+#:
+msgid "Status of hostgroup triggers"
+msgstr "Status dos triggers de grupo de hosts"
+
+#:
+msgid "Status of host triggers"
+msgstr "Status dos triggers de host"
+
+#:
+msgid "Hide all"
+msgstr "Esconder tudo"
+
+#:
+msgid "Show only problems"
+msgstr "Mostrar apenas problemas"
+
+#:
+msgid "Show unacknowledged"
+msgstr "Mostar não confirmado"
+
+#:
+msgid "Show problem-unacknowledged"
+msgstr "Mostar problema não confirmado"
+
+#:
+msgid "Not acknowledged"
+msgstr "Não vistado"
+
+#:
+msgid "Show last"
+msgstr "Mostrar último"
+
+#:
+msgid "Show details"
+msgstr "Mostrar detalhes"
+
+#:
+msgid "Filter by name"
+msgstr "Filtrar por nome"
+
+#:
+msgid "TRIGGERS"
+msgstr "TRIGGERS"
+
+#:
+msgid "Last change"
+msgstr "Última alteração"
+
+#:
+msgid "Comments"
+msgstr "Comentários"
+
+#:
+msgid "Acknowledged"
+msgstr "Visto"
+
+#:
+msgid "Ack"
+msgstr "Visto"
+
+#:
+msgid "Not Ack"
+msgstr "Não vistar"
+
+#:
+msgid "Never"
+msgstr "Nunca"
+
+#:
+msgid "Found"
+msgstr "Encontrado(s)"
+
+#:
+msgid "Acknowledge status"
+msgstr "Estado do visto"
+
+#:
+msgid "Any"
+msgstr "Qualquer"
+
+#:
+msgid "With unacknowledged events"
+msgstr "Com eventos não vistados"
+
+#:
+msgid "With last event unacknowledged"
+msgstr "Com últimos eventos não vistados"
+
+#:
+msgid "Triggers status"
+msgstr "Estado das triggers"
+
+#:
+msgid "Age less than"
+msgstr "Idade menor que"
+
+#:
+msgid "Select"
+msgstr "Selecionar"
+
+#:
+msgid "Zabbix User"
+msgstr "Usuário Zabbix"
+
+#:
+msgid "Zabbix Admin"
+msgstr "Administrador Zabbix"
+
+#:
+msgid "Zabbix Super Admin"
+msgstr "Super Administrador Zabbix"
+
+#:
+msgid "User type"
+msgstr "Tipo de usuário"
+
+#:
+msgid "Users"
+msgstr "Usuários"
+
+#:
+msgid "User added"
+msgstr "Usuário incluído"
+
+#:
+msgid "Cannot add user"
+msgstr "Usuário não foi incluído"
+
+#:
+msgid "Cannot add user. Both passwords must be equal."
+msgstr "Usuário não foi incluído. Senhas não conferem."
+
+#:
+msgid "User deleted"
+msgstr "Usuário removido"
+
+#:
+msgid "Cannot delete user"
+msgstr "Usuário não foi removido"
+
+#:
+msgid "Password should not be empty"
+msgstr "Senha não pode ser vazia"
+
+#:
+msgid "For guest, password must be empty"
+msgstr "Para convidado, senha deve ser vazia"
+
+#:
+msgid "User updated"
+msgstr "Usuário atualizado"
+
+#:
+msgid "Cannot update user"
+msgstr "Usuário não foi atualizado"
+
+#:
+msgid "Cannot update user. Both passwords must be equal."
+msgstr "Usuário não foi atualizado. Ambas as senhas devem ser iguais."
+
+#:
+msgid "Group added"
+msgstr "Grupo incluído"
+
+#:
+msgid "Cannot add group"
+msgstr "Grupo não foi incluído"
+
+#:
+msgid "Group updated"
+msgstr "Grupo atualizado"
+
+#:
+msgid "Cannot update group"
+msgstr "Grupo não foi atualizado"
+
+#:
+msgid "Group deleted"
+msgstr "Grupo removido"
+
+#:
+msgid "Cannot delete group"
+msgstr "Grupo não foi removido"
+
+#:
+msgid "Proxy added"
+msgstr "Proxy adicionado"
+
+#:
+msgid "Cannot add proxy"
+msgstr "Não foi possível adicionar proxy"
+
+#:
+msgid "Proxy updated"
+msgstr "Proxy atualizado"
+
+#:
+msgid "Cannot update proxy"
+msgstr "Não foi possível atualizar proxy"
+
+#:
+msgid "Proxy deleted"
+msgstr "Proxy deletado"
+
+#:
+msgid "Cannot delete proxy"
+msgstr "Não foi possível deletar proxy"
+
+#:
+msgid "Users status updated"
+msgstr "Status de usuários atualizados"
+
+#:
+msgid "Cannot update users status"
+msgstr "Status de usuários não foi atualizado"
+
+#:
+msgid "Users unblocked"
+msgstr "Usuários desbloqueados"
+
+#:
+msgid "Cannot unblock users"
+msgstr "Não foi possível desbloquear usuários"
+
+#:
+msgid "GUI access updated"
+msgstr "Acesso GUI atualizado"
+
+#:
+msgid "Cannot update GUI access"
+msgstr "Acesso GUI não foi atualizado"
+
+#:
+msgid "API access updated"
+msgstr "Acesso API atualizado"
+
+#:
+msgid "Cannot update API access"
+msgstr "Acesso API não foi atualizado"
+
+#:
+msgid "Debug mode updated"
+msgstr "Modo de Depuração atualizado"
+
+#:
+msgid "Cannot update debug mode"
+msgstr "Modo de Depuração não foi atualizado"
+
+#:
+msgid "User cannot disable himself"
+msgstr "Usuário não pode desabilitar a si mesmo"
+
+#:
+msgid "User cannot change status of himself"
+msgstr "Usuário não pode alterar seu próprio status"
+
+#:
+msgid "User cannot change GUI access for himself"
+msgstr "Usuário não pode alterar seus próprias direitos de acesso a GUI"
+
+#:
+msgid "User cannot delete himself"
+msgstr "Usuário não pode deletar a si mesmo"
+
+#:
+msgid "CONFIGURATION OF USERS AND USER GROUPS"
+msgstr "CONFIGURAÇÃO DE USUÁRIOS E GRUPOS"
+
+#:
+msgid "USER GROUPS"
+msgstr "GRUPOS DE USUÁRIOS"
+
+#:
+msgid "USERS"
+msgstr "USUÁRIOS"
+
+#:
+msgid "User groups"
+msgstr "Grupos de usuários"
+
+#:
+msgid "Members"
+msgstr "Membros"
+
+#:
+msgid "No user groups defined"
+msgstr "Nenhum grupo de usuário definido"
+
+#:
+msgid "Name"
+msgstr "Nome"
+
+#:
+msgid "Surname"
+msgstr "Sobrenome"
+
+#:
+msgid "Is online?"
+msgstr "Online?"
+
+#:
+msgid "No users defined"
+msgstr "Não há usuários definidos"
+
+#:
+msgid "Rights"
+msgstr "Permissões"
+
+#:
+msgid "GUI access"
+msgstr "Acesso GUI"
+
+#:
+msgid "API access"
+msgstr "Acesso API"
+
+#:
+msgid "Debug"
+msgstr "Depuração"
+
+#:
+msgid "Debug mode"
+msgstr "Modo de Depuração"
+
+#:
+msgid "Users status"
+msgstr "Estados dos Usuários"
+
+#:
+msgid "No rights defined"
+msgstr "Nenhuma permissão definida"
+
+#:
+msgid "Read only"
+msgstr "Somente leitura"
+
+#:
+msgid "Read-write"
+msgstr "Leitura-escrita"
+
+#:
+msgid "Deny"
+msgstr "Nega"
+
+#:
+msgid "Hide"
+msgstr "Esconder"
+
+#:
+msgid "Password"
+msgstr "Senha"
+
+#:
+msgid "Change password"
+msgstr "Alterar senha"
+
+#:
+msgid "Password (once again)"
+msgstr "Senha (novamente)"
+
+#:
+msgid "URL (after login)"
+msgstr "URL (ao sair)"
+
+#:
+msgid "Auto-login"
+msgstr "Auto-login"
+
+#:
+msgid "Auto-logout (min 90 seconds)"
+msgstr "Auto-logout (mín. 90 segundos)"
+
+#:
+msgid "Refresh (in seconds)"
+msgstr "Atualização da tela (em seg.)"
+
+#:
+msgid "Create User"
+msgstr "Cria Usuário"
+
+#:
+msgid "Create Group"
+msgstr "Criar Grupo"
+
+#:
+msgid "No accessible resources"
+msgstr "Nenhum recurso acessível"
+
+#:
+msgid "Add to"
+msgstr "Adicionar a"
+
+#:
+msgid "Remove from"
+msgstr "Remover de"
+
+#:
+msgid "Internal"
+msgstr "Interno"
+
+#:
+msgid "Rows per page"
+msgstr "Registros por página"
+
+#:
+msgid "Enable API"
+msgstr "Habilitar API"
+
+#:
+msgid "Disable API"
+msgstr "Desabilitar API"
+
+#:
+msgid "Enable DEBUG"
+msgstr "Habilitar DEBUG"
+
+#:
+msgid "Disable DEBUG"
+msgstr "Desabilitar DEBUG"
+
+#:
+msgid "Blocked"
+msgstr "Bloqueado"
+
+#:
+msgid "Unblock selected"
+msgstr "Desbloquear selecionado(s)"
+
+#:
+msgid "Unblock selected users?"
+msgstr "Desbloquear usuários selecionados?"
+
+#:
+msgid "Delete selected users?"
+msgstr "Remover usuários selecionados?"
+
+#:
+msgid "Enable selected groups?"
+msgstr "Habilitar grupos selecionados?"
+
+#:
+msgid "Disable selected groups?"
+msgstr "Desabilitar grupos selecionados?"
+
+#:
+msgid "Enable API access in selected groups?"
+msgstr "Habilita acesso API aos grupos selecionados?"
+
+#:
+msgid "Disable API access in selected groups?"
+msgstr "Desabilita acesso API aos grupos selecionados?"
+
+#:
+msgid "Enable debug mode in selected groups?"
+msgstr "Ativar modo debug nos grupos selecionados?"
+
+#:
+msgid "Disable debug mode in selected groups?"
+msgstr "Desativar modo debug nos grupos selecionados?"
+
+#:
+msgid "Delete selected groups?"
+msgstr "Remover grupos selecionados?"
+
+#:
+msgid "CONFIGURATION OF SCRIPTS"
+msgstr "CONFIGURAÇÃO DE SCRIPTS"
+
+#:
+msgid "Scripts"
+msgstr "Scripts"
+
+#:
+msgid "SCRIPTS"
+msgstr "SCRIPTS"
+
+#:
+msgid "Command"
+msgstr "Comando"
+
+#:
+msgid "permissions"
+msgstr "permissões"
+
+#:
+msgid "Required host"
+msgstr "Host requerido"
+
+#:
+msgid "Read"
+msgstr "Leitura"
+
+#:
+msgid "Write"
+msgstr "Escrita"
+
+#:
+msgid "No scripts defined"
+msgstr "Não há scripts definidos"
+
+#:
+msgid "Host access"
+msgstr "Acesso a Host"
+
+#:
+msgid "Delete script?"
+msgstr "Remover script?"
+
+#:
+msgid "Create script"
+msgstr "Criar script"
+
+#:
+msgid "Script added"
+msgstr "Script adicionado"
+
+#:
+msgid "Cannot add script"
+msgstr "Não foi possível adicionar script"
+
+#:
+msgid "Script updated"
+msgstr "Script atualizado"
+
+#:
+msgid "Cannot update script"
+msgstr "Não foi possível atualizar script"
+
+#:
+msgid "Script deleted"
+msgstr "Script deletado"
+
+#:
+msgid "Cannot delete script"
+msgstr "Não foi possível deletar script"
+
+#:
+msgid "Tools"
+msgstr "Ferramentas"
+
+#:
+msgid "Result"
+msgstr "Resultado"
+
+#:
+msgid "Close"
+msgstr "Fechar"
+
+#:
+msgid "Cannot connect to Zabbix server"
+msgstr "Não foi possível conectar ao Zabbix server"
+
+#:
+msgid "Delete selected scripts?"
+msgstr "Remover scripts selecionados?"
+
+#:
+msgid "SCRIPT ERROR"
+msgstr "ERRO DE SCRIPT"
+
+#:
+msgid "Error Description"
+msgstr "Erro de Descritor"
+
+#:
+msgid "Can't send command, check connection"
+msgstr "Não consegue enviar o comando, verifique a conexão"
+
+#:
+msgid "Can't read script response, check connection"
+msgstr "Não consegue ler a resposta do script, verifique a conexão"
+
+#:
+msgid "Defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value"
+msgstr "O tempo definido pela constante ZBX_SCRIPT_TIMEOUT, em \"include/defines.inc.php\" foi atingido. Voce pode tentar aumentar este valor"
+
+#:
+msgid "Defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value"
+msgstr "O limite de leitura de bytes definido pela constante ZBX_SCRIPT_BYTES_LIMIT, em \"include/defines.inc.php\" foi atingido. Voce pode tentar aumentar este valor"
+
+#:
+msgid "Unknown error happened reading script answer, please report to the developers"
+msgstr "Ocorreu um erro desconhecido ao ler a resposta do script, por favor relate aos desenvolvedores"
+
+#:
+msgid "Empty response received"
+msgstr "Recebida resposta vazia"
+
+#:
+msgid "Audit"
+msgstr "Auditoria"
+
+#:
+msgid "AUDIT LOGS"
+msgstr "AUDITORIA de LOGS"
+
+#:
+msgid "AUDIT ACTIONS"
+msgstr "AUDITORIA de AÇÕES"
+
+#:
+msgid "Action"
+msgstr "Ação"
+
+#:
+msgid "Details"
+msgstr "Detalhes"
+
+#:
+msgid "Unknown action"
+msgstr "Ação desconhecida"
+
+#:
+msgid "Added"
+msgstr "Adicionado"
+
+#:
+msgid "Updated"
+msgstr "Atualizado"
+
+#:
+msgid "Media type"
+msgstr "Tipo de mídia"
+
+#:
+msgid "Graph element"
+msgstr "Elemento gráfico"
+
+#:
+msgid "Unknown resource"
+msgstr "Recurso desconhecido"
+
+#:
+msgid "already exists"
+msgstr "já existe"
+
+#:
+msgid "Zabbix config"
+msgstr "Zabbix config"
+
+#:
+msgid "Clear"
+msgstr "Limpar"
+
+#:
+msgid "Once"
+msgstr "Uma vez"
+
+#:
+msgid "Move"
+msgstr "Mover"
+
+#:
+msgid "Unmute"
+msgstr "Som"
+
+#:
+msgid "Mute"
+msgstr "Sem som"
+
+#:
+msgid "Snooze"
+msgstr "Soneca"
+
+#:
+msgid "Messages"
+msgstr "Mensagens"
+
+#:
+msgid "Problem on"
+msgstr "Problema em"
+
+#:
+msgid "Recovery"
+msgstr "Recuperação"
+
+#:
+msgid "GUI Messaging"
+msgstr "Notificações na interface"
+
+#:
+msgid "Play sound"
+msgstr "Executar som"
+
+#:
+msgid "Message timeout"
+msgstr "Expiração de mensagem"
+
+#:
+msgid "Play"
+msgstr "Executar"
+
+#:
+msgid "Pause"
+msgstr "Pausar"
+
+#:
+msgid "Stop"
+msgstr "Parar"
+
+#:
+msgid "Loop"
+msgstr "Repetir"
+
+#:
+msgid "USER PROFILE"
+msgstr "DADOS PERSONALIZADOS DO USUÁRIO"
+
+#:
+msgid "User profile"
+msgstr "Dados personalizados do usuário"
+
+#:
+msgid "Language"
+msgstr "Língua"
+
+#:
+msgid "Theme"
+msgstr "Tema"
+
+#:
+msgid "English (GB)"
+msgstr "Inglês (GB)"
+
+#:
+msgid "French (FR)"
+msgstr "Francês (FR)"
+
+#:
+msgid "German (DE)"
+msgstr "Alemão (DE)"
+
+#:
+msgid "Italian (IT)"
+msgstr "Italiano (IT)"
+
+#:
+msgid "Korean (KO)"
+msgstr "Coreano (KO)"
+
+#:
+msgid "Latvian (LV)"
+msgstr "Lituâno (LV)"
+
+#:
+msgid "Russian (RU)"
+msgstr "Russo (RU)"
+
+#:
+msgid "Portuguese (PT)"
+msgstr "Português Brasileiro (PT_BR)"
+
+#:
+msgid "Spanish (ES)"
+msgstr "Espanhol (ES)"
+
+#:
+msgid "Swedish (SE)"
+msgstr "Sueco (SE)"
+
+#:
+msgid "Japanese (JP)"
+msgstr "Japonês (JP)"
+
+#:
+msgid "Chinese (CN)"
+msgstr "Chinês (CN)"
+
+#:
+msgid "Dutch (NL)"
+msgstr "Holandês (NL)"
+
+#:
+msgid "Hungarian (HU)"
+msgstr "Húngaro (HU)"
+
+#:
+msgid "Polish (PL)"
+msgstr "Polonês (PL)"
+
+#:
+msgid "Ukrainian (UA)"
+msgstr "Ucraniano (UA)"
+
+#:
+msgid "Czech (CZ)"
+msgstr "Czech (CZ)"
+
+#:
+msgid "ZABBIX"
+msgstr "ZABBIX"
+
+#:
+msgid "Welcome to Zabbix! You are connected as"
+msgstr "Bem-vindo ao Zabbix! Você está conectado como"
+
+#:
+msgid "Login name"
+msgstr "Login"
+
+#:
+msgid "Host profiles"
+msgstr "Dados do host"
+
+#:
+msgid "HOST PROFILES"
+msgstr "DADOS DO HOST"
+
+#:
+msgid "Extended host profile"
+msgstr "Perfil extendido do host"
+
+#:
+msgid "Extended profile"
+msgstr "Perfil extendido"
+
+#:
+msgid "Extended"
+msgstr "Extendido"
+
+#:
+msgid "Edit hosts"
+msgstr "Editar hosts"
+
+#:
+msgid "SEARCH"
+msgstr "PROCURAR"
+
+#:
+msgid "Go"
+msgstr "Ir"
+
+#:
+msgid "found"
+msgstr "encontrado(s)"
+
+#:
+msgid "Displaying"
+msgstr "Mostrando"
+
+#:
+msgid "Search pattern is empty"
+msgstr "Padrão de busca está vazio"
+
+#:
+msgid "Caption"
+msgstr "Legenda"
+
+#:
+msgid "Empty"
+msgstr "Vazio"
+
+#:
+msgid "STANDARD ITEMS"
+msgstr "ITENS PADRÃO"
+
+#:
+msgid "No items"
+msgstr "Não há itens"
+
+#:
+msgid "DISCOVERY RULES"
+msgstr "REGRAS DE DESCOBERTA"
+
+#:
+msgid "DISCOVERY CHECKS"
+msgstr "VERIFICAÇÕES DE DESCOBERTA"
+
+#:
+msgid "Hosts and templates"
+msgstr "Hosts e templates"
+
+#:
+msgid "You can not switch hosts for current selection"
+msgstr "You can not switch hosts for current selection"
+
+#:
+msgid "H:i:s"
+msgstr "H:i:s"
+
+#:
+msgid "No errors found"
+msgstr "Sem erros"
+
+#:
+msgid "Expression Syntax Error"
+msgstr "Expressão com erro de sintaxe"
+
+#:
+msgid "Unexpected end of element"
+msgstr "Fim inesperado de elemento"
+
+#:
+msgid "Check expression part starting from '"
+msgstr "Verifique a parte da expressão a partir de '"
+
+#:
+msgid "'"
+msgstr "'"
+
+#:
+msgid "Not allowed symbols or sequence of symbols in expression element detected"
+msgstr "Foram detectados símbolos não permitidos ou sequência de símbolos em expressão de elementos"
+
+#:
+msgid "Not allowed value detected in element"
+msgstr "Detectado elemento com valor não permitido"
+
+#:
+msgid "Unnecessary symbols detected"
+msgstr "Detectado símbolo desnecessário"
+
+#:
+msgid "Not allowed symbols detected after element"
+msgstr "Detectado símbolo não permitido depois do elemento"
+
+#:
+msgid "Not allowed symbols detected before element"
+msgstr "Detectado símbolo não permitido antes do elemento"
+
+#:
+msgid "New indicators"
+msgstr "Novos indicadores"
+
+#:
+msgid "Edit connector"
+msgstr "Editar conector"
+
+#:
+msgid "Include"
+msgstr "Incluir"
+
+#:
+msgid "Exclude"
+msgstr "Excluir"
+
+#:
+msgid "Keyword"
+msgstr "Palavra-chave"
+
+#:
+msgid "Position"
+msgstr "Posição"
+
+#:
+msgid "Delete expression?"
+msgstr "Remover expressão?"
+
+#:
+msgid "Delete keyword?"
+msgstr "Remover palavra-chave?"
+
+#:
+msgid "Test data"
+msgstr "Testar dados"
+
+#:
+msgid "Expression Variable Elements"
+msgstr "Expressão de Elementos Variáveis"
+
+#:
+msgid "Unknown variable type, testing not available"
+msgstr "Tipo de variável desconhecido, teste não disponível"
+
+#:
+msgid "Unknown host, no such host present in system"
+msgstr "Host desconhecido; não existe este host no sistema"
+
+#:
+msgid "Unknown host item, no such item in selected host"
+msgstr "Item de host desconhecido; não existe este item no host selecionado"
+
+#:
+msgid "Given expression is not a macro"
+msgstr "Expressão informada não é uma macro"
+
+#:
+msgid "Result type"
+msgstr "Tipo de resultado"
+
+#:
+msgid "Combined result"
+msgstr "Resultado combinado"
+
+#:
+msgid "Delete this application?"
+msgstr "Remover esta aplicação?"
+
+#:
+msgid "Activate selected applications?"
+msgstr "Habilitar aplicações selecionadas?"
+
+#:
+msgid "Disable selected applications?"
+msgstr "Desabilitar aplicações selecionadas?"
+
+#:
+msgid "Delete selected applications?"
+msgstr "Remover aplicações selecionadas?"
+
+#:
+msgid "Incorrect time period"
+msgstr "Período incorreto"
+
+#:
+msgid "No elements selected!"
+msgstr "Nenhum elemento selecionado!"
+
+#:
+msgid "refreshed every"
+msgstr "atualizado a cada"
+
+#:
+msgid "Page received incorrect data"
+msgstr "Página recebeu dados incorretos"
+
+#:
+msgid "Timezone for PHP is not set. Please set \"date.timezone\" option in php.ini."
+msgstr "Timezone do PHP não está definido. Por favor, defina a opção \"date.timezone\" no php.ini."
+
+#:
+msgid "Stats for"
+msgstr "Estatísticas de"
+
+#:
+msgid "Total time"
+msgstr "Tempo total"
+
+#:
+msgid "Memory limit"
+msgstr "Limite de memória"
+
+#:
+msgid "Memory usage"
+msgstr "Uso de memória"
+
+#:
+msgid "Memory leak"
+msgstr "Vazamento de memória"
+
+#:
+msgid "SQL selects count"
+msgstr "Contador de seleções SQL"
+
+#:
+msgid "SQL executes count"
+msgstr "Contador de execuções SQL"
+
+#:
+msgid "SQL requests count"
+msgstr "Contador de requisições SQL"
+
+#:
+msgid "Total time spent on SQL"
+msgstr "Tempo total gasto na SQL"
+
+#:
+msgid "End of"
+msgstr "Fim de"
+
+#:
+msgid "MEMORY LIMIT REACHED! Profiling was stopped to save memory for script processing."
+msgstr "LIMITE DE MEMÓRIA ALCANÇADO! Profiling parado para economizar memória para o processamento do script."
+
+#:
+msgid "Wrong type"
+msgstr "Tipo errado"
+
+#:
+msgid "Incorrect type of asort_by_key"
+msgstr "Tipo incorreto de dado para classificação ascendente por chave"
+
+#:
+msgid "days"
+msgstr "dias"
+
+#:
+msgid "B"
+msgstr "B"
+
+#:
+msgid "n"
+msgstr "n"
+
+#:
+msgid "Nano"
+msgstr "Nano"
+
+#:
+msgid "µ"
+msgstr "µ"
+
+#:
+msgid "Micro"
+msgstr "Micro"
+
+#:
+msgid "Milli"
+msgstr "Milli"
+
+#:
+msgid "K"
+msgstr "K"
+
+#:
+msgid "Kilo"
+msgstr "Kilo"
+
+#:
+msgid "M"
+msgstr "M"
+
+#:
+msgid "Mega"
+msgstr "Mega"
+
+#:
+msgid "G"
+msgstr "G"
+
+#:
+msgid "Giga"
+msgstr "Giga"
+
+#:
+msgid "T"
+msgstr "T"
+
+#:
+msgid "Tera"
+msgstr "Tera"
+
+#:
+msgid "P"
+msgstr "P"
+
+#:
+msgid "Peta"
+msgstr "Peta"
+
+#:
+msgid "E"
+msgstr "E"
+
+#:
+msgid "Exa"
+msgstr "Exa"
+
+#:
+msgid "Z"
+msgstr "Z"
+
+#:
+msgid "Zetta"
+msgstr "Zetta"
+
+#:
+msgid "Yotta"
+msgstr "Yotta"
+
+#:
+msgid "Y.m.d H:i:s"
+msgstr "d/m/Y H:i:s"
+
+#:
+msgid "Delete selected user?"
+msgstr "Remover usuário(s) selecionado(s)?"
+
+#:
+msgid "Subfilter"
+msgstr "Subfiltro"
+
+#:
+msgid "affects only filtered data!"
+msgstr "afeta somente dados filtrados!"
+
+#:
+msgid "show value mappings"
+msgstr "mostrar mapeamento de valores"
+
+#:
+msgid "Delete selected item?"
+msgstr "Remover item(ns) selecionado(s)?"
+
+#:
+msgid "Do"
+msgstr "Fazer"
+
+#:
+msgid "Incorrect list of items."
+msgstr "Lista de itens incorreta."
+
+#:
+msgid "Delete trigger?"
+msgstr "Remover trigger(s)?"
+
+#:
+msgid "Profile for this host is missing"
+msgstr "Não existe perfil para este host"
+
+#:
+msgid "No image"
+msgstr "Sem imagem"
+
+#:
+msgid "Delete system map?"
+msgstr "Remover o mapa de sistema?"
+
+#:
+msgid "Incorrect arguments passed to function"
+msgstr "Argumentos incorretos passados para a função"
+
+#:
+msgid "Incorrect key format"
+msgstr "Formato de chave incorreto"
+
+#:
+msgid "Item will not be refreshed. Please enter a correct update interval."
+msgstr "Item não será atualizado. Por favor informe um intervalo de atualização correto."
+
+#:
+msgid "Invalid SNMP port"
+msgstr "Porta SNMP inválida"
+
+#:
+msgid "Type of information must be Log for log key"
+msgstr "Tipo da informação para chave de log deve ser Log"
+
+#:
+msgid "Value type must be Float for aggregate items"
+msgstr "Para itens agregados, o tipo do valor deve ser Float"
+
+#:
+msgid "Group function"
+msgstr "Função de grupo"
+
+#:
+msgid "is not one of"
+msgstr "não é um de"
+
+#:
+msgid "Item function"
+msgstr "Item/Função"
+
+#:
+msgid "Key does not match"
+msgstr "Chave não combina"
+
+#:
+msgid "An item with the Key"
+msgstr "Um item com a chave"
+
+#:
+msgid "already exists for host"
+msgstr "já existe para host"
+
+#:
+msgid "The key must be unique."
+msgstr "A chave tem que ser única."
+
+#:
+msgid "Added new item"
+msgstr "Adiciona novo item"
+
+#:
+msgid "updated"
+msgstr "atualizado"
+
+#:
+msgid "No item with"
+msgstr "Sem item com"
+
+#:
+msgid "deleted"
+msgstr "removido"
+
+#:
+msgid "Unknown value type"
+msgstr "Tipo de valor desconhecido"
+
+#:
+msgid "Check the key, please. Default example was passed"
+msgstr "Verifique a chave, por favor. Exemplo padrão foi indicado"
+
+#:
+msgid "Scenario step number cannot be less than 1"
+msgstr "Passo de cenário não pode ser menor que 1"
+
+#:
+msgid "Scenario step name should contain"
+msgstr "Nome do passo de cenáril deve conter"
+
+#:
+msgid "characters only"
+msgstr "somente caracteres"
+
+#:
+msgid "Only characters are allowed"
+msgstr "Permitido somente caracteres"
+
+#:
+msgid "Cannot add new application"
+msgstr "Impossível adicionar nova aplicação"
+
+#:
+msgid "Scenario with name"
+msgstr "Cenário com nome"
+
+#:
+msgid "added"
+msgstr "adicionado"
+
+#:
+msgid "No media with"
+msgstr "Sem mídia com"
+
+#:
+msgid "No media type with"
+msgstr "Sem tipo de mídia com"
+
+#:
+msgid "An action type with description"
+msgstr "Um tipo de ação com descrição"
+
+#:
+msgid "can not exist without group"
+msgstr "não pode existir sem grupo"
+
+#:
+msgid "Added host group"
+msgstr "Grupo de hosts adicionado"
+
+#:
+msgid "Updated host group"
+msgstr "Grupo de hosts atualizado"
+
+#:
+msgid "Incorrect characters used for Hostname"
+msgstr "Uso de caracteres incorretos no Hostname"
+
+#:
+msgid "Incorrect characters used for DNS"
+msgstr "Uso de caracteres incorretos para DNS"
+
+#:
+msgid "Circular link can not be created"
+msgstr "Associações circulares não podem ser criadas"
+
+#:
+msgid "must be linked to at least one host group"
+msgstr "deve estar associado a pelo menos um grupo de host"
+
+#:
+msgid "Added new host"
+msgstr "Adicionado novo host"
+
+#:
+msgid "is internal and can not be deleted"
+msgstr "é interno e não pode ser removido"
+
+#:
+msgid "can not be deleted, due to inner hosts can not be unlinked"
+msgstr "não pode ser removido, visto que associações com outros hosts não podem ser desfeitas"
+
+#:
+msgid "No host groups with"
+msgstr "Sem grupo de hosts com"
+
+#:
+msgid "incorrect parameters for"
+msgstr "parâmetros incorretos para"
+
+#:
+msgid "No host with"
+msgstr "Sem host com"
+
+#:
+msgid "already exists in linked hosts"
+msgstr "já existe em hosts associados"
+
+#:
+msgid "Added new application"
+msgstr "Adicionada nova aplicação"
+
+#:
+msgid "Updated application"
+msgstr "Aplicação atualizada"
+
+#:
+msgid "used by item"
+msgstr "usado pelo item"
+
+#:
+msgid "used by scenario"
+msgstr "usado pelo cenário"
+
+#:
+msgid "No application with"
+msgstr "Sem aplicação com"
+
+#:
+msgid "unlinked"
+msgstr "desassociado"
+
+#:
+msgid "Template with item key"
+msgstr "Template com item chave"
+
+#:
+msgid "Template with application"
+msgstr "Template com aplicação"
+
+#:
+msgid "already linked to host"
+msgstr "já associado ao host"
+
+#:
+msgid "has been deleted from the system"
+msgstr "foi removido do sistema"
+
+#:
+msgid "Critical error"
+msgstr "Erro crítico"
+
+#:
+msgid "Field"
+msgstr "Campo"
+
+#:
+msgid "is not IP range"
+msgstr "não é intervalo de IPs"
+
+#:
+msgid "is not PORT range"
+msgstr "não é intervalo de PORTAs"
+
+#:
+msgid "is not integer range"
+msgstr "não é intervalo de inteiros"
+
+#:
+msgid "is not integer"
+msgstr "não é inteiro"
+
+#:
+msgid "is not double"
+msgstr "não é double"
+
+#:
+msgid "is not string"
+msgstr "não é string"
+
+#:
+msgid "contains Multibyte chars"
+msgstr "contém caracteres Multibyte (compostos)"
+
+#:
+msgid "multibyte chars are restricted"
+msgstr "caracteres multibyte (compostos) são restritos"
+
+#:
+msgid "is not a colour"
+msgstr "não é cor"
+
+#:
+msgid "is mandatory"
+msgstr "é mandatório"
+
+#:
+msgid "must be missing"
+msgstr "deve ser desconhecido"
+
+#:
+msgid "Operation cannot be performed due to unauthorized request"
+msgstr "Operação não pode ser executada por requisão não autorizada"
+
+#:
+msgid "Incorrect value for"
+msgstr "Valor incorreto para"
+
+#:
+msgid "No trigger with"
+msgstr "Sem trigger com"
+
+#:
+msgid "Incorrect usage of quotes"
+msgstr "Uso incorreto de aspas"
+
+#:
+msgid "Expression cannot be empty"
+msgstr "Expressão não pode ser vazia"
+
+#:
+msgid "No such host"
+msgstr "Host desconhecido"
+
+#:
+msgid "Too many hosts"
+msgstr "Hosts em excesso"
+
+#:
+msgid "No such monitored parameter"
+msgstr "Parâmetro não monitorado"
+
+#:
+msgid "for host"
+msgstr "para o host"
+
+#:
+msgid "Unknown function"
+msgstr "Função desconhecida"
+
+#:
+msgid "Incorrect value type"
+msgstr "Tipo de valor incorreto"
+
+#:
+msgid "for function"
+msgstr "para função"
+
+#:
+msgid "of key"
+msgstr "com chave"
+
+#:
+msgid "available only for items with value types"
+msgstr "disponível somente para itens com valores tipados"
+
+#:
+msgid "Missing mandatory parameter for function"
+msgstr "Falta parâmetro de função obrigatório"
+
+#:
+msgid "is not a float or macro for function"
+msgstr "não é real ou macro para a função"
+
+#:
+msgid "is not a float or counter or macro for function"
+msgstr "não é real ou contador ou macro para a função"
+
+#:
+msgid "An item key must be used in trigger expression"
+msgstr "Uma chave de item deve ser usada em expressões de trigger"
+
+#:
+msgid "Incorrect trigger expression"
+msgstr "Expressão de trigger incorreta"
+
+#:
+msgid "You can not use template hosts in mixed expressions."
+msgstr "Não se pode usar nomes de template em expressões mistas."
+
+#:
+msgid "Added trigger"
+msgstr "Trigger adicionado"
+
+#:
+msgid "to host"
+msgstr "para o host"
+
+#:
+msgid "Missing key"
+msgstr "Chave desconhecida"
+
+#:
+msgid "Incorrect function is used"
+msgstr "Usada função incorreta"
+
+#:
+msgid "Unknown macro"
+msgstr "Macro desconhecida"
+
+#:
+msgid "from host"
+msgstr "do host"
+
+#:
+msgid "Trigger in template"
+msgstr "Trigger no template"
+
+#:
+msgid "has dependency with trigger in template"
+msgstr "tem dependência com trigger no template"
+
+#:
+msgid "is not the highest level template"
+msgstr "não é o template de nível mais alto"
+
+#:
+msgid "No function with"
+msgstr "Sem função com"
+
+#:
+msgid "Specify the conditional expression for the target."
+msgstr "Especifique a expressão de condição para o alvo."
+
+#:
+msgid "0 or 1"
+msgstr "0 ou 1"
+
+#:
+msgid "At least one item must be present in the trigger expression."
+msgstr "Pelo menos um item deve estar presente na expressão de trigger."
+
+#:
+msgid "Host does not exist."
+msgstr "O Host não existe."
+
+#:
+msgid "Host key does not exist."
+msgstr "Chave de Host não existe."
+
+#:
+msgid "Function '"
+msgstr "A Função '"
+
+#:
+msgid "' does not accept parameters."
+msgstr "' não aceita parâmetros."
+
+#:
+msgid "Transaction has not been closed. Aborting.."
+msgstr "Transação não foi concluída. Abortando..."
+
+#:
+msgid "No system map with"
+msgstr "Sem mapa de sistema com"
+
+#:
+msgid "No sysmap element with"
+msgstr "Sem elemento de sysmap com"
+
+#:
+msgid "template"
+msgstr "template"
+
+#:
+msgid "No rows in screen"
+msgstr "Tela sem linhas"
+
+#:
+msgid "Delete it?"
+msgstr "Remover?"
+
+#:
+msgid "This screen-row is not empty"
+msgstr "Esta linha de tela não está vazia"
+
+#:
+msgid "This screen-column is not empty"
+msgstr "Esta coluna de tela não está vazia"
+
+#:
+msgid "[H:i:s]"
+msgstr "[H:i:s]"
+
+#:
+msgid "No graph item with"
+msgstr "Sem item de gráfico com"
+
+#:
+msgid "Missing items for graph"
+msgstr "Itens de gráfico inexistentes"
+
+#:
+msgid "with template host can not contain items from other hosts."
+msgstr "template de host não pode conter itens de outros hosts."
+
+#:
+msgid "Can not use multiple host items for template graph"
+msgstr "Não pode usar items de múltiplos host em template de gráfico"
+
+#:
+msgid "You must use items only from host"
+msgstr "Só pode utilizar itens do host"
+
+#:
+msgid "for template graph"
+msgstr "para template de gráfico"
+
+#:
+msgid "updated for hosts"
+msgstr "atualizado para os hosts"
+
+#:
+msgid "Skipped copying of graph"
+msgstr "Saltar cópia do gráfico"
+
+#:
+msgid "Graph \""
+msgstr "Gráfico \""
+
+#:
+msgid "\" deleted from host"
+msgstr "\" removido do host"
+
+#:
+msgid "Unable to select configuration"
+msgstr "Incapaz de selecionar configuração"
+
+#:
+msgid "on"
+msgstr "em"
+
+#:
+msgid "every"
+msgstr "todo"
+
+#:
+msgid "day"
+msgstr "dia"
+
+#:
+msgid "of every"
+msgstr "de cada"
+
+#:
+msgid "weeks"
+msgstr "semanas"
+
+#:
+msgid "week"
+msgstr "semana"
+
+#:
+msgid "Service cannot be parent and child at the same time."
+msgstr "O serviço não pode ser pai e filho ao mesmo tempo."
+
+#:
+msgid "Cannot link hardlinked service."
+msgstr "Impossível associação 'forte' de serviço."
+
+#:
+msgid "Cannot link service to itself."
+msgstr "Impossível associar serviço a ele mesmo."
+
+#:
+msgid "No service with"
+msgstr "Sem serviço com"
+
+#:
+msgid "No service linkage with"
+msgstr "Sem associação de serviço com"
+
+#:
+msgid "Unknown calculation algorithm of service status"
+msgstr "Algoritmo de cálculo de status de serviço desconhecido"
+
+#:
+msgid "Incorrect user data in"
+msgstr "Dados de usuário incorretos em"
+
+#:
+msgid "Could not save image!"
+msgstr "Impossível salvar imagem!"
+
+#:
+msgid "Execute SQL error"
+msgstr "Erro de execução SQL"
+
+#:
+msgid "Parse SQL error"
+msgstr "Erro de parser SQL"
+
+#:
+msgid "Image size must be less than 1MB"
+msgstr "Tamanho de imagem deve ser menor que 1MB"
+
+#:
+msgid "Select image to download"
+msgstr "Selecione a imagem para download"
+
+#:
+msgid "Incorrect Image"
+msgstr "Imagem incorreta"
+
+#:
+msgid "Incorrect characters used for Node name"
+msgstr "Nome de Nodo com caracteres não aceitos"
+
+#:
+msgid "Master node already exists"
+msgstr "Já existe Nó mestre"
+
+#:
+msgid "Incorrect node type"
+msgstr "Tipo de Nodo incorreto"
+
+#:
+msgid "Node with same ID already exists"
+msgstr "Já existe Nó com o mesmo ID"
+
+#:
+msgid "Unable to remove local node"
+msgstr "Impossível remover Nodo local"
+
+#:
+msgid "Please be aware that database still contains data related to the deleted Node"
+msgstr "Lembre que o banco de dados ainda contem dados relativos ao Nodo removido"
+
+#:
+msgid "PHP version"
+msgstr "Versão PHP"
+
+#:
+msgid "Minimal version of PHP is"
+msgstr "Versão mínima do PHP é"
+
+#:
+msgid "PHP memory limit"
+msgstr "Limite de memória do PHP"
+
+#:
+msgid "is a minimal PHP memory limitation"
+msgstr "é o limite mínimo de memória do PHP"
+
+#:
+msgid "PHP post max size"
+msgstr "Tamanho máximo do post PHP"
+
+#:
+msgid "is minimum size of PHP post"
+msgstr "é o tamanho mínimo do post PHP"
+
+#:
+msgid "PHP max execution time"
+msgstr "Tempo máximo de execução PHP"
+
+#:
+msgid "PHP max input time"
+msgstr "Tempo máximo para entrada PHP"
+
+#:
+msgid "is a minimal limitation on execution time of PHP scripts"
+msgstr "é o tempo limite mínimo para a execução de scripts PHP"
+
+#:
+msgid "is a minimal limitation on input parse time for PHP scripts"
+msgstr "é o tempo limite mínimo para o parse de entrada de scripts PHP"
+
+#:
+msgid "PHP timezone"
+msgstr "Timezone do PHP"
+
+#:
+msgid "no"
+msgstr "sim"
+
+#:
+msgid "yes"
+msgstr "não"
+
+#:
+msgid "Timezone for PHP is not set"
+msgstr "Timezone do PHP não está definido"
+
+#:
+msgid "Please set"
+msgstr "Favor definir"
+
+#:
+msgid "option in"
+msgstr "opção em"
+
+#:
+msgid "PHP databases support"
+msgstr "Suporte de banco de dados no PHP"
+
+#:
+msgid "Requires any database support [MySQL or PostgreSQL or Oracle or SQLite3]"
+msgstr "Requer suporte a qualquer banco de dados [MySQL ou PostgreSQL ou Oracle ou SQLite3]"
+
+#:
+msgid "Requires bcmath module"
+msgstr "Requer módulo bcmath"
+
+#:
+msgid "configure PHP with"
+msgstr "configure PHP com"
+
+#:
+msgid "Requires mb string module"
+msgstr "Requer módulo mb string"
+
+#:
+msgid "PHP Sockets"
+msgstr "Sockets PHP"
+
+#:
+msgid "Required Sockets module"
+msgstr "Requer módulo Sockets"
+
+#:
+msgid "The GD extension is not loaded."
+msgstr "A extensão GD não está carregada."
+
+#:
+msgid "GD PNG Support"
+msgstr "Suporte GD PNG"
+
+#:
+msgid "Requires images generation support"
+msgstr "Requer suporte de geração de imagens"
+
+#:
+msgid "libxml module"
+msgstr "módulo libxml"
+
+#:
+msgid "php-xml module is not installed"
+msgstr "módulo php-xml não está instalado"
+
+#:
+msgid "ctype module"
+msgstr "módulo ctype"
+
+#:
+msgid "Requires ctype module"
+msgstr "Requer móduloe ctype"
+
+#:
+msgid "PHP upload max filesize"
+msgstr "Tamanho máximo de arquivo carregado pelo PHP"
+
+#:
+msgid "is minimum for PHP upload filesize"
+msgstr "é o tamanho mínimo do arquivo a ser carregado no PHP"
+
+#:
+msgid "PHP Session"
+msgstr "Sessão PHP"
+
+#:
+msgid "Required Session module"
+msgstr "Requer módulo de Sessão"
+
+#:
+msgid "Account is blocked for"
+msgstr "Conta bloqueada por"
+
+#:
+msgid "Login name or password is incorrect"
+msgstr "Nome de usuário ou senha incorretos"
+
+#:
+msgid "Session terminated, please re-login!"
+msgstr "Sessão expirada, por favor refaça o login!"
+
+#:
+msgid "Table users is empty. Possible database corruption."
+msgstr "Tabela de usuários está vazia. Possível corrupção do banco de dados."
+
+#:
+msgid "Probably php-ldap module is missing"
+msgstr "Módulo php-ldap parece não encontrado"
+
+#:
+msgid "failed login attempts logged."
+msgstr "falhas de login registradas."
+
+#:
+msgid "Last failed attempt was from"
+msgstr "Última falha de login foi de"
+
+#:
+msgid "Only Super Admins can create Users"
+msgstr "Somente Administradores Zabbix podem criar usuários"
+
+#:
+msgid "Only Super Admins can update Users"
+msgstr "Somente Administradores Zabbix podem modificar usuários"
+
+#:
+msgid "Only Super Admins can delete Users"
+msgstr "Somente Administradores Zabbix podem deletar usuários"
+
+#:
+msgid "Only Zabbix Admins can add user Medias"
+msgstr "Somente Administradores Zabbix podem adicionar mídias de usuários"
+
+#:
+msgid "Only Zabbix Admins can remove user Medias"
+msgstr "Somente Administradores Zabbix podem remover mídias de usuários"
+
+#:
+msgid "Only Zabbix Admins can change user Medias"
+msgstr "Somente Administradores Zabbix podem alterar mídias de usuários"
+
+#:
+msgid "Can't delete user medias"
+msgstr "Impossível deletar mídias de usuário"
+
+#:
+msgid "Can't update user medias"
+msgstr "Impossível atualizar mídias de usuário"
+
+#:
+msgid "Can't insert user medias"
+msgstr "Impossível inserir mídias de usuário"
+
+#:
+msgid "Wrong fields for user"
+msgstr "Campos errados para o usuário"
+
+#:
+msgid "User ["
+msgstr "Usuário ["
+
+#:
+msgid "] already exists"
+msgstr "] já existe"
+
+#:
+msgid "Cannot rename guest user"
+msgstr "Impossível renomear mídias de usuário"
+
+#:
+msgid "User cannot restrict access to GUI for himself. Group \""
+msgstr "Usuário não pode restringir seu próprio acesso a GUI. Grupo \""
+
+#:
+msgid "\""
+msgstr "\""
+
+#:
+msgid "User cannot disable himself. Group \""
+msgstr "Usuário não pode desabilitar a si mesmo. Grupo \""
+
+#:
+msgid "Wrong period ["
+msgstr "Período incorreto ["
+
+#:
+msgid "]"
+msgstr "]"
+
+#:
+msgid "Internal Zabbix error"
+msgstr "Erro interno do Zabbix"
+
+#:
+msgid "Wrong fields for media type"
+msgstr "Campos incorretos para o tipo de mídia"
+
+#:
+msgid "Can't delete media types"
+msgstr "Não foi possível deletar tipo de mídia"
+
+#:
+msgid "Can't update media types"
+msgstr "Não foi possível atualizar tipo de mídia"
+
+#:
+msgid "Can't insert media types"
+msgstr "Não foi possível adicionar tipo de mídia"
+
+#:
+msgid "Mediatype already exists:"
+msgstr "Tipo de mídia já existe:"
+
+#:
+msgid "Mediatypes used by action:"
+msgstr "Tipo de mídia usada pela ação:"
+
+#:
+msgid "Only Super Admins can create media types"
+msgstr "Somente Administradores Zabbix podem criar tipos de mídia"
+
+#:
+msgid "Only Super Admins can update media types"
+msgstr "Somente Administradores Zabbix podem atualizar tipos de mídia"
+
+#:
+msgid "Only Super Admins can delete media types"
+msgstr "Somente Administradores Zabbix podem deletar tipos de mídia"
+
+#:
+msgid "You cannot view this URL as a"
+msgstr "Você não pode ver esta URL como"
+
+#:
+msgid "You must login to view this page."
+msgstr "Você deve logar para ver esta página."
+
+#:
+msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
+msgstr "Se você entende que esta mensagem está errada, por favor consulte os administradores sobre como conseguir as permissões necessárias."
+
+#:
+msgid "You are not logged in."
+msgstr "Você não está logado."
+
+#:
+msgid "ERROR"
+msgstr "ERRO"
+
+#:
+msgid "[Wrong value for month:"
+msgstr "[Mês errado:"
+
+#:
+msgid "[Wrong value for day of week:"
+msgstr "[Dia da semana errado:"
+
+#:
+msgid "Help"
+msgstr "Ajuda"
+
+#:
+msgid "Profile"
+msgstr "Configurações"
+
+#:
+msgid "Get support"
+msgstr "Suporte"
+
+#:
+msgid "Monitoring"
+msgstr "Monitoramento"
+
+#:
+msgid "Inventory"
+msgstr "Inventário"
+
+#:
+msgid "Queue"
+msgstr "Fila"
+
+#:
+msgid "Events"
+msgstr "Eventos"
+
+#:
+msgid "EVENTS"
+msgstr "EVENTOS"
+
+#:
+msgid "Maps"
+msgstr "Mapas"
+
+#:
+msgid "Report"
+msgstr "Relatório"
+
+#:
+msgid "Reports"
+msgstr "Relatórios"
+
+#:
+msgid "General"
+msgstr "Geral"
+
+#:
+msgid "Login"
+msgstr "Login"
+
+#:
+msgid "Logout"
+msgstr "Logout"
+
+#:
+msgid "Print"
+msgstr "Imprimir"
+
+#:
+msgid "Latest data"
+msgstr "Dados recentes"
+
+#:
+msgid "Incorrect description"
+msgstr "Descrição incorreta"
+
+#:
+msgid "Can't format Tree"
+msgstr "Não foi possível formatar árvore"
+
+#:
+msgid "You do not have permission to perform this operation"
+msgstr "Você não tem permissão para executar esta operação"
+
+#:
+msgid "No permissions for screen"
+msgstr "Sem permissão para a tela"
+
+#:
+msgid "No permissions for map"
+msgstr "Sem permissão para o mapa"
+
+#:
+msgid "XML file contains errors"
+msgstr "Arquivo XML conteem erros"
+
+#:
+msgid "W"
+msgstr "Q"
+
+#:
+msgid "F"
+msgstr "S"
+
+#:
+msgid "S"
+msgstr "S"
+
+#:
+msgid "Zoom"
+msgstr "Zoom"
+
+#:
+msgid "fixed"
+msgstr "corrigido"
+
+#:
+msgid "dynamic"
+msgstr "dinâmico"
+
+#:
+msgid "now"
+msgstr "agora"
+
+#:
+msgid "Create Log Trigger"
+msgstr "Criar Log para Trigger"
+
+#:
+msgid "Do you replace the conditional expression?"
+msgstr "A expressão condicional foi substituída?"
+
+#:
+msgid "Add Service"
+msgstr "Adicione Serviço"
+
+#:
+msgid "Edit Service"
+msgstr "Editar Serviço"
+
+#:
+msgid "Delete Service"
+msgstr "Remover Serviço"
+
+#:
+msgid "Delete selected services?"
+msgstr "Remover serviços selecionados?"
+
+#:
+msgid "Can not find objects with name"
+msgstr "Impossível encontrar objetos com nome"
+
+#:
+msgid "Can not create new element"
+msgstr "Impossível criar novo elemento"
+
+#:
+msgid "other"
+msgstr "outro"
+
+#:
+msgid "We are sorry, the maximum possible number of elements to remember has been reached."
+msgstr "Desculpe, mas o número máximo de elementos a recordar foi atingido."

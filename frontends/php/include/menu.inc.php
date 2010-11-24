@@ -233,9 +233,6 @@ $ZBX_MENU = array(
 				array('url'=>'report4.php',
 						'label'=>S_NOTIFICATIONS
 					),
-				array('url'=>'locales.php',
-						'label'=>S_LOCALES
-					),
 				array('url'=>'instal.php',
 						'label'=>S_INSTALLATION,
 						'sub_pages'=>array('setup.php','warning.php')
