@@ -1,12 +1,12 @@
 /* CSS Document */
 
-form {margin: 0}
+form { margin: 0 }
 
 form.thin .input{
 	height: 14px;
 }
 
-.input, .input[disabled]:hover{
+.input{
 	font-size: 10px;
 	font-family: Verdana, arial, helvetica, sans-serif;
 
@@ -15,39 +15,32 @@ form.thin .input{
 
 	margin: 1px 2px 0 2px;
 }
-
 .input:focus { border-color: black; }
 .input:hover { border-color: black; }
 
-.input[readonly], .input[readonly]:hover{ border-color: #D0D0D0; background-color: #EEEEEE; }
+.input[readonly]{ border-color: #D0D0D0; background-color: #EEEEEE; }
 
 .select{
 	cursor: pointer;
 	margin: 1px 4px 1px 2px;
 }
-
 .selectShorten{
 	width: 200px;
 }
 
 /**************** FORM ELEMENTS ****************/
 /******************* BUTTONS *********************/
-.button, .button[disabled]:hover{
+.button{
 	background: #F0F0F0 url('../images/gradients/button.gif') repeat-x top left;
 	border: 1px solid #808080;
 
 	vertical-align: top;
 	margin: 1px 2px 0 0;
 }
-
 .button:hover{
 	text-decoration: underline;
 	border-color: black;
 	cursor: pointer;
-}
-
-.button[disabled], .button[disabled]:hover{
-	cursor: default;
 }
 
 

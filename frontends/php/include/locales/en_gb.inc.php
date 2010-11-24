@@ -981,6 +981,8 @@
 	'S_DELETE_SELECTED_HOSTS_Q'=>			'Delete selected hosts?',
 	'S_UPDATED_STATUS_OF_HOST' =>		'Updated status of host',
 	'S_CLEAR_WHEN_UNLINKING' => 'Clear when unlinking',
+	'S_DISABLE_IPMI' => 'Disable IPMI',
+	'S_ENABLE_IPMI' => 'Enable IPMI',
 
 // templates.php
 	'S_TEMPLATE_LIST'=>			'Templates list',
