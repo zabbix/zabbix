@@ -47,7 +47,7 @@ class CComboBox extends CTag{
 		}
 		else{
 			if(zbx_strlen($caption) > 44){
-				$this->setAttribute('class', 'select selectShorten');
+				$this->setAttribute('class', $this->getAttribute('class').' selectShorten');
 			}
 
 			if(is_null($selected)){
@@ -71,7 +71,7 @@ class CComboBox extends CTag{
 			parent::addItem(new CComboItem($value, $caption, $selected));
 		}
 	}
-	
+
 	public function addItemsInGroup($label, $items){
 		$group = new COptGroup($label);
 		foreach($items as $value => $caption){
@@ -85,8 +85,8 @@ class CComboBox extends CTag{
 class COptGroup extends CTag{
 	public function __construct($label){
 		parent::__construct('optgroup', 'yes');
-		
-		$this->setAttribute('label', $label);	
+
+		$this->setAttribute('label', $label);
 	}
 }
 

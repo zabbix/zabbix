@@ -40,7 +40,7 @@
 </script>
 
 <script type="text/x-jquery-tmpl" id="hostInterfaceRowRemove">
-	
+
 </script>
 
 
@@ -69,7 +69,7 @@ function addInterfaceRow(hostInterface){
 			hostInterface.checked_dns = 'checked="checked"';
 		}
 	}
-SDJ(hostInterface);
+//SDJ(hostInterface);
 	hostInterface.checked_agent = 'checked="checked"';
 	hostInterface.checked_snmp = '';
 	hostInterface.checked_ipmi = '';
@@ -92,5 +92,22 @@ function removeInterfaceRow(hostInterfaceId){
 	jQuery('#hostInterfaceRow_'+hostInterfaceId).remove();
 	jQuery("#hostIterfaces").accordion('resize');
 }
+
+jQuery(document).ready(function() {
+	jQuery("#useipmi").button();
+	jQuery("#useipmi").change(function(){
+		if(this.checked){
+			jQuery("#useipmi").button("option", "label", "<?php print(S_DISABLE_IPMI);?>");
+			jQuery("#ipmilist :input:gt(0)").removeAttr("disabled");
+		}
+		else{
+			jQuery("#useipmi").button("option", "label", "<?php print(S_ENABLE_IPMI);?>");
+			jQuery("#ipmilist :input:gt(0)").attr("disabled", "disabled");
+		}
+
+	});
+	jQuery("#useipmi").change();
+});
+
 
 </script>

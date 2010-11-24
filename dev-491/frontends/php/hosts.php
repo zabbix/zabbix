@@ -460,7 +460,7 @@ include_once('include/page_header.php');
 	else if(isset($_REQUEST['save'])){
 		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 			access_deny();
-		
+
 		try{
 			$macros = get_request('macros', array());
 			$interfaces = get_request('interfaces', array());
@@ -506,7 +506,7 @@ include_once('include/page_header.php');
 					unset($macros[$mnum]);
 					continue;
 				}
-				
+
 				if($macro['new'] == 'create') unset($macros[$mnum]['macroid']);
 				unset($macros[$mnum]['new']);
 			}
@@ -546,10 +546,10 @@ include_once('include/page_header.php');
 				'status' => $_REQUEST['status'],
 				'proxy_hostid' => get_request('proxy_hostid', 0),
 				'useipmi' => isset($_REQUEST['useipmi']) ? 1 : 0,
-				'ipmi_authtype' => $_REQUEST['ipmi_authtype'],
-				'ipmi_privilege' => $_REQUEST['ipmi_privilege'],
-				'ipmi_username' => $_REQUEST['ipmi_username'],
-				'ipmi_password' => $_REQUEST['ipmi_password'],
+				'ipmi_authtype' => get_request('ipmi_authtype'),
+				'ipmi_privilege' => get_request('ipmi_privilege'),
+				'ipmi_username' => get_request('ipmi_username'),
+				'ipmi_password' => get_request('ipmi_password'),
 				'groups' => $groups,
 				'templates' => $templates,
 				'interfaces' => $interfaces,

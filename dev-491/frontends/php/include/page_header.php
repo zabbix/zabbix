@@ -166,7 +166,7 @@
 	}
 ?>
 </head>
-	<body onload="zbxCallPostScripts();" class="<?php print($bodyCSS); ?>" >
+	<body class="<?php print($bodyCSS); ?>" >
 <?php
 	}
 
