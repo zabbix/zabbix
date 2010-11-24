@@ -176,12 +176,15 @@ getSysmapBySysmapid: function(){
 	);
 },
 
-selementDragEnd: function(dragable) {
+selementDragEnd: function(e, ui){
 	this.debug('selementDragEnd');
 
 	this.deactivate_menu();
 
-	var element = dragable.element;
+	ui.helper.context.style.left = ui.position.left+'px';
+	ui.helper.context.style.top = ui.position.top+'px';
+	var element = ui.helper.context;
+
 	var element_id = element.id.split('_');
 	var selementid = element_id[(element_id.length - 1)];
 
@@ -847,7 +850,7 @@ updateSelementsIcon: function(){
 remove_selement_img: function(selement){
 	this.debug('remove_selement_img');
 
-	Draggables.unregister(selement.html_obj);
+	jQuery(selement.html_obj).draggable('destroy')	;
 	selement.html_obj.remove();
 },
 
@@ -858,11 +861,12 @@ makeSelementDragable: function(selement){
 	addListener(selement, 'click', this.show_menu.bindAsEventListener(this), false);
 	addListener(selement, 'mousedown', this.activate_menu.bindAsEventListener(this), false);
 
-	new Draggable(selement,{
-				ghosting: true,
-				snap: this.get_dragable_dimensions.bind(this),
-				onEnd: this.selementDragEnd.bind(this)
-				});
+	jQuery(selement).draggable({
+		containment: 'parent',
+		opacity: 0.5,
+		helper: 'clone',
+		stop: this.selementDragEnd.bind(this)
+	});
 
 },
 
@@ -948,44 +952,6 @@ set_container: function(event){
 
 // ---------- MISC FUNCTIONS ------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------
-get_window_dimensions: function(x,y,draggable){
-	this.debug('get_window_dimensions');
-//--
-
-	function constrain(n, lower, upper) {
-		if (n > upper) return upper;
-		else if (n < lower) return lower;
-		else return n;
-	}
-
-	var h = parseInt(document.body.offsetHeight);
-	var w = parseInt(document.body.offsetWidth);
-
-	return[
-		constrain(x, 0, w),
-		constrain(y, 0, h)
-	];
-},
-
-get_dragable_dimensions: function(x,y,draggable){
-	this.debug('get_dragable_dimensions');
-//--
-
-	function constrain(n, lower, upper) {
-		if (n > upper) return upper;
-		else if (n < lower) return lower;
-		else return n;
-	}
-
-	var element_dimensions = Element.getDimensions(draggable.element);
-	var parent_dimensions = Element.getDimensions(this.mapimg);
-
-	return[
-		constrain(x, 0, parent_dimensions.width - element_dimensions.width),
-		constrain(y, 0, parent_dimensions.height - element_dimensions.height)
-	];
-},
-
 get_update_params: function(params){
 	this.debug('get_update_params');
 
@@ -1116,12 +1082,11 @@ formShow: function(e, selementid){
 	this.form_link_hide(e);
 //---
 
-	new Draggable(divForm,{
-				  			'handle': this.selementForm.dragHandler,
-							'snap': this.get_window_dimensions.bind(this),
-							'starteffect': function(){ return true; },
-							'endeffect': function(){ return true; }
-						});
+	jQuery(divForm).draggable({
+		handle: this.selementForm.dragHandler,
+		containment: [0,0,3200,3200]
+	});
+
 	$(divForm).show();
 },
 
@@ -1465,7 +1430,7 @@ form_selement_newUrl: function(e){
 	var ll = $(this.selementForm.urls).select('tr[id^=urlrow]').length;
 	var sysmapelementurlid = selementid+''+ll;
 	var tpl = new Template(ZBX_TPL.selementFormUrls);
-	
+
 	$('urlfooter').insert({'before' : tpl.evaluate({'sysmapelementurlid': sysmapelementurlid})});
 },
 
@@ -2085,7 +2050,7 @@ this.selementForm.urls = e_tr_4;
 	var e_input_6 = document.createElement('input');
 	e_input_6.setAttribute('type',"button");
 	e_input_6.setAttribute('name',"apply");
-	e_input_6.className = "button";
+	e_input_6.className = "input button";
 	e_input_6.setAttribute('value',locale['S_APPLY']);
 
 
@@ -2098,7 +2063,7 @@ this.selementForm.urls = e_tr_4;
 	var e_input_6 = document.createElement('input');
 	e_input_6.setAttribute('type',"button");
 	e_input_6.setAttribute('name',"remove");
-	e_input_6.className = "button";
+	e_input_6.className = "input button";
 	e_input_6.setAttribute('value',locale['S_REMOVE']);
 
 	addListener(e_input_6, 'click', this.form_selement_delete.bindAsEventListener(this));
@@ -2110,7 +2075,7 @@ this.selementForm.urls = e_tr_4;
 	var e_input_6 = document.createElement('input');
 	e_input_6.setAttribute('type',"button");
 	e_input_6.setAttribute('name',"close");
-	e_input_6.className = "button";
+	e_input_6.className = "input button";
 	e_input_6.setAttribute('value',locale['S_CLOSE']);
 
 	addListener(e_input_6, 'click', this.formHide.bindAsEventListener(this));
@@ -2519,7 +2484,7 @@ form_selement_save: function(e){
 				alert('Incorrect map element link is given');
 				return false;
 			}
-			
+
 			params.urls[url.name] = url;
 		}
 
@@ -2888,7 +2853,7 @@ this.linkForm.colorPicker = e_div_6;
 	var e_input_6 = document.createElement('input');
 	e_input_6.setAttribute('type',"button");
 	e_input_6.setAttribute('name',"apply");
-	e_input_6.className = "button";
+	e_input_6.className = "input button";
 	e_input_6.setAttribute('value',locale['S_APPLY']);
 	e_td_5.appendChild(e_input_6);
 	addListener(e_input_6, 'click', this.form_link_save.bindAsEventListener(this));
@@ -2900,7 +2865,7 @@ this.linkForm.colorPicker = e_div_6;
 	var e_input_6 = document.createElement('input');
 	e_input_6.setAttribute('type',"button");
 	e_input_6.setAttribute('name',"remove");
-	e_input_6.className = "button";
+	e_input_6.className = "input button";
 	e_input_6.setAttribute('value',locale['S_REMOVE']);
 	e_td_5.appendChild(e_input_6);
 	addListener(e_input_6, 'click', this.form_link_delete.bindAsEventListener(this));
@@ -2912,7 +2877,7 @@ this.linkForm.colorPicker = e_div_6;
 	var e_input_6 = document.createElement('input');
 	e_input_6.setAttribute('type',"button");
 	e_input_6.setAttribute('name',"close");
-	e_input_6.className = "button";
+	e_input_6.className = "input button";
 	e_input_6.setAttribute('value',locale['S_CLOSE']);
 	addListener(e_input_6, 'click', this.form_link_hide.bindAsEventListener(this));
 
@@ -3046,7 +3011,8 @@ this.linkForm.linkIndicatorsBody = e_tbody_7;
 	e_input_6.setAttribute('type',"button");
 	e_input_6.setAttribute('name',"Add");
 	e_input_6.setAttribute('value',locale['S_ADD']);
-	e_input_6.className = "button";
+	e_input_6.setAttribute('style',"margin: 2px 4px");
+	e_input_6.className = "input button link_menu";
 	this.linkForm.linkIndicatorsTable.appendChild(e_input_6);
 
 	var url = 'popup_link_tr.php?form=1&mapid='+this.id;
@@ -3057,7 +3023,8 @@ this.linkForm.linkIndicatorsBody = e_tbody_7;
 	e_input_6.setAttribute('type',"button");
 	e_input_6.setAttribute('name',"Remove");
 	e_input_6.setAttribute('value',locale['S_REMOVE']);
-	e_input_6.className = "button";
+	e_input_6.setAttribute('style',"margin: 2px 4px");
+	e_input_6.className = "input button link_menu";
 	this.linkForm.linkIndicatorsTable.appendChild(e_input_6);
 
 	addListener(e_input_6, 'click', function(){ remove_childs('linkForm','link_triggerids','tr'); });
@@ -3693,7 +3660,7 @@ updateIcon: function(){
 removeImage: function(){
 	this.debug('remove_selement_img');
 
-	Draggables.unregister(this.html_obj);
+	jQuery(this.html_obj).draggable('destroy');
 	this.html_obj.remove();
 },
 
@@ -3703,12 +3670,12 @@ makeDragable: function(){
 	addListener(selement, 'click', this.sysmap.show_menu.bindAsEventListener(this.sysmap), false);
 	addListener(selement, 'mousedown', this.sysmap.activate_menu.bindAsEventListener(this.sysmap), false);
 
-	new Draggable(selement,{
-				ghosting: true,
-				snap: this.sysmap.get_dragable_dimensions.bind(this.sysmap),
-				onEnd: this.sysmap.sysmapUpdate.bind(this.sysmap)
-				});
-
+	jQuery(selement).draggable({
+		containment: 'parent',
+		opacity: 0.5,
+		helper: 'clone',
+		stop: this.sysmap.sysmapUpdate.bind(this.sysmap)
+	});
 }
 });
 */
