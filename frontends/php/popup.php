@@ -312,7 +312,7 @@ include_once('include/page_header.php');
 		$options['hosts']['monitored_hosts'] = true;
 	}
 	else if($real_hosts){
-		$options['groups']['real_hosts'] = true;		
+		$options['groups']['real_hosts'] = true;
 	}
 	else if($templated_hosts){
 		$options['hosts']['templated_hosts'] = true;
@@ -430,14 +430,15 @@ include_once('include/page_header.php');
 
 		$options = array(
 			'nodeids' => $nodeid,
-			'groupids'=>$groupid,
+			'groupids' => $groupid,
 			'output' => API_OUTPUT_EXTEND,
-			'sortfield'=>'host'
+			'selectInterfaces' => API_OUTPUT_EXTEND,
 		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 		if(!is_null($host_status)) $options[$host_status] = 1;
 
 		$hosts = CHost::get($options);
+		order_result($hosts, 'host');
 
 		foreach($hosts as $hnum => $host){
 			$name = new CSpan($host['host'], 'link');
@@ -452,32 +453,29 @@ include_once('include/page_header.php');
 			else
 				$status=S_UNKNOWN;
 
-			if($host['status'] == HOST_STATUS_TEMPLATE){
-				$dns = $ip = $port = $available = '-';
-			}
-			else{
-				$dns = $host['dns'];
-				$ip = $host['ip'];
+			$interface = reset($host['interfaces']);
 
-				$tmp = ($host['useip'] == 1) ? 'ip' : 'dns';
-				$$tmp = bold($$tmp);
+			$dns = $interface['dns'];
+			$ip = $interface['ip'];
 
-				if($host['available'] == HOST_AVAILABLE_TRUE)
-					$available = new CSpan(S_AVAILABLE,'off');
-				else if($host['available'] == HOST_AVAILABLE_FALSE)
-					$available = new CSpan(S_NOT_AVAILABLE,'on');
-				else if($host['available'] == HOST_AVAILABLE_UNKNOWN)
-					$available = new CSpan(S_UNKNOWN,'unknown');
-			}
+			$tmp = ($interface['useip'] == 1) ? 'ip' : 'dns';
+			$$tmp = bold($$tmp);
+
+			if($host['available'] == HOST_AVAILABLE_TRUE)
+				$available = new CSpan(S_AVAILABLE,'off');
+			else if($host['available'] == HOST_AVAILABLE_FALSE)
+				$available = new CSpan(S_NOT_AVAILABLE,'on');
+			else if($host['available'] == HOST_AVAILABLE_UNKNOWN)
+				$available = new CSpan(S_UNKNOWN,'unknown');
 
 			$table->addRow(array(
 				$name,
 				$dns,
 				$ip,
-				$host['port'],
+				$interface['port'],
 				$status,
 				$available
-				));
+			));
 
 			unset($host);
 		}
