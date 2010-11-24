@@ -289,6 +289,7 @@ function make_system_status($filter){
 			'value' => TRIGGER_VALUE_TRUE,
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => 1,
+			'select_acknowledges' => API_OUTPUT_COUNT,
 			'limit' => 1,
 			'sortfield' => 'clock',
 			'sortorder' => ZBX_SORT_DOWN
@@ -1011,6 +1012,7 @@ function make_latest_issues($filter = array()){
 			$ack = getEventAckState($event);
 
 			$description = expand_trigger_description_by_data(zbx_array_merge($trigger, array('clock'=>$event['clock'], 'ns'=>$event['ns'])),ZBX_FLAG_EVENT);
+
 
 //actions
 			$actions = get_event_actions_stat_hints($event['eventid']);

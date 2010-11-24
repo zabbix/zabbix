@@ -1,5 +1,6 @@
 <?php
 // get language translations {{{
+require_once('include/gettextwrapper.inc.php');
 require_once('include/locales/en_gb.inc.php');
 require_once('include/js.inc.php');
 $translations = $TRANSLATION;

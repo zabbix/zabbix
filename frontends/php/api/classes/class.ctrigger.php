@@ -1349,6 +1349,7 @@ COpt::memoryPick();
  */
 	public static function update($triggers){
 		$triggers = zbx_toArray($triggers);
+		$triggerids = zbx_objectValues($triggers, 'triggerid');
 
 		try{
 			self::BeginTransaction(__METHOD__);
@@ -1386,6 +1387,7 @@ COpt::memoryPick();
 
 			foreach($triggers as $trigger)
 				self::inherit($trigger);
+
 
 			self::EndTransaction(true, __METHOD__);
 			return array('triggerids' => $triggerids);

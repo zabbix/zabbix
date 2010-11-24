@@ -116,6 +116,7 @@ function get_next_event($currentEvent, $eventList = null, $showUnknown=false){
 
 // author: Aly
 function make_event_details($event, $trigger){
+	$config = select_config();
 	$table = new CTableInfo();
 
 	$table->addRow(array(S_EVENT, expand_trigger_description_by_data(array_merge($trigger, $event), ZBX_FLAG_EVENT)));
@@ -128,30 +129,21 @@ function make_event_details($event, $trigger){
 	}
 
 	if($event['value'] == TRIGGER_VALUE_FALSE){
-		$value = new CCol(S_OK_BIG,'off');
+		$value=new CCol(S_OK_BIG,'off');
 	}
 	elseif($event['value'] == TRIGGER_VALUE_TRUE){
-		$value = new CCol(S_PROBLEM_BIG,'on');
+		$value=new CCol(S_PROBLEM_BIG,'on');
 	}
 	else{
-		$value = new CCol(S_UNKNOWN_BIG,'unknown');
+		$value=new CCol(S_UNKNOWN_BIG,'unknown');
 	}
 
-	$ack = '-';
-	if(($event['value'] == TRIGGER_VALUE_TRUE) && ($event['acknowledged'] == 1)){
-		$db_acks = get_acknowledges_by_eventid($event['eventid']);
-		$rows=0;
-		while($a=DBfetch($db_acks))	$rows++;
-
-		$ack=array(
-			new CLink(S_YES,'acknow.php?eventid='.$event['eventid'],'off'),
-			SPACE.'('.$rows.')'
-			);
+	
+	if($config['event_ack_enable']){
+		$ack = getEventAckState($event, true);
+		$table->addRow(array(S_ACKNOWLEDGED, $ack));
 	}
 
-	$table->addRow(array(S_STATUS, $value));
-	$table->addRow(array(S_DURATION, $duration));
-	$table->addRow(array(S_ACKNOWLEDGED, $ack));
 
 return $table;
 }
@@ -160,6 +152,7 @@ function make_small_eventlist($startEvent){
 	$config = select_config();
 
 	$table = new CTableInfo();
+
 	$table->setHeader(array(
 		S_TIME,
 		S_STATUS,
@@ -197,7 +190,7 @@ function make_small_eventlist($startEvent){
 
 		$value = new CCol(trigger_value2str($event['value']), get_trigger_value_style($event['value']));
 
-		$ack = getEventAckState($event);
+		$ack = getEventAckState($event, true);
 
 //actions
 		$actions = get_event_actions_stat_hints($event['eventid']);
@@ -225,7 +218,7 @@ function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
 	$config = select_config();
 
 	$table = new CTableInfo();
-	
+
 	//if acknowledges are turned on, we show 'ack' column
 	if ($config['event_ack_enable']) {
 		$table->setHeader(array(S_TIME,S_STATUS,S_DURATION, S_AGE, S_ACK));
@@ -244,6 +237,7 @@ function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
 			'object' => EVENT_OBJECT_TRIGGER
 		),
 		'nopermissions' => 1,
+		'select_acknowledges' => API_OUTPUT_COUNT,
 		'sortfield' => 'clock',
 		'sortorder' => ZBX_SORT_DOWN,
 		'limit' => ZBX_WIDGET_ROWS
@@ -259,7 +253,6 @@ function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
 
 // ack +++
 		$ack = getEventAckState($event);
-
 // ---
 		$table->addRow(array(
 			zbx_date2str(S_EVENTS_POPUP_EVENT_LIST_DATE_FORMAT,$event['clock']),
@@ -273,8 +266,9 @@ function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
 return $table;
 }
 
-function getEventAckState($event){
+function getEventAckState($event, $extBackurl=false){
 	$config = select_config();
+	global $page;
 
 	if(!$config['event_ack_enable']) return null;
 //	if(($event['value'] != TRIGGER_VALUE_TRUE) || ($event['value_changed'] == TRIGGER_VALUE_CHANGED_NO)){
@@ -282,15 +276,19 @@ function getEventAckState($event){
 		return SPACE;
 	}
 
+	if($extBackurl){
+		$backurl = urlencode(urlencode($page['file'].'?eventid='.$event['eventid'].'&triggerid='.$event['objectid']));
+	}
+	else{
+		$backurl = $page['file'];
+	}
+	
 	if($event['acknowledged'] == 0){
-		$ack = new CLink(S_NO,'acknow.php?eventid='.$event['eventid'],'on');
+		$ack = new CLink(S_NO,'acknow.php?eventid='.$event['eventid'].'&backurl='.$backurl,'on');
 	}
 	else{
 		$rows = is_array($event['acknowledges']) ? count($event['acknowledges']) : $event['acknowledges'];
-		$ack = array(
-			new CLink(new CSpan(S_YES,'off'),'acknow.php?eventid='.$event['eventid']),
-			SPACE.'('.$rows.')'
-		);
+		$ack = array(new CLink(new CSpan(S_YES,'off'),'acknow.php?eventid='.$event['eventid'].'&backurl='.$backurl),' ('.$rows.')');
 	}
 
 return $ack;

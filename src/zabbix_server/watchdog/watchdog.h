@@ -20,6 +20,6 @@
 #ifndef ZABBIX_WATCHDOG_H
 #define ZABBIX_WATCHDOG_H
 
-void main_watchdog_loop();
+void	main_watchdog_loop();
 
 #endif
