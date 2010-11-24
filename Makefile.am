@@ -33,3 +33,6 @@ dbschema:
 	create/schema/gen.pl postgresql > create/schema/postgresql.sql
 	create/schema/gen.pl sqlite3 > create/schema/sqlite3.sql
 	create/schema/gen.pl c > src/libs/zbxdbhigh/dbschema.c
+
+gettext:
+	frontends/php/locale/make_mo.sh
