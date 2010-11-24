@@ -23,13 +23,13 @@
 </td>
 <td>
 	<div class="jqueryinputset">
-		<input type="radio" id="radio_agent_#{interfaceid}" name="interfaces[#{interfaceid}][type]" value="0" #{*checked_agent} />
+		<input type="radio" id="radio_agent_#{interfaceid}" name="interfaces[#{interfaceid}][type]" value="<?php print(INTERFACE_TYPE_AGENT);?>" #{*checked_agent} />
 		<label for="radio_agent_#{interfaceid}"><?php print(S_AGENT);?></label>
 
-		<input type="radio" id="radio_snmp_#{interfaceid}" name="interfaces[#{interfaceid}][type]" value="6" #{*checked_snmp} />
+		<input type="radio" id="radio_snmp_#{interfaceid}" name="interfaces[#{interfaceid}][type]" value="<?php print(INTERFACE_TYPE_SNMP);?>" #{*checked_snmp} />
 		<label for="radio_snmp_#{interfaceid}"><?php print(S_SNMP);?></label>
 
-		<input type="radio" id="radio_ipmi_#{interfaceid}" name="interfaces[#{interfaceid}][type]" value="12" #{*checked_ipmi} />
+		<input type="radio" id="radio_ipmi_#{interfaceid}" name="interfaces[#{interfaceid}][type]" value="<?php print(INTERFACE_TYPE_IPMI);?>" #{*checked_ipmi} />
 		<label for="radio_ipmi_#{interfaceid}"><?php print(S_IPMI);?></label>
 	</div>
 </td>
@@ -76,9 +76,9 @@ function addInterfaceRow(hostInterface){
 	if(isset("type", hostInterface)){
 		hostInterface.checked_agent = '';
 		switch(hostInterface.type){
-			case '6': hostInterface.checked_snmp = 'checked="checked"'; break;
-			case '12': hostInterface.checked_ipmi = 'checked="checked"'; break;
-			case '0':
+			case '<?php print(INTERFACE_TYPE_SNMP);?>': hostInterface.checked_snmp = 'checked="checked"'; break;
+			case '<?php print(INTERFACE_TYPE_IPMI);?>': hostInterface.checked_ipmi = 'checked="checked"'; break;
+			case '<?php print(INTERFACE_TYPE_AGENT);?>':
 			default: hostInterface.checked_agent = 'checked="checked"'; break;
 		}
 	}
