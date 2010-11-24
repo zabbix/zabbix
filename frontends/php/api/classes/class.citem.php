@@ -1453,7 +1453,6 @@ COpt::memoryPick();
 				else if(isset($item['type'])){
 // if we creating new item or if we updating item type
 					$type = getInterfaceTypeByItem($item);
-
 					if(!is_null($exItem)){
 // on update
 						if(!isset($interfaces[$type])){
