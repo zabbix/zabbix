@@ -923,11 +923,16 @@ int	MAIN_ZABBIX_ENTRY(void);
 zbx_uint64_t	zbx_letoh_uint64(zbx_uint64_t data);
 zbx_uint64_t	zbx_htole_uint64(zbx_uint64_t data);
 
-int	is_hostname_char(const char c);
-int	is_key_char(const char c);
-int	is_function_char(const char c);
+int	is_hostname_char(char c);
+int	is_key_char(char c);
+int	is_function_char(char c);
+
+int	parse_host(char **exp, char **host);
+int	parse_key(char **exp, char **key);
 int	parse_function(char **exp, char **func, char **params);
+
 int	parse_host_key(char *exp, char **host, char **key);
+
 void	make_hostname(char *host);
 
 #endif
