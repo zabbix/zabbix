@@ -261,6 +261,7 @@ include_once('include/page_header.php');
 
 	$m_form = new CForm('acknow.php');
 	$m_form->setName('tr_status');
+	$m_form->addVar('backurl', $page['file']);
 
 	$admin_links = (($USER_DETAILS['type'] == USER_TYPE_ZABBIX_ADMIN) || ($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN));
 	$show_event_col = ($config['event_ack_enable'] && ($_REQUEST['show_events'] != EVENTS_OPTION_NOEVENT));
@@ -591,7 +592,7 @@ include_once('include/page_header.php');
 
 		if($config['event_ack_enable']){
 			if($trigger['event_count']){
-				$to_ack = new CCol(array(new CLink(S_ACKNOWLEDGE, 'acknow.php?triggers[]='.$trigger['triggerid'], 'on'), ' ('.$trigger['event_count'].')'));
+				$to_ack = new CCol(array(new CLink(S_ACKNOWLEDGE, 'acknow.php?triggers[]='.$trigger['triggerid'].'&backurl='.$page['file'], 'on'), ' ('.$trigger['event_count'].')'));
 			}
 			else{
 				$to_ack = new CCol(S_ACKNOWLEDGED, 'off');

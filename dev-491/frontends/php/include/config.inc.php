@@ -78,6 +78,7 @@ function __autoload($class_name){
 ?>
 <?php
 
+	require_once('include/gettextwrapper.inc.php');
 	require_once('include/defines.inc.php');
 	require_once('include/func.inc.php');
 	require_once('include/html.inc.php');
@@ -211,10 +212,32 @@ function __autoload($class_name){
 	if(!defined('ZBX_PAGE_NO_AUTHORIZATION') && !defined('ZBX_RPC_REQUEST')){
 		check_authorisation();
 
-		if(file_exists('include/locales/'.$USER_DETAILS['lang'].'.inc.php')){
-			include_once('include/locales/'.$USER_DETAILS['lang'].'.inc.php');
-			process_locales();
+		if (function_exists('bindtextdomain')){
+			//initializing gettext translations depending on language selected by user
+			$locales = zbx_locale_variants($USER_DETAILS['lang']);
+			$locale_found = false;
+			foreach($locales as $locale){
+				putenv("LC_ALL=$locale");
+				if (setlocale(LC_ALL, $locale)){
+					$locale_found = true;
+					$USER_DETAILS['locale'] = $locale;
+					break;
+				}
+			}
+
+			if (!$locale_found && $USER_DETAILS['lang'] != 'en_gb'){
+				error('Locale for language "'.$USER_DETAILS['lang'].'" is not found on the web server. Tried to set: '.implode(', ', $locales).'. Unable to translate zabbix interface.');
+			}
+			bindtextdomain("frontend", "locale");
+			bind_textdomain_codeset("frontend", 'UTF-8');
+			textdomain("frontend");
 		}
+		else {
+			error('Your PHP has no gettext support. Zabbix translations are not available.');
+		}
+		// Numeric Locale to default
+		setLocale(LC_NUMERIC, array('en','en_US','en_US.UTF-8','English_United States.1252'));
+
 
 		include_once('include/locales/en_gb.inc.php');
 		process_locales();

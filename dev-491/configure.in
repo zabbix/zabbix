@@ -958,6 +958,7 @@ have_jabber="no"
 have_snmp="no"
 have_ipmi="no"
 have_ipv6="no"
+have_ssh2="no"
 
 if test "$ipv6" = "yes"; then
 	AC_DEFINE(HAVE_IPV6,1,[Define to 1 if IPv6 should be enabled.])
@@ -1070,10 +1071,10 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 		fi
 	fi
 
-	AC_MSG_CHECKING(for Zabbix server database selection)
+	AC_MSG_CHECKING(for Zabbix server/proxy database selection)
 	if test "x$have_db" = "xno"; then
 		AC_MSG_RESULT(error)
-		AC_MSG_ERROR([No database selected for Zabbix server. Use --with-ibm-db2 or --with-mysql or --with-oracle or --with-postgresql or --with-sqlite3.])
+		AC_MSG_ERROR([No database selected for Zabbix server/proxy. Use --with-ibm-db2 or --with-mysql or --with-oracle or --with-postgresql or --with-sqlite3.])
 	else
 		AC_MSG_RESULT(ok)
 	fi
@@ -1446,13 +1447,15 @@ Configuration:
 
 if test "x$server" != "xno"; then
 
-echo "  With database:         ${have_db}
-  WEB Monitoring via:    ${have_web_monitoring}
-  Native Jabber:         ${have_jabber}
-  SNMP:                  ${have_snmp}
-  IPMI:                  ${have_ipmi}
-  Linker flags:          ${LDFLAGS} ${SERVER_LDFLAGS}
-  Libraries:             ${LIBS} ${SERVER_LIBS}"
+echo "  Server details:
+    With database:         ${have_db}
+    WEB Monitoring via:    ${have_web_monitoring}
+    Native Jabber:         ${have_jabber}
+    SNMP:                  ${have_snmp}
+    IPMI:                  ${have_ipmi}
+    SSH:                   ${have_ssh2}
+    Linker flags:          ${LDFLAGS} ${SERVER_LDFLAGS}
+    Libraries:             ${LIBS} ${SERVER_LIBS}"
 
 fi
 
@@ -1461,12 +1464,13 @@ echo "
 
 if test "x$proxy" != "xno"; then
 
-echo "  With database:         ${have_db}
-  WEB Monitoring via:    ${have_web_monitoring}
-  SNMP:                  ${have_snmp}
-  IPMI:                  ${have_ipmi}
-  Linker flags:          ${LDFLAGS} ${PROXY_LDFLAGS}
-  Libraries:             ${LIBS} ${PROXY_LIBS}"
+echo "  Proxy details:
+    With database:         ${have_db}
+    SNMP:                  ${have_snmp}
+    IPMI:                  ${have_ipmi}
+    SSH:                   ${have_ssh2}
+    Linker flags:          ${LDFLAGS} ${PROXY_LDFLAGS}
+    Libraries:             ${LIBS} ${PROXY_LIBS}"
 
 fi
 
@@ -1475,8 +1479,9 @@ echo "
 
 if test "x$agent" != "xno"; then
 
-echo "  Linker flags:          ${LDFLAGS}
-  Libraries:             ${LIBS}"
+echo "  Agent details:
+    Linker flags:          ${LDFLAGS}
+    Libraries:             ${LIBS}"
 
 fi
 
