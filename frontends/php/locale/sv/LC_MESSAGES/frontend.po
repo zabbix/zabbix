@@ -1,0 +1,2343 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Zabbix 1.9\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-11-22 16:17+0300\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Konstantin <konstantin.buravcov@zabbix.com>\n"
+"Language-Team: Zabbix <info@zabbix.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#:
+msgid "d M Y H:i:s"
+msgstr "d M H:i:s"
+
+#:
+msgid "d M Y"
+msgstr "Y M d"
+
+#:
+msgid "UTF-8"
+msgstr "UTF-8"
+
+#:
+msgid "Create rule"
+msgstr "Skapa regel"
+
+#:
+msgid "Acknowledges"
+msgstr "Bekräftelser"
+
+#:
+msgid "Acknowledge"
+msgstr "Bekräfta"
+
+#:
+msgid "Acknowledge alarm by"
+msgstr "Bekräfta alarm för"
+
+#:
+msgid "Add comment by"
+msgstr "Lägg till kommentar av"
+
+#:
+msgid "ALARM ACKNOWLEDGES"
+msgstr "ALARMBEKRÄFTELSER"
+
+#:
+msgid "Configuration of actions"
+msgstr "Konfiguration av åtgärder"
+
+#:
+msgid "CONFIGURATION OF ACTIONS"
+msgstr "KONFIGURATION AV ÅTGÄRDER"
+
+#:
+msgid "Send message"
+msgstr "Skicka meddelande"
+
+#:
+msgid "Remote command"
+msgstr "Fjärrkommando"
+
+#:
+msgid "Filter"
+msgstr "Filter"
+
+#:
+msgid "Trigger severity"
+msgstr "Allvarlighetsgrad för utlösare"
+
+#:
+msgid "Trigger value"
+msgstr "Värde för utlösare"
+
+#:
+msgid "Time period"
+msgstr "Tidsperiod"
+
+#:
+msgid "Trigger description"
+msgstr "Beskrivning av utlösare"
+
+#:
+msgid "Conditions"
+msgstr "Villkor"
+
+#:
+msgid "Condition"
+msgstr "Villkor"
+
+#:
+msgid "No conditions defined"
+msgstr "Inga villkor har definierats"
+
+#:
+msgid "Actions deleted"
+msgstr "Åtgärder borttagna"
+
+#:
+msgid "Cannot delete actions"
+msgstr "Kan inte ta bort åtgärder"
+
+#:
+msgid "Actions"
+msgstr "Åtgärder"
+
+#:
+msgid "ACTIONS"
+msgstr "ÅTGÄRDER"
+
+#:
+msgid "Action added"
+msgstr "Åtgärd lades till"
+
+#:
+msgid "Cannot add action"
+msgstr "Kan inte lägga till åtgärd"
+
+#:
+msgid "Action updated"
+msgstr "Åtgärd uppdaterad"
+
+#:
+msgid "Cannot update action"
+msgstr "Kan inte uppdatera åtgärd"
+
+#:
+msgid "Action deleted"
+msgstr "Åtgärd borttagen"
+
+#:
+msgid "Cannot delete action"
+msgstr "Kan inte ta bort åtgärd"
+
+#:
+msgid "Send message to"
+msgstr "Skicka meddelande till"
+
+#:
+msgid "Delay"
+msgstr "Fördröjning"
+
+#:
+msgid "Subject"
+msgstr "Ämne"
+
+#:
+msgid "Message"
+msgstr "Meddelande"
+
+#:
+msgid "On"
+msgstr "P"
+
+#:
+msgid "Off"
+msgstr "AV"
+
+#:
+msgid "No actions defined"
+msgstr "Inga åtgärder har definierats"
+
+#:
+msgid "Single user"
+msgstr "En användare"
+
+#:
+msgid "User group"
+msgstr "Användargrupp"
+
+#:
+msgid "Group"
+msgstr "Grupp"
+
+#:
+msgid "User"
+msgstr "Användare"
+
+#:
+msgid "Not classified"
+msgstr "Inte klassifierad"
+
+#:
+msgid "Information"
+msgstr "Information"
+
+#:
+msgid "Warning"
+msgstr "Varning"
+
+#:
+msgid "Average"
+msgstr "Medel"
+
+#:
+msgid "High"
+msgstr "Hög"
+
+#:
+msgid "Disaster"
+msgstr "Allvarlig"
+
+#:
+msgid "Create Action"
+msgstr "Skapa åtgärd"
+
+#:
+msgid "Show all"
+msgstr "Visa alla"
+
+#:
+msgid "Time"
+msgstr "Tid"
+
+#:
+msgid "Status"
+msgstr "Status"
+
+#:
+msgid "Duration"
+msgstr "Längd"
+
+#:
+msgid "TRUE"
+msgstr "SANT"
+
+#:
+msgid "FALSE"
+msgstr "FALSKT"
+
+#:
+msgid "UNKNOWN"
+msgstr "OKÄNT"
+
+#:
+msgid "Type"
+msgstr "Typ"
+
+#:
+msgid "Recipient(s)"
+msgstr "Mottagare"
+
+#:
+msgid "Error"
+msgstr "Fel"
+
+#:
+msgid "sent"
+msgstr "skickat"
+
+#:
+msgid "not sent"
+msgstr "inte skickat"
+
+#:
+msgid "No actions found"
+msgstr "Inga åtgärder hittades"
+
+#:
+msgid "Custom graphs"
+msgstr "Anpassade diagram"
+
+#:
+msgid "GRAPHS"
+msgstr "DIAGRAM"
+
+#:
+msgid "Select graph to display"
+msgstr "Välj diagram att visa"
+
+#:
+msgid "Period"
+msgstr "Period"
+
+#:
+msgid "Select graph..."
+msgstr "Välj diagram..."
+
+#:
+msgid "Cannot update value map"
+msgstr "Kan inte uppdatera värdeskarta"
+
+#:
+msgid "Value map added"
+msgstr "Värdeskarta lades till"
+
+#:
+msgid "Cannot add value map"
+msgstr "Kan inte lägga till värdeskarta"
+
+#:
+msgid "Value map deleted"
+msgstr "Värdeskarta borttagen"
+
+#:
+msgid "Cannot delete value map"
+msgstr "Kan inte ta bort värdeskarta"
+
+#:
+msgid "Value map updated"
+msgstr "Värdeskarta uppdaterad"
+
+#:
+msgid "VALUE MAPPING"
+msgstr "VÄRDESMAPPNING"
+
+#:
+msgid "Value mapping"
+msgstr "Värdesmappning"
+
+#:
+msgid "Value map"
+msgstr "Värdeskarta"
+
+#:
+msgid "Mapping"
+msgstr "Mappning"
+
+#:
+msgid "New mapping"
+msgstr "Ny mappning"
+
+#:
+msgid "No mapping defined"
+msgstr "Ingen mappning definierad"
+
+#:
+msgid "Create value map"
+msgstr "Skapa värdeskarta"
+
+#:
+msgid "Configuration of Zabbix"
+msgstr "Konfiguration av ZABBIX"
+
+#:
+msgid "CONFIGURATION OF ZABBIX"
+msgstr "KONFIGURATION AV ZABBIX"
+
+#:
+msgid "Configuration updated"
+msgstr "Konfiguration uppdaterad"
+
+#:
+msgid "Configuration was not updated"
+msgstr "Konfiguration blev inte uppdaterad"
+
+#:
+msgid "Added new media type"
+msgstr "Lade till ny mediatyp"
+
+#:
+msgid "New media type was not added"
+msgstr "Ny mediatyp lades inte till"
+
+#:
+msgid "Media type updated"
+msgstr "Mediatyp uppdaterad"
+
+#:
+msgid "Media type was not updated"
+msgstr "Mediatyp blev inte uppdaterad"
+
+#:
+msgid "Media type deleted"
+msgstr "Mediatyp borttagen"
+
+#:
+msgid "Media type was not deleted"
+msgstr "Mediatyp blev inte borttagen"
+
+#:
+msgid "Configuration"
+msgstr "Konfiguration"
+
+#:
+msgid "Do not keep actions older than (in days)"
+msgstr "Behåll inte åtgärder äldre än (i dagar)"
+
+#:
+msgid "Do not keep events older than (in days)"
+msgstr "Behåll inte händelser äldre än (i dagar)"
+
+#:
+msgid "No media types defined"
+msgstr "Inga mediatyper har definierats"
+
+#:
+msgid "SMTP server"
+msgstr "SMTP-server"
+
+#:
+msgid "SMTP helo"
+msgstr "SMTP helo"
+
+#:
+msgid "SMTP email"
+msgstr "SMTP email"
+
+#:
+msgid "Script name"
+msgstr "Skriptnamn"
+
+#:
+msgid "Delete selected media?"
+msgstr "Ta bort markerat media?"
+
+#:
+msgid "Delete selected image?"
+msgstr "Ta bort markerad bild?"
+
+#:
+msgid "Housekeeper"
+msgstr "Hushållerska"
+
+#:
+msgid "Media types"
+msgstr "Mediatyper"
+
+#:
+msgid "Escalation rules"
+msgstr "Eskaleringsregler"
+
+#:
+msgid "Escalation"
+msgstr "Eskalering"
+
+#:
+msgid "Escalation rule"
+msgstr "Eskaleringsregel"
+
+#:
+msgid "Default"
+msgstr "Standard"
+
+#:
+msgid "Images"
+msgstr "Bilder"
+
+#:
+msgid "Image"
+msgstr "Bild"
+
+#:
+msgid "IMAGES"
+msgstr "BILDER"
+
+#:
+msgid "Icon"
+msgstr "Ikon"
+
+#:
+msgid "No images defined"
+msgstr "Inga bilder har definierats"
+
+#:
+msgid "Background"
+msgstr "Bakgrund"
+
+#:
+msgid "Upload"
+msgstr "Skicka upp"
+
+#:
+msgid "Image added"
+msgstr "Bild lades till"
+
+#:
+msgid "Cannot add image"
+msgstr "Kan inte lägga till bild"
+
+#:
+msgid "Image deleted"
+msgstr "Bild togs bort"
+
+#:
+msgid "Cannot delete image"
+msgstr "Kan inte ta bort bild"
+
+#:
+msgid "Image updated"
+msgstr "Bild uppdaterades"
+
+#:
+msgid "Cannot update image"
+msgstr "Kan inte uppdatera bild"
+
+#:
+msgid "Other"
+msgstr "Övrigt"
+
+#:
+msgid "Other parameters"
+msgstr "Övriga parametrar"
+
+#:
+msgid "Refresh unsupported items (in sec)"
+msgstr "Uppdatera objekt som inte stöds (i sekunder)"
+
+#:
+msgid "Create Media Type"
+msgstr "Skapa mediatyp"
+
+#:
+msgid "Create Image"
+msgstr "Skapa bild"
+
+#:
+msgid "Working time"
+msgstr "Arbetstid"
+
+#:
+msgid "Expression"
+msgstr "Uttryck"
+
+#:
+msgid "No permissions !"
+msgstr "Inga rättigheter!"
+
+#:
+msgid "LATEST DATA"
+msgstr "SENASTE DATA"
+
+#:
+msgid "all"
+msgstr "alla"
+
+#:
+msgid "- all -"
+msgstr "- alla -"
+
+#:
+msgid "- other -"
+msgstr "- övriga -"
+
+#:
+msgid "Graph"
+msgstr "Diagram"
+
+#:
+msgid "Connected as"
+msgstr "Ansluten som"
+
+#:
+msgid "Item added"
+msgstr "Objekt lades till"
+
+#:
+msgid "Item updated"
+msgstr "Objekt uppdaterades"
+
+#:
+msgid "Parameter"
+msgstr "Parameter"
+
+#:
+msgid "Colour"
+msgstr "Färg"
+
+#:
+msgid "Up"
+msgstr "Uppåt"
+
+#:
+msgid "Down"
+msgstr "Nedåt"
+
+#:
+msgid "New item for the graph"
+msgstr "Nytt objekt för diagrammet"
+
+#:
+msgid "Sort order (0->100)"
+msgstr "Sorteringsordning (0->100)"
+
+#:
+msgid "Y axis side"
+msgstr "Y-axel"
+
+#:
+msgid "Left"
+msgstr "Vänster"
+
+#:
+msgid "Function"
+msgstr "Funktion"
+
+#:
+msgid "min"
+msgstr "min"
+
+#:
+msgid "avg"
+msgstr "medel"
+
+#:
+msgid "max"
+msgstr "max"
+
+#:
+msgid "Draw style"
+msgstr "Ritstil"
+
+#:
+msgid "Simple"
+msgstr "Enkel"
+
+#:
+msgid "Aggregated"
+msgstr "Samlad"
+
+#:
+msgid "Aggregated periods count"
+msgstr "Antal perioder"
+
+#:
+msgid "Configuration of graphs"
+msgstr "Konfiguration av diagram"
+
+#:
+msgid "CONFIGURATION OF GRAPHS"
+msgstr "KONFIGURATION AV DIAGRAM"
+
+#:
+msgid "Graph added"
+msgstr "Diagram lades till"
+
+#:
+msgid "Graph updated"
+msgstr "Diagram uppdaterades"
+
+#:
+msgid "Cannot update graph"
+msgstr "Kan inte uppdatera diagram"
+
+#:
+msgid "Graph deleted"
+msgstr "Diagram togs bort"
+
+#:
+msgid "Cannot delete graph"
+msgstr "Kan inte ta bort diagram"
+
+#:
+msgid "Cannot add graph"
+msgstr "Kan inte lägga till diagram"
+
+#:
+msgid "Id"
+msgstr "Id"
+
+#:
+msgid "No graphs defined"
+msgstr "Inga diagram har definierats"
+
+#:
+msgid "Delete graph?"
+msgstr "Ta bort diagram?"
+
+#:
+msgid "Y axis MIN value"
+msgstr "MIN-värde för Y-axel"
+
+#:
+msgid "Y axis MAX value"
+msgstr "MAX-värde för Y-axel"
+
+#:
+msgid "Calculated"
+msgstr "Beräknade"
+
+#:
+msgid "Fixed"
+msgstr "Fast"
+
+#:
+msgid "Create Graph"
+msgstr "Skapa diagram"
+
+#:
+msgid "Show working time"
+msgstr "Visa arbetstid"
+
+#:
+msgid "Show triggers"
+msgstr "Visa utlösare"
+
+#:
+msgid "Last hour graph"
+msgstr "Diagram för senaste timmen"
+
+#:
+msgid "500 latest values"
+msgstr "500 senaste värdena"
+
+#:
+msgid "Timestamp"
+msgstr "Tidsstämpel"
+
+#:
+msgid "Local"
+msgstr "Lokal"
+
+#:
+msgid "Source"
+msgstr "Källa"
+
+#:
+msgid "Show selected"
+msgstr "Visa markerade"
+
+#:
+msgid "Hide selected"
+msgstr "Dölj markerade"
+
+#:
+msgid "Mark selected"
+msgstr "Markera markerade"
+
+#:
+msgid "Mark others"
+msgstr "Markera övriga"
+
+#:
+msgid "as Red"
+msgstr "som Röd"
+
+#:
+msgid "as Green"
+msgstr "som Grön"
+
+#:
+msgid "as Blue"
+msgstr "som Bl"
+
+#:
+msgid "Application"
+msgstr "Program"
+
+#:
+msgid "Applications"
+msgstr "Program"
+
+#:
+msgid "APPLICATIONS"
+msgstr "PROGRAM"
+
+#:
+msgid "Create application"
+msgstr "Skapa program"
+
+#:
+msgid "Application updated"
+msgstr "Program uppdaterat"
+
+#:
+msgid "Cannot update application"
+msgstr "Kan inte uppdatera program"
+
+#:
+msgid "Application added"
+msgstr "Program lades till"
+
+#:
+msgid "Cannot add application"
+msgstr "Kan inte lägga till program"
+
+#:
+msgid "Application deleted"
+msgstr "Program togs bort"
+
+#:
+msgid "Cannot delete application"
+msgstr "Kan inte ta bort program"
+
+#:
+msgid "Hosts"
+msgstr "Värdar"
+
+#:
+msgid "Items"
+msgstr "Objekt"
+
+#:
+msgid "ITEMS"
+msgstr "OBJEKT"
+
+#:
+msgid "Triggers"
+msgstr "Utlösare"
+
+#:
+msgid "Graphs"
+msgstr "Diagram"
+
+#:
+msgid "Host added"
+msgstr "Värd lades till"
+
+#:
+msgid "Cannot add host"
+msgstr "Kan inte lägga till värd"
+
+#:
+msgid "Host updated"
+msgstr "Värd uppdaterades"
+
+#:
+msgid "Cannot update host"
+msgstr "Kan inte uppdatera värd"
+
+#:
+msgid "Host status updated"
+msgstr "Värdstatus uppdaterades"
+
+#:
+msgid "Cannot update host status"
+msgstr "Kan inte uppdatera värdstatus"
+
+#:
+msgid "Host deleted"
+msgstr "Värd togs bort"
+
+#:
+msgid "Cannot delete host"
+msgstr "Kan inte ta bort värd"
+
+#:
+msgid "HOST GROUPS"
+msgstr "VÄRDGRUPPER"
+
+#:
+msgid "No host groups defined"
+msgstr "Inga värdgrupper har definierats"
+
+#:
+msgid "No hosts defined"
+msgstr "Inga värdar har definierats"
+
+#:
+msgid "HOSTS"
+msgstr "VÄRDAR"
+
+#:
+msgid "Host"
+msgstr "Värd"
+
+#:
+msgid "IP"
+msgstr "IP"
+
+#:
+msgid "Port"
+msgstr "Port"
+
+#:
+msgid "Monitored"
+msgstr "Övervakad"
+
+#:
+msgid "Not monitored"
+msgstr "Inte övervakad"
+
+#:
+msgid "Template"
+msgstr "Mall"
+
+#:
+msgid "Deleted"
+msgstr "Borttagen"
+
+#:
+msgid "Unknown"
+msgstr "Okänd"
+
+#:
+msgid "Groups"
+msgstr "Grupper"
+
+#:
+msgid "New group"
+msgstr "Ny grupp"
+
+#:
+msgid "IP address"
+msgstr "IP-adress"
+
+#:
+msgid "Use profile"
+msgstr "Använd profil"
+
+#:
+msgid "Delete selected host?"
+msgstr "Ta bort markerad värd?"
+
+#:
+msgid "Group name"
+msgstr "Gruppnamn"
+
+#:
+msgid "Host group"
+msgstr "Värdgrupp"
+
+#:
+msgid "Host groups"
+msgstr "Värdgrupper"
+
+#:
+msgid "Update"
+msgstr "Uppdatera"
+
+#:
+msgid "Availability"
+msgstr "Tillgänglighet"
+
+#:
+msgid "Available"
+msgstr "Tillgänglig"
+
+#:
+msgid "Not available"
+msgstr "Inte tillgänglig"
+
+#:
+msgid "Delete selected hosts?"
+msgstr "Ta bort markerade värdar?"
+
+#:
+msgid "Link with template"
+msgstr "Koppla mot mall"
+
+#:
+msgid "Host profile"
+msgstr "Värdprofil"
+
+#:
+msgid "Device type"
+msgstr "Enhetstyp"
+
+#:
+msgid "OS"
+msgstr "OS"
+
+#:
+msgid "SerialNo"
+msgstr "Serienummer"
+
+#:
+msgid "Tag"
+msgstr "Tagg"
+
+#:
+msgid "Hardware"
+msgstr "Hårdvara"
+
+#:
+msgid "Software"
+msgstr "Programvara"
+
+#:
+msgid "Contact"
+msgstr "Kontakt"
+
+#:
+msgid "Location"
+msgstr "Plats"
+
+#:
+msgid "Notes"
+msgstr "Anteckningar"
+
+#:
+msgid "MAC Address"
+msgstr "MAC-adress"
+
+#:
+msgid "Add to group"
+msgstr "Lägg till i grupp"
+
+#:
+msgid "Delete from group"
+msgstr "Ta bort från grupp"
+
+#:
+msgid "Update in group"
+msgstr "Uppdatera i grupp"
+
+#:
+msgid "Create Host"
+msgstr "Skapa värd"
+
+#:
+msgid "Create Template"
+msgstr "Skapa mall"
+
+#:
+msgid "Template linkage"
+msgstr "Mallkoppling"
+
+#:
+msgid "Templates"
+msgstr "Mallar"
+
+#:
+msgid "TEMPLATES"
+msgstr "MALLAR"
+
+#:
+msgid "No items defined"
+msgstr "Inga objekt har definierats"
+
+#:
+msgid "History cleared"
+msgstr "Historik rensad"
+
+#:
+msgid "Cannot clear history"
+msgstr "Kan inte rensa historik"
+
+#:
+msgid "Configuration of items"
+msgstr "Konfiguration av objekt"
+
+#:
+msgid "CONFIGURATION OF ITEMS"
+msgstr "KONFIGURATION AV OBJEKT"
+
+#:
+msgid "Cannot update item"
+msgstr "Kan inte uppdatera objekt"
+
+#:
+msgid "Status updated"
+msgstr "Status uppdaterad"
+
+#:
+msgid "Cannot update status"
+msgstr "Kan inte uppdatera status"
+
+#:
+msgid "Cannot add item"
+msgstr "Kan inte lägga till objekt"
+
+#:
+msgid "Item deleted"
+msgstr "Objekt togs bort"
+
+#:
+msgid "Cannot delete item"
+msgstr "Kan inte ta bort objekt"
+
+#:
+msgid "Items deleted"
+msgstr "Objekt borttagna"
+
+#:
+msgid "Cannot delete items"
+msgstr "Kan inte ta bort objekt"
+
+#:
+msgid "Items activated"
+msgstr "Objekt aktiverade"
+
+#:
+msgid "Items disabled"
+msgstr "Objekt inaktiverade"
+
+#:
+msgid "Key"
+msgstr "Nyckel"
+
+#:
+msgid "Description"
+msgstr "Beskrivning"
+
+#:
+msgid "Update interval"
+msgstr "Uppdateringsintervall"
+
+#:
+msgid "History"
+msgstr "Historik"
+
+#:
+msgid "Trends"
+msgstr "Trender"
+
+#:
+msgid "Zabbix agent"
+msgstr "ZABBIX-agent"
+
+#:
+msgid "Zabbix agent (active)"
+msgstr "ZABBIX-agent (aktiv)"
+
+#:
+msgid "SNMPv1 agent"
+msgstr "SNMPv1-agent"
+
+#:
+msgid "Zabbix trapper"
+msgstr "ZABBIX-fångare"
+
+#:
+msgid "Simple check"
+msgstr "Enkel kontroll"
+
+#:
+msgid "SNMPv2 agent"
+msgstr "SNMPv2-agent"
+
+#:
+msgid "SNMPv3 agent"
+msgstr "SNMPv3-agent"
+
+#:
+msgid "Zabbix internal"
+msgstr "ZABBIX internt"
+
+#:
+msgid "Zabbix aggregate"
+msgstr "ZABBIX samlat"
+
+#:
+msgid "Active"
+msgstr "Aktiv"
+
+#:
+msgid "Not supported"
+msgstr "Stöds inte"
+
+#:
+msgid "Email"
+msgstr "E-post"
+
+#:
+msgid "SMS"
+msgstr "SMS"
+
+#:
+msgid "Script"
+msgstr "Skript"
+
+#:
+msgid "GSM modem"
+msgstr "GSM-modem"
+
+#:
+msgid "Units"
+msgstr "Enheter"
+
+#:
+msgid "Update interval (in sec)"
+msgstr "Uppdateringsintervall (i sekunder)"
+
+#:
+msgid "Keep history (in days)"
+msgstr "Behåll historik (i dagar)"
+
+#:
+msgid "Keep trends (in days)"
+msgstr "Behåll trender (i dagar)"
+
+#:
+msgid "Type of information"
+msgstr "Typ av information"
+
+#:
+msgid "Store value"
+msgstr "Lagra värde"
+
+#:
+msgid "Show value"
+msgstr "Visa värde"
+
+#:
+msgid "Numeric (unsigned)"
+msgstr "Numerisk (heltal 64-bit)"
+
+#:
+msgid "Numeric (float)"
+msgstr "Numerisk (flyttal)"
+
+#:
+msgid "Character"
+msgstr "Tecken"
+
+#:
+msgid "Log"
+msgstr "Logg"
+
+#:
+msgid "Text"
+msgstr "Text"
+
+#:
+msgid "As is"
+msgstr "Som det är"
+
+#:
+msgid "Delta (speed per second)"
+msgstr "Delta (hastighet per sekund)"
+
+#:
+msgid "Delta (simple change)"
+msgstr "Delta (enkel ändring)"
+
+#:
+msgid "Item"
+msgstr "Objekt"
+
+#:
+msgid "SNMP community"
+msgstr "SNMP community"
+
+#:
+msgid "SNMP OID"
+msgstr "SNMP OID"
+
+#:
+msgid "SNMP port"
+msgstr "SNMP-port"
+
+#:
+msgid "Allowed hosts"
+msgstr "Tillåtna värdar"
+
+#:
+msgid "SNMPv3 security name"
+msgstr "SNMPv3 security name"
+
+#:
+msgid "SNMPv3 security level"
+msgstr "SNMPv3 security level"
+
+#:
+msgid "SNMPv3 auth passphrase"
+msgstr "SNMPv3 auth passphrase"
+
+#:
+msgid "SNMPv3 priv passphrase"
+msgstr "SNMPv3 priv passphrase"
+
+#:
+msgid "Custom multiplier"
+msgstr "Anpassad faktor"
+
+#:
+msgid "Select host..."
+msgstr "Välj värd..."
+
+#:
+msgid "Log time format"
+msgstr "Tidsformat för logg"
+
+#:
+msgid "Create Item"
+msgstr "Skapa objekt"
+
+#:
+msgid "Latest events"
+msgstr "Senaste händelser"
+
+#:
+msgid "HISTORY OF EVENTS"
+msgstr "HÄNDELSEHISTORIK"
+
+#:
+msgid "No events found"
+msgstr "Inga händelser hittades"
+
+#:
+msgid "Last check"
+msgstr "Senaste kontroll"
+
+#:
+msgid "Last value"
+msgstr "Senaste värde"
+
+#:
+msgid "Link"
+msgstr "Länk"
+
+#:
+msgid "Label"
+msgstr "Etikett"
+
+#:
+msgid "X"
+msgstr "X"
+
+#:
+msgid "Link status indicator"
+msgstr "Länkstatusindikator"
+
+#:
+msgid "Configuration of network maps"
+msgstr "KONFIGURATION AV NÄTVERKSKARTOR"
+
+#:
+msgid "MAPS"
+msgstr "KARTOR"
+
+#:
+msgid "No maps defined"
+msgstr "Inga kartor har definierats"
+
+#:
+msgid "Create Map"
+msgstr "Skapa karta"
+
+#:
+msgid "Icon label location"
+msgstr "Position för ikonetikett"
+
+#:
+msgid "Bottom"
+msgstr "Nederkant"
+
+#:
+msgid "Top"
+msgstr "Överkant"
+
+#:
+msgid "OK"
+msgstr "OK"
+
+#:
+msgid "http://www.zabbix.com"
+msgstr "http://www.zabbix.com"
+
+#:
+msgid "Network maps"
+msgstr "Nätverkskartor"
+
+#:
+msgid "NETWORK MAPS"
+msgstr "NÄTVERKSKARTOR"
+
+#:
+msgid "Background image"
+msgstr "Bakgrundsbild"
+
+#:
+msgid "Icon label type"
+msgstr "Typ av ikonetikett"
+
+#:
+msgid "Label location"
+msgstr "Etikettposition"
+
+#:
+msgid "Element name"
+msgstr "Elementnamn"
+
+#:
+msgid "Status only"
+msgstr "Endast status"
+
+#:
+msgid "Nothing"
+msgstr "Ingenting"
+
+#:
+msgid "Media"
+msgstr "Media"
+
+#:
+msgid "Send to"
+msgstr "Skicka till"
+
+#:
+msgid "When active"
+msgstr "När aktiv"
+
+#:
+msgid "No media defined"
+msgstr "Inget media har definierats"
+
+#:
+msgid "New media"
+msgstr "Nytt media"
+
+#:
+msgid "Use if severity"
+msgstr "Använd om allvarlighetsgrad"
+
+#:
+msgid "Save"
+msgstr "Spara"
+
+#:
+msgid "Cancel"
+msgstr "Avbryt"
+
+#:
+msgid "Overview"
+msgstr "Översikt"
+
+#:
+msgid "OVERVIEW"
+msgstr "ÖVERSIKT"
+
+#:
+msgid "Data"
+msgstr "Data"
+
+#:
+msgid "QUEUE"
+msgstr "K"
+
+#:
+msgid "QUEUE OF ITEMS TO BE UPDATED"
+msgstr "UPPDATERINGSKÖ FÖR OBJEKT"
+
+#:
+msgid "Next check"
+msgstr "Nästa kontroll"
+
+#:
+msgid "The queue is empty"
+msgstr "Kön är tom"
+
+#:
+msgid "Total"
+msgstr "Totalt"
+
+#:
+msgid "Count"
+msgstr "Antal"
+
+#:
+msgid "5 seconds"
+msgstr "5 sekunder"
+
+#:
+msgid "10 seconds"
+msgstr "10 sekunder"
+
+#:
+msgid "30 seconds"
+msgstr "30 sekunder"
+
+#:
+msgid "1 minute"
+msgstr "1 minut"
+
+#:
+msgid "5 minutes"
+msgstr "5 minuter"
+
+#:
+msgid "Status of Zabbix"
+msgstr "Status för ZABBIX"
+
+#:
+msgid "STATUS OF ZABBIX"
+msgstr "STATUS FÖR ZABBIX"
+
+#:
+msgid "Value"
+msgstr "Värde"
+
+#:
+msgid "Zabbix server is running"
+msgstr "ZABBIX-server kör"
+
+#:
+msgid "Values stored"
+msgstr "Lagrade värden"
+
+#:
+msgid "Trends stored"
+msgstr "Lagrade trender"
+
+#:
+msgid "Number of triggers (enabled/disabled)[problem/unknown/ok]"
+msgstr "Antal utlösare (aktiverade/inaktiverade)[problem/okänt/ok]"
+
+#:
+msgid "Triggers (e/d)[p/u/o]"
+msgstr "Utlösare (a/i)[p/o/ok]"
+
+#:
+msgid "Number of items (monitored/disabled/not supported)"
+msgstr "Antal objekt (övervakade/inaktiverade/stöds inte)"
+
+#:
+msgid "Items (m/d/n)"
+msgstr "Objekt (ö/i/s)"
+
+#:
+msgid "Number of users (online)"
+msgstr "Antal användare (anslutna)"
+
+#:
+msgid "Users (online)"
+msgstr "Användare (anslutna)"
+
+#:
+msgid "Number of hosts (monitored/not monitored/templates)"
+msgstr "Antal värdar (övervakade/inte övervakade/mallar)"
+
+#:
+msgid "Hosts (m/n/t)"
+msgstr "Värdar (ö/i/m)"
+
+#:
+msgid "Yes"
+msgstr "Ja"
+
+#:
+msgid "No"
+msgstr "Nej"
+
+#:
+msgid "running"
+msgstr "kör"
+
+#:
+msgid "not running"
+msgstr "kör inte"
+
+#:
+msgid "Availability report"
+msgstr "Tillgänglighetsrapport"
+
+#:
+msgid "AVAILABILITY REPORT"
+msgstr "TILLGÄNGLIGHETSRAPPORT"
+
+#:
+msgid "Show"
+msgstr "Visa"
+
+#:
+msgid "IT services availability report"
+msgstr "Tillgänglighetsrapport för IT-tjänster"
+
+#:
+msgid "IT SERVICES AVAILABILITY REPORT"
+msgstr "TILLGÄNGLIGHETSRAPPOR FÖR IT-TJÄNSTER"
+
+#:
+msgid "From"
+msgstr "Från"
+
+#:
+msgid "Till"
+msgstr "Till"
+
+#:
+msgid "Ok"
+msgstr "Ok"
+
+#:
+msgid "Problems"
+msgstr "Problem"
+
+#:
+msgid "Percentage"
+msgstr "Procentandel"
+
+#:
+msgid "SLA"
+msgstr "SLA"
+
+#:
+msgid "Day"
+msgstr "Dag"
+
+#:
+msgid "Month"
+msgstr "Månad"
+
+#:
+msgid "Year"
+msgstr "År"
+
+#:
+msgid "Daily"
+msgstr "Dagligen"
+
+#:
+msgid "Weekly"
+msgstr "Veckovis"
+
+#:
+msgid "Monthly"
+msgstr "Månatligen"
+
+#:
+msgid "Yearly"
+msgstr "Årligen"
+
+#:
+msgid "Notifications"
+msgstr "Notifieringar"
+
+#:
+msgid "NOTIFICATIONS"
+msgstr "NOTIFIERINGAR"
+
+#:
+msgid "Notification report"
+msgstr "Notifieringsrapport"
+
+#:
+msgid "Most busy triggers top 100"
+msgstr "Mest använda utlösare - topp 100"
+
+#:
+msgid "MOST BUSY TRIGGERS TOP 100"
+msgstr "MEST ANVÄNDA UTLÖSARE - TOPP 100"
+
+#:
+msgid "Number of status changes"
+msgstr "Antal statusändringar"
+
+#:
+msgid "Week"
+msgstr "Vecka"
+
+#:
+msgid "Last"
+msgstr "Senaste"
+
+#:
+msgid "Screens"
+msgstr "Skärmar"
+
+#:
+msgid "Screen"
+msgstr "Skärm"
+
+#:
+msgid "CONFIGURATION OF SCREENS"
+msgstr "KONFIGURATION AV SKÄRMAR"
+
+#:
+msgid "Configuration of screens"
+msgstr "Konfiguration av skärmar"
+
+#:
+msgid "Screen added"
+msgstr "Skärm lades till"
+
+#:
+msgid "Cannot add screen"
+msgstr "Kan inte lägga till skärm"
+
+#:
+msgid "Screen updated"
+msgstr "Skärm uppdaterades"
+
+#:
+msgid "Cannot update screen"
+msgstr "Kan inte uppdatera skärm"
+
+#:
+msgid "Screen deleted"
+msgstr "Skärm togs bort"
+
+#:
+msgid "Cannot deleted screen"
+msgstr "Kan inte ta bort skärm"
+
+#:
+msgid "Columns"
+msgstr "Kolumner"
+
+#:
+msgid "Rows"
+msgstr "Rader"
+
+#:
+msgid "No screens defined"
+msgstr "Inga skärmar har definierats"
+
+#:
+msgid "Delete screen?"
+msgstr "Ta bort skärm?"
+
+#:
+msgid "CONFIGURATION OF SCREEN"
+msgstr "KONFIGURATION AV SKÄRM"
+
+#:
+msgid "Screen cell configuration"
+msgstr "Konfiguration av skärmcell"
+
+#:
+msgid "Resource"
+msgstr "Resurs"
+
+#:
+msgid "Simple graph"
+msgstr "Enkelt diagram"
+
+#:
+msgid "Graph name"
+msgstr "Diagramnamn"
+
+#:
+msgid "Width"
+msgstr "Bredd"
+
+#:
+msgid "Height"
+msgstr "Höjd"
+
+#:
+msgid "Create Screen"
+msgstr "Skapa skärm"
+
+#:
+msgid "Edit"
+msgstr "Redigera"
+
+#:
+msgid "Dimension (cols x rows)"
+msgstr "Dimension (kolumner x rader)"
+
+#:
+msgid "Map"
+msgstr "Karta"
+
+#:
+msgid "As plain text"
+msgstr "Som ren text"
+
+#:
+msgid "Plain text"
+msgstr "Ren text"
+
+#:
+msgid "Column span"
+msgstr "Kolumnspann"
+
+#:
+msgid "Row span"
+msgstr "Radspann"
+
+#:
+msgid "Show lines"
+msgstr "Visa linjer"
+
+#:
+msgid "Hosts info"
+msgstr "Info om värdar"
+
+#:
+msgid "Triggers info"
+msgstr "Info om utlösare"
+
+#:
+msgid "Server info"
+msgstr "Serverinfo"
+
+#:
+msgid "Clock"
+msgstr "Klocka"
+
+#:
+msgid "Triggers overview"
+msgstr "Översikt över utlösare"
+
+#:
+msgid "Data overview"
+msgstr "Översikt över data"
+
+#:
+msgid "History of actions"
+msgstr "Historik för åtgärder"
+
+#:
+msgid "History of events"
+msgstr "Historik för händelser"
+
+#:
+msgid "Time type"
+msgstr "Tidstyp"
+
+#:
+msgid "Server time"
+msgstr "Servertid"
+
+#:
+msgid "Local time"
+msgstr "Lokal tid"
+
+#:
+msgid "Style"
+msgstr "Stil"
+
+#:
+msgid "Vertical"
+msgstr "Vertikal"
+
+#:
+msgid "Horizontal"
+msgstr "Horisontell"
+
+#:
+msgid "Horizontal align"
+msgstr "Horisontell justering"
+
+#:
+msgid "Centre"
+msgstr "Centrera"
+
+#:
+msgid "Right"
+msgstr "Rättighet"
+
+#:
+msgid "Vertical align"
+msgstr "Vertikal justering"
+
+#:
+msgid "Middle"
+msgstr "Mitten"
+
+#:
+msgid "Custom screens"
+msgstr "Anpassade skärmar"
+
+#:
+msgid "SCREENS 45645645"
+msgstr "SKÄRMAR"
+
+#:
+msgid "IT services"
+msgstr "IT-tjänster"
+
+#:
+msgid "Service updated"
+msgstr "Tjänst uppdaterad"
+
+#:
+msgid "Cannot update service"
+msgstr "Kan inte uppdatera tjänst"
+
+#:
+msgid "Service added"
+msgstr "Tjänst lades till"
+
+#:
+msgid "Cannot add service"
+msgstr "Kan inte lägga till tjänst"
+
+#:
+msgid "Service deleted"
+msgstr "Tjänst togs bort"
+
+#:
+msgid "Cannot delete service"
+msgstr "Kan inte ta bort tjänst"
+
+#:
+msgid "Status calculation"
+msgstr "Statusberäkning"
+
+#:
+msgid "Status calculation algorithm"
+msgstr "Algoritm för statusberäkning"
+
+#:
+msgid "None"
+msgstr "Ingen"
+
+#:
+msgid "Soft"
+msgstr "Mjuk"
+
+#:
+msgid "Do not calculate"
+msgstr "Beräkna inte"
+
+#:
+msgid "Acceptable SLA (in %)"
+msgstr "Acceptabel SLA (i %)"
+
+#:
+msgid "Link to trigger?"
+msgstr "Länk till utlösare?"
+
+#:
+msgid "Sort order (0->999)"
+msgstr "Sorteringsordning (0->999)"
+
+#:
+msgid "Trigger"
+msgstr "Utlösare"
+
+#:
+msgid "Server"
+msgstr "Server"
+
+#:
+msgid "Delete"
+msgstr "Ta bort"
+
+#:
+msgid "IT SERVICES"
+msgstr "IT-TJÄNSTER"
+
+#:
+msgid "Service"
+msgstr "Tjänst"
+
+#:
+msgid "Reason"
+msgstr "Anledning"
+
+#:
+msgid "No triggers defined"
+msgstr "Inga utlösare har definierats"
+
+#:
+msgid "Configuration of triggers"
+msgstr "Konfiguration av utlösare"
+
+#:
+msgid "CONFIGURATION OF TRIGGERS"
+msgstr "KONFIGURATION AV UTLÖSARE"
+
+#:
+msgid "Triggers deleted"
+msgstr "Utlösare togs bort"
+
+#:
+msgid "Cannot delete triggers"
+msgstr "Kan inte ta bort utlösare"
+
+#:
+msgid "Trigger deleted"
+msgstr "Utlösare togs bort"
+
+#:
+msgid "Cannot delete trigger"
+msgstr "Kan inte ta bort utlösare"
+
+#:
+msgid "Trigger added"
+msgstr "Utlösare lades till"
+
+#:
+msgid "Cannot add trigger"
+msgstr "Kan inte lägga till utlösare"
+
+#:
+msgid "Severity"
+msgstr "Allvarlighetsgrad"
+
+#:
+msgid "Disabled"
+msgstr "Inaktiverad"
+
+#:
+msgid "Enabled"
+msgstr "Aktiverad"
+
+#:
+msgid "Change"
+msgstr "Ändra"
+
+#:
+msgid "Trigger updated"
+msgstr "Utlösare uppdaterades"
+
+#:
+msgid "Cannot update trigger"
+msgstr "Kan inte uppdatera utlösare"
+
+#:
+msgid "Depends on"
+msgstr "Beroende av"
+
+#:
+msgid "URL"
+msgstr "URL"
+
+#:
+msgid "Create Trigger"
+msgstr "Skapa utlösare"
+
+#:
+msgid "Trigger comments"
+msgstr "Kommentarer för utlösare"
+
+#:
+msgid "TRIGGER COMMENTS"
+msgstr "KOMMENTARER FÖR UTLÖSARE"
+
+#:
+msgid "Comment updated"
+msgstr "Kommentar uppdaterades"
+
+#:
+msgid "Cannot update comment"
+msgstr "Kan inte uppdatera kommentar"
+
+#:
+msgid "Add"
+msgstr "Lägg till"
+
+#:
+msgid "Status of triggers"
+msgstr "Status för utlösare"
+
+#:
+msgid "STATUS OF TRIGGERS"
+msgstr "STATUS FÖR UTLÖSARE"
+
+#:
+msgid "Show details"
+msgstr "Visa detaljer"
+
+#:
+msgid "TRIGGERS"
+msgstr "UTLÖSARE"
+
+#:
+msgid "Last change"
+msgstr "Senaste ändring"
+
+#:
+msgid "Comments"
+msgstr "Kommentarer"
+
+#:
+msgid "Acknowledged"
+msgstr "Bekräftade"
+
+#:
+msgid "Ack"
+msgstr "Bekräfta"
+
+#:
+msgid "Select"
+msgstr "Välj"
+
+#:
+msgid "Users"
+msgstr "Användare"
+
+#:
+msgid "User added"
+msgstr "Användare lades till"
+
+#:
+msgid "Cannot add user"
+msgstr "Kan inte lägga till användare"
+
+#:
+msgid "Cannot add user. Both passwords must be equal."
+msgstr "Kan inte lägga till användare. Båda lösenorden måste vara samma."
+
+#:
+msgid "User deleted"
+msgstr "Användare togs bort"
+
+#:
+msgid "Cannot delete user"
+msgstr "Kan inte ta bort användare"
+
+#:
+msgid "User updated"
+msgstr "Användare uppdaterades"
+
+#:
+msgid "Cannot update user"
+msgstr "Kan inte uppdatera användare"
+
+#:
+msgid "Cannot update user. Both passwords must be equal."
+msgstr "Kan inte uppdatera användare. Båda lösenorden måste vara samma."
+
+#:
+msgid "Group added"
+msgstr "Grupp lades till"
+
+#:
+msgid "Cannot add group"
+msgstr "Kan inte lägga till grupp"
+
+#:
+msgid "Group updated"
+msgstr "Grupp har uppdaterats"
+
+#:
+msgid "Cannot update group"
+msgstr "Kan inte uppdatera grupp"
+
+#:
+msgid "Group deleted"
+msgstr "Grupp togs bort"
+
+#:
+msgid "Cannot delete group"
+msgstr "Kan inte ta bort grupp"
+
+#:
+msgid "CONFIGURATION OF USERS AND USER GROUPS"
+msgstr "KONFIGURATION AV ANVÄNDARE OCH ANVÄNDARGRUPPER"
+
+#:
+msgid "USER GROUPS"
+msgstr "ANVÄNDARGRUPPER"
+
+#:
+msgid "USERS"
+msgstr "ANVÄNDARE"
+
+#:
+msgid "User groups"
+msgstr "Användargrupper"
+
+#:
+msgid "Members"
+msgstr "Medlemmar"
+
+#:
+msgid "No user groups defined"
+msgstr "Inga användargrupper har definierats"
+
+#:
+msgid "Alias"
+msgstr "Alias"
+
+#:
+msgid "Name"
+msgstr "Namn"
+
+#:
+msgid "Surname"
+msgstr "Efternamn"
+
+#:
+msgid "Is online?"
+msgstr "Är ansluten?"
+
+#:
+msgid "No users defined"
+msgstr "Inga användare har definierats"
+
+#:
+msgid "Read only"
+msgstr "Endast läs"
+
+#:
+msgid "Read-write"
+msgstr "Läs-skriv"
+
+#:
+msgid "Hide"
+msgstr "Dölj"
+
+#:
+msgid "Password"
+msgstr "Lösenord"
+
+#:
+msgid "Password (once again)"
+msgstr "Lösenord (en gång till)"
+
+#:
+msgid "URL (after login)"
+msgstr "URL (efter inloggning)"
+
+#:
+msgid "Refresh (in seconds)"
+msgstr "Uppdatera (i sekunder)"
+
+#:
+msgid "Create User"
+msgstr "Skapa användare"
+
+#:
+msgid "Create Group"
+msgstr "Skapa grupp"
+
+#:
+msgid "Audit"
+msgstr "Granskning"
+
+#:
+msgid "Action"
+msgstr "Åtgärd"
+
+#:
+msgid "Details"
+msgstr "Detaljer"
+
+#:
+msgid "Unknown action"
+msgstr "Okänd åtgärd"
+
+#:
+msgid "Added"
+msgstr "Lades till"
+
+#:
+msgid "Updated"
+msgstr "Uppdaterad"
+
+#:
+msgid "Media type"
+msgstr "Mediatyp"
+
+#:
+msgid "Graph element"
+msgstr "Diagramelement"
+
+#:
+msgid "Unknown resource"
+msgstr "Okänd resurs"
+
+#:
+msgid "USER PROFILE"
+msgstr "ANVÄNDARPROFIL"
+
+#:
+msgid "User profile"
+msgstr "Användarprofil"
+
+#:
+msgid "Language"
+msgstr "Språk"
+
+#:
+msgid "English (GB)"
+msgstr "Engelska (GB)"
+
+#:
+msgid "French (FR)"
+msgstr "Franska (FR)"
+
+#:
+msgid "German (DE)"
+msgstr "Tyska (DE)"
+
+#:
+msgid "Italian (IT)"
+msgstr "Italienska (IT)"
+
+#:
+msgid "Latvian (LV)"
+msgstr "Lettiska (LV)"
+
+#:
+msgid "Russian (RU)"
+msgstr "Ryska (RU)"
+
+#:
+msgid "Spanish (ES)"
+msgstr "Spanska (ES)"
+
+#:
+msgid "Japanese (JP)"
+msgstr "Japanska (JP)"
+
+#:
+msgid "Chinese (CN)"
+msgstr "Kinesiska (CN)"
+
+#:
+msgid "ZABBIX"
+msgstr "ZABBIX"
+
+#:
+msgid "Host profiles"
+msgstr "Värdprofiler"
+
+#:
+msgid "HOST PROFILES"
+msgstr "VÄRDPROFILER"
+
+#:
+msgid "Empty"
+msgstr "Tom"
+
+#:
+msgid "STANDARD ITEMS"
+msgstr "STANDARDOBJEKT"
+
+#:
+msgid "No items"
+msgstr "Inga objekt"
+
+#:
+msgid "Y"
+msgstr "Y"
+
+#:
+msgid "Help"
+msgstr "Hjälp"
+
+#:
+msgid "Profile"
+msgstr "Profil"
+
+#:
+msgid "Monitoring"
+msgstr "Övervakning"
+
+#:
+msgid "Inventory"
+msgstr "Inventarier"
+
+#:
+msgid "Queue"
+msgstr "K"
+
+#:
+msgid "Events"
+msgstr "Händelser"
+
+#:
+msgid "Maps"
+msgstr "Kartor"
+
+#:
+msgid "Reports"
+msgstr "Rapporter"
+
+#:
+msgid "General"
+msgstr "Allmänt"
+
+#:
+msgid "Login"
+msgstr "Inloggning"
+
+#:
+msgid "Latest data"
+msgstr "Senaste data"
+
+#:
+msgid "Incorrect description"
+msgstr "Felaktig beskrivning"

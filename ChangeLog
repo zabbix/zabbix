@@ -1,5 +1,6 @@
 Changes for 1.9.1
 
+ - [ZBXNEXT-556] zabbix frontend translations are now handled by PHP gettext module (KB)
  - [ZBXNEXT-558] added support of monitoring auto-registered hosts with passive checks (Sasha)
  - [ZBX-3190] fixed sql errors when processing proxy configuration (asaveljevs,Sasha)
  - [DEV-471] fixed sql scripts names consistency (Sasha)

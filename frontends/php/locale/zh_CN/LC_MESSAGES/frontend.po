@@ -1,0 +1,7199 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Zabbix 1.9\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-11-22 16:17+0300\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Konstantin <konstantin.buravcov@zabbix.com>\n"
+"Language-Team: Zabbix <info@zabbix.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#:
+msgid "d M Y H:i:s"
+msgstr "d M H:i:s"
+
+#:
+msgid "d M Y"
+msgstr "d M Y"
+
+#:
+msgid "UTF-8"
+msgstr "UTF-8"
+
+#:
+msgid "y"
+msgstr "y"
+
+#:
+msgid "m"
+msgstr "m"
+
+#:
+msgid "w"
+msgstr "w"
+
+#:
+msgid "d"
+msgstr "d"
+
+#:
+msgid "h"
+msgstr "h"
+
+#:
+msgid "s"
+msgstr "s"
+
+#:
+msgid "ms"
+msgstr "ms"
+
+#:
+msgid "Activate selected"
+msgstr "激活所选"
+
+#:
+msgid "Disable selected"
+msgstr "禁用所选"
+
+#:
+msgid "Activate selected hosts"
+msgstr "激活所选主机"
+
+#:
+msgid "Disable selected hosts"
+msgstr "禁用所选主机"
+
+#:
+msgid "Delete selected"
+msgstr "删除所选"
+
+#:
+msgid "Copy selected to ..."
+msgstr "拷贝所选到 ..."
+
+#:
+msgid "Host IP"
+msgstr "主机IP地址"
+
+#:
+msgid "Service type"
+msgstr "服务类型"
+
+#:
+msgid "Service port"
+msgstr "服务端口"
+
+#:
+msgid "Discovery status"
+msgstr "自动发现状态"
+
+#:
+msgid "Received value"
+msgstr "接收到的数据"
+
+#:
+msgid "Uptime/Downtime"
+msgstr "在线/不在线"
+
+#:
+msgid "Discovery rule"
+msgstr "自动发现规则"
+
+#:
+msgid "Discovery"
+msgstr "自动发现"
+
+#:
+msgid "DISCOVERY"
+msgstr "自动发现"
+
+#:
+msgid "Configuration of discovery"
+msgstr "配置自动发现"
+
+#:
+msgid "CONFIGURATION OF DISCOVERY"
+msgstr "配置自动发现"
+
+#:
+msgid "No discovery rules defined"
+msgstr "没有定义自动发现规则"
+
+#:
+msgid "IP range"
+msgstr "IP地址段"
+
+#:
+msgid "Checks"
+msgstr "Checks"
+
+#:
+msgid "Create rule"
+msgstr "Create rule"
+
+#:
+msgid "Delete rule?"
+msgstr "Delete rule?"
+
+#:
+msgid "Discovery by proxy"
+msgstr "Discovery by proxy"
+
+#:
+msgid "(no proxy)"
+msgstr "(no proxy)"
+
+#:
+msgid "Device uniqueness criteria"
+msgstr "Device uniqueness criteria"
+
+#:
+msgid "Event source"
+msgstr "事件源"
+
+#:
+msgid "New check"
+msgstr "New check"
+
+#:
+msgid "SSH"
+msgstr "SSH"
+
+#:
+msgid "LDAP"
+msgstr "LDAP"
+
+#:
+msgid "SMTP"
+msgstr "SMTP"
+
+#:
+msgid "FTP"
+msgstr "FTP"
+
+#:
+msgid "HTTP"
+msgstr "HTTP"
+
+#:
+msgid "POP"
+msgstr "POP"
+
+#:
+msgid "NNTP"
+msgstr "NNTP"
+
+#:
+msgid "IMAP"
+msgstr "IMAP"
+
+#:
+msgid "TCP"
+msgstr "TCP"
+
+#:
+msgid "ICMP Ping"
+msgstr "ICMP Ping"
+
+#:
+msgid "ports"
+msgstr "端口"
+
+#:
+msgid "Discovery rules deleted"
+msgstr "自发现规则已删除"
+
+#:
+msgid "Discovery rule deleted"
+msgstr "自发现规则已删除"
+
+#:
+msgid "Cannot delete discovery rule"
+msgstr "无法删除自动发现的规则"
+
+#:
+msgid "Discovery rules updated"
+msgstr "自动发现的规则已更新"
+
+#:
+msgid "Discovery rule updated"
+msgstr "自动发现的规则已更新"
+
+#:
+msgid "Cannot update discovery rule"
+msgstr "无法更新自动发现的规则"
+
+#:
+msgid "Discovery rule added"
+msgstr "自动发现的规则已添加"
+
+#:
+msgid "Cannot add discovery rule"
+msgstr "无法添加自动发现的规则"
+
+#:
+msgid "STATUS OF DISCOVERY"
+msgstr "自动发现的状态"
+
+#:
+msgid "Status of discovery"
+msgstr "自动发现的状态"
+
+#:
+msgid "Enable selected discovery rules?"
+msgstr "启用所选的自发现规则?"
+
+#:
+msgid "Disable selected discovery rules?"
+msgstr "关闭所选的自发现规则?"
+
+#:
+msgid "Delete selected discovery rules?"
+msgstr "删除所选的自发现规则?"
+
+#:
+msgid "Discovered"
+msgstr "Discovered"
+
+#:
+msgid "Lost"
+msgstr "Lost"
+
+#:
+msgid "Uptime"
+msgstr "在线时间"
+
+#:
+msgid "Downtime"
+msgstr "下线时间"
+
+#:
+msgid "Discovered device"
+msgstr "Discovered device"
+
+#:
+msgid "Monitored host"
+msgstr "已监控的主机"
+
+#:
+msgid "Incorrect IP range."
+msgstr "错误的IP地址段"
+
+#:
+msgid "Details of scenario"
+msgstr "Details of scenario"
+
+#:
+msgid "DETAILS OF SCENARIO"
+msgstr "DETAILS OF SCENARIO"
+
+#:
+msgid "Speed"
+msgstr "Speed"
+
+#:
+msgid "Response code"
+msgstr "Response code"
+
+#:
+msgid "TOTAL"
+msgstr "TOTAL"
+
+#:
+msgid "Response time"
+msgstr "Response time"
+
+#:
+msgid "In progress"
+msgstr "In progress"
+
+#:
+msgid "of"
+msgstr "of"
+
+#:
+msgid "to"
+msgstr "to"
+
+#:
+msgid "In check"
+msgstr "In check"
+
+#:
+msgid "Idle till"
+msgstr "Idle till"
+
+#:
+msgid "Failed on"
+msgstr "Failed on"
+
+#:
+msgid "Failed"
+msgstr "Failed"
+
+#:
+msgid "Status of Web monitoring"
+msgstr "Web监控的状态"
+
+#:
+msgid "STATUS OF WEB MONITORING"
+msgstr "Web监控的状态"
+
+#:
+msgid "State"
+msgstr "State"
+
+#:
+msgid "Sort"
+msgstr "Sort"
+
+#:
+msgid "Status codes"
+msgstr "Status codes"
+
+#:
+msgid "Web"
+msgstr "Web"
+
+#:
+msgid "Configuration of Web monitoring"
+msgstr "Web监控的配置"
+
+#:
+msgid "CONFIGURATION OF WEB MONITORING"
+msgstr "WEB监控的配置"
+
+#:
+msgid "Scenario"
+msgstr "Scenario"
+
+#:
+msgid "Scenarios"
+msgstr "Scenarios"
+
+#:
+msgid "SCENARIOS"
+msgstr "SCENARIOS"
+
+#:
+msgid "Create scenario"
+msgstr "Create scenario"
+
+#:
+msgid "Hide disabled scenarios"
+msgstr "Hide disabled scenarios"
+
+#:
+msgid "Show disabled scenarios"
+msgstr "Show disabled scenarios"
+
+#:
+msgid "Number of steps"
+msgstr "Number of steps"
+
+#:
+msgid "Scenario deleted"
+msgstr "Scenario deleted"
+
+#:
+msgid "Scenario activated"
+msgstr "Scenario activated"
+
+#:
+msgid "Scenario disabled"
+msgstr "Scenario disabled"
+
+#:
+msgid "Delete scenario?"
+msgstr "Delete scenario?"
+
+#:
+msgid "Scenario updated"
+msgstr "Scenario updated"
+
+#:
+msgid "Cannot update scenario"
+msgstr "Cannot update scenario"
+
+#:
+msgid "Scenario added"
+msgstr "Scenario added"
+
+#:
+msgid "Cannot add scenario"
+msgstr "Cannot add scenario"
+
+#:
+msgid "Cannot delete scenario"
+msgstr "Cannot delete scenario"
+
+#:
+msgid "Agent"
+msgstr "Agent"
+
+#:
+msgid "Variables"
+msgstr "变量"
+
+#:
+msgid "Step"
+msgstr "Step"
+
+#:
+msgid "Steps"
+msgstr "Steps"
+
+#:
+msgid "Timeout"
+msgstr "Timeout"
+
+#:
+msgid "Post"
+msgstr "Post"
+
+#:
+msgid "Required"
+msgstr "Required"
+
+#:
+msgid "Step of scenario"
+msgstr "Step of scenario"
+
+#:
+msgid "Basic authentication"
+msgstr "Basic认证方式"
+
+#:
+msgid "Enable selected WEB scenarios?"
+msgstr "Enable selected WEB scenarios?"
+
+#:
+msgid "Disable selected WEB scenarios?"
+msgstr "Disable selected WEB scenarios?"
+
+#:
+msgid "Delete history of selected WEB scenarios?"
+msgstr "Delete history of selected WEB scenarios?"
+
+#:
+msgid "Delete selected WEB scenarios?"
+msgstr "Delete selected WEB scenarios?"
+
+#:
+msgid "Element"
+msgstr "Element"
+
+#:
+msgid "Elements"
+msgstr "Elements"
+
+#:
+msgid "Only host info"
+msgstr "Only host info"
+
+#:
+msgid "Export/Import"
+msgstr "导入/导出"
+
+#:
+msgid "Import file"
+msgstr "导入文件"
+
+#:
+msgid "Import"
+msgstr "导入"
+
+#:
+msgid "IMPORT"
+msgstr "导入"
+
+#:
+msgid "Export"
+msgstr "导出"
+
+#:
+msgid "Export selected"
+msgstr "导出所选"
+
+#:
+msgid "EXPORT"
+msgstr "导出"
+
+#:
+msgid "Preview"
+msgstr "Preview"
+
+#:
+msgid "Back"
+msgstr "返回"
+
+#:
+msgid "BACK"
+msgstr "返回"
+
+#:
+msgid "No data for export"
+msgstr "没有可导出的数据"
+
+#:
+msgid "no data"
+msgstr "没有数据"
+
+#:
+msgid "Rules"
+msgstr "Rules"
+
+#:
+msgid "Existing"
+msgstr "Existing"
+
+#:
+msgid "Missing"
+msgstr "Missing"
+
+#:
+msgid "Refresh"
+msgstr "Refresh"
+
+#:
+msgid "Imported"
+msgstr "Imported"
+
+#:
+msgid "successfully"
+msgstr "successfully"
+
+#:
+msgid "failed"
+msgstr "failed"
+
+#:
+msgid "Previous"
+msgstr "Previous"
+
+#:
+msgid "Next"
+msgstr "Next"
+
+#:
+msgid "Retry"
+msgstr "Retry"
+
+#:
+msgid "Finish"
+msgstr "Finish"
+
+#:
+msgid "Fail"
+msgstr "Fail"
+
+#:
+msgid "UPDATE"
+msgstr "UPDATE"
+
+#:
+msgid "Installation"
+msgstr "安装"
+
+#:
+msgid "New installation"
+msgstr "新安装"
+
+#:
+msgid "NEW INSTALLATION"
+msgstr "新安装"
+
+#:
+msgid "Installation/Update"
+msgstr "Installation/Update"
+
+#:
+msgid "Zabbix is temporarily unavailable"
+msgstr "Zabbix is temporarily unavailable"
+
+#:
+msgid "Multibyte String module required to run FrontEnd"
+msgstr "Multibyte String module required to run FrontEnd"
+
+#:
+msgid "Empty input parameter"
+msgstr "Empty input parameter"
+
+#:
+msgid "Time zone"
+msgstr "Time zone"
+
+#:
+msgid "Do not keep history older than (in days)"
+msgstr "Do not keep history older than (in days)"
+
+#:
+msgid "Do not keep trends older than (in days)"
+msgstr "Do not keep trends older than (in days)"
+
+#:
+msgid "Master node"
+msgstr "Master node"
+
+#:
+msgid "Child"
+msgstr "Child"
+
+#:
+msgid "Master"
+msgstr "Master"
+
+#:
+msgid "Node updated"
+msgstr "Node updated"
+
+#:
+msgid "Cannot update node"
+msgstr "Cannot update node"
+
+#:
+msgid "Node added"
+msgstr "Node added"
+
+#:
+msgid "Cannot add node"
+msgstr "Cannot add node"
+
+#:
+msgid "Node deleted"
+msgstr "Node deleted"
+
+#:
+msgid "Cannot delete node"
+msgstr "Cannot delete node"
+
+#:
+msgid "Current node"
+msgstr "Current node"
+
+#:
+msgid "Select Nodes"
+msgstr "Select Nodes"
+
+#:
+msgid "No events to acknowledge"
+msgstr "No events to acknowledge"
+
+#:
+msgid "Acknowledges"
+msgstr "Acknowledges"
+
+#:
+msgid "Acknowledge"
+msgstr "Acknowledge"
+
+#:
+msgid "Return"
+msgstr "Return"
+
+#:
+msgid "Acknowledge alarm by"
+msgstr "Acknowledge alarm by"
+
+#:
+msgid "Add comment by"
+msgstr "Add comment by"
+
+#:
+msgid "ALARM ACKNOWLEDGES"
+msgstr "ALARM ACKNOWLEDGES"
+
+#:
+msgid "Acknowledge added"
+msgstr "Acknowledge added"
+
+#:
+msgid "Cannot acknowledge event"
+msgstr "Cannot acknowledge event"
+
+#:
+msgid "----[BULK ACKNOWLEDGE]----"
+msgstr "----[BULK ACKNOWLEDGE]----"
+
+#:
+msgid "Bulk acknowledge"
+msgstr "Bulk acknowledge"
+
+#:
+msgid "Immediately"
+msgstr "Immediately"
+
+#:
+msgid "Infinity"
+msgstr "Infinity"
+
+#:
+msgid "Recovery message"
+msgstr "Recovery message"
+
+#:
+msgid "Configuration of actions"
+msgstr "配置操作过程"
+
+#:
+msgid "CONFIGURATION OF ACTIONS"
+msgstr "配置操作过程"
+
+#:
+msgid "Operation type"
+msgstr "Operation type"
+
+#:
+msgid "Send message"
+msgstr "Send message"
+
+#:
+msgid "Remote command"
+msgstr "Remote command"
+
+#:
+msgid "Remote commands"
+msgstr "Remote commands"
+
+#:
+msgid "Filter"
+msgstr "Filter"
+
+#:
+msgid "Trigger severity"
+msgstr "Trigger severity"
+
+#:
+msgid "Trigger value"
+msgstr "Trigger value"
+
+#:
+msgid "Time period"
+msgstr "时间范围"
+
+#:
+msgid "Maintenance status"
+msgstr "维护状态"
+
+#:
+msgid "maintenance"
+msgstr "维护"
+
+#:
+msgid "max value"
+msgstr "最大值"
+
+#:
+msgid "min value"
+msgstr "最小值"
+
+#:
+msgid "Trigger description"
+msgstr "触发器描述"
+
+#:
+msgid "Host name"
+msgstr "主机名"
+
+#:
+msgid "Action conditions"
+msgstr "操作的预设条件"
+
+#:
+msgid "Operation condition"
+msgstr "操作的先决条件"
+
+#:
+msgid "Conditions"
+msgstr "触发条件"
+
+#:
+msgid "Condition"
+msgstr "Condition"
+
+#:
+msgid "New condition"
+msgstr "新的触发条件"
+
+#:
+msgid "Action operations"
+msgstr "操作类型"
+
+#:
+msgid "Operations"
+msgstr "详细操作"
+
+#:
+msgid "Edit operation"
+msgstr "Edit operation"
+
+#:
+msgid "No conditions defined"
+msgstr "No conditions defined"
+
+#:
+msgid "Actions deleted"
+msgstr "Actions deleted"
+
+#:
+msgid "Cannot delete actions"
+msgstr "Cannot delete actions"
+
+#:
+msgid "No operations defined"
+msgstr "No operations defined"
+
+#:
+msgid "New"
+msgstr "新建"
+
+#:
+msgid "Add host"
+msgstr "添加主机"
+
+#:
+msgid "Remove host"
+msgstr "删除主机"
+
+#:
+msgid "Enable host"
+msgstr "启用主机"
+
+#:
+msgid "Disable host"
+msgstr "禁用主机"
+
+#:
+msgid "Link to template"
+msgstr "与模板关联"
+
+#:
+msgid "Unlink from template"
+msgstr "Unlink from template"
+
+#:
+msgid "Host template"
+msgstr "Host template"
+
+#:
+msgid "Event acknowledged"
+msgstr "Event acknowledged"
+
+#:
+msgid "Send only to"
+msgstr "Send only to"
+
+#:
+msgid "User medias"
+msgstr "User medias"
+
+#:
+msgid "Discovery check"
+msgstr "Discovery check"
+
+#:
+msgid "Discovered object"
+msgstr "Discovered object"
+
+#:
+msgid "Device"
+msgstr "Device"
+
+#:
+msgid "Auto registration"
+msgstr "Auto registration"
+
+#:
+msgid "Incorrect trigger"
+msgstr "错误的触发器"
+
+#:
+msgid "Incorrect host"
+msgstr "错误的主机"
+
+#:
+msgid "Incorrect period"
+msgstr "错误的时间段"
+
+#:
+msgid "Incorrect IP"
+msgstr "错误的IP"
+
+#:
+msgid "Incorrect discovery check"
+msgstr "Incorrect discovery check"
+
+#:
+msgid "Incorrect port"
+msgstr "错误的端口"
+
+#:
+msgid "Incorrect discovery status"
+msgstr "Incorrect discovery status"
+
+#:
+msgid "Incorrect condition type"
+msgstr "Incorrect condition type"
+
+#:
+msgid "Incorrect operation type"
+msgstr "Incorrect operation type"
+
+#:
+msgid "Incorrect user"
+msgstr "错误的用户"
+
+#:
+msgid "Incorrect steps"
+msgstr "Incorrect steps"
+
+#:
+msgid "selected actions?"
+msgstr "selected actions?"
+
+#:
+msgid "Actions"
+msgstr "操作"
+
+#:
+msgid "Logs"
+msgstr "日志"
+
+#:
+msgid "ACTIONS"
+msgstr "操作"
+
+#:
+msgid "Message actions"
+msgstr "Message actions"
+
+#:
+msgid "Command actions"
+msgstr "Command actions"
+
+#:
+msgid "Action added"
+msgstr "添加操作"
+
+#:
+msgid "Cannot add action"
+msgstr "无法添加操作"
+
+#:
+msgid "Action updated"
+msgstr "更新操作Action updated"
+
+#:
+msgid "Cannot update action"
+msgstr "无法更新操作Cannot update action"
+
+#:
+msgid "Action deleted"
+msgstr "删除操作Action deleted"
+
+#:
+msgid "Cannot delete action"
+msgstr "无法删除操作Cannot delete action"
+
+#:
+msgid "Send message to"
+msgstr "发送信息到"
+
+#:
+msgid "Run remote commands"
+msgstr "Run remote commands"
+
+#:
+msgid "Delay"
+msgstr "延迟"
+
+#:
+msgid "Subject"
+msgstr "主题"
+
+#:
+msgid "Recovery subject"
+msgstr "Recovery subject"
+
+#:
+msgid "Default message"
+msgstr "默认信息"
+
+#:
+msgid "Default subject"
+msgstr "默认主题"
+
+#:
+msgid "Message"
+msgstr "信息"
+
+#:
+msgid "On"
+msgstr "开"
+
+#:
+msgid "Off"
+msgstr "关"
+
+#:
+msgid "No actions defined"
+msgstr "没有定义操作"
+
+#:
+msgid "Single user"
+msgstr "单用户"
+
+#:
+msgid "User group"
+msgstr "用户组"
+
+#:
+msgid "Group"
+msgstr "组名"
+
+#:
+msgid "User"
+msgstr "用户"
+
+#:
+msgid "Not classified"
+msgstr "未分类"
+
+#:
+msgid "Information"
+msgstr "信息"
+
+#:
+msgid "Warning"
+msgstr "警告"
+
+#:
+msgid "Average"
+msgstr "Average"
+
+#:
+msgid "High"
+msgstr "严重"
+
+#:
+msgid "Disaster"
+msgstr "灾难"
+
+#:
+msgid "AND / OR"
+msgstr "AND / OR"
+
+#:
+msgid "AND"
+msgstr "AND"
+
+#:
+msgid "and"
+msgstr "and"
+
+#:
+msgid "&"
+msgstr "&"
+
+#:
+msgid "OR"
+msgstr "OR"
+
+#:
+msgid "or"
+msgstr "or"
+
+#:
+msgid "Type of calculation"
+msgstr "计算方式"
+
+#:
+msgid "Create Action"
+msgstr "Create Action"
+
+#:
+msgid "Delete selected action?"
+msgstr "Delete selected action?"
+
+#:
+msgid "like"
+msgstr "like"
+
+#:
+msgid "not like"
+msgstr "not like"
+
+#:
+msgid "in"
+msgstr "in"
+
+#:
+msgid "not in"
+msgstr "not in"
+
+#:
+msgid "Retries left"
+msgstr "Retries left"
+
+#:
+msgid "Actions since"
+msgstr "Actions since"
+
+#:
+msgid "Show all"
+msgstr "显示所有"
+
+#:
+msgid "Time"
+msgstr "时间"
+
+#:
+msgid "Status"
+msgstr "状态"
+
+#:
+msgid "Duration"
+msgstr "持续时间"
+
+#:
+msgid "TRUE"
+msgstr "TRUE"
+
+#:
+msgid "FALSE"
+msgstr "FALSE"
+
+#:
+msgid "UNKNOWN"
+msgstr "UNKNOWN"
+
+#:
+msgid "Type"
+msgstr "类型"
+
+#:
+msgid "Recipient(s)"
+msgstr "收件人"
+
+#:
+msgid "Recipient"
+msgstr "Recipient"
+
+#:
+msgid "Error"
+msgstr "错误"
+
+#:
+msgid "sent"
+msgstr "已发送"
+
+#:
+msgid "executed"
+msgstr "executed"
+
+#:
+msgid "not sent"
+msgstr "未发送"
+
+#:
+msgid "No actions found"
+msgstr "No actions found"
+
+#:
+msgid "Incorrect command"
+msgstr "Incorrect command"
+
+#:
+msgid "Unknown group name"
+msgstr "Unknown group name"
+
+#:
+msgid "Unknown host name"
+msgstr "Unknown host name"
+
+#:
+msgid "in command"
+msgstr "in command"
+
+#:
+msgid "Line"
+msgstr "Line"
+
+#:
+msgid "Filled region"
+msgstr "Filled region"
+
+#:
+msgid "Bold line"
+msgstr "Bold line"
+
+#:
+msgid "Dot"
+msgstr "Dot"
+
+#:
+msgid "Dashed line"
+msgstr "Dashed line"
+
+#:
+msgid "Gradient line"
+msgstr "Gradient line"
+
+#:
+msgid "Custom graphs"
+msgstr "Custom graphs"
+
+#:
+msgid "GRAPHS"
+msgstr "GRAPHS"
+
+#:
+msgid "Select graph to display"
+msgstr "请选择图表"
+
+#:
+msgid "Period"
+msgstr "时期"
+
+#:
+msgid "Select graph..."
+msgstr "选择图表..."
+
+#:
+msgid "Fullscreen"
+msgstr "全屏"
+
+#:
+msgid "View"
+msgstr "View"
+
+#:
+msgid "GUI"
+msgstr "GUI"
+
+#:
+msgid "Dropdown first entry"
+msgstr "Dropdown first entry"
+
+#:
+msgid "remember selected"
+msgstr "remember selected"
+
+#:
+msgid "Max count of elements to show inside table cell"
+msgstr "Max count of elements to show inside table cell"
+
+#:
+msgid "Search/Filter elements limit"
+msgstr "Search/Filter elements limit"
+
+#:
+msgid "Themes"
+msgstr "Themes"
+
+#:
+msgid "System default"
+msgstr "默认"
+
+#:
+msgid "Black & Blue"
+msgstr "黑&蓝"
+
+#:
+msgid "Original blue"
+msgstr "原始的蓝色"
+
+#:
+msgid "Default theme"
+msgstr "默认风格"
+
+#:
+msgid "Event acknowledges"
+msgstr "Event acknowledges"
+
+#:
+msgid "Days"
+msgstr "天数"
+
+#:
+msgid "Show events not older"
+msgstr "Show events not older"
+
+#:
+msgid "Show events max"
+msgstr "Show events max"
+
+#:
+msgid "Max count of events per trigger to show"
+msgstr "Max count of events per trigger to show"
+
+#:
+msgid "Cannot update value map"
+msgstr "Cannot update value map"
+
+#:
+msgid "Value map added"
+msgstr "Value map added"
+
+#:
+msgid "Cannot add value map"
+msgstr "Cannot add value map"
+
+#:
+msgid "Value map deleted"
+msgstr "Value map deleted"
+
+#:
+msgid "Cannot delete value map"
+msgstr "Cannot delete value map"
+
+#:
+msgid "Value map updated"
+msgstr "Value map updated"
+
+#:
+msgid "VALUE MAPPING"
+msgstr "VALUE MAPPING"
+
+#:
+msgid "Value mapping"
+msgstr "Value mapping"
+
+#:
+msgid "Value map"
+msgstr "Value map"
+
+#:
+msgid "Mapping"
+msgstr "Mapping"
+
+#:
+msgid "New mapping"
+msgstr "New mapping"
+
+#:
+msgid "No mapping defined"
+msgstr "No mapping defined"
+
+#:
+msgid "Create value map"
+msgstr "Create value map"
+
+#:
+msgid "Configuration of Zabbix"
+msgstr "ZABBIX配置"
+
+#:
+msgid "CONFIGURATION OF ZABBIX"
+msgstr "ZABBIX配置类型"
+
+#:
+msgid "Configuration updated"
+msgstr "Configuration updated"
+
+#:
+msgid "Configuration was not updated"
+msgstr "Configuration was not updated"
+
+#:
+msgid "Added new media type"
+msgstr "Added new media type"
+
+#:
+msgid "New media type was not added"
+msgstr "New media type was not added"
+
+#:
+msgid "Media type updated"
+msgstr "Media type updated"
+
+#:
+msgid "Media type was not updated"
+msgstr "Media type was not updated"
+
+#:
+msgid "Media type deleted"
+msgstr "Media type deleted"
+
+#:
+msgid "Media type was not deleted"
+msgstr "Media type was not deleted"
+
+#:
+msgid "Configuration"
+msgstr "系统配置"
+
+#:
+msgid "Administration"
+msgstr "高级配置"
+
+#:
+msgid "Do not keep actions older than (in days)"
+msgstr "Do not keep actions older than (in days)"
+
+#:
+msgid "Do not keep events older than (in days)"
+msgstr "Do not keep events older than (in days)"
+
+#:
+msgid "No media types defined"
+msgstr "未定义介质类型"
+
+#:
+msgid "SMTP server"
+msgstr "SMTP服务器"
+
+#:
+msgid "SMTP helo"
+msgstr "SMTP HELO"
+
+#:
+msgid "SMTP email"
+msgstr "SMTP发件人"
+
+#:
+msgid "Script name"
+msgstr "脚本名称"
+
+#:
+msgid "Delete selected media?"
+msgstr "Delete selected media?"
+
+#:
+msgid "Delete selected image?"
+msgstr "Delete selected image?"
+
+#:
+msgid "Housekeeper"
+msgstr "Housekeeper"
+
+#:
+msgid "Media types"
+msgstr "处理方法"
+
+#:
+msgid "Escalation rules"
+msgstr "Escalation rules"
+
+#:
+msgid "Enable escalations"
+msgstr "Enable escalations"
+
+#:
+msgid "Escalation"
+msgstr "Escalation"
+
+#:
+msgid "Escalation rule"
+msgstr "Escalation rule"
+
+#:
+msgid "Default"
+msgstr "默认"
+
+#:
+msgid "Images"
+msgstr "图片"
+
+#:
+msgid "Image"
+msgstr "图片"
+
+#:
+msgid "IMAGES"
+msgstr "图片"
+
+#:
+msgid "Icon"
+msgstr "小图标"
+
+#:
+msgid "No images defined"
+msgstr "未定义图片"
+
+#:
+msgid "Background"
+msgstr "背景"
+
+#:
+msgid "Upload"
+msgstr "上传"
+
+#:
+msgid "Image added"
+msgstr "图片已添加"
+
+#:
+msgid "Cannot add image"
+msgstr "无法添加图片"
+
+#:
+msgid "Image deleted"
+msgstr "图片已删除"
+
+#:
+msgid "Cannot delete image"
+msgstr "无法删除图片"
+
+#:
+msgid "Image updated"
+msgstr "图片已更新"
+
+#:
+msgid "Cannot update image"
+msgstr "无法更新图片"
+
+#:
+msgid "Other"
+msgstr "其他"
+
+#:
+msgid "Other parameters"
+msgstr "其他参数"
+
+#:
+msgid "Refresh unsupported items (in sec)"
+msgstr "更新不支持的监控项时间(秒)"
+
+#:
+msgid "Create Media Type"
+msgstr "创建处理方式"
+
+#:
+msgid "Create Image"
+msgstr "创建图片"
+
+#:
+msgid "Working time"
+msgstr "工作时间"
+
+#:
+msgid "User group for database down message"
+msgstr "User group for database down message"
+
+#:
+msgid "Incorrect group"
+msgstr "Incorrect group"
+
+#:
+msgid "Nothing to do"
+msgstr "Nothing to do"
+
+#:
+msgid "Incorrect work period"
+msgstr "作时间错误"
+
+#:
+msgid "Regular expressions"
+msgstr "正则表达式"
+
+#:
+msgid "Regular expression"
+msgstr "正则表达式"
+
+#:
+msgid "Expressions"
+msgstr "表达式"
+
+#:
+msgid "Expression"
+msgstr "表达式"
+
+#:
+msgid "Expected result"
+msgstr "期望的结果"
+
+#:
+msgid "Character string included"
+msgstr "Character string included"
+
+#:
+msgid "Any character string included"
+msgstr "Any character string included"
+
+#:
+msgid "Character string not included"
+msgstr "Character string not included"
+
+#:
+msgid "Result is TRUE"
+msgstr "Result is TRUE"
+
+#:
+msgid "Result is FALSE"
+msgstr "Result is FALSE"
+
+#:
+msgid "Expression type"
+msgstr "Expression type"
+
+#:
+msgid "New expression"
+msgstr "New expression"
+
+#:
+msgid "Case sensitive"
+msgstr "Case sensitive"
+
+#:
+msgid "Test"
+msgstr "测试"
+
+#:
+msgid "Delimiter"
+msgstr "分隔符"
+
+#:
+msgid "Test string"
+msgstr "Test string"
+
+#:
+msgid "Incorrect expression"
+msgstr "错误的表达式"
+
+#:
+msgid "New regular expression"
+msgstr "新表达式"
+
+#:
+msgid "Regular expression added"
+msgstr "表达式已添加"
+
+#:
+msgid "Cannot add regular expression"
+msgstr "无法添加表达式"
+
+#:
+msgid "Regular expression updated"
+msgstr "表达式已更新"
+
+#:
+msgid "Cannot update regular expression"
+msgstr "无法更新表达式"
+
+#:
+msgid "Regular expression deleted"
+msgstr "表达式已删除"
+
+#:
+msgid "Cannot delete regular expression"
+msgstr "无法删除表达式"
+
+#:
+msgid "Delete regular expression?"
+msgstr "删除表达式?"
+
+#:
+msgid "Delete selected regular expressions?"
+msgstr "删除所选表达式?"
+
+#:
+msgid "Group for discovered hosts"
+msgstr "Group for discovered hosts"
+
+#:
+msgid "Value maps are used to create a mapping between numeric values and string representations"
+msgstr "Value maps are used to create a mapping between numeric values and string representations"
+
+#:
+msgid "Delete selected value mapping?"
+msgstr "Delete selected value mapping?"
+
+#:
+msgid "Your setup is not configured for distributed monitoring"
+msgstr "当前配置没有启用分布式监控"
+
+#:
+msgid "CONFIGURATION OF NODES"
+msgstr "配置节点"
+
+#:
+msgid "DM"
+msgstr "节点管理"
+
+#:
+msgid "Node"
+msgstr "节点"
+
+#:
+msgid "Nodes"
+msgstr "节点"
+
+#:
+msgid "NODES"
+msgstr "节点"
+
+#:
+msgid "New node"
+msgstr "新节点"
+
+#:
+msgid "No nodes defined"
+msgstr "没有定义节点"
+
+#:
+msgid "All nodes"
+msgstr "所有节点"
+
+#:
+msgid "Delete selected node?"
+msgstr "删除所选节点?"
+
+#:
+msgid "Enable hosts monitored by selected proxies?"
+msgstr "Enable hosts monitored by selected proxies?"
+
+#:
+msgid "Disable hosts monitored by selected proxies?"
+msgstr "Disable hosts monitored by selected proxies?"
+
+#:
+msgid "Delete selected proxies?"
+msgstr "删除所选代理?"
+
+#:
+msgid "CONFIGURATION OF PROXIES"
+msgstr "配置代理服务器"
+
+#:
+msgid "Delete selected proxy?"
+msgstr "删除所选代理?"
+
+#:
+msgid "Authentication"
+msgstr "认证"
+
+#:
+msgid "Authentication to Zabbix"
+msgstr "Zabbix 的认证方式"
+
+#:
+msgid "Base DN"
+msgstr "基础 DN"
+
+#:
+msgid "Bind DN"
+msgstr "绑定 DN"
+
+#:
+msgid "Bind Password"
+msgstr "绑定密码"
+
+#:
+msgid "Search attribute"
+msgstr "定位属性"
+
+#:
+msgid "was not"
+msgstr "was not"
+
+#:
+msgid "successful"
+msgstr "successful"
+
+#:
+msgid "must be valid"
+msgstr "必须为有效/"
+
+#:
+msgid "LDAP Authentication"
+msgstr "LDAP认证"
+
+#:
+msgid "HTTP Authentication"
+msgstr "HTTP认证"
+
+#:
+msgid "Zabbix Internal authentication"
+msgstr "Zabbix 的内部验证方式"
+
+#:
+msgid "Default authentication"
+msgstr "默认认证方式"
+
+#:
+msgid "Switching HTTP authentication will reset all current sessions! Continue?"
+msgstr "Switching HTTP authentication will reset all current sessions! Continue?"
+
+#:
+msgid "Switching LDAP authentication will reset all current sessions! Continue?"
+msgstr "Switching LDAP authentication will reset all current sessions! Continue?"
+
+#:
+msgid "No permissions !"
+msgstr "权限不足!"
+
+#:
+msgid "LATEST DATA"
+msgstr "最新数据"
+
+#:
+msgid "All"
+msgstr "All"
+
+#:
+msgid "all"
+msgstr "all"
+
+#:
+msgid "- all -"
+msgstr "- all -"
+
+#:
+msgid "- other -"
+msgstr "- other -"
+
+#:
+msgid "not selected"
+msgstr "not selected"
+
+#:
+msgid "Graph"
+msgstr "图形显示"
+
+#:
+msgid "Zabbix"
+msgstr "Zabbix"
+
+#:
+msgid "Copyright 2001-2010 by"
+msgstr "Copyright 2001-2006 by"
+
+#:
+msgid "Connected as"
+msgstr "Connected as"
+
+#:
+msgid "Not connected"
+msgstr "Not connected"
+
+#:
+msgid "SIA Zabbix"
+msgstr "SIA Zabbix"
+
+#:
+msgid "Graphs copied"
+msgstr "Graphs copied"
+
+#:
+msgid "Cannot copy graphs"
+msgstr "Cannot copy graphs"
+
+#:
+msgid "Item added"
+msgstr "监控项已添加"
+
+#:
+msgid "Item updated"
+msgstr "监控项已更新"
+
+#:
+msgid "Items updated"
+msgstr "监控项已更新"
+
+#:
+msgid "Item does not exist"
+msgstr "监控项不存在"
+
+#:
+msgid "Sort by"
+msgstr "排序方式"
+
+#:
+msgid "Parameter"
+msgstr "参数"
+
+#:
+msgid "Colour"
+msgstr "颜色"
+
+#:
+msgid "Up"
+msgstr "Up"
+
+#:
+msgid "Down"
+msgstr "Down"
+
+#:
+msgid "New item for the graph"
+msgstr "New item for the graph"
+
+#:
+msgid "Update item for the graph"
+msgstr "Update item for the graph"
+
+#:
+msgid "Sort order (0->100)"
+msgstr "Sort order (0->100)"
+
+#:
+msgid "Y axis side"
+msgstr "纵轴"
+
+#:
+msgid "Axis side"
+msgstr "Axis side"
+
+#:
+msgid "Left"
+msgstr "左侧"
+
+#:
+msgid "Function"
+msgstr "Function"
+
+#:
+msgid "min"
+msgstr "最小"
+
+#:
+msgid "avg"
+msgstr "平均"
+
+#:
+msgid "max"
+msgstr "最大"
+
+#:
+msgid "last"
+msgstr "最新"
+
+#:
+msgid "Draw style"
+msgstr "Draw style"
+
+#:
+msgid "Simple"
+msgstr "Simple"
+
+#:
+msgid "Graph type"
+msgstr "Graph type"
+
+#:
+msgid "Stacked"
+msgstr "Stacked"
+
+#:
+msgid "Normal"
+msgstr "Normal"
+
+#:
+msgid "Pie"
+msgstr "Pie"
+
+#:
+msgid "Exploded"
+msgstr "Exploded"
+
+#:
+msgid "Aggregated"
+msgstr "Aggregated"
+
+#:
+msgid "Aggregated periods count"
+msgstr "Aggregated periods count"
+
+#:
+msgid "add graph items first"
+msgstr "add graph items first"
+
+#:
+msgid "Title"
+msgstr "Title"
+
+#:
+msgid "Percentile line"
+msgstr "Percentile line"
+
+#:
+msgid "Configuration of graphs"
+msgstr "图表显示配置"
+
+#:
+msgid "CONFIGURATION OF GRAPHS"
+msgstr "图表显示配置"
+
+#:
+msgid "Graph added"
+msgstr "图表已添加"
+
+#:
+msgid "Graph updated"
+msgstr "图表已更新"
+
+#:
+msgid "Cannot update graph"
+msgstr "无法更新图表"
+
+#:
+msgid "Graph deleted"
+msgstr "图表已删除"
+
+#:
+msgid "Cannot delete graph"
+msgstr "无法删除图表"
+
+#:
+msgid "Graphs deleted"
+msgstr "图表已删除"
+
+#:
+msgid "Cannot delete graphs"
+msgstr "无法删除图表"
+
+#:
+msgid "Cannot add graph"
+msgstr "无法添加图表"
+
+#:
+msgid "Cannot add more than one item with type \"Graph sum\""
+msgstr "Cannot add another item with type \"Graph sum\""
+
+#:
+msgid "Id"
+msgstr "ID"
+
+#:
+msgid "No graphs defined"
+msgstr "No graphs defined"
+
+#:
+msgid "No graph defined"
+msgstr "No graph defined"
+
+#:
+msgid "Delete graph?"
+msgstr "Delete graph?"
+
+#:
+msgid "Y axis MIN value"
+msgstr "纵轴最小值"
+
+#:
+msgid "Y axis MAX value"
+msgstr "纵轴最大值"
+
+#:
+msgid "Calculated"
+msgstr "Calculated"
+
+#:
+msgid "Fixed"
+msgstr "Fixed"
+
+#:
+msgid "Create Graph"
+msgstr "创建图表"
+
+#:
+msgid "Show working time"
+msgstr "Show working time"
+
+#:
+msgid "Show triggers"
+msgstr "Show triggers"
+
+#:
+msgid "3D view"
+msgstr "3D view"
+
+#:
+msgid "Legend"
+msgstr "Legend"
+
+#:
+msgid "Graph sum"
+msgstr "Graph sum"
+
+#:
+msgid "Graph item"
+msgstr "Graph item"
+
+#:
+msgid "Items required for graph"
+msgstr "Items required for graph"
+
+#:
+msgid "Templated graph"
+msgstr "Templated graph"
+
+#:
+msgid "No target selected"
+msgstr "No target selected"
+
+#:
+msgid "Delete selected graphs?"
+msgstr "Delete selected graphs?"
+
+#:
+msgid "seconds"
+msgstr "seconds"
+
+#:
+msgid "sec"
+msgstr "sec"
+
+#:
+msgid "Select rows with value like"
+msgstr "Select rows with value like"
+
+#:
+msgid "Last hour graph"
+msgstr "最近一小时"
+
+#:
+msgid "Last week graph"
+msgstr "Last week graph"
+
+#:
+msgid "Last month graph"
+msgstr "Last month graph"
+
+#:
+msgid "500 latest values"
+msgstr "最近500个值"
+
+#:
+msgid "Timestamp"
+msgstr "时间戳"
+
+#:
+msgid "Local"
+msgstr "Local"
+
+#:
+msgid "Source"
+msgstr "Source"
+
+#:
+msgid "Event ID"
+msgstr "Event ID"
+
+#:
+msgid "log files"
+msgstr "log files"
+
+#:
+msgid "Remove selected"
+msgstr "Remove selected"
+
+#:
+msgid "Show selected"
+msgstr "显示所选"
+
+#:
+msgid "Hide selected"
+msgstr "隐藏所选"
+
+#:
+msgid "Mark selected"
+msgstr "标记所选"
+
+#:
+msgid "Mark others"
+msgstr "标记其他"
+
+#:
+msgid "as Red"
+msgstr "as Red"
+
+#:
+msgid "as Green"
+msgstr "as Green"
+
+#:
+msgid "as Blue"
+msgstr "as Blue"
+
+#:
+msgid "Failure Audit"
+msgstr "Failure Audit"
+
+#:
+msgid "Success Audit"
+msgstr "Success Audit"
+
+#:
+msgid "Maintenance"
+msgstr "预维护"
+
+#:
+msgid "Maintenance added"
+msgstr "Maintenance added"
+
+#:
+msgid "Maintenance updated"
+msgstr "Maintenance updated"
+
+#:
+msgid "Maintenance deleted"
+msgstr "Maintenance deleted"
+
+#:
+msgid "Delete selected maintenance periods?"
+msgstr "Delete selected maintenance periods?"
+
+#:
+msgid "Hosts in maintenance"
+msgstr "Hosts in maintenance"
+
+#:
+msgid "Groups in maintenance"
+msgstr "Groups in maintenance"
+
+#:
+msgid "Cannot add maintenance"
+msgstr "Cannot add maintenance"
+
+#:
+msgid "Cannot update maintenance"
+msgstr "Cannot update maintenance"
+
+#:
+msgid "Cannot delete maintenance"
+msgstr "Cannot delete maintenance"
+
+#:
+msgid "Maintenance period length"
+msgstr "Maintenance period length"
+
+#:
+msgid "Maintenance periods"
+msgstr "维护的时间段"
+
+#:
+msgid "MAINTENANCE PERIODS"
+msgstr "维护的时间段"
+
+#:
+msgid "New maintenance period"
+msgstr "New maintenance period"
+
+#:
+msgid "Edit maintenance period"
+msgstr "Edit maintenance period"
+
+#:
+msgid "Create maintenance period"
+msgstr "Create maintenance period"
+
+#:
+msgid "Maintenance type"
+msgstr "Maintenance type"
+
+#:
+msgid "Expired"
+msgstr "Expired"
+
+#:
+msgid "With data collection"
+msgstr "With data collection"
+
+#:
+msgid "No data collection"
+msgstr "No data collection"
+
+#:
+msgid "Normal maintenance"
+msgstr "Normal maintenance"
+
+#:
+msgid "No data maintenance"
+msgstr "No data maintenance"
+
+#:
+msgid "Delete maintenance period?"
+msgstr "Delete maintenance period?"
+
+#:
+msgid "Active since"
+msgstr "Active since"
+
+#:
+msgid "Active till"
+msgstr "Active till"
+
+#:
+msgid "Period type"
+msgstr "Period type"
+
+#:
+msgid "Schedule"
+msgstr "Schedule"
+
+#:
+msgid "Next run"
+msgstr "Next run"
+
+#:
+msgid "Date"
+msgstr "Date"
+
+#:
+msgid "One time only"
+msgstr "One time only"
+
+#:
+msgid "Day of week"
+msgstr "Day of week"
+
+#:
+msgid "Day of month"
+msgstr "Day of month"
+
+#:
+msgid "Every day(s)"
+msgstr "Every day(s)"
+
+#:
+msgid "Every week(s)"
+msgstr "Every week(s)"
+
+#:
+msgid "First"
+msgstr "First"
+
+#:
+msgid "Second"
+msgstr "Second"
+
+#:
+msgid "Third"
+msgstr "Third"
+
+#:
+msgid "Fourth"
+msgstr "Fourth"
+
+#:
+msgid "At"
+msgstr "At"
+
+#:
+msgid "January"
+msgstr "January"
+
+#:
+msgid "February"
+msgstr "February"
+
+#:
+msgid "March"
+msgstr "March"
+
+#:
+msgid "April"
+msgstr "April"
+
+#:
+msgid "May"
+msgstr "May"
+
+#:
+msgid "June"
+msgstr "June"
+
+#:
+msgid "July"
+msgstr "July"
+
+#:
+msgid "August"
+msgstr "August"
+
+#:
+msgid "September"
+msgstr "September"
+
+#:
+msgid "October"
+msgstr "October"
+
+#:
+msgid "November"
+msgstr "November"
+
+#:
+msgid "December"
+msgstr "December"
+
+#:
+msgid "Incorrect maintenance period"
+msgstr "Incorrect maintenance period"
+
+#:
+msgid "Incorrect maintenance date"
+msgstr "Incorrect maintenance date"
+
+#:
+msgid "Incorrect maintenance day period"
+msgstr "Incorrect maintenance day period"
+
+#:
+msgid "Incorrect maintenance week period"
+msgstr "Incorrect maintenance week period"
+
+#:
+msgid "Incorrect maintenance month period"
+msgstr "Incorrect maintenance month period"
+
+#:
+msgid "Incorrect maintenance days of week"
+msgstr "Incorrect maintenance days of week"
+
+#:
+msgid "CONFIGURATION OF HOST GROUPS"
+msgstr "配置主机组"
+
+#:
+msgid "Delete selected group?"
+msgstr "删除所选组?"
+
+#:
+msgid "Enable selected Host Groups?"
+msgstr "Enable selected Host Groups?"
+
+#:
+msgid "Disable selected Host Groups?"
+msgstr "Disable selected Host Groups?"
+
+#:
+msgid "Delete selected Host Groups?"
+msgstr "Delete selected Host Groups?"
+
+#:
+msgid "Delete selected groups"
+msgstr "Delete selected groups"
+
+#:
+msgid "Macros"
+msgstr "Macros"
+
+#:
+msgid "Wrong macro"
+msgstr "Wrong macro"
+
+#:
+msgid "Macro name is too long, should not exceed 64 chars."
+msgstr "Macro name is too long, should not exceed 64 chars."
+
+#:
+msgid "Macro value is too long, should not exceed 255 chars."
+msgstr "Macro value is too long, should not exceed 255 chars."
+
+#:
+msgid "Macro already exists"
+msgstr "Macro already exists"
+
+#:
+msgid "New macro"
+msgstr "New macro"
+
+#:
+msgid "Empty macro value"
+msgstr "Empty macro value"
+
+#:
+msgid "No macros defined"
+msgstr "No macros defined"
+
+#:
+msgid "Macro added"
+msgstr "Macro added"
+
+#:
+msgid "Macros deleted"
+msgstr "Macros deleted"
+
+#:
+msgid "Cannot add macro"
+msgstr "Cannot add macro"
+
+#:
+msgid "Cannot delete macros"
+msgstr "Cannot delete macros"
+
+#:
+msgid "Hosts list"
+msgstr "Hosts list"
+
+#:
+msgid "In"
+msgstr "In"
+
+#:
+msgid "Application"
+msgstr "应用程序"
+
+#:
+msgid "Applications"
+msgstr "应用程序"
+
+#:
+msgid "APPLICATIONS"
+msgstr "应用程序"
+
+#:
+msgid "Create application"
+msgstr "创建应用程序"
+
+#:
+msgid "Application updated"
+msgstr "应用程序已更新"
+
+#:
+msgid "Cannot update application"
+msgstr "无法更新应用程序"
+
+#:
+msgid "Application added"
+msgstr "应用程序已添加"
+
+#:
+msgid "Cannot add application"
+msgstr "无法添加应用程序"
+
+#:
+msgid "Application deleted"
+msgstr "应用程序已删除"
+
+#:
+msgid "Cannot delete application"
+msgstr "无法删除应用程序"
+
+#:
+msgid "No applications defined"
+msgstr "没有定义应用程序"
+
+#:
+msgid "No templates linked"
+msgstr "没有与模板关联"
+
+#:
+msgid "Hosts"
+msgstr "主机"
+
+#:
+msgid "Items"
+msgstr "监控项"
+
+#:
+msgid "ITEMS"
+msgstr "ITEMS"
+
+#:
+msgid "Triggers"
+msgstr "触发器"
+
+#:
+msgid "Graphs"
+msgstr "图形显示"
+
+#:
+msgid "Host added"
+msgstr "已添加主机"
+
+#:
+msgid "Cannot add host"
+msgstr "无法添加主机"
+
+#:
+msgid "Items copied"
+msgstr "Items copied"
+
+#:
+msgid "Cannot copy items"
+msgstr "Cannot copy items"
+
+#:
+msgid "Host updated"
+msgstr "主机已更新"
+
+#:
+msgid "Cannot update host"
+msgstr "无法更新主机"
+
+#:
+msgid "Cannot update"
+msgstr "Cannot update"
+
+#:
+msgid "Host status updated"
+msgstr "主机状态已更新"
+
+#:
+msgid "Cannot update host status"
+msgstr "无法更新主机状态"
+
+#:
+msgid "Host deleted"
+msgstr "已删除主机"
+
+#:
+msgid "Cannot delete host"
+msgstr "无法删除主机"
+
+#:
+msgid "CONFIGURATION OF HOSTS"
+msgstr "主机的配置"
+
+#:
+msgid "CONFIGURATION OF TEMPLATES"
+msgstr "模板的配置"
+
+#:
+msgid "CONFIGURATION OF APPLICATIONS"
+msgstr "应用程序的配置"
+
+#:
+msgid "CONFIGURATION OF MAINTENANCE PERIODS"
+msgstr "维护时间段的配置"
+
+#:
+msgid "HOST GROUPS"
+msgstr "主机组"
+
+#:
+msgid "No host groups defined"
+msgstr "没有定义主机组"
+
+#:
+msgid "No hosts defined"
+msgstr "没有定义主机"
+
+#:
+msgid "No templates defined"
+msgstr "没有定义模板"
+
+#:
+msgid "No proxies defined"
+msgstr "没有定义代理主机"
+
+#:
+msgid "HOSTS"
+msgstr "主机"
+
+#:
+msgid "Host"
+msgstr "主机"
+
+#:
+msgid "Connect to"
+msgstr "Connect to"
+
+#:
+msgid "DNS"
+msgstr "主机域名"
+
+#:
+msgid "IP"
+msgstr "IP地址"
+
+#:
+msgid "Port"
+msgstr "端口"
+
+#:
+msgid "Zabbix agent port"
+msgstr "Zabbix客户端端口"
+
+#:
+msgid "Monitored"
+msgstr "检测中"
+
+#:
+msgid "Not monitored"
+msgstr "未被检测"
+
+#:
+msgid "Template"
+msgstr "模本"
+
+#:
+msgid "Deleted"
+msgstr "已删除"
+
+#:
+msgid "Unknown"
+msgstr "未知"
+
+#:
+msgid "Groups"
+msgstr "组"
+
+#:
+msgid " - all groups - "
+msgstr "- all groups -"
+
+#:
+msgid "All groups"
+msgstr "All groups"
+
+#:
+msgid "No groups defined"
+msgstr "No groups defined"
+
+#:
+msgid "New group"
+msgstr "新主机组"
+
+#:
+msgid "DNS name"
+msgstr "DNS name"
+
+#:
+msgid "IP address"
+msgstr "IP地址"
+
+#:
+msgid "Link additional templates"
+msgstr "Link additional templates"
+
+#:
+msgid "Replace linked templates"
+msgstr "Replace linked templates"
+
+#:
+msgid "Use IPMI"
+msgstr "Use IPMI"
+
+#:
+msgid "IPMI IP address"
+msgstr "IPMI IP address"
+
+#:
+msgid "IPMI port"
+msgstr "IPMI port"
+
+#:
+msgid "IPMI authentication algorithm"
+msgstr "IPMI authentication algorithm"
+
+#:
+msgid "None"
+msgstr "None"
+
+#:
+msgid "MD2"
+msgstr "MD2"
+
+#:
+msgid "MD5"
+msgstr "MD5"
+
+#:
+msgid "Straight"
+msgstr "Straight"
+
+#:
+msgid "OEM"
+msgstr "OEM"
+
+#:
+msgid "RMCP+"
+msgstr "RMCP+"
+
+#:
+msgid "IPMI privilege level"
+msgstr "IPMI privilege level"
+
+#:
+msgid "Callback"
+msgstr "Callback"
+
+#:
+msgid "Operator"
+msgstr "Operator"
+
+#:
+msgid "Admin"
+msgstr "Admin"
+
+#:
+msgid "IPMI username"
+msgstr "IPMI username"
+
+#:
+msgid "IPMI password"
+msgstr "IPMI password"
+
+#:
+msgid "Use profile"
+msgstr "Use profile"
+
+#:
+msgid "Delete selected host?"
+msgstr "Delete selected host?"
+
+#:
+msgid "Delete selected with linked elements"
+msgstr "Delete selected with linked elements"
+
+#:
+msgid "Group name"
+msgstr "用户组"
+
+#:
+msgid "Host group"
+msgstr "主机组"
+
+#:
+msgid "Host groups"
+msgstr "主机组"
+
+#:
+msgid "Update"
+msgstr "更新"
+
+#:
+msgid "Availability"
+msgstr "可用性"
+
+#:
+msgid "Available"
+msgstr "可用"
+
+#:
+msgid "Not available"
+msgstr "不可用"
+
+#:
+msgid "Proxies"
+msgstr "代理主机"
+
+#:
+msgid "PROXIES"
+msgstr "代理主机"
+
+#:
+msgid "Proxy"
+msgstr "代理主机"
+
+#:
+msgid "Create Proxy"
+msgstr "创建代理主机"
+
+#:
+msgid "Proxy name"
+msgstr "代理主机名"
+
+#:
+msgid "Last seen (age)"
+msgstr "Last seen (age)"
+
+#:
+msgid "Host macro"
+msgstr "Host macro"
+
+#:
+msgid "doesn't exist"
+msgstr "doesn't exist"
+
+#:
+msgid "Enable selected hosts?"
+msgstr "Enable selected hosts?"
+
+#:
+msgid "Disable selected hosts?"
+msgstr "Disable selected hosts?"
+
+#:
+msgid "Delete selected hosts?"
+msgstr "删除选中主机?"
+
+#:
+msgid "Updated status of host"
+msgstr "Updated status of host"
+
+#:
+msgid "Templates list"
+msgstr "Templates list"
+
+#:
+msgid "New template added"
+msgstr "New template added"
+
+#:
+msgid "Cannot add template"
+msgstr "Cannot add template"
+
+#:
+msgid "Template updated"
+msgstr "Template updated"
+
+#:
+msgid "Cannot update template"
+msgstr "Cannot update template"
+
+#:
+msgid "Linked templates"
+msgstr "Linked templates"
+
+#:
+msgid "Linked to"
+msgstr "Linked to"
+
+#:
+msgid "Template deleted"
+msgstr "Template deleted"
+
+#:
+msgid "Cannot delete template"
+msgstr "Cannot delete template"
+
+#:
+msgid "Link with template"
+msgstr "Link with template"
+
+#:
+msgid "Delete and clear"
+msgstr "Delete AND clear"
+
+#:
+msgid "Delete selected templates?"
+msgstr "Delete selected templates?"
+
+#:
+msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
+msgstr "Warning: this will delete selected templates and clear all linked hosts"
+
+#:
+msgid "Host profile"
+msgstr "主机配置"
+
+#:
+msgid "Device type"
+msgstr "设备类型"
+
+#:
+msgid "OS"
+msgstr "操作系统"
+
+#:
+msgid "SerialNo"
+msgstr "SerialNo"
+
+#:
+msgid "Tag"
+msgstr "标签"
+
+#:
+msgid "Hardware"
+msgstr "硬件环境"
+
+#:
+msgid "Software"
+msgstr "软件环境"
+
+#:
+msgid "Contact"
+msgstr "联系人"
+
+#:
+msgid "Location"
+msgstr "主机位置"
+
+#:
+msgid "Notes"
+msgstr "备注"
+
+#:
+msgid "MAC Address"
+msgstr "MAC地址"
+
+#:
+msgid "Add to group"
+msgstr "添加到组"
+
+#:
+msgid "Delete from group"
+msgstr "从组中删除"
+
+#:
+msgid "Update in group"
+msgstr "更新组"
+
+#:
+msgid "Create Host"
+msgstr "创建主机"
+
+#:
+msgid "Create Template"
+msgstr "创建模板"
+
+#:
+msgid "Template linkage"
+msgstr "模板间的关联"
+
+#:
+msgid "Templates"
+msgstr "模板"
+
+#:
+msgid "TEMPLATES"
+msgstr "模板"
+
+#:
+msgid "Unlink"
+msgstr "取消关联"
+
+#:
+msgid "Cannot unlink template"
+msgstr "无法关联模板"
+
+#:
+msgid "Cannot link template"
+msgstr "无法与模板关联"
+
+#:
+msgid "Unlink and clear"
+msgstr "取消关联并清理"
+
+#:
+msgid "Monitored by proxy"
+msgstr "由代理监控"
+
+#:
+msgid "Use extended profile"
+msgstr "使用扩展配置"
+
+#:
+msgid "Alias"
+msgstr "Alias"
+
+#:
+msgid "Device Chassis"
+msgstr "Device Chassis"
+
+#:
+msgid "OS (Full Details)"
+msgstr "OS (Full Details)"
+
+#:
+msgid "OS (Short)"
+msgstr "OS (Short)"
+
+#:
+msgid "HW Architecture"
+msgstr "HW Architecture"
+
+#:
+msgid "Serial Number"
+msgstr "Serial Number"
+
+#:
+msgid "Model Number"
+msgstr "Model Number"
+
+#:
+msgid "Asset Tag"
+msgstr "Asset Tag"
+
+#:
+msgid "Device Vendor"
+msgstr "Device Vendor"
+
+#:
+msgid "Device Contract Number"
+msgstr "Device Contract Number"
+
+#:
+msgid "Installer Name"
+msgstr "Installer Name"
+
+#:
+msgid "Device Deployment Status"
+msgstr "Device Deployment Status"
+
+#:
+msgid "Software Application #1"
+msgstr "Software Application #1"
+
+#:
+msgid "Software Application #2"
+msgstr "Software Application #2"
+
+#:
+msgid "Software Application #3"
+msgstr "Software Application #3"
+
+#:
+msgid "Software Application #4"
+msgstr "Software Application #4"
+
+#:
+msgid "Software Application #5"
+msgstr "Software Application #5"
+
+#:
+msgid "URL #1"
+msgstr "URL #1"
+
+#:
+msgid "URL #2"
+msgstr "URL #2"
+
+#:
+msgid "URL #3"
+msgstr "URL #3"
+
+#:
+msgid "Device Port Connections"
+msgstr "Device Port Connections"
+
+#:
+msgid "Device Notes"
+msgstr "Device Notes"
+
+#:
+msgid "Device Hardware"
+msgstr "Device Hardware"
+
+#:
+msgid "Device Software"
+msgstr "Device Software"
+
+#:
+msgid "Host Subnet Mask"
+msgstr "Host Subnet Mask"
+
+#:
+msgid "Host Router"
+msgstr "Host Router"
+
+#:
+msgid "Host MAC Address"
+msgstr "Host MAC Address"
+
+#:
+msgid "OOB IP Address"
+msgstr "OOB IP Address"
+
+#:
+msgid "OOB Subnet Mask"
+msgstr "OOB Subnet Mask"
+
+#:
+msgid "OOB Router"
+msgstr "OOB Router"
+
+#:
+msgid "Date HW Purchased"
+msgstr "Date HW Purchased"
+
+#:
+msgid "Date HW Installed"
+msgstr "Date HW Installed"
+
+#:
+msgid "Date HW Maintenance Expires"
+msgstr "Date HW Maintenance Expires"
+
+#:
+msgid "Date HW Decommissioned"
+msgstr "Date HW Decommissioned"
+
+#:
+msgid "Site Address 1"
+msgstr "Site Address 1"
+
+#:
+msgid "Site Address 2"
+msgstr "Site Address 2"
+
+#:
+msgid "Site Address 3"
+msgstr "Site Address 3"
+
+#:
+msgid "Site City"
+msgstr "Site City"
+
+#:
+msgid "Site State / Province"
+msgstr "Site State / Province"
+
+#:
+msgid "Site Country"
+msgstr "Site Country"
+
+#:
+msgid "Site Zip / Postal"
+msgstr "Site Zip / Postal"
+
+#:
+msgid "Site Rack Location"
+msgstr "Site Rack Location"
+
+#:
+msgid "Site Notes"
+msgstr "Site Notes"
+
+#:
+msgid "Primary POC Name"
+msgstr "Primary POC Name"
+
+#:
+msgid "Primary POC Email"
+msgstr "Primary POC Email"
+
+#:
+msgid "Primary POC Phone 1"
+msgstr "Primary POC Phone 1"
+
+#:
+msgid "Primary POC Phone 2"
+msgstr "Primary POC Phone 2"
+
+#:
+msgid "Primary POC Cell"
+msgstr "Primary POC Cell"
+
+#:
+msgid "Primary POC Screen Name"
+msgstr "Primary POC Screen Name"
+
+#:
+msgid "Primary POC Comments"
+msgstr "Primary POC Comments"
+
+#:
+msgid "Secondary POC Name"
+msgstr "Secondary POC Name"
+
+#:
+msgid "Secondary POC Email"
+msgstr "Secondary POC Email"
+
+#:
+msgid "Secondary POC Phone 1"
+msgstr "Secondary POC Phone 1"
+
+#:
+msgid "Secondary POC Phone 2"
+msgstr "Secondary POC Phone 2"
+
+#:
+msgid "Secondary POC Cell"
+msgstr "Secondary POC Cell"
+
+#:
+msgid "Secondary POC Screen Name"
+msgstr "Secondary POC Screen Name"
+
+#:
+msgid "Secondary POC Comments"
+msgstr "Secondary POC Comments"
+
+#:
+msgid "Templated items"
+msgstr "Templated items"
+
+#:
+msgid "Not Templated items"
+msgstr "Not Templated items"
+
+#:
+msgid "With triggers"
+msgstr "With triggers"
+
+#:
+msgid "Without triggers"
+msgstr "Without triggers"
+
+#:
+msgid "Types"
+msgstr "Types"
+
+#:
+msgid "No items defined"
+msgstr "No items defined"
+
+#:
+msgid "No item defined"
+msgstr "No item defined"
+
+#:
+msgid "History cleared"
+msgstr "History cleared"
+
+#:
+msgid "Clear history for selected"
+msgstr "Clear history for selected"
+
+#:
+msgid "Clear history"
+msgstr "Clear history"
+
+#:
+msgid "Cannot clear history"
+msgstr "Cannot clear history"
+
+#:
+msgid "Configuration of items"
+msgstr "配置监控项"
+
+#:
+msgid "CONFIGURATION OF ITEMS"
+msgstr "配置检测监控项"
+
+#:
+msgid "Cannot update item"
+msgstr "Cannot update item"
+
+#:
+msgid "Status updated"
+msgstr "状态已更新"
+
+#:
+msgid "Cannot update status"
+msgstr "Cannot update status"
+
+#:
+msgid "Cannot add item"
+msgstr "Cannot add item"
+
+#:
+msgid "Item deleted"
+msgstr "Item deleted"
+
+#:
+msgid "Cannot delete item"
+msgstr "Cannot delete item"
+
+#:
+msgid "Items deleted"
+msgstr "Items deleted"
+
+#:
+msgid "Cannot delete items"
+msgstr "Cannot delete items"
+
+#:
+msgid "Items activated"
+msgstr "Items activated"
+
+#:
+msgid "Items disabled"
+msgstr "Items disabled"
+
+#:
+msgid "Key"
+msgstr "Keyֵ"
+
+#:
+msgid "Description"
+msgstr "检测内容"
+
+#:
+msgid "Update interval"
+msgstr "更新间隔s"
+
+#:
+msgid "Interval"
+msgstr "间隔"
+
+#:
+msgid "History"
+msgstr "访问记录"
+
+#:
+msgid "Trends"
+msgstr "Trends"
+
+#:
+msgid "Zabbix agent"
+msgstr "Zabbix 客户端"
+
+#:
+msgid "Zabbix agent (active)"
+msgstr "Zabbix 客户端(激活)"
+
+#:
+msgid "SNMPv1 agent"
+msgstr "SNMPv1 agent"
+
+#:
+msgid "Zabbix trapper"
+msgstr "Zabbix trapper"
+
+#:
+msgid "Simple check"
+msgstr "Simple check"
+
+#:
+msgid "SNMPv2 agent"
+msgstr "SNMPv2 agent"
+
+#:
+msgid "SNMPv3 agent"
+msgstr "SNMPv3 agent"
+
+#:
+msgid "Zabbix internal"
+msgstr "Zabbix internal"
+
+#:
+msgid "Database monitor"
+msgstr "Database monitor"
+
+#:
+msgid "IPMI agent"
+msgstr "IPMI agent"
+
+#:
+msgid "SSH agent"
+msgstr "SSH agent"
+
+#:
+msgid "TELNET agent"
+msgstr "TELNET agent"
+
+#:
+msgid "Zabbix aggregate"
+msgstr "Zabbix aggregate"
+
+#:
+msgid "External check"
+msgstr "External check"
+
+#:
+msgid "Web monitoring"
+msgstr "Web 服务监控"
+
+#:
+msgid "WEB CHECKS"
+msgstr "WEB CHECKS"
+
+#:
+msgid "Active"
+msgstr "活跃"
+
+#:
+msgid "Not supported"
+msgstr "不支持"
+
+#:
+msgid "Email"
+msgstr "邮件"
+
+#:
+msgid "Jabber"
+msgstr "Jabber"
+
+#:
+msgid "Jabber identifier"
+msgstr "Jabber Identifier"
+
+#:
+msgid "SMS"
+msgstr "短信"
+
+#:
+msgid "Script"
+msgstr "脚本"
+
+#:
+msgid "GSM modem"
+msgstr "GSM Modem"
+
+#:
+msgid "Units"
+msgstr "单位Units"
+
+#:
+msgid "Update interval (in sec)"
+msgstr "数据更新间隔(秒)"
+
+#:
+msgid "Keep history (in days)"
+msgstr "数据保存天数"
+
+#:
+msgid "Keep trends (in days)"
+msgstr "Keep trends (in days)"
+
+#:
+msgid "Type of information"
+msgstr "数据类型"
+
+#:
+msgid "Data type"
+msgstr "Data type"
+
+#:
+msgid "Decimal"
+msgstr "Decimal"
+
+#:
+msgid "Octal"
+msgstr "Octal"
+
+#:
+msgid "Hexadecimal"
+msgstr "Hexadecimal"
+
+#:
+msgid "Store value"
+msgstr "Store value"
+
+#:
+msgid "Show value"
+msgstr "Show value"
+
+#:
+msgid "Numeric (integer 64bit)"
+msgstr "Numeric (integer 64bit)"
+
+#:
+msgid "Numeric (unsigned)"
+msgstr "Numeric (unsigned)"
+
+#:
+msgid "Numeric (float)"
+msgstr "Numeric (float)"
+
+#:
+msgid "Character"
+msgstr "字符串"
+
+#:
+msgid "Log"
+msgstr "日志"
+
+#:
+msgid "Text"
+msgstr "Text"
+
+#:
+msgid "As is"
+msgstr "As is"
+
+#:
+msgid "Delta (speed per second)"
+msgstr "Delta (speed per second)"
+
+#:
+msgid "Delta (simple change)"
+msgstr "Delta (simple change)"
+
+#:
+msgid "Item"
+msgstr "Item"
+
+#:
+msgid "SNMP community"
+msgstr "SNMP community"
+
+#:
+msgid "SNMP OID"
+msgstr "SNMP OID"
+
+#:
+msgid "SNMP port"
+msgstr "SNMP port"
+
+#:
+msgid "Allowed hosts"
+msgstr "Allowed hosts"
+
+#:
+msgid "SNMPv3 security name"
+msgstr "SNMPv3 security name"
+
+#:
+msgid "SNMPv3 security level"
+msgstr "SNMPv3 security level"
+
+#:
+msgid "SNMPv3 auth passphrase"
+msgstr "SNMPv3 auth passphrase"
+
+#:
+msgid "SNMPv3 priv passphrase"
+msgstr "SNMPv3 priv passphrase"
+
+#:
+msgid "Custom multiplier"
+msgstr "Custom multiplier"
+
+#:
+msgid "Select host..."
+msgstr "选择主机..."
+
+#:
+msgid "Log time format"
+msgstr "Log time format"
+
+#:
+msgid "Create Item"
+msgstr "Create Item"
+
+#:
+msgid "elements copy to ..."
+msgstr "elements copy to ..."
+
+#:
+msgid "Mode"
+msgstr "Mode"
+
+#:
+msgid "Target"
+msgstr "Target"
+
+#:
+msgid "Target type"
+msgstr "Target type"
+
+#:
+msgid "Skip existing items"
+msgstr "Skip existing items"
+
+#:
+msgid "update existing non linked items"
+msgstr "update existing non linked items"
+
+#:
+msgid "Copy"
+msgstr "Copy"
+
+#:
+msgid "Show items with description like"
+msgstr "Show items with description like"
+
+#:
+msgid "History clearing can take a long time. Continue?"
+msgstr "History clearing can take a long time. Continue?"
+
+#:
+msgid "Mass update"
+msgstr "批量更新"
+
+#:
+msgid "Search"
+msgstr "查找"
+
+#:
+msgid "Original"
+msgstr "Original"
+
+#:
+msgid "New flexible interval"
+msgstr "New flexible interval"
+
+#:
+msgid "Flexible intervals (sec)"
+msgstr "Flexible intervals (sec)"
+
+#:
+msgid "No flexible intervals"
+msgstr "No flexible intervals"
+
+#:
+msgid "Additional parameters"
+msgstr "Additional parameters"
+
+#:
+msgid "New application"
+msgstr "New application"
+
+#:
+msgid "IPMI sensor"
+msgstr "IPMI sensor"
+
+#:
+msgid "Templated item"
+msgstr "Templated item"
+
+#:
+msgid "Web item"
+msgstr "Web item"
+
+#:
+msgid "Executed script"
+msgstr "Executed script"
+
+#:
+msgid "User name"
+msgstr "User name"
+
+#:
+msgid "Public key file"
+msgstr "Public key file"
+
+#:
+msgid "Private key file"
+msgstr "Private key file"
+
+#:
+msgid "Public key"
+msgstr "Public key"
+
+#:
+msgid "Authentication method"
+msgstr "Authentication method"
+
+#:
+msgid "Passphrase"
+msgstr "Passphrase"
+
+#:
+msgid "Edit Trigger"
+msgstr "Edit Trigger"
+
+#:
+msgid "Enable selected items?"
+msgstr "Enable selected items?"
+
+#:
+msgid "Disable selected items?"
+msgstr "Disable selected items?"
+
+#:
+msgid "Mass update selected items?"
+msgstr "Mass update selected items?"
+
+#:
+msgid "Copy selected items?"
+msgstr "Copy selected items?"
+
+#:
+msgid "Delete history of selected items?"
+msgstr "Delete history of selected items?"
+
+#:
+msgid "Delete selected items?"
+msgstr "Delete selected items?"
+
+#:
+msgid "Event"
+msgstr "Event"
+
+#:
+msgid "Event details"
+msgstr "Event details"
+
+#:
+msgid "List"
+msgstr "List"
+
+#:
+msgid "Latest events"
+msgstr "最新报警"
+
+#:
+msgid "HISTORY OF EVENTS"
+msgstr "系统警告信息"
+
+#:
+msgid "No events found"
+msgstr "No events found"
+
+#:
+msgid "Events since"
+msgstr "Events since"
+
+#:
+msgid "Last check"
+msgstr "最近检查记录"
+
+#:
+msgid "Last value"
+msgstr "最新数据"
+
+#:
+msgid "Upper level maps"
+msgstr "Upper level maps"
+
+#:
+msgid "Links"
+msgstr "Links"
+
+#:
+msgid "Link"
+msgstr "Link"
+
+#:
+msgid "Label"
+msgstr "Label"
+
+#:
+msgid "X"
+msgstr "X"
+
+#:
+msgid "Icon (problem)"
+msgstr "Icon (problem)"
+
+#:
+msgid "Icon (OK)"
+msgstr "Icon (OK)"
+
+#:
+msgid "Icon (unknown)"
+msgstr "Icon (unknown)"
+
+#:
+msgid "Icon (maintenance)"
+msgstr "Icon (maintenance)"
+
+#:
+msgid "Icon (disabled)"
+msgstr "Icon (disabled)"
+
+#:
+msgid "Link status indicator"
+msgstr "Link status indicator"
+
+#:
+msgid "Configuration of network maps"
+msgstr "配置拓扑图"
+
+#:
+msgid "CONFIGURATION OF NETWORK MAPS"
+msgstr "配置网络拓扑图"
+
+#:
+msgid "Map is saved! Return?"
+msgstr "Map is saved! Return?"
+
+#:
+msgid "Map save operation failed."
+msgstr "Map save operation failed."
+
+#:
+msgid "Get Img: Element data not found!"
+msgstr "Get Img: Element data not found!"
+
+#:
+msgid "Add element"
+msgstr "添加组件"
+
+#:
+msgid "Coordinate X"
+msgstr "Coordinate X"
+
+#:
+msgid "Coordinate Y"
+msgstr "Coordinate Y"
+
+#:
+msgid "Connectors"
+msgstr "Connectors"
+
+#:
+msgid "UNAVAILABLE"
+msgstr "UNAVAILABLE"
+
+#:
+msgid "MAINTENANCE"
+msgstr "MAINTENANCE"
+
+#:
+msgid "Edit map element"
+msgstr "Edit map element"
+
+#:
+msgid "Icon (default)"
+msgstr "Icon (default)"
+
+#:
+msgid "Apply"
+msgstr "Apply"
+
+#:
+msgid "Map elements"
+msgstr "Map elements"
+
+#:
+msgid "Network map deleted"
+msgstr "Network map deleted"
+
+#:
+msgid "Cannot delete network map"
+msgstr "Cannot delete network map"
+
+#:
+msgid "MAPS"
+msgstr "拓扑图"
+
+#:
+msgid "No maps defined"
+msgstr "没有定义拓扑图"
+
+#:
+msgid "Create Map"
+msgstr "创建拓扑图"
+
+#:
+msgid "Import Map"
+msgstr "导入拓扑图"
+
+#:
+msgid "Icon label location"
+msgstr "Icon label location"
+
+#:
+msgid "Icon highlighting"
+msgstr "Icon highlighting"
+
+#:
+msgid "Link indicators"
+msgstr "Link indicators"
+
+#:
+msgid "Type (OK)"
+msgstr "Type (OK)"
+
+#:
+msgid "Colour (OK)"
+msgstr "Colour (OK)"
+
+#:
+msgid "Use advanced icons"
+msgstr "Use advanced icons"
+
+#:
+msgid "Delete selected maps?"
+msgstr "Delete selected maps?"
+
+#:
+msgid "Network map added"
+msgstr "Network map added"
+
+#:
+msgid "Cannot add network map"
+msgstr "Cannot add network map"
+
+#:
+msgid "Network map updated"
+msgstr "Network map updated"
+
+#:
+msgid "Cannot update network map"
+msgstr "Cannot update network map"
+
+#:
+msgid "Expand single problem"
+msgstr "Expand single problem"
+
+#:
+msgid "Bottom"
+msgstr "底部"
+
+#:
+msgid "Top"
+msgstr "顶部"
+
+#:
+msgid "Link status indicators"
+msgstr "Link status indicators"
+
+#:
+msgid "Remove element"
+msgstr "删除组建"
+
+#:
+msgid "Add link"
+msgstr "添加链接"
+
+#:
+msgid "Remove link"
+msgstr "Remove link"
+
+#:
+msgid "Cannot find image"
+msgstr "Cannot find image"
+
+#:
+msgid "Cannot find background image"
+msgstr "Cannot find background image"
+
+#:
+msgid "Cannot find trigger"
+msgstr "Cannot find trigger"
+
+#:
+msgid "Cannot find host"
+msgstr "Cannot find host"
+
+#:
+msgid "Cannot find hostgroup"
+msgstr "Cannot find hostgroup"
+
+#:
+msgid "Cannot find map"
+msgstr "Cannot find map"
+
+#:
+msgid "Cannot find screen"
+msgstr "Cannot find screen"
+
+#:
+msgid "used in exported map"
+msgstr "used in exported map"
+
+#:
+msgid "No icon for map element"
+msgstr "No icon for map element"
+
+#:
+msgid "Export does not contain Zabbix maps"
+msgstr "Export does not contain Zabbix maps"
+
+#:
+msgid "Export does not contain Zabbix screens"
+msgstr "Export does not contain Zabbix screens"
+
+#:
+msgid "OK"
+msgstr "OK"
+
+#:
+msgid "PROBLEM"
+msgstr "PROBLEM"
+
+#:
+msgid "http://www.zabbix.com"
+msgstr "http://www.zabbix.com"
+
+#:
+msgid "Network maps"
+msgstr "网络结构图"
+
+#:
+msgid "NETWORK MAPS"
+msgstr "网络结构"
+
+#:
+msgid "Background image"
+msgstr "背景图片"
+
+#:
+msgid "Icon label type"
+msgstr "Icon label type"
+
+#:
+msgid "Label location"
+msgstr "Label location"
+
+#:
+msgid "Element name"
+msgstr "Element name"
+
+#:
+msgid "Status only"
+msgstr "Status only"
+
+#:
+msgid "Nothing"
+msgstr "Nothing"
+
+#:
+msgid "CONFIGURATION OF MEDIA TYPES"
+msgstr "配置处理方法"
+
+#:
+msgid "MEDIA TYPES"
+msgstr "处理方法"
+
+#:
+msgid "Media"
+msgstr "报警介质"
+
+#:
+msgid "Send to"
+msgstr "收件人"
+
+#:
+msgid "When active"
+msgstr "激活时间"
+
+#:
+msgid "No media defined"
+msgstr "没有定义介质"
+
+#:
+msgid "New media"
+msgstr "新方法"
+
+#:
+msgid "Use if severity"
+msgstr "Use if severity"
+
+#:
+msgid "Save"
+msgstr "保存"
+
+#:
+msgid "Cancel"
+msgstr "取消"
+
+#:
+msgid "Dashboard"
+msgstr "Dashboard"
+
+#:
+msgid "PERSONAL DASHBOARD"
+msgstr "PERSONAL DASHBOARD"
+
+#:
+msgid "Age"
+msgstr "Age"
+
+#:
+msgid "Issue"
+msgstr "Issue"
+
+#:
+msgid "System status"
+msgstr "System status"
+
+#:
+msgid "Host status"
+msgstr "Host status"
+
+#:
+msgid "Without problems"
+msgstr "Without problems"
+
+#:
+msgid "With problems"
+msgstr "With problems"
+
+#:
+msgid "Last 20 issues"
+msgstr "Last 20 issues"
+
+#:
+msgid "Favourite"
+msgstr "Favourite"
+
+#:
+msgid "Favourites"
+msgstr "Favourites"
+
+#:
+msgid "Every"
+msgstr "Every"
+
+#:
+msgid "Menu"
+msgstr "Menu"
+
+#:
+msgid "Reset"
+msgstr "Reset"
+
+#:
+msgid "Maximize"
+msgstr "Maximize"
+
+#:
+msgid "Minimize"
+msgstr "Minimize"
+
+#:
+msgid "Loading..."
+msgstr "Loading..."
+
+#:
+msgid "Dashboard configuration"
+msgstr "Dashboard configuration"
+
+#:
+msgid "DASHBOARD CONFIGURATION"
+msgstr "DASHBOARD CONFIGURATION"
+
+#:
+msgid "Configure"
+msgstr "Configure"
+
+#:
+msgid "Selected"
+msgstr "Selected"
+
+#:
+msgid "Show hosts in maintenance"
+msgstr "Show hosts in maintenance"
+
+#:
+msgid "Triggers with severity"
+msgstr "Triggers with severity"
+
+#:
+msgid "Dashboard filter"
+msgstr "Dashboard filter"
+
+#:
+msgid "Overview"
+msgstr "总览"
+
+#:
+msgid "Overview by proxy"
+msgstr "Overview by proxy"
+
+#:
+msgid "OVERVIEW"
+msgstr "总览"
+
+#:
+msgid "Hosts location"
+msgstr "主机位置"
+
+#:
+msgid "Data"
+msgstr "数据"
+
+#:
+msgid "Show graph of item"
+msgstr "Show graph of item"
+
+#:
+msgid "Show values of item"
+msgstr "Show values of item"
+
+#:
+msgid "Values"
+msgstr "Values"
+
+#:
+msgid "5 min"
+msgstr "5分"
+
+#:
+msgid "15 min"
+msgstr "15分"
+
+#:
+msgid "QUEUE"
+msgstr "队列"
+
+#:
+msgid "QUEUE OF ITEMS TO BE UPDATED"
+msgstr "已经更新的队列"
+
+#:
+msgid "Next check"
+msgstr "Next check"
+
+#:
+msgid "The queue is empty"
+msgstr "The queue is empty"
+
+#:
+msgid "Total"
+msgstr "合计"
+
+#:
+msgid "Count"
+msgstr "数量"
+
+#:
+msgid "5 seconds"
+msgstr "5秒"
+
+#:
+msgid "10 seconds"
+msgstr "10秒"
+
+#:
+msgid "30 seconds"
+msgstr "30秒"
+
+#:
+msgid "1 minute"
+msgstr "1分"
+
+#:
+msgid "5 minutes"
+msgstr "5分"
+
+#:
+msgid "More than 10 minutes"
+msgstr "10分钟以上"
+
+#:
+msgid "Truncated"
+msgstr "Truncated"
+
+#:
+msgid "Delayed by"
+msgstr "Delayed by"
+
+#:
+msgid "REPORT"
+msgstr "REPORT"
+
+#:
+msgid "Status of Zabbix"
+msgstr "ZABBIX 状态"
+
+#:
+msgid "STATUS OF ZABBIX"
+msgstr "ZABBIX 状态"
+
+#:
+msgid "Value"
+msgstr "ֵ"
+
+#:
+msgid "Zabbix server is running"
+msgstr "Zabbix 服务器端运行中"
+
+#:
+msgid "Values stored"
+msgstr "Values stored"
+
+#:
+msgid "Trends stored"
+msgstr "Trends stored"
+
+#:
+msgid "Number of triggers (enabled/disabled)[problem/unknown/ok]"
+msgstr "触发器数量 (启用/关闭)[problem/unknown/ok]"
+
+#:
+msgid "Triggers (e/d)[p/u/o]"
+msgstr "Triggers (e/d)[p/u/o]"
+
+#:
+msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
+msgstr "Only triggers assigned to enabled hosts and depending on enabled items are counted"
+
+#:
+msgid "Number of items (monitored/disabled/not supported)"
+msgstr "监控项数量 (监控/关闭/不支持)"
+
+#:
+msgid "Items (m/d/n)"
+msgstr "Items (m/d/n)"
+
+#:
+msgid "Only items assigned to enabled hosts are counted"
+msgstr "Only items assigned to enabled hosts are counted"
+
+#:
+msgid "Number of users (online)"
+msgstr "ZABBIX 系统用户数量"
+
+#:
+msgid "Users (online)"
+msgstr "Users (online)"
+
+#:
+msgid "Number of hosts (monitored/not monitored/templates)"
+msgstr "主机数量 (监控/未监控/模板)"
+
+#:
+msgid "Hosts (m/n/t)"
+msgstr "主机 (m/n/t)"
+
+#:
+msgid "Required server performance, new values per second"
+msgstr "Required server performance, new values per second"
+
+#:
+msgid "Yes"
+msgstr "Yes"
+
+#:
+msgid "No"
+msgstr "No"
+
+#:
+msgid "running"
+msgstr "running"
+
+#:
+msgid "not running"
+msgstr "not running"
+
+#:
+msgid "Availability report"
+msgstr "可用性统计"
+
+#:
+msgid "AVAILABILITY REPORT"
+msgstr "系统可用性统计"
+
+#:
+msgid "Show"
+msgstr "显示"
+
+#:
+msgid "By host"
+msgstr "By host"
+
+#:
+msgid "By trigger template"
+msgstr "By trigger template"
+
+#:
+msgid "IT services availability report"
+msgstr "IT services availability report"
+
+#:
+msgid "IT SERVICES AVAILABILITY REPORT"
+msgstr "IT服务可用性报告"
+
+#:
+msgid "From"
+msgstr "起始"
+
+#:
+msgid "from"
+msgstr "起始"
+
+#:
+msgid "Till"
+msgstr "截止"
+
+#:
+msgid "To"
+msgstr "To"
+
+#:
+msgid "Ok"
+msgstr "Ok"
+
+#:
+msgid "Problem"
+msgstr "Problem"
+
+#:
+msgid "Problems"
+msgstr "Problems"
+
+#:
+msgid "Percentage"
+msgstr "百分比"
+
+#:
+msgid "SLA"
+msgstr "SLA"
+
+#:
+msgid "Hour"
+msgstr "Hour"
+
+#:
+msgid "Hours"
+msgstr "Hours"
+
+#:
+msgid "Minute"
+msgstr "Minute"
+
+#:
+msgid "Minutes"
+msgstr "Minutes"
+
+#:
+msgid "Day"
+msgstr "日"
+
+#:
+msgid "Month"
+msgstr "月"
+
+#:
+msgid "Year"
+msgstr "年"
+
+#:
+msgid "year"
+msgstr "year"
+
+#:
+msgid "Hourly"
+msgstr "Hourly"
+
+#:
+msgid "Daily"
+msgstr "每日"
+
+#:
+msgid "Weekly"
+msgstr "每周"
+
+#:
+msgid "Monthly"
+msgstr "每月"
+
+#:
+msgid "Yearly"
+msgstr "每年"
+
+#:
+msgid "Do not add"
+msgstr "Do not add"
+
+#:
+msgid "Leave empty"
+msgstr "Leave empty"
+
+#:
+msgid "Fill with default value"
+msgstr "Fill with default value"
+
+#:
+msgid "Create"
+msgstr "Create"
+
+#:
+msgid "new"
+msgstr "new"
+
+#:
+msgid "Locales"
+msgstr "语言"
+
+#:
+msgid "locale"
+msgstr "locale"
+
+#:
+msgid "Download"
+msgstr "Download"
+
+#:
+msgid "Take for default locale"
+msgstr "Take for default locale"
+
+#:
+msgid "Locale to extend"
+msgstr "Locale to extend"
+
+#:
+msgid "New entries"
+msgstr "New entries"
+
+#:
+msgid "Notifications"
+msgstr "警报"
+
+#:
+msgid "NOTIFICATIONS"
+msgstr "警报"
+
+#:
+msgid "Notification report"
+msgstr "警报汇总"
+
+#:
+msgid "Most busy triggers top 100"
+msgstr "最繁忙的100条触发器"
+
+#:
+msgid "MOST BUSY TRIGGERS TOP 100"
+msgstr "最繁忙的100条触发器"
+
+#:
+msgid "Number of status changes"
+msgstr "状态改变次数"
+
+#:
+msgid "Week"
+msgstr "Week"
+
+#:
+msgid "Last"
+msgstr "Last"
+
+#:
+msgid "Bar reports"
+msgstr "Bar reports"
+
+#:
+msgid "Distribution of values for multiple periods"
+msgstr "Distribution of values for multiple periods"
+
+#:
+msgid "Distribution of values for multiple items"
+msgstr "Distribution of values for multiple items"
+
+#:
+msgid "Compare values for multiple periods"
+msgstr "Compare values for multiple periods"
+
+#:
+msgid "Selected hosts"
+msgstr "Selected hosts"
+
+#:
+msgid "Selected groups"
+msgstr "Selected groups"
+
+#:
+msgid "Scale"
+msgstr "Scale"
+
+#:
+msgid "Average by"
+msgstr "Average by"
+
+#:
+msgid "Palette"
+msgstr "Palette"
+
+#:
+msgid "Darken"
+msgstr "Darken"
+
+#:
+msgid "Brighten"
+msgstr "Brighten"
+
+#:
+msgid "Screens"
+msgstr "配置图表"
+
+#:
+msgid "Screen"
+msgstr "图表"
+
+#:
+msgid "CONFIGURATION OF SCREENS"
+msgstr "用户显示图表配置"
+
+#:
+msgid "Configuration of screens"
+msgstr "显示图表配置"
+
+#:
+msgid "Screen added"
+msgstr "图表已添加"
+
+#:
+msgid "Cannot add screen"
+msgstr "无法添加图表"
+
+#:
+msgid "Screen updated"
+msgstr "图表已更新"
+
+#:
+msgid "Cannot update screen"
+msgstr "无法更新图表"
+
+#:
+msgid "Screen deleted"
+msgstr "图表已删除"
+
+#:
+msgid "Cannot deleted screen"
+msgstr "无法删除图表"
+
+#:
+msgid "Columns"
+msgstr "列数"
+
+#:
+msgid "Rows"
+msgstr "函数"
+
+#:
+msgid "No screens defined"
+msgstr "没有定义图表"
+
+#:
+msgid "Delete screen?"
+msgstr "删除图表?"
+
+#:
+msgid "CONFIGURATION OF SCREEN"
+msgstr "图表的配置"
+
+#:
+msgid "Screen cell configuration"
+msgstr "图表单元配置"
+
+#:
+msgid "Resource"
+msgstr "资源"
+
+#:
+msgid "User rights"
+msgstr "用户权限"
+
+#:
+msgid "No resources defined"
+msgstr "没有定义资源"
+
+#:
+msgid "Simple graph"
+msgstr "Simple graph"
+
+#:
+msgid "Simple graphs"
+msgstr "Simple graphs"
+
+#:
+msgid "SIMPLE GRAPH"
+msgstr "SIMPLE GRAPH"
+
+#:
+msgid "Graph name"
+msgstr "图形名"
+
+#:
+msgid "Width"
+msgstr "宽"
+
+#:
+msgid "Height"
+msgstr "高"
+
+#:
+msgid "Create Screen"
+msgstr "Create Screen"
+
+#:
+msgid "Edit"
+msgstr "编辑"
+
+#:
+msgid "Dynamic item"
+msgstr "动态监控项"
+
+#:
+msgid "Dimension (cols x rows)"
+msgstr "图表规格 (列 x 行)"
+
+#:
+msgid "Delete selected slideshows?"
+msgstr "Delete selected slideshows?"
+
+#:
+msgid "Slide shows"
+msgstr "Slide shows"
+
+#:
+msgid "Slide show"
+msgstr "Slide show"
+
+#:
+msgid "CONFIGURATION OF SLIDE SHOWS"
+msgstr "CONFIGURATION OF SLIDE SHOWS"
+
+#:
+msgid "SLIDE SHOWS"
+msgstr "SLIDE SHOWS"
+
+#:
+msgid "No slide shows defined"
+msgstr "No slide shows defined"
+
+#:
+msgid "Count of slides"
+msgstr "Count of slides"
+
+#:
+msgid "No slides defined"
+msgstr "No slides defined"
+
+#:
+msgid "Slides"
+msgstr "Slides"
+
+#:
+msgid "New slide"
+msgstr "New slide"
+
+#:
+msgid "Show text as HTML"
+msgstr "Show text as HTML"
+
+#:
+msgid "Import screen"
+msgstr "Import screen"
+
+#:
+msgid "Cannot find graph"
+msgstr "Cannot find graph"
+
+#:
+msgid "Cannot find item"
+msgstr "Cannot find item"
+
+#:
+msgid "used in exported screen"
+msgstr "used in exported screen"
+
+#:
+msgid "Map"
+msgstr "Map"
+
+#:
+msgid "As plain text"
+msgstr "As plain text"
+
+#:
+msgid "Plain text"
+msgstr "文本"
+
+#:
+msgid "PLAINT TEXT"
+msgstr "PLAINT TEXT"
+
+#:
+msgid "Column span"
+msgstr "列宽度"
+
+#:
+msgid "Row span"
+msgstr "行宽度"
+
+#:
+msgid "Show lines"
+msgstr "Show lines"
+
+#:
+msgid "Hosts info"
+msgstr "Hosts info"
+
+#:
+msgid "Triggers info"
+msgstr "Triggers info"
+
+#:
+msgid "Server info"
+msgstr "Server info"
+
+#:
+msgid "Clock"
+msgstr "Clock"
+
+#:
+msgid "Triggers overview"
+msgstr "Triggers overview"
+
+#:
+msgid "Data overview"
+msgstr "Data overview"
+
+#:
+msgid "History of actions"
+msgstr "History of actions"
+
+#:
+msgid "History of events"
+msgstr "History of events"
+
+#:
+msgid "Time type"
+msgstr "Time type"
+
+#:
+msgid "Server time"
+msgstr "Server time"
+
+#:
+msgid "Local time"
+msgstr "Local time"
+
+#:
+msgid "Style"
+msgstr "Style"
+
+#:
+msgid "Vertical"
+msgstr "Vertical"
+
+#:
+msgid "Horizontal"
+msgstr "横向"
+
+#:
+msgid "Horizontal align"
+msgstr "横向对齐"
+
+#:
+msgid "Centre"
+msgstr "居中"
+
+#:
+msgid "Right"
+msgstr "右侧"
+
+#:
+msgid "Vertical align"
+msgstr "纵向对齐"
+
+#:
+msgid "Middle"
+msgstr "居中"
+
+#:
+msgid "Impossible to remove last row and column"
+msgstr "Impossible to remove last row and column"
+
+#:
+msgid "Screen should contain at least one row and column"
+msgstr "Screen should contain at least one row and column"
+
+#:
+msgid "Custom screens"
+msgstr "用户图表"
+
+#:
+msgid "SCREENS 45645645"
+msgstr "用户图表"
+
+#:
+msgid "Slideshow updated"
+msgstr "Slideshow updated"
+
+#:
+msgid "Cannot_update slideshow"
+msgstr "Cannot_update slideshow"
+
+#:
+msgid "Slideshow added"
+msgstr "Slideshow added"
+
+#:
+msgid "Cannot add slideshow"
+msgstr "Cannot add slideshow"
+
+#:
+msgid "Slideshow deleted"
+msgstr "Slideshow deleted"
+
+#:
+msgid "Cannot delete slideshow"
+msgstr "Cannot delete slideshow"
+
+#:
+msgid "Delete slideshow?"
+msgstr "Delete slideshow?"
+
+#:
+msgid "Average problem"
+msgstr "Average problem"
+
+#:
+msgid "Serious problem"
+msgstr "Serious problem"
+
+#:
+msgid "Minor problem"
+msgstr "Minor problem"
+
+#:
+msgid "root"
+msgstr "root"
+
+#:
+msgid "IT service"
+msgstr "IT 服务"
+
+#:
+msgid "IT services"
+msgstr "服务"
+
+#:
+msgid "Configuration of IT services"
+msgstr "配置 IT 服务"
+
+#:
+msgid "Service updated"
+msgstr "服务已更新"
+
+#:
+msgid "No IT service defined"
+msgstr "没有定义 IT 服务"
+
+#:
+msgid "Cannot update service"
+msgstr "无法更新服务"
+
+#:
+msgid "Service added"
+msgstr "服务已经添加"
+
+#:
+msgid "Cannot add service"
+msgstr "无法添加服务"
+
+#:
+msgid "Service deleted"
+msgstr "服务已经删除"
+
+#:
+msgid "Cannot delete service"
+msgstr "无法删除服务"
+
+#:
+msgid "Parent service"
+msgstr "上一级服务"
+
+#:
+msgid "Status calculation"
+msgstr "状态统计"
+
+#:
+msgid "Status calculation algorithm"
+msgstr "Status calculation algorithm"
+
+#:
+msgid "Problem, if at least one child has a problem"
+msgstr "Problem, if at least one child has a problem"
+
+#:
+msgid "Problem, if all children have problems"
+msgstr "Problem, if all children have problems"
+
+#:
+msgid "Soft"
+msgstr "Soft"
+
+#:
+msgid "Do not calculate"
+msgstr "Do not calculate"
+
+#:
+msgid "Calculate SLA"
+msgstr "Calculate SLA"
+
+#:
+msgid "Acceptable SLA (in %)"
+msgstr "可接受的 SLA (in %)"
+
+#:
+msgid "Link to trigger?"
+msgstr "Link to trigger?"
+
+#:
+msgid "Sort order (0->999)"
+msgstr "Sort order (0->999)"
+
+#:
+msgid "Trigger"
+msgstr "Trigger"
+
+#:
+msgid "Server"
+msgstr "Server"
+
+#:
+msgid "Delete"
+msgstr "删除"
+
+#:
+msgid "Clone"
+msgstr "复制"
+
+#:
+msgid "Full clone"
+msgstr "全复制"
+
+#:
+msgid "One-time downtime"
+msgstr "One-time downtime"
+
+#:
+msgid "No times defined"
+msgstr "No times defined"
+
+#:
+msgid "Service times"
+msgstr "Service times"
+
+#:
+msgid "New service time"
+msgstr "New service time"
+
+#:
+msgid "Note"
+msgstr "Note"
+
+#:
+msgid "Remove"
+msgstr "Remove"
+
+#:
+msgid "Sunday"
+msgstr "Sunday"
+
+#:
+msgid "Monday"
+msgstr "Monday"
+
+#:
+msgid "Tuesday"
+msgstr "Tuesday"
+
+#:
+msgid "Wednesday"
+msgstr "Wednesday"
+
+#:
+msgid "Thursday"
+msgstr "Thursday"
+
+#:
+msgid "Friday"
+msgstr "Friday"
+
+#:
+msgid "Saturday"
+msgstr "Saturday"
+
+#:
+msgid "IT SERVICES"
+msgstr "IT服务"
+
+#:
+msgid "Service"
+msgstr "服务"
+
+#:
+msgid "Services"
+msgstr "Services"
+
+#:
+msgid "Reason"
+msgstr "Reason"
+
+#:
+msgid "Today"
+msgstr "今天"
+
+#:
+msgid "This week"
+msgstr "本周"
+
+#:
+msgid "This year"
+msgstr "本年"
+
+#:
+msgid "This month"
+msgstr "本月"
+
+#:
+msgid "Last 24 hours"
+msgstr "最近24小时"
+
+#:
+msgid "Last 7 days"
+msgstr "最近7天"
+
+#:
+msgid "Last 30 days"
+msgstr "最近30天"
+
+#:
+msgid "Last 365 days"
+msgstr "最近365天"
+
+#:
+msgid "Cannot format Tree. Check logic structure in service links"
+msgstr "Cannot format Tree. Check logic structure in service links"
+
+#:
+msgid "Show triggers with unacknowledged events"
+msgstr "Show triggers with unacknowledged events"
+
+#:
+msgid "No trigger"
+msgstr "No trigger"
+
+#:
+msgid "No triggers defined"
+msgstr "No triggers defined"
+
+#:
+msgid "No trigger defined"
+msgstr "No trigger defined"
+
+#:
+msgid "Configuration of triggers"
+msgstr "配置触发器"
+
+#:
+msgid "CONFIGURATION OF TRIGGERS"
+msgstr "触发器配置"
+
+#:
+msgid "Triggers deleted"
+msgstr "触发器已删除"
+
+#:
+msgid "Cannot delete triggers"
+msgstr "无法删除触发器"
+
+#:
+msgid "Trigger deleted"
+msgstr "触发器已删除"
+
+#:
+msgid "Cannot delete trigger"
+msgstr "无法删除触发器"
+
+#:
+msgid "Trigger added"
+msgstr "触发器已添加"
+
+#:
+msgid "Cannot add trigger"
+msgstr "无法添加触发器"
+
+#:
+msgid "Severity"
+msgstr "示警度"
+
+#:
+msgid "Min severity"
+msgstr "Min severity"
+
+#:
+msgid "Disabled"
+msgstr "不活跃"
+
+#:
+msgid "DISABLED"
+msgstr "关闭"
+
+#:
+msgid "Enabled"
+msgstr "活跃"
+
+#:
+msgid "Disable"
+msgstr "关闭"
+
+#:
+msgid "Enable"
+msgstr "开启"
+
+#:
+msgid "Enable selected"
+msgstr "启用所选"
+
+#:
+msgid "Change"
+msgstr "更改"
+
+#:
+msgid "Trigger updated"
+msgstr "触发器已更新"
+
+#:
+msgid "Cannot update trigger"
+msgstr "无法更新触发器"
+
+#:
+msgid "Depends on"
+msgstr "Depends on"
+
+#:
+msgid "Dependent"
+msgstr "Dependent"
+
+#:
+msgid "URL"
+msgstr "URL"
+
+#:
+msgid "Zabbix has received an incorrect request"
+msgstr "Zabbix收到错误的请求"
+
+#:
+msgid "Create Trigger"
+msgstr "Create Trigger"
+
+#:
+msgid "Insert"
+msgstr "Insert"
+
+#:
+msgid "Seconds"
+msgstr "Seconds"
+
+#:
+msgid "Last of"
+msgstr "Last of"
+
+#:
+msgid "Show disabled triggers"
+msgstr "Show disabled triggers"
+
+#:
+msgid "Hide disabled triggers"
+msgstr "Hide disabled triggers"
+
+#:
+msgid "The trigger depends on"
+msgstr "The trigger depends on"
+
+#:
+msgid "No dependencies defined"
+msgstr "No dependencies defined"
+
+#:
+msgid "New dependency"
+msgstr "New dependency"
+
+#:
+msgid "Event generation"
+msgstr "Event generation"
+
+#:
+msgid "Triggers massupdate"
+msgstr "Triggers massupdate"
+
+#:
+msgid "Trigger dependencies"
+msgstr "Trigger dependencies"
+
+#:
+msgid "Incorrect dependency"
+msgstr "Incorrect dependency"
+
+#:
+msgid "Toggle input method"
+msgstr "Toggle input method"
+
+#:
+msgid "Insert macro"
+msgstr "Insert macro"
+
+#:
+msgid "Replace"
+msgstr "Replace"
+
+#:
+msgid "Templated trigger"
+msgstr "Templated trigger"
+
+#:
+msgid "Enable selected triggers?"
+msgstr "Enable selected triggers?"
+
+#:
+msgid "Disable selected triggers?"
+msgstr "Disable selected triggers?"
+
+#:
+msgid "Mass update selected triggers?"
+msgstr "Mass update selected triggers?"
+
+#:
+msgid "Copy selected triggers?"
+msgstr "Copy selected triggers?"
+
+#:
+msgid "Delete selected triggers?"
+msgstr "Delete selected triggers?"
+
+#:
+msgid "Trigger comments"
+msgstr "Trigger comments"
+
+#:
+msgid "TRIGGER COMMENTS"
+msgstr "TRIGGER COMMENTS"
+
+#:
+msgid "Comment updated"
+msgstr "Comment updated"
+
+#:
+msgid "Cannot update comment"
+msgstr "Cannot update comment"
+
+#:
+msgid "Add"
+msgstr "添加"
+
+#:
+msgid "Sound"
+msgstr "Sound"
+
+#:
+msgid "Status of triggers"
+msgstr "触发器状态"
+
+#:
+msgid "STATUS OF TRIGGERS"
+msgstr "触发器的状态"
+
+#:
+msgid "Status of hostgroup triggers"
+msgstr "Status of hostgroup triggers"
+
+#:
+msgid "Status of host triggers"
+msgstr "Status of host triggers"
+
+#:
+msgid "Hide all"
+msgstr "Hide all"
+
+#:
+msgid "Show only problems"
+msgstr "Show only problems"
+
+#:
+msgid "Show unacknowledged"
+msgstr "Show unacknowledged"
+
+#:
+msgid "Show problem-unacknowledged"
+msgstr "Show problem-unacknowledged"
+
+#:
+msgid "Not acknowledged"
+msgstr "Not acknowledged"
+
+#:
+msgid "Show last"
+msgstr "Show last"
+
+#:
+msgid "Show details"
+msgstr "显示细节"
+
+#:
+msgid "TRIGGERS"
+msgstr "触发器"
+
+#:
+msgid "Last change"
+msgstr "上次修改于"
+
+#:
+msgid "Comments"
+msgstr "备注"
+
+#:
+msgid "Acknowledged"
+msgstr "已确认"
+
+#:
+msgid "Ack"
+msgstr "Ack"
+
+#:
+msgid "Not Ack"
+msgstr "Not Ack"
+
+#:
+msgid "Never"
+msgstr "Never"
+
+#:
+msgid "Found"
+msgstr "Found"
+
+#:
+msgid "Select"
+msgstr "搜索"
+
+#:
+msgid "Zabbix User"
+msgstr "Zabbix User"
+
+#:
+msgid "Zabbix Admin"
+msgstr "Zabbix Admin"
+
+#:
+msgid "Zabbix Super Admin"
+msgstr "Zabbix Super Admin"
+
+#:
+msgid "User type"
+msgstr "User type"
+
+#:
+msgid "Users"
+msgstr "用户"
+
+#:
+msgid "User added"
+msgstr "添加用户"
+
+#:
+msgid "Cannot add user"
+msgstr "无法添加用户"
+
+#:
+msgid "Cannot add user. Both passwords must be equal."
+msgstr "无法添加用户. 两次输入的密码必须一致."
+
+#:
+msgid "User deleted"
+msgstr "用户已删除"
+
+#:
+msgid "Cannot delete user"
+msgstr "无法删除用户"
+
+#:
+msgid "Password should not be empty"
+msgstr "密码不能为空"
+
+#:
+msgid "For guest, password must be empty"
+msgstr "访客的密码必须为空"
+
+#:
+msgid "User updated"
+msgstr "用户已更新"
+
+#:
+msgid "Cannot update user"
+msgstr "无法更新用户"
+
+#:
+msgid "Cannot update user. Both passwords must be equal."
+msgstr "无法更新用户. 两次输入的密码必须一致."
+
+#:
+msgid "Group added"
+msgstr "Group added"
+
+#:
+msgid "Cannot add group"
+msgstr "Cannot add group"
+
+#:
+msgid "Group updated"
+msgstr "Group updated"
+
+#:
+msgid "Cannot update group"
+msgstr "Cannot update group"
+
+#:
+msgid "Group deleted"
+msgstr "Group deleted"
+
+#:
+msgid "Cannot delete group"
+msgstr "Cannot delete group"
+
+#:
+msgid "Proxy added"
+msgstr "Proxy added"
+
+#:
+msgid "Cannot add proxy"
+msgstr "Cannot add proxy"
+
+#:
+msgid "Proxy updated"
+msgstr "Proxy updated"
+
+#:
+msgid "Cannot update proxy"
+msgstr "Cannot update proxy"
+
+#:
+msgid "Proxy deleted"
+msgstr "Proxy deleted"
+
+#:
+msgid "Cannot delete proxy"
+msgstr "Cannot delete proxy"
+
+#:
+msgid "Users status updated"
+msgstr "用户状态已更新"
+
+#:
+msgid "Cannot update users status"
+msgstr "Cannot update users status"
+
+#:
+msgid "Users unblocked"
+msgstr "Users unblocked"
+
+#:
+msgid "Cannot unblock users"
+msgstr "Cannot unblock users"
+
+#:
+msgid "GUI access updated"
+msgstr "GUI access updated"
+
+#:
+msgid "Cannot update GUI access"
+msgstr "Cannot update GUI access"
+
+#:
+msgid "API access updated"
+msgstr "API access updated"
+
+#:
+msgid "Cannot update API access"
+msgstr "Cannot update API access"
+
+#:
+msgid "Debug mode updated"
+msgstr "调试模式已更新"
+
+#:
+msgid "Cannot update debug mode"
+msgstr "无法更新调试模式"
+
+#:
+msgid "User cannot disable himself"
+msgstr "User cannot disable itself"
+
+#:
+msgid "User cannot change status of himself"
+msgstr "User cannot change status to itself"
+
+#:
+msgid "User cannot change GUI access for himself"
+msgstr "User cannot change GUI access to itself"
+
+#:
+msgid "User cannot delete himself"
+msgstr "User cannot delete itself"
+
+#:
+msgid "CONFIGURATION OF USERS AND USER GROUPS"
+msgstr "用户及用户组配置"
+
+#:
+msgid "USER GROUPS"
+msgstr "用户组"
+
+#:
+msgid "USERS"
+msgstr "用户"
+
+#:
+msgid "User groups"
+msgstr "用户组"
+
+#:
+msgid "Members"
+msgstr "成员"
+
+#:
+msgid "No user groups defined"
+msgstr "未定义用户组"
+
+#:
+msgid "Name"
+msgstr "名称"
+
+#:
+msgid "Surname"
+msgstr "姓氏"
+
+#:
+msgid "Is online?"
+msgstr "是否在线?"
+
+#:
+msgid "No users defined"
+msgstr "没有定义用户"
+
+#:
+msgid "Rights"
+msgstr "权限"
+
+#:
+msgid "GUI access"
+msgstr "Web访问"
+
+#:
+msgid "API access"
+msgstr "API访问"
+
+#:
+msgid "Debug"
+msgstr "调试"
+
+#:
+msgid "Debug mode"
+msgstr "调试模式"
+
+#:
+msgid "Users status"
+msgstr "用户状态"
+
+#:
+msgid "No rights defined"
+msgstr "未定义权限"
+
+#:
+msgid "Read only"
+msgstr "只读"
+
+#:
+msgid "Read-write"
+msgstr "读写"
+
+#:
+msgid "Deny"
+msgstr "禁止"
+
+#:
+msgid "Hide"
+msgstr "隐藏"
+
+#:
+msgid "Password"
+msgstr "密码"
+
+#:
+msgid "Change password"
+msgstr "修改密码"
+
+#:
+msgid "Password (once again)"
+msgstr "确认密码"
+
+#:
+msgid "URL (after login)"
+msgstr "登录后定向到"
+
+#:
+msgid "Auto-login"
+msgstr "自动登录"
+
+#:
+msgid "Auto-logout (min 90 seconds)"
+msgstr "自动退出(90秒)"
+
+#:
+msgid "Refresh (in seconds)"
+msgstr "自动刷行间隔(s)"
+
+#:
+msgid "Create User"
+msgstr "创建用户"
+
+#:
+msgid "Create Group"
+msgstr "创建组"
+
+#:
+msgid "No accessible resources"
+msgstr "没有允许访问的资源"
+
+#:
+msgid "Add to"
+msgstr "添加至"
+
+#:
+msgid "Remove from"
+msgstr "删除从"
+
+#:
+msgid "Internal"
+msgstr "Internal"
+
+#:
+msgid "Rows per page"
+msgstr "每页显示行数"
+
+#:
+msgid "Enable API"
+msgstr "打开 API"
+
+#:
+msgid "Disable API"
+msgstr "关闭 API"
+
+#:
+msgid "Enable DEBUG"
+msgstr "打开DEBUG"
+
+#:
+msgid "Disable DEBUG"
+msgstr "关闭DEBUG"
+
+#:
+msgid "Blocked"
+msgstr "Blocked"
+
+#:
+msgid "Unblock selected"
+msgstr "Unblock selected"
+
+#:
+msgid "Unblock selected users?"
+msgstr "Unblock selected users?"
+
+#:
+msgid "Delete selected users?"
+msgstr "Delete selected users?"
+
+#:
+msgid "Enable selected groups?"
+msgstr "Enable selected groups?"
+
+#:
+msgid "Disable selected groups?"
+msgstr "Disable selected groups?"
+
+#:
+msgid "Enable API access in selected groups?"
+msgstr "Enable API access in selected groups?"
+
+#:
+msgid "Disable API access in selected groups?"
+msgstr "Disable API access in selected groups?"
+
+#:
+msgid "Enable debug mode in selected groups?"
+msgstr "Enable debug mode in selected groups?"
+
+#:
+msgid "Disable debug mode in selected groups?"
+msgstr "Disable debug mode in selected groups?"
+
+#:
+msgid "Delete selected groups?"
+msgstr "删除所选脚本?"
+
+#:
+msgid "CONFIGURATION OF SCRIPTS"
+msgstr "脚本的配置"
+
+#:
+msgid "Scripts"
+msgstr "脚本"
+
+#:
+msgid "SCRIPTS"
+msgstr "脚本"
+
+#:
+msgid "Command"
+msgstr "命令"
+
+#:
+msgid "permissions"
+msgstr "命令"
+
+#:
+msgid "Required host"
+msgstr "Required host"
+
+#:
+msgid "Read"
+msgstr "读"
+
+#:
+msgid "Write"
+msgstr "写"
+
+#:
+msgid "No scripts defined"
+msgstr "未定义脚本"
+
+#:
+msgid "Host access"
+msgstr "Host access"
+
+#:
+msgid "Delete script?"
+msgstr "删除脚本?"
+
+#:
+msgid "Create script"
+msgstr "创建脚本"
+
+#:
+msgid "Script added"
+msgstr "脚本已添加"
+
+#:
+msgid "Cannot add script"
+msgstr "无法添加脚本"
+
+#:
+msgid "Script updated"
+msgstr "脚本已更新"
+
+#:
+msgid "Cannot update script"
+msgstr "无法更新脚本"
+
+#:
+msgid "Script deleted"
+msgstr "脚本已删除"
+
+#:
+msgid "Cannot delete script"
+msgstr "无法删除脚本"
+
+#:
+msgid "Tools"
+msgstr "Tools"
+
+#:
+msgid "Result"
+msgstr "Result"
+
+#:
+msgid "Close"
+msgstr "Close"
+
+#:
+msgid "Cannot connect to Zabbix server"
+msgstr "无法链接到 Zabbix 服务器端"
+
+#:
+msgid "Delete selected scripts?"
+msgstr "删除所选脚本?"
+
+#:
+msgid "SCRIPT ERROR"
+msgstr "SCRIPT ERROR"
+
+#:
+msgid "Error Description"
+msgstr "Error Description"
+
+#:
+msgid "Can't send command, check connection"
+msgstr "无法发送命令,请检查连接"
+
+#:
+msgid "Can't read script response, check connection"
+msgstr "无法读取脚本返回,请检查连接"
+
+#:
+msgid "Defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value"
+msgstr "Defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value"
+
+#:
+msgid "Defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value"
+msgstr "Defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value"
+
+#:
+msgid "Unknown error happened reading script answer, please report to the developers"
+msgstr "Unknown error happend reading script answer, report to the developers, please"
+
+#:
+msgid "Empty response received"
+msgstr "Empty response received"
+
+#:
+msgid "Audit"
+msgstr "审计"
+
+#:
+msgid "AUDIT LOGS"
+msgstr "审计日志"
+
+#:
+msgid "AUDIT ACTIONS"
+msgstr "AUDIT ACTIONS"
+
+#:
+msgid "Action"
+msgstr "操作"
+
+#:
+msgid "Details"
+msgstr "详细内容"
+
+#:
+msgid "Unknown action"
+msgstr "未知操作"
+
+#:
+msgid "Added"
+msgstr "添加"
+
+#:
+msgid "Updated"
+msgstr "更新"
+
+#:
+msgid "Media type"
+msgstr "介质类型"
+
+#:
+msgid "Graph element"
+msgstr "Graph element"
+
+#:
+msgid "Unknown resource"
+msgstr "未知资源"
+
+#:
+msgid "already exists"
+msgstr "already exists"
+
+#:
+msgid "Zabbix config"
+msgstr "Zabbix config"
+
+#:
+msgid "USER PROFILE"
+msgstr "个人信息"
+
+#:
+msgid "User profile"
+msgstr "个人信息"
+
+#:
+msgid "Language"
+msgstr "Language"
+
+#:
+msgid "Theme"
+msgstr "Theme"
+
+#:
+msgid "English (GB)"
+msgstr "英语 (GB)"
+
+#:
+msgid "French (FR)"
+msgstr "法语 (FR)"
+
+#:
+msgid "German (DE)"
+msgstr "德语 (DE)"
+
+#:
+msgid "Italian (IT)"
+msgstr "意大利语 (IT)"
+
+#:
+msgid "Korean (KO)"
+msgstr "韩语 (KO)"
+
+#:
+msgid "Latvian (LV)"
+msgstr "拉脱维亚语(LV)"
+
+#:
+msgid "Russian (RU)"
+msgstr "俄语 (RU)"
+
+#:
+msgid "Portuguese (PT)"
+msgstr "波兰语 (PT)"
+
+#:
+msgid "Spanish (ES)"
+msgstr "西班牙语 (ES)"
+
+#:
+msgid "Swedish (SE)"
+msgstr "Swedish (SE)"
+
+#:
+msgid "Japanese (JP)"
+msgstr "日语 (JP)"
+
+#:
+msgid "Chinese (CN)"
+msgstr "中文 (CN)"
+
+#:
+msgid "Dutch (NL)"
+msgstr "Dutch (NL)"
+
+#:
+msgid "Hungarian (HU)"
+msgstr "Hungary (HU)"
+
+#:
+msgid "Polish (PL)"
+msgstr "Polish (PL)"
+
+#:
+msgid "Ukrainian (UA)"
+msgstr "Ukrainian (UA)"
+
+#:
+msgid "ZABBIX"
+msgstr "ZABBIX"
+
+#:
+msgid "Welcome to Zabbix! You are connected as"
+msgstr "欢迎使用Zabbix! 您的登录名为"
+
+#:
+msgid "Login name"
+msgstr "登录名"
+
+#:
+msgid "Host profiles"
+msgstr "主机配置"
+
+#:
+msgid "HOST PROFILES"
+msgstr "请选择主机所在位置=>"
+
+#:
+msgid "Extended host profile"
+msgstr "Extended host profile"
+
+#:
+msgid "Extended"
+msgstr "Extended"
+
+#:
+msgid "SEARCH"
+msgstr "搜索"
+
+#:
+msgid "Go"
+msgstr "确认"
+
+#:
+msgid "found"
+msgstr "found"
+
+#:
+msgid "Displaying"
+msgstr "显示"
+
+#:
+msgid "Search pattern is empty"
+msgstr "搜索规则为空"
+
+#:
+msgid "Caption"
+msgstr "Caption"
+
+#:
+msgid "Empty"
+msgstr "Empty"
+
+#:
+msgid "STANDARD ITEMS"
+msgstr "STANDARD ITEMS"
+
+#:
+msgid "No items"
+msgstr "No items"
+
+#:
+msgid "DISCOVERY RULES"
+msgstr "DISCOVERY RULES"
+
+#:
+msgid "DISCOVERY CHECKS"
+msgstr "DISCOVERY CHECKS"
+
+#:
+msgid "Hosts and templates"
+msgstr "Hosts and templates"
+
+#:
+msgid "Edit connector"
+msgstr "Edit connector"
+
+#:
+msgid "Include"
+msgstr "Include"
+
+#:
+msgid "Exclude"
+msgstr "Exclude"
+
+#:
+msgid "Keyword"
+msgstr "Keyword"
+
+#:
+msgid "Position"
+msgstr "Position"
+
+#:
+msgid "Delete expression?"
+msgstr "删除表达式?"
+
+#:
+msgid "Delete keyword?"
+msgstr "删除关键字?"
+
+#:
+msgid "Test data"
+msgstr "测试数据"
+
+#:
+msgid "Result type"
+msgstr "结果类型"
+
+#:
+msgid "Combined result"
+msgstr "Combined result"
+
+#:
+msgid "Delete this application?"
+msgstr "删除这个应用程序?"
+
+#:
+msgid "Activate selected applications?"
+msgstr "激活所选的应用程序?"
+
+#:
+msgid "Disable selected applications?"
+msgstr "禁用所选的程序?"
+
+#:
+msgid "Delete selected applications?"
+msgstr "删除所选的程序?"
+
+#:
+msgid "Incorrect time period"
+msgstr "日期格式不正确"
+
+#:
+msgid "No elements selected!"
+msgstr "没有选取组件!"
+
+#:
+msgid "refreshed every"
+msgstr "refreshed every"
+
+#:
+msgid "Page received incorrect data"
+msgstr "Page received incorrect data"
+
+#:
+msgid "Timezone for PHP is not set. Please set \"date.timezone\" option in php.ini."
+msgstr "Timezone for PHP is not set. Please set \"date.timezone\" option in php.ini."
+
+#:
+msgid "Stats for"
+msgstr "Stats for"
+
+#:
+msgid "Total time"
+msgstr "Total time"
+
+#:
+msgid "Memory limit"
+msgstr "Memory limit"
+
+#:
+msgid "Memory usage"
+msgstr "Memory usage"
+
+#:
+msgid "Memory leak"
+msgstr "Memory leak"
+
+#:
+msgid "SQL selects count"
+msgstr "SQL selects count"
+
+#:
+msgid "SQL executes count"
+msgstr "SQL executes count"
+
+#:
+msgid "SQL requests count"
+msgstr "SQL requests count"
+
+#:
+msgid "Total time spent on SQL"
+msgstr "Total time spent on SQL"
+
+#:
+msgid "End of"
+msgstr "End of"
+
+#:
+msgid "MEMORY LIMIT REACHED! Profiling was stopped to save memory for script processing."
+msgstr "MEMORY LIMIT REACHED! Profiling was stopped to save memory for script processing."
+
+#:
+msgid "Wrong type"
+msgstr "Wrong type"
+
+#:
+msgid "Incorrect type of asort_by_key"
+msgstr "Incorrect type of asort_by_key"
+
+#:
+msgid "days"
+msgstr "days"
+
+#:
+msgid "B"
+msgstr "B"
+
+#:
+msgid "K"
+msgstr "K"
+
+#:
+msgid "Kilo"
+msgstr "Kilo"
+
+#:
+msgid "M"
+msgstr "M"
+
+#:
+msgid "Mega"
+msgstr "Mega"
+
+#:
+msgid "G"
+msgstr "G"
+
+#:
+msgid "Giga"
+msgstr "Giga"
+
+#:
+msgid "T"
+msgstr "T"
+
+#:
+msgid "Tera"
+msgstr "Tera"
+
+#:
+msgid "P"
+msgstr "P"
+
+#:
+msgid "Peta"
+msgstr "Peta"
+
+#:
+msgid "E"
+msgstr "E"
+
+#:
+msgid "Exa"
+msgstr "Exa"
+
+#:
+msgid "Z"
+msgstr "Z"
+
+#:
+msgid "Zetta"
+msgstr "Zetta"
+
+#:
+msgid "Y"
+msgstr "Y"
+
+#:
+msgid "Yotta"
+msgstr "Yotta"
+
+#:
+msgid "Delete selected user?"
+msgstr "Delete selected user?"
+
+#:
+msgid "Subfilter"
+msgstr "Subfilter"
+
+#:
+msgid "affects only filtered data!"
+msgstr "affects only filtered data!"
+
+#:
+msgid "Delete selected item?"
+msgstr "Delete selected item?"
+
+#:
+msgid "Incorrect list of items."
+msgstr "Incorrect list of items."
+
+#:
+msgid "Delete trigger?"
+msgstr "Delete trigger?"
+
+#:
+msgid "Profile for this host is missing"
+msgstr "Profile for this host is missing"
+
+#:
+msgid "No image"
+msgstr "No image"
+
+#:
+msgid "Delete system map?"
+msgstr "Delete system map?"
+
+#:
+msgid "Incorrect arguments passed to function"
+msgstr "Incorrect arguments passed to function"
+
+#:
+msgid "Incorrect key format"
+msgstr "Incorrect key format"
+
+#:
+msgid "Item will not be refreshed. Please enter a correct update interval."
+msgstr "Item will not be refreshed. Please enter a correct update interval."
+
+#:
+msgid "Invalid SNMP port"
+msgstr "Invalid SNMP port"
+
+#:
+msgid "Type of information must be Log for log key"
+msgstr "Type of information must be Log for log key"
+
+#:
+msgid "Value type must be Float for aggregate items"
+msgstr "Value type must be Float for aggregate items"
+
+#:
+msgid "Group function"
+msgstr "Group function"
+
+#:
+msgid "is not one of"
+msgstr "is not one of"
+
+#:
+msgid "Item function"
+msgstr "监控项的函数"
+
+#:
+msgid "Key does not match"
+msgstr "Key does not match"
+
+#:
+msgid "An item with the Key"
+msgstr "An item with the Key"
+
+#:
+msgid "already exists for host"
+msgstr "already exists for host"
+
+#:
+msgid "The key must be unique."
+msgstr "The key must be unique."
+
+#:
+msgid "Added new item"
+msgstr "Added new item"
+
+#:
+msgid "updated"
+msgstr "已更新"
+
+#:
+msgid "No item with"
+msgstr "No item with"
+
+#:
+msgid "deleted"
+msgstr "已删除"
+
+#:
+msgid "Unknown value type"
+msgstr "Unknown value type"
+
+#:
+msgid "Scenario step number cannot be less than 1"
+msgstr "Scenario step number cannot be less than 1"
+
+#:
+msgid "Scenario step name should contain"
+msgstr "Scenario step name should contain"
+
+#:
+msgid "characters only"
+msgstr "characters only"
+
+#:
+msgid "Only characters are allowed"
+msgstr "Only characters are allowed"
+
+#:
+msgid "Cannot add new application"
+msgstr "Cannot add new application"
+
+#:
+msgid "Scenario with name"
+msgstr "Scenario with name"
+
+#:
+msgid "added"
+msgstr "已添加"
+
+#:
+msgid "No media with"
+msgstr "No media with"
+
+#:
+msgid "No media type with"
+msgstr "No media type with"
+
+#:
+msgid "An action type with description"
+msgstr "An action type with description"
+
+#:
+msgid "can not exist without group"
+msgstr "can not exist without group"
+
+#:
+msgid "Added host group"
+msgstr "Added host group"
+
+#:
+msgid "Updated host group"
+msgstr "Updated host group"
+
+#:
+msgid "Incorrect characters used for Hostname"
+msgstr "Incorrect characters used for Hostname"
+
+#:
+msgid "Incorrect characters used for DNS"
+msgstr "Incorrect characters used for DNS"
+
+#:
+msgid "Circular link can not be created"
+msgstr "Circular link can not be created"
+
+#:
+msgid "must be linked to at least one host group"
+msgstr "must be linked to at least one host group"
+
+#:
+msgid "Added new host"
+msgstr "Added new host"
+
+#:
+msgid "is internal and can not be deleted"
+msgstr "is internal and can not be deleted"
+
+#:
+msgid "can not be deleted, due to inner hosts can not be unlinked"
+msgstr "can not be deleted, due to inner hosts can not be unlinked"
+
+#:
+msgid "No host groups with"
+msgstr "No host groups with"
+
+#:
+msgid "incorrect parameters for"
+msgstr "incorrect parameters for"
+
+#:
+msgid "No host with"
+msgstr "No host with"
+
+#:
+msgid "already exists in linked hosts"
+msgstr "already exists in linked hosts"
+
+#:
+msgid "Added new application"
+msgstr "Added new application"
+
+#:
+msgid "Updated application"
+msgstr "Updated application"
+
+#:
+msgid "used by item"
+msgstr "used by item"
+
+#:
+msgid "used by scenario"
+msgstr "used by scenario"
+
+#:
+msgid "No application with"
+msgstr "No application with"
+
+#:
+msgid "unlinked"
+msgstr "unlinked"
+
+#:
+msgid "Template with item key"
+msgstr "Template with item key"
+
+#:
+msgid "Template with application"
+msgstr "Template with application"
+
+#:
+msgid "already linked to host"
+msgstr "already linked to host"
+
+#:
+msgid "Critical error"
+msgstr "Critical error"
+
+#:
+msgid "Field"
+msgstr "Field"
+
+#:
+msgid "is not IP range"
+msgstr "不是IP地址段"
+
+#:
+msgid "is not PORT range"
+msgstr "is not PORT range"
+
+#:
+msgid "is not integer range"
+msgstr "不是整型数据"
+
+#:
+msgid "is not integer"
+msgstr "不是整型数据"
+
+#:
+msgid "is not double"
+msgstr "is not double"
+
+#:
+msgid "is not string"
+msgstr "is not string"
+
+#:
+msgid "contains Multibyte chars"
+msgstr "contains Multibyte chars"
+
+#:
+msgid "multibyte chars are restricted"
+msgstr "multibyte chars are restricted"
+
+#:
+msgid "is not a colour"
+msgstr "is not a colour"
+
+#:
+msgid "is mandatory"
+msgstr "is mandatory"
+
+#:
+msgid "must be missing"
+msgstr "must be missing"
+
+#:
+msgid "Operation cannot be performed due to unauthorized request"
+msgstr "Operation cannot be performed due to unauthorized request"
+
+#:
+msgid "Incorrect value for"
+msgstr "错误的取值类型"
+
+#:
+msgid "No trigger with"
+msgstr "No trigger with"
+
+#:
+msgid "Incorrect usage of quotes"
+msgstr "Incorrect usage of quotes"
+
+#:
+msgid "Expression cannot be empty"
+msgstr "Expression cannot be empty"
+
+#:
+msgid "No such host"
+msgstr "没有该主机"
+
+#:
+msgid "Too many hosts"
+msgstr "太多的主机"
+
+#:
+msgid "No such monitored parameter"
+msgstr "没有该监控参数"
+
+#:
+msgid "for host"
+msgstr "for host"
+
+#:
+msgid "Unknown function"
+msgstr "没有此函数"
+
+#:
+msgid "Incorrect value type"
+msgstr "数据类型错误"
+
+#:
+msgid "for function"
+msgstr "for function"
+
+#:
+msgid "of key"
+msgstr "of key"
+
+#:
+msgid "available only for items with value types"
+msgstr "available only for items with value types"
+
+#:
+msgid "Missing mandatory parameter for function"
+msgstr "Missing mandatory parameter for function"
+
+#:
+msgid "is not a float or macro for function"
+msgstr "is not a float or macro for function"
+
+#:
+msgid "is not a float or counter or macro for function"
+msgstr "is not a float or counter or macro for function"
+
+#:
+msgid "An item key must be used in trigger expression"
+msgstr "An item key must be used in trigger expression"
+
+#:
+msgid "Incorrect trigger expression"
+msgstr "Incorrect trigger expression"
+
+#:
+msgid "You can not use template hosts in mixed expressions."
+msgstr "You can not use template hosts in mixed expressions."
+
+#:
+msgid "Added trigger"
+msgstr "Added trigger"
+
+#:
+msgid "to host"
+msgstr "to host"
+
+#:
+msgid "Missing key"
+msgstr "Missing key"
+
+#:
+msgid "Incorrect function is used"
+msgstr "Incorrect function is used"
+
+#:
+msgid "Unknown macro"
+msgstr "Unknown macro"
+
+#:
+msgid "from host"
+msgstr "from host"
+
+#:
+msgid "Trigger in template"
+msgstr "Trigger in template"
+
+#:
+msgid "has dependency with trigger in template"
+msgstr "has dependency with trigger in template"
+
+#:
+msgid "is not the highest level template"
+msgstr "is not the highest level template"
+
+#:
+msgid "No function with"
+msgstr "No function with"
+
+#:
+msgid "Specify the conditional expression for the target."
+msgstr "Specify the conditional expression for the target."
+
+#:
+msgid "0 or 1"
+msgstr "0 或者 1"
+
+#:
+msgid "Transaction has not been closed. Aborting.."
+msgstr "Transaction has not been closed. Aborting.."
+
+#:
+msgid "No system map with"
+msgstr "No system map with"
+
+#:
+msgid "No sysmap element with"
+msgstr "No sysmap element with"
+
+#:
+msgid "template"
+msgstr "模板"
+
+#:
+msgid "No rows in screen"
+msgstr "No rows in screen"
+
+#:
+msgid "Delete it?"
+msgstr "删除它?"
+
+#:
+msgid "This screen-row is not empty"
+msgstr "This screen-row is not empty"
+
+#:
+msgid "This screen-column is not empty"
+msgstr "This screen-column is not empty"
+
+#:
+msgid "No graph item with"
+msgstr "No graph item with"
+
+#:
+msgid "Missing items for graph"
+msgstr "Missing items for graph"
+
+#:
+msgid "with template host can not contain items from other hosts."
+msgstr "with template host can not contain items from other hosts."
+
+#:
+msgid "Can not use multiple host items for template graph"
+msgstr "Can not use multiple host items for template graph"
+
+#:
+msgid "You must use items only from host"
+msgstr "You must use items only from host"
+
+#:
+msgid "for template graph"
+msgstr "for template graph"
+
+#:
+msgid "updated for hosts"
+msgstr "updated for hosts"
+
+#:
+msgid "Skipped copying of graph"
+msgstr "Skipped copying of graph"
+
+#:
+msgid "Unable to select configuration"
+msgstr "Unable to select configuration"
+
+#:
+msgid "on"
+msgstr "on"
+
+#:
+msgid "every"
+msgstr "every"
+
+#:
+msgid "day"
+msgstr "day"
+
+#:
+msgid "of every"
+msgstr "of every"
+
+#:
+msgid "weeks"
+msgstr "weeks"
+
+#:
+msgid "week"
+msgstr "week"
+
+#:
+msgid "Service cannot be parent and child at the same time."
+msgstr "Service cannot be parent and child at the same time."
+
+#:
+msgid "Cannot link hardlinked service."
+msgstr "Cannot link hardlinked service."
+
+#:
+msgid "Cannot link service to itself."
+msgstr "Cannot link service to itself."
+
+#:
+msgid "No service with"
+msgstr "No service with"
+
+#:
+msgid "No service linkage with"
+msgstr "No service linkage with"
+
+#:
+msgid "Unknown calculation algorithm of service status"
+msgstr "Unknown calculation algorithm of service status"
+
+#:
+msgid "Incorrect user data in"
+msgstr "Incorrect user data in"
+
+#:
+msgid "Could not save image!"
+msgstr "Could not save image!"
+
+#:
+msgid "Execute SQL error"
+msgstr "SQL执行错误"
+
+#:
+msgid "Parse SQL error"
+msgstr "解析 SQL 语句出错"
+
+#:
+msgid "Image size must be less than 1MB"
+msgstr "图片大小必须小于 1MB"
+
+#:
+msgid "Select image to download"
+msgstr "选择需要图片下载"
+
+#:
+msgid "Incorrect Image"
+msgstr "错误的图片"
+
+#:
+msgid "Incorrect characters used for Node name"
+msgstr "节点名不支持某些字符"
+
+#:
+msgid "Master node already exists"
+msgstr "Master node already exists"
+
+#:
+msgid "Incorrect node type"
+msgstr "Incorrect node type"
+
+#:
+msgid "Node with same ID already exists"
+msgstr "Node with same ID already exists"
+
+#:
+msgid "Unable to remove local node"
+msgstr "Unable to remove local node"
+
+#:
+msgid "Please be aware that database still contains data related to the deleted Node"
+msgstr "Please be aware that database still contains data related to the deleted Node"
+
+#:
+msgid "PHP version"
+msgstr "PHP version"
+
+#:
+msgid "Minimal version of PHP is"
+msgstr "Minimal version of PHP is"
+
+#:
+msgid "PHP memory limit"
+msgstr "PHP memory limit"
+
+#:
+msgid "is a minimal PHP memory limitation"
+msgstr "is a minimal PHP memory limitation"
+
+#:
+msgid "PHP post max size"
+msgstr "PHP post max size"
+
+#:
+msgid "is minimum size of PHP post"
+msgstr "is minimum size of PHP post"
+
+#:
+msgid "PHP max execution time"
+msgstr "PHP max execution time"
+
+#:
+msgid "PHP max input time"
+msgstr "PHP max input time"
+
+#:
+msgid "is a minimal limitation on execution time of PHP scripts"
+msgstr "is a minimal limitation on execution time of PHP scripts"
+
+#:
+msgid "is a minimal limitation on input parse time for PHP scripts"
+msgstr "is a minimal limitation on input parse time for PHP scripts"
+
+#:
+msgid "PHP timezone"
+msgstr "PHP的时区设置"
+
+#:
+msgid "no"
+msgstr "非"
+
+#:
+msgid "yes"
+msgstr "是"
+
+#:
+msgid "Timezone for PHP is not set"
+msgstr "PHP未设置时区"
+
+#:
+msgid "Please set"
+msgstr "请设置"
+
+#:
+msgid "option in"
+msgstr "option in"
+
+#:
+msgid "PHP databases support"
+msgstr "PHP支持的数据库"
+
+#:
+msgid "Requires any database support [MySQL or PostgreSQL or Oracle or SQLite3]"
+msgstr "需要支持至少以下一种数据库 [MySQL, PostgreSQL, Oracle 或者 SQLite3]"
+
+#:
+msgid "Requires bcmath module"
+msgstr "需要 bcmath 模块"
+
+#:
+msgid "configure PHP with"
+msgstr "编译 PHP 添加"
+
+#:
+msgid "Requires mb string module"
+msgstr "需要 mbstring 模块"
+
+#:
+msgid "PHP Sockets"
+msgstr "PHP 的 Sockets"
+
+#:
+msgid "Required Sockets module"
+msgstr "需要 Sockets 模块"
+
+#:
+msgid "The GD extension is not loaded."
+msgstr "The GD extension is not loaded."
+
+#:
+msgid "GD PNG Support"
+msgstr "GD PNG Support"
+
+#:
+msgid "Requires images generation support"
+msgstr "Requires images generation support"
+
+#:
+msgid "libxml module"
+msgstr "libxml 模块"
+
+#:
+msgid "php-xml module is not installed"
+msgstr "php-xml module is not installed"
+
+#:
+msgid "ctype module"
+msgstr "ctype module"
+
+#:
+msgid "Requires ctype module"
+msgstr "Requires ctype module"
+
+#:
+msgid "PHP upload max filesize"
+msgstr "PHP最大上传文件大小"
+
+#:
+msgid "is minimum for PHP upload filesize"
+msgstr "is minimum for PHP upload filesize"
+
+#:
+msgid "Help"
+msgstr "帮助"
+
+#:
+msgid "Profile"
+msgstr "配置"
+
+#:
+msgid "Get support"
+msgstr "获取帮助"
+
+#:
+msgid "Monitoring"
+msgstr "状态统计"
+
+#:
+msgid "Inventory"
+msgstr "资产记录"
+
+#:
+msgid "Queue"
+msgstr "队列"
+
+#:
+msgid "Events"
+msgstr "事件"
+
+#:
+msgid "EVENTS"
+msgstr "事件"
+
+#:
+msgid "Maps"
+msgstr "拓扑图"
+
+#:
+msgid "Report"
+msgstr "报告"
+
+#:
+msgid "Reports"
+msgstr "系统评估"
+
+#:
+msgid "General"
+msgstr "总览"
+
+#:
+msgid "Login"
+msgstr "登录"
+
+#:
+msgid "Logout"
+msgstr "退出"
+
+#:
+msgid "Print"
+msgstr "打印"
+
+#:
+msgid "Latest data"
+msgstr "最新数据"
+
+#:
+msgid "Incorrect description"
+msgstr "错误的描述"
+
+#:
+msgid "Can't format Tree"
+msgstr "Can't format Tree"
+
+#:
+msgid "You do not have permission to perform this operation"
+msgstr "You do not have permission to perform this operation"
+
+#:
+msgid "No permissions for screen"
+msgstr "No permissions for screen"
+
+#:
+msgid "No permissions for map"
+msgstr "No permissions for map"
+
+#:
+msgid "XML file contains errors"
+msgstr "XML file contains errors"
