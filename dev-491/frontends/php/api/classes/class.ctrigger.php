@@ -1418,7 +1418,7 @@ COpt::memoryPick();
 				'triggerids' => $triggerids,
 				'output' => API_OUTPUT_EXTEND,
 				'editable' => 1,
-				'select_hosts' => API_OUTPUT_EXTEND,
+				'selectHosts' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1
 			);
 			$del_triggers = self::get($options);
