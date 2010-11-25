@@ -19,7 +19,7 @@
 	</div>
 </td>
 <td>
-	<input class="input" name="interfaces[#{interfaceid}][port]" type="text" size="10" value="#{port}" />
+	<input class="input" name="interfaces[#{interfaceid}][port]" type="text" size="15" value="#{port}" />
 </td>
 <td>
 	<div class="jqueryinputset">

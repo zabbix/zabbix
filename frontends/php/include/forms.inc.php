@@ -370,24 +370,27 @@
 		}
 
 
-		//prepaitring the list of possible interface languages
+// prepaitring the list of possible interface languages
 		$cmbLang = new CComboBox('lang',$lang);
 		$languages_unable_set = 0;
 		foreach($ZBX_LOCALES as $loc_id => $loc_name){
-			//checking if this locale exists in the system. The only way of doing it is to try and set one
+// checking if this locale exists in the system. The only way of doing it is to try and set one
 			$locale_exists = setlocale(LC_ALL, zbx_locale_variants($loc_id)) ? 'yes' : 'no';
-			$selected = $loc_id == $USER_DETAILS['lang'] ? true : null;
+
+			$selected = ($loc_id == $USER_DETAILS['lang']) ? true : null;
 			$cmbLang->addItem($loc_id, $loc_name, $selected, $locale_exists);
-			if ($locale_exists != 'yes'){
+
+			if($locale_exists != 'yes'){
 				$languages_unable_set++;
 			}
 		}
-		//restoring original locale
+// restoring original locale
 		setlocale(LC_ALL, zbx_locale_variants($USER_DETAILS['lang']));
-		// Numeric Locale to default
+
+// Numeric Locale to default
 		setLocale(LC_NUMERIC, array('en','en_US','en_US.UTF-8','English_United States.1252'));
 
-		//if some languages can't be set, showing a warning about that
+// if some languages can't be set, showing a warning about that
 		$lang_hint = $languages_unable_set > 0 ? _('You are not able to choose some of the languages, because locales for them are not installed on the web server.') : '';
 
 		$lang_tbl = new CTable();

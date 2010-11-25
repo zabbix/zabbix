@@ -1269,7 +1269,7 @@ Copt::memoryPick();
 				if(!isset($dbHosts[$host['hostid']]))
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 
-				if($delete) $proxy['host'] = $dbProxies[$proxy['proxyid']]['host'];
+				if($delete) $host['host'] = $dbHosts[$host['hostid']]['host'];
 			}
 			else{
 				if(!isset($host['groups']))

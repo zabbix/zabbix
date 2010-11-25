@@ -79,8 +79,8 @@
 		}
 
 		$cmbConnectBy = new CRadioButton('interfaces[0][useip]', $interface['useip']);
-		$cmbConnectBy->addValue(S_DNS_NAME, 0);
-		$cmbConnectBy->addValue(S_IP_ADDRESS, 1);
+		$cmbConnectBy->addValue(S_IP, 1);
+		$cmbConnectBy->addValue(S_DNS, 0);
 		$cmbConnectBy->useJQueryStyle();
 
 		$ifTab = new CTable();
@@ -91,10 +91,10 @@
 			S_PORT
 		));
 		$ifTab->addRow(array(
-			new CTextBox('interfaces[0][ip]', $interface['ip'], '20'),
-			new CTextBox('interfaces[0][dns]', $interface['dns'], '40'),
+			new CTextBox('interfaces[0][ip]', $interface['ip'], '24'),
+			new CTextBox('interfaces[0][dns]', $interface['dns'], '30'),
 			$cmbConnectBy,
-			new CNumericBox('interfaces[0][port]', $interface['port'], 5)
+			new CTextBox('interfaces[0][port]', $interface['port'], 15)
 		));
 
 		$proxyList->addRow(S_INTERFACE, new CDiv($ifTab, 'border_dotted objectlist'));
