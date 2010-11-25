@@ -389,7 +389,7 @@
 
 		//if some languages can't be set, showing a warning about that
 		$lang_hint = $languages_unable_set > 0 ? _('You are not able to choose some of the languages, because locales for them are not installed on the web server.') : '';
-		
+
 		$lang_tbl = new CTable();
 		$c1 = new CCol($cmbLang);
 		$c1->addStyle('padding-left: 0;');
@@ -3708,7 +3708,6 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$ip			= get_request('ip',	'0.0.0.0');
 		$proxy_hostid	= get_request('proxy_hostid','');
 
-		$useipmi	= get_request('useipmi', 'no');
 		$ipmi_ip	= get_request('ipmi_ip', '');
 		$ipmi_port	= get_request('ipmi_port', 623);
 		$ipmi_authtype	= get_request('ipmi_authtype', -1);
@@ -3975,60 +3974,53 @@ JAVASCRIPT;
 
 
 		$frmHost->addRow(array(
-			new CVisibilityBox('visible[useipmi]', isset($visible['useipmi']), 'useipmi', S_ORIGINAL), S_USEIPMI),
-			new CCheckBox('useipmi', $useipmi, 'submit()')
+			new CVisibilityBox('visible[ipmi_ip]', isset($visible['ipmi_ip']), 'ipmi_ip', S_ORIGINAL), S_IPMI_IP_ADDRESS),
+			new CTextBox('ipmi_ip', $ipmi_ip, defined('ZBX_HAVE_IPV6') ? 39 : 15)
 		);
 
-		if($useipmi == 'yes'){
-			$frmHost->addRow(array(
-				new CVisibilityBox('visible[ipmi_ip]', isset($visible['ipmi_ip']), 'ipmi_ip', S_ORIGINAL), S_IPMI_IP_ADDRESS),
-				new CTextBox('ipmi_ip', $ipmi_ip, defined('ZBX_HAVE_IPV6') ? 39 : 15)
-			);
+		$frmHost->addRow(array(
+			new CVisibilityBox('visible[ipmi_port]', isset($visible['ipmi_port']), 'ipmi_port', S_ORIGINAL), S_IPMI_PORT),
+			new CNumericBox('ipmi_port', $ipmi_port, 15)
+		);
 
-			$frmHost->addRow(array(
-				new CVisibilityBox('visible[ipmi_port]', isset($visible['ipmi_port']), 'ipmi_port', S_ORIGINAL), S_IPMI_PORT),
-				new CNumericBox('ipmi_port', $ipmi_port, 15)
-			);
+		$cmbIPMIAuthtype = new CComboBox('ipmi_authtype', $ipmi_authtype);
+		$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_DEFAULT,	S_AUTHTYPE_DEFAULT);
+		$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_NONE,		S_AUTHTYPE_NONE);
+		$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_MD2,		S_AUTHTYPE_MD2);
+		$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_MD5,		S_AUTHTYPE_MD5);
+		$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_STRAIGHT,	S_AUTHTYPE_STRAIGHT);
+		$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_OEM,		S_AUTHTYPE_OEM);
+		$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_RMCP_PLUS,	S_AUTHTYPE_RMCP_PLUS);
+		$frmHost->addRow(array(
+			new CVisibilityBox('visible[ipmi_authtype]', isset($visible['ipmi_authtype']), 'ipmi_authtype', S_ORIGINAL), S_IPMI_AUTHTYPE),
+			$cmbIPMIAuthtype
+		);
 
-			$cmbIPMIAuthtype = new CComboBox('ipmi_authtype', $ipmi_authtype);
-			$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_DEFAULT,	S_AUTHTYPE_DEFAULT);
-			$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_NONE,		S_AUTHTYPE_NONE);
-			$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_MD2,		S_AUTHTYPE_MD2);
-			$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_MD5,		S_AUTHTYPE_MD5);
-			$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_STRAIGHT,	S_AUTHTYPE_STRAIGHT);
-			$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_OEM,		S_AUTHTYPE_OEM);
-			$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_RMCP_PLUS,	S_AUTHTYPE_RMCP_PLUS);
-			$frmHost->addRow(array(
-				new CVisibilityBox('visible[ipmi_authtype]', isset($visible['ipmi_authtype']), 'ipmi_authtype', S_ORIGINAL), S_IPMI_AUTHTYPE),
-				$cmbIPMIAuthtype
-			);
-
-			$cmbIPMIPrivilege = new CComboBox('ipmi_privilege', $ipmi_privilege);
-			$cmbIPMIPrivilege->addItem(IPMI_PRIVILEGE_CALLBACK,	S_PRIVILEGE_CALLBACK);
-			$cmbIPMIPrivilege->addItem(IPMI_PRIVILEGE_USER,		S_PRIVILEGE_USER);
-			$cmbIPMIPrivilege->addItem(IPMI_PRIVILEGE_OPERATOR,	S_PRIVILEGE_OPERATOR);
-			$cmbIPMIPrivilege->addItem(IPMI_PRIVILEGE_ADMIN,	S_PRIVILEGE_ADMIN);
-			$cmbIPMIPrivilege->addItem(IPMI_PRIVILEGE_OEM,		S_PRIVILEGE_OEM);
-			$frmHost->addRow(array(
-				new CVisibilityBox('visible[ipmi_privilege]', isset($visible['ipmi_privilege']), 'ipmi_privilege', S_ORIGINAL), S_IPMI_PRIVILEGE),
-				$cmbIPMIPrivilege
-			);
-
-			$frmHost->addRow(array(
-				new CVisibilityBox('visible[ipmi_username]', isset($visible['ipmi_username']), 'ipmi_username', S_ORIGINAL), S_IPMI_USERNAME),
-				new CTextBox('ipmi_username', $ipmi_username, 16)
-			);
-
-			$frmHost->addRow(array(
-				new CVisibilityBox('visible[ipmi_password]', isset($visible['ipmi_password']), 'ipmi_password', S_ORIGINAL), S_IPMI_PASSWORD),
-				new CTextBox('ipmi_password', $ipmi_password, 20)
-			);
-		}
+		$cmbIPMIPrivilege = new CComboBox('ipmi_privilege', $ipmi_privilege);
+		$cmbIPMIPrivilege->addItem(IPMI_PRIVILEGE_CALLBACK,	S_PRIVILEGE_CALLBACK);
+		$cmbIPMIPrivilege->addItem(IPMI_PRIVILEGE_USER,		S_PRIVILEGE_USER);
+		$cmbIPMIPrivilege->addItem(IPMI_PRIVILEGE_OPERATOR,	S_PRIVILEGE_OPERATOR);
+		$cmbIPMIPrivilege->addItem(IPMI_PRIVILEGE_ADMIN,	S_PRIVILEGE_ADMIN);
+		$cmbIPMIPrivilege->addItem(IPMI_PRIVILEGE_OEM,		S_PRIVILEGE_OEM);
+		$frmHost->addRow(array(
+			new CVisibilityBox('visible[ipmi_privilege]', isset($visible['ipmi_privilege']), 'ipmi_privilege', S_ORIGINAL), S_IPMI_PRIVILEGE),
+			$cmbIPMIPrivilege
+		);
 
 		$frmHost->addRow(array(
-					new CVisibilityBox('visible[useprofile]', isset($visible['useprofile']), 'useprofile', S_ORIGINAL),S_USE_PROFILE),
-					new CCheckBox('useprofile',$useprofile,'submit()')
-				);
+			new CVisibilityBox('visible[ipmi_username]', isset($visible['ipmi_username']), 'ipmi_username', S_ORIGINAL), S_IPMI_USERNAME),
+			new CTextBox('ipmi_username', $ipmi_username, 16)
+		);
+
+		$frmHost->addRow(array(
+			new CVisibilityBox('visible[ipmi_password]', isset($visible['ipmi_password']), 'ipmi_password', S_ORIGINAL), S_IPMI_PASSWORD),
+			new CTextBox('ipmi_password', $ipmi_password, 20)
+		);
+
+		$frmHost->addRow(array(
+			new CVisibilityBox('visible[useprofile]', isset($visible['useprofile']), 'useprofile', S_ORIGINAL),S_USE_PROFILE),
+			new CCheckBox('useprofile',$useprofile,'submit()')
+		);
 
 // BEGIN: HOSTS PROFILE EXTENDED Section
 		$frmHost->addRow(array(

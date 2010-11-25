@@ -39,7 +39,6 @@
 	$status		= get_request('status',	HOST_STATUS_MONITORED);
 	$proxy_hostid	= get_request('proxy_hostid','');
 
-	$useipmi	= get_request('useipmi','no');
 	$ipmi_authtype	= get_request('ipmi_authtype',-1);
 	$ipmi_privilege	= get_request('ipmi_privilege',2);
 	$ipmi_username	= get_request('ipmi_username','');
@@ -112,7 +111,6 @@
 		$host			= $dbHost['host'];
 		$status			= $dbHost['status'];
 
-		$useipmi		= $dbHost['useipmi'] ? 'yes' : 'no';
 		$ipmi_authtype		= $dbHost['ipmi_authtype'];
 		$ipmi_privilege		= $dbHost['ipmi_privilege'];
 		$ipmi_username		= $dbHost['ipmi_username'];
@@ -427,7 +425,6 @@
 
 // IPMI TAB {
 	$ipmiList = new CFormList('ipmilist');
-	$ipmiList->addRow(array(new CLabel(SPACE, 'useipmi'), new CCheckBox('useipmi', $useipmi)));
 
 	$cmbIPMIAuthtype = new CComboBox('ipmi_authtype', $ipmi_authtype);
 	$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_DEFAULT,	S_AUTHTYPE_DEFAULT);

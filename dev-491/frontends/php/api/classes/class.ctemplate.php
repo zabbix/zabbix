@@ -977,19 +977,6 @@ COpt::memoryPick();
  *
  * @param array $templates multidimensional array with templates data
  * @param string $templates['host']
- * @param string $templates['port']
- * @param string $templates['status']
- * @param string $templates['useip']
- * @param string $templates['dns']
- * @param string $templates['ip']
- * @param string $templates['proxy_hostid']
- * @param string $templates['useipmi']
- * @param string $templates['ipmi_ip']
- * @param string $templates['ipmi_port']
- * @param string $templates['ipmi_authtype']
- * @param string $templates['ipmi_privilege']
- * @param string $templates['ipmi_username']
- * @param string $templates['ipmi_password']
  * @return boolean
  */
 	public static function create($templates){
@@ -1338,21 +1325,6 @@ COpt::memoryPick();
  *
  * @param _array $hosts multidimensional array with Hosts data
  * @param array $hosts['hosts'] Array of Host objects to update
- * @param string $hosts['fields']['host'] Host name.
- * @param array $hosts['fields']['groupids'] HostGroup IDs add Host to.
- * @param int $hosts['fields']['port'] Port. OPTIONAL
- * @param int $hosts['fields']['status'] Host Status. OPTIONAL
- * @param int $hosts['fields']['useip'] Use IP. OPTIONAL
- * @param string $hosts['fields']['dns'] DNS. OPTIONAL
- * @param string $hosts['fields']['ip'] IP. OPTIONAL
- * @param int $hosts['fields']['proxy_hostid'] Proxy Host ID. OPTIONAL
- * @param int $hosts['fields']['useipmi'] Use IPMI. OPTIONAL
- * @param string $hosts['fields']['ipmi_ip'] IPMAI IP. OPTIONAL
- * @param int $hosts['fields']['ipmi_port'] IPMI port. OPTIONAL
- * @param int $hosts['fields']['ipmi_authtype'] IPMI authentication type. OPTIONAL
- * @param int $hosts['fields']['ipmi_privilege'] IPMI privilege. OPTIONAL
- * @param string $hosts['fields']['ipmi_username'] IPMI username. OPTIONAL
- * @param string $hosts['fields']['ipmi_password'] IPMI password. OPTIONAL
  * @return boolean
  */
 	public static function massUpdate($data){
