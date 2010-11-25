@@ -709,14 +709,10 @@ include_once('include/page_header.php');
 
 		zbx_add_post_js('chkbxRange.pageGoName = "templates";');
 
-		$footer = get_table_header(new CCol(array($goBox, $goButton)));
+		$footer = get_table_header(array($goBox, $goButton));
 // }GO
 
-// PAGING FOOTER
-		$table = array($paging,$table,$paging,$footer);
-//---------
-
-		$form->addItem($table);
+		$form->addItem(array($paging,$table,$paging,$footer));
 		$template_wdgt->addItem($form);
 	}
 

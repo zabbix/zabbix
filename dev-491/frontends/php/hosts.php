@@ -362,7 +362,7 @@ include_once('include/page_header.php');
 
 			$hosts = array('hosts' => zbx_toObject($hostids, 'hostid'));
 
-			$properties = array('port', 'useip', 'dns',	'ip', 'proxy_hostid', 'ipmi_ip', 'ipmi_port', 'ipmi_authtype',
+			$properties = array('proxy_hostid', 'ipmi_authtype',
 				'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'status');
 			$new_values = array();
 			foreach($properties as $property){
@@ -728,7 +728,8 @@ include_once('include/page_header.php');
 ?>
 <?php
 	if(($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['hosts'])){
-		$hosts_wdgt->addItem(insert_mass_update_host_form());
+		$hostForm = new CGetForm();
+		$hosts_wdgt->addItem($hostForm->render('host.massupdate'));
 	}
 	else if(isset($_REQUEST['form'])){
 		if($_REQUEST['form'] == S_IMPORT_HOST)
