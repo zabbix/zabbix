@@ -137,8 +137,8 @@ div.draggable {
 	cursor: pointer;
 }
 
-div.hoverclass123{
-	border:1px solid red;
+.screen_edit .hoverclass123 {
+	border: 1px solid red;
 }
 /***************************/
 
