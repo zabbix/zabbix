@@ -54,6 +54,7 @@ return 0;
 }
 
 function isset(key, obj){
+	if(is_null(key) || is_null(obj)) return false;
 	return (typeof(obj[key]) != 'undefined');
 }
 

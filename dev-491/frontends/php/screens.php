@@ -146,7 +146,8 @@
 
 	$screens = CScreen::get(array(
 		'nodeids' => get_current_nodeid(),
-		'extendoutput' => 1
+		'output' => API_OUTPUT_EXTEND,
+		'select_screenitems' => API_OUTPUT_EXTEND,
 	));
 
 
@@ -260,7 +261,7 @@
 			$form->addItem(array(SPACE.S_HOST.SPACE, $cmbHosts));
 		}
 
-		$element = get_screen($screen['screenid'], 0, $effectiveperiod);
+		$element = get_screen($screen, 0, $effectiveperiod);
 
 		if(2 != $_REQUEST['fullscreen']){
 			$timeline = array(

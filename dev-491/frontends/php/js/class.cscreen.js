@@ -1,6 +1,6 @@
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,92 +58,74 @@ initialize: function(screenid, obj_id, id){
 	this.id = id;
 
 	this.screen_obj = $(obj_id);
-//	this.add_divs(this.screen_obj, 'td', 'draggable');
-
-	var trs = this.screen_obj.getElementsByTagName("tr");
 
 	function wedge(event){ return false }
 
-	for (var i = 0; i < trs.length; i++){
-		var divs = document.getElementsByClassName("draggable", trs[i]);
-		for (var j = 0; j < divs.length; ++j){
-			addListener(divs[j], 'mousedown', this.deactivate_drag.bindAsEventListener(this), false);
-
-			jQuery(divs[j]).draggable({
-				revert: 'invalid',
-				start: function(){
-					if(IE){
-						Event.observe(document.body, "drag", wedge, false);
-						Event.observe(document.body, "selectstart", wedge, false);
-					}
-				},
-				stop: this.activate_drag.bind(this)
-			});
+	jQuery('.draggable').draggable({
+		revert: 'invalid',
+//		scroll: false,
+		opacity: 0.5,
+		start: function(){
+			if(IE){
+				Event.observe(document.body, "drag", wedge, false);
+				Event.observe(document.body, "selectstart", wedge, false);
+			}
 		}
-	}
+	});
 
-	var divs = $$(this.screen_obj).select(".draggable");
-	for (var j = 0; j < divs.length; ++j){
-		jQuery(divs[j]).droppable({
-			accept:'draggable',
-			hoverClass:'hoverclass123',
-			drop: this.on_drop.bind(this)
-		})
-	}
+	jQuery(".cntr_mdl").droppable({
+		accept: '.draggable',
+		hoverClass: 'hoverclass123',
+		drop: this.on_drop.bind(this),
+		tolerance: 'pointer'
+	});
 },
 
-on_drop: function(element, dropon, event){
-	var dropon_parent = dropon.parentNode;
-	element.parentNode.appendChild(dropon);
-	dropon_parent.appendChild(element);
+on_drop: function(event, ui){
+	var element = ui.draggable.context;
+	var dropon = event.target;
+	var dropDiv = jQuery(dropon).children('.draggable');
+
+	var x1 = jQuery(element).data('xcoord');
+	var y1 = jQuery(element).data('ycoord');
+	var x2 = jQuery(dropDiv).data('xcoord');
+	var y2 = jQuery(dropDiv).data('ycoord');
+
+	var url = new Curl(location.href);
+	var params = {
+		ajaxAction: 'sw_pos',
+		output: 'ajax',
+		"sw_pos[0]": y1,
+		"sw_pos[1]": x1,
+		"sw_pos[2]": y2,
+		"sw_pos[3]": x2,
+		screenid: url.getArgument('screenid'),
+		sid: url.getArgument('sid')
+	};
+
+	jQuery.post("screenedit.php", params, function(data){
+		if(!isset('result', data) || !data.result){
+			jQuery('<p>Ajax request error</p>').dialog({
+				modal: true,
+				resizable: false,
+				draggable: false
+			});
+		}
+		else{
+			var draggable_parent = element.parentNode;
+			draggable_parent.appendChild(dropon.childNodes[0]);
+			dropon.appendChild(element);
+
+			jQuery(element).data('ycoord', y2);
+			jQuery(element).data('xcoord', x2);
+			jQuery(dropDiv).data('ycoord', y1);
+			jQuery(dropDiv).data('xcoord', x1);
+		}
+
+	}, 'json');
 
 	element.style.top = '0px';
 	element.style.left = '0px';
-
-	var pos = element.id.split('_');
-	var r1 = pos[1];
-	var c1 = pos[2];
-
-	pos = dropon.id.split('_');
-	var r2 = pos[1];
-	var c2 = pos[2];
-
-	var url = new Curl(location.href);
-
-	var args = url.getArguments();
-	for(a in args){
-		if(a == 'screenid') continue;
-		url.unsetArgument(a);
-	}
-
-	url.setArgument('sw_pos[0]',r1);
-	url.setArgument('sw_pos[1]',c1);
-	url.setArgument('sw_pos[2]',r2);
-	url.setArgument('sw_pos[3]',c2);
-
-
-	// url.unsetArgument('add_row');
-	// url.unsetArgument('add_col');
-	// url.unsetArgument('rmv_row');
-	// url.unsetArgument('rmv_col');
-
-	location.href = url.getUrl();
-},
-
-element_onclick: function(href){
-	if(this.dragged == 0){
-		location.href = href;
-	}
-},
-
-activate_drag: function(){
-	this.debug('activate_drag');
-	this.dragged = 1;
-},
-
-deactivate_drag: function(){
-	this.debug('deactivate_drag');
-	this.dragged = 0;
 },
 
 debug: function(str){

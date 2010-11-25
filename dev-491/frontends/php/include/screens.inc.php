@@ -893,6 +893,7 @@ require_once('include/js.inc.php');
 
 		$skip_field = array();
 		$screenItems = array();
+
 		foreach($screen['screenitems'] as $sinum => $screenItem){
 			$screenItems[] = $screenItem;
 			for($i = 0; $i < $screenItem['rowspan'] || $i == 0; $i++){
@@ -913,7 +914,7 @@ require_once('include/js.inc.php');
 			$new_cols = array(new Ccol(new Cimg('images/general/zero.gif','zero',1,1)));
 			for($c=0;$c<$screen['hsize']+1;$c++){
 				$add_icon = new Cimg('images/general/closed.gif', NULL, NULL, NULL, 'pointer');
-            $add_icon->addAction('onclick', "javascript: location.href = 'screenedit.php?config=1&screenid=".$screen['screenid']."&add_col=$c';");
+            	$add_icon->addAction('onclick', "javascript: location.href = 'screenedit.php?config=1&screenid=".$screen['screenid']."&add_col=$c';");
 				array_push($new_cols, new Ccol($add_icon));
 			}
 			$table->addRow($new_cols);
@@ -927,7 +928,7 @@ require_once('include/js.inc.php');
 
 			if($editmode == 1){
 				$add_icon = new Cimg('images/general/closed.gif', NULL, NULL, NULL, 'pointer');
-            $add_icon->addAction('onclick', "javascript: location.href = 'screenedit.php?config=1&screenid=".$screen['screenid']."&add_row=$r';");
+            	$add_icon->addAction('onclick', "javascript: location.href = 'screenedit.php?config=1&screenid=".$screen['screenid']."&add_row=$r';");
 				array_push($new_cols, new Ccol($add_icon));
 			}
 
@@ -981,11 +982,9 @@ require_once('include/js.inc.php');
 				}
 
 				if($editmode == 1 && $screenitemid!=0){
-					$onclick_action = "ZBX_SCREENS['".$_REQUEST['screenid']."'].screen.element_onclick('screenedit.php?form=update".url_param('screenid').'&screenitemid='.$screenitemid."#form');";
 					$action = 'screenedit.php?form=update'.url_param('screenid').'&screenitemid='.$screenitemid.'#form';
 				}
 				else if($editmode == 1 && $screenitemid==0){
-					$onclick_action = "ZBX_SCREENS['".$_REQUEST['screenid']."'].screen.element_onclick('screenedit.php?form=update".url_param('screenid').'&x='.$c.'&y='.$r."#form');";
 					$action = 'screenedit.php?form=update'.url_param('screenid').'&x='.$c.'&y='.$r.'#form';
 				}
 				else
@@ -1583,7 +1582,7 @@ require_once('include/js.inc.php');
 							new CLink(
 								$trigger['description'],
 								'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid']
-								),
+							),
 							$value,
 							new CCol(get_severity_description($trigger['priority']), get_severity_style($trigger['priority'])),
 						));
@@ -1608,9 +1607,10 @@ require_once('include/js.inc.php');
 				if($valign == VALIGN_BOTTOM)	$str_valign = 'bttm';
 
 				if(($editmode == 1) && !$item_form){
-					$item = new CDiv($item,'draggable');
-					$item->setAttribute('id','position_'.$r.'_'.$c);
-					if($editmode == 1)	$item->setAttribute('onclick','javascript: '.$onclick_action);
+					$item = new CDiv($item, 'draggable');
+					$item->setAttribute('id', 'position_'.$r.'_'.$c);
+					$item->setAttribute('data-xcoord', $c);
+					$item->setAttribute('data-ycoord', $r);
 				}
 
 				$new_col = new CCol($item,$str_halign.'_'.$str_valign);
