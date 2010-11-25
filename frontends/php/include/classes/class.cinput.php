@@ -27,13 +27,13 @@ class CInput extends CTag{
 		$this->jQuery = false;
 
 		$this->setType($type);
-		
+
 		$this->setAttribute('id', $name);
 		$this->setAttribute('name', $name);
 
 		$this->setAttribute('value',$value);
 
-		if(!is_null($class)) 
+		if(!is_null($class))
 			$this->setAttribute('class', 'input '.$class);
 		else
 			$this->setAttribute('class', 'input '.$type);

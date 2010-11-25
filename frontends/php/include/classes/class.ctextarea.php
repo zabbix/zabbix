@@ -21,13 +21,13 @@
 <?php
 class CTextArea extends CTag{
 /* public */
-	public function __construct($name='textarea',$value='',$cols=77,$rows=7,$readonly='no'){
+	public function __construct($name='textarea',$value='',$cols=77,$rows=7, $readonly=false){
 		parent::__construct('textarea','yes');
 		$this->attributes['class'] = 'input';
 
 		$this->attributes['id'] = $name;
 		$this->attributes['name'] = $name;
-		
+
 		$this->attributes['rows'] = $rows;
 		$this->attributes['cols'] = $cols;
 		$this->setReadonly($readonly);
@@ -35,11 +35,11 @@ class CTextArea extends CTag{
 		$this->addItem($value);
 	}
 
-	public function setReadonly($value='yes'){
-		if($value==='yes' || $value == true)
-			return $this->attributes['readonly'] = 'readonly';
-
-		$this->removeAttribute('readonly');
+	public function setReadonly($value=true){
+		if($value)
+			$this->attributes['readonly'] = 'readonly';
+		else
+			$this->removeAttribute('readonly');
 	}
 
 	public function setValue($value=''){
