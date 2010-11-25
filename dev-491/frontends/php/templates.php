@@ -484,11 +484,12 @@ include_once('include/page_header.php');
 	$frmForm = new CForm();
 	if(!isset($_REQUEST['form'])){
 		$frmForm->cleanItems();
-		$bttnList = new CList(null, 'objectlist');
-		$bttnList->addItem(new CSubmit('form', S_CREATE_TEMPLATE, null, 'link_menu'));
-		$bttnList->addItem(new CSubmit('form', S_IMPORT_TEMPLATE, null, 'link_menu'));
-
-		$frmForm->addItem($bttnList);
+		$buttons = new CDiv(array(
+			new CSubmit('form', S_CREATE_TEMPLATE),
+			new CSubmit('form', S_IMPORT_TEMPLATE)
+		));
+		$buttons->useJQueryStyle();
+		$frmForm->addItem($buttons);
 	}
 
 	$template_wdgt = new CWidget();

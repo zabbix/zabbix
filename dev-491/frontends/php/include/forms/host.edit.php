@@ -494,50 +494,29 @@
 
 // PROFILE WIDGET {
 	$profileList = new CFormList('profilelist');
+	$profileList->addRow(array(new CLabel(SPACE, 'useprofile'), new CCheckBox('useprofile', $useprofile)));
 
-	$profileList->addRow(S_USE_PROFILE,new CCheckBox('useprofile',$useprofile,'submit()'));
-
-	if($useprofile == 'yes'){
-		$profileList->addRow(S_DEVICE_TYPE,new CTextBox('devicetype',$devicetype,61));
-		$profileList->addRow(S_NAME,new CTextBox('name',$name,61));
-		$profileList->addRow(S_OS,new CTextBox('os',$os,61));
-		$profileList->addRow(S_SERIALNO,new CTextBox('serialno',$serialno,61));
-		$profileList->addRow(S_TAG,new CTextBox('tag',$tag,61));
-		$profileList->addRow(S_MACADDRESS,new CTextBox('macaddress',$macaddress,61));
-		$profileList->addRow(S_HARDWARE,new CTextArea('hardware',$hardware,60,4));
-		$profileList->addRow(S_SOFTWARE,new CTextArea('software',$software,60,4));
-		$profileList->addRow(S_CONTACT,new CTextArea('contact',$contact,60,4));
-		$profileList->addRow(S_LOCATION,new CTextArea('location',$location,60,4));
-		$profileList->addRow(S_NOTES,new CTextArea('notes',$notes,60,4));
-	}
-	else{
-		$frmHost->addVar('devicetype', $devicetype);
-		$frmHost->addVar('name',$name);
-		$frmHost->addVar('os',$os);
-		$frmHost->addVar('serialno',$serialno);
-		$frmHost->addVar('tag',	$tag);
-		$frmHost->addVar('macaddress',$macaddress);
-		$frmHost->addVar('hardware',$hardware);
-		$frmHost->addVar('software',$software);
-		$frmHost->addVar('contact',$contact);
-		$frmHost->addVar('location',$location);
-		$frmHost->addVar('notes',$notes);
-	}
+	$profileList->addRow(S_DEVICE_TYPE,new CTextBox('devicetype',$devicetype,61));
+	$profileList->addRow(S_NAME,new CTextBox('name',$name,61));
+	$profileList->addRow(S_OS,new CTextBox('os',$os,61));
+	$profileList->addRow(S_SERIALNO,new CTextBox('serialno',$serialno,61));
+	$profileList->addRow(S_TAG,new CTextBox('tag',$tag,61));
+	$profileList->addRow(S_MACADDRESS,new CTextBox('macaddress',$macaddress,61));
+	$profileList->addRow(S_HARDWARE,new CTextArea('hardware',$hardware,60,4));
+	$profileList->addRow(S_SOFTWARE,new CTextArea('software',$software,60,4));
+	$profileList->addRow(S_CONTACT,new CTextArea('contact',$contact,60,4));
+	$profileList->addRow(S_LOCATION,new CTextArea('location',$location,60,4));
+	$profileList->addRow(S_NOTES,new CTextArea('notes',$notes,60,4));
 
 	$divTabs->addTab('profileTab', S_HOST_PROFILE, $profileList);
 // } PROFILE WIDGET
 
 // EXT PROFILE WIDGET {
 	$profileexlist =  new CFormList('profileexlist');
-	$profileexlist->addRow(S_USE_EXTENDED_PROFILE,new CCheckBox('useprofile_ext',$useprofile_ext,'submit()','yes'));
+	$profileexlist->addRow(array(new CLabel(SPACE, 'useprofile_ext'), new CCheckBox('useprofile_ext', $useprofile_ext)));
 
 	foreach($ext_profiles_fields as $prof_field => $caption){
-		if($useprofile_ext == 'yes'){
-			$profileexlist->addRow($caption,new CTextBox('ext_host_profiles['.$prof_field.']',$ext_host_profiles[$prof_field],80));
-		}
-		else{
-			$frmHost->addVar('ext_host_profiles['.$prof_field.']',	$ext_host_profiles[$prof_field]);
-		}
+		$profileexlist->addRow($caption, new CTextBox('ext_host_profiles['.$prof_field.']',$ext_host_profiles[$prof_field],80));
 	}
 
 	$divTabs->addTab('profileExTab', S_EXTENDED_HOST_PROFILE, $profileexlist);

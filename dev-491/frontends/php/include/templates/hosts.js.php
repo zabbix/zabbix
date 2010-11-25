@@ -93,4 +93,31 @@ function removeInterfaceRow(hostInterfaceId){
 	jQuery("#hostIterfaces").accordion('resize');
 }
 
+jQuery(document).ready(function(){
+
+	jQuery("#useprofile").change(function(){
+		if(this.checked){
+			jQuery("#useprofile").button("option", "label", "<?php print(_('Disable profile'));?>");
+			jQuery("#profilelist :input:gt(0)").removeAttr("disabled");
+		}
+		else{
+			jQuery("#useprofile").button("option", "label", "<?php print(_('Enable profile'));?>");
+			jQuery("#profilelist :input:gt(0)").attr("disabled", "disabled");
+		}
+	}
+	).button().change();
+
+
+	jQuery("#useprofile_ext").change(function(){
+		if(this.checked){
+			jQuery("#useprofile_ext").button("option", "label", "<?php print(_('Disable extended profile'));?>");
+			jQuery("#profileexlist :input:gt(0)").removeAttr("disabled");
+		}
+		else{
+			jQuery("#useprofile_ext").button("option", "label", "<?php print(_('Enable extended profile'));?>");
+			jQuery("#profileexlist :input:gt(0)").attr("disabled", "disabled");
+		}
+	}).button().change();
+});
+
 </script>

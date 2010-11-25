@@ -19,7 +19,10 @@ form.thin .input{
 .input:hover { border-color: black; }
 
 .input[readonly]{ border-color: #D0D0D0; background-color: #EEEEEE; }
-.input[disabled]{ color: grey; text-decoration: none; corsor: default; }
+.input[disabled]{
+	color: gray;
+	cursor: default; 
+}
 
 .select{
 	cursor: pointer;
