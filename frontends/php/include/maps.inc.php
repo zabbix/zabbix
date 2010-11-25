@@ -2006,17 +2006,20 @@
 		$labelFontBaseline = $allLabelsSize['baseline'];
 
 		if($map['label_type'] == MAP_LABEL_TYPE_IP){
+			$elementsHostids = array();
 			foreach($selements as $selementid => $selement){
 				if($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST)
 					$elementsHostids[] = $selement['elementid'];
 			}
 
-			$mapHosts = CHost::get(array(
-				'hostids' => $elementsHostids,
-				'output' => API_OUTPUT_SHORTEN,
-				'selectInterfaces' => API_OUTPUT_EXTEND,
-			));
-			$mapHosts = zbx_toHash($mapHosts, 'hostid');
+			if(!empty($elementsHostids)){
+				$mapHosts = CHost::get(array(
+					'hostids' => $elementsHostids,
+					'output' => API_OUTPUT_SHORTEN,
+					'selectInterfaces' => API_OUTPUT_EXTEND,
+				));
+				$mapHosts = zbx_toHash($mapHosts, 'hostid');
+			}
 		}
 
 
