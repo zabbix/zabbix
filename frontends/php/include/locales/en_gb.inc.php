@@ -932,8 +932,6 @@
 	'S_IP_ADDRESS'=>				_('IP address'),
 	'S_LINK_ADDITIONAL_TEMPLATES'=>			_('Link additional templates'),
 	'S_RELINK_TEMPLATES'=>			_('Replace linked templates'),
-	'S_IPMI_IP_ADDRESS'=>				_('IPMI IP address'),
-	'S_IPMI_PORT'=>					_('IPMI port'),
 	'S_IPMI_AUTHTYPE'=>				_('IPMI authentication algorithm'),
 	'S_AUTHTYPE_DEFAULT'=>				_('Default'),
 	'S_AUTHTYPE_NONE'=>				_('None'),

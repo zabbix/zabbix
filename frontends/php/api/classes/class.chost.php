@@ -1336,8 +1336,6 @@ Copt::memoryPick();
  * @param string $hosts['dns'] DNS. OPTIONAL
  * @param string $hosts['ip'] IP. OPTIONAL
  * @param int $hosts['proxy_hostid'] Proxy Host ID. OPTIONAL
- * @param string $hosts['ipmi_ip'] IPMAI IP. OPTIONAL
- * @param int $hosts['ipmi_port'] IPMI port. OPTIONAL
  * @param int $hosts['ipmi_authtype'] IPMI authentication type. OPTIONAL
  * @param int $hosts['ipmi_privilege'] IPMI privilege. OPTIONAL
  * @param string $hosts['ipmi_username'] IPMI username. OPTIONAL
@@ -1423,8 +1421,6 @@ Copt::memoryPick();
  * @param string $hosts['dns'] DNS. OPTIONAL
  * @param string $hosts['ip'] IP. OPTIONAL
  * @param int $hosts['proxy_hostid'] Proxy Host ID. OPTIONAL
- * @param string $hosts['ipmi_ip'] IPMAI IP. OPTIONAL
- * @param int $hosts['ipmi_port'] IPMI port. OPTIONAL
  * @param int $hosts['ipmi_authtype'] IPMI authentication type. OPTIONAL
  * @param int $hosts['ipmi_privilege'] IPMI privilege. OPTIONAL
  * @param string $hosts['ipmi_username'] IPMI username. OPTIONAL
@@ -1603,8 +1599,6 @@ Copt::memoryPick();
  * @param string $hosts['fields']['dns'] DNS. OPTIONAL
  * @param string $hosts['fields']['ip'] IP. OPTIONAL
  * @param int $hosts['fields']['proxy_hostid'] Proxy Host ID. OPTIONAL
- * @param string $hosts['fields']['ipmi_ip'] IPMAI IP. OPTIONAL
- * @param int $hosts['fields']['ipmi_port'] IPMI port. OPTIONAL
  * @param int $hosts['fields']['ipmi_authtype'] IPMI authentication type. OPTIONAL
  * @param int $hosts['fields']['ipmi_privilege'] IPMI privilege. OPTIONAL
  * @param string $hosts['fields']['ipmi_username'] IPMI username. OPTIONAL

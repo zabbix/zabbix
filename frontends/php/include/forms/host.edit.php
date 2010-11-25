@@ -434,7 +434,7 @@
 	$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_STRAIGHT,	S_AUTHTYPE_STRAIGHT);
 	$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_OEM,		S_AUTHTYPE_OEM);
 	$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_RMCP_PLUS,	S_AUTHTYPE_RMCP_PLUS);
-	$ipmiList->addRow(S_IPMI_AUTHTYPE, $cmbIPMIAuthtype);
+	$ipmiList->addRow(_('Authentication algorithm'), $cmbIPMIAuthtype);
 
 	$cmbIPMIPrivilege = new CComboBox('ipmi_privilege', $ipmi_privilege);
 	$cmbIPMIPrivilege->addItem(IPMI_PRIVILEGE_CALLBACK,	S_PRIVILEGE_CALLBACK);
@@ -442,10 +442,10 @@
 	$cmbIPMIPrivilege->addItem(IPMI_PRIVILEGE_OPERATOR,	S_PRIVILEGE_OPERATOR);
 	$cmbIPMIPrivilege->addItem(IPMI_PRIVILEGE_ADMIN,	S_PRIVILEGE_ADMIN);
 	$cmbIPMIPrivilege->addItem(IPMI_PRIVILEGE_OEM,		S_PRIVILEGE_OEM);
-	$ipmiList->addRow(S_IPMI_PRIVILEGE, $cmbIPMIPrivilege);
+	$ipmiList->addRow(_('Privilege level'), $cmbIPMIPrivilege);
 
-	$ipmiList->addRow(S_IPMI_USERNAME, new CTextBox('ipmi_username', $ipmi_username, 16));
-	$ipmiList->addRow(S_IPMI_PASSWORD, new CTextBox('ipmi_password', $ipmi_password, 20));
+	$ipmiList->addRow(_('Username'), new CTextBox('ipmi_username', $ipmi_username, 20));
+	$ipmiList->addRow(_('Password'), new CTextBox('ipmi_password', $ipmi_password, 20));
 
 	$divTabs->addTab('ipmiTab', S_IPMI, $ipmiList);
 
