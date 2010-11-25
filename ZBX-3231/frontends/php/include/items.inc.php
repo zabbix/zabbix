@@ -1764,4 +1764,193 @@
 
 	return array('nextcheck' => $nextcheck, 'delay' => $delay);
 	}
+
+
+	/**
+	 * Check item key and return info about an error if one is present
+	 *
+	 * @param string $key item key, e.g. system.run[cat /etc/passwd | awk -F: '{ print $1 }']
+	 * @return array
+	 *
+	 */
+	function check_item_key($key){
+
+		$key_strlen = zbx_strlen($key);
+		$charecters = array();
+
+		//gathering charecters into array, because we can't just work with them ar one if it's a unicode string
+		for($i = 0; $i < $key_strlen; $i++){
+			$charecters[] = zbx_substr($key, $i, 1);
+		}
+
+		//checking every charecter, one by one
+		for($current_char = 0; $current_char < $key_strlen; $current_char++) {
+			if(!preg_match("/".ZBX_PREG_KEY_NAME."/", $charecters[$current_char])) {
+				break; //$current_char now points to a first 'not a key name' char
+			}
+		}
+
+		//no function specified?
+		if ($current_char == $key_strlen) {
+			return array(
+				true,   //is key valid?
+				'key is valid' //result destription
+			);
+		}
+		//function with parameter, e.g. system.run[...]
+		elseif($charecters[$current_char] == '[') {
+
+			$state = 0; //0 - initial, 1 - inside quoted param, 2 - inside unquoted param
+			$nest_level = 0;
+
+			//for every char, starting after '['
+			for($i = $current_char+1; $i < $key_strlen; $i++) {
+				switch($state){
+					//initial state
+					case 0:
+						if($charecters[$i] == ',') {
+							//do nothing
+						}
+						//Zapcat: '][' is treated as ','
+						elseif($charecters[$i] == ']' && isset($charecters[$i+1]) && $charecters[$i+1] == '[' && $nest_level == 0) {
+							$i++;
+						}
+						//entering quotes
+						elseif($charecters[$i] == '"') {
+							$state = 1;
+						}
+						//next nesting level
+						elseif($charecters[$i] == '[') {
+							$nest_level++;
+						}
+						//one of the nested sets ended
+						elseif($charecters[$i] == ']' && $nest_level != 0) {
+							$nest_level--;
+							//skiping spaces
+							while($charecters[$i+1] == ' ') {
+								$i++;
+							}
+							//all nestings are closed correctly
+							if ($nest_level == 0 && isset($charecters[$i+1]) && $charecters[$i+1] == ']') {
+								return array(
+									true,   //is key valid?
+									'key is valid' //result destription
+								);
+							}
+
+							if($charecters[$i+1] != ',' && !($nest_level!=0 && $charecters[$i+1] == ']')) {
+								return array(
+									false,   //is key valid?
+									sprintf('incorrect syntax near \'%s\' in position %d', $charecters[$current_char], $current_char) //result destription
+								);
+							}
+						}
+						elseif($charecters[$i] == ']' && $nest_level == 0) {
+		
+							if (isset($charecters[$i+1])){
+								return array(
+									true,   //is key valid?
+									sprintf('Incorrect usage of bracket symbols: \'%s\' found after final bracket', $charecters[$i+1]) //result destription
+								);
+							}
+							else {
+								return array(
+									true,   //is key valid?
+									'key is valid' //result destription
+								);
+							}
+						}
+						elseif($charecters[$i] != ' ') {
+							$state = 2;
+						}
+						
+					break;
+
+					//quoted
+					case 1:
+						//ending quote is reached
+						if($charecters[$i] == '"')
+						{
+							//skiping spaces
+							while($charecters[$i+1] == ' ') {
+								$i++;
+							}
+
+							//Zapcat
+							if ($nest_level == 0 && isset($charecters[$i+1]) && $charecters[$i+1] == ']' && $charecters[$i+2] == '[')
+							{
+								$state = 0;
+								break;
+							}
+
+							if ($nest_level == 0 && isset($charecters[$i+1]) && $charecters[$i+1] == ']')
+							{
+	
+								return array(
+									true,   //is key valid?
+									'key is valid' //result destription
+								);
+							}
+
+							if ($charecters[$i+1] != ',' && !($nest_level != 1 && $charecters[$i+1] == ']'))
+							{
+								return array(
+									false,   //is key valid?
+									sprintf('incorrect syntax near \'%s\' in position %d', $charecters[$current_char], $current_char) //result destription
+								);
+							}
+
+							$state = 0;
+						}
+						//escaped quote (\")
+						elseif($charecters[$i] == '\\' && isset($charecters[$i+1]) && $charecters[$i+1] == '"') {
+							$i++;
+						}
+
+					break;
+
+					//unquoted
+					case 2:
+						//Zapcat
+						if($nest_level == 0 && $charecters[$i] == ']' && isset($charecters[$i+1]) && $charecters[$i+1] =='[' )
+						{
+							$i--;
+							$state = 0;
+						}
+						elseif($charecters[$i] == ',' || ($charecters[$i] == ']' && $nest_level != 0)) {
+							$i--;
+							$state = 0;
+						}
+						elseif($charecters[$i] == ']' && $nest_level == 0) {
+							if (isset($charecters[$i+1])){
+								return array(
+									true,   //is key valid?
+									sprintf('Incorrect usage of bracket symbols: \'%s\' found after final bracket', $charecters[$i+1]) //result destription
+								);
+							}
+							else {
+								return array(
+									true,   //is key valid?
+									'key is valid' //result destription
+								);
+							}
+						}
+					break;
+				}
+			}
+
+			return array(
+				false,   //is key valid?
+				'Invalid key format' //result destription
+			);
+
+		}
+		else {
+			return array(
+				false,   //is key valid?
+				sprintf('ivalid char \'%s\' in position %d', $charecters[$current_char], $current_char) //result destription
+			);
+		}
+		
+	}
 ?>
