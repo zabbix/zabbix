@@ -1655,11 +1655,6 @@
 
 			if(!empty($linktriggers)){
 				$max_severity=0;
-				$options = array(
-					'nopermissions' => 1,
-					'output' => API_OUTPUT_EXTEND,
-					'triggerids' => array()
-				);
 
 				$triggers = array();
 				foreach($linktriggers as $lt_num => $link_trigger){
@@ -1892,11 +1887,6 @@
 
 			if(!empty($linktriggers)){
 				$max_severity=0;
-				$options = array(
-					'nopermissions' => 1,
-					'output' => API_OUTPUT_EXTEND,
-					'triggerids' => array()
-				);
 
 				$triggers = array();
 				foreach($linktriggers as $lt_num => $link_trigger){

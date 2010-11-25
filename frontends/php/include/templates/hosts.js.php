@@ -93,21 +93,4 @@ function removeInterfaceRow(hostInterfaceId){
 	jQuery("#hostIterfaces").accordion('resize');
 }
 
-jQuery(document).ready(function() {
-	jQuery("#useipmi").button();
-	jQuery("#useipmi").change(function(){
-		if(this.checked){
-			jQuery("#useipmi").button("option", "label", "<?php print(S_DISABLE_IPMI);?>");
-			jQuery("#ipmilist :input:gt(0)").removeAttr("disabled");
-		}
-		else{
-			jQuery("#useipmi").button("option", "label", "<?php print(S_ENABLE_IPMI);?>");
-			jQuery("#ipmilist :input:gt(0)").attr("disabled", "disabled");
-		}
-
-	});
-	jQuery("#useipmi").change();
-});
-
-
 </script>

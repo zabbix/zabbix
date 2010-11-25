@@ -63,7 +63,6 @@ include_once('include/page_header.php');
 		'templates_rem'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   null,	null),
 		'clear_templates'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,	null),
 
-		'useipmi'=>			array(T_ZBX_STR, O_OPT,	NULL, NULL,				NULL),
 		'ipmi_authtype'=>	array(T_ZBX_INT, O_OPT,	NULL, BETWEEN(-1,6),	NULL),
 		'ipmi_privilege'=>	array(T_ZBX_INT, O_OPT,	NULL, BETWEEN(0,5),		NULL),
 		'ipmi_username'=>	array(T_ZBX_STR, O_OPT,	NULL, NULL,				NULL),
@@ -363,15 +362,12 @@ include_once('include/page_header.php');
 
 			$hosts = array('hosts' => zbx_toObject($hostids, 'hostid'));
 
-			$properties = array('port', 'useip', 'dns',	'ip', 'proxy_hostid', 'useipmi', 'ipmi_ip', 'ipmi_port', 'ipmi_authtype',
+			$properties = array('port', 'useip', 'dns',	'ip', 'proxy_hostid', 'ipmi_ip', 'ipmi_port', 'ipmi_authtype',
 				'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'status');
 			$new_values = array();
 			foreach($properties as $property){
 				if(isset($visible[$property])){
-					if($property == 'useipmi')
-						$new_values[$property] = isset($_REQUEST['useipmi']) ? 1 : 0;
-					else
-						$new_values[$property] = $_REQUEST[$property];
+					$new_values[$property] = $_REQUEST[$property];
 				}
 			}
 
@@ -545,7 +541,6 @@ include_once('include/page_header.php');
 				'host' => $_REQUEST['host'],
 				'status' => $_REQUEST['status'],
 				'proxy_hostid' => get_request('proxy_hostid', 0),
-				'useipmi' => isset($_REQUEST['useipmi']) ? 1 : 0,
 				'ipmi_authtype' => get_request('ipmi_authtype'),
 				'ipmi_privilege' => get_request('ipmi_privilege'),
 				'ipmi_username' => get_request('ipmi_username'),
@@ -708,11 +703,12 @@ include_once('include/page_header.php');
 	if(!isset($_REQUEST['form'])){
 // removes form_refresh variable
 		$frmForm->cleanItems();
-		$bttnList = new CList(null, 'objectlist');
-		$bttnList->addItem(new CSubmit('form',S_CREATE_HOST, null, 'link_menu'));
-		$bttnList->addItem(new CSubmit('form', S_IMPORT_HOST, null, 'link_menu'));
-
-		$frmForm->addItem($bttnList);
+		$buttons = new CDiv(array(
+			new CSubmit('form', S_CREATE_HOST),
+			new CSubmit('form', S_IMPORT_HOST)
+		));
+		$buttons->useJQueryStyle();
+		$frmForm->addItem($buttons);
 	}
 
 	$hosts_wdgt = new CWidget();
