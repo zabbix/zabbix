@@ -874,9 +874,18 @@ COpt::memoryPick();
 				'webitems' => true,
 				'preservekeys' => 1
 			));
+
+			$dbHosts = CHost::get(array(
+				'output' => array('hostid', 'host', 'status'),
+				'hostids' => zbx_objectValues($dbItems, 'hostid'),
+				'templated_hosts' => 1,
+				'editable' => 1,
+				'preservekeys' => 1
+			));
 		}
 		else{
 			$item_db_fields = array('description'=>null, 'key_'=>null, 'hostid'=>null);
+
 			$dbHosts = CHost::get(array(
 				'output' => array('hostid', 'host', 'status'),
 				'hostids' => zbx_objectValues($items, 'hostid'),
@@ -898,10 +907,10 @@ COpt::memoryPick();
 			unset($item['prevorgvalue']);
 			unset($item['lastns']);
 
-			if($dbHosts[$item['hostid']]['status'] == HOST_STATUS_TEMPLATE)
-				unset($item['interfaceid']);
-
 			if($create){
+				if($dbHosts[$item['hostid']]['status'] == HOST_STATUS_TEMPLATE)
+					unset($item['interfaceid']);
+
 				if(!isset($dbHosts[$item['hostid']]))
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 
@@ -925,6 +934,9 @@ COpt::memoryPick();
 				continue;
 			}
 			else{
+				if($dbHosts[$dbItems[$item['itemid']]['hostid']]['status'] == HOST_STATUS_TEMPLATE)
+					unset($item['interfaceid']);
+
 				if(!isset($dbItems[$item['itemid']]))
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 

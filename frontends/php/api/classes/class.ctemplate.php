@@ -1844,7 +1844,6 @@ COpt::memoryPick();
 	private static function unlink($templateids, $targetids=null, $clear=false){
 
 /* GRAPHS {{{ */
-
 		$sql_from = 'graphs g';
 		$sql_where = ' EXISTS ('.
 				' SELECT ggi.graphid'.

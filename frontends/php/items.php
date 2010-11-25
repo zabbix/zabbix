@@ -1044,10 +1044,8 @@ switch($itemType) {
 			}
 
 
-			if(empty($item['applications'])){
-				$applications = '-';
-			}
-			else{
+			$applications = null;
+			if(!empty($item['applications'])){
 				$applications = array();
 				foreach($item['applications'] as $anum => $app){
 					$applications[] = $app['name'];

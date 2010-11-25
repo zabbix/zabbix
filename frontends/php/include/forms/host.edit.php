@@ -90,6 +90,7 @@
 
 		$frm_title	.= SPACE.' ['.$dbHost['host'].']';
 		$original_templates = $dbHost['parentTemplates'];
+		$original_templates = zbx_toHash($original_templates, 'templateid');
 
 		if(!empty($interfaces)){
 			foreach($interfaces as $hinum => $interface){

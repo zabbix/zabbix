@@ -87,6 +87,7 @@
 	'S_COPY_SELECTED_TO'=>			_('Copy selected to ...'),
 
 //	dicoveryconf.php
+	'S_CREATED_SMALL' => _('created'),
 	'S_HOST_IP'=>				_('Host IP'),
 	'S_SERVICE_TYPE'=>			_('Service type'),
 	'S_SERVICE_PORT'=>			_('Service port'),
