@@ -219,7 +219,7 @@ function __autoload($class_name){
 				}
 			}
 
-			if (!$locale_found && $USER_DETAILS['lang'] != 'en_gb'){
+			if (!$locale_found && $USER_DETAILS['lang'] != 'en_GB' && $USER_DETAILS['lang'] != 'en_gb'){
 				error('Locale for language "'.$USER_DETAILS['lang'].'" is not found on the web server. Tried to set: '.implode(', ', $locales).'. Unable to translate zabbix interface.');
 			}
 			bindtextdomain("frontend", "locale");
