@@ -402,7 +402,7 @@
 		//validating item key
 		list($item_key_is_valid, $check_result) = check_item_key($item['key_']);
 		if(!$item_key_is_valid){
-			error('Error in item key format: '.$check_result);
+			error(S_ERROR_IN_ITEM_KEY.SPACE.$check_result);
 			return false;
 		}
 
@@ -616,7 +616,7 @@
 		//validating item key
 		list($item_key_is_valid, $check_result) = check_item_key($item['key_']);
 		if(!$item_key_is_valid){
-			error('Error in item key format: '.$check_result);
+			error(S_ERROR_IN_ITEM_KEY.SPACE.$check_result);
 			return false;
 		}
 
@@ -1808,7 +1808,7 @@
 		if ($current_char == $key_strlen) {
 			return array(
 				true,   //is key valid?
-				'key is valid' //result destription
+				S_KEY_IS_VALID //result destription
 			);
 		}
 		//function with parameter, e.g. system.run[...]
@@ -1848,14 +1848,14 @@
 							if ($nest_level == 0 && isset($charecters[$i+1]) && $charecters[$i+1] == ']') {
 								return array(
 									true,   //is key valid?
-									'key is valid' //result destription
+									S_KEY_IS_VALID //result destription
 								);
 							}
 
 							if($charecters[$i+1] != ',' && !($nest_level!=0 && $charecters[$i+1] == ']')) {
 								return array(
 									false,   //is key valid?
-									sprintf('incorrect syntax near \'%s\' in position %d', $charecters[$current_char], $current_char) //result destription
+									sprintf(S_INCORRECT_SYNTAX_NEAR, $charecters[$current_char], $current_char) //result destription
 								);
 							}
 						}
@@ -1864,13 +1864,13 @@
 							if (isset($charecters[$i+1])){
 								return array(
 									false,   //is key valid?
-									sprintf('Incorrect usage of bracket symbols: \'%s\' found after final bracket', $charecters[$i+1]) //result destription
+									sprintf(S_INCORRECT_USAGE_OF_BRACKETS, $charecters[$i+1]) //result destription
 								);
 							}
 							else {
 								return array(
 									true,   //is key valid?
-									'key is valid' //result destription
+									S_KEY_IS_VALID //result destription
 								);
 							}
 						}
@@ -1902,7 +1902,7 @@
 	
 								return array(
 									true,   //is key valid?
-									'key is valid' //result destription
+									S_KEY_IS_VALID //result destription
 								);
 							}
 
@@ -1910,7 +1910,7 @@
 							{
 								return array(
 									false,   //is key valid?
-									sprintf('incorrect syntax near \'%s\' in position %d', $charecters[$current_char], $current_char) //result destription
+									sprintf(S_INCORRECT_SYNTAX_NEAR, $charecters[$current_char], $current_char) //result destription
 								);
 							}
 
@@ -1939,13 +1939,13 @@
 							if (isset($charecters[$i+1])){
 								return array(
 									false,   //is key valid?
-									sprintf('Incorrect usage of bracket symbols: \'%s\' found after final bracket', $charecters[$i+1]) //result destription
+									sprintf(S_INCORRECT_USAGE_OF_BRACKETS, $charecters[$i+1]) //result destription
 								);
 							}
 							else {
 								return array(
 									true,   //is key valid?
-									'key is valid' //result destription
+									S_KEY_IS_VALID //result destription
 								);
 							}
 						}
@@ -1955,14 +1955,14 @@
 
 			return array(
 				false,   //is key valid?
-				'Invalid key format' //result destription
+				S_INVALID_KEY_FORMAT //result destription
 			);
 
 		}
 		else {
 			return array(
 				false,   //is key valid?
-				sprintf('ivalid char \'%s\' in position %d', $charecters[$current_char], $current_char) //result destription
+				sprintf(S_INVALID_CHARECTER_AT_POSITION, $charecters[$current_char], $current_char) //result destription
 			);
 		}
 		
