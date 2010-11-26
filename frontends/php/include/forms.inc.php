@@ -378,7 +378,7 @@
 		$languages_unable_set = 0;
 		foreach($ZBX_LOCALES as $loc_id => $loc_name){
 			//checking if this locale exists in the system. The only way of doing it is to try and set one
-			$locale_exists = setlocale(LC_ALL, zbx_locale_variants($loc_id)) ? 'yes' : 'no';
+			$locale_exists = setlocale(LC_ALL, zbx_locale_variants($loc_id)) || $loc_id == 'en_GB' ? 'yes' : 'no';
 			$selected = $loc_id == $USER_DETAILS['lang'] ? true : null;
 			$cmbLang->addItem($loc_id, $loc_name, $selected, $locale_exists);
 			if ($locale_exists != 'yes'){
