@@ -452,7 +452,7 @@
 					}
 				}
 				else{
-					$error_msg = 'Incorrect configuration file ['.$ZBX_CONFIGURATION_FILE.']';
+					$error_msg = 'Incorrect configuration file ['.$ZBX_CONFIGURATION_FILE.'], or database connection details in the file don\'t match those specified in step 4.';
 				}
 				DBclose();
 			}
