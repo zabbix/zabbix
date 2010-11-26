@@ -97,7 +97,7 @@
 			new CTextBox('interfaces[0][port]', $interface['port'], 15)
 		));
 
-		$proxyList->addRow(S_INTERFACE, new CDiv($ifTab, 'border_dotted objectlist'));
+		$proxyList->addRow(S_INTERFACE, new CDiv($ifTab, 'border_dotted objectgroup ui-corner-all'));
 	}
 
 

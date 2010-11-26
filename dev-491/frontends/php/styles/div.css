@@ -134,7 +134,7 @@ div.formElement_footer{
 
 /**** SCREEN DRAG & DROP ****/
 div.draggable {
-	cursor: pointer;
+	cursor: move;
 }
 
 .screen_edit .hoverclass123 {
@@ -168,6 +168,12 @@ div.formlist ul li div.dt{
 div.formlist ul li div.dd{
 	width: 77%;
 	padding-left: 21%;
+}
+
+.objectgroup {
+	padding: 6px;
+	margin: 5px 0px 5px 0px;
+	display: inline-block;
 }
 
 /********* DIV IMG *********/
@@ -598,10 +604,10 @@ span.discoveryName{
 }
 
 
+/* Sortable */
+.column{ float: left; margin: 0px 0px 5px 5px; min-width: 100px; padding-bottom: 100px; }
 
-.column{ float: left; margin: 5px 0px 5px 5px; min-width: 100px; padding-bottom: 100px; }
-
-.column .widget{ padding: 2px; margin-top: 5px; margin-bottom: 5px; }
+.column .widget{ padding: 2px; margin-top: 5px; margin-bottom: 5px; float: left;}
 
 .column .widget .header{
 	height: 18px;
