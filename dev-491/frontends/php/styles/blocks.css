@@ -142,7 +142,7 @@ div.scrollbar .info .zoom{
 div.scrollbar .info .zoom .text{
 	padding-left: 2px;
 	padding-right: 5px;
-	
+
 	font-weight: bold;
 	font-size: 11px;
 	color: #333333;
@@ -164,7 +164,7 @@ div.scrollbar .info .timeline{
 	float: right;
 	border: 0px #FF00FF solid;
 	white-space:nowrap;
-	
+
 	height: 14px;
 	font-size: 10px;
 	vertical-align:bottom;
@@ -172,7 +172,7 @@ div.scrollbar .info .timeline{
 
 div.scrollbar .info .timeline .info_left{
 	border: 0px black solid;
-	padding-right: 5px;	
+	padding-right: 5px;
 
 	line-height: 12px;
 	vertical-align: bottom;
@@ -230,13 +230,13 @@ div.scrollbar .overlevel{
 }
 
 div.scrollbar .overlevel .bar{
-	position:relative;
-	left: 74px;	
+	position:absolute;
+	left: 74px;
 	width: 140px;
 	height: 25px;
-	
+
 	border: 1px black solid;
-	
+
 	z-index: 1;
 	cursor: pointer;
 }
@@ -244,7 +244,7 @@ div.scrollbar .overlevel .bar{
 div.scrollbar .overlevel .bar .icon{
 	position: relative;
 	height: 25px;
-	
+
 	background-image: url(../images/general/bar/bar_bg.png);
 	background-repeat:repeat-x;
 }
@@ -264,9 +264,9 @@ div.scrollbar .overlevel .ghost{
 
 	height: 25px;
 	width: 140px;
-	
+
 	line-height: 25px;
-	
+
 	border: 1px black solid;
 }
 
@@ -278,7 +278,7 @@ div.scrollbar .overlevel .left_arr{
 	height: 13px;
 
 	background-image: url(../images/general/bar/left_arr.png);
-	
+
 	z-index: 99;
 	cursor:e-resize;
 }
@@ -291,7 +291,7 @@ div.scrollbar .overlevel .right_arr{
 	height: 13px;
 
 	background-image: url(../images/general/bar/right_arr.png);
-	
+
 	z-index: 99;
 	cursor:e-resize;
 }

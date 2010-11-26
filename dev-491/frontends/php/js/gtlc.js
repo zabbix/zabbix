@@ -154,8 +154,6 @@ addImage: function(objid){
 			addListener(obj.domid, 'load', function(){ setTimeout( function(){$('scrollbar_cntr').show();}, 500);});
 		}
 	}
-
-
 },
 
 addSBox: function(e, objid){
@@ -1064,9 +1062,9 @@ makeBarDragable: function(element){
 	this.debug('makeBarDragable');
 //--
 
-//TODO:  write proper function
+	//TODO:  write proper function
 	jQuery(element).draggable({
-		containment: 'parent',//[pD.left, 0, pD.width+pD.left-pD.offset, 0],
+		containment: 'parent',
 		axis: 'x',
 		start: this.barDragStart.bind(this),
 		drag: this.barDragChange.bind(this),
@@ -1129,7 +1127,6 @@ leftArrowDragEnd: function(e, ui){
 	this.debug('leftArrowDragEnd');
 	if(this.disabled) return false;
 //---
-
 	var element = ui.helper.context;
 	this.position.leftArr = getDimensions(element);
 
@@ -1150,7 +1147,7 @@ make_right_arr_dragable: function(element){
 
 //TODO:  write proper function
 	jQuery(element).draggable({
-		containment: [pD.left-4, 0, pD.width+pD.left-4, 0],
+		containment: [pD.left-4, 0, pD.width+pD.left-5, 0],
 		axis: 'x',
 		start: this.rightArrowDragStart.bind(this),
 		drag: this.rightArrowDragChange.bind(this),
@@ -1283,10 +1280,12 @@ updateTimeLine: function(dim){
 // Hack for bars most right position
 	if((dim.right) == this.size.scrollline){
 		if(dim.width != this.position.bar.width){
+			this.position.bar.width = dim.width;
 			this.timeline.period(new_period);
 		}
 
 		this.timeline.setNow();
+
 	}
 	else{
 		if(right){
@@ -1300,15 +1299,15 @@ updateTimeLine: function(dim){
 		if(period >= 86400) new_usertime = this.roundTime(new_usertime);
 
 		if(dim.width != this.position.bar.width){
+			this.position.bar.width = dim.width;
 			this.timeline.period(new_period);
 		}
 
 		this.timeline.usertime(new_usertime);
-
-//		var	real_period = this.timeline.period();
-//		var real_usertime = this.timeline.usertime();
-//SDI(left+' : '+new_usertime+' ('+real_usertime+')  p '+new_period+' ('+real_period+')');
 	}
+//var	real_period = this.timeline.period();
+//var real_usertime = this.timeline.usertime();
+//SDI(left+' : '+new_usertime+' ('+real_usertime+')  p '+(new_period/3600)+' ('+(real_period/3600)+')');
 //---------------
 },
 
@@ -1669,7 +1668,7 @@ scrollcreate: function(w){
 	this.dom.right_arr = document.createElement('div');
 	this.dom.overlevel.appendChild(this.dom.right_arr);
 	this.dom.right_arr.className = 'right_arr';
-// </OVERLEVEL>
+//</OVERLEVEL>
 
 // <SUBLINE>
 	this.dom.subline = document.createElement('div');
