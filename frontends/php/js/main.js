@@ -970,6 +970,31 @@ function change_flicker_state(divid){
 	if(typeof(moveSBoxes) != 'undefined') moveSBoxes();
 }
 
+function changeHatStateUI(icon, divid){
+	deselectAll();
+
+	var eff_time = 500;
+
+	var switchIcon = function(){
+		switchElementsClass(icon,"arrowup","arrowdown");
+	}
+
+	var hat_state = ShowHide($(divid).parentNode);
+	switchIcon();
+//	var hat_state = showHideEffect(divid, 'slide', eff_time, switchIcon);
+
+	if(false === hat_state) return false;
+
+	var params = {
+		'action':	'flop',
+		'favobj': 	'hat',
+		'favref': 	divid,
+		'state':	hat_state
+	}
+
+	send_params(params);
+}
+
 function change_hat_state(icon, divid){
 	deselectAll();
 

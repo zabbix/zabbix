@@ -20,12 +20,18 @@
 ?>
 <?php
 class CList extends CTag{
-/* public */
+public $emptyList;
+
 	public function __construct($value=NULL,$class=NULL){
 		parent::__construct('ul','yes');
 		$this->tag_end = '';
 		$this->addItem($value);
 		$this->setClass($class);
+
+		if(is_null($value)){
+			$this->addItem(_('List is empty'), 'empty');
+			$this->emptyList = true;
+		}
 	}
 
 	public function prepareItem($value=NULL,$class=null){
@@ -36,6 +42,11 @@ class CList extends CTag{
 	}
 
 	public function addItem($value,$class=null){
+		if(!is_null($value) && $this->emptyList){
+			$this->emptyList = false;
+			$this->items = array();
+		}
+
 		if(is_array($value)){
 			parent::addItem($this->prepareItem($value,$class));
 			//foreach($value as $el)

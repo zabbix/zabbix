@@ -135,7 +135,7 @@
 	$proxyFooter->addItem(new CButtonCancel());
 	$proxyFooter->useJQueryStyle();
 
-	$frmProxy->addItem(new CDiv($proxyFooter, 'objectlist right'));
+	$frmProxy->addItem(new CDiv($proxyFooter, 'objectlist'));
 
 	
 return $frmProxy;

@@ -142,9 +142,7 @@ div.draggable {
 }
 /***************************/
 
-div.formlist {
-
-}
+div.formlist {}
 
 div.formlist ul{
 	list-style-type: none;
@@ -180,7 +178,8 @@ div.zabbix_logo{
 	cursor: pointer;
 }
 
-div.menu_icon{
+.menu_icon{
+	display: inline-block;
 	background-repeat:no-repeat;
 	height: 16px;
 	width: 16px;
@@ -191,50 +190,72 @@ div.menu_icon{
 	-o-border-radius: 2px;
 	border-radius: 2px;
 }
-div.menu_icon:hover{
+
+.menu_icon:hover{
 	-webkit-box-shadow: 0 0 6px white;
 	-moz-box-shadow: 0 0 6px white;
 	box-shadow: 0 0 6px white;
 }
 
-div.iconminus{
+.iconminus{
 	background-image: url('../images/general/bttn/minus.png');
 }
-div.iconplus{
+.iconplus{
 	background-image: url('../images/general/bttn/plus.png');
 }
-div.iconmenu{
+.iconmenu{
 	background-image: url('../images/general/bttn/menu.png');
 }
-div.iconmenu_b{
+.iconmenu_b{
 	background-image: url('../images/general/bttn/menu.png');
 	background-color: #5572AA;
 }
-div.arrowup{
+.arrowup{
 	background-image: url('../images/general/bttn/arrowup.png');
 }
-div.arrowdown{
+.arrowdown{
 	background-image: url('../images/general/bttn/arrowdown.png');
 }
-div.arrowleft{
+.arrowleft{
 	background-image: url('../images/general/bttn/arrowleft.png');
 }
-div.arrowright{
+.arrowright{
 	background-image: url('../images/general/bttn/arrowright.png');
 }
-div.fullscreen{
+.fullscreen{
 	background-image: url('../images/general/bttn/fullscreen.png');
 }
-div.iconhelp{
+.iconhelp{
 	background-image: url('../images/general/bttn/help.png');
 }
-div.iconconfig{
+.iconconfig{
 	background-image: url('../images/general/bttn/config.png');
 }
-div.iconconfig_hl{
+.iconconfig_hl{
 	background-image: url('../images/general/bttn/config_hl.png');
 }
-div.filterclosed{
+
+.iconsound{
+	background-image: url('../images/general/bttn/sound.png');
+}
+.iconmute{
+	background-image: url('../images/general/bttn/mute.png');
+}
+.iconreset{
+	background-image: url('../images/general/bttn/reset.png');
+}
+.iconsnooze{
+	background-image: url('../images/general/bttn/snooze.png');
+}
+.iconclose{
+	background-image: url('../images/general/bttn/close.png');
+}
+.iconmove{
+	background-image: url('../images/general/bttn/move.png');
+	cursor: move;
+}
+
+.filterclosed{
 	height: 9px;
 	width: 9px;
 	background-image: url('../images/general/closed.gif');
@@ -242,7 +263,7 @@ div.filterclosed{
 	cursor:pointer;
 }
 
-div.filteropened{
+.filteropened{
 	height: 9px;
 	width: 9px;
 	background-image: url('../images/general/opened.gif');
@@ -250,42 +271,21 @@ div.filteropened{
 	cursor:pointer;
 }
 
-div.iconsound{
-	background-image: url('../images/general/bttn/sound.png');
-}
-div.iconmute{
-	background-image: url('../images/general/bttn/mute.png');
-}
-div.iconreset{
-	background-image: url('../images/general/bttn/reset.png');
-}
-div.iconsnooze{
-	background-image: url('../images/general/bttn/snooze.png');
-}
-div.iconclose{
-	background-image: url('../images/general/bttn/close.png');
-}
-div.iconmove{
-	background-image: url('../images/general/bttn/move.png');
-	cursor: move;
-}
-
-
-div.iconerror{
+.iconerror{
 	height: 14px;
 	width: 14px;
 	background-image: url('../images/general/error_icon.png');
 	background-repeat:no-repeat;
 	cursor:pointer;
 }
-div.iconok{
+.iconok{
 	height: 14px;
 	width: 14px;
 	background-image: url('../images/general/ok_icon.png');
 	background-repeat:no-repeat;
 }
 
-div.iconunknown{
+.iconunknown{
 	height: 14px;
 	width: 14px;
 	background-image: url('../images/general/unknown_icon.png');
@@ -294,63 +294,63 @@ div.iconunknown{
 }
 
 /* <status icons> */
-div.iconzbxunknown{
+.iconzbxunknown{
 	height: 14px;
 	width: 14px;
 	background-image: url('../images/general/zabbix_unknown.png');
 	background-repeat:no-repeat;
 	margin: 0 1px;
 }
-div.iconzbxavailable{
+.iconzbxavailable{
 	height: 14px;
 	width: 14px;
 	background-image: url('../images/general/zabbix_available.png');
 	background-repeat:no-repeat;
 	margin: 0 1px;
 }
-div.iconzbxunavailable{
+.iconzbxunavailable{
 	height: 14px;
 	width: 14px;
 	background-image: url('../images/general/zabbix_unavailable.png');
 	background-repeat:no-repeat;
 	margin: 0 1px;
 }
-div.iconsnmpunknown{
+.iconsnmpunknown{
 	height: 14px;
 	width: 14px;
 	background-image: url('../images/general/snmp_unknown.png');
 	background-repeat:no-repeat;
 	margin: 0 1px;
 }
-div.iconsnmpavailable{
+.iconsnmpavailable{
 	height: 14px;
 	width: 14px;
 	background-image: url('../images/general/snmp_available.png');
 	background-repeat:no-repeat;
 	margin: 0 1px;
 }
-div.iconsnmpunavailable{
+.iconsnmpunavailable{
 	height: 14px;
 	width: 14px;
 	background-image: url('../images/general/snmp_unavailable.png');
 	background-repeat:no-repeat;
 	margin: 0 1px;
 }
-div.iconipmiunknown{
+.iconipmiunknown{
 	height: 14px;
 	width: 14px;
 	background-image: url('../images/general/ipmi_unknown.png');
 	background-repeat:no-repeat;
 	margin: 0 1px;
 }
-div.iconipmiavailable{
+.iconipmiavailable{
 	height: 14px;
 	width: 14px;
 	background-image: url('../images/general/ipmi_available.png');
 	background-repeat:no-repeat;
 	margin: 0 1px;
 }
-div.iconipmiunavailable{
+.iconipmiunavailable{
 	height: 14px;
 	width: 14px;
 	background-image: url('../images/general/ipmi_unavailable.png');
@@ -360,7 +360,7 @@ div.iconipmiunavailable{
 /* </status icons> */
 
 
-div.dbl_arrow_down{
+.dbl_arrow_down{
 	height: 10px;
 	width: 9px;
 	background-image: url('../images/general/dbl_arrow_down2.png');
@@ -368,7 +368,7 @@ div.dbl_arrow_down{
 	display:block;
 	cursor:pointer;
 }
-div.dbl_arrow_up{
+.dbl_arrow_up{
 	height: 10px;
 	width: 9px;
 	background-image: url('../images/general/dbl_arrow_up2.png');
@@ -376,25 +376,25 @@ div.dbl_arrow_up{
 	cursor:pointer;
 }
 
-div.sla_green{
+.sla_green{
 	height: 15px;
 	background-image: url('../images/gradients/sla_green15.png');
 	background-repeat:repeat-x;
 }
-div.sla_red{
+.sla_red{
 	height: 15px;
 	background-image: url('../images/gradients/sla_red15.png');
 	background-repeat:repeat-x;
 }
 
-div.icon_sortup{
+.icon_sortup{
 	height: 16px;
 	width: 19px;
 	background-image: url('../images/general/sort_up.gif');
 	background-repeat:no-repeat;
 	cursor: pointer;
 }
-div.icon_sortdown{
+.icon_sortdown{
 	height: 16px;
 	width: 19px;
 	background-image: url('../images/general/sort_down.gif');
@@ -598,6 +598,20 @@ span.discoveryName{
 }
 
 
-div.widget{
-	/*margin: 0px 4px 0px 4px;*/
+
+.column{ float: left; margin: 5px 0px 5px 5px; min-width: 100px; padding-bottom: 100px; }
+
+.column .widget{ padding: 2px; margin-top: 5px; margin-bottom: 5px; }
+
+.column .widget .header{
+	height: 18px;
+	line-height: 18px;
+	font-size: 1.1em;
+	font-weight: bold;
+	padding: 3px;
+	margin-bottom: 2px;
 }
+
+.widget .header .menu_icon{ float: right; margin-right: 2px; }
+
+.widget .footer { color: white; line-height: 12px; height: 12px; padding: 4px 4px; margin-top: 2px;}

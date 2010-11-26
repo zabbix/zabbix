@@ -516,31 +516,31 @@ div.zabbix_logo{
 	background-image:url('../images/general/zabbix_od.png');
 }
 
-div.iconzbxavailable{
+.iconzbxavailable{
 	background-image: url('../images/general/zabbix_available_bb.png');
 }
 
-div.iconsnmpavailable{
+.iconsnmpavailable{
 	background-image: url('../images/general/snmp_available_bb.png');
 }
 
-div.iconipmiavailable{
+.iconipmiavailable{
 	background-image: url('../images/general/ipmi_available_bb.png');
 }
 
-div.sla_green{
+.sla_green{
 	background-image: url('../images/gradients/sla_blue15.png');
 }
 
-div.icon_sortup{
+.icon_sortup{
 	background-image: url('../images/general/sort_up_od.gif');
 }
 
-div.icon_sortdown{
+.icon_sortdown{
 	background-image: url('../images/general/sort_down_od.gif');
 }
 
-div.menu_icon:hover{
+.menu_icon:hover{
 	-webkit-box-shadow: 0 0 6px #FF5500;
 	-moz-box-shadow: 0 0 6px #FF5500;
 	box-shadow: 0 0 6px #FF5500;
@@ -682,3 +682,6 @@ div.suggest{
 	border: 0px;
 	cursor: default;
 }
+
+.column .widget .header{ border: 0px;}
+.column .widget .footer{ border: 0px;}
