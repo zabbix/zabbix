@@ -103,7 +103,6 @@ function __autoload($class_name){
 	require_once('include/sounds.inc.php');
 	require_once('include/images.inc.php');
 	require_once('include/events.inc.php');
-	require_once('include/scripts.inc.php');
 	require_once('include/maintenances.inc.php');
 	require_once('include/valuemap.inc.php');
 
