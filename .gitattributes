@@ -325,7 +325,6 @@ frontends/php/include/regexp.inc.php -text
 frontends/php/include/reports.inc.php -text
 frontends/php/include/requirements.inc.php -text
 frontends/php/include/schema.inc.php -text
-frontends/php/include/scripts.inc.php -text
 frontends/php/include/sounds.inc.php -text
 frontends/php/include/templates/hosts.js.php -text
 frontends/php/include/templates/macros.js.php -text

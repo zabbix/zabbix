@@ -21,7 +21,6 @@
 <?php
 include_once('include/config.inc.php');
 require_once('include/hosts.inc.php');
-require_once('include/scripts.inc.php');
 require_once('include/users.inc.php');
 
 $page['title'] = 'S_SCRIPTS';
@@ -177,7 +176,14 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 		if(isset($_REQUEST['scriptid']) && !isset($_REQUEST['form_refresh'])){
 			$frmScr->addVar('form_refresh',get_request('form_refresh',1));
 
-			if($script = get_script_by_scriptid($_REQUEST['scriptid'])){
+			$options = array(
+				'scriptids' => $_REQUEST['scriptid'],
+				'output' => API_OUTPUT_EXTEND,
+			);
+			$script = CScript::get($options);
+			$script = reset($script);
+
+			if($script){
 				$name = $script['name'];
 				$command  = $script['command'];
 
