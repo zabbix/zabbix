@@ -1056,7 +1056,7 @@ return $caption;
 			$expression['value'] = preg_replace('/\s+(AND){1,2}\s+/U', '&', $expression['value']);
 			$expression['value'] = preg_replace('/\s+(OR){1,2}\s+/U', '|', $expression['value']);
 //sdi('<pre>'.print_r($expression['value'],true).'</pre>');
-			$pastcexpor = $cexpor;
+
 			if($expression['type'] == REGEXP_INCLUDE){
 				if(!empty($complite_expr)) {
 					$complite_expr.=' | ';
@@ -1940,8 +1940,6 @@ return $caption;
 	}
 
 	function check_right_on_trigger_by_expression($permission,$expression){
-		global $USER_DETAILS;
-
 		$hostids = array();
 		$db_hosts = get_hosts_by_expression($expression);
 		while($host_data = DBfetch($db_hosts)){

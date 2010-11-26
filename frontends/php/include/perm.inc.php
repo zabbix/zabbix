@@ -45,7 +45,6 @@ function permission2str($group_permission){
 *****************************************/
 
 function check_authorisation(){
-	global $USER_DETAILS;
 	$sessionid = get_cookie('zbx_sessionid');
 
 	$user = array('sessionid'=>$sessionid);
@@ -317,8 +316,6 @@ return $result;
 }
 
 function get_accessible_groups_by_user($user_data,$perm,$perm_res=null,$nodeid=null){
-	global $ZBX_LOCALNODEID;
-
 	if(is_null($perm_res)) $perm_res = PERM_RES_IDS_ARRAY;
 	if(is_null($nodeid)) $nodeid = get_current_nodeid();
 

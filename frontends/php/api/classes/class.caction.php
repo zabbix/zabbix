@@ -742,7 +742,6 @@ COpt::memoryPick();
 		$operations = zbx_toArray($operations);
 		$operation_inserts = array();
 		$opcondition_inserts = array();
-		$opmediatype_inserts = array();
 
 		foreach($operations as $onum => $operation){
 			if(!validate_operation($operation)){

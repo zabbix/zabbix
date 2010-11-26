@@ -534,7 +534,6 @@ Copt::memoryPick();
 		$errors = array();
 		$dservices = zbx_toArray($dservices);
 		$dserviceids = array();
-		$groupids = array();
 		$result = false;
 
 		if($result){
@@ -558,9 +557,6 @@ Copt::memoryPick();
  * @param _array $dservices multidimensional array with Services data
  */
 	public static function update($dservices){
-		$errors = array();
-		$result = true;
-
 		$dservices = zbx_toArray($dservices);
 		$dserviceids = zbx_objectValues($dservices, 'hostid');
 

@@ -257,8 +257,6 @@
 		}
 
 		function stage4(){
-			global $ZBX_CONFIG;
-
 			$table = new CTable(null, 'requirements');
 			$table->setAlign('center');
 

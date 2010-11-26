@@ -21,9 +21,6 @@
 <?php
 
 function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
-	global $USER_DETAILS;
-
-	$available_groups = $PAGE_GROUPS['groupids'];
 	$available_hosts = $PAGE_HOSTS['hostids'];
 
 
@@ -183,21 +180,14 @@ return $filterForm;
 }
 
 function bar_report_form(){
-	global $USER_DETAILS;
-
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY);
-
 	$config = get_request('config',1);
 	$items = get_request('items',array());
-	$function_type = get_request('function_type',CALC_FNC_AVG);
 	$scaletype = get_request('scaletype',TIMEPERIOD_TYPE_WEEKLY);
 
 	$title = get_request('title',S_REPORT.' 1');
 	$xlabel = get_request('xlabel','');
 	$ylabel = get_request('ylabel','');
 	$showlegend = get_request('showlegend',0);
-
-//	$showLegend =
 
 	$report_timesince = $_REQUEST['report_timesince'];
 	$report_timetill = $_REQUEST['report_timetill'];
@@ -206,7 +196,6 @@ function bar_report_form(){
 	$reportForm->setAttribute('name','zbx_report');
 	$reportForm->setAttribute('id','zbx_report');
 
-//	$reportForm->setMethod('post');
 	if(isset($_REQUEST['report_show']) && !empty($items))
 		$reportForm->addVar('report_show','show');
 
@@ -306,9 +295,6 @@ function bar_report_form(){
 			$host = get_host_by_itemid($gitem['itemid']);
 			$item = get_item_by_itemid($gitem['itemid']);
 
-			if($host['status'] == HOST_STATUS_TEMPLATE) $only_hostid = $host['hostid'];
-			else $monitored_hosts = 1;
-
 			$color = new CColorCell(null,$gitem['color']);
 
 			$caption = new CSpan($gitem['caption'], 'link');
@@ -355,8 +341,6 @@ return $reportForm;
 }
 
 function bar_report_form2(){
-	global $USER_DETAILS;
-
 	$config = get_request('config',1);
 
 	$title = get_request('title',S_REPORT.' 2');
@@ -365,7 +349,6 @@ function bar_report_form2(){
 
 	$sorttype = get_request('sorttype',0);
 
-	$captions = get_request('captions',array());
 	$items = get_request('items',array());
 	$periods = get_request('periods',array());
 
@@ -452,9 +435,6 @@ function bar_report_form2(){
 			$host = get_host_by_itemid($gitem['itemid']);
 			$item = get_item_by_itemid($gitem['itemid']);
 
-			if($host['status'] == HOST_STATUS_TEMPLATE) $only_hostid = $host['hostid'];
-			else $monitored_hosts = 1;
-
 			$caption = new CSpan($gitem['caption'], 'link');
 			$caption->onClick(
 					'return PopUp("popup_bitem.php?config=2&list_name=items&dstfrm='.$reportForm->GetName().
@@ -499,23 +479,18 @@ return $reportForm;
 }
 
 function bar_report_form3(){
-	global $USER_DETAILS;
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
-
 	$config = get_request('config',1);
 
 	$title = get_request('title',S_REPORT.' 3');
 	$xlabel = get_request('xlabel','');
 	$ylabel = get_request('ylabel','');
 
-	$sorttype = get_request('sorttype',0);
 	$scaletype = get_request('scaletype', TIMEPERIOD_TYPE_WEEKLY);
 	$avgperiod = get_request('avgperiod', TIMEPERIOD_TYPE_DAILY);
 
 	$report_timesince = get_request('report_timesince',date('YmdHis', time()-86400));
 	$report_timetill = get_request('report_timetill',date('YmdHis'));
 
-	$captions = get_request('captions',array());
 	$items = get_request('items',array());
 
 	$hostids = get_request('hostids', array());
