@@ -312,7 +312,7 @@
 	}
 	$host_footer->addItem(new CButtonCancel(url_param('groupid')));
 	$host_footer->useJQueryStyle();
-	$frmHost->addItem(new CDiv($host_footer, 'objectlist right'));
+	$frmHost->addItem(new CDiv($host_footer, 'objectlist'));
 
 return $frmHost;
 ?>

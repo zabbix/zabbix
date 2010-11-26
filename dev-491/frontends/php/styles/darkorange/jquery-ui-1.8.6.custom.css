@@ -60,7 +60,6 @@
 .darkorange .ui-widget .ui-widget { font-size: 1em; }
 .darkorange .ui-widget input, .darkorange .ui-widget select, .darkorange .ui-widget textarea, .darkorange .ui-widget button { font-family: Verdana, Arial, sans-serif; font-size: 1em; }
 .darkorange .ui-widget-content { border: 1px solid #ff5500; background: #1f1f1f url(images/ui-bg_flat_25_1f1f1f_40x100.png) 50% 50% repeat-x; color: #dfdfdf; }
-.darkorange .ui-widget-content a { color: #dfdfdf; }
 .darkorange .ui-widget-header { border: 1px solid #ff5500; background: #4f4f4f url(images/ui-bg_highlight-hard_30_4f4f4f_1x100.png) 50% 50% repeat-x; color: #dfdfdf; font-weight: bold; }
 .darkorange .ui-widget-header a { color: #dfdfdf; }
 
@@ -451,6 +450,7 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 .darkorange .ui-dialog .ui-dialog-buttonpane button { margin: .5em .4em .5em 0; cursor: pointer; }
 .darkorange .ui-dialog .ui-resizable-se { width: 14px; height: 14px; right: 3px; bottom: 3px; }
 .darkorange .ui-draggable .ui-dialog-titlebar { cursor: move; }
+.darkorange .ui-sortable-placeholder { border: 1px dotted #dfdfdf;}
 /*
  * jQuery UI Slider 1.8.6
  *

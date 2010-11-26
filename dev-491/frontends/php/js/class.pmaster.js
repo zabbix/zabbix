@@ -286,6 +286,7 @@ update: function(){
 onSuccess: function(resp){
 	this.debug('onSuccess');
 	this.rmwDarken();
+	this.updateSortable();
 
 	var headers = resp.getAllResponseHeaders(); 
 //alert(headers);
@@ -341,5 +342,22 @@ rmwDarken: function(){
 		document.body.removeChild(this._domdark);
 		this._domdark = null;
 	}
+},
+
+updateSortable: function(){
+	if(empty(jQuery(".column"))) return false;
+
+	jQuery(".column").sortable({
+		connectWith: ".column",
+        handle: 'div.header',
+        forcePlaceholderSize: true,
+        placeholder: 'ui-corner-all ui-sortable-placeholder',
+        opacity: '0.8'
+	});
+
+	jQuery(".column").find(".widget")
+		.addClass("ui-widget ui-widget-content ui-helper-clearfix ui-corner-all");
+
+	jQuery(".column").disableSelection();
 }
 });

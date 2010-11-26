@@ -451,6 +451,7 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 .originalblue .ui-dialog .ui-dialog-buttonpane button { margin: .5em .4em .5em 0; cursor: pointer; }
 .originalblue .ui-dialog .ui-resizable-se { width: 14px; height: 14px; right: 3px; bottom: 3px; }
 .originalblue .ui-draggable .ui-dialog-titlebar { cursor: move; }
+.originalblue .ui-sortable-placeholder { border: 1px dotted #2f2f2f; }
 /*
  * jQuery UI Slider 1.8.6
  *

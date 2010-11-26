@@ -4,7 +4,6 @@ ul{
 	padding-left: 1em;
 }
 
-
 ul.itservices{
 	margin: 0px;
 	margin-left: 5px;
@@ -20,7 +19,7 @@ ul.messages{
 
 ul.messages li{
 	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 8pt;
+	font-size: 1.1em;
 	line-height: 18px;
 }
 
@@ -39,4 +38,32 @@ ul li.linear{
 	float: left;
 	list-style-type: none;
 	margin-right: 2px;
+}
+
+ul.favorites{
+	vertical-align: top;
+	margin: 8px 0px 8px 0px;
+	text-align: left;
+}
+
+ul.favorites li{
+	height: 18px;
+	line-height: 18px;
+	vertical-align: top;
+
+	list-style: url("../images/general/chart.png");
+	margin: 4px 0px 4px 20px;
+}
+
+ul.favorites li.empty{
+	list-style: none;
+	line-height: 18px;
+	vertical-align: top;
+	margin-left: 10px;
+	color: #999;
+}
+
+ul.favorites li a{
+	line-height: 18px;
+	vertical-align: top;
 }
