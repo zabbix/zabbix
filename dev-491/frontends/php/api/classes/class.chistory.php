@@ -240,7 +240,6 @@ class CHistory extends CZBXAPI{
 
 
 		$itemids = array();
-		$triggerids = array();
 
 		$sql_parts['select'] = array_unique($sql_parts['select']);
 		$sql_parts['from'] = array_unique($sql_parts['from']);

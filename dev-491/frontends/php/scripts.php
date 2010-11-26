@@ -271,11 +271,7 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 
 // sorting
 		order_result($scripts, $sortfield, $sortorder);
-
-// PAGING UPPER
 		$paging = getPagingLine($scripts);
-		$scripts_wdgt->addItem($paging);
-//---------
 
 		foreach($scripts as $snum => $script){
 			$scriptid = $script['scriptid'];
@@ -297,20 +293,16 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 
 
 			$table->addRow(array(
-					new CCheckBox('scripts['.$script['scriptid'].']','no',NULL,$script['scriptid']),
-					new CLink($script['name'],'scripts.php?form=1'.'&scriptid='.$script['scriptid'].'#form'),
-					htmlspecialchars($script['command']),
-					$user_group_name,
-					$host_group_name,
-					((PERM_READ_WRITE == $script['host_access'])?S_WRITE:S_READ)
-				));
+				new CCheckBox('scripts['.$script['scriptid'].']','no',NULL,$script['scriptid']),
+				new CLink($script['name'],'scripts.php?form=1'.'&scriptid='.$script['scriptid'].'#form'),
+				htmlspecialchars($script['command']),
+				$user_group_name,
+				$host_group_name,
+				((PERM_READ_WRITE == $script['host_access'])?S_WRITE:S_READ)
+			));
 		}
 
 
-// PAGING FOOTER
-		$table->addRow(new CCol($paging));
-//		$items_wdgt->addItem($paging);
-//---------
 
 //----- GO ------
 		$goBox = new CComboBox('go');
@@ -324,10 +316,10 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 
 		zbx_add_post_js('chkbxRange.pageGoName = "scripts";');
 
-		$table->setFooter(new CCol(array($goBox, $goButton)));
+		$footer = get_table_header(array($goBox, $goButton));
 //----
 
-		$form->addItem($table);
+		$form->addItem(array($paging,$table,$paging,$footer));
 		$scripts_wdgt->addItem($form);
 	}
 

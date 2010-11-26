@@ -1582,8 +1582,6 @@ class zbxXML{
 						if(isset($data['graphs_items'])){
 							$graph_elements_node = $graph_node->appendChild(new DOMElement(XML_TAG_GRAPH_ELEMENTS));
 							foreach($data['graphs_items'] as $ginum => $gitem){
-								$tmp_item = get_item_by_itemid($gitem['itemid']);
-
 								$gitem['graphs'] = zbx_toHash($gitem['graphs'], 'graphid');
 								if(isset($gitem['graphs'][$graph['graphid']])){
 									self::addChildData($graph_elements_node, XML_TAG_GRAPH_ELEMENT, $gitem);

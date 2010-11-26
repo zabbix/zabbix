@@ -27,8 +27,6 @@ class CButtonCancel extends CButton{
 	}
 
 	public function setVars($value=NULL){
-		global $page;
-
 		$url = '?cancel=1';
 		if(!is_null($value)) $url.= $value;
 

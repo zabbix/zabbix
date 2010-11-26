@@ -237,8 +237,6 @@ if(!isset($DB)){
 	}
 
 	function DBloadfile($file, &$error){
-		global $DB;
-
 		if(!file_exists($file)){
 			$error = 'DBloadfile. Missing file['.$file.']';
 			return false;
@@ -556,7 +554,6 @@ COpt::savesqlrequest(microtime(true)-$time_start,$query);
 					}
 				break;
 				case 'IBM_DB2':
-					$options = array();
 					if(!$result = db2_prepare($DB['DB'], $query)){
 						$e = @db2_stmt_errormsg($result);
 						error('SQL error ['.$query.'] in ['.$e.']');
@@ -897,15 +894,6 @@ else {
 	function zbx_db_distinct($sql_parts){
 		if(count($sql_parts['from']) > 1) return ' DISTINCT ';
 		else return ' ';
-
-		$distinct_tables = array(
-			'hosts_groups', 'hosts_templates',
-			'functions', 'graphs_items', 'screens_items', 'slides',
-			'httpstepitem', 'items_applications',
-			'maintenances_hosts', 'maintenances_groups',
-			'sysmaps_elements', 'sysmaps_link_triggers',
-			'rights', 'users_groups'
-		);
 	}
 
 	function zbx_db_search($table, $options, &$sql_parts){
@@ -1276,7 +1264,7 @@ else {
 			}
 
 			$sql = 'DELETE FROM '.$table.' WHERE '.implode(($use_or ? ' OR ' : ' AND '), $sql_wheres);
-			
+
 			if(!DBexecute($sql)) {
 				self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
 			}

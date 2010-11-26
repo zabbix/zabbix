@@ -121,23 +121,6 @@ function make_event_details($event, $trigger){
 
 	$table->addRow(array(S_EVENT, expand_trigger_description_by_data(array_merge($trigger, $event), ZBX_FLAG_EVENT)));
 	$table->addRow(array(S_TIME, zbx_date2str(S_EVENTS_EVENT_DETAILS_DATE_FORMAT,$event['clock'])));
-
-	$duration = zbx_date2age($event['clock']);
-
-	if($next_event = get_next_event($event, null, true)){
-		$duration = zbx_date2age($event['clock'],$next_event['clock']);
-	}
-
-	if($event['value'] == TRIGGER_VALUE_FALSE){
-		$value=new CCol(S_OK_BIG,'off');
-	}
-	elseif($event['value'] == TRIGGER_VALUE_TRUE){
-		$value=new CCol(S_PROBLEM_BIG,'on');
-	}
-	else{
-		$value=new CCol(S_UNKNOWN_BIG,'unknown');
-	}
-
 	
 	if($config['event_ack_enable']){
 		$ack = getEventAckState($event, true);
@@ -282,7 +265,7 @@ function getEventAckState($event, $extBackurl=false){
 	else{
 		$backurl = $page['file'];
 	}
-	
+
 	if($event['acknowledged'] == 0){
 		$ack = new CLink(S_NO,'acknow.php?eventid='.$event['eventid'].'&backurl='.$backurl,'on');
 	}

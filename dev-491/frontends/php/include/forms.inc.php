@@ -206,7 +206,6 @@
 			$alias		= $user['alias'];
 			$name		= $user['name'];
 			$surname	= $user['surname'];
-			$password	= null;
 			$password1	= null;
 			$password2	= null;
 			$url		= $user['url'];
@@ -249,7 +248,6 @@
 			$alias		= get_request('alias','');
 			$name		= get_request('name','');
 			$surname	= get_request('surname','');
-			$password	= null;
 			$password1	= get_request('password1', '');
 			$password2	= get_request('password2', '');
 			$url		= get_request('url','');
@@ -858,8 +856,6 @@
 	}
 
 	function get_rights_of_elements_table($rights=array(),$user_type=USER_TYPE_ZABBIX_USER){
-		global $ZBX_LOCALNODEID;
-
 		$table = new CTable('S_NO_ACCESSIBLE_RESOURCES', 'right_table');
 		$table->setHeader(array(SPACE, S_READ_WRITE, S_READ_ONLY, S_DENY),'header');
 
@@ -2212,8 +2208,6 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			$frmItem->addItemToBottomRow(array($cmbAction, SPACE, new CSubmit('register',S_DO)));
 		}
 
-		$json = new CJSON();
-
 		zbx_add_post_js("var valueTypeSwitcher = new CViewSwitcher('value_type', 'change', ".zbx_jsvalue($valueTypeVisibility, true).");");
 		zbx_add_post_js("var authTypeSwitcher = new CViewSwitcher('authtype', 'change', ".zbx_jsvalue($authTypeVisibility, true).");");
 		zbx_add_post_js("var typeSwitcher = new CViewSwitcher('type', 'change', ".zbx_jsvalue($typeVisibility, true).(isset($_REQUEST['itemid'])? ', true': '').');');
@@ -2235,16 +2229,11 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$frmItem->addVar('group_itemid', $itemids);
 		$frmItem->addVar('config',get_request('config',0));
 
-		$description	= get_request('description'	,'');
-		$key		= get_request('key'		,'');
-		$host		= get_request('host',		null);
-		$interfaceid	= get_request('interfaceid',		null);
 		$delay		= get_request('delay'		,30);
 		$history	= get_request('history'		,90);
 		$status		= get_request('status'		,0);
 		$type		= get_request('type'		,0);
 		$snmp_community	= get_request('snmp_community'	,'public');
-		$snmp_oid	= get_request('snmp_oid'	,'interfaces.ifTable.ifEntry.ifInOctets.1');
 		$port	= get_request('port'	,161);
 		$value_type	= get_request('value_type'	,ITEM_VALUE_TYPE_UINT64);
 		$data_type	= get_request('data_type'	,ITEM_DATA_TYPE_DECIMAL);
@@ -2263,8 +2252,6 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 		$formula	= get_request('formula'		,'1');
 		$logtimefmt	= get_request('logtimefmt'	,'');
-
-		$add_groupid	= get_request('add_groupid'	,get_request('groupid',0));
 
 		$delay_flex_el = array();
 
@@ -2536,8 +2523,6 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$priority = get_request('priority',	'');
 		$dependencies = get_request('dependencies',array());
 
-		$original_templates = array();
-
 		asort($dependencies);
 
 		$frmMTrig = new CFormTable(S_TRIGGERS_MASSUPDATE);
@@ -2726,9 +2711,6 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 						show_messages(false, '', S_EXPRESSION_SYNTAX_ERROR);
 					}
 				}
-
-				$tree = array();
-				//create_node_list($node, $tree);
 
 				$frmTrig->addVar('expression', $expression);
 				$exprfname = 'expr_temp';
@@ -3834,16 +3816,12 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 	}
 
 	function get_regexp_form(){
-		$frm_title = S_REGULAR_EXPRESSION;
-
 		if(isset($_REQUEST['regexpid']) && !isset($_REQUEST["form_refresh"])){
 			$sql = 'SELECT re.* '.
 				' FROM regexps re '.
 				' WHERE '.DBin_node('re.regexpid').
 					' AND re.regexpid='.$_REQUEST['regexpid'];
 			$regexp = DBfetch(DBSelect($sql));
-
-			$frm_title .= ' ['.$regexp['name'].']';
 
 			$rename			= $regexp['name'];
 			$test_string	= $regexp['test_string'];
@@ -3894,10 +3872,8 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 				if(uint_in_array($expression['expression_type'], array(EXPRESSION_TYPE_TRUE,EXPRESSION_TYPE_FALSE))){
 					if($expression['case_sensitive'])
-//						$results[$id] = ereg($paterns[0],$test_string);
 						$results[$id] = preg_match('/'.$paterns[0].'/',$test_string);
 					else
-//						$results[$id] = eregi($paterns[0],$test_string);
 						$results[$id] = preg_match('/'.$paterns[0].'/i',$test_string);
 
 					if($expression['expression_type'] == EXPRESSION_TYPE_TRUE)
