@@ -287,7 +287,7 @@
 
 	$ifTab->addRow($buttonRow);
 
-	$hostList->addRow(S_INTERFACES, new CDiv($ifTab, 'border_dotted objectlist'));
+	$hostList->addRow(S_INTERFACES, new CDiv($ifTab, 'border_dotted objectgroup ui-corner-all'));
 
 //Proxy
 	$cmbProxy = new CComboBox('proxy_hostid', $proxy_hostid);
