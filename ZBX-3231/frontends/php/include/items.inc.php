@@ -399,6 +399,13 @@
 			return $result;
 		}
 
+		//validating item key
+		list($item_key_is_valid, $check_result) = check_item_key($item['key_']);
+		if(!$item_key_is_valid){
+			error('Error in item key format: '.$check_result);
+			return false;
+		}
+
 		// first add mother item
 		$itemid=get_dbid('items','itemid');
 		$result=DBexecute('INSERT INTO items '.
@@ -604,6 +611,13 @@
 				error(S_CANNOT_UPDATE_ITEM.SPACE."'".$host["host"].':'.$item['key_']."'");
 				return FALSE;
 			}
+		}
+
+		//validating item key
+		list($item_key_is_valid, $check_result) = check_item_key($item['key_']);
+		if(!$item_key_is_valid){
+			error('Error in item key format: '.$check_result);
+			return false;
 		}
 
 		$item_old = get_item_by_itemid($itemid);
@@ -1849,7 +1863,7 @@
 		
 							if (isset($charecters[$i+1])){
 								return array(
-									true,   //is key valid?
+									false,   //is key valid?
 									sprintf('Incorrect usage of bracket symbols: \'%s\' found after final bracket', $charecters[$i+1]) //result destription
 								);
 							}
@@ -1924,7 +1938,7 @@
 						elseif($charecters[$i] == ']' && $nest_level == 0) {
 							if (isset($charecters[$i+1])){
 								return array(
-									true,   //is key valid?
+									false,   //is key valid?
 									sprintf('Incorrect usage of bracket symbols: \'%s\' found after final bracket', $charecters[$i+1]) //result destription
 								);
 							}
