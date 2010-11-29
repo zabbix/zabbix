@@ -449,7 +449,7 @@
 					)
 				{
 					if(!DBconnect($error_msg)){
-						$error_msg = 'Can not connect to database';
+						$error_msg = 'Cannot connect to database';
 					}
 				}
 				else{
