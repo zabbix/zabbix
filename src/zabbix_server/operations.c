@@ -22,6 +22,7 @@
 #include "db.h"
 #include "log.h"
 #include "zlog.h"
+#include "zbxserver.h"
 
 #include "operations.h"
 
@@ -55,7 +56,7 @@ static void	run_remote_command(char *host_name, char *command)
 	char		*p, *host_esc, *param;
 #ifdef HAVE_OPENIPMI
 	int		val;
-	char		error[MAX_STRING_LEN];
+	char		error[MAX_STRING_LEN], *port;
 #endif
 
 	assert(host_name);
@@ -67,8 +68,7 @@ static void	run_remote_command(char *host_name, char *command)
 
 	host_esc = DBdyn_escape_string(host_name);
 	result = DBselect(
-			"select hostid,host,useip,ip,dns,port,useipmi,ipmi_ip,ipmi_port,ipmi_authtype,"
-				"ipmi_privilege,ipmi_username,ipmi_password"
+			"select hostid,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password"
 			" from hosts"
 			" where status in (%d)"
 				" and host='%s'"
@@ -83,54 +83,83 @@ static void	run_remote_command(char *host_name, char *command)
 		memset(&item, 0, sizeof(item));
 
 		ZBX_STR2UINT64(item.host.hostid, row[0]);
-		zbx_strlcpy(item.host.host, row[1], sizeof(item.host.host));
-		item.host.useip = (unsigned char)atoi(row[2]);
-		zbx_strlcpy(item.host.ip, row[3], sizeof(item.host.ip));
-		zbx_strlcpy(item.host.dns, row[4], sizeof(item.host.dns));
-		item.host.port = (unsigned short)atoi(row[5]);
+		strscpy(item.host.host, host_name);
 
 		p = command;
 		while (*p == ' ' && *p != '\0')
 			p++;
 
+		*error = '\0';
+
 #ifdef HAVE_OPENIPMI
 		if (0 == strncmp(p, "IPMI", 4))
 		{
-			if (1 == atoi(row[6]))
-			{
-				zbx_strlcpy(item.host.ipmi_ip_orig, row[7], sizeof(item.host.ipmi_ip));
-				item.host.ipmi_port = (unsigned short)atoi(row[8]);
-				item.host.ipmi_authtype = atoi(row[9]);
-				item.host.ipmi_privilege = atoi(row[10]);
-				zbx_strlcpy(item.host.ipmi_username, row[11], sizeof(item.host.ipmi_username));
-				zbx_strlcpy(item.host.ipmi_password, row[12], sizeof(item.host.ipmi_password));
-			}
+			item.host.ipmi_authtype = (signed char)atoi(row[1]);
+			item.host.ipmi_privilege = (unsigned char)atoi(row[2]);
+			strscpy(item.host.ipmi_username, row[3]);
+			strscpy(item.host.ipmi_password, row[4]);
 
-			if (SUCCEED == (ret = parse_ipmi_command(p, item.ipmi_sensor, &val)))
+			if (SUCCEED == DCconfig_get_interface_by_type(&item.interface, item.host.hostid,
+					INTERFACE_TYPE_IPMI, 1))
 			{
-				item.key = item.ipmi_sensor;
-				ret = set_ipmi_control_value(&item, val, error, sizeof(error));
+				item.interface.addr = strdup(item.interface.useip ? item.interface.ip_orig : item.interface.dns_orig);
+				substitute_simple_macros(NULL, NULL, &item.host, NULL,
+						&item.interface.addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
+
+				port = strdup(item.interface.port_orig);
+				substitute_simple_macros(NULL, NULL, NULL, NULL,
+						&port, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
+				if (SUCCEED == is_ushort(port, &item.interface.port))
+				{
+					if (SUCCEED == (ret = parse_ipmi_command(p, item.ipmi_sensor, &val)))
+					{
+						item.key = item.ipmi_sensor;
+						ret = set_ipmi_control_value(&item, val, error, sizeof(error));
+					}
+					else
+						zbx_snprintf(error, sizeof(error), "incorrect format of IPMI command");
+				}
+				else
+					zbx_snprintf(error, sizeof(error), "Invalid port number [%s]",
+								item.interface.port_orig);
+
+				zbx_free(port);
+				zbx_free(item.interface.addr);
 			}
+			else
+				zbx_snprintf(error, sizeof(error), "IPMI interface is not defined for host [%s]", host_name);
 		}
 		else
 		{
 #endif
-			param = dyn_escape_param(p);
-			item.key = zbx_dsprintf(NULL, "system.run[\"%s\",\"nowait\"]", param);
-			zbx_free(param);
+			if (SUCCEED == DCconfig_get_interface_by_type(&item.interface, item.host.hostid,
+					INTERFACE_TYPE_AGENT, 1))
+			{
+				param = dyn_escape_param(p);
+				item.key = zbx_dsprintf(NULL, "system.run[\"%s\",\"nowait\"]", param);
+				zbx_free(param);
 
-			init_result(&agent_result);
+				init_result(&agent_result);
 
-			alarm(CONFIG_TIMEOUT);
-			ret = get_value_agent(&item, &agent_result);
-			alarm(0);
+				alarm(CONFIG_TIMEOUT);
+				ret = get_value_agent(&item, &agent_result);
+				alarm(0);
 
-			free_result(&agent_result);
+				free_result(&agent_result);
 
-			zbx_free(item.key);
+				zbx_free(item.key);
+			}
+			else
+				zbx_snprintf(error, sizeof(error), "ZABBIX Agent interface is not defined for host [%s]", host_name);
 #ifdef HAVE_OPENIPMI
 		}
 #endif
+
+		if (ret != SUCCEED && '\0' != error)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Can not execute remote command [%s]: %s",
+					p, error);
+		}
 	}
 	DBfree_result(result);
 
@@ -348,67 +377,6 @@ static zbx_uint64_t	select_discovered_host(DB_EVENT *event)
 
 /******************************************************************************
  *                                                                            *
- * Function: get_discovered_agent_port                                        *
- *                                                                            *
- * Purpose: return port of the discovered zabbix_agent                        *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value: discovered port number, otherwise default port - 10050       *
- *                                                                            *
- * Author: Aleksander Vladishev                                               *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-static unsigned short	get_discovered_agent_port(DB_EVENT *event)
-{
-	const char	*__function_name = "get_discovered_agent_port";
-	DB_RESULT	result;
-	DB_ROW		row;
-	unsigned short	port = 10050;
-	char		sql[256];
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	if (event->source != EVENT_SOURCE_DISCOVERY)
-		goto end;
-
-	switch (event->object) {
-	case EVENT_OBJECT_DHOST:
-		zbx_snprintf(sql, sizeof(sql), "select port from dservices where type=%d and dhostid=" ZBX_FS_UI64
-				" order by dserviceid",
-				SVC_AGENT,
-				event->objectid);
-		break;
-	case EVENT_OBJECT_DSERVICE:
-		zbx_snprintf(sql, sizeof(sql), "select port from dservices where type=%d and"
-				" dhostid in (select dhostid from dservices where dserviceid=" ZBX_FS_UI64 ")"
-				" order by dserviceid",
-				SVC_AGENT,
-				event->objectid);
-		break;
-	default:
-		goto end;
-	}
-
-	result = DBselectN(sql, 1);
-	if (NULL != (row = DBfetch(result)))
-	{
-		port = atoi(row[0]);
-
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() port:%d",
-				__function_name, (int)port);
-	}
-	DBfree_result(result);
-end:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-
-	return port;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: add_discovered_host_group                                        *
  *                                                                            *
  * Purpose: add group to host if not added already                            *
@@ -470,10 +438,11 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 	DB_RESULT	result2;
 	DB_ROW		row;
 	DB_ROW		row2;
-	zbx_uint64_t	hostid = 0, proxy_hostid, host_proxy_hostid;
-	char		host[MAX_STRING_LEN], *host_esc, *ip_esc, *host_unique, *host_unique_esc;
-	int		port;
-	zbx_uint64_t	groupid;
+	zbx_uint64_t	dhostid, hostid = 0, proxy_hostid, host_proxy_hostid;
+	char		host[MAX_STRING_LEN], *host_esc, *host_unique, *host_unique_esc;
+	unsigned short	port;
+	zbx_uint64_t	groupid = 0;
+	unsigned char	svc_type, interface_type;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(eventid:" ZBX_FS_UI64 ")",
 			__function_name, event->eventid);
@@ -481,120 +450,96 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 	result = DBselect(
 			"select discovery_groupid"
 			" from config"
-			" where 1=1" DB_NODE,
+			" where 1=1"
+				DB_NODE,
 			DBnode_local("configid"));
 
 	if (NULL != (row = DBfetch(result)))
-	{
-		ZBX_DBROW2UINT64(groupid, row[0]);
-	}
-	else
+		ZBX_STR2UINT64(groupid, row[0]);
+	DBfree_result(result);
+
+	if (0 == groupid)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Can't add discovered host:"
 				" Group for discovered hosts is not defined");
-		return 0;
-	}
-	DBfree_result(result);
-
-	switch (event->object) {
-	case EVENT_OBJECT_DHOST:
-		result = DBselect(
-				"select dr.proxy_hostid,ds.ip"
-				" from drules dr,dchecks dc,dservices ds"
-				" where dc.druleid=dr.druleid"
-					" and ds.dcheckid=dc.dcheckid"
-					" and ds.dhostid=" ZBX_FS_UI64
-				" order by ds.dserviceid",
-				event->objectid);
-		break;
-	case EVENT_OBJECT_DSERVICE:
-		result = DBselect(
-				"select dr.proxy_hostid,ds.ip"
-				" from drules dr,dchecks dc,dservices ds,dservices ds1"
-				" where dc.druleid=dr.druleid"
-					" and ds.dcheckid=dc.dcheckid"
-					" and ds1.dhostid=ds.dhostid"
-					" and ds1.dserviceid=" ZBX_FS_UI64
-				" order by ds.dserviceid",
-				event->objectid);
-		break;
-	case EVENT_OBJECT_ZABBIX_ACTIVE:
-		result = DBselect(
-				"select proxy_hostid,host,listen_ip,listen_port"
-				" from autoreg_host"
-				" where autoreg_hostid=" ZBX_FS_UI64,
-				event->objectid);
-		break;
-	default:
-		return 0;
+		return hostid;
 	}
 
-	if (NULL != (row = DBfetch(result)))
+	if (EVENT_OBJECT_DHOST == event->object || EVENT_OBJECT_DSERVICE == event->object)
 	{
-		ZBX_DBROW2UINT64(proxy_hostid, row[0])
-
-		if (EVENT_OBJECT_ZABBIX_ACTIVE == event->object)
+		if (EVENT_OBJECT_DHOST == event->object)
 		{
-			host_esc = DBdyn_escape_string_len(row[1], HOST_HOST_LEN);
-			ip_esc = DBdyn_escape_string_len(row[2], HOST_IP_LEN);
-
-			result2 = DBselect(
-					"select hostid,proxy_hostid"
-					" from hosts"
-					" where host='%s'"
-					       	DB_NODE,
-					host_esc,
-					DBnode_local("hostid"));
-
-			if (NULL == (row2 = DBfetch(result2)))
-			{
-				hostid = DBget_maxid("hosts");
-
-				DBexecute("insert into hosts (hostid,proxy_hostid,host,useip,dns,ip,port)"
-						" values (" ZBX_FS_UI64 ",%s,'%s',1,'%s','%s',%s)",
-						hostid,
-						DBsql_id_ins(proxy_hostid),
-						host_esc, host_esc, ip_esc, row[3]);
-			}
-			else
-			{
-				ZBX_STR2UINT64(hostid, row2[0]);
-				ZBX_DBROW2UINT64(host_proxy_hostid, row2[1]);
-
-				if (host_proxy_hostid != proxy_hostid)
-				{
-					DBexecute("update hosts"
-							" set proxy_hostid=%s"
-							" where hostid=" ZBX_FS_UI64,
-							DBsql_id_ins(proxy_hostid),
-							hostid);
-				}
-			}
-			DBfree_result(result2);
-
-			zbx_free(ip_esc);
-			zbx_free(host_esc);
+			result = DBselect(
+					"select ds.dhostid,dr.proxy_hostid,ds.ip,ds.port,ds.type"
+					" from drules dr,dchecks dc,dservices ds"
+					" where dc.druleid=dr.druleid"
+						" and ds.dcheckid=dc.dcheckid"
+						" and ds.dhostid=" ZBX_FS_UI64
+					" order by ds.dserviceid",
+					event->objectid);
 		}
-		else /* EVENT_OBJECT_DHOST, EVENT_OBJECT_DSERVICE */
-		{			
+		else
+		{
+			result = DBselect(
+					"select ds.dhostid,dr.proxy_hostid,ds.ip,ds.port,ds.type"
+					" from drules dr,dchecks dc,dservices ds,dservices ds1"
+					" where dc.druleid=dr.druleid"
+						" and ds.dcheckid=dc.dcheckid"
+						" and ds1.dhostid=ds.dhostid"
+						" and ds1.dserviceid=" ZBX_FS_UI64
+					" order by ds.dserviceid",
+					event->objectid);
+		}
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			ZBX_STR2UINT64(dhostid, row[0]);
+			ZBX_DBROW2UINT64(proxy_hostid, row[1]);
+			svc_type = (unsigned char)atoi(row[4]);
+
+			switch (svc_type)
+			{
+				case SVC_AGENT:
+					port = (unsigned short)atoi(row[3]);
+					interface_type = INTERFACE_TYPE_AGENT;
+					break;
+				case SVC_SNMPv1:
+				case SVC_SNMPv2c:
+				case SVC_SNMPv3:
+					port = (unsigned short)atoi(row[3]);
+					interface_type = INTERFACE_TYPE_SNMP;
+					break;
+				default:
+					port = 10050;
+					interface_type = INTERFACE_TYPE_AGENT;
+			}
+
 			alarm(CONFIG_TIMEOUT);
-			zbx_gethost_by_ip(row[1], host, sizeof(host));
+			zbx_gethost_by_ip(row[2], host, sizeof(host));
 			alarm(0);
 
-			host_esc = DBdyn_escape_string_len(host, HOST_HOST_LEN);
-			ip_esc = DBdyn_escape_string_len(row[1], HOST_IP_LEN);
+			if (0 == hostid)
+			{
+				result2 = DBselect(
+						"select distinct h.hostid,h.proxy_hostid"
+						" from hosts h,interface i,dservices ds"
+						" where h.hostid=i.hostid"
+							" and i.ip=ds.ip"
+							" and ds.dhostid=" ZBX_FS_UI64
+						       	DB_NODE
+						" order by h.hostid",
+						dhostid,
+						DBnode_local("h.hostid"));
 
-			port = get_discovered_agent_port(event);
+				if (NULL != (row2 = DBfetch(result2)))
+				{
+					ZBX_STR2UINT64(hostid, row2[0]);
+					ZBX_DBROW2UINT64(host_proxy_hostid, row2[1]);
+				}
+				DBfree_result(result2);
+			}
 
-			result2 = DBselect(
-					"select hostid,dns,port,proxy_hostid"
-					" from hosts"
-					" where ip='%s'"
-					       	DB_NODE,
-					ip_esc,
-					DBnode_local("hostid"));
-
-			if (NULL == (row2 = DBfetch(result2)))
+			if (0 == hostid)
 			{
 				hostid = DBget_maxid("hosts");
 
@@ -608,45 +553,93 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 				else
 				{
 					/* by ip */
-					make_hostname(row[1]); /* replace not-allowed symbols */
-					host_unique = DBget_unique_hostname_by_sample(row[1]);
+					make_hostname(row[2]); /* replace not-allowed symbols */
+					host_unique = DBget_unique_hostname_by_sample(row[2]);
 				}				
-				
+
 				host_unique_esc = DBdyn_escape_string(host_unique);
-				
-				DBexecute("insert into hosts (hostid,proxy_hostid,host,useip,ip,dns,port)"
-						" values (" ZBX_FS_UI64 ",%s,'%s',1,'%s','%s',%d)",
-						hostid,
-						DBsql_id_ins(proxy_hostid),
-						host_unique_esc,
-						ip_esc,
-						host_esc,
-						port);
-				
+
+				DBexecute("insert into hosts"
+							" (hostid,proxy_hostid,host)"
+						" values"
+							" (" ZBX_FS_UI64 ",%s,'%s')",
+						hostid, DBsql_id_ins(proxy_hostid), host_unique_esc);
+
+				DBadd_interface(hostid, interface_type, 1, row[2], host, port);
+
 				zbx_free(host_unique);
 				zbx_free(host_unique_esc);
 			}
 			else
 			{
-				ZBX_STR2UINT64(hostid, row2[0]);
-				ZBX_DBROW2UINT64(host_proxy_hostid, row2[3]);
-
-				if (0 != strcmp(host, row2[1]) || host_proxy_hostid != proxy_hostid)
+				if (host_proxy_hostid != proxy_hostid)
 				{
 					DBexecute("update hosts"
-							" set dns='%s',proxy_hostid=%s"
-							" where hostid=" ZBX_FS_UI64,
-							host_esc, DBsql_id_ins(proxy_hostid),
+							" set proxy_hostid=%s"
+							" where hostid=" ZBX_FS_UI64 ";\n",
+							DBsql_id_ins(proxy_hostid),
+							hostid);
+				}
+
+				DBadd_interface(hostid, interface_type, 1, row[2], host, port);
+			}
+		}
+		DBfree_result(result);
+	}
+	else if (EVENT_OBJECT_ZABBIX_ACTIVE == event->object)
+	{
+		result = DBselect(
+				"select proxy_hostid,host,listen_ip,listen_port"
+				" from autoreg_host"
+				" where autoreg_hostid=" ZBX_FS_UI64,
+				event->objectid);
+
+		if (NULL != (row = DBfetch(result)))
+		{
+			ZBX_DBROW2UINT64(proxy_hostid, row[0]);
+			host_esc = DBdyn_escape_string_len(row[1], HOST_HOST_LEN);
+			port = (unsigned short)atoi(row[3]);
+
+			result2 = DBselect(
+					"select hostid,proxy_hostid"
+					" from hosts"
+					" where host='%s'"
+					       	DB_NODE,
+					host_esc,
+					DBnode_local("hostid"));
+
+			if (NULL == (row2 = DBfetch(result2)))
+			{
+				hostid = DBget_maxid("hosts");
+
+				DBexecute("insert into hosts"
+							" (hostid,proxy_hostid,host)"
+						" values"
+							" (" ZBX_FS_UI64 ",%s,'%s');\n",
+						hostid, DBsql_id_ins(proxy_hostid), host_esc);
+
+				DBadd_interface(hostid, INTERFACE_TYPE_AGENT, 1, row[2], row[1], port);
+			}
+			else
+			{
+				ZBX_STR2UINT64(hostid, row2[0]);
+				ZBX_DBROW2UINT64(host_proxy_hostid, row2[1]);
+
+				if (host_proxy_hostid != proxy_hostid)
+				{
+					DBexecute("update hosts"
+							" set proxy_hostid=%s"
+							" where hostid=" ZBX_FS_UI64 ";\n",
+							DBsql_id_ins(proxy_hostid),
 							hostid);
 				}
 			}
 			DBfree_result(result2);
 
 			zbx_free(host_esc);
-			zbx_free(ip_esc);
 		}
+		DBfree_result(result);
 	}
-	DBfree_result(result);
 
 	if (0 != hostid)
 		add_discovered_host_group(hostid, groupid);

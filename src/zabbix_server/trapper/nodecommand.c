@@ -83,19 +83,18 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, char **res
 	int		result_alloc = 256, result_offset = 0,
 			ret = FAIL;
 	FILE		*f;
-	DC_HOST		host;
-#ifdef HAVE_OPENIPMI
-	DB_RESULT	db_result;
-	DB_ROW		db_row;
 	DC_ITEM		item;
+#ifdef HAVE_OPENIPMI
 	int		val;
-	char		error[MAX_STRING_LEN];
+	char		error[MAX_STRING_LEN], *port;
 #endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In execute_script() scriptid:" ZBX_FS_UI64
 			" hostid:" ZBX_FS_UI64, scriptid, hostid);
 
-	if (FAIL == DCget_host_by_hostid(&host, hostid))
+	memset(&item, 0, sizeof(item));
+
+	if (FAIL == DCget_host_by_hostid(&item.host, hostid))
 	{
 		*result = zbx_dsprintf(*result, "NODE %d: Unknown Host ID [" ZBX_FS_UI64 "]",
 				CONFIG_NODEID, hostid);
@@ -109,7 +108,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, char **res
 		return ret;
 	}
 
-	substitute_simple_macros(NULL, NULL, &host, NULL, NULL,
+	substitute_simple_macros(NULL, NULL, &item.host, NULL,
 			&command, MACRO_TYPE_SCRIPT, NULL, 0);
 
 	zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Executing command: '%s'",
@@ -122,61 +121,52 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, char **res
 #ifdef HAVE_OPENIPMI
 	if (0 == strncmp(p, "IPMI", 4))
 	{
-		db_result = DBselect(
-				"select hostid,host,useip,ip,dns,port,useipmi,ipmi_ip,ipmi_port,ipmi_authtype,"
-					"ipmi_privilege,ipmi_username,ipmi_password"
-				" from hosts"
-				" where hostid=" ZBX_FS_UI64
-					DB_NODE,
-				hostid,
-				DBnode_local("hostid"));
-
-		if (NULL != (db_row = DBfetch(db_result)))
+		if (SUCCEED == (ret = DCconfig_get_interface_by_type(&item.interface, item.host.hostid,
+				INTERFACE_TYPE_IPMI, 1)))
 		{
-			memset(&item, 0, sizeof(item));
+			item.interface.addr = strdup(item.interface.useip ? item.interface.ip_orig : item.interface.dns_orig);
+			substitute_simple_macros(NULL, NULL, &item.host, NULL,
+					&item.interface.addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
 
-			ZBX_STR2UINT64(item.host.hostid, db_row[0]);
-			zbx_strlcpy(item.host.host, db_row[1], sizeof(item.host.host));
-			item.host.useip = (unsigned char)atoi(db_row[2]);
-			zbx_strlcpy(item.host.ip, db_row[3], sizeof(item.host.ip));
-			zbx_strlcpy(item.host.dns, db_row[4], sizeof(item.host.dns));
-			item.host.port = (unsigned short)atoi(db_row[5]);
-
-			if (1 == atoi(db_row[6]))
+			port = strdup(item.interface.port_orig);
+			substitute_simple_macros(NULL, NULL, NULL, NULL,
+					&port, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
+			if (SUCCEED == (ret = is_ushort(port, &item.interface.port)))
 			{
-				zbx_strlcpy(item.host.ipmi_ip_orig, db_row[7], sizeof(item.host.ipmi_ip));
-				item.host.ipmi_port = (unsigned short)atoi(db_row[8]);
-				item.host.ipmi_authtype = atoi(db_row[9]);
-				item.host.ipmi_privilege = atoi(db_row[10]);
-				zbx_strlcpy(item.host.ipmi_username, db_row[11], sizeof(item.host.ipmi_username));
-				zbx_strlcpy(item.host.ipmi_password, db_row[12], sizeof(item.host.ipmi_password));
-			}
-
-			if (SUCCEED == (ret = parse_ipmi_command(p, item.ipmi_sensor, &val)))
-			{
-				if (SUCCEED == (ret = set_ipmi_control_value(&item, val,
-						error, sizeof(error))))
+				if (SUCCEED == (ret = parse_ipmi_command(p, item.ipmi_sensor, &val)))
 				{
-					*result = zbx_dsprintf(*result, "NODE %d: IPMI command successfully executed",
-							CONFIG_NODEID);
+					if (SUCCEED == (ret = set_ipmi_control_value(&item, val,
+							error, sizeof(error))))
+					{
+						*result = zbx_dsprintf(*result, "NODE %d: IPMI command successfully executed",
+								CONFIG_NODEID);
+					}
+					else
+					{
+						*result = zbx_dsprintf(*result, "NODE %d: Cannot execute IPMI command: %s",
+								CONFIG_NODEID, error);
+						ret = FAIL;
+					}
 				}
 				else
-					*result = zbx_dsprintf(*result, "NODE %d: Cannot execute IPMI command: %s",
-							CONFIG_NODEID, error);
+					 *result = zbx_dsprintf(*result, "NODE %d: Cannot parse IPMI command",
+							CONFIG_NODEID);
 			}
 			else
-				 *result = zbx_dsprintf(*result, "NODE %d: Cannot parse IPMI command",
-						CONFIG_NODEID);
+				*result = zbx_dsprintf(*result, "NODE %d: Invalid port number [%s]",
+						CONFIG_NODEID, item.interface.port_orig);
+
+			zbx_free(port);
+			zbx_free(item.interface.addr);
 		}
 		else
-			*result = zbx_dsprintf(*result, "NODE %d: Unknown Host ID [" ZBX_FS_UI64 "]",
-					CONFIG_NODEID, hostid);
-		DBfree_result(db_result);
+			*result = zbx_dsprintf(*result, "NODE %d: IPMI host interface is not defined for host [%s]",
+					CONFIG_NODEID, item.host.host);
 	}
 	else
 	{
 #endif
-		if(0 != (f = popen(p, "r")))
+		if (0 != (f = popen(p, "r")))
 		{
 			*result = zbx_malloc(*result, result_alloc);
 			**result = '\0';

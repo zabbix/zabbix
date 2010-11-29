@@ -182,7 +182,18 @@ typedef enum
 	ITEM_TYPE_SSH,
 	ITEM_TYPE_TELNET,
 	ITEM_TYPE_CALCULATED
-} zbx_item_type_t;
+}
+zbx_item_type_t;
+
+typedef enum
+{
+	INTERFACE_TYPE_UNKNOWN = 0,
+	INTERFACE_TYPE_AGENT,
+	INTERFACE_TYPE_SNMP,
+	INTERFACE_TYPE_IPMI
+}
+zbx_interface_type_t;
+const char	*zbx_interface_type_string(zbx_interface_type_t type);
 
 #define ZBX_FLAG_DISCOVERY		0x01	/* low-level discovery rule */
 #define ZBX_FLAG_DISCOVERY_CHILD	0x02	/* low-level discovery proto-item, proto-trigger or proto-graph */
@@ -939,5 +950,7 @@ int	is_function_char(const char c);
 int	parse_function(char **exp, char **func, char **params);
 int	parse_host_key(char *exp, char **host, char **key);
 void	make_hostname(char *host);
+
+unsigned char	get_interface_type_by_item_type(unsigned char type);
 
 #endif

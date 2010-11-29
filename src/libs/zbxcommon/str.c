@@ -2312,6 +2312,22 @@ const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type)
 	}
 }
 
+const char	*zbx_interface_type_string(zbx_interface_type_t type)
+{
+	switch (type)
+	{
+		case INTERFACE_TYPE_AGENT:
+			return "Zabbix agent";
+		case INTERFACE_TYPE_SNMP:
+			return "SNMP";
+		case INTERFACE_TYPE_IPMI:
+			return "IPMI";
+		case INTERFACE_TYPE_UNKNOWN:
+		default:
+			return "unknown";
+	}
+}
+
 const char	*zbx_result_string(int result)
 {
 	switch (result) {

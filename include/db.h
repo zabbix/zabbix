@@ -118,18 +118,21 @@ typedef enum {
 
 #define HOST_HOST_LEN			64
 #define HOST_HOST_LEN_MAX		HOST_HOST_LEN+1
-#define HOST_DNS_LEN			64
-#define HOST_DNS_LEN_MAX		HOST_DNS_LEN+1
-#define HOST_IP_LEN			39
-#define HOST_IP_LEN_MAX			HOST_IP_LEN+1
-#define HOST_ADDR_LEN			64 /* MAX(HOST_DNS_LEN,HOST_IP_LEN) */
-#define HOST_ADDR_LEN_MAX		HOST_ADDR_LEN+1
 #define HOST_ERROR_LEN			128
 #define HOST_ERROR_LEN_MAX		HOST_ERROR_LEN+1
 #define HOST_IPMI_USERNAME_LEN		16
 #define HOST_IPMI_USERNAME_LEN_MAX	HOST_IPMI_USERNAME_LEN+1
 #define HOST_IPMI_PASSWORD_LEN		20
 #define HOST_IPMI_PASSWORD_LEN_MAX	HOST_IPMI_PASSWORD_LEN+1
+
+#define INTERFACE_DNS_LEN		64
+#define INTERFACE_DNS_LEN_MAX		INTERFACE_DNS_LEN+1
+#define INTERFACE_IP_LEN		39
+#define INTERFACE_IP_LEN_MAX		INTERFACE_IP_LEN+1
+#define INTERFACE_ADDR_LEN		64 /* MAX(INTERFACE_DNS_LEN,INTERFACE_IP_LEN) */
+#define INTERFACE_ADDR_LEN_MAX		INTERFACE_ADDR_LEN+1
+#define INTERFACE_PORT_LEN		64
+#define INTERFACE_PORT_LEN_MAX		INTERFACE_PORT_LEN+1
 
 #define ITEM_KEY_LEN			1020
 #define ITEM_KEY_LEN_MAX		ITEM_KEY_LEN+1
@@ -225,12 +228,12 @@ typedef enum {
 #define HTTPSTEP_REQUIRED_LEN		255
 #define HTTPSTEP_REQUIRED_LEN_MAX	HTTPSTEP_REQUIRED_LEN+1
 
-#define ZBX_SQL_ITEM_FIELDS	"i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.type,h.useip,"	\
-				"h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,i.value_type,i.delta,"	\
-				"i.prevorgvalue,i.lastclock,i.units,i.multiplier,i.formula,i.status,"	\
-				"i.valuemapid,h.dns,i.trends,i.lastlogsize,i.data_type,i.mtime"
+#define ZBX_SQL_ITEM_FIELDS	"i.itemid,i.key_,h.host,i.type,i.history,i.lastvalue,"		\
+				"i.prevvalue,i.hostid,i.value_type,i.delta,i.prevorgvalue,"	\
+				"i.lastclock,i.units,i.multiplier,i.formula,i.status,"		\
+				"i.valuemapid,i.trends,i.data_type"
 #define ZBX_SQL_ITEM_TABLES	"hosts h,items i"
-#define ZBX_SQL_ITEM_FIELDS_NUM	27
+#define ZBX_SQL_ITEM_FIELDS_NUM	19
 #define ZBX_SQL_ITEM_SELECT	ZBX_SQL_ITEM_FIELDS " from " ZBX_SQL_ITEM_TABLES
 
 #ifdef HAVE_ORACLE
@@ -310,21 +313,6 @@ DB_EVENT
 	int		ns;
 };
 
-DB_HOST
-{
-	zbx_uint64_t     hostid;
-	char    host[HOST_HOST_LEN_MAX];
-	char    dns[HOST_DNS_LEN_MAX];
-	int     useip;
-	char    ip[HOST_IP_LEN_MAX];
-	int	port;
-	int	status;
-	int	disable_until;
-	int	errors_from;
-	char	error[HOST_ERROR_LEN_MAX];
-	int	available;
-};
-
 DB_ITEM
 {
 	zbx_uint64_t	itemid;
@@ -332,15 +320,8 @@ DB_ITEM
 	zbx_item_type_t	type;
 	zbx_item_data_type_t	data_type;
 	zbx_item_status_t	status;
-	char	*description;
 	char	*key;
-	char	*key_orig;
 	char	*host_name;
-	char	*host_ip;
-	char	*host_dns;
-	int	useip;
-	int     port;
-	int     delay;
 	int     history;
 	int	trends;
 	char	*prevorgvalue_str;
@@ -364,8 +345,6 @@ DB_ITEM
 	char	*units;
 
 	char	*formula;
-	int	lastlogsize;
-	int	mtime;
 
 	zbx_uint64_t	valuemapid;
 };
@@ -626,7 +605,6 @@ void    DBget_item_from_db(DB_ITEM *item, DB_ROW row);
 
 zbx_uint64_t	DBadd_host(char *server, int port, int status, int useip, char *ip, int disable_until, int available);
 int	DBhost_exists(char *server);
-int	DBget_host_by_hostid(int hostid,DB_HOST *host);
 int	DBadd_templates_to_host(int hostid,int host_templateid);
 
 int	DBadd_template_linkage(int hostid,int templateid,int items,int triggers,int graphs);
@@ -666,5 +644,8 @@ char	*DBget_unique_hostname_by_sample(char *host_name_sample);
 
 char	*DBsql_id_cmp(zbx_uint64_t id);
 char	*DBsql_id_ins(zbx_uint64_t id);
+
+zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
+		unsigned char useip, const char *ip, const char *dns, unsigned short port);
 
 #endif
