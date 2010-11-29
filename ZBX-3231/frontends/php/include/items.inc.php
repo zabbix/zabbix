@@ -1790,16 +1790,16 @@
 	function check_item_key($key){
 
 		$key_strlen = zbx_strlen($key);
-		$charecters = array();
+		$characters = array();
 
-		//gathering charecters into array, because we can't just work with them ar one if it's a unicode string
+		//gathering characters into array, because we can't just work with them ar one if it's a unicode string
 		for($i = 0; $i < $key_strlen; $i++){
-			$charecters[] = zbx_substr($key, $i, 1);
+			$characters[] = zbx_substr($key, $i, 1);
 		}
 
 		//checking every charecter, one by one
 		for($current_char = 0; $current_char < $key_strlen; $current_char++) {
-			if(!preg_match("/".ZBX_PREG_KEY_NAME."/", $charecters[$current_char])) {
+			if(!preg_match("/".ZBX_PREG_KEY_NAME."/", $characters[$current_char])) {
 				break; //$current_char now points to a first 'not a key name' char
 			}
 		}
@@ -1812,7 +1812,7 @@
 			);
 		}
 		//function with parameter, e.g. system.run[...]
-		elseif($charecters[$current_char] == '[') {
+		elseif($characters[$current_char] == '[') {
 
 			$state = 0; //0 - initial, 1 - inside quoted param, 2 - inside unquoted param
 			$nest_level = 0;
@@ -1822,49 +1822,49 @@
 				switch($state){
 					//initial state
 					case 0:
-						if($charecters[$i] == ',') {
+						if($characters[$i] == ',') {
 							//do nothing
 						}
 						//Zapcat: '][' is treated as ','
-						elseif($charecters[$i] == ']' && isset($charecters[$i+1]) && $charecters[$i+1] == '[' && $nest_level == 0) {
+						elseif($characters[$i] == ']' && isset($characters[$i+1]) && $characters[$i+1] == '[' && $nest_level == 0) {
 							$i++;
 						}
 						//entering quotes
-						elseif($charecters[$i] == '"') {
+						elseif($characters[$i] == '"') {
 							$state = 1;
 						}
 						//next nesting level
-						elseif($charecters[$i] == '[') {
+						elseif($characters[$i] == '[') {
 							$nest_level++;
 						}
 						//one of the nested sets ended
-						elseif($charecters[$i] == ']' && $nest_level != 0) {
+						elseif($characters[$i] == ']' && $nest_level != 0) {
 							$nest_level--;
 							//skiping spaces
-							while($charecters[$i+1] == ' ') {
+							while(isset($characters[$i+1]) && $characters[$i+1] == ' ') {
 								$i++;
 							}
 							//all nestings are closed correctly
-							if ($nest_level == 0 && isset($charecters[$i+1]) && $charecters[$i+1] == ']') {
+							if ($nest_level == 0 && isset($characters[$i+1]) && $characters[$i+1] == ']') {
 								return array(
 									true,   //is key valid?
 									S_KEY_IS_VALID //result destription
 								);
 							}
 
-							if($charecters[$i+1] != ',' && !($nest_level!=0 && $charecters[$i+1] == ']')) {
+							if((!isset($characters[$i+1]) || $characters[$i+1] != ',') && !($nest_level!=0 && isset($characters[$i+1]) && $characters[$i+1] == ']')) {
 								return array(
 									false,   //is key valid?
-									sprintf(S_INCORRECT_SYNTAX_NEAR, $charecters[$current_char], $current_char) //result destription
+									sprintf(S_INCORRECT_SYNTAX_NEAR, $characters[$current_char], $current_char) //result destription
 								);
 							}
 						}
-						elseif($charecters[$i] == ']' && $nest_level == 0) {
+						elseif($characters[$i] == ']' && $nest_level == 0) {
 		
-							if (isset($charecters[$i+1])){
+							if (isset($characters[$i+1])){
 								return array(
 									false,   //is key valid?
-									sprintf(S_INCORRECT_USAGE_OF_BRACKETS, $charecters[$i+1]) //result destription
+									sprintf(S_INCORRECT_USAGE_OF_BRACKETS, $characters[$i+1]) //result destription
 								);
 							}
 							else {
@@ -1874,7 +1874,7 @@
 								);
 							}
 						}
-						elseif($charecters[$i] != ' ') {
+						elseif($characters[$i] != ' ') {
 							$state = 2;
 						}
 						
@@ -1883,21 +1883,21 @@
 					//quoted
 					case 1:
 						//ending quote is reached
-						if($charecters[$i] == '"')
+						if($characters[$i] == '"')
 						{
 							//skiping spaces
-							while($charecters[$i+1] == ' ') {
+							while(isset($characters[$i+1]) && $characters[$i+1] == ' ') {
 								$i++;
 							}
 
 							//Zapcat
-							if ($nest_level == 0 && isset($charecters[$i+1]) && $charecters[$i+1] == ']' && $charecters[$i+2] == '[')
+							if ($nest_level == 0 && isset($characters[$i+1]) && isset($characters[$i+2]) && $characters[$i+1] == ']' && $characters[$i+2] == '[')
 							{
 								$state = 0;
 								break;
 							}
 
-							if ($nest_level == 0 && isset($charecters[$i+1]) && $charecters[$i+1] == ']')
+							if ($nest_level == 0 && isset($characters[$i+1]) && $characters[$i+1] == ']')
 							{
 	
 								return array(
@@ -1906,18 +1906,18 @@
 								);
 							}
 
-							if ($charecters[$i+1] != ',' && !($nest_level != 1 && $charecters[$i+1] == ']'))
+							if ((!isset($characters[$i+1]) || $characters[$i+1] != ',') && !($nest_level != 1 && isset($characters[$i+1]) && $characters[$i+1] == ']'))
 							{
 								return array(
 									false,   //is key valid?
-									sprintf(S_INCORRECT_SYNTAX_NEAR, $charecters[$current_char], $current_char) //result destription
+									sprintf(S_INCORRECT_SYNTAX_NEAR, $characters[$current_char], $current_char) //result destription
 								);
 							}
 
 							$state = 0;
 						}
 						//escaped quote (\")
-						elseif($charecters[$i] == '\\' && isset($charecters[$i+1]) && $charecters[$i+1] == '"') {
+						elseif($characters[$i] == '\\' && isset($characters[$i+1]) && $characters[$i+1] == '"') {
 							$i++;
 						}
 
@@ -1926,20 +1926,20 @@
 					//unquoted
 					case 2:
 						//Zapcat
-						if($nest_level == 0 && $charecters[$i] == ']' && isset($charecters[$i+1]) && $charecters[$i+1] =='[' )
+						if($nest_level == 0 && $characters[$i] == ']' && isset($characters[$i+1]) && $characters[$i+1] =='[' )
 						{
 							$i--;
 							$state = 0;
 						}
-						elseif($charecters[$i] == ',' || ($charecters[$i] == ']' && $nest_level != 0)) {
+						elseif($characters[$i] == ',' || ($characters[$i] == ']' && $nest_level != 0)) {
 							$i--;
 							$state = 0;
 						}
-						elseif($charecters[$i] == ']' && $nest_level == 0) {
-							if (isset($charecters[$i+1])){
+						elseif($characters[$i] == ']' && $nest_level == 0) {
+							if (isset($characters[$i+1])){
 								return array(
 									false,   //is key valid?
-									sprintf(S_INCORRECT_USAGE_OF_BRACKETS, $charecters[$i+1]) //result destription
+									sprintf(S_INCORRECT_USAGE_OF_BRACKETS, $characters[$i+1]) //result destription
 								);
 							}
 							else {
