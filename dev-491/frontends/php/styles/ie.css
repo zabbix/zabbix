@@ -65,7 +65,7 @@ div.formlist ul li div.dd{
 
 /* Sortable */
 .mainwidget{  }
-.column{ border: 1px red solid;  float: none;}
+.column{ float: none;}
 
 .column .widget{  }
 

@@ -424,7 +424,7 @@ $right_col = array();
 
 	$leftDiv = new CDiv($left_col, 'column');
 	$middleDiv = new CDiv($right_col, 'column');
-	$rightDiv = new CDiv(null, 'column');
+	$rightDiv = new CDiv(SPACE, 'column');
 
 	$ieTab = new CTable();
 	$ieTab->addRow(array($leftDiv,$middleDiv,$rightDiv), 'top');
