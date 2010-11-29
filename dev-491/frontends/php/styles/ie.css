@@ -54,6 +54,12 @@ table.tableinfo tr:hover td.active			{	background-color: #AAD9AA;	border: 1px #A
 table.tableinfo tr td.inactive				{	background-color: #FF8888;	border: 1px #FF8888 solid; }
 table.tableinfo tr:hover td.inactive			{	background-color: #FA8388;	border: 1px #FA8388 solid; }
 
+/* DIV */
+.menu_icon{
+	line-height: 15px;
+	height: 15px;
+	width: 15px;
+}
 
 div.objectlist ul li{
 	display: inline;
@@ -64,7 +70,7 @@ div.formlist ul li div.dd{
 }
 
 /* Sortable */
-.mainwidget{  }
+.mainwidget{ width: 90% }
 .column{ float: none;}
 
 .column .widget{  }
