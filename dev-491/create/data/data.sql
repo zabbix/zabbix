@@ -119,7 +119,7 @@ INSERT INTO hosts VALUES (10044,NULL,'Template_Microsoft_SQLServer_2005',3,0,'',
 INSERT INTO hosts VALUES (10045,NULL,'Template_pfSense',3,0,'',0,0,0,0,0,0,0,2,'','',0,0,0,0,NULL,0,0,0,0,0,'','');
 INSERT INTO hosts VALUES (10046,NULL,'Template_NetScreen_25',3,0,'',0,0,0,0,0,0,0,2,'','',0,0,0,0,NULL,0,0,0,0,0,'','');
 
-INSERT INTO interface VALUES (10017,10017,1,1,0,'127.0.0.1','','10050');
+INSERT INTO interface VALUES (10017,10017,1,1,1,'127.0.0.1','','10050');
 --
 -- Dumping data for table hosts_groups
 --
