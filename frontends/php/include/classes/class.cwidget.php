@@ -295,12 +295,7 @@ private $header;
 private $body;
 private $footer;
 
-	public function __construct($id=null,$body=null,$state=null){
-		if(is_null($id)){
-			list($usec, $sec) = explode(' ',microtime());
-			$id = 'widget_'.((int)($sec % 10)).((int)($usec * 1000));
-		}
-
+	public function __construct($id, $body=null, $state=null){
 		$this->domid = $id;
 		$this->state = $state;		// 0 - closed, 1 - opened
 
@@ -311,6 +306,7 @@ private $footer;
 		$this->footer = null;
 		
 		parent::__construct(null, 'widget');
+		$this->setAttribute('id', $id.'_widget');
 	}
 
 	public function addItem($item){
@@ -357,14 +353,13 @@ private $footer;
 		$div = new CDiv($this->body, 'body');
 		$div->setAttribute('id',$this->domid);
 		
-		$body = new CDiv($div);
-		$body->addItem($this->footer);
+		if(!$this->state){
+			$div->setAttribute('style','display: none;');
+			$this->footer->setAttribute('style','display: none;');
+		}
 
-		if(!$this->state) $body->setAttribute('style','display: none;');
-
-		parent::addItem($body);
-
-		//parent::addItem($this->footer);
+		parent::addItem($div);
+		parent::addItem($this->footer);
 
 	return $this;
 	}
