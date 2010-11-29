@@ -207,8 +207,6 @@ include_once('include/page_header.php');
 	}
 // ------- GO ---------
 	else if(($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['mass_save']) && isset($_REQUEST['g_triggerid'])){
-		show_messages();
-
 		$result = false;
 
 		$visible = get_request('visible',array());
@@ -244,9 +242,6 @@ include_once('include/page_header.php');
 		if($result){
 			unset($_REQUEST['massupdate']);
 			unset($_REQUEST['form']);
-			$url = new CUrl();
-			$path = $url->getPath();
-			insert_js('cookie.eraseArray("'.$path.'")');
 		}
 
 		$go_result = $result;

@@ -1416,9 +1416,8 @@ COpt::memoryPick();
 			$options = array(
 				'triggerids' => $triggerids,
 				'output' => API_OUTPUT_EXTEND,
-				'editable' => 1,
-				'selectHosts' => API_OUTPUT_EXTEND,
-				'preservekeys' => 1
+				'editable' => true,
+				'preservekeys' => true,
 			);
 			$del_triggers = self::get($options);
 
@@ -1439,7 +1438,7 @@ COpt::memoryPick();
 				}
 			}
 
-// first delete child triggers
+// get child triggers
 			$parent_triggerids = $triggerids;
 			do{
 				$db_items = DBselect('SELECT triggerid FROM triggers WHERE ' . DBcondition('templateid', $parent_triggerids));
@@ -1451,14 +1450,23 @@ COpt::memoryPick();
 			} while(!empty($parent_triggerids));
 
 
+// select all triggers which are deleted (include childs)
+			$options = array(
+				'triggerids' => $triggerids,
+				'output' => API_OUTPUT_EXTEND,
+				'nopermissions' => true,
+				'preservekeys' => true,
+			);
+			$del_triggers = self::get($options);
+
 			DB::delete('events', array(
-				DBcondition('objectid', $triggerids),
-				'object='.EVENT_OBJECT_TRIGGER
+				'objectid' => $triggerids,
+				'object' => EVENT_OBJECT_TRIGGER,
 			));
 
 			DB::delete('sysmaps_elements', array(
-				DBcondition('elementid', $triggerids),
-				'elementtype='.SYSMAP_ELEMENT_TYPE_TRIGGER
+				'elementid' => $triggerids,
+				'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER,
 			));
 
 // disable actions
@@ -1478,19 +1486,20 @@ COpt::memoryPick();
 
 // delete action conditions
 			DB::delete('conditions', array(
-				'conditiontype='.CONDITION_TYPE_TRIGGER,
-				DBcondition('value', $triggerids, false, true),
+				'conditiontype' => CONDITION_TYPE_TRIGGER,
+				'value' => $triggerids,
 			));
+
+// TODO: REMOVE info
+			foreach($del_triggers as $triggerid => $trigger){
+				info(sprintf(_('Trigger [%1$s:%2$s] deleted.'), $trigger['description'], explode_exp($trigger['expression'], false)));
+				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $trigger['triggerid'], $trigger['description'].':'.$trigger['expression'], NULL, NULL, NULL);
+			}
+
 
 			DB::delete('triggers', array('triggerid' => $triggerids));
 
 			update_services_status_all();
-
-// TODO: REMOVE info
-			foreach($del_triggers as $triggerid => $trigger){
-				info(S_TRIGGER.' ['.$trigger['description'].'] '.S_DELETED_SMALL.' from hosts ['.implode(', ', zbx_objectValues($trigger['hosts'], 'host')).']');
-				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $trigger['triggerid'], $trigger['description'].':'.$trigger['expression'], NULL, NULL, NULL);
-			}
 
 			self::EndTransaction(true, __METHOD__);
 			return array('triggerids' => $triggerids);
@@ -1591,7 +1600,7 @@ COpt::memoryPick();
 				'where' => array('triggerid='.$triggerid)
 			));
 
-			info( S_TRIGGER.' ['.$trigger['description'].'] '.S_CREATED_SMALL);
+			info(sprintf(_('Trigger [%1$s:%2$s] created.'), $trigger['description'], $trigger['expression']));
 		}
 
 
