@@ -2254,11 +2254,11 @@ void	substitute_macros(DB_EVENT *event, DB_ESCALATION *escalation, char **data)
 		}
 		else
 		{
-			c = *pr;
-			*pr = '\0';
+			c = *(++pp);
+			*pp = '\0';
 			str_out = zbx_strdcat(str_out, pl);
-			*pr = c;
-			pl = pr;
+			*pp = c;
+			pl = pp;
 		}
 
 		zbx_free(host);
