@@ -688,22 +688,6 @@ COpt::memoryPick();
 						self::exception(ZBX_API_ERROR_PARAMETERS, S_VALUE_TYPE_MUST_FLOAT_FOR_AGGREGATE_ITEMS);
 					}
 				}
-// {{{ EXCEPTION: ITEM EXISTS
-				$itemsExists = self::get(array(
-					'output' => array('itemid','hostid','description'),
-					'filter' => array(
-						'hostid' => $item['hostid'],
-						'key_' => $item['key_'],
-						'flags' => null
-					),
-					'nopermissions' => 1
-				));
-				foreach($itemsExists as $inum => $itemExists){
-					if(!$update || ($itemExists['itemid'] != $item['itemid'])){
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Host with item [ '.$item['description'].':'.$item['key_'].' ] already exists');
-					}
-				}
-// }}} EXCEPTION: ITEM EXISTS
 			}
 		}
 		unset($item);
@@ -740,6 +724,21 @@ COpt::memoryPick();
 	}
 
 	protected static function createReal(&$items){
+		foreach($items as $key => $item){
+			$itemsExists = CItem::get(array(
+				'output' => API_OUTPUT_SHORTEN,
+				'filter' => array(
+					'hostid' => $item['hostid'],
+					'key_' => $item['key_'],
+					'flags' => null
+				),
+				'nopermissions' => 1
+			));
+			foreach($itemsExists as $inum => $itemExists){
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'Host with item ['.$item['key_'].'] already exists');
+			}
+		}
+
 		$itemids = DB::insert('items', $items);
 
 		$itemApplications = array();
@@ -780,6 +779,21 @@ COpt::memoryPick();
 
 		$data = array();
 		foreach($items as $inum => $item){
+			$itemsExists = CItem::get(array(
+				'output' => API_OUTPUT_SHORTEN,
+				'filter' => array(
+					'hostid' => $item['hostid'],
+					'key_' => $item['key_'],
+					'flags' => null
+				),
+				'nopermissions' => 1
+			));
+			foreach($itemsExists as $inum => $itemExists){
+				if($itemExists['itemid'] != $item['itemid']){
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Host with item [ '.$item['key_'].' ] already exists');
+				}
+			}
+
 			$data[] = array('values' => $item, 'where'=> array('itemid='.$item['itemid']));
 		}
 		$result = DB::update('items', $data);

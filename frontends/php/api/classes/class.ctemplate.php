@@ -1135,7 +1135,7 @@ COpt::memoryPick();
 			$options = array(
 				'templateids' => $templateids,
 				'editable' => 1,
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1
 			);
 			$del_templates = self::get($options);
@@ -1149,14 +1149,15 @@ COpt::memoryPick();
 
 			$delItems = CItem::get(array(
 				'templateids' => $templateids,
+				'output' => API_OUTPUT_SHORTEN,
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			));
-			CItem::delete($delItems, true);
+			CItem::delete(array_keys($delItems), true);
 
 
 	// delete screen items
-			DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid',$templateids)).' AND resourcetype='.SCREEN_RESOURCE_HOST_TRIGGERS;
+			DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid', $templateids)).' AND resourcetype='.SCREEN_RESOURCE_HOST_TRIGGERS;
 
 	// delete host from maps
 			delete_sysmaps_elements_with_hostid($templateids);
@@ -1168,7 +1169,7 @@ COpt::memoryPick();
 			$sql = 'SELECT DISTINCT actionid '.
 					' FROM conditions '.
 					' WHERE conditiontype='.CONDITION_TYPE_HOST.
-						' AND '.DBcondition('value',$templateids, false, true);
+						' AND '.DBcondition('value', $templateids, false, true);
 			$db_actions = DBselect($sql);
 			while($db_action = DBfetch($db_actions)){
 				$actionids[$db_action['actionid']] = $db_action['actionid'];
@@ -1181,7 +1182,7 @@ COpt::memoryPick();
 			$sql = 'SELECT DISTINCT o.actionid '.
 					' FROM operations o '.
 					' WHERE o.operationtype IN ('.OPERATION_TYPE_GROUP_ADD.','.OPERATION_TYPE_GROUP_REMOVE.') '.
-						' AND '.DBcondition('o.objectid',$templateids);
+						' AND '.DBcondition('o.objectid', $templateids);
 			$db_actions = DBselect($sql);
 			while($db_action = DBfetch($db_actions)){
 				$actionids[$db_action['actionid']] = $db_action['actionid'];
@@ -1206,41 +1207,20 @@ COpt::memoryPick();
 							' AND '.DBcondition('objectid',$templateids));
 
 
-// delete host applications
-			//since all apps were deleted by other functions earlier, we must unlink
-			// those, who were not because they were used in web scenarios
-
-			$exceptional_applicationids = array();
-			$query = 'SELECT
-							httptest.applicationid,
-							httptest.name httptestname,
-							applications.name appname
-						FROM
-							httptest,
-							applications
-						WHERE
-							httptest.applicationid = applications.applicationid
-							AND applications.templateid IN (SELECT applicationid
-															FROM applications
-															WHERE '.DBcondition('hostid',$templateids).')';
-			$db_applications = DBselect($query);
-			while($ex_app = DBfetch($db_applications)){
-				$exceptional_applicationids[] = $ex_app['applicationid'];
-			}
-
-//removing links from those apps that were not deleted
-			if(count($exceptional_applicationids) > 0){
-				$query = 'UPDATE applications SET templateid = 0 WHERE '.DBcondition('applicationid',$exceptional_applicationids);
-				DBexecute($query);
-			}
+			$delApplications = CApplication::get(array(
+				'templateids' => $templateids,
+				'output' => API_OUTPUT_SHORTEN,
+				'nopermissions' => 1,
+				'preservekeys' => 1
+			));
+			CApplication::delete(array_keys($delApplications), true);
 
 
-			$templateidCondition = array('hostid'=>$templateids);
-			DB::delete('hosts', array($templateidCondition));
+			DB::delete('hosts', array('hostid' => $templateids));
 
 // TODO: remove info from API
 			foreach($del_templates as $template) {
-				info(S_HOST_HAS_BEEN_DELETED_MSG_PART1.SPACE.$template['host'].SPACE.S_HOST_HAS_BEEN_DELETED_MSG_PART2);
+				info(sprintf(_('Template [%1$s] deleted.'), $template['host']));
 				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $template['hostid'], $template['host'], 'hosts', NULL, NULL);
 			}
 
@@ -2006,7 +1986,7 @@ COpt::memoryPick();
 		foreach($items[ZBX_FLAG_DISCOVERY_NORMAL] as $item){
 			info(S_ITEM.' ['.$item.'] '.S_UNLINKED_SMALL);
 		}
-/* }}} ITEMS && DISCOVERYRULES  && ITEMPROTOTYPES */
+/* }}} ITEMS && DISCOVERYRULES && ITEMPROTOTYPES */
 
 
 /* APPLICATIONS {{{ */

@@ -1248,7 +1248,7 @@ else {
 //for every field
 			foreach($wheres as $field => $values){
 //if this field does not exist, just skip it
-				if (!isset($table_schema['fields'][$field])){
+				if(!isset($table_schema['fields'][$field]) || is_null($values)){
 					continue;
 				}
 				$values = zbx_toArray($values);
