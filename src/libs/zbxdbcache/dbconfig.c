@@ -2190,7 +2190,18 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 	DCget_interface(&dst_item->interface, dc_interface);
 
 	if ('\0' != *src_item->port)
-		strscpy(dst_item->interface.port_orig, src_item->port);
+	{
+		switch (src_item->type)
+		{
+			case ITEM_TYPE_SNMPv1:
+			case ITEM_TYPE_SNMPv2c:
+			case ITEM_TYPE_SNMPv3:
+				strscpy(dst_item->interface.port_orig, src_item->port);
+				break;
+			default:
+				/* nothing to do */;
+		}
+	}
 }
 
 /******************************************************************************
