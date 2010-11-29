@@ -426,7 +426,12 @@ $right_col = array();
 	$middleDiv = new CDiv($right_col, 'column');
 	$rightDiv = new CDiv(null, 'column');
 
-	$dashboard_wdgt->addItem(array($leftDiv,$middleDiv,$rightDiv));
+	$ieTab = new CTable();
+	$ieTab->addRow(array($leftDiv,$middleDiv,$rightDiv), 'top');
+
+	$dashboard_wdgt->addItem($ieTab);
+	//$dashboard_wdgt->addItem(array($leftDiv,$middleDiv,$rightDiv));
+
 	$dashboard_wdgt->show();
 
 	$jsmenu = new CPUMenu(null,170);
