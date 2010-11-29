@@ -2867,35 +2867,34 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 	// end new dependency
 		}
 
-		$type_select = new CComboBox('type');
-		$type_select->additem(TRIGGER_MULT_EVENT_DISABLED,S_NORMAL,(($type == TRIGGER_MULT_EVENT_ENABLED)? 'no':'yes'));
-		$type_select->additem(TRIGGER_MULT_EVENT_ENABLED,S_NORMAL.SPACE.'+'.SPACE.S_MULTIPLE_PROBLEM_EVENTS,(($type == TRIGGER_MULT_EVENT_ENABLED)? 'yes':'no'));
+		$type_select = new CComboBox('type', $type);
+		$type_select->additem(TRIGGER_MULT_EVENT_DISABLED, _('Normal'));
+		$type_select->additem(TRIGGER_MULT_EVENT_ENABLED, _('Normal + Multiple PROBLEM events'));
 
-		$frmTrig->addRow(S_EVENT_GENERATION,$type_select);
+		$frmTrig->addRow(S_EVENT_GENERATION, $type_select);
 
-		$cmbPrior = new CComboBox('priority',$priority);
+		$cmbPrior = new CComboBox('priority', $priority);
 		for($i = 0; $i <= 5; $i++){
 			$cmbPrior->addItem($i,get_severity_description($i));
 		}
 		$frmTrig->addRow(S_SEVERITY,$cmbPrior);
 
-		$frmTrig->addRow(S_COMMENTS,new CTextArea("comments",$comments,90,7));
-		$frmTrig->addRow(S_URL,new CTextBox("url",$url,90));
-		$frmTrig->addRow(S_DISABLED,new CCheckBox("status",$status));
+		$frmTrig->addRow(S_COMMENTS,new CTextArea("comments", $comments,90,7));
+		$frmTrig->addRow(S_URL,new CTextBox("url", $url, 90));
+		$frmTrig->addRow(S_DISABLED,new CCheckBox("status", $status));
 
-		$frmTrig->addItemToBottomRow(new CSubmit("save",S_SAVE));
+		$buttons = array();
+		$buttons[] = new CSubmit("save", S_SAVE);
 		if(isset($_REQUEST["triggerid"])){
-			$frmTrig->addItemToBottomRow(SPACE);
-			$frmTrig->addItemToBottomRow(new CSubmit("clone",S_CLONE));
-			$frmTrig->addItemToBottomRow(SPACE);
-			if( !$limited ){
-				$frmTrig->addItemToBottomRow(new CButtonDelete(S_DELETE_TRIGGER_Q,
+			$buttons[] = new CSubmit("clone", S_CLONE);
+			if(!$limited){
+				$buttons[] = new CButtonDelete(S_DELETE_TRIGGER_Q,
 					url_param("form").url_param('groupid').url_param("hostid").
-					url_param("triggerid").url_param("parent_discoveryid")));
+					url_param("triggerid").url_param("parent_discoveryid"));
 			}
 		}
-		$frmTrig->addItemToBottomRow(SPACE);
-		$frmTrig->addItemToBottomRow(new CButtonCancel(url_param('groupid').url_param("hostid").url_param("parent_discoveryid")));
+		$buttons[] = new CButtonCancel(url_param('groupid').url_param("hostid").url_param("parent_discoveryid"));
+		$frmTrig->addItemToBottomRow($buttons);
 
 		$jsmenu = new CPUMenu(null,170);
 		$jsmenu->InsertJavaScript();

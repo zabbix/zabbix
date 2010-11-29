@@ -1430,7 +1430,10 @@ class zbxXML{
 									$triggers_to_add_dep[] = $depends_triggerid['triggerid'];
 								}
 							}
-							$r = update_trigger($current_triggerid['triggerid'],null,$current_triggerid['description'],null,null,null,null,null,$triggers_to_add_dep,null);
+							$r = CTrigger::update(array(
+								'triggerid' => $current_triggerid['triggerid'],
+								'dependencies' => $triggers_to_add_dep,
+							));
 							if($r === false){
 								throw new Exception();
 							}

@@ -54,6 +54,7 @@ function __autoload($class_name){
 		'ctemplate' => 1,
 		'ctemplatescreen' => 1,
 		'ctrigger' => 1,
+		'ctriggerprototype' => 1,
 		'cuser' => 1,
 		'cusergroup' => 1,
 		'cusermacro' => 1,

@@ -1242,7 +1242,6 @@ else {
 			}
 
 			$table_schema = self::getSchema($table);
-
 			$sql_wheres = array();
 
 //for every field

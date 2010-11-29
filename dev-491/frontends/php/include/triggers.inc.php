@@ -824,106 +824,6 @@ return $caption;
 	return true;
 	}
 
-	function add_trigger($expression, $description, $type, $priority, $status, $comments, $url, $deps=array(), $templateid=0, $flags=0){
-		$expressionData = parseTriggerExpressions($expression, true);
-		if( isset($expressionData[$expression]['errors']) ) {
-			showExpressionErrors($expression, $expressionData[$expression]['errors']);
-			return false;
-		}
-		if( !validate_trigger_dependency($expression, $deps)){
-			error(S_WRONG_DEPENDENCY_ERROR);
-			return false;
-		}
-
-		if(CTrigger::exists(array('description' => $description, 'expression' => $expression))){
-			error('Trigger '.$description.' already exists');
-			return false;
-		}
-
-		$triggerid=get_dbid('triggers','triggerid');
-
-		$result=DBexecute('INSERT INTO triggers '.
-			'  (triggerid,description,type,priority,status,comments,url,value,value_flags,error,templateid,flags) '.
-			" values ($triggerid,".zbx_dbstr($description).",$type,$priority,$status,".zbx_dbstr($comments).','.
-			zbx_dbstr($url).",".TRIGGER_VALUE_FALSE.",".TRIGGER_VALUE_FLAG_UNKNOWN.",'Trigger just added. No status update so far.',".zero2null($templateid).",".$flags.")");
-
-		if(!$result){
-			return	$result;
-		}
-
-		addEvent($triggerid,TRIGGER_VALUE_UNKNOWN);
-
-		if( null == ($expression = implode_exp($expression,$triggerid)) ){
-			$result = false;
-		}
-
-
-		if($result){
-			DBexecute('update triggers set expression='.zbx_dbstr($expression).' where triggerid='.$triggerid);
-
-			foreach($deps as $id => $triggerid_up){
-				if(!$result2=add_trigger_dependency($triggerid, $triggerid_up)){
-					error(S_INCORRECT_DEPENDENCY.' ['.expand_trigger_description($triggerid_up).']');
-				}
-
-				$result &= $result2;
-			}
-		}
-
-// TODO: peredelatj!
-		if($flags != ZBX_FLAG_DISCOVERY_NORMAL){
-			$trig_info = CTrigger::get(array(
-				'triggerids' => $triggerid,
-				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
-				'output' => API_OUTPUT_REFER,
-				'selectItems' => API_OUTPUT_EXTEND
-			));
-			$trig_info = reset($trig_info);
-			$has_prototype = false;
-
-			foreach($trig_info['items'] as $titem){
-				if($titem['flags'] == ZBX_FLAG_DISCOVERY_CHILD){
-					$has_prototype = true;
-					break;
-				}
-			}
-			if(!$has_prototype){
-				error('Trigger prototype should have at least one prototype');
-				$result = false;
-			}
-		}
-// ---
-
-		$trig_hosts = get_hosts_by_triggerid($triggerid);
-		$trig_host = DBfetch($trig_hosts);
-
-		if($result){
-			$msg = S_ADDED_TRIGGER.SPACE.'"'.$description.'"';
-			if($trig_host){
-				$msg .= SPACE.S_TO_HOST_SMALL.SPACE.'"'.$trig_host['host'].'"';
-			}
-			info($msg);
-		}
-
-		if($trig_host){
-// create trigger for childs
-			$child_hosts = get_hosts_by_templateid($trig_host['hostid']);
-			while($child_host = DBfetch($child_hosts)){
-				if(!$result = copy_trigger_to_host($triggerid, $child_host['hostid']))
-					break;
-			}
-		}
-
-		if(!$result){
-			return $result;
-		}
-
-		if($result)
-			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TRIGGER,	$triggerid,	$trig_host['host'].':'.$description, NULL,	NULL, NULL);
-
-		return $triggerid;
-	}
-
 
 	/******************************************************************************
 	 *																			*
@@ -1506,27 +1406,6 @@ return $caption;
 		return $expr;
 	}
 
-	function update_trigger_comments($triggerids,$comments){
-		zbx_value2array($triggerids);
-
-		$triggers = CTrigger::get(array(
-			'editable' => 1,
-			'trigegrids' => $triggerids,
-			'output' => API_OUTPUT_SHORTEN,
-		));
-		$triggers = zbx_toHash($triggers, 'triggerid');
-		foreach($triggerids as $triggerid){
-			if(!isset($triggers[$triggerid])){
-				return false;
-			}
-		}
-
-
-		return	DBexecute('UPDATE triggers '.
-						' SET comments='.zbx_dbstr($comments).
-						' WHERE '.DBcondition('triggerid',$triggerids));
-	}
-
 // Update Trigger status
 	function update_trigger_status($triggerids,$status){
 		zbx_value2array($triggerids);
@@ -2065,42 +1944,6 @@ return $caption;
 				insert_dependency($deps[$old_triggerid], $newtriggerid);
 		}
 	}
-/*
-	 * Function: update_template_dependencies_for_host
-	 *
-	 * Description:
-	 *	 Update template triggers
-	 *
-	 * Author:
-	 *	 Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments: !!! Don't forget sync code with C !!!
-	 *
-	 *
-	function update_template_dependencies_for_host($hostid){
-
-		$db_triggers = get_triggers_by_hostid($hostid);
-
-		while($trigger_data = DBfetch($db_triggers)){
-			$db_chd_triggers = get_triggers_by_templateid($trigger_data['triggerid']);
-
-			while($chd_trigger_data = DBfetch($db_chd_triggers)){
-				update_trigger($chd_trigger_data['triggerid'],
-								NULL,	//expression
-								NULL,	//description
-								NULL,	//type
-								NULL,	//priority
-								NULL,	//status
-								NULL,	//comments
-								NULL,	//url
-					replace_template_dependencies(
-						get_trigger_dependencies_by_triggerid($trigger_data['triggerid']),
-						$hostid),
-					$trigger_data['triggerid']);
-			}
-
-		}
-	}
 
 /******************************************************************************
  *																			*
@@ -2235,26 +2078,6 @@ return $caption;
 	function delete_function_by_triggerid($triggerids){
 		zbx_value2array($triggerids);
 	return	DBexecute('DELETE FROM functions WHERE '.DBcondition('triggerid',$triggerids));
-	}
-
-/******************************************************************************
- *																			*
- * Comments: !!! Don't forget sync code with C !!!							*
- *																			*
- ******************************************************************************/
-	function delete_triggers_by_itemid($itemids){
-		zbx_value2array($itemids);
-
-		$del_triggers = array();
-		$result=DBselect('SELECT triggerid FROM functions WHERE '.DBcondition('itemid',$itemids));
-		while($row=DBfetch($result)){
-			$del_triggers[$row['triggerid']] = $row['triggerid'];
-		}
-		if(!empty($del_triggers)){
-			if(!CTrigger::delete($del_triggers)) return FALSE;
-		}
-
-	return TRUE;
 	}
 
 /*
