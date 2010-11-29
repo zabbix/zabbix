@@ -434,6 +434,7 @@
 				if(	isset($DB['TYPE']) &&
 					isset($DB['SERVER']) &&
 					isset($DB['DATABASE']) &&
+					isset($DB['PORT']) &&
 					isset($DB['USER']) &&
 					isset($DB['PASSWORD']) &&
 					isset($ZBX_SERVER) &&
