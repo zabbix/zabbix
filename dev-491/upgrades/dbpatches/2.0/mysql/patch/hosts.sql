@@ -18,9 +18,8 @@ CREATE TABLE interface (
 	port                     varchar(64)     DEFAULT '10050'           NOT NULL,
 	PRIMARY KEY (interfaceid)
 ) ENGINE=InnoDB;
-CREATE INDEX interface_1 on interface (interfaceid);
-CREATE INDEX interface_2 on interface (hostid,type);
-CREATE INDEX interface_3 on interface (ip,dns);
+CREATE INDEX interface_1 on interface (hostid,type);
+CREATE INDEX interface_2 on interface (ip,dns);
 ALTER TABLE interface ADD CONSTRAINT c_interface_1 FOREIGN KEY (hostid) REFERENCES hosts (hostid) ON DELETE CASCADE;
  
 INSERT INTO interface (interfaceid,hostid,main,type,ip,dns,useip,port)
