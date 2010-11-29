@@ -973,16 +973,12 @@ function change_flicker_state(divid){
 function changeHatStateUI(icon, divid){
 	deselectAll();
 
-	var eff_time = 500;
+	jQuery(icon).toggleClass( "arrowup" ).toggleClass( "arrowdown" );
+	jQuery($(divid).parentNode).
+		find('.body').toggle().end().
+		find('.footer').toggle().end();
 
-	var switchIcon = function(){
-		switchElementsClass(icon,"arrowup","arrowdown");
-	}
-
-	var hat_state = ShowHide($(divid).parentNode);
-	switchIcon();
-//	var hat_state = showHideEffect(divid, 'slide', eff_time, switchIcon);
-
+	var hat_state = (icon.className === "arrowup") ? 1 : 0;
 	if(false === hat_state) return false;
 
 	var params = {

@@ -95,7 +95,7 @@ rmvDoll: function(domid){
 		
 		this.dolls[domid].rmvDarken();
 		
-		try{ delete(this.dolls[domid]); } catch(e){ this.dolls[domid] = null; }
+		try{delete(this.dolls[domid]);} catch(e){this.dolls[domid] = null;}
 	}
 },
 
@@ -178,7 +178,7 @@ restartDoll: function(){
 	this.debug('restartDoll');	
 	if(!is_null(this.pexec)){
 		this.pexec.stop();		
-		try{ delete(this.pexec); } catch(e){ this.pexec = null; }
+		try{delete(this.pexec);} catch(e){this.pexec = null;}
 		this.pexec = null;
 	}
 
@@ -190,7 +190,7 @@ stopDoll: function(){
 	
 	if(!is_null(this.pexec)){
 		this.pexec.stop();		
-		try{ delete(this.pexec); } catch(e){ this.pexec = null; }
+		try{delete(this.pexec);} catch(e){this.pexec = null;}
 		this.pexec = null;
 	}
 },
@@ -326,7 +326,7 @@ setDarken: function(){
 	obj_params.width = this._domobj.offsetWidth;
 	
 	Element.extend(this._domdark);
-	this._domdark.setStyle({ 'top': obj_params.top+'px', 
+	this._domdark.setStyle({'top': obj_params.top+'px', 
 							'left': obj_params.left+'px',
 							'width': obj_params.width+'px',
 							'height': obj_params.height+'px'
@@ -347,13 +347,14 @@ rmwDarken: function(){
 updateSortable: function(){
 	if(empty(jQuery(".column"))) return false;
 
-	jQuery(".column").sortable({
+	var widgets = jQuery(".column").sortable({
 		connectWith: ".column",
         handle: 'div.header',
         forcePlaceholderSize: true,
-        placeholder: 'ui-corner-all ui-sortable-placeholder',
-        opacity: '0.8'
-	});
+        placeholder: 'widget ui-corner-all ui-sortable-placeholder',
+        opacity: '0.8',
+		update: function(e, ui){ jQuery(".column").sortableOrder("save", {"name": "dashboard"}); }
+	}).sortableOrder("load", {"name": "dashboard"});
 
 	jQuery(".column").find(".widget")
 		.addClass("ui-widget ui-widget-content ui-helper-clearfix ui-corner-all");
@@ -361,3 +362,66 @@ updateSortable: function(){
 	jQuery(".column").disableSelection();
 }
 });
+
+(function( $ ){
+	var methods = {
+		init: function( options ) {},
+		save: function( method, options ) {
+			var settings = {
+				'name':		'sortableOrder',
+				'search':	'.widget'
+			};
+
+			$.extend(settings, options);
+
+			var positions = {};
+			this.each(function(colNum, column) {
+				positions[colNum] = {};
+				$(column).find(settings.search).each(function(rowNum, widget){
+					positions[colNum][rowNum] = widget.id;
+				});
+			});
+
+			var strPos = Object.toJSON(positions);
+			cookie.create(settings.name, strPos, 365);
+
+			return this;
+		},
+		load: function( method, options ) {
+			var settings = {
+				'name':		'sortableOrder',
+				'search':	'.widget'
+			};
+
+			$.extend(settings, options);
+
+			var strPos = cookie.read(settings.name);
+			var positions = $.parseJSON(strPos);
+
+			this.each(function(colNum, column) {
+				if(!isset(colNum, positions)) return;
+
+				for(var rowNum in positions[colNum]){
+					if(empty(positions[colNum][rowNum])) continue;
+					$('#'+positions[colNum][rowNum]).appendTo(column);
+				}
+			});
+
+			return this;
+		}
+	};
+
+	$.fn.sortableOrder = function(method, options) {
+// Method calling logic
+
+		if( isset(method, methods) ){
+			return methods[method].apply(this, arguments);
+		}
+		else if(typeof(method) === 'object' || !method){
+			return methods.init.apply(this, arguments);
+		}
+		else{
+			$.error( 'Method ' +  method + ' does not exist on jQuery.tooltip' );
+		}
+	}
+})(jQuery);
