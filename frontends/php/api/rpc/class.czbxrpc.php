@@ -479,6 +479,19 @@ class czbxrpc{
 		self::$result = $result;
 	}
 
+// TRIGGER PROTOTYPE
+	private static function triggerprototype($action, $params){
+
+		CTriggerPrototype::$error = array();
+
+		switch($action){
+			default:
+			$result = call_user_func(array('CTriggerPrototype', $action), $params);
+		}
+
+		self::$result = $result;
+	}
+
 
 // USER
 	private static function user($action, $params){

@@ -123,7 +123,7 @@ include_once('include/page_header.php');
 <?php
 
 	$showdisabled = get_request('showdisabled', 0);
-	CProfile::update('web.triggers.showdisabled',$showdisabled,PROFILE_TYPE_INT);
+	CProfile::update('web.triggers.showdisabled', $showdisabled, PROFILE_TYPE_INT);
 
 // EXPRESSION ACTIONS
 	if(isset($_REQUEST['add_expression'])){
@@ -149,73 +149,35 @@ include_once('include/page_header.php');
 		$_REQUEST['form'] = 'clone';
 	}
 	else if(isset($_REQUEST['save'])){
-		show_messages();
-
-		if(!check_right_on_trigger_by_expression(PERM_READ_WRITE, $_REQUEST['expression']))
-			access_deny();
-
-		$status = isset($_REQUEST['status'])?TRIGGER_STATUS_DISABLED:TRIGGER_STATUS_ENABLED;
-
-		$type = $_REQUEST['type'];
-
-		$deps = get_request('dependencies',array());
+		$trigger = array(
+			'expression' => $_REQUEST['expression'],
+			'description' => $_REQUEST['description'],
+			'type' => $_REQUEST['type'],
+			'priority' => $_REQUEST['priority'],
+			'status' => isset($_REQUEST['status']) ? TRIGGER_STATUS_DISABLED : TRIGGER_STATUS_ENABLED,
+			'comments' => $_REQUEST['comments'],
+			'url' => $_REQUEST['url'],
+			'flags' => ZBX_FLAG_DISCOVERY_CHILD,
+		);
 
 		if(isset($_REQUEST['triggerid'])){
-			$triggerData = get_trigger_by_triggerid($_REQUEST['triggerid']);
-			if($triggerData['templateid']){
-				$_REQUEST['description'] = $triggerData['description'];
-				$_REQUEST['expression'] = explode_exp($triggerData['expression'],0);
-			}
-
-			DBstart();
-
-			$result = update_trigger($_REQUEST['triggerid'],
-				$_REQUEST['expression'],$_REQUEST['description'],$type,
-				$_REQUEST['priority'],$status,$_REQUEST['comments'],$_REQUEST['url'],
-				$deps, $triggerData['templateid'], ZBX_FLAG_DISCOVERY_CHILD);
-			$result = DBend($result);
-
-			$triggerid = $_REQUEST['triggerid'];
+			$trigger['triggerid'] = $_REQUEST['triggerid'];
+			$result = CTriggerPrototype::update($trigger);
 
 			show_messages($result, S_TRIGGER_UPDATED, S_CANNOT_UPDATE_TRIGGER);
 		}
 		else{
-			DBstart();
-			$triggerid = add_trigger($_REQUEST['expression'],$_REQUEST['description'],$type,
-				$_REQUEST['priority'],$status,$_REQUEST['comments'],$_REQUEST['url'],
-				$deps, 0, ZBX_FLAG_DISCOVERY_CHILD);
-			$result = DBend($triggerid);
+			$result = CTriggerPrototype::create($trigger);
+
 			show_messages($result, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
-			if($result) $_REQUEST['triggerid'] = $triggerid;
 		}
 		if($result)
 			unset($_REQUEST['form']);
 	}
-	else if(isset($_REQUEST['delete'])&&isset($_REQUEST['triggerid'])){
-		$result = false;
-
-		$options = array(
-			'triggerids'=> $_REQUEST['triggerid'],
-			'filter' => array('flags' => null),
-			'editable'=> 1,
-			'selectHosts'=> API_OUTPUT_EXTEND,
-			'output'=> API_OUTPUT_EXTEND,
-		);
-		$triggers = CTrigger::get($options);
-
-		if($triggerData = reset($triggers)){
-			$host = reset($triggerData['hosts']);
-
-			DBstart();
-			$result = CTrigger::delete($triggerData['triggerid']);
-			$result = DBend($result);
-			if($result){
-				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $_REQUEST['triggerid'], $host['host'].':'.$triggerData['description'], NULL, NULL, NULL);
-			}
-		}
+	else if(isset($_REQUEST['delete']) && isset($_REQUEST['triggerid'])){
+		$result = CTriggerPrototype::delete($_REQUEST['triggerid']);
 
 		show_messages($result, S_TRIGGER_DELETED, S_CANNOT_DELETE_TRIGGER);
-
 		if($result){
 			unset($_REQUEST['form']);
 			unset($_REQUEST['triggerid']);
@@ -247,10 +209,11 @@ include_once('include/page_header.php');
 				}
 			}
 
-			$result = update_trigger($db_trig['triggerid'],
-				null,null,null,
-				$db_trig['priority'],null,null,null,
-				$db_trig['dependencies'],null);
+			$result = CTriggerPrototype::update(array(
+				'triggerid' =>$db_trig['triggerid'],
+				'priority' => $db_trig['priority'],
+				'dependencies' => $db_trig['dependencies'],
+			));
 
 			if(!$result) break;
 		}
@@ -315,36 +278,7 @@ include_once('include/page_header.php');
 		show_messages($go_result, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
 	}
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['g_triggerid'])){
-		DBstart();
-
-		$triggerids = array();
-		$options = array(
-			'triggerids' => $_REQUEST['g_triggerid'],
-			'editable'=>1,
-			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
-			'selectHosts' => API_OUTPUT_EXTEND,
-			'output'=>API_OUTPUT_EXTEND,
-			'expandDescription' => 1
-		);
-		$triggers = CTrigger::get($options);
-
-		foreach($triggers as $tnum => $trigger){
-			if($trigger['templateid'] != 0){
-				unset($triggers[$tnum]);
-				error(S_CANNOT_DELETE_TRIGGER.' [ '.$trigger['description'].' ] ('.S_TEMPLATED_TRIGGER.')');
-				continue;
-			}
-
-			$triggerids[] = $trigger['triggerid'];
-			$host = reset($trigger['hosts']);
-
-			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $trigger['triggerid'], $host['host'].':'.$trigger['description'], NULL, NULL, NULL);
-		}
-
-		$go_result = !empty($triggerids);
-		if($go_result) $go_result = CTrigger::delete($triggerids);
-
-		$go_result = DBend($go_result);
+		$go_result = CTriggerPrototype::delete($_REQUEST['g_triggerid']);
 		show_messages($go_result, S_TRIGGERS_DELETED, S_CANNOT_DELETE_TRIGGERS);
 	}
 

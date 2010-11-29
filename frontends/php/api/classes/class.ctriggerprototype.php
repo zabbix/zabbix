@@ -20,170 +20,14 @@
 ?>
 <?php
 /**
- * File containing CTrigger class for API.
  * @package API
  */
 
-interface IValidator{
-	public static function validate($value, $params, $context=array());
-}
 
-abstract class CValidator{
-
-	protected static function validateContext($hash, $rules){
-		foreach($rules as $field => $filters){
-			$value = isset($hash[$field]) ? $hash[$field] : null;
-
-			foreach($filters as $filter){
-				$validator = array_shift($filter);
-				$result = call_user_func_array(array('C'.$validator.'Validator', 'validate'), array($value, $filter));
-
-				return $result['valid'];
-			}
-		}
-
-		return true;
-	}
-}
-
-class CStringValidator extends CValidator implements IValidator{
-	public static function validate($value, $params, $context=array()){
-		if(isset($params['condition']) && !self::validateContext($context, $params['condition'])){
-			return array('valid' => true);
-		}
-
-		if(is_null($value) || is_string($value)){
-			$result = array('valid' => true);
-		}
-		else{
-			$result = array('valid' => false, 'error' => $value.' is not string');
-		}
-		return $result;
-	}
-}
-
-class CArrayValidator extends CValidator implements IValidator{
-	public static function validate($value, $params, $context=array()){
-		$value = zbx_toArray($value);
-
-		foreach($value as $num => $hash){
-			$result = CHashValidator::validate($hash, $params);
-			if(!$result['valid'])
-				return array('valid' => false, 'error' => 'Element ['.$num.']: '.$result['error']);
-		}
-
-		return array('valid' => true);
-	}
-}
-
-class CRequiredValidator extends CValidator implements IValidator{
-	public static function validate($value, $params, $context=array()){
-		if(isset($params['condition']) && !self::validateContext($context, $params['condition'])){
-			return array('valid' => true);
-		}
-
-		if(empty($value)){
-			$result = array('valid' => false, 'error' => $value.' is empty');
-		}
-		else{
-			$result = array('valid' => true);
-		}
-		return $result;
-	}
-}
-
-class CHashValidator extends CValidator implements IValidator{
-	public static function validate($value, $params, $context=array()){
-		if(!isset($params['rules'])) echo 'no rules';
-		$rules = $params['rules'];
-
-		$rules_fields = array_keys($rules);
-		$input_fields = array_keys($value);
-		$diff = array_diff($input_fields, $rules_fields);
-
-		if(!empty($diff)){
-			return array('valid' => false, 'error' => 'Unknown elements: ['.implode(', ', $diff).']');
-		}
-
-		foreach($rules as $field => $filters){
-			$fieldValue = isset($value[$field]) ? $value[$field] : null;
-
-			foreach($filters as $filter){
-				$validator = array_shift($filter);
-				$validator = array('C'.$validator.'Validator', 'validate');
-
-				$result = call_user_func_array($validator, array($fieldValue, $filter, $value));
-				if(!$result['valid'])
-					return array('valid' => false, 'error' => 'Field ['.$field.']: '.$result['error']);
-			}
-		}
-
-		return array('valid' => true);
-	}
-}
-
-class CRangeValidator extends CValidator implements IValidator{
-	public static function validate($value, $params, $context=array()){
-		if(isset($params['rules']) && !self::validateContext($context, $params['rules'])){
-			return array('valid' => true);
-		}
-
-		if(is_null($value) || in_array($value, $params['range'])){
-			$result = array('valid' => true);
-		}
-		else{
-			$result = array('valid' => false, 'error' => $value.' not in range ('.implode(', ',$params['range']).')');
-		}
-		return $result;
-	}
-}
-
-
-
-class CTrigger extends CZBXAPI{
-
-	protected static function get_rules($method){
-		$rules = array();
-
-		$rules['create'] = array(
-			'expression' => array(
-				array('String'),
-				array('Required'),
-			),
-			'description' => array(
-				array('String'),
-				array('Required'),
-			),
-			'type' => array(
-				array('Range', 'range' => array(0, 1))
-			),
-			'priority' => array(
-				array('Range', 'range' => array(0, 1, 2, 3))
-			),
-			'status' => array(
-				array('Range', 'range' => array(0, 1))
-			),
-			'comments' => array(
-				array('String'),
-			),
-			'url' => array(
-				array('String'),
-				array('Required', 'condition' => array(
-					'priority' => array(
-						array('Range', 'range' => array(0))
-					),
-				)),
-			),
-			'dependencies' => array(
-				array('Array', 'rules' => array())
-			),
-		);
-
-		return $rules[$method];
-	}
+class CTriggerPrototype extends CZBXAPI{
 
 /**
- * Get Triggers data
+ * Get TriggerPrototypes data
  *
  * @param _array $options
  * @param array $options['itemids']
@@ -214,7 +58,7 @@ class CTrigger extends CZBXAPI{
 		$sql_parts = array(
 			'select' => array('triggers' => 't.triggerid'),
 			'from' => array('t' => 'triggers t'),
-			'where' => array(),
+			'where' => array('t.flags='.ZBX_FLAG_DISCOVERY_CHILD),
 			'group' => array(),
 			'order' => array(),
 			'limit' => null,
@@ -265,7 +109,6 @@ class CTrigger extends CZBXAPI{
 			'selectHosts'			=> null,
 			'selectItems'			=> null,
 			'select_functions'		=> null,
-			'select_dependencies'	=> null,
 			'selectDiscoveryRule'	=> null,
 			'countOutput'			=> null,
 			'groupCount'			=> null,
@@ -601,13 +444,7 @@ class CTrigger extends CZBXAPI{
 		}
 
 // --- FILTER ---
-		if(is_null($options['filter']))
-			$options['filter'] = array();
-
 		if(is_array($options['filter'])){
-			if(!array_key_exists('flags', $options['filter']))
-				$options['filter']['flags'] = array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED);
-
 			zbx_db_filter('triggers t', $options, $sql_parts);
 
 			if(isset($options['filter']['host']) && !is_null($options['filter']['host'])){
@@ -783,9 +620,6 @@ class CTrigger extends CZBXAPI{
 					if(!is_null($options['select_functions']) && !isset($result[$trigger['triggerid']]['functions'])){
 						$result[$trigger['triggerid']]['functions'] = array();
 					}
-					if(!is_null($options['select_dependencies']) && !isset($result[$trigger['triggerid']]['dependencies'])){
-						$result[$trigger['triggerid']]['dependencies'] = array();
-					}
 					if(!is_null($options['selectDiscoveryRule']) && !isset($result[$trigger['triggerid']]['discoveryRule'])){
 						$result[$trigger['triggerid']]['discoveryRule'] = array();
 					}
@@ -905,37 +739,6 @@ Copt::memoryPick();
 		}
 
 // Adding Objects
-// Adding trigger dependencies
-		if(!is_null($options['select_dependencies']) && str_in_array($options['select_dependencies'], $subselects_allowed_outputs)){
-			$deps = array();
-			$depids = array();
-
-			$sql = 'SELECT triggerid_up, triggerid_down '.
-				' FROM trigger_depends '.
-				' WHERE '.DBcondition('triggerid_down', $triggerids);
-			$db_deps = DBselect($sql);
-			while($db_dep = DBfetch($db_deps)){
-				if(!isset($deps[$db_dep['triggerid_down']])) $deps[$db_dep['triggerid_down']] = array();
-				$deps[$db_dep['triggerid_down']][$db_dep['triggerid_up']] = $db_dep['triggerid_up'];
-				$depids[] = $db_dep['triggerid_up'];
-			}
-
-			$obj_params = array(
-				'triggerids' => $depids,
-				'output' => $options['select_dependencies'],
-				'expandData' => 1,
-				'preservekeys' => 1
-			);
-			$allowed = self::get($obj_params); //allowed triggerids
-
-			foreach($deps as $triggerid => $deptriggers){
-				foreach($deptriggers as $num => $deptriggerid){
-					if(isset($allowed[$deptriggerid])){
-						$result[$triggerid]['dependencies'][] = $allowed[$deptriggerid];
-					}
-				}
-			}
-		}
 
 // Adding groups
 		if(!is_null($options['selectGroups']) && str_in_array($options['selectGroups'], $subselects_allowed_outputs)){
@@ -1201,42 +1004,6 @@ COpt::memoryPick();
 	return $result;
 	}
 
-/**
- * Get triggerid by host.host and trigger.expression
- *
- * @param _array $triggers multidimensional array with trigger objects
- * @param array $triggers[0,...]['expression']
- * @param array $triggers[0,...]['host']
- * @param array $triggers[0,...]['hostid'] OPTIONAL
- * @param array $triggers[0,...]['description'] OPTIONAL
- */
-	public static function getObjects($triggerData){
-		$options = array(
-			'filter' => $triggerData,
-			'output'=>API_OUTPUT_EXTEND
-		);
-
-		if(isset($triggerData['node']))
-			$options['nodeids'] = getNodeIdByNodeName($triggerData['node']);
-		else if(isset($triggerData['nodeids']))
-			$options['nodeids'] = $triggerData['nodeids'];
-
-// expression is checked later
-		unset($options['filter']['expression']);
-		$result = self::get($options);
-		if(isset($triggerData['expression'])){
-			foreach($result as $tnum => $trigger){
-				$tmp_exp = explode_exp($trigger['expression'], false);
-
-				if(strcmp(trim($tmp_exp,' '), trim($triggerData['expression'],' ')) != 0) {
-					unset($result[$tnum]);
-				}
-			}
-		}
-
-	return $result;
-	}
-
 	public static function exists($object){
 		$keyFields = array(array('hostid', 'host'), 'description');
 
@@ -1262,7 +1029,7 @@ COpt::memoryPick();
 		}
 
 		$options = array(
-			'filter' => array_merge(zbx_array_mintersect($keyFields, $object), array('flags' => null)),
+			'filter' => zbx_array_mintersect($keyFields, $object),
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => 1,
 		);
@@ -1327,6 +1094,26 @@ COpt::memoryPick();
 
 			self::createReal($triggers);
 
+			$createdTriggers = self::get(array(
+				'triggerids' => array_keys($triggers),
+				'output' => API_OUTPUT_REFER,
+				'selectItems' => API_OUTPUT_EXTEND
+			));
+			foreach($createdTriggers as $createdTrigger){
+				$has_prototype = false;
+
+				foreach($createdTrigger['items'] as $titem){
+					if($titem['flags'] == ZBX_FLAG_DISCOVERY_CHILD){
+						$has_prototype = true;
+						break;
+					}
+				}
+				if(!$has_prototype){
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						sprintf(_('Trigger [%1$s:%2$s] does not have item prototype.'), $trigger['description'], $trigger['expression']));
+				}
+			}
+
 			foreach($triggers as $trigger)
 				self::inherit($trigger);
 
@@ -1384,6 +1171,26 @@ COpt::memoryPick();
 
 			self::updateReal($triggers);
 
+			$updatedTriggers = self::get(array(
+				'triggerids' => array_keys($triggers),
+				'output' => API_OUTPUT_REFER,
+				'selectItems' => API_OUTPUT_EXTEND
+			));
+			foreach($updatedTriggers as $updatedTrigger){
+				$has_prototype = false;
+
+				foreach($updatedTrigger['items'] as $titem){
+					if($titem['flags'] == ZBX_FLAG_DISCOVERY_CHILD){
+						$has_prototype = true;
+						break;
+					}
+				}
+				if(!$has_prototype){
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						sprintf(_('Trigger [%1$s] does not have item prototype.'), $trigger['description']));
+				}
+			}
+
 			foreach($triggers as $trigger)
 				self::inherit($trigger);
 
@@ -1438,6 +1245,15 @@ COpt::memoryPick();
 					}
 				}
 			}
+
+//			if(!empty($trigger_prototypes)){
+//				$sql = 'SELECT triggerid FROM trigger_discovery WHERE '.
+//						DBcondition('parent_triggerid', $trigger_prototypes);
+//				$db_triggers = DBselect($sql);
+//				while($trigger = DBfetch($db_triggers)){
+//					$triggerids[] = $trigger['triggerid'];
+//				}
+//			}
 
 // first delete child triggers
 			$parent_triggerids = $triggerids;
@@ -1504,74 +1320,6 @@ COpt::memoryPick();
 		}
 	}
 
-/**
- * Add dependency for trigger
- *
- * @param array $triggersData
- * @param array $triggers_data['triggerid]
- * @param array $triggers_data['dependsOnTriggerid']
- * @return boolean
- */
-	public static function addDependencies($triggersData){
-		$triggersData = zbx_toArray($triggersData);
-		$triggerids = array();
-		try{
-			self::BeginTransaction(__METHOD__);
-
-			foreach($triggersData as $num => $dep){
-				$triggerids[$dep['triggerid']] = $dep['triggerid'];
-
-				$result = (bool) insert_dependency($dep['triggerid'], $dep['dependsOnTriggerid']);
-				if(!$result)
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot create dependency');
-			}
-
-			self::EndTransaction(true, __METHOD__);
-			return array('triggerids' => $triggerids);
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
-	}
-
-/**
- * Delete trigger dependencis
- *
- * @param array $triggersData
- * @param array $triggers[0,...]['triggerid']
- * @return boolean
- */
-	public static function deleteDependencies($triggersData){
-		$triggersData = zbx_toArray($triggersData);
-
-		$triggerids = array();
-		foreach($triggersData as $num => $trigger){
-			$triggerids[] = $trigger['triggerid'];
-		}
-
-		try{
-			self::BeginTransaction(__METHOD__);
-
-			$result = delete_dependencies_by_triggerid($triggerids);
-			if(!$result)
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete dependency');
-
-			self::EndTransaction(true, __METHOD__);
-			return array('triggerids' => zbx_objectValues($triggersData, 'triggerid'));
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
-	}
-
 	protected static function createReal(&$triggers){
 		$triggers = zbx_toArray($triggers);
 
@@ -1592,18 +1340,6 @@ COpt::memoryPick();
 			));
 
 			info( S_TRIGGER.' ['.$trigger['description'].'] '.S_CREATED_SMALL);
-		}
-
-
-		self::validateDependencies($triggers);
-
-		foreach($triggers as $tnum => $trigger){
-			foreach($trigger['dependencies'] as $triggerid_up){
-				DB::insert('trigger_depends', array(
-					'triggerid_down' => $triggerid,
-					'triggerid_up' => $triggerid_up
-				));
-			}
 		}
 
 	}
@@ -1695,24 +1431,9 @@ COpt::memoryPick();
 			));
 
 
-			info( sprintf(_('Trigger [%1$s:%2$s] updated.'), $trigger['description'], $trigger['expression']));
+			info(sprintf(_('Trigger [%1$s:%2$s] updated.'), $trigger['description'], $trigger['expression']));
 		}
 		unset($trigger);
-
-		foreach($triggers as $tnum => &$trigger){
-			if(isset($trigger['dependencies'])){
-				DB::delete('trigger_depends', array('triggerid_down' => $trigger['triggerid']));
-
-				self::validateDependencies($triggers);
-
-				foreach($trigger['dependencies'] as $triggerid_up){
-					DB::insert('trigger_depends', array(array(
-						'triggerid_down' => $trigger['triggerid'],
-						'triggerid_up' => $triggerid_up
-					)));
-				}
-			}
-		}
 	}
 
 	protected static function inherit($trigger, $hostids=null){
@@ -1737,9 +1458,6 @@ COpt::memoryPick();
 
 		foreach($chd_hosts as $chd_host){
 			$newTrigger = $trigger;
-
-			if(!is_null($trigger['dependencies']))
-				$newTrigger['dependencies'] = replace_template_dependencies($trigger['dependencies'], $chd_host['hostid']);
 
 			$newTrigger['templateid'] = $trigger['triggerid'];
 
@@ -1769,7 +1487,7 @@ COpt::memoryPick();
 							sprintf(_('Trigger [%1$s] already exists on [%2$s]'), $newTrigger['description'], $chd_host['host']));
 					}
 				}
-				else if($childTrigger['flags'] != ZBX_FLAG_DISCOVERY_NORMAL){
+				else if($childTrigger['flags'] != ZBX_FLAG_DISCOVERY_CHILD){
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Trigger with same name but other type exists'));
 				}
 
@@ -1816,83 +1534,6 @@ COpt::memoryPick();
 				}
 			}
 			self::inherit($newTrigger);
-		}
-	}
-
-
-	protected static function validateDependencies($triggers){
-
-		foreach($triggers as $trigger){
-			if(!isset($trigger['dependencies']) || empty($trigger['dependencies'])) continue;
-
-// check circelar dependency {{{
-			$triggerid_down = $trigger['dependencies'];
-			do{
-				$sql = 'SELECT triggerid_up '.
-						' FROM trigger_depends'.
-						' WHERE'.DBcondition('triggerid_down', $triggerid_down);
-				$db_up_triggers = DBselect($sql);
-				$up_triggerids = array();
-				while($up_trigger = DBfetch($db_up_triggers)){
-					if($up_trigger['triggerid_up'] == $trigger['triggerid']){
-						self::exception(ZBX_API_ERROR_PARAMETESRS, S_INCORRECT_DEPENDENCY);
-					}
-					$up_triggerids[] = $up_trigger['triggerid_up'];
-				}
-			} while(!empty($up_triggerids));
-// }}} check circelar dependency
-
-
-			$templates = array();
-			$templateids = array();
-			$db_triggerhosts = get_hosts_by_expression($trigger['expression']);
-			while($triggerhost = DBfetch($db_triggerhosts)){
-				if($triggerhost['status'] == HOST_STATUS_TEMPLATE){ //template
-					$templates[$triggerhost['hostid']] = $triggerhost;
-					$templateids[$triggerhost['hostid']] = $triggerhost['hostid'];
-				}
-			}
-
-			$dep_templateids = array();
-			$db_dephosts = get_hosts_by_triggerid($trigger['dependencies']);
-			while($dephost = DBfetch($db_dephosts)) {
-				if($dephost['status'] == HOST_STATUS_TEMPLATE){ //template
-					$templates[$dephost['hostid']] = $dephost;
-					$dep_templateids[$dephost['hostid']] = $dephost['hostid'];
-				}
-			}
-
-			$tdiff = array_diff($dep_templateids, $templateids);
-			if(!empty($templateids) && !empty($dep_templateids) && !empty($tdiff)){
-				$tpls = zbx_array_merge($templateids, $dep_templateids);
-				$sql = 'SELECT DISTINCT ht.templateid, ht.hostid, h.host'.
-						' FROM hosts_templates ht, hosts h'.
-						' WHERE h.hostid=ht.hostid'.
-							' AND '.DBcondition('ht.templateid', $tpls);
-
-				$db_lowlvltpl = DBselect($sql);
-				$map = array();
-				while($lovlvltpl = DBfetch($db_lowlvltpl)){
-					if(!isset($map[$lovlvltpl['hostid']])) $map[$lovlvltpl['hostid']] = array();
-					$map[$lovlvltpl['hostid']][$lovlvltpl['templateid']] = $lovlvltpl['host'];
-				}
-
-				foreach($map as $hostid => $templates){
-					$set_with_dep = false;
-
-					foreach($templateids as $tplid){
-						if(isset($templates[$tplid])){
-							$set_with_dep = true;
-							break;
-						}
-					}
-					foreach($dep_templateids as $dep_tplid){
-						if(!isset($templates[$dep_tplid]) && $set_with_dep){
-							self::exception(ZBX_API_ERROR_PARAMETERS, 'Not all Templates are linked to host [ '.reset($templates).' ]');
-						}
-					}
-				}
-			}
 		}
 	}
 

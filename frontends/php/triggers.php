@@ -153,11 +153,6 @@ include_once('include/page_header.php');
 		$_REQUEST['form'] = 'clone';
 	}
 	else if(isset($_REQUEST['save'])){
-		show_messages();
-
-		if(!check_right_on_trigger_by_expression(PERM_READ_WRITE, $_REQUEST['expression']))
-			access_deny();
-
 		$trigger = array(
 			'expression' => $_REQUEST['expression'],
 			'description' => $_REQUEST['description'],
@@ -167,7 +162,6 @@ include_once('include/page_header.php');
 			'comments' => $_REQUEST['comments'],
 			'url' => $_REQUEST['url'],
 			'dependencies' => get_request('dependencies',array()),
-			'url' => $_REQUEST['url'],
 		);
 
 		if(isset($_REQUEST['triggerid'])){
@@ -184,28 +178,8 @@ include_once('include/page_header.php');
 		if($result)
 			unset($_REQUEST['form']);
 	}
-	else if(isset($_REQUEST['delete'])&&isset($_REQUEST['triggerid'])){
-		$result = false;
-
-		$options = array(
-			'triggerids' => $_REQUEST['triggerid'],
-			'editable' => 1,
-			'selectHosts' => API_OUTPUT_EXTEND,
-			'output' => API_OUTPUT_EXTEND,
-		);
-		$triggers = CTrigger::get($options);
-
-		if($triggerData = reset($triggers)){
-			$host = reset($triggerData['hosts']);
-
-			DBstart();
-			$result = CTrigger::delete($triggerData['triggerid']);
-			$result = DBend($result);
-			if($result){
-				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $_REQUEST['triggerid'], $host['host'].':'.$triggerData['description'], NULL, NULL, NULL);
-			}
-		}
-
+	else if(isset($_REQUEST['delete']) && isset($_REQUEST['triggerid'])){
+		$result = CTrigger::delete($_REQUEST['triggerid']);
 		show_messages($result, S_TRIGGER_DELETED, S_CANNOT_DELETE_TRIGGER);
 
 		if($result){
@@ -256,10 +230,11 @@ include_once('include/page_header.php');
 				}
 			}
 
-			$result = update_trigger($db_trig['triggerid'],
-				null,null,null,
-				$db_trig['priority'],null,null,null,
-				$db_trig['dependencies'],null);
+			$result = CTrigger::update(array(
+				'triggerid' =>$db_trig['triggerid'],
+				'priority' => $db_trig['priority'],
+				'dependencies' => $db_trig['dependencies'],
+			));
 
 			if(!$result) break;
 		}
@@ -366,35 +341,7 @@ include_once('include/page_header.php');
 		show_messages($go_result, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
 	}
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['g_triggerid'])){
-		DBstart();
-
-		$triggerids = array();
-		$options = array(
-			'triggerids' => $_REQUEST['g_triggerid'],
-			'editable'=>1,
-			'selectHosts' => API_OUTPUT_EXTEND,
-			'output'=>API_OUTPUT_EXTEND,
-			'expandDescription' => 1
-		);
-		$triggers = CTrigger::get($options);
-
-		foreach($triggers as $tnum => $trigger){
-			if($trigger['templateid'] != 0){
-				unset($triggers[$tnum]);
-				error(S_CANNOT_DELETE_TRIGGER.' [ '.$trigger['description'].' ] ('.S_TEMPLATED_TRIGGER.')');
-				continue;
-			}
-
-			$triggerids[] = $trigger['triggerid'];
-			$host = reset($trigger['hosts']);
-
-			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $trigger['triggerid'], $host['host'].':'.$trigger['description'], NULL, NULL, NULL);
-		}
-
-		$go_result = !empty($triggerids);
-		if($go_result) $go_result = CTrigger::delete($triggerids);
-
-		$go_result = DBend($go_result);
+		$go_result = CTrigger::delete($_REQUEST['g_triggerid']);
 		show_messages($go_result, S_TRIGGERS_DELETED, S_CANNOT_DELETE_TRIGGERS);
 	}
 
