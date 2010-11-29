@@ -1010,11 +1010,11 @@ int	parse_key(char **exp, char **key)
 			*exp = s;
 			return FAIL;
 		}
-		
+
 		*r = '\0';
 		*key = strdup(p);
 		*r = '.';
-	
+
 		*exp = r;
 		return SUCCEED;
 	}
