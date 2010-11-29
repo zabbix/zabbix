@@ -1603,7 +1603,7 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 	struct zbx_json_parse	jp_data, jp_row;
 	int			port, status, ret = SUCCEED;
 	const char		*p = NULL;
-	char			last_ip[HOST_IP_LEN_MAX], ip[HOST_IP_LEN_MAX],
+	char			last_ip[INTERFACE_IP_LEN_MAX], ip[INTERFACE_IP_LEN_MAX],
 				key_[ITEM_KEY_LEN_MAX], tmp[MAX_STRING_LEN],
 				value[DSERVICE_VALUE_LEN_MAX];
 	time_t			now, hosttime, itemtime;
@@ -1684,7 +1684,7 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 		if ('\0' == *last_ip || 0 != strcmp(ip, last_ip))
 		{
 			memset(&dhost, 0, sizeof(dhost));
-			zbx_strlcpy(last_ip, ip, HOST_IP_LEN_MAX);
+			strscpy(last_ip, ip);
 		}
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() druleid:" ZBX_FS_UI64 " dcheckid:" ZBX_FS_UI64  " unique_dcheckid:" ZBX_FS_UI64
@@ -1744,7 +1744,7 @@ void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)
 	int			ret;
 	const char		*p = NULL;
 	time_t			now, hosttime, itemtime;
-	char			host[HOST_HOST_LEN_MAX], ip[HOST_IP_LEN_MAX];
+	char			host[HOST_HOST_LEN_MAX], ip[INTERFACE_IP_LEN_MAX];
 	unsigned short		port;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);

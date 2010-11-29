@@ -2211,3 +2211,34 @@ void	make_hostname(char *host)
 		if (FAIL == is_hostname_char(*c))
 			*c = '_';
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_interface_type_by_item_type                                  *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: Interface type                                               *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
+unsigned char	get_interface_type_by_item_type(unsigned char type)
+{
+	switch (type)
+	{
+		case ITEM_TYPE_SNMPv1:
+		case ITEM_TYPE_SNMPv2c:
+		case ITEM_TYPE_SNMPv3:
+			return INTERFACE_TYPE_SNMP;
+		case ITEM_TYPE_IPMI:
+			return INTERFACE_TYPE_IPMI;
+		case ITEM_TYPE_ZABBIX:
+		default:
+			return INTERFACE_TYPE_AGENT;
+	}
+}

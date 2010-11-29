@@ -23,6 +23,7 @@
 #include "log.h"
 #include "zlog.h"
 #include "dbcache.h"
+#include "zbxserver.h"
 
 /******************************************************************************
  *                                                                            *
@@ -353,7 +354,8 @@ static int	validate_host(zbx_uint64_t hostid, zbx_uint64_t templateid,
 			chd_gitems_alloc = 0, chd_gitems_num = 0,
 			res = SUCCEED;
 	zbx_uint64_t	graphid;
-	unsigned char	t_flags, h_flags;
+	unsigned char	t_flags, h_flags, type;
+	zbx_uint64_t	interfaceid[3];
 
 	sql = zbx_malloc(sql, sql_alloc);
 
@@ -457,6 +459,49 @@ static int	validate_host(zbx_uint64_t hostid, zbx_uint64_t templateid,
 			zbx_snprintf(error, max_error_len,
 					"Item prototype and real item [%s] have the same key",
 					trow[0]);
+		}
+		DBfree_result(tresult);
+	}
+
+	/* Interfaces */
+
+	if (SUCCEED == res)
+	{
+		memset(&interfaceid, 0, sizeof(interfaceid));
+
+		tresult = DBselect(
+				"select type,interfaceid"
+				" from interface"
+				" where type in (%d,%d,%d)"
+					" and main=1"
+					DB_NODE,
+				INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_IPMI,
+				DBnode_local("interfaceid"));
+
+		while (NULL != (trow = DBfetch(tresult)))
+		{
+			type = (unsigned char)atoi(trow[0]);
+			ZBX_STR2UINT64(interfaceid[type - 1], trow[1]);
+		}
+		DBfree_result(tresult);
+
+		tresult = DBselect(
+				"select distinct type"
+				" from items"
+				" where hostid=" ZBX_FS_UI64,
+				templateid);
+
+		while (SUCCEED == res && NULL != (trow = DBfetch(tresult)))
+		{
+			type = (unsigned char)atoi(trow[0]);
+			type = get_interface_type_by_item_type(type);
+
+			if (0 == interfaceid[type - 1])
+			{
+				res = FAIL;
+				zbx_snprintf(error, max_error_len, "Cannot find %s host interface",
+						zbx_interface_type_string((zbx_interface_type_t)type));
+			}
 		}
 		DBfree_result(tresult);
 	}
@@ -2490,9 +2535,28 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 	zbx_uint64_t	*appids = NULL, *protoids = NULL;
 	int		appids_alloc = 0, appids_num,
 			protoids_alloc = 0, protoids_num = 0;
-	unsigned char	flags;
+	unsigned char	flags, type;
+	zbx_uint64_t	interfaceid[3];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	memset(&interfaceid, 0, sizeof(interfaceid));
+
+	result = DBselect(
+			"select type,interfaceid"
+			" from interface"
+			" where type in (%d,%d,%d)"
+				" and main=1"
+				DB_NODE,
+			INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_IPMI,
+			DBnode_local("interfaceid"));
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		type = (unsigned char)atoi(row[0]);
+		ZBX_STR2UINT64(interfaceid[type - 1], row[1]);
+	}
+	DBfree_result(result);
 
 	result = DBselect(
 			"select ti.itemid,ti.description,ti.key_,ti.type,ti.value_type,"
@@ -2500,11 +2564,10 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 				"ti.status,ti.trapper_hosts,ti.units,ti.multiplier,"
 				"ti.delta,ti.formula,ti.logtimefmt,ti.valuemapid,"
 				"ti.params,ti.ipmi_sensor,ti.snmp_community,ti.snmp_oid,"
-				"ti.snmp_port,ti.snmpv3_securityname,"
-				"ti.snmpv3_securitylevel,ti.snmpv3_authpassphrase,"
-				"ti.snmpv3_privpassphrase,ti.authtype,ti.username,"
-				"ti.password,ti.publickey,ti.privatekey,ti.flags,"
-				"ti.filter,hi.itemid"
+				"ti.snmpv3_securityname,ti.snmpv3_securitylevel,"
+				"ti.snmpv3_authpassphrase,ti.snmpv3_privpassphrase,"
+				"ti.authtype,ti.username,ti.password,ti.publickey,"
+				"ti.privatekey,ti.flags,ti.filter,hi.itemid"
 			" from items ti"
 			" left join items hi on hi.key_=ti.key_"
 				" and hi.hostid=" ZBX_FS_UI64
@@ -2520,6 +2583,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(template_itemid, row[0]);
+		type = (unsigned char)atoi(row[3]);
 		ZBX_DBROW2UINT64(valuemapid, row[17]);
 
 		description_esc			= DBdyn_escape_string(row[1]);
@@ -2532,24 +2596,24 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 		ipmi_sensor_esc			= DBdyn_escape_string(row[19]);
 		snmp_community_esc		= DBdyn_escape_string(row[20]);
 		snmp_oid_esc			= DBdyn_escape_string(row[21]);
-		snmpv3_securityname_esc		= DBdyn_escape_string(row[23]);
-		snmpv3_authpassphrase_esc	= DBdyn_escape_string(row[25]);
-		snmpv3_privpassphrase_esc	= DBdyn_escape_string(row[26]);
-		username_esc			= DBdyn_escape_string(row[28]);
-		password_esc			= DBdyn_escape_string(row[29]);
-		publickey_esc			= DBdyn_escape_string(row[30]);
-		privatekey_esc			= DBdyn_escape_string(row[31]);
-		flags				= (unsigned char)atoi(row[32]);
-		filter_esc			= DBdyn_escape_string(row[33]);
+		snmpv3_securityname_esc		= DBdyn_escape_string(row[22]);
+		snmpv3_authpassphrase_esc	= DBdyn_escape_string(row[24]);
+		snmpv3_privpassphrase_esc	= DBdyn_escape_string(row[25]);
+		username_esc			= DBdyn_escape_string(row[27]);
+		password_esc			= DBdyn_escape_string(row[28]);
+		publickey_esc			= DBdyn_escape_string(row[29]);
+		privatekey_esc			= DBdyn_escape_string(row[30]);
+		flags				= (unsigned char)atoi(row[31]);
+		filter_esc			= DBdyn_escape_string(row[32]);
 
-		if (SUCCEED != (DBis_null(row[34])))
+		if (SUCCEED != (DBis_null(row[33])))
 		{
-			ZBX_STR2UINT64(itemid, row[34]);
+			ZBX_STR2UINT64(itemid, row[33]);
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8192,
 					"update items"
 						" set description='%s',"
-						"type=%s,"
+						"type=%d,"
 						"value_type=%s,"
 						"data_type=%s,"
 						"delay=%s,"
@@ -2568,7 +2632,6 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 						"ipmi_sensor='%s',"
 						"snmp_community='%s',"
 						"snmp_oid='%s',"
-						"snmp_port=%s,"
 						"snmpv3_securityname='%s',"
 						"snmpv3_securitylevel=%s,"
 						"snmpv3_authpassphrase='%s',"
@@ -2580,10 +2643,11 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 						"privatekey='%s',"
 						"templateid=" ZBX_FS_UI64 ","
 						"flags=%d,"
-						"filter='%s'"
+						"filter='%s',"
+						"interfaceid=%s"
 					" where itemid=" ZBX_FS_UI64 ";\n",
 					description_esc,
-					row[3],		/* type */
+					type,
 					row[4],		/* value_type */
 					row[5],		/* data_type */
 					row[6],		/* delay */
@@ -2602,12 +2666,11 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 					ipmi_sensor_esc,
 					snmp_community_esc,
 					snmp_oid_esc,
-					row[22],	/* snmp_port */
 					snmpv3_securityname_esc,
-					row[24],	/* snmpv3_securitylevel */
+					row[23],	/* snmpv3_securitylevel */
 					snmpv3_authpassphrase_esc,
 					snmpv3_privpassphrase_esc,
-					row[27],	/* authtype */
+					row[26],	/* authtype */
 					username_esc,
 					password_esc,
 					publickey_esc,
@@ -2615,6 +2678,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 					template_itemid,
 					(int)flags,
 					filter_esc,
+					DBsql_id_ins(interfaceid[get_interface_type_by_item_type(type) - 1]),
 					itemid);
 		}
 		else
@@ -2628,21 +2692,21 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 						" (itemid,description,key_,hostid,type,value_type,data_type,"
 						"delay,delay_flex,history,trends,status,trapper_hosts,units,"
 						"multiplier,delta,formula,logtimefmt,valuemapid,params,"
-						"ipmi_sensor,snmp_community,snmp_oid,snmp_port,"
+						"ipmi_sensor,snmp_community,snmp_oid,"
 						"snmpv3_securityname,snmpv3_securitylevel,"
 						"snmpv3_authpassphrase,snmpv3_privpassphrase,"
 						"authtype,username,password,publickey,privatekey,templateid,"
-						"flags,filter)"
+						"flags,filter,interfaceid)"
 					" values"
-						" (" ZBX_FS_UI64 ",'%s','%s'," ZBX_FS_UI64 ",%s,%s,%s,"
+						" (" ZBX_FS_UI64 ",'%s','%s'," ZBX_FS_UI64 ",%d,%s,%s,"
 						"%s,'%s',%s,%s,%s,'%s','%s',%s,%s,'%s','%s',%s,'%s','%s',"
-						"'%s','%s',%s,'%s',%s,'%s','%s',%s,'%s','%s','%s',"
-						"'%s'," ZBX_FS_UI64 ",%d,'%s');\n",
+						"'%s','%s','%s',%s,'%s','%s',%s,'%s','%s','%s',"
+						"'%s'," ZBX_FS_UI64 ",%d,'%s',%s);\n",
 					itemid,
 					description_esc,
 					key_esc,
 					hostid,
-					row[3],		/* type */
+					type,
 					row[4],		/* value_type */
 					row[5],		/* data_type */
 					row[6],		/* delay */
@@ -2661,19 +2725,19 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 					ipmi_sensor_esc,
 					snmp_community_esc,
 					snmp_oid_esc,
-					row[22],	/* snmp_port */
 					snmpv3_securityname_esc,
-					row[24],	/* snmpv3_securitylevel */
+					row[23],	/* snmpv3_securitylevel */
 					snmpv3_authpassphrase_esc,
 					snmpv3_privpassphrase_esc,
-					row[27],	/* authtype */
+					row[26],	/* authtype */
 					username_esc,
 					password_esc,
 					publickey_esc,
 					privatekey_esc,
 					template_itemid,
 					(int)flags,
-					filter_esc);
+					filter_esc,
+					DBsql_id_ins(interfaceid[get_interface_type_by_item_type(type) - 1]));
 
 			zbx_free(key_esc);
 
@@ -3494,4 +3558,100 @@ int	DBdelete_host(zbx_uint64_t hostid)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBadd_interface                                                  *
+ *                                                                            *
+ * Purpose: add new interface to specified host                               *
+ *                                                                            *
+ * Parameters: hostid - [IN] host identificator from database                 *
+ *             type   - [IN] new interface type                               *
+ *             useip  - [IN]                                                  *
+ *             ip     - [IN]                                                  *
+ *             dns    - [IN]                                                  *
+ *             port   - [IN]                                                  *
+ *                                                                            *
+ * Return value: upon successful completion return interface identificator    *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
+		unsigned char useip, const char *ip, const char *dns, unsigned short port)
+{
+	const char	*__function_name = "DBadd_interface";
+
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*ip_esc, *dns_esc, *tmp = NULL;
+	zbx_uint64_t	interfaceid = 0;
+	unsigned char	main_ = 1, db_main, db_useip;
+	unsigned short	db_port;
+	const char	*db_ip, *db_dns;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	result = DBselect(
+			"select interfaceid,useip,ip,dns,port,main"
+			" from interface"
+			" where hostid=" ZBX_FS_UI64
+				" and type=%d",
+			hostid, (int)type);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		db_useip = (unsigned char)atoi(row[1]);
+		db_ip = row[2];
+		db_dns = row[3];
+		db_main = (unsigned char)atoi(row[5]);
+		if (1 == db_main)
+			main_ = 0;
+
+		if (db_useip != useip)
+			continue;
+
+		if (useip && 0 != strcmp(db_ip, ip))
+			continue;
+
+		if (!useip && 0 != strcmp(db_dns, dns))
+			continue;
+
+		zbx_free(tmp);
+		tmp = strdup(row[4]);
+		substitute_simple_macros(NULL, NULL, NULL, NULL,
+				&tmp, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
+		if (FAIL == is_ushort(tmp, &db_port) || db_port != port)
+			continue;
+
+		ZBX_STR2UINT64(interfaceid, row[0]);
+		break;
+	}
+	DBfree_result(result);
+
+	zbx_free(tmp);
+
+	if (0 != interfaceid)
+		goto out;
+
+	ip_esc = DBdyn_escape_string_len(ip, INTERFACE_IP_LEN);
+	dns_esc = DBdyn_escape_string_len(dns, INTERFACE_IP_LEN);
+
+	interfaceid = DBget_maxid("interface");
+
+	DBexecute("insert into interface"
+			" (interfaceid,hostid,main,type,useip,ip,dns,port)"
+		" values"
+			" (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d,%d,'%s','%s',%d)",
+		interfaceid, hostid, (int)main_, (int)type, (int)useip, ip_esc, dns_esc, (int)port);
+
+	zbx_free(dns_esc);
+	zbx_free(ip_esc);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():" ZBX_FS_UI64, __function_name, interfaceid);
+
+	return interfaceid;
 }
