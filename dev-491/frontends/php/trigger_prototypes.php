@@ -108,10 +108,9 @@ include_once('include/page_header.php');
 		$options = array(
 			'itemids' => $_REQUEST['parent_discoveryid'],
 			'output' => API_OUTPUT_EXTEND,
-			'filter' => array('flags' => ZBX_FLAG_DISCOVERY),
 			'editable' => 1
 		);
-		$discovery_rule = CItem::get($options);
+		$discovery_rule = CDiscoveryRule::get($options);
 		$discovery_rule = reset($discovery_rule);
 		if(!$discovery_rule) access_deny();
 		$_REQUEST['hostid'] = $discovery_rule['hostid'];
@@ -121,7 +120,6 @@ include_once('include/page_header.php');
 	}
 ?>
 <?php
-
 	$showdisabled = get_request('showdisabled', 0);
 	CProfile::update('web.triggers.showdisabled', $showdisabled, PROFILE_TYPE_INT);
 
@@ -185,17 +183,14 @@ include_once('include/page_header.php');
 	}
 // ------- GO ---------
 	else if(($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['mass_save']) && isset($_REQUEST['g_triggerid'])){
-		show_messages();
-
 		$result = false;
 
-		$visible = get_request('visible',array());
+		$visible = get_request('visible', array());
 		$_REQUEST['dependencies'] = get_request('dependencies',array());
 
 		$options = array(
 			'triggerids' => $_REQUEST['g_triggerid'],
 			'select_dependencies' => 1,
-			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => 1
 		);
@@ -210,7 +205,7 @@ include_once('include/page_header.php');
 			}
 
 			$result = CTriggerPrototype::update(array(
-				'triggerid' =>$db_trig['triggerid'],
+				'triggerid' => $db_trig['triggerid'],
 				'priority' => $db_trig['priority'],
 				'dependencies' => $db_trig['dependencies'],
 			));
@@ -223,9 +218,6 @@ include_once('include/page_header.php');
 		if($result){
 			unset($_REQUEST['massupdate']);
 			unset($_REQUEST['form']);
-			$url = new CUrl();
-			$path = $url->getPath();
-			insert_js('cookie.eraseArray("'.$path.'")');
 		}
 
 		$go_result = $result;
