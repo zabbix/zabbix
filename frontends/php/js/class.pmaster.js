@@ -356,9 +356,6 @@ updateSortable: function(){
 		update: function(e, ui){ jQuery(".column").sortableOrder("save", {"name": "dashboard"}); }
 	}).sortableOrder("load", {"name": "dashboard"});
 
-	jQuery(".column").find(".widget")
-		.addClass("ui-widget ui-widget-content ui-helper-clearfix ui-corner-all");
-
 	jQuery(".column").disableSelection();
 }
 });
@@ -383,7 +380,7 @@ updateSortable: function(){
 			});
 
 			var strPos = Object.toJSON(positions);
-			cookie.create(settings.name, strPos, 365);
+			$.cookie(settings.name, strPos, {expires: 365});
 
 			return this;
 		},
@@ -395,7 +392,7 @@ updateSortable: function(){
 
 			$.extend(settings, options);
 
-			var strPos = cookie.read(settings.name);
+			var strPos = $.cookie(settings.name);
 			var positions = $.parseJSON(strPos);
 
 			this.each(function(colNum, column) {

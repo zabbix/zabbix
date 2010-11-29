@@ -978,7 +978,7 @@ function changeHatStateUI(icon, divid){
 		find('.body').toggle().end().
 		find('.footer').toggle().end();
 
-	var hat_state = (icon.className === "arrowup") ? 1 : 0;
+	var hat_state = jQuery(icon).hasClass("arrowup") ? 1 : 0;
 	if(false === hat_state) return false;
 
 	var params = {

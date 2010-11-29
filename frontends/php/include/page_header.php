@@ -125,12 +125,6 @@
 	<meta name="Author" content="ZABBIX SIA" />
 	<link rel="shortcut icon" href="images/general/zabbix.ico" />
 	<link rel="stylesheet" type="text/css" href="css.css" />
-<!--[if IE 6]>
-	<script type="text/javascript" src="js/ie6fix.js"></script>
-<![endif]-->
-<!--[if lte IE 7]>
-	<link rel="stylesheet" type="text/css" href="styles/ie.css" />
-<![endif]-->
 <?php
 	$bodyCSS = 'originalblue';
 	if(isset($DB['DB']) && !is_null($DB['DB'])){
@@ -153,6 +147,12 @@
 	if($page['file'] == 'sysmap.php')
 		print('<link rel="stylesheet" type="text/css" href="imgstore.php?css=1&output=css" />');
 ?>
+<!--[if IE 6]>
+	<script type="text/javascript" src="js/ie6fix.js"></script>
+<![endif]-->
+<!--[if lte IE 7]>
+	<link rel="stylesheet" type="text/css" href="styles/ie.css" />
+<![endif]-->
 <script type="text/javascript">	var PHP_TZ_OFFSET = <?php echo date('Z'); ?>;</script>
 <?php
 	$path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&lang='.$USER_DETAILS['lang'];

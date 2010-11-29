@@ -84,7 +84,7 @@ function make_favorite_graphs(){
 			$link->setTarget('blank');
 		}
 
-		$favList->addItem($link);
+		$favList->addItem($link, 'nowrap');
 	}
 
 return $favList;
@@ -129,7 +129,7 @@ function make_favorite_screens(){
 			$link->setTarget('blank');
 		}
 
-		$favList->addItem($link);
+		$favList->addItem($link, 'nowrap');
 	}
 
 
@@ -159,7 +159,7 @@ function make_favorite_maps(){
 		$link = new CLink(get_node_name_by_elid($sysmapid, null, ': ').$sysmap['name'],'maps.php?sysmapid='.$sysmapid);
 		$link->setTarget('blank');
 
-		$favList->addItem($link);
+		$favList->addItem($link, 'nowrap');
 	}
 
 return $favList;

@@ -47,8 +47,7 @@ ul.favorites{
 }
 
 ul.favorites li{
-	height: 18px;
-	line-height: 18px;
+	line-height: 16px;
 	vertical-align: top;
 
 	list-style: url("../images/general/chart.png");

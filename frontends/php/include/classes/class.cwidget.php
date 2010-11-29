@@ -133,7 +133,7 @@ private $flicker;
 			$widget[] = $flicker_tab;
 		}
 
-		$div = new CDiv($this->body, 'widget');
+		$div = new CDiv($this->body, 'mainwidget');
 		$div->setAttribute('id',$this->domid);
 
 		if(!$this->state) $div->setAttribute('style','display: none;');
@@ -305,7 +305,7 @@ private $footer;
 		$this->body = array($body);
 		$this->footer = null;
 		
-		parent::__construct(null, 'widget');
+		parent::__construct(null, 'ui-widget ui-widget-content ui-helper-clearfix ui-corner-all widget');
 		$this->setAttribute('id', $id.'_widget');
 	}
 
@@ -337,7 +337,7 @@ private $footer;
 	}
 
 	public function setFooter($footer, $right=false){
-		$this->footer = new CDiv($footer, 'footer ui-corner-all ui-widget-header'.($right?' right':' left'));
+		$this->footer = new CDiv($footer, 'nowrap ui-corner-all ui-widget-header footer '.($right?' right':' left'));
 
 	return $this->footer;
 	}
