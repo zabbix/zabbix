@@ -8,20 +8,19 @@ ALTER TABLE hosts ADD CONSTRAINT c_hosts_1 FOREIGN KEY (proxy_hostid) REFERENCES
 ALTER TABLE hosts ADD CONSTRAINT c_hosts_2 FOREIGN KEY (maintenanceid) REFERENCES maintenances (maintenanceid);
 
 CREATE TABLE interface (
-	interfaceid		bigint unsigned				NOT NULL,
-	hostid			bigint unsigned				NOT NULL,
-	main			integer         DEFAULT '0'		NOT NULL,
-	type			integer		DEFAULT '0'		NOT NULL,
-	dns                      varchar(64)     DEFAULT ''		NOT NULL,
-	useip                    integer         DEFAULT '1'		NOT NULL,
-	ip                       varchar(39)     DEFAULT '127.0.0.1'	NOT NULL,
-	port                     integer         DEFAULT '10050'	NOT NULL,
+	interfaceid              bigint unsigned                           NOT NULL,
+	hostid                   bigint unsigned                           NOT NULL,
+	main                     integer         DEFAULT '0'               NOT NULL,
+	type                     integer         DEFAULT '0'               NOT NULL,
+	useip                    integer         DEFAULT '1'               NOT NULL,
+	ip                       varchar(39)     DEFAULT '127.0.0.1'       NOT NULL,
+	dns                      varchar(64)     DEFAULT ''                NOT NULL,
+	port                     varchar(64)     DEFAULT '10050'           NOT NULL,
 	PRIMARY KEY (interfaceid)
 ) ENGINE=InnoDB;
 CREATE INDEX interface_1 on interface (interfaceid);
-CREATE INDEX interface_2 on interface (hostid, type);
+CREATE INDEX interface_2 on interface (hostid,type);
 CREATE INDEX interface_3 on interface (ip,dns);
-
 ALTER TABLE interface ADD CONSTRAINT c_interface_1 FOREIGN KEY (hostid) REFERENCES hosts (hostid) ON DELETE CASCADE;
  
 INSERT INTO interface (interfaceid,hostid,main,type,ip,dns,useip,port)

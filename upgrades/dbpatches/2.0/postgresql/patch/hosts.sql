@@ -13,16 +13,16 @@ CREATE TABLE interface (
 	hostid                   bigint                                    NOT NULL,
 	main                     integer         DEFAULT '0'               NOT NULL,
 	type                     integer         DEFAULT '0'               NOT NULL,
-	dns                      varchar(64)     DEFAULT ''                NOT NULL,
 	useip                    integer         DEFAULT '1'               NOT NULL,
 	ip                       varchar(39)     DEFAULT '127.0.0.1'       NOT NULL,
-	port                     integer         DEFAULT '10050'           NOT NULL,
+	dns                      varchar(64)     DEFAULT ''                NOT NULL,
+	port                     varchar(64)     DEFAULT '10050'           NOT NULL,
 	PRIMARY KEY (interfaceid)
 ) with OIDS;
 CREATE INDEX interface_1 on interface (interfaceid);
 CREATE INDEX interface_2 on interface (hostid,type);
 CREATE INDEX interface_3 on interface (ip,dns);
-ALTER TABLE ONLY interface ADD CONSTRAINT c_interface_1 FOREIGN KEY (hostid) REFERENCES hosts(hostid) ON DELETE CASCADE;
+ALTER TABLE ONLY interface ADD CONSTRAINT c_interface_1 FOREIGN KEY (hostid) REFERENCES hosts (hostid) ON DELETE CASCADE;
  
 INSERT INTO interface (interfaceid,hostid,main,type,ip,dns,useip,port)
 	(SELECT (hostid - ((hostid / 100000000000)*100000000000)) * 2 + ((hostid / 100000000000)*100000000000),
