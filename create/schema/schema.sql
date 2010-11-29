@@ -1073,6 +1073,5 @@ FIELD		|useip		|t_integer	|'1'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|ip		|t_varchar(39)	|'127.0.0.1'|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|dns		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|port		|t_varchar(64)	|'10050'|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-INDEX		|1		|interfaceid
-INDEX		|2		|hostid,type
-INDEX		|3		|ip,dns
+INDEX		|1		|hostid,type
+INDEX		|2		|ip,dns

@@ -27,11 +27,9 @@ CREATE TABLE interface (
 	PRIMARY KEY (interfaceid)
 );
 REORG TABLE interface;
-CREATE INDEX interface_1 on interface (interfaceid);
+CREATE INDEX interface_1 on interface (hostid,type);
 REORG TABLE interface;
-CREATE INDEX interface_2 on interface (hostid,type);
-REORG TABLE interface;
-CREATE INDEX interface_3 on interface (ip,dns);
+CREATE INDEX interface_2 on interface (ip,dns);
 REORG TABLE interface;
 ALTER TABLE interface ADD CONSTRAINT c_interface_1 FOREIGN KEY (hostid) REFERENCES hosts (hostid) ON DELETE CASCADE;
 REORG TABLE interface;
