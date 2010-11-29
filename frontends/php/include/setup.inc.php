@@ -330,7 +330,7 @@
 				$table, BR(),
 				$this->DISABLE_NEXT_BUTTON ? array(new CButton('retry', S_RETRY), BR(),BR()) : null,
 				!$this->getConfig('ZBX_CONFIG_FILE_CORRECT', false) ?
-					array('Please install configuration file manualy, or fix permissions on conf directory.',BR(),BR(),
+					array('Please install configuration file manually, or fix permissions on conf directory.',BR(),BR(),
 						'Press "Save configuration file" button, download configuration file ',
 						'and save it as ',BR(),
 						'"'.$ZBX_CONFIGURATION_FILE.'"',BR(),BR(),
@@ -385,7 +385,7 @@
 			DBclose();
 
 			if($DB['TYPE'] == 'SQLITE3' && !zbx_is_callable(array('sem_get','sem_acquire','sem_release','sem_remove'))){
-				error('SQLite3 required IPC functions');
+				error('SQLite3 requires IPC functions');
 				$result &= false;
 			}
 
@@ -407,7 +407,7 @@
 		}
 
 		function CheckConfigurationFile(){
-			global $DB,$ZBX_SERVER,$ZBX_SERVER_PORT;
+			global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT;
 
 			if(!empty($DB)){
 				$old_DB				= true;
@@ -439,12 +439,12 @@
 					isset($ZBX_SERVER) &&
 					isset($ZBX_SERVER_PORT) &&
 					isset($IMAGE_FORMAT_DEFAULT) &&
-					$DB['TYPE']		== $this->getConfig('DB_TYPE',		null) &&
-					$DB['SERVER']		== $this->getConfig('DB_SERVER',	null) &&
-					$DB['PORT']		== $this->getConfig('DB_PORT',		null) &&
-					$DB['DATABASE']		== $this->getConfig('DB_DATABASE',	null) &&
-					$DB['USER']		== $this->getConfig('DB_USER',		null) &&
-					$DB['PASSWORD']		== $this->getConfig('DB_PASSWORD',	null)
+					$DB['TYPE'] == $this->getConfig('DB_TYPE',		null) &&
+					$DB['SERVER'] == $this->getConfig('DB_SERVER',	null) &&
+					$DB['PORT'] == $this->getConfig('DB_PORT',		null) &&
+					$DB['DATABASE'] == $this->getConfig('DB_DATABASE',	null) &&
+					$DB['USER'] == $this->getConfig('DB_USER',		null) &&
+					$DB['PASSWORD'] == $this->getConfig('DB_PASSWORD',	null)
 					)
 				{
 					if(!DBconnect($error_msg)){
@@ -452,12 +452,12 @@
 					}
 				}
 				else{
-					$error_msg = 'Incorrect configuration file['.$ZBX_CONFIGURATION_FILE.']';
+					$error_msg = 'Incorrect configuration file ['.$ZBX_CONFIGURATION_FILE.'], or database connection details in the file don\'t match those specified in step 4.';
 				}
 				DBclose();
 			}
 			else{
-				$error = 'Missing configuration file['.$ZBX_CONFIGURATION_FILE.']';
+				$error = 'Missing configuration file ['.$ZBX_CONFIGURATION_FILE.']';
 			}
 
 			if(isset($error_msg)){
@@ -527,7 +527,7 @@
 			}
 
 			if($this->getStep() == 6){
-				// $this->setConfig('ZBX_CONFIG_FILE_CORRECT', $this->CheckConfigurationFile());
+				$this->setConfig('ZBX_CONFIG_FILE_CORRECT', $this->CheckConfigurationFile());
 
 				if(!$this->getConfig('ZBX_CONFIG_FILE_CORRECT', false)){
 					$this->DISABLE_NEXT_BUTTON = true;
