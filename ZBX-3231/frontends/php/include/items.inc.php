@@ -1788,7 +1788,6 @@
 	 *
 	 */
 	function check_item_key($key){
-
 		$key_strlen = zbx_strlen($key);
 		$characters = array();
 
@@ -1808,7 +1807,7 @@
 		if ($current_char == $key_strlen) {
 			return array(
 				true,   //is key valid?
-				S_KEY_IS_VALID //result destription
+				S_KEY_IS_VALID //result description
 			);
 		}
 		//function with parameter, e.g. system.run[...]
@@ -1845,32 +1844,32 @@
 								$i++;
 							}
 							//all nestings are closed correctly
-							if ($nest_level == 0 && isset($characters[$i+1]) && $characters[$i+1] == ']') {
-								return array(
+							if ($nest_level == 0 && isset($characters[$i+1]) && $characters[$i+1] == ']' && !isset($characters[$i+2])) {
+                                return array(
 									true,   //is key valid?
-									S_KEY_IS_VALID //result destription
+									S_KEY_IS_VALID //result description
 								);
 							}
 
-							if((!isset($characters[$i+1]) || $characters[$i+1] != ',') && !($nest_level!=0 && isset($characters[$i+1]) && $characters[$i+1] == ']')) {
-								return array(
+							if((!isset($characters[$i+1]) || $characters[$i+1] != ',')
+                               && !($nest_level !=0 && isset($characters[$i+1]) && $characters[$i+1] == ']')) {
+                                return array(
 									false,   //is key valid?
-									sprintf(S_INCORRECT_SYNTAX_NEAR, $characters[$current_char], $current_char) //result destription
+									sprintf(S_INCORRECT_SYNTAX_NEAR, $characters[$current_char], $current_char) //result description
 								);
 							}
 						}
 						elseif($characters[$i] == ']' && $nest_level == 0) {
-		
 							if (isset($characters[$i+1])){
 								return array(
 									false,   //is key valid?
-									sprintf(S_INCORRECT_USAGE_OF_BRACKETS, $characters[$i+1]) //result destription
+									sprintf(S_INCORRECT_USAGE_OF_BRACKETS, $characters[$i+1]) //result description
 								);
 							}
 							else {
 								return array(
 									true,   //is key valid?
-									S_KEY_IS_VALID //result destription
+									S_KEY_IS_VALID //result description
 								);
 							}
 						}
@@ -1897,20 +1896,20 @@
 								break;
 							}
 
-							if ($nest_level == 0 && isset($characters[$i+1]) && $characters[$i+1] == ']')
+							if ($nest_level == 0 && isset($characters[$i+1]) && $characters[$i+1] == ']' && !isset($characters[$i+2]))
 							{
-	
 								return array(
 									true,   //is key valid?
-									S_KEY_IS_VALID //result destription
+									S_KEY_IS_VALID //result description
 								);
 							}
 
-							if ((!isset($characters[$i+1]) || $characters[$i+1] != ',') && !($nest_level != 1 && isset($characters[$i+1]) && $characters[$i+1] == ']'))
+							if ((!isset($characters[$i+1]) || $characters[$i+1] != ',') //if next symbol is not ','
+                                && !($nest_level != 0 && isset($characters[$i+1]) && $characters[$i+1] == ']'))
 							{
 								return array(
 									false,   //is key valid?
-									sprintf(S_INCORRECT_SYNTAX_NEAR, $characters[$current_char], $current_char) //result destription
+									sprintf(S_INCORRECT_SYNTAX_NEAR, $characters[$current_char], $current_char) //result description
 								);
 							}
 
@@ -1939,13 +1938,13 @@
 							if (isset($characters[$i+1])){
 								return array(
 									false,   //is key valid?
-									sprintf(S_INCORRECT_USAGE_OF_BRACKETS, $characters[$i+1]) //result destription
+									sprintf(S_INCORRECT_USAGE_OF_BRACKETS, $characters[$i+1]) //result description
 								);
 							}
 							else {
 								return array(
 									true,   //is key valid?
-									S_KEY_IS_VALID //result destription
+									S_KEY_IS_VALID //result description
 								);
 							}
 						}
@@ -1955,14 +1954,14 @@
 
 			return array(
 				false,   //is key valid?
-				S_INVALID_KEY_FORMAT //result destription
+				S_INVALID_KEY_FORMAT //result description
 			);
 
 		}
 		else {
 			return array(
 				false,   //is key valid?
-				sprintf(S_INVALID_CHARECTER_AT_POSITION, $charecters[$current_char], $current_char) //result destription
+				sprintf(S_INVALID_CHARECTER_AT_POSITION, $charecters[$current_char], $current_char) //result description
 			);
 		}
 		
