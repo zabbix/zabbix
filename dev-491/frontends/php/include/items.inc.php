@@ -274,18 +274,6 @@
 	return $result;
 	}
 
-	/*
-	 * Function: copy_item_to_host
-	 *
-	 * Description:
-	 *     Copy specified item to the host
-	 *
-	 * Author:
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments:
-	 *
-	 */
 	function copy_item_to_host($itemid, $hostid){
 		$db_tmp_item = get_item_by_itemid_limited($itemid);
 		$applications = get_same_applications_for_host(get_applications_by_itemid($db_tmp_item['itemid']),$hostid);
@@ -303,7 +291,7 @@
 
 		unset($db_tmp_item['interfaceid']);
 		if($host['status'] != HOST_STATUS_TEMPLATE){
-			$type = getInterfaceTypeByItem($item);
+			$type = getInterfaceTypeByItem($db_tmp_item);
 			foreach($host['interfaces'] as $hinum => $interface){
 				if(($interface['type'] == $type) && ($interface['main'] == 1)){
 					$db_tmp_item['interfaceid'] = $interface['interfaceid'];
@@ -321,6 +309,54 @@
 		$db_tmp_item['templateid'] = 0;
 
 		$result = CItem::create($db_tmp_item);
+
+		return $result;
+	}
+
+	function copyItems($srcid, $destid){
+		$options = array(
+			'hostids' => $srcid,
+			'output' => API_OUTPUT_EXTEND,
+			'inherited' => false,
+			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
+			'select_applications' => API_OUTPUT_REFER,
+		);
+		$srcItems = CItem::get($options);
+
+		foreach($srcItems as $item){
+
+			$hosts = CHost::get(array(
+				'output' => array('hostid', 'host', 'status'),
+				'selectInterfaces' => API_OUTPUT_EXTEND,
+				'hostids' => $destid,
+				'preservekeys' => 1,
+				'nopermissions' => 1,
+				'templated_hosts' => 1
+			));
+			$host = reset($hosts);
+
+			unset($item['interfaceid']);
+			if($host['status'] != HOST_STATUS_TEMPLATE){
+				$type = getInterfaceTypeByItem($item);
+				foreach($host['interfaces'] as $hinum => $interface){
+					if(($interface['type'] == $type) && ($interface['main'] == 1)){
+						$item['interfaceid'] = $interface['interfaceid'];
+					}
+				}
+
+				if(!isset($item['interfaceid'])){
+					error(sprintf(_('Item [%1$s:%2$s] cannot find interface on host [%3$s]'), $item['description'], $item['key_'], $host['host']));
+					return false;
+				}
+			}
+
+			$item['hostid'] = $destid;
+			$item['applications'] = get_same_applications_for_host(zbx_objectValues($item['applications'], 'applicationid'), $destid);
+			$item['templateid'] = 0;
+
+			$result = CItem::create($item);
+			if(!$result) break;
+		}
 
 		return $result;
 	}

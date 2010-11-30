@@ -555,6 +555,10 @@ COpt::memoryPick();
 		}
 
 		foreach($items as $inum => &$item){
+			$current_item = $items[$inum];
+			check_db_fields($current_item, $dbItems[$item['itemid']]);
+
+
 			if(!check_db_fields($item_db_fields, $item)){
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION);
 			}
@@ -620,12 +624,12 @@ COpt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 			}
 
-			if(isset($item['port'])){
-				if(zbx_ctype_digit($item['port']) && ($item['port']>0) && ($item['port']<65535)){}
-				else if(preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/u', $item['port'])){}
-				else{
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_INVALID_PORT);
-				}
+			if((isset($item['port']) && !empty($item['port']))
+				&& (!(zbx_ctype_digit($item['port']) && ($item['port']>0) && ($item['port']<65535))
+				|| !preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/u', $item['port']))
+			){
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					sprintf(_('Item [%1$s:%2$s] has invalid port: "%3$s".'), $current_item['description'], $current_item['key_'], $item['port']));
 			}
 
 			if(isset($item['value_type'])){
@@ -877,21 +881,22 @@ COpt::memoryPick();
 	public static function delete($prototypeids, $nopermissions=false){
 		if(empty($prototypeids)) return true;
 
-		$prototypeids = zbx_toArray($prototypeids);
 		$prototypeids = zbx_toHash($prototypeids);
+
 		try{
 			self::BeginTransaction(__METHOD__);
 
-			if(!$nopermissions){
-				$options = array(
-					'itemids' => $prototypeids,
-					'editable' => 1,
-					'preservekeys' => 1,
-					'output' => API_OUTPUT_EXTEND,
-				);
-				$del_items = self::get($options);
-				foreach($prototypeids as $prototypeid){
+			$options = array(
+				'itemids' => $prototypeids,
+				'editable' => 1,
+				'preservekeys' => 1,
+				'output' => API_OUTPUT_EXTEND,
+			);
+			$del_items = self::get($options);
+
 // TODO: remove $nopermissions hack
+			if(!$nopermissions){
+				foreach($prototypeids as $prototypeid){
 					if(!isset($del_items[$prototypeid])){
 						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
 					}
@@ -913,6 +918,7 @@ COpt::memoryPick();
 			}while(!empty($parent_itemids));
 
 
+// CREATED ITEMS
 			$created_items = array();
 			$sql = 'SELECT itemid FROM item_discovery WHERE '.DBcondition('parent_itemid', $prototypeids);
 			$db_items = DBselect($sql);
@@ -961,6 +967,11 @@ COpt::memoryPick();
 			}
 			DB::insert('housekeeper', $insert);
 // }}} HOUSEKEEPER
+
+// TODO: remove info from API
+			foreach($del_items as $item){
+				info(sprintf(_('Item prototype [%1$s:%2$s] deleted'), $item['description'], $item['key_']));
+			}
 
 			self::EndTransaction(true, __METHOD__);
 			return array('prototypeids' => $prototypeids);

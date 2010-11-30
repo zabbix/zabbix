@@ -490,6 +490,17 @@ Copt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Can not switch host for interface');
 
 				$interface['hostid'] = $dbInterface['hostid'];
+
+				if($delete) continue;
+
+
+				if($update){
+					if(((isset($interface['ip']) && zbx_empty($interface['ip'])) || zbx_empty($dbInterfaces[$interface['interfaceid']]['ip']))
+						&& ((isset($interface['dns']) && zbx_empty($interface['dns'])) || zbx_empty($dbInterfaces[$interface['interfaceid']]['dns']))
+					){
+						self::exception(ZBX_API_ERROR_PARAMETERS, 'IP and DNS can not be empty for host interface');
+					}
+				}
 			}
 			else{
 				if(!isset($dbHosts[$interface['hostid']]) && !isset($dbProxies[$interface['hostid']]))
@@ -607,7 +618,6 @@ Copt::memoryPick();
  */
 	public static function create($interfaces){
 		$interfaces = zbx_toArray($interfaces);
-
 		try{
 			self::BeginTransaction(__METHOD__);
 

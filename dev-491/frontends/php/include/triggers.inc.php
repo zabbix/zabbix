@@ -1876,10 +1876,7 @@ return $caption;
 		$triggerdepid = get_dbid('trigger_depends','triggerdepid');
 		$result=DBexecute('INSERT INTO trigger_depends (triggerdepid,triggerid_down,triggerid_up) '.
 							" VALUES ($triggerdepid,$triggerid_down,$triggerid_up)");
-		if(!$result){
-			return	$result;
-		}
-	return DBexecute('UPDATE triggers SET dep_level=dep_level+1 WHERE triggerid='.$triggerid_up);
+		return	$result;
 	}
 
 /*
@@ -3526,18 +3523,18 @@ return $caption;
 			$options = array(
 				'hostids' => $srcid,
 				'output' => API_OUTPUT_EXTEND,
-				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY, ZBX_FLAG_DISCOVERY_CHILD, ZBX_FLAG_DISCOVERY_NORMAL)),
+				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 				'inherited' => 0,
 				'select_dependencies' => API_OUTPUT_EXTEND
 			);
 			$triggers = CTrigger::get($options);
 
 			$hash = array();
-
 			foreach($triggers as $trigger){
 				$expr = explode_exp($trigger['expression'], 0);
 				$expr = str_replace($src['host'].':', $dest['host'].':', $expr);
 				$trigger['expression'] = $expr;
+				$trigger['dependencies'] = array();
 
 				$result = CTrigger::create($trigger);
 
@@ -3554,7 +3551,8 @@ return $caption;
 					else{
 						$dep = $dep['triggerid'];
 					}
-
+sdi($hash[$trigger['triggerid']]);
+sdi($dep);
 					$res = add_trigger_dependency($hash[$trigger['triggerid']], $dep);
 					if(!$res) throw new Exception();
 				}
