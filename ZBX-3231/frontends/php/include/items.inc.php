@@ -1845,15 +1845,15 @@
 							}
 							//all nestings are closed correctly
 							if ($nest_level == 0 && isset($characters[$i+1]) && $characters[$i+1] == ']' && !isset($characters[$i+2])) {
-                                return array(
+								return array(
 									true,   //is key valid?
 									S_KEY_IS_VALID //result description
 								);
 							}
 
 							if((!isset($characters[$i+1]) || $characters[$i+1] != ',')
-                               && !($nest_level !=0 && isset($characters[$i+1]) && $characters[$i+1] == ']')) {
-                                return array(
+								&& !($nest_level !=0 && isset($characters[$i+1]) && $characters[$i+1] == ']')) {
+								return array(
 									false,   //is key valid?
 									sprintf(S_INCORRECT_SYNTAX_NEAR, $characters[$current_char], $current_char) //result description
 								);
@@ -1905,7 +1905,7 @@
 							}
 
 							if ((!isset($characters[$i+1]) || $characters[$i+1] != ',') //if next symbol is not ','
-                                && !($nest_level != 0 && isset($characters[$i+1]) && $characters[$i+1] == ']'))
+								&& !($nest_level != 0 && isset($characters[$i+1]) && $characters[$i+1] == ']'))
 							{
 								return array(
 									false,   //is key valid?
