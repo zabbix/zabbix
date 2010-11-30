@@ -1412,17 +1412,31 @@ function make_refresh_menu($pmid,$dollid,$cur_interval,$params=null,&$menu,&$sub
 /************* MATH *************/
 
 function bcceil($number) {
+    //stripping trailing zeros: 0.000 => 0., 2.5000 => 2.5 and so on
+    if(strpos($number, '.')){
+        while(substr($number, -1, 1) == '0'){
+            $number = substr($number, 0, strlen($number)-1); //removing last symbol
+        }
+    }
+    //removing a dot at the end: '0.' => '0', '2.' => '2' and so on
+    if(substr($number, -1, 1) == '.') {
+        $number = substr($number, 0, strlen($number)-1); //removing last symbol
+    }
+
     if (strpos($number, '.') !== false) {
 		//3.000000 is the same as 3
 		if (preg_match("/\.[0]+$/", $number)) {
-			return bcround($number, 0);
+			$round = bcround($number, 0);
+            return $round == '-0' ? '0' : $round;
 		}
 
         if ($number[0] != '-') {
-            return bcadd($number, 1, 0);
+            $add = bcadd($number, 1, 0);
+            return $add == '-0' ? '0' : $add;
         }
 
-        return bcsub($number, 0, 0);
+        $sub = bcsub($number, 0, 0);
+        return $sub == '-0' ? '0' : $sub;
     }
 
     return $number == '-0' ? '0' : $number;
@@ -1430,14 +1444,27 @@ function bcceil($number) {
 
 function bcfloor($number)
 {
+    //stripping trailing zeros: 0.000 => 0., 2.5000 => 2.5 and so on
+    if(strpos($number, '.')){
+        while(substr($number, -1, 1) == '0'){
+            $number = substr($number, 0, strlen($number)-1); //removing last symbol
+        }
+    }
+    //removing a dot at the end: '0.' => '0', '2.' => '2' and so on
+    if(substr($number, -1, 1) == '.') {
+        $number = substr($number, 0, strlen($number)-1); //removing last symbol
+    }
+
     if (strpos($number, '.') !== false) {
 		//3.000000 is the same as 3
 		if (preg_match("/\.[0]+$/", $number)) {
-			return bcround($number, 0);
+			$round = bcround($number, 0);
+            return $round == '-0' ? '0' : $round;
 		}
 
         if ($number[0] != '-') {
-            return bcadd($number, 0, 0);
+            $add = bcadd($number, 1, 0);
+            return $add == '-0' ? '0' : $add;
         }
 
         return bcsub($number, 1, 0);
@@ -1446,14 +1473,28 @@ function bcfloor($number)
     return $number == '-0' ? '0' : $number;
 }
 
+
 function bcround($number, $precision = 0)
 {
+    //stripping trailing zeros: 0.000 => 0., 2.5000 => 2.5 and so on
+    if(strpos($number, '.')){
+        while(substr($number, -1, 1) == '0'){
+            $number = substr($number, 0, strlen($number)-1); //removing last symbol
+        }
+    }
+    //removing a dot at the end: '0.' => '0', '2.' => '2' and so on
+    if(substr($number, -1, 1) == '.') {
+        $number = substr($number, 0, strlen($number)-1); //removing last symbol
+    }
+
     if (strpos($number, '.') !== false) {
         if ($number[0] != '-') {
-            return bcadd($number, '0.' . str_repeat('0', $precision) . '5', $precision);
+            $add = bcadd($number, '0.' . str_repeat('0', $precision) . '5', $precision);
+            return $add == '-0' ? '0' : $add;
         }
 
-        return bcsub($number, '0.' . str_repeat('0', $precision) . '5', $precision);
+        $sub = bcsub($number, '0.' . str_repeat('0', $precision) . '5', $precision);
+        return $sub == '-0' ? '0' : $sub;
     }
 
     return $number == '-0' ? '0' : $number;
