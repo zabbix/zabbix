@@ -45,7 +45,7 @@ class CFormList extends CDiv{
 		if(!is_null($description))
 			$this->formList->addItem(array(new CDiv($label, 'dt'), new CDiv($description, 'dd')));
 		else
-			$this->formList->addItem(new CDiv($label, 'dd'));
+			$this->formList->addItem(array(new CDiv(SPACE, 'dt'), new CDiv($label, 'dd')));
 	}
 
 	public function toString($destroy=true){
