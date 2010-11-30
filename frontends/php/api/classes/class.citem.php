@@ -866,12 +866,10 @@ COpt::memoryPick();
 // permissions
 		if($update || $delete){
 			$item_db_fields = array('itemid'=> null);
-// TODO: forbid creating web items
 			$dbItems = self::get(array(
 				'output' => API_OUTPUT_EXTEND,
 				'itemids' => zbx_objectValues($items, 'itemid'),
 				'editable' => 1,
-				'webitems' => true,
 				'preservekeys' => 1
 			));
 
@@ -896,6 +894,9 @@ COpt::memoryPick();
 		}
 
 		foreach($items as $inum => &$item){
+			$current_item = $items[$inum];
+			check_db_fields($current_item, $dbItems[$item['itemid']]);
+
 			if(!check_db_fields($item_db_fields, $item)){
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION);
 			}
@@ -992,15 +993,12 @@ COpt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Item uses Host interface from non parent host');
 			}
 
-			if(isset($item['port'])){
-				if(zbx_ctype_digit($item['port']) && ($item['port']>0) && ($item['port']<65535)){
-				}
-				else if(preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/u', $item['port'])){
-				}
-				else{
-					error(S_INVALID_PORT);
-					return FALSE;
-				}
+			if((isset($item['port']) && !empty($item['port']))
+				&& (!(zbx_ctype_digit($item['port']) && ($item['port']>0) && ($item['port']<65535))
+				|| !preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/u', $item['port']))
+			){
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					sprintf(_('Item [%1$s:%2$s] has invalid port: "%3$s".'), $current_item['description'], $current_item['key_'], $item['port']));
 			}
 
 			if(isset($item['value_type'])){
@@ -1247,19 +1245,30 @@ COpt::memoryPick();
 	public static function delete($itemids, $nopermissions=false){
 		if(empty($itemids)) return true;
 
-		$itemids = zbx_toArray($itemids);
 		$itemids = zbx_toHash($itemids);
 
 		try{
 			self::BeginTransaction(__METHOD__);
 
+			$options = array(
+				'itemids' => $itemids,
+				'editable' => 1,
+				'preservekeys' => 1,
+				'output' => API_OUTPUT_EXTEND,
+			);
+			$del_items = self::get($options);
+
 // TODO: remove $nopermissions hack
-			$items = zbx_toObject($itemids, 'itemid');
-
 			if(!$nopermissions){
-				self::checkInput($items, __FUNCTION__);
+				foreach($itemids as $itemid){
+					if(!isset($del_items[$itemid])){
+						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
+					}
+					if($del_items[$itemid]['templateid'] != 0){
+						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete templated items');
+					}
+				}
 			}
-
 // first delete child items
 			$parent_itemids = $itemids;
 			do{
@@ -1270,6 +1279,7 @@ COpt::memoryPick();
 					$itemids[$db_item['itemid']] = $db_item['itemid'];
 				}
 			} while(!empty($parent_itemids));
+
 
 // delete graphs, leave if graph still have item
 			$del_graphs = array();
@@ -1300,7 +1310,7 @@ COpt::memoryPick();
 				'preservekeys' => true,
 			));
 			if(!empty($triggers))
-				DB::delete('triggers', array('triggerid'=>zbx_objectValues($triggers, 'triggerid')));
+				DB::delete('triggers', array('triggerid' => zbx_objectValues($triggers, 'triggerid')));
 
 
 			$itemids_condition = array('itemid'=>$itemids);
@@ -1325,7 +1335,6 @@ COpt::memoryPick();
 				'history_str',
 				'history',
 			);
-
 			$insert = array();
 			foreach($itemids as $id => $itemid){
 				foreach($item_data_tables as $table){
@@ -1337,6 +1346,11 @@ COpt::memoryPick();
 				}
 			}
 			DB::insert('housekeeper', $insert);
+
+// TODO: remove info from API
+			foreach($del_items as $item){
+				info(sprintf(_('Item [%1$s:%2$s] deleted'), $item['description'], $item['key_']));
+			}
 
 			self::EndTransaction(true, __METHOD__);
 			return array('itemids' => $itemids);

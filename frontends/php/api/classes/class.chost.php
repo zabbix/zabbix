@@ -1377,7 +1377,7 @@ Copt::memoryPick();
 					self::exception();
 				}
 
-				if(isset($host['profile']) && !empty($host['extendedProfile'])){
+				if(isset($host['profile']) && !empty($host['profile'])){
 					$fields = array_keys($host['profile']);
 					$fields = implode(', ', $fields);
 
@@ -1438,19 +1438,8 @@ Copt::memoryPick();
 			self::checkInput($hosts, __FUNCTION__);
 
 			foreach($hosts as $hnum => $host){
-				$interfaces = null;
-				if(isset($host['interfaces'])){
-					$interfaces = $host['interfaces'];
-					unset($host['interfaces']);
-				}
-
-				$data = $host;
-				$data['hosts'] = $host;
-
-				$result = self::massUpdate($data);
-
 // INTERFACES
-				if(!is_null($interfaces)){
+				if(isset($host['interfaces']) && !is_null($host['interfaces'])){
 					$interfacesToDelete = CHostInterface::get(array(
 						'hostids' => $host['hostid'],
 						'output' => API_OUTPUT_EXTEND,
@@ -1460,7 +1449,7 @@ Copt::memoryPick();
 // Add
 					$interfacesToAdd = array();
 					$interfacesToUpdate = array();
-					foreach($interfaces as $hinum => $interface){
+					foreach($host['interfaces'] as $hinum => $interface){
 						$interface['hostid'] = $host['hostid'];
 
 						if(!isset($interface['interfaceid'])){
@@ -1473,18 +1462,26 @@ Copt::memoryPick();
 					}
 //----
 
-					if(!empty($interfacesToDelete))
+					if(!empty($interfacesToDelete)){
 						$result = CHostInterface::delete(zbx_objectValues($interfacesToDelete, 'interfaceid'));
 						if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Host update failed');
+					}
 
-					if(!empty($interfacesToUpdate))
+					if(!empty($interfacesToUpdate)){
 						$result = CHostInterface::update($interfacesToUpdate);
 						if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Host update failed');
+					}
 
-					if(!empty($interfacesToAdd))
+					if(!empty($interfacesToAdd)){
 						$result = CHostInterface::create($interfacesToAdd);
 						if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Host update failed');
+					}
 				}
+				unset($host['interfaces']);
+
+				$data = $host;
+				$data['hosts'] = $host;
+				$result = self::massUpdate($data);
 
 				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Host update failed');
 			}
@@ -1528,6 +1525,18 @@ Copt::memoryPick();
 				}
 			}
 
+			if(isset($data['interfaces']) && !empty($data['interfaces'])){
+				$data['interfaces'] = zbx_toArray($data['interfaces']);
+
+				$options = array(
+					'hosts' => &$data['hosts'],
+					'interfaces' => &$data['interfaces']
+				);
+
+				$result = CHostInterface::massAdd($options);
+				if(!$result) self::exception();
+			}
+
 			if(isset($data['groups']) && !empty($data['groups'])){
 				$data['groups'] = zbx_toArray($data['groups']);
 
@@ -1559,18 +1568,6 @@ Copt::memoryPick();
 				);
 
 				$result = CUserMacro::massAdd($options);
-				if(!$result) self::exception();
-			}
-
-			if(isset($data['interfaces']) && !empty($data['interfaces'])){
-				$data['interfaces'] = zbx_toArray($data['interfaces']);
-
-				$options = array(
-					'hosts' => &$data['hosts'],
-					'interfaces' => &$data['interfaces']
-				);
-
-				$result = CHostInterface::massAdd($options);
 				if(!$result) self::exception();
 			}
 
@@ -1704,6 +1701,21 @@ Copt::memoryPick();
 // }}} UPDATE HOSTGROUPS LINKAGE
 
 
+// UPDATE INTERFACES {{{
+			if(isset($data['interfaces']) && !is_null($data['interfaces'])){
+				$hostInterfaces = CHostInterface::get(array(
+					'hostids' => $hostids,
+					'output' => API_OUTPUT_EXTEND,
+					'preservekeys' => true,
+					'nopermissions' => 1
+				));
+
+				self::massRemove(array('hosts' => $hosts, 'interfaces' => $hostInterfaces));
+				self::massAdd(array('hosts' => $hosts, 'interfaces' => $data['interfaces']));
+			}
+// }}} UPDATE INTERFACES
+
+
 			$data['templates_clear'] = isset($data['templates_clear']) ? zbx_toArray($data['templates_clear']) : array();
 			$templateids_clear = zbx_objectValues($data['templates_clear'], 'templateid');
 
@@ -1744,20 +1756,6 @@ Copt::memoryPick();
 			}
 // }}} UPDATE TEMPLATE LINKAGE
 
-
-// UPDATE INTERFACES {{{
-			if(isset($data['interfaces']) && !is_null($data['interfaces'])){
-				$hostInterfaces = CHostInterface::get(array(
-					'hostids' => $hostids,
-					'output' => API_OUTPUT_EXTEND,
-					'preservekeys' => true,
-					'nopermissions' => 1
-				));
-
-				self::massRemove(array('hosts' => $hosts, 'interfaces' => $hostInterfaces));
-				self::massAdd(array('hosts' => $hosts, 'interfaces' => $data['interfaces']));
-			}
-// }}} UPDATE INTERFACES
 
 // UPDATE MACROS {{{
 			if(isset($data['macros']) && !is_null($data['macros'])){

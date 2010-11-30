@@ -311,89 +311,161 @@
 	$hostList->addRow(S_STATUS,$cmbStatus);
 
 	if($_REQUEST['form'] == 'full_clone'){
-// Host items
-		$host_items = CItem::get(array(
+// Items
+		$hostItems = CItem::get(array(
 			'hostids' => $_REQUEST['hostid'],
-			'inherited' => 0,
-			'webitems' => 1,
-			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CHILD)),
+			'inherited' => false,
+			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 			'output' => API_OUTPUT_EXTEND,
 		));
-
-		if(!empty($host_items)){
-			$items_lbx = new CListBox('items', null, 8);
-			$items_lbx->setAttribute('disabled', 'disabled');
-
-			order_result($host_items, 'description');
-			foreach($host_items as $hitem){
-				$items_lbx->addItem($hitem['itemid'], item_description($hitem));
+		if(!empty($hostItems)){
+			$itemsList = array();
+			foreach($hostItems as $hostItem){
+				$itemsList[$hostItem['itemid']] = item_description($hostItem);
 			}
+			order_result($itemsList);
 
-			$hostList->addRow(S_ITEMS, $items_lbx);
+			$listBox = new CListBox('items', null, 8);
+			$listBox->setAttribute('disabled', 'disabled');
+			$listBox->addItems($itemsList);
+
+			$hostList->addRow(_('Items'), $listBox);
 		}
 
-// Host triggers
-		$options = array(
-			'inherited' => 0,
+// Triggers
+		$hostTriggers = CTrigger::get(array(
+			'inherited' => false,
 			'hostids' => $_REQUEST['hostid'],
 			'output' => API_OUTPUT_EXTEND,
-			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CHILD)),
+			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL)),
 			'expandDescription' => true,
-		);
-		$host_triggers = CTrigger::get($options);
-
-		if(!empty($host_triggers)){
-			$trig_lbx = new CListBox('triggers' ,null, 8);
-			$trig_lbx->setAttribute('disabled', 'disabled');
-
-			order_result($host_triggers, 'description');
-			foreach($host_triggers as $htrigger){
-				$trig_lbx->addItem($htrigger['triggerid'], $htrigger['description']);
+		));
+		if(!empty($hostTriggers)){
+			$triggersList = array();
+			foreach($hostTriggers as $hostTrigger){
+				$triggersList[$hostTrigger['triggerid']] = $hostTrigger['description'];
 			}
-			$hostList->addRow(S_TRIGGERS, $trig_lbx);
+			order_result($triggersList);
+
+			$listBox = new CListBox('triggers', null, 8);
+			$listBox->setAttribute('disabled', 'disabled');
+			$listBox->addItems($triggersList);
+
+			$hostList->addRow(_('Triggers'), $listBox);
 		}
-// Host graphs
-		$options = array(
-			'inherited' => 0,
+
+// Graphs
+		$hostGraphs = CGraph::get(array(
+			'inherited' => false,
 			'hostids' => $_REQUEST['hostid'],
-			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CHILD)),
+			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL)),
 			'selectHosts' => API_OUTPUT_REFER,
 			'output' => API_OUTPUT_EXTEND,
-		);
-		$host_graphs = CGraph::get($options);
-
-		if(!empty($host_graphs)){
-			$graphs_lbx = new CListBox('graphs', null, 8);
-			$graphs_lbx->setAttribute('disabled', 'disabled');
-
-			order_result($host_graphs, 'name');
-			foreach($host_graphs as $hgraph){
-				if(count($hgraph['hosts']) > 1) continue;
-				$graphs_lbx->addItem($hgraph['graphid'], $hgraph['name']);
+		));
+		if(!empty($hostGraphs)){
+			$graphsList = array();
+			foreach($hostGraphs as $hostGraph){
+				if(count($hostGraph['hosts']) == 1){
+					$graphsList[$hostGraph['graphid']] = $hostGraph['name'];
+				}
 			}
+			order_result($graphsList);
 
-			$hostList->addRow(S_GRAPHS, $graphs_lbx);
+			$listBox = new CListBox('graphs', null, 8);
+			$listBox->setAttribute('disabled', 'disabled');
+			$listBox->addItems($graphsList);
+
+			$hostList->addRow(_('Graphs'), $listBox);
 		}
 
-// discovery rules
-		$options = array(
-			'inherited' => 0,
+// Discovery rules
+		$hostDiscoveryRuleids = array();
+
+		$hostDiscoveryRules = CDiscoveryRule::get(array(
+			'inherited' => false,
 			'hostids' => $_REQUEST['hostid'],
 			'output' => API_OUTPUT_EXTEND,
-			'filter' => array('flags' => ZBX_FLAG_DISCOVERY),
-			'webitems' => 1,
-		);
-		$host_items = CItem::get($options);
-
-		if(!empty($host_items)){
-			$items_lbx = new CListBox('items', null, 8);
-			$items_lbx->setAttribute('disabled', 'disabled');
-
-			order_result($host_items, 'description');
-			foreach($host_items as $hitem){
-				$items_lbx->addItem($hitem['itemid'], item_description($hitem));
+		));
+		if(!empty($hostDiscoveryRules)){
+			$discoveryRuleList = array();
+			foreach($hostDiscoveryRules as $discoveryRule){
+				$discoveryRuleList[$discoveryRule['itemid']] = item_description($discoveryRule);
 			}
-			$hostList->addRow(S_DISCOVERY_RULES, $items_lbx);
+			order_result($discoveryRuleList);
+			$hostDiscoveryRuleids = array_keys($discoveryRuleList);
+
+			$listBox = new CListBox('discoveryRules', null, 8);
+			$listBox->setAttribute('disabled', 'disabled');
+			$listBox->addItems($discoveryRuleList);
+
+			$hostList->addRow(_('Discovery rules'), $listBox);
+		}
+
+// Item prototypes
+		$hostItemPrototypes = CItemPrototype::get(array(
+			'hostids' => $_REQUEST['hostid'],
+			'discoveryids' => $hostDiscoveryRuleids,
+			'inherited' => false,
+			'output' => API_OUTPUT_EXTEND,
+		));
+		if(!empty($hostItemPrototypes)){
+			$prototypeList = array();
+			foreach($hostItemPrototypes as $itemPrototype){
+				$prototypeList[$itemPrototype['itemid']] = item_description($itemPrototype);
+			}
+			order_result($prototypeList);
+
+			$listBox = new CListBox('itemsPrototypes', null, 8);
+			$listBox->setAttribute('disabled', 'disabled');
+			$listBox->addItems($prototypeList);
+
+			$hostList->addRow(_('Item prototypes'), $listBox);
+		}
+
+// Trigger prototypes
+		$hostTriggerPrototypes = CTriggerPrototype::get(array(
+			'hostids' => $_REQUEST['hostid'],
+			'discoveryids' => $hostDiscoveryRuleids,
+			'inherited' => false,
+			'output' => API_OUTPUT_EXTEND,
+			'expandDescription' => true,
+		));
+		if(!empty($hostTriggerPrototypes)){
+			$prototypeList = array();
+			foreach($hostTriggerPrototypes as $triggerPrototype){
+				$prototypeList[$triggerPrototype['triggerid']] = $triggerPrototype['description'];
+			}
+			order_result($prototypeList);
+
+			$listBox = new CListBox('triggerprototypes', null, 8);
+			$listBox->setAttribute('disabled', 'disabled');
+			$listBox->addItems($prototypeList);
+
+			$hostList->addRow(_('Trigger prototypes'), $listBox);
+		}
+
+// Graph prototypes
+		$hostGraphPrototypes = CGraphPrototype::get(array(
+			'hostids' => $_REQUEST['hostid'],
+			'discoveryids' => $hostDiscoveryRuleids,
+			'inherited' => false,
+			'selectHosts' => API_OUTPUT_COUNT,
+			'output' => API_OUTPUT_EXTEND,
+		));
+		if(!empty($hostGraphPrototypes)){
+			$prototypeList = array();
+			foreach($hostGraphPrototypes as $graphPrototype){
+				if(count($graphPrototype['hosts']) == 1){
+					$prototypeList[$graphPrototype['graphid']] = $graphPrototype['name'];
+				}
+			}
+			order_result($prototypeList);
+
+			$listBox = new CListBox('graphPrototypes', null, 8);
+			$listBox->setAttribute('disabled', 'disabled');
+			$listBox->addItems($prototypeList);
+
+			$hostList->addRow(_('Graph prototypes'), $listBox);
 		}
 	}
 

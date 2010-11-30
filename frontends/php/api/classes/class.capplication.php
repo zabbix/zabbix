@@ -607,9 +607,9 @@ COpt::memoryPick();
 // TODO: remove $nopermissions hack
 			$options = array(
 				'applicationids' => $applicationids,
-				'editable' => 1,
+				'editable' => true,
 				'output' => API_OUTPUT_EXTEND,
-				'preservekeys' => 1
+				'preservekeys' => true,
 			);
 			$del_applications = self::get($options);
 
@@ -625,16 +625,26 @@ COpt::memoryPick();
 			}
 
 
-			$parent_applicationids = $applicationids;
+			$parent_applicationids = $child_applications = $applicationids;
 			do{
 				$db_applications = DBselect('SELECT applicationid FROM applications WHERE ' . DBcondition('templateid', $parent_applicationids));
 				$parent_applicationids = array();
 				while($db_application = DBfetch($db_applications)){
 					$parent_applicationids[] = $db_application['applicationid'];
-					$applicationids[$db_application['applicationid']] = $db_application['applicationid'];
+					$child_applications[$db_application['applicationid']] = $db_application['applicationid'];
 				}
 			} while(!empty($parent_applicationids));
 
+			$options = array(
+				'applicationids' => array_diff($child_applications, $applicationids),
+				'output' => API_OUTPUT_EXTEND,
+				'nopermissions' => true,
+				'preservekeys' => true,
+			);
+			$del_application_childs = self::get($options);
+
+			$del_applications = array_merge($del_applications, $del_application_childs);
+			$applicationids = array_merge($applicationids, $child_applications);
 
 //check if app is used by web scenario
 			$sql = 'SELECT ht.name, ht.applicationid '.
@@ -651,7 +661,7 @@ COpt::memoryPick();
 
 // TODO: remove info from API
 			foreach($del_applications as $del_application){
-				info(S_APPLICATION.' ['.$del_application['name'].'] '.S_DELETED_SMALL);
+				info(sprintf(_('Application [%1$s] deleted'), $del_application['name']));
 			}
 
 			self::EndTransaction(true, __METHOD__);

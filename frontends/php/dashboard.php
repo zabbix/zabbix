@@ -277,7 +277,7 @@ $left_col = array();
 						CProfile::get('web.dashboard.hats.hat_favgrph.state',1)
 						);
 	$fav_grph->setHeader(S_FAVOURITE_GRAPHS,array($graph_menu));
-	$fav_grph->setFooter(new CLink(S_GRAPHS.' &raquo;','graphs.php','highlight'), true);
+	$fav_grph->setFooter(new CLink(S_GRAPHS.' &raquo;','charts.php','highlight'), true);
 	$left_col[] = $fav_grph;
 //----------------
 

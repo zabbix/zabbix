@@ -386,11 +386,10 @@ include_once('include/page_header.php');
 		}
 // }}} CREATE/UPDATE TEMPLATE
 
-// FULL_CLONE {
-
+// FULL_CLONE {{{
 		if(!zbx_empty($templateid) && $templateid && $clone_templateid && ($_REQUEST['form'] == 'full_clone')){
 
-			if(!copy_applications($clone_hostid, $hostid)) throw new Exception();
+			if(!copy_applications($clone_templateid, $templateid)) $result = false;
 
 // Host items
 			$sql = 'SELECT DISTINCT i.itemid, i.description '.
@@ -417,7 +416,7 @@ include_once('include/page_header.php');
 				$result &= (bool) copy_graph_to_host($db_graph['graphid'], $templateid);
 			}
 		}
-// }
+// }}} FULL_CLONE
 
 		$result = DBend($result);
 

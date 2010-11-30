@@ -1294,7 +1294,6 @@ COpt::memoryPick();
  */
 	public static function create($triggers){
 		$triggers = zbx_toArray($triggers);
-		$triggerids = array();
 
 		try{
 			self::BeginTransaction(__METHOD__);
@@ -1313,7 +1312,7 @@ COpt::memoryPick();
 				$expressionData = parseTriggerExpressions($trigger['expression'], true);
 
 				if(isset($expressionData[$trigger['expression']]['errors'])){
-					self::exception(API_ERROR_PARAMETERS, $expressionData[$trigger['expression']]['errors']);
+					self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData[$trigger['expression']]['errors']);
 				}
 
 				if(CTrigger::exists(array(
@@ -1331,7 +1330,7 @@ COpt::memoryPick();
 				self::inherit($trigger);
 
 			self::EndTransaction(true, __METHOD__);
-			return array('triggerids' => $triggerids);
+			return array('triggerids' => zbx_objectValues($triggers, 'triggerid'));
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);

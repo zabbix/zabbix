@@ -171,67 +171,162 @@
 
 // FULL CLONE {
 	if($_REQUEST['form'] == 'full_clone'){
-// FORM ITEM : Template items
-		$items_lbx = new CListBox('items', null, 8);
-		$items_lbx->setAttribute('disabled', 'disabled');
-
-		$options = array(
-			'editable' => 1,
+// Items
+		$hostItems = CItem::get(array(
 			'hostids' => $templateid,
-			'output' => API_OUTPUT_EXTEND
-		);
-		$template_items = CItem::get($options);
-
-		if(empty($template_items)){
-			$items_lbx->setAttribute('style', 'width: 200px;');
-		}
-		else{
-			foreach($template_items as $inum => $titem){
-				$item_description = item_description($titem);
-				$items_lbx->addItem($titem['itemid'], $item_description);
-			}
-		}
-		$templateList->addRow(S_ITEMS, $items_lbx);
-
-
-// FORM ITEM : Template triggers
-		$trig_lbx = new CListBox('triggers', null, 8);
-		$trig_lbx->setAttribute('disabled', 'disabled');
-
-		$template_triggers = CTrigger::get(array(
-			'hostids' => $templateid,
-			'editable' => true, 
-			'output' => API_OUTPUT_EXTEND
+			'inherited' => false,
+			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
+			'output' => API_OUTPUT_EXTEND,
 		));
-
-		if(empty($template_triggers)){
-			$trig_lbx->setAttribute('style','width: 200px;');
-		}
-		else{
-			foreach($template_triggers as $tnum => $ttrigger){
-				$trigger_description = expand_trigger_description($ttrigger['triggerid']);
-				$trig_lbx->addItem($ttrigger['triggerid'], $trigger_description);
+		if(!empty($hostItems)){
+			$itemsList = array();
+			foreach($hostItems as $hostItem){
+				$itemsList[$hostItem['itemid']] = item_description($hostItem);
 			}
+			order_result($itemsList);
+
+			$listBox = new CListBox('items', null, 8);
+			$listBox->setAttribute('disabled', 'disabled');
+			$listBox->addItems($itemsList);
+
+			$templateList->addRow(_('Items'), $listBox);
 		}
-		$templateList->addRow(S_TRIGGERS, $trig_lbx);
 
-
-// FORM ITEM : Host graphs
-		$graphs_lbx = new CListBox('graphs', null, 8);
-		$graphs_lbx->setAttribute('disabled', 'disabled');
-
-		$options = array('editable' => 1, 'hostids' => $templateid, 'output' => API_OUTPUT_EXTEND);
-		$template_graphs = CGraph::get($options);
-
-		if(empty($template_graphs)){
-			$graphs_lbx->setAttribute('style','width: 200px;');
-		}
-		else{
-			foreach($template_graphs as $tnum => $tgraph){
-				$graphs_lbx->addItem($tgraph['graphid'], $tgraph['name']);
+// Triggers
+		$hostTriggers = CTrigger::get(array(
+			'inherited' => false,
+			'hostids' => $templateid,
+			'output' => API_OUTPUT_EXTEND,
+			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL)),
+			'expandDescription' => true,
+		));
+		if(!empty($hostTriggers)){
+			$triggersList = array();
+			foreach($hostTriggers as $hostTrigger){
+				$triggersList[$hostTrigger['triggerid']] = $hostTrigger['description'];
 			}
+			order_result($triggersList);
+
+			$listBox = new CListBox('triggers', null, 8);
+			$listBox->setAttribute('disabled', 'disabled');
+			$listBox->addItems($triggersList);
+
+			$templateList->addRow(_('Triggers'), $listBox);
 		}
-		$templateList->addRow(S_GRAPHS, $graphs_lbx);
+
+// Graphs
+		$hostGraphs = CGraph::get(array(
+			'inherited' => false,
+			'hostids' => $templateid,
+			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL)),
+			'selectHosts' => API_OUTPUT_REFER,
+			'output' => API_OUTPUT_EXTEND,
+		));
+		if(!empty($hostGraphs)){
+			$graphsList = array();
+			foreach($hostGraphs as $hostGraph){
+				if(count($hostGraph['hosts']) == 1){
+					$graphsList[$hostGraph['graphid']] = $hostGraph['name'];
+				}
+			}
+			order_result($graphsList);
+
+			$listBox = new CListBox('graphs', null, 8);
+			$listBox->setAttribute('disabled', 'disabled');
+			$listBox->addItems($graphsList);
+
+			$templateList->addRow(_('Graphs'), $listBox);
+		}
+
+// Discovery rules
+		$hostDiscoveryRuleids = array();
+
+		$hostDiscoveryRules = CDiscoveryRule::get(array(
+			'inherited' => false,
+			'hostids' => $templateid,
+			'output' => API_OUTPUT_EXTEND,
+		));
+		if(!empty($hostDiscoveryRules)){
+			$discoveryRuleList = array();
+			foreach($hostDiscoveryRules as $discoveryRule){
+				$discoveryRuleList[$discoveryRule['itemid']] = item_description($discoveryRule);
+			}
+			order_result($discoveryRuleList);
+			$hostDiscoveryRuleids = array_keys($discoveryRuleList);
+
+			$listBox = new CListBox('discoveryRules', null, 8);
+			$listBox->setAttribute('disabled', 'disabled');
+			$listBox->addItems($discoveryRuleList);
+
+			$templateList->addRow(_('Discovery rules'), $listBox);
+		}
+
+// Item prototypes
+		$hostItemPrototypes = CItemPrototype::get(array(
+			'hostids' => $templateid,
+			'discoveryids' => $hostDiscoveryRuleids,
+			'inherited' => false,
+			'output' => API_OUTPUT_EXTEND,
+		));
+		if(!empty($hostItemPrototypes)){
+			$prototypeList = array();
+			foreach($hostItemPrototypes as $itemPrototype){
+				$prototypeList[$itemPrototype['itemid']] = item_description($itemPrototype);
+			}
+			order_result($prototypeList);
+
+			$listBox = new CListBox('itemsPrototypes', null, 8);
+			$listBox->setAttribute('disabled', 'disabled');
+			$listBox->addItems($prototypeList);
+
+			$templateList->addRow(_('Item prototypes'), $listBox);
+		}
+
+// Trigger prototypes
+		$hostTriggerPrototypes = CTriggerPrototype::get(array(
+			'hostids' => $templateid,
+			'discoveryids' => $hostDiscoveryRuleids,
+			'inherited' => false,
+			'output' => API_OUTPUT_EXTEND,
+			'expandDescription' => true,
+		));
+		if(!empty($hostTriggerPrototypes)){
+			$prototypeList = array();
+			foreach($hostTriggerPrototypes as $triggerPrototype){
+				$prototypeList[$triggerPrototype['triggerid']] = $triggerPrototype['description'];
+			}
+			order_result($prototypeList);
+
+			$listBox = new CListBox('triggerprototypes', null, 8);
+			$listBox->setAttribute('disabled', 'disabled');
+			$listBox->addItems($prototypeList);
+
+			$templateList->addRow(_('Trigger prototypes'), $listBox);
+		}
+
+// Graph prototypes
+		$hostGraphPrototypes = CGraphPrototype::get(array(
+			'hostids' => $templateid,
+			'discoveryids' => $hostDiscoveryRuleids,
+			'inherited' => false,
+			'selectHosts' => API_OUTPUT_COUNT,
+			'output' => API_OUTPUT_EXTEND,
+		));
+		if(!empty($hostGraphPrototypes)){
+			$prototypeList = array();
+			foreach($hostGraphPrototypes as $graphPrototype){
+				if(count($graphPrototype['hosts']) == 1){
+					$prototypeList[$graphPrototype['graphid']] = $graphPrototype['name'];
+				}
+			}
+			order_result($prototypeList);
+
+			$listBox = new CListBox('graphPrototypes', null, 8);
+			$listBox->setAttribute('disabled', 'disabled');
+			$listBox->addItems($prototypeList);
+
+			$templateList->addRow(_('Graph prototypes'), $listBox);
+		}
 	}
 
 	$divTabs->addTab('templateTab', S_TEMPLATE, $templateList);

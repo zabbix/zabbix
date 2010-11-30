@@ -597,33 +597,21 @@ include_once('include/page_header.php');
 // FULL CLONE {{{
 			if($clone_hostid && ($_REQUEST['form'] == 'full_clone')){
 				if(!copy_applications($clone_hostid, $hostid)) throw new Exception();
-
 // Host items
-				$sql = 'SELECT DISTINCT i.itemid, i.description '.
-						' FROM items i '.
-						' WHERE i.hostid='.$clone_hostid.
-							' AND i.templateid IS NULL '.
-								' AND i.flags<>'.ZBX_FLAG_DISCOVERY_CREATED.
-						' ORDER BY i.description';
-				$res = DBselect($sql);
-				while($db_item = DBfetch($res)){
-					if(!copy_item_to_host($db_item['itemid'], $hostid)) throw new Exception();
-				}
-
+				if(!copyItems($clone_hostid, $hostid)) throw new Exception();
 // Host triggers
 				if(!copy_triggers($clone_hostid, $hostid)) throw new Exception();
-
 // Host graphs
 				$options = array(
-					'inherited' => 0,
 					'hostids' => $clone_hostid,
-					'selectHosts' => API_OUTPUT_REFER,
-						'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY, ZBX_FLAG_DISCOVERY_CHILD, ZBX_FLAG_DISCOVERY_NORMAL)),
 					'output' => API_OUTPUT_EXTEND,
+					'inherited' => 0,
+					'selectHosts' => API_OUTPUT_COUNT,
+					'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 				);
 				$graphs = CGraph::get($options);
 				foreach($graphs as $gnum => $graph){
-					if(count($graph['hosts']) > 1) continue;
+					if($graph['hosts'] > 1) continue;
 						if(!copy_graph_to_host($graph['graphid'], $hostid)) throw new Exception();
 				}
 			}

@@ -545,6 +545,10 @@ COpt::memoryPick();
 		}
 
 		foreach($items as $inum => &$item){
+			$current_item = $items[$inum];
+			check_db_fields($current_item, $dbItems[$item['itemid']]);
+
+
 			if(!check_db_fields($item_db_fields, $item)){
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION);
 			}
@@ -621,12 +625,12 @@ COpt::memoryPick();
 				}
 			}
 
-			if(isset($item['port'])){
-				if(zbx_ctype_digit($item['port']) && ($item['port']>0) && ($item['port']<65535)){}
-				else if(preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/u', $item['port'])){}
-				else{
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_INVALID_PORT);
-				}
+			if((isset($item['port']) && !empty($item['port']))
+				&& (!(zbx_ctype_digit($item['port']) && ($item['port']>0) && ($item['port']<65535))
+				|| !preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/u', $item['port']))
+			){
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					sprintf(_('Item [%1$s:%2$s] has invalid port: "%3$s".'), $current_item['description'], $current_item['key_'], $item['port']));
 			}
 
 			if(isset($item['value_type'])){
@@ -872,18 +876,32 @@ COpt::memoryPick();
 	public static function delete($ruleids, $nopermissions=false){
 		if(empty($ruleids)) return true;
 
-		$ruleids = zbx_toArray($ruleids);
 		$ruleids = zbx_toHash($ruleids);
 
 		try{
 			self::BeginTransaction(__METHOD__);
 
+			$options = array(
+				'itemids' => $ruleids,
+				'editable' => 1,
+				'preservekeys' => 1,
+				'output' => API_OUTPUT_EXTEND,
+			);
+			$del_items = self::get($options);
+
+// TODO: remove $nopermissions hack
 			if(!$nopermissions){
-				self::checkInput($items, __FUNCTION__);
+				foreach($ruleids as $ruleid){
+					if(!isset($del_items[$ruleid])){
+						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
+					}
+					if($del_items[$ruleid]['templateid'] != 0){
+						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete templated items');
+					}
+				}
 			}
 
 // first delete child items
-
 			$parent_itemids = $ruleids;
 			do{
 				$db_items = DBselect('SELECT itemid FROM items WHERE ' . DBcondition('templateid', $parent_itemids));
@@ -933,6 +951,11 @@ COpt::memoryPick();
 			}
 			DB::insert('housekeeper', $insert);
 // }}} HOUSEKEEPER
+
+// TODO: remove info from API
+			foreach($del_items as $item){
+				info(sprintf(_('Discovery rule [%1$s:%2$s] deleted'), $item['description'], $item['key_']));
+			}
 
 			self::EndTransaction(true, __METHOD__);
 			return array('ruleids' => $ruleids);
