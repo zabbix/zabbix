@@ -485,8 +485,8 @@ include_once('include/page_header.php');
 	if(!isset($_REQUEST['form'])){
 		$frmForm->cleanItems();
 		$buttons = new CDiv(array(
-			new CSubmit('form', S_CREATE_TEMPLATE),
-			new CSubmit('form', S_IMPORT_TEMPLATE)
+			new CSubmit('form', S_CREATE),
+			new CSubmit('form', S_IMPORT)
 		));
 		$buttons->useJQueryStyle();
 		$frmForm->addItem($buttons);

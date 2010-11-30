@@ -61,23 +61,17 @@ table.tableinfo tr:hover td.inactive			{	background-color: #FA8388;	border: 1px 
 	width: 15px;
 }
 
-div.objectlist ul li{
+ul.objectlist li{
 	display: inline;
 }
 
-div.formlist ul li div.dd{
+ul.formlist li div.dd{
 	padding-left: 1%;
 }
 
 /* Sortable */
-.mainwidget{ width: 90% }
-.column{ float: none;}
+.column{ }
 
-.column .widget{  }
+.footer .dt input.main{ height: 25px; }
+.footer .dd { padding-left: 1%; }
 
-.column .widget .header { }
-.column .widget .body { }
-
-.widget .header .menu_icon{ }
-
-.widget .footer {  }

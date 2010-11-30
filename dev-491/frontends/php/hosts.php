@@ -704,8 +704,8 @@ include_once('include/page_header.php');
 // removes form_refresh variable
 		$frmForm->cleanItems();
 		$buttons = new CDiv(array(
-			new CSubmit('form', S_CREATE_HOST),
-			new CSubmit('form', S_IMPORT_HOST)
+			new CSubmit('form', S_CREATE),
+			new CSubmit('form', S_IMPORT)
 		));
 		$buttons->useJQueryStyle();
 		$frmForm->addItem($buttons);
