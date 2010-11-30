@@ -2050,7 +2050,7 @@ this.selementForm.urls = e_tr_4;
 	var e_input_6 = document.createElement('input');
 	e_input_6.setAttribute('type',"button");
 	e_input_6.setAttribute('name',"apply");
-	e_input_6.className = "input button";
+	e_input_6.className = "input button shadow";
 	e_input_6.setAttribute('value',locale['S_APPLY']);
 
 
@@ -2063,7 +2063,7 @@ this.selementForm.urls = e_tr_4;
 	var e_input_6 = document.createElement('input');
 	e_input_6.setAttribute('type',"button");
 	e_input_6.setAttribute('name',"remove");
-	e_input_6.className = "input button";
+	e_input_6.className = "input button shadow";
 	e_input_6.setAttribute('value',locale['S_REMOVE']);
 
 	addListener(e_input_6, 'click', this.form_selement_delete.bindAsEventListener(this));
@@ -2075,7 +2075,7 @@ this.selementForm.urls = e_tr_4;
 	var e_input_6 = document.createElement('input');
 	e_input_6.setAttribute('type',"button");
 	e_input_6.setAttribute('name',"close");
-	e_input_6.className = "input button";
+	e_input_6.className = "input button shadow";
 	e_input_6.setAttribute('value',locale['S_CLOSE']);
 
 	addListener(e_input_6, 'click', this.formHide.bindAsEventListener(this));
@@ -2853,7 +2853,7 @@ this.linkForm.colorPicker = e_div_6;
 	var e_input_6 = document.createElement('input');
 	e_input_6.setAttribute('type',"button");
 	e_input_6.setAttribute('name',"apply");
-	e_input_6.className = "input button";
+	e_input_6.className = "input button shadow";
 	e_input_6.setAttribute('value',locale['S_APPLY']);
 	e_td_5.appendChild(e_input_6);
 	addListener(e_input_6, 'click', this.form_link_save.bindAsEventListener(this));
@@ -2865,7 +2865,7 @@ this.linkForm.colorPicker = e_div_6;
 	var e_input_6 = document.createElement('input');
 	e_input_6.setAttribute('type',"button");
 	e_input_6.setAttribute('name',"remove");
-	e_input_6.className = "input button";
+	e_input_6.className = "input button shadow";
 	e_input_6.setAttribute('value',locale['S_REMOVE']);
 	e_td_5.appendChild(e_input_6);
 	addListener(e_input_6, 'click', this.form_link_delete.bindAsEventListener(this));
@@ -2877,7 +2877,7 @@ this.linkForm.colorPicker = e_div_6;
 	var e_input_6 = document.createElement('input');
 	e_input_6.setAttribute('type',"button");
 	e_input_6.setAttribute('name',"close");
-	e_input_6.className = "input button";
+	e_input_6.className = "input button shadow";
 	e_input_6.setAttribute('value',locale['S_CLOSE']);
 	addListener(e_input_6, 'click', this.form_link_hide.bindAsEventListener(this));
 

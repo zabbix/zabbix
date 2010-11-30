@@ -425,9 +425,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 
 //------------------------------------- <HISTORY> ---------------------------------------
 	if(isset($page['hist_arg']) && ($USER_DETAILS['alias'] != ZBX_GUEST_USER) && ($page['type'] == PAGE_TYPE_HTML) && !defined('ZBX_PAGE_NO_MENU')){
-		$table = new CTable();
-		$table->setClass('history');
-
+		$table = new CTable(null,'history');
 		$table->setCellSpacing(0);
 		$table->setCellPadding(0);
 

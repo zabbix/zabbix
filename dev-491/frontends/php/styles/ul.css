@@ -9,37 +9,58 @@ ul.itservices{
 	margin-left: 5px;
 }
 
-ul.messages{
-	overflow:auto;
-	vertical-align: top;
-	background-color: #FFFFFF;
-	margin: 1px;
-	text-align:left;
-}
-
-ul.messages li{
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 1.1em;
-	line-height: 18px;
-}
-
-ul.messages li.info{
-	color:#000000;
-	list-style: url("../images/general/warning_small.gif") inside;
-}
-
-ul.messages li.error{
-	color:#AA0000;
-	list-style: url("../images/general/error_small.gif") inside;
-}
-
-
 ul li.linear{
 	float: left;
 	list-style-type: none;
 	margin-right: 2px;
 }
 
+/* Form field list*/
+ul.formlist{
+	list-style-type: none;
+	margin: 0px;
+	padding: 0px;
+	width: 100%;
+}
+
+ul.formlist li{
+	padding: 2px;
+	width: 100%;
+	height: 100%;
+	vertical-align: middle;
+}
+
+ul.formlist li div.dt{
+	width: 20%;
+	float: left;
+	text-align: right;
+	white-space: nowrap;
+}
+
+ul.formlist li div.dd{
+	width: 77%;
+	padding-left: 21%;
+}
+
+/* Any object list inline */
+ul.objectlist {
+	padding: 0px;
+	list-style: none;
+	margin: 0px;
+}
+
+ul.objectlist li{
+	display: inline-block;
+	margin: 2px 10px 2px 5px;
+	white-space: nowrap;
+	font-size: 1.1em;
+}
+
+ul.objectlist li.selected{
+	font-weight: bold;
+	font-size: 1.2em;
+}
+/* FAVORITES */
 ul.favorites{
 	vertical-align: top;
 	margin: 8px 4px 8px 0px;
@@ -65,4 +86,29 @@ ul.favorites li.empty{
 ul.favorites li a{
 	line-height: 18px;
 	vertical-align: top;
+}
+
+/* GUI messages */
+ul.messages{
+	overflow:auto;
+	vertical-align: top;
+	background-color: #FFFFFF;
+	margin: 1px;
+	text-align:left;
+}
+
+ul.messages li{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 1.1em;
+	line-height: 18px;
+}
+
+ul.messages li.info{
+	color:#000000;
+	list-style: url("../images/general/warning_small.gif") inside;
+}
+
+ul.messages li.error{
+	color:#AA0000;
+	list-style: url("../images/general/error_small.gif") inside;
 }

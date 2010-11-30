@@ -64,7 +64,7 @@ initialize: function(screenid, obj_id, id){
 	jQuery('.draggable').draggable({
 		revert: 'invalid',
 //		scroll: false,
-		opacity: 0.5,
+		opacity: 0.8,
 		start: function(){
 			if(IE){
 				Event.observe(document.body, "drag", wedge, false);
@@ -75,7 +75,7 @@ initialize: function(screenid, obj_id, id){
 
 	jQuery(".cntr_mdl").droppable({
 		accept: '.draggable',
-		hoverClass: 'hoverclass123',
+		hoverClass: 'ui-sortable-placeholder',
 		drop: this.on_drop.bind(this),
 		tolerance: 'pointer'
 	});

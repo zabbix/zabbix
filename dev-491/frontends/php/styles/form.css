@@ -2,7 +2,7 @@
 
 form { margin: 0 }
 
-form.thin .input{
+form .thin .input{
 	height: 14px;
 }
 
@@ -62,7 +62,6 @@ form.thin .input{
 }
 
 .link_menu:hover{ color: #6C80B9; border-bottom: 1px dotted #6C80B9;}
-
 .link_menu[disabled]{ color: grey; text-decoration: none; corsor: default; border: 0px; }
 
 /******************* CHECKBOX *********************/

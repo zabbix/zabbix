@@ -137,10 +137,11 @@ include_once('include/page_header.php');
 		array(bold(S_PORT.': '), new CTextBox('filter_port', $_REQUEST['filter_port'], 20))
 	));
 
-	$reset = new CSpan( S_RESET,'biglink');
+	$reset = new CSpan(S_RESET,'menu_link');
 	$reset->onClick("javascript: clearAllForm('zbx_filter');");
-	$filter = new CSpan(S_FILTER,'biglink');
-	$filter->onClick("javascript: create_var('zbx_filter', 'filter_set', '1', true);");
+
+	$filter = new CButton('filter', S_FILTER, "javascript: create_var('zbx_filter', 'filter_set', '1', true);");
+	$filter->useJQueryStyle();
 
 	$footer_col = new CCol(array($filter, SPACE, SPACE, SPACE, $reset), 'center');
 	$footer_col->setColSpan(4);

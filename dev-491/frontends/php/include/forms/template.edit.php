@@ -301,18 +301,17 @@
 	$frmHost->addItem($divTabs);
 
 // Footer
-	$host_footer = new CDiv();
-	$host_footer->addItem(new CSubmit('save', S_SAVE));
-
+	$main = array(new CSubmit('save', S_SAVE));
+	$others = array();
 	if(($templateid > 0) && ($_REQUEST['form'] != 'full_clone')){
-		$host_footer->addItem(new CSubmit('clone', S_CLONE));
-		$host_footer->addItem(new CSubmit('full_clone', S_FULL_CLONE));
-		$host_footer->addItem(new CButtonDelete(S_DELETE_TEMPLATE_Q,  url_param('form').url_param('templateid').url_param('groupid')));
-		$host_footer->addItem(new CButtonQMessage('delete_and_clear', S_DELETE_AND_CLEAR, S_DELETE_AND_CLEAR_TEMPLATE_Q, url_param('form').url_param('templateid').url_param('groupid')));
+		$others[] = new CSubmit('clone', S_CLONE);
+		$others[] = new CSubmit('full_clone', S_FULL_CLONE);
+		$others[] = new CButtonDelete(S_DELETE_TEMPLATE_Q,  url_param('form').url_param('templateid').url_param('groupid'));
+		$others[] = new CButtonQMessage('delete_and_clear', S_DELETE_AND_CLEAR, S_DELETE_AND_CLEAR_TEMPLATE_Q, url_param('form').url_param('templateid').url_param('groupid'));
 	}
-	$host_footer->addItem(new CButtonCancel(url_param('groupid')));
-	$host_footer->useJQueryStyle();
-	$frmHost->addItem(new CDiv($host_footer, 'objectlist'));
+	$others[] = new CButtonCancel(url_param('groupid'));
 
+	$frmHost->addItem(makeFormFooter($main, $others));
+	
 return $frmHost;
 ?>

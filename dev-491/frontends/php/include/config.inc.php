@@ -85,30 +85,27 @@ function __autoload($class_name){
 	require_once('include/html.inc.php');
 	require_once('include/copt.lib.php');
 	require_once('include/profiles.inc.php');
+
 	require_once('conf/maintenance.inc.php');
-
-	require_once('include/nodes.inc.php');
-	require_once('include/hosts.inc.php');
-	require_once('include/items.inc.php');
-	require_once('include/triggers.inc.php');
-	require_once('include/graphs.inc.php');
-
-	require_once('include/maps.inc.php');
+// ABC sorting
 	require_once('include/acknow.inc.php');
-	require_once('include/services.inc.php');
-	require_once('include/httptest.inc.php');
-
 	include_once('include/actions.inc.php');
-	include_once('include/discovery.inc.php');
-
-	require_once('include/sounds.inc.php');
-	require_once('include/images.inc.php');
+	include_once('include/discovery.inc.php');	
 	require_once('include/events.inc.php');
-	require_once('include/maintenances.inc.php');
-	require_once('include/valuemap.inc.php');
-
-	require_once('include/users.inc.php');
+	require_once('include/graphs.inc.php');
+	require_once('include/hosts.inc.php');
+	require_once('include/httptest.inc.php');
 	require_once('include/ident.inc.php');
+	require_once('include/images.inc.php');
+	require_once('include/items.inc.php');
+	require_once('include/maintenances.inc.php');
+	require_once('include/maps.inc.php');
+	require_once('include/nodes.inc.php');
+	require_once('include/services.inc.php');
+	require_once('include/sounds.inc.php');
+	require_once('include/triggers.inc.php');
+	require_once('include/users.inc.php');
+	require_once('include/valuemap.inc.php');
 // GLOBALS
 	global $USER_DETAILS, $USER_RIGHTS, $page;
 

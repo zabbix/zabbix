@@ -395,7 +395,7 @@ include_once('include/page_header.php');
 					$crow->setAttribute('style','background-color: '.sprintf("#%X%X%X",$int_color,$int_color,$int_color));
 				}
 				else if(!is_null($color_style)){
-					$crow->setClass($color_style);
+					$crow->setAttribute('class', $color_style);
 				}
 
 				$table->addRow($crow);

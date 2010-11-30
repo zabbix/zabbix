@@ -26,7 +26,7 @@ public $emptyList;
 		parent::__construct('ul','yes');
 		$this->tag_end = '';
 		$this->addItem($value);
-		$this->setClass($class);
+		$this->setAttribute('class', $class);
 
 		if(is_null($value)){
 			$this->addItem(_('List is empty'), 'empty');
