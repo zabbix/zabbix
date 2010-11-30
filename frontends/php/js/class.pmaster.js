@@ -353,8 +353,8 @@ updateSortable: function(){
         forcePlaceholderSize: true,
         placeholder: 'widget ui-corner-all ui-sortable-placeholder',
         opacity: '0.8',
-		update: function(e, ui){ jQuery(".column").sortableOrder("save", {"name": "dashboard"}); }
-	}).sortableOrder("load", {"name": "dashboard"});
+		update: function(e, ui){ jQuery(".column").portletState("save", {"name": "dashboard"}); }
+	}).portletState("load", {"name": "dashboard"});
 
 	jQuery(".column").disableSelection();
 }
@@ -366,7 +366,7 @@ updateSortable: function(){
 		save: function( method, options ) {
 			var settings = {
 				'name':		'sortableOrder',
-				'search':	'.widget'
+				'sortable':	'.widget'
 			};
 
 			$.extend(settings, options);
@@ -374,7 +374,7 @@ updateSortable: function(){
 			var positions = {};
 			this.each(function(colNum, column) {
 				positions[colNum] = {};
-				$(column).find(settings.search).each(function(rowNum, widget){
+				$(column).find(settings.sortable).each(function(rowNum, widget){
 					positions[colNum][rowNum] = widget.id;
 				});
 			});
@@ -387,7 +387,7 @@ updateSortable: function(){
 		load: function( method, options ) {
 			var settings = {
 				'name':		'sortableOrder',
-				'search':	'.widget'
+				'sortable':	'.widget'
 			};
 
 			$.extend(settings, options);
@@ -408,17 +408,14 @@ updateSortable: function(){
 		}
 	};
 
-	$.fn.sortableOrder = function(method, options) {
+	$.fn.portletState = function(method, options) {
 // Method calling logic
 
 		if( isset(method, methods) ){
 			return methods[method].apply(this, arguments);
 		}
-		else if(typeof(method) === 'object' || !method){
-			return methods.init.apply(this, arguments);
-		}
 		else{
-			$.error( 'Method ' +  method + ' does not exist on jQuery.tooltip' );
+			$.error( 'Method ' +  method + ' does not exist on jQuery.portletState' );
 		}
 	}
 })(jQuery);
