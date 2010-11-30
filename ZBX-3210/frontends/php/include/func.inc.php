@@ -1414,7 +1414,7 @@ function make_refresh_menu($pmid,$dollid,$cur_interval,$params=null,&$menu,&$sub
 function bcceil($number) {
     if (strpos($number, '.') !== false) {
 		//3.000000 is the same as 3
-		if (preg_match("/\.[0]+$/i", $number)) {
+		if (preg_match("/\.[0]+$/", $number)) {
 			return bcround($number, 0);
 		}
 
@@ -1425,14 +1425,14 @@ function bcceil($number) {
         return bcsub($number, 0, 0);
     }
 
-    return $number;
+    return $number == '-0' ? '0' : $number;
 }
 
 function bcfloor($number)
 {
     if (strpos($number, '.') !== false) {
 		//3.000000 is the same as 3
-		if (preg_match("/\.[0]+$/i", $number)) {
+		if (preg_match("/\.[0]+$/", $number)) {
 			return bcround($number, 0);
 		}
 
@@ -1443,7 +1443,7 @@ function bcfloor($number)
         return bcsub($number, 1, 0);
     }
 
-    return $number;
+    return $number == '-0' ? '0' : $number;
 }
 
 function bcround($number, $precision = 0)
@@ -1456,7 +1456,7 @@ function bcround($number, $precision = 0)
         return bcsub($number, '0.' . str_repeat('0', $precision) . '5', $precision);
     }
 
-    return $number;
+    return $number == '-0' ? '0' : $number;
 }
 
 /************* END MATH *************/

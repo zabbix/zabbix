@@ -847,8 +847,8 @@ class CChart extends CGraphDraw{
 			}
 
 // correcting MIN & MAX
-			$this->m_minY[$other_side] = bcmul(floor(bcdiv($this->m_minY[$other_side], $interval)), $interval);
-			$this->m_maxY[$other_side] = bcmul(ceil(bcdiv($this->m_maxY[$other_side], $interval)), $interval);
+			$this->m_minY[$other_side] = bcmul(bcfloor(bcdiv($this->m_minY[$other_side], $interval)), $interval);
+			$this->m_maxY[$other_side] = bcmul(bcceil(bcdiv($this->m_maxY[$other_side], $interval)), $interval);
 //--------------------
 
 // if we lowered min more than highed max - need additional recalculating
@@ -881,7 +881,7 @@ class CChart extends CGraphDraw{
 			if(!isset($this->axis_valuetype[$graphSide])) continue;
 
 			if($this->type == GRAPH_TYPE_STACKED){
-				$this->m_minY[$graphSide] = min($tmp_minY[GRAPH_YAXIS_SIDE_LEFT], 0);
+				$this->m_minY[$graphSide] = bccomp($tmp_minY[GRAPH_YAXIS_SIDE_LEFT], 0) == -1 ? $tmp_minY[GRAPH_YAXIS_SIDE_LEFT] : 0;
 			}
 
 			if($this->ymax_type == GRAPH_YAXIS_TYPE_FIXED){
@@ -908,7 +908,7 @@ class CChart extends CGraphDraw{
 		if(isset($this->axis_valuetype[$other_side])){
 			$diff_val = bcsub($this->m_maxY[$other_side], $this->m_minY[$other_side]);
 			if(bccomp($diff_val, 0) == 0) $diff_val = 1;
-			$this->gridStepX[$other_side] = ($this->gridStep[$other_side] * $this->sizeY) / $diff_val;
+			$this->gridStepX[$other_side] = bcdiv(bcmul($this->gridStep[$other_side], $this->sizeY), $diff_val);
 		}
 
 //SDI($this->gridStep);
