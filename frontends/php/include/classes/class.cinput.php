@@ -31,12 +31,12 @@ class CInput extends CTag{
 		$this->setAttribute('id', $name);
 		$this->setAttribute('name', $name);
 
-		$this->setAttribute('value',$value);
+		$this->setAttribute('value', $value);
 
-		if(!is_null($class))
-			$this->setAttribute('class', 'input '.$class);
-		else
-			$this->setAttribute('class', 'input '.$type);
+		$class = !is_null($class) ? $class : $type;
+		if($class == 'button' || $class == 'submit') $class.= ' shadow ui-corner-all';
+
+		$this->setAttribute('class', 'input '.$class);
 
 	return $this;
 	}
@@ -76,11 +76,11 @@ class CInput extends CTag{
 
 	public function useJQueryStyle(){
 		$this->jQuery = true;
-		$this->setAttribute('class', 'jqueryinput');
+		$this->setAttribute('class', 'jqueryinput '.$this->getAttribute('class'));
 
 		if(!defined('ZBX_JQUERY_INPUT')){
 			define('ZBX_JQUERY_INPUT', true);
-			zbx_add_post_js('jQuery("input[class=jqueryinput]").button();');
+			zbx_add_post_js('jQuery("input.jqueryinput").button();');
 		}
 
 		return $this;

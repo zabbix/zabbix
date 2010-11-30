@@ -484,13 +484,11 @@ if(isset($_REQUEST['sform'])){
 
 //child links
 
-	$table = new CTable();
-
-	$table->setClass('tableinfo');
+	$table = new CTable(null, 'tableinfo');
 	$table->setOddRowClass('even_row');
 	$table->setEvenRowClass('even_row');
-	$table->attributes['cellpadding'] = 3;
-	$table->attributes['cellspacing'] = 1;
+	$table->setCellpadding(3);
+	$table->setCellspacing(1);
 	$table->headerClass = 'header';
 	$table->footerClass = 'footer';
 

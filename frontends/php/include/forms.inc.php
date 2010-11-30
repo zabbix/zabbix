@@ -1029,8 +1029,7 @@
 		$table->setCellSpacing(0);
 
 // 1st col
-		$col_table1 = new CTable();
-		$col_table1->setClass('filter');
+		$col_table1 = new CTable(null, 'filter');
 		$col_table1->addRow(array(bold(S_HOST_GROUP.': '),
 				array(new CTextBox('filter_group', $filter_group, 20),
 					new CButton('btn_group', S_SELECT, 'return PopUp("popup.php?dstfrm='.$form->getName().
@@ -1052,8 +1051,7 @@
 			new CTextBox("filter_key", $filter_key, 30)));
 
 // 2nd col
-		$col_table2 = new CTable();
-		$col_table2->setClass('filter');
+		$col_table2 = new CTable(null, 'filter');
 		$fTypeVisibility = array();
 
 //first row
@@ -1160,8 +1158,7 @@
 
 		$col_table2->addRow(array(array($label251, SPACE), array($field251, SPACE)));
 // 3rd col
-		$col_table3 = new CTable();
-		$col_table3->setClass('filter');
+		$col_table3 = new CTable(null, 'filter');
 		$fVTypeVisibility = array();
 
 		$cmbValType = new CComboBox('filter_value_type', $filter_value_type); //, "javascript: create_var('zbx_filter', 'filter_set', '1', true);");
@@ -1195,8 +1192,7 @@
 
 		$col_table3->addRow(array(bold(S_KEEP_TRENDS_IN_DAYS.': '), new CNumericBox('filter_trends',$filter_trends,8,null,true)));
 // 4th col
-		$col_table4 = new CTable();
-		$col_table4->setClass('filter');
+		$col_table4 = new CTable(null, 'filter');
 
 		$cmbStatus = new CComboBox('filter_status',$filter_status);
 		$cmbStatus->addItem(-1,S_ALL_SMALL);
@@ -1230,8 +1226,9 @@
 
 		$reset = new CSpan( S_RESET,'link_menu');
 		$reset->onClick("javascript: clearAllForm('zbx_filter');");
-		$filter = new CSpan(S_FILTER,'biglink');
-		$filter->onClick("javascript: create_var('zbx_filter', 'filter_set', '1', true);");
+		
+		$filter = new CButton('filter',S_FILTER,"javascript: create_var('zbx_filter', 'filter_set', '1', true);");
+		$filter->useJQueryStyle();
 
 		$div_buttons = new CDiv(array($filter, SPACE, SPACE, SPACE, $reset));
 		$div_buttons->setAttribute('style', 'padding: 4px 0;');
@@ -1244,11 +1241,10 @@
 // } FORM FOR FILTER DISPLAY
 
 // SUBFILTERS {
-		$h = new CDiv(S_SUBFILTER.SPACE.'['.S_AFFECTS_ONLY_FILTERED_DATA_SMALL.']');
-		$h->setClass('thin_header');
+		$h = new CDiv(S_SUBFILTER.SPACE.'['.S_AFFECTS_ONLY_FILTERED_DATA_SMALL.']', 'thin_header');
 		$form->addItem($h);
-		$table_subfilter = new Ctable();
-		$table_subfilter->setClass('filter');
+
+		$table_subfilter = new CTable(null, 'filter');
 
 // array contains subfilters and number of items in each
 		$item_params = array(
@@ -2766,8 +2762,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$frmTrig->addRow($exprtitle, $row);
 
 		if($input_method == IM_TREE){
-			$exp_table = new CTable();
-			$exp_table->setClass('tableinfo');
+			$exp_table = new CTable(null, 'tableinfo');
 			$exp_table->setAttribute('id','exp_list');
 			$exp_table->setOddRowClass('even_row');
 			$exp_table->setEvenRowClass('even_row');

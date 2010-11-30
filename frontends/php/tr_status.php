@@ -19,21 +19,15 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/hosts.inc.php');
-	require_once('include/acknow.inc.php');
-	require_once('include/triggers.inc.php');
-	require_once('include/events.inc.php');
-	require_once('include/scripts.inc.php');
+require_once('include/config.inc.php');
 
-	$page['file'] = 'tr_status.php';
-	$page['title'] = 'S_STATUS_OF_TRIGGERS';
-	$page['scripts'] = array('effects.js');
-	$page['hist_arg'] = array('groupid', 'hostid');
-	$page['scripts'] = array('class.cswitcher.js');
+$page['file'] = 'tr_status.php';
+$page['title'] = 'S_STATUS_OF_TRIGGERS';
+$page['scripts'] = array('effects.js');
+$page['hist_arg'] = array('groupid', 'hostid');
+$page['scripts'] = array('class.cswitcher.js');
 
-	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
-
+$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 ?>
 <?php
 if($page['type'] == PAGE_TYPE_HTML){

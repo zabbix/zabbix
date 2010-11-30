@@ -133,48 +133,7 @@ div.formElement_footer{
 /* </FORM ELEMENT> */
 
 /**** SCREEN DRAG & DROP ****/
-div.draggable {
-	cursor: move;
-}
-
-.screen_edit .hoverclass123 {
-	border: 1px solid red;
-}
-/***************************/
-
-div.formlist {}
-
-div.formlist ul{
-	list-style-type: none;
-	margin: 0px;
-	padding: 0px;
-	width: 100%;
-}
-
-div.formlist ul li{
-	padding: 2px;
-	width: 100%;
-	height: 100%;
-	vertical-align: middle;
-}
-
-div.formlist ul li div.dt{
-	width: 20%;
-	float: left;
-	text-align: right;
-	white-space: nowrap;
-}
-
-div.formlist ul li div.dd{
-	width: 77%;
-	padding-left: 21%;
-}
-
-.objectgroup {
-	padding: 6px;
-	margin: 5px 0px 5px 0px;
-	display: inline-block;
-}
+div.draggable { cursor: move; }
 
 /********* DIV IMG *********/
 div.zabbix_logo{
@@ -407,201 +366,62 @@ div.zabbix_logo{
 	background-repeat:no-repeat;
 	cursor: pointer;
 }
-
-/********** <OBJECT LIST> ************/
-div.objectlist{
-	padding: 3px;
-	margin: 5px 0px 5px 0px;
-	border: 1px solid #6C80B9;
-	background-color: #FFFFFF;
-
-	-moz-border-radius: 3px;
-	-webkit-border-radius: 3px;
-	border-radius: 3px;
-}
-
-ul.objectlist {
-	padding: 0px;
-	list-style: none;
-	margin: 0px;
-}
-
-ul.objectlist li{
-	display: inline-block;
-	margin: 2px 10px 2px 5px;
-	white-space: nowrap;
-	font-size: 1.1em;
-}
-
-ul.objectlist li.selected{
-	font-weight: bold;
-	font-size: 1.2em;
-}
-
-div.border_dotted{
-	border: 1px dotted #6C80B9;
-}
-
-div.border_none{
-	border: 0px;
-}
 /********* DIV IMG END *********/
 
-.link{
-	cursor: pointer;
-	color:#3C3089;
-	text-decoration: underline;
-}
+/********** <OBJECT LIST> ************/
+.objectgroup { padding: 4px; margin: 5px 0px 5px 0px; }
+.border_dotted{ border: 1px dotted #6C80B9; }
+.border_none{ border: 0px; }
 
-.link:hover{
-	color:#6C80B9;
-	text-decoration: underline;
-}
+.footer { padding-left: 1.6em; }
+.footer .dt { float: left; width: 20%; }
+.footer .dt input.main{ border-color: #FFAA33; height: 22px;}
+.footer .dt input.main:hover{ border-color: #DD7711; }
+.footer .dd { width: 70%; padding-left: 21%; }
+/***************************/
 
-.darklink{
-	color:#3C3089;
-	cursor: pointer;
-	text-decoration: underline;
-}
+.link{ cursor: pointer; color:#3C3089; text-decoration: underline; }
+.link:hover{ color:#6C80B9; text-decoration: underline; }
 
-.darklink:hover{
-	color:#6C80B9;
-	text-decoration: underline;
-}
+.darklink{ color:#3C3089; cursor: pointer; text-decoration: underline; }
+.darklink:hover{ color:#6C80B9; text-decoration: underline; }
 
-.blacklink{
-	color:#1A1A1A;
-	cursor: pointer;
-	text-decoration: underline;
-}
+.blacklink{ color:#1A1A1A; cursor: pointer; text-decoration: underline;}
+.blacklink:hover{ color:#3A3A3A; }
 
-.blacklink:hover{
-	color:#3A3A3A;
-}
+.whitelink{ color:#F3F3F3; cursor: pointer; text-decoration: underline; }
+.whitelink:hover { color:#DADADA; }
 
-.whitelink{
-	color:#F3F3F3;
-	cursor: pointer;
-	text-decoration: underline;
-}
+.link_menu{ color: #3C3089; cursor: pointer; text-decoration: none; border-bottom: 1px dotted #3C3089; }
+.link_menu:hover { color: #6C80B9; text-decoration: none; border-bottom: 1px dotted #6C80B9; }
 
-.whitelink:hover{
-	color:#DADADA;
-}
+.underline{ text-decoration: underline; }
 
-.link_menu{
-	color: #3C3089;
-	cursor: pointer;
-	text-decoration: none;
-	border-bottom: 1px dotted #3C3089;
-}
-
-.link_menu:hover{
-	color: #6C80B9;
-	text-decoration: none;
-	border-bottom: 1px dotted #6C80B9;
-}
-
-.underline{
-	text-decoration: underline;
-}
-
-span.footer_sign{
-	padding-right: 5px;
-	padding-left: 5px;
-}
-
-span.divider{
-	color: #000000;
-	font-family: Verdana, Arial, sans-serif;
-	font-size: 10px;
-	font-weight: normal;
-}
+span.footer_sign{ padding-right: 5px; padding-left: 5px; }
+span.divider{ color: #000000; font-weight: normal;}
 
 /********** <SUBFILTER BUTTONS> ************/
-span.subfilter_enabled{
-	color: #00AA00;
-	cursor: pointer;
-	text-decoration: none;
-	border-bottom: 1px dashed;
-}
-span.subfilter_enabled:hover{
-	color:#44CC44;
-}
-span.subfilter_disabled{
-	color:maroon;
-	cursor: pointer;
-	text-decoration: none;
-	border-bottom: 1px dashed;
-}
-span.subfilter_disabled:hover{
-	color:#CC4444;
-}
-span.subfilter_inactive{
-	color: #777777;
-}
-span.subfilter_inactive:hover{
-
-	color: #999999;
-}
-span.subfilter_active{
-	color: teal;
-}
+span.subfilter_enabled{ color: #00AA00; cursor: pointer; text-decoration: none; border-bottom: 1px dashed; }
+span.subfilter_enabled:hover{ color:#44CC44; }
+span.subfilter_disabled{ color:maroon; cursor: pointer; text-decoration: none; border-bottom: 1px dashed; }
+span.subfilter_disabled:hover{ color:#CC4444; }
+span.subfilter_inactive{ color: #777777; }
+span.subfilter_inactive:hover{ color: #999999; }
+span.subfilter_active{ color: teal; }
 /********** </SUBFILTER BUTTONS> ************/
 
 /********** REQUIREMENTS TABLE *************/
 
-span.ok{
-	white-space: normal;
-	color:		#00AA00;
-	font-weight:	bold;
-}
+span.ok{ white-space: normal; color: #00AA00; font-weight: bold; }
+span.fail{ color: #AA0000; font-weight: bold; }
+span.fail:hover{ color:	#AA0000; }
 
-span.fail{
-	color:		#AA0000;
-	font-weight:	bold;
-}
-span.fail:hover{
-	color:		#AA0000;
-}
-
-span.green{
-	color:		#00AA00;
-}
-
-span.red{
-	color:		#AA0000;
-}
-
-span.orange{
-	color:		#EE6000;
-}
-
-span.blue{
-	color:		#0033FF;
-}
-
-span.info{
- font-weight: bold;
-	color: #444444;
-	font-size: 11px;
-}
-
-span.discoveryName{
-	color: #999900;
-}
-
-.biglink{
-	font-weight: bold;
-	font-size: 13px;
-	color:#3C3089;
-	cursor: pointer;
-	text-decoration: underline;
-}
-.biglink:hover{
-	color:#6C80B9;
-	text-decoration: underline;
-}
+span.green { color: #00AA00; }
+span.red { color: #AA0000; }
+span.orange { color: #EE6000; }
+span.blue { color: #0033FF; }
+span.info{ font-weight: bold; color: #444444; font-size: 11px; }
+span.discoveryName{ color: #999900; }
 
 
 /* Sortable */
@@ -621,3 +441,5 @@ span.discoveryName{
 .widget .header .menu_icon{ float: right; margin-right: 2px; }
 
 .widget .footer { color: white; line-height: 12px; height: 12px; padding: 4px 4px; margin-top: 2px;}
+
+.inlineblock{ display: inline-block; }

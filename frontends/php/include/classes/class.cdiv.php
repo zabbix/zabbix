@@ -22,7 +22,7 @@
 class CDiv extends CTag{
 	public function __construct($items=NULL,$class=NULL){
 		parent::__construct('div','yes');
-		$this->setClass($class);
+		$this->setAttribute('class', $class);
 		$this->addItem($items);
 
 		$this->tag_body_start = '';
@@ -35,11 +35,11 @@ class CDiv extends CTag{
 	}
 
 	public function useJQueryStyle(){
-		$this->setAttribute('class', 'jqueryinputset');
+		$this->setAttribute('class', $this->getAttribute('class').' jqueryinputset');
 
 		if(!defined('ZBX_JQUERY_INPUTSET')){
 			define('ZBX_JQUERY_INPUTSET', true);
-			zbx_add_post_js('setTimeout(function(){jQuery("div[class=jqueryinputset]").buttonset();}, 10);');
+			zbx_add_post_js('setTimeout(function(){jQuery("div.jqueryinputset").buttonset();}, 10);');
 		}
 
 		return $this;

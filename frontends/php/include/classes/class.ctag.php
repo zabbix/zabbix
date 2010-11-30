@@ -54,7 +54,7 @@ class CTag extends CObject{
 			$this->addItem($body);
 		}
 
-		$this->setClass($class);
+		$this->setAttribute('class', $class);
 	}
 
 	public function showStart(){	echo $this->startToString();}
@@ -109,13 +109,13 @@ class CTag extends CObject{
 	return NULL;
 	}
 
-	public function setClass($value){
-		if(isset($value))
-			$this->attributes['class'] = $value;
+	public function addClass($cssClass){
+		if(!isset($this->attributes['class']) || zbx_empty($this->attributes['class'])) 
+				$this->attributes['class'] = $cssClass;
 		else
-			unset($this->attributes['class']);
+			$this->attributes['class'] .= ' '.$cssClass;
 
-	return $value;
+	return $this->attributes['class'];
 	}
 
 	public function getAttribute($name){

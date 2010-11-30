@@ -48,8 +48,7 @@ include_once('include/page_header.php');
 
 // test data (create table, create check fields)
 
-	$data_table = new CTable();
-	$data_table->setClass('tableinfo');
+	$data_table = new CTable(null, 'tableinfo');
 	$data_table->setAttribute('id', 'data_list');
 	$data_table->setOddRowClass('even_row');
 	$data_table->setEvenRowClass('even_row');
@@ -126,8 +125,7 @@ include_once('include/page_header.php');
 	$frm_test->addRow(S_TEST_DATA, $data_table);
 
 /* result */
-	$res_table = new CTable();
-	$res_table->setClass('tableinfo');
+	$res_table = new CTable(null, 'tableinfo');
 	$res_table->setAttribute('id', 'result_list');
 	$res_table->setOddRowClass('even_row');
 	$res_table->setEvenRowClass('even_row');

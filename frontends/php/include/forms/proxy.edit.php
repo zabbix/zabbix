@@ -97,7 +97,7 @@
 			new CTextBox('interfaces[0][port]', $interface['port'], 15)
 		));
 
-		$proxyList->addRow(S_INTERFACE, new CDiv($ifTab, 'border_dotted objectgroup ui-corner-all'));
+		$proxyList->addRow(S_INTERFACE, new CDiv($ifTab, 'objectgroup inlineblock border_dotted ui-corner-all'));
 	}
 
 
@@ -126,16 +126,15 @@
 	$frmProxy->addItem($proxyTabs);
 
 // Footer
-	$proxyFooter = new CDiv();
-	$proxyFooter->addItem(new CSubmit('save', S_SAVE));
+	$main = array(new CSubmit('save', S_SAVE));
+	$others = array();
 	if($_REQUEST['hostid']>0){
-		$proxyFooter->addItem(new CSubmit('clone',S_CLONE));
-		$proxyFooter->addItem(new CButtonDelete(S_DELETE_SELECTED_PROXY_Q, url_param('form').url_param('hostid')));
+		$others[] = new CSubmit('clone', S_CLONE);
+		$others[] = new CButtonDelete(S_DELETE_SELECTED_PROXY_Q, url_param('form').url_param('hostid'));
 	}
-	$proxyFooter->addItem(new CButtonCancel());
-	$proxyFooter->useJQueryStyle();
+	$others[] = new CButtonCancel(url_param('groupid'));
 
-	$frmProxy->addItem(new CDiv($proxyFooter, 'objectlist'));
+	$frmProxy->addItem(makeFormFooter($main, $others));
 
 	
 return $frmProxy;

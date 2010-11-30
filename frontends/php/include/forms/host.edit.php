@@ -287,7 +287,7 @@
 
 	$ifTab->addRow($buttonRow);
 
-	$hostList->addRow(S_INTERFACES, new CDiv($ifTab, 'border_dotted objectgroup ui-corner-all'));
+	$hostList->addRow(S_INTERFACES, new CDiv($ifTab, 'objectgroup inlineblock border_dotted ui-corner-all'));
 
 //Proxy
 	$cmbProxy = new CComboBox('proxy_hostid', $proxy_hostid);
@@ -530,17 +530,16 @@
 	$frmHost->addItem($divTabs);
 
 // Footer
-	$host_footer = new CDiv();
-	$host_footer->addItem(new CSubmit('save', S_SAVE));
+	$main = array(new CSubmit('save', S_SAVE));
+	$others = array();
 	if(($_REQUEST['hostid']>0) && ($_REQUEST['form'] != 'full_clone')){
-		$host_footer->addItem(new CSubmit('clone', S_CLONE));
-		$host_footer->addItem(new CSubmit('full_clone', S_FULL_CLONE));
-		$host_footer->addItem(new CButtonDelete(S_DELETE_SELECTED_HOST_Q, url_param('form').url_param('hostid').url_param('groupid')));
+		$others[] = new CSubmit('clone', S_CLONE);
+		$others[] = new CSubmit('full_clone', S_FULL_CLONE);
+		$others[] = new CButtonDelete(S_DELETE_SELECTED_HOST_Q, url_param('form').url_param('hostid').url_param('groupid'));
 	}
-	$host_footer->addItem(new CButtonCancel(url_param('groupid')));
-	$host_footer->useJQueryStyle();
-	$frmHost->addItem(new CDiv($host_footer, 'objectlist'));
+	$others[] = new CButtonCancel(url_param('groupid'));
 
+	$frmHost->addItem(makeFormFooter($main, $others));
 
 return $frmHost;
 ?>

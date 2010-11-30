@@ -121,7 +121,7 @@ setSettings: function(settings){
 	this.sounds.repeat = settings['sounds.repeat'];
 	this.sounds.mute = settings['sounds.mute'];
 	if(this.sounds.mute == 1){
-		this.dom.mute.className = 'iconmute menu_icon';
+		this.dom.mute.className = 'iconmute menu_icon shadow';
 	}
 
 	if(settings.enabled != 1) this.stop();
@@ -409,7 +409,7 @@ createContainer: function(){
 // move
 	this.dom.move = document.createElement('div');
 	this.dom.move.setAttribute('title', locale['S_MOVE']);
-	this.dom.move.className = 'iconmove menu_icon';
+	this.dom.move.className = 'iconmove menu_icon shadow';
 	//this.dom.move.style.display = 'none';
 
 	this.dom.controlList.addItem(this.dom.move, 'linear');
@@ -417,21 +417,21 @@ createContainer: function(){
 // snooze
 	this.dom.snooze = document.createElement('div');
 	this.dom.snooze.setAttribute('title', locale['S_SNOOZE']);
-	this.dom.snooze.className = 'iconsnooze menu_icon';
+	this.dom.snooze.className = 'iconsnooze menu_icon shadow';
 
 	this.dom.controlList.addItem(this.dom.snooze, 'linear');
 
 // mute
 	this.dom.mute = document.createElement('div');
 	this.dom.mute.setAttribute('title', locale['S_MUTE']+'/'+locale['S_UNMUTE']);
-	this.dom.mute.className = 'iconsound menu_icon';
+	this.dom.mute.className = 'iconsound menu_icon shadow';
 
 	this.dom.controlList.addItem(this.dom.mute, 'linear');
 
 // close all
 	this.dom.closeAll = document.createElement('div');
 	this.dom.closeAll.setAttribute('title', locale['S_CLEAR']);
-	this.dom.closeAll.className = 'iconclose menu_icon';
+	this.dom.closeAll.className = 'iconclose menu_icon shadow';
 
 	this.dom.controlList.addItem(this.dom.closeAll, 'linear');
 

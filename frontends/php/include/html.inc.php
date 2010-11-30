@@ -351,7 +351,7 @@
 			$list->addItem(array('&laquo; ', new CLink(S_HOST_LIST, 'hosts.php?hostid='.$header_host['hostid'].url_param('groupid'))));
 
 
-		$tbl_header_host = new CDiv(null, 'objectlist');
+		$tbl_header_host = new CDiv(null, 'objectgroup ui-widget-content ui-corner-all');
 		if($header_host['status'] == HOST_STATUS_TEMPLATE){
 			$list->addItem(array(bold(S_TEMPLATE.': '), new CLink($description, 'templates.php?form=update&templateid='.$header_host['hostid'])));
 		}
@@ -402,5 +402,25 @@
 
 		$tbl_header_host->addItem($list);
 		return $tbl_header_host;
+	}
+
+
+	function makeFormFooter($main, $other){
+		$mainBttns = new CDiv();
+		foreach($main as $bttn){
+			$bttn->addClass('main');
+			$bttn->useJQueryStyle();
+			$mainBttns->addItem($bttn);
+		}
+
+		$otherBttns = new CDiv($other);
+		$otherBttns->useJQueryStyle();
+
+		$space = new CDiv($mainBttns, 'dt right');
+		$buttons = new CDiv(array($otherBttns), 'dd');
+
+		$footer = new CDiv(array($space, $buttons), 'objectgroup ui-widget-content ui-corner-all footer min-width');
+
+	return $footer;
 	}
 ?>

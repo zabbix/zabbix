@@ -11,7 +11,7 @@
 /* Layout helpers
 ----------------------------------*/
 .originalblue .ui-helper-hidden { display: none; }
-.originalblue .ui-helper-hidden-accessible { position: absolute; left: -99999999px; }
+.originalblue .ui-helper-hidden-accessible { position: absolute; left: -99999999px; visibility: hidden; }
 .originalblue .ui-helper-reset { margin: 0; padding: 0; border: 0; outline: 0; line-height: 1.3; text-decoration: none; font-size: 100%; list-style: none; }
 .originalblue .ui-helper-clearfix:after { content: "."; display: block; height: 0; clear: both; visibility: hidden; }
 .originalblue .ui-helper-clearfix { display: inline-block; }
@@ -60,9 +60,9 @@
 .originalblue .ui-widget .ui-widget { font-size: 1em; }
 .originalblue .ui-widget input, .originalblue .ui-widget select, .originalblue .ui-widget textarea, .originalblue .ui-widget button { font-family: Verdana, Arial, sans-serif; font-size: 1em; }
 .originalblue .ui-widget-content { border: 1px solid #a6c9e2; background: #fcfdfd url(images/ui-bg_inset-hard_100_fcfdfd_1x100.png) 50% bottom repeat-x; color: #222222; }
-.originalblue .ui-widget-content a { color: #222222; }
+/* .originalblue .ui-widget-content a { color: #222222; } */
 .originalblue .ui-widget-header { border: 1px solid #4297d7; background: #5c9ccc url(images/ui-bg_highlight-hard_55_5c9ccc_1x100.png) 50% 50% repeat-x; color: #ffffff; font-weight: bold; }
-.originalblue .ui-widget-header a { color: #ffffff; }
+/* .originalblue .ui-widget-header a { color: #ffffff; } */
 
 /* Interaction states
 ----------------------------------*/

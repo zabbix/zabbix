@@ -474,22 +474,13 @@ div.calendar input.calendar_textbox{
 }
 
 /* SCROLLBAR */
-div.scrollbar{
-	background-color: #3F3F3F;
-	border: 1px solid #AA5500;
-}
+div.scrollbar{ background-color: #3F3F3F; border: 1px solid #AA5500; }
 
-div.scrollbar .info .zoom .text{
-	color: #DFDFDF;
-}
+div.scrollbar .info .zoom .text{ color: #DFDFDF; }
 
-div.scrollbar .subline .info_period{
-	color: #DFDFDF;
-}
+div.scrollbar .subline .info_period{ color: #DFDFDF; }
 
-div.scrollbar .subline .nav_links .text{
-	color: #DFDFDF;
-}
+div.scrollbar .subline .nav_links .text{ color: #DFDFDF; }
 
 /* MESAGES */
 div.messagecontainer .message .messagebox{
@@ -504,127 +495,49 @@ div.formElement_header{
 div.formElement_body{
 	border: 1px solid #222222;
 }
-div.formElement_footer{
-	background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left;
-}
+div.formElement_footer{ background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left; }
+div.thin_header{ background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left; }
+div.zabbix_logo{ background-image:url('../images/general/zabbix_od.png'); }
+.iconzbxavailable{ background-image: url('../images/general/zabbix_available_bb.png'); }
+.iconsnmpavailable{ background-image: url('../images/general/snmp_available_bb.png'); }
 
-div.thin_header{
-	background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left;
-}
+.iconipmiavailable{ background-image: url('../images/general/ipmi_available_bb.png'); }
+.sla_green{ background-image: url('../images/gradients/sla_blue15.png'); }
+.icon_sortup{ background-image: url('../images/general/sort_up_od.gif'); }
+.icon_sortdown{ background-image: url('../images/general/sort_down_od.gif'); }
 
-div.zabbix_logo{
-	background-image:url('../images/general/zabbix_od.png');
-}
+.menu_icon:hover{ background-color: #FF5500; }
+div.iconmenu_b{ background-color: transparent; }
 
-.iconzbxavailable{
-	background-image: url('../images/general/zabbix_available_bb.png');
-}
+div.messagecontainer{ background-color: #8c8a8b;}
+div#scrolltableft{ color: #00CCFF; }
+div#scrolltabright{ color: #00CCFF; }
+div#selection_box{ filter:alpha(opacity=60); opacity:.60; background-color:#6666FF; }
 
-.iconsnmpavailable{
-	background-image: url('../images/general/snmp_available_bb.png');
-}
-
-.iconipmiavailable{
-	background-image: url('../images/general/ipmi_available_bb.png');
-}
-
-.sla_green{
-	background-image: url('../images/gradients/sla_blue15.png');
-}
-
-.icon_sortup{
-	background-image: url('../images/general/sort_up_od.gif');
-}
-
-.icon_sortdown{
-	background-image: url('../images/general/sort_down_od.gif');
-}
-
-.menu_icon:hover{
-	-webkit-box-shadow: 0 0 6px #FF5500;
-	-moz-box-shadow: 0 0 6px #FF5500;
-	box-shadow: 0 0 6px #FF5500;
-	background-color: #FF5500;
-}
-div.iconmenu_b{
-	background-color: transparent;
-}
-
-div.messagecontainer{
-	background-color: #8c8a8b;
-}
-
-div#scrolltableft{
-	color: #00CCFF;
-}
-
-div#scrolltabright{
-	color: #00CCFF;
-}
-
-div#selection_box{
-	filter:alpha(opacity=60);
-	opacity:.60;
-	background-color:#6666FF;
-}
-
-div.formElement{
-	border: 1px solid #5A5A5A;
-}
-
-div.formElement_body{
-	background-color: #1A1A1A;
-}
+div.formElement{ border: 1px solid #5A5A5A;}
+div.formElement_body{ background-color: #1A1A1A; }
 
 
-div.objectlist{
-	border-color: #CC5500;
-	background-color: #2F2F2F;
-}
+div.objectgroup{ border-color: #CC5500; background-color: #2F2F2F; }
 
-ul.objectlist li{
-	color: #DADADA;
-}
+.footer .dt input.main{ border-color: #FF5500; }
+.footer .dt input.main:hover{ border-color: #FF5500; }
 
-div.border_dotted{
-	border: 1px dotted #CC5500;
-}
 
-.formElementTable tr td{
-	color: #DFDFDF;
-}
+ul.objectlist li{ color: #DADADA; }
 
-span.info{
-	color:	#FF5500;
-}
+div.border_dotted{ border: 1px dotted #CC5500; }
 
-span.link{
-	color: #FF5500;
-}
+.formElementTable tr td{ color: #DFDFDF; }
 
-span.link:hover{
-	color: #FF8800;
-}
+span.info{ color:	#FF5500; }
 
-span.darklink{
-	color: #AA5500;
-}
+span.link{ color: #FF5500; }
+span.link:hover{ color: #FF8800; }
 
-span.darklink:hover{
-	color: #FF5500;
-}
+span.darklink{ color: #AA5500; }span.darklink:hover{ color: #FF5500; }
 
-span.biglink{
-	color: #FF5500;
-}
-
-span.biglink:hover{
-	color: #FF8800;
-}
-
-div.suggest{
-	border: 1px #FF5500 solid;
-}
+div.suggest{ border: 1px #FF5500 solid; }
 
 /*////////////////	FORMS	////////////////////*/
 .input, .input[disabled]:hover{
@@ -643,26 +556,12 @@ div.suggest{
 	color: #DFDFDF;
 }
 
-.select{
-	cursor: pointer;
-	margin: 1px 4px 1px 2px;
-}
+.shadow {}
+.shadow:hover{ -webkit-box-shadow: 0 0 6px #FF5500; -moz-box-shadow: 0 0 6px #FF5500; box-shadow: 0 0 6px #FF5500; }
 
-.button{ 
-	border-color: #FF5500;
-	background: #2f2f2f;
-	color: #FF5500;
-}
-
-.button:hover {
-	border-color: #2f2f2f;
-	color: #2f2f2f;
-	background: #FF5500;
-	text-decoration: none;
-	-webkit-box-shadow: 0 0 6px #FF5500;
-	-moz-box-shadow: 0 0 6px #FF5500;
-	box-shadow: 0 0 6px #FF5500;
-}
+.select{ cursor: pointer; margin: 1px 4px 1px 2px; }
+.button{  border-color: #FF5500; background: #2f2f2f; color: #FF5500; }
+.button:hover { border-color: #2f2f2f; color: #2f2f2f; background: #FF5500; text-decoration: none; }
 
 .link_menu{
 	border: 0px;
