@@ -1903,8 +1903,8 @@
 									S_KEY_IS_VALID //result description
 								);
 							}
-                            elseif($characters[$i+1] == ']' && isset($characters[$i+2])){
-                                return array(
+							elseif($characters[$i+1] == ']' && isset($characters[$i+2])){
+								return array(
 									false,   //is key valid?
 									sprintf(S_INCORRECT_USAGE_OF_BRACKETS, $characters[$i+2]) //result description
 								);
