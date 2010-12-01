@@ -107,7 +107,7 @@ static void	run_remote_command(char *host_name, char *command)
 						&item.interface.addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
 
 				port = strdup(item.interface.port_orig);
-				substitute_simple_macros(NULL, NULL, NULL, NULL,
+				substitute_simple_macros(NULL, &item.host.hostid, NULL, NULL,
 						&port, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
 				if (SUCCEED == is_ushort(port, &item.interface.port))
 				{
