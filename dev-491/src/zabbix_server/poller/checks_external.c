@@ -41,14 +41,14 @@
  ******************************************************************************/
 int     get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 {
-	FILE*	fp;
+	FILE	*fp;
 	char	scriptname[MAX_STRING_LEN];
 	char	key[MAX_STRING_LEN];
 	char	params[MAX_STRING_LEN];
 	char	error[MAX_STRING_LEN];
 	char	cmd[MAX_STRING_LEN];
 	char	msg[MAX_STRING_LEN];
-	char	*p,*p2;
+	char	*p, *p2;
 	int	i;
 
 	int	ret = SUCCEED;

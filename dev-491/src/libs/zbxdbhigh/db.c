@@ -1343,7 +1343,7 @@ void	DBescape_like_pattern(const char *src, char *dst, int len)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-char*	DBdyn_escape_like_pattern(const char *src)
+char	*DBdyn_escape_like_pattern(const char *src)
 {
 	int	len;
 	char	*dst = NULL;
@@ -1359,8 +1359,6 @@ char*	DBdyn_escape_like_pattern(const char *src)
 
 void	DBget_item_from_db(DB_ITEM *item, DB_ROW row)
 {
-//	static char	*key = NULL;
-
 	ZBX_STR2UINT64(item->itemid, row[0]);
 	item->key			= row[1];
 	item->host_name			= row[2];

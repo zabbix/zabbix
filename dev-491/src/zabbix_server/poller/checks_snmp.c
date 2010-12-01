@@ -686,7 +686,7 @@ static int	snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID, AG
 			else if (status == STAT_TIMEOUT)
 			{
 				SET_MSG_RESULT(value, zbx_dsprintf(NULL, "Timeout while connecting to [%s:%d]",
-						item->interface.addr, item->interface.port));
+						item->interface.addr, (int)item->interface.port));
 				ret = NETWORK_ERROR;
 				running = 0;
 			}

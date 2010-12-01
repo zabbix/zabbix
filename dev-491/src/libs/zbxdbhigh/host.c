@@ -2647,7 +2647,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 						"interfaceid=%s"
 					" where itemid=" ZBX_FS_UI64 ";\n",
 					description_esc,
-					type,
+					(int)type,
 					row[4],		/* value_type */
 					row[5],		/* data_type */
 					row[6],		/* delay */
@@ -2706,7 +2706,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 					description_esc,
 					key_esc,
 					hostid,
-					type,
+					(int)type,
 					row[4],		/* value_type */
 					row[5],		/* data_type */
 					row[6],		/* delay */
