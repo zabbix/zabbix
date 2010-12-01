@@ -467,7 +467,6 @@ include/strpool.h -text
 include/zbxalgo.h -text
 include/zbxicmpping.h -text
 include/zbxjson.h -text
-include/zbxmacros.h -text
 include/zbxmedia.h -text
 include/zbxodbc.h -text
 m4/ax_lib_ibm_db2.m4 -text
@@ -505,7 +504,6 @@ src/libs/zbxdbcache/dbcache.c -text
 src/libs/zbxdbcache/dbconfig.c -text
 src/libs/zbxdbcache/nextchecks.c -text
 src/libs/zbxdbhigh/discovery.c -text
-src/libs/zbxdbhigh/macro.c -text
 src/libs/zbxdbhigh/proxy.c -text
 src/libs/zbxicmpping/Makefile.am -text
 src/libs/zbxicmpping/icmpping.c -text
