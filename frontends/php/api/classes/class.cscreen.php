@@ -482,11 +482,24 @@ SDI('/////////////////////////////////');
 		$maps = array();
 		$screens = array();
 
+		$resources = array(SCREEN_RESOURCE_GRAPH, SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT, 
+					SCREEN_RESOURCE_MAP,SCREEN_RESOURCE_SCREEN, SCREEN_RESOURCE_TRIGGERS_OVERVIEW,
+					SCREEN_RESOURCE_DATA_OVERVIEW);
+
 		foreach($screenitems as $item){
 			if((isset($item['resourcetype']) && !isset($item['resourceid'])) ||
-				(!isset($item['resourcetype']) && isset($item['resourceid']))){
+				(!isset($item['resourcetype']) && isset($item['resourceid'])))
+			{
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 			}
+
+			if(isset($item['resourceid']) && ($item['resourceid'] == 0)){
+				if(uint_in_array($item['resourcetype'], $resources))
+					throw new Exception('Incorrect resource provided for screen item');
+				else
+					continue;
+			}
+
 			switch($item['resourcetype']){
 				case SCREEN_RESOURCE_HOSTS_INFO:
 				case SCREEN_RESOURCE_TRIGGERS_INFO:
@@ -521,7 +534,8 @@ SDI('/////////////////////////////////');
 				'preservekeys' => 1,
 			));
 			foreach($hostgroups as $id){
-				if(!isset($result[$id])) self::exception(ZBX_API_ERROR_PERMISSIONS, S_HOST_GROUP);
+				if(!isset($result[$id])) 
+					self::exception(ZBX_API_ERROR_PERMISSIONS, 'Incorrect Host group identity "'.$id.'" provided for Screens item resource');
 			}
 		}
 		if(!empty($hosts)){
@@ -531,7 +545,8 @@ SDI('/////////////////////////////////');
 				'preservekeys' => 1,
 			));
 			foreach($hosts as $id){
-				if(!isset($result[$id])) self::exception(ZBX_API_ERROR_PERMISSIONS, S_HOST);
+				if(!isset($result[$id]))
+					self::exception(ZBX_API_ERROR_PERMISSIONS, 'Incorrect Host identity "'.$id.'" provided for Screens item resource');
 			}
 		}
 		if(!empty($graphs)){
@@ -541,7 +556,8 @@ SDI('/////////////////////////////////');
 				'preservekeys' => 1,
 			));
 			foreach($graphs as $id){
-				if(!isset($result[$id])) self::exception(ZBX_API_ERROR_PERMISSIONS, S_GRAPH);
+				if(!isset($result[$id]))
+					self::exception(ZBX_API_ERROR_PERMISSIONS, 'Incorrect Graph identity "'.$id.'" provided for Screens item resource');
 			}
 		}
 		if(!empty($items)){
@@ -552,7 +568,8 @@ SDI('/////////////////////////////////');
 				'webitems' => 1,
 			));
 			foreach($items as $id){
-				if(!isset($result[$id])) self::exception(ZBX_API_ERROR_PERMISSIONS, S_ITEM);
+				if(!isset($result[$id]))
+					self::exception(ZBX_API_ERROR_PERMISSIONS, 'Incorrect Item identity "'.$id.'" provided for Screens item resource');
 			}
 		}
 		if(!empty($maps)){
@@ -562,7 +579,8 @@ SDI('/////////////////////////////////');
 				'preservekeys' => 1,
 			));
 			foreach($maps as $id){
-				if(!isset($result[$id])) self::exception(ZBX_API_ERROR_PERMISSIONS, S_MAP);
+				if(!isset($result[$id]))
+					self::exception(ZBX_API_ERROR_PERMISSIONS, 'Incorrect Map identity "'.$id.'" provided for Screens item resource');
 			}
 		}
 		if(!empty($screens)){
@@ -572,7 +590,8 @@ SDI('/////////////////////////////////');
 				'preservekeys' => 1,
 			));
 			foreach($screens as $id){
-				if(!isset($result[$id])) self::exception(ZBX_API_ERROR_PERMISSIONS, S_SCREEN);
+				if(!isset($result[$id]))
+					self::exception(ZBX_API_ERROR_PERMISSIONS, 'Incorrect Screen identity "'.$id.'" provided for Screens item resource');
 			}
 		}
 	}
