@@ -457,14 +457,16 @@ class zbxXML{
 							case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
 							case SCREEN_RESOURCE_DATA_OVERVIEW:
 							case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
-								$db_hostgroups = CHostgroup::getObjects($screenitem['resourceid']);
-								if(empty($db_hostgroups)){
-									$error = S_CANNOT_FIND_HOSTGROUP.' "'.$nodeCaption.$screenitem['resourceid']['name'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
-									throw new Exception($error);
-								}
+								if(is_array($screenitem['resourceid'])){
+									$db_hostgroups = CHostgroup::getObjects($screenitem['resourceid']);
+									if(empty($db_hostgroups)){
+										$error = S_CANNOT_FIND_HOSTGROUP.' "'.$nodeCaption.$screenitem['resourceid']['name'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
+										throw new Exception($error);
+									}
 
-								$tmp = reset($db_hostgroups);
-								$screenitem['resourceid'] = $tmp['groupid'];
+									$tmp = reset($db_hostgroups);
+									$screenitem['resourceid'] = $tmp['groupid'];
+								}
 							break;
 							case SCREEN_RESOURCE_HOST_TRIGGERS:
 								$db_hosts = CHost::getObjects($screenitem['resourceid']);
