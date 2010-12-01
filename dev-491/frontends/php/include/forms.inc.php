@@ -1226,7 +1226,7 @@
 
 		$reset = new CSpan( S_RESET,'link_menu');
 		$reset->onClick("javascript: clearAllForm('zbx_filter');");
-		
+
 		$filter = new CButton('filter',S_FILTER,"javascript: create_var('zbx_filter', 'filter_set', '1', true);");
 		$filter->useJQueryStyle();
 
@@ -1536,7 +1536,7 @@
 		$type = get_request('type', 0);
 		$snmp_community = get_request('snmp_community', 'public');
 		$snmp_oid = get_request('snmp_oid', 'interfaces.ifTable.ifEntry.ifInOctets.1');
-		$port = get_request('port', 161);
+		$port = get_request('port', '');
 		$value_type = get_request('value_type', ITEM_VALUE_TYPE_UINT64);
 		$data_type = get_request('data_type', ITEM_DATA_TYPE_DECIMAL);
 		$trapper_hosts = get_request('trapper_hosts', '');
@@ -2230,7 +2230,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$status		= get_request('status'		,0);
 		$type		= get_request('type'		,0);
 		$snmp_community	= get_request('snmp_community'	,'public');
-		$port	= get_request('port'	,161);
+		$port	= get_request('port', '');
 		$value_type	= get_request('value_type'	,ITEM_VALUE_TYPE_UINT64);
 		$data_type	= get_request('data_type'	,ITEM_DATA_TYPE_DECIMAL);
 		$trapper_hosts	= get_request('trapper_hosts'	,'');
