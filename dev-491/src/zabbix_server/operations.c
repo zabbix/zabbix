@@ -48,7 +48,7 @@
  ******************************************************************************/
 static void	run_remote_command(char *host_name, char *command)
 {
-	int		ret = 9;
+	int		ret = FAIL;
 	AGENT_RESULT	agent_result;
 	DC_ITEM         item;
 	DB_RESULT	result;
@@ -150,7 +150,7 @@ static void	run_remote_command(char *host_name, char *command)
 				zbx_free(item.key);
 			}
 			else
-				zbx_snprintf(error, sizeof(error), "ZABBIX Agent interface is not defined for host [%s]", host_name);
+				zbx_snprintf(error, sizeof(error), "Zabbix Agent interface is not defined for host [%s]", host_name);
 #ifdef HAVE_OPENIPMI
 		}
 #endif
@@ -576,7 +576,7 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 				{
 					DBexecute("update hosts"
 							" set proxy_hostid=%s"
-							" where hostid=" ZBX_FS_UI64 ";\n",
+							" where hostid=" ZBX_FS_UI64,
 							DBsql_id_ins(proxy_hostid),
 							hostid);
 				}
@@ -615,7 +615,7 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 				DBexecute("insert into hosts"
 							" (hostid,proxy_hostid,host)"
 						" values"
-							" (" ZBX_FS_UI64 ",%s,'%s');\n",
+							" (" ZBX_FS_UI64 ",%s,'%s')",
 						hostid, DBsql_id_ins(proxy_hostid), host_esc);
 
 				DBadd_interface(hostid, INTERFACE_TYPE_AGENT, 1, row[2], row[1], port);
@@ -629,7 +629,7 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 				{
 					DBexecute("update hosts"
 							" set proxy_hostid=%s"
-							" where hostid=" ZBX_FS_UI64 ";\n",
+							" where hostid=" ZBX_FS_UI64,
 							DBsql_id_ins(proxy_hostid),
 							hostid);
 				}
