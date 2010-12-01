@@ -502,7 +502,7 @@ static int	get_values()
 			case ITEM_TYPE_IPMI:
 				zbx_free(port);
 				port = strdup(items[i].interface.port_orig);
-				substitute_simple_macros(NULL, NULL, NULL, NULL,
+				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL,
 						&port, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
 				if (FAIL == is_ushort(port, &items[i].interface.port))
 				{
