@@ -895,7 +895,6 @@ COpt::memoryPick();
 
 		foreach($items as $inum => &$item){
 			$current_item = $items[$inum];
-			check_db_fields($current_item, $dbItems[$item['itemid']]);
 
 			if(!check_db_fields($item_db_fields, $item)){
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION);
@@ -935,6 +934,8 @@ COpt::memoryPick();
 				continue;
 			}
 			else{
+				check_db_fields($current_item, $dbItems[$item['itemid']]);
+
 				if($dbHosts[$dbItems[$item['itemid']]['hostid']]['status'] == HOST_STATUS_TEMPLATE)
 					unset($item['interfaceid']);
 
@@ -994,8 +995,8 @@ COpt::memoryPick();
 			}
 
 			if((isset($item['port']) && !empty($item['port']))
-				&& (!(zbx_ctype_digit($item['port']) && ($item['port']>0) && ($item['port']<65535))
-				|| !preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/u', $item['port']))
+				&& !((zbx_ctype_digit($item['port']) && ($item['port']>0) && ($item['port']<65535))
+				|| preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/u', $item['port']))
 			){
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					sprintf(_('Item [%1$s:%2$s] has invalid port: "%3$s".'), $current_item['description'], $current_item['key_'], $item['port']));
