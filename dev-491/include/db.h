@@ -23,7 +23,6 @@
 /* time_t */
 #include <time.h>
 
-#include "zbxmacros.h"
 #include "common.h"
 #include "zbxdb.h"
 #include "dbschema.h"

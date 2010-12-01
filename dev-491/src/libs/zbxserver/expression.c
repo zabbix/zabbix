@@ -23,6 +23,59 @@
 #include "db.h"
 #include "log.h"
 #include "zlog.h"
+#include "zbxalgo.h"
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbxmacros_get_value_by_triggerid                                 *
+ *                                                                            *
+ * Purpose: get host macros from db and add it to the buffer                  *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbxmacros_get_value_by_triggerid(zbx_uint64_t triggerid, const char *macro, char **replace_to)
+{
+	const char		*__function_name = "zbxmacros_get_value_by_triggerid";
+
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_vector_uint64_t	hostids;
+	zbx_uint64_t		hostid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64, __function_name, triggerid);
+
+	zbx_vector_uint64_create(&hostids);
+	zbx_vector_uint64_reserve(&hostids, 8);
+
+	result = DBselect(
+			"select distinct i.hostid"
+			" from items i,functions f"
+			" where f.itemid=i.itemid"
+				" and f.triggerid=" ZBX_FS_UI64,
+			triggerid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(hostid, row[0]);
+		zbx_vector_uint64_append(&hostids, hostid);
+	}
+	DBfree_result(result);
+
+	zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	DCget_user_macro(hostids.values, hostids.values_num, macro, replace_to);
+
+	zbx_vector_uint64_destroy(&hostids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
 
 /******************************************************************************
  *                                                                            *
