@@ -889,7 +889,7 @@ esac],
 [server=no])
 AM_CONDITIONAL(SERVER, test x$server = xyes)
 
-AC_ARG_ENABLE(proxy,[  --enable-proxy          Turn on build of proxy server],
+AC_ARG_ENABLE(proxy,[  --enable-proxy          Turn on build of Zabbix proxy],
 [case "${enableval}" in
   yes) proxy=yes ;;
   no)  proxy=no ;;
@@ -898,7 +898,7 @@ esac],
 [proxy=no])
 AM_CONDITIONAL(PROXY, test x$proxy = xyes)
 
-AC_ARG_ENABLE(agent,[  --enable-agent          Turn on build of agent],
+AC_ARG_ENABLE(agent,[  --enable-agent          Turn on build of agent and client utilities],
 [case "${enableval}" in
   yes) agent=yes ;;
   no)  agent=no ;;

@@ -77,7 +77,7 @@ function set_zbx_locales(){
 		'ru_ru'=>  S_RUSSIAN_RU,
 		'sp_sp'=>  S_SPANISH_SP,
 		'sv_se'=>  S_SWEDISH_SE,
-		'uk_ua'=>  S_UKRAINIAN_UA,
+		'ua_ua'=>  S_UKRAINIAN_UA,
 	);
 }
 ?>
