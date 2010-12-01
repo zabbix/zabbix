@@ -882,48 +882,61 @@ COpt::memoryPick();
 			self::BeginTransaction(__METHOD__);
 
 			$options = array(
-				'itemids' => $ruleids,
-				'editable' => 1,
-				'preservekeys' => 1,
 				'output' => API_OUTPUT_EXTEND,
+				'itemids' => $ruleids,
+				'editable' => true,
+				'preservekeys' => true,
 			);
-			$del_items = self::get($options);
+			$del_rules = self::get($options);
 
 // TODO: remove $nopermissions hack
 			if(!$nopermissions){
 				foreach($ruleids as $ruleid){
-					if(!isset($del_items[$ruleid])){
+					if(!isset($del_rules[$ruleid])){
 						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
 					}
-					if($del_items[$ruleid]['templateid'] != 0){
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete templated items');
+					if($del_rules[$ruleid]['templateid'] != 0){
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete templated items'));
 					}
 				}
 			}
 
-// first delete child items
+// get child discovery rules
 			$parent_itemids = $ruleids;
+			$child_ruleids = array();
 			do{
 				$db_items = DBselect('SELECT itemid FROM items WHERE ' . DBcondition('templateid', $parent_itemids));
 				$parent_itemids = array();
 				while($db_item = DBfetch($db_items)){
 					$parent_itemids[$db_item['itemid']] = $db_item['itemid'];
-					$ruleids[$db_item['itemid']] = $db_item['itemid'];
+					$child_ruleids[$db_item['itemid']] = $db_item['itemid'];
 				}
 			}while(!empty($parent_itemids));
 
-			$prototypeids = array();
+			$options = array(
+				'output' => API_OUTPUT_EXTEND,
+				'itemids' => $child_ruleids,
+				'nopermissions' => true,
+				'preservekeys' => true,
+			);
+			$del_rules_childs = self::get($options);
+
+			$del_rules = array_merge($del_rules, $del_rules_childs);
+			$ruleids = array_merge($ruleids, $child_ruleids);
+
+
+			$iprototypeids = array();
 			$sql = 'SELECT i.itemid'.
 			 		' FROM item_discovery id, items i'.
-			 		' WHERE i.templateid IS NULL'.
-			 			' AND i.itemid=id.itemid'.
+			 		' WHERE i.itemid=id.itemid'.
 			 			' AND '.DBcondition('parent_itemid', $ruleids);
 			$db_items = DBselect($sql);
 			while($item = DBfetch($db_items)){
-				$prototypeids[$item['itemid']] = $item['itemid'];
+				$iprototypeids[$item['itemid']] = $item['itemid'];
 			}
-			if(!CItemPrototype::delete($prototypeids, true))
+			if(!CItemPrototype::delete($iprototypeids, true))
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete discovery rule');
+
 
 			DB::delete('items', array('itemid'=>$ruleids));
 
@@ -953,7 +966,7 @@ COpt::memoryPick();
 // }}} HOUSEKEEPER
 
 // TODO: remove info from API
-			foreach($del_items as $item){
+			foreach($del_rules as $item){
 				info(sprintf(_('Discovery rule [%1$s:%2$s] deleted'), $item['description'], $item['key_']));
 			}
 

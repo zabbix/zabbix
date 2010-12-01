@@ -892,15 +892,15 @@ COpt::memoryPick();
 				'preservekeys' => 1,
 				'output' => API_OUTPUT_EXTEND,
 			);
-			$del_items = self::get($options);
+			$del_itemPrototypes = self::get($options);
 
 // TODO: remove $nopermissions hack
 			if(!$nopermissions){
 				foreach($prototypeids as $prototypeid){
-					if(!isset($del_items[$prototypeid])){
+					if(!isset($del_itemPrototypes[$prototypeid])){
 						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
 					}
-					if($del_items[$prototypeid]['templateid'] != 0){
+					if($del_itemPrototypes[$prototypeid]['templateid'] != 0){
 						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete templated items');
 					}
 				}
@@ -908,14 +908,26 @@ COpt::memoryPick();
 
 // first delete child items
 			$parent_itemids = $prototypeids;
+			$child_prototypeids = array();
 			do{
 				$db_items = DBselect('SELECT itemid FROM items WHERE ' . DBcondition('templateid', $parent_itemids));
 				$parent_itemids = array();
 				while($db_item = DBfetch($db_items)){
 					$parent_itemids[$db_item['itemid']] = $db_item['itemid'];
-					$prototypeids[$db_item['itemid']] = $db_item['itemid'];
+					$child_prototypeids[$db_item['itemid']] = $db_item['itemid'];
 				}
 			}while(!empty($parent_itemids));
+
+			$options = array(
+				'output' => API_OUTPUT_EXTEND,
+				'itemids' => $child_prototypeids,
+				'nopermissions' => true,
+				'preservekeys' => true,
+			);
+			$del_itemPrototypes_childs = self::get($options);
+
+			$del_itemPrototypes = array_merge($del_itemPrototypes, $del_itemPrototypes_childs);
+			$prototypeids = array_merge($prototypeids, $child_prototypeids);
 
 
 // CREATED ITEMS
@@ -929,20 +941,28 @@ COpt::memoryPick();
 			if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete item prototype');
 
 
-// delete graph prototypes
-			$del_graphs = array();
-			$sql = 'SELECT gi.graphid' .
-					' FROM graphs_items gi' .
-					' WHERE ' . DBcondition('gi.itemid', $prototypeids);
-			$db_graphs = DBselect($sql);
-			while($db_graph = DBfetch($db_graphs)){
-				$del_graphs[$db_graph['graphid']] = $db_graph['graphid'];
-			}
-			if(!empty($del_graphs))
-				DB::delete('graphs', array('graphid'=>$del_graphs));
-// --
+// GRAPH PROTOTYPES
+			$del_graphPrototypes = CGraphPrototype::get(array(
+				'itemids' => $prototypeids,
+				'output' => API_OUTPUT_SHORTEN,
+				'nopermissions' => true,
+				'preservekeys' => true,
+			));
+			CGraphPrototype::delete($del_graphPrototypes);
 
-			DB::delete('items', array('itemid'=>$prototypeids));
+
+// TRIGGER PROTOTYPES
+			$del_triggerPrototypes = CTriggerPrototype::get(array(
+				'itemids' => $prototypeids,
+				'output' => API_OUTPUT_SHORTEN,
+				'nopermissions' => true,
+				'preservekeys' => true,
+			));
+			CTriggerPrototype::delete($del_triggerPrototypes);
+
+
+// ITEM PROTOTYPES
+			DB::delete('items', array('itemid' => $prototypeids));
 
 
 // HOUSEKEEPER {{{
@@ -969,7 +989,7 @@ COpt::memoryPick();
 // }}} HOUSEKEEPER
 
 // TODO: remove info from API
-			foreach($del_items as $item){
+			foreach($del_itemPrototypes as $item){
 				info(sprintf(_('Item prototype [%1$s:%2$s] deleted'), $item['description'], $item['key_']));
 			}
 

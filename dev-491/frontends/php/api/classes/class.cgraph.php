@@ -1017,7 +1017,6 @@ COpt::memoryPick();
 				'graphids' => $graphids,
 				'editable' => 1,
 				'output' => API_OUTPUT_EXTEND,
-				'selectHosts' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1
 			);
 			$del_graphs = self::get($options);
@@ -1059,8 +1058,7 @@ COpt::memoryPick();
 
 // TODO: REMOVE info
 			foreach($del_graphs as $graphid => $graph){
-				info(S_GRAPH.' ['.$graph['name'].'] '.S_DELETED_SMALL.'from hosts ['.
-						implode(', ',zbx_objectValues($graph['hosts'], 'host')).']');
+				info(sprintf(_('Graph [%1$s] deleted.'), $graph['name']));
 			}
 
 			self::EndTransaction(true, __METHOD__);

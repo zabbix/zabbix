@@ -1611,9 +1611,9 @@ Copt::memoryPick();
 
 			$options = array(
 				'hostids' => $hostids,
-				'editable' => 1,
+				'editable' => true,
 				'output' => API_OUTPUT_EXTEND,
-				'preservekeys' => 1,
+				'preservekeys' => true,
 			);
 			$upd_hosts = self::get($options);
 			foreach($hosts as $hnum => $host){
@@ -2122,8 +2122,8 @@ Copt::memoryPick();
 			DB::delete('hosts', array('hostid'=>$hostids));
 
 // TODO: remove info from API
-			foreach($hosts as $hnum => $host) {
-				info(S_HOST_HAS_BEEN_DELETED_MSG_PART1.SPACE.$host['host'].SPACE.S_HOST_HAS_BEEN_DELETED_MSG_PART2);
+			foreach($hosts as $hnum => $host){
+				info(sprintf(_('Host [%1$s] deleted.'), $host['host']));
 				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $host['hostid'], $host['host'], 'hosts', NULL, NULL);
 			}
 

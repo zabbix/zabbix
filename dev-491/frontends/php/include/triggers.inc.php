@@ -495,20 +495,6 @@ return $caption;
 	return $db_triggers;
 	}
 
-
-/*
- * Function: get_trigger_by_description
- *
- * Description:
- *	 retrieve triggerid by description
- *
- * Author:
- *	Aly
- *
- * Comments:
- *	  description - host-name:trigger-description. Example( "unix server:low free disk space")
- */
-
 	function get_trigger_by_description($desc){
 		list($host_name, $trigger_description) = explode(':',$desc,2);
 
@@ -1841,11 +1827,6 @@ return $caption;
 
 // ----------- DEPENDENCIES --------------
 
-/******************************************************************************
- *																			*
- * Comments: !!! Don't forget sync code with C !!!							*
- *																			*
- ******************************************************************************/
 	function get_trigger_dependencies_by_triggerid($triggerid){
 		$result = array();
 
@@ -2094,38 +2075,6 @@ return $caption;
 		$expr2 = preg_replace('/{[0-9]+}/', 'func', $expr2);
 		return strcmp($expr1, $expr2);
 	}
-
-/*
- * Function: copy_template_triggers
- *
- * Description:
- *	 Copy triggers from template
- *
- * Author:
- *	 Eugene Grigorjev (eugene.grigorjev@zabbix.com)
- *
- * Comments: !!! Don't forget sync code with C !!!
- *
- */
-	function copy_template_triggers($hostid, $templateid = null){
-		if(null == $templateid){
-			$templateid = array_keys(get_templates_by_hostid($hostid));
-		}
-
-		if(is_array($templateid)){
-			foreach($templateid as $id)
-				copy_template_triggers($hostid, $id); // attention recursion
-			return;
-		}
-
-		$triggers = get_triggers_by_hostid($templateid);
-		while($trigger = DBfetch($triggers)){
-			copy_trigger_to_host($trigger['triggerid'], $hostid, false);
-		}
-
-		update_template_dependencies_for_host($hostid);
-	}
-
 
 /*
  * Function: get_triggers_overview

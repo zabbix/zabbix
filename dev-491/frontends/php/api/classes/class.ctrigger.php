@@ -1592,8 +1592,9 @@ COpt::memoryPick();
 
 			$expression = implode_exp($trigger['expression'], $triggerid);
 			if(is_null($expression)){
-				self::exception();
+				self::exception(_('Cannot implode expression'));
 			}
+
 			DB::update('triggers', array(
 				'values' => array('expression' => $expression),
 				'where' => array('triggerid='.$triggerid)
@@ -1724,6 +1725,7 @@ COpt::memoryPick();
 	}
 
 	protected static function inherit($trigger, $hostids=null){
+
 		$triggerTemplate = CTemplate::get(array(
 			'triggerids' => $trigger['triggerid'],
 			'output' => API_OUTPUT_EXTEND,
@@ -1764,9 +1766,9 @@ COpt::memoryPick();
 			if($childTrigger = reset($childTriggers)){
 				$childTrigger['expression'] = explode_exp($childTrigger['expression'], 0);
 
-				if((strcmp($childTrigger['expression'], $newTrigger['expression']) != 0) ||
-						(strcmp($childTrigger['description'], $newTrigger['description']) != 0))
-				{
+				if((strcmp($childTrigger['expression'], $newTrigger['expression']) != 0)
+					|| (strcmp($childTrigger['description'], $newTrigger['description']) != 0)
+				){
 					$exists = self::exists(array(
 						'description' => $newTrigger['description'],
 						'expression' => $newTrigger['expression'],
@@ -1819,7 +1821,7 @@ COpt::memoryPick();
 					self::updateReal($newTrigger);
 				}
 				else{
-					self::createReal($newTrigger);
+					self::createReal($newTrigger, false);
 					$newTrigger = reset($newTrigger);
 				}
 			}
@@ -1827,6 +1829,64 @@ COpt::memoryPick();
 		}
 	}
 
+	public static function syncTemplates($data){
+		try{
+			self::BeginTransaction(__METHOD__);
+
+			$data['templateids'] = zbx_toArray($data['templateids']);
+			$data['hostids'] = zbx_toArray($data['hostids']);
+
+			$options = array(
+				'hostids' => $data['hostids'],
+				'editable' => true,
+				'preservekeys' => true,
+				'templated_hosts' => true,
+				'output' => API_OUTPUT_SHORTEN
+			);
+			$allowedHosts = CHost::get($options);
+			foreach($data['hostids'] as $hostid){
+				if(!isset($allowedHosts[$hostid])){
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				}
+			}
+			$options = array(
+				'templateids' => $data['templateids'],
+				'preservekeys' => true,
+				'editable' => true,
+				'output' => API_OUTPUT_SHORTEN
+			);
+			$allowedTemplates = CTemplate::get($options);
+			foreach($data['templateids'] as $templateid){
+				if(!isset($allowedTemplates[$templateid])){
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				}
+			}
+
+			$options = array(
+				'hostids' => $data['templateids'],
+				'preservekeys' => 1,
+				'output' => API_OUTPUT_EXTEND,
+				'select_dependencies' => true,
+			);
+			$triggers = self::get($options);
+
+			foreach($triggers as $trigger){
+				$trigger['expression'] = explode_exp($trigger['expression'], false);
+				self::inherit($trigger, $data['hostids']);
+			}
+
+
+			self::EndTransaction(true, __METHOD__);
+			return true;
+		}
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
+			return false;
+		}
+	}
 
 	protected static function validateDependencies($triggers){
 
