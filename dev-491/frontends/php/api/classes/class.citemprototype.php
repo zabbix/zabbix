@@ -1040,9 +1040,14 @@ COpt::memoryPick();
 			$options = array(
 				'hostids' => $data['templateids'],
 				'preservekeys' => 1,
+				'select_applications' => API_OUTPUT_REFER,
 				'output' => API_OUTPUT_EXTEND,
 			);
 			$items = self::get($options);
+
+			foreach($items as $inum => $item){
+				$items[$inum]['applications'] = zbx_objectValues($item['applications'], 'applicationid');
+			}
 
 			self::inherit($items, $data['hostids']);
 
