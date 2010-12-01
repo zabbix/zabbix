@@ -24,6 +24,7 @@ Changes for 1.9.0
 
 Changes for 1.8.4rc3
 
+ - [ZBX-3061] fixed screen import problem with "Status of triggers" screen type (Aly)
  - [ZBX-3249] added define for frontend graphing on partitioned DB data store (Aly)
  - [ZBX-3216] fixed setup not catching existing configuration file on step 6 (Vedmak)
  - [ZBX-3240] updated Russian translation; thanks to dotneft and zalex_ua (Richlv)
