@@ -633,6 +633,8 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 							DBsql_id_ins(proxy_hostid),
 							hostid);
 				}
+
+				DBadd_interface(hostid, INTERFACE_TYPE_AGENT, 1, row[2], row[1], port);
 			}
 			DBfree_result(result2);
 
