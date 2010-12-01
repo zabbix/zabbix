@@ -934,7 +934,10 @@ COpt::memoryPick();
 				continue;
 			}
 			else{
-				check_db_fields($current_item, $dbItems[$item['itemid']]);
+				check_db_fields($dbItems[$item['itemid']], $current_item);
+
+				if(!isset($item['key_'])) $item['key_'] = $dbItems[$item['itemid']]['key_'];
+				if(!isset($item['hostid'])) $item['hostid'] = $dbItems[$item['itemid']]['hostid'];
 
 				if($dbHosts[$dbItems[$item['itemid']]['hostid']]['status'] == HOST_STATUS_TEMPLATE)
 					unset($item['interfaceid']);
@@ -977,14 +980,11 @@ COpt::memoryPick();
 					'ipmi_sensor'		=> array()
 				);
 
+
 				foreach($restoreRules as $var_name => $info){
 					if(!isset($info['template']) && (0 != $dbItems[$item['itemid']]['templateid'])){
 						unset($item[$var_name]);
 					}
-				}
-
-				if(!isset($items[$inum]['hostid'])){
-					$item['hostid'] = $dbItems[$item['itemid']]['hostid'];
 				}
 			}
 
@@ -994,8 +994,8 @@ COpt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Item uses Host interface from non parent host');
 			}
 
-			if((isset($item['port']) && !empty($item['port']))
-				&& !((zbx_ctype_digit($item['port']) && ($item['port']>0) && ($item['port']<65535))
+			if((isset($item['port']) && !zbx_empty($item['port']))
+				&& !((zbx_ctype_digit($item['port']) && ($item['port']>0) && ($item['port']<=65535))
 				|| preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/u', $item['port']))
 			){
 				self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -1188,7 +1188,7 @@ COpt::memoryPick();
 		}
 
 		if(!empty($itemids)){
-			DB::delete('items_applications', array( 'itemid'=>$itemids));
+			DB::delete('items_applications', array('itemid'=>$itemids));
 			DB::insert('items_applications', $itemApplications);
 		}
 

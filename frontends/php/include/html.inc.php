@@ -361,7 +361,7 @@
 					$status = new CSpan(S_MONITORED, 'off');
 					break;
 				case HOST_STATUS_NOT_MONITORED:
-					$status = new CSpan(S_NOT_MONITORED, 'off');
+					$status = new CSpan(S_NOT_MONITORED, 'on');
 					break;
 				default:
 					$status = S_UNKNOWN;

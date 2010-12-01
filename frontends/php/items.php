@@ -129,7 +129,7 @@ switch($itemType) {
 													ITEM_TYPE_SNMPV1.','.
 													ITEM_TYPE_SNMPV2C.','.
 													ITEM_TYPE_SNMPV3,'type')),
-		'port'=>		array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,	'isset({save})&&isset({type})&&'.IN(
+		'port'=>		array(T_ZBX_STR, O_OPT,  null,  BETWEEN(0, 65535),	'isset({save})&&isset({type})&&'.IN(
 													ITEM_TYPE_SNMPV1.','.
 													ITEM_TYPE_SNMPV2C.','.
 													ITEM_TYPE_SNMPV3,'type')),
