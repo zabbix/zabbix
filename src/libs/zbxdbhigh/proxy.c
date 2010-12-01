@@ -344,6 +344,7 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 		{"items"},
 		{"drules"},
 		{"dchecks"},
+		{"interface"},
 		{NULL}
 	};
 
@@ -422,6 +423,13 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 					DRULE_STATUS_MONITORED);
 		}
 		else if (0 == strcmp(pt[i].table, "hostmacro"))
+		{
+			zbx_snprintf_alloc(&condition, &condition_alloc, &condition_offset, 256,
+					" where%s", 0 == hostids_num ? " 0=1" : "");
+			DBadd_condition_alloc(&condition, &condition_alloc, &condition_offset,
+					"t.hostid", hostids, hostids_num);
+		}
+		else if (0 == strcmp(pt[i].table, "interface"))
 		{
 			zbx_snprintf_alloc(&condition, &condition_alloc, &condition_offset, 256,
 					" where%s", 0 == hostids_num ? " 0=1" : "");
