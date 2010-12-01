@@ -1401,10 +1401,15 @@ COpt::memoryPick();
 			$options = array(
 				'hostids' => $data['templateids'],
 				'preservekeys' => 1,
+				'select_applications' => API_OUTPUT_REFER,
 				'output' => API_OUTPUT_EXTEND,
 				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 			);
 			$items = self::get($options);
+
+			foreach($items as $inum => $item){
+				$items[$inum]['applications'] = zbx_objectValues($item['applications'], 'applicationid');
+			}
 
 			self::inherit($items, $data['hostids']);
 
