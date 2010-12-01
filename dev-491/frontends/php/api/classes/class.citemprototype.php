@@ -556,8 +556,6 @@ COpt::memoryPick();
 
 		foreach($items as $inum => &$item){
 			$current_item = $items[$inum];
-			check_db_fields($current_item, $dbItems[$item['itemid']]);
-
 
 			if(!check_db_fields($item_db_fields, $item)){
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION);
@@ -571,6 +569,11 @@ COpt::memoryPick();
 			unset($item['lastns']);
 
 			if($update){
+				check_db_fields($dbItems[$item['itemid']], $current_item);
+
+				if(!isset($item['key_'])) $item['key_'] = $dbItems[$item['itemid']]['key_'];
+				if(!isset($item['hostid'])) $item['hostid'] = $dbItems[$item['itemid']]['hostid'];
+
 				if(!isset($dbItems[$item['itemid']]))
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 
@@ -614,17 +617,13 @@ COpt::memoryPick();
 						unset($item[$var_name]);
 					}
 				}
-
-				if(!isset($items[$inum]['hostid'])){
-					$item['hostid'] = $dbItems[$item['itemid']]['hostid'];
-				}
 			}
 			else{
 				if(!isset($dbHosts[$item['hostid']]))
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 			}
 
-			if((isset($item['port']) && !empty($item['port']))
+			if((isset($item['port']) && !zbx_empty($item['port']))
 				&& !((zbx_ctype_digit($item['port']) && ($item['port']>0) && ($item['port']<65535))
 				|| preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/u', $item['port']))
 			){
