@@ -3568,10 +3568,10 @@ int	DBdelete_host(zbx_uint64_t hostid)
  *                                                                            *
  * Parameters: hostid - [IN] host identificator from database                 *
  *             type   - [IN] new interface type                               *
- *             useip  - [IN]                                                  *
- *             ip     - [IN]                                                  *
- *             dns    - [IN]                                                  *
- *             port   - [IN]                                                  *
+ *             useip  - [IN] how to connect to the host 0/1 - DNS/IP          *
+ *             ip     - [IN] IP address                                       *
+ *             dns    - [IN] DNS address                                      *
+ *             port   - [IN] port                                             *
  *                                                                            *
  * Return value: upon successful completion return interface identificator    *
  *                                                                            *

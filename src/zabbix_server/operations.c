@@ -53,10 +53,10 @@ static void	run_remote_command(char *host_name, char *command)
 	DC_ITEM         item;
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		*p, *host_esc, *param;
+	char		error[MAX_STRING_LEN], *p, *host_esc, *param;
 #ifdef HAVE_OPENIPMI
 	int		val;
-	char		error[MAX_STRING_LEN], *port;
+	char		*port;
 #endif
 
 	assert(host_name);
