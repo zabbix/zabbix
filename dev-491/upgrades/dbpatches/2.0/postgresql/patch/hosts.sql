@@ -14,34 +14,34 @@ CREATE TABLE interface (
 CREATE INDEX interface_1 on interface (hostid,type);
 CREATE INDEX interface_2 on interface (ip,dns);
 ALTER TABLE ONLY interface ADD CONSTRAINT c_interface_1 FOREIGN KEY (hostid) REFERENCES hosts (hostid) ON DELETE CASCADE;
- 
--- Passive proxy interface 
+
+-- Passive proxy interface
 INSERT INTO interface (interfaceid,hostid,main,type,ip,dns,useip,port)
 	(SELECT (hostid - ((hostid / 100000000000)*100000000000)) * 3 + ((hostid / 100000000000)*100000000000),
 		hostid,1,0,ip,dns,useip,port
-	FROM hosts 
+	FROM hosts
 	WHERE status IN (6));	-- HOST_STATUS_PROXY_PASSIVE
 
--- Zabbix Agent interface 
+-- Zabbix Agent interface
 INSERT INTO interface (interfaceid,hostid,main,type,ip,dns,useip,port)
 	(SELECT (hostid - ((hostid / 100000000000)*100000000000)) * 3 + ((hostid / 100000000000)*100000000000),
 		hostid,1,1,ip,dns,useip,port
-	FROM hosts 
+	FROM hosts
 	WHERE status IN (0,1));
 
--- SNMP interface 
+-- SNMP interface
 INSERT INTO interface (interfaceid,hostid,main,type,ip,dns,useip,port)
 	(SELECT (hostid - ((hostid / 100000000000)*100000000000)) * 3 + ((hostid / 100000000000)*100000000000) + 1,
 		hostid,1,2,ip,dns,useip,'161'
-	FROM hosts 
+	FROM hosts
 	WHERE status IN (0,1)
 		AND EXISTS (SELECT DISTINCT i.hostid FROM items i WHERE i.hostid=hosts.hostid and i.type IN (1,4,6)));	-- SNMPv1, SNMPv2c, SNMPv3
 
--- IPMI interface 
+-- IPMI interface
 INSERT INTO interface (interfaceid,hostid,main,type,ip,dns,useip,port)
 	(SELECT (hostid - ((hostid / 100000000000)*100000000000)) * 3 + ((hostid / 100000000000)*100000000000) + 2,
 		hostid,1,3,'',ipmi_ip,0,ipmi_port
-	FROM hosts 
+	FROM hosts
 	WHERE status IN (0,1) AND useipmi=1);
 
 ---- Patching table `items`
@@ -74,19 +74,19 @@ UPDATE items SET port=snmp_port;
 ALTER TABLE items DROP COLUMN snmp_port;
 
 -- host interface for non IPMI, SNMP and non templated items
-UPDATE items 
+UPDATE items
 	SET interfaceid=(SELECT interfaceid FROM interface WHERE hostid=items.hostid AND main=1 AND type=1)
 	WHERE EXISTS (SELECT hostid FROM hosts WHERE hosts.hostid=items.hostid AND hosts.status IN (0,1))
 		AND type NOT IN (1,4,6,12);     -- SNMPv1, SNMPv2c, SNMPv3, IPMI
 
 -- host interface for SNMP and non templated items
-UPDATE items 
+UPDATE items
 	SET interfaceid=(SELECT interfaceid FROM interface WHERE hostid=items.hostid AND main=1 AND type=2)
 	WHERE EXISTS (SELECT hostid FROM hosts WHERE hosts.hostid=items.hostid AND hosts.status IN (0,1))
 		AND type IN (1,4,6);		-- SNMPv1, SNMPv2c, SNMPv3
 
 -- host interface for IPMI and non templated items
-UPDATE items 
+UPDATE items
 	SET interfaceid=(SELECT interfaceid FROM interface WHERE hostid=items.hostid AND main=1 AND type=3)
 	WHERE EXISTS (SELECT hostid FROM hosts WHERE hosts.hostid=items.hostid AND hosts.status IN (0,1))
 		AND type IN (12);		-- IPMI
