@@ -1903,6 +1903,12 @@
 									S_KEY_IS_VALID //result description
 								);
 							}
+                            elseif($characters[$i+1] == ']' && isset($characters[$i+2])){
+                                return array(
+									false,   //is key valid?
+									sprintf(S_INCORRECT_USAGE_OF_BRACKETS, $characters[$i+2]) //result description
+								);
+                            }
 
 							if ((!isset($characters[$i+1]) || $characters[$i+1] != ',') //if next symbol is not ','
 								&& !($nest_level != 0 && isset($characters[$i+1]) && $characters[$i+1] == ']'))
