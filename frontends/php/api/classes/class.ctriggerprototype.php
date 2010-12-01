@@ -1547,6 +1547,61 @@ COpt::memoryPick();
 		}
 	}
 
+	public static function syncTemplates($data){
+		try{
+			self::BeginTransaction(__METHOD__);
+
+			$data['templateids'] = zbx_toArray($data['templateids']);
+			$data['hostids'] = zbx_toArray($data['hostids']);
+
+			$options = array(
+				'hostids' => $data['hostids'],
+				'editable' => true,
+				'preservekeys' => true,
+				'templated_hosts' => true,
+				'output' => API_OUTPUT_SHORTEN
+			);
+			$allowedHosts = CHost::get($options);
+			foreach($data['hostids'] as $hostid){
+				if(!isset($allowedHosts[$hostid])){
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				}
+			}
+			$options = array(
+				'templateids' => $data['templateids'],
+				'preservekeys' => true,
+				'editable' => true,
+				'output' => API_OUTPUT_SHORTEN
+			);
+			$allowedTemplates = CTemplate::get($options);
+			foreach($data['templateids'] as $templateid){
+				if(!isset($allowedTemplates[$templateid])){
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				}
+			}
+
+			$options = array(
+				'hostids' => $data['templateids'],
+				'preservekeys' => 1,
+				'output' => API_OUTPUT_EXTEND,
+				'select_dependencies' => true,
+			);
+			$triggers = self::get($options);
+
+			foreach($triggers as $trigger)
+				self::inherit($trigger, $data['hostids']);
+
+			self::EndTransaction(true, __METHOD__);
+			return true;
+		}
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
+			return false;
+		}
+	}
 }
 
 ?>

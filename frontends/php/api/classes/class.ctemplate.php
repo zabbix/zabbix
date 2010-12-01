@@ -1783,6 +1783,7 @@ COpt::memoryPick();
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
+				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot sync applications');
 
 				$result = CDiscoveryRule::syncTemplates(array(
 					'hostids' => $targetid,
@@ -1802,7 +1803,17 @@ COpt::memoryPick();
 				));
 				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot sync items');
 
-				copy_template_triggers($targetid, $templateid);
+				$result = CTrigger::syncTemplates(array(
+					'hostids' => $targetid,
+					'templateids' => $templateid
+				));
+				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot sync Triggers');
+
+				$result = CTriggerPrototype::syncTemplates(array(
+					'hostids' => $targetid,
+					'templateids' => $templateid
+				));
+				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot sync Triggers prototypes');
 
 				$result = CGraphPrototype::syncTemplates(array(
 					'hostids' => $targetid,
@@ -1823,7 +1834,7 @@ COpt::memoryPick();
 
 	private static function unlink($templateids, $targetids=null, $clear=false){
 
-/* ITEMS, DISCOVERY RULES, ITEM PROTOTYPES {{{ */
+/* ITEMS, DISCOVERY RULES {{{ */
 		$sql_from = 'items i1, items i2';
 		$sql_where = ' i2.itemid=i1.templateid'.
 			' AND '.DBCondition('i2.hostid', $templateids).
@@ -1928,12 +1939,7 @@ COpt::memoryPick();
 /* }}} GRAPHS */
 
 
-/* TRIGGERS, TRIGGER PROTOTYPES {{{ */
-		$triggers = array(
-			ZBX_FLAG_DISCOVERY_NORMAL => array(),
-			ZBX_FLAG_DISCOVERY_CHILD => array(),
-		);
-
+/* TRIGGERS {{{ */
 		$sql_from = 'triggers t';
 		$sql_where = ' EXISTS ('.
 				' SELECT ff.triggerid'.
@@ -1951,50 +1957,32 @@ COpt::memoryPick();
 		$sql = 'SELECT DISTINCT t.triggerid, t.description, t.flags, t.expression'.
 				' FROM '.$sql_from.
 				' WHERE '.$sql_where.
-					' AND '.DBcondition('t.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CHILD));
+					' AND t.flags='.ZBX_FLAG_DISCOVERY_NORMAL;
 		$db_triggers = DBSelect($sql);
 		while($trigger = DBfetch($db_triggers)){
-			$triggers[$trigger['flags']][$trigger['triggerid']] = array(
+			$triggers[$trigger['triggerid']] = array(
 				'description' => $trigger['description'],
 				'expression' => explode_exp($trigger['expression'], false),
 			);
 		}
 
-		if(!empty($triggers[ZBX_FLAG_DISCOVERY_NORMAL])){
+		if(!empty($triggers)){
 			if($clear){
-				$result = CTrigger::delete(array_keys($triggers[ZBX_FLAG_DISCOVERY_NORMAL]), true);
+				$result = CTrigger::delete(array_keys($triggers), true);
 				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Cannot unlink and clear triggers');
 			}
 			else{
 				DB::update('triggers', array(
 					'values' => array('templateid' => 0),
-					'where' => array(DBcondition('triggerid', array_keys($triggers[ZBX_FLAG_DISCOVERY_NORMAL])))
+					'where' => array(DBcondition('triggerid', array_keys($triggers)))
 				));
 
-				foreach($triggers[ZBX_FLAG_DISCOVERY_NORMAL] as $trigger){
+				foreach($triggers as $trigger){
 					info(sprintf(_('Trigger [%1$s:%2$s] unlinked.'), $trigger['description'], $trigger['expression']));
 				}
 			}
 		}
-
-
-		if(!empty($triggers[ZBX_FLAG_DISCOVERY_CHILD])){
-			if($clear){
-				$result = CTriggerPrototype::delete(array_keys($triggers[ZBX_FLAG_DISCOVERY_CHILD]), true);
-				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Cannot unlink and clear triggers');
-			}
-			else{
-				DB::update('triggers', array(
-					'values' => array('templateid' => 0),
-					'where' => array(DBcondition('triggerid', array_keys($triggers[ZBX_FLAG_DISCOVERY_CHILD])))
-				));
-
-				foreach($triggers[ZBX_FLAG_DISCOVERY_CHILD] as $triggerPrototype){
-					info(sprintf(_('Trigger prototype [%1$s:%2$s] unlinked.'), $triggerPrototype['description'], $triggerPrototype['expression']));
-				}
-			}
-		}
-/* }}} TRIGGERS, TRIGGER PROTOTYPES */
+/* }}} TRIGGERS */
 
 
 /* APPLICATIONS {{{ */
@@ -2034,9 +2022,25 @@ COpt::memoryPick();
 
 
 		DB::delete('hosts_templates', array(
-			'templateid'=>$templateids,
-			'hostid'=>$targetids
+			'templateid' => $templateids,
+			'hostid' => $targetids
 		));
+
+		$hosts = CHost::get(array(
+			'hostids' => $targetids,
+			'output' => array('hostid, host'),
+			'nopermissions' => true,
+		));
+		$templates = CTemplate::get(array(
+			'templateids' => $templateids,
+			'output' => array('hostid, host'),
+			'nopermissions' => true,
+		));
+
+		$hosts = implode(', ', zbx_objectValues($hosts, 'host'));
+		$templates = implode(', ', zbx_objectValues($templates, 'host'));
+
+		info(sprintf(_('Templates [%1$s] unlinked from hosts [%2$s].'), $templates, $hosts));
 
 		return true;
 	}

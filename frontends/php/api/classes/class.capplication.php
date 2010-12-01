@@ -323,7 +323,7 @@ class CApplication extends CZBXAPI{
 							$result[$application['applicationid']]['hosts'] = array();
 
 						$result[$application['applicationid']]['hosts'][] = array('hostid' => $application['hostid']);
-						unset($application['hostid']);
+//						unset($application['hostid']);
 					}
 
 // itemids
@@ -554,6 +554,8 @@ COpt::memoryPick();
 	}
 
 	protected static function createReal(&$applications){
+		if(empty($applications)) return true;
+
 		$applicationids = DB::insert('applications', $applications);
 
 		foreach($applications as $anum => $application){
@@ -625,18 +627,19 @@ COpt::memoryPick();
 			}
 
 
-			$parent_applicationids = $child_applications = $applicationids;
+			$parent_applicationids = $applicationids;
+			$child_applicationids = array();
 			do{
 				$db_applications = DBselect('SELECT applicationid FROM applications WHERE ' . DBcondition('templateid', $parent_applicationids));
 				$parent_applicationids = array();
 				while($db_application = DBfetch($db_applications)){
 					$parent_applicationids[] = $db_application['applicationid'];
-					$child_applications[$db_application['applicationid']] = $db_application['applicationid'];
+					$child_applicationids[$db_application['applicationid']] = $db_application['applicationid'];
 				}
 			} while(!empty($parent_applicationids));
 
 			$options = array(
-				'applicationids' => array_diff($child_applications, $applicationids),
+				'applicationids' => $child_applicationids,
 				'output' => API_OUTPUT_EXTEND,
 				'nopermissions' => true,
 				'preservekeys' => true,
@@ -644,7 +647,7 @@ COpt::memoryPick();
 			$del_application_childs = self::get($options);
 
 			$del_applications = array_merge($del_applications, $del_application_childs);
-			$applicationids = array_merge($applicationids, $child_applications);
+			$applicationids = array_merge($applicationids, $child_applicationids);
 
 //check if app is used by web scenario
 			$sql = 'SELECT ht.name, ht.applicationid '.
@@ -798,6 +801,7 @@ COpt::memoryPick();
 
 		$insertApplications = array();
 		$updateApplications = array();
+
 		foreach($chdHosts as $hostid => $host){
 			$templateids = zbx_toHash($host['templates'], 'templateid');
 
@@ -810,11 +814,12 @@ COpt::memoryPick();
 
 // check existing items to decide insert or update
 			$exApplications = self::get(array(
-				'output' => array('applicationid', 'name', 'templateid'),
+				'output' => API_OUTPUT_EXTEND,
 				'hostids' => $hostid,
-				'preservekeys' => 1,
-				'nopermissions' => 1
+				'preservekeys' => true,
+				'nopermissions' => true,
 			));
+
 			$exApplicationsNames = zbx_toHash($exApplications, 'name');
 			$exApplicationsTpl = zbx_toHash($exApplications, 'templateid');
 
@@ -827,8 +832,10 @@ COpt::memoryPick();
 				}
 
 // update by name
+
 				if(isset($application['name']) && isset($exApplicationsNames[$application['name']])){
 					$exApplication = $exApplicationsNames[$application['name']];
+
 					if(($exApplication['templateid'] > 0) && ($exApplication['templateid'] != $application['applicationid'])){
 						self::exception(ZBX_API_ERROR_PARAMETERS, S_APPLICATION.' ['.$exApplication['name'].'] '.S_ALREADY_EXISTS_FOR_HOST_SMALL.' ['.$host['host'].']');
 					}

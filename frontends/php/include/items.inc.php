@@ -314,6 +314,8 @@
 	}
 
 	function copyItems($srcid, $destid){
+		$result = true;
+
 		$options = array(
 			'hostids' => $srcid,
 			'output' => API_OUTPUT_EXTEND,

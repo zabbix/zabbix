@@ -605,13 +605,13 @@ include_once('include/page_header.php');
 				$options = array(
 					'hostids' => $clone_hostid,
 					'output' => API_OUTPUT_EXTEND,
-					'inherited' => 0,
-					'selectHosts' => API_OUTPUT_COUNT,
+					'inherited' => false,
+					'selectHosts' => API_OUTPUT_SHORTEN,
 					'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 				);
 				$graphs = CGraph::get($options);
 				foreach($graphs as $gnum => $graph){
-					if($graph['hosts'] > 1) continue;
+					if(count($graph['hosts']) > 1) continue;
 						if(!copy_graph_to_host($graph['graphid'], $hostid)) throw new Exception();
 				}
 			}

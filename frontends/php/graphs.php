@@ -505,7 +505,7 @@ include_once('include/page_header.php');
 
 
 			$chkBox = new CCheckBox('group_graphid['.$graphid.']', NULL, NULL, $graphid);
-			if(($graph['templateid'] > 0) || empty($item['discoveryRule']))
+			if(($graph['templateid'] > 0) || !empty($graph['discoveryRule']))
 				$chkBox->setEnabled(false);
 
 			$table->addRow(array(
