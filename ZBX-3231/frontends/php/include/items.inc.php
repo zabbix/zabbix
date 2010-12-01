@@ -1796,7 +1796,7 @@
 			$characters[] = zbx_substr($key, $i, 1);
 		}
 
-		//checking every charecter, one by one
+		//checking every character, one by one
 		for($current_char = 0; $current_char < $key_strlen; $current_char++) {
 			if(!preg_match("/".ZBX_PREG_KEY_NAME."/", $characters[$current_char])) {
 				break; //$current_char now points to a first 'not a key name' char
@@ -1839,7 +1839,7 @@
 						//one of the nested sets ended
 						elseif($characters[$i] == ']' && $nest_level != 0) {
 							$nest_level--;
-							//skiping spaces
+							//skipping spaces
 							while(isset($characters[$i+1]) && $characters[$i+1] == ' ') {
 								$i++;
 							}
@@ -1876,7 +1876,7 @@
 						elseif($characters[$i] != ' ') {
 							$state = 2;
 						}
-						
+
 					break;
 
 					//quoted
@@ -1884,7 +1884,7 @@
 						//ending quote is reached
 						if($characters[$i] == '"')
 						{
-							//skiping spaces
+							//skipping spaces
 							while(isset($characters[$i+1]) && $characters[$i+1] == ' ') {
 								$i++;
 							}
@@ -1967,9 +1967,9 @@
 		else {
 			return array(
 				false,   //is key valid?
-				sprintf(S_INVALID_CHARECTER_AT_POSITION, $charecters[$current_char], $current_char) //result description
+				sprintf(S_INVALID_CHARECTER_AT_POSITION, $characters[$current_char], $current_char) //result description
 			);
 		}
-		
+
 	}
 ?>
