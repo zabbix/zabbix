@@ -27,22 +27,22 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: zbxmacros_get_value_by_triggerid                                 *
+ * Function: DBget_macro_value_by_triggerid                                   *
  *                                                                            *
- * Purpose: get host macros from db and add it to the buffer                  *
+ * Purpose: get value of a user macro                                         *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	zbxmacros_get_value_by_triggerid(zbx_uint64_t triggerid, const char *macro, char **replace_to)
+static void	DBget_macro_value_by_triggerid(zbx_uint64_t triggerid, const char *macro, char **replace_to)
 {
-	const char		*__function_name = "zbxmacros_get_value_by_triggerid";
+	const char		*__function_name = "DBget_macro_value_by_triggerid";
 
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -2248,7 +2248,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 					ret = DBget_item_value_by_triggerid(event->objectid, &replace_to, N_functionid,
 							event->clock, event->ns);
 				else if (0 == strncmp(m, "{$", 2))	/* user defined macros */
-					zbxmacros_get_value_by_triggerid(event->objectid, m, &replace_to);
+					DBget_macro_value_by_triggerid(event->objectid, m, &replace_to);
 			}
 		}
 		else if (macro_type & MACRO_TYPE_TRIGGER_EXPRESSION)
@@ -2259,7 +2259,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 					replace_to = zbx_dsprintf(replace_to, "%d", event->value);
 				else if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				{
-					zbxmacros_get_value_by_triggerid(event->objectid, m, &replace_to);
+					DBget_macro_value_by_triggerid(event->objectid, m, &replace_to);
 					if (NULL != replace_to && FAIL == (res = is_double_prefix(replace_to)) && NULL != error)
 						zbx_snprintf(error, maxerrlen, "Macro '%s' value is not numeric", m);
 				}
