@@ -26,7 +26,7 @@ INSERT INTO interface (interfaceid,hostid,main,type,ip,dns,useip,port)
 INSERT INTO interface (interfaceid,hostid,main,type,ip,dns,useip,port)
 	(SELECT (hostid - (round(hostid / 100000000000)*100000000000)) * 3 + (round(hostid / 100000000000)*100000000000),
 		hostid,1,1,ip,dns,useip,port
-	FROM hosts 
+	FROM hosts
 	WHERE status IN (0,1));
 
 -- SNMP interface
@@ -41,7 +41,7 @@ INSERT INTO interface (interfaceid,hostid,main,type,ip,dns,useip,port)
 INSERT INTO interface (interfaceid,hostid,main,type,ip,dns,useip,port)
 	(SELECT (hostid - (round(hostid / 100000000000)*100000000000)) * 3 + (round(hostid / 100000000000)*100000000000) + 2,
 		hostid,1,3,'',ipmi_ip,0,ipmi_port
-	FROM hosts 
+	FROM hosts
 	WHERE status IN (0,1) AND useipmi=1);
 
 ---- Patching table `items`
@@ -74,7 +74,7 @@ UPDATE items SET port=snmp_port;
 ALTER TABLE items DROP COLUMN snmp_port;
 
 -- host interface for non IPMI, SNMP and non templated items
-UPDATE items 
+UPDATE items
 	SET interfaceid=(SELECT interfaceid FROM interface WHERE hostid=items.hostid AND main=1 AND type=1)
 	WHERE EXISTS (SELECT hostid FROM hosts WHERE hosts.hostid=items.hostid AND hosts.status IN (0,1))
 		AND type NOT IN (1,4,6,12);
@@ -86,7 +86,7 @@ UPDATE items
 		AND type IN (1,4,6);
 
 -- host interface for IPMI and non templated items
-UPDATE items 
+UPDATE items
 	SET interfaceid=(SELECT interfaceid FROM interface WHERE hostid=items.hostid AND main=1 AND type=3)
 	WHERE EXISTS (SELECT hostid FROM hosts WHERE hosts.hostid=items.hostid AND hosts.status IN (0,1))
 		AND type IN (12);
