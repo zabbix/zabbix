@@ -152,7 +152,7 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request, unsigned char zb
 
 	strscpy(ip, get_ip_by_socket(sock));
 
-	if (FAIL == get_hostid_by_host(host, ip, 10050, &hostid, error, zbx_process))
+	if (FAIL == get_hostid_by_host(host, ip, ZBX_DEFAULT_AGENT_PORT, &hostid, error, zbx_process))
 		goto out;
 
 	buffer = zbx_malloc(buffer, buffer_alloc);
@@ -291,7 +291,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp,
 		*tmp = '\0';
 
 	if (FAIL == is_ushort(tmp, &port))
-		port = 10050;
+		port = ZBX_DEFAULT_AGENT_PORT;
 
 	if (FAIL == get_hostid_by_host(host, ip, port, &hostid, error, zbx_process))
 		goto error;

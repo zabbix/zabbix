@@ -1778,7 +1778,7 @@ void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)
 			*tmp = '\0';
 
 		if (FAIL == is_ushort(tmp, &port))
-			port = 10050;
+			port = ZBX_DEFAULT_AGENT_PORT;
 
 		DBbegin();
 		DBregister_host(proxy_hostid, host, ip, port, itemtime);

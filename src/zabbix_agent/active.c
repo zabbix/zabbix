@@ -373,7 +373,7 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 			*p = ',';
 	}
 
-	if (10050 != CONFIG_LISTEN_PORT)
+	if (ZBX_DEFAULT_AGENT_PORT != CONFIG_LISTEN_PORT)
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_PORT, CONFIG_LISTEN_PORT);
 
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, CONFIG_TIMEOUT)))

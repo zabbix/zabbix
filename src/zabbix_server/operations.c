@@ -510,7 +510,7 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 					interface_type = INTERFACE_TYPE_SNMP;
 					break;
 				default:
-					port = 10050;
+					port = ZBX_DEFAULT_AGENT_PORT;
 					interface_type = INTERFACE_TYPE_AGENT;
 			}
 
