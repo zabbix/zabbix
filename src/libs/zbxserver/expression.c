@@ -1415,7 +1415,7 @@ static int	DBget_item_lastvalue_by_triggerid(zbx_uint64_t triggerid, char **last
 	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[4]))
 	{
 		value_type = atoi(row[1]);
-		ZBX_DBROW2UINT64(valuemapid, row[2])
+		ZBX_DBROW2UINT64(valuemapid, row[2]);
 
 		switch (value_type)
 		{
@@ -1599,11 +1599,12 @@ static int	get_escalation_history(DB_EVENT *event, DB_ESCALATION *escalation, ch
 			escalation != NULL ? escalation->eventid : event->eventid,
 			ALERT_TYPE_MESSAGE);
 
-	while (NULL != (row = DBfetch(result))) {
+	while (NULL != (row = DBfetch(result)))
+	{
 		now		= atoi(row[0]);
 		status		= atoi(row[1]);
 		esc_step	= atoi(row[5]);
-		ZBX_DBROW2UINT64(userid, row[6])
+		ZBX_DBROW2UINT64(userid, row[6]);
 
 		if (esc_step != 0)
 			zbx_snprintf_alloc(&buf, &buf_allocated, &buf_offset, 16, "%d. ", esc_step);

@@ -39,7 +39,7 @@ typedef struct
 	zbx_uint64_t	itemid;
 	zbx_uint64_t	hostid;
 	zbx_uint64_t	interfaceid;
-	const char	*key;			/* interned; key[ITEM_KEY_LEN_MAX];					*/
+	const char	*key;
 	const char	*port;
 	int		delay;
 	int		nextcheck;
@@ -56,7 +56,7 @@ ZBX_DC_ITEM;
 typedef struct
 {
 	zbx_uint64_t	hostid;
-	const char	*key;			/* interned; key[ITEM_KEY_LEN_MAX];					*/
+	const char	*key;
 	ZBX_DC_ITEM	*item_ptr;
 }
 ZBX_DC_ITEM_HK;
@@ -64,11 +64,11 @@ ZBX_DC_ITEM_HK;
 typedef struct
 {
 	zbx_uint64_t	itemid;
-	const char	*snmp_community;	/* interned; snmp_community[ITEM_SNMP_COMMUNITY_LEN_MAX];		*/
-	const char	*snmp_oid;		/* interned; snmp_oid[ITEM_SNMP_OID_LEN_MAX];				*/
-	const char	*snmpv3_securityname;	/* interned; snmpv3_securityname[ITEM_SNMPV3_SECURITYNAME_LEN_MAX];	*/
-	const char	*snmpv3_authpassphrase;	/* interned; snmpv3_authpassphrase[ITEM_SNMPV3_AUTHPASSPHRASE_LEN_MAX];	*/
-	const char	*snmpv3_privpassphrase;	/* interned; snmpv3_privpassphrase[ITEM_SNMPV3_PRIVPASSPHRASE_LEN_MAX];	*/
+	const char	*snmp_community;
+	const char	*snmp_oid;
+	const char	*snmpv3_securityname;
+	const char	*snmpv3_authpassphrase;
+	const char	*snmpv3_privpassphrase;
 	unsigned char	snmpv3_securitylevel;
 }
 ZBX_DC_SNMPITEM;
@@ -76,46 +76,46 @@ ZBX_DC_SNMPITEM;
 typedef struct
 {
 	zbx_uint64_t	itemid;
-	const char	*ipmi_sensor;		/* interned; ipmi_sensor[ITEM_IPMI_SENSOR_LEN_MAX];			*/
+	const char	*ipmi_sensor;
 }
 ZBX_DC_IPMIITEM;
 
 typedef struct
 {
 	zbx_uint64_t	itemid;
-	const char	*delay_flex;		/* interned; delay_flex[ITEM_DELAY_FLEX_LEN_MAX];			*/
+	const char	*delay_flex;
 }
 ZBX_DC_FLEXITEM;
 
 typedef struct
 {
 	zbx_uint64_t	itemid;
-	const char	*trapper_hosts;		/* interned; trapper_hosts[ITEM_TRAPPER_HOSTS_LEN_MAX];			*/
+	const char	*trapper_hosts;
 }
 ZBX_DC_TRAPITEM;
 
 typedef struct
 {
 	zbx_uint64_t	itemid;
-	const char	*logtimefmt;		/* interned; logtimefmt[ITEM_LOGTIMEFMT_LEN_MAX];			*/
+	const char	*logtimefmt;
 }
 ZBX_DC_LOGITEM;
 
 typedef struct
 {
 	zbx_uint64_t	itemid;
-	const char	*params;		/* interned; params[ITEM_PARAMS_LEN_MAX];				*/
+	const char	*params;
 }
 ZBX_DC_DBITEM;
 
 typedef struct
 {
 	zbx_uint64_t	itemid;
-	const char	*username;		/* interned; username[ITEM_USERNAME_LEN_MAX];				*/
-	const char	*publickey;		/* interned; publickey[ITEM_PUBLICKEY_LEN_MAX];				*/
-	const char	*privatekey;		/* interned; privatekey[ITEM_PRIVATEKEY_LEN_MAX];			*/
-	const char	*password;		/* interned; password[ITEM_PASSWORD_LEN_MAX];				*/
-	const char	*params;		/* interned; params[ITEM_PARAMS_LEN_MAX];				*/
+	const char	*username;
+	const char	*publickey;
+	const char	*privatekey;
+	const char	*password;
+	const char	*params;
 	unsigned char	authtype;
 }
 ZBX_DC_SSHITEM;
@@ -123,16 +123,16 @@ ZBX_DC_SSHITEM;
 typedef struct
 {
 	zbx_uint64_t	itemid;
-	const char	*username;		/* interned; username[ITEM_USERNAME_LEN_MAX];				*/
-	const char	*password;		/* interned; password[ITEM_PASSWORD_LEN_MAX];				*/
-	const char	*params;		/* interned; params[ITEM_PARAMS_LEN_MAX];				*/
+	const char	*username;
+	const char	*password;
+	const char	*params;
 }
 ZBX_DC_TELNETITEM;
 
 typedef struct
 {
 	zbx_uint64_t	itemid;
-	const char	*params;		/* interned; params[ITEM_PARAMS_LEN_MAX];				*/
+	const char	*params;
 }
 ZBX_DC_CALCITEM;
 
@@ -140,7 +140,7 @@ typedef struct
 {
 	zbx_uint64_t	hostid;
 	zbx_uint64_t	proxy_hostid;
-	const char	*host;			/* interned; host[HOST_HOST_LEN_MAX];					*/
+	const char	*host;
 	int		maintenance_from;
 	int		errors_from;
 	int		disable_until;
@@ -161,7 +161,7 @@ typedef struct
 {
 	zbx_uint64_t	proxy_hostid;
 	unsigned char	status;
-	const char	*host;			/* interned; host[HOST_HOST_LEN_MAX];					*/
+	const char	*host;
 	ZBX_DC_HOST	*host_ptr;
 }
 ZBX_DC_HOST_PH;
@@ -178,8 +178,8 @@ ZBX_DC_PROXY;
 typedef struct
 {
 	zbx_uint64_t	hostid;
-	const char	*ipmi_username;		/* interned; ipmi_username[HOST_IPMI_USERNAME_LEN_MAX];			*/
-	const char	*ipmi_password;		/* interned; ipmi_password[HOST_IPMI_PASSWORD_LEN_MAX];			*/
+	const char	*ipmi_username;
+	const char	*ipmi_password;
 	signed char	ipmi_authtype;
 	unsigned char	ipmi_privilege;
 }
@@ -279,10 +279,10 @@ static ZBX_DC_CONFIG	*config = NULL;
 static ZBX_MUTEX	config_lock;
 static zbx_mem_info_t	*config_mem;
 
+ZBX_MEM_FUNC_IMPL(__config, config_mem);
+
 static const char	*INTERNED_SERVER_STATUS_KEY;
 static const char	*INTERNED_SERVER_ZABBIXLOG_KEY;
-
-ZBX_MEM_FUNC_IMPL(__config, config_mem);
 
 /*
  * Returns type of poller for item
@@ -581,7 +581,7 @@ static void	DCsync_items(DB_RESULT result)
 	{
 		ZBX_STR2UINT64(itemid, row[0]);
 		ZBX_STR2UINT64(hostid, row[1]);
-		ZBX_DBROW2UINT64(proxy_hostid, row[2])
+		ZBX_DBROW2UINT64(proxy_hostid, row[2]);
 		delay = atoi(row[15]);
 		status = (unsigned char)atoi(row[20]);
 
@@ -608,7 +608,7 @@ static void	DCsync_items(DB_RESULT result)
 		DCstrpool_replace(found, &item->key, row[6]);
 		DCstrpool_replace(found, &item->port, row[9]);
 		item->flags = (unsigned char)atoi(row[26]);
-		ZBX_DBROW2UINT64(item->interfaceid, row[27])
+		ZBX_DBROW2UINT64(item->interfaceid, row[27]);
 
 		if (0 != (ZBX_FLAG_DISCOVERY & item->flags))
 			item->value_type = ITEM_VALUE_TYPE_TEXT;
@@ -1239,7 +1239,7 @@ static void	DCsync_gmacros(DB_RESULT result)
 		gmacro = DCfind_id(&config->gmacros, globalmacroid, sizeof(ZBX_DC_GMACRO), &found);
 
 		/* check whether we need to update gmacro_m index */
-		if (found && (0 != strcmp(gmacro->macro, row[1])))
+		if (found && 0 != strcmp(gmacro->macro, row[1]))
 		{
 			update_index = 1;
 			gmacro_m.macro = gmacro->macro;
@@ -1396,7 +1396,7 @@ static void	DCsync_interfaces(DB_RESULT result)
 		type = (unsigned char)atoi(row[2]);
 		main_ = (unsigned char)atoi(row[3]);
 
-		/* array of selected globalmacros */
+		/* array of selected interfaces */
 		zbx_vector_uint64_append(&ids, interfaceid);
 
 		interface = DCfind_id(&config->interfaces, interfaceid, sizeof(ZBX_DC_INTERFACE), &found);
@@ -1416,7 +1416,7 @@ static void	DCsync_interfaces(DB_RESULT result)
 		interface->hostid = hostid;
 		interface->type = type;
 		interface->main = main_;
-		interface->useip = (unsigned short)atoi(row[4]);
+		interface->useip = (unsigned char)atoi(row[4]);
 		DCstrpool_replace(found, &interface->ip, row[5]);
 		DCstrpool_replace(found, &interface->dns, row[6]);
 		DCstrpool_replace(found, &interface->port, row[7]);
@@ -1432,7 +1432,7 @@ static void	DCsync_interfaces(DB_RESULT result)
 		}
 	}
 
-	/* remove deleted globalmacros from buffer */
+	/* remove deleted interfaces from buffer */
 
 	zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
@@ -1470,7 +1470,7 @@ static void	DCsync_interfaces(DB_RESULT result)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev, Aleksandrs Saveljevs                         *
+ * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1584,10 +1584,10 @@ void	DCsync_configuration()
 			gmsec);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() hmacro sql : " ZBX_FS_DBL " sec.", __function_name,
 			hmsec);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() sync lock  : " ZBX_FS_DBL " sec.", __function_name,
-			ssec);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() interf sql : " ZBX_FS_DBL " sec.", __function_name,
 			ifsec);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() sync lock  : " ZBX_FS_DBL " sec.", __function_name,
+			ssec);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() total time : " ZBX_FS_DBL " sec.", __function_name,
 			isec + hsec + htsec + gmsec + hmsec + ifsec + ssec);
 
@@ -1617,8 +1617,8 @@ void	DCsync_configuration()
 			config->hosts.num_data, config->hosts.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts_ph   : %d (%d slots)", __function_name,
 			config->hosts_ph.num_data, config->hosts_ph.num_slots);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() interfaces : %d (%d slots)", __function_name,
-			config->interfaces.num_data, config->interfaces.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() proxies    : %d (%d slots)", __function_name,
+			config->proxies.num_data, config->proxies.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() ipmihosts  : %d (%d slots)", __function_name,
 			config->ipmihosts.num_data, config->ipmihosts.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() htmpls     : %d (%d slots)", __function_name,
@@ -1631,6 +1631,10 @@ void	DCsync_configuration()
 			config->hmacros.num_data, config->hmacros.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() hmacros_hm : %d (%d slots)", __function_name,
 			config->hmacros_hm.num_data, config->hmacros_hm.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() interfaces : %d (%d slots)", __function_name,
+			config->interfaces.num_data, config->interfaces.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() interfa_htm: %d (%d slots)", __function_name,
+			config->interfaces_htm.num_data, config->interfaces_htm.num_slots);
 
 	for (i = 0; i < ZBX_POLLER_TYPE_COUNT; i++)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() queue[%d]   : %d (%d allocated)", __function_name,
@@ -1672,13 +1676,14 @@ void	DCsync_configuration()
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev, Aleksandrs Saveljevs                         *
+ * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
  * Comments: helper functions __config_mem_XXX_func(), __config_XXX_hash,     *
  *           and __config_XXX_compare are only used inside this function      *
  *           for initializing hashset, vector, and heap data structures       *
  *                                                                            *
  ******************************************************************************/
+
 static zbx_hash_t	__config_item_hk_hash(const void *data)
 {
 	const ZBX_DC_ITEM_HK	*item_hk = (const ZBX_DC_ITEM_HK *)data;
@@ -1742,7 +1747,7 @@ static int	__config_gmacro_m_compare(const void *d1, const void *d2)
 	const ZBX_DC_GMACRO_M	*gmacro_m_1 = (const ZBX_DC_GMACRO_M *)d1;
 	const ZBX_DC_GMACRO_M	*gmacro_m_2 = (const ZBX_DC_GMACRO_M *)d2;
 
-	return strcmp(gmacro_m_1->macro, gmacro_m_2->macro);
+	return (gmacro_m_1->macro == gmacro_m_2->macro ? 0 : strcmp(gmacro_m_1->macro, gmacro_m_2->macro));
 }
 
 static zbx_hash_t	__config_hmacro_hm_hash(const void *data)
@@ -1859,12 +1864,15 @@ void	init_configuration_cache()
 
 #define	INIT_HASHSET_SIZE	1000 /* should be calculated dynamically based on config_size? */
 
-#define CREATE_HASHSET(hashset)	zbx_hashset_create_ext(&hashset, INIT_HASHSET_SIZE,		\
-								ZBX_DEFAULT_UINT64_HASH_FUNC,	\
-								ZBX_DEFAULT_UINT64_COMPARE_FUNC,\
-								__config_mem_malloc_func,	\
-								__config_mem_realloc_func,	\
-								__config_mem_free_func);
+#define CREATE_HASHSET(hashset)	CREATE_HASHSET_EXT(hashset, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC)
+
+#define CREATE_HASHSET_EXT(hashset, hash_func, compare_func)								\
+															\
+	zbx_hashset_create_ext(&hashset, INIT_HASHSET_SIZE,								\
+				hash_func, compare_func,								\
+				__config_mem_malloc_func,								\
+				__config_mem_realloc_func,								\
+				__config_mem_free_func)
 
 	CREATE_HASHSET(config->items);
 	CREATE_HASHSET(config->snmpitems);
@@ -1876,52 +1884,19 @@ void	init_configuration_cache()
 	CREATE_HASHSET(config->sshitems);
 	CREATE_HASHSET(config->telnetitems);
 	CREATE_HASHSET(config->calcitems);
-
 	CREATE_HASHSET(config->hosts);
 	CREATE_HASHSET(config->proxies);
 	CREATE_HASHSET(config->ipmihosts);
-
 	CREATE_HASHSET(config->htmpls);
-
 	CREATE_HASHSET(config->gmacros);
 	CREATE_HASHSET(config->hmacros);
-
 	CREATE_HASHSET(config->interfaces);
 
-	zbx_hashset_create_ext(&config->items_hk, INIT_HASHSET_SIZE,
-					__config_item_hk_hash,
-					__config_item_hk_compare,
-					__config_mem_malloc_func,
-					__config_mem_realloc_func,
-					__config_mem_free_func);
-
-	zbx_hashset_create_ext(&config->hosts_ph, INIT_HASHSET_SIZE,
-					__config_host_ph_hash,
-					__config_host_ph_compare,
-					__config_mem_malloc_func,
-					__config_mem_realloc_func,
-					__config_mem_free_func);
-
-	zbx_hashset_create_ext(&config->gmacros_m, INIT_HASHSET_SIZE,
-					__config_gmacro_m_hash,
-					__config_gmacro_m_compare,
-					__config_mem_malloc_func,
-					__config_mem_realloc_func,
-					__config_mem_free_func);
-
-	zbx_hashset_create_ext(&config->hmacros_hm, INIT_HASHSET_SIZE,
-					__config_hmacro_hm_hash,
-					__config_hmacro_hm_compare,
-					__config_mem_malloc_func,
-					__config_mem_realloc_func,
-					__config_mem_free_func);
-
-	zbx_hashset_create_ext(&config->interfaces_htm, INIT_HASHSET_SIZE,
-					__config_interface_htm_hash,
-					__config_interface_htm_compare,
-					__config_mem_malloc_func,
-					__config_mem_realloc_func,
-					__config_mem_free_func);
+	CREATE_HASHSET_EXT(config->items_hk, __config_item_hk_hash, __config_item_hk_compare);
+	CREATE_HASHSET_EXT(config->hosts_ph, __config_host_ph_hash, __config_host_ph_compare);
+	CREATE_HASHSET_EXT(config->gmacros_m, __config_gmacro_m_hash, __config_gmacro_m_compare);
+	CREATE_HASHSET_EXT(config->hmacros_hm, __config_hmacro_hm_hash, __config_hmacro_hm_compare);
+	CREATE_HASHSET_EXT(config->interfaces_htm, __config_interface_htm_hash, __config_interface_htm_compare);
 
 	for (i = 0; i < ZBX_POLLER_TYPE_COUNT; i++)
 	{
@@ -1943,6 +1918,7 @@ void	init_configuration_cache()
 #undef	INIT_HASHSET_SIZE
 
 #undef	CREATE_HASHSET
+#undef	CREATE_HASHSET_EXT
 
 	zbx_strpool_create(strpool_size);
 
@@ -3043,14 +3019,14 @@ static int	DCget_host_macro(zbx_uint64_t *hostids, int host_num, const char *mac
 		{
 			for (j = 0; j < htmpl->templateids.values_num; j++)
 				zbx_vector_uint64_append(&templateids, htmpl->templateids.values[j]);
-
 		}
 	}
 
-	zbx_vector_uint64_sort(&templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	if (FAIL == ret && 0 != templateids.values_num)	/* recursion */
-		ret = DCget_host_macro(templateids.values, templateids.values_num, macro, replace_to);
+	if (FAIL == ret && 0 != templateids.values_num)
+	{
+		zbx_vector_uint64_sort(&templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		ret = DCget_host_macro(templateids.values, templateids.values_num, macro, replace_to);	/* recursion */
+	}
 
 	zbx_vector_uint64_destroy(&templateids);
 clean:
@@ -3078,21 +3054,6 @@ static void	DCget_global_macro(const char *macro, char **replace_to)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: zbxmacros_get_value                                              *
- *                                                                            *
- * Purpose: get host macros and add it to the buffer                          *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Aleksander Vladishev                                               *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
 void	DCget_user_macro(zbx_uint64_t *hostids, int host_num, const char *macro, char **replace_to)
 {
 	const char	*__function_name = "DCget_user_macro";
@@ -3108,4 +3069,3 @@ void	DCget_user_macro(zbx_uint64_t *hostids, int host_num, const char *macro, ch
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
-

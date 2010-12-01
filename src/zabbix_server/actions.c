@@ -918,7 +918,7 @@ static int	check_auto_registration_condition(DB_EVENT *event, DB_CONDITION *cond
 
 		if (NULL != (row = DBfetch(result)))
 		{
-			ZBX_DBROW2UINT64(id, row[0])
+			ZBX_DBROW2UINT64(id, row[0]);
 
 			switch (condition->operator)
 			{

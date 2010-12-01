@@ -36,7 +36,7 @@
  *                                                                            *
  * Return value: NULL if script not found                                     *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -71,7 +71,7 @@ static char	*get_command_by_scriptid(zbx_uint64_t scriptid)
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -202,7 +202,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, char **res
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -267,7 +267,7 @@ exit_sock:
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -281,9 +281,11 @@ static int	get_next_point_to_node(int current_nodeid, int slave_nodeid, int *nod
 	db_result = DBselect("select nodeid from nodes where masterid=%d",
 		current_nodeid);
 
-	while (NULL != (db_row = DBfetch(db_result))) {
+	while (NULL != (db_row = DBfetch(db_result)))
+	{
 		id = atoi(db_row[0]);
-		if (id == slave_nodeid || SUCCEED == get_next_point_to_node(id, slave_nodeid, NULL)) {
+		if (id == slave_nodeid || SUCCEED == get_next_point_to_node(id, slave_nodeid, NULL))
+		{
 			if (NULL != nodeid)
 				*nodeid = id;
 			res = SUCCEED;
@@ -306,7 +308,7 @@ static int	get_next_point_to_node(int current_nodeid, int slave_nodeid, int *nod
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
