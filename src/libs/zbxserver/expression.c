@@ -2325,19 +2325,10 @@ void	substitute_macros(DB_EVENT *event, DB_ESCALATION *escalation, char **data)
 {
 	const char	*__function_name = "substitute_macros";
 
-	char
-		*str_out = NULL,
-		*replace_to = NULL,
-		*pl = NULL,
-		*pr = NULL,
-		*pms = NULL,
-		*pme = NULL,
-		*p = NULL;
-	char
-		host[MAX_STRING_LEN],
-		key[MAX_STRING_LEN],
-		function[MAX_STRING_LEN],
-		parameter[MAX_STRING_LEN];
+	char	c, *pl = NULL, *pp = NULL, *pr = NULL;
+	char	*str_out = NULL, *replace_to = NULL;
+	char	*host = NULL, *key = NULL;
+	char	*function = NULL, *parameter = NULL;
 
 	if (NULL == data || NULL == *data || '\0' == **data)
 	{
@@ -2350,70 +2341,51 @@ void	substitute_macros(DB_EVENT *event, DB_ESCALATION *escalation, char **data)
 	substitute_simple_macros(event, NULL, NULL, NULL, escalation, data, MACRO_TYPE_MESSAGE, NULL, 0);
 
 	pl = *data;
+
 	while (NULL != (pr = strchr(pl, '{')))
 	{
-		if (NULL == (pme = strchr(pr, '}')))
-			break;
+		pp = pr++;
 
-		pme[0] = '\0';
-
-		pr = strrchr(pr, '{'); /* find '{' near '}' */
-
-		/* copy left side */
-		pr[0] = '\0';
-		str_out = zbx_strdcat(str_out, pl);
-		pr[0] = '{';
-
-		/* copy original name of variable */
-		replace_to = zbx_dsprintf(replace_to, "%s}", pr);	/* in format used '}' because in 'pr' string */
-									/* symbol '}' is changed to '\0' by 'pme' */
-		pl = pr + strlen(replace_to);
-
-		pms = pr + 1;
-
-		if(NULL != (p = strchr(pms, ':')))
+		if (SUCCEED == parse_host(&pr, &host) &&
+				':' == *pr && (++pr, SUCCEED == parse_key(&pr, &key)) &&
+				'.' == *pr && (++pr, SUCCEED == parse_function(&pr, &function, &parameter)) &&
+				'}' == *pr)
 		{
-			*p = '\0';
-			zbx_snprintf(host, sizeof(host), "%s", pms);
-			*p = ':';
-			pms = p + 1;
-			if(NULL != (p = strrchr(pms, '.')))
-			{
-				*p = '\0';
-				zbx_snprintf(key, sizeof(key), "%s", pms);
-				*p = '.';
-				pms = p + 1;
-				if(NULL != (p = strchr(pms, '(')))
-				{
-					*p = '\0';
-					zbx_snprintf(function, sizeof(function), "%s", pms);
-					*p = '(';
-					pms = p + 1;
-					if(NULL != (p = strchr(pms, ')')))
-					{
-						*p = '\0';
-						zbx_snprintf(parameter, sizeof(parameter), "%s", pms);
-						*p = ')';
-						pms = p + 1;
+			*pp = '\0';
+			str_out = zbx_strdcat(str_out, pl);
+			*pp = '{';
 
-						/* function 'evaluate_macro_function' requires 'replace_to' with size 'MAX_BUFFER_LEN' */
-						replace_to = zbx_realloc(replace_to, MAX_BUFFER_LEN);
+			/* function 'evaluate_macro_function' requires 'replace_to' with size 'MAX_BUFFER_LEN' */
 
-						if (SUCCEED != evaluate_macro_function(replace_to, host, key, function, parameter))
-							zbx_snprintf(replace_to, MAX_BUFFER_LEN, "%s", STR_UNKNOWN_VARIABLE);
-					}
-				}
-			}
+			if (NULL == replace_to)
+				replace_to = zbx_malloc(replace_to, MAX_BUFFER_LEN);
+
+			if (SUCCEED == evaluate_macro_function(replace_to, host, key, function, parameter))
+				str_out = zbx_strdcat(str_out, replace_to);
+			else
+				str_out = zbx_strdcat(str_out, STR_UNKNOWN_VARIABLE);
+
+			pl = pr + 1;
 		}
-		pme[0] = '}';
+		else
+		{
+			c = *(++pp);
+			*pp = '\0';
+			str_out = zbx_strdcat(str_out, pl);
+			*pp = c;
+			pl = pp;
+		}
 
-		str_out = zbx_strdcat(str_out, replace_to);
-		zbx_free(replace_to);
+		zbx_free(host);
+		zbx_free(key);
+		zbx_free(function);
+		zbx_free(parameter);
 	}
+
+	zbx_free(replace_to);
+
 	str_out = zbx_strdcat(str_out, pl);
-
 	zbx_free(*data);
-
 	*data = str_out;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() data:'%s'", __function_name, *data);

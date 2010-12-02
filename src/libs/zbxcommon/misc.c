@@ -2095,21 +2095,21 @@ double	str2double(const char *str)
  * Return value:  SUCCEED - the char is allowed in the host name              *
  *                FAIL - otherwise                                            *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: in host name allowed characters: '0-9a-zA-Z_. -]'                *
+ * Comments: in host name allowed characters: '0-9a-zA-Z. _-]'                *
  *           !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
-int	is_hostname_char(const char c)
+int	is_hostname_char(char c)
 {
 	if (c >= 'a' && c <= 'z')
 		return SUCCEED;
 
-	if (c == '.' || c == '_' || c == '-' || c == ' ')
+	if (c >= 'A' && c <= 'Z')
 		return SUCCEED;
 
-	if (c >= 'A' && c <= 'Z')
+	if (c == '.' || c == ' ' || c == '_' || c == '-')
 		return SUCCEED;
 
 	if (c >= '0' && c <= '9')
@@ -2129,21 +2129,21 @@ int	is_hostname_char(const char c)
  * Return value:  SUCCEED - the char is allowed in the item key               *
  *                FAIL - otherwise                                            *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: in host name allowed characters: '0-9a-zA-Z_.,]'                 *
+ * Comments: in key allowed characters: '0-9a-zA-Z.,_-]'                      *
  *           !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
-int	is_key_char(const char c)
+int	is_key_char(char c)
 {
 	if (c >= 'a' && c <= 'z')
 		return SUCCEED;
 
-	if (c == '.' || c == ',' || c == '_' || c == '-')
+	if (c >= 'A' && c <= 'Z')
 		return SUCCEED;
 
-	if (c >= 'A' && c <= 'Z')
+	if (c == '.' || c == ',' || c == '_' || c == '-')
 		return SUCCEED;
 
 	if (c >= '0' && c <= '9')
@@ -2163,24 +2163,15 @@ int	is_key_char(const char c)
  * Return value:  SUCCEED - the char is allowed in the trigger function       *
  *                FAIL - otherwise                                            *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: in host name allowed characters: '0-9a-zA-Z_. -]'                *
+ * Comments: in trigger function allowed characters: 'a-z'                    *
  *           !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
-int	is_function_char(const char c)
+int	is_function_char(char c)
 {
 	if (c >= 'a' && c <= 'z')
-		return SUCCEED;
-
-	if (c == '_')
-		return SUCCEED;
-
-	if (c >= 'A' && c <= 'Z')
-		return SUCCEED;
-
-	if (c >= '0' && c <= '9')
 		return SUCCEED;
 
 	return FAIL;
@@ -2203,11 +2194,11 @@ int	is_function_char(const char c)
  ******************************************************************************/
 void	make_hostname(char *host)
 {
-	char	*c = NULL;
+	char	*c;
 	
 	assert(host);
 	
-	for ( c = host; '\0' != *c; ++c)
+	for (c = host; '\0' != *c; ++c)
 		if (FAIL == is_hostname_char(*c))
 			*c = '_';
 }

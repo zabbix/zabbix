@@ -24,6 +24,7 @@ Changes for 1.9.0
 
 Changes for 1.8.4rc3
 
+ - [ZBX-3231] improved item key validation (KB,asaveljevs)
  - [ZBX-3061] fixed screen import problem with "Status of triggers" screen type (Aly)
  - [ZBX-3249] added define for frontend graphing on partitioned DB data store (Aly)
  - [ZBX-3216] fixed setup not catching existing configuration file on step 6 (Vedmak)
@@ -60,7 +61,7 @@ Changes for 1.8.4rc3
  - [ZBX-3040] guest users now can't edit trigger comments (KB)
  - [ZBX-3123] fixed Oracle SQL errors in processing of IT services (Sasha)
  - [ZBXNEXT-205,ZBXNEXT-355] added support of user macros in community, OID, security name and passphrases fields of SNMP items (Sasha,Aly)
- - [ZBXNEXT-357] added support of user macros in parameters field of database item; thanks to Kirill Fateev (Sasha) 
+ - [ZBXNEXT-357] added support of user macros in parameters field of database item; thanks to Kirill Fateev (Sasha)
  - [ZBX-3179] fixed memory leaks and 100% CPU usage for proxy with SQLite3 (asaveljevs)
  - [ZBXNEXT-538] include ibm_db2.sql and images_ibm_db2.sql files in distribution package (Sasha)
  - [ZBX-3107] fixed graph bugs: problem with large values, problem with uptime format (KB)
