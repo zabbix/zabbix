@@ -1422,4 +1422,5 @@ function make_refresh_menu($pmid,$dollid,$cur_interval,$params=null,&$menu,&$sub
 }
 
 /************* END REFRESH *************/
+
 ?>
