@@ -888,6 +888,7 @@ upgrades/dbpatches/2.0/ibm_db2/patch/events.sql -text
 upgrades/dbpatches/2.0/ibm_db2/patch/expressions.sql -text
 upgrades/dbpatches/2.0/ibm_db2/patch/functions.sql -text
 upgrades/dbpatches/2.0/ibm_db2/patch/globalmacro.sql -text
+upgrades/dbpatches/2.0/ibm_db2/patch/graph_discovery.sql -text
 upgrades/dbpatches/2.0/ibm_db2/patch/graph_theme.sql -text
 upgrades/dbpatches/2.0/ibm_db2/patch/graphs.sql -text
 upgrades/dbpatches/2.0/ibm_db2/patch/graphs_items.sql -text
@@ -905,6 +906,7 @@ upgrades/dbpatches/2.0/ibm_db2/patch/httptest.sql -text
 upgrades/dbpatches/2.0/ibm_db2/patch/httptestitem.sql -text
 upgrades/dbpatches/2.0/ibm_db2/patch/ids.sql -text
 upgrades/dbpatches/2.0/ibm_db2/patch/images.sql -text
+upgrades/dbpatches/2.0/ibm_db2/patch/item_discovery.sql -text
 upgrades/dbpatches/2.0/ibm_db2/patch/items.sql -text
 upgrades/dbpatches/2.0/ibm_db2/patch/items_applications.sql -text
 upgrades/dbpatches/2.0/ibm_db2/patch/maintenances.sql -text
@@ -943,6 +945,7 @@ upgrades/dbpatches/2.0/ibm_db2/patch/sysmaps_link_triggers.sql -text
 upgrades/dbpatches/2.0/ibm_db2/patch/sysmaps_links.sql -text
 upgrades/dbpatches/2.0/ibm_db2/patch/timeperiods.sql -text
 upgrades/dbpatches/2.0/ibm_db2/patch/trigger_depends.sql -text
+upgrades/dbpatches/2.0/ibm_db2/patch/trigger_discovery.sql -text
 upgrades/dbpatches/2.0/ibm_db2/patch/triggers.sql -text
 upgrades/dbpatches/2.0/ibm_db2/patch/user_history.sql -text
 upgrades/dbpatches/2.0/ibm_db2/patch/users.sql -text
