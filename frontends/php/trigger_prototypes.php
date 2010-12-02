@@ -183,36 +183,21 @@ include_once('include/page_header.php');
 	}
 // ------- GO ---------
 	else if(($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['mass_save']) && isset($_REQUEST['g_triggerid'])){
-		$result = false;
+		$visible = get_request('visible');
 
-		$visible = get_request('visible', array());
-		$_REQUEST['dependencies'] = get_request('dependencies',array());
-
-		$options = array(
-			'triggerids' => $_REQUEST['g_triggerid'],
-			'select_dependencies' => 1,
-			'output' => API_OUTPUT_EXTEND,
-			'editable' => 1
-		);
-		$triggers = CTrigger::get($options);
-
-		DBstart();
-		foreach($triggers as $tnum => $db_trig){
-			foreach($db_trig as $key => $value){
-				if(isset($visible[$key])){
-					$db_trig[$key] = $_REQUEST[$key];
-				}
+		if(isset($visible['priority'])){
+			$priority = get_request('priority');
+			foreach($_REQUEST['g_triggerid'] as $triggerid){
+				$result = CTriggerPrototype::update(array(
+					'triggerid' => $triggerid,
+					'priority' => $priority,
+				));
+				if(!$result) break;
 			}
-
-			$result = CTriggerPrototype::update(array(
-				'triggerid' => $db_trig['triggerid'],
-				'priority' => $db_trig['priority'],
-				'dependencies' => $db_trig['dependencies'],
-			));
-
-			if(!$result) break;
 		}
-		$result = DBend($result);
+		else{
+			$result = true;
+		}
 
 		show_messages($result, S_TRIGGER_UPDATED, S_CANNOT_UPDATE_TRIGGER);
 		if($result){
