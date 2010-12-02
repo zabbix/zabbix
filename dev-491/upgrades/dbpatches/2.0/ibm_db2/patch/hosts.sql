@@ -11,8 +11,11 @@ CREATE TABLE interface (
 	port                     varchar(64)     WITH DEFAULT '10050'      NOT NULL,
 	PRIMARY KEY (interfaceid)
 );
+REORG TABLE interface;
 CREATE INDEX interface_1 on interface (hostid,type);
+REORG TABLE interface;
 CREATE INDEX interface_2 on interface (ip,dns);
+REORG TABLE interface;
 ALTER TABLE interface ADD CONSTRAINT c_interface_1 FOREIGN KEY (hostid) REFERENCES hosts (hostid) ON DELETE CASCADE;
 REORG TABLE interface;
 
@@ -48,16 +51,27 @@ INSERT INTO interface (interfaceid,hostid,main,type,ip,dns,useip,port)
 ---- Patching table `items`
 
 ALTER TABLE items ALTER COLUMN itemid SET WITH DEFAULT NULL;
+REORG TABLE items;
 ALTER TABLE items ALTER COLUMN hostid SET WITH DEFAULT NULL;
+REORG TABLE items;
 ALTER TABLE items ALTER COLUMN units SET DATA TYPE varchar(255);
+REORG TABLE items;
 ALTER TABLE items ALTER COLUMN templateid SET WITH DEFAULT NULL;
+REORG TABLE items;
 ALTER TABLE items ALTER COLUMN templateid DROP NOT NULL;
+REORG TABLE items;
 ALTER TABLE items ALTER COLUMN valuemapid SET WITH DEFAULT NULL;
+REORG TABLE items;
 ALTER TABLE items ALTER COLUMN valuemapid DROP NOT NULL;
+REORG TABLE items;
 ALTER TABLE items ADD lastns integer NULL;
+REORG TABLE items;
 ALTER TABLE items ADD flags integer WITH DEFAULT '0' NOT NULL;
+REORG TABLE items;
 ALTER TABLE items ADD filter varchar(255) WITH DEFAULT '' NOT NULL;
+REORG TABLE items;
 ALTER TABLE items ADD interfaceid bigint NULL;
+REORG TABLE items;
 ALTER TABLE items ADD port varchar(64) WITH DEFAULT '' NOT NULL;
 REORG TABLE items;
 UPDATE items SET templateid=NULL WHERE templateid=0;
@@ -67,8 +81,11 @@ UPDATE items SET valuemapid=NULL WHERE valuemapid IS NOT NULL AND valuemapid NOT
 UPDATE items SET units='Bps' WHERE type=9 AND units='bps';
 DELETE FROM items WHERE hostid NOT IN (SELECT hostid FROM hosts);
 ALTER TABLE items ADD CONSTRAINT c_items_1 FOREIGN KEY (hostid) REFERENCES hosts (hostid) ON DELETE CASCADE;
+REORG TABLE items;
 ALTER TABLE items ADD CONSTRAINT c_items_2 FOREIGN KEY (templateid) REFERENCES items (itemid) ON DELETE CASCADE;
+REORG TABLE items;
 ALTER TABLE items ADD CONSTRAINT c_items_3 FOREIGN KEY (valuemapid) REFERENCES valuemaps (valuemapid);
+REORG TABLE items;
 ALTER TABLE items ADD CONSTRAINT c_items_4 FOREIGN KEY (interfaceid) REFERENCES interface (interfaceid);
 REORG TABLE items;
 
@@ -102,19 +119,30 @@ UPDATE items
 ---- Patching table `hosts`
 
 ALTER TABLE hosts ALTER COLUMN hostid SET WITH DEFAULT NULL;
+REORG TABLE hosts;
 ALTER TABLE hosts ALTER COLUMN proxy_hostid SET WITH DEFAULT NULL;
+REORG TABLE hosts;
 ALTER TABLE hosts ALTER COLUMN proxy_hostid DROP NOT NULL;
+REORG TABLE hosts;
 ALTER TABLE hosts ALTER COLUMN maintenanceid SET WITH DEFAULT NULL;
+REORG TABLE hosts;
 ALTER TABLE hosts ALTER COLUMN maintenanceid DROP NOT NULL;
+REORG TABLE hosts;
 ALTER TABLE hosts DROP COLUMN ip;
+REORG TABLE hosts;
 ALTER TABLE hosts DROP COLUMN dns;
+REORG TABLE hosts;
 ALTER TABLE hosts DROP COLUMN port;
+REORG TABLE hosts;
 ALTER TABLE hosts DROP COLUMN useip;
+REORG TABLE hosts;
 ALTER TABLE hosts DROP COLUMN ipmi_ip;
+REORG TABLE hosts;
 ALTER TABLE hosts DROP COLUMN ipmi_port;
 REORG TABLE hosts;
 UPDATE hosts SET proxy_hostid=NULL WHERE proxy_hostid=0;
 UPDATE hosts SET maintenanceid=NULL WHERE maintenanceid=0;
 ALTER TABLE hosts ADD CONSTRAINT c_hosts_1 FOREIGN KEY (proxy_hostid) REFERENCES hosts (hostid);
+REORG TABLE hosts;
 ALTER TABLE hosts ADD CONSTRAINT c_hosts_2 FOREIGN KEY (maintenanceid) REFERENCES maintenances (maintenanceid);
 REORG TABLE hosts;
