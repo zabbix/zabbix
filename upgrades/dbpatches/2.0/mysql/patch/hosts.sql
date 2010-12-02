@@ -112,7 +112,9 @@ ALTER TABLE hosts MODIFY hostid bigint unsigned NOT NULL,
 		  DROP COLUMN useip,
 		  DROP COLUMN useipmi,
 		  DROP COLUMN ipmi_ip,
-		  DROP COLUMN ipmi_port;
+		  DROP COLUMN ipmi_port,
+		  DROP COLUMN inbytes,
+		  DROP COLUMN outbytes;
 UPDATE hosts SET proxy_hostid=NULL WHERE proxy_hostid=0;
 UPDATE hosts SET maintenanceid=NULL WHERE maintenanceid=0;
 ALTER TABLE hosts ADD CONSTRAINT c_hosts_1 FOREIGN KEY (proxy_hostid) REFERENCES hosts (hostid);

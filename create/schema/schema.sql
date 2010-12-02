@@ -538,8 +538,6 @@ FIELD		|error		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|available	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|errors_from	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|lastaccess	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|inbytes	|t_bigint	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|outbytes	|t_bigint	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|ipmi_authtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|ipmi_privilege	|t_integer	|'2'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|ipmi_username	|t_varchar(16)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
