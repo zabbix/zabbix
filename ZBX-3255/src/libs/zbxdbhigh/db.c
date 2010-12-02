@@ -1197,7 +1197,7 @@ int	DBget_escape_string_len(const char *src)
 			continue;
 
 		if (*s == '\''
-#if !defined(HAVE_ORACLE) && !defined(HAVE_SQLITE3)
+#if !defined(HAVE_IBM_DB2) && !defined(HAVE_ORACLE) && !defined(HAVE_SQLITE3)
 			|| *s == '\\'
 #endif
 			)
@@ -1230,7 +1230,7 @@ void    DBescape_string(const char *src, char *dst, int len)
 {
 	const char	*s;
 	char		*d;
-#if defined(HAVE_ORACLE) || defined(HAVE_SQLITE3)
+#if defined(HAVE_IBM_DB2) || defined(HAVE_ORACLE) || defined(HAVE_SQLITE3)
 #	define ZBX_DB_ESC_CH	'\''
 #else
 #	define ZBX_DB_ESC_CH	'\\'
@@ -1245,7 +1245,7 @@ void    DBescape_string(const char *src, char *dst, int len)
 			continue;
 
 		if (*s == '\''
-#if !defined(HAVE_ORACLE) && !defined(HAVE_SQLITE3)
+#if !defined(HAVE_IBM_DB2) && !defined(HAVE_ORACLE) && !defined(HAVE_SQLITE3)
 			|| *s == '\\'
 #endif
 			)
@@ -1326,7 +1326,7 @@ char	*DBdyn_escape_string_len(const char *src, int max_src_len)
 			continue;
 
 		if (*s == '\''
-#if !defined(HAVE_ORACLE) && !defined(HAVE_SQLITE3)
+#if !defined(HAVE_IBM_DB2) && !defined(HAVE_ORACLE) && !defined(HAVE_SQLITE3)
 			|| *s == '\\'
 #endif
 			)
