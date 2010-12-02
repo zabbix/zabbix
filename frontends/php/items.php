@@ -66,8 +66,8 @@ switch($itemType) {
 
 		'groupid'=>			array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			null),
 		'hostid'=>			array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,			null),
-		'form_hostid'=>			array(T_ZBX_INT, O_OPT,  null,	DB_ID.NOT_ZERO,		'isset({save})', S_HOST),
-		'interfaceid'=>			array(T_ZBX_INT, O_OPT,  null,	DB_ID,				null, S_INTERFACE),
+		'form_hostid'=>			array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID.NOT_ZERO,		'isset({save})', S_HOST),
+		'interfaceid'=>			array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,				null, S_INTERFACE),
 
 
 		'add_groupid'=>		array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			'(isset({register})&&({register}=="go"))'),

@@ -1526,7 +1526,7 @@
 		else
 			$hostid = get_request('form_hostid', 0);
 
-		$interfaceid	= get_request('interfaceid', 0);
+		$interfaceid = get_request('interfaceid', 0);
 		$description = get_request('description', '');
 		$key = get_request('key', '');
 		$host = get_request('host', null);

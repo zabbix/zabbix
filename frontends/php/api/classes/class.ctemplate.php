@@ -1834,11 +1834,18 @@ COpt::memoryPick();
 
 	private static function unlink($templateids, $targetids=null, $clear=false){
 
+		if($clear){
+			$flags = array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY);
+		}
+		else{
+			$flags = array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY, ZBX_FLAG_DISCOVERY_CHILD);
+		}
+
 /* ITEMS, DISCOVERY RULES {{{ */
 		$sql_from = 'items i1, items i2';
 		$sql_where = ' i2.itemid=i1.templateid'.
 			' AND '.DBCondition('i2.hostid', $templateids).
-			' AND '.DBCondition('i1.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY));
+			' AND '.DBCondition('i1.flags', $flags);
 
 		if(!is_null($targetids)){
 			$sql_where .= ' AND '.DBCondition('i1.hostid', $targetids);
@@ -1850,6 +1857,7 @@ COpt::memoryPick();
 		$items = array(
 			ZBX_FLAG_DISCOVERY_NORMAL => array(),
 			ZBX_FLAG_DISCOVERY => array(),
+			ZBX_FLAG_DISCOVERY_CHILD => array(),
 		);
 		while($item = DBfetch($db_items)){
 			$items[$item['flags']][$item['itemid']] = array(
@@ -1892,6 +1900,24 @@ COpt::memoryPick();
 				}
 			}
 		}
+
+
+		if(!empty($items[ZBX_FLAG_DISCOVERY_CHILD])){
+			if($clear){
+				$result = CItemPrototype::delete(array_keys($items[ZBX_FLAG_DISCOVERY_CHILD]), true);
+				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Cannot unlink and clear item prototypes');
+			}
+			else{
+				DB::update('items', array(
+					'values' => array('templateid' => 0),
+					'where' => array(DBcondition('itemid', array_keys($items[ZBX_FLAG_DISCOVERY_CHILD])))
+				));
+
+				foreach($items[ZBX_FLAG_DISCOVERY_CHILD] as $item){
+					info(sprintf(_('Item prototype [%1$s:%2$s] unlinked.'), $item['description'], $item['key_']));
+				}
+			}
+		}
 /* }}} ITEMS, DISCOVERY RULES */
 
 
@@ -1902,7 +1928,9 @@ COpt::memoryPick();
 				' FROM graphs_items ggi, items ii'.
 				' WHERE ggi.graphid=g.templateid'.
 					' AND ii.itemid=ggi.itemid'.
-					' AND '.DBCondition('ii.hostid', $templateids).')';
+					' AND '.DBCondition('ii.hostid', $templateids).')'.
+				' AND '.DBCondition('g.flags', $flags);
+
 
 		if(!is_null($targetids)){
 			$sql_from = 'graphs g, graphs_items gi, items i';
@@ -1910,28 +1938,48 @@ COpt::memoryPick();
   				' AND gi.itemid=i.itemid'.
 				' AND g.graphid=gi.graphid';
 		}
-		$sql = 'SELECT DISTINCT g.graphid, g.name'.
+		$sql = 'SELECT DISTINCT g.graphid, g.name, g.flags'.
 				' FROM '.$sql_from.
-				' WHERE '.$sql_where.
-					' AND g.flags='.ZBX_FLAG_DISCOVERY_NORMAL;
+				' WHERE '.$sql_where;
 		$db_graphs = DBSelect($sql);
-		$graphs = array();
+		$graphs = array(
+			ZBX_FLAG_DISCOVERY_NORMAL => array(),
+			ZBX_FLAG_DISCOVERY_CHILD => array(),
+		);
 		while($graph = DBfetch($db_graphs)){
-			$graphs[$graph['graphid']] = $graph['name'];
+			$graphs[$graph['flags']][$graph['graphid']] = $graph['name'];
 		}
 
-		if(!empty($graphs)){
+		if(!empty($graphs[ZBX_FLAG_DISCOVERY_CHILD])){
 			if($clear){
-				$result = CGraph::delete(array_keys($graphs), true);
-				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Cannot unlink and clear graphs');
+				$result = CGraphPrototype::delete(array_keys($graphs[ZBX_FLAG_DISCOVERY_CHILD]), true);
+				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Cannot unlink and clear graph prototypes');
 			}
 			else{
 				DB::update('graphs', array(
 					'values' => array('templateid' => 0),
-					'where' => array(DBcondition('graphid', array_keys($graphs)))
+					'where' => array(DBcondition('graphid', array_keys($graphs[ZBX_FLAG_DISCOVERY_CHILD])))
 				));
 
-				foreach($graphs as $graph){
+				foreach($graphs[ZBX_FLAG_DISCOVERY_CHILD] as $graph){
+					info(sprintf(_('Graph prototype [%1$s] unlinked.'), $graph));
+				}
+			}
+		}
+
+
+		if(!empty($graphs[ZBX_FLAG_DISCOVERY_NORMAL])){
+			if($clear){
+				$result = CGraph::delete(array_keys($graphs[ZBX_FLAG_DISCOVERY_NORMAL]), true);
+				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Cannot unlink and clear graphs.');
+			}
+			else{
+				DB::update('graphs', array(
+					'values' => array('templateid' => 0),
+					'where' => array(DBcondition('graphid', array_keys($graphs[ZBX_FLAG_DISCOVERY_NORMAL])))
+				));
+
+				foreach($graphs[ZBX_FLAG_DISCOVERY_NORMAL] as $graph){
 					info(sprintf(_('Graph [%1$s] unlinked.'), $graph));
 				}
 			}
@@ -1946,7 +1994,9 @@ COpt::memoryPick();
 				' FROM functions ff, items ii'.
 				' WHERE ff.triggerid=t.templateid'.
 					' AND ii.itemid=ff.itemid'.
-					' AND '.DBCondition('ii.hostid', $templateids).')';
+					' AND '.DBCondition('ii.hostid', $templateids).')'.
+				' AND '.DBCondition('t.flags', $flags);
+
 
 		if(!is_null($targetids)){
 			$sql_from = 'triggers t, functions f, items i';
@@ -1956,17 +2006,20 @@ COpt::memoryPick();
 		}
 		$sql = 'SELECT DISTINCT t.triggerid, t.description, t.flags, t.expression'.
 				' FROM '.$sql_from.
-				' WHERE '.$sql_where.
-					' AND t.flags='.ZBX_FLAG_DISCOVERY_NORMAL;
+				' WHERE '.$sql_where;
 		$db_triggers = DBSelect($sql);
+		$triggers = array(
+			ZBX_FLAG_DISCOVERY_NORMAL => array(),
+			ZBX_FLAG_DISCOVERY_CHILD => array(),
+		);
 		while($trigger = DBfetch($db_triggers)){
-			$triggers[$trigger['triggerid']] = array(
+			$triggers[$trigger['flags']][$trigger['triggerid']] = array(
 				'description' => $trigger['description'],
 				'expression' => explode_exp($trigger['expression'], false),
 			);
 		}
 
-		if(!empty($triggers)){
+		if(!empty($triggers[ZBX_FLAG_DISCOVERY_NORMAL])){
 			if($clear){
 				$result = CTrigger::delete(array_keys($triggers), true);
 				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Cannot unlink and clear triggers');
@@ -1974,11 +2027,28 @@ COpt::memoryPick();
 			else{
 				DB::update('triggers', array(
 					'values' => array('templateid' => 0),
-					'where' => array(DBcondition('triggerid', array_keys($triggers)))
+					'where' => array(DBcondition('triggerid', array_keys($triggers[ZBX_FLAG_DISCOVERY_NORMAL])))
 				));
 
-				foreach($triggers as $trigger){
+				foreach($triggers[ZBX_FLAG_DISCOVERY_NORMAL] as $trigger){
 					info(sprintf(_('Trigger [%1$s:%2$s] unlinked.'), $trigger['description'], $trigger['expression']));
+				}
+			}
+		}
+
+		if(!empty($triggers[ZBX_FLAG_DISCOVERY_CHILD])){
+			if($clear){
+				$result = CTriggerPrototype::delete(array_keys($triggers[ZBX_FLAG_DISCOVERY_CHILD]), true);
+				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Cannot unlink and clear triggers');
+			}
+			else{
+				DB::update('triggers', array(
+					'values' => array('templateid' => 0),
+					'where' => array(DBcondition('triggerid', array_keys($triggers[ZBX_FLAG_DISCOVERY_CHILD])))
+				));
+
+				foreach($triggers[ZBX_FLAG_DISCOVERY_CHILD] as $trigger){
+					info(sprintf(_('Trigger prototype [%1$s:%2$s] unlinked.'), $trigger['description'], $trigger['expression']));
 				}
 			}
 		}
@@ -1995,7 +2065,6 @@ COpt::memoryPick();
 		$sql = 'SELECT DISTINCT a1.applicationid, a1.name'.
 				' FROM '.$sql_from.
 				' WHERE '.$sql_where;
-
 		$db_applications = DBSelect($sql);
 		$applications = array();
 		while($application = DBfetch($db_applications)){
@@ -2005,7 +2074,7 @@ COpt::memoryPick();
 		if(!empty($applications)){
 			if($clear){
 				$result = CApplication::delete(array_keys($applications), true);
-				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Cannot unlink and clear graphs');
+				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Cannot unlink and clear applications');
 			}
 			else{
 				DB::update('applications', array(

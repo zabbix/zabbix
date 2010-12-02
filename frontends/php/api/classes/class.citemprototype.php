@@ -571,9 +571,6 @@ COpt::memoryPick();
 			if($update){
 				check_db_fields($dbItems[$item['itemid']], $current_item);
 
-				if(!isset($item['key_'])) $item['key_'] = $dbItems[$item['itemid']]['key_'];
-				if(!isset($item['hostid'])) $item['hostid'] = $dbItems[$item['itemid']]['hostid'];
-
 				if(!isset($dbItems[$item['itemid']]))
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 
@@ -617,6 +614,9 @@ COpt::memoryPick();
 						unset($item[$var_name]);
 					}
 				}
+
+				if(!isset($item['key_'])) $item['key_'] = $dbItems[$item['itemid']]['key_'];
+				if(!isset($item['hostid'])) $item['hostid'] = $dbItems[$item['itemid']]['hostid'];
 			}
 			else{
 				if(!isset($dbHosts[$item['hostid']]))
@@ -975,6 +975,7 @@ COpt::memoryPick();
 				'history',
 			);
 
+			$insert = array();
 			foreach($prototypeids as $id => $prototypeid){
 				foreach($item_data_tables as $table){
 					$insert[] = array(
@@ -989,7 +990,7 @@ COpt::memoryPick();
 
 // TODO: remove info from API
 			foreach($del_itemPrototypes as $item){
-				info(sprintf(_('Item prototype [%1$s:%2$s] deleted'), $item['description'], $item['key_']));
+				info(sprintf(_('Item prototype [%1$s:%2$s] deleted.'), $item['description'], $item['key_']));
 			}
 
 			self::EndTransaction(true, __METHOD__);

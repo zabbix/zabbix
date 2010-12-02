@@ -26,7 +26,7 @@ require_once('include/forms.inc.php');
 
 $page['title'] = 'S_CONFIGURATION_OF_DISCOVERY';
 $page['file'] = 'host_discovery.php';
-$page['scripts'] = array('effects.js', 'class.cviewswitcher.js');
+$page['scripts'] = array('class.cviewswitcher.js');
 $page['hist_arg'] = array();
 
 include_once('include/page_header.php');
@@ -44,6 +44,7 @@ switch($itemType) {
 	$fields=array(
 		'hostid'=>			array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,			'!isset({form})'),
 		'itemid'=>			array(T_ZBX_INT, O_NO,	 P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))'),
+		'interfaceid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,	null, S_INTERFACE),
 
 		'description'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),
 		'item_filter_macro'=>		array(T_ZBX_STR, O_OPT,  null,	null,		'isset({save})'),
@@ -178,7 +179,7 @@ switch($itemType) {
 	}
 	else if(isset($_REQUEST['delete'])&&isset($_REQUEST['itemid'])){
 		$result = CDiscoveryRule::delete($_REQUEST['itemid']);
-		show_messages($result, S_ITEM_DELETED, S_CANNOT_DELETE_ITEM);
+		show_messages($result, _('Discovery rule deleted'), _('Cannot delete discovery rule'));
 
 		unset($_REQUEST['itemid']);
 		unset($_REQUEST['form']);
@@ -196,11 +197,12 @@ switch($itemType) {
 		}
 		$db_delay_flex = trim($db_delay_flex,';');
 
-		$ifm =  get_request('item_filter_macro');
-		$ifv =  get_request('item_filter_value');
-		$filter = $ifm.':'.$ifv;
+		$ifm = get_request('item_filter_macro');
+		$ifv = get_request('item_filter_value');
+		$filter = isset($ifm, $ifv) ? $ifm.':'.$ifv : '';
 
 		$item = array(
+			'interfaceid' => get_request('interfaceid'),
 			'description' => get_request('description'),
 			'key_' => get_request('key'),
 			'hostid' => get_request('hostid'),
@@ -238,11 +240,11 @@ switch($itemType) {
 
 			$result = CDiscoveryRule::update($item);
 			$result = DBend($result);
-			show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
+			show_messages($result, _('Discovery rule updated'), _('Cannot update discovery rule'));
 		}
 		else{
 			$result = CDiscoveryRule::create(array($item));
-			show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
+			show_messages($result, _('Discovery rule created'), _('Cannot add discovery rule'));
 		}
 
 		if($result){
@@ -258,11 +260,11 @@ switch($itemType) {
 		DBstart();
 		$go_result = ($_REQUEST['go'] == 'activate') ? activate_item($group_itemid) : disable_item($group_itemid);
 		$go_result = DBend($go_result);
-		show_messages($go_result, ($_REQUEST['go'] == 'activate') ? S_ITEMS_ACTIVATED : S_ITEMS_DISABLED, null);
+		show_messages($go_result, ($_REQUEST['go'] == 'activate') ? _('Discovery rules activated') : _('Discovery rules disabled'), null);
 	}
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_itemid'])){
 		$go_result = CDiscoveryRule::delete($_REQUEST['group_itemid']);
-		show_messages($go_result, S_ITEMS_DELETED, S_CANNOT_DELETE_ITEMS);
+		show_messages($go_result, _('Discovery rule deleted'), _('Cannot delete discovery rule'));
 	}
 
 	if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
@@ -288,10 +290,9 @@ switch($itemType) {
 		$frmItem = new CFormTable();
 		$frmItem->setName('items');
 		$frmItem->setTitle(S_RULE);
-		$frmItem->setAttribute('style','visibility: hidden;');
+		$frmItem->setAttribute('style', 'visibility: hidden;');
 
 		$hostid = get_request('hostid');
-
 		$frmItem->addVar('hostid', $hostid);
 
 		$limited = false;
@@ -321,6 +322,8 @@ switch($itemType) {
 		$publickey = get_request('publickey', '');
 		$privatekey = get_request('privatekey', '');
 
+		$interfaceid = get_request('interfaceid', 0);
+
 		$formula = get_request('formula', '1');
 		$logtimefmt = get_request('logtimefmt', '');
 
@@ -341,6 +344,8 @@ switch($itemType) {
 		}
 
 		if((isset($_REQUEST['itemid']) && !isset($_REQUEST['form_refresh']))){
+			$interfaceid	= $item_data['interfaceid'];
+
 			$description = $item_data['description'];
 			$key = $item_data['key_'];
 			$type = $item_data['type'];
@@ -356,7 +361,7 @@ switch($itemType) {
 			$snmpv3_privpassphrase = $item_data['snmpv3_privpassphrase'];
 
 			$ipmi_sensor = $item_data['ipmi_sensor'];
-			$trapper_hosts		= $item_data['trapper_hosts'];
+			$trapper_hosts = $item_data['trapper_hosts'];
 
 			$authtype = $item_data['authtype'];
 			$username = $item_data['username'];
@@ -369,9 +374,9 @@ switch($itemType) {
 
 
 			if(!isset($limited) || !isset($_REQUEST['form_refresh'])){
-				$delay		= $item_data['delay'];
-				$status		= $item_data['status'];
-				$db_delay_flex	= $item_data['delay_flex'];
+				$delay = $item_data['delay'];
+				$status = $item_data['status'];
+				$db_delay_flex = $item_data['delay_flex'];
 
 				if(isset($db_delay_flex)){
 					$arr_of_dellays = explode(';',$db_delay_flex);
@@ -421,14 +426,29 @@ switch($itemType) {
 		array_push($delay_flex_el, count($delay_flex_el)==0 ? S_NO_FLEXIBLE_INTERVALS : new CSubmit('del_delay_flex',S_DELETE_SELECTED));
 
 
+// Interfaces
+		$interfaces = CHostInterface::get(array(
+			'hostids' => $hostid,
+			'output' => API_OUTPUT_EXTEND,
+		));
+		if(!empty($interfaces)){
+			$sbIntereaces = new CComboBox('interfaceid', $interfaceid);
+			foreach($interfaces as $ifnum => $interface){
+				$caption = $interface['useip'] ? $interface['ip'] : $interface['dns'];
+				$caption.= ' : '.$interface['port'];
+
+				$sbIntereaces->addItem($interface['interfaceid'], $caption);
+			}
+			$frmItem->addRow(S_HOST_INTERFACE, $sbIntereaces);
+		}
+
 // Name
-		$frmItem->addRow(S_NAME, new CTextBox('description',$description,40, $limited));
+		$frmItem->addRow(S_NAME, new CTextBox('description', $description, 40, $limited));
 
 // Key
 		$frmItem->addRow(S_KEY, new CTextBox('key', $key, 40, $limited));
 
 // Type
-
 		if($limited){
 			$cmbType = new CTextBox('typename', item_type2str($type), 40, 'yes');
 			$frmItem->addVar('type', $type);
@@ -608,10 +628,10 @@ switch($itemType) {
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TRAPPER, 'row_trapper_hosts');
 
 
-		$frmRow = array(new CSubmit('save',S_SAVE));
+		$frmRow = array(new CSubmit('save', S_SAVE));
 		if(isset($_REQUEST['itemid'])){
-			$frmRow[] = new CSubmit('clone',S_CLONE);
-			$frmRow[] = new CButtonDelete(S_DELETE_SELECTED_ITEM_Q,	url_param('form').url_param('groupid').url_param('itemid'));
+			$frmRow[] = new CSubmit('clone', S_CLONE);
+			$frmRow[] = new CButtonDelete(_('Delete selected discovery rules?'), url_param('form').url_param('groupid').url_param('itemid'));
 		}
 		$frmRow[] = new CButtonCancel(url_param('groupid').url_param('hostid'));
 		$frmItem->addItemToBottomRow($frmRow);

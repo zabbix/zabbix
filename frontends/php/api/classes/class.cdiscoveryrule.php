@@ -524,6 +524,15 @@ COpt::memoryPick();
 		$update = ($method == 'update');
 		$delete = ($method == 'delete');
 
+// interfaces
+		$interfaceids = zbx_objectValues($items, 'interfaceid');
+		$interfaces = CHostInterface::get(array(
+			'output' => array('interfaceid', 'hostid'),
+			'interfaceids' => $interfaceids,
+			'nopermissions' => 1,
+			'preservekeys' => 1
+		));
+
 // permissions
 		if($update || $delete){
 			$item_db_fields = array('itemid'=> null);
@@ -561,6 +570,14 @@ COpt::memoryPick();
 			if($create){
 				if(!isset($dbHosts[$item['hostid']]))
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+
+				if($dbHosts[$item['hostid']]['status'] == HOST_STATUS_TEMPLATE){
+					unset($item['interfaceid']);
+				}
+				else if(!isset($item['interfaceid'])){
+					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf(_('Discovery rule [%1$s:%2$s] has no interface.'), $item['description'], $item['key_']));
+				}
+
 			}
 			else if($delete){
 				if(!isset($dbItems[$item['itemid']]))
@@ -574,9 +591,6 @@ COpt::memoryPick();
 			}
 			else{
 				check_db_fields($dbItems[$item['itemid']], $current_item);
-
-				if(!isset($item['key_'])) $item['key_'] = $dbItems[$item['itemid']]['key_'];
-				if(!isset($item['hostid'])) $item['hostid'] = $dbItems[$item['itemid']]['hostid'];
 
 				if(!isset($dbItems[$item['itemid']]))
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
@@ -622,6 +636,14 @@ COpt::memoryPick();
 						unset($item[$var_name]);
 					}
 				}
+
+				if(!isset($item['key_'])) $item['key_'] = $dbItems[$item['itemid']]['key_'];
+				if(!isset($item['hostid'])) $item['hostid'] = $dbItems[$item['itemid']]['hostid'];
+			}
+
+			if(isset($item['interfaceid'])){
+				if($interfaces[$item['interfaceid']]['hostid'] != $item['hostid'])
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Item uses Host interface from non parent host'));
 			}
 
 			if((isset($item['port']) && !zbx_empty($item['port']))
@@ -950,7 +972,6 @@ COpt::memoryPick();
 				'history_str',
 				'history',
 			);
-
 			$insert = array();
 			foreach($ruleids as $id => $ruleid){
 				foreach($item_data_tables as $table){
@@ -966,7 +987,7 @@ COpt::memoryPick();
 
 // TODO: remove info from API
 			foreach($del_rules as $item){
-				info(sprintf(_('Discovery rule [%1$s:%2$s] deleted'), $item['description'], $item['key_']));
+				info(sprintf(_('Discovery rule [%1$s:%2$s] deleted.'), $item['description'], $item['key_']));
 			}
 
 			self::EndTransaction(true, __METHOD__);
@@ -1043,16 +1064,23 @@ COpt::memoryPick();
 		$chdHosts = CHost::get(array(
 			'templateids' => zbx_objectValues($items, 'hostid'),
 			'hostids' => $hostids,
-			'output' => array('hostid', 'host'),
-			'preservekeys' => 1,
-			'nopermissions' => 1,
-			'templated_hosts' => 1
+			'output' => array('hostid', 'host', 'status'),
+			'selectInterfaces' => API_OUTPUT_EXTEND,
+			'preservekeys' => true,
+			'nopermissions' => true,
+			'templated_hosts' => true
 		));
 		if(empty($chdHosts)) return true;
 
 		$insertItems = array();
 		$updateItems = array();
 		foreach($chdHosts as $hostid => $host){
+			$interfaces = array();
+			foreach($host['interfaces'] as $hinum => $interface){
+				if($interface['main'] == 1)
+					$interfaces[$interface['type']] = $interface;
+			}
+
 			$templateids = zbx_toHash($host['templates'], 'templateid');
 
 // skip items not from parent templates of current host
@@ -1094,10 +1122,41 @@ COpt::memoryPick();
 					}
 				}
 
+// checking interfaces
+				$type = null;
+				if($host['status'] == HOST_STATUS_TEMPLATE){
+					unset($item['interfaceid']);
+				}
+				else if(isset($item['type'])){
+// if we creating new item or if we updating item type
+					$type = getInterfaceTypeByItem($item);
+					if(!is_null($exItem)){
+// on update
+						if(!isset($interfaces[$type])){
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot find host interface on host ['.$host['host'].'] for item key ['.$exItem['key_'].']'));
+						}
+
+// item type changes does not reflect on used interface [do not update interface]
+						$exType = getInterfaceTypeByItem($exItem);
+						if($exType == $type) $type = null;
+					}
+					else if(!isset($interfaces[$type])){
+// on create
+						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot find host interface on host ['.$host['host'].'] for item key ['.$item['key_'].']');
+					}
+				}
+// -----
+
+
 // coping item
 				$newItem = $item;
 				$newItem['hostid'] = $host['hostid'];
 				$newItem['templateid'] = $item['itemid'];
+
+				if(is_null($type))
+					unset($newItem['interfaceid']);
+				else
+					$newItem['interfaceid'] = $interfaces[$type]['interfaceid'];
 
 // setting item application
 				if(isset($item['applications'])){
