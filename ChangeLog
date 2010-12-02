@@ -24,7 +24,8 @@ Changes for 1.9.0
 
 Changes for 1.8.4rc3
 
- - [ZBX-3231] improved item key validation (KB,asaveljevs)
+ - [ZBX-3210] fixed incorrect height scaling in graphs (KB,asaveljevs)
+ - [ZBX-3231] improved item key validation in the GUI and notification macro parser on the server (KB,asaveljevs)
  - [ZBX-3061] fixed screen import problem with "Status of triggers" screen type (Aly)
  - [ZBX-3249] added define for frontend graphing on partitioned DB data store (Aly)
  - [ZBX-3216] fixed setup not catching existing configuration file on step 6 (Vedmak)
