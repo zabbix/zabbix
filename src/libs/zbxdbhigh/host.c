@@ -355,7 +355,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_uint64_t templateid,
 			res = SUCCEED;
 	zbx_uint64_t	graphid;
 	unsigned char	t_flags, h_flags, type;
-	zbx_uint64_t	interfaceid[3];
+	zbx_uint64_t	interfaceids[3];
 
 	sql = zbx_malloc(sql, sql_alloc);
 
@@ -467,7 +467,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_uint64_t templateid,
 
 	if (SUCCEED == res)
 	{
-		memset(&interfaceid, 0, sizeof(interfaceid));
+		memset(&interfaceids, 0, sizeof(interfaceids));
 
 		tresult = DBselect(
 				"select type,interfaceid"
@@ -481,22 +481,24 @@ static int	validate_host(zbx_uint64_t hostid, zbx_uint64_t templateid,
 		while (NULL != (trow = DBfetch(tresult)))
 		{
 			type = (unsigned char)atoi(trow[0]);
-			ZBX_STR2UINT64(interfaceid[type - 1], trow[1]);
+			ZBX_STR2UINT64(interfaceids[type - 1], trow[1]);
 		}
 		DBfree_result(tresult);
 
 		tresult = DBselect(
 				"select distinct type"
 				" from items"
-				" where hostid=" ZBX_FS_UI64,
-				templateid);
+				" where hostid=" ZBX_FS_UI64
+					" and type not in (%d,%d,%d,%d)",
+				templateid, ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL,
+				ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_CALCULATED);
 
 		while (SUCCEED == res && NULL != (trow = DBfetch(tresult)))
 		{
 			type = (unsigned char)atoi(trow[0]);
 			type = get_interface_type_by_item_type(type);
 
-			if (0 == interfaceid[type - 1])
+			if (0 == interfaceids[type - 1])
 			{
 				res = FAIL;
 				zbx_snprintf(error, max_error_len, "Cannot find %s host interface",
@@ -2536,11 +2538,11 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 	int		appids_alloc = 0, appids_num,
 			protoids_alloc = 0, protoids_num = 0;
 	unsigned char	flags, type;
-	zbx_uint64_t	interfaceid[3];
+	zbx_uint64_t	interfaceids[3], interfaceid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	memset(&interfaceid, 0, sizeof(interfaceid));
+	memset(&interfaceids, 0, sizeof(interfaceids));
 
 	result = DBselect(
 			"select type,interfaceid"
@@ -2554,7 +2556,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 	while (NULL != (row = DBfetch(result)))
 	{
 		type = (unsigned char)atoi(row[0]);
-		ZBX_STR2UINT64(interfaceid[type - 1], row[1]);
+		ZBX_STR2UINT64(interfaceids[type - 1], row[1]);
 	}
 	DBfree_result(result);
 
@@ -2605,6 +2607,19 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 		privatekey_esc			= DBdyn_escape_string(row[30]);
 		flags				= (unsigned char)atoi(row[31]);
 		filter_esc			= DBdyn_escape_string(row[32]);
+
+		switch (type)
+		{
+			case ITEM_TYPE_TRAPPER:
+			case ITEM_TYPE_INTERNAL:
+			case ITEM_TYPE_ZABBIX_ACTIVE:
+			case ITEM_TYPE_AGGREGATE:
+			case ITEM_TYPE_CALCULATED:
+				interfaceid = 0;
+				break;
+			default:
+				interfaceid = interfaceids[get_interface_type_by_item_type(type) - 1];
+		}
 
 		if (SUCCEED != (DBis_null(row[33])))
 		{
@@ -2678,7 +2693,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 					template_itemid,
 					(int)flags,
 					filter_esc,
-					DBsql_id_ins(interfaceid[get_interface_type_by_item_type(type) - 1]),
+					DBsql_id_ins(interfaceid),
 					itemid);
 		}
 		else
@@ -2737,7 +2752,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 					template_itemid,
 					(int)flags,
 					filter_esc,
-					DBsql_id_ins(interfaceid[get_interface_type_by_item_type(type) - 1]));
+					DBsql_id_ins(interfaceid));
 
 			zbx_free(key_esc);
 
