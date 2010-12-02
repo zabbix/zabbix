@@ -136,6 +136,8 @@ ALTER TABLE hosts DROP COLUMN port;
 REORG TABLE hosts;
 ALTER TABLE hosts DROP COLUMN useip;
 REORG TABLE hosts;
+ALTER TABLE hosts DROP COLUMN useipmi;
+REORG TABLE hosts;
 ALTER TABLE hosts DROP COLUMN ipmi_ip;
 REORG TABLE hosts;
 ALTER TABLE hosts DROP COLUMN ipmi_port;
