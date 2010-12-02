@@ -59,12 +59,12 @@
 <?php
 	if(isset($_REQUEST['save'])){
 		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY))) access_deny();
-		
+
 		$proxy = array(
 			'host' => get_request('host'),
 			'status' => get_request('status'),
 			'interfaces' =>  get_request('interfaces'),
-			'hosts' => get_request('hosts',array())
+			'hosts' => get_request('hosts', array())
 		);
 
 		DBstart();
@@ -224,7 +224,7 @@
 		$paging = getPagingLine($proxies);
 // --
 
-// CALCULATE PERFORMANCE {{{ 
+// CALCULATE PERFORMANCE {{{
 		$proxyids = array_keys($proxies);
 		$sql = 'SELECT h.proxy_hostid, sum(1.0/i.delay) as qps '.
 				' FROM items i,hosts h '.
@@ -258,7 +258,7 @@
 
 		foreach($proxies as $pnum => $proxy){
 			$hosts = array();
-			
+
 			foreach($proxy['hosts'] as $host){
 				$style = ($host['status']==HOST_STATUS_MONITORED) ? 'off':(($host['status']==HOST_STATUS_TEMPLATE)?'unknown' :'on');
 				$hosts[] = new CLink($host['host'], 'hosts.php?form=update&hostid='.$host['hostid'], $style);

@@ -1159,13 +1159,13 @@ COpt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 				}
 
-				if($trigger['priority'] == $dbTriggers[$trigger['triggerid']]['priority'])
+				if(isset($trigger['priority']) && ($trigger['priority'] == $dbTriggers[$trigger['triggerid']]['priority']))
 					unset($triggers[$gnum]['priority']);
-				if($trigger['type'] == $dbTriggers[$trigger['triggerid']]['type'])
+				if(isset($trigger['type']) && ($trigger['type'] == $dbTriggers[$trigger['triggerid']]['type']))
 					unset($triggers[$gnum]['type']);
-				if($trigger['url'] == $dbTriggers[$trigger['triggerid']]['url'])
+				if(isset($trigger['url']) && ($trigger['url'] == $dbTriggers[$trigger['triggerid']]['url']))
 					unset($triggers[$gnum]['url']);
-				if($trigger['status'] == $dbTriggers[$trigger['triggerid']]['status'])
+				if(isset($trigger['status']) && ($trigger['status'] == $dbTriggers[$trigger['triggerid']]['status']))
 					unset($triggers[$gnum]['status']);
 			}
 
@@ -1371,13 +1371,13 @@ COpt::memoryPick();
 		foreach($triggers as $tnum => &$trigger){
 			$dbTrigger = $dbTriggers[$trigger['triggerid']];
 
-			if((strcmp($dbTrigger['description'], $trigger['description']) != 0)){
+			if(isset($trigger['description']) && (strcmp($dbTrigger['description'], $trigger['description']) != 0)){
 				$description_changed = true;
 			}
 
 
 			$expression_full = explode_exp($dbTrigger['expression'], 0);
-			if((strcmp($expression_full, $trigger['expression']) != 0)){
+			if(isset($trigger['expression']) && (strcmp($expression_full, $trigger['expression']) != 0)){
 				$expression_changed = true;
 				$expression_full = $trigger['expression'];
 				$trigger['error'] = 'Trigger expression updated. No status update so far.';
@@ -1441,7 +1441,9 @@ COpt::memoryPick();
 				'where' => array('triggerid='.$trigger['triggerid'])
 			));
 
-			info(sprintf(_('Trigger [%1$s:%2$s] updated.'), $trigger['description'], $trigger['expression']));
+			$description = isset($trigger['description']) ? $trigger['description'] : $dbTrigger['description'];
+			$expression = isset($trigger['expression']) ? $trigger['expression'] : explode_exp($dbTrigger['expression'], false);
+			info(sprintf(_('Trigger prototype [%1$s:%2$s] updated.'), $description, $expression));
 		}
 		unset($trigger);
 	}

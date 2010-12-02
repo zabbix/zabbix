@@ -97,7 +97,7 @@ class CProxy extends CZBXAPI{
 			$sql_parts['select']['hostid'] = ' h.hostid';
 			foreach($options['output'] as $key => $field){
 				if($field == 'proxyid') continue;
-				
+
 				$sql_parts['select'][$field] = ' h.'.$field;
 			}
 
@@ -468,7 +468,7 @@ class CProxy extends CZBXAPI{
 			return false;
 		}
 	}
-	
+
 /**
  * Delete Proxy
  *
@@ -491,7 +491,7 @@ class CProxy extends CZBXAPI{
 			$actionids = array();
 
 // conditions
-			
+
 			$sql = 'SELECT DISTINCT actionid '.
 					' FROM conditions '.
 					' WHERE conditiontype='.CONDITION_TYPE_PROXY.

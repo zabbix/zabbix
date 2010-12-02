@@ -289,12 +289,7 @@ class CGraphPrototype extends CZBXAPI{
 		}
 
 // filter
-		if(is_null($options['filter']))
-			$options['filter'] = array();
-
 		if(is_array($options['filter'])){
-			if(!array_key_exists('flags', $options['filter']))
-				$options['filter']['flags'] = array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED);
 
 			zbx_db_filter('graphs g', $options, $sql_parts);
 
