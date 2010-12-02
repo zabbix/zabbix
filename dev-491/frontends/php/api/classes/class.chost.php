@@ -551,7 +551,7 @@ class CHost extends CZBXAPI{
 				' WHERE '.$sql_where.
 				$sql_group.
 				$sql_order;
-///SDI($sql);
+//SDI($sql);
 		$res = DBselect($sql, $sql_limit);
 		while($host = DBfetch($res)){
 			if(!is_null($options['countOutput'])){

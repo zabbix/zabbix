@@ -914,10 +914,7 @@ COpt::memoryPick();
 				if(!isset($dbHosts[$item['hostid']]))
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 
-// TODO: remove webchecks
-				if(isset($item['type']) && ($item['type'] == ITEM_TYPE_HTTPTEST))
-					unset($item['interfaceid']);
-				else if(!isset($item['interfaceid']) && ($dbHosts[$item['hostid']]['status'] != HOST_STATUS_TEMPLATE))
+				if(!isset($item['interfaceid']) && ($dbHosts[$item['hostid']]['status'] != HOST_STATUS_TEMPLATE))
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 			}
 			else if($delete){
@@ -935,9 +932,6 @@ COpt::memoryPick();
 			}
 			else{
 				check_db_fields($dbItems[$item['itemid']], $current_item);
-
-				if(!isset($item['key_'])) $item['key_'] = $dbItems[$item['itemid']]['key_'];
-				if(!isset($item['hostid'])) $item['hostid'] = $dbItems[$item['itemid']]['hostid'];
 
 				if($dbHosts[$dbItems[$item['itemid']]['hostid']]['status'] == HOST_STATUS_TEMPLATE)
 					unset($item['interfaceid']);
@@ -986,6 +980,9 @@ COpt::memoryPick();
 						unset($item[$var_name]);
 					}
 				}
+
+				if(!isset($item['key_'])) $item['key_'] = $dbItems[$item['itemid']]['key_'];
+				if(!isset($item['hostid'])) $item['hostid'] = $dbItems[$item['itemid']]['hostid'];
 			}
 
 			if(isset($item['interfaceid'])){
@@ -1350,7 +1347,7 @@ COpt::memoryPick();
 
 // TODO: remove info from API
 			foreach($del_items as $item){
-				info(sprintf(_('Item [%1$s:%2$s] deleted'), $item['description'], $item['key_']));
+				info(sprintf(_('Item [%1$s:%2$s] deleted.'), $item['description'], $item['key_']));
 			}
 
 			self::EndTransaction(true, __METHOD__);
