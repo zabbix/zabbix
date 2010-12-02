@@ -1210,7 +1210,7 @@
 	'S_PROTOTYPES' => _('Prototypes'),
 	'S_REGEXP' => _('Regexp'),
 	'S_DISCOVERY_RULES' => _('Discovery rules'),
-	
+
 // disc_prototypes.php
 	'S_CONFIGURATION_OF_ITEM_PROTOTYPES_BIG' => _('CONFIGURATION OF ITEM PROTOTYPES'),
 	'S_ITEM_PROTOTYPES_OF_BIG' => _('ITEM PROTOTYPES OF'),
@@ -1218,16 +1218,16 @@
 	'S_SELECT_PROTOTYPE' => _('Select prototype'),
 	'S_CREATE_PROTOTYPE' => _('Create prototype'),
 	'S_ITEM_PROTOTYPE' => _('Item prototype'),
-	
+
 	'S_CONFIGURATION_OF_GRAPHS_PROTOTYPES_BIG' => _('CONFIGURATION OF GRAPH PROTOTYPES'),
-	
+
 // trigger_prototypes.php
 	'S_CONFIGURATION_OF_TRIGGERS_PROTOTYPES_BIG' => _('CONFIGURATION OF TRIGGER PROTOTYPES'),
 	'S_TRIGGER_PROTOTYPES_OF_BIG' => _('TRIGGER PROTOTYPES OF'),
 
 // graph_prototypes.php
 	'S_GRAPH_PROTOTYPES_OF_BIG' => _('GRAPH PROTOTYPES OF'),
-	
+
 //	events.php
 	'S_EVENT'=>				_('Event'),
 	'S_EVENT_DETAILS'=>			_('Event details'),
@@ -1340,6 +1340,9 @@
 	'S_NO_ICON_FOR_MAP_ELEMENT'=>	_('No icon for map element'),
 	'S_EXPORT_HAVE_NO_MAPS'=>		_('Export does not contain Zabbix maps'),
 	'S_EXPORT_HAVE_NO_SCREENS'=>	_('Export does not contain Zabbix screens'),
+
+	'S_INCORRECT_ELEMENT_MAP_LINK' => _('All links should have "Name" and "Url" specified'),
+	'S_EACH_URL_SHOULD_HAVE_UNIQUE' => _('Each URL should have a unique name. Please rename one of URLs named'),
 
 //	map.php
 	'S_OK_BIG'=>			_('OK'),
@@ -2315,7 +2318,7 @@
 	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART1'=>	_('Function \''),
 	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART2'=>	_('\' does not accept parameters.'),
     'S_WRONG_DEPENDENCY_ERROR'=>	'Error adding dependencies. Following dependencies are not allowed: 1) from a host trigger to a template trigger; 2) from a template trigger to a host trigger; 3) between template triggers, where templates have links to other templates.',
-		
+
 //	page_footer.php
 	'S_TRANSACTION_HAVE_NOT_BEEN_CLOSED_ABORTING'=>	_('Transaction has not been closed. Aborting..'),
 
