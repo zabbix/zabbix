@@ -118,6 +118,8 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp,
 
 			continue;
 		}
+		else
+			e--;
 
 		functionid = calcitem_add_function(exp, func, params);
 

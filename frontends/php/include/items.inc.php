@@ -399,6 +399,13 @@
 			return $result;
 		}
 
+		//validating item key
+		list($item_key_is_valid, $check_result) = check_item_key($item['key_']);
+		if(!$item_key_is_valid){
+			error(S_ERROR_IN_ITEM_KEY.SPACE.$check_result);
+			return false;
+		}
+
 		// first add mother item
 		$itemid=get_dbid('items','itemid');
 		$result=DBexecute('INSERT INTO items '.
@@ -604,6 +611,13 @@
 				error(S_CANNOT_UPDATE_ITEM.SPACE."'".$host["host"].':'.$item['key_']."'");
 				return FALSE;
 			}
+		}
+
+		//validating item key
+		list($item_key_is_valid, $check_result) = check_item_key($item['key_']);
+		if(!$item_key_is_valid){
+			error(S_ERROR_IN_ITEM_KEY.SPACE.$check_result);
+			return false;
 		}
 
 		$item_old = get_item_by_itemid($itemid);
@@ -1763,5 +1777,199 @@
 		}
 
 	return array('nextcheck' => $nextcheck, 'delay' => $delay);
+	}
+
+
+	/**
+	 * Check item key and return info about an error if one is present
+	 *
+	 * @param string $key item key, e.g. system.run[cat /etc/passwd | awk -F: '{ print $1 }']
+	 * @return array
+	 *
+	 */
+	function check_item_key($key){
+		$key_strlen = zbx_strlen($key);
+		$characters = array();
+
+		//gathering characters into array, because we can't just work with them ar one if it's a unicode string
+		for($i = 0; $i < $key_strlen; $i++){
+			$characters[] = zbx_substr($key, $i, 1);
+		}
+
+		//checking every character, one by one
+		for($current_char = 0; $current_char < $key_strlen; $current_char++) {
+			if(!preg_match("/".ZBX_PREG_KEY_NAME."/", $characters[$current_char])) {
+				break; //$current_char now points to a first 'not a key name' char
+			}
+		}
+
+		//no function specified?
+		if ($current_char == $key_strlen) {
+			return array(
+				true,   //is key valid?
+				S_KEY_IS_VALID //result description
+			);
+		}
+		//function with parameter, e.g. system.run[...]
+		elseif($characters[$current_char] == '[') {
+
+			$state = 0; //0 - initial, 1 - inside quoted param, 2 - inside unquoted param
+			$nest_level = 0;
+
+			//for every char, starting after '['
+			for($i = $current_char+1; $i < $key_strlen; $i++) {
+				switch($state){
+					//initial state
+					case 0:
+						if($characters[$i] == ',') {
+							//do nothing
+						}
+						//Zapcat: '][' is treated as ','
+						elseif($characters[$i] == ']' && isset($characters[$i+1]) && $characters[$i+1] == '[' && $nest_level == 0) {
+							$i++;
+						}
+						//entering quotes
+						elseif($characters[$i] == '"') {
+							$state = 1;
+						}
+						//next nesting level
+						elseif($characters[$i] == '[') {
+							$nest_level++;
+						}
+						//one of the nested sets ended
+						elseif($characters[$i] == ']' && $nest_level != 0) {
+							$nest_level--;
+							//skipping spaces
+							while(isset($characters[$i+1]) && $characters[$i+1] == ' ') {
+								$i++;
+							}
+							//all nestings are closed correctly
+							if ($nest_level == 0 && isset($characters[$i+1]) && $characters[$i+1] == ']' && !isset($characters[$i+2])) {
+								return array(
+									true,   //is key valid?
+									S_KEY_IS_VALID //result description
+								);
+							}
+
+							if((!isset($characters[$i+1]) || $characters[$i+1] != ',')
+								&& !($nest_level !=0 && isset($characters[$i+1]) && $characters[$i+1] == ']')) {
+								return array(
+									false,   //is key valid?
+									sprintf(S_INCORRECT_SYNTAX_NEAR, $characters[$current_char], $current_char) //result description
+								);
+							}
+						}
+						elseif($characters[$i] == ']' && $nest_level == 0) {
+							if (isset($characters[$i+1])){
+								return array(
+									false,   //is key valid?
+									sprintf(S_INCORRECT_USAGE_OF_BRACKETS, $characters[$i+1]) //result description
+								);
+							}
+							else {
+								return array(
+									true,   //is key valid?
+									S_KEY_IS_VALID //result description
+								);
+							}
+						}
+						elseif($characters[$i] != ' ') {
+							$state = 2;
+						}
+
+					break;
+
+					//quoted
+					case 1:
+						//ending quote is reached
+						if($characters[$i] == '"')
+						{
+							//skipping spaces
+							while(isset($characters[$i+1]) && $characters[$i+1] == ' ') {
+								$i++;
+							}
+
+							//Zapcat
+							if ($nest_level == 0 && isset($characters[$i+1]) && isset($characters[$i+2]) && $characters[$i+1] == ']' && $characters[$i+2] == '[')
+							{
+								$state = 0;
+								break;
+							}
+
+							if ($nest_level == 0 && isset($characters[$i+1]) && $characters[$i+1] == ']' && !isset($characters[$i+2]))
+							{
+								return array(
+									true,   //is key valid?
+									S_KEY_IS_VALID //result description
+								);
+							}
+							elseif($nest_level == 0 && $characters[$i+1] == ']' && isset($characters[$i+2])){
+								return array(
+									false,   //is key valid?
+									sprintf(S_INCORRECT_USAGE_OF_BRACKETS, $characters[$i+2]) //result description
+								);
+							}
+
+							if ((!isset($characters[$i+1]) || $characters[$i+1] != ',') //if next symbol is not ','
+								&& !($nest_level != 0 && isset($characters[$i+1]) && $characters[$i+1] == ']'))
+							{
+								return array(
+									false,   //is key valid?
+									sprintf(S_INCORRECT_SYNTAX_NEAR, $characters[$current_char], $current_char) //result description
+								);
+							}
+
+							$state = 0;
+						}
+						//escaped quote (\")
+						elseif($characters[$i] == '\\' && isset($characters[$i+1]) && $characters[$i+1] == '"') {
+							$i++;
+						}
+
+					break;
+
+					//unquoted
+					case 2:
+						//Zapcat
+						if($nest_level == 0 && $characters[$i] == ']' && isset($characters[$i+1]) && $characters[$i+1] =='[' )
+						{
+							$i--;
+							$state = 0;
+						}
+						elseif($characters[$i] == ',' || ($characters[$i] == ']' && $nest_level != 0)) {
+							$i--;
+							$state = 0;
+						}
+						elseif($characters[$i] == ']' && $nest_level == 0) {
+							if (isset($characters[$i+1])){
+								return array(
+									false,   //is key valid?
+									sprintf(S_INCORRECT_USAGE_OF_BRACKETS, $characters[$i+1]) //result description
+								);
+							}
+							else {
+								return array(
+									true,   //is key valid?
+									S_KEY_IS_VALID //result description
+								);
+							}
+						}
+					break;
+				}
+			}
+
+			return array(
+				false,   //is key valid?
+				S_INVALID_KEY_FORMAT //result description
+			);
+
+		}
+		else {
+			return array(
+				false,   //is key valid?
+				sprintf(S_INVALID_CHARECTER_AT_POSITION, $characters[$current_char], $current_char) //result description
+			);
+		}
+
 	}
 ?>
