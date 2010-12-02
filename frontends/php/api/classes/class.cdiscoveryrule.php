@@ -527,7 +527,7 @@ COpt::memoryPick();
 // interfaces
 		$interfaceids = zbx_objectValues($items, 'interfaceid');
 		$interfaces = CHostInterface::get(array(
-			'output' => array('interfaceid', 'hostid'),
+			'output' => array('interfaceid', 'hostid', 'status'),
 			'interfaceids' => $interfaceids,
 			'nopermissions' => 1,
 			'preservekeys' => 1
