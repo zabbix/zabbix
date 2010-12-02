@@ -179,7 +179,7 @@ include_once('include/page_header.php');
 						foreach($selements as $id => $selement){
 							if(isset($selement['urls'])){
 								foreach($selement['urls'] as $unum => $url){
-									if($url['name'] === '') unset($selement['urls'][$unum]);
+									if($url['name'] === '' && $url['url'] === '') unset($selement['urls'][$unum]);
 								}
 							}
 
