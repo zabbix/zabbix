@@ -203,7 +203,9 @@ switch($itemType) {
 		array_push($_REQUEST['delay_flex'],$_REQUEST['new_delay_flex']);
 	}
 	else if(isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])){
+		DBstart();
 		$result = CItemPrototype::delete($_REQUEST['itemid']);
+		$result = DBend($result);
 		show_messages($result, S_ITEM_DELETED, S_CANNOT_DELETE_ITEM);
 
 		unset($_REQUEST['itemid']);
@@ -312,7 +314,10 @@ switch($itemType) {
 		show_messages($go_result, ($_REQUEST['go'] == 'activate') ? S_ITEMS_ACTIVATED : S_ITEMS_DISABLED, null);
 	}
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_itemid'])){
-		$go_result = CItemPrototype::delete($_REQUEST['group_itemid']);
+		$group_itemid = $_REQUEST['group_itemid'];
+		DBstart();
+		$go_result = CItemPrototype::delete($group_itemid);
+		$go_result = DBend($go_result);
 		show_messages($go_result, S_ITEMS_DELETED, S_CANNOT_DELETE_ITEMS);
 	}
 
