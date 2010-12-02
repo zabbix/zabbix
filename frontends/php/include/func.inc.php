@@ -1407,4 +1407,47 @@ function make_refresh_menu($pmid,$dollid,$cur_interval,$params=null,&$menu,&$sub
 
 /************* END REFRESH *************/
 
+
+/************* MATH *************/
+
+function bcfloor($number) {
+	if (strpos($number, '.') !== false) {
+		if (($tmp = preg_replace('/\.0+$/', '', $number)) !== $number)
+			$number = $tmp;
+		else if ($number[0] != '-')
+			$number = bcadd($number, 0, 0);
+		else
+			$number = bcsub($number, 1, 0);
+	}
+	return $number == '-0' ? '0' : $number;
+}
+
+function bcceil($number) {
+	if (strpos($number, '.') !== false) {
+		if (($tmp = preg_replace('/\.0+$/', '', $number)) !== $number)
+			$number = $tmp;
+		else if ($number[0] != '-')
+			$number = bcadd($number, 1, 0);
+		else
+			$number = bcsub($number, 0, 0);
+	}
+	return $number == '-0' ? '0' : $number;
+}
+
+function bcround($number, $precision = 0) {
+	if (strpos($number, '.') !== false) {
+		if ($number[0] != '-')
+			$number = bcadd($number, '0.' . str_repeat('0', $precision) . '5', $precision);
+		else
+			$number = bcsub($number, '0.' . str_repeat('0', $precision) . '5', $precision);
+	}
+	else if ($precision != 0) {
+		$number .= '.' . str_repeat('0', $precision);
+	}
+	// According to bccomp(), '-0.0' does not equal '-0'. However, '0.0' and '0' are equal.
+	$zero = ($number[0] != '-' ? bccomp($number, '0') == 0 : bccomp(substr($number, 1), '0') == 0);
+	return $zero ? ($precision == 0 ? '0' : '0.' . str_repeat('0', $precision)) : $number;
+}
+
+/************* END MATH *************/
 ?>
