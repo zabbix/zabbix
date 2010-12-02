@@ -241,7 +241,7 @@ void	__zbx_zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_l
 		*str = zbx_realloc(*str, *alloc_len);
 	}
 
-	*offset += zbx_vsnprintf(*str+*offset, max_len, fmt, args);
+	*offset += zbx_vsnprintf(*str + *offset, max_len, fmt, args);
 
 	va_end(args);
 }
