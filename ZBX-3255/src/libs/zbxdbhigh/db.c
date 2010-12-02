@@ -105,7 +105,7 @@ void    DBconnect(int flag)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1220,7 +1220,7 @@ int	DBget_escape_string_len(const char *src)
  *                                                                            *
  * Return value: escaped string                                               *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: sync changes with 'DBget_escape_string_len'                      *
  *           and 'DBdyn_escape_string_len'                                    *
@@ -1275,12 +1275,12 @@ void    DBescape_string(const char *src, char *dst, int len)
  *                                                                            *
  * Return value: escaped string                                               *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-char*	DBdyn_escape_string(const char *src)
+char	*DBdyn_escape_string(const char *src)
 {
 	int	len;
 	char	*dst = NULL;
@@ -1304,7 +1304,7 @@ char*	DBdyn_escape_string(const char *src)
  *                                                                            *
  * Return value: escaped string                                               *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: sync changes with 'DBescape_string', 'DBget_escape_string_len'   *
  *                                                                            *
@@ -1395,7 +1395,7 @@ int	DBget_escape_like_pattern_len(const char *src)
  *           using '!' as escape character. Our queries then become:          *
  *                                                                            *
  *           ... LIKE 'a!_b!%c\\d\'e!!f' ESCAPE '!' (MySQL, PostgreSQL)       *
- *           ... LIKE 'a!_b!%c\d''e!!f' ESCAPE '!' (SQLite3, Oracle)          *
+ *           ... LIKE 'a!_b!%c\d''e!!f' ESCAPE '!' (IBM DB2, Oracle, SQLite3) *
  *                                                                            *
  *           Using backslash as escape character in LIKE would be too much    *
  *           trouble, because escaping backslashes would have to be escaped   *
@@ -1403,7 +1403,7 @@ int	DBget_escape_like_pattern_len(const char *src)
  *                                                                            *
  *           ... LIKE 'a\\_b\\%c\\\\d\'e!f' ESCAPE '\\' or                    *
  *           ... LIKE 'a\\_b\\%c\\\\d\\\'e!f' ESCAPE '\\' (MySQL, PostgreSQL) *
- *           ... LIKE 'a\_b\%c\\d''e!f' ESCAPE '\' (SQLite3, Oracle)          *
+ *           ... LIKE 'a\_b\%c\\d''e!f' ESCAPE '\' (IBM DB2, Oracle, SQLite3) *
  *                                                                            *
  *           Hence '!' instead of backslash.                                  *
  *                                                                            *
@@ -1455,7 +1455,7 @@ void	DBescape_like_pattern(const char *src, char *dst, int len)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-char*	DBdyn_escape_like_pattern(const char *src)
+char	*DBdyn_escape_like_pattern(const char *src)
 {
 	int	len;
 	char	*dst = NULL;
@@ -1781,7 +1781,7 @@ static char	buf_string[640];
  *                                                                            *
  * Return value: <host> or "???" if host not found                            *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1817,7 +1817,7 @@ char	*zbx_host_string(zbx_uint64_t hostid)
  *                                                                            *
  * Return value: <host>:<key> or "???" if item not found                      *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1851,7 +1851,7 @@ char	*zbx_host_key_string(zbx_uint64_t itemid)
  *                                                                            *
  * Return value: <host>:<key>                                                 *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1873,7 +1873,7 @@ char	*zbx_host_key_string_by_item(DB_ITEM *item)
  *                                                                            *
  * Return value: "Name Surname (Alias)" or "unknown" if user not found        *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1914,7 +1914,7 @@ char	*zbx_user_string(zbx_uint64_t userid)
  *                                    <host>:<key>.<function>(<parameters>)   *
  *                             or "???" if function not found                 *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1981,7 +1981,7 @@ zbx_uint64_t	DBmultiply_value_uint64(DB_ITEM *item, zbx_uint64_t value)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -2037,7 +2037,7 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, int now)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
