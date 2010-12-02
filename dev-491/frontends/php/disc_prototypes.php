@@ -312,7 +312,7 @@ switch($itemType) {
 		show_messages($go_result, ($_REQUEST['go'] == 'activate') ? S_ITEMS_ACTIVATED : S_ITEMS_DISABLED, null);
 	}
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_itemid'])){
-		$go_result = CItemPrototype::delete($group_itemid);
+		$go_result = CItemPrototype::delete($_REQUEST['group_itemid']);
 		show_messages($go_result, S_ITEMS_DELETED, S_CANNOT_DELETE_ITEMS);
 	}
 
