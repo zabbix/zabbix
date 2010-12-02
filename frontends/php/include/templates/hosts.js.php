@@ -75,7 +75,7 @@ function addInterfaceRow(hostInterface){
 	hostInterface.checked_ipmi = '';
 	if(isset("type", hostInterface)){
 		hostInterface.checked_agent = '';
-		switch(hostInterface.type){
+		switch(hostInterface.type.toString()){
 			case '<?php print(INTERFACE_TYPE_SNMP);?>': hostInterface.checked_snmp = 'checked="checked"'; break;
 			case '<?php print(INTERFACE_TYPE_IPMI);?>': hostInterface.checked_ipmi = 'checked="checked"'; break;
 			case '<?php print(INTERFACE_TYPE_AGENT);?>':
