@@ -24,6 +24,7 @@ Changes for 1.9.0
 
 Changes for 1.8.4rc3
 
+ - [ZBX-3201] fixed evaluation of calculated items with multiline expressions (asaveljevs)
  - [ZBX-3210] fixed incorrect height scaling in graphs (KB,asaveljevs)
  - [ZBX-3231] improved item key validation in the GUI and notification macro parser on the server (KB,asaveljevs)
  - [ZBX-3061] fixed screen import problem with "Status of triggers" screen type (Aly)
