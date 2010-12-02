@@ -2184,6 +2184,12 @@
 	'S_DELETED_SMALL'=>				'deleted',
 	'S_UNKNOWN_VALUE_TYPE'=>			'Unknown value type',
 	'S_ITEMS_CHECK_KEY_DEFAULT_EXAMPLE_PASSED'=>	'Check the key, please. Default example was passed',
+	'S_ERROR_IN_ITEM_KEY' => 'Error in item key:',
+	'S_KEY_IS_VALID' => 'Key is valid',
+	'S_INCORRECT_SYNTAX_NEAR' => 'incorrect syntax near \'%1$s\' at position %2$d',
+	'S_INCORRECT_USAGE_OF_BRACKETS' => 'incorrect usage of bracket symbols. \'%s\' found after final bracket.',
+	'S_INVALID_CHARECTER_AT_POSITION' => 'ivalid charecter \'%1$s\' at position %2$d',
+	'S_INVALID_KEY_FORMAT' => 'Invalid key format',
 
 //	httptest.inc.php
 	'S_SCENARIO_STEP_NUMBER_CANNOT_BE_LESS_ONE'=>	'Scenario step number cannot be less than 1',
