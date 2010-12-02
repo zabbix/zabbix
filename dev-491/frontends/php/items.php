@@ -398,7 +398,7 @@ switch($itemType) {
 		if(!zbx_empty($_REQUEST['new_application'])){
 			$new_appid = CApplication::create(array(
 				'name' => $_REQUEST['new_application'],
-				'hostid' => $_REQUEST['hostid']
+				'hostid' => $_REQUEST['form_hostid']
 			));
 			if($new_appid){
 				$new_appid = reset($new_appid['applicationids']);
