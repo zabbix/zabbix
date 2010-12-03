@@ -1148,7 +1148,7 @@ switch($itemType) {
 					$triggers = rtrim($triggers,',').')';
 				}
 				else{
-					$triggers = '';
+					$triggers = 'Array()';
 				}
 
 				$menuicon = new CIcon(S_MENU,'iconmenu_b',
