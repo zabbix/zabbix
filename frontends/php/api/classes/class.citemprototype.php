@@ -947,7 +947,8 @@ COpt::memoryPick();
 				'nopermissions' => true,
 				'preservekeys' => true,
 			));
-			CGraphPrototype::delete($del_graphPrototypes);
+			$result = CGraphPrototype::delete(zbx_objectValues($del_graphPrototypes, 'graphid'));
+			if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete graph prototype');
 
 
 // TRIGGER PROTOTYPES
@@ -957,7 +958,8 @@ COpt::memoryPick();
 				'nopermissions' => true,
 				'preservekeys' => true,
 			));
-			CTriggerPrototype::delete($del_triggerPrototypes);
+			$result = CTriggerPrototype::delete(zbx_objectValues($del_triggerPrototypes, 'triggerid'));
+			if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete trigger prototype');
 
 
 // ITEM PROTOTYPES

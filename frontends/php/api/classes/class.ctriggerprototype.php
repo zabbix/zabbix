@@ -1343,7 +1343,7 @@ COpt::memoryPick();
 
 			$expression = implode_exp($trigger['expression'], $triggerid);
 			if(is_null($expression)){
-				self::exception();
+				self::exception(_('Cannot implode expression'));
 			}
 			DB::update('triggers', array(
 				'values' => array('expression' => $expression),
@@ -1443,7 +1443,7 @@ COpt::memoryPick();
 
 			$description = isset($trigger['description']) ? $trigger['description'] : $dbTrigger['description'];
 			$expression = isset($trigger['expression']) ? $trigger['expression'] : explode_exp($dbTrigger['expression'], false);
-			info(sprintf(_('Trigger prototype [%1$s:%2$s] updated.'), $description, $expression));
+			info(_s('Trigger prototype [%1$s:%2$s] updated.', $description, $expression));
 		}
 		unset($trigger);
 	}
@@ -1590,8 +1590,10 @@ COpt::memoryPick();
 			);
 			$triggers = self::get($options);
 
-			foreach($triggers as $trigger)
+			foreach($triggers as $trigger){
+				$trigger['expression'] = explode_exp($trigger['expression'], false);
 				self::inherit($trigger, $data['hostids']);
+			}
 
 			self::EndTransaction(true, __METHOD__);
 			return true;

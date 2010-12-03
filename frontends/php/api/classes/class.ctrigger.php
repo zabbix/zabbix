@@ -1592,7 +1592,7 @@ COpt::memoryPick();
 
 			$expression = implode_exp($trigger['expression'], $triggerid);
 			if(is_null($expression)){
-				self::exception(_('Cannot implode expression'));
+				self::exception(_s('Cannot implode expression'));
 			}
 
 			DB::update('triggers', array(
@@ -1822,7 +1822,7 @@ COpt::memoryPick();
 					self::updateReal($newTrigger);
 				}
 				else{
-					self::createReal($newTrigger, false);
+					self::createReal($newTrigger);
 					$newTrigger = reset($newTrigger);
 				}
 			}

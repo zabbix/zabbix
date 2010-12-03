@@ -544,7 +544,7 @@ COpt::memoryPick();
 			));
 		}
 		else{
-			$item_db_fields = array('description'=>null, 'key_'=>null, 'hostid'=>null);
+			$item_db_fields = array('description'=>null, 'key_'=>null, 'hostid'=>null, 'type' => null);
 			$dbHosts = CHost::get(array(
 				'hostids' => zbx_objectValues($items, 'hostid'),
 				'output' => array('hostid', 'host', 'status'),
@@ -572,13 +572,16 @@ COpt::memoryPick();
 				if(!isset($dbHosts[$item['hostid']]))
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 
-				if($dbHosts[$item['hostid']]['status'] == HOST_STATUS_TEMPLATE){
+				if(!in_array($current_item['type'], array(ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV1,
+						ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI,
+						ITEM_TYPE_SSH, ITEM_TYPE_TELNET))
+					|| ($dbHosts[$item['hostid']]['status'] == HOST_STATUS_TEMPLATE)
+				){
 					unset($item['interfaceid']);
 				}
 				else if(!isset($item['interfaceid'])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule [%1$s:%2$s] has no interface.', $item['description'], $item['key_']));
 				}
-
 			}
 			else if($delete){
 				if(!isset($dbItems[$item['itemid']]))
@@ -642,9 +645,17 @@ COpt::memoryPick();
 				if(!isset($item['hostid'])) $item['hostid'] = $dbItems[$item['itemid']]['hostid'];
 			}
 
-			if(isset($item['interfaceid'])){
-				if($interfaces[$item['interfaceid']]['hostid'] != $item['hostid'])
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Item uses Host interface from non parent host'));
+			if(in_array($current_item['type'], array(ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV1,
+				ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI,
+				ITEM_TYPE_SSH, ITEM_TYPE_TELNET))
+			){
+				if(isset($item['interfaceid'])){
+					if(!isset($interfaces[$item['interfaceid']]) || ($interfaces[$item['interfaceid']]['hostid'] != $item['hostid']))
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item uses Host interface from non parent host'));
+				}
+			}
+			else{
+				unset($item['interfaceid']);
 			}
 
 			if((isset($item['port']) && !zbx_empty($item['port']))
@@ -918,7 +929,7 @@ COpt::memoryPick();
 						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
 					}
 					if($del_rules[$ruleid]['templateid'] != 0){
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete templated items'));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete templated items'));
 					}
 				}
 			}
