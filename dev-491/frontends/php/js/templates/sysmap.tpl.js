@@ -6,7 +6,7 @@ Object.extend(ZBX_TPL,{
 'selementFormUrlContainer': '<td class="form_row_l">'+locale['S_LINKS']+'</td>'+
 		'<td class="form_row_r">'+
 		'<table><tbody id="urlContainer">'+
-			'<tr class="header"><td>Name</td><td>Url</td><td></td></tr>'+
+			'<tr class="header"><td>'+locale['S_NAME']+'</td><td>'+locale['S_URL']+'</td><td></td></tr>'+
 			'<tr id="urlfooter"><td colspan="3"><span id="newSelementUrl" class="link_menu" title="Add">'+locale['S_ADD']+'</span></td></tr>'+
 		'</tbody></table>'+
 		'</td>',

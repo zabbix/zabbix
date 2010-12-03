@@ -2469,6 +2469,9 @@ form_selement_save: function(e){
 		params.urls = {};
 		var urlrows = $(this.selementForm.urls).select('tr[id^=urlrow]');
 
+		//checking for duplicate URL names
+		var urlNameList = new Array();
+
 		for(var i=0; i < urlrows.length; i++){
 			var urlid = urlrows[i].id.split('_')[1];
 
@@ -2480,8 +2483,18 @@ form_selement_save: function(e){
 
 			if(empty(url.name) && empty(url.url)) continue;
 
+			if(typeof(urlNameList[url.name]) == 'undefined'){
+				urlNameList[url.name] = true;
+			}
+			else{
+				//element with this name already exists
+				alert(locale['S_EACH_URL_SHOULD_HAVE_UNIQUE'] + " '" + url.name + "'.");
+				return false;
+			}
+
+
 			if(empty(url.name) || empty(url.url)){
-				alert('Incorrect map element link is given');
+				alert(locale['S_INCORRECT_ELEMENT_MAP_LINK']);
 				return false;
 			}
 

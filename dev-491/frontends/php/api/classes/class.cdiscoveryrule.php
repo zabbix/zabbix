@@ -568,6 +568,14 @@ COpt::memoryPick();
 			unset($item['prevorgvalue']);
 			unset($item['lastns']);
 
+			//validating item key
+			if(isset($item['key_'])){
+				list($item_key_is_valid, $check_result) = check_item_key($item['key_']);
+				if(!$item_key_is_valid){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Error in item key: %s', $check_result));
+				}
+			}
+
 			if($create){
 				if(!isset($dbHosts[$item['hostid']]))
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
