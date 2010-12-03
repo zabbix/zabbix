@@ -1490,8 +1490,6 @@ Ajax.Request = Class.create(Ajax.Base, {
   },
 
   respondToReadyState: function(readyState) {
-	console.log(readyState);
-	console.log(Ajax);
     var state = Ajax.Request.Events[readyState], response = new Ajax.Response(this);
 
     if (state == 'Complete') {

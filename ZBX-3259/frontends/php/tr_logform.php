@@ -166,7 +166,8 @@ if(isset($_REQUEST['save_trigger'])){
 			add_audit($audit_action, AUDIT_RESOURCE_TRIGGER, S_TRIGGER." [".$triggerid."] [".expand_trigger_description($triggerid)."] ");
 			unset($_REQUEST["sform"]);
 
-			zbx_add_post_js('closeform("items.php");');
+			//zbx_add_post_js('closeform("items.php");');
+			zbx_add_post_js('window.close()');
 			include_once('include/page_footer.php');
 		}
 	}
