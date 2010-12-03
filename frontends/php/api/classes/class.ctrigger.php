@@ -1320,7 +1320,7 @@ COpt::memoryPick();
 					'expression' => $trigger['expression'])
 				)){
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						sprintf(_('Trigger [%1$s:%2$s] already exists.'), $trigger['description'], $trigger['expression']));
+						_s('Trigger [%1$s:%2$s] already exists.', $trigger['description'], $trigger['expression']));
 				}
 			}
 
@@ -1429,7 +1429,7 @@ COpt::memoryPick();
 
 					if($del_triggers[$triggerid]['templateid'] != 0){
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							sprintf(_('Cannot delete templated trigger [%1$s:%2$s]'),
+							_s('Cannot delete templated trigger [%1$s:%2$s]',
 								$del_triggers[$triggerid]['description'],
 								explode_exp($del_triggers[$triggerid]['expression'], false))
 						);
@@ -1491,7 +1491,7 @@ COpt::memoryPick();
 
 // TODO: REMOVE info
 			foreach($del_triggers as $triggerid => $trigger){
-				info(sprintf(_('Trigger [%1$s:%2$s] deleted.'), $trigger['description'], explode_exp($trigger['expression'], false)));
+				info(_s('Trigger [%1$s:%2$s] deleted.', $trigger['description'], explode_exp($trigger['expression'], false)));
 				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $trigger['triggerid'], $trigger['description'].':'.$trigger['expression'], NULL, NULL, NULL);
 			}
 
@@ -1600,7 +1600,7 @@ COpt::memoryPick();
 				'where' => array('triggerid='.$triggerid)
 			));
 
-			info(sprintf(_('Trigger [%1$s:%2$s] created.'), $trigger['description'], $trigger['expression']));
+			info(_s('Trigger [%1$s:%2$s] created.', $trigger['description'], $trigger['expression']));
 		}
 
 
@@ -1705,7 +1705,7 @@ COpt::memoryPick();
 
 			$description = isset($trigger['description']) ? $trigger['description'] : $dbTrigger['description'];
 			$expression = isset($trigger['expression']) ? $trigger['expression'] : explode_exp($dbTrigger['expression'], false);
-			info(sprintf(_('Trigger [%1$s:%2$s] updated.'), $description, $expression));
+			info(_s('Trigger [%1$s:%2$s] updated.', $description, $expression));
 		}
 		unset($trigger);
 
@@ -1777,7 +1777,7 @@ COpt::memoryPick();
 					));
 					if($exists){
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							sprintf(_('Trigger [%1$s] already exists on [%2$s]'), $newTrigger['description'], $chd_host['host']));
+							_s('Trigger [%1$s] already exists on [%2$s]', $newTrigger['description'], $chd_host['host']));
 					}
 				}
 				else if($childTrigger['flags'] != ZBX_FLAG_DISCOVERY_NORMAL){
@@ -1812,7 +1812,7 @@ COpt::memoryPick();
 				if($childTrigger){
 					if($childTrigger['templateid'] != 0){
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							sprintf(_('Trigger [%1$s] already exists on [%2$s]'), $childTrigger['description'], $chd_host['host']));
+							_s('Trigger [%1$s] already exists on [%2$s]', $childTrigger['description'], $chd_host['host']));
 					}
 					else if($childTrigger['flags'] != $newTrigger['flags']){
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Trigger with same name but other type exists'));

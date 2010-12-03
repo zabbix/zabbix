@@ -664,7 +664,7 @@ COpt::memoryPick();
 
 // TODO: remove info from API
 			foreach($del_applications as $del_application){
-				info(sprintf(_('Application [%1$s] deleted'), $del_application['name']));
+				info(_s('Application [%1$s] deleted', $del_application['name']));
 			}
 
 			self::EndTransaction(true, __METHOD__);

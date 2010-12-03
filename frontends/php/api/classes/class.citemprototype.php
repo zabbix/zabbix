@@ -628,7 +628,7 @@ COpt::memoryPick();
 				|| preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/u', $item['port']))
 			){
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					sprintf(_('Item [%1$s:%2$s] has invalid port: "%3$s".'), $current_item['description'], $current_item['key_'], $item['port']));
+					_s('Item [%1$s:%2$s] has invalid port: "%3$s".', $current_item['description'], $current_item['key_'], $item['port']));
 			}
 
 			if(isset($item['value_type'])){
@@ -990,7 +990,7 @@ COpt::memoryPick();
 
 // TODO: remove info from API
 			foreach($del_itemPrototypes as $item){
-				info(sprintf(_('Item prototype [%1$s:%2$s] deleted.'), $item['description'], $item['key_']));
+				info(_s('Item prototype [%1$s:%2$s] deleted.', $item['description'], $item['key_']));
 			}
 
 			self::EndTransaction(true, __METHOD__);

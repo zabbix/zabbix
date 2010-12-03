@@ -347,7 +347,7 @@
 				}
 
 				if(!isset($item['interfaceid'])){
-					error(sprintf(_('Item [%1$s:%2$s] cannot find interface on host [%3$s]'), $item['description'], $item['key_'], $host['host']));
+					error(_s('Item [%1$s:%2$s] cannot find interface on host [%3$s]', $item['description'], $item['key_'], $host['host']));
 					return false;
 				}
 			}

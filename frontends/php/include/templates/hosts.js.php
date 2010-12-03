@@ -56,7 +56,7 @@ function addInterfaceRow(hostInterface){
 		hostInterface.newValue = "create";
 	}
 
-	hostInterface.disabled = '';//'<?php print(S_INTERFACE_IS_USED);?>';
+	hostInterface.disabled = '';
 	if(isset("items", hostInterface) && (hostInterface.items > 0)){
 		hostInterface.disabled = 'disabled="disabled"';
 	}
