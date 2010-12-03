@@ -1341,7 +1341,7 @@
 	'S_EXPORT_HAVE_NO_MAPS'=>		_('Export does not contain Zabbix maps'),
 	'S_EXPORT_HAVE_NO_SCREENS'=>	_('Export does not contain Zabbix screens'),
 
-	'S_INCORRECT_ELEMENT_MAP_LINK' => _('All links should have "Name" and "Url" specified'),
+	'S_INCORRECT_ELEMENT_MAP_LINK' => _('All links should have "Name" and "URL" specified'),
 	'S_EACH_URL_SHOULD_HAVE_UNIQUE' => _('Each URL should have a unique name. Please make sure there is only one URL named'),
 
 //	map.php
