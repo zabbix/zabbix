@@ -1490,9 +1490,6 @@ Ajax.Request = Class.create(Ajax.Base, {
   },
 
   respondToReadyState: function(readyState) {
-	alert("readystate = " + readyState);
-	alert("typeof(Ajax) = " + typeof(Ajax));
-	alert("Ajax = " + Ajax);
 	var state = Ajax.Request.Events[readyState], response = new Ajax.Response(this);
 
     if (state == 'Complete') {
