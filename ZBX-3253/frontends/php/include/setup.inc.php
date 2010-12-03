@@ -455,9 +455,8 @@
 					$DB['DATABASE'] == $this->getConfig('DB_DATABASE',	null) &&
 					$DB['USER'] == $this->getConfig('DB_USER',		null) &&
 					$DB['PASSWORD'] == $this->getConfig('DB_PASSWORD',	null)
-					)
-				{
-					$DB['SCHEMA'] == $this->getConfig('DB_SCHEMA',	null);
+				){
+					$DB['SCHEMA'] = $this->getConfig('DB_SCHEMA', null);
 					if(!DBconnect($error_msg)){
 						$error_msg = 'Cannot connect to database';
 					}

@@ -125,7 +125,7 @@ if(!isset($DB)){
 						
 						if(isset($DB['SCHEMA']) && ($DB['SCHEMA'] != '')){
 							DBexecute("SET CURRENT SCHEMA='".$DB['SCHEMA']."'");
-                        }
+						}
 					}
 
 					break;
