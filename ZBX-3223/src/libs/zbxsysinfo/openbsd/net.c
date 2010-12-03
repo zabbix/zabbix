@@ -21,6 +21,10 @@
 
 #include "sysinfo.h"
 
+#include <sys/sockio.h>
+
+#define N_UNDF	0x00		/* undefined */
+
 static struct nlist kernel_symbols[] =
 {
 	{"_ifnet", N_UNDF, 0, 0, 0},
@@ -37,64 +41,70 @@ static int	get_ifdata(const char *if_name, zbx_uint64_t *ibytes, zbx_uint64_t *i
 {
 	struct ifnet_head	head;
 	struct ifnet 		*ifp;
-	struct ifnet		v;
 
 	kvm_t 	*kp;
 	int	len = 0;
 	int 	ret = SYSINFO_RET_FAIL;
 
+	/* if_ibytes;		total number of octets received */
+	/* if_ipackets;		packets received on interface */
+	/* if_ierrors;		input errors on interface */
+	/* if_iqdrops;		dropped on input, this interface */
+	/* if_obytes;		total number of octets sent */
+	/* if_opackets;		packets sent on interface */
+	/* if_oerrors;		output errors on interface */
+	/* if_collisions;	collisions on csma interfaces */
+
+	if (ibytes)
+		*ibytes = 0;
+	if (ipackets)
+		*ipackets = 0;
+	if (ierrors)
+		*ierrors = 0;
+	if (idropped)
+		*idropped = 0;
+	if (obytes)
+		*obytes = 0;
+	if (opackets)
+		*opackets = 0;
+	if (oerrors)
+		*oerrors = 0;
+	if (tbytes)
+		*tbytes = 0;
+	if (tpackets)
+		*tpackets = 0;
+	if (terrors)
+		*terrors = 0;
+	if (tdropped)
+		*tdropped = 0;
+	if (icollisions)
+		*icollisions = 0;
+
 	kp = kvm_open(NULL, NULL, NULL, O_RDONLY, NULL);
 
-	if (kp) {
+	if (kp)
+	{
+		struct ifnet	v;
+
 		if (N_UNDF == kernel_symbols[IFNET_ID].n_type)
 			if (0 != kvm_nlist(kp, &kernel_symbols[0]))
 				kernel_symbols[IFNET_ID].n_type = N_UNDF;
 
-		if (N_UNDF != kernel_symbols[IFNET_ID].n_type) {
+		if (N_UNDF != kernel_symbols[IFNET_ID].n_type)
+		{
 			len = sizeof(struct ifnet_head);
 
-			if (kvm_read(kp, kernel_symbols[IFNET_ID].n_value, &head, len) >= len) {
+			if (kvm_read(kp, kernel_symbols[IFNET_ID].n_value, &head, len) >= len)
+			{
 				len = sizeof(struct ifnet);
 
-				/* if_ibytes;		total number of octets received */
-				/* if_ipackets;		packets received on interface */
-				/* if_ierrors;		input errors on interface */
-				/* if_iqdrops;		dropped on input, this interface */
-				/* if_obytes;		total number of octets sent */
-				/* if_opackets;		packets sent on interface */
-				/* if_oerrors;		output errors on interface */
-				/* if_collisions;	collisions on csma interfaces */
-
-				if (ibytes)
-					*ibytes = 0;
-				if (ipackets)
-					*ipackets = 0;
-				if (ierrors)
-					*ierrors = 0;
-				if (idropped)
-					*idropped = 0;
-				if (obytes)
-					*obytes = 0;
-				if (opackets)
-					*opackets = 0;
-				if (oerrors)
-					*oerrors = 0;
-				if (tbytes)
-					*tbytes = 0;
-				if (tpackets)
-					*tpackets = 0;
-				if (terrors)
-					*terrors = 0;
-				if (tdropped)
-					*tdropped = 0;
-				if (icollisions)
-					*icollisions = 0;
-
-				for(ifp = head.tqh_first; ifp; ifp = v.if_list.tqe_next) {
+				for (ifp = head.tqh_first; ifp; ifp = v.if_list.tqe_next)
+				{
 					if (kvm_read(kp, (u_long)ifp, &v, len) < len)
 						break;
 
-					if (*if_name == '\0' || 0 == strcmp(if_name, v.if_xname)) {
+					if (*if_name == '\0' || 0 == strcmp(if_name, v.if_xname))
+					{
 						if (ibytes)
 							*ibytes += v.if_ibytes;
 						if (ipackets)
@@ -126,7 +136,57 @@ static int	get_ifdata(const char *if_name, zbx_uint64_t *ibytes, zbx_uint64_t *i
 		}
 		kvm_close(kp);
 	}
+	else
+	{
+		/* Fallback to using SIOCGIFDATA */
 
+		int		if_s = -1;
+		struct ifreq	ifr;
+		struct if_data	v;
+
+		if ((if_s = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+			goto out;
+
+		zbx_strlcpy(ifr.ifr_name, if_name, IFNAMSIZ - 1);
+		ifr.ifr_data = (caddr_t)&v;
+
+		if (ioctl(if_s, SIOCGIFDATA, &ifr))
+			goto out;
+
+		if (*if_name == '\0' || 0 == strcmp(if_name, ifr.ifr_name))
+		{
+			if (ibytes)
+				*ibytes += v.ifi_ibytes;
+			if (ipackets)
+				*ipackets += v.ifi_ipackets;
+			if (ierrors)
+				*ierrors += v.ifi_ierrors;
+			if (idropped)
+				*idropped += v.ifi_iqdrops;
+			if (obytes)
+				*obytes += v.ifi_obytes;
+			if (opackets)
+				*opackets += v.ifi_opackets;
+			if (oerrors)
+				*oerrors += v.ifi_oerrors;
+			if (tbytes)
+				*tbytes += v.ifi_ibytes + v.ifi_obytes;
+			if (tpackets)
+				*tpackets += v.ifi_ipackets + v.ifi_opackets;
+			if (terrors)
+				*terrors += v.ifi_ierrors + v.ifi_oerrors;
+			if (tdropped)
+				*tdropped += v.ifi_iqdrops;
+			if (icollisions)
+				*icollisions += v.ifi_collisions;
+		}
+
+		close(if_s);
+
+		ret = SYSINFO_RET_OK;
+	}
+
+out:
 	return ret;
 }
 
