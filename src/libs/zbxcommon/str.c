@@ -922,6 +922,216 @@ char	*__zbx_zbx_strdcatf(char *dest, const char *f, ...)
 
 /******************************************************************************
  *                                                                            *
+ * Function: parse_host                                                       *
+ *                                                                            *
+ * Purpose: return hostname                                                   *
+ *                                                                            *
+ *  e.g., Zabbix server                                                       *
+ *                                                                            *
+ * Parameters: exp - pointer to the first char of hostname                    *
+ *                                                                            *
+ *  e.g., {Zabbix server:agent.ping.last(0)}                                  *
+ *         ^                                                                  *
+ *                                                                            *
+ * Return value: return SUCCEED and pointer to just after the end of hostname *
+ *               or FAIL and pointer to incorrect char                        *
+ *                                                                            *
+ * Author: Aleksandrs Saveljevs                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	parse_host(char **exp, char **host)
+{
+	char	c, *p, *s;
+
+	p = *exp;
+
+	for (s = *exp; SUCCEED == is_hostname_char(*s); s++)
+		;
+
+	*exp = s;
+
+	if (p != s)
+	{
+		c = *s;
+		*s = '\0';
+		*host = strdup(p);
+		*s = c;
+		return SUCCEED;
+	}
+	else
+		return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: parse_key                                                        *
+ *                                                                            *
+ * Purpose: return key with parameters (if present)                           *
+ *                                                                            *
+ *  e.g., system.run[cat /etc/passwd | awk -F: '{ print $1 }']                *
+ *                                                                            *
+ * Parameters: exp - pointer to the first char of key                         *
+ *                                                                            *
+ *  e.g., {host:system.run[cat /etc/passwd | awk -F: '{ print $1 }'].last(0)} *
+ *              ^                                                             *
+ *                                                                            *
+ * Return value: return SUCCEED and pointer to just after the end of key      *
+ *               or FAIL and pointer to incorrect char                        *
+ *                                                                            *
+ * Author: Aleksandrs Saveljevs                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	parse_key(char **exp, char **key)
+{
+	char	c;
+	char	*p, *r, *s;
+
+	p = *exp;
+
+	for (s = *exp; SUCCEED == is_key_char(*s); s++)
+		;
+
+	if ('\0' == *s)		/* no function specified? */
+	{
+		*key = strdup(p);
+		*exp = s;
+		return SUCCEED;
+	}
+	else if ('(' == *s)	/* for instance, ssh,22.last(0) */
+	{
+		for (r = s - 1; p <= r && '.' != *r; r--)
+			;
+
+		if (r <= p)
+		{
+			*exp = s;
+			return FAIL;
+		}
+
+		*r = '\0';
+		*key = strdup(p);
+		*r = '.';
+
+		*exp = r;
+		return SUCCEED;
+	}
+	else if ('[' == *s)	/* for instance, net.tcp.port[,80] */
+	{
+		int	state = 0;	/* 0 - init, 1 - inside quoted param, 2 - inside unquoted param */
+		int	array = 0;	/* array nest level */
+
+		for (s++; '\0' != *s; s++)
+		{
+			switch (state)
+			{
+				/* Init state */
+				case 0:
+					if (',' == *s)
+						;
+					else if (']' == *s && '[' == s[1] && 0 == array)	/* Zapcat */
+						s++;
+					else if ('"' == *s)
+						state = 1;
+					else if ('[' == *s)
+						array++;
+					else if (']' == *s && 0 != array)
+					{
+						array--;
+
+						/* skip spaces */
+						while (' ' == s[1])
+							s++;
+
+						if (0 == array && ']' == s[1])
+						{
+							s++;
+							goto succeed;
+						}
+
+						if (',' != s[1] && !(0 != array && ']' == s[1]))
+						{
+							s++;
+							goto fail;	/* incorrect syntax */
+						}
+					}
+					else if (']' == *s && 0 == array)
+						goto succeed;
+					else if (' ' != *s)
+						state = 2;
+					break;
+				/* Quoted */
+				case 1:
+					if ('"' == *s)
+					{
+						/* skip spaces */
+						while (' ' == s[1])
+							s++;
+
+						if (0 == array && ']' == s[1] && '[' == s[2])	/* Zapcat */
+						{
+							state = 0;
+							break;
+						}
+
+						if (0 == array && ']' == s[1])
+						{
+							s++;
+							goto succeed;
+						}
+
+						if (',' != s[1] && !(0 != array && ']' == s[1]))
+						{
+							s++;
+							goto fail;	/* incorrect syntax */
+						}
+
+						state = 0;
+					}
+					else if ('\\' == *s && '"' == s[1])
+						s++;
+					break;
+				/* Unquoted */
+				case 2:
+					if (0 == array && ']' == *s && '[' == s[1])	/* Zapcat */
+					{
+						s--;
+						state = 0;
+					}
+					else if (',' == *s || (']' == *s && 0 != array))
+					{
+						s--;
+						state = 0;
+					}
+					else if (']' == *s && 0 == array)
+						goto succeed;
+					break;
+			}
+		}
+fail:
+		*exp = s;
+		return FAIL;
+succeed:
+		c = *(++s);
+		*s = '\0';
+		*key = strdup(p);
+		*s = c;
+
+		*exp = s;
+		return SUCCEED;
+	}
+	else
+	{
+		*exp = s;
+		return FAIL;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: parse_function                                                   *
  *                                                                            *
  * Purpose: return function and function parameters                           *
@@ -932,7 +1142,7 @@ char	*__zbx_zbx_strdcatf(char *dest, const char *f, ...)
  *                last("host:key[key params]",#1)                             *
  *                ^                                                           *
  *                                                                            *
- * Return value: return SUCCEED and pointer to the right round bracket ')'    *
+ * Return value: return SUCCEED and pointer to just after the right ')'       *
  *               or FAIL and pointer to incorrect char                        *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
@@ -990,8 +1200,13 @@ int	parse_function(char **exp, char **func, char **params)
 				/* Quoted */
 				case 1:
 					if ('"' == *p)
-						state = 0;
-					else if('\\' == *p && '"' == p[1])
+					{
+						if ('"' != p[1])
+							state = 0;
+						else
+							goto error;
+					}
+					else if ('\\' == *p && '"' == p[1])
 						p++;
 					break;
 				/* Unquoted */
@@ -1018,13 +1233,14 @@ int	parse_function(char **exp, char **func, char **params)
 		}
 		else
 			goto error;
+
 		break;
 	}
 
 	if (NULL == *func || NULL == *params)
 		goto error;
 
-	*exp = p;
+	*exp = p + 1;
 
 	return SUCCEED;
 error:
@@ -1134,6 +1350,8 @@ int	num_param(const char *p)
 				if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
 					return 0;	/* incorrect syntax */
 			}
+			else if (']' == *p && 0 == array)
+				return 0;		/* incorrect syntax */
 			else if (' ' != *p)
 				state = 2;
 			break;
@@ -1147,6 +1365,7 @@ int	num_param(const char *p)
 
 				if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
 					return 0;	/* incorrect syntax */
+
 				state = 0;
 			}
 			else if ('\\' == *p && '"' == p[1])
@@ -1159,6 +1378,8 @@ int	num_param(const char *p)
 				p--;
 				state = 0;
 			}
+			else if (']' == *p && 0 == array)
+				return 0;		/* incorrect syntax */
 			break;
 		}
 	}
@@ -1190,7 +1411,7 @@ int	num_param(const char *p)
  *      1 - requested parameter missing                                       *
  *      0 - requested parameter found (value - 'buf' can be empty string)     *
  *                                                                            *
- * Author: Eugene Grigorjev, rewritten by Alexei                              *
+ * Author: Eugene Grigorjev, rewritten by Alexei Vladishev                    *
  *                                                                            *
  * Comments:  delimeter for parameters is ','                                 *
  *                                                                            *
@@ -1239,6 +1460,8 @@ int	get_param(const char *p, int num, char *buf, int maxlen)
 				if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
 					return 1;	/* incorrect syntax */
 			}
+			else if (']' == *p && 0 == array)
+				return 1;		/* incorrect syntax */
 			else if (' ' != *p)
 			{
 				if (idx == num)
@@ -1259,6 +1482,7 @@ int	get_param(const char *p, int num, char *buf, int maxlen)
 
 				if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
 					return 1;	/* incorrect syntax */
+
 				state = 0;
 			}
 			else if ('\\' == *p && '"' == p[1] && 0 == array)
@@ -1277,6 +1501,8 @@ int	get_param(const char *p, int num, char *buf, int maxlen)
 				p--;
 				state = 0;
 			}
+			else if (']' == *p && 0 == array)
+				return 1;		/* incorrect syntax */
 			else if (idx == num)
 				buf[buf_i++] = *p;
 			break;
@@ -1368,6 +1594,8 @@ static int	get_param_len(const char *p, int num, size_t *sz)
 				if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
 					return 1;	/* incorrect syntax */
 			}
+			else if (']' == *p && 0 == array)
+				return 1;		/* incorrect syntax */
 			else if (' ' != *p)
 			{
 				if (idx == num)
@@ -1388,6 +1616,7 @@ static int	get_param_len(const char *p, int num, size_t *sz)
 
 				if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
 					return 1;	/* incorrect syntax */
+
 				state = 0;
 			}
 			else if ('\\' == *p && '"' == p[1] && 0 == array)
@@ -1406,6 +1635,8 @@ static int	get_param_len(const char *p, int num, size_t *sz)
 				p--;
 				state = 0;
 			}
+			else if (']' == *p && 0 == array)
+				return 1;		/* incorrect syntax */
 			else if (idx == num)
 				(*sz)++;
 			break;
@@ -1589,7 +1820,7 @@ const char	*get_string(const char *p, char *buf, size_t bufsize)
 			{
 				p++;
 				if (buf_i < bufsize)
-					buf[buf_i++] = 0x0a;
+					buf[buf_i++] = '\n';
 			}
 			else if (buf_i < bufsize)
 				buf[buf_i++] = *p;
@@ -1809,7 +2040,8 @@ int	zbx_pg_escape_bytea(const u_char *input, int ilen, char **output, int *olen)
 	o = *output;
 	i = input;
 
-	while(i - input < ilen) {
+	while(i - input < ilen)
+	{
 		if(*i == '\0' || *i <= 0x1f || *i >= 0x7f)
 		{
 			*o++ = '\\';
@@ -1866,7 +2098,8 @@ int	zbx_pg_unescape_bytea(u_char *io)
 
 	assert(io);
 
-	while(*i != '\0') {
+	while(*i != '\0')
+	{
 		switch(*i)
 		{
 			case '\\':
@@ -1894,46 +2127,6 @@ int	zbx_pg_unescape_bytea(u_char *io)
 	return o - io;
 }
 #endif
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_get_field                                                    *
- *                                                                            *
- * Purpose: return Nth field of character separated string                    *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-int	zbx_get_field(const char *line, char *result, int num, char separator)
-{
-	int delim=0;
-	int ptr=0;
-	int i;
-
-	int ret = FAIL;
-
-	for(i=0;line[i]!=0;i++)
-	{
-		if(line[i]==separator)
-		{
-			delim++;
-			continue;
-		}
-		if(delim==num)
-		{
-			result[ptr++]=line[i];
-			result[ptr]=0;
-			ret = SUCCEED;
-		}
-	}
-	return ret;
-}
 
 /******************************************************************************
  *                                                                            *
@@ -2400,14 +2593,16 @@ const char	*zbx_nodetype_string(unsigned char nodetype)
 #ifdef _WINDOWS
 static int	get_codepage(const char *encoding, unsigned int *codepage)
 {
-	typedef struct codepage_s {
+	typedef struct
+	{
 		unsigned int	codepage;
-		char		*name;
-	} codepage_t;
+		const char	*name;
+	}
+	codepage_t;
 
 	int		i;
 	char		buf[16];
-	codepage_t	cp[] = {{0, "ANSI"}, {037, "IBM037"}, {437, "IBM437"}, {500, "IBM500"}, {708, "ASMO-708"},
+	codepage_t	cp[] = {{0, "ANSI"}, {37, "IBM037"}, {437, "IBM437"}, {500, "IBM500"}, {708, "ASMO-708"},
 			{709, NULL}, {710, NULL}, {720, "DOS-720"}, {737, "IBM737"}, {775, "IBM775"}, {850, "IBM850"},
 			{852, "IBM852"}, {855, "IBM855"}, {857, "IBM857"}, {858, "IBM00858"}, {860, "IBM860"},
 			{861, "IBM861"}, {862, "DOS-862"}, {863, "IBM863"}, {864, "IBM864"}, {865, "IBM865"},

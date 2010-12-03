@@ -1349,6 +1349,9 @@
 	'S_EXPORT_HAVE_NO_MAPS'=>		_('Export does not contain Zabbix maps'),
 	'S_EXPORT_HAVE_NO_SCREENS'=>	_('Export does not contain Zabbix screens'),
 
+	'S_INCORRECT_ELEMENT_MAP_LINK' => _('All links should have "Name" and "URL" specified'),
+	'S_EACH_URL_SHOULD_HAVE_UNIQUE' => _('Each URL should have a unique name. Please make sure there is only one URL named'),
+
 //	map.php
 	'S_OK_BIG'=>			_('OK'),
 	'S_PROBLEM_BIG'=>		_('PROBLEM'),
@@ -2224,6 +2227,7 @@
 	'S_DELETED_SMALL'=>				_('deleted'),
 	'S_UNKNOWN_VALUE_TYPE'=>			_('Unknown value type'),
 	'S_ITEMS_CHECK_KEY_DEFAULT_EXAMPLE_PASSED'=>	_('Check the key, please. Default example was passed'),
+	'S_ERROR_IN_ITEM_KEY' => 'Error in item key:',
 
 //	httptest.inc.php
 	'S_SCENARIO_STEP_NUMBER_CANNOT_BE_LESS_ONE'=>	_('Scenario step number cannot be less than 1'),

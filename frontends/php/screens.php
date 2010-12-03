@@ -147,7 +147,7 @@
 	$screens = CScreen::get(array(
 		'nodeids' => get_current_nodeid(),
 		'output' => API_OUTPUT_EXTEND,
-		'select_screenitems' => API_OUTPUT_EXTEND,
+		'select_screenitems' => API_OUTPUT_EXTEND
 	));
 
 
@@ -243,7 +243,7 @@
 			foreach($options as $option) $params[$option] = 1;
 			$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
 			$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
-//SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
+
 			validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
 
 			$cmbGroups = new CComboBox('groupid', $PAGE_GROUPS['selected'], 'javascript: submit();');

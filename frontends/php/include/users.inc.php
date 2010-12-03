@@ -32,7 +32,7 @@
 		{
 			$css = $USER_DETAILS['theme'];
 		}
-
+		if(!isset($css)) $css = 'css_ob.css';
 	return $css;
 	}
 

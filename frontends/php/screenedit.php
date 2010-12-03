@@ -166,12 +166,6 @@ include_once('include/page_header.php');
 				$msg_ok = S_ITEM_ADDED;
 				$msg_err = S_CANNOT_ADD_ITEM;
 			}
-			$resources = array(SCREEN_RESOURCE_GRAPH, SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT, SCREEN_RESOURCE_MAP,
-				SCREEN_RESOURCE_SCREEN, SCREEN_RESOURCE_TRIGGERS_OVERVIEW, SCREEN_RESOURCE_DATA_OVERVIEW);
-			if(str_in_array($_REQUEST['resourcetype'], $resources) && ($_REQUEST['resourceid'] == 0)){
-				throw new Exception('Incorrect resource');
-			}
-
 			if(isset($_REQUEST['screenitemid'])){
 				$result = update_screen_item($_REQUEST['screenitemid'],
 					$_REQUEST['resourcetype'],$_REQUEST['resourceid'],$_REQUEST['width'],
