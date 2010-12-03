@@ -97,12 +97,18 @@
 		$result = false;
 
 		if(isset($_REQUEST['hostid'])){
+			$proxies = CProxy::get(array(
+				'proxyids' => $_REQUEST['hostid'],
+				'output' => API_OUTPUT_EXTEND
+			));
+
 			DBstart();
 			$result = CProxy::delete(array('proxyid' => $_REQUEST['hostid']));
 			$result = DBend($result);
 
 			if($result){
-				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_PROXY,'['.$proxy['host'].' ] ['.$proxy['hostid'].']');
+				$proxy = reset($proxies);
+				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_PROXY,'['.$proxy['host'].' ] ['.$proxy['proxyid'].']');
 			}
 
 			show_messages($result, S_PROXY_DELETED, S_CANNOT_DELETE_PROXY);
@@ -152,7 +158,7 @@
 
 		DBstart();
 		$go_result = CProxy::delete(zbx_toObject($hosts, 'proxyid'));
-		$go_result = DBend();
+		$go_result = DBend($go_result);
 
 		show_messages($go_result, S_PROXY_DELETED, S_CANNOT_DELETE_PROXY);
 	}
