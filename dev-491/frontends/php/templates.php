@@ -435,7 +435,7 @@ include_once('include/page_header.php');
 		$go_result = true;
 		if(isset($_REQUEST['delete'])){
 			$result = CTemplate::massUpdate(array(
-				'templateids' => $_REQUEST['templateid'],
+				'templates' => zbx_toObject($_REQUEST['templateid'], 'templateid'),
 				'hosts' => array()
 			));
 		}

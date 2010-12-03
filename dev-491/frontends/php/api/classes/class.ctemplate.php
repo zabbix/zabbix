@@ -1316,12 +1316,12 @@ COpt::memoryPick();
 		try{
 			$options = array(
 				'templateids' => $templateids,
-				'editable' => 1,
+				'editable' => true,
 				'output' => API_OUTPUT_EXTEND,
-				'preservekeys' => 1,
+				'preservekeys' => true,
+				'preservekeys' => true,
 			);
 			$upd_templates = self::get($options);
-
 			foreach($templates as $tnum => $template){
 				if(!isset($upd_templates[$template['templateid']])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -1332,7 +1332,6 @@ COpt::memoryPick();
 			if(isset($data['groups']) && empty($data['groups'])){
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'No groups for template');
 			}
-			$data['groups'] = zbx_toArray($data['groups']);
 // }}} CHECK IF TEMPLATES HAVE AT LEAST 1 GROUP
 
 			$transaction = self::BeginTransaction(__METHOD__);
@@ -1382,6 +1381,7 @@ COpt::memoryPick();
 
 // UPDATE HOSTGROUPS LINKAGE {{{
 			if(isset($data['groups']) && !is_null($data['groups'])){
+				$data['groups'] = zbx_toArray($data['groups']);
 				$template_groups = CHostGroup::get(array('hostids' => $templateids));
 				$template_groupids = zbx_objectValues($template_groups, 'groupid');
 				$new_groupids = zbx_objectValues($data['groups'], 'groupid');
