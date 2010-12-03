@@ -1220,7 +1220,7 @@ COpt::memoryPick();
 
 // TODO: remove info from API
 			foreach($del_templates as $template) {
-				info(sprintf(_('Template [%1$s] deleted.'), $template['host']));
+				info(_s('Template [%1$s] deleted.', $template['host']));
 				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $template['hostid'], $template['host'], 'hosts', NULL, NULL);
 			}
 
@@ -1878,7 +1878,7 @@ COpt::memoryPick();
 				));
 
 				foreach($items[ZBX_FLAG_DISCOVERY] as $discoveryRule){
-					info(sprintf(_('Discovery rule [%1$s:%2$s] unlinked.'), $discoveryRule['description'], $discoveryRule['key_']));
+					info(_s('Discovery rule [%1$s:%2$s] unlinked.', $discoveryRule['description'], $discoveryRule['key_']));
 				}
 			}
 		}
@@ -1896,7 +1896,7 @@ COpt::memoryPick();
 				));
 
 				foreach($items[ZBX_FLAG_DISCOVERY_NORMAL] as $item){
-					info(sprintf(_('Item [%1$s:%2$s] unlinked.'), $item['description'], $item['key_']));
+					info(_s('Item [%1$s:%2$s] unlinked.', $item['description'], $item['key_']));
 				}
 			}
 		}
@@ -1914,7 +1914,7 @@ COpt::memoryPick();
 				));
 
 				foreach($items[ZBX_FLAG_DISCOVERY_CHILD] as $item){
-					info(sprintf(_('Item prototype [%1$s:%2$s] unlinked.'), $item['description'], $item['key_']));
+					info(_s('Item prototype [%1$s:%2$s] unlinked.', $item['description'], $item['key_']));
 				}
 			}
 		}
@@ -1962,7 +1962,7 @@ COpt::memoryPick();
 				));
 
 				foreach($graphs[ZBX_FLAG_DISCOVERY_CHILD] as $graph){
-					info(sprintf(_('Graph prototype [%1$s] unlinked.'), $graph));
+					info(_s('Graph prototype [%1$s] unlinked.', $graph));
 				}
 			}
 		}
@@ -1980,7 +1980,7 @@ COpt::memoryPick();
 				));
 
 				foreach($graphs[ZBX_FLAG_DISCOVERY_NORMAL] as $graph){
-					info(sprintf(_('Graph [%1$s] unlinked.'), $graph));
+					info(_s('Graph [%1$s] unlinked.', $graph));
 				}
 			}
 		}
@@ -2031,7 +2031,7 @@ COpt::memoryPick();
 				));
 
 				foreach($triggers[ZBX_FLAG_DISCOVERY_NORMAL] as $trigger){
-					info(sprintf(_('Trigger [%1$s:%2$s] unlinked.'), $trigger['description'], $trigger['expression']));
+					info(_s('Trigger [%1$s:%2$s] unlinked.', $trigger['description'], $trigger['expression']));
 				}
 			}
 		}
@@ -2048,7 +2048,7 @@ COpt::memoryPick();
 				));
 
 				foreach($triggers[ZBX_FLAG_DISCOVERY_CHILD] as $trigger){
-					info(sprintf(_('Trigger prototype [%1$s:%2$s] unlinked.'), $trigger['description'], $trigger['expression']));
+					info(_s('Trigger prototype [%1$s:%2$s] unlinked.', $trigger['description'], $trigger['expression']));
 				}
 			}
 		}
@@ -2083,7 +2083,7 @@ COpt::memoryPick();
 				));
 
 				foreach($applications as $application){
-					info(sprintf(_('Application [%1$s] unlinked.'), $application));
+					info(_s('Application [%1$s] unlinked.', $application));
 				}
 			}
 		}
@@ -2109,7 +2109,7 @@ COpt::memoryPick();
 		$hosts = implode(', ', zbx_objectValues($hosts, 'host'));
 		$templates = implode(', ', zbx_objectValues($templates, 'host'));
 
-		info(sprintf(_('Templates [%1$s] unlinked from hosts [%2$s].'), $templates, $hosts));
+		info(_s('Templates [%1$s] unlinked from hosts [%2$s].', $templates, $hosts));
 
 		return true;
 	}
