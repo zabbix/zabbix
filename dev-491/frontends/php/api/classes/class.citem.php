@@ -882,7 +882,7 @@ COpt::memoryPick();
 			));
 		}
 		else{
-			$item_db_fields = array('description'=>null, 'key_'=>null, 'hostid'=>null);
+			$item_db_fields = array('description'=>null, 'key_'=>null, 'hostid'=>null, 'type' => null);
 
 			$dbHosts = CHost::get(array(
 				'output' => array('hostid', 'host', 'status'),
@@ -908,14 +908,19 @@ COpt::memoryPick();
 			unset($item['lastns']);
 
 			if($create){
-				if($dbHosts[$item['hostid']]['status'] == HOST_STATUS_TEMPLATE)
-					unset($item['interfaceid']);
-
 				if(!isset($dbHosts[$item['hostid']]))
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 
-				if(!isset($item['interfaceid']) && ($dbHosts[$item['hostid']]['status'] != HOST_STATUS_TEMPLATE))
+				if(!in_array($current_item['type'], array(ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV1,
+						ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI,
+						ITEM_TYPE_SSH, ITEM_TYPE_TELNET))
+					|| ($dbHosts[$item['hostid']]['status'] == HOST_STATUS_TEMPLATE)
+				){
+					unset($item['interfaceid']);
+				}
+				else if(!isset($item['interfaceid'])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+				}
 			}
 			else if($delete){
 				if(!isset($dbItems[$item['itemid']]))
@@ -985,10 +990,17 @@ COpt::memoryPick();
 				if(!isset($item['hostid'])) $item['hostid'] = $dbItems[$item['itemid']]['hostid'];
 			}
 
-			if(isset($item['interfaceid'])){
-				$interface = $interfaces[$item['interfaceid']];
-				if($interface['hostid'] != $item['hostid'])
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Item uses Host interface from non parent host');
+			if(in_array($current_item['type'], array(ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV1,
+				ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI,
+				ITEM_TYPE_SSH, ITEM_TYPE_TELNET))
+			){
+				if(isset($item['interfaceid'])){
+					if(!isset($interfaces[$item['interfaceid']]) || ($interfaces[$item['interfaceid']]['hostid'] != $item['hostid']))
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item uses Host interface from non parent host'));
+				}
+			}
+			else{
+				unset($item['interfaceid']);
 			}
 
 			if((isset($item['port']) && !zbx_empty($item['port']))
@@ -1148,6 +1160,7 @@ COpt::memoryPick();
 	protected static function updateReal($items){
 		$items = zbx_toArray($items);
 
+		$itemids = array();
 		$data = array();
 		foreach($items as $inum => $item){
 			$itemsExists = CItem::get(array(
@@ -1166,16 +1179,17 @@ COpt::memoryPick();
 			}
 
 			$data[] = array('values' => $item, 'where'=> array('itemid='.$item['itemid']));
+			$itemids[] = $item['itemid'];
 		}
 		$result = DB::update('items', $data);
 		if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 
-		$itemids = array();
-		$itemApplications = array();
-		foreach($items as $key => $item){
-			$itemids[] = $item['itemid'];
 
+		$itemApplications = $aids = array();
+		foreach($items as $key => $item){
 			if(!isset($item['applications'])) continue;
+			$aids[] = $item['itemid'];
+
 			foreach($item['applications'] as $anum => $appid){
 				$itemApplications[] = array(
 					'applicationid' => $appid,
@@ -1185,7 +1199,7 @@ COpt::memoryPick();
 		}
 
 		if(!empty($itemids)){
-			DB::delete('items_applications', array('itemid'=>$itemids));
+			DB::delete('items_applications', array('itemid' => $aids));
 			DB::insert('items_applications', $itemApplications);
 		}
 
@@ -1297,7 +1311,7 @@ COpt::memoryPick();
 
 			if(!empty($del_graphs)){
 				$result = CGraph::delete($del_graphs, true);
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete item');
+				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete graph'));
 			}
 //--
 
@@ -1347,7 +1361,7 @@ COpt::memoryPick();
 
 // TODO: remove info from API
 			foreach($del_items as $item){
-				info(_('Item [%1$s:%2$s] deleted.', $item['description'], $item['key_']));
+				info(_s('Item [%1$s:%2$s] deleted.', $item['description'], $item['key_']));
 			}
 
 			self::EndTransaction(true, __METHOD__);
@@ -1490,7 +1504,9 @@ COpt::memoryPick();
 
 // checking interfaces
 				$type = null;
-				if($host['status'] == HOST_STATUS_TEMPLATE){
+				if(($host['status'] == HOST_STATUS_TEMPLATE) || !in_array($item['type'], array(ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV1,
+						ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI,
+						ITEM_TYPE_SSH, ITEM_TYPE_TELNET))){
 					unset($item['interfaceid']);
 				}
 				else if(isset($item['type'])){
@@ -1501,7 +1517,6 @@ COpt::memoryPick();
 						if(!isset($interfaces[$type])){
 							self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot find host interface on host ['.$host['host'].'] for item key ['.$exItem['key_'].']');
 						}
-
 // item type changes does not reflect on used interface [do not update interface]
 						$exType = getInterfaceTypeByItem($exItem);
 						if($exType == $type) $type = null;

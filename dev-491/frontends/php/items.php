@@ -500,13 +500,10 @@ switch($itemType) {
 		if(!is_null(get_request('formula',null))) $_REQUEST['multiplier']=1;
 		if('0' === get_request('formula',null)) $_REQUEST['multiplier']=0;
 
-		$group_itemid = $_REQUEST['group_itemid'];
-		$result = false;
+		$applications = get_request('applications', null);
+		if(isset($applications[0]) && $applications[0] == '0') $applications = array();
 
 		$item = array(
-			'description'	=> null,
-			'key_'			=> null,
-			'hostid'		=> null,
 			'interfaceid'	=> get_request('interfaceid', null),
 			'delay'			=> get_request('delay'),
 			'history'		=> get_request('history'),
@@ -534,27 +531,23 @@ switch($itemType) {
 			'password'		=> get_request('password'),
 			'publickey'		=> get_request('publickey'),
 			'privatekey'		=> get_request('privatekey'),
-			'params'			=> null,
 			'ipmi_sensor'		=> get_request('ipmi_sensor'),
-			'applications'		=> get_request('applications',null),
+			'applications'		=> $applications,
 			'data_type'		=> get_request('data_type')
 		);
 
 		DBstart();
-		foreach($group_itemid as $id){
+		foreach($_REQUEST['group_itemid'] as $id){
 			$item['itemid'] = $id;
-			$result |= CItem::update($item);
+			$result = CItem::update($item);
+			if(!$result) break;
 		}
 		$result = DBend($result);
 
 		show_messages($result, S_ITEMS_UPDATED);
 		unset($_REQUEST['group_itemid'], $_REQUEST['massupdate'], $_REQUEST['update'], $_REQUEST['form']);
-		$url = new CUrl();
-		$path = $url->getPath();
-		insert_js('cookie.eraseArray("'.$path.'")');
 	}
 	else if(isset($_REQUEST['register'])){
-
 		if($_REQUEST['register']=='do'){
 			$item = array(
 				'description'	=> get_request('description'),

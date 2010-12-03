@@ -1515,11 +1515,10 @@
 
 			$options = array(
 				'itemids' => $parent_discoveryid,
-				'filter' => array('flags' => ZBX_FLAG_DISCOVERY),
 				'output' => API_OUTPUT_EXTEND,
 				'editable' => true,
 			);
-			$discoveryRule = CItem::get($options);
+			$discoveryRule = CDiscoveryRule::get($options);
 			$discoveryRule = reset($discoveryRule);
 			$hostid = $discoveryRule['hostid'];
 		}
@@ -1752,7 +1751,7 @@
 					"return PopUp('popup.php?dstfrm=".$frmItem->getName().
 					"&dstfld1=host&dstfld2=form_hostid&srctbl=hosts_and_templates&srcfld1=host&srcfld2=hostid',450,450);",
 					'H')
-				));
+			));
 
 
 			$interfaces = CHostInterface::get(array(
@@ -1767,7 +1766,27 @@
 
 					$sbIntereaces->addItem($interface['interfaceid'], $caption);
 				}
-				$frmItem->addRow(S_HOST_INTERFACE,$sbIntereaces);
+				$frmItem->addRow(S_HOST_INTERFACE, $sbIntereaces, null, 'interface_row');
+				zbx_subarray_push($typeVisibility, ITEM_TYPE_ZABBIX, 'interface_row');
+				zbx_subarray_push($typeVisibility, ITEM_TYPE_ZABBIX, 'interfaceid');
+				zbx_subarray_push($typeVisibility, ITEM_TYPE_SIMPLE, 'interface_row');
+				zbx_subarray_push($typeVisibility, ITEM_TYPE_SIMPLE, 'interfaceid');
+				zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV1, 'interface_row');
+				zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV1, 'interfaceid');
+				zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV2C, 'interface_row');
+				zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV2C, 'interfaceid');
+				zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'interface_row');
+				zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'interfaceid');
+				zbx_subarray_push($typeVisibility, ITEM_TYPE_EXTERNAL, 'interface_row');
+				zbx_subarray_push($typeVisibility, ITEM_TYPE_EXTERNAL, 'interfaceid');
+				zbx_subarray_push($typeVisibility, ITEM_TYPE_DB_MONITOR, 'interface_row');
+				zbx_subarray_push($typeVisibility, ITEM_TYPE_DB_MONITOR, 'interfaceid');
+				zbx_subarray_push($typeVisibility, ITEM_TYPE_IPMI, 'interface_row');
+				zbx_subarray_push($typeVisibility, ITEM_TYPE_IPMI, 'interfaceid');
+				zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'interface_row');
+				zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'interfaceid');
+				zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'interface_row');
+				zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'interfaceid');
 			}
 		}
 
