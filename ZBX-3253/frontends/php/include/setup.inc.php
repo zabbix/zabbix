@@ -231,16 +231,19 @@
 
 			$DB['TYPE'] = $this->getConfig('DB_TYPE');
 
-			$cmbType = new CComboBox('type', $DB['TYPE']);
+			$cmbType = new CComboBox('type', $DB['TYPE'], 'this.form.submit();');
 			foreach($ZBX_CONFIG['allowed_db'] as $id => $name){
 				$cmbType->addItem($id, $name);
 			}
 			$table->addRow(array(new CCol(S_TYPE,'header'), $cmbType));
-			$table->addRow(array(new CCol(S_HOST,'header'), new CTextBox('server',		$this->getConfig('DB_SERVER',	'localhost'))));
-			$table->addRow(array(new CCol(S_PORT,'header'), array(new CNumericBox('port',	$this->getConfig('DB_PORT',	'0'),5),' 0 - use default port')));
-			$table->addRow(array(new CCol(S_NAME,'header'), new CTextBox('database',	$this->getConfig('DB_DATABASE',	'zabbix'))));
-			$table->addRow(array(new CCol(S_USER,'header'), new CTextBox('user',		$this->getConfig('DB_USER',	'root'))));
-			$table->addRow(array(new CCol(S_PASSWORD,'header'), new CPassBox('password',	$this->getConfig('DB_PASSWORD',	''))));
+			$table->addRow(array(new CCol(S_HOST,'header'), new CTextBox('server', $this->getConfig('DB_SERVER', 'localhost'))));
+			$table->addRow(array(new CCol(S_PORT,'header'), array(new CNumericBox('port', $this->getConfig('DB_PORT', '0'),5),' 0 - use default port')));
+			$table->addRow(array(new CCol(S_NAME,'header'), new CTextBox('database', $this->getConfig('DB_DATABASE', 'zabbix'))));
+			$table->addRow(array(new CCol(S_USER,'header'), new CTextBox('user', $this->getConfig('DB_USER',	'root'))));
+			$table->addRow(array(new CCol(S_PASSWORD,'header'), new CPassBox('password', $this->getConfig('DB_PASSWORD', ''))));
+			
+			if($DB['TYPE'] == 'IBM_DB2')
+				$table->addRow(array(new CCol(S_SCHEMA,'header'), new CTextBox('schema', $this->getConfig('DB_SCHEMA', ''))));
 
 			return array(
 				'Please create database manually,', BR(),
@@ -250,10 +253,10 @@
 				BR(),BR(),
 				$table,
 				BR(),
-				!$this->DISABLE_NEXT_BUTTON ? new CSpan(S_OK,'ok') :  new CSpan(S_FAIL, 'fail'),
+				!$this->DISABLE_NEXT_BUTTON ? new CSpan(S_OK, 'ok') :  new CSpan(S_FAIL, 'fail'),
 				BR(),
 				new  CButton('retry', 'Test connection')
-				);
+			);
 		}
 
 		function stage4(){
@@ -284,6 +287,8 @@
 			$table->addRow(array(new CCol('Database user:','header'),	$this->getConfig('DB_USER',		'unknown')));
 //			$table->addRow(array(new CCol('Database password:','header'),	ereg_replace('.','*',$this->getConfig('DB_PASSWORD',	'unknown'))));
 			$table->addRow(array(new CCol('Database password:','header'),	preg_replace('/./','*',$this->getConfig('DB_PASSWORD',	'unknown'))));
+			if($this->getConfig('DB_TYPE', '') == 'IBM_DB2')
+				$table->addRow(array(new CCol('Database schema:','header'),	$this->getConfig('DB_SCHEMA', 'unknown')));
 			/* $table->addRow(array(new CCol('Distributed monitoring','header'),	$this->getConfig('distributed', null) ? 'Enabled' : 'Disabled')); */
 
 			if($this->getConfig('distributed', null)){
@@ -361,6 +366,7 @@
 				$old_DB_DATABASE= $DB['DATABASE'];
 				$old_DB_USER	= $DB['USER'];
 				$old_DB_PASSWORD= $DB['PASSWORD'];
+				$old_DB_SCHEMA = isset($DB['SCHEMA']) ? $DB['SCHEMA'] : '';
 			}
 
 			$DB['TYPE']	= $this->getConfig('DB_TYPE');
@@ -371,6 +377,7 @@
 			$DB['DATABASE']	= $this->getConfig('DB_DATABASE',	'zabbix');
 			$DB['USER']	= $this->getConfig('DB_USER',		'root');
 			$DB['PASSWORD']	= $this->getConfig('DB_PASSWORD',	'');
+			$DB['SCHEMA']	= $this->getConfig('DB_SCHEMA',	'');
 
 			$error = '';
 			if(!$result = DBconnect($error)){
@@ -399,6 +406,7 @@
 				$DB['DATABASE']	= $old_DB_DATABASE;
 				$DB['USER']	= $old_DB_USER;
 				$DB['PASSWORD']	= $old_DB_PASSWORD;
+				$DB['SCHEMA'] = $old_DB_SCHEMA;
 			}
 
 			DBconnect($error);
@@ -417,6 +425,7 @@
 				$old_DB_DATABASE	= $DB['DATABASE'];
 				$old_DB_USER		= $DB['USER'];
 				$old_DB_PASSWORD	= $DB['PASSWORD'];
+				$old_DB_SCHEMA = isset($DB['SCHEMA']) ? $DB['SCHEMA'] : '';
 
 				$old_ZBX_SERVER		= $ZBX_SERVER;
 				$old_ZBX_SERVER_PORT	= $ZBX_SERVER_PORT;
@@ -448,6 +457,7 @@
 					$DB['PASSWORD'] == $this->getConfig('DB_PASSWORD',	null)
 					)
 				{
+					$DB['SCHEMA'] == $this->getConfig('DB_SCHEMA',	null);
 					if(!DBconnect($error_msg)){
 						$error_msg = 'Cannot connect to database';
 					}
@@ -475,6 +485,7 @@
 				$DB['DATABASE']		= $old_DB_DATABASE;
 				$DB['USER']		= $old_DB_USER;
 				$DB['PASSWORD']		= $old_DB_PASSWORD;
+				$DB['SCHEMA'] = $old_DB_SCHEMA;
 
 				$ZBX_SERVER		= $old_ZBX_SERVER;
 				$ZBX_SERVER_PORT	= $old_ZBX_SERVER_PORT;
@@ -508,25 +519,29 @@
 				$this->setConfig('DB_DATABASE',	get_request('database',	$this->getConfig('DB_DATABASE',	'zabbix')));
 				$this->setConfig('DB_USER',	get_request('user',	$this->getConfig('DB_USER',	'root')));
 				$this->setConfig('DB_PASSWORD',	get_request('password',	$this->getConfig('DB_PASSWORD',	'')));
+				$this->setConfig('DB_SCHEMA', get_request('schema', $this->getConfig('DB_SCHEMA', '')));
 
-				if(!$this->CheckConnection()){
+				if(isset($_REQUEST['retry'])){
+					if(!$this->CheckConnection()){
+						$this->DISABLE_NEXT_BUTTON = true;
+						unset($_REQUEST['next']);
+					}
+				}
+				else if(!isset($_REQUEST['next'][$this->getStep()])){
 					$this->DISABLE_NEXT_BUTTON = true;
 					unset($_REQUEST['next']);
 				}
 
-				if(isset($_REQUEST['next'][$this->getStep()]))		$this->DoNext();
+				if(isset($_REQUEST['next'][$this->getStep()])) $this->DoNext();
 			}
-
 			if($this->getStep() == 4){
 				$this->setConfig('ZBX_SERVER',		get_request('zbx_server',	$this->getConfig('ZBX_SERVER',		'localhost')));
 				$this->setConfig('ZBX_SERVER_PORT',	get_request('zbx_server_port',	$this->getConfig('ZBX_SERVER_PORT',	'10051')));
 				if(isset($_REQUEST['next'][$this->getStep()])) $this->DoNext();
 			}
-
 			if($this->getStep() == 5 && isset($_REQUEST['next'][$this->getStep()])){
 				$this->DoNext();
 			}
-
 			if($this->getStep() == 6){
 				$this->setConfig('ZBX_CONFIG_FILE_CORRECT', $this->CheckConfigurationFile());
 
@@ -550,6 +565,15 @@
 		}
 
 		function getNewConfigurationFileContent(){
+			$SCHEMA = '';
+			$dbschema = $this->getConfig('DB_SCHEMA', '');
+			$dbtype = $this->getConfig('DB_TYPE', '');
+
+			if(($dbtype == 'IBM_DB2') && !zbx_empty($dbschema)){
+				$SCHEMA = '$DB["SCHEMA"]		= \''.$dbschema.'\';';
+			}
+		
+			
 			return
 '<?php
 /*
@@ -581,6 +605,7 @@ $DB["USER"]		= \''.$this->getConfig('DB_USER' ,'unknown').'\';
 $DB["PASSWORD"]		= \''.$this->getConfig('DB_PASSWORD' ,'').'\';
 $ZBX_SERVER		= \''.$this->getConfig('ZBX_SERVER' ,'').'\';
 $ZBX_SERVER_PORT	= \''.$this->getConfig('ZBX_SERVER_PORT' ,'0').'\';
+'.$SCHEMA.'
 
 $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 ?>
