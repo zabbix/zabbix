@@ -166,7 +166,7 @@ if(isset($_REQUEST['save_trigger'])){
 			add_audit($audit_action, AUDIT_RESOURCE_TRIGGER, S_TRIGGER." [".$triggerid."] [".expand_trigger_description($triggerid)."] ");
 			unset($_REQUEST["sform"]);
 
-			zbx_add_post_js('closeform("items.php");');
+			//zbx_add_post_js('closeform("items.php");');
 			include_once('include/page_footer.php');
 		}
 	}
@@ -404,8 +404,7 @@ if(isset($_REQUEST['sform'])){
 	$frmTRLog->addItemToBottomRow(new CButton('save_trigger',S_SAVE,'javascript: document.forms[0].action += \'?saction=1\';'));
 	$frmTRLog->addItemToBottomRow(SPACE);
 
-	//$cb = new CButton('cancel',S_CANCEL, 'javascript: self.close();');
-	$cb = new CButton('cancel',S_CANCEL, '');
+	$cb = new CButton('cancel',S_CANCEL, 'javascript: self.close();');
 	$cb->setType('button');
 
 	$frmTRLog->addItemToBottomRow($cb);
