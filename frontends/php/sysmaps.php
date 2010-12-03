@@ -148,7 +148,7 @@ include_once('include/page_header.php');
 
 		$urls = get_request('urls', array());
 		foreach($urls as $unum => $url){
-			if(empty($url['name']) && empty($url['url']))
+			if($url['name'] === '' && $url['url'] === '')
 				unset($urls[$unum]);
 		}
 
