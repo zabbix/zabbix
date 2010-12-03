@@ -405,7 +405,7 @@ if(isset($_REQUEST['sform'])){
 	$frmTRLog->addItemToBottomRow(SPACE);
 
 	//$cb = new CButton('cancel',S_CANCEL, 'javascript: self.close();');
-	$cb = new CButton('cancel',S_CANCEL, 'javascript: self.close();');
+	$cb = new CButton('cancel',S_CANCEL, '');
 	$cb->setType('button');
 
 	$frmTRLog->addItemToBottomRow($cb);
