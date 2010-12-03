@@ -192,8 +192,7 @@ if(isset($_REQUEST['sform'])){
 					' WHERE t.triggerid='.$_REQUEST['triggerid'].
 						' AND i.itemid=f.itemid '.
 						' AND f.triggerid = t.triggerid '.
-						' AND i.value_type IN ('.ITEM_VALUE_TYPE_LOG.' , '.ITEM_VALUE_TYPE_TEXT.', '.ITEM_VALUE_TYPE_STR.')'.
-						' AND i.key_ LIKE \''.$matchkey.'\'';
+						' AND i.value_type IN ('.ITEM_VALUE_TYPE_LOG.' , '.ITEM_VALUE_TYPE_TEXT.', '.ITEM_VALUE_TYPE_STR.')';
 
 		$res = DBselect($sql);
 		while($rows = DBfetch($res)){
