@@ -566,11 +566,11 @@ COpt::memoryPick();
 
 				$urlNames = zbx_toHash($map['urls'], 'name');
 				foreach($map['urls'] as $unum => $url){
-					if(empty($url['name']) || empty($url['url']))
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Link should have both "name" and "url" fields.');
+					if($url['name'] === '' || $url['url'] === '')
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Link should have both "name" and "url" fields.'));
 
 					if(!isset($urlNames[$url['name']]))
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Link name should be unique.');
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Link name should be unique.'));
 
 					unset($urlNames[$url['name']]);
 				}
@@ -638,7 +638,7 @@ COpt::memoryPick();
 				'output' => API_OUTPUT_EXTEND,
 			);
 			$db_sysmaps = self::get($options);
-			foreach($maps as $mnum => $map){
+			foreach($maps as $map){
 				if(!isset($db_sysmaps[$map['sysmapid']])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Map with ID ['.$map['sysmapid'].'] does not exist');
 				}
@@ -646,7 +646,7 @@ COpt::memoryPick();
 
 			$update = array();
 			$urlidsToDelete = $urlsToUpdate = $urlsToAdd = array();
-			foreach($maps as $mnum => $map){
+			foreach($maps as $map){
 				if(isset($map['name'])){
 					$options = array(
 						'filter' => array(
@@ -672,12 +672,12 @@ COpt::memoryPick();
 
 				if(isset($map['urls'])){
 					$urlNames = zbx_toHash($map['urls'], 'name');
-					foreach($map['urls'] as $unum => $url){
-						if(empty($url['name']) || empty($url['url']))
-							self::exception(ZBX_API_ERROR_PARAMETERS, 'Link should have both "name" and "url" fields.');
+					foreach($map['urls'] as $url){
+						if($url['name'] === '' || $url['url'] === '')
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Link should have both "name" and "url" fields.'));
 
 						if(!isset($urlNames[$url['name']]))
-							self::exception(ZBX_API_ERROR_PARAMETERS, 'Link name should be unique.');
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Link name should be unique.'));
 
 						unset($urlNames[$url['name']]);
 					}
