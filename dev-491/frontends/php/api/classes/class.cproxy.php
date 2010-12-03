@@ -331,6 +331,13 @@ class CProxy extends CZBXAPI{
 				if(!isset($dbProxies[$proxy['proxyid']]))
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 
+				if(isset($proxy['status']) && ($proxy['status'] == HOST_STATUS_PROXY_PASSIVE)){
+					if($dbProxies[$proxy['proxyid']]['status'] == $proxy['status'])
+						unset($proxy['status']);
+					else if(!isset($proxy['interfaces']))
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces provided for proxy "%s".', $proxy['host']));
+				}
+
 				if($delete) $proxy['host'] = $dbProxies[$proxy['proxyid']]['host'];
 			}
 			else{
@@ -338,19 +345,21 @@ class CProxy extends CZBXAPI{
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 
 				if(($proxy['status'] == HOST_STATUS_PROXY_PASSIVE) && !isset($proxy['interfaces']))
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'No interfaces for proxy [ '.$proxy['host'].' ]');
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces provided for proxy "%s"',$proxy['host']));
 			}
 
 			if($delete) continue;
 
 			if(isset($proxy['interfaces'])){
 				if(!is_array($proxy['interfaces']) || empty($proxy['interfaces']))
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'No interfaces for proxy [ '.$proxy['host'].' ]');
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces for proxy "%s"',$proxy['host']));
+				else if(count($proxy['interfaces']) > 1)
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Too many interfaces provided for proxy "%s".',$proxy['host']));
 			}
 
 			if(isset($proxy['host'])){
 				if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $proxy['host'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect characters used for Proxy name [ '.$proxy['host'].' ]');
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for Proxy name "%s".',$proxy['host']));
 				}
 
 				$proxiesExists = self::get(array(
@@ -358,7 +367,7 @@ class CProxy extends CZBXAPI{
 				));
 				foreach($proxiesExists as $exnum => $proxyExists){
 					if(!$update || ($proxyExists['proxyid'] != $proxy['proxyid'])){
-						self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$proxy['host'].' ] '.S_ALREADY_EXISTS_SMALL);
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host "%s" already exists.', $proxy['host']));
 					}
 				}
 			}
@@ -449,8 +458,19 @@ class CProxy extends CZBXAPI{
 
 // INTERFACES
 				if(isset($proxy['interfaces']) && is_array($proxy['interfaces'])){
-					$result = CHostInterface::update($proxy['interfaces']);
+					foreach($proxy['interfaces'] as $inum => &$interface){
+						$interface['hostid'] = $proxy['hostid'];
+					}
+
+					if(isset($interface['interfaceid']))
+						$result = CHostInterface::update($proxy['interfaces']);
+					else
+						$result = CHostInterface::create($proxy['interfaces']);
+
 					if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Proxy interface update failed');
+
+// unset after foreach with pointer
+					unset($interface);
 				}
 			}
 

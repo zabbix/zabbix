@@ -426,7 +426,7 @@ span.discoveryName{ color: #999900; }
 /* Sortable */
 .column{ margin: 5px 0px 5px 5px; min-width: 240px; padding-bottom: 100px; }
 
-.column .widget{ padding: 2px; margin-bottom: 5px;}
+.column .widget{ padding: 2px; margin-bottom: 5px; overflow: hidden;}
 
 .column .widget .header{
 	height: 18px;
