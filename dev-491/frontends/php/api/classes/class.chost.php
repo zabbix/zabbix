@@ -1446,6 +1446,7 @@ Copt::memoryPick();
 						'preservekeys' => true,
 						'nopermissions' => 1
 					));
+
 // Add
 					$interfacesToAdd = array();
 					$interfacesToUpdate = array();
@@ -1461,7 +1462,6 @@ Copt::memoryPick();
 						}
 					}
 //----
-
 					if(!empty($interfacesToDelete)){
 						$result = CHostInterface::delete(zbx_objectValues($interfacesToDelete, 'interfaceid'));
 						if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Host update failed');
