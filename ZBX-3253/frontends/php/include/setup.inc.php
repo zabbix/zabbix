@@ -372,12 +372,12 @@
 			$DB['TYPE']	= $this->getConfig('DB_TYPE');
 			if(is_null($DB['TYPE']))	return false;
 
-			$DB['SERVER']	= $this->getConfig('DB_SERVER',		'localhost');
-			$DB['PORT']	= $this->getConfig('DB_PORT',		'0');
-			$DB['DATABASE']	= $this->getConfig('DB_DATABASE',	'zabbix');
-			$DB['USER']	= $this->getConfig('DB_USER',		'root');
-			$DB['PASSWORD']	= $this->getConfig('DB_PASSWORD',	'');
-			$DB['SCHEMA']	= $this->getConfig('DB_SCHEMA',	'');
+			$DB['SERVER'] = $this->getConfig('DB_SERVER', 'localhost');
+			$DB['PORT']	= $this->getConfig('DB_PORT', '0');
+			$DB['DATABASE']	= $this->getConfig('DB_DATABASE', 'zabbix');
+			$DB['USER']	= $this->getConfig('DB_USER', 'root');
+			$DB['PASSWORD']	= $this->getConfig('DB_PASSWORD', '');
+			$DB['SCHEMA'] = $this->getConfig('DB_SCHEMA', '');
 
 			$error = '';
 			if(!$result = DBconnect($error)){
@@ -385,8 +385,16 @@
 				error($error);
 			}
 			else{
-				$result = DBexecute('CREATE table zabbix_installation_test ( test_row integer )');
-				$result &= DBexecute('DROP table zabbix_installation_test');
+				$result = true;
+				if(!zbx_empty($DB['SCHEMA']) && ($DB['TYPE'] == 'IBM_DB2')){
+					$db_schema = DBselect("SELECT schemaname FROM syscat.schemata WHERE schemaname='{$DB['SCHEMA']}'");
+					$result = DBfetch($db_schema);
+				}
+				
+				if($result){
+					$result = DBexecute('CREATE table zabbix_installation_test ( test_row integer )');
+					$result &= DBexecute('DROP table zabbix_installation_test');
+				}
 			}
 
 			DBclose();
@@ -458,7 +466,7 @@
 				){
 					$DB['SCHEMA'] = $this->getConfig('DB_SCHEMA', null);
 					if(!DBconnect($error_msg)){
-						$error_msg = 'Cannot connect to database';
+						$error_msg = 'Cannot connect to database.';
 					}
 				}
 				else{
@@ -467,7 +475,7 @@
 				DBclose();
 			}
 			else{
-				$error = 'Missing configuration file ['.$ZBX_CONFIGURATION_FILE.']';
+				$error = 'Missing configuration file ['.$ZBX_CONFIGURATION_FILE.'].';
 			}
 
 			if(isset($error_msg)){
@@ -569,7 +577,7 @@
 			$dbtype = $this->getConfig('DB_TYPE', '');
 
 			if(($dbtype == 'IBM_DB2') && !zbx_empty($dbschema)){
-				$SCHEMA = '$DB["SCHEMA"]		= \''.$dbschema.'\';';
+				$SCHEMA = '$DB["SCHEMA"]			= \''.$dbschema.'\';'."\n";
 			}
 		
 			
@@ -596,15 +604,16 @@
 
 global $DB;
 
-$DB["TYPE"]		= \''.$this->getConfig('DB_TYPE' ,'unknown').'\';
-$DB["SERVER"]		= \''.$this->getConfig('DB_SERVER' ,'unknown').'\';
-$DB["PORT"]		= \''.$this->getConfig('DB_PORT' ,'0').'\';
-$DB["DATABASE"]		= \''.$this->getConfig('DB_DATABASE' ,'unknown').'\';
-$DB["USER"]		= \''.$this->getConfig('DB_USER' ,'unknown').'\';
-$DB["PASSWORD"]		= \''.$this->getConfig('DB_PASSWORD' ,'').'\';
-$ZBX_SERVER		= \''.$this->getConfig('ZBX_SERVER' ,'').'\';
-$ZBX_SERVER_PORT	= \''.$this->getConfig('ZBX_SERVER_PORT' ,'0').'\';
+$DB["TYPE"]				= \''.$this->getConfig('DB_TYPE' ,'unknown').'\';
+$DB["SERVER"]			= \''.$this->getConfig('DB_SERVER' ,'unknown').'\';
+$DB["PORT"]				= \''.$this->getConfig('DB_PORT' ,'0').'\';
+$DB["DATABASE"]			= \''.$this->getConfig('DB_DATABASE' ,'unknown').'\';
+$DB["USER"]				= \''.$this->getConfig('DB_USER' ,'unknown').'\';
+$DB["PASSWORD"]			= \''.$this->getConfig('DB_PASSWORD' ,'').'\';
 '.$SCHEMA.'
+
+$ZBX_SERVER				= \''.$this->getConfig('ZBX_SERVER' ,'').'\';
+$ZBX_SERVER_PORT		= \''.$this->getConfig('ZBX_SERVER_PORT' ,'0').'\';
 
 $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 ?>
