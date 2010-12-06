@@ -460,7 +460,7 @@ Copt::memoryPick();
 			));
 		}
 		else{
-			$interfaceDBfields = array('hostid'=>null,'ip'=>null,'dns'=>null,'useip'=>null);
+			$interfaceDBfields = array('hostid'=>null,'ip'=>null,'dns'=>null,'useip'=>null,'port'=>null);
 			$dbHosts = CHost::get(array(
 				'output' => array('host', 'status'),
 				'hostids' => zbx_objectValues($interfaces, 'hostid'),
@@ -493,14 +493,10 @@ Copt::memoryPick();
 
 				if($delete) continue;
 
-
-				if($update){
-					if(((isset($interface['ip']) && zbx_empty($interface['ip'])) || zbx_empty($dbInterfaces[$interface['interfaceid']]['ip']))
-						&& ((isset($interface['dns']) && zbx_empty($interface['dns'])) || zbx_empty($dbInterfaces[$interface['interfaceid']]['dns']))
-					){
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'IP and DNS can not be empty for host interface');
-					}
-				}
+// we check all fields on "updated" interface
+				$updInterface = $interface;
+				$interface = zbx_array_merge($dbInterface, $interface);
+//--
 			}
 			else{
 				if(!isset($dbHosts[$interface['hostid']]) && !isset($dbProxies[$interface['hostid']]))
@@ -509,17 +505,19 @@ Copt::memoryPick();
 				if(isset($dbProxies[$interface['hostid']]))
 					$interface['type'] = INTERFACE_TYPE_UNKNOWN;
 				else if(!isset($interface['type']))
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to method.'));
 			}
 
-			if($create){
-				if(zbx_empty($interface['ip']) && zbx_empty($interface['dns'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'IP and DNS can not be empty for host interface');
-				}
+			if(zbx_empty($interface['ip']) && zbx_empty($interface['dns'])){
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('IP and DNS can not be empty for host interface.'));
+			}
 
-				if(isset($interface['port']) && zbx_empty($interface['port'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'PORT can not be empty for host interface');
-				}
+			if(($interface['useip'] == INTERFACE_USE_IP) && zbx_empty($interface['ip'])){
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface with DNS " %1$s " can not have empty IP address.', $interface['dns']));
+			}
+
+			if(($interface['useip'] == INTERFACE_USE_DNS) && zbx_empty($interface['dns'])){
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface with IP " %1$s " can not have empty DNS name.', $interface['ip']));
 			}
 
 			if(isset($interface['dns']) && !zbx_empty($interface['dns'])){
@@ -527,7 +525,7 @@ Copt::memoryPick();
 					&& !preg_match('/^'.ZBX_PREG_MACRO_NAME_FORMAT.'$/u', $interface['dns'])
 					&& !preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/u', $interface['dns']))
 				{
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect interface DNS paramter "'.$interface['dns'].'" provided');
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect interface DNS paramter " %1$s " provided.', $interface['dns']));
 				}
 			}
 
@@ -536,8 +534,12 @@ Copt::memoryPick();
 					&& !preg_match('/^'.ZBX_PREG_MACRO_NAME_FORMAT.'$/i', $interface['ip'])
 					&& !preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/i', $interface['ip']))
 				{
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect interface IP parameter "'.$interface['ip'].'" provided');
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect interface IP parameter " %1$s " provided.', $interface['ip']));
 				}
+			}
+
+			if(!isset($interface['port']) || zbx_empty($interface['port'])){
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('PORT can not be empty for host interface'));
 			}
 
 			if(isset($interface['port'])){
@@ -548,6 +550,10 @@ Copt::memoryPick();
 				else if(!preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $interface['port'])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect interface PORT "'.$interface['port'].'". '.S_WRONG_MACRO);
 				}
+			}
+
+			if($update){
+				$interface = $updInterface;
 			}
 		}
 		unset($interface);

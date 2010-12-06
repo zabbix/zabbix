@@ -1319,7 +1319,6 @@ COpt::memoryPick();
 				'editable' => true,
 				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => true,
-				'preservekeys' => true,
 			);
 			$upd_templates = self::get($options);
 			foreach($templates as $tnum => $template){

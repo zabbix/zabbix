@@ -50,6 +50,7 @@ function addInterfaceRow(hostInterface){
 	var tpl = new Template(jQuery('#hostInterfaceRow').html());
 
 	if(!isset("new", hostInterface)) hostInterface.newValue = "update";
+	else hostInterface.newValue = hostInterface["new"];
 
 	if(!isset("interfaceid", hostInterface)){
 		hostInterface.interfaceid = $("hostInterfaces").select("tr[id^=hostInterfaceRow]").length;
