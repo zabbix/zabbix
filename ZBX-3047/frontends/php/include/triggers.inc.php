@@ -3963,7 +3963,7 @@ return $caption;
 			if(!isset($triggersData[$str])) {
 
 				if(ZAPCAT_COMPATIBILITY)
-					$tmp_expr = str_replace('][', ',,', $str);
+					$tmp_expr = str_replace('][',',"][",', $str);
 				else
 					$tmp_expr = $str;
 

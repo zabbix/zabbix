@@ -49,12 +49,12 @@
 	define('ZBX_UNITS_ROUNDOFF_UPPER_LIMIT', 2);
 	define('ZBX_UNITS_ROUNDOFF_LOWER_LIMIT', 6);
 
-// this define made for partitioned DB installs!!
+	define('ZAPCAT_COMPATIBILITY', false);
+
+// for partitioned DB installs!!
 	define('ZBX_HISTORY_DATA_UPKEEP',		-1); // in days; -1: disabled, 0: always use trends
 
 /* END OF USERS DEFINES */
-	define('ZAPCAT_COMPATIBILITY', false);
-
 	define('ZBX_MAP_HIGHLIGHT', 0x1);
 	define('ZBX_MAP_EXPANDPROBLEM', 0x2);
 	define('ZBX_MAP_MARKELEMENTS', 0x4);

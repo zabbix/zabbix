@@ -866,31 +866,33 @@ function triggerExpressionValidateHost(&$parent, &$levelData, $index, &$expressi
 }
 
 function triggerExpressionValidateItemKey(&$parent, &$levelData, $index, &$expression, &$rules) {
-        if(!isset($parent['indexes']['keyName']) || !count($parent['indexes']['keyName']))
-                return;
+	if(!isset($parent['indexes']['keyName']) || !count($parent['indexes']['keyName']))
+		return;
 
-        reset($parent['indexes']['keyName']);
+	reset($parent['indexes']['keyName']);
 	$kData =& $parent['indexes']['keyName'][key($parent['indexes']['keyName'])];
 	$keyName = zbx_substr($expression, $kData['openSymbolNum']+zbx_strlen($kData['openSymbol']), $kData['closeSymbolNum']-$kData['openSymbolNum']-zbx_strlen($kData['closeSymbol']));
 
 	if(isset($parent['indexes']['keyParams']) && count($parent['indexes']['keyParams']) > 0) {
-	        reset($parent['indexes']['keyParams']);
-        	$kpData =& $parent['indexes']['keyParams'][key($parent['indexes']['keyParams'])];
-        	$keyParams = isset($parent['indexes']['keyParams']) && count($parent['indexes']['keyParams']) > 0 ? zbx_substr($expression, $kpData['openSymbolNum'], $kpData['closeSymbolNum']-$kpData['openSymbolNum']+zbx_strlen($kpData['closeSymbol'])) : '';
-        }else{
-                $keyParams = '';
-        }
+		reset($parent['indexes']['keyParams']);
+		$kpData =& $parent['indexes']['keyParams'][key($parent['indexes']['keyParams'])];
+		$keyParams = isset($parent['indexes']['keyParams']) && count($parent['indexes']['keyParams']) > 0 ? zbx_substr($expression, $kpData['openSymbolNum'], $kpData['closeSymbolNum']-$kpData['openSymbolNum']+zbx_strlen($kpData['closeSymbol'])) : '';
+	}
+	else{
+		$keyParams = '';
+	}
 
-        reset($parent['indexes']['server']);
+	reset($parent['indexes']['server']);
 	$hData =& $parent['indexes']['server'][key($parent['indexes']['server'])];
 	if(isset($hData['levelDBData']) && $hData['levelDBData']['hostid'] > 0) {
 		$hostId = $hData['levelDBData']['hostid'];
-	}else{
+	}
+	else{
 		return;
 	}
 
 	if(ZAPCAT_COMPATIBILITY)
-		$keyParams = str_replace(',,', '][', $keyParams);
+		$keyParams = str_replace(',"][",', '][', $keyParams);
 		
 	$itemFound = CItem::get(Array('filter' => Array('hostid' => $hostId, 'key_' => $keyName.$keyParams), 'output' => API_OUTPUT_EXTEND, 'webitems' => true));
 	if(count($itemFound) > 0) {
