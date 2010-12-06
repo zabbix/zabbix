@@ -25,6 +25,7 @@ Changes for 1.9.0
 
 Changes for 1.8.4rc3
 
+ - [ZBX-3259] fixed log trigger wizard functionality: now it can be used for any item with value type=log (KB)
  - [ZBX-2672] added internal checks zabbix[*] to help items in data.sql (Sasha)
  - [ZBX-3255] fixed string escaping under IBM DB2 (asaveljevs,Sasha)
  - [ZBX-3201] fixed evaluation of calculated items with multiline expressions (asaveljevs)
