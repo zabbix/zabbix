@@ -253,7 +253,7 @@
 		}
 		$result = delete_application($applicationids);
 		if(!$result) return false;
-		
+
 
 // delete host
 		foreach($hostids as $id){	/* The section should be improved */
@@ -293,6 +293,15 @@
 			}
 			return false;
 		}
+
+		//cheking, if there is a host group used in a script
+		$used_in_scripts = getHostGroupsUsedInScripts($groupids);
+		if (count($used_in_scripts)>0){
+			error(sprintf(S_HOSTGROUP_CANNOT_BE_DELETED_USED_IN_SCRIPT, $used_in_scripts[0]['group'], $used_in_scripts[0]['script']));
+			return false;
+		}
+
+
 // delete screens items
 		$resources = array(
 			SCREEN_RESOURCE_HOSTGROUP_TRIGGERS,
@@ -1371,10 +1380,10 @@ return $result;
 
 		if(!empty($tmp_appids)){
 // recursion!!!
-			if(!delete_application($tmp_appids)) return false; 
+			if(!delete_application($tmp_appids)) return false;
 		}
-   
-   
+
+
 		$unlink_apps = array();
 		//check if app is used by web scenario
 		$sql = 'SELECT ht.name, ht.applicationid '.
@@ -1389,9 +1398,9 @@ return $result;
 			else{
 				error(S_APPLICATION.' ['.$apps[$info['applicationid']]['host'].':'.$apps[$info['applicationid']]['name'].'] '.S_USED_IN_WEB_SCENARIO);
 				return false;
-			}			
+			}
 		}
-		
+
 		$sql = 'SELECT i.itemid, i.key_, i.description, ia.applicationid '.
 				' FROM items_applications ia, items i '.
 				' WHERE i.type='.ITEM_TYPE_HTTPTEST.
@@ -1749,5 +1758,35 @@ return $result;
 		}
 
 	return $dlt_groupids;
+	}
+
+
+	/**
+	 * Filter out those host groups that are not used in a scripts and return
+	 * group name and script name.
+	 *
+	 * @param array $groupids list of group ids
+	 * @return array ['group'=>'groupname', 'script'=>'scriptname'] these groups are used in scripts
+	 */
+	function getHostGroupsUsedInScripts($groupids){
+		zbx_value2array($groupids);
+
+		$sql = 'SELECT '.
+						' scripts.name AS script_name, '.
+						' groups.name AS group_name '.
+					' FROM '.
+						' scripts, '.
+						' groups '.
+					' WHERE '.
+						' groups.groupid = scripts.groupid '.
+						' AND '.DBcondition('scripts.groupid', $groupids);
+		$res = DBselect($sql);
+
+		$result = array();
+		while($group = DBfetch($res)){
+			$result[] = array('script'=>$group['script_name'], 'group'=>$group['group_name']);
+		}
+
+		return $result;
 	}
 ?>
