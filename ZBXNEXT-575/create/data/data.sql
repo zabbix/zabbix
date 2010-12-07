@@ -10963,28 +10963,42 @@ INSERT INTO functions VALUES (12127,22137,12999,'last','0');
 -- Dumping data for table `actions`
 --
 
-INSERT INTO actions VALUES (2,'Auto discovery. Linux servers.',1,0,1,0,'','',0,'','');
-INSERT INTO actions VALUES (3,'Auto discovery. Windows servers.',1,0,1,0,'','',0,'','');
+INSERT INTO actions VALUES (1,'Auto discovery. Linux servers.',1,0,1,0,'','',0,'','');
+INSERT INTO actions VALUES (2,'Auto discovery. Windows servers.',1,0,1,0,'','',0,'','');
 
 --
 -- Dumping data for table `conditions`
 --
 
-INSERT INTO conditions VALUES (2,2,10,0,'0');
-INSERT INTO conditions VALUES (3,2,8,0,'9');
-INSERT INTO conditions VALUES (4,2,12,2,'Linux');
-INSERT INTO conditions VALUES (5,3,8,0,'9');
-INSERT INTO conditions VALUES (6,3,10,0,'0');
-INSERT INTO conditions VALUES (7,3,12,2,'Windows');
+INSERT INTO conditions VALUES (1,1,8,0,'9');
+INSERT INTO conditions VALUES (2,1,10,0,'0');
+INSERT INTO conditions VALUES (3,1,12,2,'Linux');
+INSERT INTO conditions VALUES (4,2,8,0,'9');
+INSERT INTO conditions VALUES (5,2,10,0,'0');
+INSERT INTO conditions VALUES (6,2,12,2,'Windows');
 
 --
 -- Dumping data for table `operations`
 --
 
-INSERT INTO operations VALUES (3,2,6,0,10001,'','',0,1,1,0,0,NULL);
-INSERT INTO operations VALUES (4,2,4,0,2,'','',0,1,1,0,0,NULL);
-INSERT INTO operations VALUES (5,3,4,0,3,'','',0,1,1,0,0,NULL);
-INSERT INTO operations VALUES (6,3,6,0,10002,'','',0,1,1,0,0,NULL);
+INSERT INTO operations VALUES (1,1,4,0,1,1,0);
+INSERT INTO operations VALUES (2,1,6,0,1,1,0);
+INSERT INTO operations VALUES (3,2,4,0,1,1,0);
+INSERT INTO operations VALUES (4,2,6,0,1,1,0);
+
+--
+-- Dumping data for table `opgroup`
+--
+
+INSERT INTO opgroup VALUES (1,1,2);
+INSERT INTO opgroup VALUES (2,3,3);
+
+--
+-- Dumping data for table `optemplate`
+--
+
+INSERT INTO optemplate VALUES (1,2,10001);
+INSERT INTO optemplate VALUES (2,4,10002);
 
 --
 -- Dumping data for table `drules`
