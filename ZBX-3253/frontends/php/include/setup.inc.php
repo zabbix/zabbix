@@ -387,7 +387,7 @@
 			else{
 				$result = true;
 				if(!zbx_empty($DB['SCHEMA']) && ($DB['TYPE'] == 'IBM_DB2')){
-					$db_schema = DBselect("SELECT schemaname FROM syscat.schemata WHERE schemaname='{$DB['SCHEMA']}'");
+					$db_schema = DBselect("SELECT schemaname FROM syscat.schemata WHERE schemaname='".db2_escape_string($DB['SCHEMA'])."'");
 					$result = DBfetch($db_schema);
 				}
 				
