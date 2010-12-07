@@ -372,17 +372,58 @@ TABLE|operations|operationid|ZBX_SYNC
 FIELD		|operationid	|t_id		|	|NOT NULL	|0
 FIELD		|actionid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|actions
 FIELD		|operationtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|object		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|objectid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|shortdata	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|longdata	|t_blob		|''	|NOT NULL	|ZBX_SYNC
 FIELD		|esc_period	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|esc_step_from	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|esc_step_to	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|default_msg	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|evaltype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|mediatypeid	|t_id		|	|NULL		|ZBX_SYNC		|2|media_type
 INDEX		|1		|actionid
+
+TABLE|opmessage|opmessageid|ZBX_SYNC
+FIELD		|opmessageid	|t_id		|	|NOT NULL	|0
+FIELD		|operationid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|operations
+FIELD		|default_msg	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|subject	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|message	|t_text		|''	|NOT NULL	|ZBX_SYNC
+FIELD		|mediatypeid	|t_id		|	|NULL		|ZBX_SYNC		|3|media_type	|		|RESTRICT
+INDEX		|1		|operationid
+
+TABLE|opmessage_grp|opmessage_grpid|ZBX_SYNC
+FIELD		|opmessage_grpid|t_id		|	|NOT NULL	|0
+FIELD		|opmessageid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|opmessage
+FIELD		|usrgrpid	|t_id		|	|NOT NULL	|ZBX_SYNC		|2|usrgrp	|		|RESTRICT
+INDEX		|1		|opmessageid
+
+TABLE|opmessage_usr|opmessage_usrid|ZBX_SYNC
+FIELD		|opmessage_usrid|t_id		|	|NOT NULL	|0
+FIELD		|opmessageid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|opmessage
+FIELD		|userid		|t_id		|	|NOT NULL	|ZBX_SYNC		|2|users	|		|RESTRICT
+INDEX		|1		|opmessageid
+
+TABLE|opcommand_hst|opcommand_hstid|ZBX_SYNC
+FIELD		|opcommand_hstid|t_id		|	|NOT NULL	|0
+FIELD		|operationid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|operations
+FIELD		|hostid		|t_id		|	|NULL		|ZBX_SYNC		|2|hosts	|		|RESTRICT
+FIELD		|command	|t_text		|''	|NOT NULL	|ZBX_SYNC
+INDEX		|1		|operationid
+
+TABLE|opcommand_grp|opcommand_grpid|ZBX_SYNC
+FIELD		|opcommand_grpid|t_id		|	|NOT NULL	|0
+FIELD		|operationid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|operations
+FIELD		|groupid	|t_id		|	|NOT NULL	|ZBX_SYNC		|2|groups	|		|RESTRICT
+FIELD		|command	|t_text		|''	|NOT NULL	|ZBX_SYNC
+INDEX		|1		|operationid
+
+TABLE|opgroup|opgroupid|ZBX_SYNC
+FIELD		|opgroupid	|t_id		|	|NOT NULL	|0
+FIELD		|operationid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|operations
+FIELD		|groupid	|t_id		|	|NOT NULL	|ZBX_SYNC		|2|groups	|		|RESTRICT
+INDEX		|1		|operationid
+
+TABLE|optemplate|optemplateid|ZBX_SYNC
+FIELD		|optemplateid	|t_id		|	|NOT NULL	|0
+FIELD		|operationid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|operations
+FIELD		|templateid	|t_id		|	|NOT NULL	|ZBX_SYNC		|2|hosts	|hostid		|RESTRICT
+INDEX		|1		|operationid
 
 TABLE|opconditions|opconditionid|ZBX_SYNC
 FIELD		|opconditionid	|t_id		|	|NOT NULL	|0
