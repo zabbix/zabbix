@@ -23,8 +23,6 @@
 
 #include <sys/sockio.h>
 
-#define N_UNDF	0x00		/* undefined */
-
 static struct nlist kernel_symbols[] =
 {
 	{"_ifnet", N_UNDF, 0, 0, 0},
@@ -80,9 +78,7 @@ static int	get_ifdata(const char *if_name, zbx_uint64_t *ibytes, zbx_uint64_t *i
 	if (icollisions)
 		*icollisions = 0;
 
-	kp = kvm_open(NULL, NULL, NULL, O_RDONLY, NULL);
-
-	if (kp)
+	if (NULL != (kp = kvm_open(NULL, NULL, NULL, O_RDONLY, NULL))) /* requires root privileges */
 	{
 		struct ifnet	v;
 
@@ -150,7 +146,7 @@ static int	get_ifdata(const char *if_name, zbx_uint64_t *ibytes, zbx_uint64_t *i
 		zbx_strlcpy(ifr.ifr_name, if_name, IFNAMSIZ - 1);
 		ifr.ifr_data = (caddr_t)&v;
 
-		if (ioctl(if_s, SIOCGIFDATA, &ifr))
+		if (ioctl(if_s, SIOCGIFDATA, &ifr) < 0)
 			goto clean;
 
 		if ('\0' == *if_name || 0 == strcmp(if_name, ifr.ifr_name))
