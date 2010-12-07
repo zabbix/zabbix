@@ -1144,7 +1144,7 @@ switch($itemType) {
 			}
 //-------
 			//if item type is 'Log' we must show log menu
-			if($item['value_type'] == ITEM_VALUE_TYPE_LOG){
+			if($item['value_type'] == ITEM_VALUE_TYPE_LOG || $item['value_type'] == ITEM_VALUE_TYPE_STR || $item['value_type'] == ITEM_VALUE_TYPE_TEXT){
 
 				$triggers_flag = false;
 				$triggers="Array('".S_EDIT_TRIGGER."',null,null,{'outer' : 'pum_o_submenu','inner' : ['pum_i_submenu']}\n";
