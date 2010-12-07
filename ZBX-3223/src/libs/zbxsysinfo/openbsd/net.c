@@ -46,14 +46,14 @@ static int	get_ifdata(const char *if_name, zbx_uint64_t *ibytes, zbx_uint64_t *i
 	int	len = 0;
 	int 	ret = SYSINFO_RET_FAIL;
 
-	/* if_ibytes;		total number of octets received */
-	/* if_ipackets;		packets received on interface */
-	/* if_ierrors;		input errors on interface */
-	/* if_iqdrops;		dropped on input, this interface */
-	/* if_obytes;		total number of octets sent */
-	/* if_opackets;		packets sent on interface */
-	/* if_oerrors;		output errors on interface */
-	/* if_collisions;	collisions on csma interfaces */
+	/* if(i)_ibytes;	total number of octets received */
+	/* if(i)_ipackets;	packets received on interface */
+	/* if(i)_ierrors;	input errors on interface */
+	/* if(i)_iqdrops;	dropped on input, this interface */
+	/* if(i)_obytes;	total number of octets sent */
+	/* if(i)_opackets;	packets sent on interface */
+	/* if(i)_oerrors;	output errors on interface */
+	/* if(i)_collisions;	collisions on csma interfaces */
 
 	if (ibytes)
 		*ibytes = 0;
@@ -103,7 +103,7 @@ static int	get_ifdata(const char *if_name, zbx_uint64_t *ibytes, zbx_uint64_t *i
 					if (kvm_read(kp, (u_long)ifp, &v, len) < len)
 						break;
 
-					if (*if_name == '\0' || 0 == strcmp(if_name, v.if_xname))
+					if ('\0' == *if_name || 0 == strcmp(if_name, v.if_xname))
 					{
 						if (ibytes)
 							*ibytes += v.if_ibytes;
@@ -140,20 +140,20 @@ static int	get_ifdata(const char *if_name, zbx_uint64_t *ibytes, zbx_uint64_t *i
 	{
 		/* Fallback to using SIOCGIFDATA */
 
-		int		if_s = -1;
+		int		if_s;
 		struct ifreq	ifr;
 		struct if_data	v;
 
 		if ((if_s = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
-			goto out;
+			goto clean;
 
 		zbx_strlcpy(ifr.ifr_name, if_name, IFNAMSIZ - 1);
 		ifr.ifr_data = (caddr_t)&v;
 
 		if (ioctl(if_s, SIOCGIFDATA, &ifr))
-			goto out;
+			goto clean;
 
-		if (*if_name == '\0' || 0 == strcmp(if_name, ifr.ifr_name))
+		if ('\0' == *if_name || 0 == strcmp(if_name, ifr.ifr_name))
 		{
 			if (ibytes)
 				*ibytes += v.ifi_ibytes;
@@ -181,12 +181,12 @@ static int	get_ifdata(const char *if_name, zbx_uint64_t *ibytes, zbx_uint64_t *i
 				*icollisions += v.ifi_collisions;
 		}
 
-		close(if_s);
-
 		ret = SYSINFO_RET_OK;
+clean:
+		if (if_s >= 0)
+			close(if_s);
 	}
 
-out:
 	return ret;
 }
 
