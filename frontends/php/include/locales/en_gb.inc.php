@@ -1786,7 +1786,7 @@
 	'S_COPY_SELECTED_TRIGGERS_Q'=>		'Copy selected triggers?',
 	'S_DELETE_SELECTED_TRIGGERS_Q'=>	'Delete selected triggers?',
 
-	'S_TRIGGER_LOG_FORM'=>	'Log trigger form',
+	'S_TRIGGER_LOG_FORM'=>	'Trigger form',
 
 //	tr_comments.php
 	'S_TRIGGER_COMMENTS'=>			'Trigger comments',
@@ -2289,7 +2289,7 @@
 	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART1'=>	'Function \'',
 	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART2'=>	'\' does not accept parameters.',
     'S_WRONG_DEPENDENCY_ERROR'=>	'Error adding dependencies. Following dependencies are not allowed: 1) from a host trigger to a template trigger; 2) from a template trigger to a host trigger; 3) between template triggers, where templates have links to other templates.',
-		
+
 //	page_footer.php
 	'S_TRANSACTION_HAVE_NOT_BEEN_CLOSED_ABORTING'=>	'Transaction has not been closed. Aborting..',
 
