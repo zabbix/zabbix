@@ -2496,7 +2496,7 @@
 	'S_NOW_SMALL'=>			'now',
 
 //	functions.js
-	'S_CREATE_LOG_TRIGGER'=>			'Create Log Trigger',
+	'S_CREATE_LOG_TRIGGER'=>			'Create trigger',
 	'DO_YOU_REPLACE_CONDITIONAL_EXPRESSION_Q'=>	'Do you replace the conditional expression?',
 	'S_ADD_SERVICE'=>				'Add Service',
 	'S_EDIT_SERVICE'=>				'Edit Service',
