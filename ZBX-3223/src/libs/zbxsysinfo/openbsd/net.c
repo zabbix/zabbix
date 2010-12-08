@@ -265,7 +265,7 @@ int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 	else
 		return SYSINFO_RET_FAIL;
 
-	return SYSINFO_RET_FAIL;
+	return SYSINFO_RET_OK;
 }
 
 int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -308,7 +308,7 @@ int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	else
 		return SYSINFO_RET_FAIL;
 
-	return SYSINFO_RET_FAIL;
+	return SYSINFO_RET_OK;
 }
 
 int     NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
