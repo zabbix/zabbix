@@ -284,6 +284,7 @@ include_once('include/page_header.php');
 // clone
 	else if(isset($_REQUEST['clone']) && isset($_REQUEST['templateid'])){
 		unset($_REQUEST['templateid']);
+		unset($_REQUEST['hosts']);
 		$_REQUEST['form'] = 'clone';
 	}
 // full_clone

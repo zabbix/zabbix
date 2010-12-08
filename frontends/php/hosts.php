@@ -637,7 +637,10 @@ include_once('include/page_header.php');
 	}
 // DELETE HOST
 	else if(isset($_REQUEST['delete']) && isset($_REQUEST['hostid'])){
+		DBstart();
 		$result = CHost::delete(array('hostid' => $_REQUEST['hostid']));
+		$result = DBend($result);
+		
 		show_messages($result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
 
 		if($result){
@@ -663,7 +666,9 @@ include_once('include/page_header.php');
 	else if($_REQUEST['go'] == 'delete'){
 		$hostids = get_request('hosts', array());
 
+		DBstart();
 		$go_result = CHost::delete(zbx_toObject($hostids,'hostid'));
+		$go_result = DBend($go_result);
 		show_messages($go_result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
 	}
 // ACTIVATE/DISABLE HOSTS
