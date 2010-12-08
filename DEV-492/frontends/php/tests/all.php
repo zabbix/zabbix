@@ -1,7 +1,7 @@
 <?php
 require_once 'PHPUnit/Framework.php';
  
-class ArrayTest extends PHPUnit_Framework_TestCase
+class All extends PHPUnit_Framework_TestCase
 {
     public function testNewArrayIsEmpty()
     {

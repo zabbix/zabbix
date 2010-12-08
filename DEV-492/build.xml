@@ -20,9 +20,6 @@
   <target name="phpunit">
     <exec executable="phpunit" dir="${basedir}/frontends/php/tests" failonerror="off">
       <arg line="--log-xml ${basedir}/build/logs/phpunit.xml
-                 --log-pmd ${basedir}/build/logs/phpunit.pmd.xml
-                 --log-metrics ${basedir}/build/logs/metrics.xml
-                 --configuration phpunit.xml
                 " />
     </exec>
   </target>
