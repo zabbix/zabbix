@@ -122,13 +122,13 @@ ZBX_SINGLE_DISKDEVICE_DATA	*collector_diskdevice_get(const char *devname)
 	{
 		if (0 == strcmp(devname, collector->diskdevices.device[i].name))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s():%p", __function_name,
+			zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name,
 					&collector->diskdevices.device[i]);
 			return &collector->diskdevices.device[i];
 		}
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s():NULL", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():NULL", __function_name);
 
 	return NULL;
 }
@@ -146,7 +146,7 @@ ZBX_SINGLE_DISKDEVICE_DATA	*collector_diskdevice_add(const char *devname)
 	/* collector is full */
 	if (collector->diskdevices.count == MAX_DISKDEVICES)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s():NULL collector is full", __function_name);
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():NULL collector is full", __function_name);
 		return NULL;
 	}
 
@@ -157,7 +157,7 @@ ZBX_SINGLE_DISKDEVICE_DATA	*collector_diskdevice_add(const char *devname)
 
 	process_diskstat(device);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s():%p", __function_name, device);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, device);
 
 	return device;
 }
