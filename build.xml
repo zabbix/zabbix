@@ -20,7 +20,7 @@
   <target name="phpunit">
     <exec executable="phpunit" dir="${basedir}/frontends/php/tests" failonerror="off">
       <arg line="--log-xml ${basedir}/build/logs/phpunit.xml
-                all" />
+                all.php" />
     </exec>
   </target>
 </project>
