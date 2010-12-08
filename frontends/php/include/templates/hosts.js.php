@@ -4,10 +4,10 @@
 <td>
 	<input type="hidden" name="interfaces[#{interfaceid}][new]" value="#{newValue}" />
 	<input type="hidden" name="interfaces[#{interfaceid}][interfaceid]" value="#{interfaceid}" />
-	<input class="input" name="interfaces[#{interfaceid}][ip]" type="text" size="24" value="#{ip}" />
+	<input class="input" id="interface_ip_#{interfaceid}" name="interfaces[#{interfaceid}][ip]" type="text" size="24" value="#{ip}" />
 </td>
 <td>
-	<input class="input" name="interfaces[#{interfaceid}][dns]" type="text" size="30" value="#{dns}" />
+	<input class="input" id="interface_dns_#{interfaceid}" name="interfaces[#{interfaceid}][dns]" type="text" size="30" value="#{dns}" />
 </td>
 <td>
 	<div class="jqueryinputset">
@@ -19,10 +19,10 @@
 	</div>
 </td>
 <td>
-	<input class="input" name="interfaces[#{interfaceid}][port]" type="text" size="15" value="#{port}" />
+	<input class="input" id="port_#{interfaceid}" name="interfaces[#{interfaceid}][port]" type="text" size="15" value="#{port}" />
 </td>
 <td>
-	<div class="jqueryinputset">
+	<div id="interface_type_#{interfaceid}" class="jqueryinputset">
 		<input type="radio" id="radio_agent_#{interfaceid}" name="interfaces[#{interfaceid}][type]" value="<?php print(INTERFACE_TYPE_AGENT);?>" #{*checked_agent} />
 		<label for="radio_agent_#{interfaceid}"><?php print(S_AGENT);?></label>
 
@@ -62,18 +62,26 @@ function addInterfaceRow(hostInterface){
 		hostInterface.disabled = 'disabled="disabled"';
 	}
 
-	hostInterface.checked_ip = 'checked="checked"';
-	hostInterface.checked_dns = '';
-	if(isset("useip", hostInterface)){
-		if(hostInterface.useip == 0){
-			hostInterface.checked_ip = '';
-			hostInterface.checked_dns = 'checked="checked"';
+	if(!isset("ip", hostInterface) && !isset("dns", hostInterface)){
+		if(jQuery("#hostInterfaces").find("input[type=radio]:checked").first().val() == "0"){
+			hostInterface.useip = 0;
+			hostInterface.dns = jQuery("#hostInterfaces").find("input[id^=interface_dns]").first().val();
+		}
+		else{
+			hostInterface.useip = 1;
+			hostInterface.ip = jQuery("#hostInterfaces").find("input[id^=interface_ip]").first().val();
 		}
 	}
+
+	if(isset("useip", hostInterface)){
+		if(hostInterface.useip == 0)
+			hostInterface.checked_dns = 'checked="checked"';
+		else
+			hostInterface.checked_ip = 'checked="checked"';
+	}
 //SDJ(hostInterface);
+	hostInterface.port = '10050';
 	hostInterface.checked_agent = 'checked="checked"';
-	hostInterface.checked_snmp = '';
-	hostInterface.checked_ipmi = '';
 	if(isset("type", hostInterface)){
 		hostInterface.checked_agent = '';
 		switch(hostInterface.type.toString()){
@@ -85,8 +93,20 @@ function addInterfaceRow(hostInterface){
 	}
 
 	jQuery("#hostIterfacesFooter").before(tpl.evaluate(hostInterface));
-	jQuery("#hostInterfaceRow_"+hostInterface.interfaceid).find("div[class=jqueryinputset]").buttonset();
-	jQuery("#hostIterfaces").accordion('resize');
+	jQuery("#hostInterfaceRow_"+hostInterface.interfaceid)
+		.find("div.jqueryinputset").buttonset().end()
+		.find("#interface_type_"+hostInterface.interfaceid).find("label")
+			.click({"hostInterface": hostInterface}, function(event){
+				var portInput = jQuery("#port_"+event.data.hostInterface.interfaceid)[0];
+				if(empty(portInput.value) || !(portInput.value == "10050" || portInput.value == "161" || portInput.value == "623")) return true;
+
+				var interfaceTypeId = event.currentTarget.htmlFor.toLowerCase();
+				switch(true){
+					case (interfaceTypeId.indexOf('agent') > -1): portInput.value = "10050"; break;
+					case (interfaceTypeId.indexOf('snmp') > -1): portInput.value = "161"; break;
+					case (interfaceTypeId.indexOf('ipmi') > -1): portInput.value = "623"; break;
+				}
+			}).end();
 }
 
 function removeInterfaceRow(hostInterfaceId){
