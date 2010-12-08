@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Zabbix" default="build" basedir=".">
+  <property name="basedir" value="${WORKSPACE}"/>
+  
+  <target name="init">
+    <!-- Create the different build directories -->
+    <mkdir dir="${basedir}/build/logs" />
+  </target>
+
+  <target name="clean">
+    <!-- Delete build directories from the previous run -->
+    <delete>
+      <fileset dir="${basedir}/build/logs" includes="**.*" />
+    </delete>
+  </target>
+
+  <!-- Default target -->
+  <target name="build" depends="init,phpunit" />
+
+  <target name="phpunit">
+    <exec executable="phpunit" dir="${basedir}/frontend/php/tests" failonerror="off">
+      <arg line="--log-xml ${basedir}/build/logs/phpunit.xml
+                 --log-pmd ${basedir}/build/logs/phpunit.pmd.xml
+                 --log-metrics ${basedir}/build/logs/metrics.xml
+                 --configuration phpunit.xml
+                " />
+    </exec>
+  </target>
+</project>
