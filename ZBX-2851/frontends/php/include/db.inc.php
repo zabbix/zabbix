@@ -60,7 +60,7 @@ if(!isset($DB)){
 						$result = false;
 					}
 					else{
-						if (!mysql_select_db($DB['DATABASE'])){
+						if(!mysql_select_db($DB['DATABASE'])){
 							$error = 'Error database in selection ['.mysql_error().']';
 							$result = false;
 						}
@@ -118,7 +118,6 @@ if(!isset($DB)){
 						$result = false;
 					}
 					else{
-						//DBexecute('set current schema='.$DB['USER'].';');
 						$options = array(
 							'db2_attr_case' => DB2_CASE_LOWER,
 						);
@@ -189,9 +188,8 @@ if(!isset($DB)){
 					$result = false;
 			}
 		}
-		if( false == $result )
-			$DB['DB']= null;
-
+		if(false == $result)
+			$DB['DB'] = null;
 		return $result;
 	}
 
@@ -409,7 +407,7 @@ if(!isset($DB)){
 		SELECT * FROM (SELECT ROWNUM as RN, * FROM tbl) WHERE RN BETWEEN 6 AND 15
 //*/
 
-	function &DBselect($query, $limit='NO', $offset=0){
+	function DBselect($query, $limit='NO', $offset=0){
 		global $DB;
 
 		$time_start=microtime(true);
@@ -424,7 +422,7 @@ if(!isset($DB)){
 						$query .= ' LIMIT '.intval($limit).' OFFSET '.intval($offset);
 					}
 
-					$result=mysql_query($query,$DB['DB']);
+					$result = mysql_query($query,$DB['DB']);
 					if(!$result){
 						error('Error in query ['.$query.'] ['.mysql_error().']');
 					}
@@ -830,7 +828,9 @@ else {
 		do{
 			$min=bcadd(bcmul($nodeid,'100000000000000'),bcmul($ZBX_LOCALNODEID,'100000000000'));
 			$max=bcadd(bcadd(bcmul($nodeid,'100000000000000'),bcmul($ZBX_LOCALNODEID,'100000000000')),'99999999999');
-			$row = DBfetch(DBselect('SELECT nextid FROM ids WHERE nodeid='.$nodeid .' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field)));
+			$db_select = DBselect('SELECT nextid FROM ids WHERE nodeid='.$nodeid .' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field));
+			if(!is_resource($db_select)) return false;
+			$row = DBfetch($db_select);
 
 			if(!$row){
 				$row = DBfetch(DBselect('SELECT max('.$field.') AS id FROM '.$table.' WHERE '.$field.'>='.$min.' AND '.$field.'<='.$max));
