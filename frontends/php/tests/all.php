@@ -41,8 +41,16 @@ class All extends PHPUnit_Framework_TestCase
 			array('key["a"]654',false),
 			array('key[a][[b]',false),
 			array('key["a"][["b"]',false),
-			// Incorrect test case for testing
-			array('key(a)',true)
+			array('key(a)',false),
+			// 256 char long key
+			array('0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',false),
+			// Empty key
+			array('',false),
+			// UTF8 chars
+			array('ГУГЛ',false),
+			// UTF8 chars in params
+			array('key[ГУГЛ]',true),
+			array('key["ГУГЛ"]',true)
 		);
 	}
 
@@ -52,7 +60,11 @@ class All extends PHPUnit_Framework_TestCase
 	public function testItemKeyValidation($a, $b)
 	{
 		$result=check_item_key($a);
-		$this->assertEquals($result[0],$b,$result[1]);
+		if($result[0]) {
+			$this->assertEquals($result[0],$b);
+		} else {
+			$this->assertEquals($result[0],$b,$result[1]);
+		}
 	}
 
 }
