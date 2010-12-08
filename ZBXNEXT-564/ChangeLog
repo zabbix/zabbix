@@ -1,5 +1,7 @@
 Changes for 1.8.4rc3
 
+ - [ZBXNEXT-564] added new {PROXY.NAME} and {HOSTNAME} macros for auto discovery notifications (Sasha)
+ - [ZBXNEXT-564] added support of {PROXY.NAME} macros for discovery and trigger notifications (Sasha)
  - [ZBX-3267] fixed trigger updating through API (Aly)
  - [ZBX-3259] fixed log trigger wizard functionality: now it can be used for any item with value type = log, text or char (KB)
  - [ZBX-2672] added internal checks zabbix[*] to help items in data.sql (Sasha)
