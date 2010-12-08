@@ -41,7 +41,8 @@ class All extends PHPUnit_Framework_TestCase
 			array('key["a"]654',false),
 			array('key[a][[b]',false),
 			array('key["a"][["b"]',false),
-			array('key(a)',false)
+			// Incorrect test case for testing
+			array('key(a)',true)
 		);
 	}
 
