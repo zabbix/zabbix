@@ -724,7 +724,7 @@ static void	process_active_checks(char *server, unsigned short port)
 
 	AGENT_RESULT	result;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In process_active_checks('%s',%u)",server, port);
+	zabbix_log(LOG_LEVEL_DEBUG, "In process_active_checks('%s',%hu)", server, port);
 
 	init_result(&result);
 

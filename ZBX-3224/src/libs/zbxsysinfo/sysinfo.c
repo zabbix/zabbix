@@ -23,21 +23,19 @@
 #include "cfg.h"
 #include "alias.h"
 
-#include "common/common.h"
-
 #if defined(WITH_COMMON_METRICS)
 #	include "common/common.h"
-#endif /* USE_COMMON_METRICS */
+#endif
 
 #if defined(WITH_SIMPLE_METRICS)
 #	include "simple/simple.h"
-#endif /* USE_SIMPLE_METRICS */
+#endif
 
 #if defined(WITH_SPECIFIC_METRICS)
 #	include "specsysinfo.h"
-#endif /* USE_SPECIFIC_METRICS */
+#endif
 
-ZBX_METRIC *commands=NULL;
+ZBX_METRIC	*commands = NULL;
 
 void	add_metric(ZBX_METRIC *new)
 {
@@ -131,7 +129,7 @@ int	add_user_parameter(char *key, char *command)
 	return SUCCEED;
 }
 
-void	init_metrics(void)
+void	init_metrics()
 {
 	register int	i;
 
@@ -160,13 +158,13 @@ void	init_metrics(void)
 #endif /* USE_SIMPLE_METRICS */
 }
 
-void	free_metrics(void)
+void	free_metrics()
 {
-	int i = 0;
-
-	if( commands )
+	if (NULL != commands)
 	{
-		for(i=0; NULL != commands[i].key; i++)
+		int	i;
+
+		for (i = 0; NULL != commands[i].key; i++)
 		{
 			zbx_free(commands[i].key);
 			zbx_free(commands[i].main_param);
@@ -207,42 +205,8 @@ void    escape_string(char *from, char *to, int maxlen)
 	to[maxlen-1]=0;
 }
 
-int	copy_result(AGENT_RESULT *src, AGENT_RESULT *dist)
-{
-	assert(src);
-	assert(dist);
-
-	free_result(dist);
-	dist->type = src->type;
-	dist->dbl = src->dbl;
-	if(src->str)
-	{
-		dist->str = strdup(src->str);
-		if(!dist->str)
-			return 1;
-	}
-	if(src->msg)
-	{
-		dist->msg = strdup(src->msg);
-		if(!dist->msg)
-			return 1;
-	}
-	return 0;
-}
-
-void	free_result(AGENT_RESULT *result)
-{
-	UNSET_DBL_RESULT(result);
-	UNSET_UI64_RESULT(result);
-	UNSET_STR_RESULT(result);
-	UNSET_TEXT_RESULT(result);
-	UNSET_MSG_RESULT(result);
-}
-
 void	init_result(AGENT_RESULT *result)
 {
- /* don't use `free_result(result)`, dangerous recycling */
-
 	result->type = 0;
 
 	result->ui64 = 0;
@@ -250,6 +214,15 @@ void	init_result(AGENT_RESULT *result)
 	result->str = NULL;
 	result->text = NULL;
 	result->msg = NULL;
+}
+
+void	free_result(AGENT_RESULT *result)
+{
+	UNSET_UI64_RESULT(result);
+	UNSET_DBL_RESULT(result);
+	UNSET_STR_RESULT(result);
+	UNSET_TEXT_RESULT(result);
+	UNSET_MSG_RESULT(result);
 }
 
 /*
@@ -315,7 +288,7 @@ int	parse_command(const char *command, char *cmd, int cmd_max_len,
 	return 2;
 }
 
-void	test_parameter(const char* key, unsigned flags)
+void	test_parameter(const char *key, unsigned flags)
 {
 	AGENT_RESULT	result;
 
@@ -323,11 +296,11 @@ void	test_parameter(const char* key, unsigned flags)
 
 	process(key, flags, &result);
 
-	if (result.type & AR_DOUBLE)
-		printf(" [d|" ZBX_FS_DBL "]", result.dbl);
-
 	if (result.type & AR_UINT64)
 		printf(" [u|" ZBX_FS_UI64 "]", result.ui64);
+
+	if (result.type & AR_DOUBLE)
+		printf(" [d|" ZBX_FS_DBL "]", result.dbl);
 
 	if (result.type & AR_STRING)
 		printf(" [s|%s]", result.str);
@@ -345,9 +318,9 @@ void	test_parameter(const char* key, unsigned flags)
 	fflush(stdout);
 }
 
-void	test_parameters(void)
+void	test_parameters()
 {
-	register int	i;
+	int	i;
 
 	for (i = 0; 0 != commands[i].key; i++)
 		test_parameter(commands[i].key, PROCESS_TEST | PROCESS_USE_TEST_PARAM);
