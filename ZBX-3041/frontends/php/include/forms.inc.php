@@ -896,7 +896,7 @@
 				default:
 					$list_name='deny';
 			}
-			$lst['group'][$list_name]->addItem($group['groupid'],(!empty($group['node_name'])?$group['node_name'].':':$group['node_name']).$group['name']);
+			$lst['group'][$list_name]->addItem($group['groupid'], (empty($group['node_name']) ? '' : $group['node_name'].':' ).$group['name']);
 		}
 		unset($groups);
 
@@ -913,7 +913,7 @@
 				case PERM_READ_WRITE:	$list_name='read_write';	break;
 				default:		$list_name='deny';		break;
 			}
-			$lst['host'][$list_name]->addItem($host['hostid'], (!empty($host['node_name'])?$host['node_name'].':':$host['node_name']).$host['host']);
+			$lst['host'][$list_name]->addItem($host['hostid'], (empty($host['node_name']) ? '' : $host['node_name'].':' ).$host['host']);
 		}
 		unset($hosts);
 
