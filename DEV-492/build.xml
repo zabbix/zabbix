@@ -15,7 +15,7 @@
   </target>
 
   <!-- Default target -->
-  <target name="build" depends="clean,init,gui" />
+  <target name="build" depends="init,gui" />
 
   <target name="gui">
     <exec executable="phpunit" dir="${basedir}/frontends/php/tests" failonerror="off">
