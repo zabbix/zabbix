@@ -15,11 +15,12 @@
   </target>
 
   <!-- Default target -->
-  <target name="build" depends="clean,init,phpunit" />
+  <target name="build" depends="clean,init,gui" />
 
-  <target name="phpunit">
+  <target name="gui">
     <exec executable="phpunit" dir="${basedir}/frontends/php/tests" failonerror="off">
-      <arg line="--log-xml=${basedir}/build/logs/phpunit.xml all.php
+      <arg line="--log-xml=${basedir}/build/logs/phpunit.xml
+		all.php
                 " />
     </exec>
   </target>
