@@ -1,5 +1,7 @@
 Changes for 1.8.4rc3
 
+ - [ZBX-3115] fixed returned data type for net.tcp.listen under Solaris and FreeBSD (Sasha)
+ - [ZBX-3115] fixed returned data type for system.users.num metric (Sasha)
  - [ZBX-3267] fixed trigger updating through API (Aly)
  - [ZBX-3259] fixed log trigger wizard functionality: now it can be used for any item with value type = log, text or char (KB)
  - [ZBX-2672] added internal checks zabbix[*] to help items in data.sql (Sasha)
