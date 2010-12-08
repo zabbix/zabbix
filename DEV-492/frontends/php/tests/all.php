@@ -52,8 +52,7 @@ class All extends PHPUnit_Framework_TestCase
 	public function testItemKeyValidation($a, $b)
 	{
 		$result=check_item_key($a);
-		$this->assertEquals($result[0],$b);
-//		$this->assertEquals($result[0],$b,$result[1]);
+		$this->assertEquals($result[0],$b,$result[1]);
 	}
 
 }
