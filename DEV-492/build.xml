@@ -18,7 +18,7 @@
   <target name="build" depends="init,phpunit" />
 
   <target name="phpunit">
-    <exec executable="phpunit" dir="${basedir}/frontend/php/tests" failonerror="off">
+    <exec executable="phpunit" dir="${basedir}/frontends/php/tests" failonerror="off">
       <arg line="--log-xml ${basedir}/build/logs/phpunit.xml
                  --log-pmd ${basedir}/build/logs/phpunit.pmd.xml
                  --log-metrics ${basedir}/build/logs/metrics.xml
