@@ -1130,7 +1130,7 @@ else {
 			$table_schema = self::getSchema($table);
 
 			foreach($values as $key => $row){
-				foreach($row as $field => &$value){
+				foreach($row as $field => $value){
 					if(!isset($table_schema['fields'][$field])){
 						unset($row[$field]);
 						continue;
@@ -1152,8 +1152,9 @@ else {
 						if($table_schema['fields'][$field]['null'])
 							$value = zero2null($value);
 					}
+
+					$row[$field] = $value;
 				}
-				unset($value);
 
 				if($getids){
 					$resultIds[$key] = $id;

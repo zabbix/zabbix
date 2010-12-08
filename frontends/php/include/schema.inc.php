@@ -2428,18 +2428,6 @@ return array(
 				'length' => 10,
 				'default' => '0',
 			),
-			'inbytes' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_UINT,
-				'length' => 20,
-				'default' => '0',
-			),
-			'outbytes' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_UINT,
-				'length' => 20,
-				'default' => '0',
-			),
 			'ipmi_authtype' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
