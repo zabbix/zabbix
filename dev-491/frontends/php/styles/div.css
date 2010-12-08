@@ -1,5 +1,6 @@
 /* CSS Document */
 div.min-width{
+	min-width: 1000px;
 }
 
 div.disaster{
@@ -374,7 +375,7 @@ div.zabbix_logo{
 
 .footer { padding-left: 1.6em; }
 .footer .dt { float: left; width: 20%; }
-.footer .dt input.main{ border-color: #FFAA33; height: 22px;}
+.footer .dt input.main{ border-color: #FFAA33;}
 .footer .dt input.main:hover{ border-color: #DD7711; }
 .footer .dd { width: 70%; padding-left: 21%; }
 /***************************/

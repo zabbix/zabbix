@@ -1726,7 +1726,6 @@ COpt::memoryPick();
 	}
 
 	protected static function inherit($trigger, $hostids=null){
-
 		$triggerTemplate = CTemplate::get(array(
 			'triggerids' => $trigger['triggerid'],
 			'output' => API_OUTPUT_EXTEND,
@@ -1734,7 +1733,6 @@ COpt::memoryPick();
 		));
 		$triggerTemplate = reset($triggerTemplate);
 		if(!$triggerTemplate) return true;
-
 
 		$options = array(
 			'templateids' => $triggerTemplate['templateid'],

@@ -69,8 +69,15 @@ ul.formlist li div.dd{
 	padding-left: 1%;
 }
 
+/* INPUT */
+
+
 /* Sortable */
 .column{ }
+.link_menu{
+	border: 0px;
+	text-decoration: underline;
+}
 
 .footer .dt input.main{ height: 25px; }
 .footer .dd { padding-left: 1%; }
