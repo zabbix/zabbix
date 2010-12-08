@@ -475,23 +475,21 @@
 // TEMPLATES{
 	$tmplList = new CFormList('tmpllist');
 
-	foreach($templates as $id => $temp_name){
-		$frmHost->addVar('templates['.$id.']', $temp_name);
-		$tmplList->addRow($temp_name, new CCheckBox('templates_rem['.$id.']', 'no', null, $id));
+	foreach($templates as $tid => $temp_name){
+		$frmHost->addVar('templates['.$tid.']', $temp_name);
+		$tmplList->addRow($temp_name, array(
+			new CSubmit('unlink['.$tid.']', S_UNLINK, null, 'link_menu'),
+			SPACE, SPACE,
+			isset($original_templates[$tid]) ? new CSubmit('unlink_and_clear['.$tid.']', S_UNLINK_AND_CLEAR, null, 'link_menu') : SPACE
+		));
 	}
 
-	$tmplFooter = new CDiv();
 	$tmplAdd = new CButton('add', S_ADD, "return PopUp('popup.php?dstfrm=".$frmHost->getName().
 			"&dstfld1=new_template&srctbl=templates&srcfld1=hostid&srcfld2=host".
 			url_param($templates,false,'existed_templates')."',450,450)",
 			'link_menu');
 
-	$tmplUnlink = new CSubmit('unlink', S_UNLINK, null, 'link_menu');
-	$tmplUnlinkClear = new CSubmit('unlink_and_clear', S_UNLINK_AND_CLEAR, null, 'link_menu');
-
-	$tmplFooter->addItem(array($tmplAdd,SPACE,SPACE,$tmplUnlink,SPACE,SPACE,$tmplUnlinkClear));
-
-	$tmplList->addRow($tmplFooter);
+	$tmplList->addRow($tmplAdd, SPACE);
 
 	$divTabs->addTab('templateTab', S_TEMPLATES, $tmplList);
 // } TEMPLATES
