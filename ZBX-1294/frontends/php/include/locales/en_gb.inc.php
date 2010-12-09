@@ -1146,6 +1146,7 @@
 	'S_NUMERIC_FLOAT'=>					'Numeric (float)',
 	'S_CHARACTER'=>						'Character',
 	'S_WIZARD'=>						'Wizard',
+	'S_LOG' => 						'Log',
 	'S_TEXT'=>						'Text',
 	'S_AS_IS'=>						'As is',
 	'S_DELTA_SPEED_PER_SECOND'=>				'Delta (speed per second)',
