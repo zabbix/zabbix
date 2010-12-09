@@ -36,12 +36,12 @@ static int	get_ifdata(const char *if_name, zbx_uint64_t *ibytes, zbx_uint64_t *i
 						zbx_uint64_t *icollisions)
 {
 	struct ifnet_head	head;
-	struct ifnet 		*ifp;
+	struct ifnet		*ifp;
 	struct ifnet		v;
 
-	kvm_t 	*kp;
+	kvm_t	*kp;
 	int	len = 0;
-	int 	ret = SYSINFO_RET_FAIL;
+	int	ret = SYSINFO_RET_FAIL;
 
 	if (NULL != (kp = kvm_open(NULL, NULL, NULL, O_RDONLY, NULL))) /* requires root privileges */
 	{
