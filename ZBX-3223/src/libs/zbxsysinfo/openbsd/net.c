@@ -38,11 +38,11 @@ static int	get_ifdata(const char *if_name, zbx_uint64_t *ibytes, zbx_uint64_t *i
 						zbx_uint64_t *icollisions)
 {
 	struct ifnet_head	head;
-	struct ifnet 		*ifp;
+	struct ifnet		*ifp;
 
-	kvm_t 	*kp;
+	kvm_t	*kp;
 	int	len = 0;
-	int 	ret = SYSINFO_RET_FAIL;
+	int	ret = SYSINFO_RET_FAIL;
 
 	/* if(i)_ibytes;	total number of octets received */
 	/* if(i)_ipackets;	packets received on interface */
@@ -301,7 +301,7 @@ int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	return SYSINFO_RET_OK;
 }
 
-int     NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	assert(result);
 
@@ -310,7 +310,7 @@ int     NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT
 	return SYSINFO_RET_FAIL;
 }
 
-int     NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char		if_name[MAX_STRING_LEN];
 	zbx_uint64_t	icollisions;

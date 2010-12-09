@@ -250,7 +250,7 @@ int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	return SYSINFO_RET_OK;
 }
 
-int     NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	assert(result);
 
@@ -259,7 +259,7 @@ int     NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT
 	return SYSINFO_RET_FAIL;
 }
 
-int     NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char		if_name[MAX_STRING_LEN];
 	zbx_uint64_t	icollisions;
