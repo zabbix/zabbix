@@ -1058,7 +1058,7 @@ COpt::memoryPick();
 
 // TODO: REMOVE info
 			foreach($del_graphs as $graphid => $graph){
-				info(_s('Graph [%1$s] deleted.', $graph['name']));
+				info(_s('Graph [%s] deleted.', $graph['name']));
 			}
 
 			self::EndTransaction(true, __METHOD__);

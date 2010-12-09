@@ -353,6 +353,7 @@ COpt::memoryPick();
 				'output' => $options['selectHosts'],
 				'applicationids' => $applicationids,
 				'nopermissions' => 1,
+				'templated_hosts' => true,
 				'preservekeys' => 1
 			);
 			$hosts = CHost::get($obj_params);
@@ -566,10 +567,12 @@ COpt::memoryPick();
 		$applications_created = self::get(array(
 			'applicationids' => $applicationids,
 			'output' => API_OUTPUT_EXTEND,
+			'selectHosts' => API_OUTPUT_EXTEND,
 			'nopermissions' => 1
 		));
 		foreach($applications_created as $application_created){
-			info(S_APPLICATION.' ['.$application_created['name'].'] '.S_CREATED_SMALL);
+			$host = reset($application_created['hosts']);
+			info(_s('Application [%1$s:%2$s] updated.', $host['host'], $application_created['name']));
 		}
 	}
 
@@ -588,10 +591,12 @@ COpt::memoryPick();
 		$applications_upd = self::get(array(
 			'applicationids' => zbx_objectValues($applications, 'applicationid'),
 			'output' => API_OUTPUT_EXTEND,
+			'selectHosts' => API_OUTPUT_EXTEND,
 			'nopermissions' => 1,
 		));
 		foreach($applications_upd as $application_upd){
-			info(S_APPLICATION.' ['.$application_upd['name'].'] '.S_UPDATED_SMALL);
+			$host = reset($application_upd['hosts']);
+			info(_s('Application [%1$s:%2$s] updated.', $host['host'], $application_upd['name']));
 		}
 	}
 
