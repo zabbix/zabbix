@@ -1002,7 +1002,7 @@ static int	DBget_trigger_value_by_triggerid(zbx_uint64_t triggerid, char **repla
 				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_PROXY_NAME:
-				ZBX_STR2UINT64(proxy_hostid, row[ZBX_SQL_ITEM_FIELDS_NUM]);
+				ZBX_DBROW2UINT64(proxy_hostid, row[ZBX_SQL_ITEM_FIELDS_NUM]);
 
 				if (0 == proxy_hostid)
 				{
@@ -1871,7 +1871,12 @@ static int	get_autoreg_value_by_event(DB_EVENT *event, char **replace_to, const 
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		*replace_to = zbx_strdup(*replace_to, row[0]);
+		if (SUCCEED == DBis_null(row[0]))
+		{
+			zbx_free(*replace_to);
+		}
+		else
+			*replace_to = zbx_strdup(*replace_to, row[0]);
 		ret = SUCCEED;
 	}
 	DBfree_result(result);
@@ -1892,6 +1897,7 @@ static int	get_autoreg_value_by_event(DB_EVENT *event, char **replace_to, const 
 #define MVAR_IPADDRESS			"{IPADDRESS}"
 #define MVAR_HOST_DNS			"{HOST.DNS}"
 #define MVAR_HOST_CONN			"{HOST.CONN}"
+#define MVAR_HOST_PORT			"{HOST.PORT}"
 #define MVAR_TIME			"{TIME}"
 #define MVAR_ITEM_LASTVALUE		"{ITEM.LASTVALUE}"
 #define MVAR_ITEM_VALUE			"{ITEM.VALUE}"
@@ -2245,7 +2251,7 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ITEM *item, DC_HOST *dc_host,
 					{
 						zbx_uint64_t	proxy_hostid;
 
-						ZBX_STR2UINT64(proxy_hostid, replace_to);
+						ZBX_DBROW2UINT64(proxy_hostid, replace_to);
 
 						if (0 == proxy_hostid)
 							replace_to = zbx_strdup(replace_to, "");
@@ -2274,13 +2280,17 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ITEM *item, DC_HOST *dc_host,
 					ret = get_node_value_by_event(event, &replace_to, "name");
 				else if (0 == strcmp(m, MVAR_HOSTNAME))
 					ret = get_autoreg_value_by_event(event, &replace_to, "host");
+				else if (0 == strcmp(m, MVAR_IPADDRESS))
+					ret = get_autoreg_value_by_event(event, &replace_to, "listen_ip");
+				else if (0 == strcmp(m, MVAR_HOST_PORT))
+					ret = get_autoreg_value_by_event(event, &replace_to, "listen_port");
 				else if (0 == strcmp(m, MVAR_PROXY_NAME))
 				{
 					if (SUCCEED == (ret = get_autoreg_value_by_event(event, &replace_to, "proxy_hostid")))
 					{
 						zbx_uint64_t	proxy_hostid;
 
-						ZBX_STR2UINT64(proxy_hostid, replace_to);
+						ZBX_DBROW2UINT64(proxy_hostid, replace_to);
 
 						if (0 == proxy_hostid)
 							replace_to = zbx_strdup(replace_to, "");
