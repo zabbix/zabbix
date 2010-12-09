@@ -1144,7 +1144,7 @@ COpt::memoryPick();
 
 // checking interfaces
 				$type = null;
-				if(($host['status'] == HOST_STATUS_TEMPLATE) || (isset($item['type']) || !in_array($item['type'], array(ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV1,
+				if(($host['status'] == HOST_STATUS_TEMPLATE) || (isset($item['type']) && !in_array($item['type'], array(ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV1,
 						ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI,
 						ITEM_TYPE_SSH, ITEM_TYPE_TELNET)))){
 					unset($item['interfaceid']);
@@ -1155,7 +1155,7 @@ COpt::memoryPick();
 					if(!is_null($exItem)){
 // on update
 						if(!isset($interfaces[$type])){
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot find host interface on host ['.$host['host'].'] for item key ['.$exItem['key_'].']'));
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host [%1$s] for item key [%2$s]', $host['host'], $exItem['key_']));
 						}
 
 // item type changes does not reflect on used interface [do not update interface]
@@ -1164,7 +1164,7 @@ COpt::memoryPick();
 					}
 					else if(!isset($interfaces[$type])){
 // on create
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot find host interface on host ['.$host['host'].'] for item key ['.$item['key_'].']');
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host [%1$s] for item key [%2$s]', $host['host'], $item['key_']));
 					}
 				}
 // -----
