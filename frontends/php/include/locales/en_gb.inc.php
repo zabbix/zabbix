@@ -1149,7 +1149,7 @@
 	'S_NUMERIC_UNSIGNED'=>					_('Numeric (unsigned)'),
 	'S_NUMERIC_FLOAT'=>					_('Numeric (float)'),
 	'S_CHARACTER'=>						_('Character'),
-	'S_LOG'=>						_('Log'),
+	'S_WIZARD'=>						_('Wizard'),
 	'S_TEXT'=>						_('Text'),
 	'S_AS_IS'=>						_('As is'),
 	'S_DELTA_SPEED_PER_SECOND'=>				_('Delta (speed per second)'),

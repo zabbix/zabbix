@@ -939,7 +939,7 @@ switch($itemType) {
 // Table Header //
 		$table->setHeader(array(
 			new CCheckBox('all_items',null,"checkAll('".$form->GetName()."','all_items','group_itemid');"),
-			S_LOG,
+			S_WIZARD,
 			$show_host?S_HOST:null,
 			make_sorting_header(S_DESCRIPTION,'description'),
 			S_TRIGGERS,
