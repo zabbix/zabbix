@@ -1145,7 +1145,7 @@
 	'S_NUMERIC_UNSIGNED'=>					'Numeric (unsigned)',
 	'S_NUMERIC_FLOAT'=>					'Numeric (float)',
 	'S_CHARACTER'=>						'Character',
-	'S_LOG'=>						'Log',
+	'S_WIZARD'=>						'Wizard',
 	'S_TEXT'=>						'Text',
 	'S_AS_IS'=>						'As is',
 	'S_DELTA_SPEED_PER_SECOND'=>				'Delta (speed per second)',
@@ -1191,7 +1191,7 @@
 	'S_PUBLIC_KEY'=>					'Public key',
 	'S_AUTHENTICATION_METHOD'=>				'Authentication method',
 	'S_PASSPHRASE'=>					'Passphrase',
-	'S_EDIT_TRIGGER'=>					'Edit Trigger',
+	'S_EDIT_TRIGGER'=>					'Edit trigger',
 	'S_ENABLE_SELECTED_ITEMS_Q'=>				'Enable selected items?',
 	'S_DISABLE_SELECTED_ITEMS_Q'=>				'Disable selected items?',
 	'S_MASS_UPDATE_SELECTED_ITEMS_Q'=>			'Mass update selected items?',
@@ -1786,7 +1786,7 @@
 	'S_COPY_SELECTED_TRIGGERS_Q'=>		'Copy selected triggers?',
 	'S_DELETE_SELECTED_TRIGGERS_Q'=>	'Delete selected triggers?',
 
-	'S_TRIGGER_LOG_FORM'=>	'Log trigger form',
+	'S_TRIGGER_LOG_FORM'=>	'Trigger form',
 
 //	tr_comments.php
 	'S_TRIGGER_COMMENTS'=>			'Trigger comments',
@@ -2190,6 +2190,8 @@
 	'S_INCORRECT_USAGE_OF_BRACKETS' => 'incorrect usage of bracket symbols. \'%s\' found after final bracket.',
 	'S_INVALID_CHARECTER_AT_POSITION' => 'ivalid charecter \'%1$s\' at position %2$d',
 	'S_INVALID_KEY_FORMAT' => 'Invalid key format',
+	'S_KEY_CANNOT_BE_EMPTY' => 'Key cannot be empty',
+	'S_KEY_TOO_LARGE' => 'Key is too large: maximum %d characters',
 
 //	httptest.inc.php
 	'S_SCENARIO_STEP_NUMBER_CANNOT_BE_LESS_ONE'=>	'Scenario step number cannot be less than 1',
@@ -2289,7 +2291,7 @@
 	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART1'=>	'Function \'',
 	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART2'=>	'\' does not accept parameters.',
     'S_WRONG_DEPENDENCY_ERROR'=>	'Error adding dependencies. Following dependencies are not allowed: 1) from a host trigger to a template trigger; 2) from a template trigger to a host trigger; 3) between template triggers, where templates have links to other templates.',
-		
+
 //	page_footer.php
 	'S_TRANSACTION_HAVE_NOT_BEEN_CLOSED_ABORTING'=>	'Transaction has not been closed. Aborting..',
 
@@ -2496,7 +2498,7 @@
 	'S_NOW_SMALL'=>			'now',
 
 //	functions.js
-	'S_CREATE_LOG_TRIGGER'=>			'Create Log Trigger',
+	'S_CREATE_LOG_TRIGGER'=>			'Create trigger',
 	'DO_YOU_REPLACE_CONDITIONAL_EXPRESSION_Q'=>	'Do you replace the conditional expression?',
 	'S_ADD_SERVICE'=>				'Add Service',
 	'S_EDIT_SERVICE'=>				'Edit Service',

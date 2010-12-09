@@ -1,5 +1,15 @@
 Changes for 1.8.4rc3
 
+ - [ZBX-3223] it is now possible to gather network interface statistics under a normal user; thanks to Robert Nagy (asaveljevs,Sasha)
+ - [ZBX-3270] fixed server crash when processing calculated items with non-numeric user macros (asaveljevs)
+ - [ZBXNEXT-564] added new {PROXY.NAME} and {HOSTNAME} macros for auto registration notifications (Sasha)
+ - [ZBXNEXT-564] added support of {PROXY.NAME} macro for discovery and trigger notifications (Sasha)
+ - [ZBX-3269] fixed processing of vfs.dev.read/write metrics for devices with trailing digits (Sasha)
+ - [ZBX-3115] fixed returned data type for net.tcp.listen under Solaris and FreeBSD (Sasha)
+ - [ZBX-3115] fixed returned data type for system.users.num metric (Sasha)
+ - [ZBX-3267] fixed trigger updating through API (Aly)
+ - [ZBX-3259] fixed log trigger wizard functionality: now it can be used for any item with value type = log, text or char (KB)
+ - [ZBX-2672] added internal checks zabbix[*] to help items in data.sql (Sasha)
  - [ZBX-3255] fixed string escaping under IBM DB2 (asaveljevs,Sasha)
  - [ZBX-3201] fixed evaluation of calculated items with multiline expressions (asaveljevs)
  - [ZBX-3210] fixed incorrect height scaling in graphs (KB,asaveljevs)
