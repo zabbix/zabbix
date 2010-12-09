@@ -664,7 +664,7 @@
 
 			$db_rights = DBselect($sql);
 			while($db_right = DBfetch($db_rights)){
-				if(isset($db_right['node_name']))
+				if(!empty($db_right['node_name']))
 					$db_right['name'] = $db_right['node_name'].':'.$db_right['name'];
 
 				$group_rights[$db_right['id']] = array(
