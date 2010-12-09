@@ -1037,7 +1037,7 @@ return $caption;
  * Comments: !!! Don't forget sync code with C !!!							*
  *																			*
  ******************************************************************************/
-	function explode_exp($expression, $html,$template=false,$resolve_macro=false){
+	function explode_exp($expression, $html=false,$template=false,$resolve_macro=false){
 //		echo "EXPRESSION:",$expression,"<Br>";
 		$functionid='';
 		$macros = '';

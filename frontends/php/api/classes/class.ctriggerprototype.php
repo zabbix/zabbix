@@ -1142,31 +1142,43 @@ COpt::memoryPick();
 		try{
 			self::BeginTransaction(__METHOD__);
 
-			foreach($triggers as $tnum => $trigger){
-				if(!isset($trigger['triggerid']))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for trigger'));
-			}
-
 			$options = array(
 				'triggerids' => $triggerids,
-				'editable' => 1,
+				'editable' => true,
 				'output' => API_OUTPUT_EXTEND,
-				'preservekeys' => 1,
+				'preservekeys' => true,
 			);
 			$dbTriggers = self::get($options);
-			foreach($triggers as $gnum => $trigger){
+			foreach($triggers as $tnum => $trigger){
 				if(!isset($dbTriggers[$trigger['triggerid']])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 				}
 
+				if(!isset($trigger['triggerid']))
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for trigger'));
+
+
+				$dbTrigger = $dbTriggers[$trigger['triggerid']];
+
+				if(isset($trigger['expression'])){
+					$expression_full = explode_exp($dbTrigger['expression']);
+					if(strcmp($trigger['expression'], $expression_full) == 0){
+						unset($triggers[$tnum]['expression']);
+					}
+				}
+
+				if(isset($trigger['description']) && strcmp($trigger['description'], $dbTrigger['description']))
+					unset($triggers[$tnum]['description']);
+				if(isset($trigger['priority']) && ($trigger['priority'] == $dbTrigger['priority']))
+					unset($triggers[$tnum]['priority']);
 				if(isset($trigger['priority']) && ($trigger['priority'] == $dbTriggers[$trigger['triggerid']]['priority']))
-					unset($triggers[$gnum]['priority']);
+					unset($triggers[$tnum]['priority']);
 				if(isset($trigger['type']) && ($trigger['type'] == $dbTriggers[$trigger['triggerid']]['type']))
-					unset($triggers[$gnum]['type']);
+					unset($triggers[$tnum]['type']);
 				if(isset($trigger['url']) && ($trigger['url'] == $dbTriggers[$trigger['triggerid']]['url']))
-					unset($triggers[$gnum]['url']);
+					unset($triggers[$tnum]['url']);
 				if(isset($trigger['status']) && ($trigger['status'] == $dbTriggers[$trigger['triggerid']]['status']))
-					unset($triggers[$gnum]['status']);
+					unset($triggers[$tnum]['status']);
 			}
 
 			self::updateReal($triggers);
@@ -1360,7 +1372,6 @@ COpt::memoryPick();
 
 		$options = array(
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
-			'editable' => 1,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => 1,
 			'nopermissions' => 1,
@@ -1457,6 +1468,21 @@ COpt::memoryPick();
 		$triggerTemplate = reset($triggerTemplate);
 		if(!$triggerTemplate) return true;
 
+		if(!isset($trigger['expression']) || !isset($trigger['description'])){
+			$options = array(
+				'triggerids' => $trigger['triggerid'],
+				'output' => API_OUTPUT_EXTEND,
+				'preservekeys' => true,
+				'nopermissions' => true,
+			);
+			$dbTrigger = self::get($options);
+			$dbTrigger = reset($dbTrigger);
+
+			if(!isset($trigger['description']))
+				$trigger['description'] = $dbTrigger['description'];
+			if(!isset($trigger['expression']))
+				$trigger['expression'] = explode_exp($dbTrigger['expression'], 0);
+		}
 
 		$options = array(
 			'templateids' => $triggerTemplate['templateid'],
@@ -1531,10 +1557,10 @@ COpt::memoryPick();
 				if($childTrigger){
 					if($childTrigger['templateid'] != 0){
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							sprintf(_('Trigger [%1$s] already exists on [%2$s]'), $childTrigger['description'], $chd_host['host']));
+							_s('Trigger [%1$s] already exists on [%2$s]', $childTrigger['description'], $chd_host['host']));
 					}
 					else if($childTrigger['flags'] != $newTrigger['flags']){
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Trigger with same name but other type exists'));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Trigger with same name but other type exists'));
 					}
 
 					$newTrigger['triggerid'] = $childTrigger['triggerid'];
