@@ -100,6 +100,7 @@ class CHost extends CZBXAPI{
 			'triggerids'				=> null,
 			'maintenanceids'			=> null,
 			'graphids'					=> null,
+			'applicationids'			=> null,
 			'dhostids'					=> null,
 			'dserviceids'				=> null,
 			'webcheckids'				=> null,
@@ -340,6 +341,23 @@ class CHost extends CZBXAPI{
 			if(!$nodeCheck){
 				$nodeCheck = true;
 				$sql_parts['where'][] = DBin_node('gi.graphid', $nodeids);
+			}
+		}
+
+// applicationids
+		if(!is_null($options['applicationids'])){
+			zbx_value2array($options['applicationids']);
+			if($options['output'] != API_OUTPUT_SHORTEN){
+				$sql_parts['select']['applicationid'] = 'a.applicationid';
+			}
+
+			$sql_parts['from']['applications'] = 'applications a';
+			$sql_parts['where'][] = DBcondition('a.applicationid', $options['applicationids']);
+			$sql_parts['where']['ah'] = 'a.hostid=h.hostid';
+
+			if(!$nodeCheck){
+				$nodeCheck = true;
+				$sql_parts['where'][] = DBin_node('a.applicationid', $nodeids);
 			}
 		}
 
@@ -668,7 +686,14 @@ class CHost extends CZBXAPI{
 						$result[$host['hostid']]['graphs'][] = array('graphid' => $host['graphid']);
 						unset($host['graphid']);
 					}
+// graphids
+					if(isset($host['applicationid'])){
+						if(!isset($result[$host['hostid']]['applications']))
+							$result[$host['hostid']]['applications'] = array();
 
+						$result[$host['hostid']]['applications'][] = array('applicationid' => $host['applicationid']);
+						unset($host['applicationid']);
+					}
 // webcheckids
 					if(isset($host['httptestid'])){
 						if(!isset($result[$host['hostid']]['webchecks']))

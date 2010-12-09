@@ -1014,7 +1014,6 @@ COpt::memoryPick();
 				'graphids' => $graphids,
 				'editable' => 1,
 				'output' => API_OUTPUT_EXTEND,
-				'selectHosts' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1
 			);
 			$del_graphs = self::get($options);
@@ -1041,7 +1040,7 @@ COpt::memoryPick();
 
 
 			$created_graphs = array();
-			$sql = 'SELECT itemid FROM graph_discovery WHERE '.DBcondition('parent_graphid', $graphids);
+			$sql = 'SELECT graphid FROM graph_discovery WHERE '.DBcondition('parent_graphid', $graphids);
 			$db_graphs = DBselect($sql);
 			while($graph = DBfetch($db_graphs)){
 				$created_graphs[$graph['graphid']] = $graph['graphid'];
@@ -1066,8 +1065,7 @@ COpt::memoryPick();
 			));
 
 			foreach($del_graphs as $graphid => $graph){
-				info(S_GRAPH.' ['.$graph['name'].'] '.S_DELETED_SMALL.'from hosts ['.
-						implode(', ',zbx_objectValues($graph['hosts'], 'host')).']');
+				info(_s('Graph prototype [%s] deleted.', $graph['name']));
 			}
 
 			self::EndTransaction(true, __METHOD__);
