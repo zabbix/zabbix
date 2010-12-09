@@ -728,7 +728,7 @@ class CUserGroup extends CZBXAPI{
 				{
 					$error_array[] = sprintf(S_GROUP_IS_USED_IN_SCRIPT, $err_group['name'], $used_in_scripts[$err_group['usrgrpid']]);
 				}
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_YOU_CANNOT_DELETE_GROUP_USED_IN_SCRIPT.SPACE.implode(', ', $error_array));
+				self::exception(ZBX_API_ERROR_PARAMETERS, S_YOU_CANNOT_DELETE_GROUP_USED_IN_SCRIPT.SPACE.implode(', ', $error_array).".");
 			}
 
 			DB::delete('rights', array(DBcondition('groupid', $usrgrpids)));
