@@ -1699,7 +1699,7 @@ static int	get_node_value_by_triggerid(zbx_uint64_t triggerid, char **replace_to
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
  *                                                                            *
- * Author: Alexander Vladishe v                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1746,7 +1746,7 @@ static int	get_node_value_by_event(DB_EVENT *event, char **replace_to, const cha
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
  *                                                                            *
- * Author: Alexander Vladishe                                                 *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *

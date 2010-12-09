@@ -224,7 +224,7 @@ char    *zbx_strdup2(const char *filename, int line, char *old, const char *str)
 	if (NULL != ptr)
 		return ptr;
 
-	zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_strdup: out of memory. Requested %lu bytes.", filename, line, strlen(str));
+	zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_strdup: out of memory. Requested %lu bytes.", filename, line, strlen(str) + 1);
 	exit(FAIL);
 
 	/* Program will never reach this point. */
