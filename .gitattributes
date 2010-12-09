@@ -398,6 +398,8 @@ frontends/php/styles/table.css -text
 frontends/php/styles/ul.css -text
 frontends/php/templates.php -text
 frontends/php/tests/all.php -text
+frontends/php/tests/api/ApiTests.php -text
+frontends/php/tests/api/otherTest2.php -text
 frontends/php/tests/general/GeneralTests.php -text
 frontends/php/tests/general/itemKeyValidation.php -text
 frontends/php/tests/general/otherTest.php -text
