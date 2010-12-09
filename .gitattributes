@@ -398,6 +398,9 @@ frontends/php/styles/table.css -text
 frontends/php/styles/ul.css -text
 frontends/php/templates.php -text
 frontends/php/tests/all.php -text
+frontends/php/tests/general/GeneralTests.php -text
+frontends/php/tests/general/itemKeyValidation.php -text
+frontends/php/tests/general/otherTest.php -text
 frontends/php/tests/phpunit2hudson.php -text
 frontends/php/tr_logform.php -text
 frontends/php/tr_testexpr.php -text
