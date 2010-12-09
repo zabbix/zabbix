@@ -25,6 +25,8 @@ Changes for 1.9.0
 
 Changes for 1.8.4rc3
 
+ - [ZBXNEXT-564] added new {PROXY.NAME} and {HOSTNAME} macros for auto registration notifications (Sasha)
+ - [ZBXNEXT-564] added support of {PROXY.NAME} macro for discovery and trigger notifications (Sasha)
  - [ZBX-3269] fixed processing of vfs.dev.read/write metrics for devices with trailing digits (Sasha)
  - [ZBX-3115] fixed returned data type for net.tcp.listen under Solaris and FreeBSD (Sasha)
  - [ZBX-3115] fixed returned data type for system.users.num metric (Sasha)
