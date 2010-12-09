@@ -21,7 +21,7 @@ form .thin .input{
 .input[readonly]{ border-color: #D0D0D0; background-color: #EEEEEE; }
 .input[disabled]{
 	color: gray;
-	cursor: default; 
+	cursor: default;
 }
 
 .select{
@@ -49,7 +49,7 @@ form .thin .input{
 
 
 .link_menu{
-	border: 0px;
+	border: 0;
 	background: none;
 	color: #3C3089;
 
@@ -57,12 +57,12 @@ form .thin .input{
 	border-bottom: 1px dotted #3C3089;
 
 	height: 16px;
-	padding: 0px;
-	margin: 0px;
+	padding: 0;
+	margin: 0;
 }
 
 .link_menu:hover{ color: #6C80B9; border-bottom: 1px dotted #6C80B9;}
-.link_menu[disabled]{ color: grey; text-decoration: none; corsor: default; border: 0px; }
+.link_menu[disabled]{ color: gray; text-decoration: none; corsor: default; border: 0px; }
 
 /******************* CHECKBOX *********************/
 .checkbox{ cursor: pointer;}

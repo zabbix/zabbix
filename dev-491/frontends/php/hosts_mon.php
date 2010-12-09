@@ -165,7 +165,6 @@ include_once('include/page_header.php');
 		S_TRIGGERS,
 		S_GRAPHS,
 		S_SCREENS,
-		S_IP,
 		S_AVAILABILITY
 	));
 
@@ -238,17 +237,6 @@ include_once('include/page_header.php');
 		$description[] = new CLink($host['host'], 'hosts.php?form=update&hostid='.$host['hostid'].url_param('groupid'));
 
 
-		if(!empty($host['dns'])){
-			$dns = '('.$host['dns'].')';
-			$dns = (1 == $host['useip']) ? $dns : bold($dns);
-		}
-		else{
-			$dns = null;
-		}
-		$ip = (1 == $host['useip']) ?  bold($host['ip']) : $host['ip'];
-
-		$address = array($ip, $dns, ' :'.$host['port']);
-
 		switch($host['available']){
 			case HOST_AVAILABLE_TRUE:
 				$zbx_available = new CDiv(SPACE, 'iconzbxavailable');
@@ -298,7 +286,6 @@ include_once('include/page_header.php');
 			$triggers,
 			$graphs,
 			$screens,
-			$address,
 			$av_table
 		));
 	}

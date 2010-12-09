@@ -491,20 +491,25 @@ switch($itemType) {
 	}
 	else if(isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_REQUEST['group_itemid'])){
 
-		$delay_flex = get_request('delay_flex',array());
-		$db_delay_flex = '';
-		foreach($delay_flex as $val)
-			$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
-		$db_delay_flex = trim($db_delay_flex,';');
+		$delay_flex = get_request('delay_flex');
+		if(!is_null($delay_flex)){
+			$db_delay_flex = '';
+			foreach($delay_flex as $val)
+				$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
+			$db_delay_flex = trim($db_delay_flex,';');
+		}
+		else{
+			$db_delay_flex = null;
+		}
 
-		if(!is_null(get_request('formula',null))) $_REQUEST['multiplier']=1;
-		if('0' === get_request('formula',null)) $_REQUEST['multiplier']=0;
+		if(!is_null(get_request('formula', null))) $_REQUEST['multiplier']=1;
+		if('0' === get_request('formula', null)) $_REQUEST['multiplier']=0;
 
 		$applications = get_request('applications', null);
 		if(isset($applications[0]) && $applications[0] == '0') $applications = array();
 
 		$item = array(
-			'interfaceid'	=> get_request('interfaceid', null),
+			'interfaceid'	=> get_request('interfaceid'),
 			'delay'			=> get_request('delay'),
 			'history'		=> get_request('history'),
 			'status'		=> get_request('status'),
@@ -535,6 +540,9 @@ switch($itemType) {
 			'applications'		=> $applications,
 			'data_type'		=> get_request('data_type')
 		);
+		foreach($item as $fnum => $field){
+			if(is_null($field)) unset($item[$fnum]);
+		}
 
 		DBstart();
 		foreach($_REQUEST['group_itemid'] as $id){
