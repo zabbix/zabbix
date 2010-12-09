@@ -34,7 +34,7 @@ static struct nlist kernel_symbols[] =
 
 static int	get_ifdata(const char *if_name, zbx_uint64_t *ibytes, zbx_uint64_t *ipackets, zbx_uint64_t *ierrors, zbx_uint64_t *idropped,
 						zbx_uint64_t *obytes, zbx_uint64_t *opackets, zbx_uint64_t *oerrors,
-						zbx_uint64_t *tbytes, zbx_uint64_t *tpackets, zbx_uint64_t *terrors, zbx_uint64_t *tdropped,
+						zbx_uint64_t *tbytes, zbx_uint64_t *tpackets, zbx_uint64_t *terrors,
 						zbx_uint64_t *icollisions)
 {
 	struct ifnet_head	head;
@@ -73,8 +73,6 @@ static int	get_ifdata(const char *if_name, zbx_uint64_t *ibytes, zbx_uint64_t *i
 		*tpackets = 0;
 	if (terrors)
 		*terrors = 0;
-	if (tdropped)
-		*tdropped = 0;
 	if (icollisions)
 		*icollisions = 0;
 
@@ -121,8 +119,6 @@ static int	get_ifdata(const char *if_name, zbx_uint64_t *ibytes, zbx_uint64_t *i
 							*tpackets += v.if_ipackets + v.if_opackets;
 						if (terrors)
 							*terrors += v.if_ierrors + v.if_oerrors;
-						if (tdropped)
-							*tdropped += v.if_iqdrops;
 						if (icollisions)
 							*icollisions += v.if_collisions;
 						ret = SYSINFO_RET_OK;
@@ -171,8 +167,6 @@ static int	get_ifdata(const char *if_name, zbx_uint64_t *ibytes, zbx_uint64_t *i
 				*tpackets += v.ifi_ipackets + v.ifi_opackets;
 			if (terrors)
 				*terrors += v.ifi_ierrors + v.ifi_oerrors;
-			if (tdropped)
-				*tdropped += v.ifi_iqdrops;
 			if (icollisions)
 				*icollisions += v.ifi_collisions;
 		}
@@ -204,7 +198,7 @@ int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 	if (0 != get_param(param, 2, mode, sizeof(mode)))
 		*mode = '\0';
 
-	if (SYSINFO_RET_OK != get_ifdata(if_name, &ibytes, &ipackets, &ierrors, &idropped, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL))
+	if (SYSINFO_RET_OK != get_ifdata(if_name, &ibytes, &ipackets, &ierrors, &idropped, NULL, NULL, NULL, NULL, NULL, NULL, NULL))
 		return SYSINFO_RET_FAIL;
 
 	if ('\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
@@ -247,7 +241,7 @@ int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 	if (0 != get_param(param, 2, mode, sizeof(mode)))
 		*mode = '\0';
 
-	if (SYSINFO_RET_OK != get_ifdata(if_name, NULL, NULL, NULL, NULL, &obytes, &opackets, &oerrors, NULL, NULL, NULL, NULL, NULL))
+	if (SYSINFO_RET_OK != get_ifdata(if_name, NULL, NULL, NULL, NULL, &obytes, &opackets, &oerrors, NULL, NULL, NULL, NULL))
 		return SYSINFO_RET_FAIL;
 
 	if ('\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
@@ -271,7 +265,7 @@ int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char		if_name[MAX_STRING_LEN], mode[16];
-	zbx_uint64_t	tbytes, tpackets, terrors, tdropped;	
+	zbx_uint64_t	tbytes, tpackets, terrors;	
 
 	assert(result);
 
@@ -286,7 +280,7 @@ int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	if (0 != get_param(param, 2, mode, sizeof(mode)))
 		*mode = '\0';
 
-	if (SYSINFO_RET_OK != get_ifdata(if_name, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &tbytes, &tpackets, &terrors, &tdropped, NULL))
+	if (SYSINFO_RET_OK != get_ifdata(if_name, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &tbytes, &tpackets, &terrors, NULL))
 		return SYSINFO_RET_FAIL;
 
 	if ('\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
@@ -300,10 +294,6 @@ int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	else if (0 == strcmp(mode, "errors"))
 	{
 		SET_UI64_RESULT(result, terrors);
-	}
-	else if (0 == strcmp(mode, "dropped"))
-	{
-		SET_UI64_RESULT(result, tdropped);
 	}
 	else
 		return SYSINFO_RET_FAIL;
@@ -335,7 +325,7 @@ int     NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AG
 	if (0 != get_param(param, 1, if_name, sizeof(if_name)))
 		*if_name = '\0';
 
-	if (SYSINFO_RET_OK != get_ifdata(if_name, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &icollisions))
+	if (SYSINFO_RET_OK != get_ifdata(if_name, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &icollisions))
 		return SYSINFO_RET_FAIL;
 
 	SET_UI64_RESULT(result, icollisions);
