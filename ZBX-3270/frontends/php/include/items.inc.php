@@ -1802,7 +1802,7 @@
 		if($key_strlen > 255){
 			return array(
 				false,   //is key valid?
-				sprintf(S_KEY_TO_LARGE, 255) //result description
+				sprintf(S_KEY_TOO_LARGE, 255) //result description
 			);
 		}
 
