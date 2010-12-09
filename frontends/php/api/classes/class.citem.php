@@ -1512,7 +1512,7 @@ COpt::memoryPick();
 
 // checking interfaces
 				$type = null;
-				if(($host['status'] == HOST_STATUS_TEMPLATE) || (isset($item['type']) || !in_array($item['type'], array(ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV1,
+				if(($host['status'] == HOST_STATUS_TEMPLATE) || (isset($item['type']) && !in_array($item['type'], array(ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV1,
 						ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI,
 						ITEM_TYPE_SSH, ITEM_TYPE_TELNET)))){
 					unset($item['interfaceid']);
