@@ -214,7 +214,7 @@ int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char		if_name[MAX_STRING_LEN], mode[16];
-	zbx_uint64_t	tbytes, tpackets, terrors;	
+	zbx_uint64_t	tbytes, tpackets, terrors;
 
 	assert(result);
 
