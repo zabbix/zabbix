@@ -392,19 +392,9 @@ include_once('include/page_header.php');
 
 			if(!copy_applications($clone_templateid, $templateid)) $result = false;
 
-// Host items
-			$sql = 'SELECT DISTINCT i.itemid, i.description '.
-					' FROM items i '.
-					' WHERE i.hostid='.$clone_templateid.
-						' AND i.templateid=0 '.
-					' ORDER BY i.description';
-			$res = DBselect($sql);
-			while($db_item = DBfetch($res)){
-				$result &= (bool) copy_item_to_host($db_item['itemid'], $templateid);
-			}
+			if(!copyItems($clone_templateid, $templateid)) $result = false;
 
-// Host triggers
-			$result &= copy_triggers($clone_templateid, $templateid);
+			if(!copy_triggers($clone_templateid, $templateid)) $result = false;
 
 // Host graphs
 			$options = array(

@@ -219,15 +219,12 @@
 			'inherited' => false,
 			'hostids' => $templateid,
 			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL)),
-			'selectHosts' => API_OUTPUT_REFER,
 			'output' => API_OUTPUT_EXTEND,
 		));
 		if(!empty($hostGraphs)){
 			$graphsList = array();
 			foreach($hostGraphs as $hostGraph){
-				if(count($hostGraph['hosts']) == 1){
-					$graphsList[$hostGraph['graphid']] = $hostGraph['name'];
-				}
+				$graphsList[$hostGraph['graphid']] = $hostGraph['name'];
 			}
 			order_result($graphsList);
 
@@ -239,8 +236,6 @@
 		}
 
 // Discovery rules
-		$hostDiscoveryRuleids = array();
-
 		$hostDiscoveryRules = CDiscoveryRule::get(array(
 			'inherited' => false,
 			'hostids' => $templateid,
@@ -309,15 +304,12 @@
 			'hostids' => $templateid,
 			'discoveryids' => $hostDiscoveryRuleids,
 			'inherited' => false,
-			'selectHosts' => API_OUTPUT_COUNT,
 			'output' => API_OUTPUT_EXTEND,
 		));
 		if(!empty($hostGraphPrototypes)){
 			$prototypeList = array();
 			foreach($hostGraphPrototypes as $graphPrototype){
-				if(count($graphPrototype['hosts']) == 1){
-					$prototypeList[$graphPrototype['graphid']] = $graphPrototype['name'];
-				}
+				$prototypeList[$graphPrototype['graphid']] = $graphPrototype['name'];
 			}
 			order_result($prototypeList);
 
@@ -407,6 +399,6 @@
 	$others[] = new CButtonCancel(url_param('groupid'));
 
 	$frmHost->addItem(makeFormFooter($main, $others));
-	
+
 return $frmHost;
 ?>

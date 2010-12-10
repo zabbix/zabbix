@@ -449,7 +449,7 @@
 			'hostids' => $_REQUEST['hostid'],
 			'discoveryids' => $hostDiscoveryRuleids,
 			'inherited' => false,
-			'selectHosts' => API_OUTPUT_COUNT,
+			'selectHosts' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND,
 		));
 		if(!empty($hostGraphPrototypes)){
