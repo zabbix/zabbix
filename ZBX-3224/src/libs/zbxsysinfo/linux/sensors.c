@@ -22,57 +22,52 @@
 
 static int	get_sensor(const char *name, unsigned flags, AGENT_RESULT *result)
 {
-	DIR	*dir;
-	struct	dirent *entries;
-	struct	stat buf;
-	char	filename[MAX_STRING_LEN];
-	char	line[MAX_STRING_LEN];
-	double	d1,d2,d3;
-	FILE	*f;
+	DIR		*dir;
+	FILE		*f;
+	struct dirent	*entries;
+	struct stat	buf;
+	char		filename[MAX_STRING_LEN];
+	char		line[MAX_STRING_LEN];
+	double		d1, d2, d3;
 
-	dir=opendir("/proc/sys/dev/sensors");
-	if(NULL == dir)
-	{
+	if (NULL == (dir = opendir("/proc/sys/dev/sensors")))
 		return SYSINFO_RET_FAIL;
-	}
 
-	while((entries=readdir(dir))!=NULL)
+	while (NULL != (entries = readdir(dir)))
 	{
-		strscpy(filename,"/proc/sys/dev/sensors/");
-		zbx_strlcat(filename,entries->d_name,MAX_STRING_LEN);
-		zbx_strlcat(filename,name,MAX_STRING_LEN);
+		strscpy(filename, "/proc/sys/dev/sensors/");
+		zbx_strlcat(filename, entries->d_name, MAX_STRING_LEN);
+		zbx_strlcat(filename, name, MAX_STRING_LEN);
 
-		if(stat(filename,&buf)==0)
+		if (0 == stat(filename, &buf))
 		{
-			if( NULL == (f = fopen(filename,"r") ))
-			{
+			if (NULL == (f = fopen(filename, "r")))
 				continue;
-			}
-			if(NULL == fgets(line,MAX_STRING_LEN,f))
+
+			if (NULL == fgets(line, MAX_STRING_LEN, f))
 			{
 				zbx_fclose(f);
 				continue;
 			}
-			zbx_fclose(f);
 
-			if(sscanf(line,"%lf\t%lf\t%lf\n",&d1, &d2, &d3) == 3)
+			zbx_fclose(f);
+			closedir(dir);
+
+			if (3 == sscanf(line, "%lf\t%lf\t%lf\n", &d1, &d2, &d3))
 			{
-				closedir(dir);
 				SET_DBL_RESULT(result, d3);
-				return  SYSINFO_RET_OK;
+				return SYSINFO_RET_OK;
 			}
 			else
-			{
-				closedir(dir);
-				return  SYSINFO_RET_FAIL;
-			}
+				return SYSINFO_RET_FAIL;
 		}
 	}
 	closedir(dir);
-	return	SYSINFO_RET_FAIL;
+
+	return SYSINFO_RET_FAIL;
 }
 
-int     OLD_SENSOR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	GET_SENSOR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char	key[MAX_STRING_LEN];
 	int	ret;

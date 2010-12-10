@@ -219,6 +219,7 @@ int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c
 
 /* external system functions */
 
+int	GET_SENSOR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	KERNEL_MAXPROC(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
