@@ -551,7 +551,7 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 					"select hostid,proxy_hostid"
 					" from hosts"
 					" where host='%s'"
-					       	DB_NODE,
+						DB_NODE,
 					host_esc,
 					DBnode_local("hostid"));
 
@@ -585,7 +585,7 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 			zbx_free(host_esc);
 		}
 		else /* EVENT_OBJECT_DHOST, EVENT_OBJECT_DSERVICE */
-		{			
+		{
 			alarm(CONFIG_TIMEOUT);
 			zbx_gethost_by_ip(row[1], host, sizeof(host));
 			alarm(0);
@@ -599,7 +599,7 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 					"select hostid,dns,port,proxy_hostid"
 					" from hosts"
 					" where ip='%s'"
-					       	DB_NODE,
+						DB_NODE,
 					ip_esc,
 					DBnode_local("hostid"));
 
@@ -619,10 +619,10 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 					/* by ip */
 					make_hostname(row[1]); /* replace not-allowed symbols */
 					host_unique = DBget_unique_hostname_by_sample(row[1]);
-				}				
-				
+				}
+
 				host_unique_esc = DBdyn_escape_string(host_unique);
-				
+
 				DBexecute("insert into hosts (hostid,proxy_hostid,host,useip,ip,dns,port)"
 						" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s',1,'%s','%s',%d)",
 						hostid,
@@ -632,7 +632,7 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 						ip_esc,
 						host_esc,
 						port);
-				
+
 				zbx_free(host_unique);
 				zbx_free(host_unique_esc);
 			}
