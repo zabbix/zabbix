@@ -2500,7 +2500,7 @@
 
 //	functions.js
 	'S_CREATE_LOG_TRIGGER'=>			'Create trigger',
-	'DO_YOU_REPLACE_CONDITIONAL_EXPRESSION_Q'=>	'Do you replace the conditional expression?',
+	'DO_YOU_REPLACE_CONDITIONAL_EXPRESSION_Q'=>	'Do you wish to replace the conditional expression?',
 	'S_ADD_SERVICE'=>				'Add Service',
 	'S_EDIT_SERVICE'=>				'Edit Service',
 	'S_DELETE_SERVICE'=>				'Delete Service',
