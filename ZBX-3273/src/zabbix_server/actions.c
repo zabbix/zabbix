@@ -1110,8 +1110,8 @@ static void	execute_operations(DB_EVENT *event, zbx_uint64_t actionid)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		operationtype = (unsigned char)atoi(row[1]);
-		ZBX_STR2UINT64(objectid, row[3]);
+		operationtype = (unsigned char)atoi(row[0]);
+		ZBX_STR2UINT64(objectid, row[1]);
 
 		switch (operationtype)
 		{
