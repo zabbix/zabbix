@@ -665,11 +665,13 @@ const char	*zbx_nodetype_string(unsigned char nodetype);
 #define strscpy(x, y)		zbx_strlcpy(x, y, sizeof(x))
 #define strnscpy(x, y, n)	zbx_strlcpy(x, y, n);
 
-#define zbx_malloc(old, size)	zbx_malloc2(__FILE__, __LINE__, old , size)
-#define zbx_realloc(old, size)	zbx_realloc2(__FILE__, __LINE__, old , size)
+#define zbx_malloc(old, size)	zbx_malloc2(__FILE__, __LINE__, old, size)
+#define zbx_realloc(src, size)	zbx_realloc2(__FILE__, __LINE__, src, size)
+#define zbx_strdup(old, str)	zbx_strdup2(__FILE__, __LINE__, old, str)
 
 void    *zbx_malloc2(const char *filename, int line, void *old, size_t size);
 void    *zbx_realloc2(const char *filename, int line, void *src, size_t size);
+char    *zbx_strdup2(const char *filename, int line, char *old, const char *str);
 
 #define zbx_free(ptr)		\
 	if (ptr)		\

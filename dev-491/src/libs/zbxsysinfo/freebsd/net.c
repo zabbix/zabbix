@@ -195,14 +195,13 @@ int     NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT
 	if (FAIL == is_ushort(tmp, &port))
 		return SYSINFO_RET_FAIL;
 
-	zbx_snprintf(command, sizeof(command), "netstat -an | grep '*.%d\\>' | wc -l", (int)port);
+	zbx_snprintf(command, sizeof(command), "netstat -an | grep '*.%hu\\>' | wc -l", port);
 
 	if (SYSINFO_RET_FAIL == (res = EXECUTE_INT(NULL, command, flags, result)))
 		return res;
 
-	if (NULL != GET_DBL_RESULT(result))
-		if (result->dbl > 1)
-			result->dbl = 1;
+	if (result->ui64 > 1)
+		result->ui64 = 1;
 
 	return res;
 }

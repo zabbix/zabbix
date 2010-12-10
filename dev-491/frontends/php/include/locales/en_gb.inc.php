@@ -1157,6 +1157,7 @@
 	'S_NUMERIC_UNSIGNED'=>					_('Numeric (unsigned)'),
 	'S_NUMERIC_FLOAT'=>					_('Numeric (float)'),
 	'S_CHARACTER'=>						_('Character'),
+	'S_WIZARD'=>						_('Wizard'),
 	'S_LOG'=>						_('Log'),
 	'S_TEXT'=>						_('Text'),
 	'S_AS_IS'=>						_('As is'),
@@ -1829,7 +1830,7 @@
 	'S_COPY_SELECTED_TRIGGERS_Q'=>		_('Copy selected triggers?'),
 	'S_DELETE_SELECTED_TRIGGERS_Q'=>	_('Delete selected triggers?'),
 
-	'S_TRIGGER_LOG_FORM'=>	_('Log trigger form'),
+	'S_TRIGGER_LOG_FORM'=>	_('Trigger form'),
 
 //	tr_comments.php
 	'S_TRIGGER_COMMENTS'=>			_('Trigger comments'),
@@ -2536,8 +2537,8 @@
 	'S_NOW_SMALL'=>			_('now'),
 
 //	functions.js
-	'S_CREATE_LOG_TRIGGER'=>			_('Create Log Trigger'),
-	'DO_YOU_REPLACE_CONDITIONAL_EXPRESSION_Q'=>	_('Do you replace the conditional expression?'),
+	'S_CREATE_LOG_TRIGGER'=>			_('Create trigger'),
+	'DO_YOU_REPLACE_CONDITIONAL_EXPRESSION_Q'=>	_('Do you wish to replace the conditional expression?'),
 	'S_ADD_SERVICE'=>				_('Add Service'),
 	'S_EDIT_SERVICE'=>				_('Edit Service'),
 	'S_DELETE_SERVICE'=>				_('Delete Service'),
