@@ -13,7 +13,6 @@ libspecsysinfo_a_SOURCES = \
 	memory.c \
 	net.c \
 	proc.c \
-	sensors.c \
 	swap.c \
 	boottime.c \
 	uptime.c

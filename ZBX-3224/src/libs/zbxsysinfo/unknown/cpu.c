@@ -73,13 +73,13 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		return SYSINFO_RET_FAIL;
 
 	if ('\0' == *type || 0 == strcmp(type, "user"))	/* default parameter */
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].user[mode])
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].user[mode]);
 	else if (0 == strcmp(type, "nice"))
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].nice[mode])
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].nice[mode]);
 	else if (0 == strcmp(type, "system"))
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].system[mode])
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].system[mode]);
 	else if (0 == strcmp(type, "idle"))
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].idle[mode])
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].idle[mode]);
 	else
 		return SYSINFO_RET_FAIL;
 

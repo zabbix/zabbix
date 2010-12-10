@@ -18,26 +18,16 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
 #include "stats.h"
 
-int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return SYSINFO_RET_FAIL;
-}
-
 int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char cpuname[MAX_STRING_LEN];
-	char type[MAX_STRING_LEN];
-	char mode[MAX_STRING_LEN];
+	char	cpuname[MAX_STRING_LEN];
+	char	type[MAX_STRING_LEN];
+	char	mode[MAX_STRING_LEN];
 
-	int cpu_num = 0;
-
-        assert(result);
-
-        init_result(result);
+	int	cpu_num = 0;
 
         if(num_param(param) > 3)
         {
@@ -95,38 +85,36 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	if( 0 == strcmp(type,"idle"))
 	{
-		if( 0 == strcmp(mode,"avg1"))		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].idle[ZBX_AVG1])
-		else if( 0 == strcmp(mode,"avg5"))	SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].idle[ZBX_AVG5])
-		else if( 0 == strcmp(mode,"avg15"))	SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].idle[ZBX_AVG15])
+		if( 0 == strcmp(mode,"avg1"))		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].idle[ZBX_AVG1]);
+		else if( 0 == strcmp(mode,"avg5"))	SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].idle[ZBX_AVG5]);
+		else if( 0 == strcmp(mode,"avg15"))	SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].idle[ZBX_AVG15]);
 		else return SYSINFO_RET_FAIL;
 
 	}
 	else if( 0 == strcmp(type,"nice"))
 	{
-		if( 0 == strcmp(mode,"avg1")) 		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].nice[ZBX_AVG1])
-		else if( 0 == strcmp(mode,"avg5")) 	SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].nice[ZBX_AVG5])
-		else if( 0 == strcmp(mode,"avg15"))	SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].nice[ZBX_AVG15])
+		if( 0 == strcmp(mode,"avg1")) 		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].nice[ZBX_AVG1]);
+		else if( 0 == strcmp(mode,"avg5")) 	SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].nice[ZBX_AVG5]);
+		else if( 0 == strcmp(mode,"avg15"))	SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].nice[ZBX_AVG15]);
 		else return SYSINFO_RET_FAIL;
 
 	}
 	else if( 0 == strcmp(type,"user"))
 	{
-		if( 0 == strcmp(mode,"avg1")) 		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].user[ZBX_AVG1])
-		else if( 0 == strcmp(mode,"avg5")) 	SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].user[ZBX_AVG5])
-		else if( 0 == strcmp(mode,"avg15"))	SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].user[ZBX_AVG15])
+		if( 0 == strcmp(mode,"avg1")) 		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].user[ZBX_AVG1]);
+		else if( 0 == strcmp(mode,"avg5")) 	SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].user[ZBX_AVG5]);
+		else if( 0 == strcmp(mode,"avg15"))	SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].user[ZBX_AVG15]);
 		else return SYSINFO_RET_FAIL;
 	}
 	else if( 0 == strcmp(type,"system"))
 	{
-		if( 0 == strcmp(mode,"avg1")) 		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].system[ZBX_AVG1])
-		else if( 0 == strcmp(mode,"avg5")) 	SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].system[ZBX_AVG5])
-		else if( 0 == strcmp(mode,"avg15"))	SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].system[ZBX_AVG15])
+		if( 0 == strcmp(mode,"avg1")) 		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].system[ZBX_AVG1]);
+		else if( 0 == strcmp(mode,"avg5")) 	SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].system[ZBX_AVG5]);
+		else if( 0 == strcmp(mode,"avg15"))	SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].system[ZBX_AVG15]);
 		else return SYSINFO_RET_FAIL;
 	}
 	else
-	{
 		return SYSINFO_RET_FAIL;
-	}
 
 	return SYSINFO_RET_OK;
 }
@@ -165,14 +153,10 @@ static int getloadavg_kmem(double loadavg[], int nelem)
 }
 #endif
 
-int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef HAVE_GETLOADAVG
 	double	load[3];
-
-	assert(result);
-
-        init_result(result);
 
 	if(getloadavg(load, 3))
 	{
@@ -180,16 +164,10 @@ int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_R
 		return SYSINFO_RET_OK;
 	}
 	else
-	{
 		return SYSINFO_RET_FAIL;
-	}
 #else
 #ifdef	HAVE_SYS_PSTAT_H
 	struct	pst_dynamic dyn;
-
-	assert(result);
-
-        init_result(result);
 
 	if (pstat_getdynamic(&dyn, sizeof(dyn), 1, 0) == -1)
 	{
@@ -209,10 +187,6 @@ int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_R
 	kstat_t *ks;
 	kstat_named_t *kn;
 
-	assert(result);
-
-        init_result(result);
-
 	if (!kc && !(kc = kstat_open()))
 	{
 		return SYSINFO_RET_FAIL;
@@ -229,10 +203,6 @@ int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_R
 #ifdef HAVE_KNLIST_H
 	double loadavg[3];
 
-	assert(result);
-
-        init_result(result);
-
 	if(getloadavg_kmem(loadavg,3) == FAIL)
 	{
 		return SYSINFO_RET_FAIL;
@@ -241,10 +211,7 @@ int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_R
 	SET_DBL_RESULT(result, loadavg[0]);
 	return SYSINFO_RET_OK;
 #else
-	assert(result);
-
-        init_result(result);
-	return	SYSINFO_RET_FAIL;
+	return SYSINFO_RET_FAIL;
 #endif
 #endif
 #endif
@@ -252,14 +219,10 @@ int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_R
 #endif
 }
 
-int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef HAVE_GETLOADAVG
 	double	load[3];
-
-	assert(result);
-
-        init_result(result);
 
 	if(getloadavg(load, 3))
 	{
@@ -273,10 +236,6 @@ int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_R
 #else
 #ifdef	HAVE_SYS_PSTAT_H
 	struct	pst_dynamic dyn;
-
-	assert(result);
-
-        init_result(result);
 
 	if (pstat_getdynamic(&dyn, sizeof(dyn), 1, 0) == -1)
 	{
@@ -296,10 +255,6 @@ int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_R
 	kstat_t *ks;
 	kstat_named_t *kn;
 
-	assert(result);
-
-        init_result(result);
-
 	if (!kc && !(kc = kstat_open()))
 	{
 		return SYSINFO_RET_FAIL;
@@ -316,10 +271,6 @@ int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_R
 #ifdef HAVE_KNLIST_H
 	double loadavg[3];
 
-	assert(result);
-
-        init_result(result);
-
 	if(getloadavg_kmem(loadavg,3) == FAIL)
 	{
 		return STSINFO_RET_FAIL;
@@ -328,10 +279,7 @@ int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_R
 	SET_DBL_RESULT(result, loadavg[1]);
 	return SYSINFO_RET_OK;
 #else
-	assert(result);
-
-        init_result(result);
-	return	SYSINFO_RET_FAIL;
+	return SYSINFO_RET_FAIL;
 #endif
 #endif
 #endif
@@ -343,10 +291,6 @@ int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_
 {
 #ifdef HAVE_GETLOADAVG
 	double	load[3];
-
-	assert(result);
-
-        init_result(result);
 
 	if(getloadavg(load, 3))
 	{
@@ -360,10 +304,6 @@ int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_
 #else
 #ifdef	HAVE_SYS_PSTAT_H
 	struct	pst_dynamic dyn;
-
-	assert(result);
-
-        init_result(result);
 
 	if (pstat_getdynamic(&dyn, sizeof(dyn), 1, 0) == -1)
 	{
@@ -383,10 +323,6 @@ int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_
 	kstat_t *ks;
 	kstat_named_t *kn;
 
-	assert(result);
-
-        init_result(result);
-
 	if (!kc && !(kc = kstat_open()))
 	{
 		return SYSINFO_RET_FAIL;
@@ -403,10 +339,6 @@ int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_
 #ifdef HAVE_KNLIST_H
 	double loadavg[3];
 
-	assert(result);
-
-        init_result(result);
-
 	if(getloadavg_kmem(loadavg,3) == FAIL)
 	{
 		return STSINFO_RET_FAIL;
@@ -415,9 +347,6 @@ int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_
 	SET_DBL_RESULT(result, loadavg[2]);
 	return SYSINFO_RET_OK;
 #else
-	assert(result);
-
-        init_result(result);
 	return	SYSINFO_RET_FAIL;
 #endif
 #endif
@@ -428,15 +357,7 @@ int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_
 
 int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-
-#define CPU_FNCLIST struct cpu_fnclist_s
-CPU_FNCLIST
-{
-	char *mode;
-	int (*function)();
-};
-
-	CPU_FNCLIST fl[] =
+	MODE_FUNCTION fl[] =
 	{
 		{"avg1" ,	SYSTEM_CPU_LOAD1},
 		{"avg5" ,	SYSTEM_CPU_LOAD5},
@@ -444,13 +365,9 @@ CPU_FNCLIST
 		{0,		0}
 	};
 
-	char cpuname[MAX_STRING_LEN];
-	char mode[MAX_STRING_LEN];
-	int i;
-
-        assert(result);
-
-        init_result(result);
+	char	cpuname[MAX_STRING_LEN];
+	char	mode[MAX_STRING_LEN];
+	int	i;
 
         if(num_param(param) > 2)
         {
@@ -481,30 +398,8 @@ CPU_FNCLIST
 		zbx_snprintf(mode, sizeof(mode), "avg1");
 	}
 	for(i=0; fl[i].mode!=0; i++)
-	{
 		if(strncmp(mode, fl[i].mode, MAX_STRING_LEN)==0)
-		{
 			return (fl[i].function)(cmd, param, flags, result);
-		}
-	}
-
-	return SYSINFO_RET_FAIL;
-}
-
-int     SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-        assert(result);
-
-        init_result(result);
-
-	return SYSINFO_RET_FAIL;
-}
-
-int     SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-        assert(result);
-
-        init_result(result);
 
 	return SYSINFO_RET_FAIL;
 }

@@ -18,16 +18,12 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
-
-#include "md5.h"
-
 
 /* Solaris. */
 #ifndef HAVE_SYSINFO_FREESWAP
 #ifdef HAVE_SYS_SWAP_SWAPTABLE
-void get_swapinfo(double *total, double *fr)
+static void	get_swapinfo(double *total, double *fr)
 {
 	register int cnt, i, page_size;
 /* Support for >2Gb */
@@ -252,15 +248,7 @@ static int	SYSTEM_SWAP_PUSED(const char *cmd, const char *param, unsigned flags,
 
 int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-
-#define SWP_FNCLIST struct swp_fnclist_s
-SWP_FNCLIST
-{
-	char *mode;
-	int (*function)();
-};
-
-	SWP_FNCLIST fl[] =
+	MODE_FUNCTION fl[] =
 	{
 		{"total",	SYSTEM_SWAP_TOTAL},
 		{"free",	SYSTEM_SWAP_FREE},
@@ -318,16 +306,4 @@ SWP_FNCLIST
 	}
 
 	return SYSINFO_RET_FAIL;
-}
-
-int	SYSTEM_SWAP_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-    /* currently this function for this platform is unsupported */
-    return	SYSINFO_RET_FAIL;
-}
-
-int	SYSTEM_SWAP_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-    /* currently this function for this platform isunsupported */
-    return	SYSINFO_RET_FAIL;
 }

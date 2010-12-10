@@ -20,11 +20,9 @@
 #include "common.h"
 #include "sysinfo.h"
 
-ZBX_METRIC	parameters_specific[]=
-/* 	KEY			FLAG	FUNCTION 	ADD_PARAM	TEST_PARAM */
-	{
-
-	{"kernel.maxfiles",	0,		KERNEL_MAXFILES,	0,	0},
+ZBX_METRIC	parameters_specific[] =
+/* 	KEY			FLAG		FUNCTION 	ADD_PARAM	TEST_PARAM */
+{
 	{"kernel.maxproc",	0,		KERNEL_MAXPROC, 	0,	0},
 
 	{"vfs.fs.size",		CF_USEUPARAM,	VFS_FS_SIZE,		0,	"/,free"},
@@ -59,4 +57,4 @@ ZBX_METRIC	parameters_specific[]=
 	{"system.boottime",	0,		SYSTEM_BOOTTIME,	0,	0},
 
 	{0}
-	};
+};

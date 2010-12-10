@@ -18,7 +18,6 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
 
 static struct nlist kernel_symbols[] =
@@ -43,17 +42,18 @@ static int	get_ifdata(const char *if_name, zbx_uint64_t *ibytes, zbx_uint64_t *i
 	int	len = 0;
 	int 	ret = SYSINFO_RET_FAIL;
 
-	kp = kvm_open(NULL, NULL, NULL, O_RDONLY, NULL);
-
-	if (kp) {
+	if (NULL != (kp = kvm_open(NULL, NULL, NULL, O_RDONLY, NULL))) /* requires root privileges */
+	{
 		if (N_UNDF == kernel_symbols[IFNET_ID].n_type)
 			if (0 != kvm_nlist(kp, &kernel_symbols[0]))
 				kernel_symbols[IFNET_ID].n_type = N_UNDF;
 
-		if (N_UNDF != kernel_symbols[IFNET_ID].n_type) {
+		if (N_UNDF != kernel_symbols[IFNET_ID].n_type)
+		{
 			len = sizeof(struct ifnet_head);
 
-			if (kvm_read(kp, kernel_symbols[IFNET_ID].n_value, &head, len) >= len) {
+			if (kvm_read(kp, kernel_symbols[IFNET_ID].n_value, &head, len) >= len)
+			{
 				len = sizeof(struct ifnet);
 
 				/* if_ibytes;		total number of octets received */
@@ -90,11 +90,13 @@ static int	get_ifdata(const char *if_name, zbx_uint64_t *ibytes, zbx_uint64_t *i
 				if (icollisions)
 					*icollisions = 0;
 
-				for(ifp = head.tqh_first; ifp; ifp = v.if_list.tqe_next) {
+				for(ifp = head.tqh_first; ifp; ifp = v.if_list.tqe_next)
+				{
 					if (kvm_read(kp, (u_long)ifp, &v, len) < len)
 						break;
 
-					if (*if_name == '\0' || 0 == strcmp(if_name, v.if_xname)) {
+					if (*if_name == '\0' || 0 == strcmp(if_name, v.if_xname))
+					{
 						if (ibytes)
 							*ibytes += v.if_ibytes;
 						if (ipackets)
@@ -180,14 +182,7 @@ static int	NET_IF_IN_DROPPED(const char *if_name, AGENT_RESULT *result)
 
 int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#define NET_FNCLIST struct net_fnclist_s
-NET_FNCLIST
-{
-	char	*mode;
-	int	(*function)();
-};
-
-	NET_FNCLIST fl[] =
+	MODE_FUNCTION fl[] =
 	{
 		{"bytes",	NET_IF_IN_BYTES},
 		{"packets",	NET_IF_IN_PACKETS},
@@ -199,10 +194,6 @@ NET_FNCLIST
 	char	if_name[MAX_STRING_LEN];
 	char	mode[MAX_STRING_LEN];
 	int	i;
-
-	assert(result);
-
-	init_result(result);
 
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
@@ -262,14 +253,7 @@ static int      NET_IF_OUT_ERRORS(const char *if_name, AGENT_RESULT *result)
 
 int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#define NET_FNCLIST struct net_fnclist_s
-NET_FNCLIST
-{
-	char	*mode;
-	int	(*function)();
-};
-
-	NET_FNCLIST fl[] =
+	MODE_FUNCTION fl[] =
 	{
 		{"bytes",	NET_IF_OUT_BYTES},
 		{"packets",	NET_IF_OUT_PACKETS},
@@ -281,10 +265,6 @@ NET_FNCLIST
 	char	if_name[MAX_STRING_LEN];
 	char	mode[MAX_STRING_LEN];
 	int	i;
-
-	assert(result);
-
-	init_result(result);
 
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
@@ -356,14 +336,7 @@ static int	NET_IF_TOTAL_DROPPED(const char *if_name, AGENT_RESULT *result)
 
 int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#define NET_FNCLIST struct net_fnclist_s
-NET_FNCLIST
-{
-	char	*mode;
-	int	(*function)();
-};
-
-	NET_FNCLIST fl[] =
+	MODE_FUNCTION fl[] =
 	{
 		{"bytes",	NET_IF_TOTAL_BYTES},
 		{"packets",	NET_IF_TOTAL_PACKETS},
@@ -375,10 +348,6 @@ NET_FNCLIST
 	char	if_name[MAX_STRING_LEN];
 	char	mode[MAX_STRING_LEN];
 	int	i;
-
-	assert(result);
-
-	init_result(result);
 
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
@@ -400,23 +369,10 @@ NET_FNCLIST
 	return SYSINFO_RET_FAIL;
 }
 
-int     NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	assert(result);
-
-	init_result(result);
-
-	return SYSINFO_RET_FAIL;
-}
-
 int     NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value;
 	char		if_name[MAX_STRING_LEN];
-
-	assert(result);
-
-	init_result(result);
 
 	if (num_param(param) > 1)
 		return SYSINFO_RET_FAIL;

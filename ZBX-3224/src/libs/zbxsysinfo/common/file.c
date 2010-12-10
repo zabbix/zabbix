@@ -27,10 +27,6 @@ int	VFS_FILE_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	struct stat	buf;
 	char		filename[MAX_STRING_LEN];
 
-	assert(result);
-
-	init_result(result);
-
 	if (num_param(param) > 1)
 		return SYSINFO_RET_FAIL;
 
@@ -49,10 +45,6 @@ int	VFS_FILE_TIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 {
 	struct stat	buf;
 	char		filename[MAX_STRING_LEN], type[8];
-
-	assert(result);
-
-	init_result(result);
 
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
@@ -89,10 +81,6 @@ int	VFS_FILE_EXISTS(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	struct stat	buf;
 	char		filename[MAX_STRING_LEN];
 
-	assert(result);
-
-	init_result(result);
-
 	if (num_param(param) > 1)
 		return SYSINFO_RET_FAIL;
 
@@ -113,10 +101,6 @@ int	VFS_FILE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	char	filename[MAX_STRING_LEN], regexp[MAX_STRING_LEN], encoding[32];
 	char	buf[MAX_BUFFER_LEN], *utf8;
 	int	f, nbytes, len;
-
-	assert(result);
-
-	init_result(result);
 
 	if (num_param(param) > 3)
 		return SYSINFO_RET_FAIL;
@@ -163,10 +147,6 @@ int	VFS_FILE_REGMATCH(const char *cmd, const char *param, unsigned flags, AGENT_
 	char	filename[MAX_STRING_LEN], regexp[MAX_STRING_LEN], encoding[32];
 	char	buf[MAX_BUFFER_LEN], *utf8;
 	int	f, nbytes, len, res;
-
-	assert(result);
-
-	init_result(result);
 
 	if (num_param(param) > 3)
 		return SYSINFO_RET_FAIL;
@@ -216,10 +196,6 @@ int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	char		*hashText = NULL;
 	size_t		sz;
 	md5_byte_t	hash[MD5_DIGEST_SIZE];
-
-	assert(result);
-
-	init_result(result);
 
 	if (num_param(param) > 1)
 		return SYSINFO_RET_FAIL;
@@ -340,10 +316,6 @@ int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	u_char			buf[16 * 1024];
 	u_long			cval;
 	int			f;
-
-	assert(result);
-
-	init_result(result);
 
 	if (num_param(param) > 1)
 		return SYSINFO_RET_FAIL;

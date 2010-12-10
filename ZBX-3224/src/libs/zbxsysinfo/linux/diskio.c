@@ -24,8 +24,8 @@
 
 #if defined(KERNEL_2_4)
 #	define INFO_FILE_NAME	"/proc/partitions"
-#	define DEVNAME(line)	if(sscanf(line, "%*d %*d %*d %s ", name) != 1) continue
-#	define PARSE(line)	if(sscanf(line, "%*d %*d %*d %s " \
+#	define DEVNAME(line)	if (sscanf(line, "%*d %*d %*d %s ", name) != 1) continue
+#	define PARSE(line)	if (sscanf(line, "%*d %*d %*d %s " \
 					ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d " \
 					ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d %*d %*d %*d", \
 				name, 		\
@@ -36,8 +36,8 @@
 				) != 5) continue
 #else
 #	define INFO_FILE_NAME	"/proc/diskstats"
-#	define DEVNAME(line)	if(sscanf(line, "%*d %*d %s ", name) != 1) continue
-#	define PARSE(line)	if(sscanf(line, "%*d %*d %s " \
+#	define DEVNAME(line)	if (sscanf(line, "%*d %*d %s ", name) != 1) continue
+#	define PARSE(line)	if (sscanf(line, "%*d %*d %s " \
 					ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d " \
 					ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d %*d %*d %*d", \
 				name,		\
@@ -114,10 +114,6 @@ int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	char	devname[32], tmp[16];
 	int	type, mode, nparam;
 
-	assert(result);
-
-	init_result(result);
-
 	nparam = num_param(param);
 	if (nparam > 3)
 		return SYSINFO_RET_FAIL;
@@ -153,9 +149,9 @@ int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 			return SYSINFO_RET_FAIL;
 
 		if (type == ZBX_DSTAT_TYPE_SECT)
-			SET_UI64_RESULT(result, dstats[ZBX_DSTAT_W_SECT])
+			SET_UI64_RESULT(result, dstats[ZBX_DSTAT_W_SECT]);
 		else	/* ZBX_DSTAT_TYPE_OPER */
-			SET_UI64_RESULT(result, dstats[ZBX_DSTAT_W_OPER])
+			SET_UI64_RESULT(result, dstats[ZBX_DSTAT_W_OPER]);
 
 		return SYSINFO_RET_OK;
 	}
@@ -182,9 +178,9 @@ int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 		return SYSINFO_RET_FAIL;
 
 	if (type == ZBX_DSTAT_TYPE_SPS)	/* default parameter */
-		SET_DBL_RESULT(result, device->w_sps[mode])
+		SET_DBL_RESULT(result, device->w_sps[mode]);
 	else if (type == ZBX_DSTAT_TYPE_OPS)
-		SET_DBL_RESULT(result, device->w_ops[mode])
+		SET_DBL_RESULT(result, device->w_ops[mode]);
 
 	return SYSINFO_RET_OK;
 }
@@ -195,10 +191,6 @@ int	VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	char	devname[32], tmp[16];
 	int	type, mode, nparam;
 
-	assert(result);
-
-	init_result(result);
-
 	nparam = num_param(param);
 	if (nparam > 3)
 		return SYSINFO_RET_FAIL;
@@ -234,9 +226,9 @@ int	VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 			return SYSINFO_RET_FAIL;
 
 		if (type == ZBX_DSTAT_TYPE_SECT)
-			SET_UI64_RESULT(result, dstats[ZBX_DSTAT_R_SECT])
+			SET_UI64_RESULT(result, dstats[ZBX_DSTAT_R_SECT]);
 		else	/* ZBX_DSTAT_TYPE_OPER */
-			SET_UI64_RESULT(result, dstats[ZBX_DSTAT_R_OPER])
+			SET_UI64_RESULT(result, dstats[ZBX_DSTAT_R_OPER]);
 
 		return SYSINFO_RET_OK;
 	}
@@ -263,9 +255,9 @@ int	VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 		return SYSINFO_RET_FAIL;
 
 	if (type == ZBX_DSTAT_TYPE_SPS)	/* default parameter */
-		SET_DBL_RESULT(result, device->r_sps[mode])
+		SET_DBL_RESULT(result, device->r_sps[mode]);
 	else if (type == ZBX_DSTAT_TYPE_OPS)
-		SET_DBL_RESULT(result, device->r_ops[mode])
+		SET_DBL_RESULT(result, device->r_ops[mode]);
 
 	return SYSINFO_RET_OK;
 }

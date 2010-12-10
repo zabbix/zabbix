@@ -18,7 +18,6 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
 #include "stats.h"
 
@@ -27,10 +26,6 @@ int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	char	mode[32];
 	int	sysinfo_name;
 	long	ncpu = 0;
-
-	assert(result);
-
-	init_result(result);
 
 	if (num_param(param) > 1)
 		return SYSINFO_RET_FAIL;
@@ -57,10 +52,6 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 {
 	char	tmp[32], type[32];
 	int	cpu_num, mode;
-
-	assert(result);
-
-	init_result(result);
 
 	if (!CPU_COLLECTOR_STARTED(collector))
 	{
@@ -99,21 +90,21 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		return SYSINFO_RET_FAIL;
 
 	if ('\0' == *type || 0 == strcmp(type, "user"))	/* default parameter */
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].user[mode])
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].user[mode]);
 	else if (0 == strcmp(type, "nice"))
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].nice[mode])
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].nice[mode]);
 	else if (0 == strcmp(type, "system"))
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].system[mode])
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].system[mode]);
 	else if (0 == strcmp(type, "idle"))
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].idle[mode])
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].idle[mode]);
 	else if (0 == strcmp(type, "iowait"))
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].iowait[mode])
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].iowait[mode]);
 	else if (0 == strcmp(type, "interrupt"))
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].interrupt[mode])
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].interrupt[mode]);
 	else if (0 == strcmp(type, "softirq"))
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].softirq[mode])
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].softirq[mode]);
 	else if (0 == strcmp(type, "steal"))
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].steal[mode])
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].steal[mode]);
 	else
 		return SYSINFO_RET_FAIL;
 
@@ -125,10 +116,6 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	char	tmp[32];
 	int	mode;
 	double	load[ZBX_AVGMAX];
-
-	assert(result);
-
-	init_result(result);
 
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
@@ -166,10 +153,6 @@ int     SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, 
 	zbx_uint64_t	value = 0;
 	FILE		*f;
 
-	assert(result);
-
-	init_result(result);
-
 	if (NULL == (f = fopen("/proc/stat", "r")))
 		return SYSINFO_RET_FAIL;
 
@@ -196,10 +179,6 @@ int     SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGEN
 	char		line[MAX_STRING_LEN], name[32];
 	zbx_uint64_t	value = 0;
 	FILE		*f;
-
-	assert(result);
-
-	init_result(result);
 
 	if (NULL == (f = fopen("/proc/stat", "r")))
 		return SYSINFO_RET_FAIL;

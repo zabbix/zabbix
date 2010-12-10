@@ -18,10 +18,7 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
-
-#include "md5.h"
 
 static int	get_fs_inodes_stat(char *fs, double *total, double *free, double *usage)
 {
@@ -63,10 +60,6 @@ static int	VFS_FS_INODE_USED(const char *cmd, const char *param, unsigned flags,
 	char 	mountPoint[MAX_STRING_LEN];
 	double	value = 0;
 
-	assert(result);
-
-	init_result(result);
-
         if(num_param(param) > 1)
                 return SYSINFO_RET_FAIL;
 
@@ -86,10 +79,6 @@ static int	VFS_FS_INODE_FREE(const char *cmd, const char *param, unsigned flags,
 	char 	mountPoint[MAX_STRING_LEN];
 	double	value = 0;
 
-	assert(result);
-
-	init_result(result);
-
         if(num_param(param) > 1)
                 return SYSINFO_RET_FAIL;
 
@@ -108,10 +97,6 @@ static int	VFS_FS_INODE_TOTAL(const char *cmd, const char *param, unsigned flags
 {
 	char 	mountPoint[MAX_STRING_LEN];
 	double	value = 0;
-
-	assert(result);
-
-	init_result(result);
 
         if(num_param(param) > 1)
                 return SYSINFO_RET_FAIL;
@@ -135,10 +120,6 @@ static int	VFS_FS_INODE_PFREE(const char *cmd, const char *param, unsigned flags
 	double	tot_val = 0;
 	double	free_val = 0;
 
-	assert(result);
-
-	init_result(result);
-
         if(num_param(param) > 1)
                 return SYSINFO_RET_FAIL;
 
@@ -159,10 +140,6 @@ static int	VFS_FS_INODE_PUSED(const char *cmd, const char *param, unsigned flags
 	double	tot_val = 0;
 	double	usg_val = 0;
 
-	assert(result);
-
-	init_result(result);
-
         if(num_param(param) > 1)
                 return SYSINFO_RET_FAIL;
 
@@ -179,15 +156,7 @@ static int	VFS_FS_INODE_PUSED(const char *cmd, const char *param, unsigned flags
 
 int	VFS_FS_INODE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-
-#define FS_FNCLIST struct fs_fnclist_s
-FS_FNCLIST
-{
-	char *mode;
-	int (*function)();
-};
-
-	FS_FNCLIST fl[] =
+	MODE_FUNCTION fl[] =
 	{
 		{"free" ,	VFS_FS_INODE_FREE},
 		{"total" ,	VFS_FS_INODE_TOTAL},
@@ -201,24 +170,15 @@ FS_FNCLIST
 	char mode[MAX_STRING_LEN];
 	int i;
 
-        assert(result);
-
-        init_result(result);
-
         if(num_param(param) > 2)
-        {
                 return SYSINFO_RET_FAIL;
-        }
 
         if(get_param(param, 1, fsname, sizeof(fsname)) != 0)
-        {
                 return SYSINFO_RET_FAIL;
-        }
 
 	if(get_param(param, 2, mode, sizeof(mode)) != 0)
-        {
                 mode[0] = '\0';
-        }
+
         if(mode[0] == '\0')
 	{
 		/* default parameter */
@@ -226,12 +186,8 @@ FS_FNCLIST
 	}
 
 	for(i=0; fl[i].mode!=0; i++)
-	{
 		if(strncmp(mode, fl[i].mode, MAX_STRING_LEN)==0)
-		{
 			return (fl[i].function)(cmd, fsname, flags, result);
-		}
-	}
 
 	return SYSINFO_RET_FAIL;
 }

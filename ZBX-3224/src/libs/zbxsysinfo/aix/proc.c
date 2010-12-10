@@ -1,24 +1,23 @@
 /*
- * ** ZABBIX
- * ** Copyright (C) 2000-2005 SIA Zabbix
- * **
- * ** This program is free software; you can redistribute it and/or modify
- * ** it under the terms of the GNU General Public License as published by
- * ** the Free Software Foundation; either version 2 of the License, or
- * ** (at your option) any later version.
- * **
- * ** This program is distributed in the hope that it will be useful,
- * ** but WITHOUT ANY WARRANTY; without even the implied warranty of
- * ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * ** GNU General Public License for more details.
- * **
- * ** You should have received a copy of the GNU General Public License
- * ** along with this program; if not, write to the Free Software
- * ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- * **/
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+**/
 
 #include "common.h"
-
 #include "sysinfo.h"
 
 #define DO_SUM 0
@@ -32,7 +31,8 @@ static int	check_procstate(psinfo_t *psinfo, int zbx_proc_stat)
 	if (zbx_proc_stat == ZBX_PROC_STAT_ALL)
 		return SUCCEED;
 
-	switch (zbx_proc_stat) {
+	switch (zbx_proc_stat)
+	{
 		case ZBX_PROC_STAT_RUN:
 			return (psinfo->pr_lwp.pr_sname == PR_SNAME_TSRUN) ? SUCCEED : FAIL;
 		case ZBX_PROC_STAT_SLEEP:
@@ -49,7 +49,8 @@ static int	check_procstate(struct procsinfo *procsinfo, int zbx_proc_stat)
 	if (zbx_proc_stat == ZBX_PROC_STAT_ALL)
 		return SUCCEED;
 
-	switch (zbx_proc_stat) {
+	switch (zbx_proc_stat)
+	{
 		case ZBX_PROC_STAT_RUN:
 			return (procsinfo->pi_state == SRUN) ? SUCCEED : FAIL;
 		case ZBX_PROC_STAT_SLEEP:
@@ -83,10 +84,6 @@ int	PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	int			do_task;
 	double			memsize = 0;
 	zbx_uint64_t		proccount = 0;
-
-	assert(result);
-
-	init_result(result);
 
 	if (num_param(param) > 4)
 		return SYSINFO_RET_FAIL;
@@ -230,9 +227,7 @@ int	PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		SET_DBL_RESULT(result, proccount == 0 ? 0 : memsize/proccount);
 	}
 	else
-	{
 		SET_UI64_RESULT(result, memsize);
-	}
 
 	return SYSINFO_RET_OK;
 }
@@ -258,10 +253,6 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 	int			zbx_proc_stat;
 	zbx_uint64_t		proccount = 0;
 
-	assert(result);
-
-	init_result(result);
-
 	if (num_param(param) > 4)
 		return SYSINFO_RET_FAIL;
 
@@ -271,17 +262,20 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 	if (0 != get_param(param, 2, tmp, sizeof(tmp)))
 		*tmp = '\0';
 
-	if (*tmp != '\0') {
+	if (*tmp != '\0')
+	{
 		usrinfo = getpwnam(tmp);
 		if (usrinfo == NULL)	/* incorrect user name */
 			return SYSINFO_RET_FAIL;
-	} else
+	}
+	else
 		usrinfo = NULL;
 
 	if (0 != get_param(param, 3, tmp, sizeof(tmp)))
 		*tmp = '\0';
 
-	if (*tmp != '\0') {
+	if (*tmp != '\0')
+	{
 		if (0 == strcmp(tmp, "run"))
 			zbx_proc_stat = ZBX_PROC_STAT_RUN;
 		else if (0 == strcmp(tmp, "sleep"))
@@ -292,7 +286,8 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 			zbx_proc_stat = ZBX_PROC_STAT_ALL;
 		else
 			return SYSINFO_RET_FAIL;
-	} else
+	}
+	else
 		zbx_proc_stat = ZBX_PROC_STAT_ALL;
 
 	if (0 != get_param(param, 4, proccomm, sizeof(proccomm)))

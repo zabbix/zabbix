@@ -20,10 +20,9 @@
 #include "common.h"
 #include "sysinfo.h"
 
-ZBX_METRIC	parameters_specific[]=
-/* 	KEY			FLAG	FUNCTION 	ADD_PARAM	TEST_PARAM */
-	{
-
+ZBX_METRIC	parameters_specific[] =
+/* 	KEY			FLAG		FUNCTION 	ADD_PARAM	TEST_PARAM */
+{
 	{"kernel.maxfiles",	0,		KERNEL_MAXFILES,	0,	0},
 	{"kernel.maxproc",	0,		KERNEL_MAXPROC, 	0,	0},
 
@@ -32,8 +31,6 @@ ZBX_METRIC	parameters_specific[]=
 
 	{"vfs.dev.read",	CF_USEUPARAM,	VFS_DEV_READ,		0,	"hda,bytes"},
 	{"vfs.dev.write",	CF_USEUPARAM,	VFS_DEV_WRITE,		0,	"hda,operations"},
-
-	{"net.tcp.listen",      CF_USEUPARAM,   NET_TCP_LISTEN, 	0,      "80"},
 
 	{"net.if.in",		CF_USEUPARAM,	NET_IF_IN,		0,	"lo0,bytes"},
 	{"net.if.out",		CF_USEUPARAM,	NET_IF_OUT,		0,	"lo0,bytes"},
@@ -59,4 +56,4 @@ ZBX_METRIC	parameters_specific[]=
 	{"system.boottime",     0,      	SYSTEM_BOOTTIME,        0,      0},
 
 	{0}
-	};
+};

@@ -18,13 +18,9 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
 
-#include "md5.h"
-
-
-void get_swapinfo(double *total, double *fr)
+static void	get_swapinfo(double *total, double *fr)
 {
 	register int cnt, i, page_size;
 /* Support for >2Gb */
@@ -87,13 +83,9 @@ point them all to the same buffer */
 
 int	SYSTEM_SWAP_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	double swaptotal,swapfree;
+	double	swaptotal, swapfree;
 
-	assert(result);
-
-        init_result(result);
-
-	get_swapinfo(&swaptotal,&swapfree);
+	get_swapinfo(&swaptotal, &swapfree);
 
 	SET_UI64_RESULT(result, swapfree);
 	return SYSINFO_RET_OK;
@@ -101,13 +93,9 @@ int	SYSTEM_SWAP_FREE(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 int	SYSTEM_SWAP_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	double swaptotal,swapfree;
+	double	swaptotal, swapfree;
 
-	assert(result);
-
-        init_result(result);
-
-	get_swapinfo(&swaptotal,&swapfree);
+	get_swapinfo(&swaptotal, &swapfree);
 
 	SET_UI64_RESULT(result, swaptotal);
 	return SYSINFO_RET_OK;
@@ -116,52 +104,43 @@ int	SYSTEM_SWAP_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_
 static int	SYSTEM_SWAP_PFREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	AGENT_RESULT	result_tmp;
-        zbx_uint64_t  tot_val = 0;
-        zbx_uint64_t  free_val = 0;
+	zbx_uint64_t	tot_val = 0;
+	zbx_uint64_t	free_val = 0;
 
-        assert(result);
-
-        init_result(result);
         init_result(&result_tmp);
 
-	if(SYSTEM_SWAP_TOTAL(cmd, param, flags, &result_tmp) != SYSINFO_RET_OK ||
-		!(result_tmp.type & AR_UINT64))
-	                return  SYSINFO_RET_FAIL;
+	if(SYSTEM_SWAP_TOTAL(cmd, param, flags, &result_tmp) != SYSINFO_RET_OK || !(result_tmp.type & AR_UINT64))
+		return SYSINFO_RET_FAIL;
 	tot_val = result_tmp.ui64;
 
 	/* Check for division by zero */
 	if(tot_val == 0)
 	{
 		free_result(&result_tmp);
-                return  SYSINFO_RET_FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 
-	if(SYSTEM_SWAP_FREE(cmd, param, flags, &result_tmp) != SYSINFO_RET_OK ||
-		!(result_tmp.type & AR_UINT64))
-                	return  SYSINFO_RET_FAIL;
+	if(SYSTEM_SWAP_FREE(cmd, param, flags, &result_tmp) != SYSINFO_RET_OK || !(result_tmp.type & AR_UINT64))
+		return SYSINFO_RET_FAIL;
 	free_val = result_tmp.ui64;
 
 	free_result(&result_tmp);
 
 	SET_DBL_RESULT(result, (100.0 * (double)free_val) / (double)tot_val);
 
-        return SYSINFO_RET_OK;
+	return SYSINFO_RET_OK;
 }
 
 static int	SYSTEM_SWAP_PUSED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	AGENT_RESULT	result_tmp;
-        zbx_uint64_t  tot_val = 0;
-        zbx_uint64_t  free_val = 0;
+	zbx_uint64_t	tot_val = 0;
+	zbx_uint64_t	free_val = 0;
 
-        assert(result);
-
-        init_result(result);
         init_result(&result_tmp);
 
-	if(SYSTEM_SWAP_TOTAL(cmd, param, flags, &result_tmp) != SYSINFO_RET_OK ||
-		!(result_tmp.type & AR_UINT64))
-                	return  SYSINFO_RET_FAIL;
+	if(SYSTEM_SWAP_TOTAL(cmd, param, flags, &result_tmp) != SYSINFO_RET_OK || !(result_tmp.type & AR_UINT64))
+		return SYSINFO_RET_FAIL;
 	tot_val = result_tmp.ui64;
 
 	/* Check for division by zero */
@@ -171,29 +150,20 @@ static int	SYSTEM_SWAP_PUSED(const char *cmd, const char *param, unsigned flags,
                 return  SYSINFO_RET_FAIL;
 	}
 
-	if(SYSTEM_SWAP_FREE(cmd, param, flags, &result_tmp) != SYSINFO_RET_OK ||
-		!(result_tmp.type & AR_UINT64))
-                	return  SYSINFO_RET_FAIL;
+	if(SYSTEM_SWAP_FREE(cmd, param, flags, &result_tmp) != SYSINFO_RET_OK || !(result_tmp.type & AR_UINT64))
+		return SYSINFO_RET_FAIL;
 	free_val = result_tmp.ui64;
 
 	free_result(&result_tmp);
 
-	SET_DBL_RESULT(result, 100.0-(100.0 * (double)free_val) / (double)tot_val);
+	SET_DBL_RESULT(result, 100.0 - (100.0 * (double)free_val) / (double)tot_val);
 
         return SYSINFO_RET_OK;
 }
 
 int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-
-#define SWP_FNCLIST struct swp_fnclist_s
-SWP_FNCLIST
-{
-	char *mode;
-	int (*function)();
-};
-
-	SWP_FNCLIST fl[] =
+	MODE_FUNCTION fl[] =
 	{
 		{"total",	SYSTEM_SWAP_TOTAL},
 		{"free",	SYSTEM_SWAP_FREE},
@@ -205,10 +175,6 @@ SWP_FNCLIST
 	char swapdev[MAX_STRING_LEN];
 	char mode[MAX_STRING_LEN];
 	int i;
-
-        assert(result);
-
-        init_result(result);
 
         if(num_param(param) > 2)
         {
@@ -243,12 +209,8 @@ SWP_FNCLIST
 	}
 
 	for(i=0; fl[i].mode!=0; i++)
-	{
 		if(strncmp(mode, fl[i].mode, MAX_STRING_LEN)==0)
-		{
 			return (fl[i].function)(cmd, param, flags, result);
-		}
-	}
 
 	return SYSINFO_RET_FAIL;
 }
@@ -319,10 +281,6 @@ int	SYSTEM_SWAP_IN(const char *cmd, const char *param, unsigned flags, AGENT_RES
     char    mode[MAX_STRING_LEN];
     double  value = 0;
 
-    assert(result);
-
-    init_result(result);
-
     if(num_param(param) > 2)
     {
         return SYSINFO_RET_FAIL;
@@ -380,10 +338,6 @@ int	SYSTEM_SWAP_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RE
     char    swapdev[MAX_STRING_LEN];
     char    mode[MAX_STRING_LEN];
     double  value = 0;
-
-    assert(result);
-
-    init_result(result);
 
     if(num_param(param) > 2)
     {

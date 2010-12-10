@@ -20,10 +20,9 @@
 #include "common.h"
 #include "sysinfo.h"
 
-ZBX_METRIC	parameters_specific[]=
-/*	KEY			FLAG	FUNCTION	ADD_PARAM	TEST_PARAM */
-	{
-
+ZBX_METRIC	parameters_specific[] =
+/*	KEY			FLAG		FUNCTION	ADD_PARAM	TEST_PARAM */
+{
 	{"kernel.maxfiles",	0,		KERNEL_MAXFILES,	0,	0},
 	{"kernel.maxproc",	0,		KERNEL_MAXPROC,		0,	0},
 
@@ -34,14 +33,12 @@ ZBX_METRIC	parameters_specific[]=
 	{"vfs.dev.write",	CF_USEUPARAM,	VFS_DEV_WRITE,		0,	"sda,sectors"},
 
 	{"net.tcp.listen",	CF_USEUPARAM,	NET_TCP_LISTEN,		0,	"80"},
+	{"net.udp.listen",	CF_USEUPARAM,	NET_UDP_LISTEN,		0,	"68"},
 
 	{"net.if.in",		CF_USEUPARAM,	NET_IF_IN,		0,	"lo,bytes"},
 	{"net.if.out",		CF_USEUPARAM,	NET_IF_OUT,		0,	"lo,bytes"},
 	{"net.if.total",	CF_USEUPARAM,	NET_IF_TOTAL,		0,	"lo,bytes"},
 	{"net.if.collisions",	CF_USEUPARAM,	NET_IF_COLLISIONS,	0,	"lo"},
-
-	{"net.tcp.listen",	CF_USEUPARAM,	NET_TCP_LISTEN,		NULL,	"80"},
-	{"net.udp.listen",	CF_USEUPARAM,	NET_UDP_LISTEN,		NULL,	"68"},
 
 	{"vm.memory.size",	CF_USEUPARAM,	VM_MEMORY_SIZE,		0,	"total"},
 
@@ -62,4 +59,4 @@ ZBX_METRIC	parameters_specific[]=
 	{"system.boottime",	0,		SYSTEM_BOOTTIME,	0,	0},
 
 	{0}
-	};
+};

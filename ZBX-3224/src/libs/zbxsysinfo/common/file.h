@@ -22,7 +22,7 @@
 
 #include "sysinfo.h"
 
-#define MAX_FILE_LEN (1024*1024)
+#define MAX_FILE_LEN (1024 * 1024)
 
 int	VFS_FILE_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	VFS_FILE_TIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);

@@ -1,21 +1,21 @@
 /*
- * ** ZABBIX
- * ** Copyright (C) 2000-2005 SIA Zabbix
- * **
- * ** This program is free software; you can redistribute it and/or modify
- * ** it under the terms of the GNU General Public License as published by
- * ** the Free Software Foundation; either version 2 of the License, or
- * ** (at your option) any later version.
- * **
- * ** This program is distributed in the hope that it will be useful,
- * ** but WITHOUT ANY WARRANTY; without even the implied warranty of
- * ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * ** GNU General Public License for more details.
- * **
- * ** You should have received a copy of the GNU General Public License
- * ** along with this program; if not, write to the Free Software
- * ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- * **/
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+**/
 
 #include "common.h"
 #include "sysinfo.h"
@@ -110,10 +110,6 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	struct kinfo_proc	*proc = NULL;
 	struct passwd		*usrinfo;
 
-	assert(result);
-
-	init_result(result);
-
 	if (num_param(param) > 4)
 		return SYSINFO_RET_FAIL;
 
@@ -125,17 +121,20 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	if (0 != get_param(param, 2, buffer, sizeof(buffer)))
 		*buffer = '\0';
 
-	if (*buffer != '\0') {
+	if (*buffer != '\0')
+	{
 		usrinfo = getpwnam(buffer);
 		if (usrinfo == NULL)	/* incorrect user name */
 			return SYSINFO_RET_FAIL;
-	} else
+	}
+	else
 		usrinfo = NULL;
 
 	if (0 != get_param(param, 3, buffer, sizeof(buffer)))
 		*buffer = '\0';
 
-	if (*buffer != '\0') {
+	if (*buffer != '\0')
+	{
 		if (0 == strcmp(buffer, "avg"))
 			do_task = DO_AVG;
 		else if (0 == strcmp(buffer, "max"))
@@ -146,7 +145,8 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 			do_task = DO_SUM;
 		else
 			return SYSINFO_RET_FAIL;
-	} else
+	}
+	else
 		do_task = DO_SUM;
 
 	if (0 != get_param(param, 4, proccomm, sizeof(proccomm)))
@@ -156,11 +156,14 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	mib[0] = CTL_KERN;
 	mib[1] = KERN_PROC;
-	if (NULL != usrinfo) {
+	if (NULL != usrinfo)
+	{
 		mib[2] = KERN_PROC_UID;
 		mib[3] = usrinfo->pw_uid;
 		mibs = 4;
-	} else {
+	}
+	else
+	{
 		mib[2] = KERN_PROC_ALL;
 		mib[3] = 0;
 		mibs = 3;
@@ -171,14 +174,16 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		return SYSINFO_RET_FAIL;
 
 	proc = (struct kinfo_proc *)zbx_malloc(proc, sz);
-	if (0 != sysctl(mib, mibs, proc, &sz, NULL, 0)) {
+	if (0 != sysctl(mib, mibs, proc, &sz, NULL, 0))
+	{
 		zbx_free(proc);
 		return SYSINFO_RET_FAIL;
 	}
 
 	count = sz / sizeof(struct kinfo_proc);
 
-	for (i = 0; i < count; i++) {
+	for (i = 0; i < count; i++)
+	{
 #if(__FreeBSD_version > 500000)
 		if (proc[i].ki_flag & P_KTHREAD)	/* skip a system thread */
 			continue;
@@ -189,20 +194,24 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		if (*procname == '\0' || 0 == strcmp(procname, proc[i].ZBX_PROC_COMM))
 			proc_ok = 1;
 
-		if (*proccomm != '\0') {
+		if (*proccomm != '\0')
+		{
 			if (NULL != (args = get_commandline(&proc[i])))
 				if (zbx_regexp_match(args, proccomm, NULL) != NULL)
 					comm_ok = 1;
-		} else
+		}
+		else
 			comm_ok = 1;
 
-		if (proc_ok && comm_ok) {
+		if (proc_ok && comm_ok)
+		{
 			value = proc[i].ZBX_PROC_TSIZE + proc[i].ZBX_PROC_DSIZE + proc[i].ZBX_PROC_SSIZE;
 			value *= pagesize;
 
 			if (0 == proccount++)
 				memsize = value;
-			else {
+			else
+			{
 				if (do_task == DO_MAX)
 					memsize = MAX(memsize, value);
 				else if (do_task == DO_MIN)
@@ -214,11 +223,10 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	}
 	zbx_free(proc);
 
-	if (do_task == DO_AVG) {
+	if (do_task == DO_AVG)
 		SET_DBL_RESULT(result, proccount == 0 ? 0 : memsize/proccount);
-	} else {
+	else
 		SET_UI64_RESULT(result, memsize);
-	}
 
 	return SYSINFO_RET_OK;
 }
@@ -246,10 +254,6 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 	struct kinfo_proc	*proc = NULL;
 	struct passwd		*usrinfo;
 
-	assert(result);
-
-	init_result(result);
-
 	if (num_param(param) > 4)
 		return SYSINFO_RET_FAIL;
 
@@ -261,17 +265,20 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 	if (0 != get_param(param, 2, buffer, sizeof(buffer)))
 		*buffer = '\0';
 
-	if (*buffer != '\0') {
+	if (*buffer != '\0')
+	{
 		usrinfo = getpwnam(buffer);
 		if (usrinfo == NULL)	/* incorrect user name */
 			return SYSINFO_RET_FAIL;
-	} else
+	}
+	else
 		usrinfo = NULL;
 
 	if (0 != get_param(param, 3, buffer, sizeof(buffer)))
 		*buffer = '\0';
 
-	if (*buffer != '\0') {
+	if (*buffer != '\0')
+	{
 		if (0 == strcmp(buffer, "run"))
 			zbx_proc_stat = ZBX_PROC_STAT_RUN;
 		else if (0 == strcmp(buffer, "sleep"))
@@ -282,7 +289,8 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 			zbx_proc_stat = ZBX_PROC_STAT_ALL;
 		else
 			return SYSINFO_RET_FAIL;
-	} else
+	}
+	else
 		zbx_proc_stat = ZBX_PROC_STAT_ALL;
 
 	if (0 != get_param(param, 4, proccomm, sizeof(proccomm)))
@@ -290,11 +298,14 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 
 	mib[0] = CTL_KERN;
 	mib[1] = KERN_PROC;
-	if (NULL != usrinfo) {
+	if (NULL != usrinfo)
+	{
 		mib[2] = KERN_PROC_UID;
 		mib[3] = usrinfo->pw_uid;
 		mibs = 4;
-	} else {
+	}
+	else
+	{
 		mib[2] = KERN_PROC_ALL;
 		mib[3] = 0;
 		mibs = 3;
@@ -305,14 +316,16 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 		return SYSINFO_RET_FAIL;
 
 	proc = (struct kinfo_proc *)zbx_malloc(proc, sz);
-	if (0 != sysctl(mib, mibs, proc, &sz, NULL, 0)) {
+	if (0 != sysctl(mib, mibs, proc, &sz, NULL, 0))
+	{
 		zbx_free(proc);
 		return SYSINFO_RET_FAIL;
 	}
 
 	count = sz / sizeof(struct kinfo_proc);
 
-	for (i = 0; i < count; i++) {
+	for (i = 0; i < count; i++)
+	{
 #if(__FreeBSD_version > 500000)
 		if (proc[i].ki_flag & P_KTHREAD)	/* skip a system thread */
 			continue;
@@ -325,7 +338,8 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 		if (*procname == '\0' || 0 == strcmp(procname, proc[i].ZBX_PROC_COMM))
 			proc_ok = 1;
 
-		if (zbx_proc_stat != ZBX_PROC_STAT_ALL) {
+		if (zbx_proc_stat != ZBX_PROC_STAT_ALL)
+		{
 			switch (zbx_proc_stat) {
 			case ZBX_PROC_STAT_RUN:
 				if (proc[i].ZBX_PROC_STAT == SRUN)
@@ -340,14 +354,17 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 					stat_ok = 1;
 				break;
 			}
-		} else
+		}
+		else
 			stat_ok = 1;
 
-		if (*proccomm != '\0') {
+		if (*proccomm != '\0')
+		{
 			if (NULL != (args = get_commandline(&proc[i])))
 				if (zbx_regexp_match(args, proccomm, NULL) != NULL)
 					comm_ok = 1;
-		} else
+		}
+		else
 			comm_ok = 1;
 
 		if (proc_ok && stat_ok && comm_ok)

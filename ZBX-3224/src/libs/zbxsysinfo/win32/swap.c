@@ -18,12 +18,8 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
 #include "symbols.h"
-
-#include "md5.h"
-
 
 int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
@@ -100,22 +96,4 @@ int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_R
 	}
 
 	return SYSINFO_RET_OK;
-}
-
-int	SYSTEM_SWAP_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-#ifdef TODO
-#error Realize function SYSTEM_SWAP_IN!!!
-#endif /* todo */
-
-	return SYSINFO_RET_FAIL;
-}
-
-int	SYSTEM_SWAP_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-#ifdef TODO
-#error Realize function SYSTEM_SWAP_OUT!!!
-#endif /* todo */
-
-	return SYSINFO_RET_FAIL;
 }

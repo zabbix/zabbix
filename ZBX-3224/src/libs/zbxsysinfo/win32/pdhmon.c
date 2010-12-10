@@ -43,9 +43,9 @@ int	USER_PERFCOUNTER(const char *cmd, const char *param, unsigned flags, AGENT_R
 		if (NULL != perfs->name && 0 == strcmp(perfs->name, param) )
 		{
 			if (ITEM_STATUS_NOTSUPPORTED == perfs->status)
-				SET_MSG_RESULT(result, strdup(perfs->error))
+				SET_MSG_RESULT(result, strdup(perfs->error));
 			else
-				SET_DBL_RESULT(result, perfs->lastValue)
+				SET_DBL_RESULT(result, perfs->lastValue);
 			ret = SYSINFO_RET_OK;
 			break;
 		}
@@ -96,9 +96,9 @@ int	PERF_MONITOR(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 		for (perfs = collector->perfs.pPerfCounterList; perfs != NULL; perfs = perfs->next) {
 			if (NULL == perfs->name && 0 == strcmp(perfs->counterPath, counter_path) && perfs->interval == interval) {
 				if (ITEM_STATUS_NOTSUPPORTED == perfs->status)
-					SET_MSG_RESULT(result, strdup(perfs->error))
+					SET_MSG_RESULT(result, strdup(perfs->error));
 				else
-					SET_DBL_RESULT(result, perfs->lastValue)
+					SET_DBL_RESULT(result, perfs->lastValue);
 				return SYSINFO_RET_OK;
 			}
 		}

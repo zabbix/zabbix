@@ -1,24 +1,23 @@
 /*
- * ** ZABBIX
- * ** Copyright (C) 2000-2005 SIA Zabbix
- * **
- * ** This program is free software; you can redistribute it and/or modify
- * ** it under the terms of the GNU General Public License as published by
- * ** the Free Software Foundation; either version 2 of the License, or
- * ** (at your option) any later version.
- * **
- * ** This program is distributed in the hope that it will be useful,
- * ** but WITHOUT ANY WARRANTY; without even the implied warranty of
- * ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * ** GNU General Public License for more details.
- * **
- * ** You should have received a copy of the GNU General Public License
- * ** along with this program; if not, write to the Free Software
- * ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- * **/
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+**/
 
 #include "common.h"
-
 #include "sysinfo.h"
 
 #define DO_SUM 0
@@ -26,34 +25,29 @@
 #define DO_MIN 2
 #define DO_AVG 3
 
-int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{ /* usage: <function name>[ <process name>, <user name>, <mode>, <command> ] */
+int	PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	DIR	*dir;
+	int	proc;
 
-    DIR		*dir;
-    int		proc;
+	struct dirent	*entries;
+	struct stat		buf;
+	struct passwd	*usrinfo = NULL;
+	struct prpsinfo	psinfo;
 
-    struct  dirent	*entries;
-    struct  stat	buf;
-    struct passwd	*usrinfo = NULL;
-    struct prpsinfo	psinfo;
+	char	filename[MAX_STRING_LEN];
 
-    char	filename[MAX_STRING_LEN];
+	char	procname[MAX_STRING_LEN];
+	char	usrname[MAX_STRING_LEN];
+	char	mode[MAX_STRING_LEN];
+	char	proccomm[MAX_STRING_LEN];
 
-    char	procname[MAX_STRING_LEN];
-    char	usrname[MAX_STRING_LEN];
-    char	mode[MAX_STRING_LEN];
-    char	proccomm[MAX_STRING_LEN];
+	int	do_task = DO_SUM;
 
-    int		do_task = DO_SUM;
-
-    double	memsize = -1;
-    int		pgsize = getpagesize();
-    int		proccount = 0;
-    pid_t	curr_pid = getpid();
-
-	assert(result);
-
-	init_result(result);
+	double	memsize = -1;
+	int	pgsize = getpagesize();
+	int	proccount = 0;
+	pid_t	curr_pid = getpid();
 
 	if(num_param(param) > 4)
 	{
@@ -200,32 +194,27 @@ lbl_skip_procces:
 	return SYSINFO_RET_OK;
 }
 
-int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{ /* usage: <function name>[ <process name>, <user name>, <process state>, <command> ] */
+int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	DIR	*dir;
+	int	proc;
 
-    DIR		*dir;
-    int		proc;
+	struct  dirent	*entries;
+	struct  stat	buf;
+	struct passwd	*usrinfo = NULL;
+	struct prpsinfo	psinfo;
 
-    struct  dirent	*entries;
-    struct  stat	buf;
-    struct passwd	*usrinfo = NULL;
-    struct prpsinfo	psinfo;
+	char	filename[MAX_STRING_LEN];
 
-    char	filename[MAX_STRING_LEN];
+	char	procname[MAX_STRING_LEN];
+	char	usrname[MAX_STRING_LEN];
+	char	procstat[MAX_STRING_LEN];
+	char	proccomm[MAX_STRING_LEN];
 
-    char	procname[MAX_STRING_LEN];
-    char	usrname[MAX_STRING_LEN];
-    char	procstat[MAX_STRING_LEN];
-    char	proccomm[MAX_STRING_LEN];
+	int	do_task = DO_SUM;
 
-    int		do_task = DO_SUM;
-
-    int		proccount = 0;
-    pid_t	curr_pid = getpid();
-
-	assert(result);
-
-	init_result(result);
+	int	proccount = 0;
+	pid_t	curr_pid = getpid();
 
 	if(num_param(param) > 4)
 	{

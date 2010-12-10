@@ -600,7 +600,7 @@ int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c
 			break;
 		value_double = atof(c);
 
-		SET_DBL_RESULT(result, value_double)
+		SET_DBL_RESULT(result, value_double);
 		ret = SUCCEED;
 		break;
 	case ITEM_VALUE_TYPE_STR:
@@ -647,7 +647,7 @@ static zbx_uint64_t* get_result_ui64_value(AGENT_RESULT *result)
 		if (SUCCEED != is_uint64(result->str, &value))
 			return NULL;
 
-		SET_UI64_RESULT(result, value)
+		SET_UI64_RESULT(result, value);
 	}
 	else if(ISSET_TEXT(result))
 	{
@@ -658,7 +658,7 @@ static zbx_uint64_t* get_result_ui64_value(AGENT_RESULT *result)
 		if (SUCCEED != is_uint64(result->text, &value))
 			return NULL;
 
-		SET_UI64_RESULT(result, value)
+		SET_UI64_RESULT(result, value);
 	}
 	/* skip AR_MESSAGE - it is information field */
 
@@ -693,7 +693,7 @@ static double* get_result_dbl_value(AGENT_RESULT *result)
 			return NULL;
 		value = atof(result->str);
 
-		SET_DBL_RESULT(result, value)
+		SET_DBL_RESULT(result, value);
 	}
 	else if(ISSET_TEXT(result))
 	{
@@ -704,7 +704,7 @@ static double* get_result_dbl_value(AGENT_RESULT *result)
 			return NULL;
 		value = atof(result->text);
 
-		SET_DBL_RESULT(result, value)
+		SET_DBL_RESULT(result, value);
 	}
 	/* skip AR_MESSAGE - it is information field */
 
@@ -738,11 +738,11 @@ static char** get_result_str_value(AGENT_RESULT *result)
 	}
 	else if(ISSET_UI64(result))
 	{
-		SET_STR_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_UI64, result->ui64))
+		SET_STR_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_UI64, result->ui64));
 	}
 	else if(ISSET_DBL(result))
 	{
-		SET_STR_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_DBL, result->dbl))
+		SET_STR_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_DBL, result->dbl));
 	}
 	/* skip AR_MESSAGE - it is information field */
 
@@ -768,11 +768,11 @@ static char** get_result_text_value(AGENT_RESULT *result)
 	}
 	else if(ISSET_UI64(result))
 	{
-		SET_TEXT_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_UI64, result->ui64))
+		SET_TEXT_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_UI64, result->ui64));
 	}
 	else if(ISSET_DBL(result))
 	{
-		SET_TEXT_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_DBL, result->dbl))
+		SET_TEXT_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_DBL, result->dbl));
 	}
 	/* skip AR_MESSAGE - it is information field */
 
@@ -810,25 +810,27 @@ void	*get_result_value_by_type(AGENT_RESULT *result, int require_type)
 {
 	assert(result);
 
-	switch(require_type)
+	switch (require_type)
 	{
 		case AR_UINT64:
-			return (void*)get_result_ui64_value(result);
+			return (void *)get_result_ui64_value(result);
 			break;
 		case AR_DOUBLE:
-			return (void*)get_result_dbl_value(result);
+			return (void *)get_result_dbl_value(result);
 			break;
 		case AR_STRING:
-			return (void*)get_result_str_value(result);
+			return (void *)get_result_str_value(result);
 			break;
 		case AR_TEXT:
-			return (void*)get_result_text_value(result);
+			return (void *)get_result_text_value(result);
 			break;
 		case AR_MESSAGE:
-			if(ISSET_MSG(result))	return (void*)(&result->msg);
+			if (ISSET_MSG(result))
+				return (void *)(&result->msg);
 			break;
 		default:
 			break;
 	}
+
 	return NULL;
 }

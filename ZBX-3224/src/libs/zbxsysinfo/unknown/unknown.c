@@ -20,10 +20,9 @@
 #include "common.h"
 #include "sysinfo.h"
 
-ZBX_METRIC	parameters_specific[]=
-/* 	KEY			FLAG	FUNCTION 	ADD_PARAM	TEST_PARAM */
-	{
-
+ZBX_METRIC	parameters_specific[] =
+/* 	KEY			FLAG		FUNCTION 	ADD_PARAM	TEST_PARAM */
+{
 	{"kernel.maxfiles",	0,		KERNEL_MAXFILES,	0,	0},
 	{"kernel.maxproc",	0,		KERNEL_MAXPROC, 	0,	0},
 
@@ -58,4 +57,4 @@ ZBX_METRIC	parameters_specific[]=
 	{"system.uptime",	0,		SYSTEM_UPTIME,		0,	0},
 
 	{0}
-	};
+};

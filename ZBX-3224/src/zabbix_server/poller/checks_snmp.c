@@ -538,18 +538,18 @@ static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, char *snmp_oid, AGEN
 			{
 				/* Negative integer values are converted to double */
 				if (*vars->val.integer < 0)
-					SET_DBL_RESULT(value, (double)*vars->val.integer)
+					SET_DBL_RESULT(value, (double)*vars->val.integer);
 				else
-					SET_UI64_RESULT(value, (zbx_uint64_t)*vars->val.integer)
+					SET_UI64_RESULT(value, (zbx_uint64_t)*vars->val.integer);
 			}
 #ifdef OPAQUE_SPECIAL_TYPES
 			else if (vars->type == ASN_FLOAT)
 			{
-				SET_DBL_RESULT(value, *vars->val.floatVal)
+				SET_DBL_RESULT(value, *vars->val.floatVal);
 			}
 			else if (vars->type == ASN_DOUBLE)
 			{
-				SET_DBL_RESULT(value, *vars->val.doubleVal)
+				SET_DBL_RESULT(value, *vars->val.doubleVal);
 			}
 #endif
 			else if (vars->type == ASN_IPADDRESS)
@@ -558,7 +558,7 @@ static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, char *snmp_oid, AGEN
 						vars->val.string[0],
 						vars->val.string[1],
 						vars->val.string[2],
-						vars->val.string[3]))
+						vars->val.string[3]));
 			}
 			else
 			{

@@ -1,21 +1,21 @@
 /*
- * ** ZABBIX
- * ** Copyright (C) 2000-2005 SIA Zabbix
- * **
- * ** This program is free software; you can redistribute it and/or modify
- * ** it under the terms of the GNU General Public License as published by
- * ** the Free Software Foundation; either version 2 of the License, or
- * ** (at your option) any later version.
- * **
- * ** This program is distributed in the hope that it will be useful,
- * ** but WITHOUT ANY WARRANTY; without even the implied warranty of
- * ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * ** GNU General Public License for more details.
- * **
- * ** You should have received a copy of the GNU General Public License
- * ** along with this program; if not, write to the Free Software
- * ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- * **/
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+**/
 
 #include "common.h"
 
@@ -93,15 +93,6 @@ lbl_err:
 	CloseHandle(tok);
 
 	return res;
-}
-
-int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{ /* usage: <function name>[ <process name>, <user name>, <mode>, <command> ] */
-	#ifdef TODO
-	#	error Realize function KERNEL_MAXFILES!!!
-	#endif /* todo */
-
-	return SYSINFO_RET_FAIL;
 }
 
 int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -382,7 +373,7 @@ int	PROC_INFO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 	free(procList);
 
 	if (SYSINFO_RET_OK == ret)
-		SET_DBL_RESULT(result, value)
+		SET_DBL_RESULT(result, value);
 
 	return ret;
 }

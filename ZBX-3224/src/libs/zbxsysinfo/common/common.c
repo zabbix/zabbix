@@ -40,9 +40,9 @@ static int	AGENT_PING(const char *cmd, const char *param, unsigned flags, AGENT_
 static int	AGENT_VERSION(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 static int	ONLY_ACTIVE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 
-ZBX_METRIC	parameters_common[]=
-/*      KEY                     FLAG    FUNCTION        ADD_PARAM       TEST_PARAM */
-	{
+ZBX_METRIC	parameters_common[] =
+/*      KEY                     FLAG		FUNCTION        ADD_PARAM       TEST_PARAM */
+{
 	{"agent.ping",		0,		AGENT_PING, 		0,	0},
 	{"agent.version",	0,		AGENT_VERSION,		0,	0},
 
@@ -61,27 +61,24 @@ ZBX_METRIC	parameters_common[]=
 	{"vfs.file.cksum",	CF_USEUPARAM,	VFS_FILE_CKSUM,		0,	VFS_TEST_FILE},
 	{"vfs.file.md5sum",	CF_USEUPARAM,	VFS_FILE_MD5SUM,	0,	VFS_TEST_FILE},
 
-	{"net.tcp.dns",		CF_USEUPARAM,	CHECK_DNS,		0,	",localhost"},
-	{"net.tcp.dns.query",	CF_USEUPARAM,	CHECK_DNS_QUERY,	0,	",localhost"},
+	{"net.tcp.dns",		CF_USEUPARAM,	NET_TCP_DNS,		0,	",localhost"},
+	{"net.tcp.dns.query",	CF_USEUPARAM,	NET_TCP_DNS_QUERY,	0,	",localhost"},
 	{"net.tcp.port",	CF_USEUPARAM,	NET_TCP_PORT,		0,	",80"},
 
 	{"system.hostname",	0,		SYSTEM_HOSTNAME,	0,	0},
 	{"system.uname",	0,		SYSTEM_UNAME,		0,	0},
 
-	{"system.users.num",	0,		SYSTEM_UNUM, 		0,	0},
+	{"system.users.num",	0,		SYSTEM_USERS_NUM,	0,	0},
+
 	{"log",			CF_USEUPARAM,	ONLY_ACTIVE, 		0,	"logfile"},
 	{"logrt",		CF_USEUPARAM,	ONLY_ACTIVE,		0,	"logfile"},
 	{"eventlog",		CF_USEUPARAM,	ONLY_ACTIVE, 		0,	"system"},
 
 	{0}
-	};
+};
 
 static int	ONLY_ACTIVE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	assert(result);
-
-	init_result(result);
-
 	SET_MSG_RESULT(result, strdup("Accessible only as active check!"));
 
 	return SYSINFO_RET_FAIL;
@@ -95,10 +92,6 @@ int	getPROC(char *file, int lineno, int fieldno, unsigned flags, AGENT_RESULT *r
 	char	c[MAX_STRING_LEN];
 	int	i;
 	double	value = 0;
-
-	assert(result);
-
-	init_result(result);
 
 	if(NULL == (f = fopen(file,"r")))
 	{
@@ -133,10 +126,6 @@ int	getPROC(char *file, int lineno, int fieldno, unsigned flags, AGENT_RESULT *r
 
 static int	AGENT_PING(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	assert(result);
-
-	init_result(result);
-
 	SET_UI64_RESULT(result, 1);
 
 	return SYSINFO_RET_OK;
@@ -144,13 +133,7 @@ static int	AGENT_PING(const char *cmd, const char *param, unsigned flags, AGENT_
 
 static int	AGENT_VERSION(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	static char	version[] = ZABBIX_VERSION;
-
-	assert(result);
-
-	init_result(result);
-
-	SET_STR_RESULT(result, strdup(version));
+	SET_STR_RESULT(result, strdup(ZABBIX_VERSION));
 
 	return SYSINFO_RET_OK;
 }
@@ -369,10 +352,6 @@ int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 #else /* not _WINDOWS */
 	pid_t	pid;
 #endif
-
-	assert(result);
-
-	init_result(result);
 
 	if (CONFIG_ENABLE_REMOTE_COMMANDS != 1)
 	{

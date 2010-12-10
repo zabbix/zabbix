@@ -18,10 +18,7 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
-
-#include "md5.h"
 
 static int	get_sensor(const char *name, unsigned flags, AGENT_RESULT *result)
 {
@@ -31,12 +28,7 @@ static int	get_sensor(const char *name, unsigned flags, AGENT_RESULT *result)
 	char	filename[MAX_STRING_LEN];
 	char	line[MAX_STRING_LEN];
 	double	d1,d2,d3;
-
 	FILE	*f;
-
-	assert(result);
-
-	init_result(result);
 
 	dir=opendir("/proc/sys/dev/sensors");
 	if(NULL == dir)
@@ -85,36 +77,16 @@ int     OLD_SENSOR(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	char	key[MAX_STRING_LEN];
 	int	ret;
 
-	assert(result);
-
-	init_result(result);
-
-	if(num_param(param) > 1)
-	{
+	if (num_param(param) > 1)
 		return SYSINFO_RET_FAIL;
-	}
 
-	if(get_param(param, 1, key, MAX_STRING_LEN) != 0)
-	{
+	if (0 != get_param(param, 1, key, MAX_STRING_LEN))
 		return SYSINFO_RET_FAIL;
-	}
 
-	if(strcmp(key,"temp1") == 0)
-	{
-	ret = get_sensor("temp1", flags, result);
-	}
-	else if(strcmp(key,"temp2") == 0)
-	{
-	ret = get_sensor("temp2", flags, result);
-	}
-	else if(strcmp(key,"temp3") == 0)
-	{
-	ret = get_sensor("temp3", flags, result);
-	}
+	if (SUCCEED == str_in_list("temp1,temp2,temp3", key, ','))
+		ret = get_sensor(key, flags, result);
 	else
-	{
-	ret = SYSINFO_RET_FAIL;
-	}
+		ret = SYSINFO_RET_FAIL;
 
 	return ret;
 }

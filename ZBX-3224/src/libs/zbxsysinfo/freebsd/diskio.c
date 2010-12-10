@@ -110,10 +110,6 @@ int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	char	devname[32], tmp[16];
 	int	type, mode, nparam;
 
-	assert(result);
-
-	init_result(result);
-
 	nparam = num_param(param);
 	if (nparam > 3)
 		return SYSINFO_RET_FAIL;
@@ -149,9 +145,9 @@ int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 			return SYSINFO_RET_FAIL;
 
 		if (type == ZBX_DSTAT_TYPE_BYTE)
-			SET_UI64_RESULT(result, dstats[ZBX_DSTAT_W_BYTE])
+			SET_UI64_RESULT(result, dstats[ZBX_DSTAT_W_BYTE]);
 		else	/* ZBX_DSTAT_TYPE_OPER */
-			SET_UI64_RESULT(result, dstats[ZBX_DSTAT_W_OPER])
+			SET_UI64_RESULT(result, dstats[ZBX_DSTAT_W_OPER]);
 
 		return SYSINFO_RET_OK;
 	}
@@ -178,9 +174,9 @@ int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 		return SYSINFO_RET_FAIL;
 
 	if (type == ZBX_DSTAT_TYPE_BPS)	/* default parameter */
-		SET_DBL_RESULT(result, device->w_bps[mode])
+		SET_DBL_RESULT(result, device->w_bps[mode]);
 	else if (type == ZBX_DSTAT_TYPE_OPS)
-		SET_DBL_RESULT(result, device->w_ops[mode])
+		SET_DBL_RESULT(result, device->w_ops[mode]);
 
 	return SYSINFO_RET_OK;
 }
@@ -191,10 +187,6 @@ int	VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	char	devname[32], tmp[16];
 	int	type, mode, nparam;
 
-	assert(result);
-
-	init_result(result);
-
 	nparam = num_param(param);
 	if (nparam > 3)
 		return SYSINFO_RET_FAIL;
@@ -230,9 +222,9 @@ int	VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 			return SYSINFO_RET_FAIL;
 
 		if (type == ZBX_DSTAT_TYPE_BYTE)
-			SET_UI64_RESULT(result, dstats[ZBX_DSTAT_R_BYTE])
+			SET_UI64_RESULT(result, dstats[ZBX_DSTAT_R_BYTE]);
 		else	/* ZBX_DSTAT_TYPE_OPER */
-			SET_UI64_RESULT(result, dstats[ZBX_DSTAT_R_OPER])
+			SET_UI64_RESULT(result, dstats[ZBX_DSTAT_R_OPER]);
 
 		return SYSINFO_RET_OK;
 	}
@@ -259,9 +251,9 @@ int	VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 		return SYSINFO_RET_FAIL;
 
 	if (type == ZBX_DSTAT_TYPE_BPS)	/* default parameter */
-		SET_DBL_RESULT(result, device->r_bps[mode])
+		SET_DBL_RESULT(result, device->r_bps[mode]);
 	else if (type == ZBX_DSTAT_TYPE_OPS)
-		SET_DBL_RESULT(result, device->r_ops[mode])
+		SET_DBL_RESULT(result, device->r_ops[mode]);
 
 	return SYSINFO_RET_OK;
 }

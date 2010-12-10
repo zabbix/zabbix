@@ -44,37 +44,37 @@ AGENT_RESULT;
 /* SET RESULT */
 
 #define SET_UI64_RESULT(res, val)		\
-{						\
-	(res)->type |= AR_UINT64;		\
-	(res)->ui64 = (zbx_uint64_t)(val);	\
-}
+(						\
+	(res)->type |= AR_UINT64,		\
+	(res)->ui64 = (zbx_uint64_t)(val)	\
+)
 
 #define SET_DBL_RESULT(res, val)		\
-{						\
-	(res)->type |= AR_DOUBLE;		\
-	(res)->dbl = (double)(val);		\
-}
+(						\
+	(res)->type |= AR_DOUBLE,		\
+	(res)->dbl = (double)(val)		\
+)
 
 /* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
 #define SET_STR_RESULT(res, val)		\
-{						\
-	(res)->type |= AR_STRING;		\
-	(res)->str = (char *)(val);		\
-}
+(						\
+	(res)->type |= AR_STRING,		\
+	(res)->str = (char *)(val)		\
+)
 
 /* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
 #define SET_TEXT_RESULT(res, val)		\
-{						\
-	(res)->type |= AR_TEXT;			\
-	(res)->text = (char *)(val);		\
-}
+(						\
+	(res)->type |= AR_TEXT,			\
+	(res)->text = (char *)(val)		\
+)
 
 /* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
 #define SET_MSG_RESULT(res, val)		\
-{						\
-	(res)->type |= AR_MESSAGE;		\
-	(res)->msg = (char *)(val);		\
-}
+(						\
+	(res)->type |= AR_MESSAGE,		\
+	(res)->msg = (char *)(val)		\
+)
 
 /* CHECK RESULT */
 
@@ -87,52 +87,52 @@ AGENT_RESULT;
 /* UNSET RESULT */
 
 #define UNSET_UI64_RESULT(res)			\
-{						\
-	(res)->type &= ~AR_UINT64;		\
-	(res)->ui64 = (zbx_uint64_t)0;		\
-}
+(						\
+	(res)->type &= ~AR_UINT64,		\
+	(res)->ui64 = (zbx_uint64_t)0		\
+)
 
 #define UNSET_DBL_RESULT(res)			\
-{						\
-	(res)->type &= ~AR_DOUBLE;		\
-	(res)->dbl = (double)0;			\
-}
+(						\
+	(res)->type &= ~AR_DOUBLE,		\
+	(res)->dbl = (double)0			\
+)
 
 #define UNSET_STR_RESULT(res)			\
-{						\
+({						\
 	if ((res)->type & AR_STRING)		\
 	{					\
 		zbx_free((res)->str);		\
 		(res)->type &= ~AR_STRING;	\
 	}					\
-}
+})
 
 #define UNSET_TEXT_RESULT(res)			\
-{						\
+({						\
 	if ((res)->type & AR_TEXT)		\
 	{					\
 		zbx_free((res)->text);		\
 		(res)->type &= ~AR_TEXT;	\
 	}					\
-}
+})
 
 #define UNSET_MSG_RESULT(res)			\
-{						\
+({						\
 	if ((res)->type & AR_MESSAGE)		\
 	{					\
 		zbx_free((res)->msg);		\
 		(res)->type &= ~AR_MESSAGE;	\
 	}					\
-}
+})
 
 #define UNSET_RESULT_EXCLUDING(res, exc_type) 			\
-{								\
-	if (!(exc_type & AR_UINT64))	UNSET_UI64_RESULT(res)	\
-	if (!(exc_type & AR_DOUBLE))	UNSET_DBL_RESULT(res)	\
-	if (!(exc_type & AR_STRING))	UNSET_STR_RESULT(res)	\
-	if (!(exc_type & AR_TEXT))	UNSET_TEXT_RESULT(res)	\
-	if (!(exc_type & AR_MESSAGE))	UNSET_MSG_RESULT(res)	\
-}
+({								\
+	if (!(exc_type & AR_UINT64))	UNSET_UI64_RESULT(res);	\
+	if (!(exc_type & AR_DOUBLE))	UNSET_DBL_RESULT(res);	\
+	if (!(exc_type & AR_STRING))	UNSET_STR_RESULT(res);	\
+	if (!(exc_type & AR_TEXT))	UNSET_TEXT_RESULT(res);	\
+	if (!(exc_type & AR_MESSAGE))	UNSET_MSG_RESULT(res);	\
+})
 
 /* RETRIEVE RESULT VALUE */
 
@@ -227,10 +227,14 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	NET_UDP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	SYSTEM_SWAP_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	SYSTEM_SWAP_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
@@ -242,12 +246,6 @@ int	VFS_FILE_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 int	VFS_FS_INODE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-
-int	NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 
 #if defined(_WINDOWS)
 int	USER_PERFCOUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
@@ -261,5 +259,20 @@ int	NET_IF_LIST(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 #ifdef _AIX
 int	SYSTEM_STAT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 #endif	/* _AIX */
+
+typedef struct
+{
+	const char	*mode;
+	int		(*function)();
+}
+MODE_FUNCTION;
+
+typedef struct
+{
+	const char	*type;
+	const char	*mode;
+	int		(*function)();
+}
+TYPE_MODE_FUNCTION;
 
 #endif

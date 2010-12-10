@@ -18,33 +18,14 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
-
 
 void	refresh_diskdevices()
 {
+	/* nothing to do */
 }
 
 int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 {
 	return FAIL;
-}
-
-int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-#ifdef TODO
-#error Realize function VFS_DEV_WRITE!!!
-#endif /* todo */
-
-	return SYSINFO_RET_FAIL;
-}
-
-int	VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-#ifdef TODO
-#error Realize function VFS_DEV_READ!!!
-#endif /* todo */
-
-	return SYSINFO_RET_FAIL;
 }

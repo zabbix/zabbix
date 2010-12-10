@@ -18,11 +18,11 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
 
 void	refresh_diskdevices()
 {
+	/* nothing to do */
 }
 
 int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
@@ -83,17 +83,17 @@ int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 
 	if( 0 == strcmp(type,"ops"))
 	{
-		if( 0 == strcmp(mode,"avg1"))		SET_DBL_RESULT(result, collector->diskdevices.XXX1)
-		else if( 0 == strcmp(mode,"avg5"))	SET_DBL_RESULT(result, collector->diskdevices.XXX5)
-		else if( 0 == strcmp(mode,"avg15"))	SET_DBL_RESULT(result, collector->diskdevices.XXX15)
+		if( 0 == strcmp(mode,"avg1"))		SET_DBL_RESULT(result, collector->diskdevices.XXX1);
+		else if( 0 == strcmp(mode,"avg5"))	SET_DBL_RESULT(result, collector->diskdevices.XXX5);
+		else if( 0 == strcmp(mode,"avg15"))	SET_DBL_RESULT(result, collector->diskdevices.XXX15);
 		else return SYSINFO_RET_FAIL;
 
 	}
 	else if( 0 == strcmp(type,"bps"))
 	{
-		if( 0 == strcmp(mode,"avg1")) 		SET_DBL_RESULT(result, collector->diskdevices.XXX1)
-		else if( 0 == strcmp(mode,"avg5")) 	SET_DBL_RESULT(result, collector->diskdevices.XXX5)
-		else if( 0 == strcmp(mode,"avg15"))	SET_DBL_RESULT(result, collector->diskdevices.XXX15)
+		if( 0 == strcmp(mode,"avg1")) 		SET_DBL_RESULT(result, collector->diskdevices.XXX1);
+		else if( 0 == strcmp(mode,"avg5")) 	SET_DBL_RESULT(result, collector->diskdevices.XXX5);
+		else if( 0 == strcmp(mode,"avg15"))	SET_DBL_RESULT(result, collector->diskdevices.XXX15);
 		else return SYSINFO_RET_FAIL;
 
 	}
@@ -159,17 +159,17 @@ int	VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 
 	if( 0 == strcmp(type,"ops"))
 	{
-		if( 0 == strcmp(mode,"avg1"))		SET_DBL_RESULT(result, collector->diskdevices.XXX1)
-		else if( 0 == strcmp(mode,"avg5"))	SET_DBL_RESULT(result, collector->diskdevices.XXX5)
-		else if( 0 == strcmp(mode,"avg15"))	SET_DBL_RESULT(result, collector->diskdevices.XXX15)
+		if( 0 == strcmp(mode,"avg1"))		SET_DBL_RESULT(result, collector->diskdevices.XXX1);
+		else if( 0 == strcmp(mode,"avg5"))	SET_DBL_RESULT(result, collector->diskdevices.XXX5);
+		else if( 0 == strcmp(mode,"avg15"))	SET_DBL_RESULT(result, collector->diskdevices.XXX15);
 		else return SYSINFO_RET_FAIL;
 
 	}
 	else if( 0 == strcmp(type,"bps"))
 	{
-		if( 0 == strcmp(mode,"avg1")) 		SET_DBL_RESULT(result, collector->diskdevices.XXX1)
-		else if( 0 == strcmp(mode,"avg5")) 	SET_DBL_RESULT(result, collector->diskdevices.XXX5)
-		else if( 0 == strcmp(mode,"avg15"))	SET_DBL_RESULT(result, collector->diskdevices.XXX15)
+		if( 0 == strcmp(mode,"avg1")) 		SET_DBL_RESULT(result, collector->diskdevices.XXX1);
+		else if( 0 == strcmp(mode,"avg5")) 	SET_DBL_RESULT(result, collector->diskdevices.XXX5);
+		else if( 0 == strcmp(mode,"avg15"))	SET_DBL_RESULT(result, collector->diskdevices.XXX15);
 		else return SYSINFO_RET_FAIL;
 
 	}

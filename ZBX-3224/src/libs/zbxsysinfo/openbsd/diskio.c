@@ -18,11 +18,11 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
 
 void	refresh_diskdevices()
 {
+	/* nothing to do */
 }
 
 int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
@@ -30,7 +30,7 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 	return FAIL;
 }
 
-static int get_disk_stats(const char *devname, zbx_uint64_t *rbytes, zbx_uint64_t *wbytes, zbx_uint64_t *roper, zbx_uint64_t *woper)
+static int	get_disk_stats(const char *devname, zbx_uint64_t *rbytes, zbx_uint64_t *wbytes, zbx_uint64_t *roper, zbx_uint64_t *woper)
 {
 	int			ret = SYSINFO_RET_FAIL, mib[2], drive_count;
 	size_t			len;
@@ -62,9 +62,12 @@ static int get_disk_stats(const char *devname, zbx_uint64_t *rbytes, zbx_uint64_
 	if (woper)
 		*woper = 0;
 
-	if (0 == sysctl(mib, 2, stats, &len, NULL, 0)) {
-		for (i = 0; i < drive_count; i++) {
-			if (0 == strcmp(devname, "all") || 0 == strcmp(devname, stats[i].ds_name)) {
+	if (0 == sysctl(mib, 2, stats, &len, NULL, 0))
+	{
+		for (i = 0; i < drive_count; i++)
+		{
+			if (0 == strcmp(devname, "all") || 0 == strcmp(devname, stats[i].ds_name))
+			{
 				if (rbytes)
 					*rbytes += stats[i].ds_rbytes;
 				if (wbytes)
@@ -133,14 +136,7 @@ static int	VFS_DEV_WRITE_OPERATIONS(const char *devname, AGENT_RESULT *result)
 
 int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#define DEV_FNCLIST struct dev_fnclist_s
-DEV_FNCLIST
-{
-	char	*mode;
-	int	(*function)();
-};
-
-	DEV_FNCLIST fl[] =
+	MODE_FUNCTION fl[] =
 	{
 		{"bytes",	VFS_DEV_WRITE_BYTES},
 		{"operations",	VFS_DEV_WRITE_OPERATIONS},
@@ -150,10 +146,6 @@ DEV_FNCLIST
 	char	devname[MAX_STRING_LEN];
 	char	mode[MAX_STRING_LEN];
 	int	i;
-
-	assert(result);
-
-	init_result(result);
 
 	if (num_param(param) > 3)
 		return SYSINFO_RET_FAIL;
@@ -181,14 +173,7 @@ DEV_FNCLIST
 
 int	VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#define DEV_FNCLIST struct dev_fnclist_s
-DEV_FNCLIST
-{
-	char *mode;
-	int (*function)();
-};
-
-	DEV_FNCLIST fl[] =
+	MODE_FUNCTION fl[] =
 	{
 		{"bytes",	VFS_DEV_READ_BYTES},
 		{"operations",	VFS_DEV_READ_OPERATIONS},
@@ -198,10 +183,6 @@ DEV_FNCLIST
 	char	devname[MAX_STRING_LEN];
 	char	mode[MAX_STRING_LEN];
 	int	i;
-
-	assert(result);
-
-	init_result(result);
 
 	if (num_param(param) > 3)
 		return SYSINFO_RET_FAIL;
