@@ -415,14 +415,12 @@ DB_TRIGGER
 DB_ACTION
 {
 	zbx_uint64_t	actionid;
-	int		actiontype;
-	int		evaltype;
-	int		status;
-	int		eventsource;
-	int		esc_period;
 	char		*shortdata;
 	char		*longdata;
-	int		recovery_msg;
+	int		esc_period;
+	unsigned char	evaltype;
+	unsigned char	eventsource;
+	unsigned char	recovery_msg;
 };
 
 DB_OPERATION

@@ -874,7 +874,7 @@ void	op_group_add(DB_EVENT *event, DB_OPERATION *operation)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	op_group_del(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation)
+void	op_group_del(DB_EVENT *event, DB_OPERATION *operation)
 {
 	const char	*__function_name = "op_group_del";
 	zbx_uint64_t	hostid;
@@ -918,7 +918,7 @@ void	op_group_del(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	op_template_add(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation)
+void	op_template_add(DB_EVENT *event, DB_OPERATION *operation)
 {
 	const char	*__function_name = "op_template_add";
 	zbx_uint64_t	hostid;
@@ -957,7 +957,7 @@ void	op_template_add(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	op_template_del(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation)
+void	op_template_del(DB_EVENT *event, DB_OPERATION *operation)
 {
 	const char	*__function_name = "op_template_del";
 	zbx_uint64_t	hostid;
