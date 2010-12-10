@@ -146,21 +146,13 @@ int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 		return SYSINFO_RET_FAIL;
 
 	if ('\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
-	{
 		SET_UI64_RESULT(result, ibytes);
-	}
 	else if (0 == strcmp(mode, "packets"))
-	{
 		SET_UI64_RESULT(result, ipackets);
-	}
 	else if (0 == strcmp(mode, "errors"))
-	{
 		SET_UI64_RESULT(result, ierrors);
-	}
 	else if (0 == strcmp(mode, "dropped"))
-	{
 		SET_UI64_RESULT(result, idropped);
-	}
 	else
 		return SYSINFO_RET_FAIL;
 
@@ -185,17 +177,11 @@ int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 		return SYSINFO_RET_FAIL;
 
 	if ('\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
-	{
 		SET_UI64_RESULT(result, obytes);
-	}
 	else if (0 == strcmp(mode, "packets"))
-	{
 		SET_UI64_RESULT(result, opackets);
-	}
 	else if (0 == strcmp(mode, "errors"))
-	{
 		SET_UI64_RESULT(result, oerrors);
-	}
 	else
 		return SYSINFO_RET_FAIL;
 
@@ -220,17 +206,11 @@ int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 		return SYSINFO_RET_FAIL;
 
 	if ('\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
-	{
 		SET_UI64_RESULT(result, tbytes);
-	}
 	else if (0 == strcmp(mode, "packets"))
-	{
 		SET_UI64_RESULT(result, tpackets);
-	}
 	else if (0 == strcmp(mode, "errors"))
-	{
 		SET_UI64_RESULT(result, terrors);
-	}
 	else
 		return SYSINFO_RET_FAIL;
 
