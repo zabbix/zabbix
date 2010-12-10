@@ -193,7 +193,6 @@ ZBX_METRIC;
 #define ZBX_DSTAT_W_OPER	4
 #define ZBX_DSTAT_W_BYTE	5
 #define ZBX_DSTAT_MAX		6
-void	refresh_diskdevices();
 int	get_diskstat(const char *devname, zbx_uint64_t *dstat);
 
 /* flags for command */

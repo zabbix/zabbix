@@ -24,37 +24,6 @@
 
 static struct statinfo	*si = NULL;
 
-void	refresh_diskdevices()
-{
-	int		i;
-	struct devstat	*ds = NULL;
-
-	/* "all" devices */
-	if (NULL == collector_diskdevice_get(""))
-		collector_diskdevice_add("");
-
-	if (NULL == si)
-	{
-		si = (struct statinfo *)zbx_malloc(si, sizeof(struct statinfo));
-		si->dinfo = (struct devinfo *)zbx_malloc(NULL, sizeof(struct devinfo));
-		memset(si->dinfo, 0, sizeof(struct devinfo));
-	}
-
-#if DEVSTAT_USER_API_VER >= 5
-	if (-1 == devstat_getdevs(NULL, si))
-#else
-	if (-1 == getdevs(si))
-#endif
-		return;
-
-	for (i = 0; i < si->dinfo->numdevs; i++)
-	{
-		ds = &si->dinfo->devices[i];
-		if (NULL == collector_diskdevice_get(ds->device_name))
-			collector_diskdevice_add(ds->device_name);
-	}
-}
-
 int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 {
 	int		i;
@@ -107,8 +76,9 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	ZBX_SINGLE_DISKDEVICE_DATA *device;
-	char	devname[32], tmp[16];
-	int	type, mode, nparam;
+	char		devname[32], tmp[16];
+	int		type, mode, nparam;
+	zbx_uint64_t	dstats[ZBX_DSTAT_MAX];
 
 	nparam = num_param(param);
 	if (nparam > 3)
@@ -136,8 +106,6 @@ int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 
 	if (type == ZBX_DSTAT_TYPE_BYTE || type == ZBX_DSTAT_TYPE_OPER)
 	{
-		zbx_uint64_t	dstats[ZBX_DSTAT_MAX];
-
 		if (nparam > 2)
 			return SYSINFO_RET_FAIL;
 
@@ -171,7 +139,13 @@ int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 		return SYSINFO_RET_FAIL;
 
 	if (NULL == (device = collector_diskdevice_get(devname)))
-		return SYSINFO_RET_FAIL;
+	{
+		if (FAIL == get_diskstat(devname, dstats))	/* validate device name */
+			return SYSINFO_RET_FAIL;
+
+		if (NULL == (device = collector_diskdevice_add(devname)))
+			return SYSINFO_RET_FAIL;
+	}
 
 	if (type == ZBX_DSTAT_TYPE_BPS)	/* default parameter */
 		SET_DBL_RESULT(result, device->w_bps[mode]);
@@ -184,8 +158,9 @@ int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 int	VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	ZBX_SINGLE_DISKDEVICE_DATA *device;
-	char	devname[32], tmp[16];
-	int	type, mode, nparam;
+	char		devname[32], tmp[16];
+	int		type, mode, nparam;
+	zbx_uint64_t	dstats[ZBX_DSTAT_MAX];
 
 	nparam = num_param(param);
 	if (nparam > 3)
@@ -213,8 +188,6 @@ int	VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 
 	if (type == ZBX_DSTAT_TYPE_BYTE || type == ZBX_DSTAT_TYPE_OPER)
 	{
-		zbx_uint64_t	dstats[ZBX_DSTAT_MAX];
-
 		if (nparam > 2)
 			return SYSINFO_RET_FAIL;
 
@@ -248,7 +221,13 @@ int	VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 		return SYSINFO_RET_FAIL;
 
 	if (NULL == (device = collector_diskdevice_get(devname)))
-		return SYSINFO_RET_FAIL;
+	{
+		if (FAIL == get_diskstat(devname, dstats))	/* validate device name */
+			return SYSINFO_RET_FAIL;
+
+		if (NULL == (device = collector_diskdevice_add(devname)))
+			return SYSINFO_RET_FAIL;
+	}
 
 	if (type == ZBX_DSTAT_TYPE_BPS)	/* default parameter */
 		SET_DBL_RESULT(result, device->r_bps[mode]);

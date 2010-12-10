@@ -166,7 +166,7 @@ int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 int     NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char		tmp[8], command[64];
-	zbx_uint64_t	port;
+	unsigned short	port;
 	int		res;
 
 	if (num_param(param) > 1)
@@ -175,20 +175,16 @@ int     NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT
 	if (0 != get_param(param, 1, tmp, sizeof(tmp)))
 		return SYSINFO_RET_FAIL;
 
-	if (FAIL == is_uint64(tmp, &port))
+	if (FAIL == is_ushort(tmp, &port))
 		return SYSINFO_RET_FAIL;
 
-	if (port < 1 || port > 65535)
-		return SYSINFO_RET_FAIL;
-
-	zbx_snprintf(command, sizeof(command), "netstat -an | grep '*." ZBX_FS_UI64 "\\>' | wc -l", port);
+	zbx_snprintf(command, sizeof(command), "netstat -an | grep '*.%hu\\>' | wc -l", port);
 
 	if (SYSINFO_RET_FAIL == (res = EXECUTE_INT(NULL, command, flags, result)))
 		return res;
 
-	if (NULL != GET_DBL_RESULT(result))
-		if (result->dbl > 1)
-			result->dbl = 1;
+	if (result->ui64 > 1)
+		result->ui64 = 1;
 
 	return res;
 }

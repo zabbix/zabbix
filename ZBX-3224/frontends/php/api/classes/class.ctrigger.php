@@ -1163,6 +1163,7 @@ COpt::memoryPick();
 			foreach($triggers as $tnum => $trigger){
 
 				$trigger_db_fields = $upd_triggers[$trigger['triggerid']];
+				$trigger_db_fields['expression'] = explode_exp($trigger_db_fields['expression'], false);
 				if(!check_db_fields($trigger_db_fields, $trigger)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for trigger');
 				}
@@ -1171,7 +1172,6 @@ COpt::memoryPick();
 				if($trigger_db_fields['priority'] == $trigger['priority']) $trigger['priority'] = null;
 				if($trigger_db_fields['comments'] == $trigger['comments']) $trigger['comments'] = null;
 				if($trigger_db_fields['url'] == $trigger['url']) $trigger['url'] = null;
-
 
 				$result = update_trigger(
 					$trigger['triggerid'],
@@ -1185,7 +1185,9 @@ COpt::memoryPick();
 					array(),
 					$trigger['templateid']
 				);
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Trigger ['.$trigger['description'].' ]: cannot update');
+
+				if(!$result)
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Trigger ['.$trigger['description'].' ]: cannot update');
 			}
 
 			self::EndTransaction(true, __METHOD__);

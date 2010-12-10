@@ -316,23 +316,36 @@ lbl_exit:
 	return ret;
 }
 
-int	EXECUTE_INT(const char *cmd, const char *command, unsigned flags, AGENT_RESULT *result)
+int	EXECUTE_DBL(const char *cmd, const char *command, unsigned flags, AGENT_RESULT *result)
 {
-	int	ret	= SYSINFO_RET_FAIL;
+	if (SYSINFO_RET_OK != EXECUTE_STR(cmd, command, flags, result))
+		return SYSINFO_RET_FAIL;
 
-	ret = EXECUTE_STR(cmd,command,flags,result);
-
-	if(SYSINFO_RET_OK == ret)
+	if (NULL == GET_DBL_RESULT(result))
 	{
-		if( NULL == GET_DBL_RESULT(result) )
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "Remote command [%s] result is not double", command);
-			ret = SYSINFO_RET_FAIL;
-		}
-		UNSET_RESULT_EXCLUDING(result, AR_DOUBLE);
+		zabbix_log(LOG_LEVEL_WARNING, "Remote command [%s] result is not double", command);
+		return SYSINFO_RET_FAIL;
 	}
 
-	return ret;
+	UNSET_RESULT_EXCLUDING(result, AR_DOUBLE);
+
+	return SYSINFO_RET_OK;
+}
+
+int	EXECUTE_INT(const char *cmd, const char *command, unsigned flags, AGENT_RESULT *result)
+{
+	if (SYSINFO_RET_OK != EXECUTE_STR(cmd, command, flags, result))
+		return SYSINFO_RET_FAIL;
+
+	if (NULL == GET_UI64_RESULT(result))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Remote command [%s] result is not unsigned integer", command);
+		return SYSINFO_RET_FAIL;
+	}
+
+	UNSET_RESULT_EXCLUDING(result, AR_UINT64);
+
+	return SYSINFO_RET_OK;
 }
 
 int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
