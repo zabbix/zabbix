@@ -1150,6 +1150,7 @@
 	'S_NUMERIC_FLOAT'=>					_('Numeric (float)'),
 	'S_CHARACTER'=>						_('Character'),
 	'S_WIZARD'=>						_('Wizard'),
+	'S_LOG'=>						_('Log'),
 	'S_TEXT'=>						_('Text'),
 	'S_AS_IS'=>						_('As is'),
 	'S_DELTA_SPEED_PER_SECOND'=>				_('Delta (speed per second)'),
@@ -2529,7 +2530,7 @@
 
 //	functions.js
 	'S_CREATE_LOG_TRIGGER'=>			_('Create trigger'),
-	'DO_YOU_REPLACE_CONDITIONAL_EXPRESSION_Q'=>	_('Do you replace the conditional expression?'),
+	'DO_YOU_REPLACE_CONDITIONAL_EXPRESSION_Q'=>	_('Do you wish to replace the conditional expression?'),
 	'S_ADD_SERVICE'=>				_('Add Service'),
 	'S_EDIT_SERVICE'=>				_('Edit Service'),
 	'S_DELETE_SERVICE'=>				_('Delete Service'),
