@@ -294,13 +294,19 @@
 			return false;
 		}
 
-		//cheking, if there is a host group used in a script
-		$used_in_scripts = getHostGroupsUsedInScripts($groupids);
-		if (count($used_in_scripts)>0){
-			error(sprintf(S_HOSTGROUP_CANNOT_BE_DELETED_USED_IN_SCRIPT, $used_in_scripts[0]['group'], $used_in_scripts[0]['script']));
-			return false;
+// check if hostgroup used in scripts
+		$error = false;
+		$sql = 'SELECT s.name AS script_name, g.name AS group_name '.
+				' FROM scripts s, groups g'.
+				' WHERE '.
+					' g.groupid = s.groupid '.
+					' AND '.DBcondition('s.groupid', $groupids);
+		$res = DBselect($sql);
+		while($group = DBfetch($res)){
+			$error = true;
+			error(sprintf(S_HOSTGROUP_CANNOT_BE_DELETED_USED_IN_SCRIPT, $group['group_name'], $group['script_name']));
 		}
-
+		if($error) return false;
 
 // delete screens items
 		$resources = array(
@@ -1760,33 +1766,4 @@ return $result;
 	return $dlt_groupids;
 	}
 
-
-	/**
-	 * Filter out those host groups that are not used in a scripts and return
-	 * group name and script name.
-	 *
-	 * @param array $groupids list of group ids
-	 * @return array ['group'=>'groupname', 'script'=>'scriptname'] these groups are used in scripts
-	 */
-	function getHostGroupsUsedInScripts($groupids){
-		zbx_value2array($groupids);
-
-		$sql = 'SELECT '.
-						' scripts.name AS script_name, '.
-						' groups.name AS group_name '.
-					' FROM '.
-						' scripts, '.
-						' groups '.
-					' WHERE '.
-						' groups.groupid = scripts.groupid '.
-						' AND '.DBcondition('scripts.groupid', $groupids);
-		$res = DBselect($sql);
-
-		$result = array();
-		while($group = DBfetch($res)){
-			$result[] = array('script'=>$group['script_name'], 'group'=>$group['group_name']);
-		}
-
-		return $result;
-	}
 ?>

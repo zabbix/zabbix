@@ -702,34 +702,19 @@ class CUserGroup extends CZBXAPI{
 			}
 
 			//we must check, if this user group is used in one of the scripts. If so, it cannot be deleted
-			$used_in_scripts = array();
-			$options = array(
-				'output' => API_OUTPUT_EXTEND,
-				'filter' => array('usrgrpid'=>$usrgrpids)
-			);
-			$scripts = CScript::get($options);
-			foreach($scripts as $script){
-				$used_in_scripts[$script['usrgrpid']] = $script['name'];
+			$error_array = array();
+			$sql = 'SELECT s.name AS script_name, ug.name AS group_name '.
+					' FROM scripts s, usrgrp ug'.
+					' WHERE '.
+						' ug.usrgrpid = s.usrgrpid '.
+						' AND '.DBcondition('s.usrgrpid', $usrgrpids);
+			$res = DBselect($sql);
+			while($group = DBfetch($res)){
+				$error_array[] = sprintf(S_GROUP_IS_USED_IN_SCRIPT, $group['group_name'], $group['script_name']);
 			}
+			if(!empty($error_array))
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error_array);
 
-			//at least one of the groups is used in script
-			if(count($used_in_scripts) > 0){
-
-				//getting group info, to generate better error message
-				$options = array(
-					'output' => API_OUTPUT_EXTEND,
-					'filter' => array('usrgrpid'=>array_keys($used_in_scripts))
-				);
-				$err_groups = self::get($options);
-
-				//generating comma-separated errors, for each situation
-				$error_array = array();
-				foreach($err_groups as $err_group)
-				{
-					$error_array[] = sprintf(S_GROUP_IS_USED_IN_SCRIPT, $err_group['name'], $used_in_scripts[$err_group['usrgrpid']]);
-				}
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_YOU_CANNOT_DELETE_GROUP_USED_IN_SCRIPT.SPACE.implode(', ', $error_array).".");
-			}
 
 			DB::delete('rights', array(DBcondition('groupid', $usrgrpids)));
 			DB::delete('operations', array('object='.OPERATION_OBJECT_GROUP, DBcondition('objectid',$usrgrpids)));
