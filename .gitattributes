@@ -401,8 +401,7 @@ frontends/php/tests/all.php -text
 frontends/php/tests/api/ApiTests.php -text
 frontends/php/tests/api/otherTest2.php -text
 frontends/php/tests/general/GeneralTests.php -text
-frontends/php/tests/general/itemKeyValidation.php -text
-frontends/php/tests/general/otherTest.php -text
+frontends/php/tests/general/function_check_item_key.php -text
 frontends/php/tests/phpunit2hudson.php -text
 frontends/php/tr_logform.php -text
 frontends/php/tr_testexpr.php -text
