@@ -1015,7 +1015,7 @@ static int	DBget_trigger_value_by_triggerid(zbx_uint64_t triggerid, char **repla
 
 	result = DBselect(
 			"select i.description,i.key_,h.hostid,h.host,"
-				"ni.useip,ni.ip,ni.dns,ni.port"
+				"ni.useip,ni.ip,ni.dns,h.proxy_hostid"
 			" from functions f,hosts h,items i"
 				" left join interface ni"
 					" on ni.interfaceid=i.interfaceid"
@@ -1066,6 +1066,17 @@ static int	DBget_trigger_value_by_triggerid(zbx_uint64_t triggerid, char **repla
 					*replace_to = key;
 				}
 				ret = SUCCEED;
+				break;
+			case ZBX_REQUEST_PROXY_NAME:
+				ZBX_DBROW2UINT64(proxy_hostid, row[7]);
+
+				if (0 == proxy_hostid)
+				{
+					*replace_to = zbx_strdup(*replace_to, "");
+					ret = SUCCEED;
+				}
+				else
+					ret = DBget_host_name_by_hostid(proxy_hostid, replace_to);
 				break;
 		}
 	}
