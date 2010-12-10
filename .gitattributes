@@ -7,6 +7,7 @@ bin/win64/zabbix_agentd.exe -text
 bin/win64/zabbix_get.exe -text
 bin/win64/zabbix_sender.exe -text
 /bootstrap.sh -text
+/build.xml -text
 build/win32/project/Makefile_agent -text
 build/win32/project/Makefile_agent_x64 -text
 build/win32/project/Makefile_get -text
@@ -396,6 +397,12 @@ frontends/php/styles/popupmenu.css -text
 frontends/php/styles/table.css -text
 frontends/php/styles/ul.css -text
 frontends/php/templates.php -text
+frontends/php/tests/all.php -text
+frontends/php/tests/api/ApiTests.php -text
+frontends/php/tests/api/otherTest2.php -text
+frontends/php/tests/general/GeneralTests.php -text
+frontends/php/tests/general/function_check_item_key.php -text
+frontends/php/tests/phpunit2hudson.php -text
 frontends/php/tr_logform.php -text
 frontends/php/tr_testexpr.php -text
 frontends/php/trigger_prototypes.php -text
