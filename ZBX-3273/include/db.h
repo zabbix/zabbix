@@ -418,7 +418,6 @@ DB_ACTION
 	char		*shortdata;
 	char		*longdata;
 	int		esc_period;
-	unsigned char	evaltype;
 	unsigned char	eventsource;
 	unsigned char	recovery_msg;
 };

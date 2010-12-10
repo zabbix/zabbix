@@ -1096,28 +1096,24 @@ static void	execute_operations(DB_EVENT *event, zbx_uint64_t actionid)
 
 	DB_RESULT	result;
 	DB_ROW		row;
-	DB_OPERATION	operation;
+	unsigned char	operationtype;
+	zbx_uint64_t	objectid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64,
 			__function_name, actionid);
 
 	result = DBselect(
-			"select operationid,operationtype,object,objectid"
+			"select operationtype,objectid"
 			" from operations"
 			" where actionid=" ZBX_FS_UI64,
 			actionid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		memset(&operation, 0, sizeof(operation));
+		operationtype = (unsigned char)atoi(row[1]);
+		ZBX_STR2UINT64(objectid, row[3]);
 
-		ZBX_STR2UINT64(operation.operationid, row[0]);
-		operation.actionid = actionid;
-		operation.operationtype = atoi(row[1]);
-		operation.object = atoi(row[2]);
-		ZBX_STR2UINT64(operation.objectid, row[3]);
-
-		switch (operation.operationtype)
+		switch (operationtype)
 		{
 			case OPERATION_TYPE_HOST_ADD:
 				op_host_add(event);
@@ -1132,16 +1128,16 @@ static void	execute_operations(DB_EVENT *event, zbx_uint64_t actionid)
 				op_host_disable(event);
 				break;
 			case OPERATION_TYPE_GROUP_ADD:
-				op_group_add(event, &operation);
+				op_group_add(event, objectid);
 				break;
 			case OPERATION_TYPE_GROUP_REMOVE:
-				op_group_del(event, &operation);
+				op_group_del(event, objectid);
 				break;
 			case OPERATION_TYPE_TEMPLATE_ADD:
-				op_template_add(event, &operation);
+				op_template_add(event, objectid);
 				break;
 			case OPERATION_TYPE_TEMPLATE_REMOVE:
-				op_template_del(event, &operation);
+				op_template_del(event, objectid);
 				break;
 			default:
 				break;
