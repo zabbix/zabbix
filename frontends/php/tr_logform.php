@@ -31,12 +31,6 @@ $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 define('ZBX_PAGE_NO_MENU', 1);
 
-$strltype = array();
-$strltype[] = 'log[%';
-$strltype[] = 'logrt[%';
-$strltype[] = 'eventlog[%';
-$strltype[] = 'snmptraps';
-
 include_once('include/page_header.php');
 ?>
 <?php
@@ -64,7 +58,6 @@ include_once('include/page_header.php');
 		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	 NULL,		NULL,	NULL),
 		'save_trigger'=>	array(T_ZBX_STR, O_OPT,	 P_SYS|P_ACT,	NULL,	null),
 		'keys'=> 			array(T_ZBX_STR, O_OPT,  NULL,		NULL,	NULL),
-		'ltype'=> 			array(T_ZBX_INT, O_OPT,  NULL,		IN('0,1,2'),NULL)
 	);
 
 	check_fields($fields);
@@ -188,13 +181,6 @@ if(isset($_REQUEST['sform'])){
 	$frmTRLog->setTableClass('formlongtable formtable');
 	$frmTRLog->addVar('form_refresh',get_request('form_refresh',1));
 
-	$ltype = 0;
-	$matchkey = $strltype[$ltype];
-	if(isset($_REQUEST['ltype'])) {
-		$frmTRLog->addVar('ltype',$_REQUEST['ltype']);
-		$matchkey = $strltype[$_REQUEST['ltype']];
-		$ltype=$_REQUEST['ltype'];
-	}
 	if(isset($_REQUEST['triggerid'])) $frmTRLog->addVar('triggerid',$_REQUEST['triggerid']);
 
 	if(isset($_REQUEST['triggerid']) && !isset($_REQUEST['form_refresh'])){
@@ -206,8 +192,7 @@ if(isset($_REQUEST['sform'])){
 					' WHERE t.triggerid='.$_REQUEST['triggerid'].
 						' AND i.itemid=f.itemid '.
 						' AND f.triggerid = t.triggerid '.
-						' AND i.value_type IN ('.ITEM_VALUE_TYPE_LOG.' , '.ITEM_VALUE_TYPE_TEXT.', '.ITEM_VALUE_TYPE_STR.')'.
-						' AND i.key_ LIKE \''.$matchkey.'\'';
+						' AND i.value_type IN ('.ITEM_VALUE_TYPE_LOG.' , '.ITEM_VALUE_TYPE_TEXT.', '.ITEM_VALUE_TYPE_STR.')';
 
 		$res = DBselect($sql);
 		while($rows = DBfetch($res)){

@@ -58,6 +58,8 @@ static void	free_expression(expression_t *exp)
 
 	zbx_free(exp->exp);
 	zbx_free(exp->functions);
+	exp->functions_alloc = 0;
+	exp->functions_num = 0;
 }
 
 /*
@@ -144,10 +146,7 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp,
 
 	if (FAIL == (ret = substitute_simple_macros(NULL, NULL, &dc_item->host, NULL,
 				&exp->exp, MACRO_TYPE_ITEM_EXPRESSION, error, max_error_len)))
-	{
-		free_expression(exp);
 		ret = NOTSUPPORTED;
-	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
