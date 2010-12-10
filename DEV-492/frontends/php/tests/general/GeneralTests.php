@@ -1,6 +1,6 @@
 <?php
-require_once 'itemKeyValidation.php';
-require_once 'otherTest.php';
+require_once 'function_check_item_key.php';
+//require_once 'otherTest.php';
  
 class GeneralTests
 {
@@ -8,9 +8,9 @@ class GeneralTests
 	{
 		$suite = new PHPUnit_Framework_TestSuite('general');
  
-		$suite->addTestSuite('itemKeyValidation');
-		$suite->addTestSuite('otherTest');
-		// ...
+		$suite->addTestSuite('function_check_item_key');
+//		$suite->addTestSuite('otherTest');
+//		...
  
 		return $suite;
 	}

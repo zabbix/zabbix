@@ -6,7 +6,7 @@ require_once('../include/items.inc.php');
 require_once('../include/defines.inc.php');
 require_once('../include/locales.inc.php');
  
-class itemKeyValidation extends PHPUnit_Framework_TestCase
+class function_check_item_key extends PHPUnit_Framework_TestCase
 {
 	public static function provider()
 	{
@@ -59,7 +59,7 @@ class itemKeyValidation extends PHPUnit_Framework_TestCase
 	/**
 	* @dataProvider provider
 	*/
-	public function testItemKeyValidation($a, $b)
+	public function test_check_item_key($a, $b)
 	{
 		$result=check_item_key($a);
 		if($result[0]) {
