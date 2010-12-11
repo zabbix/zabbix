@@ -14,5 +14,4 @@ libspecsysinfo_a_SOURCES = \
 	memory.c \
 	net.c \
 	proc.c \
-	swap.c \
 	uptime.c
