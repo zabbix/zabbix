@@ -18,7 +18,6 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
 
 #include "symbols.h"
@@ -95,8 +94,8 @@ lbl_err:
 	return res;
 }
 
-int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{ /* usage: <function name>[ <process name>, <user name>] */
+int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
 	HANDLE	hProcess;
 	DWORD	procList[MAX_PROCESSES], dwSize;
 	int	i, proccount, max_proc_cnt,

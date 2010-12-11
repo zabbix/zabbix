@@ -99,40 +99,52 @@ AGENT_RESULT;
 )
 
 #define UNSET_STR_RESULT(res)			\
-({						\
+						\
+do						\
+{						\
 	if ((res)->type & AR_STRING)		\
 	{					\
 		zbx_free((res)->str);		\
 		(res)->type &= ~AR_STRING;	\
 	}					\
-})
+}						\
+while (0)
 
 #define UNSET_TEXT_RESULT(res)			\
-({						\
+						\
+do						\
+{						\
 	if ((res)->type & AR_TEXT)		\
 	{					\
 		zbx_free((res)->text);		\
 		(res)->type &= ~AR_TEXT;	\
 	}					\
-})
+}						\
+while (0)
 
 #define UNSET_MSG_RESULT(res)			\
-({						\
+						\
+do						\
+{						\
 	if ((res)->type & AR_MESSAGE)		\
 	{					\
 		zbx_free((res)->msg);		\
 		(res)->type &= ~AR_MESSAGE;	\
 	}					\
-})
+}						\
+while (0)
 
 #define UNSET_RESULT_EXCLUDING(res, exc_type) 			\
-({								\
+								\
+do								\
+{								\
 	if (!(exc_type & AR_UINT64))	UNSET_UI64_RESULT(res);	\
 	if (!(exc_type & AR_DOUBLE))	UNSET_DBL_RESULT(res);	\
 	if (!(exc_type & AR_STRING))	UNSET_STR_RESULT(res);	\
 	if (!(exc_type & AR_TEXT))	UNSET_TEXT_RESULT(res);	\
 	if (!(exc_type & AR_MESSAGE))	UNSET_MSG_RESULT(res);	\
-})
+}								\
+while (0)
 
 /* RETRIEVE RESULT VALUE */
 
