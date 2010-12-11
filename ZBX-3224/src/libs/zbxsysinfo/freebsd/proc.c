@@ -92,7 +92,7 @@ retry:
  *	Tested: FreeBSD 6.2_i386, 7.0_i386;
  */
 
-int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int     PROC_MEM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char	procname[MAX_STRING_LEN],
 		buffer[MAX_STRING_LEN],

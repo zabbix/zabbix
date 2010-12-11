@@ -70,7 +70,7 @@ static char	*proc_argv(pid_t pid)
 	return argv;
 }
 
-int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int     PROC_MEM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char	procname[MAX_STRING_LEN],
 		buffer[MAX_STRING_LEN],

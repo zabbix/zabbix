@@ -103,7 +103,7 @@ static void	collect_args(char **argv, int argc, char **args, size_t *args_alloc)
 	(*args)[args_offset] = '\0';
 }
 
-int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int     PROC_MEM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char	procname[MAX_STRING_LEN],
 		buffer[MAX_STRING_LEN],

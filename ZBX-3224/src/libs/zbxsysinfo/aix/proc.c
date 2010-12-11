@@ -63,7 +63,7 @@ static int	check_procstate(struct procsinfo *procsinfo, int zbx_proc_stat)
 }
 #endif /* HAVE_SYS_PROCFS_H */
 
-int	PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	PROC_MEM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char			tmp[MAX_STRING_LEN],
 				procname[MAX_STRING_LEN],

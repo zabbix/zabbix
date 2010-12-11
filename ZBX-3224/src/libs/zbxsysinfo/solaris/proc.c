@@ -43,7 +43,7 @@ static int	check_procstate(psinfo_t *psinfo, int zbx_proc_stat)
 	return FAIL;
 }
 
-int	PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	PROC_MEM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char		tmp[MAX_STRING_LEN],
 			procname[MAX_STRING_LEN],

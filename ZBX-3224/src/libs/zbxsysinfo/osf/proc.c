@@ -25,7 +25,7 @@
 #define DO_MIN 2
 #define DO_AVG 3
 
-int	PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	PROC_MEM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	DIR	*dir;
 	int	proc;
