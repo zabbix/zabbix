@@ -2007,7 +2007,7 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, int now)
 				proxy_hostid, host_esc,
 				DBnode_local("hostid"));
 
-		if (NULL != (row = DBfetch(result)))
+		if (NULL != DBfetch(result))
 			res = FAIL;
 		DBfree_result(result);
 	}
