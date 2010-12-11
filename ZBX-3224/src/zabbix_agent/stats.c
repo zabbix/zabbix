@@ -62,7 +62,7 @@ ZBX_COLLECTOR_DATA	*collector = NULL;
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_get_cpu_num(void)
+static int	zbx_get_cpu_num()
 {
 #if defined(_WINDOWS)
 	SYSTEM_INFO	sysInfo;
@@ -254,7 +254,8 @@ void	free_collector_data()
 	key_t	shm_key;
 	int	shm_id;
 
-	if(NULL == collector) return;
+	if (NULL == collector)
+		return;
 
 	ZBX_GET_SHM_KEY(shm_key);
 
