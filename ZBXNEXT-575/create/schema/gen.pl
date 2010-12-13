@@ -456,7 +456,7 @@ sub process_index
 		if (1 == $unique) { $unique = " UNIQUE"; }
 		else { $unique = ""; }
 
-		print "CREATE${unique} INDEX ${table_name}_$name\ on $table_name ($fields);${eol}\n";
+		print "CREATE${unique} INDEX ${table_name}_$name\ ON $table_name ($fields);${eol}\n";
 	}
 }
 
