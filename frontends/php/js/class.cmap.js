@@ -89,7 +89,7 @@ mlink: {
 	linktriggers:	null,			// ALWAYS must be a STRING (js doesn't support uint64)
 	tr_desc:		locale['S_SELECT'],		// default trigger caption
 	drawtype:		0,
-	color:			'0000CC',
+	color:			'00CC00',
 	status:			1				// status of link 1 - active, 2 - passive
 },
 
