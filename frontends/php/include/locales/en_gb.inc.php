@@ -86,6 +86,7 @@
 	'S_DELETE_SELECTED'=>			_('Delete selected'),
 	'S_COPY_SELECTED_TO'=>			_('Copy selected to ...'),
 
+	'S_SCHEMA' => 'Schema',
 //	dicoveryconf.php
 	'S_CREATED_SMALL' => _('created'),
 	'S_HOST_IP'=>				_('Host IP'),

@@ -5,7 +5,7 @@ require_once('../include/func.inc.php');
 require_once('../include/items.inc.php');
 require_once('../include/defines.inc.php');
 require_once('../include/locales.inc.php');
- 
+
 class function_check_item_key extends PHPUnit_Framework_TestCase
 {
 	public static function provider()
@@ -71,4 +71,3 @@ class function_check_item_key extends PHPUnit_Framework_TestCase
 
 }
 ?>
-

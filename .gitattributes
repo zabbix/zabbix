@@ -45,7 +45,6 @@ frontends/php/audio/alarm_information.wav -text
 frontends/php/audio/alarm_ok.wav -text
 frontends/php/audio/alarm_warning.wav -text
 frontends/php/audio/no_sound.wav -text
-frontends/php/conf/zabbix.conf.php.example -text
 frontends/php/fonts/DejaVuSans.ttf -text
 frontends/php/images/flash/zbxclock.swf -text svneol=unset#unset
 frontends/php/images/general/arrowdown.gif -text
@@ -183,8 +182,6 @@ frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
 frontends/php/locale/POTFILES.in -text
-frontends/php/locale/README -text
-frontends/php/locale/add_new_language.sh -text
 frontends/php/locale/cs/LC_MESSAGES/frontend.po -text
 frontends/php/locale/de/LC_MESSAGES/frontend.po -text
 frontends/php/locale/es/LC_MESSAGES/frontend.po -text
@@ -193,14 +190,12 @@ frontends/php/locale/hu/LC_MESSAGES/frontend.po -text
 frontends/php/locale/it/LC_MESSAGES/frontend.po -text
 frontends/php/locale/ko/LC_MESSAGES/frontend.po -text
 frontends/php/locale/lv/LC_MESSAGES/frontend.po -text
-frontends/php/locale/make_mo.sh -text
 frontends/php/locale/nl/LC_MESSAGES/frontend.po -text
 frontends/php/locale/pl/LC_MESSAGES/frontend.po -text
 frontends/php/locale/pt_BR/LC_MESSAGES/frontend.po -text
 frontends/php/locale/ru/LC_MESSAGES/frontend.po -text
 frontends/php/locale/sv/LC_MESSAGES/frontend.po -text
 frontends/php/locale/uk/LC_MESSAGES/frontend.po -text
-frontends/php/locale/update_po.sh -text
 frontends/php/locale/zh_CN/LC_MESSAGES/frontend.po -text
 frontends/php/styles/darkblue/images/ui-bg_diagonals-small_50_5c5c5c_40x40.png -text
 frontends/php/styles/darkblue/images/ui-bg_flat_25_000000_40x100.png -text
