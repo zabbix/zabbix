@@ -21,10 +21,6 @@
 
 #include "sysinfo.h"
 
-void	refresh_diskdevices()
-{
-}
-
 int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 {
 	return FAIL;

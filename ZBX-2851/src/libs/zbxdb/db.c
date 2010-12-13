@@ -45,7 +45,7 @@ static int	txn_init = 0;
 /*
  * Connect to the database.
  */
-int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbsocket, int port)
+int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port)
 {
 	int	ret = ZBX_DB_OK;
 
@@ -94,6 +94,16 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
   	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_NOSCAN,
 								(SQLPOINTER)SQL_NOSCAN_ON, SQL_NTS)))
 		ret = ZBX_DB_DOWN;
+
+	/* set current schema */
+	if (NULL != dbschema && '\0' != *dbschema && ZBX_DB_OK == ret)
+	{
+		char	*dbschema_esc;
+
+		dbschema_esc = DBdyn_escape_string(dbschema);
+		DBexecute("set current schema='%s'", dbschema_esc);
+		zbx_free(dbschema_esc);
+	}
 
 	/* output error information */
 	if (ZBX_DB_OK != ret)
@@ -299,7 +309,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	return ret;
 }
 
-void	zbx_db_init(char *host, char *user, char *password, char *dbname, char *dbsocket, int port)
+void	zbx_db_init(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port)
 {
 #if defined(HAVE_SQLITE3)
 	int		ret;

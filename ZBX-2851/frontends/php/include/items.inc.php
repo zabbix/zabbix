@@ -1789,6 +1789,23 @@
 	 */
 	function check_item_key($key){
 		$key_strlen = zbx_strlen($key);
+
+		//empty string
+		if($key_strlen == 0){
+			return array(
+				false,   //is key valid?
+				S_KEY_CANNOT_BE_EMPTY //result description
+			);
+		}
+
+		//key is larger then 255 chars
+		if($key_strlen > 255){
+			return array(
+				false,   //is key valid?
+				sprintf(S_KEY_TOO_LARGE, 255) //result description
+			);
+		}
+
 		$characters = array();
 
 		//gathering characters into array, because we can't just work with them ar one if it's a unicode string
