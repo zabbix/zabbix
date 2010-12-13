@@ -128,6 +128,10 @@ switch($itemType) {
 		'new_application'=>	array(T_ZBX_STR, O_OPT, null,	null,	'isset({save})'),
 		'applications'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID, null),
 
+		'history'=>			array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),'isset({save})'),
+		'trends'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	'isset({save})&&isset({value_type})&&'.IN(
+												ITEM_VALUE_TYPE_FLOAT.','.
+												ITEM_VALUE_TYPE_UINT64, 'value_type')),
 		'del_history'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'add_delay_flex'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'del_delay_flex'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -252,6 +256,8 @@ switch($itemType) {
 			'value_type'	=> get_request('value_type'),
 			'trapper_hosts'	=> get_request('trapper_hosts'),
 			'port'		=> get_request('port'),
+			'history'		=> get_request('history'),
+			'trends'		=> get_request('trends'),
 			'units'			=> get_request('units'),
 			'multiplier'	=> get_request('multiplier', 0),
 			'delta'			=> get_request('delta'),
