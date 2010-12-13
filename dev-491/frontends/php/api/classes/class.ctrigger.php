@@ -24,6 +24,7 @@
  * @package API
  */
 
+/*
 interface IValidator{
 	public static function validate($value, $params, $context=array());
 }
@@ -138,6 +139,7 @@ class CRangeValidator extends CValidator implements IValidator{
 	}
 }
 
+*/
 
 
 class CTrigger extends CZBXAPI{
