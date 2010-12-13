@@ -122,6 +122,9 @@ if(!isset($DB)){
 							'db2_attr_case' => DB2_CASE_LOWER,
 						);
 						db2_set_option($DB['DB'], $options, 1);
+						if(isset($DB['SCHEMA']) && ($DB['SCHEMA'] != '')){
+							DBexecute("SET CURRENT SCHEMA='".$DB['SCHEMA']."'");
+						}
 					}
 
 					break;
@@ -190,6 +193,7 @@ if(!isset($DB)){
 		}
 		if(false == $result)
 			$DB['DB'] = null;
+
 		return $result;
 	}
 

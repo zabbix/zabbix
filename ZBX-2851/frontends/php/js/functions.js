@@ -291,7 +291,9 @@ function swapNodes(n1, n2){
 
 		p1.replaceChild(n2, n1); // new,old
 		if(b){
-			p2.insertBefore(n1, b);	//4to,pered 4em
+// n1 - the node which we insert
+// b - the node before which we insert 
+			p2.insertBefore(n1, b);
 		}
 		else {
 			p2.appendChild(n1);
