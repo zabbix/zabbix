@@ -407,7 +407,7 @@ if(!isset($DB)){
 		SELECT * FROM (SELECT ROWNUM as RN, * FROM tbl) WHERE RN BETWEEN 6 AND 15
 //*/
 
-	function DBselect($query, $limit='NO', $offset=0){
+	function &DBselect($query, $limit='NO', $offset=0){
 		global $DB;
 
 		$time_start=microtime(true);
