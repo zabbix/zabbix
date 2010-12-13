@@ -23,9 +23,6 @@
 ZBX_METRIC	parameters_specific[] =
 /* 	KEY			FLAG		FUNCTION 	ADD_PARAM	TEST_PARAM */
 {
-	{"kernel.maxfiles",	0,		KERNEL_MAXFILES,	0,	0},
-	{"kernel.maxproc",	0,		KERNEL_MAXPROC, 	0,	0},
-
 	{"vfs.fs.size",		CF_USEUPARAM,	VFS_FS_SIZE,		0,	"/,free"},
 	{"vfs.fs.inode",	CF_USEUPARAM,	VFS_FS_INODE,		0,	"/,free"},
 
@@ -44,8 +41,6 @@ ZBX_METRIC	parameters_specific[] =
 	{"system.cpu.util",	CF_USEUPARAM,	SYSTEM_CPU_UTIL,	0,	"all,user,avg1"},
 	{"system.cpu.load",	CF_USEUPARAM,	SYSTEM_CPU_LOAD,	0,	"all,avg1"},
 	{"system.cpu.num",	CF_USEUPARAM,	SYSTEM_CPU_NUM,		0,	"online"},
-
-	{"system.swap.size",	CF_USEUPARAM,	SYSTEM_SWAP_SIZE,	0,	"all,free"},
 
 	{"system.uptime",	0,		SYSTEM_UPTIME,		0,	0},
 
