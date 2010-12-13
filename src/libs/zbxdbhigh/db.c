@@ -1944,7 +1944,7 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 		event.value	= TRIGGER_VALUE_TRUE;
 
 		/* Processing event */
-		process_event(&event, 0);
+		process_event(&event, 1);
 	}
 
 	zbx_free(ip_esc);
