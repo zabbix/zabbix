@@ -1470,6 +1470,10 @@ function checkConfigData(&$error=null){
 		$error = 'DB user is not set.';
 		return false;
 	}
+	if(!isset($DB['PORT'])){
+		$error = 'DB port is not set.';
+		return false;
+	}
 	if(!isset($DB['PASSWORD'])){
 		$error = 'DB password is not set.';
 		return false;

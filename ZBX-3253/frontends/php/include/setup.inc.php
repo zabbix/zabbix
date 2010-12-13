@@ -396,7 +396,7 @@ JS;
 		}
 
 		function CheckConfigurationFile(){
-			global $ZBX_CONFIGURATION_FILE, $ZBX_SERVER, $ZBX_SERVER_PORT, $IMAGE_FORMAT_DEFAULT;
+			global $ZBX_CONFIGURATION_FILE, $ZBX_SERVER, $ZBX_SERVER_PORT;
 
 			$error = null;
 
@@ -424,6 +424,12 @@ JS;
 				}
 				else if(($this->getConfig('DB_TYPE') == 'IBM_DB2') && ($this->getConfig('DB_SCHEMA') != $DB['SCHEMA'])){
 					$error = 'Config file DB schema is not equal to wizard input.';
+				}
+				else if($this->getConfig('ZBX_SERVER') != $ZBX_SERVER){
+					$error = 'Config file Zabbix server is not equal to wizard input.';
+				}
+				else if($this->getConfig('ZBX_SERVER_PORT') != $ZBX_SERVER_PORT){
+					$error = 'Config file Zabbix server port is not equal to wizard input.';
 				}
 				else if(!$this->CheckConnection()){
 					$error = 'Cannot connect to database.';
