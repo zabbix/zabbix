@@ -295,8 +295,6 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 	if (0 != init_cpu_collector(&(collector->cpus)))
 		close_cpu_collector(&(collector->cpus));
 
-	collector_diskdevice_add("");
-
 	while (ZBX_IS_RUNNING())
 	{
 		if (CPU_COLLECTOR_STARTED(collector))

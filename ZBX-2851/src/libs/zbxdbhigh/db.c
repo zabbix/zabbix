@@ -61,7 +61,7 @@ void	DBclose()
  * Connect to the database.
  * If fails, program terminates.
  */
-void	DBconnect(int flag)
+void    DBconnect(int flag)
 {
 	int	err;
 
@@ -69,7 +69,7 @@ void	DBconnect(int flag)
 	do
 	{
 		err = zbx_db_connect(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD,
-					CONFIG_DBNAME, CONFIG_DBSCHEMA, CONFIG_DBSOCKET, CONFIG_DBPORT);
+					CONFIG_DBNAME, CONFIG_DBSOCKET, CONFIG_DBPORT);
 
 		switch(err) {
 		case ZBX_DB_OK:
@@ -112,7 +112,7 @@ void	DBconnect(int flag)
  ******************************************************************************/
 void	DBinit()
 {
-	zbx_db_init(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBNAME, CONFIG_DBSCHEMA, CONFIG_DBSOCKET, CONFIG_DBPORT);
+	zbx_db_init(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBNAME, CONFIG_DBSOCKET, CONFIG_DBPORT);
 }
 
 /******************************************************************************
@@ -134,8 +134,7 @@ int	DBping()
 {
 	int ret;
 
-	ret = (ZBX_DB_OK != zbx_db_connect(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD,
-				CONFIG_DBNAME, CONFIG_DBSCHEMA, CONFIG_DBSOCKET, CONFIG_DBPORT)) ? FAIL : SUCCEED;
+	ret = (ZBX_DB_OK != zbx_db_connect(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBNAME, CONFIG_DBSOCKET, CONFIG_DBPORT)) ? FAIL : SUCCEED;
 	DBclose();
 
 	return ret;
@@ -481,7 +480,7 @@ static int	trigger_dependent(zbx_uint64_t triggerid)
 	zabbix_log( LOG_LEVEL_DEBUG, "In trigger_dependent(triggerid:" ZBX_FS_UI64 ")",
 		triggerid);
 
-	ret = trigger_dependent_rec(triggerid, &level);
+	ret =  trigger_dependent_rec(triggerid, &level);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of trigger_dependent():%s",
 			zbx_result_string(ret));
@@ -1227,7 +1226,7 @@ int	DBget_escape_string_len(const char *src)
  *           and 'DBdyn_escape_string_len'                                    *
  *                                                                            *
  ******************************************************************************/
-void	DBescape_string(const char *src, char *dst, int len)
+void    DBescape_string(const char *src, char *dst, int len)
 {
 	const char	*s;
 	char		*d;
@@ -1460,7 +1459,7 @@ char	*DBdyn_escape_like_pattern(const char *src)
 {
 	int	len;
 	char	*dst = NULL;
-
+	
 	len = DBget_escape_like_pattern_len(src);
 
 	dst = zbx_malloc(dst, len);
@@ -1902,6 +1901,7 @@ char	*zbx_user_string(zbx_uint64_t userid)
 	return buf_string;
 }
 
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_host_key_function_string                                     *
@@ -1993,63 +1993,38 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, int now)
 	DB_ROW		row;
 	DB_EVENT	event;
 	zbx_uint64_t	autoreg_hostid;
-	int		res = SUCCEED;
 
 	host_esc = DBdyn_escape_string_len(host, HOST_HOST_LEN);
 
-	if (0 != proxy_hostid)
+	result = DBselect("select autoreg_hostid from autoreg_host where proxy_hostid=" ZBX_FS_UI64 " and host='%s'" DB_NODE,
+			proxy_hostid,
+			host_esc,
+			DBnode_local("autoreg_hostid"));
+
+	if (NULL != (row = DBfetch(result)))
+		ZBX_STR2UINT64(autoreg_hostid, row[0])
+	else
 	{
-		result = DBselect(
-				"select hostid"
-				" from hosts"
-				" where proxy_hostid=" ZBX_FS_UI64
-					" and host='%s'"
-					DB_NODE,
-				proxy_hostid, host_esc,
-				DBnode_local("hostid"));
-
-		if (NULL != DBfetch(result))
-			res = FAIL;
-		DBfree_result(result);
+		autoreg_hostid = DBget_maxid("autoreg_host");
+		DBexecute("insert into autoreg_host (autoreg_hostid,proxy_hostid,host) values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s')",
+				autoreg_hostid,
+				proxy_hostid,
+				host_esc);
 	}
-
-	if (SUCCEED == res)
-	{
-		result = DBselect(
-				"select autoreg_hostid"
-				" from autoreg_host"
-				" where proxy_hostid=" ZBX_FS_UI64
-					" and host='%s'"
-					DB_NODE,
-				proxy_hostid, host_esc,
-				DBnode_local("autoreg_hostid"));
-
-		if (NULL != (row = DBfetch(result)))
-			ZBX_STR2UINT64(autoreg_hostid, row[0])
-		else
-		{
-			autoreg_hostid = DBget_maxid("autoreg_host");
-			DBexecute("insert into autoreg_host"
-					" (autoreg_hostid,proxy_hostid,host)"
-					" values"
-					" (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s')",
-					autoreg_hostid, proxy_hostid, host_esc);
-		}
-		DBfree_result(result);
-
-		/* Preparing auto registration event for processing */
-		memset(&event, 0, sizeof(DB_EVENT));
-		event.source	= EVENT_SOURCE_AUTO_REGISTRATION;
-		event.object	= EVENT_OBJECT_ZABBIX_ACTIVE;
-		event.objectid	= autoreg_hostid;
-		event.clock	= now;
-		event.value	= TRIGGER_VALUE_TRUE;
-
-		/* Processing event */
-		process_event(&event, 0);
-	}
+	DBfree_result(result);
 
 	zbx_free(host_esc);
+
+	/* Preparing auto registration event for processing */
+	memset(&event, 0, sizeof(DB_EVENT));
+	event.source	= EVENT_SOURCE_AUTO_REGISTRATION;
+	event.object	= EVENT_OBJECT_ZABBIX_ACTIVE;
+	event.objectid	= autoreg_hostid;
+	event.clock	= now;
+	event.value	= TRIGGER_VALUE_TRUE;
+
+	/* Processing event */
+	process_event(&event, 0);
 }
 
 /******************************************************************************
@@ -2152,7 +2127,7 @@ char	*DBget_unique_hostname_by_sample(char *host_name_sample)
 			"select host"
 			" from hosts"
 			" where host like '%s%%' escape '%c'"
-				DB_NODE
+		                 DB_NODE
 			" group by host",
 			host_name_sample_esc,
 			ZBX_SQL_LIKE_ESCAPE_CHAR,

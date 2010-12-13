@@ -316,7 +316,7 @@ static void	free_trigger_info(DB_EVENT *event)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  *
+ * Comments: Cannot use action->userid as it may also be groupid              *
  *                                                                            *
  ******************************************************************************/
 int	process_event(DB_EVENT *event, int force_actions)

@@ -17,6 +17,23 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <netinet/in.h>
+#include <netdb.h>
+
+#include <signal.h>
+
+#include <string.h>
+
+#include <time.h>
+
+#include <sys/socket.h>
+#include <errno.h>
+
 #include "common.h"
 #include "db.h"
 #include "log.h"
@@ -24,6 +41,9 @@
 
 #include "actions.h"
 #include "operations.h"
+
+#include "poller/poller.h"
+#include "poller/checks_agent.h"
 
 /******************************************************************************
  *                                                                            *
@@ -45,7 +65,7 @@
 static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 {
 	const char	*__function_name = "check_trigger_condition";
-	DB_RESULT	result;
+	DB_RESULT 	result;
 	DB_ROW		row;
 	zbx_uint64_t	condition_value;
 	int		nodeid;
@@ -341,11 +361,11 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 		switch (condition->operator) {
 		case CONDITION_OPERATOR_EQUAL:
 			if (nodeid == condition_value)
-				ret = SUCCEED;
+			       ret = SUCCEED;
 			break;
 		case CONDITION_OPERATOR_NOT_EQUAL:
 			if (nodeid != condition_value)
-				ret = SUCCEED;
+			       ret = SUCCEED;
 			break;
 		default:
 			zabbix_log(LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
@@ -459,7 +479,7 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 static int	check_discovery_condition(DB_EVENT *event, DB_CONDITION *condition)
 {
 	const char	*__function_name = "check_discovery_condition";
-	DB_RESULT	result;
+	DB_RESULT 	result;
 	DB_ROW		row;
 	zbx_uint64_t	condition_value;
 	int		tmp_int, now;
@@ -851,7 +871,7 @@ static int	check_discovery_condition(DB_EVENT *event, DB_CONDITION *condition)
 static int	check_auto_registration_condition(DB_EVENT *event, DB_CONDITION *condition)
 {
 	const char	*__function_name = "check_auto_registration_condition";
-	DB_RESULT	result;
+	DB_RESULT 	result;
 	DB_ROW		row;
 	zbx_uint64_t	condition_value;
 	int		ret = FAIL;
@@ -948,7 +968,7 @@ int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 	const char	*__function_name = "check_action_condition";
 	int		ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64 " conditionid:" ZBX_FS_UI64 " cond.value:'%s'",
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [actionid:" ZBX_FS_UI64 ",conditionid:" ZBX_FS_UI64 ",cond.value:%s]",
 			__function_name,
 			condition->actionid,
 			condition->conditionid,
@@ -994,7 +1014,7 @@ int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	check_action_conditions(DB_EVENT *event, zbx_uint64_t actionid, unsigned char evaltype)
+static int	check_action_conditions(DB_EVENT *event, DB_ACTION *action)
 {
 	const char	*__function_name = "check_action_conditions";
 
@@ -1005,24 +1025,23 @@ static int	check_action_conditions(DB_EVENT *event, zbx_uint64_t actionid, unsig
 	int	ret = SUCCEED; /* SUCCEED required for ACTION_EVAL_TYPE_AND_OR */
 	int	cond, old_type = -1, exit = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64, __function_name, actionid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): actionid [" ZBX_FS_UI64 "]", __function_name, action->actionid);
 
-	result = DBselect(
-			"select conditionid,conditiontype,operator,value"
-			" from conditions"
-			" where actionid=" ZBX_FS_UI64
-			" order by conditiontype",
-			actionid);
+	result = DBselect("select conditionid,conditiontype,operator,value"
+				" from conditions"
+				" where actionid=" ZBX_FS_UI64
+				" order by conditiontype",
+			action->actionid);
 
 	while (NULL != (row = DBfetch(result)) && 0 == exit)
 	{
 		ZBX_STR2UINT64(condition.conditionid, row[0]);
-		condition.actionid = actionid;
+		condition.actionid = action->actionid;
 		condition.conditiontype = atoi(row[1]);
 		condition.operator = atoi(row[2]);
 		condition.value = row[3];
 
-		switch (evaltype)
+		switch (action->evaltype)
 		{
 			case ACTION_EVAL_TYPE_AND_OR:
 				if (old_type == condition.conditiontype)	/* OR conditions */
@@ -1090,62 +1109,59 @@ static int	check_action_conditions(DB_EVENT *event, zbx_uint64_t actionid, unsig
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	execute_operations(DB_EVENT *event, zbx_uint64_t actionid)
+void	execute_operations(DB_EVENT *event, DB_ACTION *action)
 {
-	const char	*__function_name = "execute_operations";
-
 	DB_RESULT	result;
 	DB_ROW		row;
-	unsigned char	operationtype;
-	zbx_uint64_t	objectid;
+	DB_OPERATION	operation;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64,
-			__function_name, actionid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In execute_operations(actionid:" ZBX_FS_UI64 ")",
+			action->actionid);
 
-	result = DBselect(
-			"select operationtype,objectid"
-			" from operations"
-			" where actionid=" ZBX_FS_UI64,
-			actionid);
+	result = DBselect("select operationid,actionid,operationtype,object,objectid from operations where actionid=" ZBX_FS_UI64,
+			action->actionid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		operationtype = (unsigned char)atoi(row[0]);
-		ZBX_STR2UINT64(objectid, row[1]);
+		memset(&operation, 0, sizeof(operation));
 
-		switch (operationtype)
+		ZBX_STR2UINT64(operation.operationid,	row[0]);
+		ZBX_STR2UINT64(operation.actionid,	row[1]);
+		operation.operationtype			= atoi(row[2]);
+		operation.object			= atoi(row[3]);
+		ZBX_STR2UINT64(operation.objectid,	row[4]);
+
+		switch (operation.operationtype)
 		{
-			case OPERATION_TYPE_HOST_ADD:
+			case	OPERATION_TYPE_HOST_ADD:
 				op_host_add(event);
 				break;
-			case OPERATION_TYPE_HOST_REMOVE:
+			case	OPERATION_TYPE_HOST_REMOVE:
 				op_host_del(event);
 				break;
-			case OPERATION_TYPE_HOST_ENABLE:
+			case	OPERATION_TYPE_HOST_ENABLE:
 				op_host_enable(event);
 				break;
-			case OPERATION_TYPE_HOST_DISABLE:
+			case	OPERATION_TYPE_HOST_DISABLE:
 				op_host_disable(event);
 				break;
-			case OPERATION_TYPE_GROUP_ADD:
-				op_group_add(event, objectid);
+			case	OPERATION_TYPE_GROUP_ADD:
+				op_group_add(event, &operation);
 				break;
-			case OPERATION_TYPE_GROUP_REMOVE:
-				op_group_del(event, objectid);
+			case	OPERATION_TYPE_GROUP_REMOVE:
+				op_group_del(event,action,&operation);
 				break;
-			case OPERATION_TYPE_TEMPLATE_ADD:
-				op_template_add(event, objectid);
+			case	OPERATION_TYPE_TEMPLATE_ADD:
+				op_template_add(event,action,&operation);
 				break;
-			case OPERATION_TYPE_TEMPLATE_REMOVE:
-				op_template_del(event, objectid);
+			case	OPERATION_TYPE_TEMPLATE_REMOVE:
+				op_template_del(event,action,&operation);
 				break;
 			default:
 				break;
 		}
 	}
 	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -1165,46 +1181,42 @@ static void	execute_operations(DB_EVENT *event, zbx_uint64_t actionid)
  ******************************************************************************/
 void	process_actions(DB_EVENT *event)
 {
-	const char	*__function_name = "process_actions";
-
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	actionid;
-	unsigned char	evaltype;
+	DB_ACTION	action;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64,
-			__function_name, event->eventid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In process_actions() eventid:" ZBX_FS_UI64,
+			event->eventid);
 
-	result = DBselect(
-			"select actionid,evaltype"
-			" from actions"
-			" where status=%d"
-				" and eventsource=%d"
-				DB_NODE,
-			ACTION_STATUS_ACTIVE, event->source, DBnode_local("actionid"));
+	result = DBselect("select actionid,evaltype,status,eventsource from actions where status=%d and eventsource=%d" DB_NODE,
+			ACTION_STATUS_ACTIVE,
+			event->source,
+			DBnode_local("actionid"));
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(actionid, row[0]);
-		evaltype = (unsigned char)atoi(row[1]);
+		ZBX_STR2UINT64(action.actionid, row[0]);
+		action.evaltype		= atoi(row[1]);
+		action.status		= atoi(row[2]);
+		action.eventsource	= atoi(row[3]);
 
-		if (SUCCEED == check_action_conditions(event, actionid, evaltype))
+		if (SUCCEED == check_action_conditions(event, &action))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Conditions match our event. Execute operations.");
 
-			DBstart_escalation(actionid, event->source == EVENT_SOURCE_TRIGGERS ? event->objectid : 0, event->eventid);
+			DBstart_escalation(action.actionid, event->source == EVENT_SOURCE_TRIGGERS ? event->objectid : 0, event->eventid);
 
 			if (event->source == EVENT_SOURCE_DISCOVERY || event->source == EVENT_SOURCE_AUTO_REGISTRATION)
-				execute_operations(event, actionid);
+				execute_operations(event, &action);
 		}
 		else if (event->source == EVENT_SOURCE_TRIGGERS)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Conditions do not match our event. Do not execute operations.");
 
-			DBstop_escalation(actionid, event->objectid, event->eventid);
+			DBstop_escalation(action.actionid, event->objectid, event->eventid);
 		}
 	}
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log( LOG_LEVEL_DEBUG, "End process_actions()");
 }

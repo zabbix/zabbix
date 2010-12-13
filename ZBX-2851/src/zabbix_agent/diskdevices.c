@@ -102,7 +102,12 @@ static void	process_diskstat(ZBX_SINGLE_DISKDEVICE_DATA *device)
 
 void	collect_stats_diskdevices(ZBX_DISKDEVICES_DATA *diskdevices)
 {
-	int	i;
+	static int	s = 0;
+	register int	i;
+
+	s = s % 60;
+	if (0 == s++)	/* refresh device list every 60 seconds */
+		refresh_diskdevices();
 
 	for (i = 0; i < diskdevices->count; i++)
 		process_diskstat(&diskdevices->device[i]);
@@ -110,45 +115,30 @@ void	collect_stats_diskdevices(ZBX_DISKDEVICES_DATA *diskdevices)
 
 ZBX_SINGLE_DISKDEVICE_DATA	*collector_diskdevice_get(const char *devname)
 {
-	const char	*__function_name = "collector_diskdevice_get";
-
 	int	i;
 
 	assert(devname);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() devname:'%s'", __function_name, devname);
+	zabbix_log(LOG_LEVEL_DEBUG, "In collector_diskdevice_get(\"%s\")", devname);
 
 	for (i = 0; i < collector->diskdevices.count; i ++)
-	{
 		if (0 == strcmp(devname, collector->diskdevices.device[i].name))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name,
-					&collector->diskdevices.device[i]);
 			return &collector->diskdevices.device[i];
-		}
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():NULL", __function_name);
 
 	return NULL;
 }
 
 ZBX_SINGLE_DISKDEVICE_DATA	*collector_diskdevice_add(const char *devname)
 {
-	const char	*__function_name = "collector_diskdevice_add";
-
 	ZBX_SINGLE_DISKDEVICE_DATA	*device;
 
 	assert(devname);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() devname:'%s'", __function_name, devname);
+	zabbix_log(LOG_LEVEL_DEBUG, "In collector_diskdevice_add(\"%s\")", devname);
 
 	/* collector is full */
 	if (collector->diskdevices.count == MAX_DISKDEVICES)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():NULL collector is full", __function_name);
 		return NULL;
-	}
 
 	device = &collector->diskdevices.device[collector->diskdevices.count];
 	zbx_strlcpy(device->name, devname, sizeof(device->name));
@@ -156,8 +146,6 @@ ZBX_SINGLE_DISKDEVICE_DATA	*collector_diskdevice_add(const char *devname)
 	collector->diskdevices.count++;
 
 	process_diskstat(device);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, device);
 
 	return device;
 }

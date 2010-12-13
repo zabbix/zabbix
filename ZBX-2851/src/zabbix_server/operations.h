@@ -23,10 +23,10 @@
 #include "common.h"
 #include "db.h"
 
-void	op_template_add(DB_EVENT *event, zbx_uint64_t templateid);
-void	op_template_del(DB_EVENT *event, zbx_uint64_t templateid);
-void	op_group_add(DB_EVENT *event, zbx_uint64_t groupid);
-void	op_group_del(DB_EVENT *event, zbx_uint64_t groupid);
+void	op_template_add(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation);
+void	op_template_del(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation);
+void	op_group_add(DB_EVENT *event, DB_OPERATION *operation);
+void	op_group_del(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation);
 void	op_host_add(DB_EVENT *event);
 void	op_host_del(DB_EVENT *event);
 void	op_host_enable(DB_EVENT *event);

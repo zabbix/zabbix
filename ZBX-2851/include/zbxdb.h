@@ -162,8 +162,8 @@
 #	define ZBX_SQL_MOD(x, y) "mod(" #x "," #y ")"
 #endif
 
-int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port);
-void	zbx_db_init(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port);
+int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbsocket, int port);
+void	zbx_db_init(char *host, char *user, char *password, char *dbname, char *dbsocket, int port);
 void    zbx_db_close();
 
 int	zbx_db_begin();

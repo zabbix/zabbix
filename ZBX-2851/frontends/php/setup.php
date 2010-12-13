@@ -35,6 +35,7 @@ if(!defined('PAGE_HEADER_LOADED'))
 <?php
 	$fields=array(
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+		'agree'=>		array(T_ZBX_STR, O_OPT,	null,	null,			null),
 		'distributed'=>		array(T_ZBX_STR, O_OPT,	null,	null,			null),
 		'trouble'=>		array(T_ZBX_STR, O_OPT,	null,	null,			null),
 
@@ -44,10 +45,8 @@ if(!defined('PAGE_HEADER_LOADED'))
 		'database'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		null),
 		'user'=>		array(T_ZBX_STR, O_OPT,	null,	null,			null),
 		'password'=>		array(T_ZBX_STR, O_OPT,	null,	null, 			null),
-		'schema'=>		array(T_ZBX_STR, O_OPT,	null,	null, 			null),
 
 		'zbx_server'=>		array(T_ZBX_STR, O_OPT, null,   null,                   null),
-		'zbx_server_name'=>		array(T_ZBX_STR, O_OPT, null,   null,                   null),
 		'zbx_server_port'=>	array(T_ZBX_INT, O_OPT, null,	BETWEEN(0,65535),	null),
 
 		'message'=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,			NULL),
