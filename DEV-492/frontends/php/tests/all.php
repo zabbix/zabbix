@@ -1,6 +1,7 @@
 <?php
 require_once 'general/GeneralTests.php';
 require_once 'api/ApiTests.php';
+require_once 'selenium/SeleniumTests.php';
 
 class All
 {
@@ -10,6 +11,7 @@ class All
 
 		$suite->addTest(GeneralTests::suite());
 		$suite->addTest(ApiTests::suite());
+		$suite->addTest(SeleniumTests::suite());
 		// ...
 
 		return $suite;
