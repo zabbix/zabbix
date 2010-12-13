@@ -954,9 +954,16 @@ upgrades/dbpatches/2.0/mysql/patch/media.sql -text
 upgrades/dbpatches/2.0/mysql/patch/media_type.sql -text
 upgrades/dbpatches/2.0/mysql/patch/node_cksum.sql -text
 upgrades/dbpatches/2.0/mysql/patch/nodes.sql -text
+upgrades/dbpatches/2.0/mysql/patch/opcommand_grp.sql -text
+upgrades/dbpatches/2.0/mysql/patch/opcommand_hst.sql -text
 upgrades/dbpatches/2.0/mysql/patch/opconditions.sql -text
 upgrades/dbpatches/2.0/mysql/patch/operations.sql -text
+upgrades/dbpatches/2.0/mysql/patch/opgroup.sql -text
 upgrades/dbpatches/2.0/mysql/patch/opmediatypes.sql -text
+upgrades/dbpatches/2.0/mysql/patch/opmessage.sql -text
+upgrades/dbpatches/2.0/mysql/patch/opmessage_grp.sql -text
+upgrades/dbpatches/2.0/mysql/patch/opmessage_usr.sql -text
+upgrades/dbpatches/2.0/mysql/patch/optemplate.sql -text
 upgrades/dbpatches/2.0/mysql/patch/profiles.sql -text
 upgrades/dbpatches/2.0/mysql/patch/proxy_autoreg_host.sql -text
 upgrades/dbpatches/2.0/mysql/patch/proxy_dhistory.sql -text
