@@ -604,7 +604,7 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 					"select hostid,proxy_hostid"
 					" from hosts"
 					" where host='%s'"
-					       	DB_NODE,
+						DB_NODE,
 					host_esc,
 					DBnode_local("hostid"));
 
@@ -808,8 +808,8 @@ void	op_host_disable(DB_EVENT *event)
  *                                                                            *
  * Purpose: add group to discovered host                                      *
  *                                                                            *
- * Parameters: event - event data                                             *
- *             operation - operation data                                     *
+ * Parameters: event   - [IN] event data                                      *
+ *             groupid - [IN] group identificator from database               *
  *                                                                            *
  * Return value: nothing                                                      *
  *                                                                            *
@@ -818,16 +818,12 @@ void	op_host_disable(DB_EVENT *event)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	op_group_add(DB_EVENT *event, DB_OPERATION *operation)
+void	op_group_add(DB_EVENT *event, zbx_uint64_t groupid)
 {
 	const char	*__function_name = "op_group_add";
 	zbx_uint64_t	hostid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() object:%d",
-			__function_name, event->object);
-
-	if (operation->operationtype != OPERATION_TYPE_GROUP_ADD)
-		return;
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (event->source != EVENT_SOURCE_DISCOVERY && event->source != EVENT_SOURCE_AUTO_REGISTRATION)
 		return;
@@ -838,7 +834,7 @@ void	op_group_add(DB_EVENT *event, DB_OPERATION *operation)
 	if (0 == (hostid = add_discovered_host(event)))
 		return;
 
-	add_discovered_host_group(hostid, operation->objectid);
+	add_discovered_host_group(hostid, groupid);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -849,8 +845,8 @@ void	op_group_add(DB_EVENT *event, DB_OPERATION *operation)
  *                                                                            *
  * Purpose: delete group from discovered host                                 *
  *                                                                            *
- * Parameters: trigger - trigger data                                         *
- *             action  - action data                                          *
+ * Parameters: event   - [IN] event data                                      *
+ *             groupid - [IN] group identificator from database               *
  *                                                                            *
  * Return value: nothing                                                      *
  *                                                                            *
@@ -859,15 +855,12 @@ void	op_group_add(DB_EVENT *event, DB_OPERATION *operation)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	op_group_del(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation)
+void	op_group_del(DB_EVENT *event, zbx_uint64_t groupid)
 {
 	const char	*__function_name = "op_group_del";
 	zbx_uint64_t	hostid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	if (operation->operationtype != OPERATION_TYPE_GROUP_REMOVE)
-		return;
 
 	if (event->source != EVENT_SOURCE_DISCOVERY)
 		return;
@@ -883,7 +876,7 @@ void	op_group_del(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation)
 			" where hostid=" ZBX_FS_UI64
 				" and groupid=" ZBX_FS_UI64,
 			hostid,
-			operation->objectid);
+			groupid);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -894,7 +887,8 @@ void	op_group_del(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation)
  *                                                                            *
  * Purpose: link host with template                                           *
  *                                                                            *
- * Parameters:                                                                *
+ * Parameters: event      - [IN] event data                                   *
+ *             templateid - [IN] host template identificator from database    *
  *                                                                            *
  * Return value: nothing                                                      *
  *                                                                            *
@@ -903,15 +897,12 @@ void	op_group_del(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	op_template_add(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation)
+void	op_template_add(DB_EVENT *event, zbx_uint64_t templateid)
 {
 	const char	*__function_name = "op_template_add";
 	zbx_uint64_t	hostid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(object:%d)", __function_name, event->object);
-
-	if (operation->operationtype != OPERATION_TYPE_TEMPLATE_ADD)
-		return;
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (event->source != EVENT_SOURCE_DISCOVERY && event->source != EVENT_SOURCE_AUTO_REGISTRATION)
 		return;
@@ -922,7 +913,7 @@ void	op_template_add(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation
 	if (0 == (hostid = add_discovered_host(event)))
 		return;
 
-	DBcopy_template_elements(hostid, operation->objectid);
+	DBcopy_template_elements(hostid, templateid);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -933,7 +924,8 @@ void	op_template_add(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation
  *                                                                            *
  * Purpose: unlink and clear host from template                               *
  *                                                                            *
- * Parameters:                                                                *
+ * Parameters: event      - [IN] event data                                   *
+ *             templateid - [IN] host template identificator from database    *
  *                                                                            *
  * Return value: nothing                                                      *
  *                                                                            *
@@ -942,15 +934,12 @@ void	op_template_add(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	op_template_del(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation)
+void	op_template_del(DB_EVENT *event, zbx_uint64_t templateid)
 {
 	const char	*__function_name = "op_template_del";
 	zbx_uint64_t	hostid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(object:%d)", __function_name, event->object);
-
-	if (operation->operationtype != OPERATION_TYPE_TEMPLATE_REMOVE)
-		return;
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (event->source != EVENT_SOURCE_DISCOVERY)
 		return;
@@ -961,7 +950,7 @@ void	op_template_del(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation
 	if (0 == (hostid = select_discovered_host(event)))
 		return;
 
-	DBdelete_template_elements(hostid, operation->objectid);
+	DBdelete_template_elements(hostid, templateid);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
