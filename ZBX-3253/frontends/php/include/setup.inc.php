@@ -264,7 +264,7 @@ JS;
 
 			$table->addRow(array(new CCol(S_HOST,'header'), new CTextBox('zbx_server',		$this->getConfig('ZBX_SERVER',		'localhost'))));
 			$table->addRow(array(new CCol(S_PORT,'header'), new CNumericBox('zbx_server_port',	$this->getConfig('ZBX_SERVER_PORT',	'10051'),5)));
-			$table->addRow(array(new CCol(S_NAME,'header'), new CNumericBox('zbx_server_name',	$this->getConfig('ZBX_SERVER_NAME',	''))));
+			$table->addRow(array(new CCol(S_NAME,'header'), new CTextBox('zbx_server_name',	$this->getConfig('ZBX_SERVER_NAME',	''))));
 
 			return array(
 				'Please enter host name or host IP address', BR(),
@@ -418,7 +418,7 @@ JS;
 				else if($DB['PASSWORD'] != $this->getConfig('DB_PASSWORD')){
 					$error = 'Config file DB password is not equal to wizard input.';
 				}
-				else if(($this->getConfig('DB_TYPE') == 'IBM_DB2') && ($this->getConfig('DB_TYPE') != $DB['SCHEMA'])){
+				else if(($this->getConfig('DB_TYPE') == 'IBM_DB2') && ($this->getConfig('DB_SCHEMA') != $DB['SCHEMA'])){
 					$error = 'Config file DB schema is not equal to wizard input.';
 				}
 				else if(!$this->CheckConnection()){
