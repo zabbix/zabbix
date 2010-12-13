@@ -2711,9 +2711,9 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 
 		$add_expr_button = new CButton('insert',$input_method == IM_TREE ? S_EDIT : S_ADD,
-										 "return PopUp('popup_trexpr.php?dstfrm=".$frmTrig->getName().
-										 "&dstfld1=${exprfname}&srctbl=expression".
-										 "&srcfld1=expression&expression=' + escape($exprparam),1000,700);");
+								 "return PopUp('popup_trexpr.php?dstfrm=".$frmTrig->getName().
+								 "&dstfld1=${exprfname}&srctbl=expression".url_param('parent_discoveryid').
+								 "&srcfld1=expression&expression=' + escape($exprparam),1000,700);");
 		if($limited=='yes'){
 			$add_expr_button->setAttribute('disabled', 'disabled');
 		}
