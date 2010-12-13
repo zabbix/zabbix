@@ -1,5 +1,6 @@
 Changes for 1.8.4rc3
 
+ - [ZBX-1294] disabled "Add" and "Toggle input method" for templated trigger expressions (KB)
  - [ZBX-3223] it is now possible to gather network interface statistics under a normal user on OpenBSD; thanks to Robert Nagy (asaveljevs,Sasha)
  - [ZBX-3270] fixed server crash when processing calculated items with non-numeric user macros (asaveljevs)
  - [ZBXNEXT-564] added new {PROXY.NAME} and {HOSTNAME} macros for auto registration notifications (Sasha)
