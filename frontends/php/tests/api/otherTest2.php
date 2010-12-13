@@ -5,7 +5,7 @@ require_once('../include/func.inc.php');
 require_once('../include/items.inc.php');
 require_once('../include/defines.inc.php');
 require_once('../include/locales.inc.php');
- 
+
 class otherTest2 extends PHPUnit_Framework_TestCase
 {
 	public static function provider()
@@ -71,4 +71,3 @@ class otherTest2 extends PHPUnit_Framework_TestCase
 
 }
 ?>
-
