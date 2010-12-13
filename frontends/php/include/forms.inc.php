@@ -5013,10 +5013,6 @@ JAVASCRIPT;
 
 		insert_js('
 			function addMacroRow(){
-<<<<<<< .working
-=======
-
->>>>>>> .merge-right.r15986
 				if(typeof(addMacroRow.macro_count) == "undefined"){
 					addMacroRow.macro_count = '.count($macros).';
 				}
