@@ -34,6 +34,7 @@ include_once('include/page_header.php');
 <?php
 // needed type to know which field name to use
 $itemType = get_request('type', 0);
+
 switch($itemType) {
 	case ITEM_TYPE_SSH: case ITEM_TYPE_TELNET: $paramsFieldName = S_EXECUTED_SCRIPT; break;
 	case ITEM_TYPE_DB_MONITOR: $paramsFieldName = S_PARAMS; break;
@@ -310,7 +311,7 @@ switch($itemType) {
 		}
 	}
 
-// ----- GO -----
+// GO {{{
 	else if((($_REQUEST['go'] == 'activate') || ($_REQUEST['go'] == 'disable')) && isset($_REQUEST['group_itemid'])){
 		$group_itemid = $_REQUEST['group_itemid'];
 
@@ -332,6 +333,7 @@ switch($itemType) {
 		$path = $url->getPath();
 		insert_js('cookie.eraseArray("'.$path.'")');
 	}
+// }}} GO
 ?>
 <?php
 	$items_wdgt = new CWidget();
