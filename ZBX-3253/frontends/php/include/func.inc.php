@@ -1474,6 +1474,10 @@ function checkConfigData(&$error=null){
 		$error = 'DB password is not set.';
 		return false;
 	}
+	if($DB['TYPE'] == 'IBM_DB2' && !isset($DB['SCHEMA'])){
+		$error = 'DB schema is not set.';
+		return false;
+	}
 	if(!isset($ZBX_SERVER)){
 		$error = 'ZBX_SERVER is not set.';
 		return false;

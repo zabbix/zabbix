@@ -41,12 +41,12 @@
 
 			$this->stage = array(
 				0 => array('title' => '1. Introduction'			, 'fnc' => 'stage0' ),
-				1 => array('title' => '2. Licence Agreement'		, 'fnc' => 'stage1' ),
+				1 => array('title' => '2. Licence agreement'		, 'fnc' => 'stage1' ),
 				2 => array('title' => '3. Check of pre-requisites'	, 'fnc' => 'stage2' ),
 				3 => array('title' => '4. Configure DB connection'	, 'fnc' => 'stage3' ),
 				4 => array('title' => '5. Zabbix server details'	, 'fnc' => 'stage4' ),
 				//4 => array('title' => '5. Distributed monitoring'	, 'fnc' => 'stage4' ),
-				5 => array('title' => '6. Pre-Installation Summary'	, 'fnc' => 'stage5' ),
+				5 => array('title' => '6. Pre-Installation summary'	, 'fnc' => 'stage5' ),
 				6 => array('title' => '7. Install'			, 'fnc' => 'stage6' ),
 				7 => array('title' => '8. Finish'			, 'fnc' => 'stage7' )
 				);
@@ -268,7 +268,8 @@ JS;
 
 			return array(
 				'Please enter host name or host IP address', BR(),
-				'and port number of Zabbix server', BR(), BR(),
+				'and port number of Zabbix server,', BR(), 
+				'as well as the name of the installation (optional).', BR(), BR(),
 				$table,
 				);
 		}
@@ -314,6 +315,9 @@ JS;
 						}
 					}
 				}
+			}
+			else if($this->setConfig('ZBX_CONFIG_FILE_CORRECT', $this->CheckConfigurationFile())){
+				$this->DISABLE_NEXT_BUTTON = false;
 			}
 			clear_messages(); /* don't show errors */
 
