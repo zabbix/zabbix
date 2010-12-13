@@ -41,12 +41,12 @@
 
 			$this->stage = array(
 				0 => array('title' => '1. Introduction'			, 'fnc' => 'stage0' ),
-				1 => array('title' => '2. Licence Agreement'		, 'fnc' => 'stage1' ),
+				1 => array('title' => '2. Licence agreement'		, 'fnc' => 'stage1' ),
 				2 => array('title' => '3. Check of pre-requisites'	, 'fnc' => 'stage2' ),
 				3 => array('title' => '4. Configure DB connection'	, 'fnc' => 'stage3' ),
 				4 => array('title' => '5. Zabbix server details'	, 'fnc' => 'stage4' ),
 				//4 => array('title' => '5. Distributed monitoring'	, 'fnc' => 'stage4' ),
-				5 => array('title' => '6. Pre-Installation Summary'	, 'fnc' => 'stage5' ),
+				5 => array('title' => '6. Pre-Installation summary'	, 'fnc' => 'stage5' ),
 				6 => array('title' => '7. Install'			, 'fnc' => 'stage6' ),
 				7 => array('title' => '8. Finish'			, 'fnc' => 'stage7' )
 				);
@@ -139,18 +139,21 @@
 		function stage1(){
 			$LICENCE_FILE = 'conf/COPYING';
 
-			$this->DISABLE_NEXT_BUTTON = !$this->getConfig('agree', false);
+			$this->DISABLE_NEXT_BUTTON = true;
 
 			$license = 'Missing licence file. See GPL licence.';
 			if(file_exists($LICENCE_FILE))
 				$license = zbx_nl2br(nbsp(file_get_contents($LICENCE_FILE)));
 
-			$agree = array( new CCheckBox('agree', $this->getConfig('agree', false), 'submit();'), 'I agree');
+			$action = <<<JS
+if(this.checked) $("next[1]").writeAttribute('disabled', false);
+else $("next[1]").writeAttribute('disabled', 'disabled');
+JS;
 
 			return array(
 				new CDiv(new CSpan($license), 'licence'),
 				BR(),
-				new CDiv($agree, 'center')
+				new CDiv(array(new CCheckBox('agree', 'no', $action), 'I agree'), 'center')
 			);
 		}
 
@@ -160,7 +163,7 @@
 
 			$final_result = true;
 
-			$row = new CRow(array(
+			$table->addRow(array(
 				SPACE,
 				new CCol('Current value', 'header'),
 				new CCol('Required', 'header'),
@@ -168,7 +171,6 @@
 				SPACE,
 				SPACE
 			));
-			$table->addRow($row);
 
 			$reqs = check_php_requirements();
 			foreach($reqs as $req){
@@ -186,7 +188,7 @@
 					$result->setHint($req['error']);
 				}
 
-				$row = new CRow(array(
+				$table->addRow(array(
 					new CCol(
 						$req['name'], 'header'),
 						$req['current'],
@@ -194,10 +196,7 @@
 						$req['recommended'] ? $req['recommended'] : SPACE,
 						$result
 					),
-					$req['result'] ? SPACE : 'fail'
-				);
-
-				$table->addRow($row);
+					$req['result'] ? SPACE : 'fail');
 
 				$final_result &= (bool) $req['result'];
 			}
@@ -220,7 +219,7 @@
 				$final_result = new CSpan(S_OK,'ok');
 			}
 
-		return array($table, BR(), $final_result);
+			return array($table, BR(), $final_result);
 		}
 
 		function stage3(){
@@ -231,16 +230,19 @@
 
 			$DB['TYPE'] = $this->getConfig('DB_TYPE');
 
-			$cmbType = new CComboBox('type', $DB['TYPE']);
+			$cmbType = new CComboBox('type', $DB['TYPE'], 'this.form.submit();');
 			foreach($ZBX_CONFIG['allowed_db'] as $id => $name){
 				$cmbType->addItem($id, $name);
 			}
 			$table->addRow(array(new CCol(S_TYPE,'header'), $cmbType));
-			$table->addRow(array(new CCol(S_HOST,'header'), new CTextBox('server',		$this->getConfig('DB_SERVER',	'localhost'))));
-			$table->addRow(array(new CCol(S_PORT,'header'), array(new CNumericBox('port',	$this->getConfig('DB_PORT',	'0'),5),' 0 - use default port')));
-			$table->addRow(array(new CCol(S_NAME,'header'), new CTextBox('database',	$this->getConfig('DB_DATABASE',	'zabbix'))));
-			$table->addRow(array(new CCol(S_USER,'header'), new CTextBox('user',		$this->getConfig('DB_USER',	'root'))));
-			$table->addRow(array(new CCol(S_PASSWORD,'header'), new CPassBox('password',	$this->getConfig('DB_PASSWORD',	''))));
+			$table->addRow(array(new CCol(S_HOST,'header'), new CTextBox('server', $this->getConfig('DB_SERVER', 'localhost'))));
+			$table->addRow(array(new CCol(S_PORT,'header'), array(new CNumericBox('port', $this->getConfig('DB_PORT', '0'),5),' 0 - use default port')));
+			$table->addRow(array(new CCol(S_NAME,'header'), new CTextBox('database', $this->getConfig('DB_DATABASE', 'zabbix'))));
+			$table->addRow(array(new CCol(S_USER,'header'), new CTextBox('user', $this->getConfig('DB_USER',	'root'))));
+			$table->addRow(array(new CCol(S_PASSWORD,'header'), new CPassBox('password', $this->getConfig('DB_PASSWORD', ''))));
+
+			if($DB['TYPE'] == 'IBM_DB2')
+				$table->addRow(array(new CCol(S_SCHEMA,'header'), new CTextBox('schema', $this->getConfig('DB_SCHEMA', ''))));
 
 			return array(
 				'Please create database manually,', BR(),
@@ -250,7 +252,7 @@
 				BR(),BR(),
 				$table,
 				BR(),
-				!$this->DISABLE_NEXT_BUTTON ? new CSpan(S_OK,'ok') :  new CSpan(S_FAIL, 'fail'),
+				!$this->DISABLE_NEXT_BUTTON ? new CSpan(S_OK, 'ok') :  new CSpan(S_FAIL, 'fail'),
 				BR(),
 				new  CSubmit('retry', 'Test connection')
 				);
@@ -262,10 +264,12 @@
 
 			$table->addRow(array(new CCol(S_HOST,'header'), new CTextBox('zbx_server',		$this->getConfig('ZBX_SERVER',		'localhost'))));
 			$table->addRow(array(new CCol(S_PORT,'header'), new CNumericBox('zbx_server_port',	$this->getConfig('ZBX_SERVER_PORT',	'10051'),5)));
+			$table->addRow(array(new CCol(S_NAME,'header'), new CTextBox('zbx_server_name',	$this->getConfig('ZBX_SERVER_NAME',	''))));
 
 			return array(
 				'Please enter host name or host IP address', BR(),
-				'and port number of Zabbix server', BR(), BR(),
+				'and port number of Zabbix server,', BR(), 
+				'as well as the name of the installation (optional).', BR(), BR(),
 				$table,
 				);
 		}
@@ -275,34 +279,32 @@
 
 			$table = new CTable(null, 'requirements');
 			$table->setAlign('center');
-			$table->addRow(array(new CCol('Database type:','header'),	$allowed_db[$this->getConfig('DB_TYPE',	'unknown')]));
-			$table->addRow(array(new CCol('Database server:','header'),	$this->getConfig('DB_SERVER',		'unknown')));
-			$table->addRow(array(new CCol('Database port:','header'),	$this->getConfig('DB_PORT',		'0')));
-			$table->addRow(array(new CCol('Database name:','header'),	$this->getConfig('DB_DATABASE',		'unknown')));
-			$table->addRow(array(new CCol('Database user:','header'),	$this->getConfig('DB_USER',		'unknown')));
-//			$table->addRow(array(new CCol('Database password:','header'),	ereg_replace('.','*',$this->getConfig('DB_PASSWORD',	'unknown'))));
-			$table->addRow(array(new CCol('Database password:','header'),	preg_replace('/./','*',$this->getConfig('DB_PASSWORD',	'unknown'))));
-			/* $table->addRow(array(new CCol('Distributed monitoring','header'),	$this->getConfig('distributed', null) ? 'Enabled' : 'Disabled')); */
-
-			if($this->getConfig('distributed', null)){
-				$table->addRow(array(new CCol('Node name','header'),	$this->getConfig('nodename',	'unknown')));
-				$table->addRow(array(new CCol('Node GUID','header'),	$this->getConfig('nodeid',	'unknown')));
-			}
+			$table->addRow(array(new CCol('Database type:','header'), $allowed_db[$this->getConfig('DB_TYPE')]));
+			$table->addRow(array(new CCol('Database server:','header'), $this->getConfig('DB_SERVER')));
+			$table->addRow(array(new CCol('Database port:','header'), $this->getConfig('DB_PORT')));
+			$table->addRow(array(new CCol('Database name:','header'), $this->getConfig('DB_DATABASE')));
+			$table->addRow(array(new CCol('Database user:','header'), $this->getConfig('DB_USER')));
+			$table->addRow(array(new CCol('Database password:','header'),	preg_replace('/./','*',$this->getConfig('DB_PASSWORD'))));
+			if($this->getConfig('DB_TYPE', '') == 'IBM_DB2')
+				$table->addRow(array(new CCol('Database schema:','header'),	$this->getConfig('DB_SCHEMA')));
 
 			$table->addRow(BR());
 
-			$table->addRow(array(new CCol('Zabbix server:','header'),	$this->getConfig('ZBX_SERVER',		'unknown')));
-			$table->addRow(array(new CCol('Zabbix server port:','header'),	$this->getConfig('ZBX_SERVER_PORT',	'unknown')));
+			$table->addRow(array(new CCol('Zabbix server:','header'), $this->getConfig('ZBX_SERVER')));
+			$table->addRow(array(new CCol('Zabbix server port:','header'), $this->getConfig('ZBX_SERVER_PORT')));
+			$table->addRow(array(new CCol('Zabbix server name:','header'), $this->getConfig('ZBX_SERVER_NAME')));
+
 			return array(
 				'Please check configuration parameters.', BR(),
 				'If all is correct, press "Next" button, or "Previous" button to change configuration parameters.', BR(), BR(),
 				$table
-				);
+			);
 		}
 
 		function stage6(){
-			global $ZBX_CONFIGURATION_FILE;
+			global $ZBX_CONFIGURATION_FILE, $ZBX_SERVER, $ZBX_SERVER_PORT, $IMAGE_FORMAT_DEFAULT;
 
+			$this->DISABLE_NEXT_BUTTON = true;
 			show_messages();
 			/* Write the new contents */
 			if($f = @fopen($ZBX_CONFIGURATION_FILE, 'w')){
@@ -314,15 +316,18 @@
 					}
 				}
 			}
+			else if($this->setConfig('ZBX_CONFIG_FILE_CORRECT', $this->CheckConfigurationFile())){
+				$this->DISABLE_NEXT_BUTTON = false;
+			}
 			clear_messages(); /* don't show errors */
 
 			$table = new CTable(null, 'requirements');
 			$table->setAlign('center');
 
-			$table->addRow(array('Configuration file: ',  $this->getConfig('ZBX_CONFIG_FILE_CORRECT', false) ?
-									new CSpan(S_OK,'ok') :
-									new CSpan(S_FAIL,'fail')
-										));
+			$table->addRow(array('Configuration file: ', $this->getConfig('ZBX_CONFIG_FILE_CORRECT', false) ?
+				new CSpan(S_OK,'ok') :
+				new CSpan(S_FAIL,'fail')
+			));
 
 			return array(
 				$table, BR(),
@@ -348,184 +353,141 @@
 		}
 
 		function CheckConnection(){
-			global $DB, $ZBX_MESSAGES;
-
-//			$old_DB		= $DB['DB'];
-			if(!empty($DB) ){
-				$old_DB			= true;
-				$old_DB_TYPE	= $DB['TYPE'];
-				$old_DB_SERVER	= $DB['SERVER'];
-				$old_DB_PORT	= $DB['PORT'];
-				$old_DB_DATABASE= $DB['DATABASE'];
-				$old_DB_USER	= $DB['USER'];
-				$old_DB_PASSWORD= $DB['PASSWORD'];
-			}
+			global $DB;
+//			global $ZBX_MESSAGES;
 
 			$DB['TYPE']	= $this->getConfig('DB_TYPE');
-			if(is_null($DB['TYPE']))	return false;
+			if(is_null($DB['TYPE'])) return false;
 
-			$DB['SERVER']	= $this->getConfig('DB_SERVER',		'localhost');
-			$DB['PORT']	= $this->getConfig('DB_PORT',		'0');
-			$DB['DATABASE']	= $this->getConfig('DB_DATABASE',	'zabbix');
-			$DB['USER']	= $this->getConfig('DB_USER',		'root');
-			$DB['PASSWORD']	= $this->getConfig('DB_PASSWORD',	'');
+			$DB['SERVER'] = $this->getConfig('DB_SERVER', 'localhost');
+			$DB['PORT']	= $this->getConfig('DB_PORT', '0');
+			$DB['DATABASE']	= $this->getConfig('DB_DATABASE', 'zabbix');
+			$DB['USER']	= $this->getConfig('DB_USER', 'root');
+			$DB['PASSWORD']	= $this->getConfig('DB_PASSWORD', '');
+			$DB['SCHEMA'] = $this->getConfig('DB_SCHEMA', '');
 
 			$error = '';
 			if(!$result = DBconnect($error)){
-				if(!is_null($ZBX_MESSAGES)) array_pop($ZBX_MESSAGES);
+//				if(!is_null($ZBX_MESSAGES)) array_pop($ZBX_MESSAGES);
 				error($error);
 			}
 			else{
-				$result = DBexecute('CREATE table zabbix_installation_test ( test_row integer )');
-				$result &= DBexecute('DROP table zabbix_installation_test');
+				$result = true;
+				if(!zbx_empty($DB['SCHEMA']) && ($DB['TYPE'] == 'IBM_DB2')){
+					$db_schema = DBselect("SELECT schemaname FROM syscat.schemata WHERE schemaname='".db2_escape_string($DB['SCHEMA'])."'");
+					$result = DBfetch($db_schema);
+				}
+
+				if($result){
+					$result = DBexecute('CREATE table zabbix_installation_test ( test_row integer )');
+					$result &= DBexecute('DROP table zabbix_installation_test');
+				}
 			}
 
 			DBclose();
 
 			if($DB['TYPE'] == 'SQLITE3' && !zbx_is_callable(array('sem_get','sem_acquire','sem_release','sem_remove'))){
 				error('SQLite3 requires IPC functions');
-				$result &= false;
+				$result = false;
 			}
 
-			/* restore connection */
-			global $DB;
-
-			if(isset($old_DB)){
-				$DB['TYPE']	= $old_DB_TYPE;
-				$DB['SERVER']	= $old_DB_SERVER;
-				$DB['PORT']	= $old_DB_PORT;
-				$DB['DATABASE']	= $old_DB_DATABASE;
-				$DB['USER']	= $old_DB_USER;
-				$DB['PASSWORD']	= $old_DB_PASSWORD;
-			}
-
-			DBconnect($error);
-
-		return $result;
+			$DB = null;
+			return $result;
 		}
 
 		function CheckConfigurationFile(){
-			global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT;
-
-			if(!empty($DB)){
-				$old_DB				= true;
-				$old_DB_TYPE		= $DB['TYPE'];
-				$old_DB_SERVER		= $DB['SERVER'];
-				$old_DB_PORT		= $DB['PORT'];
-				$old_DB_DATABASE	= $DB['DATABASE'];
-				$old_DB_USER		= $DB['USER'];
-				$old_DB_PASSWORD	= $DB['PASSWORD'];
-
-				$old_ZBX_SERVER		= $ZBX_SERVER;
-				$old_ZBX_SERVER_PORT	= $ZBX_SERVER_PORT;
-			}
-
+			global $ZBX_CONFIGURATION_FILE, $ZBX_SERVER, $ZBX_SERVER_PORT;
 
 			$error = null;
-			$error_msg = null;
-
-			global $ZBX_CONFIGURATION_FILE;
 
 			if(file_exists($ZBX_CONFIGURATION_FILE)){
 				include $ZBX_CONFIGURATION_FILE;
 
-				if(	isset($DB['TYPE']) &&
-					isset($DB['SERVER']) &&
-					isset($DB['DATABASE']) &&
-					isset($DB['PORT']) &&
-					isset($DB['USER']) &&
-					isset($DB['PASSWORD']) &&
-					isset($ZBX_SERVER) &&
-					isset($ZBX_SERVER_PORT) &&
-					isset($IMAGE_FORMAT_DEFAULT) &&
-					$DB['TYPE'] == $this->getConfig('DB_TYPE',		null) &&
-					$DB['SERVER'] == $this->getConfig('DB_SERVER',	null) &&
-					$DB['PORT'] == $this->getConfig('DB_PORT',		null) &&
-					$DB['DATABASE'] == $this->getConfig('DB_DATABASE',	null) &&
-					$DB['USER'] == $this->getConfig('DB_USER',		null) &&
-					$DB['PASSWORD'] == $this->getConfig('DB_PASSWORD',	null)
-					)
-				{
-					if(!DBconnect($error_msg)){
-						$error_msg = 'Cannot connect to database';
-					}
+				if(!checkConfigData($error)){ }
+				else if($DB['TYPE'] != $this->getConfig('DB_TYPE')){
+					$error = 'Config file DB type is not equal to wizard input.';
 				}
-				else{
-					$error_msg = 'Incorrect configuration file ['.$ZBX_CONFIGURATION_FILE.'], or database connection details in the file don\'t match those specified in step 4.';
+				else if($DB['SERVER'] != $this->getConfig('DB_SERVER')){
+					$error = 'Config file DB server is not equal to wizard input.';
 				}
-				DBclose();
+				else if($DB['PORT'] != $this->getConfig('DB_PORT')){
+					$error = 'Config file DB port is not equal to wizard input.';
+				}
+				else if($DB['DATABASE'] != $this->getConfig('DB_DATABASE')){
+					$error = 'Config file DB database is not equal to wizard input.';
+				}
+				else if($DB['USER'] != $this->getConfig('DB_USER')){
+					$error = 'Config file DB user is not equal to wizard input.';
+				}
+				else if($DB['PASSWORD'] != $this->getConfig('DB_PASSWORD')){
+					$error = 'Config file DB password is not equal to wizard input.';
+				}
+				else if(($this->getConfig('DB_TYPE') == 'IBM_DB2') && ($this->getConfig('DB_SCHEMA') != $DB['SCHEMA'])){
+					$error = 'Config file DB schema is not equal to wizard input.';
+				}
+				else if($this->getConfig('ZBX_SERVER') != $ZBX_SERVER){
+					$error = 'Config file Zabbix server is not equal to wizard input.';
+				}
+				else if($this->getConfig('ZBX_SERVER_PORT') != $ZBX_SERVER_PORT){
+					$error = 'Config file Zabbix server port is not equal to wizard input.';
+				}
+				else if(!$this->CheckConnection()){
+					$error = 'Cannot connect to database.';
+				}
 			}
 			else{
-				$error = 'Missing configuration file ['.$ZBX_CONFIGURATION_FILE.']';
+				$error = 'Missing configuration file ['.$ZBX_CONFIGURATION_FILE.'].';
 			}
 
-			if(isset($error_msg)){
-				error($error_msg);
-			}
+			if(isset($error)) error($error);
 
-			/* restore connection */
-			global $DB;
-
-			if(isset($old_DB)){
-				$DB['TYPE']		= $old_DB_TYPE;
-				$DB['SERVER']		= $old_DB_SERVER;
-				$DB['PORT']		= $old_DB_PORT;
-				$DB['DATABASE']		= $old_DB_DATABASE;
-				$DB['USER']		= $old_DB_USER;
-				$DB['PASSWORD']		= $old_DB_PASSWORD;
-
-				$ZBX_SERVER		= $old_ZBX_SERVER;
-				$ZBX_SERVER_PORT	= $old_ZBX_SERVER_PORT;
-			}
-
-			DBconnect($error2);
-
-			return !isset($error)&&!isset($error_msg);
+			return !isset($error);
 		}
 
 		function EventHandler(){
 			if(isset($_REQUEST['back'][$this->getStep()]))	$this->DoBack();
 
 			if($this->getStep() == 1){
-				if(!isset($_REQUEST['next'][0]) && !isset($_REQUEST['back'][2])){
-					$this->setConfig('agree', isset($_REQUEST['agree']));
-				}
-
-				if(isset($_REQUEST['next'][$this->getStep()]) && $this->getConfig('agree', false)){
+				if(isset($_REQUEST['next'][$this->getStep()])){
 					$this->DoNext();
 				}
 			}
-
-			if($this->getStep() == 2 && isset($_REQUEST['next'][$this->getStep()]) && !isset($_REQUEST['trouble'])){
+			else if($this->getStep() == 2 && isset($_REQUEST['next'][$this->getStep()]) && !isset($_REQUEST['trouble'])){
 				$this->DoNext();
+				$this->DISABLE_NEXT_BUTTON = true;
 			}
-			if($this->getStep() == 3){
+			else if($this->getStep() == 3){
 				$this->setConfig('DB_TYPE',	get_request('type',	$this->getConfig('DB_TYPE')));
-				$this->setConfig('DB_SERVER',	get_request('server',	$this->getConfig('DB_SERVER',	'localhost')));
-				$this->setConfig('DB_PORT',	get_request('port',	$this->getConfig('DB_PORT',	'0')));
-				$this->setConfig('DB_DATABASE',	get_request('database',	$this->getConfig('DB_DATABASE',	'zabbix')));
+				$this->setConfig('DB_SERVER', get_request('server',	$this->getConfig('DB_SERVER', 'localhost')));
+				$this->setConfig('DB_PORT',	get_request('port',	$this->getConfig('DB_PORT', '0')));
+				$this->setConfig('DB_DATABASE',	get_request('database',	$this->getConfig('DB_DATABASE', 'zabbix')));
 				$this->setConfig('DB_USER',	get_request('user',	$this->getConfig('DB_USER',	'root')));
 				$this->setConfig('DB_PASSWORD',	get_request('password',	$this->getConfig('DB_PASSWORD',	'')));
+				$this->setConfig('DB_SCHEMA', get_request('schema', $this->getConfig('DB_SCHEMA', '')));
 
-				if(!$this->CheckConnection()){
+				if(isset($_REQUEST['retry'])){
+					if(!$this->CheckConnection()){
+						$this->DISABLE_NEXT_BUTTON = true;
+						unset($_REQUEST['next']);
+					}
+				}
+				else if(!isset($_REQUEST['next'][$this->getStep()])){
 					$this->DISABLE_NEXT_BUTTON = true;
 					unset($_REQUEST['next']);
 				}
 
-				if(isset($_REQUEST['next'][$this->getStep()]))		$this->DoNext();
-			}
-
-			if($this->getStep() == 4){
-				$this->setConfig('ZBX_SERVER',		get_request('zbx_server',	$this->getConfig('ZBX_SERVER',		'localhost')));
-				$this->setConfig('ZBX_SERVER_PORT',	get_request('zbx_server_port',	$this->getConfig('ZBX_SERVER_PORT',	'10051')));
 				if(isset($_REQUEST['next'][$this->getStep()])) $this->DoNext();
 			}
-
-			if($this->getStep() == 5 && isset($_REQUEST['next'][$this->getStep()])){
+			else if($this->getStep() == 4){
+				$this->setConfig('ZBX_SERVER',		get_request('zbx_server',	$this->getConfig('ZBX_SERVER',		'localhost')));
+				$this->setConfig('ZBX_SERVER_PORT',	get_request('zbx_server_port',	$this->getConfig('ZBX_SERVER_PORT',	'10051')));
+				$this->setConfig('ZBX_SERVER_NAME',	get_request('zbx_server_name',	$this->getConfig('ZBX_SERVER_NAME',	'')));
+				if(isset($_REQUEST['next'][$this->getStep()])) $this->DoNext();
+			}
+			else if($this->getStep() == 5 && isset($_REQUEST['next'][$this->getStep()])){
 				$this->DoNext();
 			}
-
-			if($this->getStep() == 6){
+			else if($this->getStep() == 6){
 				$this->setConfig('ZBX_CONFIG_FILE_CORRECT', $this->CheckConfigurationFile());
 
 				if(!$this->getConfig('ZBX_CONFIG_FILE_CORRECT', false)){
@@ -548,6 +510,15 @@
 		}
 
 		function getNewConfigurationFileContent(){
+			$SCHEMA = '';
+			$dbschema = $this->getConfig('DB_SCHEMA', '');
+			$dbtype = $this->getConfig('DB_TYPE', '');
+
+			if(($dbtype == 'IBM_DB2') && !zbx_empty($dbschema)){
+				$SCHEMA = '$DB["SCHEMA"]			= \''.$dbschema.'\';'."\n";
+			}
+
+
 			return
 '<?php
 /*
@@ -571,14 +542,17 @@
 
 global $DB;
 
-$DB["TYPE"]		= \''.$this->getConfig('DB_TYPE' ,'unknown').'\';
-$DB["SERVER"]		= \''.$this->getConfig('DB_SERVER' ,'unknown').'\';
-$DB["PORT"]		= \''.$this->getConfig('DB_PORT' ,'0').'\';
-$DB["DATABASE"]		= \''.$this->getConfig('DB_DATABASE' ,'unknown').'\';
-$DB["USER"]		= \''.$this->getConfig('DB_USER' ,'unknown').'\';
-$DB["PASSWORD"]		= \''.$this->getConfig('DB_PASSWORD' ,'').'\';
-$ZBX_SERVER		= \''.$this->getConfig('ZBX_SERVER' ,'').'\';
-$ZBX_SERVER_PORT	= \''.$this->getConfig('ZBX_SERVER_PORT' ,'0').'\';
+$DB["TYPE"]				= \''.$this->getConfig('DB_TYPE' ,'unknown').'\';
+$DB["SERVER"]			= \''.$this->getConfig('DB_SERVER' ,'unknown').'\';
+$DB["PORT"]				= \''.$this->getConfig('DB_PORT' ,'0').'\';
+$DB["DATABASE"]			= \''.$this->getConfig('DB_DATABASE' ,'unknown').'\';
+$DB["USER"]				= \''.$this->getConfig('DB_USER' ,'unknown').'\';
+$DB["PASSWORD"]			= \''.$this->getConfig('DB_PASSWORD' ,'').'\';
+'.$SCHEMA.'
+
+$ZBX_SERVER				= \''.$this->getConfig('ZBX_SERVER' ,'').'\';
+$ZBX_SERVER_PORT		= \''.$this->getConfig('ZBX_SERVER_PORT' ,'0').'\';
+$ZBX_SERVER_NAME		= \''.$this->getConfig('ZBX_SERVER_NAME' ,'').'\';
 
 $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 ?>

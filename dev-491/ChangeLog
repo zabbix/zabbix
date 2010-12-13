@@ -26,6 +26,10 @@ Changes for 1.9.0
 
 Changes for 1.8.4rc3
 
+ - [ZBXNEXT-176] added zabbix server name input during setup (Vedmak)
+ - [ZBX-3253] added schema selection for db2 setup and a configuration file parameter on the server (asaveljevs,Vedmak)
+ - [ZBX-3239] fixed error in Proxies screen on Oracle, when no proxy defined (Vedmak)
+ - [ZBX-3273] removed renewed auto registration notifications for already created hosts (Sasha)
  - [ZBX-1294] disabled "Add" and "Toggle input method" for templated trigger expressions (KB)
  - [ZBX-3223] it is now possible to gather network interface statistics under a normal user on OpenBSD; thanks to Robert Nagy (asaveljevs,Sasha)
  - [ZBX-3270] fixed server crash when processing calculated items with non-numeric user macros (asaveljevs)
