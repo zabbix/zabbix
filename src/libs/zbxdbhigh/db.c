@@ -51,7 +51,7 @@ void	DBclose()
  * Connect to the database.
  * If fails, program terminates.
  */
-void    DBconnect(int flag)
+void	DBconnect(int flag)
 {
 	int	err;
 
@@ -1114,7 +1114,7 @@ int	DBget_escape_string_len(const char *src)
  *           and 'DBdyn_escape_string_len'                                    *
  *                                                                            *
  ******************************************************************************/
-void    DBescape_string(const char *src, char *dst, int len)
+void	DBescape_string(const char *src, char *dst, int len)
 {
 	const char	*s;
 	char		*d;
@@ -1347,7 +1347,7 @@ char	*DBdyn_escape_like_pattern(const char *src)
 {
 	int	len;
 	char	*dst = NULL;
-	
+
 	len = DBget_escape_like_pattern_len(src);
 
 	dst = zbx_malloc(dst, len);
@@ -1791,7 +1791,6 @@ char	*zbx_user_string(zbx_uint64_t userid)
 	return buf_string;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_host_key_function_string                                     *
@@ -1883,54 +1882,73 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 	DB_ROW		row;
 	DB_EVENT	event;
 	zbx_uint64_t	autoreg_hostid;
+	int		res = SUCCEED;
 
 	host_esc = DBdyn_escape_string_len(host, HOST_HOST_LEN);
 	ip_esc = DBdyn_escape_string_len(ip, HOST_IP_LEN);
 
-	result = DBselect(
-			"select autoreg_hostid"
-			" from autoreg_host"
-			" where proxy_hostid%s"
-				" and host='%s'"
-				DB_NODE,
-			DBsql_id_cmp(proxy_hostid),
-			host_esc,
-			DBnode_local("autoreg_hostid"));
-
-	if (NULL != (row = DBfetch(result)))
+	if (0 != proxy_hostid)
 	{
-		ZBX_STR2UINT64(autoreg_hostid, row[0]);
+		result = DBselect(
+				"select hostid"
+				" from hosts"
+				" where proxy_hostid%s"
+					" and host='%s'"
+					DB_NODE,
+				DBsql_id_cmp(proxy_hostid), host_esc,
+				DBnode_local("hostid"));
 
-		DBexecute("update autoreg_host"
-				" set listen_ip='%s',listen_port=%d"
-				" where autoreg_hostid=" ZBX_FS_UI64,
-				ip_esc, (int)port, autoreg_hostid);
+		if (NULL != DBfetch(result))
+			res = FAIL;
+		DBfree_result(result);
 	}
-	else
+
+	if (SUCCEED == res)
 	{
-		autoreg_hostid = DBget_maxid("autoreg_host");
-		DBexecute("insert into autoreg_host"
-				" (autoreg_hostid,proxy_hostid,host,listen_ip,listen_port)"
-				" values"
-				" (" ZBX_FS_UI64 ",%s,'%s','%s',%d)",
-				autoreg_hostid, DBsql_id_ins(proxy_hostid),
-				host_esc, ip_esc, (int)port);
+		result = DBselect(
+				"select autoreg_hostid"
+				" from autoreg_host"
+				" where proxy_hostid%s"
+					" and host='%s'"
+					DB_NODE,
+				DBsql_id_cmp(proxy_hostid), host_esc,
+				DBnode_local("autoreg_hostid"));
+
+		if (NULL != (row = DBfetch(result)))
+		{
+			ZBX_STR2UINT64(autoreg_hostid, row[0]);
+
+			DBexecute("update autoreg_host"
+					" set listen_ip='%s',listen_port=%d"
+					" where autoreg_hostid=" ZBX_FS_UI64,
+					ip_esc, (int)port, autoreg_hostid);
+		}
+		else
+		{
+			autoreg_hostid = DBget_maxid("autoreg_host");
+			DBexecute("insert into autoreg_host"
+					" (autoreg_hostid,proxy_hostid,host,listen_ip,listen_port)"
+					" values"
+					" (" ZBX_FS_UI64 ",'%s','%s')",
+					autoreg_hostid, DBsql_id_ins(proxy_hostid),
+					host_esc, ip_esc, (int)port);
+		}
+		DBfree_result(result);
+
+		/* Preparing auto registration event for processing */
+		memset(&event, 0, sizeof(DB_EVENT));
+		event.source	= EVENT_SOURCE_AUTO_REGISTRATION;
+		event.object	= EVENT_OBJECT_ZABBIX_ACTIVE;
+		event.objectid	= autoreg_hostid;
+		event.clock	= now;
+		event.value	= TRIGGER_VALUE_TRUE;
+
+		/* Processing event */
+		process_event(&event, 0);
 	}
-	DBfree_result(result);
 
 	zbx_free(ip_esc);
 	zbx_free(host_esc);
-
-	/* Preparing auto registration event for processing */
-	memset(&event, 0, sizeof(DB_EVENT));
-	event.source	= EVENT_SOURCE_AUTO_REGISTRATION;
-	event.object	= EVENT_OBJECT_ZABBIX_ACTIVE;
-	event.objectid	= autoreg_hostid;
-	event.clock	= now;
-	event.value	= TRIGGER_VALUE_TRUE;
-
-	/* Processing event */
-	process_event(&event, 1);
 }
 
 /******************************************************************************
@@ -2037,7 +2055,7 @@ char	*DBget_unique_hostname_by_sample(char *host_name_sample)
 			"select host"
 			" from hosts"
 			" where host like '%s%%' escape '%c'"
-		                 DB_NODE
+				DB_NODE
 			" group by host",
 			host_name_sample_esc,
 			ZBX_SQL_LIKE_ESCAPE_CHAR,
