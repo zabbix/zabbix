@@ -27,6 +27,7 @@
 	return $result;
 	}
 
+
 	function get_hostgroup_by_groupid($groupid){
 		$result=DBselect("select * from groups where groupid=".$groupid);
 		$row=DBfetch($result);
@@ -731,6 +732,7 @@ return $result;
 
 /* APPLICATIONS */
 
+
 	function get_application_by_applicationid($applicationid,$no_error_message=0){
 		$result = DBselect("select * from applications where applicationid=".$applicationid);
 		$row=DBfetch($result);
@@ -882,4 +884,5 @@ return $result;
 
 	return $dlt_groupids;
 	}
+
 ?>

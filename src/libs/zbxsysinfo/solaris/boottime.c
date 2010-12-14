@@ -18,7 +18,6 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
 
 int	SYSTEM_BOOTTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -27,10 +26,6 @@ int	SYSTEM_BOOTTIME(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	kstat_t		*kp;
 	kstat_named_t	*kn;
 	int		ret = SYSINFO_RET_FAIL;
-
-	assert(result);
-
-	init_result(result);
 
 	if (NULL == (kc = kstat_open()))
 		return ret;

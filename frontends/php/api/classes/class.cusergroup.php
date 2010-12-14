@@ -698,9 +698,24 @@ class CUserGroup extends CZBXAPI{
 			self::BeginTransaction(__METHOD__);
 
 			if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
-				self::exception(ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can add User Groups');
+				//GETTEXT: Api exception
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can delete User Groups.'));
 			}
 
+			//we must check, if this user group is used in one of the scripts. If so, it cannot be deleted
+			$error_array = array();
+			$sql = 'SELECT s.name AS script_name, ug.name AS group_name '.
+					' FROM scripts s, usrgrp ug'.
+					' WHERE '.
+						' ug.usrgrpid = s.usrgrpid '.
+						' AND '.DBcondition('s.usrgrpid', $usrgrpids);
+			$res = DBselect($sql);
+			while($group = DBfetch($res)){
+				//GETTEXT: User gets this error message when tries to delete user group used in script
+				$error_array[] = sprintf(_('User group [%1$s] is used in script [%2$s].'), $group['group_name'], $group['script_name']);
+			}
+			if(!empty($error_array))
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error_array);
 			DB::delete('rights', array('groupid'=>$usrgrpids));
 			DB::delete('operations', array('object'=>OPERATION_OBJECT_GROUP, 'objectid'=>$usrgrpids));
 			DB::delete('users_groups', array('usrgrpid'=>$usrgrpids));

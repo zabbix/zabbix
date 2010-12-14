@@ -2199,7 +2199,7 @@ int	zbx_get_next_field(const char **line, char **output, int *olen, char separat
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	str_in_list(const char *list, const char *value, const char delimiter)
+int	str_in_list(const char *list, const char *value, char delimiter)
 {
 	const char	*end;
 	int		len, ret = FAIL;

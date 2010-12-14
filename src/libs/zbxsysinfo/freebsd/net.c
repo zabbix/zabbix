@@ -18,12 +18,11 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
 
-static struct ifmibdata ifmd;
+static struct ifmibdata	ifmd;
 
-static int get_ifmib_general(char *if_name)
+static int	get_ifmib_general(char *if_name)
 {
 	int	ifcount, mib[6];
 	size_t	sz;
@@ -61,10 +60,6 @@ static int get_ifmib_general(char *if_name)
 int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char	if_name[MAX_STRING_LEN], mode[32];
-
-	assert(result);
-
-	init_result(result);
 
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
@@ -104,10 +99,6 @@ int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 {
 	char	if_name[MAX_STRING_LEN], mode[32];
 
-	assert(result);
-
-	init_result(result);
-
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
 
@@ -141,10 +132,6 @@ int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char	if_name[MAX_STRING_LEN], mode[32];
-
-	assert(result);
-
-	init_result(result);
 
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
@@ -182,10 +169,6 @@ int     NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT
 	unsigned short	port;
 	int		res;
 
-	assert(result);
-
-	init_result(result);
-
 	if (num_param(param) > 1)
 		return SYSINFO_RET_FAIL;
 
@@ -209,10 +192,6 @@ int     NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT
 int     NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char	if_name[MAX_STRING_LEN], mode[32];
-
-	assert(result);
-
-	init_result(result);
 
 	if (num_param(param) > 1)
 		return SYSINFO_RET_FAIL;

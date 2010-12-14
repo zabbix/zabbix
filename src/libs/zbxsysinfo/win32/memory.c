@@ -18,9 +18,7 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
-
 #include "symbols.h"
 
 int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)

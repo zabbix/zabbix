@@ -18,7 +18,6 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
 
 #include <sys/sockio.h>
@@ -145,31 +144,28 @@ static int	get_ifdata(const char *if_name, zbx_uint64_t *ibytes, zbx_uint64_t *i
 		if (ioctl(if_s, SIOCGIFDATA, &ifr) < 0)
 			goto clean;
 
-		if ('\0' == *if_name || 0 == strcmp(if_name, ifr.ifr_name))
-		{
-			if (ibytes)
-				*ibytes += v.ifi_ibytes;
-			if (ipackets)
-				*ipackets += v.ifi_ipackets;
-			if (ierrors)
-				*ierrors += v.ifi_ierrors;
-			if (idropped)
-				*idropped += v.ifi_iqdrops;
-			if (obytes)
-				*obytes += v.ifi_obytes;
-			if (opackets)
-				*opackets += v.ifi_opackets;
-			if (oerrors)
-				*oerrors += v.ifi_oerrors;
-			if (tbytes)
-				*tbytes += v.ifi_ibytes + v.ifi_obytes;
-			if (tpackets)
-				*tpackets += v.ifi_ipackets + v.ifi_opackets;
-			if (terrors)
-				*terrors += v.ifi_ierrors + v.ifi_oerrors;
-			if (icollisions)
-				*icollisions += v.ifi_collisions;
-		}
+		if (ibytes)
+			*ibytes += v.ifi_ibytes;
+		if (ipackets)
+			*ipackets += v.ifi_ipackets;
+		if (ierrors)
+			*ierrors += v.ifi_ierrors;
+		if (idropped)
+			*idropped += v.ifi_iqdrops;
+		if (obytes)
+			*obytes += v.ifi_obytes;
+		if (opackets)
+			*opackets += v.ifi_opackets;
+		if (oerrors)
+			*oerrors += v.ifi_oerrors;
+		if (tbytes)
+			*tbytes += v.ifi_ibytes + v.ifi_obytes;
+		if (tpackets)
+			*tpackets += v.ifi_ipackets + v.ifi_opackets;
+		if (terrors)
+			*terrors += v.ifi_ierrors + v.ifi_oerrors;
+		if (icollisions)
+			*icollisions += v.ifi_collisions;
 
 		ret = SYSINFO_RET_OK;
 clean:
@@ -185,10 +181,6 @@ int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 	char		if_name[MAX_STRING_LEN], mode[16];
 	zbx_uint64_t	ibytes, ipackets, ierrors, idropped;
 
-	assert(result);
-
-	init_result(result);
-
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
 
@@ -202,21 +194,13 @@ int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 		return SYSINFO_RET_FAIL;
 
 	if ('\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
-	{
 		SET_UI64_RESULT(result, ibytes);
-	}
 	else if (0 == strcmp(mode, "packets"))
-	{
 		SET_UI64_RESULT(result, ipackets);
-	}
 	else if (0 == strcmp(mode, "errors"))
-	{
 		SET_UI64_RESULT(result, ierrors);
-	}
 	else if (0 == strcmp(mode, "dropped"))
-	{
 		SET_UI64_RESULT(result, idropped);
-	}
 	else
 		return SYSINFO_RET_FAIL;
 
@@ -227,10 +211,6 @@ int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 {
 	char		if_name[MAX_STRING_LEN], mode[16];
 	zbx_uint64_t	obytes, opackets, oerrors;
-
-	assert(result);
-
-	init_result(result);
 
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
@@ -245,17 +225,11 @@ int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 		return SYSINFO_RET_FAIL;
 
 	if ('\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
-	{
 		SET_UI64_RESULT(result, obytes);
-	}
 	else if (0 == strcmp(mode, "packets"))
-	{
 		SET_UI64_RESULT(result, opackets);
-	}
 	else if (0 == strcmp(mode, "errors"))
-	{
 		SET_UI64_RESULT(result, oerrors);
-	}
 	else
 		return SYSINFO_RET_FAIL;
 
@@ -266,10 +240,6 @@ int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 {
 	char		if_name[MAX_STRING_LEN], mode[16];
 	zbx_uint64_t	tbytes, tpackets, terrors;
-
-	assert(result);
-
-	init_result(result);
 
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
@@ -284,40 +254,21 @@ int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 		return SYSINFO_RET_FAIL;
 
 	if ('\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
-	{
 		SET_UI64_RESULT(result, tbytes);
-	}
 	else if (0 == strcmp(mode, "packets"))
-	{
 		SET_UI64_RESULT(result, tpackets);
-	}
 	else if (0 == strcmp(mode, "errors"))
-	{
 		SET_UI64_RESULT(result, terrors);
-	}
 	else
 		return SYSINFO_RET_FAIL;
 
 	return SYSINFO_RET_OK;
 }
 
-int	NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	assert(result);
-
-	init_result(result);
-
-	return SYSINFO_RET_FAIL;
-}
-
 int	NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char		if_name[MAX_STRING_LEN];
 	zbx_uint64_t	icollisions;
-
-	assert(result);
-
-	init_result(result);
 
 	if (num_param(param) > 1)
 		return SYSINFO_RET_FAIL;

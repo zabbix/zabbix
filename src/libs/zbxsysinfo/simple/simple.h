@@ -17,7 +17,8 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#if !defined(SYSINFO_SIMPLE_H_INCLUDED)
+#ifndef ZABBIX_SYSINFO_SIMPLE_H
+#define ZABBIX_SYSINFO_SIMPLE_H
 
 #include "sysinfo.h"
 
@@ -27,4 +28,4 @@ extern ZBX_METRIC	parameters_simple[];
 int	CHECK_SERVICE_PERF(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	CHECK_SERVICE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 
-#endif /* SYSINFO_SIMPLE_H_INCLUDED */
+#endif /* ZABBIX_SYSINFO_SIMPLE_H */

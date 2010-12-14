@@ -18,7 +18,6 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
 
 static int	get_vm_stat(zbx_uint64_t *total, zbx_uint64_t *free, zbx_uint64_t *used, double *pfree, double *pused, zbx_uint64_t *cached)
@@ -171,14 +170,7 @@ static int	VM_MEMORY_CACHED(AGENT_RESULT *result)
 
 int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#define MEM_FNCLIST struct mem_fnclist_s
-MEM_FNCLIST
-{
-	char	*mode;
-	int	(*function)();
-};
-
-	MEM_FNCLIST fl[] =
+	MODE_FUNCTION fl[] =
 	{
 		{"total",	VM_MEMORY_TOTAL},
 		{"free",	VM_MEMORY_FREE},
@@ -194,10 +186,6 @@ MEM_FNCLIST
 	char	mode[MAX_STRING_LEN];
 	int	i;
 
-	assert(result);
-
-	init_result(result);
-
 	if (num_param(param) > 1)
 		return SYSINFO_RET_FAIL;
 
@@ -208,7 +196,7 @@ MEM_FNCLIST
 	if (*mode == '\0')
 		zbx_snprintf(mode, sizeof(mode), "total");
 
-	for(i = 0; fl[i].mode != 0; i++)
+	for (i = 0; fl[i].mode != 0; i++)
 		if (0 == strncmp(mode, fl[i].mode, MAX_STRING_LEN))
 			return (fl[i].function)(result);
 
