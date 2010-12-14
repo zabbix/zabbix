@@ -254,70 +254,70 @@
 			$listBox->addItems($discoveryRuleList);
 
 			$templateList->addRow(_('Discovery rules'), $listBox);
-		}
 
 // Item prototypes
-		$hostItemPrototypes = CItemPrototype::get(array(
-			'hostids' => $templateid,
-			'discoveryids' => $hostDiscoveryRuleids,
-			'inherited' => false,
-			'output' => API_OUTPUT_EXTEND,
-		));
-		if(!empty($hostItemPrototypes)){
-			$prototypeList = array();
-			foreach($hostItemPrototypes as $itemPrototype){
-				$prototypeList[$itemPrototype['itemid']] = item_description($itemPrototype);
+			$hostItemPrototypes = CItemPrototype::get(array(
+				'hostids' => $templateid,
+				'discoveryids' => $hostDiscoveryRuleids,
+				'inherited' => false,
+				'output' => API_OUTPUT_EXTEND,
+			));
+			if(!empty($hostItemPrototypes)){
+				$prototypeList = array();
+				foreach($hostItemPrototypes as $itemPrototype){
+					$prototypeList[$itemPrototype['itemid']] = item_description($itemPrototype);
+				}
+				order_result($prototypeList);
+
+				$listBox = new CListBox('itemsPrototypes', null, 8);
+				$listBox->setAttribute('disabled', 'disabled');
+				$listBox->addItems($prototypeList);
+
+				$templateList->addRow(_('Item prototypes'), $listBox);
 			}
-			order_result($prototypeList);
-
-			$listBox = new CListBox('itemsPrototypes', null, 8);
-			$listBox->setAttribute('disabled', 'disabled');
-			$listBox->addItems($prototypeList);
-
-			$templateList->addRow(_('Item prototypes'), $listBox);
-		}
 
 // Trigger prototypes
-		$hostTriggerPrototypes = CTriggerPrototype::get(array(
-			'hostids' => $templateid,
-			'discoveryids' => $hostDiscoveryRuleids,
-			'inherited' => false,
-			'output' => API_OUTPUT_EXTEND,
-			'expandDescription' => true,
-		));
-		if(!empty($hostTriggerPrototypes)){
-			$prototypeList = array();
-			foreach($hostTriggerPrototypes as $triggerPrototype){
-				$prototypeList[$triggerPrototype['triggerid']] = $triggerPrototype['description'];
+			$hostTriggerPrototypes = CTriggerPrototype::get(array(
+				'hostids' => $templateid,
+				'discoveryids' => $hostDiscoveryRuleids,
+				'inherited' => false,
+				'output' => API_OUTPUT_EXTEND,
+				'expandDescription' => true,
+			));
+			if(!empty($hostTriggerPrototypes)){
+				$prototypeList = array();
+				foreach($hostTriggerPrototypes as $triggerPrototype){
+					$prototypeList[$triggerPrototype['triggerid']] = $triggerPrototype['description'];
+				}
+				order_result($prototypeList);
+
+				$listBox = new CListBox('triggerprototypes', null, 8);
+				$listBox->setAttribute('disabled', 'disabled');
+				$listBox->addItems($prototypeList);
+
+				$templateList->addRow(_('Trigger prototypes'), $listBox);
 			}
-			order_result($prototypeList);
-
-			$listBox = new CListBox('triggerprototypes', null, 8);
-			$listBox->setAttribute('disabled', 'disabled');
-			$listBox->addItems($prototypeList);
-
-			$templateList->addRow(_('Trigger prototypes'), $listBox);
-		}
 
 // Graph prototypes
-		$hostGraphPrototypes = CGraphPrototype::get(array(
-			'hostids' => $templateid,
-			'discoveryids' => $hostDiscoveryRuleids,
-			'inherited' => false,
-			'output' => API_OUTPUT_EXTEND,
-		));
-		if(!empty($hostGraphPrototypes)){
-			$prototypeList = array();
-			foreach($hostGraphPrototypes as $graphPrototype){
-				$prototypeList[$graphPrototype['graphid']] = $graphPrototype['name'];
+			$hostGraphPrototypes = CGraphPrototype::get(array(
+				'hostids' => $templateid,
+				'discoveryids' => $hostDiscoveryRuleids,
+				'inherited' => false,
+				'output' => API_OUTPUT_EXTEND,
+			));
+			if(!empty($hostGraphPrototypes)){
+				$prototypeList = array();
+				foreach($hostGraphPrototypes as $graphPrototype){
+					$prototypeList[$graphPrototype['graphid']] = $graphPrototype['name'];
+				}
+				order_result($prototypeList);
+
+				$listBox = new CListBox('graphPrototypes', null, 8);
+				$listBox->setAttribute('disabled', 'disabled');
+				$listBox->addItems($prototypeList);
+
+				$templateList->addRow(_('Graph prototypes'), $listBox);
 			}
-			order_result($prototypeList);
-
-			$listBox = new CListBox('graphPrototypes', null, 8);
-			$listBox->setAttribute('disabled', 'disabled');
-			$listBox->addItems($prototypeList);
-
-			$templateList->addRow(_('Graph prototypes'), $listBox);
 		}
 	}
 
