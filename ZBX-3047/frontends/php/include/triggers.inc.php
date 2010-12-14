@@ -32,10 +32,10 @@
  *
  */
 	function INIT_TRIGGER_EXPRESSION_STRUCTURES(){
-		if( defined('TRIGGER_EXPRESSION_STRUCTURES_OK') ) return;
-		define('TRIGGER_EXPRESSION_STRUCTURES_OK', 1);
-
 		global $ZBX_TR_EXPR_SIMPLE_MACROS, $ZBX_TR_EXPR_REPLACE_TO, $ZBX_TR_EXPR_ALLOWED_FUNCTIONS;
+
+		if( defined('TRIGGER_EXPRESSION_STRUCTURES_OK') ) return $ZBX_TR_EXPR_ALLOWED_FUNCTIONS;
+		define('TRIGGER_EXPRESSION_STRUCTURES_OK', 1);
 
 		$ZBX_TR_EXPR_SIMPLE_MACROS['{TRIGGER.VALUE}'] = '{TRIGGER.VALUE}';
 
@@ -48,20 +48,25 @@
 				ITEM_VALUE_TYPE_STR,
 				ITEM_VALUE_TYPE_TEXT,
 				ITEM_VALUE_TYPE_LOG
-				)
-			);
-		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['avg']	= array('args' => array(	0 => array('type' => 'sec_num','mandat' => true) ),
+			)
+		);
+
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['avg']	= array(
+			'args' => array( array('type' => 'sec_num','mandat' => true) ),
 			'item_types' => array(
 				ITEM_VALUE_TYPE_FLOAT,
 				ITEM_VALUE_TYPE_UINT64
-				),
-			);
-		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['delta']	= array('args' => array( 0 => array('type' => 'sec_num','mandat' => true) ),
+			),
+		);
+
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['delta']	= array(
+			'args' => array( array('type' => 'sec_num','mandat' => true) ),
 			'item_types' => array(
 				ITEM_VALUE_TYPE_FLOAT,
 				ITEM_VALUE_TYPE_UINT64
-				),
-			);
+			),
+		);
+
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['change']	= array('args' => null,
 			'item_types' => array(
 				ITEM_VALUE_TYPE_FLOAT,
@@ -69,17 +74,23 @@
 				ITEM_VALUE_TYPE_STR,
 				ITEM_VALUE_TYPE_TEXT,
 				ITEM_VALUE_TYPE_LOG
-				),
-			);
-		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['count']	= array('args' => array( 0 => array('type' => 'sec_num','mandat' => true), 1 => array('type' => 'str'), 1=>array('type' => 'str') ),
+			),
+		);
+
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['count']	= array(
+			'args' => array(
+				array('type' => 'sec_num','mandat' => true),
+				array('type' => 'str')
+			),
 			'item_types' => array(
 				ITEM_VALUE_TYPE_FLOAT,
 				ITEM_VALUE_TYPE_UINT64,
 				ITEM_VALUE_TYPE_STR,
 				ITEM_VALUE_TYPE_TEXT,
 				ITEM_VALUE_TYPE_LOG
-				)
-			);
+			)
+		);
+
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['date']	= array('args' => null, 'item_types' => null );
 
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['dayofweek']= array('args' => null,	'item_types' => null );
@@ -91,44 +102,59 @@
 				ITEM_VALUE_TYPE_STR,
 				ITEM_VALUE_TYPE_TEXT,
 				ITEM_VALUE_TYPE_LOG
-				)
-			);
+			)
+		);
+
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['fuzzytime']	= array('args' => null,
 			'item_types' => array(
 				ITEM_VALUE_TYPE_FLOAT,
 				ITEM_VALUE_TYPE_UINT64
-				)
-			);
-		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['iregexp']= array('args' => array( 0 => array('type' => 'str','mandat' => true) ),
+			)
+		);
+
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['iregexp']= array(
+			'args' => array(array('type' => 'str','mandat' => true)),
 			'item_types' => array(
 				ITEM_VALUE_TYPE_STR,
 				ITEM_VALUE_TYPE_TEXT,
 				ITEM_VALUE_TYPE_LOG
-				)
-			);
-		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['last']	= array('args' => array( 0 => array('type' => 'sec_num','mandat' => true) ),
+			)
+		);
+
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['last']	= array(
+			'args' => array( array('type' => 'sec_num','mandat' => true) ),
 			'item_types' => array(
 				ITEM_VALUE_TYPE_FLOAT,
 				ITEM_VALUE_TYPE_UINT64,
 				ITEM_VALUE_TYPE_STR,
 				ITEM_VALUE_TYPE_TEXT,
 				ITEM_VALUE_TYPE_LOG
-				)
-			);
-		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['max']	= array('args' => array( 0 => array('type' => 'sec_num','mandat' => true) ),
+			)
+		);
+
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['max']	= array(
+			'args' => array( array('type' => 'sec_num','mandat' => true) ),
 			'item_types' => array(
 				ITEM_VALUE_TYPE_FLOAT,
 				ITEM_VALUE_TYPE_UINT64
-				)
-			);
-		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['min']	= array('args' => array( 0 => array('type' => 'sec_num','mandat' => true) ),
+			)
+		);
+
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['min']	= array(
+			'args' => array( array('type' => 'sec_num','mandat' => true) ),
 			'item_types' => array(
 				ITEM_VALUE_TYPE_FLOAT,
 				ITEM_VALUE_TYPE_UINT64
-				)
-			);
-		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['nodata']= array('args' => array( 0 => array('type' => 'sec','mandat' => true) ), 'item_types' => null );
+			)
+		);
+
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['nodata']= array(
+			'args' => array( array('type' => 'sec','mandat' => true) ),
+			'item_types' => null
+		);
+
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['now']	= array('args' => null, 'item_types' => null );
+
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['prev']	= array('args' => null,
 			'item_types' => array(
 				ITEM_VALUE_TYPE_FLOAT,
@@ -136,41 +162,45 @@
 				ITEM_VALUE_TYPE_STR,
 				ITEM_VALUE_TYPE_TEXT,
 				ITEM_VALUE_TYPE_LOG
-				)
-			);
-		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['str']	= array('args' => array( 0 => array('type' => 'str','mandat' => true) ),
+			)
+		);
+
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['str']	= array(
+			'args' => array( array('type' => 'str','mandat' => true) ),
 			'item_types' => array(
 				ITEM_VALUE_TYPE_STR,
 				ITEM_VALUE_TYPE_TEXT,
 				ITEM_VALUE_TYPE_LOG
-				)
-			);
+			)
+		);
 
-
-		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['sum']	= array('args' => array( 0 => array('type' => 'sec_num','mandat' => true) ),
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['sum']	= array(
+			'args' => array( array('type' => 'sec_num','mandat' => true) ),
 			'item_types' => array(
 				ITEM_VALUE_TYPE_FLOAT,
 				ITEM_VALUE_TYPE_UINT64
-				)
-			);
+			)
+		);
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['logseverity']= array('args' => null,
 			'item_types' => array(
 				ITEM_VALUE_TYPE_LOG
-				)
-			);
-		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['logsource']= array('args' => array( 0=> array('type' => 'str','mandat' => true) ),
+			)
+		);
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['logsource']= array(
+			'args' => array( array('type' => 'str','mandat' => true) ),
 			'item_types' => array(
 				ITEM_VALUE_TYPE_LOG
-				)
-			);
+			)
+		);
 
-		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['regexp']= array('args' => array( 0 => array('type' => 'str','mandat' => true) ),
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['regexp']= array(
+			'args' => array( array('type' => 'str','mandat' => true) ),
 			'item_types' => array(
 				ITEM_VALUE_TYPE_STR,
 				ITEM_VALUE_TYPE_TEXT,
 				ITEM_VALUE_TYPE_LOG
-				)
-			);
+			)
+		);
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['time']	= array('args' => null, 'item_types' => null );
 	}
 
@@ -864,10 +894,11 @@ return $caption;
 
 		addEvent($triggerid,TRIGGER_VALUE_UNKNOWN);
 
-		if( null == ($expression = implode_exp($expression,$triggerid)) ){
+		$expression = implode_exp($expression,$triggerid);
+		if(is_null($expression)){
+			error('Incorrect item keys provided for trigger expression');
 			$result = false;
 		}
-
 
 		if($result){
 			DBexecute('update triggers set expression='.zbx_dbstr($expression).' where triggerid='.$triggerid);
@@ -1376,117 +1407,55 @@ return $caption;
 //SDII($exp);
 	return $exp;
 	}
-	/*
-	 * Function: implode_exp
-	 *
-	 * Description:
-	 *	 Translate localhost:procload.last(0)>10 to {12}>10
-	 *	 And create database representation.
-	 *
-	 * Author:
-	 *	 Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments: !!! Don't forget sync code with C !!!
-	 *
-	 */
+/*
+ * Function: implode_exp
+ *
+ * Description:
+ *	 Translate localhost:procload.last(0)>10 to {12}>10
+ *	 And create database representation.
+ *
+ * Author:
+ *	 Aly (aly@zabbix.com)
+ *
+ * Comments: !!! Don't forget sync code with C !!!
+ *
+ */
 	function implode_exp($expression, $triggerid){
-//		global $ZBX_TR_EXPR_SIMPLE_MACROS, $ZBX_TR_EXPR_REPLACE_TO;
 		$expr = $expression;
-//		$short_exp = $expression;
 
-/* Replace all {server:key.function(param)} and {MACRO} with '$ZBX_TR_EXPR_REPLACE_TO' */
-/* build short expression {12}>10 */
-//		while(ereg(ZBX_EREG_EXPRESSION_TOKEN_FORMAT, $expr, $arr)){
-/*		while(preg_match('/'.ZBX_PREG_EXPRESSION_TOKEN_FORMAT.'/', $expr, $arr)){
-			if($arr[ZBX_EXPRESSION_MACRO_ID] && !isset($ZBX_TR_EXPR_SIMPLE_MACROS[$arr[ZBX_EXPRESSION_MACRO_ID]])){
-				error('[ie]'.SPACE.S_UNKNOWN_MACRO.' ['.$arr[ZBX_EXPRESSION_MACRO_ID].']');
-				return false;
-			}
-			else if(!$arr[ZBX_EXPRESSION_MACRO_ID]) {
+		$trigExpr = new CTriggerExpression(array('expression' => $expression));
 
-				$s_expr		= &$arr[ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID];
-				$host		= &$arr[ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID + ZBX_SIMPLE_EXPRESSION_HOST_ID];
-				$key		= &$arr[ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID + ZBX_SIMPLE_EXPRESSION_KEY_ID];
-				$function 	= &$arr[ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID + ZBX_SIMPLE_EXPRESSION_FUNCTION_NAME_ID];
-				$parameter	= &$arr[ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID + ZBX_SIMPLE_EXPRESSION_FUNCTION_PARAM_ID];
-*/
-		$expressionData = parseTriggerExpressions($expression, true);
-		if(isset($expressionData[$expression]['errors'])) return null;
-		if(!is_array($expressionData[$expression]['expressions']) || !count($expressionData[$expression]['expressions'])) return $expression;
+		if(!empty($trigExpr->errors)) return null;
+		if(empty($trigExpr->expressions)) return null;
 
-		$usedItems = Array();
+		$usedItems = array();
 
 		$cuted = 0;
-		foreach($expressionData[$expression]['expressions'] as &$macro) {
-			$itemStr = zbx_substr($expression, $macro['openSymbolNum'], $macro['closeSymbolNum']-$macro['openSymbolNum']+1);
-			unset($iData);
-//			SDII($macro);
-			reset($macro['indexes']['server']);
-			$iData =& $macro['indexes']['server'][key($macro['indexes']['server'])];
-			$host = zbx_substr($expression, $iData['openSymbolNum']+1, $iData['closeSymbolNum']-($iData['openSymbolNum']+1));
-//			SDI($host);
-			unset($iData);
-			reset($macro['indexes']['keyName']);
-			$iData =& $macro['indexes']['keyName'][key($macro['indexes']['keyName'])];
-			$keyName = zbx_substr($expression, $iData['openSymbolNum']+1, $iData['closeSymbolNum']-($iData['openSymbolNum']+1));
-//			SDI($keyName);
-			if(isset($macro['indexes']['keyParams']) && count($macro['indexes']['keyParams']) > 0) {
-				unset($iData);
-				reset($macro['indexes']['keyParams']);
-				$iData =& $macro['indexes']['keyParams'][key($macro['indexes']['keyParams'])];
-				$keyParams = zbx_substr($expression, $iData['openSymbolNum'], $iData['closeSymbolNum']-$iData['openSymbolNum']+1);
-			}else{
-				$keyParams = '';
-			}
-			unset($iData);
-			reset($macro['indexes']['keyFunctionName']);
-			$iData =& $macro['indexes']['keyFunctionName'][key($macro['indexes']['keyFunctionName'])];
-			$function = zbx_substr($expression, $iData['openSymbolNum']+1, $iData['closeSymbolNum']-($iData['openSymbolNum']+1));
-//			SDI($function);
-			if(isset($macro['indexes']['keyFunctionParams']) && count($macro['indexes']['keyFunctionParams']) > 0) {
-				unset($iData);
-				reset($macro['indexes']['keyFunctionParams']);
-				$iData =& $macro['indexes']['keyFunctionParams'][key($macro['indexes']['keyFunctionParams'])];
-				$functionParams = zbx_substr($expression, $iData['openSymbolNum']+1, $iData['closeSymbolNum']-($iData['openSymbolNum']+1));
-			}else{
-				$functionParams = '';
-			}
-//			SDI($functionParams);
-//			SDI('FINISH ------------------------------------->>>>>>>>>>>>>>>>>>>>');
+		foreach($trigExpr->expressions as $exprPart){
 			$sql = 'SELECT i.itemid '.
 				' FROM items i,hosts h'.
-				' WHERE i.key_='.zbx_dbstr($keyName.$keyParams).
-					' AND h.host='.zbx_dbstr($host).
-					' AND h.hostid=i.hostid';
+				' WHERE i.key_='.zbx_dbstr($exprPart['key']).
+					' AND h.host='.zbx_dbstr($exprPart['host']).
+					' AND h.hostid=i.hostid'.
+					' AND '.DBin_node('i.itemid');
+			if(!$item = DBfetch(DBselect($sql))) return null;
 
-			$item_res = DBselect($sql);
-			while(($item = DBfetch($item_res)) && (!in_node($item['itemid']))){
-			}
-
-			if(!$item) return null;
-
-			$itemid = $item['itemid'];
-
-			if(!isset($usedItems[$itemStr])) {
+			if(!isset($usedItems[$exprPart['expression']])) {
 				$functionid = get_dbid('functions','functionid');
 
-				$sql = 'insert into functions (functionid,itemid,triggerid,function,parameter)'.
-					' values ('.$functionid.','.$itemid.','.$triggerid.','.zbx_dbstr($function).','.
-					zbx_dbstr($functionParams).')';
-				if( !DBexecute($sql)) {
-					return	null;
-				}else {
-					$usedItems[$itemStr] = $functionid;
-				}
+				$sql = 'INSERT INTO functions (functionid,itemid,triggerid,function,parameter)'.
+					' VALUES ('.$functionid.','.$item['itemid'].','.$triggerid.','.
+						zbx_dbstr($exprPart['functionName']).','.zbx_dbstr($exprPart['functionParam']).')';
+
+				if(!DBexecute($sql)) return null;
+				else $usedItems[$exprPart['expression']] = $functionid;
 			}
 //SDI("BEFORE: $expr");
-			$expr = zbx_substr($expr, 0, $macro['openSymbolNum']-$cuted).'{'.$usedItems[$itemStr].'}'.zbx_substr($expr, $macro['closeSymbolNum']-$cuted+1);
-			$cuted += $macro['closeSymbolNum']-$macro['openSymbolNum']+1-zbx_strlen('{'.$usedItems[$itemStr].'}');
+			$expr = str_replace($exprPart['expression'], '{'.$usedItems[$exprPart['expression']].'}', $expr);
 //SDI("AFTER: $expr");
 		}
-//		SDI($expr);
-//		exit;
-		return $expr;
+
+	return $expr;
 	}
 
 	function update_trigger_comments($triggerids,$comments){
@@ -1889,7 +1858,6 @@ return $caption;
 
 
 		$exp_hosts 	= get_hosts_by_expression($expression);
-
 		if( $exp_hosts ){
 			$chd_hosts	= get_hosts_by_templateid($trig_host['hostid']);
 
@@ -1929,7 +1897,11 @@ return $caption;
 			return	$result;
 		}
 
-		$expression = implode_exp($expression,$triggerid); /* errors can be ignored cose function must return NULL */
+		$expression = implode_exp($expression,$triggerid);
+		if(is_null($expression)){
+			error('Incorrect item keys provided for trigger expression');
+			return false;
+		}
 
 		$update_values = array();
 		if(!is_null($expression)) $update_values['expression'] = $expression;
