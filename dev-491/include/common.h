@@ -227,7 +227,7 @@ typedef enum
 
 typedef enum
 {
-	DOBJECT_STATUS_UP	= 0,
+	DOBJECT_STATUS_UP = 0,
 	DOBJECT_STATUS_DOWN,
 	DOBJECT_STATUS_DISCOVER,
 	DOBJECT_STATUS_LOST
@@ -784,7 +784,7 @@ int	zbx_pg_escape_bytea(const u_char *input, int ilen, char **output, int *olen)
 int	zbx_pg_unescape_bytea(u_char *io);
 #endif
 int	zbx_get_next_field(const char **line, char **output, int *olen, char separator);
-int	str_in_list(const char *list, const char *value, const char delimiter);
+int	str_in_list(const char *list, const char *value, char delimiter);
 
 #ifdef HAVE___VA_ARGS__
 #	define zbx_setproctitle(fmt, ...) __zbx_zbx_setproctitle(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)

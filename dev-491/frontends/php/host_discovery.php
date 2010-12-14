@@ -581,8 +581,12 @@ switch($itemType) {
 // Filter
 
 		$item_filter_macro = $item_filter_value = '';
-		if(!empty($item_filter))
-			list($item_filter_macro, $item_filter_value) = explode(':', $item_filter);
+		if(!empty($item_filter)){
+			//Exploding filter to two parts: before first ':' and after
+			$col_position = zbx_strpos($item_filter, ':');
+			$item_filter_macro = zbx_substr($item_filter, 0, $col_position); //before first ':'
+			$item_filter_value = zbx_substr($item_filter, $col_position+1); //after first ':'
+		}
 
 		$frmItem->addRow(S_FILTER, array(
 			S_MACRO, SPACE, new CTextBox('item_filter_macro',$item_filter_macro,20),

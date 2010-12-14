@@ -21,36 +21,27 @@
 <?php
 class CFormTable extends CForm{
 
- private $align;
- private $help;
+	private $align;
+	private $help;
+	private $title;
+	private $tableclass = 'formtable';
 
- protected $top_items = array();
- protected $center_items = array();
- protected $bottom_items = array();
+	protected $top_items = array();
+	protected $center_items = array();
+	protected $bottom_items = array();
 
 	public function __construct($title=null, $action=null, $method=null, $enctype=null, $form_variable=null){
+		$method = is_null($method) ? 'post' : $method;
+		parent::__construct($action, $method, $enctype);
 
-		$this->top_items = array();
-		$this->center_items = array();
-		$this->bottom_items = array();
-		$this->tableclass = 'formtable';
-
-		if( null == $method ){
-			$method = 'post';
-		}
-
-		if( null == $form_variable ){
-			$form_variable = 'form';
-		}
-
-		parent::__construct($action,$method,$enctype);
 		$this->setTitle($title);
 		$this->setHelp();
 
+		$form_variable = is_null($form_variable) ? 'form' : $form_variable;
 		$this->addVar($form_variable, get_request($form_variable, 1));
 
 		$this->bottom_items = new CCol(SPACE,'form_row_last');
-			$this->bottom_items->setColSpan(2);
+		$this->bottom_items->setColSpan(2);
 	}
 
 	public function setAction($value){
@@ -80,12 +71,6 @@ class CFormTable extends CForm{
 	}
 
 	public function setTitle($value=null){
-		if(is_null($value)){
-			$this->title = null;
-			return 0;
-		}
-
-		// $this->title = unpack_object($value);
 		$this->title = $value;
 	}
 
@@ -106,14 +91,6 @@ class CFormTable extends CForm{
 		}
 
 	return 0;
-	}
-
-	public function addVar($name, $value){
-		$this->addItemToTopRow(new CVar($name, $value));
-	}
-
-	public function addItemToTopRow($value){
-		array_push($this->top_items, $value);
 	}
 
 	public function addRow($item1, $item2=NULL, $class=NULL, $id=null){
@@ -167,11 +144,9 @@ class CFormTable extends CForm{
 	}
 
 	public function bodyToString(){
-		parent::bodyToString();
+		$res = parent::bodyToString();
 
 		$tbl = new CTable(NULL,$this->tableclass);
-
-		foreach($this->top_items as $item)	$tbl->addItem($item);
 
 		//$tbl->setOddRowClass('form_odd_row');
 		//$tbl->setEvenRowClass('form_even_row');
@@ -203,7 +178,7 @@ class CFormTable extends CForm{
 			$tbl->addRow($item);
 		}
 
-	return $tbl->toString();
+		return $res . $tbl->toString();
 	}
 }
 ?>

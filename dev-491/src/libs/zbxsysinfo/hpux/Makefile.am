@@ -9,10 +9,5 @@ libspecsysinfo_a_SOURCES = \
 	diskio.c \
 	diskspace.c \
 	inodes.c \
-	kernel.c \
 	memory.c \
-	net.c \
-	proc.c \
-	sensors.c \
-	swap.c \
-	uptime.c
+	net.c

@@ -18,7 +18,6 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
 #include "stats.h"
 
@@ -27,10 +26,6 @@ int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	SYSTEM_INFO	sysInfo;
 
 	char	mode[128];
-
-        assert(result);
-
-        init_result(result);
 
         if(num_param(param) > 1)
         {
@@ -54,7 +49,6 @@ int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
 	GetSystemInfo(&sysInfo);
 
-
 	SET_UI64_RESULT(result, sysInfo.dwNumberOfProcessors);
 
 	return SYSINFO_RET_OK;
@@ -64,10 +58,6 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 {
 	char	tmp[32];
 	int	cpu_num;
-
-	assert(result);
-
-	init_result(result);
 
 	if (!CPU_COLLECTOR_STARTED(collector))
 	{
@@ -101,11 +91,11 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		*tmp = '\0';
 
 	if ('\0' == *tmp || 0 == strcmp(tmp, "avg1"))	/* default parameter */
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].util1)
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].util1);
 	else if (0 == strcmp(tmp, "avg5"))
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].util5)
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].util5);
 	else if (0 == strcmp(tmp, "avg15"))
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].util15)
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].util15);
 	else
 		return SYSINFO_RET_FAIL;
 
@@ -173,25 +163,4 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	}
 
 	return SYSINFO_RET_OK;
-
-}
-
-int     SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-#ifdef TODO
-#error Realize function SYSTEM_CPU_SWITCHES!!!
-#endif /* todo */
-
-	return SYSINFO_RET_FAIL;
-
-}
-
-int     SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-#ifdef TODO
-#error Realize function SYSTEM_CPU_INTR!!!
-#endif /* todo */
-
-	return SYSINFO_RET_FAIL;
-
 }
