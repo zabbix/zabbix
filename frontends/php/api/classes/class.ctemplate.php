@@ -1156,16 +1156,16 @@ COpt::memoryPick();
 			CItem::delete(array_keys($delItems), true);
 
 
-	// delete screen items
+// delete screen items
 			DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid', $templateids)).' AND resourcetype='.SCREEN_RESOURCE_HOST_TRIGGERS;
 
-	// delete host from maps
+// delete host from maps
 			delete_sysmaps_elements_with_hostid($templateids);
 
-	// disable actions
+// disable actions
 			$actionids = array();
 
-	// conditions
+// conditions
 			$sql = 'SELECT DISTINCT actionid '.
 					' FROM conditions '.
 					' WHERE conditiontype='.CONDITION_TYPE_HOST.
@@ -1178,7 +1178,7 @@ COpt::memoryPick();
 			DBexecute('UPDATE actions '.
 						' SET status='.ACTION_STATUS_DISABLED.
 						' WHERE '.DBcondition('actionid',$actionids));
-	// operations
+// operations
 			$sql = 'SELECT DISTINCT o.actionid '.
 					' FROM operations o '.
 					' WHERE o.operationtype IN ('.OPERATION_TYPE_GROUP_ADD.','.OPERATION_TYPE_GROUP_REMOVE.') '.
@@ -1195,13 +1195,13 @@ COpt::memoryPick();
 			}
 
 
-	// delete action conditions
+// delete action conditions
 			DBexecute('DELETE FROM conditions '.
 						' WHERE conditiontype='.CONDITION_TYPE_HOST.
 							' AND '.DBcondition('value',$templateids, false, true));	// FIXED[POSIBLE value type violation]!!!
 
 
-	// delete action operations
+// delete action operations
 			DBexecute('DELETE FROM operations '.
 						' WHERE operationtype IN ('.OPERATION_TYPE_TEMPLATE_ADD.','.OPERATION_TYPE_TEMPLATE_REMOVE.') '.
 							' AND '.DBcondition('objectid',$templateids));
@@ -2094,21 +2094,33 @@ COpt::memoryPick();
 			'hostid' => $targetids
 		));
 
-		$hosts = CHost::get(array(
-			'hostids' => $targetids,
-			'output' => array('hostid, host'),
-			'nopermissions' => true,
-		));
-		$templates = CTemplate::get(array(
-			'templateids' => $templateids,
-			'output' => array('hostid, host'),
-			'nopermissions' => true,
-		));
+		if(!is_null($targetids)){
+			$hosts = CHost::get(array(
+				'hostids' => $targetids,
+				'output' => array('hostid, host'),
+				'nopermissions' => true,
+			));
+		}
+		else{
+			$hosts = CHost::get(array(
+				'templateids' => $templateids,
+				'output' => array('hostid, host'),
+				'nopermissions' => true,
+			));
+		}
 
-		$hosts = implode(', ', zbx_objectValues($hosts, 'host'));
-		$templates = implode(', ', zbx_objectValues($templates, 'host'));
+		if(!empty($hosts)){
+			$templates = CTemplate::get(array(
+				'templateids' => $templateids,
+				'output' => array('hostid, host'),
+				'nopermissions' => true,
+			));
 
-		info(_s('Templates [%1$s] unlinked from hosts [%2$s].', $templates, $hosts));
+			$hosts = implode(', ', zbx_objectValues($hosts, 'host'));
+			$templates = implode(', ', zbx_objectValues($templates, 'host'));
+
+			info(_s('Templates [%1$s] unlinked from hosts [%2$s].', $templates, $hosts));
+		}
 
 		return true;
 	}
