@@ -43,7 +43,7 @@ class CServerInfo extends CTable{
 				'(',new CLink(_('refresh now'),'http://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']),')')));
 		$this->addRow(S_NUMBER_OF_USERS_SHORT.': '.$status['users_count'].'('.$status['users_online'].')');
 		$this->addRow(new CCol(array(_('Logged in as').SPACE, new CLink($USER_DETAILS['alias'],'profile.php'))));
-		$this->addRow(new CCol(array(new CLink('Zabbix server','report1.php'),' is ',$server)),'status');
+		$this->addRow(new CCol(array(new CLink(_('Zabbix server'),'report1.php'),' is ',$server)),'status');
 		//$this->addRow(S_VALUES_STORED.': '.$status['history_count']);
 		//$this->addRow(S_TRENDS_STORED.': '.$status['trends_count']);
 		$this->addRow(new CCol(array(S_NUMBER_OF_HOSTS_SHORT.': '.$status['hosts_count'].'(',
