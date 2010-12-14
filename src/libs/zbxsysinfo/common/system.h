@@ -17,13 +17,14 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#if !defined(SYSINFO_COMMON_SYSTEM_H_INCLUDED)
+#ifndef ZABBIX_SYSINFO_COMMON_SYSTEM_H
+#define ZABBIX_SYSINFO_COMMON_SYSTEM_H
 
 #include "sysinfo.h"
 
 int	SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int     SYSTEM_UNUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int     SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int     SYSTEM_HOSTNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	SYSTEM_USERS_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	SYSTEM_HOSTNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 
-#endif /* SYSINFO_COMMON_SYSTEM_H_INCLUDED */
+#endif /* ZABBIX_SYSINFO_COMMON_SYSTEM_H */

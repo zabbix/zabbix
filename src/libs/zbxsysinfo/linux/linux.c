@@ -20,10 +20,9 @@
 #include "common.h"
 #include "sysinfo.h"
 
-ZBX_METRIC	parameters_specific[]=
+ZBX_METRIC	parameters_specific[] =
 /*	KEY			FLAG		FUNCTION	ADD_PARAM	TEST_PARAM */
-	{
-
+{
 	{"kernel.maxfiles",	0,		KERNEL_MAXFILES,	NULL,	NULL},
 	{"kernel.maxproc",	0,		KERNEL_MAXPROC,		NULL,	NULL},
 
@@ -34,19 +33,19 @@ ZBX_METRIC	parameters_specific[]=
 	{"vfs.dev.read",	CF_USEUPARAM,	VFS_DEV_READ,		NULL,	"sda,operations"},
 	{"vfs.dev.write",	CF_USEUPARAM,	VFS_DEV_WRITE,		NULL,	"sda,sectors"},
 
+	{"net.tcp.listen",	CF_USEUPARAM,	NET_TCP_LISTEN,		NULL,	"80"},
+	{"net.udp.listen",	CF_USEUPARAM,	NET_UDP_LISTEN,		NULL,	"68"},
+
 	{"net.if.in",		CF_USEUPARAM,	NET_IF_IN,		NULL,	"lo,bytes"},
 	{"net.if.out",		CF_USEUPARAM,	NET_IF_OUT,		NULL,	"lo,bytes"},
 	{"net.if.total",	CF_USEUPARAM,	NET_IF_TOTAL,		NULL,	"lo,bytes"},
 	{"net.if.collisions",	CF_USEUPARAM,	NET_IF_COLLISIONS,	NULL,	"lo"},
 	{"net.if.discovery",	0,		NET_IF_DISCOVERY,	NULL,	NULL},
 
-	{"net.tcp.listen",	CF_USEUPARAM,	NET_TCP_LISTEN,		NULL,	"80"},
-	{"net.udp.listen",	CF_USEUPARAM,	NET_UDP_LISTEN,		NULL,	"68"},
-
 	{"vm.memory.size",	CF_USEUPARAM,	VM_MEMORY_SIZE,		NULL,	"total"},
 
 	{"proc.num",		CF_USEUPARAM,	PROC_NUM,		NULL,	"inetd,,,"},
-	{"proc.mem",		CF_USEUPARAM,	PROC_MEMORY,		NULL,	"inetd,,"},
+	{"proc.mem",		CF_USEUPARAM,	PROC_MEM,		NULL,	"inetd,,"},
 
 	{"system.cpu.switches", 0,		SYSTEM_CPU_SWITCHES,	NULL,	NULL},
 	{"system.cpu.intr",	0,		SYSTEM_CPU_INTR,	NULL,	NULL},
@@ -61,5 +60,7 @@ ZBX_METRIC	parameters_specific[]=
 	{"system.uptime",	0,		SYSTEM_UPTIME,		NULL,	NULL},
 	{"system.boottime",	0,		SYSTEM_BOOTTIME,	NULL,	NULL},
 
+	{"sensor",		CF_USEUPARAM,	GET_SENSOR,		NULL,	"temp1"},
+
 	{0}
-	};
+};

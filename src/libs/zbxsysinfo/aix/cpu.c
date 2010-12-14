@@ -18,7 +18,6 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
 #include "stats.h"
 
@@ -27,13 +26,7 @@ int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 #if defined(HAVE_LIBPERFSTAT)
 	char			mode[MAX_STRING_LEN];
 	perfstat_cpu_total_t	ps_cpu_total;
-#endif
 
-	assert(result);
-
-	init_result(result);
-
-#if defined(HAVE_LIBPERFSTAT)
 	if (num_param(param) > 1)
 		return SYSINFO_RET_FAIL;
 
@@ -62,10 +55,6 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 {
 	char	tmp[32], type[32];
 	int	cpu_num, mode;
-
-        assert(result);
-
-        init_result(result);
 
 	if (!CPU_COLLECTOR_STARTED(collector))
 	{
@@ -104,13 +93,13 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		return SYSINFO_RET_FAIL;
 
 	if ('\0' == *type || 0 == strcmp(type, "user"))	/* default parameter */
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].user[mode])
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].user[mode]);
 	else if (0 == strcmp(type, "system"))
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].system[mode])
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].system[mode]);
 	else if (0 == strcmp(type, "idle"))
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].idle[mode])
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].idle[mode]);
 	else if (0 == strcmp(type, "iowait"))
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].iowait[mode])
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].iowait[mode]);
 	else
 		return SYSINFO_RET_FAIL;
 
@@ -141,7 +130,7 @@ static int	get_cpuload(double *load1, double *load5, double *load15)
 #endif
 }
 
-int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	double	value;
 
@@ -153,7 +142,7 @@ int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_R
 	return SYSINFO_RET_OK;
 }
 
-int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	double	value;
 
@@ -165,7 +154,7 @@ int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_R
 	return SYSINFO_RET_OK;
 }
 
-int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	double	value;
 
@@ -179,15 +168,7 @@ int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_
 
 int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-
-#define CPU_FNCLIST struct cpu_fnclist_s
-CPU_FNCLIST
-{
-	char *mode;
-	int (*function)();
-};
-
-	CPU_FNCLIST fl[] =
+	MODE_FUNCTION fl[] =
 	{
 		{"avg1" ,	SYSTEM_CPU_LOAD1},
 		{"avg5" ,	SYSTEM_CPU_LOAD5},
@@ -198,10 +179,6 @@ CPU_FNCLIST
 	char	cpuname[MAX_STRING_LEN],
 		mode[MAX_STRING_LEN];
 	int	i;
-
-        assert(result);
-
-        init_result(result);
 
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
@@ -234,13 +211,7 @@ int     SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, 
 {
 #if defined(HAVE_LIBPERFSTAT)
 	perfstat_cpu_total_t	ps_cpu_total;
-#endif
 
-	assert(result);
-
-	init_result(result);
-
-#if defined(HAVE_LIBPERFSTAT)
 	if (-1 == perfstat_cpu_total(NULL, &ps_cpu_total, sizeof(ps_cpu_total), 1))
 		return SYSINFO_RET_FAIL;
 
@@ -256,13 +227,7 @@ int     SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGEN
 {
 #if defined(HAVE_LIBPERFSTAT)
 	perfstat_cpu_total_t	ps_cpu_total;
-#endif
 
-	assert(result);
-
-	init_result(result);
-
-#if defined(HAVE_LIBPERFSTAT)
 	if (-1 == perfstat_cpu_total(NULL, &ps_cpu_total, sizeof(ps_cpu_total), 1))
 		return SYSINFO_RET_FAIL;
 

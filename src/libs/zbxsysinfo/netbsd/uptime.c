@@ -18,17 +18,12 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
 
 int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #if defined(HAVE_SYSINFO_UPTIME)
 	struct sysinfo info;
-
-	assert(result);
-
-        init_result(result);
 
 	if( 0 == sysinfo(&info))
 	{
@@ -43,10 +38,6 @@ int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	int		mib[2], now;
 	size_t		len;
 	struct timeval	uptime;
-
-	assert(result);
-
-        init_result(result);
 
 	mib[0] = CTL_KERN;
 	mib[1] = KERN_BOOTTIME;
@@ -69,18 +60,12 @@ int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	long          hz;
 	long          secs;
 
-        assert(result);
-
-        init_result(result);
-
 	hz = sysconf(_SC_CLK_TCK);
 
 	/* open kstat */
 	kc = kstat_open();
 	if (0 == kc)
-	{
 		return SYSINFO_RET_FAIL;
-	}
 
 	/* read uptime counter */
 	kp = kstat_lookup(kc, "unix", 0, "system_misc");
@@ -104,10 +89,6 @@ int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	SET_UI64_RESULT(result, secs);
 	return SYSINFO_RET_OK;
 #else
-        assert(result);
-
-        init_result(result);
-
-	return	SYSINFO_RET_FAIL;
+	return SYSINFO_RET_FAIL;
 #endif
 }
