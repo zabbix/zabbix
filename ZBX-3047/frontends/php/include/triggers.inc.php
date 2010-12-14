@@ -834,11 +834,13 @@ return $caption;
 	}
 
 	function add_trigger($expression, $description, $type, $priority, $status, $comments, $url, $deps=array(), $templateid=0){
-		$expressionData = parseTriggerExpressions($expression, true);
-		if( isset($expressionData[$expression]['errors']) ) {
-			showExpressionErrors($expression, $expressionData[$expression]['errors']);
+		$expr = new CTriggerExpression(array('expression' => $expression));
+
+		if(!empty($expr->errors)){
+			foreach($expr->errors as $error) error($error);
 			return false;
 		}
+
 		if( !validate_trigger_dependency($expression, $deps)){
 			error(S_WRONG_DEPENDENCY_ERROR);
 			return false;
@@ -1150,6 +1152,7 @@ return $caption;
 
 		$trigger=array();
 		$state='';
+
 		for($i=0,$max=zbx_strlen($expression); $i<$max; $i++){
 			if(($expression[$i] == '{') && ($expression[$i+1] == '$')){
 				$functionid='';
@@ -1831,19 +1834,18 @@ return $caption;
 
 		$event_to_unknown = false;
 
-		$expressionData = parseTriggerExpressions($expression, true);
-
+// Restore expression
 		if(is_null($expression)){
-			/* Restore expression */
 			$expression = explode_exp($trigger['expression'],0);
-			$expressionData = parseTriggerExpressions($expression, true);
+			$expr = new CTriggerExpression(array('expression' => $expression));
 		}
-		else if(!isset($expressionData[$expression]['errors']) && $expression != explode_exp($trigger['expression'],0)){
-			$event_to_unknown = true;
+		else{
+			$expr = new CTriggerExpression(array('expression' => $expression));
+			$event_to_unknown = (empty($expr->errors) && $expression != explode_exp($trigger['expression'],0));
 		}
 
-		if( isset($expressionData[$expression]['errors']) ) {
-			showExpressionErrors($expression, $expressionData[$expression]['errors']);
+		if(!empty($expr->errors)){
+			foreach($expr->errors as $error) error($error);
 			return false;
 		}
 
@@ -1859,11 +1861,7 @@ return $caption;
 
 		if(CTrigger::exists(array('description' => $description, 'expression' => $expression))){
 
-			reset($expressionData[$expression]['hosts']);
-			$hData =& $expressionData[$expression]['hosts'][key($expressionData[$expression]['hosts'])];
-
-			$host = zbx_substr($expression, $hData['openSymbolNum']+1, $hData['closeSymbolNum']-($hData['openSymbolNum']+1));
-
+			$host = reset($expr->data['hosts']);
 			$options = array(
 				'filter' => array('description' => $description, 'host' => $host),
 				'output' => API_OUTPUT_EXTEND,
@@ -1994,25 +1992,23 @@ return $caption;
 	}
 
 	function check_right_on_trigger_by_expression($permission,$expression){
-		global $USER_DETAILS;
+		$expr = new CTriggerExpression(array('expression' => $expression));
 
-		$hostids = array();
-		$db_hosts = get_hosts_by_expression($expression);
-		while($host_data = DBfetch($db_hosts)){
-			$hostids[] = $host_data['hostid'];
-		}
 		$hosts = CHost::get(array(
-			'hostids' => $hostids,
+			'filter' => array('host' => $expr->data['hosts']),
 			'editable' => (($permission == PERM_READ_WRITE) ? 1 : null),
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => array('hostid', 'host'),
 			'templated_hosts' => 1,
+			'preservekeys' => 1
 		));
-		$hosts = zbx_toHash($hosts, 'hostid');
-		foreach($hostids as $hostid){
-			if(!isset($hosts[$hostid])) return false;
+
+		$hosts = zbx_toHash($hosts, 'host');
+
+		foreach($expr->data['hosts'] as $host){
+			if(!isset($hosts[$host])) return false;
 		}
 
-		return true;
+	return true;
 	}
 
 
@@ -3961,12 +3957,12 @@ return $caption;
 		$noErrors = true;
 		foreach($expressions as $key => $str) {
 			if(!isset($triggersData[$str])) {
-
-				if(ZAPCAT_COMPATIBILITY)
-					$tmp_expr = str_replace('][',',"][",', $str);
+				if(ZAPCAT_COMPATIBILITY){
+					$tmp_expr = str_replace(',,',',][,', $str);
+				}
 				else
 					$tmp_expr = $str;
-
+//SDI($tmp_expr);
 				if($scparser->parse($tmp_expr)) {
 					$triggersData[$str]['expressions'] = $scparser->getElements('expression');
 					$triggersData[$str]['hosts'] = $scparser->getElements('server');
