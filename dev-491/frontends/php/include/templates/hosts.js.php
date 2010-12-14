@@ -80,7 +80,8 @@ function addInterfaceRow(hostInterface){
 			hostInterface.checked_ip = 'checked="checked"';
 	}
 //SDJ(hostInterface);
-	hostInterface.port = '10050';
+	if(!isset('port', hostInterface)) hostInterface.port = '10050';
+
 	hostInterface.checked_agent = 'checked="checked"';
 	if(isset("type", hostInterface)){
 		hostInterface.checked_agent = '';
