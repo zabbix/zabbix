@@ -21,7 +21,7 @@
 #include "sysinfo.h"
 #include "zbxjson.h"
 
-typedef struct net_stat_s
+typedef struct
 {
 	zbx_uint64_t ibytes;
 	zbx_uint64_t ipackets;
@@ -79,9 +79,7 @@ static int	get_net_stat(const char *if_name, net_stat_t *result)
 	}
 
 	if (ret != SYSINFO_RET_OK)
-	{
 		memset(result, 0, sizeof(net_stat_t));
-	}
 
 	return ret;
 }
@@ -90,10 +88,6 @@ int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 {
 	net_stat_t	ns;
 	char		if_name[MAX_STRING_LEN], mode[16];
-
-	assert(result);
-
-	init_result(result);
 
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
@@ -108,21 +102,13 @@ int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 		return SYSINFO_RET_FAIL;
 
 	if ('\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
-	{
 		SET_UI64_RESULT(result, ns.ibytes);
-	}
 	else if (0 == strcmp(mode, "packets"))
-	{
 		SET_UI64_RESULT(result, ns.ipackets);
-	}
 	else if (0 == strcmp(mode, "errors"))
-	{
 		SET_UI64_RESULT(result, ns.ierr);
-	}
 	else if (0 == strcmp(mode, "dropped"))
-	{
 		SET_UI64_RESULT(result, ns.idrop);
-	}
 	else
 		return SYSINFO_RET_FAIL;
 
@@ -134,10 +120,6 @@ int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 	net_stat_t	ns;
 	char		if_name[MAX_STRING_LEN], mode[16];
 
-	assert(result);
-
-	init_result(result);
-
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
 
@@ -151,21 +133,13 @@ int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 		return SYSINFO_RET_FAIL;
 
 	if ('\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
-	{
 		SET_UI64_RESULT(result, ns.obytes);
-	}
 	else if (0 == strcmp(mode, "packets"))
-	{
 		SET_UI64_RESULT(result, ns.opackets);
-	}
 	else if (0 == strcmp(mode, "errors"))
-	{
 		SET_UI64_RESULT(result, ns.oerr);
-	}
 	else if (0 == strcmp(mode, "dropped"))
-	{
 		SET_UI64_RESULT(result, ns.odrop);
-	}
 	else
 		return SYSINFO_RET_FAIL;
 
@@ -177,10 +151,6 @@ int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	net_stat_t	ns;
 	char		if_name[MAX_STRING_LEN], mode[16];
 
-	assert(result);
-
-	init_result(result);
-
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
 
@@ -194,21 +164,13 @@ int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 		return SYSINFO_RET_FAIL;
 
 	if ('\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
-	{
 		SET_UI64_RESULT(result, ns.ibytes + ns.obytes);
-	}
 	else if (0 == strcmp(mode, "packets"))
-	{
 		SET_UI64_RESULT(result, ns.ipackets + ns.opackets);
-	}
 	else if (0 == strcmp(mode, "errors"))
-	{
 		SET_UI64_RESULT(result, ns.ierr + ns.oerr);
-	}
 	else if (0 == strcmp(mode, "dropped"))
-	{
 		SET_UI64_RESULT(result, ns.idrop + ns.odrop);
-	}
 	else
 		return SYSINFO_RET_FAIL;
 
@@ -219,10 +181,6 @@ int	NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_
 {
 	net_stat_t	ns;
 	char		if_name[MAX_STRING_LEN];
-
-	assert(result);
-
-	init_result(result);
 
 	if (num_param(param) > 1)
 		return SYSINFO_RET_FAIL;
@@ -244,8 +202,6 @@ int	NET_IF_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 	char		line[MAX_STRING_LEN], *p;
 	FILE		*f;
 	struct zbx_json	j;
-
-	assert(result);
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 

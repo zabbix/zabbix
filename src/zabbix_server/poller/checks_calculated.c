@@ -21,7 +21,8 @@
 #include "zbxserver.h"
 #include "log.h"
 
-typedef struct function_s {
+typedef struct
+{
 	int		functionid;
 	char		*host;
 	char		*key;
@@ -29,15 +30,18 @@ typedef struct function_s {
 	char		*params;
 	char		*value;
 	unsigned char	found;
-} function_t;
+}
+function_t;
 
-typedef struct expression_s {
+typedef struct
+{
 	char		*exp;
 	function_t	*functions;
 	int		functions_alloc, functions_num;
-} expression_t;
+}
+expression_t;
 
-static void	zbx_free_expression(expression_t *exp)
+static void	free_expression(expression_t *exp)
 {
 	function_t	*f;
 	int		i;
@@ -51,8 +55,11 @@ static void	zbx_free_expression(expression_t *exp)
 		zbx_free(f->params);
 		zbx_free(f->value);
 	}
+
 	zbx_free(exp->exp);
 	zbx_free(exp->functions);
+	exp->functions_alloc = 0;
+	exp->functions_num = 0;
 }
 
 /*
@@ -79,6 +86,7 @@ static int	calcitem_add_function(expression_t *exp, char *func, char *params)
 		exp->functions = zbx_realloc(exp->functions,
 				exp->functions_alloc * sizeof(function_t));
 	}
+
 	f = &exp->functions[exp->functions_num++];
 	f->functionid = exp->functions_num;
 	f->host = NULL;
@@ -107,7 +115,7 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp,
 
 	for (e = dc_item->params_orig; '\0' != *e; e++)
 	{
-		if (' ' == *e)
+		if (NULL != strchr(" \t\r\n", *e))
 			continue;
 
 		f = e;
@@ -118,6 +126,8 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp,
 
 			continue;
 		}
+		else
+			e--;
 
 		functionid = calcitem_add_function(exp, func, params);
 
@@ -136,10 +146,7 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp,
 
 	if (FAIL == (ret = substitute_simple_macros(NULL, NULL, NULL, dc_item, NULL,
 				&exp->exp, MACRO_TYPE_ITEM_EXPRESSION, error, max_error_len)))
-	{
-		zbx_free_expression(exp);
 		ret = NOTSUPPORTED;
-	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -293,9 +300,6 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp,
 		exp->exp = buf;
 	}
 
-	if (SUCCEED != ret)
-		return ret;
-
 	return ret;
 }
 
@@ -335,7 +339,7 @@ int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
 
 	SET_DBL_RESULT(result, value);
 clean:
-	zbx_free_expression(&exp);
+	free_expression(&exp);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 			

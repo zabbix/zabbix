@@ -378,7 +378,7 @@
 		$languages_unable_set = 0;
 		foreach($ZBX_LOCALES as $loc_id => $loc_name){
 			//checking if this locale exists in the system. The only way of doing it is to try and set one
-			$locale_exists = setlocale(LC_ALL, zbx_locale_variants($loc_id)) ? 'yes' : 'no';
+			$locale_exists = setlocale(LC_ALL, zbx_locale_variants($loc_id)) || $loc_id == 'en_GB' ? 'yes' : 'no';
 			$selected = $loc_id == $USER_DETAILS['lang'] ? true : null;
 			$cmbLang->addItem($loc_id, $loc_name, $selected, $locale_exists);
 			if ($locale_exists != 'yes'){
@@ -392,7 +392,7 @@
 
 		//if some languages can't be set, showing a warning about that
 		$lang_hint = $languages_unable_set > 0 ? _('You are not able to choose some of the languages, because locales for them are not installed on the web server.') : '';
-		
+
 		$lang_tbl = new CTable();
 		$c1 = new CCol($cmbLang);
 		$c1->addStyle('padding-left: 0;');
@@ -664,7 +664,7 @@
 
 			$db_rights = DBselect($sql);
 			while($db_right = DBfetch($db_rights)){
-				if(isset($db_right['node_name']))
+				if(!empty($db_right['node_name']))
 					$db_right['name'] = $db_right['node_name'].':'.$db_right['name'];
 
 				$group_rights[$db_right['id']] = array(
@@ -896,7 +896,7 @@
 				default:
 					$list_name='deny';
 			}
-			$lst['group'][$list_name]->addItem($group['groupid'],(!empty($group['node_name'])?$group['node_name'].':':$group['node_name']).$group['name']);
+			$lst['group'][$list_name]->addItem($group['groupid'], (empty($group['node_name']) ? '' : $group['node_name'].':' ).$group['name']);
 		}
 		unset($groups);
 
@@ -913,7 +913,7 @@
 				case PERM_READ_WRITE:	$list_name='read_write';	break;
 				default:		$list_name='deny';		break;
 			}
-			$lst['host'][$list_name]->addItem($host['hostid'], (!empty($host['node_name'])?$host['node_name'].':':$host['node_name']).$host['host']);
+			$lst['host'][$list_name]->addItem($host['hostid'], (empty($host['node_name']) ? '' : $host['node_name'].':' ).$host['host']);
 		}
 		unset($hosts);
 
@@ -2691,9 +2691,6 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 					}
 				}
 
-				$tree = array();
-				//create_node_list($node, $tree);
-
 				$frmTrig->addVar('expression', $expression);
 				$exprfname = 'expr_temp';
 				$exprtxt = new CTextBox($exprfname, $expr_temp, 65, 'yes');
@@ -2703,7 +2700,6 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			else{
 				show_messages(false, '', S_EXPRESSION_SYNTAX_ERROR);
 				$input_method = IM_ESTABLISHED;
-				//$input_method = IM_FORCED;
 			}
 		}
 
@@ -2713,11 +2709,17 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			$exprparam = "getSelectedText(this.form.elements['$exprfname'])";
 		}
 
-		$row = array($exprtxt,
-			 new CButton('insert',$input_method == IM_TREE ? S_EDIT : S_ADD,
-						 "return PopUp('popup_trexpr.php?dstfrm=".$frmTrig->getName().
-						 "&dstfld1=${exprfname}&srctbl=expression".url_param('parent_discoveryid').
-						 "&srcfld1=expression&expression=' + escape($exprparam),1000,700);"));
+
+		$add_expr_button = new CButton('insert',$input_method == IM_TREE ? S_EDIT : S_ADD,
+								 "return PopUp('popup_trexpr.php?dstfrm=".$frmTrig->getName().
+								 "&dstfld1=${exprfname}&srctbl=expression".url_param('parent_discoveryid').
+								 "&srcfld1=expression&expression=' + escape($exprparam),1000,700);");
+		if($limited=='yes'){
+			$add_expr_button->setAttribute('disabled', 'disabled');
+		}
+
+
+		$row = array($exprtxt, $add_expr_button);
 
 		if(isset($macrobtn)) array_push($row, $macrobtn);
 		if($input_method == IM_TREE){
@@ -2735,7 +2737,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$frmTrig->addVar('toggle_input_method', '');
 		$exprtitle = array(S_EXPRESSION);
 
-		if($input_method != IM_FORCED){
+		if($input_method != IM_FORCED && $limited != 'yes'){
 			$btn_im = new CSpan(S_TOGGLE_INPUT_METHOD,'link');
 			$btn_im->setAttribute('onclick','javascript: '.
 								"document.getElementById('toggle_input_method').value=1;".
@@ -2843,7 +2845,6 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 								'&reference=deptrigger'.
 								'&multiselect=1'.
 							"',1000,700);",'T');
-
 
 			$frmTrig->addRow(S_NEW_DEPENDENCY, $btnSelect, 'new');
 	// end new dependency

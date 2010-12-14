@@ -18,10 +18,7 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
-
-#include "md5.h"
 
 static int	get_fs_inodes_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *free, zbx_uint64_t *used, double *pfree, double *pused)
 {
@@ -130,14 +127,7 @@ static int	VFS_FS_INODE_PUSED(const char *fs, AGENT_RESULT *result)
 
 int	VFS_FS_INODE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#define FS_FNCLIST struct fs_fnclist_s
-FS_FNCLIST
-{
-	char	*mode;
-	int	(*function)();
-};
-
-	FS_FNCLIST fl[] =
+	MODE_FUNCTION fl[] =
 	{
 		{"free",	VFS_FS_INODE_FREE},
 		{"total",	VFS_FS_INODE_TOTAL},
@@ -150,10 +140,6 @@ FS_FNCLIST
 	char	fsname[MAX_STRING_LEN];
 	char	mode[MAX_STRING_LEN];
 	int	i;
-
-	assert(result);
-
-	init_result(result);
 
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;

@@ -39,10 +39,6 @@ int	SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_R
 	struct timezone	tz;
 #endif /* _WINDOWS */
 
-	assert(result);
-
-	init_result(result);
-
 	if (num_param(param) > 3)
 		return SYSINFO_RET_FAIL;
 
@@ -102,7 +98,7 @@ int	SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_R
 	return SYSINFO_RET_OK;
 }
 
-int	SYSTEM_UNUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	SYSTEM_USERS_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #if defined(_WINDOWS)
 	char	counter_path[64];
@@ -111,10 +107,6 @@ int	SYSTEM_UNUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
 	return PERF_MONITOR(cmd, counter_path, flags, result);
 #else
-	assert(result);
-
-	init_result(result);
-
 	return EXECUTE_INT(cmd, "who|wc -l", flags, result);
 #endif /* _WINDOWS */
 }
@@ -222,10 +214,6 @@ int	SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 
 	return SYSINFO_RET_OK;
 #else
-	assert(result);
-
-	init_result(result);
-
 	return EXECUTE_STR(cmd, "uname -a", flags, result);
 #endif /* _WINDOWS */
 }
@@ -242,14 +230,10 @@ int	SYSTEM_HOSTNAME(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	if (0 == GetComputerName(computerName, &dwSize))
 		*computerName = '\0';
 
-	SET_STR_RESULT(result, zbx_unicode_to_utf8(computerName))
+	SET_STR_RESULT(result, zbx_unicode_to_utf8(computerName));
 
 	return SYSINFO_RET_OK;
 #else
-	assert(result);
-
-	init_result(result);
-
 	return EXECUTE_STR(cmd, "hostname", flags, result);
 #endif /* _WINDOWS */
 }

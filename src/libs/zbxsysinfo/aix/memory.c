@@ -18,7 +18,6 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
 
 static int	VM_MEMORY_CACHED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -45,7 +44,7 @@ static int	VM_MEMORY_CACHED(const char *cmd, const char *param, unsigned flags, 
 
         if( NULL == ( f = fopen("/proc/meminfo","r")))
         {
-                return  SYSINFO_RET_FAIL;
+		return SYSINFO_RET_FAIL;
         }
         while(NULL!=fgets(c,MAX_STRING_LEN,f))
         {
@@ -88,9 +87,7 @@ static int	VM_MEMORY_BUFFERS(const char *cmd, const char *param, unsigned flags,
 		return SYSINFO_RET_OK;
 	}
 	else
-	{
 		return SYSINFO_RET_FAIL;
-	}
 #else
 	return	SYSINFO_RET_FAIL;
 #endif
@@ -335,28 +332,18 @@ static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AG
 
 int	VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#define MEM_FNCLIST struct mem_fnclist_s
-MEM_FNCLIST
-{
-	char	*mode;
-	int	(*function)();
-};
-
-	MEM_FNCLIST fl[] =
+	MODE_FUNCTION fl[] =
 	{
 		{"free",	VM_MEMORY_FREE},
 		{"shared",	VM_MEMORY_SHARED},
 		{"total",	VM_MEMORY_TOTAL},
 		{"buffers",	VM_MEMORY_BUFFERS},
 		{"cached",	VM_MEMORY_CACHED},
-		{0,	0}
+		{0,		0}
 	};
+
 	char	mode[MAX_STRING_LEN];
 	int	i;
-
-        assert(result);
-
-        init_result(result);
 
 	if (num_param(param) > 1)
 		return SYSINFO_RET_FAIL;

@@ -25,7 +25,7 @@
 
 		if(isset($config['default_theme'])) $css = $config['default_theme'];
 		if(isset($USER_DETAILS['theme']) && ($USER_DETAILS['theme']!=ZBX_DEFAULT_CSS) && ($USER_DETAILS['alias']!=ZBX_GUEST_USER)) $css = $USER_DETAILS['theme'];
-
+		if(!isset($css)) $css = 'css_ob.css';
 	return $css;
 	}
 

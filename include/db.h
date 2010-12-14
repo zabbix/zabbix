@@ -28,19 +28,20 @@
 #include "zbxdb.h"
 #include "dbschema.h"
 
-extern	char	*CONFIG_DBHOST;
-extern	char	*CONFIG_DBNAME;
-extern	char	*CONFIG_DBUSER;
-extern	char	*CONFIG_DBPASSWORD;
-extern	char	*CONFIG_DBSOCKET;
-extern	int	CONFIG_DBPORT;
-extern	int	CONFIG_NODEID;
-extern	int	CONFIG_MASTER_NODEID;
-extern	int	CONFIG_DBSYNCER_FORKS;
-extern	int	CONFIG_NODE_NOHISTORY;
-extern  int     CONFIG_REFRESH_UNSUPPORTED;
-extern	int	CONFIG_UNAVAILABLE_DELAY;
-extern	int	CONFIG_LOG_SLOW_QUERIES;
+extern char	*CONFIG_DBHOST;
+extern char	*CONFIG_DBNAME;
+extern char	*CONFIG_DBSCHEMA;
+extern char	*CONFIG_DBUSER;
+extern char	*CONFIG_DBPASSWORD;
+extern char	*CONFIG_DBSOCKET;
+extern int	CONFIG_DBPORT;
+extern int	CONFIG_NODEID;
+extern int	CONFIG_MASTER_NODEID;
+extern int	CONFIG_DBSYNCER_FORKS;
+extern int	CONFIG_NODE_NOHISTORY;
+extern int	CONFIG_REFRESH_UNSUPPORTED;
+extern int	CONFIG_UNAVAILABLE_DELAY;
+extern int	CONFIG_LOG_SLOW_QUERIES;
 
 typedef enum {
 	GRAPH_TYPE_NORMAL = 0,
@@ -421,14 +422,11 @@ DB_TRIGGER
 DB_ACTION
 {
 	zbx_uint64_t	actionid;
-	int		actiontype;
-	int		evaltype;
-	int		status;
-	int		eventsource;
-	int		esc_period;
 	char		*shortdata;
 	char		*longdata;
-	int		recovery_msg;
+	int		esc_period;
+	unsigned char	eventsource;
+	unsigned char	recovery_msg;
 };
 
 DB_OPERATION
@@ -614,13 +612,13 @@ zbx_uint64_t DBget_proxy_lastaccess(const char *hostname);
 
 int	DBget_escape_string_len(const char *src);
 void    DBescape_string(const char *src, char *dst, int len);
-char*	DBdyn_escape_string(const char *src);
-char*	DBdyn_escape_string_len(const char *src, int max_src_len);
+char	*DBdyn_escape_string(const char *src);
+char	*DBdyn_escape_string_len(const char *src, int max_src_len);
 
 #define ZBX_SQL_LIKE_ESCAPE_CHAR '!'
 int	DBget_escape_like_pattern_len(const char *src);
 void	DBescape_like_pattern(const char *src, char *dst, int len);
-char*	DBdyn_escape_like_pattern(const char *src);
+char	*DBdyn_escape_like_pattern(const char *src);
 
 void    DBget_item_from_db(DB_ITEM *item, DB_ROW row);
 

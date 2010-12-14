@@ -1422,4 +1422,95 @@ function make_refresh_menu($pmid,$dollid,$cur_interval,$params=null,&$menu,&$sub
 }
 
 /************* END REFRESH *************/
+
+
+/************* MATH *************/
+
+function bcfloor($number) {
+	if (strpos($number, '.') !== false) {
+		if (($tmp = preg_replace('/\.0+$/', '', $number)) !== $number)
+			$number = $tmp;
+		else if ($number[0] != '-')
+			$number = bcadd($number, 0, 0);
+		else
+			$number = bcsub($number, 1, 0);
+	}
+	return $number == '-0' ? '0' : $number;
+}
+
+function bcceil($number) {
+	if (strpos($number, '.') !== false) {
+		if (($tmp = preg_replace('/\.0+$/', '', $number)) !== $number)
+			$number = $tmp;
+		else if ($number[0] != '-')
+			$number = bcadd($number, 1, 0);
+		else
+			$number = bcsub($number, 0, 0);
+	}
+	return $number == '-0' ? '0' : $number;
+}
+
+function bcround($number, $precision = 0) {
+	if (strpos($number, '.') !== false) {
+		if ($number[0] != '-')
+			$number = bcadd($number, '0.' . str_repeat('0', $precision) . '5', $precision);
+		else
+			$number = bcsub($number, '0.' . str_repeat('0', $precision) . '5', $precision);
+	}
+	else if ($precision != 0) {
+		$number .= '.' . str_repeat('0', $precision);
+	}
+	// According to bccomp(), '-0.0' does not equal '-0'. However, '0.0' and '0' are equal.
+	$zero = ($number[0] != '-' ? bccomp($number, '0') == 0 : bccomp(substr($number, 1), '0') == 0);
+	return $zero ? ($precision == 0 ? '0' : '0.' . str_repeat('0', $precision)) : $number;
+}
+
+/************* END MATH *************/
+
+function checkConfigData(&$error=null){
+	global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT, $IMAGE_FORMAT_DEFAULT;
+
+	if(!(isset($DB['TYPE']) && in_array($DB['TYPE'], array('MYSQL', 'POSTGRESQL', 'ORACLE', 'IBM_DB2', 'SQLITE3')))){
+		$error = 'DB type is not set or has wrong value.';
+		return false;
+	}
+	if(!isset($DB['SERVER'])){
+		$error = 'DB server is not set or has wrong value.';
+		return false;
+	}
+	if(!isset($DB['DATABASE'])){
+		$error = 'DB database is not set.';
+		return false;
+	}
+	if(!isset($DB['USER'])){
+		$error = 'DB user is not set.';
+		return false;
+	}
+	if(!isset($DB['PORT'])){
+		$error = 'DB port is not set.';
+		return false;
+	}
+	if(!isset($DB['PASSWORD'])){
+		$error = 'DB password is not set.';
+		return false;
+	}
+	if($DB['TYPE'] == 'IBM_DB2' && !isset($DB['SCHEMA'])){
+		$error = 'DB schema is not set.';
+		return false;
+	}
+	if(!isset($ZBX_SERVER)){
+		$error = 'ZBX_SERVER is not set.';
+		return false;
+	}
+	if(!isset($ZBX_SERVER_PORT)){
+		$error = 'ZBX_SERVER_PORT is not set.';
+		return false;
+	}
+	if(!isset($IMAGE_FORMAT_DEFAULT)){
+		$error = 'IMAGE_FORMAT_DEFAULT is not set.';
+		return false;
+	}
+
+	return true;
+}
 ?>
