@@ -303,7 +303,7 @@ JS;
 
 		function stage6(){
 			global $ZBX_CONFIGURATION_FILE, $ZBX_SERVER, $ZBX_SERVER_PORT, $IMAGE_FORMAT_DEFAULT;
-
+			
 			$this->DISABLE_NEXT_BUTTON = true;
 			show_messages();
 			/* Write the new contents */
@@ -319,6 +319,7 @@ JS;
 			else if($this->setConfig('ZBX_CONFIG_FILE_CORRECT', $this->CheckConfigurationFile())){
 				$this->DISABLE_NEXT_BUTTON = false;
 			}
+			
 			clear_messages(); /* don't show errors */
 
 			$table = new CTable(null, 'requirements');
@@ -396,7 +397,7 @@ JS;
 		}
 
 		function CheckConfigurationFile(){
-			global $ZBX_CONFIGURATION_FILE, $ZBX_SERVER, $ZBX_SERVER_PORT;
+			global $ZBX_CONFIGURATION_FILE, $ZBX_SERVER, $ZBX_SERVER_PORT, $IMAGE_FORMAT_DEFAULT;
 
 			$error = null;
 
