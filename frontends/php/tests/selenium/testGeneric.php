@@ -46,7 +46,7 @@ class testGeneric extends PHPUnit_Extensions_SeleniumTestCase
 	/**
 	* @dataProvider provider
 	*/
-        public function testTitles($a, $b)
+	public function testTitles($a, $b)
 	{
 		$this->open($a);
 		$this->assertTitleEquals($b);
@@ -55,7 +55,7 @@ class testGeneric extends PHPUnit_Extensions_SeleniumTestCase
 	/**
 	* @dataProvider provider
 	*/
-        public function testNotExists($a,$b)
+	public function testNotExists($a,$b)
 	{
 		$this->open($a);
 		foreach($this->failIfExists as $str)
