@@ -59,7 +59,7 @@ class CProxy extends CZBXAPI{
 
 
 		$sql_parts = array(
-			'select' => array('hosts' => 'h.hostid'),
+			'select' => array('hostid' => 'h.hostid'),
 			'from' => array('hosts' => 'hosts h'),
 			'where' => array('h.status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')'),
 			'order' => array(),
@@ -128,7 +128,10 @@ class CProxy extends CZBXAPI{
 
 // extendoutput
 		if($options['output'] == API_OUTPUT_EXTEND){
-			$sql_parts['select']['hosts'] = 'h.hostid, h.host, h.status, h.lastaccess';
+			$sql_parts['select']['hostid'] = 'h.hostid';
+			$sql_parts['select']['host'] = 'h.host';
+			$sql_parts['select']['status'] = 'h.status';
+			$sql_parts['select']['lastaccess'] = 'h.lastaccess';
 		}
 
 // countOutput
@@ -145,7 +148,6 @@ class CProxy extends CZBXAPI{
 			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN)?ZBX_SORT_DOWN:ZBX_SORT_UP;
 
 			$sql_parts['order'][] = 'h.'.$options['sortfield'].' '.$sortorder;
-
 			if(!str_in_array('h.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('h.*', $sql_parts['select'])){
 				$sql_parts['select'][] = 'h.'.$options['sortfield'];
 			}

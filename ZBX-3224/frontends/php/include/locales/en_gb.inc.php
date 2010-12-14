@@ -86,6 +86,7 @@
 	'S_DELETE_SELECTED'=>			'Delete selected',
 	'S_COPY_SELECTED_TO'=>			'Copy selected to ...',
 
+	'S_SCHEMA' => 'Schema',
 //	dicoveryconf.php
 	'S_HOST_IP'=>				'Host IP',
 	'S_SERVICE_TYPE'=>			'Service type',
@@ -1146,6 +1147,7 @@
 	'S_NUMERIC_FLOAT'=>					'Numeric (float)',
 	'S_CHARACTER'=>						'Character',
 	'S_WIZARD'=>						'Wizard',
+	'S_LOG' => 						'Log',
 	'S_TEXT'=>						'Text',
 	'S_AS_IS'=>						'As is',
 	'S_DELTA_SPEED_PER_SECOND'=>				'Delta (speed per second)',
@@ -2499,7 +2501,7 @@
 
 //	functions.js
 	'S_CREATE_LOG_TRIGGER'=>			'Create trigger',
-	'DO_YOU_REPLACE_CONDITIONAL_EXPRESSION_Q'=>	'Do you replace the conditional expression?',
+	'DO_YOU_REPLACE_CONDITIONAL_EXPRESSION_Q'=>	'Do you wish to replace the conditional expression?',
 	'S_ADD_SERVICE'=>				'Add Service',
 	'S_EDIT_SERVICE'=>				'Edit Service',
 	'S_DELETE_SERVICE'=>				'Delete Service',

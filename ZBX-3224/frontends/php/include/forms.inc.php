@@ -2674,9 +2674,6 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 					}
 				}
 
-				$tree = array();
-				//create_node_list($node, $tree);
-
 				$frmTrig->addVar('expression', $expression);
 				$exprfname = 'expr_temp';
 				$exprtxt = new CTextBox($exprfname, $expr_temp, 65, 'yes');
@@ -2686,7 +2683,6 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			else{
 				show_messages(false, '', S_EXPRESSION_SYNTAX_ERROR);
 				$input_method = IM_ESTABLISHED;
-				//$input_method = IM_FORCED;
 			}
 		}
 
@@ -2696,11 +2692,15 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			$exprparam = "getSelectedText(this.form.elements['$exprfname'])";
 		}
 
-		$row = array($exprtxt,
-					 new CButton('insert',$input_method == IM_TREE ? S_EDIT : S_ADD,
-								 "return PopUp('popup_trexpr.php?dstfrm=".$frmTrig->getName().
-								 "&dstfld1=${exprfname}&srctbl=expression".
-								 "&srcfld1=expression&expression=' + escape($exprparam),1000,700);"));
+		$add_expr_button = new CButton('insert',$input_method == IM_TREE ? S_EDIT : S_ADD,
+										 "return PopUp('popup_trexpr.php?dstfrm=".$frmTrig->getName().
+										 "&dstfld1=${exprfname}&srctbl=expression".
+										 "&srcfld1=expression&expression=' + escape($exprparam),1000,700);");
+		if($limited=='yes'){
+			$add_expr_button->setAttribute('disabled', 'disabled');
+		}
+
+		$row = array($exprtxt, $add_expr_button);
 
 		if(isset($macrobtn)) array_push($row, $macrobtn);
 		if($input_method == IM_TREE){
@@ -2718,7 +2718,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$frmTrig->addVar('toggle_input_method', '');
 		$exprtitle = array(S_EXPRESSION);
 
-		if($input_method != IM_FORCED){
+		if($input_method != IM_FORCED && $limited != 'yes'){
 			$btn_im = new CSpan(S_TOGGLE_INPUT_METHOD,'link');
 			$btn_im->setAttribute('onclick','javascript: '.
 								"document.getElementById('toggle_input_method').value=1;".
@@ -2825,7 +2825,6 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 							'&reference=deptrigger'.
 							'&multiselect=1'.
 						"',1000,700);",'T');
-
 
 		$frmTrig->addRow(S_NEW_DEPENDENCY, $btnSelect, 'new');
 // end new dependency
@@ -5226,7 +5225,7 @@ JAVASCRIPT;
 
 		insert_js('
 			function addMacroRow(){
-				
+
 				if(typeof(addMacroRow.macro_count) == "undefined"){
 					addMacroRow.macro_count = '.count($macros).';
 				}
