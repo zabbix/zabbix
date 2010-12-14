@@ -18,118 +18,105 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
-
 
 int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 {
 	return FAIL;
 }
 
-static int get_kstat_io(
-    const char *name,
-    kstat_io_t *returned_data
-    )
+static int	get_kstat_io(const char *name, kstat_io_t *returned_data)
 {
-    int result = SYSINFO_RET_FAIL;
-    kstat_ctl_t *kc;
-    kstat_t *kt;
+	int result = SYSINFO_RET_FAIL;
+	kstat_ctl_t *kc;
+	kstat_t *kt;
 
-    kc = kstat_open();
-    if (kc)
-    {
-	kt = kstat_lookup(kc, NULL, -1, (char *) name);
-	if (kt)
+	kc = kstat_open();
+	if (kc)
 	{
-	    if (kt->ks_type == KSTAT_TYPE_IO)
-	    {
-		if(kstat_read(kc, kt, returned_data) != -1)
+		kt = kstat_lookup(kc, NULL, -1, (char *) name);
+		if (kt)
 		{
-		    result = SYSINFO_RET_OK;
+			if (kt->ks_type == KSTAT_TYPE_IO)
+			{
+				if(kstat_read(kc, kt, returned_data) != -1)
+				{
+					result = SYSINFO_RET_OK;
+				}
+			}
 		}
-            }
-        }
-	kstat_close(kc);
-    }
-    return result;
+		kstat_close(kc);
+	}
+	return result;
 }
 
 static int	VFS_DEV_READ_BYTES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-    kstat_io_t kio;
-    int	ret;
+	kstat_io_t	kio;
+	int		ret;
 
-    ret = get_kstat_io(param, &kio);
+	ret = get_kstat_io(param, &kio);
 
-    if(ret == SYSINFO_RET_OK)
-    {
-	/* u_longlong_t nread;	number of bytes read */
-	SET_UI64_RESULT(result, kio.nread);
-    }
+	if(ret == SYSINFO_RET_OK)
+	{
+		/* u_longlong_t nread;	number of bytes read */
+		SET_UI64_RESULT(result, kio.nread);
+	}
 
-    return ret;
+	return ret;
 }
 
 static int	VFS_DEV_READ_OPERATIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-    kstat_io_t kio;
-    int	ret;
+	kstat_io_t	kio;
+	int		ret;
 
-    ret = get_kstat_io(param, &kio);
+	ret = get_kstat_io(param, &kio);
 
-    if(ret == SYSINFO_RET_OK)
-    {
-	/* uint_t reads;    number of read operations */
-	SET_UI64_RESULT(result, kio.reads);
-    }
+	if(ret == SYSINFO_RET_OK)
+	{
+		/* uint_t reads;    number of read operations */
+		SET_UI64_RESULT(result, kio.reads);
+	}
 
-    return ret;
+	return ret;
 }
 
 static int	VFS_DEV_WRITE_BYTES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-    kstat_io_t kio;
-    int	ret;
+	kstat_io_t	kio;
+	int		ret;
 
-    ret = get_kstat_io(param, &kio);
+	ret = get_kstat_io(param, &kio);
 
-    if(ret == SYSINFO_RET_OK)
-    {
-	/* u_longlong_t nwritten;   number of bytes written */
-	SET_UI64_RESULT(result, kio.nwritten);
-    }
+	if(ret == SYSINFO_RET_OK)
+	{
+		/* u_longlong_t nwritten;   number of bytes written */
+		SET_UI64_RESULT(result, kio.nwritten);
+	}
 
-    return ret;
+	return ret;
 }
 
 static int	VFS_DEV_WRITE_OPERATIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-    kstat_io_t kio;
-    int	ret;
+	kstat_io_t	kio;
+	int		ret;
 
-    ret = get_kstat_io(param, &kio);
+	ret = get_kstat_io(param, &kio);
 
-    if(ret == SYSINFO_RET_OK)
-    {
-	/* uint_t   writes;    number of write operations */
-	SET_UI64_RESULT(result, kio.writes);
-    }
+	if(ret == SYSINFO_RET_OK)
+	{
+		/* uint_t   writes;    number of write operations */
+		SET_UI64_RESULT(result, kio.writes);
+	}
 
-    return ret;
+	return ret;
 }
 
 int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-
-#define DEV_FNCLIST struct dev_fnclist_s
-DEV_FNCLIST
-{
-	char *mode;
-	int (*function)();
-};
-
-	DEV_FNCLIST fl[] =
+	MODE_FUNCTION fl[] =
 	{
 		{"bytes", 	VFS_DEV_WRITE_BYTES},
 		{"operations", 	VFS_DEV_WRITE_OPERATIONS},
@@ -139,10 +126,6 @@ DEV_FNCLIST
 	char devname[MAX_STRING_LEN];
 	char mode[MAX_STRING_LEN];
 	int i;
-
-        assert(result);
-
-        init_result(result);
 
         if(num_param(param) > 2)
         {
@@ -165,27 +148,15 @@ DEV_FNCLIST
 	}
 
 	for(i=0; fl[i].mode!=0; i++)
-	{
 		if(strncmp(mode, fl[i].mode, MAX_STRING_LEN)==0)
-		{
 			return (fl[i].function)(cmd, devname, flags, result);
-		}
-	}
 
 	return SYSINFO_RET_FAIL;
 }
 
 int	VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-
-#define DEV_FNCLIST struct dev_fnclist_s
-DEV_FNCLIST
-{
-	char *mode;
-	int (*function)();
-};
-
-	DEV_FNCLIST fl[] =
+	MODE_FUNCTION fl[] =
 	{
 		{"bytes",	VFS_DEV_READ_BYTES},
 		{"operations",	VFS_DEV_READ_OPERATIONS},
@@ -195,10 +166,6 @@ DEV_FNCLIST
 	char devname[MAX_STRING_LEN];
 	char mode[MAX_STRING_LEN];
 	int i;
-
-        assert(result);
-
-        init_result(result);
 
         if(num_param(param) > 2)
         {
@@ -220,11 +187,8 @@ DEV_FNCLIST
 		zbx_snprintf(mode, sizeof(mode), "bytes");
 	}
 	for(i=0; fl[i].mode!=0; i++)
-	{
 		if(strncmp(mode, fl[i].mode, MAX_STRING_LEN)==0)
-		{
 			return (fl[i].function)(cmd, devname, flags, result);
-		}
-	}
+
 	return SYSINFO_RET_FAIL;
 }

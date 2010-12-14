@@ -18,12 +18,9 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
 
-#include "md5.h"
-
-static int get_swap_size(zbx_uint64_t *total, zbx_uint64_t *free, zbx_uint64_t *used, double *pfree, double *pused)
+static int	get_swap_size(zbx_uint64_t *total, zbx_uint64_t *free, zbx_uint64_t *used, double *pfree, double *pused)
 {
 	int		mib[2];
 	size_t		len;
@@ -117,14 +114,7 @@ static int	SYSTEM_SWAP_PUSED(AGENT_RESULT *result)
 
 int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#define SWP_FNCLIST struct swp_fnclist_s
-SWP_FNCLIST
-{
-	char	*mode;
-	int	(*function)();
-};
-
-	SWP_FNCLIST fl[] =
+	MODE_FUNCTION fl[] =
 	{
 		{"total",	SYSTEM_SWAP_TOTAL},
 		{"free",	SYSTEM_SWAP_FREE},
@@ -137,10 +127,6 @@ SWP_FNCLIST
 	char	swapdev[MAX_STRING_LEN];
 	char	mode[MAX_STRING_LEN];
 	int	i;
-
-	assert(result);
-
-	init_result(result);
 
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
@@ -206,10 +192,6 @@ int	SYSTEM_SWAP_IN(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	char		mode[MAX_STRING_LEN];
 	zbx_uint64_t	value = 0;
 
-	assert(result);
-
-	init_result(result);
-
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
 
@@ -230,13 +212,17 @@ int	SYSTEM_SWAP_IN(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	if (*mode == '\0')
 		zbx_snprintf(mode, sizeof(mode), "count");
 
-	if (0 == strcmp(mode, "count")) {
+	if (0 == strcmp(mode, "count"))
+	{
 		if (SYSINFO_RET_OK != get_swap_io(&value, NULL, NULL, NULL))
 			return SYSINFO_RET_FAIL;
-	} else if (0 == strcmp(mode,"pages")) {
+	}
+	else if (0 == strcmp(mode, "pages"))
+	{
 		if (SYSINFO_RET_OK != get_swap_io(NULL, &value, NULL, NULL))
 			return SYSINFO_RET_FAIL;
-	} else
+	}
+	else
 		return SYSINFO_RET_FAIL;
 
 	SET_UI64_RESULT(result, value);
@@ -250,10 +236,6 @@ int	SYSTEM_SWAP_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	char		mode[MAX_STRING_LEN];
 	zbx_uint64_t	value = 0;
 
-	assert(result);
-
-	init_result(result);
-
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
 
@@ -274,13 +256,17 @@ int	SYSTEM_SWAP_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	if (*mode == '\0')
 		zbx_snprintf(mode, sizeof(mode), "count");
 
-	if (0 == strcmp(mode, "count")) {
+	if (0 == strcmp(mode, "count"))
+	{
 		if (SYSINFO_RET_OK != get_swap_io(NULL, NULL, &value, NULL))
 			return SYSINFO_RET_FAIL;
-	} else if (0 == strcmp(mode,"pages")) {
+	}
+	else if (0 == strcmp(mode,"pages"))
+	{
 		if (SYSINFO_RET_OK != get_swap_io(NULL, NULL, NULL, &value))
 			return SYSINFO_RET_FAIL;
-	} else
+	}
+	else
 		return SYSINFO_RET_FAIL;
 
 	SET_UI64_RESULT(result, value);
