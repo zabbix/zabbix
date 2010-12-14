@@ -2761,12 +2761,11 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			$exp_table->setOddRowClass('even_row');
 			$exp_table->setEvenRowClass('even_row');
 
-			$exp_table->setHeader(array(S_TARGET, S_EXPRESSION, S_EXPRESSION_PART_ERROR, ($limited == 'yes' ? null : S_DELETE)));
+			$exp_table->setHeader(array(($limited == 'yes' ? null : S_TARGET), S_EXPRESSION, S_EXPRESSION_PART_ERROR, ($limited == 'yes' ? null : S_DELETE)));
 
 			$allowedTesting = true;
 			if($eHTMLTree != null){
 				foreach($eHTMLTree as $i => $e){
-					$tgt_chk = new CCheckbox('expr_target_single', ($i==0) ? 'yes':'no', 'check_target(this);', $e['id']);
 
 					if($limited != 'yes'){
 						$del_url = new CSpan(S_DELETE,'link');
@@ -2775,6 +2774,10 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 										' delete_expression(\''.$e['id'] .'\');'.
 										' document.forms["config_triggers.php"].submit(); '.
 									'}');
+						$tgt_chk = new CCheckbox('expr_target_single', ($i==0) ? 'yes':'no', 'check_target(this);', $e['id']);
+					}
+					else{
+						$tgt_chk = null;
 					}
 
 					if(!isset($e['expression']['levelErrors'])) {
