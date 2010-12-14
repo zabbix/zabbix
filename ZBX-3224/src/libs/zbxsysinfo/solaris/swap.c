@@ -147,7 +147,7 @@ static int	SYSTEM_SWAP_PUSED(const char *cmd, const char *param, unsigned flags,
 	if(tot_val == 0)
 	{
 		free_result(&result_tmp);
-                return SYSINFO_RET_FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 
 	if(SYSTEM_SWAP_FREE(cmd, param, flags, &result_tmp) != SYSINFO_RET_OK || !(result_tmp.type & AR_UINT64))
