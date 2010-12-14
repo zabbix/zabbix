@@ -2519,7 +2519,7 @@
 	'S_PREVIOUS_EVENTS'=>		'Previous',
 
 // class.cusergroup
-	'S_GROUP_IS_USED_IN_SCRIPT' =>	'group [%1$s] is used in script [%2$s]',
+	'S_GROUP_IS_USED_IN_SCRIPT' =>	'User group [%1$s] is used in script [%2$s]',
 	'S_YOU_CANNOT_DELETE_GROUP_USED_IN_SCRIPT' => 'Cannot delete user group used in a script:',
 	'S_ONLY_SUPERADMIN_CAN_DELETE_USERGROUP' => 'Only Super Admins can add User Groups',
 );
