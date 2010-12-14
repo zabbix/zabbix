@@ -514,7 +514,7 @@ JS;
 			$dbschema = $this->getConfig('DB_SCHEMA', '');
 			$dbtype = $this->getConfig('DB_TYPE', '');
 
-			if(($dbtype == 'IBM_DB2') && !zbx_empty($dbschema)){
+			if(($dbtype == 'IBM_DB2')){
 				$SCHEMA = '$DB["SCHEMA"]			= \''.$dbschema.'\';'."\n";
 			}
 
