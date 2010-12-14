@@ -253,7 +253,7 @@
 		}
 		$result = delete_application($applicationids);
 		if(!$result) return false;
-		
+
 
 // delete host
 		foreach($hostids as $id){	/* The section should be improved */
@@ -293,6 +293,22 @@
 			}
 			return false;
 		}
+
+// check if hostgroup used in scripts
+		$error = false;
+		$sql = 'SELECT s.name AS script_name, g.name AS group_name '.
+				' FROM scripts s, groups g'.
+				' WHERE '.
+					' g.groupid = s.groupid '.
+					' AND '.DBcondition('s.groupid', $groupids);
+		$res = DBselect($sql);
+		while($group = DBfetch($res)){
+			$error = true;
+			//GETTEXT: User gets this error message when tries to delete host group that is used in some script
+			error(sprintf(_('Host group "%1$s" can not be deleted, because it is used in script "%2$s".'), $group['group_name'], $group['script_name']));
+		}
+		if($error) return false;
+
 // delete screens items
 		$resources = array(
 			SCREEN_RESOURCE_HOSTGROUP_TRIGGERS,
@@ -1371,10 +1387,10 @@ return $result;
 
 		if(!empty($tmp_appids)){
 // recursion!!!
-			if(!delete_application($tmp_appids)) return false; 
+			if(!delete_application($tmp_appids)) return false;
 		}
-   
-   
+
+
 		$unlink_apps = array();
 		//check if app is used by web scenario
 		$sql = 'SELECT ht.name, ht.applicationid '.
@@ -1390,9 +1406,9 @@ return $result;
 			else{
 				error(S_APPLICATION.' ['.$apps[$info['applicationid']]['host'].':'.$apps[$info['applicationid']]['name'].'] '.S_USED_IN_WEB_SCENARIO);
 				return false;
-			}			
+			}
 		}
-		
+
 		$sql = 'SELECT i.itemid, i.key_, i.description, ia.applicationid '.
 				' FROM items_applications ia, items i '.
 				' WHERE i.type='.ITEM_TYPE_HTTPTEST.
@@ -1751,4 +1767,5 @@ return $result;
 
 	return $dlt_groupids;
 	}
+
 ?>
