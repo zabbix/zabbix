@@ -18,20 +18,14 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
-
 
 int	KERNEL_MAXPROC(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-    int ret = SYSINFO_RET_FAIL;
-    kstat_ctl_t *kc;
-    kstat_t	*kt;
-    struct var	*v;
-
-	assert(result);
-
-	init_result(result);
+	int		ret = SYSINFO_RET_FAIL;
+	kstat_ctl_t	*kc;
+	kstat_t		*kt;
+	struct var	*v;
 
 	kc = kstat_open();
 	if(kc)
@@ -53,13 +47,4 @@ int	KERNEL_MAXPROC(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	}
 
 	return ret;
-}
-
-int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	assert(result);
-
-        init_result(result);
-
-	return SYSINFO_RET_FAIL;
 }

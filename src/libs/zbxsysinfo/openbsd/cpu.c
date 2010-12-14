@@ -18,7 +18,6 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
 #include "stats.h"
 
@@ -29,10 +28,6 @@ int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	size_t	len;
 	int	mib[] = {CTL_HW, HW_NCPU}, ncpu;
 	char	mode[MAX_STRING_LEN];
-
-	assert(result);
-
-	init_result(result);
 
 	if (num_param(param) > 1)
 		return SYSINFO_RET_FAIL;
@@ -67,10 +62,6 @@ int     SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGEN
 	size_t		len;
 	struct uvmexp	v;
 
-	assert(result);
-
-	init_result(result);
-
 	len = sizeof(struct uvmexp);
 
 	if (0 != sysctl(mib, 2, &v, &len, NULL, 0))
@@ -92,10 +83,6 @@ int     SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, 
 	size_t		len;
 	struct uvmexp	v;
 
-	assert(result);
-
-	init_result(result);
-
 	len = sizeof(struct uvmexp);
 
 	if (0 != sysctl(mib, 2, &v, &len, NULL, 0))
@@ -113,10 +100,6 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 {
 	char	tmp[32], type[32];
 	int	cpu_num, mode;
-
-	assert(result);
-
-	init_result(result);
 
 	if (!CPU_COLLECTOR_STARTED(collector))
 	{
@@ -155,15 +138,15 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		return SYSINFO_RET_FAIL;
 
 	if ('\0' == *type || 0 == strcmp(type, "user"))	/* default parameter */
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].user[mode])
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].user[mode]);
 	else if (0 == strcmp(type, "nice"))
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].nice[mode])
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].nice[mode]);
 	else if (0 == strcmp(type, "system"))
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].system[mode])
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].system[mode]);
 	else if (0 == strcmp(type, "idle"))
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].idle[mode])
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].idle[mode]);
 	else if (0 == strcmp(type, "interrupt"))
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].interrupt[mode])
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].interrupt[mode]);
 	else
 		return SYSINFO_RET_FAIL;
 
@@ -176,10 +159,6 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	char	tmp[32];
 	int	mode;
 	double	load[ZBX_AVGMAX];
-
-	assert(result);
-
-	init_result(result);
 
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;

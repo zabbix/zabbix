@@ -18,7 +18,6 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
 #include "stats.h"
 
@@ -27,10 +26,6 @@ int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	char	mode[128];
 	int	sysinfo_name = -1;
 	long	ncpu = 0;
-
-        assert(result);
-
-        init_result(result);
 
         if(num_param(param) > 1)
         {
@@ -69,10 +64,6 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	char	tmp[32], type[32];
 	int	cpu_num, mode;
 
-	assert(result);
-
-	init_result(result);
-
 	if (!CPU_COLLECTOR_STARTED(collector))
 	{
 		SET_MSG_RESULT(result, strdup("Collector is not started!"));
@@ -110,13 +101,13 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		return SYSINFO_RET_FAIL;
 
 	if ('\0' == *type || 0 == strcmp(type, "user"))	/* default parameter */
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].user[mode])
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].user[mode]);
 	else if (0 == strcmp(type, "wait"))
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].nice[mode])
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].nice[mode]);
 	else if (0 == strcmp(type, "kernel"))
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].system[mode])
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].system[mode]);
 	else if (0 == strcmp(type, "idle"))
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].idle[mode])
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].idle[mode]);
 	else
 		return SYSINFO_RET_FAIL;
 
@@ -170,10 +161,6 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 #endif
 	char	tmp[MAX_STRING_LEN];
 
-	assert(result);
-
-	init_result(result);
-
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
 
@@ -221,90 +208,77 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 #else
 	return SYSINFO_RET_FAIL;
 #endif
-
 	return SYSINFO_RET_OK;
 }
 
 int	SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-    kstat_ctl_t	    *kc;
-    kstat_t	    *k;
-    cpu_stat_t	    *cpu;
+	kstat_ctl_t	*kc;
+	kstat_t		*k;
+	cpu_stat_t	*cpu;
 
-    int	    cpu_count = 0;
-    double  swt_count = 0.0;
+	int	cpu_count = 0;
+	double	swt_count = 0.0;
 
-    assert(result);
+	kc = kstat_open();
 
-    init_result(result);
-
-    kc = kstat_open();
-
-    if(kc != NULL)
-    {
-	k = kc->kc_chain;
-  	while (k != NULL)
+	if(kc != NULL)
 	{
-	    if( (strncmp(k->ks_name, "cpu_stat", 8) == 0) &&
-		(kstat_read(kc, k, NULL) != -1) )
-	    {
-		cpu = (cpu_stat_t*) k->ks_data;
-		swt_count += (double) cpu->cpu_sysinfo.pswitch;
-		cpu_count += 1;
-  	    }
-	    k = k->ks_next;
-        }
-	kstat_close(kc);
-    }
+		k = kc->kc_chain;
+		while (k != NULL)
+		{
+			if( (strncmp(k->ks_name, "cpu_stat", 8) == 0) &&
+					(kstat_read(kc, k, NULL) != -1) )
+			{
+				cpu = (cpu_stat_t*) k->ks_data;
+				swt_count += (double) cpu->cpu_sysinfo.pswitch;
+				cpu_count += 1;
+			}
+			k = k->ks_next;
+		}
+		kstat_close(kc);
+	}
 
-    if(cpu_count == 0)
-    {
-	return SYSINFO_RET_FAIL;
-    }
+	if(cpu_count == 0)
+		return SYSINFO_RET_FAIL;
 
 	SET_UI64_RESULT(result, swt_count);
 
-    return SYSINFO_RET_OK;
+	return SYSINFO_RET_OK;
 }
 
 int	SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-    kstat_ctl_t	    *kc;
-    kstat_t	    *k;
-    cpu_stat_t	    *cpu;
+	kstat_ctl_t	*kc;
+	kstat_t		*k;
+	cpu_stat_t	*cpu;
 
-    int	    cpu_count = 0;
-    double  intr_count = 0.0;
+	int	cpu_count = 0;
+	double	intr_count = 0.0;
 
-    assert(result);
+	kc = kstat_open();
 
-    init_result(result);
-
-    kc = kstat_open();
-
-    if(kc != NULL)
-    {
-	k = kc->kc_chain;
-  	while (k != NULL)
+	if(kc != NULL)
 	{
-	    if( (strncmp(k->ks_name, "cpu_stat", 8) == 0) &&
-		(kstat_read(kc, k, NULL) != -1) )
-	    {
-		cpu = (cpu_stat_t*) k->ks_data;
-		intr_count += (double) cpu->cpu_sysinfo.intr;
-		cpu_count += 1;
-  	    }
-	    k = k->ks_next;
-        }
-	kstat_close(kc);
-    }
+		k = kc->kc_chain;
+		while (k != NULL)
+		{
+			if( (strncmp(k->ks_name, "cpu_stat", 8) == 0) &&
+					(kstat_read(kc, k, NULL) != -1) )
+			{
+				cpu = (cpu_stat_t*) k->ks_data;
+				intr_count += (double) cpu->cpu_sysinfo.intr;
+				cpu_count += 1;
+			}
+			k = k->ks_next;
+		}
+		kstat_close(kc);
+	}
 
-    if(cpu_count == 0)
-    {
-	return SYSINFO_RET_FAIL;
-    }
+	if(cpu_count == 0)
+		return SYSINFO_RET_FAIL;
 
 	SET_UI64_RESULT(result, intr_count);
 
-    return SYSINFO_RET_OK;
+	return SYSINFO_RET_OK;
 }

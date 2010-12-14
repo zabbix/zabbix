@@ -1,24 +1,23 @@
 /*
- * ** ZABBIX
- * ** Copyright (C) 2000-2005 SIA Zabbix
- * **
- * ** This program is free software; you can redistribute it and/or modify
- * ** it under the terms of the GNU General Public License as published by
- * ** the Free Software Foundation; either version 2 of the License, or
- * ** (at your option) any later version.
- * **
- * ** This program is distributed in the hope that it will be useful,
- * ** but WITHOUT ANY WARRANTY; without even the implied warranty of
- * ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * ** GNU General Public License for more details.
- * **
- * ** You should have received a copy of the GNU General Public License
- * ** along with this program; if not, write to the Free Software
- * ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- * **/
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+**/
 
 #include "common.h"
-
 #include "sysinfo.h"
 
 #define DO_SUM 0
@@ -158,7 +157,8 @@ static int	check_procstate(FILE *f_stat, int zbx_proc_stat)
 
 		p = tmp + 7;
 
-		switch (zbx_proc_stat) {
+		switch (zbx_proc_stat)
+		{
 			case ZBX_PROC_STAT_RUN:
 				return (*p == 'R') ? SUCCEED : FAIL;
 			case ZBX_PROC_STAT_SLEEP:
@@ -169,10 +169,11 @@ static int	check_procstate(FILE *f_stat, int zbx_proc_stat)
 				return FAIL;
 		}
 	}
+
 	return FAIL;
 }
 
-int	PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	PROC_MEM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char		tmp[MAX_STRING_LEN], *p, *p1,
 			procname[MAX_STRING_LEN],
@@ -185,10 +186,6 @@ int	PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	int		do_task;
 	double		memsize = 0;
 	int		proccount = 0;
-
-	assert(result);
-
-	init_result(result);
 
 	if (num_param(param) > 4)
 		return SYSINFO_RET_FAIL;
@@ -309,12 +306,10 @@ int	PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
 	if (do_task == DO_AVG)
 	{
-		SET_DBL_RESULT(result, proccount == 0 ? 0 : memsize/proccount);
+		SET_DBL_RESULT(result, proccount == 0 ? 0 : memsize / proccount);
 	}
 	else
-	{
 		SET_UI64_RESULT(result, memsize);
-	}
 
 	return SYSINFO_RET_OK;
 }
@@ -331,11 +326,6 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 	int		zbx_proc_stat;
 	zbx_uint64_t	proccount = 0;
 
-	assert(result);
-
-	init_result(result);
-
-
 	if (num_param(param) > 4)
 		return SYSINFO_RET_FAIL;
 
@@ -345,17 +335,20 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 	if (0 != get_param(param, 2, tmp, sizeof(tmp)))
 		*tmp = '\0';
 
-	if (*tmp != '\0') {
+	if (*tmp != '\0')
+	{
 		usrinfo = getpwnam(tmp);
 		if (usrinfo == NULL)	/* incorrect user name */
 			return SYSINFO_RET_FAIL;
-	} else
+	}
+	else
 		usrinfo = NULL;
 
 	if (0 != get_param(param, 3, tmp, sizeof(tmp)))
 		*tmp = '\0';
 
-	if (*tmp != '\0') {
+	if (*tmp != '\0')
+	{
 		if (0 == strcmp(tmp, "run"))
 			zbx_proc_stat = ZBX_PROC_STAT_RUN;
 		else if (0 == strcmp(tmp, "sleep"))
@@ -366,7 +359,8 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 			zbx_proc_stat = ZBX_PROC_STAT_ALL;
 		else
 			return SYSINFO_RET_FAIL;
-	} else
+	}
+	else
 		zbx_proc_stat = ZBX_PROC_STAT_ALL;
 
 	if (0 != get_param(param, 4, proccomm, sizeof(proccomm)))
@@ -375,7 +369,8 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 	if (NULL == (dir = opendir("/proc")))
 		return SYSINFO_RET_FAIL;
 
-	while (NULL != (entries = readdir(dir))) {
+	while (NULL != (entries = readdir(dir)))
+	{
 		zbx_fclose(f_cmd);
 		zbx_fclose(f_stat);
 
