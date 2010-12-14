@@ -20,7 +20,7 @@
 ?>
 <?php
 require_once 'PHPUnit/Extensions/SeleniumTestCase.php';
- 
+
 class testGeneric extends PHPUnit_Extensions_SeleniumTestCase
 {
 	protected $captureScreenshotOnFailure = TRUE;
