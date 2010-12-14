@@ -30,7 +30,7 @@ static int	VM_MEMORY_CACHED(const char *cmd, const char *param, unsigned flags, 
 
         if(NULL == (f = fopen("/proc/meminfo","r") ))
         {
-                return  SYSINFO_RET_FAIL;
+                return SYSINFO_RET_FAIL;
         }
 
         while(NULL!=fgets(c,MAX_STRING_LEN,f))

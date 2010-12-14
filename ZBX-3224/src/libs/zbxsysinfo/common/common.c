@@ -95,7 +95,7 @@ int	getPROC(char *file, int lineno, int fieldno, unsigned flags, AGENT_RESULT *r
 
 	if(NULL == (f = fopen(file,"r")))
 	{
-		return	SYSINFO_RET_FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 
 	for(i=1; i<=lineno; i++)
@@ -103,7 +103,7 @@ int	getPROC(char *file, int lineno, int fieldno, unsigned flags, AGENT_RESULT *r
 		if(NULL == fgets(c,MAX_STRING_LEN,f))
 		{
 			zbx_fclose(f);
-			return	SYSINFO_RET_FAIL;
+			return SYSINFO_RET_FAIL;
 		}
 	}
 

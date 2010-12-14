@@ -53,7 +53,7 @@ static int	VFS_FS_INODE_USED(const char *cmd, const char *param, unsigned flags,
                 return SYSINFO_RET_FAIL;
 
 	if(get_fs_inodes_stat(mountPoint, NULL, NULL, &value) != SYSINFO_RET_OK)
-		return  SYSINFO_RET_FAIL;
+		return SYSINFO_RET_FAIL;
 
 	SET_UI64_RESULT(result, value);
 
@@ -72,7 +72,7 @@ static int	VFS_FS_INODE_FREE(const char *cmd, const char *param, unsigned flags,
                 return SYSINFO_RET_FAIL;
 
 	if(get_fs_inodes_stat(mountPoint, NULL, &value, NULL) != SYSINFO_RET_OK)
-		return  SYSINFO_RET_FAIL;
+		return SYSINFO_RET_FAIL;
 
 	SET_UI64_RESULT(result, value);
 
@@ -91,7 +91,7 @@ static int	VFS_FS_INODE_TOTAL(const char *cmd, const char *param, unsigned flags
                 return SYSINFO_RET_FAIL;
 
 	if(get_fs_inodes_stat(mountPoint, &value, NULL, NULL) != SYSINFO_RET_OK)
-		return  SYSINFO_RET_FAIL;
+		return SYSINFO_RET_FAIL;
 
 	SET_UI64_RESULT(result, value);
 
@@ -111,7 +111,7 @@ static int	VFS_FS_INODE_PFREE(const char *cmd, const char *param, unsigned flags
                 return SYSINFO_RET_FAIL;
 
 	if(get_fs_inodes_stat(mountPoint, &tot_val, &free_val, NULL) != SYSINFO_RET_OK)
-		return  SYSINFO_RET_FAIL;
+		return SYSINFO_RET_FAIL;
 
 	SET_DBL_RESULT(result, (100.0 * free_val) / tot_val);
 
@@ -131,7 +131,7 @@ static int	VFS_FS_INODE_PUSED(const char *cmd, const char *param, unsigned flags
                 return SYSINFO_RET_FAIL;
 
 	if(get_fs_inodes_stat(mountPoint, &tot_val, NULL, &usg_val) != SYSINFO_RET_OK)
-		return  SYSINFO_RET_FAIL;
+		return SYSINFO_RET_FAIL;
 
 	SET_DBL_RESULT(result, (100.0 * usg_val) / tot_val);
 
