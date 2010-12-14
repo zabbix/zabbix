@@ -1,5 +1,6 @@
 Changes for 1.8.4rc3
 
+ - [ZBX-3006] fixed some forms <input> elements are put inside <table> tag (Vedmak)
  - [ZBXNEXT-176] added zabbix server name input during setup (Vedmak)
  - [ZBX-3253] added schema selection for db2 setup and a configuration file parameter on the server (asaveljevs,Vedmak)
  - [ZBX-3239] fixed error in Proxies screen on Oracle, when no proxy defined (Vedmak)
