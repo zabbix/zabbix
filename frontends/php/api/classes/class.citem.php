@@ -1008,7 +1008,7 @@ COpt::memoryPick();
 				}
 			}
 			else{
-				unset($item['interfaceid']);
+				$item['interfaceid'] = 0;
 			}
 
 			if((isset($item['port']) && !zbx_empty($item['port']))
@@ -1511,27 +1511,23 @@ COpt::memoryPick();
 				}
 
 // checking interfaces
-				$type = null;
-				if(($host['status'] == HOST_STATUS_TEMPLATE) || (isset($item['type']) && !in_array($item['type'], array(ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV1,
-						ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI,
-						ITEM_TYPE_SSH, ITEM_TYPE_TELNET)))){
+				if(($host['status'] == HOST_STATUS_TEMPLATE) || !isset($item['type'])){
 					unset($item['interfaceid']);
 				}
-				else if(isset($item['type'])){
-// if we creating new item or if we updating item type
-					$type = getInterfaceTypeByItem($item);
-					if(!is_null($exItem)){
-// on update
+				else if(isset($item['type']) && ($item['type'] != $exItem['type'])){
+					if(in_array($item['type'], array(ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV1,
+						ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI,
+						ITEM_TYPE_SSH, ITEM_TYPE_TELNET))
+					){
+						$type = getInterfaceTypeByItem($item);
 						if(!isset($interfaces[$type])){
 							self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot find host interface on host ['.$host['host'].'] for item key ['.$exItem['key_'].']');
 						}
-// item type changes does not reflect on used interface [do not update interface]
-						$exType = getInterfaceTypeByItem($exItem);
-						if($exType == $type) $type = null;
+
+						$item['interfaceid'] = $interfaces[$type]['interfaceid'];
 					}
-					else if(!isset($interfaces[$type])){
-// on create
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot find host interface on host ['.$host['host'].'] for item key ['.$item['key_'].']');
+					else{
+						$item['interfaceid'] = 0;
 					}
 				}
 // -----
@@ -1541,11 +1537,6 @@ COpt::memoryPick();
 				$newItem = $item;
 				$newItem['hostid'] = $host['hostid'];
 				$newItem['templateid'] = $item['itemid'];
-
-				if(is_null($type))
-					unset($newItem['interfaceid']);
-				else
-					$newItem['interfaceid'] = $interfaces[$type]['interfaceid'];
 
 // setting item application
 				if(isset($item['applications'])){
