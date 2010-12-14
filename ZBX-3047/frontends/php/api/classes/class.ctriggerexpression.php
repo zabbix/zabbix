@@ -98,12 +98,14 @@ private $allowedFunctions;
 		if(isset($this->symbols['expr'][$symbol])) $this->symbols['expr'][$symbol]++;
 
 		if($this->currExpr['part']['expression']){
-			switch($symbol){
-				case '"':
-					if(($this->previous['expr'] == '\\') && ($this->symbols['sequence'] % 2 == 1)){
-						$this->symbols['expr'][$symbol]--;
-					}
-					break;
+			if($symbol == '"'){
+				if(($this->previous['expr'] == '\\') && ($this->symbols['sequence'] % 2 == 1)){
+					$this->symbols['expr'][$symbol]--;
+				}
+			}
+
+			if(isset($this->symbols['linkage'][$symbol]) && $this->currExpr['object']['functionParam']){
+				$this->symbols['linkage'][$symbol]--;
 			}
 		}
 		else{
@@ -347,7 +349,7 @@ private $allowedFunctions;
 
 	private function initializeVars(){
 		$this->allowedFunctions = INIT_TRIGGER_EXPRESSION_STRUCTURES();
-		
+
 		$this->errors = array();
 		$this->expressions = array();
 		$this->data = array('hosts'=>array(),'usermacros'=>array(),'items'=>array(),'functions'=>array());
