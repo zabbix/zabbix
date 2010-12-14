@@ -38,7 +38,8 @@ class CServerInfo extends CTable{
 
 		$header = new CCol('Zabbix '.S_SERVER_INFO,'header');
 		$this->addRow($header);
-		$this->addRow(_('Updated').': '.date('r',time()));
+		// GETTEXT: r is date format string as described in http://php.net/date
+		$this->addRow(_('Updated').': '.zbx_date2str(_('r'),time()));
 		$this->addRow(new CCol(array(_('Refreshed every').': '.$USER_DETAILS['refresh'].' sec ',
 				'(',new CLink(_('refresh now'),'http://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']),')')));
 		$this->addRow(S_NUMBER_OF_USERS_SHORT.': '.$status['users_count'].'('.$status['users_online'].')');
