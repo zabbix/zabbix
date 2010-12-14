@@ -1,5 +1,6 @@
 Changes for 1.8.4rc3
 
+ - [ZBX-2862] it is now not possible to delete host group or user group used in scripts (KB)
  - [ZBX-3281] fixed system.cpu.util[] for all processors combined on NetBSD (asaveljevs)
  - [ZBX-3006] fixed some forms <input> elements are put inside <table> tag (Vedmak)
  - [ZBXNEXT-176] added zabbix server name input during setup (Vedmak)

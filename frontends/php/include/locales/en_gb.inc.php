@@ -2239,6 +2239,7 @@
 	'S_YOU_CANT_DELETE_TEMPLATE_FOR_APP_USED_IN_SCENARIO'=>'You can\'t delete template for an application that is used in a web scenario',
 	'S_USED_IN_WEB_SCENARIO' => 'used in web scenario',
 	'S_AND_CANT_BE_DELETED' => 'and can\'t be deleted',
+	'S_HOSTGROUP_CANNOT_BE_DELETED_USED_IN_SCRIPT' => 'Host group "%1$s" can not be deleted, because it is used in script "%2$s".',
 //	validate.inc.php
 	'S_CRITICAL_ERROR'=>				'Critical error',
 	'S_FIELD'=>					'Field',
@@ -2521,5 +2522,9 @@
 	'S_NEXT_PAGE'=>			'Next',
 	'S_PREVIOUS_EVENTS'=>		'Previous',
 
+// class.cusergroup
+	'S_GROUP_IS_USED_IN_SCRIPT' =>	'User group [%1$s] is used in script [%2$s].',
+	'S_YOU_CANNOT_DELETE_GROUP_USED_IN_SCRIPT' => 'Cannot delete user group used in a script:',
+	'S_ONLY_SUPERADMIN_CAN_DELETE_USERGROUP' => 'Only Super Admins can add User Groups',
 );
 ?>
