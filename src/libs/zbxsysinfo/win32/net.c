@@ -118,10 +118,6 @@ int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 	char		if_name[MAX_STRING_LEN], mode[32];
 	MIB_IFROW	pIfRow;
 
-	assert(result);
-
-	init_result(result);
-
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
 
@@ -161,10 +157,6 @@ int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 	char		if_name[MAX_STRING_LEN], mode[32];
 	MIB_IFROW	pIfRow;
 
-	assert(result);
-
-	init_result(result);
-
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
 
@@ -203,10 +195,6 @@ int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 {
 	char		if_name[MAX_STRING_LEN], mode[32];
 	MIB_IFROW	pIfRow;
-
-	assert(result);
-
-	init_result(result);
 
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
@@ -253,10 +241,6 @@ int	NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	zbx_uint64_t	port;
 	char		tmp[8];
 
-	assert(result);
-
-	init_result(result);
-
 	if (num_param(param) > 1)
 		return SYSINFO_RET_FAIL;
 
@@ -299,25 +283,17 @@ int	NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	}
 
 	if (!ISSET_UI64(result))
-		SET_UI64_RESULT(result, 0)
+		SET_UI64_RESULT(result, 0);
 clean:
 	zbx_free(pTcpTable);
 
 	return ret;
 }
 
-int     NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-#ifdef TODO
-#error Realize function NET_IF_COLLISIONS!!!
-#endif /* todo */
-
-	return SYSINFO_RET_FAIL;
-}
-
 static char	*get_if_type_string(DWORD type)
 {
-	switch (type) {
+	switch (type)
+	{
 		case IF_TYPE_OTHER:			return "Other";
 		case IF_TYPE_ETHERNET_CSMACD:		return "Ethernet";
 		case IF_TYPE_ISO88025_TOKENRING:	return "Token Ring";
@@ -333,7 +309,8 @@ static char	*get_if_type_string(DWORD type)
 
 static char	*get_if_adminstatus_string(DWORD status)
 {
-	switch (status) {
+	switch (status)
+	{
 		case 0:		return "disabled";
 		case 1:		return "enabled";
 		default:	return "unknown";
@@ -351,10 +328,6 @@ int	NET_IF_LIST(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	/* variables used for GetIpAddrTable */
 	MIB_IPADDRTABLE	*pIPAddrTable = NULL;
 	IN_ADDR		in_addr;
-
-        assert(result);
-
-        init_result(result);
 
 	/* Allocate memory for our pointers. */
 	dwSize = sizeof(MIB_IPADDRTABLE);

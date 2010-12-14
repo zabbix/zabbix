@@ -18,10 +18,9 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
 
-static int getPROC2(char *file, char *param, int fieldno, unsigned flags, int type, AGENT_RESULT *result)
+static int	getPROC2(char *file, char *param, int fieldno, unsigned flags, int type, AGENT_RESULT *result)
 {
 
 	FILE	*f;
@@ -85,9 +84,5 @@ static int getPROC2(char *file, char *param, int fieldno, unsigned flags, int ty
 
 int	SYSTEM_BOOTTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	assert(result);
-
-	init_result(result);
-
-	return  getPROC2("/proc/stat", "btime", 1, flags, AR_UINT64, result);
+	return getPROC2("/proc/stat", "btime", 1, flags, AR_UINT64, result);
 }

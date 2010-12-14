@@ -18,7 +18,6 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
 
 int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -27,10 +26,6 @@ int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	int		mib[2], now;
 	size_t		len;
 	struct timeval	uptime;
-
-	assert(result);
-
-	init_result(result);
 
 	mib[0] = CTL_KERN;
 	mib[1] = KERN_BOOTTIME;

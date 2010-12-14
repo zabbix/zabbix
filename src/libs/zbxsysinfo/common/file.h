@@ -17,11 +17,12 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#if !defined(SYSINFO_COMMON_FILE_H_INCLUDED)
+#ifndef ZABBIX_SYSINFO_COMMON_FILE_H
+#define ZABBIX_SYSINFO_COMMON_FILE_H
 
 #include "sysinfo.h"
 
-#define MAX_FILE_LEN (1024*1024)
+#define MAX_FILE_LEN (1024 * 1024)
 
 int	VFS_FILE_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	VFS_FILE_TIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
@@ -31,4 +32,4 @@ int	VFS_FILE_REGMATCH(const char *cmd, const char *param, unsigned flags, AGENT_
 int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 
-#endif /* SYSINFO_COMMON_FILE_H_INCLUDED */
+#endif /* ZABBIX_SYSINFO_COMMON_FILE_H */

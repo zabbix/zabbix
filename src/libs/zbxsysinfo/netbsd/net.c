@@ -18,7 +18,6 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
 
 static struct nlist kernel_symbols[] =
@@ -134,10 +133,6 @@ int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 	char		if_name[MAX_STRING_LEN], mode[16];
 	zbx_uint64_t	ibytes, ipackets, ierrors, idropped;
 
-	assert(result);
-
-	init_result(result);
-
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
 
@@ -151,21 +146,13 @@ int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 		return SYSINFO_RET_FAIL;
 
 	if ('\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
-	{
 		SET_UI64_RESULT(result, ibytes);
-	}
 	else if (0 == strcmp(mode, "packets"))
-	{
 		SET_UI64_RESULT(result, ipackets);
-	}
 	else if (0 == strcmp(mode, "errors"))
-	{
 		SET_UI64_RESULT(result, ierrors);
-	}
 	else if (0 == strcmp(mode, "dropped"))
-	{
 		SET_UI64_RESULT(result, idropped);
-	}
 	else
 		return SYSINFO_RET_FAIL;
 
@@ -176,10 +163,6 @@ int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 {
 	char		if_name[MAX_STRING_LEN], mode[16];
 	zbx_uint64_t	obytes, opackets, oerrors;
-
-	assert(result);
-
-	init_result(result);
 
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
@@ -194,17 +177,11 @@ int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 		return SYSINFO_RET_FAIL;
 
 	if ('\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
-	{
 		SET_UI64_RESULT(result, obytes);
-	}
 	else if (0 == strcmp(mode, "packets"))
-	{
 		SET_UI64_RESULT(result, opackets);
-	}
 	else if (0 == strcmp(mode, "errors"))
-	{
 		SET_UI64_RESULT(result, oerrors);
-	}
 	else
 		return SYSINFO_RET_FAIL;
 
@@ -215,10 +192,6 @@ int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 {
 	char		if_name[MAX_STRING_LEN], mode[16];
 	zbx_uint64_t	tbytes, tpackets, terrors;
-
-	assert(result);
-
-	init_result(result);
 
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
@@ -233,40 +206,21 @@ int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 		return SYSINFO_RET_FAIL;
 
 	if ('\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
-	{
 		SET_UI64_RESULT(result, tbytes);
-	}
 	else if (0 == strcmp(mode, "packets"))
-	{
 		SET_UI64_RESULT(result, tpackets);
-	}
 	else if (0 == strcmp(mode, "errors"))
-	{
 		SET_UI64_RESULT(result, terrors);
-	}
 	else
 		return SYSINFO_RET_FAIL;
 
 	return SYSINFO_RET_OK;
 }
 
-int	NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	assert(result);
-
-	init_result(result);
-
-	return SYSINFO_RET_FAIL;
-}
-
 int	NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char		if_name[MAX_STRING_LEN];
 	zbx_uint64_t	icollisions;
-
-	assert(result);
-
-	init_result(result);
 
 	if (num_param(param) > 1)
 		return SYSINFO_RET_FAIL;

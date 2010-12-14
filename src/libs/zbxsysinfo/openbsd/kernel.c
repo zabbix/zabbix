@@ -18,7 +18,6 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
 
 int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -27,10 +26,6 @@ int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	int	mib[2];
 	size_t	len;
 	int	maxfiles;
-
-	assert(result);
-
-	init_result(result);
 
 	mib[0] = CTL_KERN;
 	mib[1] = KERN_MAXFILES;
@@ -44,7 +39,7 @@ int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	return SYSINFO_RET_OK;
 #else
-	return	SYSINFO_RET_FAIL;
+	return SYSINFO_RET_FAIL;
 #endif
 }
 
@@ -54,10 +49,6 @@ int	KERNEL_MAXPROC(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	int	mib[2];
 	size_t	len;
 	int	maxproc;
-
-	assert(result);
-
-	init_result(result);
 
 	mib[0] = CTL_KERN;
 	mib[1] = KERN_MAXPROC;
@@ -71,6 +62,6 @@ int	KERNEL_MAXPROC(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
 	return SYSINFO_RET_OK;
 #else
-	return	SYSINFO_RET_FAIL;
+	return SYSINFO_RET_FAIL;
 #endif
 }
