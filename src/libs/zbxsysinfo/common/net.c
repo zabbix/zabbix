@@ -30,7 +30,7 @@
  * 0 - NOT OK
  * 1 - OK
  * */
-int	tcp_expect(const char *host, unsigned short port, const char *request,
+int	tcp_expect(const char *host, unsigned short port, int timeout, const char *request,
 		const char *expect, const char *sendtoclose, int *value_int)
 {
 	zbx_sock_t	s;
@@ -41,7 +41,7 @@ int	tcp_expect(const char *host, unsigned short port, const char *request,
 
 	*value_int = 0;
 
-	if (SUCCEED == (net = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, 0)))
+	if (SUCCEED == (net = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout)))
 	{
 		if (NULL != request)
 		{
@@ -106,14 +106,10 @@ int	NET_TCP_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	if (SUCCEED != is_ushort(port_str, &port))
 		return SYSINFO_RET_FAIL;
 
-	alarm(CONFIG_TIMEOUT);
-
-	if (SYSINFO_RET_OK == (ret = tcp_expect(ip, port, NULL, NULL, NULL, &value_int)))
+	if (SYSINFO_RET_OK == (ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, NULL, NULL, &value_int)))
 	{
 		SET_UI64_RESULT(result, value_int);
 	}
-
-	alarm(0);
 
 	return ret;
 }
