@@ -699,7 +699,7 @@ class CUserGroup extends CZBXAPI{
 
 			if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
 				//GETTEXT: Api exception
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can add User Groups.'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can delete User Groups.'));
 			}
 
 			//we must check, if this user group is used in one of the scripts. If so, it cannot be deleted
