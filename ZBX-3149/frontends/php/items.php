@@ -939,7 +939,7 @@ switch($itemType) {
 // Table Header //
 		$table->setHeader(array(
 			new CCheckBox('all_items',null,"checkAll('".$form->GetName()."','all_items','group_itemid');"),
-			S_LOG,
+			S_WIZARD,
 			$show_host?S_HOST:null,
 			make_sorting_header(S_DESCRIPTION,'description'),
 			S_TRIGGERS,
@@ -1143,19 +1143,17 @@ switch($itemType) {
 				$trigger_info = SPACE;
 			}
 //-------
-
-			if(preg_match('/^(log|logrt|eventlog|snmptraps)(\[.*\])?$/',$item['key_'],$matchkey)){
-				//preg_match('/(log|logrt|eventlog|snmptraps)/', $matchkeys[0], $matchkey);
-				$ltype = $logtype[$matchkey[1]];
+			//if item type is 'Log' we must show log menu
+			if($item['value_type'] == ITEM_VALUE_TYPE_LOG || $item['value_type'] == ITEM_VALUE_TYPE_STR || $item['value_type'] == ITEM_VALUE_TYPE_TEXT){
 
 				$triggers_flag = false;
-				$triggers=",Array('".S_EDIT_TRIGGER."',null,null,{'outer' : 'pum_o_submenu','inner' : ['pum_i_submenu']}\n";
+				$triggers="Array('".S_EDIT_TRIGGER."',null,null,{'outer' : 'pum_o_submenu','inner' : ['pum_i_submenu']}\n";
 
 				foreach($item['triggers'] as $num => $trigger){
 					$triggers .= ',["'.$trigger['description_expanded'].'",'.
 										zbx_jsvalue("javascript: openWinCentered('tr_logform.php?sform=1&itemid=".$item['itemid'].
 																"&triggerid=".$trigger['triggerid'].
-																"&ltype=".$ltype."','TriggerLog',760,540,".
+																"','TriggerLog',760,540,".
 																"'titlebar=no, resizable=yes, scrollbars=yes');").']';
 					$triggers_flag = true;
 				}
@@ -1164,12 +1162,12 @@ switch($itemType) {
 					$triggers = rtrim($triggers,',').')';
 				}
 				else{
-					$triggers = '';
+					$triggers = 'Array()';
 				}
 
 				$menuicon = new CIcon(S_MENU,'iconmenu_b',
 						'call_triggerlog_menu(event, '.zbx_jsvalue($item['itemid']).','.
-						zbx_jsvalue($item['description_expanded']).','.$ltype.$triggers.');');
+						zbx_jsvalue($item['description_expanded']).','.$triggers.');');
 			}
 			else{
 				$menuicon = SPACE;

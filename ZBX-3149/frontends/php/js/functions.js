@@ -63,14 +63,14 @@ function call_ins_macro_menu(ev){
 	return false;
 }
 
-function call_triggerlog_menu(evnt,id,name,ltype,menu_options){
+function call_triggerlog_menu(evnt,id,name, menu_options){
  	var tname = locale['S_CREATE_LOG_TRIGGER'];
 
 	if(typeof(menu_options) != 'undefined'){
 		show_popup_menu(evnt,
 					[
 						[name,null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],
-						[tname, "javascript: openWinCentered('tr_logform.php?sform=1&itemid="+id+"&ltype="+ltype+"','TriggerLog',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');",{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],
+						[tname, "javascript: openWinCentered('tr_logform.php?sform=1&itemid="+id+"','TriggerLog',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');",{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],
 						menu_options
 					],240);
 	}
@@ -78,7 +78,7 @@ function call_triggerlog_menu(evnt,id,name,ltype,menu_options){
 		show_popup_menu(evnt,
 					[
 						[name,null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],
-						[tname, "javascript: openWinCentered('tr_logform.php?sform=1&itemid="+id+"&ltype="+ltype+"','ServiceForm',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');", {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]
+						[tname, "javascript: openWinCentered('tr_logform.php?sform=1&itemid="+id+"','ServiceForm',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');", {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]
 					],140);
 	}
 return false;
@@ -291,7 +291,9 @@ function swapNodes(n1, n2){
 
 		p1.replaceChild(n2, n1); // new,old
 		if(b){
-			p2.insertBefore(n1, b);	//4to,pered 4em
+// n1 - the node which we insert
+// b - the node before which we insert 
+			p2.insertBefore(n1, b);
 		}
 		else {
 			p2.appendChild(n1);
@@ -308,7 +310,7 @@ function swapNodesNames(n1,n2){
 		id2 = parseInt(id2.replace(reg,"$1"));
 	}
 
-	if(is_number(id1) && is_number(id2)){ 
+	if(is_number(id1) && is_number(id2)){
 		var elm = new Array();
 		elm[0] = document.getElementsByName('expressions['+id1+'][value]')[0];
 		elm[1] = document.getElementsByName('expressions['+id1+'][type]')[0];
@@ -339,7 +341,7 @@ function closeform(page){
 	catch(e){
 		zbx_throw(e);
 	}
-	
+
 self.close();
 }
 
@@ -722,7 +724,7 @@ function create_mon_trigger_menu(e, args, items){
 	else {
 		history_section_caption = locale['S_SIMPLE_GRAPHS'];
 	}
-	
+
 
 	tr_menu.push([history_section_caption,null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}]);
 

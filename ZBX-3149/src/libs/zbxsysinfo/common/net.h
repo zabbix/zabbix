@@ -17,16 +17,17 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#if !defined(SYSINFO_COMMON_NET_H_INCLUDED)
+#ifndef ZABBIX_SYSINFO_COMMON_NET_H
+#define ZABBIX_SYSINFO_COMMON_NET_H
 
 #include "sysinfo.h"
 
 extern char	*CONFIG_SOURCE_IP;
 
-int	tcp_expect(const char *host, unsigned short port, const char *request,
+int	tcp_expect(const char *host, unsigned short port, int timeout, const char *request,
 		const char *expect, const char *sendtoclose, int *value_int);
 int	NET_TCP_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	CHECK_DNS_QUERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	NET_TCP_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	NET_TCP_DNS_QUERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 
-#endif /* SYSINFO_COMMON_NET_H_INCLUDED */
+#endif /* ZABBIX_SYSINFO_COMMON_NET_H */

@@ -51,7 +51,7 @@ void	DBclose()
  * Connect to the database.
  * If fails, program terminates.
  */
-void    DBconnect(int flag)
+void	DBconnect(int flag)
 {
 	int	err;
 
@@ -59,7 +59,7 @@ void    DBconnect(int flag)
 	do
 	{
 		err = zbx_db_connect(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD,
-					CONFIG_DBNAME, CONFIG_DBSOCKET, CONFIG_DBPORT);
+					CONFIG_DBNAME, CONFIG_DBSCHEMA, CONFIG_DBSOCKET, CONFIG_DBPORT);
 
 		switch(err) {
 		case ZBX_DB_OK:
@@ -95,14 +95,14 @@ void    DBconnect(int flag)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	DBinit()
 {
-	zbx_db_init(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBNAME, CONFIG_DBSOCKET, CONFIG_DBPORT);
+	zbx_db_init(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBNAME, CONFIG_DBSCHEMA, CONFIG_DBSOCKET, CONFIG_DBPORT);
 }
 
 /******************************************************************************
@@ -124,7 +124,8 @@ int	DBping()
 {
 	int ret;
 
-	ret = (ZBX_DB_OK != zbx_db_connect(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBNAME, CONFIG_DBSOCKET, CONFIG_DBPORT)) ? FAIL : SUCCEED;
+	ret = (ZBX_DB_OK != zbx_db_connect(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD,
+				CONFIG_DBNAME, CONFIG_DBSCHEMA, CONFIG_DBSOCKET, CONFIG_DBPORT)) ? FAIL : SUCCEED;
 	DBclose();
 
 	return ret;
@@ -1085,7 +1086,7 @@ int	DBget_escape_string_len(const char *src)
 			continue;
 
 		if (*s == '\''
-#if !defined(HAVE_ORACLE) && !defined(HAVE_SQLITE3)
+#if !defined(HAVE_IBM_DB2) && !defined(HAVE_ORACLE) && !defined(HAVE_SQLITE3)
 			|| *s == '\\'
 #endif
 			)
@@ -1108,17 +1109,17 @@ int	DBget_escape_string_len(const char *src)
  *                                                                            *
  * Return value: escaped string                                               *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: sync changes with 'DBget_escape_string_len'                      *
  *           and 'DBdyn_escape_string_len'                                    *
  *                                                                            *
  ******************************************************************************/
-void    DBescape_string(const char *src, char *dst, int len)
+void	DBescape_string(const char *src, char *dst, int len)
 {
 	const char	*s;
 	char		*d;
-#if defined(HAVE_ORACLE) || defined(HAVE_SQLITE3)
+#if defined(HAVE_IBM_DB2) || defined(HAVE_ORACLE) || defined(HAVE_SQLITE3)
 #	define ZBX_DB_ESC_CH	'\''
 #else
 #	define ZBX_DB_ESC_CH	'\\'
@@ -1133,7 +1134,7 @@ void    DBescape_string(const char *src, char *dst, int len)
 			continue;
 
 		if (*s == '\''
-#if !defined(HAVE_ORACLE) && !defined(HAVE_SQLITE3)
+#if !defined(HAVE_IBM_DB2) && !defined(HAVE_ORACLE) && !defined(HAVE_SQLITE3)
 			|| *s == '\\'
 #endif
 			)
@@ -1163,7 +1164,7 @@ void    DBescape_string(const char *src, char *dst, int len)
  *                                                                            *
  * Return value: escaped string                                               *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1192,7 +1193,7 @@ char	*DBdyn_escape_string(const char *src)
  *                                                                            *
  * Return value: escaped string                                               *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: sync changes with 'DBescape_string', 'DBget_escape_string_len'   *
  *                                                                            *
@@ -1214,7 +1215,7 @@ char	*DBdyn_escape_string_len(const char *src, int max_src_len)
 			continue;
 
 		if (*s == '\''
-#if !defined(HAVE_ORACLE) && !defined(HAVE_SQLITE3)
+#if !defined(HAVE_IBM_DB2) && !defined(HAVE_ORACLE) && !defined(HAVE_SQLITE3)
 			|| *s == '\\'
 #endif
 			)
@@ -1283,7 +1284,7 @@ int	DBget_escape_like_pattern_len(const char *src)
  *           using '!' as escape character. Our queries then become:          *
  *                                                                            *
  *           ... LIKE 'a!_b!%c\\d\'e!!f' ESCAPE '!' (MySQL, PostgreSQL)       *
- *           ... LIKE 'a!_b!%c\d''e!!f' ESCAPE '!' (SQLite3, Oracle)          *
+ *           ... LIKE 'a!_b!%c\d''e!!f' ESCAPE '!' (IBM DB2, Oracle, SQLite3) *
  *                                                                            *
  *           Using backslash as escape character in LIKE would be too much    *
  *           trouble, because escaping backslashes would have to be escaped   *
@@ -1291,7 +1292,7 @@ int	DBget_escape_like_pattern_len(const char *src)
  *                                                                            *
  *           ... LIKE 'a\\_b\\%c\\\\d\'e!f' ESCAPE '\\' or                    *
  *           ... LIKE 'a\\_b\\%c\\\\d\\\'e!f' ESCAPE '\\' (MySQL, PostgreSQL) *
- *           ... LIKE 'a\_b\%c\\d''e!f' ESCAPE '\' (SQLite3, Oracle)          *
+ *           ... LIKE 'a\_b\%c\\d''e!f' ESCAPE '\' (IBM DB2, Oracle, SQLite3) *
  *                                                                            *
  *           Hence '!' instead of backslash.                                  *
  *                                                                            *
@@ -1343,11 +1344,11 @@ void	DBescape_like_pattern(const char *src, char *dst, int len)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-char*	DBdyn_escape_like_pattern(const char *src)
+char	*DBdyn_escape_like_pattern(const char *src)
 {
 	int	len;
 	char	*dst = NULL;
-	
+
 	len = DBget_escape_like_pattern_len(src);
 
 	dst = zbx_malloc(dst, len);
@@ -1671,7 +1672,7 @@ static char	buf_string[640];
  *                                                                            *
  * Return value: <host> or "???" if host not found                            *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1707,7 +1708,7 @@ char	*zbx_host_string(zbx_uint64_t hostid)
  *                                                                            *
  * Return value: <host>:<key> or "???" if item not found                      *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1741,7 +1742,7 @@ char	*zbx_host_key_string(zbx_uint64_t itemid)
  *                                                                            *
  * Return value: <host>:<key>                                                 *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1763,7 +1764,7 @@ char	*zbx_host_key_string_by_item(DB_ITEM *item)
  *                                                                            *
  * Return value: "Name Surname (Alias)" or "unknown" if user not found        *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1791,7 +1792,6 @@ char	*zbx_user_string(zbx_uint64_t userid)
 	return buf_string;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_host_key_function_string                                     *
@@ -1804,7 +1804,7 @@ char	*zbx_user_string(zbx_uint64_t userid)
  *                                    <host>:<key>.<function>(<parameters>)   *
  *                             or "???" if function not found                 *
  *                                                                            *
- * Author: Aleksander Vladishev                                               *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1883,54 +1883,73 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 	DB_ROW		row;
 	DB_EVENT	event;
 	zbx_uint64_t	autoreg_hostid;
+	int		res = SUCCEED;
 
 	host_esc = DBdyn_escape_string_len(host, HOST_HOST_LEN);
 	ip_esc = DBdyn_escape_string_len(ip, HOST_IP_LEN);
 
-	result = DBselect(
-			"select autoreg_hostid"
-			" from autoreg_host"
-			" where proxy_hostid%s"
-				" and host='%s'"
-				DB_NODE,
-			DBsql_id_cmp(proxy_hostid),
-			host_esc,
-			DBnode_local("autoreg_hostid"));
-
-	if (NULL != (row = DBfetch(result)))
+	if (0 != proxy_hostid)
 	{
-		ZBX_STR2UINT64(autoreg_hostid, row[0]);
+		result = DBselect(
+				"select hostid"
+				" from hosts"
+				" where proxy_hostid%s"
+					" and host='%s'"
+					DB_NODE,
+				DBsql_id_cmp(proxy_hostid), host_esc,
+				DBnode_local("hostid"));
 
-		DBexecute("update autoreg_host"
-				" set listen_ip='%s',listen_port=%d"
-				" where autoreg_hostid=" ZBX_FS_UI64,
-				ip_esc, (int)port, autoreg_hostid);
+		if (NULL != DBfetch(result))
+			res = FAIL;
+		DBfree_result(result);
 	}
-	else
+
+	if (SUCCEED == res)
 	{
-		autoreg_hostid = DBget_maxid("autoreg_host");
-		DBexecute("insert into autoreg_host"
-				" (autoreg_hostid,proxy_hostid,host,listen_ip,listen_port)"
-				" values"
-				" (" ZBX_FS_UI64 ",%s,'%s','%s',%d)",
-				autoreg_hostid, DBsql_id_ins(proxy_hostid),
-				host_esc, ip_esc, (int)port);
+		result = DBselect(
+				"select autoreg_hostid"
+				" from autoreg_host"
+				" where proxy_hostid%s"
+					" and host='%s'"
+					DB_NODE,
+				DBsql_id_cmp(proxy_hostid), host_esc,
+				DBnode_local("autoreg_hostid"));
+
+		if (NULL != (row = DBfetch(result)))
+		{
+			ZBX_STR2UINT64(autoreg_hostid, row[0]);
+
+			DBexecute("update autoreg_host"
+					" set listen_ip='%s',listen_port=%d"
+					" where autoreg_hostid=" ZBX_FS_UI64,
+					ip_esc, (int)port, autoreg_hostid);
+		}
+		else
+		{
+			autoreg_hostid = DBget_maxid("autoreg_host");
+			DBexecute("insert into autoreg_host"
+					" (autoreg_hostid,proxy_hostid,host,listen_ip,listen_port)"
+					" values"
+					" (" ZBX_FS_UI64 ",'%s','%s','%s',%d)",
+					autoreg_hostid, DBsql_id_ins(proxy_hostid),
+					host_esc, ip_esc, (int)port);
+		}
+		DBfree_result(result);
+
+		/* Preparing auto registration event for processing */
+		memset(&event, 0, sizeof(DB_EVENT));
+		event.source	= EVENT_SOURCE_AUTO_REGISTRATION;
+		event.object	= EVENT_OBJECT_ZABBIX_ACTIVE;
+		event.objectid	= autoreg_hostid;
+		event.clock	= now;
+		event.value	= TRIGGER_VALUE_TRUE;
+
+		/* Processing event */
+		process_event(&event, 1);
 	}
-	DBfree_result(result);
 
 	zbx_free(ip_esc);
 	zbx_free(host_esc);
-
-	/* Preparing auto registration event for processing */
-	memset(&event, 0, sizeof(DB_EVENT));
-	event.source	= EVENT_SOURCE_AUTO_REGISTRATION;
-	event.object	= EVENT_OBJECT_ZABBIX_ACTIVE;
-	event.objectid	= autoreg_hostid;
-	event.clock	= now;
-	event.value	= TRIGGER_VALUE_TRUE;
-
-	/* Processing event */
-	process_event(&event, 1);
 }
 
 /******************************************************************************
@@ -2037,7 +2056,7 @@ char	*DBget_unique_hostname_by_sample(char *host_name_sample)
 			"select host"
 			" from hosts"
 			" where host like '%s%%' escape '%c'"
-		                 DB_NODE
+				DB_NODE
 			" group by host",
 			host_name_sample_esc,
 			ZBX_SQL_LIKE_ESCAPE_CHAR,

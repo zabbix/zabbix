@@ -18,20 +18,13 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
 
 int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #if defined(HAVE_LIBPERFSTAT)
 	perfstat_cpu_total_t	ps_cpu_total;
-#endif
 
-	assert(result);
-
-	init_result(result);
-
-#if defined(HAVE_LIBPERFSTAT)
 	/* AIX 6.1 */
 	if (-1 == perfstat_cpu_total(NULL, &ps_cpu_total, sizeof(ps_cpu_total), 1))
 		return SYSINFO_RET_FAIL;

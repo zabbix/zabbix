@@ -30,7 +30,7 @@
  * 0 - NOT OK
  * 1 - OK
  * */
-int	tcp_expect(const char *host, unsigned short port, const char *request,
+int	tcp_expect(const char *host, unsigned short port, int timeout, const char *request,
 		const char *expect, const char *sendtoclose, int *value_int)
 {
 	zbx_sock_t	s;
@@ -41,7 +41,7 @@ int	tcp_expect(const char *host, unsigned short port, const char *request,
 
 	*value_int = 0;
 
-	if (SUCCEED == (net = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, 0)))
+	if (SUCCEED == (net = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout)))
 	{
 		if (NULL != request)
 		{
@@ -87,10 +87,6 @@ int	NET_TCP_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	int		value_int, ret;
 	char		ip[64], port_str[8];
 
-	assert(result);
-
-	init_result(result);
-
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
 
@@ -106,14 +102,10 @@ int	NET_TCP_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	if (SUCCEED != is_ushort(port_str, &port))
 		return SYSINFO_RET_FAIL;
 
-	alarm(CONFIG_TIMEOUT);
-
-	if (SYSINFO_RET_OK == (ret = tcp_expect(ip, port, NULL, NULL, NULL, &value_int)))
+	if (SYSINFO_RET_OK == (ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, NULL, NULL, &value_int)))
 	{
 		SET_UI64_RESULT(result, value_int);
 	}
-
-	alarm(0);
 
 	return ret;
 }
@@ -221,7 +213,7 @@ static char	*get_name(unsigned char *msg, unsigned char *msg_end, unsigned char 
 #endif /* HAVE_RES_QUERY */
 #endif /* not _WINDOWS */
 
-int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_TCP_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #if !defined(_WINDOWS)
 #ifdef HAVE_RES_QUERY
@@ -236,12 +228,6 @@ int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 	char	respbuf[512];
 #endif
 	struct	in_addr in;
-
-	/* extern char *h_errlist[]; */
-
-	assert(result);
-
-	init_result(result);
 
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
@@ -291,7 +277,7 @@ int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 #endif /* if !defined(_WINDOWS) */
 }
 
-int	CHECK_DNS_QUERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_TCP_DNS_QUERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifndef _WINDOWS
 #ifdef HAVE_RES_QUERY
@@ -341,12 +327,6 @@ int	CHECK_DNS_QUERY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	struct in_addr	inaddr;
 	struct protoent	*pr;
 	struct servent	*s;
-
-	assert(result);
-
-	init_result(result);
-
-	/*zabbix_log(LOG_LEVEL_CRIT, "=> %s", cmd);*/
 
 	if (num_param(param) > 3)
 		return SYSINFO_RET_FAIL;

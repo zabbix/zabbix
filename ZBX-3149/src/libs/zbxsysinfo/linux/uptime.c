@@ -24,10 +24,6 @@ int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 {
 	struct sysinfo	info;
 
-	assert(result);
-
-	init_result(result);
-
 	if (0 != sysinfo(&info))
 		return SYSINFO_RET_FAIL;
 

@@ -72,10 +72,6 @@ int	WEB_PAGE_GET(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	char	port_str[8];
 	char	buffer[MAX_BUFFER_LEN];
 
-	assert(result);
-
-	init_result(result);
-
         if (num_param(param) > 3)
                 return SYSINFO_RET_FAIL;
 
@@ -107,10 +103,6 @@ int	WEB_PAGE_PERF(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	char	path[MAX_STRING_LEN];
 	char	port_str[8];
 	double	start_time;
-
-        assert(result);
-
-        init_result(result);
 
         if (num_param(param) > 3)
                 return SYSINFO_RET_FAIL;
@@ -148,10 +140,6 @@ int	WEB_PAGE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	char	back[MAX_BUFFER_LEN];
 	char	*buffer = NULL, *found;
 	int	len, found_len;
-
-        assert(result);
-
-        init_result(result);
 
         if (num_param(param) > 5)
                 return SYSINFO_RET_FAIL;

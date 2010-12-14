@@ -86,6 +86,7 @@
 	'S_DELETE_SELECTED'=>			_('Delete selected'),
 	'S_COPY_SELECTED_TO'=>			_('Copy selected to ...'),
 
+	'S_SCHEMA' => 'Schema',
 //	dicoveryconf.php
 	'S_HOST_IP'=>				_('Host IP'),
 	'S_SERVICE_TYPE'=>			_('Service type'),
@@ -1149,6 +1150,7 @@
 	'S_NUMERIC_UNSIGNED'=>					_('Numeric (unsigned)'),
 	'S_NUMERIC_FLOAT'=>					_('Numeric (float)'),
 	'S_CHARACTER'=>						_('Character'),
+	'S_WIZARD'=>						_('Wizard'),
 	'S_LOG'=>						_('Log'),
 	'S_TEXT'=>						_('Text'),
 	'S_AS_IS'=>						_('As is'),
@@ -1210,7 +1212,7 @@
 	'S_PROTOTYPES' => _('Prototypes'),
 	'S_REGEXP' => _('Regexp'),
 	'S_DISCOVERY_RULES' => _('Discovery rules'),
-	
+
 // disc_prototypes.php
 	'S_CONFIGURATION_OF_ITEM_PROTOTYPES_BIG' => _('CONFIGURATION OF ITEM PROTOTYPES'),
 	'S_ITEM_PROTOTYPES_OF_BIG' => _('ITEM PROTOTYPES OF'),
@@ -1218,16 +1220,16 @@
 	'S_SELECT_PROTOTYPE' => _('Select prototype'),
 	'S_CREATE_PROTOTYPE' => _('Create prototype'),
 	'S_ITEM_PROTOTYPE' => _('Item prototype'),
-	
+
 	'S_CONFIGURATION_OF_GRAPHS_PROTOTYPES_BIG' => _('CONFIGURATION OF GRAPH PROTOTYPES'),
-	
+
 // trigger_prototypes.php
 	'S_CONFIGURATION_OF_TRIGGERS_PROTOTYPES_BIG' => _('CONFIGURATION OF TRIGGER PROTOTYPES'),
 	'S_TRIGGER_PROTOTYPES_OF_BIG' => _('TRIGGER PROTOTYPES OF'),
 
 // graph_prototypes.php
 	'S_GRAPH_PROTOTYPES_OF_BIG' => _('GRAPH PROTOTYPES OF'),
-	
+
 //	events.php
 	'S_EVENT'=>				_('Event'),
 	'S_EVENT_DETAILS'=>			_('Event details'),
@@ -1340,6 +1342,9 @@
 	'S_NO_ICON_FOR_MAP_ELEMENT'=>	_('No icon for map element'),
 	'S_EXPORT_HAVE_NO_MAPS'=>		_('Export does not contain Zabbix maps'),
 	'S_EXPORT_HAVE_NO_SCREENS'=>	_('Export does not contain Zabbix screens'),
+
+	'S_INCORRECT_ELEMENT_MAP_LINK' => _('All links should have "Name" and "URL" specified'),
+	'S_EACH_URL_SHOULD_HAVE_UNIQUE' => _('Each URL should have a unique name. Please make sure there is only one URL named'),
 
 //	map.php
 	'S_OK_BIG'=>			_('OK'),
@@ -1818,7 +1823,7 @@
 	'S_COPY_SELECTED_TRIGGERS_Q'=>		_('Copy selected triggers?'),
 	'S_DELETE_SELECTED_TRIGGERS_Q'=>	_('Delete selected triggers?'),
 
-	'S_TRIGGER_LOG_FORM'=>	_('Log trigger form'),
+	'S_TRIGGER_LOG_FORM'=>	_('Trigger form'),
 
 //	tr_comments.php
 	'S_TRIGGER_COMMENTS'=>			_('Trigger comments'),
@@ -2216,6 +2221,7 @@
 	'S_DELETED_SMALL'=>				_('deleted'),
 	'S_UNKNOWN_VALUE_TYPE'=>			_('Unknown value type'),
 	'S_ITEMS_CHECK_KEY_DEFAULT_EXAMPLE_PASSED'=>	_('Check the key, please. Default example was passed'),
+	'S_ERROR_IN_ITEM_KEY' => 'Error in item key:',
 
 //	httptest.inc.php
 	'S_SCENARIO_STEP_NUMBER_CANNOT_BE_LESS_ONE'=>	_('Scenario step number cannot be less than 1'),
@@ -2315,7 +2321,7 @@
 	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART1'=>	_('Function \''),
 	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART2'=>	_('\' does not accept parameters.'),
     'S_WRONG_DEPENDENCY_ERROR'=>	'Error adding dependencies. Following dependencies are not allowed: 1) from a host trigger to a template trigger; 2) from a template trigger to a host trigger; 3) between template triggers, where templates have links to other templates.',
-		
+
 //	page_footer.php
 	'S_TRANSACTION_HAVE_NOT_BEEN_CLOSED_ABORTING'=>	_('Transaction has not been closed. Aborting..'),
 
@@ -2524,8 +2530,8 @@
 	'S_NOW_SMALL'=>			_('now'),
 
 //	functions.js
-	'S_CREATE_LOG_TRIGGER'=>			_('Create Log Trigger'),
-	'DO_YOU_REPLACE_CONDITIONAL_EXPRESSION_Q'=>	_('Do you replace the conditional expression?'),
+	'S_CREATE_LOG_TRIGGER'=>			_('Create trigger'),
+	'DO_YOU_REPLACE_CONDITIONAL_EXPRESSION_Q'=>	_('Do you wish to replace the conditional expression?'),
 	'S_ADD_SERVICE'=>				_('Add Service'),
 	'S_EDIT_SERVICE'=>				_('Edit Service'),
 	'S_DELETE_SERVICE'=>				_('Delete Service'),

@@ -216,7 +216,7 @@ typedef enum
 
 typedef enum
 {
-	DOBJECT_STATUS_UP	= 0,
+	DOBJECT_STATUS_UP = 0,
 	DOBJECT_STATUS_DOWN,
 	DOBJECT_STATUS_DISCOVER,
 	DOBJECT_STATUS_LOST
@@ -654,11 +654,13 @@ const char	*zbx_nodetype_string(unsigned char nodetype);
 #define strscpy(x, y)		zbx_strlcpy(x, y, sizeof(x))
 #define strnscpy(x, y, n)	zbx_strlcpy(x, y, n);
 
-#define zbx_malloc(old, size)	zbx_malloc2(__FILE__, __LINE__, old , size)
-#define zbx_realloc(old, size)	zbx_realloc2(__FILE__, __LINE__, old , size)
+#define zbx_malloc(old, size)	zbx_malloc2(__FILE__, __LINE__, old, size)
+#define zbx_realloc(src, size)	zbx_realloc2(__FILE__, __LINE__, src, size)
+#define zbx_strdup(old, str)	zbx_strdup2(__FILE__, __LINE__, old, str)
 
 void    *zbx_malloc2(const char *filename, int line, void *old, size_t size);
 void    *zbx_realloc2(const char *filename, int line, void *src, size_t size);
+char    *zbx_strdup2(const char *filename, int line, char *old, const char *str);
 
 #define zbx_free(ptr)		\
 	if (ptr)		\
@@ -770,9 +772,8 @@ void	zbx_hex2octal(const char *input, char **output, int *olen);
 int	zbx_pg_escape_bytea(const u_char *input, int ilen, char **output, int *olen);
 int	zbx_pg_unescape_bytea(u_char *io);
 #endif
-int	zbx_get_field(const char *line, char *result, int num, char separator);
 int	zbx_get_next_field(const char **line, char **output, int *olen, char separator);
-int	str_in_list(const char *list, const char *value, const char delimiter);
+int	str_in_list(const char *list, const char *value, char delimiter);
 
 #ifdef HAVE___VA_ARGS__
 #	define zbx_setproctitle(fmt, ...) __zbx_zbx_setproctitle(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
@@ -933,11 +934,16 @@ int	MAIN_ZABBIX_ENTRY(void);
 zbx_uint64_t	zbx_letoh_uint64(zbx_uint64_t data);
 zbx_uint64_t	zbx_htole_uint64(zbx_uint64_t data);
 
-int	is_hostname_char(const char c);
-int	is_key_char(const char c);
-int	is_function_char(const char c);
+int	is_hostname_char(char c);
+int	is_key_char(char c);
+int	is_function_char(char c);
+
+int	parse_host(char **exp, char **host);
+int	parse_key(char **exp, char **key);
 int	parse_function(char **exp, char **func, char **params);
+
 int	parse_host_key(char *exp, char **host, char **key);
+
 void	make_hostname(char *host);
 
 #endif

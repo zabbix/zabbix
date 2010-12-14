@@ -23,21 +23,19 @@
 #include "cfg.h"
 #include "alias.h"
 
-#include "common/common.h"
-
 #if defined(WITH_COMMON_METRICS)
 #	include "common/common.h"
-#endif /* USE_COMMON_METRICS */
+#endif
 
 #if defined(WITH_SIMPLE_METRICS)
 #	include "simple/simple.h"
-#endif /* USE_SIMPLE_METRICS */
+#endif
 
 #if defined(WITH_SPECIFIC_METRICS)
 #	include "specsysinfo.h"
-#endif /* USE_SPECIFIC_METRICS */
+#endif
 
-ZBX_METRIC *commands=NULL;
+ZBX_METRIC	*commands = NULL;
 
 void	add_metric(ZBX_METRIC *new)
 {
@@ -131,7 +129,7 @@ int	add_user_parameter(char *key, char *command)
 	return SUCCEED;
 }
 
-void	init_metrics(void)
+void	init_metrics()
 {
 	register int	i;
 
@@ -160,13 +158,13 @@ void	init_metrics(void)
 #endif /* USE_SIMPLE_METRICS */
 }
 
-void	free_metrics(void)
+void	free_metrics()
 {
-	int i = 0;
-
-	if( commands )
+	if (NULL != commands)
 	{
-		for(i=0; NULL != commands[i].key; i++)
+		int	i;
+
+		for (i = 0; NULL != commands[i].key; i++)
 		{
 			zbx_free(commands[i].key);
 			zbx_free(commands[i].main_param);
@@ -207,42 +205,8 @@ void    escape_string(char *from, char *to, int maxlen)
 	to[maxlen-1]=0;
 }
 
-int	copy_result(AGENT_RESULT *src, AGENT_RESULT *dist)
-{
-	assert(src);
-	assert(dist);
-
-	free_result(dist);
-	dist->type = src->type;
-	dist->dbl = src->dbl;
-	if(src->str)
-	{
-		dist->str = strdup(src->str);
-		if(!dist->str)
-			return 1;
-	}
-	if(src->msg)
-	{
-		dist->msg = strdup(src->msg);
-		if(!dist->msg)
-			return 1;
-	}
-	return 0;
-}
-
-void	free_result(AGENT_RESULT *result)
-{
-	UNSET_DBL_RESULT(result);
-	UNSET_UI64_RESULT(result);
-	UNSET_STR_RESULT(result);
-	UNSET_TEXT_RESULT(result);
-	UNSET_MSG_RESULT(result);
-}
-
 void	init_result(AGENT_RESULT *result)
 {
- /* don't use `free_result(result)`, dangerous recycling */
-
 	result->type = 0;
 
 	result->ui64 = 0;
@@ -250,6 +214,15 @@ void	init_result(AGENT_RESULT *result)
 	result->str = NULL;
 	result->text = NULL;
 	result->msg = NULL;
+}
+
+void	free_result(AGENT_RESULT *result)
+{
+	UNSET_UI64_RESULT(result);
+	UNSET_DBL_RESULT(result);
+	UNSET_STR_RESULT(result);
+	UNSET_TEXT_RESULT(result);
+	UNSET_MSG_RESULT(result);
 }
 
 /*
@@ -315,7 +288,7 @@ int	parse_command(const char *command, char *cmd, int cmd_max_len,
 	return 2;
 }
 
-void	test_parameter(const char* key, unsigned flags)
+void	test_parameter(const char *key, unsigned flags)
 {
 	AGENT_RESULT	result;
 
@@ -323,11 +296,11 @@ void	test_parameter(const char* key, unsigned flags)
 
 	process(key, flags, &result);
 
-	if (result.type & AR_DOUBLE)
-		printf(" [d|" ZBX_FS_DBL "]", result.dbl);
-
 	if (result.type & AR_UINT64)
 		printf(" [u|" ZBX_FS_UI64 "]", result.ui64);
+
+	if (result.type & AR_DOUBLE)
+		printf(" [d|" ZBX_FS_DBL "]", result.dbl);
 
 	if (result.type & AR_STRING)
 		printf(" [s|%s]", result.str);
@@ -345,9 +318,9 @@ void	test_parameter(const char* key, unsigned flags)
 	fflush(stdout);
 }
 
-void	test_parameters(void)
+void	test_parameters()
 {
-	register int	i;
+	int	i;
 
 	for (i = 0; 0 != commands[i].key; i++)
 		test_parameter(commands[i].key, PROCESS_TEST | PROCESS_USE_TEST_PARAM);
@@ -627,7 +600,7 @@ int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c
 			break;
 		value_double = atof(c);
 
-		SET_DBL_RESULT(result, value_double)
+		SET_DBL_RESULT(result, value_double);
 		ret = SUCCEED;
 		break;
 	case ITEM_VALUE_TYPE_STR:
@@ -674,7 +647,7 @@ static zbx_uint64_t* get_result_ui64_value(AGENT_RESULT *result)
 		if (SUCCEED != is_uint64(result->str, &value))
 			return NULL;
 
-		SET_UI64_RESULT(result, value)
+		SET_UI64_RESULT(result, value);
 	}
 	else if(ISSET_TEXT(result))
 	{
@@ -685,7 +658,7 @@ static zbx_uint64_t* get_result_ui64_value(AGENT_RESULT *result)
 		if (SUCCEED != is_uint64(result->text, &value))
 			return NULL;
 
-		SET_UI64_RESULT(result, value)
+		SET_UI64_RESULT(result, value);
 	}
 	/* skip AR_MESSAGE - it is information field */
 
@@ -720,7 +693,7 @@ static double* get_result_dbl_value(AGENT_RESULT *result)
 			return NULL;
 		value = atof(result->str);
 
-		SET_DBL_RESULT(result, value)
+		SET_DBL_RESULT(result, value);
 	}
 	else if(ISSET_TEXT(result))
 	{
@@ -731,7 +704,7 @@ static double* get_result_dbl_value(AGENT_RESULT *result)
 			return NULL;
 		value = atof(result->text);
 
-		SET_DBL_RESULT(result, value)
+		SET_DBL_RESULT(result, value);
 	}
 	/* skip AR_MESSAGE - it is information field */
 
@@ -765,11 +738,11 @@ static char** get_result_str_value(AGENT_RESULT *result)
 	}
 	else if(ISSET_UI64(result))
 	{
-		SET_STR_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_UI64, result->ui64))
+		SET_STR_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_UI64, result->ui64));
 	}
 	else if(ISSET_DBL(result))
 	{
-		SET_STR_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_DBL, result->dbl))
+		SET_STR_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_DBL, result->dbl));
 	}
 	/* skip AR_MESSAGE - it is information field */
 
@@ -795,11 +768,11 @@ static char** get_result_text_value(AGENT_RESULT *result)
 	}
 	else if(ISSET_UI64(result))
 	{
-		SET_TEXT_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_UI64, result->ui64))
+		SET_TEXT_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_UI64, result->ui64));
 	}
 	else if(ISSET_DBL(result))
 	{
-		SET_TEXT_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_DBL, result->dbl))
+		SET_TEXT_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_DBL, result->dbl));
 	}
 	/* skip AR_MESSAGE - it is information field */
 
@@ -837,25 +810,27 @@ void	*get_result_value_by_type(AGENT_RESULT *result, int require_type)
 {
 	assert(result);
 
-	switch(require_type)
+	switch (require_type)
 	{
 		case AR_UINT64:
-			return (void*)get_result_ui64_value(result);
+			return (void *)get_result_ui64_value(result);
 			break;
 		case AR_DOUBLE:
-			return (void*)get_result_dbl_value(result);
+			return (void *)get_result_dbl_value(result);
 			break;
 		case AR_STRING:
-			return (void*)get_result_str_value(result);
+			return (void *)get_result_str_value(result);
 			break;
 		case AR_TEXT:
-			return (void*)get_result_text_value(result);
+			return (void *)get_result_text_value(result);
 			break;
 		case AR_MESSAGE:
-			if(ISSET_MSG(result))	return (void*)(&result->msg);
+			if (ISSET_MSG(result))
+				return (void *)(&result->msg);
 			break;
 		default:
 			break;
 	}
+
 	return NULL;
 }

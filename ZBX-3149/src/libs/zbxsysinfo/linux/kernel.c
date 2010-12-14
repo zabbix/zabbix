@@ -18,7 +18,6 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
 
 static int	read_uint64_from_procfs(const char *path, zbx_uint64_t *value)
@@ -51,9 +50,6 @@ int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	int		ret = SYSINFO_RET_FAIL;
 	zbx_uint64_t	value = 0;
 
-	assert(result);
-        init_result(result);
-
 	if (SYSINFO_RET_OK == read_uint64_from_procfs("/proc/sys/fs/file-max", &value))
 	{
 		SET_UI64_RESULT(result, value);
@@ -67,9 +63,6 @@ int	KERNEL_MAXPROC(const char *cmd, const char *param, unsigned flags, AGENT_RES
 {
 	int		ret = SYSINFO_RET_FAIL;
 	zbx_uint64_t	value = 0;
-
-	assert(result);
-        init_result(result);
 
 	if (SYSINFO_RET_OK == read_uint64_from_procfs("/proc/sys/kernel/pid_max", &value))
 	{

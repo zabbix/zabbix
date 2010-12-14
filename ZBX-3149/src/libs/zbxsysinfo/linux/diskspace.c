@@ -70,10 +70,6 @@ int	VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	zbx_uint64_t	total, free, used;
 	double		pfree, pused;
 
-	assert(result);
-
-	init_result(result);
-
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
 
@@ -88,25 +84,15 @@ int	VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
 	/* default parameter */
 	if ('\0' == *mode || 0 == strcmp(mode, "total"))	/* default parameter */
-	{
 		SET_UI64_RESULT(result, total);
-	}
 	else if (0 == strcmp(mode, "free"))
-	{
 		SET_UI64_RESULT(result, free);
-	}
 	else if (0 == strcmp(mode, "used"))
-	{
 		SET_UI64_RESULT(result, used);
-	}
 	else if (0 == strcmp(mode, "pfree"))
-	{
 		SET_DBL_RESULT(result, pfree);
-	}
 	else if (0 == strcmp(mode, "pused"))
-	{
 		SET_DBL_RESULT(result, pused);
-	}
 	else
 		return SYSINFO_RET_FAIL;
 
@@ -119,8 +105,6 @@ int	VFS_FS_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 	char		line[MAX_STRING_LEN], *p, *mpoint;
 	FILE		*f;
 	struct zbx_json	j;
-
-	assert(result);
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 

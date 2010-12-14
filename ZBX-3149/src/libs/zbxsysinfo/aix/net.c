@@ -21,7 +21,8 @@
 #include "sysinfo.h"
 #include "zbxjson.h"
 
-typedef struct net_stat_s {
+typedef struct
+{
 	zbx_uint64_t ibytes;
 	zbx_uint64_t ipackets;
 	zbx_uint64_t ierr;
@@ -29,7 +30,8 @@ typedef struct net_stat_s {
 	zbx_uint64_t opackets;
 	zbx_uint64_t oerr;
 	zbx_uint64_t colls;
-} net_stat_t;
+}
+net_stat_t;
 
 static int	get_net_stat(const char *if_name, net_stat_t *ns)
 {
@@ -67,10 +69,6 @@ int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 	char		if_name[MAX_STRING_LEN], mode[MAX_STRING_LEN];
 	net_stat_t	ns;
 	int		ret = SYSINFO_RET_OK;
-
-	assert(result);
-
-	init_result(result);
 
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
@@ -114,10 +112,6 @@ int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 	net_stat_t	ns;
 	int		ret = SYSINFO_RET_OK;
 
-	assert(result);
-
-	init_result(result);
-
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
 
@@ -160,10 +154,6 @@ int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	net_stat_t	ns;
 	int		ret = SYSINFO_RET_OK;
 
-	assert(result);
-
-	init_result(result);
-
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
 
@@ -200,24 +190,11 @@ int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	return ret;
 }
 
-int	NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	assert(result);
-
-	init_result(result);
-
-	return SYSINFO_RET_FAIL;
-}
-
 int	NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char		if_name[MAX_STRING_LEN];
 	net_stat_t	ns;
 	int		ret = SYSINFO_RET_OK;
-
-	assert(result);
-
-	init_result(result);
 
 	if (num_param(param) > 1)
 		return SYSINFO_RET_FAIL;

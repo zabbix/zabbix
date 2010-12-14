@@ -21,58 +21,11 @@
 #include "sysinfo.h"
 #include "zbxjson.h"
 
-int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-        assert(result);
-
-        init_result(result);
-
-	return SYSINFO_RET_FAIL;
-}
-
-int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-        assert(result);
-
-        init_result(result);
-
-	return SYSINFO_RET_FAIL;
-}
-
-int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-        assert(result);
-
-        init_result(result);
-
-	return SYSINFO_RET_FAIL;
-}
-
-int     NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-        assert(result);
-
-        init_result(result);
-
-	return SYSINFO_RET_FAIL;
-}
-
-int     NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-        assert(result);
-
-        init_result(result);
-
-	return SYSINFO_RET_FAIL;
-}
-
 int	NET_IF_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	struct if_nameindex	*ni;
 	struct zbx_json		j;
 	int			i;
-
-	assert(result);
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 

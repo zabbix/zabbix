@@ -118,11 +118,13 @@ if(!isset($DB)){
 						$result = false;
 					}
 					else{
-						//DBexecute('set current schema='.$DB['USER'].';');
 						$options = array(
 							'db2_attr_case' => DB2_CASE_LOWER,
 						);
 						db2_set_option($DB['DB'], $options, 1);
+						if(isset($DB['SCHEMA']) && ($DB['SCHEMA'] != '')){
+							DBexecute("SET CURRENT SCHEMA='".$DB['SCHEMA']."'");
+						}
 					}
 
 					break;
@@ -189,8 +191,8 @@ if(!isset($DB)){
 					$result = false;
 			}
 		}
-		if( false == $result )
-			$DB['DB']= null;
+		if(false == $result)
+			$DB['DB'] = null;
 
 		return $result;
 	}
@@ -885,12 +887,13 @@ else {
 	}
 
 	function create_id_by_nodeid($id,$nodeid=0){
-
 		global $ZBX_LOCALNODEID;
+
+		if($id == 0) return 0;
 		$nodeid = ($nodeid == 0)?get_current_nodeid(false):$nodeid;
 
 		$id=remove_nodes_from_id($id);
-		$id=bcadd($id,bcadd(bcmul($nodeid,'100000000000000'),bcmul($ZBX_LOCALNODEID,'100000000000')));
+		$id=bcadd($id,bcadd(bcmul($nodeid,'100000000000000'),bcmul($ZBX_LOCALNODEID,'100000000000')),0);
 	return $id;
 	}
 
