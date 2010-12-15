@@ -29,6 +29,7 @@ class testGeneric extends PHPUnit_Extensions_SeleniumTestCase
 
 	// List of strings that should NOT appear on any page
 	public $failIfExists = array (
+		"ZABBIX_ERROR",
 		"pg_query",
 		"Error in",
 		"expects parameter",
