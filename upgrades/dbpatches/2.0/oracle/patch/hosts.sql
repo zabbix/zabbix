@@ -17,21 +17,21 @@ ALTER TABLE interface ADD CONSTRAINT c_interface_1 FOREIGN KEY (hostid) REFERENC
 
 -- Passive proxy interface
 INSERT INTO interface (interfaceid,hostid,main,type,ip,dns,useip,port)
-	(SELECT (hostid - (round(hostid / 100000000000)*100000000000)) * 3 + (round(hostid / 100000000000)*100000000000),
+	(SELECT (hostid - (trunc(hostid / 100000000000)*100000000000)) * 3 + (trunc(hostid / 100000000000)*100000000000),
 		hostid,1,0,ip,dns,useip,port
 	FROM hosts
 	WHERE status IN (6));
 
 -- Zabbix Agent interface
 INSERT INTO interface (interfaceid,hostid,main,type,ip,dns,useip,port)
-	(SELECT (hostid - (round(hostid / 100000000000)*100000000000)) * 3 + (round(hostid / 100000000000)*100000000000),
+	(SELECT (hostid - (trunc(hostid / 100000000000)*100000000000)) * 3 + (trunc(hostid / 100000000000)*100000000000),
 		hostid,1,1,ip,dns,useip,port
 	FROM hosts
 	WHERE status IN (0,1));
 
 -- SNMP interface
 INSERT INTO interface (interfaceid,hostid,main,type,ip,dns,useip,port)
-	(SELECT (hostid - (round(hostid / 100000000000)*100000000000)) * 3 + (round(hostid / 100000000000)*100000000000) + 1,
+	(SELECT (hostid - (trunc(hostid / 100000000000)*100000000000)) * 3 + (trunc(hostid / 100000000000)*100000000000) + 1,
 		hostid,1,2,ip,dns,useip,'161'
 	FROM hosts
 	WHERE status IN (0,1)
@@ -39,7 +39,7 @@ INSERT INTO interface (interfaceid,hostid,main,type,ip,dns,useip,port)
 
 -- IPMI interface
 INSERT INTO interface (interfaceid,hostid,main,type,ip,dns,useip,port)
-	(SELECT (hostid - (round(hostid / 100000000000)*100000000000)) * 3 + (round(hostid / 100000000000)*100000000000) + 2,
+	(SELECT (hostid - (trunc(hostid / 100000000000)*100000000000)) * 3 + (trunc(hostid / 100000000000)*100000000000) + 2,
 		hostid,1,3,'',ipmi_ip,0,ipmi_port
 	FROM hosts
 	WHERE status IN (0,1) AND useipmi=1);
