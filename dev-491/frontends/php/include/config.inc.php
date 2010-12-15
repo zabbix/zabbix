@@ -553,7 +553,7 @@ function __autoload($class_name){
 			if(isset($USER_DETAILS['debug_mode']) && !is_object($msg) && !$USER_DETAILS['debug_mode']){
 				$msg = preg_replace('/^\[.+?::.+?\]/', '', $msg);
 			}
-			array_push($ZBX_MESSAGES, array('type' => 'error', 'message' => $msg));
+			array_push($ZBX_MESSAGES, array('type' => 'error', 'message' => '[ZABBIX_ERROR] '.$msg));
 		}
 	}
 

@@ -19,18 +19,17 @@
 **/
 ?>
 <?php
-require_once 'function_check_item_key.php';
-//require_once 'otherTest.php';
+require_once 'testGeneric.php';
+// ...
 
-class GeneralTests
+class SeleniumTests
 {
 	public static function suite()
 	{
-		$suite = new PHPUnit_Framework_TestSuite('general');
+		$suite = new PHPUnit_Framework_TestSuite('selenium');
 
-		$suite->addTestSuite('function_check_item_key');
-//		$suite->addTestSuite('otherTest');
-//		...
+		$suite->addTestSuite('testGeneric');
+		// ...
 
 		return $suite;
 	}
