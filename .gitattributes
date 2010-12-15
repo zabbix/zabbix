@@ -197,6 +197,8 @@ frontends/php/locale/ru/LC_MESSAGES/frontend.po -text
 frontends/php/locale/sv/LC_MESSAGES/frontend.po -text
 frontends/php/locale/uk/LC_MESSAGES/frontend.po -text
 frontends/php/locale/zh_CN/LC_MESSAGES/frontend.po -text
+frontends/php/tests/selenium/SeleniumTests.php -text
+frontends/php/tests/selenium/testGeneric.php -text
 m4/ax_lib_ibm_db2.m4 -text
 m4/ax_lib_oracle_oci.m4 -text
 m4/iconv.m4 -text
