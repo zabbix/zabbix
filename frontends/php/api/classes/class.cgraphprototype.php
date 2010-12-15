@@ -545,7 +545,6 @@ COpt::memoryPick();
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'itemids' => $ruleids,
-				'filter' => array('flags' => null),
 				'nopermissions' => 1,
 				'preservekeys' => 1,
 			);
@@ -1125,7 +1124,6 @@ COpt::memoryPick();
 			$options = array(
 				'nodeids' => get_current_nodeid(true),
 				'itemids' => array_unique($itemids),
-				'filter' => array('flags' => null),
 				'webitems' => 1,
 				'editable' => 1,
 				'output' => API_OUTPUT_EXTEND,

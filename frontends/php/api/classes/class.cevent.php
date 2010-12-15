@@ -293,12 +293,7 @@ class CEvent extends CZBXAPI{
 		}
 
 // filter
-		if(is_null($options['filter'])) $options['filter'] = array();
-
 		if(is_array($options['filter'])){
-			if(!array_key_exists('value_changed', $options['filter']))
-				$options['filter']['value_changed'] = TRIGGER_VALUE_CHANGED_YES;
-
 			zbx_db_filter('events e', $options, $sql_parts);
 		}
 
@@ -523,6 +518,7 @@ Copt::memoryPick();
 				'nodeids' => $nodeids,
 				'output' => $options['selectItems'],
 				'triggerids' => $triggerids,
+				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 				'webitems' => 1,
 				'nopermissions' => 1,
 				'preservekeys' => 1

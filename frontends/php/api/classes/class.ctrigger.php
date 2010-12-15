@@ -1030,7 +1030,6 @@ Copt::memoryPick();
 				'nodeids' => $nodeids,
 				'output' => $options['selectItems'],
 				'triggerids' => $triggerids,
-				'filter' => array('flags' => null),
 				'webitems' => 1,
 				'nopermissions' => 1,
 				'preservekeys' => 1
@@ -1063,7 +1062,6 @@ Copt::memoryPick();
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'itemids' => $ruleids,
-				'filter' => array('flags' => null),
 				'nopermissions' => 1,
 				'preservekeys' => 1,
 			);

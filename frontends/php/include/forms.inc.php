@@ -1589,7 +1589,6 @@
 
 			$options = array(
 				'itemids' => $_REQUEST['itemid'],
-				'filter' => array('flags' => null),
 				'output' => API_OUTPUT_EXTEND,
 			);
 			$item_data = CItem::get($options);

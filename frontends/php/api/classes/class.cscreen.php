@@ -320,17 +320,19 @@ sdii($screens_to_check);
 
 // item
 			$item_options = array(
-								'nodeids' => $nodeids,
-								'itemids' => $items_to_check,
-								'webitems' => 1,
-								'editable' => $options['editable']);
+				'nodeids' => $nodeids,
+				'itemids' => $items_to_check,
+				'webitems' => 1,
+				'editable' => $options['editable']
+			);
 			$allowed_items = CItem::get($item_options);
 			$allowed_items = zbx_objectValues($allowed_items, 'itemid');
 // map
 			$map_options = array(
-								'nodeids' => $nodeids,
-								'sysmapids' => $maps_to_check,
-								'editable' => $options['editable']);
+				'nodeids' => $nodeids,
+				'sysmapids' => $maps_to_check,
+				'editable' => $options['editable']
+			);
 			$allowed_maps = CMap::get($map_options);
 			$allowed_maps = zbx_objectValues($allowed_maps, 'sysmapid');
 // screen

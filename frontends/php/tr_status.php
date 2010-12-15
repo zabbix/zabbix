@@ -358,12 +358,15 @@ include_once('include/page_header.php');
 	if($config['event_ack_enable']){
 		foreach($triggers as $tnum => $trigger){
 			$options = array(
-				'countOutput' => 1,
+				'countOutput' => true,
 				'triggerids' => $trigger['triggerid'],
-				'object' => EVENT_OBJECT_TRIGGER,
-				'acknowledged' => 0,
-				'value' => TRIGGER_VALUE_TRUE,
-				'nopermissions' => 1
+				'filter' => array(
+					'object' => EVENT_OBJECT_TRIGGER,
+					'value_changed' => TRIGGER_VALUE_CHANGED_YES,
+					'acknowledged' => false,
+					'value' => TRIGGER_VALUE_TRUE,
+				),
+				'nopermissions' => true
 			);
 			$triggers[$tnum]['event_count'] = CEvent::get($options);
 		}
@@ -387,13 +390,16 @@ include_once('include/page_header.php');
 		$ev_options = array(
 			'nodeids' => get_current_nodeid(),
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
-			'nopermissions' => 1,
+			'filter' => array(
+				'value_changed' => TRIGGER_VALUE_CHANGED_YES,
+			),
 			'output' => API_OUTPUT_EXTEND,
 			'select_acknowledges' => API_OUTPUT_COUNT,
 			'time_from' => time() - ($config['event_expire']*86400),
 			'time_till' => time(),
 			'sortfield' => 'eventid',
 			'sortorder' => ZBX_SORT_DOWN,
+			'nopermissions' => true,
 			//'limit' => $config['event_show_max']
 		);
 
@@ -401,7 +407,7 @@ include_once('include/page_header.php');
 			case EVENTS_OPTION_ALL:
 			break;
 			case EVENTS_OPTION_NOT_ACK:
-				$ev_options['acknowledged'] = 0;
+				$ev_options['acknowledged'] = false;
 				$ev_options['value'] = TRIGGER_VALUE_TRUE;
 			break;
 		}

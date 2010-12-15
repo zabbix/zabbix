@@ -63,9 +63,12 @@
 		$options = array(
 			'countOutput' => 1,
 			'triggerids' => zbx_objectValues($triggerids, 'triggerid'),
+			'filter' => array(
+				'value_changed' => TRIGGER_VALUE_CHANGED_YES,
+				'value' => is_null($value_event) ? array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE) : $value_event,
+				'acknowledged' => $ack ? 1 : 0,
+			),
 			'object' => EVENT_OBJECT_TRIGGER,
-			'acknowledged' => $ack ? 1 : 0,
-			'value' => is_null($value_event) ? array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE) : $value_event,
 			'nopermissions' => 1
 		);
 		$event_count = CEvent::get($options);
@@ -150,7 +153,6 @@ function make_small_eventlist($startEvent){
 	$options = array(
 		'triggerids' => $startEvent['objectid'],
 		'eventid_till' => $startEvent['eventid'],
-		'filter' => array('value_changed' => null),
 		'output' => API_OUTPUT_EXTEND,
 		'select_acknowledges' => API_OUTPUT_COUNT,
 		'sortfield' => 'eventid',
@@ -217,7 +219,8 @@ function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
 		'triggerids' => $triggerid,
 		'eventid_till' => $eventid,
 		'filter' => array(
-			'object' => EVENT_OBJECT_TRIGGER
+			'object' => EVENT_OBJECT_TRIGGER,
+			'value_changed' => TRIGGER_VALUE_CHANGED_YES
 		),
 		'nopermissions' => 1,
 		'select_acknowledges' => API_OUTPUT_COUNT,
@@ -292,8 +295,11 @@ function getLastEvents($options){
 	);
 
 	$eventOptions = array(
-		'object' => EVENT_OBJECT_TRIGGER,
 		'output' => API_OUTPUT_EXTEND,
+		'filter' => array(
+			'object' => EVENT_OBJECT_TRIGGER,
+			'value_changed' => TRIGGER_VALUE_CHANGED_YES
+		),
 		'sortfield' => 'clock',
 		'sortorder' => ZBX_SORT_DOWN,
 		'limit' => $options['limit']

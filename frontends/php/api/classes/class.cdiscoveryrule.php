@@ -449,7 +449,6 @@ COpt::memoryPick();
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'discoveryids' => $itemids,
-				'filter' => array('flags' => null),
 				'nopermissions' => 1,
 				'preservekeys' => 1,
 			);
@@ -774,8 +773,7 @@ COpt::memoryPick();
 				'output' => API_OUTPUT_SHORTEN,
 				'filter' => array(
 					'hostid' => $item['hostid'],
-					'key_' => $item['key_'],
-					'flags' => null
+					'key_' => $item['key_']
 				),
 				'nopermissions' => 1
 			));
@@ -828,8 +826,7 @@ COpt::memoryPick();
 				'output' => API_OUTPUT_SHORTEN,
 				'filter' => array(
 					'hostid' => $item['hostid'],
-					'key_' => $item['key_'],
-					'flags' => null
+					'key_' => $item['key_']
 				),
 				'nopermissions' => 1
 			));

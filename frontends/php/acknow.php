@@ -93,7 +93,8 @@ include_once('include/page_header.php');
 			$options = array(
 				'output' => API_OUTPUT_SHORTEN,
 				'acknowledged' => 0,
-				'triggerids' => $_REQUEST['triggers']
+				'triggerids' => $_REQUEST['triggers'],
+				'filter'=> array('value_changed' => TRIGGER_VALUE_CHANGED_YES)
 			);
 			$_REQUEST['events'] = CEvent::get($options);
 		}

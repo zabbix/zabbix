@@ -54,6 +54,7 @@ function make_favorite_graphs(){
 	$options = array(
 			'itemids' => $itemids,
 			'selectHosts' => API_OUTPUT_EXTEND,
+			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 			'output' => API_OUTPUT_EXTEND,
 			'webitems' => 1,
 		);
@@ -229,15 +230,18 @@ function make_system_status($filter){
 	foreach($triggers as $tnum => $trigger){
 		$options = array(
 			'nodeids' => get_current_nodeid(),
-			'triggerids' => $trigger['triggerid'],
 			'object' => EVENT_SOURCE_TRIGGERS,
-			'value' => TRIGGER_VALUE_TRUE,
+			'triggerids' => $trigger['triggerid'],
+			'filter'=> array(
+				'value' => TRIGGER_VALUE_TRUE,
+				'value_changed' => TRIGGER_VALUE_CHANGED_YES
+			),
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => 1,
 			'select_acknowledges' => API_OUTPUT_COUNT,
-			'limit' => 1,
 			'sortfield' => 'clock',
-			'sortorder' => ZBX_SORT_DOWN
+			'sortorder' => ZBX_SORT_DOWN,
+			'limit' => 1
 		);
 		$events = CEvent::get($options);
 		if(empty($events)){
@@ -1192,6 +1196,7 @@ function make_graph_submenu(){
 	$options = array(
 			'itemids' => $itemids,
 			'selectHosts' => array('hostid', 'host'),
+			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 			'output' => API_OUTPUT_EXTEND,
 			'webitems' => 1,
 		);

@@ -712,7 +712,11 @@
 			$parameter = $matches['param'][$num];
 
 			$options = array(
-				'filter' => array('host' => $host, 'key_' => $key),
+				'filter' => array(
+					'host' => $host,
+					'key_' => $key,
+					'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED),
+				),
 				'output' => API_OUTPUT_EXTEND
 			);
 			$db_item = CItem::get($options);

@@ -1018,7 +1018,8 @@ class zbxXML{
 							$options = array(
 								'filter' => array(
 									'hostid' => $item_db['hostid'],
-									'key_' => $item_db['key_']
+									'key_' => $item_db['key_'],
+									'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED),
 								),
 								'webitems' => 1,
 								'output' => API_OUTPUT_EXTEND,
@@ -1225,7 +1226,8 @@ class zbxXML{
 								if($current_item = CItem::exists($gitem_db)){
 									$current_item = CItem::get(array(
 										'filter' => array(
-											'key_' => $gitem_db['key_']
+											'key_' => $gitem_db['key_'],
+											'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED),
 										),
 										'webitems' => 1,
 										'host' => $gitem_db['host'],

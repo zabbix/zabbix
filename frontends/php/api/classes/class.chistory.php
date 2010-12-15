@@ -120,6 +120,7 @@ class CHistory extends CZBXAPI{
 		}
 		else{
 			$itemOptions = array(
+				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 				'editable' => $options['editable'],
 				'preservekeys' => 1
 			);

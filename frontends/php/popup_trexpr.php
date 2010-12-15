@@ -292,12 +292,11 @@
 		$options = array(
 			'output' => API_OUTPUT_EXTEND,
 			'itemids' => $itemid,
-			'filter' => array('flags' => null),
 			'webitems' => 1,
 			'selectHosts' => API_OUTPUT_EXTEND
 		);
-		$item_data = CItem::get($options);
-		$item_data = reset($item_data);
+		$items_data = CItem::get($options);
+		$item_data = reset($items_data);
 		$item_key = $item_data['key_'];
 
 		$item_host = reset($item_data['hosts']);

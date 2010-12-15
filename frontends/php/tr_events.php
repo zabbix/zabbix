@@ -81,7 +81,6 @@
 	$options = array(
 		'eventids' => $_REQUEST['eventid'],
 		'triggerids' => $_REQUEST['triggerid'],
-		'filter' => array('value_changed' => null),
 		'select_alerts' => API_OUTPUT_EXTEND,
 		'select_acknowledges' => API_OUTPUT_EXTEND,
 		'output' => API_OUTPUT_EXTEND,

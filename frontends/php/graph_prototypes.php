@@ -125,7 +125,6 @@ include_once('include/page_header.php');
 			$options = array(
 				'nodeids'=>get_current_nodeid(true),
 				'itemids'=>$itemids,
-				'filter' => array('flags' => null),
 				'webitems'=>1,
 				'editable'=>1
 			);
