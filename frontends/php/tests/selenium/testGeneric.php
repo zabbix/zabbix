@@ -188,7 +188,7 @@ class testGeneric extends PHPUnit_Extensions_SeleniumTestCase
 	{
 		$this->login();
 		$this->open($a);
-		$this->assertTitleEquals($b,'URL:'.$a);
+		$this->assertTitleEquals($b,'assertTitleEquals('.$a.','.$b.')');
 		$this->logout();
 	}
 
@@ -201,7 +201,7 @@ class testGeneric extends PHPUnit_Extensions_SeleniumTestCase
 		$this->open($a);
 		foreach($this->failIfExists as $str)
 		{
-			$this->assertTextNotPresent($str,'URL:'.$a);
+			$this->assertTextNotPresent($str,'assertTextNotPresent('.$a.','.$str.')');
 		}
 		$this->logout();
 	}
@@ -215,7 +215,7 @@ class testGeneric extends PHPUnit_Extensions_SeleniumTestCase
 		$this->open($a);
 		foreach($this->failIfNotExists as $str)
 		{
-			$this->assertTextPresent($str,'URL:'.$a);
+			$this->assertTextPresent($str,'assertTextPresent('.$a.','.$str.')');
 		}
 		$this->logout();
 	}
