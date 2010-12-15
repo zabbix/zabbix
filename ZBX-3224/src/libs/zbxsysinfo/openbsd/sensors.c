@@ -24,14 +24,13 @@
 
 #define CELSIUS(x) ((x - 273150000) / 1000000.0)
 
-static int	sensor_value(int *mib, struct sensor *sensor, const char *key2)
+static int	sensor_value(int *mib, struct sensor *sensor, const char *ordinal)
 {
-	size_t	slen;
+	size_t	slen = sizeof(*sensor);
 
 	mib[3] = SENSOR_TEMP;
-	mib[4] = (NULL != key2 ? atoi(key2) : 0);
+	mib[4] = (NULL != ordinal ? atoi(ordinal) : 0);
 
-	slen = sizeof(*sensor);
 	if (-1 == sysctl(mib, 5, sensor, &slen, NULL, 0))
 		return SYSINFO_RET_FAIL;
 
@@ -44,23 +43,23 @@ int	GET_SENSOR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 	struct sensordev	sensordev;
 	struct sensor		sensor;
 	size_t			sdlen = sizeof(sensordev);
-	int			mib[5], dev, numt, cnt = 0, ret = SYSINFO_RET_FAIL;
+	char			device[MAX_STRING_LEN], ordinal[MAX_STRING_LEN];
+	int			mib[5], dev, cnt = 0, ret = SYSINFO_RET_OK;
 	uint64_t		aggr = 0;
-	char			key[MAX_STRING_LEN], key2[MAX_STRING_LEN];
 
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
 
-	if (get_param(param, 1, key, MAX_STRING_LEN) != 0)
+	if (get_param(param, 1, device, MAX_STRING_LEN) != 0)
 		return SYSINFO_RET_FAIL;
 
-	if (num_param(param) == 2 && get_param(param, 2, key2, MAX_STRING_LEN) != 0)
+	if (num_param(param) == 2 && get_param(param, 2, ordinal, MAX_STRING_LEN) != 0)
 		return SYSINFO_RET_FAIL;
 
 	mib[0] = CTL_HW;
 	mib[1] = HW_SENSORS;
 
-	for (dev = 0; ; dev++)
+	for (dev = 0; SYSINFO_RET_OK == ret; dev++)
 	{
 		mib[2] = dev;
 
@@ -74,7 +73,7 @@ int	GET_SENSOR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 			return SYSINFO_RET_FAIL;
 		}
 
-		if (0 == strcmp(key, "") || 0 == strcmp(key, "cpu"))
+		if (0 == strcmp(device, "") || 0 == strcmp(device, "cpu"))
 		{
 			if (0 == strncmp(sensordev.xname, "cpu", 3))
 			{
@@ -85,16 +84,16 @@ int	GET_SENSOR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 		}
 		else
 		{
-			if (0 == strcmp(sensordev.xname, key))
+			if (0 == strcmp(sensordev.xname, device))
 			{
-				ret = sensor_value(mib, &sensor, key2);
+				ret = sensor_value(mib, &sensor, ordinal);
 				if (SENSOR_TEMP == sensor.type)
 					SET_DBL_RESULT(result, CELSIUS(sensor.value));
 			}
 		}
 	}
 
-	if ((0 == strcmp(key, "") || 0 == strcmp(key, "cpu")) && 0 != cnt)
+	if ((0 == strcmp(device, "") || 0 == strcmp(device, "cpu")) && 0 != cnt)
 		SET_DBL_RESULT(result, CELSIUS(aggr / cnt));
 
 	return ret;
