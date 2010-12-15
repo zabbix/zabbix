@@ -499,7 +499,7 @@ include_once('include/page_header.php');
 ?>
 <?php
 	if(isset($_REQUEST['form'])){
-		if($_REQUEST['form'] == S_IMPORT_TEMPLATE){
+		if($_REQUEST['form'] == S_IMPORT){
 			$template_wdgt->addItem(import_host_form(true));
 		}
 		else{
