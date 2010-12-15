@@ -693,7 +693,6 @@ include_once('include/page_header.php');
 	}
 ?>
 <?php
-
 	$frmForm = new CForm();
 	if(!isset($_REQUEST['form'])){
 // removes form_refresh variable
@@ -727,7 +726,7 @@ include_once('include/page_header.php');
 		$hosts_wdgt->addItem($hostForm->render('host.massupdate'));
 	}
 	else if(isset($_REQUEST['form'])){
-		if($_REQUEST['form'] == S_IMPORT_HOST)
+		if($_REQUEST['form'] == S_IMPORT)
 			$hosts_wdgt->addItem(import_host_form());
 		else{
 			$hosts_wdgt->addItem(get_header_host_table($_REQUEST['hostid'], 'host'));
