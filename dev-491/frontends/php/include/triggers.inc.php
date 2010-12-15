@@ -3390,7 +3390,14 @@ return $caption;
 
 					if($hostId == null) return EXPRESSION_HOST_UNKNOWN;
 
-					$itemFound = CItem::get(Array('filter' => Array('hostid' => $hostId, 'key_' => $hostKey.$hostKeyParams, 'webitems' => true)));
+					$itemFound = CItem::get(array(
+						'filter' => array(
+							'hostid' => $hostId,
+							'key_' => $hostKey.$hostKeyParams,
+							'webitems' => true,
+							'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED),
+						)
+					));
 					if(count($itemFound) > 0) {
 						$itemFound = array_shift($itemFound);
 						if(isset($itemFound['itemid']) && $itemFound['itemid'] > 0) $itemId = $itemFound['itemid'];

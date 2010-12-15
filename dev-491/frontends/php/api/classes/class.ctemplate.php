@@ -1149,6 +1149,7 @@ COpt::memoryPick();
 
 			$delItems = CItem::get(array(
 				'templateids' => $templateids,
+				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 				'output' => API_OUTPUT_SHORTEN,
 				'nopermissions' => 1,
 				'preservekeys' => 1

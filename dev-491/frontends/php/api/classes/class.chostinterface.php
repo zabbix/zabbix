@@ -563,6 +563,7 @@ Copt::memoryPick();
 				'output' => array('key_'),
 				'selectHosts' => array('host'),
 				'interfaceids' => zbx_objectValues($interfaces, 'interfaceid'),
+				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 				'preservekeys' => 1,
 				'nopermissions' => 1
 			));

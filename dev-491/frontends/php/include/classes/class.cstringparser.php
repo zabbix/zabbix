@@ -899,7 +899,10 @@ function triggerExpressionValidateItemKey(&$parent, &$levelData, $index, &$expre
 	}
 
 	$itemFound = CItem::get(array(
-		'filter' => array('hostid' => $hostId, 'key_' => $keyName.$keyParams, 'flags' => null),
+		'filter' => array(
+			'hostid' => $hostId,
+			'key_' => $keyName.$keyParams
+		),
 		'output' => API_OUTPUT_EXTEND,
 		'webitems' => true
 	));

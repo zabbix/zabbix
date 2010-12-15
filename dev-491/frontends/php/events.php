@@ -230,6 +230,7 @@
 	else if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid'] > 0)){
 		$options['object'] = EVENT_OBJECT_TRIGGER;
 		$options['triggerids'] = $_REQUEST['triggerid'];
+		$options['filter'] = array('value_changed' => TRIGGER_VALUE_CHANGED_YES);
 	}
 
 	$firstEvent = CEvent::get($options);
@@ -378,6 +379,7 @@
 			$options = array(
 				'nodeids' => get_current_nodeid(),
 				'filter' => array(
+					'value_changed' => TRIGGER_VALUE_CHANGED_YES,
 					'object' => EVENT_OBJECT_TRIGGER,
 				),
 				'time_from' => $from,
@@ -398,7 +400,6 @@
 			$options = array(
 				'nodeids' => get_current_nodeid(),
 				'eventids' => zbx_objectValues($events,'eventid'),
-				'filter' => array('value_changed' => null),
 				'output' => API_OUTPUT_EXTEND,
 				'select_acknowledges' => API_OUTPUT_COUNT,
 				'sortfield' => 'eventid',

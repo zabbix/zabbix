@@ -372,6 +372,7 @@ COpt::memoryPick();
 			$obj_params = array(
 				'output' => $options['selectItems'],
 				'applicationids' => $applicationids,
+				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);

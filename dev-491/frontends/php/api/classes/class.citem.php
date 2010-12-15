@@ -1120,8 +1120,7 @@ COpt::memoryPick();
 				'output' => API_OUTPUT_SHORTEN,
 				'filter' => array(
 					'hostid' => $item['hostid'],
-					'key_' => $item['key_'],
-					'flags' => null
+					'key_' => $item['key_']
 				),
 				'nopermissions' => 1
 			));
@@ -1175,8 +1174,7 @@ COpt::memoryPick();
 				'output' => API_OUTPUT_SHORTEN,
 				'filter' => array(
 					'hostid' => $item['hostid'],
-					'key_' => $item['key_'],
-					'flags' => null
+					'key_' => $item['key_']
 				),
 				'nopermissions' => 1
 			));

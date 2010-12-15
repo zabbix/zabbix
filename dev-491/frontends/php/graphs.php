@@ -136,6 +136,7 @@ include_once('include/page_header.php');
 			$options = array(
 				'nodeids'=>get_current_nodeid(true),
 				'itemids'=>$itemids,
+				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 				'webitems'=>1,
 				'editable'=>1,
 			);

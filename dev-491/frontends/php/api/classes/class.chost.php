@@ -2052,6 +2052,7 @@ Copt::memoryPick();
 // delete items -> triggers -> graphs
 			$delItems = CItem::get(array(
 				'hostids' => $hostids,
+				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			));
