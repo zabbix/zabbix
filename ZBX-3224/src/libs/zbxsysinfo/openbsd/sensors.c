@@ -29,7 +29,7 @@ static int	sensor_value(int *mib, struct sensor *sensor, const char *key2)
 	size_t	slen;
 
 	mib[3] = SENSOR_TEMP;
-	mib[4] = key2 ? atoi(key2) : 0;
+	mib[4] = (NULL != key2 ? atoi(key2) : 0);
 
 	slen = sizeof(*sensor);
 	if (-1 == sysctl(mib, 5, sensor, &slen, NULL, 0))
@@ -74,9 +74,9 @@ int	GET_SENSOR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 			return SYSINFO_RET_FAIL;
 		}
 
-		if (0 != strcmp(key, "") || 0 != strcmp(key, "cpu"))
+		if (0 == strcmp(key, "") || 0 == strcmp(key, "cpu"))
 		{
-			if (0 != strncmp(sensordev.xname, "cpu", 3))
+			if (0 == strncmp(sensordev.xname, "cpu", 3))
 			{
 				ret = sensor_value(mib, &sensor, NULL);
 				aggr += sensor.value;
@@ -85,7 +85,7 @@ int	GET_SENSOR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 		}
 		else
 		{
-			if (0 != strcmp(sensordev.xname, key))
+			if (0 == strcmp(sensordev.xname, key))
 			{
 				ret = sensor_value(mib, &sensor, key2);
 				if (SENSOR_TEMP == sensor.type)
@@ -94,7 +94,7 @@ int	GET_SENSOR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 		}
 	}
 
-	if ((0 != strcmp(key, "") || 0 != strcmp(key, "cpu")) && 0 != cnt)
+	if ((0 == strcmp(key, "") || 0 == strcmp(key, "cpu")) && 0 != cnt)
 		SET_DBL_RESULT(result, CELSIUS(aggr / cnt));
 
 	return ret;
