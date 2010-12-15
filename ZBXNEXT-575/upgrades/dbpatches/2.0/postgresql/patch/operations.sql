@@ -125,7 +125,7 @@ CREATE OR REPLACE FUNCTION unnest(anyarray) RETURNS SETOF anyelement
 LANGUAGE SQL AS $$
 	SELECT $1[i]
 		FROM generate_series(array_lower($1, 1), array_upper($1, 1)) as i;
-$$; 
+$$;
 
 INSERT INTO _opcommand (operationid, longdata)
 	SELECT operationid, unnest(string_to_array(longdata, '\n'))
