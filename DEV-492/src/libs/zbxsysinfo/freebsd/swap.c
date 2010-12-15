@@ -67,15 +67,15 @@ int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_R
 	}
 
 	if ('\0' == *mode || 0 == strcmp(mode, "free"))	/* default parameter */
-		SET_UI64_RESULT(result, (total - used) * getpagesize())
+		SET_UI64_RESULT(result, (total - used) * getpagesize());
 	else if (0 == strcmp(mode, "total"))
-		SET_UI64_RESULT(result, total * getpagesize())
+		SET_UI64_RESULT(result, total * getpagesize());
 	else if (0 == strcmp(mode, "used"))
-		SET_UI64_RESULT(result, used * getpagesize())
+		SET_UI64_RESULT(result, used * getpagesize());
 	else if (0 == strcmp(mode, "pfree"))
-		SET_DBL_RESULT(result, total ? ((double)(total - used) * 100.0 / (double)total) : 0.0)
+		SET_DBL_RESULT(result, total ? ((double)(total - used) * 100.0 / (double)total) : 0.0);
 	else if (0 == strcmp(mode, "pused"))
-		SET_DBL_RESULT(result, total ? ((double)used * 100.0 / (double)total) : 0.0)
+		SET_DBL_RESULT(result, total ? ((double)used * 100.0 / (double)total) : 0.0);
 	else
 		return SYSINFO_RET_FAIL;
 
@@ -83,16 +83,4 @@ int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_R
 #else
 	return SYSINFO_RET_FAIL;
 #endif
-}
-
-int	SYSTEM_SWAP_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	/* currently this function for this platform is unsupported */
-	return SYSINFO_RET_FAIL;
-}
-
-int	SYSTEM_SWAP_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	/* currently this function for this platform is unsupported */
-	return SYSINFO_RET_FAIL;
 }

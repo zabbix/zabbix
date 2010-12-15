@@ -201,37 +201,37 @@ static int	check_service(const char *cmd, const char *param, unsigned flags, AGE
 	else if (0 == strcmp(service, "smtp"))
 	{
 		if (0 == port) port = ZBX_DEFAULT_SMTP_PORT;
-		ret = tcp_expect(ip, port, NULL, "220", "QUIT\n", &value_int);
+		ret = tcp_expect(ip, port, 0, NULL, "220", "QUIT\n", &value_int);
 	}
 	else if (0 == strcmp(service, "ftp"))
 	{
 		if (0 == port) port = ZBX_DEFAULT_FTP_PORT;
-		ret = tcp_expect(ip, port, NULL, "220", "QUIT\n", &value_int);
+		ret = tcp_expect(ip, port, 0, NULL, "220", "QUIT\n", &value_int);
 	}
 	else if (0 == strcmp(service, "http"))
 	{
 		if (0 == port) port = ZBX_DEFAULT_HTTP_PORT;
-		ret = tcp_expect(ip, port, NULL, NULL, NULL, &value_int);
+		ret = tcp_expect(ip, port, 0, NULL, NULL, NULL, &value_int);
 	}
 	else if (0 == strcmp(service, "pop"))
 	{
 		if (0 == port) port = ZBX_DEFAULT_POP_PORT;
-		ret = tcp_expect(ip, port, NULL, "+OK", "QUIT\n", &value_int);
+		ret = tcp_expect(ip, port, 0, NULL, "+OK", "QUIT\n", &value_int);
 	}
 	else if (0 == strcmp(service, "nntp"))
 	{
 		if (0 == port) port = ZBX_DEFAULT_NNTP_PORT;
-		ret = tcp_expect(ip, port, NULL, "200", "QUIT\n", &value_int);
+		ret = tcp_expect(ip, port, 0, NULL, "200", "QUIT\n", &value_int);
 	}
 	else if (0 == strcmp(service, "imap"))
 	{
 		if (0 == port) port = ZBX_DEFAULT_IMAP_PORT;
-		ret = tcp_expect(ip, port, NULL, "* OK", "a1 LOGOUT\n", &value_int);
+		ret = tcp_expect(ip, port, 0, NULL, "* OK", "a1 LOGOUT\n", &value_int);
 	}
 	else if (0 == strcmp(service, "tcp"))
 	{
 		if (0 == port) return SYSINFO_RET_FAIL;
-		ret = tcp_expect(ip, port, NULL, NULL, NULL, &value_int);
+		ret = tcp_expect(ip, port, 0, NULL, NULL, NULL, &value_int);
 	}
 	else
 		return SYSINFO_RET_FAIL;

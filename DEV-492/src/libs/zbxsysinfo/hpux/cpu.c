@@ -18,26 +18,16 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
 #include "stats.h"
 
 int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #if defined(HAVE_SYS_PSTAT_H)
-
 	char	mode[128];
 	int	sysinfo_name = -1;
 	long	ncpu = 0;
 	struct pst_dynamic psd;
-
-#endif /* HAVE_SYS_PSTAT_H */
-
-        assert(result);
-
-        init_result(result);
-
-#if defined(HAVE_SYS_PSTAT_H)
 
         if(num_param(param) > 1)
         {
@@ -68,21 +58,15 @@ int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	SET_UI64_RESULT(result, psd.psd_proc_cnt);
 
 	return SYSINFO_RET_OK;
-#else /* HAVE_SYS_PSTAT_H */
-
+#else
 	return SYSINFO_RET_FAIL;
-
-#endif /* HAVE_SYS_PSTAT_H */
+#endif
 }
 
 int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char	tmp[32], type[32];
 	int	cpu_num, mode;
-
-	assert(result);
-
-	init_result(result);
 
 	if (!CPU_COLLECTOR_STARTED(collector))
 	{
@@ -121,78 +105,61 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		return SYSINFO_RET_FAIL;
 
 	if ('\0' == *type || 0 == strcmp(type, "user"))	/* default parameter */
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].user[mode])
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].user[mode]);
 	else if (0 == strcmp(type, "nice"))
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].nice[mode])
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].nice[mode]);
 	else if (0 == strcmp(type, "system"))
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].system[mode])
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].system[mode]);
 	else if (0 == strcmp(type, "idle"))
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].idle[mode])
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].idle[mode]);
 	else
 		return SYSINFO_RET_FAIL;
 
 	return SYSINFO_RET_OK;
 }
 
-int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	struct	pst_dynamic dyn;
+	struct pst_dynamic	dyn;
 
-	assert(result);
-
-        init_result(result);
-
-	if (pstat_getdynamic(&dyn, sizeof(dyn), 1, 0) != -1)
+	if (-1 != pstat_getdynamic(&dyn, sizeof(dyn), 1, 0))
 	{
 		SET_DBL_RESULT(result, dyn.psd_avg_1_min);
 		return SYSINFO_RET_OK;
 	}
+
 	return SYSINFO_RET_FAIL;
 }
 
-int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	struct	pst_dynamic dyn;
+	struct pst_dynamic	dyn;
 
-	assert(result);
-
-        init_result(result);
-
-	if (pstat_getdynamic(&dyn, sizeof(dyn), 1, 0) != -1)
+	if (-1 != pstat_getdynamic(&dyn, sizeof(dyn), 1, 0))
 	{
 		SET_DBL_RESULT(result, dyn.psd_avg_5_min);
 		return SYSINFO_RET_OK;
 	}
+
 	return SYSINFO_RET_FAIL;
 }
 
-int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	struct	pst_dynamic dyn;
+	struct pst_dynamic	dyn;
 
-	assert(result);
-
-        init_result(result);
-
-	if (pstat_getdynamic(&dyn, sizeof(dyn), 1, 0) != -1)
+	if (-1 != pstat_getdynamic(&dyn, sizeof(dyn), 1, 0))
 	{
 		SET_DBL_RESULT(result, dyn.psd_avg_15_min);
 		return SYSINFO_RET_OK;
 	}
+
 	return SYSINFO_RET_FAIL;
 }
 
 int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-
-#define CPU_FNCLIST struct cpu_fnclist_s
-CPU_FNCLIST
-{
-	char *mode;
-	int (*function)();
-};
-
-	CPU_FNCLIST fl[] =
+	MODE_FUNCTION fl[] =
 	{
 		{"avg1" ,	SYSTEM_CPU_LOAD1},
 		{"avg5" ,	SYSTEM_CPU_LOAD5},
@@ -203,10 +170,6 @@ CPU_FNCLIST
 	char cpuname[MAX_STRING_LEN];
 	char mode[MAX_STRING_LEN];
 	int i;
-
-        assert(result);
-
-        init_result(result);
 
         if(num_param(param) > 2)
         {
@@ -243,24 +206,6 @@ CPU_FNCLIST
 			return (fl[i].function)(cmd, param, flags, result);
 		}
 	}
-
-	return SYSINFO_RET_FAIL;
-}
-
-int     SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-        assert(result);
-
-        init_result(result);
-
-	return SYSINFO_RET_FAIL;
-}
-
-int     SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-        assert(result);
-
-        init_result(result);
 
 	return SYSINFO_RET_FAIL;
 }

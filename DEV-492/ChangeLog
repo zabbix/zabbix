@@ -1,5 +1,6 @@
 Changes for 1.9.1
 
+ - [ZBX-3149] allow to translate more strings in screen element 'Server info'; add support for translator comments (Richlv)
  - [ZBXNEXT-564] added new {IPADDRESS} and {HOST.PORT} macros in auto registration notifications (Sasha)
  - [ZBX-3248] fixed empty and duplicate map URL name handling (KB)
  - [ZBXNEXT-556] zabbix frontend translations are now handled by PHP gettext module (KB)
@@ -26,6 +27,9 @@ Changes for 1.9.0
 
 Changes for 1.8.4rc3
 
+ - [ZBX-2862] it is now not possible to delete host group or user group used in scripts (KB)
+ - [ZBX-3281] fixed system.cpu.util[] for all processors combined on NetBSD (asaveljevs)
+ - [ZBX-3006] fixed some forms <input> elements are put inside <table> tag (Vedmak)
  - [ZBXNEXT-176] added zabbix server name input during setup (Vedmak)
  - [ZBX-3253] added schema selection for db2 setup and a configuration file parameter on the server (asaveljevs,Vedmak)
  - [ZBX-3239] fixed error in Proxies screen on Oracle, when no proxy defined (Vedmak)
@@ -38,6 +42,7 @@ Changes for 1.8.4rc3
  - [ZBX-3269] fixed processing of vfs.dev.read/write metrics for devices with trailing digits (Sasha)
  - [ZBX-3115] fixed returned data type for net.tcp.listen under Solaris and FreeBSD (Sasha)
  - [ZBX-3115] fixed returned data type for system.users.num metric (Sasha)
+ - [ZBX-3267] fixed trigger updating through API (Aly)
  - [ZBX-3259] fixed log trigger wizard functionality: now it can be used for any item with value type = log, text or char (KB)
  - [ZBX-2672] added internal checks zabbix[*] to help items in data.sql (Sasha)
  - [ZBX-3255] fixed string escaping under IBM DB2 (asaveljevs,Sasha)
