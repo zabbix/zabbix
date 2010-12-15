@@ -119,10 +119,6 @@ int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 	char		if_name[MAX_STRING_LEN], mode[32];
 	MIB_IFROW	pIfRow;
 
-	assert(result);
-
-	init_result(result);
-
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
 
@@ -161,10 +157,6 @@ int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 {
 	char		if_name[MAX_STRING_LEN], mode[32];
 	MIB_IFROW	pIfRow;
-
-	assert(result);
-
-	init_result(result);
 
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
@@ -205,10 +197,6 @@ int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	char		if_name[MAX_STRING_LEN], mode[32];
 	MIB_IFROW	pIfRow;
 
-	assert(result);
-
-	init_result(result);
-
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
 
@@ -245,15 +233,6 @@ int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	return SYSINFO_RET_OK;
 }
 
-int     NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-#ifdef TODO
-#error Realize function NET_IF_COLLISIONS!!!
-#endif /* todo */
-
-	return SYSINFO_RET_FAIL;
-}
-
 int	NET_IF_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	DWORD		dwSize, dwRetVal, i;
@@ -262,10 +241,6 @@ int	NET_IF_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 	MIB_IFTABLE	*pIfTable = NULL;
 	MIB_IFROW	pIfRow;
 	struct zbx_json	j;
-
-	assert(result);
-
-	init_result(result);
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
@@ -354,10 +329,6 @@ int	NET_IF_LIST(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	/* variables used for GetIpAddrTable */
 	MIB_IPADDRTABLE	*pIPAddrTable = NULL;
 	IN_ADDR		in_addr;
-
-        assert(result);
-
-        init_result(result);
 
 	/* Allocate memory for our pointers. */
 	dwSize = sizeof(MIB_IPADDRTABLE);
@@ -496,7 +467,7 @@ int	NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	}
 
 	if (!ISSET_UI64(result))
-		SET_UI64_RESULT(result, 0)
+		SET_UI64_RESULT(result, 0);
 clean:
 	zbx_free(pTcpTable);
 

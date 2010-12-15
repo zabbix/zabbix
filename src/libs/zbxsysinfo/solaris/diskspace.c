@@ -127,14 +127,7 @@ static int	VFS_FS_PUSED(const char *fs, AGENT_RESULT *result)
 
 int	VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#define FS_FNCLIST struct fs_fnclist_s
-FS_FNCLIST
-{
-	char	*mode;
-	int	(*function)();
-};
-
-	FS_FNCLIST fl[] =
+	MODE_FUNCTION fl[] =
 	{
 		{"free",	VFS_FS_FREE},
 		{"total",	VFS_FS_TOTAL},
@@ -146,10 +139,6 @@ FS_FNCLIST
 
 	char	fsname[MAX_STRING_LEN], mode[8];
 	int	i;
-
-	assert(result);
-
-	init_result(result);
 
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
@@ -177,8 +166,6 @@ int	VFS_FS_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 	struct mnttab	mt;
 	FILE		*f;
 	struct zbx_json	j;
-
-	assert(result);
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 

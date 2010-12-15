@@ -205,10 +205,6 @@ int	NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_
 	kstat_named_t	kn;
 	char		if_name[MAX_STRING_LEN];
 
-	assert(result);
-
-	init_result(result);
-
 	if (num_param(param) > 1)
 		return SYSINFO_RET_FAIL;
 
@@ -230,10 +226,6 @@ int	NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	char		tmp[8], command[64];
 	unsigned short	port;
 	int		res;
-
-	assert(result);
-
-	init_result(result);
 
 	if (num_param(param) > 1)
 		return SYSINFO_RET_FAIL;
@@ -257,14 +249,7 @@ int	NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
 int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#define NET_FNCLIST struct net_fnclist_s
-NET_FNCLIST
-{
-	char	*mode;
-	int	(*function)();
-};
-
-	NET_FNCLIST fl[] =
+	MODE_FUNCTION fl[] =
 	{
 		{"bytes",   NET_IF_IN_BYTES},
 		{"packets", NET_IF_IN_PACKETS},
@@ -274,10 +259,6 @@ NET_FNCLIST
 
 	char	if_name[MAX_STRING_LEN], mode[16];
 	int	i;
-
-	assert(result);
-
-	init_result(result);
 
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
@@ -301,14 +282,7 @@ NET_FNCLIST
 
 int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#define NET_FNCLIST struct net_fnclist_s
-NET_FNCLIST
-{
-	char	*mode;
-	int	(*function)();
-};
-
-	NET_FNCLIST fl[] =
+	MODE_FUNCTION fl[] =
 	{
 		{"bytes",   NET_IF_OUT_BYTES},
 		{"packets", NET_IF_OUT_PACKETS},
@@ -318,10 +292,6 @@ NET_FNCLIST
 
 	char	if_name[MAX_STRING_LEN], mode[16];
 	int	i;
-
-	assert(result);
-
-	init_result(result);
 
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
@@ -345,14 +315,7 @@ NET_FNCLIST
 
 int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#define NET_FNCLIST struct net_fnclist_s
-NET_FNCLIST
-{
-	char	*mode;
-	int	(*function)();
-};
-
-	NET_FNCLIST fl[] =
+	MODE_FUNCTION fl[] =
 	{
 		{"bytes",   NET_IF_TOTAL_BYTES},
 		{"packets", NET_IF_TOTAL_PACKETS},
@@ -362,10 +325,6 @@ NET_FNCLIST
 
 	char	if_name[MAX_STRING_LEN], mode[16];
 	int	i;
-
-	assert(result);
-
-	init_result(result);
 
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
@@ -392,8 +351,6 @@ int	NET_IF_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 	struct if_nameindex	*ni;
 	struct zbx_json		j;
 	int			i;
-
-	assert(result);
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
