@@ -73,7 +73,7 @@ DELETE FROM items WHERE hostid NOT IN (SELECT hostid FROM hosts);
 ALTER TABLE items ADD CONSTRAINT c_items_1 FOREIGN KEY (hostid) REFERENCES hosts (hostid) ON DELETE CASCADE;
 ALTER TABLE items ADD CONSTRAINT c_items_2 FOREIGN KEY (templateid) REFERENCES items (itemid) ON DELETE CASCADE;
 ALTER TABLE items ADD CONSTRAINT c_items_3 FOREIGN KEY (valuemapid) REFERENCES valuemaps (valuemapid);
-ALTER TABLE items ADD CONSTRAINT c_items_4 FOREIGN KEY (interfaceid) REFERENCES interface (interfaceid) ON DELETE CASCADE;
+ALTER TABLE items ADD CONSTRAINT c_items_4 FOREIGN KEY (interfaceid) REFERENCES interface (interfaceid);
 
 UPDATE items SET port=snmp_port;
 ALTER TABLE items DROP COLUMN snmp_port;
@@ -82,7 +82,7 @@ ALTER TABLE items DROP COLUMN snmp_port;
 UPDATE items
 	SET interfaceid=(SELECT interfaceid FROM interface WHERE hostid=items.hostid AND main=1 AND type=1)
 	WHERE EXISTS (SELECT hostid FROM hosts WHERE hosts.hostid=items.hostid AND hosts.status IN (0,1))
-		AND type NOT IN (1,4,6,12);	-- SNMPv1, SNMPv2c, SNMPv3, IPMI
+		AND type IN (0, 3, 10, 11, 13, 14);     -- Agent, Simple, External, Database, SSH, TELNET
 
 -- host interface for SNMP and non templated items
 UPDATE items

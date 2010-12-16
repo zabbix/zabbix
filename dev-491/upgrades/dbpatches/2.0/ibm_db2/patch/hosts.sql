@@ -86,7 +86,7 @@ ALTER TABLE items ADD CONSTRAINT c_items_2 FOREIGN KEY (templateid) REFERENCES i
 REORG TABLE items;
 ALTER TABLE items ADD CONSTRAINT c_items_3 FOREIGN KEY (valuemapid) REFERENCES valuemaps (valuemapid);
 REORG TABLE items;
-ALTER TABLE items ADD CONSTRAINT c_items_4 FOREIGN KEY (interfaceid) REFERENCES interface (interfaceid) ON DELETE CASCADE;
+ALTER TABLE items ADD CONSTRAINT c_items_4 FOREIGN KEY (interfaceid) REFERENCES interface (interfaceid);
 REORG TABLE items;
 
 UPDATE items SET port=snmp_port;
@@ -97,7 +97,7 @@ REORG TABLE items;
 UPDATE items
 	SET interfaceid=(SELECT interfaceid FROM interface WHERE hostid=items.hostid AND main=1 AND type=1)
 	WHERE EXISTS (SELECT hostid FROM hosts WHERE hosts.hostid=items.hostid AND hosts.status IN (0,1))
-		AND type NOT IN (1,4,6,12);
+		AND type IN (0, 3, 10, 11, 13, 14);     -- Agent, Simple, External, Database, SSH, TELNET
 
 -- host interface for SNMP and non templated items
 UPDATE items

@@ -716,7 +716,7 @@ FIELD		|mtime		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|lastns		|t_nanosec	|	|NULL		|0
 FIELD		|flags		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|filter		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|interfaceid	|t_id		|	|NULL		|ZBX_SYNC,ZBX_PROXY	|4|interface
+FIELD		|interfaceid	|t_id		|	|NULL		|ZBX_SYNC,ZBX_PROXY	|4|interface	|		|RESTRICT
 FIELD		|port		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 UNIQUE		|1		|hostid,key_
 INDEX		|3		|status
