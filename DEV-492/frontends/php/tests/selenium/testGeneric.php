@@ -163,12 +163,13 @@ class testGeneric extends PHPUnit_Extensions_SeleniumTestCase
 	{
 		$this->setHost('localhost');
 		$this->setBrowser('*firefox');
-		$this->setBrowserUrl('http://localhost/~zabbix/DEV-492/frontends/php/');
+		$this->setBrowserUrl('http://localhost/~hudson/DEV-492/frontends/php/');
 	}
 
 	public function login()
 	{
-		$this->open('index.php');
+		$this->open('index.php?reconnect=1');
+		$this->waitForPageToLoad();
 		$this->click('link=Login');
 		$this->waitForPageToLoad();
 		$this->type('name','Admin');
