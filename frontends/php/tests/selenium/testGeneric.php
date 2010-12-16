@@ -63,6 +63,7 @@ class testGeneric extends PHPUnit_Extensions_SeleniumTestCase
 		// List of URLs to test
 		// URL, expected page Title
 		return array(
+
 			// Monitoring
 			array('index.php',	'ZABBIX'),
 			array('dashboard.php',	'Dashboard'),
@@ -168,8 +169,9 @@ class testGeneric extends PHPUnit_Extensions_SeleniumTestCase
 
 	public function login()
 	{
-		$this->open('index.php?reconnect=1');
+		$this->open('index.php');
 		$this->waitForPageToLoad();
+//		$this->assertTextPresent('Login');
 		$this->click('link=Login');
 		$this->waitForPageToLoad();
 		$this->type('name','Admin');
@@ -191,7 +193,7 @@ class testGeneric extends PHPUnit_Extensions_SeleniumTestCase
 	{
 		$this->login();
 		$this->open($a);
-		$this->assertTitleEquals($b,'assertTitleEquals('.$a.','.$b.')');
+		$this->assertTitle($b);
 		$this->logout();
 	}
 
