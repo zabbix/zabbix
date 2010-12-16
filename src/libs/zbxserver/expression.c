@@ -1934,7 +1934,10 @@ static int	get_autoreg_value_by_event(DB_EVENT *event, char **replace_to, const 
 	DB_ROW		row;
 	int		ret = FAIL;
 
-	result = DBselect("select %s from autoreg_host where autoreg_hostid=%d", fieldname, event->objectid);
+	result = DBselect(
+			"select %s"
+			" from autoreg_host"
+			" where autoreg_hostid=" ZBX_FS_UI64, fieldname, event->objectid);
 
 	if (NULL != (row = DBfetch(result)))
 	{
