@@ -114,7 +114,7 @@ CREATE INDEX opcommand_grp_1 on opcommand_grp (operationid);
 ALTER TABLE ONLY opcommand_grp ADD CONSTRAINT c_opcommand_grp_1 FOREIGN KEY (operationid) REFERENCES operations (operationid) ON DELETE CASCADE;
 ALTER TABLE ONLY opcommand_grp ADD CONSTRAINT c_opcommand_grp_2 FOREIGN KEY (groupid) REFERENCES groups (groupid);
 
--- creating temporary tabls `_opcommand`
+-- creating temporary table `_opcommand`
 
 CREATE TEMPORARY TABLE _opcommand (
 	operationid bigint,
@@ -135,7 +135,7 @@ INSERT INTO _opcommand (operationid, longdata)
 UPDATE _opcommand
 	SET longdata = TRIM(TRAILING '\r' FROM longdata);
 
--- creating temporary tabls `_opcommand_hst`
+-- creating temporary table `_opcommand_hst`
 
 CREATE TEMPORARY TABLE _opcommand_hst (
 	operationid bigint,
@@ -183,7 +183,7 @@ UPDATE opcommand_hst
 
 DROP TABLE _opcommand_hst;
 
--- creating temporary tabls `_opcommand_grp`
+-- creating temporary table `_opcommand_grp`
 
 CREATE TEMPORARY TABLE _opcommand_grp (
 	operationid bigint,
