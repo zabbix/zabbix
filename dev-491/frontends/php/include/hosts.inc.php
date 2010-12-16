@@ -28,6 +28,7 @@
 	}
 
 
+
 	function get_hostgroup_by_groupid($groupid){
 		$result=DBselect("select * from groups where groupid=".$groupid);
 		$row=DBfetch($result);
@@ -886,3 +887,4 @@ return $result;
 	}
 
 ?>
+

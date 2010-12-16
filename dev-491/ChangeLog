@@ -27,6 +27,8 @@ Changes for 1.9.0
 
 Changes for 1.8.4rc3
 
+ - [ZBX-3261] fixed second level template deletion (Aly)
+ - [ZBX-3295] fixed compilation warnings in eztexting module if code configured without cURL library (Sasha)
  - [ZBX-2862] it is now not possible to delete host group or user group used in scripts (KB)
  - [ZBX-3281] fixed system.cpu.util[] for all processors combined on NetBSD (asaveljevs)
  - [ZBX-3006] fixed some forms <input> elements are put inside <table> tag (Vedmak)
