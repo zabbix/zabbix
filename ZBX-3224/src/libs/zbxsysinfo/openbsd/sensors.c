@@ -65,7 +65,7 @@ static int	get_device_sensors(int do_task, int *mib, const struct sensordev *sen
 	if (DO_ONE == do_task)
 	{
 		int		i, len = 0;
-		struct sensor	sensor; 
+		struct sensor	sensor;
 		size_t		slen = sizeof(sensor);
 
 		for (i = 0; i < SENSOR_MAX_TYPES; i++)
@@ -97,19 +97,19 @@ static int	get_device_sensors(int do_task, int *mib, const struct sensordev *sen
 			for (j = 0; j < sensordev->maxnumt[i]; j++)
 			{
 				char		human[64];
-				struct sensor	sensor; 
+				struct sensor	sensor;
 				size_t		slen = sizeof(sensor);
+
+				zbx_snprintf(human, sizeof(human), "%s%d", sensor_type_s[i], j);
+
+				if (NULL == zbx_regexp_match(human, name, NULL))
+					continue;
 
 				mib[3] = i;
 				mib[4] = j;
 
 				if (-1 == sysctl(mib, 5, &sensor, &slen, NULL, 0))
 					return FAIL;
-
-				zbx_snprintf(human, sizeof(human), "%s%d", sensor_type_s[i], j);
-
-				if (NULL == zbx_regexp_match(human, name, NULL))
-					continue;
 
 				count_sensor(do_task, &sensor, aggr, cnt);
 			}
