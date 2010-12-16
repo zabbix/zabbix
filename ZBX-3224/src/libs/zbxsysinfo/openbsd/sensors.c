@@ -22,6 +22,8 @@
 
 #include <sys/sensors.h>
 
+#ifdef HAVE_SENSORDEV
+
 #define DO_ONE	0
 #define DO_AVG	1
 #define DO_MAX	2
@@ -183,3 +185,12 @@ int	GET_SENSOR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 
 	return SYSINFO_RET_OK;
 }
+
+#else
+
+int	GET_SENSOR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	return SYSINFO_RET_FAIL;
+}
+
+#endif	/* HAVE_SENSORDEV */

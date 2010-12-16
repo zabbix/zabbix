@@ -278,7 +278,7 @@ dnl Check for file /proc/net/dev
 AC_MSG_CHECKING(for file /proc/net/dev)
 if test -r /proc/net/dev; then
 	AC_MSG_RESULT(yes)
-	AC_DEFINE(HAVE_PROC_NET_DEV,1,[Define to 1 if file /proc/net/dev' should be used.])
+	AC_DEFINE(HAVE_PROC_NET_DEV,1,[Define to 1 if file '/proc/net/dev' should be used.])
 else
 	AC_MSG_RESULT(no)
 fi
@@ -512,7 +512,7 @@ AC_TRY_COMPILE(
     }
     swt->swt_n = cnt;
 
-    /* fill in ste_path pointers: we don't care about the paths, so we
+    /* fill in ste_path pointers: we do not care about the paths, so we
 point
        them all to the same buffer */
     ste = &(swt->swt_ent[0]);
@@ -531,7 +531,7 @@ point
     i = cnt;
     while (--i >= 0)
     {
-  /* don't count slots being deleted */
+  /* do not count slots being deleted */
   if (!(ste->ste_flags & ST_INDEL) &&
       !(ste->ste_flags & ST_DOINGDEL))
   {
@@ -555,6 +555,20 @@ AC_TRY_COMPILE([#include <sys/sysinfo.h>],
 sysinfo.totalswap=0;
 ],
 AC_DEFINE(HAVE_SYSINFO_TOTALSWAP,1,[Define to 1 if 'sysinfo.totalswap' exist.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+dnl Check for struct sensordev in sys/sensors.h
+AC_MSG_CHECKING(for struct sensordev in sys/sensors.h)
+AC_TRY_COMPILE([
+#include <stdlib.h>
+#include <sys/queue.h>
+#include <sys/sensors.h>],
+[struct sensordev sensordev;
+sensordev.xname[0]='\0';
+sensordev.maxnumt[0]=0;
+],
+AC_DEFINE(HAVE_SENSORDEV,1,[Define to 1 if struct 'sensordev' exist.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
@@ -1270,12 +1284,12 @@ linux*)
         case "${kernel}" in
              2.6.*) 
         	    AC_MSG_RESULT([2.6 family (${kernel})])
-        	    AC_DEFINE([KERNEL_2_6], 1, [Define to 1 if you're using Linux 2.6.x])
+        	    AC_DEFINE([KERNEL_2_6], 1, [Define to 1 if you are using Linux 2.6.x])
         	    ;;
 
              2.4.*) 
         	    AC_MSG_RESULT([2.4 family (${kernel})])
-        	    AC_DEFINE([KERNEL_2_4], 1, [Define to 1 if you're using Linux 2.4.x])
+        	    AC_DEFINE([KERNEL_2_4], 1, [Define to 1 if you are using Linux 2.4.x])
         	    ;;
         esac
 ;;
@@ -1288,7 +1302,7 @@ darwin*|rhapsody*)
 	ARCH="osx"
 
 	AC_MSG_RESULT([ok (${host_os})])
-	AC_DEFINE([MAC_OS_X], 1, [Define to 1 if you're using Mac OS X])
+	AC_DEFINE([MAC_OS_X], 1, [Define to 1 if you are using Mac OS X])
 ;;
 *solaris*)
 	ARCH="solaris"
