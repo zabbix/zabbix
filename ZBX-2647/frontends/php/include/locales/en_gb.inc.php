@@ -594,6 +594,10 @@
 	'S_VALUE_MAPS_CREATE_NUM_STRING'=>		'Value maps are used to create a mapping between numeric values and string representations',
 	'S_DELETE_SELECTED_VALUE_MAPPING'=>		'Delete selected value mapping?',
 
+	'S_CANNOT_REMOVE_MACRO' => 'Cannot remove macro',
+	'S_CANNOT_UPDATE_MACRO' => 'Cannot update macro',
+	'S_CANNOT_ADD_MACRO' => 'Cannot add macro',
+
 // media_types.php
 	'S_DELETE_SELECTED_MEDIATYPES_Q'=>		'Delete selected media types?',
 	'S_COMMERCIAL' => 'Commercial',
@@ -1592,6 +1596,7 @@
 	'S_DYNAMIC_ITEM'=>				'Dynamic item',
 	'S_DIMENSION_COLS_ROWS'=>		'Dimension (cols x rows)',
 	'S_DELETE_SELECTED_SLIDESHOWS_Q'=>	'Delete selected slideshows?',
+	'S_DELETE_SELECTED_SCREENS_Q' => 'Delete selected screens?',
 
 	'S_SLIDESHOW_MUST_CONTAIN_SLIDES' => 'Slideshow must contain slides',
 	'S_SLIDESHOWS'=>				'Slide shows',
@@ -2066,7 +2071,8 @@
 	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_AFTER_ERROR'=>'Not allowed symbols detected after element',
 	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_BEFORE_ERROR'=>'Not allowed symbols detected before element',
 	'S_ARE_YOU_SURE_YOU_WANT_TO_DELETE'=>'Are you sure you want to delete',
-	'S_MACROS_ES'=>'macro(s)',
+	'S_MACROS_ES' => 'macro(s)',
+	'S_SEC_AT' => 'sec at',
 
 //	popup_link_tr.php
 	'S_NEW_INDICATORS'=>			'New indicators',
@@ -2194,6 +2200,7 @@
 	'S_INVALID_KEY_FORMAT' => 'Invalid key format',
 	'S_KEY_CANNOT_BE_EMPTY' => 'Key cannot be empty',
 	'S_KEY_TOO_LARGE' => 'Key is too large: maximum %d characters',
+	'S_ITEM_UNLINKED' => 'Item "%s" unlinked',
 
 //	httptest.inc.php
 	'S_SCENARIO_STEP_NUMBER_CANNOT_BE_LESS_ONE'=>	'Scenario step number cannot be less than 1',
@@ -2203,7 +2210,10 @@
 	'S_CANNOT_ADD_NEW_APPLICATION'=>		'Cannot add new application',
 	'S_SCENARIO_WITH_NAME'=>			'Scenario with name',
 	'S_ADDED_SMALL'=>				'added',
-	'S_PRINTABLE_ONLY'=>'only printable characters',
+	'S_PRINTABLE_ONLY' => 'only printable characters',
+	'S_DOWNLOAD_SPEED_FOR_STEP' => 'Download speed for step "%1$s" of scenario "%1$s"',
+	'S_RESPONSE_TIME_FOR_STEP' => 'Response time for step "%1$s" of scenario "%1$s"',
+	'S_RESPONSE_CODE_FOR_STEP' => 'Response code for step "%1$s" of scenario "%1$s"',
 
 //	media.inc.php
 	'S_NO_MEDIA_WITH'=>			'No media with',
@@ -2294,6 +2304,7 @@
 	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART1'=>	'Function \'',
 	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART2'=>	'\' does not accept parameters.',
     'S_WRONG_DEPENDENCY_ERROR'=>	'Error adding dependencies. Following dependencies are not allowed: 1) from a host trigger to a template trigger; 2) from a template trigger to a host trigger; 3) between template triggers, where templates have links to other templates.',
+	'S_TRIGGER_UNLINKED' => 'Trigger "%s" unlinked',
 
 //	page_footer.php
 	'S_TRANSACTION_HAVE_NOT_BEEN_CLOSED_ABORTING'=>	'Transaction has not been closed. Aborting..',
@@ -2525,6 +2536,23 @@
 // class.cusergroup
 	'S_GROUP_IS_USED_IN_SCRIPT' =>	'User group [%1$s] is used in script [%2$s].',
 	'S_YOU_CANNOT_DELETE_GROUP_USED_IN_SCRIPT' => 'Cannot delete user group used in a script:',
-	'S_ONLY_SUPERADMIN_CAN_DELETE_USERGROUP' => 'Only Super Admins can delete User Groups',
+	'S_ONLY_SUPERADMIN_CAN_DELETE_USERGROUP' => 'Only Super Admins can delete User Groups.',
+
+// class.cgraph.php
+	'S_GRAPH_ALREADY_EXISTS_ON' => 'Graph "%1$s" already exists on "%2$s".',
+	'S_INHERITED_FROM_ANOTHER_TEMPLATE' => '(inherited from another template).',
+	'S_ITEMS_ARE_NOT_IDENTICAL' => '(items are not identical).',
+
+// class.ctemplate.php
+	'S_CANNOT_SYNC_TEMPLATE' => 'Cannot sync template',
+	'S_CIRCULAR_LINK_CANNOT' => 'Circular link can not be created',
+
+// class.chost.php
+	'S_YOU_DO_NOT_HAVE_ENOUGH_RIGHTS' => 'You do not have enough rights for operation',
+	'S_HOST_UPDATE_FAILED' => 'Host update failed',
+
+// discoveryconf.php
+	'S_SECOND_IN_PARENTHESES' => '(seconds)'
+
 );
 ?>

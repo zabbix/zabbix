@@ -1682,7 +1682,7 @@
 					array(
 						new CCheckBox('rem_delay_flex['.$i.']', 'no', null,$i),
 						$val['delay'],
-						' sec at ',
+						SPACE.S_SEC_AT.SPACE,
 						$val['period']),
 					BR());
 				$frmItem->addVar('delay_flex['.$i.'][delay]', $val['delay']);
@@ -2242,7 +2242,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 				array(
 					new CCheckBox('rem_delay_flex[]', 'no', null,$i),
 						$val['delay'],
-						' sec at ',
+						SPACE.S_SEC_AT.SPACE,
 						$val['period']
 				),
 				BR());

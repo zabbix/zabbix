@@ -1243,7 +1243,7 @@ Copt::memoryPick();
 			$upd_hosts = self::get($options);
 			foreach($hosts as $gnum => $host){
 				if(!isset($upd_hosts[$host['hostid']])){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, 'You do not have enough rights for operation');
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_YOU_DO_NOT_HAVE_ENOUGH_RIGHTS);
 				}
 			}
 
@@ -1252,7 +1252,7 @@ Copt::memoryPick();
 				$host['hosts'] = $tmp;
 
 				$result = self::massUpdate($host);
-				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Host update failed');
+				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, S_HOST_UPDATE_FAILED);
 			}
 
 			self::EndTransaction(true, __METHOD__);
@@ -1515,7 +1515,7 @@ Copt::memoryPick();
 			}
 // }}} UPDATE TEMPLATE LINKAGE
 
-			
+
 // UPDATE MACROS {{{
 			if(isset($data['macros']) && !is_null($data['macros'])){
 				$macrosToAdd = zbx_toHash($data['macros'], 'macro');

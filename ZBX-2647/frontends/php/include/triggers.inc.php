@@ -2423,7 +2423,7 @@ return $caption;
 
 			if($unlink_mode){
 				if(DBexecute('UPDATE triggers SET templateid=0 WHERE triggerid='.$trigger['triggerid'])){
-						info('Trigger "'.$trigger['description'].'" unlinked');
+					info(sprintf(S_TRIGGER_UNLINKED, $trigger['description']));
 				}
 			}
 			else{

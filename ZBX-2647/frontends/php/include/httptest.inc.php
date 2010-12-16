@@ -92,19 +92,19 @@ require_once('include/items.inc.php');
 
 		$monitored_items = array(
 			array(
-				'description'	=> 'Download speed for step \'$2\' of scenario \'$1\'',
+				'description'	=> sprintf(S_DOWNLOAD_SPEED_FOR_STEP, '$2', '$1'),
 				'key_'		=> 'web.test.in['.$testname.','.$name.',bps]',
 				'type'		=> ITEM_VALUE_TYPE_FLOAT,
 				'units'		=> 'Bps',
 				'httpstepitemtype'=> HTTPSTEP_ITEM_TYPE_IN),
 			array(
-				'description'	=> 'Response time for step \'$2\' of scenario \'$1\'',
+				'description'	=> sprintf(S_RESPONSE_TIME_FOR_STEP, '$2', '$1'),
 				'key_'		=> 'web.test.time['.$testname.','.$name.',resp]',
 				'type'		=> ITEM_VALUE_TYPE_FLOAT,
 				'units'		=> 's',
 				'httpstepitemtype'=> HTTPSTEP_ITEM_TYPE_TIME),
 			array(
-				'description'	=> 'Response code for step \'$2\' of scenario \'$1\'',
+				'description'	=> sprintf(S_RESPONSE_CODE_FOR_STEP, '$2', '$1'),
 				'key_'		=> 'web.test.rspcode['.$testname.','.$name.']',
 				'type'		=> ITEM_VALUE_TYPE_UINT64,
 				'units'		=> '',

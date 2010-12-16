@@ -782,7 +782,7 @@
 
 			if($unlink_mode){
 				if(DBexecute('UPDATE items SET templateid=0 WHERE itemid='.$db_item["itemid"])){
-					info("Item '".$db_item["key_"]."' unlinked");
+					info(S_ITEM_UNLINKED, $db_item["key_"]);
 				}
 			}
 			else{
