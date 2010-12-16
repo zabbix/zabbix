@@ -24,123 +24,6 @@
  * @package API
  */
 
-/*
-interface IValidator{
-	public static function validate($value, $params, $context=array());
-}
-
-abstract class CValidator{
-
-	protected static function validateContext($hash, $rules){
-		foreach($rules as $field => $filters){
-			$value = isset($hash[$field]) ? $hash[$field] : null;
-
-			foreach($filters as $filter){
-				$validator = array_shift($filter);
-				$result = call_user_func_array(array('C'.$validator.'Validator', 'validate'), array($value, $filter));
-
-				return $result['valid'];
-			}
-		}
-
-		return true;
-	}
-}
-
-class CStringValidator extends CValidator implements IValidator{
-	public static function validate($value, $params, $context=array()){
-		if(isset($params['condition']) && !self::validateContext($context, $params['condition'])){
-			return array('valid' => true);
-		}
-
-		if(is_null($value) || is_string($value)){
-			$result = array('valid' => true);
-		}
-		else{
-			$result = array('valid' => false, 'error' => $value.' is not string');
-		}
-		return $result;
-	}
-}
-
-class CArrayValidator extends CValidator implements IValidator{
-	public static function validate($value, $params, $context=array()){
-		$value = zbx_toArray($value);
-
-		foreach($value as $num => $hash){
-			$result = CHashValidator::validate($hash, $params);
-			if(!$result['valid'])
-				return array('valid' => false, 'error' => 'Element ['.$num.']: '.$result['error']);
-		}
-
-		return array('valid' => true);
-	}
-}
-
-class CRequiredValidator extends CValidator implements IValidator{
-	public static function validate($value, $params, $context=array()){
-		if(isset($params['condition']) && !self::validateContext($context, $params['condition'])){
-			return array('valid' => true);
-		}
-
-		if(empty($value)){
-			$result = array('valid' => false, 'error' => $value.' is empty');
-		}
-		else{
-			$result = array('valid' => true);
-		}
-		return $result;
-	}
-}
-
-class CHashValidator extends CValidator implements IValidator{
-	public static function validate($value, $params, $context=array()){
-		if(!isset($params['rules'])) echo 'no rules';
-		$rules = $params['rules'];
-
-		$rules_fields = array_keys($rules);
-		$input_fields = array_keys($value);
-		$diff = array_diff($input_fields, $rules_fields);
-
-		if(!empty($diff)){
-			return array('valid' => false, 'error' => 'Unknown elements: ['.implode(', ', $diff).']');
-		}
-
-		foreach($rules as $field => $filters){
-			$fieldValue = isset($value[$field]) ? $value[$field] : null;
-
-			foreach($filters as $filter){
-				$validator = array_shift($filter);
-				$validator = array('C'.$validator.'Validator', 'validate');
-
-				$result = call_user_func_array($validator, array($fieldValue, $filter, $value));
-				if(!$result['valid'])
-					return array('valid' => false, 'error' => 'Field ['.$field.']: '.$result['error']);
-			}
-		}
-
-		return array('valid' => true);
-	}
-}
-
-class CRangeValidator extends CValidator implements IValidator{
-	public static function validate($value, $params, $context=array()){
-		if(isset($params['rules']) && !self::validateContext($context, $params['rules'])){
-			return array('valid' => true);
-		}
-
-		if(is_null($value) || in_array($value, $params['range'])){
-			$result = array('valid' => true);
-		}
-		else{
-			$result = array('valid' => false, 'error' => $value.' not in range ('.implode(', ',$params['range']).')');
-		}
-		return $result;
-	}
-}
-
-*/
-
 
 class CTrigger extends CZBXAPI{
 
@@ -1959,9 +1842,9 @@ COpt::memoryPick();
 			if(!empty($templateids) && !empty($dep_templateids) && !empty($tdiff)){
 				$tpls = zbx_array_merge($templateids, $dep_templateids);
 				$sql = 'SELECT DISTINCT ht.templateid, ht.hostid, h.host'.
-						' FROM hosts_templates ht, hosts h'.
-						' WHERE h.hostid=ht.hostid'.
-							' AND '.DBcondition('ht.templateid', $tpls);
+					' FROM hosts_templates ht, hosts h'.
+					' WHERE h.hostid=ht.hostid'.
+						' AND '.DBcondition('ht.templateid', $tpls);
 
 				$db_lowlvltpl = DBselect($sql);
 				$map = array();
@@ -1991,4 +1874,120 @@ COpt::memoryPick();
 
 }
 
+/*
+interface IValidator{
+	public static function validate($value, $params, $context=array());
+}
+
+abstract class CValidator{
+
+	protected static function validateContext($hash, $rules){
+		foreach($rules as $field => $filters){
+			$value = isset($hash[$field]) ? $hash[$field] : null;
+
+			foreach($filters as $filter){
+				$validator = array_shift($filter);
+				$result = call_user_func_array(array('C'.$validator.'Validator', 'validate'), array($value, $filter));
+
+				return $result['valid'];
+			}
+		}
+
+		return true;
+	}
+}
+
+class CStringValidator extends CValidator implements IValidator{
+	public static function validate($value, $params, $context=array()){
+		if(isset($params['condition']) && !self::validateContext($context, $params['condition'])){
+			return array('valid' => true);
+		}
+
+		if(is_null($value) || is_string($value)){
+			$result = array('valid' => true);
+		}
+		else{
+			$result = array('valid' => false, 'error' => $value.' is not string');
+		}
+		return $result;
+	}
+}
+
+class CArrayValidator extends CValidator implements IValidator{
+	public static function validate($value, $params, $context=array()){
+		$value = zbx_toArray($value);
+
+		foreach($value as $num => $hash){
+			$result = CHashValidator::validate($hash, $params);
+			if(!$result['valid'])
+				return array('valid' => false, 'error' => 'Element ['.$num.']: '.$result['error']);
+		}
+
+		return array('valid' => true);
+	}
+}
+
+class CRequiredValidator extends CValidator implements IValidator{
+	public static function validate($value, $params, $context=array()){
+		if(isset($params['condition']) && !self::validateContext($context, $params['condition'])){
+			return array('valid' => true);
+		}
+
+		if(empty($value)){
+			$result = array('valid' => false, 'error' => $value.' is empty');
+		}
+		else{
+			$result = array('valid' => true);
+		}
+		return $result;
+	}
+}
+
+class CHashValidator extends CValidator implements IValidator{
+	public static function validate($value, $params, $context=array()){
+		if(!isset($params['rules'])) echo 'no rules';
+		$rules = $params['rules'];
+
+		$rules_fields = array_keys($rules);
+		$input_fields = array_keys($value);
+		$diff = array_diff($input_fields, $rules_fields);
+
+		if(!empty($diff)){
+			return array('valid' => false, 'error' => 'Unknown elements: ['.implode(', ', $diff).']');
+		}
+
+		foreach($rules as $field => $filters){
+			$fieldValue = isset($value[$field]) ? $value[$field] : null;
+
+			foreach($filters as $filter){
+				$validator = array_shift($filter);
+				$validator = array('C'.$validator.'Validator', 'validate');
+
+				$result = call_user_func_array($validator, array($fieldValue, $filter, $value));
+				if(!$result['valid'])
+					return array('valid' => false, 'error' => 'Field ['.$field.']: '.$result['error']);
+			}
+		}
+
+		return array('valid' => true);
+	}
+}
+
+class CRangeValidator extends CValidator implements IValidator{
+	public static function validate($value, $params, $context=array()){
+		if(isset($params['rules']) && !self::validateContext($context, $params['rules'])){
+			return array('valid' => true);
+		}
+
+		if(is_null($value) || in_array($value, $params['range'])){
+			$result = array('valid' => true);
+		}
+		else{
+			$result = array('valid' => false, 'error' => $value.' not in range ('.implode(', ',$params['range']).')');
+		}
+		return $result;
+	}
+}
+
+*/
 ?>

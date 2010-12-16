@@ -47,7 +47,9 @@ class CVar{
 			return;
 		}
 
-		$this->var_container[] = new CInput('hidden', $name, zbx_htmlstr($value));
+		$hiddenVar = new CInput('hidden', $name, zbx_htmlstr($value));
+		$hiddenVar->removeAttribute('class');
+		$this->var_container[] = $hiddenVar;
 	}
 
 	public function toString(){
