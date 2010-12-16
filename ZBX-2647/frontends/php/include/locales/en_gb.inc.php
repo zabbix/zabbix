@@ -2211,9 +2211,9 @@
 	'S_SCENARIO_WITH_NAME'=>			'Scenario with name',
 	'S_ADDED_SMALL'=>				'added',
 	'S_PRINTABLE_ONLY' => 'only printable characters',
-	'S_DOWNLOAD_SPEED_FOR_STEP' => 'Download speed for step "%1$s" of scenario "%1$s"',
-	'S_RESPONSE_TIME_FOR_STEP' => 'Response time for step "%1$s" of scenario "%1$s"',
-	'S_RESPONSE_CODE_FOR_STEP' => 'Response code for step "%1$s" of scenario "%1$s"',
+	'S_DOWNLOAD_SPEED_FOR_STEP' => 'Download speed for step "%1$s" of scenario "%2$s"',
+	'S_RESPONSE_TIME_FOR_STEP' => 'Response time for step "%1$s" of scenario "%2$s"',
+	'S_RESPONSE_CODE_FOR_STEP' => 'Response code for step "%1$s" of scenario "%2$s"',
 
 //	media.inc.php
 	'S_NO_MEDIA_WITH'=>			'No media with',
