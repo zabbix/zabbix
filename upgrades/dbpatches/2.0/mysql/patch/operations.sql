@@ -48,10 +48,10 @@ ALTER TABLE opmessage_grp ADD CONSTRAINT c_opmessage_grp_2 FOREIGN KEY (usrgrpid
 SET @opmessage_grpid := 0;
 INSERT INTO opmessage_grp (opmessage_grpid, opmessageid, usrgrpid)
 	SELECT @opmessage_grpid := @opmessage_grpid + 1, m.opmessageid, o.objectid
-		FROM opmessage m, operations o
+		FROM opmessage m, operations o, usrgrp g
 		WHERE m.operationid = o.operationid
-			AND o.object IN (1)	-- OPERATION_OBJECT_GROUP
-			AND o.objectid IN (SELECT usrgrpid FROM usrgrp);
+			AND o.objectid = g.usrgrpid
+			AND o.object IN (1);	-- OPERATION_OBJECT_GROUP
 
 UPDATE opmessage_grp
 	SET opmessage_grpid = (opmessageid div 100000000000) * 100000000000 + opmessage_grpid
@@ -72,10 +72,10 @@ ALTER TABLE opmessage_usr ADD CONSTRAINT c_opmessage_usr_2 FOREIGN KEY (userid) 
 SET @opmessage_usrid := 0;
 INSERT INTO opmessage_usr (opmessage_usrid, opmessageid, userid)
 	SELECT @opmessage_usrid := @opmessage_usrid + 1, m.opmessageid, o.objectid
-		FROM opmessage m, operations o
+		FROM opmessage m, operations o, users u
 		WHERE m.operationid = o.operationid
-			AND o.object IN (0)	-- OPERATION_OBJECT_USER
-			AND o.objectid IN (SELECT userid FROM users);
+			AND o.objectid = u.userid
+			AND o.object IN (0);	-- OPERATION_OBJECT_USER
 
 UPDATE opmessage_usr
 	SET opmessage_usrid = (opmessageid div 100000000000) * 100000000000 + opmessage_usrid
@@ -252,9 +252,10 @@ ALTER TABLE opgroup ADD CONSTRAINT c_opgroup_2 FOREIGN KEY (groupid) REFERENCES 
 
 SET @opgroupid := 0;
 INSERT INTO opgroup (opgroupid, operationid, groupid)
-	SELECT @opgroupid := @opgroupid + 1, operationid, objectid
-		FROM operations
-		WHERE operationtype IN (4,5);	-- OPERATION_TYPE_GROUP_ADD, OPERATION_TYPE_GROUP_REMOVE
+	SELECT @opgroupid := @opgroupid + 1, o.operationid, o.objectid
+		FROM operations o, groups g
+		WHERE o.objectid = g.groupid
+			AND o.operationtype IN (4,5);	-- OPERATION_TYPE_GROUP_ADD, OPERATION_TYPE_GROUP_REMOVE
 
 UPDATE opgroup
 	SET opgroupid = (operationid div 100000000000) * 100000000000 + opgroupid
@@ -274,9 +275,10 @@ ALTER TABLE optemplate ADD CONSTRAINT c_optemplate_2 FOREIGN KEY (templateid) RE
 
 SET @optemplateid := 0;
 INSERT INTO optemplate (optemplateid, operationid, templateid)
-	SELECT @optemplateid := @optemplateid + 1, operationid, objectid
-		FROM operations
-		WHERE operationtype IN (6,7);	-- OPERATION_TYPE_TEMPLATE_ADD, OPERATION_TYPE_TEMPLATE_REMOVE
+	SELECT @optemplateid := @optemplateid + 1, o.operationid, o.objectid
+		FROM operations o, hosts h
+		WHERE o.objectid = h.hostid
+			AND o.operationtype IN (6,7);	-- OPERATION_TYPE_TEMPLATE_ADD, OPERATION_TYPE_TEMPLATE_REMOVE
 
 UPDATE optemplate
 	SET optemplateid = (operationid div 100000000000) * 100000000000 + optemplateid
