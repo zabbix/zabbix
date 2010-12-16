@@ -14,21 +14,13 @@ ALTER TABLE opmessage ADD CONSTRAINT c_opmessage_1 FOREIGN KEY (operationid) REF
 ALTER TABLE opmessage ADD CONSTRAINT c_opmessage_3 FOREIGN KEY (mediatypeid) REFERENCES media_type (mediatypeid);
 
 CREATE SEQUENCE opmessage_seq;
-CREATE TRIGGER opmessage_tr
-BEFORE INSERT ON opmessage
-FOR EACH ROW
-BEGIN
-SELECT opmessage_seq.nextval INTO :new.opmessageid FROM dual;
-END;
-/
 
-INSERT INTO opmessage (operationid, default_msg, subject, message)
-	SELECT operationid, default_msg, shortdata, longdata
+INSERT INTO opmessage (opmessageid, operationid, default_msg, subject, message)
+	SELECT opmessage_seq.NEXTVAL, operationid, default_msg, shortdata, longdata
 		FROM operations
 		WHERE operationtype IN (0)	-- OPERATION_TYPE_MESSAGE
 /
 
-DROP TRIGGER opmessage_tr;
 DROP SEQUENCE opmessage_seq;
 
 UPDATE opmessage
@@ -58,22 +50,15 @@ ALTER TABLE opmessage_grp ADD CONSTRAINT c_opmessage_grp_1 FOREIGN KEY (opmessag
 ALTER TABLE opmessage_grp ADD CONSTRAINT c_opmessage_grp_2 FOREIGN KEY (usrgrpid) REFERENCES usrgrp (usrgrpid);
 
 CREATE SEQUENCE opmessage_grp_seq;
-CREATE TRIGGER opmessage_grp_tr
-BEFORE INSERT ON opmessage_grp
-FOR EACH ROW
-BEGIN
-SELECT opmessage_grp_seq.nextval INTO :new.opmessage_grpid FROM dual;
-END;
+
+INSERT INTO opmessage_grp (opmessage_grpid, opmessageid, usrgrpid)
+	SELECT opmessage_grp_seq.NEXTVAL, m.opmessageid, o.objectid
+		FROM opmessage m, operations o, usrgrp g
+		WHERE m.operationid = o.operationid
+			AND o.objectid=g.usrgrpid
+			AND o.object IN (1)	-- OPERATION_OBJECT_GROUP
 /
 
-INSERT INTO opmessage_grp (opmessageid, usrgrpid)
-	SELECT m.opmessageid, o.objectid
-		FROM opmessage m, operations o
-		WHERE m.operationid = o.operationid
-			AND o.object IN (1)	-- OPERATION_OBJECT_GROUP
-			AND o.objectid IN (SELECT usrgrpid FROM usrgrp);
-
-DROP TRIGGER opmessage_grp_tr;
 DROP SEQUENCE opmessage_grp_seq;
 
 UPDATE opmessage_grp
@@ -93,22 +78,15 @@ ALTER TABLE opmessage_usr ADD CONSTRAINT c_opmessage_usr_1 FOREIGN KEY (opmessag
 ALTER TABLE opmessage_usr ADD CONSTRAINT c_opmessage_usr_2 FOREIGN KEY (userid) REFERENCES users (userid);
 
 CREATE SEQUENCE opmessage_usr_seq;
-CREATE TRIGGER opmessage_usr_tr
-BEFORE INSERT ON opmessage_usr
-FOR EACH ROW
-BEGIN
-SELECT opmessage_usr_seq.nextval INTO :new.opmessage_usrid FROM dual;
-END;
+
+INSERT INTO opmessage_usr (opmessage_usrid, opmessageid, userid)
+	SELECT opmessage_usr_seq.NEXTVAL, m.opmessageid, o.objectid
+		FROM opmessage m, operations o, users u
+		WHERE m.operationid = o.operationid
+			AND o.objectid = u.userid
+			AND o.object IN (0)	-- OPERATION_OBJECT_USER
 /
 
-INSERT INTO opmessage_usr (opmessageid, userid)
-	SELECT m.opmessageid, o.objectid
-		FROM opmessage m, operations o
-		WHERE m.operationid = o.operationid
-			AND o.object IN (0)	-- OPERATION_OBJECT_USER
-			AND o.objectid IN (SELECT userid FROM users);
-
-DROP TRIGGER opmessage_usr_tr;
 DROP SEQUENCE opmessage_usr_seq;
 
 UPDATE opmessage_usr
@@ -225,19 +203,11 @@ UPDATE tmp_opcommand_hst
 	WHERE name <> '{HOSTNAME}';
 
 CREATE SEQUENCE opcommand_hst_seq;
-CREATE TRIGGER opcommand_hst_tr
-BEFORE INSERT ON opcommand_hst
-FOR EACH ROW
-BEGIN
-SELECT opcommand_hst_seq.nextval INTO :new.opcommand_hstid FROM dual;
-END;
-/
 
-INSERT INTO opcommand_hst (operationid, hostid, command)
-	SELECT operationid, hostid, longdata
+INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid, command)
+	SELECT opcommand_hst_seq.NEXTVAL, operationid, hostid, longdata
 		FROM tmp_opcommand_hst;
 
-DROP TRIGGER opcommand_hst_tr;
 DROP SEQUENCE opcommand_hst_seq;
 
 UPDATE opcommand_hst
@@ -279,19 +249,11 @@ UPDATE tmp_opcommand_grp
 				AND TRUNC(g.groupid / 100000000000000) = TRUNC(tmp_opcommand_grp.operationid / 100000000000000));
 
 CREATE SEQUENCE opcommand_grp_seq;
-CREATE TRIGGER opcommand_grp_tr
-BEFORE INSERT ON opcommand_grp
-FOR EACH ROW
-BEGIN
-SELECT opcommand_grp_seq.nextval INTO :new.opcommand_grpid FROM dual;
-END;
-/
 
-INSERT INTO opcommand_grp (operationid, groupid, command)
-	SELECT operationid, groupid, longdata
+INSERT INTO opcommand_grp (opcommand_grpid, operationid, groupid, command)
+	SELECT opcommand_grp_seq.NEXTVAL, operationid, groupid, longdata
 		FROM tmp_opcommand_grp;
 
-DROP TRIGGER opcommand_grp_tr;
 DROP SEQUENCE opcommand_grp_seq;
 
 UPDATE opcommand_grp
@@ -314,21 +276,14 @@ ALTER TABLE opgroup ADD CONSTRAINT c_opgroup_1 FOREIGN KEY (operationid) REFEREN
 ALTER TABLE opgroup ADD CONSTRAINT c_opgroup_2 FOREIGN KEY (groupid) REFERENCES groups (groupid);
 
 CREATE SEQUENCE opgroup_seq;
-CREATE TRIGGER opgroup_tr
-BEFORE INSERT ON opgroup
-FOR EACH ROW
-BEGIN
-SELECT opgroup_seq.nextval INTO :new.opgroupid FROM dual;
-END;
+
+INSERT INTO opgroup (opgroupid, operationid, groupid)
+	SELECT opgroup_seq.NEXTVAL, o.operationid, o.objectid
+		FROM operations o, groups g
+		WHERE o.objectid = g.groupid
+			AND o.operationtype IN (4,5)	-- OPERATION_TYPE_GROUP_ADD, OPERATION_TYPE_GROUP_REMOVE
 /
 
-INSERT INTO opgroup (operationid, groupid)
-	SELECT operationid, objectid
-		FROM operations
-		WHERE operationtype IN (4,5)	-- OPERATION_TYPE_GROUP_ADD, OPERATION_TYPE_GROUP_REMOVE
-/
-
-DROP TRIGGER opgroup_tr;
 DROP SEQUENCE opgroup_seq;
 
 UPDATE opgroup
@@ -348,21 +303,14 @@ ALTER TABLE optemplate ADD CONSTRAINT c_optemplate_1 FOREIGN KEY (operationid) R
 ALTER TABLE optemplate ADD CONSTRAINT c_optemplate_2 FOREIGN KEY (templateid) REFERENCES hosts (hostid);
 
 CREATE SEQUENCE optemplate_seq;
-CREATE TRIGGER optemplate_tr
-BEFORE INSERT ON optemplate
-FOR EACH ROW
-BEGIN
-SELECT optemplate_seq.nextval INTO :new.optemplateid FROM dual;
-END;
+
+INSERT INTO optemplate (optemplateid, operationid, templateid)
+	SELECT optemplate_seq.NEXTVAL, o.operationid, o.objectid
+		FROM operations o, hosts h
+		WHERE o.objectid = h.hostid
+			AND o.operationtype IN (6,7)	-- OPERATION_TYPE_TEMPLATE_ADD, OPERATION_TYPE_TEMPLATE_REMOVE
 /
 
-INSERT INTO optemplate (operationid, templateid)
-	SELECT operationid, objectid
-		FROM operations
-		WHERE operationtype IN (6,7)	-- OPERATION_TYPE_TEMPLATE_ADD, OPERATION_TYPE_TEMPLATE_REMOVE
-/
-
-DROP TRIGGER optemplate_tr;
 DROP SEQUENCE optemplate_seq;
 
 UPDATE optemplate

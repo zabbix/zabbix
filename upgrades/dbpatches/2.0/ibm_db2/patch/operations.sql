@@ -66,9 +66,9 @@ CREATE SEQUENCE opmessage_grp_seq AS bigint
 
 INSERT INTO opmessage_grp (opmessage_grpid, opmessageid, usrgrpid)
 	SELECT NEXTVAL FOR opmessage_grp_seq, m.opmessageid, o.objectid
-		FROM opmessage m, operations o,usrgrp g
+		FROM opmessage m, operations o, usrgrp g
 		WHERE m.operationid = o.operationid
-			AND g.usrgrpid=o.objectid
+			AND o.objectid = g.usrgrpid
 			AND o.object IN (1)	-- OPERATION_OBJECT_GROUP
 /
 
@@ -101,9 +101,9 @@ CREATE SEQUENCE opmessage_usr_seq
 
 INSERT INTO opmessage_usr (opmessage_usrid, opmessageid, userid)
 	SELECT NEXTVAL FOR opmessage_usr_seq, m.opmessageid, o.objectid
-		FROM opmessage m, operations o,users u
+		FROM opmessage m, operations o, users u
 		WHERE m.operationid = o.operationid
-			AND u.userid=o.objectid
+			AND o.objectid = u.userid
 			AND o.object IN (0)	-- OPERATION_OBJECT_USER
 /
 
@@ -351,9 +351,9 @@ CREATE SEQUENCE opgroup_seq AS bigint
 
 INSERT INTO opgroup (opgroupid, operationid, groupid)
 	SELECT NEXTVAL FOR opgroup_seq, o.operationid, o.objectid
-		FROM operations o,groups g
-		WHERE o.operationtype IN (4,5)	-- OPERATION_TYPE_GROUP_ADD, OPERATION_TYPE_GROUP_REMOVE
-			AND g.groupid=o.objectid
+		FROM operations o, groups g
+		WHERE o.objectid = g.groupid
+			AND o.operationtype IN (4,5)	-- OPERATION_TYPE_GROUP_ADD, OPERATION_TYPE_GROUP_REMOVE
 /
 
 DROP SEQUENCE opgroup_seq
@@ -386,8 +386,8 @@ CREATE SEQUENCE optemplate_seq AS bigint
 INSERT INTO optemplate (optemplateid, operationid, templateid)
 	SELECT NEXTVAL FOR optemplate_seq, o.operationid, o.objectid
 		FROM operations o, hosts h
-		WHERE o.operationtype IN (6,7)	-- OPERATION_TYPE_TEMPLATE_ADD, OPERATION_TYPE_TEMPLATE_REMOVE
-			AND h.hostid=o.objectid
+		WHERE o.objectid = h.hostid
+			AND o.operationtype IN (6,7)	-- OPERATION_TYPE_TEMPLATE_ADD, OPERATION_TYPE_TEMPLATE_REMOVE
 /
 
 DROP SEQUENCE optemplate_seq
