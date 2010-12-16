@@ -24,6 +24,8 @@
 
 /* the callback code is the same as in httptest.c and httptest.h, would be nice to abstract it */
 
+#ifdef HAVE_LIBCURL
+
 typedef struct
 {
 	char	*data;
@@ -67,6 +69,8 @@ static size_t	HEADERFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userda
 
 #define EZ_TEXTING_TIMEOUT		15
 #define EZ_TEXTING_API_URL		"https://app.eztexting.com/api/sending"
+
+#endif	/* HAVE_LIBCURL */
 
 /******************************************************************************
  *                                                                            *
