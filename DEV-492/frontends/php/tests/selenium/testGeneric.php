@@ -24,8 +24,8 @@ require_once 'PHPUnit/Extensions/SeleniumTestCase.php';
 class testGeneric extends PHPUnit_Extensions_SeleniumTestCase
 {
 	protected $captureScreenshotOnFailure = TRUE;
-	protected $screenshotPath = '/tmp/screenshots';
-	protected $screenshotUrl = 'http://localhost/screenshots';
+	protected $screenshotPath = '/home/hudson/public_html/screenshots';
+	protected $screenshotUrl = 'http://hudson/~hudson/screenshots';
 
 	// List of strings that should NOT appear on any page
 	public $failIfExists = array (
