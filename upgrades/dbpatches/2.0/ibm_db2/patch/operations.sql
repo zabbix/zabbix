@@ -24,7 +24,6 @@ INSERT INTO opmessage (opmessageid, operationid, default_msg, subject, message)
 	SELECT NEXTVAL FOR opmessage_seq, operationid, default_msg, shortdata, longdata
 		FROM operations
 		WHERE operationtype IN (0)	-- OPERATION_TYPE_MESSAGE
-
 /
 
 DROP SEQUENCE opmessage_seq
@@ -67,10 +66,10 @@ CREATE SEQUENCE opmessage_grp_seq AS bigint
 
 INSERT INTO opmessage_grp (opmessage_grpid, opmessageid, usrgrpid)
 	SELECT NEXTVAL FOR opmessage_grp_seq, m.opmessageid, o.objectid
-		FROM opmessage m, operations o
+		FROM opmessage m, operations o,usrgrp g
 		WHERE m.operationid = o.operationid
+			AND g.usrgrpid=o.objectid
 			AND o.object IN (1)	-- OPERATION_OBJECT_GROUP
-			AND o.objectid IN (SELECT usrgrpid FROM usrgrp)
 /
 
 DROP SEQUENCE opmessage_grp_seq
@@ -102,10 +101,10 @@ CREATE SEQUENCE opmessage_usr_seq
 
 INSERT INTO opmessage_usr (opmessage_usrid, opmessageid, userid)
 	SELECT NEXTVAL FOR opmessage_usr_seq, m.opmessageid, o.objectid
-		FROM opmessage m, operations o
+		FROM opmessage m, operations o,users u
 		WHERE m.operationid = o.operationid
+			AND u.userid=o.objectid
 			AND o.object IN (0)	-- OPERATION_OBJECT_USER
-			AND o.objectid IN (SELECT userid FROM users)
 /
 
 DROP SEQUENCE opmessage_usr_seq
@@ -193,8 +192,8 @@ BEGIN
 			SET v_cur_string = STRIP(v_cur_string, TRAILING, X'0D');
 
 			IF LENGTH(v_cur_string) > 0 THEN
- 				INSERT INTO tmp_opcommand (operationid, longdata)
- 					VALUES (v_operationid, v_cur_string);
+				INSERT INTO tmp_opcommand (operationid, longdata)
+					VALUES (v_operationid, v_cur_string);
 			END IF;
 
 			IF r_pos = 0 THEN
@@ -351,10 +350,10 @@ CREATE SEQUENCE opgroup_seq AS bigint
 /
 
 INSERT INTO opgroup (opgroupid, operationid, groupid)
-	SELECT NEXTVAL FOR opgroup_seq, operationid, objectid
-		FROM operations
-		WHERE operationtype IN (4,5)	-- OPERATION_TYPE_GROUP_ADD, OPERATION_TYPE_GROUP_REMOVE
-
+	SELECT NEXTVAL FOR opgroup_seq, o.operationid, o.objectid
+		FROM operations o,groups g
+		WHERE o.operationtype IN (4,5)	-- OPERATION_TYPE_GROUP_ADD, OPERATION_TYPE_GROUP_REMOVE
+			AND g.groupid=o.objectid
 /
 
 DROP SEQUENCE opgroup_seq
@@ -385,10 +384,10 @@ CREATE SEQUENCE optemplate_seq AS bigint
 /
 
 INSERT INTO optemplate (optemplateid, operationid, templateid)
-	SELECT NEXTVAL FOR optemplate_seq, operationid, objectid
-		FROM operations
-		WHERE operationtype IN (6,7)	-- OPERATION_TYPE_TEMPLATE_ADD, OPERATION_TYPE_TEMPLATE_REMOVE
-
+	SELECT NEXTVAL FOR optemplate_seq, o.operationid, o.objectid
+		FROM operations o, hosts h
+		WHERE o.operationtype IN (6,7)	-- OPERATION_TYPE_TEMPLATE_ADD, OPERATION_TYPE_TEMPLATE_REMOVE
+			AND h.hostid=o.objectid
 /
 
 DROP SEQUENCE optemplate_seq
