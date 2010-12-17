@@ -241,6 +241,7 @@ frontends/php/styles/originalblue/images/ui-icons_d8e7f3_256x240.png -text
 frontends/php/styles/originalblue/images/ui-icons_f9bd01_256x240.png -text
 frontends/php/tests/bootstrap.php.template -text
 frontends/php/tests/selenium/SeleniumTests.php -text
+frontends/php/tests/selenium/testClicks.php -text
 frontends/php/tests/selenium/testGeneric.php -text
 m4/ax_lib_ibm_db2.m4 -text
 m4/ax_lib_oracle_oci.m4 -text
