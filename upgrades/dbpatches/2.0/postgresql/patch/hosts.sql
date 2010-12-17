@@ -77,7 +77,7 @@ ALTER TABLE items DROP COLUMN snmp_port;
 UPDATE items
 	SET interfaceid=(SELECT interfaceid FROM interface WHERE hostid=items.hostid AND main=1 AND type=1)
 	WHERE EXISTS (SELECT hostid FROM hosts WHERE hosts.hostid=items.hostid AND hosts.status IN (0,1))
-		AND type IN (0, 3, 10, 11, 13, 14);     -- Agent, Simple, External, Database, SSH, TELNET
+		AND type IN (0,3,10,11,13,14);	-- ZABBIX, SIMPLE, EXTERNAL, DB_MONITOR, SSH, TELNET
 
 -- host interface for SNMP and non templated items
 UPDATE items
