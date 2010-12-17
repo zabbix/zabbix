@@ -159,7 +159,6 @@
 		}
 	return $status;
 	}
-	# Update Item definition for selected group
 
 	function update_item_in_group($groupid,$itemid,$item){
 /*		$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,$valuemapid,$delay_flex,$params,$ipmi_sensor,$applications)
@@ -172,9 +171,23 @@
 		$result=DBSelect($sql);
 		while($row=DBfetch($result)){
 			$item['hostid'] = $row['hostid'];
-			update_item($row['itemid'],$item);
+			CItem::update($row['itemid'],$item);
 		}
 	return true;
+	}
+
+	function getInterfaceTypeByItem($item){
+		if(!isset($item['type'])) return null;
+
+		switch($item['type']){
+			case ITEM_TYPE_SNMPV1: $type = INTERFACE_TYPE_SNMP; break;
+			case ITEM_TYPE_SNMPV2C: $type = INTERFACE_TYPE_SNMP; break;
+			case ITEM_TYPE_SNMPV3: $type = INTERFACE_TYPE_SNMP; break;
+			case ITEM_TYPE_IPMI: $type = INTERFACE_TYPE_IPMI; break;
+			case ITEM_TYPE_ZABBIX:
+			default: $type = INTERFACE_TYPE_AGENT;
+		}
+	return $type;
 	}
 
 // Delete Item definition from selected group
@@ -199,7 +212,7 @@
 			$del_items[$row['itemid']] = $row['itemid'];
 		}
 		if(!empty($del_items)){
-			delete_item($del_items);
+			CItem::delete($del_items);
 		}
 	return 1;
 	}
@@ -213,248 +226,11 @@
 		$result=DBSelect($sql);
 		while($row=DBfetch($result)){
 			$item['hostid'] = $row['hostid'];
-			add_item($item);
+			CItem::create($item);
 		}
 	return true;
 	}
 
-	/******************************************************************************
-	 *                                                                            *
-	 * Comments: !!! Don't forget sync code with C !!!                            *
-	 *                                                                            *
-	 ******************************************************************************/
-	function add_item($item){
-/*
-		$item = array('description','key','hostid','delay','history','status','type',
-		'snmp_community','snmp_oid','value_type','trapper_hosts','snmp_port','units','multiplier','delta',
-		'snmpv3_securityname','snmpv3_securitylevel','snmpv3_authpassphrase','snmpv3_privpassphrase',
-		'formula','trends','logtimefmt','valuemapid','delay_flex','params','ipmi_sensor','applications','templateid');
-//*/
-
-		$item_db_fields = array(
-				'description'		=> null,
-				'key_'			=> null,
-				'hostid'		=> null,
-				'delay'			=> 60,
-				'history'		=> 7,
-				'status'		=> ITEM_STATUS_ACTIVE,
-				'type'			=> ITEM_TYPE_ZABBIX,
-				'snmp_community'	=> '',
-				'snmp_oid'		=> '',
-				'value_type'		=> ITEM_VALUE_TYPE_STR,
-				'data_type'		=> ITEM_DATA_TYPE_DECIMAL,
-				'trapper_hosts'		=> 'localhost',
-				'snmp_port'		=> 161,
-				'units'			=> '',
-				'multiplier'		=> 0,
-				'delta'			=> 0,
-				'snmpv3_securityname'	=> '',
-				'snmpv3_securitylevel'	=> 0,
-				'snmpv3_authpassphrase'	=> '',
-				'snmpv3_privpassphrase'	=> '',
-				'formula'		=> 0,
-				'trends'		=> 365,
-				'logtimefmt'		=> '',
-				'valuemapid'		=> 0,
-				'delay_flex'		=> '',
-				'authtype'		=> 0,
-				'username'		=> '',
-				'password'		=> '',
-				'publickey'		=> '',
-				'privatekey'		=> '',
-				'params'		=> '',
-				'ipmi_sensor'		=> '',
-				'applications'		=> array(),
-				'templateid'		=> 0,
-				'flags' => 0,
-				'filter' => '',
-		);
-
-		if(!check_db_fields($item_db_fields, $item)){
-			error(S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION.SPACE.'[add_item]');
-			return false;
-		}
-
-		$host = get_host_by_hostid($item['hostid']);
-		if(!$host){
-			return false;
-		}
-
-		if(($i = array_search(0,$item['applications'])) !== FALSE)
-			unset($item['applications'][$i]);
-
-		if(!preg_match('/^'.ZBX_PREG_ITEM_KEY_FORMAT.'$/u', $item['key_']) ){
-			error(S_INCORRECT_KEY_FORMAT.SPACE."'key_name[param1,param2,...]'");
-			return false;
-		}
-
-		if(($item['type'] == ITEM_TYPE_DB_MONITOR && $item['key_'] == 'db.odbc.select[<unique short description>]') ||
-		   ($item['type'] == ITEM_TYPE_SSH && $item['key_'] == 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]') ||
-		   ($item['type'] == ITEM_TYPE_TELNET && $item['key_'] == 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]')) {
-		   	error(S_ITEMS_CHECK_KEY_DEFAULT_EXAMPLE_PASSED);
-		   	return false;
-		}
-
-		$res = calculate_item_nextcheck(0, $item['type'], $item['delay'], $item['delay_flex'], time());
-		if ($res['delay'] == SEC_PER_YEAR && $item['type'] != ITEM_TYPE_ZABBIX_ACTIVE && $item['type'] != ITEM_TYPE_TRAPPER){
-			error(S_ITEM_WILL_NOT_BE_REFRESHED_PLEASE_ENTER_A_CORRECT_UPDATE_INTERVAL);
-			return FALSE;
-		}
-
-		if(($item['snmp_port']<1 || $item['snmp_port']>65535) && in_array($item['type'],array(ITEM_TYPE_SNMPV1,ITEM_TYPE_SNMPV2C,ITEM_TYPE_SNMPV3))){
-			error(S_INVALID_SNMP_PORT);
-			return FALSE;
-		}
-
-		if(preg_match('/^(log|logrt|eventlog)\[/', $item['key_']) && ($item['value_type'] != ITEM_VALUE_TYPE_LOG)){
-			error(S_TYPE_INFORMATION_BUST_LOG_FOR_LOG_KEY);
-			return FALSE;
-		}
-
-		if($item['value_type'] == ITEM_VALUE_TYPE_STR){
-			$item['delta']=0;
-		}
-
-		if ($item['value_type'] != ITEM_VALUE_TYPE_UINT64) {
-			$item['data_type'] = 0;
-		}
-
-		if(($item['type'] == ITEM_TYPE_AGGREGATE) && ($item['value_type'] != ITEM_VALUE_TYPE_FLOAT)){
-			error(S_VALUE_TYPE_MUST_FLOAT_FOR_AGGREGATE_ITEMS);
-			return FALSE;
-		}
-
-		if($item['type'] == ITEM_TYPE_AGGREGATE){
-			/* grpfunc['group','key','itemfunc','numeric param'] */
-			if(preg_match('/^((.)*)(\[\"((.)*)\"\,\"((.)*)\"\,\"((.)*)\"\,\"([0-9]+)\"\])$/i', $item['key_'], $arr)){
-				$g=$arr[1];
-				if(!str_in_array($g,array("grpmax","grpmin","grpsum","grpavg"))){
-					error(S_GROUP_FUNCTION.SPACE."[$g]".SPACE.S_IS_NOT_ONE_OF.SPACE."[grpmax, grpmin, grpsum, grpavg]");
-					return FALSE;
-				}
-				// Group
-				$g=$arr[4];
-				// Key
-				$g=$arr[6];
-				// Item function
-				$g=$arr[8];
-				if(!str_in_array($g,array('last', 'min', 'max', 'avg', 'sum','count'))){
-					error(S_ITEM_FUNCTION.SPACE.'['.$g.']'.SPACE.S_IS_NOT_ONE_OF.SPACE.'[last, min, max, avg, sum, count]');
-					return FALSE;
-				}
-				// Parameter
-				$g=$arr[10];
-			}
-			else{
-				error(S_KEY_DOES_NOT_MATCH.SPACE.'grpfunc["group","key","itemfunc","numeric param"]');
-				return FALSE;
-			}
-		}
-
-		$sql = 'SELECT itemid, hostid, templateid '.
-				' FROM items '.
-				' WHERE hostid='.$item['hostid'].
-					' AND key_='.zbx_dbstr($item['key_']);
-		$db_item = DBfetch(DBselect($sql));
-		if($db_item && (($item['templateid'] == 0) || (($db_item['templateid'] != 0) && ($item['templateid'] != 0) && ($item['templateid'] != $db_item['templateid'])))){
-			error(S_AN_ITEM_WITH_THE_KEY.SPACE.'['.$item['key_'].']'.SPACE.S_ALREADY_EXISTS_FOR_HOST_SMALL.SPACE.'['.$host['host'].'].'.SPACE.S_THE_KEY_MUST_BE_UNIQUE);
-			return FALSE;
-		}
-		else if ($db_item && $item['templateid'] != 0){
-			$item['hostid'] = $db_item['hostid'];
-			$item['applications'] = get_same_applications_for_host($item['applications'], $db_item['hostid']);
-
-			$result = update_item($db_item['itemid'], $item);
-
-			return $result;
-		}
-
-		//validating item key
-		list($item_key_is_valid, $check_result) = check_item_key($item['key_']);
-		if(!$item_key_is_valid){
-			error(S_ERROR_IN_ITEM_KEY.SPACE.$check_result);
-			return false;
-		}
-
-		// first add mother item
-		$itemid=get_dbid('items','itemid');
-		$result=DBexecute('INSERT INTO items '.
-				' (itemid,description,key_,hostid,delay,history,status,type,'.
-					'snmp_community,snmp_oid,value_type,data_type,trapper_hosts,'.
-					'snmp_port,units,multiplier,'.
-					'delta,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,'.
-					'snmpv3_privpassphrase,formula,trends,logtimefmt,valuemapid,'.
-					'delay_flex,params,ipmi_sensor,templateid,authtype,username,password,publickey,privatekey, flags, filter)'.
-			' VALUES ('.$itemid.','.zbx_dbstr($item['description']).','.zbx_dbstr($item['key_']).','.(!$item['hostid']? '0':$item['hostid']).','.
-						(!$item['delay']? '0':$item['delay']).','.(!$item['history']? '0':$item['history']).','.(!$item['status']? '0':$item['status']).','.(!$item['type']? '0':$item['type']).','.
-						zbx_dbstr($item['snmp_community']).','.zbx_dbstr($item['snmp_oid']).','.(!$item['value_type']? '0':$item['value_type']).','.(!$item['data_type']? '0':$item['data_type']).','.
-						zbx_dbstr($item['trapper_hosts']).','.$item['snmp_port'].','.zbx_dbstr($item['units']).','.(!$item['multiplier'] ? '0':$item['multiplier']).','.
-						intval($item['delta']).','.zbx_dbstr($item['snmpv3_securityname']).','.intval($item['snmpv3_securitylevel']).','.
-						zbx_dbstr($item['snmpv3_authpassphrase']).','.zbx_dbstr($item['snmpv3_privpassphrase']).','.
-						zbx_dbstr($item['formula']).','.(!$item['trends'] ? '0':$item['trends']).','.zbx_dbstr($item['logtimefmt']).','.(!$item['valuemapid'] ? 'NULL':$item['valuemapid']).','.
-						zbx_dbstr($item['delay_flex']).','.zbx_dbstr($item['params']).','.
-						zbx_dbstr($item['ipmi_sensor']).','.zero2null($item['templateid']).','.intval($item['authtype']).','.
-						zbx_dbstr($item['username']).','.zbx_dbstr($item['password']).','.
-						zbx_dbstr($item['publickey']).','.zbx_dbstr($item['privatekey']).','.$item['flags'].','.zbx_dbstr($item['filter']).')'
-			);
-
-		if(isset($item['parent_itemid'])){
-			try{
-				$val = array(array(
-					'itemid' => $itemid,
-					'parent_itemid' => $item['parent_itemid'],
-				));
-				DB::insert('item_discovery', $val);
-			}
-			catch(APIException $e){
-				$result = false;
-			}
-		}
-
-		if ($result)
-			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_ITEM, $itemid, $host['host'].':'.$item['description'], NULL, NULL, NULL);
-		else
-			return $result;
-
-		foreach($item['applications'] as $key => $appid){
-			$itemappid=get_dbid('items_applications','itemappid');
-			DBexecute('INSERT INTO items_applications (itemappid,itemid,applicationid) VALUES('.$itemappid.','.$itemid.','.$appid.')');
-		}
-
-		info(S_ADDED_NEW_ITEM.SPACE.$host['host'].':'.$item['key_']);
-
-// add items to child hosts
-
-		$db_hosts = get_hosts_by_templateid($host['hostid']);
-		while($db_host = DBfetch($db_hosts)){
-// recursion
-			$item['hostid'] = $db_host['hostid'];
-			$item['applications'] = get_same_applications_for_host($item['applications'], $db_host['hostid']);
-			$item['templateid'] = $itemid;
-
-			if(isset($item['parent_itemid'])){
-				$sql = 'SELECT parent_itemid FROM item_discovery WHERE itemid='.$itemid;
-				$current_parentid = DBfetch(DBselect($sql));
-				$sql = 'SELECT itemid FROM items WHERE templateid='.
-						$current_parentid['parent_itemid'].' AND hostid='.$item['hostid'];
-				$new_parentid = DBfetch(DBselect($sql));
-
-				$item['parent_itemid'] = $new_parentid['itemid'];
-			}
-
-			$result = add_item($item);
-			if(!$result) break;
-		}
-
-		if($result)
-			return $itemid;
-
-		if($item['templateid'] == 0){
-			delete_item($itemid);
-		}
-
-	return $result;
-	}
 
 // Update Item status
 
@@ -499,317 +275,93 @@
 	return $result;
 	}
 
-	/******************************************************************************
-	 *                                                                            *
-	 * Comments: !!! Don't forget sync code with C !!!                            *
-	 *                                                                            *
-	 ******************************************************************************/
-	function update_item($itemid,$item){
-/*
-		$item = array('description','key','hostid','delay','history','status','type',
-		'snmp_community','snmp_oid','value_type','trapper_hosts','snmp_port','units','multiplier','delta',
-		'snmpv3_securityname','snmpv3_securitylevel','snmpv3_authpassphrase','snmpv3_privpassphrase',
-		'formula','trends','logtimefmt','valuemapid','delay_flex','params','ipmi_sensor','applications','templateid');
-*/
-		$upd_app = ((isset($item['applications'])) && !is_null($item['applications']));
-		$item_in_params = $item;
+	function copy_item_to_host($itemid, $hostid){
+		$db_tmp_item = get_item_by_itemid_limited($itemid);
+		$applications = get_same_applications_for_host(get_applications_by_itemid($db_tmp_item['itemid']),$hostid);
 
-		$item_data = get_item_by_itemid_limited($itemid);
-		$item_data['applications'] = get_applications_by_itemid($itemid);
+		$hosts = CHost::get(array(
+			'output' => array('hostid', 'host', 'status'),
+			'selectInterfaces' => API_OUTPUT_EXTEND,
+			'hostids' => $hostid,
+			'preservekeys' => 1,
+			'nopermissions' => 1,
+			'templated_hosts' => 1
+		));
+		if(empty($hosts)) return false;
+		$host = reset($hosts);
 
-		if(!check_db_fields($item_data, $item)){
-			error(S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION.SPACE.'[update_item]');
-			return false;
-		}
-
-		$host = get_host_by_hostid($item['hostid']);
-
-		if(($i = array_search(0,$item['applications'])) !== FALSE) unset($item['applications'][$i]);
-
-		if( !preg_match('/^'.ZBX_PREG_ITEM_KEY_FORMAT.'$/u', $item['key_']) ){
-			error(S_INCORRECT_KEY_FORMAT.SPACE."'key_name[param1,param2,...]'");
-			return false;
-		}
-
-		if(($item['type'] == ITEM_TYPE_DB_MONITOR && $item['key_'] == 'db.odbc.select[<unique short description>]') ||
-		   ($item['type'] == ITEM_TYPE_SSH && $item['key_'] == 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]') ||
-		   ($item['type'] == ITEM_TYPE_TELNET && $item['key_'] == 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]')) {
-		   	error(S_ITEMS_CHECK_KEY_DEFAULT_EXAMPLE_PASSED);
-			return false;
-		}
-
-		$res = calculate_item_nextcheck(0, $item['type'], $item['delay'], $item['delay_flex'], time());
-		if ($res['delay'] == SEC_PER_YEAR && $item['type'] != ITEM_TYPE_ZABBIX_ACTIVE && $item['type'] != ITEM_TYPE_TRAPPER){
-			error(S_ITEM_WILL_NOT_BE_REFRESHED_PLEASE_ENTER_A_CORRECT_UPDATE_INTERVAL);
-			return FALSE;
-		}
-
-		if(($item['snmp_port'] < 1 || $item['snmp_port'] > 65535) && in_array($item['type'], array(ITEM_TYPE_SNMPV1,ITEM_TYPE_SNMPV2C,ITEM_TYPE_SNMPV3))){
-			error(S_INVALID_SNMP_PORT);
-			return FALSE;
-		}
-
-		if($item['value_type'] == ITEM_VALUE_TYPE_STR){
-			$item['delta']=0;
-		}
-
-		if(preg_match('/^(log|logrt|eventlog)\[/', $item['key_']) && ($item['value_type'] != ITEM_VALUE_TYPE_LOG)){
-			error(S_TYPE_INFORMATION_BUST_LOG_FOR_LOG_KEY);
-			return FALSE;
-		}
-
-		if($item['value_type'] != ITEM_VALUE_TYPE_UINT64) {
-			$item['data_type'] = 0;
-		}
-
-		$sql = 'SELECT itemid, hostid, templateid '.
-				' FROM items '.
-				' WHERE hostid='.$item['hostid'].
-					' AND itemid<>'.$itemid.
-					' AND key_='.zbx_dbstr($item['key_']);
-		$db_item = DBfetch(DBselect($sql));
-		if($db_item && (($db_item['templateid'] != 0) || ($item['templateid'] == 0))){
-			error(S_AN_ITEM_WITH_THE_KEY.SPACE.'['.$item['key_'].']'.SPACE.S_ALREADY_EXISTS_FOR_HOST_SMALL.SPACE.'['.$host['host'].'].'.SPACE.S_THE_KEY_MUST_BE_UNIQUE);
-			return FALSE;
-		}
-// first update child items
-		$db_tmp_items = DBselect('SELECT itemid, hostid FROM items WHERE templateid='.$itemid);
-		while($db_tmp_item = DBfetch($db_tmp_items)){
-			$child_item_params = $item_in_params;
-
-			$child_item_params['hostid'] = $db_tmp_item['hostid'];
-			$child_item_params['templateid'] = $itemid;
-
-			if($upd_app){
-				$child_item_params['applications'] = get_same_applications_for_host($item['applications'], $db_tmp_item['hostid']);
-			}
-			else{
-				$child_item_params['applications'] = null;
+		unset($db_tmp_item['interfaceid']);
+		if($host['status'] != HOST_STATUS_TEMPLATE){
+			$type = getInterfaceTypeByItem($db_tmp_item);
+			foreach($host['interfaces'] as $hinum => $interface){
+				if(($interface['type'] == $type) && ($interface['main'] == 1)){
+					$db_tmp_item['interfaceid'] = $interface['interfaceid'];
+				}
 			}
 
-			if(!check_db_fields($db_tmp_item, $child_item_params)){
-				error(S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION.SPACE.'[update_item]');
+			if(!isset($db_tmp_item['interfaceid'])){
+				error('Cannot find needed host interface on ['.$host['host'].']');
 				return false;
 			}
-
-			$result = update_item($db_tmp_item['itemid'], $child_item_params);		// recursion!!!
-
-			if(!$result)
-				return $result;
 		}
-
-		if($db_item && $item['templateid'] != 0){
-			$result = delete_item($db_item['itemid']);
-			if(!$result) {
-				error(S_CANNOT_UPDATE_ITEM.SPACE."'".$host["host"].':'.$item['key_']."'");
-				return FALSE;
-			}
-		}
-
-		//validating item key
-		list($item_key_is_valid, $check_result) = check_item_key($item['key_']);
-		if(!$item_key_is_valid){
-			error(S_ERROR_IN_ITEM_KEY.SPACE.$check_result);
-			return false;
-		}
-
-		$item_old = get_item_by_itemid($itemid);
-		DBexecute('UPDATE items SET lastlogsize=0, mtime=0 WHERE itemid='.$itemid.' AND key_<>'.zbx_dbstr($item['key_']));
-
-
-		if($upd_app){
-			$result = DBexecute('DELETE FROM items_applications WHERE itemid='.$itemid);
-			foreach($item['applications'] as $appid){
-				$itemappid=get_dbid('items_applications','itemappid');
-				DBexecute('INSERT INTO items_applications (itemappid,itemid,applicationid) VALUES ('.$itemappid.','.$itemid.','.$appid.')');
-			}
-		}
-
-		if($item['status'] == ITEM_STATUS_ACTIVE)
-			DBexecute("UPDATE items SET error='' WHERE itemid=".$itemid.' and status<>'.$item['status']);
-
-		$result=DBexecute(
-			'UPDATE items '.
-			' SET description='.zbx_dbstr($item['description']).','.
-				'key_='.zbx_dbstr($item['key_']).','.
-				'hostid='.$item['hostid'].','.
-				'delay='.$item['delay'].','.
-				'history='.$item['history'].','.
-				'type='.$item['type'].','.
-				'snmp_community='.zbx_dbstr($item['snmp_community']).','.
-				'snmp_oid='.zbx_dbstr($item['snmp_oid']).','.
-				'value_type='.$item['value_type'].','.
-				'data_type='.$item['data_type'].','.
-				'trapper_hosts='.zbx_dbstr($item['trapper_hosts']).','.
-				'snmp_port='.$item['snmp_port'].','.
-				'units='.zbx_dbstr($item['units']).','.
-				'multiplier='.$item['multiplier'].','.
-				'delta='.$item['delta'].','.
-				'snmpv3_securityname='.zbx_dbstr($item['snmpv3_securityname']).','.
-				'snmpv3_securitylevel='.$item['snmpv3_securitylevel'].','.
-				'snmpv3_authpassphrase='.zbx_dbstr($item['snmpv3_authpassphrase']).','.
-				'snmpv3_privpassphrase='.zbx_dbstr($item['snmpv3_privpassphrase']).','.
-				'formula='.zbx_dbstr($item['formula']).','.
-				'trends='.$item['trends'].','.
-				'logtimefmt='.zbx_dbstr($item['logtimefmt']).','.
-				'valuemapid='.zero2null($item['valuemapid']).','.
-				'delay_flex='.zbx_dbstr($item['delay_flex']).','.
-				'params='.zbx_dbstr($item['params']).','.
-				'ipmi_sensor='.zbx_dbstr($item['ipmi_sensor']).','.
-				'templateid='.zero2null($item['templateid']).','.
-				'authtype='.$item['authtype'].','.
-				'username='.zbx_dbstr($item['username']).','.
-				'password='.zbx_dbstr($item['password']).','.
-				'publickey='.zbx_dbstr($item['publickey']).','.
-				'privatekey='.zbx_dbstr($item['privatekey']).','.
-				'filter='.zbx_dbstr($item['filter']).
-			' WHERE itemid='.$itemid);
-
-		if ($result){
-			$item_new = get_item_by_itemid($itemid);
-			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, $itemid, $host['host'].':'.$item_old['description'], 'items', $item_old, $item_new);
-		}
-
-		update_item_status($itemid, $item['status']);
-
-		if($result){
-			info(S_ITEM.SPACE."'".$host['host'].':'.$item['key_']."'".SPACE.S_UPDATED_SMALL);
-		}
-
-	return $result;
-	}
-
-/*
- * Function: smart_update_item
- *
- * Description:
- *     Update specified fields of item
- *
- * Author:
- *     Aly
- *
- * Comments:
- *
- */
-	function smart_update_item($itemid, $item=array()){
-		$item_data = get_item_by_itemid_limited($itemid);
-
-		$restore_rules= array(
-					'description'		=> array(),
-					'key_'			=> array(),
-					'hostid'		=> array(),
-					'delay'			=> array('template' => 1),
-					'history'		=> array('template' => 1 , 'httptest' => 1),
-					'status'		=> array('template' => 1 , 'httptest' => 1),
-					'type'			=> array(),
-					'snmp_community'	=> array('template' => 1),
-					'snmp_oid'		=> array(),
-					'snmp_port'		=> array('template' => 1),
-					'snmpv3_securityname'	=> array('template' => 1),
-					'snmpv3_securitylevel'	=> array('template' => 1),
-					'snmpv3_authpassphrase'	=> array('template' => 1),
-					'snmpv3_privpassphrase'	=> array('template' => 1),
-					'value_type'		=> array(),
-					'data_type'		=> array(),
-					'trapper_hosts'		=> array('template' =>1 ),
-					'units'			=> array(),
-					'multiplier'		=> array(),
-					'delta'			=> array('template' => 1 , 'httptest' => 1),
-					'formula'		=> array(),
-					'trends'		=> array('template' => 1 , 'httptest' => 1),
-					'logtimefmt'		=> array(),
-					'valuemapid'		=> array('httptest' => 1),
-					'authtype'		=> array('template' => 1),
-					'username'		=> array('template' => 1),
-					'password'		=> array('template' => 1),
-					'publickey'		=> array('template' => 1),
-					'privatekey'		=> array('template' => 1),
-					'params'		=> array('template' => 1),
-					'delay_flex'		=> array('template' => 1),
-					'filter'		=> array('template' => 1),
-					'ipmi_sensor'		=> array());
-
-		foreach($restore_rules as $var_name => $info){
-/*			if(($item_data['type'] == ITEM_TYPE_HTTPTEST) && !isset($info['httptest'])){
-				$item[$var_name] = $item_data[$var_name];
-			}*/
-
-			if(!isset($info['template']) && (0 != $item_data['templateid'])){
-				$item[$var_name] = $item_data[$var_name];
-			}
-
-			if(!array_key_exists($var_name,$item)){
-				$item[$var_name] = $item_data[$var_name];
-			}
-		}
-
-/*		if($item_data['type'] == ITEM_TYPE_HTTPTEST)
-			$item['applications'] = get_applications_by_itemid($itemid);*/
-
-	return update_item($itemid,$item);
-	}
-
-	/*
-	 * Function: delete_template_items
-	 *
-	 * Description:
-	 *     Delete items from host by templateid
-	 *
-	 * Author:
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments: !!! Don't forget sync code with C !!!
-	 *
-	 */
-	function delete_template_items($hostid, $templateids = null, $unlink_mode = false){
-		zbx_value2array($templateids);
-
-		$db_items = get_items_by_hostid($hostid);
-		while($db_item = DBfetch($db_items)){
-			if($db_item["templateid"] == 0)
-				continue;
-
-			if( !is_null($templateids)){
-				$db_tmp_item = get_item_by_itemid($db_item["templateid"]);
-
-				if(!uint_in_array($db_tmp_item["hostid"], $templateids)) continue;
-			}
-
-			if($unlink_mode){
-				if(DBexecute('UPDATE items SET templateid=NULL WHERE itemid='.$db_item["itemid"])){
-					info("Item '".$db_item["key_"]."' unlinked");
-				}
-			}
-			else{
-				if(!in_array($db_item['flags'], array(ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_CHILD))){
-					DBexecute('UPDATE items SET templateid=NULL WHERE itemid='.$db_item["itemid"]);
-					CItem::delete($db_item["itemid"]);
-				}
-			}
-		}
-	}
-
-	/*
-	 * Function: copy_item_to_host
-	 *
-	 * Description:
-	 *     Copy specified item to the host
-	 *
-	 * Author:
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments:
-	 *
-	 */
-	function copy_item_to_host($itemid, $hostid, $copy_mode = false){
-		$db_tmp_item = get_item_by_itemid_limited($itemid);
 
 		$db_tmp_item['hostid'] = $hostid;
-		$db_tmp_item['applications'] = get_same_applications_for_host(get_applications_by_itemid($db_tmp_item['itemid']),$hostid);
-		$db_tmp_item['templateid'] = $copy_mode?0:$db_tmp_item['itemid'];
+		$db_tmp_item['applications'] = $applications;
+		$db_tmp_item['templateid'] = 0;
 
-		$result = add_item($db_tmp_item);
-	return $result;
+		$result = CItem::create($db_tmp_item);
+
+		return $result;
+	}
+
+	function copyItems($srcid, $destid){
+		$result = true;
+
+		$options = array(
+			'hostids' => $srcid,
+			'output' => API_OUTPUT_EXTEND,
+			'inherited' => false,
+			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
+			'select_applications' => API_OUTPUT_REFER,
+		);
+		$srcItems = CItem::get($options);
+
+		foreach($srcItems as $item){
+
+			$hosts = CHost::get(array(
+				'output' => array('hostid', 'host', 'status'),
+				'selectInterfaces' => API_OUTPUT_EXTEND,
+				'hostids' => $destid,
+				'preservekeys' => 1,
+				'nopermissions' => 1,
+				'templated_hosts' => 1
+			));
+			$host = reset($hosts);
+
+			unset($item['interfaceid']);
+			if($host['status'] != HOST_STATUS_TEMPLATE){
+				$type = getInterfaceTypeByItem($item);
+				foreach($host['interfaces'] as $hinum => $interface){
+					if(($interface['type'] == $type) && ($interface['main'] == 1)){
+						$item['interfaceid'] = $interface['interfaceid'];
+					}
+				}
+
+				if(!isset($item['interfaceid'])){
+					error(_s('Item [%1$s:%2$s] cannot find interface on host [%3$s]', $item['description'], $item['key_'], $host['host']));
+					return false;
+				}
+			}
+
+			$item['hostid'] = $destid;
+			$item['applications'] = get_same_applications_for_host(zbx_objectValues($item['applications'], 'applicationid'), $destid);
+			$item['templateid'] = 0;
+
+			$result = CItem::create($item);
+			if(!$result) break;
+		}
+
+		return $result;
 	}
 
 	function copy_applications($srcid, $destid){
@@ -828,101 +380,6 @@
 		return CApplication::create($apps_to_clone);
 	}
 
-	function copy_items($srcid, $destid){
-
-	}
-
-	/*
-	 * Function: copy_template_items
-	 *
-	 * Description:
-	 *     Copy items from template to the host
-	 *
-	 * Author:
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments: !!! Don't forget sync code with C !!!
-	 *
-	 */
-	function copy_template_items($hostid, $templateid = null, $copy_mode = false){
-		if($templateid == null){
-			$templateid = array_keys(get_templates_by_hostid($hostid));
-		}
-
-		if(is_array($templateid)){
-			foreach($templateid as $id)
-				copy_template_items($hostid, $id, $copy_mode); // attention recursion
-			return;
-		}
-
-		$db_tmp_items = get_items_by_hostid($templateid);
-
-		$item_proto_map = $prototypeids = $disc_rule_map = array();
-		while($db_tmp_item = DBfetch($db_tmp_items)){
-
-			$db_tmp_item['hostid'] = $hostid;
-			$db_tmp_item['applications'] = get_same_applications_for_host(get_applications_by_itemid($db_tmp_item['itemid']),$hostid);
-			$db_tmp_item['templateid'] = $copy_mode?0:$db_tmp_item['itemid'];
-
-			add_item($db_tmp_item);
-
-			if($db_tmp_item['flags'] == ZBX_FLAG_DISCOVERY_CHILD){
-				$prototypeids[$db_tmp_item['itemid']] = $db_tmp_item['itemid'];
-			}
-		}
-
-		if(!empty($prototypeids)){
-			$prototypes = array();
-			$sql = 'SELECT itemid, parent_itemid FROM item_discovery WHERE'.DBcondition('itemid', $prototypeids);
-			$db_res = DBselect($sql);
-			while($pro = DBfetch($db_res)){
-				$prototypes[$pro['itemid']] = $pro['parent_itemid'];
-			}
-
-
-			$item_proto_map = CItem::get(array(
-				'hostids' => $hostid,
-				'filter' => array('templateid' => array_keys($prototypes), 'flags' => null),
-				'output' => API_OUTPUT_EXTEND,
-				'preservekeys' => true,
-			));
-			$sql = 'SELECT itemid, parent_itemid FROM item_discovery WHERE'.DBcondition('itemid', array_keys($item_proto_map));
-			$db_res = DBselect($sql);
-			while($pro = DBfetch($db_res)){
-				unset($item_proto_map[$pro['itemid']]);
-			}
-			$item_proto_map = zbx_toHash($item_proto_map, 'templateid');
-
-			$disc_rule_map = CItem::get(array(
-				'hostids' => $hostid,
-				'filter' => array('templateid' => array_unique($prototypes), 'flags' => null),
-				'output' => API_OUTPUT_EXTEND,
-				'preservekeys' => true,
-			));
-			$disc_rule_map = zbx_toHash($disc_rule_map, 'templateid');
-
-
-			$insert = array();
-			foreach($item_proto_map as $old_proto => $new_proto){
-				if(!empty($new_proto['discoveryRule'])) continue;
-				$old_rule = $prototypes[$old_proto];
-				$parent_itemid = $disc_rule_map[$old_rule]['itemid'];
-
-				$insert[] = array(
-					'itemid' => $new_proto['itemid'],
-					'parent_itemid' => $parent_itemid,
-				);
-			}
-
-			try{
-				DB::insert('item_discovery', $insert);
-			}
-			catch(Exception $e){
-				return false;
-			}
-		}
-
-	}
 
 // Activate Item
 
@@ -993,8 +450,8 @@
 	}
 
 	function get_item_by_itemid_limited($itemid){
-		$sql = 'SELECT itemid,description,key_,hostid,delay,history,status,type,'.
-					'snmp_community,snmp_oid,value_type,data_type,trapper_hosts,snmp_port,units,multiplier,delta,'.
+		$sql = 'SELECT itemid,interfaceid,description,key_,hostid,delay,history,status,type,'.
+					'snmp_community,snmp_oid,value_type,data_type,trapper_hosts,port,units,multiplier,delta,'.
 					'snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,'.
 					'formula,trends,logtimefmt,valuemapid,delay_flex,params,ipmi_sensor,templateid,'.
 					'authtype,username,password,publickey,privatekey,flags, filter '.
@@ -1058,91 +515,6 @@
 				return $same_item;
 		}
 	return false;
-	}
-
-	/******************************************************************************
-	 *                                                                            *
-	 * Comments: !!! Don't forget sync code with C !!!                            *
-	 *                                                                            *
-	 ******************************************************************************/
-	function delete_item($itemids){
-		zbx_value2array($itemids);
-		if(empty($itemids)) return true;
-
-// Get items INFO before delete them!
-		$items = array();
-		$item_res = DBselect('SELECT itemid, description, key_ FROM items WHERE '.DBcondition('itemid',$itemids));
-		while($item_rows = DBfetch($item_res)){
-			$items[$item_rows['itemid']] = $item_rows;
-		}
-// --
-		$hosts = array();
-		$hosts = get_host_by_itemid($itemids);
-// first delete child items
-		$del_cld_items = array();
-		$db_items = DBselect('SELECT itemid FROM items WHERE '.DBcondition('templateid',$itemids));
-		while($db_item = DBfetch($db_items)){		// recursion !!!!
-			$del_cld_items[$db_item['itemid']] = $db_item['itemid'];
-		}
-		if(!empty($del_cld_items)){
-			$result = delete_item($del_cld_items);
-			if(!$result)	return	$result;
-		}
-//--
-// triggers
-		$result = delete_triggers_by_itemid($itemids);
-		if(!$result)	return	$result;
-//--
-
-// delete graphs
-		$del_graphs = array();
-		$sql = 'SELECT gi.graphid'.
-			' FROM graphs_items gi'.
-			' WHERE '.DBcondition('gi.itemid', $itemids).
-				' AND NOT EXISTS ('.
-					' SELECT gii.gitemid'.
-					' FROM graphs_items gii'.
-					' WHERE gii.graphid=gi.graphid'.
-						' AND '.DBcondition('gii.itemid', $itemids, true, false).
-					' )';
-		$db_graphs = DBselect($sql);
-		while($db_graph = DBfetch($db_graphs)){
-			$del_graphs[$db_graph['graphid']] = $db_graph['graphid'];
-		}
-
-		if(!empty($del_graphs)){
-			$result = delete_graph($del_graphs);
-			if(!$result)	return	$result;
-		}
-
-		DBexecute('DELETE FROM graphs_items WHERE '.DBcondition('itemid', $itemids));
-//--
-
-		$result = delete_history_by_itemid($itemids, 1 /* use housekeeper */);
-		if(!$result)	return	$result;
-
-		$temp_arr = array(SCREEN_RESOURCE_SIMPLE_GRAPH,SCREEN_RESOURCE_PLAIN_TEXT);
-
-		DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid',$itemids).' AND '.DBcondition('resourcetype', $temp_arr));
-		DBexecute('DELETE FROM items_applications WHERE '.DBcondition('itemid',$itemids));
-		DBexecute("DELETE FROM profiles WHERE idx='web.favorite.graphids' AND source='itemid' AND ".DBcondition('value_id',$itemids));
-
-		foreach ($itemids as $id) {	/* The section should be improved */
-			$item_old = get_item_by_itemid($id);
-			$result = DBexecute('DELETE FROM items WHERE itemid='.$id);
-			if ($result)
-				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM, $id, $item_old['description'], 'items', NULL, NULL);
-			else
-				break;
-		}
-
-/*		$result = DBexecute('DELETE FROM items WHERE '.DBcondition('itemid',$itemids));*/
-		if($result){
-			foreach($items as $itemid => $item){
-				info(S_ITEM.SPACE."'".$hosts[$itemid]['host'].':'.$item['key_']."'".SPACE.S_DELETED_SMALL);
-			}
-		}
-	return $result;
 	}
 
 	/*
@@ -1244,6 +616,7 @@
 
 	function get_realhost_by_itemid($itemid){
 		$item = get_item_by_itemid($itemid);
+
 		if($item['templateid'] <> 0)
 			return get_realhost_by_itemid($item['templateid']);
 

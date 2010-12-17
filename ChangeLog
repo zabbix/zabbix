@@ -1,5 +1,7 @@
 Changes for 1.9.1
 
+ - [ZBXNEXT-588] improved template, host, proxy form view, dashboard screen (Aly,Vedmak)
+ - [ZBXNEXT-587] added support of multiple host interfaces (Aly,Sasha,Vedmak,asaveljevs)
  - [ZBX-3149] allow to translate more strings in screen element 'Server info'; add support for translator comments (Richlv)
  - [ZBXNEXT-564] added new {IPADDRESS} and {HOST.PORT} macros in auto registration notifications (Sasha)
  - [ZBX-3248] fixed empty and duplicate map URL name handling (KB)

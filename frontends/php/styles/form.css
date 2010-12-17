@@ -1,73 +1,68 @@
 /* CSS Document */
 
-form {margin: 0}
+form { margin: 0 }
 
-/**************** FORM ELEMENTS ****************/
-input, select, textarea{
-	font-family: Verdana, Helvetica, Geneva;
+form .thin .input{
+	height: 14px;
+}
+
+.input{
 	font-size: 10px;
-	line-height: 14px;
+	font-family: Verdana, arial, helvetica, sans-serif;
+
+	border: 1px solid gray;
+	background-color: white;
+
+	margin: 1px 2px 0 2px;
+}
+.input:focus { border-color: black; }
+.input:hover { border-color: black; }
+
+.input[readonly]{ border-color: #D0D0D0; background-color: #EEEEEE; }
+.input[disabled]{
+	color: gray;
+	cursor: default;
 }
 
 .select{
-	border: 1px solid gray;
 	cursor: pointer;
 	margin: 1px 4px 1px 2px;
 }
-
 .selectShorten{
 	width: 200px;
 }
 
-.select:focus{
-	border-color: black;
-}
-.select:hover{
-	border-color: black;
-}
-
-.biginput, .biginput[disabled]:hover{
-	border: 1px solid gray;
-	background-color: white;
-	padding: 0 1px 0 0;
-	margin: 1px 2px 0 2px;
-	vertical-align: top;
-}
-.biginput:focus	{
-	border-color: black;
-}
-.biginput:hover	{
-	border-color: black;
-}
-
-.biginput[readonly], .biginput[readonly]:hover{
-/* NOTE: Ignored by IE */
-	border-color: #D0D0D0;
-	background-color: #EEEEEE;
-}
-
-.button, .button[disabled]:hover{
+/**************** FORM ELEMENTS ****************/
+/******************* BUTTONS *********************/
+.button{
 	background: #F0F0F0 url('../images/gradients/button.gif') repeat-x top left;
 	border: 1px solid #808080;
+
 	vertical-align: top;
 	margin: 1px 2px 0 0;
 }
-
 .button:hover{
 	text-decoration: underline;
 	border-color: black;
 	cursor: pointer;
 }
 
-.button[disabled], .button[disabled]:hover{
-	cursor: default;
+
+.link_menu{
+	border: 0;
+	background: none;
+	color: #3C3089;
+
+	text-decoration: none;
+	border-bottom: 1px dotted #3C3089;
+
+	height: 16px;
+	padding: 0;
+	margin: 0;
 }
 
-.checkbox{
-	cursor: pointer;
-}
+.link_menu:hover{ color: #6C80B9; border-bottom: 1px dotted #6C80B9;}
+.link_menu[disabled]{ color: gray; text-decoration: none; corsor: default; border: 0px; }
 
-form.thin .biginput{
-	font-size: 11px;
-	height: 14px;
-}
+/******************* CHECKBOX *********************/
+.checkbox{ cursor: pointer;}

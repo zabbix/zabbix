@@ -217,8 +217,8 @@ include_once('include/page_header.php');
 ?>
 <?php
 	$form = new CForm(null, 'get');
-	$form->addItem(new CButton('form', S_CREATE_MAP));
-	$form->addItem(new CButton('form', S_IMPORT_MAP));
+	$form->addItem(new CSubmit('form', S_CREATE_MAP));
+	$form->addItem(new CSubmit('form', S_IMPORT_MAP));
 
 	$map_wdgt = new CWidget();
 	$map_wdgt->addPageHeader(S_CONFIGURATION_OF_NETWORK_MAPS, $form);
@@ -376,7 +376,7 @@ include_once('include/page_header.php');
 
 			$table_map->addRow(S_LINKS, $url_table);
 
-			$footer = array(new CButton('save', S_SAVE));
+			$footer = array(new CSubmit('save', S_SAVE));
 			if(isset($_REQUEST['sysmapid'])){
 				$footer[] = SPACE;
 				$footer[] = new CButtonDelete(S_DELETE_SYSTEM_MAP_Q, url_param('form').url_param('sysmapid'));
@@ -441,7 +441,7 @@ include_once('include/page_header.php');
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
-		$goButton = new CButton('goButton',S_GO);
+		$goButton = new CSubmit('goButton',S_GO);
 		$goButton->setAttribute('id','goButton');
 
 		zbx_add_post_js('chkbxRange.pageGoName = "maps";');

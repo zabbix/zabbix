@@ -247,12 +247,6 @@ include_once('include/page_header.php');
 	$dashboard_wdgt->addHeader(S_DASHBOARD_BIG, array($dc_icon, $fs_icon));
 //-------------
 
-	$left_tab = new CTable();
-	$left_tab->setCellPadding(3);
-	$left_tab->setCellSpacing(3);
-
-	$left_tab->setAttribute('border',0);
-
 	$menu = array();
 	$submenu = array();
 
@@ -274,46 +268,44 @@ include_once('include/page_header.php');
 
 // --------------
 
+$left_col = array();
+
 // Favorite graphs
 	$graph_menu = get_icon('menu', array('menu' => 'graphs'));
-	$fav_grph = new CWidget('hat_favgrph',
+	$fav_grph = new CUIWidget('hat_favgrph',
 						make_favorite_graphs(),
 						CProfile::get('web.dashboard.hats.hat_favgrph.state',1)
 						);
-	$fav_grph->addHeader(S_FAVOURITE_GRAPHS,array($graph_menu));
-	$left_tab->addRow($fav_grph);
+	$fav_grph->setHeader(S_FAVOURITE_GRAPHS,array($graph_menu));
+	$fav_grph->setFooter(new CLink(S_GRAPHS.' &raquo;','charts.php','highlight'), true);
+	$left_col[] = $fav_grph;
 //----------------
 
 // favorite screens
 	$screen_menu = get_icon('menu', array('menu' => 'screens'));
-	$fav_scr = new CWidget('hat_favscr',
+	$fav_scr = new CUIWidget('hat_favscr',
 						make_favorite_screens(),
 						CProfile::get('web.dashboard.hats.hat_favscr.state',1)
 						);
-	$fav_scr->addHeader(S_FAVOURITE_SCREENS,array($screen_menu));
-	$left_tab->addRow($fav_scr);
+	$fav_scr->setHeader(S_FAVOURITE_SCREENS,array($screen_menu));
+	$fav_scr->setFooter(new CLink(S_SCREENS.' &raquo;','screens.php','highlight'), true);
+	$left_col[] = $fav_scr;
 //----------------
 
 // Favorite Sysmaps
 	$sysmap_menu = get_icon('menu', array('menu' => 'sysmaps'));
-	$fav_maps = new CWidget('hat_favmap',
+	$fav_maps = new CUIWidget('hat_favmap',
 						make_favorite_maps(),
 						CProfile::get('web.dashboard.hats.hat_favmap.state',1)
 						);
-	$fav_maps->addHeader(S_FAVOURITE_MAPS,array($sysmap_menu));
-	$left_tab->addRow($fav_maps);
+	$fav_maps->setHeader(S_FAVOURITE_MAPS,array($sysmap_menu));
+	$fav_maps->setFooter(new CLink(S_MAPS.' &raquo;','maps.php','highlight'), true);
+
+	$left_col[] = $fav_maps;
 //----------------
 
-	$left_tab->addRow(SPACE);
-
-	$right_tab = new CTable();
-	$right_tab->setCellPadding(3);
-	$right_tab->setCellSpacing(3);
-
-	$right_tab->setAttribute('border',0);
 
 // Refresh tab
-
 	$refresh_tab = array(
 		array('id' => 'hat_syssum',
 				'frequency' => CProfile::get('web.dahsboard.rf_rate.hat_syssum',120)
@@ -336,56 +328,67 @@ include_once('include/page_header.php');
 			)*/
 	);
 
+$right_col = array();
 // Status of ZBX
 	if(USER_TYPE_SUPER_ADMIN == $USER_DETAILS['type']){
 		$refresh_menu = get_icon('menu', array('menu' => 'hat_stszbx'));
-		$zbx_stat = new CWidget('hat_stszbx',
+		$zbx_stat = new CUIWidget('hat_stszbx',
 							new CSpan(S_LOADING_P,'textcolorstyles'),//make_status_of_zbx()
 							CProfile::get('web.dashboard.hats.hat_stszbx.state',1)
 							);
-		$zbx_stat->addHeader(S_STATUS_OF_ZABBIX,array($refresh_menu));
-		$right_tab->addRow($zbx_stat);
+		$zbx_stat->setHeader(S_STATUS_OF_ZABBIX,array($refresh_menu));
+		$zbx_stat->setFooter(SPACE);
+		$right_col[] = $zbx_stat;
 	}
+
 //----------------
 
 // System status
 	$refresh_menu = new CIcon(S_MENU, 'iconmenu', 'create_page_menu(event,"hat_syssum");');
-	$sys_stat = new CWidget('hat_syssum',
+	$sys_stat = new CUIWidget('hat_syssum',
 						new CSpan(S_LOADING_P,'textcolorstyles'),//make_system_summary()
 						CProfile::get('web.dashboard.hats.hat_syssum.state',1)
 						);
-	$sys_stat->addHeader(S_SYSTEM_STATUS,array($refresh_menu));
-	$right_tab->addRow($sys_stat);
+	$sys_stat->setHeader(S_SYSTEM_STATUS,array($refresh_menu));
+	$sys_stat->setFooter(SPACE);
+
+	$right_col[] = $sys_stat;
 //----------------
 
 // Host status
 	$refresh_menu = get_icon('menu', array('menu' => 'hat_hoststat'));
-	$hoststat = new CWidget('hat_hoststat',
+	$hoststat = new CUIWidget('hat_hoststat',
 						new CSpan(S_LOADING_P,'textcolorstyles'),//make_system_summary()
 						CProfile::get('web.dashboard.hats.hat_hoststat.state',1)
 						);
-	$hoststat->addHeader(S_HOST_STATUS_STATUS,array($refresh_menu));
-	$right_tab->addRow($hoststat);
+	$hoststat->setHeader(S_HOST_STATUS_STATUS,array($refresh_menu));
+	$hoststat->setFooter(SPACE);
+
+	$right_col[] = $hoststat;
 //----------------
 
 // Last Issues
 	$refresh_menu = get_icon('menu', array('menu' => 'hat_lastiss'));
-	$lastiss = new CWidget('hat_lastiss',
+	$lastiss = new CUIWidget('hat_lastiss',
 						new CSpan(S_LOADING_P,'textcolorstyles'),//make_latest_issues(),
 						CProfile::get('web.dashboard.hats.hat_lastiss.state',1)
 						);
-	$lastiss->addHeader(S_LAST_20_ISSUES,array($refresh_menu));
-	$right_tab->addRow($lastiss);
+	$lastiss->setHeader(S_LAST_20_ISSUES,array($refresh_menu));
+	$lastiss->setFooter(SPACE);
+	$right_col[] = $lastiss;
 //----------------
 
 // Web monioring
 	$refresh_menu = get_icon('menu', array('menu' => 'hat_webovr'));
-	$web_mon = new CWidget('hat_webovr',
-						new CSpan(S_LOADING_P,'textcolorstyles'),//make_webmon_overview()
+	$web_mon = new CUIWidget('hat_webovr',
+						new CSpan(S_LOADING_P,'textcolorstyles'),
+						//make_webmon_overview(),
 						CProfile::get('web.dashboard.hats.hat_webovr.state',1)
 						);
-	$web_mon->addHeader(S_WEB_MONITORING,array($refresh_menu));
-	$right_tab->addRow($web_mon);
+	$web_mon->setHeader(S_WEB_MONITORING,array($refresh_menu));
+	$web_mon->setFooter(SPACE);
+
+	$right_col[] = $web_mon;
 //----------------
 
 // Discovery Info
@@ -396,12 +399,14 @@ include_once('include/page_header.php');
 		$refresh_tab[] = array(	'id' => 'hat_dscvry','frequency'  => CProfile::get('web.dahsboard.rf_rate.hat_dscvry',60));
 
 		$refresh_menu = get_icon('menu', array('menu' => 'hat_dscvry'));
-		$web_mon = new CWidget('hat_dscvry',
+		$dcvr_mon = new CUIWidget('hat_dscvry',
 							new CSpan(S_LOADING_P,'textcolorstyles'),//make_discovery_status()
 							CProfile::get('web.dashboard.hats.hat_dscvry.state',1)
 							);
-		$web_mon->addHeader(S_DISCOVERY_STATUS,array($refresh_menu));
-		$right_tab->addRow($web_mon);
+		$dcvr_mon->setHeader(S_DISCOVERY_STATUS,array($refresh_menu));
+		$dcvr_mon->setFooter(SPACE);
+
+		$right_col[] = $dcvr_mon;
 //----------------
 	}
 
@@ -416,19 +421,17 @@ include_once('include/page_header.php');
 			CProfile::get('web.dashboard.hats.hat_custom.state',1)
 		));
 */
-	$td_l = new CCol($left_tab);
-	$td_l->setAttribute('valign','top');
 
-	$td_r = new CCol($right_tab);
-	$td_r->setAttribute('valign','top');
+	$leftDiv = new CDiv($left_col, 'column');
+	$middleDiv = new CDiv($right_col, 'column');
+	$rightDiv = new CDiv(null, 'column');
 
-	$outer_table = new CTable();
-	$outer_table->setAttribute('border',0);
-	$outer_table->setCellPadding(1);
-	$outer_table->setCellSpacing(1);
-	$outer_table->addRow(array($td_l,$td_r));
+	$ieTab = new CTable();
+	$ieTab->addRow(array($leftDiv,$middleDiv,$rightDiv), 'top');
 
-	$dashboard_wdgt->addItem($outer_table);
+	$dashboard_wdgt->addItem($ieTab);
+	//$dashboard_wdgt->addItem(array($leftDiv,$middleDiv,$rightDiv));
+
 	$dashboard_wdgt->show();
 
 	$jsmenu = new CPUMenu(null,170);
@@ -459,6 +462,7 @@ function addPopupValues(list){
 		send_params(params);
 	}
 }
+
 //]]> -->
 </script>
 <?php

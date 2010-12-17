@@ -321,7 +321,7 @@ include_once('include/page_header.php');
 		$options = array(
 			'sysmapids' => $_REQUEST['sysmapid'],
 			'editable' => 1,
-			'extendoutput' => 1,
+			'output' => API_OUTPUT_EXTEND,
 		);
 		$maps = CMap::get($options);
 
@@ -358,7 +358,7 @@ include_once('include/page_header.php');
 	$td = new CCol($elcn_tab);
 	$td->setAttribute('valign','top');
 //----
-	$save_btn = new CButton('save',S_SAVE);
+	$save_btn = new CSubmit('save',S_SAVE);
 	$save_btn->setAttribute('id','sysmap_save');
 
 	$elcn_tab = new CTable(null,'textwhite');
@@ -378,7 +378,7 @@ include_once('include/page_header.php');
 	$gridSize->addItem('75x75', '75x75');
 	$gridSize->addItem('100x100', '100x100');
 
-	$gridAlignAll = new CButton('gridalignall', S_ALIGN_ICONS);
+	$gridAlignAll = new CSubmit('gridalignall', S_ALIGN_ICONS);
 	$gridAlignAll->setAttribute('id', 'gridalignall');
 
 	$gridForm = new CDiv(array($gridSize, $gridAlignAll));

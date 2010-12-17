@@ -456,10 +456,12 @@ static int	get_values()
 	int		ids_alloc = 0, snmpids_alloc = 0, ipmiids_alloc = 0,
 			ids_num = 0, snmpids_num = 0, ipmiids_num = 0,
 			i, num, res;
-	static char	*key = NULL, *ipmi_ip = NULL, *params = NULL,
-			*username = NULL, *publickey = NULL, *privatekey = NULL,
-			*password = NULL, *snmp_community = NULL, *snmp_oid = NULL,
-			*snmpv3_securityname = NULL, *snmpv3_authpassphrase = NULL,
+	static char	*key = NULL, *addr = NULL, *port = NULL,
+			*params = NULL, *username = NULL, *publickey = NULL,
+			*privatekey = NULL, *password = NULL,
+			*snmp_community = NULL, *snmp_oid = NULL,
+			*snmpv3_securityname = NULL,
+			*snmpv3_authpassphrase = NULL,
 			*snmpv3_privpassphrase = NULL;
 	zbx_timespec_t	ts;
 
@@ -472,11 +474,45 @@ static int	get_values()
 
 	for (i = 0; i < num; i++)
 	{
+		init_result(&agent);
+
 		zbx_free(key);
 		key = strdup(items[i].key_orig);
-		substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+		substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
 				&key, MACRO_TYPE_ITEM_KEY, NULL, 0);
 		items[i].key = key;
+
+		items[i].interface.addr = items[i].interface.useip ? items[i].interface.ip_orig : items[i].interface.dns_orig;
+
+		if (INTERFACE_TYPE_AGENT != items[i].interface.type || 1 != items[i].interface.main)
+		{
+			zbx_free(addr);
+			addr = strdup(items[i].interface.addr);
+			substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
+					&addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
+			items[i].interface.addr = addr;
+		}
+
+		switch (items[i].type)
+		{
+			case ITEM_TYPE_ZABBIX:
+			case ITEM_TYPE_SNMPv1:
+			case ITEM_TYPE_SNMPv2c:
+			case ITEM_TYPE_SNMPv3:
+			case ITEM_TYPE_IPMI:
+				zbx_free(port);
+				port = strdup(items[i].interface.port_orig);
+				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL,
+						&port, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
+				if (FAIL == is_ushort(port, &items[i].interface.port))
+				{
+					SET_MSG_RESULT(&agent, zbx_dsprintf(NULL, "Invalid port number [%s]",
+								items[i].interface.port_orig));
+					res = NETWORK_ERROR;
+					goto update;
+				}
+				break;
+		}
 
 		switch (items[i].type)
 		{
@@ -489,11 +525,11 @@ static int	get_values()
 				snmpv3_authpassphrase = strdup(items[i].snmpv3_authpassphrase_orig);
 				snmpv3_privpassphrase = strdup(items[i].snmpv3_privpassphrase_orig);
 
-				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
 						&snmpv3_securityname, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
 						&snmpv3_authpassphrase, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
 						&snmpv3_privpassphrase, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 
 				items[i].snmpv3_securityname = snmpv3_securityname;
@@ -507,25 +543,18 @@ static int	get_values()
 				snmp_community = strdup(items[i].snmp_community_orig);
 				snmp_oid = strdup(items[i].snmp_oid_orig);
 
-				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
 						&snmp_community, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
 						&snmp_oid, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 
 				items[i].snmp_community = snmp_community;
 				items[i].snmp_oid = snmp_oid;
 				break;
-			case ITEM_TYPE_IPMI:
-				zbx_free(ipmi_ip);
-				ipmi_ip = strdup(items[i].host.ipmi_ip_orig);
-				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
-						&ipmi_ip, MACRO_TYPE_HOST_IPMI_IP, NULL, 0);
-				items[i].host.ipmi_ip = ipmi_ip;
-				break;
 			case ITEM_TYPE_DB_MONITOR:
 				zbx_free(params);
 				params = strdup(items[i].params_orig);
-				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
 						&params, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 				items[i].params = params;
 				break;
@@ -542,15 +571,15 @@ static int	get_values()
 				password = strdup(items[i].password_orig);
 				params = strdup(items[i].params_orig);
 
-				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
 						&username, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
 						&publickey, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
 						&privatekey, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
 						&password, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
 						&params, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 
 				items[i].username = username;
@@ -568,11 +597,11 @@ static int	get_values()
 				password = strdup(items[i].password_orig);
 				params = strdup(items[i].params_orig);
 
-				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
 						&username, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
 						&password, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
 						&params, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 
 				items[i].username = username;
@@ -617,9 +646,8 @@ static int	get_values()
 				/* nothing to do */;
 		}
 
-		init_result(&agent);
-
 		res = get_value(&items[i], &agent);
+update:
 		zbx_timespec(&ts);
 
 		switch (res)
@@ -682,7 +710,8 @@ static int	get_values()
 	}
 
 	zbx_free(key);
-	zbx_free(ipmi_ip);
+	zbx_free(addr);
+	zbx_free(port);
 	zbx_free(params);
 	zbx_free(username);
 	zbx_free(publickey);

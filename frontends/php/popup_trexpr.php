@@ -61,7 +61,7 @@
 				'M' => $metrics		/* metrcis */
 			     )
 	);
-	
+
 	$param1_sec = array(
 			array(
 				'C' => S_LAST_OF.' (T)',	/* caption */
@@ -274,30 +274,29 @@
 
 		if(!isset($functions[$function])) unset($function);
 	}
-	
-	
+
+
 	$dstfrm = get_request('dstfrm', 0);
 	$dstfld1 = get_request('dstfld1', '');
 	$itemid = get_request('itemid', 0);
 	$value = get_request('value', 0);
 	$param = get_request('param', 0);
 	$paramtype = get_request('paramtype');
-	
+
 	if(!isset($function)) $function = 'last';
 	if(!isset($functions[$function]['operators'][$operator])) $operator = '=';
 
 	$expr_type = $function.'['.$operator.']';
-	
+
 	if($itemid){
 		$options = array(
 			'output' => API_OUTPUT_EXTEND,
 			'itemids' => $itemid,
-			'filter' => array('flags' => null),
 			'webitems' => 1,
-			'select_hosts' => API_OUTPUT_EXTEND
+			'selectHosts' => API_OUTPUT_EXTEND
 		);
-		$item_data = CItem::get($options);
-		$item_data = reset($item_data);
+		$items_data = CItem::get($options);
+		$item_data = reset($items_data);
 		$item_key = $item_data['key_'];
 
 		$item_host = reset($item_data['hosts']);
@@ -312,14 +311,14 @@
 
 
 	if(is_null($paramtype) && isset($functions[$function]['params']['M'])){
-		$paramtype = is_array($functions[$function]['params']['M'])  
+		$paramtype = is_array($functions[$function]['params']['M'])
 				? reset($functions[$function]['params']['M'])
 				: $functions[$function]['params']['M'];
 	}
 	else if(is_null($paramtype)){
 		$paramtype = PARAM_TYPE_SECONDS;
 	}
-		
+
 
 	if(!is_array($param)){
 		if(isset($functions[$function]['params'])){
@@ -502,7 +501,7 @@ if(form){
 
 	$form->addRow('N', new CTextBox('value', $value, 10));
 
-	$form->addItemToBottomRow(new CButton('insert',S_INSERT));
+	$form->addItemToBottomRow(new CSubmit('insert',S_INSERT));
 	$form->show();
 
 

@@ -726,9 +726,11 @@ Copt::memoryPick();
  * @param array $users[0,...]['userids']
  * @return boolean
  */
-	public static function delete($userids){
+	public static function delete($users){
 		global $USER_DETAILS;
 
+		$users = zbx_toArray($users);
+		$userids = zbx_objectValues($users, 'userid');
 		try{
 			self::BeginTransaction(__METHOD__);
 
@@ -748,7 +750,7 @@ Copt::memoryPick();
 				}
 
 				if($del_users[$user['userid']]['alias'] == ZBX_GUEST_USER){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_CANNOT_DELETE_USER.' [ '.ZBX_GUEST_USER.' ]');
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Can not delete %1$s internal user " %2$s ", try disabling that user.', S_ZABBIX, ZBX_GUEST_USER));
 				}
 			}
 

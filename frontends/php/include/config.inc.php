@@ -31,16 +31,20 @@ function __autoload($class_name){
 		'capplication' => 1,
 		'cdcheck' => 1,
 		'cdhost' => 1,
+		'cdiscoveryrule' => 1,
 		'cdrule' => 1,
 		'cdservice' => 1,
 		'cevent' => 1,
 		'cgraph' => 1,
+		'cgraphprototype' => 1,
 		'cgraphitem' => 1,
 		'chistory' => 1,
 		'chost' => 1,
 		'chostgroup' => 1,
+		'chostinterface'=> 1,
 		'cimage' => 1,
 		'citem' => 1,
+		'citemprototype' => 1,
 		'cmaintenance' => 1,
 		'cmap' => 1,
 		'cmediatype' => 1,
@@ -50,10 +54,12 @@ function __autoload($class_name){
 		'ctemplate' => 1,
 		'ctemplatescreen' => 1,
 		'ctrigger' => 1,
+		'ctriggerprototype' => 1,
 		'cuser' => 1,
 		'cusergroup' => 1,
 		'cusermacro' => 1,
-		'czbxapi' => 1
+		'cwebcheck' => 1,
+		'czbxapi' => 1,
 	);
 
 	$rpc = array(
@@ -79,30 +85,27 @@ function __autoload($class_name){
 	require_once('include/html.inc.php');
 	require_once('include/copt.lib.php');
 	require_once('include/profiles.inc.php');
+
 	require_once('conf/maintenance.inc.php');
-
-	require_once('include/nodes.inc.php');
-	require_once('include/hosts.inc.php');
-	require_once('include/items.inc.php');
-	require_once('include/triggers.inc.php');
-	require_once('include/graphs.inc.php');
-
-	require_once('include/maps.inc.php');
+// ABC sorting
 	require_once('include/acknow.inc.php');
-	require_once('include/services.inc.php');
-	require_once('include/httptest.inc.php');
-
 	include_once('include/actions.inc.php');
-	include_once('include/discovery.inc.php');
-
-	require_once('include/sounds.inc.php');
-	require_once('include/images.inc.php');
+	include_once('include/discovery.inc.php');	
 	require_once('include/events.inc.php');
-	require_once('include/scripts.inc.php');
+	require_once('include/graphs.inc.php');
+	require_once('include/hosts.inc.php');
+	require_once('include/httptest.inc.php');
+	require_once('include/ident.inc.php');
+	require_once('include/images.inc.php');
+	require_once('include/items.inc.php');
 	require_once('include/maintenances.inc.php');
-	require_once('include/valuemap.inc.php');
-
+	require_once('include/maps.inc.php');
+	require_once('include/nodes.inc.php');
+	require_once('include/services.inc.php');
+	require_once('include/sounds.inc.php');
+	require_once('include/triggers.inc.php');
 	require_once('include/users.inc.php');
+	require_once('include/valuemap.inc.php');
 // GLOBALS
 	global $USER_DETAILS, $USER_RIGHTS, $page;
 
@@ -212,13 +215,15 @@ function __autoload($class_name){
 	if(!defined('ZBX_PAGE_NO_AUTHORIZATION') && !defined('ZBX_RPC_REQUEST')){
 		check_authorisation();
 
-		if (function_exists('bindtextdomain')){
+		if(function_exists('bindtextdomain')){
 			//initializing gettext translations depending on language selected by user
 			$locales = zbx_locale_variants($USER_DETAILS['lang']);
+
 			$locale_found = false;
 			foreach($locales as $locale){
-				putenv("LC_ALL=$locale");
-				if (setlocale(LC_ALL, $locale)){
+				putenv('LC_ALL='.$locale);
+
+				if(setlocale(LC_ALL, $locale)){
 					$locale_found = true;
 					$USER_DETAILS['locale'] = $locale;
 					break;
@@ -228,14 +233,14 @@ function __autoload($class_name){
 			if (!$locale_found && $USER_DETAILS['lang'] != 'en_GB' && $USER_DETAILS['lang'] != 'en_gb'){
 				error('Locale for language "'.$USER_DETAILS['lang'].'" is not found on the web server. Tried to set: '.implode(', ', $locales).'. Unable to translate zabbix interface.');
 			}
-			bindtextdomain("frontend", "locale");
-			bind_textdomain_codeset("frontend", 'UTF-8');
-			textdomain("frontend");
+			bindtextdomain('frontend', 'locale');
+			bind_textdomain_codeset('frontend', 'UTF-8');
+			textdomain('frontend');
 		}
 		else {
 			error('Your PHP has no gettext support. Zabbix translations are not available.');
 		}
-		// Numeric Locale to default
+// Numeric Locale to default
 		setLocale(LC_NUMERIC, array('en','en_US','en_US.UTF-8','English_United States.1252'));
 
 

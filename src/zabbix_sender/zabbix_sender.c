@@ -36,7 +36,7 @@ const char	*help_message[] = {
 	"  -c --config <file>                   Specify configuration file",
 	"",
 	"  -z --zabbix-server <server>          Hostname or IP address of Zabbix Server",
-	"  -p --port <server port>              Specify port number of server trapper running on the server. Default is 10051",
+	"  -p --port <server port>              Specify port number of server trapper running on the server. Default is " ZBX_DEFAULT_SERVER_PORT_STR,
 	"  -s --host <hostname>                 Specify host name. Host IP address and DNS name will not work",
 	"  -I --source-address <IP address>     Specify source IP address",
 	"",
@@ -65,7 +65,7 @@ const char	*help_message[] = {
 	"  -c <file>                    Specify configuration file",
 	"",
 	"  -z <server>                  Hostname or IP address of Zabbix Server",
-	"  -p <server port>             Specify port number of server trapper running on the server. Default is 10051",
+	"  -p <server port>             Specify port number of server trapper running on the server. Default is " ZBX_DEFAULT_SERVER_PORT_STR,
 	"  -s <hostname>                Specify hostname or IP address of a host",
 	"  -I <IP address>              Specify source IP address",
 	"",
@@ -416,7 +416,7 @@ int main(int argc, char **argv)
 		goto exit;
 	}
 	if (0 == ZABBIX_SERVER_PORT)
-		ZABBIX_SERVER_PORT = 10051;
+		ZABBIX_SERVER_PORT = ZBX_DEFAULT_SERVER_PORT;
 
 	if (MIN_ZABBIX_PORT > ZABBIX_SERVER_PORT)
 	{

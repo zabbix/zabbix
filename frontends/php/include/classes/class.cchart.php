@@ -687,8 +687,6 @@ class CChart extends CGraphDraw{
 	}
 
 	protected function calcZero(){
-		$left = GRAPH_YAXIS_SIDE_LEFT;
-		$right = GRAPH_YAXIS_SIDE_RIGHT;
 		$sides = array(GRAPH_YAXIS_SIDE_LEFT, GRAPH_YAXIS_SIDE_RIGHT);
 
 		foreach($sides as $num => $side){
@@ -1164,7 +1162,6 @@ class CChart extends CGraphDraw{
 		$main_interval = $this->grid['horizontal']['main']['interval'];
 		$main_intervalX = $this->grid['horizontal']['main']['intervalx'];
 		$main_offset = $this->grid['horizontal']['main']['offset'];
-		$main_offsetX = $this->grid['horizontal']['main']['offsetx'];
 
 		$sub = &$this->grid['horizontal']['sub'];
 		$interval = $sub['interval'];
@@ -2051,7 +2048,6 @@ class CChart extends CGraphDraw{
 		$this->fullSizeY = $this->sizeY+$this->shiftY+$this->legendOffsetY;
 
 		if($this->drawLegend){
-			$trCount = $this->m_showTriggers?count($this->triggers):0;
 			$this->fullSizeY += 14 * ($this->num+1+(($this->sizeY < 120)?0:count($this->triggers))) + 8;
 		}
 
@@ -2188,7 +2184,6 @@ class CChart extends CGraphDraw{
 
 		$this->drawLogo();
 
-		$end_time=getmicrotime();
 		$str=sprintf('%0.2f',(getmicrotime()-$start_time));
 
 // if we get chart from config by get method

@@ -83,8 +83,7 @@ class CHostGroup extends CZBXAPI{
 
 // output
 			'output'					=> API_OUTPUT_REFER,
-			'extendoutput'				=> null,
-			'select_hosts'				=> null,
+			'selectHosts'				=> null,
 			'select_templates'			=> null,
 
 			'countOutput'				=> null,
@@ -98,16 +97,6 @@ class CHostGroup extends CZBXAPI{
 		);
 
 		$options = zbx_array_merge($def_options, $params);
-
-
-		if(!is_null($options['extendoutput'])){
-			$options['output'] = API_OUTPUT_EXTEND;
-
-			if(!is_null($options['select_hosts'])){
-				$options['select_hosts'] = API_OUTPUT_EXTEND;
-			}
-		}
-
 
 // editable + PERMISSION CHECK
 
@@ -406,12 +395,12 @@ class CHostGroup extends CZBXAPI{
 						$result[$group['groupid']]['templates'] = array();
 					}
 
-					if(!is_null($options['select_hosts']) && !isset($result[$group['groupid']]['hosts'])){
+					if(!is_null($options['selectHosts']) && !isset($result[$group['groupid']]['hosts'])){
 						$result[$group['groupid']]['hosts'] = array();
 					}
 
 // hostids
-					if(isset($group['hostid']) && is_null($options['select_hosts'])){
+					if(isset($group['hostid']) && is_null($options['selectHosts'])){
 						if(!isset($result[$group['groupid']]['hosts']))
 							$result[$group['groupid']]['hosts'] = array();
 
@@ -458,15 +447,15 @@ COpt::memoryPick();
 		}
 
 // Adding hosts
-		if(!is_null($options['select_hosts'])){
+		if(!is_null($options['selectHosts'])){
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'groupids' => $groupids,
 				'preservekeys' => 1
 			);
 
-			if(is_array($options['select_hosts']) || str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
-				$obj_params['output'] = $options['select_hosts'];
+			if(is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['selectHosts'];
 				$hosts = CHost::get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($hosts, 'host');
@@ -487,7 +476,7 @@ COpt::memoryPick();
 					}
 				}
 			}
-			else if(API_OUTPUT_COUNT == $options['select_hosts']){
+			else if(API_OUTPUT_COUNT == $options['selectHosts']){
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
@@ -600,7 +589,7 @@ COpt::memoryPick();
 	}
 
 /**
- * Add hostgroupGroups
+ * Add hostGroups
  *
  * @param array $groups array with HostGroup names
  * @param array $groups['name']
@@ -718,36 +707,114 @@ COpt::memoryPick();
 /**
  * Delete HostGroups
  *
- * @param array $groups
- * @param array $groups[0,..]['groupid']
+ * @param array $groupids
  * @return boolean
  */
-	public static function delete($groups){
-		$groups = zbx_toArray($groups);
-		$groupids = zbx_objectValues($groups, 'groupid');
+	public static function delete($groupids){
+		if(empty($groupids)) return true;
+
+		$groupids = zbx_toArray($groupids);
 
 		try{
 			self::BeginTransaction(__METHOD__);
 
 			$options = array(
 				'groupids' => $groupids,
-				'editable' => 1,
-				'output' => API_OUTPUT_SHORTEN,
+				'editable' => true,
+				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1
 			);
 			$del_groups = self::get($options);
-			foreach($groups as $gnum => $group){
-				if(!isset($del_groups[$group['groupid']])){
+			foreach($groupids as $groupid){
+				if(!isset($del_groups[$groupid])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				}
 			}
 
-			if(empty($groupids)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter');
+			$dlt_groupids = getDeletableHostGroups($groupids);
+			if(count($groupids) != count($dlt_groupids)){
+				foreach($groupids as $num => $groupid){
+					if($del_groups[$groupid]['internal'] == ZBX_INTERNAL_GROUP)
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+								S_GROUP.' ['.$del_groups[$groupid]['name'].'] '.S_INTERNAL_AND_CANNOT_DELETED_SMALL);
+					else
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+								S_GROUP.' ['.$del_groups[$groupid]['name'].'] '.S_CANNOT_DELETED_INNER_HOSTS_CANNOT_UNLINKED_SMALL);
+
+				}
 			}
 
-			$result = delete_host_group($groupids);
-			if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete group');
+
+// delete screens items
+			$resources = array(
+				SCREEN_RESOURCE_HOSTGROUP_TRIGGERS,
+				SCREEN_RESOURCE_HOSTS_INFO,
+				SCREEN_RESOURCE_TRIGGERS_INFO,
+				SCREEN_RESOURCE_TRIGGERS_OVERVIEW,
+				SCREEN_RESOURCE_DATA_OVERVIEW
+			);
+			DB::delete('screens_items', array(
+				'resourceid'=>$groupids,
+				'resourcetype'=>$resources
+			));
+
+// delete sysmap element
+			if(!delete_sysmaps_elements_with_groupid($groupids))
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete sysmap elements');
+
+
+// disable actions
+			$actionids = array();
+
+// conditions
+			$sql = 'SELECT DISTINCT c.actionid '.
+					' FROM conditions c '.
+					' WHERE c.conditiontype='.CONDITION_TYPE_HOST_GROUP.
+						' AND '.DBcondition('c.value',$groupids, false, true);
+			$db_actions = DBselect($sql);
+			while($db_action = DBfetch($db_actions)){
+				$actionids[$db_action['actionid']] = $db_action['actionid'];
+			}
+
+// operations
+			$sql = 'SELECT DISTINCT o.actionid '.
+					' FROM operations o '.
+					' WHERE o.operationtype IN ('.OPERATION_TYPE_GROUP_ADD.','.OPERATION_TYPE_GROUP_REMOVE.') '.
+						' AND '.DBcondition('o.objectid',$groupids);
+			$db_actions = DBselect($sql);
+			while($db_action = DBfetch($db_actions)){
+				$actionids[$db_action['actionid']] = $db_action['actionid'];
+			}
+
+			if(!empty($actionids)){
+				DBexecute('UPDATE actions '.
+						' SET status='.ACTION_STATUS_DISABLED.
+						' WHERE '.DBcondition('actionid', $actionids));
+			}
+
+
+// delete action conditions
+			DB::delete('conditions', array(
+				'conditiontype'=>CONDITION_TYPE_HOST_GROUP,
+				'value'=>$groupids
+			));
+
+// delete action operations
+			DB::delete('operations', array(
+				'operationtype'=>array(OPERATION_TYPE_GROUP_ADD, OPERATION_TYPE_GROUP_REMOVE),
+				'objectid'=>$groupids
+			));
+
+			DB::delete('groups', array(
+				'groupid'=>$groupids
+			));
+
+
+// TODO: remove audit
+			foreach($groupids as $groupid){
+				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST_GROUP, $groupid, $del_groups[$groupid]['name'], 'groups', NULL, NULL);
+			}
+
 
 			self::EndTransaction(true, __METHOD__);
 			return array('groupids' => $groupids);
@@ -868,8 +935,8 @@ COpt::memoryPick();
 				}
 
 				DB::delete('hosts_groups', array(
-					DBcondition('hostid', $objectids_to_unlink),
-					DBcondition('groupid', $groupids)
+					'hostid'=>$objectids_to_unlink,
+					'groupid'=>$groupids
 				));
 			}
 
