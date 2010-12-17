@@ -105,6 +105,7 @@ class testGeneric extends PHPUnit_Extensions_SeleniumTestCase
 			array('screenconf.php',	'Configuration of screens'),
 			array('slideconf.php',	'Configuration of slideshows'),
 			array('sysmaps.php',	'Network maps'),
+			array('discovery.php',	'Status of discovery'),
 			array('services.php',	'Configuration of IT services'),
 			array('discoveryconf.php','Configuration of discovery'),
 

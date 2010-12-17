@@ -29,6 +29,7 @@ class SeleniumTests
 		$suite = new PHPUnit_Framework_TestSuite('selenium');
 
 		$suite->addTestSuite('testGeneric');
+		$suite->addTestSuite('testClicks');
 		// ...
 
 		return $suite;
