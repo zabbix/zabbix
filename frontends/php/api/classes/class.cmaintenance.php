@@ -82,8 +82,8 @@ class CMaintenance extends CZBXAPI{
 // OutPut
 			'output'				=> API_OUTPUT_REFER,
 			'extendoutput'			=> null,
-			'select_groups'			=> null,
-			'select_hosts'			=> null,
+			'selectGroups'			=> null,
+			'selectHosts'			=> null,
 			'countOutput'			=> null,
 			'groupCount'			=> null,
 			'preservekeys'			=> null,
@@ -98,11 +98,11 @@ class CMaintenance extends CZBXAPI{
 		if(!is_null($options['extendoutput'])){
 			$options['output'] = API_OUTPUT_EXTEND;
 
-			if(!is_null($options['select_groups'])){
-				$options['select_groups'] = API_OUTPUT_EXTEND;
+			if(!is_null($options['selectGroups'])){
+				$options['selectGroups'] = API_OUTPUT_EXTEND;
 			}
-			if(!is_null($options['select_hosts'])){
-				$options['select_hosts'] = API_OUTPUT_EXTEND;
+			if(!is_null($options['selectHosts'])){
+				$options['selectHosts'] = API_OUTPUT_EXTEND;
 			}
 		}
 // editable + PERMISSION CHECK
@@ -246,12 +246,12 @@ class CMaintenance extends CZBXAPI{
 
 // groupids
 		if(!is_null($options['groupids'])){
-			$options['select_groups'] = 1;
+			$options['selectGroups'] = 1;
 		}
 
 // hostids
 		if(!is_null($options['hostids'])){
-			$options['select_hosts'] = 1;
+			$options['selectHosts'] = 1;
 		}
 
 // maintenanceids
@@ -351,14 +351,14 @@ class CMaintenance extends CZBXAPI{
 					if(!isset($result[$maintenance['maintenanceid']]))
 						$result[$maintenance['maintenanceid']]= array();
 
-					if(!is_null($options['select_groups']) && !isset($result[$maintenance['maintenanceid']]['groups'])){
+					if(!is_null($options['selectGroups']) && !isset($result[$maintenance['maintenanceid']]['groups'])){
 						$result[$maintenance['maintenanceid']]['groups'] = array();
 					}
-					if(!is_null($options['select_hosts']) && !isset($result[$maintenance['maintenanceid']]['hosts'])){
+					if(!is_null($options['selectHosts']) && !isset($result[$maintenance['maintenanceid']]['hosts'])){
 						$result[$maintenance['maintenanceid']]['hosts'] = array();
 					}
 // groupids
-					if(isset($maintenance['groupid']) && is_null($options['select_groups'])){
+					if(isset($maintenance['groupid']) && is_null($options['selectGroups'])){
 						if(!isset($result[$maintenance['maintenanceid']]['groups']))
 							$result[$maintenance['maintenanceid']]['groups'] = array();
 
@@ -367,7 +367,7 @@ class CMaintenance extends CZBXAPI{
 					}
 
 // hostids
-					if(isset($maintenance['hostid']) && is_null($options['select_hosts'])){
+					if(isset($maintenance['hostid']) && is_null($options['selectHosts'])){
 						if(!isset($result[$maintenance['maintenanceid']]['hosts']))
 							$result[$maintenance['maintenanceid']]['hosts'] = array();
 
@@ -387,13 +387,13 @@ Copt::memoryPick();
 			return $result;
 		}
 
-// select_groups
-		if(is_array($options['select_groups']) || str_in_array($options['select_groups'], $subselects_allowed_outputs)){
+// selectGroups
+		if(is_array($options['selectGroups']) || str_in_array($options['selectGroups'], $subselects_allowed_outputs)){
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'maintenanceids' => $maintenanceids,
 				'preservekeys' => 1,
-				'output' => $options['select_groups'],
+				'output' => $options['selectGroups'],
 			);
 			$groups = CHostGroup::get($obj_params);
 
@@ -407,13 +407,13 @@ Copt::memoryPick();
 		}
 
 
-// select_hosts
-		if(is_array($options['select_hosts']) || str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
+// selectHosts
+		if(is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselects_allowed_outputs)){
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'maintenanceids' => $maintenanceids,
 				'preservekeys' => 1,
-				'output' => $options['select_hosts'],
+				'output' => $options['selectHosts'],
 			);
 			$hosts = CHost::get($obj_params);
 
@@ -686,8 +686,8 @@ Copt::memoryPick();
 				$timeperiodids[] = $timeperiod['timeperiodid'];
 			}
 
-			DB::delete('timeperiods', DBcondition('timeperiodid', $timeperiodids));
-			DB::delete('maintenances_windows', DBcondition('maintenanceid', $maintenanceids));
+			DB::delete('timeperiods', array('timeperiodid'=>$timeperiodids));
+			DB::delete('maintenances_windows', array('maintenanceid'=>$maintenanceids));
 
 
 			$tid = 0;
@@ -727,8 +727,8 @@ Copt::memoryPick();
 			DB::insert('maintenances_windows', $insert_windows);
 
 
-			DB::delete('maintenances_hosts', DBcondition('maintenanceid', $maintenanceids));
-			DB::delete('maintenances_groups', DBcondition('maintenanceid', $maintenanceids));
+			DB::delete('maintenances_hosts', array('maintenanceid'=>$maintenanceids));
+			DB::delete('maintenances_groups', array('maintenanceid'=>$maintenanceids));
 
 			$insert_hosts = array();
 			$insert_groups = array();
@@ -804,8 +804,8 @@ Copt::memoryPick();
 				$timeperiodids[] = $timeperiod['timeperiodid'];
 			}
 
-			$mid_cond = DBcondition('maintenanceid', $maintenanceids);
-			DB::delete('timeperiods', DBcondition('timeperiodid', $timeperiodids));
+			$mid_cond = array('maintenanceid'=>$maintenanceids);
+			DB::delete('timeperiods', array('timeperiodid'=>$timeperiodids));
 			DB::delete('maintenances_windows', $mid_cond);
 			DB::delete('maintenances_hosts', $mid_cond);
 			DB::delete('maintenances_groups', $mid_cond);

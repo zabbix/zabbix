@@ -63,9 +63,12 @@
 		$options = array(
 			'countOutput' => 1,
 			'triggerids' => zbx_objectValues($triggerids, 'triggerid'),
+			'filter' => array(
+				'value_changed' => TRIGGER_VALUE_CHANGED_YES,
+				'value' => is_null($value_event) ? array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE) : $value_event,
+				'acknowledged' => $ack ? 1 : 0,
+			),
 			'object' => EVENT_OBJECT_TRIGGER,
-			'acknowledged' => $ack ? 1 : 0,
-			'value' => is_null($value_event) ? array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE) : $value_event,
 			'nopermissions' => 1
 		);
 		$event_count = CEvent::get($options);
@@ -121,23 +124,6 @@ function make_event_details($event, $trigger){
 
 	$table->addRow(array(S_EVENT, expand_trigger_description_by_data(array_merge($trigger, $event), ZBX_FLAG_EVENT)));
 	$table->addRow(array(S_TIME, zbx_date2str(S_EVENTS_EVENT_DETAILS_DATE_FORMAT,$event['clock'])));
-
-	$duration = zbx_date2age($event['clock']);
-
-	if($next_event = get_next_event($event,null,true)){
-		$duration = zbx_date2age($event['clock'],$next_event['clock']);
-	}
-
-	if($event['value'] == TRIGGER_VALUE_FALSE){
-		$value=new CCol(S_OK_BIG,'off');
-	}
-	elseif($event['value'] == TRIGGER_VALUE_TRUE){
-		$value=new CCol(S_PROBLEM_BIG,'on');
-	}
-	else{
-		$value=new CCol(S_UNKNOWN_BIG,'unknown');
-	}
-
 	
 	if($config['event_ack_enable']){
 		$ack = getEventAckState($event, true);
@@ -167,7 +153,6 @@ function make_small_eventlist($startEvent){
 	$options = array(
 		'triggerids' => $startEvent['objectid'],
 		'eventid_till' => $startEvent['eventid'],
-		'filter' => array('value_changed' => null),
 		'output' => API_OUTPUT_EXTEND,
 		'select_acknowledges' => API_OUTPUT_COUNT,
 		'sortfield' => 'eventid',
@@ -234,7 +219,8 @@ function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
 		'triggerids' => $triggerid,
 		'eventid_till' => $eventid,
 		'filter' => array(
-			'object' => EVENT_OBJECT_TRIGGER
+			'object' => EVENT_OBJECT_TRIGGER,
+			'value_changed' => TRIGGER_VALUE_CHANGED_YES
 		),
 		'nopermissions' => 1,
 		'select_acknowledges' => API_OUTPUT_COUNT,
@@ -282,7 +268,7 @@ function getEventAckState($event, $extBackurl=false){
 	else{
 		$backurl = $page['file'];
 	}
-	
+
 	if($event['acknowledged'] == 0){
 		$ack = new CLink(S_NO,'acknow.php?eventid='.$event['eventid'].'&backurl='.$backurl,'on');
 	}
@@ -300,7 +286,7 @@ function getLastEvents($options){
 	$triggerOptions = array(
 		'filter' => array(),
 		'skipDependent'	=> 1,
-		'select_hosts' => array('hostid', 'host'),
+		'selectHosts' => array('hostid', 'host'),
 		'output' => API_OUTPUT_EXTEND,
 //		'expandDescription' => 1,
 		'sortfield' => 'lastchange',
@@ -309,8 +295,11 @@ function getLastEvents($options){
 	);
 
 	$eventOptions = array(
-		'object' => EVENT_OBJECT_TRIGGER,
 		'output' => API_OUTPUT_EXTEND,
+		'filter' => array(
+			'object' => EVENT_OBJECT_TRIGGER,
+			'value_changed' => TRIGGER_VALUE_CHANGED_YES
+		),
 		'sortfield' => 'clock',
 		'sortorder' => ZBX_SORT_DOWN,
 		'limit' => $options['limit']

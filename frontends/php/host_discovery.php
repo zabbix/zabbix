@@ -26,7 +26,7 @@ require_once('include/forms.inc.php');
 
 $page['title'] = 'S_CONFIGURATION_OF_DISCOVERY';
 $page['file'] = 'host_discovery.php';
-$page['scripts'] = array('effects.js', 'class.cviewswitcher.js');
+$page['scripts'] = array('class.cviewswitcher.js');
 $page['hist_arg'] = array();
 
 include_once('include/page_header.php');
@@ -44,6 +44,7 @@ switch($itemType) {
 	$fields=array(
 		'hostid'=>			array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,			'!isset({form})'),
 		'itemid'=>			array(T_ZBX_INT, O_NO,	 P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))'),
+		'interfaceid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,	null, S_INTERFACE),
 
 		'description'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),
 		'item_filter_macro'=>		array(T_ZBX_STR, O_OPT,  null,	null,		'isset({save})'),
@@ -89,7 +90,7 @@ switch($itemType) {
 													ITEM_TYPE_SNMPV1.','.
 													ITEM_TYPE_SNMPV2C.','.
 													ITEM_TYPE_SNMPV3,'type')),
-		'snmp_port'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	'isset({save})&&isset({type})&&'.IN(
+		'port'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	'isset({save})&&isset({type})&&'.IN(
 													ITEM_TYPE_SNMPV1.','.
 													ITEM_TYPE_SNMPV2C.','.
 													ITEM_TYPE_SNMPV3,'type')),
@@ -131,11 +132,10 @@ switch($itemType) {
 	if(get_request('itemid', false)){
 		$options = array(
 			'itemids' => $_REQUEST['itemid'],
-			'filter' => array('flags' => ZBX_FLAG_DISCOVERY),
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => 1
 		);
-		$item = CItem::get($options);
+		$item = CDiscoveryRule::get($options);
 		$item = reset($item);
 		if(!$item) access_deny();
 		$_REQUEST['hostid'] = $item['hostid'];
@@ -143,7 +143,7 @@ switch($itemType) {
 	else if(get_request('hostid', 0) > 0){
 		$options = array(
 			'hostids' => $_REQUEST['hostid'],
-			'extendoutput' => 1,
+			'output' => API_OUTPUT_EXTEND,
 			'templated_hosts' => 1,
 			'editable' => 1
 		);
@@ -178,12 +178,8 @@ switch($itemType) {
 		array_push($_REQUEST['delay_flex'],$_REQUEST['new_delay_flex']);
 	}
 	else if(isset($_REQUEST['delete'])&&isset($_REQUEST['itemid'])){
-		$result = false;
-		if($item = get_item_by_itemid($_REQUEST['itemid'])){
-			$result = CItem::delete($_REQUEST['itemid']);
-		}
-
-		show_messages($result, S_ITEM_DELETED, S_CANNOT_DELETE_ITEM);
+		$result = CDiscoveryRule::delete($_REQUEST['itemid']);
+		show_messages($result, _('Discovery rule deleted'), _('Cannot delete discovery rule'));
 
 		unset($_REQUEST['itemid']);
 		unset($_REQUEST['form']);
@@ -201,11 +197,12 @@ switch($itemType) {
 		}
 		$db_delay_flex = trim($db_delay_flex,';');
 
-		$ifm =  get_request('item_filter_macro');
-		$ifv =  get_request('item_filter_value');
-		$filter = $ifm.':'.$ifv;
+		$ifm = get_request('item_filter_macro');
+		$ifv = get_request('item_filter_value');
+		$filter = isset($ifm, $ifv) ? $ifm.':'.$ifv : '';
 
 		$item = array(
+			'interfaceid' => get_request('interfaceid'),
 			'description' => get_request('description'),
 			'key_' => get_request('key'),
 			'hostid' => get_request('hostid'),
@@ -214,7 +211,7 @@ switch($itemType) {
 			'type' => get_request('type'),
 			'snmp_community' => get_request('snmp_community'),
 			'snmp_oid' => get_request('snmp_oid'),
-			'snmp_port' => get_request('snmp_port'),
+			'port' => get_request('port'),
 			'snmpv3_securityname' => get_request('snmpv3_securityname'),
 			'snmpv3_securitylevel' => get_request('snmpv3_securitylevel'),
 			'snmpv3_authpassphrase' => get_request('snmpv3_authpassphrase'),
@@ -227,7 +224,6 @@ switch($itemType) {
 			'privatekey' => get_request('privatekey'),
 			'params' => get_request('params'),
 			'ipmi_sensor' => get_request('ipmi_sensor'),
-			'applications' => array(),
 			'flags' => ZBX_FLAG_DISCOVERY,
 			'filter' => $filter,
 		);
@@ -236,18 +232,19 @@ switch($itemType) {
 			DBstart();
 
 			$db_item = get_item_by_itemid_limited($_REQUEST['itemid']);
-			$db_item['applications'] = get_applications_by_itemid($_REQUEST['itemid']);
+			foreach($item as $field => $value){
+				if($item[$field] == $db_item[$field]) unset($item[$field]);
+			}
 
-			$result = smart_update_item($_REQUEST['itemid'], $item);
+			$item['itemid'] = $_REQUEST['itemid'];
+
+			$result = CDiscoveryRule::update($item);
 			$result = DBend($result);
-
-			show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
+			show_messages($result, _('Discovery rule updated'), _('Cannot update discovery rule'));
 		}
 		else{
-			DBstart();
-			$result = add_item($item);
-			$result = DBend($result);
-			show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
+			$result = CDiscoveryRule::create(array($item));
+			show_messages($result, _('Discovery rule created'), _('Cannot add discovery rule'));
 		}
 
 		if($result){
@@ -263,42 +260,11 @@ switch($itemType) {
 		DBstart();
 		$go_result = ($_REQUEST['go'] == 'activate') ? activate_item($group_itemid) : disable_item($group_itemid);
 		$go_result = DBend($go_result);
-		show_messages($go_result, ($_REQUEST['go'] == 'activate') ? S_ITEMS_ACTIVATED : S_ITEMS_DISABLED, null);
+		show_messages($go_result, ($_REQUEST['go'] == 'activate') ? _('Discovery rules activated') : _('Discovery rules disabled'), null);
 	}
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_itemid'])){
-		global $USER_DETAILS;
-
-		$go_result = true;
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_WRITE);
-
-		$group_itemid = $_REQUEST['group_itemid'];
-
-		$sql = 'SELECT h.host, i.itemid, i.description, i.key_, i.templateid, i.type'.
-				' FROM items i, hosts h '.
-				' WHERE '.DBcondition('i.itemid',$group_itemid).
-					' AND h.hostid=i.hostid'.
-					' AND '.DBcondition('h.hostid',$available_hosts);
-		$db_items = DBselect($sql);
-		while($item = DBfetch($db_items)) {
-			if($item['templateid'] != ITEM_TYPE_ZABBIX) {
-				unset($group_itemid[$item['itemid']]);
-				error(S_ITEM.SPACE."'".$item['host'].':'.item_description($item)."'".SPACE.S_CANNOT_DELETE_ITEM.SPACE.'('.S_TEMPLATED_ITEM.')');
-				continue;
-			}
-			else if($item['type'] == ITEM_TYPE_HTTPTEST) {
-				unset($group_itemid[$item['itemid']]);
-				error(S_ITEM.SPACE."'".$item['host'].':'.item_description($item)."'".SPACE.S_CANNOT_DELETE_ITEM.SPACE.'('.S_WEB_ITEM.')');
-				continue;
-			}
-
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM,S_ITEM.' ['.$item['key_'].'] ['.$item['itemid'].'] '.S_HOST.' ['.$item['host'].']');
-		}
-
-		$go_result &= !empty($group_itemid);
-		if($go_result) {
-			$go_result = CItem::delete($group_itemid);
-		}
-		show_messages($go_result, S_ITEMS_DELETED, S_CANNOT_DELETE_ITEMS);
+		$go_result = CDiscoveryRule::delete($_REQUEST['group_itemid']);
+		show_messages($go_result, _('Discovery rule deleted'), _('Cannot delete discovery rule'));
 	}
 
 	if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
@@ -310,15 +276,13 @@ switch($itemType) {
 <?php
 	$items_wdgt = new CWidget();
 
-
+	$form = null;
 	if(!isset($_REQUEST['form'])){
 		$form = new CForm(null, 'get');
 		$form->addVar('hostid', $_REQUEST['hostid']);
-		$form->addItem(new CButton('form', S_CREATE_RULE));
+		$form->addItem(new CSubmit('form', S_CREATE_RULE));
 	}
-	else{
-		$form = null;
-	}
+
 	$items_wdgt->addPageHeader(S_CONFIGURATION_OF_DISCOVERY_RULES_BIG, $form);
 
 
@@ -326,10 +290,9 @@ switch($itemType) {
 		$frmItem = new CFormTable();
 		$frmItem->setName('items');
 		$frmItem->setTitle(S_RULE);
-		$frmItem->setAttribute('style','visibility: hidden;');
+		$frmItem->setAttribute('style', 'visibility: hidden;');
 
 		$hostid = get_request('hostid');
-
 		$frmItem->addVar('hostid', $hostid);
 
 		$limited = false;
@@ -342,7 +305,7 @@ switch($itemType) {
 		$type = get_request('type', 0);
 		$snmp_community = get_request('snmp_community', 'public');
 		$snmp_oid = get_request('snmp_oid', 'interfaces.ifTable.ifEntry.ifInOctets.1');
-		$snmp_port = get_request('snmp_port', 161);
+		$port = get_request('port', 161);
 		$params = get_request('params', '');
 		$delay_flex = get_request('delay_flex', array());
 		$trapper_hosts = get_request('trapper_hosts', '');
@@ -358,6 +321,8 @@ switch($itemType) {
 		$password = get_request('password', '');
 		$publickey = get_request('publickey', '');
 		$privatekey = get_request('privatekey', '');
+
+		$interfaceid = get_request('interfaceid', 0);
 
 		$formula = get_request('formula', '1');
 		$logtimefmt = get_request('logtimefmt', '');
@@ -379,12 +344,14 @@ switch($itemType) {
 		}
 
 		if((isset($_REQUEST['itemid']) && !isset($_REQUEST['form_refresh']))){
+			$interfaceid	= $item_data['interfaceid'];
+
 			$description = $item_data['description'];
 			$key = $item_data['key_'];
 			$type = $item_data['type'];
 			$snmp_community = $item_data['snmp_community'];
 			$snmp_oid = $item_data['snmp_oid'];
-			$snmp_port = $item_data['snmp_port'];
+			$port = $item_data['port'];
 			$params = $item_data['params'];
 			$item_filter = $item_data['filter'];
 
@@ -394,7 +361,7 @@ switch($itemType) {
 			$snmpv3_privpassphrase = $item_data['snmpv3_privpassphrase'];
 
 			$ipmi_sensor = $item_data['ipmi_sensor'];
-			$trapper_hosts		= $item_data['trapper_hosts'];
+			$trapper_hosts = $item_data['trapper_hosts'];
 
 			$authtype = $item_data['authtype'];
 			$username = $item_data['username'];
@@ -407,9 +374,9 @@ switch($itemType) {
 
 
 			if(!isset($limited) || !isset($_REQUEST['form_refresh'])){
-				$delay		= $item_data['delay'];
-				$status		= $item_data['status'];
-				$db_delay_flex	= $item_data['delay_flex'];
+				$delay = $item_data['delay'];
+				$status = $item_data['status'];
+				$db_delay_flex = $item_data['delay_flex'];
 
 				if(isset($db_delay_flex)){
 					$arr_of_dellays = explode(';',$db_delay_flex);
@@ -456,17 +423,32 @@ switch($itemType) {
 			if($i >= 7) break;
 		}
 
-		array_push($delay_flex_el, count($delay_flex_el)==0 ? S_NO_FLEXIBLE_INTERVALS : new CButton('del_delay_flex',S_DELETE_SELECTED));
+		array_push($delay_flex_el, count($delay_flex_el)==0 ? S_NO_FLEXIBLE_INTERVALS : new CSubmit('del_delay_flex',S_DELETE_SELECTED));
 
+
+// Interfaces
+		$interfaces = CHostInterface::get(array(
+			'hostids' => $hostid,
+			'output' => API_OUTPUT_EXTEND,
+		));
+		if(!empty($interfaces)){
+			$sbIntereaces = new CComboBox('interfaceid', $interfaceid);
+			foreach($interfaces as $ifnum => $interface){
+				$caption = $interface['useip'] ? $interface['ip'] : $interface['dns'];
+				$caption.= ' : '.$interface['port'];
+
+				$sbIntereaces->addItem($interface['interfaceid'], $caption);
+			}
+			$frmItem->addRow(S_HOST_INTERFACE, $sbIntereaces);
+		}
 
 // Name
-		$frmItem->addRow(S_NAME, new CTextBox('description',$description,40, $limited));
+		$frmItem->addRow(S_NAME, new CTextBox('description', $description, 40, $limited));
 
 // Key
 		$frmItem->addRow(S_KEY, new CTextBox('key', $key, 40, $limited));
 
 // Type
-
 		if($limited){
 			$cmbType = new CTextBox('typename', item_type2str($type), 40, 'yes');
 			$frmItem->addVar('type', $type);
@@ -519,13 +501,13 @@ switch($itemType) {
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'row_snmpv3_privpassphrase');
 
 // SNMP port
-		$frmItem->addRow(S_SNMP_PORT, new CNumericBox('snmp_port',$snmp_port,5), null, 'row_snmp_port');
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV1, 'snmp_port');
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV2C, 'snmp_port');
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'snmp_port');
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV1, 'row_snmp_port');
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV2C, 'row_snmp_port');
-		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'row_snmp_port');
+		$frmItem->addRow(S_PORT, new CNumericBox('port',$port,5), null, 'row_port');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV1, 'port');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV2C, 'port');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'port');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV1, 'row_port');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV2C, 'row_port');
+		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'row_port');
 
 // IPMI sensor
 		$frmItem->addRow(S_IPMI_SENSOR, new CTextBox('ipmi_sensor', $ipmi_sensor, 64, $limited), null, 'row_ipmi_sensor');
@@ -627,7 +609,7 @@ switch($itemType) {
 			S_DELAY, SPACE,	new CNumericBox('new_delay_flex[delay]', '50', 5),
 			S_PERIOD, SPACE, new CTextBox('new_delay_flex[period]', '1-7,00:00-23:59', 27),
 			BR(),
-			new CButton('add_delay_flex', S_ADD)
+			new CSubmit('add_delay_flex', S_ADD)
 		), 'new', 'row_new_delay_flex');
 
 		foreach($type_keys as $it) {
@@ -650,10 +632,10 @@ switch($itemType) {
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TRAPPER, 'row_trapper_hosts');
 
 
-		$frmRow = array(new CButton('save',S_SAVE));
+		$frmRow = array(new CSubmit('save', S_SAVE));
 		if(isset($_REQUEST['itemid'])){
-			$frmRow[] = new CButton('clone',S_CLONE);
-			$frmRow[] = new CButtonDelete(S_DELETE_SELECTED_ITEM_Q,	url_param('form').url_param('groupid').url_param('itemid'));
+			$frmRow[] = new CSubmit('clone', S_CLONE);
+			$frmRow[] = new CButtonDelete(_('Delete selected discovery rules?'), url_param('form').url_param('groupid').url_param('itemid'));
 		}
 		$frmRow[] = new CButtonCancel(url_param('groupid').url_param('hostid'));
 		$frmItem->addItemToBottomRow($frmRow);
@@ -669,8 +651,8 @@ switch($itemType) {
 		$numrows = new CDiv();
 		$numrows->setAttribute('name', 'numrows');
 
-		$items_wdgt->addHeader(S_DISCOVERY_RULES_BIG, SPACE);
-		$items_wdgt->addHeader($numrows, SPACE);
+		$items_wdgt->addHeader(S_DISCOVERY_RULES_BIG);
+		$items_wdgt->addHeader($numrows);
 
 		$items_wdgt->addItem(get_header_host_table($_REQUEST['hostid'], 'discoveries'));
 // ----------------
@@ -682,7 +664,7 @@ switch($itemType) {
 		$sortlink = new Curl();
 		$sortlink->setArgument('hostid', $_REQUEST['hostid']);
 		$sortlink = $sortlink->getUrl();
-		$table  = new CTableInfo();
+		$table = new CTableInfo();
 		$table->setHeader(array(
 			new CCheckBox('all_items',null,"checkAll('".$form->GetName()."','all_items','group_itemid');"),
 			make_sorting_header(S_NAME,'description', $sortlink),
@@ -702,29 +684,17 @@ switch($itemType) {
 			'hostids' => $_REQUEST['hostid'],
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => 1,
-			'filter' => array('flags' => ZBX_FLAG_DISCOVERY),
 			'select_prototypes' => API_OUTPUT_COUNT,
+			'select_graphs' => API_OUTPUT_COUNT,
+			'select_triggers' => API_OUTPUT_COUNT,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
 		);
-		$items = CItem::get($options);
+		$items = CDiscoveryRule::get($options);
 
 		order_result($items, $sortfield, $sortorder);
 		$paging = getPagingLine($items);
-
-		$options = array(
-			'discoveryids' => zbx_objectValues($items, 'itemid'),
-			'filter' => array('flags' => null),
-			'output' => API_OUTPUT_COUNT,
-			'groupCount' => true,
-			'countOutput' => true,
-		);
-		$graphs = CGraph::get($options);
-		$graphs = zbx_toHash($graphs, 'parent_itemid');
-
-		$triggers = CTrigger::get($options);
-		$triggers = zbx_toHash($triggers, 'parent_itemid');
 
 		foreach($items as $inum => $item){
 			$description = array();
@@ -754,11 +724,11 @@ switch($itemType) {
 
 			$graphs_count = isset($graphs[$item['itemid']]['rowscount']) ? $graphs[$item['itemid']]['rowscount'] : 0;
 			$protographs = array(new CLink(S_GRAPHS, 'graph_prototypes.php?&parent_discoveryid='.$item['itemid']),
-				' ('.$graphs_count.')');
+				' ('.$item['graphs'].')');
 
 			$triggers_count = isset($triggers[$item['itemid']]['rowscount']) ? $triggers[$item['itemid']]['rowscount'] : 0;
 			$prototriggers = array(new CLink(S_TRIGGERS, 'trigger_prototypes.php?&parent_discoveryid='.$item['itemid']),
-				' ('.$triggers_count.')');
+				' ('.$item['triggers'].')');
 
 			$table->addRow(array(
 				new CCheckBox('group_itemid['.$item['itemid'].']',null,null,$item['itemid']),
@@ -789,7 +759,7 @@ switch($itemType) {
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
-		$goButton = new CButton('goButton',S_GO);
+		$goButton = new CSubmit('goButton',S_GO);
 		$goButton->setAttribute('id','goButton');
 
 		zbx_add_post_js('chkbxRange.pageGoName = "group_itemid";');

@@ -31,17 +31,10 @@ protected $sid = null;
 		$this->tag_body_end = '';
 		$this->nosid = $nosid;
 
-		if(!is_null($class))	$this->setClass($class);
+		if(!is_null($class))	$this->setAttribute('class', $class);
 		if(!is_null($item))		$this->addItem($item);
 		if(!is_null($url))		$this->setUrl($url);
-		if(!is_null($action))	$this->setAction($action);
-	}
-
-	public function setAction($value=NULL){
-		if(is_null($value))
-			return $this->attributes['action'] = $page['file'];
-
-		return parent::addAction('onclick', $value);
+		if(!is_null($action))	$this->setAttribute('onclick', $action);
 	}
 
 	public function setUrl($value){

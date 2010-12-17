@@ -498,7 +498,7 @@ Copt::memoryPick();
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_MEDIATYPE_USED_BY_ACTIONS . ' ' . $action['name']);
 			}
 
-			DB::delete('media_type', DBcondition('mediatypeid', $mediatypeids));
+			DB::delete('media_type', array('mediatypeid'=>$mediatypeids));
 
 			self::EndTransaction(true, __METHOD__);
 			return array('mediatypeids' => $mediatypeids);
