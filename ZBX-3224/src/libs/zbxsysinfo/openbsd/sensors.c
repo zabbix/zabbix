@@ -55,10 +55,18 @@ static void	count_sensor(int do_task, const struct sensor *sensor, double *aggr,
 
 	switch (do_task)
 	{
-		case DO_ONE:	*aggr = value;						break;
-		case DO_AVG:	*aggr += value;						break;
-		case DO_MAX:	*aggr = (1 == *cnt ? value : MAX(*aggr, value));	break;
-		case DO_MIN:	*aggr = (1 == *cnt ? value : MIN(*aggr, value));	break;
+		case DO_ONE:
+			*aggr = value;
+			break;
+		case DO_AVG:
+			*aggr += value;
+			break;
+		case DO_MAX:
+			*aggr = (1 == *cnt ? value : MAX(*aggr, value));
+			break;
+		case DO_MIN:
+			*aggr = (1 == *cnt ? value : MIN(*aggr, value));
+			break;
 	}
 }
 
