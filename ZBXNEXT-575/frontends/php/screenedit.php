@@ -27,7 +27,8 @@
 	$page['title'] = 'S_CONFIGURATION_OF_SCREENS';
 	$page['file'] = 'screenedit.php';
 	$page['hist_arg'] = array('screenid');
-	$page['scripts'] = array('effects.js', 'dragdrop.js', 'class.cscreen.js', 'class.calendar.js', 'gtlc.js');
+	$page['scripts'] = array('class.cscreen.js', 'class.calendar.js', 'gtlc.js');
+	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 include_once('include/page_header.php');
 
@@ -73,6 +74,8 @@ include_once('include/page_header.php');
 		'rmv_col'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,100),		null),
 
 		'sw_pos'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,100),		null),
+		'ajaxAction'=>	array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
+
 	);
 
 	check_fields($fields);
@@ -92,6 +95,62 @@ include_once('include/page_header.php');
 	}
 
 	$screen = reset($screens);
+
+/* AJAX */
+	if(isset($_REQUEST['ajaxAction'])){
+
+		switch($_REQUEST['ajaxAction']){
+			case 'sw_pos':
+				$sw_pos = get_request('sw_pos', array());
+				if(count($sw_pos) > 3){
+					$sql = 'SELECT screenitemid, colspan, rowspan '.
+							' FROM screens_items '.
+							' WHERE y='.$sw_pos[0].
+								' AND x='.$sw_pos[1].
+								' AND screenid='.$screen['screenid'];
+					$fitem = DBfetch(DBselect($sql));
+
+					$sql = 'SELECT screenitemid, colspan, rowspan '.
+							' FROM screens_items '.
+							' WHERE y='.$sw_pos[2].
+								' AND x='.$sw_pos[3].
+								' AND screenid='.$screen['screenid'];
+					$sitem = DBfetch(DBselect($sql));
+
+					if($fitem){
+						DBexecute('UPDATE screens_items '.
+									' SET y='.$sw_pos[2].',x='.$sw_pos[3].
+									',colspan='.(isset($sitem['colspan']) ? $sitem['colspan'] : 0).
+									',rowspan='.(isset($sitem['rowspan']) ? $sitem['rowspan'] : 0).
+									' WHERE y='.$sw_pos[0].
+										' AND x='.$sw_pos[1].
+										' AND screenid='.$screen['screenid'].
+										' AND screenitemid='.$fitem['screenitemid']);
+
+					}
+
+					if($sitem){
+						DBexecute('UPDATE screens_items '.
+									' SET y='.$sw_pos[0].',x='.$sw_pos[1].
+									',colspan='.(isset($fitem['colspan']) ? $fitem['colspan'] : 0).
+									',rowspan='.(isset($fitem['rowspan']) ? $fitem['rowspan'] : 0).
+									' WHERE y='.$sw_pos[2].
+										' AND x='.$sw_pos[3].
+										' AND screenid='.$screen['screenid'].
+										' AND screenitemid='.$sitem['screenitemid']);
+					}
+					add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN,' Name ['.$screen['name'].'] Items switched');
+				}
+
+				echo '{"result": true}';
+			break;
+		}
+	}
+
+	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		include_once('include/page_footer.php');
+		exit();
+	}
 
 	if(isset($_REQUEST['save'])){
 		if(!isset($_REQUEST['elements'])) $_REQUEST['elements'] = 0;
@@ -191,48 +250,6 @@ include_once('include/page_header.php');
 			error(S_SCREEN_SHOULD_CONTAIN_ONE_ROW_AND_COLUMN);
 			show_messages(false, '', S_CANNOT_REMOVE_ROW_OR_COLUMN);
       }
-	}
-	else if(isset($_REQUEST['sw_pos'])){
-		$sw_pos = get_request('sw_pos', array());
-		if(count($sw_pos) > 3){
-			$sql = 'SELECT screenitemid, colspan, rowspan '.
-					' FROM screens_items '.
-					' WHERE y='.$sw_pos[0].
-						' AND x='.$sw_pos[1].
-						' AND screenid='.$screen['screenid'];
-			$fitem = DBfetch(DBselect($sql));
-
-			$sql = 'SELECT screenitemid, colspan, rowspan '.
-					' FROM screens_items '.
-					' WHERE y='.$sw_pos[2].
-						' AND x='.$sw_pos[3].
-						' AND screenid='.$screen['screenid'];
-			$sitem = DBfetch(DBselect($sql));
-
-			if($fitem){
-				DBexecute('UPDATE screens_items '.
-							' SET y='.$sw_pos[2].',x='.$sw_pos[3].
-							',colspan='.(isset($sitem['colspan']) ? $sitem['colspan'] : 0).
-							',rowspan='.(isset($sitem['rowspan']) ? $sitem['rowspan'] : 0).
-							' WHERE y='.$sw_pos[0].
-								' AND x='.$sw_pos[1].
-								' AND screenid='.$screen['screenid'].
-								' AND screenitemid='.$fitem['screenitemid']);
-
-			}
-
-			if($sitem){
-				DBexecute('UPDATE screens_items '.
-							' SET y='.$sw_pos[0].',x='.$sw_pos[1].
-							',colspan='.(isset($fitem['colspan']) ? $fitem['colspan'] : 0).
-							',rowspan='.(isset($fitem['rowspan']) ? $fitem['rowspan'] : 0).
-							' WHERE y='.$sw_pos[2].
-								' AND x='.$sw_pos[3].
-								' AND screenid='.$screen['screenid'].
-								' AND screenitemid='.$sitem['screenitemid']);
-			}
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN,' Name ['.$screen['name'].'] Items switched');
-		}
 	}
 
 	$screen_wdgt = new CWidget();

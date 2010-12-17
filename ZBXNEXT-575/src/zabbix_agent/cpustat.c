@@ -251,7 +251,7 @@ static int	get_cpustat(
 	if (cpuid > 0)
 		zbx_snprintf(cpu_name, sizeof(cpu_name), "cpu%d ", cpuid - 1);
 	else
-		zbx_strlcpy(cpu_name, "cpu  ", sizeof(cpu_name));
+		zbx_strlcpy(cpu_name, "cpu ", sizeof(cpu_name));
 
 	while (NULL != fgets(line, sizeof(line), file))
 	{
@@ -671,9 +671,9 @@ void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus)
 
 	zbx_uint64_t cpu_user, cpu_nice, cpu_system, cpu_idle, cpu_interrupt, cpu_iowait, cpu_softirq, cpu_steal;
 
-	for (i= 0; i <= pcpus->count; i++)
+	for (i = 0; i <= pcpus->count; i++)
 	{
-		if(0 != get_cpustat(i, &now, &cpu_user, &cpu_system, &cpu_nice, &cpu_idle, &cpu_interrupt, &cpu_iowait, &cpu_softirq, &cpu_steal))
+		if (0 != get_cpustat(i, &now, &cpu_user, &cpu_system, &cpu_nice, &cpu_idle, &cpu_interrupt, &cpu_iowait, &cpu_softirq, &cpu_steal))
 			continue;
 
 		apply_cpustat(pcpus, i, now, cpu_user, cpu_system, cpu_nice, cpu_idle, cpu_interrupt, cpu_iowait, cpu_softirq, cpu_steal);

@@ -120,6 +120,7 @@ class CHistory extends CZBXAPI{
 		}
 		else{
 			$itemOptions = array(
+				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 				'editable' => $options['editable'],
 				'preservekeys' => 1
 			);
@@ -240,7 +241,6 @@ class CHistory extends CZBXAPI{
 
 
 		$itemids = array();
-		$triggerids = array();
 
 		$sql_parts['select'] = array_unique($sql_parts['select']);
 		$sql_parts['from'] = array_unique($sql_parts['from']);

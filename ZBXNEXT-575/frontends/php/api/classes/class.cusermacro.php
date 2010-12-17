@@ -100,8 +100,8 @@ class CUserMacro extends CZBXAPI{
 // OutPut
 			'output'					=> API_OUTPUT_REFER,
 			'extendoutput'				=> null,
-			'select_groups'				=> null,
-			'select_hosts'				=> null,
+			'selectGroups'				=> null,
+			'selectHosts'				=> null,
 			'select_templates'			=> null,
 			'countOutput'				=> null,
 			'preservekeys'				=> null,
@@ -117,11 +117,11 @@ class CUserMacro extends CZBXAPI{
 		if(!is_null($options['extendoutput'])){
 			$options['output'] = API_OUTPUT_EXTEND;
 
-			if(!is_null($options['select_groups'])){
-				$options['select_groups'] = API_OUTPUT_EXTEND;
+			if(!is_null($options['selectGroups'])){
+				$options['selectGroups'] = API_OUTPUT_EXTEND;
 			}
-			if(!is_null($options['select_hosts'])){
-				$options['select_hosts'] = API_OUTPUT_EXTEND;
+			if(!is_null($options['selectHosts'])){
+				$options['selectHosts'] = API_OUTPUT_EXTEND;
 			}
 			if(!is_null($options['select_templates'])){
 				$options['select_templates'] = API_OUTPUT_EXTEND;
@@ -168,9 +168,9 @@ class CUserMacro extends CZBXAPI{
 			$options['hostids'] = null;
 			$options['itemids'] = null;
 
-			$options['select_groups'] = null;
+			$options['selectGroups'] = null;
 			$options['select_templates'] = null;
-			$options['select_hosts'] = null;
+			$options['selectHosts'] = null;
 		}
 
 // globalmacroids
@@ -210,9 +210,9 @@ class CUserMacro extends CZBXAPI{
 				$sql_parts['select']['templateid'] = 'ht.templateid';
 			}
 
-			$sql_parts['from']['macros_templates'] = 'macros_templates ht';
+			$sql_parts['from']['macros_templates'] = 'hosts_templates ht';
 			$sql_parts['where'][] = DBcondition('ht.templateid', $options['templateids']);
-			$sql_parts['where']['hht'] = 'hm.hostid=ht.macroid';
+			$sql_parts['where']['hht'] = 'hm.hostid=ht.hostid';
 		}
 
 
@@ -291,7 +291,7 @@ class CUserMacro extends CZBXAPI{
 			$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.'
 					FROM '.$sql_from.'
 					WHERE '.DBin_node('gm.globalmacroid', $nodeids).
-					$sql_where.
+						$sql_where.
 					$sql_order;
 			$res = DBselect($sql, $sql_limit);
 			while($macro = DBfetch($res)){
@@ -334,7 +334,7 @@ class CUserMacro extends CZBXAPI{
 			$sql = 'SELECT '.$sql_select.'
 					FROM '.$sql_from.'
 					WHERE '.DBin_node('hm.hostmacroid', $nodeids).
-					$sql_where.
+						$sql_where.
 					$sql_order;
 //SDI($sql);
 			$res = DBselect($sql, $sql_limit);
@@ -354,7 +354,7 @@ class CUserMacro extends CZBXAPI{
 						if(!isset($result[$macro['hostmacroid']])) $result[$macro['hostmacroid']]= array();
 
 // Groups
-						if($options['select_groups'] && !isset($result[$macro['hostmacroid']]['groups'])){
+						if($options['selectGroups'] && !isset($result[$macro['hostmacroid']]['groups'])){
 							$result[$macro['hostmacroid']]['groups'] = array();
 						}
 // Templates
@@ -362,7 +362,7 @@ class CUserMacro extends CZBXAPI{
 							$result[$macro['hostmacroid']]['templates'] = array();
 						}
 // Hosts
-						if($options['select_hosts'] && !isset($result[$macro['hostmacroid']]['hosts'])){
+						if($options['selectHosts'] && !isset($result[$macro['hostmacroid']]['hosts'])){
 							$result[$macro['hostmacroid']]['hosts'] = array();
 						}
 
@@ -404,9 +404,9 @@ class CUserMacro extends CZBXAPI{
 
 // Adding Objects
 // Adding Groups
-		if(!is_null($options['select_groups']) && str_in_array($options['select_groups'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectGroups']) && str_in_array($options['selectGroups'], $subselects_allowed_outputs)){
 			$obj_params = array(
-				'output' => $options['select_groups'],
+				'output' => $options['selectGroups'],
 				'hostids' => $hostids,
 				'preservekeys' => 1
 			);
@@ -446,9 +446,9 @@ class CUserMacro extends CZBXAPI{
 		}
 
 // Adding Hosts
-		if(!is_null($options['select_hosts']) && str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
+		if(!is_null($options['selectHosts']) && str_in_array($options['selectHosts'], $subselects_allowed_outputs)){
 			$obj_params = array(
-				'output' => $options['select_hosts'],
+				'output' => $options['selectHosts'],
 				'hostids' => $hostids,
 				'preservekeys' => 1
 			);
@@ -899,7 +899,7 @@ class CUserMacro extends CZBXAPI{
 			$db_macros = self::get($options);
 			$hostmacroids = array_keys($db_macros);
 
-			DB::delete('hostmacro', array(DBcondition('hostmacroid', $hostmacroids)));
+			DB::delete('hostmacro', array('hostmacroid'=>$hostmacroids));
 
 			self::EndTransaction(true, __METHOD__);
 			return array('hostmacroids' => $hostmacroids);
@@ -977,6 +977,9 @@ class CUserMacro extends CZBXAPI{
 
 			$objectids = array_merge($hostids, $templateids);
 
+// first we need to validate input data
+			self::validate($data['macros']);
+
 // Check on existing
 			$options = array(
 				'hostids' => $objectids,
@@ -985,23 +988,8 @@ class CUserMacro extends CZBXAPI{
 				'output' => API_OUTPUT_EXTEND
 			);
 			$db_macros = self::get($options);
-/*
-			foreach($db_macros as $dbnum => $db_macro){
-				if(!isset($existing_macros[$db_macro['macro']])) $existing_macros[$db_macro['macro']] = array();
-				$existing_macros[$db_macro['macro']][$db_macro['hostid']] = $db_macro;
-			}
-
-			foreach($data['macros'] as $hmnum => $updMacro){
-				foreach($objectids as $hnum => $objectid){
-					if(!isset($existing_macros[$updMacro['macro']][$objectid]))
-						self::exception(ZBX_API_ERROR_PERMISSIONS, S_MACRO.' [ '.$updMacro['macro'].' ] '.S_DOES_NOT_EXIST_SMALL);
-				}
-			}
-//*/
 //--
-
-// first we need to validate input data
-			self::validate($data['macros']);
+			
 			$updateMacros = zbx_toHash($data['macros'], 'macro');
 
 			$hostmacroids = array();

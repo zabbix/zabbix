@@ -228,12 +228,12 @@ include_once('include/page_header.php');
 
 	$form = new CForm(null, 'get');
 
-	$form->addItem(new CButton('form', S_CREATE_SCREEN));
+	$form->addItem(new CSubmit('form', S_CREATE_SCREEN));
 	if($templateid){
 		$form->addVar('templateid', $templateid);
 	}
 	else{
-		$form->addItem(new CButton('form', S_IMPORT_SCREEN));
+		$form->addItem(new CSubmit('form', S_IMPORT_SCREEN));
 	}
 
 
@@ -289,10 +289,10 @@ include_once('include/page_header.php');
 			$frmScr->addRow(S_ROWS, new CNumericBox('vsize', $vsize, 3));
 
 
-			$frmScr->addItemToBottomRow(new CButton('save', S_SAVE));
+			$frmScr->addItemToBottomRow(new CSubmit('save', S_SAVE));
 			if(isset($_REQUEST['screenid'])){
 				/* $frmScr->addItemToBottomRow(SPACE);
-				$frmScr->addItemToBottomRow(new CButton('clone',S_CLONE)); !!! TODO */
+				$frmScr->addItemToBottomRow(new CSubmit('clone',S_CLONE)); !!! TODO */
 				$frmScr->addItemToBottomRow(array(SPACE, new CButtonDelete(S_DELETE_SCREEN_Q, url_param('form').url_param('screenid'))));
 			}
 			$frmScr->addItemToBottomRow(array(SPACE, new CButtonCancel(url_param('templateid'))));
@@ -361,7 +361,7 @@ include_once('include/page_header.php');
 		$goBox->addItem($goOption);
 
 		// goButton name is necessary!!!
-		$goButton = new CButton('goButton', S_GO);
+		$goButton = new CSubmit('goButton', S_GO);
 		$goButton->setAttribute('id', 'goButton');
 
 		zbx_add_post_js('chkbxRange.pageGoName = "screens";');

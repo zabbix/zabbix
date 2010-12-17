@@ -28,7 +28,7 @@ require_once('include/requirements.inc.php');
 
 // Author: Aly
 function make_favorite_graphs(){
-	$table = new CTableInfo();
+	$favList = new CList(null, 'favorites');
 
 	$graphids = array();
 	$itemids = array();
@@ -45,7 +45,7 @@ function make_favorite_graphs(){
 
 	$options = array(
 			'graphids' => $graphids,
-			'select_hosts' => API_OUTPUT_EXTEND,
+			'selectHosts' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND,
 		);
 	$graphs = CGraph::get($options);
@@ -53,7 +53,8 @@ function make_favorite_graphs(){
 
 	$options = array(
 			'itemids' => $itemids,
-			'select_hosts' => API_OUTPUT_EXTEND,
+			'selectHosts' => API_OUTPUT_EXTEND,
+			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 			'output' => API_OUTPUT_EXTEND,
 			'webitems' => 1,
 		);
@@ -73,12 +74,6 @@ function make_favorite_graphs(){
 
 			$link = new CLink(get_node_name_by_elid($sourceid, null, ': ').$host['host'].':'.$item['description'],'history.php?action=showgraph&itemid='.$sourceid);
 			$link->setTarget('blank');
-
-			$capt = new CSpan($link);
-			$capt->setAttribute('style','line-height: 14px; vertical-align: middle;');
-
-			$icon = new CLink(new CImg('images/general/chart.png','chart',18,18,'borderless'),'history.php?action=showgraph&itemid='.$sourceid.'&fullscreen=1');
-			$icon->setTarget('blank');
 		}
 		else{
 			if(!isset($graphs[$sourceid])) continue;
@@ -88,31 +83,17 @@ function make_favorite_graphs(){
 
 			$link = new CLink(get_node_name_by_elid($sourceid, null, ': ').$ghost['host'].':'.$graph['name'],'charts.php?graphid='.$sourceid);
 			$link->setTarget('blank');
-
-			$capt = new CSpan($link);
-			$capt->setAttribute('style','line-height: 14px; vertical-align: middle;');
-
-			$icon = new CLink(new CImg('images/general/chart.png','chart',18,18,'borderless'),'charts.php?graphid='.$sourceid.'&fullscreen=1');
-			$icon->setTarget('blank');
 		}
 
-		$table->addRow(new CCol(array(
-			$icon,
-			SPACE,
-			$capt)
-		));
+		$favList->addItem($link, 'nowrap');
 	}
-	$td = new CCol(array(new CLink(S_GRAPHS.' &raquo;','charts.php','highlight')));
-	$td->setAttribute('style','text-align: right;');
 
-	$table->setFooter($td);
-
-return $table;
+return $favList;
 }
 
 // Author: Aly
 function make_favorite_screens(){
-	$table = new CTableInfo();
+	$favList = new CList(null, 'favorites');
 
 	$fav_screens = get_favorites('web.favorite.screenids');
 
@@ -140,12 +121,6 @@ function make_favorite_screens(){
 
 			$link = new CLink(get_node_name_by_elid($sourceid, null, ': ').$slide['name'],'slides.php?elementid='.$sourceid);
 			$link->setTarget('blank');
-
-			$capt = new CSpan($link);
-			$capt->setAttribute('style','line-height: 14px; vertical-align: middle;');
-
-			$icon = new CLink(new CImg('images/general/chart.png','screen',18,18,'borderless'),'slides.php?elementid='.$sourceid.'&fullscreen=1');
-			$icon->setTarget('blank');
 		}
 		else{
 			if(!isset($screens[$sourceid])) continue;
@@ -153,32 +128,18 @@ function make_favorite_screens(){
 
 			$link = new CLink(get_node_name_by_elid($sourceid, null, ': ').$screen['name'],'screens.php?elementid='.$sourceid);
 			$link->setTarget('blank');
-
-			$capt = new CSpan($link);
-			$capt->setAttribute('style','line-height: 14px; vertical-align: middle;');
-
-			$icon = new CLink(new CImg('images/general/chart.png','screen',18,18,'borderless'),'screens.php?elementid='.$sourceid.'&fullscreen=1');
-			$icon->setTarget('blank');
 		}
 
-		$table->addRow(new CCol(array(
-			$icon,
-			SPACE,
-			$capt)
-		));
+		$favList->addItem($link, 'nowrap');
 	}
 
-	$td = new CCol(array(new CLink(S_SCREENS.' &raquo;','screens.php','highlight')));
-	$td->setAttribute('style','text-align: right;');
 
-	$table->setFooter($td);
-
-return $table;
+return $favList;
 }
 
 // Author: Aly
 function make_favorite_maps(){
-	$table = new CTableInfo();
+	$favList = new CList(null, 'favorites');
 
 	$fav_sysmaps = get_favorites('web.favorite.sysmapids');
 
@@ -199,25 +160,10 @@ function make_favorite_maps(){
 		$link = new CLink(get_node_name_by_elid($sysmapid, null, ': ').$sysmap['name'],'maps.php?sysmapid='.$sysmapid);
 		$link->setTarget('blank');
 
-		$capt = new CSpan($link);
-		$capt->setAttribute('style','line-height: 14px; vertical-align: middle;');
-
-		$icon = new CLink(new CImg('images/general/chart.png','map',18,18,'borderless'),'maps.php?sysmapid='.$sysmapid.'&fullscreen=1');
-		$icon->setTarget('blank');
-
-		$table->addRow(new CCol(array(
-			$icon,
-			SPACE,
-			$capt)
-		));
+		$favList->addItem($link, 'nowrap');
 	}
 
-	$td = new CCol(array(new CLink(S_MAPS.' &raquo;','maps.php','highlight')));
-	$td->setAttribute('style','text-align: right;');
-
-	$table->setFooter($td);
-
-return $table;
+return $favList;
 }
 
 // Author: Aly
@@ -284,15 +230,18 @@ function make_system_status($filter){
 	foreach($triggers as $tnum => $trigger){
 		$options = array(
 			'nodeids' => get_current_nodeid(),
-			'triggerids' => $trigger['triggerid'],
 			'object' => EVENT_SOURCE_TRIGGERS,
-			'value' => TRIGGER_VALUE_TRUE,
+			'triggerids' => $trigger['triggerid'],
+			'filter'=> array(
+				'value' => TRIGGER_VALUE_TRUE,
+				'value_changed' => TRIGGER_VALUE_CHANGED_YES
+			),
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => 1,
 			'select_acknowledges' => API_OUTPUT_COUNT,
-			'limit' => 1,
 			'sortfield' => 'clock',
-			'sortorder' => ZBX_SORT_DOWN
+			'sortorder' => ZBX_SORT_DOWN,
+			'limit' => 1
 		);
 		$events = CEvent::get($options);
 		if(empty($events)){
@@ -456,9 +405,10 @@ function make_system_status($filter){
 		$table->addRow($group_row);
 	}
 
-	$table->setFooter(new CCol(S_UPDATED.': '.zbx_date2str(S_BLOCKS_SYSTEM_SUMMARY_TIME_FORMAT)));
+	$footer = new CDiv(S_UPDATED.': '.zbx_date2str(S_BLOCKS_SYSTEM_SUMMARY_TIME_FORMAT), 'textwhite');
+	$footer->setAttribute('style', 'height: 0px; position: relative; padding-left: 4px; top: 5px;');
 
-	return $table;
+return new CDiv(array($table, $footer));
 }
 
 function make_hoststat_summary($filter){
@@ -515,7 +465,7 @@ function make_hoststat_summary($filter){
 			'monitored' => 1,
 			'maintenance' => $filter['maintenance'],
 			'withLastEventUnacknowledged' => 1,
-			'select_hosts' => API_OUTPUT_REFER,
+			'selectHosts' => API_OUTPUT_REFER,
 			'filter' => array(
 				'priority' => $filter['severity'],
 				'value' => TRIGGER_VALUE_TRUE
@@ -772,9 +722,10 @@ function make_hoststat_summary($filter){
 		$table->addRow($group_row);
 	}
 
-	$table->setFooter(new CCol(S_UPDATED.': '.zbx_date2str(S_BLOCKS_HOSTSTAT_SUMMARY_TIME_FORMAT)));
+	$footer = new CDiv(S_UPDATED.': '.zbx_date2str(S_BLOCKS_SYSTEM_SUMMARY_TIME_FORMAT), 'textwhite');
+	$footer->setAttribute('style', 'height: 0px; position: relative; padding-left: 4px; top: 5px;');
 
-	return $table;
+return new CDiv(array($table, $footer));
 }
 
 // Author: Aly
@@ -850,10 +801,10 @@ function make_status_of_zbx(){
 	}
 // }}}CHECK REQUIREMENTS
 
+	$footer = new CDiv(S_UPDATED.': '.zbx_date2str(S_BLOCKS_SYSTEM_SUMMARY_TIME_FORMAT), 'textwhite');
+	$footer->setAttribute('style', 'height: 0px; position: relative; padding-left: 4px; top: 5px;');
 
-	$table->setFooter(new CCol(S_UPDATED.': '.zbx_date2str(S_BLOCKS_ZBX_STATUS_TIME_FORMAT)));
-
-return $table;
+return new CDiv(array($table, $footer));
 }
 
 
@@ -871,8 +822,8 @@ function make_latest_issues($filter = array()){
 			'priority' => $filter['severity'],
 			'value' => TRIGGER_VALUE_TRUE,
 		),
-		'select_groups' => API_OUTPUT_EXTEND,
-		'select_hosts' => array('hostid', 'host', 'maintenance_status', 'maintenanceid'),
+		'selectGroups' => API_OUTPUT_EXTEND,
+		'selectHosts' => array('hostid', 'host', 'maintenance_status', 'maintenanceid'),
 		'output' => API_OUTPUT_EXTEND,
 		'sortfield' => 'lastchange',
 		'sortorder' => ZBX_SORT_DOWN,
@@ -1044,9 +995,10 @@ function make_latest_issues($filter = array()){
 		unset($trigger,$description,$actions);
 	}
 
-	$table->setFooter(new CCol(S_UPDATED.': '.zbx_date2str(S_BLOCKS_LATEST_ISSUES_TIME_FORMAT)));
+	$footer = new CDiv(S_UPDATED.': '.zbx_date2str(S_BLOCKS_SYSTEM_SUMMARY_TIME_FORMAT), 'textwhite');
+	$footer->setAttribute('style', 'height: 0px; position: relative; padding-left: 4px; top: 5px;');
 
-return $table;
+return new CDiv(array($table, $footer));
 }
 
 // author Aly
@@ -1121,8 +1073,11 @@ function make_webmon_overview($filter){
 			new CSpan($apps[HTTPTEST_STATE_UNKNOWN],'unknown')
 		));
 	}
-	$table->setFooter(new CCol(S_UPDATED.': '.zbx_date2str(S_BLOCKS_WEBMON_TIME_FORMAT)));
-return $table;
+
+	$footer = new CDiv(S_UPDATED.': '.zbx_date2str(S_BLOCKS_SYSTEM_SUMMARY_TIME_FORMAT), 'textwhite');
+	$footer->setAttribute('style', 'height: 0px; position: relative; padding-left: 4px; top: 5px;');
+
+return new CDiv(array($table, $footer));
 }
 
 // Author: Aly
@@ -1167,9 +1122,11 @@ function make_discovery_status(){
 			new CSpan($drule['down'],($drule['down'] > 0)? 'red':'green')
 		));
 	}
-	$table->setFooter(new CCol(S_UPDATED.': '.zbx_date2str(S_BLOCKS_DISCOVERY_STATUS_TIME_FORMAT)));
 
-return 	$table;
+	$footer = new CDiv(S_UPDATED.': '.zbx_date2str(S_BLOCKS_SYSTEM_SUMMARY_TIME_FORMAT), 'textwhite');
+	$footer->setAttribute('style', 'height: 0px; position: relative; padding-left: 4px; top: 5px;');
+
+return new CDiv(array($table, $footer));
 }
 
 function make_graph_menu(&$menu,&$submenu){
@@ -1182,7 +1139,7 @@ function make_graph_menu(&$menu,&$submenu){
 		);
 
 	$menu['menu_graphs'][] = array(
-				S_ADD.SPACE.S_GRAPH,
+				S_ADD.' '.S_GRAPH,
 				'javascript: '.
 				"PopUp('popup.php?srctbl=graphs".
 					'&srcfld1=graphid'.
@@ -1194,7 +1151,7 @@ function make_graph_menu(&$menu,&$submenu){
 				array('outer' => 'pum_o_submenu', 'inner'=>array('pum_i_submenu'))
 		);
 	$menu['menu_graphs'][] = array(
-				S_ADD.SPACE.S_SIMPLE_GRAPH,
+				S_ADD.' '.S_SIMPLE_GRAPH,
 				'javascript: '.
 				"PopUp('popup.php?srctbl=simple_graph".
 					'&srcfld1=itemid'.
@@ -1230,7 +1187,7 @@ function make_graph_submenu(){
 
 	$options = array(
 			'graphids' => $graphids,
-			'select_hosts' => array('hostid', 'host'),
+			'selectHosts' => array('hostid', 'host'),
 			'output' => API_OUTPUT_EXTEND
 		);
 	$graphs = CGraph::get($options);
@@ -1238,7 +1195,8 @@ function make_graph_submenu(){
 
 	$options = array(
 			'itemids' => $itemids,
-			'select_hosts' => array('hostid', 'host'),
+			'selectHosts' => array('hostid', 'host'),
+			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 			'output' => API_OUTPUT_EXTEND,
 			'webitems' => 1,
 		);
@@ -1285,7 +1243,7 @@ function make_graph_submenu(){
 
 	if(isset($graph_added)){
 			$favGraphs[] = array(
-			'name'	=>	S_REMOVE.SPACE.S_ALL_S.SPACE.S_GRAPHS,
+			'name'	=>	S_REMOVE.' '.S_ALL_S.' '.S_GRAPHS,
 			'favobj'=>	'graphid',
 			'favid'	=>	0,
 			'action'=>	'remove'
@@ -1294,7 +1252,7 @@ function make_graph_submenu(){
 
 	if(isset($item_added)){
 		$favGraphs[] = array(
-			'name'	=>	S_REMOVE.SPACE.S_ALL_S.SPACE.S_SIMPLE_GRAPHS,
+			'name'	=>	S_REMOVE.' '.S_ALL_S.' '.S_SIMPLE_GRAPHS,
 			'favobj'=>	'itemid',
 			'favid'	=>	0,
 			'action'=>	'remove'
@@ -1308,7 +1266,7 @@ function make_sysmap_menu(&$menu,&$submenu){
 
 	$menu['menu_sysmaps'][] = array(S_FAVOURITE_MAPS, null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
 	$menu['menu_sysmaps'][] = array(
-				S_ADD.SPACE.S_MAP,
+				S_ADD.' '.S_MAP,
 				'javascript: '.
 				"PopUp('popup.php?srctbl=sysmaps".
 					'&srcfld1=sysmapid'.
@@ -1348,7 +1306,7 @@ function make_sysmap_submenu(){
 
 	if(!empty($favMaps)){
 		$favMaps[] = array(
-				'name'	=>	S_REMOVE.SPACE.S_ALL_S.SPACE.S_MAPS,
+				'name'	=>	S_REMOVE.' '.S_ALL_S.' '.S_MAPS,
 				'favobj'=>	'sysmapid',
 				'favid'	=>	0,
 				'action'=>	'remove'
@@ -1362,7 +1320,7 @@ function make_screen_menu(&$menu,&$submenu){
 
 	$menu['menu_screens'][] = array(S_FAVOURITE_SCREENS, null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
 	$menu['menu_screens'][] = array(
-				S_ADD.SPACE.S_SCREEN,
+				S_ADD.' '.S_SCREEN,
 				'javascript: '.
 				"PopUp('popup.php?srctbl=screens".
 					'&srcfld1=screenid'.
@@ -1373,7 +1331,7 @@ function make_screen_menu(&$menu,&$submenu){
 				array('outer' => 'pum_o_submenu', 'inner'=>array('pum_i_submenu')
 		));
 	$menu['menu_screens'][] = array(
-				S_ADD.SPACE.S_SLIDESHOW,
+				S_ADD.' '.S_SLIDESHOW,
 				'javascript: '.
 				"PopUp('popup.php?srctbl=slides".
 					'&srcfld1=slideshowid'.
@@ -1441,7 +1399,7 @@ function make_screen_submenu(){
 
 	if(isset($screen_added)){
 		$favScreens[] = array(
-			'name'	=>	S_REMOVE.SPACE.S_ALL_S.SPACE.S_SCREENS,
+			'name'	=>	S_REMOVE.' '.S_ALL_S.' '.S_SCREENS,
 			'favobj'=>	'screenid',
 			'favid'	=>	0,
 			'action'=>	'remove'
@@ -1450,7 +1408,7 @@ function make_screen_submenu(){
 
 	if(isset($slide_added)){
 		$favScreens[] = array(
-			'name'	=>	S_REMOVE.SPACE.S_ALL_S.SPACE.S_SLIDES,
+			'name'	=>	S_REMOVE.' '.S_ALL_S.' '.S_SLIDES,
 			'favobj'=>	'slideshowid',
 			'favid'	=>	0,
 			'action'=>	'remove'

@@ -194,11 +194,13 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 			case SVC_SNMPv2c:
 			case SVC_SNMPv3:
 				memset(&item, 0, sizeof(DC_ITEM));
-				zbx_strlcpy(item.key_orig, dcheck->key_, sizeof(item.key_orig));
+
+				strscpy(item.key_orig, dcheck->key_);
 				item.key = item.key_orig;
-				zbx_strlcpy(item.host.ip, ip, sizeof(item.host.ip));
-				item.host.useip	= 1;
-				item.host.port	= port;
+				
+				item.interface.useip = 1;
+				item.interface.addr = ip;
+				item.interface.port = port;
 
 				item.value_type	= ITEM_VALUE_TYPE_STR;
 
@@ -232,13 +234,12 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 				else
 #ifdef HAVE_SNMP
 				{
-					item.snmp_port = port;
 					item.snmp_community = strdup(dcheck->snmp_community);
 					item.snmp_oid = strdup(dcheck->key_);
 
-					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL,
+					substitute_simple_macros(NULL, NULL, NULL, NULL,
 							&item.snmp_community, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL,
+					substitute_simple_macros(NULL, NULL, NULL, NULL,
 							&item.snmp_oid, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 
 					if (ITEM_TYPE_SNMPv3 == item.type)
@@ -248,11 +249,11 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 						item.snmpv3_authpassphrase = strdup(dcheck->snmpv3_authpassphrase);
 						item.snmpv3_privpassphrase = strdup(dcheck->snmpv3_privpassphrase);
 
-						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL,
+						substitute_simple_macros(NULL, NULL, NULL, NULL,
 								&item.snmpv3_securityname, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL,
+						substitute_simple_macros(NULL, NULL, NULL, NULL,
 								&item.snmpv3_authpassphrase, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL,
+						substitute_simple_macros(NULL, NULL, NULL, NULL,
 								&item.snmpv3_privpassphrase, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 					}
 
@@ -463,7 +464,7 @@ static void	process_rule(DB_DRULE *drule)
 	DB_DHOST	dhost;
 	int		host_status, now;
 	unsigned int	j[9], i, first, last, mask, network, broadcast;
-	char		ip[HOST_IP_LEN_MAX], *curr_range, *next_range, *dash, *slash;
+	char		ip[INTERFACE_IP_LEN_MAX], *curr_range, *next_range, *dash, *slash;
 #if defined(HAVE_IPV6)
 	int		ipv6;
 #endif

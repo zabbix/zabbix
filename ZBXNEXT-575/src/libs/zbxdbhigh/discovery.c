@@ -273,7 +273,7 @@ static void	discovery_register_service(DB_DRULE *drule, DB_DCHECK *dcheck,
 			__function_name, ip, port, dcheck->key_);
 
 	key_esc = DBdyn_escape_string_len(dcheck->key_, DSERVICE_KEY_LEN);
-	ip_esc = DBdyn_escape_string_len(ip, HOST_IP_LEN);
+	ip_esc = DBdyn_escape_string_len(ip, INTERFACE_IP_LEN);
 
 	result = DBselect(
 			"select dserviceid,dhostid,status,lastup,lastdown,value"

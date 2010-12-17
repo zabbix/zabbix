@@ -118,11 +118,13 @@ if(!isset($DB)){
 						$result = false;
 					}
 					else{
-						//DBexecute('set current schema='.$DB['USER'].';');
 						$options = array(
 							'db2_attr_case' => DB2_CASE_LOWER,
 						);
 						db2_set_option($DB['DB'], $options, 1);
+						if(isset($DB['SCHEMA']) && ($DB['SCHEMA'] != '')){
+							DBexecute("SET CURRENT SCHEMA='".$DB['SCHEMA']."'");
+						}
 					}
 
 					break;
@@ -189,8 +191,8 @@ if(!isset($DB)){
 					$result = false;
 			}
 		}
-		if( false == $result )
-			$DB['DB']= null;
+		if(false == $result)
+			$DB['DB'] = null;
 
 		return $result;
 	}
@@ -237,8 +239,6 @@ if(!isset($DB)){
 	}
 
 	function DBloadfile($file, &$error){
-		global $DB;
-
 		if(!file_exists($file)){
 			$error = 'DBloadfile. Missing file['.$file.']';
 			return false;
@@ -556,7 +556,6 @@ COpt::savesqlrequest(microtime(true)-$time_start,$query);
 					}
 				break;
 				case 'IBM_DB2':
-					$options = array();
 					if(!$result = db2_prepare($DB['DB'], $query)){
 						$e = @db2_stmt_errormsg($result);
 						error('SQL error ['.$query.'] in ['.$e.']');
@@ -898,15 +897,6 @@ else {
 	function zbx_db_distinct($sql_parts){
 		if(count($sql_parts['from']) > 1) return ' DISTINCT ';
 		else return ' ';
-
-		$distinct_tables = array(
-			'hosts_groups', 'hosts_templates',
-			'functions', 'graphs_items', 'screens_items', 'slides',
-			'httpstepitem', 'items_applications',
-			'maintenances_hosts', 'maintenances_groups',
-			'sysmaps_elements', 'sysmaps_link_triggers',
-			'rights', 'users_groups'
-		);
 	}
 
 	function zbx_db_search($table, $options, &$sql_parts){
@@ -929,7 +919,16 @@ else {
 				zbx_dbstr($start.zbx_strtoupper($pattern).'%');
 		}
 
-		if(!empty($search)) $sql_parts['where']['search'] = '( '.implode(' OR ', $search).' )';
+		if(!empty($search)){
+			if(isset($sql_parts['where']['search'])){
+				$search[] = $sql_parts['where']['search'];
+			}
+
+			$sql_parts['where']['search'] = '( '.implode(' OR ', $search).' )';
+			return true;
+		}
+
+	return false;
 	}
 
 
@@ -958,7 +957,15 @@ else {
 			}
 		}
 
-		if(!empty($filter)) $sql_parts['where']['filter'] = '( '.implode(' AND ', $filter).' )';
+		if(!empty($filter)){
+			if(isset($sql_parts['where']['filter'])){
+				$filter[] = $sql_parts['where']['filter'];
+			}
+			$sql_parts['where']['filter'] = '( '.implode(' AND ', $filter).' )';
+			return true;
+		}
+
+	return false;
 	}
 
 
@@ -1029,6 +1036,7 @@ else {
 		const SCHEMA_FILE = 'schema.inc.php';
 		const DBEXECUTE_ERROR = 1;
 		const RESERVEIDS_ERROR = 2;
+		const SCHEMA_ERROR = 3;
 
 		const FIELD_TYPE_INT = 'int';
 		const FIELD_TYPE_CHAR = 'char';
@@ -1103,7 +1111,8 @@ else {
 				return self::$schema;
 			else if(isset(self::$schema[$table]))
 				return self::$schema[$table];
-			else return false;
+			else
+				self::exception(self::SCHEMA_ERROR, 'Table '. $table .' does not exist.');
 		}
 
 /**
@@ -1115,7 +1124,7 @@ else {
  */
 		public static function insert($table, $values, $getids=true){
 			if(empty($values)) return true;
-			$result_ids = array();
+			$resultIds = array();
 
 			if($getids)
 				$id = self::reserveIds($table, count($values));
@@ -1123,20 +1132,34 @@ else {
 			$table_schema = self::getSchema($table);
 
 			foreach($values as $key => $row){
-				foreach($row as $field => $v){
+				foreach($row as $field => $value){
 					if(!isset($table_schema['fields'][$field])){
 						unset($row[$field]);
+						continue;
 					}
-					else if($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_CHAR){
-						$row[$field] = zbx_dbstr($v);
+
+					// TODO: decide  if we allow to pass null to NOT NULL field using default instead
+					if(is_null($value)){
+						if($table_schema['fields'][$field]['null'])
+							$value = 'NULL';
+						else if(isset($table_schema['fields'][$field]['default']))
+							$value = $table_schema['fields'][$field]['default'];
+					}
+
+					if($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_CHAR){
+						if($value != 'NULL')
+							$value = zbx_dbstr($value);
 					}
 					else if(isset($table_schema['fields'][$field]['ref_table'])){
-						$row[$field] = zero2null($v);
+						if($table_schema['fields'][$field]['null'])
+							$value = zero2null($value);
 					}
+
+					$row[$field] = $value;
 				}
 
 				if($getids){
-					$result_ids[$key] = $id;
+					$resultIds[$key] = $id;
 					$row[$table_schema['key']] = $id;
 					$id = bcadd($id, 1, 0);
 				}
@@ -1147,7 +1170,7 @@ else {
 				if(!DBexecute($sql)) self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
 			}
 
-			return $result_ids;
+			return $resultIds;
 		}
 
 /**
@@ -1171,15 +1194,27 @@ else {
 					if(!isset($table_schema['fields'][$field])){
 						continue;
 					}
-					else if($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_CHAR){
-						$value = zbx_dbstr($value);
+
+// TODO: decide  if we allow to pass null to NOT NULL field using default instead
+					if(is_null($value)){
+						if($table_schema['fields'][$field]['null'])
+							$value = 'NULL';
+						else if(isset($table_schema['fields'][$field]['default']))
+							$value = $table_schema['fields'][$field]['default'];
+					}
+
+					if($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_CHAR){
+						if($value != 'NULL')
+							$value = zbx_dbstr($value);
 					}
 					else if(isset($table_schema['fields'][$field]['ref_table'])){
-						$value = zero2null($value);
+						if($table_schema['fields'][$field]['null'])
+							$value = zero2null($value);
 					}
 
 					$sql_set .= $field.'='.$value.',';
 				}
+
 				$sql_set = rtrim($sql_set, ',');
 
 				if(!empty($sql_set)){
@@ -1190,7 +1225,57 @@ else {
 			return true;
 		}
 
-		public static function delete($table, $where){
+
+/**
+ * Delete data from DB
+ *
+ * Example:
+ * DB::delete('applications', array('applicationid'=>array(1, 8, 6)));
+ * DELETE FROM applications WHERE applicationid IN (1, 8, 6)
+ *
+ * DB::delete('applications', array('applicationid'=>array(1), 'templateid'=array(10)));
+ * DELETE FROM applications WHERE applicationid IN (1) AND templateid IN (10)
+ *
+ * @param string $table
+ * @param array $where pair of fieldname => fieldvalues
+ * @return bool
+ */
+		public static function delete($table, $wheres, $use_or=false){
+			if(empty($wheres) || !is_array($wheres)){
+				return true;
+			}
+
+			$table_schema = self::getSchema($table);
+			$sql_wheres = array();
+
+//for every field
+			foreach($wheres as $field => $values){
+//if this field does not exist, just skip it
+				if(!isset($table_schema['fields'][$field]) || is_null($values)){
+					continue;
+				}
+				$values = zbx_toArray($values);
+				$is_string = ($table_schema['fields'][$field]['type'] == self::FIELD_TYPE_CHAR);
+
+//false = not NOT IN
+				$sql_wheres[] = DBcondition($field, $values, false, $is_string);
+			}
+
+//we will not delete everything from a table just like this
+			if(count($sql_wheres) == 0){
+				return false;
+			}
+
+			$sql = 'DELETE FROM '.$table.' WHERE '.implode(($use_or ? ' OR ' : ' AND '), $sql_wheres);
+
+			if(!DBexecute($sql)) {
+				self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
+			}
+			return true;
+		}
+
+
+		public static function old_delete($table, $where){
 			$where = zbx_toArray($where);
 
 			$sql = 'DELETE FROM '.$table.' WHERE '.implode(' AND ', $where);
@@ -1200,6 +1285,5 @@ else {
 		}
 
 	}
-
 
 ?>

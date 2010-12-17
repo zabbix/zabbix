@@ -106,7 +106,7 @@ function itemIdents($itemids){
 	$options = array(
 		'itemids' => $itemids,
 		'output' => API_OUTPUT_EXTEND,
-		'select_hosts' => array('hostid', 'host'),
+		'selectHosts' => array('hostid', 'host'),
 		'nodeids'=> get_current_nodeid(true),
 		'webitems' => 1,
 	);
@@ -130,7 +130,7 @@ function triggerIdents($triggerids){
 
 	$options = array(
 		'triggerids' => $triggerids,
-		'select_hosts' => array('hostid', 'host'),
+		'selectHosts' => array('hostid', 'host'),
 		'output' => API_OUTPUT_EXTEND,
 		'nodeids'=> get_current_nodeid(true)
 	);
@@ -155,7 +155,7 @@ function graphIdents($graphids){
 
 	$options = array(
 		'graphids' => $graphids,
-		'select_hosts' => array('hostid', 'host'),
+		'selectHosts' => array('hostid', 'host'),
 		'output' => API_OUTPUT_EXTEND,
 		'nodeids'=> get_current_nodeid(true)
 	);

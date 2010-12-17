@@ -48,8 +48,7 @@ include_once('include/page_header.php');
 
 // test data (create table, create check fields)
 
-	$data_table = new CTable();
-	$data_table->setClass('tableinfo');
+	$data_table = new CTable(null, 'tableinfo');
 	$data_table->setAttribute('id', 'data_list');
 	$data_table->setOddRowClass('even_row');
 	$data_table->setEvenRowClass('even_row');
@@ -126,8 +125,7 @@ include_once('include/page_header.php');
 	$frm_test->addRow(S_TEST_DATA, $data_table);
 
 /* result */
-	$res_table = new CTable();
-	$res_table->setClass('tableinfo');
+	$res_table = new CTable(null, 'tableinfo');
 	$res_table->setAttribute('id', 'result_list');
 	$res_table->setOddRowClass('even_row');
 	$res_table->setEvenRowClass('even_row');
@@ -175,14 +173,12 @@ include_once('include/page_header.php');
 	$frm_test->addRow(S_RESULT, $res_table);
 
 // action buttons
-	$btn_test = new CButton('test_expression', S_TEST);
+	$btn_test = new CSubmit('test_expression', S_TEST);
 	if(!$allowedTesting) $btn_test->setAttribute('disabled', 'disabled');
 	$frm_test->addItemToBottomRow($btn_test);
 	$frm_test->addItemToBottomRow(SPACE);
 
-	$btn_close = new CButton('close', S_CLOSE);
-	$btn_close->setType('button');
-	$btn_close->setAction('javascript: self.close();');
+	$btn_close = new CButton('close', S_CLOSE,'javascript: self.close();');
 	$frm_test->addItemToBottomRow($btn_close);
 
 	$frm_test->show();

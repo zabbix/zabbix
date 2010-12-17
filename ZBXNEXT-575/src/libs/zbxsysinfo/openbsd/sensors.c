@@ -1,6 +1,6 @@
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,99 +18,187 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
 
-#include "md5.h"
+#include <sys/sensors.h>
 
-static int	get_sensor(const char *name, unsigned flags, AGENT_RESULT *result)
+#ifdef HAVE_SENSORDEV
+
+#define DO_ONE	0
+#define DO_AVG	1
+#define DO_MAX	2
+#define DO_MIN	3
+
+static void	count_sensor(int do_task, const struct sensor *sensor, double *aggr, int *cnt)
 {
-	DIR	*dir;
-	struct	dirent *entries;
-	struct	stat buf;
-	char	filename[MAX_STRING_LEN];
-	char	line[MAX_STRING_LEN];
-	double	d1,d2,d3;
+	double	value = sensor->value;
 
-	FILE	*f;
-
-        assert(result);
-
-        init_result(result);
-
-	dir=opendir("/proc/sys/dev/sensors");
-	if(NULL == dir)
+	switch (sensor->type)
 	{
-		return SYSINFO_RET_FAIL;
+		case SENSOR_TEMP:
+			value = (value - 273150000) / 1000000;
+			break;
+		case SENSOR_VOLTS_DC:
+		case SENSOR_VOLTS_AC:
+		case SENSOR_AMPS:
+		case SENSOR_LUX:
+			value /= 1000000;
+			break;
+		case SENSOR_TIMEDELTA:
+			value /= 1000000000;
+			break;
+		default:
+			break;
 	}
 
-	while((entries=readdir(dir))!=NULL)
+	(*cnt)++;
+
+	switch (do_task)
 	{
-		strscpy(filename,"/proc/sys/dev/sensors/");
-		zbx_strlcat(filename,entries->d_name,MAX_STRING_LEN);
-		zbx_strlcat(filename,name,MAX_STRING_LEN);
+		case DO_ONE:
+			*aggr = value;
+			break;
+		case DO_AVG:
+			*aggr += value;
+			break;
+		case DO_MAX:
+			*aggr = (1 == *cnt ? value : MAX(*aggr, value));
+			break;
+		case DO_MIN:
+			*aggr = (1 == *cnt ? value : MIN(*aggr, value));
+			break;
+	}
+}
 
-		if(stat(filename,&buf)==0)
+static int	get_device_sensors(int do_task, int *mib, const struct sensordev *sensordev, const char *name, double *aggr, int *cnt)
+{
+	if (DO_ONE == do_task)
+	{
+		int		i, len = 0;
+		struct sensor	sensor;
+		size_t		slen = sizeof(sensor);
+
+		for (i = 0; i < SENSOR_MAX_TYPES; i++)
 		{
-			if(NULL == (f = fopen(filename,"r")))
-			{
-				continue;
-			}
-			fgets(line,MAX_STRING_LEN,f);
-			zbx_fclose(f);
+			if (0 == strncmp(name, sensor_type_s[i], len = strlen(sensor_type_s[i])))
+				break;
+		}
 
-			if(sscanf(line,"%lf\t%lf\t%lf\n",&d1, &d2, &d3) == 3)
+		if (i == SENSOR_MAX_TYPES)
+			return FAIL;
+
+		if (SUCCEED != is_uint(name + len))
+			return FAIL;
+
+		mib[3] = i;
+		mib[4] = atoi(name + len);
+
+		if (-1 == sysctl(mib, 5, &sensor, &slen, NULL, 0))
+			return FAIL;
+
+		count_sensor(do_task, &sensor, aggr, cnt);
+	}
+	else
+	{
+		int	i, j;
+
+		for (i = 0; i < SENSOR_MAX_TYPES; i++)
+		{
+			for (j = 0; j < sensordev->maxnumt[i]; j++)
 			{
-				closedir(dir);
-				SET_DBL_RESULT(result, d3);
-				return  SYSINFO_RET_OK;
-			}
-			else
-			{
-				closedir(dir);
-				return  SYSINFO_RET_FAIL;
+				char		human[64];
+				struct sensor	sensor;
+				size_t		slen = sizeof(sensor);
+
+				zbx_snprintf(human, sizeof(human), "%s%d", sensor_type_s[i], j);
+
+				if (NULL == zbx_regexp_match(human, name, NULL))
+					continue;
+
+				mib[3] = i;
+				mib[4] = j;
+
+				if (-1 == sysctl(mib, 5, &sensor, &slen, NULL, 0))
+					return FAIL;
+
+				count_sensor(do_task, &sensor, aggr, cnt);
 			}
 		}
 	}
-	closedir(dir);
-	return	SYSINFO_RET_FAIL;
+
+	return SUCCEED;
 }
 
-int     OLD_SENSOR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	GET_SENSOR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-        char    key[MAX_STRING_LEN];
-        int     ret;
+	char	device[MAX_STRING_LEN], name[MAX_STRING_LEN], function[8];
+	int	do_task, mib[5], dev, cnt = 0;
+	double	aggr = 0;
 
-        assert(result);
+	if (num_param(param) > 3)
+		return SYSINFO_RET_FAIL;
 
-        init_result(result);
+	if (0 != get_param(param, 1, device, sizeof(device)))
+		return SYSINFO_RET_FAIL;
 
-        if(num_param(param) > 1)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	if (0 != get_param(param, 2, name, sizeof(name)))
+		return SYSINFO_RET_FAIL;
 
-        if(get_param(param, 1, key, MAX_STRING_LEN) != 0)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	if (0 != get_param(param, 3, function, sizeof(function)))
+		do_task = DO_ONE;
+	else if (0 == strcmp(function, "avg"))
+		do_task = DO_AVG;
+	else if (0 == strcmp(function, "max"))
+		do_task = DO_MAX;
+	else if (0 == strcmp(function, "min"))
+		do_task = DO_MIN;
+	else
+		return SYSINFO_RET_FAIL;
 
-        if(strcmp(key,"temp1") == 0)
-        {
-                ret = get_sensor("temp1", flags, result);
-        }
-        else if(strcmp(key,"temp2") == 0)
-        {
-                ret = get_sensor("temp2", flags, result);
-        }
-        else if(strcmp(key,"temp3") == 0)
-        {
-                ret = get_sensor("temp3", flags, result);
-        }
-        else
-        {
-                ret = SYSINFO_RET_FAIL;
-        }
+	mib[0] = CTL_HW;
+	mib[1] = HW_SENSORS;
 
-        return ret;
+	for (dev = 0;; dev++)
+	{
+		struct sensordev	sensordev;
+		size_t			sdlen = sizeof(sensordev);
+
+		mib[2] = dev;
+
+		if (-1 == sysctl(mib, 3, &sensordev, &sdlen, NULL, 0))
+		{
+			if (errno == ENXIO)
+				continue;
+			if (errno == ENOENT)
+				break;
+
+			return SYSINFO_RET_FAIL;
+		}
+
+		if ((DO_ONE == do_task && 0 == strcmp(sensordev.xname, device)) ||
+				(DO_ONE != do_task && NULL != zbx_regexp_match(sensordev.xname, device, NULL)))
+		{
+			if (SUCCEED != get_device_sensors(do_task, mib, &sensordev, name, &aggr, &cnt))
+				return SYSINFO_RET_FAIL;
+		}
+	}
+
+	if (0 == cnt)
+		return SYSINFO_RET_FAIL;
+
+	if (DO_AVG == do_task)
+		SET_DBL_RESULT(result, aggr / cnt);
+	else
+		SET_DBL_RESULT(result, aggr);
+
+	return SYSINFO_RET_OK;
 }
+
+#else
+
+int	GET_SENSOR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	return SYSINFO_RET_FAIL;
+}
+
+#endif	/* HAVE_SENSORDEV */

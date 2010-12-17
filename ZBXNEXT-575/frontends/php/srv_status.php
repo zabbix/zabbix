@@ -273,7 +273,7 @@ include_once('include/page_header.php');
 		if($tree){
 // creates form for choosing a preset interval
 			$r_form = new CForm();
-			$r_form->setClass('nowrap');
+			$r_form->setAttribute('class', 'nowrap');
 			$r_form->setMethod('get');
 			$r_form->setAttribute('name', 'period_choice');
 			$r_form->addVar('fullscreen', $_REQUEST['fullscreen']);

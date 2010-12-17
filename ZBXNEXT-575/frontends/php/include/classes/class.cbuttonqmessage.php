@@ -24,12 +24,12 @@ class CButtonQMessage extends CButton{
  public $msg;
  public $name;
 
-	public function __construct($name, $caption, $msg=NULL, $vars=NULL){
+	public function __construct($name, $caption, $msg=NULL, $vars=NULL, $class=null){
 		$this->vars = null;
 		$this->msg = null;
 		$this->name = $name;
 
-		parent::__construct($name,$caption);
+		parent::__construct($name,$caption,null,$class);
 
 		$this->setMessage($msg);
 		$this->setVars($vars);
@@ -57,7 +57,7 @@ class CButtonQMessage extends CButton{
 
 	public function setAction($value=null){
 		if(!is_null($value))
-			return parent::setAction($value);
+			return parent::setAttribute('onclick', $value);
 
 		global $page;
 
@@ -73,7 +73,7 @@ class CButtonQMessage extends CButton{
 			$action = 'true';
 		}
 
-		return parent::setAction('if('.$confirmation.') return '.$action.'; else return false;');
+		return parent::setAttribute('onclick', 'if('.$confirmation.') return '.$action.'; else return false;');
 	}
 }
 ?>

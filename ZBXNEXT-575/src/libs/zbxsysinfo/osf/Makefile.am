@@ -11,8 +11,6 @@ libspecsysinfo_a_SOURCES = \
 	inodes.c \
 	kernel.c \
 	memory.c \
-	net.c \
 	proc.c \
-	sensors.c \
 	swap.c \
 	uptime.c
