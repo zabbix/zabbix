@@ -256,8 +256,12 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 
 	now = time(NULL);
 
-	DBexecute("update httptest set lastcheck=%d where httptestid=" ZBX_FS_UI64,
-		now,
+	DBexecute(
+		"update httptest"
+		" set lastcheck=%d,"
+			"nextcheck=%d+delay"
+		" where httptestid=" ZBX_FS_UI64,
+		now, now,
 		httptest->httptestid);
 
 	if (NULL == (easyhandle = curl_easy_init()))
@@ -295,7 +299,7 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 
 	now = time(NULL);
 
-	while (NULL != (row = DBfetch(result)) && NULL == err_str)
+	while (NULL == err_str && NULL != (row = DBfetch(result)))
 	{
 		/* NOTE: do not use break or return for this block!
 		 *       process_step_data calling required!
@@ -360,8 +364,7 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 					CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_USERPWD, auth)))
 			{
 				zabbix_log(LOG_LEVEL_ERR, "Cannot set cURL option %d: [%s]", opt, curl_easy_strerror(err));
-				err_str = strdup(curl_easy_strerror(err));
-				lastfailedstep = httpstep.no;
+				err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 			}
 		}
 
@@ -374,8 +377,7 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 					CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_CONNECTTIMEOUT, httpstep.timeout)))
 			{
 				zabbix_log(LOG_LEVEL_ERR, "Cannot set cURL option %d: [%s]", opt, curl_easy_strerror(err));
-				err_str = strdup(curl_easy_strerror(err));
-				lastfailedstep = httpstep.no;
+				err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 			}
 		}
 
@@ -386,55 +388,50 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 			if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 			{
 				zabbix_log(LOG_LEVEL_ERR, "Error doing curl_easy_perform [%s]", curl_easy_strerror(err));
-				err_str = strdup(curl_easy_strerror(err));
-				lastfailedstep = httpstep.no;
+				err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 			}
 			else
 			{
 				if ('\0' != httpstep.required[0] && NULL == zbx_regexp_match(page.data, httpstep.required, NULL))
 				{
-					zabbix_log(LOG_LEVEL_DEBUG, "Page didn't match [%s]", httpstep.required);
-					err_str = strdup("Page didn't match");
-					lastfailedstep = httpstep.no;
+					zabbix_log(LOG_LEVEL_DEBUG, "Page did not match [%s]", httpstep.required);
+					err_str = zbx_strdup(err_str, "Page did not match");
 				}
-			}
-			zbx_free(page.data);
 
-			if (NULL == err_str)
-			{
 				if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_RESPONSE_CODE, &stat.rspcode)))
 				{
 					zabbix_log(LOG_LEVEL_ERR, "Error getting CURLINFO_RESPONSE_CODE [%s]", curl_easy_strerror(err));
-					err_str = strdup(curl_easy_strerror(err));
-					lastfailedstep = httpstep.no;
+					err_str = (NULL == err_str ? zbx_strdup(err_str, curl_easy_strerror(err)) : err_str);
 				}
 				else if ('\0' != httpstep.status_codes[0] && FAIL == int_in_list(httpstep.status_codes, stat.rspcode))
 				{
-					zabbix_log(LOG_LEVEL_DEBUG, "Status code didn't match [%s]", httpstep.status_codes);
-					err_str = strdup("Status code didn't match");
-					lastfailedstep = httpstep.no;
+					zabbix_log(LOG_LEVEL_DEBUG, "Status code did not match [%s]", httpstep.status_codes);
+					err_str = (NULL == err_str ? zbx_strdup(err_str, "Status code did not match") : err_str);
+				}
+
+				if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_TOTAL_TIME, &stat.total_time)))
+				{
+					zabbix_log(LOG_LEVEL_ERR, "Error getting CURLINFO_TOTAL_TIME [%s]", curl_easy_strerror(err));
+					err_str = (NULL == err_str ? zbx_strdup(err_str, curl_easy_strerror(err)) : err_str);
+				}
+
+				if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_SPEED_DOWNLOAD, &stat.speed_download)))
+				{
+					zabbix_log(LOG_LEVEL_ERR, "Error getting CURLINFO_SPEED_DOWNLOAD [%s]", curl_easy_strerror(err));
+					err_str = (NULL == err_str ? zbx_strdup(err_str, curl_easy_strerror(err)) : err_str);
+				}
+				else
+				{
+					speed_download += stat.speed_download;
+					speed_download_num++;
 				}
 			}
 
-			if (NULL == err_str && CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_TOTAL_TIME, &stat.total_time)))
-			{
-				zabbix_log(LOG_LEVEL_ERR, "Error getting CURLINFO_TOTAL_TIME [%s]", curl_easy_strerror(err));
-				err_str = strdup(curl_easy_strerror(err));
-				lastfailedstep = httpstep.no;
-			}
-
-			if (NULL == err_str && CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_SPEED_DOWNLOAD, &stat.speed_download)))
-			{
-				zabbix_log(LOG_LEVEL_ERR, "Error getting CURLINFO_SPEED_DOWNLOAD [%s]", curl_easy_strerror(err));
-				err_str = strdup(curl_easy_strerror(err));
-				lastfailedstep = httpstep.no;
-			}
-			else
-			{
-				speed_download += stat.speed_download;
-				speed_download_num++;
-			}
+			zbx_free(page.data);
 		}
+
+		if (NULL != err_str)
+			lastfailedstep = httpstep.no;
 
 		httptest->time += stat.total_time;
 		process_step_data(httptest, &httpstep, &stat);
@@ -463,7 +460,7 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 
 	zbx_free(esc_err_str);
 
-	stat.test_total_time =  httptest->time;
+	stat.test_total_time = httptest->time;
 	stat.test_last_step = lastfailedstep;
 	stat.speed_download = speed_download_num ? speed_download / speed_download_num : 0;
 
