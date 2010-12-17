@@ -813,7 +813,7 @@ include_once('include/page_header.php');
 		if(isset($_REQUEST['form'])){
 			$frmValmap = new CFormTable(S_VALUE_MAP);
 			$frmValmap->setHelp("web.mapping.php");
-			$frmValmap->addVar("config",get_request("config",6));
+			$frmValmap->addVar("config", 6);
 
 			if(isset($_REQUEST["valuemapid"])){
 				$frmValmap->addVar("valuemapid",$_REQUEST["valuemapid"]);
@@ -830,10 +830,9 @@ include_once('include/page_header.php');
 				$mapname = $db_valuemap["name"];
 				$mappings = DBselect("select * FROM mappings WHERE valuemapid=".$_REQUEST["valuemapid"]);
 				while($mapping = DBfetch($mappings)) {
-					$value = array(
+					$valuemap[] = array(
 						"value" => $mapping["value"],
 						"newvalue" => $mapping["newvalue"]);
-					array_push($valuemap, $value);
 				}
 			}
 			else{
@@ -862,7 +861,8 @@ include_once('include/page_header.php');
 			if(count($valuemap_el)==0) {
 				array_push($valuemap_el, S_NO_MAPPING_DEFINED);
 				$saveButton->setAttribute('disabled', 'true');
-			} else {
+			}
+			else{
 				array_push($valuemap_el, new CSubmit('del_map',S_DELETE_SELECTED));
 			}
 
@@ -875,17 +875,23 @@ include_once('include/page_header.php');
 				new CSubmit("add_map",S_ADD)
 				),'new');
 
-			$frmValmap->addItemToBottomRow($saveButton);
+			$buttons = array($saveButton);
 			if(isset($_REQUEST["valuemapid"])){
-				$frmValmap->addItemToBottomRow(SPACE);
-				$frmValmap->addItemToBottomRow(new CButtonDelete(S_DELETE_SELECTED_VALUE_MAPPING,
-					url_param("form").url_param("valuemapid").url_param("config")));
-			}
-			else {
-			}
-			$frmValmap->addItemToBottomRow(SPACE);
-			$frmValmap->addItemToBottomRow(new CButtonCancel(url_param("config")));
+				$sql = 'SELECT COUNT(itemid) as cnt FROM items WHERE valuemapid='.$_REQUEST['valuemapid'];
+				$count = DBfetch(DBselect($sql));
+				if($count['cnt']){
+					$confirmMesage = _s('Delete selected value mapping? It is used for %d items!', $count['cnt']);
+				}
+				else{
+					$confirmMesage = _s('Delete selected value mapping?');
+				}
 
+				$buttons[] = new CButtonDelete($confirmMesage,
+					url_param("form").url_param("valuemapid").url_param("config"));
+			}
+			$buttons[] = new CButtonCancel(url_param("config"));
+
+			$frmValmap->addItemToBottomRow($buttons);
 			$cnf_wdgt->addItem($frmValmap);
 		}
 		else{
