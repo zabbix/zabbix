@@ -165,7 +165,7 @@ class testGeneric extends PHPUnit_Extensions_SeleniumTestCase
 	{
 		$this->setHost('localhost');
 		$this->setBrowser('*firefox');
-		$this->setBrowserUrl('http://localhost/~hudson/DEV-492/frontends/php/');
+		$this->setBrowserUrl('http://hudson/~hudson/'.PHPUNIT_URL.'/frontends/php/');
 	}
 
 	public function login()
