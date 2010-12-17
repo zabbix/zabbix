@@ -887,4 +887,3 @@ return $result;
 	}
 
 ?>
-
