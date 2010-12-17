@@ -20,6 +20,7 @@
 ?>
 <?php
 require_once 'testGeneric.php';
+require_once 'testClicks.php';
 // ...
 
 class SeleniumTests
