@@ -19,11 +19,8 @@
 
 #include "common.h"
 
-#include "cfg.h"
-#include "pid.h"
 #include "db.h"
 #include "log.h"
-#include "zlog.h"
 #include "dbcache.h"
 
 #include "httpmacro.h"
@@ -31,7 +28,7 @@
 
 #ifdef HAVE_LIBCURL
 
-static S_ZBX_HTTPPAGE	page;
+static ZBX_HTTPPAGE	page;
 
 /******************************************************************************
  *                                                                            *
@@ -56,8 +53,6 @@ static int	process_value(zbx_uint64_t itemid, AGENT_RESULT *value)
 	DB_RESULT	result;
 	DB_ROW		row;
 	unsigned char	value_type;
-
-	INIT_CHECK_MEMORY();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_value(itemid:" ZBX_FS_UI64 ")",
 			itemid);
@@ -94,8 +89,6 @@ static int	process_value(zbx_uint64_t itemid, AGENT_RESULT *value)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End process_value()");
 
-	CHECK_MEMORY("process_value", "end");
-
 	return SUCCEED;
 }
 
@@ -121,15 +114,13 @@ static size_t	HEADERFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userda
 	return size * nmemb;
 }
 
-static void	process_test_data(DB_HTTPTEST *httptest, S_ZBX_HTTPSTAT *stat)
+static void	process_test_data(DB_HTTPTEST *httptest, ZBX_HTTPSTAT *stat)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_HTTPTESTITEM	httptestitem;
 
 	AGENT_RESULT    value;
-
-	INIT_CHECK_MEMORY();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_test_data(test:%s,time:" ZBX_FS_DBL ",last step:%d)",
 		 httptest->name,
@@ -139,7 +130,7 @@ static void	process_test_data(DB_HTTPTEST *httptest, S_ZBX_HTTPSTAT *stat)
 	result = DBselect("select httptestitemid,httptestid,itemid,type from httptestitem where httptestid=" ZBX_FS_UI64,
 		httptest->httptestid);
 
-	while((row=DBfetch(result)))
+	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(httptestitem.httptestitemid, row[0]);
 		ZBX_STR2UINT64(httptestitem.httptestid, row[1]);
@@ -148,14 +139,15 @@ static void	process_test_data(DB_HTTPTEST *httptest, S_ZBX_HTTPSTAT *stat)
 
 		init_result(&value);
 
-		switch (httptestitem.type) {
+		switch (httptestitem.type)
+		{
 			case ZBX_HTTPITEM_TYPE_TIME:
 				SET_DBL_RESULT(&value, stat->test_total_time);
-				process_value(httptestitem.itemid,&value);
+				process_value(httptestitem.itemid, &value);
 				break;
 			case ZBX_HTTPITEM_TYPE_LASTSTEP:
 				SET_UI64_RESULT(&value, stat->test_last_step);
-				process_value(httptestitem.itemid,&value);
+				process_value(httptestitem.itemid, &value);
 				break;
 			case ZBX_HTTPITEM_TYPE_SPEED:
 				SET_UI64_RESULT(&value, stat->speed_download);
@@ -170,20 +162,16 @@ static void	process_test_data(DB_HTTPTEST *httptest, S_ZBX_HTTPSTAT *stat)
 
 	DBfree_result(result);
 	zabbix_log(LOG_LEVEL_DEBUG, "End process_test_data()");
-
-	CHECK_MEMORY("process_test_data", "end");
 }
 
 
-static void	process_step_data(DB_HTTPTEST *httptest, DB_HTTPSTEP *httpstep, S_ZBX_HTTPSTAT *stat)
+static void	process_step_data(DB_HTTPTEST *httptest, DB_HTTPSTEP *httpstep, ZBX_HTTPSTAT *stat)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_HTTPSTEPITEM	httpstepitem;
 
 	AGENT_RESULT    value;
-
-	INIT_CHECK_MEMORY();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_step_data(step:%s,url:%s,rsp:%d,time:" ZBX_FS_DBL ",speed:" ZBX_FS_DBL ")",
 		httpstep->name,
@@ -195,7 +183,7 @@ static void	process_step_data(DB_HTTPTEST *httptest, DB_HTTPSTEP *httpstep, S_ZB
 	result = DBselect("select httpstepitemid,httpstepid,itemid,type from httpstepitem where httpstepid=" ZBX_FS_UI64,
 		httpstep->httpstepid);
 
-	while((row=DBfetch(result)))
+	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(httpstepitem.httpstepitemid, row[0]);
 		ZBX_STR2UINT64(httpstepitem.httpstepid, row[1]);
@@ -204,18 +192,19 @@ static void	process_step_data(DB_HTTPTEST *httptest, DB_HTTPSTEP *httpstep, S_ZB
 
 		init_result(&value);
 
-		switch (httpstepitem.type) {
+		switch (httpstepitem.type)
+		{
 			case ZBX_HTTPITEM_TYPE_RSPCODE:
 				SET_UI64_RESULT(&value, stat->rspcode);
-				process_value(httpstepitem.itemid,&value);
+				process_value(httpstepitem.itemid, &value);
 				break;
 			case ZBX_HTTPITEM_TYPE_TIME:
 				SET_DBL_RESULT(&value, stat->total_time);
-				process_value(httpstepitem.itemid,&value);
+				process_value(httpstepitem.itemid, &value);
 				break;
 			case ZBX_HTTPITEM_TYPE_SPEED:
 				SET_DBL_RESULT(&value, stat->speed_download);
-				process_value(httpstepitem.itemid,&value);
+				process_value(httpstepitem.itemid, &value);
 				break;
 			default:
 				break;
@@ -226,8 +215,6 @@ static void	process_step_data(DB_HTTPTEST *httptest, DB_HTTPSTEP *httpstep, S_ZB
 
 	DBfree_result(result);
 	zabbix_log(LOG_LEVEL_DEBUG, "End process_step_data()");
-
-	CHECK_MEMORY("process_step_data", "end");
 }
 
 /******************************************************************************
@@ -247,26 +234,25 @@ static void	process_step_data(DB_HTTPTEST *httptest, DB_HTTPSTEP *httpstep, S_ZB
  ******************************************************************************/
 static void	process_httptest(DB_HTTPTEST *httptest)
 {
+	const char	*__function_name = "process_httptest";
+
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_HTTPSTEP	httpstep;
 	int		err;
 	char		*err_str = NULL, *esc_err_str = NULL;
 	char		auth[HTTPTEST_HTTP_USER_LEN_MAX + HTTPTEST_HTTP_PASSWORD_LEN_MAX];
-	int		now;
+	int		opt, now;
 	int		lastfailedstep;
 
-	S_ZBX_HTTPSTAT	stat;
+	ZBX_HTTPSTAT	stat;
 	double		speed_download = 0;
 	int		speed_download_num = 0;
 
 	CURL            *easyhandle = NULL;
 
-	INIT_CHECK_MEMORY();
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In process_httptest(httptestid:" ZBX_FS_UI64 ",name:%s)",
-		httptest->httptestid,
-		httptest->name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() httptestid:" ZBX_FS_UI64 " name:'%s'",
+			__function_name, httptest->httptestid, httptest->name);
 
 	now = time(NULL);
 
@@ -274,74 +260,25 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 		now,
 		httptest->httptestid);
 
-	easyhandle = curl_easy_init();
-	if(easyhandle == NULL)
+	if (NULL == (easyhandle = curl_easy_init()))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot init cURL");
 		return;
 	}
-	if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_COOKIEFILE, "")))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "Cannot set CURLOPT_COOKIEFILE [%s]",
-			curl_easy_strerror(err));
-		(void)curl_easy_cleanup(easyhandle);
-		return;
-	}
-	if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERAGENT, httptest->agent)))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "Cannot set CURLOPT_USERAGENT [%s]",
-			curl_easy_strerror(err));
-		(void)curl_easy_cleanup(easyhandle);
-		return;
-	}
-	if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_FOLLOWLOCATION, 1)))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "Cannot set CURLOPT_FOLLOWLOCATION [%s]",
-			curl_easy_strerror(err));
-		(void)curl_easy_cleanup(easyhandle);
-		return;
-	}
-	if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, WRITEFUNCTION2)))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "Cannot set CURLOPT_WRITEFUNCTION [%s]",
-			curl_easy_strerror(err));
-		(void)curl_easy_cleanup(easyhandle);
-		return;
-	}
-	if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HEADERFUNCTION, HEADERFUNCTION2)))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "Cannot set CURLOPT_HEADERFUNCTION [%s]",
-			curl_easy_strerror(err));
-		(void)curl_easy_cleanup(easyhandle);
-		return;
-	}
-	/* Process self-signed certificates. Do not verify certificate. */
-	if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYPEER, 0)))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "Cannot set CURLOPT_SSL_VERIFYPEER [%s]",
-			curl_easy_strerror(err));
-		(void)curl_easy_cleanup(easyhandle);
-		return;
-	}
 
-	/* Process certs whose hostnames do not match the queried hostname. */
-	if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYHOST, 0)))
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_COOKIEFILE, "")) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_USERAGENT, httptest->agent)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_FOLLOWLOCATION, 1)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_WRITEFUNCTION, WRITEFUNCTION2)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HEADERFUNCTION, HEADERFUNCTION2)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYPEER, 0)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYHOST, 0)) ||
+			/* The pointed data are not copied by the library. As a consequence, the data */
+			/* must be preserved by the calling application until the transfer finishes. */
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, httpstep.posts)))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Cannot set CURLOPT_SSL_VERIFYHOST [%s]",
-		curl_easy_strerror(err));
-		(void)curl_easy_cleanup(easyhandle);
-		return;
-	}
-
-	/* The pointed data are NOT copied by the library:
-	 * as a consequence, they must be preserved
-	 * by the calling application until the transfer finishes.
-	 */
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, httpstep.posts)))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "Cannot set CURLOPT_POSTFIELDS [%s]",
-				curl_easy_strerror(err));
-		(void)curl_easy_cleanup(easyhandle);
+		zabbix_log(LOG_LEVEL_ERR, "Cannot set cURL option %d: [%s]", opt, curl_easy_strerror(err));
+		curl_easy_cleanup(easyhandle);
 		return;
 	}
 
@@ -387,40 +324,22 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 		http_substitute_macros(httptest, httpstep.url, sizeof(httpstep.url));
 		http_substitute_macros(httptest, httpstep.posts, sizeof(httpstep.posts));
 
-		zabbix_log(LOG_LEVEL_DEBUG, "WEBMonitor: use step [%s]",
-				httpstep.name);
+		zabbix_log(LOG_LEVEL_DEBUG, "WEBMonitor: use step [%s]", httpstep.name);
 
 		if ('\0' != *httpstep.posts)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "WEBMonitor: use post [%s]",
-					httpstep.posts);
-
+			zabbix_log(LOG_LEVEL_DEBUG, "WEBMonitor: use post [%s]", httpstep.posts);
 			curl_easy_setopt(easyhandle, CURLOPT_POST, 1);
 		}
 		else
 			curl_easy_setopt(easyhandle, CURLOPT_POST, 0);
-
-		if (NULL == err_str)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "WEBMonitor: go to URL [%s]",
-					httpstep.url);
-
-			if (CURLE_OK != (err = curl_easy_setopt(easyhandle,
-					CURLOPT_URL, httpstep.url)))
-			{
-				zabbix_log(LOG_LEVEL_ERR, "Cannot set URL [%s]",
-						curl_easy_strerror(err));
-
-				err_str = strdup(curl_easy_strerror(err));
-				lastfailedstep = httpstep.no;
-			}
-		}
 
 		if (NULL == err_str && httptest->authentication != HTTPTEST_AUTH_NONE)
 		{
 			long	curlauth = 0;
 
 			zabbix_log(LOG_LEVEL_DEBUG, "WEBMonitor: Setting HTTPAUTH [%d]", httptest->authentication);
+			zabbix_log(LOG_LEVEL_DEBUG, "WEBMonitor: Setting USERPWD for authentication");
 
 			switch (httptest->authentication)
 			{
@@ -435,64 +354,44 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 					break;
 			}
 
-			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPAUTH, curlauth)))
-			{
-				zabbix_log(LOG_LEVEL_ERR, "Cannot set HTTPAUTH [%s]",
-						curl_easy_strerror(err));
-				err_str = strdup(curl_easy_strerror(err));
-				lastfailedstep = httpstep.no;
-			}
-		}
-
-		if (NULL == err_str && httptest->authentication != HTTPTEST_AUTH_NONE)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "WEBMonitor: Setting USERPWD for authentication");
-
 			zbx_snprintf(auth, sizeof(auth), "%s:%s", httptest->http_user, httptest->http_password);
 
-			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERPWD, auth)))
+			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HTTPAUTH, curlauth)) ||
+					CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_USERPWD, auth)))
 			{
-				zabbix_log(LOG_LEVEL_ERR, "Cannot set USERPWD [%s]",
-					curl_easy_strerror(err));
+				zabbix_log(LOG_LEVEL_ERR, "Cannot set cURL option %d: [%s]", opt, curl_easy_strerror(err));
 				err_str = strdup(curl_easy_strerror(err));
 				lastfailedstep = httpstep.no;
 			}
 		}
 
-		if( !err_str )
+		if (NULL == err_str)
 		{
-			if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_TIMEOUT, httpstep.timeout)))
+			zabbix_log(LOG_LEVEL_DEBUG, "WEBMonitor: go to URL [%s]", httpstep.url);
+
+			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_URL, httpstep.url)) ||
+					CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_TIMEOUT, httpstep.timeout)) ||
+					CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_CONNECTTIMEOUT, httpstep.timeout)))
 			{
-				zabbix_log(LOG_LEVEL_ERR, "Cannot set TIMEOUT [%s]",
-					curl_easy_strerror(err));
-				err_str = strdup(curl_easy_strerror(err));
-				lastfailedstep = httpstep.no;
-			}
-		}
-		if( !err_str )
-		{
-			if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_CONNECTTIMEOUT, httpstep.timeout)))
-			{
-				zabbix_log(LOG_LEVEL_ERR, "Cannot set CONNECTTIMEOUT [%s]",
-					curl_easy_strerror(err));
+				zabbix_log(LOG_LEVEL_ERR, "Cannot set cURL option %d: [%s]", opt, curl_easy_strerror(err));
 				err_str = strdup(curl_easy_strerror(err));
 				lastfailedstep = httpstep.no;
 			}
 		}
 
-		if( !err_str )
+		if (NULL == err_str)
 		{
 			memset(&page, 0, sizeof(page));
-			if(CURLE_OK != (err = curl_easy_perform(easyhandle)))
+
+			if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 			{
-				zabbix_log(LOG_LEVEL_ERR, "Error doing curl_easy_perform [%s]",
-					curl_easy_strerror(err));
+				zabbix_log(LOG_LEVEL_ERR, "Error doing curl_easy_perform [%s]", curl_easy_strerror(err));
 				err_str = strdup(curl_easy_strerror(err));
 				lastfailedstep = httpstep.no;
 			}
 			else
 			{
-				if(httpstep.required[0]!='\0' && zbx_regexp_match(page.data,httpstep.required,NULL) == NULL)
+				if ('\0' != httpstep.required[0] && NULL == zbx_regexp_match(page.data, httpstep.required, NULL))
 				{
 					zabbix_log(LOG_LEVEL_DEBUG, "Page didn't match [%s]", httpstep.required);
 					err_str = strdup("Page didn't match");
@@ -501,16 +400,15 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 			}
 			zbx_free(page.data);
 
-			if( !err_str )
+			if (NULL == err_str)
 			{
-				if(CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_RESPONSE_CODE, &stat.rspcode)))
+				if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_RESPONSE_CODE, &stat.rspcode)))
 				{
-					zabbix_log(LOG_LEVEL_ERR, "Error getting CURLINFO_RESPONSE_CODE [%s]",
-						curl_easy_strerror(err));
+					zabbix_log(LOG_LEVEL_ERR, "Error getting CURLINFO_RESPONSE_CODE [%s]", curl_easy_strerror(err));
 					err_str = strdup(curl_easy_strerror(err));
 					lastfailedstep = httpstep.no;
 				}
-				else if(httpstep.status_codes[0]!='\0' && (int_in_list(httpstep.status_codes,stat.rspcode) == FAIL))
+				else if ('\0' != httpstep.status_codes[0] && FAIL == int_in_list(httpstep.status_codes, stat.rspcode))
 				{
 					zabbix_log(LOG_LEVEL_DEBUG, "Status code didn't match [%s]", httpstep.status_codes);
 					err_str = strdup("Status code didn't match");
@@ -518,18 +416,16 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 				}
 			}
 
-			if( !err_str && CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_TOTAL_TIME, &stat.total_time)))
+			if (NULL == err_str && CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_TOTAL_TIME, &stat.total_time)))
 			{
-				zabbix_log(LOG_LEVEL_ERR, "Error getting CURLINFO_TOTAL_TIME [%s]",
-					curl_easy_strerror(err));
+				zabbix_log(LOG_LEVEL_ERR, "Error getting CURLINFO_TOTAL_TIME [%s]", curl_easy_strerror(err));
 				err_str = strdup(curl_easy_strerror(err));
 				lastfailedstep = httpstep.no;
 			}
 
-			if( !err_str && CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_SPEED_DOWNLOAD, &stat.speed_download)))
+			if (NULL == err_str && CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_SPEED_DOWNLOAD, &stat.speed_download)))
 			{
-				zabbix_log(LOG_LEVEL_ERR, "Error getting CURLINFO_SPEED_DOWNLOAD [%s]",
-					curl_easy_strerror(err));
+				zabbix_log(LOG_LEVEL_ERR, "Error getting CURLINFO_SPEED_DOWNLOAD [%s]", curl_easy_strerror(err));
 				err_str = strdup(curl_easy_strerror(err));
 				lastfailedstep = httpstep.no;
 			}
@@ -548,13 +444,18 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 	esc_err_str = DBdyn_escape_string_len(err_str, HTTPTEST_ERROR_LEN);
 	zbx_free(err_str);
 
-	(void)curl_easy_cleanup(easyhandle);
+	curl_easy_cleanup(easyhandle);
 
-	DBexecute("update httptest set curstep=0,curstate=%d,lastcheck=%d,nextcheck=%d+delay,lastfailedstep=%d,"
-			"time=" ZBX_FS_DBL ",error='%s' where httptestid=" ZBX_FS_UI64,
+	DBexecute(
+		"update httptest"
+		" set curstep=0,curstate=%d,"
+			"lastcheck=%d,nextcheck=%d+delay,"
+			"lastfailedstep=%d,"
+			"time=" ZBX_FS_DBL ","
+			"error='%s'"
+		" where httptestid=" ZBX_FS_UI64,
 		HTTPTEST_STATE_IDLE,
-		now,
-		now,
+		now, now,
 		lastfailedstep,
 		httptest->time,
 		esc_err_str,
@@ -568,10 +469,8 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 
 	process_test_data(httptest, &stat);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End process_httptest(total time:" ZBX_FS_DBL ")",
-		httptest->time);
-
-	CHECK_MEMORY("process_httptest", "end");
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() total_time:" ZBX_FS_DBL,
+			__function_name, httptest->time);
 }
 
 /******************************************************************************
@@ -589,16 +488,16 @@ static void	process_httptest(DB_HTTPTEST *httptest)
  * Comments: always SUCCEED                                                   *
  *                                                                            *
  ******************************************************************************/
-void process_httptests(int now)
+void	process_httptests(int now)
 {
+	const char	*__function_name = "process_httptests";
+
 	DB_RESULT	result;
 	DB_ROW		row;
 
 	DB_HTTPTEST	httptest;
 
-	INIT_CHECK_MEMORY();
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In process_httptests()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	result = DBselect(
 			"select t.httptestid,t.name,t.applicationid,t.nextcheck,t.status,t.delay,"
@@ -619,7 +518,7 @@ void process_httptests(int now)
 			HOST_MAINTENANCE_STATUS_OFF, MAINTENANCE_TYPE_NORMAL,
 			DBnode_local("t.httptestid"));
 
-	while((row=DBfetch(result)))
+	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(httptest.httptestid, row[0]);
 		httptest.name		= row[1];
@@ -637,9 +536,8 @@ void process_httptests(int now)
 	}
 
 	DBfree_result(result);
-	zabbix_log(LOG_LEVEL_DEBUG, "End process_httptests()");
 
-	CHECK_MEMORY("process_httptests", "end");
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-#endif /* HAVE_LIBCURL */
+#endif	/* HAVE_LIBCURL */

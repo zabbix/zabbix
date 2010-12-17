@@ -19,16 +19,13 @@
 
 #include "common.h"
 
-#include "cfg.h"
 #include "db.h"
 #include "log.h"
 
 #include "httptest.h"
 #include "httppoller.h"
 
-#include "daemon.h"
-
-int httppoller_num;
+int	httppoller_num;
 
 /******************************************************************************
  *                                                                            *
@@ -45,15 +42,14 @@ int httppoller_num;
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int get_minnextcheck(int now)
+static int	get_minnextcheck(int now)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-
 	int		res;
 
 	result = DBselect(
-			"select count(*),min(t.nextcheck)"
+			"select min(t.nextcheck)"
 			" from httptest t,applications a,hosts h"
 			" where t.applicationid=a.applicationid"
 				" and a.hostid=h.hostid"
@@ -68,27 +64,17 @@ static int get_minnextcheck(int now)
 			HOST_MAINTENANCE_STATUS_OFF, MAINTENANCE_TYPE_NORMAL,
 			DBnode_local("t.httptestid"));
 
-	row=DBfetch(result);
-
-	if(!row || DBis_null(row[0])==SUCCEED || DBis_null(row[1])==SUCCEED)
+	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "No httptests to process in get_minnextcheck.");
 		res = FAIL;
 	}
 	else
-	{
-		if( atoi(row[0]) == 0)
-		{
-			res = FAIL;
-		}
-		else
-		{
-			res = atoi(row[1]);
-		}
-	}
+		res = atoi(row[0]);
+
 	DBfree_result(result);
 
-	return	res;
+	return res;
 }
 
 /******************************************************************************
@@ -106,19 +92,17 @@ static int get_minnextcheck(int now)
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-void main_httppoller_loop(int num)
+void	main_httppoller_loop(int num)
 {
-	int	now;
-	int	nextcheck,sleeptime;
+	int	now, nextcheck, sleeptime;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In main_httppoller_loop(num:%d)",
-		num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In main_httppoller_loop() num:%d", num);
 
 	httppoller_num = num;
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	for(;;)
+	for (;;)
 	{
 		zbx_setproctitle("http poller [getting values]");
 
@@ -163,9 +147,5 @@ void main_httppoller_loop(int num)
 		{
 			zabbix_log( LOG_LEVEL_DEBUG, "No sleeping" );
 		}
-
-#ifdef ZABBIX_TEST
-		break;
-#endif /* ZABBIX_TEST */
 	}
 }
