@@ -99,7 +99,7 @@ if(form){
 			$row['name']
 		));
 	}
-	$table->setFooter(new CCol(new CButton('select', S_SELECT)));
+	$table->setFooter(new CCol(new CSubmit('select', S_SELECT)));
 
 	$form->addItem($table);
 	$form->show();

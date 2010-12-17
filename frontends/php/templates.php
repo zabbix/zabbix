@@ -177,6 +177,7 @@ include_once('include/page_header.php');
 // SELECT ITEMS
 		$params = array(
 			'hostids' => $templateids,
+			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 			'preservekeys' => 1,
 			'output' => API_OUTPUT_EXTEND
 		);
@@ -284,6 +285,7 @@ include_once('include/page_header.php');
 // clone
 	else if(isset($_REQUEST['clone']) && isset($_REQUEST['templateid'])){
 		unset($_REQUEST['templateid']);
+		unset($_REQUEST['hosts']);
 		$_REQUEST['form'] = 'clone';
 	}
 // full_clone
@@ -294,6 +296,7 @@ include_once('include/page_header.php');
 // save
 	else if(isset($_REQUEST['save'])){
 
+		$macros = get_request('macros', array());
 		$groups = get_request('groups', array());
 		$hosts = get_request('hosts', array());
 		$templates = get_request('templates', array());
@@ -311,6 +314,16 @@ include_once('include/page_header.php');
 		if($_REQUEST['form'] == 'full_clone'){
 			$clone_templateid = $templateid;
 			$templateid = null;
+		}
+
+		foreach($macros as $mnum => $macro){
+			if(zbx_empty($macro['value'])){
+				unset($macros[$mnum]);
+				continue;
+			}
+
+			if($macro['new'] == 'create') unset($macros[$mnum]['macroid']);
+			unset($macros[$mnum]['new']);
 		}
 
 		DBstart();
@@ -337,11 +350,6 @@ include_once('include/page_header.php');
 		$templates_clear = zbx_toObject($templates_clear, 'templateid');
 
 		$hosts = zbx_toObject($hosts, 'hostid');
-
-		$macros = get_request('macros', array());
-		foreach($macros as $mnum => $macro){
-			if(zbx_empty($macro['value'])) unset($macros[$mnum]);
-		}
 
 		$template = array(
 			'host' => $template_name,
@@ -380,25 +388,14 @@ include_once('include/page_header.php');
 		}
 // }}} CREATE/UPDATE TEMPLATE
 
-// FULL_CLONE {
-
+// FULL_CLONE {{{
 		if(!zbx_empty($templateid) && $templateid && $clone_templateid && ($_REQUEST['form'] == 'full_clone')){
 
-			if(!copy_applications($clone_hostid, $hostid)) throw new Exception();
+			if(!copy_applications($clone_templateid, $templateid)) $result = false;
 
-// Host items
-			$sql = 'SELECT DISTINCT i.itemid, i.description '.
-					' FROM items i '.
-					' WHERE i.hostid='.$clone_templateid.
-						' AND i.templateid=0 '.
-					' ORDER BY i.description';
-			$res = DBselect($sql);
-			while($db_item = DBfetch($res)){
-				$result &= (bool) copy_item_to_host($db_item['itemid'], $templateid, true);
-			}
+			if(!copyItems($clone_templateid, $templateid)) $result = false;
 
-// Host triggers
-			$result &= copy_triggers($clone_templateid, $templateid);
+			if(!copy_triggers($clone_templateid, $templateid)) $result = false;
 
 // Host graphs
 			$options = array(
@@ -408,10 +405,10 @@ include_once('include/page_header.php');
 			);
 			$db_graphs = CGraph::get($options);
 			foreach($db_graphs as $gnum => $db_graph){
-				$result &= (bool) copy_graph_to_host($db_graph['graphid'], $templateid, true);
+				$result &= (bool) copy_graph_to_host($db_graph['graphid'], $templateid);
 			}
 		}
-// }
+// }}} FULL_CLONE
 
 		$result = DBend($result);
 
@@ -425,15 +422,18 @@ include_once('include/page_header.php');
 	}
 // delete, delete_and_clear
 	else if((isset($_REQUEST['delete']) || isset($_REQUEST['delete_and_clear'])) && isset($_REQUEST['templateid'])){
-		$unlink_mode = false;
-		if(isset($_REQUEST['delete'])){
-			$unlink_mode =  true;
-		}
-
-		//$host = get_host_by_hostid($_REQUEST['templateid']);
-
 		DBstart();
-		$result = delete_host($_REQUEST['templateid'], $unlink_mode);
+
+		$go_result = true;
+		if(isset($_REQUEST['delete'])){
+			$result = CTemplate::massUpdate(array(
+				'templates' => zbx_toObject($_REQUEST['templateid'], 'templateid'),
+				'hosts' => array()
+			));
+		}
+		if($result)
+			$result = CTemplate::delete($_REQUEST['templateid']);
+
 		$result = DBend($result);
 
 		show_messages($result, S_TEMPLATE_DELETED, S_CANNOT_DELETE_TEMPLATE);
@@ -446,19 +446,20 @@ include_once('include/page_header.php');
 	}
 // ---------- GO ---------
 	else if(str_in_array($_REQUEST['go'], array('delete', 'delete_and_clear')) && isset($_REQUEST['templates'])){
-		$unlink_mode = false;
-		if($_REQUEST['go'] == 'delete'){
-			$unlink_mode = true;
-		}
 
-		DBstart();
-		$go_result = true;
 		$templates = get_request('templates', array());
-		$del_hosts = CTemplate::get(array('templateids' => $templates, 'editable' => 1));
-		$del_hosts = zbx_objectValues($del_hosts, 'templateid');
+		DBstart();
 
+		$go_result = true;
+		if(isset($_REQUEST['delete'])){
+			$go_result = CTemplate::massUpdate(array(
+				'templateids' => $templates,
+				'hosts' => array()
+			));
+		}
+		if($go_result)
+			$go_result = CTemplate::delete($templates);
 
-		$go_result = delete_host($del_hosts, $unlink_mode);
 		$go_result = DBend($go_result);
 
 		show_messages($go_result, S_TEMPLATE_DELETED, S_CANNOT_DELETE_TEMPLATE);
@@ -473,12 +474,16 @@ include_once('include/page_header.php');
 <?php
 	$frmForm = new CForm();
 	if(!isset($_REQUEST['form'])){
-		$frmForm->addItem(new CButton('form', S_CREATE_TEMPLATE));
-		$frmForm->addItem(new CButton('form', S_IMPORT_TEMPLATE));
+		$frmForm->cleanItems();
+		$buttons = new CDiv(array(
+			new CSubmit('form', S_CREATE),
+			new CSubmit('form', S_IMPORT)
+		));
+		$buttons->useJQueryStyle();
+		$frmForm->addItem($buttons);
 	}
 
 	$template_wdgt = new CWidget();
-	$template_wdgt->addPageHeader(S_CONFIGURATION_OF_TEMPLATES, $frmForm);
 
 	$options = array(
 		'config' => array(
@@ -495,291 +500,28 @@ include_once('include/page_header.php');
 ?>
 <?php
 	if(isset($_REQUEST['form'])){
-		if($_REQUEST['form'] == S_IMPORT_TEMPLATE){
+		if($_REQUEST['form'] == S_IMPORT){
 			$template_wdgt->addItem(import_host_form(true));
 		}
 		else{
+			$template_wdgt->addItem(get_header_host_table(get_request('templateid',0), 'template'));
 
-			$templateid = get_request('templateid', 0);
-			$template_name = get_request('template_name', '');
-			$newgroup = get_request('newgroup', '');
-			$templates = get_request('templates', array());
-			$clear_templates = get_request('clear_templates', array());
-
-			$frm_title = S_TEMPLATE;
-
-			if($templateid > 0){
-				$db_host = get_host_by_hostid($templateid);
-				$template_name = $db_host['host'];
-				$frm_title .= SPACE.' ['.$template_name.']';
-
-				$original_templates = get_templates_by_hostid($templateid);
-			}
-			else{
-				$original_templates = array();
-			}
-
-			$frmHost = new CForm('templates.php');
-			$frmHost->setName('tpl_for');
-
-			$frmHost->addVar('form', get_request('form', 1));
-			$from_rfr = get_request('form_refresh', 0);
-			$frmHost->addVar('form_refresh', $from_rfr+1);
-			$frmHost->addVar('clear_templates', $clear_templates);
-			$frmHost->addVar('groupid', $_REQUEST['groupid']);
-
-			if($templateid){
-				$frmHost->addVar('templateid', $templateid);
-			}
-
-			if(($templateid > 0) && !isset($_REQUEST['form_refresh'])){
-	// get template groups from db
-				$options = array(
-					'hostids' => $templateid,
-					'editable' => 1
-				);
-				$groups = CHostGroup::get($options);
-				$groups = zbx_objectValues($groups, 'groupid');
-
-	// get template hosts from db
-				$params = array(
-					'templateids' => $templateid,
-					'editable' => 1,
-					'templated_hosts' => 1
-				);
-				$hosts_linked_to = CHost::get($params);
-				$hosts_linked_to = zbx_objectValues($hosts_linked_to, 'hostid');
-				$hosts_linked_to = zbx_toHash($hosts_linked_to, 'hostid');
-				$templates = $original_templates;
-			}
-			else{
-				$groups = get_request('groups', array());
-				if(isset($_REQUEST['groupid']) && ($_REQUEST['groupid']>0) && !uint_in_array($_REQUEST['groupid'], $groups)){
-					array_push($groups, $_REQUEST['groupid']);
-				}
-				$hosts_linked_to = get_request('hosts', array());
-			}
-
-			$clear_templates = array_intersect($clear_templates, array_keys($original_templates));
-			$clear_templates = array_diff($clear_templates, array_keys($templates));
-			natcasesort($templates);
-			$frmHost->addVar('clear_templates', $clear_templates);
-
-// TEMPLATE WIDGET {
-			$template_tbl = new CTable('', 'tablestripped');
-			$template_tbl->setOddRowClass('form_odd_row');
-			$template_tbl->setEvenRowClass('form_even_row');
-// FORM ITEM : Template name text box [  ]
-			$template_tbl->addRow(array(S_NAME, new CTextBox('template_name', $template_name, 54)));
-
-// FORM ITEM : Groups tween box [  ] [  ]
-// get all Groups
-			$group_tb = new CTweenBox($frmHost, 'groups', $groups, 10);
-			$options = array('editable' => 1, 'extendoutput' => 1);
-			$all_groups = CHostGroup::get($options);
-			order_result($all_groups, 'name');
-
-			foreach($all_groups as $gnum => $group){
-				$group_tb->addItem($group['groupid'], $group['name']);
-			}
-			$template_tbl->addRow(array(S_GROUPS, $group_tb->get(S_IN.SPACE.S_GROUPS,S_OTHER.SPACE.S_GROUPS)));
-
-
-// FORM ITEM : new group text box [  ]
-			$template_tbl->addRow(array(S_NEW_GROUP, new CTextBox('newgroup', $newgroup)));
-
-// FORM ITEM : linked Hosts tween box [  ] [  ]
-			// $options = array('editable' => 1, 'extendoutput' => 1);
-			// $twb_groups = CHostGroup::get($options);
-			$twb_groupid = get_request('twb_groupid', 0);
-			if($twb_groupid == 0){
-				$gr = reset($all_groups);
-				$twb_groupid = $gr['groupid'];
-			}
-			$cmbGroups = new CComboBox('twb_groupid', $twb_groupid, 'submit()');
-			foreach($all_groups as $gnum => $group){
-				$cmbGroups->addItem($group['groupid'], $group['name']);
-			}
-
-			$host_tb = new CTweenBox($frmHost, 'hosts', $hosts_linked_to, 25);
-
-// get hosts from selected twb_groupid combo
-			$params = array(
-				'groupids' => $twb_groupid,
-				'templated_hosts' => 1,
-				'editable' => 1,
-				'extendoutput' => 1);
-			$db_hosts = CHost::get($params);
-			order_result($db_hosts, 'host');
-
-			foreach($db_hosts as $hnum => $db_host){
-				if(isset($hosts_linked_to[$db_host['hostid']])) continue;// add all except selected hosts
-				$host_tb->addItem($db_host['hostid'], $db_host['host']);
-			}
-
-// select selected hosts and add them
-			$params = array(
-				'hostids' => $hosts_linked_to,
-				'templated_hosts' => 1,
-				'editable' => 1,
-				'extendoutput' => 1);
-			$db_hosts = CHost::get($params);
-			order_result($db_hosts, 'host');
-			foreach($db_hosts as $hnum => $db_host){
-				$host_tb->addItem($db_host['hostid'], $db_host['host']);
-			}
-
-			$template_tbl->addRow(array(S_HOSTS.'|'.S_TEMPLATES, $host_tb->Get(S_IN, array(S_OTHER.SPACE.'|'.SPACE.S_GROUP.SPACE,$cmbGroups))));
-
-// FORM ITEM : linked Template table
-			$tpl_table = new CTable();
-			$tpl_table->setCellPadding(0);
-			$tpl_table->setCellSpacing(0);
-			foreach($templates as $tid => $tname){
-				$frmHost->addVar('templates['.$tid.']', $tname);
-				$tpl_table->addRow(array(
-					$tname,
-					new CButton('unlink['.$tid.']', S_UNLINK),
-					isset($original_templates[$tid]) ? new CButton('unlink_and_clear['.$tid.']', S_UNLINK_AND_CLEAR) : SPACE
-				));
-			}
-
-			$template_tbl->addRow(array(S_LINK_WITH_TEMPLATE, array(
-				$tpl_table,
-				new CButton('add_template', S_ADD,
-					'return PopUp("popup.php?dstfrm='.$frmHost->GetName().
-					'&dstfld1=new_template&srctbl=templates&srcfld1=hostid&srcfld2=host&excludeids['.$templateid.']='.$templateid.
-					url_param($templates,false,"existed_templates").'",450,450)', 'T')
-			)));
-
-// FULL CLONE {
-			if($_REQUEST['form'] == 'full_clone'){
-// FORM ITEM : Template items
-				$items_lbx = new CListBox('items', null, 8);
-				$items_lbx->setAttribute('disabled', 'disabled');
-
-				$options = array(
-					'editable' => 1,
-					'hostids' => $templateid,
-					'output' => API_OUTPUT_EXTEND
-				);
-				$template_items = CItem::get($options);
-
-				if(empty($template_items)){
-					$items_lbx->setAttribute('style', 'width: 200px;');
-				}
-				else{
-					foreach($template_items as $inum => $titem){
-						$item_description = item_description($titem);
-						$items_lbx->addItem($titem['itemid'], $item_description);
-					}
-				}
-				$template_tbl->addRow(array(S_ITEMS, $items_lbx));
-
-
-// FORM ITEM : Template triggers
-				$trig_lbx = new CListBox('triggers', null, 8);
-				$trig_lbx->setAttribute('disabled', 'disabled');
-
-				$options = array('editable' => 1, 'hostids' => $templateid, 'extendoutput' => 1);
-				$template_triggers = CTrigger::get($options);
-
-				if(empty($template_triggers)){
-					$trig_lbx->setAttribute('style','width: 200px;');
-				}
-				else{
-					foreach($template_triggers as $tnum => $ttrigger){
-						$trigger_description = expand_trigger_description($ttrigger['triggerid']);
-						$trig_lbx->addItem($ttrigger['triggerid'], $trigger_description);
-					}
-				}
-				$template_tbl->addRow(array(S_TRIGGERS, $trig_lbx));
-
-
-// FORM ITEM : Host graphs
-				$graphs_lbx = new CListBox('graphs', null, 8);
-				$graphs_lbx->setAttribute('disabled', 'disabled');
-
-				$options = array('editable' => 1, 'hostids' => $templateid, 'extendoutput' => 1);
-				$template_graphs = CGraph::get($options);
-
-				if(empty($template_graphs)){
-					$graphs_lbx->setAttribute('style','width: 200px;');
-				}
-				else{
-					foreach($template_graphs as $tnum => $tgraph){
-						$graphs_lbx->addItem($tgraph['graphid'], $tgraph['name']);
-					}
-				}
-				$template_tbl->addRow(array(S_GRAPHS, $graphs_lbx));
-			}
-// FULL CLONE }
-
-			$host_footer = array();
-			$host_footer[] = new CButton('save', S_SAVE);
-			if(($templateid > 0) && ($_REQUEST['form'] != 'full_clone')){
-				$host_footer[] = SPACE;
-				$host_footer[] = new CButton('clone', S_CLONE);
-				$host_footer[] = SPACE;
-				$host_footer[] = new CButton('full_clone', S_FULL_CLONE);
-				$host_footer[] = SPACE;
-				$host_footer[] = new CButtonDelete(S_DELETE_TEMPLATE_Q, url_param('form').url_param('templateid').url_param('groupid'));
-				$host_footer[] = SPACE;
-				$host_footer[] = new CButtonQMessage('delete_and_clear', S_DELETE_AND_CLEAR, S_DELETE_AND_CLEAR_TEMPLATE_Q, url_param('form').
-					url_param('templateid').url_param('groupid'));
-			}
-			array_push($host_footer, SPACE, new CButtonCancel(url_param('groupid')));
-
-			$host_footer = new CCol($host_footer);
-			$host_footer->setColSpan(2);
-			$template_tbl->setFooter($host_footer);
-
-			$tplForm_wdgt = new CWidget();
-			$tplForm_wdgt->setClass('header');
-			$tplForm_wdgt->addHeader($frm_title);
-			$tplForm_wdgt->addItem($template_tbl);
-// } TEMPLATE WIDGET
-
-
-// MACROS WIDGET {
-			$macros_wdgt = get_macros_widget($templateid);
-// } MACROS WIDGET
-
-			$left_table = new CTable();
-			$left_table->setCellPadding(4);
-			$left_table->setCellSpacing(4);
-			$left_table->addRow($tplForm_wdgt);
-
-			$right_table = new CTable();
-			$right_table->setCellPadding(4);
-			$right_table->setCellSpacing(4);
-			$right_table->addRow($macros_wdgt);
-
-			$td_l = new CCol($left_table);
-			$td_l->setAttribute('valign','top');
-			$td_r = new CCol($right_table);
-			$td_r->setAttribute('valign','top');
-
-			$outer_table = new CTable();
-			$outer_table->addRow(array($td_l, $td_r));
-
-			$frmHost->addItem($outer_table);
-
-			$template_wdgt->addItem($frmHost);
+			$templateForm = new CGetForm();
+			$template_wdgt->addItem($templateForm->render('template.edit'));
 		}
 	}
 	else{
 // TABLE WITH TEMPLATES
 
-		$frmForm = new CForm(null, 'get');
-		$frmForm->addItem(array(S_GROUP.SPACE, $pageFilter->getGroupsCB()));
+		$frmGroup = new CForm(null, 'get');
+		$frmGroup->addItem(array(S_GROUP.SPACE, $pageFilter->getGroupsCB()));
 
 // table header
 		$numrows = new CDiv();
 		$numrows->setAttribute('name', 'numrows');
 
-		$template_wdgt->addHeader(S_TEMPLATES_BIG, $frmForm);
-		$template_wdgt->addHeader($numrows);
+		$template_wdgt->addHeader(S_CONFIGURATION_OF_TEMPLATES, $frmGroup);
+		$template_wdgt->addHeader($numrows, $frmForm);
 //------
 
 		$form = new CForm();
@@ -829,14 +571,14 @@ include_once('include/page_header.php');
 			'templateids' => zbx_objectValues($templates, 'templateid'),
 			'editable' => 1,
 			'output' => API_OUTPUT_EXTEND,
-			'select_hosts' => array('hostid','host','status'),
+			'selectHosts' => array('hostid','host','status'),
 			'select_templates' => array('hostid','host','status'),
 			'selectParentTemplates' => array('hostid','host','status'),
-			'select_items' => API_OUTPUT_COUNT,
+			'selectItems' => API_OUTPUT_COUNT,
 			'select_triggers' => API_OUTPUT_COUNT,
 			'select_graphs' => API_OUTPUT_COUNT,
 			'select_applications' => API_OUTPUT_COUNT,
-			'select_discoveries' => API_OUTPUT_COUNT,
+			'selectDiscoveries' => API_OUTPUT_COUNT,
 			'selectScreens' => API_OUTPUT_COUNT,
 			'nopermissions' => 1,
 		);
@@ -953,19 +695,15 @@ include_once('include/page_header.php');
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
-		$goButton = new CButton('goButton',S_GO);
+		$goButton = new CSubmit('goButton',S_GO);
 		$goButton->setAttribute('id','goButton');
 
 		zbx_add_post_js('chkbxRange.pageGoName = "templates";');
 
-		$footer = get_table_header(new CCol(array($goBox, $goButton)));
+		$footer = get_table_header(array($goBox, $goButton));
 // }GO
 
-// PAGING FOOTER
-		$table = array($paging,$table,$paging,$footer);
-//---------
-
-		$form->addItem($table);
+		$form->addItem(array($paging,$table,$paging,$footer));
 		$template_wdgt->addItem($form);
 	}
 

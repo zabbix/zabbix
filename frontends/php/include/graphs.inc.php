@@ -65,16 +65,6 @@
 			);
 	}
 
-/*
- * Function: graph_item_drawtype2str
- *
- * Description:
- *     Represent integer value of graph item drawing type into the string
- *
- * Author:
- *     Eugene Grigorjev
- *
- */
 	function graph_item_drawtype2str($drawtype,$type=null){
 		if($type == GRAPH_ITEM_AGGREGATED) return '-';
 
@@ -89,16 +79,7 @@
 		}
 	return $drawtype;
 	}
-/*
- * Function: graph_item_calc_fnc2str
- *
- * Description:
- *     Represent integer value of calculation function into the string
- *
- * Author:
- *     Eugene Grigorjev
- *
- */
+
 	function graph_item_calc_fnc2str($calc_fnc, $type=null){
 		if($type == GRAPH_ITEM_AGGREGATED) return '-';
 
@@ -189,13 +170,6 @@
 							' WHERE h.hostid=i.hostid '.
 								' AND gi.itemid=i.itemid '.
 								' AND gi.graphid='.$graphid);
-	}
-
-	function get_graphitems_by_graphid($graphid){
-		return DBselect('SELECT * '.
-					' FROM graphs_items '.
-					' WHERE graphid='.$graphid.
-					' ORDER BY itemid,drawtype,sortorder,color,yaxisside');
 	}
 
 /*
@@ -317,11 +291,6 @@
 		return	false;
 	}
 
-	function get_graphs_by_templateid($templateids){
-		zbx_value2array($templateids);
-	return DBselect('SELECT * FROM graphs WHERE '.DBcondition('templateid',$templateids));
-	}
-
 /*
  * Function: get_same_graphitems_for_host
  *
@@ -366,482 +335,6 @@
 		return $result;
 	}
 
-        /*
-         * Function: add_graph
-         *
-         * Description:
-         *     Add graph without items and recursion for templates
-         *
-         * Author:
-         *     Eugene Grigorjev
-         *
-         * Comments: !!! Don't forget sync code with C !!!
-         *
-         */
-	function add_graph($name,$width,$height,$ymin_type,$ymax_type,$yaxismin,$yaxismax,$ymin_itemid,$ymax_itemid,$showworkperiod,$showtriggers,$graphtype,$legend,$graph3d,$percent_left,$percent_right,$templateid=0)
-	{
-		$graphid = get_dbid("graphs","graphid");
-
-		$result=DBexecute('INSERT INTO graphs '.
-			' (graphid,name,width,height,ymin_type,ymax_type,yaxismin,yaxismax,ymin_itemid,ymax_itemid,templateid,show_work_period,show_triggers,graphtype,show_legend,show_3d,percent_left,percent_right) '.
-			" VALUES ($graphid,".zbx_dbstr($name).",$width,$height,$ymin_type,$ymax_type,$yaxismin,$yaxismax,".zero2null($ymin_itemid).",".zero2null($ymax_itemid).",".
-			zero2null($templateid).",$showworkperiod,$showtriggers,$graphtype,$legend,$graph3d,$percent_left,$percent_right)");
-
-		return ( $result ? $graphid : $result);
-	}
-
-        /*
-         * Function: add_graph_with_items
-         *
-         * Description:
-         *     Add graph with items and recursion for templates
-         *
-         * Author:
-         *     Eugene Grigorjev
-         *
-         * Comments: !!! Don't forget sync code with C !!!
-         *
-         */
-	function add_graph_with_items($name,$width,$height,$ymin_type,$ymax_type,$yaxismin,$yaxismax,$ymin_itemid,$ymax_itemid,$showworkperiod,$showtriggers,$graphtype,$legend,$graph3d,$percent_left,$percent_right,$gitems=array(),$templateid=0)
-	{
-		$result = false;
-
-		if(!is_array($gitems) || count($gitems)<1){
-			error(S_MISSING_ITEMS_FOR_GRAPH.SPACE.'"'.$name.'"');
-			return $result;
-		}
-
-		/* check items for template graph */
-		unset($new_host_is_template);
-		$host_list = array();
-		$itemid = array(0);
-
-		foreach($gitems as $gitem)
-			$itemid[] = $gitem['itemid'];
-
-		$db_item_hosts = DBselect('SELECT DISTINCT h.hostid,h.host,h.status '.
-							' FROM items i, hosts h '.
-							' WHERE h.hostid=i.hostid '.
-								' AND '.DBcondition('i.itemid',$itemid));
-
-		$graph_hostids = array();
-		while($db_item_host = DBfetch($db_item_hosts)){
-			$host_list[] = '"'.$db_item_host['host'].'"';
-			$graph_hostids[] = $db_item_host['hostid'];
-
-			if(HOST_STATUS_TEMPLATE ==  $db_item_host['status'])
-				$new_host_is_template = true;
-		}
-
-		if(isset($new_host_is_template) && count($host_list)>1){
-			error(S_GRAPH.SPACE.'"'.$name.'"'.SPACE.S_GRAPH_TEMPLATE_HOST_CANNOT_OTHER_ITEMS_HOSTS_SMALL);
-			return $result;
-		}
-
-		// $filter = array(
-			// 'name' => $name,
-			// 'hostids' => $graph_hostids
-		// );
-		// if(CGraph::exists($filter)){
-			// error('Graph already exists [ '.$name.' ]');
-			// return false;
-		// }
-
-		if($graphid = add_graph($name,$width,$height,$ymin_type,$ymax_type,$yaxismin,$yaxismax,$ymin_itemid,$ymax_itemid,$showworkperiod,$showtriggers,$graphtype,$legend,$graph3d,$percent_left,$percent_right,$templateid)){
-			$result = true;
-			foreach($gitems as $gitem){
-				if (!$result = add_item_to_graph(
-					$graphid,
-					$gitem['itemid'],
-					$gitem['color'],
-					$gitem['drawtype'],
-					$gitem['sortorder'],
-					$gitem['yaxisside'],
-					$gitem['calc_fnc'],
-					$gitem['type'],
-					$gitem['periods_cnt']))
-				{
-					break;
-				}
-			}
-		}
-
-		if ( $result ){
-			info('Graph "'.$name.'" added to hosts '.implode(',',$host_list));
-
-			/* add graphs for child hosts */
-			$tmp_hosts = get_hosts_by_graphid($graphid);
-			$host = DBfetch($tmp_hosts);
-
-			$chd_hosts = get_hosts_by_templateid($host['hostid']);
-			while($chd_host = DBfetch($chd_hosts)){
-				copy_graph_to_host($graphid, $chd_host['hostid'], false);
-			}
-		}
-
-		if ( !$result && $graphid ){
-			delete_graph($graphid);
-			$graphid = false;
-		}
-
-	return $graphid;
-	}
-
-        /*
-         * Function: update_graph
-         *
-         * Description:
-         *     Update graph without items and recursion for template
-         *
-         * Author:
-         *     Eugene Grigorjev
-         *
-         * Comments: !!! Don't forget sync code with C !!!
-         *
-         */
-	function update_graph($graphid,$name,$width,$height,$ymin_type,$ymax_type,$yaxismin,$yaxismax,$ymin_itemid,$ymax_itemid,$showworkperiod,$showtriggers,$graphtype,$legend,$graph3d,$percent_left,$percent_right,$templateid=0){
-
-		$g_graph = get_graph_by_graphid($graphid);
-
-		$sql = 'UPDATE graphs SET '.
-				'name='.zbx_dbstr($name).','.
-				'width='.$width.','.
-				'height='.$height.','.
-				'ymin_type='.$ymin_type.','.
-				'ymax_type='.$ymax_type.','.
-				'yaxismin='.$yaxismin.','.
-				'yaxismax='.$yaxismax.','.
-				'ymin_itemid='.zero2null($ymin_itemid).','.
-				'ymax_itemid='.zero2null($ymax_itemid).','.
-				'templateid='.zero2null($templateid).','.
-				'show_work_period='.$showworkperiod.','.
-				'show_triggers='.$showtriggers.','.
-				'graphtype='.$graphtype.','.
-				'show_legend='.$legend.','.
-				'show_3d='.$graph3d.','.
-				'percent_left='.$percent_left.','.
-				'percent_right='.$percent_right.
-			' WHERE graphid='.$graphid;
-
-		if($result = DBexecute($sql)){
-			if($g_graph['graphtype'] != $graphtype && $graphtype == GRAPH_TYPE_STACKED){
-				$result = DBexecute('UPDATE graphs_items SET calc_fnc='.CALC_FNC_AVG.',drawtype=1,type='.GRAPH_ITEM_SIMPLE.
-					' WHERE graphid='.$graphid);
-			}
-		}
-		return $result;
-	}
-
-/*
- * Function: update_graph_with_items
- *
- * Description:
- *     Update graph with items and recursion for template
- *
- * Author:
- *     Eugene Grigorjev
- *
- * Comments: !!! Don't forget sync code with C !!!
- *
- */
-	function update_graph_with_items($graphid,$name,$width,$height,$ymin_type,$ymax_type,$yaxismin,$yaxismax,$ymin_itemid,$ymax_itemid,$showworkperiod,$showtriggers,$graphtype,$legend,$graph3d,$percent_left,$percent_right,$gitems=array(),$templateid=0)
-	{
-		$result = false;
-
-		if(!is_array($gitems) || count($gitems) < 1){
-			error(S_MISSING_ITEMS_FOR_GRAPH.SPACE.'"'.$name.'"');
-			return $result;
-		}
-
-// check items for template graph
-		$tmp_hosts = get_hosts_by_graphid($graphid);
-		$host = DBfetch($tmp_hosts);
-		if($host["status"] == HOST_STATUS_TEMPLATE ){
-			unset($new_hostid);
-			$itemid = array(0);
-
-			foreach($gitems as $gitem)
-				$itemid[] = $gitem['itemid'];
-
-			$db_item_hosts = DBselect('SELECT DISTINCT hostid from items where itemid in ('.implode(',', $itemid).')');
-			while($db_item = DBfetch($db_item_hosts)){
-				if ( isset($new_hostid) ){
-					error(S_CANNOT_USE_MULTIPLE_HOST_ITEMS_TEMPLATE_GRAPH.SPACE.'"'.$name.'"');
-					return $result;
-				}
-
-				$new_hostid = $db_item['hostid'];
-			}
-
-			if ( (bccomp($host['hostid'] ,$new_hostid ) != 0)){
-				error(S_MUST_USE_ITEMS_ONLY_FROM_HOST.SPACE.'"'.$host['host'].'"'.SPACE.S_FOR_TEMPLATE_GRAPH_SMALL.SPACE.'"'.$name.'"');
-				return $result;
-			}
-		}
-
-// firstly update child graphs
-		$chd_graphs = get_graphs_by_templateid($graphid);
-		while($chd_graph = DBfetch($chd_graphs)){
-			$tmp_hosts = get_hosts_by_graphid($chd_graph['graphid']);
-			$chd_host = DBfetch($tmp_hosts);
-
-			if(!$new_gitems = get_same_graphitems_for_host($gitems, $chd_host['hostid'])){ /* skip host with missing items */
-				error(S_CANNOT_UPDATE_GRAPH.SPACE.'"'.$name.'"'.SPACE.S_FOR_HOST_SMALL.SPACE.'"'.$chd_host['host'].'"');
-				return $result;
-			}
-
-			if (!$result = update_graph_with_items($chd_graph['graphid'], $name, $width, $height,
-				$ymin_type,$ymax_type,$yaxismin,$yaxismax,$ymin_itemid,$ymax_itemid,
-				$showworkperiod, $showtriggers, $graphtype, $legend, $graph3d, $percent_left, $percent_right, $new_gitems, $graphid))
-			{
-				return $result;
-			}
-		}
-
-		DBexecute('DELETE FROM graphs_items WHERE graphid='.$graphid);
-
-		foreach($gitems as $gitem){
-			if (!$result = add_item_to_graph(
-					$graphid,
-					$gitem['itemid'],
-					$gitem['color'],
-					$gitem['drawtype'],
-					$gitem['sortorder'],
-					$gitem['yaxisside'],
-					$gitem['calc_fnc'],
-					$gitem['type'],
-					$gitem['periods_cnt']))
-			{
-				return $result;
-			}
-		}
-
-		if ($result = update_graph($graphid,$name,$width,$height,$ymin_type,$ymax_type,$yaxismin,$yaxismax,$ymin_itemid,$ymax_itemid,$showworkperiod,
-						$showtriggers,$graphtype,$legend,$graph3d,$percent_left,$percent_right,$templateid))
-		{
-			$host_list = array();
-			$db_hosts = get_hosts_by_graphid($graphid);
-			while($db_host = DBfetch($db_hosts)){
-				$host_list[] = '"'.$db_host["host"].'"';
-			}
-
-			info(S_GRAPH.SPACE.'"'.$name.'"'.SPACE.S_UPDATED_FOR_HOSTS.SPACE.implode(',',$host_list));
-		}
-
-		return $result;
-	}
-
-/*
- * Function: delete_graph
- *
- * Description:
- *     Delete graph with templates
- *
- * Author:
- *     Eugene Grigorjev
- *
- * Comments: !!! Don't forget sync code with C !!!
- *
- */
-	function delete_graph($graphids){
-		zbx_value2array($graphids);
-
-		$result = true;
-
-		$graphs = array();
-		$host_list = array();
-		foreach($graphids as $id => $graphid){
-			$graphs[$graphid] = get_graph_by_graphid($graphid);
-
-			$host_list[$graphid] = array();
-			$db_hosts = get_hosts_by_graphid($graphid);
-			while($db_host = DBfetch($db_hosts)){
-				if(!isset($host_list[$graphid][$db_host['host']]))
-					$host_list[$graphid][$db_host['host']] = true;
-			}
-		}
-
-// first remove child graphs
-		$del_chd_graphs = array();
-		$chd_graphs = get_graphs_by_templateid($graphids);
-		while($chd_graph = DBfetch($chd_graphs)){ /* recursion */
-			$del_chd_graphs[$chd_graph['graphid']] = $chd_graph['graphid'];
-		}
-		if(!empty($del_chd_graphs)){
-			$result &= delete_graph($del_chd_graphs);
-		}
-
-
-		$sql = 'SELECT graphid FROM graph_discovery WHERE '.DBcondition('parent_graphid', $graphids);
-		$db_graphs = DBselect($sql);
-		while($graph = DBfetch($db_graphs)){
-			$graphids[] = $graph['graphid'];
-		}
-
-		DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid',$graphids).' AND resourcetype='.SCREEN_RESOURCE_GRAPH);
-
-// delete graph
-		DBexecute('DELETE FROM graphs_items WHERE '.DBcondition('graphid',$graphids));
-		DBexecute("DELETE FROM profiles WHERE idx='web.favorite.graphids' AND source='graphid' AND ".DBcondition('value_id',$graphids));
-
-		$result = DBexecute('DELETE FROM graphs WHERE '.DBcondition('graphid',$graphids));
-		if($result){
-			foreach($graphs as $graphid => $graph){
-				if(isset($host_list[$graphid]))
-					info(S_GRAPH_DELETED_FROM_HOSTS_PART1.SPACE.$graph['name'].SPACE.S_GRAPH_DELETED_FROM_HOSTS_PART2.SPACE.(count($host_list[$graphid]) > 1 ? 's' : '').SPACE.S_GRAPH_DELETED_FROM_HOSTS_PART3.':'.SPACE.'"'.implode('","', array_keys($host_list[$graphid])).'"');
-			}
-		}
-
-	return $result;
-	}
-
-/*
- * Function: cmp_graphitems
- *
- * Description:
- *     Compare two graph items
- *
- * Author:
- *     Eugene Grigorjev
- *
- * Comments: !!! Don't forget sync code with C !!!
- *
- */
-	function cmp_graphitems(&$gitem1, &$gitem2){
-		if($gitem1['drawtype']	!= $gitem2['drawtype'])		return 1;
-		if($gitem1['sortorder']	!= $gitem2['sortorder'])	return 2;
-		if($gitem1['color']	!= $gitem2['color'])		return 3;
-		if($gitem1['yaxisside']	!= $gitem2['yaxisside'])	return 4;
-
-		$item1 = get_item_by_itemid($gitem1['itemid']);
-		$item2 = get_item_by_itemid($gitem2['itemid']);
-
-		if($item1['key_'] != $item2['key_'])			return 5;
-
-		return 0;
-	}
-
-/*
- * Function: add_item_to_graph
- *
- * Description:
- *     Add item to graph
- *
- * Author:
- *     Eugene Grigorjev
- *
- * Comments: !!! Don't forget sync code with C !!!
- *
- */
-	function add_item_to_graph($graphid,$itemid,$color,$drawtype,$sortorder,$yaxisside,$calc_fnc,$type,$periods_cnt){
-		$gitemid = get_dbid('graphs_items','gitemid');
-
-		$result = DBexecute('insert into graphs_items'.
-			' (gitemid,graphid,itemid,color,drawtype,sortorder,yaxisside,calc_fnc,type,periods_cnt)'.
-			' values ('.$gitemid.','.$graphid.','.$itemid.','.zbx_dbstr($color).','.$drawtype.','.
-			$sortorder.','.$yaxisside.','.$calc_fnc.','.$type.','.$periods_cnt.')');
-
-		return ( $result ? $gitemid : $result );
-	}
-
-/*
- * Function: delete_template_graphs
- *
- * Description:
- *     Delete template graph from specified host
- *
- * Author:
- *     Eugene Grigorjev
- *
- * Comments: !!! Don't forget sync code with C !!!
- *
- */
-	function delete_template_graphs($hostid, $templateids = null /* array format 'arr[id]=name' */, $unlink_mode = false){
-		zbx_value2array($templateids);
-
-		$db_graphs = get_graphs_by_hostid($hostid);
-		while($db_graph = DBfetch($db_graphs)){
-			if($db_graph['templateid'] == 0)
-				continue;
-
-			if(!is_null($templateids)){
-				$tmp_hhosts = get_hosts_by_graphid($db_graph['templateid']);
-				$tmp_host = DBfetch($tmp_hhosts);
-
-				if( !uint_in_array($tmp_host['hostid'], $templateids)) continue;
-			}
-
-			if($unlink_mode){
-				if(DBexecute('UPDATE graphs SET templateid=NULL WHERE graphid='.$db_graph['graphid'])){
-					info(S_GRAPH.SPACE.'"'.$db_graph['name'].'"'.SPACE.S_UNLINKED_SMALL);
-				}
-			}
-			else{
-				DBexecute('UPDATE graphs SET templateid=NULL WHERE graphid='.$db_graph['graphid']);
-				CGraph::delete($db_graph['graphid']);
-			}
-		}
-	}
-
-        /*
-         * Function: copy_template_graphs
-         *
-         * Description:
-         *     Copy all graphs to the specified host
-         *
-         * Author:
-         *     Eugene Grigorjev
-         *
-         * Comments: !!! Don't forget sync code with C !!!
-         *
-         */
-	function copy_template_graphs($hostid, $templateid = null /* array format 'arr[key]=id' */, $copy_mode = false){
-		if($templateid == null){
-			$templateid = get_templates_by_hostid($hostid);
-			$templateid = array_keys($templateid);
-		}
-
-		if(is_array($templateid)){
-			foreach($templateid as $key => $id)
-				copy_template_graphs($hostid, $id, $copy_mode); // attention recursion
-			return;
-		}
-
-		$db_graphs = get_graphs_by_hostid($templateid);
-
-		if($copy_mode){
-			while($db_graph = DBfetch($db_graphs)){
-				copy_graph_to_host($db_graph["graphid"], $hostid, $copy_mode);
-			}
-		}
-		else{
-			while($db_graph = DBfetch($db_graphs)){
-				$gitems = CGraphItem::get(array(
-					'graphids' => $db_graph['graphid'],
-					'output' => API_OUTPUT_EXTEND
-				));
-
-
-				$filter = array(
-					'name' => $db_graph['name'],
-					'hostids' => $hostid
-				);
-				if(CGraph::exists($filter)){
-					$db_graph['gitems'] = $gitems;
-					$res = CGraph::update($db_graph);
-				}
-				else{
-					$db_graph['templateid'] = $db_graph['graphid'];
-					$db_graph['gitems'] = get_same_graphitems_for_host($gitems, $hostid);
-					$res = CGraph::create($db_graph);
-				}
-				if($res === false) return false;
-			}
-		}
-
-		return true;
-	}
-
 /*
  * Function: copy_graph_to_host
  *
@@ -849,88 +342,28 @@
  *     Copy specified graph to the specified host
  *
  * Author:
- *     Eugene Grigorjev
- *
- * Comments: !!! Don't forget sync code with C !!!
+ *     Aly
  *
  */
-	function copy_graph_to_host($graphid, $hostid, $copy_mode = false){
-		$result = true;
+	function copy_graph_to_host($graphid, $hostid){
+		$graphs = CGraph::get(array(
+			'graphids' => $graphid,
+			'output' => API_OUTPUT_EXTEND,
+			'select_graph_items' => API_OUTPUT_EXTEND
+		));
+		$graph = reset($graphs);
+		$gitems = $graph['gitems'];
 
-		$gitems = array();
-
-		$db_graph_items = get_graphitems_by_graphid($graphid);
-		while( $db_gitem = DBfetch($db_graph_items) ){
-			$gitems[] = array(
-				'itemid'	=> $db_gitem['itemid'],
-				'color'		=> $db_gitem['color'],
-				'drawtype'	=> $db_gitem['drawtype'],
-				'sortorder'	=> $db_gitem['sortorder'],
-				'yaxisside'	=> $db_gitem['yaxisside'],
-				'calc_fnc'	=> $db_gitem['calc_fnc'],
-				'type'		=> $db_gitem['type'],
-				'periods_cnt'	=> $db_gitem['periods_cnt']
-			);
-		}
-
-		$db_graph = get_graph_by_graphid($graphid);
-		if($new_gitems = get_same_graphitems_for_host($gitems, $hostid)){
-			unset($chd_graphid);
-
-			$chd_graphs = get_graphs_by_hostid($hostid);
-			while( !isset($chd_graphid) && $chd_graph = DBfetch($chd_graphs)){
-/* compare graphs */
-				if ( $chd_graph['templateid'] != 0 ) continue;
-
-				unset($equal);
-				$chd_gitems = get_graphitems_by_graphid($chd_graph["graphid"]);
-				while($chd_gitem = DBfetch($chd_gitems)){
-					unset($gitem_equal);
-
-					foreach($new_gitems as $new_gitem){
-						if(cmp_graphitems($new_gitem, $chd_gitem))	continue;
-
-						$gitem_equal = true;
-						break;
-					}
-
-					if(!isset($gitem_equal)){
-						unset($equal);
-						break;
-					}
-
-					/* found equal graph item */
-					if(!isset($equal))$equal = 0;
-
-					$equal++;
-				}
-
-				if(isset($equal) && (count($new_gitems) == $equal)){
-/* found equal graph */
-					$chd_graphid = $chd_graph['graphid'];
-					break;
-				}
-			}
-
-			if(isset($chd_graphid)){
-				$result = update_graph_with_items($chd_graphid, $db_graph['name'], $db_graph['width'], $db_graph['height'],
-					$db_graph['ymin_type'], $db_graph['ymax_type'], $db_graph['yaxismin'], $db_graph['yaxismax'],
-					zero2null($db_graph['ymin_itemid']), zero2null($db_graph['ymax_itemid']),
-					$db_graph['show_work_period'], $db_graph['show_triggers'], $db_graph['graphtype'],$db_graph['show_legend'],
-					$db_graph['show_3d'], $db_graph['percent_left'], $db_graph['percent_right'], $new_gitems, zero2null(($copy_mode ? 0: $db_graph['graphid'])));
-			}
-			else{
-				$result = add_graph_with_items($db_graph['name'], $db_graph['width'], $db_graph['height'],
-					$db_graph['ymin_type'], $db_graph['ymax_type'], $db_graph['yaxismin'], $db_graph['yaxismax'],
-					zero2null($db_graph['ymin_itemid']), zero2null($db_graph['ymax_itemid']),
-					$db_graph['show_work_period'], $db_graph['show_triggers'], $db_graph['graphtype'],$db_graph['show_legend'],
-					$db_graph['show_3d'], $db_graph['percent_left'], $db_graph['percent_right'], $new_gitems, zero2null(($copy_mode ? 0: $db_graph['graphid'])));
-			}
-		}
-		else{
+		$new_gitems = get_same_graphitems_for_host($gitems, $hostid);
+		if(empty($new_gitems)){
 			$host = get_host_by_hostid($hostid);
-			info(S_SKIPPED_COPYING_OF_GRAPH.SPACE.'"'.$db_graph["name"].'"'.SPACE.S_TO_HOST_SMALL.SPACE.'"'.$host['host'].'"');
+			info(S_SKIPPED_COPYING_OF_GRAPH.SPACE.'"'.$graph["name"].'"'.SPACE.S_TO_HOST_SMALL.SPACE.'"'.$host['host'].'"');
+			return false;
 		}
+
+		$graph['gitems'] = $new_gitems;
+
+		$result = CGraph::create($graph);
 
 	return $result;
 	}

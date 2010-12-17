@@ -347,7 +347,7 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 	const char		*__function_name = "get_pinger_hosts";
 	DC_ITEM			items[MAX_ITEMS];
 	int			i, num, count, interval, size, timeout;
-	char			error[MAX_STRING_LEN], *addr = NULL, *conn;
+	char			error[MAX_STRING_LEN], *addr = NULL;
 	icmpping_t		icmpping;
 	icmppingsec_type_t	type;
 
@@ -360,11 +360,14 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 	for (i = 0; i < num; i++)
 	{
 		items[i].key = strdup(items[i].key_orig);
-		substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+		substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
 				&items[i].key, MACRO_TYPE_ITEM_KEY, NULL, 0);
 
-		conn = items[i].host.useip == 1 ? items[i].host.ip : items[i].host.dns;
-		if (SUCCEED == parse_key_params(items[i].key, conn, &icmpping, &addr, &count,
+		items[i].interface.addr = strdup(items[i].interface.useip == 1 ? items[i].interface.ip_orig : items[i].interface.dns_orig);
+		substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
+				&items[i].interface.addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
+
+		if (SUCCEED == parse_key_params(items[i].key, items[i].interface.addr, &icmpping, &addr, &count,
 					&interval, &size, &timeout, &type, error, sizeof(error)))
 		{
 			add_icmpping_item(icmp_items, icmp_items_alloc, icmp_items_count, count, interval, size,
@@ -373,6 +376,7 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 		else
 			DCadd_nextcheck(items[i].itemid, now, error);	/* update error & status field in items table */
 
+		zbx_free(items[i].interface.addr);
 		zbx_free(items[i].key);
 	}
 

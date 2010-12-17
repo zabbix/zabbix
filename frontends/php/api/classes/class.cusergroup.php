@@ -605,8 +605,8 @@ class CUserGroup extends CZBXAPI{
 					DB::insert('users_groups', $users_insert);
 				if(!empty($userids_to_unlink))
 					DB::delete('users_groups', array(
-						DBcondition('userid', $userids_to_unlink),
-						DBcondition('usrgrpid', $usrgrpids),
+						'userid'=>$userids_to_unlink,
+						'usrgrpid'=>$usrgrpids,
 					));
 			}
 
@@ -654,8 +654,8 @@ class CUserGroup extends CZBXAPI{
 
 				if(!empty($rights_to_unlink)){
 					DB::delete('rights', array(
-						DBcondition('id', $rights_to_unlink),
-						DBcondition('groupid', $usrgrpids),
+						'id'=>$rights_to_unlink,
+						'groupid'=>$usrgrpids,
 					));
 				}
 
@@ -716,12 +716,10 @@ class CUserGroup extends CZBXAPI{
 			}
 			if(!empty($error_array))
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error_array);
-
-
-			DB::delete('rights', array(DBcondition('groupid', $usrgrpids)));
-			DB::delete('operations', array('object='.OPERATION_OBJECT_GROUP, DBcondition('objectid',$usrgrpids)));
-			DB::delete('users_groups', array(DBcondition('usrgrpid',$usrgrpids)));
-			DB::delete('usrgrp', array(DBcondition('usrgrpid', $usrgrpids)));
+			DB::delete('rights', array('groupid'=>$usrgrpids));
+			DB::delete('operations', array('object'=>OPERATION_OBJECT_GROUP, 'objectid'=>$usrgrpids));
+			DB::delete('users_groups', array('usrgrpid'=>$usrgrpids));
+			DB::delete('usrgrp', array('usrgrpid'=>$usrgrpids));
 
 			self::EndTransaction(true, __METHOD__);
 			return array('usrgrpids' => $usrgrpids);

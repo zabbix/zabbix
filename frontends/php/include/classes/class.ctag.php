@@ -54,7 +54,7 @@ class CTag extends CObject{
 			$this->addItem($body);
 		}
 
-		$this->setClass($class);
+		$this->setAttribute('class', $class);
 	}
 
 	public function showStart(){	echo $this->startToString();}
@@ -76,10 +76,6 @@ class CTag extends CObject{
 	public function bodyToString(){
 		$res = $this->tag_body_start;
 	return $res.parent::toString(false);
-
-		/*foreach($this->items as $item)
-			$res .= $item;
-		return $res;*/
 	}
 
 	public function endToString(){
@@ -113,13 +109,13 @@ class CTag extends CObject{
 	return NULL;
 	}
 
-	public function setClass($value){
-		if(isset($value))
-			$this->attributes['class'] = $value;
+	public function addClass($cssClass){
+		if(!isset($this->attributes['class']) || zbx_empty($this->attributes['class'])) 
+				$this->attributes['class'] = $cssClass;
 		else
-			unset($this->attributes['class']);
+			$this->attributes['class'] .= ' '.$cssClass;
 
-	return $value;
+	return $this->attributes['class'];
 	}
 
 	public function getAttribute($name){
@@ -185,6 +181,16 @@ class CTag extends CObject{
 	public function error($value){
 		error('class('.get_class($this).') - '.$value);
 		return 1;
+	}
+
+	public function getForm($action=NULL, $method='post', $enctype=NULL){
+		$form = new CForm($action, $method, $enctype);
+		$form->addItem($this);
+	return $form;
+	}
+
+	public function setTitle($value='title'){
+		$this->setAttribute('title', $value);
 	}
 }
 ?>

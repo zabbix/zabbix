@@ -327,7 +327,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 
 	$form->addVar('eventsource', $_REQUEST['eventsource']);
 	if(!isset($_REQUEST['form'])){
-		$form->addItem(new CButton('form', S_CREATE_ACTION));
+		$form->addItem(new CSubmit('form', S_CREATE_ACTION));
 	}
 	$action_wdgt->addPageHeader(S_CONFIGURATION_OF_ACTIONS_BIG, $form);
 
@@ -438,9 +438,9 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		$cmbStatus->addItem(ACTION_STATUS_DISABLED,S_DISABLED);
 		$tblAct->addRow(array(S_STATUS, $cmbStatus));
 
-		$footer = array(new CButton('save',S_SAVE));
+		$footer = array(new CSubmit('save',S_SAVE));
 		if(isset($_REQUEST['actionid'])){
-			$footer[] = new CButton('clone',S_CLONE);
+			$footer[] = new CSubmit('clone',S_CLONE);
 			$footer[] = new CButtonDelete(S_DELETE_SELECTED_ACTION_Q,
 				url_param('form').url_param('eventsource').
 				url_param('actionid')
@@ -507,11 +507,11 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 
 		$footer = array();
 		if(!isset($_REQUEST['new_condition'])){
-			$footer[] = new CButton('new_condition',S_NEW);
+			$footer[] = new CSubmit('new_condition',S_NEW);
 		}
 
 		if($cond_el->ItemsCount() > 0){
-			$footer[] = new CButton('del_condition',S_DELETE_SELECTED);
+			$footer[] = new CSubmit('del_condition',S_DELETE_SELECTED);
 		}
 		if($cond_el->ItemsCount() > 1){
 			/* prepare condition calcuation type selector */
@@ -585,7 +585,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 					$tblNewCond->addItem(new CVar('new_condition[value]','0'));
 					$rowCondition[] = array(
 						new CTextBox('group','',20,'yes'),
-						new CButton('btn1',S_SELECT,
+						new CSubmit('btn1',S_SELECT,
 							"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
 							"&dstfld1=new_condition%5Bvalue%5D&dstfld2=group&srctbl=host_group".
 							"&srcfld1=groupid&srcfld2=name',450,450);",
@@ -595,7 +595,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 					$tblNewCond->addItem(new CVar('new_condition[value]','0'));
 					$rowCondition[] = array(
 						new CTextBox('host','',20,'yes'),
-						new CButton('btn1',S_SELECT,
+						new CSubmit('btn1',S_SELECT,
 							"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
 							"&dstfld1=new_condition%5Bvalue%5D&dstfld2=host&srctbl=host_templates".
 							"&srcfld1=hostid&srcfld2=host',450,450);",
@@ -605,7 +605,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 					$tblNewCond->addItem(new CVar('new_condition[value]','0'));
 					$rowCondition[] = array(
 						new CTextBox('host','',20,'yes'),
-						new CButton('btn1',S_SELECT,
+						new CSubmit('btn1',S_SELECT,
 							"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
 							"&dstfld1=new_condition%5Bvalue%5D&dstfld2=host&srctbl=hosts".
 							"&srcfld1=hostid&srcfld2=host',450,450);",
@@ -616,7 +616,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 
 					$rowCondition[] = array(
 						new CTextBox('trigger','',20,'yes'),
-						new CButton('btn1',S_SELECT,
+						new CSubmit('btn1',S_SELECT,
 							"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
 							"&dstfld1=new_condition%5Bvalue%5D&dstfld2=trigger&srctbl=triggers".
 							"&srcfld1=triggerid&srcfld2=description');",
@@ -730,7 +730,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 
 			$tblNewCond->addRow($rowCondition);
 
-			$footer = array(new CButton('add_condition',S_ADD),new CButton('cancel_new_condition',S_CANCEL));
+			$footer = array(new CSubmit('add_condition',S_ADD),new CSubmit('cancel_new_condition',S_CANCEL));
 			$left_tab->addRow(new CFormElement(S_NEW_CONDITION, $tblNewCond, $footer));
 		}
 // }}} NEW CONDITION FORM
@@ -818,7 +818,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 				$oper_details,
 				$esc_period_txt,
 				$esc_delay_txt,
-				new CButton('edit_operationid['.$id.']',S_EDIT)
+				new CSubmit('edit_operationid['.$id.']',S_EDIT)
 			));
 
 			$tblOper->addItem(new CVar('operations['.$id.'][operationtype]'	,$condition['operationtype']));
@@ -841,10 +841,10 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 
 		$footer = array();
 		if(!isset($_REQUEST['new_operation'])){
-			$footer[] = new CButton('new_operation',S_NEW);
+			$footer[] = new CSubmit('new_operation',S_NEW);
 		}
 		if($tblOper->ItemsCount() > 0 ){
-			$footer[] = new CButton('del_operation',S_DELETE_SELECTED);
+			$footer[] = new CSubmit('del_operation',S_DELETE_SELECTED);
 		}
 
 		$right_tab->addRow(new CFormElement(S_ACTION_OPERATIONS, $tblOper, $footer));
@@ -1130,11 +1130,11 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 				$cond_buttons = array();
 
 				if(!isset($_REQUEST['new_opcondition'])) {
-					$cond_buttons[] = new CButton('new_opcondition', S_NEW);
+					$cond_buttons[] = new CSubmit('new_opcondition', S_NEW);
 				}
 
 				if($cond_el->ItemsCount() > 0){
-					$cond_buttons[] = new CButton('del_opcondition', S_DELETE_SELECTED);
+					$cond_buttons[] = new CSubmit('del_opcondition', S_DELETE_SELECTED);
 				}
 
 				if($cond_el->ItemsCount() > 1){
@@ -1181,8 +1181,8 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 
 
 			$footer = array(
-				new CButton('add_operation', $update_mode ? S_SAVE : S_ADD),
-				new CButton('cancel_new_operation', S_CANCEL)
+				new CSubmit('add_operation', $update_mode ? S_SAVE : S_ADD),
+				new CSubmit('cancel_new_operation', S_CANCEL)
 			);
 			$right_tab->addRow(new CFormElement(S_EDIT_OPERATION, $tblOper, $footer));
 		}
@@ -1236,8 +1236,8 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			$tblCond->addRow($rowCondition);
 
 			$footer = array(
-				new CButton('add_opcondition', S_ADD),
-				new CButton('cancel_new_opcondition', S_CANCEL)
+				new CSubmit('add_opcondition', S_ADD),
+				new CSubmit('cancel_new_opcondition', S_CANCEL)
 			);
 			$right_tab->addRow(new CFormElement(S_NEW.SPACE.S_OPERATION_CONDITION, $tblCond, $footer));
 		}
@@ -1361,7 +1361,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		$goOption->setAttribute('confirm',S_DELETE.' '.S_SELECTED_ACTIONS);
 		$goBox->addItem($goOption);
 
-		$goButton = new CButton('goButton',S_GO);
+		$goButton = new CSubmit('goButton',S_GO);
 		$goButton->setAttribute('id','goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "g_actionid";');
 

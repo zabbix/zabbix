@@ -52,13 +52,13 @@ class CDHost extends CZBXAPI{
  * @param boolean $options['with_graphs'] only with graphs
  * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
  * @param int $options['extendoutput'] return all fields for Hosts
- * @param boolean $options['select_groups'] select HostGroups
+ * @param boolean $options['selectGroups'] select HostGroups
  * @param boolean $options['select_templates'] select Templates
- * @param boolean $options['select_items'] select Items
+ * @param boolean $options['selectItems'] select Items
  * @param boolean $options['select_triggers'] select Triggers
  * @param boolean $options['select_graphs'] select Graphs
  * @param boolean $options['select_applications'] select Applications
- * @param boolean $options['select_macros'] select Macros
+ * @param boolean $options['selectMacros'] select Macros
  * @param boolean $options['select_profile'] select Profile
  * @param int $options['count'] count Hosts, returned column name is rowscount
  * @param string $options['pattern'] search hosts by pattern in Host name
@@ -483,7 +483,7 @@ Copt::memoryPick();
 			}
 		}
 
-// TODO :select_groups
+// TODO :selectGroups
 		if(!is_null($options['selectGroups']) && str_in_array($options['selectGroups'], $subselects_allowed_outputs)){
 			$obj_params = array(
 					'nodeids' => $nodeids,
@@ -502,7 +502,7 @@ Copt::memoryPick();
 			}
 		}
 
-// select_hosts
+// selectHosts
 		if(!is_null($options['selectHosts'])){
 			$obj_params = array(
 				'nodeids' => $nodeids,

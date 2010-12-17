@@ -90,8 +90,15 @@ function set_zbx_locales(){
  * @param string $language in format 'ru_RU', 'en_EN' and so on
  * @return array a list of possible locale names
  */
-function zbx_locale_variants($language)
-{
+function zbx_locale_variants($language){
+	if(stristr($_SERVER['SERVER_SOFTWARE'], 'win32') !== false)
+		$result = zbx_locale_variants_win($language);
+	else
+		$result = zbx_locale_variants_unix($language);
+return $result;
+}
+
+function zbx_locale_variants_unix($language){
 	$postfixes = array(
 		'',
 		'.utf8',
@@ -136,6 +143,71 @@ function zbx_locale_variants($language)
 	foreach($postfixes as $postfix){
 		$result[] = $language.$postfix;
 	}
-	return $result;
+return $result;
+}
+
+function zbx_locale_variants_win($language){
+// windows locales are written like language[_country][.charset]
+	$winLanguageName = array(
+		'en_gb'=>  'english',
+		'zh_cn'=>  'chinese',
+		'cs_cz'=>  'czech',
+		'nl_nl'=>  'dutch',
+		'fr_fr'=>  'french',
+		'de_de'=>  'german',
+		'hu_hu'=>  'hungarian',
+		'it_it'=>  'italian',
+		'ko_kr'=>  'korean',
+		'ja_jp'=>  'japanese',
+		'lv_lv'=>  'latvian',
+		'pl_pl'=>  'polish',
+		'pt_br'=>  'portuguese',
+		'ru_ru'=>  'russian',
+		'es_es'=>  'spanish',
+		'sv_se'=>  'swedish',
+		'uk_ua'=>  'ukrainian'
+	);
+
+	$winCountries = array(
+// most common
+		'united states', 'us',
+		'united kingdom', 'england',
+
+// abc
+		'america', 'australia', 'austria',
+		'belgium', 'brazil',
+		'czech', 'canada', 'china',
+		'denmark',	
+		'finland', 'france',
+		'germany', 'great britain', 'greece',
+		'hong kong',
+		'ireland', 'italy',
+		'japan',
+		'korea',
+		'latvia',
+		'mexico',
+		'netherlands', 'norway',
+		'poland', 'portugal',
+		'russia',
+		'slovak', 'spain', 'sweden', 'switzerland',
+		'taiwan',
+		'usa',
+	);
+
+	$winCodepages = array(
+// common
+		'utf8', 'UTF-8', '1252', '1251', '1250',
+		'932', '936',
+// other
+		'1253','1254','1255','1256','1257','1258','874','936','949', '950', 
+	);
+
+	$winLang = $winLanguageName[strtolower($language)];
+
+	$result = array();
+	foreach($winCountries as $country){
+		foreach($winCodepages as $codepage) $result[] = $winLang.'_'.$country.'.'.$codepage;
+	}
+return $result;
 }
 ?>

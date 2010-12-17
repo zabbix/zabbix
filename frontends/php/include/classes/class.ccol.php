@@ -24,7 +24,7 @@ class CCol extends CTag{
 		parent::__construct('td','yes');
 
 		$this->addItem($item);
-		$this->setClass($class);
+		$this->setAttribute('class', $class);
 	}
 
 	public function setAlign($value){

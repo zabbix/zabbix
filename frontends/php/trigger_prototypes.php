@@ -108,10 +108,9 @@ include_once('include/page_header.php');
 		$options = array(
 			'itemids' => $_REQUEST['parent_discoveryid'],
 			'output' => API_OUTPUT_EXTEND,
-			'filter' => array('flags' => ZBX_FLAG_DISCOVERY),
 			'editable' => 1
 		);
-		$discovery_rule = CItem::get($options);
+		$discovery_rule = CDiscoveryRule::get($options);
 		$discovery_rule = reset($discovery_rule);
 		if(!$discovery_rule) access_deny();
 		$_REQUEST['hostid'] = $discovery_rule['hostid'];
@@ -121,9 +120,8 @@ include_once('include/page_header.php');
 	}
 ?>
 <?php
-
 	$showdisabled = get_request('showdisabled', 0);
-	CProfile::update('web.triggers.showdisabled',$showdisabled,PROFILE_TYPE_INT);
+	CProfile::update('web.triggers.showdisabled', $showdisabled, PROFILE_TYPE_INT);
 
 // EXPRESSION ACTIONS
 	if(isset($_REQUEST['add_expression'])){
@@ -149,73 +147,35 @@ include_once('include/page_header.php');
 		$_REQUEST['form'] = 'clone';
 	}
 	else if(isset($_REQUEST['save'])){
-		show_messages();
-
-		if(!check_right_on_trigger_by_expression(PERM_READ_WRITE, $_REQUEST['expression']))
-			access_deny();
-
-		$status = isset($_REQUEST['status'])?TRIGGER_STATUS_DISABLED:TRIGGER_STATUS_ENABLED;
-
-		$type = $_REQUEST['type'];
-
-		$deps = get_request('dependencies',array());
+		$trigger = array(
+			'expression' => $_REQUEST['expression'],
+			'description' => $_REQUEST['description'],
+			'type' => $_REQUEST['type'],
+			'priority' => $_REQUEST['priority'],
+			'status' => isset($_REQUEST['status']) ? TRIGGER_STATUS_DISABLED : TRIGGER_STATUS_ENABLED,
+			'comments' => $_REQUEST['comments'],
+			'url' => $_REQUEST['url'],
+			'flags' => ZBX_FLAG_DISCOVERY_CHILD,
+		);
 
 		if(isset($_REQUEST['triggerid'])){
-			$triggerData = get_trigger_by_triggerid($_REQUEST['triggerid']);
-			if($triggerData['templateid']){
-				$_REQUEST['description'] = $triggerData['description'];
-				$_REQUEST['expression'] = explode_exp($triggerData['expression'],0);
-			}
-
-			DBstart();
-
-			$result = update_trigger($_REQUEST['triggerid'],
-				$_REQUEST['expression'],$_REQUEST['description'],$type,
-				$_REQUEST['priority'],$status,$_REQUEST['comments'],$_REQUEST['url'],
-				$deps, $triggerData['templateid'], ZBX_FLAG_DISCOVERY_CHILD);
-			$result = DBend($result);
-
-			$triggerid = $_REQUEST['triggerid'];
+			$trigger['triggerid'] = $_REQUEST['triggerid'];
+			$result = CTriggerPrototype::update($trigger);
 
 			show_messages($result, S_TRIGGER_UPDATED, S_CANNOT_UPDATE_TRIGGER);
 		}
 		else{
-			DBstart();
-			$triggerid = add_trigger($_REQUEST['expression'],$_REQUEST['description'],$type,
-				$_REQUEST['priority'],$status,$_REQUEST['comments'],$_REQUEST['url'],
-				$deps, 0, ZBX_FLAG_DISCOVERY_CHILD);
-			$result = DBend($triggerid);
+			$result = CTriggerPrototype::create($trigger);
+
 			show_messages($result, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
-			if($result) $_REQUEST['triggerid'] = $triggerid;
 		}
 		if($result)
 			unset($_REQUEST['form']);
 	}
-	else if(isset($_REQUEST['delete'])&&isset($_REQUEST['triggerid'])){
-		$result = false;
-
-		$options = array(
-			'triggerids'=> $_REQUEST['triggerid'],
-			'filter' => array('flags' => null),
-			'editable'=> 1,
-			'select_hosts'=> API_OUTPUT_EXTEND,
-			'output'=> API_OUTPUT_EXTEND,
-		);
-		$triggers = CTrigger::get($options);
-
-		if($triggerData = reset($triggers)){
-			$host = reset($triggerData['hosts']);
-
-			DBstart();
-			$result = CTrigger::delete($triggerData['triggerid']);
-			$result = DBend($result);
-			if($result){
-				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $_REQUEST['triggerid'], $host['host'].':'.$triggerData['description'], NULL, NULL, NULL);
-			}
-		}
+	else if(isset($_REQUEST['delete']) && isset($_REQUEST['triggerid'])){
+		$result = CTriggerPrototype::delete($_REQUEST['triggerid']);
 
 		show_messages($result, S_TRIGGER_DELETED, S_CANNOT_DELETE_TRIGGER);
-
 		if($result){
 			unset($_REQUEST['form']);
 			unset($_REQUEST['triggerid']);
@@ -223,46 +183,26 @@ include_once('include/page_header.php');
 	}
 // ------- GO ---------
 	else if(($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['mass_save']) && isset($_REQUEST['g_triggerid'])){
-		show_messages();
+		$visible = get_request('visible');
 
-		$result = false;
-
-		$visible = get_request('visible',array());
-		$_REQUEST['dependencies'] = get_request('dependencies',array());
-
-		$options = array(
-			'triggerids' => $_REQUEST['g_triggerid'],
-			'select_dependencies' => 1,
-			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
-			'output' => API_OUTPUT_EXTEND,
-			'editable' => 1
-		);
-		$triggers = CTrigger::get($options);
-
-		DBstart();
-		foreach($triggers as $tnum => $db_trig){
-			foreach($db_trig as $key => $value){
-				if(isset($visible[$key])){
-					$db_trig[$key] = $_REQUEST[$key];
-				}
+		if(isset($visible['priority'])){
+			$priority = get_request('priority');
+			foreach($_REQUEST['g_triggerid'] as $triggerid){
+				$result = CTriggerPrototype::update(array(
+					'triggerid' => $triggerid,
+					'priority' => $priority,
+				));
+				if(!$result) break;
 			}
-
-			$result = update_trigger($db_trig['triggerid'],
-				null,null,null,
-				$db_trig['priority'],null,null,null,
-				$db_trig['dependencies'],null);
-
-			if(!$result) break;
 		}
-		$result = DBend($result);
+		else{
+			$result = true;
+		}
 
 		show_messages($result, S_TRIGGER_UPDATED, S_CANNOT_UPDATE_TRIGGER);
 		if($result){
 			unset($_REQUEST['massupdate']);
 			unset($_REQUEST['form']);
-			$url = new CUrl();
-			$path = $url->getPath();
-			insert_js('cookie.eraseArray("'.$path.'")');
 		}
 
 		$go_result = $result;
@@ -274,7 +214,7 @@ include_once('include/page_header.php');
 			'editable' => 1,
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
 			'output' => API_OUTPUT_EXTEND,
-			'select_hosts' => API_OUTPUT_EXTEND
+			'selectHosts' => API_OUTPUT_EXTEND
 		);
 
 		$triggers = CTrigger::get($options);
@@ -315,36 +255,7 @@ include_once('include/page_header.php');
 		show_messages($go_result, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
 	}
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['g_triggerid'])){
-		DBstart();
-
-		$triggerids = array();
-		$options = array(
-			'triggerids' => $_REQUEST['g_triggerid'],
-			'editable'=>1,
-			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
-			'select_hosts' => API_OUTPUT_EXTEND,
-			'output'=>API_OUTPUT_EXTEND,
-			'expandDescription' => 1
-		);
-		$triggers = CTrigger::get($options);
-
-		foreach($triggers as $tnum => $trigger){
-			if($trigger['templateid'] != 0){
-				unset($triggers[$tnum]);
-				error(S_CANNOT_DELETE_TRIGGER.' [ '.$trigger['description'].' ] ('.S_TEMPLATED_TRIGGER.')');
-				continue;
-			}
-
-			$triggerids[] = $trigger['triggerid'];
-			$host = reset($trigger['hosts']);
-
-			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $trigger['triggerid'], $host['host'].':'.$trigger['description'], NULL, NULL, NULL);
-		}
-
-		$go_result = !empty($triggerids);
-		if($go_result) $go_result = CTrigger::delete($triggerids);
-
-		$go_result = DBend($go_result);
+		$go_result = CTriggerPrototype::delete($_REQUEST['g_triggerid']);
 		show_messages($go_result, S_TRIGGERS_DELETED, S_CANNOT_DELETE_TRIGGERS);
 	}
 
@@ -364,7 +275,7 @@ include_once('include/page_header.php');
 
 // Config
 	if(!isset($_REQUEST['form'])){
-		$form->addItem(new CButton('form', S_CREATE_TRIGGER));
+		$form->addItem(new CSubmit('form', S_CREATE_TRIGGER));
 	}
 
 	$triggers_wdgt->addPageHeader(S_CONFIGURATION_OF_TRIGGERS_PROTOTYPES_BIG, $form);
@@ -420,8 +331,8 @@ include_once('include/page_header.php');
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 			'output' => API_OUTPUT_EXTEND,
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
-			'select_hosts' => API_OUTPUT_EXTEND,
-			'select_items' => API_OUTPUT_EXTEND,
+			'selectHosts' => API_OUTPUT_EXTEND,
+			'selectItems' => API_OUTPUT_EXTEND,
 			'select_functions' => API_OUTPUT_EXTEND,
 		);
 		$triggers = CTrigger::get($options);
@@ -517,7 +428,7 @@ include_once('include/page_header.php');
 		$goOption->setAttribute('confirm',S_DELETE_SELECTED_TRIGGERS_Q);
 		$goBox->addItem($goOption);
 
-		$goButton = new CButton('goButton',S_GO);
+		$goButton = new CSubmit('goButton',S_GO);
 		$goButton->setAttribute('id','goButton');
 
 		zbx_add_post_js('chkbxRange.pageGoName = "g_triggerid";');

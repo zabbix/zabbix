@@ -320,17 +320,19 @@ sdii($screens_to_check);
 
 // item
 			$item_options = array(
-								'nodeids' => $nodeids,
-								'itemids' => $items_to_check,
-								'webitems' => 1,
-								'editable' => $options['editable']);
+				'nodeids' => $nodeids,
+				'itemids' => $items_to_check,
+				'webitems' => 1,
+				'editable' => $options['editable']
+			);
 			$allowed_items = CItem::get($item_options);
 			$allowed_items = zbx_objectValues($allowed_items, 'itemid');
 // map
 			$map_options = array(
-								'nodeids' => $nodeids,
-								'sysmapids' => $maps_to_check,
-								'editable' => $options['editable']);
+				'nodeids' => $nodeids,
+				'sysmapids' => $maps_to_check,
+				'editable' => $options['editable']
+			);
 			$allowed_maps = CMap::get($map_options);
 			$allowed_maps = zbx_objectValues($allowed_maps, 'sysmapid');
 // screen
@@ -760,10 +762,10 @@ SDI('/////////////////////////////////');
 				if(!isset($del_screens[$screenid])) self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 			}
 
-			DB::delete('screens_items', DBcondition('screenid', $screenids));
-			DB::delete('screens_items', array(DBcondition('resourceid', $screenids), 'resourcetype='.SCREEN_RESOURCE_SCREEN));
-			DB::delete('slides', DBcondition('screenid', $screenids));
-			DB::delete('screens', DBcondition('screenid', $screenids));
+			DB::delete('screens_items', array('screenid'=>$screenids));
+			DB::delete('screens_items', array('resourceid'=>$screenids, 'resourcetype'=>SCREEN_RESOURCE_SCREEN));
+			DB::delete('slides', array('screenid'=>$screenids));
+			DB::delete('screens', array('screenid'=>$screenids));
 
 			self::EndTransaction(true, __METHOD__);
 			return array('screenids' => $screenids);
@@ -885,7 +887,7 @@ SDI('/////////////////////////////////');
 
 		if(!empty($insert)) DB::insert('screens_items', $insert);
 		if(!empty($update)) DB::update('screens_items', $update);
-		if(!empty($delete)) DB::delete('screens_items', DBcondition('screenitemid', $delete));
+		if(!empty($delete)) DB::delete('screens_items', array('screenitemid'=>$delete));
 
 	return true;
 	}
