@@ -52,20 +52,28 @@ static void	count_sensor(int do_task, const char *filename, double *aggr, int *c
 
 		switch (do_task)
 		{
-			case DO_ONE:	*aggr = value;						break;
-			case DO_AVG:	*aggr += value;						break;
-			case DO_MAX:	*aggr = (1 == *cnt ? value : MAX(*aggr, value));	break;
-			case DO_MIN:	*aggr = (1 == *cnt ? value : MIN(*aggr, value));	break;
+			case DO_ONE:
+				*aggr = value;
+				break;
+			case DO_AVG:
+				*aggr += value;
+				break;
+			case DO_MAX:
+				*aggr = (1 == *cnt ? value : MAX(*aggr, value));
+				break;
+			case DO_MIN:
+				*aggr = (1 == *cnt ? value : MIN(*aggr, value));
+				break;
 		}
 	}
 }
 
 static void	get_device_sensors(int do_task, const char *device, const char *name, double *aggr, int *cnt)
 {
+	char	sensorname[MAX_STRING_LEN];
+
 	if (DO_ONE == do_task)
 	{
-		char	sensorname[MAX_STRING_LEN];
-
 		zbx_snprintf(sensorname, sizeof(sensorname), "%s/%s/%s", DEVICE_DIR, device, name);
 		count_sensor(do_task, sensorname, aggr, cnt);
 	}
@@ -74,10 +82,9 @@ static void	get_device_sensors(int do_task, const char *device, const char *name
 		DIR		*devicedir = NULL, *sensordir = NULL;
 		struct dirent	*deviceent, *sensorent;
 		char		devicename[MAX_STRING_LEN];
-		char		sensorname[MAX_STRING_LEN];
 
 		if (NULL == (devicedir = opendir(DEVICE_DIR)))
-			goto deviceclean;
+			return;
 
 		while (NULL != (deviceent = readdir(devicedir)))
 		{
@@ -90,7 +97,7 @@ static void	get_device_sensors(int do_task, const char *device, const char *name
 			zbx_snprintf(devicename, sizeof(devicename), "%s/%s", DEVICE_DIR, deviceent->d_name);
 
 			if (NULL == (sensordir = opendir(devicename)))
-				goto sensorclean;
+				continue;
 
 			while (NULL != (sensorent = readdir(sensordir)))
 			{
@@ -103,17 +110,15 @@ static void	get_device_sensors(int do_task, const char *device, const char *name
 				zbx_snprintf(sensorname, sizeof(sensorname), "%s/%s", devicename, sensorent->d_name);
 				count_sensor(do_task, sensorname, aggr, cnt);
 			}
-sensorclean:
 			closedir(sensordir);
 		}
-deviceclean:
 		closedir(devicedir);
 	}
 }
 
 int	GET_SENSOR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char	device[MAX_STRING_LEN], name[MAX_STRING_LEN], function[MAX_STRING_LEN];
+	char	device[MAX_STRING_LEN], name[MAX_STRING_LEN], function[8];
 	int	do_task, cnt = 0;
 	double	aggr = 0;
 

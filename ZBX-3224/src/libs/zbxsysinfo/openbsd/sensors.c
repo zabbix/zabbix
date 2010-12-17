@@ -123,7 +123,7 @@ static int	get_device_sensors(int do_task, int *mib, const struct sensordev *sen
 
 int	GET_SENSOR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char	device[MAX_STRING_LEN], name[MAX_STRING_LEN], function[MAX_STRING_LEN];
+	char	device[MAX_STRING_LEN], name[MAX_STRING_LEN], function[8];
 	int	do_task, mib[5], dev, cnt = 0;
 	double	aggr = 0;
 
