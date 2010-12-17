@@ -23,7 +23,7 @@ global $DB;
 $DB["TYPE"]		= "MYSQL";
 $DB["SERVER"]		= "localhost";
 $DB["PORT"]		= "0";
-$DB["DATABASE"]		= "test";
+$DB["DATABASE"]		= "{DBNAME}";
 $DB["USER"]		= "root";
 $DB["PASSWORD"]		= "";
 
