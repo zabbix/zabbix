@@ -77,24 +77,28 @@ ALTER TABLE items DROP COLUMN snmp_port;
 UPDATE items
 	SET interfaceid=(SELECT interfaceid FROM interface WHERE hostid=items.hostid AND main=1 AND type=1)
 	WHERE EXISTS (SELECT hostid FROM hosts WHERE hosts.hostid=items.hostid AND hosts.status IN (0,1))
-		AND type IN (0, 3, 10, 11, 13, 14);     -- Agent, Simple, External, Database, SSH, TELNET
+		AND type IN (0,3,10,11,13,14)	-- ZABBIX, SIMPLE, EXTERNAL, DB_MONITOR, SSH, TELNET
+/
 
 -- host interface for SNMP and non templated items
 UPDATE items
 	SET interfaceid=(SELECT interfaceid FROM interface WHERE hostid=items.hostid AND main=1 AND type=2)
 	WHERE EXISTS (SELECT hostid FROM hosts WHERE hosts.hostid=items.hostid AND hosts.status IN (0,1))
-		AND type IN (1,4,6);
+		AND type IN (1,4,6)		-- SNMPv1, SNMPv2c, SNMPv3
+/
 
 -- host interface for IPMI and non templated items
 UPDATE items
 	SET interfaceid=(SELECT interfaceid FROM interface WHERE hostid=items.hostid AND main=1 AND type=3)
 	WHERE EXISTS (SELECT hostid FROM hosts WHERE hosts.hostid=items.hostid AND hosts.status IN (0,1))
-		AND type IN (12);
+		AND type IN (12)		-- IPMI
+/
 
 -- clear port number for non SNMP items
 UPDATE items
 	SET port=''
-	WHERE type NOT IN (1,4,6);
+	WHERE type NOT IN (1,4,6)		-- SNMPv1, SNMPv2c, SNMPv3
+/
 
 ALTER TABLE hosts MODIFY hostid DEFAULT NULL;
 ALTER TABLE hosts MODIFY proxy_hostid DEFAULT NULL;
