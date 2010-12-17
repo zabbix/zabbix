@@ -8,7 +8,7 @@ $DB["PORT"]				= '0';
 $DB["DATABASE"]			= 'zabbix';
 $DB["USER"]				= 'zabbix';
 $DB["PASSWORD"]			= 'zabbix_password';
-// SCHEMA is actual only for IBM_DB2 database
+// SCHEMA is relevant only for IBM_DB2 database
 $DB["SCHEMA"]			= '';
 
 $ZBX_SERVER				= 'localhost';

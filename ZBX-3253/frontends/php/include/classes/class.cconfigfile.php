@@ -104,7 +104,7 @@ $DB["PORT"]				= \''.$this->config['DB']['PORT'].'\';
 $DB["DATABASE"]			= \''.$this->config['DB']['DATABASE'].'\';
 $DB["USER"]				= \''.$this->config['DB']['USER'].'\';
 $DB["PASSWORD"]			= \''.$this->config['DB']['PASSWORD'].'\';
-// SCHEMA is actual only for IBM_DB2 database
+// SCHEMA is relevant only for IBM_DB2 database
 $DB["SCHEMA"]			= \''.$this->config['DB']['SCHEMA'].'\';
 
 $ZBX_SERVER				= \''.$this->config['ZBX_SERVER'].'\';
