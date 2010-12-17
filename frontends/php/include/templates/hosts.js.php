@@ -3,7 +3,7 @@
 <tr id="hostInterfaceRow_#{interfaceid}">
 <td>
 	<input type="hidden" name="interfaces[#{interfaceid}][new]" value="#{newValue}" />
-	<input type="hidden" name="interfaces[#{interfaceid}][interfaceid]" value="#{interfaceid}" />
+	<input type="hidden" id="interface_id_#{interfaceid}" name="interfaces[#{interfaceid}][interfaceid]" value="#{interfaceid}" />
 	<input class="input" id="interface_ip_#{interfaceid}" name="interfaces[#{interfaceid}][ip]" type="text" size="24" value="#{ip}" />
 </td>
 <td>
@@ -53,7 +53,12 @@ function addInterfaceRow(hostInterface){
 	else hostInterface.newValue = hostInterface["new"];
 
 	if(!isset("interfaceid", hostInterface)){
-		hostInterface.interfaceid = $("hostInterfaces").select("tr[id^=hostInterfaceRow]").length;
+
+		hostInterface.interfaceid = jQuery("#hostInterfaces tr[id^=hostInterfaceRow]").length;
+		while(jQuery("#interface_id_"+hostInterface.interfaceid).length){
+			hostInterface.interfaceid++;
+		}
+
 		hostInterface.newValue = "create";
 	}
 
@@ -63,13 +68,13 @@ function addInterfaceRow(hostInterface){
 	}
 
 	if(!isset("ip", hostInterface) && !isset("dns", hostInterface)){
-		if(jQuery("#hostInterfaces").find("input[type=radio]:checked").first().val() == "0"){
+		if(jQuery("#hostInterfaces input[type=radio]:checked").first().val() == "0"){
 			hostInterface.useip = 0;
-			hostInterface.dns = jQuery("#hostInterfaces").find("input[id^=interface_dns]").first().val();
+			hostInterface.dns = jQuery("#hostInterfaces input[id^=interface_dns]").first().val();
 		}
 		else{
 			hostInterface.useip = 1;
-			hostInterface.ip = jQuery("#hostInterfaces").find("input[id^=interface_ip]").first().val();
+			hostInterface.ip = jQuery("#hostInterfaces input[id^=interface_ip]").first().val();
 		}
 	}
 
