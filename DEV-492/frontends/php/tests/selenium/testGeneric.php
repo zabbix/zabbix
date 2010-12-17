@@ -44,7 +44,8 @@ class testGeneric extends PHPUnit_Extensions_SeleniumTestCase
 		"PHP warning",
 		"Use of undefined",
 		"You must login",
-		"DEBUG INFO"
+		"DEBUG INFO",
+		"Cannot modify header"
 	);
 
 	// List of strings that SHOULD appear on every page

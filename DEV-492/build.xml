@@ -1,10 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="Zabbix" default="build" basedir=".">
 	<property name="basedir" value="${WORKSPACE}"/>
+	<property name="builddir" value="${BUILDDIR}"/>
+	<property name="svn" value="${SVN}"/>
+	<property name="dbtype" value="${DBTYPE}"/>
 
 	<target name="init">
 		<!-- Create the different build directories -->
 		<mkdir dir="${basedir}/build/logs" />
+		<mkdir dir="${builddir}" />
+		<exec executable="svn" dir="${basedir}/frontends/php/tests" failonerror="on">
+			<arg line="checkout ${svn} ${builddir}
+			" />
+		</exec>
+		<exec executable="./bootstrap.sh" dir="${builddir}" failonerror="on"></exec>
+		<exec executable="./configure" dir="${builddir}" failonerror="on"></exec>
+		<exec executable="make" dir="${builddir}" failonerror="on">
+			<arg line="dbschema
+			" />
+		</exec>
+		<exec executable="mysql" dir="${builddir}/create/schema" failonerror="on">
+			<arg line="-uroot
+			-e 'drop database if exists test;'
+			" />
+		</exec>
+		<exec executable="mysql" dir="${builddir}/create/schema" failonerror="on">
+			<arg line="-uroot
+			-e 'create database test;'
+			" />
+		</exec>
+		<exec executable="mysql" dir="${builddir}/create/schema" input="${builddir}/create/schema/mysql.sql" failonerror="on">
+			<arg line="-uroot
+			test
+			" />
+		</exec>
+		<exec executable="mysql" dir="${builddir}/create/schema" input="${builddir}/create/data/images_mysql.sql" failonerror="on">
+			<arg line="-uroot
+			test
+			" />
+		</exec>
+		<exec executable="mysql" dir="${builddir}/create/schema" input="${builddir}/create/data/data.sql" failonerror="on">
+			<arg line="-uroot
+			test
+			" />
+		</exec>
+		<exec executable="cp" failonerror="on">
+			<arg line="-f ${builddir}/tests/templates/zabbix.conf.php.mysql ${builddir}/frontends/php/conf/zabbix.conf.php
+			" />
+		</exec>
 	</target>
 
 	<target name="clean">
@@ -18,7 +61,7 @@
 	<target name="build" depends="init,gui" />
 
 	<target name="gui">
-		<exec executable="phpunit" dir="${basedir}/frontends/php/tests" failonerror="off">
+		<exec executable="phpunit" dir="${basedir}/frontends/php/tests" failonerror="on">
 			<arg line="--log-xml=${basedir}/build/logs/phpunit.xml
 			all.php
 			" />
