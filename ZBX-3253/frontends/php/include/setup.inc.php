@@ -510,7 +510,6 @@ JS;
 						'ZBX_SERVER_PORT' => $this->getConfig('ZBX_SERVER_PORT'),
 						'ZBX_SERVER_NAME' => $this->getConfig('ZBX_SERVER_NAME'),
 					);
-					$config->getString();
 					die($config->getString());
 				}
 			}

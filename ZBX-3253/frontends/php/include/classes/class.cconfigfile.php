@@ -69,8 +69,8 @@ class CConfigFile{
 		global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT, $ZBX_SERVER_NAME;
 
 		$DB = $this->config['DB'];
-		$ZBX_SERVER = $this->config['ZBX_SERVER'];;
-		$ZBX_SERVER_PORT = $this->config['ZBX_SERVER_PORT'];;
+		$ZBX_SERVER = $this->config['ZBX_SERVER'];
+		$ZBX_SERVER_PORT = $this->config['ZBX_SERVER_PORT'];
 		$ZBX_SERVER_NAME = $this->config['ZBX_SERVER_NAME'];
 	}
 
@@ -83,7 +83,7 @@ class CConfigFile{
 			$this->check();
 
 			if(!file_put_contents($this->configFile, $this->getString())){
-				self::exception('Cannot write config file;');
+				self::exception('Cannot write config file.');
 			}
 		}
 		catch(Exception $e){
